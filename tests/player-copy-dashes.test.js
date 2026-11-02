@@ -6,7 +6,9 @@
  *   - a lone "—" standing for an empty value (garden.js plotStatusLabel);
  *   - Tiny Speck's own text, kept word for word: SOURCE_VERBATIM below names
  *     the file each one comes from, and the source check proves it;
- *   - item catalog pages, which print the GSJS item description.
+ *   - item catalog pages, which print the GSJS item description, and
+ *     encyclopedia pages, which print Tiny Speck's quest, achievement and
+ *     skill text word for word (checked against assets/content).
  * The changelog notes keep their archived text (tests/changelog.test.js).
  */
 import { describe, it } from 'node:test';
@@ -133,11 +135,29 @@ describe('em-dashes in player-facing copy (G215)', () => {
         const outside = text.replace(/<meta name="description"[^>]*>/, '').replace(desc, '');
         if (!DASH.test(outside) && (!existsSync(GS) || readFileSync(join(GS, 'items', `${item}.js`), 'utf8').includes(desc.replace(/&#39;/g, '\'').replace(/&quot;/g, '"').replace(/&amp;/g, '&')))) continue;
       }
+      // Encyclopedia pages print Tiny Speck's quest, achievement and skill text (tools/encyclopedia/build.mjs)
+      // in .cat-desc and .ency-talk blocks; a dash may stand only there, and only where their data has it.
+      if (/^encyclopedia\//.test(path) && encyclopediaDashesAreSource(text)) continue;
       stray.push(path);
     }
     assert.deepEqual(stray, []);
   });
 });
+
+let sourceText = null;
+function encyclopediaDashesAreSource(text) {
+  sourceText ??= ['quests.json', 'achievements.json', 'skills.json'].map((f) => readFileSync(join(pub, 'assets', 'content', f), 'utf8')).join('\n');
+  const blocks = [...text.matchAll(/<div class="(?:cat-desc|ency-talk)">([\s\S]*?)<\/div>/g)].map((m) => m[1]);
+  const outside = blocks.reduce((t, b) => t.replace(b, ''), text.replace(/<meta name="description"[^>]*>/, ''));
+  if (DASH.test(outside)) return false;
+  const plain = (s) => s.replace(/<[^>]*>/g, '\n').replace(/&#39;/g, '\'').replace(/&quot;/g, '\\"').replace(/&amp;/g, '&');
+  for (const b of blocks) {
+    for (const m of plain(b).matchAll(/([^\n]{0,12})—([^\n]{0,12})/g)) {
+      if (!sourceText.includes(`${m[1]}—${m[2]}`)) return false;
+    }
+  }
+  return true;
+}
 
 describe('the lines G215 reworded', () => {
   it('making uses the source result line and a colon before the recipe name', async () => {
