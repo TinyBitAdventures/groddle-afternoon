@@ -56,7 +56,7 @@
 import { performPlotVerb, plotArtPath, plotLabel, plotStatusLabel, plotVerbs } from '../patches.js?v=1bf0dd8e';
 import { trantStatusLabel } from '../trants.js?v=9c2e8c0f';
 import { woodTreeStatusLabel } from '../woodcutting.js?v=38730935';
-import { animalStatusLabel } from '../animals.js?v=24533b10';
+import { animalAnchorX, animalStatusLabel } from '../animals.js?v=926d8898';
 import { frameTexture, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js?v=db2ce452';
 import { homeStreetLayout, normalizeCultivationState } from '../home-cultivation.js?v=1cfff492';
 import { readVisitScene } from '../neighbours-mp.js?v=a8d5544e';
@@ -78,13 +78,13 @@ import {
   treeSnapshot,
   visitorAnimalState,
   visitorTreeState,
-} from '../yard-verbs-mp.js?v=95826528';
+} from '../yard-verbs-mp.js?v=d979fde6';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
 import { countItem, removeItem } from '../inventory.js?v=b0e33301';
 import { ROCK_CATALOG, rockStatusLabel, tickMineRock } from '../mining.js?v=4806e3e8';
 import { getResourceNodeDef, regrowDelayMs } from '../resource-nodes.js?v=4f48fd75';
 import { getGameDayKey } from '../game-day.js?v=edb00566';
-import { rockReady } from '../street-objects.js?v=fdb9ea3a';
+import { rockReady } from '../street-objects.js?v=2b27b69a';
 import { resourceNodesFeature } from './resource-nodes-feature.js?v=6c7b2c40';
 import {
   ROCK_RESPAWN_MS,
@@ -240,7 +240,8 @@ function createSession(engine, client) {
       : classId === 'npc_chicken' ? (t.chickenWalk?.frames || []).slice(0, 6) : (t.butterfly?.frames || []).slice(0, 14);
     const spr = new PIXI.AnimatedSprite(frames.length ? frames : [PIXI.Texture.EMPTY]);
     const scale = classId === 'npc_piggy' ? 0.97 : 0.7;
-    spr.anchor.set(0.5, classId === 'npc_butterfly' ? 0.5 : 1);
+    // Under the animal, so it turns on the spot (js/animals.js ANIMAL_ANCHOR_X).
+    spr.anchor.set(animalAnchorX(classId), classId === 'npc_butterfly' ? 0.5 : 1);
     spr.baseScale = scale;
     spr.scale.set(scale);
     spr.animationSpeed = classId === 'npc_butterfly' ? 0.25 : 0.13;

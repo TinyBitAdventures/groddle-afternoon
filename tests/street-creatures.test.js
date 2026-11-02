@@ -17,6 +17,12 @@ import {
   batterflyAt,
   batterflyPerks,
   batterflyResponseFor,
+  CHICKEN_PAUSE,
+  CHICKEN_PLAN_PAUSES,
+  chickenPauseRoll,
+  chickenPlan,
+  chickenSeed,
+  chickenWalkAt,
   clockOffset,
   creatureOf,
   easeToward,
@@ -29,10 +35,10 @@ import {
   restAt,
   sharedCreatureLabel,
   walkerAt,
-} from '../public/js/street-creatures.js?v=144ebb1e';
-import { createStreetCopy, idKind, reconcile, takeObjs } from '../public/js/street-objects.js?v=fdb9ea3a';
-import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=ddf0cba9';
-import { FEATURES } from '../public/js/features/index.js?v=d8ec9500';
+} from '../public/js/street-creatures.js?v=5e81d288';
+import { createStreetCopy, idKind, reconcile, takeObjs } from '../public/js/street-objects.js?v=2b27b69a';
+import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=7ee20ef7';
+import { FEATURES } from '../public/js/features/index.js?v=b7df291e';
 import { GAME_EPOCH_MS } from '../public/js/game-day.js?v=edb00566';
 import { creatureRequests, setCreatureEcology, streetObjectLayout } from '../tools/build-realtime-objects.mjs';
 import { STREET_INDEX, applyStreetIndex, loadStreetDataFromFs } from '../public/js/street-loader.js?v=33d2b8bc';
@@ -146,6 +152,129 @@ describe('street animals: the shared paths', () => {
     assert.ok(Math.abs(easeToward(0, 10, 1) - 1.2) < 1e-9);
     assert.equal(easeToward(0, SNAP_PX + 1, 1), SNAP_PX + 1);
     assert.equal(easeToward(5, 5.1, 1), 5.1);
+  });
+});
+
+describe('street animals: a Chicken\'s walk, turns and pauses (lane CHICKWALK)', () => {
+  // Austin 2026-11-01: "They move left and then snap back to the middle walking right. They never
+  // turn around from the left and walk to the right."
+  const homes = [
+    { baseX: 1000, range: 100, dir: 1 },
+    { baseX: 1000, range: 100, dir: -1 },
+    { baseX: 2500, range: 30, dir: 1 },
+  ];
+  const run = (home, seed, from, ms, fn) => {
+    let prev = null;
+    for (let t = from; t <= from + ms; t += 1000 / 60) {
+      const p = chickenWalkAt(home, t, seed);
+      fn(p, prev, t);
+      prev = p;
+    }
+  };
+
+  it('the original\'s pauses: every 6-14 s, 2-4 s standing or pecking, turning round half the time', () => {
+    assert.deepEqual([...CHICKEN_PAUSE.everyMs], [6000, 14000]);
+    assert.deepEqual(CHICKEN_PAUSE.choices.map(([ms, pose]) => `${ms / 1000}${pose}`), ['4stand', '4stand', '4stand', '4stand', '4stand', '4stand', '3peck', '2peck']);
+    const rng = (() => { let k = 0; const v = [0, 0.4, 0, 0.99, 0.6, 0.999999]; return () => v[k++ % v.length]; })();
+    assert.deepEqual(chickenPauseRoll(rng), { holdMs: 4000, pose: 'stand', turn: true, nextMs: 6000 });
+    assert.deepEqual(chickenPauseRoll(rng), { holdMs: 2000, pose: 'peck', turn: false, nextMs: 14000 });
+  });
+
+  it('walks to each end of its walk, turns there and walks back, never a jump', () => {
+    for (const [i, home] of homes.entries()) {
+      const seed = chickenSeed(i, home.baseX);
+      const plan = chickenPlan(home, seed);
+      let maxStep = 0;
+      const turns = { left: 0, right: 0 };
+      run(home, seed, 1.7e12, 2 * plan.ms, (p, prev) => {
+        assert.ok(p.x >= home.baseX - home.range - 1e-6 && p.x <= home.baseX + home.range + 1e-6, `inside its walk: ${p.x}`);
+        if (!prev) return;
+        maxStep = Math.max(maxStep, Math.abs(p.x - prev.x));
+        if (p.dir === prev.dir) return;
+        if (Math.abs(p.x - (home.baseX - home.range)) < 1) turns.left += 1;
+        else if (Math.abs(p.x - (home.baseX + home.range)) < 1) turns.right += 1;
+        else assert.notEqual(prev.pose, 'walk', `a turn mid-walk only after a pause: x ${p.x}`);
+        if (prev.x <= home.baseX - home.range + 1e-6) assert.equal(p.dir, 1, 'from the left end it walks right');
+        if (prev.x >= home.baseX + home.range - 1e-6) assert.equal(p.dir, -1, 'from the right end it walks left');
+      });
+      assert.ok(maxStep <= 0.5 + 1e-4, `at most its 0.5 px a frame: ${maxStep}`);
+      assert.ok(turns.left >= 1 && turns.right >= 1, `turns at both ends: ${JSON.stringify(turns)}`);
+    }
+  });
+
+  it('stands still through a pause, then walks on from there (and a round ends where the next begins)', () => {
+    const home = homes[0];
+    const seed = chickenSeed(0, home.baseX);
+    const plan = chickenPlan(home, seed);
+    assert.equal(plan.segs.filter((g) => g.pose !== 'walk').length, CHICKEN_PLAN_PAUSES);
+    // Pauses start 6-14 s apart, as onPause's timer, and last their state's seconds.
+    const pauses = plan.segs.filter((g) => g.pose !== 'walk');
+    for (let k = 1; k < pauses.length; k += 1) {
+      const gap = pauses[k].at - pauses[k - 1].at;
+      assert.ok(gap >= 6000 && gap <= 14000, `onPause every 6-14 s: ${gap}`);
+    }
+    for (const g of pauses) assert.ok([2000, 3000, 4000].includes(g.ms));
+    const epoch = 3e12 - (3e12 % plan.ms);
+    for (const g of plan.segs) {
+      const a = chickenWalkAt(home, epoch + g.at + 1, seed);
+      const b = chickenWalkAt(home, epoch + g.at + g.ms - 1, seed);
+      if (g.pose === 'walk') {
+        assert.equal(a.pose, 'walk');
+        continue;
+      }
+      assert.equal(a.pose, g.pose);
+      assert.equal(b.x, a.x, 'stands where it stopped');
+      assert.equal(b.dir, a.dir, 'facing the way it came until it walks on');
+      const on = chickenWalkAt(home, epoch + g.at + g.ms + 1000 / 60, seed);
+      assert.ok(Math.abs(on.x - a.x) <= 0.5 + 1e-4, 'walks on from there');
+    }
+    // The round repeats without a jump.
+    const end = chickenWalkAt(home, epoch + plan.ms - 1, seed);
+    const next = chickenWalkAt(home, epoch + plan.ms, seed);
+    assert.ok(Math.abs(end.x - next.x) < 0.05 && end.dir === next.dir);
+    assert.ok(Math.abs(next.x - home.baseX) < 1e-3 && next.dir === 1, 'from its spot, the way it set off');
+  });
+
+  it('every page draws it in the same place, and a hold freezes it there', () => {
+    const home = homes[1];
+    const seed = chickenSeed(1, home.baseX);
+    assert.equal(seed, chickenSeed(1, home.baseX));
+    assert.notEqual(seed, chickenSeed(2, home.baseX));
+    const t = 1_900_000_000_000 - GAME_EPOCH_MS;
+    assert.deepEqual(chickenWalkAt({ ...home }, t, seed), chickenWalkAt(home, t, seed));
+    const held = pathFrom({ lag: 1000, hold: 3000 }, 5000, t + GAME_EPOCH_MS - 5000);
+    const at = chickenWalkAt(home, pathTime(held, 5000, t + GAME_EPOCH_MS - 5000), seed);
+    assert.deepEqual(chickenWalkAt(home, pathTime(held, 7500, t + GAME_EPOCH_MS - 5000), seed), at);
+  });
+
+  it('the art turns on the spot: the sprite is anchored under the bird (Chicken sheets are cut 27 px off centre)', async () => {
+    const { ANIMAL_ANCHOR_X, animalAnchorX } = await import('../public/js/animals.js?v=926d8898');
+    assert.equal(animalAnchorX('npc_chicken'), 101 / 148);
+    assert.equal(animalAnchorX('npc_piggy'), 0.5);
+    assert.equal(animalAnchorX('npc_butterfly'), 0.5);
+    assert.ok(Object.isFrozen(ANIMAL_ANCHOR_X));
+    // Turned round, the bird's middle (101 of the 148 px cell) stays at x, where at 0.5 it moved
+    // 2 x 27 px x 0.702 = 38 px.
+    const drawnMid = (anchor, sx) => sx * (101 - anchor * 148) * 0.702;
+    assert.equal(Math.abs(drawnMid(animalAnchorX('npc_chicken'), 1) - drawnMid(animalAnchorX('npc_chicken'), -1)), 0);
+    assert.ok(Math.abs(drawnMid(0.5, 1) - drawnMid(0.5, -1)) > 37);
+    // Every Chicken sprite takes it: the street's, released and raised ones, the tutorial's, a visited yard's.
+    assert.match(read('public/game.js'), /function spawnChickens[\s\S]*?spr\.anchor\.x = animalAnchorX\('npc_chicken'\)/);
+    for (const f of ['animal-husbandry-feature.js', 'newxp-feature.js', 'yard-verbs-mp-feature.js']) {
+      assert.match(read(`public/js/features/${f}`), /anchor\.set\(animalAnchorX\(/, f);
+    }
+  });
+
+  it('online and solo walk with the pauses: the shared path and game.js\'s own walk', () => {
+    const feat = read('public/js/features/street-objects-feature.js');
+    assert.match(feat, /chickenWalkAt\(home, pathTime\(t\.sharedPath, Date\.now\(\), copy\.offset\), seed\)/);
+    assert.match(feat, /spr\.walkPose\?\.\(held && p\.pose === 'walk' \? 'stand' : p\.pose\)/);
+    const game = read('public/game.js');
+    assert.match(game, /Math\.abs\(c\.vx\) >= 0\.01 && soloChickenPause\(c, dt\)/);
+    assert.match(game, /function soloChickenPause\(c, dt\) \{[\s\S]*?chickenPauseRoll\(\)/);
+    assert.match(game, /spr\.walkPose = \(pose\) =>/);
+    // A player at it: it stands, not walking in place.
+    assert.match(game, /currentAction\?\.target\?\.sprite === c\) \{\n\s+c\.walkPose\?\.\('stand'\);\n\s+continue;/);
   });
 });
 

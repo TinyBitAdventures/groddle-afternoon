@@ -44,7 +44,7 @@ import {
   ensureAnimalState,
   listAnimalFeedOptions,
   feedAnimal,
-} from './js/animals.js?v=24533b10';
+} from './js/animals.js?v=926d8898';
 import {
   quoteAnimalKinship,
   performAnimalKinship,

@@ -2,9 +2,9 @@
  * Groddle Afternoon — original street geometry + layered decos
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
-import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=b351d7cb';
+import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=fe2bbd71';
 import { createFeatureHost } from './js/feature-host.js?v=e4f648b1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=d8ec9500';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=b7df291e';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -461,8 +461,8 @@ import {
 } from './js/inventory.js?v=b0e33301';
 import { PACK_COPY, isBagClass, unitRankAt } from './js/pack-slots.js?v=44e00ce9';
 import { createPackRow, mountPackClearance, packBandRange, packCountText, packSearchEntries, packSlotTip } from './js/ui/pack-row.js?v=9b23e21a';
-import { listAnimalFeedOptions } from './js/animals.js?v=24533b10';
-import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=24533b10';
+import { listAnimalFeedOptions } from './js/animals.js?v=926d8898';
+import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=926d8898';
 import {
   createDroppedItemState,
   parseDroppedItemState,
@@ -782,10 +782,11 @@ import {
   vendorBuyUnitPrice,
 } from './js/vendor.js?v=c2fc9ac0';
 import {
+  animalAnchorX,
   createAnimalState,
   resetAnimalDay,
   animalStatusLabel,
-} from './js/animals.js?v=24533b10';
+} from './js/animals.js?v=926d8898';
 import {
   ensureWoodTreeState,
   pickWoodTool,
@@ -884,7 +885,7 @@ import {
   ANIMAL_PATROL,
   nearestPlacementGap,
 } from './js/street-ecology.js?v=7fbae08d';
-import { easeToward, flightFloorAt, flightFloorFor, flyerLift } from './js/street-creatures.js?v=144ebb1e';
+import { chickenPauseRoll, easeToward, flightFloorAt, flightFloorFor, flyerLift } from './js/street-creatures.js?v=5e81d288';
 import { createSoundBoard, DEFAULT_SFX_VOLUME, watchButtonClicks, watchPanelSounds } from './js/sound-board.js?v=a1c4a308';
 import {
   actionLoopFor,
@@ -11576,6 +11577,8 @@ function spawnChickens(xs) {
       frameSlice: [0, 6],
       scale: ENTITY_SCALE.chicken,
     });
+    // Anchored under the bird, so it turns on the spot (js/animals.js ANIMAL_ANCHOR_X, lane CHICKWALK).
+    spr.anchor.x = animalAnchorX('npc_chicken');
     spr.baseScale = ENTITY_SCALE.chicken;
     spr.x = x;
     spr.y = GROUND_Y + 2;
@@ -11598,6 +11601,33 @@ function spawnChickens(xs) {
         spr.gotoAndPlay(0);
         spr.onComplete = null;
       };
+    };
+    // Its walk's pose (js/street-creatures.js CHICKEN_PAUSE): 'walk' plays the walk, 'stand' stands
+    // on its first frame (the original's idles), 'peck' plays pecking_once (2 s, as the source's
+    // state). A one-shot clip (a squeeze) plays to its end first.
+    spr.walkPose = (pose) => {
+      if (spr.destroyed || (!spr.loop && spr.onComplete)) return;
+      const walk = textures.chickenWalk.frames.slice(0, 6);
+      if (pose === 'peck') {
+        const peck = textures.chickenPeck.frames;
+        if (spr.textures[0] !== peck[0] || spr.textures.length !== peck.length) {
+          spr.textures = peck;
+          spr.loop = true;
+          spr.animationSpeed = peck.length / 120;
+          spr.gotoAndPlay(0);
+        }
+        return;
+      }
+      if (spr.textures[0] !== walk[0] || spr.textures.length !== walk.length) {
+        spr.textures = walk;
+        spr.loop = true;
+        spr.animationSpeed = 0.12;
+        if (pose === 'stand') spr.gotoAndStop(0);
+        else spr.gotoAndPlay(0);
+        return;
+      }
+      if (pose === 'stand' && spr.playing) spr.gotoAndStop(0);
+      else if (pose !== 'stand' && !spr.playing) spr.play();
     };
     entityLayer.addChild(spr);
     list.push(spr);
@@ -13141,6 +13171,34 @@ function handleInput() {
  * original's walked the platform lines by apiFindPath (npc_piggy.js onCreate 1437-1444,
  * npc_chicken.js onCreate 1008-1023, onPathing). Planted 2 px into the line, as enterStreet does.
  */
+/**
+ * A solo Chicken's pauses (js/street-creatures.js chickenPauseRoll; online its shared path has them,
+ * street-objects-feature): true while it stands or pecks this frame. dt in 60 fps frames.
+ */
+function soloChickenPause(c, dt) {
+  const ms = (Math.max(0, dt) * 1000) / 60;
+  if (!Number.isFinite(c._nextPauseMs)) c._nextPauseMs = chickenPauseRoll().nextMs;
+  c._nextPauseMs -= ms;
+  if (c._pause) {
+    c._pause.left -= ms;
+    if (c._pause.left > 0) return true;
+    // Walking on, the other way half the time (turnAround).
+    if (c._pause.turn) c.vx *= -1;
+    c._pause = null;
+    c.walkPose?.('walk');
+    return false;
+  }
+  if (c._nextPauseMs > 0) {
+    c.walkPose?.('walk');
+    return false;
+  }
+  const roll = chickenPauseRoll();
+  c._nextPauseMs = roll.nextMs;
+  c._pause = { left: roll.holdMs, turn: roll.turn };
+  c.walkPose?.(roll.pose);
+  return true;
+}
+
 function followWalkFloor(spr, dt = 1) {
   const y = walkSurfaceY(streetPlatforms, spr.x, spr.y - 2, { up: 24, down: 24 });
   if (!Number.isFinite(y)) return;
@@ -13253,10 +13311,22 @@ function physics(dt) {
     p.scale.y = Math.abs(ps);
   }
   for (const c of chickens) {
-    if (menuTarget?.sprite === c || currentAction?.target?.sprite === c) continue;
+    // A player at it: it stands (the source's onWaitStart stopMoving, npc_chicken.js 1635-1643),
+    // not walking in place; a squeeze's peck plays to its end first (walkPose).
+    if (menuTarget?.sprite === c || currentAction?.target?.sprite === c) {
+      c.walkPose?.('stand');
+      continue;
+    }
     // Multiplayer: a street Chicken the server shares walks its shared path (street-objects-feature),
     // unless something here holds it still (the Rook, a sulk: their own vx 0).
     if (c._path?.(dt)) {
+      followWalkFloor(c, dt);
+      continue;
+    }
+    // The original's pauses (js/street-creatures.js CHICKEN_PAUSE, npc_chicken.js onPause
+    // 1216-1277): every 6-14 s it stands or pecks for 2-4 s and turns round half the time. Not
+    // while something holds it (the Rook, a sulk: vx 0 or creeping).
+    if (Math.abs(c.vx) >= 0.01 && soloChickenPause(c, dt)) {
       followWalkFloor(c, dt);
       continue;
     }

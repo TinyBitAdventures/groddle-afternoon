@@ -123,11 +123,11 @@ import {
   treeId,
   treeReady,
   treeSkill,
-} from '../street-objects.js?v=fdb9ea3a';
+} from '../street-objects.js?v=2b27b69a';
 import { ROCK_CATALOG } from '../mining.js?v=4806e3e8';
 import { TRANT_META, trantStatusLabel } from '../trants.js?v=9c2e8c0f';
 import { quoteWoodTreeHarvest } from '../woodcutting.js?v=38730935';
-import { animalStatusLabel, pickerMaxCount } from '../animals.js?v=24533b10';
+import { animalStatusLabel, pickerMaxCount } from '../animals.js?v=926d8898';
 import { highestAnimalKinshipRank, quoteAnimalKinship } from '../animal-kinship.js?v=3a50bfb2';
 import { animalPatrolRange } from '../street-ecology.js?v=7fbae08d';
 import { INCUBATION, PIGGY_FEED, itemBaseCost, resetIncubation } from '../animal-husbandry.js?v=ef8ed409';
@@ -135,6 +135,8 @@ import {
   applyCreatureState,
   batterflyAt,
   batterflyPerks,
+  chickenSeed,
+  chickenWalkAt,
   creatureOf,
   easeToward,
   flightFloorFor,
@@ -147,8 +149,7 @@ import {
   restAt,
   serverPathClock,
   sharedCreatureLabel,
-  walkerAt,
-} from '../street-creatures.js?v=144ebb1e';
+} from '../street-creatures.js?v=5e81d288';
 
 export const STREET_OBJECTS_FEATURE_ID = 'street-objects';
 const RECONCILE_MS = 250;
@@ -313,7 +314,10 @@ function setPath(engine, obj) {
     const spot = engine.placement?.('chickens')?.[obj.index];
     const home = { baseX: Number.isFinite(spot?.x) ? spot.x : spr.baseX, range: spot ? animalPatrolRange('chickens', spot.room) : (spr.range || 100), dir: obj.index % 2 ? -1 : 1 };
     if (!Number.isFinite(home.baseX)) return;
-    pointAt = () => walkerAt(home, pathTime(t.sharedPath, Date.now(), copy.offset));
+    // Its walk with the original's pauses (js/street-creatures.js chickenWalkAt), rolled from a seed
+    // every page shares, so everyone sees it stop, peck and turn at the same moment (CHICKWALK).
+    const seed = chickenSeed(obj.index, home.baseX);
+    pointAt = () => chickenWalkAt(home, pathTime(t.sharedPath, Date.now(), copy.offset), seed);
     step = (dt) => {
       if (Math.abs(spr.vx || 0) < 0.01) return false;
       const p = pointAt();
@@ -323,6 +327,10 @@ function setPath(engine, obj) {
       const bs = spr.baseScale ?? Math.abs(spr.scale.y);
       spr.scale.x = p.dir * bs;
       spr.scale.y = Math.abs(bs);
+      // Walking, standing or pecking (game.js spawnChickens walkPose); held for someone at it, it
+      // stands rather than walking in place (onWaitStart stopMoving).
+      const held = Number(t.sharedPath?.holdEnd) > Date.now() + (Number(copy.offset) || 0);
+      spr.walkPose?.(held && p.pose === 'walk' ? 'stand' : p.pose);
       return true;
     };
   } else if (obj.kind === 'butterfly' && t.airborne) {

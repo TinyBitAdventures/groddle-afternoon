@@ -131,7 +131,7 @@ import { frameTexture, onLoaded, sourceFromUrl, textureFromUrl } from '../textur
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 import { displayTopOf, itemstackOverlayPoint, playPoofIn, playSheetOverlay, poofInAlpha } from '../overlay-art.js?v=3753a0d2';
 import { HOME_MACHINE } from '../home-ticket.js?v=dd702301';
-import { createAnimalState } from '../animals.js?v=24533b10';
+import { animalAnchorX, createAnimalState } from '../animals.js?v=926d8898';
 import {
   AK_ANIMALS,
   AK_BUBBLE,
@@ -2154,7 +2154,8 @@ function akSpawn(engine, classId) {
   const frames = akFrames(engine, classId);
   const spr = new PIXI.AnimatedSprite(frames.length ? frames : [PIXI.Texture.EMPTY]);
   const scale = classId === 'npc_piggy' ? 0.97 : 0.7;
-  spr.anchor.set(0.5, def.airborne ? 0.5 : 1);
+  // Under the animal, so it turns on the spot (js/animals.js ANIMAL_ANCHOR_X).
+  spr.anchor.set(animalAnchorX(classId), def.airborne ? 0.5 : 1);
   spr.baseScale = scale;
   spr.scale.set(scale);
   spr.animationSpeed = def.airborne ? 0.25 : 0.13;

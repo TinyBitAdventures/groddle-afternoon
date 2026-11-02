@@ -56,7 +56,7 @@ import { nearestSurfaceY } from '../walk-surface.js?v=5b6e1c8d';
 import { displayTopOf, itemstackOverlayPoint, playSheetOverlay } from '../overlay-art.js?v=3753a0d2';
 import { SET_FREE, applySetFree, canSetFree, setFreeGoneLine, setFreePrompt } from '../animal-set-free.js?v=3b194fca';
 import { getGameDayKey } from '../game-day.js?v=edb00566';
-import { createAnimalState, resetAnimalDay, animalStatusLabel, listAnimalFeedOptions } from '../animals.js?v=24533b10';
+import { animalAnchorX, createAnimalState, resetAnimalDay, animalStatusLabel, listAnimalFeedOptions } from '../animals.js?v=926d8898';
 import {
   BABY_ANIMALS,
   BATTERFLY,
@@ -103,11 +103,11 @@ import {
   stepHogtie,
   stickPlaceState,
 } from '../animal-husbandry.js?v=ef8ed409';
-import { batterflyBaseY, batterflyResponseFor, flightFloorFor } from '../street-creatures.js?v=144ebb1e';
+import { batterflyBaseY, batterflyResponseFor, flightFloorFor } from '../street-creatures.js?v=5e81d288';
 import { loseEnergy, shiftMetabolic } from '../metabolics.js?v=8504134e';
 import { textureFromUrl } from '../textures.js?v=db2ce452';
 import { PIGGY_DEATH_DROPS, PIGGY_DEATH_PUFF, SAD_BABY, forcedRoll, isSadIn } from '../animal-mood.js?v=a49495fc';
-import { animalCrowdChanged, animalCrowdSad, animalPlaceIsDepressing, crowdLimit, smokePuff as sharedSmokePuff } from './animal-mood-feature.js?v=87f18134';
+import { animalCrowdChanged, animalCrowdSad, animalPlaceIsDepressing, crowdLimit, smokePuff as sharedSmokePuff } from './animal-mood-feature.js?v=96f0c7d0';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
 
@@ -425,7 +425,8 @@ function buildExtraAnimal(engine, row) {
   const frames = animalFrames(engine, row.classId);
   const spr = new PIXI.AnimatedSprite(frames.length ? frames : [PIXI.Texture.EMPTY]);
   const scale = row.classId === 'npc_piggy' ? 0.97 : row.classId === 'npc_chicken' ? 0.7 : 0.7;
-  spr.anchor.set(0.5, row.classId === 'npc_butterfly' ? 0.5 : 1);
+  // Under the animal, so it turns on the spot (js/animals.js ANIMAL_ANCHOR_X).
+  spr.anchor.set(animalAnchorX(row.classId), row.classId === 'npc_butterfly' ? 0.5 : 1);
   spr.baseScale = scale;
   spr.scale.set(scale);
   spr.animationSpeed = row.classId === 'npc_butterfly' ? 0.25 : 0.13;

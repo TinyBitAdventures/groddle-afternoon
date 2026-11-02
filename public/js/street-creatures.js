@@ -7,7 +7,8 @@
  * everyone on the street. Online, every client now draws each street animal on the same path from
  * the server's clock, so two players see it in the same place without the server moving anything:
  *   - a Chicken walks to and fro across its spot (game.js spawnChickens: 100 px each way at
- *     0.5 px a frame, 30 px/s, the odd ones setting off left);
+ *     0.5 px a frame, 30 px/s, the odd ones setting off left), stopping to stand or peck every
+ *     6-14 s as the original did (chickenWalkAt, CHICKEN_PAUSE);
  *   - a resting Butterfly bobs on its perch (spawnButterflies: 0.04 a frame);
  *   - a flying Butterfly drifts across the whole street and back in from the far side
  *     (0.65 px a frame, 39 px/s, bobbing 14 px at 0.06 a frame), over the floor under it
@@ -136,6 +137,140 @@ export function walkerAt({ baseX, range = CREATURE_PATHS.chicken.range, speed = 
   if (s < r) return { x: baseX + s, dir: 1 };
   if (s < 3 * r) return { x: baseX + 2 * r - s, dir: -1 };
   return { x: baseX + s - 4 * r, dir: 1 };
+}
+
+/**
+ * A Chicken's pauses (lane CHICKWALK, Austin 2026-11-01: "Can you review the chickens? Their
+ * walk/animation still isn't correct"). The original's Chicken, while players are on its street,
+ * stops every 6-14 s (npc_chicken.js onPause 1216-1277: apiSetTimer('onPause', randInt(6000,
+ * 14000)) 1272, from the start of the last pause), stands in one of pause_state_choices (1860-1869:
+ * idle1, idle1, idle1, idle2, idle3 and pause for 4 s, pecking_twice for 3 s, pecking_once for
+ * 2 s), turns round half the time (is_chance(0.5) turnAround, 1225-1228) and walks on
+ * (startMoving after the pause's seconds, 1253-1256). At the end of its walk it turns and walks
+ * straight back (onPathing 1168-1186). The remake has the walk and pecking_once sheets: an idle
+ * stands on the walk's first frame ('stand'), a peck plays pecking_once ('peck').
+ */
+export const CHICKEN_PAUSE = Object.freeze({
+  everyMs: Object.freeze([6000, 14000]),
+  choices: Object.freeze([
+    Object.freeze([4000, 'stand']),
+    Object.freeze([4000, 'stand']),
+    Object.freeze([4000, 'stand']),
+    Object.freeze([4000, 'stand']),
+    Object.freeze([4000, 'stand']),
+    Object.freeze([4000, 'stand']),
+    Object.freeze([3000, 'peck']),
+    Object.freeze([2000, 'peck']),
+  ]),
+  turnChance: 0.5,
+});
+
+/** One onPause: how long it stands and how (pose), whether it turns round, and when the next one is. */
+export function chickenPauseRoll(rng = Math.random) {
+  const { choices, everyMs, turnChance } = CHICKEN_PAUSE;
+  const [holdMs, pose] = choices[Math.min(choices.length - 1, Math.floor(rng() * choices.length))];
+  const turn = rng() < turnChance;
+  const nextMs = everyMs[0] + Math.min(everyMs[1] - everyMs[0], Math.floor(rng() * (everyMs[1] - everyMs[0] + 1)));
+  return { holdMs, pose, turn, nextMs };
+}
+
+/** A small seeded random source (mulberry32): the same numbers on every player's page. */
+export function seededRandom(seed) {
+  let a = (Number(seed) >>> 0) || 1;
+  return () => {
+    a = (a + 0x6d2b79f5) >>> 0;
+    let t = a;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+/** The pauses in one round of a shared Chicken's walk (chickenPlan). */
+export const CHICKEN_PLAN_PAUSES = 8;
+
+// A place on the to-and-fro loop (walkerAt's s, 0..4r) to its x and heading, and the same x heading the other way.
+function loopAt(baseX, r, s) {
+  if (s < r) return { x: baseX + s, dir: 1 };
+  if (s < 3 * r) return { x: baseX + 2 * r - s, dir: -1 };
+  return { x: baseX + s - 4 * r, dir: 1 };
+}
+function loopTurn(r, s) {
+  if (s < r) return mod(2 * r - s, 4 * r);
+  if (s < 3 * r) {
+    const u = 2 * r - s;
+    return u >= 0 ? u : 4 * r + u;
+  }
+  return mod(2 * r - (s - 4 * r), 4 * r);
+}
+
+const planCache = new Map();
+
+/**
+ * A shared Chicken's walk with the original's pauses, as one round that repeats: CHICKEN_PLAN_PAUSES
+ * pauses rolled from `seed` (chickenPauseRoll on seededRandom), each after its 6-14 s, then a walk
+ * on to where the round began (its spot, heading the way it set off), so the next round carries on
+ * from there without a jump. Every page with the same home and seed gets the same round. Returns
+ * { ms, r, v, segs }: segs are { at, ms, s, pose } (walk: from loop place s at v px/ms; a pause
+ * stands at s).
+ */
+export function chickenPlan({ baseX = 0, range = CREATURE_PATHS.chicken.range, speed = CREATURE_PATHS.chicken.speed, dir = 1 } = {}, seed = 1) {
+  const r = Math.max(1, range);
+  const key = `${baseX}|${r}|${speed}|${dir < 0 ? -1 : 1}|${seed}`;
+  const hit = planCache.get(key);
+  if (hit) return hit;
+  const v = speed / 1000;
+  const loop = 4 * r;
+  const rng = seededRandom(seed);
+  const start = dir < 0 ? 2 * r : 0;
+  const segs = [];
+  let at = 0;
+  let s = start;
+  let held = 0;
+  let next = chickenPauseRoll(rng).nextMs;
+  for (let k = 0; k < CHICKEN_PLAN_PAUSES; k += 1) {
+    const roll = chickenPauseRoll(rng);
+    const walk = Math.max(0, next - held);
+    segs.push({ at, ms: walk, s, pose: 'walk' });
+    at += walk;
+    s = mod(s + v * walk, loop);
+    segs.push({ at, ms: roll.holdMs, s, pose: roll.pose });
+    at += roll.holdMs;
+    if (roll.turn) s = loopTurn(r, s);
+    held = roll.holdMs;
+    next = roll.nextMs;
+  }
+  // On to where the round began, the way it set off.
+  const back = mod(start - s, loop) / v;
+  segs.push({ at, ms: back, s, pose: 'walk' });
+  at += back;
+  const plan = Object.freeze({ ms: at, r, v, segs });
+  if (planCache.size > 256) planCache.clear();
+  planCache.set(key, plan);
+  return plan;
+}
+
+/**
+ * A shared Chicken at path time t (ms): x, heading and pose ('walk', 'stand', 'peck') on its
+ * chickenPlan round. A pause that turns it shows the new heading when it walks on.
+ */
+export function chickenWalkAt(home, t, seed = 1) {
+  const plan = chickenPlan(home, seed);
+  const baseX = home?.baseX ?? 0;
+  if (!(plan.ms > 0)) return { ...loopAt(baseX, plan.r, 0), pose: 'walk' };
+  const tc = mod(Number(t) || 0, plan.ms);
+  let seg = plan.segs[0];
+  for (const g of plan.segs) {
+    if (g.at > tc) break;
+    seg = g;
+  }
+  if (seg.pose !== 'walk') return { ...loopAt(baseX, plan.r, seg.s), pose: seg.pose };
+  return { ...loopAt(baseX, plan.r, mod(seg.s + plan.v * (tc - seg.at), 4 * plan.r)), pose: 'walk' };
+}
+
+/** The seed a street's Chicken rolls its pauses from: its spawn index and spot, the same on every page. */
+export function chickenSeed(index, baseX) {
+  return ((Math.imul((Number(index) || 0) + 1, 2654435761) ^ Math.round(Number(baseX) || 0)) >>> 0) || 1;
 }
 
 /**

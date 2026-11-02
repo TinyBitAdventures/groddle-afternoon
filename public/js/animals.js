@@ -25,6 +25,25 @@ export const ANIMAL_CLASS_IDS = Object.freeze([
   'npc_butterfly',
 ]);
 
+/**
+ * Where each walking animal's sheet puts the animal in its cell (the x of its anchor, 0..1), so a
+ * sprite turned round by scale.x -1 turns on the spot. In the original the item's x is the art's
+ * registration point under the animal and the client mirrors the art about it. Tiny Speck's
+ * Chicken sheets (npc_chicken__x1_walk, pecking_once, sit: 148 x 110 cells, the same for every
+ * state) were cut with the bird about 27 px right of the cell's middle: its body spans 75-131 px,
+ * 101 px across the walk frames on average. Anchored at the middle (0.5), each turn mirrored the
+ * bird about a point 27 px behind it and it hopped 38 px at its drawn scale (lane CHICKWALK,
+ * Austin 2026-11-01: "They move left and then snap back to the middle walking right"). The Piggy
+ * walk (88 x 62), the Butterfly's fly-side (70 x 65) and the Batterfly's profile (111 x 96) sheets
+ * are centred in their cells (within 1.5 px), so they keep 0.5.
+ */
+export const ANIMAL_ANCHOR_X = Object.freeze({ npc_chicken: 101 / 148 });
+
+/** The anchor x a walking animal's sprite takes (ANIMAL_ANCHOR_X; 0.5 for the rest). */
+export function animalAnchorX(classId) {
+  return ANIMAL_ANCHOR_X[classId] ?? 0.5;
+}
+
 const FEED_CATALOG = Object.freeze({
   npc_piggy: Object.freeze({
     apple: { label: 'Apple', nutrition: 2 },
