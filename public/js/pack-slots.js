@@ -567,6 +567,31 @@ export function moveStack(inv, prefs, from, to, opts = {}) {
   }
   const next = JSON.parse(JSON.stringify(layout.prefs));
   const srcKey = src === layout.pack ? 'pack' : from.container;
+  // Player report 37: a stack dropped on a stack of its own class that has room joins it, up to
+  // the class's stack max, and what does not fit stays where it was. The client offers such a
+  // stack as a drop target (PackDisplayManager.as _findItemDragTargetSlot 700-711: same class,
+  // not full; the partly-fitting drag allowed, 711) and sends inventory_move to its slot
+  // (_packDragCompleteHandler 979-1006); the server adds into that slot and puts the rest back
+  // (GSJS main.js doInventoryMove, bag.js addItemStack 241-258). Inside one container too.
+  // Only places change: the counts per class, the save's inventory and the ledger stay as they are.
+  const toAt = Number.isFinite(Number(to?.index)) && !to?.bag ? Math.floor(Number(to.index)) : -1;
+  const onto = toAt >= 0 ? dest.slots[toAt] : null;
+  if (slot.kind === 'stack' && onto?.kind === 'stack' && onto !== slot && onto.cls === slot.cls) {
+    const max = stackMaxOf(slot.cls, opts.catalog);
+    if (onto.count < max) {
+      let at = Math.floor(Number(from.index));
+      if (next.place[srcKey][at] !== slot.cls) at = next.place[srcKey].indexOf(slot.cls);
+      const have = next.n[srcKey][at] || slot.count;
+      const moved = Math.min(have, max - onto.count);
+      next.n[destKey][toAt] = onto.count + moved;
+      if (have - moved > 0) next.n[srcKey][at] = have - moved;
+      else {
+        next.place[srcKey].splice(at, 1);
+        next.n[srcKey].splice(at, 1);
+      }
+      return { ok: true, prefs: next, merged: moved };
+    }
+  }
   const entry = slot.kind === 'bag' ? `@${slot.key}` : slot.cls;
   const list = next.place[srcKey];
   const nums = (next.n[srcKey] ||= list.map(() => 0));

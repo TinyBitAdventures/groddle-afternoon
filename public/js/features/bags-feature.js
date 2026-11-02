@@ -90,7 +90,7 @@ import {
   takeBag,
   unitPlaces,
   unitRankAt,
-} from '../pack-slots.js?v=44e00ce9';
+} from '../pack-slots.js?v=f3890c72';
 import { TOOL_CONDITION_CATALOG, moveToolCopy, pickToolCopies, placeToolCopies } from '../tools.js?v=3d109172';
 import { createMinnAccount } from '../minn-account.js?v=ea900c51';
 

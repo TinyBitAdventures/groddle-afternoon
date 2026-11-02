@@ -40,7 +40,7 @@ import {
 } from '../public/js/hell-bar.js?v=ea0c3bfa';
 import { hellBarFeature } from '../public/js/features/hell-bar-feature.js?v=1bb7d66e';
 import { hellFeature } from '../public/js/features/hell-feature.js?v=bbe7a45e';
-import { FEATURES } from '../public/js/features/index.js?v=47d284bf';
+import { FEATURES } from '../public/js/features/index.js?v=67406e7f';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const pub = join(spike, 'public');

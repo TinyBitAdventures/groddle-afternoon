@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=fe2bbd71';
 import { createFeatureHost } from './js/feature-host.js?v=e4f648b1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=47d284bf';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=67406e7f';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -459,7 +459,7 @@ import {
   removeItem,
   isToolItem,
 } from './js/inventory.js?v=b0e33301';
-import { PACK_COPY, isBagClass, unitRankAt } from './js/pack-slots.js?v=44e00ce9';
+import { PACK_COPY, isBagClass, unitRankAt } from './js/pack-slots.js?v=f3890c72';
 import { createPackRow, mountPackClearance, packBandRange, packCountText, packSearchEntries, packSlotTip } from './js/ui/pack-row.js?v=65c0f180';
 import { listAnimalFeedOptions } from './js/animals.js?v=926d8898';
 import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=926d8898';
@@ -4737,20 +4737,99 @@ function setupPackDrops() {
     el.title = dest.bag ? PACK_COPY.moveTo(label || 'the bag') : PACK_COPY.moveHere;
     if (app?.canvas) app.canvas.dataset.packDragTip = el.title;
   });
-  bar.addEventListener('drop', (event) => {
-    if (!packDrag) return;
-    const el = targetOf(event);
+  // A drop on a slot: a move, or onto a stack of its own class a merge (pack-slots.js moveStack).
+  const dropOn = (el) => {
     const dest = destFor(el);
     document.querySelectorAll('.pack-bar .is-drop-target').forEach((n) => n.classList.remove('is-drop-target'));
-    if (!dest) return;
-    event.preventDefault();
+    if (!dest) return false;
     const from = { container: packDrag.container, index: packDrag.index };
     packDrag = null;
     const result = features.query('packMove', from, dest, engine);
     if (result && !result.ok && result.reason && result.reason !== 'missing') toast(result.reason, 3000);
     playSound(result?.ok ? 'CLICK_SUCCESS' : 'CLICK_FAILURE', { volume: 0.45 });
+    if (app?.canvas) app.canvas.dataset.packDrop = result?.ok ? (result.merged ? `merged:${result.merged}` : 'moved') : String(result?.reason || 'refused');
     updateHud();
+    return true;
+  };
+  bar.addEventListener('drop', (event) => {
+    if (!packDrag) return;
+    const el = targetOf(event);
+    if (!destFor(el)) {
+      document.querySelectorAll('.pack-bar .is-drop-target').forEach((n) => n.classList.remove('is-drop-target'));
+      return;
+    }
+    event.preventDefault();
+    dropOn(el);
   });
+  // Touch (player report 37): a stack held still for a moment lifts, follows the finger and drops
+  // where it is let go, as a mouse drag does; a finger that moves first scrolls the pack as before.
+  const HOLD_MS = 350;
+  let touch = null;
+  const endTouch = () => {
+    if (!touch) return;
+    clearTimeout(touch.timer);
+    touch.ghost?.remove();
+    touch.slot.classList.remove('is-dragging');
+    document.querySelectorAll('.pack-bar .is-drop-target').forEach((n) => n.classList.remove('is-drop-target'));
+    const lifted = touch.on;
+    touch = null;
+    if (lifted) {
+      packDrag = null;
+      if (packBarHeld) renderPackBar();
+    }
+  };
+  const under = (x, y) => document.elementFromPoint(x, y)?.closest?.('.pack-slot[data-pack-container], .pack-slot.pack-empty, [data-pack-container]') || null;
+  bar.addEventListener('pointerdown', (event) => {
+    if (event.pointerType !== 'touch' || touch) return;
+    const slot = event.target?.closest?.('.pack-slot[data-pack-container][data-pack-index]');
+    if (!slot || !slot.draggable) return;
+    touch = { slot, id: event.pointerId, x: event.clientX, y: event.clientY, on: false, ghost: null };
+    touch.timer = setTimeout(() => {
+      if (!touch || touch.slot !== slot) return;
+      touch.on = true;
+      closePackPopover();
+      packDrag = { container: slot.dataset.packContainer, index: Number(slot.dataset.packIndex), cls: slot.dataset.tsid, bag: slot.dataset.packBag || '' };
+      slot.classList.add('is-dragging');
+      const r = slot.getBoundingClientRect();
+      const ghost = slot.cloneNode(true);
+      ghost.removeAttribute('id');
+      ghost.classList.add('pack-touch-ghost');
+      ghost.style.cssText = `position:fixed;left:${touch.x - r.width / 2}px;top:${touch.y - r.height / 2}px;width:${r.width}px;height:${r.height}px;margin:0;pointer-events:none;opacity:.85;z-index:2147483000`;
+      document.body.appendChild(ghost);
+      touch.ghost = ghost;
+      if (app?.canvas) app.canvas.dataset.packTouchDrag = packDrag.cls || '';
+    }, HOLD_MS);
+  });
+  bar.addEventListener('pointermove', (event) => {
+    if (!touch || event.pointerId !== touch.id) return;
+    if (!touch.on) {
+      if (Math.hypot(event.clientX - touch.x, event.clientY - touch.y) > 10) endTouch();
+      return;
+    }
+    const r = touch.ghost.getBoundingClientRect();
+    touch.ghost.style.left = `${event.clientX - r.width / 2}px`;
+    touch.ghost.style.top = `${event.clientY - r.height / 2}px`;
+    const el = under(event.clientX, event.clientY);
+    document.querySelectorAll('.pack-bar .is-drop-target').forEach((n) => { if (n !== el) n.classList.remove('is-drop-target'); });
+    if (destFor(el)) el.classList.add('is-drop-target');
+  });
+  // Lifted, the finger drags the stack: no scrolling, no long-press menu, no native drag on top.
+  bar.addEventListener('touchmove', (event) => { if (touch?.on) event.preventDefault(); }, { passive: false });
+  bar.addEventListener('contextmenu', (event) => { if (touch) event.preventDefault(); });
+  bar.addEventListener('dragstart', (event) => { if (touch?.on) event.preventDefault(); }, true);
+  document.addEventListener('pointerup', (event) => {
+    if (!touch || event.pointerId !== touch.id) return;
+    if (touch.on) {
+      const el = under(event.clientX, event.clientY);
+      // The tap that ends a lift is not a click on the slot (that would open its menu).
+      const eat = (e) => { e.stopPropagation(); e.preventDefault(); };
+      document.addEventListener('click', eat, { capture: true, once: true });
+      setTimeout(() => document.removeEventListener('click', eat, true), 400);
+      if (packDrag) dropOn(el);
+    }
+    endTouch();
+  });
+  document.addEventListener('pointercancel', (event) => { if (touch && event.pointerId === touch.id) endTouch(); });
 }
 
 /**
