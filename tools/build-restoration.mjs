@@ -343,5 +343,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     console.log(`${data.back}/${data.possible} systems back · ${data.quests.playable} playable quests · ${data.rooms.built}/${data.rooms.total} rooms -> ${out}`);
     // The item catalog reads the same game data and the coverage inventory, so it is rebuilt with the report.
     execFileSync(process.execPath, [fileURLToPath(new URL('./catalog/build.mjs', import.meta.url))], { stdio: 'inherit' });
+    // So does the encyclopedia (docs/encyclopedia.md), whose links the item pages share.
+    execFileSync(process.execPath, [fileURLToPath(new URL('./encyclopedia/build.mjs', import.meta.url))], { stdio: 'inherit' });
   }
 }

@@ -34,6 +34,9 @@ export const FALLBACK = [
  */
 export const SECTIONS = {
   '/project/': ['/restoration/', '/compare/', '/changelog/', '/code/'],
+  // The Item catalog and the encyclopedia are one section, whichever link the menu holds (docs/encyclopedia.md).
+  '/items/': ['/encyclopedia/'],
+  '/encyclopedia/': ['/items/'],
 };
 
 const decode = (s) => s.replace(/<[^>]*>/g, '').replace(/&(amp|lt|gt|quot|#039|#39|apos);/g, (m, e) => ({ amp: '&', lt: '<', gt: '>', quot: '"', '#039': "'", '#39': "'", apos: "'" })[e]);

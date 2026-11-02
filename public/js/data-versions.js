@@ -5619,6 +5619,7 @@
       "assets/ui/signpost/signpost_post@3x.webp": "afdb7515",
       "assets/ui/signpost/signpost_shadow@3x.png": "dc99d4c5",
       "brand/share.jpg": "fb033ab8",
+      "encyclopedia/search.json": "1f126db6",
       "items/data.json": "5b6d525d",
       "landing/card-explore.webp": "9fa06b9d",
       "landing/card-grow.webp": "65e5704b",

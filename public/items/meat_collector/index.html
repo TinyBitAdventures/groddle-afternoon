@@ -38,6 +38,7 @@
           <h1>Meat Collector</h1>
           <p class="cat-plural">Plural: Meat Collectors</p>
           <p class="cat-status"><span class="pill st-source">In the remake</span></p>
+          <p class="ency-chips cat-stats"><span class="ency-chip"><img class="ency-chip-ic" src="../../assets/sprites/icons/pile_of_currants.png?v=df15aba7" srcset="../../assets/sprites/icons/pile_of_currants.png?v=df15aba7 1x, ../../assets/sprites/icons/pile_of_currants@3x.png?v=df15aba7 3x" alt="" width="15" height="18" loading="lazy" decoding="async" />500 currants</span></p>
         </div>
       </div>
     </div>
@@ -75,17 +76,25 @@
         <div class="cat-remake-body">
           <p class="cat-status-text">This item is in the remake.</p>
           <h3>How to get it</h3>
-          <ul class="cat-list">
-            <li>Sold by the <a href="../?sold=animal">Animal Goods Vendor</a> for 545 currants.</li>
-            <li>Sold by the <a href="../?sold=tools">Tool Vendor</a> for 525 currants.</li>
-            <li id="recipe-meat_collector"><strong>Meat Collector</strong>: With a <a href="../tinkertool/">Tinkertool</a>, from 5 <a href="../tin/">Tin Ingots</a> and 4 <a href="../plain_metal/">Plain Metal Ingots</a>. Needs Remote Herdkeeping.</li>
-          </ul>
+          <ul class="ency-vendors"><li><span class="ency-vendor"><span class="ency-vendor-ic cat-ph" aria-hidden="true"></span><span class="ency-vendor-text"><span class="ency-vendor-name">Animal Goods Vendor</span><span class="ency-price"><img class="ency-chip-ic" src="../../assets/sprites/icons/pile_of_currants.png?v=df15aba7" srcset="../../assets/sprites/icons/pile_of_currants.png?v=df15aba7 1x, ../../assets/sprites/icons/pile_of_currants@3x.png?v=df15aba7 3x" alt="" width="15" height="18" loading="lazy" decoding="async" />545 currants</span></span></span></li><li><span class="ency-vendor"><span class="ency-vendor-ic cat-ph" aria-hidden="true"></span><span class="ency-vendor-text"><span class="ency-vendor-name">Tool Vendor</span><span class="ency-price"><img class="ency-chip-ic" src="../../assets/sprites/icons/pile_of_currants.png?v=df15aba7" srcset="../../assets/sprites/icons/pile_of_currants.png?v=df15aba7 1x, ../../assets/sprites/icons/pile_of_currants@3x.png?v=df15aba7 3x" alt="" width="15" height="18" loading="lazy" decoding="async" />525 currants</span></span></span></li></ul>
+          <div class="ency-recipe" id="recipe-meat_collector">
+            <p class="ency-recipe-name">Meat Collector</p><div class="ency-recipe-row"><ul class="ency-tiles ency-ins"><li><a class="ency-tile" href="../../items/tin/"><span class="ency-tile-pic"><img class="ency-ic" src="../../assets/sprites/icons/tin.png?v=df15aba7" srcset="../../assets/sprites/icons/tin.png?v=df15aba7 1x, ../../assets/sprites/icons/tin@3x.png?v=df15aba7 3x" alt="" width="48" height="43" loading="lazy" decoding="async" /><span class="ency-n">×5</span></span><span class="ency-tile-name">Tin Ingot</span></a></li><li class="ency-plus" aria-hidden="true">+</li><li><a class="ency-tile" href="../../items/plain_metal/"><span class="ency-tile-pic"><img class="ency-ic" src="../../assets/sprites/icons/plain_metal.png?v=df15aba7" srcset="../../assets/sprites/icons/plain_metal.png?v=df15aba7 1x, ../../assets/sprites/icons/plain_metal@3x.png?v=df15aba7 3x" alt="" width="48" height="42" loading="lazy" decoding="async" /><span class="ency-n">×4</span></span><span class="ency-tile-name">Plain Metal Ingot</span></a></li></ul><span class="ency-arrow" aria-label="makes">→</span><ul class="ency-tiles ency-outs"><li><a class="ency-tile" href="../../items/meat_collector/"><span class="ency-tile-pic"><img class="ency-ic" src="../../assets/sprites/icons/meat_collector.png?v=df15aba7" srcset="../../assets/sprites/icons/meat_collector.png?v=df15aba7 1x, ../../assets/sprites/icons/meat_collector@3x.png?v=df15aba7 3x" alt="" width="48" height="37" loading="lazy" decoding="async" /></span><span class="ency-tile-name">Meat Collector</span></a></li></ul></div>
+            <p class="ency-chips"><a class="ency-chip" href="../../items/tinkertool/"><img class="ency-chip-ic" src="../../assets/sprites/icons/tinkertool.png?v=df15aba7" srcset="../../assets/sprites/icons/tinkertool.png?v=df15aba7 1x, ../../assets/sprites/icons/tinkertool@3x.png?v=df15aba7 3x" alt="" width="20" height="16" loading="lazy" decoding="async" /><span>with a Tinkertool</span></a></p>
+          </div>
 
         </div>
       </div>
     </section>
 
-    <section class="band cat-verbs-band" aria-labelledby="verbs-h">
+    <section class="band ency-band cat-ency" aria-labelledby="ency-h">
+      <div class="wrap">
+        <h2 id="ency-h">In the encyclopedia</h2>
+        <h3>Quests</h3>
+        <ul class="ency-tiles"><li><a class="ency-tile" href="../../encyclopedia/quests/remoteherdkeeping_fill_up_meat_collector_and_milker/"><span class="ency-tile-pic"><img class="ency-ic" src="../../assets/ui/quest-book.png?v=df15aba7" alt="" width="48" height="32" loading="lazy" decoding="async" /></span><span class="ency-tile-name">Got Milk?</span><span class="ency-tile-sub">involves it</span></a></li></ul>
+      </div>
+    </section>
+
+    <section class="band band-alt cat-verbs-band" aria-labelledby="verbs-h">
       <div class="wrap">
         <h2 id="verbs-h">Verbs</h2>
         <p class="section-lead">What the original let you do with it, with Tiny Speck’s tooltips.</p>
@@ -98,7 +107,7 @@
       </div>
     </section>
 
-    <nav class="band band-alt note-after" aria-label="More items">
+    <nav class="band note-after" aria-label="More items">
       <div class="wrap">
         <div class="note-pager">
           <a class="note-pager-older" href="../meat/" rel="prev"><span>Previous</span>Meat</a>
@@ -112,7 +121,7 @@
   <footer class="foot">
     <div class="wrap">
       <p>A <a href="https://tinybitadventures.com">fan remake</a> of Tiny Speck’s Glitch · <a href="../../credits/">Credits</a> · <a href="../../privacy-policy/">Privacy</a></p>
-      <p><a href="../../">Home</a> · <a href="../../play/">Play Groddle Afternoon</a> · <a href="../../restoration/">Restoration report</a> · <a href="../../items/">Item catalog</a></p>
+      <p><a href="../../">Home</a> · <a href="../../play/">Play Groddle Afternoon</a> · <a href="../../restoration/">Restoration report</a> · <a href="../../items/">Item catalog</a> · <a href="../../encyclopedia/">Encyclopedia</a></p>
     </div>
   </footer>
 </body>

@@ -36,6 +36,8 @@ import { committedMap, keyAssetUrls, mapTags } from '../data-versions/build.mjs'
 import { keyOf as moduleKeyOf } from '../module-keys/build.mjs';
 import { literalFrom, readItemTags } from '../inventory/gsjs-data.mjs';
 import { supplyConversions } from '../job-obtainable.mjs';
+import { loadEncyclopedia } from '../encyclopedia/data.mjs';
+import { makeParts } from '../encyclopedia/parts.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = join(here, '..', '..');
@@ -586,7 +588,9 @@ function evidenceWay(evidence, quests, takeable) {
 
 /* -- Build --------------------------------------------- */
 
-export async function buildCatalog({ inventory = readInventory(), evidence = readEvidence() } = {}) {
+export async function buildCatalog({ inventory = readInventory(), evidence = readEvidence(), encyclopedia = null } = {}) {
+  // The encyclopedia's cross references (tools/encyclopedia/data.mjs): quests, creatures, people and places of each item.
+  const ency = encyclopedia || await loadEncyclopedia();
   const ids = [...inventory.keys()].filter((id) => existsSync(join(GSJS, 'items', `${id}.js`)));
   const tagIndex = readItemTags(GSJS);
   const all = new Map(ids.map((id) => {
@@ -648,10 +652,12 @@ export async function buildCatalog({ inventory = readInventory(), evidence = rea
 
   const files = {};
   files[`${OUT}/data.json`] = `${JSON.stringify(data, null, 0).replace(/\{"id":/g, '\n{"id":')}\n`;
-  files[`${OUT}/index.html`] = indexPage(data);
+  // Each store's keeper's picture for the Sold by combobox (the encyclopedia's People entry).
+  const vendorIcons = Object.fromEntries(data.vendors.map((v) => [v.key, ency.entries.get(ency.stores.get(v.key))?.icon?.src]).filter(([, src]) => src));
+  files[`${OUT}/index.html`] = indexPage(data, vendorIcons);
   entries.forEach((e, i) => {
     files[`${OUT}/${e.it.id}/index.html`] = itemPage(e, {
-      prev: entries[i - 1], next: entries[i + 1], remake, inCatalog, names, musicCards, quests, total: entries.length, index: i,
+      prev: entries[i - 1], next: entries[i + 1], remake, inCatalog, names, musicCards, quests, total: entries.length, index: i, ency,
     });
   });
   // Each page's icons and art carry their content keys (tools/data-versions/build.mjs keyAssetUrls).
@@ -698,7 +704,7 @@ function waysFor(id, remake, evidence, quests, takeable) {
 const FOOT = (p) => `  <footer class="foot">
     <div class="wrap">
       <p>A <a href="https://tinybitadventures.com">fan remake</a> of Tiny Speck’s Glitch · <a href="${p}credits/">Credits</a> · <a href="${p}privacy-policy/">Privacy</a></p>
-      <p><a href="${p}">Home</a> · <a href="${p}play/">Play Groddle Afternoon</a> · <a href="${p}restoration/">Restoration report</a> · <a href="${p}items/">Item catalog</a></p>
+      <p><a href="${p}">Home</a> · <a href="${p}play/">Play Groddle Afternoon</a> · <a href="${p}restoration/">Restoration report</a> · <a href="${p}items/">Item catalog</a> · <a href="${p}encyclopedia/">Encyclopedia</a></p>
     </div>
   </footer>`;
 
@@ -726,7 +732,7 @@ ${FOOT(p)}
 </html>
 `;
 
-function indexPage(data) {
+function indexPage(data, vendorIcons = {}) {
   const c = data.counts;
   const s = c.byStatus;
   const chip = (group, key, label, n, pressed = false) => `<button type="button" class="chip" data-${group}="${esc(key)}" aria-pressed="${pressed}">${group === 'status' && key ? `<span class="dot st-${esc(key)}" aria-hidden="true"></span>` : ''}${esc(label)} <span class="count">${fmt(n)}</span></button>`;
@@ -738,6 +744,7 @@ function indexPage(data) {
       <h1>Item catalog</h1>
       <p class="lead">Every item in Tiny Speck’s Glitch, from the game’s own code, and whether you can get it in the remake yet.</p>
       <p class="cat-score"><strong>${fmt(s.source)}</strong> of ${fmt(c.listed)} items are in the remake. ${fmt(s.missing)} are not in yet, ${fmt(s.lost)} are lost for now because they needed other players or Tiny Speck’s own servers, and ${fmt(s.unbuilt_original)} were never finished in the original.</p>
+      <p class="cat-score ency-more">Stuck on a quest? The <a href="../encyclopedia/">Groddle Encyclopedia</a> has every quest step by step, the animals and people, skills, places and achievements, linked to these items.</p>
       <p class="cat-note">${fmt(c.excluded)} more classes in the item folder are server plumbing (admin tools, tests, quest markers, containers the server made for itself) and are left out.</p>
     </div>
   </header>
@@ -753,13 +760,13 @@ function indexPage(data) {
           <label><span>Category</span>
             <select id="cat">
               <option value="">All categories</option>
-${data.categories.map((name) => `              <option value="${esc(name)}">${esc(name)} (${fmt(data.items.filter((i) => i.category === name).length)})</option>`).join('\n')}
+${data.categories.map((name) => { const pic = data.items.find((i) => i.category === name && i.icon); return `              <option value="${esc(name)}"${pic ? ` data-icon="../assets/sprites/icons/${esc(pic.id)}.png"` : ''}>${esc(name)} (${fmt(data.items.filter((i) => i.category === name).length)})</option>`; }).join('\n')}
             </select>
           </label>
           <label><span>Sold by</span>
             <select id="sold">
               <option value="">Any vendor</option>
-${data.vendors.map((v) => `              <option value="${esc(v.key)}">${esc(v.label)}</option>`).join('\n')}
+${data.vendors.map((v) => `              <option value="${esc(v.key)}"${vendorIcons?.[v.key] ? ` data-icon="../${esc(vendorIcons[v.key])}"` : ''}>${esc(v.label)} (${fmt(data.items.filter((i) => i.sold.includes(v.key)).length)})</option>`).join('\n')}
             </select>
           </label>
         </div>
@@ -792,6 +799,9 @@ function itemPage(e, ctx) {
   const linkItem = (id) => (inCatalog.has(id) ? `../${esc(id)}/` : null);
   const qty = (id, n) => (n === 1 || n === '1' ? `${article(nameOf(id))} ${link(id)}` : `${esc(n)} ${link(id, pluralOf(id))}`);
   const tool = (id) => (id ? `${article(nameOf(id))} ${link(id)}` : '');
+  const { ency } = ctx;
+  const info = (key) => (key.startsWith('item:') ? (inCatalog.has(key.slice(5)) ? ency.items.get(key.slice(5)) : null) : ency.entries.get(key) || null);
+  const P = makeParts(p, info);
 
   const recipeText = (r) => {
     const inputs = andList((r.inputs || []).map((i) => qty(i.classTsid, i.qty)));
@@ -834,32 +844,32 @@ function itemPage(e, ctx) {
   // How to get it in the remake.
   const recipesShown = new Set();
   const ways = e.ways.map((w) => {
-    if (w.kind === 'sold') return `<li>Sold by the <a href="../?sold=${esc(w.vendor)}">${esc(w.label)}</a>${w.price ? ` for ${fmt(w.price)} currants` : ''}.</li>`;
-    if (w.recipe) {
-      if (recipesShown.has(w.recipe.key)) return '';
-      recipesShown.add(w.recipe.key);
-      return `<li id="recipe-${esc(w.recipe.key)}"><strong>${esc(w.recipe.name)}</strong>: ${recipeText(w.recipe)}</li>`;
-    }
+    if (w.kind === 'sold' || w.recipe) return '';
     if (w.conv) return `<li>${convText(w.conv)}</li>`;
     if (w.harvest) return `<li>${harvestText(w.harvest)}</li>`;
     return `<li>${esc(w.text)}</li>`;
   }).filter((li, i, all) => li && all.indexOf(li) === i);
   const uniq = (list) => [...new Set(list)];
+  const sold = e.ways.filter((w) => w.kind === 'sold');
+  const vendorCards = uniq(sold.map((w) => P.vendorCard(ency.stores.get(w.vendor) || `vendor:${w.vendor}`, { label: w.label, price: w.price })));
+  const recipeRows = uniq(e.ways.filter((w) => w.recipe).map((w) => P.recipeRow(w.recipe, { id: `recipe-${w.recipe.key}` })));
 
   // What it is used for in the remake.
   const uses = [];
-  const usedIn = uniq((remake.usedIn.get(it.id) || []).map((r) => {
+  // Recipes it goes into, and recipes it is the tool for: a tile of each result, linking its recipe.
+  const recipeTile = (r, subText) => {
     const out = r.outputs?.[0]?.classTsid;
-    const label = esc(r.name);
-    const a = out && inCatalog.has(out) ? `<a href="../${esc(out)}/#recipe-${esc(r.key)}">${label}</a>` : label;
-    return `${a}${r.tool ? ` <span class="cat-with">(${esc(nameOf(r.tool))})</span>` : ''}`;
-  }));
-  if (usedIn.length) uses.push(`<li><strong>An ingredient in ${usedIn.length === 1 ? 'one recipe' : `${usedIn.length} recipes`}:</strong> ${usedIn.join(', ')}.</li>`);
-  const makes = uniq((remake.toolFor.get(it.id) || []).map((r) => {
-    const out = r.outputs?.[0]?.classTsid;
-    return out && inCatalog.has(out) ? `<a href="../${esc(out)}/#recipe-${esc(r.key)}">${esc(r.name)}</a>` : esc(r.name);
-  }));
-  if (makes.length) uses.push(`<li><strong>The tool for ${makes.length === 1 ? 'one recipe' : `${makes.length} recipes`}:</strong> ${makes.join(', ')}.</li>`);
+    return out && inCatalog.has(out) ? P.tile(`item:${out}`, { name: r.name, anchor: `recipe-${r.key}`, sub: subText }) : P.tile(`recipe:${r.key}`, { name: r.name, sub: subText });
+  };
+  const seenUse = new Set();
+  const usedIn = (remake.usedIn.get(it.id) || []).filter((r) => !seenUse.has(r.key) && seenUse.add(r.key))
+    .map((r) => recipeTile(r, r.tool ? esc(`with ${nameOf(r.tool)}`) : 'by hand'));
+  const seenTool = new Set();
+  const makes = (remake.toolFor.get(it.id) || []).filter((r) => !seenTool.has(r.key) && seenTool.add(r.key)).map((r) => recipeTile(r, ''));
+  const useTiles = [
+    usedIn.length ? `<h3>An ingredient in ${usedIn.length === 1 ? 'one recipe' : `${usedIn.length} recipes`}</h3>\n          ${P.tiles(usedIn)}` : '',
+    makes.length ? `<h3>The tool for ${makes.length === 1 ? 'one recipe' : `${makes.length} recipes`}</h3>\n          ${P.tiles(makes)}` : '',
+  ].filter(Boolean).join('\n          ');
   for (const c of remake.otherUses.get(it.id) || []) {
     const outs = andList(uniq(c.outputs).map((o) => link(o)));
     const kind = c.source.split(':')[0];
@@ -916,15 +926,40 @@ function itemPage(e, ctx) {
   const remakeBody = e.status === 'source'
     ? `
           <h3>How to get it</h3>
-          <ul class="cat-list">
+${vendorCards.length ? `          ${P.vendors(vendorCards)}\n` : ''}${recipeRows.length ? `          ${recipeRows.join('\n          ')}\n` : ''}${ways.length ? `          <ul class="cat-list">
             ${ways.join('\n            ')}
-          </ul>
-${usesHtml.length ? `          <h3>What it is for</h3>
-          <ul class="cat-list">
+          </ul>\n` : ''}${usesHtml.length || useTiles ? `          <h3 class="cat-for">What it is for</h3>
+${usesHtml.length ? `          <ul class="cat-list">
             ${usesHtml.join('\n            ')}
-          </ul>\n` : ''}${isMusic ? `          <p class="cat-music"><a href="${musicHref}">Hear it on the Musicblocks page</a></p>\n` : ''}`
+          </ul>\n` : ''}${useTiles ? `          ${useTiles}\n` : ''}` : ''}${isMusic ? `          <p class="cat-music"><a href="${musicHref}">Hear it on the Musicblocks page</a></p>\n` : ''}`
     : `${isMusic ? `\n          <p class="cat-music"><a href="${musicHref}">Hear the Musicblocks on their own page</a></p>` : ''}
           <p class="cat-muted">${e.status === 'missing' ? 'You can’t get it in the remake yet, so there is nothing to make with it or use it for here.' : 'There is no way to get it in the remake.'}</p>`;
+
+  function statChips() {
+    const list = [];
+    if (it.baseCost) list.push(P.currants(it.baseCost, 'ency-chip'));
+    if (it.stackmax > 1) list.push(P.chip(`stacks to ${fmt(it.stackmax)}`));
+    if (use?.energy) list.push(P.chip(`${fmt(use.energy)} energy`));
+    if (use?.mood) list.push(P.chip(`${fmt(use.mood)} mood`));
+    return list.length ? `<p class="ency-chips cat-stats">${list.join('')}</p>` : '';
+  }
+  // The encyclopedia's way back to this item: quests, creatures and people, places, achievements.
+  const backs = ency.back.get(`item:${it.id}`) || [];
+  const fromAll = (test) => backs.filter((b) => test(b) && ency.entries.has(b.from)).filter((b, i, a) => a.findIndex((x) => x.from === b.from) === i);
+  const QUEST_REL = { needs: 'needs it', tool: 'needs it as a tool', rewards: 'a reward', gives: 'given to you', mentions: 'named in it', involves: 'involves it' };
+  const qRank = { needs: 0, tool: 1, rewards: 2, gives: 3, involves: 4, mentions: 5 };
+  const questTiles = fromAll((b) => b.from.startsWith('quests:')).map((b) => ({ ...b, rel: backs.filter((x) => x.from === b.from).sort((x, y) => qRank[x.rel] - qRank[y.rel])[0].rel }))
+    .sort((a, b) => qRank[a.rel] - qRank[b.rel]).map((b) => P.tile(b.from, { sub: QUEST_REL[b.rel] || '' }));
+  const whoTiles = fromAll((b) => (b.from.startsWith('animals:') || b.from.startsWith('people:')) && b.rel !== 'sells' && b.rel !== 'mentions').map((b) => P.tile(b.from, { sub: 'gives it' }));
+  const placeChips = fromAll((b) => b.from.startsWith('places:') && b.rel === 'lives').sort((a, b) => b.n - a.n)
+    .map((b) => P.chip(`${esc(ency.entries.get(b.from).name)} <b>${fmt(b.n)}</b>`, { link: P.href(b.from), cls: 'ency-place' }));
+  const achTiles = fromAll((b) => b.from.startsWith('achievements:')).map((b) => P.tile(b.from, { sub: b.n > 1 ? `${fmt(b.n)} times` : '' }));
+  const encyBody = [
+    questTiles.length ? `<h3>Quests</h3>\n        ${P.tiles(questTiles)}` : '',
+    whoTiles.length ? `<h3>Creatures and people that give it</h3>\n        ${P.tiles(whoTiles)}` : '',
+    placeChips.length ? `<h3>Where it is found</h3>\n        <p class="ency-lead-small">Regions on the map, with how many there are in each, from the streets’ own files.</p>\n        ${P.chips(placeChips)}` : '',
+    achTiles.length ? `<h3>Achievements</h3>\n        ${P.tiles(achTiles)}` : '',
+  ].filter(Boolean).join('\n        ');
 
   const body = `
   <header class="masthead note-head cat-item-head">
@@ -936,6 +971,7 @@ ${usesHtml.length ? `          <h3>What it is for</h3>
           <h1>${esc(it.name)}</h1>
           ${it.plural && it.plural !== it.name ? `<p class="cat-plural">Plural: ${esc(it.plural)}</p>` : '<p class="cat-plural">&nbsp;</p>'}
           <p class="cat-status"><span class="pill st-${esc(e.status)}">${esc(status.label)}</span>${e.register ? ` <span class="cat-register">Register row ${esc(e.register)}</span>` : ''}</p>
+          ${statChips()}
         </div>
       </div>
     </div>
@@ -967,8 +1003,15 @@ ${extras.length ? `          <ul class="cat-list cat-extras">\n${extras.map((x) 
         </div>
       </div>
     </section>
-${verbs.length ? `
-    <section class="band cat-verbs-band" aria-labelledby="verbs-h">
+${encyBody ? `
+    <section class="band ency-band cat-ency" aria-labelledby="ency-h">
+      <div class="wrap">
+        <h2 id="ency-h">In the encyclopedia</h2>
+        ${encyBody}
+      </div>
+    </section>
+` : ''}${verbs.length ? `
+    <section class="band${encyBody ? ' band-alt' : ''} cat-verbs-band" aria-labelledby="verbs-h">
       <div class="wrap">
         <h2 id="verbs-h">Verbs</h2>
         <p class="section-lead">What the original let you do with it, with Tiny Speck’s tooltips.</p>
@@ -978,7 +1021,7 @@ ${verbs.map((v) => `          <div><dt>${esc(v.name)}</dt><dd>${v.tooltip ? esc(
       </div>
     </section>
 ` : ''}
-    <nav class="band band-alt note-after" aria-label="More items">
+    <nav class="band${((encyBody ? 1 : 0) + (verbs.length ? 1 : 0)) % 2 ? ' band-alt' : ''} note-after" aria-label="More items">
       <div class="wrap">
         <div class="note-pager">
           ${ctx.prev ? `<a class="note-pager-older" href="../${esc(ctx.prev.it.id)}/" rel="prev"><span>Previous</span>${esc(ctx.prev.it.name)}</a>` : '<span></span>'}
@@ -1000,7 +1043,7 @@ ${verbs.map((v) => `          <div><dt>${esc(v.name)}</dt><dd>${v.tooltip ? esc(
 
 /* -- Write / check -------------------------------------- */
 
-const STATIC = new Set(['catalog.js', 'catalog.css']);
+const STATIC = new Set(['catalog.js', 'catalog.css', 'combobox.js']);
 
 function strays(files) {
   const dir = join(pub, OUT);

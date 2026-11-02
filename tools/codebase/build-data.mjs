@@ -48,6 +48,8 @@ const DOCS = new Set(['md', 'txt', 'log']);
 /** Folders of built pages in the game: each page is written by a tool, so it is generated, not code. */
 const GAME_BUILT = [
   ['public/items/', 'the item catalog pages (tools/catalog)'],
+  ...['index.html', 'search.json', 'quests/', 'animals/', 'people/', 'skills/', 'places/', 'achievements/']
+    .map((p) => [`public/encyclopedia/${p}`, 'the encyclopedia pages (tools/encyclopedia)']),
   ['public/changelog/', 'the old build notes (tools/changelog/build.mjs)'],
   ['public/changelog.html', 'the old build notes (tools/changelog/build.mjs)'],
 ];

@@ -121,3 +121,179 @@ li[id^="recipe-"]:target { background: color-mix(in srgb, var(--accent) 18%, tra
   .cat-score strong { font-size: 26px; }
   .cat-note { font-size: 13px; }
 }
+
+/* —— Encyclopedia parts (tools/encyclopedia/parts.mjs), shared by the item pages and /encyclopedia/ —— */
+.st-rebuilt, .st-reimagined, .st-solo { --tone: var(--moss); }
+.st-partial { --tone: var(--sun); }
+.dot.st-rebuilt, .dot.st-reimagined, .dot.st-solo, .dot.st-partial { background: var(--tone); }
+.dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; flex: none; }
+
+.ency-band h2 { font-size: clamp(26px, 3.4vw, 36px); }
+.ency-band h3, .cat-remake h3 { font-size: 20px; margin: 22px 0 10px; }
+.ency-band .section-lead { margin-top: -4px; }
+.ency-lead-small { margin: 0 0 10px; color: var(--muted); font-size: 15px; }
+
+/* A tile: a picture card for one thing. */
+.ency-tiles { list-style: none; margin: 0 0 14px; padding: 0; display: flex; flex-wrap: wrap; gap: 10px; }
+.ency-tiles > li { display: flex; }
+.ency-tile {
+  position: relative; width: 112px; min-height: 118px; box-sizing: border-box;
+  display: grid; grid-template-rows: 56px auto 1fr; justify-items: center; align-content: start; gap: 4px;
+  padding: 8px 6px 8px; text-align: center; text-decoration: none; color: var(--fg);
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+}
+a.ency-tile:hover { border-color: var(--moss); }
+a.ency-tile:focus-visible, .ency-chip:focus-visible, .ency-vendor:focus-visible, .ency-card:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.ency-tile-out { border-style: dashed; }
+.ency-tile-out .ency-ic { opacity: 0.75; }
+.ency-tile-pic { position: relative; width: 56px; height: 56px; display: grid; place-items: center; }
+.ency-ic { max-width: 48px; max-height: 48px; width: auto; height: auto; object-fit: contain; }
+.ency-ic.cat-ph { width: 40px; height: 40px; }
+.ency-n {
+  position: absolute; right: -10px; bottom: -2px; min-width: 22px; padding: 1px 6px; box-sizing: border-box;
+  font-size: 12px; font-weight: 800; line-height: 1.4; color: var(--surface); background: var(--fg); border-radius: 999px;
+}
+.ency-tile-name { font-size: 13px; font-weight: 700; line-height: 1.2; overflow-wrap: anywhere; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.ency-tile-sub { font-size: 11.5px; font-weight: 700; color: var(--muted); line-height: 1.25; }
+.ency-tile-sub .cat-st { font-size: 11px; }
+.ency-shop .ency-tile-sub { color: var(--fg); }
+.ency-tile .ency-price { display: inline-flex; align-items: center; gap: 3px; }
+.ency-tile .ency-price .ency-chip-ic { width: 14px; height: auto; }
+.ency-grid .ency-tile { width: auto; }
+.ency-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); }
+.ency-grid > li[hidden], .ency-group[hidden] { display: none; }
+.ency-grid > li { content-visibility: auto; contain-intrinsic-size: auto 128px; }
+.ency-grid .ency-tile { width: 100%; }
+
+/* Chips: a stat or a link with a little picture. */
+.ency-chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 14px; }
+.ency-chip {
+  display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px 4px 8px; min-height: 30px; box-sizing: border-box;
+  font-size: 14px; font-weight: 700; color: var(--fg); text-decoration: none;
+  background: var(--surface); border: 1px solid var(--border); border-radius: 999px;
+}
+a.ency-chip:hover { border-color: var(--moss); }
+.ency-chip b { font-weight: 800; color: var(--moss); margin-left: 2px; }
+.ency-chip-ic { width: 20px; height: 20px; object-fit: contain; flex: none; }
+.ency-chip-xp { background: color-mix(in srgb, var(--moss) 14%, var(--surface)); }
+.ency-place { padding-left: 12px; }
+
+/* A recipe: ingredients + ... -> result. */
+.ency-recipe { padding: 12px 14px 4px; margin: 0 0 12px; background: color-mix(in srgb, var(--surface) 70%, transparent); border: 1px solid var(--border); border-radius: var(--radius-lg); max-width: 60em; }
+.ency-recipe:target { background: color-mix(in srgb, var(--accent) 18%, var(--surface)); }
+.ency-recipe-name { margin: 0 0 8px; font-weight: 800; }
+.ency-recipe-row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; }
+.ency-recipe-row .ency-tiles { margin: 0 0 8px; align-items: center; }
+.ency-plus, .ency-arrow { font-size: 22px; font-weight: 800; color: var(--muted); align-self: center; }
+.ency-arrow { margin: 0 4px 8px; }
+
+/* Store cards. */
+.ency-vendors { list-style: none; margin: 0 0 14px; padding: 0; display: flex; flex-wrap: wrap; gap: 10px; }
+.ency-vendor {
+  display: flex; align-items: center; gap: 12px; padding: 8px 16px 8px 10px; min-width: 220px; box-sizing: border-box;
+  color: var(--fg); text-decoration: none; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg);
+}
+a.ency-vendor:hover { border-color: var(--moss); }
+.ency-vendor-ic { width: auto; height: 52px; max-width: 52px; object-fit: contain; }
+.ency-vendor-text { display: grid; gap: 2px; }
+.ency-vendor-name { font-weight: 800; }
+.ency-price { display: inline-flex; align-items: center; gap: 5px; font-weight: 700; }
+
+/* Quest steps and talk. */
+.ency-steps { margin: 0 0 18px; padding-left: 26px; display: grid; gap: 14px; max-width: 60em; }
+.ency-steps > li::marker { font-weight: 800; color: var(--moss); }
+.ency-step-title { margin: 0 0 8px; font-weight: 700; }
+.ency-talk { max-width: 44em; padding: 10px 16px; margin: 0 0 12px; border-left: 4px solid var(--border); color: var(--lead); }
+.ency-talk p { margin: 0 0 8px; }
+.ency-talk a { color: var(--moss); font-weight: 700; }
+
+/* Places. */
+.ency-streets { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; }
+.ency-street { padding: 10px 0 2px; border-bottom: 1px solid var(--row-line); scroll-margin-top: 80px; }
+.ency-street:target { background: color-mix(in srgb, var(--accent) 14%, transparent); }
+.ency-street-name { margin: 0 0 8px; font-weight: 800; display: flex; align-items: center; gap: 8px; }
+.ency-street .ency-chips { margin-bottom: 8px; gap: 6px; }
+.ency-street .ency-chip { font-size: 13px; min-height: 26px; padding: 2px 10px 2px 6px; }
+
+/* Lists and the home. */
+.ency-group h2 { font-size: 24px; margin: 22px 0 12px; }
+.ency-group h2 .count, .ency-card-name .count { font-family: var(--font-body); font-size: 15px; color: var(--muted); font-weight: 700; }
+.ency-search { margin-top: 18px; max-width: 640px; }
+.ency-filter { margin-top: 12px; }
+.ency-cards { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr)); gap: 12px; }
+.ency-card {
+  display: flex; align-items: center; gap: 16px; padding: 14px 16px; height: 100%; box-sizing: border-box;
+  color: var(--fg); text-decoration: none; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg);
+}
+a.ency-card:hover { border-color: var(--moss); }
+.ency-card-ic { width: 64px; height: 64px; object-fit: contain; flex: none; }
+.ency-card-text { display: grid; gap: 4px; }
+.ency-card-name { font-family: var(--font-display); font-size: 22px; font-weight: 600; }
+.ency-card-blurb { color: var(--muted); font-size: 14.5px; }
+.cat-stats { margin: 10px 0 0; }
+.cat-stats .ency-chip { font-size: 13px; }
+
+@media (max-width: 520px) {
+  .ency-tiles:not(.ency-ins):not(.ency-outs) { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+  .ency-tiles:not(.ency-ins):not(.ency-outs) .ency-tile { width: 100%; }
+  .ency-tile { width: 96px; min-height: 110px; padding: 6px 4px; }
+  .ency-tile-name { font-size: 12.5px; }
+  .ency-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .ency-vendor { min-width: 0; width: 100%; }
+  .ency-vendors > li { flex: 1 1 100%; }
+  .ency-recipe { padding: 10px 10px 2px; }
+  .ency-recipe-row .ency-tile { width: 84px; min-height: 100px; }
+  .ency-plus, .ency-arrow { font-size: 18px; }
+  .ency-card-ic { width: 48px; height: 48px; }
+}
+.ency-more { font-size: 16px; } .ency-more a { color: var(--moss); font-weight: 700; }
+
+/* —— Themed combobox (./combobox.js) over the Category and Sold by selects —— */
+.cbx-field { display: inline-flex; align-items: center; gap: 8px; }
+.cat-selects .cbx-label::after { content: none; }
+.cbx { position: relative; width: min(64vw, 260px); }
+.cbx-input {
+  width: 100%; box-sizing: border-box; font: inherit; font-size: 14px; font-weight: 600; color: var(--fg);
+  background: var(--surface); border: 1px solid var(--border); border-radius: 999px; padding: 6px 58px 6px 14px; min-height: 34px;
+}
+.cbx-input::placeholder { color: var(--fg); opacity: 1; }
+.cbx-input:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.cbx-open .cbx-input { border-color: var(--moss); }
+.cbx-chev { position: absolute; right: 6px; top: 50%; width: 28px; height: 28px; margin-top: -14px; cursor: pointer; }
+.cbx-chev::after {
+  content: ''; position: absolute; left: 10px; top: 9px; width: 7px; height: 7px;
+  border-right: 2px solid var(--fg); border-bottom: 2px solid var(--fg); transform: rotate(45deg);
+}
+.cbx-open .cbx-chev::after { top: 12px; transform: rotate(-135deg); }
+.cbx-clear {
+  position: absolute; right: 32px; top: 50%; width: 24px; height: 24px; margin-top: -12px; padding: 0;
+  font: inherit; font-size: 16px; line-height: 1; font-weight: 700; color: var(--muted); background: transparent; border: 0; border-radius: 50%; cursor: pointer;
+}
+.cbx-clear:hover { color: var(--fg); background: color-mix(in srgb, var(--border) 50%, transparent); }
+.cbx-list {
+  position: absolute; left: 0; top: calc(100% + 6px); z-index: 20; width: max(100%, 240px); max-height: min(320px, 60vh); overflow-y: auto;
+  margin: 0; padding: 6px; list-style: none; box-sizing: border-box;
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg);
+  box-shadow: 0 12px 32px color-mix(in srgb, var(--fg) 18%, transparent), 0 2px 6px color-mix(in srgb, var(--fg) 10%, transparent);
+}
+.cbx-list[hidden] { display: none; }
+.cbx-list li[role="option"] {
+  display: flex; align-items: center; gap: 10px; padding: 7px 10px; border-radius: var(--radius);
+  font-size: 14px; font-weight: 600; color: var(--fg); cursor: pointer;
+}
+.cbx-list li img { width: 22px; height: 22px; object-fit: contain; flex: none; }
+.cbx-noic { width: 22px; flex: none; }
+.cbx-text { flex: 1; min-width: 0; }
+.cbx-count { font-size: 12px; font-weight: 700; color: var(--muted); }
+.cbx-list li.cbx-all { color: var(--muted); }
+.cbx-list li[aria-selected="true"] { font-weight: 800; }
+.cbx-list li[aria-selected="true"] .cbx-text::after { content: ' ✓'; color: var(--moss); }
+.cbx-list li.cbx-active { background: color-mix(in srgb, var(--accent) 22%, var(--surface)); }
+.cbx-none { padding: 8px 10px; color: var(--muted); font-size: 14px; }
+@media (max-width: 520px) {
+  .cat-selects { display: grid; gap: 10px; }
+  .cbx-field { display: grid; grid-template-columns: 82px minmax(0, 1fr); }
+  .cbx { width: 100%; }
+  .cbx-list { width: 100%; }
+}
+.ency-filter[hidden] { display: none; }

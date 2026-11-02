@@ -79,7 +79,8 @@ describe('item catalog', () => {
       for (const [, href] of page.html.matchAll(/ (?:href|src)="([^"]+)"/g)) {
         if (/^https?:/.test(href)) continue;
         const sold = /^\.\.\/\?sold=([a-z0-9_]+)$/.exec(href);
-        if (sold) { vendorLinks += 1; assert.ok(vendors.has(sold[1]), `${page.file}: vendor ${sold[1]}`); continue; }
+        if (sold) { assert.ok(vendors.has(sold[1]), `${page.file}: vendor ${sold[1]}`); continue; }
+
         const music = /musicblocks\/#([a-z0-9_]+)$/.exec(href);
         if (music) { assert.ok(musicCards.has(music[1]), `${page.file}: ${href}`); continue; }
         if (minnServed(href)) continue;
@@ -95,7 +96,9 @@ describe('item catalog', () => {
       }
     }
     assert.ok(recipeLinks > 300, `only ${recipeLinks} recipe links`);
-    assert.ok(vendorLinks > 100, `only ${vendorLinks} vendor links`);
+    // Store cards (tools/encyclopedia/parts.mjs vendorCard), linking the store's page in the encyclopedia's People.
+    for (const page of pages) vendorLinks += (page.html.match(/<li><(?:a|span) class="ency-vendor"/g) || []).length;
+    assert.ok(vendorLinks > 100, `only ${vendorLinks} store cards`);
   });
 
   it('links each Musicblock to the Musicblocks page', () => {

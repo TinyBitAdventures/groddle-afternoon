@@ -3,8 +3,11 @@
  * tools/catalog/build.mjs) once, then filters by toggling `hidden`, so typing
  * and clicking never rebuild the list. Icons load lazily with fixed sizes, and
  * the filters live in the address (?q=&status=&cat=&get=&sold=) so a link can
- * open the catalog already filtered (item pages link vendors as ?sold=<key>).
+ * open the catalog already filtered (?sold=<key> opens one vendor's stock). The
+ * Category and Sold by selects are drawn as themed comboboxes (./combobox.js).
  */
+import { combobox } from './combobox.js?v=5821d844';
+
 const ICONS = '../assets/sprites/icons/';
 const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -62,6 +65,9 @@ async function main() {
   search.value = state.q;
   cat.value = state.cat;
   sold.value = state.sold;
+  // Themed comboboxes over the two selects (./combobox.js): the selects stay the state and fire change.
+  combobox(cat);
+  combobox(sold);
 
   let frame = 0;
   const apply = () => {

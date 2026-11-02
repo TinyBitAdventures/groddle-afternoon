@@ -429,6 +429,38 @@
    "what": "the item catalog pages (tools/catalog)"
   },
   {
+   "path": "public/encyclopedia/index.html",
+   "what": "the encyclopedia pages (tools/encyclopedia)"
+  },
+  {
+   "path": "public/encyclopedia/search.json",
+   "what": "the encyclopedia pages (tools/encyclopedia)"
+  },
+  {
+   "path": "public/encyclopedia/quests/",
+   "what": "the encyclopedia pages (tools/encyclopedia)"
+  },
+  {
+   "path": "public/encyclopedia/animals/",
+   "what": "the encyclopedia pages (tools/encyclopedia)"
+  },
+  {
+   "path": "public/encyclopedia/people/",
+   "what": "the encyclopedia pages (tools/encyclopedia)"
+  },
+  {
+   "path": "public/encyclopedia/skills/",
+   "what": "the encyclopedia pages (tools/encyclopedia)"
+  },
+  {
+   "path": "public/encyclopedia/places/",
+   "what": "the encyclopedia pages (tools/encyclopedia)"
+  },
+  {
+   "path": "public/encyclopedia/achievements/",
+   "what": "the encyclopedia pages (tools/encyclopedia)"
+  },
+  {
    "path": "public/changelog/",
    "what": "the old build notes (tools/changelog/build.mjs)"
   },
