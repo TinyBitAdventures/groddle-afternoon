@@ -147,3 +147,18 @@ describe('street playlists', () => {
     assert.ok(cfg.downloads.some((d) => /Spinning-Wheel/.test(d.file)));
   });
 });
+
+describe('Hell keeps its own music (ticket 47)', () => {
+  it('no other theme plays a Hell track: the Firebogs had seven songs of their own and Hell one (main.js 350-358, 449-451)', () => {
+    const music = JSON.parse(readFileSync(join(dirname(fileURLToPath(import.meta.url)), '../public/assets/content/ambient-music.json'), 'utf8'));
+    const themes = music.themes || music;
+    const hell = new Set(themes.hell.tracks);
+    assert.deepEqual([...hell], ['assets/audio/ambient/Dirge-of-the-Damned_1291886020.mp3']);
+    for (const [name, theme] of Object.entries(themes)) {
+      // The Rook attack's own music (ROOK_ATTACK) may share it: an event's theme, not a place's.
+      if (name === 'hell' || name === 'rook' || !Array.isArray(theme?.tracks)) continue;
+      for (const track of theme.tracks) assert.ok(!hell.has(track), `${name} plays Hell's ${track}`);
+    }
+    assert.ok(themes.firebog.tracks.length >= 2);
+  });
+});

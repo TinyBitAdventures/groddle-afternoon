@@ -43,7 +43,6 @@
       "label": "Firebog",
       "gsjsKeys": ["AMBIENT_FIREBOGS1", "AMBIENT_FIREBOGS2", "AMBIENT_FIREBOGS3"],
       "tracks": [
-        "assets/audio/ambient/Dirge-of-the-Damned_1291886020.mp3",
         "assets/audio/ambient/Spooky_Groddle_1291879214.mp3",
         "assets/audio/ambient/rooks_woods_1344997275.mp3"
       ]
@@ -121,9 +120,7 @@
       "label": "Hell",
       "gsjsKeys": ["HELL"],
       "tracks": [
-        "assets/audio/ambient/Dirge-of-the-Damned_1291886020.mp3",
-        "assets/audio/ambient/rooks_woods_1344997275.mp3",
-        "assets/audio/ambient/Spooky_Groddle_1291879214.mp3"
+        "assets/audio/ambient/Dirge-of-the-Damned_1291886020.mp3"
       ]
     },
     "subway": {

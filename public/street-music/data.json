@@ -36,7 +36,6 @@
      "audio": "/assets/audio/ambient/rooks_woods_1344997275.mp3",
      "places": [
       "the Firebogs",
-      "Hell",
       "Rook attacks"
      ]
     },
@@ -86,15 +85,13 @@
      "title": "Spooky Groddle",
      "audio": "/assets/audio/ambient/Spooky_Groddle_1291879214.mp3",
      "places": [
-      "the Firebogs",
-      "Hell"
+      "the Firebogs"
      ]
     },
     {
      "title": "Dirge of the Damned",
      "audio": "/assets/audio/ambient/Dirge-of-the-Damned_1291886020.mp3",
      "places": [
-      "the Firebogs",
       "Hell",
       "Rook attacks"
      ]
