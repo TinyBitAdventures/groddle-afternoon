@@ -260,6 +260,11 @@ export function createHomeBuilder({ root, doc = root?.ownerDocument }) {
   let model = null;
   let press = null; // a tile pressed, before it is a drag
   let suppressClick = false;
+  // The docked row (the Pack tab): the band it lives in, the box it covers and the pager's sync.
+  let docked = null; // { node, box, scroller }
+  let dockPager = null;
+  let dockKey = '';
+  const dockScrollers = new WeakSet();
 
   const onWindowMove = (e) => {
     if (!press || e.pointerId !== press.pointerId) return;
@@ -296,6 +301,65 @@ export function createHomeBuilder({ root, doc = root?.ownerDocument }) {
     const cx = `${Math.round(r.left + r.width / 2)}px`;
     if (bar.style.getPropertyValue('--hb-cx') !== cx) bar.style.setProperty('--hb-cx', cx);
   }
+
+  /**
+   * The Pack tab shows the pack in the tray's panel, as the other tabs show their tiles: the pack's own
+   * band (#pack-bar, game.js and js/ui/pack-row.js draw it) stays where it is, so every click, drag,
+   * bag, menu and tooltip keeps working, and takes the tray's height (its top is the tray's top, so an
+   * open bag, a stack's menu and everything that stops above the pack rise over the whole tray), with
+   * the row laid over the panel's dock box. Css px, the band's own frame; written only when they change.
+   */
+  function syncDock() {
+    if (!docked) return;
+    const { node, box } = docked;
+    if (!node.isConnected || !box.isConnected || bar.hidden) return;
+    const t = tray.getBoundingClientRect();
+    const d = box.getBoundingClientRect();
+    if (!t.height || !d.width) return;
+    const cb = node.offsetParent || root;
+    const c = cb.getBoundingClientRect();
+    // Not rounded: a skin in its own units (Classic's --cu) puts the tray on fractions of a px.
+    const px2 = (v) => Math.round(v * 100) / 100;
+    const top = px2(t.top - c.top - (cb.clientTop || 0));
+    const height = px2(t.height);
+    const setVar = (name, v) => {
+      const px = `${v}px`;
+      if (node.style.getPropertyValue(name) !== px) node.style.setProperty(name, px);
+    };
+    setVar('--hb-dock-top', top);
+    setVar('--hb-dock-h', height);
+    if (node.dataset.hbDock !== '1') node.dataset.hbDock = '1';
+    // The band's left edge after its top moved (the skins place it across the stage).
+    const n = node.getBoundingClientRect();
+    const at = { x: px2(d.left - n.left), y: px2(d.top - t.top), w: px2(d.width), h: px2(d.height) };
+    const key = `${top},${height},${at.x},${at.y},${at.w},${at.h}`;
+    if (key === dockKey) return;
+    dockKey = key;
+    setVar('--hb-dock-x', at.x);
+    setVar('--hb-dock-y', at.y);
+    setVar('--hb-dock-w', at.w);
+    setVar('--hb-dock-rh', at.h);
+    dockPager?.();
+  }
+
+  /** Give the band its own place back (another tab, Cultivation Mode, or the builder closed). */
+  function undock() {
+    if (!docked) return;
+    const { node, box, scroller } = docked;
+    resizeDock?.unobserve(box);
+    for (const child of scroller?.children || []) resizeDock?.unobserve(child);
+    delete node.dataset.hbDock;
+    for (const name of ['--hb-dock-top', '--hb-dock-h', '--hb-dock-x', '--hb-dock-y', '--hb-dock-w', '--hb-dock-rh']) node.style.removeProperty(name);
+    docked = null;
+    dockPager = null;
+    dockKey = '';
+  }
+
+  // The tray and the dock box move the row; the scroller's own boxes (bags, stacks) growing or
+  // shrinking only change what the arrows can reach.
+  const resizeDock = typeof ResizeObserver === 'function' ? new ResizeObserver(() => { syncDock(); dockPager?.(); }) : null;
+  resizeDock?.observe(tray);
+  doc.defaultView?.addEventListener('resize', () => syncDock());
 
   function trayHit(x, y) {
     if (bar.hidden || tray.hidden) return false;
@@ -393,6 +457,11 @@ export function createHomeBuilder({ root, doc = root?.ownerDocument }) {
         m.aside.balance ? el(doc, 'p', { class: 'hb-balance', text: m.aside.balance }) : null,
       ]));
     }
+    if (m.dock?.node) {
+      renderDock(m, panel, parts);
+      return;
+    }
+    undock();
     const strip = el(doc, 'div', { class: 'hb-strip', role: 'list', 'aria-label': m.stripLabel || 'Choices' });
     for (const group of m.groups || [{ tiles: m.tiles || [] }]) {
       if (group.heading) strip.append(el(doc, 'span', { class: 'hb-group', role: 'presentation', text: group.heading }));
@@ -447,19 +516,76 @@ export function createHomeBuilder({ root, doc = root?.ownerDocument }) {
         return node;
       })));
     }
-    if (m.note || m.footActions?.length || m.bannerActions?.length) {
-      parts.push(el(doc, 'div', { class: 'hb-foot' }, [
-        el(doc, 'p', { class: 'hb-note hb-tray-note', role: 'status', text: m.note || '' }),
-        ...(m.footActions || []).map((b) => button(doc, b, 'hb-bt')),
-        // The banner's buttons again, for a skin whose header has no room for them (Classic, narrow).
-        ...(m.bannerActions || []).map((b) => button(doc, { ...b, attrs: { ...(b.attrs || {}), 'data-home-mirror': '1' } }, 'hb-bt hb-foot-mirror')),
-      ]));
-    }
+    pushFoot(m, parts);
     tray.replaceChildren(...parts);
     if (keepScroll) strip.scrollLeft = keepScroll;
     syncPager();
     // Keep the chosen tile in view.
     strip.querySelector('.hb-tile.on')?.scrollIntoView?.({ block: 'nearest', inline: 'nearest' });
+  }
+
+  /** The tray's footer: the note (what to do now) and its buttons (the Furniture Store). */
+  function pushFoot(m, parts) {
+    if (m.note || m.footActions?.length || m.bannerActions?.length) {
+      parts.push(el(doc, 'div', { class: 'hb-foot' }, [
+        // The note's words in its tooltip too: a phone shows it on one line.
+        el(doc, 'p', { class: 'hb-note hb-tray-note', role: 'status', title: m.note || false, text: m.note || '' }),
+        ...(m.footActions || []).map((b) => button(doc, b, 'hb-bt')),
+        // The banner's buttons again, for a skin whose header has no room for them (Classic, narrow).
+        ...(m.bannerActions || []).map((b) => button(doc, { ...b, attrs: { ...(b.attrs || {}), 'data-home-mirror': '1' } }, 'hb-bt hb-foot-mirror')),
+      ]));
+    }
+  }
+
+  /**
+   * The Pack tab's panel: the paging arrows round a dock box the pack's row is laid over (syncDock),
+   * the same size as the other tabs' strips. `m.dock`: { node: the pack's band, scroller: what the
+   * arrows and the wheel scroll, owns: the row's id, which the tab panel takes into its accessibility
+   * tree (the row stays elsewhere in the page) }.
+   */
+  function renderDock(m, panel, parts) {
+    const { node, scroller = null, owns = '' } = m.dock;
+    if (docked && docked.node !== node) undock();
+    const box = el(doc, 'div', { class: 'hb-dock', 'aria-owns': owns || false });
+    const prev = el(doc, 'button', { type: 'button', class: 'hb-page hb-page-prev', 'aria-label': 'Scroll left', tabindex: '-1', text: '‹' });
+    const next = el(doc, 'button', { type: 'button', class: 'hb-page hb-page-next', 'aria-label': 'Scroll right', tabindex: '-1', text: '›' });
+    const page = (dir) => {
+      if (!scroller) return;
+      const step = Math.max(80, scroller.clientWidth - 80);
+      scroller.scrollBy?.({ left: dir * step, behavior: doc.defaultView?.matchMedia?.('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+    };
+    prev.addEventListener('click', () => page(-1));
+    next.addEventListener('click', () => page(1));
+    const syncPager = () => {
+      const left = scroller?.scrollLeft || 0;
+      const room = (scroller?.scrollWidth || 0) - (scroller?.clientWidth || 0);
+      prev.disabled = left <= 1;
+      next.disabled = left >= room - 1;
+    };
+    dockPager = syncPager;
+    if (scroller && !dockScrollers.has(scroller)) {
+      // Once per scroller: these call whichever arrows are drawn now.
+      dockScrollers.add(scroller);
+      scroller.addEventListener('scroll', () => { if (docked?.scroller === scroller) dockPager?.(); }, { passive: true });
+      // A vertical wheel over the pack scrolls it sideways, as over the other tabs' tiles.
+      scroller.addEventListener('wheel', (e) => {
+        if (docked?.scroller !== scroller || Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return;
+        scroller.scrollLeft += e.deltaY;
+        e.preventDefault();
+      }, { passive: false });
+    }
+    panel.classList.add('hb-panel-dock');
+    panel.append(prev, box, next);
+    parts.push(panel);
+    pushFoot(m, parts);
+    tray.replaceChildren(...parts);
+    if (docked) resizeDock?.unobserve(docked.box);
+    docked = { node, box, scroller };
+    dockKey = '';
+    resizeDock?.observe(box);
+    for (const child of scroller?.children || []) resizeDock?.observe(child);
+    syncDock();
+    syncPager();
   }
 
   return {
@@ -479,6 +605,7 @@ export function createHomeBuilder({ root, doc = root?.ownerDocument }) {
       const hook = active && bar.contains(active) ? focusHook(active) : null;
       bar.hidden = !m;
       if (!m) {
+        undock();
         delete html.dataset.homeBuilder;
         delete html.dataset.homeTray;
         this.setPop(null);

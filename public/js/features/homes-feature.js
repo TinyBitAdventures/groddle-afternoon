@@ -150,7 +150,7 @@ import {
   panKey,
   placeCostText,
   trayFilters,
-} from '../ui/home-builder.js?v=a542286a';
+} from '../ui/home-builder.js?v=3922b0d9';
 import { RECIPE_CATALOG } from '../making.js?v=20d5364b';
 import {
   createBackYardState,
@@ -3450,7 +3450,7 @@ function decorateModel(engine) {
     closeLabel: 'Leave Decoration Mode',
     onClose: () => setMode(engine, null),
     bannerActions: decorateBannerActions(engine),
-    // The Pack tab's tooltip says what it is for (its hint line has no room beside the pack).
+    // The Pack tab's tooltip says what it is for, as its footer does.
     tabs: DECOR_TABS.map(([id, label]) => ({ id, label, title: id === 'pack' ? BUILDER_TEXT.packNote : '' })),
     tab: tabId,
     tabsLabel: 'Decorate with',
@@ -3466,8 +3466,18 @@ function decorateModel(engine) {
     footActions: [{ label: 'Furniture Store', attrs: { 'data-home-store': '1' }, onClick: () => openStore(engine) }],
   };
   if (tabId === 'pack') {
-    // The pack itself shows below the tabs (the Inventory tab): drag things onto shelves and tables.
-    return { ...model, panelHidden: true, note: BUILDER_TEXT.packNote };
+    // The pack itself, in the tray's panel as the other tabs show their tiles (PackTabberUI's Inventory
+    // tab showed the pack where the furniture bag shows; Austin 2026-11-01: "the pack tab doesn't show
+    // the packed items within its tab"). The row stays game.js's own, docked over the panel
+    // (js/ui/home-builder.js renderDock), so its clicks, drags, bags, menus and search all still work.
+    const node = typeof document !== 'undefined' ? document.getElementById('pack-bar') : null;
+    if (!node) return { ...model, panelHidden: true, note: BUILDER_TEXT.packNote };
+    return {
+      ...model,
+      dock: { node, scroller: document.getElementById('pack-scroll'), owns: 'pack-row' },
+      stripKey: 'pack',
+      note: BUILDER_TEXT.packNote,
+    };
   }
   if (tabId === 'furniture') return { ...model, ...furnitureTray(engine) };
   return { ...model, ...swatchTray(engine, tabId) };
@@ -5210,6 +5220,10 @@ function bindPointer(engine) {
     if (!mode) return;
     if (e.key === 'Escape') {
       if (typing(e.target) && e.target.tagName !== 'SELECT') return;
+      // The Pack tab's pack: a stack's menu or an open bag takes Escape first (game.js closes it, as
+      // on the street), then Escape leaves as before.
+      if (mode === 'decorate' && typeof document !== 'undefined'
+        && [document.getElementById('pack-popover'), document.getElementById('pack-bag')].some((n) => n && !n.hidden)) return;
       // G277: an open confirm takes Escape first, as its no (ConfirmationDialog.as closeFromUserInput
       // 102-111 submits escape_value; HouseExpandDialog.as 202-209 sets it false). The bar stays open.
       if (engine.questDialogueOpen?.()) return;

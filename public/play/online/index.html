@@ -66,11 +66,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="robots" content="noindex" />
   <title>Groddle Afternoon · Multiplayer</title>
-    <link rel="stylesheet" href="style.css?v=9958ff80" />
+    <link rel="stylesheet" href="style.css?v=7bb00e77" />
   <!-- The UI font, self-hosted (style.css @font-face; OFL in assets/fonts/nunito/): the roman latin file, before first paint. -->
   <link rel="preload" href="assets/fonts/nunito/nunito-roman-latin.woff2" as="font" type="font/woff2" crossorigin />
   <!-- The Classic interface (js/classic/ui-mode.js sets <html data-ui="classic">); every rule is scoped to it. -->
-  <link rel="stylesheet" href="css/classic.css?v=10ec991f" />
+  <link rel="stylesheet" href="css/classic.css?v=71e67304" />
   <!-- Content keys for data and art URLs (js/data-urls.js): before every other script. -->
   <script src="js/data-versions.js?v=d7a1e1d2"></script>
   <script src="js/data-urls.js?v=523668ca"></script>
@@ -1008,9 +1008,13 @@
            the free slots, a pager only when the row overflows, the slot count and search (Shift+F or `). -->
       <div class="pack-bar" id="pack-bar">
         <nav class="pack-row" id="pack-row" aria-label="Pack">
-          <div id="pack-bags" class="pack-slots pack-bags" role="list" aria-label="Bags"></div>
-          <span class="pack-vsep" aria-hidden="true"></span>
-          <div id="pack-items" class="pack-slots pack-items" role="list" aria-label="Items" aria-describedby="pack-hint"></div>
+          <!-- The slots' scroller in Decoration Mode's Pack tab (js/ui/home-builder.js docks the row
+               in the tray); everywhere else it is only a box around them (display: contents). -->
+          <div class="pack-scroll" id="pack-scroll">
+            <div id="pack-bags" class="pack-slots pack-bags" role="list" aria-label="Bags"></div>
+            <span class="pack-vsep" aria-hidden="true"></span>
+            <div id="pack-items" class="pack-slots pack-items" role="list" aria-label="Items" aria-describedby="pack-hint"></div>
+          </div>
           <button type="button" class="pack-pager" id="pack-pager" data-pack-scroll="1" aria-label="More items" data-pack-tip="More items" hidden>
             <svg viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" aria-hidden="true"><path d="m8 5 5 5-5 5"/></svg>
           </button>
@@ -1094,6 +1098,6 @@
   <!-- Password managers skip the game's own boxes (chat, searches, names); the account forms keep autofill. -->
   <script type="module" src="js/no-autofill.js?v=6a1a4382"></script>
   <!-- game.js loads once the multiplayer save is in memory (js/online-boot.js). -->
-  <script type="module" id="online-boot" src="js/online-boot.js?v=c55ccff7" data-game="game.js?v=02531142"></script>
+  <script type="module" id="online-boot" src="js/online-boot.js?v=c55ccff7" data-game="game.js?v=6b142f62"></script>
 </body>
 </html>

@@ -454,6 +454,9 @@ export function createPackRow({ document: doc = globalThis.document, setData = (
     $('pack-pager')?.addEventListener('click', page);
     const box = items();
     box?.addEventListener('scroll', () => { refreshPager(); hideTip(); onScroll(); }, { passive: true });
+    // Decoration Mode's Pack tab scrolls the bags and stacks together (#pack-scroll, js/ui/home-builder.js
+    // renderDock): the tooltip goes and a stack's menu follows its slot, as on the row's own scroll.
+    $('pack-scroll')?.addEventListener('scroll', () => { hideTip(); onScroll(); }, { passive: true });
     box?.addEventListener('wheel', (event) => {
       const state = packPagerState(box);
       if (!state.overflow || Math.abs(event.deltaY) <= Math.abs(event.deltaX)) return;

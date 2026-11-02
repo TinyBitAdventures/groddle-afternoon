@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=fe2bbd71';
 import { createFeatureHost } from './js/feature-host.js?v=e4f648b1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=b7df291e';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=05161dd8';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -460,7 +460,7 @@ import {
   isToolItem,
 } from './js/inventory.js?v=b0e33301';
 import { PACK_COPY, isBagClass, unitRankAt } from './js/pack-slots.js?v=44e00ce9';
-import { createPackRow, mountPackClearance, packBandRange, packCountText, packSearchEntries, packSlotTip } from './js/ui/pack-row.js?v=9b23e21a';
+import { createPackRow, mountPackClearance, packBandRange, packCountText, packSearchEntries, packSlotTip } from './js/ui/pack-row.js?v=65c0f180';
 import { listAnimalFeedOptions } from './js/animals.js?v=926d8898';
 import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=926d8898';
 import {
@@ -23435,6 +23435,9 @@ function updateLocalChatDockPosition() {
   const pack = document.getElementById('pack-bar');
   const root = document.getElementById('game-root');
   if (!pack || !root) return;
+  // Docked in Decoration Mode's Pack tab (js/ui/home-builder.js renderDock) the band is the tray's
+  // height: what stops above the pack keeps its place, as on the tray's other tabs.
+  if (pack.dataset.hbDock) return;
   root.style.setProperty('--pack-live-height', `${Math.ceil(pack.offsetHeight) + 8}px`);
 }
 

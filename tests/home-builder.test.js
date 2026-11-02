@@ -26,7 +26,7 @@ import {
   panKey,
   placeCostText,
   trayFilters,
-} from '../public/js/ui/home-builder.js?v=a542286a';
+} from '../public/js/ui/home-builder.js?v=3922b0d9';
 import {
   INTERIOR,
   createHomeDecorState,
@@ -303,7 +303,7 @@ function fakeDom() {
       this.parentNode = null;
       this.attrs = {};
       this.dataset = {};
-      this.style = { props: {}, setProperty(k, v) { this.props[k] = v; }, getPropertyValue(k) { return this.props[k] || ''; } };
+      this.style = { props: {}, setProperty(k, v) { this.props[k] = v; }, getPropertyValue(k) { return this.props[k] || ''; }, removeProperty(k) { delete this.props[k]; } };
       this._text = '';
       this.nodeType = 1;
       this.rect = { left: 0, top: 0, right: 0, bottom: 0, width: 0, height: 0 };
@@ -318,6 +318,7 @@ function fakeDom() {
     get className() { return this.attrs.class || ''; }
     set className(v) { this.attrs.class = v; }
     get ownerDocument() { return doc; }
+    get isConnected() { return true; }
     get hidden() { return 'hidden' in this.attrs; }
     set hidden(v) { if (v) this.attrs.hidden = ''; else delete this.attrs.hidden; }
     get disabled() { return 'disabled' in this.attrs; }
@@ -452,6 +453,66 @@ describe('the builder DOM', () => {
     assert.deepEqual(calls, ['dragstart', 'dragmove', 'dragend:true']);
   });
 
+  it('the Pack tab lays the pack\'s own row over its panel, the size of the other tabs\' strips (DECOPACK)', () => {
+    const calls = [];
+    const { b, fire, win, El } = setup();
+    // The pack's band (#pack-bar) and its scroller (#pack-scroll), drawn by game.js elsewhere in the page.
+    const band = new El('div');
+    band.rect = { left: 0, top: 736, right: 1280, bottom: 800, width: 1280, height: 64 };
+    const scroller = new El('div');
+    scroller.append(new El('div'), new El('div'));
+    const scrolled = [];
+    scroller.scrollBy = (o) => scrolled.push(o.left);
+    const pack = { ...model(calls), tab: 'pack', filters: [], tiles: [], dock: { node: band, scroller, owns: 'pack-row' }, note: BUILDER_TEXT.packNote };
+    b.render(pack);
+    const box = b.tray.querySelector('.hb-dock');
+    assert.ok(box, 'a dock box where the strip goes');
+    assert.equal(box.getAttribute('aria-owns'), 'pack-row', 'the tab panel holds the pack row for a screen reader');
+    assert.equal(b.tray.querySelector('.hb-strip'), null);
+    assert.equal(b.tray.querySelector('.hb-panel').hidden, false, 'the panel shows (it was hidden, the pack beside it)');
+    assert.equal(b.tray.querySelectorAll('.hb-page').length, 2, 'the paging arrows');
+    // The footer stays: the note and the Furniture Store, as on the other tabs.
+    assert.equal(b.tray.querySelector('.hb-tray-note').textContent, BUILDER_TEXT.packNote);
+    assert.ok(b.tray.querySelector('[data-home-store="1"]'));
+    // Laid out: the band takes the tray's top and height, the row the dock box.
+    box.rect = { left: 50, top: 669, right: 1050, bottom: 753, width: 1000, height: 84 };
+    fire(win, 'resize');
+    assert.equal(band.dataset.hbDock, '1');
+    assert.deepEqual(
+      ['--hb-dock-top', '--hb-dock-h', '--hb-dock-x', '--hb-dock-y', '--hb-dock-w', '--hb-dock-rh'].map((k) => band.style.getPropertyValue(k)),
+      ['620px', '170px', '50px', '49px', '1000px', '84px'],
+    );
+    // The arrows and a vertical wheel scroll the pack.
+    const [prev, next] = b.tray.querySelectorAll('.hb-page');
+    assert.equal(prev.disabled, true);
+    assert.equal(next.disabled, false);
+    next.click();
+    assert.deepEqual(scrolled, [520]);
+    const wheel = fire(scroller, 'wheel', { deltaY: 60, deltaX: 0 });
+    assert.equal(scroller.scrollLeft, 60);
+    assert.equal(wheel.defaultPrevented, true);
+    // Redrawn (a placed thing, a count) it stays docked, its listeners once.
+    b.render(pack);
+    box.rect = b.tray.querySelector('.hb-dock').rect = { left: 50, top: 669, right: 1050, bottom: 753, width: 1000, height: 84 };
+    fire(win, 'resize');
+    fire(scroller, 'wheel', { deltaY: 60, deltaX: 0 });
+    assert.equal(scroller.scrollLeft, 120, 'one wheel listener');
+    // Another tab gives the band its own place back; so does leaving.
+    b.render(model(calls));
+    assert.equal(band.dataset.hbDock, undefined);
+    assert.equal(band.style.getPropertyValue('--hb-dock-top'), '');
+    assert.ok(b.tray.querySelector('.hb-strip'));
+    fire(scroller, 'wheel', { deltaY: 60, deltaX: 0 });
+    assert.equal(scroller.scrollLeft, 120, 'the wheel is the pack row\'s own again');
+    b.render(pack);
+    b.tray.querySelector('.hb-dock').rect = box.rect;
+    fire(win, 'resize');
+    assert.equal(band.dataset.hbDock, '1');
+    b.render(null);
+    assert.equal(band.dataset.hbDock, undefined);
+    assert.equal(band.style.getPropertyValue('--hb-dock-x'), '');
+  });
+
   it('the Place button stays focusable on a bad spot and refuses there', () => {
     const { b } = setup();
     const calls = [];
@@ -494,14 +555,12 @@ describe('two skins, one DOM', () => {
     assert.match(classic, /assets\/classic\/furn_scroll\.png/);
   });
 
-  it('keeps the tray tabs on one row, and the Pack tab clear of the pack and an open bag', () => {
+  it('keeps the tray tabs on one row, and an open bag clear of the tabs', () => {
     const style = read('public/style.css');
     const classic = read('public/css/classic.css');
     assert.match(style, /#game-root \.hb-tray \.hb-tabs \{[^}]*flex-wrap: nowrap;[^}]*min-width: max-content;/);
     assert.match(style, /#game-root \.hb-tray \.hb-tabs button \{ white-space: nowrap; \}/);
-    assert.match(style, /\.hb-tray\[data-tab="pack"\] \{ right: auto; width: max-content;/);
-    assert.doesNotMatch(style, /\.hb-tray\[data-tab="pack"\] \.hb-tabs \{ flex-wrap: wrap; \}/);
-    // Classic: the bag rises over the tabs that hang 17 above the pack band.
+    // Classic: the bag rises over the tabs that hang 17 above the tray.
     assert.match(classic, /:root\[data-ui="classic"\]\[data-home-tray="pack"\] #game-root \.pack-bag-row \{ bottom: calc\(100% \+ 8px \+ 21 \* var\(--cu\)\); \}/);
   });
 

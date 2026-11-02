@@ -2246,11 +2246,36 @@
   cursor: pointer;
 }
 :root[data-ui="classic"] #game-root .hb-tray .hb-tabs button.on { background: var(--c-classic-page); color: var(--c-classic-title); box-shadow: 3px 0 3px -2px color-mix(in srgb, var(--c-classic-ink) 20%, transparent), -3px 0 3px -2px color-mix(in srgb, var(--c-classic-ink) 20%, transparent); }
-/* The Inventory tab: the pack itself under the tabs. */
-:root[data-ui="classic"] #game-root .hb-tray[data-tab="pack"] { height: 0; padding: 0; bottom: auto; top: calc(100% - var(--cband-h, calc(132 * var(--cu)))); background: transparent; }
-:root[data-ui="classic"] #game-root .hb-tray[data-tab="pack"] .hb-foot { display: none; }
-/* An open bag rises clear of the tabs while they hang over the pack (PackTabberUI 17 tall). */
+/* An open bag rises clear of the tabs that hang over the tray (PackTabberUI 17 tall). */
 :root[data-ui="classic"][data-home-tray="pack"] #game-root .pack-bag-row { bottom: calc(100% + 8px + 21 * var(--cu)); }
+/* The Inventory tab: the pack in the furniture bag's paging well (PackTabberUI showed the pack where
+   the bag shows; home-builder.js renderDock lays the row over the well), its slots as the bag's
+   70 x 70 white tiles with the pack's own counts, wear bars and bag strips. */
+:root[data-ui="classic"] #game-root #pack-bar[data-hb-dock] .pack-row { gap: calc(5 * var(--cu)); padding: 0 calc(4 * var(--cu)) 0 0; }
+:root[data-ui="classic"] #game-root #pack-bar[data-hb-dock] .pack-scroll { gap: calc(5 * var(--cu)); padding: calc(5 * var(--cu)); }
+:root[data-ui="classic"] #game-root #pack-bar[data-hb-dock] .pack-scroll .pack-slots { gap: calc(5 * var(--cu)); }
+:root[data-ui="classic"] #game-root #pack-bar[data-hb-dock] .pack-scroll .pack-slot {
+  width: calc(70 * var(--cu));
+  height: calc(70 * var(--cu));
+  padding: calc(4 * var(--cu));
+  box-sizing: border-box;
+  border-radius: calc(4 * var(--cu));
+  background: var(--c-classic-panel);
+  box-shadow: 0 1px 3px color-mix(in srgb, var(--c-classic-ink) 15%, transparent);
+  transform: none;
+}
+:root[data-ui="classic"] #game-root #pack-bar[data-hb-dock] .pack-scroll .pack-slot:hover { box-shadow: 0 0 0 2px var(--c-classic-focus); }
+:root[data-ui="classic"] #game-root #pack-bar[data-hb-dock] .pack-scroll .pack-slot:focus-visible,
+:root[data-ui="classic"] #game-root #pack-bar[data-hb-dock] .pack-scroll .pack-slot.active,
+:root[data-ui="classic"] #game-root #pack-bar[data-hb-dock] .pack-scroll .pack-slot.pack-bag.is-open,
+:root[data-ui="classic"] #game-root #pack-bar[data-hb-dock] .pack-scroll .pack-slot.is-drop-target { box-shadow: 0 0 7px 2px var(--c-classic-focus); transform: none; }
+:root[data-ui="classic"] #game-root #pack-bar[data-hb-dock] .pack-scroll .pack-slot img:not(.pack-slot-inbag) { width: calc(54 * var(--cu)); height: calc(50 * var(--cu)); }
+:root[data-ui="classic"] #game-root #pack-bar[data-hb-dock] .pack-scroll .pack-slot.pack-bag { padding-top: calc(5 * var(--cu)); }
+:root[data-ui="classic"] #game-root #pack-bar[data-hb-dock] .pack-scroll .pack-slot.pack-bag img { width: calc(50 * var(--cu)); height: calc(42 * var(--cu)); }
+:root[data-ui="classic"] #game-root #pack-bar[data-hb-dock] .pack-scroll .pack-bag-opener { border-radius: 0 0 calc(4 * var(--cu)) calc(4 * var(--cu)); }
+:root[data-ui="classic"] #game-root #pack-bar[data-hb-dock] .pack-scroll .pack-slot-wear { left: calc(15 * var(--cu)); }
+:root[data-ui="classic"] #game-root #pack-bar[data-hb-dock] .pack-scroll .pack-empty,
+:root[data-ui="classic"] #game-root #pack-bar[data-hb-dock] .pack-scroll .pack-slot.pack-ghost { width: calc(70 * var(--cu)); height: calc(70 * var(--cu)); box-shadow: none; }
 :root[data-ui="classic"] #game-root .hb-tray .hb-panel {
   position: relative;
   gap: 0;
