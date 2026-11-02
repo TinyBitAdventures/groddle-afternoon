@@ -9,7 +9,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { SIDE_SHEET_IDS, sheetKeyToWorld } from '../public/js/ui/panel-shell.js?v=3309a3d9';
+import { SIDE_SHEET_IDS, sheetKeyToWorld } from '../public/js/ui/panel-shell.js?v=b984b886';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const game = readFileSync(join(root, 'public/game.js'), 'utf8');

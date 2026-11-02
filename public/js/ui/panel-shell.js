@@ -9,7 +9,7 @@
  * - one side sheet at a time: a sheet that opens closes the one that was open (its closer);
  * - while a side sheet is open, --inset-l on the root is the width it takes plus its gap, as the
  *   Social drawer sets --inset-r, so the pack and the notices centre in the width that is left;
- *   the root has data-sheet="<id>" (the pinned quest tracker hides then);
+ *   the root has data-sheet="<id>" (the pinned quest tracker steps right, beside the sheet);
  * - a sheet that opens takes focus on its title, and gives it back to what opened it on close;
  * - tabs (role=tab in a role=tablist) move with the arrow keys, Home and End.
  *

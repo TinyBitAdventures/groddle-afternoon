@@ -11114,8 +11114,11 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
   [data-ui="modern"] #game-root #buffs-panel,
   [data-ui="modern"] #map-panel .map-card.map-hub { animation: none; }
 }
-/* Pinned quests (js/ui/quest-tracker.js): up to two, top left under the left pill; folds to a chip;
-   gone while a side sheet is open (the root's data-sheet). A skin that does not show it keeps it hidden. */
+/* Pinned quests (js/ui/quest-tracker.js): up to two, top left under the left pill; folds to a chip.
+   MAKESHEET (Austin 2026-11-02): while a side sheet is open (the root's data-sheet: Make, a tool's
+   recipes, a vendor, Quests) the card steps right, beside the sheet (--inset-l holds the sheet's width
+   and its gap), so a pinned quest stays in view and ticks as you craft, buy or sell. Only a narrow
+   window, with no room beside the sheet, still hides it. A skin that does not show it keeps it hidden. */
 .quest-pins { display: none; }
 [data-ui="modern"] #game-root #quest-pins:not([hidden]) {
   position: absolute;
@@ -11135,9 +11138,9 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
   font-size: var(--fs-m);
   font-weight: var(--fw-regular);
   line-height: var(--lh-tight);
-  transition: opacity var(--motion-med), transform var(--motion-med) var(--ease-out), visibility var(--motion-med);
+  transition: opacity var(--motion-med), transform var(--motion-med) var(--ease-out), visibility var(--motion-med), left var(--motion-med) var(--ease-out);
 }
-[data-ui="modern"] #game-root[data-sheet] #quest-pins { opacity: 0; visibility: hidden; transform: translateX(-8px); pointer-events: none; }
+[data-ui="modern"] #game-root[data-sheet] #quest-pins:not([hidden]) { left: max(var(--hud-inset), var(--inset-l, 0px)); }
 [data-ui="modern"] #quest-pins .quest-pins-head { display: flex; align-items: center; gap: var(--space-1); height: 24px; }
 [data-ui="modern"] #quest-pins .quest-pins-head img { width: 22px; height: auto; flex: none; }
 [data-ui="modern"] #quest-pins .quest-pins-title {
@@ -11196,6 +11199,7 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
 [data-ui="modern"] #game-root:not([data-sheet]) #quest-pins:not([hidden]) ~ #buff-strip { top: calc(var(--hud-h) + 6px + var(--quest-pins-h, 0px) + var(--space-2)); }
 @media (max-width: 760px) {
   [data-ui="modern"] #game-root #quest-pins:not([hidden]) { top: calc(2 * var(--hud-h) + var(--space-4)); }
+  [data-ui="modern"] #game-root[data-sheet] #quest-pins { opacity: 0; visibility: hidden; transform: translateX(-8px); pointer-events: none; }
   [data-ui="modern"] #game-root:not([data-sheet]) #quest-pins:not([hidden]) ~ #buff-strip { top: calc(2 * var(--hud-h) + var(--space-4) + var(--quest-pins-h, 0px) + var(--space-2)); }
 }
 /* PINMENU (js/ui/quest-pin-menu.js): a pinned row's menu (right-click, Shift+F10, a long press):

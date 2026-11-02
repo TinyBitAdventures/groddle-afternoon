@@ -915,9 +915,9 @@ import { createNotifier, effectTokens, floatKey, offerCardDrop, stackFloat, toke
 import { mountNotifyView } from './js/notify-view.js?v=81d06119';
 import { mountSocialDrawer } from './js/ui/social-drawer.js?v=bee1328e';
 import { bindDragScroll } from './js/ui/drag-scroll.js?v=9a527ac8';
-import { SIDE_SHEET_IDS, bindTabs, inSideSheet, mountPanelShell, sheetKeyToWorld } from './js/ui/panel-shell.js?v=3309a3d9';
+import { SIDE_SHEET_IDS, bindTabs, inSideSheet, mountPanelShell, sheetKeyToWorld } from './js/ui/panel-shell.js?v=b984b886';
 import { createQuestSheet, questStep } from './js/ui/quest-sheet.js?v=2a704f05';
-import { createQuestTracker } from './js/ui/quest-tracker.js?v=335ff8b6';
+import { createQuestTracker } from './js/ui/quest-tracker.js?v=b088b3c7';
 import { bindCountField, countKeyValue, countStepMarkup } from './js/ui/count-chooser.js?v=893305c8';
 import { bindVerbMenu, focusVerbRow, lockVerbMenuSize, makeVerbRow, placeVerbMenu, plainWords, refuseVerbRow, syncVerbDetail, verbMenuKey, verbRowAttrs, verbRowInner, verbRowKeys } from './js/ui/verb-menu.js?v=e9d100c3';
 import { createPromptSettler, promptId } from './js/prompt-settle.js?v=509ba9cc';

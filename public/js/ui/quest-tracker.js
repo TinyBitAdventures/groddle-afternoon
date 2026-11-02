@@ -2,8 +2,9 @@
  * VERBS (phase 2, Warm paper; the HUD mock's pinned quest tracker): up to two quests pinned from
  * the Quests sheet, top left under the left pill. Each shows its title, the step you are on, its
  * count and a bar, and ticks as the count moves. The head folds it to one chip ("Porcine Pleaser
- * 4/6 +1"). It hides while a side sheet is open (the root's data-sheet, css) and when nothing is
- * pinned. A quest's line opens the Quests sheet on it.
+ * 4/6 +1"). While a side sheet is open (the root's data-sheet, css) it sits beside the sheet, so it
+ * stays in view and ticks while you make or trade (MAKESHEET, Austin 2026-11-02); it hides when
+ * nothing is pinned. A quest's line opens the Quests sheet on it.
  *
  * PINMENU (Austin 2026-11-01): a row's menu (js/ui/quest-pin-menu.js) unpins it, only from its
  * Unpin row: right-click, the Menu key or Shift+F10 on a focused row, or a long press on touch.
