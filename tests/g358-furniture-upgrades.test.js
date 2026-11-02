@@ -33,11 +33,11 @@ import {
   pickUpFurniture,
   placeFurniture,
   surfaceHeight,
-} from '../public/js/home-decor.js?v=df55aa99';
-import { FURNITURE_CATALOG } from '../public/js/homes-catalog.js?v=29713fa8';
+} from '../public/js/home-decor.js?v=f396b68f';
+import { FURNITURE_CATALOG } from '../public/js/homes-catalog.js?v=b3d9aea7';
 import { IMAGINATION_UPGRADES, upgradeStatus, DEALT_SECRET_CARDS } from '../public/js/imagination.js?v=b4f0eaf6';
 import { isOfferedInRemake, remakeStatus } from '../public/js/imagination-remake.js?v=ca0a48d5';
-import { visitorHomeState } from '../public/js/features/homes-feature.js?v=1223fe23';
+import { visitorHomeState } from '../public/js/features/homes-feature.js?v=28401e58';
 
 const spike = join(import.meta.dirname, '..');
 const pub = join(spike, 'public');
@@ -209,7 +209,8 @@ describe('upgraded pieces in the house (home-decor.js)', () => {
   });
 
   it('rests tabletop decor on an upgraded table at its catalog plat', () => {
-    assert.equal(surfaceHeight('furniture_table'), 80);
+    // The plain table from its own plat (getFurnitureBaseGeo 43) and base SWF foot (-25), DECOPOLISH.
+    assert.equal(surfaceHeight('furniture_table'), 68);
     // The catalog plat counts from the SWF stage's bottom, art.foot over the art's bottom (DECOITEMS).
     const row = FURNITURE_UPGRADES.furniture_table.upgrades['59'];
     assert.equal(surfaceHeight('furniture_table', '59'), row.platY - row.art.foot);

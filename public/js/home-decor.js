@@ -49,7 +49,7 @@ import {
   FURNITURE_STARTER_KIT,
   HOME_LIMITS,
   HOME_TEXTURE_CONFIGS,
-} from './homes-catalog.js?v=29713fa8';
+} from './homes-catalog.js?v=b3d9aea7';
 import { cleanHistory, cleanUpgradeId, upgradeArt, upgradeRow } from './furniture-upgrades.js?v=2bc913dc';
 
 export const SEGMENT_W = 150;
@@ -154,21 +154,33 @@ export const REST_INSET = 2;
  * by tools/furniture-upgrades/tops.mjs, whose --check sweeps every piece): a
  * plat above it, or a piece with no plat, rests things REST_INSET into that top.
  * With no measurement, the class's surface in proportion to the art's height.
+ * A plain piece rests things the same way from its own plat and foot
+ * (build-homes.mjs from getFurnitureBaseGeo and the base SWF): the round table
+ * at 43 + 25 = 68 up its 85 px art, not the hand-set 80 at the back edge of its
+ * top (DECOPOLISH, Austin 2026-11-02).
  */
 export function surfaceHeight(classTsid, upgradeId = '') {
   const def = furnitureDef(classTsid);
   if (!def?.surface) return 0;
   const art = upgradeArt(classTsid, upgradeId);
   if (art) {
-    const row = upgradeRow(classTsid, upgradeId)?.platY;
-    const foot = Number.isFinite(Number(art.foot)) ? Number(art.foot) : 0;
-    const plat = row != null && Number.isFinite(Number(row)) ? Math.round(Number(row) - foot) : 0;
-    const top = Number.isFinite(Number(art.top)) ? art.h - Number(art.top) : null;
-    if (plat > 0 && plat <= (top ?? art.h + 4)) return plat;
-    if (top != null) return Math.max(1, top - REST_INSET);
-    return Math.round(def.surface * (art.h / def.art.h));
+    const rest = restOnArt(art, upgradeRow(classTsid, upgradeId)?.platY, 1);
+    return rest ?? Math.round(def.surface * (art.h / def.art.h));
   }
-  return Math.round(def.surface * furnitureScale(classTsid));
+  // The plain piece the same way (DECOPOLISH): its plat from items/<class>.js getFurnitureBaseGeo
+  // and its base SWF's foot (build-homes.mjs); its hand-set `surface` only when it has no plat.
+  const s = furnitureScale(classTsid);
+  return (def.platY != null ? restOnArt(def.art, def.platY, s) : null) ?? Math.round(def.surface * s);
+}
+
+/** plat - foot on `art`, kept under its visible top (or REST_INSET into the top with no plat), at scale s; null with neither. */
+function restOnArt(art, platY, s) {
+  const foot = Number.isFinite(Number(art.foot)) ? Number(art.foot) : 0;
+  const plat = platY != null && Number.isFinite(Number(platY)) ? Math.round((Number(platY) - foot) * s) : 0;
+  const top = Number.isFinite(Number(art.top)) ? Math.round((art.h - Number(art.top)) * s) : null;
+  if (plat > 0 && plat <= (top ?? Math.round((art.h + 4) * s))) return plat;
+  if (top != null) return Math.max(1, top - REST_INSET);
+  return null;
 }
 
 function finite(value, fallback = 0) {

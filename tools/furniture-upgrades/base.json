@@ -1,0 +1,93 @@
+{
+ "bag_furniture_cabinet": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/bag_furniture_cabinet_base/bag_furniture_cabinet/bag_furniture_cabinet.swf",
+  "sha": "a13ed4f02a37948f",
+  "w": 142,
+  "h": 187,
+  "foot": -25,
+  "top": 0
+ },
+ "bag_furniture_largecabinet": {
+  "top": 0
+ },
+ "bag_furniture_smallcabinet": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/bag_furniture_cabinet_base/bag_furniture_smallcabinet/bag_furniture_smallcabinet.swf",
+  "sha": "97d59cc7ea4eea21",
+  "w": 169,
+  "h": 77,
+  "foot": -24,
+  "top": 0
+ },
+ "furniture_bookcase": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_base/furniture_bookcase/furniture_bookcase.swf",
+  "sha": "2cb159913bb55dde",
+  "w": 151,
+  "h": 159,
+  "foot": -20,
+  "top": 1
+ },
+ "furniture_cabinet": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_base/furniture_cabinet/furniture_cabinet.swf",
+  "sha": "11a26ea2576afa3b",
+  "w": 159,
+  "h": 169,
+  "foot": -14,
+  "top": 0
+ },
+ "furniture_coffeetable": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_base/furniture_coffeetable/furniture_coffeetable.swf",
+  "sha": "03cbb8dff8a3bb44",
+  "w": 260,
+  "h": 62,
+  "foot": -27,
+  "top": 4
+ },
+ "furniture_counter": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_base/furniture_counter/furniture_counter.swf",
+  "sha": "c4a71b3936d92ae1",
+  "w": 199,
+  "h": 81,
+  "foot": -22,
+  "top": 3
+ },
+ "furniture_desk": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_base/furniture_desk/furniture_desk.swf",
+  "sha": "c597fa759498e5c1",
+  "w": 172,
+  "h": 72,
+  "foot": -21,
+  "top": 1
+ },
+ "furniture_fireplace": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_base/furniture_fireplace/furniture_fireplace.swf",
+  "sha": "234829d8158bbc6b",
+  "w": 192,
+  "h": 134,
+  "foot": -24,
+  "top": 7
+ },
+ "furniture_shelf": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_base/furniture_shelf/furniture_shelf.swf",
+  "sha": "79a41f599c04e74e",
+  "w": 233,
+  "h": 47,
+  "foot": 8,
+  "top": 3
+ },
+ "furniture_sidetable": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_base/furniture_sidetable/furniture_sidetable.swf",
+  "sha": "47bd3ac17f327d8c",
+  "w": 63,
+  "h": 54,
+  "foot": -18,
+  "top": 0
+ },
+ "furniture_table": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_base/furniture_table/furniture_table.swf",
+  "sha": "d1aba665f268b910",
+  "w": 220,
+  "h": 85,
+  "foot": -25,
+  "top": 1
+ }
+}

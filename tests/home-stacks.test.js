@@ -21,13 +21,14 @@ import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { FURNITURE_CATALOG } from '../public/js/homes-catalog.js?v=29713fa8';
+import { FURNITURE_CATALOG } from '../public/js/homes-catalog.js?v=b3d9aea7';
 import { FURNITURE_UPGRADES } from '../public/js/furniture-upgrades-data.js?v=268c538a';
-import { createHomeDecorState, INTERIOR, placeFurniture, settleStacks, STALE_REST_GIVE, surfaceHeight } from '../public/js/home-decor.js?v=df55aa99';
+import { createHomeDecorState, INTERIOR, placeFurniture, settleStacks, STALE_REST_GIVE, surfaceHeight } from '../public/js/home-decor.js?v=f396b68f';
 import { normalizeDroppedItemState } from '../public/js/world-items.js?v=210bef3b';
 import { isStandable } from '../public/js/street-model.js?v=505d8990';
 import { BUILDER_TEXT } from '../public/js/ui/home-builder.js?v=3922b0d9';
-import { hasMagick } from '../tools/furniture-upgrades/tops.mjs';
+import { hasMagick, itemBottoms } from '../tools/furniture-upgrades/tops.mjs';
+import { basePlats, surfaceFrom } from '../tools/furniture-upgrades/build.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');
@@ -162,6 +163,68 @@ describe('every piece rests things on its art', () => {
   it('the sweep over every piece\'s art passes (tools/furniture-upgrades/tops.mjs --check)', { skip: !hasMagick() && 'ImageMagick missing' }, () => {
     const out = execFileSync(process.execPath, [join(root, 'tools/furniture-upgrades/tops.mjs'), '--check'], { cwd: root, encoding: 'utf8' });
     assert.match(out, /^ok: \d+ pieces rest things on their art/m);
+  });
+});
+
+describe('the plain pieces rest things on their own plats (DECOPOLISH, Austin 2026-11-02)', () => {
+  // "Placed items seem to float above the table. Can we bump them down a bit?": a Musicblock and
+  // Bubbles on the plain round table, Wheat on the small cabinet. The plain pieces had hand-set
+  // heights 5 px under the art's top edge (the back edge of the tabletop); the original rested
+  // things on the plat items/<class>.js getFurnitureBaseGeo gives, over the SWF stage's bottom.
+  const base = JSON.parse(read('tools/furniture-upgrades/base.json'));
+  const gsjs = join(process.env.HOME || '', 'Documents/glitch-audit/glitch-GameServerJS/items/furniture_table.js');
+  const haveGsjs = (() => {
+    try {
+      readFileSync(gsjs);
+      return true;
+    } catch {
+      return false;
+    }
+  })();
+
+  it('the round table, the small cabinet, the shelf and the counter rest things on their plats, under the old heights', () => {
+    const want = { furniture_table: [80, 68], bag_furniture_smallcabinet: [72, 65], furniture_shelf: [40, 30], furniture_counter: [76, 64], furniture_coffeetable: [54, 45], furniture_sidetable: [50, 45], furniture_desk: [66, 62] };
+    for (const [cls, [was, now]] of Object.entries(want)) {
+      const def = FURNITURE_CATALOG[cls];
+      assert.equal(surfaceHeight(cls), now, cls);
+      assert.equal(def.platY - def.art.foot, now, `${cls}: plat ${def.platY} - foot ${def.art.foot}`);
+      assert.ok(now < was, `${cls}: lower than the hand-set ${was}`);
+      assert.ok(now <= def.art.h - def.art.top, `${cls}: under its visible top`);
+    }
+  });
+
+  it('reads each plat from the source and each foot from the base SWF (base.json)', { skip: !haveGsjs && 'GSJS missing' }, () => {
+    assert.equal(surfaceFrom(basePlats('furniture_table')), 43, 'furniture_table.js getFurnitureBaseGeo: y -42 .. -43');
+    assert.equal(base.furniture_table.foot, -25);
+    assert.equal(surfaceFrom(basePlats('bag_furniture_smallcabinet')), 41);
+    for (const [cls, def] of Object.entries(FURNITURE_CATALOG)) {
+      if (def.platY == null) continue;
+      assert.equal(def.platY, surfaceFrom(basePlats(cls)), cls);
+      assert.equal(def.art.foot, base[cls].foot, cls);
+    }
+    // No plat, no change: the bookcase and cabinets held nothing in the original; the SDB has plats null.
+    assert.equal(basePlats('furniture_bookcase'), null);
+    assert.equal(basePlats('bag_furniture_sdb'), null);
+    assert.equal(surfaceHeight('furniture_bookcase'), FURNITURE_CATALOG.furniture_bookcase.surface);
+    // The Fireplace's OGA file is a sheet of 5 x 5 frames, not the base frame: its hand-set surface stands.
+    assert.equal(FURNITURE_CATALOG.furniture_fireplace.platY, undefined);
+    assert.equal(surfaceHeight('furniture_fireplace'), 280);
+  });
+
+  it('things set on the round table before the fix come down onto it when the room loads', () => {
+    const state = austinsRoom();
+    const rows = [
+      { id: 'mb', classTsid: 'musicblock_d_blue_05', count: 1, x: 1140 + 540, y: 620 - 80, on: 3 },
+      { id: 'pb', classTsid: 'plain_bubble', count: 4, x: 1140 + 580, y: 620 - 80 },
+    ];
+    assert.equal(settleStacks(state, rows, 1140), 2);
+    for (const row of rows) assert.deepEqual({ y: row.y, on: row.on }, { y: 620 - 68, on: 3 });
+  });
+
+  it('what rests on a piece rests by its own bottom: no world-art state has clear rows under it', { skip: !hasMagick() && 'ImageMagick missing' }, () => {
+    const { files, problems } = itemBottoms();
+    assert.ok(files > 1500, String(files));
+    assert.deepEqual(problems, []);
   });
 });
 

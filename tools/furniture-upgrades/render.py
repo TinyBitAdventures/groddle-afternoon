@@ -23,6 +23,15 @@ rest 33 px up its 49 px art, on the plank). Each render records it; for art
 rendered before it was kept:
 
     python3 -I tools/furniture-upgrades/render.py --feet [--work DIR]
+
+The plain pieces (no upgrade) draw their recovered OGA frame, which is the base
+SWF's frame 1 trimmed (glitch-items/furniture/furniture_base/<class>/<class>.swf,
+bag_furniture_cabinet_base/ for the storage cabinets). Their feet go in
+base.json, for every class build-homes.mjs gives a surface, with the trimmed
+SWF size (the Fireplace's OGA frame is drawn about five times the SWF's size,
+so build-homes scales by art height over SWF height):
+
+    python3 -I tools/furniture-upgrades/render.py --base [--work DIR] [class ...]
 """
 import hashlib, json, os, shutil, subprocess, sys, tempfile
 
@@ -84,6 +93,52 @@ def feet(art, work):
         print(f'  {min(b + BATCH, len(keys))}/{len(keys)}')
 
 
+BASE = os.path.join(HERE, 'base.json')
+FURNITURE = os.path.expanduser('~/Documents/glitch-audit/glitch-items/furniture')
+
+
+def base_swf(cls):
+    for sub in ('furniture_base', 'bag_furniture_cabinet_base'):
+        path = os.path.join(FURNITURE, sub, cls, cls + '.swf')
+        if os.path.exists(path):
+            return path
+    return None
+
+
+def base_feet(classes, work):
+    """Render each plain piece's base SWF at zoom 1: its trimmed size and foot, into base.json."""
+    base = json.load(open(BASE)) if os.path.exists(BASE) else {}
+    classes = classes or sorted(base)
+    src_dir = os.path.join(work, 'bsrc')
+    out_dir = os.path.join(work, 'bout')
+    os.makedirs(src_dir, exist_ok=True)
+    infos = {}
+    for cls in classes:
+        src = base_swf(cls)
+        if not src:
+            print('  no base SWF', cls)
+            continue
+        infos[cls] = (src, swfinfo.read(src))
+        swfinfo.rewrite(src, os.path.join(src_dir, cls + '.swf'), pad=1.0)
+    subprocess.run([JAVA, '-Djava.awt.headless=true', '-jar', FFDEC, '-zoom', '1', '-ignorebackground',
+                    '-select', '1', '-format', 'frame:png', '-export', 'frame', out_dir, src_dir],
+                   capture_output=True, text=True)
+    for cls, (src, info) in infos.items():
+        png = os.path.join(out_dir, cls + '.swf', '1.png')
+        if not os.path.exists(png):
+            print('  no render', cls)
+            continue
+        w, h, x, y = trim_box(png)
+        row = base.get(cls, {})
+        row.update({'swf': src.replace(os.path.expanduser('~'), '~'), 'sha': sha(src), 'w': w, 'h': h, 'foot': foot_of(info, y, h, 1)})
+        base[cls] = row
+    shutil.rmtree(src_dir, ignore_errors=True)
+    shutil.rmtree(out_dir, ignore_errors=True)
+    json.dump(dict(sorted(base.items())), open(BASE, 'w'), indent=1)
+    open(BASE, 'a').write('\n')
+    print(f'{len(infos)} base pieces measured into base.json')
+
+
 def guard():
     load = os.getloadavg()[0]
     free = shutil.disk_usage(os.path.expanduser('~')).free / 1e9
@@ -97,6 +152,10 @@ def main(args):
     work = None
     if '--work' in args:
         work = args[args.index('--work') + 1]
+    if '--base' in args:
+        only = [a for a in args if not a.startswith('--') and a != work]
+        base_feet(only, work or tempfile.mkdtemp(prefix='furnbase-'))
+        return
     if '--feet' in args:
         art = json.load(open(ART))
         feet(art, work or tempfile.mkdtemp(prefix='furnfeet-'))

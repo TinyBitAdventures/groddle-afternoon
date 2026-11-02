@@ -14,7 +14,7 @@ import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { WORLD_ART } from '../public/js/world-art-list.js?v=df42115a';
 import { FALLBACK_MAX, artIdOf, worldArtFor, worldStateFor } from '../public/js/world-art.js?v=df476660';
-import { surfaceHeight, stackSurfaceAt, createHomeDecorState } from '../public/js/home-decor.js?v=df55aa99';
+import { surfaceHeight, stackSurfaceAt, createHomeDecorState } from '../public/js/home-decor.js?v=f396b68f';
 import { FURNITURE_UPGRADES } from '../public/js/furniture-upgrades-data.js?v=268c538a';
 
 const root = join(import.meta.dirname, '..');
@@ -137,8 +137,9 @@ describe('what is set on a shelf rests on its plank', () => {
     assert.equal(surfaceHeight('furniture_shelf', '94'), 33);
   });
 
-  it('leaves the base shelf as it was; a table drawn past its point rests things that much higher, on its top (DECOITEMS)', () => {
-    assert.equal(surfaceHeight('furniture_shelf', ''), 40);
+  it('rests things on the base shelf\'s plank from its own plat; a table drawn past its point rests things that much higher, on its top (DECOITEMS)', () => {
+    // DECOPOLISH: furniture_shelf.js getFurnitureBaseGeo plat 38 over a stage bottom 8 px under its 47 px art: 30 up.
+    assert.equal(surfaceHeight('furniture_shelf', ''), 30);
     // Dining Table with Striped Runner: plat 52 over a stage bottom 24 px above its art's bottom.
     assert.equal(FURNITURE_UPGRADES.furniture_table.upgrades['59'].art.foot, -24);
     assert.equal(surfaceHeight('furniture_table', '59'), 76);

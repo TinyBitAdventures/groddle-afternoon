@@ -8,7 +8,7 @@ import {
   FURNITURE_STORE,
   HOME_LIMITS,
   HOME_TEXTURE_CONFIGS,
-} from '../public/js/homes-catalog.js?v=29713fa8';
+} from '../public/js/homes-catalog.js?v=b3d9aea7';
 import {
   INTERIOR,
   SEGMENT_W,
@@ -31,7 +31,7 @@ import {
   restackFurniture,
   setHomeTexture,
   snapPlacement,
-} from '../public/js/home-decor.js?v=df55aa99';
+} from '../public/js/home-decor.js?v=f396b68f';
 
 const root = join(import.meta.dirname, '..', 'public');
 
@@ -144,7 +144,7 @@ describe('decorating the house', () => {
     const table = placeFurniture(state, {}, 'furniture_table', { x: 500 }).item;
     const lamp = placeFurniture(state, {}, 'furniture_tablelamp', { x: 520 }).item;
     assert.equal(lamp.on, table.id);
-    assert.equal(lamp.y, INTERIOR.floorY - 80);
+    assert.equal(lamp.y, INTERIOR.floorY - 68);
     moveFurniture(state, table.id, { x: 800 });
     assert.equal(lamp.x, 820);
     const order = renderOrder(state).map((row) => row.id);

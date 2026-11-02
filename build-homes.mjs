@@ -31,6 +31,7 @@ import { copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync, writeFi
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { loadItem } from './build-recipes.mjs';
+import { basePlats, surfaceFrom } from './tools/furniture-upgrades/build.mjs';
 
 const root = dirname(fileURLToPath(import.meta.url));
 const AUDIT = join(process.env.HOME || '', 'Documents/glitch-audit');
@@ -100,9 +101,18 @@ const FURNITURE_CLASSES = [
 ];
 
 /**
- * Remake-only layout facts that the base art implies but the source does not
- * record for the un-upgraded frame (catalog_furniture plats belong to upgrades):
- * `surface` is the height above the foot where tabletop decor rests.
+ * Remake layout facts for the un-upgraded frame. `surface` marks a piece things
+ * rest on; where it rests comes from the source when the class has a plat:
+ * items/<class>.js getFurnitureBaseGeo (furniture-upgrades/build.mjs basePlats)
+ * gives `platY` over the SWF stage's bottom, and the base SWF's foot
+ * (tools/furniture-upgrades/base.json, render.py --base) and visible top
+ * (tops.mjs) go on `art`, so js/home-decor.js surfaceHeight rests things on the
+ * plain piece as on an upgraded one (DECOPOLISH, Austin 2026-11-02: things on
+ * the plain round table and the small cabinet floated; these hand-set heights
+ * were 5 px under the art's top edge, the back of the tabletop). The number
+ * here is used as it stands only by a piece with no source plat (the bookcase
+ * and the cabinets, which held nothing in the original: the remake lets them,
+ * a few px into their thin top boards).
  * `scale` only ever shrinks: the 965x665 Fireplace is shown at half size.
  */
 const LAYOUT = {
@@ -124,6 +134,27 @@ const LAYOUT = {
 const TABLETOP = new Set([
   'furniture_tabledeco', 'furniture_smalltabledeco', 'furniture_largetabledeco', 'furniture_tablelamp',
 ]);
+
+const BASE_ART = join(root, 'tools/furniture-upgrades/base.json');
+
+/**
+ * Where a plain piece with a surface rests things, from the source: { platY,
+ * art: { foot, top } } in its art's px, or { art: { top } } when its art is not
+ * the base SWF's frame (height within 2 px, width 8: the Fireplace's OGA file is a 965 x 665
+ * sheet of 5 x 5 frames, bag_furniture_largecabinet has no base SWF), so its
+ * hand-set surface stands.
+ */
+function baseSurface(classTsid, artW, artH) {
+  if (!LAYOUT[classTsid]?.surface) return {};
+  const base = existsSync(BASE_ART) ? JSON.parse(readFileSync(BASE_ART, 'utf8'))[classTsid] : null;
+  const out = { art: {} };
+  if (Number.isFinite(base?.top)) out.art.top = base.top;
+  if (!base?.h || !Number.isFinite(base.foot) || Math.abs(base.w - artW) > 8 || Math.abs(base.h - artH) > 2) return out;
+  out.art.foot = base.foot;
+  const platY = surfaceFrom(basePlats(classTsid, GSJS));
+  if (platY != null) out.platY = platY;
+  return out;
+}
 
 function slotFor(placementSet) {
   if (placementSet.includes('rug')) return 'rug';
@@ -188,6 +219,7 @@ function buildFurniture() {
     }
     const placementSet = String(row.classProps.placement_set || '').split(',').map((s) => s.trim()).filter(Boolean);
     const { w, h } = pngSize(art);
+    const rest = baseSurface(classTsid, w, h);
     const offer = store.offers.find((o) => o.classTsid === classTsid);
     catalog[classTsid] = {
       classTsid,
@@ -198,8 +230,9 @@ function buildFurniture() {
       slot: slotFor(placementSet),
       tabletop: TABLETOP.has(classTsid),
       canFlip: String(row.classProps.can_flip ?? '1') !== '0',
-      art: { path: `assets/sprites/furniture/${classTsid}.png`, w, h },
+      art: { path: `assets/sprites/furniture/${classTsid}.png`, w, h, ...rest.art },
       ...(LAYOUT[classTsid] || {}),
+      ...(rest.platY != null ? { platY: rest.platY } : {}),
       ...(classTsid === 'furniture_door'
         ? { doorArt: Object.fromEntries(DOOR_ART.map((v) => [v, `assets/sprites/furniture/furniture_door_${v}.png`])) }
         : {}),
