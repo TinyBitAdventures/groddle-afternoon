@@ -1112,6 +1112,36 @@
 :root[data-ui="classic"] #verb-menu .vm-detail { margin: calc(3 * var(--cu)) calc(5 * var(--cu)) 0; font: var(--fs-classic-count)/var(--lh-snug) var(--font-classic-body); color: var(--c-classic-text); }
 :root[data-ui="classic"] #verb-menu .vm-detail.bad { color: var(--c-classic-disabled); }
 :root[data-ui="classic"] #verb-menu .verb-menu-hint { display: none; }
+/* A verb's picture level (Feed what?; makePickTile): the client's target-item buttons, 50 x 50 verb
+   buttons 2 apart with a 40 px icon and no name, one row up to 7, then a grid, centred, the card as
+   wide as the grid (InteractionMenu.as buildTargetItemCUIs 474-610, calcWidth 751); the focused one
+   lit as a verb row is. The count on the icon as the pack draws it; name and count in the desc line. */
+:root[data-ui="classic"] #verb-menu[data-vm-picks] .verb-menu-card { max-width: none; }
+:root[data-ui="classic"] #verb-menu .vm-picks {
+  display: grid;
+  grid-template-columns: repeat(var(--vm-pick-cols, 4), calc(50 * var(--cu)));
+  gap: 2px;
+  justify-content: center;
+  padding: calc(2 * var(--cu)) calc(5 * var(--cu)) 0;
+}
+:root[data-ui="classic"] #verb-menu .verb-choice.vm-pick {
+  position: relative;
+  justify-content: center;
+  width: calc(50 * var(--cu));
+  height: calc(50 * var(--cu));
+  min-height: 0;
+  padding: 0;
+}
+:root[data-ui="classic"] #verb-menu .vm-pick .vm-pick-icon { width: calc(40 * var(--cu)); height: calc(40 * var(--cu)); object-fit: contain; pointer-events: none; }
+:root[data-ui="classic"] #verb-menu .vm-pick .count {
+  position: absolute;
+  right: calc(4 * var(--cu));
+  bottom: calc(3 * var(--cu));
+  color: var(--c-classic-count);
+  font: 700 var(--fs-classic-count)/var(--lh-none) var(--font-classic-count);
+  text-shadow: 0 0 2px var(--c-classic-panel), 0 0 2px var(--c-classic-panel), 0 0 2px var(--c-classic-panel), 0 0 2px var(--c-classic-panel);
+  pointer-events: none;
+}
 /* A pack stack's menu (#pack-popover) draws VERBS' rows too: the same, without key caps or the lock. */
 :root[data-ui="classic"] #pack-popover :is(.vm-key, .vm-lock) { display: none; }
 :root[data-ui="classic"] #pack-popover .vm-row { display: inline-flex; align-items: center; gap: 3px; }

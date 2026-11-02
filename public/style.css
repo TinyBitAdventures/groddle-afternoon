@@ -10771,6 +10771,45 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
 [data-ui="modern"] .vm-row .vm-lock,
 [data-ui="modern"] .vm-row .vm-backicon { flex: none; color: var(--text-muted); }
 [data-ui="modern"] .vm-row.vm-back .vm-label { color: var(--text-muted); }
+/* A verb's picture level (Feed what?, Incubate what?, Deposit what?; makePickTile): the stacks as
+   their pictures in 50 px buttons 2 px apart, one row up to 7, then a grid, centred, the card as
+   wide as the grid needs (InteractionMenu.as buildTargetItemCUIs 474-610). The key cap in the
+   corner, the count on the picture as the pack draws it, the name and count in the footer. */
+[data-ui="modern"] #verb-menu[data-vm-picks] { --vm-w: max(240px, calc(var(--vm-pick-cols, 4) * 52px + 2 * var(--sp-3))); }
+[data-ui="modern"] #verb-menu .vm-picks {
+  display: grid;
+  grid-template-columns: repeat(var(--vm-pick-cols, 4), 50px);
+  gap: 2px;
+  justify-content: center;
+  padding: var(--sp-2) 0 0;
+}
+[data-ui="modern"] #verb-menu .vm-row.vm-pick {
+  position: relative;
+  width: 50px;
+  height: 50px;
+  padding: 0;
+  justify-content: center;
+  gap: 0;
+}
+[data-ui="modern"] #verb-menu .vm-pick .vm-pick-icon { width: 40px; height: 40px; object-fit: contain; pointer-events: none; }
+[data-ui="modern"] #verb-menu .vm-pick .vm-key { position: absolute; top: 1px; left: 1px; }
+[data-ui="modern"] #verb-menu .vm-pick .count {
+  position: absolute;
+  top: 1px;
+  right: 1px;
+  min-width: 18px;
+  box-sizing: border-box;
+  padding: 0 5px;
+  border-radius: var(--radius-pill);
+  background: var(--moss);
+  color: var(--text-inverse);
+  font-size: var(--fs-2xs);
+  font-weight: var(--fw-heavy);
+  line-height: 1.5;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  pointer-events: none;
+}
 /* The footer line: the row's explanation, or (red) why it can't be done. */
 [data-ui="modern"] #verb-menu .vm-detail,
 [data-ui="modern"] #quest-pin-menu .vm-detail,

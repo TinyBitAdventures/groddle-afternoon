@@ -920,10 +920,10 @@ import { mountNotifyView } from './js/notify-view.js?v=81d06119';
 import { mountSocialDrawer } from './js/ui/social-drawer.js?v=bee1328e';
 import { bindDragScroll } from './js/ui/drag-scroll.js?v=9a527ac8';
 import { SIDE_SHEET_IDS, bindTabs, inSideSheet, mountPanelShell, sheetKeyToWorld } from './js/ui/panel-shell.js?v=b984b886';
-import { createQuestSheet, questStep } from './js/ui/quest-sheet.js?v=2a704f05';
-import { createQuestTracker } from './js/ui/quest-tracker.js?v=b088b3c7';
+import { createQuestSheet, questStep } from './js/ui/quest-sheet.js?v=9097723b';
+import { createQuestTracker } from './js/ui/quest-tracker.js?v=3d45998b';
 import { bindCountField, countKeyValue, countStepMarkup } from './js/ui/count-chooser.js?v=893305c8';
-import { bindVerbMenu, focusVerbRow, lockVerbMenuSize, makeVerbRow, placeVerbMenu, plainWords, refuseVerbRow, syncVerbDetail, verbMenuKey, verbRowAttrs, verbRowInner, verbRowKeys } from './js/ui/verb-menu.js?v=e9d100c3';
+import { bindVerbMenu, focusVerbRow, lockVerbMenuSize, makePickTile, makeVerbRow, pickGridCols, placeVerbMenu, plainWords, refuseVerbRow, syncVerbDetail, verbMenuKey, verbRowAttrs, verbRowInner, verbRowKeys } from './js/ui/verb-menu.js?v=25dced72';
 import { createPromptSettler, promptId } from './js/prompt-settle.js?v=509ba9cc';
 import { clientKeyAction, createHotkeysSheet, isHotkeySheetRelease, isPlainKey } from './js/client-hotkeys.js?v=87795519';
 import { installHeldKeyGuard } from './js/held-keys.js?v=98b96620';
@@ -1879,6 +1879,8 @@ let feedPickerOptions = [];
 /** Target-item verb the picker serves (feed, incubate, deposit) and the stack awaiting a count. */
 let feedPickerVerb = 'feed';
 let feedPickerQtyFood = null;
+/** The verb whose menu level picked the stack (VERBS), so How many's Back returns there; null when the panel opened on its own grid. */
+let feedPickerFromMenu = null;
 /** Keep keyboard interaction on the just-used entity through short overlap ambiguity. */
 let recentInteractionTarget = null;
 let recentInteractionUntil = 0;
@@ -7140,8 +7142,8 @@ function openVerbMenu(target) {
 /**
  * VERBS (js/ui/verb-menu.js): the menu's rows, one line each with a 1-9 key cap and the energy
  * cost; the tooltip or the reason a verb can't be done shows in the footer line. A verb that
- * picks from the pack (Feed, Incubate, Deposit) opens a second level of the stacks it takes
- * (the original's target-item list), with 0 or Backspace back to the verbs.
+ * picks from the pack (Feed, Incubate, Deposit) opens a second level of the stacks it takes, as
+ * their pictures (the original's target-item menu), with 0 or Backspace back to the verbs.
  */
 function renderVerbMenu(target, verbs, level = null) {
   const menu = document.getElementById('verb-menu');
@@ -7159,6 +7161,8 @@ function renderVerbMenu(target, verbs, level = null) {
     if (iconUrl && icon.getAttribute('src') !== iconUrl) icon.src = iconUrl;
   }
   menu.dataset.vmLevel = level ? level.verbId : '';
+  delete menu.dataset.vmPicks;
+  menu.style.removeProperty('--vm-pick-cols');
   menu.dataset.vmDefault = '';
   delete menu.dataset.vmLock;
   list.innerHTML = '';
@@ -7181,18 +7185,39 @@ function renderVerbMenu(target, verbs, level = null) {
       const at = [...list.querySelectorAll('.vm-row')].findIndex((r) => r.dataset.verb === level.verb?.id);
       focusVerbRow(menu, at < 0 ? null : at);
     });
+    // The choices as pictures (InteractionMenu.as 425-436, buildTargetItemCUIs 474-610: 50 px
+    // buttons, no names, one row up to 7, then a grid), the name and count in the footer line.
+    const li = document.createElement('li');
+    li.setAttribute('role', 'none');
+    li.className = 'vm-picks-li';
+    const grid = document.createElement('div');
+    grid.className = 'vm-picks';
+    grid.setAttribute('role', 'group');
+    grid.setAttribute('aria-label', level.title);
+    const cols = pickGridCols(level.options.length);
+    grid.dataset.cols = String(cols);
+    // Both skins size the card and the grid from it (the original's menu was as wide as its grid).
+    menu.style.setProperty('--vm-pick-cols', String(cols));
+    menu.dataset.vmPicks = String(cols);
     level.options.forEach((food, i) => {
-      add({
+      const tile = makePickTile(document, {
         key: keys[i + 1],
         label: food.label,
-        count: `×${food.have}`,
-        tip: `${FEED_PICKER_VERB_LABELS[level.verbId] || 'Feed'} ${food.label} · ${food.have} in your pack`,
+        have: food.have,
+        icon: ITEM_ICONS[food.classTsid] || itemIconUrl(food.classTsid),
+        food: food.classTsid,
         verb: `${level.verbId}:${food.classTsid}`,
-      }, () => {
+        verbLabel: FEED_PICKER_VERB_LABELS[level.verbId] || 'Feed',
+      });
+      tile.classList.add('verb-choice');
+      tile.addEventListener('click', () => {
         closeVerbMenu();
         openFeedPicker(target, level.verb, food.classTsid);
       });
+      grid.appendChild(tile);
     });
+    li.appendChild(grid);
+    list.appendChild(li);
     return;
   }
   if (!verbs.length) {
@@ -7226,21 +7251,50 @@ function renderVerbMenu(target, verbs, level = null) {
   });
 }
 
-/** Feed (and the other pack pickers): the stacks it takes, or why there are none. */
-function openVerbPickLevel(target, verb, row) {
+/**
+ * Feed (and the other pack pickers): the stacks it takes, or why there are none. `focusFood`: the
+ * stack to focus (coming Back from How many), else the first.
+ */
+function openVerbPickLevel(target, verb, row, focusFood = '') {
   const menu = document.getElementById('verb-menu');
   const verbId = verb?.picker || verb?.id || 'feed';
   const options = feedPickerChoices(target, verbId);
   if (!options.length) {
     // The reason in the footer, where the menu's other reasons go (was a toast).
+    if (!row) return false;
     row.setAttribute('aria-disabled', 'true');
     row.dataset.vmReason = verb?.emptyMsg || `You don't have anything this ${target.label || 'animal'} wants to eat.`;
     refuseVerbRow(menu, row);
-    return;
+    return false;
   }
   renderVerbMenu(target, null, { verbId, verb, options, title: FEED_PICKER_TITLES[verbId] || 'Feed what?' });
   placeWorldVerbMenu(target);
-  focusVerbRow(menu, 1);
+  const at = Math.max(0, options.findIndex((o) => o.classTsid === focusFood));
+  focusVerbRow(menu, at + 1);
+  return true;
+}
+
+/**
+ * How many's Back, when its stack was picked in the verb menu: the menu again at the pictures the
+ * stack came from (the original's count step was a level of the same menu: InteractionMenu.as 415,
+ * InteractionMenuController.as 1333-1341), not the panel's own grid. Player report 2026-11-02.
+ */
+function backToVerbPickLevel(target, verb, food) {
+  if (!target || currentAction || (target.sprite && target.sprite.destroyed)) return false;
+  const menu = document.getElementById('verb-menu');
+  menuTarget = target;
+  menu.hidden = false;
+  if (!openVerbPickLevel(target, verb, null, food)) {
+    renderVerbMenu(target, menuVerbsFor(target));
+    placeWorldVerbMenu(target);
+  }
+  // Defer the focus, as openVerbMenu does, so the Enter that pressed Back does not pick a picture.
+  const at = [...menu.querySelectorAll('.vm-row')].findIndex((r) => r.dataset.food === food);
+  focusVerbRow(menu, at < 0 ? null : at, { focus: false });
+  requestAnimationFrame(() => {
+    if (menuTarget === target && !menu.hidden) focusVerbRow(menu, at < 0 ? null : at);
+  });
+  return true;
 }
 
 /**
@@ -7377,6 +7431,7 @@ function closeFeedPicker(result = 'cancelled') {
   showFeedPickerQty(null);
   feedPickerTarget = null;
   feedPickerOptions = [];
+  feedPickerFromMenu = null;
   if (app?.canvas && result) app.canvas.dataset.feedPickerResult = result;
 }
 
@@ -7470,6 +7525,19 @@ function setFeedPickerQty(value) {
   return n;
 }
 
+/** How many's Back: to the verb menu's pictures when the stack was picked there, else the panel's grid. */
+function feedPickerQtyBack() {
+  const verb = feedPickerFromMenu;
+  const target = feedPickerTarget;
+  const food = feedPickerQtyFood?.classTsid || '';
+  if (!verb || !target) {
+    showFeedPickerQty(null);
+    return;
+  }
+  closeFeedPicker('back');
+  if (!backToVerbPickLevel(target, verb, food)) closeVerbMenu();
+}
+
 function confirmFeedPickerQty() {
   const food = feedPickerQtyFood;
   if (!food) return false;
@@ -7538,6 +7606,7 @@ function openFeedPicker(target, verb = null, pick = '') {
   feedPickerTarget = target;
   feedPickerOptions = options;
   feedPickerVerb = verbId;
+  feedPickerFromMenu = pick ? (verb || { id: verbId }) : null;
   showFeedPickerQty(null);
   const title = document.getElementById('feed-picker-title');
   if (title) title.textContent = FEED_PICKER_TITLES[verbId] || 'Feed what?';
@@ -28144,7 +28213,7 @@ async function main() {
   });
   document.getElementById('feed-picker-qty-max')?.addEventListener('click', () => setFeedPickerQty(Infinity));
   document.getElementById('feed-picker-qty-input')?.addEventListener('change', (e) => setFeedPickerQty(e.target.value));
-  document.getElementById('feed-picker-qty-back')?.addEventListener('click', () => showFeedPickerQty(null));
+  document.getElementById('feed-picker-qty-back')?.addEventListener('click', () => feedPickerQtyBack());
   document.getElementById('feed-picker-qty-go')?.addEventListener('click', () => confirmFeedPickerQty());
   document.getElementById('feed-picker').addEventListener('click', (e) => {
     if (e.target.id === 'feed-picker') closeFeedPicker();
@@ -28303,7 +28372,7 @@ async function main() {
     if (isFeedPickerOpen() && feedPickerQtyFood) {
       if (e.key === 'Enter') {
         e.preventDefault();
-        if (document.activeElement?.id === 'feed-picker-qty-back') showFeedPickerQty(null);
+        if (document.activeElement?.id === 'feed-picker-qty-back') feedPickerQtyBack();
         else confirmFeedPickerQty();
         return;
       }

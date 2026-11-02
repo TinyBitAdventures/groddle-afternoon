@@ -20,7 +20,7 @@
  * QA: canvas data questPinMenu (the open row's quest id, "" when closed).
  */
 
-import { bindVerbMenu, focusVerbRow, lockVerbMenuSize, makeVerbRow, verbMenuKey } from './verb-menu.js?v=e9d100c3';
+import { bindVerbMenu, focusVerbRow, lockVerbMenuSize, makeVerbRow, verbMenuKey } from './verb-menu.js?v=25dced72';
 
 /** How long a finger holds a row before the menu opens, and how far it may drift. */
 export const LONG_PRESS_MS = 500;

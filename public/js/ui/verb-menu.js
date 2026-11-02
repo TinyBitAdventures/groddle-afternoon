@@ -11,7 +11,9 @@
  * - a tail that points at the thing; the menu sits above it and flips below when there is no
  *   room, and steps sideways to keep clear of the avatar (placeVerbMenu);
  * - keys: Up/Down or W/S move, Enter picks, 1-9 pick a row, 0 or Backspace go back from a
- *   second level (Feed, Eat more, Drop some), Esc closes (game.js).
+ *   second level (Feed, Eat more, Drop some), Esc closes (game.js);
+ * - a verb that takes a thing from the pack (Feed what?) shows the things as pictures in a grid
+ *   (makePickTile, the original's target-item menu), walked with the arrows.
  *
  * game.js keeps the verbs, their order and what each does (menuVerbsFor, renderPackPopover):
  * this module only draws rows and moves between them. Rows are buttons with class vm-row;
@@ -101,6 +103,69 @@ export function makeVerbRow(doc, row) {
   else if (row.count) said.push(row.count);
   if (row.disabled && row.reason) said.push(plainWords(row.reason));
   btn.setAttribute('aria-label', said.join(', '));
+  return btn;
+}
+
+/**
+ * The picture level's columns (InteractionMenu.as buildTargetItemCUIs 487-493): up to 7 choices
+ * sit in one row; more fill a grid of max(4, floor(sqrt(n)) + 4) columns.
+ */
+export function pickGridCols(n) {
+  const count = Math.max(0, Math.floor(Number(n) || 0));
+  if (count > 7) return Math.max(4, Math.floor(Math.sqrt(count)) + 4);
+  return Math.max(1, Math.min(7, count));
+}
+
+/**
+ * Where an arrow goes in the picture grid, the client's way (InteractionMenu.as focusLeftChoice,
+ * focusRightChoice, focusUpChoice, focusDownChoice 2031-2098): Left and Right wrap inside the row,
+ * Up and Down wrap inside the column. `i` is the tile's index among `n` tiles. Returns the new
+ * index, or -1 for Up off the top row and Down off the bottom row, where this menu's Back row sits.
+ * @param {number} i @param {number} n @param {number} cols @param {'left'|'right'|'up'|'down'} dir
+ */
+export function pickGridStep(i, n, cols, dir) {
+  if (n < 1) return -1;
+  const c = Math.max(1, cols);
+  const rows = Math.ceil(n / c);
+  const col = i % c;
+  const row = Math.floor(i / c);
+  if (dir === 'left') return col === 0 ? Math.min(n - 1, i + c - 1) : i - 1;
+  if (dir === 'right') {
+    if (col === c - 1) return Math.max(0, i - (c - 1));
+    return i + 1 > n - 1 ? c * (rows - 1) : i + 1;
+  }
+  if (dir === 'up') return row === 0 ? -1 : i - c;
+  if (dir === 'down') {
+    if (row === rows - 1) return -1;
+    return i + c > n - 1 ? -1 : i + c;
+  }
+  return i;
+}
+
+/**
+ * A choice in a verb's picture level (Feed what?, Incubate what?, Deposit what?): the original
+ * drew the target items as pictures with no names (InteractionMenu.as 560-578, `label = ''`, an
+ * ItemIconView 40 px in a 50 px button), the name and how many you have in the one desc line
+ * under them (1891-1916: "Grain (you have 5)"). Here the count also sits on the picture the way
+ * the pack draws it (none for one), and the name is the tooltip and what a screen reader says.
+ * @param {Document} doc
+ * @param {{ key?: string, label: string, have: number, icon: string, verb?: string, food?: string, verbLabel?: string }} pick
+ */
+export function makePickTile(doc, pick) {
+  const have = Math.max(0, Math.floor(Number(pick.have) || 0));
+  const btn = doc.createElement('button');
+  btn.type = 'button';
+  btn.className = `vm-row vm-pick${have < 2 ? ' is-single' : ''}`;
+  btn.setAttribute('role', 'menuitem');
+  btn.dataset.vmTip = `${pick.label} (you have ${have})`;
+  if (pick.food) btn.dataset.food = pick.food;
+  if (pick.verb) btn.dataset.verb = pick.verb;
+  btn.title = pick.label;
+  btn.setAttribute('aria-label', `${pick.verbLabel ? `${pick.verbLabel} ` : ''}${pick.label}, ${have} in your pack`);
+  if (pick.key) btn.setAttribute('aria-keyshortcuts', pick.key);
+  const key = pick.key ? `<span class="vm-key kcap" aria-hidden="true">${escapeText(pick.key)}</span>` : '';
+  const count = have > 1 ? `<span class="count" aria-hidden="true">${have}</span>` : '';
+  btn.innerHTML = `${key}<img class="vm-pick-icon" src="${escapeText(pick.icon)}" alt="" draggable="false" />${count}`;
   return btn;
 }
 
@@ -239,6 +304,27 @@ export function verbMenuKey(el, e) {
   const k = e.key;
   const doc = el.ownerDocument;
   const at = rows.indexOf(doc?.activeElement?.closest?.('.vm-row'));
+  // The picture level: the arrows (and W A S D) walk its grid; Up off the top row and Down off the
+  // bottom row land on Back, and from Back they step into the grid again.
+  const grid = el.querySelector('.vm-picks');
+  const tiles = grid ? rows.filter((r) => r.classList.contains('vm-pick')) : [];
+  if (tiles.length && !e.shiftKey) {
+    const dir = { ArrowLeft: 'left', a: 'left', A: 'left', ArrowRight: 'right', d: 'right', D: 'right',
+      ArrowUp: 'up', w: 'up', W: 'up', ArrowDown: 'down', s: 'down', S: 'down' }[k];
+    if (dir) {
+      const cur = rows[at];
+      const ti = tiles.indexOf(cur);
+      const cols = Math.max(1, Number(grid.dataset.cols) || pickGridCols(tiles.length));
+      let next = null;
+      if (ti >= 0) {
+        const to = pickGridStep(ti, tiles.length, cols, dir);
+        next = to < 0 ? rows.find((r) => r.hasAttribute('data-vm-back')) || null : tiles[to];
+      } else if (dir === 'down' || dir === 'right') next = tiles[0];
+      else if (dir === 'up' || dir === 'left') next = tiles[tiles.length - 1];
+      if (next) focusVerbRow(el, rows.indexOf(next));
+      return true;
+    }
+  }
   if (k === 'ArrowDown' || k === 'ArrowUp' || (!e.shiftKey && (k === 's' || k === 'S' || k === 'w' || k === 'W'))) {
     const down = k === 'ArrowDown' || k === 's' || k === 'S';
     focusVerbRow(el, at < 0 ? (down ? 0 : rows.length - 1) : at + (down ? 1 : -1));
