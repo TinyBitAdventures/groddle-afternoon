@@ -30,7 +30,7 @@ const content = (name) => JSON.parse(readFileSync(join(PUB, 'assets', 'content',
 const js = (name) => join(PUB, 'js', name);
 
 /** The sections built so far (docs/encyclopedia.md "Order of work"). */
-export const BUILT_SECTIONS = ['quests', 'animals', 'people'];
+export const BUILT_SECTIONS = ['quests', 'animals', 'people', 'skills', 'places'];
 
 const ALL_SECTIONS = [
   { key: 'quests', label: 'Quests', one: 'quest', blurb: 'How to get each quest, every step, what it needs and what it gives.' },
