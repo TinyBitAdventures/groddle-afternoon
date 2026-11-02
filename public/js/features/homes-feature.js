@@ -92,6 +92,7 @@
 
 import { countItem, ensureItem, ITEM_CATALOG, removeItem } from '../inventory.js?v=b0e33301';
 import { isBagClass } from '../pack-slots.js?v=f3890c72';
+import { createCombobox } from '../combobox.js?v=2e9bfa90';
 import {
   CULTIVATION_CLASSES,
   FURNITURE_CATALOG,
@@ -153,7 +154,7 @@ import {
   panKey,
   placeCostText,
   trayFilters,
-} from '../ui/home-builder.js?v=3922b0d9';
+} from '../ui/home-builder.js?v=98b71348';
 import { RECIPE_CATALOG } from '../making.js?v=20d5364b';
 import {
   createBackYardState,
@@ -3597,8 +3598,14 @@ function furniturePop(engine) {
     }
     const choices = displayableItems(engine);
     if (choices.length) {
-      const select = el('select', { 'aria-label': 'Item to display', 'data-home-display': '1' }, choices.map((row) => el('option', { value: row.classTsid, text: `${row.label} (${row.count})` })));
-      extra.push(select, el('button', {
+      // DECOPOLISH (Austin 2026-11-02: "Can we change the select dropdown to pretty looking
+      // autocomplete UIs?"): the native select stays as the value (Display reads it), behind the
+      // game's own type-to-filter list with each item's icon and count (js/combobox.js).
+      const select = el('select', { 'aria-label': 'Item to display', 'data-home-display': '1' }, choices.map((row) => el('option', { value: row.classTsid, text: row.label, 'data-count': String(row.count), 'data-icon': row.icon || null })));
+      const field = el('div', { class: 'hb-display-pick' }, [select]);
+      const combo = createCombobox(select, { label: 'Item to display', placeholder: 'Find something to show…', className: 'combo-pick', minListWidth: 230 });
+      combo.input.setAttribute('data-home-display-input', '1');
+      extra.push(field, el('button', {
         type: 'button',
         class: 'hb-bt primary',
         'data-home-action': 'deposit',

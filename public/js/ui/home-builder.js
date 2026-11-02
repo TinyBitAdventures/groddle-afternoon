@@ -724,7 +724,7 @@ export function createHomeBuilder({ root, doc = root?.ownerDocument }) {
 
 /** A selector that finds the same control after a redraw. */
 function focusHook(node) {
-  for (const a of ['data-furniture', 'data-swatch', 'data-cultivate', 'data-home-tab', 'data-home-filter', 'data-home-action', 'data-home-expand', 'data-home-unexpand', 'data-home-store', 'data-tower-expand']) {
+  for (const a of ['data-furniture', 'data-swatch', 'data-cultivate', 'data-home-tab', 'data-home-filter', 'data-home-action', 'data-home-display-input', 'data-home-expand', 'data-home-unexpand', 'data-home-store', 'data-tower-expand']) {
     const v = node.getAttribute?.(a);
     if (v != null) {
       const style = a === 'data-furniture' ? node.getAttribute('data-furniture-style') : null;

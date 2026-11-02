@@ -6,8 +6,20 @@
  * `change`, so existing listeners and QA scripts keep working. Call
  * `refresh()` after repopulating the select.
  *
- * Keyboard: type to filter, Up/Down to move, Enter to choose, Esc to close
- * the list (and restore the current value) without closing the panel behind.
+ * An <option> may carry data-icon (an item's icon, drawn at the row's start),
+ * data-count (a count pill; else a trailing "(N)" or " ×N" in its text is one)
+ * and data-hint.
+ *
+ * Keyboard: type to filter, Up/Down to move, PageUp/PageDown, Home/End, Enter
+ * to choose, Esc to close the list (and restore the current value) without
+ * closing the panel behind.
+ *
+ * The list opens in the top layer (the popover API, where the browser has it)
+ * at the field's place, under it or above it when there is no room below, and
+ * no taller than the room there is, so a picker in a small card by a piece of
+ * furniture (DECOPOLISH: the Storage Display Box's Display list) is never cut
+ * off by the card or the window. A row is chosen on click, so a finger can
+ * scroll the list on a touch screen without choosing.
  */
 
 const norm = (text) => String(text || '').toLowerCase().normalize('NFKD').replace(/[̀-ͯ]/g, '');
@@ -41,14 +53,45 @@ export function shownOptions(options, query, { searchLimit = 8 } = {}) {
   return filterOptions(options, query).filter((o) => !o.searchOnly || (extra += 1) <= searchLimit);
 }
 
+/** A trailing count in an option's text: "Allspice (21)" or "Grain ×6" -> { name, count }. */
+export function splitCount(label) {
+  const m = /^(.*?)(?:\s*\((\d[\d,]*)\)|\s*×\s*(\d[\d,]*))?$/.exec(String(label || ''));
+  return { name: m[1], count: m[2] || m[3] || '' };
+}
+
+/** Margin kept between the open list and the window's edge, and the gap to its field. */
+export const LIST_MARGIN = 8;
+export const LIST_GAP = 6;
+
+/**
+ * Where the open list goes (PURE): under the field when it fits (or there is more room there),
+ * else above it; never taller than the room on that side, never past the window's sides.
+ * `field` is the field's client rect, `want` the list's natural height, `max` its tallest.
+ * @returns {{ left: number, width: number, top?: number, bottom?: number, maxHeight: number, above: boolean }}
+ */
+export function placeList(field, want, view, { max = 304, minWidth = 0 } = {}) {
+  const below = view.height - field.bottom - LIST_GAP - LIST_MARGIN;
+  const aboveRoom = field.top - LIST_GAP - LIST_MARGIN;
+  const need = Math.min(want, max);
+  const above = need > below && aboveRoom > below;
+  const maxHeight = Math.max(80, Math.min(max, above ? aboveRoom : below));
+  const width = Math.min(Math.max(field.width, minWidth), view.width - 2 * LIST_MARGIN);
+  const left = Math.max(LIST_MARGIN, Math.min(view.width - LIST_MARGIN - width, field.left));
+  return above
+    ? { left, width, bottom: view.height - field.top + LIST_GAP, maxHeight, above }
+    : { left, width, top: field.bottom + LIST_GAP, maxHeight, above };
+}
+
 /**
  * @param {HTMLSelectElement} select
- * @param {{ placeholder?: string, label?: string }} [opts]
+ * @param {{ placeholder?: string, label?: string, className?: string, minListWidth?: number }} [opts]
+ *   className: an extra class on the wrap (a look of its own, e.g. 'combo-pick' in Decoration Mode);
+ *   minListWidth: the list may be wider than a narrow field.
  */
 export function createCombobox(select, opts = {}) {
   const id = `combo-${(uid += 1)}`;
   const wrap = document.createElement('div');
-  wrap.className = 'combo';
+  wrap.className = opts.className ? `combo ${opts.className}` : 'combo';
   const input = document.createElement('input');
   input.type = 'text';
   input.className = 'combo-input';
@@ -71,7 +114,11 @@ export function createCombobox(select, opts = {}) {
   list.className = 'combo-list';
   list.id = `${id}-list`;
   list.setAttribute('role', 'listbox');
+  if (opts.label) list.setAttribute('aria-label', opts.label);
   list.hidden = true;
+  // The top layer, where there is one: no card's overflow or transform clips or moves it.
+  const layered = typeof list.showPopover === 'function';
+  if (layered) list.setAttribute('popover', 'manual');
   wrap.append(input, toggle, list);
   select.hidden = true;
   select.tabIndex = -1;
@@ -85,7 +132,7 @@ export function createCombobox(select, opts = {}) {
   const currentLabel = () => options.find((o) => o.value === select.value)?.label || '';
 
   function readOptions() {
-    options = [...select.options].map((o) => ({ value: o.value, label: o.textContent || '', hint: o.dataset.hint || '', searchOnly: o.dataset.searchOnly === '1' }));
+    options = [...select.options].map((o) => ({ value: o.value, label: o.textContent || '', hint: o.dataset.hint || '', icon: o.dataset.icon || '', count: o.dataset.count || '', searchOnly: o.dataset.searchOnly === '1' }));
   }
 
   function setActive(index) {
@@ -113,9 +160,25 @@ export function createCombobox(select, opts = {}) {
       li.setAttribute('role', 'option');
       li.dataset.value = opt.value;
       if (opt.value === select.value) li.classList.add('is-current');
-      // Bold the matched part; the trailing "(N)" count reads lighter.
-      const m = /^(.*?)(\s*\(\d+\))?$/.exec(opt.label);
-      const name = m[1];
+      // Bold the matched part; the trailing count reads lighter, as a pill.
+      const parts = splitCount(opt.label);
+      const name = opt.count ? opt.label : parts.name;
+      const countText = opt.count || parts.count;
+      if (opt.icon) {
+        const icon = document.createElement('img');
+        icon.className = 'combo-icon';
+        icon.src = opt.icon;
+        icon.alt = '';
+        icon.width = 24;
+        icon.height = 24;
+        icon.loading = 'lazy';
+        icon.decoding = 'async';
+        li.append(icon);
+      } else if (options.some((o) => o.icon)) {
+        const gap = document.createElement('span');
+        gap.className = 'combo-icon';
+        li.append(gap);
+      }
       const at = q ? norm(name).indexOf(q) : -1;
       const nameEl = document.createElement('span');
       nameEl.className = 'combo-name';
@@ -134,14 +197,17 @@ export function createCombobox(select, opts = {}) {
         hint.textContent = opt.hint;
         li.append(hint);
       }
-      if (m[2]) {
+      if (countText) {
         const count = document.createElement('span');
         count.className = 'combo-count';
-        count.textContent = m[2].trim().replace(/[()]/g, '');
+        count.textContent = countText;
         li.append(count);
       }
-      li.addEventListener('pointerdown', (e) => {
-        e.preventDefault(); // keep focus in the input
+      // Keep focus in the input; choose on the click, so a finger scrolling the list chooses nothing.
+      li.addEventListener('pointerdown', (e) => e.preventDefault());
+      li.addEventListener('mousedown', (e) => e.preventDefault());
+      li.addEventListener('click', (e) => {
+        e.preventDefault();
         choose(opt);
       });
       li.addEventListener('pointermove', () => { if (active !== i) setActive(i); });
@@ -157,14 +223,59 @@ export function createCombobox(select, opts = {}) {
     setActive(currentIndex >= 0 ? currentIndex : 0);
   }
 
+  /** Put the open list by its field, inside the window (placeList). */
+  function position() {
+    if (list.hidden) return;
+    if (!input.isConnected) {
+      close({ restore: false }); // its card was redrawn without it
+      return;
+    }
+    const f = input.getBoundingClientRect();
+    const view = { width: document.documentElement.clientWidth || window.innerWidth, height: window.innerHeight };
+    list.style.maxHeight = '';
+    const at = placeList(f, list.scrollHeight, view, { minWidth: opts.minListWidth || 0, max: Math.min(304, Math.round(view.height * 0.55)) });
+    wrap.classList.toggle('is-above', at.above);
+    list.classList.toggle('is-above', at.above);
+    list.style.maxHeight = `${Math.round(at.maxHeight)}px`;
+    if (!layered) return; // in the page: CSS puts it under (or, .is-above, over) the field
+    list.style.position = 'fixed';
+    list.style.left = `${Math.round(at.left)}px`;
+    list.style.width = `${Math.round(at.width)}px`;
+    list.style.right = 'auto';
+    list.style.top = at.top != null ? `${Math.round(at.top)}px` : 'auto';
+    list.style.bottom = at.bottom != null ? `${Math.round(at.bottom)}px` : 'auto';
+  }
+
+  const onViewChange = () => position();
+
   function open(query = '') {
     render(query);
+    const was = list.hidden;
     list.hidden = false;
+    if (layered && !list.matches(':popover-open')) {
+      try {
+        list.showPopover();
+      } catch {}
+    }
+    position();
+    const current = list.querySelector('.is-active');
+    if (current) current.scrollIntoView({ block: 'nearest' });
     wrap.classList.add('is-open');
     input.setAttribute('aria-expanded', 'true');
+    if (was) {
+      window.addEventListener('resize', onViewChange);
+      window.addEventListener('scroll', onViewChange, true);
+    }
   }
 
   function close({ restore = true } = {}) {
+    if (layered && list.matches(':popover-open')) {
+      try {
+        list.hidePopover();
+      } catch {}
+    }
+    window.removeEventListener('resize', onViewChange);
+    window.removeEventListener('scroll', onViewChange, true);
     list.hidden = true;
     wrap.classList.remove('is-open');
     input.setAttribute('aria-expanded', 'false');
@@ -177,6 +288,8 @@ export function createCombobox(select, opts = {}) {
     input.value = opt.label;
     if (opt.value !== select.value) {
       select.value = opt.value;
+      // As a native select does: `input`, then `change` (a form may listen for either).
+      select.dispatchEvent(new Event('input', { bubbles: true }));
       select.dispatchEvent(new Event('change', { bubbles: true }));
     }
     input.blur();
@@ -195,14 +308,18 @@ export function createCombobox(select, opts = {}) {
       if (!isOpen) open('');
       else setActive(active + (e.key === 'ArrowDown' ? 1 : -1));
     } else if (e.key === 'PageDown' || e.key === 'PageUp') {
-      if (!isOpen) return;
-      e.preventDefault();
-      setActive(active + (e.key === 'PageDown' ? 8 : -8));
-    } else if (e.key === 'Enter') {
-      if (isOpen && shown[active]) {
+      if (isOpen) {
         e.preventDefault();
-        choose(shown[active]);
+        setActive(active + (e.key === 'PageDown' ? 8 : -8));
       }
+    } else if ((e.key === 'Home' || e.key === 'End') && isOpen) {
+      e.preventDefault();
+      setActive(e.key === 'Home' ? 0 : shown.length - 1);
+    } else if (e.key === 'Enter') {
+      // Never the form's submit (a native select does not send a form on Enter either).
+      e.preventDefault();
+      if (isOpen && shown[active]) choose(shown[active]);
+      else if (!isOpen) open('');
     } else if (e.key === 'Escape') {
       if (isOpen) {
         e.preventDefault();
@@ -230,5 +347,5 @@ export function createCombobox(select, opts = {}) {
   }
 
   refresh();
-  return { input, list, refresh, open, close, element: wrap };
+  return { input, list, refresh, open, close, position, element: wrap };
 }

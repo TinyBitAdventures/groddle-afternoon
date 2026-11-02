@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=fe2bbd71';
 import { createFeatureHost } from './js/feature-host.js?v=e4f648b1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=aeabd788';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=4ff81744';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -387,7 +387,7 @@ import {
   recordStreetEntry,
   streetLoadingVisit,
 } from './js/exploration.js?v=19c6758f';
-import { createCombobox } from './js/combobox.js?v=6854d30d';
+import { createCombobox } from './js/combobox.js?v=2e9bfa90';
 import {
   INCANTATION_LINES,
   INCANTATION_FEAT_TITLE,
@@ -21133,7 +21133,7 @@ function renderMailboxCompose(recipient = '', replyTo = null) {
         <label>Attach one stack
           <select name="attachment">
             <option value="">Nothing</option>
-            ${attachable.map((slot) => `<option value="${escapeHtml(slot.classTsid)}">${escapeHtml(slot.label)} ×${slot.count}</option>`).join('')}
+            ${attachable.map((slot) => `<option value="${escapeHtml(slot.classTsid)}" data-count="${slot.count}" data-icon="${escapeHtml(slot.icon || '')}">${escapeHtml(slot.label)}</option>`).join('')}
           </select>
         </label>
         <label>Qty
@@ -21154,6 +21154,7 @@ function renderMailboxCompose(recipient = '', replyTo = null) {
     </form>
   `;
   const form = reader.querySelector('#mail-compose-form');
+  themeMailPickers(form);
   const updateCost = () => {
     const data = new FormData(form);
     const classTsid = String(data.get('attachment') || '');
@@ -21213,6 +21214,20 @@ function renderMailboxCompose(recipient = '', replyTo = null) {
 }
 
 /**
+ * DECOPOLISH (Austin 2026-11-02: no OS menus): the letter's pickers (who to, which stack to attach)
+ * as the game's own type-to-filter list (js/combobox.js), the stacks with their icons and counts.
+ * The selects stay as the form's values.
+ */
+function themeMailPickers(form) {
+  for (const [name, label, placeholder] of [['recipient', 'Send to', 'Choose who…'], ['attachment', 'Attach one stack', 'Nothing']]) {
+    const select = form?.querySelector(`select[name="${name}"]`);
+    if (!select) continue;
+    const combo = createCombobox(select, { label, placeholder, className: 'combo-form', minListWidth: 220 });
+    combo.input.dataset.mailPick = name;
+  }
+}
+
+/**
  * G478: Write mail in multiplayer: To a real player (your buddies offered,
  * MailComposeUI.as:384-411), at most 300 characters, one stack of up to 999,
  * currants, the postage the site will take (mail_get_message_cost).
@@ -21237,7 +21252,7 @@ function renderPlayerMailCompose(reader, online, recipient = '', replyTo = null)
         <label>Attach one stack
           <select name="attachment">
             <option value="">Nothing</option>
-            ${attachable.map((slot) => `<option value="${escapeHtml(slot.classTsid)}">${escapeHtml(slot.label)} ×${slot.count}</option>`).join('')}
+            ${attachable.map((slot) => `<option value="${escapeHtml(slot.classTsid)}" data-count="${slot.count}" data-icon="${escapeHtml(slot.icon || '')}">${escapeHtml(slot.label)}</option>`).join('')}
           </select>
         </label>
         <label>Qty
@@ -21259,6 +21274,7 @@ function renderPlayerMailCompose(reader, online, recipient = '', replyTo = null)
     </form>
   `;
   const form = reader.querySelector('#mail-compose-form');
+  themeMailPickers(form);
   const read = () => {
     const data = new FormData(form);
     const c = String(data.get('attachment') || '');

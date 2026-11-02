@@ -2390,6 +2390,38 @@
 :root[data-ui="classic"] #game-root .hb-pop .hb-actions { gap: calc(4 * var(--cu)); }
 :root[data-ui="classic"] #game-root .hb-pop .hb-bt { min-width: 0; }
 :root[data-ui="classic"] #game-root .hb-pop select { height: calc(24 * var(--cu)); border: 1px solid var(--c-classic-input-border); background: var(--c-classic-input); color: var(--c-classic-text); font-size: calc(var(--fs-classic-count) * var(--cu-n, 1)); }
+/* Decoration Mode's pickers (DECOPOLISH): the 2012 field (InputField.as) and a white list with the
+   pack's 1px rules, as the client's own menus (the list sits in the top layer, js/combobox.js). */
+:root[data-ui="classic"] .combo-pick { width: calc(190 * var(--cu)); max-width: 100%; }
+:root[data-ui="classic"] .combo-pick .combo-input {
+  min-height: calc(24 * var(--cu));
+  padding: 0 calc(24 * var(--cu)) 0 calc(6 * var(--cu));
+  border: 1px solid var(--c-classic-input-border);
+  border-radius: 3.5px;
+  background: var(--c-classic-input);
+  color: var(--c-classic-text);
+  font: calc(var(--fs-classic-count) * var(--cu-n, 1))/var(--lh-normal) var(--font-classic-body);
+  box-shadow: none;
+}
+:root[data-ui="classic"] .combo-pick .combo-input:focus { border-color: var(--c-classic-focus); box-shadow: 0 0 0 2px color-mix(in srgb, var(--c-classic-focus) 35%, transparent); }
+:root[data-ui="classic"] .combo-pick .combo-input::placeholder { color: var(--c-classic-count); font-weight: 400; }
+:root[data-ui="classic"] .combo-pick .combo-toggle { color: var(--c-classic-text); border-radius: 3px; }
+:root[data-ui="classic"] :is(.combo-pick, .combo-form) .combo-list {
+  padding: calc(3 * var(--cu));
+  border: 1px solid color-mix(in srgb, var(--c-classic-ink) 37%, transparent);
+  border-radius: calc(6 * var(--cu));
+  background: var(--c-classic-panel);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--c-classic-ink) 15%, transparent);
+}
+:root[data-ui="classic"] :is(.combo-pick, .combo-form) .combo-option { gap: calc(6 * var(--cu)); padding: calc(3 * var(--cu)) calc(5 * var(--cu)); border-radius: 3px; border-bottom: 1px solid var(--c-classic-row-rule); color: var(--c-classic-text); font: calc(var(--fs-classic-count) * var(--cu-n, 1))/1.25 var(--font-classic-body); }
+:root[data-ui="classic"] :is(.combo-pick, .combo-form) .combo-option:last-child { border-bottom: 0; }
+:root[data-ui="classic"] :is(.combo-pick, .combo-form) .combo-option.is-active { background: var(--c-classic-input-hi); }
+:root[data-ui="classic"] :is(.combo-pick, .combo-form) .combo-option.is-current { color: var(--c-classic-title); font-weight: 700; }
+:root[data-ui="classic"] :is(.combo-pick, .combo-form) .combo-option.is-current::before { background: var(--c-classic-focus); }
+:root[data-ui="classic"] :is(.combo-pick, .combo-form) .combo-icon { width: calc(24 * var(--cu)); height: calc(24 * var(--cu)); }
+:root[data-ui="classic"] :is(.combo-pick, .combo-form) .combo-count { color: var(--c-classic-count); background: none; font-weight: 700; padding: 0; }
+:root[data-ui="classic"] :is(.combo-pick, .combo-form) .combo-count::before { content: '\00d7'; }
+:root[data-ui="classic"] :is(.combo-pick, .combo-form) .combo-name mark { background: color-mix(in srgb, var(--c-classic-focus) 30%, transparent); }
 /* CultCarryUI's invoke button: "Place (N iMG)" on white. */
 :root[data-ui="classic"] #game-root .hb-place {
   min-height: calc(26 * var(--cu));

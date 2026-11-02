@@ -6214,6 +6214,61 @@ body.buff-purple-pulse::after {
 @media (max-width: 520px) {
   .combo { width: 11rem; }
 }
+/* An option's item icon (data-icon). */
+.combo-option:has(.combo-icon) { align-items: center; }
+.combo-icon { flex: none; width: 24px; height: 24px; object-fit: contain; }
+/* The list in the top layer (js/combobox.js placeList): the popover's own box undone; js sets
+   its place and height. Without the popover API it stays in the page, over the field when
+   there is no room under it. */
+.combo-list[popover] { inset: auto; margin: 0; color: inherit; }
+/* A field's label may be set in capitals (the letter's): the list keeps the names as they are. */
+.combo-list { text-transform: none; letter-spacing: normal; text-align: left; }
+.combo.is-above .combo-list:not([popover]) { top: auto; bottom: calc(100% + 6px); }
+@media (prefers-reduced-motion: no-preference) {
+  .combo-list[popover]:popover-open { animation: combo-in 0.12s ease-out; }
+  @keyframes combo-in { from { opacity: 0; transform: translateY(-3px); } }
+  .combo-list.is-above[popover]:popover-open { animation-name: combo-in-up; }
+  @keyframes combo-in-up { from { opacity: 0; transform: translateY(3px); } }
+}
+
+/* Decoration Mode's pickers (the Storage Display Box's Display list, DECOPOLISH): the Modern
+   card's own field and list. */
+[data-ui="modern"] .combo-pick { width: 13rem; max-width: 100%; }
+/* A picker inside a form (the letter's To and Attach): the form's own field, full width. */
+.combo-form { width: 100%; max-width: none; }
+.combo-form .combo-input { padding-right: 2.2rem; }
+[data-ui="modern"] #mail-panel .mail-compose-form .combo-form .combo-input { padding-right: 2.2rem; }
+[data-ui="modern"] .combo-pick .combo-input {
+  min-height: 30px;
+  padding: 0 calc(var(--sp-3) + 1.6rem) 0 var(--sp-5);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-pill);
+  background: var(--surface-raised);
+  color: var(--text);
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  box-shadow: none;
+}
+[data-ui="modern"] .combo-pick .combo-input::placeholder { color: var(--text-muted); font-weight: 600; }
+[data-ui="modern"] .combo-pick .combo-input:hover { border-color: var(--accent); }
+[data-ui="modern"] .combo-pick .combo-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+[data-ui="modern"] .combo-pick .combo-toggle { color: var(--text-muted); }
+[data-ui="modern"] .combo-pick .combo-toggle:hover { background: var(--surface-hover); }
+[data-ui="modern"] :is(.combo-pick, .combo-form) .combo-list {
+  padding: var(--sp-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-l);
+  background: var(--surface);
+  box-shadow: var(--shadow-3);
+  scrollbar-color: var(--border-strong) transparent;
+}
+[data-ui="modern"] :is(.combo-pick, .combo-form) .combo-option { gap: var(--sp-3); padding: var(--sp-2) var(--sp-3); border-radius: var(--radius-m); color: var(--text); font-size: var(--fs-xs); }
+[data-ui="modern"] :is(.combo-pick, .combo-form) .combo-option.is-active { background: var(--surface-hover); }
+[data-ui="modern"] :is(.combo-pick, .combo-form) .combo-option.is-current { color: var(--text); }
+[data-ui="modern"] :is(.combo-pick, .combo-form) .combo-option.is-current::before { background: var(--accent); }
+[data-ui="modern"] :is(.combo-pick, .combo-form) .combo-name mark { background: var(--accent-soft); }
+[data-ui="modern"] :is(.combo-pick, .combo-form) .combo-count { color: var(--text-muted); background: var(--surface-sunken); }
+[data-ui="modern"] :is(.combo-pick, .combo-form) .combo-empty { color: var(--text-muted); font-size: var(--fs-xs); }
 
 .visually-hidden {
   position: absolute;
@@ -11592,7 +11647,7 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
   border-radius: var(--radius-xs);
 }
 /* The buttons inside: the shell's pills (primary in the accent, the rest raised). */
-[data-ui="modern"] :is(#home-panel, #mail-panel) :is(.home-body, .mail-reader, .mail-head-actions) button:not(.verb-menu-x):not(.mail-row) {
+[data-ui="modern"] :is(#home-panel, #mail-panel) :is(.home-body, .mail-reader, .mail-head-actions) button:not(.verb-menu-x):not(.mail-row):not(.combo-toggle) {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -11609,9 +11664,9 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
   font-weight: var(--fw-heavy);
   cursor: pointer;
 }
-[data-ui="modern"] :is(#home-panel, #mail-panel) :is(.home-body, .mail-reader, .mail-head-actions) button.btn-glitch-primary:not(.verb-menu-x):not(.mail-row) { border-color: var(--accent); background: var(--accent); color: var(--accent-text); }
-[data-ui="modern"] :is(#home-panel, #mail-panel) :is(.home-body, .mail-reader, .mail-head-actions) button:not(.verb-menu-x):not(.mail-row):hover:not(:disabled) { background: var(--surface-hover); }
-[data-ui="modern"] :is(#home-panel, #mail-panel) :is(.home-body, .mail-reader, .mail-head-actions) button.btn-glitch-primary:not(.verb-menu-x):not(.mail-row):hover:not(:disabled) { background: var(--accent-hover); }
+[data-ui="modern"] :is(#home-panel, #mail-panel) :is(.home-body, .mail-reader, .mail-head-actions) button.btn-glitch-primary:not(.verb-menu-x):not(.mail-row):not(.combo-toggle) { border-color: var(--accent); background: var(--accent); color: var(--accent-text); }
+[data-ui="modern"] :is(#home-panel, #mail-panel) :is(.home-body, .mail-reader, .mail-head-actions) button:not(.verb-menu-x):not(.mail-row):not(.combo-toggle):hover:not(:disabled) { background: var(--surface-hover); }
+[data-ui="modern"] :is(#home-panel, #mail-panel) :is(.home-body, .mail-reader, .mail-head-actions) button.btn-glitch-primary:not(.verb-menu-x):not(.mail-row):not(.combo-toggle):hover:not(:disabled) { background: var(--accent-hover); }
 [data-ui="modern"] :is(#home-panel, #mail-panel) button:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
 [data-ui="modern"] :is(#home-panel, #mail-panel) button:disabled { border-color: var(--border); background: var(--surface-sunken); color: var(--text-muted); cursor: not-allowed; }
 /* Home: the owned card and the ticket machine. */
