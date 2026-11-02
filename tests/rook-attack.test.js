@@ -280,7 +280,7 @@ describe('rooked things and cures', () => {
 });
 
 describe('rook attack feature', async () => {
-  const { ROOK_SHEETS, rookAttackFeature } = await import('../public/js/features/rook-attack-feature.js?v=16ac9f33');
+  const { ROOK_SHEETS, rookAttackFeature } = await import('../public/js/features/rook-attack-feature.js?v=750929ea');
   const { createFeatureHost } = await import('../public/js/feature-host.js?v=e4f648b1');
 
   /** Pixel size from a PNG IHDR or a WebP VP8/VP8L/VP8X header. */
@@ -303,6 +303,76 @@ describe('rook attack feature', async () => {
       assert.equal(h % def.fh, 0, `${id} height ${h} / ${def.fh}`);
       assert.equal(w / def.fw, def.cols, `${id} cols`);
       assert.ok(Math.ceil(def.frames / def.cols) * def.fh <= h, `${id} rows`);
+    }
+  });
+
+  // Austin 2026-11-02: the skull and bats over rooked things looped with a reset jump. The sheet
+  // (OGA emotional_bear__x1_rooked_halo) holds emotional_bear.swf's rooked_halo scene: 30 frames
+  // of 124x46, 8 to a row. Cut as 124x92 x16 it played two frames stacked and its last two cells
+  // half empty. The scene is in the SWF's loopers and its last frame leads into its first.
+  it('plays the rooked halo as the SWF did: 30 single frames at 30 fps, looping seamlessly', async () => {
+    const { ROOKED_HALO } = await import('../public/js/features/rook-attack-feature.js?v=750929ea');
+    const { decodePng } = await import('../tools/builder/art-image.mjs');
+    const def = ROOK_SHEETS.halo;
+    assert.deepEqual({ fw: def.fw, fh: def.fh, cols: def.cols, frames: def.frames }, { fw: 124, fh: 46, cols: 8, frames: 30 });
+    assert.equal(ROOKED_HALO.fps, 30);
+    assert.equal(ROOKED_HALO.width, 108);
+    const img = decodePng(fs.readFileSync(path.join(root, def.path)));
+    assert.deepEqual([img.w, img.h], [def.cols * def.fw, Math.ceil(def.frames / def.cols) * def.fh]);
+    const cell = (i) => {
+      const out = new Float64Array(def.fw * def.fh * 4);
+      const cx = (i % def.cols) * def.fw;
+      const cy = Math.floor(i / def.cols) * def.fh;
+      for (let y = 0; y < def.fh; y += 1) {
+        for (let x = 0; x < def.fw; x += 1) {
+          const p = ((cy + y) * img.w + cx + x) * 4;
+          for (let k = 0; k < 4; k += 1) out[(y * def.fw + x) * 4 + k] = img.px[p + k];
+        }
+      }
+      return out;
+    };
+    const cover = (c) => c.filter((_, k) => k % 4 === 3 && c[k] > 0).length;
+    const diff = (a, b) => {
+      let sum = 0;
+      for (let k = 0; k < a.length; k += 4) {
+        const fa = a[k + 3] / 255;
+        const fb = b[k + 3] / 255;
+        sum += Math.abs(a[k + 3] - b[k + 3]);
+        for (let j = 0; j < 3; j += 1) sum += Math.abs(a[k + j] * fa - b[k + j] * fb) / 3;
+      }
+      return sum / (a.length / 4);
+    };
+    const cells = Array.from({ length: def.frames }, (_, i) => cell(i));
+    // One frame per cell: every frame shows about as much art (a stacked pair or a half-empty
+    // cell does not), and the two cells after the 30th are empty.
+    const covers = cells.map(cover);
+    const mid = [...covers].sort((a, b) => a - b)[Math.floor(covers.length / 2)];
+    for (const [i, n] of covers.entries()) assert.ok(n > mid * 0.7 && n < mid * 1.3, `cell ${i} covers ${n} px, median ${mid}`);
+    for (let i = def.frames; i < def.cols * (img.h / def.fh); i += 1) assert.equal(cover(cell(i)), 0, `cell ${i} is empty`);
+    // Seamless: the wrap from the last frame to the first is no bigger a step than any in the loop.
+    const steps = cells.slice(1).map((c, i) => diff(cells[i], c));
+    assert.ok(diff(cells.at(-1), cells[0]) <= Math.max(...steps), 'the loop wraps without a jump');
+  });
+
+  // The rooked animals' clips: the server's cadence per class, the SWFs' 30 fps, and only the
+  // scenes the SWFs list in loopers loop (the rest play once and hold, as the client did).
+  it('cycles the rooked animal clips on the server cadence, looping only the SWF loopers', async () => {
+    const { ROOKED_CADENCE, ROOKED_FPS, ROOKED_LOOPERS } = await import('../public/js/features/rook-attack-feature.js?v=750929ea');
+    assert.equal(ROOKED_FPS, 30);
+    assert.deepEqual([...ROOKED_LOOPERS].sort(), ['bflyFly', 'bflyRest', 'piggy1']);
+    const flat = (c) => [c.start, ...c.cycle].map(([clip, ms]) => `${clip}:${ms}`).join(' ');
+    assert.equal(flat(ROOKED_CADENCE.npc_piggy), 'piggy1:5000 piggy2:1000 piggy1:1000 piggy2:1000 piggy1:5000');
+    assert.equal(flat(ROOKED_CADENCE.npc_chicken), 'chicken1:2000 chicken2:2000 chicken1:2000');
+    assert.equal(flat(ROOKED_CADENCE.npc_butterfly), 'bflyFly:3000 bflyFly:1200 bflyRest:3000');
+    assert.equal(flat(ROOKED_CADENCE.npc_kitty_chicken), 'kittySad:2000 kittySad:2000');
+    for (const c of Object.values(ROOKED_CADENCE)) {
+      for (const [clip] of [c.start, ...c.cycle]) assert.ok(ROOK_SHEETS[clip], clip);
+    }
+    // A clip that plays once fits inside its hold at 30 fps, so it ends and holds before the next.
+    for (const c of Object.values(ROOKED_CADENCE)) {
+      for (const [clip, ms] of [c.start, ...c.cycle]) {
+        if (!ROOKED_LOOPERS.includes(clip)) assert.ok((ROOK_SHEETS[clip].frames / ROOKED_FPS) * 1000 <= ms, `${clip} fits ${ms} ms`);
+      }
     }
   });
 

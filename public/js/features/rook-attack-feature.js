@@ -72,7 +72,6 @@ import {
   ROOK_LOOSE_KEY_BASE,
   isRookableClass,
   rookKeyFor,
-  isTreeClass,
   normalizeRookSave,
   normalizeRookedSlot,
   orbJoinOrder,
@@ -146,7 +145,9 @@ export const ROOK_SHEETS = Object.freeze({
   hover: sheet('rook-hover.webp', 496, 300, 6, 36),
   side: sheet('rook-side.webp', 296, 290, 6, 18),
   fore: sheet('forehorseman-frantic.webp', 191, 202, 8, 47),
-  halo: sheet('rooked-halo.png', 124, 92, 8, 16),
+  // emotional_bear.swf scene rooked_halo (frames 479-508): 30 frames of 124x46 in an 8 x 4 grid. Read
+  // as 124x92 it played two frames stacked, and the last two cells came up half empty each loop.
+  halo: sheet('rooked-halo.png', 124, 46, 8, 30),
   balm: sheet('rook-balm-tool.png', 88, 106, 10, 67),
   piggy1: sheet('piggy-rooked1.png', 88, 62, 10, 10),
   piggy2: sheet('piggy-rooked2.png', 88, 62, 8, 24),
@@ -165,6 +166,32 @@ export const ROOK_SHEETS = Object.freeze({
   head_killShot: sheet('rook-head-killShot.png', 108, 127, 8, 30),
   head_dead: sheet('rook-head-dead.png', 108, 127, 1, 1),
   head_taunt: sheet('rook-head-taunt.png', 108, 127, 8, 39),
+});
+
+/**
+ * How the client played the rooked overlay: LisRookManager.as rook() shows emotional_bear's
+ * rooked_halo in an ItemIconView 108 px wide, registered centre-bottom 12 px below the top of the
+ * thing (positionRookedOverlay), faded in over 0.6 s. The scene is in the SWF's loopers, so
+ * SSCollection.figureDefaultActionForFrameCollection loops all 30 frames at the SWF's 30 fps:
+ * one second, seamless (its last frame leads into its first), with no intro clip.
+ */
+export const ROOKED_HALO = Object.freeze({ fps: 30, width: 108, overlap: 12, fadeMs: 600 });
+
+/**
+ * The rooked animals' clips as the server cycled them (setAndBroadcastState in rook.js 55-64 and
+ * each class's onRooked / onRookedInterval: npc_piggy.js 1097-1129, npc_chicken.js 1397-1424,
+ * npc_butterfly.js 1395-1423, npc_kitty_chicken.js 1239-1248): the clip set when it is rooked, then
+ * the cycle, each for its ms. Their SWFs run at 30 fps; a clip loops only when the SWF lists it
+ * in `loopers` (npc_piggy rooked1, npc_butterfly rest-rooked and fly-rooked), else it plays once
+ * and holds its last frame until the next state.
+ */
+export const ROOKED_FPS = 30;
+export const ROOKED_LOOPERS = Object.freeze(['piggy1', 'bflyFly', 'bflyRest']);
+export const ROOKED_CADENCE = Object.freeze({
+  npc_piggy: Object.freeze({ start: ['piggy1', 5000], cycle: [['piggy2', 1000], ['piggy1', 1000], ['piggy2', 1000], ['piggy1', 5000]] }),
+  npc_chicken: Object.freeze({ start: ['chicken1', 2000], cycle: [['chicken2', 2000], ['chicken1', 2000]] }),
+  npc_butterfly: Object.freeze({ start: ['bflyFly', 3000], cycle: [['bflyFly', 1200], ['bflyRest', 3000]] }),
+  npc_kitty_chicken: Object.freeze({ start: ['kittySad', 2000], cycle: [['kittySad', 2000]] }),
 });
 
 // ---------------------------------------------------------------------------
@@ -330,7 +357,7 @@ function applyRookedVisual(engine, entry) {
     speed: spr.animationSpeed,
     loop: spr.loop,
   };
-  const row = { target, saved, halo: null, clipAt: 0, clip: '' };
+  const row = { target, saved, halo: null, clipAt: 0, clip: '', step: -1 };
   tracked.set(key, row);
   target.subtitle = rookedSubtitle();
   const cls = target.classId;
@@ -346,53 +373,56 @@ function applyRookedVisual(engine, entry) {
   // thing only with the rooked_halo overlay above it (LisRookManager.as rook(), ROOK_ANIMATION_NAME);
   // a rooked tree's own art changes through its health and maturity (trants.js onRooked 1140-1166),
   // and an animal through its rooked state (rook.js 55-64).
-  setRookedClip(row, 'a');
+  setRookedClip(row, -1);
   addHalo(engine, row);
 }
 
-function setRookedClip(row, phase) {
+/** Step -1 is the clip set when it is rooked; 0.. walk the cadence's cycle. */
+function setRookedClip(row, step) {
   const spr = row.target.sprite;
   if (!loader || !spr || spr.destroyed || typeof spr.gotoAndPlay !== 'function') return;
-  const cls = row.target.classId;
-  let def = null;
-  let loop = true;
-  let hold = 2000;
-  if (cls === 'npc_piggy') {
-    def = phase === 'a' ? ROOK_SHEETS.piggy1 : ROOK_SHEETS.piggy2;
-    hold = phase === 'a' ? 5000 : 1600;
-  } else if (cls === 'npc_chicken') {
-    def = phase === 'a' ? ROOK_SHEETS.chicken1 : ROOK_SHEETS.chicken2;
-    hold = 2000;
-  } else if (cls === 'npc_butterfly') {
-    def = phase === 'a' ? ROOK_SHEETS.bflyRest : ROOK_SHEETS.bflyFly;
-    hold = phase === 'a' ? 3000 : 1200;
-  } else if (cls === 'npc_kitty_chicken') {
-    def = ROOK_SHEETS.kittySad;
-    hold = 999999;
-  }
-  if (!def) return;
-  const frames = loader.frames(def);
+  const cadence = ROOKED_CADENCE[row.target.classId];
+  if (!cadence) return;
+  const [clip, hold] = step < 0 ? cadence.start : cadence.cycle[step % cadence.cycle.length];
+  const def = ROOK_SHEETS[clip];
+  const frames = def ? loader.frames(def) : [];
   if (!frames.length) return;
-  row.clip = phase;
+  const loop = ROOKED_LOOPERS.includes(clip);
+  row.step = step;
   row.clipAt = now() + hold;
+  // The same looping state again carries on where it is (a looping clip never jumps back to its
+  // start); a clip that plays once starts over, as the kitty's 3sad does every 2 s.
+  if (row.clip === clip && loop && spr.textures?.[0] === frames[0] && spr.playing) return;
+  row.clip = clip;
   spr.textures = frames;
   spr.loop = loop;
-  spr.animationSpeed = pixiSpeed(24);
+  spr.animationSpeed = pixiSpeed(ROOKED_FPS);
   spr.gotoAndPlay(0);
+}
+
+/** Where the client hung the overlay: its bottom 12 px below the top of the thing's art. */
+function placeHalo(row) {
+  const spr = row.target.sprite;
+  const art = Number(row.target.artHeight);
+  const top = art > 0 ? spr.y - art : spr.y - Math.abs(spr.height || 0) * (Number(spr.anchor?.y) || 1);
+  row.halo.x = spr.x;
+  row.halo.y = top + ROOKED_HALO.overlap;
 }
 
 function addHalo(engine, row) {
   if (!loader?.ready(ROOK_SHEETS.halo) || row.halo) return;
   const { PIXI } = engine;
   const halo = new PIXI.AnimatedSprite(loader.frames(ROOK_SHEETS.halo));
-  halo.anchor.set(0.5, 0.75);
-  halo.animationSpeed = pixiSpeed(18);
+  halo.anchor.set(0.5, 1);
+  halo.animationSpeed = pixiSpeed(ROOKED_HALO.fps);
   halo.loop = true;
   halo.play();
-  halo.scale.set(isTreeClass(row.target.classId) ? 0.85 : 0.6);
+  halo.scale.set(ROOKED_HALO.width / ROOK_SHEETS.halo.fw);
+  halo.alpha = 0;
   halo.eventMode = 'none';
   engine.fxLayer.addChild(halo);
   row.halo = halo;
+  row.haloAt = now();
 }
 
 function removeRookedVisual(engine, key) {
@@ -455,20 +485,17 @@ function updateRookedVisuals(engine) {
       spr.x = row.saved.x;
       spr.y = row.saved.y;
       const sad = loader?.frames(ROOK_SHEETS.kittySad);
-      if (sad?.length && spr.textures?.[0] !== sad[0]) setRookedClip(row, 'a');
-    } else if (row.clip && t >= row.clipAt) {
-      setRookedClip(row, row.clip === 'a' ? 'b' : 'a');
+      if (sad?.length && spr.textures?.[0] !== sad[0]) setRookedClip(row, row.step);
     }
+    if (row.clip && t >= row.clipAt) setRookedClip(row, row.step + 1);
     // fullStop (include/rook.js 53-63): a rooked Piggy or Chicken stays put until it is revived.
     if (row.target.classId === 'npc_piggy' || row.target.classId === 'npc_chicken') spr.vx = 0;
     // Its label says so until then, whatever else relabels it (the mood ticks, the shared Piggy and
     // tree updates of street-objects-feature): the rook verbs are the only ones it offers.
     if (row.target.subtitle !== rookedSubtitle()) row.target.subtitle = rookedSubtitle();
     if (row.halo && !row.halo.destroyed) {
-      const b = spr.getBounds();
-      const cam = engine.camera;
-      row.halo.x = b.x + b.width / 2 + cam.x;
-      row.halo.y = b.y + cam.y + (isTreeClass(row.target.classId) ? 30 : 4);
+      placeHalo(row);
+      row.halo.alpha = Math.min(1, Math.max(0, (t - (row.haloAt || 0)) / ROOKED_HALO.fadeMs));
     }
     // rookedCollision: a passing Glitch hears the plea.
     if (p && Math.abs(p.x - spr.x) < 70 && Math.abs(p.y - spr.y) < 140 && (lastTalk.get(key) || 0) < t) {
