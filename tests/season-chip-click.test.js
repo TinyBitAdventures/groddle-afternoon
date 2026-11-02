@@ -41,4 +41,11 @@ describe('the holiday chip is clickable', () => {
     assert.match(src, /\.note-view \.note-card \{[^}]*overflow: auto;/);
     assert.match(src, /frame\.appendChild\(card\);/);
   });
+
+  it('leaves no empty pill on the nameplate out of season (Austin 2026-11-02)', () => {
+    // .season-chip's display: inline-flex beat [hidden], so after Zilloween ended an empty pill stayed.
+    const src = read('public/js/features/seasons-feature.js');
+    assert.match(src, /\.season-chip\[hidden\] \{ display: none; \}/);
+    assert.match(src, /chip\.hidden = !id;/);
+  });
 });

@@ -348,6 +348,8 @@ function renderChip(engine) {
 .season-chip { pointer-events: auto; cursor: pointer; }
 .season-chip img { width: 18px; height: 18px; object-fit: contain; }
 .season-chip:hover { filter: brightness(1.04); }
+/* Its display: inline-flex would beat [hidden]: out of season it leaves no empty pill on the nameplate. */
+.season-chip[hidden] { display: none; }
 @media (max-width: 640px) { .season-chip span { display: none; } .season-chip { padding-right: 0.2rem; } }
 .season-card-list { margin: var(--sp-3) 0 0; padding-left: var(--sp-9); font-size: var(--fs-base); line-height: var(--lh-loose); color: var(--text-brown); }
 `;
