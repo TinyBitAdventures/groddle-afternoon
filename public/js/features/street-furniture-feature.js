@@ -35,7 +35,7 @@
  */
 
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=2e580c24';
-import { nearestSurfaceY } from '../walk-surface.js?v=5b6e1c8d';
+import { nearestSurfaceY } from '../walk-surface.js?v=c982983e';
 import { loadWildlifeCatalog, wildlifeCatalog } from '../wildlife.js?v=670c3a7f';
 import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=b0e33301';
 import { canUseTool, useToolCondition } from '../tools.js?v=3d109172';

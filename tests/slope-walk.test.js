@@ -12,7 +12,7 @@ import { join } from 'node:path';
 import { SLOPE_STICK, holdCloseToFloor, stickToSlope } from '../public/js/slope-walk.js?v=9af1e505';
 import { platformsScreen, resolveGround } from '../public/js/street-model.js?v=505d8990';
 import { avatarAnimState } from '../public/js/avatar-anims.js?v=fb921bf4';
-import { landingY } from '../public/js/walk-surface.js?v=5b6e1c8d';
+import { landingY } from '../public/js/walk-surface.js?v=c982983e';
 
 const root = join(import.meta.dirname, '..');
 const babySteppes = JSON.parse(readFileSync(join(root, 'public/assets/streets/GM416LNIKVLM1.json'), 'utf8'));

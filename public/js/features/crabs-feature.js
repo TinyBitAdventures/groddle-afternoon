@@ -38,7 +38,7 @@ import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 import { slugsFromEffects } from '../speech-slugs.js?v=130338f9';
 import { getGameDayKey } from '../game-day.js?v=edb00566';
 import { cleanQuestMarkup } from '../quests.js?v=282e1621';
-import { walkSurfaceY } from '../walk-surface.js?v=5b6e1c8d';
+import { walkSurfaceY } from '../walk-surface.js?v=c982983e';
 import { isStandable } from '../street-model.js?v=505d8990';
 import {
   CRAB_CLASS,

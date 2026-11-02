@@ -19,11 +19,11 @@ import {
   unknownLine,
 } from '../public/js/slash-commands.js?v=58e63833';
 import { slashCommandsFeature, slashContext } from '../public/js/features/slash-commands-feature.js?v=899ae85b';
-import { smallItemsFeature } from '../public/js/features/small-items-feature.js?v=40810a08';
+import { smallItemsFeature } from '../public/js/features/small-items-feature.js?v=58016f46';
 import { towerApi } from '../public/js/features/home-tower-feature.js?v=6ca164d2';
 import { BUTLER_STRINGS } from '../public/js/butler.js?v=9d29b9b4';
 import { butlerFeature } from '../public/js/features/butler-feature.js?v=b47ef665';
-import { FEATURES } from '../public/js/features/index.js?v=2e2d873e';
+import { FEATURES } from '../public/js/features/index.js?v=7627d3d5';
 import { createFeatureHost } from '../public/js/feature-host.js?v=e4f648b1';
 import { countItem } from '../public/js/inventory.js?v=b0e33301';
 

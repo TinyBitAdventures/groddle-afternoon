@@ -410,7 +410,8 @@ function killTree(engine, target, opts = {}) {
     patchesFeature.adoptPlot(engine, { key: `tree:${index}`, soilClass: outcome.soilClass, x, y: y - 4 });
     result = { classId: target.classId, soilClass: outcome.soilClass, x, y, key: `tree:${index}` };
   }
-  if (result && outcome.planks) engine.dropWorldStack?.('plank', outcome.planks, x + outcome.plankDx, y - 74);
+  // On the ground beside it (wood_tree.js 866: createItemStack('plank', 25, patch.x + 80, patch.y)).
+  if (result && outcome.planks) engine.dropWorldStack?.('plank', outcome.planks, x + outcome.plankDx, y);
   last = `died:${target.classId}>${outcome.soilClass}`;
   engine.save?.();
   publish(engine);

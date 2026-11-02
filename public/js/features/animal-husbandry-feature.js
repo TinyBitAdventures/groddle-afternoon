@@ -52,7 +52,7 @@
 
 import { slugsFromEffects } from '../speech-slugs.js?v=130338f9';
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=2e580c24';
-import { nearestSurfaceY } from '../walk-surface.js?v=5b6e1c8d';
+import { nearestSurfaceY } from '../walk-surface.js?v=c982983e';
 import { displayTopOf, itemstackOverlayPoint, playSheetOverlay } from '../overlay-art.js?v=3753a0d2';
 import { SET_FREE, applySetFree, canSetFree, setFreeGoneLine, setFreePrompt } from '../animal-set-free.js?v=3b194fca';
 import { getGameDayKey } from '../game-day.js?v=edb00566';
@@ -107,7 +107,7 @@ import { batterflyBaseY, batterflyResponseFor, flightFloorFor } from '../street-
 import { loseEnergy, shiftMetabolic } from '../metabolics.js?v=8504134e';
 import { textureFromUrl } from '../textures.js?v=db2ce452';
 import { PIGGY_DEATH_DROPS, PIGGY_DEATH_PUFF, SAD_BABY, forcedRoll, isSadIn } from '../animal-mood.js?v=a49495fc';
-import { animalCrowdChanged, animalCrowdSad, animalPlaceIsDepressing, crowdLimit, smokePuff as sharedSmokePuff } from './animal-mood-feature.js?v=55561f4a';
+import { animalCrowdChanged, animalCrowdSad, animalPlaceIsDepressing, crowdLimit, smokePuff as sharedSmokePuff } from './animal-mood-feature.js?v=62ac7b3e';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
 
@@ -574,8 +574,8 @@ const PIGGY_TOP_PX = 75;
 /** die() 1036-1041 on this street: 10 Meat at the piggy, a Plop 80 px along. */
 function dropStarvedRemains(engine, x, refY) {
   const meatX = Math.round(x + PIGGY_DEATH_DROPS.meatDx);
-  // World stacks sit 74 px above the ground like a player drop (game.js dropPackStack, tree death).
-  engine.dropWorldStack('meat', PIGGY_DEATH_DROPS.meat, meatX, surfaceAt(engine, meatX, refY) - 74);
+  // On the ground, as every stack rests on the line under it (game.js dropWorldStack).
+  engine.dropWorldStack('meat', PIGGY_DEATH_DROPS.meat, meatX, surfaceAt(engine, meatX, refY));
   // A die() Plop has no seed_class: examining it gives plop.js's default, 1 Corn Seed (219-228).
   const plopX = Math.max(30, Math.min((engine.worldW || Infinity) - 30, x + PIGGY_DEATH_DROPS.plopDx));
   dropPlop(engine, plopX, 'seed_corn', PIGGY_DEATH_DROPS.plop, { silent: true, refY });
@@ -1405,7 +1405,7 @@ function setupDemo(engine) {
         // G64 QA: 3 Potatoes on the yard ground and a fruiting Fruit Tree in
         // the yard's first Patch plot (a fixture: drawn only where the yard
         // has a Patch) for the hungry herd to find while "away".
-        engine.dropWorldStack('potato', 3, Math.round(stickX + 60), surfaceAt(engine, stickX + 60) - 74);
+        engine.dropWorldStack('potato', 3, Math.round(stickX + 60), surfaceAt(engine, stickX + 60));
         const soil = engine.streetSlot('patches', YARD_TSID);
         soil.plots ||= {};
         soil.plots['patch:0'] ||= {

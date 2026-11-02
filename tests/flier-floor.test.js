@@ -39,7 +39,7 @@ import { setCreatureEcology, streetObjectLayout } from '../tools/build-realtime-
 import { STREET_INDEX, applyStreetIndex, loadStreetDataFromFs, setZoneStreetsShown } from '../public/js/street-loader.js?v=33d2b8bc';
 import { setStreetEcologyCatalog } from '../public/js/street-ecology.js?v=7fbae08d';
 import { platformsScreen, streetWidth, isItemSolid } from '../public/js/street-model.js?v=505d8990';
-import { nearestSurfaceY } from '../public/js/walk-surface.js?v=5b6e1c8d';
+import { nearestSurfaceY } from '../public/js/walk-surface.js?v=c982983e';
 
 const root = join(import.meta.dirname, '..');
 const read = (rel) => readFileSync(join(root, rel), 'utf8');

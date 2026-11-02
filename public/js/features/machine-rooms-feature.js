@@ -91,7 +91,7 @@ import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inv
 import { energyMax, moodMax } from '../metabolics.js?v=8504134e';
 import { getSkillCatalog } from '../content-catalogs.js?v=10b118dd';
 import { worldToScreen } from '../street-model.js?v=505d8990';
-import { nearestSurfaceY } from '../walk-surface.js?v=5b6e1c8d';
+import { nearestSurfaceY } from '../walk-surface.js?v=c982983e';
 import { textureFromUrl } from '../textures.js?v=db2ce452';
 import { createSheetLoader } from '../sprite-sheets.js?v=2e580c24';
 import {

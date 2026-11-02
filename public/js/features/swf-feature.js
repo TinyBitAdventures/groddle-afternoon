@@ -145,8 +145,8 @@ function dropSwf(engine, classTsid, index) {
   if (countItem(engine.inv, classTsid) < 1 || !engine.streetTsid) return;
   const p = engine.player;
   const points = dropPoints(p?.x ?? 0, engine.worldW);
-  // game.js dropPackItem: a dropped stack sits 74 px above the feet.
-  const y = (p?.y ?? engine.groundY ?? 0) - 74;
+  // takeable_drop 164-167 puts it in at pc.y - 20; it falls to the line under it (game.js dropWorldStack).
+  const y = (p?.y ?? engine.groundY ?? 0) - 20;
   removeItem(engine.inv, classTsid, 1);
   const res = engine.dropWorldStack?.(classTsid, 1, points[index], y);
   if (res?.ok && res.stack) game.drops.push({ id: res.stack.id, tsid: engine.streetTsid, classTsid });

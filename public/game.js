@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=fe2bbd71';
 import { createFeatureHost } from './js/feature-host.js?v=e4f648b1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=2e2d873e';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=7627d3d5';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -727,7 +727,7 @@ import {
 } from './js/travel.js?v=7fd6e363';
 import { facingScaleX, facingFromVelocity } from './js/avatar.js?v=c4da73ea';
 import { AFK_SEQUENCE, AFK_TIMEOUT_MS, ANIMS, ANIM_FPS, EMOTIONS, EMOTION_MS, FALL_LOOP, IDLE_SHEETS, RANDOM_IDLE_MS, RANDOM_IDLE_WAIT_MS, animForState, avatarAnimState, createIdleClock, crowdScaleX, frameRef, idleSheetFor } from './js/avatar-anims.js?v=fb921bf4';
-import { landingY, walkSurfaceY } from './js/walk-surface.js?v=5b6e1c8d';
+import { landingY, stackRestY, walkSurfaceY } from './js/walk-surface.js?v=c982983e';
 import { holdCloseToFloor } from './js/slope-walk.js?v=9af1e505';
 import { WALK_MAX, avatarGround, coastX, stepAvatar, steerAccel, steerX, streetPhysicsExtras } from './js/avatar-step.js?v=33ad1926';
 import { createUserPath, stepUserPath } from './js/user-path.js?v=8880557f';
@@ -11226,6 +11226,8 @@ const engine = {
   streetWorld: (tsid) => streetWorldState(tsid),
   /** createItemStack on the current street: a ground stack anyone can pick up. */
   dropWorldStack(classTsid, count, x, y) {
+    // createItemStack(WithPoof) puts it in at the caller's point and it falls to the line under it.
+    y = restingStackY(x, y);
     const result = dropInventoryStack(droppedItemState, { [classTsid]: count }, droppedStacksTsid(), classTsid, count, { x, y }, { now: Date.now(), merge: false });
     if (result.ok) {
       saveDroppedItems();
@@ -11991,18 +11993,24 @@ function resetStreetCollectiblesForNewDay() {
   return n;
 }
 
-function spawnApples(xs) {
+/**
+ * The street's loose Apples, one on each planned point (planStreetPlacements: a line that holds
+ * items). An apple is an item, and an item on a street lies still with its art's bottom centre
+ * on its point (LocationItemstackView.as _positionViewDO 853-854); it bobs only for a class whose
+ * CSS names a bob_amt (215-229, default 0), and apple.js names none (Austin 2026-11-02: the
+ * floating apples rest on the ground, as dropped stacks and Musicblocks do, desk DROPHOVER).
+ */
+function spawnApples(points) {
   const list = [];
   const collected = new Set(streetWorldState().collectedApples);
-  (xs !== undefined ? xs : [250, 600, 850, 1300, 1800, 2200]).forEach((x, i) => {
+  points.forEach((p, i) => {
     if (collected.has(i)) return;
     const spr = new PIXI.Sprite(textures.appleIcon.frames[0]);
     spr.anchor.set(0.5, 1);
     spr.baseScale = ENTITY_SCALE.apple;
     spr.scale.set(ENTITY_SCALE.apple);
-    spr.x = x;
-    spr.y = GROUND_Y + 2;
-    spr.bob = Math.random() * 6;
+    spr.x = p.x;
+    spr.y = p.y;
     spr._naturalIndex = i;
     spr.zIndex = itemZ('apple', 4);
     entityLayer.addChild(spr);
@@ -12110,8 +12118,10 @@ function spawnDroppedItemStack(stack) {
     onLoaded(spr.texture?.source, () => sizeDroppedItemSprite(spr));
   }
   spr.x = stack.x;
-  spr.baseY = stack.y;
-  spr.y = stack.y;
+  // It rests on the line under its point (a stack set down in the air before 10-30, a shared
+  // stack the server put in at the dropper's feet - 20 as takeable.js 166-167 does).
+  spr.baseY = restingStackY(stack.x, stack.y);
+  spr.y = spr.baseY;
   // Dropped stacks must stay legible in front of large vendors/gardens at crowded spawns.
   spr.zIndex = itemZ(stack.classTsid, 12);
   spr.worldItemId = stack.id;
@@ -12136,6 +12146,17 @@ function spawnDroppedItemStack(stack) {
     worldItemId: stack.id,
   });
   return spr;
+}
+
+/**
+ * Where a stack set down here at (x, y) comes to rest (walk-surface.js stackRestY: the first line
+ * under it that holds items, as a stack obeying physics falls in the original), else where it
+ * was put. In a home's rooms homes-feature sets each stack on the shelf, table or seat that holds
+ * it (home-decor.js settleStacks): furniture tops are not street lines, so those stay as set.
+ */
+function restingStackY(x, y) {
+  if (homeIsInstanced() && currentStreetTsid === HOME_INTERIOR_TSID) return y;
+  return stackRestY(streetPlatforms, x, y) ?? y;
 }
 
 /** G226: where this place's dropped stacks are kept (homes-feature dropTsid: a Tower floor's own key). */
@@ -13420,12 +13441,6 @@ function physics(dt) {
     const cs = c.baseScale ?? ENTITY_SCALE.chicken;
     c.scale.x = (c.vx >= 0 ? 1 : -1) * cs;
     c.scale.y = Math.abs(cs);
-  }
-
-  for (const a of apples) {
-    a.bob = (a.bob || 0) + 0.05 * dt;
-    if (!a._baseY) a._baseY = a.y;
-    a.y = a._baseY + Math.sin(a.bob) * 3;
   }
 
   for (const q of quoins) {
@@ -22167,12 +22182,7 @@ async function enterStreet(tsid, opts = {}) {
       spr._groundY = p.y;
     }
   });
-  const applePoints = placement('apples');
-  apples = spawnApples(applePoints.map((p) => p.x));
-  apples.forEach((spr) => {
-    const p = applePoints[spr._naturalIndex || 0];
-    if (p) { spr.x = p.x; spr.y = p.y + 2; }
-  });
+  apples = spawnApples(placement('apples'));
   worldMusicblocks = spawnMusicblockDrop(placement('musicblocks')[0], true);
   const treeSpots = placement('trees').map((point, index) => ({
     x: point.x,

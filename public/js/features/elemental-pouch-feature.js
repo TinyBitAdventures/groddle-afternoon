@@ -220,7 +220,7 @@ function demoSetup(engine) {
   if (demo === 'ground') {
     removeItem(inv, POUCH_CLASS, countItem(inv, POUCH_CLASS));
     const p = engine.player;
-    engine.dropWorldStack?.(POUCH_CLASS, 1, (p?.x || 400) + 60, (p?.y || 600) - 74);
+    engine.dropWorldStack?.(POUCH_CLASS, 1, (p?.x || 400) + 60, p?.y || 600);
     engine.updateHud?.();
     publish(engine);
     return;

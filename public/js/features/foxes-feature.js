@@ -49,7 +49,7 @@ import { getToolCondition } from '../tools.js?v=3d109172';
 import { worldToScreen } from '../street-model.js?v=505d8990';
 import { OVERLAY_USES, playOverlay } from '../overlays.js?v=90f4b1ba';
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=2e580c24';
-import { nearestSurfaceY, walkSurfaceY } from '../walk-surface.js?v=5b6e1c8d';
+import { nearestSurfaceY, walkSurfaceY } from '../walk-surface.js?v=c982983e';
 import { loadWildlifeCatalog, wildlifeCatalog, wildlifeFor } from '../wildlife.js?v=670c3a7f';
 import {
   FIBER_ID,

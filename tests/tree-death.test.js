@@ -41,14 +41,14 @@ import {
 } from '../public/js/tree-poison.js?v=f6e01177';
 import { createPlot, killPlotTree, performPlotVerb, growTree } from '../public/js/patches.js?v=1bf0dd8e';
 import { createFeatureHost } from '../public/js/feature-host.js?v=e4f648b1';
-import { FEATURES } from '../public/js/features/index.js?v=2e2d873e';
+import { FEATURES } from '../public/js/features/index.js?v=7627d3d5';
 import { adoptedPlan } from '../public/js/features/patches-feature.js?v=25d3d145';
 import { patchesFeature } from '../public/js/features/patches-feature.js?v=25d3d145';
 import {
   decorateTreeVerbs,
   streetTreeIndex,
   treeDeathFeature,
-} from '../public/js/features/tree-death-feature.js?v=c0c6d826';
+} from '../public/js/features/tree-death-feature.js?v=baf2ddcb';
 import { skillRemakeNote } from '../public/js/skill-tree.js?v=17787a09';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=10b118dd';
 
@@ -383,7 +383,7 @@ describe('tree-death feature', () => {
     treeDeathFeature._completePour(engine, 'poison', wood);
     treeDeathFeature._killTree(engine, wood);
     assert.deepEqual(adopted.map((r) => [r.key, r.soilClass]), [['tree:0', 'patch']]);
-    assert.deepEqual(calls.drops, [['plank', 25, 980, 902 - 74]]);
+    assert.deepEqual(calls.drops, [['plank', 25, 980, 902]]);
     patchesFeature.adoptPlot = realAdopt;
   });
 
