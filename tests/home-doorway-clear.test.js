@@ -5,6 +5,12 @@
  * every street style, house style and street width, nor over a Tower's door. Cultivations a
  * player planted are not scenery and are never moved. The same rule as a public street's doors
  * (DOORCLEAR, street-ecology streetReservedSpots).
+ *
+ * PLANTS (Austin 2026-11-01, "Plants by the house, thin out the ones covering the door"): the
+ * border no longer hides a For Sale sign (the house decos ship without it since FORSALE), so it
+ * keeps off the whole house front (houseFront: the door, its mat or path, the windows, Meadow's
+ * flower bed and bench, Firebog's mushrooms, Uralia's pots) and is thinned to what fits at the
+ * corner. A neighbour's house keeps its front clear the same way (no bush over it).
  */
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
@@ -13,16 +19,19 @@ import { join } from 'node:path';
 import { HOME_LIMITS } from '../public/js/homes-catalog.js?v=29713fa8';
 import { createCultivationState, homeStreetLayout } from '../public/js/home-cultivation.js?v=1cfff492';
 import { EXTERIOR_STYLES, streetLook } from '../public/js/home-styles.js?v=f591561f';
+import { NEIGHBOURS, neighbourLayout } from '../public/js/neighbours.js?v=862857f9';
+import { SCENE_STYLES, propPlan } from '../public/js/features/neighbour-scene.js?v=57b32c01';
 import {
   DOORWAY_GAP,
   HOUSE_STYLE_KEYS,
   houseDoorway,
   houseFixtureX,
+  houseFront,
   landscapeNearSpots,
   streetNearSkip,
   streetTrimSpots,
   towerDoorway,
-} from '../public/js/features/homes-feature.js?v=461bb18d';
+} from '../public/js/features/homes-feature.js?v=ab7a5418';
 
 const read = (rel) => readFileSync(join(import.meta.dirname, '..', 'public', 'js', rel), 'utf8');
 const maxLeft = HOME_LIMITS.MAX_FRONTYARD_LEFT_SEGMENTS - HOME_LIMITS.START_FRONTYARD_LEFT_SEGMENTS;
@@ -41,25 +50,61 @@ describe('the home street keeps its doorways clear of scenery (PORCH)', () => {
     }
   });
 
-  it('no planted border sprite reaches the doorway, and the border still hides the For Sale sign', () => {
+  it('the house front spans the doorway and the house art along its foot', () => {
+    const layout = homeStreetLayout(createCultivationState({}));
+    for (const style of HOUSE_STYLE_KEYS) {
+      const front = houseFront(layout, style);
+      const door = houseDoorway(layout, style);
+      const { left, signX } = houseFixtureX(layout, style);
+      assert.ok(front.x1 < door.x1 && front.x2 > door.x2, `${style}: the doorway is inside the front`);
+      assert.ok(front.x1 > left && front.x1 - left < 80, `${style}: from the wall's left corner`);
+      assert.ok(front.x2 - front.x1 > 250, `${style}: across the whole front`);
+      assert.ok(signX < front.x1, `${style}: the Mailbox's corner stays outside`);
+    }
+  });
+
+  it('no planted border sprite stands on the house front or past the yard edge, and the border is thinned', () => {
     let checked = 0;
+    let kept = 0;
+    let listed = 0;
     for (const row of built) {
       const look = streetLook(row.key);
       for (const style of HOUSE_STYLE_KEYS) {
         for (let yardLeft = 0; yardLeft <= maxLeft; yardLeft += 1) {
           const layout = homeStreetLayout(createCultivationState({ yardLeft }));
           const door = houseDoorway(layout, style);
-          const { left, signX } = houseFixtureX(layout, style);
+          const front = houseFront(layout, style);
           const spots = streetTrimSpots(look, layout, style);
+          listed += look.trim.length;
+          kept += spots.length;
+          assert.ok(spots.length < look.trim.length, `${row.key} ${style}: thinned (${spots.length} of ${look.trim.length})`);
           for (const s of spots) {
             checked += 1;
             assert.ok(s.x + s.half <= door.x1 - DOORWAY_GAP, `${row.key} ${style} ${s.meta.s} at ${Math.round(s.x)} reaches the doorway ${door.x1}`);
+            assert.ok(s.x + s.half <= front.x1 - DOORWAY_GAP, `${row.key} ${style} ${s.meta.s} at ${Math.round(s.x)} stands on the house front ${front.x1}`);
+            assert.ok(s.x - s.half >= layout.lotLeft + 40, `${row.key} ${style} ${s.meta.s} past the yard edge`);
           }
-          if (spots.length) assert.ok(spots.some((s) => s.x - s.half <= signX && s.x + s.half >= left), `${row.key} ${style}: something stands at the sign`);
+          for (let a = 0; a < spots.length; a += 1) {
+            // Each next one stands left of the one before it, side by side, not stacked.
+            for (let b = a + 1; b < spots.length; b += 1) assert.ok(spots[b].x + spots[b].half <= spots[a].x - spots[a].half + 0.5, `${row.key} ${style}: side by side, not stacked`);
+          }
         }
       }
     }
-    assert.ok(checked > 500, `swept ${checked} border sprites`);
+    assert.ok(checked > 200, `swept ${checked} border sprites`);
+    assert.ok(kept * 2 < listed + 20, `about half the border is left (${kept} of ${listed})`);
+  });
+
+  it('a neighbour\'s house front stays clear: no bush over it, props away from it', () => {
+    for (const n of NEIGHBOURS) {
+      assert.equal(n.house.cover, undefined, `${n.id}: no bush planted over the house`);
+      const l = neighbourLayout(n);
+      const front = { x1: l.houseX - l.houseW / 2, x2: l.houseX + l.houseW / 2 };
+      for (const p of propPlan(n)) assert.ok(p.x < front.x1 - 100 || p.x > front.x2 + 100, `${n.id} ${p.name} at ${p.x} by the house`);
+      assert.ok(SCENE_STYLES[n.style], n.id);
+    }
+    const src = read('features/neighbour-scene.js');
+    assert.doesNotMatch(src, /h\.cover|coverX/, 'the scene plants nothing over the house');
   });
 
   it('no grass or plant grows over a house doorway or a Tower door, at any width', () => {

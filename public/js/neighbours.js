@@ -47,8 +47,12 @@ const ITEM = (classTsid, count = 1) => Object.freeze({ classTsid, count });
  * is the door's centre and saleX the centre of the spot where Tiny Speck's art
  * keeps its For Sale sign, both as fractions of the house width (-1: none). The
  * house decos ship without the sign (an owned house never showed it,
- * DoorView.as 228-232; tools/deco-pipeline/door-signs.py); a bush (`cover`)
- * stands on that spot and the neighbour's own mailbox beside it.
+ * DoorView.as 228-232; tools/deco-pipeline/door-signs.py), and the neighbour's
+ * own mailbox stands left of that spot. PLANTS (Austin 2026-11-01, "thin out the
+ * ones covering the door"): the bush once planted over the sign is gone; it hid
+ * each house's own front (Dorrit's pots, Pemberton's mushroom and window,
+ * Juniper's flower bed, Hadwin's log bench) and there is no room for it at the
+ * corner beside the mailbox.
  */
 export const NEIGHBOURS = Object.freeze([
   Object.freeze({
@@ -56,7 +60,7 @@ export const NEIGHBOURS = Object.freeze([
     name: 'Dorrit Applewhistle',
     first: 'Dorrit',
     style: 'meadow',
-    house: { path: 'door_asset_house_large_05', w: 830, h: 668, scale: 0.5, doorX: 0.5, saleX: 0.1, cover: { s: 'bush_1', scale: 0.72 } },
+    house: { path: 'door_asset_house_large_05', w: 830, h: 668, scale: 0.5, doorX: 0.5, saleX: 0.1 },
     props: ['bench', 'flower_bush_5', 'groddle_flower_2'],
     chore: 'garden',
     doorNote: { title: 'Back soon!', text: 'Gone to the Fruit Tree festival. If the tomatoes look thirsty, they are. Thank you, whoever you are!' },
@@ -69,7 +73,7 @@ export const NEIGHBOURS = Object.freeze([
     name: 'Pemberton Fizz',
     first: 'Pemberton',
     style: 'firebog',
-    house: { path: 'door_asset_house_medium_03', w: 764, h: 586, scale: 0.58, doorX: 0.55, saleX: 0.13, cover: { s: 'heights_bush_1', scale: 0.62 } },
+    house: { path: 'door_asset_house_medium_03', w: 764, h: 586, scale: 0.58, doorX: 0.55, saleX: 0.13 },
     props: ['mushrooms', 'lantern_stacked', 'underground_plant_1'],
     chore: 'gift',
     gifts: [ITEM('mushroom', 2), ITEM('honey', 1), ITEM('plum', 3), ITEM('bun', 1)],
@@ -83,7 +87,7 @@ export const NEIGHBOURS = Object.freeze([
     name: 'Juniper Quoinsworth',
     first: 'Juniper',
     style: 'uralia',
-    house: { path: 'door_asset_house_large_01', w: 830, h: 668, scale: 0.5, doorX: 0.5, saleX: 0.1, cover: { s: 'bush_1', scale: 0.72 } },
+    house: { path: 'door_asset_house_large_01', w: 830, h: 668, scale: 0.5, doorX: 0.5, saleX: 0.1 },
     props: ['bling_birdhouse_1', 'purple_mushroom_3', 'plant_fern_2'],
     chore: 'birdhouse',
     doorNote: { title: 'An arrangement', text: 'The birds and I have an arrangement. I feed them, they sing. I\'m away, so if you could keep up my end of the bargain, they\'ll keep up theirs.' },
@@ -96,7 +100,7 @@ export const NEIGHBOURS = Object.freeze([
     name: 'Old Hadwin Mossbottom',
     first: 'Hadwin',
     style: 'meadow',
-    house: { path: 'door_asset_house_small_01', w: 684, h: 570, scale: 0.6, doorX: 0.54, saleX: 0.12, cover: { s: 'bush_1', scale: 0.8 } },
+    house: { path: 'door_asset_house_small_01', w: 684, h: 570, scale: 0.6, doorX: 0.54, saleX: 0.12 },
     props: ['lantern', 'bush_1', 'groddle_grass_1'],
     chore: 'lanterns',
     doorNote: { title: 'Probably napping', text: 'Fell asleep at the shrine again, probably. If it gets dark, light my lanterns so I can find my way home.' },
@@ -335,8 +339,8 @@ export function neighbourLayout(neighbour) {
   const left = houseX - houseW / 2;
   const right = houseX + houseW / 2;
   const doorX = Math.round(left + houseW * h.doorX);
-  const coverX = h.saleX >= 0 ? Math.round(left + houseW * h.saleX) : null;
-  const mailboxX = Math.round(coverX != null ? coverX - 90 : left - 60);
+  const cornerX = h.saleX >= 0 ? Math.round(left + houseW * h.saleX) : null;
+  const mailboxX = Math.round(cornerX != null ? cornerX - 90 : left - 60);
   const choreX = Math.round(right + 150 + hash01(`${neighbour.id}:chore`) * 60);
   return {
     width,
@@ -346,7 +350,6 @@ export function neighbourLayout(neighbour) {
     houseX,
     houseW,
     doorX,
-    coverX,
     mailboxX,
     choreX,
     benchX: Math.round(left - 300 - hash01(`${neighbour.id}:bench`) * 60),

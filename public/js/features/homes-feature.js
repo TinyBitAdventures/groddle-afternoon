@@ -1462,9 +1462,9 @@ function runRockVerb(target, verbId, engine) {
  * through homes_rebuild_exterior.
  */
 const HOUSES = {
-  meadow: { path: 'door_asset_house_large_01', w: 830, h: 668, scale: 0.48, doorX: 0.52, signX: 0.06, doorway: [0.38, 0.64] },
-  firebog: { path: 'door_asset_house_medium_03', w: 764, h: 586, scale: 0.58, doorX: 0.55, signX: 0.06, doorway: [0.32, 0.64] },
-  uralia: { path: 'door_asset_house_large_05', w: 830, h: 668, scale: 0.48, doorX: 0.52, signX: 0.06, doorway: [0.30, 0.62] },
+  meadow: { path: 'door_asset_house_large_01', w: 830, h: 668, scale: 0.48, doorX: 0.52, signX: 0.06, doorway: [0.38, 0.64], front: [0.15, 0.89] },
+  firebog: { path: 'door_asset_house_medium_03', w: 764, h: 586, scale: 0.58, doorX: 0.55, signX: 0.06, doorway: [0.32, 0.64], front: [0.15, 0.88] },
+  uralia: { path: 'door_asset_house_large_05', w: 830, h: 668, scale: 0.48, doorX: 0.52, signX: 0.06, doorway: [0.30, 0.62], front: [0.17, 0.88] },
 };
 export const HOUSE_STYLE_KEYS = Object.freeze(Object.keys(HOUSES));
 
@@ -1495,23 +1495,41 @@ export function towerDoorway(footX) {
 }
 
 /**
- * The planted border in front of the house (the street style's `trim`): where each sprite
- * stands. It starts at the sign corner (the house's front left, where Tiny Speck's art keeps
- * its For Sale sign; the house decos ship without it since FORSALE, as the client hid it on a
- * house not for sale: DoorView.as 228-232, tools/deco-pipeline/door-signs.py) and steps right,
- * but no sprite reaches into the doorway; one that would moves left, back to the corner.
- * PURE (world x).
+ * PLANTS (Austin 2026-11-01, "Plants by the house, thin out the ones covering the door"): the
+ * house's front, everything Tiny Speck painted along its foot (the door and its mat or path, the
+ * windows, Meadow's flower bed and bench, Firebog's two mushrooms, Uralia's four pots), from
+ * the wall's left corner to its right one, as fractions of the house art (`front`, measured on
+ * the door_asset_house_* decos where they stand on the ground). World x: { x1, x2 }.
  */
-export function streetTrimSpots(look, layout, houseStyle = 'meadow') {
+export function houseFront(layout, houseStyle = 'meadow') {
   const h = HOUSES[houseStyle] || HOUSES.meadow;
   const w = h.w * h.scale;
-  const { left } = houseFixtureX(layout, houseStyle);
-  const door = houseDoorway(layout, houseStyle);
-  return (look?.trim || []).map((meta, i) => {
+  const left = layout.houseX - w / 2;
+  return { x1: Math.round(left + w * h.front[0]), x2: Math.round(left + w * h.front[1]) };
+}
+
+/**
+ * The planted border by the house (the street style's `trim`): where each sprite stands. It
+ * stood over the deco's For Sale sign to hide it; the house decos ship without the sign since
+ * FORSALE (the client hid it on a house not for sale: DoorView.as 228-232,
+ * tools/deco-pipeline/door-signs.py), so the border only dresses the corner now. Thinned
+ * (PLANTS): the sprites line up leftwards from the house's front (houseFront) with the doorway
+ * gap, side by side, and only those that fit before the yard's own planting (the lot edge where
+ * the `near` row stops, streetNearSkip) stay; the rest are not drawn. None stands on the house
+ * front, so the door, its mat and the house's own art stay in view. PURE (world x).
+ */
+export function streetTrimSpots(look, layout, houseStyle = 'meadow') {
+  const front = houseFront(layout, houseStyle);
+  const stop = layout.lotLeft + 40;
+  let edge = front.x1 - DOORWAY_GAP;
+  const out = [];
+  (look?.trim || []).forEach((meta, i) => {
     const half = (meta.w * meta.scale) / 2;
-    const want = left + w * (h.signX + 0.05 + i * 0.07);
-    return { meta, x: Math.min(want, door.x1 - DOORWAY_GAP - half), half, flip: i % 2 === 1 };
+    if (edge - 2 * half < stop) return;
+    out.push({ meta, x: edge - half, half, flip: i % 2 === 1 });
+    edge -= 2 * half;
   });
+  return out;
 }
 
 /** The street's Tower's foot in world x (its cultivation's spot), or null. */

@@ -29,7 +29,7 @@ import { startAssembly, startDisassembly } from '../public/js/machines.js?v=0641
 import { createToolConditionState, repairToolCondition, setToolRemaining } from '../public/js/tools.js?v=3d109172';
 import { smeltMetalRocks } from '../public/js/mining.js?v=4806e3e8';
 import { craftRecipe } from '../public/js/making.js?v=20d5364b';
-import { doChore, neighbourById, normalizeNeighbourState } from '../public/js/neighbours.js?v=b7e4258a';
+import { doChore, neighbourById, normalizeNeighbourState } from '../public/js/neighbours.js?v=862857f9';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const pub = join(here, '../public');

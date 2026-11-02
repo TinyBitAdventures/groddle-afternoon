@@ -7,7 +7,7 @@
  * neighbour by a stable hash.
  */
 
-import { NEIGHBOUR_SCENE, hash01, neighbourLayout } from '../neighbours.js?v=b7e4258a';
+import { NEIGHBOUR_SCENE, hash01, neighbourLayout } from '../neighbours.js?v=862857f9';
 import { textureFromUrl } from '../textures.js?v=db2ce452';
 
 const DECO = 'assets/decos/groddle/';
@@ -64,7 +64,6 @@ export const SCENE_DECO_SIZES = Object.freeze({
   groddle_flower_2: [78, 206],
   lantern_stacked: [66, 188],
   bush_1: [208, 166],
-  heights_bush_1: [320, 188],
   lantern: [54, 110],
   bling_birdhouse_1: [120, 438],
 });
@@ -273,13 +272,6 @@ export function buildNeighbourBackground(PIXI, neighbour) {
   house.y = groundY + 14;
   house.zIndex = -20;
   root.addChild(house);
-
-  // A bush planted over the deco's painted For Sale sign.
-  if (h.cover && layout.coverX != null) {
-    const cover = decoSprite(PIXI, h.cover.s, h.cover.scale, layout.coverX, groundY + 22, false);
-    cover.zIndex = -19;
-    root.addChild(cover);
-  }
 
   const props = new PIXI.Container();
   props.zIndex = -18;
