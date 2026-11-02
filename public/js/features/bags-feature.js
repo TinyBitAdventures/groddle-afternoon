@@ -60,14 +60,27 @@
  * put it in the first free slot and refused a full pack, bag.js:89-238,
  * inc_stores.js:170-173). Bags held and what they hold never move.
  *
+ * Rename (items/bag_bigger.js verbs.rename 475-520, onInputBoxResponse 605-611;
+ * js/bag-names.js): every bag's menu has Rename (sort_on 67), which asks "Name
+ * Me!" / "My new name:" for that one bag (the menu's bag, packBagMenu). The
+ * name is kept on the bag's row in the arrangement (pack-slots.js renameBag),
+ * so it saves with the player (online too: the save route keeps the slice as
+ * it is, and the ledger counts classes only), goes with the bag when it is
+ * dropped and comes back when it is picked up (a named bag stays the player's
+ * own on the ground, even empty: the shared ground carries no names). A bag the
+ * player put down can be renamed where it lies (decorateVerbs adds Rename to its
+ * ground menu; renameDroppedBag). A bag given, traded, mailed or sold goes as a
+ * class and a count (trade goods { c, n, r }), so it arrives with its class name.
+ *
  * QA: `?autostart=1&fresh=1&resetgame=1&questoffer=off&bagdemo=1` empties the
  * pack to a Generic Bag and 15 stacks (16/16, the bag empty) and drops 5 Plums
  * beside you; `bagdemo=full` fills the bag's 10 slots too, so the Plums can't
- * be picked up. `bagdemo=hero` is the home page's pack (tools/landing/shots.mjs): no
+ * be picked up; `&bagname=Lunchbox` names the demo's bag. `bagdemo=hero` is the home page's pack (tools/landing/shots.mjs): no
  * bags or toolbox, a few things gathered loose (HERO_PACK) and the tools on their row
  * (HERO_TOOLS), with nothing dropped.
- * Canvas data packSlots (used/16), packBags, packBagOpen, packRock,
- * packLast, bagDemo; window.groddlePack.{layout,counts,room,move,toggle}, and in solo
+ * Canvas data packSlots (used/16), packBags, packBagOpen, packBagNames (key:cls:name
+ * for each named bag), packRock, packLast, bagDemo;
+ * window.groddlePack.{layout,counts,room,move,toggle,rename}, and in solo
  * grant(class, n) to gain something the way a reward does.
  */
 
@@ -86,13 +99,16 @@ import {
   moveStack,
   normalizePrefs,
   packIntoBags,
+  renameBag,
   roomFor,
   takeBag,
   unitPlaces,
   unitRankAt,
-} from '../pack-slots.js?v=f3890c72';
+} from '../pack-slots.js?v=b02c404c';
 import { TOOL_CONDITION_CATALOG, moveToolCopy, pickToolCopies, placeToolCopies } from '../tools.js?v=6a9e1314';
 import { createMinnAccount } from '../minn-account.js?v=ea900c51';
+import { BAG_NAME_MAX, BAG_RENAME_COPY, canRenameBag, cleanBagName, renamedTo } from '../bag-names.js?v=0d896c8f';
+import { openNamePrompt } from '../ui/name-prompt.js?v=142b551a';
 
 export const BAGS_FEATURE_ID = 'bags';
 export const BAG_DEMO_KIT = Object.freeze([
@@ -128,6 +144,8 @@ const TAKE_WAIT_MS = 60000;
 /** A take done here and now (eat, a solo drop) lands at once; one that didn't soon lapses. */
 const TAKE_SOON_MS = 1500;
 let demoDone = false;
+/** The bag whose menu is open (game.js renderPackPopover: packBagMenu), its prefs key, or ''. */
+let menuBag = '';
 /** The site's answers that settle the starter question: granted, none, or refused (new, nosave). */
 const STARTER_DONE = new Set(['granted', 'none', 'new', 'nosave']);
 const STARTER_TRADE = /^starter-bags-[1-9][0-9]{0,18}$/;
@@ -186,6 +204,7 @@ function publish(engine, layout) {
   engine.setData('packBags', Object.values(layout.bags).map((b) => `${b.cls}:${b.slots.length}/${b.capacity}`).join(','));
   engine.setData('packBagOpen', slice.open && layout.bags[slice.open] ? `${slice.open}:${layout.bags[slice.open].cls}` : '');
   engine.setData('packRock', Object.entries(layout.rock).map(([c, n]) => `${c}:${n}`).join(','));
+  engine.setData('packBagNames', Object.values(layout.bags).filter((b) => b.name).map((b) => `${b.key}:${b.cls}:${b.name}`).join(','));
 }
 
 function say(engine, text) {
@@ -229,6 +248,10 @@ function runDemo(engine) {
   slice.rock = {};
   slice.open = '';
   slice.migrated = true;
+  if (!hero && engine.param('bagname')) {
+    const named = renameBag(layoutPack(inv, slice.prefs, opts()).prefs, 'b1', engine.param('bagname'));
+    if (named.ok) slice.prefs = named.prefs;
+  }
   const p = engine.player;
   if (!hero && p && engine.dropWorldStack) engine.dropWorldStack(BAG_DEMO_DROP.classTsid, BAG_DEMO_DROP.count, p.x + BAG_DEMO_DROP.dx, p.y);
   engine.setData?.('bagDemo', hero ? 'hero' : 'ready');
@@ -440,6 +463,77 @@ function doMove(engine, from, to) {
   return result;
 }
 
+/** The bag a Rename is about: the menu's bag when it is of this class, else the first of the class. */
+function bagKeyFor(layout, cls, key = menuBag) {
+  if (key && layout.bags[key]?.cls === cls) return key;
+  return Object.values(layout.bags).find((b) => b.cls === cls)?.key || '';
+}
+
+/** onInputBoxResponse 605-611 for one bag in the pack. Returns the result of renameBag. */
+function applyBagName(engine, key, value) {
+  const layout = layoutPack(engine.inv, slice.prefs, opts());
+  const res = renameBag(layout.prefs, key, value);
+  if (!res.ok) return res;
+  slice.prefs = normalizePrefs(res.prefs);
+  engine.setData?.('packLast', res.changed ? `renamed:${key}:${res.name}` : `rename_kept:${key}`);
+  if (res.changed) {
+    engine.playSound?.('CLICK_SUCCESS', { volume: 0.45 });
+    engine.save?.();
+  }
+  publish(engine, reconcile(engine));
+  engine.updateHud?.();
+  engine.refreshPack?.();
+  return res;
+}
+
+/** verbs.rename handler 501-519: the input box for one bag, its name filled in. */
+function askBagName(current, onName) {
+  openNamePrompt({
+    title: BAG_RENAME_COPY.title,
+    label: BAG_RENAME_COPY.input,
+    value: current || '',
+    maxChars: BAG_NAME_MAX,
+    // input_restrict 'A-Z a-z 0-9'.
+    restrict: /[^a-z0-9 ]/gi,
+    onSubmit: onName,
+  });
+}
+
+/** A dropped bag of the player's own (js/world-items.js record) on this street, or null. */
+function droppedRecord(target, engine) {
+  if (target?.classId !== 'dropped_item' || !canRenameBag(target?.state?.classTsid)) return null;
+  const id = target.state.id || target.worldItemId;
+  const rows = engine?.droppedItems?.streets?.[engine.dropTsid];
+  return Array.isArray(rows) ? rows.find((r) => r.id === id && r.classTsid === target.state.classTsid) || null : null;
+}
+
+/** Rename a bag lying on the ground (ok_states in_location): the record keeps the name. */
+function renameDroppedBag(target, engine, value) {
+  const record = droppedRecord(target, engine);
+  if (!record) return false;
+  const name = renamedTo(record.name, value);
+  if (name && name !== record.name) {
+    record.name = name;
+    engine.droppedItemsChanged?.();
+    engine.setData?.('packLast', `renamed:ground:${name}`);
+  }
+  return true;
+}
+
+/** takeable.js:48: the pick up verb is disabled when nothing of the stack fits (a new list, or null). */
+function pickupRoom(target, verbs, engine) {
+  if (!verbs.some((v) => v?.id === 'pickup' && v.enabled !== false)) return null;
+  const cls = target?.classId === 'dropped_item' ? target?.state?.classTsid : target?.classId;
+  if (!cls) return null;
+  // A dropped bag with things in it needs room for itself with them inside (pack-slots.js giveBag).
+  const contents = target?.classId === 'dropped_item' ? target?.state?.contents : null;
+  const fits = contents?.length
+    ? bagsFeature.packBagRoom(cls, contents, engine)
+    : roomFor(engine?.inv || {}, slice.prefs, cls, 1, opts()) > 0;
+  if (fits) return null;
+  return verbs.map((v) => (v?.id === 'pickup' ? { ...v, enabled: false, reason: PACK_COPY.pickupDisabled } : v));
+}
+
 export const bagsFeature = {
   id: BAGS_FEATURE_ID,
 
@@ -452,6 +546,8 @@ export const bagsFeature = {
       room: (cls, n = 1) => roomFor(engine.inv, slice.prefs, cls, n, opts()),
       move: (from, to) => doMove(engine, from, to),
       toggle: (key) => bagsFeature.packToggleBag(key, engine),
+      /** Rename the bag with this key as the Name Me! box's OK does (an empty value keeps the name). */
+      rename: (key, value) => applyBagName(engine, String(key || ''), value),
       // Solo QA only: gain something as any reward would (a full pack's magic rock takes it).
       ...(engine?.mode === 'multiplayer' ? {} : { grant: (cls, n = 1) => { addItem(engine.inv, String(cls), Math.max(1, Math.floor(n))); engine.updateHud?.(); } }),
       get slice() { return JSON.parse(JSON.stringify(slice)); },
@@ -521,8 +617,9 @@ export const bagsFeature = {
   /**
    * A drop of a bag with things in it (game.js dropPackBag): the bag the player chose
    * leaves the pack with all it holds, as in the source (pack-slots.js takeBag).
-   * Returns { ok, cls, contents: [{ cls, count, points? }] }; the inventory and the
-   * arrangement have changed (tools' wear goes with them in `points`).
+   * Returns { ok, cls, contents: [{ cls, count, points? }], name? }; the inventory and the
+   * arrangement have changed (tools' wear goes with them in `points`, the bag's name in `name`).
+   * An empty bag goes this way too when it has a name, so the name goes down with it.
    */
   packTakeBag(key, engine) {
     if (!engine?.inv) return { ok: false, reason: 'missing' };
@@ -559,7 +656,7 @@ export const bagsFeature = {
     takes = [];
     if (slice.open === String(key)) slice.open = '';
     engine.setData?.('packLast', `bag_out:${res.cls}:${contents.length}`);
-    return { ok: true, cls: res.cls, contents };
+    return { ok: true, cls: res.cls, contents, ...(res.name ? { name: res.name } : {}) };
   },
 
   /** An empty bag's drop (shared or not) takes the bag the player chose (pack-slots.js bagLeavesLast). */
@@ -574,15 +671,15 @@ export const bagsFeature = {
   },
 
   /**
-   * A pick up of a bag with things in it: the bag comes back with them inside
-   * (pack-slots.js giveBag) and its tools keep their wear. Returns { ok, key } or
+   * A pick up of a bag with things in it (or with a name): the bag comes back with them inside
+   * (pack-slots.js giveBag), its tools keep their wear and it keeps its name. Returns { ok, key } or
    * { ok: false, reason: 'full' }; on ok the inventory holds the bag and its contents.
    */
-  packGiveBag(cls, contents, engine) {
+  packGiveBag(cls, contents, engine, name = '') {
     if (!engine?.inv) return { ok: false, reason: 'missing' };
     const o = opts();
     const list = (contents || []).map((c) => ({ cls: c.classTsid || c.cls, count: c.count, points: c.points }));
-    const res = giveBag(engine.inv, slice.prefs, String(cls || ''), list, o);
+    const res = giveBag(engine.inv, slice.prefs, String(cls || ''), list, o, cleanBagName(name));
     if (!res.ok) return res;
     addItem(engine.inv, String(cls), 1);
     for (const c of list) addItem(engine.inv, c.cls, c.count);
@@ -619,6 +716,39 @@ export const bagsFeature = {
     return slice.open || '';
   },
 
+  /** game.js renderPackPopover: the bag the menu is about (its key), or null when the menu is not a bag's. */
+  packBagMenu(key) {
+    menuBag = key ? String(key) : '';
+    return menuBag;
+  },
+
+  /** A bag's shown name and its class's ({ key, cls, label, name, className }) for a menu title, or null. */
+  packBagInfo(key, engine) {
+    const box = engine?.inv ? layoutPack(engine.inv, slice.prefs, opts()).bags[String(key || '')] : null;
+    return box ? { key: box.key, cls: box.cls, label: box.label, name: box.name || '', className: box.className } : null;
+  },
+
+  /** The first bag of a class in the pack ({ key, cls, label, name, className }), or null. */
+  packFirstBag(cls, engine) {
+    if (!engine?.inv) return null;
+    const key = bagKeyFor(layoutPack(engine.inv, slice.prefs, opts()), String(cls || ''), '');
+    return key ? bagsFeature.packBagInfo(key, engine) : null;
+  },
+
+  /** Rename the first bag of a class (the Elemental Pouch's one-name saves, its QA). renameBag's result, or null with none. */
+  packRenameFirst(cls, value, engine) {
+    const first = bagsFeature.packFirstBag(cls, engine);
+    return first ? applyBagName(engine, first.key, value) : null;
+  },
+
+  /** A dropped bag's Rename (game.js runs the ground verb here). True when handled. */
+  bagRenameGround(target, engine) {
+    const record = droppedRecord(target, engine);
+    if (!record) return null;
+    askBagName(record.name, (value) => renameDroppedBag(target, engine, value));
+    return true;
+  },
+
   packToggleBag(key, engine) {
     const k = String(key || '');
     slice.open = slice.open === k ? '' : k;
@@ -626,22 +756,23 @@ export const bagsFeature = {
     return slice.open;
   },
 
-  /** takeable.js:48: the pick up verb is disabled when nothing of the stack fits. */
+  /** takeable.js:48: the pick up verb is disabled when nothing of the stack fits; a dropped bag of one's own has Rename. */
   decorateVerbs(target, verbs, engine) {
-    if (!Array.isArray(verbs) || !verbs.some((v) => v?.id === 'pickup' && v.enabled !== false)) return null;
-    const cls = target?.classId === 'dropped_item' ? target?.state?.classTsid : target?.classId;
-    if (!cls) return null;
-    // A dropped bag with things in it needs room for itself with them inside (pack-slots.js giveBag).
-    const contents = target?.classId === 'dropped_item' ? target?.state?.contents : null;
-    const fits = contents?.length
-      ? bagsFeature.packBagRoom(cls, contents, engine)
-      : roomFor(engine?.inv || {}, slice.prefs, cls, 1, opts()) > 0;
-    if (fits) return null;
-    return verbs.map((v) => (v?.id === 'pickup' ? { ...v, enabled: false, reason: PACK_COPY.pickupDisabled } : v));
+    if (!Array.isArray(verbs)) return null;
+    let out = null;
+    // verbs.rename ok_states in_location: a bag the player put down can be renamed where it lies.
+    if (droppedRecord(target, engine) && !verbs.some((v) => v?.id === 'rename')) {
+      out = [...verbs, { id: 'rename', label: BAG_RENAME_COPY.label.toLowerCase(), sort: BAG_RENAME_COPY.sortOn, tooltip: BAG_RENAME_COPY.tooltip, enabled: true, reason: '', energy: 0 }];
+    }
+    return pickupRoom(target, out || verbs, engine) || out;
   },
 
   packVerbs(classTsid, engine) {
     const cls = String(classTsid || '');
+    if (cls && isBagClass(cls) && engine?.inv && canRenameBag(cls)) {
+      // verbs.rename (sort_on 67): always enabled for a bag in the pack.
+      return [{ id: 'bags_rename', label: BAG_RENAME_COPY.label, enabled: true, reason: '', tooltip: BAG_RENAME_COPY.tooltip }];
+    }
     if (!cls || isBagClass(cls) || !engine?.inv) return null;
     const layout = layoutPack(engine.inv, slice.prefs, opts());
     const places = focusedPlaces(layout, cls);
@@ -669,6 +800,15 @@ export const bagsFeature = {
   },
 
   runPackVerb(classTsid, verbId, engine) {
+    if (verbId === 'bags_rename') {
+      const cls = String(classTsid || '');
+      if (!isBagClass(cls) || !engine?.inv) return false;
+      const layout = layoutPack(engine.inv, slice.prefs, opts());
+      const key = bagKeyFor(layout, cls);
+      if (!key) return false;
+      askBagName(layout.bags[key].name, (value) => applyBagName(engine, key, value));
+      return true;
+    }
     const m = /^bags_(put|take):([a-zA-Z0-9_]+)$/.exec(String(verbId || ''));
     if (!m) return false;
     const layout = layoutPack(engine.inv, slice.prefs, opts());
@@ -693,6 +833,7 @@ export const bagsFeature = {
     lastLayout = null;
     focus = null;
     takes = [];
+    menuBag = '';
     starterAsked = false;
     if (!saved || typeof saved !== 'object') return;
     slice.prefs = normalizePrefs(saved.prefs);

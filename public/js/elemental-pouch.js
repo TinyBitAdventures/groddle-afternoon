@@ -21,16 +21,19 @@
  *    away. The counter is only set when something was made.
  *  - The pouch holds elements only, one 5000-stack per element (canContain
  *    651-659 with element_*.js stackmax 5000; onCreate capacity 4).
- *  - Rename (bag_generic verbs.rename 538-585, onInputBoxResponse 723-729):
- *    "My new name:", 32 characters of A-Z a-z 0-9 and space.
+ *  - Rename (bag_generic verbs.rename 538-585, onInputBoxResponse 723-729) is
+ *    every bag's: js/bag-names.js, features/bags-feature.js.
  *
  * Remake adaptation: the pack has no bag slots, so the pouch is a pack item
  * and the four element stacks in the pack are its contents. Shake reads and
  * adds to those stacks, and the 5000 per element limit is the pouch being
- * full. One name covers every pouch you carry (they share a pack slot).
+ * full. A save's `name` is from when one name covered every pouch; the
+ * feature gives it to the first pouch (each pouch has its own name now).
  * Sort/Magic Sort/Stack Up are bag interface verbs behind the `interface`
  * cards (imagination-remake.js) and stay out.
  */
+
+import { cleanBagName } from './bag-names.js?v=0d896c8f';
 
 export const POUCH_CLASS = 'bag_elemental_pouch';
 export const POUCH_SKILL = 'elementhandling_1';
@@ -74,7 +77,6 @@ export const SHAKE_COPY = Object.freeze({
 });
 
 export const PICKUP_BLOCKED = 'You need to know Element Handling to pick this up.';
-export const RENAME_COPY = Object.freeze({ tooltip: 'Give me a new name', title: 'Name Me!', label: 'My new name:' });
 
 const asList = (value) => (Array.isArray(value) ? value : value instanceof Set ? [...value] : []);
 const countOf = (inv, classTsid) => Math.max(0, Math.floor(Number(inv?.[classTsid]) || 0));
@@ -87,7 +89,8 @@ export function createPouchState(seed = {}) {
     // stats daily counter 'elemental_shake': the game day it was set on.
     shakeDay: typeof s.shakeDay === 'string' ? s.shakeDay : '',
     shakes: Math.max(0, Math.floor(Number(s.shakes) || 0)),
-    name: normalizePouchName(s.name),
+    // The one name every pouch shared before bags had their own (moved to the first pouch).
+    name: cleanBagName(s.name),
   };
 }
 
@@ -187,14 +190,4 @@ export function shakePouch(state, inv, upgrades, dayKey, opts = {}) {
 /** canPickup (661-667): a pouch on the ground needs Element Handling. */
 export function pouchPickupCheck(learned = []) {
   return asList(learned).includes(POUCH_SKILL) ? { ok: true, msg: '' } : { ok: false, msg: PICKUP_BLOCKED };
-}
-
-/** onInputBoxResponse (723-729): first 32 characters, letters, digits and spaces only. */
-export function normalizePouchName(value) {
-  return value ? String(value).substr(0, 32).replace(/[^a-z0-9 ]/gi, '') : '';
-}
-
-/** getLabel (715-721): the player's name for it, else the item label. */
-export function pouchLabel(state) {
-  return state?.name && state.name.trim() ? state.name : POUCH_ITEM.label;
 }

@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=9ac37cff';
 import { createFeatureHost } from './js/feature-host.js?v=903263a4';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=309db96d';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=05fcf51e';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -459,7 +459,7 @@ import {
   removeItem,
   isToolItem,
 } from './js/inventory.js?v=b0e33301';
-import { PACK_COPY, isBagClass, unitRankAt } from './js/pack-slots.js?v=f3890c72';
+import { PACK_COPY, isBagClass, unitRankAt } from './js/pack-slots.js?v=b02c404c';
 import { createPackRow, mountPackClearance, packBandRange, packCountText, packSearchEntries, packSlotTip } from './js/ui/pack-row.js?v=65c0f180';
 import { listAnimalFeedOptions } from './js/animals.js?v=d34f13bc';
 import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=d34f13bc';
@@ -473,7 +473,7 @@ import {
   pickupDroppedStack,
   placeDroppedBag,
   takeDroppedRecord,
-} from './js/world-items.js?v=210bef3b';
+} from './js/world-items.js?v=e29969b0';
 import {
   createPlayerSave,
   parsePlayerSave,
@@ -3868,6 +3868,14 @@ function beginToolRepair(classTsid, copy = null) {
 }
 
 /** Original-style pack inspection card with contextual use, recipe, and sell actions. */
+/**
+ * A verb on a bag's menu (sell, give, auction) that may take one bag of its class away takes this one:
+ * the bags of a class leave last-first (pack-slots.js bagLeavesLast), so its name and its place go with it.
+ */
+function leavingMenuBag(classTsid) {
+  if (isBagClass(classTsid) && packSelectedBag) features.query('packBagLeaves', packSelectedBag, engine);
+}
+
 function renderPackPopover(classTsid, anchor = null) {
   const pop = document.getElementById('pack-popover');
   const slot = listPackSlots(inv).find((entry) => entry.classTsid === classTsid);
@@ -3890,6 +3898,10 @@ function renderPackPopover(classTsid, anchor = null) {
   if (anchor?.dataset?.packCopy != null && anchor.dataset.packCopy !== '') packSelectedCopy = Number(anchor.dataset.packCopy);
   // A bag's menu stays the bag it was opened on (its slot's key), whatever redraws the popover.
   if (anchor?.dataset?.packBag) packSelectedBag = anchor.dataset.packBag;
+  // That bag is the one its Rename names (features/bags-feature.js), and its own name heads the menu
+  // (items/bag_bigger.js getLabel 592-598: the itemstack's label is its user_name).
+  features.query('packBagMenu', isBagClass(classTsid) ? packSelectedBag : null, engine);
+  const menuBag = isBagClass(classTsid) && packSelectedBag ? features.query('packBagInfo', packSelectedBag, engine) : null;
   // A stack's menu stays the stack it was opened on (its slot's place), whatever redraws the popover.
   const anchorPlace = packPlaceOf(anchor);
   if (anchorPlace) packSelectedPlace = anchorPlace;
@@ -4188,8 +4200,11 @@ function renderPackPopover(classTsid, anchor = null) {
     ? `<button type="button" class="vm-row vm-back" ${level === 'eat' ? 'data-pack-eat-cancel' : 'data-pack-drop-cancel'} ${verbRowAttrs({ back: true, tip: 'Back to what you can do with it' })}>${verbRowInner({ key: '0', label: 'Back', back: true })}</button>`
     : rows.map((row, i) => rowMarkup(row, keys[i])).join('');
 
-  // A named Cubimal goes by its name, its figure type on the kind line (features/cubimal-race-feature.js).
-  const named = features.query('itemDisplayName', classTsid);
+  // A named Cubimal goes by its name, its figure type on the kind line (features/cubimal-race-feature.js);
+  // a bag's menu is that one bag's, named or not, its class on the kind line when it has a name.
+  const named = menuBag?.cls === classTsid
+    ? { label: menuBag.label, kind: menuBag.name ? menuBag.className : kind, one: true }
+    : features.query('itemDisplayName', classTsid);
   pop.hidden = false;
   pop.dataset.vmDefault = plainWords(slot.desc || 'A thing from Ur.');
   pop.dataset.vmLevel = level;
@@ -4197,7 +4212,7 @@ function renderPackPopover(classTsid, anchor = null) {
     <div class="pack-pop-head vm-head"${isEmotionalBear ? ` data-bear-state="${bearStateName}"` : ''}>
       <div class="pack-pop-icon"><img src="${slot.icon}" alt="" /></div>
       <div class="pack-pop-title">
-        <h3 id="pack-popover-title">${escapeHtml(named?.label || slot.label)} <b>×${stackCount}</b></h3>
+        <h3 id="pack-popover-title">${escapeHtml(named?.label || slot.label)} <b>×${named?.one ? 1 : stackCount}</b></h3>
         <span class="pack-pop-kind">${named ? escapeHtml(named.kind) : kind}${kindNote ? ` · ${kindNote}` : ''}</span>
       </div>
       <button type="button" class="pack-pop-close" data-pack-close aria-label="Close item actions">×</button>
@@ -4253,6 +4268,7 @@ function renderPackPopover(classTsid, anchor = null) {
   pop.querySelector('[data-pack-emblem-spend]')?.addEventListener('click', () => confirmEmblemSpend(classTsid));
   pop.querySelectorAll('[data-feature-pack-verb]').forEach((button) => {
     button.addEventListener('click', () => {
+      leavingMenuBag(classTsid);
       closePackPopover();
       features.runPackVerb(classTsid, button.dataset.featurePackVerb, engine, button.dataset.featureId);
     });
@@ -4302,6 +4318,7 @@ function renderPackPopover(classTsid, anchor = null) {
     }
   });
   pop.querySelector('[data-pack-sell]')?.addEventListener('click', () => {
+    leavingMenuBag(classTsid);
     const copy = slot.isTool ? packSelectedCopy : null;
     closePackPopover();
     stageVendorSell(classTsid, copy);
@@ -4637,6 +4654,8 @@ function renderPackRow(box, slots, opts = {}) {
           return;
         }
         closePackPopover();
+        // A bag dragged to the vendor is the one that sells (its name goes with it).
+        if (s.bag) features.query('packBagLeaves', s.bag.key, engine);
         vendorDragTsid = s.classTsid;
         vendorDragCopy = toolSlot && s.copy != null ? s.copy : null;
         vendorSellReceipt = null;
@@ -8208,6 +8227,8 @@ function executeVerb(target, verbId) {
       pickupDroppedWorldItem(target);
       return;
     }
+    // items/bag_bigger.js verbs.rename ok_states in_location: a bag of one's own on the ground (features/bags-feature.js).
+    if (verbId === 'rename' && features.query('bagRenameGround', target, engine)) return;
   }
   if (target?.classId?.startsWith('npc_shrine_') && (verbId === 'donate_to' || verbId === 'check_favor')) {
     openShrinePanel(target);
@@ -12310,13 +12331,14 @@ function spawnDroppedItemStack(stack) {
 
   entityLayer.addChild(spr);
   droppedItemSprites.push(spr);
-  const named = features.query('itemDisplayName', stack.classTsid);
+  // A named bag goes by its own name, its class first on the subtitle (items/bag_bigger.js getLabel 592-598).
+  const named = stack.name ? { label: stack.name, kind: item.label || stack.classTsid } : features.query('itemDisplayName', stack.classTsid);
   register({
     classId: 'dropped_item',
     label: named?.label || item.label || stack.classTsid,
     subtitle: `${named ? `${named.kind} · ` : ''}${stack.subtitle || (stack.contents?.length
       ? `Dropped bag · ${stack.contents.length} ${stack.contents.length === 1 ? 'stack' : 'stacks'} inside`
-      : `Dropped stack · ${stack.count} in this pile`)}`,
+      : stack.name ? 'Dropped bag · nothing inside' : `Dropped stack · ${stack.count} in this pile`)}`,
     sprite: spr,
     state: {
       id: stack.id,
@@ -12324,6 +12346,7 @@ function spawnDroppedItemStack(stack) {
       count: stack.count,
       label: named?.label || item.label || stack.classTsid,
       ...(stack.contents?.length ? { contents: stack.contents.map((c) => ({ ...c })) } : {}),
+      ...(stack.name ? { name: stack.name } : {}),
     },
     worldItemId: stack.id,
   });
@@ -12470,8 +12493,9 @@ function dropPackItem(classTsid, requested = 1) {
  * whole with what it holds (items/include/takeable.js takeable_drop 157-213; the
  * conditions let it unless something in it is locked to you, 122-130), and it
  * comes back up with it all inside (pickupDroppedWorldItem). An empty bag drops
- * as any stack does (shared on a public street online); one with things in it
- * stays the player's own (the shared ground carries single stacks: drops.go).
+ * as any stack does (shared on a public street online); one with things in it,
+ * or with a name of its own (js/bag-names.js), stays the player's own (the shared
+ * ground carries single stacks and no names: drops.go) and keeps its name.
  */
 function dropPackBag(classTsid, key) {
   if (!state.started || !player || !currentStreetTsid) return;
@@ -12489,7 +12513,7 @@ function dropPackBag(classTsid, key) {
     dropPackItem(classTsid, 1);
     return;
   }
-  if (!box.slots.length) {
+  if (!box.slots.length && !box.name) {
     features.query('packBagLeaves', bagKey, engine);
     dropPackItem(classTsid, 1);
     return;
@@ -12507,10 +12531,10 @@ function dropPackBag(classTsid, key) {
     toast('Could not drop that item.');
     return;
   }
-  const result = placeDroppedBag(droppedItemState, droppedStacksTsid(), classTsid, res.contents, { x, y }, { now: Date.now() });
+  const result = placeDroppedBag(droppedItemState, droppedStacksTsid(), classTsid, res.contents, { x, y }, { now: Date.now(), name: res.name || '' });
   saveDroppedItems();
   refreshDroppedWorldItems();
-  const label = ITEM_CATALOG[classTsid]?.label || classTsid.replace(/_/g, ' ');
+  const label = res.name || ITEM_CATALOG[classTsid]?.label || classTsid.replace(/_/g, ' ');
   const line = `You dropped 1× ${label}.`;
   toast(line);
   pushActivity(line);
@@ -12520,7 +12544,7 @@ function dropPackBag(classTsid, key) {
   updateHud();
 }
 
-/** Pick up a dropped bag with what it held: it comes back whole, everything still inside. */
+/** Pick up a dropped bag with what it held: it comes back whole, everything still inside, its name its own. */
 function pickupDroppedBag(target) {
   const cls = target?.state?.classTsid;
   const contents = target?.state?.contents || [];
@@ -12541,7 +12565,7 @@ function pickupDroppedBag(target) {
     refreshDroppedWorldItems();
     return false;
   }
-  const res = features.query('packGiveBag', record.classTsid, record.contents || [], engine);
+  const res = features.query('packGiveBag', record.classTsid, record.contents || [], engine, record.name || '');
   if (!res?.ok) {
     // It didn't fit after all: it stays where it was.
     (droppedItemState.streets[tsid] ||= []).push(record);
@@ -12551,7 +12575,7 @@ function pickupDroppedBag(target) {
     return false;
   }
   saveDroppedItems();
-  const label = ITEM_CATALOG[record.classTsid]?.label || record.classTsid.replace(/_/g, ' ');
+  const label = record.name || ITEM_CATALOG[record.classTsid]?.label || record.classTsid.replace(/_/g, ' ');
   const line = `You picked up 1× ${label}.`;
   toast(line);
   pushActivity(line);
@@ -12564,7 +12588,7 @@ function pickupDroppedBag(target) {
 }
 
 function pickupDroppedWorldItem(target) {
-  if (target?.state?.contents?.length) return pickupDroppedBag(target);
+  if (target?.state?.contents?.length || target?.state?.name) return pickupDroppedBag(target);
   // G152 (takeable.js:76-79, 84-93): a full pack refuses the stack; a part that fits is taken, the rest stays down.
   const wantClass = target?.state?.classTsid;
   const wantCount = Math.max(1, Math.floor(Number(target?.state?.count) || 1));

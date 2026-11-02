@@ -18,8 +18,8 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { ITEM_CATALOG, isToolItem, removeItem } from '../public/js/inventory.js?v=b0e33301';
-import { PACK_CAPACITY, layoutPack } from '../public/js/pack-slots.js?v=f3890c72';
-import { bagsFeature } from '../public/js/features/bags-feature.js?v=fd6121a9';
+import { PACK_CAPACITY, layoutPack } from '../public/js/pack-slots.js?v=b02c404c';
+import { bagsFeature } from '../public/js/features/bags-feature.js?v=53dc672e';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const OPTS = { capacity: PACK_CAPACITY, catalog: ITEM_CATALOG, isTool: isToolItem, order: Object.keys(ITEM_CATALOG) };
@@ -172,7 +172,8 @@ describe('game.js: the menu stays on the slot it was opened from', () => {
   });
 
   it('the counts are the stack\'s: header, Drop\'s chooser and its Max, Eat more', () => {
-    assert.match(pop, /<b>×\$\{stackCount\}<\/b>/);
+    // A bag's menu is one bag's (×1; tests/bag-rename.test.js), any other the stack's count.
+    assert.match(pop, /<b>×\$\{named\?\.one \? 1 : stackCount\}<\/b>/);
     assert.match(pop, /countStepMarkup\(\{ value: packDropQty, max: stackCount, verb: 'Drop'/);
     assert.match(pop, /setDropQty\(stackCount\)/);
     assert.match(pop, /packEatManyInfo\(classTsid, useInfo, stackCount\)/);

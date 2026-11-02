@@ -39,7 +39,12 @@
  * that empties frees its slot and nothing else moves. A save from before
  * prefs.n splits each class into full stacks first, in saved order, once.
  *
- * prefs = { bags: [{ key, cls }], place: { pack: [entry], <bagKey>: [cls] }, n: { pack: [count], <bagKey>: [count] } }
+ * Bag names (items/bag_bigger.js verbs.rename 475-520, getLabel 592-598; js/bag-names.js):
+ * a bag's name is its own, kept on its row in prefs.bags, so two Bigger Bags can
+ * have different names; the bag's label (its tray's head, its slot's tip and
+ * aria-label, Put in / Take out) is the name when it has one.
+ *
+ * prefs = { bags: [{ key, cls, name? }], place: { pack: [entry], <bagKey>: [cls] }, n: { pack: [count], <bagKey>: [count] } }
  *   pack entries are a class (one stack) or '@<bagKey>' (a bag in that slot);
  *   n runs beside place, the count of the stack in each slot (0 for a bag, or unknown).
  */
@@ -54,6 +59,7 @@ import {
   STACKMAX,
   TOOL_CLASSES,
 } from './pack-slots-data.js?v=330c51e4';
+import { canRenameBag, cleanBagName, renamedTo } from './bag-names.js?v=0d896c8f';
 
 /** PC.as:48 pack_slots; items/bag.js:1. */
 export const PACK_CAPACITY = 16;
@@ -180,7 +186,8 @@ export function normalizePrefs(seed) {
     const cls = cleanKey(row?.cls);
     if (!key || !isBagClass(cls) || seen.has(key)) continue;
     seen.add(key);
-    out.bags.push({ key, cls });
+    const name = canRenameBag(cls) ? cleanBagName(row?.name) : '';
+    out.bags.push(name ? { key, cls, name } : { key, cls });
   }
   const place = seed.place && typeof seed.place === 'object' ? seed.place : {};
   const counts = seed.n && typeof seed.n === 'object' ? seed.n : {};
@@ -250,11 +257,11 @@ export function layoutPack(inv, prefs = null, opts = {}) {
     if (!isBagClass(cls)) continue;
     const n = Math.max(0, Math.floor(Number(inv[cls]) || 0));
     const rows = (savedByCls.get(cls) || []).slice(0, n);
-    for (const row of rows) instances.push({ key: row.key, cls, placed: false });
+    for (const row of rows) instances.push({ key: row.key, cls, placed: false, name: row.name || '' });
     for (let i = rows.length; i < n; i += 1) {
       const key = nextBagKey(used);
       used.add(key);
-      instances.push({ key, cls, placed: false, fresh: true });
+      instances.push({ key, cls, placed: false, fresh: true, name: '' });
     }
   }
   const byKey = new Map(instances.map((b) => [b.key, b]));
@@ -269,13 +276,14 @@ export function layoutPack(inv, prefs = null, opts = {}) {
   const labelOf = (cls) => opts.labels?.[cls] || opts.catalog?.[cls]?.label || cls;
   const openBox = (inst) => {
     const def = BAG_DEFS[inst.cls];
-    const box = { key: inst.key, cls: inst.cls, label: labelOf(inst.cls), capacity: def.capacity, holds: def.holds, limited: def.limited, onePerClass: Boolean(def.onePerClass), slots: [] };
+    // getLabel 592-598: the bag's own name, else its class label (className keeps the latter).
+    const box = { key: inst.key, cls: inst.cls, label: inst.name || labelOf(inst.cls), name: inst.name, className: labelOf(inst.cls), capacity: def.capacity, holds: def.holds, limited: def.limited, onePerClass: Boolean(def.onePerClass), slots: [] };
     boxes.set(inst.key, box);
     return box;
   };
   const putBag = (inst) => {
     inst.placed = true;
-    pack.slots.push({ kind: 'bag', key: inst.key, cls: inst.cls, count: 1 });
+    pack.slots.push({ kind: 'bag', key: inst.key, cls: inst.cls, count: 1, ...(inst.name ? { name: inst.name } : {}) });
     openBox(inst);
   };
   const boxTakes = (box, cls) => {
@@ -428,7 +436,7 @@ export function layoutPack(inv, prefs = null, opts = {}) {
     rock[cls] = queue.reduce((a, b) => a + b, 0);
     rockStacks += queue.length;
   }
-  const rockBags = instances.filter((b) => !b.placed).map((b) => ({ key: b.key, cls: b.cls }));
+  const rockBags = instances.filter((b) => !b.placed).map((b) => ({ key: b.key, cls: b.cls, ...(b.name ? { name: b.name } : {}) }));
   for (const b of rockBags) {
     rock[b.cls] = (rock[b.cls] || 0) + 1;
     rockStacks += 1;
@@ -441,7 +449,7 @@ export function layoutPack(inv, prefs = null, opts = {}) {
     }
   }
   const nextPrefs = {
-    bags: instances.map((b) => ({ key: b.key, cls: b.cls })),
+    bags: instances.map((b) => (b.name ? { key: b.key, cls: b.cls, name: b.name } : { key: b.key, cls: b.cls })),
     place: { pack: pack.slots.map((s) => (s.kind === 'bag' ? `@${s.key}` : s.cls)) },
     n: { pack: pack.slots.map((s) => (s.kind === 'bag' ? 0 : s.count)) },
   };
@@ -772,9 +780,9 @@ export function arrangeIntoBags(inv, mint, opts = {}, keep = null) {
  * apiPutItemIntoPosition), and takeable_drop_conditions lets a bag go down with
  * things in it unless one of them is soulbound (104-135, 122-130).
  * key: the bag the player chose (prefs bag key). Returns { ok, cls, contents:
- * [{ cls, count }], prefs } (prefs: the arrangement once the bag and its contents
- * are out; the caller takes cls and each content's count from the inventory), or
- * { ok: false, reason }.
+ * [{ cls, count }], prefs, name? } (prefs: the arrangement once the bag and its
+ * contents are out; the caller takes cls and each content's count from the
+ * inventory; name: the bag's own, which goes with it), or { ok: false, reason }.
  */
 export function takeBag(inv, prefs, key, opts = {}) {
   const layout = layoutPack(inv, prefs, opts);
@@ -790,7 +798,7 @@ export function takeBag(inv, prefs, key, opts = {}) {
   }
   delete next.place[box.key];
   delete next.n[box.key];
-  return { ok: true, cls: box.cls, contents, prefs: next };
+  return { ok: true, cls: box.cls, contents, prefs: next, ...(box.name ? { name: box.name } : {}) };
 }
 
 /**
@@ -814,10 +822,11 @@ export function bagLeavesLast(prefs, key) {
  * bags; with none free it goes in place of the leftmost stack it can hold, which
  * goes in with it (the arrival rule, arrivalSlot). contents: [{ cls, count }] as
  * takeBag gave them. inv is the inventory before the bag and its contents are
- * added. Returns { ok, key, prefs } (the caller adds the counts), or { ok: false,
- * reason: 'full' } when it can't fit without anything going to the magic rock.
+ * added. name: the bag's own (takeBag gave it), which it keeps. Returns { ok, key,
+ * prefs } (the caller adds the counts), or { ok: false, reason: 'full' } when it
+ * can't fit without anything going to the magic rock.
  */
-export function giveBag(inv, prefs, cls, contents = [], opts = {}) {
+export function giveBag(inv, prefs, cls, contents = [], opts = {}, name = '') {
   if (!isBagClass(cls)) return { ok: false, reason: 'not_bag' };
   const def = BAG_DEFS[cls];
   const capacity = Math.max(1, Math.floor(opts.capacity ?? PACK_CAPACITY));
@@ -827,7 +836,8 @@ export function giveBag(inv, prefs, cls, contents = [], opts = {}) {
   const list = (Array.isArray(contents) ? contents : [])
     .map((c) => ({ cls: String(c?.cls || ''), count: Math.max(0, Math.floor(Number(c?.count) || 0)) }))
     .filter((c) => c.cls && c.count > 0);
-  next.bags.push({ key, cls });
+  const own = canRenameBag(cls) ? cleanBagName(name) : '';
+  next.bags.push(own ? { key, cls, name: own } : { key, cls });
   next.place[key] = list.map((c) => c.cls);
   next.n[key] = list.map((c) => c.count);
   const lastBag = next.place.pack.reduce((last, e, i) => (e.startsWith('@') ? i : last), -1);
@@ -854,4 +864,20 @@ export function giveBag(inv, prefs, cls, contents = [], opts = {}) {
   const box = check.bags[key];
   if (!box || overflowOf(check) > overflowOf(layout)) return { ok: false, reason: 'full' };
   return { ok: true, key, prefs: check.prefs };
+}
+
+/**
+ * Rename one bag (verbs.rename, onInputBoxResponse 605-611): a non-empty answer,
+ * cleaned, is its new name; an empty one keeps the old. key: the bag's prefs key.
+ * Returns { ok, prefs, name, changed } or { ok: false, reason }.
+ */
+export function renameBag(prefs, key, value) {
+  const next = normalizePrefs(prefs);
+  const row = next.bags.find((b) => b.key === String(key || ''));
+  if (!row) return { ok: false, reason: 'missing', prefs: next };
+  if (!canRenameBag(row.cls)) return { ok: false, reason: 'not_renamable', prefs: next };
+  const name = renamedTo(row.name, value);
+  const changed = name !== (row.name || '');
+  if (name) row.name = name;
+  return { ok: true, prefs: next, name, changed };
 }

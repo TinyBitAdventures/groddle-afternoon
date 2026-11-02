@@ -12,7 +12,7 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { bagLeavesLast, giveBag, layoutPack, takeBag, unitPlaces } from '../public/js/pack-slots.js?v=f3890c72';
+import { bagLeavesLast, giveBag, layoutPack, takeBag, unitPlaces } from '../public/js/pack-slots.js?v=b02c404c';
 import {
   createDroppedItemState,
   dropInventoryStack,
@@ -20,7 +20,7 @@ import {
   placeDroppedBag,
   serializeDroppedItemState,
   takeDroppedRecord,
-} from '../public/js/world-items.js?v=210bef3b';
+} from '../public/js/world-items.js?v=e29969b0';
 import { bindToolInventory, createToolConditionState, pickToolCopies, placeToolCopies, toolCopies } from '../public/js/tools.js?v=6a9e1314';
 
 const root = join(import.meta.dirname, '..');
@@ -163,7 +163,8 @@ describe('game.js and the bags feature', () => {
   });
 
   it('picking it up asks for room for the bag with its contents', () => {
-    assert.match(game, /if \(target\?\.state\?\.contents\?\.length\) return pickupDroppedBag\(target\);/);
+    // A named bag, empty or not, comes back up whole too (it keeps its name: tests/bag-rename.test.js).
+    assert.match(game, /if \(target\?\.state\?\.contents\?\.length \|\| target\?\.state\?\.name\) return pickupDroppedBag\(target\);/);
     assert.match(bags, /packBagRoom\(cls, contents, engine\)/);
   });
 });

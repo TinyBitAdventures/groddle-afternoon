@@ -91,7 +91,7 @@
  */
 
 import { countItem, ensureItem, ITEM_CATALOG, removeItem } from '../inventory.js?v=b0e33301';
-import { isBagClass } from '../pack-slots.js?v=f3890c72';
+import { isBagClass } from '../pack-slots.js?v=b02c404c';
 import { createCombobox } from '../combobox.js?v=31679d26';
 import {
   CULTIVATION_CLASSES,

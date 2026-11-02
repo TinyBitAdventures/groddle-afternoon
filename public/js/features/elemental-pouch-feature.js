@@ -8,7 +8,9 @@
  *    offers once you know Element Handling and which pays 100 Red, Green and
  *    Blue Elements.
  *  - Pack verbs: Shake (once a game day, with Elemental Shake or Super
- *    Elemental Shake) and Rename.
+ *    Elemental Shake). Rename is every bag's (features/bags-feature.js,
+ *    js/bag-names.js), so each pouch has its own name; a save from when one
+ *    name covered every pouch gives that name to the first pouch, once.
  *  - A pouch lying on the street can only be picked up with Element Handling
  *    (canPickup), through the decorateVerbs hook on the dropped stack's menu.
  *
@@ -21,7 +23,7 @@
  *     Element Handling); pouchdemo=buy accepts "Get Elemental!" and opens the
  *     Alchemical Goods Vendor with no pouch in the pack.
  *     &pouchautoplay=shake shakes, then tries again (already shook today);
- *     =rename names it &pouchname=Sparkles. Canvas: pouchCount,
+ *     =rename names the first pouch &pouchname=Sparkles. Canvas: pouchCount,
  *     pouchContents, pouchShake, pouchShakeDay, pouchLast, pouchMade,
  *     pouchDeltas, pouchName, pouchCards, pouchPickup, pouchAutoplay.
  */
@@ -35,18 +37,15 @@ import {
   POUCH_CLASS,
   POUCH_ELEMENTS,
   POUCH_ITEM,
-  RENAME_COPY,
   SHAKE_CARD_1,
   SHAKE_CARD_2,
   SHAKE_COPY,
   createPouchState,
-  normalizePouchName,
   pouchContents,
-  pouchLabel,
   pouchPickupCheck,
   shakeCheck,
   shakePouch,
-} from '../elemental-pouch.js?v=22f23943';
+} from '../elemental-pouch.js?v=42528ad0';
 
 export const POUCH_FEATURE_ID = 'elemental-pouch';
 const POUCH_QUEST = 'elementhandling_buy_elemental_pouch';
@@ -59,7 +58,6 @@ let demoDone = false;
 let autoplayAt = 0;
 let autoplayStep = 0;
 let publishAt = 0;
-let nameModal = null;
 
 const dayKey = () => getGameDayKey(Date.now());
 const upgrades = (engine) => engine.pc?.imaginationUpgrades || [];
@@ -77,7 +75,20 @@ function rngFor(engine) {
 }
 
 function registerItem() {
-  ensureItem(POUCH_CLASS, { ...POUCH_ITEM, label: pouchLabel(state) });
+  ensureItem(POUCH_CLASS, { ...POUCH_ITEM });
+}
+
+/** The first pouch's shown name (its own, else the class label). */
+function firstPouchLabel(engine) {
+  return engine.query?.('packFirstBag', POUCH_CLASS, engine)?.label || POUCH_ITEM.label;
+}
+
+/** A save from when one name covered every pouch: that name goes to the first pouch, once. */
+function migrateName(engine) {
+  if (!state.name || !engine?.started || countItem(engine.inv, POUCH_CLASS) < 1) return;
+  if (!engine.query?.('packRenameFirst', POUCH_CLASS, state.name, engine)) return;
+  state.name = '';
+  engine.save?.();
 }
 
 function shakeState(engine) {
@@ -97,7 +108,7 @@ function publish(engine) {
   engine.setData('pouchLast', last || 'none');
   engine.setData('pouchMade', lastMade || 'none');
   engine.setData('pouchDeltas', lastDeltas || 'none');
-  engine.setData('pouchName', pouchLabel(state));
+  engine.setData('pouchName', firstPouchLabel(engine));
   engine.setData('pouchCards', [SHAKE_CARD_1, SHAKE_CARD_2].filter((id) => upgrades(engine).includes(id)).join(',') || 'none');
   engine.setData('pouchPickup', pouchPickupCheck(learned(engine)).ok ? 'ok' : 'blocked');
 }
@@ -124,70 +135,6 @@ function runShake(engine) {
   say(engine, out.msg, !out.full);
   engine.save?.();
   return true;
-}
-
-function applyName(engine, value) {
-  const name = normalizePouchName(value);
-  // onInputBoxResponse: an empty answer leaves the old name.
-  if (!name) return;
-  state.name = name;
-  registerItem();
-  engine.refreshPack?.();
-  engine.save?.();
-  publish(engine);
-}
-
-function closeNameModal() {
-  if (nameModal?.parentElement) nameModal.parentElement.removeChild(nameModal);
-  nameModal = null;
-}
-
-/** bag_generic verbs.rename: the askPlayer input box. */
-function openNameModal(engine) {
-  closeNameModal();
-  if (typeof document === 'undefined') return;
-  const host = document.getElementById('verb-menu')?.parentElement || document.body;
-  const wrap = document.createElement('div');
-  wrap.className = 'verb-menu pouch-name-modal';
-  wrap.setAttribute('role', 'dialog');
-  wrap.setAttribute('aria-modal', 'true');
-  wrap.innerHTML = `
-    <div class="verb-menu-card">
-      <div class="verb-menu-head">
-        <div class="verb-menu-title"></div>
-        <button type="button" class="verb-menu-x" aria-label="Cancel">×</button>
-      </div>
-      <form style="padding:0.2rem 0.85rem 0.85rem;display:grid;gap:0.55rem">
-        <label style="font-size:0.82rem;opacity:0.75"></label>
-        <input type="text" maxlength="32" autocomplete="off" spellcheck="false"
-          style="font:inherit;padding:0.45rem 0.6rem;border:1px solid #d9ccb3;border-radius:8px;background:#fff" />
-        <div style="display:flex;gap:0.5rem;justify-content:flex-end">
-          <button type="button" data-cancel class="verb-choice" style="width:auto;border:1px solid #e4d9c4;border-radius:8px;padding:0.35rem 0.8rem">Cancel</button>
-          <button type="submit" class="verb-choice" style="width:auto;border:1px solid #9cc47a;border-radius:8px;padding:0.35rem 0.8rem;background:#e8f0dc;font-weight:700">OK</button>
-        </div>
-      </form>
-    </div>`;
-  wrap.querySelector('.verb-menu-title').textContent = RENAME_COPY.title;
-  wrap.querySelector('label').textContent = RENAME_COPY.label;
-  const input = wrap.querySelector('input');
-  input.value = state.name || '';
-  wrap.querySelector('.verb-menu-x').addEventListener('click', closeNameModal);
-  wrap.querySelector('[data-cancel]').addEventListener('click', closeNameModal);
-  wrap.querySelector('form').addEventListener('submit', (e) => {
-    e.preventDefault();
-    const value = input.value;
-    closeNameModal();
-    applyName(engine, value);
-  });
-  input.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-      e.preventDefault();
-      closeNameModal();
-    }
-  });
-  host.appendChild(wrap);
-  nameModal = wrap;
-  requestAnimationFrame(() => input.focus());
 }
 
 /* ------------------------------------------------------------ QA */
@@ -232,7 +179,7 @@ function demoSetup(engine) {
     if (have < fill) addItem(inv, el.classTsid, fill - have);
     else if (have > fill) removeItem(inv, el.classTsid, have - fill);
   }
-  if (engine.param('pouchname')) applyName(engine, engine.param('pouchname'));
+  if (engine.param('pouchname')) engine.query?.('packRenameFirst', POUCH_CLASS, engine.param('pouchname'), engine);
   engine.updateHud?.();
   if (engine.param('pouchautoplay')) autoplayAt = Date.now() + 1500;
   publish(engine);
@@ -242,7 +189,8 @@ function autoplay(engine) {
   const mode = engine.param('pouchautoplay');
   autoplayAt = 0;
   if (mode === 'rename') {
-    applyName(engine, engine.param('pouchname') || 'Sparkles');
+    engine.query?.('packRenameFirst', POUCH_CLASS, engine.param('pouchname') || 'Sparkles', engine);
+    publish(engine);
     engine.setData('pouchAutoplay', 'done');
     return;
   }
@@ -276,6 +224,7 @@ export const pouchFeature = {
   },
 
   onTick(dtMs, now, engine) {
+    migrateName(engine);
     if (autoplayAt && now >= autoplayAt) autoplay(engine);
     // Keep the canvas readout current after purchases and quest rewards (QA only).
     if (now >= publishAt && demoDone) {
@@ -287,12 +236,11 @@ export const pouchFeature = {
   packVerbs(classTsid, engine) {
     if (classTsid !== POUCH_CLASS) return [];
     const rows = [];
-    // sort_on: shake 50, rename 67.
+    // sort_on: shake 50 (rename 67 is the bags feature's).
     const check = shakeCheck(state, engine.inv, upgrades(engine), dayKey());
     if (check) {
       rows.push({ id: 'shake', label: 'Shake', enabled: check.ok, reason: check.msg, tooltip: SHAKE_COPY.tooltip, primary: true });
     }
-    rows.push({ id: 'rename', label: 'Rename', enabled: true, tooltip: RENAME_COPY.tooltip });
     return rows;
   },
 
@@ -300,10 +248,6 @@ export const pouchFeature = {
     if (classTsid !== POUCH_CLASS) return false;
     if (countItem(engine.inv, POUCH_CLASS) < 1) return false;
     if (verbId === 'shake') return runShake(engine);
-    if (verbId === 'rename') {
-      openNameModal(engine);
-      return true;
-    }
     return false;
   },
 
@@ -338,7 +282,6 @@ export const pouchFeature = {
     autoplayAt = 0;
     autoplayStep = 0;
     publishAt = 0;
-    closeNameModal();
     registerItem();
   },
 };

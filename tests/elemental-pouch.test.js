@@ -18,17 +18,15 @@ import {
   chooseOne,
   createPouchState,
   elementChangeText,
-  normalizePouchName,
   pouchContents,
-  pouchLabel,
   pouchPickupCheck,
   shakeCheck,
   shakeDeltas,
   shakeElement,
   shakePouch,
-} from '../public/js/elemental-pouch.js?v=22f23943';
-import { pouchFeature } from '../public/js/features/elemental-pouch-feature.js?v=66183da9';
-import { FEATURES } from '../public/js/features/index.js?v=309db96d';
+} from '../public/js/elemental-pouch.js?v=42528ad0';
+import { pouchFeature } from '../public/js/features/elemental-pouch-feature.js?v=ab110305';
+import { FEATURES } from '../public/js/features/index.js?v=05fcf51e';
 import { ITEM_CATALOG, countItem, createInventory } from '../public/js/inventory.js?v=b0e33301';
 import { STORE_CATALOG } from '../public/js/store-catalog.js?v=79d4de8a';
 import { VENDOR_PROFILES, vendorBuy } from '../public/js/vendor.js?v=998821e3';
@@ -195,16 +193,6 @@ describe('Shake (verbs.shake 53-114, doShake 669-690)', () => {
   });
 });
 
-describe('Rename (bag_generic verbs.rename, onInputBoxResponse)', () => {
-  it('keeps 32 letters, digits and spaces', () => {
-    assert.equal(normalizePouchName('Sparkle-Pouch #1!'), 'SparklePouch 1');
-    assert.equal(normalizePouchName('x'.repeat(40)).length, 32);
-    assert.equal(normalizePouchName(''), '');
-    assert.equal(pouchLabel(createPouchState({ name: 'Sparkles' })), 'Sparkles');
-    assert.equal(pouchLabel(createPouchState()), 'Elemental Pouch');
-  });
-});
-
 describe('feature hooks', () => {
   let engine;
   beforeEach(() => {
@@ -225,12 +213,12 @@ describe('feature hooks', () => {
     };
   });
 
-  it('offers Rename always and Shake only with a card', () => {
-    assert.deepEqual(pouchFeature.packVerbs(POUCH_CLASS, engine).map((v) => v.id), ['rename']);
+  it('offers Shake only with a card (Rename is every bag\'s: tests/bag-rename.test.js)', () => {
+    assert.deepEqual(pouchFeature.packVerbs(POUCH_CLASS, engine).map((v) => v.id), []);
     assert.deepEqual(pouchFeature.packVerbs('element_red', engine), []);
     engine.pc.imaginationUpgrades = [...CARD1];
     const verbs = pouchFeature.packVerbs(POUCH_CLASS, engine);
-    assert.deepEqual(verbs.map((v) => v.id), ['shake', 'rename']);
+    assert.deepEqual(verbs.map((v) => v.id), ['shake']);
     assert.equal(verbs[0].enabled, true);
     assert.equal(verbs[0].tooltip, 'Shake up your Elements');
   });

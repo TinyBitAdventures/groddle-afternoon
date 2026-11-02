@@ -7,6 +7,7 @@
  * coupling it to Pixi or DOM state.
  */
 import { addItem, removeItem } from './inventory.js?v=b0e33301';
+import { canRenameBag, cleanBagName } from './bag-names.js?v=0d896c8f';
 
 export const WORLD_ITEM_STATE_VERSION = 1;
 export const DEFAULT_MERGE_RADIUS = 56;
@@ -76,6 +77,8 @@ function cleanRecord(row, streetTsid, fallbackId) {
   const points = cleanPoints(row?.points, count);
   // A bag with things in it is one bag (bags never stack, stackmax 1).
   const contents = count === 1 ? cleanContents(row?.contents) : null;
+  // A named bag is one bag too, and keeps its name (items/bag_bigger.js getLabel 592-598; js/bag-names.js).
+  const name = count === 1 && canRenameBag(classTsid) ? cleanBagName(row?.name) : '';
   return {
     id,
     streetTsid,
@@ -86,6 +89,7 @@ function cleanRecord(row, streetTsid, fallbackId) {
     droppedAt: Math.max(0, Math.floor(finite(row?.droppedAt, 0))),
     ...(points ? { points } : {}),
     ...(contents ? { contents } : {}),
+    ...(name ? { name } : {}),
     // In a house: the placed piece (its id in that room's decor) the stack rests on (js/home-decor.js settleStacks).
     ...(Number.isInteger(row?.on) && row.on > 0 ? { on: row.on } : {}),
   };
@@ -171,7 +175,7 @@ export function dropInventoryStack(state, inv, streetTsid, classTsid, requested,
   const mergeRadius = Math.max(0, finite(opts.mergeRadius, DEFAULT_MERGE_RADIUS));
   const merge = opts.merge !== false
     ? rows
-      .filter((row) => row.classTsid === item && !row.contents)
+      .filter((row) => row.classTsid === item && !row.contents && !row.name)
       .map((row) => ({ row, distance: Math.hypot(row.x - x, row.y - y) }))
       .filter((candidate) => candidate.distance <= mergeRadius)
       .sort((a, b) => a.distance - b.distance)[0]?.row
@@ -233,6 +237,7 @@ export function pickupDroppedStack(state, inv, streetTsid, stackId, requested = 
 /**
  * Put a bag down with what it held (the pack already gave them up: bags-feature
  * packTakeBag). It never merges: each bag is its own thing on the ground.
+ * opts.name: the bag's own name, which it keeps on the ground (an empty named bag goes down this way too).
  */
 export function placeDroppedBag(state, streetTsid, classTsid, contents, position = {}, opts = {}) {
   const street = cleanStreetTsid(streetTsid);
@@ -250,6 +255,8 @@ export function placeDroppedBag(state, streetTsid, classTsid, contents, position
     droppedAt: Math.max(0, Math.floor(finite(opts.now, Date.now()))),
     ...(held ? { contents: held } : {}),
   };
+  const name = canRenameBag(item) ? cleanBagName(opts.name) : '';
+  if (name) stack.name = name;
   rows.push(stack);
   return { ok: true, count: 1, stack: { ...stack }, merged: false };
 }
