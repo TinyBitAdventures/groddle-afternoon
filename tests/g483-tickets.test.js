@@ -16,9 +16,9 @@ import { homedir } from 'node:os';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { SITE_DIR, sitePath, skipWithoutSite } from '../tools/repos.mjs';
-import { REPORT_MAX, REPORT_PICTURE, REPORT_TEXT, STATUS_WORDS, UNREAD_POLL_MS, base64Size, createReportsApi, pictureRefused, pictureSize, pictureSrc, refusalWords, reportFromHash, ticketLine, unreadCount, whenWords } from '../public/js/reports.js?v=d0391a23';
-import { mountReportsSheet } from '../public/js/ui/reports-sheet.js?v=870031fc';
-import { BUG_TEXT, badgeFor, bugReportFeature, capturePicture } from '../public/js/features/bug-report-feature.js?v=318118d0';
+import { REPORT_MAX, REPORT_PICTURE, REPORT_TEXT, STATUS_WORDS, UNREAD_POLL_MS, base64Size, canEditFirst, createReportsApi, pictureRefused, pictureSize, pictureSrc, refusalWords, reportFromHash, ticketLine, unreadCount, whenWords } from '../public/js/reports.js?v=e83d5ec3';
+import { mountReportsSheet } from '../public/js/ui/reports-sheet.js?v=c493c923';
+import { BUG_TEXT, badgeFor, bugReportFeature, capturePicture } from '../public/js/features/bug-report-feature.js?v=c1b501c6';
 
 const root = join(import.meta.dirname, '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');
@@ -529,7 +529,7 @@ describe('the site (groddle-afternoon-site)', { skip: skipWithoutSite }, () => {
   it('a player reaches only their own tickets: every route that names one reads it through mine()', () => {
     const php = src('src/Tickets.php');
     const routes = [...php.matchAll(/#\[Route\(Method::(\w+), '([^']+)', policy: new Policy\(Access::(\w+)\)\)\]\s*public function (\w+)\(([^)]*)\): Response\s*\{([\s\S]*?)\n    \}/g)];
-    assert.deepEqual(routes.map((r) => `${r[1]} ${r[2]}`), ['Get /groddle/v1/tickets', 'Get /groddle/v1/tickets/unread', 'Get /groddle/v1/tickets/{id:\\d+}', 'Post /groddle/v1/tickets', 'Post /groddle/v1/tickets/{id:\\d+}/messages', 'Post /groddle/v1/tickets/{id:\\d+}/close']);
+    assert.deepEqual(routes.map((r) => `${r[1]} ${r[2]}`), ['Get /groddle/v1/tickets', 'Get /groddle/v1/tickets/unread', 'Get /groddle/v1/tickets/{id:\\d+}', 'Post /groddle/v1/tickets', 'Post /groddle/v1/tickets/{id:\\d+}/messages', 'Post /groddle/v1/tickets/{id:\\d+}/close', 'Post /groddle/v1/tickets/{id:\\d+}/edit']);
     for (const r of routes) {
       assert.equal(r[3], 'SignedIn', r[2]);
       if (r[2].includes('{id')) assert.match(r[6], /\$row = \$this->mine\(\$me, \(int\) \$id\);/, `${r[2]} goes through mine()`);
@@ -564,10 +564,10 @@ describe('the site (groddle-afternoon-site)', { skip: skipWithoutSite }, () => {
   it('the console\'s routes are manage_options only, and each action is logged', () => {
     const php = src('src/AdminTickets.php');
     const routes = [...php.matchAll(/#\[Route\(Method::(\w+), '([^']+)', policy: new Policy\(([^)]*)\)\)\]/g)];
-    assert.equal(routes.length, 6);
+    assert.equal(routes.length, 7);
     for (const r of routes) assert.equal(r[3], 'Access::Cap, self::ADMIN', r[2]);
     assert.match(php, /private const ADMIN = 'manage_options';/);
-    for (const kind of ['reply', 'close', 'reopen', 'migrate']) assert.match(php, new RegExp(`AdminConsole::recordAction\\(\\$this->minn->db, \\$admin->id, [^,]+, '${kind}'`), kind);
+    for (const kind of ['reply', 'close', 'reopen', 'working', 'migrate']) assert.match(php, new RegExp(`AdminConsole::recordAction\\(\\$this->minn->db, \\$admin->id, [^,]+, '${kind}'`), kind);
     assert.match(src('src/Extension.php'), /new Tickets\(\$minn\)/);
     assert.match(src('src/Extension.php'), /new AdminTickets\(\$minn\)/);
   });
@@ -614,7 +614,7 @@ describe('the site (groddle-afternoon-site)', { skip: skipWithoutSite }, () => {
   it('the console has a Reports tab: list, thread, reply, close and reopen, and the old reports\' button', async () => {
     const page = src('src/AdminConsolePage.php');
     for (const hook of ['data-console-tab="reports"', 'data-console-tickets', 'data-console-thread', 'data-console-reply', 'data-console-thread-close', 'data-console-thread-reopen', 'data-console-migrate', 'data-console-ticket-filter']) assert.ok(page.includes(hook), hook);
-    assert.match(page, /ASSET_KEY = 'picture-popup-1'/);
+    assert.match(page, /ASSET_KEY = 'working-edit-1'/);
     const js = src('console/console.js');
     for (const route of ["admin/tickets?status=", "admin/tickets/${id}", "admin/tickets/${tickets.open}/reply", "admin/tickets/${tickets.open}/${kind}", "admin/tickets/migrate"]) assert.ok(js.includes(route), route);
     assert.match(js, /el\('p', \{ class: 'console-msg-body', text: m\.body \}\)/, 'messages set as text');
@@ -746,5 +746,218 @@ describe('the site keeps a report\'s picture (groddle-afternoon-site)', { skip: 
     assert.deepEqual(out.tooLong, { code: 'groddle_report_picture_too_large', status: 413 });
     for (const k of ['garbage', 'cut', 'notString']) assert.deepEqual(out[k], { code: 'groddle_report_picture', status: 400 }, k);
     assert.deepEqual(out.limits, { maxBytes: REPORT_PICTURE.maxBytes, maxW: REPORT_PICTURE.maxWidth, maxH: REPORT_PICTURE.maxHeight }, 'the game and the site agree');
+  });
+});
+
+// Ticket 49 (Austin 2026-11-02, a player's two ideas): Working on it, and Edit until read.
+describe('Working on it and Edit until read (ticket 49)', () => {
+  const at = (ms) => new Date(NOW - ms).toISOString();
+  function editApi({ status = 'open', editable = true, refuse = false } = {}) {
+    const calls = [];
+    const t = { id: 5, status, subject: 'Pigs float', lastAuthor: 'player', lastMessageAt: at(60000), unread: false };
+    const msgs = [{ id: 11, author: 'player', body: 'Pigs float', at: at(60000), edited: null }];
+    return {
+      calls,
+      list: async () => ({ tickets: [{ ...t }], unread: 0 }),
+      unread: async () => ({ unread: 0 }),
+      thread: async (id) => { calls.push(['thread', id]); return { ticket: { ...t }, messages: msgs.map((m) => ({ ...m })), picture: null, editable }; },
+      reply: async () => ({ ticket: { ...t }, messages: msgs, editable }),
+      close: async () => ({ ticket: { ...t, status: 'closed' }, messages: msgs, editable }),
+      edit: async (id, message) => {
+        calls.push(['edit', id, message]);
+        if (refuse) throw Object.assign(new Error('read'), { status: 409, code: 'groddle_ticket_read', data: { message: 'An administrator has read this report, so it can no longer be changed. Write a reply to add to it.' } });
+        Object.assign(msgs[0], { body: message, edited: new Date(NOW).toISOString() });
+        t.subject = message.split('\n')[0];
+        return { ticket: { ...t }, messages: msgs.map((m) => ({ ...m })), picture: null, editable: true };
+      },
+    };
+  }
+  const mount = (api) => {
+    const doc = fakeDoc();
+    const host = new FakeNode('div', doc);
+    const states = [];
+    const sheet = mountReportsSheet({ doc, host, api, onState: (s) => states.push(s), now: () => NOW });
+    return { doc, host, states, sheet };
+  };
+
+  it('the rules: Working on it in words, an edit route, and Edit only on your own first message the site calls editable', async () => {
+    assert.equal(STATUS_WORDS.working, 'Working on it');
+    assert.equal(canEditFirst({ editable: true, messages: [{ author: 'player' }] }), true);
+    assert.equal(canEditFirst({ editable: false, messages: [{ author: 'player' }] }), false);
+    assert.equal(canEditFirst({ editable: true, messages: [{ author: 'admin' }] }), false);
+    assert.equal(canEditFirst({ editable: 'yes', messages: [{ author: 'player' }] }), false);
+    assert.equal(canEditFirst({ editable: true, messages: [] }), false);
+    assert.equal(canEditFirst(null), false);
+    for (const k of ['edit', 'editLabel', 'editSave', 'editCancel', 'editSaving', 'editDone', 'editEmpty', 'edited', 'editHint']) assert.ok(REPORT_TEXT[k] && !/[—–]/.test(REPORT_TEXT[k]), k);
+    const calls = [];
+    const fetch = async (url, init) => { calls.push({ url, method: init.method, body: init.body }); return { status: 200, ok: true, headers: { get: () => null }, json: async () => ({ ok: 1 }) }; };
+    await createReportsApi({ baseUri: 'https://groddle.localhost/', fetch, nonce: 'abcdef1234' }).edit(7, 'New words');
+    assert.deepEqual(calls.map((c) => `${c.method} ${c.url.replace('https://groddle.localhost/wp-json/groddle/v1/', '')}`), ['POST tickets/7/edit']);
+    assert.deepEqual(JSON.parse(calls[0].body), { message: 'New words' });
+  });
+
+  it('the sheet shows Working on it as its own chip, in the list and the thread', async () => {
+    const { host, sheet } = mount(editApi({ status: 'working', editable: false }));
+    sheet.open('list');
+    await flush();
+    assert.ok(host.find((n) => n.className === 'reports-chip is-working' && n.textContent === 'Working on it'));
+    assert.match(host.find((n) => n.className === 'reports-row-btn').getAttribute('aria-label'), /Working on it/);
+    await sheet.openTicket(5);
+    await flush();
+    assert.equal(byData(host, 'reportsThreadStatus').dataset.status, 'working');
+    assert.equal(byData(host, 'reportsThreadStatus').textContent, 'Working on it');
+    assert.equal(byData(host, 'reportsEdit'), null, 'read already: no Edit');
+  });
+
+  it('Edit opens your words in place; Save sends them and marks the message edited; Cancel and Esc put them back', async () => {
+    const api = editApi();
+    const { host, sheet, states } = mount(api);
+    sheet.open('list');
+    await flush();
+    await sheet.openTicket(5);
+    await flush();
+    const edit = byData(host, 'reportsEdit');
+    assert.ok(edit, 'Edit on your unread report');
+    assert.equal(edit.textContent, 'Edit');
+    edit.click();
+    const box = byId(host, 'reports-edit-text');
+    assert.ok(box, 'the box in place of the words');
+    assert.equal(box.value, 'Pigs float');
+    assert.equal(box.getAttribute('maxlength'), String(REPORT_MAX));
+    assert.equal(byData(host, 'reportsMessages').children[0].dataset.editing, '1');
+    assert.equal(byData(host, 'reportsEdit'), null, 'Edit hides while the box is open');
+    // Cancel puts the words back.
+    byData(host, 'reportsEditCancel').click();
+    assert.equal(byId(host, 'reports-edit-text'), null);
+    assert.equal(byData(host, 'reportsMessages').children[0].children[1].textContent, 'Pigs float');
+    // Esc in the box cancels, the sheet stays open.
+    byData(host, 'reportsEdit').click();
+    byId(host, 'bug-report-panel').dispatch('keydown', { key: 'Escape', target: byId(host, 'reports-edit-text') });
+    assert.equal(sheet.state, 'open');
+    assert.equal(byId(host, 'reports-edit-text'), null);
+    // An empty edit is refused here.
+    byData(host, 'reportsEdit').click();
+    byId(host, 'reports-edit-text').value = '   ';
+    byData(host, 'reportsEditSave').click();
+    await flush();
+    assert.equal(states.at(-1).last, REPORT_TEXT.editEmpty);
+    assert.equal(api.calls.filter((c) => c[0] === 'edit').length, 0);
+    // Save.
+    byId(host, 'reports-edit-text').value = '  Pigs float upward\nfast  ';
+    byData(host, 'reportsEditSave').click();
+    await flush();
+    await flush();
+    assert.deepEqual(api.calls.find((c) => c[0] === 'edit'), ['edit', 5, 'Pigs float upward\nfast']);
+    assert.equal(states.at(-1).last, REPORT_TEXT.editDone);
+    const first = byData(host, 'reportsMessages').children[0];
+    assert.equal(first.dataset.edited, '1');
+    assert.ok(first.children[0].textContent.includes(`· ${REPORT_TEXT.edited}`));
+    assert.equal(first.children[1].textContent, 'Pigs float upward\nfast');
+    assert.ok(byData(host, 'reportsEdit'), 'still unread: Edit stays');
+  });
+
+  it('once an administrator has read it the site refuses (409) in plain words, and Edit goes', async () => {
+    const api = editApi({ refuse: true });
+    const { host, sheet, states } = mount(api);
+    sheet.open('list');
+    await flush();
+    await sheet.openTicket(5);
+    await flush();
+    byData(host, 'reportsEdit').click();
+    byId(host, 'reports-edit-text').value = 'Changed';
+    byData(host, 'reportsEditSave').click();
+    await flush();
+    await flush();
+    assert.match(states.at(-1).last, /An administrator has read this report, so it can no longer be changed/);
+    assert.equal(byData(host, 'reportsEdit'), null);
+    assert.equal(byId(host, 'reports-edit-text'), null);
+    assert.equal(byData(host, 'reportsMessages').children[0].children[1].textContent, 'Pigs float', 'the words as they were');
+  });
+
+  it('both skins style the chip and Edit, Classic under its root', () => {
+    const f = read('public/js/features/bug-report-feature.js');
+    for (const sel of ['.reports-chip.is-working', '.reports-edit', '.reports-msg[data-editing]', '.reports-edit-text']) assert.ok(f.includes(`[data-ui="modern"] #bug-report-panel ${sel}`), sel);
+    const css = read('public/css/classic.css');
+    for (const sel of ['.reports-chip.is-working', '.reports-edit', '.reports-msg[data-editing]', '.reports-edit-text']) assert.ok(css.includes(`:root[data-ui="classic"] #bug-report-panel ${sel}`), sel);
+  });
+
+  describe('the site (groddle-afternoon-site)', { skip: skipWithoutSite }, () => {
+    const src = (f) => readFileSync(sitePath(f), 'utf8');
+
+    it('keeps it additive: a new status value in the same column, edited_at a new column, the schema version bumped', () => {
+      const m = JSON.parse(src('minn.json'));
+      assert.ok(m.tables.groddle_tickets.includes("status varchar(8) NOT NULL DEFAULT 'open'"), 'the same status column');
+      assert.ok(m.tables.groddle_ticket_messages.includes('edited_at datetime NULL DEFAULT NULL'));
+      for (const col of ['id', 'ticket_id', 'author_user_id', 'author_role', 'body', 'created_at']) assert.ok(m.tables.groddle_ticket_messages.some((l) => l.startsWith(`${col} `)), col);
+      const [a, b, c] = m.version.split('.').map(Number);
+      assert.ok(a > 0 || b > 5 || (b === 5 && c >= 32), `schema version past 0.5.31: ${m.version}`);
+    });
+
+    it('Working on it: an admin route, logged, read marks untouched, no email; the list sorts it after open', () => {
+      const php = src('src/AdminTickets.php');
+      const working = php.slice(php.indexOf('public function working('), php.indexOf('public function migrate('));
+      assert.match(php, /#\[Route\(Method::Post, '\/groddle\/v1\/admin\/tickets\/\{id:\\d\+\}\/working', policy: new Policy\(Access::Cap, self::ADMIN\)\)\]/);
+      assert.match(working, /TicketStore::workingStatus\(\$on, \(string\) \$row\['last_author_role'\]\)/);
+      assert.match(working, /recordAction\(\$this->minn->db, \$admin->id, \(int\) \$row\['player_user_id'\], 'working', \[.*'on' => \$on\], 'stored'\)/);
+      assert.doesNotMatch(working, /mail|markRead/, 'a status, not a reply: no email, and the read marks stay');
+      const store = src('src/TicketStore.php');
+      assert.match(store, /FIELD\(status, 'open', 'working', 'answered', 'closed'\)/);
+      assert.match(store, /ORDER BY admin_unread DESC, FIELD/, 'unread first, as before');
+      assert.match(store, /self::statusAfter\(\$role, \$current\)/, 'a reply keeps a working report working');
+    });
+
+    it('Edit: a player route through mine(), the new-message rules, a locked conditional write, 409 once read', () => {
+      const php = src('src/Tickets.php');
+      const edit = php.slice(php.indexOf('public function edit('), php.indexOf('private function thread('));
+      assert.match(edit, /\$row = \$this->mine\(\$me, \(int\) \$id\);/);
+      assert.match(edit, /BugReports::message\(\$body\['message'\] \?\? null, BugReports::MAX_MESSAGE, 'groddle_ticket_long'\)/);
+      assert.match(edit, /throw new RestError\('groddle_ticket_read', '[^']+', 409\)/);
+      assert.ok(!/[—–]/.test(edit));
+      assert.match(php, /'editable' => TicketStore::editable\(\$row, \$store->first\(\$id\), \$player\)/);
+      const store = src('src/TicketStore.php');
+      const write = store.slice(store.indexOf('public function editFirst('), store.indexOf('public function markRead('));
+      assert.match(write, /WHERE id = \? AND player_user_id = \? FOR UPDATE/);
+      assert.match(write, /self::editable\(\$row, \$first, \$player\)/);
+      assert.match(write, /SET body = \?, edited_at = \? WHERE id = \? AND ticket_id = \?/);
+    });
+
+    it('the console: a Working on it button beside Close and back, its filter and chip, the log line, and edited on a message', async () => {
+      const page = src('src/AdminConsolePage.php');
+      for (const hook of ['data-console-thread-working>Mark working on it<', 'data-console-thread-unworking hidden>Not working on it<', 'data-status="working">Working on it', 'data-console-status-count="working"']) assert.ok(page.includes(hook), hook);
+      assert.ok(page.indexOf('data-console-thread-working') < page.indexOf('data-console-thread-close'), 'beside Close');
+      const js = src('console/console.js');
+      assert.ok(js.includes('admin/tickets/${tickets.open}/working'));
+      assert.match(js, /body: \{ working: on \}/);
+      assert.match(src('console/console.css'), /\.console-chip-working \{/);
+      const mod = await import(pathToFileURL(sitePath('console/console.js')).href);
+      assert.equal(mod.TICKET_STATUS.working, 'Working on it');
+      assert.equal(mod.logWords({ kind: 'working', player: { name: 'Ada' }, detail: { subject: 'Pigs', on: true }, delivery: 'stored' }), 'marked Ada\'s report “Pigs” working on it');
+      assert.equal(mod.logWords({ kind: 'working', player: { name: 'Ada' }, detail: { subject: 'Pigs', on: false }, delivery: 'stored' }), 'stopped marking Ada\'s report “Pigs” working on it');
+      const when = (iso) => (iso ? 'Nov 2' : '');
+      assert.equal(mod.messageWhen({ at: 'x', edited: 'y' }, when), 'Nov 2 · edited');
+      assert.equal(mod.messageWhen({ at: 'x', edited: null }, when), 'Nov 2');
+    });
+
+    it('the rules (php): status set and clear, edit before read and refused after, owner only, length refused', { skip: (!hasPhp && 'no php') || noEngine }, () => {
+      const out = JSON.parse(execFileSync('php', [join(root, 'tests/fixtures/minn-accounts/tickets.php'), engine, SITE_DIR], { encoding: 'utf8' }));
+      assert.deepEqual(out.working, {
+        statuses: ['open', 'answered', 'working', 'closed'], fitsColumn: true,
+        playerWritesInWorking: 'working', adminWritesInWorking: 'working', playerWritesInClosed: 'open', adminWritesInOpen: 'answered',
+        set: 'working', clearPlayerLast: 'open', clearAdminLast: 'answered',
+      });
+      const e = out.edit;
+      assert.equal(e.neverRead, true);
+      assert.equal(e.readBeforeIt, true);
+      assert.equal(e.readAfter, false);
+      assert.equal(e.readSameSecond, false);
+      assert.equal(e.editedThenRead, false);
+      for (const k of ['otherPlayer', 'notTheirTicket', 'adminMessage', 'otherTicketsMessage', 'noMessage', 'signedOut']) assert.equal(e[k], false, k);
+      assert.deepEqual(e.fits, { ok: REPORT_MAX });
+      assert.deepEqual(e.tooLong, { code: 'groddle_ticket_long', status: 422 });
+      assert.equal(e.cleaned, 'New words\nhere');
+      assert.equal(e.subject, 'New first line');
+      assert.equal(e.out[0].edited, '2026-11-02T10:05:00Z');
+      assert.equal(e.out[1].edited, null);
+    });
   });
 });

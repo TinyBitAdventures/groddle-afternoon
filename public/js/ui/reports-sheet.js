@@ -16,7 +16,11 @@
  *   for one still drawing at most PICTURE_WAIT_MS, then sends the world one.
  *   A picture the site refuses never costs the report: it goes again without it.
  * A thread shows the report's picture under its first message; a click opens
- * it full size in a new tab.
+ * it full size in a new tab. Ticket 49: Working on it has its own chip, and
+ * your report's first message has Edit until an administrator has read it
+ * (the thread's editable): the words open in a box in place, Save sends them
+ * (the same limit as a new report), Cancel puts them back. Once it is read
+ * the site refuses (409) and Edit goes; a changed message says edited.
  * Esc closes, Ctrl or Cmd+Enter sends, Back returns to the list.
  *
  * Classic restyles it in place as a 2012 window (css/classic.css, the same
@@ -30,10 +34,12 @@
  * [data-reports-close-ticket], [data-reports-new], [data-reports-back],
  * #reports-picture [data-reports-picture] (the checkbox), #reports-picture-ui
  * [data-reports-picture-ui] (Include the game's UI: the feature's capture({ ui })),
- * [data-reports-picture-preview], [data-reports-thread-picture].
+ * [data-reports-picture-preview], [data-reports-thread-picture]; ticket 49:
+ * [data-reports-edit] (Edit), #reports-edit-text [data-reports-edit-text],
+ * [data-reports-edit-save], [data-reports-edit-cancel], [data-edited] on a changed message.
  */
 
-import { REPORT_MAX, REPORT_TEXT as T, STATUS_WORDS, pictureRefused, pictureSrc, refusalWords, ticketLine, unreadCount, whenWords } from '../reports.js?v=d0391a23';
+import { REPORT_MAX, REPORT_TEXT as T, STATUS_WORDS, canEditFirst, pictureRefused, pictureSrc, refusalWords, ticketLine, unreadCount, whenWords } from '../reports.js?v=e83d5ec3';
 
 /** How long Send waits for a picture still drawing before it sends the world-only one (ms). */
 export const PICTURE_WAIT_MS = 6000;
@@ -62,6 +68,9 @@ export function mountReportsSheet({ doc = globalThis.document, host, api, contex
   let messages = [];
   let last = '';
   let loading = false;
+  // Ticket 49: whether the report's first message can still be changed, and whether its box is open.
+  let editable = false;
+  let editing = false;
   let shot = null;
   let picture = null;
   // The two pictures a new report can carry (with the game's UI, the world only), drawn when first wanted.
@@ -104,6 +113,13 @@ export function mountReportsSheet({ doc = globalThis.document, host, api, contex
   const sendReply = e('button', { type: 'button', class: 'reports-btn', 'data-reports-send-reply': '' }, T.replySend);
   threadActs.append(closeTicket, sendReply);
   threadView.append(threadHead, msgs, closedNote, replyLabel, reply, threadActs);
+  // Editing the report's first message in place (ticket 49): one box, kept across redraws.
+  const editLabel = e('label', { for: 'reports-edit-text', class: 'reports-label' }, T.editLabel);
+  const editBox = e('textarea', { id: 'reports-edit-text', class: 'reports-text reports-edit-text', maxlength: String(REPORT_MAX), rows: '4', 'data-reports-edit-text': '' });
+  const editActs = e('div', { class: 'reports-actions reports-edit-actions' });
+  const editCancel = e('button', { type: 'button', class: 'reports-btn is-quiet', 'data-reports-edit-cancel': '' }, T.editCancel);
+  const editSave = e('button', { type: 'button', class: 'reports-btn', 'data-reports-edit-save': '' }, T.editSave);
+  editActs.append(editCancel, editSave);
   // A new report: the original's form.
   const newView = e('section', { class: 'reports-view reports-new-view', 'data-reports-new-view': '', hidden: true });
   const newTitle = e('p', { class: 'reports-new-title' }, T.title);
@@ -183,11 +199,21 @@ export function mountReportsSheet({ doc = globalThis.document, host, api, contex
     title.textContent = ticket.subject || T.sheet;
     chip(threadChip, ticket.status);
     threadWhen.textContent = ticketLine(ticket, now());
-    msgs.replaceChildren(...messages.map((m) => {
-      const li = e('li', { class: `reports-msg is-${m.author === 'admin' ? 'admin' : 'player'}`, 'data-author': m.author });
+    const canEdit = canEditFirst({ editable, messages });
+    if (!canEdit) editing = false;
+    msgs.replaceChildren(...messages.map((m, i) => {
+      const li = e('li', { class: `reports-msg is-${m.author === 'admin' ? 'admin' : 'player'}`, 'data-author': m.author, 'data-edited': m.edited ? '1' : null, 'data-editing': i === 0 && editing ? '1' : null });
       const who = e('p', { class: 'reports-msg-who' });
-      who.append(e('b', {}, m.author === 'admin' ? T.admin : T.you), e('time', { datetime: m.at }, ` ${whenWords(m.at, now())}`));
-      li.append(who, e('p', { class: 'reports-msg-body' }, m.body));
+      who.append(e('b', {}, m.author === 'admin' ? T.admin : T.you), e('time', { datetime: m.at }, ` ${whenWords(m.at, now())}${m.edited ? ` · ${T.edited}` : ''}`));
+      // Your report itself, not read yet: Edit (ticket 49).
+      if (i === 0 && canEdit && !editing) {
+        const edit = e('button', { type: 'button', class: 'reports-edit', 'data-reports-edit': '', title: T.editHint }, T.edit);
+        edit.addEventListener('click', () => startEdit());
+        who.append(edit);
+      }
+      li.append(who);
+      if (i === 0 && editing) li.append(editLabel, editBox, editActs);
+      else li.append(e('p', { class: 'reports-msg-body' }, m.body));
       return li;
     }));
     // The report's picture, under its first message (the report itself).
@@ -243,6 +269,8 @@ export function mountReportsSheet({ doc = globalThis.document, host, api, contex
     ticket = tickets.find((t) => t.id === id) || { id, status: 'open', subject: T.sheet };
     messages = [];
     picture = null;
+    editable = false;
+    editing = false;
     drawThread();
     say(T.loading);
     try {
@@ -250,6 +278,7 @@ export function mountReportsSheet({ doc = globalThis.document, host, api, contex
       ticket = r.ticket;
       messages = r.messages || [];
       picture = r.picture || null;
+      editable = r.editable === true;
       // Read now: its dot goes, and the badge with it.
       const row = tickets.find((t) => t.id === id);
       if (row) Object.assign(row, ticket);
@@ -451,6 +480,7 @@ export function mountReportsSheet({ doc = globalThis.document, host, api, contex
       reply.value = '';
       ticket = r.ticket;
       messages = r.messages || [];
+      if ('editable' in (r || {})) editable = r.editable === true;
       const row = tickets.find((t) => t.id === ticket.id);
       if (row) Object.assign(row, ticket);
       state = 'open';
@@ -472,6 +502,7 @@ export function mountReportsSheet({ doc = globalThis.document, host, api, contex
       const r = await api.close(ticket.id);
       ticket = r.ticket;
       messages = r.messages || messages;
+      if ('editable' in (r || {})) editable = r.editable === true;
       const row = tickets.find((t) => t.id === ticket.id);
       if (row) Object.assign(row, ticket);
       drawThread();
@@ -483,15 +514,73 @@ export function mountReportsSheet({ doc = globalThis.document, host, api, contex
     }
   }
 
+  /** Edit: the report's words in a box in its place (ticket 49). */
+  function startEdit() {
+    if (state !== 'open' || view !== 'thread' || !canEditFirst({ editable, messages })) return;
+    editing = true;
+    editBox.value = String(messages[0]?.body || '');
+    drawThread();
+    say(T.editHint);
+    setTimeout(() => editBox.focus(), 0);
+  }
+
+  function cancelEdit() {
+    if (state === 'sending') return;
+    editing = false;
+    drawThread();
+    say('');
+    msgs.children[0]?.querySelector?.('[data-reports-edit]')?.focus?.();
+  }
+
+  async function saveEdit() {
+    if (state !== 'open' || view !== 'thread' || !ticket || !editing) return;
+    const message = editBox.value.trim();
+    if (!message) {
+      say(T.editEmpty, true);
+      editBox.focus();
+      return;
+    }
+    state = 'sending';
+    editSave.disabled = true;
+    say(T.editSaving);
+    try {
+      const r = await api.edit(ticket.id, message);
+      ticket = r.ticket;
+      messages = r.messages || messages;
+      editable = r.editable === true;
+      editing = false;
+      const row = tickets.find((t) => t.id === ticket.id);
+      if (row) Object.assign(row, ticket);
+      state = 'open';
+      drawThread();
+      drawList();
+      say(T.editDone);
+      reply.focus({ preventScroll: true });
+    } catch (err) {
+      state = 'open';
+      // Read meanwhile: the site says so in plain words, and Edit goes.
+      if (err?.status === 409) {
+        editable = false;
+        editing = false;
+        drawThread();
+      }
+      say(refusalWords(err), true);
+    } finally {
+      editSave.disabled = false;
+    }
+  }
+
   // Typing here is not walking: keys stay in the sheet (as the old form's did).
   for (const kind of ['keydown', 'keyup', 'keypress']) {
     panel.addEventListener(kind, (ev) => {
       ev.stopPropagation();
       if (kind !== 'keydown') return;
-      if (ev.key === 'Escape') { ev.preventDefault(); close(); }
+      // Esc in the edit box puts the words back; anywhere else it closes the sheet.
+      if (ev.key === 'Escape') { ev.preventDefault(); if (editing && ev.target === editBox) cancelEdit(); else close(); }
       if (ev.key === 'Enter' && (ev.metaKey || ev.ctrlKey)) {
         ev.preventDefault();
         if (view === 'new') send();
+        else if (view === 'thread' && editing && ev.target === editBox) saveEdit();
         else if (view === 'thread') sendTheReply();
       }
     });
@@ -499,6 +588,9 @@ export function mountReportsSheet({ doc = globalThis.document, host, api, contex
   panel.addEventListener('pointerdown', (ev) => { if (ev.target === panel) close(); });
   text.addEventListener('input', () => { if (status.classList.contains('is-error')) say(''); });
   reply.addEventListener('input', () => { if (status.classList.contains('is-error')) say(''); });
+  editBox.addEventListener('input', () => { if (status.classList.contains('is-error')) say(''); });
+  editCancel.addEventListener('click', () => cancelEdit());
+  editSave.addEventListener('click', () => saveEdit());
   picBox.addEventListener('change', () => drawPicture());
   uiBox.addEventListener('change', () => {
     if (!shots[mode()] && !jobs[mode()]) takePicture(mode());

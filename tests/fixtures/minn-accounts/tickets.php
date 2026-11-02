@@ -1,7 +1,8 @@
 <?php
 /**
  * Runs the site repo's ticket rules (groddle-afternoon-site src/TicketStore.php,
- * TicketMigration.php, BugReports.php, PlayerMail.php, ReportPicture.php) against the engine's
+ * TicketMigration.php, BugReports.php, PlayerMail.php, ReportPicture.php; ticket 49's Working on it
+ * and Edit until read) against the engine's
  * classes and prints them as JSON (tests/g483-tickets.test.js). Pure: no
  * database is opened.
  *
@@ -81,7 +82,48 @@ $noise = static function (int $w, int $h): string {
     return (string) ob_get_clean();
 };
 
+// Ticket 49: Edit until read. A ticket of player 7 and its first message, as the database rows read.
+$ticket = ['id' => 5, 'player_user_id' => 7, 'admin_read_at' => null];
+$first = ['id' => 11, 'ticket_id' => 5, 'author_user_id' => 7, 'author_role' => 'player', 'body' => 'Pigs float', 'created_at' => '2026-11-02 10:00:00', 'edited_at' => null];
+$read = static fn (?string $at): array => ['admin_read_at' => $at] + $ticket;
+$long = static function (int $n): array {
+    try {
+        return ['ok' => mb_strlen(BugReports::message(str_repeat('z', $n), BugReports::MAX_MESSAGE, 'groddle_ticket_long'))];
+    } catch (Minn\RestError $e) {
+        return ['code' => $e->errorCode, 'status' => $e->status];
+    }
+};
+
 echo json_encode([
+    'working' => [
+        'statuses' => TicketStore::STATUSES,
+        'fitsColumn' => strlen(TicketStore::WORKING) <= 8,
+        'playerWritesInWorking' => TicketStore::statusAfter('player', 'working'),
+        'adminWritesInWorking' => TicketStore::statusAfter('admin', 'working'),
+        'playerWritesInClosed' => TicketStore::statusAfter('player', 'closed'),
+        'adminWritesInOpen' => TicketStore::statusAfter('admin', 'open'),
+        'set' => TicketStore::workingStatus(true, 'player'),
+        'clearPlayerLast' => TicketStore::workingStatus(false, 'player'),
+        'clearAdminLast' => TicketStore::workingStatus(false, 'admin'),
+    ],
+    'edit' => [
+        'neverRead' => TicketStore::editable($ticket, $first, 7),
+        'readBeforeIt' => TicketStore::editable($read('2026-11-02 09:59:59'), $first, 7),
+        'readAfter' => TicketStore::editable($read('2026-11-02 10:00:01'), $first, 7),
+        'readSameSecond' => TicketStore::editable($read('2026-11-02 10:00:00'), $first, 7),
+        'editedThenRead' => TicketStore::editable($read('2026-11-02 10:06:00'), ['edited_at' => '2026-11-02 10:05:00'] + $first, 7),
+        'otherPlayer' => TicketStore::editable($ticket, $first, 8),
+        'notTheirTicket' => TicketStore::editable(['player_user_id' => 8] + $ticket, ['author_user_id' => 8] + $first, 7),
+        'adminMessage' => TicketStore::editable($ticket, ['author_role' => 'admin', 'author_user_id' => 1] + $first, 7),
+        'otherTicketsMessage' => TicketStore::editable($ticket, ['ticket_id' => 6] + $first, 7),
+        'noMessage' => TicketStore::editable($ticket, null, 7),
+        'signedOut' => TicketStore::editable($ticket, $first, 0),
+        'fits' => $long(BugReports::MAX_MESSAGE),
+        'tooLong' => $long(BugReports::MAX_MESSAGE + 1),
+        'cleaned' => BugReports::message("  New\x07 words\r\nhere  ", BugReports::MAX_MESSAGE, 'groddle_ticket_long'),
+        'subject' => TicketStore::subject("New first line\nmore"),
+        'out' => TicketStore::messagesOut([['edited_at' => '2026-11-02 10:05:00'] + $first, ['edited_at' => null] + $first]),
+    ],
     'picture' => [
         'kept' => ['width' => $kept['width'], 'height' => $kept['height'], 'soi' => str_starts_with($kept['bytes'], "\xFF\xD8\xFF"), 'fits' => strlen($kept['bytes']) <= ReportPicture::MAX_BYTES, 'tagDropped' => !str_contains($kept['bytes'], 'SECRETGPS')],
         'pngNamedJpeg' => $refusal('data:image/jpeg;base64,' . base64_encode($png)),

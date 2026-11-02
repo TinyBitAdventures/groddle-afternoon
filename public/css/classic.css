@@ -2168,6 +2168,8 @@
 }
 :root[data-ui="classic"] #bug-report-panel .reports-chip.is-answered { color: var(--c-classic-online-text); }
 :root[data-ui="classic"] #bug-report-panel .reports-chip.is-closed { color: var(--c-classic-offline); }
+/* Ticket 49: Working on it, an administrator's mark. */
+:root[data-ui="classic"] #bug-report-panel .reports-chip.is-working { border-color: var(--c-classic-link); color: var(--c-classic-link); }
 :root[data-ui="classic"] #bug-report-panel .reports-empty { margin: calc(16 * var(--cu)) 0; color: var(--c-classic-offline); text-align: center; }
 :root[data-ui="classic"] #bug-report-panel .reports-thread-head { display: flex; align-items: center; gap: calc(8 * var(--cu)); }
 /* Ticket 21: the thread scrolls in the well (the body), every message at its full height, with the chat log's scrollbar. */
@@ -2182,6 +2184,21 @@
 :root[data-ui="classic"] #bug-report-panel .reports-msg.is-admin { box-shadow: inset 3px 0 0 var(--c-classic-link); }
 :root[data-ui="classic"] #bug-report-panel .reports-msg-who { margin: 0 0 calc(2 * var(--cu)); color: var(--c-classic-title); font-family: var(--font-classic-title); }
 :root[data-ui="classic"] #bug-report-panel .reports-msg-body { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+/* Ticket 49: Edit on your report until it is read, and its words in a box in place. */
+:root[data-ui="classic"] #bug-report-panel .reports-edit {
+  margin: 0 0 0 calc(8 * var(--cu));
+  padding: 0 calc(8 * var(--cu));
+  border: 1px solid var(--c-classic-btn-minor-border);
+  border-radius: var(--radius-xs);
+  background: linear-gradient(180deg, var(--c-classic-btn-minor-top), var(--c-classic-btn-minor-bottom));
+  color: var(--c-classic-btn-minor-label);
+  font: 800 calc(var(--fs-classic-body) * var(--cu-n, 1))/var(--lh-normal) var(--font-classic-title);
+  cursor: pointer;
+}
+:root[data-ui="classic"] #bug-report-panel .reports-edit:hover { background: linear-gradient(180deg, var(--c-classic-panel), var(--c-classic-btn-minor-top)); }
+:root[data-ui="classic"] #bug-report-panel .reports-edit:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--c-classic-focus); }
+:root[data-ui="classic"] #bug-report-panel .reports-msg[data-editing] { display: grid; gap: calc(6 * var(--cu)); padding-right: calc(4 * var(--cu)); }
+:root[data-ui="classic"] #bug-report-panel .reports-edit-text { min-height: calc(80 * var(--cu)); }
 :root[data-ui="classic"] #bug-report-panel .reports-new-title { margin: 0; color: var(--c-classic-title); font: 800 calc(var(--fs-classic-row-title) * var(--cu-n, 1))/var(--lh-tight) var(--font-classic-title); }
 :root[data-ui="classic"] #bug-report-panel .reports-text {
   box-sizing: border-box;

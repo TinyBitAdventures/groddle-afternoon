@@ -50,8 +50,8 @@
  * window.groddleBugReport.open('list'|'new'), .openTicket(id), .refresh() in multiplayer.
  */
 
-import { createReportsApi, REPORT_PICTURE, REPORT_TEXT, UNREAD_POLL_MS, base64Size, pictureSize, reportFromHash } from '../reports.js?v=d0391a23';
-import { mountReportsSheet } from '../ui/reports-sheet.js?v=870031fc';
+import { createReportsApi, REPORT_PICTURE, REPORT_TEXT, UNREAD_POLL_MS, base64Size, pictureSize, reportFromHash } from '../reports.js?v=e83d5ec3';
+import { mountReportsSheet } from '../ui/reports-sheet.js?v=c493c923';
 
 export const BUG_REPORT_FEATURE_ID = 'bug-report';
 
@@ -341,6 +341,8 @@ const STYLE = `
 [data-ui="modern"] #bug-report-panel .reports-chip { flex: none; padding: 1px var(--space-2); border-radius: var(--radius-pill); background: var(--surface-sunken); color: var(--text-muted); font-size: var(--fs-xs); font-weight: var(--fw-heavy); line-height: var(--lh-tight); }
 [data-ui="modern"] #bug-report-panel .reports-chip.is-open { background: var(--accent-soft); color: var(--accent); }
 [data-ui="modern"] #bug-report-panel .reports-chip.is-answered { color: var(--status-good); }
+/* Ticket 49: Working on it, an administrator's mark. */
+[data-ui="modern"] #bug-report-panel .reports-chip.is-working { background: color-mix(in srgb, var(--status-warn) 24%, transparent); color: var(--warn); }
 [data-ui="modern"] #bug-report-panel .reports-empty { margin: var(--space-4) 0; color: var(--text-muted); line-height: var(--lh-body); text-align: center; }
 [data-ui="modern"] #bug-report-panel .reports-thread-head { display: flex; align-items: center; gap: var(--space-2); }
 /* Ticket 21: a thread is read in the sheet's one scroller (its body, with a scrollbar you can see), every message at its full height. */
@@ -353,6 +355,11 @@ const STYLE = `
 [data-ui="modern"] #bug-report-panel .reports-msg-who { margin: 0 0 2px; font-size: var(--fs-s); }
 [data-ui="modern"] #bug-report-panel .reports-msg-who time { color: var(--text-muted); }
 [data-ui="modern"] #bug-report-panel .reports-msg-body { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; line-height: var(--lh-body); }
+/* Ticket 49: Edit on your report until it is read, and its words in a box in place. */
+[data-ui="modern"] #bug-report-panel .reports-edit { margin: 0 0 0 var(--space-2); padding: 1px var(--space-2); border: 1px solid var(--border-strong); border-radius: var(--radius-pill); background: var(--surface-raised); color: var(--text); font: var(--fw-bold) var(--fs-xs)/var(--lh-tight) var(--font-ui); cursor: pointer; }
+[data-ui="modern"] #bug-report-panel .reports-edit:hover { background: var(--surface-hover); }
+[data-ui="modern"] #bug-report-panel .reports-msg[data-editing] { box-sizing: border-box; width: 88%; display: grid; gap: var(--space-2); }
+[data-ui="modern"] #bug-report-panel .reports-edit-text { min-height: 5rem; }
 [data-ui="modern"] #bug-report-panel .reports-closed-note { margin: 0; color: var(--text-muted); font-size: var(--fs-s); }
 [data-ui="modern"] #bug-report-panel .reports-new-title { margin: 0; font-weight: var(--fw-heavy); font-size: var(--fs-l); }
 [data-ui="modern"] #bug-report-panel .reports-label { color: var(--text-muted); font-size: var(--fs-s); }

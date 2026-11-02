@@ -5,9 +5,14 @@
  * its calls to groddle/v1/tickets, signed in, with the session's REST nonce
  * (a stale one is fetched again once, as js/minn-account.js does).
  *
- * A ticket: { id, status: open|answered|closed, subject, createdAt, updatedAt,
+ * A ticket: { id, status: open|answered|working|closed, subject, createdAt, updatedAt,
  * lastMessageAt, lastAuthor: player|admin, unread }; a message: { id, author:
- * player|admin, body, at }. Who wrote is a role: an administrator is never named.
+ * player|admin, body, at, edited }. Who wrote is a role: an administrator is never named.
+ *
+ * Ticket 49 (2026-11-02, a player's two ideas): Working on it is a status an
+ * administrator sets (its own chip), and the report's first message can be
+ * edited until an administrator has read it (a thread's editable; the site
+ * answers 409 groddle_ticket_read once they have).
  *
  * A new report may carry a picture of the game (Austin 2026-10-30): Attach a
  * picture of the game, ticked by default, sends the game's canvas as a JPEG
@@ -50,6 +55,15 @@ export const REPORT_TEXT = Object.freeze({
   closed: 'This report is closed. Write a reply to open it again.',
   closedDone: 'Report closed.',
   unreadDot: 'New reply',
+  edit: 'Edit',
+  editLabel: 'Change your report',
+  editSave: 'Save',
+  editCancel: 'Cancel',
+  editSaving: 'Saving…',
+  editDone: 'Your report was changed.',
+  editEmpty: 'Write your report first.',
+  edited: 'edited',
+  editHint: 'You can change this until an administrator reads it.',
   meta: (n) => (n === 0 ? 'No reports yet' : n === 1 ? '1 report' : `${n} reports`),
   picture: 'Attach a picture of the game',
   pictureHint: 'It shows the street as you see it, with other players, their names and speech bubbles. Not your chat or these windows.',
@@ -105,7 +119,13 @@ export function pictureSrc(picture) {
 }
 
 /** The status chip's words. */
-export const STATUS_WORDS = Object.freeze({ open: 'Open', answered: 'Answered', closed: 'Closed' });
+export const STATUS_WORDS = Object.freeze({ open: 'Open', answered: 'Answered', working: 'Working on it', closed: 'Closed' });
+
+/** Whether a thread's first message can still be edited: the site says so, and it is yours. */
+export function canEditFirst(thread) {
+  const first = Array.isArray(thread?.messages) ? thread.messages[0] : null;
+  return thread?.editable === true && first?.author === 'player';
+}
 
 /** As the site keeps them (src/BugReports.php MAX_MESSAGE). */
 export const REPORT_MAX = 4000;
@@ -209,5 +229,7 @@ export function createReportsApi({ baseUri, fetch: fetchFn = globalThis.fetch?.b
     reply: (id, message) => call(`tickets/${Number(id)}/messages`, { method: 'POST', body: { message } }),
     /** { ticket, messages } */
     close: (id) => call(`tickets/${Number(id)}/close`, { method: 'POST' }),
+    /** { ticket, messages, editable }: new words for the report's first message, until an administrator reads it. */
+    edit: (id, message) => call(`tickets/${Number(id)}/edit`, { method: 'POST', body: { message } }),
   };
 }
