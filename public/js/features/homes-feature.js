@@ -91,6 +91,7 @@
  */
 
 import { countItem, ensureItem, ITEM_CATALOG, removeItem } from '../inventory.js?v=b0e33301';
+import { isBagClass } from '../pack-slots.js?v=f3890c72';
 import {
   CULTIVATION_CLASSES,
   FURNITURE_CATALOG,
@@ -101,7 +102,9 @@ import {
   arrangeStarterRoom,
   createHomeDecorState,
   displayDeposit,
+  displayRefusal,
   displayWithdraw,
+  DISPLAY_TEXT,
   expandInterior,
   flipFurniture,
   furnishDemoRoom,
@@ -132,7 +135,7 @@ import {
   textureConfig,
   unexpandInterior,
   UNEXPAND_TEXT,
-} from '../home-decor.js?v=f396b68f';
+} from '../home-decor.js?v=37d38d09';
 import { applyBonusUpgrade, applyUpgrade, bonusUpgradeLine, currantsText, hasUpgrades, pieceLabel, rollBonusUpgrade, upgradeVerb, UPGRADE_TEXT } from '../furniture-upgrades.js?v=2bc913dc';
 import { chooseUpgrade, closeUpgradePicker, openUpgradePicker, saveUpgrade, upgradePickerOpen, upgradePickerState } from '../furniture-upgrade-picker.js?v=b9a05bee';
 import {
@@ -260,7 +263,7 @@ import {
   quoteHouseExpansion,
   quoteHouseUnexpand,
   unexpandHouseFloors,
-} from '../home-floors.js?v=42a6b0e6';
+} from '../home-floors.js?v=bb8de397';
 
 export const HOMES_FEATURE_ID = 'homes';
 const HOME_STREET_TSID = 'RH_HOME_EXT';
@@ -2081,6 +2084,19 @@ function spawnStreetTargets(engine) {
 // Furniture views
 // ---------------------------------------------------------------------------
 
+/**
+ * The shown item's centre over a Storage Display Box's foot: bag_furniture_sdb.js getExtraConfig
+ * 909-930 puts it 26 px over the SWF stage's bottom (delta_y -26, center_view, width 34); the art
+ * is drawn from its own bottom, the base SWF's 12 px under that point (render.py --base), an
+ * upgrade's art.foot. Was -35, 3 px low.
+ */
+export const SDB_ITEM_DY = -26;
+export const SDB_BASE_FOOT = -12;
+function displayIconY(item, upgradeId = item.upgradeId) {
+  const foot = Number(pieceArt(item.classTsid, upgradeId)?.foot);
+  return SDB_ITEM_DY + (Number.isFinite(foot) ? foot : SDB_BASE_FOOT);
+}
+
 function furnitureView(PIXI, item) {
   // G358: an upgraded piece (or the style the picker previews on it) draws its upgrade's frame.
   const upgradeId = upgradePreview?.id === item.id ? upgradePreview.upgradeId : item.upgradeId;
@@ -2120,7 +2136,7 @@ function furnitureView(PIXI, item) {
     icon.anchor.set(0.5);
     icon.width = 34;
     icon.height = 34;
-    icon.y = -35;
+    icon.y = displayIconY(item, upgradeId);
     box.addChild(icon);
     const badge = new PIXI.Text({ text: String(item.display.count), style: {
       fontFamily: 'Trebuchet MS, sans-serif',
@@ -3805,9 +3821,8 @@ function runFurnUpAutoplay(engine, how) {
 function displayableItems(engine) {
   const box = selected ? placedItem(decor, selected.id) : null;
   return Object.entries(engine.inv)
-    .filter(([cls, n]) => n > 0 && ITEM_CATALOG[cls] && !FURNITURE_CATALOG[cls] && !ITEM_CATALOG[cls].isTool)
-    .filter(([cls]) => !box?.display || box.display.classTsid === cls)
-    .map(([cls, n]) => ({ classTsid: cls, label: ITEM_CATALOG[cls].label, count: n }))
+    .filter(([cls, n]) => n > 0 && ITEM_CATALOG[cls] && !displayRefusal(box, cls, displayMeta(cls)))
+    .map(([cls, n]) => ({ classTsid: cls, label: ITEM_CATALOG[cls].label, count: n, icon: ITEM_CATALOG[cls].icon || '' }))
     .sort((a, b) => a.label.localeCompare(b.label))
     .slice(0, 80);
 }
@@ -4691,6 +4706,93 @@ function redrawPreview(engine) {
   engine.setData('homeSwatchPreview', '');
 }
 
+// --- Storage Display Boxes take what is dragged onto them (DECOPOLISH, Austin 2026-11-02: "Doesn't
+// look like I can place items on these storage boxes"). The original: a box has no plats (bag_furniture_sdb.js
+// getFurnitureBaseGeo 1033-1041: plats null, and none of its 47 styles has one), so nothing rests on it;
+// it shows one kind of thing inside it, stocked by its deposit verb, a drop target ("is_drop_target",
+// drop_tip "Deposit", drop_ok_code 624-636) the client kept in Decoration Mode (DragVO.as
+// findDragTargetForStack 133-138: "NOT DOING THIS NO MORE SO WE CAN DRAG TO SDBs IN DECO MODE"). A
+// stack set down in the room goes in too (valid_items 668-690, the handler's target_itemstack_tsid
+// from the location 718-741). The remake puts in the whole stack dragged (the original asked how
+// many, drop_many), and a box that will not take it says why instead of letting it fall to the floor
+// behind (the original simply was not a target there).
+
+/** What the Display rule needs to know of a class (displayRefusal). */
+function displayMeta(cls) {
+  const tags = ITEM_CATALOG[cls]?.tags || [];
+  return { tool: Boolean(ITEM_CATALOG[cls]?.isTool), bag: isBagClass(cls), blocked: tags.includes('quest-item') || tags.includes('no_drop') };
+}
+
+/** The Storage Display Box under a room point (the front-most), or null. */
+function displayBoxAt(point) {
+  if (!point) return null;
+  for (const item of renderOrder(decor).reverse()) {
+    if (item.classTsid !== 'bag_furniture_sdb') continue;
+    const b = furnitureBounds(item);
+    if (point.x >= b.x && point.x <= b.x + b.w && point.y >= b.y && point.y <= b.y + b.h) return item;
+  }
+  return null;
+}
+
+/** A drag over a box: { box, refusal } (refusal null when it takes `cls`), or null off every box. */
+function displayDropAt(point, cls) {
+  const box = displayBoxAt(point);
+  return box ? { box, refusal: displayRefusal(box, cls, displayMeta(cls)) } : null;
+}
+
+/** Light the box a drag is over: green with the drop tip when it takes it, else red with why not. */
+function drawDisplayTarget(engine, hit) {
+  if (scene?.sdbMarker && !scene.sdbMarker.destroyed) scene.sdbMarker.destroy({ children: true });
+  if (scene) scene.sdbMarker = null;
+  if (!hit || !scene) {
+    engine.setData('homeDisplayTarget', '');
+    return;
+  }
+  const { PIXI } = engine;
+  const b = furnitureBounds(hit.box);
+  const ok = !hit.refusal;
+  const color = ok ? 0x8fe388 : 0xff8f7a;
+  const g = new PIXI.Container();
+  g.zIndex = 9999;
+  g.eventMode = 'none';
+  const ring = new PIXI.Graphics();
+  ring.roundRect(b.x - 5, b.y - 5, b.w + 10, b.h + 10, 8).stroke({ width: 3, color, alpha: 1 });
+  ring.roundRect(b.x - 5, b.y - 5, b.w + 10, b.h + 10, 8).fill({ color, alpha: 0.14 });
+  const tip = new PIXI.Text({ text: ok ? DISPLAY_TEXT.dropTip : hit.refusal.msg, style: {
+    fontFamily: 'Trebuchet MS, sans-serif', fontSize: 12, fontWeight: '700', fill: 0xffffff,
+    stroke: { color: 0x3b2a1f, width: 3 }, align: 'center', wordWrap: true, wordWrapWidth: 180,
+  } });
+  tip.anchor.set(0.5, 1);
+  tip.x = b.x + b.w / 2;
+  tip.y = b.y - 9;
+  g.addChild(ring, tip);
+  g.x = roomX0();
+  engine.entityLayer.addChild(g);
+  scene.sdbMarker = g;
+  engine.setData('homeDisplayTarget', `${hit.box.id}:${ok ? 'ok' : hit.refusal.reason}`);
+}
+
+function clearDisplayTarget(engine) {
+  drawDisplayTarget(engine, null);
+}
+
+/** Put `count` of a pack class in a box (the Display button's deposit, the dragged stack's count). */
+function depositInBox(engine, box, cls, count) {
+  const refusal = displayRefusal(box, cls, displayMeta(cls));
+  if (refusal) return { ok: false, ...refusal };
+  const n = Math.min(Math.max(1, Math.floor(Number(count) || 1)), Number(engine.inv[cls]) || 0);
+  if (!n) return { ok: false, reason: 'missing', msg: 'That stack is no longer in your pack.' };
+  const result = displayDeposit(decor, engine.inv, box.id, cls, n);
+  if (result.ok) {
+    engine.refreshPack();
+    engine.playSound?.('ITEM_DROP', { volume: 0.45 });
+    renderFurniture(engine);
+    renderBar(engine);
+    engine.save();
+  }
+  return result;
+}
+
 // --- pack items onto shelves and tables (HandOfDecorator startWithItemFromPack, dropItemFromPackOnTargetPlatform)
 
 function packDropTarget(engine, e) {
@@ -4727,6 +4829,7 @@ function endPackDrag(engine) {
   lastClient = null;
   edgeSince = 0;
   drawPackMarker(engine, null);
+  clearDisplayTarget(engine);
   if (placing?.from === 'pack' && !drag) cancelCarry(engine);
   engine.setData('homeDrag', '');
 }
@@ -4745,10 +4848,15 @@ function wirePackDrag(engine) {
       updateGhost(engine);
       return;
     }
-    drawPackMarker(engine, packDropTarget(engine, e));
-    engine.setData('homeDrag', `pack:${packDrag.classTsid}:room`);
+    const hit = displayDropAt(toRoom(worldPoint(engine, e)), packDrag.classTsid);
+    drawDisplayTarget(engine, hit);
+    drawPackMarker(engine, hit ? null : packDropTarget(engine, e));
+    engine.setData('homeDrag', `pack:${packDrag.classTsid}:${hit ? 'sdb' : 'room'}`);
   });
-  canvas.addEventListener('dragleave', () => drawPackMarker(engine, null));
+  canvas.addEventListener('dragleave', () => {
+    drawPackMarker(engine, null);
+    clearDisplayTarget(engine);
+  });
   canvas.addEventListener('drop', (e) => {
     if (!packDrag || mode !== 'decorate') return;
     e.preventDefault();
@@ -4759,6 +4867,17 @@ function wirePackDrag(engine) {
       const res = placeAtPointer(engine, toRoom(pointer));
       engine.setData('homeDropLast', res?.ok ? 'placed' : `refused:${res?.reason || ''}`);
       endPackDrag(engine);
+      return;
+    }
+    const hit = displayDropAt(toRoom(worldPoint(engine, e)), was.classTsid);
+    if (hit) {
+      endPackDrag(engine);
+      const res = depositInBox(engine, hit.box, was.classTsid, was.count);
+      if (!res.ok) {
+        if (res.msg) engine.toast(res.msg);
+        engine.playSound?.('CLICK_FAILURE', { volume: 0.4 });
+      }
+      engine.setData('homeDropLast', res.ok ? `display:${was.classTsid}:${hit.box.id}` : `refused:${res.reason || ''}`);
       return;
     }
     const target = packDropTarget(engine, e);
@@ -4907,6 +5026,35 @@ function pickUpStack(engine, id) {
   return ok;
 }
 
+/**
+ * A stack set down in the room dragged onto a Storage Display Box goes in it: by the item's own
+ * Pick up, then the deposit, so the pack, the dropped stacks and the box each see one move (a full
+ * pack leaves it where it was). A box that will not take it says why; the stack stays put.
+ */
+function stackIntoBox(engine, id, hit) {
+  const row = stackRow(engine, id);
+  if (!row) return { ok: false, reason: 'gone' };
+  if (hit.refusal) {
+    engine.toast(hit.refusal.msg);
+    engine.playSound?.('CLICK_FAILURE', { volume: 0.4 });
+    engine.setData('homeStackLast', `refused:${id}:${hit.refusal.reason}`);
+    return { ok: false, ...hit.refusal };
+  }
+  const cls = row.classTsid;
+  const had = Number(engine.inv[cls]) || 0;
+  if (!engine.pickUpDroppedStack?.(id)) {
+    engine.setData('homeStackLast', `refused:${id}:pack`);
+    return { ok: false, reason: 'pack' };
+  }
+  const got = (Number(engine.inv[cls]) || 0) - had;
+  const res = got > 0 ? depositInBox(engine, hit.box, cls, got) : { ok: false, reason: 'missing' };
+  if (selected?.kind === 'stack') selected = null;
+  drawStackSelection(engine);
+  engine.setData('homeStackLast', res.ok ? `display:${id}:${hit.box.id}` : `refused:${id}:${res.reason || ''}`);
+  publish(engine);
+  return res;
+}
+
 function stackPop(engine) {
   if (selected?.kind !== 'stack' || placing) return null;
   const row = stackRow(engine, selected.id);
@@ -4939,7 +5087,9 @@ function moveStackDrag(engine, e) {
     }
   }
   document.getElementById('pack-bar')?.classList.toggle('is-drop-target', toPack);
-  const target = drag.over === 'room' && row ? stackSurfaceAt(decor, toRoom(worldPoint(engine, e)).x, toRoom(worldPoint(engine, e)).y) : null;
+  const hit = drag.over === 'room' && row ? displayDropAt(toRoom(worldPoint(engine, e)), row.classTsid) : null;
+  drawDisplayTarget(engine, hit);
+  const target = drag.over === 'room' && row && !hit ? stackSurfaceAt(decor, toRoom(worldPoint(engine, e)).x, toRoom(worldPoint(engine, e)).y) : null;
   drawPackMarker(engine, target, row);
   syncFloating(engine);
   engine.setData('homeDrag', `stack:${row?.classTsid || ''}:${drag.over || ''}`);
@@ -4951,13 +5101,18 @@ function endStackDrag(engine, e, cancelled) {
   lastClient = null;
   edgeSince = 0;
   drawPackMarker(engine, null);
+  clearDisplayTarget(engine);
   ui?.builder?.tray?.classList.remove('is-drop-target');
   document.getElementById('pack-bar')?.classList.remove('is-drop-target');
   engine.setData('homeDrag', '');
   if (cancelled || !was) return null;
   if (overPack(e.clientX, e.clientY)) return pickUpStack(engine, was.id);
   if (!overCanvas(e)) return null;
-  return moveStack(engine, was.id, toRoom(worldPoint(engine, e)));
+  const p = toRoom(worldPoint(engine, e));
+  const row = stackRow(engine, was.id);
+  const hit = row ? displayDropAt(p, row.classTsid) : null;
+  if (hit) return stackIntoBox(engine, was.id, hit);
+  return moveStack(engine, was.id, p);
 }
 
 // --- the floating actions and the Place button

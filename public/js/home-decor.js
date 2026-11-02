@@ -864,17 +864,36 @@ export function unexpandInterior(state, inv = {}) {
   return { ok: true, wallSegments: state.wallSegments, width: interiorWidth(state), items: { ...quote.items }, moved, edge };
 }
 
+export const DISPLAY_TEXT = Object.freeze({
+  /** bag_furniture_sdb.js verbs.deposit drop_tip. */
+  dropTip: 'Deposit',
+  badItem: 'That cannot go in a display box.',
+  otherClass: 'A Storage Display Box shows off one kind of thing at a time.',
+});
+
+/**
+ * Whether a Storage Display Box takes a class (bag_furniture_sdb.js verbs.deposit drop_ok_code
+ * 624-636 and valid_items 668-708): not furniture, a bag (`bag`) or something that may not leave
+ * the pack (`blocked`: a quest item, no_drop), and its own kind or an empty box. `tool`: the
+ * remake keeps tools out (their wear is per copy in the pack, js/tools.js), as Display always has.
+ * Returns null, or { reason, msg }.
+ */
+export function displayRefusal(box, classTsid, { tool = false, bag = false, blocked = false } = {}) {
+  if (!box || box.classTsid !== 'bag_furniture_sdb') return { reason: 'not_box', msg: '' };
+  const cls = cleanKey(classTsid);
+  if (!cls || isFurniture(cls) || tool || bag || blocked) return { reason: 'bad_item', msg: DISPLAY_TEXT.badItem };
+  if (box.display && box.display.classTsid !== cls) return { reason: 'other_class', msg: DISPLAY_TEXT.otherClass };
+  return null;
+}
+
 /** Storage Display Box: deposit pack items of one class (bag_furniture_sdb). */
 export function displayDeposit(state, inv, id, classTsid, qty = 1) {
   const box = itemById(state, id);
   if (!box || box.classTsid !== 'bag_furniture_sdb') return { ok: false, reason: 'not_box' };
   const cls = cleanKey(classTsid);
   const n = Math.max(1, Math.floor(finite(qty, 1)));
-  if (!cls || isFurniture(cls)) return { ok: false, reason: 'bad_item', msg: 'That cannot go in a display box.' };
-  if (box.display && box.display.classTsid !== cls) {
-    return { ok: false, reason: 'other_class', msg: 'A Storage Display Box shows off one kind of thing at a time.' };
-  }
-  if ((inv?.[cls] || 0) < n) return { ok: false, reason: 'none', msg: "You don't have that many." };
+  const refused = displayRefusal(box, cls);
+  if (refused) return { ok: false, ...refused };
   inv[cls] -= n;
   box.display = { classTsid: cls, count: (box.display?.count || 0) + n };
   return { ok: true, display: { ...box.display } };

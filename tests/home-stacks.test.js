@@ -23,7 +23,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { FURNITURE_CATALOG } from '../public/js/homes-catalog.js?v=b3d9aea7';
 import { FURNITURE_UPGRADES } from '../public/js/furniture-upgrades-data.js?v=268c538a';
-import { createHomeDecorState, INTERIOR, placeFurniture, settleStacks, STALE_REST_GIVE, surfaceHeight } from '../public/js/home-decor.js?v=f396b68f';
+import { createHomeDecorState, INTERIOR, placeFurniture, settleStacks, STALE_REST_GIVE, surfaceHeight } from '../public/js/home-decor.js?v=37d38d09';
 import { normalizeDroppedItemState } from '../public/js/world-items.js?v=210bef3b';
 import { isStandable } from '../public/js/street-model.js?v=505d8990';
 import { BUILDER_TEXT } from '../public/js/ui/home-builder.js?v=3922b0d9';
@@ -244,8 +244,9 @@ describe('Decoration Mode moves and takes back what is set down', () => {
     const down = homes.slice(homes.indexOf("const stack = mode === 'decorate' ? stackAt(engine, p) : null;"));
     assert.match(down.slice(0, 600), /selectStack\(engine, stack\.id\)/);
     const end = homes.slice(homes.indexOf('function endStackDrag('));
-    assert.match(end.slice(0, 800), /if \(overPack\(e\.clientX, e\.clientY\)\) return pickUpStack\(engine, was\.id\);/);
-    assert.match(end.slice(0, 800), /return moveStack\(engine, was\.id, toRoom\(worldPoint\(engine, e\)\)\);/);
+    assert.match(end.slice(0, 1200), /if \(overPack\(e\.clientX, e\.clientY\)\) return pickUpStack\(engine, was\.id\);/);
+    // DECOPOLISH: onto a Storage Display Box it goes in the box (tests/decor-display-box.test.js), else it moves.
+    assert.match(end.slice(0, 1200), /const p = toRoom\(worldPoint\(engine, e\)\);[\s\S]{0,200}return moveStack\(engine, was\.id, p\);/);
     const move = homes.slice(homes.indexOf('function moveStack('));
     assert.match(move.slice(0, 500), /const target = stackSurfaceAt\(decor, p\.x, p\.y\);/);
   });

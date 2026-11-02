@@ -10,6 +10,13 @@
  "bag_furniture_largecabinet": {
   "top": 0
  },
+ "bag_furniture_sdb": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_base/bag_furniture_sdb/bag_furniture_sdb.swf",
+  "sha": "c66ef80edc3b2f4c",
+  "w": 67,
+  "h": 69,
+  "foot": -12
+ },
  "bag_furniture_smallcabinet": {
   "swf": "~/Documents/glitch-audit/glitch-items/furniture/bag_furniture_cabinet_base/bag_furniture_smallcabinet/bag_furniture_smallcabinet.swf",
   "sha": "97d59cc7ea4eea21",
