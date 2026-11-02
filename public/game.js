@@ -925,7 +925,7 @@ import { createQuestTracker } from './js/ui/quest-tracker.js?v=b088b3c7';
 import { bindCountField, countKeyValue, countStepMarkup } from './js/ui/count-chooser.js?v=893305c8';
 import { bindVerbMenu, focusVerbRow, lockVerbMenuSize, makeVerbRow, placeVerbMenu, plainWords, refuseVerbRow, syncVerbDetail, verbMenuKey, verbRowAttrs, verbRowInner, verbRowKeys } from './js/ui/verb-menu.js?v=e9d100c3';
 import { createPromptSettler, promptId } from './js/prompt-settle.js?v=509ba9cc';
-import { clientKeyAction, createHotkeysSheet, isHotkeySheetRelease, isPlainKey } from './js/client-hotkeys.js?v=da9efe52';
+import { clientKeyAction, createHotkeysSheet, isHotkeySheetRelease, isPlainKey } from './js/client-hotkeys.js?v=87795519';
 import { installHeldKeyGuard } from './js/held-keys.js?v=98b96620';
 import { forgetTexture, frameTexture, isFailed, isLoaded, onFailed, onLoaded, textureFromUrl, whenLoaded } from './js/textures.js?v=db2ce452';
 import { FALLBACK_MAX as WORLD_ART_FALLBACK_MAX, worldArtFor } from './js/world-art.js?v=df476660';
@@ -8806,6 +8806,33 @@ function interactReach(t) {
   if (t.classId === 'garden_plot') d *= 0.55;
   if (t.classId === 'garden_new') d *= 1.35;
   return d;
+}
+
+/**
+ * VENDORKEY: the nearest thing in reach that sells (a street spirit's Browse goods, a vendor's
+ * Buy/Sell), within the server's default verb reach of 300 px (main.js doVerb 2939-2967), runs that
+ * verb as a click on it would; with none in reach V says so and opens nothing.
+ */
+const VENDOR_KEY_REACH = 300;
+const VENDOR_KEY_VERBS = ['browse', 'buy_sell'];
+function vendorKey() {
+  if (!player || currentAction) return;
+  const near = interactables
+    .filter((t) => withinReach(t, VENDOR_KEY_REACH))
+    .sort((a, b) => interactDistance(a, player.x, player.y) - interactDistance(b, player.x, player.y));
+  for (const target of near) {
+    const verb = (menuVerbsFor(target) || []).find((v) => VENDOR_KEY_VERBS.includes(v.id));
+    if (!verb) continue;
+    setCanvasData('vendorKey', `${target.classId}:${verb.id}`);
+    if (verb.enabled === false) {
+      toast(verb.reason || 'This vendor is not trading right now.', 2600);
+      return;
+    }
+    requestVerb(target, verb);
+    return;
+  }
+  setCanvasData('vendorKey', 'none');
+  toast('There is no vendor in range.', 2400);
 }
 
 function nearestInteractable(maxD) {
@@ -28353,6 +28380,8 @@ async function main() {
       // N only: C is Camera Mode's, never Make's (TSMainView.as cKeyHandler 790-800).
       if (isPlainKey(e, 'n')) closeMakePanel();
       if (isPlainKey(e, 'l')) closeAvatarPanel();
+      // VENDORKEY: V closes the store it opened.
+      if (isPlainKey(e, 'v') && isVendorOpen()) closeVendor();
       // A side sheet sits beside the world: walking, jumping, Enter and E (and the number keys, with
       // focus outside it) go on to the world; a modal panel keeps every key (js/ui/panel-shell.js).
       const modal = isMailboxOpen() || isHomePanelOpen() || isGardenOpen() || isAvatarOpen() || isShrineOpen();
@@ -28433,9 +28462,11 @@ async function main() {
     // (TSMainView.as 790-800) only starts Camera Mode, and where Camera Mode cannot start
     // (a quest instance, a verb, a panel) C does nothing, so it never falls through to Make.
     if (isPlainKey(e, 'n')) openMakePanel();
-    // Austin 2026-11-02: no Vendor key. A store opens only from its vendor's verbs, as in the
-    // original (street_spirit.js buy_sell -> inc_stores.js openStoreInterface); the client had no
-    // store key (TSMainView.as: V is only a god build's Q+V render switch, 1916-1921).
+    // Austin 2026-11-02: a store opens only from its vendor's verbs, as in the original
+    // (street_spirit.js buy_sell -> inc_stores.js openStoreInterface). VENDORKEY (Austin, later that
+    // day, ticket 42): V runs a vendor in reach's own Browse goods; the client had no store key
+    // (TSMainView.as: V is only a god build's Q+V render switch, 1916-1921), so this one is ours.
+    if (isPlainKey(e, 'v')) vendorKey();
     if (e.key === 'l' || e.key === 'L') openAvatarPanel();
   });
   // A letter let go after Shift comes up lower case: drop both (G221, Shift+S held then Shift let go).

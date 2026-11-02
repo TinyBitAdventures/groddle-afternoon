@@ -7,6 +7,8 @@
  * your location (main.js doStoreBuy 4730-4754 -> getTargetStack 4627-4629, pc.location.apiLockStack);
  * the client's StoreDialog closed when you moved to another street (Dialog.as close_on_move 58,
  * onInvalidate 367-373) and had no store key (TSMainView.as: V only in a god build's Q+V, 1916-1921).
+ * VENDORKEY (Austin, later on 2026-11-02, ticket 42): V is back, but only for a vendor in reach (300 px,
+ * main.js doVerb's default reach): it runs that vendor's own Browse goods, else "There is no vendor in range."
  * Run: node --test tests/vendor-needs-npc.test.js
  */
 import { describe, it } from 'node:test';
@@ -14,7 +16,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { hotkeySections } from '../public/js/client-hotkeys.js?v=da9efe52';
+import { hotkeySections } from '../public/js/client-hotkeys.js?v=87795519';
 import { MENU_ROWS, menuRowFor } from '../public/js/ui/topbar.js?v=9cfbbd95';
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -43,17 +45,24 @@ describe('a store opens only from its vendor', () => {
     assert.equal(menuRowFor('feat-btn').group, 'world');
   });
 
-  it('the key list has no Vendor and nothing took V', () => {
+  it('the key list names V for a vendor in reach, and nothing else took V', () => {
     for (const opts of [{}, { keyring: true, hub: true }]) {
       const rows = hotkeySections(opts).flatMap((s) => s.rows);
-      assert.equal(rows.some((r) => /vendor/i.test(r[0])), false);
-      assert.equal(rows.some((r) => r[1].some((combo) => combo.length === 1 && combo[0] === 'V')), false, 'V is free');
+      const v = rows.filter((r) => r[1].some((combo) => combo.length === 1 && combo[0] === 'V'));
+      assert.deepEqual(v.map((r) => [r[0], r[2]]), [['Vendor', '(A vendor in reach)']]);
     }
   });
 
-  it('V neither opens nor closes the store, and no button opens it', () => {
+  it('V runs a vendor in reach\'s own verb, or says none is in range; it never opens a store by itself', () => {
     assert.doesNotMatch(game, /e\.key === 'v' \|\| e\.key === 'V'/);
-    assert.doesNotMatch(game, /isPlainKey\(e, 'v'\)/);
+    assert.match(game, /if \(isPlainKey\(e, 'v'\)\) vendorKey\(\);/);
+    assert.match(game, /if \(isPlainKey\(e, 'v'\) && isVendorOpen\(\)\) closeVendor\(\);/);
+    const fn = game.slice(game.indexOf('function vendorKey()'), game.indexOf('function nearestInteractable('));
+    assert.match(game, /const VENDOR_KEY_REACH = 300;/);
+    assert.match(fn, /withinReach\(t, VENDOR_KEY_REACH\)/);
+    assert.match(fn, /requestVerb\(target, verb\);/);
+    assert.match(fn, /toast\('There is no vendor in range\.', 2400\);/);
+    assert.doesNotMatch(fn, /openVendor/);
     assert.doesNotMatch(game, /getElementById\('vendor-btn'\)/);
   });
 
