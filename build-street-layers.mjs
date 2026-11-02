@@ -185,8 +185,14 @@ for (const file of files) {
   const gradientAt = xml.indexOf('<object id="gradient">');
   if (gradientAt >= 0) {
     const g = directScalars(objectBody(xml, gradientAt));
-    if (/^[0-9a-f]{6}$/i.test(g.top || '') && /^[0-9a-f]{6}$/i.test(g.bottom || '')) {
-      street.gradient = { top: g.top.toUpperCase(), bottom: g.bottom.toUpperCase() };
+    // Flash wrote colours as numbers, so leading zeros are gone ("50404" is 050404); the client reads
+    // them with parseInt("0x" + color, 16) (ColorUtil.colorStrToNum 20-23). Ticket 39: 196 streets,
+    // Naraka's among them, lost their sky to a 6-digit-only test and drew the meadow sky instead.
+    const hex = (c) => (/^#?[0-9a-f]{1,6}$/i.test(c || '') ? c.replace('#', '').padStart(6, '0').toUpperCase() : null);
+    const top = hex(g.top);
+    const bottom = hex(g.bottom);
+    if (top && bottom) {
+      street.gradient = { top, bottom };
       gradients += 1;
     }
   }

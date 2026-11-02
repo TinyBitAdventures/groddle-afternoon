@@ -8,7 +8,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { glitchLayerMatrix, parallaxLayerOffset } from '../public/js/street-render.js?v=a9394f56';
+import { glitchLayerMatrix, parallaxLayerOffset } from '../public/js/street-render.js?v=1aafd546';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const street = (tsid) =>
@@ -22,6 +22,24 @@ describe('street layer data', () => {
     assert.equal(bg1.w, 2740);
     assert.equal(bg1.h, 990);
     assert.equal(bg1.filters.saturation, -100);
+  });
+
+  it('keeps a gradient Flash wrote without leading zeros, as the client read it (ticket 39)', () => {
+    // ColorUtil.colorStrToNum: parseInt("0x" + color, 16), so "50404" is 050404.
+    assert.deepEqual(street('GA5PV4T79OE2AOA').gradient, { top: '050404', bottom: '850000' }, 'Mahatam Audarika');
+    assert.deepEqual(street('GA5Q57C99OE2GNU').gradient, { top: '7A0000', bottom: '020A06' }, 'Ratna Vitteha');
+    const index = JSON.parse(readFileSync(join(here, '../public/assets/streets/index.json'), 'utf8')).streets;
+    const hell = Object.keys(index).filter((t) => String(index[t].hubId) === '40');
+    assert.ok(hell.length >= 7);
+    for (const tsid of hell) assert.match(street(tsid).gradient?.top || '', /^[0-9A-F]{6}$/, `${tsid} has its own sky`);
+    const skyless = Object.keys(index).filter((t) => /^G/.test(t) && !street(t).gradient);
+    assert.ok(skyless.length <= 11, `${skyless.length} streets draw the painted meadow sky (11 have no gradient in the archive)`);
+  });
+
+  it('draws a black ground skirt black, not as a missing colour (ticket 39, Panka Surazu)', () => {
+    const src = readFileSync(join(here, '../public/js/street-render.js'), 'utf8');
+    assert.match(src, /const fallback = Number\.isFinite\(parsed\) \? parsed : 0x6b8f3c;/);
+    assert.ok(!/16\) \|\| 0x6b8f3c/.test(src));
   });
 
   it('gives every non-middleground layer on Hechey Track a parallax canvas size', () => {

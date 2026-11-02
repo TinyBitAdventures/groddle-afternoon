@@ -1754,7 +1754,9 @@ export function buildStreetView(street, PIXI, opts = {}) {
   const skirtDepth = H - sourceH + Math.max(0, Number(opts.skirtBelow) || 0);
   if (skirtDepth > 0 && opts.renderer) {
     const ground = layerContainers.find((lc) => lc.label === 'middleground');
-    const fallback = parseInt(String(street.gradient?.bottom || '6b8f3c').replace(/^#/, ''), 16) || 0x6b8f3c;
+    // Ticket 39: black (000000) is a colour, not a missing one (Panka Surazu's skirt drew meadow green).
+    const parsed = parseInt(String(street.gradient?.bottom || '').replace(/^#/, ''), 16);
+    const fallback = Number.isFinite(parsed) ? parsed : 0x6b8f3c;
     buildGroundSkirt(PIXI, opts.renderer, root, ground, W, sourceH, skirtDepth, fallback);
   }
   root.decoDrawn = drawn;
