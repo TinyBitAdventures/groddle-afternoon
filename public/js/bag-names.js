@@ -41,6 +41,8 @@
  * trimmed.
  */
 
+import { filterText } from './word-filter.js?v=9a7a7ebb';
+
 /** Every bag class in the source with verbs.rename (the grep above). */
 export const SOURCE_RENAMABLE_BAGS = Object.freeze([
   'bag_alchemistry_kit',
@@ -86,8 +88,14 @@ export function renamedTo(oldName, value) {
   return next || cleanBagName(oldName);
 }
 
-/** getLabel 592-598: the player's name for it, else the class label. */
+/**
+ * getLabel 592-598: the player's name for it, else the class label. The name
+ * is kept as typed (the rename's letters, digits and spaces) and shown through
+ * the word filter (the remake's own addition, js/word-filter.js), so a bad
+ * word shows as a grawlix wherever the name shows, saves made before the
+ * filter too.
+ */
 export function bagLabel(name, classLabel) {
-  return cleanBagName(name) || String(classLabel || '');
+  return filterText(cleanBagName(name)) || String(classLabel || '');
 }
 

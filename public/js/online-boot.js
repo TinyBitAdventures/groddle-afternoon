@@ -18,7 +18,7 @@
  */
 
 import { createMinnAccount } from './minn-account.js?v=ea900c51';
-import { mountAccountForms, resetLinkFrom, verifyLinkFrom } from './account-forms.js?v=b40dbb9f';
+import { mountAccountForms, resetLinkFrom, verifyLinkFrom } from './account-forms.js?v=fe37d0de';
 import { claimCharacter, newWriterId, takeHandoff } from './save-claim.js?v=30cf5250';
 
 const PILL_TEXT = {

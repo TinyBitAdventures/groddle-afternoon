@@ -54,7 +54,7 @@ import {
   normalizePlayerMailSlice,
   playerMailCost,
   sentRow,
-} from '../player-mail.js?v=a1d50656';
+} from '../player-mail.js?v=2e9cc4ea';
 
 export const PLAYER_MAIL_FEATURE_ID = 'player-mail';
 const SYNC_EVERY_MS = 5 * 60_000;

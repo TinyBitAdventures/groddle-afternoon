@@ -46,7 +46,7 @@ import {
   petKitty,
   rollScare,
   stepKitty,
-} from '../heli-kitties.js?v=ee89a5bf';
+} from '../heli-kitties.js?v=8fbe314a';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
 
 export const KITTY_FEATURE_ID = 'heli-kitties';

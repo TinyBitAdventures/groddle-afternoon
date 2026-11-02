@@ -39,7 +39,7 @@ import { setSeasonalRecipeCheck } from '../making.js?v=68521d02';
 import { getToolCondition } from '../tools.js?v=6a9e1314';
 import { landingY, nearestSurfaceY } from '../walk-surface.js?v=c982983e';
 import { isStandable } from '../street-model.js?v=505d8990';
-import { isBatterflyHabitat } from '../animal-husbandry.js?v=7f683879';
+import { isBatterflyHabitat } from '../animal-husbandry.js?v=1e8d5d0e';
 import { emblemCostFor } from '../shrines.js?v=cf7c3993';
 import { rollDropTable } from '../drop-tables.js?v=0f922478';
 import { openNoteView, noteViewOpen } from '../note-view.js?v=21c55475';
@@ -98,11 +98,12 @@ import {
   teachPhrase,
   yetiMailDue,
   yetiQuote,
-} from '../seasons.js?v=886b0b84';
+} from '../seasons.js?v=1978c3f3';
 import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=db2ce452';
 import { playOverlay } from '../overlays.js?v=90f4b1ba';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
-import { MAIL_POST_SENDER } from '../mailbox.js?v=18178bf5';
+import { MAIL_POST_SENDER } from '../mailbox.js?v=b2bde2fe';
+import { filterText } from '../word-filter.js?v=9a7a7ebb';
 
 export const SEASONS_FEATURE_ID = 'seasons';
 const LANTERN_GROUP = 'seasons:lantern';
@@ -940,7 +941,7 @@ function signCard(engine) {
     editBody: '',
     maxBody: 300,
     onSave: (_title, body) => {
-      card.message = String(body || '').trim().slice(0, 300);
+      card.message = filterText(String(body || '').trim().slice(0, 300)); // the remake's own word filter (js/word-filter.js)
       card.signed = true;
       card.from = engine.pc?.name || 'you';
       say(engine, 'You signed the Glitchmas Card. Mail it to someone nice.');

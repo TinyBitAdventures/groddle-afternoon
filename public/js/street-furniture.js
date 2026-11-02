@@ -1,4 +1,5 @@
 import { isItemFloor, platformYAt, worldToScreen } from './street-model.js?v=505d8990';
+import { filterText } from './word-filter.js?v=9a7a7ebb';
 
 /**
  * Street furniture rules: street Mailboxes, placed Notes, Notice Boards and
@@ -378,8 +379,9 @@ export function editNote(note, { title = '', body = '' } = {}, ctx = {}) {
   if (n.lastEditor && n.lastEditor !== me) return { ok: false, error: NOTE_TEXT.notYours };
   const reason = penReason(ctx);
   if (reason) return { ok: false, error: reason === NOTE_TEXT.needQuill ? NOTE_TEXT.quillGone : reason };
-  const nextTitle = cleanText(title, NOTE_LIMITS.title);
-  const nextBody = cleanText(body, NOTE_LIMITS.body);
+  // The word filter (the remake's own addition, js/word-filter.js): written with a bad word as a grawlix.
+  const nextTitle = filterText(cleanText(title, NOTE_LIMITS.title));
+  const nextBody = filterText(cleanText(body, NOTE_LIMITS.body));
   if (!n.initialText && !n.initialTitle && n.body === nextBody && n.title === nextTitle) {
     return { ok: true, unchanged: true, note: n, costs: { quillWear: 0 } };
   }

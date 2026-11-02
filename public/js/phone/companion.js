@@ -21,10 +21,10 @@
  */
 
 import { createMinnAccount } from '../minn-account.js?v=ea900c51';
-import { mountAccountForms, resetLinkFrom, verifyLinkFrom } from '../account-forms.js?v=b40dbb9f';
-import { gateFor, quietSession, suspendedNow } from '../online-boot.js?v=c55ccff7';
+import { mountAccountForms, resetLinkFrom, verifyLinkFrom } from '../account-forms.js?v=fe37d0de';
+import { gateFor, quietSession, suspendedNow } from '../online-boot.js?v=958c5322';
 import { REPORT_MAX, REPORT_TEXT, STATUS_WORDS, createReportsApi, pictureRefused, pictureSrc, refusalWords, reportFromHash, ticketLine, unreadCount, whenWords } from '../reports.js?v=e83d5ec3';
-import { DEVICE_KEY, PHONE_TEXT as T, POLL_MS, createPresenceApi, fitPhoto, friendsView, fullGameHref, itemNamesFrom, itemWords, mailRows, mailboxFromSave, mergePlayerMail, phoneContext, unreadLetters } from './companion-data.js?v=38c3e074';
+import { DEVICE_KEY, PHONE_TEXT as T, POLL_MS, createPresenceApi, fitPhoto, friendsView, fullGameHref, itemNamesFrom, itemWords, mailRows, mailboxFromSave, mergePlayerMail, phoneContext, unreadLetters } from './companion-data.js?v=da54a3c8';
 
 const doc = globalThis.document;
 

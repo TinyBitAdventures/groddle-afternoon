@@ -2,9 +2,9 @@
  * Groddle Afternoon — original street geometry + layered decos
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
-import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=9ac37cff';
+import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=bad66806';
 import { createFeatureHost } from './js/feature-host.js?v=903263a4';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=4decc7ce';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=899ca2e0';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -459,10 +459,10 @@ import {
   removeItem,
   isToolItem,
 } from './js/inventory.js?v=b0e33301';
-import { PACK_COPY, isBagClass, unitRankAt } from './js/pack-slots.js?v=b02c404c';
+import { PACK_COPY, isBagClass, unitRankAt } from './js/pack-slots.js?v=ba0a895f';
 import { createPackRow, mountPackClearance, packBandRange, packCountText, packSearchEntries, packSlotTip } from './js/ui/pack-row.js?v=65c0f180';
-import { listAnimalFeedOptions } from './js/animals.js?v=d34f13bc';
-import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=d34f13bc';
+import { listAnimalFeedOptions } from './js/animals.js?v=a6308230';
+import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=a6308230';
 import {
   createDroppedItemState,
   parseDroppedItemState,
@@ -473,13 +473,13 @@ import {
   pickupDroppedStack,
   placeDroppedBag,
   takeDroppedRecord,
-} from './js/world-items.js?v=e29969b0';
+} from './js/world-items.js?v=d4b33a98';
 import {
   createPlayerSave,
   parsePlayerSave,
   serializePlayerSave,
   restorePlayerSave,
-} from './js/player-save.js?v=4ee358bc';
+} from './js/player-save.js?v=c6e3727d';
 import {
   HOME_INTERIOR_TSID,
   HOME_STREET_TSID,
@@ -506,7 +506,7 @@ import {
   seedMailbox,
   sendMail,
   unreadMailCount,
-} from './js/mailbox.js?v=18178bf5';
+} from './js/mailbox.js?v=b2bde2fe';
 import {
   TOOL_CONDITION_CATALOG,
   createToolConditionState,
@@ -790,7 +790,7 @@ import {
   createAnimalState,
   resetAnimalDay,
   animalStatusLabel,
-} from './js/animals.js?v=d34f13bc';
+} from './js/animals.js?v=a6308230';
 import {
   ensureWoodTreeState,
   pickWoodTool,
@@ -839,7 +839,7 @@ import {
   ensureCubimalItems,
   openCubimalPackage,
   setCubimalFree,
-} from './js/cubimals.js?v=efe75c51';
+} from './js/cubimals.js?v=1224ad3e';
 import {
   STOOT_DOLL_BUBBLE_MS,
   STOOT_DOLL_ID,
@@ -889,7 +889,7 @@ import {
   ANIMAL_PATROL,
   nearestPlacementGap,
 } from './js/street-ecology.js?v=75086599';
-import { chickenPauseRoll, easeToward, flightFloorAt, flightFloorFor, flyerLift } from './js/street-creatures.js?v=6425488e';
+import { chickenPauseRoll, easeToward, flightFloorAt, flightFloorFor, flyerLift } from './js/street-creatures.js?v=71b36a9e';
 import { createSoundBoard, DEFAULT_SFX_VOLUME, watchButtonClicks, watchPanelSounds } from './js/sound-board.js?v=a1c4a308';
 import {
   actionLoopFor,
@@ -943,6 +943,7 @@ import { SPEECH_HOLD_MARGIN, clearSpeechOfBox, deepestSpeechTip, giveArtHeight, 
 import { shrineDonationResponseKey, verbResponse } from './js/verb-responses.js?v=3ceb8a8c';
 import { itemZ } from './js/item-bands.js?v=e98b10bc';
 import { SLUG_ANIMATION, SLUG_LAYOUT, SLUG_STYLES, SLUG_TARGETS, drawSlugIcon, formatRawSlugs, formatSlugList, layoutSlugRow, slugBox, slugNumber, slugPillPath, slugSign, speechSlugList } from './js/speech-slugs.js?v=130338f9';
+import { filterText } from './js/word-filter.js?v=9a7a7ebb'; // the remake's own word filter
 // The interface skin (js/classic/ui-mode.js) sets <html data-ui> as it loads: before main(), so before the boot cover lifts.
 import { installInterfaceSettings } from './js/classic/classic-prefs.js?v=fd177dd9';
 
@@ -12365,7 +12366,7 @@ function spawnDroppedItemStack(stack) {
   entityLayer.addChild(spr);
   droppedItemSprites.push(spr);
   // A named bag goes by its own name, its class first on the subtitle (items/bag_bigger.js getLabel 592-598).
-  const named = stack.name ? { label: stack.name, kind: item.label || stack.classTsid } : features.query('itemDisplayName', stack.classTsid);
+  const named = stack.name ? { label: filterText(stack.name), kind: item.label || stack.classTsid } : features.query('itemDisplayName', stack.classTsid);
   register({
     classId: 'dropped_item',
     label: named?.label || item.label || stack.classTsid,
@@ -12567,7 +12568,7 @@ function dropPackBag(classTsid, key) {
   const result = placeDroppedBag(droppedItemState, droppedStacksTsid(), classTsid, res.contents, { x, y }, { now: Date.now(), name: res.name || '' });
   saveDroppedItems();
   refreshDroppedWorldItems();
-  const label = res.name || ITEM_CATALOG[classTsid]?.label || classTsid.replace(/_/g, ' ');
+  const label = filterText(res.name || '') || ITEM_CATALOG[classTsid]?.label || classTsid.replace(/_/g, ' ');
   const line = `You dropped 1× ${label}.`;
   toast(line);
   pushActivity(line);
@@ -12608,7 +12609,7 @@ function pickupDroppedBag(target) {
     return false;
   }
   saveDroppedItems();
-  const label = record.name || ITEM_CATALOG[record.classTsid]?.label || record.classTsid.replace(/_/g, ' ');
+  const label = filterText(record.name || '') || ITEM_CATALOG[record.classTsid]?.label || record.classTsid.replace(/_/g, ' ');
   const line = `You picked up 1× ${label}.`;
   toast(line);
   pushActivity(line);
@@ -24035,12 +24036,15 @@ function handleFeatResult(result, participant) {
 }
 
 function sayLocalChat(message, participant = 'Ur', { quietActivity = false } = {}) {
-  const text = String(message || '').trim().slice(0, 180);
-  if (!text) return { ok: false, reason: 'empty' };
+  const typed = String(message || '').trim().slice(0, 180);
+  if (!typed) return { ok: false, reason: 'empty' };
+  // The word filter (the remake's own addition, js/word-filter.js): the line is shown with a bad word as a grawlix.
+  const text = filterText(typed);
   const result = submitIncantation(featState, text, participant, Date.now());
-  // Multiplayer: the player's line also goes to the street, under their own name (realtime-feature).
+  // Multiplayer: the player's line also goes to the street, under their own name (realtime-feature);
+  // the server filters it for everyone and its chat log keeps what was typed.
   const shown = participant === 'Ur' ? features.query('playerChatName', engine) || participant : participant;
-  if (participant === 'Ur') features.query('localChatSaid', text, engine);
+  if (participant === 'Ur') features.query('localChatSaid', typed, engine);
   showLocalChatBubble(shown, text, { feat: result.matched || result.broken, mine: participant === 'Ur' });
   // The Local chat dock keeps the whole chain. In-world, keep only the current
   // speaker readable instead of stacking three large bubbles over the actors.

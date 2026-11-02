@@ -59,7 +59,7 @@ import {
   STACKMAX,
   TOOL_CLASSES,
 } from './pack-slots-data.js?v=330c51e4';
-import { canRenameBag, cleanBagName, renamedTo } from './bag-names.js?v=0d896c8f';
+import { bagLabel, canRenameBag, cleanBagName, renamedTo } from './bag-names.js?v=22391c55';
 
 /** PC.as:48 pack_slots; items/bag.js:1. */
 export const PACK_CAPACITY = 16;
@@ -277,7 +277,7 @@ export function layoutPack(inv, prefs = null, opts = {}) {
   const openBox = (inst) => {
     const def = BAG_DEFS[inst.cls];
     // getLabel 592-598: the bag's own name, else its class label (className keeps the latter).
-    const box = { key: inst.key, cls: inst.cls, label: inst.name || labelOf(inst.cls), name: inst.name, className: labelOf(inst.cls), capacity: def.capacity, holds: def.holds, limited: def.limited, onePerClass: Boolean(def.onePerClass), slots: [] };
+    const box = { key: inst.key, cls: inst.cls, label: bagLabel(inst.name, labelOf(inst.cls)), name: inst.name, className: labelOf(inst.cls), capacity: def.capacity, holds: def.holds, limited: def.limited, onePerClass: Boolean(def.onePerClass), slots: [] };
     boxes.set(inst.key, box);
     return box;
   };

@@ -35,6 +35,8 @@
  * - furniture_rug.js verbs.munch: FOX_EAT and feeling_called_love.
  */
 
+import { filterText } from './word-filter.js?v=9a7a7ebb';
+
 /** potion_base: apiSetTimerX('onQuaffComplete' | 'onPourComplete', 2500). */
 export const POTION_ACTION_MS = 2500;
 /** potion_animal_youth / potion_trantsformation_fluid findCloseStack(…, 200). */
@@ -533,10 +535,10 @@ export function sauceWord(value) {
 }
 
 /** getLabel: "Alphabet Sauce spelling <word>". */
-export const sauceLabel = (word) => `Alphabet Sauce spelling ${word}`;
+export const sauceLabel = (word) => `Alphabet Sauce spelling ${filterText(word)}`; // the remake's own word filter
 
 /** onPour's sendLocationActivity to everyone else here. */
-export const sauceStreetLine = (name, word) => `${name} poured an Alphabet Sauce to try and spell: ${word}`;
+export const sauceStreetLine = (name, word) => `${name} poured an Alphabet Sauce to try and spell: ${filterText(word)}`;
 
 /** The 450 x 450 hit box, centred on the puddle and rising from its feet. */
 export function inSauce(item, px, py, bodyH = 90) {

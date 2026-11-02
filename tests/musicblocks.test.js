@@ -37,7 +37,7 @@ import {
   countItem,
   createInventory,
 } from '../public/js/inventory.js?v=b0e33301';
-import { getVerbsFor, runVerb } from '../public/content.js?v=9ac37cff';
+import { getVerbsFor, runVerb } from '../public/content.js?v=bad66806';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const publicRoot = join(here, '../public');

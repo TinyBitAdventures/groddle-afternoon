@@ -46,6 +46,7 @@
 import { TOWER_ROOM_SPOTS } from './tower-rooms.js?v=eeebce6f';
 import { TOWER_PART_CHOICES, TOWER_VARIANT_ART } from './home-tower-art.js?v=564b782e';
 import { loseEnergy } from './metabolics.js?v=8504134e';
+import { filterText } from './word-filter.js?v=9a7a7ebb';
 
 export { TOWER_PART_CHOICES, TOWER_VARIANT_ART };
 
@@ -484,9 +485,13 @@ export const PROTO_ART = Object.freeze({
 const whole = (v) => Math.max(0, Math.floor(Number(v) || 0));
 const cleanId = (v) => String(v || '').replace(/[^a-z0-9_]/gi, '').slice(0, 40);
 
-/** furniture_tower_chassis.setUserName: 25 chars through the client's regex. */
+/**
+ * furniture_tower_chassis.setUserName: 25 chars through the client's regex,
+ * then the remake's own word filter (js/word-filter.js). The regex has no % or
+ * *, so a grawlix loses those two when the name is cleaned again on load.
+ */
 export function cleanTowerName(value) {
-  return value ? String(value).substr(0, 25).replace(/[^a-z0-9/&\-!?.$()#@~+'",_\\ ]/gi, '') : '';
+  return value ? filterText(String(value).substr(0, 25).replace(/[^a-z0-9/&\-!?.$()#@~+'",_\\ ]/gi, '')) : '';
 }
 
 function cleanGot(job, got) {

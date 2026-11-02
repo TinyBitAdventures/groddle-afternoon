@@ -31,10 +31,10 @@ import {
   tendCounters,
   tendedText,
 } from '../public/js/neighbours-mp.js?v=a8d5544e';
-import { createButlerState, nextHandover, normalizeButlerState, packagesAndMessagesForOwner } from '../public/js/butler.js?v=9d29b9b4';
+import { createButlerState, nextHandover, normalizeButlerState, packagesAndMessagesForOwner } from '../public/js/butler.js?v=86316578';
 import { createGarden, tickGarden } from '../public/js/garden.js?v=86ed507d';
-import { butlerApi } from '../public/js/features/butler-feature.js?v=3090480b';
-import { neighboursMpFeature } from '../public/js/features/neighbours-mp-feature.js?v=0f46deda';
+import { butlerApi } from '../public/js/features/butler-feature.js?v=fd30eb7c';
+import { neighboursMpFeature } from '../public/js/features/neighbours-mp-feature.js?v=6cec30ee';
 import { createMinnAccount } from '../public/js/minn-account.js?v=ea900c51';
 import { HAS_SERVER, HAS_SITE, SITE_DIR, serverPath, sitePath } from '../tools/repos.mjs';
 
@@ -44,7 +44,7 @@ const hasPhp = spawnSync('php', ['-v']).status === 0;
 const skipSite = !HAS_SITE ? 'no groddle-afternoon-site checkout' : !hasPhp ? 'no php' : false;
 
 function php(body) {
-  const code = `foreach (['Economy', 'LedgerMath', 'ButlerParcels', 'HomeTending'] as $c) require ${JSON.stringify(SITE_DIR)} . "/src/$c.php"; use Groddle\\Minn\\ButlerParcels; use Groddle\\Minn\\HomeTending; ${body}`;
+  const code = `foreach (['Economy', 'LedgerMath', 'WordFilter', 'ButlerParcels', 'HomeTending'] as $c) require ${JSON.stringify(SITE_DIR)} . "/src/$c.php"; use Groddle\\Minn\\ButlerParcels; use Groddle\\Minn\\HomeTending; ${body}`;
   return JSON.parse(execFileSync('php', ['-r', code]).toString());
 }
 

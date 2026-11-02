@@ -61,7 +61,7 @@
  *   that comes back from the Post waits the same way.
  */
 
-import { MAIL_POST_SENDER } from './mailbox.js?v=18178bf5';
+import { MAIL_POST_SENDER } from './mailbox.js?v=b2bde2fe';
 
 export const PLAYER_MAIL_RULES = Object.freeze({
   textMax: 300,

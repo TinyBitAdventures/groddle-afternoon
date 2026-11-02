@@ -104,10 +104,10 @@ import {
   takeBag,
   unitPlaces,
   unitRankAt,
-} from '../pack-slots.js?v=b02c404c';
+} from '../pack-slots.js?v=ba0a895f';
 import { TOOL_CONDITION_CATALOG, moveToolCopy, pickToolCopies, placeToolCopies } from '../tools.js?v=6a9e1314';
 import { createMinnAccount } from '../minn-account.js?v=ea900c51';
-import { BAG_NAME_MAX, BAG_RENAME_COPY, canRenameBag, cleanBagName, renamedTo } from '../bag-names.js?v=0d896c8f';
+import { BAG_NAME_MAX, BAG_RENAME_COPY, bagLabel, canRenameBag, cleanBagName, renamedTo } from '../bag-names.js?v=22391c55';
 import { openNamePrompt } from '../ui/name-prompt.js?v=142b551a';
 
 export const BAGS_FEATURE_ID = 'bags';
@@ -486,16 +486,21 @@ function applyBagName(engine, key, value) {
   return res;
 }
 
-/** verbs.rename handler 501-519: the input box for one bag, its name filled in. */
+/**
+ * verbs.rename handler 501-519: the input box for one bag, its name filled in
+ * as it shows (through the word filter, js/bag-names.js bagLabel); OK on that
+ * shown name unchanged keeps the name as it was.
+ */
 function askBagName(current, onName) {
+  const shown = bagLabel(current, '');
   openNamePrompt({
     title: BAG_RENAME_COPY.title,
     label: BAG_RENAME_COPY.input,
-    value: current || '',
+    value: shown,
     maxChars: BAG_NAME_MAX,
     // input_restrict 'A-Z a-z 0-9'.
     restrict: /[^a-z0-9 ]/gi,
-    onSubmit: onName,
+    onSubmit: (typed) => onName(shown && typed === shown ? current : typed),
   });
 }
 

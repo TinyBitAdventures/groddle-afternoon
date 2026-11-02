@@ -30,11 +30,11 @@
  */
 
 import { createMinnAccount } from '../minn-account.js?v=ea900c51';
-import { mountAccountForms, mountAccountSettings } from '../account-forms.js?v=b40dbb9f';
+import { mountAccountForms, mountAccountSettings } from '../account-forms.js?v=fe37d0de';
 import { createBrowserSaveStore, freezeSoloSaves, restoreSoloSave, saveStore, savedAtOf, soloSaveSnapshot } from '../save-store.js?v=8839ba7b';
 import { formatGameDayLabel } from '../game-day.js?v=edb00566';
 import { multiplayerEntryUrl } from '../game-mode.js?v=1ecf2899';
-import { quietSession } from '../online-boot.js?v=c55ccff7';
+import { quietSession } from '../online-boot.js?v=958c5322';
 
 /** Which slot a new backup goes to: the first empty one, else the oldest (which then needs a yes). */
 export function slotForNewBackup(backups, slots) {

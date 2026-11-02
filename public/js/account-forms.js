@@ -42,11 +42,25 @@
  * 'reset' | 'verify' }) runs once the session and its nonce are in place.
  */
 
+import { hasBadWord, NAME_REFUSED } from './word-filter.js?v=9a7a7ebb';
+
 /** Google Identity Services, loaded only when the site has a Google client id. */
 export const GOOGLE_SCRIPT = 'https://accounts.google.com/gsi/client';
 
 /** Cloudflare's widget script, loaded only when the site has a Turnstile site key. */
 export const TURNSTILE_SCRIPT = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
+
+/**
+ * A character name's first problem, or '' (the site's PlayerAccount::NAME and
+ * its words). A name with a bad word is refused with "Please pick a different
+ * name." (the word filter, the remake's own addition: names are refused, never
+ * filtered; the site refuses it too).
+ */
+export function characterNameProblem(name) {
+  const n = String(name || '').trim().replace(/\s+/g, ' ');
+  if (!/^[A-Za-z0-9](?:[A-Za-z0-9 _-]{1,17})[A-Za-z0-9]$/.test(n)) return 'Names are 3 to 19 letters, numbers, spaces, - or _, starting and ending with a letter or number.';
+  return hasBadWord(n) ? NAME_REFUSED : '';
+}
 
 /**
  * The account calls the forms make beyond js/minn-account.js: the card's
@@ -695,7 +709,8 @@ export function mountAccountForms(host, { account, start = 'signin', reset = nul
       const missing = {};
       if (!values.email.includes('@')) missing.email = 'Enter your email.';
       if (values.password.length < 8) missing.password = 'Passwords need at least 8 characters.';
-      if (!/^[A-Za-z0-9](?:[A-Za-z0-9 _-]{1,17})[A-Za-z0-9]$/.test(values.name)) missing.name = 'Names are 3 to 19 letters, numbers, spaces, - or _, starting and ending with a letter or number.';
+      const nameProblem = characterNameProblem(values.name);
+      if (nameProblem) missing.name = nameProblem;
       if (Object.keys(missing).length) return showRefusal({ fields: missing }, fields);
       const r = await withTurnstile('signup', () => account.signUp(values), async (token) => {
         const answer = await requests.signUp({ ...values, turnstile: token });
@@ -757,7 +772,8 @@ export function mountAccountForms(host, { account, start = 'signin', reset = nul
     e.preventDefault();
     submit(finish, vfSubmit, FORM_COPY.verify.busy, async () => {
       const name = vfName.input.value.trim().replace(/\s+/g, ' ');
-      if (!/^[A-Za-z0-9](?:[A-Za-z0-9 _-]{1,17})[A-Za-z0-9]$/.test(name)) return showRefusal({ fields: { name: 'Names are 3 to 19 letters, numbers, spaces, - or _, starting and ending with a letter or number.' } }, { name: vfName });
+      const nameProblem = characterNameProblem(name);
+      if (nameProblem) return showRefusal({ fields: { name: nameProblem } }, { name: vfName });
       await finishSignUp(name);
     });
   });
@@ -777,7 +793,8 @@ export function mountAccountForms(host, { account, start = 'signin', reset = nul
     e.preventDefault();
     submit(googleName, gnSubmit, FORM_COPY.google.busy, async () => {
       const name = gnName.input.value.trim().replace(/\s+/g, ' ');
-      if (!/^[A-Za-z0-9](?:[A-Za-z0-9 _-]{1,17})[A-Za-z0-9]$/.test(name)) return showRefusal({ fields: { name: 'Names are 3 to 19 letters, numbers, spaces, - or _, starting and ending with a letter or number.' } }, { name: gnName });
+      const nameProblem = characterNameProblem(name);
+      if (nameProblem) return showRefusal({ fields: { name: nameProblem } }, { name: gnName });
       if (!googlePending) return show('signin');
       const r = await requests.googleFinish({ ...googlePending, name });
       if (r.ok) return googleSignedIn(r);

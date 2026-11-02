@@ -12,6 +12,7 @@
 
 import { metabolicGain, moodMax, loseEnergy } from './metabolics.js?v=8504134e';
 import { grantMoodXp } from './mood-xp.js?v=958e7680';
+import { filterText } from './word-filter.js?v=9a7a7ebb';
 export const KITTY_ID = 'npc_kitty_chicken';
 export const KITTY_LABEL = 'Heli Kitty';
 export const KITTY_PLURAL = 'Heli Kitties';
@@ -223,14 +224,14 @@ export function nameKitty(kitty, value, { learned = [], playerId = 'player', now
     ok: true,
     name,
     previous,
-    bubble: `And they shall call me "${name}"`,
+    bubble: `And they shall call me "${filterText(name)}"`,
     counter: `animals_named:${KITTY_ID}`,
   };
 }
 
-/** getLabel: 'A Heli Kitty Named X'. */
+/** getLabel: 'A Heli Kitty Named X' (the name through the remake's own word filter, js/word-filter.js). */
 export function kittyLabel(kitty) {
-  return kitty?.name ? `A ${KITTY_LABEL} Named ${kitty.name}` : KITTY_LABEL;
+  return kitty?.name ? `A ${KITTY_LABEL} Named ${filterText(kitty.name)}` : KITTY_LABEL;
 }
 
 /** fly(): a kick up and sideways; flying blocks petting until it lands. */

@@ -15,6 +15,8 @@
  * 160-225, SnapTravelView.as (the travel screen).
  */
 
+import { filterText } from './word-filter.js?v=9a7a7ebb';
+
 export const CAMERA_CLASS = 'camera';
 export const RECHARGE_BUFF = 'camera_recharging';
 export const SNAPSHOTTERY = 'snapshotting';
@@ -137,7 +139,7 @@ export function cleanCaption(text) {
     .replace(/\s+/gu, ' ')
     .replace(/\p{C}/gu, '')
     .trim();
-  return [...s].slice(0, CAPTION_MAX).join('');
+  return filterText([...s].slice(0, CAPTION_MAX).join('')); // the remake's own word filter (the site's Snaps::caption too)
 }
 
 /** A served Snap URL the game will load: the site's own folder, a name Snaps wrote. */

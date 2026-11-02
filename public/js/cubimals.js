@@ -13,6 +13,7 @@ import {
   ensureItem,
   removeItem,
 } from './inventory.js?v=b0e33301';
+import { filterText } from './word-filter.js?v=9a7a7ebb';
 
 export const CUBIMAL_PACKAGE_IDS = Object.freeze({
   1: 'cubimal_package',
@@ -416,7 +417,7 @@ export function cubimalNameVerb(names, classTsid) {
 /** onInputBoxResponse 43-49: an empty or unchanged name does nothing. */
 export function nameCubimal(names, classTsid, value) {
   if (!isCubimal(classTsid)) return { ok: false, reason: 'not_cubimal' };
-  const name = sanitizeCubimalName(value);
+  const name = filterText(sanitizeCubimalName(value)); // the remake's own word filter (js/word-filter.js)
   const previous = names?.[classTsid] || '';
   if (!name || name === previous) return { ok: false, reason: name ? 'unchanged' : 'empty' };
   names[classTsid] = name;

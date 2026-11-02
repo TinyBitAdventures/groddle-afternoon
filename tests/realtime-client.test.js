@@ -34,7 +34,7 @@ import {
 } from '../public/js/realtime-client.js?v=f19c76a1';
 import { createMinnAccount } from '../public/js/minn-account.js?v=ea900c51';
 import { emoteCommand, lookOf, poseOf, realtimeFeature, sharedStreet, statusText } from '../public/js/features/realtime-feature.js?v=c6f08935';
-import { FEATURES } from '../public/js/features/index.js?v=4decc7ce';
+import { FEATURES } from '../public/js/features/index.js?v=899ca2e0';
 
 const root = join(import.meta.dirname, '..');
 const read = (rel) => readFileSync(join(root, rel), 'utf8');
@@ -606,7 +606,8 @@ describe('realtime feature', () => {
 
   it('game.js hands the feature the chat and the Glitch packs, nothing more', () => {
     const game = read('public/game.js');
-    assert.match(game, /features\.query\('localChatSaid', text, engine\)/);
+    // The typed line goes to the server (it filters it for everyone; its chat log keeps it as typed, js/word-filter.js).
+    assert.match(game, /features\.query\('localChatSaid', typed, engine\)/);
     assert.match(game, /features\.query\('playerChatName', engine\)/);
     assert.match(game, /glitchPack\(look\)/);
     assert.match(game, /heldGlitchAnims\.has\(bake\.pack\.anims\)/);

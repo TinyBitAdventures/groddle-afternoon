@@ -30,6 +30,7 @@
  */
 
 import { SEASON_DATA } from './seasons-data.js?v=b5174bc9';
+import { filterText } from './word-filter.js?v=9a7a7ebb';
 
 const DAY_MS = 86_400_000;
 
@@ -316,7 +317,7 @@ export function placeCheck(ctx = {}) {
 /** lit_pumpkin_base teach: three phrases at most, 150 characters each. */
 export function teachPhrase(phrases, text) {
   const list = Array.isArray(phrases) ? phrases : [];
-  const value = String(text || '').trim().slice(0, 150);
+  const value = filterText(String(text || '').trim().slice(0, 150)); // the remake's own word filter (js/word-filter.js)
   if (!value) return { ok: false, msg: '' };
   if (list.length >= 3) return { ok: false, msg: SOURCE_LINES.teachFull };
   list.push(value);

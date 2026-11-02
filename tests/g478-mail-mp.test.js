@@ -31,12 +31,12 @@ import {
   normalizePlayerMailSlice,
   playerMailCost,
   sentRow,
-} from '../public/js/player-mail.js?v=a1d50656';
-import { playerMailFeature } from '../public/js/features/player-mail-feature.js?v=b2334fd2';
-import { createMailboxState, deliverMail, listMailboxMessages, mailCost, normalizeMailboxState, recordSentMail } from '../public/js/mailbox.js?v=18178bf5';
-import { handOver, isExpressPending, sendDueToMailbox } from '../public/js/mail-courier.js?v=d525206a';
+} from '../public/js/player-mail.js?v=2e9cc4ea';
+import { playerMailFeature } from '../public/js/features/player-mail-feature.js?v=41d97c4d';
+import { createMailboxState, deliverMail, listMailboxMessages, mailCost, normalizeMailboxState, recordSentMail } from '../public/js/mailbox.js?v=b2bde2fe';
+import { handOver, isExpressPending, sendDueToMailbox } from '../public/js/mail-courier.js?v=12d7d7a4';
 import { mailText } from '../public/js/ui/topbar.js?v=9cfbbd95';
-import { mergePlayerMail } from '../public/js/phone/companion-data.js?v=38c3e074';
+import { mergePlayerMail } from '../public/js/phone/companion-data.js?v=da54a3c8';
 import { mailJson } from '../tools/build-mail.mjs';
 import { ITEM_BASE_COSTS } from '../public/js/store-catalog.js?v=79d4de8a';
 import { HAS_SITE, SITE_DIR, sitePath } from '../tools/repos.mjs';
@@ -46,7 +46,7 @@ const hasPhp = spawnSync('php', ['-v']).status === 0;
 const skipSite = !HAS_SITE ? 'no groddle-afternoon-site checkout' : !hasPhp ? 'no php' : false;
 
 function php(body) {
-  const code = `foreach (['Economy', 'LedgerMath', 'LedgerGift', 'LedgerMail'] as $c) require ${JSON.stringify(SITE_DIR)} . "/src/$c.php"; use Groddle\\Minn\\LedgerMail; ${body}`;
+  const code = `foreach (['Economy', 'LedgerMath', 'WordFilter', 'LedgerGift', 'LedgerMail'] as $c) require ${JSON.stringify(SITE_DIR)} . "/src/$c.php"; use Groddle\\Minn\\LedgerMail; ${body}`;
   return JSON.parse(execFileSync('php', ['-r', code]).toString());
 }
 

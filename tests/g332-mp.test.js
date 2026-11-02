@@ -29,7 +29,7 @@ import {
   unwrapPack,
   wrapBox,
 } from '../public/js/gifts.js?v=d0732a90';
-import { giftsFeature } from '../public/js/features/gifts-feature.js?v=6a7e9833';
+import { giftsFeature } from '../public/js/features/gifts-feature.js?v=58e6b682';
 import { HAS_SERVER, HAS_SITE, SITE_DIR, serverPath, sitePath } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');
@@ -38,7 +38,7 @@ const hasPhp = spawnSync('php', ['-v']).status === 0;
 const skipSite = !HAS_SITE ? 'no groddle-afternoon-site checkout' : !hasPhp ? 'no php' : false;
 
 function php(body) {
-  const code = `foreach (['Economy', 'LedgerMath', 'LedgerGift'] as $c) require ${JSON.stringify(SITE_DIR)} . "/src/$c.php"; use Groddle\\Minn\\LedgerGift; use Groddle\\Minn\\LedgerMath; use Groddle\\Minn\\Economy; ${body}`;
+  const code = `foreach (['Economy', 'LedgerMath', 'WordFilter', 'LedgerGift'] as $c) require ${JSON.stringify(SITE_DIR)} . "/src/$c.php"; use Groddle\\Minn\\LedgerGift; use Groddle\\Minn\\LedgerMath; use Groddle\\Minn\\Economy; ${body}`;
   return JSON.parse(execFileSync('php', ['-r', code]).toString());
 }
 

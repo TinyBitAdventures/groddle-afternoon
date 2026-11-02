@@ -30,10 +30,10 @@ import {
   tabCommand,
   tabOrder,
   writeMemory,
-} from '../public/js/groups.js?v=65337c22';
+} from '../public/js/groups.js?v=b9076c50';
 import { createMinnAccount } from '../public/js/minn-account.js?v=ea900c51';
-import { groupsFeature } from '../public/js/features/groups-feature.js?v=d41023ea';
-import { FEATURES } from '../public/js/features/index.js?v=4decc7ce';
+import { groupsFeature } from '../public/js/features/groups-feature.js?v=246c9845';
+import { FEATURES } from '../public/js/features/index.js?v=899ca2e0';
 import { serverPath, sitePath, skipWithoutServer, skipWithoutSite } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');

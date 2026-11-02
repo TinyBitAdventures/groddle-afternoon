@@ -15,7 +15,7 @@ import { SITE_DIR, sitePath, serverPath, skipWithoutSite, skipWithoutServer, HAS
 import { ADMIN_TEXT, ADMIN_TEXT_MAX, adminGiveGoods, adminMessageText, applyAdminGive, applyAdminRefill, bootedLine, showAdminMessage, showBooted } from '../public/js/admin-console-mp.js?v=ec34b27a';
 import { CLOSE_BANNED, CLOSE_BOOTED, createRealtimeClient } from '../public/js/realtime-client.js?v=f19c76a1';
 import { statusText } from '../public/js/features/realtime-feature.js?v=c6f08935';
-import { GATE_COPY, suspendedNow } from '../public/js/online-boot.js?v=c55ccff7';
+import { GATE_COPY, suspendedNow } from '../public/js/online-boot.js?v=958c5322';
 
 const root = join(import.meta.dirname, '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');

@@ -11,6 +11,8 @@
  *   are claimed independently from reading.
  */
 
+import { filterText } from './word-filter.js?v=9a7a7ebb';
+
 export const MAIL_BASE_COST = 2;
 export const MAIL_TEXT_LIMIT = 500;
 export const MAIL_COMPANIONS = Object.freeze([
@@ -223,7 +225,7 @@ export function sendMail(
   const normalized = normalizeMailboxState(state);
   Object.assign(state, normalized);
   const to = cleanParty(recipient, '');
-  const body = cleanText(text);
+  const body = filterText(cleanText(text)); // the remake's own word filter (js/word-filter.js)
   if (!COMPANION_SET.has(to)) return { ok: false, reason: 'recipient' };
   if (!body) return { ok: false, reason: 'empty' };
 

@@ -131,7 +131,7 @@ import { frameTexture, onLoaded, sourceFromUrl, textureFromUrl } from '../textur
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 import { displayTopOf, itemstackOverlayPoint, playPoofIn, playSheetOverlay, poofInAlpha } from '../overlay-art.js?v=3753a0d2';
 import { HOME_MACHINE } from '../home-ticket.js?v=dd702301';
-import { animalAnchorX, createAnimalState } from '../animals.js?v=d34f13bc';
+import { animalAnchorX, createAnimalState } from '../animals.js?v=a6308230';
 import {
   AK_ANIMALS,
   AK_BUBBLE,
@@ -148,6 +148,7 @@ import {
   akVerbReaction,
   createAkState,
 } from '../skillquest-ak.js?v=281b956d';
+import { filterText } from '../word-filter.js?v=9a7a7ebb';
 
 export const NEWXP_FEATURE_ID = 'newxp';
 /** newxp_training1.js 705-706 slothRemove: deleteWithPoof, then hideTree 0.5 s later. */
@@ -1579,7 +1580,7 @@ async function runTraining1(t) {
   if (!save.name) {
     await talk(t, fl, LINES.t1Name, { buttons: ['Hmm …'] });
     const res = await talk(t, fl, LINES.t1NamePrompt, { buttons: ['OK'], input: { max: 19, placeholder: 'Your name' } });
-    const name = String(res?.text || '').replace(/[<>]/g, '').trim().slice(0, 19);
+    const name = filterText(String(res?.text || '').replace(/[<>]/g, '').trim().slice(0, 19)); // the remake's own word filter (js/word-filter.js)
     save.name = name || 'Glitchling';
     engine.save();
   }

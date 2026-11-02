@@ -10,6 +10,8 @@
  * TradeChannelDialog.as).
  */
 
+import { hasBadWord, NAME_REFUSED } from './word-filter.js?v=9a7a7ebb';
+
 /** config_prod.js:39 max_groups. */
 export const GROUPS_MAX = 20;
 /** Lines each chat tab keeps (the server's history ring is the same size, channels.go chanHistory). */
@@ -194,7 +196,9 @@ export function tabCommand(text) {
 /** A group name's first problem, or '' (Groups::NAME and the site's words). */
 export function groupNameProblem(name) {
   const n = String(name || '').replace(/\s+/g, ' ').trim();
-  return GROUP_NAME.test(n) ? '' : 'Group names are 3 to 32 letters, numbers, spaces, - or _, starting and ending with a letter or number.';
+  if (!GROUP_NAME.test(n)) return 'Group names are 3 to 32 letters, numbers, spaces, - or _, starting and ending with a letter or number.';
+  // The word filter (the remake's own addition): a name with a bad word is refused, as the site's Groups::create does.
+  return hasBadWord(n) ? NAME_REFUSED : '';
 }
 
 /** What the game remembers per player: the chats open and the tab in front (a per-viewer convenience). */

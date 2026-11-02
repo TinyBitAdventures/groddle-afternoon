@@ -62,7 +62,7 @@ import {
   tabCommand,
   tabOrder,
   writeMemory,
-} from '../groups.js?v=65337c22';
+} from '../groups.js?v=b9076c50';
 
 export const GROUPS_FEATURE_ID = 'groups';
 

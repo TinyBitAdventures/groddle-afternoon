@@ -18,7 +18,7 @@ import {
   openCubimalPackage,
   selectCubimal,
   setCubimalFree,
-} from '../public/js/cubimals.js?v=efe75c51';
+} from '../public/js/cubimals.js?v=1224ad3e';
 import {
   ITEM_CATALOG,
   addItem,

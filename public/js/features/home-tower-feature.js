@@ -108,7 +108,7 @@ import {
   towerSecretText,
   towerSpotsFor,
   workCheck,
-} from '../home-tower.js?v=b05c58d8';
+} from '../home-tower.js?v=3d4486de';
 import { textureFromUrl } from '../textures.js?v=db2ce452';
 import { pieceUrl } from '../home-wallpaper.js?v=e676f00f';
 import { wantsHiresDecos } from '../deco-hires.js?v=cb905e17';

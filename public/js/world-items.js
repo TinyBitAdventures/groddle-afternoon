@@ -7,7 +7,7 @@
  * coupling it to Pixi or DOM state.
  */
 import { addItem, removeItem } from './inventory.js?v=b0e33301';
-import { canRenameBag, cleanBagName } from './bag-names.js?v=0d896c8f';
+import { canRenameBag, cleanBagName } from './bag-names.js?v=22391c55';
 
 export const WORLD_ITEM_STATE_VERSION = 1;
 export const DEFAULT_MERGE_RADIUS = 56;

@@ -15,7 +15,7 @@ define('ABSPATH', sys_get_temp_dir() . '/');
 define('MINN_ENGINE_DIR', $engine);
 require $engine . '/src/Minn/Autoloader.php';
 Minn\Autoloader::register();
-foreach (['SaveShape', 'Characters', 'MultiplayerSave', 'Profiles', 'Buddies', 'StaticRoot', 'SiteNav', 'PlayerPages'] as $class) {
+foreach (['WordFilter', 'SaveShape', 'Characters', 'MultiplayerSave', 'Profiles', 'Buddies', 'StaticRoot', 'SiteNav', 'PlayerPages'] as $class) {
     require_once $extension . "/src/{$class}.php";
 }
 

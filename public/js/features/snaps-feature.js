@@ -33,7 +33,7 @@ import { STREET_INDEX, resolveIndexTsid } from '../street-loader.js?v=33d2b8bc';
 import {
   CAMERA_CLASS, CAPTION_MAX, FORGET_RECHARGE_SEC, RECHARGE_BUFF, SNAP_COPY as T, SNAP_MAX_BYTES, SNAP_QUALITY, SNAP_WIDTHS, TRAVEL,
   base64Bytes, canSnap, cleanCaption, isSnapUrl, jpegBase64, snapAuthor, snapPlace, snapStreet, takePictureState, withCamera,
-} from '../snaps.js?v=7df81689';
+} from '../snaps.js?v=55d4c257';
 
 export const SNAPS_FEATURE_ID = 'snaps';
 const VERB = 'take_picture';

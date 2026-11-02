@@ -46,6 +46,7 @@ import { stationByTsid } from './subway.js?v=5719ffc3';
 import { ensurePiggyMood, piggyTwiceDailyTick, satePiggy } from './animal-mood.js?v=a49495fc';
 import { isCrowdSad } from './animal-crowding.js?v=e8d3ce7c';
 import { ecologyForStreet } from './street-ecology.js?v=75086599';
+import { filterText } from './word-filter.js?v=9a7a7ebb';
 
 const MINUTE = 60 * 1000;
 const HOUR = 60 * MINUTE;
@@ -665,7 +666,8 @@ export function namingVerbs(classId, state = {}, ctx = {}) {
 
 export function nameAnimal(classId, state, value, ctx = {}) {
   if (!canNameAnimal(state, ctx)) return { ok: false, reason: "You can't name this animal right now." };
-  const name = sanitizeAnimalName(value);
+  // The word filter (the remake's own addition, js/word-filter.js): a bad word is kept as a grawlix.
+  const name = filterText(sanitizeAnimalName(value));
   if (!name) return { ok: false, reason: 'Names need at least one letter or number.' };
   if (name === state.userName) return { ok: false, reason: 'unchanged' };
   const previous = state.userName || '';
@@ -685,7 +687,7 @@ export function nameAnimal(classId, state, value, ctx = {}) {
 /** getLabel: "A Piggy Named Wilbur". */
 export function namedAnimalLabel(classId, state = {}, fallback = '') {
   const label = NAMEABLE_ANIMALS[classId] || fallback || classId;
-  return state?.userName ? `A ${label} Named ${state.userName}` : fallback || label;
+  return state?.userName ? `A ${label} Named ${filterText(state.userName)}` : fallback || label;
 }
 
 // ---------------------------------------------------------------------------

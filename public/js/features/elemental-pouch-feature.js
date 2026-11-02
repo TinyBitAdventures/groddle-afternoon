@@ -45,7 +45,7 @@ import {
   pouchPickupCheck,
   shakeCheck,
   shakePouch,
-} from '../elemental-pouch.js?v=42528ad0';
+} from '../elemental-pouch.js?v=7ae2ad99';
 
 export const POUCH_FEATURE_ID = 'elemental-pouch';
 const POUCH_QUEST = 'elementhandling_buy_elemental_pouch';

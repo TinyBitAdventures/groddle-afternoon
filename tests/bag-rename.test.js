@@ -25,13 +25,13 @@ import {
   canRenameBag,
   cleanBagName,
   renamedTo,
-} from '../public/js/bag-names.js?v=0d896c8f';
-import { BAG_DEFS, PACK_CAPACITY, giveBag, layoutPack, moveStack, normalizePrefs, renameBag, takeBag } from '../public/js/pack-slots.js?v=b02c404c';
+} from '../public/js/bag-names.js?v=22391c55';
+import { BAG_DEFS, PACK_CAPACITY, giveBag, layoutPack, moveStack, normalizePrefs, renameBag, takeBag } from '../public/js/pack-slots.js?v=ba0a895f';
 import { ITEM_CATALOG, isToolItem } from '../public/js/inventory.js?v=b0e33301';
-import { createDroppedItemState, dropInventoryStack, parseDroppedItemState, placeDroppedBag, serializeDroppedItemState } from '../public/js/world-items.js?v=e29969b0';
-import { bagsFeature } from '../public/js/features/bags-feature.js?v=53dc672e';
-import { pouchFeature } from '../public/js/features/elemental-pouch-feature.js?v=ab110305';
-import { POUCH_CLASS } from '../public/js/elemental-pouch.js?v=42528ad0';
+import { createDroppedItemState, dropInventoryStack, parseDroppedItemState, placeDroppedBag, serializeDroppedItemState } from '../public/js/world-items.js?v=d4b33a98';
+import { bagsFeature } from '../public/js/features/bags-feature.js?v=d1b9507d';
+import { pouchFeature } from '../public/js/features/elemental-pouch-feature.js?v=34ffd4a6';
+import { POUCH_CLASS } from '../public/js/elemental-pouch.js?v=7ae2ad99';
 import { HAS_SITE, SITE_DIR } from '../tools/repos.mjs';
 
 const ROOT = join(import.meta.dirname, '..');

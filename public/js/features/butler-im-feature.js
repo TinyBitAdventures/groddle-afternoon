@@ -29,9 +29,10 @@
  * window.groddleButlerIm in multiplayer.
  */
 
-import { butlerApi } from './butler-feature.js?v=3090480b';
-import { BUTLER_STRINGS } from '../butler.js?v=9d29b9b4';
+import { butlerApi } from './butler-feature.js?v=fd30eb7c';
+import { BUTLER_STRINGS } from '../butler.js?v=86316578';
 import { BUTLER_IM_TEXT, BUTLER_IM_VERBS, HELP_AGAIN_MS, imDelayMs, imLine, normalizeImPrefs, parseButlerIm } from '../butler-im.js?v=44783638';
+import { filterText } from '../word-filter.js?v=9a7a7ebb';
 
 export const BUTLER_IM_FEATURE_ID = 'butler-im';
 /** The Butler's chat in the Social drawer. */
@@ -89,7 +90,8 @@ function createSession(engine, client) {
   }
 
   function ownLine(text) {
-    if (ensureTab()) social.push(BUTLER_TAB, { name: me(), text, mine: true });
+    // The owner's own line shows through the word filter (the remake's own addition); the server filters what the Butler says.
+    if (ensureTab()) social.push(BUTLER_TAB, { name: me(), text: filterText(text), mine: true });
   }
 
   function watchState() {

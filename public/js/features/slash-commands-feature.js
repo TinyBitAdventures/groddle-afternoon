@@ -39,10 +39,10 @@
  *     slashLine (the last line shown).
  */
 
-import { BUTLER_STRINGS } from '../butler.js?v=9d29b9b4';
-import { butlerApi } from './butler-feature.js?v=3090480b';
+import { BUTLER_STRINGS } from '../butler.js?v=86316578';
+import { butlerApi } from './butler-feature.js?v=fd30eb7c';
 import { hellFeature } from './hell-feature.js?v=1f2abc54';
-import { towerApi } from './home-tower-feature.js?v=571385ad';
+import { towerApi } from './home-tower-feature.js?v=c65f8992';
 import { STUCK_COOLDOWN_MS, STUCK_TEXT, slashPlan, unknownLine } from '../slash-commands.js?v=58e63833';
 import { parseTp, runTeleportCommand, TP_TEXT } from '../admin-teleport.js?v=fa56e8df';
 import { minnUrls } from '../minn-account.js?v=ea900c51';

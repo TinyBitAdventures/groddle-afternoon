@@ -51,6 +51,7 @@
 
 import { getGameDayKey } from './game-day.js?v=edb00566';
 import { normalizeButlerHi } from './hi-signs.js?v=b90c7d7e';
+import { filterText } from './word-filter.js?v=9a7a7ebb';
 
 /** classProps and onCreate numbers. */
 export const BUTLER = Object.freeze({
@@ -898,14 +899,14 @@ export function renameButler(state, txt, { now = Date.now(), rand = Math.random 
   const raw = String(txt ?? '').replace(/<(?:.|\s)*?>/g, '').trim();
   if (!raw) return { ok: false };
   const shortened = raw.length > BUTLER.NAME_MAX;
-  state.name = raw.slice(0, BUTLER.NAME_MAX);
+  state.name = filterText(raw.slice(0, BUTLER.NAME_MAX)); // the remake's own word filter (js/word-filter.js)
   state.namedAt = whole(now);
   return { ok: true, shortened, text: butlerText(shortened ? 'nameShortened' : 'nameSuccess', { butler: state.name }, rand) };
 }
 
 /** onTeach (phrase_limit 1: the newest phrase replaces the old). */
 export function teachButler(state, type, txt) {
-  const line = cleanLine(txt, 140);
+  const line = filterText(cleanLine(txt, 140)); // the remake's own word filter (js/word-filter.js)
   if (!line) return { ok: false };
   if (type === 'owner_greeting') {
     state.ownerGreeting = line;

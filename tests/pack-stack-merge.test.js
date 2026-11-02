@@ -18,7 +18,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import { ITEM_CATALOG, isToolItem, removeItem } from '../public/js/inventory.js?v=b0e33301';
-import { PACK_CAPACITY, layoutPack, moveStack, stackMaxOf } from '../public/js/pack-slots.js?v=b02c404c';
+import { PACK_CAPACITY, layoutPack, moveStack, stackMaxOf } from '../public/js/pack-slots.js?v=ba0a895f';
 
 const root = join(import.meta.dirname, '..');
 const OPTS = { capacity: PACK_CAPACITY, catalog: ITEM_CATALOG, isTool: isToolItem, order: Object.keys(ITEM_CATALOG) };

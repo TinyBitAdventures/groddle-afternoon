@@ -12,7 +12,7 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { bagLeavesLast, giveBag, layoutPack, takeBag, unitPlaces } from '../public/js/pack-slots.js?v=b02c404c';
+import { bagLeavesLast, giveBag, layoutPack, takeBag, unitPlaces } from '../public/js/pack-slots.js?v=ba0a895f';
 import {
   createDroppedItemState,
   dropInventoryStack,
@@ -20,7 +20,7 @@ import {
   placeDroppedBag,
   serializeDroppedItemState,
   takeDroppedRecord,
-} from '../public/js/world-items.js?v=e29969b0';
+} from '../public/js/world-items.js?v=d4b33a98';
 import { bindToolInventory, createToolConditionState, pickToolCopies, placeToolCopies, toolCopies } from '../public/js/tools.js?v=6a9e1314';
 
 const root = join(import.meta.dirname, '..');

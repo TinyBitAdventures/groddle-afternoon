@@ -41,7 +41,7 @@ import {
 } from '../public/js/home-street-mp.js?v=4039f2d5';
 import { NOTE_POLE_CONTAINERS, NOTE_POLE_PARTS, NOTE_POLE_SIGN_Y } from '../public/js/note-pole-art.js?v=860d393a';
 import { isSharedJob } from '../public/js/street-jobs-mp.js?v=d18e4b4a';
-import { homeStreetMpFeature } from '../public/js/features/home-street-mp-feature.js?v=7cbe92b9';
+import { homeStreetMpFeature } from '../public/js/features/home-street-mp-feature.js?v=2c3e2bd9';
 import { projectTable } from '../tools/build-realtime-projects.mjs';
 import { HAS_SITE, SITE_DIR, serverPath } from '../tools/repos.mjs';
 
@@ -52,7 +52,7 @@ const hasPhp = spawnSync('php', ['-v']).status === 0;
 const skipSite = !HAS_SITE ? 'no groddle-afternoon-site checkout' : !hasPhp ? 'no php' : false;
 
 function php(body) {
-  const code = `foreach (['Economy', 'LedgerMath', 'HomeSignpost', 'HomeStreet', 'LedgerFurniture'] as $c) require ${JSON.stringify(SITE_DIR)} . "/src/$c.php"; use Groddle\\Minn\\HomeStreet; use Groddle\\Minn\\LedgerFurniture; ${body}`;
+  const code = `foreach (['Economy', 'LedgerMath', 'WordFilter', 'HomeSignpost', 'HomeStreet', 'LedgerFurniture'] as $c) require ${JSON.stringify(SITE_DIR)} . "/src/$c.php"; use Groddle\\Minn\\HomeStreet; use Groddle\\Minn\\LedgerFurniture; ${body}`;
   return JSON.parse(execFileSync('php', ['-r', code]).toString());
 }
 

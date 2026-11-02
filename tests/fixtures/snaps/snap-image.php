@@ -17,6 +17,7 @@ require $engine . '/src/Minn/Autoloader.php';
 Minn\Autoloader::register();
 require $extension . '/src/ProfilePng.php';
 require $extension . '/src/SnapImage.php';
+require $extension . '/src/WordFilter.php';
 require $extension . '/src/Snaps.php';
 
 use Groddle\Minn\SnapImage;

@@ -16,7 +16,7 @@ define('ABSPATH', sys_get_temp_dir() . '/');
 define('MINN_ENGINE_DIR', $engine);
 require $engine . '/src/Minn/Autoloader.php';
 Minn\Autoloader::register();
-foreach (['GoogleIdToken', 'GoogleSignIn', 'PlayerAccount'] as $class) {
+foreach (['WordFilter', 'GoogleIdToken', 'GoogleSignIn', 'PlayerAccount'] as $class) {
     require $extension . "/src/{$class}.php";
 }
 
