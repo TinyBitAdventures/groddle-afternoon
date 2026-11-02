@@ -724,6 +724,34 @@
 :root[data-ui="classic"] #game-root .street-nameplate .street-time-divider,
 :root[data-ui="classic"] #game-root .street-nameplate .dametime-clock,
 :root[data-ui="classic"] #game-root .street-nameplate > :not(#street-name) { display: none; }
+/* The quest pill (player report 37; features/quest-plate-feature.js): in a quest place "Current
+   location" stays the street's, and the quest sits in the middle of the header on one line, in the
+   prompt card's dark look (PromptView.as:367-368, the original's "Are you stuck? Do you want to leave
+   this place?" prompt, inc_instances.js 329-339). Its caption is the same dark card under it. */
+:root[data-ui="classic"] #game-root .street-nameplate.is-quest > #street-name { display: block !important; }
+:root[data-ui="classic"] #game-root .street-nameplate.is-quest > .quest-plate:not([hidden]) {
+  display: flex !important;
+  position: fixed;
+  top: calc(5 * var(--cu));
+  left: 50%;
+  transform: translateX(-50%);
+  height: calc(30 * var(--cu));
+  max-width: min(560px, 33vw);
+  padding: 0 calc(5 * var(--cu)) 0 calc(10 * var(--cu));
+  border-radius: calc(15 * var(--cu));
+  background: color-mix(in srgb, var(--c-classic-prompt) 90%, transparent);
+  color: var(--c-classic-panel);
+  font: 700 var(--fs-classic-body)/var(--lh-tight) var(--font-classic-body);
+  cursor: default;
+}
+:root[data-ui="classic"] #game-root .quest-plate .qp-title { font-family: var(--font-classic-title); font-weight: 800; }
+:root[data-ui="classic"] #game-root .quest-plate :is(.qp-stage, .qp-progress) { color: var(--c-classic-tip); font-weight: 700; }
+:root[data-ui="classic"] #game-root .quest-plate .qp-timer { background: none; padding: 0; color: var(--c-classic-panel); font-weight: 800; }
+:root[data-ui="classic"] #game-root .quest-plate .qp-timer.is-low { color: var(--c-classic-wear-low); }
+:root[data-ui="classic"] #game-root .quest-plate .qp-dots i { background: color-mix(in srgb, var(--c-classic-panel) 30%, transparent); }
+:root[data-ui="classic"] #game-root .quest-plate .qp-dots i.is-done { background: var(--c-classic-tip); }
+:root[data-ui="classic"] #game-root .quest-plate .qp-leave { border-color: var(--c-classic-btn-minor-border); background: linear-gradient(var(--c-classic-btn-minor-top), var(--c-classic-btn-minor-bottom)); color: var(--c-classic-btn-minor-label); font: 700 var(--fs-classic-body)/1.2 var(--font-classic-body); }
+:root[data-ui="classic"] #game-root .quest-caption { border-radius: calc(8 * var(--cu)); background: color-mix(in srgb, var(--c-classic-prompt) 90%, transparent); font: 700 var(--fs-classic-chat)/var(--lh-snug) var(--font-classic-body); }
 
 /* == The right column (classic-spec spec §7): the Social drawer (js/ui/social-drawer.js) as the 2012
    contact strip and chat column, restyled in place, so its tabs, log, input history, "/" and every

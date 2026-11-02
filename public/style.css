@@ -10026,6 +10026,7 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
 [data-ui="modern"] .street-nameplate .street-time-divider { margin: 0; color: var(--text-muted); }
 [data-ui="modern"] .street-nameplate .dametime-clock { color: var(--text); font-size: var(--fs-m); }
 [data-ui="modern"] .street-nameplate .season-chip { margin-left: 0; flex: none; }
+
 @media (max-width: 1100px) {
   [data-ui="modern"] .street-nameplate .street-name-hub { display: none; }
   [data-ui="modern"] .top-bar .hud-favor,
@@ -10058,6 +10059,60 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
   [data-ui="modern"] #buff-strip { top: calc(2 * var(--hud-h) + var(--space-4)); }
 }
 /* —— end PAPER —— */
+/* The quest pill (player report 37; features/quest-plate-feature.js, js/quest-plate.js): in a quest
+   place the nameplate shows the quest on one line, at its own place and height. The room's card
+   folds away and opens under the pill; its step or story line shows once as a caption under it.
+   All three sit under every menu, tooltip and window (the pill is the nameplate's --z-hud; the
+   caption and the open card take --z-quest-hud). */
+.quest-plate[hidden],
+.quest-plate [hidden] { display: none !important; }
+.street-nameplate.is-quest { pointer-events: auto; }
+.street-nameplate.is-quest > :not(.quest-plate) { display: none !important; }
+.quest-plate { display: flex; align-items: center; gap: var(--sp-3); min-width: 0; max-width: 100%; height: 100%; }
+.quest-plate .qp-open {
+  display: flex; align-items: center; gap: var(--sp-3); min-width: 0; height: 100%; margin: 0; padding: 0;
+  border: 0; background: none; color: inherit; font: inherit; white-space: nowrap; cursor: pointer;
+}
+.quest-plate .qp-icon { flex: none; display: inline-grid; place-items: center; width: 22px; height: 22px; color: var(--c-orange-62); font-size: var(--fs-md); line-height: 1; }
+.quest-plate .qp-icon img { width: 22px; height: 22px; object-fit: contain; }
+.quest-plate .qp-title { flex: 0 1 auto; min-width: 3em; overflow: hidden; text-overflow: ellipsis; font-weight: 800; }
+.quest-plate .qp-stage { flex: 0 100 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; color: var(--c-slate-60); font-size: var(--fs-sm); }
+.quest-plate .qp-timer { flex: none; padding: 1px var(--sp-3); border-radius: var(--radius-pill); background: var(--c-blue-56b); color: var(--text-inverse); font-size: var(--fs-sm); font-weight: 900; font-variant-numeric: tabular-nums; }
+.quest-plate .qp-timer.is-low { background: var(--c-red-55); }
+.quest-plate .qp-progress { flex: none; color: var(--c-slate-60); font-size: var(--fs-sm); font-weight: 800; }
+.quest-plate .qp-dots { display: inline-flex; gap: 3px; vertical-align: middle; }
+.quest-plate .qp-dots i { width: 7px; height: 7px; border-radius: 50%; background: color-mix(in srgb, var(--c-slate-60) 35%, transparent); }
+.quest-plate .qp-dots i.is-done { background: var(--c-orange-62); }
+.quest-plate .qp-leave {
+  flex: none; margin: 0; padding: 2px var(--sp-4); border: 1px solid color-mix(in srgb, var(--c-slate-63) 45%, transparent);
+  border-radius: var(--radius-pill); background: var(--surface-bright); color: var(--c-navy-40); font: inherit; font-size: var(--fs-sm); font-weight: 800; cursor: pointer;
+}
+.quest-plate :is(.qp-open, .qp-leave):focus-visible { outline: 2px solid var(--c-blue-56b); outline-offset: 2px; }
+[data-ui="modern"] .street-nameplate.is-quest { padding: 0 var(--space-2) 0 var(--space-3); }
+[data-ui="modern"] .quest-plate .qp-open:hover .qp-title { text-decoration: underline; text-underline-offset: 3px; }
+[data-ui="modern"] .quest-plate .qp-timer { background: var(--accent, var(--c-blue-56b)); }
+[data-ui="modern"] .quest-plate .qp-timer.is-low { background: var(--c-red-55); }
+[data-ui="modern"] .quest-plate .qp-stage,
+[data-ui="modern"] .quest-plate .qp-progress { color: var(--text-muted); }
+@media (max-width: 1100px) {
+  [data-ui="modern"] .quest-plate .qp-stage { display: none; }
+}
+/* The folded card, and the card opened from the pill (placed by the feature under the pill). */
+#game-root .qp-card:not(.qp-open) { display: none !important; }
+#game-root .qp-card.qp-open {
+  position: absolute !important; top: var(--qp-top) !important; left: var(--qp-left) !important; right: auto !important; bottom: auto !important;
+  transform: none !important; margin: 0 !important; visibility: visible !important; z-index: var(--z-quest-hud) !important; pointer-events: auto;
+}
+.quest-caption {
+  position: absolute; z-index: var(--z-quest-hud); top: 56px; left: 50%; box-sizing: border-box; width: max-content; max-width: min(560px, calc(100% - 32px));
+  margin: 0; padding: var(--sp-3) var(--sp-6); border-radius: var(--radius-3xl);
+  background: color-mix(in srgb, var(--c-navy-23) 78%, transparent); color: var(--text-inverse);
+  font-size: var(--fs-md); font-weight: 700; line-height: var(--lh-snug); text-align: center; text-wrap: balance;
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--c-black) 22%, transparent);
+  opacity: 0; transition: opacity 0.35s ease; pointer-events: none;
+}
+.quest-caption.is-on { opacity: 1; }
+@media (prefers-reduced-motion: reduce) { .quest-caption { transition: none; } }
 /* Both skins: the study pill names the skill (game.js paintStudyChip); hovered or focused, Classic's card shows its icon. */
 #study-chip .study-chip-label { display: flex; min-width: 0; white-space: nowrap; }
 #study-chip .study-chip-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; }

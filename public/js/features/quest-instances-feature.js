@@ -154,7 +154,7 @@ const ROOM_MODULES = {
   an_autumn_day: () => import('../quest-rooms/an-autumn-day.js?v=bed1f7a5'),
   being_watched: () => import('../quest-rooms/being-watched.js?v=03352d7f'),
   back_alley: () => import('../quest-rooms/back-alley.js?v=bf6df2f1'),
-  clubhouse: () => import('../quest-rooms/clubhouse.js?v=bf1f107e'),
+  clubhouse: () => import('../quest-rooms/clubhouse.js?v=ac4c7311'),
   light_perspective: () => import('../quest-rooms/light-perspective.js?v=f6fb0621'),
   tile_puzzle: () => import('../quest-rooms/tile-puzzle.js?v=9ba8f9cc'),
   operation_grow: () => import('../quest-rooms/operation-grow.js?v=232a0736'),
@@ -162,7 +162,7 @@ const ROOM_MODULES = {
   mental_block: () => import('../quest-rooms/mental-block.js?v=67e96f95'),
   penalty: () => import('../quest-rooms/penalty.js?v=754f738c'),
   esquibeth: () => import('../quest-rooms/esquibeth.js?v=eb39b25c'),
-  firefly_whistle: () => import('../quest-rooms/firefly-whistle.js?v=553e607d'),
+  firefly_whistle: () => import('../quest-rooms/firefly-whistle.js?v=e0ed70f7'),
 };
 
 function loadRoom(roomId) {
@@ -403,7 +403,7 @@ function customPrereq(questId, prereq, engine) {
 /* ------------------------------------------------------------------ */
 
 const DIALOG_STYLE = `
-.qi-hud{position:absolute;z-index:calc(var(--z-dialog) + 9);top:66px;left:50%;width:min(650px,calc(100% - 32px));padding:var(--sp-5) var(--sp-7) 11px;transform:translateX(-50%);
+.qi-hud{position:absolute;z-index:var(--z-quest-hud);top:66px;left:50%;width:min(650px,calc(100% - 32px));padding:var(--sp-5) var(--sp-7) 11px;transform:translateX(-50%);
  color:var(--c-sand-35);border:2px solid color-mix(in srgb, var(--c-white) 85%, transparent);border-radius:var(--radius-3xl);background:linear-gradient(180deg,color-mix(in srgb, var(--surface-bright) 95%, transparent),color-mix(in srgb, var(--surface-lilac) 95%, transparent));
  box-shadow:0 10px 30px color-mix(in srgb, var(--c-sky-31) 28%, transparent),inset 0 0 0 1px color-mix(in srgb, var(--c-slate-76) 35%, transparent);backdrop-filter:blur(7px);pointer-events:none;font-family:inherit}
 .qi-hud[hidden]{display:none}
@@ -1072,7 +1072,9 @@ function renderHud(engine, force = false) {
   const covered = (dialog && !dialog.modal.hidden)
     || Boolean(ctx?.data?._hudCovered)
     || (typeof document !== 'undefined' && Boolean(document.querySelector('#award-screen.is-visible:not([hidden])')));
-  hud.bar.className = `qi-hud${room.theme ? ` theme-${room.theme}` : ''}${covered ? ' is-covered' : ''}`;
+  // The quest pill's classes (features/quest-plate-feature.js: folded, opened) stay.
+  const plate = ['qp-card', 'qp-open'].filter((c) => hud.bar.classList.contains(c)).map((c) => ` ${c}`).join('');
+  hud.bar.className = `qi-hud${room.theme ? ` theme-${room.theme}` : ''}${covered ? ' is-covered' : ''}${plate}`;
   if (force || hud.icon.dataset.src !== room.icon) {
     hud.icon.dataset.src = room.icon || '';
     if (room.icon) hud.icon.src = room.icon;

@@ -76,8 +76,13 @@ export function vpOverlay(sink, { lines = [], clickToAdvance = false, durationMs
       if (settled) return;
       current?.finish?.();
       // Inside a quest room the room card holds the top of the view: sit just under it.
+      // The room card folds into the quest pill (features/quest-plate-feature.js): sit under the pill and its caption.
+      const host = node.parentElement?.getBoundingClientRect?.();
+      const below = (el) => (el && !el.hidden && host && el.getBoundingClientRect ? el.getBoundingClientRect().bottom - host.top + 14 : 0);
       const card = document.getElementById('quest-instance-hud');
-      const under = card && !card.hidden && card.parentElement === node.parentElement ? card.offsetTop + card.offsetHeight + 14 : 0;
+      const under = card && !card.hidden && !card.classList.contains('qp-card') && card.parentElement === node.parentElement
+        ? card.offsetTop + card.offsetHeight + 14
+        : Math.max(below(document.querySelector?.('#street-nameplate.is-quest')), below(document.querySelector?.('#quest-caption.is-on')));
       node.style.top = under ? `max(${topY}, ${under}px)` : topY;
       node.innerHTML = lines.map(() => '<p style="margin:0;font:900 clamp(1.1rem,2.8vw,1.6rem)/1.25 Nunito,\'Trebuchet MS\',sans-serif;color:#fff;'
         + 'text-shadow:0 2px 0 #24303a,0 0 3px #24303a,0 0 14px rgba(0,0,0,.45)"></p>').join('')

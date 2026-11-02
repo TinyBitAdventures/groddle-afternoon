@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=fe2bbd71';
 import { createFeatureHost } from './js/feature-host.js?v=e4f648b1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=529cc1e9';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=d57e6dd6';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -15948,7 +15948,9 @@ function pressGreedyStoryButton(target) {
     volume: result.actCompleted ? 0.54 : 0.34,
     rate: 0.92 + result.actIndex * 0.04,
   });
-  pushActivity(`${GREEDY_ACTS[result.actIndex].title}: ${result.line}`);
+  // Player report 37: the line is the story's dialogue and then the quest pill's caption
+  // (features/quest-plate-feature.js), so it goes to the log only, not a notice stacked under them.
+  notify.log(`${GREEDY_ACTS[result.actIndex].title}: ${result.line}`);
   openScriptedQuestDialogue({
     title: 'The Greedy Street Spirit',
     kicker: `${GREEDY_ACTS[result.actIndex].title} · scene ${result.step + 1} of ${GREEDY_ACTS[result.actIndex].lines.length}`,
