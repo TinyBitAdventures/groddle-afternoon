@@ -197,4 +197,19 @@ describe('rook-mp: wiring', () => {
     assert.ok(data.values.plank > 1);
     assert.ok(data.refused.includes('pick'));
   });
+
+  it('the server prices every offering the browser can make, so none reads as too small (ticket 38)', { skip: skipWithoutServer }, async () => {
+    const data = JSON.parse(fs.readFileSync(serverPath('data/rook.json'), 'utf8'));
+    const { MUSICBLOCK_CATALOG } = await import('../public/js/musicblocks.js?v=da091c51');
+    const { ITEM_BASE_COSTS } = await import('../public/js/store-catalog.js?v=79d4de8a');
+    // Registered at run time in the browser, so a catalog-only build left them at the server's floor of 1.
+    for (const [id, def] of Object.entries(MUSICBLOCK_CATALOG)) assert.equal(data.values[id], def.baseCost, id);
+    assert.equal(data.values.upgrade_card_reshuffle, 100);
+    const refused = new Set(data.refused);
+    const missing = Object.entries(ITEM_BASE_COSTS)
+      .filter(([id, cost]) => Math.floor(cost) >= 10 && !refused.has(id) && !id.startsWith('bag_') && !id.startsWith('emblem_'))
+      .filter(([id]) => !(data.values[id] >= 10))
+      .map(([id]) => id);
+    assert.deepEqual(missing, [], 'worth 1 damage or more in the source, unpriced on the server');
+  });
 });

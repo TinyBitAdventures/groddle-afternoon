@@ -14,6 +14,10 @@
  * - values: what an offering is worth to a primed shrine, per item class
  *   (js/shrines.js donationValueFor over the game's item catalog: GSJS
  *   base_cost from making-items.json, else SHRINE_ITEM_BASE_COSTS, else 1).
+ *   Classes the browser registers at run time (Musicblocks, imagination
+ *   cards, ...) are not in this catalog, so they take the GSJS base_cost from
+ *   store-catalog.js ITEM_BASE_COSTS: without it a Musicblock or a Reshuffle
+ *   Card was worth 1 on the server and refused as too small (ticket 38).
  *   items/include/shrines.js launchAttack 1034-1046 turns 10% of it into
  *   damage. Classes worth 1 are left out (the server's fallback is 1, as the
  *   client's is); tools, no_donate items, machines and other emblems are
@@ -37,6 +41,8 @@ import { ecologyForStreet, planStreetPlacements, populationForStreet, setStreetE
 import { ITEM_CATALOG } from '../public/js/inventory.js?v=b0e33301';
 import { loadRecipeCatalogFromFile } from '../public/js/making.js?v=68521d02';
 import { SHRINE_ITEM_BASE_COSTS, donationValueFor, giantForStreet } from '../public/js/shrines.js?v=cf7c3993';
+import { ITEM_BASE_COSTS } from '../public/js/store-catalog.js?v=79d4de8a';
+import { TOOL_CONDITION_CATALOG } from '../public/js/tools.js?v=6a9e1314';
 import { placementRequests } from './build-realtime-objects.mjs';
 import { streetIsRookable } from '../public/js/rook-attack.js?v=55853232';
 import { rebuiltRoomEcology } from '../public/js/rebuilt-rooms.js?v=9eb97c49';
@@ -74,16 +80,19 @@ export function streetShrine(data, { starter = false, ecology = ecologyForStreet
 export function offerValues() {
   const values = {};
   const refused = [];
-  const ids = new Set([...Object.keys(ITEM_CATALOG), ...Object.keys(SHRINE_ITEM_BASE_COSTS)]);
+  const ids = new Set([...Object.keys(ITEM_CATALOG), ...Object.keys(SHRINE_ITEM_BASE_COSTS), ...Object.keys(ITEM_BASE_COSTS)]);
   for (const id of [...ids].sort()) {
     const meta = ITEM_CATALOG[id] || {};
     const tags = meta.tags || [];
     // shrines.js donate_to drop_ok_code 318-330: no bags, emblems (but the shrine's own), machines, no_donate.
-    if (meta.isTool || meta.donatable === false || tags.includes('emblem') || tags.includes('machine') || tags.includes('no_donate') || id.startsWith('emblem_')) {
+    // A class only the base-cost table knows is a tool when it carries wear (tools.js); a known class says itself.
+    if (meta.isTool || (!ITEM_CATALOG[id] && TOOL_CONDITION_CATALOG[id]) || meta.donatable === false || tags.includes('emblem') || tags.includes('machine') || tags.includes('no_donate') || id.startsWith('emblem_') || id.startsWith('bag_')) {
       refused.push(id);
       continue;
     }
-    const v = donationValueFor(id);
+    // In this catalog (or the shrine table): as the browser prices it; else the GSJS base_cost, whole as donationValueFor's.
+    const known = Number(meta.baseCost) > 0 || SHRINE_ITEM_BASE_COSTS[id] != null;
+    const v = known ? donationValueFor(id) : Math.max(0, Math.floor(Number(ITEM_BASE_COSTS[id]) || 0));
     if (v > 1) values[id] = v;
   }
   return { values, refused };
