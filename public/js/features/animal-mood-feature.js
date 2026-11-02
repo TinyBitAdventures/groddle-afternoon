@@ -1526,6 +1526,10 @@ export const animalMoodFeature = {
       .sort((a, b) => Math.abs(a.sprite.x - p.x) - Math.abs(b.sprite.x - p.x))[0];
     if (!trant) return;
     for (const target of livePiggies(engine)) {
+      // Ticket 40: online, the server walks its street Piggies to food (objects_pigs.go, capped at
+      // 1600 px) and checks reach from where it keeps them; a walk of our own across the street left
+      // a Piggy beside you refused with "You need to be closer" for minutes. Only the server's ate events move them.
+      if (serverPig(engine, target)) continue;
       const r = recordFor(target);
       if (canSeek(engine, r)) startSeek(engine, r, { kind: 'trant', target: trant, x: trant.sprite.x, y: trant.sprite.y });
     }

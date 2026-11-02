@@ -21,7 +21,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { createAnimalState } from '../public/js/animals.js?v=d34f13bc';
-import { PIGGY_ROOTING, animalMoodFeature, piggyRootDelayMs } from '../public/js/features/animal-mood-feature.js?v=9ac58df6';
+import { PIGGY_ROOTING, animalMoodFeature, piggyRootDelayMs } from '../public/js/features/animal-mood-feature.js?v=d47a12e4';
 import { platformsScreen, streetWidth } from '../public/js/street-model.js?v=505d8990';
 import {
   ANIMAL_BODY,
@@ -92,6 +92,21 @@ function street({ mode = 'solo', hunger = 6, root = 'off', xs = [2962, 2700] } =
   const run = (s, each = null) => { for (let i = 0; i < s * 60; i += 1) { each?.(i); tick(); } };
   return { engine, pigs, tree, tick, run, setAt: (x) => { at = x; } };
 }
+
+describe('a tree you work does not send the server\'s Piggies (ticket 40)', () => {
+  it('online, a harvest leaves the street Piggies on their walks: only the server\'s ate events move them', () => {
+    animalMoodFeature.onStreetClear();
+    const { engine, pigs, run } = street({ mode: 'multiplayer' });
+    run(1.2);
+    const homes = pigs.map((p) => p.sprite.home.x);
+    animalMoodFeature.onEvent('trant_bean:harvest', 1, engine);
+    run(20);
+    pigs.forEach((p, i) => {
+      assert.equal(p.sprite.baseX, homes[i], 'still on its own walk');
+      assert.ok(Math.abs(p.sprite.x - homes[i]) <= 90.01, `wandered to ${p.sprite.x}`);
+    });
+  });
+});
 
 describe('a hungry Piggy sent to a tree', () => {
   for (const mode of ['solo', 'multiplayer']) {
