@@ -31,7 +31,7 @@
  * Players: local signs up through POST groddle/v1/players (the site's instant sign-up option
  * covers zz-*@groddle.localhost). Live has no instant sign-up and no mail to read, so it holds
  * two sign-ups by SQL (the sha256 of a known token, a Minn password hash made on the server)
- * and opens /play/online/#verify=<token>, as the dev-glitch-game skill's "Live QA without
+ * and opens /play/online/#verify=<token>, as the dev-groddle skill's "Live QA without
  * mail". Live never files a report (the console reply would mail a fake address) and skips
  * chat and the party when someone else is on the street.
  *

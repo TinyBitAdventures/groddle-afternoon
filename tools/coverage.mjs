@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * The restoration scorecard for /dev-glitch-game-coverage: every measure the
+ * The restoration scorecard for /dev-groddle-coverage: every measure the
  * coverage loop works on, from public/restoration/data.json (rebuild it first
  * with node tools/build-restoration.mjs), the avatar catalog and the gap
  * register in ~/Documents/glitch-audit/research/coverage/register.md.
