@@ -10455,6 +10455,7 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
 }
 [data-ui="modern"] #verb-menu[hidden] { display: none !important; }
 [data-ui="modern"] #verb-menu .verb-menu-card,
+[data-ui="modern"] #quest-pin-menu,
 [data-ui="modern"] #pack-popover {
   box-sizing: border-box;
   width: var(--vm-w);
@@ -10537,6 +10538,7 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
 [data-ui="modern"] #verb-menu .vm-empty { padding: var(--sp-3) var(--sp-3) var(--sp-2); color: var(--text-muted); font-size: var(--fs-s); opacity: 1; }
 /* One line per verb. */
 [data-ui="modern"] #verb-menu .vm-row,
+[data-ui="modern"] #quest-pin-menu .vm-row,
 [data-ui="modern"] #pack-popover .vm-row {
   width: 100%;
   height: 32px;
@@ -10560,11 +10562,15 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
 }
 [data-ui="modern"] #verb-menu .vm-row:hover,
 [data-ui="modern"] #verb-menu .vm-row.cur,
+[data-ui="modern"] #quest-pin-menu .vm-row:hover,
+[data-ui="modern"] #quest-pin-menu .vm-row.cur,
 [data-ui="modern"] #pack-popover .vm-row:hover,
 [data-ui="modern"] #pack-popover .vm-row.cur { background: var(--accent-soft); box-shadow: none; }
 [data-ui="modern"] #verb-menu .vm-row:focus,
+[data-ui="modern"] #quest-pin-menu .vm-row:focus,
 [data-ui="modern"] #pack-popover .vm-row:focus { outline: none; }
 [data-ui="modern"] #verb-menu .vm-row:focus-visible,
+[data-ui="modern"] #quest-pin-menu .vm-row:focus-visible,
 [data-ui="modern"] #pack-popover .vm-row:focus-visible { outline: 2px solid var(--focus); outline-offset: -2px; box-shadow: none; }
 [data-ui="modern"] #verb-menu .vm-row[aria-disabled="true"],
 [data-ui="modern"] #pack-popover .vm-row[aria-disabled="true"] { color: var(--text-muted); cursor: not-allowed; opacity: 1; }
@@ -10614,6 +10620,7 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
 [data-ui="modern"] .vm-row.vm-back .vm-label { color: var(--text-muted); }
 /* The footer line: the row's explanation, or (red) why it can't be done. */
 [data-ui="modern"] #verb-menu .vm-detail,
+[data-ui="modern"] #quest-pin-menu .vm-detail,
 [data-ui="modern"] #pack-popover .vm-detail {
   margin: var(--sp-2) 2px 0;
   padding: var(--sp-3) var(--sp-4);
@@ -10627,7 +10634,7 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
   line-height: 1.35;
   border: 0;
 }
-[data-ui="modern"] #verb-menu .vm-detail[hidden] { display: none; }
+[data-ui="modern"] :is(#verb-menu, #quest-pin-menu) .vm-detail[hidden] { display: none; }
 [data-ui="modern"] #verb-menu .vm-detail.bad,
 [data-ui="modern"] #pack-popover .vm-detail.bad { color: var(--danger); }
 /* The tail at the thing: under the card, or over it when the menu flipped below. */
@@ -11135,6 +11142,33 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
 @media (max-width: 760px) {
   [data-ui="modern"] #game-root #quest-pins:not([hidden]) { top: calc(2 * var(--hud-h) + var(--space-4)); }
   [data-ui="modern"] #game-root:not([data-sheet]) #quest-pins:not([hidden]) ~ #buff-strip { top: calc(2 * var(--hud-h) + var(--space-4) + var(--quest-pins-h, 0px) + var(--space-2)); }
+}
+/* PINMENU (js/ui/quest-pin-menu.js): a pinned row's menu (right-click, Shift+F10, a long press):
+   Unpin and Open in Quests in the verb menu's card and rows, beside the tracker or at the pointer.
+   Only the modern skin has the tracker, so only it shows the menu. */
+.quest-pin-menu { display: none; }
+[data-ui="modern"] #game-root #quest-pin-menu:not([hidden]) {
+  position: absolute;
+  z-index: var(--z-notice);
+  display: block;
+  width: 216px;
+  transform-origin: 0 0;
+}
+[data-ui="modern"] #quest-pin-menu .qpm-head { padding: 2px var(--sp-3) var(--sp-2); }
+[data-ui="modern"] #quest-pin-menu .qpm-title {
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text-muted);
+  font-size: var(--fs-s);
+  font-weight: var(--fw-heavy);
+}
+[data-ui="modern"] #quest-pin-menu .qpm-title:empty { display: none; }
+/* A long press on a row opens its menu: no text selection or callout under the finger. */
+[data-ui="modern"] #quest-pins .tq { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
+@media (prefers-reduced-motion: reduce) {
+  [data-ui="modern"] #quest-pin-menu { animation: none; }
 }
 /* The Quests card's Pin button. */
 [data-ui="modern"] #quest .qc-pin {
