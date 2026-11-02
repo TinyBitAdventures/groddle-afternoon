@@ -20,7 +20,7 @@ import {
   aboutCounter, aboutLength, avatarKeyOf, base64Bytes, cleanAbout, homeKeyOf, homeSizes, imageBase64, pngBase64, profileSlug, shortHash, shouldUpload, stillTransform,
 } from '../public/js/profiles.js?v=174a1a84';
 import { createMinnAccount } from '../public/js/minn-account.js?v=ea900c51';
-import { FEATURES } from '../public/js/features/index.js?v=09099051';
+import { FEATURES } from '../public/js/features/index.js?v=309db96d';
 import { SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
 import { loadContentCatalogsFromDir, getSkillCatalog } from '../public/js/content-catalogs.js?v=10b118dd';
 import { skillTitle } from '../public/js/skill-tree.js?v=17787a09';
@@ -242,6 +242,7 @@ describe('the site side (groddle-afternoon-site)', { skip: skipWithoutSite }, ()
       'Get /players/{slug:[a-z0-9][a-z0-9.-]*}/ Public',
       'Get /players/{slug:[a-z0-9][a-z0-9.-]*}/{tab:skills|achievements|buddies} Public',
       'Get /players/{slug:[a-z0-9][a-z0-9.-]*}/{tab:skills|achievements|buddies}/ Public',
+      'Post /players/{slug:[a-z0-9][a-z0-9.-]*}/buddy/ Public',
     ]);
   });
 

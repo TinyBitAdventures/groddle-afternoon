@@ -18,8 +18,13 @@
  * - Menu, Buddies: your buddies with online or offline and the street they
  *   are on, Remove; who added you (Add back); who you block (Un-block).
  * - Toasts: a buddy online or offline, "X just added you as a contact!"
- *   (live from the server, or at the next load for adds made while you were
- *   away: the site marks those new).
+ *   live from the server (the source's activity line, inc_buddies.js:209).
+ * - Adds made while you were away (the site marks those new; they may come
+ *   from the website's "Add to buddy list" on your page): a prompt each,
+ *   "X just added you as a contact! Add them back?" with Add back and Not now
+ *   (the source's friend_add notification, inc_buddies.js:215-225); the line
+ *   alone when you already hold them (friend_add_mutual). A prompt goes away
+ *   when you add, block or lose them some other way first.
  * - Blocking: the blocked player's chat and emotes are hidden here
  *   (realtime-feature asks query('realtimeHidden', id)); their party invites
  *   and trade offers are refused by the server (party.go, trade.go ask
@@ -34,7 +39,8 @@
  *   counts the buddies online (drawerView()).
  *
  * QA: canvas data buddiesCount, buddiesOnline (name@street,...),
- * buddiesIgnoring (ids), buddiesLast (the last notice); window.groddleBuddies.
+ * buddiesIgnoring (ids), buddiesAsking (ids with an "Add them back?" prompt),
+ * buddiesLast (the last notice); window.groddleBuddies.
  */
 
 import { createMinnAccount } from '../minn-account.js?v=ea900c51';
@@ -44,6 +50,7 @@ import {
   BUDDY_TEXT,
   BUDDY_VERBS,
   WATCH_REFRESH_MS,
+  addedYouKind,
   addedYouOnly,
   applyPresence,
   applyStatus,
@@ -53,7 +60,7 @@ import {
   isBuddy,
   isIgnoring,
   normalizeList,
-} from '../buddies.js?v=183da4ff';
+} from '../buddies.js?v=df41a3bb';
 
 export const BUDDIES_FEATURE_ID = 'buddies';
 const VERB_IDS = new Set(Object.values(BUDDY_VERBS));
@@ -113,6 +120,11 @@ function createSession(engine, client) {
   const online = new Map();
   /** Reverse entries already told ("added you"), so a refresh does not tell them twice. */
   const told = new Set();
+  /** id -> prompt uid: the "Add them back?" prompts showing or queued. */
+  const asking = new Map();
+  /** The adds the prompts asked for, one after another. */
+  let addQueue = Promise.resolve();
+  let running = null;
   let note = '';
   let noteTone = 'good';
 
@@ -219,6 +231,7 @@ function createSession(engine, client) {
     engine.setData?.('buddiesOnline', [...online.entries()].map(([id, p]) => `${p.name}@${p.street || 'secret'}`).join(','));
     engine.setData?.('buddiesIgnoring', (list?.ignoring || []).map((r) => r.id).join(','));
     engine.setData?.('buddiesLast', last);
+    engine.setData?.('buddiesAsking', [...asking.keys()].join(','));
   }
 
   function notice(text, ms = 4200) {
@@ -250,8 +263,10 @@ function createSession(engine, client) {
     for (const id of [...online.keys()]) if (!isBuddy(list, id) && !list.reverse.some((r) => r.id === id)) online.delete(id);
     for (const r of freshReverse(list, told)) {
       told.add(r.id);
-      notice(BUDDY_TEXT.addedYou(r.name));
+      if (addedYouKind(list, r.id) === 'ask') askBack(r);
+      else notice(BUDDY_TEXT.addedYou(r.name));
     }
+    settleAsks();
     countBadges();
     watch();
     render();
@@ -279,6 +294,8 @@ function createSession(engine, client) {
     if (busy) return false;
     busy = true;
     render();
+    let done;
+    running = new Promise((resolve) => { done = resolve; });
     try {
       const answer = await run();
       apply(answer);
@@ -290,8 +307,50 @@ function createSession(engine, client) {
       return false;
     } finally {
       busy = false;
+      running = null;
+      done();
       render();
     }
+  }
+
+  // —— "Add them back?" (adds made while you were away) ——
+  function askBack(r) {
+    if (asking.has(r.id)) return;
+    last = BUDDY_TEXT.addedYouAsk(r.name);
+    if (!engine.prompt) {
+      notice(BUDDY_TEXT.addedYou(r.name));
+      return;
+    }
+    const uid = engine.prompt({
+      text: BUDDY_TEXT.addedYouAsk(r.name),
+      choices: [{ label: BUDDY_TEXT.addBack, value: 'add' }, { label: BUDDY_TEXT.notNow, value: 'later' }],
+      onChoice: (v) => {
+        asking.delete(r.id);
+        if (v === 'add' && !isBuddy(list, r.id) && !isIgnoring(list, r.id)) queueAdd({ id: r.id, name: r.name });
+        publish();
+      },
+    });
+    asking.set(r.id, uid || '');
+    publish();
+  }
+
+  /** Prompts for someone you now hold, block, or who no longer holds you: taken away unanswered. */
+  function settleAsks() {
+    for (const [id, uid] of [...asking]) {
+      if (isBuddy(list, id) || isIgnoring(list, id) || !list.reverse.some((r) => r.id === id)) {
+        asking.delete(id);
+        if (uid) engine.removePrompt?.(uid);
+      }
+    }
+  }
+
+  /** Add back from a prompt, after whatever add or remove is running (several prompts answered quickly). */
+  function queueAdd(p) {
+    addQueue = addQueue.then(async () => {
+      while (running) await running;
+      if (!isBuddy(list, p.id)) await add(p);
+    });
+    return addQueue;
   }
 
   function add(player) {

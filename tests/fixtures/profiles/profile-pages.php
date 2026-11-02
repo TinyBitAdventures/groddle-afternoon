@@ -41,6 +41,25 @@ foreach (['/project/', '/restoration/', '/restoration/history/', '/compare/', '/
 }
 $both = [...$header, ['Notes', '/changelog/', '']];
 
+// The buddy button on a player's page (PlayerPages::buddyControl), as each reader sees it.
+$state = static fn (array $over): array => $over + ['viewer' => 7, 'id' => 9, 'name' => 'Zz <b>Ada</b>', 'base' => '/players/zz-ada/', 'tab' => '', 'holds' => false, 'blocked' => false, 'nonce' => 'abcdef0123', 'said' => ''];
+$buddy = [];
+foreach ([
+    'add' => [],
+    'remove' => ['holds' => true],
+    'signed out' => ['viewer' => 0],
+    'own page' => ['viewer' => 9],
+    'blocked' => ['blocked' => true],
+    'no nonce' => ['nonce' => ''],
+    'added' => ['holds' => true, 'said' => 'added'],
+    'removed' => ['said' => 'removed'],
+    'limit' => ['said' => 'limit'],
+    'unknown said' => ['said' => '<script>'],
+    'on skills' => ['tab' => 'skills'],
+] as $case => $over) {
+    $buddy[$case] = PlayerPages::buddyControl($state($over));
+}
+
 echo json_encode([
     'skills' => $skills,
     'ids' => Profiles::ids(['alchemy_1', 'mining_1', 'alchemy_1', 'Bad-Id', 5, null, 'refining_1']),
@@ -48,4 +67,5 @@ echo json_encode([
     'current' => $current,
     'direct link wins' => SiteNav::current($both, '/changelog/'),
     'nav on /code/' => SiteNav::nav($header, '/code/'),
+    'buddy' => $buddy,
 ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . "\n";

@@ -35,6 +35,10 @@ export const BUDDY_TEXT = Object.freeze({
   unignoreTip: (name) => `Allow ${name} to talk to you`, // main.js:3608
   limit: (n) => `You currently have the maximum number of friends (${n} or more!)`, // main.js:3640
   addedYou: (name) => `${name} just added you as a contact!`, // inc_buddies.js:209
+  // inc_buddies.js:215-225: added while you were away and not your buddy, a friend_add notification asks you to add them back.
+  addedYouAsk: (name) => `${name} just added you as a contact! Add them back?`,
+  addBack: 'Add back',
+  notNow: 'Not now',
   blocked: (name) => `You blocked ${name}.`, // inc_buddies.js:560
   unblocked: (name) => `You un-blocked ${name}.`, // inc_buddies.js:577
   hidden: 'A secret place', // inc_buddies.js:343 a hidden location
@@ -120,6 +124,15 @@ export function buddyWhere(presence, labelFor = (t) => t) {
 /** Reverse entries the player has not been told about yet (added while they were away). */
 export function freshReverse(list, told = new Set()) {
   return (list?.reverse || []).filter((r) => r.isNew && !told.has(r.id));
+}
+
+/**
+ * How to tell a fresh reverse entry (buddies_has_added, inc_buddies.js:203-225):
+ * 'ask' (they are not your buddy: Add them back?, the friend_add notification),
+ * 'tell' (already your buddy: the line alone, friend_add_mutual).
+ */
+export function addedYouKind(list, id) {
+  return isBuddy(list, id) ? 'tell' : 'ask';
 }
 
 /** Who added you that you have not added back: the panel's "Added you" rows. */

@@ -11,13 +11,16 @@ import assert from 'node:assert/strict';
 import { after, before, describe, it } from 'node:test';
 import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
+import { homedir } from 'node:os';
 import { join } from 'node:path';
+import vm from 'node:vm';
 
 import {
   BUDDY_COUNTER,
   BUDDY_LIMIT,
   BUDDY_TEXT,
   BUDDY_VERBS,
+  addedYouKind,
   addedYouOnly,
   applyPresence,
   applyStatus,
@@ -25,10 +28,10 @@ import {
   buddyWhere,
   freshReverse,
   normalizeList,
-} from '../public/js/buddies.js?v=183da4ff';
+} from '../public/js/buddies.js?v=df41a3bb';
 import { createMinnAccount } from '../public/js/minn-account.js?v=ea900c51';
-import { buddiesFeature } from '../public/js/features/buddies-feature.js?v=730d3814';
-import { FEATURES } from '../public/js/features/index.js?v=09099051';
+import { buddiesFeature } from '../public/js/features/buddies-feature.js?v=3d549d54';
+import { FEATURES } from '../public/js/features/index.js?v=309db96d';
 import { serverPath, sitePath, skipWithoutServer, skipWithoutSite } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');
@@ -97,6 +100,11 @@ describe('buddies rules (js/buddies.js)', () => {
     assert.deepEqual(addedYouOnly(l).map((r) => r.id), [5]);
     assert.deepEqual(freshReverse(l).map((r) => r.id), [5]);
     assert.deepEqual(freshReverse(l, new Set([5])), []);
+    // Ed is not your buddy: ask to add back (friend_add); Bo is: the line alone (friend_add_mutual).
+    assert.equal(addedYouKind(l, 5), 'ask');
+    assert.equal(addedYouKind(l, 2), 'tell');
+    assert.equal(BUDDY_TEXT.addedYouAsk('Ed'), 'Ed just added you as a contact! Add them back?');
+    assert.deepEqual([BUDDY_TEXT.addBack, BUDDY_TEXT.notNow], ['Add back', 'Not now']);
   });
 
   it('counts the badges the source counts', () => {
@@ -226,6 +234,9 @@ describe('buddies feature (js/features/buddies-feature.js)', () => {
   let answer;
   const events = [];
   const posted = [];
+  /** The "Add them back?" prompts, unanswered: { uid, text, choices, onChoice }. */
+  const asks = [];
+  const NAMES = { 5: 'Ed', 6: 'Fi', 8: 'Hal', 9: 'Ivy', 10: 'Jo' };
 
   before(() => {
     for (const k of ['document', 'fetch', 'groddleBuddies', 'GRODDLE_MP_BOOT']) saved[k] = globalThis[k];
@@ -242,7 +253,7 @@ describe('buddies feature (js/features/buddies-feature.js)', () => {
       let body = answer;
       if (method === 'POST' && path === 'buddies') {
         const id = JSON.parse(init.body).id;
-        answer.buddies.unshift({ id, name: id === 5 ? 'Ed' : 'Fi', addedAt: '', mutual: id === 5 });
+        answer.buddies.unshift({ id, name: NAMES[id] || 'Fi', addedAt: '', mutual: answer.reverse.some((r) => r.id === id) });
         body = { ...answer, told: 'told.sig', watch: { token: 'tok2.sig', expiresIn: 3600 } };
       }
       if (method === 'POST' && path === 'buddies/ignores') {
@@ -261,7 +272,18 @@ describe('buddies feature (js/features/buddies-feature.js)', () => {
       setData: (k, v) => { engine.data[k] = v; },
       data: {},
       toast: (t) => events.push(`toast:${t}`),
-      prompt: (p) => { events.push(`prompt:${p.text}`); p.onChoice?.(true); },
+      prompt: (p) => {
+        events.push(`prompt:${p.text}`);
+        // "Add them back?" waits for a test to answer; the confirmations say yes at once.
+        if (/Add them back\?$/.test(p.text)) {
+          const uid = `p${asks.length + 1}`;
+          asks.push({ uid, ...p });
+          return uid;
+        }
+        p.onChoice?.(true);
+        return '';
+      },
+      removePrompt: (uid) => events.push(`removePrompt:${uid}`),
       pushActivity: (t) => events.push(`activity:${t}`),
       achievement: (c, n) => events.push(`achievement:${c}:${n}`),
       resetAchievementCounter: (c) => events.push(`reset:${c}`),
@@ -301,7 +323,11 @@ describe('buddies feature (js/features/buddies-feature.js)', () => {
     assert.equal(engine.data.buddiesCount, '2');
     assert.ok(events.includes(`reset:${BUDDY_COUNTER}`));
     assert.ok(events.includes(`achievement:${BUDDY_COUNTER}:2`));
-    assert.ok(events.includes(`toast:${BUDDY_TEXT.addedYou('Ed')}`), 'Ed added you while you were away');
+    // Ed added you while you were away and is not your buddy: a prompt, not a toast.
+    assert.ok(events.includes(`prompt:${BUDDY_TEXT.addedYouAsk('Ed')}`), 'Ed added you while you were away');
+    assert.ok(!events.includes(`toast:${BUDDY_TEXT.addedYou('Ed')}`));
+    assert.deepEqual(asks.map((a) => [a.text, a.choices.map((c) => c.label)]), [[BUDDY_TEXT.addedYouAsk('Ed'), ['Add back', 'Not now']]]);
+    assert.equal(engine.data.buddiesAsking, '5');
     assert.ok(menu.find('id', 'buddies-btn'), 'Menu has Buddies');
     // A reconnect sends the same list again.
     client.emit('hello', { id: 1, name: 'Ada' });
@@ -348,6 +374,7 @@ describe('buddies feature (js/features/buddies-feature.js)', () => {
     posted.length = 0;
     client.msg({ t: 'buddy_added', id: 7, name: 'Gus' });
     assert.ok(events.includes(`toast:${BUDDY_TEXT.addedYou('Gus')}`));
+    assert.ok(!events.some((e) => e.startsWith('prompt:')), 'online, the line alone (the source\'s activity line)');
     await wait(5);
     assert.deepEqual(posted, ['GET buddies']);
     // Someone you block: nothing.
@@ -366,6 +393,62 @@ describe('buddies feature (js/features/buddies-feature.js)', () => {
     assert.equal(buddiesFeature.realtimeHidden(2), true);
     assert.equal(buddiesFeature.realtimeHidden(4), null);
     assert.equal(engine.data.buddiesIgnoring, '2,3');
+  });
+
+  it('asks once per player who added you while you were away: Add back adds them, Not now leaves them in Added you', async () => {
+    // Ed's prompt from the load is still up; a refresh does not ask again.
+    await globalThis.groddleBuddies.refresh();
+    assert.equal(asks.length, 1);
+    // Three more came while away (one already your buddy: the line alone).
+    answer.reverse.push({ id: 8, name: 'Hal', addedAt: '', new: true }, { id: 9, name: 'Ivy', addedAt: '', new: true }, { id: 4, name: 'Di', addedAt: '', new: true });
+    events.length = 0;
+    posted.length = 0;
+    await globalThis.groddleBuddies.refresh();
+    assert.deepEqual(asks.map((a) => a.text), ['Ed', 'Hal', 'Ivy'].map(BUDDY_TEXT.addedYouAsk), 'one prompt each');
+    assert.ok(events.includes(`toast:${BUDDY_TEXT.addedYou('Di')}`), 'Di is already your buddy');
+    assert.equal(engine.data.buddiesAsking, '5,8,9');
+    // Add back on Ed and Hal at once: both are added, one after the other.
+    const [ed, hal, ivy] = asks;
+    ed.onChoice(ed.choices[0].value);
+    hal.onChoice(hal.choices[0].value);
+    await wait(20);
+    assert.deepEqual(posted.filter((p) => p.startsWith('POST')), ['POST buddies', 'POST buddies']);
+    assert.ok(globalThis.groddleBuddies.list.buddies.some((b) => b.id === 5 && b.mutual), 'Ed is your buddy now, both ways');
+    assert.ok(globalThis.groddleBuddies.list.buddies.some((b) => b.id === 8));
+    assert.deepEqual(client.take('buddy_tell').length, 2, 'each add sends its proof');
+    assert.ok(events.includes(`toast:${BUDDY_TEXT.added('Hal')}`));
+    // Not now on Ivy: nothing is sent, and she stays under Added you.
+    posted.length = 0;
+    ivy.onChoice(ivy.choices[1].value);
+    await wait(5);
+    assert.deepEqual(posted, []);
+    assert.deepEqual(addedYouOnly(globalThis.groddleBuddies.list).map((r) => r.id), [9]);
+    assert.equal(engine.data.buddiesAsking, '');
+  });
+
+  it('takes a prompt away when you add or block them some other way first', async () => {
+    answer.reverse.push({ id: 11, name: 'Kim', addedAt: '', new: true });
+    await globalThis.groddleBuddies.refresh();
+    const kim = asks.at(-1);
+    assert.equal(kim.text, BUDDY_TEXT.addedYouAsk('Kim'));
+    events.length = 0;
+    await globalThis.groddleBuddies.ignore({ id: 11, name: 'Kim' });
+    assert.ok(events.includes(`removePrompt:${kim.uid}`), 'blocked: the prompt goes');
+
+    answer.reverse.push({ id: 10, name: 'Jo', addedAt: '', new: true });
+    await globalThis.groddleBuddies.refresh();
+    const jo = asks.at(-1);
+    assert.equal(jo.text, BUDDY_TEXT.addedYouAsk('Jo'));
+    events.length = 0;
+    // The Buddies panel's Add back (or the player menu) adds Jo: the prompt goes, unanswered.
+    await globalThis.groddleBuddies.add({ id: 10, name: 'Jo' });
+    assert.ok(events.includes(`removePrompt:${jo.uid}`));
+    assert.equal(engine.data.buddiesAsking, '');
+    // Answering it late adds nothing twice.
+    posted.length = 0;
+    jo.onChoice('add');
+    await wait(5);
+    assert.deepEqual(posted, []);
   });
 });
 
@@ -411,3 +494,104 @@ describe('buddies across the repos', () => {
   });
 });
 
+
+// —— The website's "Add to buddy list" (ticket 46) ——
+
+describe('"Add to buddy list" on a player\'s page (site PlayerPages, players/buddy.js; ticket 46)', { skip: skipWithoutSite }, () => {
+  const site = (rel) => readFileSync(sitePath(rel), 'utf8');
+
+  it('the buddy routes can leave who added you new, so a website add never swallows the game\'s prompt', () => {
+    const php = site('src/Buddies.php');
+    assert.match(php, /return \$request->query\('keepNew'\) === '1';/);
+    assert.match(php, /return \$this->answer\(!\$keepNew\) \+ \['added' => \$id, 'told'/);
+    assert.match(php, /return \$this->answer\(!\$keepNew\) \+ \['removed' => \$id\];/);
+    assert.match(php, /if \(\$markSeen && array_filter\(\$out\['reverse'\]/);
+    assert.match(php, /private function answer\(bool \$markSeen = true\): array/, 'the game\'s calls still mark them seen');
+  });
+
+  it('the page form posts with the REST nonce, as the reader, for the player the path names', () => {
+    const php = site('src/PlayerPages.php');
+    const fn = php.slice(php.indexOf('public function buddy('), php.indexOf('private function buddyButton('));
+    assert.match(fn, /\[\$id, \$canonical\] = \$this->find\(\$slug\) \?\? throw new RouteMiss\(\);/);
+    assert.match(fn, /Nonce::verify\(\$nonce, \$reader->userId, \$reader->sessionToken\)/);
+    assert.match(fn, /\$this->isPlayer\(\$reader->userId\)/);
+    assert.match(fn, /Profiles::fromSave\(\$this->minn->db, \$id\)\['level'\] >= Profiles::LISTED_LEVEL/);
+    assert.match(fn, /\$buddies->removeBuddy\(\$id, true\) : \$buddies->addBuddy\(\$id, true\)/);
+    assert.match(fn, /Response::redirect\("\{\$back\}\?buddy=\{\$said\}", 303\)/);
+    assert.doesNotMatch(fn, /\$form\['(?:id|user|user_id)'\]/, 'never a player id from the form');
+    const button = php.slice(php.indexOf('private function buddyButton('), php.indexOf('private function isPlayer('));
+    assert.match(button, /\$reader->userId === \$id/);
+    assert.match(button, /\(new Buddies\(\$this->minn\)\)->between\(\$id\)/);
+    assert.match(button, /Nonce::create\(\$reader->userId, \$reader->sessionToken\)/);
+    assert.match(php, /'Cache-Control', \$this->minn->reader->userId > 0 \? 'private, no-cache' : 'no-cache'/, 'a page with a nonce is the reader\'s alone');
+    assert.match(php, /public const BUDDY_LABELS = \['add' => 'Add to buddy list', 'remove' => 'Remove from buddy list'\];/);
+    const between = site('src/Buddies.php');
+    assert.match(between, /'blocked' => \$this->ignoring\(\$me, \$other\) \|\| \$this->ignoring\(\$other, \$me\)/);
+    assert.match(site('style.css'), /\.profile-buddy-btn \{[^}]*var\(--play-bg\)/);
+    assert.ok(existsSync(sitePath('players/buddy.js')));
+  });
+
+  const engine = process.env.MINN_ENGINE_DIR || join(homedir(), 'Cove/Sites/minn-engine.localhost/public/minn');
+  it('draws the button only for another signed-in player neither blocks, in glitch.com\'s words (php)', { skip: !existsSync(join(engine, 'src/Minn/Autoloader.php')) && 'Minn Engine not found (set MINN_ENGINE_DIR)' }, () => {
+    let out;
+    try {
+      out = JSON.parse(execFileSync('php', [join(root, 'tests/fixtures/profiles/profile-pages.php'), engine, sitePath(''), join(root, 'public')], { encoding: 'utf8' })).buddy;
+    } catch (err) {
+      if (err.code === 'ENOENT') return; // no php here
+      throw err;
+    }
+    for (const c of ['signed out', 'own page', 'blocked', 'no nonce']) assert.equal(out[c], '', c);
+    assert.match(out.add, /<form class="profile-buddy" method="post" action="\/players\/zz-ada\/buddy\/"/);
+    assert.match(out.add, /<input type="hidden" name="_wpnonce" value="abcdef0123" \/>/);
+    assert.match(out.add, /<button type="submit" class="profile-buddy-btn" data-buddy-do="add">Add to buddy list<\/button>/);
+    assert.match(out.remove, /data-buddy-do="remove">Remove from buddy list<\/button>/);
+    assert.match(out.add, /data-buddy-name="Zz &lt;b&gt;Ada&lt;\/b&gt;"/, 'the name is escaped');
+    assert.doesNotMatch(Object.values(out).join(''), /<b>|<script>/);
+    assert.match(out.added, />Zz &lt;b&gt;Ada&lt;\/b&gt; is on your buddy list now\.<\/span>/);
+    assert.match(out.removed, /is off your buddy list\.<\/span>/);
+    assert.match(out.limit, /data-tone="bad">You currently have the maximum number of friends \(1000 or more!\)/);
+    assert.match(out['unknown said'], /aria-live="polite"><\/span>/);
+    assert.match(out['on skills'], /name="tab" value="skills"/);
+  });
+
+  it('with JavaScript the button calls groddle/v1/buddies (keepNew) and changes in place, a stale nonce refreshed once', async () => {
+    const calls = [];
+    let stale = true;
+    const field = (value) => ({ value });
+    const doField = field('add');
+    const nonceField = field('abcdef0123');
+    const button = { dataset: { buddyDo: 'add' }, textContent: 'Add to buddy list', disabled: false, hidden: false };
+    const note = { textContent: '', dataset: {} };
+    let submit;
+    const form = {
+      dataset: { buddyId: '9', buddyName: 'Ada', labelAdd: 'Add to buddy list', labelRemove: 'Remove from buddy list' },
+      querySelector: (sel) => ({ '[data-buddy-do]': button, 'input[name="do"]': doField, 'input[name="_wpnonce"]': nonceField, '.profile-buddy-note': note })[sel] || null,
+      addEventListener: (type, fn) => { if (type === 'submit') submit = fn; },
+    };
+    const reply = (status, body, headers = {}) => ({ ok: status >= 200 && status < 300, status, headers: { get: (k) => headers[k] ?? null }, json: async () => body, text: async () => String(body) });
+    const fetch = async (url, init = {}) => {
+      calls.push(`${init.method || 'GET'} ${url} ${init.headers?.['X-WP-Nonce'] || ''} ${init.body || ''}`.trim());
+      if (url.includes('rest-nonce')) return reply(200, 'fedcba9876');
+      if (stale) {
+        stale = false;
+        return reply(403, { code: 'rest_cookie_invalid_nonce' });
+      }
+      return init.method === 'DELETE' ? reply(200, { removed: 9 }) : reply(201, { added: 9 }, { 'X-WP-Nonce': '0123456789' });
+    };
+    vm.runInNewContext(site('players/buddy.js'), { document: { querySelectorAll: () => [form] }, fetch });
+    await submit({ preventDefault() {} });
+    assert.deepEqual(calls, [
+      'POST /wp-json/groddle/v1/buddies?keepNew=1 abcdef0123 {"id":9}',
+      'GET /wp-admin/admin-ajax.php?action=rest-nonce',
+      'POST /wp-json/groddle/v1/buddies?keepNew=1 fedcba9876 {"id":9}',
+    ]);
+    assert.equal(button.textContent, 'Remove from buddy list');
+    assert.equal(doField.value, 'remove');
+    assert.equal(note.textContent, 'Ada is on your buddy list now.');
+    calls.length = 0;
+    await submit({ preventDefault() {} });
+    assert.deepEqual(calls, ['DELETE /wp-json/groddle/v1/buddies/9?keepNew=1 0123456789'], 'the fresh nonce from the answer');
+    assert.equal(button.textContent, 'Add to buddy list');
+    assert.equal(note.textContent, 'Ada is off your buddy list.');
+  });
+});
