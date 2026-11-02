@@ -16,9 +16,9 @@ import { homedir } from 'node:os';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { SITE_DIR, sitePath, skipWithoutSite } from '../tools/repos.mjs';
-import { REPORT_MAX, REPORT_PICTURE, REPORT_TEXT, STATUS_WORDS, UNREAD_POLL_MS, base64Size, createReportsApi, pictureRefused, pictureSize, pictureSrc, refusalWords, reportFromHash, ticketLine, unreadCount, whenWords } from '../public/js/reports.js?v=eabbd20e';
-import { mountReportsSheet } from '../public/js/ui/reports-sheet.js?v=f9d44c71';
-import { BUG_TEXT, badgeFor, bugReportFeature, capturePicture } from '../public/js/features/bug-report-feature.js?v=cab34594';
+import { REPORT_MAX, REPORT_PICTURE, REPORT_TEXT, STATUS_WORDS, UNREAD_POLL_MS, base64Size, createReportsApi, pictureRefused, pictureSize, pictureSrc, refusalWords, reportFromHash, ticketLine, unreadCount, whenWords } from '../public/js/reports.js?v=d0391a23';
+import { mountReportsSheet } from '../public/js/ui/reports-sheet.js?v=870031fc';
+import { BUG_TEXT, badgeFor, bugReportFeature, capturePicture } from '../public/js/features/bug-report-feature.js?v=318118d0';
 
 const root = join(import.meta.dirname, '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');
@@ -135,7 +135,7 @@ describe('the rules (js/reports.js)', () => {
   it('keeps the original form\'s words and the site\'s limits, with no em dashes', () => {
     assert.equal(BUG_TEXT.title, 'We\'d love to hear from you!');
     assert.equal(BUG_TEXT.label, 'Tell us anything: feedback, a suggestion, or a bug you found.');
-    assert.equal(REPORT_MAX, 2000);
+    assert.equal(REPORT_MAX, 4000);
     assert.equal(UNREAD_POLL_MS, 60000);
     const words = [...Object.values(REPORT_TEXT).map((v) => (typeof v === 'function' ? `${v(1)} ${v(3)}` : v)), ...Object.values(STATUS_WORDS)];
     for (const w of words) assert.ok(!/[—–]/.test(w), `no em dash: ${w}`);
@@ -546,7 +546,14 @@ describe('the site (groddle-afternoon-site)', { skip: skipWithoutSite }, () => {
   it('keeps the report\'s limits: length, rate, and the reply limit', () => {
     const php = src('src/Tickets.php');
     const bug = src('src/BugReports.php');
-    assert.match(bug, /MAX_MESSAGE = 2000;/);
+    assert.match(bug, /MAX_MESSAGE = 4000;/);
+    // Too long is refused with a message, never cut: a cut admin reply reached a player mid-sentence (ticket 21, 2026-11-01).
+    assert.match(src('src/TicketStore.php'), /MAX_ADMIN_MESSAGE = 10000;/);
+    assert.match(php, /BugReports::message\(\$body\['message'\] \?\? null, BugReports::MAX_MESSAGE, 'groddle_feedback_long'\)/);
+    assert.match(php, /BugReports::message\(\$body\['message'\] \?\? null, TicketStore::MAX_MESSAGE, 'groddle_ticket_long'\)/);
+    assert.match(src('src/AdminTickets.php'), /BugReports::message\(\$body\['message'\] \?\? null, TicketStore::MAX_ADMIN_MESSAGE, 'groddle_ticket_long'\)/);
+    assert.match(src('console/console.js'), /export const TICKET_MAX = 10000;/);
+    assert.match(src('src/AdminConsolePage.php'), /id="console-reply-text" name="message" rows="4" maxlength="10000"/);
     assert.match(bug, /PER_WINDOW = 3;/);
     assert.match(bug, /PER_DAY = 50;/);
     assert.match(php, /openedSince\(\$me->id, BugReports::WINDOW, \$now\) >= BugReports::PER_WINDOW \|\| \$store->openedSince\(\$me->id, 86400, \$now\) >= BugReports::PER_DAY/);
@@ -623,7 +630,8 @@ describe('the site (groddle-afternoon-site)', { skip: skipWithoutSite }, () => {
     assert.deepEqual(out.subject, { short: 'Pigs float', long: `${'a'.repeat(59)}…`, longLen: 60, spaces: 'a b' });
     assert.deepEqual(out.statusAfter, ['open', 'answered']);
     assert.deepEqual(out.unread, { adminWroteNeverRead: true, adminWroteReadBefore: true, adminWroteReadAfter: false, playerWroteForPlayer: false, playerWroteForAdmin: true, playerWroteAdminRead: false });
-    assert.deepEqual(out.clean, { control: 'ab\nc', badUtf8: 'ok ?( there', cut: 2000 });
+    assert.deepEqual(out.clean, { control: 'ab\nc', badUtf8: 'ok ?( there', cut: 4000 });
+    assert.deepEqual(out.message, { fits: 4000, admin: 9000, refused: ['groddle_ticket_long', 422], words: true });
     // An old post: the words (entities read back, <br> a line, paragraphs a blank line apart), the Details as the context.
     assert.equal(out.migration.message, 'The pig & the <b>butterfly</b> froze.\nThen the street went dark.\n\nSecond paragraph.');
     assert.deepEqual(out.migration.context, { street: 'GA5101HF7F429V5', streetName: 'Hechey Track', x: '120', y: '-30', build: 'g465-1', page: '/play/online/', agent: 'Test/1.0', screen: '1280x800', panels: '', errors: ['TypeError: boom <here>', 'second'] });

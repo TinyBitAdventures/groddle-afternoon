@@ -33,7 +33,7 @@
  * [data-reports-picture-preview], [data-reports-thread-picture].
  */
 
-import { REPORT_MAX, REPORT_TEXT as T, STATUS_WORDS, pictureRefused, pictureSrc, refusalWords, ticketLine, unreadCount, whenWords } from '../reports.js?v=eabbd20e';
+import { REPORT_MAX, REPORT_TEXT as T, STATUS_WORDS, pictureRefused, pictureSrc, refusalWords, ticketLine, unreadCount, whenWords } from '../reports.js?v=d0391a23';
 
 /** How long Send waits for a picture still drawing before it sends the world-only one (ms). */
 export const PICTURE_WAIT_MS = 6000;

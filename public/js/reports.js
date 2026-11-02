@@ -108,7 +108,7 @@ export function pictureSrc(picture) {
 export const STATUS_WORDS = Object.freeze({ open: 'Open', answered: 'Answered', closed: 'Closed' });
 
 /** As the site keeps them (src/BugReports.php MAX_MESSAGE). */
-export const REPORT_MAX = 2000;
+export const REPORT_MAX = 4000;
 
 /** How often the bug icon asks for new replies while the game is online (ms). */
 export const UNREAD_POLL_MS = 60000;

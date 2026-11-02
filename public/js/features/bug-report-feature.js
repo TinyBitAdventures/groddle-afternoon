@@ -50,8 +50,8 @@
  * window.groddleBugReport.open('list'|'new'), .openTicket(id), .refresh() in multiplayer.
  */
 
-import { createReportsApi, REPORT_PICTURE, REPORT_TEXT, UNREAD_POLL_MS, base64Size, pictureSize, reportFromHash } from '../reports.js?v=eabbd20e';
-import { mountReportsSheet } from '../ui/reports-sheet.js?v=f9d44c71';
+import { createReportsApi, REPORT_PICTURE, REPORT_TEXT, UNREAD_POLL_MS, base64Size, pictureSize, reportFromHash } from '../reports.js?v=d0391a23';
+import { mountReportsSheet } from '../ui/reports-sheet.js?v=870031fc';
 
 export const BUG_REPORT_FEATURE_ID = 'bug-report';
 
@@ -69,7 +69,7 @@ export const BUG_TEXT = Object.freeze({
 });
 
 /** As the site keeps them (BugReports.php MAX_MESSAGE, MAX_ERRORS). */
-export const MAX_MESSAGE = 2000;
+export const MAX_MESSAGE = 4000;
 const MAX_ERRORS = 10;
 
 /** The page's last errors, newest last, each cut short. */

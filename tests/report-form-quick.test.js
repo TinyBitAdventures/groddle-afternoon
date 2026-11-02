@@ -5,8 +5,8 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { mountReportsSheet, PICTURE_WAIT_MS } from '../public/js/ui/reports-sheet.js?v=f9d44c71';
-import { blankPicture, leftOut } from '../public/js/features/bug-report-feature.js?v=cab34594';
+import { mountReportsSheet, PICTURE_WAIT_MS } from '../public/js/ui/reports-sheet.js?v=870031fc';
+import { blankPicture, leftOut } from '../public/js/features/bug-report-feature.js?v=318118d0';
 
 const root = join(import.meta.dirname, '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');

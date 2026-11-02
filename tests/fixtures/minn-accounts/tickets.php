@@ -113,8 +113,22 @@ echo json_encode([
     'clean' => [
         'control' => BugReports::clean("a\x07b\r\nc", 2000, true),
         'badUtf8' => BugReports::clean("ok \xC3\x28 there", 2000, true),
-        'cut' => mb_strlen(BugReports::clean(str_repeat('x', 2100), TicketStore::MAX_MESSAGE, true)),
+        'cut' => mb_strlen(BugReports::clean(str_repeat('x', 4100), TicketStore::MAX_MESSAGE, true)),
     ],
+    'message' => (static function (): array {
+        try {
+            BugReports::message(str_repeat('x', TicketStore::MAX_MESSAGE + 1), TicketStore::MAX_MESSAGE, 'groddle_ticket_long');
+            $refused = null;
+        } catch (\Minn\RestError $e) {
+            $refused = [$e->errorCode, $e->status, $e->getMessage()];
+        }
+        return [
+            'fits' => mb_strlen(BugReports::message(str_repeat('x', TicketStore::MAX_MESSAGE), TicketStore::MAX_MESSAGE, 'c')),
+            'admin' => mb_strlen(BugReports::message(str_repeat('y', 9000), TicketStore::MAX_ADMIN_MESSAGE, 'c')),
+            'refused' => $refused ? [$refused[0], $refused[1]] : null,
+            'words' => $refused !== null && str_contains($refused[2], '4,001 characters') && !preg_match('/[\x{2014}\x{2013}]/u', $refused[2]),
+        ];
+    })(),
     'migration' => [
         'message' => $oldMessage, 'context' => $oldContext,
         'bareMessage' => $bareMessage, 'bareContext' => $bareContext,

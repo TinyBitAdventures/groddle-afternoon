@@ -9,7 +9,7 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { BUG_TEXT, MAX_MESSAGE, bugReportFeature, buildKey, rememberError, reportContext } from '../public/js/features/bug-report-feature.js?v=cab34594';
+import { BUG_TEXT, MAX_MESSAGE, bugReportFeature, buildKey, rememberError, reportContext } from '../public/js/features/bug-report-feature.js?v=318118d0';
 import { createMinnAccount } from '../public/js/minn-account.js?v=ea900c51';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -88,8 +88,8 @@ describe('Report a bug (G353)', () => {
     assert.ok(manifest.tables.groddle_tickets && manifest.tables.groddle_ticket_messages, 'the ticket tables');
     assert.match(php, /#\[Route\(Method::Post, '\/groddle\/v1\/feedback', policy: new Policy\(Access::SignedIn\)\)\]/);
     assert.match(php, /return \(new Tickets\(\$this->minn\)\)->create\(\$request\);/);
-    assert.match(php, /MAX_MESSAGE = 2000;/);
-    assert.equal(MAX_MESSAGE, 2000);
+    assert.match(php, /MAX_MESSAGE = 4000;/);
+    assert.equal(MAX_MESSAGE, 4000);
     // The player's words are plain text: control characters out, invalid UTF-8 scrubbed; every reader sets them as text.
     assert.match(php, /mb_scrub\(\$text, 'UTF-8'\)/);
   });
