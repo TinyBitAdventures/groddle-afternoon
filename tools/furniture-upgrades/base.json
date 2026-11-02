@@ -25,6 +25,30 @@
   "foot": -24,
   "top": 0
  },
+ "furniture_armchair": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_base/furniture_armchair/furniture_armchair.swf",
+  "sha": "ab74b7771f0de175",
+  "w": 118,
+  "h": 90,
+  "foot": -25,
+  "top": 1
+ },
+ "furniture_bed": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_base/furniture_bed/furniture_bed.swf",
+  "sha": "21c10386a9d48444",
+  "w": 287,
+  "h": 112,
+  "foot": -45,
+  "top": 9
+ },
+ "furniture_bench": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_base/furniture_bench/furniture_bench.swf",
+  "sha": "52528d30198eaa27",
+  "w": 227,
+  "h": 53,
+  "foot": -20,
+  "top": 6
+ },
  "furniture_bookcase": {
   "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_base/furniture_bookcase/furniture_bookcase.swf",
   "sha": "2cb159913bb55dde",
@@ -40,6 +64,14 @@
   "h": 169,
   "foot": -14,
   "top": 0
+ },
+ "furniture_chair": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_base/furniture_chair/furniture_chair.swf",
+  "sha": "b238ccc400d13dbf",
+  "w": 72,
+  "h": 93,
+  "foot": -17,
+  "top": 1
  },
  "furniture_coffeetable": {
   "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_base/furniture_coffeetable/furniture_coffeetable.swf",
@@ -73,6 +105,14 @@
   "foot": -24,
   "top": 7
  },
+ "furniture_loveseat": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_base/furniture_loveseat/furniture_loveseat.swf",
+  "sha": "78ddcf8409809574",
+  "w": 182,
+  "h": 99,
+  "foot": -22,
+  "top": 0
+ },
  "furniture_shelf": {
   "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_base/furniture_shelf/furniture_shelf.swf",
   "sha": "79a41f599c04e74e",
@@ -87,6 +127,22 @@
   "w": 63,
   "h": 54,
   "foot": -18,
+  "top": 0
+ },
+ "furniture_sofa": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_base/furniture_sofa/furniture_sofa.swf",
+  "sha": "6f676f65bb637617",
+  "w": 247,
+  "h": 108,
+  "foot": -22,
+  "top": 0
+ },
+ "furniture_stool": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_base/furniture_stool/furniture_stool.swf",
+  "sha": "6051b5bbde488da0",
+  "w": 64,
+  "h": 48,
+  "foot": -13,
   "top": 0
  },
  "furniture_table": {

@@ -72,7 +72,7 @@ import { XP_FOR_LEVEL, currantRewardForLevel } from '../public/js/progression.js
 import { IMAGINATION_UPGRADES } from '../public/js/imagination-data.js?v=4a85e7fe';
 import { SPINDLE_TOOLS } from '../public/js/making.js?v=20d5364b';
 import { creditedMultiplayerQuests } from '../public/js/quests-mp.js?v=2beb658a';
-import { FURNITURE_STARTER_KIT } from '../public/js/homes-catalog.js?v=b3d9aea7';
+import { FURNITURE_STARTER_KIT } from '../public/js/homes-catalog.js?v=7aa9beb0';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 export const OUT = sitePath('data', 'economy.json');

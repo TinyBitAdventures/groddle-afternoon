@@ -39,6 +39,11 @@
  *     passed while the plain pieces rested things on the back edge of their
  *     tops, 5 px under the art's top edge and up to 13 px over the plat.
  *
+ *   - a seat (platOnly: chair, armchair, bench, stool, sofa, loveseat, bed; SEATSELECT,
+ *     Austin 2026-11-02) rests things only on its plat, plain and every style: its plat
+ *     must lie on its art, and a style with no plat in the source holds nothing
+ *     (platlessSeats: two hidden test sofas).
+ *
  *   node tools/furniture-upgrades/tops.mjs           also writes the plain tops
  *                                                    into base.json: then run
  *                                                    node build-homes.mjs --no-art
@@ -126,9 +131,11 @@ export async function surfacePieces() {
     if (!def.surface) continue;
     const scale = Math.min(1, Number(def.scale) || 1);
     const plain = def.art.path.replace(/\.png$/, '@3x.webp');
-    out.push({ key: `${cls}/0`, cls, id: '', path: existsSync(join(root, 'public', plain)) ? plain : def.art.path, w: Math.round(def.art.w * scale), h: Math.round(def.art.h * scale), artH: def.art.h, scale, def });
+    out.push({ key: `${cls}/0`, cls, id: '', path: existsSync(join(root, 'public', plain)) ? plain : def.art.path, w: Math.round(def.art.w * scale), h: Math.round(def.art.h * scale), artH: def.art.h, scale, def, platOnly: Boolean(def.platOnly) });
     for (const [id, row] of Object.entries(FURNITURE_UPGRADES[cls]?.upgrades || {})) {
-      if (row.art) out.push({ key: `${cls}/${id}`, cls, id, path: row.art.path, w: row.art.w, h: row.art.h });
+      // A seat's style with no plat holds nothing (platOnly, SEATSELECT): the sweep proves that apart.
+      if (def.platOnly && row.platY == null) continue;
+      if (row.art) out.push({ key: `${cls}/${id}`, cls, id, path: row.art.path, w: row.art.w, h: row.art.h, platOnly: Boolean(def.platOnly) });
     }
   }
   return out;
@@ -189,8 +196,32 @@ export async function sweep(measured) {
     if (on < REST_ON) problems.push(`${piece.key}: rests ${h} over its foot in the air (${Math.round(on * 100)}% of its middle drawn under it)`);
     const want = await sourceRest(piece, m, base);
     if (want != null && Math.abs(h - want) > 1) problems.push(`${piece.key}: rests ${h} over its foot, its plat is at ${want}`);
+    // A seat rests things only on its plat (SEATSELECT): the plat must be found and on the art.
+    if (piece.platOnly && want == null) problems.push(`${piece.key}: a seat with no plat under its visible top`);
   }
   return problems;
+}
+
+/**
+ * The seats' styles with no plat (platOnly classes, SEATSELECT): they hold nothing, as in the
+ * original (include/furniture.js getPlatsAndWalls adds no geo). Returns the problems.
+ */
+export async function platlessSeats() {
+  const { FURNITURE_CATALOG } = await import(join(root, 'public/js/homes-catalog.js'));
+  const { FURNITURE_UPGRADES } = await import(join(root, 'public/js/furniture-upgrades-data.js'));
+  const { surfaceHeight } = await import(join(root, 'public/js/home-decor.js'));
+  const keys = [];
+  const problems = [];
+  for (const [cls, def] of Object.entries(FURNITURE_CATALOG)) {
+    if (!def.platOnly) continue;
+    if (def.platY == null) problems.push(`${cls}/0: a seat with no plat of its own`);
+    for (const [id, row] of Object.entries(FURNITURE_UPGRADES[cls]?.upgrades || {})) {
+      if (row.platY != null) continue;
+      keys.push(`${cls}/${id}`);
+      if (surfaceHeight(cls, id)) problems.push(`${cls}/${id}: has no plat in the source but holds things`);
+    }
+  }
+  return { keys, problems };
 }
 
 /**
@@ -268,13 +299,16 @@ async function main() {
     return;
   }
   problems.push(...(await sweep(measured)));
+  const platless = await platlessSeats();
+  problems.push(...platless.problems);
   const items = itemBottoms();
   problems.push(...items.problems);
   if (problems.length) {
     console.error(problems.join('\n'));
     process.exit(1);
   }
-  console.log(`ok: ${measured.length} pieces rest things on their art, on their plats; ${items.files} item states rest on their own bottoms`);
+  const seats = measured.filter(([piece]) => piece.platOnly).length;
+  console.log(`ok: ${measured.length} pieces rest things on their art, on their plats (${seats} seats on their seat plats; ${platless.keys.length} plat-less seat styles hold nothing); ${items.files} item states rest on their own bottoms`);
 }
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) await main();

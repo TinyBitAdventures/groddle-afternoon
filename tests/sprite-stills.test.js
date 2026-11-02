@@ -13,10 +13,10 @@ import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { FIRST_DRAW_SPRITES, HIRES_SPRITES } from '../public/js/sprite-hires.js?v=03e66d26';
+import { FIRST_DRAW_SPRITES, HIRES_SPRITES } from '../public/js/sprite-hires.js?v=8b7fdbb5';
 import { DENSE_SPRITES, denseSprite } from '../public/js/sprite-dense.js?v=8e0109eb';
 import { MAILBOX_SHEETS, STONE_ART, NOTE_ART, BOARD_ART } from '../public/js/street-furniture.js?v=171adb63';
-import { FURNITURE_CATALOG } from '../public/js/homes-catalog.js?v=b3d9aea7';
+import { FURNITURE_CATALOG } from '../public/js/homes-catalog.js?v=7aa9beb0';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const pub = join(root, 'public');
@@ -57,8 +57,8 @@ describe('sharp world still items', () => {
     for (const s of Object.values(MAILBOX_SHEETS)) assert.equal(results[s.path].cells, s.frames, s.path);
   });
 
-  it('covers every home furniture base piece with a CC0 base SWF (not the door, fireplace or house)', () => {
-    const left = ['furniture_door', 'furniture_fireplace'];
+  it('covers every home furniture base piece with a CC0 base SWF (not the door or house; the Fireplace since SEATSELECT drew one cell)', () => {
+    const left = ['furniture_door'];
     for (const [cls, def] of Object.entries(FURNITURE_CATALOG)) {
       if (!def?.art?.path || left.includes(cls)) continue;
       assert.ok(HIRES_SPRITES.has(def.art.path), `${cls} ${def.art.path}`);

@@ -52,7 +52,7 @@
 
 import { slugsFromEffects } from '../speech-slugs.js?v=130338f9';
 import { addItem, countItem, ensureItem, removeItem, ITEM_CATALOG } from '../inventory.js?v=b0e33301';
-import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=ac3acecc';
+import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=2e580c24';
 import { nearestSurfaceY } from '../walk-surface.js?v=5b6e1c8d';
 import { donationValueFor } from '../shrines.js?v=99cbf9a3';
 import { TRANT_META, trantStatusLabel } from '../trants.js?v=9c2e8c0f';

@@ -43421,5 +43421,37 @@
   "frameScores": [
    0.9647
   ]
+ },
+ "assets/sprites/furniture/furniture_fireplace.png": {
+  "animal": "furniture_fireplace",
+  "swf": "furniture/furniture_base/furniture_fireplace/furniture_fireplace.swf",
+  "sprite": 0,
+  "label": null,
+  "swfFrames": [
+   1,
+   1
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 193,
+  "fh": 133,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   -570,
+   -426
+  ],
+  "score": 0.9912,
+  "minFrame": 0.9912,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/furniture/furniture_fireplace@3x.webp",
+  "bytes": 77014,
+  "firstDraw": true,
+  "frameScores": [
+   0.9912
+  ]
  }
 }

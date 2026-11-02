@@ -55,7 +55,7 @@
  *   `rockRx`); a fixture steps aside for a cultivation, never the other way round.
  */
 
-import { CULTIVATION_CLASSES, HOME_LIMITS } from './homes-catalog.js?v=b3d9aea7';
+import { CULTIVATION_CLASSES, HOME_LIMITS } from './homes-catalog.js?v=7aa9beb0';
 import {
   TOWER_CHASSIS,
   TOWER_IMG_COST,

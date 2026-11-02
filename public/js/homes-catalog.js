@@ -20,8 +20,13 @@ export const FURNITURE_CATALOG = Object.freeze({
     "art": {
       "path": "assets/sprites/furniture/furniture_chair.png",
       "w": 72,
-      "h": 93
+      "h": 93,
+      "top": 1,
+      "foot": -17
     },
+    "surface": 45,
+    "platOnly": true,
+    "platY": 28,
     "upgrades": 16,
     "recipe": {
       "id": "252",
@@ -46,8 +51,13 @@ export const FURNITURE_CATALOG = Object.freeze({
     "art": {
       "path": "assets/sprites/furniture/furniture_armchair.png",
       "w": 118,
-      "h": 90
+      "h": 90,
+      "top": 1,
+      "foot": -25
     },
+    "surface": 47,
+    "platOnly": true,
+    "platY": 22,
     "upgrades": 23,
     "recipe": {
       "id": "257",
@@ -72,8 +82,13 @@ export const FURNITURE_CATALOG = Object.freeze({
     "art": {
       "path": "assets/sprites/furniture/furniture_bench.png",
       "w": 224,
-      "h": 53
+      "h": 53,
+      "top": 6,
+      "foot": -20
     },
+    "surface": 41,
+    "platOnly": true,
+    "platY": 21,
     "upgrades": 13,
     "recipe": {
       "id": "271",
@@ -98,8 +113,13 @@ export const FURNITURE_CATALOG = Object.freeze({
     "art": {
       "path": "assets/sprites/furniture/furniture_stool.png",
       "w": 62,
-      "h": 48
+      "h": 48,
+      "top": 0,
+      "foot": -13
     },
+    "surface": 39,
+    "platOnly": true,
+    "platY": 26,
     "upgrades": 14,
     "recipe": {
       "id": "276",
@@ -124,8 +144,13 @@ export const FURNITURE_CATALOG = Object.freeze({
     "art": {
       "path": "assets/sprites/furniture/furniture_sofa.png",
       "w": 244,
-      "h": 108
+      "h": 108,
+      "top": 0,
+      "foot": -22
     },
+    "surface": 43,
+    "platOnly": true,
+    "platY": 21,
     "upgrades": 16,
     "recipe": {
       "id": "259",
@@ -150,8 +175,13 @@ export const FURNITURE_CATALOG = Object.freeze({
     "art": {
       "path": "assets/sprites/furniture/furniture_loveseat.png",
       "w": 180,
-      "h": 99
+      "h": 99,
+      "top": 0,
+      "foot": -22
     },
+    "surface": 44,
+    "platOnly": true,
+    "platY": 22,
     "upgrades": 12,
     "recipe": {
       "id": "266",
@@ -175,8 +205,13 @@ export const FURNITURE_CATALOG = Object.freeze({
     "art": {
       "path": "assets/sprites/furniture/furniture_bed.png",
       "w": 284,
-      "h": 112
+      "h": 112,
+      "top": 9,
+      "foot": -45
     },
+    "surface": 59,
+    "platOnly": true,
+    "platY": 14,
     "upgrades": 23,
     "recipe": {
       "id": "258",
@@ -396,12 +431,13 @@ export const FURNITURE_CATALOG = Object.freeze({
     "canFlip": true,
     "art": {
       "path": "assets/sprites/furniture/furniture_fireplace.png",
-      "w": 965,
-      "h": 665,
-      "top": 7
+      "w": 193,
+      "h": 133,
+      "top": 7,
+      "foot": -24
     },
-    "scale": 0.5,
-    "surface": 560,
+    "surface": 121,
+    "platY": 97,
     "upgrades": 11,
     "recipe": {
       "id": "321",

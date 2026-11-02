@@ -96,7 +96,7 @@
  *   animalMoodRooting (Piggies rooting now), animalMoodLast (root:look | root:sniff).
  */
 
-import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=ac3acecc';
+import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=2e580c24';
 import { nearestSurfaceY } from '../walk-surface.js?v=5b6e1c8d';
 import { displayTopOf, itemstackOverlayPoint, playSheetOverlay } from '../overlay-art.js?v=3753a0d2';
 import { isInHell } from '../hell.js?v=d9afd81b';
@@ -105,7 +105,7 @@ import { TRANT_META, trantStatusLabel } from '../trants.js?v=9c2e8c0f';
 import { animalStatusLabel } from '../animals.js?v=926d8898';
 import { quoteAnimalKinship } from '../animal-kinship.js?v=3a50bfb2';
 import { captureVerbState, isFoodItem, itemLabel } from '../animal-husbandry.js?v=ef8ed409';
-import { ROOK_SHEETS, rookAttackFeature } from './rook-attack-feature.js?v=750929ea';
+import { ROOK_SHEETS, rookAttackFeature } from './rook-attack-feature.js?v=fd9cf50b';
 import { ANIMAL_BODY, ANIMAL_PATROL, TREE_FOOTPRINT } from '../street-ecology.js?v=7fbae08d';
 import {
   CHECK_ON_REMOVE,

@@ -28,11 +28,11 @@ import { requireSite, sitePath } from './repos.mjs';
 export const OUT = sitePath('data', 'home-machines.json');
 
 export async function homeMachinesJson() {
-  const hm = await import('../public/js/home-machines.js?v=44ae75ca');
+  const hm = await import('../public/js/home-machines.js?v=6dab3667');
   const { MACHINE_SKILLS } = await import('../public/js/machine-rooms.js?v=1e082003');
   const { FRESH_FUEL, MACHINE_IDS } = await import('../public/js/machines.js?v=0641eeaa');
-  const decor = await import('../public/js/home-decor.js?v=37d38d09');
-  const { HOME_LIMITS } = await import('../public/js/homes-catalog.js?v=b3d9aea7');
+  const decor = await import('../public/js/home-decor.js?v=39721c9f');
+  const { HOME_LIMITS } = await import('../public/js/homes-catalog.js?v=7aa9beb0');
   const tower = decor.interiorBounds({ layout: 'tower' });
   const rooms = { segmentW: decor.SEGMENT_W, minSegments: HOME_LIMITS.MIN_WALL_SEGMENTS, startSegments: HOME_LIMITS.START_WALL_SEGMENTS, maxSegments: HOME_LIMITS.MAX_WALL_SEGMENTS, endCap: decor.INTERIOR.endCapW, towerLeft: tower.left, towerRight: tower.right };
   const root = join(dirname(fileURLToPath(import.meta.url)), '..');

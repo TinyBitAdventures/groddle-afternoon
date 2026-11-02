@@ -36,8 +36,8 @@ import {
   placeFurniture,
   stackSurfaceAt,
   surfaceHeight,
-} from '../public/js/home-decor.js?v=37d38d09';
-import { FURNITURE_CATALOG } from '../public/js/homes-catalog.js?v=b3d9aea7';
+} from '../public/js/home-decor.js?v=39721c9f';
+import { FURNITURE_CATALOG } from '../public/js/homes-catalog.js?v=7aa9beb0';
 
 const root = join(import.meta.dirname, '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');
@@ -187,11 +187,11 @@ describe('pack items on shelves and tables (the dropped-stack model)', () => {
     assert.equal(onTable.y, table.y - surfaceHeight('furniture_table'));
   });
 
-  it('falls to the floor under a chair, below a shelf, or in open space', () => {
+  it('rests on a chair\'s seat (SEATSELECT: its getFurnitureBaseGeo plat), falls below a shelf or in open space', () => {
     const state = room();
     const shelf = state.placed.find((r) => r.classTsid === 'furniture_shelf');
     const chair = state.placed.find((r) => r.classTsid === 'furniture_chair');
-    assert.deepEqual(stackSurfaceAt(state, chair.x, 400), { x: chair.x, y: INTERIOR.floorY, on: null });
+    assert.deepEqual(stackSurfaceAt(state, chair.x, 400), { x: chair.x, y: chair.y - surfaceHeight('furniture_chair', chair.upgradeId), on: chair.id });
     assert.equal(stackSurfaceAt(state, shelf.x, shelf.y + 40).on, null, 'under the shelf it lands on the floor');
     assert.equal(stackSurfaceAt(state, 860, 200).on, null);
   });

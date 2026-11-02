@@ -49,8 +49,8 @@ import {
   FURNITURE_STARTER_KIT,
   HOME_LIMITS,
   HOME_TEXTURE_CONFIGS,
-} from './homes-catalog.js?v=b3d9aea7';
-import { cleanHistory, cleanUpgradeId, upgradeArt, upgradeRow } from './furniture-upgrades.js?v=2bc913dc';
+} from './homes-catalog.js?v=7aa9beb0';
+import { cleanHistory, cleanUpgradeId, upgradeArt, upgradeRow } from './furniture-upgrades.js?v=a3788c0d';
 
 export const SEGMENT_W = 150;
 /** Room geometry version stored with the house (2 = source 150 px segments). */
@@ -105,7 +105,7 @@ export function isFurniture(classTsid) {
   return Boolean(FURNITURE_CATALOG[classTsid]);
 }
 
-/** Display scale: only ever shrinks oversized recovered frames (Fireplace). */
+/** Display scale: only ever shrinks an oversized recovered frame (none since the Fireplace draws one cell of its sheet, SEATSELECT). */
 export function furnitureScale(classTsid) {
   return Math.min(1, Number(furnitureDef(classTsid)?.scale) || 1);
 }
@@ -164,12 +164,16 @@ export function surfaceHeight(classTsid, upgradeId = '') {
   if (!def?.surface) return 0;
   const art = upgradeArt(classTsid, upgradeId);
   if (art) {
-    const rest = restOnArt(art, upgradeRow(classTsid, upgradeId)?.platY, 1);
+    const platY = upgradeRow(classTsid, upgradeId)?.platY;
+    // A seat (platOnly, SEATSELECT) holds things only on a plat: a style with none holds nothing.
+    if (def.platOnly && platY == null) return 0;
+    const rest = restOnArt(art, platY, 1);
     return rest ?? Math.round(def.surface * (art.h / def.art.h));
   }
   // The plain piece the same way (DECOPOLISH): its plat from items/<class>.js getFurnitureBaseGeo
   // and its base SWF's foot (build-homes.mjs); its hand-set `surface` only when it has no plat.
   const s = furnitureScale(classTsid);
+  if (def.platOnly && def.platY == null) return 0;
   return (def.platY != null ? restOnArt(def.art, def.platY, s) : null) ?? Math.round(def.surface * s);
 }
 

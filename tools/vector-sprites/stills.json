@@ -417,6 +417,23 @@
    ]
   },
   {
+   "name": "furniture_fireplace",
+   "swf": "furniture/furniture_base/furniture_fireplace/furniture_fireplace.swf",
+   "sprite": 0,
+   "padStage": 1,
+   "sheets": [
+    {
+     "path": "assets/sprites/furniture/furniture_fireplace.png",
+     "fw": 193,
+     "fh": 133,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 1,
+     "swfCount": 1
+    }
+   ]
+  },
+  {
    "name": "furniture_floorlamp",
    "swf": "furniture/furniture_base/furniture_floorlamp/furniture_floorlamp.swf",
    "sprite": 0,

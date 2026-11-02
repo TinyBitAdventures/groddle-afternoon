@@ -47,7 +47,7 @@
 import { insideBottomRect } from '../doors.js?v=eb9510b1';
 import { assignQuest } from '../quests.js?v=282e1621';
 import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=db2ce452';
-import { pixiSpeed } from '../sprite-sheets.js?v=ac3acecc';
+import { pixiSpeed } from '../sprite-sheets.js?v=2e580c24';
 import {
   GREETERBOT,
   MEZZANINE_TSID,

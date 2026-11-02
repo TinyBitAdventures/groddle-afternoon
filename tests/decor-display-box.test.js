@@ -18,8 +18,8 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { createHomeDecorState, DISPLAY_TEXT, displayDeposit, displayRefusal, surfaceHeight } from '../public/js/home-decor.js?v=37d38d09';
-import { FURNITURE_UPGRADES } from '../public/js/furniture-upgrades-data.js?v=268c538a';
+import { createHomeDecorState, DISPLAY_TEXT, displayDeposit, displayRefusal, surfaceHeight } from '../public/js/home-decor.js?v=39721c9f';
+import { FURNITURE_UPGRADES } from '../public/js/furniture-upgrades-data.js?v=ced89b64';
 import { basePlats } from '../tools/furniture-upgrades/build.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');

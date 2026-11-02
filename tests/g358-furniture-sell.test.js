@@ -9,7 +9,7 @@ import { describe, it } from 'node:test';
 import { execFileSync, spawnSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { FURNITURE_UPGRADES } from '../public/js/furniture-upgrades-data.js?v=268c538a';
+import { FURNITURE_UPGRADES } from '../public/js/furniture-upgrades-data.js?v=ced89b64';
 import {
   CURRANTS_PER_CREDIT,
   HISTORY_LIMIT,
@@ -24,14 +24,14 @@ import {
   saveButtonText,
   styleCurrants,
   UPGRADE_TEXT,
-} from '../public/js/furniture-upgrades.js?v=2bc913dc';
+} from '../public/js/furniture-upgrades.js?v=a3788c0d';
 import {
   createHomeDecorState,
   listPlaceable,
   normalizeHomeDecorState,
   pickUpFurniture,
   placeFurniture,
-} from '../public/js/home-decor.js?v=37d38d09';
+} from '../public/js/home-decor.js?v=39721c9f';
 import { SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');

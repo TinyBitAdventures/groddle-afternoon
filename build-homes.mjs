@@ -60,8 +60,8 @@ function pngSize(file) {
 const ART_DIR = { furniture_door: 'furniture_door_door_door_up_job' };
 /** furniture_door.js getDefaultUpgradeConfig: door_<up|down>[_job]. */
 const DOOR_ART = ['up', 'up_job', 'down', 'down_job'];
-/** Icons made elsewhere (G174's icon pass drew the Door from its SWF): keep them. */
-const KEEP_ICON = new Set(['furniture_door']);
+/** Icons made elsewhere (G174's icon pass drew the Door from its SWF; the Fireplace's shows its logs): keep them. */
+const KEEP_ICON = new Set(['furniture_door', 'furniture_fireplace']);
 
 function ogaFrame(classTsid, pattern = /__x1_1_png_|_x1_1_png_/) {
   const dir = join(OGA, ART_DIR[classTsid] || classTsid);
@@ -113,7 +113,16 @@ const FURNITURE_CLASSES = [
  * here is used as it stands only by a piece with no source plat (the bookcase
  * and the cabinets, which held nothing in the original: the remake lets them,
  * a few px into their thin top boards).
- * `scale` only ever shrinks: the 965x665 Fireplace is shown at half size.
+ * The seats (chair, armchair, bench, stool, sofa, loveseat, bed) rest things
+ * on their seat plats too (SEATSELECT, Austin 2026-11-02: "Seat furniture: yes
+ * let's do the original and let stuff rest on top"): furniture_chair.js
+ * getFurnitureBaseGeo y -28 over a foot of -17 is 45 up the chair's 93 px art.
+ * `platOnly` keeps a seat to its plats: a style whose catalog row has none (two
+ * hidden test sofas) holds nothing, as in the original, rather than resting
+ * things on its back (include/furniture.js getPlatsAndWalls).
+ * The plain Fireplace draws the first frame of its OGA sheet (SHEET_ART), its
+ * base SWF's frame, at 1:1; before SEATSELECT the whole 5 x 5 sheet was drawn at
+ * half size, a wall of 22 fireplaces.
  */
 const LAYOUT = {
   furniture_table: { surface: 80 },
@@ -127,8 +136,29 @@ const LAYOUT = {
   bag_furniture_largecabinet: { surface: 164 },
   bag_furniture_smallcabinet: { surface: 72 },
   furniture_shelf: { surface: 40 },
-  furniture_fireplace: { scale: 0.5, surface: 560 },
+  furniture_fireplace: { surface: 121 },
+  furniture_chair: { surface: 45, platOnly: true },
+  furniture_armchair: { surface: 47, platOnly: true },
+  furniture_bench: { surface: 41, platOnly: true },
+  furniture_stool: { surface: 39, platOnly: true },
+  furniture_sofa: { surface: 43, platOnly: true },
+  furniture_loveseat: { surface: 44, platOnly: true },
+  furniture_bed: { surface: 59, platOnly: true },
 };
+
+/**
+ * OGA files that are a sheet of frames, not one frame: the piece draws its
+ * first cell. furniture_fireplace__x1_1_png is 965 x 665, 5 x 5 cells of 193 x
+ * 133 (22 drawn: the fire's flicker), the base SWF's frame 1 trimmed to 192 x 134.
+ */
+const SHEET_ART = { furniture_fireplace: { cols: 5, rows: 5 } };
+
+/** The art's size: one cell of a sheet (SHEET_ART), else the file's. */
+function artSize(classTsid, file) {
+  const { w, h } = pngSize(file);
+  const sheet = SHEET_ART[classTsid];
+  return sheet ? { w: Math.floor(w / sheet.cols), h: Math.floor(h / sheet.rows) } : { w, h };
+}
 
 /** Decor that may sit on another piece's surface (tabletop placement). */
 const TABLETOP = new Set([
@@ -140,9 +170,8 @@ const BASE_ART = join(root, 'tools/furniture-upgrades/base.json');
 /**
  * Where a plain piece with a surface rests things, from the source: { platY,
  * art: { foot, top } } in its art's px, or { art: { top } } when its art is not
- * the base SWF's frame (height within 2 px, width 8: the Fireplace's OGA file is a 965 x 665
- * sheet of 5 x 5 frames, bag_furniture_largecabinet has no base SWF), so its
- * hand-set surface stands.
+ * the base SWF's frame (height within 2 px, width 8: bag_furniture_largecabinet has no
+ * base SWF), so its hand-set surface stands.
  */
 function baseSurface(classTsid, artW, artH) {
   if (!LAYOUT[classTsid]?.surface) return {};
@@ -218,7 +247,7 @@ function buildFurniture() {
       continue;
     }
     const placementSet = String(row.classProps.placement_set || '').split(',').map((s) => s.trim()).filter(Boolean);
-    const { w, h } = pngSize(art);
+    const { w, h } = artSize(classTsid, art);
     const rest = baseSurface(classTsid, w, h);
     const offer = store.offers.find((o) => o.classTsid === classTsid);
     catalog[classTsid] = {
@@ -378,8 +407,14 @@ function copyArt(furniture) {
   mkdirSync(cultDir, { recursive: true });
   let thumbs = 0;
   for (const classTsid of Object.keys(furniture)) {
-    const src = ogaFrame(classTsid);
-    copyFileSync(src, join(furnDir, `${classTsid}.png`));
+    const sheet = SHEET_ART[classTsid];
+    let src = ogaFrame(classTsid);
+    if (sheet) {
+      // The sheet's first cell (SHEET_ART): the piece and its thumbnail are one frame.
+      const { w, h } = artSize(classTsid, src);
+      execFileSync('magick', [src, '-crop', `${w}x${h}+0+0`, '+repage', '-strip', join(furnDir, `${classTsid}.png`)]);
+      src = join(furnDir, `${classTsid}.png`);
+    } else copyFileSync(src, join(furnDir, `${classTsid}.png`));
     if (classTsid === 'furniture_door') {
       for (const v of DOOR_ART) copyFileSync(ogaFrameIn(`furniture_door_door_door_${v}`), join(furnDir, `furniture_door_${v}.png`));
     }

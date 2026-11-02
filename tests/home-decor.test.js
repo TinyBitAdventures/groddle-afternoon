@@ -8,7 +8,7 @@ import {
   FURNITURE_STORE,
   HOME_LIMITS,
   HOME_TEXTURE_CONFIGS,
-} from '../public/js/homes-catalog.js?v=b3d9aea7';
+} from '../public/js/homes-catalog.js?v=7aa9beb0';
 import {
   INTERIOR,
   SEGMENT_W,
@@ -31,7 +31,7 @@ import {
   restackFurniture,
   setHomeTexture,
   snapPlacement,
-} from '../public/js/home-decor.js?v=37d38d09';
+} from '../public/js/home-decor.js?v=39721c9f';
 
 const root = join(import.meta.dirname, '..', 'public');
 
@@ -69,8 +69,10 @@ describe('furniture catalog', () => {
       assert.ok(existsSync(join(root, 'assets/sprites/icons', `${def.classTsid}.png`)), def.classTsid);
       assert.ok(def.art.w > 0 && def.art.h > 0);
     }
-    assert.deepEqual(FURNITURE_CATALOG.furniture_chair.art, { path: 'assets/sprites/furniture/furniture_chair.png', w: 72, h: 93 });
-    assert.equal(furnitureScale('furniture_fireplace'), 0.5);
+    assert.deepEqual(FURNITURE_CATALOG.furniture_chair.art, { path: 'assets/sprites/furniture/furniture_chair.png', w: 72, h: 93, top: 1, foot: -17 });
+    // The Fireplace draws one cell of its 5 x 5 OGA sheet at 1:1 (SEATSELECT), not the whole sheet at half size.
+    assert.deepEqual([FURNITURE_CATALOG.furniture_fireplace.art.w, FURNITURE_CATALOG.furniture_fireplace.art.h], [193, 133]);
+    assert.equal(furnitureScale('furniture_fireplace'), 1);
     assert.equal(furnitureScale('furniture_chair'), 1);
   });
 

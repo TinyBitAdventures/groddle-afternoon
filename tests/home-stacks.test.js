@@ -21,9 +21,9 @@ import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { FURNITURE_CATALOG } from '../public/js/homes-catalog.js?v=b3d9aea7';
-import { FURNITURE_UPGRADES } from '../public/js/furniture-upgrades-data.js?v=268c538a';
-import { createHomeDecorState, INTERIOR, placeFurniture, settleStacks, STALE_REST_GIVE, surfaceHeight } from '../public/js/home-decor.js?v=37d38d09';
+import { FURNITURE_CATALOG } from '../public/js/homes-catalog.js?v=7aa9beb0';
+import { FURNITURE_UPGRADES } from '../public/js/furniture-upgrades-data.js?v=ced89b64';
+import { createHomeDecorState, INTERIOR, placeFurniture, settleStacks, stackSurfaceAt, STALE_REST_GIVE, surfaceHeight } from '../public/js/home-decor.js?v=39721c9f';
 import { normalizeDroppedItemState } from '../public/js/world-items.js?v=210bef3b';
 import { isStandable } from '../public/js/street-model.js?v=505d8990';
 import { BUILDER_TEXT } from '../public/js/ui/home-builder.js?v=98b71348';
@@ -146,6 +146,8 @@ describe('every piece rests things on its art', () => {
       if (!def.surface) continue;
       for (const [id, row] of Object.entries(FURNITURE_UPGRADES[cls]?.upgrades || {})) {
         if (!row.art) continue;
+        // A seat's style with no plat holds nothing (SEATSELECT): the seats' own describe proves it.
+        if (def.platOnly && row.platY == null) continue;
         assert.ok(Number.isInteger(row.art.top) && row.art.top >= 0 && row.art.top < row.art.h, `${cls}/${id} top ${row.art.top}`);
         const h = surfaceHeight(cls, id);
         assert.ok(h > 0 && h <= row.art.h - row.art.top + 1, `${cls}/${id}: rests ${h}, visible top ${row.art.h - row.art.top}`);
@@ -206,9 +208,10 @@ describe('the plain pieces rest things on their own plats (DECOPOLISH, Austin 20
     assert.equal(basePlats('furniture_bookcase'), null);
     assert.equal(basePlats('bag_furniture_sdb'), null);
     assert.equal(surfaceHeight('furniture_bookcase'), FURNITURE_CATALOG.furniture_bookcase.surface);
-    // The Fireplace's OGA file is a sheet of 5 x 5 frames, not the base frame: its hand-set surface stands.
-    assert.equal(FURNITURE_CATALOG.furniture_fireplace.platY, undefined);
-    assert.equal(surfaceHeight('furniture_fireplace'), 280);
+    // The Fireplace draws its sheet's first cell, the base SWF's frame (SEATSELECT): its mantel plat,
+    // furniture_fireplace.js getFurnitureBaseGeo y -97 .. -96, over a foot of -24.
+    assert.equal(FURNITURE_CATALOG.furniture_fireplace.platY, 97);
+    assert.equal(surfaceHeight('furniture_fireplace'), 121);
   });
 
   it('things set on the round table before the fix come down onto it when the room loads', () => {
@@ -225,6 +228,57 @@ describe('the plain pieces rest things on their own plats (DECOPOLISH, Austin 20
     const { files, problems } = itemBottoms();
     assert.ok(files > 1500, String(files));
     assert.deepEqual(problems, []);
+  });
+});
+
+describe('the seats rest things on their seat plats, as in the original (SEATSELECT, Austin 2026-11-02)', () => {
+  // "Seat furniture: yes let's do the original and let stuff rest on top." Every seat class's
+  // items/<class>.js getFurnitureBaseGeo has one plat with platform_item_perm -1 (an item rests on
+  // it), and so has every style's catalog_furniture row but two hidden test sofas.
+  const SEATS = { furniture_chair: [28, -17, 45], furniture_armchair: [22, -25, 47], furniture_bench: [21, -20, 41], furniture_stool: [26, -13, 39], furniture_sofa: [21, -22, 43], furniture_loveseat: [22, -22, 44], furniture_bed: [14, -45, 59] };
+
+  it('each plain seat rests things on its plat, over its foot, under its visible top', () => {
+    for (const [cls, [plat, foot, rest]] of Object.entries(SEATS)) {
+      const def = FURNITURE_CATALOG[cls];
+      assert.equal(def.platOnly, true, cls);
+      assert.equal(def.platY, plat, cls);
+      assert.equal(def.art.foot, foot, cls);
+      assert.equal(surfaceHeight(cls), rest, cls);
+      assert.ok(rest < def.art.h - def.art.top, `${cls}: ${rest} under its visible top ${def.art.h - def.art.top}`);
+    }
+  });
+
+  it('every style of every seat rests things on its own plat; the two plat-less test sofas hold nothing', () => {
+    let n = 0;
+    const none = [];
+    for (const cls of Object.keys(SEATS)) {
+      for (const [id, row] of Object.entries(FURNITURE_UPGRADES[cls].upgrades)) {
+        if (row.platY == null) {
+          none.push(`${cls}/${id}`);
+          assert.equal(surfaceHeight(cls, id), 0, `${cls}/${id}`);
+          continue;
+        }
+        assert.equal(surfaceHeight(cls, id), Math.round(row.platY - row.art.foot), `${cls}/${id}`);
+        n += 1;
+      }
+    }
+    assert.deepEqual(none, ['furniture_sofa/406', 'furniture_sofa/577']);
+    assert.ok(n >= 115, String(n));
+  });
+
+  it('a thing set down over a chair rests on its seat, moves with it and falls to the floor when it goes', () => {
+    const state = createHomeDecorState({});
+    state.storage.furniture_chair = 1;
+    const chair = placeFurniture(state, {}, 'furniture_chair', { x: 400, y: INTERIOR.floorY }).item;
+    const hit = stackSurfaceAt(state, 400, INTERIOR.floorY - 80);
+    assert.deepEqual(hit, { x: 400, y: chair.y - 45, on: chair.id });
+    const rows = [{ id: 'a', classTsid: 'apple', count: 1, x: hit.x, y: hit.y, on: hit.on }];
+    chair.x = 600;
+    assert.equal(settleStacks(state, rows, 0), 1);
+    assert.deepEqual({ x: rows[0].x, y: rows[0].y, on: rows[0].on }, { x: 600 - 30, y: chair.y - 45, on: chair.id });
+    state.placed = state.placed.filter((row) => row.id !== chair.id);
+    settleStacks(state, rows, 0);
+    assert.deepEqual({ y: rows[0].y, on: rows[0].on }, { y: INTERIOR.floorY, on: undefined });
   });
 });
 
@@ -254,7 +308,9 @@ describe('Decoration Mode moves and takes back what is set down', () => {
   it('Pick up is the item\'s own pickup (the pack and the ledger see one move), and a moved piece takes its stacks', () => {
     const fn = game.slice(game.indexOf('pickUpDroppedStack(id) {'));
     assert.match(fn.slice(0, 300), /return target \? pickupDroppedWorldItem\(target\) : false;/);
-    assert.match(homes, /for \(const row of roomStackRows\(engine\)\) if \(row\.on === placing\.moveId\) row\.x \+= dx;/);
+    assert.match(homes, /for \(const row of roomStackRows\(engine\)\) \{\s+if \(row\.on !== placing\.moveId \|\| !dx\) continue;\s+row\.x \+= dx;/);
+    // SEATSELECT: saved and redrawn where they went (before, they stayed drawn behind until a reload).
+    assert.match(homes, /if \(carried\) engine\.droppedItemsChanged\?\.\(\);/);
     // Only x, y and `on` change on a move: no item is made or lost.
     const mv = homes.slice(homes.indexOf('function moveStack('), homes.indexOf('function pickUpStack('));
     assert.doesNotMatch(mv, /count|addItem|removeItem|inv\b/);

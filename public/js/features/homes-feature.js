@@ -97,7 +97,7 @@ import {
   CULTIVATION_CLASSES,
   FURNITURE_CATALOG,
   FURNITURE_STORE,
-} from '../homes-catalog.js?v=b3d9aea7';
+} from '../homes-catalog.js?v=7aa9beb0';
 import {
   INTERIOR,
   arrangeStarterRoom,
@@ -136,9 +136,9 @@ import {
   textureConfig,
   unexpandInterior,
   UNEXPAND_TEXT,
-} from '../home-decor.js?v=37d38d09';
-import { applyBonusUpgrade, applyUpgrade, bonusUpgradeLine, currantsText, hasUpgrades, pieceLabel, rollBonusUpgrade, upgradeVerb, UPGRADE_TEXT } from '../furniture-upgrades.js?v=2bc913dc';
-import { chooseUpgrade, closeUpgradePicker, openUpgradePicker, saveUpgrade, upgradePickerOpen, upgradePickerState } from '../furniture-upgrade-picker.js?v=b9a05bee';
+} from '../home-decor.js?v=39721c9f';
+import { applyBonusUpgrade, applyUpgrade, bonusUpgradeLine, currantsText, hasUpgrades, pieceLabel, rollBonusUpgrade, upgradeVerb, UPGRADE_TEXT } from '../furniture-upgrades.js?v=a3788c0d';
+import { chooseUpgrade, closeUpgradePicker, openUpgradePicker, saveUpgrade, upgradePickerOpen, upgradePickerState } from '../furniture-upgrade-picker.js?v=ffdc8eff';
 import {
   BUILDER_TEXT,
   DRAG_DIST,
@@ -186,18 +186,18 @@ import {
   quoteYardExpansion,
   removeCultivation,
   towerItem,
-} from '../home-cultivation.js?v=b3585294';
+} from '../home-cultivation.js?v=e04c3e7b';
 import { PROTO_DEPLETED_ART } from '../home-proto-art.js?v=68506420';
 import { MOVABLE_FIXTURES, MOVABLE_FIXTURE_IDS, fixtureFits, fixtureText, savedFixtureRx, signpostX } from '../home-street-fixtures.js?v=badcb725';
 import { displayTopOf, itemstackOverlayPoint, overlayAlpha, overlayLifeMs, playPoofIn, trackOverlay } from '../overlay-art.js?v=3753a0d2';
-import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=ac3acecc';
+import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=2e580c24';
 import { fadeInNewNear } from '../poof-fade.js?v=06fed92f';
 import { projectApi } from './street-jobs-feature.js?v=49e239a6';
 import { TOWER_CHASSIS, TOWER_CONFIG, TOWER_DOOR_DX, TOWER_GEO, TOWER_PROTO, normalizeTowerState } from '../home-tower.js?v=b05c58d8';
 import { drawTowerElevator, drawTowerExit, towerApi, visitorTowerView } from './home-tower-feature.js?v=6ca164d2';
 import { pieceUrl, roomPieces, surfaceAt, swatchPiece, wallTargetAt } from '../home-wallpaper.js?v=e676f00f';
 import { wantsHiresDecos } from '../deco-hires.js?v=cb905e17';
-import { resourceNodesFeature } from './resource-nodes-feature.js?v=717a0fb9';
+import { resourceNodesFeature } from './resource-nodes-feature.js?v=5b12cf1d';
 import { patchesFeature } from './patches-feature.js?v=25d3d145';
 import { GROWN_TREE_LABELS, createPlot, growTree, plotLabel } from '../patches.js?v=1bf0dd8e';
 import { WOTD_DEPLETE_MS, WOTD_TEXT, nearestPourTarget, pourButton, pourConditions, pourConfirmText } from '../wine-pour.js?v=6daa23a7';
@@ -264,7 +264,7 @@ import {
   quoteHouseExpansion,
   quoteHouseUnexpand,
   unexpandHouseFloors,
-} from '../home-floors.js?v=bb8de397';
+} from '../home-floors.js?v=0fcc7b5e';
 
 export const HOMES_FEATURE_ID = 'homes';
 const HOME_STREET_TSID = 'RH_HOME_EXT';
@@ -4295,7 +4295,15 @@ function placeAtPointer(engine, at) {
       // dropFromLocationOnTargetPlatform also_tsids: the stacks on a moved piece go with it.
       if (result.ok && Number.isFinite(fromX)) {
         const dx = placedItem(decor, placing.moveId).x - fromX;
-        for (const row of roomStackRows(engine)) if (row.on === placing.moveId) row.x += dx;
+        let carried = 0;
+        for (const row of roomStackRows(engine)) {
+          if (row.on !== placing.moveId || !dx) continue;
+          row.x += dx;
+          carried += 1;
+        }
+        // Saved and redrawn now (SEATSELECT): settleRoomStacks finds them already on the piece and
+        // moves nothing, so before this they stayed where they were drawn until the room reloaded.
+        if (carried) engine.droppedItemsChanged?.();
       }
       selected = { kind: 'furniture', id: placing.moveId };
       if (result.ok && isDoor) setTimeout(() => engine.refreshHomeScene?.(), 0);

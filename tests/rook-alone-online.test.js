@@ -12,7 +12,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { rookAttackFeature } from '../public/js/features/rook-attack-feature.js?v=750929ea';
+import { rookAttackFeature } from '../public/js/features/rook-attack-feature.js?v=fd9cf50b';
 import { MP_ROOK_TEXT } from '../public/js/rook-mp.js?v=6012319e';
 import { SKILL_REMAKE_NOTES } from '../public/js/skill-tree.js?v=17787a09';
 

@@ -107,7 +107,7 @@ describe('the archived placements', () => {
 describe('the feature', () => {
   it('is registered and draws one looping, untargetable sprite per objref', async () => {
     assert.match(readFileSync(join(pub, 'js/features/index.js'), 'utf8'), /import \{ swoonerfliesFeature \} from '\.\/swoonerflies-feature\.js\?v=[0-9a-f]{8}'; FEATURES\.push\(swoonerfliesFeature\);/);
-    const { swoonerfliesFeature } = await import('../public/js/features/swoonerflies-feature.js?v=85ed5cc4');
+    const { swoonerfliesFeature } = await import('../public/js/features/swoonerflies-feature.js?v=1a967193');
     class AnimatedSprite {
       constructor(textures) {
         this.textures = textures;

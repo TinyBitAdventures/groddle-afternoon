@@ -11,7 +11,7 @@ import {
   FURNITURE_UPGRADE_COUNTS,
   FURNITURE_UPGRADES_LEFT_OUT,
   FURNITURE_UPGRADES_MISSING_ART,
-} from '../public/js/furniture-upgrades-data.js?v=268c538a';
+} from '../public/js/furniture-upgrades-data.js?v=ced89b64';
 import {
   applyBonusUpgrade,
   applyUpgrade,
@@ -23,7 +23,7 @@ import {
   saveButtonText,
   upgradeVerb,
   UPGRADE_TEXT,
-} from '../public/js/furniture-upgrades.js?v=2bc913dc';
+} from '../public/js/furniture-upgrades.js?v=a3788c0d';
 import {
   createHomeDecorState,
   furnitureSize,
@@ -33,11 +33,11 @@ import {
   pickUpFurniture,
   placeFurniture,
   surfaceHeight,
-} from '../public/js/home-decor.js?v=37d38d09';
-import { FURNITURE_CATALOG } from '../public/js/homes-catalog.js?v=b3d9aea7';
+} from '../public/js/home-decor.js?v=39721c9f';
+import { FURNITURE_CATALOG } from '../public/js/homes-catalog.js?v=7aa9beb0';
 import { IMAGINATION_UPGRADES, upgradeStatus, DEALT_SECRET_CARDS } from '../public/js/imagination.js?v=b4f0eaf6';
 import { isOfferedInRemake, remakeStatus } from '../public/js/imagination-remake.js?v=ca0a48d5';
-import { visitorHomeState } from '../public/js/features/homes-feature.js?v=7c802a04';
+import { visitorHomeState } from '../public/js/features/homes-feature.js?v=9189236b';
 
 const spike = join(import.meta.dirname, '..');
 const pub = join(spike, 'public');
@@ -94,7 +94,7 @@ describe('upgrade data (tools/furniture-upgrades/build.mjs)', () => {
   });
 
   it('the picker gives a style\'s 3x file a density srcset: tiles at its 1x size, the preview at 2x as before', async () => {
-    const { artImgAttrs } = await import('../public/js/furniture-upgrade-picker.js?v=b9a05bee');
+    const { artImgAttrs } = await import('../public/js/furniture-upgrade-picker.js?v=ffdc8eff');
     const path = FURNITURE_UPGRADES.furniture_chair.upgrades['1'].art.path;
     assert.deepEqual(artImgAttrs(path), { src: path, srcset: `${path} 3x` });
     assert.deepEqual(artImgAttrs(path, 2), { src: path, srcset: `${path} 1.5x` });

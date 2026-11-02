@@ -1632,6 +1632,8 @@
       "assets/sprites/furniture/furniture_coffeetable@3x.webp": "f3e04071",
       "assets/sprites/furniture/furniture_counter@3x.webp": "47fc5256",
       "assets/sprites/furniture/furniture_desk@3x.webp": "77449798",
+      "assets/sprites/furniture/furniture_fireplace.png": "4cf57671",
+      "assets/sprites/furniture/furniture_fireplace@3x.webp": "8d69944e",
       "assets/sprites/furniture/furniture_floorlamp@3x.webp": "9824b18c",
       "assets/sprites/furniture/furniture_lamp@3x.webp": "95d82d3d",
       "assets/sprites/furniture/furniture_largebackfloordeco@3x.webp": "00f13480",
