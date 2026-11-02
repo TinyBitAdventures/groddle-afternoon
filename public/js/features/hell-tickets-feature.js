@@ -60,7 +60,7 @@ import {
   planGraveVisit,
   recognitionBranch,
   ticketDue,
-} from '../hell-tickets.js?v=6cc28351';
+} from '../hell-tickets.js?v=cb784752';
 import { hellFeature } from './hell-feature.js?v=bbe7a45e';
 import { doorsFeature } from './doors-feature.js?v=b7e66401';
 
@@ -182,6 +182,7 @@ function planVisit(engine, hs, now) {
     visitId: hs.visitId,
     now,
     force,
+    questState: engine.questState,
     delayMs: force ? (Number.isFinite(ms) && ms >= 0 ? ms : GRAVE_VISIT.demoDelayMs) : undefined,
     type: demo === 'mourn' || demo === 'celebrate' ? demo : undefined,
     recognizer: engine.param('gravecompanion') || undefined,

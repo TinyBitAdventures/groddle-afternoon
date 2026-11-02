@@ -34,6 +34,9 @@
  * player is in Naraka and never sees the grave, so no world actor is needed.
  * Chosen timing (stated, not source): one croak in three gets a visit, 20 to 50
  * seconds after the croak, while the grave still stands (you are still dead).
+ * Until the Bellzebooze quest (hell_quest) is done, every croak gets one (Austin
+ * 2026-11-02, ticket 39: a player missed the Hell quests twice to the dice and
+ * took it for a bug); after that, one in three keeps drink tickets a treat.
  * Most first visits land in Hell One, where the source offers hell_hole.
  */
 
@@ -118,7 +121,9 @@ const pick = (list, r) => list[Math.max(0, Math.min(list.length - 1, Math.floor(
 export function planGraveVisit(opts = {}) {
   const rng = typeof opts.rng === 'function' ? opts.rng : Math.random;
   const now = Number.isFinite(Number(opts.now)) ? Number(opts.now) : Date.now();
-  if (!opts.force && !(rng() < GRAVE_VISIT.chance)) return null;
+  // Certain while the Hell quests are still to come (see the header); `questState` absent keeps the dice.
+  const certain = opts.force || (opts.questState != null && hellQuestStatus(opts.questState, 'hell_quest') !== 'done');
+  if (!certain && !(rng() < GRAVE_VISIT.chance)) return null;
   const delay = Number.isFinite(Number(opts.delayMs)) && Number(opts.delayMs) >= 0
     ? Number(opts.delayMs)
     : GRAVE_VISIT.minDelayMs + rng() * (GRAVE_VISIT.maxDelayMs - GRAVE_VISIT.minDelayMs);

@@ -26,13 +26,13 @@ import {
   planGraveVisit,
   recognitionBranch,
   ticketDue,
-} from '../public/js/hell-tickets.js?v=6cc28351';
-import { hellTicketsFeature } from '../public/js/features/hell-tickets-feature.js?v=90af74c8';
+} from '../public/js/hell-tickets.js?v=cb784752';
+import { hellTicketsFeature } from '../public/js/features/hell-tickets-feature.js?v=50c8fd17';
 import { hellFeature } from '../public/js/features/hell-feature.js?v=bbe7a45e';
 import { hellBarFeature } from '../public/js/features/hell-bar-feature.js?v=8cf7ebbe';
 import { questOffersFeature } from '../public/js/features/quest-offers-feature.js?v=9d9418e8';
 import { questFlagsFeature } from '../public/js/features/quest-flags-feature.js?v=17c6ef48';
-import { FEATURES } from '../public/js/features/index.js?v=8e7118b8';
+import { FEATURES } from '../public/js/features/index.js?v=28390adf';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const CONTENT = join(spike, 'public/assets/content');
@@ -69,6 +69,20 @@ describe('grave visits (the solo stand-in for other players)', () => {
     const rng = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
     for (let i = 0; i < 3000; i += 1) if (planGraveVisit({ visitId: i, rng })) n += 1;
     assert.ok(n > 850 && n < 1150, `${n} visits in 3000 croaks`);
+  });
+
+  it('every croak gets a visit until the Bellzebooze quest is done, then one in three (ticket 39)', () => {
+    const miss = () => 0.99;
+    // A new player, the Hell Hole under way, or Bellzebooze under way: always a visit.
+    for (const qs of [{ active: {}, completed: [] }, { active: { hell_hole: {} }, completed: [] }, { active: { hell_quest: {} }, completed: ['hell_hole'] }]) {
+      assert.ok(planGraveVisit({ visitId: 1, now: T0, rng: miss, questState: qs }), JSON.stringify(qs));
+    }
+    // Both done: back to the dice.
+    assert.equal(planGraveVisit({ visitId: 1, now: T0, rng: miss, questState: { active: {}, completed: ['hell_hole', 'hell_quest'] } }), null);
+    // No quest state (an old caller): the dice as before.
+    assert.equal(planGraveVisit({ visitId: 1, now: T0, rng: miss }), null);
+    const src = readFileSync(new URL('../public/js/features/hell-tickets-feature.js', import.meta.url), 'utf8');
+    assert.match(src, /force,\n    questState: engine\.questState,/);
   });
 
   it('QA forces a visit with a chosen delay, type and companion', () => {
