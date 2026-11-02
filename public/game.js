@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=9ac37cff';
 import { createFeatureHost } from './js/feature-host.js?v=903263a4';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=05fcf51e';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=4decc7ce';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -555,7 +555,7 @@ import {
   recipeToolInUse,
 } from './js/making.js?v=68521d02';
 import { MAKE_TOOL_SHEETS } from './js/make-tool-sheets.js?v=6f758e09';
-import { LOW_FUEL_LINE, craftSessionElapsedMs, isLowFuel, isMachineArt, machineArtHtml, packMakeState, playMachineHandOver, setMachineArtFrame } from './js/machine-art.js?v=a4c8da0e';
+import { LOW_FUEL_LINE, craftSessionElapsedMs, isLowFuel, isMachineArt, machineArtHtml, packMakeState, playMachineHandOver, setMachineArtFrame } from './js/machine-art.js?v=a62fac48';
 import {
   createGarden,
   tickGarden,
@@ -912,7 +912,7 @@ import { createAudioBuses, fadeGain } from './js/audio-buses.js?v=af167b54';
 import { installTopBar, renderTopBar } from './js/ui/topbar.js?v=9cfbbd95';
 import { installFocusReturn } from './js/ui/focus-return.js?v=8885653a';
 import { QUOIN_FRAME_BOB, advanceQuoinClock, quoinBobBetweenFrames } from './js/quoin-motion.js?v=ea0bd408';
-import { installHiresFirstDraw, installHiresSprites } from './js/sprite-hires.js?v=92eefcb7';
+import { installHiresFirstDraw, installHiresSprites, upgradeSource } from './js/sprite-hires.js?v=5965385e';
 import { denseSprite } from './js/sprite-dense.js?v=8e0109eb';
 import { wholeStatAmounts, wholeEffects } from './js/stat-text.js?v=f96d8fd3';
 import { createNotifier, effectTokens, floatKey, offerCardDrop, stackFloat, tokenText } from './js/notify.js?v=d85330ff';
@@ -1069,6 +1069,12 @@ function glitchSheetDef(name, av = VECTOR_AVATAR) {
   return { url: `${av.dir}${sheet.file}`, fw: sheet.fw, fh: sheet.fh, cols, rows: sheet.rows ?? Math.ceil(sheet.cells / cols), frameCount: sheet.cells };
 }
 
+// The Spinning Wheel's 514x450 OGA cells hold its art in one 172x267 box at (170, 181): its 1x
+// sheets (and their 3x renders from npc_spinning_wheel.swf, tools/vector-sprites/spinning-wheel.json)
+// store only that box, and `trim` gives every frame its whole cell back (a Pixi orig/trim), so the
+// sprite keeps the cell's size, anchor and hit box. The disappear sheet's smoke fills its cells.
+const WHEEL_TRIM = Object.freeze({ x: 170, y: 181, w: 514, h: 450 });
+
 const SHEETS = {
   piggyWalk: {
     url: 'assets/sprites/npc_piggy__x1_walk_png_1354829432.png',
@@ -1217,7 +1223,7 @@ const SHEETS = {
   },
   wheelAppear: {
     url: 'assets/sprites/spinning-wheel/appear.png',
-    fw: 514, fh: 450, cols: 7, rows: 2, frameCount: 14,
+    fw: 172, fh: 267, cols: 7, rows: 2, frameCount: 14, trim: WHEEL_TRIM,
   },
   wheelDisappear: {
     url: 'assets/sprites/spinning-wheel/disappear.png',
@@ -1225,27 +1231,27 @@ const SHEETS = {
   },
   wheelGreenSpin: {
     url: 'assets/sprites/spinning-wheel/green-spin.png',
-    fw: 514, fh: 450, cols: 7, rows: 8, frameCount: 53,
+    fw: 172, fh: 267, cols: 7, rows: 8, frameCount: 53, trim: WHEEL_TRIM,
   },
   wheelGreenEnd: {
     url: 'assets/sprites/spinning-wheel/green-end.png',
-    fw: 514, fh: 450, cols: 1, rows: 8, frameCount: 8,
+    fw: 172, fh: 267, cols: 1, rows: 8, frameCount: 8, trim: WHEEL_TRIM,
   },
   wheelWhiteSpin: {
     url: 'assets/sprites/spinning-wheel/white-spin.png',
-    fw: 514, fh: 450, cols: 7, rows: 8, frameCount: 53,
+    fw: 172, fh: 267, cols: 7, rows: 8, frameCount: 53, trim: WHEEL_TRIM,
   },
   wheelWhiteEnd: {
     url: 'assets/sprites/spinning-wheel/white-end.png',
-    fw: 514, fh: 450, cols: 1, rows: 8, frameCount: 8,
+    fw: 172, fh: 267, cols: 1, rows: 8, frameCount: 8, trim: WHEEL_TRIM,
   },
   wheelRedSpin: {
     url: 'assets/sprites/spinning-wheel/red-spin.png',
-    fw: 514, fh: 450, cols: 7, rows: 8, frameCount: 53,
+    fw: 172, fh: 267, cols: 7, rows: 8, frameCount: 53, trim: WHEEL_TRIM,
   },
   wheelRedEnd: {
     url: 'assets/sprites/spinning-wheel/red-end.png',
-    fw: 514, fh: 450, cols: 1, rows: 8, frameCount: 8,
+    fw: 172, fh: 267, cols: 1, rows: 8, frameCount: 8, trim: WHEEL_TRIM,
   },
   phantomAppear: {
     url: 'assets/sprites/quests/phantom-appear.png',
@@ -6053,17 +6059,28 @@ function applyMute(trackFadeSec = STREET_MIX_FADE_SEC) {
 }
 
 // —— Textures ——
-function sliceSheet(baseTexture, { fw, fh, cols, rows }, frameCount = null) {
+function sliceSheet(baseTexture, { fw, fh, cols, rows, trim = null }, frameCount = null) {
   const frames = [];
   const total = frameCount ?? cols * rows;
   let n = 0;
   for (let r = 0; r < rows && n < total; r++) {
     for (let c = 0; c < cols && n < total; c++) {
-      frames.push(frameTexture(baseTexture, new PIXI.Rectangle(c * fw, r * fh, fw, fh)));
+      const frame = frameTexture(baseTexture, new PIXI.Rectangle(c * fw, r * fh, fw, fh));
+      // A cropped cell (SHEETS trim) is drawn at its place in the whole cell.
+      if (trim) trimFrame(frame, trim);
+      frames.push(frame);
       n++;
     }
   }
   return frames;
+}
+
+/** Give a cropped frame Texture its whole cell back: { x, y } of the crop in a w x h cell. */
+function trimFrame(texture, { x, y, w, h }) {
+  texture.orig = new PIXI.Rectangle(0, 0, w, h);
+  texture.trim = new PIXI.Rectangle(x, y, texture.frame.width, texture.frame.height);
+  texture.updateUvs();
+  return texture;
 }
 
 function loadTexture(url, opts) {
@@ -9066,6 +9083,18 @@ function wheelSheetKey(phase) {
   return `wheel${color}${suffix}`;
 }
 
+/**
+ * Fetch the wheel's 3x sheets (js/sprite-hires.js, firstDraw) before their phase plays, so a
+ * 1.2 s appear or 1.5 s colour spin is not half over at 1x when its 3x arrives. A no-op on
+ * screens that draw the 1x sheets (installHiresSprites) and once a sheet is swapped.
+ */
+function preloadWheelSheets(keys) {
+  for (const key of keys) {
+    const source = textures[key]?.frames?.[0]?.source;
+    if (source && SHEETS[key]) upgradeSource(source, SHEETS[key].url, whenLoaded);
+  }
+}
+
 function setSpinningWheelVisual(target, phase) {
   const sprite = target?.sprite;
   const wheel = target?.state?.wheel;
@@ -9148,6 +9177,8 @@ function spawnSpinningWheel({ now = Date.now() } = {}) {
   });
   spinningWheelLastPhase = '';
   spinningWheelPrompted = false;
+  // The spin and disappear are the same for every wheel; the colour waits for the spin.
+  preloadWheelSheets(['wheelAppear', 'wheelWhiteSpin', 'wheelDisappear']);
   setSpinningWheelVisual(spinningWheelTarget, 'appear');
   if (app?.canvas) {
     app.canvas.dataset.spinningWheelActive = '1';
@@ -9335,6 +9366,8 @@ function handleSpinningWheelTarget(target, verbId) {
     return;
   }
   target.state.wheel.phase = 'spin';
+  // The 2.5 s neutral spin is time to fetch the colour's 3x sheets (wheelSheetKey).
+  preloadWheelSheets([wheelSheetKey(`${result.color}_spin`), wheelSheetKey(`${result.color}_end`)]);
   setSpinningWheelVisual(target, 'spin');
   playSfx('spinningWheel', { volume: 0.72 });
   pushActivity('You spin the Spinning Wheel. Round and round it goes!');
@@ -29186,6 +29219,29 @@ async function main() {
         gpuTextures: managed.length,
         gpuTextureMB: +(bytes / 1048576).toFixed(1),
         images: textureUrls.textureStats(),
+      };
+    },
+    /**
+     * WHEELSHARP QA: the Spinning Wheel's whole-cell box in screen px and the texture its current
+     * frame draws from (a 3x file or part reports resolution 3 and its @3x URL), or null.
+     */
+    spinningWheel() {
+      const spr = spinningWheelTarget?.sprite;
+      if (!spr || spr.destroyed) return null;
+      const b = spr.getBounds();
+      const src = spr.texture?.source;
+      return {
+        phase: spinningWheelTarget.state?.wheel?.phase || '',
+        frame: spr.currentFrame,
+        frames: spr.totalFrames,
+        bounds: { x: b.x, y: b.y, width: b.width, height: b.height },
+        screen: { width: app.screen.width, height: app.screen.height },
+        source: src ? {
+          url: src.hiresSrc || src.label || textureUrls.sourceUrl(src) || '',
+          resolution: src.resolution,
+          pixelWidth: src.pixelWidth,
+          pixelHeight: src.pixelHeight,
+        } : null,
       };
     },
     /**

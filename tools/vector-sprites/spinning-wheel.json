@@ -1,0 +1,20 @@
+{
+ "about": "The Stoot shrine's Gameshow Ticket Spinning Wheel (glitch-items misc/npc/npc_spinning_wheel/npc_spinning_wheel.swf sprite 290, the .as animatee spinning_wheel, CC0) for game.js SHEETS wheel*. The 1x sheets are the OGA cells (514x450) cropped to one shared 172x267 box at (170, 181), the union of every cell's art plus 2 px, so the 3x sheets fit the budget; game.js gives their frames the 514x450 cell back as Pixi trim (SHEETS trim), so the sprite's size, anchor and hit box are unchanged. disappear keeps the whole cell (its smoke fills it) and its last 9 cells are empty (the wheel is gone), so only cells 0-8 get 3x parts. appear is the OGA's 14 frames, the looping end of the SWF's 33-frame appear (loop_froms appear 19). Run: node tools/vector-sprites/build.mjs --manifest tools/vector-sprites/spinning-wheel.json",
+ "firstDraw": true,
+ "webp": true,
+ "budget": {"maxSide": 8192, "maxMB": 64},
+ "jobs": [
+  {"name": "spinning-wheel", "swf": "misc/npc/npc_spinning_wheel/npc_spinning_wheel.swf", "sprite": 290, "sheets": [
+   {"path": "assets/sprites/spinning-wheel/appear.png", "label": "appear", "swfStart": 19, "swfCount": 15, "fw": 172, "fh": 267, "cols": 7, "frames": 14},
+   {"path": "assets/sprites/spinning-wheel/white-spin.png", "label": "white_spin", "fw": 172, "fh": 267, "cols": 7, "frames": 53},
+   {"path": "assets/sprites/spinning-wheel/white-end.png", "label": "white_spin_end", "fw": 172, "fh": 267, "cols": 1, "frames": 8},
+   {"path": "assets/sprites/spinning-wheel/green-spin.png", "label": "green_spin", "fw": 172, "fh": 267, "cols": 7, "frames": 53},
+   {"path": "assets/sprites/spinning-wheel/green-end.png", "label": "green_spin_end", "fw": 172, "fh": 267, "cols": 1, "frames": 8},
+   {"path": "assets/sprites/spinning-wheel/red-spin.png", "label": "red_spin", "fw": 172, "fh": 267, "cols": 7, "frames": 53},
+   {"path": "assets/sprites/spinning-wheel/red-end.png", "label": "red_spin_end", "fw": 172, "fh": 267, "cols": 1, "frames": 8}
+  ]},
+  {"name": "spinning-wheel-disappear", "swf": "misc/npc/npc_spinning_wheel/npc_spinning_wheel.swf", "sprite": 290, "sheets": [
+   {"path": "assets/sprites/spinning-wheel/disappear.png", "label": "disappear", "fw": 514, "fh": 450, "cols": 6, "frames": 9}
+  ]}
+ ]
+}

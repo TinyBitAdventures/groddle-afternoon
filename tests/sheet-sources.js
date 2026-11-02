@@ -151,7 +151,7 @@ export function gameSheetTable() {
     const def = game.evaluate(prop.value);
     if (def.whole || !def.fw) continue;
     const grid = def.cols * def.rows;
-    out.push({ name, path: clean(def.url), fw: def.fw, fh: def.fh, cols: def.cols, rows: def.rows, n: Math.min(grid, def.frameCount ?? grid) });
+    out.push({ name, path: clean(def.url), fw: def.fw, fh: def.fh, cols: def.cols, rows: def.rows, n: Math.min(grid, def.frameCount ?? grid), ...(def.trim ? { trim: def.trim } : {}) });
   }
   return out;
 }

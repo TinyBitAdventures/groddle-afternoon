@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { execFileSync } from 'node:child_process';
 
 import {
   GAMESHOW_TICKET_ID,
@@ -152,17 +153,18 @@ test.describe('shrine source and client integration', () => {
 
   test('ships complete clean sprite sheets and runtime wiring', () => {
     const spriteDir = path.join(root, 'public/assets/sprites/spinning-wheel');
+    // The OGA 514x450 cells cropped to the wheel's 172x267 box (WHEEL_TRIM, see below).
     assert.deepEqual(pngSize(path.join(spriteDir, 'appear.png')), {
-      width: 3_598,
-      height: 900,
+      width: 7 * 172,
+      height: 2 * 267,
     });
     assert.deepEqual(pngSize(path.join(spriteDir, 'red-spin.png')), {
-      width: 3_598,
-      height: 3_600,
+      width: 7 * 172,
+      height: 8 * 267,
     });
     assert.deepEqual(pngSize(path.join(spriteDir, 'red-end.png')), {
-      width: 514,
-      height: 3_600,
+      width: 172,
+      height: 8 * 267,
     });
     for (const file of [
       'disappear.png',
@@ -186,5 +188,156 @@ test.describe('shrine source and client integration', () => {
     assert.match(game, /stootdemo/);
     assert.match(content, /classId === 'npc_spinning_wheel'/);
     assert.match(html, /"game\.js\?v=[0-9a-f]{8}"/);
+  });
+});
+
+// The wheel was soft on a Retina screen next to the 3x avatar (Austin 2026-11-02, "is the spinning
+// wheel slightly blurry?"): it drew the OGA 1x raster sheets at 0.72 x the stage x the screen's
+// density. Every sheet now has a 3x render of npc_spinning_wheel.swf (glitch-items, CC0) sprite 290
+// (tools/vector-sprites/spinning-wheel.json), loaded when the wheel spawns (firstDraw sheets).
+test.describe('sharp Spinning Wheel sheets', () => {
+  const WHEEL = Object.freeze({
+    wheelAppear: { file: 'appear', label: 'appear', swfFrames: [19, 32], n: 14 },
+    wheelWhiteSpin: { file: 'white-spin', label: 'white_spin', swfFrames: [154, 206], n: 53 },
+    wheelWhiteEnd: { file: 'white-end', label: 'white_spin_end', swfFrames: [207, 214], n: 8 },
+    wheelGreenSpin: { file: 'green-spin', label: 'green_spin', swfFrames: [93, 145], n: 53 },
+    wheelGreenEnd: { file: 'green-end', label: 'green_spin_end', swfFrames: [146, 153], n: 8 },
+    wheelRedSpin: { file: 'red-spin', label: 'red_spin', swfFrames: [215, 267], n: 53 },
+    wheelRedEnd: { file: 'red-end', label: 'red_spin_end', swfFrames: [268, 275], n: 8 },
+    // The smoke fills the whole cell; cells 9-17 are empty (the wheel is gone) and stay 1x.
+    wheelDisappear: { file: 'disappear', label: 'disappear', swfFrames: [276, 284], n: 18, art: 9 },
+  });
+  const sheetPath = (file) => `assets/sprites/spinning-wheel/${file}.png`;
+
+  async function wheelRows() {
+    const { gameSheetTable } = await import('./sheet-sources.js');
+    return new Map(gameSheetTable().filter((r) => r.name in WHEEL).map((r) => [r.name, r]));
+  }
+
+  /** Lossless WebP (VP8L) or extended (VP8X) canvas size. */
+  function webpSize(file) {
+    const b = fs.readFileSync(file);
+    assert.equal(b.subarray(8, 12).toString(), 'WEBP', file);
+    const chunk = b.subarray(12, 16).toString();
+    if (chunk === 'VP8L') {
+      return {
+        width: 1 + (((b[22] & 0x3f) << 8) | b[21]),
+        height: 1 + (((b[24] & 0x0f) << 10) | (b[23] << 2) | ((b[22] & 0xc0) >> 6)),
+      };
+    }
+    assert.equal(chunk, 'VP8X', file);
+    return { width: 1 + b.readUIntLE(24, 3), height: 1 + b.readUIntLE(27, 3) };
+  }
+
+  test('frame counts and timings are the original sheets\', the crop gives each frame its whole cell back', async () => {
+    const rows = await wheelRows();
+    assert.equal(rows.size, Object.keys(WHEEL).length);
+    for (const [name, want] of Object.entries(WHEEL)) {
+      const r = rows.get(name);
+      assert.equal(r.path, sheetPath(want.file), name);
+      assert.equal(r.n, want.n, `${name} frames`);
+      const size = pngSize(path.join(root, 'public', r.path));
+      assert.deepEqual(size, { width: r.cols * r.fw, height: r.rows * r.fh }, `${name} grid`);
+      if (name === 'wheelDisappear') {
+        assert.deepEqual([r.fw, r.fh, r.trim], [514, 450, undefined], 'the smoke keeps the whole cell');
+        continue;
+      }
+      // The 514x450 OGA cell, its art cropped to one shared box (WHEEL_TRIM in game.js).
+      assert.deepEqual([r.fw, r.fh], [172, 267], name);
+      assert.deepEqual(r.trim, { x: 170, y: 181, w: 514, h: 450 }, name);
+      assert.ok(r.trim.x + r.fw <= r.trim.w && r.trim.y + r.fh <= r.trim.h, `${name} crop inside the cell`);
+    }
+    const game = fs.readFileSync(path.join(root, 'public/game.js'), 'utf8');
+    // The wheel's lifecycle (1.2 s appear, 0.6 s disappear; js/spinning-wheel.js times the phases).
+    assert.match(game, /sprite\.animationSpeed = 14 \/ 72;/);
+    assert.match(game, /sprite\.animationSpeed = 18 \/ 36;/);
+    assert.match(game, /if \(trim\) trimFrame\(frame, trim\);/);
+    assert.match(game, /texture\.orig = new PIXI\.Rectangle\(0, 0, w, h\);/);
+  });
+
+  test('the crop keeps all of the wheel: no cell\'s art reaches the crop\'s edge', async () => {
+    const rows = [...(await wheelRows()).values()].filter((r) => r.trim)
+      .map((r) => ({ ...r, path: path.join(root, 'public', r.path) }));
+    const py = `import json,sys
+from PIL import Image
+out=[]
+for r in json.load(sys.stdin):
+    a=Image.open(r['path']).convert('RGBA').getchannel('A')
+    for i in range(r['n']):
+        x,y=(i%r['cols'])*r['fw'],(i//r['cols'])*r['fh']
+        b=a.crop((x,y,x+r['fw'],y+r['fh'])).getbbox()
+        if not b or b[0]<1 or b[1]<1 or b[2]>r['fw']-1 or b[3]>r['fh']-1: out.append(f"{r['name']} cell {i} {b}")
+print(json.dumps(out))`;
+    let bad;
+    try {
+      bad = JSON.parse(execFileSync('python3.11', ['-I', '-c', py], { input: JSON.stringify(rows), encoding: 'utf8' }));
+    } catch (err) {
+      if (/ENOENT|No module named/.test(String(err))) return;
+      throw err;
+    }
+    assert.deepEqual(bad, []);
+  });
+
+  test('every sheet has a 3x render from npc_spinning_wheel.swf, matched to the 1x frame for frame', async () => {
+    const { HIRES_SPRITES, SPLIT_SPRITES, FIRST_DRAW_SPRITES } = await import('../public/js/sprite-hires.js?v=5965385e');
+    const results = JSON.parse(fs.readFileSync(path.join(root, 'tools/vector-sprites/results.json'), 'utf8'));
+    const manifest = JSON.parse(fs.readFileSync(path.join(root, 'tools/vector-sprites/spinning-wheel.json'), 'utf8'));
+    assert.deepEqual(
+      manifest.jobs.flatMap((j) => j.sheets.map((s) => s.path)).sort(),
+      Object.values(WHEEL).map((w) => sheetPath(w.file)).sort(),
+    );
+    const rows = await wheelRows();
+    for (const [name, want] of Object.entries(WHEEL)) {
+      const key = sheetPath(want.file);
+      const r = rows.get(name);
+      const result = results[key];
+      assert.equal(result?.status, 'ok', key);
+      assert.equal(result.swf, 'misc/npc/npc_spinning_wheel/npc_spinning_wheel.swf');
+      assert.equal(result.sprite, 290);
+      assert.equal(result.label, want.label, key);
+      assert.deepEqual(result.swfFrames, want.swfFrames, `${key}: one SWF frame per cell, in order`);
+      const art = want.art ?? want.n;
+      assert.equal(result.cells, art, key);
+      assert.equal(result.frameScores.length, art, key);
+      // The silhouette match after the 3:1 downscale (the Chicken's stand scored 0.963).
+      assert.ok(Math.min(...result.frameScores) >= 0.97, `${key} min ${Math.min(...result.frameScores)}`);
+      assert.ok(FIRST_DRAW_SPRITES.has(key), `${key} waits for the wheel (game.js preloadWheelSheets)`);
+      const split = SPLIT_SPRITES.get(key);
+      if (!split) {
+        const twin = HIRES_SPRITES.get(key);
+        assert.match(twin || '', /@3x\.webp$/, key);
+        assert.deepEqual(webpSize(path.join(root, 'public', twin)), { width: 3 * r.cols * r.fw, height: 3 * r.rows * r.fh }, twin);
+        continue;
+      }
+      assert.ok(!HIRES_SPRITES.has(key), key);
+      assert.deepEqual([split.fw, split.fh, split.cols], [r.fw, r.fh, r.cols], key);
+      let next = 0;
+      for (const [url, from, count, cols] of split.parts) {
+        assert.equal(from, next, `${url} follows the last part`);
+        next += count;
+        assert.match(url, /\.p\d@3x\.webp$/);
+        const size = webpSize(path.join(root, 'public', url));
+        assert.deepEqual(size, { width: 3 * cols * r.fw, height: 3 * Math.ceil(count / cols) * r.fh }, url);
+        assert.ok(size.width <= 8192 && size.height <= 8192 && size.width * size.height * 4 <= 64 * 2 ** 20, `${url} in the texture budget`);
+      }
+      assert.equal(next, art, `${key}: parts cover the cells with art`);
+    }
+    // Files exactly 3x their 1x sheet and js/sprite-hires.js current (no FFDec needed).
+    const vs = path.join(root, 'tools/vector-sprites');
+    const out = execFileSync(process.execPath, [path.join(vs, 'build.mjs'), '--manifest', path.join(vs, 'spinning-wheel.json'), '--check'], { encoding: 'utf8' });
+    assert.match(out, /spinning-wheel\.json: ok/);
+  });
+
+  test('the 3x covers the wheel\'s draw scale on a 2x laptop at Original zoom, and loads before it plays', async () => {
+    const { stageFor } = await import('../public/js/location-view.js?v=5a0d5c0b');
+    const game = fs.readFileSync(path.join(root, 'public/game.js'), 'utf8');
+    const scale = Number(/new PIXI\.AnimatedSprite\(textures\.wheelAppear\.frames\);\n\s+sprite\.anchor\.set\(0\.5, 1\);\n\s+sprite\.scale\.set\(([\d.]+)\);/.exec(game)?.[1]);
+    assert.equal(scale, 0.72);
+    for (const [w, h] of [[1280, 740], [1512, 880], [1728, 1010]]) {
+      const draw = scale * stageFor({ width: w, height: h, sceneWidth: 4000, sceneHeight: 1000, zoom: 1 }).scale * 2;
+      assert.ok(draw > 1 && draw <= 3, `${w} x ${h}: drawn ${draw.toFixed(2)}x`);
+    }
+    assert.match(game, /preloadWheelSheets\(\['wheelAppear', 'wheelWhiteSpin', 'wheelDisappear'\]\);\n\s+setSpinningWheelVisual\(spinningWheelTarget, 'appear'\);/);
+    assert.match(game, /preloadWheelSheets\(\[wheelSheetKey\(`\$\{result\.color\}_spin`\), wheelSheetKey\(`\$\{result\.color\}_end`\)\]\);/);
   });
 });
