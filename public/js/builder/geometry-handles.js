@@ -17,8 +17,8 @@
  * Pure: no DOM, no Pixi.
  */
 import { isStandable, platformsScreen } from '../street-model.js?v=505d8990';
-import { decoBox, handlePoints, resizeBy } from './handles.js?v=9e4e7fff';
-import { floorUnder } from './zone.js?v=77727f6b';
+import { decoBox, handlePoints, resizeBy } from './handles.js?v=0a4b08d0';
+import { floorUnder } from './zone.js?v=dff4acc0';
 import { arrivalInTarget, streetAliases } from '../location-navigation.js?v=4be109b9';
 import { EFFECT_DEFAULTS } from '../street-effects.js?v=f0fb3ce6';
 

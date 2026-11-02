@@ -10,7 +10,7 @@
  *
  * No DOM; Pixi only through the Graphics handed in.
  */
-import { geoShape, permName, dashes, wallSides, shapeBounds } from './geometry-handles.js?v=a8c00c00';
+import { geoShape, permName, dashes, wallSides, shapeBounds } from './geometry-handles.js?v=6fa13da1';
 import { normaliseEmitter } from '../street-effects.js?v=f0fb3ce6';
 
 export const OVERLAY_COLOURS = Object.freeze({

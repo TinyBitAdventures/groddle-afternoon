@@ -12,8 +12,8 @@
  * The editor gives each a context (ctx) with its helpers and its state; nothing here keeps the
  * draft itself. Every change is an op the editor commits (one undo step).
  */
-import { TEMPLATES, WIDTH, HEIGHT, MAP_W, MAP_H, templateOf, newStreet, newStreetOps, newHub, nextHubId, mapWithStreet } from './templates.js?v=d6e95682';
-import { streetKeyFrom, POPULATION_CLASSES } from './zone.js?v=77727f6b';
+import { TEMPLATES, WIDTH, HEIGHT, MAP_W, MAP_H, templateOf, newStreet, newStreetOps, newHub, nextHubId, mapWithStreet } from './templates.js?v=04776537';
+import { streetKeyFrom, POPULATION_CLASSES } from './zone.js?v=dff4acc0';
 
 /** Plain words for the population classes (street-ecology.json counts). */
 export const POPULATION_WORDS = Object.freeze({
@@ -22,6 +22,7 @@ export const POPULATION_WORDS = Object.freeze({
   rock_beryl_1: 'Beryl rock', rock_dullite_1: 'Dullite rock', rock_sparkly_1: 'Sparkly rock', dirt_pile: 'Dirt pile', dust_trap: 'Dust trap',
   peat_1: 'Peat bog', mortar_barnacle: 'Barnacle', jellisac: 'Jellisac', ice_knob: 'Ice knob', npc_piggy: 'Piggy', npc_chicken: 'Chicken',
   npc_butterfly: 'Butterfly', npc_salmon: 'Salmon', npc_firefly: 'Firefly', npc_sloth: 'Sloth', garden: 'Garden plot',
+  npc_fire_dragon: 'Fire Dragon (made for Groddle)',
 });
 
 /** PURE: a population with one class's count changed (0 removes it), keys in the classes' order. */

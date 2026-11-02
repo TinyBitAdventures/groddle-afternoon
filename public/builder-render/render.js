@@ -25,8 +25,8 @@ import * as textureUrls from '../js/textures.js?v=db2ce452';
 import { installPixiFixes } from '../js/pixi-fixes.js?v=173fb649';
 import { installHiresDecos } from '../js/deco-hires.js?v=cb905e17';
 import { installNewArt, withNewArt } from '../js/builder/new-art.js?v=29f0b13e';
-import { spotGroup } from '../js/builder/editor-zone.js?v=159f359c';
-import { drawGeometryOverlay, drawReachOverlay, drawArrivals, OVERLAY_COLOURS } from '../js/builder/overlays.js?v=7ced8d87';
+import { spotGroup } from '../js/builder/editor-zone.js?v=03afc47c';
+import { drawGeometryOverlay, drawReachOverlay, drawArrivals, OVERLAY_COLOURS } from '../js/builder/overlays.js?v=aa637219';
 import { createStreetEffects, normaliseEmitter, emitterAnchor, EFFECT_WORDS } from '../js/street-effects.js?v=f0fb3ce6';
 
 export const MAX_SIDE = 4096;

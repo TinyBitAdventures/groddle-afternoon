@@ -21,8 +21,8 @@
  * rev, with a link back to the builder.
  */
 import { registerDraftStreets, loadStreetData, resolveIndexTsid, STREET_INDEX } from '../street-loader.js?v=33d2b8bc';
-import { streetWithEdits, editsOn } from './zone.js?v=77727f6b';
-import { getStreetEcologyCatalog, setStreetEcologyCatalog } from '../street-ecology.js?v=7fbae08d';
+import { streetWithEdits, editsOn } from './zone.js?v=dff4acc0';
+import { getStreetEcologyCatalog, setStreetEcologyCatalog } from '../street-ecology.js?v=75086599';
 import { createBuilderApi } from './api.js?v=9560d68f';
 import { installNewArt } from './new-art.js?v=29f0b13e';
 import { loadDecoManifest } from '../street-render.js?v=a9394f56';

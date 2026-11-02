@@ -28,10 +28,10 @@ import { signKey, parseKey, parseEnv, configDir, canonicalQuery } from './sign.m
 import { catalog, searchDecos, styleProfile, styleProfiles } from './catalog.mjs';
 import { builderGuide } from './guide.mjs';
 import { applyOps, applyOp, nextDecoId, nextGeometryId, findGeometry, findDeco, GEOMETRY, OpError, OP_NAMES } from '../../public/js/builder/ops.js?v=27c7796f';
-import { forkStreet, forkOps, newTsid, libraryAsset, linkEdit, editsOn } from '../../public/js/builder/zone.js?v=77727f6b';
-import { newStreet, newStreetOps, newHub, nextHubId, mapWithStreet, mapWithoutStreet, TEMPLATES, DEFAULT_MAP_COLOURS } from '../../public/js/builder/templates.js?v=d6e95682';
-import { arriveFor, newConnect, POST_W, POST_H, LADDER_W } from '../../public/js/builder/geometry-handles.js?v=a8c00c00';
-import { arrivalOps, settlePostOps, followPostOps } from '../../public/js/builder/posts.js?v=b9746a0c';
+import { forkStreet, forkOps, newTsid, libraryAsset, linkEdit, editsOn } from '../../public/js/builder/zone.js?v=dff4acc0';
+import { newStreet, newStreetOps, newHub, nextHubId, mapWithStreet, mapWithoutStreet, TEMPLATES, DEFAULT_MAP_COLOURS } from '../../public/js/builder/templates.js?v=04776537';
+import { arriveFor, newConnect, POST_W, POST_H, LADDER_W } from '../../public/js/builder/geometry-handles.js?v=6fa13da1';
+import { arrivalOps, settlePostOps, followPostOps } from '../../public/js/builder/posts.js?v=3f65c33b';
 import { platformsScreen, isStandable } from '../../public/js/street-model.js?v=505d8990';
 import { DECO_TWINS } from '../../public/js/street-render.js?v=a9394f56';
 import { groundOps, floatingLines, FLOAT_REACH } from '../../public/js/builder/ground.js?v=a60d7c91';
@@ -1165,7 +1165,7 @@ export async function run(argv, { env = process.env, fetchImpl = globalThis.fetc
       let report;
       let rev;
       if (local()) {
-        const { validateZone } = await import('../../public/js/builder/validate.js?v=08ef19c5');
+        const { validateZone } = await import('../../public/js/builder/validate.js?v=c3df8fc4');
         const { loadValidatorContext } = await import('./validator-context.mjs');
         const zone = readJson(resolve(flags.file));
         rev = zone.rev;

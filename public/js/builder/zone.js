@@ -21,7 +21,7 @@ export const POPULATION_CLASSES = Object.freeze([
   'street_spirit', 'trant_fruit', 'trant_bean', 'trant_bubble', 'trant_egg', 'trant_gas', 'trant_spice', 'wood_tree',
   'paper_tree', 'rock_metal_1', 'rock_beryl_1', 'rock_dullite_1', 'rock_sparkly_1', 'dirt_pile', 'dust_trap', 'peat_1',
   'mortar_barnacle', 'jellisac', 'ice_knob', 'npc_piggy', 'npc_chicken', 'npc_butterfly', 'npc_salmon', 'npc_firefly',
-  'npc_sloth', 'garden',
+  'npc_sloth', 'garden', 'npc_fire_dragon',
 ]);
 
 const TSID_CHARS = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';

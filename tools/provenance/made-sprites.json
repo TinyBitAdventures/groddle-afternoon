@@ -1,0 +1,27 @@
+{
+  "format": "groddle-made-sprites/1",
+  "policy": "Sprites made for Groddle Afternoon, not restored from Tiny Speck: dedicated CC0 1.0 with their provenance (tools/builder/licence-policy.json). Inputs are Tiny Speck's CC0 art (sprite: or deco:) or our own earlier output (made:).",
+  "sprites": {
+    "npc_fire_dragon_walk": {
+      "file": "public/assets/sprites/made/fire-dragon/npc_fire_dragon_walk@3x.webp",
+      "sha256": "bf930506ef0ef5770cc56278c8f0eab67c5e6f1cf9725719b8108a78b7974047",
+      "licence": "ai-generated",
+      "author": "Austin Ginder (directed), Grok Bot in T3 Chat",
+      "tool": "GPT Image 2.5 Sunburst",
+      "made": "2026-11-02",
+      "uses": [
+        "npc_fire_dragon"
+      ],
+      "prompt": "Create ONE sprite sheet image: an 8-frame walk cycle for the baby fire dragon in the attached picture \"dragon-design.png\".\n\nTHE CHARACTER: Copy the dragon in \"dragon-design.png\" exactly: the same head, eyes, horns, wing, spikes, spots, colours, tail flame, outline and painting style. Same size in every frame. Side view, facing RIGHT. Only the legs, a small body bob and the tail move between frames. The head, eye, horns, wing and spikes stay identical in all 8 frames.\n\nTHE STRIDE: The attached \"stride-guide-piggy.png\" is Tiny Speck's own walk cycle for a Piggy, cut to 8 frames in the same grid this sheet must use. Use it only as a guide to how the legs move from frame to frame. Do not draw a pig.\n\nTHE GRID: 2 columns x 4 rows, 8 equal cells, read left to right, top to bottom (row 1 = frames 1 and 2, row 2 = frames 3 and 4, and so on). Square image, as large as possible (ideally 2048 x 2048, so each cell is 1024 wide and 512 tall).\n\nTHE LEGS: The dragon walks with its legs in diagonal pairs:\n- Pair A = the NEAR front leg (closest to us) + the FAR back leg.\n- Pair B = the FAR front leg + the NEAR back leg.\nDraw the far legs (behind the body) a little darker than the near legs, so all four read clearly.\n- Frame 1: Pair A reaches fully forward, feet just touching the ground. Pair B is fully back, pushing off on its toes. Body at its lowest.\n- Frame 2: Pair A is planted and starting to move under the body. Pair B lifts off the ground.\n- Frame 3: Pair A stands straight under the body. Pair B is lifted, swinging forward, its feet at their highest. Body at its highest.\n- Frame 4: Pair A angles back behind the body. Pair B reaches forward, about to land.\n- Frame 5: the mirror of frame 1. Pair B reaches fully forward, Pair A fully back pushing off. Body at its lowest.\n- Frame 6: the mirror of frame 2. Pair B planted, Pair A lifts off.\n- Frame 7: the mirror of frame 3. Pair B straight under the body, Pair A lifted and swinging forward. Body at its highest.\n- Frame 8: the mirror of frame 4. Pair B angles back, Pair A reaches forward, about to land. Frame 8 leads smoothly back into frame 1.\nThe body bobs only a little: lowest in frames 1 and 5, highest in 3 and 7. The tail sways gently, opposite to the body bob.\n\nIT WALKS IN PLACE, like on a treadmill:\n- The body stays at the same left-right spot in every cell, centred horizontally.\n- The feet on the ground touch the same invisible ground line, 85% of the way down each cell, in every frame.\n- Nothing crosses into a neighbouring cell.\n\nBACKGROUND AND CLEAN-UP:\n- Transparent background if you can; if not, one flat solid magenta (#FF00FF) with no shading, no floor and no shadows.\n- No magenta, pink or purple on the dragon.\n- No grid lines, borders, frame numbers, labels or text.\n",
+      "inputs": [
+        "sprite:npc_piggy walk (Tiny Speck, OGA CC0), every third frame as an 8-frame stride guide",
+        "made:fire-dragon design, the standing frame of an earlier GPT Image 2.5 Sunburst sheet made from Tiny Speck's CC0 npc_piggy and npc_chicken walk sheets"
+      ],
+      "source": {
+        "sheet_sha256": "62a19545c2c8f9c2e0a5c9a190b3c80a25951403a1f63bd6c25dc74aea26de00",
+        "attempt": 3,
+        "cut": "each dragon found by the empty gaps around it, lined up on its snout tip and feet, scaled 0.45 into 360x228 cells (120x76 logical at 3x), 8 across, WebP q92 alpha 100"
+      }
+    }
+  }
+}

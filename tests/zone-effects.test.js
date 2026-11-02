@@ -25,11 +25,11 @@ import {
   createRumbleClock, rumbleShare, rumbleEnvelope, createStreetEffects, seededRandom,
 } from '../public/js/street-effects.js?v=f0fb3ce6';
 import { zoneEffectsFeature } from '../public/js/features/zone-effects-feature.js?v=b0813bcf';
-import { useDraftArt } from '../public/js/builder/draft-play.js?v=376c9c5c';
+import { useDraftArt } from '../public/js/builder/draft-play.js?v=655c08bf';
 import { run, effectOps, rumbleOps, effectsReport, placeOps, ladderTiling, LADDER_TILINGS } from '../tools/builder/cli.mjs';
 import * as textures from '../public/js/textures.js?v=db2ce452';
 import { installNewArt } from '../public/js/builder/new-art.js?v=29f0b13e';
-import { newStreet } from '../public/js/builder/templates.js?v=d6e95682';
+import { newStreet } from '../public/js/builder/templates.js?v=04776537';
 import { kindChange, costWords } from '../public/js/builder/editor-effects.js?v=a550db37';
 
 const json = (p) => JSON.parse(readFileSync(join(GAME_DIR, p), 'utf8'));

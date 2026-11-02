@@ -30,12 +30,12 @@
 import { compileSchema } from './schema-check.js?v=cc9d1af4';
 import { reachStreet, REACH_LIMITS, TIGHT_MARGIN, LANDING_TRIES, AIR_JUMP_TRIES, LANDING_SHARE, streetBuff } from './reach-graph.js?v=3602d09e';
 import { platformsScreen, barriersScreen, isStandable, isSolidFromBelow, isItemFloor, assertStreetGeometry, avatarHeadReach, platformYAt, worldToScreen, streetWidth, streetHeight } from '../street-model.js?v=505d8990';
-import { planStreetPlacements, populationForStreet, streetReservedSpots } from '../street-ecology.js?v=7fbae08d';
+import { planStreetPlacements, populationForStreet, streetReservedSpots } from '../street-ecology.js?v=75086599';
 import { JUMP_SPEED } from '../avatar-step.js?v=33ad1926';
 import { STY_RULES, styleFindings } from './style-rules.js?v=abf9bfae';
 import { EFFECT_LIMITS, effectsCost, normaliseEmitter, rumbleShare, emitterAnchor } from '../street-effects.js?v=f0fb3ce6';
 import { LICENCE_POLICY, provenanceProblems } from './new-art.js?v=29f0b13e';
-import { postOffFloor, offFloorWords } from './posts.js?v=b9746a0c';
+import { postOffFloor, offFloorWords } from './posts.js?v=3f65c33b';
 import { floatingLines, FLOAT_REACH, FLOAT_OPEN } from './ground.js?v=a60d7c91';
 
 export const RULES = Object.freeze({

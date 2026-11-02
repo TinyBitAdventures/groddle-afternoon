@@ -240,6 +240,22 @@ export function butterflySplit(count) {
   return { butterflies: 0, flyingButterflies: total };
 }
 
+/**
+ * Classes a feature spawns from a street's counts (not the planner's own groups): the feature
+ * reads population.featureCounts in placementGroups. js/fire-dragon.js is the first (2026-11-02).
+ */
+export const FEATURE_CLASSES = Object.freeze(['npc_fire_dragon']);
+
+/** PURE: whole counts of FEATURE_CLASSES from an ecology row's counts. */
+export function featureCountsFrom(counts) {
+  const out = {};
+  for (const c of FEATURE_CLASSES) {
+    const n = Math.floor(Number(counts?.[c]));
+    if (Number.isFinite(n) && n > 0) out[c] = Math.min(12, n);
+  }
+  return out;
+}
+
 function emptyPopulation({ source, sourceTsid = null }) {
   return {
     source,
@@ -260,6 +276,7 @@ function emptyPopulation({ source, sourceTsid = null }) {
     quoins: 0,
     companions: false,
     resourceCounts: {},
+    featureCounts: {},
     resourceNodeClasses: [],
   };
 }
@@ -309,6 +326,7 @@ export function populationForStreet(tsid, entry, { starter = false } = {}) {
       quoins: whole(entry.quoins, 0, 40),
       companions: entry.companions !== false,
       resourceCounts: resourceCountsFrom(counts),
+      featureCounts: featureCountsFrom(counts),
       resourceNodeClasses: expandResourceClasses(counts),
     };
   }
@@ -377,6 +395,7 @@ export function populationForStreet(tsid, entry, { starter = false } = {}) {
     quoins: Number.isFinite(entry?.quoins) ? whole(entry.quoins, 0, 40) : 8,
     companions: entry?.companions !== false,
     resourceCounts: resourceCountsFrom(counts),
+    featureCounts: featureCountsFrom(counts),
     resourceNodeClasses: expandResourceClasses(counts),
   };
 }

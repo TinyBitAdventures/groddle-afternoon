@@ -14,10 +14,10 @@ import { existsSync, readFileSync, statSync } from 'node:fs';
 import { extname, join, normalize } from 'node:path';
 import { GAME_DIR } from '../repos.mjs';
 import { openBrowser } from '../qa/browser.mjs';
-import { validateZone, placementRequests, hash16 } from '../../public/js/builder/validate.js?v=08ef19c5';
-import { planStreetPlacements, populationForStreet, streetReservedSpots } from '../../public/js/street-ecology.js?v=7fbae08d';
+import { validateZone, placementRequests, hash16 } from '../../public/js/builder/validate.js?v=c3df8fc4';
+import { planStreetPlacements, populationForStreet, streetReservedSpots } from '../../public/js/street-ecology.js?v=75086599';
 import { platformsScreen, streetWidth } from '../../public/js/street-model.js?v=505d8990';
-import { plannedSpots } from '../../public/js/builder/editor-zone.js?v=159f359c';
+import { plannedSpots } from '../../public/js/builder/editor-zone.js?v=03afc47c';
 
 /** Rules only a render makes (validateZone never does): new art the render could not carry. */
 export const RENDER_ONLY = Object.freeze(['AST-007']);
