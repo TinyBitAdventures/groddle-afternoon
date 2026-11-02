@@ -49,13 +49,13 @@ import { signpostX as fixtureSignpostX } from '../home-street-fixtures.js?v=badc
 import { PROTO_DEPLETED_ART } from '../home-proto-art.js?v=68506420';
 import { NOTE_POLE_CONTAINERS, NOTE_POLE_PARTS, NOTE_POLE_SIGN_Y } from '../note-pole-art.js?v=860d393a';
 import { textureFromUrl } from '../textures.js?v=db2ce452';
-import { signArmWidth, signLabel } from '../street-render.js?v=aa2eadc7';
+import { addSignBoard, signArmWidth, signLabel } from '../street-render.js?v=a9394f56';
 import { openNotePicker, openNoteView } from '../note-view.js?v=21c55475';
 import { homeStreetName, possessive, readVisitScene } from '../neighbours-mp.js?v=a8d5544e';
-import { BACK_YARD_GROUND_Y, STREET_GROUND_Y, homesFeature, visitorHomeState } from './homes-feature.js?v=43ab9e34';
-import { projectApi } from './street-jobs-feature.js?v=805a7789';
+import { BACK_YARD_GROUND_Y, SIGN_PROMPT_LIFT, STREET_GROUND_Y, homesFeature, visitorHomeState } from './homes-feature.js?v=ad20c5ef';
+import { projectApi } from './street-jobs-feature.js?v=9426905d';
 import { saveStore } from '../save-store.js?v=8839ba7b';
-import { giveCarriedNote, takeCarriedNote, writtenCarriedNotes } from './street-furniture-feature.js?v=4e62f156';
+import { giveCarriedNote, takeCarriedNote, writtenCarriedNotes } from './street-furniture-feature.js?v=0bb7540d';
 import {
   GOOD_NEIGHBOUR_AT,
   GOOD_NEIGHBOUR_COUNTER,
@@ -339,16 +339,21 @@ function createSession(engine, client) {
       label.y = -1;
       arm.addChild(board, label);
       holder.addChild(arm);
+      // FRIENDPOST (SignpostView.as makeSign 290-329, LocationInputHandler.as 396-399): each arm is its
+      // own sign; a click or tap on it (or its number at the post, under Back to Ur's 1) goes to that home.
+      addSignBoard(PIXI, box, arm, { width: w, left, key: i + 2, arm: board, label, verbId: `sign_go_${n.position}`, tip: T.goVerb(n.name) });
     });
-    // The friends' arms only: it stops under the top arm (Back to Ur, homes-feature's target).
+    // The post under the arms (and between them): its menu, with Edit your signpost for the owner. It
+    // stops under the top arm (Back to Ur, homes-feature's target).
     box.addChild(hitBox(PIXI, -70, -FRIENDS_HIT_H + 2, 140, FRIENDS_HIT_H));
     box._worldHitW = 140;
     box._worldHitH = FRIENDS_HIT_H;
+    // The Enter hint over the post's top, clear of every arm (homes-feature's post says the same).
+    box._promptLift = SIGN_PROMPT_LIFT;
     engine.entityLayer.addChild(box);
-    const label = owner ? T.signpost : T.signpost;
     const subtitle = arms.length ? arms.map((n) => n.name).join(', ') : T.noArms;
     // arms: the street map's tip lists them (street-minimap sceneSignMarks).
-    drawn.signpost = { target: addTarget({ classId: CLASS_SIGNPOST, label, subtitle, sprite: box, state: { owner, arms: arms.map((n) => n.name) } }), neighbors: arms, owner };
+    drawn.signpost = { target: addTarget({ classId: CLASS_SIGNPOST, label: T.signpost, subtitle, sprite: box, state: { owner, arms: arms.map((n) => n.name) } }), neighbors: arms, owner };
   }
 
   /** note_pole.as: the pole, the sign and (posted) the note, from the pole's base. */

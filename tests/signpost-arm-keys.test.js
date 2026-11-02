@@ -17,7 +17,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { walkUpSignpostStreet } from '../public/js/ladder-top-signposts.js?v=40abe6f5';
 import { navigableSignposts, signpostNear, worldToScreen } from '../public/js/street-model.js?v=505d8990';
-import { SIGN_MAX_ARMS, setSignpostKeys } from '../public/js/street-render.js?v=aa2eadc7';
+import { SIGN_MAX_ARMS, setSignpostKeys } from '../public/js/street-render.js?v=a9394f56';
 import { hotkeySections, hotkeyText } from '../public/js/client-hotkeys.js?v=8b63d6e5';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -64,9 +64,11 @@ describe('signpost arm keys: the arms', () => {
 
 describe('signpost arm keys: the post at hand', () => {
   it('is the post Enter and the T hint find, never from a ladder', () => {
-    const fn = game.slice(game.indexOf('function signpostAtHand()'), game.indexOf('let keyedSignView'));
-    assert.match(fn, /if \(!currentStreet \|\| climb\.active \|\| !player\) return null;/);
+    const fn = game.slice(game.indexOf('function signpostAtHand()'), game.indexOf('function sceneSignViews()'));
+    assert.match(fn, /if \(climb\.active \|\| !player\) return null;\n\s*if \(currentStreet\) \{/);
     assert.match(fn, /signpostNear\(walkUpSignpostStreet\(currentStreet\), player\.x, 140, player\.y\)/);
+    // FRIENDPOST: else the post a scene draws itself (the home street's signpost).
+    assert.match(fn, /return scenePostAtHand\(\);/);
   });
 
   it('a deckless ladder-top post and a buried post never show keys', () => {
@@ -81,7 +83,7 @@ describe('signpost arm keys: the post at hand', () => {
   });
 
   it('shows the keys only while the prompt is worked out, and hides them otherwise', () => {
-    assert.match(game, /const nearSign = currentStreet \? signpostNear\(walkUpSignpostStreet\(currentStreet\), player\.x, 140, player\.y\) : null;\n\s*showSignpostKeys\(signpostAtHand\(\)\);/);
+    assert.match(game, /const nearSign = currentStreet \? signpostNear\(walkUpSignpostStreet\(currentStreet\), player\.x, 140, player\.y\) : null;\n\s*const postAtHand = signpostAtHand\(\);\n\s*showSignpostKeys\(postAtHand\);/);
     assert.match(game, /prompt\.visible = false;\n\s*showSignpostKeys\(null\);/);
   });
 });

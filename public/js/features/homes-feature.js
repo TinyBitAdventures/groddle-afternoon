@@ -192,7 +192,7 @@ import { MOVABLE_FIXTURES, MOVABLE_FIXTURE_IDS, fixtureFits, fixtureText, savedF
 import { displayTopOf, itemstackOverlayPoint, overlayAlpha, overlayLifeMs, playPoofIn, trackOverlay } from '../overlay-art.js?v=3753a0d2';
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=2e580c24';
 import { fadeInNewNear } from '../poof-fade.js?v=06fed92f';
-import { projectApi } from './street-jobs-feature.js?v=805a7789';
+import { projectApi } from './street-jobs-feature.js?v=9426905d';
 import { TOWER_CHASSIS, TOWER_CONFIG, TOWER_DOOR_DX, TOWER_GEO, TOWER_PROTO, normalizeTowerState } from '../home-tower.js?v=b05c58d8';
 import { drawTowerElevator, drawTowerExit, towerApi, visitorTowerView } from './home-tower-feature.js?v=6ca164d2';
 import { pieceUrl, roomPieces, surfaceAt, swatchPiece, wallTargetAt } from '../home-wallpaper.js?v=e676f00f';
@@ -221,7 +221,7 @@ import {
 } from '../home-styles.js?v=f591561f';
 import { frameTexture, isLoaded, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js?v=db2ce452';
 import { FALLBACK_MAX as WORLD_ART_FALLBACK_MAX, worldArtFor } from '../world-art.js?v=df476660';
-import { oneArmSignpost } from '../street-render.js?v=aa2eadc7';
+import { oneArmSignpost } from '../street-render.js?v=a9394f56';
 import { ROCK_CATALOG } from '../mining.js?v=4806e3e8';
 import {
   HOUSE_SIGN,
@@ -2002,9 +2002,14 @@ function makeHomeSignpost(engine) {
   const post = oneArmSignpost(engine.PIXI, WAY_OUT_ARM, { left: true });
   post._worldHitW = WAY_OUT_HIT.w;
   post._worldHitH = WAY_OUT_HIT.h;
+  // FRIENDPOST: the Enter hint sits over the post's top, clear of its arms (game.js, as a street post's T hint).
+  post._promptLift = SIGN_PROMPT_LIFT;
   post.label = 'home-signpost';
   return post;
 }
+
+/** World px over the post's foot where its hint's bottom sits: the post's top (246 at 0.8) and 10 more, as a street post's T hint. */
+export const SIGN_PROMPT_LIFT = Math.round(246 * 0.8 + 10);
 
 /** The top arm's words. */
 export const WAY_OUT_ARM = 'Back to Ur';
@@ -2078,6 +2083,8 @@ function spawnStreetTargets(engine) {
     sprite: gate,
     state: { returnLabel: way.label || '', returnHub: way.hubName || '' },
   });
+  // FRIENDPOST: hovering the arm says where it leads.
+  for (const b of gate.signBoards || []) b.tip = way.label ? `Back to ${way.label}` : '';
   return { mailbox: mailTarget, door: doorTarget, gate: gateTarget };
 }
 

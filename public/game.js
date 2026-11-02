@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=fe2bbd71';
 import { createFeatureHost } from './js/feature-host.js?v=e4f648b1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=7627d3d5';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=784f165e';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -597,7 +597,7 @@ import {
   ensureStreetIndex,
   resolveIndexTsid,
 } from './js/street-loader.js?v=33d2b8bc';
-import { showDraftBanner, startDraftPlay } from './js/builder/draft-play.js?v=f6e43604';
+import { showDraftBanner, startDraftPlay } from './js/builder/draft-play.js?v=376c9c5c';
 import {
   ladderTopDeck,
   groundBeneath,
@@ -625,7 +625,7 @@ import {
   setSignpostHover,
   setSignpostKeys,
   signpostBoardAt,
-} from './js/street-render.js?v=aa2eadc7';
+} from './js/street-render.js?v=a9394f56';
 import {
   GAME_DAY_MS,
   shouldFireNewDay,
@@ -6248,8 +6248,7 @@ function setSignpostBoardHover(hit) {
   setSignpostHover(hit.view, true, hit.index);
   if (app?.canvas) {
     app.canvas.style.cursor = 'pointer';
-    app.canvas.dataset.signpostHoverLabel =
-      hit.connection?.label || hit.connection?.tsid || '';
+    app.canvas.dataset.signpostHoverLabel = signBoardLabel(hit.board) || hit.connection?.label || hit.connection?.tsid || '';
   }
 }
 
@@ -6452,7 +6451,8 @@ function wireInteractableSprite(target) {
   spr.eventMode = 'static';
   spr.cursor = 'pointer';
   spr.on('pointerover', () => {
-    if (!state.started || menuTarget || isScreenFxBlocking()) return;
+    // A post's arm under the pointer is its own target (FRIENDPOST): the post's outline stays off.
+    if (!state.started || menuTarget || isScreenFxBlocking() || hoveredSignBoard) return;
     setHoverTarget(target);
   });
   spr.on('pointerout', () => {
@@ -22435,22 +22435,67 @@ function signpostTravelRefused() {
  * from a ladder: the client gave a climber no signpost, ladder-top-signposts.js), with its view.
  */
 function signpostAtHand() {
-  if (!currentStreet || climb.active || !player) return null;
-  const near = signpostNear(walkUpSignpostStreet(currentStreet), player.x, 140, player.y);
-  if (!near) return null;
-  const view = (portalSprites || []).find((v) => v && !v.destroyed && v.signpost === near.signpost);
-  return view?.signBoards?.length ? { signpost: near.signpost, view } : null;
+  if (climb.active || !player) return null;
+  if (currentStreet) {
+    const near = signpostNear(walkUpSignpostStreet(currentStreet), player.x, 140, player.y);
+    const view = near ? (portalSprites || []).find((v) => v && !v.destroyed && v.signpost === near.signpost) : null;
+    if (view?.signBoards?.length) return { signpost: near.signpost, view, views: [view], boards: view.signBoards.map((board) => ({ view, board })) };
+  }
+  return scenePostAtHand();
+}
+
+/**
+ * FRIENDPOST: the posts a scene draws itself (the home street's signpost: homes-feature's post
+ * and its Back to Ur arm, home-street-mp-feature's friends' arms), as the registered targets'
+ * sprites that carry scene boards (street-render.js addSignBoard).
+ */
+function sceneSignViews() {
+  const out = [];
+  for (const t of interactables) {
+    const v = t?.sprite;
+    if (v && !v.destroyed && v.parent && v.signBoards?.some((b) => b.scene) && !out.includes(v)) out.push(v);
+  }
+  return out;
+}
+
+/** Every post on screen whose arms are boards: the street's and the scene's. */
+function signViewsHere() {
+  const scene = sceneSignViews();
+  return scene.length ? [...(portalSprites || []), ...scene] : portalSprites;
+}
+
+/**
+ * FRIENDPOST: the scene post the avatar stands at (the street posts' 140 px), its views' arms
+ * together, numbered from the top (Back to Ur 1, the friends 2 on), as one post.
+ */
+function scenePostAtHand() {
+  const views = sceneSignViews();
+  let best = null;
+  for (const v of views) {
+    const dx = Math.abs(v.x - player.x);
+    if (dx > 140 || Math.abs(v.y - player.y) > 120) continue;
+    if (!best || dx < Math.abs(best.x - player.x)) best = v;
+  }
+  if (!best) return null;
+  const post = views.filter((v) => Math.abs(v.x - best.x) < 2 && Math.abs(v.y - best.y) < 2);
+  const boards = post.flatMap((view) => view.signBoards.map((board) => ({ view, board }))).sort((a, b) => Number(a.board.key) - Number(b.board.key));
+  return { signpost: null, view: best, views: post, boards };
+}
+
+/** What an arm says it leads to (QA data and the hover hint). */
+function signBoardLabel(board) {
+  return board?.connection?.label || board?.connection?.tsid || board?.tip || board?.label?.text || '';
 }
 
 /** Austin 2026-11-01: the post at hand shows each arm's number key (street-render.js setSignpostKeys). */
-let keyedSignView = null;
+let keyedSignViews = [];
 function showSignpostKeys(at) {
-  const view = at?.view || null;
-  if (keyedSignView === view) return;
-  if (keyedSignView && !keyedSignView.destroyed) setSignpostKeys(keyedSignView, false);
-  keyedSignView = view;
-  if (view) setSignpostKeys(view, true);
-  if (app?.canvas) app.canvas.dataset.signpostKeys = view ? view.signBoards.map((b) => `${b.key}:${b.connection?.label || b.connection?.tsid || ''}`).join('|') : '';
+  const views = at?.views || [];
+  if (views.length === keyedSignViews.length && views.every((v, i) => v === keyedSignViews[i])) return;
+  for (const v of keyedSignViews) if (v && !v.destroyed) setSignpostKeys(v, false);
+  keyedSignViews = views;
+  for (const v of views) setSignpostKeys(v, true);
+  if (app?.canvas) app.canvas.dataset.signpostKeys = at ? at.boards.map(({ board }) => `${board.key}:${signBoardLabel(board)}`).join('|') : '';
 }
 
 /**
@@ -22460,11 +22505,41 @@ function showSignpostKeys(at) {
 function signpostArmFor(key) {
   if (!/^[1-9]$/.test(String(key))) return null;
   const at = signpostAtHand();
-  return at?.view.signBoards.find((b) => b.key === String(key)) || null;
+  return at?.boards.find(({ board }) => board.key === String(key)) || null;
 }
+
+/**
+ * FRIENDPOST: a scene post's arm runs its verb on its target as the post's menu would (the
+ * walk-over included, requestVerb): a friend's arm goes to their home street, Back to Ur back
+ * out (SignpostView.as clickHandler 519-525 and go 581-584: a click on a sign is that sign).
+ */
+function takeSceneArm(hit) {
+  const board = hit?.board;
+  const target = board?.target || interactables.find((t) => t?.sprite === hit?.view) || null;
+  if (!target) return false;
+  const verbs = menuVerbsFor(target) || [];
+  const verb = board.verbId ? verbs.find((v) => v.id === board.verbId) : verbs.find((v) => v.enabled !== false) || verbs[0];
+  setCanvasData('signpostArm', `${board.key}:${target.classId || ''}:${verb?.id || ''}`);
+  clearSignpostBoardHover();
+  if (!verb) return false;
+  if (verb.enabled === false) {
+    if (verb.reason) toast(verb.reason, 2600);
+    else openVerbMenu(target);
+    return true;
+  }
+  requestVerb(target, verb);
+  return true;
+}
+
 function signpostArmKey(key) {
-  const board = signpostArmFor(key);
-  if (!board) return false;
+  const hit = signpostArmFor(key);
+  if (!hit) return false;
+  const { board } = hit;
+  if (board.scene) {
+    if (app?.canvas) app.canvas.dataset.signpostArmKey = `${key}:${signBoardLabel(board)}`;
+    takeSceneArm(hit);
+    return true;
+  }
   if (signpostTravelRefused()) return true;
   const conn = pickConnection({ connects: [board.connection] }, availableStreetTsids());
   if (app?.canvas) app.canvas.dataset.signpostArmKey = `${key}:${board.connection?.label || ''}`;
@@ -28359,7 +28434,7 @@ async function main() {
     const bounds = app.canvas.getBoundingClientRect();
     const wx = (e.clientX - bounds.left) * (VIEW_W / bounds.width) + camTarget;
     const wy = (e.clientY - bounds.top) * (VIEW_H / bounds.height) + (camY || 0);
-    const signBoard = signpostBoardAt(portalSprites, wx, wy);
+    const signBoard = signpostBoardAt(signViewsHere(), wx, wy);
     setSignpostBoardHover(signBoard);
     if (signBoard) {
       if (hoverTarget) clearHoverGlow();
@@ -28384,7 +28459,12 @@ async function main() {
 
     // Each road-name board owns its own hover/click target; the post and the
     // other destination arms are deliberately inert for this click.
-    const signBoard = signpostBoardAt(portalSprites, sx, sy);
+    const signBoard = signpostBoardAt(signViewsHere(), sx, sy);
+    // FRIENDPOST: a scene post's arm (the home street's signpost) runs its own verb.
+    if (signBoard?.board?.scene) {
+      takeSceneArm(signBoard);
+      return;
+    }
     if (signBoard) {
       const conn = pickConnection(
         { connects: [signBoard.connection] },
@@ -28627,6 +28707,31 @@ async function main() {
     setInterval(play, 4000);
   }
   window.groddleQA = {
+    /**
+     * FRIENDPOST QA: every signpost arm on screen (street posts' and a scene post's, the home
+     * street's signpost) with its centre in view px (times the canvas's client box over viewW,
+     * viewH for a click), its post's foot (postX, postY), its number, its words and whether it is
+     * a scene post's.
+     */
+    signArms() {
+      const out = [];
+      for (const view of signViewsHere() || []) {
+        if (!view || view.destroyed) continue;
+        const sc = Number(view.signScale) || 1;
+        for (const b of view.signBoards || []) {
+          const h = b.hitArea;
+          if (!h) continue;
+          const lx = h.x + h.width / 2;
+          const ly = h.y + h.height / 2;
+          const c = Math.cos(Number(b.rotation) || 0);
+          const s = Math.sin(Number(b.rotation) || 0);
+          const x = view.x + (Number(b.x) + lx * c - ly * s) * sc - camTarget;
+          const y = view.y + (Number(b.y) + lx * s + ly * c) * sc - (camY || 0);
+          out.push({ key: b.key, label: signBoardLabel(b), scene: Boolean(b.scene), x, y, postX: view.x - camTarget, postY: view.y - (camY || 0), viewW: VIEW_W, viewH: VIEW_H });
+        }
+      }
+      return out;
+    },
     /** NOTIFY QA: raise a notice, read the notices and the Activity log, earn a badge (its screen and log line). */
     notify: {
       notice: (text, ms) => toast(String(text || ''), ms),
@@ -29033,13 +29138,21 @@ async function main() {
           ? nearHover
           : nearestInteractable(100));
       const nearSign = currentStreet ? signpostNear(walkUpSignpostStreet(currentStreet), player.x, 140, player.y) : null;
-      showSignpostKeys(signpostAtHand());
+      const postAtHand = signpostAtHand();
+      showSignpostKeys(postAtHand);
+      // FRIENDPOST: a scene post's hovered arm says where it leads, over the post's top (its
+      // number while you stand at the post), so the hint never covers an arm.
+      const armHover = hoveredSignBoard?.board?.scene && hoveredSignBoard.view && !hoveredSignBoard.view.destroyed ? hoveredSignBoard : null;
       const nearClimb = !climb.active
         ? findClimbWallNear(streetWalls, player.x, player.y, 42)
         : null;
       let want = null;
       if (climb.active) {
         want = { key: '↑↓', label: 'climb · Space jump', x: player.x, y: player.y - 80 };
+      } else if (armHover) {
+        const v = armHover.view;
+        const live = postAtHand?.boards?.some(({ board }) => board === armHover.board);
+        want = { key: live ? armHover.board.key : '', label: signBoardLabel(armHover.board), x: v.x, y: v.y - (v._promptLift || 207) };
       } else if (nearClimb && (!near || Math.abs(player.x - nearClimb.x) < 50)) {
         want = { key: '↑', label: 'climb', x: nearClimb.x, y: Math.min(player.y, nearClimb.yBot) - 70 };
       } else if (near) {
@@ -29058,7 +29171,8 @@ async function main() {
           key: 'Enter',
           label,
           x: near.sprite.x,
-          y: (box ? box.top : near.sprite.y - 74) - 12,
+          // FRIENDPOST: a post (the home street's signpost) has its hint over its top, clear of the arms.
+          y: near.sprite._promptLift ? near.sprite.y - near.sprite._promptLift : (box ? box.top : near.sprite.y - 74) - 12,
         };
       } else if (nearSign) {
         const conn = pickAwayConnection(nearSign.signpost, currentStreetTsid, availableStreetTsids());

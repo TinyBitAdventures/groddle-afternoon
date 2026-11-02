@@ -139,6 +139,8 @@ export function oneArmSignpost(PIXI, text, { left = true, fill = SIGN_TEXT_FILL 
   label.label = 'sign-label';
   arm.addChild(board, label);
   holder.addChild(arm);
+  // FRIENDPOST: the arm is a board of its own, as a street post's are (hover glow, click, number key 1).
+  addSignBoard(PIXI, box, arm, { width: w, left, key: 1, arm: board, label });
   box.armWidth = Math.round(w * SIGNPOST.scale);
   box.signText = String(text);
   return box;
@@ -383,6 +385,55 @@ export function setSignpostKeys(g, on) {
     if (board.keyCap && !board.keyCap.destroyed) board.keyCap.visible = Boolean(on);
   }
   g.signKeysShown = Boolean(on);
+}
+
+/**
+ * FRIENDPOST (Austin 2026-11-02: "you can't actually click on the individual signs themselves"):
+ * one arm of a post a scene draws itself (the home street's signpost: homes-feature's Back to Ur,
+ * home-street-mp-feature's friends) becomes a board as buildSignpostSprite's are, so the same
+ * hover glow, click and number key reach it. SignpostView.as makeSign 290-329 made every arm its
+ * own SignpostSignView (mouseChildren off, hand cursor), and LocationInputHandler.as 396-399 took a
+ * click on one as that arm. `view` is the container the hit test reads (origin the post's foot,
+ * holder scale SIGN_SCALE); `armHolder` the arm's container, already placed and tilted. The game
+ * runs a scene board's verb (`verbId`, else the target's first) on the target whose sprite is
+ * `view`, or on `target` when the feature sets one (game.js takeSceneArm).
+ * @param {typeof PIXI} PIXI
+ * @param {PIXI.Container} view
+ * @param {PIXI.Container} armHolder
+ * @param {{ width: number, left?: boolean, key: number|string, arm?: any, label?: any, verbId?: string, tip?: string }} opts
+ */
+export function addSignBoard(PIXI, view, armHolder, { width, left = false, key, arm = null, label = null, verbId = '', tip = '' }) {
+  const armH = 30;
+  const glow = new PIXI.Graphics();
+  glow.roundRect(left ? -width : 0, -armH / 2, width, armH, 4).fill({ color: SIGN_GLOW_COLOUR, alpha: 1 });
+  if (PIXI.BlurFilter) glow.filters = [new PIXI.BlurFilter({ strength: 7, quality: 3 })];
+  glow.visible = false;
+  glow.label = 'sign-glow';
+  armHolder.addChildAt(glow, 0);
+  const keyCap = signKeyCap(PIXI, key);
+  keyCap.x = left ? -width - SIGN_KEY_GAP - SIGN_KEY_W / 2 : width + SIGN_KEY_GAP + SIGN_KEY_W / 2;
+  keyCap.visible = false;
+  armHolder.addChild(keyCap);
+  view.signScale = SIGNPOST.scale;
+  if (!Array.isArray(view.signBoards)) view.signBoards = [];
+  const board = {
+    index: view.signBoards.length,
+    key: String(key),
+    scene: true,
+    verbId,
+    tip,
+    target: null,
+    arm,
+    glow,
+    label,
+    keyCap,
+    x: armHolder.x,
+    y: armHolder.y,
+    rotation: armHolder.rotation,
+    hitArea: { x: left ? -width : 0, y: -armH / 2, width, height: armH },
+  };
+  view.signBoards.push(board);
+  return board;
 }
 
 /**

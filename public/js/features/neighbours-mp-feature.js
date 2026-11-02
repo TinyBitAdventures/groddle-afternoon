@@ -91,8 +91,8 @@ import { cultivationDef, homeStreetLayout } from '../home-cultivation.js?v=e04c3
 import { tickGarden } from '../garden.js?v=854d4730';
 import { BUTLER_RIG_SCALE, ButlerPainter, butlerRigNow, loadButlerRig } from '../butler-rig.js?v=e81817d9';
 import { butlerPostRx, normalizeButlerParts } from '../butler.js?v=9d29b9b4';
-import { butlerApi } from './butler-feature.js?v=b47ef665';
-import { homesFeature, visitorHomeScene, visitorHomeState } from './homes-feature.js?v=43ab9e34';
+import { butlerApi } from './butler-feature.js?v=58b26a7a';
+import { homesFeature, visitorHomeScene, visitorHomeState } from './homes-feature.js?v=ad20c5ef';
 import {
   BUTLER_MESSAGE_MAX,
   KEY_VERB,
@@ -374,6 +374,8 @@ function createSession(engine, client) {
       // GATESIGN2: the signpost's top arm, Back to Ur; its tip the street the visitor came from.
       const way = wayOutOf(visit.returnTo);
       t.gate = engine.register({ classId: CLASS_GATE, featureId: NEIGHBOURS_MP_FEATURE_ID, label: 'Back to Ur', subtitle: `${way.label}${way.hubName && way.hubName !== way.label ? `, ${way.hubName}` : ''}`, sprite: spots.gate, state: { owner: visit.owner } });
+      // FRIENDPOST: the arm itself takes you back (game.js takeSceneArm runs go_back); hovering it says where.
+      for (const b of spots.gate?.signBoards || []) b.tip = way.label ? `Back to ${way.label}` : '';
       // MPVISIT: the owner's built Tower: Enter (furniture_tower_chassis enter; the owner's customize and flip are left off).
       visit.towerX = spots.tower?.box?.x;
       visit.mailboxX = spots.mailbox?.x;
