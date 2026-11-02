@@ -8,7 +8,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { HELL_TEXT, checkLowEnergyWarning, createHellState } from '../public/js/hell.js?v=d9afd81b';
+import { HELL_TEXT, checkLowEnergyWarning, createHellState } from '../public/js/hell.js?v=120ba5e5';
 
 const root = join(import.meta.dirname, '..', 'public');
 const read = (p) => readFileSync(join(root, p), 'utf8');
@@ -31,5 +31,22 @@ describe('walking at 0 energy (ticket 45)', () => {
     assert.equal(checkLowEnergyWarning(s, pc, t0 + 61_000).warn, true, 'again a minute on');
     const src = read('js/features/hell-feature.js');
     assert.match(src, /lastEnergy = energy;\n\s*\/\/ player\.js onTimePlaying 837-843[\s\S]{0,200}const warning = checkLowEnergyWarning\(state, engine\.pc, now\);/);
+  });
+});
+
+describe('Pooped says why you did not croak again (ticket 44)', () => {
+  it('Pooped and Super Pooped carry the You Croaked ending, in the strip and the Buffs panel', async () => {
+    const { POOPED_EXPLAINED, hellBuffDesc } = await import('../public/js/hell.js?v=120ba5e5');
+    assert.ok(POOPED_EXPLAINED.startsWith('You can only croak once a day'));
+    assert.equal(hellBuffDesc('pooped', 'You are seriously pooped! You need energy to get out of it'),
+      `You are seriously pooped! You need energy to get out of it. ${POOPED_EXPLAINED}`);
+    assert.ok(hellBuffDesc('super_pooped', 'Rest').endsWith(POOPED_EXPLAINED));
+    assert.equal(hellBuffDesc('spinach', 'Strong'), 'Strong');
+    const game = read('game.js');
+    assert.match(game, /chip\.title = `\$\{row\.def\.name\}: \$\{hellBuffDesc\(row\.def\.classTsid, row\.def\.desc\)\}`;/);
+    assert.match(game, /escapeHtml\(hellBuffDesc\(b\.def\.classTsid, b\.def\.desc\)\)/);
+    // The source's own words (quests/you_croaked.js 4).
+    const src = readFileSync(join(root, '../../glitch-GameServerJS/quests/you_croaked.js'), 'utf8');
+    assert.ok(src.includes(POOPED_EXPLAINED.replace(/'/g, "'")));
   });
 });

@@ -130,6 +130,21 @@ export const HELL_MUSIC = Object.freeze({
   stopFadeSeconds: 2,
 });
 
+/**
+ * Ticket 44 (Austin 2026-11-02): Pooped and Super Pooped say why you did not croak again, in Tiny
+ * Speck's own words from the You Croaked quest's ending (quests/you_croaked.js 4). That quest was
+ * switched off by the late game (player.js croak(): //this.quests_offer('you_croaked', true)), so the
+ * rule went unexplained; the buffs' own descriptions (catalog_buffs.js) only say how to get out of it.
+ */
+export const POOPED_EXPLAINED = "You can only croak once a day, but you'll need to get your energy back up to start feeling better. Run out of energy while pooped and you'll end up 'super-pooped', and that's really no fun!";
+
+/** A buff's description, with POOPED_EXPLAINED after Pooped's and Super Pooped's. */
+export function hellBuffDesc(classTsid, desc = '') {
+  const base = String(desc || '').trim();
+  if (classTsid !== 'pooped' && classTsid !== 'super_pooped') return base;
+  return base ? `${base.replace(/[.!]?$/, (m) => m || '.')} ${POOPED_EXPLAINED}` : POOPED_EXPLAINED;
+}
+
 /** Buffs touched by croak/resurrect (items/catalog_buffs.js). */
 export const HELL_BUFFS = Object.freeze({
   pooped: Object.freeze({

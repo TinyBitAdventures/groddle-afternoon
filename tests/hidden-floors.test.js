@@ -49,8 +49,8 @@ import {
   jumpApex,
   teleportersOn,
 } from '../public/js/hidden-floors.js?v=5ce87a04';
-import { hiddenFloorsFeature } from '../public/js/features/hidden-floors-feature.js?v=e5d108bd';
-import { FEATURES } from '../public/js/features/index.js?v=5f70fa64';
+import { hiddenFloorsFeature } from '../public/js/features/hidden-floors-feature.js?v=3b7ec815';
+import { FEATURES } from '../public/js/features/index.js?v=964a32db';
 import { rawTripleJumpMultiplier, scaledTripleJumpMultiplier } from '../public/js/movement.js?v=a314f8a1';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');

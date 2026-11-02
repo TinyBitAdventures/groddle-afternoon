@@ -11,8 +11,8 @@ import { fileURLToPath } from 'node:url';
 import { loadContentCatalogsFromDir, resetContentCatalogs, getQuestCatalog } from '../public/js/content-catalogs.js?v=10b118dd';
 import { createQuestState } from '../public/js/quests.js?v=282e1621';
 import { classifyQuests, eventCounters, isEventEmitted, questRoutingReport, requirementRoute } from '../public/js/quest-offers.js?v=3c7925ca';
-import { HELL_LOCATION, HELL_QUESTS, createHellState, croak } from '../public/js/hell.js?v=d9afd81b';
-import { PANKA_TSID, HELL_BAR_TSID } from '../public/js/hell-bar.js?v=ea0c3bfa';
+import { HELL_LOCATION, HELL_QUESTS, createHellState, croak } from '../public/js/hell.js?v=120ba5e5';
+import { PANKA_TSID, HELL_BAR_TSID } from '../public/js/hell-bar.js?v=efff73f9';
 import {
   GRAVE_VISIT,
   GRAVE_VISITORS,
@@ -26,13 +26,13 @@ import {
   planGraveVisit,
   recognitionBranch,
   ticketDue,
-} from '../public/js/hell-tickets.js?v=cb784752';
-import { hellTicketsFeature } from '../public/js/features/hell-tickets-feature.js?v=dfb20218';
-import { hellFeature } from '../public/js/features/hell-feature.js?v=a5988f29';
-import { hellBarFeature } from '../public/js/features/hell-bar-feature.js?v=8cf7ebbe';
+} from '../public/js/hell-tickets.js?v=03d766d7';
+import { hellTicketsFeature } from '../public/js/features/hell-tickets-feature.js?v=b378852e';
+import { hellFeature } from '../public/js/features/hell-feature.js?v=1f2abc54';
+import { hellBarFeature } from '../public/js/features/hell-bar-feature.js?v=645d7d0e';
 import { questOffersFeature } from '../public/js/features/quest-offers-feature.js?v=9d9418e8';
 import { questFlagsFeature } from '../public/js/features/quest-flags-feature.js?v=17c6ef48';
-import { FEATURES } from '../public/js/features/index.js?v=5f70fa64';
+import { FEATURES } from '../public/js/features/index.js?v=964a32db';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const CONTENT = join(spike, 'public/assets/content');

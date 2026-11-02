@@ -99,7 +99,7 @@
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=5cf694a1';
 import { nearestSurfaceY } from '../walk-surface.js?v=c982983e';
 import { displayTopOf, itemstackOverlayPoint, playSheetOverlay } from '../overlay-art.js?v=3753a0d2';
-import { isInHell } from '../hell.js?v=d9afd81b';
+import { isInHell } from '../hell.js?v=120ba5e5';
 import { HOG_HAUL_STREET_ID } from '../hog-haul.js?v=50d2e072';
 import { TRANT_META, trantStatusLabel } from '../trants.js?v=9c2e8c0f';
 import { animalStatusLabel } from '../animals.js?v=d34f13bc';

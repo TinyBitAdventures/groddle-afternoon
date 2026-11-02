@@ -41,7 +41,7 @@
 
 import { BUTLER_STRINGS } from '../butler.js?v=9d29b9b4';
 import { butlerApi } from './butler-feature.js?v=90ca5198';
-import { hellFeature } from './hell-feature.js?v=a5988f29';
+import { hellFeature } from './hell-feature.js?v=1f2abc54';
 import { towerApi } from './home-tower-feature.js?v=571385ad';
 import { STUCK_COOLDOWN_MS, STUCK_TEXT, slashPlan, unknownLine } from '../slash-commands.js?v=58e63833';
 import { parseTp, runTeleportCommand, TP_TEXT } from '../admin-teleport.js?v=fa56e8df';

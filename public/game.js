@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=9ac37cff';
 import { createFeatureHost } from './js/feature-host.js?v=903263a4';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=5f70fa64';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=964a32db';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -736,7 +736,7 @@ import { holdCloseToFloor } from './js/slope-walk.js?v=9af1e505';
 import { WALK_MAX, avatarGround, coastX, stepAvatar, steerAccel, steerX, streetPhysicsExtras } from './js/avatar-step.js?v=33ad1926';
 import { createUserPath, stepUserPath } from './js/user-path.js?v=8880557f';
 import { FAILED_LINE, inVerbReach, movingLine, verbRange, walkOverEnd, walkOverGoalX } from './js/walk-over.js?v=db80ba07';
-import { isInHell } from './js/hell.js?v=d9afd81b';
+import { hellBuffDesc, isInHell } from './js/hell.js?v=120ba5e5';
 import { climbBobY, ladderAnimState, ladderSwap } from './js/ladder-anim.js?v=a8b327a0';
 import { VECTOR_AVATAR } from './js/avatar-vector-sheets.js?v=ad801376';
 import { createNpcGlitchKit } from './js/npc-glitch.js?v=0b81a3e4';
@@ -24574,7 +24574,7 @@ function renderBuffsPanel() {
     card.innerHTML = `<div class="buff-card-head">
         <img src="${escapeHtml(buffIconUrl(b))}" alt="" />
         <div><div class="q-title">${escapeHtml(b.def.name)}</div><div class="buff-time">${waiting ? 'Begins' : 'Remaining'} ${escapeHtml(formatBuffRemaining(b, now))}</div></div>
-      </div><div class="q-req">${escapeHtml(b.def.desc || '')}</div>`;
+      </div><div class="q-req">${escapeHtml(hellBuffDesc(b.def.classTsid, b.def.desc))}</div>`;
     // G213: a buff another system holds (Pooped, cooldowns) cannot be ended here; it would come straight back.
     if (!b.heldBy) {
       const btn = document.createElement('button');
@@ -24656,7 +24656,7 @@ function renderBuffStrip() {
     const chip = document.createElement('button');
     chip.type = 'button';
     chip.className = `buff-chip${row.activated === false || row.appliedAt > now ? ' pending' : ''}`;
-    chip.title = `${row.def.name}: ${row.def.desc || ''}`;
+    chip.title = `${row.def.name}: ${hellBuffDesc(row.def.classTsid, row.def.desc)}`;
     chip.setAttribute('aria-label', `${row.def.name}, ${formatBuffRemaining(row, now)}`);
     chip.innerHTML = `<img src="${escapeHtml(buffIconUrl(row))}" alt="" /><span>${escapeHtml(formatBuffRemaining(row, now))}</span>`;
     chip.addEventListener('click', openBuffsPanel);
