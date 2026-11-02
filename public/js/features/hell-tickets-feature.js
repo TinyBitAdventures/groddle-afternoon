@@ -61,7 +61,7 @@ import {
   recognitionBranch,
   ticketDue,
 } from '../hell-tickets.js?v=cb784752';
-import { hellFeature } from './hell-feature.js?v=bbe7a45e';
+import { hellFeature } from './hell-feature.js?v=a5988f29';
 import { doorsFeature } from './doors-feature.js?v=b7e66401';
 
 export const HELL_TICKETS_FEATURE_ID = 'hell-tickets';

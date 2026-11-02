@@ -22,7 +22,6 @@
  *   labelFor(tsid)                        // -> { street, hub, hubId } public street name
  *   placementGroups(population, street)   // -> [{ key, count, clearance }] extra planner groups;
  *                                         //    read the points with engine.placement(key)
- *   allowZeroEnergyMovement(engine)       // -> true lets the avatar walk at 0 energy
  *   reloadLocation(saved, engine)         // -> { tsid, x, y } overrides the saved start
  *   metabolicGate(stat, direction, engine)// -> { ok:false, msg } blocks a gain/loss
  *   physics(engine)                       // -> { speed, jump, gravity } multipliers, plus optional

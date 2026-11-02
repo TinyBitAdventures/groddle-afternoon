@@ -386,11 +386,6 @@ export const hellFeature = {
     return state.isDead ? true : null;
   },
 
-  /** The dead walk Naraka with zero energy. */
-  allowZeroEnergyMovement() {
-    return state.isDead ? true : null;
-  },
-
   physics() {
     return hellPhysics(state, Date.now());
   },
@@ -458,9 +453,6 @@ export const hellFeature = {
     if (lastEnergy != null && energy < lastEnergy) {
       // metabolics_lose_energy 134: the loss counts toward today's energy_consumed (G200: Super Pooped).
       state = noteEnergyConsumed(state, lastEnergy - energy, now);
-      const warning = checkLowEnergyWarning(state, engine.pc, now);
-      state = warning.state;
-      applyEffects(warning.effects, engine);
       const pooped = checkPooped(state, engine.pc, now, { energyConsumedToday: energyConsumedTodayFor(state, now) });
       if (pooped.applied) {
         state = pooped.state;
@@ -469,6 +461,13 @@ export const hellFeature = {
       }
     }
     lastEnergy = energy;
+    // player.js onTimePlaying 837-843: while energy is 10% or less the warning repeats each minute
+    // of play, not only when energy drops (ticket 45: a player stuck at 0 heard it once).
+    const warning = checkLowEnergyWarning(state, engine.pc, now);
+    if (warning.warn) {
+      state = warning.state;
+      applyEffects(warning.effects, engine);
+    }
     if (shouldCroak(engine.pc, state, {
       streetTsid: engine.streetTsid,
       hubId: engine.street?.hubId || '',

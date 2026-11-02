@@ -3,8 +3,8 @@
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=9ac37cff';
-import { createFeatureHost } from './js/feature-host.js?v=e4f648b1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=7b837ba5';
+import { createFeatureHost } from './js/feature-host.js?v=903263a4';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=00adf70b';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -479,7 +479,7 @@ import {
   parsePlayerSave,
   serializePlayerSave,
   restorePlayerSave,
-} from './js/player-save.js?v=b6a4346e';
+} from './js/player-save.js?v=4ee358bc';
 import {
   HOME_INTERIOR_TSID,
   HOME_STREET_TSID,
@@ -13304,13 +13304,9 @@ function handleInput() {
     }
     return;
   }
-  if (pc.energy <= 0 && features.query('allowZeroEnergyMovement', engine) !== true) {
-    endUserWalk('held');
-    player.vx *= 0.85;
-    if (climb.active) stopClimb();
-    clearJumpQueue(jumpState);
-    return;
-  }
+  // Ticket 45: no freeze at 0 energy. The client never checked energy to move (AvatarController,
+  // PhysicsModel); Pooped and Super Pooped halve walk and jump instead (catalog_buffs.js 1689-1717,
+  // hell-feature physics). Energy gates verbs and teleports, not walking.
   const now = movementNow();
   let left = keys.has('ArrowLeft') || keys.has('a') || keys.has('A');
   let right = keys.has('ArrowRight') || keys.has('d') || keys.has('D');
