@@ -69,6 +69,7 @@ import {
 import { textureFromUrl } from '../textures.js?v=db2ce452';
 import { playSheetOverlay } from '../overlay-art.js?v=3753a0d2';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
+import { energyMax, metabolicGain, moodMax } from '../metabolics.js?v=8504134e';
 import { CONVERSATION_RULES, adoptLegacyTalks, conversationRecord, hasCompleted, toldRecord } from '../conversations.js?v=7cbdfea4';
 import { TELLERS } from '../conversations-data.js?v=f11b7e02';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
@@ -107,11 +108,22 @@ function publish(engine) {
   engine.setData('iconSprite', v ? `${Math.round(v.sprite.x)},${Math.round(v.baseY)},${v.sprite.texture?.width || 0}x${v.sprite.texture?.height || 0},player=${Math.round(engine.player?.x || 0)},${Math.round(engine.player?.y || 0)}` : 'none');
 }
 
+/** "+25 mood", "+20 energy", "+30 iMG": what landed, for the popup (item.js transformEffects). */
+function effectWords(effects) {
+  return Object.entries(effects || {})
+    .filter(([, v]) => Number(v))
+    .map(([k, v]) => `${v > 0 ? '+' : ''}${v} ${k === 'xp' ? 'iMG' : k}`)
+    .join(', ');
+}
+
 function say(engine, msg, ok = true, effects = null) {
   last = String(msg || '').trim();
   if (effects) engine.pushActivity?.({ base: last.replace(/\.$/, ''), effects });
   else engine.pushActivity?.(last);
-  engine.toast?.(last, ok ? 2800 : 2400);
+  // Ticket 48: the popup says what you got, as the source's verb message did (item.js
+  // buildVerbMessage 26-74: "You caressed an Emblem of Lem. +25 Mood"); nothing when nothing landed.
+  const words = effects ? effectWords(effects) : '';
+  engine.toast?.(words ? `${last} ${words}` : last, ok ? 2800 : 2400);
   engine.refreshPack?.();
   publish(engine);
 }
@@ -125,9 +137,13 @@ function grant(engine, stat, amount) {
     engine.updateHud?.();
     return landed;
   }
-  const cap = stat === 'energy' ? Math.max(100, Number(pc.energyMax) || 100) : 100;
+  // Ticket 48: the real limits (metabolics_recalc_limits: mood shares the energy tank), and a gain
+  // never lowers the stat: mood 134 with a +25 Caress was cut to the old fixed 100 (-34).
+  // metabolics_add_mood / add_energy (inc_metabolics.js 40-98) add nothing while dead.
+  if ((stat === 'energy' || stat === 'mood') && !metabolicGain(stat).ok) return 0;
+  const cap = stat === 'energy' ? energyMax(pc) : moodMax(pc);
   const before = Math.max(0, Number(pc[stat]) || 0);
-  pc[stat] = Math.min(cap, before + amount);
+  pc[stat] = Math.max(before, Math.min(cap, before + amount));
   engine.updateHud?.();
   return Math.round(pc[stat] - before);
 }

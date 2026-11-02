@@ -260,7 +260,7 @@ describe('icon conversations (G202: the shared record)', () => {
   });
 
   it('a version 1 save hands its talked list to the record once, in either restore order', async () => {
-    const { giantIconsFeature } = await import('../public/js/features/giant-icons-feature.js?v=2daee378');
+    const { giantIconsFeature } = await import('../public/js/features/giant-icons-feature.js?v=0a91c02a');
     const old = { version: 1, talked: ['icon_humbaba_1', 'icon_alph_1'] };
     const saved = { completed: { npc_chicken: { chickens_cautionary_tales_1: 700 } } };
     const t0 = Date.now();
@@ -299,7 +299,7 @@ describe('imagination cards', () => {
 
 describe('giant icons feature', () => {
   it('offers the source pack verbs and iconizes through the engine', async () => {
-    const { giantIconsFeature } = await import('../public/js/features/giant-icons-feature.js?v=2daee378');
+    const { giantIconsFeature } = await import('../public/js/features/giant-icons-feature.js?v=0a91c02a');
     giantIconsFeature._reset();
     const events = [];
     const granted = [];
@@ -329,6 +329,29 @@ describe('giant icons feature', () => {
     giantIconsFeature.runPackVerb('icon_alph', 'revere', engine);
     assert.ok(engine.pc.energy > 10);
     assert.equal(giantIconsFeature._state().pack.alph[0], 19);
+  });
+
+  it('Caress adds mood up to the real limit and never takes any away; the popup says what landed (ticket 48)', async () => {
+    const { giantIconsFeature } = await import('../public/js/features/giant-icons-feature.js?v=0a91c02a');
+    giantIconsFeature._reset();
+    const toasts = [];
+    const engine = {
+      inv: { emblem_lem: 1 },
+      pc: { level: 20, currants: 0, mood: 134, energy: 150, energyMax: 200, xp: 0, imagination: 0, imaginationUpgrades: [] },
+      learnedSkills: [], streetTsid: 'GTEST', setData() {}, pushActivity() {}, toast: (m) => toasts.push(m),
+      refreshPack() {}, updateHud() {}, save() {}, param: () => null, playSound() {}, achievement() {}, grantAchievement() {},
+    };
+    giantIconsFeature.init(engine);
+    giantIconsFeature.runPackVerb('emblem_lem', 'caress', engine);
+    assert.equal(engine.pc.mood, 159, 'mood 134 + 25 with a 200 tank (was cut to 100: -34)');
+    assert.match(toasts.at(-1), /^You caressed an Emblem of Lem\. \+25 mood$/);
+    // Near the top it adds what fits; at the top nothing, and the popup names no amount.
+    giantIconsFeature._reset();
+    giantIconsFeature.init(engine);
+    engine.pc.mood = 200;
+    giantIconsFeature.runPackVerb('emblem_lem', 'caress', engine);
+    assert.equal(engine.pc.mood, 200);
+    assert.equal(toasts.at(-1), 'You caressed an Emblem of Lem.');
   });
 
   it('a placed Icon\'s own menu has no Talk to: the conversations feature adds it while one is offered', () => {
