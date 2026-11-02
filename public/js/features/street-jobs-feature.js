@@ -44,13 +44,13 @@
  */
 
 import { ITEM_CATALOG, addItem, countItem, ensureItem, itemIcon, removeItem } from '../inventory.js?v=b0e33301';
-import { canUseTool, useToolCondition } from '../tools.js?v=3d109172';
+import { canUseTool, useToolCondition } from '../tools.js?v=6a9e1314';
 import { ecologyForStreet } from '../street-ecology.js?v=75086599';
 import { worldToScreen } from '../street-model.js?v=505d8990';
 import { signArmWidth } from '../street-render.js?v=a9394f56';
 import { getSkillCatalog } from '../content-catalogs.js?v=10b118dd';
-import { GIANTS } from '../shrines.js?v=99cbf9a3';
-import { teleportationFeature } from './teleportation-feature.js?v=5f8b0c68';
+import { GIANTS } from '../shrines.js?v=cf7c3993';
+import { teleportationFeature } from './teleportation-feature.js?v=236fbddc';
 import {
   SOLO_DIVISOR,
   WORK_UNIT_MS,

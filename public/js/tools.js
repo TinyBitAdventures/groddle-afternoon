@@ -480,10 +480,76 @@ export function quoteToolRepair(state, classTsid, learned = [], opts = {}) {
     tinkering,
     missing,
     durationSeconds,
-    durationMs: Math.max(900, Math.min(8000, durationSeconds * 180)),
+    durationMs: repairDurationMs(durationSeconds),
+    // The full repair's energy (tinkertool.js tooltip: "The full repair takes $total_energy energy").
     energy,
+    energyPerTwoTicks: Math.max(1, energyPerTwoTicks),
     tinkertoolWear: rawSeconds,
   };
+}
+
+/** How long the remake shows a repair of `seconds` source ticks. */
+function repairDurationMs(seconds) {
+  return Math.max(900, Math.min(8000, seconds * 180));
+}
+
+/**
+ * PURE: how far a repair gets on the energy the player has (tinkertool.js onTick 405-445). Each
+ * one-second tick repairs the rank's points while energy is above the two-tick cost; every other
+ * tick pays that cost; the repair ends when energy is at or under it, keeping what it fixed.
+ * The verb needs more than the cost plus one to start (repair conditions, line 83-85).
+ * Returns { ok, points, energy (spent), ticks (that repaired: the Tinkertool's wear), full, durationMs }.
+ */
+export function toolRepairPlan(quote, energy) {
+  if (!quote?.ok) return { ok: false, reason: quote?.reason || 'quote', points: 0, energy: 0, ticks: 0, full: false };
+  const cost = Math.max(1, Number(quote.energyPerTwoTicks) || 1);
+  let e = Math.max(0, Number(energy) || 0);
+  if (e <= cost + 1) return { ok: false, reason: 'energy', points: 0, energy: 0, ticks: 0, full: false };
+  const perTick = quote.tinkering.repairPerSecond;
+  let points = 0;
+  let spent = 0;
+  let ticks = 0;
+  for (let t = 1; t <= 10000; t += 1) {
+    if (e > cost) {
+      points = Math.min(quote.missing, points + perTick);
+      ticks += 1;
+    }
+    if (t % 2 === 1) {
+      if (e <= cost) break;
+      e -= cost;
+      spent += cost;
+    }
+    if (points >= quote.missing) break;
+    if (e <= cost) break;
+  }
+  return { ok: true, points, energy: spent, ticks, full: points >= quote.missing, durationMs: repairDurationMs(ticks) };
+}
+
+/**
+ * PURE: what one copy of a tool is worth to a vendor or a shrine (tool_base.js getBaseCost 360-368):
+ * 20% of its base cost plus 80% by the wear it has left. A tool with no wear meter is worth its base
+ * cost: null, as for a class this module does not track, so the caller uses its catalog value.
+ */
+export function toolWornBaseCost(state, classTsid, opts = {}) {
+  const def = TOOL_CONDITION_CATALOG[classTsid];
+  if (!def) return null;
+  // A machine's tank is fuel, not points_capacity: getBaseCost's else branch, the item's full
+  // base cost, which the caller's catalog holds (this catalog keeps 0 for machines).
+  if (def.fuel || !(def.baseCost > 0)) return null;
+  const c = getToolCondition(state, classTsid, opts);
+  const left = Math.max(0, Math.min(def.capacity, Number(c.remaining) || 0));
+  return def.baseCost * 0.2 + def.baseCost * 0.8 * (left / def.capacity);
+}
+
+/** The copy a sale or a donation takes: the most worn one (its place in pack order). */
+export function mostWornToolCopy(state, classTsid) {
+  const def = TOOL_CONDITION_CATALOG[classTsid];
+  if (!def) return null;
+  const row = ensureToolCondition(state, classTsid);
+  if (!row.copies.length) return null;
+  let at = 0;
+  for (let i = 1; i < row.copies.length; i += 1) if (row.copies[i] < row.copies[at]) at = i;
+  return at;
 }
 
 /** Commit a quoted full repair atomically. Inventory presence is supplied by the caller. */
@@ -496,43 +562,53 @@ export function repairToolCondition(state, classTsid, pc, opts = {}) {
   if (classTsid === 'tinkertool' && opts.hasSpareTinkertool !== true) {
     return { ok: false, reason: 'spare_tinkertool', quote, msg: 'A Tinkertool needs another working Tinkertool for this repair.' };
   }
+  // tinkertool.js onTick: the repair runs while the energy lasts and keeps what it fixed.
+  const plan = toolRepairPlan(quote, pc?.energy);
+  if (!plan.ok) {
+    return { ok: false, reason: 'energy', quote, msg: "You don't have enough energy to repair this." };
+  }
   // The Tinkertool doing the repair is another copy when the one repaired is a Tinkertool itself.
-  const tinkerOpts = classTsid === 'tinkertool' ? { copy: spareTinkertoolIndex(state, quote.condition.copy, quote.tinkertoolWear) } : {};
-  const tinkerCheck = canUseTool(state, 'tinkertool', quote.tinkertoolWear, tinkerOpts);
+  const tinkerOpts = classTsid === 'tinkertool' ? { copy: spareTinkertoolIndex(state, quote.condition.copy, plan.ticks) } : {};
+  const tinkerCheck = canUseTool(state, 'tinkertool', plan.ticks, tinkerOpts);
   if (!tinkerCheck.ok) {
     return { ok: false, reason: 'tinkertool_broken', quote, msg: tinkerCheck.msg };
   }
-  if ((pc?.energy || 0) < quote.energy) {
-    return {
-      ok: false,
-      reason: 'energy',
-      quote,
-      msg: `You need ${quote.energy} energy to finish this repair.`,
-    };
-  }
   const target = ensureToolCondition(state, classTsid);
   // tinkertool.js 435: each tick is metabolics_lose_energy; 368 reports what was used.
-  const energyUsed = loseEnergy(pc, quote.energy);
-  target.copies[quote.condition.copy] = quote.condition.capacity;
-  target.repairs = (target.repairs || 0) + 1;
+  const energyUsed = loseEnergy(pc, plan.energy);
+  const capacity = quote.condition.capacity;
+  const after = Math.min(capacity, quote.condition.remaining + plan.points);
+  target.copies[quote.condition.copy] = after;
+  const full = after >= capacity;
+  // tinkertool.js endRepair 346-364: the badge and quest counters count a finished repair only.
+  if (full) {
+    target.repairs = (target.repairs || 0) + 1;
+    state.totalRepairs = (state.totalRepairs || 0) + 1;
+  }
   settleRow(target, TOOL_CONDITION_CATALOG[classTsid]);
-  state.totalRepairs = (state.totalRepairs || 0) + 1;
-  const tinkertoolUse = useToolCondition(state, 'tinkertool', quote.tinkertoolWear, tinkerOpts);
+  const tinkertoolUse = useToolCondition(state, 'tinkertool', plan.ticks, tinkerOpts);
   // Tink Happy Thoughts (tinkertool.js:419): each repair tick adds mood equal
   // to that tick's Tinkertool wear, so the whole repair adds the full wear.
   let moodGained = 0;
   // metabolics_add_mood: nothing while dead (inc_metabolics.js 79-86).
-  if (repairGivesMood(opts.upgrades || pc?.imaginationUpgrades) && pc && quote.tinkertoolWear > 0 && metabolicGain('mood').ok) {
+  if (repairGivesMood(opts.upgrades || pc?.imaginationUpgrades) && pc && plan.ticks > 0 && metabolicGain('mood').ok) {
     const before = Number(pc.mood) || 0;
-    pc.mood = Math.min(moodMax(pc), before + quote.tinkertoolWear);
+    pc.mood = Math.min(moodMax(pc), before + plan.ticks);
     moodGained = pc.mood - before;
   }
+  // endRepair 337-348: a tool short of full says how far it got.
+  const said = full
+    ? `You fixed the ${quote.condition.label} up just perfect.`
+    : `You repaired the ${quote.condition.label} to ${Math.floor((after / capacity) * 100)} percent.`;
   return {
     ok: true,
+    full,
     quote,
+    plan,
+    remaining: after,
     tinkertoolUse,
     moodGained,
-    msg: `You fixed the ${quote.condition.label} up just perfect. You spent ${energyUsed} energy.`,
+    msg: `${said} You spent ${energyUsed} energy.`,
   };
 }
 

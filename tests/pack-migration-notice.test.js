@@ -14,7 +14,7 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createNotifier } from '../public/js/notify.js?v=d85330ff';
-import { bagsFeature } from '../public/js/features/bags-feature.js?v=f233f5ad';
+import { bagsFeature } from '../public/js/features/bags-feature.js?v=fd6121a9';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 

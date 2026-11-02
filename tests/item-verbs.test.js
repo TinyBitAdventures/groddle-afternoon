@@ -21,8 +21,8 @@ import {
   homeTrophyCount,
   isTrophyClass,
   itemVerbsFeature,
-} from '../public/js/features/item-verbs-feature.js?v=d8889a08';
-import { homesFeature } from '../public/js/features/homes-feature.js?v=df21884b';
+} from '../public/js/features/item-verbs-feature.js?v=5647bbc3';
+import { homesFeature } from '../public/js/features/homes-feature.js?v=63607c9d';
 import {
   applyAchievementProgress,
   createAchievementState,
@@ -290,7 +290,7 @@ describe('game.js wiring for G134', () => {
   it('buff events reach features, shrine powders reach donations, the spindle passes its spin', () => {
     const game = readFileSync(join(publicRoot, 'game.js'), 'utf8');
     assert.match(game, /features\.event\(`buff_\$\{event\.type\}:\$\{event\.classTsid\}`, 1, engine\)/);
-    assert.match(game, /donateToShrine\(shrineState, giantId, inv, pc, shrineSelected, shrineQty, shrinePowderOpts\(\)\)/);
+    assert.match(game, /donateToShrine\(shrineState, giantId, inv, pc, shrineSelected, shrineQty, \{\s*\.\.\.shrinePowderOpts\(\),/);
     assert.match(game, /shrinePowderAchievementCounters\(result\.powderConsumed, result\.baseCost\)/);
     assert.match(game, /makingOutputAchievementCounters\(record\.recipe\.tool, record\.recipe\.outputs, spin\)/);
     assert.match(game, /resetAchievementCounter: \(counter\) => resetAchievementCounter\(achieveState, counter\)/);

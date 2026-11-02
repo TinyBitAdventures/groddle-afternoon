@@ -8,12 +8,12 @@ import {
   addItem,
   removeItem,
   countItem,
-  listPackItemSlots,
+  listPackSlots,
   ITEM_CATALOG,
   ensureItem,
 } from './inventory.js?v=b0e33301';
-import { gardenVendorOffers } from './garden.js?v=854d4730';
-import { miningVendorOffers } from './mining.js?v=4806e3e8';
+import { gardenVendorOffers } from './garden.js?v=86ed507d';
+import { miningVendorOffers } from './mining.js?v=ff73fa4b';
 
 import { STORE_CATALOG, ITEM_BASE_COSTS, NO_VENDOR_ITEMS } from './store-catalog.js?v=79d4de8a';
 
@@ -177,14 +177,17 @@ export function itemBaseCost(classTsid) {
  * round(base_cost * buy_multiplier) per unit, then Fast Talker … Ultimate
  * Closer add 2/5/7/10% rounded once on the total. A unit worth 0 (including
  * every item at a 0-multiplier store, and no_vendor items) can't be sold.
+ * `opts.baseCost` stands in for the item's base cost: a worn tool's
+ * (tool_base.js getBaseCost, tools.js toolWornBaseCost).
  * @param {string} classTsid
  * @param {number} [qty]
- * @param {{ buyMultiplier?: number, upgrades?: string[] }} [opts]
+ * @param {{ buyMultiplier?: number, upgrades?: string[], baseCost?: number }} [opts]
  */
 export function vendorSellValue(classTsid, qty = 1, opts = {}) {
   if (ITEM_CATALOG[classTsid]?.sellable === false || NO_VENDOR_ITEMS.has(classTsid)) return { unit: 0, total: 0 };
   const multiplier = Number(opts.buyMultiplier ?? BUYBACK_MULTIPLIER);
-  const unit = Math.round(itemBaseCost(classTsid) * multiplier);
+  const base = opts.baseCost != null && Number.isFinite(Number(opts.baseCost)) ? Number(opts.baseCost) : itemBaseCost(classTsid);
+  const unit = Math.round(base * multiplier);
   if (unit <= 0) return { unit: 0, total: 0 };
   return { unit, total: adjustedVendorPayout(unit * qty, opts.upgrades || []) };
 }
@@ -243,10 +246,19 @@ export function vendorSell(pc, inv, offers, classTsid, qty = 1, opts = {}) {
   if (countItem(inv, classTsid) < amount) {
     return { ok: false, reason: 'empty', msgs: ['You do not have enough to sell.'] };
   }
-  const { total: gain } = vendorSellValue(classTsid, amount, { ...opts, upgrades: pc?.imaginationUpgrades });
+  // A tool goes one copy at a time at its worn price (opts.toolBaseCost); with no callback it stays.
+  const isTool = Boolean(ITEM_CATALOG[classTsid]?.isTool);
+  if (isTool && (amount !== 1 || typeof opts.toolBaseCost !== 'function')) {
+    return { ok: false, reason: 'not_sellable', msgs: ['Sell tools one at a time.'] };
+  }
+  const worn = isTool ? opts.toolBaseCost(classTsid) : null;
+  const baseCost = worn == null ? undefined : Number(worn);
+  const { total: gain } = vendorSellValue(classTsid, amount, { ...opts, baseCost, upgrades: pc?.imaginationUpgrades });
   if (gain <= 0) {
     return { ok: false, reason: 'no_value', msgs: ["You can't sell that item."] };
   }
+  // The caller's last step before the stack shrinks (a tool's copy moves last: tools.js takeToolCopy).
+  if (typeof opts.beforeRemove === 'function') opts.beforeRemove();
   if (!removeItem(inv, classTsid, amount)) {
     return { ok: false, reason: 'empty', msgs: ['You do not have enough to sell.'] };
   }
@@ -278,18 +290,38 @@ export function listBuyOffers(offers, upgrades = []) {
 }
 
 /**
+ * The pack slots a vendor buys from, with the base cost each unit is priced at.
+ * Tools come one at a time, priced by their wear through `opts.toolBaseCost(classTsid)`
+ * (the copy that goes is the caller's: game.js sells the most worn); without that
+ * callback tools stay out, as before. Any vendor bought tools in the original
+ * (inc_stores.js storeSell has no tool check; tool_base.js getBaseCost prices the wear).
+ */
+function sellSlots(inv, opts = {}) {
+  const toolCost = typeof opts.toolBaseCost === 'function' ? opts.toolBaseCost : null;
+  return listPackSlots(inv)
+    .filter((slot) => slot.sellable !== false && (!slot.isTool || toolCost))
+    .map((slot) => {
+      if (!slot.isTool) return { slot, baseCost: undefined, maxQty: slot.count };
+      const cost = toolCost(slot.classTsid);
+      return { slot, baseCost: cost == null ? undefined : Number(cost), maxQty: 1 };
+    });
+}
+
+/**
  * List sellable pack rows for UI.
  * @param {import('./inventory.js').Inventory} inv
  * @param {VendorOffer[]} offers
  */
 export function listSellOffers(inv, offers, upgrades = [], opts = {}) {
-  return listPackItemSlots(inv).filter((slot) => slot.sellable !== false).map((slot) => {
+  return sellSlots(inv, opts).map(({ slot, baseCost, maxQty }) => {
     const offer = findOffer(offers, slot.classTsid);
     return {
       classTsid: slot.classTsid,
       label: offer?.label || slot.label,
-      price: vendorSellUnitPrice(slot.classTsid, { ...opts, upgrades }),
+      price: vendorSellUnitPrice(slot.classTsid, { ...opts, upgrades, baseCost }),
       have: slot.count,
+      maxQty,
+      tool: Boolean(slot.isTool),
       mode: 'sell',
       vendorStocked: Boolean(offer),
     };
@@ -298,31 +330,33 @@ export function listSellOffers(inv, offers, upgrades = [], opts = {}) {
 
 /**
  * Build the non-mutating quote shown after dropping/clicking a pack item.
- * The vendor buys any known non-tool item, matching the original sell tab.
+ * The vendor buys any known item, a tool one at a time at its worn price (opts.toolBaseCost).
  * @param {import('./inventory.js').Inventory} inv
  * @param {VendorOffer[]} offers
  * @param {string} classTsid
  * @param {number} [qty=1]
  */
 export function createVendorSellQuote(inv, offers, classTsid, qty = 1, upgrades = [], opts = {}) {
-  const slot = listPackItemSlots(inv).find((row) => row.classTsid === classTsid);
-  if (!slot || slot.count < 1 || slot.sellable === false) {
+  const row = sellSlots(inv, opts).find((r) => r.slot.classTsid === classTsid);
+  const slot = row?.slot;
+  if (!slot || slot.count < 1) {
     return { ok: false, reason: 'not_sellable', classTsid, msgs: ['That item is not sellable from your pack.'] };
   }
   const offer = findOffer(offers, classTsid);
-  const amount = Math.max(1, Math.min(slot.count, Math.floor(Number(qty) || 1)));
-  const value = vendorSellValue(classTsid, amount, { ...opts, upgrades });
+  const amount = Math.max(1, Math.min(row.maxQty, Math.floor(Number(qty) || 1)));
+  const value = vendorSellValue(classTsid, amount, { ...opts, upgrades, baseCost: row.baseCost });
   if (value.unit <= 0) {
     return { ok: false, reason: 'no_value', classTsid, msgs: ["You can't sell that kind of thing."] };
   }
-  const unitPrice = vendorSellUnitPrice(classTsid, { ...opts, upgrades });
+  const unitPrice = vendorSellUnitPrice(classTsid, { ...opts, upgrades, baseCost: row.baseCost });
   return {
     ok: true,
     reason: 'quoted',
     classTsid,
     label: offer?.label || slot.label,
     have: slot.count,
-    maxQty: slot.count,
+    maxQty: row.maxQty,
+    tool: Boolean(slot.isTool),
     qty: amount,
     unitPrice,
     total: value.total,

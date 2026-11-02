@@ -28,10 +28,10 @@ import {
   PURPLE_JOURNEY_STREETS,
   COLD_COMFORT,
   COLD_COMFORT_LEAVE_TEXT,
-} from '../public/js/quest-offers.js?v=fe9fb524';
-import { createResourceNode, harvestResourceNode } from '../public/js/resource-nodes.js?v=4f48fd75';
-import { createPlot, performPlotVerb } from '../public/js/patches.js?v=1bf0dd8e';
-import { createToolConditionState } from '../public/js/tools.js?v=3d109172';
+} from '../public/js/quest-offers.js?v=3c7925ca';
+import { createResourceNode, harvestResourceNode } from '../public/js/resource-nodes.js?v=a3c19f90';
+import { createPlot, performPlotVerb } from '../public/js/patches.js?v=8136719f';
+import { createToolConditionState } from '../public/js/tools.js?v=6a9e1314';
 import { performEmotionalBearAction, createEmotionalBearState } from '../public/js/emotional-bear.js?v=1dd276f7';
 import {
   questVerbsFeature,
@@ -39,7 +39,7 @@ import {
   SLATHER_VERB,
   SLATHER_COPY,
 } from '../public/js/features/quest-verbs-feature.js?v=91309fbd';
-import { onOwnYard } from '../public/js/features/quest-offers-feature.js?v=d7a7da2e';
+import { onOwnYard } from '../public/js/features/quest-offers-feature.js?v=9d9418e8';
 import {
   giveCubimalVerb,
   GIVE_CUBIMAL_VERB,
@@ -280,7 +280,8 @@ describe('tools (G440 G445)', () => {
     assert.equal(progress(qs, 'tinkering_repair_for_time_period', 'tinkertool_15s_repair'), 0);
     route(qs, 'tool_repaired_long:pick');
     assert.equal(progress(qs, 'tinkering_repair_for_time_period', 'tinkertool_15s_repair'), 1);
-    assert.match(read('game.js'), /if \(quote\.durationSeconds >= 15\) emitGameEvent\(`tool_repaired_long:\$\{classTsid\}`\);/);
+    // The ticks the repair ran, partial repairs too (the flag is set outside endRepair's "fixed" branch).
+    assert.match(read('game.js'), /if \(result\.plan\.ticks >= 15\) emitGameEvent\(`tool_repaired_long:\$\{classTsid\}`\);/);
   });
 });
 

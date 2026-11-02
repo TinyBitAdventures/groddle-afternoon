@@ -230,22 +230,43 @@ export function giantForStreet(street = {}) {
   return GIANTS[GIANT_IDS[stableHash(key) % GIANT_IDS.length]];
 }
 
-/** @param {{ xp?: number }} [opts] the player's lifetime XP sets the daily iMG cap */
+/**
+ * A tool's donation value through `opts.toolBaseCost(classTsid)` (its worn base cost,
+ * tools.js toolWornBaseCost; null for a tool with no wear meter, which is worth its
+ * catalog value), or null when the caller gave no callback (then tools stay out).
+ * The original took tools at a shrine: include/shrines.js 397 values a stack at
+ * getBaseCost() * count, and tool_base.js getBaseCost prices the wear.
+ */
+function toolDonationValue(classTsid, opts = {}) {
+  if (!isToolItem(classTsid) || typeof opts.toolBaseCost !== 'function') return null;
+  const cost = opts.toolBaseCost(classTsid);
+  const value = cost != null && Number.isFinite(Number(cost))
+    ? Number(cost)
+    : whole(ITEM_CATALOG[classTsid]?.baseCost, 0) || SHRINE_ITEM_BASE_COSTS[classTsid] || 0;
+  // A machine is worth 0 (machine_base, base_cost 0): the source would take it for nothing, so it stays out.
+  return value > 0 ? value : null;
+}
+
+/**
+ * @param {{ xp?: number, toolBaseCost?: (classTsid: string) => number|null }} [opts] the player's
+ * lifetime XP sets the daily iMG cap; toolBaseCost lets a tool be given, one at a time
+ */
 export function quoteShrineDonation(state, giantId, inv, classTsid, count = 1, opts = {}) {
   const giant = GIANTS[giantId];
   if (!giant) return { ok: false, reason: 'unknown_giant' };
+  const toolValue = classTsid ? toolDonationValue(classTsid, opts) : null;
   if (
     !classTsid ||
-    isToolItem(classTsid) ||
+    (isToolItem(classTsid) && toolValue == null) ||
     classTsid.startsWith('emblem_') ||
     ITEM_CATALOG[classTsid]?.donatable === false
   ) {
     return { ok: false, reason: 'not_donatable' };
   }
   const have = whole(inv?.[classTsid]);
-  const qty = Math.max(1, Math.min(have || 1, whole(count, 1, 9999)));
+  const qty = toolValue != null ? 1 : Math.max(1, Math.min(have || 1, whole(count, 1, 9999)));
   if (have < qty) return { ok: false, reason: 'missing', have, qty };
-  const baseCost = donationValueFor(classTsid) * qty;
+  const baseCost = (toolValue ?? donationValueFor(classTsid)) * qty;
   // shrines.js:445-457: a hallowed powder multiplies XP, mood and favor
   // (opts.powderBonus 2 or 3); No-No Powder's rush keeps a fifth of the XP.
   // shrines.js 450 folds in the mood bonus here (opts.moodMultiplier, from
@@ -270,6 +291,8 @@ export function quoteShrineDonation(state, giantId, inv, classTsid, count = 1, o
     label: ITEM_CATALOG[classTsid]?.label || classTsid.replace(/_/g, ' '),
     have,
     qty,
+    maxQty: toolValue != null ? 1 : have,
+    tool: toolValue != null,
     baseCost,
     xp: Math.min(rawXp, dailyXpRoom),
     mood: rawMood,
@@ -292,18 +315,21 @@ export function listShrineDonationOptions(state, giantId, inv = {}, opts = {}) {
   return Object.keys(inv)
     .filter((classTsid) =>
       whole(inv[classTsid]) > 0 &&
-      !isToolItem(classTsid) &&
+      (!isToolItem(classTsid) || toolDonationValue(classTsid, opts) != null) &&
       !classTsid.startsWith('emblem_') &&
       ITEM_CATALOG[classTsid]?.donatable !== false
     )
     .map((classTsid) => quoteShrineDonation(state, giantId, inv, classTsid, 1, opts))
     .filter((row) => row.ok)
-    .sort((a, b) => b.baseCost - a.baseCost || a.label.localeCompare(b.label));
+    // Tools after goods, so the panel's first pick is never a tool the player is using.
+    .sort((a, b) => Number(a.tool) - Number(b.tool) || b.baseCost - a.baseCost || a.label.localeCompare(b.label));
 }
 
 export function donateToShrine(state, giantId, inv, pc, classTsid, count = 1, opts = {}) {
-  const quote = quoteShrineDonation(state, giantId, inv, classTsid, count, { xp: pc?.xp, powderBonus: opts.powderBonus, noNo: opts.noNo, moodMultiplier: opts.moodMultiplier });
+  const quote = quoteShrineDonation(state, giantId, inv, classTsid, count, { xp: pc?.xp, powderBonus: opts.powderBonus, noNo: opts.noNo, moodMultiplier: opts.moodMultiplier, toolBaseCost: opts.toolBaseCost });
   if (!quote.ok) return quote;
+  // The caller's last step before the stack shrinks (a tool's copy moves last: tools.js takeToolCopy).
+  if (typeof opts.beforeRemove === 'function') opts.beforeRemove();
   if (!removeItem(inv, classTsid, quote.qty)) return { ok: false, reason: 'missing' };
 
   // The lucky bonus is added before the daily cap (items/include/shrines.js:460-478).

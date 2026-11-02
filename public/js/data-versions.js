@@ -1610,6 +1610,8 @@
       "assets/sprites/animals/butterfly_milker@3x.webp": "46d6552e",
       "assets/sprites/animals/meat_collector@3x.webp": "fb8d24b6",
       "assets/sprites/animals/npc_chicken_sit@3x.webp": "47e26352",
+      "assets/sprites/animals/npc_chicken_stand.png": "9a9d6008",
+      "assets/sprites/animals/npc_chicken_stand@3x.webp": "ea3670d3",
       "assets/sprites/animals/piggy_feeder@3x.webp": "4f4ac839",
       "assets/sprites/animals/plop@3x.webp": "fb56d828",
       "assets/sprites/butler/butler_box@3x.webp": "b6b68e13",

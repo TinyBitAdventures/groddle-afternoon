@@ -18,7 +18,7 @@ import {
   wisdomPool,
 } from '../public/js/animal-flattery.js?v=63001f58';
 import { setMetabolicGainGate } from '../public/js/metabolics.js?v=8504134e';
-import { getVerbsFor, runVerb } from '../public/content.js?v=a71f590c';
+import { getVerbsFor, runVerb } from '../public/content.js?v=9ac37cff';
 import { getGameDayKey } from '../public/js/game-day.js?v=edb00566';
 
 const here = dirname(fileURLToPath(import.meta.url));

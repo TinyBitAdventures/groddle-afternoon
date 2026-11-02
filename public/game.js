@@ -2,9 +2,9 @@
  * Groddle Afternoon — original street geometry + layered decos
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
-import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=a71f590c';
+import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=9ac37cff';
 import { createFeatureHost } from './js/feature-host.js?v=e4f648b1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=f96cea34';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=0b583184';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -36,7 +36,7 @@ import {
 // Quest copy is Flash htmlText: <b>/<i>/<br> drawn as formatting, the rest dropped, never innerHTML.
 import { questRequirementText, renderQuestText, withQuestMarkup } from './js/quest-text.js?v=7f5d761c';
 // G267: the world-verb quest counters skip offer-system quests; old saves drop the boot Moloko quest.
-import { dropBootStarterQuests, routesCounter, worldVerbQuestEvents, makingUnitQuestEvents, shrineDonationQuestEvents } from './js/quest-offers.js?v=fe9fb524';
+import { dropBootStarterQuests, routesCounter, worldVerbQuestEvents, makingUnitQuestEvents, shrineDonationQuestEvents } from './js/quest-offers.js?v=3c7925ca';
 import {
   PHANTOM_QUEST_ID,
   REMEMBER_QUEST_ID,
@@ -220,7 +220,7 @@ import {
   rookEggStateForProgress,
   rookWoodsObjective,
   rookWoodsRemainingMs,
-} from './js/rook-woods.js?v=754a9774';
+} from './js/rook-woods.js?v=0a7bd931';
 import {
   ROOK_HALL_QUEST_ID,
   ROOK_HALL_START_QUEST_ID,
@@ -461,8 +461,8 @@ import {
 } from './js/inventory.js?v=b0e33301';
 import { PACK_COPY, isBagClass, unitRankAt } from './js/pack-slots.js?v=f3890c72';
 import { createPackRow, mountPackClearance, packBandRange, packCountText, packSearchEntries, packSlotTip } from './js/ui/pack-row.js?v=65c0f180';
-import { listAnimalFeedOptions } from './js/animals.js?v=247f357d';
-import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=247f357d';
+import { listAnimalFeedOptions } from './js/animals.js?v=d34f13bc';
+import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=d34f13bc';
 import {
   createDroppedItemState,
   parseDroppedItemState,
@@ -479,7 +479,7 @@ import {
   parsePlayerSave,
   serializePlayerSave,
   restorePlayerSave,
-} from './js/player-save.js?v=65c3cd4d';
+} from './js/player-save.js?v=b6a4346e';
 import {
   HOME_INTERIOR_TSID,
   HOME_STREET_TSID,
@@ -515,12 +515,16 @@ import {
   useToolCondition,
   quoteToolRepair,
   repairToolCondition,
+  toolRepairPlan,
+  toolWornBaseCost,
+  mostWornToolCopy,
+  takeToolCopy,
   setToolRemaining,
   WATERING_CAN_TOOLS,
   firstWorkingTool,
   bindToolInventory,
   TOOL_CONDITION_CATALOG as TOOL_WEAR,
-} from './js/tools.js?v=3d109172';
+} from './js/tools.js?v=6a9e1314';
 import {
   listRecipes,
   listRecipesForTool,
@@ -549,7 +553,7 @@ import {
   MAKING_TOOL_SKILLS,
   recipeTaskLimit,
   recipeToolInUse,
-} from './js/making.js?v=20d5364b';
+} from './js/making.js?v=68521d02';
 import { MAKE_TOOL_SHEETS } from './js/make-tool-sheets.js?v=6f758e09';
 import { LOW_FUEL_LINE, craftSessionElapsedMs, isLowFuel, isMachineArt, machineArtHtml, packMakeState, playMachineHandOver, setMachineArtFrame } from './js/machine-art.js?v=a4c8da0e';
 import {
@@ -576,7 +580,7 @@ import {
   cropIcon,
   hasWateringCan,
   hasHoe,
-} from './js/garden.js?v=854d4730';
+} from './js/garden.js?v=86ed507d';
 import { GARDEN_SCALE, PLOT_H as GARDEN_PLOT_H, PLOT_W as GARDEN_PLOT_W, gardenFrame, gardenLayout, gardenStyle, plotPieces } from './js/garden-view.js?v=05651e76';
 import {
   ROCK_CATALOG,
@@ -589,7 +593,7 @@ import {
   starterMiningTools,
   STARTER_MINING_SKILLS,
   findWorkingPick,
-} from './js/mining.js?v=4806e3e8';
+} from './js/mining.js?v=ff73fa4b';
 import {
   loadStreetData,
   STREET_INDEX,
@@ -780,20 +784,20 @@ import {
   createVendorSellQuote,
   vendorSellUnitPrice,
   vendorBuyUnitPrice,
-} from './js/vendor.js?v=c2fc9ac0';
+} from './js/vendor.js?v=998821e3';
 import {
   animalAnchorX,
   createAnimalState,
   resetAnimalDay,
   animalStatusLabel,
-} from './js/animals.js?v=247f357d';
+} from './js/animals.js?v=d34f13bc';
 import {
   ensureWoodTreeState,
   pickWoodTool,
   resetWoodTreeDay,
   woodToolLabel,
   woodTreeStatusLabel,
-} from './js/woodcutting.js?v=38730935';
+} from './js/woodcutting.js?v=13b9e3b4';
 import {
   GIANTS,
   createShrineState,
@@ -815,8 +819,8 @@ import {
   favorRelationNote,
   emblemRelationNote,
   formatSpeedUpTime,
-} from './js/shrines.js?v=99cbf9a3';
-import { shrinePowderOptions, shrinePowderAchievementCounters } from './js/powders.js?v=279a153b';
+} from './js/shrines.js?v=cf7c3993';
+import { shrinePowderOptions, shrinePowderAchievementCounters } from './js/powders.js?v=3c3e9997';
 import {
   GAMESHOW_TICKET_ID,
   applySpinningWheelReward,
@@ -3785,18 +3789,20 @@ function beginToolRepair(classTsid, copy = null) {
     toast('A Tinkertool needs another working Tinkertool for this repair.');
     return false;
   }
-  const tinkerCheck = canUseTool(toolState, 'tinkertool', quote.tinkertoolWear);
+  // tinkertool.js onTick: the repair goes as far as the energy does (tools.js toolRepairPlan).
+  const plan = toolRepairPlan(quote, pc.energy);
+  if (!plan.ok) {
+    toast("You don't have enough energy to repair this.");
+    return false;
+  }
+  const tinkerCheck = canUseTool(toolState, 'tinkertool', plan.ticks);
   if (!tinkerCheck.ok) {
     toast(tinkerCheck.msg);
     return false;
   }
-  if (pc.energy < quote.energy) {
-    toast(`You need ${quote.energy} energy to finish this repair.`);
-    return false;
-  }
 
   closePackPopover();
-  const finishesAt = Date.now() + quote.durationMs;
+  const finishesAt = Date.now() + plan.durationMs;
   const timer = window.setTimeout(() => {
     if (!activeToolRepair || activeToolRepair.classTsid !== classTsid) return;
     activeToolRepair = null;
@@ -3815,16 +3821,20 @@ function beginToolRepair(classTsid, copy = null) {
     toast(result.msg, 3600);
     pushActivity(result.msg);
     playSound('CRAFT_DONE', { volume: 0.5 });
-    emitGameEvent(`tool_repaired:${classTsid}`);
+    // tinkertool.js endRepair 346-364: a finished repair counts for the badges and quests.
+    if (result.full) emitGameEvent(`tool_repaired:${classTsid}`);
     // tinkertool.js 370-371: a repair of 15 or more one-second ticks sets tinkertool_15s_repair.
-    if (quote.durationSeconds >= 15) emitGameEvent(`tool_repaired_long:${classTsid}`);
+    if (result.plan.ticks >= 15) emitGameEvent(`tool_repaired_long:${classTsid}`);
     updateHud();
-  }, quote.durationMs);
+  }, plan.durationMs);
   activeToolRepair = { classTsid, timer, finishesAt };
-  showToolRepairFx(quote.condition.label, quote.durationMs);
+  showToolRepairFx(quote.condition.label, plan.durationMs);
+  const reach = plan.full
+    ? ''
+    : ` · your energy takes it to ${Math.floor(((quote.condition.remaining + plan.points) / quote.condition.capacity) * 100)}%`;
   toast(
-    `Repairing ${quote.condition.label} · ${quote.energy} energy · ${quote.durationSeconds}s of tinkering`,
-    quote.durationMs + 500
+    `Repairing ${quote.condition.label} · ${plan.energy} energy · ${plan.ticks}s of tinkering${reach}`,
+    plan.durationMs + 500
   );
   playSound('TINKERTOOL', { volume: 0.6 });
   return true;
@@ -3961,16 +3971,39 @@ function renderPackPopover(classTsid, anchor = null) {
     ? quoteToolRepair(toolState, classTsid, skillState.learned || [], { copy: toolCondition.copy })
     : null;
   const hasRepairTool = countItem(inv, 'tinkertool') >= (classTsid === 'tinkertool' ? 2 : 1);
-  const repairTinkertoolReady = repairQuote?.ok
-    ? canUseTool(toolState, 'tinkertool', repairQuote.tinkertoolWear).ok
+  // How far the player's energy takes the repair (tinkertool.js onTick: it stops when energy runs low).
+  const repairPlan = repairQuote?.ok ? toolRepairPlan(repairQuote, pc.energy) : null;
+  const repairTinkertoolReady = repairPlan?.ok
+    ? canUseTool(toolState, 'tinkertool', repairPlan.ticks).ok
     : false;
   const canRepair = Boolean(
     repairQuote?.ok &&
     hasRepairTool &&
     repairTinkertoolReady &&
-    pc.energy >= repairQuote.energy &&
+    repairPlan?.ok &&
     !activeToolRepair
   );
+  // The source's own words for why not (tinkertool.js repair conditions 63-90).
+  const repairReason = !repairQuote?.ok
+    ? repairQuote?.reason === 'skill'
+      ? 'You need to know Tinkering I to repair this.'
+      : repairQuote?.reason === 'self_skill'
+        ? 'You need to know Tinkering III to repair this.'
+        : 'This does not need repairing.'
+    : !hasRepairTool
+      ? 'You need a Tinkertool to repair this.'
+      : !repairPlan?.ok
+        ? "You don't have enough energy to repair this."
+        : !repairTinkertoolReady
+          ? 'Your Tinkertool is too worn for this repair.'
+          : activeToolRepair
+            ? 'Finish the current repair first.'
+            : '';
+  const repairTip = repairQuote?.ok
+    ? repairPlan?.ok && !repairPlan.full
+      ? `Your energy repairs it to ${Math.floor(((repairQuote.condition.remaining + repairPlan.points) / repairQuote.condition.capacity) * 100)}% (the full repair takes ${repairQuote.energy} energy and ${repairQuote.durationSeconds} seconds)`
+      : `The full repair takes ${repairQuote.energy} energy and ${repairQuote.durationSeconds} seconds`
+    : 'Repair with your Tinkertool';
   // The kind line under the name: the tool's wear, the food's fullness today, the bear's state.
   const conditionNote = toolCondition?.tracked
     ? `<span class="pack-tool-condition${toolCondition.broken ? ' broken' : ''}">${toolCondition.broken ? 'Broken' : 'Condition'} ${toolCondition.remaining}/${toolCondition.capacity}</span>`
@@ -3994,8 +4027,9 @@ function renderPackPopover(classTsid, anchor = null) {
       ? `Used in ${relatedRecipes.length} ${relatedRecipes.length === 1 ? 'recipe' : 'recipes'}`
       : '';
   const collectionNote = musicblockDef ? musicblockCollectionNote(inv, classTsid) : '';
-  const sellPrice = vendorSellUnitPrice(classTsid, { ...vendorSellOpts(), upgrades: pc.imaginationUpgrades });
-  const canSellHere = isVendorOpen() && !slot.isTool && slot.sellable !== false && sellPrice > 0;
+  const packToolWorth = slot.isTool ? leavingToolBaseCost(classTsid, packSelectedCopy) : null;
+  const sellPrice = vendorSellUnitPrice(classTsid, { ...vendorSellOpts(), upgrades: pc.imaginationUpgrades, baseCost: packToolWorth ?? undefined });
+  const canSellHere = isVendorOpen() && slot.sellable !== false && sellPrice > 0;
   const makeLabel = slot.isTool
     ? classTsid === 'fruit_changing_machine'
       ? 'Convert fruit'
@@ -4088,10 +4122,10 @@ function renderPackPopover(classTsid, anchor = null) {
       attrs: 'data-pack-repair',
       cls: 'pack-pop-repair',
       label: repairQuote?.ok ? 'Repair' : 'Repair (unavailable)',
-      cost: repairQuote?.ok ? repairQuote.energy : 0,
+      cost: repairPlan?.ok ? repairPlan.energy : repairQuote?.ok ? repairQuote.energy : 0,
       disabled: !canRepair,
-      tip: 'Repair with your Tinkertool',
-      reason: 'Needs Tinkering, energy, and a working Tinkertool',
+      tip: repairTip,
+      reason: repairReason || 'Needs Tinkering, energy, and a working Tinkertool',
     });
   }
   if (emblemSpend) {
@@ -4241,8 +4275,9 @@ function renderPackPopover(classTsid, anchor = null) {
     }
   });
   pop.querySelector('[data-pack-sell]')?.addEventListener('click', () => {
+    const copy = slot.isTool ? packSelectedCopy : null;
     closePackPopover();
-    stageVendorSell(classTsid);
+    stageVendorSell(classTsid, copy);
   });
   pop.querySelector('[data-pack-drop]')?.addEventListener('click', () => {
     // A bag is one bag: drop the one this menu is about, with what it holds (no count chooser).
@@ -25230,7 +25265,7 @@ function renderShrinePanel() {
   }
   renderShrineLearnFaster(giantId, giant);
 
-  const options = listShrineDonationOptions(shrineState, giantId, inv, { xp: pc.xp });
+  const options = listShrineDonationOptions(shrineState, giantId, inv, { xp: pc.xp, ...shrineToolOpts() });
   if (!options.some((row) => row.classTsid === shrineSelected)) {
     shrineSelected = options[0]?.classTsid || null;
     shrineQty = 1;
@@ -25239,7 +25274,7 @@ function renderShrinePanel() {
   if (list) {
     list.innerHTML = '';
     if (!options.length) {
-      list.innerHTML = '<div class="make-empty">Your pack has no donatable goods. Tools and emblems are kept safe.</div>';
+      list.innerHTML = '<div class="make-empty">Your pack has no donatable goods. Emblems are kept safe.</div>';
     }
     for (const row of options) {
       const tile = document.createElement('button');
@@ -25270,7 +25305,7 @@ function renderShrinePanel() {
   }
   const have = Math.max(1, inv[shrineSelected] || 1);
   shrineQty = clamp(Math.floor(shrineQty || 1), 1, have);
-  const quote = quoteShrineDonation(shrineState, giantId, inv, shrineSelected, shrineQty, { xp: pc.xp, ...shrinePowderOpts() });
+  const quote = quoteShrineDonation(shrineState, giantId, inv, shrineSelected, shrineQty, { xp: pc.xp, ...shrinePowderOpts(), ...shrineToolOpts() });
   if (!quote.ok) {
     shrineSelected = null;
     renderShrinePanel();
@@ -25294,19 +25329,19 @@ function renderShrinePanel() {
       ${capNotes.map((note) => `<p class="shrine-cap-note">${escapeHtml(note)}</p>`).join('')}
       <div class="qty-row">
         <button type="button" data-shrine-dec aria-label="Donate one fewer">−</button>
-        <input type="number" data-shrine-qty min="1" max="${quote.have}" value="${quote.qty}" aria-label="Donation quantity" />
+        <input type="number" data-shrine-qty min="1" max="${quote.maxQty}" value="${quote.qty}" aria-label="Donation quantity" />
         <button type="button" data-shrine-inc aria-label="Donate one more">+</button>
         <button type="button" class="btn-max" data-shrine-max>Max</button>
         <button type="button" class="btn-glitch-primary" data-shrine-donate>Donate ${quote.qty}</button>
       </div>
     </div>`;
   const setQty = (value) => {
-    shrineQty = clamp(Math.floor(Number(value) || 1), 1, quote.have);
+    shrineQty = clamp(Math.floor(Number(value) || 1), 1, quote.maxQty);
     renderShrinePanel();
   };
   detail.querySelector('[data-shrine-dec]')?.addEventListener('click', () => setQty(shrineQty - 1));
   detail.querySelector('[data-shrine-inc]')?.addEventListener('click', () => setQty(shrineQty + 1));
-  detail.querySelector('[data-shrine-max]')?.addEventListener('click', () => setQty(quote.have));
+  detail.querySelector('[data-shrine-max]')?.addEventListener('click', () => setQty(quote.maxQty));
   detail.querySelector('[data-shrine-qty]')?.addEventListener('change', (event) => setQty(event.target.value));
   detail.querySelector('[data-shrine-donate]')?.addEventListener('click', performShrineDonation);
   const tip = document.getElementById('shrine-tip');
@@ -25318,7 +25353,14 @@ function performShrineDonation() {
   const giantId = target?.state?.giantId;
   const giant = GIANTS[giantId];
   if (!target || !giant || !shrineSelected) return;
-  const result = donateToShrine(shrineState, giantId, inv, pc, shrineSelected, shrineQty, shrinePowderOpts());
+  // A tool goes one at a time, its most worn copy (priced first, then moved last so it is the one removed).
+  const toolCopy = TOOL_WEAR[shrineSelected] ? leavingToolCopy(shrineSelected) : null;
+  const toolWorth = toolCopy != null ? leavingToolBaseCost(shrineSelected) : null;
+  const result = donateToShrine(shrineState, giantId, inv, pc, shrineSelected, shrineQty, {
+    ...shrinePowderOpts(),
+    toolBaseCost: toolCopy != null ? () => toolWorth : shrineToolOpts().toolBaseCost,
+    beforeRemove: toolCopy != null ? () => takeToolCopy(toolState, shrineSelected, { copy: toolCopy }) : null,
+  });
   if (!result.ok) {
     toast('That donation could not be completed.');
     renderShrinePanel();
@@ -25366,6 +25408,11 @@ function performShrineDonation() {
 }
 
 /** Hallowed shrine powders and No-No Powder on the next donation (js/powders.js). */
+/** Shrines took tools in the original, valued by their wear (include/shrines.js 397; tool_base.js getBaseCost). */
+function shrineToolOpts() {
+  return { toolBaseCost: (classTsid) => leavingToolBaseCost(classTsid) };
+}
+
 function shrinePowderOpts(now = Date.now()) {
   // include/shrines.js 450: the donation's iMG folds in the mood bonus.
   return { ...shrinePowderOptions((id) => hasBuff(buffState, id, now)), moodMultiplier: moodXpMultiplierFor(pc) };
@@ -25624,14 +25671,44 @@ function grantShrineEmblem(target) {
 }
 
 /** The open store's buy-back multiplier, for sell prices. */
-function vendorSellOpts() {
-  return { buyMultiplier: activeVendor?.buyMultiplier };
+/**
+ * The copy of a tool a sale or a donation takes: the one the pack menu was opened on
+ * (`chosen`), else the most worn. Null for a tool with no wear meter.
+ */
+function leavingToolCopy(classTsid, chosen = null) {
+  if (!TOOL_WEAR[classTsid]) return null;
+  const n = Number(chosen);
+  if (chosen != null && Number.isInteger(n) && n >= 0 && n < countItem(inv, classTsid)) return n;
+  return mostWornToolCopy(toolState, classTsid);
 }
 
-/** Stage a pack item in the Sell detail without mutating inventory. */
-function stageVendorSell(classTsid) {
+/** That copy's worth (tool_base.js getBaseCost: 20% of base cost + 80% by the wear left). */
+function leavingToolBaseCost(classTsid, chosen = null) {
+  const copy = leavingToolCopy(classTsid, chosen);
+  return copy == null ? null : toolWornBaseCost(toolState, classTsid, { copy });
+}
+
+/** Which tool copy the vendor's Sell detail is about (set from the pack menu's Sell). */
+let vendorToolCopy = null;
+
+function vendorSellChosenCopy(classTsid) {
+  return vendorToolCopy?.classTsid === classTsid ? vendorToolCopy.copy : null;
+}
+
+function vendorSellOpts() {
+  return {
+    buyMultiplier: activeVendor?.buyMultiplier,
+    // Any vendor bought tools, at their worn price (inc_stores.js storeSell; tool_base.js getBaseCost).
+    toolBaseCost: (classTsid) => leavingToolBaseCost(classTsid, vendorSellChosenCopy(classTsid)),
+  };
+}
+
+/** Stage a pack item in the Sell detail without mutating inventory (`copy`: the tool copy, from the pack menu). */
+function stageVendorSell(classTsid, copy = null) {
+  vendorToolCopy = copy != null && TOOL_WEAR[classTsid] ? { classTsid, copy } : null;
   const quote = createVendorSellQuote(inv, activeVendor.offers, classTsid, 1, pc.imaginationUpgrades, vendorSellOpts());
   if (!quote.ok) {
+    vendorToolCopy = null;
     toast(quote.msgs?.[0] || 'That item cannot be sold here.');
     return quote;
   }
@@ -25704,7 +25781,7 @@ function renderVendorList() {
       ? unit > 0
         ? Math.max(1, Math.floor((pc.currants || 0) / unit))
         : 99
-      : Math.max(1, have);
+      : Math.max(1, quote.maxQty ?? have);
     vendorQty = Math.max(1, Math.min(vendorQty, maxQ));
     const total = unit * vendorQty;
     detail.style.display = 'block';
@@ -25792,7 +25869,7 @@ function renderVendorList() {
         ? { ok: false, reason: 'pack_full', msgs: [PACK_COPY.buyNone] }
         : isBuy
           ? vendorBuy(pc, inv, activeVendor.offers, vendorSelected, fit != null && fit < vendorQty ? fit : vendorQty)
-          : vendorSell(pc, inv, activeVendor.offers, vendorSelected, vendorQty, vendorSellOpts());
+          : sellToVendor(vendorSelected, vendorQty);
       if (isBuy && r.ok && fit != null && fit < vendorQty) r.msgs[0] += PACK_COPY.buyPartial(vendorQty - fit);
       toast(r.msgs[0]);
       pushActivity(r.msgs[0]);
@@ -25902,12 +25979,28 @@ function drawVendorTiles(list) {
         <span class="tile-label">${row.label} ×${row.have}</span>`;
       tile.addEventListener('click', () => {
         vendorSelected = row.classTsid;
+        vendorToolCopy = null;
         vendorQty = 1;
         renderVendorList();
       });
       list.appendChild(tile);
     }
   }
+}
+
+/** Sell from the vendor's detail: a tool takes its chosen (or most worn) copy, then leaves the pack. */
+function sellToVendor(classTsid, qty) {
+  const opts = vendorSellOpts();
+  if (TOOL_WEAR[classTsid] && countItem(inv, classTsid) > 0) {
+    // Price it first, while the copy is where the quote saw it; then move that copy last so it is the one removed.
+    const worn = leavingToolBaseCost(classTsid, vendorSellChosenCopy(classTsid));
+    const copy = leavingToolCopy(classTsid, vendorSellChosenCopy(classTsid));
+    opts.toolBaseCost = () => worn;
+    const r = vendorSell(pc, inv, activeVendor.offers, classTsid, qty, { ...opts, beforeRemove: () => takeToolCopy(toolState, classTsid, { copy }) });
+    if (r.ok) vendorToolCopy = null;
+    return r;
+  }
+  return vendorSell(pc, inv, activeVendor.offers, classTsid, qty, opts);
 }
 
 async function ensureShrineTextures(giantId) {
@@ -28951,7 +29044,7 @@ async function main() {
   }
   // Garden talkback QA (js/garden-talk-qa.js): ?gardentalkdemo=herb|crop.
   if (new URLSearchParams(location.search).has('gardentalkdemo')) {
-    import('./js/garden-talk-qa.js?v=b66dc06a').then((m) => m.runGardenTalkDemo({ engine, executeVerb, params: new URLSearchParams(location.search) }));
+    import('./js/garden-talk-qa.js?v=712201be').then((m) => m.runGardenTalkDemo({ engine, executeVerb, params: new URLSearchParams(location.search) }));
   }
   // Loading card QA (js/loading-card-qa.js): ?loadcarddemo=<tsid>[,<tsid>].
   if (new URLSearchParams(location.search).has('loadcarddemo')) {

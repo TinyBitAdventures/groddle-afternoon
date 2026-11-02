@@ -6,7 +6,7 @@ import { readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { packStamp } from '../public/js/inventory.js?v=b0e33301';
-import { bindToolInventory, createToolConditionState, getToolCondition, repairToolCondition, setToolRemaining, useToolCondition } from '../public/js/tools.js?v=3d109172';
+import { bindToolInventory, createToolConditionState, getToolCondition, repairToolCondition, setToolRemaining, useToolCondition } from '../public/js/tools.js?v=6a9e1314';
 import { createPackRow } from '../public/js/ui/pack-row.js?v=65c0f180';
 import { FakeEl, page } from './social-fake-dom.js';
 
