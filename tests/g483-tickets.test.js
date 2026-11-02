@@ -614,7 +614,7 @@ describe('the site (groddle-afternoon-site)', { skip: skipWithoutSite }, () => {
   it('the console has a Reports tab: list, thread, reply, close and reopen, and the old reports\' button', async () => {
     const page = src('src/AdminConsolePage.php');
     for (const hook of ['data-console-tab="reports"', 'data-console-tickets', 'data-console-thread', 'data-console-reply', 'data-console-thread-close', 'data-console-thread-reopen', 'data-console-migrate', 'data-console-ticket-filter']) assert.ok(page.includes(hook), hook);
-    assert.match(page, /ASSET_KEY = 'working-edit-1'/);
+    assert.match(page, /ASSET_KEY = 'revisions-1'/);
     const js = src('console/console.js');
     for (const route of ["admin/tickets?status=", "admin/tickets/${id}", "admin/tickets/${tickets.open}/reply", "admin/tickets/${tickets.open}/${kind}", "admin/tickets/migrate"]) assert.ok(js.includes(route), route);
     assert.match(js, /el\('p', \{ class: 'console-msg-body', text: m\.body \}\)/, 'messages set as text');
@@ -958,6 +958,29 @@ describe('Working on it and Edit until read (ticket 49)', () => {
       assert.equal(e.subject, 'New first line');
       assert.equal(e.out[0].edited, '2026-11-02T10:05:00Z');
       assert.equal(e.out[1].edited, null);
+      // Revisions: only the administrator's thread has them; the player's has no such key.
+      assert.ok(!('revisions' in e.out[0]));
+      assert.deepEqual(e.adminOut[0].revisions, [
+        { body: 'Pigs float', at: '2026-11-02T10:00:00Z', replaced: '2026-11-02T10:05:00Z' },
+        { body: 'Pigs float up', at: '2026-11-02T10:05:00Z', replaced: '2026-11-02T10:07:00Z' },
+      ]);
+      assert.equal(e.adminOut[0].body, 'Pigs float high');
+      assert.deepEqual(e.adminOutNone[0].revisions, []);
+    });
+
+    it('revisions: every edit keeps the text it replaces; administrators see the whole history (Austin 2026-11-02)', async () => {
+      const store = src('src/TicketStore.php');
+      const write = store.slice(store.indexOf('public function editFirst('), store.indexOf('public function markRead('));
+      assert.ok(/INSERT INTO ' \. \$this->db->table\(self::REVISIONS\) \. ' \(message_id, ticket_id, player_user_id, body, written_at, replaced_at\)/.test(write), 'the old text is stored');
+      assert.ok(write.indexOf('self::REVISIONS') < write.indexOf('SET body = ?, edited_at = ?'), 'before it is replaced, in the same locked write');
+      assert.match(src('src/AdminTickets.php'), /TicketStore::messagesOut\(\$store->messages\(\$id\), \$store->revisions\(\$id\)\)/);
+      assert.match(src('src/Tickets.php'), /'messages' => TicketStore::messagesOut\(\$store->messages\(\$id\)\),/, 'the player gets no history');
+      const table = JSON.parse(src('minn.json')).tables.groddle_ticket_message_revisions;
+      assert.ok(table && table.includes('player_user_id bigint(20) unsigned NOT NULL'), 'a *user_id column: the throwaway cleanup finds its rows');
+      const mod = await import(pathToFileURL(sitePath('console/console.js')).href);
+      assert.equal(mod.messageHistory({ revisions: [] }, () => ''), null);
+      assert.equal(mod.messageHistory({}, () => ''), null);
+      assert.match(src('console/console.js'), /messageHistory\(m, when\)\)\)\);/);
     });
   });
 });

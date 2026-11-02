@@ -123,6 +123,12 @@ echo json_encode([
         'cleaned' => BugReports::message("  New\x07 words\r\nhere  ", BugReports::MAX_MESSAGE, 'groddle_ticket_long'),
         'subject' => TicketStore::subject("New first line\nmore"),
         'out' => TicketStore::messagesOut([['edited_at' => '2026-11-02 10:05:00'] + $first, ['edited_at' => null] + $first]),
+        // Revisions (Austin 2026-11-02): an administrator's thread carries every earlier text, oldest first.
+        'adminOut' => TicketStore::messagesOut([['edited_at' => '2026-11-02 10:07:00', 'body' => 'Pigs float high'] + $first], [11 => [
+            ['message_id' => 11, 'body' => 'Pigs float', 'written_at' => '2026-11-02 10:00:00', 'replaced_at' => '2026-11-02 10:05:00'],
+            ['message_id' => 11, 'body' => 'Pigs float up', 'written_at' => '2026-11-02 10:05:00', 'replaced_at' => '2026-11-02 10:07:00'],
+        ]]),
+        'adminOutNone' => TicketStore::messagesOut([$first], []),
     ],
     'picture' => [
         'kept' => ['width' => $kept['width'], 'height' => $kept['height'], 'soi' => str_starts_with($kept['bytes'], "\xFF\xD8\xFF"), 'fits' => strlen($kept['bytes']) <= ReportPicture::MAX_BYTES, 'tagDropped' => !str_contains($kept['bytes'], 'SECRETGPS')],
