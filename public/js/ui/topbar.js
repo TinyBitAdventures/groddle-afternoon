@@ -17,6 +17,7 @@
  * The pure helpers below are tested without a DOM (tests/topbar.test.js).
  */
 import { vitalLevel, vitalTitle } from '../vitals.js?v=ca7471dd';
+import { loadAudioRestore, saveAudioRestore } from '../audio-pref.js?v=6fe817bc';
 import { ZOOM_KEYS_HINT, clampZoom, zoomLabel, zoomValueText } from '../world-zoom.js?v=b262a6c7';
 import { NIGHT_TINT_HINT, NIGHT_TINT_LABEL } from '../night-tint.js?v=1dfc9c89';
 import { STREET_MAP_HINT, STREET_MAP_LABEL } from './street-minimap.js?v=abefc4d6';
@@ -149,6 +150,18 @@ export function mailText(unread, parcels = 0) {
 export function volumeLevel(v, fallback = 100) {
   const n = Number(v);
   return Number.isFinite(n) ? Math.max(0, Math.min(100, Math.round(n))) : fallback;
+}
+
+/**
+ * PURE: clicking a channel's name (Effects, Music). A channel that plays goes to 0 and remembers
+ * its level; a silent one goes back to the level it remembered (100 if none).
+ * Returns { level, restore } (restore: what to remember next).
+ */
+export function soundChannelToggle(level, restore) {
+  const now = volumeLevel(level, 0);
+  if (now > 0) return { level: 0, restore: now };
+  const back = volumeLevel(restore, 100);
+  return { level: back > 0 ? back : 100, restore: back > 0 ? back : 100 };
 }
 
 // --------------------------------------------------------------------- DOM
@@ -504,13 +517,38 @@ function installSound(doc, audio) {
       input.setAttribute('aria-valuetext', `${level}%`);
     }
   };
+  // The level each channel goes back to when its name is clicked again (js/audio-pref.js, kept across reloads).
+  const restore = loadAudioRestore();
+  const keep = () => saveAudioRestore(restore);
+  const names = () => {
+    const v = audio?.levels?.() || {};
+    for (const [kind] of rows) {
+      const name = pop.querySelector(`[data-sound-toggle="${kind}"]`);
+      if (!name) continue;
+      const off = volumeLevel(v[kind]) === 0;
+      const word = name.textContent.toLowerCase();
+      name.setAttribute('aria-pressed', String(off));
+      name.title = off ? `Turn ${word} back on` : `Turn ${word} off`;
+    }
+  };
   for (const [kind, input] of rows) {
     input?.addEventListener('input', () => {
       audio?.setLevel?.(kind, volumeLevel(input.value));
       draw();
+      names();
+    });
+    pop.querySelector(`[data-sound-toggle="${kind}"]`)?.addEventListener('click', (e) => {
+      e.preventDefault();
+      const next = soundChannelToggle(audio?.levels?.()?.[kind], restore[kind]);
+      restore[kind] = next.restore;
+      keep();
+      audio?.setLevel?.(kind, next.level);
+      draw();
+      names();
     });
   }
-  popover(doc, btn, pop, { onOpen: draw });
+  popover(doc, btn, pop, { onOpen: () => { draw(); names(); } });
+  names();
   draw();
 }
 

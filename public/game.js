@@ -903,9 +903,9 @@ import {
 import { loseMood, moodMax, setMetabolicGainGate, setMetabolicLossGate } from './js/metabolics.js?v=8504134e';
 import { installHiresIcons } from './js/icon-hires.js?v=5357d4b4';
 import { installHiresDecos } from './js/deco-hires.js?v=cb905e17';
-import { loadAudioLevels, loadMutedPreference, saveAudioLevel, saveMutedPreference } from './js/audio-pref.js?v=e56202ee';
+import { loadAudioLevels, loadMutedPreference, saveAudioLevel, saveMutedPreference } from './js/audio-pref.js?v=6fe817bc';
 import { createAudioBuses, fadeGain } from './js/audio-buses.js?v=af167b54';
-import { installTopBar, renderTopBar } from './js/ui/topbar.js?v=32d074a4';
+import { installTopBar, renderTopBar } from './js/ui/topbar.js?v=9cfbbd95';
 import { installFocusReturn } from './js/ui/focus-return.js?v=8885653a';
 import { QUOIN_FRAME_BOB, advanceQuoinClock, quoinBobBetweenFrames } from './js/quoin-motion.js?v=ea0bd408';
 import { installHiresFirstDraw, installHiresSprites } from './js/sprite-hires.js?v=8b7fdbb5';

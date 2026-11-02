@@ -16,7 +16,8 @@ import {
   ringDash,
   vitalRing,
   volumeLevel,
-} from '../public/js/ui/topbar.js?v=32d074a4';
+  soundChannelToggle,
+} from '../public/js/ui/topbar.js?v=9cfbbd95';
 
 const pub = join(import.meta.dirname, '..', 'public');
 const read = (f) => readFileSync(join(pub, f), 'utf8');
@@ -60,6 +61,24 @@ describe('top bar helpers', () => {
     assert.equal(volumeLevel('35'), 35);
     assert.equal(volumeLevel(140), 100);
     assert.equal(volumeLevel('x'), 100);
+  });
+
+  it('Effects and Music names turn their channel off, then back to the level it had (Austin 2026-11-02)', () => {
+    // On: off, remembering the level.
+    assert.deepEqual(soundChannelToggle(65, undefined), { level: 0, restore: 65 });
+    // Off: back to what it had.
+    assert.deepEqual(soundChannelToggle(0, 65), { level: 65, restore: 65 });
+    // Off with nothing remembered (or a remembered 0): full.
+    assert.deepEqual(soundChannelToggle(0, undefined), { level: 100, restore: 100 });
+    assert.deepEqual(soundChannelToggle(0, 0), { level: 100, restore: 100 });
+    // A slider moved after the toggle wins: the next click remembers the new level.
+    assert.deepEqual(soundChannelToggle(30, 65), { level: 0, restore: 30 });
+    const html = readFileSync(join(pub, 'play/index.html'), 'utf8');
+    for (const [kind, word, input] of [['effects', 'Effects', 'sfx-volume'], ['music', 'Music', 'music-volume']]) {
+      assert.match(html, new RegExp(`<label class="hud-slider"><button type="button" class="hud-slider-name" data-sound-toggle="${kind}" aria-pressed="false" title="Turn ${kind} off">${word}</button><input id="${input}"`));
+    }
+    const topbar = readFileSync(join(pub, 'js/ui/topbar.js'), 'utf8');
+    assert.match(topbar, /\[data-sound-toggle="\$\{kind\}"\]`\)\?\.addEventListener\('click'/);
   });
 
   it('the Menu holds what it held, regrouped into Me, World, Social and Settings', () => {

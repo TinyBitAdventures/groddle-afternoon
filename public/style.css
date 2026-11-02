@@ -10032,6 +10032,13 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
 }
 [data-ui="modern"] .hud-slider input { width: 100%; height: 24px; margin: 0; accent-color: var(--accent); }
 [data-ui="modern"] .hud-slider output { color: var(--text-muted); text-align: right; font-variant-numeric: tabular-nums; }
+/* Effects / Music: click the name to turn that channel off, again to bring its level back. */
+[data-ui="modern"] .hud-slider-name {
+  padding: 0; border: 0; background: none; color: inherit; font: inherit; text-align: left; cursor: pointer;
+  text-decoration: underline dotted transparent; text-underline-offset: 3px;
+}
+[data-ui="modern"] .hud-slider-name:hover, [data-ui="modern"] .hud-slider-name:focus-visible { text-decoration-color: currentColor; }
+[data-ui="modern"] .hud-slider-name[aria-pressed="true"] { color: var(--text-muted); text-decoration: line-through; }
 [data-ui="modern"] .top-bar .hud-mute {
   display: flex; align-items: center; justify-content: flex-start; gap: var(--space-2);
   width: 100%; min-height: 32px; margin-top: var(--space-1); padding: 0 var(--space-2);

@@ -66,7 +66,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="robots" content="noindex" />
   <title>Groddle Afternoon · Multiplayer</title>
-    <link rel="stylesheet" href="style.css?v=6d5b0765" />
+    <link rel="stylesheet" href="style.css?v=21be6faf" />
   <!-- The UI font, self-hosted (style.css @font-face; OFL in assets/fonts/nunito/): the roman latin file, before first paint. -->
   <link rel="preload" href="assets/fonts/nunito/nunito-roman-latin.woff2" as="font" type="font/woff2" crossorigin />
   <!-- The Classic interface (js/classic/ui-mode.js sets <html data-ui="classic">); every rule is scoped to it. -->
@@ -261,8 +261,8 @@
       </div>
       <div id="sound-pop" class="hud-pop sound-pop" role="dialog" aria-label="Sound" hidden>
         <h3 class="hud-pop-title">Sound</h3>
-        <label class="hud-slider"><span>Effects</span><input id="sfx-volume" type="range" min="0" max="100" step="5" value="100" /><output for="sfx-volume">100</output></label>
-        <label class="hud-slider"><span>Music</span><input id="music-volume" type="range" min="0" max="100" step="5" value="100" /><output for="music-volume">100</output></label>
+        <label class="hud-slider"><button type="button" class="hud-slider-name" data-sound-toggle="effects" aria-pressed="false" title="Turn effects off">Effects</button><input id="sfx-volume" type="range" min="0" max="100" step="5" value="100" /><output for="sfx-volume">100</output></label>
+        <label class="hud-slider"><button type="button" class="hud-slider-name" data-sound-toggle="music" aria-pressed="false" title="Turn music off">Music</button><input id="music-volume" type="range" min="0" max="100" step="5" value="100" /><output for="music-volume">100</output></label>
         <button id="mute-btn" type="button" class="chrome-btn mute-btn hud-mute" title="Mute audio" aria-label="Mute audio" aria-pressed="false"><svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true"><path d="M3 7.5h3l4-3.5v12l-4-3.5H3z" fill="currentColor"/><path class="mute-x" d="M13 7.5l4 5M17 7.5l-4 5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" fill="none"/><path class="mute-waves" d="M13 7.2a4 4 0 0 1 0 5.6M15.2 5a7 7 0 0 1 0 10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" fill="none"/></svg><span>Mute audio</span></button>
       </div>
     </header>
@@ -1095,6 +1095,6 @@
   <!-- Password managers skip the game's own boxes (chat, searches, names); the account forms keep autofill. -->
   <script type="module" src="js/no-autofill.js?v=6a1a4382"></script>
   <!-- game.js loads once the multiplayer save is in memory (js/online-boot.js). -->
-  <script type="module" id="online-boot" src="js/online-boot.js?v=c55ccff7" data-game="game.js?v=c390dab7"></script>
+  <script type="module" id="online-boot" src="js/online-boot.js?v=c55ccff7" data-game="game.js?v=e2b826ee"></script>
 </body>
 </html>

@@ -34,7 +34,7 @@ import {
 import { HANDOFF_KEY, claimCharacter, leaveHandoff, listenForClaims, takeHandoff } from '../public/js/save-claim.js?v=30cf5250';
 import { SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
 import { spawnSync } from 'node:child_process';
-import { AUDIO_MUTED_KEY } from '../public/js/audio-pref.js?v=e56202ee';
+import { AUDIO_MUTED_KEY } from '../public/js/audio-pref.js?v=6fe817bc';
 import { STORAGE_KEY as APPEARANCE_KEY, APPEARANCE_PRESETS, appearanceToJson, loadAppearance, saveAppearance } from '../public/js/character-builder.js?v=1cb9713f';
 import { getGameDayKey, getLastNewDayKey, getLastNewDayTs, resetGameDayClock, setLastNewDayTs } from '../public/js/game-day.js?v=edb00566';
 import { createPlayerSave, parsePlayerSave, serializePlayerSave } from '../public/js/player-save.js?v=65c3cd4d';

@@ -54,3 +54,28 @@ export function saveAudioLevel(kind, value, storage = globalThis.localStorage) {
     /* the level just won't be remembered */
   }
 }
+
+/**
+ * The level each channel goes back to when its name (Effects, Music) is clicked again after
+ * turning it off (js/ui/topbar.js soundChannelToggle), kept in this browser.
+ */
+export const AUDIO_RESTORE_KEY = 'groddle.audio.restore';
+
+export function loadAudioRestore(storage = globalThis.localStorage) {
+  try {
+    const row = JSON.parse(storage?.getItem(AUDIO_RESTORE_KEY) || '{}') || {};
+    const out = {};
+    for (const kind of Object.keys(AUDIO_LEVEL_KEYS)) if (row[kind] != null) out[kind] = level(row[kind]);
+    return out;
+  } catch {
+    return {};
+  }
+}
+
+export function saveAudioRestore(restore, storage = globalThis.localStorage) {
+  try {
+    storage?.setItem(AUDIO_RESTORE_KEY, JSON.stringify(restore || {}));
+  } catch {
+    /* the levels just won't be remembered */
+  }
+}
