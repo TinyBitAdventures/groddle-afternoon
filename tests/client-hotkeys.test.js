@@ -31,15 +31,17 @@ describe('G221 client hotkeys', () => {
     assert.match(img, /title: 'Imagination upgrades \(U\)'/);
   });
 
-  it('game.js: Buffs on Y, Shift+S skills, Shift+T teleport points ahead of T and the movement keys', () => {
+  it('game.js: Buffs on Y, Shift+S skills, Shift+T teleport points, and no plain T at a signpost', () => {
     const keys = keyBlock(read('game.js'));
     assert.doesNotMatch(keys, /e\.key === 'u'/, 'nothing in game.js answers U');
     assert.match(keys, /if \(e\.key === 'y' \|\| e\.key === 'Y'\) openBuffsPanel\(\);/);
     assert.match(keys, /if \(e\.key === 'y' \|\| e\.key === 'Y'\) closeBuffsPanel\(\);/);
     const shiftS = keys.indexOf("if (e.shiftKey && (e.key === 's' || e.key === 'S')) {");
     const shiftT = keys.indexOf("if (e.shiftKey && (e.key === 't' || e.key === 'T')) {");
-    const plainT = keys.indexOf("if (e.key === 't' || e.key === 'T') doTeleport();");
-    assert.ok(shiftS > 0 && shiftT > shiftS && plainT > shiftT, 'Shift+T is read before plain T');
+    // Ticket 21 (2026-11-02): plain T never travelled from a post in the client (TSMainView.as 649 binds Shift+T only).
+    assert.ok(!keys.includes("if (e.key === 't' || e.key === 'T') doTeleport();"), 'no plain T travel');
+    const plainT = shiftT + 400;
+    assert.ok(shiftS > 0 && shiftT > shiftS, 'Shift+T is read after Shift+S');
     assert.match(keys.slice(shiftS, shiftT), /keys\.delete\(e\.key\);\s+if \(!e\.repeat\) openSkillsPanel\(\);\s+return;/);
     assert.match(keys.slice(shiftT, plainT), /features\.query\('teleportPointsKey', engine\)/);
     // G226/G231 Shift+C stays with homes-feature cultivateKey; Camera Mode keeps plain C.

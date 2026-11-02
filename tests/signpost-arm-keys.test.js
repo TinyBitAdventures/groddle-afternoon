@@ -1,11 +1,12 @@
 /**
  * Signpost arm keys (Austin 2026-11-01): a post's arms are numbered 1 to N from the top, each
  * shows a small key past its tip while the avatar stands at the post, and that number key takes
- * the arm, as a click on it does. T and E stay as they were; typing in a field never travels.
+ * the arm, as a click on it does; typing in a field never travels. Since 2026-11-02 Enter and E hold
+ * a post of several arms as the client did and T no longer travels (tests/signpost-focus.test.js).
  *
  * The client focused the post (SignpostView.as 395-490: Up/Down or W/S move between the arms,
- * Enter goes) and drew every visible connect, one under the other (229-247); the remake keeps T
- * (the first loaded road away) and Enter, and adds the number keys. The post at hand is the one
+ * Enter goes) and drew every visible connect, one under the other (229-247); the remake adds the
+ * number keys. The post at hand is the one
  * Enter and the T hint find (street-model.js signpostNear with signpostReachY, player report 33),
  * never a post at a deckless ladder top or one buried under the floor (ladder-top-signposts.js
  * walkUpSignpostStreet), and never from a ladder.
@@ -18,7 +19,7 @@ import { fileURLToPath } from 'node:url';
 import { walkUpSignpostStreet } from '../public/js/ladder-top-signposts.js?v=40abe6f5';
 import { navigableSignposts, signpostNear, worldToScreen } from '../public/js/street-model.js?v=505d8990';
 import { SIGN_MAX_ARMS, setSignpostKeys } from '../public/js/street-render.js?v=1aafd546';
-import { hotkeySections, hotkeyText } from '../public/js/client-hotkeys.js?v=8b63d6e5';
+import { hotkeySections, hotkeyText } from '../public/js/client-hotkeys.js?v=da9efe52';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (p) => readFileSync(join(spike, 'public', p), 'utf8');
@@ -89,17 +90,18 @@ describe('signpost arm keys: the post at hand', () => {
 });
 
 describe('signpost arm keys: the keys', () => {
-  it('1 to 9 take the arm with that number after the menus and panels, before T', () => {
+  it('1 to 9 take the arm with that number after the menus and panels, before the map key', () => {
     const at = game.indexOf('if (!e.repeat && !e.shiftKey && signpostArmKey(e.key)) {');
     assert.ok(at > 0);
-    assert.ok(at < game.indexOf("if (e.key === 't' || e.key === 'T') doTeleport();"), 'before T');
+    assert.ok(at < game.indexOf("if (e.key === 'g' || e.key === 'G' || isPlainKey(e, 'm')) {"), 'before the map key');
     assert.ok(at > game.indexOf('if (verbMenuKey(document.getElementById(\'verb-menu\'), e)) {'), 'a verb menu keeps 1 to 9');
     // The world's keydown returns at once for a field (typing never travels).
     assert.match(game, /window\.addEventListener\('keydown', \(e\) => \{\n\s*if \(e\.target\?\.matches\?\.\('input, textarea, select, \[contenteditable="true"\]'\)\) \{/);
   });
 
-  it('goes as a click on the arm does, through the same refusals as T', () => {
-    const fn = game.slice(game.indexOf('function signpostArmKey(key)'), game.indexOf('function doTeleport()'));
+  it('goes as a click on the arm does, through the same refusals as T did', () => {
+    const fn = game.slice(game.indexOf('function signpostArmKey(key)'), game.indexOf('let signpostFocus = null;'));
+    assert.match(fn, /return takeSignBoard\(hit\);/);
     assert.match(fn, /if \(signpostTravelRefused\(\)\) return true;/);
     assert.match(fn, /pickConnection\(\{ connects: \[board\.connection\] \}, availableStreetTsids\(\)\)/);
     assert.match(fn, /travelTo\(conn\.tsid, \{ label: conn\.label, arrive: conn\.arrive, via: 'signpost' \}\)/);

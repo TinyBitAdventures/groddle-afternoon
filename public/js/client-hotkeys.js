@@ -107,6 +107,8 @@ export function hotkeySections({ keyring = false, hub = false } = {}) {
         ['Preferences', [[',']]],
         ['Verbs', [['Enter'], ['E']]],
         // Austin 2026-11-01: at a post, the number on an arm takes it (game.js signpostArmKey).
+        // SIGNFOCUS (2026-11-02): Enter holds a post of several arms, as the client did (SignpostView.as 382-462).
+        ['Signpost', [['Enter'], ['↑', '↓']], '(Enter holds a post of several arms; ↑↓ or W/S choose, Enter goes, Esc lets go)'],
         ['Signpost Arm', [['1-9']], '(At a signpost: arms numbered from the top)'],
       ],
     },

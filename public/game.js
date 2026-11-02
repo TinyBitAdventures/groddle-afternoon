@@ -925,7 +925,7 @@ import { createQuestTracker } from './js/ui/quest-tracker.js?v=b088b3c7';
 import { bindCountField, countKeyValue, countStepMarkup } from './js/ui/count-chooser.js?v=893305c8';
 import { bindVerbMenu, focusVerbRow, lockVerbMenuSize, makeVerbRow, placeVerbMenu, plainWords, refuseVerbRow, syncVerbDetail, verbMenuKey, verbRowAttrs, verbRowInner, verbRowKeys } from './js/ui/verb-menu.js?v=e9d100c3';
 import { createPromptSettler, promptId } from './js/prompt-settle.js?v=509ba9cc';
-import { clientKeyAction, createHotkeysSheet, isHotkeySheetRelease, isPlainKey } from './js/client-hotkeys.js?v=8b63d6e5';
+import { clientKeyAction, createHotkeysSheet, isHotkeySheetRelease, isPlainKey } from './js/client-hotkeys.js?v=da9efe52';
 import { installHeldKeyGuard } from './js/held-keys.js?v=98b96620';
 import { forgetTexture, frameTexture, isFailed, isLoaded, onFailed, onLoaded, textureFromUrl, whenLoaded } from './js/textures.js?v=db2ce452';
 import { FALLBACK_MAX as WORLD_ART_FALLBACK_MAX, worldArtFor } from './js/world-art.js?v=df476660';
@@ -8475,7 +8475,7 @@ function enterChoiceIcon(choice) {
 
 function openEnterChoice(choice) {
   if (choice.kind === 'signpost') {
-    doTeleport();
+    enterSignpost();
     return;
   }
   // A garden in the chooser is tended, as Enter alone tends it (js/garden-tend.js).
@@ -8641,7 +8641,7 @@ function tryOpenNearestMenu({ nearestFirst = false } = {}) {
     return;
   }
   // G206: several things in reach open the chooser in the client's order; a
-  // lone signpost goes where T goes. Scripted (untrusted) presses from in-page
+  // lone signpost goes (one arm) or takes hold (several: SIGNFOCUS). Scripted (untrusted) presses from in-page
   // autoplays and &enterchooser=nearest keep nearest-first.
   if (!nearestFirst && !ENTER_CHOOSER_OFF) {
     const plan = planEnter(enterChoicesHere());
@@ -8650,7 +8650,7 @@ function tryOpenNearestMenu({ nearestFirst = false } = {}) {
       return;
     }
     if (plan.mode === 'single' && plan.choice.kind === 'signpost') {
-      doTeleport();
+      enterSignpost();
       return;
     }
   }
@@ -21977,6 +21977,7 @@ function clearWorldEntities() {
   // Player report 23: a new street starts with no key held (a real one comes back on its next repeat).
   heldKeys.releaseAll('street');
   clearHoverGlow();
+  releaseSignpostFocus();
   clearSignpostBoardHover();
   recentInteractionTarget = null;
   recentInteractionUntil = 0;
@@ -22587,21 +22588,113 @@ function takeSceneArm(hit) {
 function signpostArmKey(key) {
   const hit = signpostArmFor(key);
   if (!hit) return false;
+  if (app?.canvas) app.canvas.dataset.signpostArmKey = `${key}:${signBoardLabel(hit.board) || hit.board.connection?.label || ''}`;
+  return takeSignBoard(hit);
+}
+
+/** Take one arm of the post at hand ({ view, board }): its road, or a scene arm's verb. */
+function takeSignBoard(hit) {
   const { board } = hit;
+  releaseSignpostFocus();
   if (board.scene) {
-    if (app?.canvas) app.canvas.dataset.signpostArmKey = `${key}:${signBoardLabel(board)}`;
     takeSceneArm(hit);
     return true;
   }
   if (signpostTravelRefused()) return true;
   const conn = pickConnection({ connects: [board.connection] }, availableStreetTsids());
-  if (app?.canvas) app.canvas.dataset.signpostArmKey = `${key}:${board.connection?.label || ''}`;
   if (!conn) {
     toast('That road is not loaded yet. Use the map for another destination.');
     return true;
   }
   travelTo(conn.tsid, { label: conn.label, arrive: conn.arrive, via: 'signpost' });
   return true;
+}
+
+/*
+ * SIGNFOCUS (Austin 2026-11-02, ticket 21): Enter or E at a post works as the client's: one arm
+ * goes at once; several arms make the post take hold with the top arm lit, Up/Down or W/S move
+ * between arms (wrapping round), Enter goes, Escape, Left/Right or A/D let go, and the avatar
+ * stands still meanwhile (SignpostView.as tryFocus 382-416, focus 447-462, go 581-584,
+ * escapeHandler 586-588, downHandler 590-599, upHandler 601-610; stops_avatar_on_focus).
+ * The number keys stay (Austin 2026-11-01); T no longer travels (the client had no T at a post).
+ */
+/** @type {{ boards: { view: any, board: any }[], index: number } | null} */
+let signpostFocus = null;
+
+/** The post's arms top first (their numbers), as Enter steps through them. */
+function signpostBoardsInOrder(at) {
+  return [...(at?.boards || [])].sort((a, b) => (Number(a.board.key) || 99) - (Number(b.board.key) || 99) || (a.board.index || 0) - (b.board.index || 0));
+}
+
+function lightFocusedBoard() {
+  const entry = signpostFocus?.boards[signpostFocus.index];
+  if (!entry) return;
+  setSignpostBoardHover({ view: entry.view, board: entry.board, index: entry.board.index, connection: entry.board.connection });
+  setCanvasData('signpostFocus', `${signpostFocus.index + 1}/${signpostFocus.boards.length}:${signBoardLabel(entry.board) || entry.board.connection?.label || ''}`);
+}
+
+function releaseSignpostFocus() {
+  if (!signpostFocus) return;
+  signpostFocus = null;
+  clearSignpostBoardHover();
+  setCanvasData('signpostFocus', '');
+}
+
+/** Enter (or E, or the chooser's signpost tile) at a post. */
+function enterSignpost() {
+  const at = signpostAtHand();
+  const boards = signpostBoardsInOrder(at);
+  // No drawn arms (a post whose roads are all hidden or unloaded): the old travel and its refusals.
+  if (!boards.length) {
+    doTeleport();
+    return;
+  }
+  if (boards.length === 1) {
+    takeSignBoard(boards[0]);
+    return;
+  }
+  signpostFocus = { boards, index: 0 };
+  // The avatar stands still while the post has hold of it.
+  for (const k of ['ArrowLeft', 'ArrowRight', 'a', 'A', 'd', 'D']) keys.delete(k);
+  if (player) player.vx = 0;
+  lightFocusedBoard();
+}
+
+/**
+ * A key while a post is held: true when the post took it. A move key (Left/Right, A/D) lets go
+ * and then walks; a number key lets go and takes its arm.
+ */
+function signpostFocusKey(e) {
+  if (!signpostFocus) return false;
+  const at = signpostAtHand();
+  if (!at || !signpostFocus.boards.every((entry) => at.boards.some(({ board }) => board === entry.board))) {
+    releaseSignpostFocus();
+    return false;
+  }
+  const n = signpostFocus.boards.length;
+  if (['ArrowUp', 'w', 'W', 'ArrowDown', 's', 'S'].includes(e.key)) {
+    e.preventDefault();
+    const step = ['ArrowUp', 'w', 'W'].includes(e.key) ? -1 : 1;
+    signpostFocus.index = (signpostFocus.index + step + n) % n;
+    lightFocusedBoard();
+    return true;
+  }
+  if (e.key === 'Enter' || e.key === 'e' || e.key === 'E') {
+    e.preventDefault();
+    if (!e.repeat) takeSignBoard(signpostFocus.boards[signpostFocus.index]);
+    return true;
+  }
+  if (e.key === ' ') {
+    e.preventDefault();
+    return true;
+  }
+  if (e.key === 'Escape') {
+    e.preventDefault();
+    releaseSignpostFocus();
+    return true;
+  }
+  if (['ArrowLeft', 'ArrowRight', 'a', 'A', 'd', 'D'].includes(e.key) || /^[1-9]$/.test(e.key)) releaseSignpostFocus();
+  return false;
 }
 
 function doTeleport() {
@@ -28046,6 +28139,8 @@ async function main() {
     // A focused button in an open dialog (the subway's red button refusal and other
     // feature dialogs) takes Enter and Space itself: never the nearest thing's menu or a jump.
     if ((e.key === 'Enter' || e.key === ' ') && focusedDialogButton()) return;
+    // SIGNFOCUS: a post held by Enter takes its own keys first.
+    if (signpostFocusKey(e)) return;
     keys.add(e.key);
     if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' '].includes(e.key)) e.preventDefault();
     if (e.key === 'Escape' && escapeHasWork()) e.preventDefault();
@@ -28274,13 +28369,13 @@ async function main() {
       return;
     }
     if (e.key === 'f' || e.key === 'F') eatApple();
-    // Austin 2026-11-01: at a post, 1 to 9 take the arm with that number (T and E stay as they are).
+    // Austin 2026-11-01: at a post, 1 to 9 take the arm with that number. T no longer travels from a
+    // post (2026-11-02, ticket 21: the client had no T there; Enter and E hold the post, SIGNFOCUS).
     if (!e.repeat && !e.shiftKey && signpostArmKey(e.key)) {
       e.preventDefault();
       keys.delete(e.key);
       return;
     }
-    if (e.key === 't' || e.key === 'T') doTeleport();
     if (e.key === 'g' || e.key === 'G' || isPlainKey(e, 'm')) {
       // G254: M is the client's map key (TSMainView.as 641, mKeyHandler 733-741); G stays.
       // No map while Gentle Island hides it (newxp-feature's nx-hide-map; the client's
@@ -28553,7 +28648,8 @@ async function main() {
     const wx = (e.clientX - bounds.left) * (VIEW_W / bounds.width) + camTarget;
     const wy = (e.clientY - bounds.top) * (VIEW_H / bounds.height) + (camY || 0);
     const signBoard = signpostBoardAt(signViewsHere(), wx, wy);
-    setSignpostBoardHover(signBoard);
+    // A held post keeps its lit arm under a passing pointer (a click on an arm still goes).
+    if (!signpostFocus) setSignpostBoardHover(signBoard);
     if (signBoard) {
       if (hoverTarget) clearHoverGlow();
       return;
@@ -29037,7 +29133,13 @@ async function main() {
         signposts: (currentStreet?.signposts || []).map((s) => {
           const pos = worldToScreen(currentStreet, s.x, s.y);
           const conn = pickConnection(s, availableStreetTsids());
-          return { x: pos.x, y: pos.y, to: conn ? conn.label : '', tsid: conn ? conn.tsid : '' };
+          // Each drawn arm's number key and road (QA: tools/playtest.mjs takes a road by its number).
+          const view = (portalSprites || []).find((v) => v && !v.destroyed && v.signpost === s);
+          const arms = (view?.signBoards || []).map((b) => {
+            const c = b.connection ? pickConnection({ connects: [b.connection] }, availableStreetTsids()) : null;
+            return { key: String(b.key ?? ''), label: c?.label || b.connection?.label || '', tsid: c?.tsid || '' };
+          });
+          return { x: pos.x, y: pos.y, to: conn ? conn.label : '', tsid: conn ? conn.tsid : '', arms };
         }),
       };
     },
@@ -29294,10 +29396,18 @@ async function main() {
         };
       } else if (nearSign) {
         const conn = pickAwayConnection(nearSign.signpost, currentStreetTsid, availableStreetTsids());
-        // Above the post, clear of the arms (SignpostView post 246px at 0.8).
-        want = conn
-          ? { key: 'T', label: conn.label, x: nearSign.screen.x, y: nearSign.screen.y - 246 * 0.8 - 10 }
-          : { key: 'G', label: 'map (no loaded link)', x: nearSign.screen.x, y: nearSign.screen.y - 246 * 0.8 - 10 };
+        // Above the post, clear of the arms (SignpostView post 246px at 0.8). SIGNFOCUS: Enter
+        // takes the one arm, holds a post of several, and while held goes to the lit arm.
+        const arms = signpostBoardsInOrder(postAtHand);
+        const lit = signpostFocus?.boards[signpostFocus.index]?.board;
+        const y = nearSign.screen.y - 246 * 0.8 - 10;
+        want = !conn && !arms.length
+          ? { key: 'G', label: 'map (no loaded link)', x: nearSign.screen.x, y }
+          : lit
+            ? { key: 'Enter', label: signBoardLabel(lit) || lit.connection?.label || 'go', x: nearSign.screen.x, y }
+            : arms.length === 1
+              ? { key: 'Enter', label: signBoardLabel(arms[0].board) || arms[0].board.connection?.label || conn?.label || '', x: nearSign.screen.x, y }
+              : { key: 'Enter', label: 'Choose a road', x: nearSign.screen.x, y };
       }
       settlePrompt(want, performance.now());
       if (prompt.visible) {

@@ -329,6 +329,23 @@ class Session {
     return ok;
   }
 
+  /**
+   * Take a signpost's road from beside it: the arm's number key for the road the snapshot names
+   * (post.tsid), else Enter (a lone arm goes; a post of several is held, so Enter again takes the top).
+   * T travelled until 2026-11-02 (ticket 21: the client had no T at a post).
+   */
+  async takeRoad(post) {
+    const arm = (post?.arms || []).find((a) => a.tsid && a.tsid === post.tsid);
+    if (arm?.key && /^[1-9]$/.test(arm.key)) {
+      await this.page.keyboard.press(arm.key);
+      return;
+    }
+    await this.page.keyboard.press('Enter');
+    await this.wait(250);
+    const held = await this.page.evaluate(() => document.querySelector('canvas')?.dataset.signpostFocus || '');
+    if (held) await this.page.keyboard.press('Enter');
+  }
+
   async closeMenus() {
     await this.page.keyboard.press('Escape');
     await this.wait(200);
@@ -703,7 +720,7 @@ const SCENARIOS = {
       }
       const post = dir === 'right' ? posts[posts.length - 1] : posts[0];
       await t.walkTo(post.x, { tol: 40, maxMs: 40000 });
-      await t.page.keyboard.press('t');
+      await t.takeRoad(post);
       const moved = await t.waitFor((tsid) => window.groddleQA.snapshot().street?.tsid !== tsid, 20000, s.street.tsid);
       await t.wait(3000);
       const s2 = await t.snap();
@@ -1022,7 +1039,7 @@ const SCENARIOS = {
       if (!posts.length) break;
       const post = posts[(n * 7) % posts.length];
       await t.walkTo(post.x, { tol: 40, maxMs: 40000 });
-      await t.page.keyboard.press('t');
+      await t.takeRoad(post);
       await t.waitFor((tsid) => window.groddleQA.snapshot().street?.tsid !== tsid, 20000, s.street.tsid);
       await t.wait(2500);
     }
@@ -1106,7 +1123,7 @@ const SCENARIOS = {
       const post = posts[n % posts.length];
       // Jump next to the signpost (walking is covered by `travel`).
       await t.walkTo(post.x, { tol: 40, maxMs: 30000 });
-      await t.page.keyboard.press('t');
+      await t.takeRoad(post);
       await t.waitFor((tsid) => window.groddleQA.snapshot().street?.tsid !== tsid, 20000, s.street.tsid);
       await t.wait(2500);
       const m = await t.metrics();
