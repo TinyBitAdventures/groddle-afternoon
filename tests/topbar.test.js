@@ -112,9 +112,10 @@ describe('top bar markup and wiring', () => {
   });
 
   it('Sound: the sliders scale the effects and music buses and are remembered; Mute is the game\'s own', () => {
-    assert.match(game, /audio\.sfxGain\.gain\.value = state\.muted \? 0 : sfxLevel\(\);/);
-    assert.match(game, /const targetVol = state\.muted \? 0 : 0\.26 \* musicLevel\(\);/);
-    assert.match(game, /\(blockPause \? MUSICBLOCK_PLAYBACK\.streetMusicLevel : audio\.musicblock \? 0\.055 : 0\.26\) \* musicLevel\(\);/);
+    // MUTE (2026-11-01): the sliders and Mute set the buses (js/audio-buses.js, tests/audio-buses.test.js).
+    assert.match(game, /const audioSettings = \(\) => \(\{ muted: state\.muted, music: musicLevel\(\), effects: sfxLevel\(\) \}\);/);
+    assert.match(game, /audio\.buses\.set\(audioSettings\(\)\);/);
+    assert.match(game, /blockPause \? MUSICBLOCK_PLAYBACK\.streetMusicLevel : audio\.musicblock \? 0\.055 : STREET_MUSIC_MIX;/);
     assert.match(game, /saveAudioLevel\(kind, audioLevels\[kind\]\);\n\s*applyMute\(\);/);
     assert.match(game, /audio: \{ levels: \(\) => \(\{ \.\.\.audioLevels \}\), setLevel: setAudioLevel \}/);
     assert.match(game, /document\.getElementById\('sound-btn'\)\?\.setAttribute\('data-muted', String\(state\.muted\)\);/);

@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=b351d7cb';
 import { createFeatureHost } from './js/feature-host.js?v=e4f648b1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=94f51e17';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=d8ec9500';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -903,6 +903,7 @@ import { loseMood, moodMax, setMetabolicGainGate, setMetabolicLossGate } from '.
 import { installHiresIcons } from './js/icon-hires.js?v=5357d4b4';
 import { installHiresDecos } from './js/deco-hires.js?v=cb905e17';
 import { loadAudioLevels, loadMutedPreference, saveAudioLevel, saveMutedPreference } from './js/audio-pref.js?v=e56202ee';
+import { createAudioBuses, fadeGain } from './js/audio-buses.js?v=af167b54';
 import { installTopBar, renderTopBar } from './js/ui/topbar.js?v=dcf3a03b';
 import { installFocusReturn } from './js/ui/focus-return.js?v=8885653a';
 import { QUOIN_FRAME_BOB, advanceQuoinClock, quoinBobBetweenFrames } from './js/quoin-motion.js?v=ea0bd408';
@@ -2379,9 +2380,14 @@ let state = {
 const audio = {
   ctx: null,
   buffers: {},
-  music: null,
-  musicGain: null,
+  /** js/audio-buses.js: master (mute), music bus and effects bus; nothing else reaches the speakers. */
+  buses: null,
+  master: null,
+  musicBus: null,
   sfxGain: null,
+  /** The street track playing and its own gain (street mix, crossfades, Musicblock duck) on the music bus. */
+  music: null,
+  trackGain: null,
   musicblock: null,
   /** js/sound-board.js instance (playSound). */
   board: null,
@@ -5567,12 +5573,11 @@ async function loadAudio() {
     files[`amb:${url}`] = url;
   }
   audio.ctx = new (window.AudioContext || window.webkitAudioContext)();
-  audio.musicGain = audio.ctx.createGain();
-  audio.sfxGain = audio.ctx.createGain();
-  audio.musicGain.gain.value = 0.26 * musicLevel();
-  audio.sfxGain.gain.value = state.muted ? 0 : sfxLevel();
-  audio.musicGain.connect(audio.ctx.destination);
-  audio.sfxGain.connect(audio.ctx.destination);
+  // MUTE: the one route to the speakers, set from the saved settings before any sound starts.
+  audio.buses = createAudioBuses(audio.ctx, audioSettings());
+  audio.master = audio.buses.master;
+  audio.musicBus = audio.buses.music;
+  audio.sfxGain = audio.buses.sfx;
   // Every SFX goes through the sound board: recovered file when one exists,
   // otherwise a js/synth-sfx.js recipe (assets/content/sound-keys.json).
   audio.board = createSoundBoard({
@@ -5712,19 +5717,15 @@ async function playMusicblockAudio(def) {
     const fade = audio.musicblockClass === def.classTsid ? 0 : MUSICBLOCK_PLAYBACK.previousBlockFadeOutSec;
     audio.musicblock = null;
     try {
-      if (fade && previousGain) {
-        previousGain.gain.cancelScheduledValues(t);
-        previousGain.gain.setValueAtTime(previousGain.gain.value, t);
-        previousGain.gain.linearRampToValueAtTime(0.0001, t + fade);
-      }
+      if (fade && previousGain) fadeGain(previousGain.gain, 0, fade, audio.ctx);
       previous.stop(t + fade);
     } catch { /* already ended */ }
   }
   const src = audio.ctx.createBufferSource();
-  const gain = audio.ctx.createGain();
+  // A Musicblock is an exclusive sound effect (announce_sound), so it takes the Effects level.
+  const gain = audio.buses.sfxVoice(MUSICBLOCK_PLAYBACK.gain);
   src.buffer = audio.buffers[key];
   src.connect(gain);
-  gain.connect(audio.sfxGain);
   audio.musicblock = src;
   audio.musicblockGain = gain;
   audio.musicblockClass = def.classTsid;
@@ -5737,7 +5738,6 @@ async function playMusicblockAudio(def) {
     audio.musicblockPausesStreet = false;
     applyMute();
   };
-  gain.gain.setValueAtTime(MUSICBLOCK_PLAYBACK.gain, t);
   src.start(0);
   src.stop(t + musicblockPlaySeconds(def, src.buffer.duration));
   if (app?.canvas) app.canvas.dataset.lastSound = `${def.soundKey}:file`;
@@ -5779,17 +5779,14 @@ function setAmbientForStreet(street, opts = {}) {
   }
 
   const prev = audio.music;
-  const prevGain = audio.musicGain;
+  const prevGain = audio.trackGain;
   const now = audio.ctx.currentTime;
-  const fade = 0.85;
 
-  // Fade out previous
+  // Fade out previous (linear, so it ends at exactly 0), then stop it.
   if (prev && prevGain) {
     try {
-      prevGain.gain.cancelScheduledValues(now);
-      prevGain.gain.setValueAtTime(prevGain.gain.value, now);
-      prevGain.gain.linearRampToValueAtTime(0.001, now + fade);
-      prev.stop(now + fade + 0.05);
+      fadeGain(prevGain.gain, 0, STREET_TRACK_FADE_SEC, audio.ctx);
+      prev.stop(now + STREET_TRACK_FADE_SEC + 0.05);
     } catch {
       try {
         prev.stop();
@@ -5799,30 +5796,35 @@ function setAmbientForStreet(street, opts = {}) {
     }
   }
 
-  // Fresh gain node for new track (so we can crossfade cleanly next time)
-  const g = audio.ctx.createGain();
-  g.gain.value = 0.001;
-  g.connect(audio.ctx.destination);
-  audio.musicGain = g;
+  // MUTE: the new track starts silent on its own gain, which only reaches the speakers through the
+  // music bus and the master: muted or at Music 0 it is never heard, however it fades in.
+  const g = audio.buses.musicVoice(0);
+  audio.trackGain = g;
+  audio.trackTarget = null;
 
   const src = audio.ctx.createBufferSource();
   src.buffer = audio.buffers[bufKey];
   src.loop = true;
   src.connect(g);
   src.start(0);
-  const targetVol = state.muted ? 0 : 0.26 * musicLevel();
-  g.gain.linearRampToValueAtTime(Math.max(0.001, targetVol), now + fade);
 
   audio.music = src;
   ambientThemeId = theme;
   ambientTrackUrl = url;
-  applyMute();
+  applyMute(STREET_TRACK_FADE_SEC);
 }
 
 /** The Sound popover's Effects and Music levels, 0 to 100 (js/audio-pref.js; 100 is the game's own mix). */
 const audioLevels = loadAudioLevels();
 const sfxLevel = () => audioLevels.effects / 100;
 const musicLevel = () => audioLevels.music / 100;
+/** The player's sound settings as the buses take them (js/audio-buses.js). */
+const audioSettings = () => ({ muted: state.muted, music: musicLevel(), effects: sfxLevel() });
+/** Street music's own mix level (the Music slider scales the bus above it). */
+const STREET_MUSIC_MIX = 0.26;
+/** The street music's crossfade, and a change of its mix (a cue's duck, a quiet street). */
+const STREET_TRACK_FADE_SEC = 0.85;
+const STREET_MIX_FADE_SEC = 0.3;
 /** A slider moved: remember it and apply it to the playing buses at once. */
 function setAudioLevel(kind, value) {
   if (!(kind in audioLevels)) return;
@@ -5841,31 +5843,31 @@ function syncMuteButton() {
   btn.setAttribute('aria-pressed', String(state.muted));
 }
 
-function applyMute() {
+/**
+ * Applies Mute and the two sliders to the buses (exact: Mute holds the master at 0, Music 0 the
+ * music bus), then sets the street track's own mix: silent on a NO_MUSIC street, ducked under a
+ * cue, paused for a Musicblock. `trackFadeSec` is a new track's fade-in.
+ */
+function applyMute(trackFadeSec = STREET_MIX_FADE_SEC) {
   syncMuteButton();
-  if (!audio.musicGain) return;
-  const blockPause = Boolean(audio.musicblock && audio.musicblockPausesStreet);
-  const vol = state.muted || ambientThemeId === SILENT_THEME
-    ? 0
-    : (blockPause ? MUSICBLOCK_PLAYBACK.streetMusicLevel : audio.musicblock ? 0.055 : 0.26) * musicLevel();
-  // The client fades the street music out (1 s) for a Musicblock and back in (1 s) after it.
-  const fadeSec = blockPause === Boolean(audio.streetPausedForBlock)
-    ? 0
-    : blockPause ? MUSICBLOCK_PLAYBACK.streetFadeOutSec : MUSICBLOCK_PLAYBACK.streetFadeInSec;
-  audio.streetPausedForBlock = blockPause;
-  try {
-    const t = audio.ctx.currentTime;
-    if (fadeSec) {
-      audio.musicGain.gain.cancelScheduledValues(t);
-      audio.musicGain.gain.setValueAtTime(audio.musicGain.gain.value, t);
-      audio.musicGain.gain.linearRampToValueAtTime(vol, t + fadeSec);
-    } else {
-      audio.musicGain.gain.setTargetAtTime(vol, t, 0.05);
+  if (!audio.buses) return;
+  audio.buses.set(audioSettings());
+  if (audio.trackGain) {
+    const blockPause = Boolean(audio.musicblock && audio.musicblockPausesStreet);
+    const mix = ambientThemeId === SILENT_THEME
+      ? 0
+      : blockPause ? MUSICBLOCK_PLAYBACK.streetMusicLevel : audio.musicblock ? 0.055 : STREET_MUSIC_MIX;
+    // The client fades the street music out (1 s) for a Musicblock and back in (1 s) after it.
+    const fadeSec = blockPause === Boolean(audio.streetPausedForBlock)
+      ? trackFadeSec
+      : blockPause ? MUSICBLOCK_PLAYBACK.streetFadeOutSec : MUSICBLOCK_PLAYBACK.streetFadeInSec;
+    audio.streetPausedForBlock = blockPause;
+    // Only a new mix moves the gain, so a fade already under way is left to finish.
+    if (audio.trackTarget !== mix) {
+      audio.trackTarget = mix;
+      fadeGain(audio.trackGain.gain, mix, fadeSec, audio.ctx);
     }
-  } catch {
-    audio.musicGain.gain.value = vol;
   }
-  audio.sfxGain.gain.value = state.muted ? 0 : sfxLevel();
   if (state.muted) {
     audio.board?.stopAll();
     stopActionSoundLoop();
@@ -11237,8 +11239,12 @@ const engine = {
     if (classTsid && getSkillCatalog()[classTsid]) focusSkillInPanel(classTsid);
     openSkillsPanel();
   },
-  /** A music cue over the ducked street BGM (the Musicblock duck); resolves to stop(). loop repeats it until stop(). */
-  async playCue(url, { volume = 0.6, loop = false } = {}) {
+  /**
+   * A music cue over the ducked street BGM (the Musicblock duck); resolves to stop(). loop repeats it
+   * until stop(). Music (announce_music, play_music: SoundMaster.playSound is_music) takes the Music
+   * level; `effect: true` puts a recorded sound effect on the Effects bus instead.
+   */
+  async playCue(url, { volume = 0.6, loop = false, effect = false } = {}) {
     const key = `cue:${url}`;
     if (!audio.ctx) return () => {};
     try {
@@ -11248,12 +11254,10 @@ const engine = {
     }
     if (audio.musicblock) try { audio.musicblock.stop(); } catch { /* ended */ }
     const src = audio.ctx.createBufferSource();
-    const gain = audio.ctx.createGain();
+    const gain = effect ? audio.buses.sfxVoice(volume) : audio.buses.musicVoice(volume);
     src.buffer = audio.buffers[key];
     src.loop = Boolean(loop);
-    gain.gain.value = volume;
     src.connect(gain);
-    gain.connect(audio.sfxGain);
     audio.musicblock = src;
     // Cues keep the soft duck; only a Musicblock pauses the street music.
     audio.musicblockGain = null;
@@ -11267,7 +11271,7 @@ const engine = {
     applyMute();
     return () => {
       const t = audio.ctx.currentTime;
-      gain.gain.setTargetAtTime(0.0001, t, 0.35);
+      fadeGain(gain.gain, 0, 1.2, audio.ctx);
       try { src.stop(t + 1.4); } catch { /* ended */ }
     };
   },
@@ -28556,6 +28560,20 @@ async function main() {
     },
     animDecos(detail = false) {
       return bgLayer?.animStats?.(detail) || null;
+    },
+    /** MUTE QA: the sound settings and buses as they stand, and a trip to another street. */
+    audio: {
+      state: () => ({
+        ctx: audio.ctx?.state || null,
+        muted: state.muted,
+        levels: { ...audioLevels },
+        theme: ambientThemeId,
+        track: ambientTrackUrl,
+        master: audio.master?.gain.value ?? null,
+        music: audio.musicBus?.gain.value ?? null,
+        sfx: audio.sfxGain?.gain.value ?? null,
+      }),
+      travel: (tsid) => enterStreetWithTransition(String(tsid)).then(() => currentStreetTsid),
     },
     /** Idle/AFK QA (&idledemo=1): loaded idle sheets with load/bake ms, AFK and the idle timer. */
     /** World quoins as drawn: sprite y plus the frame's baked bob (QA for js/quoin-motion.js). */

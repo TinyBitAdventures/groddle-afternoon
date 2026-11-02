@@ -287,7 +287,8 @@ describe('Musicblock game integration', () => {
     assert.match(game, /playMusicblockAudio/);
     assert.match(game, /showMusicblockFx/);
     assert.match(game, /result\.msg\.replace\(\/\[\.\!\?\]\+\$\//);
-    assert.match(game, /audio\.musicblock \? 0\.055 : 0\.26/);
+    assert.match(game, /audio\.musicblock \? 0\.055 : STREET_MUSIC_MIX;/);
+    assert.match(game, /const STREET_MUSIC_MIX = 0\.26;/);
     assert.match(game, /musicblocks_played:/);
     assert.match(game, /spawnMusicblockDrop/);
     assert.match(game, /worldMusicblocks/);

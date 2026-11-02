@@ -211,7 +211,7 @@ function applyEffects(engine, effects, now) {
         // fall back to a recorded url when the catalog does not know the key.
         const played = typeof engine.playSound === 'function' ? engine.playSound(fx.name, { volume: 0.6 }) : null;
         const url = played ? null : soundUrl(fx.name);
-        if (url) engine.playCue(url, { volume: 0.5 });
+        if (url) engine.playCue(url, { volume: 0.5, effect: true });
         break;
       }
       case 'vog': {
