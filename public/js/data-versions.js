@@ -115,6 +115,7 @@
       "assets/classic/teensy_signpost.png": "3d101127",
       "assets/classic/upgrade_icon.png": "3dbc4e03",
       "assets/classic/warning.png": "b3880bf6",
+      "assets/content/ambient-music.json": "0b25ddc3",
       "assets/content/buffs.json": "70ea503c",
       "assets/content/deco-catalog.json": "286a2344",
       "assets/content/puzzle-triggers.json": "09810451",
@@ -5644,6 +5645,7 @@
       "landing/full/card-skills.webp": "94402c5f",
       "landing/full/hero.webp": "1a3d099e",
       "landing/hero.webp": "214afca1",
+      "street-music/data.json": "700aa24a",
     },
   };
 })(typeof globalThis !== 'undefined' ? globalThis : this);
