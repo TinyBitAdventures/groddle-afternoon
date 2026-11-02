@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=9ac37cff';
 import { createFeatureHost } from './js/feature-host.js?v=e4f648b1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=d13987ae';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=f7fd6315';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -2633,6 +2633,20 @@ let badgeGeneratedMap = {};
 let loadingImageMap = {};
 /** @type {Record<string, { top_color?: string, btm_color?: string, hubName?: string }>} */
 let hubColorCache = {};
+/**
+ * Ticket 41: street trips under way (returnFromHome, enterStreetWithTransition). busy() reports
+ * them, so nothing starts in the gap between leaving one place and the next street's load (a
+ * quest room started there was replaced by the street and ran on, unseen).
+ */
+let streetTrips = 0;
+async function onStreetTrip(work) {
+  streetTrips += 1;
+  try {
+    return await work();
+  } finally {
+    streetTrips -= 1;
+  }
+}
 
 async function loadTransitionAssets() {
   try {
@@ -2700,7 +2714,12 @@ async function resolveHubColors(hubId) {
     if (!idxRes.ok) return { top: null, bottom: null };
     const idx = await idxRes.json();
     const hubMeta = idx.hubs?.[id];
-    if (!hubMeta?.file) return { top: null, bottom: null };
+    if (!hubMeta?.file) {
+      // Ticket 41: a hub with no map ('home', 'scene') is a miss for good; asking again refetched
+      // the index on every trip from home.
+      hubColorCache[id] = {};
+      return { top: null, bottom: null };
+    }
     const res = await fetch(hubMeta.file);
     if (!res.ok) return { top: null, bottom: null };
     const hub = await res.json();
@@ -2967,6 +2986,10 @@ function announceAchievementUpdates(updates = []) {
  * @param {{ spawnX?: number, spawnY?: number, useTransition?: boolean, quiet?: boolean }} [opts]
  */
 async function enterStreetWithTransition(tsid, opts = {}) {
+  return onStreetTrip(() => streetTripTo(tsid, opts));
+}
+
+async function streetTripTo(tsid, opts = {}) {
   const useFx = opts.useTransition !== false;
   const el = document.getElementById('screen-transition');
   const currentWinterLabel = winterLocationLabel(currentStreetTsid);
@@ -10981,6 +11004,8 @@ const engine = {
         isQuestDialogueOpen() ||
         isScreenFxBlocking() ||
         isVogOpen() ||
+        // Ticket 41: between leaving a place and the next street's load.
+        streetTrips > 0 ||
         // ignoreInstance: being in a quest instance or rebuilt room is not busy (Camera Mode works there).
         (!ignoreInstance && (anyTransientInstance() || engine.inScene())) ||
         engine.instanceHold ||
@@ -11598,7 +11623,8 @@ const engine = {
       name.textContent = scene.hubName ? `${currentStreet.label} · ${scene.hubName}` : currentStreet.label;
       name.dataset.tsid = scene.tsid;
     }
-    if (scene.returnTo?.tsid) savePlayerLocation(scene.returnTo);
+    // A room entered from home keeps the saved street (home is resumed from homeState at boot).
+    if (scene.returnTo?.tsid && scene.returnTo.tsid !== HOME_STREET_TSID && scene.returnTo.tsid !== HOME_INTERIOR_TSID) savePlayerLocation(scene.returnTo);
     updateHud();
   },
   /**
@@ -22018,6 +22044,11 @@ function homeWayOut() {
 
 async function returnFromHome() {
   if (!homeIsInstanced()) return false;
+  // Ticket 41: busy from the first step, before endHomeVisit stops counting you as home.
+  return onStreetTrip(() => returnFromHomeTrip());
+}
+
+async function returnFromHomeTrip() {
   const result = endHomeVisit(homeState);
   if (!result.ok) return false;
   const destination = homeReturnDestination(result.returnLocation);

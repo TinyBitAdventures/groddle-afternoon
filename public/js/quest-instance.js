@@ -49,6 +49,17 @@ function cleanPoint(point) {
 }
 
 /**
+ * Where a run comes back to: the place it was entered from (players/inc_instances.js
+ * instances_get_exit, used by main.js 1070-1082 for an instance_exit signpost), your home
+ * street or house included, as join_club.js onStarted 96-117 instanced you straight from home.
+ * From inside another room's scene: that run's way back (`saved`).
+ */
+export function wayBackFrom(here, saved = null) {
+  if (!here?.tsid || isQuestSceneTsid(here.tsid)) return cleanPoint(saved);
+  return cleanPoint(here);
+}
+
+/**
  * Start a run. `durationMs` 0 means no timer (rooms that stay open until you
  * leave, like Rainbow Run's exit_delay: 0).
  */

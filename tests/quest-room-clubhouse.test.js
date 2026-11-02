@@ -10,7 +10,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import * as kit from '../public/js/quest-rooms/kit.js?v=c7ea6e0e';
-import * as club from '../public/js/quest-rooms/clubhouse.js?v=79754ecc';
+import * as club from '../public/js/quest-rooms/clubhouse.js?v=ded4fde1';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const JUMP_RISE = 100;
@@ -86,7 +86,9 @@ describe('Join the Club (clubhouse)', () => {
     assert.deepEqual(r.requirements.map((x) => x.name), ['solved_puzzle', 'instance_exit_via_signpost']);
     assert.equal(r.rewards.currants, 200);
     assert.equal(r.rewards.favor['0'].points, 25);
-    assert.equal(club.ROOM_MS, 5 * 60 * 1000);
+    // Ticket 41: the 5 * 60 exit delay is the "Are you stuck?" prompt, not a clock.
+    assert.equal(club.EXIT_PROMPT_MS, 5 * 60 * 1000);
+    assert.equal(club.room.durationMs, 0);
     assert.equal(club.PICTURE_REACH, 175);
     assert.equal(club.BUTTON_RESET_MS, 1000);
     assert.deepEqual(club.INTRO_LINES, ['Clubs can be very exclusive!', 'In this case, only the observant may enter.']);

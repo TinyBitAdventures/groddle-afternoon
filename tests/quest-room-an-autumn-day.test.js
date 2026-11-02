@@ -11,7 +11,7 @@ import { fileURLToPath } from 'node:url';
 
 import * as kit from '../public/js/quest-rooms/kit.js?v=c7ea6e0e';
 import { QUEST_ROOMS, roomModulePath } from '../public/js/quest-rooms/catalog.js?v=9ebeb502';
-import { questSceneTsid } from '../public/js/quest-instance.js?v=71385640';
+import { questSceneTsid } from '../public/js/quest-instance.js?v=5599c44c';
 import {
   AUTUMN_MS,
   BODY_H,

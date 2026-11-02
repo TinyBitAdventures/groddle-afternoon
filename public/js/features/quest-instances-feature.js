@@ -73,7 +73,8 @@ import {
   setRunFlag,
   solveQuestInstance,
   stepQuestInstance,
-} from '../quest-instance.js?v=71385640';
+  wayBackFrom,
+} from '../quest-instance.js?v=5599c44c';
 import { FAMILIAR_GATES, QUEST_ROOMS, REMINISCE_ITEMS, ROOM_ITEMS, isBuiltRoom, questGiver, roomModulePath } from '../quest-rooms/catalog.js?v=9ebeb502';
 import * as kit from '../quest-rooms/kit.js?v=c7ea6e0e';
 import { locationEventsApi } from './location-events-feature.js?v=df2533e4';
@@ -154,7 +155,7 @@ const ROOM_MODULES = {
   an_autumn_day: () => import('../quest-rooms/an-autumn-day.js?v=bed1f7a5'),
   being_watched: () => import('../quest-rooms/being-watched.js?v=03352d7f'),
   back_alley: () => import('../quest-rooms/back-alley.js?v=bf6df2f1'),
-  clubhouse: () => import('../quest-rooms/clubhouse.js?v=79754ecc'),
+  clubhouse: () => import('../quest-rooms/clubhouse.js?v=ded4fde1'),
   light_perspective: () => import('../quest-rooms/light-perspective.js?v=f6fb0621'),
   tile_puzzle: () => import('../quest-rooms/tile-puzzle.js?v=9ba8f9cc'),
   operation_grow: () => import('../quest-rooms/operation-grow.js?v=232a0736'),
@@ -889,6 +890,7 @@ async function buildStage(engine, stage) {
   const street = room.street?.(ctx, stage);
   if (street?.tsid) {
     engine.instanceHold = street.hold === false ? null : QUEST_INSTANCES_FEATURE_ID;
+    delete ctx.data._sceneTsid;
     ctx.data._awaitStreet = { tsid: street.tsid, stage };
     await engine.enter(street.tsid, {
       spawnX: street.x,
@@ -901,6 +903,8 @@ async function buildStage(engine, stage) {
   }
   const scene = room.build(ctx, stage);
   engine.instanceHold = null;
+  // Ticket 41: the scene this run owns (onStreetEnter ends a run whose scene a street replaced).
+  ctx.data._sceneTsid = questSceneTsid(room.id, stage);
   engine.enterScene({
     tsid: questSceneTsid(room.id, stage),
     label: scene.label || room.title,
@@ -932,9 +936,9 @@ async function startInstance(engine, questId, opts = {}) {
     const def = await loadRoom(roomId);
     if (!def) return false;
     room = def;
-    const returnTo = isQuestSceneTsid(engine.streetTsid) || engine.homeContext?.().inHome
-      ? save.returnTo
-      : { tsid: engine.streetTsid, x: Math.round(engine.player?.x || 0), y: Math.round(engine.player?.y || 0) };
+    // Ticket 41: from home too (join_club.js onStarted 96-117 instanced you from wherever you
+    // accepted, the Butler's offer at home included): the exit signpost brings you back there.
+    const returnTo = wayBackFrom({ tsid: engine.streetTsid, x: engine.player?.x, y: engine.player?.y }, save.returnTo);
     const durationMs = typeof room.durationFor === 'function' ? room.durationFor(questId) : room.durationMs;
     run = createQuestInstance({
       questId,
@@ -996,6 +1000,33 @@ function confirmLeave(engine) {
   }).then((choice) => {
     if (choice === 'leave') leaveInstance(engine);
   });
+}
+
+/**
+ * Ticket 41: a street replaced the room's scene. End the run where you stand (no trip back, the
+ * quest not failed, its flags kept); it waits to start again like a newly accepted quest
+ * (maybeStartAccepted), from where you are once nothing is busy.
+ */
+function dropReplacedRun(engine) {
+  const questId = run.questId;
+  ctx.data._leaving = true;
+  restorePlayerScale(engine);
+  room?.clear?.(ctx);
+  clearContextEntities(engine);
+  run = null;
+  room = null;
+  ctx = null;
+  save.returnTo = null;
+  save.questId = null;
+  save.roomId = null;
+  if (save.memory[questId]) delete save.memory[questId].started;
+  pendingStart = null;
+  engine.instanceHold = null;
+  if (hud) hud.bar.hidden = true;
+  engine.save();
+  engine.setData('qiStatus', 'left');
+  engine.setData('qiOutcome', 'replaced');
+  publish(engine, true);
 }
 
 async function leaveInstance(engine, opts = {}) {
@@ -1257,7 +1288,10 @@ function maybeStartAccepted(engine, now) {
     return;
   }
   if (!pendingStart || pendingStart.questId !== id) pendingStart = { questId: id, at: now + START_DELAY_MS };
-  if (now < pendingStart.at || engine.busy() || dialogOpen()) return;
+  // Ticket 41: home does not hold it back (onStarted instanced you 0.1 s after accepting, at home
+  // too: quest_scripting.js questInstanceLocation 26-46). busy() still waits out a street trip
+  // (game.js streetTrips), panels, dialogues and awards, and a house edit mode waits too.
+  if (now < pendingStart.at || engine.busy({ ignoreHome: true }) || dialogOpen() || engine.query?.('homeEditMode', engine)) return;
   pendingStart = null;
   startInstance(engine, id);
 }
@@ -1374,7 +1408,11 @@ export const questInstancesFeature = {
 
   onStreetEnter(street, engine) {
     buildChrome(engine);
-    if (run && ctx?.data?._awaitStreet && street?.tsid) {
+    if (run && ctx && !entering && !ctx.data._awaitStreet && ctx.data._sceneTsid && street?.tsid !== ctx.data._sceneTsid) {
+      // Ticket 41: a street load replaced this run's scene (a trip already under way when it
+      // started). Nothing of the room is left on screen: end the run without failing the quest.
+      dropReplacedRun(engine);
+    } else if (run && ctx?.data?._awaitStreet && street?.tsid) {
       const wait = ctx.data._awaitStreet;
       delete ctx.data._awaitStreet;
       room.enter?.(ctx, wait.stage, street);

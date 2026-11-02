@@ -4,8 +4,13 @@
  * Source: the Bag Butler hands out the invitation at 30128 iMG
  * (players/inc_stats.js; the remake offers it through the Magic Rock, see
  * catalog OFFER_OVERRIDES). onStarted instances "The Society of Keen-Eyed
- * Noticers" (LIFCSSIJNOA3PTE, entered at its marker_teleport) with a
- * 5 * 60 second exit delay; the second location is "Pintura Prosa"
+ * Noticers" (LIFCSSIJNOA3PTE, entered at its marker_teleport) 0.1 s after
+ * you accept, wherever you are (at home for the Butler's offer), with a
+ * 5 * 60 second exit delay. That delay is not a time limit
+ * (players/inc_instances.js 317-357, instances_create_delayed 377-386): after
+ * it "Are you stuck? Do you want to leave this place?" asks, Yes, please
+ * leaves (which fails the quest, onExitLocation) and No thanks asks again two
+ * minutes later (ticket 41). The second location is "Pintura Prosa"
  * (LIFD72UKNOA3679), reached through the clubhouse's Curious Painting
  * (items/club_house_picture.js: verb "jump in", tooltip "Looks inviting",
  * "Try getting closer." past 175 px, which broadcasts the location event
@@ -53,7 +58,13 @@
 import { textureFromUrl } from '../textures.js?v=db2ce452';
 import { butlerApi } from '../features/butler-feature.js?v=90ca5198';
 
-export const ROOM_MS = 5 * 60 * 1000; // source: questInstanceLocation(..., 5*60)
+// source: questInstanceLocation(..., 5*60) -> instances_schedule_exit_prompt (a prompt, not a clock).
+export const EXIT_PROMPT_MS = 5 * 60 * 1000;
+// source: players/inc_instances.js instances_exit_via_prompt, "no" -> 2*60.
+export const PROMPT_AGAIN_MS = 2 * 60 * 1000;
+export const STUCK_TEXT = 'Are you stuck? Do you want to leave this place?';
+/** The exit delay; QA &clubpromptms=<ms> shortens it (both waits) to see the prompt. */
+const promptDelay = (ctx, ms) => Number(ctx.param?.('clubpromptms')) || ms;
 export const PICTURE_REACH = 175; // source: club_house_picture jump_in conditions
 export const BUTTON_RESET_MS = 1000; // source: wall_switch reset_timer "1000"
 export const BUTTON_REACH = 420;
@@ -762,12 +773,20 @@ function overlayLine(ctx, text) {
   });
 }
 
+/**
+ * Ticket 41: the arrival lines and the camera pan belong to the clubhouse scene. A street drawn
+ * over it (a trip that was already under way) never gets them.
+ */
+export function inClub(ctx) {
+  return Boolean(ctx.engine?.inScene?.()) && ctx.stage === 'clubhouse';
+}
+
 async function intro(ctx) {
   ctx.data.phase = 'intro';
   ctx.data.pan = { x: CLUBHOUSE.fireplaceX - 480, y: DECKS.club.y - 300, k: 0, on: true, at: Date.now() };
   await ctx.wait(ctx.fx() ? 700 : 100);
   for (const line of INTRO_LINES) {
-    if (ctx.data.left) return;
+    if (ctx.data.left || !inClub(ctx)) return;
     await overlayLine(ctx, line);
   }
   ctx.data.pan.on = false;
@@ -778,7 +797,7 @@ async function intro(ctx) {
 const PAN_MS = 900;
 function stepPan(ctx) {
   const pan = ctx.data.pan;
-  if (!pan) return;
+  if (!pan || !inClub(ctx)) return;
   // Wall-clock easing, so a slow frame rate does not stretch the pan.
   const t = Math.min(1, (Date.now() - pan.at) / PAN_MS);
   pan.k = pan.on ? Math.max(pan.k, t) : Math.min(pan.k, 1 - t);
@@ -796,6 +815,7 @@ function stepPan(ctx) {
 
 function enterClub(ctx) {
   const { PIXI } = ctx;
+  ctx.data.promptAt ||= Date.now() + promptDelay(ctx, EXIT_PROMPT_MS);
   ctx.data.choices ||= initialChoices();
   ctx.data.quoins = spawnRoomQuoins(ctx, CLUB_QUOINS);
   const cy = DECKS.club.y;
@@ -929,15 +949,40 @@ async function jumpIn(ctx) {
   if (ctx.data.jumping) return;
   ctx.data.jumping = true;
   ctx.sound('TELEPORT_AWAY', { volume: 0.5 });
-  // Pintura Prosa is its own instance in the source (clubhouse_part_2): its clock starts afresh.
-  const left = ctx.remaining();
-  if (Number.isFinite(left) && left < ROOM_MS) ctx.extend(ROOM_MS - left);
   await ctx.gotoStage('pintura');
   ctx.data.jumping = false;
 }
 
+/**
+ * players/inc_instances.js instances_show_exit_prompt 322-344 (G304: a prompts_add with
+ * icon_buttons and no timeout, the bottom-right prompt stack) and instances_exit_via_prompt
+ * 346-357: Yes, please leaves; No thanks asks again two minutes later.
+ */
+export function maybePromptStuck(ctx, now = Date.now()) {
+  if (ctx.data.prompting || !ctx.data.promptAt || now < ctx.data.promptAt) return false;
+  if (ctx.data.phase === 'intro' || ctx.data.phase === 'done' || ctx.data.jumping) return false;
+  if (ctx.dialogOpen?.() || ctx.cardOpen?.()) return false;
+  ctx.data.prompting = true;
+  ctx.prompt({
+    text: STUCK_TEXT,
+    iconButtons: true,
+    choices: [
+      { label: 'Yes, please', value: 'yes' },
+      { label: 'No thanks', value: 'no' },
+    ],
+  }).then((choice) => {
+    ctx.data.prompting = false;
+    if (choice === 'yes') ctx.leave({ transition: ctx.fx() });
+    else if (choice === 'no') ctx.data.promptAt = Date.now() + promptDelay(ctx, PROMPT_AGAIN_MS);
+  });
+  return true;
+}
+
 function enterProsa(ctx) {
   ctx.data.phase = 'prosa';
+  // Pintura Prosa is its own instance in the source (clubhouse_part_2, entered by the painting's
+  // lost location event): a fresh 5 * 60 exit delay, as the remake's clock started afresh before.
+  ctx.data.promptAt = Date.now() + promptDelay(ctx, EXIT_PROMPT_MS);
   ctx.data.quoins = spawnRoomQuoins(ctx, PROSA_QUOINS);
   const { PIXI, kit } = ctx;
   const c = new PIXI.Container();
@@ -1007,7 +1052,8 @@ export const room = {
   icon: `${ART}club_house_picture.png`,
   theme: 'dark',
   hubName: 'Join the Club',
-  durationMs: ROOM_MS,
+  // The 5 * 60 exit delay is a prompt, not a clock (maybePromptStuck).
+  durationMs: 0,
   firstStage: 'clubhouse',
   leaveText: 'Leave the club before you get the picture? You will have to start over.',
   travelText: 'Find the way out, or use Leave.',
@@ -1027,6 +1073,7 @@ export const room = {
 
   tick(ctx, dtMs) {
     const now = Date.now();
+    maybePromptStuck(ctx, now);
     if (ctx.stage === 'pintura') {
       for (const d of ctx.data.motes || []) {
         if (d.m.destroyed) continue;
@@ -1065,7 +1112,7 @@ export const room = {
   },
 
   physics(ctx) {
-    return ctx.data.phase === 'intro' ? { speed: 0, jump: 0 } : null;
+    return ctx.data.phase === 'intro' && inClub(ctx) ? { speed: 0, jump: 0 } : null;
   },
 
   verbs(ctx, target) {
@@ -1133,6 +1180,8 @@ export const room = {
   clear(ctx) {
     // Runs on every scene change too; only a real leave ends the intro.
     if (!ctx.data._leaving) return;
+    // The stuck prompt goes with the room (instances_cancel_exit_prompt; the runtime removes it).
+    ctx.data.promptAt = 0;
     ctx.data.left = true;
     ctx.data.overlayNext?.();
     if (overlayEl) overlayEl.style.display = 'none';
@@ -1140,6 +1189,7 @@ export const room = {
 
   publish(ctx) {
     ctx.setData('clubStage', ctx.stage || '');
+    ctx.setData('clubPromptIn', ctx.data.promptAt ? String(Math.max(0, Math.round((ctx.data.promptAt - Date.now()) / 1000))) : '');
     ctx.setData('clubPhase', ctx.data.phase || '');
     ctx.setData('clubChoices', (ctx.data.choices || []).map((c, i) => FRAMES[i].options[c]).join(','));
     ctx.setData('clubSolved', ctx.data.solved ? '1' : '0');
