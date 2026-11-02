@@ -36,29 +36,40 @@ export const QURAZY_REWARDS = Object.freeze([
 export const FAVOR_GIANT_IDS = Object.freeze(['alph', 'cosma', 'friendly', 'grendaline', 'humbaba', 'lem', 'mab', 'pot', 'spriggan', 'ti', 'zille']);
 
 /**
- * Touching a quoin (player report 32: one level with the avatar's head was
- * only taken by jumping into it). Quoins were taken on the server, by
- * collision: quoin.js onPlayerCollision 156 runs when the player's box
- * overlaps the quoin's. The player's box is w 59 x h 112 over the feet
- * (GameServerJS players/player.js 63-64, times the avatar's scale); quoin.js
- * sets no hit box of its own, so the engine's default 60 x 60 box over the
- * quoin's bottom centre counts (Tiny Speck's engine is not public: Eleven
- * Giants' reconstruction, eleven-server src/model/Player.js handleCollision
- * 735-737 and isHit 801-814, which also overlaps the two boxes). The remake
- * draws a quoin centred on (x, y), a QUOIN_SHEET frame tall, so its bottom is
- * half a frame under y. Was a 44 px circle 28 px over the feet, which a quoin
- * at head height missed.
+ * Touching a quoin. Quoins were taken on the server, by collision: quoin.js
+ * onPlayerCollision 156 runs when the player's box overlaps the quoin
+ * (GameServerJS items/quoin.js). The player's box is w 59 x h 112 over the
+ * feet, "hardcoded values matching the client" (GameServerJS
+ * players/player.js 62-64), times the avatar's scale. The quoin's side is in
+ * Tiny Speck's engine, which is not public; quoin.js sets no hit box of its
+ * own, so the box is the coin the player sees: the drawn coin of the 1x sheet
+ * (QUOIN_SHEET, measured with its propeller: about 26 x 28 px of each 40 x 45
+ * frame, the Qurazy quoin 38 x 36; tools/quoin-art/frames.json), centred on
+ * the quoin's (x, y) as the remake draws it.
+ *
+ * Player report 32 (2026-11-01): a quoin level with the avatar's head was
+ * only taken by jumping into it (a 44 px circle 28 px over the feet). It was
+ * then given Eleven Giants' guess of a 60 x 60 box over the quoin's bottom
+ * (eleven-server src/model/Player.js handleCollision 736, "default radius
+ * 60px"), which reached 60 px either side and 36 px under a quoin, so the
+ * avatar caught every quoin nearby and no jump cleared one at standing height
+ * (player report 37). With the coin's own box a quoin at head height (92 px up)
+ * is still taken walking, one 126 px up takes a hop, and one at standing
+ * height (58 px up) is avoided by jumping over it.
  */
-export const QUOIN_TOUCH = Object.freeze({ playerW: 59, playerH: 112, box: 60 });
+export const QUOIN_TOUCH = Object.freeze({ playerW: 59, playerH: 112, coinW: 26, coinH: 28, qurazyW: 38, qurazyH: 36 });
 
-/** Whether the avatar standing (or jumping) with its feet at (x, feetY) touches quoin q (its centre x, y). */
+/** Whether the avatar standing (or jumping) with its feet at (x, feetY) touches quoin q (its centre x, y; typeId for the Qurazy quoin). */
 export function quoinTouches(q, x, feetY, { scale = 1, quoinScale = 1 } = {}) {
   if (!q || !Number.isFinite(q.x) || !Number.isFinite(q.y)) return false;
   const s = scale > 0 ? scale : 1;
-  const bottom = q.y + (QUOIN_SHEET.frameHeight / 2) * quoinScale;
+  const k = quoinScale > 0 ? quoinScale : 1;
+  const big = q.typeId === 'qurazy';
+  const coinW = (big ? QUOIN_TOUCH.qurazyW : QUOIN_TOUCH.coinW) * k;
+  const coinH = (big ? QUOIN_TOUCH.qurazyH : QUOIN_TOUCH.coinH) * k;
   const xDist = Math.abs(x - q.x);
-  const yDist = Math.abs(feetY - (QUOIN_TOUCH.playerH * s) / 2 - (bottom - QUOIN_TOUCH.box / 2));
-  return xDist < (QUOIN_TOUCH.box + QUOIN_TOUCH.playerW * s) / 2 && yDist < (QUOIN_TOUCH.box + QUOIN_TOUCH.playerH * s) / 2;
+  const yDist = Math.abs(feetY - (QUOIN_TOUCH.playerH * s) / 2 - q.y);
+  return xDist < (coinW + QUOIN_TOUCH.playerW * s) / 2 && yDist < (coinH + QUOIN_TOUCH.playerH * s) / 2;
 }
 
 const STREET_SEQUENCE = Object.freeze(['xp', 'energy', 'mood', 'currants', 'mystery', 'favor', 'xp', 'time']);

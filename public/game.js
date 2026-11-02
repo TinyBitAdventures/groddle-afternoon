@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=fe2bbd71';
 import { createFeatureHost } from './js/feature-host.js?v=e4f648b1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=d57e6dd6';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=47d284bf';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -355,7 +355,7 @@ import {
   slipTerrainY,
   starlitMoonPlainAlpha,
   starlitRevealAlpha,
-} from './js/paradise-flight.js?v=a94b5875';
+} from './js/paradise-flight.js?v=a7cdbc0f';
 import { resolveParadiseCourseAlias } from './js/paradise-courses.js?v=bb3d9051';
 import {
   buildParadiseCourseArt,
@@ -479,7 +479,7 @@ import {
   parsePlayerSave,
   serializePlayerSave,
   restorePlayerSave,
-} from './js/player-save.js?v=39b6973f';
+} from './js/player-save.js?v=65c3cd4d';
 import {
   HOME_INTERIOR_TSID,
   HOME_STREET_TSID,
@@ -859,7 +859,7 @@ import {
   quoinClassType,
   resetStreetQuoinsForNewDay,
   creditQuoinStat,
-} from './js/quoins.js?v=e75558c6';
+} from './js/quoins.js?v=14dd1c93';
 import {
   buildHubMapView,
   mapClickTravel,
@@ -13447,7 +13447,7 @@ function physics(dt) {
     const bodyScale = features.query('avatarBodyScale', engine) ?? 1;
     for (let i = quoins.length - 1; i >= 0; i--) {
       const q = quoins[i];
-      // Player report 32: the source's box touch (js/quoins.js quoinTouches), head height included.
+      // Player reports 32 and 37: the body's box on the drawn coin (js/quoins.js quoinTouches): head height walking, a jump clears one.
       if (quoinTouches(q, player.x, player.y, { scale: bodyScale, quoinScale: q.scale?.y || 1 })) {
         // Multiplayer: a street quoin is the realtime server's to give (features/shared-quoins-feature.js).
         if (features.query('quoinTouched', q, engine)) continue;

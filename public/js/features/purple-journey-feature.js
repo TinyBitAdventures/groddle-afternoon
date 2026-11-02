@@ -35,7 +35,7 @@
 
 import { addItem, countItem, ITEM_CATALOG, removeItem } from '../inventory.js?v=b0e33301';
 import { shiftMetabolic } from '../metabolics.js?v=8504134e';
-import { collectQuoin, QUOIN_SHEET, QUOIN_TYPES } from '../quoins.js?v=e75558c6';
+import { collectQuoin, QUOIN_SHEET, QUOIN_TYPES } from '../quoins.js?v=14dd1c93';
 import { frameTexture, sourceFromUrl } from '../textures.js?v=db2ce452';
 import { playPoofIn } from '../overlay-art.js?v=3753a0d2';
 import { STREET_INDEX } from '../street-loader.js?v=33d2b8bc';

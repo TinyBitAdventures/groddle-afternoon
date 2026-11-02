@@ -9,7 +9,9 @@
  * buildPlatformCandidates' (js/street-ecology.js): where a quoin lands depends on the arrival in solo
  * (the saved-arrival keep-clear), so the sweep takes every spot the planner could pick at all three
  * heights, which covers solo and the realtime server's layout (tools/build-realtime-quoins.mjs) alike.
- * A touch is js/quoins.js quoinTouches, the source's box overlap (quoin.js onPlayerCollision 156).
+ * A touch is js/quoins.js quoinTouches, the source's player box over the drawn coin (quoin.js
+ * onPlayerCollision 156). Since player report 37 the coin's own box counts, not a 60 px one: the 58 and
+ * 92 px rows are taken walking, the 126 px row (just over the head) with a hop of at most HOP px.
  *
  * Mallos Means' left quoin sits at x 38.6, 15 px inside the avatar's bound at 24: in reach. In a solo
  * layout it can float 92 or 126 px up, which the old 44 px circle 28 px over the feet missed without a
@@ -24,24 +26,31 @@ import { applyStreetIndex, loadStreetDataFromFs, setZoneStreetsShown } from '../
 import { isStandable, platformYAt, platformsScreen, streetWidth } from '../public/js/street-model.js?v=505d8990';
 import { buildPlatformCandidates, setStreetEcologyCatalog } from '../public/js/street-ecology.js?v=7fbae08d';
 import { EDGE_MARGIN } from '../public/js/avatar-step.js?v=33ad1926';
-import { quoinTouches } from '../public/js/quoins.js?v=e75558c6';
+import { quoinTouches } from '../public/js/quoins.js?v=14dd1c93';
 import { streetQuoinLayout } from '../tools/build-realtime-quoins.mjs';
 import { isZoneTsid } from '../public/js/zone-streets.js?v=b40010d5';
 
 const root = join(import.meta.dirname, '..');
 const streetsDir = join(root, 'public/assets/streets');
 const LIFTS = [58, 92, 126];
+/** A hop: feet this far up at most (a full jump rises about 105 px, js/avatar-step.js JUMP_SPEED and GRAVITY). */
+const HOP = 40;
+/** Walking takes the rows up to head height; the one over the head takes a hop. */
+const rise = (lift) => (lift > 112 ? HOP : 0);
 const MALLOS_MEANS = 'GHV1L41MCD32O4A';
 
 /** The standing spots (feet x, y) within the walk bounds that touch quoin q, or the first one. */
-function touchFrom(q, lines, w, { first = true } = {}) {
+function touchFrom(q, lines, w, { first = true, hop = 0 } = {}) {
   const lo = Math.max(EDGE_MARGIN, Math.floor(q.x - 60));
   const hi = Math.min(w - EDGE_MARGIN, Math.ceil(q.x + 60));
   const found = [];
   for (let x = lo; x <= hi; x += 2) {
     for (const p of lines) {
       const y = platformYAt(p, x, 0);
-      if (y == null || !quoinTouches(q, x, y)) continue;
+      if (y == null) continue;
+      let touched = false;
+      for (let h = 0; h <= hop && !touched; h += 2) touched = quoinTouches(q, x, y - h);
+      if (!touched) continue;
       found.push({ x, y });
       if (first) return found;
       break;
@@ -66,7 +75,7 @@ before(async () => {
 });
 
 describe('32: every quoin is in the avatar\'s reach', () => {
-  it('every spot the planner can give a quoin, at all three heights, touches from a standable spot inside the walk bounds', () => {
+  it('every spot the planner can give a quoin, at all three heights, touches from a standable spot inside the walk bounds (a hop for the top row)', () => {
     assert.ok(streets.length > 1000, `${streets.length} streets`);
     const misses = [];
     let spots = 0;
@@ -79,7 +88,7 @@ describe('32: every quoin is in the avatar\'s reach', () => {
         for (const lift of LIFTS) {
           spots += 1;
           const q = { x: c.x, y: c.y - lift };
-          if (!touchFrom(q, stand, w).length) misses.push(`${data.tsid} ${data.label}: (${Math.round(q.x)}, ${Math.round(q.y)}) ${lift} px up`);
+          if (!touchFrom(q, stand, w, { hop: rise(lift) }).length) misses.push(`${data.tsid} ${data.label}: (${Math.round(q.x)}, ${Math.round(q.y)}) ${lift} px up`);
         }
       }
     }
@@ -95,14 +104,14 @@ describe('32: every quoin is in the avatar\'s reach', () => {
       const w = streetWidth(data);
       for (const [x, y, type] of streetQuoinLayout(data)) {
         total += 1;
-        if (!touchFrom({ x, y }, lines, w).length) misses.push(`${data.tsid} ${data.label}: ${type} at (${x}, ${y})`);
+        if (!touchFrom({ x, y }, lines, w, { hop: HOP }).length) misses.push(`${data.tsid} ${data.label}: ${type} at (${x}, ${y})`);
       }
     }
     assert.ok(total > 10000, `${total} quoins`);
     assert.deepEqual(misses, []);
   });
 
-  it('Mallos Means: the left iMG quoin is taken standing at the left end, at every height', () => {
+  it('Mallos Means: the left iMG quoin is taken at the left end, at every height (a hop for the top row)', () => {
     const data = streets.find((s) => s.tsid === MALLOS_MEANS);
     assert.ok(data, 'Mallos Means');
     const lines = platformsScreen(data).filter(isStandable);
@@ -113,7 +122,7 @@ describe('32: every quoin is in the avatar\'s reach', () => {
     const floorY = left[1] + 58; // the shared layout floats it 58 px up (its index 3)
     for (const lift of LIFTS) {
       const q = { x: left[0], y: floorY - lift };
-      const at = touchFrom(q, lines, w, { first: false });
+      const at = touchFrom(q, lines, w, { first: false, hop: rise(lift) });
       assert.ok(at.some((s) => s.x === EDGE_MARGIN), `${lift} px up: touched at the bound`);
     }
   });

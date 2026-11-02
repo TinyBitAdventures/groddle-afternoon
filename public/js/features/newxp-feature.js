@@ -119,7 +119,7 @@ import {
   vogPages,
 } from '../newxp.js?v=1f9ce43b';
 import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=b0e33301';
-import { QUOIN_SHEET, QUOIN_TYPES, qrazyRewardForLevel } from '../quoins.js?v=e75558c6';
+import { QUOIN_SHEET, QUOIN_TYPES, qrazyRewardForLevel } from '../quoins.js?v=14dd1c93';
 import { soundForQuoin } from '../sound-moments.js?v=2f8597cd';
 import { IMAGINATION_UPGRADES } from '../imagination.js?v=b4f0eaf6';
 import { assignQuest, completeQuest } from '../quests.js?v=282e1621';
