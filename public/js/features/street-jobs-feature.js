@@ -864,7 +864,10 @@ const PANEL_CSS = `
 .sj-hall{margin:var(--sp-1) 0 var(--sp-4);padding:.45rem var(--sp-5);border-radius:var(--radius-md);background:color-mix(in srgb, var(--surface-bright) 86%, transparent);border:1px solid var(--border);font-size:var(--fs-md);color:var(--c-sand-39)}
 .sj-hall p{margin:var(--sp-1) 0}
 .sj-hall .sj-hall-row{display:flex;flex-wrap:wrap;gap:var(--sp-3);align-items:center;margin-top:var(--sp-3)}
-.sj-hall select{font:inherit;font-size:var(--fs-md);padding:.2rem .3rem;border-radius:var(--radius-sm);border:1px solid var(--c-sand-83);max-width:100%}
+.sj-hall :is(select,.combo-input){font:inherit;font-size:var(--fs-md);padding:.2rem .3rem;border-radius:var(--radius-sm);border:1px solid var(--c-sand-83);max-width:100%}
+.sj-hall .combo{width:calc(var(--combo-longest,12) * .6em + 2.6rem);max-width:100%}
+.sj-hall .combo .combo-toggle{border:0;background:transparent;padding:0;border-radius:var(--radius-round)}
+.sj-hall .combo-input{padding-right:1.9rem;background:var(--surface-bright);color:inherit;box-shadow:none}
 .sj-others button{font:inherit;font-size:var(--fs-sm);background:none;border:0;color:var(--c-blue-51);cursor:pointer;padding:0;text-decoration:underline}
 @media (max-width:480px){.sj-options{grid-template-columns:1fr}.sj-req{grid-template-columns:28px 1fr}.sj-req .sj-acts{grid-column:1/-1}}
 `;

@@ -61,6 +61,7 @@ import { effectInspector, rumbleSection } from './editor-effects.js?v=a550db37';
 import { setLayerOffsets } from './geometry-handles.js?v=a8c00c00';
 import { GEO_KINDS, GEO_LIST, GEO_WORDS, PERMS, geoKey, parseGeoKey, geoItem, geoKindOf, geoShape, geoHits, geoHandles, handleWorld, dragHandle, moveBy, changedFields, drawnItem, postOnFloor, defaultItem, permKey, permValue, permName, dashes, arriveFor, newConnect, shapeBounds } from './geometry-handles.js?v=a8c00c00';
 import { SNAP_PX, GUIDE_PX, endPoints, joinedEnds, snapPlatform, snapDrawnPlatform, snapPoint, floorSnapY, rulerTicks, bestPull } from './snap.js?v=66012b50';
+import { watchSelects } from '../combobox.js?v=31679d26';
 
 export const ZOOM_MIN = 0.05;
 export const ZOOM_MAX = 4;
@@ -330,6 +331,10 @@ async function boot() {
 
   // —— Layout ——
   root.replaceChildren();
+  // SEATSELECT (Austin 2026-11-02): the builder's pickers (draft, street, layer, perms, the art
+  // picker's role, set and size, ...) are the game's combobox, not the OS menu, in the builder's
+  // own look (css/builder.css .combo-builder).
+  watchSelects(root, { className: 'combo-builder' });
   const status = el('p', { class: 'builder-status', role: 'status', 'aria-live': 'polite', 'data-builder-status': '' });
   const draftSel = el('select', { 'aria-label': 'Draft', 'data-builder-draft': '' });
   const streetSel = el('select', { 'aria-label': 'Street', 'data-builder-street': '' });

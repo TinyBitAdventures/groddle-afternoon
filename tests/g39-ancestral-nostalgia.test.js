@@ -26,7 +26,7 @@ import { getBuffCatalog, loadContentCatalogsFromDir } from '../public/js/content
 import { IMAGINATION_UPGRADES, buildDeck, upgradeStatus } from '../public/js/imagination.js?v=b4f0eaf6';
 import { isOfferedInRemake, remakeStatus } from '../public/js/imagination-remake.js?v=ca0a48d5';
 import { POTION_TEXT, ancestralCheck } from '../public/js/potions.js?v=294258de';
-import { FEATURES } from '../public/js/features/index.js?v=92f285e8';
+import { FEATURES } from '../public/js/features/index.js?v=2e2d873e';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const GSJS = join(root, '../glitch-GameServerJS');

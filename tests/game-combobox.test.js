@@ -64,7 +64,8 @@ describe('the game combobox (js/combobox.js)', () => {
     // The top layer, placed by placeList; both events a native select sends; Enter never submits.
     assert.match(src, /list\.setAttribute\('popover', 'manual'\)/);
     assert.match(src, /dispatchEvent\(new Event\('input', \{ bubbles: true \}\)\);\s+select\.dispatchEvent\(new Event\('change', \{ bubbles: true \}\)\);/);
-    assert.match(src, /e\.key === 'Enter'\) \{\s+\/\/ Never the form's submit[^\n]*\n\s+e\.preventDefault\(\);/);
+    // A picker's Enter never sends the form (SEATSELECT kept it; a free name field's Enter does, createSuggestBox).
+    assert.match(src, /\/\/ Never the form's submit[^\n]*\n\s+e\.preventDefault\(\);/);
     // Item icons from data-icon.
     assert.match(src, /icon: o\.dataset\.icon/);
   });

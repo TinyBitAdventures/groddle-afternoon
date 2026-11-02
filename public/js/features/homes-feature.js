@@ -92,7 +92,7 @@
 
 import { countItem, ensureItem, ITEM_CATALOG, removeItem } from '../inventory.js?v=b0e33301';
 import { isBagClass } from '../pack-slots.js?v=f3890c72';
-import { createCombobox } from '../combobox.js?v=2e9bfa90';
+import { createCombobox } from '../combobox.js?v=31679d26';
 import {
   CULTIVATION_CLASSES,
   FURNITURE_CATALOG,
@@ -192,7 +192,7 @@ import { MOVABLE_FIXTURES, MOVABLE_FIXTURE_IDS, fixtureFits, fixtureText, savedF
 import { displayTopOf, itemstackOverlayPoint, overlayAlpha, overlayLifeMs, playPoofIn, trackOverlay } from '../overlay-art.js?v=3753a0d2';
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=2e580c24';
 import { fadeInNewNear } from '../poof-fade.js?v=06fed92f';
-import { projectApi } from './street-jobs-feature.js?v=49e239a6';
+import { projectApi } from './street-jobs-feature.js?v=805a7789';
 import { TOWER_CHASSIS, TOWER_CONFIG, TOWER_DOOR_DX, TOWER_GEO, TOWER_PROTO, normalizeTowerState } from '../home-tower.js?v=b05c58d8';
 import { drawTowerElevator, drawTowerExit, towerApi, visitorTowerView } from './home-tower-feature.js?v=6ca164d2';
 import { pieceUrl, roomPieces, surfaceAt, swatchPiece, wallTargetAt } from '../home-wallpaper.js?v=e676f00f';

@@ -16,10 +16,13 @@ const CSS = `
 .sound-test .st-tools{display:flex;gap:var(--sp-3);flex-wrap:wrap;padding:var(--sp-4) var(--sp-6);border-bottom:1px solid var(--c-cream-91)}
 .sound-test input,.sound-test select{font:inherit;padding:var(--sp-2) var(--sp-3);border:1px solid var(--c-gold-80);border-radius:var(--radius-sm);background:var(--surface-bright)}
 .sound-test input{flex:1;min-width:120px}
+.sound-test .combo{width:calc(var(--combo-longest,12) * .6em + 2.6rem);max-width:100%;flex:none}
+.sound-test .combo .combo-toggle{border:0;background:transparent;padding:0;border-radius:var(--radius-round)}
+.sound-test .combo .combo-input{flex:none;min-width:0;padding-right:1.9rem;font-weight:400;color:inherit;box-shadow:none}
 .sound-test button{font:inherit;border:1px solid var(--c-gold-75);background:var(--c-gold-93);border-radius:var(--radius-sm);padding:3px 9px;cursor:pointer}
 .sound-test button:hover{background:var(--c-gold-89c)}
 .sound-test ol{list-style:none;margin:0;padding:var(--sp-2) var(--sp-4) var(--sp-5);overflow:auto}
-.sound-test li{display:grid;grid-template-columns:auto 1fr;gap:var(--sp-1) var(--sp-4);padding:var(--sp-3) var(--sp-2);border-bottom:1px dashed var(--c-gold-89b)}
+.sound-test li:not(.combo-option,.combo-empty){display:grid;grid-template-columns:auto 1fr;gap:var(--sp-1) var(--sp-4);padding:var(--sp-3) var(--sp-2);border-bottom:1px dashed var(--c-gold-89b)}
 .sound-test li b{font-family:var(--font-mono);font-size:var(--fs-sm)}
 .sound-test .st-meta{grid-column:2;color:var(--c-sand-48);font-size:var(--fs-sm)}
 .sound-test .st-tag{display:inline-block;border-radius:var(--radius-md);padding:0 var(--sp-3);margin-left:var(--sp-3);font-size:var(--fs-xs);background:var(--surface-moss);color:var(--c-lime-43)}

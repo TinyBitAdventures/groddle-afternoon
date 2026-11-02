@@ -6195,6 +6195,42 @@ body.buff-purple-pulse::after {
   margin-left: -0.15rem;
 }
 .combo-hint { white-space: nowrap; }
+/* A select fronted in its place (SEATSELECT, js/combobox.js watchSelects): out of sight but still
+   the form's value; the field follows the select's hidden and disabled. */
+.combo-native { display: none !important; }
+.combo[hidden] { display: none; }
+.combo.is-disabled { opacity: 0.55; }
+.combo.is-disabled :is(.combo-input, .combo-toggle) { cursor: not-allowed; }
+/* The skills' and the achievements' Category: the filter field each select was, with the list's
+   arrow; the 2012 field in Classic (classic.css "Search fields and selects"). */
+.skill-tree-toolbar > .combo { width: 9.5rem; max-width: 9.5rem; }
+@media (max-width: 480px) { .skill-tree-toolbar > .combo { width: 7.5rem; max-width: 7.5rem; } }
+.skill-tree-toolbar .combo-input {
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  padding: var(--sp-3) 1.9rem var(--sp-3) var(--sp-4);
+  background: var(--surface-bright);
+  color: var(--text);
+  font: inherit;
+  font-size: var(--fs-md);
+  box-shadow: none;
+}
+.skill-tree-toolbar .combo-input:focus {
+  border-color: var(--c-lime-68b);
+  box-shadow: none;
+  outline: 2px solid color-mix(in srgb, var(--c-lime-67) 20%, transparent);
+}
+.badge-category-select > .combo { flex: 1; width: auto; max-width: none; min-width: 0; }
+.badge-category-select .combo-input {
+  border: 1px solid var(--border-grey);
+  border-radius: var(--radius-md);
+  padding: 0.3rem 1.9rem 0.3rem var(--sp-3);
+  background: var(--surface-bright);
+  color: var(--c-sand-35);
+  font: inherit;
+  box-shadow: none;
+}
+.badge-category-select .combo-input:focus { border-color: var(--c-lime-68b); box-shadow: 0 0 0 2px color-mix(in srgb, var(--c-lime-67) 20%, transparent); }
 /* A street found with the Map's search flashes (MapHub.as alert()). */
 .map-street.is-found .map-seg { animation: map-found 0.55s ease-in-out 6 alternate; }
 @keyframes map-found { to { stroke: var(--c-white); stroke-width: 11; } }

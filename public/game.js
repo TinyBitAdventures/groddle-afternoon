@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=fe2bbd71';
 import { createFeatureHost } from './js/feature-host.js?v=e4f648b1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=92f285e8';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=2e2d873e';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -387,7 +387,7 @@ import {
   recordStreetEntry,
   streetLoadingVisit,
 } from './js/exploration.js?v=19c6758f';
-import { createCombobox } from './js/combobox.js?v=2e9bfa90';
+import { createCombobox, createSuggestBox, watchSelects } from './js/combobox.js?v=31679d26';
 import {
   INCANTATION_LINES,
   INCANTATION_FEAT_TITLE,
@@ -1884,6 +1884,10 @@ let currentStreet = null;
 const cameraLook = { x: 0, y: 0 };
 /** Map panel region picker (js/combobox.js), built on first open. */
 let hubCombobox = null;
+// SEATSELECT (Austin 2026-11-02: "swap all normal selects with the new autocomplete UI"): every
+// select in the game, the page's own and each one a panel adds later, is fronted by the game's
+// combobox (js/combobox.js watchSelects): no OS menu anywhere. tests/game-selects.test.js.
+if (typeof document !== 'undefined' && document.body) watchSelects(document.body);
 /** @type {any[]|null} */
 let streetPlatforms = null;
 /** @type {{ id?:string, x:number, yTop:number, yBot:number, source?:string }[]} */
@@ -21241,8 +21245,7 @@ function renderPlayerMailCompose(reader, online, recipient = '', replyTo = null)
   reader.innerHTML = `
     <form id="mail-compose-form" class="mail-compose-form" data-player-mail-compose>
       <label>To
-        <input name="recipient" type="text" list="mail-buddy-names" autocomplete="off" maxlength="64" required placeholder="${escapeHtml(online.placeholder || '')}" value="${escapeHtml(recipient || reply?.sender || '')}" />
-        <datalist id="mail-buddy-names">${buddies.map((name) => `<option value="${escapeHtml(name)}"></option>`).join('')}</datalist>
+        <input name="recipient" type="text" autocomplete="off" maxlength="64" required placeholder="${escapeHtml(online.placeholder || '')}" value="${escapeHtml(recipient || reply?.sender || '')}" />
       </label>
       ${reply?.text ? `<blockquote class="mail-quote">${escapeHtml(reply.text)}</blockquote>` : ''}
       <label>Message
@@ -21275,6 +21278,9 @@ function renderPlayerMailCompose(reader, online, recipient = '', replyTo = null)
   `;
   const form = reader.querySelector('#mail-compose-form');
   themeMailPickers(form);
+  // SEATSELECT: To is any player's name, your buddies offered as you type (MailComposeUI.as
+  // 384-411), in the game's own list rather than the browser's suggestion menu.
+  createSuggestBox(form.querySelector('input[name="recipient"]'), { suggestions: buddies, label: 'Send to', className: 'combo-form', minListWidth: 220 });
   const read = () => {
     const data = new FormData(form);
     const c = String(data.get('attachment') || '');
@@ -28804,7 +28810,7 @@ async function main() {
     },
   };
   if (new URLSearchParams(location.search).has('soundtest')) {
-    import('./js/sound-test.js?v=4cd81fbe').then((m) => m.openSoundTest({ document, playSound, board: () => audio.board, unmute: async () => {
+    import('./js/sound-test.js?v=cf280a8b').then((m) => m.openSoundTest({ document, playSound, board: () => audio.board, unmute: async () => {
       state.muted = false;
       if (audio.ctx?.state === 'suspended') {
         try { await audio.ctx.resume(); } catch (_) { /* opt-in */ }

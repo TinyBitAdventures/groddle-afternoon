@@ -361,3 +361,76 @@ body.builder-page > main.builder {
 @media (prefers-reduced-motion: reduce) {
   .builder-dialog { animation: none; }
 }
+
+/* The pickers (SEATSELECT, Austin 2026-11-02: "swap all normal selects with the new autocomplete
+   UI"): each select is fronted by the game's combobox (js/combobox.js watchSelects), drawn here in
+   the builder's tokens; the select stays behind it as the value. */
+.combo-native { display: none !important; }
+.combo-builder { position: relative; display: inline-block; width: calc(var(--combo-longest, 12) * .58em + 2.4rem); max-width: 100%; min-width: 0; vertical-align: middle; }
+.combo-builder[hidden] { display: none; }
+.builder-bar .combo-builder { max-width: 16rem; }
+.builder-field .combo-builder, .builder-form .combo-builder { width: 100%; }
+.combo-builder .combo-input {
+  width: 100%;
+  box-sizing: border-box;
+  font: inherit;
+  font-size: .9em;
+  color: var(--fg);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  padding: .3rem 1.8rem .3rem .45rem;
+  min-width: 0;
+  text-overflow: ellipsis;
+}
+.combo-builder .combo-input:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.combo-builder .combo-input::placeholder { color: var(--muted); }
+.combo-builder.is-disabled { opacity: .55; }
+.combo-builder.is-disabled :is(.combo-input, .combo-toggle) { cursor: not-allowed; }
+.combo-builder .combo-toggle {
+  position: absolute;
+  top: 50%;
+  right: .3rem;
+  transform: translateY(-50%);
+  display: grid;
+  place-items: center;
+  width: 1.3rem;
+  height: 1.3rem;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+}
+.combo-builder .combo-toggle:hover { background: var(--track); }
+.combo-builder.is-open .combo-toggle svg { transform: rotate(180deg); }
+.combo-builder .combo-list {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  max-height: min(19rem, 55vh);
+  overflow-y: auto;
+  margin: 0;
+  padding: .25rem;
+  list-style: none;
+  color: var(--fg);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  box-shadow: 0 8px 22px color-mix(in srgb, var(--fg) 18%, transparent);
+  text-align: left;
+  font-size: .9em;
+}
+.combo-builder .combo-list[hidden] { display: none; }
+.combo-builder .combo-list[popover] { inset: auto; margin: 0; }
+.combo-builder.is-above .combo-list:not([popover]) { top: auto; bottom: calc(100% + 4px); }
+.combo-builder .combo-option { display: flex; align-items: baseline; gap: .4rem; padding: .25rem .45rem; border-radius: 6px; cursor: pointer; }
+.combo-builder .combo-option.is-active { background: var(--track); }
+.combo-builder .combo-option.is-current { font-weight: 700; }
+.combo-builder .combo-option.is-current::before { content: ''; flex: none; align-self: center; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+.combo-builder .combo-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.combo-builder .combo-name mark { background: color-mix(in srgb, var(--accent) 25%, transparent); color: inherit; border-radius: 2px; }
+.combo-builder .combo-count { flex: none; font-size: .85em; color: var(--muted); }
+.combo-builder .combo-empty { padding: .3rem .45rem; color: var(--muted); font-style: italic; }

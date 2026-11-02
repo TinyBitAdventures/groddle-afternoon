@@ -52,10 +52,10 @@ import { textureFromUrl } from '../textures.js?v=db2ce452';
 import { signArmWidth, signLabel } from '../street-render.js?v=aa2eadc7';
 import { openNotePicker, openNoteView } from '../note-view.js?v=21c55475';
 import { homeStreetName, possessive, readVisitScene } from '../neighbours-mp.js?v=a8d5544e';
-import { BACK_YARD_GROUND_Y, STREET_GROUND_Y, homesFeature, visitorHomeState } from './homes-feature.js?v=9189236b';
-import { projectApi } from './street-jobs-feature.js?v=49e239a6';
+import { BACK_YARD_GROUND_Y, STREET_GROUND_Y, homesFeature, visitorHomeState } from './homes-feature.js?v=43ab9e34';
+import { projectApi } from './street-jobs-feature.js?v=805a7789';
 import { saveStore } from '../save-store.js?v=8839ba7b';
-import { giveCarriedNote, takeCarriedNote, writtenCarriedNotes } from './street-furniture-feature.js?v=2c3ba4d2';
+import { giveCarriedNote, takeCarriedNote, writtenCarriedNotes } from './street-furniture-feature.js?v=73818316';
 import {
   GOOD_NEIGHBOUR_AT,
   GOOD_NEIGHBOUR_COUNTER,
@@ -112,8 +112,8 @@ const STYLE = `
 .hs-panel h2 { margin: 0 0 var(--sp-5); font-size: var(--fs-xl); }
 .hs-panel p { margin: var(--sp-3) 0; }
 .hs-panel .hs-close { float: right; border: 0; padding: 0.2rem 0.55rem; color: var(--c-sand-28); background: transparent; font-size: var(--fs-2xl); line-height: var(--lh-none); cursor: pointer; }
-.hs-panel ul { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--sp-3); }
-.hs-panel li { display: flex; flex-wrap: wrap; align-items: center; gap: 0.3rem var(--sp-5); padding: 0.45rem var(--sp-5); border-radius: var(--radius-md); background: var(--surface-parchment); }
+.hs-panel ul:not(.combo-list) { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--sp-3); }
+.hs-panel li:not(.combo-option, .combo-empty) { display: flex; flex-wrap: wrap; align-items: center; gap: 0.3rem var(--sp-5); padding: 0.45rem var(--sp-5); border-radius: var(--radius-md); background: var(--surface-parchment); }
 .hs-panel li .hs-what { flex: 1 1 10rem; }
 .hs-panel li .hs-what.is-empty { opacity: 0.7; font-style: italic; }
 .hs-panel button.hs-act { font: inherit; font-weight: 700; border: 0; border-radius: var(--radius-md); padding: 0.3rem var(--sp-5); cursor: pointer; color: var(--text-moss); background: var(--surface-moss); box-shadow: inset 0 0 0 2px var(--c-lime-85); }
@@ -122,6 +122,8 @@ const STYLE = `
 .hs-panel .hs-note { min-height: 1.4em; margin-top: var(--sp-5); font-weight: 600; color: var(--text-danger); }
 .hs-panel label { display: grid; gap: 0.2rem; margin: var(--sp-3) 0; font-weight: 600; }
 .hs-panel input, .hs-panel select { font: inherit; padding: 0.3rem 0.45rem; border-radius: var(--radius-md); border: 2px solid var(--c-sand-86); background: var(--surface-bright); color: var(--c-sand-28); }
+.hs-panel .combo { width: 100%; max-width: none; }
+.hs-panel .combo-input { padding-right: 1.9rem; box-shadow: none; }
 .hs-panel .hs-price { display: flex; align-items: center; gap: var(--sp-3); }
 .hs-panel .hs-price input { width: 8rem; }
 `;

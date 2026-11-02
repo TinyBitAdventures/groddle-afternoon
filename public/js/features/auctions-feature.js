@@ -85,7 +85,10 @@ const STYLE = `
 .auc-body { overflow-y: auto; padding: var(--sp-5) var(--sp-7) 0.8rem; flex: 1; }
 .auc-tools { display: flex; gap: var(--sp-3); flex-wrap: wrap; align-items: center; margin-bottom: 0.45rem; }
 .auc-tools input[type="search"] { flex: 1 1 12rem; min-width: 0; font: var(--fs-md) var(--font-system); padding: var(--sp-3) var(--sp-5); border-radius: var(--radius-pill); border: 0; box-shadow: inset 0 0 0 1px var(--c-mauve-85); background: var(--surface-bright); }
-.auc-tools select { font: var(--fs-sm) var(--font-system); padding: 0.32rem var(--sp-3); border-radius: var(--radius-md); border: 0; box-shadow: inset 0 0 0 1px var(--c-mauve-85); background: var(--surface-bright); max-width: 100%; }
+.auc-tools :is(select, .combo-input) { font: var(--fs-sm) var(--font-system); padding: 0.32rem var(--sp-3); border-radius: var(--radius-md); border: 0; box-shadow: inset 0 0 0 1px var(--c-mauve-85); background: var(--surface-bright); max-width: 100%; }
+.auc-tools .combo { width: calc(var(--combo-longest, 12) * 0.6em + 2.6rem); max-width: 100%; flex: none; }
+.auc-tools .combo-input { padding-right: 1.9rem; color: inherit; }
+.auc-tools .combo-input:focus { box-shadow: inset 0 0 0 1px var(--c-mauve-85), 0 0 0 2px color-mix(in srgb, var(--c-mauve-85) 60%, transparent); }
 .auc-hint { color: var(--text-subtle); font-size: var(--fs-xs); margin: 0 0 var(--sp-3); }
 .auc-chips { display: flex; gap: 0.3rem; flex-wrap: wrap; margin-bottom: var(--sp-3); }
 .auc-chip { display: inline-flex; gap: 0.3rem; align-items: center; font: 600 var(--fs-xs)/var(--lh-tight) var(--font-system); border-radius: var(--radius-pill); padding: 0.2rem 0.3rem 0.2rem var(--sp-5); background: var(--c-violet-50); color: var(--text-inverse); }
