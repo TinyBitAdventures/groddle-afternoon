@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=9ac37cff';
 import { createFeatureHost } from './js/feature-host.js?v=e4f648b1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=0b583184';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=d283a947';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -10900,6 +10900,8 @@ const engine = {
   /** What the player is at now: the target of the verb in progress, else of the open verb menu. */
   interactionTarget: () => currentAction?.target || menuTarget || null,
   questDialogueOpen: () => isQuestDialogueOpen(),
+  /** Ticket 39: an offer with this title is waiting to show (held behind a screen, a menu or the start card). */
+  questOfferHeld: (title) => heldScriptedDialogs.some((held) => held?.offer && held.title === title),
   /** Ticket 21: when the player last dismissed an emergency card (Escape or its X); features wait for another street before showing it again. */
   questDialogueDismissedAt: () => urgentDismissedAt,
   /** True while a feature holds the Magic Rock quiet (rook attack, Naraka, meditation). */
@@ -23381,6 +23383,13 @@ function holdScriptedDialog(opts) {
   const underEmergency = !opts?.offer && isQuestDialogueOpen() && questDialogueState?.urgent === true;
   // STARTCARD: and anything raised while the start card is up waits for the player to start.
   if (!opts || !(startHeld() || menuTarget || enterChooser?.isOpen() || underEmergency || familiarWaitsForScreen(opts))) return false;
+  // Ticket 39: the same offer asked again while it waits takes the waiting one's place, never a
+  // second card (Bellzebooze queued once a frame through a screen's fade, ~19 copies to click through).
+  const same = opts.offer ? heldScriptedDialogs.findIndex((held) => held?.offer && held.title === opts.title) : -1;
+  if (same >= 0) {
+    heldScriptedDialogs[same] = opts;
+    return true;
+  }
   heldScriptedDialogs.push(opts);
   if (app?.canvas) app.canvas.dataset.dialogHeld = String(heldScriptedDialogs.length);
   return true;

@@ -121,7 +121,7 @@ function presentOffer(engine, id, text) {
   if (hellQuestStatus(qs, id) !== 'none') return false;
   ensureQuestOfferState(qs);
   markOffered(qs, id, Date.now());
-  offerOpen = { id, text };
+  offerOpen = { id, text, title: def.title };
   offerShownAt = Date.now();
   engine.setData('hellTicketOffer', id);
   engine.playSound?.('QUEST_OFFER', { volume: 0.55 });
@@ -347,7 +347,8 @@ export const hellTicketsFeature = {
     // A fresh croak: roll its grave visit once.
     if (hs.isDead && hs.visitId !== state.plannedVisitId) planVisit(engine, hs, now);
     // G255: our emergency offer closed unanswered (another dialog took the screen): show it again.
-    if (offerOpen && !engine.questDialogueOpen()) {
+    // Ticket 39: one the game is holding (a screen fading out) has not closed: it shows when the screen goes.
+    if (offerOpen && !engine.questDialogueOpen() && !engine.questOfferHeld?.(offerOpen.title)) {
       engine.setData('hellTicketOfferResult', 'waiting');
       // Ticket 21: dismissed by the player, it waits for another street (or a minute) instead of the next tick.
       if (offerShownAt && (engine.questDialogueDismissedAt?.() || 0) >= offerShownAt) {
