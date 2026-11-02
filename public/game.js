@@ -413,7 +413,7 @@ import {
   canLearnSkill,
   listLearnedSkills,
 } from './js/skills.js?v=4542bdf9';
-import { skillTitle, spendEmblemForSkill, studyPillName } from './js/skill-tree.js?v=17787a09';
+import { skillTitle, skillTreeCounts, spendEmblemForSkill, studyPillName } from './js/skill-tree.js?v=17787a09';
 import { CARD_ART_LAYERS } from './js/imagination-data.js?v=4a85e7fe';
 import { renderSkillTreePanel, focusSkillInPanel } from './js/skills-panel.js?v=f036186a';
 import {
@@ -24317,7 +24317,7 @@ function updateSkillChrome(now = Date.now()) {
     button.textContent = 'Skills';
     button.title = 'Skills (K)';
     button.classList.remove('is-studying');
-    if (chip) chip.hidden = true;
+    if (chip) paintIdleSkillChip(chip, availableSkillCount(now));
     return;
   }
   const def = getSkillCatalog()[active.classTsid];
@@ -24327,6 +24327,33 @@ function updateSkillChrome(now = Date.now()) {
   button.title = `${name}: ${remaining} remaining`;
   button.classList.add('is-studying');
   if (chip) paintStudyChip(chip, active.classTsid, name, remaining);
+}
+
+/** How many skills can be learned now (the Skills panel's "ready"), counted at most every 5 s. */
+let idleSkillCount = { at: 0, n: 0 };
+function availableSkillCount(now = Date.now()) {
+  if (now - idleSkillCount.at < 5000) return idleSkillCount.n;
+  const ctx = { ...skillStudyContext(), unlearning: features.query('skillUnlearning', engine) };
+  idleSkillCount = { at: now, n: skillTreeCounts(skillState, ctx, now).available };
+  return idleSkillCount.n;
+}
+
+/**
+ * Ticket 39 (2026-11-02): with nothing being learned the pill says how many skills are ready,
+ * in the original's own words: the iMG menu's Skills cloud read "N available"
+ * (ImgMenuSkills.as 150). The 2012 HUD's skill book showed only while learning
+ * (PlayerSkillBookUI.as 58-69), so with none ready the pill stays hidden.
+ */
+function paintIdleSkillChip(chip, n) {
+  if (!(n > 0)) {
+    chip.hidden = true;
+    return;
+  }
+  paintStudyChip(chip, '', 'Skills', `${n} available`);
+  chip.dataset.sub = `${n} ${n === 1 ? 'skill' : 'skills'} you can learn now`;
+  delete chip.dataset.tipIcon;
+  chip.querySelector('.study-chip-card small').textContent = chip.dataset.sub;
+  chip.setAttribute('aria-label', `Not learning a skill. ${n} available. Open Skills`);
 }
 
 /**
@@ -24348,10 +24375,15 @@ function paintStudyChip(chip, classTsid, name, remaining) {
   }
   const card = chip.querySelector('.study-chip-card');
   label.firstChild.textContent = studyPillName(name);
-  label.lastChild.textContent = ` · ${remaining}`;
+  // A no-break space: a plain one collapses at the start of the inline time ("Skills· 16 available").
+  label.lastChild.textContent = ` · ${remaining}`;
   if (chip.dataset.skill !== classTsid) {
     chip.dataset.skill = classTsid;
-    card.querySelector('.study-chip-icon').src = skillArtFor(classTsid, CARD_ART_LAYERS);
+    const icon = card.querySelector('.study-chip-icon');
+    // The idle pill (paintIdleSkillChip) has no skill, so no picture.
+    icon.hidden = !classTsid;
+    if (classTsid) icon.src = skillArtFor(classTsid, CARD_ART_LAYERS);
+    else icon.removeAttribute('src');
     card.querySelector('strong').textContent = name;
   }
   card.querySelector('small').textContent = `${remaining} left`;

@@ -119,7 +119,7 @@ describe('skill study client wiring', () => {
     const game = readFileSync(join(root, 'game.js'), 'utf8');
     const fn = game.slice(game.indexOf('function paintStudyChip'), game.indexOf('function openSkillsPanel'));
     assert.match(fn, /label\.firstChild\.textContent = studyPillName\(name\);/);
-    assert.match(fn, /label\.lastChild\.textContent = ` · \$\{remaining\}`;/);
+    assert.match(fn, /label\.lastChild\.textContent = `\u00a0· \$\{remaining\}`;/);
     assert.match(fn, /skillArtFor\(classTsid, CARD_ART_LAYERS\)/);
     assert.match(fn, /chip\.dataset\.tipIcon = /, 'Modern: the bar tooltip shows the icon');
     assert.match(fn, /chip\.dataset\.sub = `\$\{remaining\} left`;/, 'the tooltip\'s time follows the clock');
@@ -210,3 +210,15 @@ describe('the imagination shop rescales on a Brain Capacity purchase', () => {
     assert.match(feature, /rescaleStudiesForLearningModifier\(\{ queue \}, percent, Date\.now\(\)\)/);
   });
 });
+
+describe('the idle skill pill (ticket 39)', () => {
+  it('says how many skills are ready, in the Skills cloud\'s words, and hides with none', () => {
+    const game = readFileSync(join(root, 'game.js'), 'utf8');
+    assert.match(game, /if \(chip\) paintIdleSkillChip\(chip, availableSkillCount\(now\)\);/);
+    const fn = game.slice(game.indexOf('function paintIdleSkillChip('), game.indexOf('function paintStudyChip('));
+    assert.match(fn, /if \(!\(n > 0\)\) \{\n\s*chip\.hidden = true;/);
+    assert.match(fn, /paintStudyChip\(chip, '', 'Skills', `\$\{n\} available`\);/);
+    assert.match(game, /skillTreeCounts\(skillState, ctx, now\)\.available/);
+  });
+});
+
