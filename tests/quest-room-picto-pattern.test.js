@@ -13,7 +13,7 @@ import { homedir } from 'node:os';
 import {
   PICTO_FACTS,
   PUZZLES,
-  ROOM_MS,
+  EXIT_PROMPT_MS,
   TARGET,
   applyOps,
   chainPlatforms,
@@ -25,7 +25,7 @@ import {
   room,
   solutionsFor,
   tallyStrokes,
-} from '../public/js/quest-rooms/picto-pattern.js?v=4f01a1d1';
+} from '../public/js/quest-rooms/picto-pattern.js?v=794ab217';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const GSJS = join(homedir(), 'Documents/glitch-audit/glitch-GameServerJS/quests/picto_pattern.js');
@@ -34,11 +34,13 @@ const { FLOOR, JUMP_RISE, JUMP_GAP, CLOUD_W } = PICTO_FACTS;
 const BAND = 160;
 
 describe('Picto-Pattern (picto_pattern) source', () => {
-  it('keeps the quest timer, target and flags', () => {
+  it('keeps the exit delay as a prompt, the target and flags', () => {
     assert.equal(TARGET, 11);
-    assert.equal(ROOM_MS, 300_000);
+    assert.equal(EXIT_PROMPT_MS, 300_000);
     assert.equal(room.id, 'picto_pattern');
-    assert.equal(room.durationMs, ROOM_MS);
+    assert.equal(room.durationMs, 0);
+    assert.equal(room.exitPromptMs, EXIT_PROMPT_MS);
+    assert.equal(room.expireText, undefined);
     assert.deepEqual(room.onLeave(), { leaveFlag: 'leave' });
     if (!existsSync(GSJS)) return;
     const src = readFileSync(GSJS, 'utf8');
@@ -150,7 +152,7 @@ describe('Picto Pattern felt look (G76, players Snaps)', () => {
     const { fileURLToPath } = await import('node:url');
     const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
     const { PICTO_PATTERN_FILES } = await import('../public/js/picto-pattern-art.js?v=72120af4');
-    const mod = await import('../public/js/quest-rooms/picto-pattern.js?v=4f01a1d1');
+    const mod = await import('../public/js/quest-rooms/picto-pattern.js?v=794ab217');
     const plan = JSON.parse(readFileSync(join(spike, 'tools/room-art/picto_pattern.json'), 'utf8'));
     assert.match(plan.source, /glitch-locations meomi2\.swf, wardrobia\.swf \(CC0\)/);
     const names = [mod.FELT.question, mod.FELT.cloud, ...mod.FELT.ground];

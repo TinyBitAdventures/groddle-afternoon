@@ -25,7 +25,7 @@ import {
   setRunFlag,
   solveQuestInstance,
   stepQuestInstance,
-} from '../public/js/quest-instance.js?v=5599c44c';
+} from '../public/js/quest-instance.js?v=f0df88c3';
 import {
   BUILT_ROOMS,
   OFFER_OVERRIDES,
@@ -203,7 +203,7 @@ describe('The High Jumper (top_of_tree)', () => {
 
 describe('Color Unblocking (color_unblocking)', () => {
   it('opens a path with the four solution switches and keeps the orange bridge', async () => {
-    const mod = await import('../public/js/quest-rooms/color-unblocking.js?v=31d09442');
+    const mod = await import('../public/js/quest-rooms/color-unblocking.js?v=f0931177');
     const layout = mod.colorLayout();
     const on = mod.colorsAfter(layout.solution);
     for (const color of ['red', 'blue', 'green', 'purple']) assert.ok(!on.has(color), `${color} cleared`);
@@ -220,7 +220,7 @@ describe('Color Unblocking (color_unblocking)', () => {
 
 describe('Vision Quest (vision_quest)', () => {
   it('uses the archived Institute street and the six source objects', async () => {
-    const mod = await import('../public/js/quest-rooms/vision-quest.js?v=2e8a7a19');
+    const mod = await import('../public/js/quest-rooms/vision-quest.js?v=d9423ecf');
     assert.equal(mod.STREET, 'GNV1T7PCUM53T25');
     assert.deepEqual(Object.keys(mod.OBJECTS).sort(), ['lemburger', 'npc_crab', 'npc_piggy', 'pumpkin', 'rock_sparkly_1', 'trant_fruit']);
     assert.equal(mod.WRONG_THINGS.length, 7);
@@ -246,7 +246,7 @@ describe("Mr. Block's playroom (kids_room)", () => {
 
 describe('The Wrizzards and The Rube (rube_yard)', () => {
   it('hides ten Wrizzards where the camera and room card leave them visible', async () => {
-    const mod = await import('../public/js/quest-rooms/rube-yard.js?v=6186a47e');
+    const mod = await import('../public/js/quest-rooms/rube-yard.js?v=83abd456');
     assert.equal(mod.WRIZZARDS_NEEDED, 10);
     assert.equal(mod.HIDING_SPOTS.length, 10);
     assert.equal(new Set(mod.HIDING_SPOTS.map((s) => s.id)).size, 10);
@@ -275,7 +275,7 @@ describe('Le Misérable (le_miserable)', () => {
   const STEP_BY_TINT = { 16777024: 1, 16750144: 2, 10436052: 3, 3394764: 4 };
 
   async function setup() {
-    const mod = await import('../public/js/quest-rooms/le-miserable.js?v=3d0bf608');
+    const mod = await import('../public/js/quest-rooms/le-miserable.js?v=04e30bda');
     const ev = await import('../public/js/location-events.js?v=61e0c5d3');
     const { readFileSync } = await import('node:fs');
     const street = JSON.parse(readFileSync(streetFile, 'utf8'));
@@ -300,9 +300,10 @@ describe('Le Misérable (le_miserable)', () => {
     return mod.PANELS.map((panel) => panel.slots.map((x) => squares.find((s) => Math.abs(s.x - x) < 3)?.step));
   }
 
-  it('keeps the source 5-minute run, rebuilt pads under every column and the crawl walls', async () => {
+  it('keeps the source 5-minute exit prompt, rebuilt pads under every column and the crawl walls', async () => {
     const { mod, street } = await setup();
-    assert.equal(mod.room.durationMs, 300_000);
+    assert.equal(mod.room.durationMs, 0);
+    assert.equal(mod.room.exitPromptMs, 300_000);
     assert.equal(mod.room.streetEvents, true);
     const pads = street.layers.flatMap((l) => l.decos || []).filter((d) => d.sprite === 'circle_cutout_04_arbito1');
     for (const panel of mod.PANELS) for (const x of panel.slots) assert.ok(pads.some((p) => Math.abs(p.x - x) < 3 && p.y === -407), `pad at ${x}`);
@@ -388,7 +389,7 @@ describe('G311: a failed room quest is Try again in the quest log', () => {
   };
 
   it('a run lost to a reload marks a startable quest failed, not a retry prompt', async () => {
-    const { questInstancesFeature } = await import('../public/js/features/quest-instances-feature.js?v=bd2bf3da');
+    const { questInstancesFeature } = await import('../public/js/features/quest-instances-feature.js?v=f29c62bb');
     const { ensureQuestOfferState } = await import('../public/js/quest-offers.js?v=3c7925ca');
     assert.equal(getQuestCatalog().mental_block?.needsStart, true);
     assert.notEqual(getQuestCatalog().help_juju_bandits?.needsStart, true, 'no onStarted in GSJS');
@@ -452,7 +453,7 @@ describe('G313: failed room quests the source removes', () => {
   });
 
   it('a reload removes a source-removed quest and its offers, and keeps the prompt for the three', async () => {
-    const { questInstancesFeature } = await import('../public/js/features/quest-instances-feature.js?v=bd2bf3da');
+    const { questInstancesFeature } = await import('../public/js/features/quest-instances-feature.js?v=f29c62bb');
     const { questStatus } = await import('../public/js/quest-offers.js?v=3c7925ca');
     const t = Date.now() - 60_000;
     questInstancesFeature.restore({ memory: {}, retry: { tower_quest: t, le_miserable_part_2: t, smuggle_the_smuggler_part2: t } });
@@ -480,7 +481,7 @@ describe('G313: failed room quests the source removes', () => {
   });
 
   it('has no map card', async () => {
-    const { questInstancesFeature } = await import('../public/js/features/quest-instances-feature.js?v=bd2bf3da');
+    const { questInstancesFeature } = await import('../public/js/features/quest-instances-feature.js?v=f29c62bb');
     assert.equal(questInstancesFeature.mapCards, undefined);
     const src = readFileSync(join(root, 'public/js/features/quest-instances-feature.js'), 'utf8');
     assert.doesNotMatch(src, /Unfinished quest places/);

@@ -224,7 +224,9 @@ export const room = {
   theme: 'warm',
   // G315: hub 135 'Puzzles' (inc_data_maps_prod.js 1197), the template's hub.
   hubName: 'Puzzles',
-  durationMs: 5 * 60 * 1000,
+  // quests/puzzle_level_color_blockage.js onStarted 107-110 (and _rem 109-112): questInstanceLocation(..., 5*60): the exit delay is the "Are you stuck?" prompt (players/inc_instances.js 317-357), not a clock.
+  durationMs: 0,
+  exitPromptMs: 5 * 60 * 1000,
   leaveText: 'Leave before you find the exit? You will have to start over.',
   travelText: 'Find the exit, or use Leave.',
 

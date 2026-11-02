@@ -46,8 +46,11 @@ const FLOOR = 620;
 
 // source: quests/picto_pattern.js desc "Add and subtract until you reach 11."
 export const TARGET = 11;
-// source: onStarted questInstanceLocation(pc, 'picto_pattern', 0, 0, 5*60, ...)
-export const ROOM_MS = 5 * 60 * 1000;
+/**
+ * source: quests/picto_pattern.js onStarted 96: questInstanceLocation(pc, 'picto_pattern', 0, 0, 5*60, ...). That exit delay is the "Are you stuck?" prompt
+ * (players/inc_instances.js 317-357), not a clock: the room stays open until you leave.
+ */
+export const EXIT_PROMPT_MS = 5 * 60 * 1000;
 
 /** The three stations, as played in the designer's footage. */
 export const PUZZLES = Object.freeze([
@@ -269,10 +272,10 @@ export const room = {
   icon: 'assets/sprites/icons/cloud_11_smoothie.png',
   theme: 'lab',
   hubName: 'Picto Pattern',
-  durationMs: ROOM_MS,
+  durationMs: 0,
+  exitPromptMs: EXIT_PROMPT_MS, // "Are you stuck?" after 5 * 60 (runtime maybeAskStuck)
   leaveText: 'Leave before the puzzle is solved? You will have to start over.',
   travelText: 'Solve the clouds and find the exit, or use Leave.',
-  expireText: 'Time is up!',
 
   build(ctx) {
     const { PIXI, kit } = ctx;

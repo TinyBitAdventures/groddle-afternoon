@@ -458,7 +458,7 @@ export const room = {
     }
     if (ctx.data.sinking && p) p.alpha = Math.max(0, (p.alpha ?? 1) - dtMs / 600);
     // exit_delay 2*60: instances_show_exit_prompt, once.
-    if (!ctx.data.promptShown && Date.now() - ctx.data.enteredAt >= EXIT_PROMPT_MS && !ctx.dialogOpen() && !ctx.engine.acting() && !ctx.data.crawling) {
+    if (!ctx.data.promptShown && Date.now() - ctx.data.enteredAt >= (ctx.stuckPromptMs?.(EXIT_PROMPT_MS) ?? EXIT_PROMPT_MS) && !ctx.dialogOpen() && !ctx.engine.acting() && !ctx.data.crawling) {
       ctx.data.promptShown = true;
       // inc_instances.js 322-339: a prompts_add prompt, not a familiar conversation (G225);
       // G304: icon_buttons, no timeout, not modal, so the bottom-right prompt stack.

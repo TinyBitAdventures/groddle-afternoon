@@ -685,7 +685,7 @@ export const room = {
     }
     ctx.data.phase = 'play';
     ctx.data.startedAt = Date.now();
-    ctx.data.promptAt = Date.now() + EXIT_PROMPT_MS;
+    ctx.data.promptAt = Date.now() + (ctx.stuckPromptMs?.(EXIT_PROMPT_MS) ?? EXIT_PROMPT_MS);
     ctx.data.prevX = geo.spawn.x;
     ctx.data.state = geo.sections.map((s) => ({
       cols: s.positions.map(() => []),
@@ -1400,7 +1400,7 @@ function maybePromptStuck(ctx, now) {
   }).then((choice) => {
     ctx.data.prompting = false;
     if (choice === 'yes') ctx.leave({ transition: ctx.fx() });
-    else ctx.data.promptAt = Date.now() + PROMPT_AGAIN_MS;
+    else ctx.data.promptAt = Date.now() + (ctx.stuckPromptMs?.(PROMPT_AGAIN_MS) ?? PROMPT_AGAIN_MS);
   });
 }
 

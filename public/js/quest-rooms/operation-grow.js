@@ -45,7 +45,11 @@ export const CEILING = 650;
 export const TUNNEL = 880;
 export const TUNNEL_X1 = 120;
 export const TUNNEL_X2 = 2420;
-export const EXIT_MS = 5 * 60 * 1000; // source: questInstanceLocation(..., 5*60)
+/**
+ * source: quests/where_the_blue_grew.js onStarted 97: questInstanceLocation(..., 5*60, ...). That exit delay is the "Are you stuck?" prompt
+ * (players/inc_instances.js 317-357), not a clock: the room stays open until you leave.
+ */
+export const EXIT_PROMPT_MS = 5 * 60 * 1000;
 export const PATCHES = 7;
 export const PATCH_X0 = 660;
 export const PATCH_DX = 185;
@@ -162,7 +166,8 @@ export const room = {
   icon: 'assets/sprites/icons/icon_mab@3x.png',
   theme: 'dark',
   hubName: 'The forgotten bog fields',
-  durationMs: EXIT_MS,
+  durationMs: 0,
+  exitPromptMs: EXIT_PROMPT_MS, // "Are you stuck?" after 5 * 60 (runtime maybeAskStuck)
   leaveText: 'Leave the bog fields still gloomy? The quest will fail.',
   travelText: 'Brighten the field, then climb down to the root tunnel and its EXIT.',
 

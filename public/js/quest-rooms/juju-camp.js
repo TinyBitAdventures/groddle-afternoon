@@ -118,7 +118,11 @@ export const HUBS = Object.freeze(Object.keys(HINTS));
 export const CLUES = 3; // r357 solve_clue num 3
 export const DIG_MARGIN = 100; // callback_juju_dig: box +-100 px
 export const OPEN_HINT_MS = 1500; // doDig: apiSetTimer('openHint', 1500)
-export const CAMP_MS = 5 * 60 * 1000; // questInstanceLocation(..., 5 * 60)
+/**
+ * source: quests/help_juju_bandits.js onAccepted 367 (and _2 onStarted 88): questInstanceLocation(..., 'juju_camp', -839, -98, 5 * 60). That exit delay is the "Are you stuck?" prompt
+ * (players/inc_instances.js 317-357), not a clock: the room stays open until you leave.
+ */
+export const EXIT_PROMPT_MS = 5 * 60 * 1000;
 
 export const TEXT = Object.freeze({
   digHere: 'Seems like this might be a good place to dig…',
@@ -515,6 +519,8 @@ async function giveItems(ctx) {
   ctx.data.givenItems = true;
   ctx.engine.save?.();
   ctx.solve(); // the quest now survives leaving (onExitLocation checks current_hint)
+  // offerCampExit (help_juju_bandits.js 324-337): instances_cancel_exit_prompt, then "All done here!".
+  ctx.cancelStuckPrompt?.();
   grandmaState(ctx, 'idle');
   schedule(ctx, 0, SCENE.restartMs);
   await openHint(ctx, h);
@@ -692,7 +698,8 @@ export const room = {
   icon: 'assets/sprites/icons/juju_paperweight.png',
   theme: 'warm',
   hubName: 'Secret Juju Bandit Hideout',
-  durationMs: CAMP_MS,
+  durationMs: 0,
+  exitPromptMs: EXIT_PROMPT_MS, // "Are you stuck?" after 5 * 60 (runtime maybeAskStuck)
   leaveText: 'Leave the hideout? Grandma has not given you anything yet, so you would have to start over.',
   travelText: 'The Juju Bandits are watching the paths. Use Leave to go back.',
   doneLabel: 'Leave',
@@ -771,11 +778,6 @@ export const room = {
     const near = nearGrandma(ctx);
     if (near && !ctx.data.wasNear && !ctx.data.talking && !busy(ctx)) bumpGrandma(ctx);
     ctx.data.wasNear = near;
-    // A solved camp still closes when the instance time runs out.
-    if (ctx.run?.status === 'solved' && ctx.remaining() <= 0 && !ctx.data.closing) {
-      ctx.data.closing = true;
-      ctx.leave({ transition: ctx.fx() });
-    }
   },
 
   objective(ctx) {

@@ -9,16 +9,17 @@ import { readFileSync, existsSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import * as mod from '../public/js/quest-rooms/operation-grow.js?v=232a0736';
+import * as mod from '../public/js/quest-rooms/operation-grow.js?v=86ec253e';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const GS = join(root, '../glitch-GameServerJS');
 
 describe('Operation: Grow source facts', () => {
-  it('keeps the 5-minute instance and the leave flag', () => {
+  it('keeps the 5-minute exit prompt and the leave flag', () => {
     assert.equal(mod.room.id, 'operation_grow');
-    assert.equal(mod.EXIT_MS, 5 * 60 * 1000);
-    assert.equal(mod.room.durationMs, mod.EXIT_MS);
+    assert.equal(mod.EXIT_PROMPT_MS, 5 * 60 * 1000);
+    assert.equal(mod.room.durationMs, 0);
+    assert.equal(mod.room.exitPromptMs, mod.EXIT_PROMPT_MS);
     assert.deepEqual(mod.room.onLeave(), { leaveFlag: 'leave' });
     const file = join(GS, 'quests/where_the_blue_grew.js');
     if (existsSync(file)) {

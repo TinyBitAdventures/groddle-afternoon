@@ -31,6 +31,9 @@
  *
  * Room module contract (all optional except id/title/build or street):
  *   { id, title, kicker, icon, theme, durationMs | durationFor(questId),
+ *     exitPromptMs | exitPromptFor(questId) (the source exit_delay: the
+ *       "Are you stuck?" prompt, see maybeAskStuck; a room using it has
+ *       durationMs 0), stuckPromptReady(ctx) -> false to hold the prompt back,
  *     firstStage, stageLabel(stage), loadingLabel(stage) (the loading card's line, else stageLabel),
  *     build(ctx, stage) -> { width, height, background, platforms, walls,
  *                            barriers, spawn: {x,y}, label, hubName }
@@ -52,13 +55,20 @@
  * (prereqs skipped) and enters its room; &questautoplay=1 (or a room mode)
  * plays it through; &questfx=0 skips the loading crossfade;
  * &questdemoflow=accept only accepts it, so the ordinary start hook enters the
- * room (the path a Magic Rock offer takes). Canvas data:
+ * room (the path a Magic Rock offer takes); &stuckpromptms=<ms> shortens the
+ * "Are you stuck?" waits (first and again) to see the prompt. Canvas data:
  * qiQuest, qiRoom, qiStage, qiStatus, qiRemaining, qiObjective, qiOutcome,
- * qiTurnedIn, qiRetry, qiRetryGiver, qiAutoplay, plus each room's own keys.
+ * qiTurnedIn, qiRetry, qiRetryGiver, qiAutoplay, qiStuckIn (seconds to the
+ * prompt), qiStuck (1 while it asks), plus each room's own keys.
  */
 
 import {
   LOW_TIME_MS,
+  STUCK_PROMPT_CHOICES,
+  STUCK_PROMPT_DEAD_MS,
+  STUCK_PROMPT_AGAIN_MS,
+  STUCK_PROMPT_TEXT,
+  answerStuckPrompt,
   changeInstanceStage,
   createQuestInstance,
   extendQuestInstance,
@@ -70,11 +80,13 @@ import {
   questSceneTsid,
   reloadTarget,
   runFlag,
+  scheduleStuckPrompt,
   setRunFlag,
   solveQuestInstance,
   stepQuestInstance,
+  stuckPromptDue,
   wayBackFrom,
-} from '../quest-instance.js?v=5599c44c';
+} from '../quest-instance.js?v=f0df88c3';
 import { FAMILIAR_GATES, QUEST_ROOMS, REMINISCE_ITEMS, ROOM_ITEMS, isBuiltRoom, questGiver, roomModulePath } from '../quest-rooms/catalog.js?v=9ebeb502';
 import * as kit from '../quest-rooms/kit.js?v=c7ea6e0e';
 import { locationEventsApi } from './location-events-feature.js?v=df2533e4';
@@ -144,26 +156,26 @@ let rubeTraded = false;
 const ROOM_MODULES = {
   rainbow_run: () => import('../quest-rooms/rainbow-run.js?v=ebc9b478'),
   top_of_tree: () => import('../quest-rooms/top-of-tree.js?v=58cdbd3b'),
-  color_unblocking: () => import('../quest-rooms/color-unblocking.js?v=31d09442'),
-  vision_quest: () => import('../quest-rooms/vision-quest.js?v=2e8a7a19'),
+  color_unblocking: () => import('../quest-rooms/color-unblocking.js?v=f0931177'),
+  vision_quest: () => import('../quest-rooms/vision-quest.js?v=d9423ecf'),
   kids_room: () => import('../quest-rooms/kids-room.js?v=304bcf00'),
-  rube_yard: () => import('../quest-rooms/rube-yard.js?v=6186a47e'),
-  le_miserable: () => import('../quest-rooms/le-miserable.js?v=3d0bf608'),
-  juju_camp: () => import('../quest-rooms/juju-camp.js?v=5bdc545c'),
-  picto_pattern: () => import('../quest-rooms/picto-pattern.js?v=4f01a1d1'),
-  radiant_glare: () => import('../quest-rooms/radiant-glare.js?v=2a265adb'),
-  an_autumn_day: () => import('../quest-rooms/an-autumn-day.js?v=bed1f7a5'),
+  rube_yard: () => import('../quest-rooms/rube-yard.js?v=83abd456'),
+  le_miserable: () => import('../quest-rooms/le-miserable.js?v=04e30bda'),
+  juju_camp: () => import('../quest-rooms/juju-camp.js?v=f1e7046e'),
+  picto_pattern: () => import('../quest-rooms/picto-pattern.js?v=794ab217'),
+  radiant_glare: () => import('../quest-rooms/radiant-glare.js?v=5f1c6a15'),
+  an_autumn_day: () => import('../quest-rooms/an-autumn-day.js?v=b9356fd3'),
   being_watched: () => import('../quest-rooms/being-watched.js?v=03352d7f'),
   back_alley: () => import('../quest-rooms/back-alley.js?v=bf6df2f1'),
-  clubhouse: () => import('../quest-rooms/clubhouse.js?v=ded4fde1'),
-  light_perspective: () => import('../quest-rooms/light-perspective.js?v=f6fb0621'),
-  tile_puzzle: () => import('../quest-rooms/tile-puzzle.js?v=9ba8f9cc'),
-  operation_grow: () => import('../quest-rooms/operation-grow.js?v=232a0736'),
-  gwendolyn: () => import('../quest-rooms/gwendolyn.js?v=e69272d1'),
-  mental_block: () => import('../quest-rooms/mental-block.js?v=67e96f95'),
-  penalty: () => import('../quest-rooms/penalty.js?v=67fee476'),
+  clubhouse: () => import('../quest-rooms/clubhouse.js?v=fb7ecac4'),
+  light_perspective: () => import('../quest-rooms/light-perspective.js?v=fae24f72'),
+  tile_puzzle: () => import('../quest-rooms/tile-puzzle.js?v=810fb412'),
+  operation_grow: () => import('../quest-rooms/operation-grow.js?v=86ec253e'),
+  gwendolyn: () => import('../quest-rooms/gwendolyn.js?v=9ae47063'),
+  mental_block: () => import('../quest-rooms/mental-block.js?v=5a727a5f'),
+  penalty: () => import('../quest-rooms/penalty.js?v=d2185a44'),
   esquibeth: () => import('../quest-rooms/esquibeth.js?v=eb39b25c'),
-  firefly_whistle: () => import('../quest-rooms/firefly-whistle.js?v=e0ed70f7'),
+  firefly_whistle: () => import('../quest-rooms/firefly-whistle.js?v=c0d7433b'),
 };
 
 function loadRoom(roomId) {
@@ -676,6 +688,12 @@ function makeContext(engine) {
     solve: () => (run ? solveQuestInstance(run) : false),
     extend: (ms) => (run ? extendQuestInstance(run, ms) : 0),
     remaining: () => (run ? instanceRemainingMs(run) : 0),
+    /** An "Are you stuck?" wait, or the QA &stuckpromptms= override (rooms with their own prompt). */
+    stuckPromptMs: (ms) => stuckPromptMs(engine, ms),
+    /** instances_schedule_exit_prompt: ask again `ms` from now (the QA override applies). */
+    scheduleStuckPrompt: (ms) => (run ? scheduleStuckPrompt(run, stuckPromptMs(engine, ms)) : 0),
+    /** instances_cancel_exit_prompt: no more "Are you stuck?" (and the open one goes). */
+    cancelStuckPrompt: () => cancelStuckPrompt(),
     /** Turn in now (quests that complete inside the room). */
     turnIn: (opts) => (run ? turnIn(engine, run.questId, opts) : Promise.resolve(false)),
     complete: () => (run ? requirementsMet(engine, run.questId) : false),
@@ -689,15 +707,16 @@ function makeContext(engine) {
      * (removed, or the room is torn down: instances_cancel_exit_prompt).
      */
     prompt(opts = {}) {
+      const { tag = '', ...shown } = opts;
       return new Promise((resolve) => {
         let uid = '';
         const done = (value) => {
           c.prompts = c.prompts.filter((p) => p.uid !== uid);
           resolve(value);
         };
-        uid = engine.prompt?.({ ...opts, onChoice: (value) => done(value ?? null) }) || '';
+        uid = engine.prompt?.({ ...shown, onChoice: (value) => done(value ?? null) }) || '';
         if (!uid) resolve(null);
-        else c.prompts.push({ uid, cancel: () => { engine.removePrompt?.(uid); done(null); } });
+        else c.prompts.push({ uid, tag, cancel: () => { engine.removePrompt?.(uid); done(null); } });
       });
     },
     advanceDialog,
@@ -940,10 +959,12 @@ async function startInstance(engine, questId, opts = {}) {
     // accepted, the Butler's offer at home included): the exit signpost brings you back there.
     const returnTo = wayBackFrom({ tsid: engine.streetTsid, x: engine.player?.x, y: engine.player?.y }, save.returnTo);
     const durationMs = typeof room.durationFor === 'function' ? room.durationFor(questId) : room.durationMs;
+    const exitPromptMs = typeof room.exitPromptFor === 'function' ? room.exitPromptFor(questId) : room.exitPromptMs;
     run = createQuestInstance({
       questId,
       roomId,
       durationMs: durationMs ?? undefined,
+      exitPromptMs: stuckPromptMs(engine, exitPromptMs),
       returnTo,
       stage: typeof room.firstStage === 'function' ? room.firstStage(questId) : room.firstStage || 'main',
       repeat: (save.memory[questId]?.completions || 0) > 0,
@@ -980,6 +1001,52 @@ async function gotoStage(engine, stage, opts = {}) {
   if (opts.transition === false) await work();
   else await withTransition(engine, label, room.theme, work);
   publish(engine, true);
+  return true;
+}
+
+/* ------------------------------------------------------------------ */
+/* "Are you stuck?" (the exit delay)                                    */
+/* ------------------------------------------------------------------ */
+
+/** A source exit-delay wait in ms; QA &stuckpromptms=<ms> replaces it. */
+function stuckPromptMs(engine, ms) {
+  const n = Math.max(0, Math.floor(Number(ms) || 0));
+  if (!n) return 0;
+  return Math.floor(Number(engine.param?.('stuckpromptms'))) || n;
+}
+
+/**
+ * players/inc_instances.js instances_show_exit_prompt 322-344 for a room with `exitPromptMs`
+ * (the exit_delay its quest passes to questInstanceLocation): the non-modal prompt-stack prompt
+ * (G304), once at a time. Yes, please leaves at once (instances_left with force: no "Leave
+ * anyway?"), which fails an unfinished quest as the Leave button does (onExitLocation); No thanks
+ * asks again two minutes later. It waits out a conversation or card the room has open, and a room
+ * may hold it back for a moment (stuckPromptReady). Leaving or a reload takes it away
+ * (instances_cancel_exit_prompt; clearContextEntities removes the room's prompts).
+ */
+function maybeAskStuck(engine, now = Date.now()) {
+  if (!stuckPromptDue(run, now)) return false;
+  if (engine.isDead?.()) {
+    scheduleStuckPrompt(run, STUCK_PROMPT_DEAD_MS, now);
+    return false;
+  }
+  if (ctx.data._leaving || dialogOpen() || ctx.cardOpen() || room?.stuckPromptReady?.(ctx) === false) return false;
+  const asked = run;
+  asked.stuckAsking = true;
+  engine.setData('qiStuck', '1');
+  ctx.prompt({ text: STUCK_PROMPT_TEXT, iconButtons: true, choices: STUCK_PROMPT_CHOICES.map((c) => ({ ...c })), tag: 'stuck' }).then((choice) => {
+    if (run !== asked) return;
+    const next = answerStuckPrompt(asked, choice, { againMs: stuckPromptMs(engine, STUCK_PROMPT_AGAIN_MS) });
+    engine.setData('qiStuck', '');
+    if (next === 'leave') leaveInstance(engine, { transition: engine.param('questfx') !== '0' });
+  });
+  return true;
+}
+
+function cancelStuckPrompt() {
+  if (!run) return false;
+  run.stuckAt = 0;
+  for (const p of [...(ctx?.prompts || [])]) if (p.tag === 'stuck') p.cancel();
   return true;
 }
 
@@ -1135,6 +1202,8 @@ function publish(engine, force = false) {
   engine.setData('qiStatus', run?.status || (engine.param('questdemo') ? 'idle' : ''));
   const remaining = run ? room?.clock?.(ctx) ?? instanceRemainingMs(run) : 0;
   engine.setData('qiRemaining', Number.isFinite(remaining) ? Math.round(remaining) : 'none');
+  engine.setData('qiStuckIn', run?.stuckAt ? String(Math.max(0, Math.round((run.stuckAt - now) / 1000))) : '');
+  engine.setData('qiStuck', run?.stuckAsking ? '1' : '');
   engine.setData('qiObjective', run && room ? room.objective?.(ctx)?.text || '' : '');
   engine.setData('qiRetry', Object.keys(save.retry).join(','));
   if (run && room?.publish) room.publish(ctx);
@@ -1458,7 +1527,10 @@ export const questInstancesFeature = {
         leaveInstance(engine);
         return;
       }
-      if (!ctx.data._awaitStreet) room.tick?.(ctx, dtMs, now);
+      if (!ctx.data._awaitStreet) {
+        room.tick?.(ctx, dtMs, now);
+        if (run && ctx) maybeAskStuck(engine, now);
+      }
       renderHud(engine);
       publish(engine);
       return;

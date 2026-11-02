@@ -9,7 +9,9 @@
  *    of a template location and teleported the player in, remembering the
  *    exit point (instances_get_exit) on the street they came from.
  *  - Most rooms carried an exit delay (5 * 60 seconds, 2 * 60 for The High
- *    Jumper, 3 * 60 for the back alley) after which the instance closed.
+ *    Jumper, 3 * 60 for the back alley). It is not a time limit: after it the
+ *    server asks "Are you stuck? Do you want to leave this place?" (see
+ *    STUCK_PROMPT below); the room stays open as long as you like.
  *  - Leaving before the quest was complete failed it (failQuest): progress
  *    reset and it could be started again. Leaving after the goal set the
  *    quest's `leave` flag, which completed most puzzle quests.
@@ -25,6 +27,25 @@ export const QUEST_SCENE_PREFIX = 'QI_';
 export const DEFAULT_INSTANCE_MS = 5 * 60 * 1000;
 /** The HUD timer turns red under this. */
 export const LOW_TIME_MS = 30 * 1000;
+
+/**
+ * The exit delay's prompt (players/inc_instances.js 317-357). instances_create_delayed 377-386
+ * schedules instances_show_exit_prompt `exit_delay` seconds after you enter; it is a prompts_add
+ * with icon_buttons and no timeout (the bottom-right stack). "Yes, please" runs
+ * instances_left(id, false, false, true): you go back to where you entered (force, even with
+ * no_auto_return), and the quest's onExitLocation fails it unless it is complete. "No thanks"
+ * asks again 2 * 60 seconds later. A dead player is asked 60 seconds later instead (323).
+ * instances_cancel_exit_prompt 359-370 drops it (help_juju_bandits.js offerCampExit 324-337).
+ */
+export const STUCK_PROMPT_TEXT = 'Are you stuck? Do you want to leave this place?';
+export const STUCK_PROMPT_CHOICES = Object.freeze([
+  Object.freeze({ label: 'Yes, please', value: 'yes' }),
+  Object.freeze({ label: 'No thanks', value: 'no' }),
+]);
+/** instances_exit_via_prompt "no": instances_schedule_exit_prompt(id, 2*60). */
+export const STUCK_PROMPT_AGAIN_MS = 2 * 60 * 1000;
+/** instances_show_exit_prompt: is_dead -> instances_schedule_exit_prompt(id, 60). */
+export const STUCK_PROMPT_DEAD_MS = 60 * 1000;
 
 const STATUSES = new Set(['active', 'solved', 'expired', 'left']);
 
@@ -61,18 +82,21 @@ export function wayBackFrom(here, saved = null) {
 
 /**
  * Start a run. `durationMs` 0 means no timer (rooms that stay open until you
- * leave, like Rainbow Run's exit_delay: 0).
+ * leave, like Rainbow Run's exit_delay: 0). `exitPromptMs` is the source exit
+ * delay: the "Are you stuck?" prompt that long after entering (0: none).
  */
 export function createQuestInstance({
   questId,
   roomId,
   now = Date.now(),
   durationMs = DEFAULT_INSTANCE_MS,
+  exitPromptMs = 0,
   returnTo = null,
   stage = 'main',
   repeat = false,
 } = {}) {
   const ms = Math.max(0, Math.floor(Number(durationMs) || 0));
+  const askMs = Math.max(0, Math.floor(Number(exitPromptMs) || 0));
   return {
     questId: cleanId(questId),
     roomId: cleanId(roomId),
@@ -85,7 +109,39 @@ export function createQuestInstance({
     returnTo: cleanPoint(returnTo),
     flags: {},
     bonusMs: 0,
+    exitPromptMs: askMs,
+    stuckAt: askMs ? now + askMs : 0,
+    stuckAsking: false,
   };
+}
+
+/** instances_schedule_exit_prompt: ask "Are you stuck?" `ms` from now (0 cancels). */
+export function scheduleStuckPrompt(run, ms, now = Date.now()) {
+  if (!run) return 0;
+  const n = Math.max(0, Math.floor(Number(ms) || 0));
+  run.stuckAt = n ? now + n : 0;
+  return run.stuckAt;
+}
+
+/** The stuck prompt is due: a live run, scheduled, not already asking. */
+export function stuckPromptDue(run, now = Date.now()) {
+  if (!run || (run.status !== 'active' && run.status !== 'solved')) return false;
+  return Boolean(run.stuckAt) && !run.stuckAsking && now >= run.stuckAt;
+}
+
+/**
+ * The answer (instances_exit_via_prompt 346-357): 'leave' for Yes, please; No thanks (or a
+ * prompt taken down unanswered by a scene change) asks again later.
+ */
+export function answerStuckPrompt(run, choice, { now = Date.now(), againMs = STUCK_PROMPT_AGAIN_MS } = {}) {
+  if (!run) return 'none';
+  run.stuckAsking = false;
+  if (choice === 'yes') {
+    run.stuckAt = 0;
+    return 'leave';
+  }
+  if (choice === 'no') scheduleStuckPrompt(run, againMs, now);
+  return 'stay';
 }
 
 export function instanceRemainingMs(run, now = Date.now()) {

@@ -3,7 +3,7 @@
  * the sequel to A Summer's Day (js/summers-day.js).
  *
  * Source: onStarted calls questInstanceLocation(pc, 'an_autumn_day', 0, 0,
- * 5 * 60, {preserve_links: true}, {}, true): one 5-minute instance of four
+ * 5 * 60, {preserve_links: true}, {}, true): one instance of four
  * linked template locations, LUVCCQSMDIB3HOI "An Autumn Day" and three
  * branches named "This feeling of …" (inc_data_maps_prod.js):
  * an_autumn_day_stillness LUVCL0STDIB37HE, _comfort LUVCLOOUDIB3432 and
@@ -55,8 +55,11 @@ import { sceneAnim } from '../deco-anim.js?v=6f548fd1';
 export const ROOM_ID = 'an_autumn_day';
 export const QUEST_ID = 'an_autumn_day';
 export const REPEAT_QUEST_ID = 'an_autumn_day_part2';
-/** source: questInstanceLocation(..., 5*60, ...) exit delay. */
-export const AUTUMN_MS = 5 * 60 * 1000;
+/**
+ * source: quests/an_autumn_day.js onStarted 95 (and _part2 104): questInstanceLocation(..., 5*60, ...). That exit delay is the "Are you stuck?" prompt
+ * (players/inc_instances.js 317-357), not a clock: the room stays open until you leave.
+ */
+export const EXIT_PROMPT_MS = 5 * 60 * 1000;
 /** source: inc_data_maps_prod.js location names. */
 export const MAIN_LABEL = 'An Autumn Day';
 export const FEELING_LABEL = 'This feeling of …';
@@ -998,10 +1001,10 @@ export const room = {
   icon: `${ART}bird_icon.png`,
   theme: 'warm',
   hubName: HUB_NAME,
-  durationMs: AUTUMN_MS,
+  durationMs: 0,
+  exitPromptMs: EXIT_PROMPT_MS, // "Are you stuck?" after 5 * 60 (runtime maybeAskStuck)
   firstStage: 'main',
   leaveText: 'Leave the memory? It will fade, and you can ask to visit again later.',
-  expireText: 'The autumn memory fades.',
   doneLabel: 'Go back',
 
   stageLabel: (stage) => (FEELINGS.includes(stage) ? FEELING_LABEL : MAIN_LABEL),

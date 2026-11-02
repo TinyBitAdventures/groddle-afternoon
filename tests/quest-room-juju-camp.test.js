@@ -9,7 +9,7 @@ import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import * as kit from '../public/js/quest-rooms/kit.js?v=c7ea6e0e';
-import * as mod from '../public/js/quest-rooms/juju-camp.js?v=5bdc545c';
+import * as mod from '../public/js/quest-rooms/juju-camp.js?v=f1e7046e';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', 'public');
 const street = (tsid) => JSON.parse(readFileSync(join(ROOT, 'assets', 'streets', `${tsid}.json`), 'utf8'));
@@ -138,8 +138,10 @@ describe('Carry That Weight hunt rules', () => {
     assert.equal(mod.TEXT.cantDig, "There's nothing to dig up here.");
     assert.equal(mod.TEXT.exitPrompt, "All done here! Press OK when you're ready to leave.");
     assert.equal(mod.OPEN_HINT_MS, 1500);
-    assert.equal(mod.CAMP_MS, 300_000);
-    assert.equal(mod.room.durationMs, 300_000);
+    // The 5 * 60 exit delay is the "Are you stuck?" prompt, not a clock.
+    assert.equal(mod.EXIT_PROMPT_MS, 300_000);
+    assert.equal(mod.room.durationMs, 0);
+    assert.equal(mod.room.exitPromptMs, 300_000);
     assert.equal(mod.HUNT_KEY, 'room:juju_camp:hunt');
   });
 });

@@ -50,7 +50,11 @@ export const TOP = FLOOR - 2 * ROW_H; // the lab ceiling
 export const END_X1 = START_W + COLS * (GREY_W + TILE_W); // 2320
 export const W = END_X1 + 700;
 export const H = 1000;
-export const EXIT_MS = 5 * 60 * 1000; // source: questInstanceLocation(..., 5*60)
+/**
+ * source: quests/btc_room_3.js onStarted 79 (and _reminisce 92): questInstanceLocation(..., 5*60, ...). That exit delay is the "Are you stuck?" prompt
+ * (players/inc_instances.js 317-357), not a clock: the room stays open until you leave.
+ */
+export const EXIT_PROMPT_MS = 5 * 60 * 1000;
 export const BUTTON_RESET_MS = 1000; // source: wall_button reset_timer
 export const TRAP = { x1: END_X1 + 220, x2: END_X1 + 380 };
 export const END_BOX = { x: END_X1 + 120, y: LINE };
@@ -524,7 +528,8 @@ export const room = {
   theme: 'lab',
   // G315: B.T.C Room #3's hub, 'Fireflex 3000 Lab' (inc_data_maps_prod.js 1253, 18097-18099).
   hubName: 'Fireflex 3000 Lab',
-  durationMs: EXIT_MS,
+  durationMs: 0,
+  exitPromptMs: EXIT_PROMPT_MS, // "Are you stuck?" after 5 * 60 (runtime maybeAskStuck)
   leaveText: 'Sneak out before you reach the exit? The quest will fail.',
   travelText: 'Reach the exit, or use Leave.',
 

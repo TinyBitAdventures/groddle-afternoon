@@ -63,8 +63,8 @@ export const EXIT_PROMPT_MS = 5 * 60 * 1000;
 // source: players/inc_instances.js instances_exit_via_prompt, "no" -> 2*60.
 export const PROMPT_AGAIN_MS = 2 * 60 * 1000;
 export const STUCK_TEXT = 'Are you stuck? Do you want to leave this place?';
-/** The exit delay; QA &clubpromptms=<ms> shortens it (both waits) to see the prompt. */
-const promptDelay = (ctx, ms) => Number(ctx.param?.('clubpromptms')) || ms;
+/** The exit delay; QA &stuckpromptms=<ms> (every room) or &clubpromptms=<ms> shortens it (both waits) to see the prompt. */
+const promptDelay = (ctx, ms) => Number(ctx.param?.('stuckpromptms')) || Number(ctx.param?.('clubpromptms')) || ms;
 export const PICTURE_REACH = 175; // source: club_house_picture jump_in conditions
 export const BUTTON_RESET_MS = 1000; // source: wall_switch reset_timer "1000"
 export const BUTTON_REACH = 420;

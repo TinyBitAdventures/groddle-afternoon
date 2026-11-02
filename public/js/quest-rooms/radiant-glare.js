@@ -50,8 +50,11 @@ export const SLAB = 120;
 export const LAMP_MS = 10_000;
 /** The last stretch of a lamp's time flickers. */
 export const LAMP_WARN_MS = 2_500;
-/** source: quests/radiant_glare.js onStarted questInstanceLocation(..., 5*60, {preserve_links: true}). */
-export const EXIT_DELAY_MS = 5 * 60 * 1000;
+/**
+ * source: quests/radiant_glare.js onStarted 107-110 (and _rem 120-123): questInstanceLocation(..., 5*60, {preserve_links: true}). That exit delay is the "Are you stuck?" prompt
+ * (players/inc_instances.js 317-357), not a clock: the room stays open until you leave.
+ */
+export const EXIT_PROMPT_MS = 5 * 60 * 1000;
 export const HINT = "Can't reach a button? I heard clicking on it works just as well.";
 
 export const LIGHT = Object.freeze({
@@ -508,7 +511,8 @@ export const room = {
    * saturation -100 (its filters go to every avatar: game.js setAvatarTone).
    */
   avatarFilters: Object.freeze({ saturation: -100 }),
-  durationMs: EXIT_DELAY_MS,
+  durationMs: 0,
+  exitPromptMs: EXIT_PROMPT_MS, // "Are you stuck?" after 5 * 60 (runtime maybeAskStuck)
   leaveText: 'Leave before you reach the glare? You will have to start over.',
   travelText: 'Find the EXIT, or use Leave.',
 

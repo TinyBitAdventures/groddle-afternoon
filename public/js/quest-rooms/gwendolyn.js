@@ -665,7 +665,7 @@ function free(ctx) {
 
 function resetStuck(ctx) {
   const sec = INSTANCES[ctx.stage]?.exitDelaySec || 0;
-  ctx.data.stuckAt = sec ? Date.now() + sec * 1000 : 0;
+  ctx.data.stuckAt = sec ? Date.now() + (ctx.stuckPromptMs?.(sec * 1000) ?? sec * 1000) : 0;
 }
 
 /** One npc line in the quest dialogue card. */

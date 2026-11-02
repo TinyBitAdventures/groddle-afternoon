@@ -9,17 +9,18 @@ import { readFileSync, existsSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import * as mod from '../public/js/quest-rooms/tile-puzzle.js?v=9ba8f9cc';
+import * as mod from '../public/js/quest-rooms/tile-puzzle.js?v=810fb412';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const GS = join(root, '../glitch-GameServerJS/quests');
 const gsjs = (name) => (existsSync(join(GS, name)) ? readFileSync(join(GS, name), 'utf8') : null);
 
 describe('B.T.C Room #3 source facts', () => {
-  it('keeps the 5-minute instance, the exit flag and the room id', () => {
+  it('keeps the 5-minute exit prompt, the exit flag and the room id', () => {
     assert.equal(mod.room.id, 'tile_puzzle');
-    assert.equal(mod.EXIT_MS, 5 * 60 * 1000);
-    assert.equal(mod.room.durationMs, mod.EXIT_MS);
+    assert.equal(mod.EXIT_PROMPT_MS, 5 * 60 * 1000);
+    assert.equal(mod.room.durationMs, 0);
+    assert.equal(mod.room.exitPromptMs, mod.EXIT_PROMPT_MS);
     assert.equal(mod.BUTTON_RESET_MS, 1000);
     assert.deepEqual(mod.room.onLeave(), { leaveFlag: 'instance_exit_via_door' });
     for (const file of ['btc_room_3.js', 'btc_room_3_reminisce.js']) {

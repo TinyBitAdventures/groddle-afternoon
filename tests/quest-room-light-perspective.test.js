@@ -11,7 +11,7 @@ import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import {
-  DURATION_MS,
+  EXIT_PROMPT_MS,
   LIGHT_ROOM_FACTS,
   LOW,
   ORB_MS,
@@ -30,7 +30,7 @@ import {
   standingWalls,
   touchOrb,
   room,
-} from '../public/js/quest-rooms/light-perspective.js?v=f6fb0621';
+} from '../public/js/quest-rooms/light-perspective.js?v=fae24f72';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const { JUMP_RISE, JUMP_GAP } = LIGHT_ROOM_FACTS;
@@ -75,9 +75,11 @@ function reach(layout, state, start, now = 0) {
 
 describe('Walk Toward the Light (light_perspective)', () => {
   it('keeps the source quest facts', () => {
-    assert.equal(DURATION_MS, 5 * 60 * 1000);
+    assert.equal(EXIT_PROMPT_MS, 5 * 60 * 1000);
     assert.equal(room.id, 'light_perspective');
-    assert.equal(room.durationMs, DURATION_MS);
+    // The 5 * 60 exit delay is the "Are you stuck?" prompt, not a clock.
+    assert.equal(room.durationMs, 0);
+    assert.equal(room.exitPromptMs, EXIT_PROMPT_MS);
     const catalog = readFileSync(join(root, 'public/js/quest-rooms/catalog.js'), 'utf8');
     assert.match(catalog, /puzzle_level_light_perspective: 'light_perspective'/);
     assert.match(catalog, /puzzle_level_light_perspective_rem: 'light_perspective'/);

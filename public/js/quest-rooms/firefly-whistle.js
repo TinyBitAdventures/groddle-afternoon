@@ -469,7 +469,7 @@ function maybePromptStuck(ctx, now) {
   }).then((choice) => {
     d.prompting = false;
     if (choice === 'yes') ctx.leave({ transition: ctx.fx() });
-    else d.promptAt = Date.now() + PROMPT_AGAIN_MS;
+    else d.promptAt = Date.now() + (ctx.stuckPromptMs?.(PROMPT_AGAIN_MS) ?? PROMPT_AGAIN_MS);
   });
 }
 
@@ -523,7 +523,7 @@ const lab = {
     d.codeTries = 0;
     d.pushes = 0;
     d.bounces = 0;
-    d.promptAt = Date.now() + EXIT_PROMPT_MS;
+    d.promptAt = Date.now() + (ctx.stuckPromptMs?.(EXIT_PROMPT_MS) ?? EXIT_PROMPT_MS);
     addStand(ctx);
     addControl(ctx);
     // The pillars stand in front of the avatar (video t20, t30, t41, t89).

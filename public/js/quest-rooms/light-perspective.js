@@ -55,8 +55,11 @@ const H = 1100;
 export const LOW = 1000;
 const FALL_Y = H - 30;
 
-// source: questInstanceLocation(..., 5*60, ...)
-export const DURATION_MS = 5 * 60 * 1000;
+/**
+ * source: quests/puzzle_level_light_perspective.js onStarted 93 (and _rem 114): questInstanceLocation(..., 5*60, ...). That exit delay is the "Are you stuck?" prompt
+ * (players/inc_instances.js 317-357), not a clock: the room stays open until you leave.
+ */
+export const EXIT_PROMPT_MS = 5 * 60 * 1000;
 // Footage: the first yellow bulb is out ~6 s after the touch, the wall's blue
 // bulb and the red wall's dark spell last a little longer, the "fall" yellow
 // and blue pair ~10 s; the floor's red bulb never goes out.
@@ -565,7 +568,8 @@ export const room = {
    * saturation -100 (its filters go to every avatar: game.js setAvatarTone).
    */
   avatarFilters: Object.freeze({ saturation: -100 }),
-  durationMs: DURATION_MS,
+  durationMs: 0,
+  exitPromptMs: EXIT_PROMPT_MS, // "Are you stuck?" after 5 * 60 (runtime maybeAskStuck)
   leaveText: 'Leave before you find the exit? You will have to start over.',
   travelText: 'Find the exit, or use Leave.',
 

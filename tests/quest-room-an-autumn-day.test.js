@@ -11,9 +11,9 @@ import { fileURLToPath } from 'node:url';
 
 import * as kit from '../public/js/quest-rooms/kit.js?v=c7ea6e0e';
 import { QUEST_ROOMS, roomModulePath } from '../public/js/quest-rooms/catalog.js?v=9ebeb502';
-import { questSceneTsid } from '../public/js/quest-instance.js?v=5599c44c';
+import { questSceneTsid } from '../public/js/quest-instance.js?v=f0df88c3';
 import {
-  AUTUMN_MS,
+  EXIT_PROMPT_MS,
   BODY_H,
   CAPTION,
   CLEARING,
@@ -41,7 +41,7 @@ import {
   sentenceSlots,
   slotCorrect,
   touchesToSolve,
-} from '../public/js/quest-rooms/an-autumn-day.js?v=bed1f7a5';
+} from '../public/js/quest-rooms/an-autumn-day.js?v=b9356fd3';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const pub = (p) => join(root, 'public', p);
@@ -91,8 +91,11 @@ describe('An Autumn Day (an_autumn_day): source', () => {
     assert.equal(QUEST_ROOMS.an_autumn_day, ROOM_ID);
     assert.equal(QUEST_ROOMS.an_autumn_day_part2, ROOM_ID);
     assert.ok(existsSync(join(root, 'public/js/quest-rooms', roomModulePath(ROOM_ID))));
-    assert.equal(AUTUMN_MS, 5 * 60 * 1000);
-    assert.equal(room.durationMs, AUTUMN_MS);
+    // The 5 * 60 exit delay is the "Are you stuck?" prompt, not a clock.
+    assert.equal(EXIT_PROMPT_MS, 5 * 60 * 1000);
+    assert.equal(room.durationMs, 0);
+    assert.equal(room.exitPromptMs, EXIT_PROMPT_MS);
+    assert.equal(room.expireText, undefined);
     assert.equal(room.firstStage, 'main');
     assert.equal(questSceneTsid(ROOM_ID, 'wonder'), 'QI_AN_AUTUMN_DAY_WONDER');
     assert.deepEqual(SOURCE_TSIDS, {
@@ -224,7 +227,7 @@ describe('An Autumn Day: the look of the Snaps (G75)', () => {
     const { fileURLToPath } = await import('node:url');
     const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
     const { AN_AUTUMN_DAY_FILES } = await import('../public/js/an-autumn-day-art.js?v=d6b2601b');
-    const mod = await import('../public/js/quest-rooms/an-autumn-day.js?v=bed1f7a5');
+    const mod = await import('../public/js/quest-rooms/an-autumn-day.js?v=b9356fd3');
     const plan = JSON.parse(readFileSync(join(spike, 'tools/room-art/an_autumn_day.json'), 'utf8'));
     assert.match(plan.source, /glitch-locations limbo1\.swf \(CC0\)/);
     assert.deepEqual(Object.keys(plan.pieces).sort(), Object.keys(AN_AUTUMN_DAY_FILES).sort());

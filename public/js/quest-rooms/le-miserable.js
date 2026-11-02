@@ -231,7 +231,9 @@ export const room = {
   icon: `${ART}bot_icon.png`,
   theme: 'memory',
   hubName: 'The Fireflex 3000 Lab',
-  durationMs: 5 * 60 * 1000,
+  // quests/le_miserable.js onStarted 76 (and le_miserable_reminisce.js 93-96): questInstanceLocation(..., 5*60): the exit delay is the "Are you stuck?" prompt (players/inc_instances.js 317-357), not a clock.
+  durationMs: 0,
+  exitPromptMs: 5 * 60 * 1000,
   streetEvents: true,
   leaveText: 'Leave the lab? You will have to start over.',
   travelText: 'There is No Exit. Not that way, anyway.',

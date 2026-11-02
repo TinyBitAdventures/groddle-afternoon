@@ -10,7 +10,7 @@ import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import {
-  EXIT_DELAY_MS,
+  EXIT_PROMPT_MS,
   FLOORS,
   HINT,
   LAMP_MS,
@@ -26,7 +26,7 @@ import {
   tierAt,
   tierSurfaces,
   walkable,
-} from '../public/js/quest-rooms/radiant-glare.js?v=2a265adb';
+} from '../public/js/quest-rooms/radiant-glare.js?v=5f1c6a15';
 import { QUEST_ROOMS, roomModulePath } from '../public/js/quest-rooms/catalog.js?v=9ebeb502';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -57,8 +57,9 @@ describe('Radiant Glare (radiant_glare)', () => {
     assert.match(rem, /"prod_tsid"\t: "LIFQ6PP37QB3PDA"/);
     assert.match(main, /"currants"\t: 1500/);
     assert.match(rem, /"currants"\t: 350/);
-    assert.equal(EXIT_DELAY_MS, 5 * 60 * 1000);
-    assert.equal(room.durationMs, EXIT_DELAY_MS);
+    assert.equal(EXIT_PROMPT_MS, 5 * 60 * 1000);
+    assert.equal(room.durationMs, 0);
+    assert.equal(room.exitPromptMs, EXIT_PROMPT_MS);
     assert.equal(room.onLeave, undefined, 'leaving solved sets the default `leave` flag');
     assert.ok(HINT.startsWith("Can't reach a button?"));
   });

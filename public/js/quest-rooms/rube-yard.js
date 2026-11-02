@@ -104,7 +104,9 @@ export const room = {
   icon: 'assets/sprites/icons/npc_rube.png',
   theme: 'warm',
   hubName: 'The Rube’s yard',
-  durationMs: 5 * 60 * 1000,
+  // quests/rube_spy.js onStarted 80: questInstanceLocation(..., 5*60): the exit delay is the "Are you stuck?" prompt (players/inc_instances.js 317-357), not a clock.
+  durationMs: 0,
+  exitPromptMs: 5 * 60 * 1000,
   leaveText: 'Leave The Rube’s yard? The Wrizzards will stay hidden and you will have to start over.',
 
   build(ctx) {
