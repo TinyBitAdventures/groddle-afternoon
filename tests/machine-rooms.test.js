@@ -50,7 +50,7 @@ import { fixedFurniturePoints, furniturePlacementGroups } from '../public/js/str
 import { worldToScreen } from '../public/js/street-model.js?v=505d8990';
 import { nearestSurfaceY } from '../public/js/walk-surface.js?v=c982983e';
 import { platformsScreen } from '../public/js/street-model.js?v=505d8990';
-import { machineRoomsFeature } from '../public/js/features/machine-rooms-feature.js?v=e180dbf7';
+import { machineRoomsFeature } from '../public/js/features/machine-rooms-feature.js?v=7e622d39';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const gsjs = join(spike, '../glitch-GameServerJS');

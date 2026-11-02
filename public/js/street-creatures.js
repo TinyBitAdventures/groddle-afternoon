@@ -147,8 +147,9 @@ export function walkerAt({ baseX, range = CREATURE_PATHS.chicken.range, speed = 
  * idle1, idle1, idle1, idle2, idle3 and pause for 4 s, pecking_twice for 3 s, pecking_once for
  * 2 s), turns round half the time (is_chance(0.5) turnAround, 1225-1228) and walks on
  * (startMoving after the pause's seconds, 1253-1256). At the end of its walk it turns and walks
- * straight back (onPathing 1168-1186). The remake has the walk and pecking_once sheets: an idle
- * stands on the walk's first frame ('stand'), a peck plays pecking_once ('peck').
+ * straight back (onPathing 1168-1186). The remake has the walk and pecking_once sheets plus one
+ * still: an idle holds idle1's first frame (game.js chickenStand, 'stand'), a peck plays
+ * pecking_once ('peck').
  */
 export const CHICKEN_PAUSE = Object.freeze({
   everyMs: Object.freeze([6000, 14000]),

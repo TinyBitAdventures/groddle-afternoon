@@ -123,7 +123,7 @@ import {
   treeId,
   treeReady,
   treeSkill,
-} from '../street-objects.js?v=47ac4706';
+} from '../street-objects.js?v=a7e292a7';
 import { ROCK_CATALOG } from '../mining.js?v=4806e3e8';
 import { TRANT_META, trantStatusLabel } from '../trants.js?v=9c2e8c0f';
 import { quoteWoodTreeHarvest } from '../woodcutting.js?v=38730935';
@@ -149,7 +149,7 @@ import {
   restAt,
   serverPathClock,
   sharedCreatureLabel,
-} from '../street-creatures.js?v=5678e498';
+} from '../street-creatures.js?v=6425488e';
 
 export const STREET_OBJECTS_FEATURE_ID = 'street-objects';
 const RECONCILE_MS = 250;

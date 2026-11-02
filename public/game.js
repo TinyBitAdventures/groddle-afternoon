@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=a71f590c';
 import { createFeatureHost } from './js/feature-host.js?v=e4f648b1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=94bb5a58';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=f96cea34';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -551,7 +551,7 @@ import {
   recipeToolInUse,
 } from './js/making.js?v=20d5364b';
 import { MAKE_TOOL_SHEETS } from './js/make-tool-sheets.js?v=6f758e09';
-import { LOW_FUEL_LINE, craftSessionElapsedMs, isLowFuel, isMachineArt, machineArtHtml, packMakeState, playMachineHandOver, setMachineArtFrame } from './js/machine-art.js?v=0d64c7b2';
+import { LOW_FUEL_LINE, craftSessionElapsedMs, isLowFuel, isMachineArt, machineArtHtml, packMakeState, playMachineHandOver, setMachineArtFrame } from './js/machine-art.js?v=a4c8da0e';
 import {
   createGarden,
   tickGarden,
@@ -885,7 +885,7 @@ import {
   ANIMAL_PATROL,
   nearestPlacementGap,
 } from './js/street-ecology.js?v=75086599';
-import { chickenPauseRoll, easeToward, flightFloorAt, flightFloorFor, flyerLift } from './js/street-creatures.js?v=5678e498';
+import { chickenPauseRoll, easeToward, flightFloorAt, flightFloorFor, flyerLift } from './js/street-creatures.js?v=6425488e';
 import { createSoundBoard, DEFAULT_SFX_VOLUME, watchButtonClicks, watchPanelSounds } from './js/sound-board.js?v=a1c4a308';
 import {
   actionLoopFor,
@@ -908,7 +908,7 @@ import { createAudioBuses, fadeGain } from './js/audio-buses.js?v=af167b54';
 import { installTopBar, renderTopBar } from './js/ui/topbar.js?v=9cfbbd95';
 import { installFocusReturn } from './js/ui/focus-return.js?v=8885653a';
 import { QUOIN_FRAME_BOB, advanceQuoinClock, quoinBobBetweenFrames } from './js/quoin-motion.js?v=ea0bd408';
-import { installHiresFirstDraw, installHiresSprites } from './js/sprite-hires.js?v=8b7fdbb5';
+import { installHiresFirstDraw, installHiresSprites } from './js/sprite-hires.js?v=92eefcb7';
 import { denseSprite } from './js/sprite-dense.js?v=8e0109eb';
 import { wholeStatAmounts, wholeEffects } from './js/stat-text.js?v=f96d8fd3';
 import { createNotifier, effectTokens, floatKey, offerCardDrop, stackFloat, tokenText } from './js/notify.js?v=d85330ff';
@@ -1085,6 +1085,13 @@ const SHEETS = {
   chickenPeck: {
     url: 'assets/sprites/npc_chicken__x1_pecking_once_png_1354830398.png',
     fw: 148, fh: 110, cols: 6, rows: 6, frameCount: 32,
+  },
+  // A Chicken standing still (a pause, a player at it): the first frame of the original's idle1, the
+  // state npc_chicken.js pause_state_choices picks most (1856-1865), not the walk's mid-step frame
+  // (Austin 2026-11-02). One cell of Tiny Speck's OGA sheet; its 3x is rendered from npc_chicken.swf.
+  chickenStand: {
+    url: 'assets/sprites/animals/npc_chicken_stand.png',
+    fw: 148, fh: 110, cols: 1, rows: 1,
   },
   butterfly: {
     url: 'assets/sprites/npc_butterfly__x1_fly-side_png_1354829525.png',
@@ -11687,12 +11694,21 @@ function spawnChickens(xs) {
         spr.onComplete = null;
       };
     };
-    // Its walk's pose (js/street-creatures.js CHICKEN_PAUSE): 'walk' plays the walk, 'stand' stands
-    // on its first frame (the original's idles), 'peck' plays pecking_once (2 s, as the source's
+    // Its walk's pose (js/street-creatures.js CHICKEN_PAUSE): 'walk' plays the walk, 'stand' holds
+    // the idle1 standing frame (chickenStand), 'peck' plays pecking_once (2 s, as the source's
     // state). A one-shot clip (a squeeze) plays to its end first.
     spr.walkPose = (pose) => {
       if (spr.destroyed || (!spr.loop && spr.onComplete)) return;
       const walk = textures.chickenWalk.frames.slice(0, 6);
+      const stand = textures.chickenStand?.frames;
+      if (pose === 'stand' && stand?.length) {
+        if (spr.textures[0] !== stand[0]) {
+          spr.textures = stand;
+          spr.loop = true;
+          spr.gotoAndStop(0);
+        }
+        return;
+      }
       if (pose === 'peck') {
         const peck = textures.chickenPeck.frames;
         if (spr.textures[0] !== peck[0] || spr.textures.length !== peck.length) {

@@ -11,7 +11,8 @@
     { "name": "chicken", "swf": "inhabitants/chicken/npc_chicken.swf", "sprite": 183, "sheets": [
       { "path": "assets/sprites/npc_chicken__x1_walk_png_1354830385.png", "label": "walk", "fw": 148, "fh": 110, "cols": 6, "frames": 24 },
       { "path": "assets/sprites/npc_chicken__x1_pecking_once_png_1354830398.png", "label": "pecking_once", "fw": 148, "fh": 110, "cols": 6, "frames": 32 },
-      { "path": "assets/sprites/animals/npc_chicken_sit.png", "label": "sit", "fw": 148, "fh": 110, "cols": 5, "frames": 20, "firstDraw": true }
+      { "path": "assets/sprites/animals/npc_chicken_sit.png", "label": "sit", "fw": 148, "fh": 110, "cols": 5, "frames": 20, "firstDraw": true },
+      { "path": "assets/sprites/animals/npc_chicken_stand.png", "label": "idle1", "fw": 148, "fh": 110, "cols": 1, "frames": 1 }
     ] },
     { "name": "batterfly", "swf": "inhabitants/batterfly/npc_batterfly.swf", "sprite": 81, "sheets": [
       { "path": "assets/sprites/animals/npc_batterfly_profile.webp", "label": "profile", "fw": 111, "fh": 96, "cols": 8, "frames": 40 },

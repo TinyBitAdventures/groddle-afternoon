@@ -12,6 +12,7 @@ export const HIRES_SPRITES = new Map([
   ["assets/sprites/animals/npc_batterfly_chew.webp", "assets/sprites/animals/npc_batterfly_chew@3x.webp"],
   ["assets/sprites/animals/npc_batterfly_profile.webp", "assets/sprites/animals/npc_batterfly_profile@3x.webp"],
   ["assets/sprites/animals/npc_chicken_sit.png", "assets/sprites/animals/npc_chicken_sit@3x.webp"],
+  ["assets/sprites/animals/npc_chicken_stand.png", "assets/sprites/animals/npc_chicken_stand@3x.webp"],
   ["assets/sprites/animals/piggy_feeder.png", "assets/sprites/animals/piggy_feeder@3x.webp"],
   ["assets/sprites/animals/plop.png", "assets/sprites/animals/plop@3x.webp"],
   ["assets/sprites/avatar/vector/angry.webp", "assets/sprites/avatar/vector/angry@3x.webp"],

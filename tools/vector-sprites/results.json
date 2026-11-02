@@ -43453,5 +43453,36 @@
   "frameScores": [
    0.9912
   ]
+ },
+ "assets/sprites/animals/npc_chicken_stand.png": {
+  "animal": "chicken",
+  "swf": "inhabitants/chicken/npc_chicken.swf",
+  "sprite": 183,
+  "label": "idle1",
+  "swfFrames": [
+   670,
+   670
+  ],
+  "swfLabelFrames": 67,
+  "cells": 1,
+  "fw": 148,
+  "fh": 110,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   -10,
+   -2
+  ],
+  "score": 0.9631,
+  "minFrame": 0.9631,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/animals/npc_chicken_stand@3x.webp",
+  "bytes": 11942,
+  "frameScores": [
+   0.9631
+  ]
  }
 }
