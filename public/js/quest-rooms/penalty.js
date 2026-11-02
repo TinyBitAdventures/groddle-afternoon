@@ -6,8 +6,9 @@
  * need some sort of tool to help you out. You dig?"), then creates instance
  * `penalty` from template LUVGFS2RQI63N49 (dev "penaltyisland2",
  * LRO10390SI63T7N) at -1319,-123 with exit_delay 2*60: after two minutes the
- * "Are you stuck? Do you want to leave this place?" prompt
- * (players/inc_instances.js). Part 1 turns in at npc_rare_item_vendor, the
+ * "Are you stuck? Do you want to leave this place?" prompt, again two minutes
+ * after each No thanks (players/inc_instances.js 317-357; the runtime's shared
+ * prompt, room.exitPromptMs). Part 1 turns in at npc_rare_item_vendor, the
  * hooded figure who is the wrongfully imprisoned Smuggler ("They got you too?
  * I'm innocent, I tell you!"). Part 2: dig the patch ('VERB:'+patch+':'+dig,
  * a working shovel). Part 3 ("After you."): crawl through the hole; 500 iMG,
@@ -40,8 +41,9 @@ export const PART_2 = 'smuggle_the_smuggler_part2';
 export const PART_3 = 'smuggle_the_smuggler_part3';
 /** source: part1 onStarted tools; patch.js dig needs either, working. */
 export const TOOLS = Object.freeze(['shovel', 'ace_of_spades']);
-/** source: exit_delay 2*60 -> instances_show_exit_prompt. */
+/** source: smuggle_the_smuggler_part1.js onStarted exit_delay 2*60 -> instances_show_exit_prompt (the runtime asks it). */
 export const EXIT_PROMPT_MS = 2 * 60 * 1000;
+/** players/inc_instances.js 330 (quest-instance.js STUCK_PROMPT_TEXT). */
 export const EXIT_PROMPT = 'Are you stuck? Do you want to leave this place?';
 export const NEED_TOOL = 'You need some sort of tool to help you out. You dig?';
 /** source: smuggle_the_smuggler_part3.js onComplete_custom. */
@@ -302,6 +304,9 @@ export const room = {
   // G315: hub 73 'Penalty' (inc_data_maps_prod.js 371, street 'The Penalty Box' 18014).
   hubName: 'Penalty',
   durationMs: 0, // exit_delay: a prompt after two minutes, no clock
+  exitPromptMs: EXIT_PROMPT_MS, // "Are you stuck?" after 2 * 60, again 2 * 60 after No thanks (runtime maybeAskStuck)
+  /** Not mid-verb (a dig) or while crawling out through the hole. */
+  stuckPromptReady: (ctx) => !ctx.engine.acting() && !ctx.data.crawling,
   leaveText: 'Leave the cell? The Smuggler stays locked up and you will have to come back.',
   travelText: 'The bars are sturdier than they look. There must be another way out.',
   doneLabel: 'Leave',
@@ -352,7 +357,6 @@ export const room = {
   enter(ctx) {
     const { PIXI } = ctx;
     ctx.data.enteredAt = Date.now();
-    ctx.data.promptShown = false;
     ctx.data.plot ||= createPlot('patch_dark');
     // A retry of part 3: the hole was dug on the earlier visit.
     if ((ctx.engine.questState?.completed || []).includes(PART_2)) ctx.data.plot.stage = 'dug';
@@ -457,17 +461,6 @@ export const room = {
       v.scale.x = p.x < v.x ? -1 : 1;
     }
     if (ctx.data.sinking && p) p.alpha = Math.max(0, (p.alpha ?? 1) - dtMs / 600);
-    // exit_delay 2*60: instances_show_exit_prompt, once.
-    if (!ctx.data.promptShown && Date.now() - ctx.data.enteredAt >= (ctx.stuckPromptMs?.(EXIT_PROMPT_MS) ?? EXIT_PROMPT_MS) && !ctx.dialogOpen() && !ctx.engine.acting() && !ctx.data.crawling) {
-      ctx.data.promptShown = true;
-      // inc_instances.js 322-339: a prompts_add prompt, not a familiar conversation (G225);
-      // G304: icon_buttons, no timeout, not modal, so the bottom-right prompt stack.
-      ctx.prompt({
-        text: EXIT_PROMPT,
-        iconButtons: true,
-        choices: [{ label: 'Yes, please', value: 'yes' }, { label: 'No thanks', value: 'no' }],
-      }).then((answer) => answer === 'yes' && ctx.leave({ transition: ctx.fx() }));
-    }
   },
 
   objective(ctx) {

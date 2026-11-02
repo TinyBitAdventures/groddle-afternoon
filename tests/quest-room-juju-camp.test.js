@@ -9,7 +9,7 @@ import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import * as kit from '../public/js/quest-rooms/kit.js?v=c7ea6e0e';
-import * as mod from '../public/js/quest-rooms/juju-camp.js?v=f1e7046e';
+import * as mod from '../public/js/quest-rooms/juju-camp.js?v=c92230db';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', 'public');
 const street = (tsid) => JSON.parse(readFileSync(join(ROOT, 'assets', 'streets', `${tsid}.json`), 'utf8'));
@@ -143,6 +143,46 @@ describe('Carry That Weight hunt rules', () => {
     assert.equal(mod.room.durationMs, 0);
     assert.equal(mod.room.exitPromptMs, 300_000);
     assert.equal(mod.HUNT_KEY, 'room:juju_camp:hunt');
+  });
+
+  it('"All done here!" is one OK in the prompt stack that leaves at once (offerCampExit)', async () => {
+    const gsjs = join(ROOT, '../../glitch-GameServerJS');
+    if (existsSync(join(gsjs, 'quests/help_juju_bandits.js'))) {
+      const q = readFileSync(join(gsjs, 'quests/help_juju_bandits.js'), 'utf8');
+      // help_juju_bandits.js 324-337: a prompts_add, icon_buttons, no timeout, one OK -> instances_exit_via_prompt.
+      assert.match(q, /function offerCampExit\(\)\{\s*this\.owner\.instances_cancel_exit_prompt\('juju_camp'\);\s*this\.owner\.prompts_add\(\{\s*txt\s*: "All done here! Press OK when you're ready to leave\.",\s*icon_buttons\s*: true,\s*timeout\s*: 0,\s*choices\s*: \[\s*\{ value : 'yes', label : 'OK' \}\s*\],\s*callback\s*: 'instances_exit_via_prompt',/);
+      // npc_juju_grandma.js giveItems: the hint opens, then the prompt, with nothing in between.
+      assert.match(readFileSync(join(gsjs, 'items/npc_juju_grandma.js'), 'utf8'), /q\.openHint\(\);\s*q\.offerCampExit\(\);/);
+    }
+    const log = [];
+    let answer;
+    const ctx = {
+      run: { questId: 'help_juju_bandits' },
+      data: {},
+      cancelStuckPrompt: () => log.push('cancel'),
+      prompt: (opts) => {
+        log.push(['prompt', opts]);
+        return new Promise((resolve) => { answer = resolve; });
+      },
+      fx: () => false,
+      leave: (opts) => log.push(['leave', opts]),
+    };
+    mod.offerCampExit(ctx);
+    assert.equal(log[0], 'cancel', 'instances_cancel_exit_prompt first');
+    const [, opts] = log[1];
+    assert.equal(opts.text, mod.TEXT.exitPrompt);
+    assert.equal(opts.iconButtons, true);
+    assert.deepEqual(opts.choices, [{ label: 'OK', value: 'yes' }], 'one OK, no "Not yet"');
+    assert.equal(opts.timeout, undefined, 'timeout 0: it stays');
+    assert.equal(opts.modal, undefined, 'the prompt stack, not the centre card');
+    assert.equal(ctx.data.campExitAsked, true);
+    answer('yes');
+    await new Promise((r) => setTimeout(r, 0));
+    assert.deepEqual(log[2], ['leave', { transition: false }]);
+    // The room's own code has no centre conversation for it any more.
+    const src = readFileSync(join(ROOT, 'js/quest-rooms/juju-camp.js'), 'utf8');
+    assert.doesNotMatch(src, /text: TEXT\.exitPrompt,\s*choices: \[\{ label: 'OK', value: 'ok' \}, \{ label: 'Not yet'/);
+    assert.doesNotMatch(src, /converse\(\{[^}]*TEXT\.exitPrompt/);
   });
 });
 

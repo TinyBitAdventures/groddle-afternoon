@@ -183,9 +183,11 @@ describe('Rainbow Run (numismatic_hustle)', () => {
 });
 
 describe('The High Jumper (top_of_tree)', () => {
-  it('keeps the source two-minute clock and branches only Spinach can reach', async () => {
-    const mod = await import('../public/js/quest-rooms/top-of-tree.js?v=58cdbd3b');
-    assert.equal(mod.CLIMB_MS, 120_000);
+  it('asks "Are you stuck?" after the source two minutes, and has branches only Spinach can reach', async () => {
+    const mod = await import('../public/js/quest-rooms/top-of-tree.js?v=e9b472a6');
+    assert.equal(mod.EXIT_PROMPT_MS, 120_000);
+    assert.equal(mod.room.exitPromptMs, 120_000);
+    assert.equal(mod.room.durationMs, 0);
     assert.deepEqual(mod.NAG.map((n) => n.atMs), [30_000, 45_000]);
     const rows = [mod.GROUND, ...mod.treeBranches().map((b) => b.y), mod.CROWN_Y];
     // An ordinary jump peaks near 110 px; Spinach's measured in-room apex is 289 px.
@@ -230,9 +232,15 @@ describe('Vision Quest (vision_quest)', () => {
 
 describe("Mr. Block's playroom (kids_room)", () => {
   it('has the 24 source words, the doneSpelling tiers and letter gifts', async () => {
-    const mod = await import('../public/js/quest-rooms/kids-room.js?v=304bcf00');
+    const mod = await import('../public/js/quest-rooms/kids-room.js?v=b89f7d69');
     assert.equal(mod.WORD_UP_WORDS.length, 24);
     assert.equal(mod.SPELL_MS, 180_000);
+    // The 5*60 exit delay is the "Are you stuck?" prompt; Word Up's 3:00 is the room's only clock.
+    assert.equal(mod.EXIT_PROMPT_MS, 300_000);
+    assert.equal(mod.room.durationMs, 0);
+    assert.equal(mod.room.exitPromptMs, 300_000);
+    assert.equal(mod.room.clock({ data: { spelling: false } }), undefined);
+    assert.ok(mod.room.clock({ data: { spelling: true, spellEndsAt: Date.now() + 60_000 } }) > 59_000);
     assert.deepEqual([2, 3, 9, 10, 19, 20].map((n) => mod.spellingTier(n).id),
       ['fail', 'done_spelling_1', 'done_spelling_1', 'done_spelling_3', 'done_spelling_3', 'done_spelling_5']);
     const spelled = [];
@@ -389,7 +397,7 @@ describe('G311: a failed room quest is Try again in the quest log', () => {
   };
 
   it('a run lost to a reload marks a startable quest failed, not a retry prompt', async () => {
-    const { questInstancesFeature } = await import('../public/js/features/quest-instances-feature.js?v=f29c62bb');
+    const { questInstancesFeature } = await import('../public/js/features/quest-instances-feature.js?v=30139391');
     const { ensureQuestOfferState } = await import('../public/js/quest-offers.js?v=3c7925ca');
     assert.equal(getQuestCatalog().mental_block?.needsStart, true);
     assert.notEqual(getQuestCatalog().help_juju_bandits?.needsStart, true, 'no onStarted in GSJS');
@@ -453,7 +461,7 @@ describe('G313: failed room quests the source removes', () => {
   });
 
   it('a reload removes a source-removed quest and its offers, and keeps the prompt for the three', async () => {
-    const { questInstancesFeature } = await import('../public/js/features/quest-instances-feature.js?v=f29c62bb');
+    const { questInstancesFeature } = await import('../public/js/features/quest-instances-feature.js?v=30139391');
     const { questStatus } = await import('../public/js/quest-offers.js?v=3c7925ca');
     const t = Date.now() - 60_000;
     questInstancesFeature.restore({ memory: {}, retry: { tower_quest: t, le_miserable_part_2: t, smuggle_the_smuggler_part2: t } });
@@ -481,7 +489,7 @@ describe('G313: failed room quests the source removes', () => {
   });
 
   it('has no map card', async () => {
-    const { questInstancesFeature } = await import('../public/js/features/quest-instances-feature.js?v=f29c62bb');
+    const { questInstancesFeature } = await import('../public/js/features/quest-instances-feature.js?v=30139391');
     assert.equal(questInstancesFeature.mapCards, undefined);
     const src = readFileSync(join(root, 'public/js/features/quest-instances-feature.js'), 'utf8');
     assert.doesNotMatch(src, /Unfinished quest places/);

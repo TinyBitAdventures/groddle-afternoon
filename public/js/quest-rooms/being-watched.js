@@ -10,10 +10,12 @@
  *    boring, without character", button "Take nap".
  *  - onStarted: questInstanceLocation(pc, 'being_watched', marker_teleport,
  *    5*60) into LIFHAO6QB4A34MO "Being Watched" (hub 61, the instance
- *    templates).
+ *    templates). The 5*60 is the exit delay: "Are you stuck?" after five
+ *    minutes (players/inc_instances.js 317-357), not a clock.
  *  - Requirements: flag `leave` "Ride It Out" (onExitLocation sets it) and
  *    flag `convo_end` "Peek Behind the Veil". onExitLocation fails the quest
- *    when it is not complete, so leaving or timing out before the peek fails.
+ *    when it is not complete, so leaving (Leave, or Yes, please) before the
+ *    peek fails.
  *  - Completion (familiar): "You passed out. Hard. Rolled around in your
  *    sleep, embarrassed yourself a bit, then woke up." / "You were
  *    watching?" / "Oh ho, yes." Rewards 750 xp, 100 mood, 100 energy.
@@ -41,8 +43,11 @@ import { onLoaded } from '../textures.js?v=db2ce452';
 import { sceneAnim } from '../deco-anim.js?v=6f548fd1';
 
 export const QUEST = 'stale_but_necessary';
-/** source: questInstanceLocation(..., 5*60). */
-export const NAP_MS = 5 * 60 * 1000;
+/**
+ * source: quests/stale_but_necessary.js onStarted 95/98: questInstanceLocation(..., 5*60). That exit delay is the
+ * "Are you stuck?" prompt (players/inc_instances.js 317-357), not a clock: the nap lasts until you leave.
+ */
+export const EXIT_PROMPT_MS = 5 * 60 * 1000;
 export const FLAGS = Object.freeze({ peek: 'convo_end', leave: 'leave' });
 /** source: cup_of_water.js drink. */
 export const DRINK_TEXT = 'Ewww. That water tastes really … bureaucratic-y.';
@@ -258,10 +263,10 @@ export const room = {
   theme: 'dark',
   // G315: template in hub 61 'Simple Level Quests' (inc_data_maps_prod.js 245), a dev label; plain remake wording.
   hubName: 'Quest',
-  durationMs: NAP_MS,
+  durationMs: 0,
+  exitPromptMs: EXIT_PROMPT_MS, // "Are you stuck?" after 5 * 60 (runtime maybeAskStuck)
   leaveText: 'Wake up now? You have not ridden it out yet.',
   travelText: 'You are fast asleep.',
-  expireText: 'You wake up with a start.',
   doneLabel: 'Wake up',
 
   build(ctx) {

@@ -155,26 +155,26 @@ let rubeTraded = false;
  */
 const ROOM_MODULES = {
   rainbow_run: () => import('../quest-rooms/rainbow-run.js?v=ebc9b478'),
-  top_of_tree: () => import('../quest-rooms/top-of-tree.js?v=58cdbd3b'),
+  top_of_tree: () => import('../quest-rooms/top-of-tree.js?v=e9b472a6'),
   color_unblocking: () => import('../quest-rooms/color-unblocking.js?v=f0931177'),
   vision_quest: () => import('../quest-rooms/vision-quest.js?v=d9423ecf'),
-  kids_room: () => import('../quest-rooms/kids-room.js?v=304bcf00'),
+  kids_room: () => import('../quest-rooms/kids-room.js?v=b89f7d69'),
   rube_yard: () => import('../quest-rooms/rube-yard.js?v=83abd456'),
   le_miserable: () => import('../quest-rooms/le-miserable.js?v=04e30bda'),
-  juju_camp: () => import('../quest-rooms/juju-camp.js?v=f1e7046e'),
+  juju_camp: () => import('../quest-rooms/juju-camp.js?v=c92230db'),
   picto_pattern: () => import('../quest-rooms/picto-pattern.js?v=794ab217'),
   radiant_glare: () => import('../quest-rooms/radiant-glare.js?v=5f1c6a15'),
   an_autumn_day: () => import('../quest-rooms/an-autumn-day.js?v=b9356fd3'),
-  being_watched: () => import('../quest-rooms/being-watched.js?v=03352d7f'),
-  back_alley: () => import('../quest-rooms/back-alley.js?v=bf6df2f1'),
+  being_watched: () => import('../quest-rooms/being-watched.js?v=ce0e95e1'),
+  back_alley: () => import('../quest-rooms/back-alley.js?v=90631324'),
   clubhouse: () => import('../quest-rooms/clubhouse.js?v=fb7ecac4'),
   light_perspective: () => import('../quest-rooms/light-perspective.js?v=fae24f72'),
   tile_puzzle: () => import('../quest-rooms/tile-puzzle.js?v=810fb412'),
   operation_grow: () => import('../quest-rooms/operation-grow.js?v=86ec253e'),
   gwendolyn: () => import('../quest-rooms/gwendolyn.js?v=9ae47063'),
   mental_block: () => import('../quest-rooms/mental-block.js?v=5a727a5f'),
-  penalty: () => import('../quest-rooms/penalty.js?v=d2185a44'),
-  esquibeth: () => import('../quest-rooms/esquibeth.js?v=eb39b25c'),
+  penalty: () => import('../quest-rooms/penalty.js?v=bd79c8af'),
+  esquibeth: () => import('../quest-rooms/esquibeth.js?v=eb9a2fa1'),
   firefly_whistle: () => import('../quest-rooms/firefly-whistle.js?v=c0d7433b'),
 };
 
@@ -274,6 +274,9 @@ async function turnIn(engine, questId, opts = {}) {
   if (!opts.force && !requirementsMet(engine, questId)) return false;
   const done = turnInQuest(engine.questState, questId, engine.pc, { ...questCtx(engine), force: opts.force === true });
   if (!done.ok) return false;
+  // quests_familiar_turnin (inc_quests.js 729-748): a familiar turn-in inside the room drops its
+  // "Are you stuck?" prompt (instances_cancel_exit_prompt on the current instance).
+  if (run?.questId === questId && done.def?.familiarTurnin) cancelStuckPrompt();
   const mem = (save.memory[questId] ||= {});
   mem.doneAt = Date.now();
   mem.completions = (Number(mem.completions) || 0) + 1;

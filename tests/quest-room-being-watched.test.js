@@ -19,7 +19,7 @@ import {
   FLAGS,
   FLOOR,
   MONITORS,
-  NAP_MS,
+  EXIT_PROMPT_MS,
   QUEST,
   SPAWN,
   TV,
@@ -32,7 +32,7 @@ import {
   napPlatforms,
   room,
   watching,
-} from '../public/js/quest-rooms/being-watched.js?v=03352d7f';
+} from '../public/js/quest-rooms/being-watched.js?v=ce0e95e1';
 import { QUEST_ROOMS } from '../public/js/quest-rooms/catalog.js?v=9ebeb502';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -40,11 +40,14 @@ const GSJS = join(homedir(), 'Documents/glitch-audit/glitch-GameServerJS');
 const BAND = 160;
 
 describe('Being Watched (stale_but_necessary) source', () => {
-  it('keeps the quest, timer and flags', () => {
+  it('keeps the quest, the exit delay and flags', () => {
     assert.equal(QUEST_ROOMS[QUEST], room.id);
     assert.equal(room.id, 'being_watched');
-    assert.equal(NAP_MS, 300_000);
-    assert.equal(room.durationMs, NAP_MS);
+    // stale_but_necessary.js 95/98: 5*60 is the "Are you stuck?" prompt, not a clock.
+    assert.equal(EXIT_PROMPT_MS, 300_000);
+    assert.equal(room.durationMs, 0);
+    assert.equal(room.exitPromptMs, EXIT_PROMPT_MS);
+    assert.equal(room.expireText, undefined);
     assert.deepEqual(FLAGS, { peek: 'convo_end', leave: 'leave' });
     const quests = JSON.parse(readFileSync(join(root, 'public/assets/content/quests.json'), 'utf8'));
     const def = (quests.quests || quests)[QUEST];

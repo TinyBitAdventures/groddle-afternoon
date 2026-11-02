@@ -36,11 +36,11 @@ import { applyStreetIndex } from '../public/js/street-loader.js?v=33d2b8bc';
 import { loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js?v=10b118dd';
 import { createQuestState } from '../public/js/quests.js?v=282e1621';
 import { HELL_QUESTS, createHellState, croak } from '../public/js/hell.js?v=120ba5e5';
-import { SUBWAY_STREETS } from '../public/js/quest-rooms/back-alley.js?v=bf6df2f1';
+import { SUBWAY_STREETS } from '../public/js/quest-rooms/back-alley.js?v=90631324';
 import { doorRooms, doorToward, routeGraph } from '../public/js/map-routes.js?v=5090dbb7';
 import { afterStreetCard, runStreetTransition, streetCardUp } from '../public/js/screen-fx.js?v=9d4640eb';
 import { EMITTED_EVENTS } from '../public/js/quest-offers.js?v=3c7925ca';
-import { smugglingFeature } from '../public/js/features/smuggling-feature.js?v=ea785cce';
+import { smugglingFeature } from '../public/js/features/smuggling-feature.js?v=f59bc12a';
 import { addItem } from '../public/js/inventory.js?v=b0e33301';
 import { resurrect } from '../public/js/hell.js?v=120ba5e5';
 

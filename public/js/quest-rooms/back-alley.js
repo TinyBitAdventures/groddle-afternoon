@@ -7,7 +7,9 @@
  *    quest_id). onStarted sets pc.back_alley_business = 'fuelmaking' and,
  *    0.1 s later, instances_create_delayed copies The Back Alley
  *    (LIF177DTS6T1KFG, the Legalize It forest) at 715, -73 with
- *    exit_delay 3 * 60.
+ *    exit_delay 3 * 60 (fuelmaking_refuel_robot.js 96): the "Are you
+ *    stuck?" prompt after three minutes (players/inc_instances.js 317-357),
+ *    not a clock.
  *  - locations/location.js: walking into the `back_alley_entered` box makes
  *    the closest npc_bureaucrat run propositionPlayer: four "sss" beats and
  *    an OK. npc_bureaucrat.js on OK (or cancel): quests_set_flag
@@ -57,8 +59,11 @@ const ART = 'assets/sprites/quest-rooms/back_alley/';
 const BOT_ART = 'assets/sprites/quest-rooms/le_miserable/';
 const LEGALIZE = 'assets/sprites/quests/legalize/';
 
-/** source: onStarted exit_delay 3*60. */
-export const ALLEY_MS = 3 * 60 * 1000;
+/**
+ * source: quests/fuelmaking_refuel_robot.js onStarted 96: instances_create_delayed exit_delay 3*60. That exit delay
+ * is the "Are you stuck?" prompt (players/inc_instances.js 317-357), not a clock.
+ */
+export const EXIT_PROMPT_MS = 3 * 60 * 1000;
 /** source: instances_create_delayed x/y (template coordinates, geometry lost). */
 export const ALLEY_SPAWN_SOURCE = Object.freeze({ x: 715, y: -73 });
 /** source: inc_transit.js createAndReturnItem('npc_maintenance_bot', 1, 198, -140). */
@@ -423,11 +428,11 @@ export const room = {
   icon: `${ART}bureaucrat_icon.png`,
   theme: 'dark',
   hubName: 'Instance',
-  durationFor: () => ALLEY_MS,
+  durationMs: 0,
+  exitPromptMs: EXIT_PROMPT_MS, // "Are you stuck?" after 3 * 60 (runtime maybeAskStuck)
   firstStage: () => 'alley',
   leaveText: 'Leave The Back Alley? The Bureaucrat has not had his word yet.',
   travelText: 'Come alone, he said. Use Leave to go back.',
-  expireText: 'The Back Alley closes up.',
   doneLabel: 'Go back',
 
   stageLabel() {

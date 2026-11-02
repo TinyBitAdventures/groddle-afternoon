@@ -11,9 +11,13 @@
  *    the run continues through waterfall_02 (LIFR2OEUQ5832LQ "Western
  *    Grotto"), waterfall_03 (LIFR7REVQ583H6Q "Waterfall Climb") and
  *    waterfall_04_wider (LIFVOTC3H593H7H "Waterfall Hollow"). The 5 * 60
- *    passed to questInstanceLocation is the instance's exit delay, not a play
- *    clock: this room has no timer (player.js even holds the new day while you
- *    are inside a waterfall instance).
+ *    passed to questInstanceLocation (onStarted 108/111, the reminisce
+ *    135/138) is the instance's exit delay, not a play clock: after it
+ *    "Are you stuck? Do you want to leave this place?" asks
+ *    (players/inc_instances.js 317-357, the runtime's shared prompt). This
+ *    room has no timer (player.js even holds the new day while you are inside
+ *    a waterfall instance). How the lost location events opened the later
+ *    waterfalls is unknown, so the one prompt runs from the start of the walk.
  *  - Part 1 has one requirement, the `got_conch` flag ("Find the Conch"), no
  *    rewards and no completion text. onComplete_custom sets end_esquibeth and
  *    locations/location.js then says, 5 s after the next arrival: "Contemplate
@@ -90,6 +94,8 @@ const SFX = 'assets/audio/sfx/';
 
 /** quests/*.js locations, in pilgrimage order. */
 export const STAGES = Object.freeze(['waterfall_01', 'waterfall_02', 'waterfall_03', 'waterfall_04_wider']);
+/** source: onStarted questInstanceLocation(..., 5*60): the "Are you stuck?" prompt, not a clock. */
+export const EXIT_PROMPT_MS = 5 * 60 * 1000;
 /** inc_data_maps_prod.js labels of the prod templates. */
 export const STAGE_LABELS = Object.freeze({
   waterfall_01: 'Eastern Grotto',
@@ -1385,6 +1391,7 @@ export const room = {
   theme: 'dark',
   hubName: 'The Last Pilgrimage of Esquibeth',
   durationMs: 0,
+  exitPromptMs: EXIT_PROMPT_MS, // "Are you stuck?" after 5 * 60 (runtime maybeAskStuck)
   firstStage: 'waterfall_01',
   leaveText: 'Leave the pilgrimage? You will have to start over from the Eastern Grotto.',
   travelText: 'The only way on is Esquibeth’s path.',

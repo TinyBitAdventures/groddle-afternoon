@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 import * as kit from '../public/js/quest-rooms/kit.js?v=c7ea6e0e';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
-const mod = await import('../public/js/quest-rooms/esquibeth.js?v=eb39b25c');
+const mod = await import('../public/js/quest-rooms/esquibeth.js?v=eb9a2fa1');
 
 // Avatar reach (game.js physics): jump 9.6 px/frame against 0.42 gravity peaks near 110 px
 // and carries about 200 px at run speed 4.4; keep margins.
@@ -84,6 +84,9 @@ describe('The Last Pilgrimage of Esquibeth (esquibeth)', () => {
     assert.equal(mod.LINES.found(1, 3), 'Notes: 1 / 3');
     for (const gone of ['great uncertainty', 'drifting apart', 'Elevenness', 'final hope', 'Found 1 of']) assert.ok(!JSON.stringify(mod.LINES).includes(gone) && !mod.LINES.found(1, 3).includes(gone), gone);
     assert.equal(mod.room.durationMs, 0, 'the 5 * 60 is an exit delay, not a clock');
+    // onStarted questInstanceLocation(..., 5*60): "Are you stuck?" after five minutes.
+    assert.equal(mod.EXIT_PROMPT_MS, 300_000);
+    assert.equal(mod.room.exitPromptMs, 300_000);
   });
 
   it('builds the song from the three recorded phrases', () => {

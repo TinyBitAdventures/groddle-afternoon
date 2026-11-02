@@ -33,7 +33,7 @@ import {
   cellStep,
   hasWorkingTool,
   room,
-} from '../public/js/quest-rooms/penalty.js?v=d2185a44';
+} from '../public/js/quest-rooms/penalty.js?v=bd79c8af';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const GSJS = join(homedir(), 'Documents/glitch-audit/glitch-GameServerJS');
@@ -45,6 +45,9 @@ describe('Smuggle the Smuggler source', () => {
     assert.equal(room.id, 'penalty');
     assert.equal(room.durationMs, 0);
     assert.equal(EXIT_PROMPT_MS, 120_000);
+    // The runtime's shared prompt asks it, and again 2 * 60 after each No thanks.
+    assert.equal(room.exitPromptMs, EXIT_PROMPT_MS);
+    assert.equal(typeof room.stuckPromptReady, 'function');
     assert.deepEqual(TOOLS, ['shovel', 'ace_of_spades']);
     const quests = JSON.parse(readFileSync(join(root, 'public/assets/content/quests.json'), 'utf8'));
     const q = quests.quests || quests;

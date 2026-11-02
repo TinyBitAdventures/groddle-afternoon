@@ -9,7 +9,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import * as mod from '../public/js/quest-rooms/top-of-tree.js?v=58cdbd3b';
+import * as mod from '../public/js/quest-rooms/top-of-tree.js?v=e9b472a6';
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 const gsjs = path.join(root, '..', 'glitch-GameServerJS');
@@ -29,4 +29,20 @@ test('the trunk is the CC0 bark deco on a white memory with no floor band', () =
   assert.match(src, /'tree_stack_trunk'/);
   assert.doesNotMatch(src, /tree_base_root_1|cloud_fluffy_1/);
   assert.ok(mod.TRUNK_W >= 80 && mod.TRUNK_W <= 100, 'about 0.7 of an avatar wide');
+});
+
+test('the climb has no clock: the 2*60 exit delay is "Are you stuck?", and time quoins are study acceleration', () => {
+  // high_jump.js 74: instances_create_delayed ... exit_delay: 2*60 (players/inc_instances.js 317-357).
+  if (fs.existsSync(path.join(gsjs, 'quests/high_jump.js'))) {
+    assert.match(fs.readFileSync(path.join(gsjs, 'quests/high_jump.js'), 'utf8'), /instance_id: 'top_of_tree', x: -315, y: -53, exit_delay: 2\*60\}/);
+    // items/quoin.js 202: a time quoin starts skill acceleration; it never touched the instance.
+    assert.match(fs.readFileSync(path.join(gsjs, 'items/quoin.js'), 'utf8'), /if \(this\.instanceProps\.type == 'time'\) pc\.skills_start_acceleration\(amount\);/);
+  }
+  assert.equal(mod.room.durationMs, 0);
+  assert.equal(mod.room.exitPromptMs, 120_000);
+  assert.equal(mod.EXIT_PROMPT_MS, 120_000);
+  assert.equal(mod.CLIMB_MS, undefined);
+  const src = fs.readFileSync(path.join(root, 'public/js/quest-rooms/top-of-tree.js'), 'utf8');
+  assert.doesNotMatch(src, /ctx\.extend\(|\+20 seconds/);
+  assert.match(src, /ctx\.collectQuoin\(q\.type, q\.x, q\.y, \{ ignoreLimit: true \}\);/);
 });

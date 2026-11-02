@@ -17,7 +17,7 @@ import * as kit from '../public/js/quest-rooms/kit.js?v=c7ea6e0e';
 import {
   ALLEY,
   ALLEY_ART,
-  ALLEY_MS,
+  EXIT_PROMPT_MS,
   ALLEY_SET,
   ALLEY_SPAWN_SOURCE,
   BOT_EXIT_PATH,
@@ -43,7 +43,7 @@ import {
   nearestStation,
   room,
   stationForDoor,
-} from '../public/js/quest-rooms/back-alley.js?v=bf6df2f1';
+} from '../public/js/quest-rooms/back-alley.js?v=90631324';
 import * as alleySet from '../public/js/quest-rooms/back-alley-set.js?v=f4c54caa';
 import { STATION_FLOOR, STATIONS, stationArrival, stationByTsid, surfaceStation } from '../public/js/subway.js?v=5719ffc3';
 import { BACK_ALLEY_FILES } from '../public/js/quest-rooms/back-alley-art.js?v=08af5d4f';
@@ -61,7 +61,7 @@ describe("We're Off to See the Lizard (fuelmaking_refuel_robot) source", () => {
   it('maps to the room and keeps the source numbers', () => {
     assert.equal(QUEST_ROOMS[QUEST], 'back_alley');
     assert.equal(room.id, 'back_alley');
-    assert.equal(ALLEY_MS, 180_000);
+    assert.equal(EXIT_PROMPT_MS, 180_000);
     assert.deepEqual(ALLEY_SPAWN_SOURCE, { x: 715, y: -73 });
     assert.deepEqual(BOT_SOURCE, { x: 198, y: -140 });
     assert.deepEqual(BOT_HITBOX, { w: 200, h: 100 });
@@ -285,12 +285,15 @@ describe('World hooks', () => {
     assert.equal(b.log.turnIn, 1);
   });
 
-  it('starts in the alley with the 3-minute clock before the meeting', () => {
+  it('starts in the alley, asking "Are you stuck?" after 3 * 60 (no clock), before the meeting', () => {
     const { wctx } = world({});
     wctx.param = () => '';
     room.world.onTick(wctx);
     assert.equal(room.firstStage(QUEST), 'alley');
-    assert.equal(room.durationFor(QUEST), ALLEY_MS);
+    assert.equal(room.durationFor, undefined);
+    assert.equal(room.durationMs, 0);
+    assert.equal(room.exitPromptMs, EXIT_PROMPT_MS);
+    assert.equal(room.expireText, undefined);
     // onExitLocation: leaving the alley unsolved is a fail (the runtime fails unsolved runs).
     assert.deepEqual(room.onLeave(), { leaveFlag: false });
   });

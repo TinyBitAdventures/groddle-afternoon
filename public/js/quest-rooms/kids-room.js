@@ -44,7 +44,15 @@ const ROOM_ART = 'assets/sprites/quest-rooms/kids_room/';
 export const LETTERS = Object.freeze(['A', 'B', 'E', 'M', 'S', 'T']);
 /** letter_block_3.js onAccepted valid_words (24, in source order). */
 export const WORD_UP_WORDS = Object.freeze(['TEA', 'TAB', 'TAT', 'SET', 'SEA', 'SAT', 'MET', 'MAT', 'MAS', 'ETA', 'EMS', 'EAT', 'BET', 'BAT', 'BAM', 'ATE', 'ABS', 'BEE', 'TEE', 'SEE', 'BAA', 'EBB', 'MAB', 'ATM']);
+/** letter_block_3.js callback_createBlocks time_left 180: the word game's own Time overlay (a real clock). */
 export const SPELL_MS = 180_000;
+/**
+ * source: letter_block_1.js onStarted 133 and letter_block_3.js onStarted 253:
+ * questInstanceLocation(pc, 'kids_room', -1528, -143, 5*60). That exit delay is the "Are you
+ * stuck?" prompt (players/inc_instances.js 317-357), not a clock: the room stays open until you
+ * leave. callback_createBlocks (letter_block_3.js 67-68) cancels it and asks again 5*60 later.
+ */
+export const EXIT_PROMPT_MS = 5 * 60 * 1000;
 /** callback_createBlocks: block_1..3 at x 0/150/300 showing M, S, B. */
 export const START_LETTERS = Object.freeze(['M', 'S', 'B']);
 
@@ -298,9 +306,10 @@ function createBlocks(ctx) {
   ctx.sound('PROTO_PUFF', { volume: 0.5 });
   ctx.data.spelling = true;
   ctx.data.spellEndsAt = Date.now() + SPELL_MS;
-  // instances_schedule_exit_prompt('kids_room', 5*60): the room stays open 5 more minutes.
-  const left = ctx.remaining();
-  if (Number.isFinite(left) && left < 5 * 60_000) ctx.extend(5 * 60_000 - left);
+  // letter_block_3.js 67-68: instances_cancel_exit_prompt('kids_room') (an open "Are you
+  // stuck?" goes), then instances_schedule_exit_prompt('kids_room', 5*60).
+  ctx.cancelStuckPrompt?.();
+  ctx.scheduleStuckPrompt?.(EXIT_PROMPT_MS);
   // move_avatar x 150 (the middle block), facing left.
   ctx.place(BLOCK_X[1], FLOOR);
   ctx.sound('QUEST_ACCEPT', { volume: 0.4 });
@@ -401,7 +410,8 @@ export const room = {
   theme: 'warm',
   // G315: template in hub 61 'Simple Level Quests' (inc_data_maps_prod.js 245), a dev label; plain remake wording.
   hubName: 'Quest',
-  durationMs: 5 * 60_000,
+  durationMs: 0,
+  exitPromptMs: EXIT_PROMPT_MS, // "Are you stuck?" after 5 * 60 (runtime maybeAskStuck)
   leaveText: 'Oh, are you not having fun here? Would you prefer to leave?',
 
   start(ctx) {
@@ -454,6 +464,7 @@ export const room = {
     ctx.data.timers = [];
   },
 
+  /** Word Up's own Time overlay while the blocks are out (letter_block_3.js updateTimeOverlay); no other clock. */
   clock(ctx) {
     return ctx.data.spelling ? Math.max(0, ctx.data.spellEndsAt - Date.now()) : undefined;
   },

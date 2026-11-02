@@ -519,20 +519,26 @@ async function giveItems(ctx) {
   ctx.data.givenItems = true;
   ctx.engine.save?.();
   ctx.solve(); // the quest now survives leaving (onExitLocation checks current_hint)
-  // offerCampExit (help_juju_bandits.js 324-337): instances_cancel_exit_prompt, then "All done here!".
-  ctx.cancelStuckPrompt?.();
   grandmaState(ctx, 'idle');
   schedule(ctx, 0, SCENE.restartMs);
+  // npc_juju_grandma.js giveItems 194-195: q.openHint(), then q.offerCampExit() at once.
   await openHint(ctx, h);
-  while (noteOpen()) await ctx.wait(200);
+  offerCampExit(ctx);
+}
+
+/**
+ * offerCampExit (help_juju_bandits.js 324-337): instances_cancel_exit_prompt('juju_camp'), then a
+ * prompts_add with icon_buttons, no timeout and the one choice OK ('yes'): the bottom-right prompt
+ * stack, as "Are you stuck?" is (one choice, so a plain OK button: PromptView.as 253). Its callback
+ * is instances_exit_via_prompt, so OK leaves at once like Yes, please; there is no "Not yet", the
+ * prompt just stays until you press it or leave another way.
+ */
+export function offerCampExit(ctx) {
+  ctx.cancelStuckPrompt?.();
   if (!ctx.run) return;
-  const answer = await ctx.converse({
-    title: 'Juju Hideout',
-    kicker: ctx.def?.title || 'Carry That Weight',
-    text: TEXT.exitPrompt,
-    choices: [{ label: 'OK', value: 'ok' }, { label: 'Not yet', value: 'stay' }],
-  });
-  if (answer === 'ok' && ctx.run) ctx.leave({ transition: ctx.fx() });
+  ctx.data.campExitAsked = true;
+  ctx.prompt({ text: TEXT.exitPrompt, iconButtons: true, choices: [{ label: 'OK', value: 'yes' }], tag: 'camp_exit' })
+    .then((answer) => { if (answer === 'yes' && ctx.run) ctx.leave({ transition: ctx.fx() }); });
 }
 
 /** Part II: onPlayerCollision with the Paperweight. */
@@ -814,6 +820,7 @@ export const room = {
     ctx.setData('jujuGrandma', ctx.data.grandmaMood || 'idle');
     ctx.setData('jujuBumps', String(ctx.data.bumps || 0));
     ctx.setData('jujuReturned', ctx.data.returned ? '1' : '0');
+    ctx.setData('jujuCampExit', ctx.data.campExitAsked ? '1' : '0');
   },
 
   /**
@@ -848,12 +855,12 @@ export const room = {
     for (let t = 0; t < 40 && !noteOpen(); t++) await ctx.wait(100);
     await ctx.wait(600);
     noteMod?.closeNoteView();
-    for (let t = 0; t < 30 && !ctx.dialogOpen(); t++) await ctx.wait(100);
-    if (mode === 'items') {
-      ctx.advanceDialog();
-      return 'items';
-    }
-    ctx.advanceDialog();
+    // offerCampExit's OK, in the prompt stack.
+    const campOk = () => [...document.querySelectorAll('.prompt-stack .game-prompt')]
+      .find((el) => el.textContent.includes(TEXT.exitPrompt))?.querySelector('[data-prompt-choice]');
+    for (let t = 0; t < 30 && !campOk(); t++) await ctx.wait(100);
+    campOk()?.click();
+    if (mode === 'items') return 'items';
     for (let t = 0; t < 60 && engine.inScene?.(); t++) await ctx.wait(100);
     await ctx.wait(1500);
     const out = await huntAutoplay(engine);

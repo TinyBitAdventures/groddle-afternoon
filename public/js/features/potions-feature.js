@@ -131,7 +131,7 @@ import { itemVerbAchievementCounters } from '../item-verbs.js?v=729ccd91';
 import { patchesFeature } from './patches-feature.js?v=01d4efa5';
 import { homesFeature } from './homes-feature.js?v=6c74a65c';
 import { streetTreeIndex } from './tree-death-feature.js?v=d6a0c85d';
-import { questRoomConverse } from './quest-instances-feature.js?v=f29c62bb';
+import { questRoomConverse } from './quest-instances-feature.js?v=30139391';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
 
 export const POTIONS_FEATURE_ID = 'potions';

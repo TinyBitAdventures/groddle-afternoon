@@ -2,7 +2,9 @@
  * The High Jumper (quests/high_jump.js): the Magic Rock's memory-place tree.
  *
  * Source: onStarted creates instance `top_of_tree` from template
- * LLI19Q27KMF175V (dev LHH37ET29CT1CBO) at -315,-53 with exit_delay 2*60.
+ * LLI19Q27KMF175V (dev LHH37ET29CT1CBO) at -315,-53 with exit_delay 2*60 (high_jump.js
+ * 74): the "Are you stuck?" prompt after two minutes (players/inc_instances.js 317-357), not a
+ * clock, so the climb has no time limit.
  * players/inc_announcements.js overlay_script_top_of_tree adds 50 energy and
  * the rock says "Trial and error, baby. Just get started…"; if no Spinach has
  * been activated it nags at 30 s ("Sigh. Activate a spinach then jump.") and
@@ -28,7 +30,11 @@ export const TREE_H = 2320;
 export const GROUND = 2160;
 export const TRUNK_X = 700;
 export const CROWN_Y = 380;
-export const CLIMB_MS = 2 * 60 * 1000;
+/**
+ * source: quests/high_jump.js onStarted 74, instances_create_delayed exit_delay 2*60. That exit
+ * delay is the "Are you stuck?" prompt (players/inc_instances.js 317-357), not a clock.
+ */
+export const EXIT_PROMPT_MS = 2 * 60 * 1000;
 export const NAG = Object.freeze([
   { atMs: 30_000, text: 'Sigh. Activate a spinach then jump.' },
   { atMs: 45_000, text: 'Oy! Activate a spinach. Then jump. It’s easy!!' },
@@ -158,7 +164,8 @@ export const room = {
   icon: 'assets/sprites/icons/spinach.png',
   theme: 'memory',
   hubName: 'A memory-place',
-  durationMs: CLIMB_MS,
+  durationMs: 0,
+  exitPromptMs: EXIT_PROMPT_MS, // "Are you stuck?" after 2 * 60 (runtime maybeAskStuck)
   doneLabel: 'Go back',
   leaveText: 'Leave the memory-place? You can try the climb again later.',
 
@@ -254,20 +261,15 @@ export const room = {
         ctx.activity(`You picked up ${n} Spinach. Activate it in your pack to jump so high.`);
       }
     }
-    // Crown quoins: ignore_quoin_limit; time quoins add 20 seconds to the climb.
+    // Crown quoins: ignore_quoin_limit. A time quoin is study acceleration like anywhere else
+    // (items/quoin.js 202 skills_start_acceleration): the climb has no clock to add to.
     for (const q of ctx.data.quoins || []) {
       if (q.taken || !q.spr || q.spr.destroyed) continue;
       q.spr.y = q.y + Math.sin(t * 2.6 + q.x / 60) * 6;
       if (Math.abs(p.x - q.x) < 34 && p.y - 70 < q.y + 18 && p.y + 6 > q.y - 18) {
         q.taken = true;
         q.spr.visible = false;
-        if (q.type === 'time') {
-          ctx.extend(20_000);
-          ctx.floatText(q.x, q.y - 16, '+20 seconds', '#ffffff');
-          ctx.sound('QUOIN_TIME', { volume: 0.5 });
-        } else {
-          ctx.collectQuoin(q.type, q.x, q.y, { ignoreLimit: true });
-        }
+        ctx.collectQuoin(q.type, q.x, q.y, { ignoreLimit: true });
       }
     }
     // The rock nags if no Spinach has been activated yet.
