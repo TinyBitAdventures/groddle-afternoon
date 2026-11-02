@@ -94,7 +94,6 @@ export function hotkeySections({ keyring = false, hub = false } = {}) {
         ['Badges', [['B']]],
         ['Feat', [['H']]],
         ['Buffs', [['Y']]],
-        ['Vendor', [['V']]],
       ],
     },
     {

@@ -392,7 +392,6 @@ const PANELS = [
   { name: 'Make', btn: '#make-btn', panel: '#make-panel', close: '#make-close' },
   { name: 'Map', btn: '#map-btn', panel: '#map-panel', close: '#map-close' },
   { name: 'Home', btn: '#home-btn', panel: '#home-panel', close: '#home-close' },
-  { name: 'Vendor', btn: '#vendor-btn', panel: '#vendor-panel', close: '#vendor-close' },
   { name: 'Look', btn: '#avatar-btn', panel: '#avatar-panel', close: '#avatar-close' },
   { name: 'Upgrades', btn: '#img-btn', panel: '#imagination-panel', close: '#imagination-panel [aria-label^="Close"], #imagination-panel .verb-menu-x' },
 ];

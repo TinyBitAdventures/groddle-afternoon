@@ -46,7 +46,6 @@ export const MENU_ROWS = Object.freeze({
   'avatar-btn': { group: 'me', rank: 5, key: 'L' },
   'home-btn': { group: 'world', rank: 0 },
   'feat-btn': { group: 'world', rank: 1, key: 'H' },
-  'vendor-btn': { group: 'world', rank: 2, key: 'V' },
   'snaps-btn': { group: 'world', rank: 3 },
   'buddies-btn': { group: 'social', rank: 0 },
   'groups-btn': { group: 'social', rank: 1 },

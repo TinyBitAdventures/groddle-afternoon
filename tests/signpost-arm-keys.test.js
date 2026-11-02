@@ -18,7 +18,7 @@ import { fileURLToPath } from 'node:url';
 import { walkUpSignpostStreet } from '../public/js/ladder-top-signposts.js?v=40abe6f5';
 import { navigableSignposts, signpostNear, worldToScreen } from '../public/js/street-model.js?v=505d8990';
 import { SIGN_MAX_ARMS, setSignpostKeys } from '../public/js/street-render.js?v=aa2eadc7';
-import { hotkeySections, hotkeyText } from '../public/js/client-hotkeys.js?v=becd1f95';
+import { hotkeySections, hotkeyText } from '../public/js/client-hotkeys.js?v=8b63d6e5';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (p) => readFileSync(join(spike, 'public', p), 'utf8');

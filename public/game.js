@@ -905,7 +905,7 @@ import { installHiresIcons } from './js/icon-hires.js?v=5357d4b4';
 import { installHiresDecos } from './js/deco-hires.js?v=cb905e17';
 import { loadAudioLevels, loadMutedPreference, saveAudioLevel, saveMutedPreference } from './js/audio-pref.js?v=e56202ee';
 import { createAudioBuses, fadeGain } from './js/audio-buses.js?v=af167b54';
-import { installTopBar, renderTopBar } from './js/ui/topbar.js?v=dcf3a03b';
+import { installTopBar, renderTopBar } from './js/ui/topbar.js?v=32d074a4';
 import { installFocusReturn } from './js/ui/focus-return.js?v=8885653a';
 import { QUOIN_FRAME_BOB, advanceQuoinClock, quoinBobBetweenFrames } from './js/quoin-motion.js?v=ea0bd408';
 import { installHiresFirstDraw, installHiresSprites } from './js/sprite-hires.js?v=03e66d26';
@@ -921,7 +921,7 @@ import { createQuestTracker } from './js/ui/quest-tracker.js?v=b088b3c7';
 import { bindCountField, countKeyValue, countStepMarkup } from './js/ui/count-chooser.js?v=893305c8';
 import { bindVerbMenu, focusVerbRow, lockVerbMenuSize, makeVerbRow, placeVerbMenu, plainWords, refuseVerbRow, syncVerbDetail, verbMenuKey, verbRowAttrs, verbRowInner, verbRowKeys } from './js/ui/verb-menu.js?v=e9d100c3';
 import { createPromptSettler, promptId } from './js/prompt-settle.js?v=509ba9cc';
-import { clientKeyAction, createHotkeysSheet, isHotkeySheetRelease, isPlainKey } from './js/client-hotkeys.js?v=becd1f95';
+import { clientKeyAction, createHotkeysSheet, isHotkeySheetRelease, isPlainKey } from './js/client-hotkeys.js?v=8b63d6e5';
 import { installHeldKeyGuard } from './js/held-keys.js?v=98b96620';
 import { forgetTexture, frameTexture, isFailed, isLoaded, onFailed, onLoaded, textureFromUrl, whenLoaded } from './js/textures.js?v=db2ce452';
 import { FALLBACK_MAX as WORLD_ART_FALLBACK_MAX, worldArtFor } from './js/world-art.js?v=df476660';
@@ -22080,6 +22080,10 @@ async function enterStreet(tsid, opts = {}) {
   if (currentStreetPopulation.giantId) {
     data.officialGiantId = currentStreetPopulation.giantId;
   }
+  // The store belongs to the street's vendor: it closes when you leave the street, as the client's
+  // dialogs did on a move (Dialog.as close_on_move 58, 367-373) and the server only traded with a
+  // vendor in your location (main.js doStoreBuy -> getTargetStack, pc.location.apiLockStack).
+  if (isVendorOpen()) closeVendor();
   activeVendor = selectVendorProfile(
     currentStreetTsid,
     new URLSearchParams(location.search).get('vendor') || '',
@@ -25913,9 +25917,10 @@ function spawnVendorNpc(placement = null) {
   label.anchor.set(0.5, 1);
   label.y = -124;
   g.addChild(label);
+  // A click on the vendor is a click on any target: its verb menu, Browse goods walks you over
+  // (requestVerb), as LocationInputHandler and the street spirit's buy_sell verb did.
   g.eventMode = 'static';
   g.cursor = 'pointer';
-  g.on('pointerdown', () => openVendor());
   entityLayer.addChild(g);
   vendorSprite = g;
   register({
@@ -27995,7 +28000,6 @@ async function main() {
       isAvatarOpen() ||
       isShrineOpen()
     ) {
-      if (e.key === 'v' || e.key === 'V') closeVendor();
       if (e.key === 'q' || e.key === 'Q') closeQuestPanel();
       if (e.key === 'b' || e.key === 'B') closeAchievePanel();
       if (e.key === 'h' || e.key === 'H') closeFeatPanel();
@@ -28086,7 +28090,9 @@ async function main() {
     // (TSMainView.as 790-800) only starts Camera Mode, and where Camera Mode cannot start
     // (a quest instance, a verb, a panel) C does nothing, so it never falls through to Make.
     if (isPlainKey(e, 'n')) openMakePanel();
-    if (e.key === 'v' || e.key === 'V') openVendor();
+    // Austin 2026-11-02: no Vendor key. A store opens only from its vendor's verbs, as in the
+    // original (street_spirit.js buy_sell -> inc_stores.js openStoreInterface); the client had no
+    // store key (TSMainView.as: V is only a god build's Q+V render switch, 1916-1921).
     if (e.key === 'l' || e.key === 'L') openAvatarPanel();
   });
   // A letter let go after Shift comes up lower case: drop both (G221, Shift+S held then Shift let go).
@@ -28249,11 +28255,6 @@ async function main() {
     event.preventDefault();
     event.stopPropagation();
     closeMakePanel();
-  });
-  document.getElementById('vendor-btn')?.addEventListener('click', () => {
-    if (!state.started) return;
-    if (isVendorOpen()) closeVendor();
-    else openVendor();
   });
   document.getElementById('vendor-close')?.addEventListener('click', closeVendor);
   document.querySelectorAll('.vendor-tab').forEach((tab) => {
