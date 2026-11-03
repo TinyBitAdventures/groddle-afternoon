@@ -27,17 +27,22 @@ import {
   BEAM_ME_DOWN,
   CONSTELLATION,
   SCENES,
+  SKY_BOX,
   beamAt,
   beamPhysics,
   beamQuoins,
   clickConstellation,
   createConstellationRun,
   fieldStars,
+  fieldStarsIn,
+  doorBox,
+  fitSky,
+  skyPoint,
   isPuzzleSceneTsid,
   nextStarIndex,
   normalizeSceneSave,
   sceneTsid,
-} from '../puzzle-scenes.js?v=5a740c2e';
+} from '../puzzle-scenes.js?v=c47b9319';
 import { metabolicGain, moodMax } from '../metabolics.js?v=8504134e';
 import { frameTexture, isLoaded, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js?v=db2ce452';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
@@ -107,19 +112,26 @@ function buildConstellation(engine) {
   const scene = CONSTELLATION;
   const root = new PIXI.Container();
   const sky = new PIXI.Sprite(skyTexture(PIXI, scene.height, [[0, '#1c2030'], [0.7, '#2c2f42'], [1, '#4a4258']]));
-  // Overscan: the chrome around the location view shows past the scene edges.
+  // Overscan: the chrome around the location view shows past the scene edges (a tall
+  // portrait view too: the sky reaches 1400 px above it).
   sky.x = -600;
-  sky.y = -400;
+  sky.y = -1400;
   sky.width = scene.width + 1200;
-  sky.height = scene.height + 800;
+  sky.height = scene.height + 1800;
   root.addChild(sky);
+  // Ticket 61: the field stars are scattered over the clear sky and the piggy is one layer,
+  // both laid out clear of the windows (layoutSky); until then, the field as it was.
+  const fieldLayer = new PIXI.Container();
+  root.addChild(fieldLayer);
   for (const s of fieldStars(scene)) {
-    root.addChild(deco(PIXI, 'star_asset_01', s.x, s.y, { w: 22 * s.size, h: 22 * s.size, ay: 0.5, alpha: 0.9 }));
+    fieldLayer.addChild(deco(PIXI, 'star_asset_01', s.x, s.y, { w: 22 * s.size, h: 22 * s.size, ay: 0.5, alpha: 0.9 }));
   }
+  const skyLayer = new PIXI.Container();
+  root.addChild(skyLayer);
   const lines = new PIXI.Graphics();
-  root.addChild(lines);
+  skyLayer.addChild(lines);
   const glows = new PIXI.Container();
-  root.addChild(glows);
+  skyLayer.addChild(glows);
   const stars = scene.stars.map((s, i) => {
     const spr = deco(PIXI, 'star_asset_01', s.x, s.y, { w: scene.starSize, h: scene.starSize, ay: 0.5 });
     spr.eventMode = 'static';
@@ -127,7 +139,7 @@ function buildConstellation(engine) {
     spr.hitArea = new PIXI.Circle(0, 0, scene.hitRadius / Math.max(0.2, spr.scale.x || 1));
     spr.on('pointertap', () => clickStar(engine, s.x, s.y));
     spr.puzzleStar = i;
-    root.addChild(spr);
+    skyLayer.addChild(spr);
     return spr;
   });
   const eye = new PIXI.Graphics();
@@ -135,9 +147,9 @@ function buildConstellation(engine) {
   eye.x = scene.eye.x;
   eye.y = scene.eye.y;
   eye.alpha = 0;
-  root.addChild(eye);
+  skyLayer.addChild(eye);
   cloudBank(PIXI, root, scene, scene.floorY, 0xd8d0e8);
-  return { root, lines, glows, stars, eye };
+  return { root, fieldLayer, skyLayer, lines, glows, stars, eye };
 }
 
 function buildBeamMeDown(engine) {
@@ -403,6 +415,94 @@ function drawConstellation(engine) {
   }
 }
 
+/**
+ * Ticket 61 (Friendly, 2026-11-03): stars were hidden under the top pills, the minimap, an
+ * open side panel and the EXIT door. The scene is rebuilt (no archived geometry; the video
+ * shows the whole sky at once), so the sky layer is fitted into the largest part of the
+ * view no window covers (js/puzzle-scenes.js fitSky), at most its own size, and fitted
+ * again when the windows or the view change (a panel opened, the minimap folded, a resize).
+ */
+const SKY_COVERS = ['#hud-stats', '.top-bar .top-actions', '#street-nameplate', '#street-minimap', '#local-chat-dock', '#play-context'];
+const SKY_PAD = 10;
+
+function skyObstacles(engine) {
+  const canvas = engine.renderer?.canvas;
+  if (!canvas?.getBoundingClientRect || typeof document === 'undefined') return null;
+  const view = canvas.getBoundingClientRect();
+  const cam = engine.camera;
+  if (!view.width || !cam?.w) return null;
+  const k = view.width / cam.w;
+  const out = [];
+  for (const sel of SKY_COVERS) {
+    for (const el of document.querySelectorAll(sel)) {
+      if (el.hidden || !el.getClientRects?.().length) continue;
+      const style = globalThis.getComputedStyle?.(el);
+      if (style && (style.visibility === 'hidden' || style.display === 'none' || Number(style.opacity) === 0)) continue;
+      const b = el.getBoundingClientRect();
+      if (b.width < 2 || b.height < 2) continue;
+      out.push({
+        x: cam.x + (b.left - view.left) / k - SKY_PAD,
+        y: cam.y + (b.top - view.top) / k - SKY_PAD,
+        w: b.width / k + 2 * SKY_PAD,
+        h: b.height / k + 2 * SKY_PAD,
+      });
+    }
+  }
+  return { cam, view, k, out };
+}
+
+function layoutSky(engine, { force = false } = {}) {
+  const layer = active?.views?.skyLayer;
+  if (!layer || layer.destroyed) return;
+  const seen = skyObstacles(engine);
+  if (!seen) return;
+  const { cam, view, out } = seen;
+  const scene = active.scene;
+  const sig = [cam.x, cam.y, cam.w, cam.h, view.width, view.height, ...out.flatMap((o) => [o.x, o.y, o.w, o.h])].map((v) => Math.round(v / 4)).join(',');
+  if (!force && sig === active.skySig) return;
+  active.skySig = sig;
+  // The view above the cloud bank (the avatar's head stays clear of the lowest stars).
+  const top = Math.max(cam.y, -40);
+  // The sky art reaches 600 px past the scene's sides (buildConstellation's overscan).
+  const left = Math.max(cam.x + 4, -560);
+  const area = { x: left, y: top, w: Math.min(cam.x + cam.w - 4, scene.width + 560) - left, h: scene.floorY - 44 - top };
+  const obstacles = [...out, doorBox(scene)];
+  const fit = fitSky({ area, obstacles });
+  // The layer draws the box's corner at (fit.x, fit.y).
+  layer.scale.set(fit.scale);
+  layer.position.set(fit.x - SKY_BOX.x * fit.scale, fit.y - SKY_BOX.y * fit.scale);
+  active.skyFit = fit;
+  // Stars stay big enough to see and click when the piggy is drawn small (the glow and lines scale).
+  active.starBoost = Math.max(1, 0.8 / fit.scale);
+  const { PIXI } = engine;
+  const field = active.views.fieldLayer;
+  const avoid = [...scene.stars, scene.eye].map((p) => skyPoint(fit, p));
+  const placedField = fieldStarsIn(area, obstacles, avoid);
+  // The sprites are kept and moved (a texture still loading sizes the one it was made for).
+  placedField.forEach((f, i) => {
+    let spr = field.children[i];
+    if (!spr) {
+      spr = deco(PIXI, 'star_asset_01', f.x, f.y, { ay: 0.5, alpha: 0.9 });
+      spr.fieldSize = 22 * f.size;
+      const size = () => { if (!spr.destroyed) spr.width = spr.height = spr.fieldSize; };
+      if (isLoaded(spr.texture)) size(); else onLoaded(spr.texture.source, size);
+      field.addChild(spr);
+    }
+    spr.visible = true;
+    spr.position.set(f.x, f.y);
+    spr.fieldSize = 22 * f.size;
+    if (isLoaded(spr.texture)) spr.width = spr.height = spr.fieldSize;
+  });
+  for (let i = placedField.length; i < field.children.length; i += 1) field.children[i].visible = false;
+  active.fieldCount = placedField.length;
+  engine.setData('constellationFit', `${fit.scale.toFixed(3)},${Math.round(layer.x)},${Math.round(layer.y)}`);
+  // QA: every star where it is drawn, in scene pixels (tools: the ticket 61 check).
+  if (typeof window !== 'undefined') {
+    const placed = { stars: avoid.slice(0, scene.stars.length), eye: avoid[scene.stars.length], field: placedField, door: doorBox(scene, 0), scale: fit.scale };
+    window.groddlePuzzleSky = () => placed;
+  }
+}
+
 function stepConstellation() {
   const { stars, eye } = active.views;
   const t = Date.now() / 1000;
@@ -410,7 +510,7 @@ function stepConstellation() {
   const showHint = active.run.connected.length === 0 || active.run.misses > 0 || Date.now() - active.lastClickAt > 6000;
   stars.forEach((spr, i) => {
     const pulse = showHint && i === hint ? 1 + Math.sin(t * 6) * 0.18 : 1;
-    if (isLoaded(spr.texture)) spr.scale.set((active.scene.starSize / spr.texture.width) * pulse);
+    if (isLoaded(spr.texture)) spr.scale.set((active.scene.starSize / spr.texture.width) * pulse * (active.starBoost || 1));
   });
   if (active.run.complete) eye.alpha = Math.min(1, eye.alpha + 0.02);
 }
@@ -541,7 +641,14 @@ export const puzzleScenesFeature = {
     if (!engine.started) return;
     demoStep(engine, now);
     if (active && inMyScene(engine)) {
-      if (active.id === 'constellation') stepConstellation();
+      if (active.id === 'constellation') {
+        // Once the piggy is closed it stays put (the award hides the minimap: no jump as it winks).
+        if (!active.run?.complete && (!active.skyAt || now - active.skyAt > 500)) {
+          active.skyAt = now;
+          layoutSky(engine);
+        }
+        stepConstellation();
+      }
       else stepBeam(engine);
     }
     publish(engine, now);

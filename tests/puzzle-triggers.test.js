@@ -253,7 +253,7 @@ describe('gut tubes', () => {
 });
 
 describe('lost puzzle levels (scenes)', async () => {
-  const scenes = await import('../public/js/puzzle-scenes.js?v=5a740c2e');
+  const scenes = await import('../public/js/puzzle-scenes.js?v=c47b9319');
   const { CONSTELLATION, BEAM_ME_DOWN } = scenes;
 
   test('Constellation: stars connect only in order, and the first star closes the piggy', () => {

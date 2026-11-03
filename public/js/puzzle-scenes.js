@@ -66,20 +66,119 @@ export const CONSTELLATION = Object.freeze({
   reward: Object.freeze({ xp: 150, mood: 50 }),
 });
 
+/**
+ * Ticket 61: the piggy (its stars, the lines and the eye) is one layer the feature fits
+ * into the part of the view no window covers (fitSky); SKY_BOX is its box in scene pixels,
+ * the stars and the eye with room for a star's glow. The field stars are then scattered
+ * over the clear sky around it (fieldStarsIn). The EXIT door's box is kept clear of both.
+ */
+export const SKY_BOX = (() => {
+  const pts = [...PIGGY_STARS, PIGGY_EYE];
+  const pad = 22;
+  const x0 = Math.min(...pts.map((p) => p.x)) - pad;
+  const y0 = Math.min(...pts.map((p) => p.y)) - pad;
+  return Object.freeze({ x: x0, y: y0, w: Math.max(...pts.map((p) => p.x)) + pad - x0, h: Math.max(...pts.map((p) => p.y)) + pad - y0 });
+})();
+export function doorBox(scene = CONSTELLATION, pad = 12) {
+  return { x: scene.exit.x - 34 - pad, y: scene.exit.y - 108 - pad, w: 68 + 2 * pad, h: 108 + 2 * pad };
+}
+
 /** Field stars that never crowd the constellation's own (seeded). */
 export function fieldStars(scene = CONSTELLATION, seed = 7) {
   const rnd = seeded(seed);
   const out = [];
   let guard = 0;
+  const door = doorBox(scene);
   while (out.length < scene.fieldCount && guard < 5000) {
     guard += 1;
     const x = 12 + rnd() * (scene.width - 24);
     const y = 8 + rnd() * (scene.floorY - 76);
     const near = (p) => Math.hypot(p.x - x, p.y - y) < 30;
+    // Ticket 61: none behind the EXIT door either (a star half hidden by it read as a lost one).
+    if (x > door.x && x < door.x + door.w && y > door.y) continue;
     if (scene.stars.some(near) || near(scene.eye) || out.some((p) => Math.hypot(p.x - x, p.y - y) < 26)) continue;
     out.push({ x: Math.round(x), y: Math.round(y), size: 0.45 + rnd() * 0.35 });
   }
   return out;
+}
+
+/**
+ * Ticket 61: where the sky layer goes so no star is under a window. `area` is the part of
+ * the view the sky may use and `obstacles` what covers it (both in scene pixels: the HUD
+ * pills, the minimap, the side panels, the EXIT door); the largest clear rectangle (on a
+ * `step` grid) takes `box` at the biggest scale that fits, at most `maxScale`, centred.
+ * Returns { scale, x, y, rect } (a point p of the box draws at x + (p.x - box.x) * scale).
+ */
+export function fitSky({ box = SKY_BOX, area, obstacles = [], step = 8, maxScale = 1, minScale = 0.5 } = {}) {
+  if (!area || area.w <= 0 || area.h <= 0) return { scale: 1, x: box.x, y: box.y, rect: null };
+  const cols = Math.max(1, Math.floor(area.w / step));
+  const rows = Math.max(1, Math.floor(area.h / step));
+  const blocked = (c, r) => {
+    const x0 = area.x + c * step;
+    const y0 = area.y + r * step;
+    return obstacles.some((o) => x0 < o.x + o.w && x0 + step > o.x && y0 < o.y + o.h && y0 + step > o.y);
+  };
+  // Largest rectangle of clear cells: a histogram per row (the classic stack method),
+  // scored by the area the box would get at its fitting scale.
+  const heights = new Array(cols).fill(0);
+  let best = null;
+  const score = (w, h) => Math.min(maxScale, (w * step) / box.w, (h * step) / box.h);
+  for (let r = 0; r < rows; r += 1) {
+    for (let c = 0; c < cols; c += 1) heights[c] = blocked(c, r) ? 0 : heights[c] + 1;
+    const stack = [];
+    for (let c = 0; c <= cols; c += 1) {
+      const h = c < cols ? heights[c] : 0;
+      let start = c;
+      while (stack.length && stack[stack.length - 1][1] >= h) {
+        const [at, hh] = stack.pop();
+        const w = c - at;
+        const sc = score(w, hh);
+        if (hh > 0 && (!best || sc > best.sc + 1e-9 || (Math.abs(sc - best.sc) < 1e-9 && w * hh > best.w * best.h))) {
+          best = { sc, c0: at, r0: r - hh + 1, w, h: hh };
+        }
+        start = at;
+      }
+      stack.push([start, h]);
+    }
+  }
+  if (!best) return { scale: 1, x: box.x, y: box.y, rect: null };
+  const rect = { x: area.x + best.c0 * step, y: area.y + best.r0 * step, w: best.w * step, h: best.h * step };
+  const scale = Math.max(minScale, best.sc);
+  return {
+    scale,
+    x: Math.round(rect.x + (rect.w - box.w * scale) / 2),
+    y: Math.round(rect.y + (rect.h - box.h * scale) / 2),
+    rect,
+  };
+}
+
+/**
+ * Ticket 61: field stars over the clear sky of `area` (scene pixels), none under an
+ * obstacle, none within 30 px of `avoid` (the fitted piggy's stars and eye) or 26 px of
+ * each other; as many as the original field's density gives (46 over the 700 x 230 sky).
+ */
+export function fieldStarsIn(area, obstacles = [], avoid = [], seed = 7) {
+  if (!area || area.w <= 0 || area.h <= 0) return [];
+  const rnd = seeded(seed);
+  const want = Math.max(12, Math.min(90, Math.round((CONSTELLATION.fieldCount * area.w * area.h) / (700 * 230))));
+  const out = [];
+  let guard = 0;
+  while (out.length < want && guard < 6000) {
+    guard += 1;
+    const x = area.x + 8 + rnd() * (area.w - 16);
+    const y = area.y + 8 + rnd() * (area.h - 16);
+    const size = 0.45 + rnd() * 0.35;
+    const r = 11 * size;
+    if (obstacles.some((o) => x + r > o.x && x - r < o.x + o.w && y + r > o.y && y - r < o.y + o.h)) continue;
+    if (avoid.some((p) => Math.hypot(p.x - x, p.y - y) < 30) || out.some((p) => Math.hypot(p.x - x, p.y - y) < 26)) continue;
+    out.push({ x: Math.round(x), y: Math.round(y), size });
+  }
+  return out;
+}
+
+/** A sky point drawn through a fitSky transform. */
+export function skyPoint(fit, p, box = SKY_BOX) {
+  return { x: fit.x + (p.x - box.x) * fit.scale, y: fit.y + (p.y - box.y) * fit.scale };
 }
 
 export function createConstellationRun() {
