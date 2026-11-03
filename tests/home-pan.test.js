@@ -161,6 +161,43 @@ describe('the site side, version 2 (groddle-afternoon-site)', { skip: skipWithou
     assert.equal(pan.tipSide([1800, 0, 100, 50], 1400, 960), '');
   });
 
+  it('shows each arrow button only while the camera can move that way (Austin 2026-11-03)', async () => {
+    const pan = await import(pathToFileURL(join(SITE_DIR, 'players/home-pan.js')).href);
+    // A 2670 px street in a 960 px view: the camera runs 0 to 1710.
+    assert.deepEqual(pan.arrowsShown(0, 2670, 960), { left: false, right: true }, 'start: only right');
+    assert.deepEqual(pan.arrowsShown(800, 2670, 960), { left: true, right: true }, 'middle: both');
+    assert.deepEqual(pan.arrowsShown(1710, 2670, 960), { left: true, right: false }, 'end: only left');
+    assert.deepEqual(pan.arrowsShown(1709.8, 2670, 960), { left: true, right: false }, 'within half a px of the end is the end');
+    assert.deepEqual(pan.arrowsShown(0.3, 2670, 960), { left: false, right: true });
+    assert.deepEqual(pan.arrowsShown(0, 960, 960), { left: false, right: false }, 'a street no wider than the view: none');
+    assert.deepEqual(pan.arrowsShown(0, 700, 960), { left: false, right: false });
+    // A click looks 60% of a view along, held inside the ends; holding pans at Camera Mode's pace.
+    assert.equal(pan.STEP_SHARE, 0.6);
+    assert.equal(pan.arrowStep(0, 1, 2670, 960), 576);
+    assert.equal(pan.arrowStep(576, -1, 2670, 960), 0);
+    assert.equal(pan.arrowStep(1500, 1, 2670, 960), 1710);
+    assert.equal(pan.arrowStep(100, -1, 2670, 960), 0);
+    assert.ok(pan.HOLD_MS > 0 && pan.HOLD_MS <= 400);
+    // The keys work page-wide once used, but never while someone types.
+    for (const el of [{ tagName: 'TEXTAREA' }, { tagName: 'INPUT', type: 'text' }, { tagName: 'INPUT' }, { tagName: 'INPUT', type: 'search' }, { tagName: 'SELECT' }, { tagName: 'DIV', isContentEditable: true }]) assert.equal(pan.typingTarget(el), true, JSON.stringify(el));
+    for (const el of [{ tagName: 'BODY' }, { tagName: 'A' }, { tagName: 'BUTTON' }, { tagName: 'INPUT', type: 'checkbox' }, null]) assert.equal(pan.typingTarget(el), false, JSON.stringify(el));
+  });
+
+  it('the arrow buttons are real buttons over the edges, in the site\'s tokens, 44 px, fading out of reach', () => {
+    const js = site('players/home-pan.js');
+    assert.match(js, /b\.type = 'button';/);
+    assert.match(js, /\['left', 'Look left', /);
+    assert.match(js, /\['right', 'Look right', /);
+    assert.match(js, /b\.setAttribute\('aria-label', label\);/);
+    assert.match(js, /if \(!on\[side\] && document\.activeElement === b\) stage\.focus\(\{ preventScroll: true \}\);/, 'a button that goes hands focus to the street');
+    const css = site('style.css');
+    assert.match(css, /\.home-diorama \.hd-stage > \.hd-arrow \{\n\s*position: absolute; top: 50%; z-index: 200; width: 44px; height: 44px;/);
+    assert.match(css, /color: var\(--fg\); background: color-mix\(in srgb, var\(--surface\) 82%, transparent\);/);
+    assert.match(css, /\.home-diorama \.hd-stage > \.hd-arrow\[data-off\] \{ opacity: 0; visibility: hidden; pointer-events: none;/);
+    assert.match(css, /@media \(prefers-reduced-motion: reduce\) \{ \.home-diorama \.hd-stage > \.hd-arrow/);
+    assert.match(site('src/PlayerPages.php'), /HOME_PAN_JS_KEY = 'pan-2'/, 'the script\'s key moved with it');
+  });
+
   const engine = process.env.MINN_ENGINE_DIR || join(homedir(), 'Cove/Sites/minn-engine.localhost/public/minn');
   it('takes a good street, refuses bad ones, and draws it in layers starting at the game\'s frame (php)', { skip: !existsSync(join(engine, 'src/Minn/Autoloader.php')) && 'Minn Engine not found (set MINN_ENGINE_DIR)' }, () => {
     let out;
@@ -187,7 +224,8 @@ describe('the site side, version 2 (groddle-afternoon-site)', { skip: skipWithou
     assert.match(html, /<figure class="profile-home home-diorama hd-pan">/);
     assert.match(html, /<div class="hd-stage" tabindex="0" role="group" aria-label="Zz Pan&#039;s home street" aria-describedby="hd-hint" data-w="960" data-sw="2670" data-cx="600" style="aspect-ratio:960 \/ 476;--w:960;--cam:600">/);
     assert.deepEqual([...html.matchAll(/<div class="hd-layer" style="--f:([0-9.]+);z-index:(\d+)">/g)].map((m) => [m[1], m[2]]), [['0', '1'], ['0.5', '2'], ['1', '3']]);
-    assert.match(html, /<span class="hd-hint" id="hd-hint" hidden>Use the arrow keys or drag to look around\. <\/span>/);
+    assert.match(html, /<span class="hd-hint" id="hd-hint" hidden>Use the arrows, your arrow keys or drag to look around\. <\/span>/);
+    assert.doesNotMatch(html, /hd-arrow/, 'the arrow buttons are the script\'s: none without JavaScript');
     // Far from the starting frame (the rock at 2300, the view 600..1560): its art waits.
     assert.match(html, /<img data-src="\/assets\/sprites\/rocks\/rock_sheet\.png" data-srcset="[^"]+"/);
     assert.match(html, /<img class="hd-art" src="\/assets\/ui\/signpost\/signpost_post\.png"/);
