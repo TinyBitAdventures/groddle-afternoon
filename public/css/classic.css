@@ -667,6 +667,9 @@
   white-space: nowrap;
 }
 :root[data-ui="classic"] .top-bar .classic-date-time { color: var(--c-classic-title); font: 800 var(--fs-classic-body)/var(--lh-tight) var(--font-classic-title); }
+/* With the hi sign board (multiplayer), the block opens it, as DateTimeUI.as 71-74 opened DateTimeDialog. */
+:root[data-ui="classic"] .top-bar .hud-actions .classic-date[data-hi-board] { cursor: pointer; pointer-events: auto; }
+:root[data-ui="classic"] .top-bar .hud-actions .classic-date[data-hi-board]:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; }
 /* The Sound popover: the 2012 volume panel's look under the icon (AudioControl.as 84-390). */
 :root[data-ui="classic"] .top-bar #sound-pop {
   position: absolute;
@@ -713,6 +716,8 @@
   z-index: var(--z-hud);
 }
 :root[data-ui="classic"] #game-root .street-nameplate:hover { background-image: url("../assets/classic/map_icon_hover.png?v=a5ada334"); }
+:root[data-ui="classic"] #game-root .street-nameplate:not(.is-quest) { pointer-events: auto; }
+:root[data-ui="classic"] #game-root .street-nameplate #street-name:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; }
 :root[data-ui="classic"] #game-root .street-nameplate::before {
   content: "Current location:";
   display: block;

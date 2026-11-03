@@ -145,10 +145,20 @@ export function installClassicTopbar({ doc = globalThis.document, win = globalTh
   doc.addEventListener('pointerdown', (e) => { if (sheetUp && !help.contains(e.target)) hideSheet(); }, true);
   doc.addEventListener('keydown', () => hideSheet(), true);
 
-  // Current location: a click opens the Map (CurrentLocationUI.as 21-142 toggled the hub map).
-  const plate = doc.getElementById('street-nameplate');
-  plate?.addEventListener('click', () => {
-    if (uiState().mode === 'classic') doc.getElementById('map-btn')?.click();
+  // Current location: a click opens the Map (CurrentLocationUI.as 129-141 toggled the hub map).
+  // js/ui/topbar.js installLocationLink wires it for both skins (ticket 60): in Classic the whole block.
+
+  // The date block: a click opens the clock's dialog (DateTimeUI.as 71-74: DateTimeDialog, the hi
+  // sign board), where the clock has one (multiplayer, hi-signs-feature bindClock).
+  date.addEventListener('click', () => {
+    const clock = doc.getElementById('dametime-clock');
+    if (classic() && clock?.dataset.hiBoard !== undefined) clock.click();
+  });
+  date.addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    e.preventDefault();
+    e.stopPropagation();
+    date.click();
   });
 
   const classic = () => uiState().mode === 'classic';
@@ -177,6 +187,25 @@ export function installClassicTopbar({ doc = globalThis.document, win = globalTh
   function syncDate() {
     if (!classic()) return;
     const clock = doc.getElementById('dametime-clock');
+    // The board's clock is a button; without one the block is only words.
+    const board = clock?.dataset.hiBoard !== undefined;
+    if ((date.dataset.hiBoard !== undefined) !== board) {
+      if (board) {
+        date.dataset.hiBoard = '';
+        date.setAttribute('role', 'button');
+        date.setAttribute('tabindex', '0');
+        date.removeAttribute('aria-hidden');
+        date.setAttribute('aria-label', clock.getAttribute('title') || 'Daily limits and things');
+        date.dataset.tip = 'Daily limits and things';
+      } else {
+        delete date.dataset.hiBoard;
+        delete date.dataset.tip;
+        date.removeAttribute('role');
+        date.removeAttribute('tabindex');
+        date.removeAttribute('aria-label');
+        date.setAttribute('aria-hidden', 'true');
+      }
+    }
     const lines = dateLines(clock?.getAttribute('aria-label'), clock?.textContent);
     const [day, time, when] = date.children;
     if (day.textContent !== lines.day) day.textContent = lines.day;

@@ -463,6 +463,64 @@ function shapeStreetName(doc) {
   new MutationObserver(shape).observe(el, { childList: true, characterData: true, subtree: true });
 }
 
+/** The words the street name's link says (ticket 60): its tooltip and its accessible name. */
+export const LOCATION_LINK = Object.freeze({ tip: 'Open the Map', key: 'M' });
+
+/** PURE: the street name's accessible name, "Hechey Track · Groddle Forest. Open the Map". */
+export function locationLinkLabel(text) {
+  const where = String(text || '').replace(/\s+/g, ' ').trim().replace(/^…$/, '');
+  return where ? `${where}. ${LOCATION_LINK.tip}` : LOCATION_LINK.tip;
+}
+
+/**
+ * Ticket 60: the street name (and its region, the same line) opens the Map, as the client's
+ * Current location did (CurrentLocationUI.as 129-141: onClick toggled the hub map); the clock beside
+ * it keeps its own click (the hi sign board in multiplayer, DateTimeUI.as 71-74). It goes through
+ * the Map button, so it opens and closes the Map wherever M does, and not where the Map is hidden
+ * (Gentle Island's nx-hide-map; canOpenMap 119-127 refused while the hub map was off). A pointer,
+ * a hover line and a tooltip show it can be clicked; Tab reaches it and Enter or Space opens it.
+ * In Classic the whole "Current location" block (its map icon and label) is the link, as in 2012.
+ */
+function installLocationLink(doc) {
+  const plate = doc.getElementById('street-nameplate');
+  const name = doc.getElementById('street-name');
+  if (!plate || !name || plate.dataset.locationLink === 'on') return;
+  plate.dataset.locationLink = 'on';
+  name.setAttribute('role', 'button');
+  name.setAttribute('tabindex', '0');
+  name.setAttribute('aria-keyshortcuts', LOCATION_LINK.key);
+  name.dataset.tip = LOCATION_LINK.tip;
+  name.dataset.key = LOCATION_LINK.key;
+  name.dataset.locationLink = '';
+  const label = () => {
+    const next = locationLinkLabel(name.textContent);
+    if (name.getAttribute('aria-label') !== next) name.setAttribute('aria-label', next);
+  };
+  label();
+  new MutationObserver(label).observe(name, { childList: true, characterData: true, subtree: true });
+  const classic = () => doc.documentElement?.dataset?.ui === 'classic';
+  const open = () => {
+    const btn = doc.getElementById('map-btn');
+    if (!btn || btn.disabled || doc.body?.classList.contains('nx-hide-map')) return false;
+    // A Map button the bar does not show (a quest place's chrome) is not one to press.
+    if (!btn.getClientRects().length && !classic()) return false;
+    btn.click();
+    return true;
+  };
+  plate.addEventListener('click', (e) => {
+    if (plate.classList.contains('is-quest')) return;
+    if (e.target?.closest?.('#dametime-clock, .season-chip, .quest-plate')) return;
+    if (!classic() && !e.target?.closest?.('#street-name')) return;
+    open();
+  });
+  name.addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    e.preventDefault();
+    e.stopPropagation();
+    open();
+  });
+}
+
 /**
  * The nameplate sits centred on the window as in the mock, unless a pill is in the way: then it
  * moves into the room between the pills, and past that it gives way (ellipsis). It lives in
@@ -745,9 +803,10 @@ export function installTopBar(doc, opts = {}) {
   installZoom(doc, opts.zoom);
   installNightTint(doc, opts.nightTint);
   installStreetMap(doc, opts.streetMap);
-  const tips = installTooltips(doc, [bar]);
+  const tips = installTooltips(doc, [bar, doc.getElementById('street-nameplate')]);
   adoptTitles(bar);
   shapeStreetName(doc);
+  installLocationLink(doc);
   trackPillWidths(doc);
   doc.getElementById('low-energy-btn')?.addEventListener('click', (e) => {
     e.stopPropagation();
