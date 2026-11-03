@@ -79,6 +79,8 @@ export const REPORT_TEXT = Object.freeze({
   pictureDrawing: 'Drawing the picture…',
   pictureAlt: 'The game when you reported it',
   pictureOpen: 'Open the picture full size',
+  // Austin 2026-11-03: the picture opens over the game (js/ui/picture-lightbox.js), named for screen readers.
+  pictureLabel: 'Report picture',
   sentNoPicture: 'Thanks! Your message was sent, without the picture.',
 });
 

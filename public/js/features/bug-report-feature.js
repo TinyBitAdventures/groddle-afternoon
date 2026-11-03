@@ -50,8 +50,8 @@
  * window.groddleBugReport.open('list'|'new'), .openTicket(id), .refresh() in multiplayer.
  */
 
-import { createReportsApi, REPORT_PICTURE, REPORT_TEXT, UNREAD_POLL_MS, base64Size, pictureSize, reportFromHash } from '../reports.js?v=75f4a7cc';
-import { mountReportsSheet } from '../ui/reports-sheet.js?v=2dfdcf83';
+import { createReportsApi, REPORT_PICTURE, REPORT_TEXT, UNREAD_POLL_MS, base64Size, pictureSize, reportFromHash } from '../reports.js?v=aae32361';
+import { mountReportsSheet } from '../ui/reports-sheet.js?v=b1c361d4';
 
 export const BUG_REPORT_FEATURE_ID = 'bug-report';
 
@@ -388,7 +388,28 @@ const STYLE = `
 #bug-report-panel .reports-check:has(.reports-checkbox:disabled) { opacity: 0.55; cursor: default; }
 #bug-report-panel .reports-filter { flex: none; }
 #bug-report-panel .reports-filter[hidden] { display: none; }
-@media (prefers-reduced-motion: reduce) { [data-ui="modern"] #bug-report-panel .reports-card { animation: none; } }
+/* The report's picture over the game (js/ui/picture-lightbox.js, Austin 2026-11-03): fitted to the window, or at
+   actual size scrolling. Fixed to the window, inside the report window so it goes with it; Classic: css/classic.css. */
+.picture-lightbox { position: fixed; inset: 0; z-index: var(--z-raised); pointer-events: auto; animation: picture-lightbox-in var(--motion-med) var(--ease-out); }
+.picture-lightbox:focus { outline: none; }
+.picture-lightbox-stage { position: absolute; inset: 0; display: flex; overflow: hidden; overscroll-behavior: contain; }
+.picture-lightbox[data-zoomed] .picture-lightbox-stage { overflow: auto; }
+.picture-lightbox-img { flex: none; display: block; margin: auto; max-width: 92vw; max-height: 88vh; width: auto; height: auto; user-select: none; -webkit-user-drag: none; touch-action: none; }
+.picture-lightbox[data-zoomable] .picture-lightbox-img { cursor: zoom-in; }
+.picture-lightbox[data-zoomed] .picture-lightbox-img { max-width: none; max-height: none; cursor: grab; }
+.picture-lightbox[data-dragging] .picture-lightbox-img { cursor: grabbing; }
+.picture-lightbox-bar { position: absolute; top: var(--space-4); right: var(--space-4); display: flex; align-items: center; gap: var(--space-2); }
+.picture-lightbox [hidden] { display: none !important; }
+@keyframes picture-lightbox-in { from { opacity: 0; } to { opacity: 1; } }
+[data-ui="modern"] #bug-report-panel .picture-lightbox { background: color-mix(in srgb, var(--c-black) 72%, transparent); }
+[data-ui="modern"] #bug-report-panel .picture-lightbox-img { border-radius: var(--radius-m); background: var(--surface-sunken); box-shadow: var(--shadow-3); }
+[data-ui="modern"] #bug-report-panel .picture-lightbox[data-zoomed] .picture-lightbox-img { border-radius: 0; box-shadow: none; }
+[data-ui="modern"] #bug-report-panel .picture-lightbox-btn { flex: none; display: inline-grid; place-items: center; width: 36px; height: 36px; margin: 0; padding: 0; border: 1px solid var(--border); border-radius: var(--radius-pill); background: var(--surface); color: var(--text); box-shadow: var(--shadow-3); font: var(--fw-heavy) var(--fs-2xl)/var(--lh-none) var(--font-ui); cursor: pointer; }
+[data-ui="modern"] #bug-report-panel .picture-lightbox-btn:hover { background: var(--surface-hover); }
+[data-ui="modern"] #bug-report-panel .picture-lightbox-tab { display: inline-flex; align-items: center; min-height: 36px; box-sizing: border-box; padding: 0 var(--space-4); border: 1px solid var(--border); border-radius: var(--radius-pill); background: var(--surface); color: var(--text); box-shadow: var(--shadow-3); font: var(--fw-bold) var(--fs-s)/var(--lh-tight) var(--font-ui); text-decoration: none; }
+[data-ui="modern"] #bug-report-panel .picture-lightbox-tab:hover { background: var(--surface-hover); text-decoration: underline; }
+[data-ui="modern"] #bug-report-panel .picture-lightbox-tab:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) { [data-ui="modern"] #bug-report-panel .reports-card, .picture-lightbox { animation: none; } }
 `;
 
 function el(tag, attrs = {}, text = '') {

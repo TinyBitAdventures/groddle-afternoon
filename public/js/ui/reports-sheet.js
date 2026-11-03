@@ -15,8 +15,11 @@
  *   first, then with the game's UI), both ticks work meanwhile, and Send waits
  *   for one still drawing at most PICTURE_WAIT_MS, then sends the world one.
  *   A picture the site refuses never costs the report: it goes again without it.
- * A thread shows the report's picture under its first message; a click opens
- * it full size in a new tab. Ticket 49: Working on it has its own chip, and
+ * A thread shows the report's picture under its first message; a click (or
+ * Enter or Space on it) opens it full size over the game, in this window's
+ * picture lightbox (js/ui/picture-lightbox.js, Austin 2026-11-03: not a new
+ * browser tab; Esc closes the picture only, and Cmd or a middle click still
+ * open a tab). Ticket 49: Working on it has its own chip, and
  * your report's first message has Edit until an administrator has read it
  * (the thread's editable): the words open in a box in place, Save sends them
  * (the same limit as a new report), Cancel puts them back. Once it is read
@@ -40,8 +43,9 @@
  * #reports-filter [data-reports-filter] (the search box, shown from REPORT_FILTER_MIN reports), [data-reports-no-match].
  */
 
-import { REPORT_FILTER_MIN, REPORT_MAX, REPORT_TEXT as T, STATUS_WORDS, canEditFirst, matchesReport, pictureRefused, pictureSrc, refusalWords, ticketLine, unreadCount, whenWords } from '../reports.js?v=75f4a7cc';
+import { REPORT_FILTER_MIN, REPORT_MAX, REPORT_TEXT as T, STATUS_WORDS, canEditFirst, matchesReport, pictureRefused, pictureSrc, refusalWords, ticketLine, unreadCount, whenWords } from '../reports.js?v=aae32361';
 import { focusBack } from './focus-return.js?v=c34f16a0';
+import { lightboxLink } from './picture-lightbox.js?v=070900ad';
 
 /** How long Send waits for a picture still drawing before it sends the world-only one (ms). */
 export const PICTURE_WAIT_MS = 6000;
@@ -75,6 +79,9 @@ export function mountReportsSheet({ doc = globalThis.document, host, api, contex
   let editing = false;
   let shot = null;
   let picture = null;
+  // The thread's picture link (a redraw makes a new one) and its lightbox while it is open.
+  let picLink = null;
+  let lightbox = null;
   // The two pictures a new report can carry (with the game's UI, the world only), drawn when first wanted.
   let shots = { ui: null, world: null };
   // Each picture's drawing while it is under way (ticket 30: drawn behind the form, never in its way).
@@ -236,8 +243,24 @@ export function mountReportsSheet({ doc = globalThis.document, host, api, contex
     if (src && first) {
       const a = e('a', { class: 'reports-picture', href: src, target: '_blank', rel: 'noopener', 'aria-label': T.pictureOpen, title: T.pictureOpen, 'data-reports-thread-picture': '' });
       a.append(e('img', { src, alt: T.pictureAlt, width: String(Number(picture.width) || ''), height: String(Number(picture.height) || ''), loading: 'lazy' }));
+      // Over the game, not a new tab (Austin 2026-11-03). After a pointer open or close focus
+      // goes to this window's title: the window stays open, so the keys stay in it.
+      const { width, height } = picture;
+      lightboxLink(a, {
+        doc,
+        host: panel,
+        width,
+        height,
+        alt: T.pictureAlt,
+        label: T.pictureLabel,
+        opener: () => picLink,
+        fallback: () => title,
+        onOpen: (lb) => { lightbox = lb; },
+        onClose: () => { lightbox = null; },
+      });
+      picLink = a;
       first.append(a);
-    }
+    } else picLink = null;
     closedNote.hidden = ticket.status !== 'closed';
     closeTicket.hidden = ticket.status === 'closed';
     // Open at the newest message's first line (a long reply reads from its start); the body is the one scroller.
@@ -279,6 +302,7 @@ export function mountReportsSheet({ doc = globalThis.document, host, api, contex
   }
 
   async function openTicket(id) {
+    closePicture();
     show('thread');
     ticket = tickets.find((t) => t.id === id) || { id, status: 'open', subject: T.sheet };
     messages = [];
@@ -399,6 +423,7 @@ export function mountReportsSheet({ doc = globalThis.document, host, api, contex
   }
 
   function open(which = 'list') {
+    closePicture();
     if (state === 'closed') {
       state = 'open';
       panel.hidden = false;
@@ -418,8 +443,15 @@ export function mountReportsSheet({ doc = globalThis.document, host, api, contex
     publish();
   }
 
+  /** The picture's lightbox goes with whatever replaces the thread (no focus of its own). */
+  function closePicture() {
+    lightbox?.close({ focus: false });
+    lightbox = null;
+  }
+
   function close() {
     if (state === 'sending') return;
+    closePicture();
     state = 'closed';
     panel.hidden = true;
     publish();
@@ -430,6 +462,7 @@ export function mountReportsSheet({ doc = globalThis.document, host, api, contex
 
   function backToList() {
     if (state === 'sending') return;
+    closePicture();
     show('list');
     drawList();
     say(listMeta());
@@ -640,5 +673,7 @@ export function mountReportsSheet({ doc = globalThis.document, host, api, contex
     get state() { return state; },
     get view() { return view; },
     get unread() { return unread; },
+    /** The picture's lightbox while it is open (js/ui/picture-lightbox.js), else null. */
+    get lightbox() { return lightbox?.open ? lightbox : null; },
   };
 }
