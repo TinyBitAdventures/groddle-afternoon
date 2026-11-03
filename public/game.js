@@ -11679,6 +11679,8 @@ const engine = {
   instanceHold: null,
   /** TSID of the feature scene last entered with enterScene (or null). */
   sceneTsid: null,
+  /** Ticket 57: where that scene leads back to (its returnTo), so Teleport home from it returns there. */
+  sceneReturnTo: null,
   inScene() {
     return Boolean(engine.sceneTsid && currentStreetTsid === engine.sceneTsid);
   },
@@ -11717,6 +11719,10 @@ const engine = {
     climb = { active: false, wall: null };
     currentStreetTsid = scene.tsid;
     engine.sceneTsid = scene.tsid;
+    engine.sceneReturnTo = scene.returnTo?.tsid ? { ...scene.returnTo } : null;
+    // Ticket 57: a scene that leads back to the world, not to your home (another player's home
+    // entered from yours: its way out is your home's own way back), ends your stay at home.
+    if (homeState.inHome && scene.returnTo?.tsid && scene.returnTo.tsid !== HOME_STREET_TSID && scene.returnTo.tsid !== HOME_INTERIOR_TSID) homeState.inHome = false;
     currentStreet = {
       tsid: scene.tsid,
       label: scene.label || scene.tsid,
@@ -11818,7 +11824,9 @@ const engine = {
       else await load();
       return;
     }
-    if (homeIsInstanced()) homeState.inHome = false;
+    // Ticket 57: any trip to a world street ends a stay at home, from a scene too (another
+    // player's home, a Tower floor), not only from your own street or house.
+    if (homeState.inHome) homeState.inHome = false;
     const resolved = resolveIndexTsid(tsid) || tsid;
     await enterStreetWithTransition(resolved, opts);
   },
@@ -22081,13 +22089,9 @@ async function teleportHome({ room = 'street' } = {}) {
     toast('Finish or leave this instance before teleporting home.');
     return { ok: false, reason: 'instance' };
   }
-  const source = {
-    tsid: currentStreetTsid,
-    label: currentStreet?.label || currentStreetTsid,
-    hubName: currentStreet?.hubName || '',
-    x: player?.x,
-    y: player?.y,
-  };
+  const source = homeTripSource();
+  // Ticket 57: a stay at home a scene left behind (it leads back home) is over once you teleport.
+  if (homeState.inHome) homeState.inHome = false;
   const result = beginHomeVisit(homeState, source);
   if (!result.ok) return result;
   // /house (inc_houses.js houses_go_to_new_house go_inside) lands straight inside the house.
@@ -22107,6 +22111,26 @@ async function teleportHome({ room = 'street' } = {}) {
   toast('Welcome home. Your mailbox is waiting.', 3000);
   savePlayerState();
   return result;
+}
+
+/**
+ * Ticket 57: where Teleport home remembers you came from. In a feature scene (another player's
+ * home, a quest room) that is the street the scene leads back to, since the scene itself can't be
+ * entered again from Return to Ur; a scene that leads home keeps the home's own way back.
+ */
+function homeTripSource() {
+  const back = engine.inScene() ? engine.sceneReturnTo : null;
+  if (back?.tsid) {
+    const meta = STREET_INDEX.streets?.[back.tsid];
+    return { tsid: back.tsid, label: meta?.label || back.label || back.tsid, hubName: meta?.hubName || '', x: back.x, y: back.y };
+  }
+  return {
+    tsid: currentStreetTsid,
+    label: currentStreet?.label || currentStreetTsid,
+    hubName: currentStreet?.hubName || '',
+    x: player?.x,
+    y: player?.y,
+  };
 }
 
 async function switchHomeRoom(room) {

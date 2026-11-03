@@ -12,9 +12,11 @@ import { DOCK_GAP, DOCK_W, dockedPickerSpot } from '../public/js/furniture-upgra
 import { filterSwatches, swatchFilters } from '../public/js/ui/home-builder.js?v=d4e0cb64';
 import { listTextures } from '../public/js/home-decor.js?v=39721c9f';
 import { salePlacementKey } from '../public/js/home-street-mp.js?v=9c8a7791';
+import { beginHomeVisit, createHomeState, imagineHome } from '../public/js/homes.js?v=385f9a1a';
 
 const root = join(import.meta.dirname, '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');
+const game = read('public/game.js');
 const homes = read('public/js/features/homes-feature.js');
 const street = read('public/js/features/home-street-mp-feature.js');
 const css = read('public/style.css');
@@ -158,5 +160,29 @@ describe('56: the signpost editor comes back with live buttons', () => {
     const body = street.slice(street.indexOf('async function signpostChange'), street.indexOf('function addNeighbor'));
     assert.ok(body.indexOf('busy = false;') < body.lastIndexOf('openSignpost();'), 'openSignpost runs once the change is done');
     assert.doesNotMatch(body.slice(body.indexOf('try {'), body.indexOf('} catch')), /openSignpost\(\)/);
+  });
+});
+
+describe('57: a visit to a friend\'s home from yours ends your stay at home', () => {
+  it('a stay left set refuses the next trip home (why the World menu said you were home)', () => {
+    const home = createHomeState();
+    imagineHome(home, 'meadow', 1);
+    assert.equal(beginHomeVisit(home, { tsid: 'LA1', label: 'A' }).ok, true);
+    assert.equal(beginHomeVisit(home, { tsid: 'LA2', label: 'B' }).reason, 'already_home');
+  });
+
+  it('a scene that leads back to the world clears it; one that leads home keeps it', () => {
+    assert.match(game, /if \(homeState\.inHome && scene\.returnTo\?\.tsid && scene\.returnTo\.tsid !== HOME_STREET_TSID && scene\.returnTo\.tsid !== HOME_INTERIOR_TSID\) homeState\.inHome = false;/);
+  });
+
+  it('any trip to a world street clears it, from a scene too', () => {
+    const enter = game.slice(game.indexOf('  async enter(tsid, opts = {}) {'), game.indexOf('// G213: every energy/mood gain'));
+    assert.match(enter, /if \(homeState\.inHome\) homeState\.inHome = false;\s*const resolved = resolveIndexTsid/);
+    assert.doesNotMatch(enter, /if \(homeIsInstanced\(\)\) homeState\.inHome = false;/);
+  });
+
+  it('Teleport home from a scene remembers the street the scene leads back to', () => {
+    assert.match(game, /const source = homeTripSource\(\);/);
+    assert.match(game, /function homeTripSource\(\) \{\s*const back = engine\.inScene\(\) \? engine\.sceneReturnTo : null;/);
   });
 });
