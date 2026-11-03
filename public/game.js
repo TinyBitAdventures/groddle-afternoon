@@ -927,14 +927,15 @@ import { mountSocialDrawer } from './js/ui/social-drawer.js?v=a0048e58';
 import { bindDragScroll } from './js/ui/drag-scroll.js?v=9a527ac8';
 import { SIDE_SHEET_IDS, bindTabs, inSideSheet, mountPanelShell, sheetKeyToWorld } from './js/ui/panel-shell.js?v=3d10b1e5';
 import { createQuestSheet, questStep } from './js/ui/quest-sheet.js?v=4d6b1340';
-import { createQuestTracker } from './js/ui/quest-tracker.js?v=32f2596e';
-import { isContextMenuKey as isMenuKey } from './js/ui/context-menu.js?v=4ccdcee0';
+import { createQuestTracker } from './js/ui/quest-tracker.js?v=5487413f';
+import { createContextMenu, isContextMenuKey as isMenuKey } from './js/ui/context-menu.js?v=b3d24c15';
 import { bindCountField, countKeyValue, countStepMarkup } from './js/ui/count-chooser.js?v=893305c8';
 import { bindVerbMenu, focusVerbRow, lockVerbMenuSize, makePickTile, makeVerbRow, pickGridCols, placeVerbMenu, plainWords, refuseVerbRow, syncVerbDetail, verbMenuKey, verbRowAttrs, verbRowInner, verbRowKeys } from './js/ui/verb-menu.js?v=74b6dfa0';
 import { createPromptSettler, promptId } from './js/prompt-settle.js?v=509ba9cc';
-import { clientKeyAction, createHotkeysSheet, isHotkeySheetRelease, isPlainKey } from './js/client-hotkeys.js?v=efc5015a';
+import { clientKeyAction, createHotkeysSheet, isHotkeySheetRelease, isPlainKey } from './js/client-hotkeys.js?v=5a0e7cc7';
 import { EAT_PICK_TEXT, bestFoodIndex, eatChoices, eatTip } from './js/eat-pick.js?v=8fb763d0';
-import { installHeldKeyGuard } from './js/held-keys.js?v=98b96620';
+import { installHeldKeyGuard, isMacPlatform } from './js/held-keys.js?v=98b96620';
+import { signpostArmRows, worldContextAction } from './js/world-context-menu.js?v=f3f48805';
 import { forgetTexture, frameTexture, isFailed, isLoaded, onFailed, onLoaded, textureFromUrl, whenLoaded } from './js/textures.js?v=db2ce452';
 import { FALLBACK_MAX as WORLD_ART_FALLBACK_MAX, worldArtFor } from './js/world-art.js?v=df476660';
 import { sceneAnim, syncAnim } from './js/deco-anim.js?v=6f548fd1';
@@ -1893,6 +1894,12 @@ let time = 0;
 let menuTarget = null;
 /** VERBS: the pointerdown that closed the modern verb menu (its timeStamp), so the canvas skips it. */
 let verbMenuClosedByPointerAt = -1;
+/** RIGHTCLICK: the last press's time (the world's contextmenu asks whether that press closed a menu). */
+let lastPressAt = -1;
+/** RIGHTCLICK: the contextmenu event Shift+F10 or the Menu key sends after its keydown opened the world's menu. */
+let worldMenuEchoUntil = 0;
+/** A Mac's Ctrl+click is its right-click: the world's contextmenu opens the menu, the press does nothing. */
+const MAC_CTRL_CLICK = isMacPlatform();
 /** Target-item chooser state for the original Feed → "Feed what?" flow. */
 let feedPickerTarget = null;
 let feedPickerOptions = [];
@@ -7588,6 +7595,7 @@ function closeVerbMenu() {
   menu.hidden = true;
   delete menu.dataset.vmLevel;
   menuTarget = null;
+  if (app?.canvas?.dataset.contextMenu?.startsWith('world:')) app.canvas.dataset.contextMenu = '';
 }
 
 function isFeedPickerOpen() {
@@ -23056,6 +23064,102 @@ function takeSceneArm(hit) {
   return true;
 }
 
+/** RIGHTCLICK: the shared menu (js/ui/context-menu.js) the world opens for a signpost's arms. */
+let worldCtxMenu = null;
+function worldContextMenu() {
+  if (!worldCtxMenu) worldCtxMenu = createContextMenu({ doc: document, host: document.getElementById('game-root'), id: 'world-ctx-menu', className: 'world-ctx-menu', setData: setCanvasData });
+  return worldCtxMenu;
+}
+
+/**
+ * RIGHTCLICK (js/world-context-menu.js; Austin 2026-11-03: a menu is not an act): a right-click on
+ * the world opens what a left click would open, under the left click's guards, and on a one-click
+ * thing (the mailbox, a scene signpost's arm) its full menu; on an ordinary signpost's arm, the
+ * post's arms. It never walks, never runs a verb and never cancels the one running.
+ */
+function worldRightClick(e) {
+  const blocked = !state.started ? 'not-started'
+    : menuTarget ? 'menu-open'
+      : isMapOpen() ? 'map'
+        : isScreenFxBlocking() ? 'screen'
+          : app?.canvas?.dataset.cameraMode === '1' ? 'camera'
+            : features.query('homeEditMode', engine) ? 'decorating'
+              : Date.now() < worldMenuEchoUntil ? 'echo'
+                // The press that closed a menu does nothing else (R6), as a left click's does.
+                : lastPressAt >= 0 && (verbMenuClosedByPointerAt === lastPressAt || worldCtxMenu?.closedByPressAt() === lastPressAt) ? 'closed-a-menu'
+                  : '';
+  if (!blocked && !e.clientX && !e.clientY) {
+    // The keys' own contextmenu with no keydown before it: Enter's menu (the nearest thing's).
+    setCanvasData('worldRightClick', 'keys');
+    tryOpenNearestMenu();
+    return;
+  }
+  let signBoard = null;
+  let best = null;
+  if (!blocked) {
+    const bounds = app.canvas.getBoundingClientRect();
+    const sx = (e.clientX - bounds.left) * (VIEW_W / bounds.width) + camTarget;
+    const sy = (e.clientY - bounds.top) * (VIEW_H / bounds.height) + (camY || 0);
+    signBoard = signpostBoardAt(signViewsHere(), sx, sy);
+    best = signBoard ? null : pickInteractableAt(sx, sy);
+  }
+  const outOfReach = Boolean(best && behindFloorFromPlayer(best) && !walkOverReaches(best));
+  const action = worldContextAction({ blocked, board: signBoard?.board || null, thing: best, outOfReach });
+  setCanvasData('worldRightClick', action.why ? `${action.kind}:${action.why}` : action.kind);
+  if (action.kind === 'arms') {
+    openSignpostArmsMenu(signBoard, { x: e.clientX, y: e.clientY });
+    return;
+  }
+  if (action.kind === 'scene-arm') {
+    // A scene post's arm runs its verb on a left click (takeSceneArm): here, that target's full menu.
+    const target = signBoard.board.target || interactables.find((t) => t?.sprite === signBoard.view) || null;
+    clearSignpostBoardHover();
+    if (target) openWorldMenuFor(target);
+    return;
+  }
+  if (action.kind === 'out-of-reach') {
+    if (app?.canvas) app.canvas.dataset.reachBlocked = best.classId || '';
+    toast(OUT_OF_REACH_LINE);
+    return;
+  }
+  if (action.kind === 'menu') {
+    setHoverTarget(best);
+    // The mailbox too: its full menu, where a left click checks the mail at once.
+    openWorldMenuFor(best);
+  }
+}
+
+/** The verb menu on a thing, opened by a right-click (QA: canvas data contextMenu "world:<class>"). */
+function openWorldMenuFor(target) {
+  openVerbMenu(target);
+  if (menuTarget === target) setCanvasData('contextMenu', `world:${target.classId || target.kind || ''}`);
+}
+
+/** RIGHTCLICK: a signpost's arms as a menu at the pointer, the arm clicked focused; a pick takes that road. */
+function openSignpostArmsMenu(hit, at) {
+  const view = hit?.view;
+  if (!view) return false;
+  const avail = availableStreetTsids();
+  const rows = signpostArmRows((view.signBoards || []).map((board) => ({ board })), {
+    inGame: (board) => Boolean(pickConnection({ connects: [board.connection] }, avail)),
+    label: signBoardLabel,
+    notInGame: ROAD_NOT_IN_GAME,
+  });
+  const clicked = rows.findIndex((r) => r.board === hit.board);
+  clearSignpostBoardHover();
+  return worldContextMenu().open({
+    title: 'Signpost',
+    rows,
+    at,
+    owner: `signpost:${signBoardLabel(hit.board) || ''}`,
+    focusIndex: clicked < 0 ? null : clicked,
+    onPick: (id) => {
+      const row = rows.find((r) => r.id === id);
+      if (row) takeSignBoard({ view, board: row.board });
+    },
+  });
+}
+
 /**
  * A signpost arm whose street is not in the game's street set (61 arms, e.g. "The Next Step"). The
  * Map cannot reach it either; the old toast said the road was not loaded yet, which read as if it
@@ -27496,6 +27600,8 @@ async function main() {
   npcGlitches = createNpcGlitchKit({ PIXI, ticker: app.ticker, stage: app.stage, hires: vectorBakeScale() === 3, canvas: app.canvas, idleWaitMs: IDLE_TIMING.waitMs });
   app.canvas.setAttribute('role', 'application');
   app.canvas.setAttribute('aria-label', 'Groddle game world');
+  // RIGHTCLICK (R7): Enter or E opens the nearest thing's menu, and so do Shift+F10 and the Menu key.
+  app.canvas.setAttribute('aria-keyshortcuts', 'Enter E Shift+F10 ContextMenu');
   app.canvas.dataset.mode = GAME_MODE;
   app.canvas.tabIndex = 0;
   root.insertBefore(app.canvas, document.getElementById('overlay'));
@@ -28864,6 +28970,18 @@ async function main() {
       }
       return;
     }
+    // RIGHTCLICK: Shift+F10 or the Menu key on the world is Enter: the nearest thing's menu (its
+    // contextmenu that follows on Windows is the echo, worldRightClick).
+    if (isMenuKey(e) && (e.target === app?.canvas || e.target === document.body)) {
+      e.preventDefault();
+      keys.delete(e.key);
+      if (!e.repeat) {
+        worldMenuEchoUntil = Date.now() + 1000;
+        setCanvasData('worldRightClick', 'keys');
+        tryOpenNearestMenu();
+      }
+      return;
+    }
     // Original AvatarController triggers on the key edge, not while Space is
     // held. W/Up keep the remake's accessible jump-or-climb controls, except on
     // a ladder, where Up only climbs (onUpKey returns when apo.onLadder).
@@ -29217,8 +29335,11 @@ async function main() {
     // Player report 23: only the main button acts on the world. The client's right click was its
     // Flash menu, "A game by Tiny Speck" (BootStrap.as 38-55, TSMainView.as 207), never a verb menu.
     if (e.pointerType === 'mouse' && e.button !== 0) return;
-    // The press that closed a verb menu (VERBS) does nothing else, as the old shade's did.
-    if (e.timeStamp === verbMenuClosedByPointerAt) return;
+    // RIGHTCLICK: a Mac's Ctrl+click is a right-click (the contextmenu below opens the menu); it never acts.
+    if (e.pointerType === 'mouse' && e.ctrlKey && MAC_CTRL_CLICK) return;
+    // The press that closed a verb menu (VERBS) does nothing else, as the old shade's did; so does
+    // the press that closed a signpost's arms menu (RIGHTCLICK R6).
+    if (e.timeStamp === verbMenuClosedByPointerAt || e.timeStamp === worldCtxMenu?.closedByPressAt()) return;
     const bounds = app.canvas.getBoundingClientRect();
     const sx = (e.clientX - bounds.left) * (VIEW_W / bounds.width) + camTarget;
     const sy = (e.clientY - bounds.top) * (VIEW_H / bounds.height) + (camY || 0);
@@ -29273,6 +29394,14 @@ async function main() {
       }
       openVerbMenu(best);
     }
+  });
+  // RIGHTCLICK (js/world-context-menu.js): a right-click (Ctrl+click on a Mac, a long press on Android)
+  // opens the thing's verb menu, as a left click does; on a one-click thing its full menu; on a
+  // signpost's arm the post's arms. The browser's menu never opens over the world (js/ui/context-guard.js).
+  window.addEventListener('pointerdown', (e) => { lastPressAt = e.timeStamp; }, true);
+  app.canvas.addEventListener('contextmenu', (e) => {
+    e.preventDefault();
+    worldRightClick(e);
   });
 
   async function beginGame() {

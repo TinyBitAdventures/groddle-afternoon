@@ -15,8 +15,8 @@
  */
 
 import { escapeText } from './verb-menu.js?v=74b6dfa0';
-import { createQuestPinMenu } from './quest-pin-menu.js?v=9bde3f79';
-import { bindContextTrigger, MORE_KEYS_LABEL } from './context-menu.js?v=4ccdcee0';
+import { createQuestPinMenu } from './quest-pin-menu.js?v=efb8b558';
+import { bindContextTrigger, MORE_KEYS_LABEL } from './context-menu.js?v=b3d24c15';
 
 /**
  * @param {{ el: HTMLElement|null, onOpen?: (classTsid: string) => void, onCollapse?: (on: boolean) => void,

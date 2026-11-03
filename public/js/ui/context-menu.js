@@ -91,6 +91,8 @@ export function createContextMenu({ doc, host, id = '', className = '', headClas
   let detail = null;
   /** What is open now: { owner, rows, keys, opener, findOpener, onPick, onClose, data }, or null. */
   let cur = null;
+  /** The time of the press that last closed it (a surface lets that press do nothing else, R6). */
+  let closedAt = -1;
 
   function build() {
     if (el || !doc || !host) return el;
@@ -139,6 +141,7 @@ export function createContextMenu({ doc, host, id = '', className = '', headClas
     // A press anywhere else closes it (the surface's own right-click then opens it again there).
     doc.addEventListener('pointerdown', (e) => {
       if (!cur || el.contains(e.target)) return;
+      closedAt = e.timeStamp ?? -1;
       close({ focus: true });
     }, true);
     doc.defaultView?.addEventListener?.('resize', () => close({ focus: false }));
@@ -220,6 +223,7 @@ export function createContextMenu({ doc, host, id = '', className = '', headClas
     isOpen: () => Boolean(cur),
     owner: () => cur?.owner || '',
     isOpenFor: (owner) => Boolean(cur && cur.owner === String(owner)),
+    closedByPressAt: () => closedAt,
     element: () => el,
   };
 }

@@ -115,6 +115,8 @@ export function hotkeySections({ keyring = false, hub = false, reports = false }
         ...(reports ? [['Report a Bug', [['R']]]] : []),
         ['Preferences', [[',']]],
         ['Verbs', [['Enter'], ['E']]],
+        // RIGHTCLICK (Austin 2026-11-03): the right-click menu from the keys (js/ui/context-menu.js); on the world it is Enter.
+        ['Right-click Menu', [['Shift', 'F10'], ['Menu']], '(What a right-click opens, for the focused thing; on the world, the nearest thing)'],
         // VENDORKEY (Austin 2026-11-02): a vendor in reach (game.js vendorKey).
         ['Vendor', [['V']], '(A vendor in reach)'],
         // Austin 2026-11-01: at a post, the number on an arm takes it (game.js signpostArmKey).
