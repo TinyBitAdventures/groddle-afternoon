@@ -8,10 +8,13 @@ import { join } from 'node:path';
 
 import { END_SEAM, roomPieces } from '../public/js/home-wallpaper.js?v=f1969400';
 import { WALLPAPER_MAPS } from '../public/js/home-wallpaper-art.js?v=9f8473e6';
+import { DOCK_GAP, DOCK_W, dockedPickerSpot } from '../public/js/furniture-upgrade-picker.js?v=3a637ec8';
 
 const root = join(import.meta.dirname, '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');
+const homes = read('public/js/features/homes-feature.js');
 const gsjs = join(root, '../glitch-GameServerJS');
+const client = join(root, '../glitch-client/com/tinyspeck/engine');
 
 describe('51b: no sky between the back wall and the side walls', () => {
   const state = { walls: Array(7).fill('grey_unfinished'), floor: 'starter_crappy', ceiling: 'starter_crappy_ceiling' };
@@ -57,5 +60,44 @@ describe('51a/c: what the original sold and stored at home (source facts the rep
       assert.match(src, /type: "cabinet_start"/, cls);
       assert.match(src, /acl_keys_player_has_key\(pc\)/, cls);
     }
+  });
+});
+
+describe('52: the style picker stands beside its piece, not over it', () => {
+  const area = { left: 0, right: 1440, top: 100, bottom: 520 };
+
+  it('to the right of the piece, the source\'s gap and width, centred in the free height', () => {
+    const spot = dockedPickerSpot({ piece: { left: 400, right: 520, top: 230, bottom: 390 }, area, w: DOCK_W, h: 300 });
+    assert.equal(spot.side, 'right');
+    assert.equal(spot.x, 520 + DOCK_GAP);
+    assert.equal(spot.y, Math.round(100 + (420 - 300) / 2));
+    assert.ok(spot.x >= 520, 'it never covers the piece');
+    assert.deepEqual([DOCK_W, DOCK_GAP], [572 - 250 - 10 - 20, 50]);
+  });
+
+  it('to the left when the right has no room (a piece by the far wall)', () => {
+    const spot = dockedPickerSpot({ piece: { left: 1180, right: 1300, top: 230, bottom: 390 }, area, w: DOCK_W, h: 300 });
+    assert.equal(spot.side, 'left');
+    assert.equal(spot.x + DOCK_W, 1180 - DOCK_GAP);
+  });
+
+  it('a column taller than the free space is held inside it', () => {
+    const spot = dockedPickerSpot({ piece: { left: 400, right: 520, top: 230, bottom: 390 }, area, w: DOCK_W, h: 2000 });
+    assert.equal(spot.y, 108);
+    assert.equal(spot.h, 420 - 16);
+  });
+
+  it('the homes feature anchors it, frames the piece with the camera, and Escape cancels it', () => {
+    assert.match(homes, /anchor: \(\) => pieceClientRect\(engine, item\.id\)/);
+    assert.match(homes, /if \(ok\) frameUpgradePiece\(engine, item\.id\);/);
+    assert.match(homes, /if \(upgradePickerOpen\(\)\) placeUpgradePicker\(\);/);
+    assert.match(homes, /if \(upgradePickerOpen\(\)\) \{\s*closeUpgradePicker\(true\);/);
+  });
+
+  it('the original placed it so (FurnUpgradeDialog.as in-place mode)', { skip: !existsSync(client) }, () => {
+    const src = readFileSync(join(client, 'port/FurnUpgradeDialog.as'), 'utf8');
+    // _jigger 643-646: _w = 572, less PREVIEW_WH 250, PREVIEW_PADD 10 and _base_padd 20 in place.
+    assert.match(src, /_w = 572[\s\S]{0,40}if \(_loc_mode\) \{\s*_w = _w - PREVIEW_WH - PREVIEW_PADD - _base_padd;/);
+    assert.match(src, /dest_x \+= Math\.max\(\(dm\.upgrade_itemstack\.client::physWidth\/2\) \+ 50/);
   });
 });

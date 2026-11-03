@@ -138,7 +138,7 @@ import {
   UNEXPAND_TEXT,
 } from '../home-decor.js?v=39721c9f';
 import { applyBonusUpgrade, applyUpgrade, bonusUpgradeLine, currantsText, hasUpgrades, pieceLabel, rollBonusUpgrade, upgradeVerb, UPGRADE_TEXT } from '../furniture-upgrades.js?v=a3788c0d';
-import { chooseUpgrade, closeUpgradePicker, openUpgradePicker, saveUpgrade, upgradePickerOpen, upgradePickerState } from '../furniture-upgrade-picker.js?v=ffdc8eff';
+import { DOCK_GAP, DOCK_W, chooseUpgrade, closeUpgradePicker, openUpgradePicker, placeUpgradePicker, saveUpgrade, upgradePickerOpen, upgradePickerState } from '../furniture-upgrade-picker.js?v=3a637ec8';
 import {
   BUILDER_TEXT,
   DRAG_DIST,
@@ -3682,9 +3682,57 @@ function openUpgradeFor(engine, id) {
       upgradePreview = null;
       renderFurniture(engine);
     },
+    // Ticket 52: the in-place column beside the piece (FurnUpgradeDialog.as _loc_mode).
+    anchor: () => pieceClientRect(engine, item.id),
+    area: () => upgradeArea(),
   });
+  if (ok) frameUpgradePiece(engine, item.id);
   publish(engine);
   return ok;
+}
+
+/** Ticket 52: the room's free client rect for the style column, clear of a left sheet and the drawer. */
+function upgradeArea() {
+  const r = ui?.builder?.roomRect?.();
+  if (!r) return null;
+  const root = typeof document !== 'undefined' ? document.getElementById('game-root') : null;
+  const cs = root && globalThis.getComputedStyle ? globalThis.getComputedStyle(root) : null;
+  const inset = (name) => parseFloat(cs?.getPropertyValue?.(name)) || 0;
+  return { left: r.left + inset('--inset-l'), right: r.right - inset('--inset-r'), top: r.top, bottom: r.bottom };
+}
+
+/** Ticket 52: a placed piece's rect on screen (client px), the style it previews included. */
+function pieceClientRect(engine, id) {
+  const item = placedItem(decor, id);
+  if (!item) return null;
+  const b = furnitureBounds(item);
+  const a = clientPoint(engine, b.x + roomX0(), b.y);
+  const z = clientPoint(engine, b.x + b.w + roomX0(), b.y + b.h);
+  return a && z ? { left: a.x, top: a.y, right: z.x, bottom: z.y } : null;
+}
+
+/**
+ * Ticket 52: FurnUpgradeDialog.as 388-409 centres the camera on the piece (in decorate mode,
+ * camera_control_pt) so the piece and the column beside it are both in view: the decorate
+ * camera slides until the piece, the gap and the column sit centred in the room's free width.
+ * Outside Decoration Mode the camera follows the avatar, and the column takes whichever side fits.
+ */
+function frameUpgradePiece(engine, id) {
+  if (mode !== 'decorate' || scene?.room !== 'interior') return false;
+  const piece = pieceClientRect(engine, id);
+  const area = upgradeArea();
+  const item = placedItem(decor, id);
+  if (!piece || !area || !item) return false;
+  const one = clientPoint(engine, 0, 0);
+  const hundred = clientPoint(engine, 100, 0);
+  const perPx = one && hundred && hundred.x !== one.x ? 100 / (hundred.x - one.x) : 0;
+  if (!perPx) return false;
+  const pair = (piece.right - piece.left) + DOCK_GAP + DOCK_W;
+  const want = area.left + (area.right - area.left - pair) / 2;
+  const dx = (piece.left - want) * perPx;
+  const span = roomSpan();
+  decorCamX = clampRoomX((decorCamX ?? engine.player?.x ?? 0) + dx, { left: span.left, right: span.right, view: engine.camera?.w || 960 });
+  return true;
 }
 
 /**
@@ -5235,7 +5283,8 @@ function syncFloating(engine, force = false) {
     return;
   }
   if (force) popModel = mode === 'decorate' ? (selected?.kind === 'stack' ? stackPop(engine) : furniturePop(engine)) : selected?.kind === 'fixture' ? fixturePop(engine) : cultivationPop(engine);
-  if (popModel && !drag && !placing && !stackCarry) b.setPop(popModel, popAnchor(engine));
+  // Ticket 52: the style column stands in for the piece's actions while it is open.
+  if (popModel && !drag && !placing && !stackCarry && !upgradePickerOpen()) b.setPop(popModel, popAnchor(engine));
   else b.setPop(null);
   const g = scene.ghost;
   if (!placing || !g || g.destroyed || (packDrag && !packDrag.furniture) || drag?.over === 'tray') {
@@ -5422,6 +5471,13 @@ function bindPointer(engine) {
       // 102-111 submits escape_value; HouseExpandDialog.as 202-209 sets it false). The bar stays open.
       if (engine.questDialogueOpen?.()) return;
       e.stopImmediatePropagation();
+      // The style picker's Escape is its Cancel (FurnUpgradeDialog.as); it used to fall through
+      // to deselecting the piece and left the picker open (ticket 52's QA).
+      if (upgradePickerOpen()) {
+        closeUpgradePicker(true);
+        publish(engine);
+        return;
+      }
       if (drag?.source === 'stack') {
         endStackDrag(engine, e, true);
       } else if (drag || ui?.builder?.dragging) {
@@ -6960,6 +7016,8 @@ export const homesFeature = {
       if (placing && carryBy === 'avatar') updateGhost(engine);
       syncFloating(engine);
     }
+    // Ticket 52: the style column stays beside its piece while the camera eases.
+    if (upgradePickerOpen()) placeUpgradePicker();
   },
 
   onEvent(counter, amount, engine) {
