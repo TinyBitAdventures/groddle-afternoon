@@ -2,9 +2,9 @@
  * Groddle Afternoon — original street geometry + layered decos
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
-import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=bad66806';
+import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=61c5424d';
 import { createFeatureHost } from './js/feature-host.js?v=903263a4';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=db31fad4';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=6dbe65e6';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -272,7 +272,7 @@ import {
   eestiStreetPoint,
   expireDeEmbiggenify,
   findSmallWorthless,
-} from './js/de-embiggenify.js?v=58d2613c';
+} from './js/de-embiggenify.js?v=7ff7ffba';
 import {
   EMOTIONAL_BEAR_ACTIONS,
   EMOTIONAL_BEAR_COMPANIONS,
@@ -461,8 +461,8 @@ import {
 } from './js/inventory.js?v=b0e33301';
 import { PACK_COPY, isBagClass, unitRankAt } from './js/pack-slots.js?v=ba0a895f';
 import { createPackRow, mountPackClearance, packBandRange, packCountText, packSearchEntries, packSlotTip } from './js/ui/pack-row.js?v=65c0f180';
-import { listAnimalFeedOptions } from './js/animals.js?v=a6308230';
-import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=a6308230';
+import { listAnimalFeedOptions } from './js/animals.js?v=1b6a9bf0';
+import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=1b6a9bf0';
 import {
   createDroppedItemState,
   parseDroppedItemState,
@@ -479,7 +479,7 @@ import {
   parsePlayerSave,
   serializePlayerSave,
   restorePlayerSave,
-} from './js/player-save.js?v=c6e3727d';
+} from './js/player-save.js?v=895c68da';
 import {
   HOME_INTERIOR_TSID,
   HOME_STREET_TSID,
@@ -736,7 +736,7 @@ import { holdCloseToFloor } from './js/slope-walk.js?v=9af1e505';
 import { WALK_MAX, avatarGround, coastX, stepAvatar, steerAccel, steerX, streetPhysicsExtras } from './js/avatar-step.js?v=33ad1926';
 import { createUserPath, stepUserPath } from './js/user-path.js?v=8880557f';
 import { FAILED_LINE, inVerbReach, movingLine, verbRange, walkOverEnd, walkOverGoalX } from './js/walk-over.js?v=db80ba07';
-import { hellBuffDesc, isInHell } from './js/hell.js?v=120ba5e5';
+import { hellBuffDesc, isInHell } from './js/hell.js?v=5349e58b';
 import { climbBobY, ladderAnimState, ladderSwap } from './js/ladder-anim.js?v=a8b327a0';
 import { VECTOR_AVATAR } from './js/avatar-vector-sheets.js?v=ad801376';
 import { createNpcGlitchKit } from './js/npc-glitch.js?v=0b81a3e4';
@@ -755,11 +755,10 @@ import { clearPresetActive, renderPresetGroups, renderStarterPicker } from './js
 import {
   loadAmbientMusicConfig,
   resolveAmbientTheme,
-  pickAmbientTrack,
+  ambientPlaylist,
   SILENT_THEME,
   themeLabel,
-  allAmbientTrackUrls,
-} from './js/ambient-music.js?v=22d6d5e1';
+} from './js/ambient-music.js?v=274c2864';
 import {
   MUSICBLOCK_CATALOG,
   MUSICBLOCK_PLAYBACK,
@@ -773,7 +772,7 @@ import {
   planMusicblockDrop,
   playMusicblock,
   starterMusicblocks,
-} from './js/musicblocks.js?v=da091c51';
+} from './js/musicblocks.js?v=9e03edca';
 import {
   VENDOR_PROFILES,
   selectVendorProfile,
@@ -790,7 +789,7 @@ import {
   createAnimalState,
   resetAnimalDay,
   animalStatusLabel,
-} from './js/animals.js?v=a6308230';
+} from './js/animals.js?v=1b6a9bf0';
 import {
   ensureWoodTreeState,
   pickWoodTool,
@@ -819,7 +818,7 @@ import {
   favorRelationNote,
   emblemRelationNote,
   formatSpeedUpTime,
-} from './js/shrines.js?v=cf7c3993';
+} from './js/shrines.js?v=4b395ddf';
 import { shrinePowderOptions, shrinePowderAchievementCounters } from './js/powders.js?v=3c3e9997';
 import {
   GAMESHOW_TICKET_ID,
@@ -830,7 +829,7 @@ import {
   spinMeResponse,
   spinningWheelPhase,
   startSpinningWheel,
-} from './js/spinning-wheel.js?v=c25f2a97';
+} from './js/spinning-wheel.js?v=1e66758d';
 import {
   CUBIMAL_PACKAGE_IDS,
   cubimalCollectionProgress,
@@ -889,8 +888,8 @@ import {
   ANIMAL_PATROL,
   nearestPlacementGap,
 } from './js/street-ecology.js?v=75086599';
-import { chickenPauseRoll, easeToward, flightFloorAt, flightFloorFor, flyerLift } from './js/street-creatures.js?v=71b36a9e';
-import { createSoundBoard, DEFAULT_SFX_VOLUME, watchButtonClicks, watchPanelSounds } from './js/sound-board.js?v=a1c4a308';
+import { chickenPauseRoll, easeToward, flightFloorAt, flightFloorFor, flyerLift } from './js/street-creatures.js?v=b838d3a0';
+import { createSoundBoard, DEFAULT_SFX_VOLUME, watchButtonClicks, watchPanelSounds } from './js/sound-board.js?v=f992a5c5';
 import {
   actionLoopFor,
   legacySoundKey,
@@ -5749,13 +5748,9 @@ let ambientTrackUrl = null;
 
 async function loadAudio() {
   await loadAmbientMusicConfig('assets/content/ambient-music.json?v=streetmusic-4');
-  const files = {
-    music: 'assets/audio/groddle.mp3', // legacy default / fallback
-  };
-  // Preload hub ambient tracks (GSJS ambient_library stand-ins)
-  for (const url of allAmbientTrackUrls()) {
-    files[`amb:${url}`] = url;
-  }
+  // Street music streams when a street needs it (setAmbientForStreet), so nothing is fetched here:
+  // the libraries are 330 MB of Tiny Speck's recordings, and the game used to download and decode
+  // every ambient track before it started.
   audio.ctx = new (window.AudioContext || window.webkitAudioContext)();
   // MUTE: the one route to the speakers, set from the saved settings before any sound starts.
   audio.buses = createAudioBuses(audio.ctx, audioSettings());
@@ -5773,17 +5768,6 @@ async function loadAudio() {
     onPlayed: (last) => { if (app?.canvas) app.canvas.dataset.lastSound = last; },
   });
   audio.board.preload(PRELOAD_SOUND_KEYS);
-  await Promise.all(
-    Object.entries(files).map(async ([key, url]) => {
-      try {
-        const res = await fetch(url);
-        if (!res.ok) return;
-        audio.buffers[key] = await audio.ctx.decodeAudioData((await res.arrayBuffer()).slice(0));
-      } catch (e) {
-        console.warn('audio', key, e);
-      }
-    })
-  );
 }
 
 /** Small recovered files worth warming at boot (the rest load on first use). */
@@ -5936,8 +5920,15 @@ function startMusic() {
   setAmbientForStreet(currentStreet || { hubId: '56', hubName: 'Groddle Forest' });
 }
 
+/** The playing library: its theme, its tracks and which one plays (ambientPlaylist). */
+let ambientPlaylistState = null;
+
 /**
  * Crossfade / switch ambient BGM for a street (hub-based).
+ * A hub's original library plays as the client played it: from its first track, each once,
+ * then the next (ambientPlaylist; SoundMaster.as changeAmbientSet 474-499, onSoundComplete
+ * 616-640), and a set already playing carries on across its streets. A street's music_file and
+ * the stand-in themes loop one track.
  * @param {{ hubId?: string|number, hubName?: string, musicFile?: string }} street
  * @param {{ force?: boolean }} [opts]
  */
@@ -5945,57 +5936,125 @@ function setAmbientForStreet(street, opts = {}) {
   if (!audio.ctx) return;
   const theme = resolveAmbientTheme(street || {});
   if (theme === SILENT_THEME) {
-    // Keep the current track loaded but faded out; the next street fades in.
+    // Keep the current track going but faded out; the next street fades in.
     ambientThemeId = theme;
     applyMute();
     return;
   }
-  const url =
-    pickAmbientTrack(theme, { hubId: street?.hubId, random: false }) ||
-    'assets/audio/groddle.mp3';
-  const bufKey = audio.buffers[`amb:${url}`] ? `amb:${url}` : audio.buffers.music ? 'music' : null;
-  if (!bufKey) return;
-
-  // Same theme+track already playing — leave it
-  if (!opts.force && ambientThemeId === theme && ambientTrackUrl === url && audio.music) {
+  const list = ambientPlaylist(theme, { hubId: street?.hubId });
+  if (!list.tracks.length) return;
+  // Same theme (and, for a looped stand-in, the same track) already playing: leave it.
+  const playing = audio.music && !audio.music.stopped && ambientPlaylistState?.theme === theme;
+  if (!opts.force && playing && (!list.loop || ambientTrackUrl === list.tracks[0])) {
+    ambientThemeId = theme;
     applyMute();
     return;
   }
+  ambientPlaylistState = { theme, tracks: list.tracks, index: list.start, loop: list.loop };
+  ambientThemeId = theme;
+  startStreetTrack(list.tracks[list.start], list.loop, STREET_TRACK_FADE_SEC);
+}
 
-  const prev = audio.music;
-  const prevGain = audio.trackGain;
-  const now = audio.ctx.currentTime;
-
-  // Fade out previous (linear, so it ends at exactly 0), then stop it.
-  if (prev && prevGain) {
-    try {
-      fadeGain(prevGain.gain, 0, STREET_TRACK_FADE_SEC, audio.ctx);
-      prev.stop(now + STREET_TRACK_FADE_SEC + 0.05);
-    } catch {
-      try {
-        prev.stop();
-      } catch {
-        /* */
-      }
-    }
-  }
-
+/**
+ * Street music streams: an <audio> element per track, through a MediaElementSource into the
+ * music bus, so a long library track starts once its first seconds arrive and is never held
+ * decoded in memory (the Flash client streamed them too: SoundMaster.addSound, Sound.load).
+ * Returns null when the element cannot be routed through the buses (it would bypass Mute).
+ */
+function streetMusicVoice(url, loop) {
+  const el = new Audio();
+  el.preload = 'auto';
+  el.loop = loop;
+  el.src = typeof globalThis.groddleDataUrl === 'function' ? globalThis.groddleDataUrl(url) : url;
   // MUTE: the new track starts silent on its own gain, which only reaches the speakers through the
   // music bus and the master: muted or at Music 0 it is never heard, however it fades in.
-  const g = audio.buses.musicVoice(0);
-  audio.trackGain = g;
+  const gain = audio.buses.musicVoice(0);
+  let node;
+  try {
+    node = audio.ctx.createMediaElementSource(el);
+    node.connect(gain);
+  } catch {
+    try { gain.disconnect(); } catch { /* */ }
+    return null;
+  }
+  const voice = {
+    url,
+    el,
+    gain,
+    stopped: false,
+    play() {
+      const started = el.play();
+      // Autoplay refused before the first click or key: start on the next one.
+      started?.catch?.(() => {
+        const retry = () => {
+          if (audio.music === voice && !voice.stopped) el.play().catch(() => {});
+        };
+        window.addEventListener('pointerdown', retry, { once: true, capture: true });
+        window.addEventListener('keydown', retry, { once: true, capture: true });
+      });
+    },
+    stop(afterSec = 0) {
+      voice.stopped = true;
+      setTimeout(() => {
+        el.pause();
+        el.removeAttribute('src');
+        el.load();
+        try { voice.looper?.stop(); } catch { /* ended */ }
+        try { node.disconnect(); gain.disconnect(); } catch { /* */ }
+      }, Math.max(0, afterSec) * 1000);
+    },
+  };
+  if (loop) {
+    // A media element's loop leaves a gap at the seam; a short loop (Sky Plunge's 9 s a cappella,
+    // the Rook cues) hands over to a decoded buffer, which loops without one, at the same point.
+    el.addEventListener('loadedmetadata', () => {
+      if (!(el.duration > 0 && el.duration <= STREET_LOOP_BUFFER_MAX_SEC)) return;
+      const key = `loop:${url}`;
+      Promise.resolve(audio.buffers[key] || fetch(url).then((r) => r.arrayBuffer()).then((b) => audio.ctx.decodeAudioData(b)))
+        .then((buffer) => {
+          audio.buffers[key] = buffer;
+          if (audio.music !== voice || voice.stopped) return;
+          const src = audio.ctx.createBufferSource();
+          src.buffer = buffer;
+          src.loop = true;
+          src.connect(gain);
+          src.start(0, (el.currentTime || 0) % buffer.duration);
+          el.pause();
+          voice.looper = src;
+        })
+        .catch(() => { /* the element keeps looping */ });
+    }, { once: true });
+  }
+  return voice;
+}
+
+/** Street loops up to this long loop from a decoded buffer (gapless); longer ones stream. */
+const STREET_LOOP_BUFFER_MAX_SEC = 60;
+
+function startStreetTrack(url, loop, fadeSec) {
+  const prev = audio.music;
+  if (prev && !prev.stopped) {
+    // Fade out the previous track (linear, so it ends at exactly 0), then let it go.
+    fadeGain(prev.gain.gain, 0, STREET_TRACK_FADE_SEC, audio.ctx);
+    prev.stop(STREET_TRACK_FADE_SEC + 0.05);
+  }
+  const voice = streetMusicVoice(url, loop);
+  audio.music = voice;
+  audio.trackGain = voice?.gain || null;
   audio.trackTarget = null;
-
-  const src = audio.ctx.createBufferSource();
-  src.buffer = audio.buffers[bufKey];
-  src.loop = true;
-  src.connect(g);
-  src.start(0);
-
-  audio.music = src;
-  ambientThemeId = theme;
   ambientTrackUrl = url;
-  applyMute(STREET_TRACK_FADE_SEC);
+  if (app?.canvas) app.canvas.dataset.ambientTrack = url;
+  if (!voice) return;
+  voice.el.addEventListener('ended', () => {
+    if (audio.music !== voice || voice.stopped) return;
+    const list = ambientPlaylistState;
+    if (!list || list.loop) return;
+    // The next track of the set at once, round to the first (onSoundComplete 627-639).
+    list.index = (list.index + 1) % list.tracks.length;
+    startStreetTrack(list.tracks[list.index], false, 0.05);
+  });
+  voice.play();
+  applyMute(fadeSec);
 }
 
 /** The Sound popover's Effects and Music levels, 0 to 100 (js/audio-pref.js; 100 is the game's own mix). */
@@ -13909,8 +13968,8 @@ function showGhostVignette(text, durationMs = 2800) {
 /**
  * phantom_glitch.js onEnterLocation 437-438: on a haunted street the player hears
  * announce_sound('HEARTBEAT', 1000000), a loop that lasts the visit; clickPhantom (323)
- * and onExitLocation (442-445) stop it. HEARTBEAT has no recovered file, so
- * js/synth-sfx.js's heartbeat recipe beats about once a second.
+ * and onExitLocation (442-445) stop it. HEARTBEAT is Tiny Speck's 21 s Heartbeat.mp3 (Sounds.zip),
+ * which loops natively once loaded; until then js/synth-sfx.js's heartbeat recipe beats once a second.
  */
 function startPhantomHeartbeat() {
   stopPhantomHeartbeat();
@@ -29385,11 +29444,20 @@ async function main() {
         levels: { ...audioLevels },
         theme: ambientThemeId,
         track: ambientTrackUrl,
+        // What the street music element is really doing (G-soundzip QA): its source, clock and index.
+        trackSrc: audio.music?.el?.currentSrc || null,
+        trackPlaying: Boolean(audio.music && !audio.music.stopped && (audio.music.looper || !audio.music.el.paused)),
+        trackBuffered: Boolean(audio.music?.looper),
+        trackTime: audio.music?.el ? Math.round(audio.music.el.currentTime * 10) / 10 : null,
+        trackLoops: audio.music?.el?.loop ?? null,
+        playlist: ambientPlaylistState ? { theme: ambientPlaylistState.theme, index: ambientPlaylistState.index, of: ambientPlaylistState.tracks.length } : null,
         master: audio.master?.gain.value ?? null,
         music: audio.musicBus?.gain.value ?? null,
         sfx: audio.sfxGain?.gain.value ?? null,
       }),
       travel: (tsid) => enterStreetWithTransition(String(tsid)).then(() => currentStreetTsid),
+      /** Ends the street track now, as its last second would (a library moves to its next track). */
+      endTrack: () => audio.music?.el?.dispatchEvent(new Event('ended')),
     },
     /** Idle/AFK QA (&idledemo=1): loaded idle sheets with load/bake ms, AFK and the idle timer. */
     /** World quoins as drawn: sprite y plus the frame's baked bob (QA for js/quoin-motion.js). */
@@ -29455,7 +29523,7 @@ async function main() {
     },
   };
   if (new URLSearchParams(location.search).has('soundtest')) {
-    import('./js/sound-test.js?v=cf280a8b').then((m) => m.openSoundTest({ document, playSound, board: () => audio.board, unmute: async () => {
+    import('./js/sound-test.js?v=f2bb22b9').then((m) => m.openSoundTest({ document, playSound, board: () => audio.board, unmute: async () => {
       state.muted = false;
       if (audio.ctx?.state === 'suspended') {
         try { await audio.ctx.resume(); } catch (_) { /* opt-in */ }

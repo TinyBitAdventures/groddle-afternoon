@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { SOUND_ALIASES, SOUND_FILES } from '../public/js/sound-keys.js?v=2d82d399';
+import { SOUND_ALIASES, SOUND_FILES } from '../public/js/sound-keys.js?v=c8a66499';
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 const pub = path.join(root, 'public');
@@ -34,13 +34,13 @@ describe('archive.org sound mapping', () => {
     }
   });
 
-  test('every installed sfx file is mapped (Wayback c2, archive.org, an overlay source or the Slack mirror)', () => {
+  test('every installed sfx file is mapped (Wayback c2, archive.org, an overlay source, the Slack mirror or Sounds.zip)', () => {
     for (const name of fs.readdirSync(SFX_DIR).filter((f) => f.endsWith('.mp3'))) {
       const key = name.replace(/\.mp3$/, '');
       const row = catalog[key];
       assert.ok(row, `${name} has no catalog key`);
       assert.equal(row.file, `assets/audio/sfx/${name}`, `${name} is installed but not mapped`);
-      assert.ok(['wayback-c2', 'archiveorg-sfx', 'overlay-fla', 'slack-mirror'].includes(row.origin), `${name} origin ${row.origin}`);
+      assert.ok(['wayback-c2', 'archiveorg-sfx', 'overlay-fla', 'slack-mirror', 'sounds-zip'].includes(row.origin), `${name} origin ${row.origin}`);
     }
   });
 

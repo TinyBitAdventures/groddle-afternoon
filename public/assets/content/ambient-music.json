@@ -1,9 +1,9 @@
 {
-  "source": "glitch-GameServerJS/main.js ambient_library + ambient_hub_map; public-domain music from glitchthegame.com/downloads (Wayback 2013-12-14)",
-  "note": "Original client picked a random track from ambient_library[set] when entering a hub. Streets could override via geometry.music_file (announce_music). Full c2.glitch.bz/sounds ambient libraries (Forest_Theme_*, CAVERN_*, Highlands_*, etc.) were never archived at exact CDN URLs — we use the complete public /downloads/ music catalog as stand-ins keyed to hub themes. The archive.org music item (glitch-mmo-tiny-speck-music, 31 tracks) matches files we already ship byte for byte; its ringtone item (esquebeth-quest) adds Meditation (Round Two in Seven) = MEDITATIVE_ARTS_01, Goodnight Groddle = GOODNIGHT_GRODDLE and 20 more Musicblock tunes, and the sfx item adds ROOK_FLOCK (rook flight); ROOK_ATTACK is the ringtone 'The Rook' (best guess). Those live in assets/audio/sfx/<KEY>.mp3 (tools/sound/archiveorg-sfx-map.json).",
+  "source": "glitch-GameServerJS/main.js ambient_library + ambient_hub_map; the originals from Sounds.zip (tools/sound/sounds-zip-map.json); stand-ins from glitchthegame.com/downloads (Wayback 2013-12-14)",
+  "note": "The original client played a hub's ambient_library set as a playlist: the first track when the set changed, each once, then the next (SoundMaster.as changeAmbientSet 474-499, onSoundComplete 616-640). A street's geometry.music_file loops its one recording instead (location.js 481-482, announce_music 999). Every library is Tiny Speck's own recordings again (Sounds.zip, a fan re-upload of the c2.glitch.bz sound files; 2026-11-02): order 'library' themes play that way. The other themes (subway, Enchanted Wood, meditation, the Rook, Eesti, the lively party) still stand in with Tiny Speck's downloads-page music, the archive.org ringtones (Meditation (Round Two in Seven) = MEDITATIVE_ARTS_01, Goodnight Groddle, the Musicblock tunes) and the archive.org sfx ROOK_FLOCK / ROOK_ATTACK; each loops one track picked by hub.",
   "recovered": {
     "downloadsCatalog": 46,
-    "cdnAmbientLibraries": 0,
+    "cdnAmbientLibraries": 15,
     "localAmbientTracks": 34,
     "archiveorgRingtones": 22,
     "archiveorgRookCues": 2
@@ -13,115 +13,198 @@
     "default": {
       "label": "Forest / Groddle",
       "gsjsKeys": ["FOREST_AMBIENT1", "FOREST_AMBIENT2", "FOREST_AMBIENT3", "FOREST_AMBIENT4"],
+      "order": "library",
+      "note": "FOREST_AMBIENT4 is Forest Theme 4.7, the nearest surviving take (music_map names 4.6, not in Sounds.zip).",
       "tracks": [
-        "assets/audio/ambient/groddle.mp3",
-        "assets/audio/ambient/Groddle-Forest-Theme_1291876879.mp3",
-        "assets/audio/ambient/Groddle-Theme-Snappy-Mix_1291876544.mp3",
-        "assets/audio/ambient/Groddle-Theme-Dreamland-Mix_1291876965.mp3",
-        "assets/audio/ambient/enchanted_woods_1344997332.mp3"
+        "assets/audio/sfx/FOREST_AMBIENT1.mp3",
+        "assets/audio/sfx/FOREST_AMBIENT2.mp3",
+        "assets/audio/sfx/FOREST_AMBIENT3.mp3",
+        "assets/audio/sfx/FOREST_AMBIENT4.mp3"
       ]
     },
     "caverns": {
       "label": "Ilmenskie Caverns",
       "gsjsKeys": ["AMBIENT_CAVERNS1", "AMBIENT_CAVERNS2", "AMBIENT_CAVERNS3", "AMBIENT_CAVERNS4"],
+      "order": "library",
       "tracks": [
-        "assets/audio/ambient/Ilmenskie-Caverns-Work-Song_1291877437.mp3",
-        "assets/audio/ambient/Tubamaphone_1292397289.mp3",
-        "assets/audio/ambient/metalmaker_1344997841.mp3"
-      ]
-    },
-    "cave": {
-      "label": "Caves",
-      "gsjsKeys": ["CAVE_MUSIC1", "CAVE_MUSIC2", "CAVE_MUSIC3", "CAVE_MUSIC4", "CAVE_MUSIC5"],
-      "tracks": [
-        "assets/audio/ambient/Ilmenskie-Caverns-Work-Song_1291877437.mp3",
-        "assets/audio/ambient/Tubamaphone_1292397289.mp3",
-        "assets/audio/ambient/moon_music_1344997839.mp3"
-      ]
-    },
-    "firebog": {
-      "label": "Firebog",
-      "gsjsKeys": ["AMBIENT_FIREBOGS1", "AMBIENT_FIREBOGS2", "AMBIENT_FIREBOGS3"],
-      "tracks": [
-        "assets/audio/ambient/Spooky_Groddle_1291879214.mp3",
-        "assets/audio/ambient/rooks_woods_1344997275.mp3"
+        "assets/audio/sfx/AMBIENT_CAVERNS1.mp3",
+        "assets/audio/sfx/AMBIENT_CAVERNS2.mp3",
+        "assets/audio/sfx/AMBIENT_CAVERNS3.mp3",
+        "assets/audio/sfx/AMBIENT_CAVERNS4.mp3"
       ]
     },
     "uralia": {
       "label": "Uralia",
       "gsjsKeys": ["AMBIENT_URALIA1", "AMBIENT_URALIA2", "AMBIENT_URALIA3", "AMBIENT_URALIA4"],
+      "order": "library",
       "tracks": [
-        "assets/audio/ambient/Rainbow-Run_1291879159.mp3",
-        "assets/audio/ambient/eesti_life_catalogue_1344997859.mp3",
-        "assets/audio/ambient/moon_music_1344997839.mp3"
+        "assets/audio/sfx/AMBIENT_URALIA1.mp3",
+        "assets/audio/sfx/AMBIENT_URALIA2.mp3",
+        "assets/audio/sfx/AMBIENT_URALIA3.mp3",
+        "assets/audio/sfx/AMBIENT_URALIA4.mp3"
+      ]
+    },
+    "firebog": {
+      "label": "Firebog",
+      "gsjsKeys": ["AMBIENT_FIREBOGS1", "AMBIENT_FIREBOGS2", "AMBIENT_FIREBOGS3", "AMBIENT_FIREBOGS4", "AMBIENT_FIREBOGS5", "AMBIENT_FIREBOGS6", "AMBIENT_FIREBOGS7"],
+      "order": "library",
+      "tracks": [
+        "assets/audio/sfx/AMBIENT_FIREBOGS1.mp3",
+        "assets/audio/sfx/AMBIENT_FIREBOGS2.mp3",
+        "assets/audio/sfx/AMBIENT_FIREBOGS3.mp3",
+        "assets/audio/sfx/AMBIENT_FIREBOGS4.mp3",
+        "assets/audio/sfx/AMBIENT_FIREBOGS5.mp3",
+        "assets/audio/sfx/AMBIENT_FIREBOGS6.mp3",
+        "assets/audio/sfx/AMBIENT_FIREBOGS7.mp3"
       ]
     },
     "savanna": {
       "label": "Savanna",
-      "gsjsKeys": ["AMBIENT_SAVANNA1", "AMBIENT_SAVANNA2"],
+      "gsjsKeys": ["AMBIENT_SAVANNA1", "AMBIENT_SAVANNA2", "AMBIENT_SAVANNA3", "AMBIENT_SAVANNA4", "AMBIENT_SAVANNA5", "AMBIENT_SAVANNA6"],
+      "order": "library",
       "tracks": [
-        "assets/audio/ambient/Rainbow-Run_1291879159.mp3",
-        "assets/audio/ambient/Groddle-Theme-Snappy-Mix_1291876544.mp3",
-        "assets/audio/ambient/eesti_life_catalogue_1344997859.mp3",
-        "assets/audio/ambient/marching_band_1344997302.mp3"
+        "assets/audio/sfx/AMBIENT_SAVANNA1.mp3",
+        "assets/audio/sfx/AMBIENT_SAVANNA2.mp3",
+        "assets/audio/sfx/AMBIENT_SAVANNA3.mp3",
+        "assets/audio/sfx/AMBIENT_SAVANNA4.mp3",
+        "assets/audio/sfx/AMBIENT_SAVANNA5.mp3",
+        "assets/audio/sfx/AMBIENT_SAVANNA6.mp3"
       ]
     },
     "highlands": {
       "label": "Highlands",
-      "gsjsKeys": ["AMBIENT_HIGHLANDS1", "AMBIENT_HIGHLANDS2"],
+      "gsjsKeys": ["AMBIENT_HIGHLANDS1", "AMBIENT_HIGHLANDS2", "AMBIENT_HIGHLANDS3", "AMBIENT_HIGHLANDS4", "AMBIENT_HIGHLANDS5", "AMBIENT_HIGHLANDS6", "AMBIENT_HIGHLANDS7"],
+      "order": "library",
       "tracks": [
-        "assets/audio/ambient/Groddle-Theme-Dreamland-Mix_1291876965.mp3",
-        "assets/audio/ambient/Meditation_1291879502.mp3",
-        "assets/audio/ambient/meditation1_1344997850.mp3",
-        "assets/audio/ambient/meditation2_1344997844.mp3",
-        "assets/audio/ambient/meditation3_1344997842.mp3",
-        "assets/audio/ambient/meditation4_1344997846.mp3",
-        "assets/audio/sfx/MEDITATIVE_ARTS_01.mp3"
+        "assets/audio/sfx/AMBIENT_HIGHLANDS1.mp3",
+        "assets/audio/sfx/AMBIENT_HIGHLANDS2.mp3",
+        "assets/audio/sfx/AMBIENT_HIGHLANDS3.mp3",
+        "assets/audio/sfx/AMBIENT_HIGHLANDS4.mp3",
+        "assets/audio/sfx/AMBIENT_HIGHLANDS5.mp3",
+        "assets/audio/sfx/AMBIENT_HIGHLANDS6.mp3",
+        "assets/audio/sfx/AMBIENT_HIGHLANDS7.mp3"
       ]
     },
-    "bortola_muufo": {
-      "label": "Slow forest (Bortola/Muufo)",
-      "gsjsKeys": ["AMBIENT_FOREST_SLOW1", "AMBIENT_FOREST_SLOW2"],
+    "cave": {
+      "label": "Caves",
+      "gsjsKeys": ["CAVE_MUSIC1", "CAVE_MUSIC2", "CAVE_MUSIC3", "CAVE_MUSIC4", "CAVE_MUSIC5"],
+      "order": "library",
       "tracks": [
-        "assets/audio/ambient/Groddle-Forest-Theme_1291876879.mp3",
-        "assets/audio/ambient/Groddle-Theme-Dreamland-Mix_1291876965.mp3",
-        "assets/audio/ambient/enchanted_woods_1344997332.mp3",
-        "assets/audio/ambient/waiting_muzak_1344997267.mp3"
-      ]
-    },
-    "nottis": {
-      "label": "Winter (Nottis/Drifa)",
-      "gsjsKeys": ["WINTER_HUB1", "WINTER_HUB2", "WINTER_HUB3"],
-      "tracks": [
-        "assets/audio/ambient/winterland_1344997854.mp3",
-        "assets/audio/ambient/winter_holiday_1344997255.mp3",
-        "assets/audio/ambient/moon_music_1344997839.mp3"
-      ]
-    },
-    "andra_kajuu": {
-      "label": "Kajuu / Andra",
-      "gsjsKeys": ["ANDRA_KAJUU_1", "ANDRA_KAJUU_2"],
-      "tracks": [
-        "assets/audio/ambient/Rainbow-Run_1291879159.mp3",
-        "assets/audio/ambient/The_Rube_Song_1290596637.mp3"
+        "assets/audio/sfx/CAVE_MUSIC1.mp3",
+        "assets/audio/sfx/CAVE_MUSIC2.mp3",
+        "assets/audio/sfx/CAVE_MUSIC3.mp3",
+        "assets/audio/sfx/CAVE_MUSIC4.mp3",
+        "assets/audio/sfx/CAVE_MUSIC5.mp3"
       ]
     },
     "ix": {
       "label": "Ix",
-      "gsjsKeys": ["AMBIENT_IX_1", "AMBIENT_IX_2"],
+      "gsjsKeys": ["AMBIENT_IX_1", "AMBIENT_IX_2", "AMBIENT_IX_3", "AMBIENT_IX_4", "AMBIENT_IX_5", "AMBIENT_IX_6", "AMBIENT_IX_7", "AMBIENT_IX_8", "AMBIENT_IX_9", "AMBIENT_IX_10", "AMBIENT_IX_11", "AMBIENT_IX_12", "AMBIENT_IX_13", "AMBIENT_IX_14", "AMBIENT_IX_15", "AMBIENT_IX_16", "AMBIENT_IX_17", "AMBIENT_IX_18"],
+      "order": "library",
       "tracks": [
-        "assets/audio/ambient/elevator_music_1344997334.mp3",
-        "assets/audio/ambient/subway_music_1344997270.mp3",
-        "assets/audio/ambient/Tubamaphone_1292397289.mp3",
-        "assets/audio/ambient/waiting_muzak_1344997267.mp3"
+        "assets/audio/sfx/AMBIENT_IX_1.mp3",
+        "assets/audio/sfx/AMBIENT_IX_2.mp3",
+        "assets/audio/sfx/AMBIENT_IX_3.mp3",
+        "assets/audio/sfx/AMBIENT_IX_4.mp3",
+        "assets/audio/sfx/AMBIENT_IX_5.mp3",
+        "assets/audio/sfx/AMBIENT_IX_6.mp3",
+        "assets/audio/sfx/AMBIENT_IX_7.mp3",
+        "assets/audio/sfx/AMBIENT_IX_8.mp3",
+        "assets/audio/sfx/AMBIENT_IX_9.mp3",
+        "assets/audio/sfx/AMBIENT_IX_10.mp3",
+        "assets/audio/sfx/AMBIENT_IX_11.mp3",
+        "assets/audio/sfx/AMBIENT_IX_12.mp3",
+        "assets/audio/sfx/AMBIENT_IX_13.mp3",
+        "assets/audio/sfx/AMBIENT_IX_14.mp3",
+        "assets/audio/sfx/AMBIENT_IX_15.mp3",
+        "assets/audio/sfx/AMBIENT_IX_16.mp3",
+        "assets/audio/sfx/AMBIENT_IX_17.mp3",
+        "assets/audio/sfx/AMBIENT_IX_18.mp3"
+      ]
+    },
+    "andra_kajuu": {
+      "label": "Kajuu / Andra",
+      "gsjsKeys": ["ANDRA_KAJUU_1", "ANDRA_KAJUU_2", "ANDRA_KAJUU_3", "ANDRA_KAJUU_4", "ANDRA_KAJUU_5", "ANDRA_KAJUU_6", "ANDRA_KAJUU_7", "ANDRA_KAJUU_8", "ANDRA_KAJUU_9", "ANDRA_KAJUU_10", "ANDRA_KAJUU_11", "ANDRA_KAJUU_12", "ANDRA_KAJUU_13", "ANDRA_KAJUU_14", "ANDRA_KAJUU_15"],
+      "order": "library",
+      "note": "music_map gives ANDRA_KAJUU_10 and _11 the same file (Kajuu_11.3), so it comes round twice, as it did in the original.",
+      "tracks": [
+        "assets/audio/sfx/ANDRA_KAJUU_1.mp3",
+        "assets/audio/sfx/ANDRA_KAJUU_2.mp3",
+        "assets/audio/sfx/ANDRA_KAJUU_3.mp3",
+        "assets/audio/sfx/ANDRA_KAJUU_4.mp3",
+        "assets/audio/sfx/ANDRA_KAJUU_5.mp3",
+        "assets/audio/sfx/ANDRA_KAJUU_6.mp3",
+        "assets/audio/sfx/ANDRA_KAJUU_7.mp3",
+        "assets/audio/sfx/ANDRA_KAJUU_8.mp3",
+        "assets/audio/sfx/ANDRA_KAJUU_9.mp3",
+        "assets/audio/sfx/ANDRA_KAJUU_11.mp3",
+        "assets/audio/sfx/ANDRA_KAJUU_11.mp3",
+        "assets/audio/sfx/ANDRA_KAJUU_12.mp3",
+        "assets/audio/sfx/ANDRA_KAJUU_13.mp3",
+        "assets/audio/sfx/ANDRA_KAJUU_14.mp3",
+        "assets/audio/sfx/ANDRA_KAJUU_15.mp3"
+      ]
+    },
+    "kloro_haoma": {
+      "label": "Kloro / Haoma",
+      "gsjsKeys": ["AMBIENT_KLORO_HAOMA1"],
+      "order": "library",
+      "tracks": ["assets/audio/sfx/AMBIENT_KLORO_HAOMA1.mp3"]
+    },
+    "urwok": {
+      "label": "Roobrik / Balzare",
+      "gsjsKeys": ["AMBIENT_URWOK1", "AMBIENT_URWOK2", "AMBIENT_URWOK3", "AMBIENT_URWOK4", "AMBIENT_URWOK5", "AMBIENT_URWOK6", "AMBIENT_URWOK7", "AMBIENT_URWOK8"],
+      "order": "library",
+      "note": "AMBIENT_URWOK5 is Urwok 5.3, the nearest surviving take (music_map names 5.4, not in Sounds.zip).",
+      "tracks": [
+        "assets/audio/sfx/AMBIENT_URWOK1.mp3",
+        "assets/audio/sfx/AMBIENT_URWOK2.mp3",
+        "assets/audio/sfx/AMBIENT_URWOK3.mp3",
+        "assets/audio/sfx/AMBIENT_URWOK4.mp3",
+        "assets/audio/sfx/AMBIENT_URWOK5.mp3",
+        "assets/audio/sfx/AMBIENT_URWOK6.mp3",
+        "assets/audio/sfx/AMBIENT_URWOK7.mp3",
+        "assets/audio/sfx/AMBIENT_URWOK8.mp3"
+      ]
+    },
+    "jal": {
+      "label": "Jal / Samudra",
+      "gsjsKeys": ["JAL1", "JAL2"],
+      "order": "library",
+      "tracks": [
+        "assets/audio/sfx/JAL1.mp3",
+        "assets/audio/sfx/JAL2.mp3"
+      ]
+    },
+    "nottis": {
+      "label": "Winter (Nottis/Drifa)",
+      "gsjsKeys": ["WINTER_HUB1", "WINTER_HUB2", "WINTER_HUB3", "WINTER_HUB4", "WINTER_HUB5"],
+      "order": "library",
+      "tracks": [
+        "assets/audio/sfx/WINTER_HUB1.mp3",
+        "assets/audio/sfx/WINTER_HUB2.mp3",
+        "assets/audio/sfx/WINTER_HUB3.mp3",
+        "assets/audio/sfx/WINTER_HUB4.mp3",
+        "assets/audio/sfx/WINTER_HUB5.mp3"
+      ]
+    },
+    "bortola_muufo": {
+      "label": "Slow forest (Bortola/Muufo)",
+      "gsjsKeys": ["AMBIENT_FOREST_SLOW1", "AMBIENT_FOREST_SLOW2", "AMBIENT_FOREST_SLOW3", "AMBIENT_FOREST_SLOW4"],
+      "order": "library",
+      "tracks": [
+        "assets/audio/sfx/AMBIENT_FOREST_SLOW1.mp3",
+        "assets/audio/sfx/AMBIENT_FOREST_SLOW2.mp3",
+        "assets/audio/sfx/AMBIENT_FOREST_SLOW3.mp3",
+        "assets/audio/sfx/AMBIENT_FOREST_SLOW4.mp3"
       ]
     },
     "hell": {
       "label": "Hell",
       "gsjsKeys": ["HELL"],
-      "tracks": [
-        "assets/audio/ambient/Dirge-of-the-Damned_1291886020.mp3"
-      ]
+      "order": "library",
+      "note": "music_map HELL is 1274906921-Bongbong.mp3, which is the downloads page's Dirge of the Damned byte for byte (Sounds.zip), so Hell plays its original.",
+      "tracks": ["assets/audio/ambient/Dirge-of-the-Damned_1291886020.mp3"]
     },
     "subway": {
       "label": "Subway",
@@ -201,20 +284,20 @@
     "party_highlands": {
       "label": "Party: Val Holla",
       "gsjsKeys": ["AMBIENT_HIGHLANDS6"],
-      "note": "Highlands_6.3.mp3 is unrecovered; a public Highlands-theme stand-in.",
-      "tracks": ["assets/audio/ambient/Groddle-Theme-Dreamland-Mix_1291876965.mp3"]
+      "note": "Highlands_6.3.mp3 from Sounds.zip (music_map AMBIENT_HIGHLANDS6).",
+      "tracks": ["assets/audio/sfx/AMBIENT_HIGHLANDS6.mp3"]
     },
     "party_abysmal": {
       "label": "Party: Aquarius",
       "gsjsKeys": ["ABYSMAL_THRILLS"],
-      "note": "_Abysmal_Thrill_1.1_2.mp3 is unrecovered; Elevator Music (public downloads) stands in.",
-      "tracks": ["assets/audio/ambient/elevator_music_1344997334.mp3"]
+      "note": "_Abysmal_Thrill_1.1_2.mp3 from Sounds.zip (music_map ABYSMAL_THRILLS).",
+      "tracks": ["assets/audio/sfx/ABYSMAL_THRILLS.mp3"]
     },
     "party_holiday": {
       "label": "Party: Winter Wingding",
       "gsjsKeys": ["GLITCHMAS_PARTY_LOCATION"],
-      "note": "Holiday_Party_Space_Loop_2.1.mp3 is unrecovered; Winter Holiday (public downloads) stands in.",
-      "tracks": ["assets/audio/ambient/winter_holiday_1344997255.mp3"]
+      "note": "Holiday_Party_Space_Loop_2.1.mp3 from Sounds.zip (music_map GLITCHMAS_PARTY_LOCATION; WINTER_WALK_QUEST names the same file).",
+      "tracks": ["assets/audio/sfx/GLITCHMAS_PARTY_LOCATION.mp3"]
     },
     "party_lively": {
       "label": "Party: lively stand-in",
@@ -238,14 +321,123 @@
     },
     "snappy": {
       "label": "Groddle Snappy Loop",
-      "gsjsKeys": ["SNAPPY_LOOP"],
-      "tracks": ["assets/audio/ambient/Groddle-Theme-Snappy-Mix_1291876544.mp3"]
+      "gsjsKeys": ["SNAPPY_LOOP", "WHISTLE_SONG"],
+      "note": "Snappy_w_and_wo_whistle_Loop.mp3 (2011-09) from Sounds.zip; WHISTLE_SONG names the same file. HOME_STREET_GRODDLE_WHISTLE named a 2012-08 re-upload that did not survive.",
+      "tracks": ["assets/audio/sfx/SNAPPY_LOOP.mp3"]
     },
     "sky_plunge": {
       "label": "Sky Plunge (Rainbow Run A Cappella)",
       "gsjsKeys": ["CLOUD_DROP_2", "CLOUD_DROP_2_INTRO", "TICKET_TO_PARADISE1"],
       "note": "Players name the Rainbow Run A Cappella theme as the Sky Plunge music. GSJS inc_data_sounds.js:203-206 cuts CLOUD_DROP_2 (8 s loop) and CLOUD_DROP_2_INTRO from it, named for the WIP street cloud_drop_2 (LDOQBF6DEO138FJ); no source binds a key to the template LHFO01RM7I238UN, and TICKET_TO_PARADISE1 (the full take) is unrecovered. The course plays the recovered loop; the intro is its every-quoin music.",
       "tracks": ["assets/audio/sfx/CLOUD_DROP_2.mp3"]
+    },
+    "carnivorous_plants": {
+      "label": "Carnivorous Plants",
+      "gsjsKeys": ["XAVIER_CARNIVOROUS_PLANTS"],
+      "note": "1274727254-CarnivorousPlantsDigestion.mp3 from Sounds.zip (music_map XAVIER_CARNIVOROUS_PLANTS).",
+      "tracks": ["assets/audio/sfx/XAVIER_CARNIVOROUS_PLANTS.mp3"]
+    },
+    "abandoned_apartments": {
+      "label": "Abandoned Apartments",
+      "gsjsKeys": ["ABANDONED_APARTMENTS1"],
+      "note": "1339105456-Abandonded_Apartments_Basement_and_Lobby_1.2.mp3 from Sounds.zip (music_map ABANDONED_APARTMENTS1).",
+      "tracks": ["assets/audio/sfx/ABANDONED_APARTMENTS1.mp3"]
+    },
+    "underground_puzzles": {
+      "label": "Abandoned Building Puzzles",
+      "gsjsKeys": ["UNDERGROUND_PUZZLES"],
+      "note": "1338428582-Abandoned_Building_Puzzles_1.4.mp3 from Sounds.zip (music_map UNDERGROUND_PUZZLES).",
+      "tracks": ["assets/audio/sfx/UNDERGROUND_PUZZLES.mp3"]
+    },
+    "dinosaur_intestines": {
+      "label": "Dinosaur Ambience",
+      "gsjsKeys": ["DINOSAUR_INTESTINES"],
+      "note": "1352397228-Dinosaur_Ambience_1.1.mp3 from Sounds.zip (music_map DINOSAUR_INTESTINES).",
+      "tracks": ["assets/audio/sfx/DINOSAUR_INTESTINES.mp3"]
+    },
+    "de_embiggenify": {
+      "label": "De-Embiggenify",
+      "gsjsKeys": ["DE_EMBIGGENIFY"],
+      "note": "1316485534-De-Embiggenfify_1.2.mp3 from Sounds.zip (music_map DE_EMBIGGENIFY).",
+      "tracks": ["assets/audio/sfx/DE_EMBIGGENIFY.mp3"]
+    },
+    "spiral_stars": {
+      "label": "Spiral Stars",
+      "gsjsKeys": ["SPIRAL_STARS"],
+      "note": "1340729256-Cloud_Theme_1.1.mp3 from Sounds.zip (music_map SPIRAL_STARS).",
+      "tracks": ["assets/audio/sfx/SPIRAL_STARS.mp3"]
+    },
+    "blue_white": {
+      "label": "Blue and White",
+      "gsjsKeys": ["BLUE__WHITE"],
+      "note": "1335837087-Blue_Quest_Ambient_Loop_1.1.mp3 from Sounds.zip (music_map BLUE__WHITE).",
+      "tracks": ["assets/audio/sfx/BLUE__WHITE.mp3"]
+    },
+    "paralaxing_streets": {
+      "label": "Paralaxing Streets",
+      "gsjsKeys": ["PARALAXING_STREETS"],
+      "note": "1335917252-Paralaxing_Level_1.3.mp3 from Sounds.zip (music_map PARALAXING_STREETS).",
+      "tracks": ["assets/audio/sfx/PARALAXING_STREETS.mp3"]
+    },
+    "newxp_training": {
+      "label": "New Experience: training",
+      "gsjsKeys": ["NEW_XP_TRAINING1"],
+      "note": "1341512455-Ix_for_newxp_w_comp_1.3.mp3 from Sounds.zip (music_map NEW_XP_TRAINING1).",
+      "tracks": ["assets/audio/sfx/NEW_XP_TRAINING1.mp3"]
+    },
+    "puzzles_whistle": {
+      "label": "Puzzles (Xavier Whistle)",
+      "gsjsKeys": ["PUZZLES1"],
+      "note": "1337808321-Xavier_Whistle_-5db.mp3 from Sounds.zip (music_map PUZZLES1).",
+      "tracks": ["assets/audio/sfx/PUZZLES1.mp3"]
+    },
+    "ice_cream_truck": {
+      "label": "Ice Cream Truck",
+      "gsjsKeys": ["ICE_CREAM_TRUCK"],
+      "note": "1316476676-Ice_Cream_Truck_for_Wintry_Place_1.3.mp3 from Sounds.zip (music_map ICE_CREAM_TRUCK).",
+      "tracks": ["assets/audio/sfx/ICE_CREAM_TRUCK.mp3"]
+    },
+    "home_uralia": {
+      "label": "Uralia home street",
+      "gsjsKeys": ["HOME_STREET_URALIA"],
+      "note": "1341949924-Musical_Party_Space_Uralia_1.3_plus_3db.mp3 from Sounds.zip (music_map HOME_STREET_URALIA).",
+      "tracks": ["assets/audio/sfx/HOME_STREET_URALIA.mp3"]
+    },
+    "home_firebogs": {
+      "label": "Firebogs home street",
+      "gsjsKeys": ["HOME_STREET_FIREBOGS"],
+      "note": "1344474398-Firebogs_Home_Street_Final_1.1.mp3 from Sounds.zip (music_map HOME_STREET_FIREBOGS).",
+      "tracks": ["assets/audio/sfx/HOME_STREET_FIREBOGS.mp3"]
+    },
+    "asslandia": {
+      "label": "Asslandia",
+      "gsjsKeys": ["ASSLANDIA"],
+      "note": "1352420340-Asslandia_1.1.mp3 from Sounds.zip (music_map ASSLANDIA).",
+      "tracks": ["assets/audio/sfx/ASSLANDIA.mp3"]
+    },
+    "street_savanna1": {
+      "label": "Savanna",
+      "gsjsKeys": ["AMBIENT_SAVANNA1"],
+      "note": "1329959624-SAVANNA_1.4plus4.mp3 from Sounds.zip (music_map AMBIENT_SAVANNA1).",
+      "tracks": ["assets/audio/sfx/AMBIENT_SAVANNA1.mp3"]
+    },
+    "street_uralia1": {
+      "label": "Uralia",
+      "gsjsKeys": ["AMBIENT_URALIA1"],
+      "note": "1312405966-URALIA_1.4.mp3 from Sounds.zip (music_map AMBIENT_URALIA1).",
+      "tracks": ["assets/audio/sfx/AMBIENT_URALIA1.mp3"]
+    },
+    "street_firebogs1": {
+      "label": "Firebog",
+      "gsjsKeys": ["AMBIENT_FIREBOGS1"],
+      "note": "1317316896-Firebogs_3.1.5_remix.mp3 from Sounds.zip (music_map AMBIENT_FIREBOGS1).",
+      "tracks": ["assets/audio/sfx/AMBIENT_FIREBOGS1.mp3"]
+    },
+    "street_jal1": {
+      "label": "Jal",
+      "gsjsKeys": ["JAL1"],
+      "note": "1350945525-Jal_1.8.mp3 from Sounds.zip (music_map JAL1).",
+      "tracks": ["assets/audio/sfx/JAL1.mp3"]
     }
   },
   "streetMusic": {
@@ -255,64 +447,80 @@
     "GLITCHMAS_PARTY_LOCATION": "party_holiday",
     "PARTY_LIVELY": "party_lively",
     "HELL": "hell",
-    "DE_EMBIGGENIFY": "eesti",
+    "DE_EMBIGGENIFY": "de_embiggenify",
     "ENCHANTED_WOOD": "enchanted",
     "ENCHANTED_WOOD_III": "enchanted",
     "PIANO_THEME1": "piano",
-    "AMBIENT_SAVANNA1": "savanna",
+    "AMBIENT_SAVANNA1": "street_savanna1",
     "SNAPPY_LOOP": "snappy",
-    "HOME_STREET_URALIA": "uralia",
-    "HOME_STREET_FIREBOGS": "firebog",
+    "HOME_STREET_URALIA": "home_uralia",
+    "HOME_STREET_FIREBOGS": "home_firebogs",
     "CLOUD_DROP_2": "sky_plunge",
     "SUBWAY_STATION_HUM": "subway",
-    "SUBWAY_CAR_HUM": "subway"
+    "SUBWAY_CAR_HUM": "subway",
+    "XAVIER_CARNIVOROUS_PLANTS": "carnivorous_plants",
+    "ABANDONED_APARTMENTS1": "abandoned_apartments",
+    "UNDERGROUND_PUZZLES": "underground_puzzles",
+    "DINOSAUR_INTESTINES": "dinosaur_intestines",
+    "SPIRAL_STARS": "spiral_stars",
+    "BLUE__WHITE": "blue_white",
+    "PARALAXING_STREETS": "paralaxing_streets",
+    "NEW_XP_TRAINING1": "newxp_training",
+    "PUZZLES1": "puzzles_whistle",
+    "ICE_CREAM_TRUCK": "ice_cream_truck",
+    "ASSLANDIA": "asslandia",
+    "AMBIENT_URALIA1": "street_uralia1",
+    "AMBIENT_FIREBOGS1": "street_firebogs1",
+    "JAL1": "street_jal1",
+    "WHISTLE_SONG": "snappy",
+    "HOME_STREET_GRODDLE_WHISTLE": "snappy"
   },
   "hubMap": {
+    "18": "caverns",
+    "27": "ix",
+    "40": "hell",
     "49": "eesti",
     "50": "caverns",
-    "78": "caverns",
-    "18": "caverns",
     "51": "uralia",
-    "40": "hell",
+    "52": "default",
+    "56": "default",
+    "58": "default",
     "63": "firebog",
     "71": "firebog",
     "72": "firebog",
+    "75": "bortola_muufo",
+    "76": "highlands",
     "77": "firebog",
-    "99": "firebog",
+    "78": "caverns",
+    "85": "andra_kajuu",
     "86": "savanna",
-    "95": "savanna",
+    "88": "bortola_muufo",
+    "89": "andra_kajuu",
     "90": "savanna",
     "91": "savanna",
-    "76": "highlands",
     "93": "highlands",
-    "109": "highlands",
-    "114": "highlands",
-    "107": "cave",
-    "106": "cave",
-    "110": "cave",
-    "85": "andra_kajuu",
-    "89": "andra_kajuu",
-    "113": "andra_kajuu",
-    "119": "andra_kajuu",
+    "95": "savanna",
+    "97": "bortola_muufo",
+    "99": "firebog",
     "102": "andra_kajuu",
     "105": "andra_kajuu",
-    "27": "ix",
-    "133": "default",
-    "131": "default",
-    "126": "default",
-    "128": "default",
-    "136": "default",
-    "140": "default",
-    "137": "nottis",
-    "141": "nottis",
-    "75": "bortola_muufo",
-    "97": "bortola_muufo",
+    "106": "cave",
+    "107": "cave",
+    "109": "highlands",
+    "110": "cave",
     "112": "bortola_muufo",
+    "113": "andra_kajuu",
+    "114": "highlands",
     "116": "bortola_muufo",
-    "88": "bortola_muufo",
-    "56": "default",
-    "58": "default",
-    "52": "default"
+    "119": "andra_kajuu",
+    "126": "urwok",
+    "128": "urwok",
+    "131": "kloro_haoma",
+    "133": "kloro_haoma",
+    "136": "jal",
+    "137": "nottis",
+    "140": "jal",
+    "141": "nottis"
   },
   "hubNameHints": {
     "Eesti": "eesti",
@@ -340,7 +548,13 @@
     "Kajuu": "andra_kajuu",
     "Ormonos": "andra_kajuu",
     "Ix": "ix",
-    "Rook": "rook"
+    "Rook": "rook",
+    "Roobrik": "urwok",
+    "Balzare": "urwok",
+    "Kloro": "kloro_haoma",
+    "Haoma": "kloro_haoma",
+    "Jal": "jal",
+    "Samudra": "jal"
   },
   "downloadsSource": "Tiny Speck's Glitch downloads page (glitchthegame.com/downloads, Wayback 2013-12-14): its music sections and track titles, in the page's order; theme = Theme Tracks, sketch = Theme Sketches, activity = Activity Music, ringtone = The Rube Song from Ringtones. Music Blocks are on the Musicblocks wiki entry.",
   "downloads": [

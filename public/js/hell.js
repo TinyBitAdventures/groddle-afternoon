@@ -117,10 +117,11 @@ export const HELL_SOUNDS = Object.freeze({
 });
 
 /**
- * HELL music: the production key pointed at c2.glitch.bz/sounds/2010-05/
- * 1274906921-Bongbong.mp3, which is absent from the Wayback Machine (CDX empty).
- * The recovered public-catalog stand-in is already shipped and mapped to hub 40
- * ("hell") in assets/content/ambient-music.json.
+ * HELL music: the production key points at c2.glitch.bz/sounds/2010-05/
+ * 1274906921-Bongbong.mp3, absent from the Wayback Machine; Sounds.zip (a fan
+ * re-upload of the c2 files, 2026-11-02) has it, and it is the downloads page's
+ * Dirge of the Damned byte for byte (md5 304c8eaf...). So the track already
+ * shipped is the original, mapped to hub 40 ("hell") in assets/content/ambient-music.json.
  */
 export const HELL_MUSIC = Object.freeze({
   key: 'HELL',

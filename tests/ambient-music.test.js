@@ -4,7 +4,7 @@
  */
 import { describe, it, before } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync, existsSync } from 'node:fs';
+import { readFileSync, existsSync, readdirSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
@@ -14,10 +14,14 @@ import {
   pickAmbientTrack,
   themeLabel,
   allAmbientTrackUrls,
+  ambientPlaylist,
   SILENT_THEME,
-} from '../public/js/ambient-music.js?v=22d6d5e1';
+} from '../public/js/ambient-music.js?v=274c2864';
+
+import { SOUND_ALIASES, SOUND_FILES } from '../public/js/sound-keys.js?v=c8a66499';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
+const GSJS_MAIN = join(__dirname, '../../glitch-GameServerJS/main.js');
 const cfgPath = join(__dirname, '../public/assets/content/ambient-music.json');
 
 before(() => {
@@ -107,9 +111,29 @@ describe('street music_file keys', () => {
   });
 
   it('a street whose music library is lost keeps its hub music', () => {
-    // XAVIER_CARNIVOROUS_PLANTS (36 streets) was never recovered.
-    assert.equal(resolveAmbientTheme({ musicFile: 'XAVIER_CARNIVOROUS_PLANTS', hubId: '50' }), resolveAmbientTheme({ hubId: '50' }));
-    assert.equal(resolveAmbientTheme({ musicFile: 'XAVIER_CARNIVOROUS_PLANTS', hubId: '50' }), 'caverns');
+    // ABANDONDED_APARTMENTS2 (Upper Floors 1.2) is in no archive and not in Sounds.zip.
+    assert.equal(resolveAmbientTheme({ musicFile: 'ABANDONDED_APARTMENTS2', hubId: '50' }), 'caverns');
+    // XAVIER_CARNIVOROUS_PLANTS (36 streets) came back with Sounds.zip and plays its own loop.
+    assert.equal(resolveAmbientTheme({ musicFile: 'XAVIER_CARNIVOROUS_PLANTS', hubId: '50' }), 'street:XAVIER_CARNIVOROUS_PLANTS');
+    assert.deepEqual(tracksForTheme('street:XAVIER_CARNIVOROUS_PLANTS'), ['assets/audio/sfx/XAVIER_CARNIVOROUS_PLANTS.mp3']);
+    assert.equal(themeLabel('street:XAVIER_CARNIVOROUS_PLANTS'), 'Carnivorous Plants');
+  });
+
+  it('every street music_file with a recovered recording loops that recording (location.js 481-482)', () => {
+    const streetsDir = join(__dirname, '../public/assets/streets');
+    const seen = new Set();
+    for (const name of readdirSync(streetsDir).filter((f) => /^G[A-Z0-9]+\.json$/.test(f))) {
+      const street = JSON.parse(readFileSync(join(streetsDir, name), 'utf8'));
+      const key = street.musicFile;
+      if (!key || key === 'NO_MUSIC' || seen.has(key)) continue;
+      seen.add(key);
+      const file = SOUND_FILES[key] || SOUND_FILES[SOUND_ALIASES[key]];
+      if (!file) continue;
+      const theme = resolveAmbientTheme(street);
+      assert.deepEqual(tracksForTheme(theme), [file], `${key} on ${street.label}`);
+      assert.deepEqual(ambientPlaylist(theme, { hubId: street.hubId }), { tracks: [file], start: 0, loop: true }, key);
+    }
+    assert.ok(seen.size >= 25);
   });
 
   it('NO_MUSIC streets are silent', () => {
@@ -150,6 +174,7 @@ describe('street playlists', () => {
 
 describe('Hell keeps its own music (ticket 47)', () => {
   it('no other theme plays a Hell track: the Firebogs had seven songs of their own and Hell one (main.js 350-358, 449-451)', () => {
+    // Both are the originals since Sounds.zip: HELL (Bongbong.mp3) is the Dirge byte for byte.
     const music = JSON.parse(readFileSync(join(dirname(fileURLToPath(import.meta.url)), '../public/assets/content/ambient-music.json'), 'utf8'));
     const themes = music.themes || music;
     const hell = new Set(themes.hell.tracks);
@@ -160,5 +185,67 @@ describe('Hell keeps its own music (ticket 47)', () => {
       for (const track of theme.tracks) assert.ok(!hell.has(track), `${name} plays Hell's ${track}`);
     }
     assert.ok(themes.firebog.tracks.length >= 2);
+    assert.deepEqual(themes.firebog.tracks, [1, 2, 3, 4, 5, 6, 7].map((n) => `assets/audio/sfx/AMBIENT_FIREBOGS${n}.mp3`));
+  });
+});
+
+describe('the original libraries (Sounds.zip, 2026-11-02)', () => {
+  const cfg = JSON.parse(readFileSync(cfgPath, 'utf8'));
+  const library = Object.entries(cfg.themes).filter(([, t]) => t.order === 'library');
+  const fileOf = (key) => SOUND_FILES[key] || SOUND_FILES[SOUND_ALIASES[key]];
+
+  it('every library theme plays its GSJS keys\' own recordings, in order', () => {
+    assert.equal(library.length, 15);
+    for (const [id, theme] of library) {
+      assert.deepEqual(theme.tracks, theme.gsjsKeys.map(fileOf), id);
+      for (const track of theme.tracks) assert.ok(existsSync(join(__dirname, '../public', track)), track);
+    }
+  });
+
+  it('matches main.js ambient_library and ambient_hub_map (331-507)', { skip: !existsSync(GSJS_MAIN) && 'needs glitch-GameServerJS beside the game' }, () => {
+    const main = readFileSync(GSJS_MAIN, 'utf8');
+    const lib = main.slice(main.indexOf('rsp.ambient_library = {'), main.indexOf('rsp.ambient_hub_map'));
+    const sets = {};
+    let cur = null;
+    for (const line of lib.split('\n')) {
+      const set = line.match(/'(\w+)': \[/);
+      if (set) sets[(cur = set[1])] = [];
+      const key = line.match(/music_map\['(\w+)'\]/);
+      if (key && cur) sets[cur].push(key[1]);
+    }
+    assert.deepEqual(Object.fromEntries(library.map(([id, t]) => [id, t.gsjsKeys])), sets);
+    const hubs = main.slice(main.indexOf('rsp.ambient_hub_map = {'));
+    for (const [, hub, set] of hubs.slice(0, hubs.indexOf('};')).matchAll(/'(\d+)': '(\w+)'/g)) {
+      assert.equal(cfg.hubMap[hub], set, `hub ${hub}`);
+    }
+  });
+
+  it('the new sets have their hubs: Roobrik and Balzare, Kloro and Haoma, Jal and Samudra', () => {
+    assert.equal(resolveAmbientTheme({ hubId: 126, hubName: 'Roobrik' }), 'urwok');
+    assert.equal(resolveAmbientTheme({ hubId: 128 }), 'urwok');
+    assert.equal(resolveAmbientTheme({ hubId: 131 }), 'kloro_haoma');
+    assert.equal(resolveAmbientTheme({ hubId: 133 }), 'kloro_haoma');
+    assert.equal(resolveAmbientTheme({ hubId: 136 }), 'jal');
+    assert.equal(resolveAmbientTheme({ hubId: 140 }), 'jal');
+  });
+
+  it('a library plays as a playlist from its first track; stand-ins loop one (SoundMaster.as 491, 627-639)', () => {
+    assert.deepEqual(ambientPlaylist('default', { hubId: 56 }), { tracks: tracksForTheme('default'), start: 0, loop: false });
+    assert.equal(ambientPlaylist('ix').tracks.length, 18);
+    // One-track sets loop (Hell, Kloro and Haoma).
+    assert.deepEqual(ambientPlaylist('hell'), { tracks: ['assets/audio/ambient/Dirge-of-the-Damned_1291886020.mp3'], start: 0, loop: true });
+    const subway = ambientPlaylist('subway', { hubId: 89 });
+    assert.equal(subway.loop, true);
+    assert.deepEqual(subway.tracks, [pickAmbientTrack('subway', { hubId: 89 })]);
+  });
+
+  it('stand-ins stay only where the originals are still missing', () => {
+    for (const id of ['subway', 'enchanted', 'eesti', 'party_lively', 'rook', 'meditation']) {
+      assert.ok(cfg.themes[id].tracks.some((t) => t.startsWith('assets/audio/ambient/') || /ROOK_|MEDITATIVE_ARTS_01/.test(t)), id);
+    }
+    for (const [id, theme] of library) assert.ok(theme.tracks.every((t) => /\/sfx\/|Dirge-of-the-Damned/.test(t)), id);
+    for (const party of ['party_highlands', 'party_abysmal', 'party_holiday']) {
+      assert.deepEqual(cfg.themes[party].tracks, [fileOf(cfg.themes[party].gsjsKeys[0])], party);
+    }
   });
 });

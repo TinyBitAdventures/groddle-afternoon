@@ -667,9 +667,9 @@ function onRadiateStarted(engine, m) {
     rad,
   };
   engine.pushActivity(RADIANCE_TEXT.begin);
-  // TRANSCENDENTAL_MEDITATION_01 / _02 (inc_data_sounds.js:135-136) are not recovered:
-  // the Wayback meditation tracks the solo verbs do not use stand in.
-  const music = rng(engine)() < 0.5 ? 'assets/audio/ambient/meditation4_1344997846.mp3' : 'assets/audio/ambient/Meditation_1291879502.mp3';
+  // TRANSCENDENTAL_MEDITATION_01 / _02 (inc_data_sounds.js:135-136: meditation_berg,
+  // meditation_limbs_2), Tiny Speck's own files from Sounds.zip; focusing_orb.js:2113 picks one (choose_one).
+  const music = rng(engine)() < 0.5 ? 'assets/audio/sfx/TRANSCENDENTAL_MEDITATION_01.mp3' : 'assets/audio/sfx/TRANSCENDENTAL_MEDITATION_02.mp3';
   engine.playCue(music, { volume: 0.55 }).then((stop) => {
     if (session && session.rad === rad && !session.stopMusic) session.stopMusic = stop;
     else stop();

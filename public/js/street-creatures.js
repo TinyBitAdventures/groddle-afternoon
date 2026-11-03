@@ -48,7 +48,7 @@
  */
 
 import { GAME_EPOCH_MS } from './game-day.js?v=edb00566';
-import { INCUBATION } from './animal-husbandry.js?v=1e8d5d0e';
+import { INCUBATION } from './animal-husbandry.js?v=b64fe814';
 import { isStandable } from './street-model.js?v=505d8990';
 
 export const CREATURE_KINDS = Object.freeze(['chicken', 'butterfly', 'batterfly']);

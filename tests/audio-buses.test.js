@@ -196,7 +196,15 @@ describe('one route to the speakers (MUTE source scan)', () => {
 
   it('no game script plays sound outside Web Audio (new Audio, <audio>, <video>)', () => {
     const hits = files.filter((f) => /new Audio\(|createElement\(['"](audio|video)['"]\)/.test(f.text)).map((f) => f.rel);
-    assert.deepEqual(hits, []);
+    // The one exception: street music streams (G-soundzip, 2026-11-02) from an <audio> element that
+    // goes through a MediaElementSource into a music-bus voice, and is dropped when it cannot.
+    assert.deepEqual(hits, ['game.js']);
+    const game = files.find((f) => f.rel === 'game.js').text;
+    assert.equal((game.match(/new Audio\(/g) || []).length, 1);
+    const voice = game.slice(game.indexOf('function streetMusicVoice('), game.indexOf('function startStreetTrack('));
+    assert.match(voice, /const el = new Audio\(\);/);
+    assert.match(voice, /const gain = audio\.buses\.musicVoice\(0\);/);
+    assert.match(voice, /node = audio\.ctx\.createMediaElementSource\(el\);\n    node\.connect\(gain\);\n  \} catch \{\n.*\n    return null;/);
   });
 
   it('no exponential ramp on a gain (it can never reach 0) outside the synth one-shots, which stop', () => {
@@ -215,7 +223,7 @@ describe('one route to the speakers (MUTE source scan)', () => {
     assert.match(game, /function applyMute\([^)]*\) \{\n  syncMuteButton\(\);\n  if \(!audio\.buses\) return;\n  audio\.buses\.set\(audioSettings\(\)\);/);
     // The street track, cues and Musicblocks: no gain of their own outside the buses.
     assert.equal((game.match(/audio\.ctx\.createGain\(\)/g) || []).length, 0);
-    assert.match(game, /const g = audio\.buses\.musicVoice\(0\);/);
+    assert.match(game, /const gain = audio\.buses\.musicVoice\(0\);/);
     assert.match(game, /const gain = effect \? audio\.buses\.sfxVoice\(volume\) : audio\.buses\.musicVoice\(volume\);/);
     assert.match(game, /const gain = audio\.buses\.sfxVoice\(MUSICBLOCK_PLAYBACK\.gain\);/);
     assert.doesNotMatch(game, /Math\.max\(0\.001/);

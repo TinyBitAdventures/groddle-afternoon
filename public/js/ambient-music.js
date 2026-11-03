@@ -3,10 +3,13 @@
  *
  * Original flow:
  * 1. Login payload sends ambient_hub_map[hubId] → set name (e.g. "caverns")
- * 2. Client SoundMaster.changeAmbientSet + ambientPlay picks tracks from ambient_library
+ * 2. Client SoundMaster.changeAmbientSet starts the set at its first track; each
+ *    track plays once and the next follows, round the set (SoundMaster.as 474-499,
+ *    onSoundComplete 616-640): ambientPlaylist, for themes with order 'library'
  * 3. Optional per-street override: location.geometry.music_file → announce_music
+ *    (location.js 481-482, loop_count 999): one recording, looped
  *
- * This module resolves theme + track list; the game loads/plays buffers.
+ * This module resolves theme + track list; the game streams them (game.js setAmbientForStreet).
  */
 
 /**
@@ -130,8 +133,35 @@ export function pickAmbientTrack(themeId, opts = {}) {
  * @param {string} themeId
  */
 export function themeLabel(themeId) {
-  const t = config?.themes?.[themeId];
+  const t = themeEntry(themeId);
   return t?.label || themeId || 'default';
+}
+
+/** A theme's entry; a street: theme is the theme its music_file maps to. */
+function themeEntry(themeId) {
+  const cfg = config;
+  if (!cfg?.themes || !themeId) return null;
+  if (themeId.startsWith('street:')) return cfg.themes[cfg.streetMusic?.[themeId.slice(7)]] || null;
+  return cfg.themes[themeId] || null;
+}
+
+/**
+ * What the street music plays for a theme: an original library (order 'library')
+ * is a playlist from its first track, each once, then the next (SoundMaster.as
+ * changeAmbientSet 491 resets ambient_track_index to 0; onSoundComplete 627-639
+ * plays the next and wraps). A street's music_file and every stand-in theme loop
+ * one track (announce_music loop_count 999; the stand-ins pick theirs by hub).
+ * @param {string} themeId
+ * @param {{ hubId?: string|number }} [opts]
+ * @returns {{ tracks: string[], start: number, loop: boolean }}
+ */
+export function ambientPlaylist(themeId, opts = {}) {
+  const tracks = tracksForTheme(themeId);
+  if (!tracks.length) return { tracks: [], start: 0, loop: true };
+  const library = !String(themeId).startsWith('street:') && themeEntry(themeId)?.order === 'library';
+  if (library && tracks.length > 1) return { tracks, start: 0, loop: false };
+  const pick = pickAmbientTrack(themeId, { hubId: opts.hubId });
+  return { tracks: [pick], start: 0, loop: true };
 }
 
 /**

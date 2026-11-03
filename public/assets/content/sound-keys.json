@@ -10,10 +10,11 @@
   "mirrored": 1,
   "downloadsBestFit": 27,
   "archiveorgSfx": 216,
+  "soundsZip": 141,
   "overlayFla": 3,
-  "withFile": 285,
-  "aliases": 83,
-  "playable": 368,
+  "withFile": 426,
+  "aliases": 88,
+  "playable": 514,
   "dead": 3,
   "live": 638
  },
@@ -72,7 +73,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2012-06/1339105456-Abandonded_Apartments_Basement_and_Lobby_1.2.mp3"
+   "url": "http://c2.glitch.bz/sounds/2012-06/1339105456-Abandonded_Apartments_Basement_and_Lobby_1.2.mp3",
+   "file": "assets/audio/sfx/ABANDONED_APARTMENTS1.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1339105456-Abandonded_Apartments_Basement_and_Lobby_1.2.mp3",
+   "zipMd5": "39be0d9e2e1ce53aab959e6b20630a14",
+   "zipMatch": "music_map"
   },
   "ABYSMAL_THRILLS": {
    "category": "music",
@@ -84,7 +90,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2012-08/1344044864-_Abysmal_Thrill_1.1_2.mp3"
+   "url": "http://c2.glitch.bz/sounds/2012-08/1344044864-_Abysmal_Thrill_1.1_2.mp3",
+   "file": "assets/audio/sfx/ABYSMAL_THRILLS.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1344044864-_Abysmal_Thrill_1.1_2.mp3",
+   "zipMd5": "a8abbbf30bd1848fb3e13c1308b3b6e1",
+   "zipMatch": "music_map"
   },
   "ACE_OF_SPADES": {
    "category": "tool",
@@ -196,7 +207,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2011-08/1312401366-CAVERN_1.2.mp3"
+   "url": "http://c2.glitch.bz/sounds/2011-08/1312401366-CAVERN_1.2.mp3",
+   "file": "assets/audio/sfx/AMBIENT_CAVERNS1.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1312401366-CAVERN_1.2.mp3",
+   "zipMd5": "35c671bec18cbe2caaa3799da5c5a096",
+   "zipMatch": "music_map"
   },
   "AMBIENT_CAVERNS2": {
    "category": "music",
@@ -208,7 +224,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2011-08/1312401399-CAVERN_2.2.mp3"
+   "url": "http://c2.glitch.bz/sounds/2011-08/1312401399-CAVERN_2.2.mp3",
+   "file": "assets/audio/sfx/AMBIENT_CAVERNS2.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1312401399-CAVERN_2.2.mp3",
+   "zipMd5": "621b3f0165cb5d7d60d629f0deae31f7",
+   "zipMatch": "music_map"
   },
   "AMBIENT_CAVERNS3": {
    "category": "music",
@@ -220,7 +241,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2011-08/1312401700-CAVERN_3.2.mp3"
+   "url": "http://c2.glitch.bz/sounds/2011-08/1312401700-CAVERN_3.2.mp3",
+   "file": "assets/audio/sfx/AMBIENT_CAVERNS3.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1312401700-CAVERN_3.2.mp3",
+   "zipMd5": "98e3131999a94f7e3759624bde95ea14",
+   "zipMatch": "music_map"
   },
   "AMBIENT_CAVERNS4": {
    "category": "music",
@@ -232,7 +258,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2011-08/1312401763-CAVERN_4.2.mp3"
+   "url": "http://c2.glitch.bz/sounds/2011-08/1312401763-CAVERN_4.2.mp3",
+   "file": "assets/audio/sfx/AMBIENT_CAVERNS4.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1312401763-CAVERN_4.2.mp3",
+   "zipMd5": "da13603d7b870e4e5f3932a94ce6489c",
+   "zipMatch": "music_map"
   },
   "AMBIENT_DEMO": {
    "category": "music",
@@ -256,7 +287,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2011-09/1317316896-Firebogs_3.1.5_remix.mp3"
+   "url": "http://c2.glitch.bz/sounds/2011-09/1317316896-Firebogs_3.1.5_remix.mp3",
+   "file": "assets/audio/sfx/AMBIENT_FIREBOGS1.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1317316896-Firebogs_3.1.5_remix.mp3",
+   "zipMd5": "8e9068eeb6dd95cb08922cb14b86a737",
+   "zipMatch": "music_map"
   },
   "AMBIENT_FIREBOGS2": {
    "category": "music",
@@ -268,7 +304,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2011-09/1317316931-Firebogs_3.2.5_remix.mp3"
+   "url": "http://c2.glitch.bz/sounds/2011-09/1317316931-Firebogs_3.2.5_remix.mp3",
+   "file": "assets/audio/sfx/AMBIENT_FIREBOGS2.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1317316931-Firebogs_3.2.5_remix.mp3",
+   "zipMd5": "8b085a2935b484e4b8ae0a251d32a9f1",
+   "zipMatch": "music_map"
   },
   "AMBIENT_FIREBOGS3": {
    "category": "music",
@@ -280,7 +321,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2011-09/1317316963-Firebogs_4.1.9_remix.mp3"
+   "url": "http://c2.glitch.bz/sounds/2011-09/1317316963-Firebogs_4.1.9_remix.mp3",
+   "file": "assets/audio/sfx/AMBIENT_FIREBOGS3.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1317316963-Firebogs_4.1.9_remix.mp3",
+   "zipMd5": "fad07228a4b18cf0cbe730f4dbc7bccf",
+   "zipMatch": "music_map"
   },
   "AMBIENT_FIREBOGS4": {
    "category": "music",
@@ -292,7 +338,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2011-09/1317317088-Firebogs_4.2.3_remix.mp3"
+   "url": "http://c2.glitch.bz/sounds/2011-09/1317317088-Firebogs_4.2.3_remix.mp3",
+   "file": "assets/audio/sfx/AMBIENT_FIREBOGS4.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1317317088-Firebogs_4.2.3_remix.mp3",
+   "zipMd5": "5523b13e6d6651e89ff82836221a24cc",
+   "zipMatch": "music_map"
   },
   "AMBIENT_FIREBOGS5": {
    "category": "music",
@@ -304,7 +355,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2011-09/1317317138-Firebogs_4.4.2_remix.mp3"
+   "url": "http://c2.glitch.bz/sounds/2011-09/1317317138-Firebogs_4.4.2_remix.mp3",
+   "file": "assets/audio/sfx/AMBIENT_FIREBOGS5.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1317317138-Firebogs_4.4.2_remix.mp3",
+   "zipMd5": "1d59df639bbc22d2019dfc9a88ace92c",
+   "zipMatch": "music_map"
   },
   "AMBIENT_FIREBOGS6": {
    "category": "music",
@@ -316,7 +372,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2011-09/1317317174-Firebogs_4.5.4_remix.mp3"
+   "url": "http://c2.glitch.bz/sounds/2011-09/1317317174-Firebogs_4.5.4_remix.mp3",
+   "file": "assets/audio/sfx/AMBIENT_FIREBOGS6.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1317317174-Firebogs_4.5.4_remix.mp3",
+   "zipMd5": "008ef9185511e5f43e78edb51dfde644",
+   "zipMatch": "music_map"
   },
   "AMBIENT_FIREBOGS7": {
    "category": "music",
@@ -328,7 +389,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2011-09/1317317206-Firebogs_4.6.2_remix.mp3"
+   "url": "http://c2.glitch.bz/sounds/2011-09/1317317206-Firebogs_4.6.2_remix.mp3",
+   "file": "assets/audio/sfx/AMBIENT_FIREBOGS7.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1317317206-Firebogs_4.6.2_remix.mp3",
+   "zipMd5": "d6d1b71d713bfda4a46b802d1c9b63d2",
+   "zipMatch": "music_map"
   },
   "AMBIENT_FOREST_SLOW1": {
    "category": "music",
@@ -340,7 +406,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2012-11/1352222409-Forest_70_1.1.mp3"
+   "url": "http://c2.glitch.bz/sounds/2012-11/1352222409-Forest_70_1.1.mp3",
+   "file": "assets/audio/sfx/AMBIENT_FOREST_SLOW1.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1352222409-Forest_70_1.1.mp3",
+   "zipMd5": "11ad3be045daeb9ca1b378893fa551d9",
+   "zipMatch": "music_map"
   },
   "AMBIENT_FOREST_SLOW2": {
    "category": "music",
@@ -352,7 +423,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2012-11/1352222410-Forest_70_2.1.mp3"
+   "url": "http://c2.glitch.bz/sounds/2012-11/1352222410-Forest_70_2.1.mp3",
+   "file": "assets/audio/sfx/AMBIENT_FOREST_SLOW2.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1352222410-Forest_70_2.1.mp3",
+   "zipMd5": "1f9d10753e3db4412587ec518afa01c8",
+   "zipMatch": "music_map"
   },
   "AMBIENT_FOREST_SLOW3": {
    "category": "music",
@@ -364,7 +440,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2012-11/1352222410-Forest_70_3.1.mp3"
+   "url": "http://c2.glitch.bz/sounds/2012-11/1352222410-Forest_70_3.1.mp3",
+   "file": "assets/audio/sfx/AMBIENT_FOREST_SLOW3.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1352222410-Forest_70_3.1.mp3",
+   "zipMd5": "179710b9b1b5ea42604b6a4ba6d6f0ca",
+   "zipMatch": "music_map"
   },
   "AMBIENT_FOREST_SLOW4": {
    "category": "music",
@@ -376,7 +457,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2012-11/1352222410-Forest_70_4.1.mp3"
+   "url": "http://c2.glitch.bz/sounds/2012-11/1352222410-Forest_70_4.1.mp3",
+   "file": "assets/audio/sfx/AMBIENT_FOREST_SLOW4.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1352222410-Forest_70_4.1.mp3",
+   "zipMd5": "ea19e6aa63eca20da0bda774e4350671",
+   "zipMatch": "music_map"
   },
   "AMBIENT_HIGHLANDS1": {
    "category": "music",
@@ -388,7 +474,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2012-01/1326153361-Highlands_1.5.mp3"
+   "url": "http://c2.glitch.bz/sounds/2012-01/1326153361-Highlands_1.5.mp3",
+   "file": "assets/audio/sfx/AMBIENT_HIGHLANDS1.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1326153361-Highlands_1.5.mp3",
+   "zipMd5": "e25570aeb160e7095686b53b981ad4ba",
+   "zipMatch": "music_map"
   },
   "AMBIENT_HIGHLANDS2": {
    "category": "music",
@@ -400,7 +491,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2012-01/1326153874-Highlands_2.4.mp3"
+   "url": "http://c2.glitch.bz/sounds/2012-01/1326153874-Highlands_2.4.mp3",
+   "file": "assets/audio/sfx/AMBIENT_HIGHLANDS2.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1326153874-Highlands_2.4.mp3",
+   "zipMd5": "f10bee0ce50f50ad3ceeed345590f707",
+   "zipMatch": "music_map"
   },
   "AMBIENT_HIGHLANDS3": {
    "category": "music",
@@ -412,7 +508,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2012-01/1326153964-Highlands_3.4.mp3"
+   "url": "http://c2.glitch.bz/sounds/2012-01/1326153964-Highlands_3.4.mp3",
+   "file": "assets/audio/sfx/AMBIENT_HIGHLANDS3.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1326153964-Highlands_3.4.mp3",
+   "zipMd5": "bd50592fdd2fc01cafb7ed4653e93f39",
+   "zipMatch": "music_map"
   },
   "AMBIENT_HIGHLANDS4": {
    "category": "music",
@@ -424,7 +525,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2012-01/1326154058-Highlands_4.4.mp3"
+   "url": "http://c2.glitch.bz/sounds/2012-01/1326154058-Highlands_4.4.mp3",
+   "file": "assets/audio/sfx/AMBIENT_HIGHLANDS4.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1326154058-Highlands_4.4.mp3",
+   "zipMd5": "3f13cf6706b8f1b9f11fa991757608a2",
+   "zipMatch": "music_map"
   },
   "AMBIENT_HIGHLANDS5": {
    "category": "music",
@@ -436,7 +542,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2012-01/1326154149-Highlands_5.4.mp3"
+   "url": "http://c2.glitch.bz/sounds/2012-01/1326154149-Highlands_5.4.mp3",
+   "file": "assets/audio/sfx/AMBIENT_HIGHLANDS5.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1326154149-Highlands_5.4.mp3",
+   "zipMd5": "5de21dc4844f515d849d183c8b8ec6f3",
+   "zipMatch": "music_map"
   },
   "AMBIENT_HIGHLANDS6": {
    "category": "music",
@@ -448,7 +559,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2012-01/1326154229-Highlands_6.3.mp3"
+   "url": "http://c2.glitch.bz/sounds/2012-01/1326154229-Highlands_6.3.mp3",
+   "file": "assets/audio/sfx/AMBIENT_HIGHLANDS6.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1326154229-Highlands_6.3.mp3",
+   "zipMd5": "6b692ae3494063e11a2826cce6253a7b",
+   "zipMatch": "music_map"
   },
   "AMBIENT_HIGHLANDS7": {
    "category": "music",
@@ -460,7 +576,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2012-01/1326154292-Highlands_7.3.mp3"
+   "url": "http://c2.glitch.bz/sounds/2012-01/1326154292-Highlands_7.3.mp3",
+   "file": "assets/audio/sfx/AMBIENT_HIGHLANDS7.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1326154292-Highlands_7.3.mp3",
+   "zipMd5": "613a009070cb704bc1c908f9189f899f",
+   "zipMatch": "music_map"
   },
   "AMBIENT_IX_1": {
    "category": "music",
@@ -472,7 +593,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2012-02/1330470531-IX_1.3.mp3"
+   "url": "http://c2.glitch.bz/sounds/2012-02/1330470531-IX_1.3.mp3",
+   "file": "assets/audio/sfx/AMBIENT_IX_1.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1330470531-IX_1.3.mp3",
+   "zipMd5": "f2411d0c1a0ff5602040ef1ff27e0a50",
+   "zipMatch": "music_map"
   },
   "AMBIENT_IX_10": {
    "category": "music",
@@ -484,7 +610,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2012-02/1330470865-IX_10.3.mp3"
+   "url": "http://c2.glitch.bz/sounds/2012-02/1330470865-IX_10.3.mp3",
+   "file": "assets/audio/sfx/AMBIENT_IX_10.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1330470865-IX_10.3.mp3",
+   "zipMd5": "cd54238f2404fdae16a6b4ef4e687797",
+   "zipMatch": "music_map"
   },
   "AMBIENT_IX_11": {
    "category": "music",
@@ -496,7 +627,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2012-02/1330470889-IX_11.2.mp3"
+   "url": "http://c2.glitch.bz/sounds/2012-02/1330470889-IX_11.2.mp3",
+   "file": "assets/audio/sfx/AMBIENT_IX_11.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1330470889-IX_11.2.mp3",
+   "zipMd5": "fd623863e7e1613498c3ade26daa375e",
+   "zipMatch": "music_map"
   },
   "AMBIENT_IX_12": {
    "category": "music",
@@ -508,7 +644,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2012-02/1330470945-IX_12.2.mp3"
+   "url": "http://c2.glitch.bz/sounds/2012-02/1330470945-IX_12.2.mp3",
+   "file": "assets/audio/sfx/AMBIENT_IX_12.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1330470945-IX_12.2.mp3",
+   "zipMd5": "c163a9a473eff71711aa4c7d50993eff",
+   "zipMatch": "music_map"
   },
   "AMBIENT_IX_13": {
    "category": "music",
@@ -520,7 +661,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2012-02/1330471043-IX_13.2.mp3"
+   "url": "http://c2.glitch.bz/sounds/2012-02/1330471043-IX_13.2.mp3",
+   "file": "assets/audio/sfx/AMBIENT_IX_13.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1330471043-IX_13.2.mp3",
+   "zipMd5": "6a2a1feca972d1ac96872cef1a5cef8c",
+   "zipMatch": "music_map"
   },
   "AMBIENT_IX_14": {
    "category": "music",
@@ -532,7 +678,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2012-02/1330470988-IX_14.4.mp3"
+   "url": "http://c2.glitch.bz/sounds/2012-02/1330470988-IX_14.4.mp3",
+   "file": "assets/audio/sfx/AMBIENT_IX_14.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1330470988-IX_14.4.mp3",
+   "zipMd5": "1cc589bd90a9ffff7029ec1f8c37c097",
+   "zipMatch": "music_map"
   },
   "AMBIENT_IX_15": {
    "category": "music",
@@ -544,7 +695,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2012-02/1330471062-IX_15.2.mp3"
+   "url": "http://c2.glitch.bz/sounds/2012-02/1330471062-IX_15.2.mp3",
+   "file": "assets/audio/sfx/AMBIENT_IX_15.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1330471062-IX_15.2.mp3",
+   "zipMd5": "c28570d2ed7900b3c135f705c26f44c3",
+   "zipMatch": "music_map"
   },
   "AMBIENT_IX_16": {
    "category": "music",
@@ -556,7 +712,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2012-02/1330471090-IX_16.2.mp3"
+   "url": "http://c2.glitch.bz/sounds/2012-02/1330471090-IX_16.2.mp3",
+   "file": "assets/audio/sfx/AMBIENT_IX_16.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1330471090-IX_16.2.mp3",
+   "zipMd5": "473826c5a8fe0183eb6525137438bb2d",
+   "zipMatch": "music_map"
   },
   "AMBIENT_IX_17": {
    "category": "music",
@@ -568,7 +729,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2012-02/1330471109-IX_17.4.mp3"
+   "url": "http://c2.glitch.bz/sounds/2012-02/1330471109-IX_17.4.mp3",
+   "file": "assets/audio/sfx/AMBIENT_IX_17.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1330471109-IX_17.4.mp3",
+   "zipMd5": "6d6549256b5e1cb449fd46192ac61da4",
+   "zipMatch": "music_map"
   },
   "AMBIENT_IX_18": {
    "category": "music",
@@ -580,7 +746,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2012-02/1330471135-IX_18.4.mp3"
+   "url": "http://c2.glitch.bz/sounds/2012-02/1330471135-IX_18.4.mp3",
+   "file": "assets/audio/sfx/AMBIENT_IX_18.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1330471135-IX_18.4.mp3",
+   "zipMd5": "ff744a92f2842e24d3a03b23a85ee34d",
+   "zipMatch": "music_map"
   },
   "AMBIENT_IX_2": {
    "category": "music",
@@ -592,7 +763,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2012-02/1330470589-IX_2.3.mp3"
+   "url": "http://c2.glitch.bz/sounds/2012-02/1330470589-IX_2.3.mp3",
+   "file": "assets/audio/sfx/AMBIENT_IX_2.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1330470589-IX_2.3.mp3",
+   "zipMd5": "d7825c87e6fb0b5255869ba44ff9a04b",
+   "zipMatch": "music_map"
   },
   "AMBIENT_IX_3": {
    "category": "music",
@@ -604,7 +780,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2012-02/1330470613-IX_3.4.mp3"
+   "url": "http://c2.glitch.bz/sounds/2012-02/1330470613-IX_3.4.mp3",
+   "file": "assets/audio/sfx/AMBIENT_IX_3.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1330470613-IX_3.4.mp3",
+   "zipMd5": "40663de50bfc471847881d3759cf1f0b",
+   "zipMatch": "music_map"
   },
   "AMBIENT_IX_4": {
    "category": "music",
@@ -616,7 +797,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2012-02/1330470673-IX_4.4.mp3"
+   "url": "http://c2.glitch.bz/sounds/2012-02/1330470673-IX_4.4.mp3",
+   "file": "assets/audio/sfx/AMBIENT_IX_4.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1330470673-IX_4.4.mp3",
+   "zipMd5": "896ee7a9421a1cb3fd749b728c570625",
+   "zipMatch": "music_map"
   },
   "AMBIENT_IX_5": {
    "category": "music",
@@ -628,7 +814,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2012-02/1330470693-IX_5.3.mp3"
+   "url": "http://c2.glitch.bz/sounds/2012-02/1330470693-IX_5.3.mp3",
+   "file": "assets/audio/sfx/AMBIENT_IX_5.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1330470693-IX_5.3.mp3",
+   "zipMd5": "fc9463e85eb1c036c4af59da5f9d242e",
+   "zipMatch": "music_map"
   },
   "AMBIENT_IX_6": {
    "category": "music",
@@ -640,7 +831,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2012-02/1330470738-IX_6.4.mp3"
+   "url": "http://c2.glitch.bz/sounds/2012-02/1330470738-IX_6.4.mp3",
+   "file": "assets/audio/sfx/AMBIENT_IX_6.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1330470738-IX_6.4.mp3",
+   "zipMd5": "1bbedd9f24e29d25d72fc0bf05c4a66a",
+   "zipMatch": "music_map"
   },
   "AMBIENT_IX_7": {
    "category": "music",
@@ -652,7 +848,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2012-02/1330470791-IX_7.3.mp3"
+   "url": "http://c2.glitch.bz/sounds/2012-02/1330470791-IX_7.3.mp3",
+   "file": "assets/audio/sfx/AMBIENT_IX_7.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1330470791-IX_7.3.mp3",
+   "zipMd5": "5af98bcb2f61c39caac53138b393c968",
+   "zipMatch": "music_map"
   },
   "AMBIENT_IX_8": {
    "category": "music",
@@ -664,7 +865,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2012-02/1330470820-IX_8.4.mp3"
+   "url": "http://c2.glitch.bz/sounds/2012-02/1330470820-IX_8.4.mp3",
+   "file": "assets/audio/sfx/AMBIENT_IX_8.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1330470820-IX_8.4.mp3",
+   "zipMd5": "a739e02ce3d83c3995dac5fdcdd5b147",
+   "zipMatch": "music_map"
   },
   "AMBIENT_IX_9": {
    "category": "music",
@@ -676,7 +882,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2012-02/1330470843-IX_9.3.mp3"
+   "url": "http://c2.glitch.bz/sounds/2012-02/1330470843-IX_9.3.mp3",
+   "file": "assets/audio/sfx/AMBIENT_IX_9.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1330470843-IX_9.3.mp3",
+   "zipMd5": "3bdbc5eaf21040380c2be788fc7539f3",
+   "zipMatch": "music_map"
   },
   "AMBIENT_KLORO_HAOMA1": {
    "category": "music",
@@ -688,7 +899,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2012-08/1344450420-Mushroom_Hubs_1.3.mp3"
+   "url": "http://c2.glitch.bz/sounds/2012-08/1344450420-Mushroom_Hubs_1.3.mp3",
+   "file": "assets/audio/sfx/AMBIENT_KLORO_HAOMA1.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1344450420-Mushroom_Hubs_1.3.mp3",
+   "zipMd5": "d4c1fffcdb899a3d988912a8d755204a",
+   "zipMatch": "music_map"
   },
   "AMBIENT_LOOP": {
    "category": "music",
@@ -700,7 +916,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2010-06/1275501421-Ambient_Loop_2.mp3"
+   "url": "http://c2.glitch.bz/sounds/2010-06/1275501421-Ambient_Loop_2.mp3",
+   "file": "assets/audio/sfx/AMBIENT_LOOP.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1275501421-Ambient_Loop_2.mp3",
+   "zipMd5": "1b671b336a6b25ddde82dc06c4d6b1ec",
+   "zipMatch": "music_map"
   },
   "AMBIENT_SAVANNA1": {
    "category": "music",
@@ -712,7 +933,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2012-02/1329959624-SAVANNA_1.4plus4.mp3"
+   "url": "http://c2.glitch.bz/sounds/2012-02/1329959624-SAVANNA_1.4plus4.mp3",
+   "file": "assets/audio/sfx/AMBIENT_SAVANNA1.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1329959624-SAVANNA_1.4plus4.mp3",
+   "zipMd5": "387dda45c27cc81ca3b0c2ac644bdb13",
+   "zipMatch": "music_map"
   },
   "AMBIENT_SAVANNA2": {
    "category": "music",
@@ -724,7 +950,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2012-02/1329959799-SAVANNA_2.3plus4.mp3"
+   "url": "http://c2.glitch.bz/sounds/2012-02/1329959799-SAVANNA_2.3plus4.mp3",
+   "file": "assets/audio/sfx/AMBIENT_SAVANNA2.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1329959799-SAVANNA_2.3plus4.mp3",
+   "zipMd5": "11afd95014658cd80a5bdf1541cc5d55",
+   "zipMatch": "music_map"
   },
   "AMBIENT_SAVANNA3": {
    "category": "music",
@@ -736,7 +967,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2012-02/1329959876-SAVANNA_3.3plus4.mp3"
+   "url": "http://c2.glitch.bz/sounds/2012-02/1329959876-SAVANNA_3.3plus4.mp3",
+   "file": "assets/audio/sfx/AMBIENT_SAVANNA3.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1329959876-SAVANNA_3.3plus4.mp3",
+   "zipMd5": "45446aac9c274c68cc51db8222d73b74",
+   "zipMatch": "music_map"
   },
   "AMBIENT_SAVANNA4": {
    "category": "music",
@@ -748,7 +984,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2012-02/1329960102-SAVANNA_4.6plus4.mp3"
+   "url": "http://c2.glitch.bz/sounds/2012-02/1329960102-SAVANNA_4.6plus4.mp3",
+   "file": "assets/audio/sfx/AMBIENT_SAVANNA4.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1329960102-SAVANNA_4.6plus4.mp3",
+   "zipMd5": "12fd268f8635e55fecbbb332a3ba2877",
+   "zipMatch": "music_map"
   },
   "AMBIENT_SAVANNA5": {
    "category": "music",
@@ -760,7 +1001,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2012-02/1329959932-SAVANNA_5.5plus4.mp3"
+   "url": "http://c2.glitch.bz/sounds/2012-02/1329959932-SAVANNA_5.5plus4.mp3",
+   "file": "assets/audio/sfx/AMBIENT_SAVANNA5.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1329959932-SAVANNA_5.5plus4.mp3",
+   "zipMd5": "59ac824cf625d581da3c9a82044e85d3",
+   "zipMatch": "music_map"
   },
   "AMBIENT_SAVANNA6": {
    "category": "music",
@@ -772,7 +1018,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2012-02/1329959970-SAVANNA_6.4plus4.mp3"
+   "url": "http://c2.glitch.bz/sounds/2012-02/1329959970-SAVANNA_6.4plus4.mp3",
+   "file": "assets/audio/sfx/AMBIENT_SAVANNA6.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1329959970-SAVANNA_6.4plus4.mp3",
+   "zipMd5": "6360376ae905dcbc57d194f71ad136ec",
+   "zipMatch": "music_map"
   },
   "AMBIENT_URALIA1": {
    "category": "music",
@@ -784,7 +1035,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2011-08/1312405966-URALIA_1.4.mp3"
+   "url": "http://c2.glitch.bz/sounds/2011-08/1312405966-URALIA_1.4.mp3",
+   "file": "assets/audio/sfx/AMBIENT_URALIA1.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1312405966-URALIA_1.4.mp3",
+   "zipMd5": "0ac8a959c2ba5b7d1ae899dc2d76b3aa",
+   "zipMatch": "music_map"
   },
   "AMBIENT_URALIA2": {
    "category": "music",
@@ -796,7 +1052,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2011-08/1312406074-URALIA_2.4.mp3"
+   "url": "http://c2.glitch.bz/sounds/2011-08/1312406074-URALIA_2.4.mp3",
+   "file": "assets/audio/sfx/AMBIENT_URALIA2.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1312406074-URALIA_2.4.mp3",
+   "zipMd5": "5428ab0f797493377b5ffee02e5398ed",
+   "zipMatch": "music_map"
   },
   "AMBIENT_URALIA3": {
    "category": "music",
@@ -808,7 +1069,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2011-08/1312406109-URALIA_3.3.mp3"
+   "url": "http://c2.glitch.bz/sounds/2011-08/1312406109-URALIA_3.3.mp3",
+   "file": "assets/audio/sfx/AMBIENT_URALIA3.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1312406109-URALIA_3.3.mp3",
+   "zipMd5": "9cb577b3acb2dc7594e6d4166a8346f7",
+   "zipMatch": "music_map"
   },
   "AMBIENT_URALIA4": {
    "category": "music",
@@ -820,7 +1086,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2011-08/1312406220-URALIA_4.3.mp3"
+   "url": "http://c2.glitch.bz/sounds/2011-08/1312406220-URALIA_4.3.mp3",
+   "file": "assets/audio/sfx/AMBIENT_URALIA4.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1312406220-URALIA_4.3.mp3",
+   "zipMd5": "ab21ce689adbadf24d76b4fcf7c9418f",
+   "zipMatch": "music_map"
   },
   "AMBIENT_URWOK1": {
    "category": "music",
@@ -832,7 +1103,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2012-08/1345512097-00._Urwok_1.4.mp3"
+   "url": "http://c2.glitch.bz/sounds/2012-08/1345512097-00._Urwok_1.4.mp3",
+   "file": "assets/audio/sfx/AMBIENT_URWOK1.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1345512097-00._Urwok_1.4.mp3",
+   "zipMd5": "70f162a53ae6a6ab211d89d959c93db7",
+   "zipMatch": "music_map"
   },
   "AMBIENT_URWOK2": {
    "category": "music",
@@ -844,7 +1120,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2012-08/1345056719-Urwok_2.3.mp3"
+   "url": "http://c2.glitch.bz/sounds/2012-08/1345056719-Urwok_2.3.mp3",
+   "file": "assets/audio/sfx/AMBIENT_URWOK2.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1345056719-Urwok_2.3.mp3",
+   "zipMd5": "978f1d513f7237a918d10cca5d5de3f9",
+   "zipMatch": "music_map"
   },
   "AMBIENT_URWOK3": {
    "category": "music",
@@ -856,7 +1137,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2012-08/1345512097-00._Urwok_3.4.mp3"
+   "url": "http://c2.glitch.bz/sounds/2012-08/1345512097-00._Urwok_3.4.mp3",
+   "file": "assets/audio/sfx/AMBIENT_URWOK3.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1345512097-00._Urwok_3.4.mp3",
+   "zipMd5": "3b714a1126005cddf1f969784412ac43",
+   "zipMatch": "music_map"
   },
   "AMBIENT_URWOK4": {
    "category": "music",
@@ -868,7 +1154,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2012-08/1345056720-Urwok_4.3.mp3"
+   "url": "http://c2.glitch.bz/sounds/2012-08/1345056720-Urwok_4.3.mp3",
+   "file": "assets/audio/sfx/AMBIENT_URWOK4.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1345056720-Urwok_4.3.mp3",
+   "zipMd5": "669bd6222e4ba53420fcd9d0215d2183",
+   "zipMatch": "music_map"
   },
   "AMBIENT_URWOK5": {
    "category": "music",
@@ -880,7 +1171,13 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2012-08/1345512098-00._Urwok_5.4.mp3"
+   "url": "http://c2.glitch.bz/sounds/2012-08/1345512098-00._Urwok_5.4.mp3",
+   "file": "assets/audio/sfx/AMBIENT_URWOK5.mp3",
+   "origin": "sounds-zip",
+   "doubt": "nearest surviving take: Urwok 5.3; music_map names 5.4 (1345512098-00._Urwok_5.4.mp3), which is not in the zip",
+   "zipFile": "1345056721-Urwok_5.3.mp3",
+   "zipMd5": "89282dec09d0aef23c13064edf073178",
+   "zipMatch": "music_map"
   },
   "AMBIENT_URWOK6": {
    "category": "music",
@@ -892,7 +1189,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2012-08/1345056721-Urwok_6.3.mp3"
+   "url": "http://c2.glitch.bz/sounds/2012-08/1345056721-Urwok_6.3.mp3",
+   "file": "assets/audio/sfx/AMBIENT_URWOK6.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1345056721-Urwok_6.3.mp3",
+   "zipMd5": "f2430cf915c78050183628b09de29284",
+   "zipMatch": "music_map"
   },
   "AMBIENT_URWOK7": {
    "category": "music",
@@ -904,7 +1206,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2012-08/1345056722-Urwok_7.3.mp3"
+   "url": "http://c2.glitch.bz/sounds/2012-08/1345056722-Urwok_7.3.mp3",
+   "file": "assets/audio/sfx/AMBIENT_URWOK7.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1345056722-Urwok_7.3.mp3",
+   "zipMd5": "b768ef05f430764c8b7b3c116b09447c",
+   "zipMatch": "music_map"
   },
   "AMBIENT_URWOK8": {
    "category": "music",
@@ -916,7 +1223,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2012-08/1345056723-Urwok_8.4.mp3"
+   "url": "http://c2.glitch.bz/sounds/2012-08/1345056723-Urwok_8.4.mp3",
+   "file": "assets/audio/sfx/AMBIENT_URWOK8.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1345056723-Urwok_8.4.mp3",
+   "zipMd5": "496a633277b853d627b13f4aa133705f",
+   "zipMatch": "music_map"
   },
   "AMBIENT_WATERFALL": {
    "category": "music",
@@ -958,7 +1270,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2012-04/1335235352-Kajuu_1.5.mp3"
+   "url": "http://c2.glitch.bz/sounds/2012-04/1335235352-Kajuu_1.5.mp3",
+   "file": "assets/audio/sfx/ANDRA_KAJUU_1.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1335235352-Kajuu_1.5.mp3",
+   "zipMd5": "6890e2f7ca5bc08fee196ce404b48742",
+   "zipMatch": "music_map"
   },
   "ANDRA_KAJUU_10": {
    "category": "music",
@@ -970,7 +1287,8 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2012-04/1335235598-Kajuu_11.3.mp3"
+   "url": "http://c2.glitch.bz/sounds/2012-04/1335235598-Kajuu_11.3.mp3",
+   "alias": "ANDRA_KAJUU_11"
   },
   "ANDRA_KAJUU_11": {
    "category": "music",
@@ -982,7 +1300,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2012-04/1335235598-Kajuu_11.3.mp3"
+   "url": "http://c2.glitch.bz/sounds/2012-04/1335235598-Kajuu_11.3.mp3",
+   "file": "assets/audio/sfx/ANDRA_KAJUU_11.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1335235598-Kajuu_11.3.mp3",
+   "zipMd5": "7f66f583e4f662cd15c40a091335e13c",
+   "zipMatch": "music_map"
   },
   "ANDRA_KAJUU_12": {
    "category": "music",
@@ -994,7 +1317,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2012-04/1335235641-Kajuu_12.3.mp3"
+   "url": "http://c2.glitch.bz/sounds/2012-04/1335235641-Kajuu_12.3.mp3",
+   "file": "assets/audio/sfx/ANDRA_KAJUU_12.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1335235641-Kajuu_12.3.mp3",
+   "zipMd5": "cb533cf2ca7ad013a9681a957598b999",
+   "zipMatch": "music_map"
   },
   "ANDRA_KAJUU_13": {
    "category": "music",
@@ -1006,7 +1334,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2012-04/1335235699-Kajuu_13.3.mp3"
+   "url": "http://c2.glitch.bz/sounds/2012-04/1335235699-Kajuu_13.3.mp3",
+   "file": "assets/audio/sfx/ANDRA_KAJUU_13.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1335235699-Kajuu_13.3.mp3",
+   "zipMd5": "a3d6e980c1e2a5edc7ca2a74e84a2912",
+   "zipMatch": "music_map"
   },
   "ANDRA_KAJUU_14": {
    "category": "music",
@@ -1018,7 +1351,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2012-04/1335235790-Kajuu_14.4.mp3"
+   "url": "http://c2.glitch.bz/sounds/2012-04/1335235790-Kajuu_14.4.mp3",
+   "file": "assets/audio/sfx/ANDRA_KAJUU_14.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1335235790-Kajuu_14.4.mp3",
+   "zipMd5": "ed2c31e1ef6cb932171608ed3d01caec",
+   "zipMatch": "music_map"
   },
   "ANDRA_KAJUU_15": {
    "category": "music",
@@ -1030,7 +1368,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2012-04/1335288511-Kajuu_15.3.mp3"
+   "url": "http://c2.glitch.bz/sounds/2012-04/1335288511-Kajuu_15.3.mp3",
+   "file": "assets/audio/sfx/ANDRA_KAJUU_15.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1335288511-Kajuu_15.3.mp3",
+   "zipMd5": "39ee21ac08841df34258143ffb984d41",
+   "zipMatch": "music_map"
   },
   "ANDRA_KAJUU_2": {
    "category": "music",
@@ -1042,7 +1385,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2012-04/1335235373-Kajuu_2.5.mp3"
+   "url": "http://c2.glitch.bz/sounds/2012-04/1335235373-Kajuu_2.5.mp3",
+   "file": "assets/audio/sfx/ANDRA_KAJUU_2.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1335235373-Kajuu_2.5.mp3",
+   "zipMd5": "7df9a6289f1a486dc46e211a15144e16",
+   "zipMatch": "music_map"
   },
   "ANDRA_KAJUU_3": {
    "category": "music",
@@ -1054,7 +1402,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2012-04/1335235392-Kajuu_3.7.mp3"
+   "url": "http://c2.glitch.bz/sounds/2012-04/1335235392-Kajuu_3.7.mp3",
+   "file": "assets/audio/sfx/ANDRA_KAJUU_3.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1335235392-Kajuu_3.7.mp3",
+   "zipMd5": "8815ed416d2e55dc46406ad0da2cc28e",
+   "zipMatch": "music_map"
   },
   "ANDRA_KAJUU_4": {
    "category": "music",
@@ -1066,7 +1419,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2012-04/1335235417-Kajuu_4.5.mp3"
+   "url": "http://c2.glitch.bz/sounds/2012-04/1335235417-Kajuu_4.5.mp3",
+   "file": "assets/audio/sfx/ANDRA_KAJUU_4.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1335235417-Kajuu_4.5.mp3",
+   "zipMd5": "04f90bbac8beb379a98ecff1ced54fb2",
+   "zipMatch": "music_map"
   },
   "ANDRA_KAJUU_5": {
    "category": "music",
@@ -1078,7 +1436,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2012-04/1335235451-Kajuu_5.9.mp3"
+   "url": "http://c2.glitch.bz/sounds/2012-04/1335235451-Kajuu_5.9.mp3",
+   "file": "assets/audio/sfx/ANDRA_KAJUU_5.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1335235451-Kajuu_5.9.mp3",
+   "zipMd5": "59b3895c095dc703686ece2bc9904e67",
+   "zipMatch": "music_map"
   },
   "ANDRA_KAJUU_6": {
    "category": "music",
@@ -1090,7 +1453,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2012-04/1335235469-Kajuu_6.5.mp3"
+   "url": "http://c2.glitch.bz/sounds/2012-04/1335235469-Kajuu_6.5.mp3",
+   "file": "assets/audio/sfx/ANDRA_KAJUU_6.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1335235469-Kajuu_6.5.mp3",
+   "zipMd5": "da93d0aa1d557617226a6b421b9754d5",
+   "zipMatch": "music_map"
   },
   "ANDRA_KAJUU_7": {
    "category": "music",
@@ -1102,7 +1470,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2012-04/1335235484-Kajuu_7.5.mp3"
+   "url": "http://c2.glitch.bz/sounds/2012-04/1335235484-Kajuu_7.5.mp3",
+   "file": "assets/audio/sfx/ANDRA_KAJUU_7.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1335235484-Kajuu_7.5.mp3",
+   "zipMd5": "506b4b26745e42f4be1e6908358dd4b2",
+   "zipMatch": "music_map"
   },
   "ANDRA_KAJUU_8": {
    "category": "music",
@@ -1114,7 +1487,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2012-04/1335235499-Kajuu_8.8.mp3"
+   "url": "http://c2.glitch.bz/sounds/2012-04/1335235499-Kajuu_8.8.mp3",
+   "file": "assets/audio/sfx/ANDRA_KAJUU_8.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1335235499-Kajuu_8.8.mp3",
+   "zipMd5": "0a83677d516ba4389cf64dd5f4c5a46a",
+   "zipMatch": "music_map"
   },
   "ANDRA_KAJUU_9": {
    "category": "music",
@@ -1126,7 +1504,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2012-04/1335235515-Kajuu_9.3.mp3"
+   "url": "http://c2.glitch.bz/sounds/2012-04/1335235515-Kajuu_9.3.mp3",
+   "file": "assets/audio/sfx/ANDRA_KAJUU_9.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1335235515-Kajuu_9.3.mp3",
+   "zipMd5": "3a76947c2fb2f06bb928cb8ea05ded66",
+   "zipMatch": "music_map"
   },
   "ANIMAL_STICK": {
    "category": "event",
@@ -1159,7 +1542,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2012-11/1352420340-Asslandia_1.1.mp3"
+   "url": "http://c2.glitch.bz/sounds/2012-11/1352420340-Asslandia_1.1.mp3",
+   "file": "assets/audio/sfx/ASSLANDIA.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1352420340-Asslandia_1.1.mp3",
+   "zipMd5": "afd9f7b6a58ce06c757eefc242ace24c",
+   "zipMatch": "music_map"
   },
   "AUTUMN_DAY": {
    "category": "music",
@@ -1482,7 +1870,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2012-04/1335837087-Blue_Quest_Ambient_Loop_1.1.mp3"
+   "url": "http://c2.glitch.bz/sounds/2012-04/1335837087-Blue_Quest_Ambient_Loop_1.1.mp3",
+   "file": "assets/audio/sfx/BLUE__WHITE.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1335837087-Blue_Quest_Ambient_Loop_1.1.mp3",
+   "zipMd5": "80d1344e680a1fc098e6e3142181ac61",
+   "zipMatch": "music_map"
   },
   "BUBBLE_TREE": {
    "category": "nature",
@@ -1527,7 +1920,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2012-01/1326989321-Waiting_Muzak_2.1.mp3"
+   "url": "http://c2.glitch.bz/sounds/2012-01/1326989321-Waiting_Muzak_2.1.mp3",
+   "file": "assets/audio/sfx/BUREAUCRATIC_HALL_MUZAK.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1326989321-Waiting_Muzak_2.1.mp3",
+   "zipMd5": "792f461acfa92f520fbc86c64babe8bd",
+   "zipMatch": "music_map"
   },
   "BURP": {
    "category": "event",
@@ -1635,7 +2033,13 @@
    ],
    "sources": [
     "street:GIFM4BD43383DKV (Le Miserable button_press)"
-   ]
+   ],
+   "file": "assets/audio/sfx/BUTTON_2.mp3",
+   "origin": "sounds-zip",
+   "why": "Le Miserable button_press (street event); the Esquibeth and Mental Block quest rooms press their buttons with it",
+   "zipFile": "1345512533-Button_2.1.mp3",
+   "zipMd5": "eda0ba6c50cdc145d62ac07459232870",
+   "zipMatch": "filename"
   },
   "BUY_FOX_BRUSHING_PERMIT": {
    "category": "animal",
@@ -1776,7 +2180,13 @@
    ],
    "sources": [
     "client:com/tinyspeck/engine/view/ui/imagination/ImaginationHandUI.as:199 (deal cards)"
-   ]
+   ],
+   "file": "assets/audio/sfx/CARD_DEAL1.mp3",
+   "origin": "sounds-zip",
+   "why": "Imagination: the hand is dealt (ImaginationHandUI.as:199; imagination-feature.js plays CARD_DEAL1)",
+   "zipFile": "1338400480-card_deal_1.1.mp3",
+   "zipMd5": "cbd006710be8a49c9e0608f08d5cbde1",
+   "zipMatch": "filename"
   },
   "CARD_DEAL2": {
    "category": "ui",
@@ -1868,7 +2278,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2012-02/1328219938-Caves_1.1.mp3"
+   "url": "http://c2.glitch.bz/sounds/2012-02/1328219938-Caves_1.1.mp3",
+   "file": "assets/audio/sfx/CAVE_MUSIC1.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1328219938-Caves_1.1.mp3",
+   "zipMd5": "990ee339e262e18bb55c3e146f1db4ed",
+   "zipMatch": "music_map"
   },
   "CAVE_MUSIC2": {
    "category": "music",
@@ -1880,7 +2295,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2012-02/1328220013-Caves_2.1.mp3"
+   "url": "http://c2.glitch.bz/sounds/2012-02/1328220013-Caves_2.1.mp3",
+   "file": "assets/audio/sfx/CAVE_MUSIC2.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1328220013-Caves_2.1.mp3",
+   "zipMd5": "a140e72713614c102d6ffd8f54782eb4",
+   "zipMatch": "music_map"
   },
   "CAVE_MUSIC3": {
    "category": "music",
@@ -1892,7 +2312,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2012-02/1328220148-Caves_3.1.mp3"
+   "url": "http://c2.glitch.bz/sounds/2012-02/1328220148-Caves_3.1.mp3",
+   "file": "assets/audio/sfx/CAVE_MUSIC3.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1328220148-Caves_3.1.mp3",
+   "zipMd5": "68284aaad4dba72f7d9f0fd485967571",
+   "zipMatch": "music_map"
   },
   "CAVE_MUSIC4": {
    "category": "music",
@@ -1904,7 +2329,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2012-02/1328220183-Caves_4.1.mp3"
+   "url": "http://c2.glitch.bz/sounds/2012-02/1328220183-Caves_4.1.mp3",
+   "file": "assets/audio/sfx/CAVE_MUSIC4.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1328220183-Caves_4.1.mp3",
+   "zipMd5": "171454eb21d1440436693ef0ce584828",
+   "zipMatch": "music_map"
   },
   "CAVE_MUSIC5": {
    "category": "music",
@@ -1916,7 +2346,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2012-02/1328220309-Caves_5.1.mp3"
+   "url": "http://c2.glitch.bz/sounds/2012-02/1328220309-Caves_5.1.mp3",
+   "file": "assets/audio/sfx/CAVE_MUSIC5.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1328220309-Caves_5.1.mp3",
+   "zipMd5": "3cbe77a10671da22be024496fb096d6c",
+   "zipMatch": "music_map"
   },
   "CHAIN_PULL": {
    "category": "event",
@@ -1927,7 +2362,13 @@
    ],
    "sources": [
     "gsjs:items/newxp_chain.js:56 (initInstanceProps)"
-   ]
+   ],
+   "file": "assets/audio/sfx/CHAIN_PULL.mp3",
+   "origin": "sounds-zip",
+   "why": "items/newxp_chain.js:56: the tutorial chain is pulled (newxp-feature.js)",
+   "zipFile": "1340909212-pull_chain_newxp_1.3.mp3",
+   "zipMd5": "5025ff9b8b94dd637f31476425333d64",
+   "zipMatch": "filename"
   },
   "CHASSIS1": {
    "category": "making",
@@ -2275,7 +2716,13 @@
     "gsjs:items/fuelmaker.js:605",
     "gsjs:items/metalmaker.js:665",
     "gsjs:items/woodworker.js:605"
-   ]
+   ],
+   "file": "assets/audio/sfx/COLLECT.mp3",
+   "origin": "sounds-zip",
+   "why": "blockmaker/fuelmaker/metalmaker/woodworker.js 605/665: a machine hands over what it made (machine rooms, home machines, yard collectors)",
+   "zipFile": "1322173667-Collect_1.3.mp3",
+   "zipMd5": "741471ee915e742825d9d982cf24f5f6",
+   "zipMatch": "filename"
   },
   "COMEDIAN": {
    "category": "event",
@@ -2596,7 +3043,13 @@
    ],
    "sources": [
     "gsjs:items/crusher.js:64 (endDrop)"
-   ]
+   ],
+   "file": "assets/audio/sfx/CRUSHER_IMPACT.mp3",
+   "origin": "sounds-zip",
+   "why": "items/crusher.js:64 endDrop: a crusher lands (Mental Block crushes a block run)",
+   "zipFile": "1286143719-crusher_impact_01.mp3",
+   "zipMd5": "784eff94c918aed8acd9e2e921f143e7",
+   "zipMatch": "filename"
   },
   "CRYSTALLIZER": {
    "category": "tool",
@@ -2650,7 +3103,13 @@
     "gsjs:items/npc_cubimal_batterfly.js:680 (onBattleLoop)",
     "gsjs:items/npc_cubimal_batterfly.js:935 (onRaceEnd)",
     "gsjs:items/npc_cubimal_bureaucrat.js:680 (onBattleLoop)"
-   ]
+   ],
+   "file": "assets/audio/sfx/CUBIMAL_WIND_DOWN.mp3",
+   "origin": "sounds-zip",
+   "why": "npc_combat_cubimal.js 743/1054: a racing cubimal winds down",
+   "zipFile": "1315417782-Cubimal_Wind_Down_1.mp3",
+   "zipMd5": "d072eee35c52b92b383a7b1aceee4b8a",
+   "zipMatch": "filename"
   },
   "CUBIMAL_WIND_UP": {
    "category": "event",
@@ -2695,7 +3154,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2011-09/1316485534-De-Embiggenfify_1.2.mp3"
+   "url": "http://c2.glitch.bz/sounds/2011-09/1316485534-De-Embiggenfify_1.2.mp3",
+   "file": "assets/audio/sfx/DE_EMBIGGENIFY.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1316485534-De-Embiggenfify_1.2.mp3",
+   "zipMd5": "955e1d891bc9a99b03a93a876a5b5744",
+   "zipMatch": "music_map"
   },
   "DEIMAGINATOR_TAKES_BOX": {
    "category": "event",
@@ -2719,7 +3183,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2012-11/1352397228-Dinosaur_Ambience_1.1.mp3"
+   "url": "http://c2.glitch.bz/sounds/2012-11/1352397228-Dinosaur_Ambience_1.1.mp3",
+   "file": "assets/audio/sfx/DINOSAUR_INTESTINES.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1352397228-Dinosaur_Ambience_1.1.mp3",
+   "zipMd5": "60093a3ec002da765e3ea97ab4765fb1",
+   "zipMatch": "music_map"
   },
   "DISCOVER_USEFUL_NEW_ITEM": {
    "category": "event",
@@ -3038,7 +3507,13 @@
    ],
    "sources": [
     "gsjs:items/emotional_bear.js:112"
-   ]
+   ],
+   "file": "assets/audio/sfx/EMO_BEAR_HUG.mp3",
+   "origin": "sounds-zip",
+   "why": "emotional_bear.js:112: a Glitch is hugged with the Emotional Bear (online Hug verb)",
+   "zipFile": "1333418742-Emo_Bear_Hug_1.3.mp3",
+   "zipMd5": "5cc7e26784014a393f2935d8309b0793",
+   "zipMatch": "filename"
   },
   "EMOTIONAL_BEAR_HIGH_5": {
    "category": "event",
@@ -3105,7 +3580,13 @@
     "gsjs:items/fuelmaker.js:741 (onApplyPart)",
     "gsjs:items/metalmaker.js:816 (onApplyPart)",
     "gsjs:items/woodworker.js:741 (onApplyPart)"
-   ]
+   ],
+   "file": "assets/audio/sfx/ENGINE1.mp3",
+   "origin": "sounds-zip",
+   "why": "blockmaker.js:737 onApplyPart: a Machine Stand part goes on (supply-feature.js assembly)",
+   "zipFile": "1302286005-engine1_30.mp3",
+   "zipMd5": "edd6d05c4ddd2586f3409992b2481769",
+   "zipMatch": "filename"
   },
   "ENGINE2": {
    "category": "making",
@@ -3319,7 +3800,13 @@
    ],
    "sources": [
     "client:com/tinyspeck/engine/view/TSMainView.as:1495 (makeVisibleFirstTime)"
-   ]
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-03/1331167039-00._Street_Loading_1.2.mp3",
+   "file": "assets/audio/sfx/FIRST_STREET_LOADING.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1331167039-00._Street_Loading_1.2.mp3",
+   "zipMd5": "6ef341f0287b7fc2d964151d6a7b0260",
+   "zipMatch": "client-url"
   },
   "FLIP_BACK": {
    "category": "ui",
@@ -3331,7 +3818,13 @@
    "sources": [
     "client:com/tinyspeck/engine/view/ui/imagination/ImgCardUI.as:352 (reset)",
     "client:com/tinyspeck/engine/view/ui/imagination/ImgCardUI.as:540 (flip)"
-   ]
+   ],
+   "file": "assets/audio/sfx/FLIP_BACK.mp3",
+   "origin": "sounds-zip",
+   "why": "ImgCardUI.as:352: an Imagination card flips back",
+   "zipFile": "1338400528-flip_back_2.1.mp3",
+   "zipMd5": "1db651046029c5fb11b9b6f03666343c",
+   "zipMatch": "filename"
   },
   "FLIP_OVER": {
    "category": "ui",
@@ -3343,7 +3836,13 @@
    "sources": [
     "client:com/tinyspeck/engine/view/ui/imagination/ImgCardUI.as:540 (flip)",
     "client:com/tinyspeck/engine/view/ui/imagination/ImgCardUI.as:540 (flip)"
-   ]
+   ],
+   "file": "assets/audio/sfx/FLIP_OVER.mp3",
+   "origin": "sounds-zip",
+   "why": "ImgCardUI.as:540: an Imagination card flips over",
+   "zipFile": "1338400540-flip_over_2.1.mp3",
+   "zipMd5": "51232101d27485b349ca78587c449e32",
+   "zipMatch": "filename"
   },
   "FLITTERBUG_COLLISION": {
    "category": "event",
@@ -3458,7 +3957,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2011-06/1309454496-Forest_Theme_1.1.mp3"
+   "url": "http://c2.glitch.bz/sounds/2011-06/1309454496-Forest_Theme_1.1.mp3",
+   "file": "assets/audio/sfx/FOREST_AMBIENT1.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1309454496-Forest_Theme_1.1.mp3",
+   "zipMd5": "3e9296699b938d48f145decb5a154a01",
+   "zipMatch": "music_map"
   },
   "FOREST_AMBIENT2": {
    "category": "music",
@@ -3470,7 +3974,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2011-06/1309454585-Forest_Theme_2.1.mp3"
+   "url": "http://c2.glitch.bz/sounds/2011-06/1309454585-Forest_Theme_2.1.mp3",
+   "file": "assets/audio/sfx/FOREST_AMBIENT2.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1309454585-Forest_Theme_2.1.mp3",
+   "zipMd5": "5192ac0a1d63270b2312b4fe55029557",
+   "zipMatch": "music_map"
   },
   "FOREST_AMBIENT3": {
    "category": "music",
@@ -3482,7 +3991,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2011-06/1309454619-Forest_Theme_3.3.mp3"
+   "url": "http://c2.glitch.bz/sounds/2011-06/1309454619-Forest_Theme_3.3.mp3",
+   "file": "assets/audio/sfx/FOREST_AMBIENT3.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1309454619-Forest_Theme_3.3.mp3",
+   "zipMd5": "86c91bd849f84792f137852e8cbf4134",
+   "zipMatch": "music_map"
   },
   "FOREST_AMBIENT4": {
    "category": "music",
@@ -3494,7 +4008,13 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2011-06/1309454863-Forest_Theme_4.6.mp3"
+   "url": "http://c2.glitch.bz/sounds/2011-06/1309454863-Forest_Theme_4.6.mp3",
+   "file": "assets/audio/sfx/FOREST_AMBIENT4.mp3",
+   "origin": "sounds-zip",
+   "doubt": "nearest surviving take: Forest Theme 4.7; music_map names 4.6 (1309454863-Forest_Theme_4.6.mp3), which is not in the zip",
+   "zipFile": "1318349566-Forest_Theme_4.7.mp3",
+   "zipMd5": "d41dda48e0d966d1f489c146a3c58f47",
+   "zipMatch": "music_map"
   },
   "FOX_BAIT": {
    "category": "animal",
@@ -3832,7 +4352,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2011-12/1324484819-Holiday_Party_Space_Loop_2.1.mp3"
+   "url": "http://c2.glitch.bz/sounds/2011-12/1324484819-Holiday_Party_Space_Loop_2.1.mp3",
+   "file": "assets/audio/sfx/GLITCHMAS_PARTY_LOCATION.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1324484819-Holiday_Party_Space_Loop_2.1.mp3",
+   "zipMd5": "6fe2445ea8a98cf427f2ba610c0c110a",
+   "zipMatch": "music_map"
   },
   "GLOWING_ORB_COLLIDE": {
    "category": "event",
@@ -3865,7 +4390,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2012-01/1326904591-Game_of_Crowns_1.2.mp3"
+   "url": "http://c2.glitch.bz/sounds/2012-01/1326904591-Game_of_Crowns_1.2.mp3",
+   "file": "assets/audio/sfx/GOC_MUSIC_1.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1326904591-Game_of_Crowns_1.2.mp3",
+   "zipMd5": "063c14fed766427a4f746d3c9922f826",
+   "zipMatch": "music_map"
   },
   "GOC_MUSIC_2": {
    "category": "music",
@@ -3877,7 +4407,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2012-01/1326904652-Game_of_Crowns_2.2.mp3"
+   "url": "http://c2.glitch.bz/sounds/2012-01/1326904652-Game_of_Crowns_2.2.mp3",
+   "file": "assets/audio/sfx/GOC_MUSIC_2.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1326904652-Game_of_Crowns_2.2.mp3",
+   "zipMd5": "46b86c6ad1ffd3cc294f13065793ec91",
+   "zipMatch": "music_map"
   },
   "GOC_MUSIC_3": {
    "category": "music",
@@ -3889,7 +4424,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2012-01/1326904729-Game_of_Crowns_3.2.mp3"
+   "url": "http://c2.glitch.bz/sounds/2012-01/1326904729-Game_of_Crowns_3.2.mp3",
+   "file": "assets/audio/sfx/GOC_MUSIC_3.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1326904729-Game_of_Crowns_3.2.mp3",
+   "zipMd5": "fe4e283071e16340f5698dc46f66b380",
+   "zipMatch": "music_map"
   },
   "GONG_GIANTS": {
    "category": "reward",
@@ -3960,7 +4500,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2011-05/1305665080-Groddle_Ambient_Test_1.6.mp3"
+   "url": "http://c2.glitch.bz/sounds/2011-05/1305665080-Groddle_Ambient_Test_1.6.mp3",
+   "file": "assets/audio/sfx/GRODDLE_AMBIENT.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1305665080-Groddle_Ambient_Test_1.6.mp3",
+   "zipMd5": "74fe0d26e6c58ecf19625be840fe0f89",
+   "zipMatch": "music_map"
   },
   "HAND_PULL_DOWN": {
    "category": "ui",
@@ -3995,7 +4540,13 @@
     "gsjs:items/npc_chicken.js:195 (initInstanceProps)",
     "gsjs:items/npc_kitty_chicken.js:753 (parent_verb_npc_chicken_butter_up)",
     "gsjs:items/npc_test.js:269 (initInstanceProps)"
-   ]
+   ],
+   "file": "assets/audio/sfx/HAPPY_CHICKEN.mp3",
+   "origin": "sounds-zip",
+   "why": "npc_chicken.js:195: a flattered Chicken is happy",
+   "zipFile": "1354665892-Happy_Chicken_1.1.mp3",
+   "zipMd5": "963924a86dd7f640b24297b8195484f8",
+   "zipMatch": "filename"
   },
   "HARVEST": {
    "category": "nature",
@@ -4052,7 +4603,13 @@
    ],
    "sources": [
     "gsjs:quests/phantom_glitch.js:438 (onEnterLocation)"
-   ]
+   ],
+   "file": "assets/audio/sfx/HEARTBEAT.mp3",
+   "origin": "sounds-zip",
+   "why": "quests/phantom_glitch.js:438 announce_sound('HEARTBEAT', 1000000): loops while an echo haunts the street",
+   "zipFile": "1351896481-Heartbeat.mp3",
+   "zipMd5": "400db9484fa6637f9e00799f05ef1f39",
+   "zipMatch": "filename"
   },
   "HELL": {
    "category": "music",
@@ -4064,7 +4621,13 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2010-05/1274906921-Bongbong.mp3"
+   "url": "http://c2.glitch.bz/sounds/2010-05/1274906921-Bongbong.mp3",
+   "file": "assets/audio/ambient/Dirge-of-the-Damned_1291886020.mp3",
+   "origin": "sounds-zip",
+   "why": "the zip's 1274906921-Bongbong.mp3 is Dirge-of-the-Damned_1291886020.mp3 byte for byte",
+   "zipFile": "1274906921-Bongbong.mp3",
+   "zipMd5": "304c8eaf884137bbce41333f439baf8b",
+   "zipMatch": "music_map"
   },
   "HERE_YOU_GO_LIGHTER": {
    "category": "recovered",
@@ -4195,7 +4758,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2012-08/1344474398-Firebogs_Home_Street_Final_1.1.mp3"
+   "url": "http://c2.glitch.bz/sounds/2012-08/1344474398-Firebogs_Home_Street_Final_1.1.mp3",
+   "file": "assets/audio/sfx/HOME_STREET_FIREBOGS.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1344474398-Firebogs_Home_Street_Final_1.1.mp3",
+   "zipMd5": "cd44582076d88a176c0f536c000a0b21",
+   "zipMatch": "music_map"
   },
   "HOME_STREET_GRODDLE_WHISTLE": {
    "category": "music",
@@ -4207,7 +4775,9 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2012-08/1344474851-Snappy_w_and_wo_whistle_Loop.mp3"
+   "url": "http://c2.glitch.bz/sounds/2012-08/1344474851-Snappy_w_and_wo_whistle_Loop.mp3",
+   "doubt": "music_map names the 2012-08 re-upload 1344474851-Snappy_w_and_wo_whistle_Loop.mp3; the zip has only the 2011-09 upload (SNAPPY_LOOP), which may differ",
+   "alias": "SNAPPY_LOOP"
   },
   "HOME_STREET_URALIA": {
    "category": "music",
@@ -4219,7 +4789,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2012-07/1341949924-Musical_Party_Space_Uralia_1.3_plus_3db.mp3"
+   "url": "http://c2.glitch.bz/sounds/2012-07/1341949924-Musical_Party_Space_Uralia_1.3_plus_3db.mp3",
+   "file": "assets/audio/sfx/HOME_STREET_URALIA.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1341949924-Musical_Party_Space_Uralia_1.3_plus_3db.mp3",
+   "zipMd5": "f245300c154aa8897551b716c3ae3d96",
+   "zipMatch": "music_map"
   },
   "HORRIBLE_SOUND": {
    "category": "event",
@@ -4251,7 +4826,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2011-09/1316476676-Ice_Cream_Truck_for_Wintry_Place_1.3.mp3"
+   "url": "http://c2.glitch.bz/sounds/2011-09/1316476676-Ice_Cream_Truck_for_Wintry_Place_1.3.mp3",
+   "file": "assets/audio/sfx/ICE_CREAM_TRUCK.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1316476676-Ice_Cream_Truck_for_Wintry_Place_1.3.mp3",
+   "zipMd5": "d4d41b3b96dd07bee7547698611835a5",
+   "zipMatch": "music_map"
   },
   "ICE_CUBE": {
    "category": "event",
@@ -4520,7 +5100,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2012-10/1350945525-Jal_1.8.mp3"
+   "url": "http://c2.glitch.bz/sounds/2012-10/1350945525-Jal_1.8.mp3",
+   "file": "assets/audio/sfx/JAL1.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1350945525-Jal_1.8.mp3",
+   "zipMd5": "14fde3e5f1b83de82e057fbcff70fcee",
+   "zipMatch": "music_map"
   },
   "JAL2": {
    "category": "music",
@@ -4532,7 +5117,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2012-10/1350945525-Jal_2.4.mp3"
+   "url": "http://c2.glitch.bz/sounds/2012-10/1350945525-Jal_2.4.mp3",
+   "file": "assets/audio/sfx/JAL2.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1350945525-Jal_2.4.mp3",
+   "zipMd5": "2b77e9a0d316f18cc830ea6398df2f43",
+   "zipMatch": "music_map"
   },
   "JUJU_BANDIT_SHRINK": {
    "category": "event",
@@ -5272,7 +5862,8 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2012-07/1341949924-Musical_Party_Space_Uralia_1.3_plus_3db.mp3"
+   "url": "http://c2.glitch.bz/sounds/2012-07/1341949924-Musical_Party_Space_Uralia_1.3_plus_3db.mp3",
+   "alias": "HOME_STREET_URALIA"
   },
   "MUSICBLOCK_B_BROWN_01": {
    "category": "music",
@@ -5833,7 +6424,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2012-07/1341954908-newxp_messed_up_theme_2.2_even_louder.mp3"
+   "url": "http://c2.glitch.bz/sounds/2012-07/1341954908-newxp_messed_up_theme_2.2_even_louder.mp3",
+   "file": "assets/audio/sfx/NEW_XP_BEFORE_CHAIN_PULL.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1341954908-newxp_messed_up_theme_2.2_even_louder.mp3",
+   "zipMd5": "0686e52b78ee7f131aeec6dfdf131214",
+   "zipMatch": "music_map"
   },
   "NEW_XP_INTRO": {
    "category": "music",
@@ -5845,7 +6441,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2012-11/1352504882-Cloud_Theme_1.4_fixed.mp3"
+   "url": "http://c2.glitch.bz/sounds/2012-11/1352504882-Cloud_Theme_1.4_fixed.mp3",
+   "file": "assets/audio/sfx/NEW_XP_INTRO.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1352504882-Cloud_Theme_1.4_fixed.mp3",
+   "zipMd5": "4216919091dd53760ecc5c5766bce7eb",
+   "zipMatch": "music_map"
   },
   "NEW_XP_TRAINING1": {
    "category": "music",
@@ -5857,7 +6458,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2012-07/1341512455-Ix_for_newxp_w_comp_1.3.mp3"
+   "url": "http://c2.glitch.bz/sounds/2012-07/1341512455-Ix_for_newxp_w_comp_1.3.mp3",
+   "file": "assets/audio/sfx/NEW_XP_TRAINING1.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1341512455-Ix_for_newxp_w_comp_1.3.mp3",
+   "zipMd5": "2c15c1c4bf9d1f2f49d7b4a67982e3d9",
+   "zipMatch": "music_map"
   },
   "NEWDAY": {
    "category": "event",
@@ -5963,7 +6569,13 @@
    ],
    "sources": [
     "client:com/tinyspeck/bootstrap/control/BootStrapController.as:826 (loadSounds)"
-   ]
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-03/1331738581-Opening_Screen_Chimes_1.1.mp3",
+   "file": "assets/audio/sfx/OPENING_SCREEN.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1331738581-Opening_Screen_Chimes_1.1.mp3",
+   "zipMd5": "7ebf3c3501d95c2caa226592ef55e524",
+   "zipMatch": "client-url"
   },
   "OPENING_SCREEN_MUSIC": {
    "category": "music",
@@ -6052,7 +6664,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2012-05/1335917252-Paralaxing_Level_1.3.mp3"
+   "url": "http://c2.glitch.bz/sounds/2012-05/1335917252-Paralaxing_Level_1.3.mp3",
+   "file": "assets/audio/sfx/PARALAXING_STREETS.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1335917252-Paralaxing_Level_1.3.mp3",
+   "zipMd5": "484a1d6565f3f809f69d8125a20e17df",
+   "zipMatch": "music_map"
   },
   "PAY_50_CURRANTS": {
    "category": "item",
@@ -6671,7 +7288,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2011-11/1321639889-ZeGroupTheme.mp3"
+   "url": "http://c2.glitch.bz/sounds/2011-11/1321639889-ZeGroupTheme.mp3",
+   "file": "assets/audio/sfx/PURPLE_LOCATION.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1321639889-ZeGroupTheme.mp3",
+   "zipMd5": "96aa7677be99a433f69918856c57be2e",
+   "zipMatch": "music_map"
   },
   "PUZZLES1": {
    "category": "music",
@@ -6683,7 +7305,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2012-05/1337808321-Xavier_Whistle_-5db.mp3"
+   "url": "http://c2.glitch.bz/sounds/2012-05/1337808321-Xavier_Whistle_-5db.mp3",
+   "file": "assets/audio/sfx/PUZZLES1.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1337808321-Xavier_Whistle_-5db.mp3",
+   "zipMd5": "6c7a1f82db955ad27517b150fba3ed0f",
+   "zipMatch": "music_map"
   },
   "QUEST_ACCEPT": {
    "category": "remake",
@@ -7293,7 +7920,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2011-08/1312844259-Rook_Hall_mixdown_VO_01.mp3"
+   "url": "http://c2.glitch.bz/sounds/2011-08/1312844259-Rook_Hall_mixdown_VO_01.mp3",
+   "file": "assets/audio/sfx/ROOK_HALL_VO_1.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1312844259-Rook_Hall_mixdown_VO_01.mp3",
+   "zipMd5": "ce0b1b6e4d39b8d66e1de3fde49e4d2d",
+   "zipMatch": "music_map"
   },
   "ROOK_HALL_VO_2": {
    "category": "music",
@@ -7305,7 +7937,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2011-08/1312844269-Rook_Hall_mixdown_VO_02.mp3"
+   "url": "http://c2.glitch.bz/sounds/2011-08/1312844269-Rook_Hall_mixdown_VO_02.mp3",
+   "file": "assets/audio/sfx/ROOK_HALL_VO_2.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1312844269-Rook_Hall_mixdown_VO_02.mp3",
+   "zipMd5": "0d5527d7293812265adbe0eb62b4029a",
+   "zipMatch": "music_map"
   },
   "ROOK_HALL_VO_3": {
    "category": "music",
@@ -7317,7 +7954,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2011-08/1312844277-Rook_Hall_mixdown_VO_03.mp3"
+   "url": "http://c2.glitch.bz/sounds/2011-08/1312844277-Rook_Hall_mixdown_VO_03.mp3",
+   "file": "assets/audio/sfx/ROOK_HALL_VO_3.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1312844277-Rook_Hall_mixdown_VO_03.mp3",
+   "zipMd5": "220b617f7ead9c80f4c355aede96882b",
+   "zipMatch": "music_map"
   },
   "ROOK_HALL_VO_4": {
    "category": "music",
@@ -7329,7 +7971,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2011-08/1312844295-Rook_Hall_mixdown_VO_04.mp3"
+   "url": "http://c2.glitch.bz/sounds/2011-08/1312844295-Rook_Hall_mixdown_VO_04.mp3",
+   "file": "assets/audio/sfx/ROOK_HALL_VO_4.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1312844295-Rook_Hall_mixdown_VO_04.mp3",
+   "zipMd5": "0211886b173814071ceaa90fa45728b4",
+   "zipMatch": "music_map"
   },
   "ROOK_HALL_VO_5": {
    "category": "music",
@@ -7341,7 +7988,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2011-08/1313204175-Rook_Hall_mixdown_VO_05_reedit.mp3"
+   "url": "http://c2.glitch.bz/sounds/2011-08/1313204175-Rook_Hall_mixdown_VO_05_reedit.mp3",
+   "file": "assets/audio/sfx/ROOK_HALL_VO_5.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1313204175-Rook_Hall_mixdown_VO_05_reedit.mp3",
+   "zipMd5": "5353acb6619b99ce0af01381ad192784",
+   "zipMatch": "music_map"
   },
   "ROOK_HALL_VO_6": {
    "category": "music",
@@ -7353,7 +8005,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2011-08/1312844328-Rook_Hall_mixdown_VO_06.mp3"
+   "url": "http://c2.glitch.bz/sounds/2011-08/1312844328-Rook_Hall_mixdown_VO_06.mp3",
+   "file": "assets/audio/sfx/ROOK_HALL_VO_6.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1312844328-Rook_Hall_mixdown_VO_06.mp3",
+   "zipMd5": "350b90829a598ca282d7836f6318a346",
+   "zipMatch": "music_map"
   },
   "RUBE_APPEARS": {
    "category": "music",
@@ -7712,7 +8369,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2011-09/1316564696-Snappy_w_and_wo_whistle_Loop.mp3"
+   "url": "http://c2.glitch.bz/sounds/2011-09/1316564696-Snappy_w_and_wo_whistle_Loop.mp3",
+   "file": "assets/audio/sfx/SNAPPY_LOOP.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1316564696-Snappy_w_and_wo_whistle_Loop.mp3",
+   "zipMd5": "89c555c2a5114ed6367436794047575b",
+   "zipMatch": "music_map"
   },
   "SNEEZING_AHCHOO": {
    "category": "event",
@@ -7804,7 +8466,13 @@
    ],
    "sources": [
     "gsjs:items/include/trants.js:342 (onHarvestingComplete)"
-   ]
+   ],
+   "file": "assets/audio/sfx/SPICE_TREE.mp3",
+   "origin": "sounds-zip",
+   "why": "items/include/trants.js:342 onHarvestingComplete: a Spice Plant is harvested",
+   "zipFile": "1354324358-spice_tree_1.1.mp3",
+   "zipMd5": "38709032af0d1079daee3b6f5b3b1672",
+   "zipMatch": "filename"
   },
   "SPIGOT": {
    "category": "tool",
@@ -7874,7 +8542,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2012-06/1340729256-Cloud_Theme_1.1.mp3"
+   "url": "http://c2.glitch.bz/sounds/2012-06/1340729256-Cloud_Theme_1.1.mp3",
+   "file": "assets/audio/sfx/SPIRAL_STARS.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1340729256-Cloud_Theme_1.1.mp3",
+   "zipMd5": "655e6f76e404f3248f796365705b9829",
+   "zipMatch": "music_map"
   },
   "SPLANK": {
    "category": "event",
@@ -8410,7 +9083,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2012-06/1339778284-Glowing_Orb_Summer_2.2.mp3"
+   "url": "http://c2.glitch.bz/sounds/2012-06/1339778284-Glowing_Orb_Summer_2.2.mp3",
+   "file": "assets/audio/sfx/TEST.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1339778284-Glowing_Orb_Summer_2.2.mp3",
+   "zipMd5": "a41e255f3ca3a5e1752f1d8eb1f74b10",
+   "zipMatch": "music_map"
   },
   "TEST_SOUND": {
    "category": "event",
@@ -8619,7 +9297,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2011-02/1297359285-meditation_berg.mp3"
+   "url": "http://c2.glitch.bz/sounds/2011-02/1297359285-meditation_berg.mp3",
+   "file": "assets/audio/sfx/TRANSCENDENTAL_MEDITATION_01.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1297359285-meditation_berg.mp3",
+   "zipMd5": "c276f6d24cbfefd5213085b6a19be888",
+   "zipMatch": "music_map"
   },
   "TRANSCENDENTAL_MEDITATION_02": {
    "category": "music",
@@ -8631,7 +9314,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2011-02/1297359584-meditation_limbs_2.mp3"
+   "url": "http://c2.glitch.bz/sounds/2011-02/1297359584-meditation_limbs_2.mp3",
+   "file": "assets/audio/sfx/TRANSCENDENTAL_MEDITATION_02.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1297359584-meditation_limbs_2.mp3",
+   "zipMd5": "5dcfb6daf064aedd32898396636d4781",
+   "zipMatch": "music_map"
   },
   "TRAVELLING_TRAIN": {
    "category": "music",
@@ -8645,7 +9333,12 @@
     "gsjs:locations/inc_transit.js:287 (transit_depart)",
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2011-01/1295895572-subway_loop3.mp3"
+   "url": "http://c2.glitch.bz/sounds/2011-01/1295895572-subway_loop3.mp3",
+   "file": "assets/audio/sfx/TRAVELLING_TRAIN.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1295895572-subway_loop3.mp3",
+   "zipMd5": "f43817bf2fb9e2e06a59ffea85c4a1c8",
+   "zipMatch": "music_map"
   },
   "TREE_POSE_FROG": {
    "category": "animal",
@@ -8779,7 +9472,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2012-05/1338428582-Abandoned_Building_Puzzles_1.4.mp3"
+   "url": "http://c2.glitch.bz/sounds/2012-05/1338428582-Abandoned_Building_Puzzles_1.4.mp3",
+   "file": "assets/audio/sfx/UNDERGROUND_PUZZLES.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1338428582-Abandoned_Building_Puzzles_1.4.mp3",
+   "zipMd5": "76b830c1afbbf3587a58a438ecff2ea5",
+   "zipMatch": "music_map"
   },
   "VENDOR_SELL": {
    "category": "remake",
@@ -8962,7 +9660,8 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2011-09/1316564696-Snappy_w_and_wo_whistle_Loop.mp3"
+   "url": "http://c2.glitch.bz/sounds/2011-09/1316564696-Snappy_w_and_wo_whistle_Loop.mp3",
+   "alias": "SNAPPY_LOOP"
   },
   "WHISTLE_SWALLOWED": {
    "category": "music",
@@ -9006,7 +9705,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2012-11/1351903483-Winter_1.9.mp3"
+   "url": "http://c2.glitch.bz/sounds/2012-11/1351903483-Winter_1.9.mp3",
+   "file": "assets/audio/sfx/WINTER_HUB1.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1351903483-Winter_1.9.mp3",
+   "zipMd5": "2d903fd9930201df062fc3393350bd1c",
+   "zipMatch": "music_map"
   },
   "WINTER_HUB2": {
    "category": "music",
@@ -9018,7 +9722,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2012-11/1351903484-Winter_2.2.mp3"
+   "url": "http://c2.glitch.bz/sounds/2012-11/1351903484-Winter_2.2.mp3",
+   "file": "assets/audio/sfx/WINTER_HUB2.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1351903484-Winter_2.2.mp3",
+   "zipMd5": "0af27b17691a03aa1544df3e95f01d43",
+   "zipMatch": "music_map"
   },
   "WINTER_HUB3": {
    "category": "music",
@@ -9030,7 +9739,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2012-11/1351903484-Winter_3.2.mp3"
+   "url": "http://c2.glitch.bz/sounds/2012-11/1351903484-Winter_3.2.mp3",
+   "file": "assets/audio/sfx/WINTER_HUB3.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1351903484-Winter_3.2.mp3",
+   "zipMd5": "053950680703646a59843d32539d1b2a",
+   "zipMatch": "music_map"
   },
   "WINTER_HUB4": {
    "category": "music",
@@ -9042,7 +9756,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2012-11/1351903485-Winter_4.2.mp3"
+   "url": "http://c2.glitch.bz/sounds/2012-11/1351903485-Winter_4.2.mp3",
+   "file": "assets/audio/sfx/WINTER_HUB4.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1351903485-Winter_4.2.mp3",
+   "zipMd5": "ba0207f25f22b244c4e19bfbc3a5a030",
+   "zipMatch": "music_map"
   },
   "WINTER_HUB5": {
    "category": "music",
@@ -9054,7 +9773,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2012-11/1351903485-Winter_5.2.mp3"
+   "url": "http://c2.glitch.bz/sounds/2012-11/1351903485-Winter_5.2.mp3",
+   "file": "assets/audio/sfx/WINTER_HUB5.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1351903485-Winter_5.2.mp3",
+   "zipMd5": "5ecfd5218401ef4e9e802aee45223764",
+   "zipMatch": "music_map"
   },
   "WINTER_WALK_QUEST": {
    "category": "music",
@@ -9066,7 +9790,8 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2011-12/1324484819-Holiday_Party_Space_Loop_2.1.mp3"
+   "url": "http://c2.glitch.bz/sounds/2011-12/1324484819-Holiday_Party_Space_Loop_2.1.mp3",
+   "alias": "GLITCHMAS_PARTY_LOCATION"
   },
   "WM_A1": {
    "category": "event",
@@ -9178,7 +9903,12 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2010-05/1274727254-CarnivorousPlantsDigestion.mp3"
+   "url": "http://c2.glitch.bz/sounds/2010-05/1274727254-CarnivorousPlantsDigestion.mp3",
+   "file": "assets/audio/sfx/XAVIER_CARNIVOROUS_PLANTS.mp3",
+   "origin": "sounds-zip",
+   "zipFile": "1274727254-CarnivorousPlantsDigestion.mp3",
+   "zipMd5": "254c61e17eef806c29002ead6ec95ca1",
+   "zipMatch": "music_map"
   },
   "YOU_LOSE": {
    "category": "event",

@@ -8,17 +8,12 @@
     {
      "title": "Winter Holiday",
      "audio": "/assets/audio/ambient/winter_holiday_1344997255.mp3",
-     "places": [
-      "Nottis and Drifa",
-      "the Winter Wingding party"
-     ]
+     "places": []
     },
     {
      "title": "Eesti Life Catalogue",
      "audio": "/assets/audio/ambient/eesti_life_catalogue_1344997859.mp3",
      "places": [
-      "Uralia",
-      "the savanna regions",
       "the Eesti Life catalogue room"
      ]
     },
@@ -26,8 +21,6 @@
      "title": "Enchanted Woods",
      "audio": "/assets/audio/ambient/enchanted_woods_1344997332.mp3",
      "places": [
-      "the Groddle forests",
-      "Bortola and Muufo",
       "the Enchanted Wood"
      ]
     },
@@ -35,58 +28,38 @@
      "title": "Rook's Woods",
      "audio": "/assets/audio/ambient/rooks_woods_1344997275.mp3",
      "places": [
-      "the Firebogs",
       "Rook attacks"
      ]
     },
     {
      "title": "Winterland",
      "audio": "/assets/audio/ambient/winterland_1344997854.mp3",
-     "places": [
-      "Nottis and Drifa"
-     ]
+     "places": []
     },
     {
      "title": "Moon Music",
      "audio": "/assets/audio/ambient/moon_music_1344997839.mp3",
-     "places": [
-      "caves",
-      "Uralia",
-      "Nottis and Drifa"
-     ]
+     "places": []
     },
     {
      "title": "Original Groddle Forest Theme",
      "audio": "/assets/audio/ambient/Groddle-Forest-Theme_1291876879.mp3",
-     "places": [
-      "the Groddle forests",
-      "Bortola and Muufo"
-     ]
+     "places": []
     },
     {
      "title": "Groddle Theme (Dreamland Mix)",
      "audio": "/assets/audio/ambient/Groddle-Theme-Dreamland-Mix_1291876965.mp3",
-     "places": [
-      "the Groddle forests",
-      "the Highlands",
-      "Bortola and Muufo",
-      "the Val Holla party"
-     ]
+     "places": []
     },
     {
      "title": "Groddle Theme (Snappy Mix)",
      "audio": "/assets/audio/ambient/Groddle-Theme-Snappy-Mix_1291876544.mp3",
-     "places": [
-      "the Groddle forests",
-      "the savanna regions"
-     ]
+     "places": []
     },
     {
      "title": "Spooky Groddle",
      "audio": "/assets/audio/ambient/Spooky_Groddle_1291879214.mp3",
-     "places": [
-      "the Firebogs"
-     ]
+     "places": []
     },
     {
      "title": "Dirge of the Damned",
@@ -99,19 +72,12 @@
     {
      "title": "Ilmenskie Caverns Work Song",
      "audio": "/assets/audio/ambient/Ilmenskie-Caverns-Work-Song_1291877437.mp3",
-     "places": [
-      "Ilmenskie Caverns",
-      "caves"
-     ]
+     "places": []
     },
     {
      "title": "Ix Tubamaphone",
      "audio": "/assets/audio/ambient/Tubamaphone_1292397289.mp3",
-     "places": [
-      "Ilmenskie Caverns",
-      "caves",
-      "Ix"
-     ]
+     "places": []
     }
    ]
   },
@@ -123,24 +89,19 @@
     {
      "title": "Marching Band",
      "audio": "/assets/audio/ambient/marching_band_1344997302.mp3",
-     "places": [
-      "the savanna regions"
-     ]
+     "places": []
     },
     {
      "title": "Elevator Music",
      "audio": "/assets/audio/ambient/elevator_music_1344997334.mp3",
      "places": [
-      "Ix",
-      "the subway",
-      "the Aquarius party"
+      "the subway"
      ]
     },
     {
      "title": "Subway Music",
      "audio": "/assets/audio/ambient/subway_music_1344997270.mp3",
      "places": [
-      "Ix",
       "the subway"
      ]
     },
@@ -148,8 +109,6 @@
      "title": "Waiting Muzak",
      "audio": "/assets/audio/ambient/waiting_muzak_1344997267.mp3",
      "places": [
-      "Bortola and Muufo",
-      "Ix",
       "the subway"
      ]
     }
@@ -164,7 +123,6 @@
      "title": "Meditation",
      "audio": "/assets/audio/ambient/Meditation_1291879502.mp3",
      "places": [
-      "the Highlands",
       "meditation"
      ]
     },
@@ -172,7 +130,6 @@
      "title": "Meditation – Variation 1",
      "audio": "/assets/audio/ambient/meditation1_1344997850.mp3",
      "places": [
-      "the Highlands",
       "meditation"
      ]
     },
@@ -180,7 +137,6 @@
      "title": "Meditation – Variation 2",
      "audio": "/assets/audio/ambient/meditation2_1344997844.mp3",
      "places": [
-      "the Highlands",
       "meditation"
      ]
     },
@@ -188,7 +144,6 @@
      "title": "Meditation – Variation 3",
      "audio": "/assets/audio/ambient/meditation3_1344997842.mp3",
      "places": [
-      "the Highlands",
       "meditation"
      ]
     },
@@ -196,16 +151,13 @@
      "title": "Meditation – Variation 4",
      "audio": "/assets/audio/ambient/meditation4_1344997846.mp3",
      "places": [
-      "the Highlands",
       "meditation"
      ]
     },
     {
      "title": "Metalmaker",
      "audio": "/assets/audio/ambient/metalmaker_1344997841.mp3",
-     "places": [
-      "Ilmenskie Caverns"
-     ]
+     "places": []
     },
     {
      "title": "Spinning Wheel",
@@ -215,11 +167,7 @@
     {
      "title": "Rainbow Run",
      "audio": "/assets/audio/ambient/Rainbow-Run_1291879159.mp3",
-     "places": [
-      "Uralia",
-      "the savanna regions",
-      "Andra and Kajuu"
-     ]
+     "places": []
     }
    ]
   },
@@ -231,9 +179,7 @@
     {
      "title": "The Rube Song",
      "audio": "/assets/audio/ambient/The_Rube_Song_1290596637.mp3",
-     "places": [
-      "Andra and Kajuu"
-     ]
+     "places": []
     }
    ]
   }

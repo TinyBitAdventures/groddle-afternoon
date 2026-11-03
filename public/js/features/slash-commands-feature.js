@@ -40,8 +40,8 @@
  */
 
 import { BUTLER_STRINGS } from '../butler.js?v=86316578';
-import { butlerApi } from './butler-feature.js?v=970059d5';
-import { hellFeature } from './hell-feature.js?v=1f2abc54';
+import { butlerApi } from './butler-feature.js?v=48dcd102';
+import { hellFeature } from './hell-feature.js?v=e9d00320';
 import { towerApi } from './home-tower-feature.js?v=18e56c4c';
 import { STUCK_COOLDOWN_MS, STUCK_TEXT, slashPlan, unknownLine } from '../slash-commands.js?v=58e63833';
 import { parseTp, runTeleportCommand, TP_TEXT } from '../admin-teleport.js?v=fa56e8df';

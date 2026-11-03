@@ -49,7 +49,7 @@ import { ecologyForStreet } from '../street-ecology.js?v=75086599';
 import { worldToScreen } from '../street-model.js?v=505d8990';
 import { signArmWidth } from '../street-render.js?v=41c545c5';
 import { getSkillCatalog } from '../content-catalogs.js?v=10b118dd';
-import { GIANTS } from '../shrines.js?v=cf7c3993';
+import { GIANTS } from '../shrines.js?v=4b395ddf';
 import { teleportationFeature } from './teleportation-feature.js?v=236fbddc';
 import {
   SOLO_DIVISOR,
@@ -116,7 +116,7 @@ import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 import { createMinnAccount } from '../minn-account.js?v=ea900c51';
 import { normalizeGroups } from '../groups.js?v=b9076c50';
 import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=db2ce452';
-import { JOB_WORK_OVERLAY, jobWorkFloatPoint, jobWorkSoundKey, jobWorkToolScale, jobWorkToolSheet } from '../job-work-fx.js?v=4c2511cd';
+import { JOB_WORK_OVERLAY, jobWorkFloatPoint, jobWorkSoundKey, jobWorkToolScale, jobWorkToolSheet } from '../job-work-fx.js?v=430b96b2';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
 
 export const STREET_JOBS_FEATURE_ID = 'street-jobs';

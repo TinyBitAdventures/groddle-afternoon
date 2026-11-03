@@ -35,7 +35,7 @@ import {
   eestiStreetPoint,
   expireDeEmbiggenify,
   findSmallWorthless,
-} from '../public/js/de-embiggenify.js?v=58d2613c';
+} from '../public/js/de-embiggenify.js?v=7ff7ffba';
 import { SOURCE_PHYSICS, triggerHit } from '../public/js/puzzle-triggers.js?v=3ee2f2c8';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -74,7 +74,7 @@ test('De-Embiggenify preserves the production two-part quest contract', () => {
   assert.equal(MR_HAIRBALL_GREETING[1].response, '');
   assert.equal(MR_HAIRBALL_REQUEST[2].response, '');
   assert.equal(MR_HAIRBALL_COMPLETION[1].response, '');
-  assert.equal(EESTI_MUSIC_FILE, 'assets/audio/ambient/eesti_life_catalogue_1344997859.mp3');
+  assert.equal(EESTI_MUSIC_FILE, 'assets/audio/sfx/DE_EMBIGGENIFY.mp3');
   assert.deepEqual(EESTI_ROOM_ROUTE, [
     'sofa-and-sleepy-cat',
     'end-table-lamp',
@@ -149,7 +149,9 @@ test('client integration uses clean recovered room and item art', () => {
     fs.readFileSync(path.join(root, 'public/assets/content/ambient-music.json'), 'utf8')
   );
   assert.equal(ambient.hubMap['49'], 'eesti');
-  assert.deepEqual(ambient.themes.eesti.tracks, [EESTI_MUSIC_FILE]);
+  // The catalogue room's own music_file plays its original (Sounds.zip); hub 49 keeps the Eesti stand-in.
+  assert.deepEqual(ambient.themes[ambient.streetMusic.DE_EMBIGGENIFY].tracks, [EESTI_MUSIC_FILE]);
+  assert.deepEqual(ambient.themes.eesti.tracks, ['assets/audio/ambient/eesti_life_catalogue_1344997859.mp3']);
   assert.match(game, /startDeEmbiggenify/);
   assert.match(game, /openMrHairballRequest/);
   assert.match(game, /handleDeEmbiggenifyTarget/);
@@ -200,7 +202,7 @@ test('the street brings its own geometry, decos, music and myles_is_great box', 
   assert.equal(eestiStreet.layers.reduce((n, layer) => n + layer.decos.length, 0), 80);
   assert.equal(eestiStreet.musicFile, 'DE_EMBIGGENIFY');
   const ambient = JSON.parse(fs.readFileSync(path.join(root, 'public/assets/content/ambient-music.json'), 'utf8'));
-  assert.equal(ambient.streetMusic.DE_EMBIGGENIFY, 'eesti');
+  assert.equal(ambient.streetMusic.DE_EMBIGGENIFY, 'de_embiggenify');
   // The archived box, in the street's screen space, is the puzzles-feature trigger as it stands.
   const box = eestiStreet.boxes.find((b) => b.id === EESTI_FIND_BOX.id);
   const at = eestiStreetPoint(EESTI_FIND_BOX);

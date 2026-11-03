@@ -61,7 +61,7 @@ import {
   scionWords,
 } from '../purple-journey.js?v=5e078ed8';
 import { VOYAGE_FLOOR, VOYAGE_H, VOYAGE_OFFSET, VOYAGE_W, buildVoyageScene } from '../purple-journey-scene.js?v=425b0b98';
-import { homesFeature } from './homes-feature.js?v=df88b07d';
+import { homesFeature } from './homes-feature.js?v=50e26973';
 
 export const PURPLE_FEATURE_ID = 'purple-journey';
 /** The scene's own TSID (the template is LNVV4OTMAUG2PQV). */
@@ -282,7 +282,8 @@ export function enterVoyage(engine) {
   // purple_journey on_apply: delete pc.taken_purple.
   taken = false;
   journeyOn = true;
-  // The room's music (inc_data_sounds.js music_map PURPLE_LOCATION, ZeGroupTheme.mp3) is not recovered.
+  // The room's music (inc_data_sounds.js music_map PURPLE_LOCATION, ZeGroupTheme.mp3) is recovered
+  // (assets/audio/sfx/PURPLE_LOCATION.mp3, Sounds.zip) but this room does not play it yet.
   haze([{ alpha: 0.5, secs: 0.2 }, { alpha: 0, secs: 1.2 }]);
   last = 'room:enter';
   engine.save?.();

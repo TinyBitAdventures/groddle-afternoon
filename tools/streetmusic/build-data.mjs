@@ -6,8 +6,9 @@
  * The tracks, their titles and their groups are Tiny Speck's own, from its
  * downloads page (assets/content/ambient-music.json "downloads"); where each
  * plays is the remake's theme map in the same file (the themes a track is in,
- * as places). Glitch's own street loops were never archived, so the remake
- * plays these published tracks in the places they fit; the entry says so.
+ * as places). Since 2026-11-02 most places play Tiny Speck's own street and hub
+ * loops again (Sounds.zip), so a published track lists only the places where
+ * it still stands in.
  *
  *   node tools/streetmusic/build-data.mjs          write data.json
  *   node tools/streetmusic/build-data.mjs --check  exit 1 if data.json is stale
@@ -60,6 +61,28 @@ export const PLACES = {
   piano: null,
   snappy: null,
   sky_plunge: 'Sky Plunge',
+  // Libraries and street loops back from Sounds.zip (2026-11-02): Tiny Speck's own, no downloads-page track.
+  kloro_haoma: 'Kloro and Haoma',
+  urwok: 'Roobrik and Balzare',
+  jal: 'Jal and Samudra',
+  carnivorous_plants: 'the Carnivorous Plants streets',
+  abandoned_apartments: 'the Gregarious Towers apartments',
+  underground_puzzles: 'the abandoned building puzzles',
+  dinosaur_intestines: 'the dinosaur intestines',
+  de_embiggenify: 'the Eesti Life catalogue room',
+  spiral_stars: 'Starlit Night',
+  blue_white: 'the Blue and White quest',
+  paralaxing_streets: 'the Paralaxing streets',
+  newxp_training: 'the new player training',
+  puzzles_whistle: 'Le Miserable',
+  ice_cream_truck: 'Wintry Place',
+  home_uralia: 'the Uralia home street',
+  home_firebogs: 'the Firebogs home street',
+  asslandia: 'Shim Shiri',
+  street_savanna1: null,
+  street_uralia1: null,
+  street_firebogs1: null,
+  street_jal1: null,
 };
 
 export function streetMusicData() {

@@ -118,7 +118,7 @@ import {
 import { saveStore } from '../save-store.js?v=8839ba7b';
 import { gainMetabolic } from '../metabolics.js?v=8504134e';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
-import { GIANTS } from '../shrines.js?v=cf7c3993';
+import { GIANTS } from '../shrines.js?v=4b395ddf';
 import {
   MP_TEXT,
   endedLine,

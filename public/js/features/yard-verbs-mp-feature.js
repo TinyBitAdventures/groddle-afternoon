@@ -53,16 +53,16 @@
  * yardApplied (acts applied to my home), yardSent (acts the site took).
  */
 
-import { performPlotVerb, plotArtPath, plotLabel, plotStatusLabel, plotVerbs } from '../patches.js?v=8136719f';
+import { performPlotVerb, plotArtPath, plotLabel, plotStatusLabel, plotVerbs } from '../patches.js?v=6bfdcfa9';
 import { trantStatusLabel } from '../trants.js?v=9c2e8c0f';
 import { woodTreeStatusLabel } from '../woodcutting.js?v=13b9e3b4';
-import { animalAnchorX, animalStatusLabel } from '../animals.js?v=a6308230';
+import { animalAnchorX, animalStatusLabel } from '../animals.js?v=1b6a9bf0';
 import { frameTexture, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js?v=db2ce452';
 import { homeStreetLayout, normalizeCultivationState } from '../home-cultivation.js?v=11616085';
 import { readVisitScene } from '../neighbours-mp.js?v=a8d5544e';
 import { saveStore } from '../save-store.js?v=8839ba7b';
-import { STREET_GROUND_Y, homesFeature, wearHomeCultivation } from './homes-feature.js?v=df88b07d';
-import { patchesFeature, treeFrameUrl } from './patches-feature.js?v=01d4efa5';
+import { STREET_GROUND_Y, homesFeature, wearHomeCultivation } from './homes-feature.js?v=50e26973';
+import { patchesFeature, treeFrameUrl } from './patches-feature.js?v=ed2f7ee8';
 import {
   YARD_STREET,
   YARD_TEXT as T,
@@ -78,14 +78,14 @@ import {
   treeSnapshot,
   visitorAnimalState,
   visitorTreeState,
-} from '../yard-verbs-mp.js?v=53466aae';
+} from '../yard-verbs-mp.js?v=45580adc';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
 import { countItem, removeItem } from '../inventory.js?v=b0e33301';
 import { ROCK_CATALOG, rockStatusLabel, tickMineRock } from '../mining.js?v=ff73fa4b';
 import { getResourceNodeDef, regrowDelayMs } from '../resource-nodes.js?v=a3c19f90';
 import { getGameDayKey } from '../game-day.js?v=edb00566';
-import { rockReady } from '../street-objects.js?v=8b4fc9de';
-import { resourceNodesFeature } from './resource-nodes-feature.js?v=7bafd724';
+import { rockReady } from '../street-objects.js?v=e90dd70a';
+import { resourceNodesFeature } from './resource-nodes-feature.js?v=be183531';
 import {
   ROCK_RESPAWN_MS,
   STOCK_NODE_VERBS,

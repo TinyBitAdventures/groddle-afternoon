@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { SOUND_ALIASES, SOUND_FILES, SOUND_KEY_COUNTS } from '../public/js/sound-keys.js?v=2d82d399';
+import { SOUND_ALIASES, SOUND_FILES, SOUND_KEY_COUNTS } from '../public/js/sound-keys.js?v=c8a66499';
 import {
   SYNTH_KEY_RECIPES,
   SYNTH_RECIPE_NAMES,
@@ -12,7 +12,7 @@ import {
   playSynthRecipe,
   recipeForKey,
 } from '../public/js/synth-sfx.js?v=9853c8e7';
-import { createSoundBoard, resolveSound } from '../public/js/sound-board.js?v=a1c4a308';
+import { createSoundBoard, resolveSound } from '../public/js/sound-board.js?v=f992a5c5';
 import {
   LEGACY_SFX_KEYS,
   actionLoopFor,
@@ -123,6 +123,12 @@ describe('sound-key catalog', () => {
           assert.match(catalog.keys[key].mirrorSource, /^https:\/\/archive\.org\/download\/slack_sfx\/[\w]+\.mp3$/);
         } else if (catalog.keys[key].origin === 'overlay-fla') {
           assert.match(catalog.keys[key].overlaySource, /^glitch-overlays\/[\w]+\.fla LIBRARY\/\d+-[\w.]+\.mp3$/);
+        } else if (catalog.keys[key].origin === 'sounds-zip') {
+          // Sounds.zip (2026-11-02): the zip's file name, md5 and how the key was matched.
+          assert.match(catalog.keys[key].zipMd5, /^[0-9a-f]{32}$/, key);
+          assert.ok(['music_map', 'client-url', 'filename'].includes(catalog.keys[key].zipMatch), key);
+          if (catalog.keys[key].zipMatch !== 'filename') assert.match(catalog.keys[key].url, /^http:\/\/c2\.glitch\.bz\/sounds\/20\d\d-\d\d\//);
+          if (catalog.keys[key].zipMatch !== 'filename' && !catalog.keys[key].doubt) assert.ok(catalog.keys[key].url.endsWith(`/${catalog.keys[key].zipFile}`), key);
         } else {
           assert.match(catalog.keys[key].url, /^http:\/\/c2\.glitch\.bz\/sounds\/20\d\d-\d\d\//);
           assert.equal(catalog.keys[key].origin, 'wayback-c2');

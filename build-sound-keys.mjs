@@ -175,6 +175,36 @@ const ALIASES = {
 };
 
 /**
+ * Sounds.zip (2026-11-02): a fan re-upload of Tiny Speck's c2.glitch.bz server
+ * files (Drive 1saaFXUb0RipE6xqA-EDRVXGrFlwLHmlT, md5 1cba0c7f...; 68 of its files
+ * are byte for byte files the game already shipped). tools/sound/sounds-zip-map.json
+ * is the reviewed table: `match` music_map (the zip name is the music_map url's,
+ * timestamp and all; `nearest` marks the two whose exact take is missing),
+ * client-url (the Flash client's own default url) or filename (an SFX key matched
+ * by name only, wired where the game plays the key and the file fits). Installed
+ * byte for byte by tools/sound/install-sounds-zip.mjs; their own origin, so the
+ * Wayback counts stay what the Wayback gave.
+ */
+const ZIP_MAP = JSON.parse(readFileSync(join(root, 'tools/sound/sounds-zip-map.json'), 'utf8'));
+const SOUNDS_ZIP = {};
+for (const row of ZIP_MAP.files) {
+  SOUNDS_ZIP[row.key] = {
+    file: row.sameAs || `assets/audio/sfx/${row.key}.mp3`,
+    zipFile: row.zip,
+    zipMd5: row.md5,
+    match: row.match,
+    ...(row.url ? { url: row.url } : {}),
+    ...(row.nearest ? { doubt: `nearest surviving take: ${row.nearest}` } : {}),
+    ...(row.sameAs ? { why: `the zip's ${row.zip} is ${row.sameAs.split('/').pop()} byte for byte` } : {}),
+    ...(row.why ? { why: row.why } : {}),
+  };
+}
+for (const [alias, target] of Object.entries(ZIP_MAP.aliases)) {
+  if (ALIASES[alias]) throw new Error(`alias ${alias} mapped twice`);
+  ALIASES[alias] = target;
+}
+
+/**
  * archive.org Glitch audio (tools/sound/archiveorg-sfx-map.json): one installed
  * file per key, plus the aliases each match lists. These win over the
  * downloads-page best fits (NEWDAY, STREET_LOADED); Wayback c2 files win over them.
@@ -545,6 +575,19 @@ for (const [key, row] of Object.entries(ARCHIVEORG)) {
     archiveFile: row.archiveFile, why: row.why, doubt: row.doubt });
   if (!existsSync(join(PUBLIC, row.file))) throw new Error(`missing archive.org file ${row.file} (run tools/sound/install-archiveorg-sfx.mjs)`);
 }
+for (const [key, row] of Object.entries(SOUNDS_ZIP)) {
+  if (!keys.has(key)) throw new Error(`Sounds.zip map names uncatalogued key ${key}`);
+  const entry = keys.get(key);
+  if (entry.file) throw new Error(`Sounds.zip map ${key} would replace ${entry.file}`);
+  if (row.match === 'music_map' && !entry.url?.endsWith(`/${row.zipFile}`) && !row.doubt) {
+    throw new Error(`${key}: ${row.zipFile} is not its music_map url ${entry.url}`);
+  }
+  Object.assign(entry, { file: row.file, origin: 'sounds-zip', zipFile: row.zipFile, zipMd5: row.zipMd5, zipMatch: row.match,
+    why: row.why, doubt: row.doubt });
+  if (row.url) entry.url = row.url;
+  if (!existsSync(join(PUBLIC, row.file))) throw new Error(`missing Sounds.zip file ${row.file} (run tools/sound/install-sounds-zip.mjs)`);
+}
+for (const [alias, doubt] of Object.entries(ZIP_MAP.aliasDoubts || {})) keys.get(alias).doubt = doubt;
 for (const [key, row] of Object.entries(DOWNLOADS)) {
   if (!keys.has(key)) note(key, { category: 'downloads', where: 'downloads.html', context: row.fit, via: 'downloads' });
   const entry = keys.get(key);
@@ -592,6 +635,7 @@ for (const key of [...keys.keys()].sort((a, b) => a.localeCompare(b))) {
     ...(row.why ? { why: row.why } : {}),
     ...(row.doubt ? { doubt: row.doubt } : {}),
     ...(row.mirrorSource ? { mirrorSource: row.mirrorSource, mirrorFile: row.mirrorFile } : {}),
+    ...(row.zipFile ? { zipFile: row.zipFile, zipMd5: row.zipMd5, zipMatch: row.zipMatch } : {}),
     ...(row.fit && !row.source ? { fit: row.fit } : {}),
     ...(ALIASES[key] ? { alias: ALIASES[key] } : {}),
     ...(dead ? { dead: 'commented out in the final client', commentedOut: row.commentedOut } : {}),
@@ -614,6 +658,7 @@ const counts = {
   mirrored: Object.keys(MIRRORED).length,
   downloadsBestFit: Object.values(catalog).filter((r) => r.origin === 'downloads-best-fit').length,
   archiveorgSfx: Object.keys(ARCHIVEORG).length,
+  soundsZip: Object.keys(SOUNDS_ZIP).length,
   overlayFla: Object.keys(OVERLAY).length,
   withFile: Object.keys(files).length,
   aliases: Object.keys(ALIASES).length,

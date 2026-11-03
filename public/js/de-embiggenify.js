@@ -34,7 +34,8 @@ export const EESTI_DURATION_MS = 2 * 60 * 1000;
 export const SMALL_WORTHLESS_ID = 'small_worthless';
 export const EMOTIONAL_BEAR_ID = 'emotional_bear';
 export const EESTI_PLAYER_SCALE = 0.42;
-export const EESTI_MUSIC_FILE = 'assets/audio/ambient/eesti_life_catalogue_1344997859.mp3';
+/** The street's music_file DE_EMBIGGENIFY: De-Embiggenfify_1.2.mp3, Tiny Speck's own (Sounds.zip). */
+export const EESTI_MUSIC_FILE = 'assets/audio/sfx/DE_EMBIGGENIFY.mp3';
 /**
  * The archived box (G XML GHFBQQ4N68733LB boxes/box_1, source bottom-centre x, y and
  * w, h): it sits on the tabletop (_pl1257983927390, y -449) just left of the cake

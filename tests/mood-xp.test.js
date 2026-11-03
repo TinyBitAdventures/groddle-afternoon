@@ -17,7 +17,7 @@ import {
 import { collectQuoin, createQuoinState } from '../public/js/quoins.js?v=14dd1c93';
 import { applyVerbReward, getVerbReward } from '../public/js/verb-rewards.js?v=d3ce41d5';
 import { applyDropResult } from '../public/js/drop-tables.js?v=0f922478';
-import { quoteShrineDonation } from '../public/js/shrines.js?v=cf7c3993';
+import { quoteShrineDonation } from '../public/js/shrines.js?v=4b395ddf';
 import { applyRewards } from '../public/js/quests.js?v=282e1621';
 import { bemoanSnoCone, eatSnoCone } from '../public/js/sno-cones.js?v=2d23307e';
 
