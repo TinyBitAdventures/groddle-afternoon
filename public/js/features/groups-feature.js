@@ -192,7 +192,8 @@ function createSession(engine, client) {
   const handed = new Map();
   /** channel -> its head in the drawer (Who is here, Close). */
   const heads = new Map();
-  const drawerLine = (line) => (line.note ? { note: true, text: line.text } : { name: line.name, text: line.text, mine: line.id === userId(), at: line.at });
+  // RIGHTCLICK: the sender's id goes with the line, so their name opens their menu (js/ui/player-menu.js).
+  const drawerLine = (line) => (line.note ? { note: true, text: line.text } : { name: line.name, text: line.text, mine: line.id === userId(), at: line.at, playerId: line.id });
   function headFor(channel) {
     let h = heads.get(channel);
     if (!h) {

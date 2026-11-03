@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=117337d3';
 import { createFeatureHost } from './js/feature-host.js?v=903263a4';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=04b66cd6';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=d66f00fd';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -923,7 +923,7 @@ import { denseSprite } from './js/sprite-dense.js?v=178a711b';
 import { wholeStatAmounts, wholeEffects } from './js/stat-text.js?v=f96d8fd3';
 import { createNotifier, effectTokens, floatKey, offerCardDrop, stackFloat, tokenText } from './js/notify.js?v=d85330ff';
 import { mountNotifyView } from './js/notify-view.js?v=81d06119';
-import { mountSocialDrawer } from './js/ui/social-drawer.js?v=a0048e58';
+import { mountSocialDrawer } from './js/ui/social-drawer.js?v=0a2b5b69';
 import { bindDragScroll } from './js/ui/drag-scroll.js?v=9a527ac8';
 import { SIDE_SHEET_IDS, bindTabs, inSideSheet, mountPanelShell, sheetKeyToWorld } from './js/ui/panel-shell.js?v=3d10b1e5';
 import { createQuestSheet, questStep } from './js/ui/quest-sheet.js?v=cc0ecd4e';
@@ -936,7 +936,7 @@ import { clientKeyAction, createHotkeysSheet, isHotkeySheetRelease, isPlainKey }
 import { EAT_PICK_TEXT, bestFoodIndex, eatChoices, eatTip } from './js/eat-pick.js?v=8fb763d0';
 import { installHeldKeyGuard, isMacPlatform } from './js/held-keys.js?v=98b96620';
 import { signpostArmRows, worldContextAction } from './js/world-context-menu.js?v=f3f48805';
-import { listPlayerTarget, opensPlayerMenu, playerMenuRows } from './js/ui/player-menu.js?v=37103fe8';
+import { listPlayerTarget, opensPlayerMenu, playerMenuRows } from './js/ui/player-menu.js?v=1dd2cf52';
 import { forgetTexture, frameTexture, isFailed, isLoaded, onFailed, onLoaded, textureFromUrl, whenLoaded } from './js/textures.js?v=db2ce452';
 import { FALLBACK_MAX as WORLD_ART_FALLBACK_MAX, worldArtFor } from './js/world-art.js?v=df476660';
 import { sceneAnim, syncAnim } from './js/deco-anim.js?v=6f548fd1';
@@ -2580,6 +2580,9 @@ const socialDrawer = MODERN_UI
     // The street alone ("Hechey Track" of "Hechey Track · Groddle Forest").
     streetName: () => (document.getElementById('street-name')?.textContent || '').split('·')[0].trim().replace(/^…$/, ''),
     setData: setCanvasData,
+    // RIGHTCLICK (js/ui/player-menu.js): a speaker's name and a buddy row open the player's menu.
+    playerMenu: (opts) => openPlayerListMenu(opts),
+    contextMenu: () => playerContextMenu(),
   })
   : null;
 
@@ -11097,7 +11100,7 @@ const engine = {
     heldGlitchAnims = new Set((packs || []).map((p) => p?.anims).filter(Boolean));
   },
   /** A line in the Local chat dock (it fades like the street's own; the modern skin's drawer keeps it in Local). */
-  chatLine: (speaker, text) => showLocalChatBubble(String(speaker || ''), String(text || '')),
+  chatLine: (speaker, text, { playerId = 0 } = {}) => showLocalChatBubble(String(speaker || ''), String(text || ''), { playerId: Number(playerId) || 0 }),
   /** SOCIAL: the modern skin's drawer (js/ui/social-drawer.js), or null (a classic skin keeps the old dock). */
   get social() {
     return socialDrawer;
@@ -24534,10 +24537,11 @@ function updateLocalChatDockPosition() {
   root.style.setProperty('--pack-live-height', `${Math.ceil(pack.offsetHeight) + 8}px`);
 }
 
-function showLocalChatBubble(participant, message, { feat = false, mine = false } = {}) {
+function showLocalChatBubble(participant, message, { feat = false, mine = false, playerId = 0 } = {}) {
   // SOCIAL: the drawer keeps the line (Local online, the Activity log solo) instead of a fading bubble.
+  // RIGHTCLICK: `playerId`, another player's line: their name in it opens their menu.
   if (socialDrawer) {
-    socialDrawer.localLine(participant, message, { feat, mine });
+    socialDrawer.localLine(participant, message, { feat, mine, playerId });
     return;
   }
   const stream = document.getElementById('local-chat-stream');

@@ -38,12 +38,24 @@
  * drop(id) takes one away, select(id) brings one to the front (in Chats unless it is a tab),
  * refresh() redraws after their data changed, statusSlot holds the realtime state pill.
  *
+ * RIGHTCLICK (Austin 2026-11-03, right-click audit later batch item 2): in every chat a speaker's
+ * name is a button (Local, Global, the groups, the party, IMs, Live Help, the Trade Channel); a
+ * left click, a right-click, Enter or Shift+F10 on it opens that player's menu from a list
+ * (playerMenu: game.js openPlayerListMenu, js/ui/player-menu.js), as Glitch's name links did
+ * (glitch-client port/RightSideManager.as 305-307, view/ui/TSLinkedTextField.as 105-106). The rest
+ * of the line stays plain text: selecting it and the browser's Copy work as before, and a
+ * right-click on a name inside selected text keeps the browser's menu too. Your own lines ("You")
+ * and lines with no player behind them (notes, the Butler, Feat lines) have no button. The menu
+ * closes when the drawer collapses or the tab changes.
+ *
  * QA: canvas data socialOpen (open|rail), socialTab (the tab selected: activity, local, global,
  * buddies or chats), socialChat (the conversation open in Chats, or ''), socialTabs (the row),
  * socialChats (the list's ids in order), socialUnread (id:n,... for every tab and conversation with
  * news, chats:n the Chats total); window.groddleSocial.
  */
 import { colorizeAmounts } from '../notify-view.js?v=81d06119';
+import { bindContextTrigger } from './context-menu.js?v=c92fbdd5';
+import { selectionCovers } from './context-guard.js?v=0f71ac17';
 
 export const SOCIAL_STORE_KEY = 'groddle-social-drawer';
 /** The drawer opens by default at this window width and up (the mock's 1440 rule). */
@@ -267,6 +279,8 @@ export function mountSocialDrawer({
   setData = () => {},
   storage = storageOf(),
   width = () => globalThis.innerWidth || 0,
+  playerMenu = null,
+  contextMenu = () => null,
 } = {}) {
   if (typeof document === 'undefined' || !root || !dock || !notifier) return null;
   const online = mode === 'online';
@@ -608,11 +622,72 @@ export function mountSocialDrawer({
     convHead.dataset.socialConvHead = t.id;
   }
 
+  /** RIGHTCLICK: the drawer's own menus (a player's, a Chats row's) close with the drawer or the tab. */
+  let drawerMenu = '';
+  function closeDrawerMenu() {
+    if (!drawerMenu) return;
+    const m = contextMenu?.();
+    if (m?.isOpenFor?.(drawerMenu)) m.close({ focus: false });
+    drawerMenu = '';
+  }
+
+  /**
+   * Another player's menu from a name or a row: at the pointer for a click, beside `from` for the
+   * keys; `find` gives the name or row as drawn now (the log redraws under it).
+   */
+  function openPlayer(id, name, from, { at = null, keys = false, find = null, ...more } = {}) {
+    if (!playerMenu) return false;
+    const opened = playerMenu({ id, name, at, keys, anchor: from, opener: from, findOpener: find, ...more });
+    if (opened) drawerMenu = `player:${Number(id) || 0}`;
+    return opened;
+  }
+
+  /** line -> its name button as last drawn (a keyboard-opened menu gives focus back to it). */
+  const nameButtons = new WeakMap();
+
+  /** A speaker's name as a button: a click, a right-click, Enter or Shift+F10 opens their menu. */
+  function nameButton(line) {
+    const id = Number(line.playerId) || 0;
+    const name = line.name || 'Someone';
+    const b = el('button', {
+      type: 'button',
+      class: 'social-name',
+      'data-ctx': 'player',
+      'data-player-id': String(id),
+      'data-social-name': `${line.at}:${id}`,
+      'aria-haspopup': 'menu',
+      'aria-keyshortcuts': 'Shift+F10',
+    }, name);
+    nameButtons.set(line, b);
+    const find = () => {
+      const now = nameButtons.get(line);
+      return now?.isConnected ? now : null;
+    };
+    // As the tabs: a click opens it without taking the keyboard from the world.
+    b.addEventListener('pointerdown', (e) => {
+      if (e.button === 0 && !e.ctrlKey) e.preventDefault?.();
+    });
+    b.addEventListener('click', (e) => {
+      const keys = e.detail === 0;
+      openPlayer(id, name, b, { at: keys ? null : { x: e.clientX, y: e.clientY }, keys, find });
+    });
+    bindContextTrigger(b, {
+      // A name inside selected text keeps the browser's menu (its Copy).
+      rowOf: (t) => (selectionCovers(document.getSelection?.() || null, t) ? null : b),
+      isOpenFor: () => Boolean(contextMenu?.()?.isOpenFor?.(`player:${id}`)),
+      open: (_, { at, keys }) => openPlayer(id, name, b, { at, keys, find }),
+    });
+    return b;
+  }
+
   function lineNode(line) {
     if (line.sep) return el('div', { class: 'social-time', 'data-social-time': '' }, line.sep);
     if (line.note) return el('p', { class: 'social-msg is-note' }, line.text);
     const p = el('p', { class: `social-msg${line.mine ? ' is-mine' : ''}${line.feat ? ' is-feat' : ''}` });
-    p.append(el('b', {}, line.mine ? 'You' : line.name || 'Someone'), document.createTextNode(` ${line.text}`));
+    const who = el('b', {});
+    if (online && playerMenu && !line.mine && line.playerId > 0) who.append(nameButton(line));
+    else who.textContent = line.mine ? 'You' : line.name || 'Someone';
+    p.append(who, document.createTextNode(` ${line.text}`));
     return p;
   }
 
@@ -766,7 +841,7 @@ export function mountSocialDrawer({
   function focusSelector(node) {
     if (!node || node === input || node === document.body || !dock.contains?.(node)) return null;
     const esc = (v) => (globalThis.CSS?.escape ? CSS.escape(v) : String(v).replace(/"/g, '\\"'));
-    for (const a of ['data-social-rail-tab', 'data-social-tab', 'data-social-chat', 'data-social-buddy']) {
+    for (const a of ['data-social-rail-tab', 'data-social-tab', 'data-social-chat', 'data-social-buddy', 'data-social-name']) {
       const v = node.getAttribute?.(a);
       if (v !== null && v !== undefined) return `[${a}="${esc(v)}"]`;
     }
@@ -812,6 +887,7 @@ export function mountSocialDrawer({
     if (next !== open) {
       open = next;
       if (open) log.dataset.jump = '1';
+      else closeDrawerMenu();
     }
     render();
     if (focus === 'tab') tablist.querySelector('[aria-selected="true"]')?.focus({ preventScroll: true }) || log.focus({ preventScroll: true });
@@ -827,6 +903,7 @@ export function mountSocialDrawer({
   function select(id, { focus = false } = {}) {
     if (id === CHATS_TAB ? !row().includes(CHATS_TAB) : !tabs.has(id)) return false;
     const changed = id !== tab;
+    if (changed) closeDrawerMenu();
     tab = id;
     log.dataset.jump = '1';
     render();
@@ -846,6 +923,7 @@ export function mountSocialDrawer({
   }
 
   function normal(line) {
+    const playerId = Number(line.playerId);
     return {
       name: String(line.name || ''),
       text: String(line.text || ''),
@@ -853,6 +931,8 @@ export function mountSocialDrawer({
       mine: Boolean(line.mine),
       feat: Boolean(line.feat),
       at: Number(line.at) || Date.now(),
+      // RIGHTCLICK: who said it (their name opens their menu); 0 for a line no player said.
+      playerId: Number.isFinite(playerId) && playerId > 0 ? Math.floor(playerId) : 0,
     };
   }
 
@@ -1172,8 +1252,8 @@ export function mountSocialDrawer({
      * A Local chat line (game.js showLocalChatBubble: the player, a companion, another
      * player). Online it goes to Local; solo it is the Activity log's chat line.
      */
-    localLine(name, text, { mine = false, feat = false } = {}) {
-      if (online) return api.push('local', { name, text, mine, feat });
+    localLine(name, text, { mine = false, feat = false, playerId = 0 } = {}) {
+      if (online) return api.push('local', { name, text, mine, feat, playerId });
       notifier.chat(`${name}: ${text}`);
       return true;
     },

@@ -9615,6 +9615,22 @@ html[data-street-cards] .notify-notices { visibility: hidden; }
 .social-msg { margin: 0; overflow-wrap: anywhere; }
 .social-msg b { font-weight: 800; color: var(--text); }
 .social-msg.is-mine b { color: var(--accent); }
+/* RIGHTCLICK (js/ui/player-menu.js): another player's name is a button that opens their menu; it
+   reads as the name it was, with a pointer and an underline on hover, and the focus ring for the keys. */
+.social-msg .social-name {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-xs);
+  background: none;
+  color: inherit;
+  font: inherit;
+  line-height: inherit;
+  text-align: inherit;
+  cursor: pointer;
+}
+.social-msg .social-name:hover { text-decoration: underline; text-underline-offset: 2px; }
+.social-msg .social-name:focus-visible { outline-offset: 1px; }
 .social-msg.is-note { color: var(--text-muted); font-style: italic; }
 .social-act {
   display: grid;

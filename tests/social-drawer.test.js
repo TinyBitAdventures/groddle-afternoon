@@ -25,7 +25,7 @@ import {
   splitChat,
   withTimeLines,
   writeChoice,
-} from '../public/js/ui/social-drawer.js?v=a0048e58';
+} from '../public/js/ui/social-drawer.js?v=0a2b5b69';
 import { createNotifier } from '../public/js/notify.js?v=d85330ff';
 import { resolveTokens } from './css-tokens.js';
 
@@ -362,7 +362,7 @@ describe('the Social drawer: wiring', () => {
 
   it('every Local chat line goes to the drawer (Local online, the Activity log solo), logged once', () => {
     const fn = game.slice(game.indexOf('function showLocalChatBubble('), game.indexOf('function handleFeatResult('));
-    assert.match(fn, /if \(socialDrawer\) \{\n\s+socialDrawer\.localLine\(participant, message, \{ feat, mine \}\);\n\s+return;/);
+    assert.match(fn, /if \(socialDrawer\) \{\n\s+socialDrawer\.localLine\(participant, message, \{ feat, mine, playerId \}\);\n\s+return;/);
     const say = game.slice(game.indexOf('function sayLocalChat('), game.indexOf('function finishAssistedFeatChain('));
     assert.match(say, /mine: participant === 'Ur' \}\);/);
     assert.match(say, /participant === 'Ur' && !socialDrawer\) \{/);

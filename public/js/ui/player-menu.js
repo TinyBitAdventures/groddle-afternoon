@@ -21,7 +21,7 @@
  */
 
 import { PROFILE_PAGE_VERB } from '../profiles.js?v=06d5732b';
-import { IM_VERB_ID } from '../player-im.js?v=f8834d6d';
+import { IM_VERB_ID } from '../player-im.js?v=04c55d2f';
 import { BUDDY_VERBS } from '../buddies.js?v=df41a3bb';
 import { VISIT_VERB } from '../neighbours-mp.js?v=a8d5544e';
 

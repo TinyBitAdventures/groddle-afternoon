@@ -42,7 +42,7 @@ import {
   normalLine,
   normalState,
   refusalText,
-} from '../player-im.js?v=f8834d6d';
+} from '../player-im.js?v=04c55d2f';
 
 export const PLAYER_IM_FEATURE_ID = 'player-im';
 

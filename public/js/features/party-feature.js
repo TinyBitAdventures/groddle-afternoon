@@ -259,7 +259,8 @@ function createSession(engine, client) {
     const text = String(msg.text || '');
     lastSaid = `${name}:${text}`;
     addLog({ name, text });
-    if (!social?.push('party', { name, text, mine: Number(msg.id) === me(), at: Number(msg.at) || Date.now() })) engine.chatLine?.(`Party · ${name}`, text);
+    // RIGHTCLICK: the sender's id goes with the line, so their name opens their menu.
+    if (!social?.push('party', { name, text, mine: Number(msg.id) === me(), at: Number(msg.at) || Date.now(), playerId: Number(msg.id) || 0 })) engine.chatLine?.(`Party · ${name}`, text);
     publish();
   });
   client.on('msg:party_invited', (msg) => {

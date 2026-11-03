@@ -114,7 +114,8 @@ export function normalState(msg) {
 /** PURE: a server line as the drawer draws it ({ name, text, mine, at }). */
 export function drawerLine(line, { me = 0, myName = 'You', name = '' } = {}) {
   const mine = Number(line.from) === Number(me);
-  return { name: mine ? myName : name || IM_TEXT.someone, text: line.text, mine, at: line.at || Date.now() };
+  // RIGHTCLICK: the other player's id, so their name in the conversation opens their menu.
+  return { name: mine ? myName : name || IM_TEXT.someone, text: line.text, mine, at: line.at || Date.now(), playerId: mine ? 0 : Number(line.from) || 0 };
 }
 
 /** PURE: what a refusal says in the conversation. */

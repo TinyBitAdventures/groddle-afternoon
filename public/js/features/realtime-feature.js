@@ -531,7 +531,8 @@ function createSession(engine) {
       r.typingUntil = 0;
     }
     if (r) engine.say?.(r.target, text, BUBBLE_MS, { speaker: name });
-    engine.chatLine?.(name, text);
+    // RIGHTCLICK: who said it, so their name in Local opens their menu (js/ui/player-menu.js).
+    engine.chatLine?.(name, text, { playerId: Number(id) || 0 });
   });
   client.on('typing', ({ id }) => {
     if (engine.query?.('realtimeHidden', id)) return;
