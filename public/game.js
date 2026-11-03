@@ -3283,6 +3283,7 @@ function closePackPopover() {
     slot.classList.remove('active');
     slot.setAttribute('aria-expanded', 'false');
   });
+  if (app?.canvas?.dataset.contextMenu?.startsWith('pack:')) app.canvas.dataset.contextMenu = '';
 }
 
 function isPackPopoverOpen() {
@@ -4626,9 +4627,9 @@ function renderPackRow(box, slots, opts = {}) {
       slot.appendChild(wear);
     }
     slot.addEventListener('click', (event) => {
-      // A Mac's Ctrl+click opened the bag's Options (contextmenu below): that is not a click on the bag.
-      if (s.bag && Date.now() < packBagSwallowClickUntil) {
-        packBagSwallowClickUntil = 0;
+      // A Mac's Ctrl+click opened the bag's Options or the stack's menu (contextmenu below): that is not a click on it.
+      if (Date.now() < packMenuSwallowClickUntil) {
+        packMenuSwallowClickUntil = 0;
         event.preventDefault();
         return;
       }
@@ -4679,6 +4680,25 @@ function renderPackRow(box, slots, opts = {}) {
         event.preventDefault();
         event.stopPropagation();
         openPackBagOptions(s, slot, { keys: true });
+      });
+    } else {
+      // RIGHTCLICK (Austin 2026-11-03, audit item 2): right-click (Ctrl+click on a Mac) on a stack or a
+      // tool, in the row or a bag's tray, or the Menu key or Shift+F10 with it focused, opens the
+      // stack's own menu (the one a left click opens). A left click and Shift+click are unchanged; a
+      // long press on touch still lifts it to drag (setupPackDrops); right-clicking the stack whose
+      // menu is open opens it again rather than closing it, and it never cancels the running verb (R9).
+      slot.setAttribute('aria-keyshortcuts', 'Shift+F10');
+      slot.addEventListener('contextmenu', (event) => {
+        if (event.pointerType === 'touch' || event.pointerType === 'pen') return;
+        event.preventDefault();
+        if (Date.now() < packMenuEchoUntil && isPackPopoverOpen() && packSelected === s.classTsid && (!inLayout || isPackPlace(slot, packSelectedPlace))) return;
+        openPackStackMenu(s, slot, { swallowClick: event.ctrlKey === true && event.button === 0 });
+      });
+      slot.addEventListener('keydown', (event) => {
+        if (!isMenuKey(event)) return;
+        event.preventDefault();
+        event.stopPropagation();
+        openPackStackMenu(s, slot, { keys: true });
       });
     }
     if (canDragToVendor || inLayout) {
@@ -4849,8 +4869,10 @@ let packTrayFocusOnOpen = false;
 
 /** The contextmenu event the Menu key sends after its keydown already opened a bag's Options. */
 let packBagMenuEchoUntil = 0;
-/** The click a Mac sends after a Ctrl+click opened a bag's Options (it is not a click on the bag). */
-let packBagSwallowClickUntil = 0;
+/** The same for a stack's menu (RIGHTCLICK). */
+let packMenuEchoUntil = 0;
+/** The click a Mac sends after a Ctrl+click opened a bag's Options or a stack's menu (it is not a click on it). */
+let packMenuSwallowClickUntil = 0;
 
 /**
  * A bag slot's Options (its right-click, the Menu key or Shift+F10): the same pack popover the open
@@ -4858,11 +4880,30 @@ let packBagSwallowClickUntil = 0;
  * the keys, its first row takes the focus, as a keyboard Enter on any stack does.
  */
 function openPackBagOptions(s, slot, { keys = false, swallowClick = false } = {}) {
-  if (currentAction) cancelCurrentAction({ quiet: true });
+  // RIGHTCLICK R9: opening a menu never cancels the running verb (a pick does: the popover's capture click).
   renderPackPopover(s.classTsid, slot);
   packBagMenuEchoUntil = Date.now() + 1000;
-  if (swallowClick) packBagSwallowClickUntil = Date.now() + 700;
+  if (swallowClick) packMenuSwallowClickUntil = Date.now() + 700;
   if (app?.canvas) app.canvas.dataset.packBagMenu = isPackPopoverOpen() ? s.bag.key : '';
+  if (app?.canvas) app.canvas.dataset.contextMenu = isPackPopoverOpen() ? `pack:${s.classTsid}` : '';
+  if (keys && MODERN_UI) focusVerbRow(document.getElementById('pack-popover'));
+}
+
+/**
+ * RIGHTCLICK: a stack's or a tool's menu from its right-click or the menu keys: the popover a left
+ * click opens on that slot (renderPackPopover), always opened (on the stack whose menu is open it
+ * opens again, fresh: never the left click's close), with the running verb left running (R9).
+ * Opened from the keys, its first row takes the focus, as a keyboard Enter on the slot does.
+ */
+function openPackStackMenu(s, slot, { keys = false, swallowClick = false } = {}) {
+  packDropMode = false;
+  packDropQty = 1;
+  packEatMode = false;
+  packEatQty = 1;
+  renderPackPopover(s.classTsid, slot);
+  packMenuEchoUntil = Date.now() + 1000;
+  if (swallowClick) packMenuSwallowClickUntil = Date.now() + 700;
+  if (app?.canvas) app.canvas.dataset.contextMenu = isPackPopoverOpen() ? `pack:${s.classTsid}` : '';
   if (keys && MODERN_UI) focusVerbRow(document.getElementById('pack-popover'));
 }
 
@@ -28741,6 +28782,13 @@ async function main() {
   document.getElementById('rook-museum-exhibit-close')?.addEventListener('click', closeRookMuseumExhibit);
   document.getElementById('de-embiggenify-leave-btn')?.addEventListener('click', confirmLeaveDeEmbiggenify);
   document.getElementById('paradise-flight-leave-btn')?.addEventListener('click', confirmLeaveParadise);
+  // RIGHTCLICK R9: a menu a right-click or the menu keys opened left the running verb running; a row
+  // picked in it then stops that verb first, as the left click that opens the menu does (renderPackRow).
+  document.getElementById('pack-popover')?.addEventListener('click', (e) => {
+    const row = e.target?.closest?.('.vm-row');
+    if (!row || !currentAction || row.getAttribute('aria-disabled') === 'true' || row.hasAttribute('data-vm-back')) return;
+    cancelCurrentAction({ quiet: true });
+  }, true);
   document.addEventListener('pointerdown', (e) => {
     // A click outside the pack closes the open bag's tray (its bag, the stacks and the stack's card keep it).
     if (features.query('packOpenBag') && !e.target?.closest?.('#pack-bag, #pack-popover, .pack-slot, .verb-menu')) closePackTray();

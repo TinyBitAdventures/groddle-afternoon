@@ -4,8 +4,9 @@
  * opens the menu the open tray's "..." opens (Rename, Give, auctions, Drop and
  * the bag's description), in Modern and Classic (one pack bar, game.js
  * renderPackRow). A left click still opens the bag, a drag still moves a stack,
- * a long press on touch still lifts it; other stacks' right-click is the
- * browser's, as before. Browser QA: scratch bagmenu-qa/qa.mjs.
+ * a long press on touch still lifts it. Other stacks' right-click opens their
+ * own menu since RIGHTCLICK (tests/pack-stack-menu.test.js). Browser QA:
+ * scratch bagmenu-qa/qa.mjs.
  */
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
@@ -35,8 +36,8 @@ describe('a bag slot opens its Options', () => {
     assert.match(bagBlock, /slot\.addEventListener\('contextmenu'/);
     assert.match(bagBlock, /event\.preventDefault\(\)/);
     assert.match(bagBlock, /slot\.addEventListener\('keydown'[\s\S]*isMenuKey\(event\)[\s\S]*openPackBagOptions\(s, slot, \{ keys: true \}\)/);
-    // No other contextmenu listener on a stack: a non-bag right-click is the browser's, unchanged.
-    assert.equal(row.split("addEventListener('contextmenu'").length - 1, 1);
+    // RIGHTCLICK: a stack's slot has its own listener (its menu), so two in all.
+    assert.equal(row.split("addEventListener('contextmenu'").length - 1, 2);
   });
 
   it('a long press on touch still lifts the bag to drag, not a menu', () => {
@@ -53,7 +54,7 @@ describe('a bag slot opens its Options', () => {
   });
 
   it('a left click still opens the bag, and a Mac Ctrl+click\'s click does not', () => {
-    assert.match(row, /if \(s\.bag && Date\.now\(\) < packBagSwallowClickUntil\) \{[\s\S]*?return;\n      \}/);
+    assert.match(row, /if \(Date\.now\(\) < packMenuSwallowClickUntil\) \{[\s\S]*?return;\n      \}/);
     assert.match(row, /if \(s\.bag && !event\.target\?\.closest\?\.\('\[data-pack-opener\]'\)\) \{[\s\S]*?features\.query\('packToggleBag', s\.bag\.key, engine\)/);
     assert.match(bagBlock, /swallowClick: event\.ctrlKey === true && event\.button === 0/);
   });
