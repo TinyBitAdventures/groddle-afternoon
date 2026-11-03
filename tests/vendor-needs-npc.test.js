@@ -31,8 +31,8 @@ describe('a store opens only from its vendor', () => {
       const list = html.slice(html.indexOf('<div id="more-list"'), html.indexOf('<div id="sound-pop"'));
       assert.ok(list.includes('id="feat-btn"'), `${page}: the World group is still there`);
       assert.doesNotMatch(list, />Vendor</, page);
-      // The start card's keys no longer offer V.
-      assert.doesNotMatch(html, /<kbd>V<\/kbd><\/span><span>Vendor/, page);
+      // The start card offers V for a vendor in reach (Austin 2026-11-03), never a store anywhere.
+      assert.match(html, /<kbd>V<\/kbd><\/span><span>Vendor nearby<\/span>/, page);
       // The store itself stays, for the vendors' verbs.
       assert.match(html, /<div id="vendor-panel" /, page);
       // Its header shows no key cap either (the Modern sheets show their key beside the title).

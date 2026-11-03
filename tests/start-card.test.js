@@ -318,14 +318,14 @@ describe('the start card layout', () => {
     for (const g of groups) assert.equal(rows[g[2]].length, (g[3].match(/<li>/g) || []).length, `${g[2]}: every row is caps + label`);
     assert.deepEqual(rows, {
       Move: ['AD: Walk', 'W or Space: Tap to jump', '↑: Climb ladders', 'C: Camera'],
-      // Austin 2026-11-02: no Vendor key (a store opens from its vendor, tests/vendor-needs-npc.test.js).
+      // V opens a vendor in reach (720e3e62c, tests/vendor-needs-npc.test.js); Austin 2026-11-03 put it back on the card.
       // Ticket 62: F opens Eat what?, / the chat box.
-      Do: ['Enter: Verbs', 'Z: Player menu', 'Shift+T: Teleport points', 'F: Eat', '/: Chat'],
+      Do: ['Enter: Verbs', 'Z: Player menu', 'Shift+T: Teleport points', 'F: Eat', 'V: Vendor nearby', '/: Chat'],
       Open: ['M or G: Map', 'Q: Quests', 'B: Badges', 'H: Feat', 'K or Shift+S: Skills', 'U: Upgrades', 'Y: Buffs'],
     });
     // Every key the old one-line list named is still on the card.
     const caps = [...card.matchAll(/<kbd[^>]*>([^<]+)<\/kbd>/g)].map((m) => m[1]);
-    for (const key of ['A', 'D', 'W', 'Space', '↑', 'Enter', 'M', 'G', 'Z', 'Q', 'B', 'H', 'K', 'Shift', 'S', 'U', 'Y', 'C', 'T', '?']) {
+    for (const key of ['A', 'D', 'W', 'Space', '↑', 'Enter', 'M', 'G', 'Z', 'Q', 'B', 'H', 'K', 'Shift', 'S', 'U', 'Y', 'C', 'T', 'V', '?']) {
       assert.ok(caps.includes(key), `${key} is on the card`);
     }
     assert.match(card, /<kbd title="Up arrow">↑<\/kbd>/);
