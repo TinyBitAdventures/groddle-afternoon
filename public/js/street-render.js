@@ -1419,6 +1419,87 @@ export function skirtFadeStops() {
   };
 }
 
+/** Opacity under which a pixel of the middleground's art below the edge is dropped, and over which it is kept whole. */
+export const SKIRT_SOLID_ALPHA = [0.8, 0.88];
+
+/**
+ * PURE: what a pixel of the middleground's art below the edge keeps of its opacity `a` (0..1):
+ * none under SKIRT_SOLID_ALPHA[0], all over [1], a ramp between, with its colour unchanged.
+ * Estevan Meadows' ground slabs hang aprons of 0.4 (0.64 and 0.78 where two or three overlap);
+ * Hobak Habitat's rock fills are 0.9.
+ */
+export function skirtSolidAlpha(a) {
+  const [lo, hi] = SKIRT_SOLID_ALPHA;
+  return Math.min(1, Math.max(0, (Number(a) - lo) / (hi - lo)));
+}
+
+// skirtSolidAlpha as a filter (premultiplied in and out). Pixi's ColorMatrixFilter cannot do it:
+// it multiplies the colour by its unclamped alpha row, so a steep ramp brightened solid pixels.
+const SOLID_GL = `in vec2 vTextureCoord;
+out vec4 finalColor;
+uniform sampler2D uTexture;
+uniform vec2 uSolid;
+void main(void) {
+  vec4 c = texture(uTexture, vTextureCoord);
+  float k = clamp((c.a - uSolid.x) / (uSolid.y - uSolid.x), 0.0, 1.0);
+  finalColor = c.a > 0.0 ? c * (k / c.a) : vec4(0.0);
+}`;
+
+const SOLID_WGSL = `struct GlobalFilterUniforms {
+  uInputSize:vec4<f32>,
+  uInputPixel:vec4<f32>,
+  uInputClamp:vec4<f32>,
+  uOutputFrame:vec4<f32>,
+  uGlobalFrame:vec4<f32>,
+  uOutputTexture:vec4<f32>,
+};
+struct SolidUniforms {
+  uSolid:vec2<f32>,
+};
+@group(0) @binding(0) var<uniform> gfu: GlobalFilterUniforms;
+@group(0) @binding(1) var uTexture: texture_2d<f32>;
+@group(0) @binding(2) var uSampler: sampler;
+@group(1) @binding(0) var<uniform> solidUniforms: SolidUniforms;
+struct VSOutput {
+  @builtin(position) position: vec4<f32>,
+  @location(0) uv: vec2<f32>,
+};
+fn filterVertexPosition(aPosition: vec2<f32>) -> vec4<f32> {
+  var position = aPosition * gfu.uOutputFrame.zw + gfu.uOutputFrame.xy;
+  position.x = position.x * (2.0 / gfu.uOutputTexture.x) - 1.0;
+  position.y = position.y * (2.0 * gfu.uOutputTexture.z / gfu.uOutputTexture.y) - gfu.uOutputTexture.z;
+  return vec4(position, 0.0, 1.0);
+}
+@vertex
+fn mainVertex(@location(0) aPosition: vec2<f32>) -> VSOutput {
+  return VSOutput(filterVertexPosition(aPosition), aPosition * (gfu.uOutputFrame.zw * gfu.uInputSize.zw));
+}
+@fragment
+fn mainFragment(@location(0) uv: vec2<f32>) -> @location(0) vec4<f32> {
+  let c = textureSampleLevel(uTexture, uSampler, uv, 0.0);
+  let k = clamp((c.a - solidUniforms.uSolid.x) / (solidUniforms.uSolid.y - solidUniforms.uSolid.x), 0.0, 1.0);
+  if (c.a <= 0.0) { return vec4<f32>(0.0); }
+  return c * (k / c.a);
+}`;
+
+let solidPrograms = null;
+function skirtSolidFilter(PIXI, resolution) {
+  if (!solidPrograms || solidPrograms.PIXI !== PIXI) {
+    solidPrograms = {
+      PIXI,
+      gl: PIXI.GlProgram.from({ vertex: PIXI.defaultFilterVert, fragment: SOLID_GL, name: 'skirt-solid' }),
+      gpu: PIXI.GpuProgram.from({ vertex: { source: SOLID_WGSL, entryPoint: 'mainVertex' }, fragment: { source: SOLID_WGSL, entryPoint: 'mainFragment' } }),
+    };
+  }
+  return new PIXI.Filter({
+    glProgram: solidPrograms.gl,
+    gpuProgram: solidPrograms.gpu,
+    resources: { solidUniforms: new PIXI.UniformGroup({ uSolid: { value: [...SKIRT_SOLID_ALPHA], type: 'vec2<f32>' } }) },
+    padding: 0,
+    resolution,
+  });
+}
+
 /** A 1 x 64 ramp of one colour at the given stops' opacities. */
 function rampTexture(PIXI, colour, stops) {
   const canvas = document.createElement('canvas');
@@ -1433,6 +1514,9 @@ function rampTexture(PIXI, colour, stops) {
   return PIXI.Texture.from(canvas);
 }
 
+/** Rows above the edge the middleground's solid copy starts at (see buildGroundSkirt). */
+const SOLID_OVERLAP = 2;
+
 /** The mirrored band's texture budget: its resolution drops for a very wide street. */
 const SKIRT_BYTES = 24 * 1024 * 1024;
 
@@ -1441,9 +1525,10 @@ const SKIRT_BYTES = 24 * 1024 * 1024;
  * up to MIN_GROUND_CLEARANCE below it, and the canvas runs on under the overlaid pack). The
  * ground layers' bottom band (skirtGroundOffset) is rendered once into one texture per chunk
  * (4096 px, fewer on a small GPU), laid down the skirt (skirtTiles), shaded at the seam and faded
- * into skirtFadeColour, then that colour runs on to the skirt's foot. The strip sits just under
- * the middleground, so the middleground's and the front layers' real art below bounds.b (The
- * Great Hole to Ix's dirt and trunks) still draws over it.
+ * into skirtFadeColour, then that colour runs on to the skirt's foot. The strip sits over the
+ * middleground with the middleground's solid art below bounds.b copied back on top (its
+ * see-through art there is covered), and the front layers' art below bounds.b (The Great Hole to
+ * Ix's dirt and trunks) still draws over it.
  */
 function buildGroundSkirt(PIXI, renderer, root, grounds, W, sourceH, depthPx, gradientBottom, fallback) {
   const depth = Math.ceil(depthPx);
@@ -1454,15 +1539,21 @@ function buildGroundSkirt(PIXI, renderer, root, grounds, W, sourceH, depthPx, gr
     if (root.destroyed || grounds.some((lc) => lc.destroyed)) return;
     const t0 = performance.now();
     const strip = new PIXI.Container();
-    // Just under the middleground, as before: its art and every front layer's (game.js
-    // syncStreetFront) draw over the strip where they run below bounds.b; the back layers' art
-    // down there stays hidden (Matsya's light glow, which the front rocks cover above the edge).
-    strip.zIndex = main.inFront ? -1 : main.zIndex - 1;
+    // Over the middleground and under the avatars: the middleground's own art below bounds.b
+    // comes back on top as an opaque-only copy (skirtSolidAlpha), so its see-through parts are
+    // covered (Estevan Meadows' flat ground slabs hang half-clear aprons there, which showed as
+    // pale boxes over the darkened skirt) and its solid parts look as they did. The front layers
+    // (game.js syncStreetFront) still draw over the strip (The Great Hole to Ix's dirt and
+    // trunks); the back layers' art down there stays hidden (Matsya's light glow).
+    strip.zIndex = main.inFront ? -1 : main.zIndex + 1;
     strip.label = 'ground-skirt';
     const textures = [];
     const maxTex = maxTextureSizeOf(renderer) || 4096;
+    // How far the middleground's art runs below the edge (in view: the skirt's depth at most).
+    const mainBox = main.getLocalBounds();
+    const below = Math.max(0, Math.min(depth, Math.ceil(mainBox.maxY - sourceH)));
     let res = Math.min(2, renderer.resolution || 1);
-    while (res > 0.5 && W * band * res * res * 4 > SKIRT_BYTES) res /= 1.25;
+    while (res > 0.5 && W * (band + below) * res * res * 4 > SKIRT_BYTES) res /= 1.25;
     const chunkW = Math.max(256, Math.min(4096, Math.floor(maxTex / res)));
     // Pixi 8 drops the filters of the container it renders (and makes it a render group), so
     // the layers render inside a throwaway parent: their colour filters apply as on screen.
@@ -1496,7 +1587,9 @@ function buildGroundSkirt(PIXI, renderer, root, grounds, W, sourceH, depthPx, gr
     let b = 0;
     let n = 0;
     const mirrors = [];
+    const solids = [];
     const top = sourceH - band;
+    const solidFilter = below > 0 ? skirtSolidFilter(PIXI, res) : null;
     for (let x0 = 0; x0 < W; x0 += chunkW) {
       const w = Math.min(chunkW, Math.ceil(W - x0));
       if (band > 0) {
@@ -1515,6 +1608,29 @@ function buildGroundSkirt(PIXI, renderer, root, grounds, W, sourceH, depthPx, gr
           }
           mirrors.push(spr);
         }
+      }
+      if (below > 0) {
+        // The middleground alone below the edge, then only its opaque pixels.
+        const others = grounds.filter((lc) => lc !== main && lc.visible);
+        for (const lc of others) lc.visible = false;
+        // From SOLID_OVERLAP px above the edge: the copy's first rows sample past its texture's
+        // top, and there they lie over the same art (identical where it is solid).
+        const raw = PIXI.RenderTexture.create({ width: w, height: below + SOLID_OVERLAP, resolution: res });
+        renderer.render({ container: shell, target: raw, transform: new PIXI.Matrix(1, 0, 0, 1, -x0, -(sourceH - SOLID_OVERLAP)), clear: true });
+        for (const lc of others) lc.visible = true;
+        const solid = PIXI.RenderTexture.create({ width: w, height: below + SOLID_OVERLAP, resolution: res });
+        const holder = new PIXI.Container();
+        const rawSprite = new PIXI.Sprite(raw);
+        rawSprite.filters = [solidFilter];
+        holder.addChild(rawSprite);
+        renderer.render({ container: holder, target: solid, clear: true });
+        holder.destroy({ children: true });
+        raw.destroy(true);
+        textures.push(solid);
+        const spr = new PIXI.Sprite(solid);
+        spr.x = x0;
+        spr.y = sourceH - SOLID_OVERLAP;
+        solids.push(spr);
       }
       // The band's average colour from an eighth-size copy (one small read per chunk).
       const sw = Math.max(1, Math.ceil(w / 8));
@@ -1535,6 +1651,7 @@ function buildGroundSkirt(PIXI, renderer, root, grounds, W, sourceH, depthPx, gr
       } catch { /* extract can fail on a lost context: the fallback colour draws */ }
       small.destroy(true);
     }
+    solidFilter?.destroy();
     for (const child of culled) child.culled = true;
     for (const h of [...homes].sort((p, q) => p.index - q.index)) {
       h.lc.x = h.x;
@@ -1565,6 +1682,7 @@ function buildGroundSkirt(PIXI, renderer, root, grounds, W, sourceH, depthPx, gr
     // Down past the last copy's foot (it can run up to a band past the skirt's depth).
     deep.rect(0, sourceH + fadeDepth, W, Math.max(0, depth + band - fadeDepth)).fill(colour);
     strip.addChild(fade, shade, deep);
+    for (const spr of solids) strip.addChild(spr);
     textures.push(fade.texture, shade.texture);
     root.addChild(strip);
     root.once('destroyed', () => {
@@ -1576,10 +1694,11 @@ function buildGroundSkirt(PIXI, renderer, root, grounds, W, sourceH, depthPx, gr
       colour,
       average,
       layers: grounds.map((lc) => lc.label),
-      chunks: textures.length - 2,
+      chunks: mirrors.length ? textures.length - 2 - solids.length : 0,
       copies: mirrors.length,
+      below,
       resolution: Math.round(res * 100) / 100,
-      bytes: Math.round(W * band * res * res * 4),
+      bytes: Math.round(W * (band + below) * res * res * 4),
       ms: Math.round(performance.now() - t0),
     };
   };

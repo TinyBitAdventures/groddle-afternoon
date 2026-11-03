@@ -16,10 +16,11 @@ import {
   skirtFadeColour,
   skirtFadeStops,
   skirtGroundOffset,
+  skirtSolidAlpha,
   skirtTiles,
   SKIRT_BAND,
   SKIRT_SLIDE_MAX,
-} from '../public/js/street-render.js?v=41c545c5';
+} from '../public/js/street-render.js?v=f98221f2';
 import { streetHeight, streetWidth } from '../public/js/street-model.js?v=505d8990';
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -65,8 +66,12 @@ describe('street layer data', () => {
     for (const m of body.matchAll(/\.rect\(0, ([^,]+),/g)) assert.match(m[1], /^sourceH( \+ fadeDepth)?$/, m[0]);
     assert.match(body, /fade\.y = sourceH;/);
     assert.match(body, /shade\.y = sourceH;/);
-    // Under the middleground: its art and the front layers' draw over the strip below the edge.
-    assert.match(body, /strip\.zIndex = main\.inFront \? -1 : main\.zIndex - 1;/);
+    // Over the middleground (under the avatars), with the middleground's solid art below the edge
+    // copied back on top; the front layers still draw over the strip.
+    assert.match(body, /strip\.zIndex = main\.inFront \? -1 : main\.zIndex \+ 1;/);
+    assert.match(body, /spr\.y = sourceH - SOLID_OVERLAP;/);
+    assert.match(body, /for \(const spr of solids\) strip\.addChild\(spr\);/);
+    assert.ok(body.indexOf('strip.addChild(fade, shade, deep)') < body.indexOf('for (const spr of solids) strip.addChild(spr)'), 'the copy goes over the fade');
     // One texture per chunk, freed with the view.
     assert.match(body, /root\.once\('destroyed', \(\) => \{\s*for \(const t of textures\) t\.destroy\(true\);/);
     assert.match(src, /buildGroundSkirt\(PIXI, opts\.renderer, root, grounds, W, sourceH, skirtDepth, /);
@@ -215,6 +220,24 @@ describe('ground skirt (the strip under a street in the Modern UI)', () => {
     // Both are front layers, which game.js draws above the whole street view (the strip included).
     assert.deepEqual(skirtGroundOffset(hole.layers.find((l) => l.id === 'middleplus'), W, H), { x: 0, y: 0 });
     assert.equal(skirtGroundOffset(hole.layers.find((l) => l.id === 'foreground'), W, H), null, 'its trees are not mirrored');
+  });
+
+  it('covers the see-through art the middleground hangs below the edge and keeps its solid art (Estevan Meadows)', () => {
+    // Estevan Meadows' evenground_platform_long slabs run past bounds.b in the middleground; their
+    // half-clear aprons (0.4, 0.64 and 0.78 where two or three overlap) showed as pale boxes over
+    // the darkened skirt. Hobak Habitat's rock fills (0.9) and solid art (1) stay.
+    const estevan = street('GLI32J0SVTD114U');
+    const H = streetHeight(estevan);
+    const mg = estevan.layers.find((l) => l.id === 'middleground');
+    const slabs = mg.decos.filter((d) => d.sprite === 'evenground_platform_long' && d.y - estevan.bounds.t > H);
+    assert.ok(slabs.length >= 3, 'slabs below the edge');
+    for (const a of [0, 0.4, 0.64, 0.78]) assert.equal(skirtSolidAlpha(a), 0, `apron ${a}`);
+    assert.equal(skirtSolidAlpha(0.9), 1, 'rock fill');
+    assert.equal(skirtSolidAlpha(1), 1);
+    assert.ok(skirtSolidAlpha(0.84) > 0 && skirtSolidAlpha(0.84) < 1, 'a ramp, not a cliff');
+    // The filter is clamped (Pixi's ColorMatrixFilter multiplied the colour by an unclamped alpha).
+    const src = readFileSync(join(here, '../public/js/street-render.js'), 'utf8');
+    assert.match(src, /float k = clamp\(\(c\.a - uSolid\.x\) \/ \(uSolid\.y - uSolid\.x\), 0\.0, 1\.0\);\s*finalColor = c\.a > 0\.0 \? c \* \(k \/ c\.a\) : vec4\(0\.0\);/);
   });
 
   it('fades into the gradient bottom when it is darker than the ground, else the ground darkened', () => {
