@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=862128f3';
 import { createFeatureHost } from './js/feature-host.js?v=903263a4';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=ff03c9a9';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=6c36987a';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -1498,6 +1498,8 @@ function clientShortcutKey(e) {
   // Shift+L: your looks (shiftLKeyHandler 980-994: opens ImaginationYourLooksUI unless it is up).
   if (action === 'looks') {
     if (!e.repeat && !isAvatarOpen()) openAvatarPanel();
+    // Ticket 59: straight to Your looks, as the client opened it (features/your-looks-feature.js).
+    if (!e.repeat) features.query('showYourLooks', engine);
     return true;
   }
   // Shift+K: the keyring (shiftKKeyHandler 962-978: ACLDialog start, or end when open).
@@ -2029,6 +2031,8 @@ const inv = createInventory(NEW_PLAYER ? newPlayerInventory(createInventory(), P
 bindToolInventory(toolState, inv);
 /** @type {import('./js/character-builder.js').Appearance} */
 let playerAppearance = loadAppearance();
+/** Ticket 59: the look worn on the street (the last one saved), not the builder's unsaved draft. */
+let wornAppearance = playerAppearance;
 /** @type {string} active builder tab */
 let avatarBuilderSlot = 'hair';
 /** open builder before game start? */
@@ -10424,6 +10428,7 @@ function paintAvatarPreview() {
 
 function commitAvatarAppearance() {
   playerAppearance = normalizeAppearance(playerAppearance);
+  wornAppearance = playerAppearance;
   saveAppearance(playerAppearance);
   applyPlayerAppearance();
   updateHud();
@@ -10905,6 +10910,26 @@ const engine = {
   get playerAppearance() {
     return playerAppearance;
   },
+  /** Ticket 59: the look worn on the street, the last one saved (the builder's draft is not it). */
+  get wornLook() {
+    return wornAppearance?.vector || {};
+  },
+  /** Ticket 59 (Your looks): wear a look's fields now, as the builder's Save look does. */
+  wearLook(vector) {
+    playerAppearance = normalizeAppearance({ ...createDefaultAppearance(), vector: vector && typeof vector === 'object' ? vector : {} });
+    wornAppearance = playerAppearance;
+    saveAppearance(playerAppearance);
+    applyPlayerAppearance();
+    updateHud();
+    clearPresetActive(document.getElementById('avatar-presets'));
+    if (isAvatarOpen()) {
+      renderAvatarBuilder();
+      paintAvatarPreview();
+    }
+    return true;
+  },
+  /** A look standing still as a picture (data URL), `size` { w, h } in CSS px (drawn at 2x). */
+  lookPortrait: (vector, size, pad) => lookPortraitUrl(vector, size, pad),
   /**
    * Another player's Glitch from their look ({ vector }): the anim pack the
    * player's own sprite uses (pack.anims by source animation). A custom
@@ -22068,22 +22093,29 @@ async function renderHomeScene(room = homeState.room || 'street', opts = {}) {
   return currentStreet;
 }
 
-/** G249: your avatar standing still for the home card (the client loaded pc.singles_url + '_172.png'). */
-const ownerPortraits = new Map();
-async function ownerPortraitUrl() {
+/**
+ * A look standing still as a picture (a data URL, cached by look and size): the home card's owner
+ * (G249: the client loaded pc.singles_url + '_172.png') and Your looks (ticket 59: the client's
+ * AvatarLookUI drew singles_base + '_100.png', 100x144).
+ */
+const lookPortraits = new Map();
+async function lookPortraitUrl(vector, size = POL_OWNER_SIZE, pad = 12) {
   if (!avatarCatalog) avatarCatalog = await loadAvatarCatalog().catch(() => null);
   if (!avatarCatalog) return null;
-  const look = resolveLook(playerAppearance.vector, avatarCatalog);
-  const key = lookKey(look);
-  if (!ownerPortraits.has(key)) {
-    ownerPortraits.set(key, prepareLook(look).then((prep) => {
+  const look = resolveLook(vector && typeof vector === 'object' ? vector : {}, avatarCatalog);
+  const key = `${size.w}x${size.h}|${lookKey(look)}`;
+  if (!lookPortraits.has(key)) {
+    lookPortraits.set(key, prepareLook(look).then((prep) => {
       const canvas = document.createElement('canvas');
-      canvas.width = POL_OWNER_SIZE.w * 2;
-      canvas.height = POL_OWNER_SIZE.h * 2;
-      return paintVectorPreview(prep, canvas, 801, { pad: 12, flip: true }).toDataURL('image/png');
+      canvas.width = size.w * 2;
+      canvas.height = size.h * 2;
+      return paintVectorPreview(prep, canvas, 801, { pad, flip: true }).toDataURL('image/png');
     }).catch(() => null));
   }
-  return ownerPortraits.get(key);
+  return lookPortraits.get(key);
+}
+function ownerPortraitUrl() {
+  return lookPortraitUrl(playerAppearance.vector);
 }
 
 /**

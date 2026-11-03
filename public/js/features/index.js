@@ -160,6 +160,7 @@ import { homeMachinesFeature } from './home-machines-feature.js?v=a805f065'; FEA
 import { homeStorageFeature } from './home-storage-feature.js?v=7f8b979b'; FEATURES.push(homeStorageFeature);
 import { questVerbsFeature } from './quest-verbs-feature.js?v=91309fbd'; FEATURES.push(questVerbsFeature);
 import { itemVerbsMoreFeature } from './item-verbs-more-feature.js?v=58ed07ff'; FEATURES.push(itemVerbsMoreFeature);
+import { yourLooksFeature } from './your-looks-feature.js?v=38cfe4e8'; FEATURES.push(yourLooksFeature);
 import { questPinsFeature } from './quest-pins-feature.js?v=e59012f1'; FEATURES.push(questPinsFeature);
 import { zoneEffectsFeature } from './zone-effects-feature.js?v=b0813bcf'; FEATURES.push(zoneEffectsFeature);
 import { updateReadyFeature } from './update-ready-feature.js?v=257c1dcb'; FEATURES.push(updateReadyFeature);

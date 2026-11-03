@@ -319,7 +319,8 @@ describe('the start card layout', () => {
     assert.deepEqual(rows, {
       Move: ['AD: Walk', 'W or Space: Tap to jump', '↑: Climb ladders', 'C: Camera'],
       // Austin 2026-11-02: no Vendor key (a store opens from its vendor, tests/vendor-needs-npc.test.js).
-      Do: ['Enter: Verbs', 'Z: Player menu', 'Shift+T: Teleport points'],
+      // Ticket 62: F opens Eat what?, / the chat box.
+      Do: ['Enter: Verbs', 'Z: Player menu', 'Shift+T: Teleport points', 'F: Eat', '/: Chat'],
       Open: ['M or G: Map', 'Q: Quests', 'B: Badges', 'H: Feat', 'K or Shift+S: Skills', 'U: Upgrades', 'Y: Buffs'],
     });
     // Every key the old one-line list named is still on the card.
