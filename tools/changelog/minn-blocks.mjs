@@ -81,7 +81,7 @@ export function blockTypes(icons) {
     sign: leaf('sign', 'Sign arm', 'One arm of a signpost.', { side: { type: 'string', enum: ['left', 'right'], default: 'left' }, text: text('Somewhere') }, 'signpost'),
     ...restorationTypes(leaf),
     ...musicblockTypes(leaf),
-    'street-music': { ...leaf('street-music', 'Street music', 'One group of Tiny Speck\'s published tracks, each to play, with where the remake plays it.', { group: { type: 'string', enum: ['theme', 'sketch', 'activity', 'ringtone'], default: 'theme' } }), category: 'widgets', keywords: ['music', 'tracks'] },
+    'street-music': { ...leaf('street-music', 'Street music', 'One group of Tiny Speck\'s published tracks, each to play, with where the remake plays it.', { group: { type: 'string', enum: ['theme', 'sketch', 'activity', 'ringtone'], default: 'theme' } }), category: 'widgets', keywords: ['music', 'tracks'] },    ...contributeTypes(leaf),
   };
 }
 
@@ -95,6 +95,20 @@ function musicblockTypes(leaf) {
   return {
     musicblocks: data('musicblocks', 'Musicblocks', 'One musicblock series, or the rare blocks, as cards to play, with the series\' collector trophy.', { set: { type: 'string', enum: [...Object.keys(MUSICBLOCK_SERIES), 'rare'], default: 'DG' } }),
     'musicblocks-rules': data('musicblocks-rules', 'Musicblock rules', 'What playing a musicblock costs and pays, read from the game itself.'),
+  };
+}
+
+/**
+ * The Contribute page's data blocks, drawn from public/contribute/data.json
+ * (tools/contribute/build-data.mjs, the site's src/Contribute.php): the street
+ * with the Giant's shrine whose Donate opens GitHub Sponsors, and the open
+ * ledger, worked out on the day the page is read.
+ */
+function contributeTypes(leaf) {
+  const data = (name, title, description, attributes = {}) => ({ ...leaf(`contribute-${name}`, title, description, attributes), category: 'widgets', keywords: ['contribute', 'support'] });
+  return {
+    'contribute-shrine': data('shrine', 'Contribute shrine', 'A little street with a Giant\'s shrine: click it for the game\'s menu, whose Donate opens GitHub Sponsors.', { hint: text('Click the shrine'), footer: text('Opens GitHub Sponsors in a new tab, to help with what the game costs to run.') }),
+    'contribute-ledger': data('ledger', 'Contribute ledger', 'The open ledger: money in and out since it started, worked out on the day the page is read.', { note: text('Updated automatically each month. Money in is added by hand when it arrives.') }),
   };
 }
 

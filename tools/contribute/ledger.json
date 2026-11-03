@@ -1,0 +1,12 @@
+{
+  "start": "2026-11-01",
+  "currency": "USD",
+  "sponsors": "https://github.com/sponsors/austinginder",
+  "costs": [
+    { "id": "domain", "name": "Domain (groddleafternoon.com)", "amount": 10, "every": "year" },
+    { "id": "server", "name": "Realtime server (DigitalOcean droplet)", "amount": 6, "every": "month" },
+    { "id": "hosting", "name": "Web hosting for the site", "amount": 20, "every": "month" },
+    { "id": "ai", "name": "AI tokens", "amount": 50, "every": "month" }
+  ],
+  "in": []
+}
