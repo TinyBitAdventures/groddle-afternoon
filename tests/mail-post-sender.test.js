@@ -10,7 +10,7 @@ import { readFileSync, readdirSync } from 'node:fs';
 import { join, relative } from 'node:path';
 import { MAIL_POST_SENDER, deliverMail, mailSender, normalizeMailboxState, seedMailbox } from '../public/js/mailbox.js?v=b2bde2fe';
 import { letterLine } from '../public/js/mail-courier.js?v=12d7d7a4';
-import { STREET_MAIL_WELCOME } from '../public/js/features/street-furniture-feature.js?v=b4959f04';
+import { STREET_MAIL_WELCOME } from '../public/js/features/street-furniture-feature.js?v=66cb96d3';
 
 const publicDir = join(import.meta.dirname, '..', 'public');
 
