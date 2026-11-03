@@ -1230,6 +1230,11 @@ header .sub {
   width: 100% !important;
   height: auto !important;
 }
+/* The world canvas takes the keyboard (tabIndex 0) so keys walk the avatar; when focus comes back to
+   it by keyboard (Esc from chat, Tab) the browser's ring would outline the whole screen. The game
+   itself is the focus, so no ring; buttons and panels keep theirs. */
+#game-root > canvas[role="application"]:focus,
+#game-root > canvas[role="application"]:focus-visible { outline: none; }
 /* Window announcements drawn by js/overlay-art.js playVectorOverlay (the Qurazy banner): above the
    world and the HUD, under side panels, modals, the pack and notices (a note card covers them). */
 #game-root > canvas.overlay-art { z-index: var(--z-overlay); }
