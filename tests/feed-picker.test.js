@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 
 import { getVerbsFor, runVerb } from '../public/content.js?v=862128f3';
 import { createAnimalState, listAnimalFeedOptions } from '../public/js/animals.js?v=dd5408ad';
-import { makePickTile, pickGridCols, pickGridStep } from '../public/js/ui/verb-menu.js?v=25dced72';
+import { makePickTile, pickGridCols, pickGridStep } from '../public/js/ui/verb-menu.js?v=74b6dfa0';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const publicDir = join(here, '../public');

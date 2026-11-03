@@ -55,6 +55,9 @@ import { mountReportsSheet } from '../ui/reports-sheet.js?v=59a71a73';
 
 export const BUG_REPORT_FEATURE_ID = 'bug-report';
 
+/** Ticket 62: the key that opens the Reports sheet (game.js keydown; the client had none). */
+export const REPORT_KEY = 'R';
+
 /** The words: the source's where it had them, short plain ones of ours where it did not (js/reports.js has the sheet's). */
 export const BUG_TEXT = Object.freeze({
   tip: REPORT_TEXT.tip,
@@ -413,7 +416,8 @@ function createSession(engine, errors) {
   document.head.append(style);
 
   // The header icon, beside the mute button (GameHeaderUI.as: the bug icon sat with help in the header).
-  const btn = el('button', { id: 'bug-btn', type: 'button', class: 'chrome-btn mute-btn bug-btn', title: BUG_TEXT.tip, 'aria-label': BUG_TEXT.tip, 'aria-haspopup': 'dialog', 'data-bug-report-open': '' });
+  // R opens it too (ticket 62, game.js keydown): the key cap in its tooltip, as the bar's other buttons.
+  const btn = el('button', { id: 'bug-btn', type: 'button', class: 'chrome-btn mute-btn bug-btn', title: BUG_TEXT.tip, 'aria-label': `${BUG_TEXT.tip} (${REPORT_KEY})`, 'aria-keyshortcuts': REPORT_KEY, 'data-key': REPORT_KEY, 'aria-haspopup': 'dialog', 'data-bug-report-open': '' });
   btn.append(el('img', { src: 'assets/ui/bug_icon.png', alt: '', width: '23', height: '20' }));
   const badge = el('span', { class: 'bug-unread hud-badge', 'aria-hidden': 'true', hidden: true, 'data-reports-badge': '' });
   btn.append(badge);
@@ -440,8 +444,9 @@ function createSession(engine, errors) {
       badge.textContent = b.text;
       // The modern bar shows data-tip (topbar.js adoptTitles moves a title there once); elsewhere the title.
       if (btn.dataset.tip !== undefined) btn.dataset.tip = b.tip;
+      // A title is moved to data-tip by the bar (the key cap shows from data-key), so it carries no "(R)".
       else btn.title = b.tip;
-      btn.setAttribute('aria-label', b.tip);
+      btn.setAttribute('aria-label', `${b.tip} (${REPORT_KEY})`);
       btn.dataset.unread = String(unread);
       btn.setAttribute('aria-expanded', state === 'closed' ? 'false' : 'true');
     },
@@ -468,7 +473,7 @@ function createSession(engine, errors) {
     if (covered) {
       const cs = getComputedStyle(btn);
       Object.assign(lift.style, { left: `${r.left}px`, top: `${r.top}px`, width: `${r.width}px`, height: `${r.height}px`, background: cs.backgroundColor, borderRadius: cs.borderRadius, color: cs.color });
-      lift.title = btn.dataset.tip || btn.title || BUG_TEXT.tip;
+      lift.title = `${btn.dataset.tip || btn.title || BUG_TEXT.tip} (${REPORT_KEY})`;
       lift.setAttribute('aria-label', btn.getAttribute('aria-label') || BUG_TEXT.tip);
       const b = lift.querySelector('[data-reports-badge]');
       const src = btn.querySelector('[data-reports-badge]');

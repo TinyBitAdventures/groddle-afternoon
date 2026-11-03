@@ -29,7 +29,7 @@ import {
   hotkeyText,
   isHotkeySheetRelease,
   isPlainKey,
-} from '../public/js/client-hotkeys.js?v=87795519';
+} from '../public/js/client-hotkeys.js?v=cd794bb3';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const PUBLIC = join(here, '../public');
@@ -211,13 +211,14 @@ describe('G254: game.js wiring', () => {
     assert.match(keys.slice(guard, guard + 220), /return;\s+\}/);
   });
 
-  it('? before dialogs and panels; Z, Shift+L/K/D after Shift+T and before F', () => {
+  it('? before dialogs and panels; Z, Shift+L/K/D after Shift+T and before F (Eat what?)', () => {
     const sheet = keys.indexOf("clientKeyAction(e) === 'hotkeys'");
     assert.ok(sheet > keys.indexOf('if (!state.started) return;'));
     assert.ok(sheet < keys.indexOf('if (isQuestDialogueOpen()) return;'));
     const shiftT = keys.indexOf("if (e.shiftKey && (e.key === 't' || e.key === 'T')) {");
     const client = keys.indexOf('if (clientShortcutKey(e)) return;');
-    const apple = keys.indexOf("if (e.key === 'f' || e.key === 'F') eatApple();");
+    // Ticket 62: F opens Eat what? (it ate an apple before), still after the client's keys.
+    const apple = keys.indexOf("if (!e.repeat && isPlainKey(e, 'f')) {");
     assert.ok(shiftT > 0 && client > shiftT && apple > client);
   });
 

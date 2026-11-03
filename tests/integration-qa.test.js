@@ -18,9 +18,9 @@ function fnBody(name) {
 }
 
 test.describe('integration playtest regressions', () => {
-  test('F eats an apple through the pack path (Naraka gate, fullness, food memory, quests)', () => {
-    const body = fnBody('eatApple');
-    assert.match(body, /usePackItem\('apple'\)/);
+  test('F eats through the pack path (Naraka gate, fullness, food memory, quests): ticket 62\'s Eat what?', () => {
+    const body = fnBody('openEatPicker');
+    assert.match(body, /usePackItem\(food\.classTsid\)/);
     assert.doesNotMatch(body, /useItem\(inv/);
   });
 

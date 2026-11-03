@@ -149,7 +149,7 @@ export function pickGridStep(i, n, cols, dir) {
  * under them (1891-1916: "Grain (you have 5)"). Here the count also sits on the picture the way
  * the pack draws it (none for one), and the name is the tooltip and what a screen reader says.
  * @param {Document} doc
- * @param {{ key?: string, label: string, have: number, icon: string, verb?: string, food?: string, verbLabel?: string }} pick
+ * @param {{ key?: string, label: string, have: number, icon: string, verb?: string, food?: string, verbLabel?: string, tip?: string }} pick (tip: the footer line, when not the name and count)
  */
 export function makePickTile(doc, pick) {
   const have = Math.max(0, Math.floor(Number(pick.have) || 0));
@@ -157,7 +157,7 @@ export function makePickTile(doc, pick) {
   btn.type = 'button';
   btn.className = `vm-row vm-pick${have < 2 ? ' is-single' : ''}`;
   btn.setAttribute('role', 'menuitem');
-  btn.dataset.vmTip = `${pick.label} (you have ${have})`;
+  btn.dataset.vmTip = pick.tip || `${pick.label} (you have ${have})`;
   if (pick.food) btn.dataset.food = pick.food;
   if (pick.verb) btn.dataset.verb = pick.verb;
   btn.title = pick.label;

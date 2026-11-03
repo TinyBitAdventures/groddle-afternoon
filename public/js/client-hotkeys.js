@@ -75,9 +75,10 @@ export const HOTKEYS_FOOTER = "Open this list by holding the '?' Key.";
  * The sheet's sections in the client's order (hotkeys.png: Menus, Interface,
  * Modes, Emotions, View). Each row is [label, alternatives, note?]; each
  * alternative is a key combination such as ['Shift', 'S'].
- * @param {{ keyring?: boolean }} opts keyring: the multiplayer keyring is there
+ * @param {{ keyring?: boolean, hub?: boolean, reports?: boolean }} opts keyring: the multiplayer keyring is there;
+ *   reports: Report a bug is there (multiplayer, features/bug-report-feature.js)
  */
-export function hotkeySections({ keyring = false, hub = false } = {}) {
+export function hotkeySections({ keyring = false, hub = false, reports = false } = {}) {
   return [
     {
       title: 'Menus',
@@ -104,6 +105,12 @@ export function hotkeySections({ keyring = false, hub = false } = {}) {
         ['Teleport', [['Shift', 'T']]],
         ...(keyring ? [['Key Ring', [['Shift', 'K']]]] : []),
         ['Inventory Search', [['Shift', 'F'], ['`']]],
+        // Ticket 62: F is the remake's own eat key (the client had none); it opens Eat what?.
+        ['Eat', [['F']], '(Eat what? with the best food chosen)'],
+        // KeyBeacon.as 31-32: / put the keyboard in the chat box.
+        ['Chat', [['/']]],
+        // Ticket 62: Report a bug had no key in the client (GameHeaderUI.as 47-69 was a button); R is free here.
+        ...(reports ? [['Report a Bug', [['R']]]] : []),
         ['Preferences', [[',']]],
         ['Verbs', [['Enter'], ['E']]],
         // VENDORKEY (Austin 2026-11-02): a vendor in reach (game.js vendorKey).
@@ -146,9 +153,9 @@ export function isHotkeySheetRelease(e) {
 /**
  * The sheet's DOM, built once on first show.
  * @param {Document} doc
- * @param {{ keyring?: () => boolean }} opts
+ * @param {{ keyring?: () => boolean, hub?: () => boolean, reports?: () => boolean }} opts
  */
-export function createHotkeysSheet(doc, { keyring = () => false, hub = () => false } = {}) {
+export function createHotkeysSheet(doc, { keyring = () => false, hub = () => false, reports = () => false } = {}) {
   let shade = null;
   const build = () => {
     shade = doc.createElement('div');
@@ -173,7 +180,7 @@ export function createHotkeysSheet(doc, { keyring = () => false, hub = () => fal
     title.textContent = HOTKEYS_TITLE;
     const cols = doc.createElement('div');
     cols.className = 'hotkeys-cols';
-    for (const section of hotkeySections({ keyring: keyring(), hub: hub() })) {
+    for (const section of hotkeySections({ keyring: keyring(), hub: hub(), reports: reports() })) {
       const box = doc.createElement('div');
       box.className = 'hotkeys-section';
       const h = doc.createElement('h3');

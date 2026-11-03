@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=862128f3';
 import { createFeatureHost } from './js/feature-host.js?v=903263a4';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=7ff6f74b';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=ff03c9a9';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -923,12 +923,13 @@ import { mountNotifyView } from './js/notify-view.js?v=81d06119';
 import { mountSocialDrawer } from './js/ui/social-drawer.js?v=486bc349';
 import { bindDragScroll } from './js/ui/drag-scroll.js?v=9a527ac8';
 import { SIDE_SHEET_IDS, bindTabs, inSideSheet, mountPanelShell, sheetKeyToWorld } from './js/ui/panel-shell.js?v=b984b886';
-import { createQuestSheet, questStep } from './js/ui/quest-sheet.js?v=9097723b';
-import { createQuestTracker } from './js/ui/quest-tracker.js?v=3d45998b';
+import { createQuestSheet, questStep } from './js/ui/quest-sheet.js?v=4d6b1340';
+import { createQuestTracker } from './js/ui/quest-tracker.js?v=76c0a782';
 import { bindCountField, countKeyValue, countStepMarkup } from './js/ui/count-chooser.js?v=893305c8';
-import { bindVerbMenu, focusVerbRow, lockVerbMenuSize, makePickTile, makeVerbRow, pickGridCols, placeVerbMenu, plainWords, refuseVerbRow, syncVerbDetail, verbMenuKey, verbRowAttrs, verbRowInner, verbRowKeys } from './js/ui/verb-menu.js?v=25dced72';
+import { bindVerbMenu, focusVerbRow, lockVerbMenuSize, makePickTile, makeVerbRow, pickGridCols, placeVerbMenu, plainWords, refuseVerbRow, syncVerbDetail, verbMenuKey, verbRowAttrs, verbRowInner, verbRowKeys } from './js/ui/verb-menu.js?v=74b6dfa0';
 import { createPromptSettler, promptId } from './js/prompt-settle.js?v=509ba9cc';
-import { clientKeyAction, createHotkeysSheet, isHotkeySheetRelease, isPlainKey } from './js/client-hotkeys.js?v=87795519';
+import { clientKeyAction, createHotkeysSheet, isHotkeySheetRelease, isPlainKey } from './js/client-hotkeys.js?v=cd794bb3';
+import { EAT_PICK_TEXT, bestFoodIndex, eatChoices, eatTip } from './js/eat-pick.js?v=8fb763d0';
 import { installHeldKeyGuard } from './js/held-keys.js?v=98b96620';
 import { forgetTexture, frameTexture, isFailed, isLoaded, onFailed, onLoaded, textureFromUrl, whenLoaded } from './js/textures.js?v=db2ce452';
 import { FALLBACK_MAX as WORLD_ART_FALLBACK_MAX, worldArtFor } from './js/world-art.js?v=df476660';
@@ -1450,7 +1451,7 @@ function openLookBuilderOn(slot) {
 }
 
 /** G254: the client's hold-? sheet (js/client-hotkeys.js); the keyring row only in multiplayer. */
-const hotkeysSheet = createHotkeysSheet(document, { keyring: () => Boolean(document.getElementById('keys-btn')), hub: () => modernUi() });
+const hotkeysSheet = createHotkeysSheet(document, { keyring: () => Boolean(document.getElementById('keys-btn')), hub: () => modernUi(), reports: () => Boolean(document.getElementById('bug-btn')) });
 
 /** A visible element (not under a hidden ancestor or display: none). */
 function shownElement(node) {
@@ -7293,8 +7294,10 @@ function renderVerbMenu(target, verbs, level = null) {
     return btn;
   };
   if (level) {
-    const keys = verbRowKeys([{ back: true }, ...level.options]);
-    add({ key: keys[0], label: 'Back', back: true, tip: `Back to what you can do with the ${target.label || 'thing'}` }, () => {
+    // A level opened on its own (F's Eat what?, ticket 62) has no verbs to go back to.
+    const off = level.noBack ? 0 : 1;
+    const keys = verbRowKeys(level.noBack ? level.options : [{ back: true }, ...level.options]);
+    if (!level.noBack) add({ key: keys[0], label: 'Back', back: true, tip: `Back to what you can do with the ${target.label || 'thing'}` }, () => {
       renderVerbMenu(target, menuVerbsFor(target));
       placeWorldVerbMenu(target);
       const at = [...list.querySelectorAll('.vm-row')].findIndex((r) => r.dataset.verb === level.verb?.id);
@@ -7316,16 +7319,21 @@ function renderVerbMenu(target, verbs, level = null) {
     menu.dataset.vmPicks = String(cols);
     level.options.forEach((food, i) => {
       const tile = makePickTile(document, {
-        key: keys[i + 1],
+        key: keys[i + off],
         label: food.label,
         have: food.have,
         icon: ITEM_ICONS[food.classTsid] || itemIconUrl(food.classTsid),
         food: food.classTsid,
         verb: `${level.verbId}:${food.classTsid}`,
-        verbLabel: FEED_PICKER_VERB_LABELS[level.verbId] || 'Feed',
+        verbLabel: level.verbLabel || FEED_PICKER_VERB_LABELS[level.verbId] || 'Feed',
+        tip: level.tipFor?.(food, i) || '',
       });
       tile.classList.add('verb-choice');
       tile.addEventListener('click', () => {
+        if (level.onPick) {
+          level.onPick(food);
+          return;
+        }
         closeVerbMenu();
         openFeedPicker(target, level.verb, food.classTsid);
       });
@@ -13886,13 +13894,66 @@ function physics(dt) {
   tickNotices();
 }
 
-function eatApple() {
-  if (countItem(inv, 'apple') < 1) {
-    toast('No apples in pack.');
-    return;
+/**
+ * F (ticket 62, js/eat-pick.js): "Eat what?", the pack's food as the verb menu's pictures over the
+ * avatar, the best food for your energy chosen. Enter (or a click) eats one through the pack's own
+ * Eat (usePackItem: Naraka's gate, fullness, food memory, quests); Esc or F again closes it.
+ */
+const EAT_PICK_CLASS = 'eat-picker';
+function openEatPicker() {
+  if (!state.started || currentAction || !player || player.destroyed) return false;
+  // Decoration Mode hides the avatar the menu hangs from (homes-feature setAvatarHidden).
+  if (features.query('homeEditMode')) return false;
+  const slots = listPackItemSlots(inv);
+  const gate = canEatFood(foodState, pc, energyCap());
+  const dead = features.metabolicGate('energy', 'gain', engine);
+  // Stuffed or dead: food that gives energy cannot go in, so only mood food is offered (as at full energy).
+  const blocked = !gate.ok || !dead.ok;
+  const choices = eatChoices(slots, {
+    info: getItemUseInfo,
+    meta: (cls) => ITEM_CATALOG[cls],
+    buff: (cls) => Boolean(getBuffItemInfo(cls)?.def),
+    energy: blocked ? energyCap() : pc.energy,
+    energyMax: energyCap(),
+  });
+  if (!choices.length) {
+    const anyFood = eatChoices(slots, { info: getItemUseInfo, meta: (cls) => ITEM_CATALOG[cls], buff: (cls) => Boolean(getBuffItemInfo(cls)?.def), energy: 0, energyMax: energyCap() }).length > 0;
+    toast(anyFood ? (!dead.ok ? dead.msg : gate.reason) : EAT_PICK_TEXT.nothing, 2600);
+    if (app?.canvas) app.canvas.dataset.eatPicker = anyFood ? 'refused' : 'nothing';
+    return false;
   }
-  // Same path as the pack's Eat: Naraka's gate, fullness, food memory, quests.
-  usePackItem('apple');
+  closePackPopover();
+  const best = bestFoodIndex(choices);
+  const target = { classId: EAT_PICK_CLASS, label: EAT_PICK_TEXT.title, sprite: player, eatPicker: true };
+  menuTarget = target;
+  const menu = document.getElementById('verb-menu');
+  renderVerbMenu(target, null, {
+    verbId: 'eat',
+    verbLabel: 'Eat',
+    options: choices,
+    noBack: true,
+    title: `Energy ${Math.floor(Number(pc.energy) || 0)}/${energyCap()}`,
+    tipFor: (food, i) => eatTip(food, { best: i === best }),
+    onPick: (food) => {
+      closeVerbMenu();
+      if (app?.canvas) app.canvas.dataset.eatPicker = `ate:${food.classTsid}`;
+      usePackItem(food.classTsid);
+    },
+  });
+  menu.hidden = false;
+  placeWorldVerbMenu(target);
+  menu.querySelectorAll('.vm-pick')[best]?.classList.add('is-best');
+  if (app?.canvas) {
+    app.canvas.dataset.eatPicker = 'open';
+    app.canvas.dataset.eatPickerOptions = choices.map((c) => c.classTsid).join(',');
+    app.canvas.dataset.eatPickerBest = choices[best]?.classTsid || '';
+  }
+  // Deferred, as openVerbMenu does, so the key that opened it never presses the tile.
+  focusVerbRow(menu, best, { focus: false });
+  requestAnimationFrame(() => {
+    if (menuTarget === target && !menu.hidden) focusVerbRow(menu, best);
+  });
+  return true;
 }
 
 function announceQuestCompletions(updates = []) {
@@ -28662,6 +28723,13 @@ async function main() {
     // Verb menu open: let Enter activate the focused choice (native button);
     // Esc already handled. Arrow keys can move between choices.
     if (menuTarget) {
+      // Ticket 62: F again puts Eat what? away.
+      if (menuTarget.eatPicker && isPlainKey(e, 'f')) {
+        e.preventDefault();
+        keys.delete(e.key);
+        if (!e.repeat) closeVerbMenu();
+        return;
+      }
       // VERBS (js/ui/verb-menu.js): Up/Down or W/S move, 1-9 pick, 0 or Backspace go back.
       if (verbMenuKey(document.getElementById('verb-menu'), e)) {
         e.preventDefault();
@@ -28705,7 +28773,13 @@ async function main() {
       if (said) toast(said, 3000);
       return;
     }
-    if (e.key === 'f' || e.key === 'F') eatApple();
+    // Ticket 62: F opens Eat what? (the pack's food, the best one chosen); it ate an apple before.
+    if (!e.repeat && isPlainKey(e, 'f')) {
+      e.preventDefault();
+      keys.delete(e.key);
+      openEatPicker();
+      return;
+    }
     // Austin 2026-11-01: at a post, 1 to 9 take the arm with that number. T no longer travels from a
     // post (2026-11-02, ticket 21: the client had no T there; Enter and E hold the post, SIGNFOCUS).
     if (!e.repeat && !e.shiftKey && signpostArmKey(e.key)) {
@@ -28736,6 +28810,15 @@ async function main() {
     // day, ticket 42): V runs a vendor in reach's own Browse goods; the client had no store key
     // (TSMainView.as: V is only a god build's Q+V render switch, 1916-1921), so this one is ours.
     if (isPlainKey(e, 'v')) vendorKey();
+    // Ticket 62: R opens Report a bug (the Reports sheet, multiplayer: features/bug-report-feature.js), or
+    // closes it. The client had no key for it (GameHeaderUI.as 47-69); R is free in every mode here.
+    if (isPlainKey(e, 'r') && !e.repeat) {
+      const bug = document.getElementById('bug-btn');
+      if (bug && !bug.disabled) {
+        e.preventDefault();
+        bug.click();
+      }
+    }
     if (e.key === 'l' || e.key === 'L') openAvatarPanel();
   });
   // A letter let go after Shift comes up lower case: drop both (G221, Shift+S held then Shift let go).
