@@ -24,6 +24,7 @@
  * <html data-ui="modern">. The pure helpers below are tested without a DOM
  * (tests/imagination-hub.test.js).
  */
+import { focusBack } from './focus-return.js?v=78ab3c0c';
 
 const ART = 'assets/imagination/cards/';
 
@@ -295,7 +296,8 @@ export function mountImaginationHub(doc, { root, actions = {}, tileState = () =>
     win?.removeEventListener?.('keypress', onKey, true);
     const back = opener;
     opener = null;
-    if (restoreFocus && back?.isConnected) back.focus?.({ preventScroll: true });
+    // Back to the opener after a keyboard open and close, to the world after a click (focus-return.js).
+    if (restoreFocus && back?.isConnected) focusBack(back, { doc });
     else if (el.contains(doc.activeElement)) doc.activeElement.blur?.();
     onOpenChange(false);
     publish();

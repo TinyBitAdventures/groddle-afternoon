@@ -31,8 +31,8 @@ import {
 } from '../public/js/home-cultivation.js?v=11616085';
 import { DISPATCHER_TEXT, SIGNPOST, dispatcherDefaultRx, dispatcherFits, signpostX, streetFixtures } from '../public/js/home-street-fixtures.js?v=badcb725';
 import { sceneSignMarks } from '../public/js/ui/street-minimap.js?v=abefc4d6';
-import { HUB_TILES, hubTileBackground, hubTileForKey, hubTileState } from '../public/js/ui/imagination-hub.js?v=fff73f8c';
-import { HUB_CLOUDS, placeClouds } from '../public/js/classic/classic-hub.js?v=264ab19f';
+import { HUB_TILES, hubTileBackground, hubTileForKey, hubTileState } from '../public/js/ui/imagination-hub.js?v=0ca10ad7';
+import { HUB_CLOUDS, placeClouds } from '../public/js/classic/classic-hub.js?v=ba10b4c8';
 
 const root = join(import.meta.dirname, '..');
 const pub = join(root, 'public');

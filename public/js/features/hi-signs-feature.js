@@ -893,6 +893,8 @@ function bindClock(engine) {
   document.body.append(box);
   board = { box, open: false, more: false };
   clock.dataset.hiBoard = '';
+  // A click on the clock leaves the keys with the world (js/ui/focus-return.js), so Space jumps.
+  clock.dataset.clickReleases = '';
   clock.setAttribute('tabindex', '0');
   clock.setAttribute('title', `${clock.getAttribute('title') || ''} (click for the ${BOARD_TEXT.title})`.trim());
   const toggle = () => setBoardOpen(engine, !board.open);

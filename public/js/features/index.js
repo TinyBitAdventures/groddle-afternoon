@@ -37,7 +37,7 @@ import { partySpacesFeature } from './party-spaces-feature.js?v=a29c403b';
 import { seasonsFeature } from './seasons-feature.js?v=972bbf83';
 import { cameraModeFeature } from './camera-mode-feature.js?v=ad1ae5ea';
 import { newxpFeature } from './newxp-feature.js?v=a666e708';
-import { streetMinimapFeature } from './street-minimap-feature.js?v=03127735';
+import { streetMinimapFeature } from './street-minimap-feature.js?v=51667e3d';
 
 export { questFlagsFeature };
 
@@ -94,7 +94,7 @@ import { butlerFeature } from './butler-feature.js?v=032f7f9c'; FEATURES.push(bu
 import { mailCourierFeature } from './mail-courier-feature.js?v=5a167843'; FEATURES.push(mailCourierFeature);
 import { pouchFeature } from './elemental-pouch-feature.js?v=f60e6357'; FEATURES.push(pouchFeature);
 import { bagsFeature } from './bags-feature.js?v=a46d62a7'; FEATURES.push(bagsFeature);
-import { hiSignsFeature } from './hi-signs-feature.js?v=0e127263'; FEATURES.push(hiSignsFeature);
+import { hiSignsFeature } from './hi-signs-feature.js?v=d2725733'; FEATURES.push(hiSignsFeature);
 import { gwendolynRoom23Feature } from './gwendolyn-room-23-feature.js?v=04b68748'; FEATURES.push(gwendolynRoom23Feature);
 import { cubimalRaceFeature } from './cubimal-race-feature.js?v=346c39b8'; FEATURES.push(cubimalRaceFeature);
 import { symphoniousMaximusFeature } from './symphonious-maximus-feature.js?v=9fca63b1'; FEATURES.push(symphoniousMaximusFeature);
@@ -149,7 +149,7 @@ import { playerMailFeature } from './player-mail-feature.js?v=6efb7f52'; FEATURE
 import { followMpFeature } from './follow-mp-feature.js?v=e5a26e1b'; FEATURES.push(followMpFeature);
 import { hogHaulMpFeature } from './hog-haul-mp-feature.js?v=bd99708a'; FEATURES.push(hogHaulMpFeature);
 import { dropsMpFeature } from './drops-mp-feature.js?v=793f04cd'; FEATURES.push(dropsMpFeature);
-import { bugReportFeature } from './bug-report-feature.js?v=d255306a'; FEATURES.push(bugReportFeature);
+import { bugReportFeature } from './bug-report-feature.js?v=5b815247'; FEATURES.push(bugReportFeature);
 import { playerVerbsMpFeature } from './player-verbs-mp-feature.js?v=ace410c8'; FEATURES.push(playerVerbsMpFeature);
 import { snapsFeature } from './snaps-feature.js?v=e383d31d'; FEATURES.push(snapsFeature);
 import { homeStreetMpFeature } from './home-street-mp-feature.js?v=a154036b'; FEATURES.push(homeStreetMpFeature);

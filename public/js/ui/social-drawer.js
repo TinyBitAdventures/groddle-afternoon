@@ -459,7 +459,8 @@ export function mountSocialDrawer({
       'aria-keyshortcuts': '/',
       title: online ? 'Open social (/)' : 'Open activity (/)',
     }, 'expand', 0);
-    expand.addEventListener('click', () => setOpen(true, { chosen: true, focus: 'tab' }));
+    // Ticket 37: a click never takes the keyboard; from the keyboard (detail 0) the keys follow.
+    expand.addEventListener('click', (e) => setOpen(true, { chosen: true, focus: e.detail === 0 ? 'tab' : null }));
     items.push(expand, el('span', { class: 'social-sep', 'aria-hidden': 'true' }));
     // The same tabs as the row; Chats is one button with the total of its conversations, and it
     // opens the list (the conversation with news is at the top of its section there).
@@ -472,9 +473,9 @@ export function mountSocialDrawer({
         'aria-label': n ? `${label}, ${n} new` : label,
         title: label,
       }, id === CHATS_TAB ? 'chats' : t.icon, n);
-      b.addEventListener('click', () => {
+      b.addEventListener('click', (e) => {
         select(id);
-        setOpen(true, { chosen: true, focus: 'log' });
+        setOpen(true, { chosen: true, focus: e.detail === 0 ? 'log' : null });
       });
       items.push(b);
     }
@@ -858,7 +859,7 @@ export function mountSocialDrawer({
   // —— Wiring ——
   collapseBtn.setAttribute('aria-label', online ? 'Collapse the social drawer' : 'Collapse the activity log');
   collapseBtn.title = 'Collapse';
-  collapseBtn.addEventListener('click', () => setOpen(false, { chosen: true, focus: 'rail' }));
+  collapseBtn.addEventListener('click', (e) => setOpen(false, { chosen: true, focus: e.detail === 0 ? 'rail' : null }));
   presence.addEventListener('click', () => select('buddies', { focus: true }));
 
   /** Back from a conversation to the Chats list; `focus` puts the keyboard on its row there. */

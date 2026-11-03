@@ -22,10 +22,11 @@
  */
 import { CLASSIC, MODERN, onUiModeChange, setUiMode, setUiSize, uiState } from './ui-mode.js?v=587c014a';
 import { CLASSIC_MIN_W, CLASSIC_MIN_H } from './classic-layout.js?v=299eef68';
-import { installClassicChrome } from './classic-chrome.js?v=33cc5d67';
+import { installClassicChrome } from './classic-chrome.js?v=0d8956d3';
 import { ZOOM_KEYS_HINT, clampZoom, onZoomChange, setWorldZoom, worldZoom, zoomLabel, zoomValueText } from '../world-zoom.js?v=b262a6c7';
 import { NIGHT_TINT_HINT, NIGHT_TINT_LABEL, nightTintOn, onNightTintChange, setNightTint } from '../night-tint.js?v=1dfc9c89';
 import { STREET_MAP_HINT, STREET_MAP_LABEL, onStreetMapChange, setStreetMap, streetMapOn } from '../ui/street-minimap.js?v=abefc4d6';
+import { focusBack } from '../ui/focus-return.js?v=78ab3c0c';
 
 export const PREFS_TITLE = 'Preferences';
 
@@ -208,7 +209,8 @@ export function createPreferences(doc) {
       shade.hidden = true;
       const back = returnFocus;
       returnFocus = null;
-      if (back && typeof back.focus === 'function' && back.isConnected) back.focus({ preventScroll: true });
+      // The opener after a keyboard open and close, the world after a click (focus-return.js).
+      if (back && typeof back.focus === 'function' && back.isConnected) focusBack(back, { doc });
     },
     toggle() {
       if (api.isOpen()) api.close();

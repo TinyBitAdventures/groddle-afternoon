@@ -10,11 +10,13 @@
  * - while a side sheet is open, --inset-l on the root is the width it takes plus its gap, as the
  *   Social drawer sets --inset-r, so the pack and the notices centre in the width that is left;
  *   the root has data-sheet="<id>" (the pinned quest tracker steps right, beside the sheet);
- * - a sheet that opens takes focus on its title, and gives it back to what opened it on close;
+ * - a sheet that opens takes focus on its title, and gives it back on close: to what opened it
+ *   after a keyboard open and close, to the world after a mouse or touch one (focusBack);
  * - tabs (role=tab in a role=tablist) move with the arrow keys, Home and End.
  *
  * QA: canvas data uiSheet (the open side sheet's id, or ""), uiSheetInset (its --inset-l px).
  */
+import { focusBack } from './focus-return.js?v=78ab3c0c';
 
 /**
  * @param {{ root: HTMLElement, sheets: { id: string, kind?: 'side'|'center', close?: () => void }[],
@@ -80,9 +82,9 @@ export function mountPanelShell({ root, sheets, setData = () => {}, onChange = (
     openers.delete(id);
     const e = el(id);
     const active = doc.activeElement;
-    if (opener?.isConnected && (!active || active === doc.body || e?.contains(active))) {
-      opener.focus?.({ preventScroll: true });
-    }
+    // Back to what opened it after a keyboard open and close; after a mouse or touch open (or a
+    // close by the pointer) the world gets the keys, so Space jumps (js/ui/focus-return.js focusBack).
+    if (!active || active === doc.body || e?.contains(active)) focusBack(opener?.isConnected ? opener : null, { doc });
     if (openSide === id) openSide = '';
   }
 

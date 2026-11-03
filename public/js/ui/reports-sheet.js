@@ -41,6 +41,7 @@
  */
 
 import { REPORT_FILTER_MIN, REPORT_MAX, REPORT_TEXT as T, STATUS_WORDS, canEditFirst, matchesReport, pictureRefused, pictureSrc, refusalWords, ticketLine, unreadCount, whenWords } from '../reports.js?v=75f4a7cc';
+import { focusBack } from './focus-return.js?v=78ab3c0c';
 
 /** How long Send waits for a picture still drawing before it sends the world-only one (ms). */
 export const PICTURE_WAIT_MS = 6000;
@@ -422,7 +423,9 @@ export function mountReportsSheet({ doc = globalThis.document, host, api, contex
     state = 'closed';
     panel.hidden = true;
     publish();
-    opener()?.focus?.();
+    // The Report a bug button after a keyboard open and close, the world after a click (focus-return.js).
+    const back = opener();
+    if (back) focusBack(back, { doc });
   }
 
   function backToList() {

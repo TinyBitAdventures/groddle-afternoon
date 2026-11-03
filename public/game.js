@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=862128f3';
 import { createFeatureHost } from './js/feature-host.js?v=903263a4';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=6c36987a';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=29131e8f';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -723,7 +723,7 @@ import { worldZoom, setWorldZoom, stepWorldZoom, onZoomChange, zoomKeyAction, zo
 import { nightTint, nightTintOn, onNightTintChange, worldTintOpacity } from './js/night-tint.js?v=1dfc9c89';
 import { streetMapSetting, toggleStreetMap } from './js/ui/street-minimap.js?v=abefc4d6';
 import './js/classic/classic-zoom.js?v=1ef4b9a5';
-import { mountImaginationHub } from './js/ui/imagination-hub.js?v=fff73f8c';
+import { mountImaginationHub } from './js/ui/imagination-hub.js?v=0ca10ad7';
 import { newDayBubble, shuffleNewDayMessages, waitForScreenGates } from './js/screen-queue.js?v=cf0132c0';
 import { applyFamiliarLook, familiarCardHeading, familiarLook, skillArtFor, skillLearnedActivity } from './js/familiar.js?v=c7e902af';
 import { armPromptTimeout, promptTimeoutMs } from './js/prompt-timeout.js?v=c13ee4f6';
@@ -912,17 +912,17 @@ import { installHiresIcons } from './js/icon-hires.js?v=5b68aeaa';
 import { installHiresDecos } from './js/deco-hires.js?v=cb905e17';
 import { loadAudioLevels, loadMutedPreference, saveAudioLevel, saveMutedPreference } from './js/audio-pref.js?v=6fe817bc';
 import { createAudioBuses, fadeGain } from './js/audio-buses.js?v=af167b54';
-import { installTopBar, renderTopBar } from './js/ui/topbar.js?v=bd95d674';
-import { installFocusReturn } from './js/ui/focus-return.js?v=8885653a';
+import { installTopBar, renderTopBar } from './js/ui/topbar.js?v=7c080e30';
+import { focusBack, installFocusReturn, lastInput } from './js/ui/focus-return.js?v=78ab3c0c';
 import { QUOIN_FRAME_BOB, advanceQuoinClock, quoinBobBetweenFrames } from './js/quoin-motion.js?v=ea0bd408';
 import { installHiresFirstDraw, installHiresSprites, upgradeSource } from './js/sprite-hires.js?v=96c22af7';
 import { denseSprite } from './js/sprite-dense.js?v=178a711b';
 import { wholeStatAmounts, wholeEffects } from './js/stat-text.js?v=f96d8fd3';
 import { createNotifier, effectTokens, floatKey, offerCardDrop, stackFloat, tokenText } from './js/notify.js?v=d85330ff';
 import { mountNotifyView } from './js/notify-view.js?v=81d06119';
-import { mountSocialDrawer } from './js/ui/social-drawer.js?v=486bc349';
+import { mountSocialDrawer } from './js/ui/social-drawer.js?v=a0048e58';
 import { bindDragScroll } from './js/ui/drag-scroll.js?v=9a527ac8';
-import { SIDE_SHEET_IDS, bindTabs, inSideSheet, mountPanelShell, sheetKeyToWorld } from './js/ui/panel-shell.js?v=b984b886';
+import { SIDE_SHEET_IDS, bindTabs, inSideSheet, mountPanelShell, sheetKeyToWorld } from './js/ui/panel-shell.js?v=0ee0fd51';
 import { createQuestSheet, questStep } from './js/ui/quest-sheet.js?v=4d6b1340';
 import { createQuestTracker } from './js/ui/quest-tracker.js?v=76c0a782';
 import { bindCountField, countKeyValue, countStepMarkup } from './js/ui/count-chooser.js?v=893305c8';
@@ -949,7 +949,7 @@ import { itemZ } from './js/item-bands.js?v=e98b10bc';
 import { SLUG_ANIMATION, SLUG_LAYOUT, SLUG_STYLES, SLUG_TARGETS, drawSlugIcon, formatRawSlugs, formatSlugList, layoutSlugRow, slugBox, slugNumber, slugPillPath, slugSign, speechSlugList } from './js/speech-slugs.js?v=130338f9';
 import { filterText } from './js/word-filter.js?v=9a7a7ebb'; // the remake's own word filter
 // The interface skin (js/classic/ui-mode.js) sets <html data-ui> as it loads: before main(), so before the boot cover lifts.
-import { installInterfaceSettings } from './js/classic/classic-prefs.js?v=e91704d1';
+import { installInterfaceSettings } from './js/classic/classic-prefs.js?v=8f44b336';
 
 /** @type {object|null} assets/maps/index.json */
 let mapIndexCache = null;
@@ -1387,7 +1387,8 @@ function installMoreMenu() {
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && !list.hidden) {
       setOpen(false);
-      btn.focus();
+      // The Menu button after a keyboard open, the world after a click (js/ui/focus-return.js).
+      focusBack(btn);
     }
   });
 }
@@ -1576,12 +1577,12 @@ function installVitalsMenu() {
   menu.setAttribute('role', 'dialog');
   menu.setAttribute('aria-label', 'Something from your pack');
   bar.appendChild(menu);
-  const close = (focusBack = false) => {
+  const close = (back = false) => {
     if (menu.hidden) return;
     menu.hidden = true;
     menu.dataset.key = '';
     vitalsMenuPill?.setAttribute('aria-expanded', 'false');
-    if (focusBack) vitalsMenuPill?.focus();
+    if (back && vitalsMenuPill) focusBack(vitalsMenuPill);
     vitalsMenuFor = null;
   };
   const open = (stat, pill) => {
@@ -1668,7 +1669,7 @@ function installPlayerMenu() {
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && !menu.hidden) {
       setOpen(false);
-      btn.focus();
+      focusBack(btn);
     }
   });
 }
@@ -4614,7 +4615,8 @@ function renderPackRow(box, slots, opts = {}) {
       // G152: clicking a bag opens or closes it (one at a time); its opener strip opens its Options.
       if (s.bag && !event.target?.closest?.('[data-pack-opener]')) {
         closePackPopover();
-        packTrayFocusOnOpen = true;
+        // From the keyboard the tray takes the keys; a click leaves them with the world (Space jumps).
+        packTrayFocusOnOpen = event.detail === 0;
         features.query('packToggleBag', s.bag.key, engine);
         playSound('CLICK_SUCCESS', { volume: 0.4 });
         updateHud();
@@ -4795,14 +4797,15 @@ function renderOpenBagRow(layout, openKey) {
       if (packSelected === box.cls && isPackPopoverOpen()) closePackPopover();
       else renderPackPopover(box.cls, document.querySelector(`.pack-slot[data-pack-bag="${box.key}"]`));
     },
-    onClose: () => closePackTray({ focusBag: true }),
+    // Its close button: back on the bag from the keyboard, the world after a click (js/ui/focus-return.js).
+    onClose: () => closePackTray({ focusBag: lastInput() !== 'pointer' }),
   });
   if (tray?.slots) renderPackRow(tray.slots, entries, rowOpts);
   if (tray) packRow.settleTray(tray, bagEl, { focusOnOpen: packTrayFocusOnOpen });
   packTrayFocusOnOpen = false;
 }
 
-/** The next tray drawn takes the focus (a keyboard or pointer open of its bag), not one restored from the save. */
+/** The next tray drawn takes the focus (a keyboard open of its bag), not one restored from the save or opened by a click. */
 let packTrayFocusOnOpen = false;
 
 /** Close the open bag's tray (Escape, a click elsewhere, its close button). */

@@ -3,7 +3,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { releasesFocus, installFocusReturn } from '../public/js/ui/focus-return.js?v=8885653a';
+import { releasesFocus, installFocusReturn } from '../public/js/ui/focus-return.js?v=78ab3c0c';
 
 /** A tiny element: closest() over a chain of selectors it matches. */
 function node(matches, parent = null) {

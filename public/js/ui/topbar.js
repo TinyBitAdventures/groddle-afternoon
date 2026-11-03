@@ -21,6 +21,7 @@ import { loadAudioRestore, saveAudioRestore } from '../audio-pref.js?v=6fe817bc'
 import { ZOOM_KEYS_HINT, clampZoom, zoomLabel, zoomValueText } from '../world-zoom.js?v=b262a6c7';
 import { NIGHT_TINT_HINT, NIGHT_TINT_LABEL } from '../night-tint.js?v=1dfc9c89';
 import { STREET_MAP_HINT, STREET_MAP_LABEL } from './street-minimap.js?v=abefc4d6';
+import { focusBack } from './focus-return.js?v=78ab3c0c';
 
 /** The Menu's groups, in the mock's order; Social shows only when something is in it. */
 export const MENU_GROUPS = Object.freeze([
@@ -271,11 +272,12 @@ function popover(doc, btn, pop, { onOpen } = {}) {
     left = Math.max(bar.left + 4, Math.min(right - w - 4, left));
     pop.style.left = `${Math.round(left - bar.left)}px`;
   };
-  const close = (focusBack = false) => {
+  const close = (back = false) => {
     if (!isOpen()) return;
     pop.hidden = true;
     btn.setAttribute('aria-expanded', 'false');
-    if (focusBack) btn.focus();
+    // Esc: back to the button after a keyboard open, to the world after a click (focus-return.js).
+    if (back) focusBack(btn, { doc });
   };
   const open = () => {
     pop.hidden = false;

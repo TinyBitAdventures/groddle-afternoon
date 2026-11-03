@@ -29,6 +29,7 @@
  */
 import { uiState, onUiModeChange, readUiCache, writeUiCache } from './ui-mode.js?v=587c014a';
 import { classicArtUrl } from './classic-art.js?v=5745e669';
+import { focusBack } from '../ui/focus-return.js?v=78ab3c0c';
 
 /** The clouds, in the client's two rows (ImgMenuView.as 343-415). */
 export const HUB_CLOUDS = Object.freeze([
@@ -240,7 +241,8 @@ function createHub(doc, win, { engine = null, avatarPortrait = null } = {}) {
       doc.querySelector('.top-bar .hud-img')?.classList.remove('is-hub-open');
       const back = returnFocus;
       returnFocus = null;
-      if (back?.isConnected && typeof back.focus === 'function') back.focus({ preventScroll: true });
+      // The opener after a keyboard open and close, the world after a click (focus-return.js).
+      if (back?.isConnected && typeof back.focus === 'function') focusBack(back, { doc });
     },
     toggle() { if (api.isOpen()) api.close(); else api.open(); },
     /** QA: the cloud pictures now ({ home, world, looks } data URLs or null), and a fresh world snapshot. */
