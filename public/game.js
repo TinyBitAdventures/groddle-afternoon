@@ -927,6 +927,7 @@ import { bindDragScroll } from './js/ui/drag-scroll.js?v=9a527ac8';
 import { SIDE_SHEET_IDS, bindTabs, inSideSheet, mountPanelShell, sheetKeyToWorld } from './js/ui/panel-shell.js?v=3d10b1e5';
 import { createQuestSheet, questStep } from './js/ui/quest-sheet.js?v=4d6b1340';
 import { createQuestTracker } from './js/ui/quest-tracker.js?v=76c0a782';
+import { isPinMenuKey as isMenuKey } from './js/ui/quest-pin-menu.js?v=7e50df06';
 import { bindCountField, countKeyValue, countStepMarkup } from './js/ui/count-chooser.js?v=893305c8';
 import { bindVerbMenu, focusVerbRow, lockVerbMenuSize, makePickTile, makeVerbRow, pickGridCols, placeVerbMenu, plainWords, refuseVerbRow, syncVerbDetail, verbMenuKey, verbRowAttrs, verbRowInner, verbRowKeys } from './js/ui/verb-menu.js?v=74b6dfa0';
 import { createPromptSettler, promptId } from './js/prompt-settle.js?v=509ba9cc';
@@ -4617,6 +4618,12 @@ function renderPackRow(box, slots, opts = {}) {
       slot.appendChild(wear);
     }
     slot.addEventListener('click', (event) => {
+      // A Mac's Ctrl+click opened the bag's Options (contextmenu below): that is not a click on the bag.
+      if (s.bag && Date.now() < packBagSwallowClickUntil) {
+        packBagSwallowClickUntil = 0;
+        event.preventDefault();
+        return;
+      }
       if (currentAction) cancelCurrentAction({ quiet: true });
       // G152: clicking a bag opens or closes it (one at a time); its opener strip opens its Options.
       if (s.bag && !event.target?.closest?.('[data-pack-opener]')) {
@@ -4648,6 +4655,24 @@ function renderPackRow(box, slots, opts = {}) {
         if (MODERN_UI && event.detail === 0) focusVerbRow(document.getElementById('pack-popover'));
       }
     });
+    if (s.bag) {
+      // Austin 2026-11-03: right-click (Ctrl+click on a Mac) on a bag's own slot, or the Menu key or
+      // Shift+F10 with it focused, opens its Options: the menu its tray's "..." opens (Rename, Give,
+      // auctions, Drop and its description), in either skin. A left click still opens the bag, a drag
+      // still moves it, and a long press on touch still lifts it to drag (setupPackDrops).
+      slot.addEventListener('contextmenu', (event) => {
+        if (event.pointerType === 'touch' || event.pointerType === 'pen') return;
+        event.preventDefault();
+        if (Date.now() < packBagMenuEchoUntil && isPackPopoverOpen() && packSelectedBag === s.bag.key) return;
+        openPackBagOptions(s, slot, { swallowClick: event.ctrlKey === true && event.button === 0 });
+      });
+      slot.addEventListener('keydown', (event) => {
+        if (!isMenuKey(event)) return;
+        event.preventDefault();
+        event.stopPropagation();
+        openPackBagOptions(s, slot, { keys: true });
+      });
+    }
     if (canDragToVendor || inLayout) {
       slot.addEventListener('dragstart', (event) => {
         packDrag = inLayout ? { container: s.container, index: s.index, cls: s.classTsid, bag: s.bag?.key || '' } : null;
@@ -4813,6 +4838,25 @@ function renderOpenBagRow(layout, openKey) {
 
 /** The next tray drawn takes the focus (a keyboard open of its bag), not one restored from the save or opened by a click. */
 let packTrayFocusOnOpen = false;
+
+/** The contextmenu event the Menu key sends after its keydown already opened a bag's Options. */
+let packBagMenuEchoUntil = 0;
+/** The click a Mac sends after a Ctrl+click opened a bag's Options (it is not a click on the bag). */
+let packBagSwallowClickUntil = 0;
+
+/**
+ * A bag slot's Options (its right-click, the Menu key or Shift+F10): the same pack popover the open
+ * tray's Options button shows, on that bag (its slot's key names the bag Rename renames). Opened from
+ * the keys, its first row takes the focus, as a keyboard Enter on any stack does.
+ */
+function openPackBagOptions(s, slot, { keys = false, swallowClick = false } = {}) {
+  if (currentAction) cancelCurrentAction({ quiet: true });
+  renderPackPopover(s.classTsid, slot);
+  packBagMenuEchoUntil = Date.now() + 1000;
+  if (swallowClick) packBagSwallowClickUntil = Date.now() + 700;
+  if (app?.canvas) app.canvas.dataset.packBagMenu = isPackPopoverOpen() ? s.bag.key : '';
+  if (keys && MODERN_UI) focusVerbRow(document.getElementById('pack-popover'));
+}
 
 /** Close the open bag's tray (Escape, a click elsewhere, its close button). */
 function closePackTray({ focusBag = false } = {}) {
