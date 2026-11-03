@@ -1315,100 +1315,281 @@ function makePlaceholder(PIXI, deco, pos) {
   return g;
 }
 
-/** A 1 x 32 ramp of one colour from clear to opaque. */
-function fadeTexture(PIXI, colour) {
-  const canvas = document.createElement('canvas');
-  canvas.width = 1;
-  canvas.height = 32;
-  const ctx = canvas.getContext('2d');
-  const hex = `#${colour.toString(16).padStart(6, '0')}`;
-  const grad = ctx.createLinearGradient(0, 0, 0, 32);
-  grad.addColorStop(0, `${hex}00`);
-  grad.addColorStop(1, `${hex}ff`);
-  ctx.fillStyle = grad;
-  ctx.fillRect(0, 0, 1, 32);
-  return PIXI.Texture.from(canvas);
+/**
+ * The ground skirt (Austin 2026-11-02, "a nicer fill"). The 2012 client never showed below a
+ * street: CameraMan.as 451-453 bounds the camera at limit_b = loc.b - loc_vp_h/2, and its
+ * viewport stopped above a separate pack strip (TSMainView.as 1229-1243), as Classic still lays
+ * out. The Modern UI's world fills the window and the pack floats over it, so the canvas shows
+ * below bounds.b. That strip is filled with the street's own bottom band, mirrored down from the
+ * bottom edge (then laid on alternately the right way up and mirrored again, so its rows always
+ * meet) and darkening into one colour, so it reads as more ground. Before, the bottom row was
+ * stretched down, which drew vertical streaks over a flat band (Cebarkul).
+ *
+ * The band is short: a 160 px band took in the grass on top of Cebarkul's lowest ledge, its owl
+ * and the eyes in its burrows, and the mirror read as a lake's reflection, not as soil (72 still
+ * caught the grass).
+ */
+export const SKIRT_BAND = 56;
+/** The darkening runs this deep below the edge; under it the fade colour carries on alone. */
+export const SKIRT_FADE_DEPTH = 140;
+/** How dark the band's average gets at the skirt's bottom (the street's own ground, deeper). */
+export const SKIRT_DEEP_SHADE = 0.55;
+
+/** PURE: how many world px above the street's bottom are mirrored below it (SKIRT_BAND, never more than the skirt or the street). */
+export function skirtBandHeight(depth, sourceH) {
+  const d = Math.ceil(Number(depth) || 0);
+  if (d <= 0) return 0;
+  return Math.max(0, Math.min(SKIRT_BAND, d, Math.floor(Number(sourceH) || 0)));
 }
 
 /**
- * Fill the strip under a street's bottom edge (street art ends at bounds.b;
- * the camera can show up to MIN_GROUND_CLEARANCE below it, and the canvas
- * runs on under the overlaid pack). The middleground's last row is stretched
- * down and fades into a fill of its average colour, so the ground carries on
- * instead of showing the sky gradient's bottom colour.
+ * PURE: the copies of the band down the skirt, from the edge: [{ y, flip }], y the copy's top.
+ * The first is mirrored (its bottom row meets the edge), the next the right way up (meeting the
+ * first's bottom row), and so on, until the skirt's depth is covered.
  */
-function buildGroundSkirt(PIXI, renderer, root, lc, W, sourceH, depthPx, fallback) {
+export function skirtTiles(depth, band) {
+  const d = Math.ceil(Number(depth) || 0);
+  const b = Math.floor(Number(band) || 0);
+  if (d <= 0 || b <= 0) return [];
+  const out = [];
+  for (let k = 0; k * b < d; k++) out.push({ y: k * b, flip: k % 2 === 0 });
+  return out;
+}
+
+/** A layer that slides this far or less against the ground over the whole street goes into the band. */
+export const SKIRT_SLIDE_MAX = 160;
+
+/**
+ * PURE: where a layer is drawn in the band, or null when it is left out. The middleground and
+ * layers with no canvas size use street coordinates, and a parallax layer the street's own size
+ * has a zero offset at every camera (parallaxLayerOffset: camX + camX/(W-vpW) x (vpW - W) = 0):
+ * both are fixed to the ground (Hechey Track's `middleplus` dirt, The Great Hole to Ix's).
+ * A layer of another size slides against the ground by W - w over the whole street, and its
+ * bottom meets the street's bottom when the camera is at the bottom (y = H - h). One close to the
+ * street's size (SKIRT_SLIDE_MAX: Matsya's dark front rocks, 100 px) is drawn where it is with the
+ * camera mid-street, so the mirror is off by at most half that slide at the street's ends; it
+ * has to be in, or the light layer it hides would show in the mirror. One that slides further
+ * (a 6500 px foreground of tall trees on a 6000 px street) is left out: a still copy of it would
+ * come apart from it at the seam, and its own art goes on drawing over the skirt.
+ */
+export function skirtGroundOffset(layer, W, sourceH) {
+  if (!layer) return null;
+  if (layer.id === 'middleground' || !(layer.w > 0 && layer.h > 0)) return { x: 0, y: 0 };
+  const slideX = W - layer.w;
+  const slideY = sourceH - layer.h;
+  if (Math.abs(slideX) < 1 && Math.abs(slideY) < 1) return { x: 0, y: 0 };
+  if (Math.abs(slideX) > SKIRT_SLIDE_MAX || Math.abs(slideY) > SKIRT_SLIDE_MAX / 2) return null;
+  return { x: slideX / 2, y: slideY };
+}
+
+const channels = (c) => [(c >> 16) & 255, (c >> 8) & 255, c & 255];
+const luma = (c) => {
+  const [r, g, b] = channels(c);
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+};
+/** PURE: a colour scaled towards black (k 1 keeps it, 0 is black). */
+export function shadeColour(colour, k) {
+  const [r, g, b] = channels(colour).map((v) => Math.max(0, Math.min(255, Math.round(v * k))));
+  return (r << 16) | (g << 8) | b;
+}
+
+/**
+ * PURE: the colour the skirt fades into. The street's gradient bottom when it is darker than its
+ * ground (Naraka's black and dark red, a deep sea), else the band's average darkened
+ * (SKIRT_DEEP_SHADE): a pale sky bottom under the ground read as the band of sky colour that
+ * 989 streets once showed there. No band average (the read failed): the fallback, which is the
+ * gradient bottom or the meadow green (black stays black, ticket 39).
+ */
+export function skirtFadeColour(bandAverage, gradientBottom, fallback) {
+  const sky = Number.isFinite(gradientBottom) ? gradientBottom : null;
+  if (!Number.isFinite(bandAverage)) return Number.isFinite(fallback) ? fallback : sky ?? 0x6b8f3c;
+  const deep = shadeColour(bandAverage, SKIRT_DEEP_SHADE);
+  return sky !== null && luma(sky) <= luma(deep) ? sky : deep;
+}
+
+/**
+ * PURE: the overlays over the mirrored ground, from the seam (at 0) to SKIRT_FADE_DEPTH (at 1):
+ * `shade` is a thin black line that softens the mirror line, `fade` the fade colour's opacity,
+ * eased so the mirrored ground stays readable at the seam and is gone at the foot.
+ */
+export function skirtFadeStops() {
+  return {
+    shade: [{ at: 0, alpha: 0.26 }, { at: 0.02, alpha: 0.12 }, { at: 0.06, alpha: 0 }],
+    fade: [{ at: 0, alpha: 0.28 }, { at: 0.12, alpha: 0.55 }, { at: 0.3, alpha: 0.78 }, { at: 0.55, alpha: 0.92 }, { at: 1, alpha: 1 }],
+  };
+}
+
+/** A 1 x 64 ramp of one colour at the given stops' opacities. */
+function rampTexture(PIXI, colour, stops) {
+  const canvas = document.createElement('canvas');
+  canvas.width = 1;
+  canvas.height = 64;
+  const ctx = canvas.getContext('2d');
+  const [r, g, b] = channels(colour);
+  const grad = ctx.createLinearGradient(0, 0, 0, 64);
+  for (const s of stops) grad.addColorStop(s.at, `rgba(${r},${g},${b},${s.alpha})`);
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, 1, 64);
+  return PIXI.Texture.from(canvas);
+}
+
+/** The mirrored band's texture budget: its resolution drops for a very wide street. */
+const SKIRT_BYTES = 24 * 1024 * 1024;
+
+/**
+ * Fill the strip under a street's bottom edge (street art ends at bounds.b; the camera can show
+ * up to MIN_GROUND_CLEARANCE below it, and the canvas runs on under the overlaid pack). The
+ * ground layers' bottom band (skirtGroundOffset) is rendered once into one texture per chunk
+ * (4096 px, fewer on a small GPU), laid down the skirt (skirtTiles), shaded at the seam and faded
+ * into skirtFadeColour, then that colour runs on to the skirt's foot. The strip sits just under
+ * the middleground, so the middleground's and the front layers' real art below bounds.b (The
+ * Great Hole to Ix's dirt and trunks) still draws over it.
+ */
+function buildGroundSkirt(PIXI, renderer, root, grounds, W, sourceH, depthPx, gradientBottom, fallback) {
   const depth = Math.ceil(depthPx);
-  if (!lc || depth <= 0 || W <= 0) return;
-  const ROWS = 3;
-  const CHUNK = 4096;
+  const main = grounds.find((lc) => lc.label === 'middleground') || grounds[0];
+  if (!main || depth <= 0 || W <= 0) return;
+  const band = skirtBandHeight(depth, sourceH);
   const build = () => {
-    if (lc.destroyed || root.destroyed) return;
+    if (root.destroyed || grounds.some((lc) => lc.destroyed)) return;
+    const t0 = performance.now();
     const strip = new PIXI.Container();
-    strip.zIndex = lc.zIndex - 1;
-    const fill = new PIXI.Graphics();
-    strip.addChild(fill);
+    // Just under the middleground, as before: its art and every front layer's (game.js
+    // syncStreetFront) draw over the strip where they run below bounds.b; the back layers' art
+    // down there stays hidden (Matsya's light glow, which the front rocks cover above the edge).
+    strip.zIndex = main.inFront ? -1 : main.zIndex - 1;
+    strip.label = 'ground-skirt';
+    const textures = [];
+    const maxTex = maxTextureSizeOf(renderer) || 4096;
+    let res = Math.min(2, renderer.resolution || 1);
+    while (res > 0.5 && W * band * res * res * 4 > SKIRT_BYTES) res /= 1.25;
+    const chunkW = Math.max(256, Math.min(4096, Math.floor(maxTex / res)));
+    // Pixi 8 drops the filters of the container it renders (and makes it a render group), so
+    // the layers render inside a throwaway parent: their colour filters apply as on screen.
+    // Each goes back to its parent at its index, at its own position.
+    const homes = grounds.map((lc) => ({ lc, parent: lc.parent, index: lc.parent ? lc.parent.getChildIndex(lc) : -1, x: lc.x, y: lc.y }));
+    const shell = new PIXI.Container();
+    shell.sortableChildren = true;
+    for (const h of homes) {
+      shell.addChild(h.lc);
+      const at = skirtGroundOffset(h.lc.skirtLayer, W, sourceH) || { x: 0, y: 0 };
+      h.lc.x = at.x;
+      h.lc.y = at.y;
+    }
+    // A blurred layer draws baked tiles, made as the camera nears them (or 250 ms after load):
+    // bake the ones the band crosses now.
+    for (const lc of grounds) {
+      const blurred = lc.blurLayer;
+      if (!blurred || !root.blurStats) continue;
+      // The band in the layer's own coordinates.
+      const y1 = sourceH - (skirtGroundOffset(lc.skirtLayer, W, sourceH)?.y || 0);
+      for (const tile of blurred.tiles) {
+        if (tile.y < y1 && tile.y + tile.h > y1 - Math.max(band, 24)) bakeBlurTile(tile, root.blurStats);
+      }
+    }
+    // Decos culled for the camera still belong in the band.
+    const culled = [];
+    for (const lc of grounds) for (const child of lc.children) if (child.culled) culled.push(child);
+    for (const child of culled) child.culled = false;
     let r = 0;
     let g = 0;
     let b = 0;
     let n = 0;
-    for (let x0 = 0; x0 < W; x0 += CHUNK) {
-      const w = Math.min(CHUNK, Math.ceil(W - x0));
-      const rt = PIXI.RenderTexture.create({ width: w, height: ROWS });
-      // Pixi 8 drops the filters of the container it renders (and makes it a
-      // render group), so render the layer inside a throwaway parent: its live
-      // colour filter and local transform apply as they did in Pixi 7.
-      const parent = lc.parent;
-      const index = parent ? parent.getChildIndex(lc) : -1;
-      const shell = new PIXI.Container();
-      shell.addChild(lc);
-      // Decos culled for the camera still belong in the strip.
-      const culled = lc.children.filter((child) => child.culled);
-      for (const child of culled) child.culled = false;
-      renderer.render({ container: shell, target: rt, transform: new PIXI.Matrix(1, 0, 0, 1, -x0, -(sourceH - ROWS)), clear: true });
-      for (const child of culled) child.culled = true;
-      if (parent) parent.addChildAt(lc, index);
-      shell.destroy();
+    const mirrors = [];
+    const top = sourceH - band;
+    for (let x0 = 0; x0 < W; x0 += chunkW) {
+      const w = Math.min(chunkW, Math.ceil(W - x0));
+      if (band > 0) {
+        const rt = PIXI.RenderTexture.create({ width: w, height: band, resolution: res });
+        renderer.render({ container: shell, target: rt, transform: new PIXI.Matrix(1, 0, 0, 1, -x0, -top), clear: true });
+        textures.push(rt);
+        for (const tile of skirtTiles(depth, band)) {
+          const spr = new PIXI.Sprite(rt);
+          spr.x = x0;
+          if (tile.flip) {
+            // Upside down: the band's bottom row (the art right at the edge) meets the copy above.
+            spr.scale.y = -1;
+            spr.y = sourceH + tile.y + band;
+          } else {
+            spr.y = sourceH + tile.y;
+          }
+          mirrors.push(spr);
+        }
+      }
+      // The band's average colour from an eighth-size copy (one small read per chunk).
+      const sw = Math.max(1, Math.ceil(w / 8));
+      const sh = Math.max(1, Math.ceil(Math.max(band, 24) / 8));
+      const small = PIXI.RenderTexture.create({ width: sw, height: sh, resolution: 1 });
+      renderer.render({ container: shell, target: small, transform: new PIXI.Matrix(1 / 8, 0, 0, 1 / 8, -x0 / 8, -(sourceH - Math.max(band, 24)) / 8), clear: true });
       try {
-        const { pixels: px } = renderer.extract.pixels(rt);
-        for (let i = 0; i < px.length; i += 16) {
+        const { pixels: px } = renderer.extract.pixels(small);
+        for (let i = 0; i < px.length; i += 4) {
           const a = px[i + 3];
           if (a < 200) continue;
-          // Pixi 7's extract un-premultiplied first; this keeps its averaged colour.
-          r += (px[i] * 255 / a) * 255 / a;
-          g += (px[i + 1] * 255 / a) * 255 / a;
-          b += (px[i + 2] * 255 / a) * 255 / a;
+          // Premultiplied: back to the colour.
+          r += px[i] * 255 / a;
+          g += px[i + 1] * 255 / a;
+          b += px[i + 2] * 255 / a;
           n += 1;
         }
-      } catch { /* extract can fail on a lost context: the stretch still draws */ }
-      const spr = new PIXI.Sprite(frameTexture(rt.source, new PIXI.Rectangle(0, ROWS - 1, w, 1)));
-      spr.x = x0;
-      spr.y = sourceH - 1;
-      spr.width = w;
-      spr.height = depth + 1;
-      strip.addChild(spr);
+      } catch { /* extract can fail on a lost context: the fallback colour draws */ }
+      small.destroy(true);
     }
-    const colour = n
-      ? (Math.round(r / n) << 16) | (Math.round(g / n) << 8) | Math.round(b / n)
-      : fallback;
-    fill.rect(0, sourceH - 1, W, depth + 1).fill(colour);
-    const fade = new PIXI.Sprite(fadeTexture(PIXI, colour));
+    for (const child of culled) child.culled = true;
+    for (const h of [...homes].sort((p, q) => p.index - q.index)) {
+      h.lc.x = h.x;
+      h.lc.y = h.y;
+      if (h.parent) h.parent.addChildAt(h.lc, Math.min(h.index, h.parent.children.length));
+    }
+    shell.destroy();
+    const average = n ? (Math.min(255, Math.round(r / n)) << 16) | (Math.min(255, Math.round(g / n)) << 8) | Math.min(255, Math.round(b / n)) : null;
+    const colour = skirtFadeColour(average, gradientBottom, fallback);
+    // Under the mirror: its clear pixels show the ground's colour, not the layers behind.
+    const fadeDepth = Math.min(depth, SKIRT_FADE_DEPTH);
+    const base = new PIXI.Graphics();
+    base.rect(0, sourceH, W, depth).fill(average ?? colour);
+    strip.addChild(base);
+    for (const spr of mirrors) strip.addChild(spr);
+    const stops = skirtFadeStops();
+    const fade = new PIXI.Sprite(rampTexture(PIXI, colour, stops.fade));
     fade.x = 0;
-    fade.y = sourceH - 1;
+    fade.y = sourceH;
     fade.width = W;
-    fade.height = Math.min(depth + 1, 36);
-    strip.addChild(fade);
-    const solid = new PIXI.Graphics();
-    solid.rect(0, sourceH + 35, W, Math.max(0, depth - 35)).fill(colour);
-    strip.addChild(solid);
+    fade.height = fadeDepth;
+    const shade = new PIXI.Sprite(rampTexture(PIXI, 0x000000, stops.shade));
+    shade.x = 0;
+    shade.y = sourceH;
+    shade.width = W;
+    shade.height = fadeDepth;
+    const deep = new PIXI.Graphics();
+    // Down past the last copy's foot (it can run up to a band past the skirt's depth).
+    deep.rect(0, sourceH + fadeDepth, W, Math.max(0, depth + band - fadeDepth)).fill(colour);
+    strip.addChild(fade, shade, deep);
+    textures.push(fade.texture, shade.texture);
     root.addChild(strip);
-    root.groundSkirt = { depth, colour };
+    root.once('destroyed', () => {
+      for (const t of textures) t.destroy(true);
+    });
+    root.groundSkirt = {
+      depth,
+      band,
+      colour,
+      average,
+      layers: grounds.map((lc) => lc.label),
+      chunks: textures.length - 2,
+      copies: mirrors.length,
+      resolution: Math.round(res * 100) / 100,
+      bytes: Math.round(W * band * res * res * 4),
+      ms: Math.round(performance.now() - t0),
+    };
   };
   const sprites = [];
-  lc.children.forEach(function walk(child) {
-    if (child instanceof PIXI.Sprite) sprites.push(child);
-    (child.children || []).forEach(walk);
-  });
+  for (const lc of grounds) {
+    lc.children.forEach(function walk(child) {
+      if (child instanceof PIXI.Sprite) sprites.push(child);
+      (child.children || []).forEach(walk);
+    });
+  }
   const pending = [...new Set(sprites.map((spr) => spr.texture.source).filter((base) => !isLoaded(base)))];
   // Let a pending colour bake swap textures first.
   const later = () => setTimeout(build, 0);
@@ -1669,6 +1850,7 @@ export function buildStreetView(street, PIXI, opts = {}) {
     lc.sortableChildren = true;
     lc.zIndex = (layer.z ?? li) * 10;
     lc.label = layer.id;
+    lc.skirtLayer = layer;
     // Every layer except the middleground is its own parallax canvas whose
     // decos use layer-local coordinates (needs the imported w/h).
     const parallax = layer.id !== 'middleground' && layer.w > 0 && layer.h > 0;
@@ -1753,11 +1935,11 @@ export function buildStreetView(street, PIXI, opts = {}) {
   }
   const skirtDepth = H - sourceH + Math.max(0, Number(opts.skirtBelow) || 0);
   if (skirtDepth > 0 && opts.renderer) {
-    const ground = layerContainers.find((lc) => lc.label === 'middleground');
+    const grounds = layerContainers.filter((lc) => skirtGroundOffset(lc.skirtLayer, W, sourceH));
     // Ticket 39: black (000000) is a colour, not a missing one (Panka Surazu's skirt drew meadow green).
     const parsed = parseInt(String(street.gradient?.bottom || '').replace(/^#/, ''), 16);
     const fallback = Number.isFinite(parsed) ? parsed : 0x6b8f3c;
-    buildGroundSkirt(PIXI, opts.renderer, root, ground, W, sourceH, skirtDepth, fallback);
+    buildGroundSkirt(PIXI, opts.renderer, root, grounds, W, sourceH, skirtDepth, Number.isFinite(parsed) ? parsed : null, fallback);
   }
   root.decoDrawn = drawn;
   /** Decos that play, for QA (canvas data-anim-decos): placed, strips in, playing, stopped off screen. */
