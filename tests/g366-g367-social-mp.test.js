@@ -13,9 +13,9 @@ import { join } from 'node:path';
 import { createRealtimeClient, CORE_KINDS } from '../public/js/realtime-client.js?v=f19c76a1';
 import { TYPING_EVERY_MS, TYPING_MS, typingCounts, typingDotAlpha } from '../public/js/features/realtime-feature.js?v=c6f08935';
 import { BUTLER_IM_TEXT, BUTLER_IM_VERBS, HELP_AGAIN_MS, commandHelp, imDelayMs, imLine, imText, normalizeImPrefs, parseButlerIm } from '../public/js/butler-im.js?v=44783638';
-import { butlerImFeature, BUTLER_TAB } from '../public/js/features/butler-im-feature.js?v=fae5b677';
+import { butlerImFeature, BUTLER_TAB } from '../public/js/features/butler-im-feature.js?v=a0180831';
 import { slashCommandsFeature } from '../public/js/features/slash-commands-feature.js?v=7c6a8b90';
-import { FEATURES } from '../public/js/features/index.js?v=16f32b00';
+import { FEATURES } from '../public/js/features/index.js?v=cbbbd72e';
 
 const root = join(import.meta.dirname, '..');
 const read = (rel) => readFileSync(join(root, rel), 'utf8');

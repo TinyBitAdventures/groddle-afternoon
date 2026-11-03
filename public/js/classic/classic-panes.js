@@ -6,9 +6,12 @@
  * - "Local Chat / Activity" is always the bottom pane, and it is Local's lines and the Activity log
  *   together, as the client's was (drawer.logNodes): solo that is the drawer's Activity tab itself;
  *   online, with Local picked, the drawer's own log shows both.
- * - Another chat picked online (a party, a group, Global Chat, Buddies) opens as the pane above it:
- *   the drawer's view, titled with that chat's name and a close that goes back to Local; the
- *   Local Chat / Activity pane stays under it with its own field, which says its words on Local.
+ * - Another chat picked online (Global Chat, Buddies, the Chats list or a conversation picked from
+ *   it: a party, a group, Live Help, the Trade Channel, your Butler) opens as the pane above it: the
+ *   drawer's view, titled with that chat's name and a close that goes back to Local; the Local
+ *   Chat / Activity pane stays under it with its own field, which says its words on Local. The
+ *   Chats list is the drawer's (css/classic.css draws it in the client's contact-list look), so
+ *   each channel, group and IM can be picked on its own, not only the first.
  * - The divider between them drags (RightSideView.as 1195-1235): each pane keeps at least 100 px,
  *   Up and Down move it from the keyboard, and the place is kept on this device (contact_list_y).
  * - Each pane has the client's title row: the options chevron, the title, the unread pill (#b1b7ba,
@@ -236,7 +239,8 @@ export function installClassicPanes({ doc = globalThis.document, win = globalThi
     if (busy || !classic()) return;
     busy = true;
     try {
-      const tab = d.tab;
+      // What the drawer shows: a conversation opened from its Chats list, else its tab.
+      const tab = d.showing ?? d.tab;
       const layout = paneLayout({ online, tab });
       dock.dataset.classicUpper = layout.upper ? 'on' : 'off';
       // The upper pane's title is its chat's name; the bottom pane is Local Chat / Activity.

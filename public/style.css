@@ -9360,8 +9360,8 @@ html[data-street-cards] .notify-notices { visibility: hidden; }
 /* ======================== end NOTIFY ======================== */
 
 /* —— SOCIAL —— (phase 2, modern skin: js/ui/social-drawer.js)
-   The right-hand drawer: Activity (the notifier's log), Local, Party, the open chat channels and
-   Buddies. #local-chat-dock is the drawer; open it is --drawer-w wide and at most 600 px tall, top
+   The right-hand drawer: Activity (the notifier's log), Local, Global, Buddies, and Chats (the list
+   of every other conversation: the party, the Butler, groups, Live Help, Trade). #local-chat-dock is the drawer; open it is --drawer-w wide and at most 600 px tall, top
    right under the top bar (--social-top, measured), collapsed a --rail-w rail with unread badges.
    It sits over the world (the canvas keeps its size); the notices centre in what it leaves.
    .social-drawer is the modern skin's (the drawer adds it; a classic skin never mounts it). */
@@ -9485,30 +9485,87 @@ html[data-street-cards] .notify-notices { visibility: hidden; }
 .social-av[data-hue="6"] { background: var(--c-blue-44); }
 .social-av[data-hue="7"] { background: var(--c-umber-45); }
 .social-av .social-dot { position: absolute; right: -2px; bottom: -2px; }
-.social-tabs { display: flex; flex: none; gap: var(--sp-1); padding: 0 var(--sp-4); overflow-x: auto; scrollbar-width: none; border-bottom: 1px solid var(--border); }
-.social-tab {
+.social-tabs { display: flex; flex: none; gap: var(--sp-1); padding: 0 var(--sp-2); overflow: hidden; border-bottom: 1px solid var(--border); }
+/* Option A (2026-11-02): five tabs that always fit the 300 px drawer, no scrolling. They share what
+   is left over. When counts on most of them would cut a label (js fitTabs), the fixed tabs' counts
+   become dots (.is-tight), then the Chats tab drops its word for its icon and count (.is-tighter). */
+.social-drawer .social-tab {
   display: inline-flex;
-  flex: 1 0 auto;
+  flex: 1 1 auto;
+  min-width: 0;
   align-items: center;
   justify-content: center;
-  gap: var(--sp-2);
+  gap: var(--sp-1);
   height: 34px;
-  padding: 0 var(--sp-2);
+  padding: 0 var(--sp-1);
   border: 0;
   border-radius: var(--radius-sm) var(--radius-sm) 0 0;
   background: transparent;
   color: var(--text-muted);
   font-size: var(--fs-sm);
-  font-weight: 800;
+  font-weight: 700;
   white-space: nowrap;
   cursor: pointer;
 }
+.social-tab-label { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.social-drawer .social-tab.is-chats { flex: 0 0 auto; padding: 0 var(--sp-2); }
+.social-tab-icon svg { width: 14px; height: 14px; }
 .social-tab:hover { color: var(--text); background: var(--surface-parchment); }
 .social-tab[aria-selected="true"] { color: var(--text); box-shadow: inset 0 -2px 0 var(--accent); }
 .social-tab:focus-visible { outline-offset: -2px; }
 /* Ticket 37: while a tab has the keyboard the arrow keys are the row's, not the avatar's; the row says so. */
 .social-tabs:has(.social-tab:focus-visible) { box-shadow: inset 0 0 0 2px var(--accent); border-radius: var(--radius-sm) var(--radius-sm) 0 0; }
-.social-tab .social-badge { min-width: 16px; height: 16px; padding: 0 var(--sp-2); box-shadow: none; }
+.social-tab .social-badge { flex: none; min-width: 14px; height: 14px; padding: 0 var(--sp-1); font-size: var(--fs-2xs); box-shadow: none; }
+.social-tabs.is-tight .social-tab:not(.is-chats) .social-badge { min-width: 8px; width: 8px; height: 8px; padding: 0; font-size: 0; }
+.social-tabs.is-tighter .social-tab.is-chats .social-tab-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+/* The Chats list: Private, Groups, Channels; each row its circle, name and note, last line, count. */
+.social-log[data-social-list] { gap: var(--sp-1); padding: var(--sp-3) var(--sp-4); }
+.social-chat-sec { display: grid; gap: var(--sp-1); }
+.social-chat-sec-title { margin: var(--sp-5) var(--sp-4) var(--sp-2); font-size: var(--fs-xs); font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-muted); }
+.social-chat-sec:first-child .social-chat-sec-title { margin-top: var(--sp-2); }
+.social-chat-row {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-5);
+  width: 100%;
+  padding: var(--sp-4);
+  border: 0;
+  border-radius: var(--radius-lg);
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+}
+.social-chat-row:hover, .social-chat-row:focus-visible { background: var(--accent-soft); }
+.social-chat-row:focus-visible { outline-offset: -2px; }
+.social-av.social-chat-av { width: 32px; height: 32px; font-size: var(--fs-md); box-shadow: none; }
+.social-chat-txt { display: grid; flex: 1 1 auto; min-width: 0; gap: var(--sp-1); }
+.social-chat-name { display: flex; align-items: baseline; gap: var(--sp-3); min-width: 0; font-size: var(--fs-base); font-weight: 800; color: var(--text); }
+.social-chat-label { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.social-chat-note { flex: none; font-size: var(--fs-xs); font-weight: 600; color: var(--text-muted); }
+.social-chat-last { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: var(--fs-sm); color: var(--text-muted); }
+.social-chat-row.is-unread .social-chat-last { font-weight: 700; color: var(--text); }
+.social-chat-row .social-badge { flex: none; box-shadow: none; }
+/* A conversation opened from Chats: the back pill, its circle and name over its lines. */
+.social-conv-head { display: flex; flex: none; align-items: center; gap: var(--sp-4); padding: var(--sp-5) var(--sp-6); border-bottom: 1px solid var(--border); background: var(--surface-parchment); font-size: var(--fs-base); font-weight: 800; }
+.social-back {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: var(--sp-1);
+  min-height: 26px;
+  padding: 0 var(--sp-5) 0 var(--sp-3);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-pill);
+  background: var(--surface-bright);
+  font-size: var(--fs-md);
+  font-weight: 700;
+  cursor: pointer;
+}
+.social-back svg { width: 12px; height: 12px; }
+.social-back:hover { background: var(--surface-card); }
+.social-conv-who { display: flex; align-items: center; gap: var(--sp-3); min-width: 0; }
+.social-av.social-conv-av { width: 22px; height: 22px; font-size: var(--fs-xs); box-shadow: none; }
+.social-conv-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .social-view { display: flex; flex: 1 1 auto; flex-direction: column; min-height: 0; }
 .social-view-head { flex: none; max-height: 45%; overflow-y: auto; padding: var(--sp-4) var(--sp-6) 0; font-size: var(--fs-sm); }
 .social-log {

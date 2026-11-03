@@ -19,7 +19,7 @@
  *                       shared one (a lane's test server: ws://127.0.0.1:<port>/ws)
  *
  * Checks: 1 both players get in (signed in, online, both on the street); 2 Local chat both
- * ways; 3 a party invite from the player menu, the Party tab on both, /p goes to the party,
+ * ways; 3 a party invite from the player menu, the Party chat in both Chats lists, /p goes to the party,
  * then leaving ends it; 4 the pack's save cloud tooltip reads "Playing as <name> · Saved";
  * 5 a Reports round trip (local only): the player files a report, a throwaway administrator
  * replies from /console/, the reply mail is recorded, the player sees the badge and the reply
@@ -317,7 +317,7 @@ const drawer = (pl) => pl.p.evaluate(() => {
   const d = document.getElementById('local-chat-dock');
   const c = document.querySelector('#game-root canvas')?.dataset || {};
   const badge = (sel) => document.querySelector(sel)?.querySelector('.social-badge')?.textContent || null;
-  return { open: d?.dataset.socialOpen, tab: c.socialTab, tabs: c.socialTabs, here: c.realtimeHere, party: c.partyState, railLocalBadge: badge('[data-social-rail-tab="local"]') };
+  return { open: d?.dataset.socialOpen, tab: c.socialTab, tabs: c.socialTabs, chats: c.socialChats, here: c.realtimeHere, party: c.partyState, railLocalBadge: badge('[data-social-rail-tab="local"]') };
 });
 async function say(pl, text) {
   await blur(pl);
@@ -487,7 +487,7 @@ async function checks() {
     const heard = (ls, re) => Boolean(ls?.some((l) => re.test(l.text)));
     check('2-local-chat', heard(bLocal, /Hello from A/) && heard(aLocal, /B here/), { bRail: { open: bRail.open, badge: bRail.railLocalBadge }, bLocal: bLocal?.slice(-2), aLocal: aLocal?.slice(-2), shots: [bShot, aShot] });
 
-    // 3. Party: invite from the player menu, the Party tab, /p, leave.
+    // 3. Party: invite from the player menu, the Party chat in Chats, /p, leave.
     alive();
     await dismiss(A);
     const menu = await openPlayerMenu(A, B);
@@ -519,9 +519,10 @@ async function checks() {
     const pa3 = await drawer(A);
     const pb3 = await drawer(B);
     partyShots.push(await shot(A.p, 'a-3-party-left'), await shot(B.p, 'b-3-party-left'));
-    const has = (tabs) => Boolean(tabs?.split(',').includes('party'));
+    // The party is a conversation in the drawer's Chats list (socialChats), not a tab of its own.
+    const has = (chats) => Boolean(chats?.split(',').includes('party'));
     const routed = Boolean(bParty?.some((l) => /party line from A/.test(l.text))) && !bLocal2?.some((l) => /party line from A/.test(l.text));
-    check('3-party', has(pa.tabs) && has(pb.tabs) && routed && !has(pa3.tabs) && !has(pb3.tabs) && pa3.party === 'none' && pb3.party === 'none', { invitedVia: invited, menuRows: menu?.rows, accepted: ok, tabs: [pa.tabs, pb.tabs], routedToParty: routed, leaveBtn, leaveConfirm: yes, after: [pa3.tabs, pb3.tabs, pa3.party, pb3.party], shots: partyShots });
+    check('3-party', has(pa.chats) && has(pb.chats) && routed && !has(pa3.chats) && !has(pb3.chats) && pa3.party === 'none' && pb3.party === 'none', { invitedVia: invited, menuRows: menu?.rows, accepted: ok, chats: [pa.chats, pb.chats], routedToParty: routed, leaveBtn, leaveConfirm: yes, after: [pa3.chats, pb3.chats, pa3.party, pb3.party], shots: partyShots });
   }
 
   // 4. The save cloud's tooltip.

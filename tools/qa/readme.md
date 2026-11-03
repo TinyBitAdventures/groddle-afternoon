@@ -41,7 +41,7 @@ releases the lock.
     node tools/qa/online-smoke.mjs --live --yes    # production
 
 Two throwaway players meet on one street and check: both get in; Local chat both ways; a party
-invite, the Party tab and leaving; the save cloud's tooltip; a Reports round trip with a reply
+invite, the Party chat in the Chats list and leaving; the save cloud's tooltip; a Reports round trip with a reply
 from `/console/` (local only); the Original zoom; no page errors.
 
 - Local players sign up through the site's instant sign-up (`zz-*@groddle.localhost`, so the

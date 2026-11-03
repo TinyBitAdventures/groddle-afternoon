@@ -25,9 +25,11 @@
  *   Invite, Members, Leave), invitations (Join / Decline), Find Groups
  *   (public ones by name) and Make a group (name, description, public or
  *   private). At most 20 groups (config_prod.js:39 max_groups).
- * - The modern skin's Social drawer (engine.social): each open chat is a tab
- *   there (after Local and Party), with Who is here and Close over its lines;
- *   the drawer's Local and Party tabs stand for Street and Party.
+ * - The modern skin's Social drawer (engine.social): Global Chat is its Global
+ *   tab (picking it joins Global Chat), every other open chat a row in its
+ *   Chats list (groups with their member count, Live Help and the Trade
+ *   Channel under Channels), each with Who is here and Close over its lines;
+ *   the drawer's Local and Party stand for Street and Party.
  * - In a chat tab, /who names who is in it (main.js:5573-5582); other
  *   commands (emotes, /p, ...) go where they always did.
  * - Blocking: a blocked player's lines are dropped here, as the original's
@@ -203,15 +205,24 @@ function createSession(engine, client) {
     }
     return h;
   }
-  /** The drawer shows the open chats as its own tabs (Local and Party are the drawer's). */
+  /** A group's member count, for the note by its name in the drawer's Chats list. */
+  function membersNote(ch) {
+    const n = list?.groups.find((g) => g.id === groupIdOf(ch))?.members || 0;
+    return n ? `${n} ${n === 1 ? 'member' : 'members'}` : '';
+  }
+  /**
+   * The drawer shows the open chats: Global Chat as its Global tab, the rest in its Chats list
+   * (groups under Groups, Live Help and the Trade Channel under Channels). Local and Party are the drawer's.
+   */
   function handOver() {
     const order = tabOrder([...chats.keys()], list, { inParty }).filter((t) => t !== 'street' && t !== 'party' && knownChat(t));
     order.forEach((ch, i) => {
       const label = chatLabel(ch, list);
-      const sig = `${label}|${i}`;
+      const note = isChannel(ch) ? '' : membersNote(ch);
+      const sig = `${label}|${i}|${note}`;
       if (handed.get(ch) === sig && social.has(ch)) return;
       handed.set(ch, sig);
-      social.channel(ch, { label, header: headFor(ch), placeholder: `Chat in ${label}`, inputLabel: label, order: 30 + i, empty: 'Nobody has said anything here yet.' });
+      social.channel(ch, { label, header: headFor(ch), placeholder: `Chat in ${label}`, inputLabel: label, order: 30 + i, empty: 'Nobody has said anything here yet.', note, ...(ch === 'help' ? { initial: '?' } : {}) });
       social.setLines(ch, (chats.get(ch)?.lines || []).map(drawerLine));
     });
     for (const ch of [...handed.keys()]) {
@@ -221,8 +232,15 @@ function createSession(engine, client) {
       social.drop(ch);
     }
   }
+  /** The drawer's Global tab picked before Global Chat is open: join it (no first-time dialog: Global has none). */
+  function joinGlobalTab() {
+    if (!social || social.showing !== 'global' || chats.has('global') || !mayOpen('global', list)) return false;
+    openChat('global', { focus: false, intro: false });
+    return chats.has('global');
+  }
   // The drawer's tab in front is this feature's tab (what a typed line is for).
   social?.onTab((t) => {
+    if (t === 'global') joinGlobalTab();
     const want = t === 'local' ? 'street' : t === 'party' ? 'party' : chats.has(t) ? t : 'street';
     if (want === tab) return;
     tab = want;
@@ -434,6 +452,12 @@ function createSession(engine, client) {
     watch();
     renderTabs();
     render();
+    // The Global tab was picked before the list came: join now.
+    if (joinGlobalTab()) {
+      tab = 'global';
+      remember();
+      publish();
+    }
     return list;
   }
 

@@ -67,7 +67,7 @@ function createSession(engine, client) {
   function ensureTab() {
     if (!social) return false;
     const n = name();
-    social.channel(BUTLER_TAB, { label: n, prefix: '/butler ', placeholder: `IM ${n} (try help)`, inputLabel: `IM ${n}`, order: 25, empty: `${n} will IM you here while you are away from home.` });
+    social.channel(BUTLER_TAB, { label: n, prefix: '/butler ', placeholder: `IM ${n} (try help)`, inputLabel: `IM ${n}`, order: 25, section: 'private', note: 'Butler', empty: `${n} will IM you here while you are away from home.` });
     return true;
   }
 

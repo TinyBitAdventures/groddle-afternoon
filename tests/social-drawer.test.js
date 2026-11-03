@@ -1,7 +1,7 @@
 /**
  * The Social drawer (phase 2 modern skin, js/ui/social-drawer.js): the right-hand drawer that
- * holds the Activity log (the notifier's own entries), Local, Party, the chat channels and
- * Buddies; a 44 px rail when collapsed; open by default from 1440 px, the player's choice
+ * holds the Activity log (the notifier's own entries), Local, Global, Buddies and the Chats
+ * list (Party, the other chat channels, groups: tests/social-chats-list.test.js); a 44 px rail when collapsed; open by default from 1440 px, the player's choice
  * remembered; "/" and Up/Down in its input. And the wiring: game.js mounts it on
  * #local-chat-dock in the modern skin with no old Activity panel, the notices centre beside
  * it, and the multiplayer features hand their lines and views over (engine.social).
@@ -25,7 +25,7 @@ import {
   splitChat,
   withTimeLines,
   writeChoice,
-} from '../public/js/ui/social-drawer.js?v=904613f6';
+} from '../public/js/ui/social-drawer.js?v=fdb15667';
 import { createNotifier } from '../public/js/notify.js?v=d85330ff';
 import { resolveTokens } from './css-tokens.js';
 
@@ -164,11 +164,11 @@ describe('the Social drawer: mounted', () => {
     assert.match(log.children[4].textContent, /Ur hello street/);
   });
 
-  it('online: Activity, Local and Buddies; chat lines count on a tab not in front; Party comes and goes', () => {
+  it('online: Activity, Local, Global, Buddies and Chats; chat lines count on a tab not in front; Party comes and goes in Chats', () => {
     const t = mount({ mode: 'online', width: 1920 });
     assert.equal(t.drawer.isOpen(), true, 'open at 1440 and up');
     assert.equal(t.dock.getAttribute('aria-label'), 'Social');
-    assert.deepEqual(t.drawer.tabs, ['activity', 'local', 'buddies']);
+    assert.deepEqual(t.drawer.tabs, ['activity', 'local', 'global', 'buddies', 'chats']);
     assert.equal(t.drawer.tab, 'local');
     t.drawer.localLine('Kukui', 'morning, Hechey!');
     t.drawer.localLine('Ada', 'got 20, one sec', { mine: true });
@@ -180,15 +180,21 @@ describe('the Social drawer: mounted', () => {
     const seen = [];
     t.drawer.onTab((id) => seen.push(id));
     t.drawer.channel('party', { label: 'Party', prefix: '/p ', placeholder: 'Message your party' });
-    assert.deepEqual(t.drawer.tabs, ['activity', 'local', 'party', 'buddies']);
+    assert.deepEqual(t.drawer.tabs, ['activity', 'local', 'global', 'buddies', 'chats'], 'the row never grows');
+    assert.deepEqual(t.drawer.chats, ['party']);
     t.drawer.push('party', { name: 'Bramble', text: 'meet at Gregarious Grange in 5?' });
     t.drawer.localLine('Tiramisu', 'anyone got spare cherries?');
     assert.equal(t.drawer.unread('party'), 1);
-    const tab = t.dock.querySelector('[data-social-tab="party"]');
+    const tab = t.dock.querySelector('[data-social-tab="chats"]');
     assert.equal(tab.getAttribute('role'), 'tab');
-    assert.equal(tab.getAttribute('aria-label'), 'Party, 1 new');
+    assert.equal(tab.getAttribute('aria-label'), 'Chats, 1 new');
     tab.click();
-    assert.deepEqual(seen, ['party']);
+    assert.deepEqual(seen, ['chats']);
+    assert.equal(t.drawer.unread('party'), 1, 'the list shows it, unread');
+    t.dock.querySelector('[data-social-chat="party"]').click();
+    assert.deepEqual(seen, ['chats', 'party']);
+    assert.equal(t.drawer.tab, 'chats', 'Chats stays selected');
+    assert.equal(t.drawer.chat, 'party');
     assert.equal(t.drawer.unread('party'), 0);
     assert.equal(t.input.placeholder, 'Message your party');
     // What you type in the Party tab goes to the party.
@@ -199,8 +205,10 @@ describe('the Social drawer: mounted', () => {
     t.form.dispatch('submit');
     assert.equal(t.input.value, '/happy', 'commands stay commands');
     t.drawer.drop('party');
-    assert.equal(t.drawer.tab, 'local', 'a party that ended takes its tab away');
-    assert.equal(t.data.socialTabs, 'activity,local,buddies');
+    assert.equal(t.drawer.tab, 'chats', 'a party that ended goes, back to the list');
+    assert.equal(t.drawer.chat, '');
+    assert.deepEqual(t.drawer.chats, []);
+    assert.equal(t.data.socialTabs, 'activity,local,global,buddies,chats');
   });
 
   it('online: the rail\'s buttons open the drawer on their tab, with the badges in their names', () => {
@@ -273,9 +281,11 @@ describe('the Social drawer: mounted', () => {
     const tab = t.dock.querySelector('[data-social-tab="local"]');
     const right = tab.dispatch('keydown', { key: 'ArrowRight' });
     assert.equal(right.stopped, true);
-    assert.equal(t.drawer.tab, 'buddies');
-    assert.equal(t.doc.activeElement.getAttribute('data-social-tab'), 'buddies');
-    t.dock.querySelector('[data-social-tab="buddies"]').dispatch('keydown', { key: 'Home' });
+    assert.equal(t.drawer.tab, 'global');
+    assert.equal(t.doc.activeElement.getAttribute('data-social-tab'), 'global');
+    t.dock.querySelector('[data-social-tab="global"]').dispatch('keydown', { key: 'End' });
+    assert.equal(t.drawer.tab, 'chats');
+    t.dock.querySelector('[data-social-tab="chats"]').dispatch('keydown', { key: 'Home' });
     assert.equal(t.drawer.tab, 'activity');
     assert.equal(tab.dispatch('keydown', { key: 'Escape' }).stopped, false);
   });

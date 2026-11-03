@@ -1,19 +1,19 @@
 /**
  * The Social drawer online (js/ui/social-drawer.js with features/party-feature.js and
- * features/groups-feature.js): with the drawer as engine.social, a party is a Party tab
- * (its roster over the party's lines, what you type there goes as /p), each open chat
- * channel is a tab of its own (its lines, Who is here and Close over them, what you type
- * there goes to the channel), and nothing is added to the old dock (no Party pill, no
+ * features/groups-feature.js): with the drawer as engine.social, a party is a Party chat in
+ * the Chats list (its roster over the party's lines, what you type there goes as /p),
+ * Global Chat is the Global tab (picking it joins), each other open chat is a row in Chats
+ * (its lines, Who is here and Close over them, what you type there goes to the channel), and nothing is added to the old dock (no Party pill, no
  * chat tabs over the input). Driven by a fake realtime client and a fake site, as
  * tests/groups.test.js and tests/party.test.js do.
  */
 import { describe, it, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import { FakeEl, memoryStore, page } from './social-fake-dom.js';
-import { mountSocialDrawer } from '../public/js/ui/social-drawer.js?v=904613f6';
+import { mountSocialDrawer } from '../public/js/ui/social-drawer.js?v=fdb15667';
 import { createNotifier } from '../public/js/notify.js?v=d85330ff';
-import { partyFeature } from '../public/js/features/party-feature.js?v=dbe171b3';
-import { groupsFeature } from '../public/js/features/groups-feature.js?v=246c9845';
+import { partyFeature } from '../public/js/features/party-feature.js?v=942b08e3';
+import { groupsFeature } from '../public/js/features/groups-feature.js?v=4c73e438';
 
 const ANSWER = {
   max: 20,
@@ -97,9 +97,12 @@ describe('the Social drawer online: parties and chat channels', () => {
     partyFeature.onTick(16, 0, engine);
     assert.ok(globalThis.groddleParty);
     assert.equal(t.doc.body.querySelector('[data-party-btn]'), null, 'no pill');
-    assert.deepEqual(drawer.tabs, ['activity', 'local', 'buddies'], 'no Party tab out of a party');
+    const ROW = ['activity', 'local', 'global', 'buddies', 'chats'];
+    assert.deepEqual(drawer.tabs, ROW);
+    assert.deepEqual(drawer.chats, [], 'no Party chat out of a party');
     client.msg({ t: 'party', party: { members: [{ id: 1, name: 'Ada', leader: true, online: true, street: '' }, { id: 6, name: 'Fi', online: true, street: '' }] } });
-    assert.deepEqual(drawer.tabs, ['activity', 'local', 'party', 'buddies']);
+    assert.deepEqual(drawer.tabs, ROW);
+    assert.deepEqual(drawer.chatList().map((s) => [s.id, s.rows.map((r) => [r.id, r.note])]), [['private', [['party', '2 members']]]], 'under Private, with how many are in it');
     assert.equal(drawer.tab, 'local', 'the tab in front stays (what you are typing keeps going where it was)');
     client.msg({ t: 'party_said', id: 6, name: 'Fi', text: 'meet at the vendor', at: 5 });
     client.msg({ t: 'party_said', id: 1, name: 'Ada', text: 'on my way', at: 6 });
@@ -121,8 +124,9 @@ describe('the Social drawer online: parties and chat channels', () => {
     client.msg({ t: 'party_activity', text: 'Fi joined the party.' });
     assert.equal(drawer.lines('party').at(-1).note, true);
     client.msg({ t: 'party', party: null });
-    assert.deepEqual(drawer.tabs, ['activity', 'local', 'buddies']);
-    assert.equal(drawer.tab, 'local');
+    assert.deepEqual(drawer.chats, []);
+    assert.equal(drawer.tab, 'chats', 'the party you were looking at ended: back to the list');
+    drawer.select('local');
     client.msg({ t: 'party_activity', text: 'You are not in a party.' });
     assert.deepEqual(drawer.lines('local').at(-1), { ...drawer.lines('local').at(-1), name: 'Party', text: 'You are not in a party.' });
   });
@@ -136,8 +140,9 @@ describe('the Social drawer online: parties and chat channels', () => {
     client.msg({ t: 'groups_status', groups: [12], channels: ['global', 'help'], open: [] });
     await g.openChat('global');
     assert.deepEqual(client.take('channel_join'), [{ t: 'channel_join', channel: 'global' }]);
-    assert.deepEqual(drawer.tabs, ['activity', 'local', 'global', 'buddies']);
+    assert.deepEqual(drawer.tabs, ['activity', 'local', 'global', 'buddies', 'chats']);
     assert.equal(drawer.tab, 'global', 'opening a chat brings it to the front');
+    assert.match(t.dock.querySelector('[data-social-tab="global"]').textContent, /^Global$/, 'the short label in the row');
     assert.equal(drawer.isOpen(), true);
     client.msg({ t: 'channel_joined', channel: 'global', history: [{ id: 2, name: 'Bo', text: 'hello', at: 1 }] });
     client.msg({ t: 'channel_said', channel: 'global', id: 1, name: 'Ada', text: 'hi Bo', at: 2 });
@@ -153,18 +158,39 @@ describe('the Social drawer online: parties and chat channels', () => {
     assert.equal(client.take('channel_say').length, 0);
     client.msg({ t: 'channel_said', channel: 'global', id: 2, name: 'Bo', text: 'me!', at: 3 });
     assert.equal(drawer.unread('global'), 1);
-    // A second chat: a group's, by its name.
+    // A second chat: a group's, by its name, in the Chats list.
     await g.openChat('group:12', { focus: false });
     client.msg({ t: 'channel_joined', channel: 'group:12', history: [] });
-    assert.deepEqual(drawer.tabs, ['activity', 'local', 'global', 'group:12', 'buddies']);
-    assert.match(t.dock.querySelector('[data-social-tab="group:12"]').textContent, /Zebra Club/);
+    assert.deepEqual(drawer.tabs, ['activity', 'local', 'global', 'buddies', 'chats']);
+    assert.deepEqual(drawer.chatList().map((s) => [s.id, s.rows.map((r) => [r.label, r.note])]), [['groups', [['Zebra Club', '3 members']]]]);
     drawer.select('global');
     const head = t.dock.querySelector('[data-social-view-head]');
     head.querySelector('[data-groups-who="global"]').click();
     assert.deepEqual(client.take('channel_who'), [{ t: 'channel_who', channel: 'global' }]);
     head.querySelector('[data-groups-close-chat="global"]').click();
     assert.deepEqual(client.take('channel_leave'), [{ t: 'channel_leave', channel: 'global' }]);
-    assert.deepEqual(drawer.tabs, ['activity', 'local', 'group:12', 'buddies']);
+    assert.deepEqual(drawer.tabs, ['activity', 'local', 'global', 'buddies', 'chats'], 'Global stays a tab');
+    assert.deepEqual(drawer.chats, ['group:12']);
     assert.equal(drawer.tab, 'local');
+    assert.deepEqual(drawer.lines('global'), [], 'its lines went with it');
+  });
+
+  it('picking the Global tab joins Global Chat; a group opened from the Groups panel opens in Chats', async () => {
+    const g = globalThis.groddleGroups;
+    client.take('channel_join');
+    t.doc.activeElement = t.doc.body;
+    t.dock.querySelector('[data-social-tab="global"]').click();
+    assert.deepEqual(client.take('channel_join'), [{ t: 'channel_join', channel: 'global' }], 'joined, with no first-time dialog');
+    assert.equal(g.tab, 'global', 'what you type goes to Global Chat');
+    assert.equal(t.doc.activeElement, t.doc.body, 'a click on the tab never takes the keyboard');
+    client.msg({ t: 'channel_joined', channel: 'global', history: [{ id: 2, name: 'Bo', text: 'back again', at: 9 }] });
+    assert.deepEqual(drawer.lines('global').map((l) => l.text), ['back again']);
+    assert.equal(t.input.placeholder, 'Chat in Global Chat');
+    await g.openChat('group:12');
+    assert.equal(drawer.tab, 'chats');
+    assert.equal(drawer.chat, 'group:12');
+    assert.equal(engine.data.groupsTab, 'group:12');
+    assert.equal(t.input.placeholder, 'Chat in Zebra Club');
+    assert.match(t.dock.querySelector('[data-social-conv-head]').textContent, /Chats.*Zebra Club/, 'the back pill and its name over it');
   });
 });

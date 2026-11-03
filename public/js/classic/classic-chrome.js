@@ -8,7 +8,7 @@
 import { installClassicFrame } from './classic-frame.js?v=9c837724';
 import { installClassicTopbar } from './classic-topbar.js?v=8057c68a';
 import { installClassicGrowl } from './classic-growl.js?v=a476fea1';
-import { installClassicPanes } from './classic-panes.js?v=419857a0';
+import { installClassicPanes } from './classic-panes.js?v=f141e3cf';
 import { installClassicPack } from './classic-pack.js?v=7ece52b8';
 import { installClassicHub } from './classic-hub.js?v=264ab19f';
 

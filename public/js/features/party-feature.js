@@ -20,8 +20,9 @@
  *   the panel and in the chat stream marked "Party".
  * - Party Spaces between the members (and their quoins) are party-spaces-feature.js (G334).
  * - The modern skin's Social drawer (engine.social): while you are in a party it
- *   has a Party tab, with the roster, invites and Leave over the party's lines,
- *   and what you type there goes to the party (/p). No Party pill then.
+ *   has a Party chat (under Private in its Chats list, with how many are in it), with
+ *   the roster, invites and Leave over the party's lines, and what you type there goes
+ *   to the party (/p). No Party pill then.
  *
  * QA: canvas data partyState (none|in), partyMembers (name@where,...),
  * partyLeader, partyInvites (prompts waiting), partyLastSaid;
@@ -90,6 +91,8 @@ function streetLabel(engine, tsid) {
 
 function createSession(engine, client) {
   let party = null;
+  /** The member note last handed to the drawer's Chats list. */
+  let drawerNote = '';
   const log = [];
   /** fromId -> prompt uid */
   const invites = new Map();
@@ -117,7 +120,7 @@ function createSession(engine, client) {
   box.append(head, roster, inviteRow, logList, hint);
   const social = engine.social || null;
   if (social) {
-    // The drawer's Party tab holds the box (shown whenever the tab is): no pill.
+    // The drawer's Party chat holds the box (shown whenever the tab is): no pill.
     box.hidden = false;
   } else {
     if (bar) bar.append(pill);
@@ -165,9 +168,16 @@ function createSession(engine, client) {
     inviteRow.replaceChildren(...(buttons.length ? [el('span', {}, 'On this street:'), ...buttons] : [el('span', {}, 'Nobody else on this street to invite. /invite <name> finds someone online.')]));
     if (!box.hidden) renderLog();
     if (social) {
-      if (party && !social.has('party')) {
-        social.channel('party', { label: 'Party', header: box, prefix: '/p ', placeholder: 'Message your party', inputLabel: 'Party chat' });
-      } else if (!party && social.has('party')) social.drop('party');
+      // The drawer's Chats list has the party under Private, with how many are in it by its name.
+      const n = party?.members?.length || 0;
+      const note = n ? `${n} ${n === 1 ? 'member' : 'members'}` : '';
+      if (party && (!social.has('party') || drawerNote !== note)) {
+        drawerNote = note;
+        social.channel('party', { label: 'Party', header: box, prefix: '/p ', placeholder: 'Message your party', inputLabel: 'Party chat', section: 'private', note });
+      } else if (!party && social.has('party')) {
+        drawerNote = '';
+        social.drop('party');
+      }
     }
     publish();
   }
@@ -199,7 +209,7 @@ function createSession(engine, client) {
   /** inc_party.js party_activity: the party pane, or local chat when it is closed (RightSideManager.as 421-431). */
   function activity(text) {
     addLog({ note: true, text });
-    // The drawer: the Party tab while in a party, else Local (as the source's local chat when the pane is shut).
+    // The drawer: the Party chat while in a party, else Local (as the source's local chat when the pane is shut).
     if (social) {
       if (!(party && social.push('party', { note: true, text }))) engine.chatLine?.('Party', text);
       return;

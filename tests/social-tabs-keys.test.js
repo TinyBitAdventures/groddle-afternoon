@@ -10,7 +10,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { mountSocialDrawer } from '../public/js/ui/social-drawer.js?v=904613f6';
+import { mountSocialDrawer } from '../public/js/ui/social-drawer.js?v=fdb15667';
 import { createNotifier } from '../public/js/notify.js?v=d85330ff';
 import { memoryStore, page } from './social-fake-dom.js';
 
@@ -40,14 +40,18 @@ describe('ticket 37: the chat tabs and the arrow keys', () => {
   it('a click picks a chat without taking the keyboard, so the arrows keep walking', () => {
     const t = mount();
     t.doc.activeElement = t.doc.body;
-    const help = t.dock.querySelector('[data-social-tab="help"]');
-    assert.equal(help.dispatch('pointerdown').defaultPrevented, true);
+    const chats = t.dock.querySelector('[data-social-tab="chats"]');
+    assert.equal(chats.dispatch('pointerdown').defaultPrevented, true);
+    chats.click();
+    assert.equal(t.drawer.tab, 'chats');
+    const help = t.dock.querySelector('[data-social-chat="help"]');
+    assert.equal(help.dispatch('pointerdown').defaultPrevented, true, 'a row too');
     help.click();
-    assert.equal(t.drawer.tab, 'help');
+    assert.equal(t.drawer.chat, 'help');
     assert.equal(t.doc.activeElement, t.doc.body);
     const e = t.winKey('ArrowLeft');
     assert.equal(e.defaultPrevented, false, 'the game has it');
-    assert.equal(t.drawer.tab, 'help');
+    assert.equal(t.drawer.chat, 'help');
   });
 
   it('with a tab focused the arrows switch chats and never reach the avatar; Escape lets go', () => {

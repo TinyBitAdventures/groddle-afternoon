@@ -1,17 +1,23 @@
 /**
  * The Social drawer (phase 2 modern skin; the HUD mock's right-hand drawer, Warm paper).
  *
- * One place on the right for what the game says and what players say: Activity (the
- * notifier's log, js/notify.js: the same entries, no second log), Local (the street's
- * chat), Party while you are in one, each chat channel you have open (Live Help,
- * Global Chat, the Trade Channel, your groups: features/groups-feature.js) and Buddies
- * (who is online and where: features/buddies-feature.js). Solo has Activity only, with
- * the chat input under it (solo's Local chat: Feat lines, hi, slash commands).
+ * One place on the right for what the game says and what players say. Its tab row is always the
+ * same five (Austin's option A, 2026-11-02, after ticket 37: with many chats open the row ran off
+ * the drawer and Local went out of sight): Activity (the notifier's log, js/notify.js: the same
+ * entries, no second log), Local (the street's chat), Global (Global Chat: features/groups-feature.js
+ * joins it when you pick the tab), Buddies (who is online and where: features/buddies-feature.js),
+ * and Chats, a list of every other conversation: Private (your party, your Butler's IMs), Groups
+ * (your groups' chats) and Channels (Live Help, the Trade Channel), each row with its avatar, name,
+ * a short note, its last line and its unread count, unread and newest first. Picking a row opens
+ * that conversation under a "‹ Chats" bar (the Chats tab stays selected); back goes to the list.
+ * The client kept Local on screen and picked the other chats from its contact list
+ * (RightSideView.as 195-199, ContactList.as 120-307), which is what the list is. Solo has Activity
+ * only, with the chat input under it (solo's Local chat: Feat lines, hi, slash commands).
  *
- * - Open it is 300 px wide (--drawer-w), at most 600 px tall, top right under the top
- *   bar. Collapsed it is a 44 px rail (--rail-w) of tab buttons with unread badges.
- *   It opens by default at 1440 px wide and up and starts as the rail below; the
- *   player's own choice is kept (localStorage SOCIAL_STORE_KEY, every access in
+ * - Open it is 300 px wide (--drawer-w), at most 600 px tall, top right under the top bar.
+ *   Collapsed it is a 44 px rail (--rail-w) of the same tabs with unread badges (Chats with the
+ *   total of its conversations). It opens by default at 1440 px wide and up and starts as the rail
+ *   below; the player's own choice is kept (localStorage SOCIAL_STORE_KEY, every access in
  *   try/catch: a private window just gets the default again).
  * - The drawer is #local-chat-dock (so the tutorial's rule hiding Local chat,
  *   body.nx-hide-chat #local-chat-dock in newxp-feature, hides it too) and holds
@@ -19,17 +25,23 @@
  *   handler, the slash commands and every feature reading the input work as before.
  * - The input keeps what you said: Up and Down walk back through it. "/" opens the
  *   drawer and focuses the input unless something else has the keyboard.
+ * - Keys (ticket 37): a click never takes the keyboard (the arrow keys keep walking the avatar).
+ *   With a tab focused (Tab to it) the arrow keys move along the row, with a ring round it; in the
+ *   Chats list Up and Down move between rows and Enter opens one; Escape in a conversation goes
+ *   back to the list, and Escape again (or on the row) gives the keys back to the game.
  * - The world canvas is not resized: the drawer sits over the world. inset() says how
  *   much of the right edge it covers, so the notices (js/notify-view.js) centre in what
  *   is left.
  *
  * Features hand their lines and views over (engine.social): channel(id, opts) makes or
- * changes a tab, push(id, line) adds a line, setLines(id, lines) replaces them,
- * drop(id) takes a tab away, refresh() redraws after their data changed, statusSlot
- * holds the realtime state pill. Without a drawer (a classic skin) they keep the old dock.
+ * changes a conversation, push(id, line) adds a line, setLines(id, lines) replaces them,
+ * drop(id) takes one away, select(id) brings one to the front (in Chats unless it is a tab),
+ * refresh() redraws after their data changed, statusSlot holds the realtime state pill.
  *
- * QA: canvas data socialOpen (open|rail), socialTab, socialTabs, socialUnread
- * (tab:n,...); window.groddleSocial.
+ * QA: canvas data socialOpen (open|rail), socialTab (the tab selected: activity, local, global,
+ * buddies or chats), socialChat (the conversation open in Chats, or ''), socialTabs (the row),
+ * socialChats (the list's ids in order), socialUnread (id:n,... for every tab and conversation with
+ * news, chats:n the Chats total); window.groddleSocial.
  */
 import { colorizeAmounts } from '../notify-view.js?v=81d06119';
 
@@ -40,8 +52,70 @@ export const OPEN_MIN_WIDTH = 1440;
 export const TIME_GAP_MS = 5 * 60 * 1000;
 export const LINE_LIMIT = 200;
 export const HISTORY_LIMIT = 50;
+/** The Global tab before groups-feature has joined Global Chat. */
+export const GLOBAL_WAIT = 'Joining Global Chat…';
+/** The Chats list with nothing in it. */
+export const CHATS_EMPTY = 'Your party, your Butler, your groups, Live Help and the Trade Channel show here. Open a channel or a group from Menu, Groups.';
 
-const ORDER = { activity: 0, local: 10, party: 20, channel: 30, buddies: 90 };
+const ORDER = { activity: 0, local: 10, global: 15, party: 20, channel: 30, buddies: 90 };
+
+/** The tabs that are always in the row (online), in order; every other conversation is in Chats. */
+export const FIXED_TABS = Object.freeze(['activity', 'local', 'global', 'buddies']);
+/** The row's last tab: the list of the other conversations. */
+export const CHATS_TAB = 'chats';
+/** A tab's label when its conversation's own name is too long for the row. */
+export const TAB_LABELS = Object.freeze({ global: 'Global' });
+/** The Chats list's sections, in order. */
+export const CHAT_SECTIONS = Object.freeze([
+  Object.freeze({ id: 'private', title: 'Private' }),
+  Object.freeze({ id: 'groups', title: 'Groups' }),
+  Object.freeze({ id: 'channels', title: 'Channels' }),
+]);
+
+/** PURE: a conversation's section: its own word, else by its id (party, butler and im:* private, group:* a group, the rest channels). */
+export function sectionOf(id, section = '') {
+  if (CHAT_SECTIONS.some((s) => s.id === section)) return section;
+  const v = String(id || '');
+  if (v === 'party' || v === 'butler' || v.startsWith('im:')) return 'private';
+  if (v.startsWith('group:')) return 'groups';
+  return 'channels';
+}
+
+/** PURE: the row of tabs: the fixed ones there are, then Chats (online, or once there is a conversation). */
+export function tabRow(ids, { online = false } = {}) {
+  const have = new Set(ids || []);
+  const row = FIXED_TABS.filter((id) => have.has(id));
+  const others = [...have].filter((id) => !FIXED_TABS.includes(id));
+  if (online || others.length) row.push(CHATS_TAB);
+  return row;
+}
+
+/**
+ * PURE: the Chats list: [{ id, title, rows }] for the sections with conversations, each section's
+ * rows unread first, then newest (by the last line's time), then by name.
+ * `convs`: [{ id, label, section, unread, lastAt }].
+ */
+export function chatSections(convs) {
+  const out = [];
+  for (const s of CHAT_SECTIONS) {
+    const rows = (convs || []).filter((c) => sectionOf(c.id, c.section) === s.id).sort((a, b) =>
+      Number((b.unread || 0) > 0) - Number((a.unread || 0) > 0)
+      || (Number(b.lastAt) || 0) - (Number(a.lastAt) || 0)
+      || String(a.label).localeCompare(String(b.label)));
+    if (rows.length) out.push({ id: s.id, title: s.title, rows });
+  }
+  return out;
+}
+
+/** PURE: a list row's last line: "You: …" or "Name: …", only the words in a private chat with that one person; '' for none. */
+export function lastLineText(lines, { label = '', section = '' } = {}) {
+  const l = (lines || []).at(-1);
+  if (!l) return '';
+  if (l.note) return String(l.text || '');
+  const who = l.mine ? 'You' : String(l.name || 'Someone');
+  if (section === 'private' && !l.mine && who === label) return String(l.text || '');
+  return `${who}: ${l.text}`;
+}
 
 const ICONS = {
   expand: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="m12 5-5 5 5 5"/></svg>',
@@ -51,6 +125,8 @@ const ICONS = {
   local: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M3.5 4.5h13v9h-7l-4 3v-3h-2z"/></svg>',
   party: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true" focusable="false"><circle cx="7" cy="7.5" r="2.5"/><circle cx="13.5" cy="8" r="2"/><path d="M2.5 16c.5-2.8 2.3-4.2 4.5-4.2s4 1.4 4.5 4.2M12 12.2c2.2-.4 4.4.8 5 3.8"/></svg>',
   channel: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M2.5 3.5h10v7h-5l-3 2.5v-2.5h-2z"/><path d="M14.5 7.5h3v7h-1.5v2.5l-3-2.5h-4v-2"/></svg>',
+  chats: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M2.5 4h11M2.5 8h11M2.5 12h7"/></svg>',
+  back: '<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="m7.5 3-3 3 3 3"/></svg>',
   buddies: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true" focusable="false"><circle cx="9" cy="7" r="3"/><path d="M3.5 16.5c.6-3 2.8-4.7 5.5-4.7 1.2 0 2.3.3 3.2 1M15 11.5v5M12.5 14h5"/></svg>',
   send: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M3.5 10 16.5 4l-4 12-2.5-5z"/></svg>',
 };
@@ -200,7 +276,7 @@ export function mountSocialDrawer({
   const sendBtn = form?.querySelector('button[type="submit"]');
   const history = createHistory();
 
-  /** id -> { id, kind, label, order, lines, unread, header, prefix, placeholder, inputLabel, compose, empty } */
+  /** id -> { id, kind, label, order, lines, unread, header, prefix, placeholder, inputLabel, compose, empty, section, note, initial, live, since } */
   const tabs = new Map();
   let tab = 'activity';
   let choice = readChoice(storage);
@@ -233,6 +309,13 @@ export function mountSocialDrawer({
       compose: opts.compose ?? was?.compose ?? true,
       empty: opts.empty ?? was?.empty ?? '',
       icon: opts.icon || was?.icon || 'local',
+      /** In the Chats list: its section, the small note by its name, the letter in its circle. */
+      section: sectionOf(id, opts.section ?? was?.section),
+      note: opts.note ?? was?.note ?? '',
+      initial: opts.initial ?? was?.initial ?? '',
+      /** A feature has handed it over (Global is in the row before groups-feature joins it). */
+      live: opts.live ?? was?.live ?? true,
+      since: was?.since || Date.now(),
     };
     tabs.set(id, t);
     return t;
@@ -249,6 +332,8 @@ export function mountSocialDrawer({
   });
   if (online) {
     addTab('local', { label: 'Local', order: ORDER.local, icon: 'local', inputLabel: 'Local chat', empty: 'Nobody has said anything on this street yet.' });
+    // Global Chat is always a tab: groups-feature joins it when it is picked (onTab).
+    addTab('global', { label: 'Global Chat', order: ORDER.global, icon: 'channel', live: false, placeholder: 'Chat in Global Chat', inputLabel: 'Global Chat', empty: GLOBAL_WAIT });
     addTab('buddies', { kind: 'buddies', label: 'Buddies', order: ORDER.buddies, icon: 'buddies', compose: false });
     tab = 'local';
   }
@@ -271,9 +356,17 @@ export function mountSocialDrawer({
   status.append(presence, statusSlot);
   const tablist = el('div', { class: 'social-tabs', role: 'tablist', 'aria-label': 'Chats', 'data-social-tabs': '' });
   const view = el('div', { id: 'social-view', class: 'social-view', role: 'tabpanel', 'data-social-view': '' });
+  // A conversation opened from Chats: "‹ Chats", its circle and its name over its lines.
+  const convHead = el('div', { class: 'social-conv-head', 'data-social-conv-head': '' });
+  const backBtn = el('button', { type: 'button', class: 'social-back', 'data-social-back': '', 'aria-label': 'Back to Chats', title: 'Back to Chats (Esc)' });
+  backBtn.innerHTML = ICONS.back;
+  backBtn.append(el('span', { class: 'social-back-label' }, 'Chats'));
+  const convWho = el('span', { class: 'social-conv-who', 'data-social-conv-who': '' });
+  convHead.append(backBtn, convWho);
+  convHead.hidden = true;
   const viewHead = el('div', { class: 'social-view-head', 'data-social-view-head': '' });
   const log = el('div', { class: 'social-log', role: 'log', tabindex: '0', 'data-social-log': '' });
-  view.append(viewHead, log);
+  view.append(convHead, viewHead, log);
   const compose = el('div', { class: 'social-compose', 'data-social-compose': '' });
   if (form) compose.append(form);
   if (sendBtn) {
@@ -287,8 +380,26 @@ export function mountSocialDrawer({
   if (!online) status.hidden = true;
 
   // —— State ——
+  // `tab` is what the view shows: a fixed tab, CHATS_TAB (the list) or a conversation (in Chats).
+  const CHATS_VIEW = Object.freeze({ id: CHATS_TAB, kind: 'chats', label: 'Chats', compose: false, header: null, lines: [] });
   function current() {
+    if (tab === CHATS_TAB) return CHATS_VIEW;
     return tabs.get(tab) || tabs.get('activity');
+  }
+
+  const isFixed = (id) => FIXED_TABS.includes(id) && tabs.has(id);
+  /** A conversation in the Chats list (not a tab of its own). */
+  const isConversation = (id) => tabs.has(id) && !FIXED_TABS.includes(id);
+
+  /** The tab selected in the row: Chats while a conversation is open. */
+  function rowTab() {
+    if (tab === CHATS_TAB || isFixed(tab)) return tab;
+    return isConversation(tab) ? CHATS_TAB : 'activity';
+  }
+
+  /** The conversation open in Chats, or ''. */
+  function openChat() {
+    return isConversation(tab) ? tab : '';
   }
 
   function visible(id) {
@@ -299,9 +410,24 @@ export function mountSocialDrawer({
     return [...tabs.values()].sort((a, b) => a.order - b.order || String(a.label).localeCompare(String(b.label)));
   }
 
+  /** The tab row's ids (js: FIXED_TABS then Chats). */
+  function row() {
+    return tabRow(sorted().map((t) => t.id), { online });
+  }
+
+  function conversations() {
+    return sorted().filter((t) => !FIXED_TABS.includes(t.id));
+  }
+
+  /** The Chats list, sectioned and in order. */
+  function listed() {
+    return chatSections(conversations().map((t) => ({ id: t.id, label: t.label, section: t.section, unread: t.unread, lastAt: t.lines.at(-1)?.at || t.since, t })));
+  }
+
   function unreadOf(t) {
     if (t.kind === 'activity') return notifier.unread;
     if (t.kind === 'buddies') return addsUnread;
+    if (t.kind === 'chats') return conversations().reduce((n, c) => n + c.unread, 0);
     return t.unread;
   }
 
@@ -312,7 +438,7 @@ export function mountSocialDrawer({
     else if (t.kind === 'buddies') {
       for (const id of buddyData()?.newAdds || []) seenAdds.add(id);
       addsUnread = 0;
-    } else t.unread = 0;
+    } else if (t.kind === 'chat') t.unread = 0;
   }
 
   // —— Rendering ——
@@ -335,26 +461,19 @@ export function mountSocialDrawer({
     }, 'expand', 0);
     expand.addEventListener('click', () => setOpen(true, { chosen: true, focus: 'tab' }));
     items.push(expand, el('span', { class: 'social-sep', 'aria-hidden': 'true' }));
-    const all = sorted();
-    const channels = all.filter((t) => t.kind === 'chat' && t.order >= ORDER.channel && t.order < ORDER.buddies);
-    for (const t of all) {
-      if (channels.includes(t) && t !== channels[0]) continue;
-      let target = t;
-      let n = unreadOf(t);
-      let label = t.label;
-      if (channels.includes(t)) {
-        // The open chat channels share one rail button: it opens the first with something new.
-        n = channels.reduce((sum, c) => sum + c.unread, 0);
-        target = channels.find((c) => c.unread) || channels[0];
-        label = channels.length > 1 ? 'Chats' : t.label;
-      }
+    // The same tabs as the row; Chats is one button with the total of its conversations, and it
+    // opens the list (the conversation with news is at the top of its section there).
+    for (const id of row()) {
+      const t = id === CHATS_TAB ? CHATS_VIEW : tabs.get(id);
+      const n = unreadOf(t);
+      const label = t.label;
       const b = iconButton({
-        'data-social-rail-tab': target.id,
+        'data-social-rail-tab': id,
         'aria-label': n ? `${label}, ${n} new` : label,
         title: label,
-      }, channels.includes(t) ? 'channel' : t.icon, n);
+      }, id === CHATS_TAB ? 'chats' : t.icon, n);
       b.addEventListener('click', () => {
-        select(target.id);
+        select(id);
         setOpen(true, { chosen: true, focus: 'log' });
       });
       items.push(b);
@@ -372,36 +491,120 @@ export function mountSocialDrawer({
   }
 
   function renderTabs() {
-    const all = sorted();
-    tablist.hidden = all.length < 2;
-    const buttons = all.map((t) => {
-      const n = t.id === tab ? 0 : unreadOf(t);
+    const ids = row();
+    tablist.hidden = ids.length < 2;
+    const sel = rowTab();
+    const buttons = ids.map((id) => {
+      const chats = id === CHATS_TAB;
+      const t = chats ? CHATS_VIEW : tabs.get(id);
+      const label = TAB_LABELS[id] || t.label;
+      // Chats keeps its total while selected: the list's rows are not read by showing the list.
+      const n = chats ? unreadOf(t) : id === sel ? 0 : unreadOf(t);
       const b = el('button', {
         type: 'button',
         role: 'tab',
-        id: `social-tab-${t.id.replace(/[^\w-]/g, '-')}`,
-        class: 'social-tab',
-        'aria-selected': String(t.id === tab),
+        id: `social-tab-${id.replace(/[^\w-]/g, '-')}`,
+        class: chats ? 'social-tab is-chats' : 'social-tab',
+        'aria-selected': String(id === sel),
         'aria-controls': 'social-view',
-        tabindex: t.id === tab ? '0' : '-1',
-        'data-social-tab': t.id,
+        tabindex: id === sel ? '0' : '-1',
+        'data-social-tab': id,
         'aria-label': n ? `${t.label}, ${n} new` : t.label,
+        title: t.label === label ? null : t.label,
       });
-      b.append(el('span', { class: 'social-tab-label' }, t.label));
+      if (chats) {
+        const icon = el('span', { class: 'social-tab-icon', 'aria-hidden': 'true' });
+        icon.innerHTML = ICONS.chats;
+        b.append(icon);
+      }
+      b.append(el('span', { class: 'social-tab-label' }, label));
       if (n) b.append(el('span', { class: 'social-badge', 'aria-hidden': 'true' }, badgeText(n)));
       // Ticket 37 follow-up: a click picks the chat and leaves the keyboard where it was, so the arrow
       // keys keep walking the avatar (Chrome would otherwise focus the tab, and its arrows would switch chats).
       b.addEventListener('pointerdown', (e) => e.preventDefault?.());
-      b.addEventListener('click', () => select(t.id, { focus: false }));
+      b.addEventListener('click', () => select(id, { focus: false }));
       return b;
     });
     tablist.replaceChildren(...buttons);
-    const sel = tablist.querySelector('[aria-selected="true"]');
-    if (sel) {
-      view.setAttribute('aria-labelledby', sel.id);
-      // A long row of chats scrolls: keep the one in front in view.
-      if (typeof sel.scrollIntoView === 'function' && tablist.scrollWidth > tablist.clientWidth) sel.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+    const selBtn = tablist.querySelector('[aria-selected="true"]');
+    if (selBtn) view.setAttribute('aria-labelledby', selBtn.id);
+    fitTabs();
+  }
+
+  /**
+   * The five tabs always fit (no scrolling): when counts would cut a label, the fixed tabs' counts
+   * become dots (is-tight), then Chats shows its icon and count without its word (is-tighter). The
+   * numbers stay in each tab's name for screen readers, and in the rail.
+   */
+  function fitTabs() {
+    if (tablist.hidden || !(tablist.clientWidth > 0)) return;
+    const cut = () => [...tablist.querySelectorAll('.social-tab-label')].some((l) => l.scrollWidth > l.clientWidth + 0.5);
+    tablist.classList.toggle('is-tight', false);
+    tablist.classList.toggle('is-tighter', false);
+    if (!cut()) return;
+    tablist.classList.add('is-tight');
+    if (cut()) tablist.classList.add('is-tighter');
+  }
+
+  /** A conversation's round avatar: its letter (or the one it was given) in its colour. */
+  function chatAvatar(t, cls = 'social-chat-av') {
+    const a = avatarOf(t.label);
+    return el('span', { class: `social-av ${cls}`, 'data-hue': String(a.hue), 'aria-hidden': 'true' }, t.initial || a.initial);
+  }
+
+  /** The note by a row's name: the feature's (Buddy, 3 members, Butler), channels "Everyone". */
+  function noteOf(t) {
+    return t.note || (t.section === 'channels' ? 'Everyone' : '');
+  }
+
+  function renderChats() {
+    const secs = listed();
+    if (!secs.length) return [el('p', { class: 'social-empty', 'data-social-chats-empty': '' }, CHATS_EMPTY)];
+    const out = [];
+    for (const sec of secs) {
+      const box = el('div', { class: 'social-chat-sec', role: 'group', 'aria-labelledby': `social-chat-sec-${sec.id}`, 'data-social-chat-section': sec.id });
+      box.append(el('h3', { id: `social-chat-sec-${sec.id}`, class: 'social-chat-sec-title' }, sec.title));
+      for (const r of sec.rows) {
+        const t = r.t;
+        const n = t.unread;
+        const note = noteOf(t);
+        const last = lastLineText(t.lines, { label: t.label, section: t.section });
+        const b = el('button', {
+          type: 'button',
+          class: `social-chat-row${n ? ' is-unread' : ''}`,
+          'data-social-chat': t.id,
+          'data-section': t.section,
+          'aria-label': [t.label, note, n ? `${n} new` : '', last].filter(Boolean).join(', '),
+        });
+        const txt = el('span', { class: 'social-chat-txt' });
+        const name = el('span', { class: 'social-chat-name' });
+        name.append(el('span', { class: 'social-chat-label' }, t.label));
+        if (note) name.append(el('small', { class: 'social-chat-note' }, note));
+        txt.append(name, el('span', { class: `social-chat-last${last ? '' : ' is-empty'}` }, last || t.empty || 'Nothing said yet.'));
+        b.append(chatAvatar(t), txt);
+        if (n) b.append(el('span', { class: 'social-badge', 'aria-hidden': 'true' }, badgeText(n)));
+        // As the tabs: a click opens it without taking the keyboard (Enter on a focused row moves it in).
+        b.addEventListener('pointerdown', (e) => e.preventDefault?.());
+        b.addEventListener('click', () => {
+          const keyed = document.activeElement === b;
+          select(t.id);
+          if (keyed) (current().compose && !compose.hidden ? input : log)?.focus?.({ preventScroll: true });
+        });
+        box.append(b);
+      }
+      out.push(box);
     }
+    return out;
+  }
+
+  /** The bar over a conversation opened from Chats. */
+  function renderConvHead(t) {
+    const conv = isConversation(t.id);
+    convHead.hidden = !conv;
+    if (!conv) return;
+    const name = el('span', { class: 'social-conv-name' }, t.label);
+    convWho.replaceChildren(chatAvatar(t, 'social-conv-av'), name);
+    convHead.dataset.socialConvHead = t.id;
   }
 
   function lineNode(line) {
@@ -505,6 +708,7 @@ export function mountSocialDrawer({
   function renderView() {
     const t = current();
     const atEnd = log.scrollHeight - log.scrollTop - log.clientHeight < 24;
+    renderConvHead(t);
     // The same head stays put (moving it would drop the keyboard from a button in it).
     if (viewHead.firstChild !== t.header || viewHead.childNodes?.length > 1) viewHead.replaceChildren(...(t.header ? [t.header] : []));
     viewHead.hidden = !t.header;
@@ -516,21 +720,30 @@ export function mountSocialDrawer({
     } else if (t.kind === 'buddies') {
       nodes = renderBuddies();
       log.setAttribute('aria-live', 'off');
+    } else if (t.kind === 'chats') {
+      nodes = renderChats();
+      log.setAttribute('aria-live', 'off');
     } else {
       nodes = t.lines.length ? withTimeLines(t.lines).map(lineNode) : t.empty ? [el('p', { class: 'social-empty' }, t.empty)] : [];
       log.setAttribute('aria-live', 'polite');
     }
     log.replaceChildren(...nodes);
-    log.setAttribute('aria-label', t.kind === 'activity' ? 'Activity log' : t.kind === 'buddies' ? 'Buddies' : `${t.label} chat`);
+    log.setAttribute('aria-label', t.kind === 'activity' ? 'Activity log' : t.kind === 'buddies' ? 'Buddies' : t.kind === 'chats' ? 'Chats' : `${t.label} chat`);
+    log.setAttribute('role', t.kind === 'chats' ? 'region' : 'log');
+    // The list's rows take the keyboard themselves: Tab from the row of tabs lands on the first.
+    log.setAttribute('tabindex', t.kind === 'chats' ? '-1' : '0');
     log.dataset.socialLog = t.id;
+    if (t.kind === 'chats') log.dataset.socialList = '1';
+    else delete log.dataset.socialList;
     if (atEnd || log.dataset.jump) log.scrollTop = log.scrollHeight;
     delete log.dataset.jump;
     // The input under the log: what it says and where your words go.
-    const showCompose = Boolean(form) && t.compose;
+    // Global waits for groups-feature to join it: a line typed before then would go to Local.
+    const showCompose = Boolean(form) && t.compose && t.live !== false;
     compose.hidden = !showCompose;
     if (input && showCompose) {
       const street = streetName();
-      const hint = t.placeholder || (street ? `Say something on ${street}` : 'Say something');
+      const hint = t.placeholder || (isConversation(t.id) ? `Message ${t.label}` : street ? `Say something on ${street}` : 'Say something');
       if (input.placeholder !== hint) input.placeholder = hint;
       if (inputLabel) inputLabel.textContent = t.inputLabel || t.label;
     }
@@ -539,20 +752,24 @@ export function mountSocialDrawer({
   function publish() {
     dock.dataset.socialOpen = open ? 'open' : 'rail';
     setData('socialOpen', open ? 'open' : 'rail');
-    setData('socialTab', tab);
-    setData('socialTabs', sorted().map((t) => t.id).join(','));
-    setData('socialUnread', sorted().map((t) => [t.id, unreadOf(t)]).filter(([, n]) => n).map(([id, n]) => `${id}:${n}`).join(','));
+    setData('socialTab', rowTab());
+    setData('socialChat', openChat());
+    setData('socialTabs', row().join(','));
+    setData('socialChats', listed().flatMap((sec) => sec.rows.map((r) => r.id)).join(','));
+    const counts = sorted().map((t) => [t.id, unreadOf(t)]);
+    if (row().includes(CHATS_TAB)) counts.push([CHATS_TAB, unreadOf(CHATS_VIEW)]);
+    setData('socialUnread', counts.filter(([, n]) => n).map(([id, n]) => `${id}:${n}`).join(','));
   }
 
   /** A selector for the drawer control that has the keyboard, so a redraw can give it back. */
   function focusSelector(node) {
     if (!node || node === input || node === document.body || !dock.contains?.(node)) return null;
     const esc = (v) => (globalThis.CSS?.escape ? CSS.escape(v) : String(v).replace(/"/g, '\\"'));
-    for (const a of ['data-social-rail-tab', 'data-social-tab', 'data-social-buddy']) {
+    for (const a of ['data-social-rail-tab', 'data-social-tab', 'data-social-chat', 'data-social-buddy']) {
       const v = node.getAttribute?.(a);
       if (v !== null && v !== undefined) return `[${a}="${esc(v)}"]`;
     }
-    for (const a of ['data-social-expand', 'data-social-collapse', 'data-social-presence', 'data-social-manage-buddies']) if (node.getAttribute?.(a) !== null) return `[${a}]`;
+    for (const a of ['data-social-expand', 'data-social-collapse', 'data-social-presence', 'data-social-manage-buddies', 'data-social-back']) if (node.getAttribute?.(a) !== null) return `[${a}]`;
     const label = node.getAttribute?.('aria-label');
     return label ? `[aria-label="${esc(label)}"]` : null;
   }
@@ -602,13 +819,17 @@ export function mountSocialDrawer({
     else if (focus === 'input') input?.focus({ preventScroll: true });
   }
 
+  /**
+   * Brings a tab or a conversation to the front: a fixed tab, CHATS_TAB (the list), or any other
+   * conversation, which opens in Chats. `focus` puts the keyboard on the row's tab.
+   */
   function select(id, { focus = false } = {}) {
-    if (!tabs.has(id)) return false;
+    if (id === CHATS_TAB ? !row().includes(CHATS_TAB) : !tabs.has(id)) return false;
     const changed = id !== tab;
     tab = id;
     log.dataset.jump = '1';
     render();
-    if (focus) tablist.querySelector(`[data-social-tab="${CSS.escape(id)}"]`)?.focus({ preventScroll: true });
+    if (focus) tablist.querySelector(`[data-social-tab="${CSS.escape(rowTab())}"]`)?.focus({ preventScroll: true });
     if (changed) for (const fn of listeners) {
       try {
         fn(id);
@@ -640,6 +861,32 @@ export function mountSocialDrawer({
   collapseBtn.addEventListener('click', () => setOpen(false, { chosen: true, focus: 'rail' }));
   presence.addEventListener('click', () => select('buddies', { focus: true }));
 
+  /** Back from a conversation to the Chats list; `focus` puts the keyboard on its row there. */
+  function back({ focus = false } = {}) {
+    const from = openChat();
+    if (!from) return false;
+    select(CHATS_TAB);
+    if (focus) (log.querySelector(`[data-social-chat="${CSS.escape(from)}"]`) || log.querySelector('[data-social-chat]') || log)?.focus?.({ preventScroll: true });
+    return true;
+  }
+  backBtn.addEventListener('pointerdown', (e) => e.preventDefault?.());
+  backBtn.addEventListener('click', () => back({ focus: document.activeElement === backBtn }));
+
+  // The Chats list: Up and Down (Home, End) move between its rows; Enter opens one (a button).
+  log.addEventListener('keydown', (e) => {
+    if (current().kind !== 'chats' || e.target?.getAttribute?.('data-social-chat') == null) return;
+    const rows = log.querySelectorAll('[data-social-chat]');
+    const i = rows.indexOf ? rows.indexOf(e.target) : [...rows].indexOf(e.target);
+    let to = -1;
+    if (e.key === 'ArrowDown') to = Math.min(rows.length - 1, i + 1);
+    else if (e.key === 'ArrowUp') to = Math.max(0, i - 1);
+    else if (e.key === 'Home') to = 0;
+    else if (e.key === 'End') to = rows.length - 1;
+    if (to < 0) return;
+    e.preventDefault();
+    rows[to]?.focus?.({ preventScroll: false });
+  });
+
   // Tabs: arrow keys move along the row (the ARIA tabs pattern), Home and End to the ends, only
   // while a tab has the keyboard (Tab or Shift+Tab to it; a click does not take it), and the row
   // shows a ring meanwhile. Escape hands the keys back to the game, as the client's Tab cycle let go
@@ -649,8 +896,8 @@ export function mountSocialDrawer({
       e.target?.blur?.();
       return;
     }
-    const all = sorted();
-    const i = all.findIndex((t) => t.id === tab);
+    const all = row();
+    const i = all.indexOf(rowTab());
     let to = -1;
     if (e.key === 'ArrowRight') to = (i + 1) % all.length;
     else if (e.key === 'ArrowLeft') to = (i - 1 + all.length) % all.length;
@@ -658,13 +905,25 @@ export function mountSocialDrawer({
     else if (e.key === 'End') to = all.length - 1;
     if (to < 0) return;
     e.preventDefault();
-    select(all[to].id, { focus: true });
+    // Onto Chats from another tab: the list (a conversation you left open there is a click away).
+    select(all[to], { focus: true });
   });
 
   // Keys pressed in the drawer stay in it (a focused tab or button never walks the avatar),
-  // except Escape, which the game's own handlers see.
+  // except Escape, which the game's own handlers see: in a conversation opened from Chats,
+  // Escape first goes back to the list (the keyboard on its row), and from there gives the keys back.
   dock.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') return;
+    if (e.key === 'Escape') {
+      if (tablist.contains?.(e.target)) return;
+      if (openChat() && panel.contains?.(e.target)) {
+        e.preventDefault?.();
+        e.stopPropagation();
+        back({ focus: true });
+        return;
+      }
+      if (e.target?.getAttribute?.('data-social-chat') != null) e.target.blur?.();
+      return;
+    }
     if (e.key === '/' && !e.target?.matches?.('input, textarea, select, [contenteditable="true"]')) {
       e.preventDefault();
       focusInput();
@@ -703,7 +962,7 @@ export function mountSocialDrawer({
   /** Shows the input (a tab that has one, the drawer open), for whatever is about to type in it. */
   function revealInput({ chosen = false } = {}) {
     if (!form) return false;
-    if (online && !current().compose) select(tabs.has('local') ? 'local' : 'activity');
+    if (online && (!current().compose || current().live === false)) select(tabs.has('local') ? 'local' : 'activity');
     if (!open) setOpen(true, { chosen });
     return true;
   }
@@ -777,6 +1036,16 @@ export function mountSocialDrawer({
   }
   layout(true);
   globalThis.addEventListener?.('resize', () => layout(true));
+  // The row's width changes as the drawer opens (it grows from the rail): fit the tabs again then.
+  if (typeof globalThis.ResizeObserver === 'function') {
+    let lastW = -1;
+    new globalThis.ResizeObserver(() => {
+      const w = tablist.clientWidth || 0;
+      if (w === lastW) return;
+      lastW = w;
+      fitTabs();
+    }).observe(tablist);
+  }
   // STARTCARD: the loading card hides the drawer (body.is-booting, visibility), so the inset measured
   // under it is 0; measure again once the game is uncovered, so the start card and the pack centre
   // clear of a drawer that opens with the window.
@@ -804,12 +1073,30 @@ export function mountSocialDrawer({
     get mode() {
       return online ? 'online' : 'solo';
     },
+    /** The tab selected in the row (chats while a conversation is open there). */
     get tab() {
+      return rowTab();
+    },
+    /** The conversation open in Chats, or ''. */
+    get chat() {
+      return openChat();
+    },
+    /** What the view shows: the open conversation, else the tab. */
+    get showing() {
       return tab;
     },
+    /** The tab row. */
     get tabs() {
-      return sorted().map((t) => t.id);
+      return row();
     },
+    /** The Chats list's conversations, in its order. */
+    get chats() {
+      return listed().flatMap((sec) => sec.rows.map((r) => r.id));
+    },
+    /** The Chats list as drawn: [{ id, title, rows: [{ id, label, note, unread, last }] }]. */
+    chatList: () => listed().map((sec) => ({ id: sec.id, title: sec.title, rows: sec.rows.map(({ t }) => ({ id: t.id, label: t.label, note: noteOf(t), unread: t.unread, last: lastLineText(t.lines, { label: t.label, section: t.section }) })) })),
+    /** Back from a conversation to the Chats list. */
+    back: (opts) => back(opts),
     isOpen: () => open,
     open: (opts = {}) => setOpen(true, { chosen: true, ...opts }),
     close: (opts = {}) => setOpen(false, { chosen: true, ...opts }),
@@ -822,20 +1109,31 @@ export function mountSocialDrawer({
     focusInput,
     /** Opens the drawer on a tab with the input (the Feat panel's Gather fills it in), without keeping that as the player's choice. */
     revealInput: () => revealInput(),
-    /** A tab's unread count. */
-    unread: (id) => (tabs.has(id) ? unreadOf(tabs.get(id)) : 0),
-    /** Makes or changes a chat tab: { label, header, prefix, placeholder, inputLabel, order, empty }. */
+    /** A tab's unread count (chats: the total of its conversations). */
+    unread: (id) => (id === CHATS_TAB ? unreadOf(CHATS_VIEW) : tabs.has(id) ? unreadOf(tabs.get(id)) : 0),
+    /**
+     * Makes or changes a conversation: { label, header, prefix, placeholder, inputLabel, order, empty,
+     * section (private|groups|channels), note (by its name in the list), initial (in its circle) }.
+     * Local and Global are tabs; anything else is in Chats.
+     */
     channel(id, opts = {}) {
-      if (id === 'activity' || id === 'buddies') return false;
-      addTab(id, { order: id === 'local' ? ORDER.local : id === 'party' ? ORDER.party : ORDER.channel, icon: id === 'party' ? 'party' : 'local', ...opts });
+      if (id === 'activity' || id === 'buddies' || id === CHATS_TAB) return false;
+      const { label, ...rest } = opts;
+      // Global's row label stays "Global" (TAB_LABELS); its name is Global Chat.
+      addTab(id, { order: id === 'local' ? ORDER.local : id === 'global' ? ORDER.global : id === 'party' ? ORDER.party : ORDER.channel, icon: id === 'party' ? 'party' : id === 'global' ? 'channel' : 'local', ...rest, ...(label ? { label } : {}), live: true });
       render();
       return true;
     },
-    /** Takes a tab away (a party that ended, a chat closed). */
+    /** Takes a conversation away (a party that ended, a chat closed); Global stays as a tab, waiting. */
     drop(id) {
       if (id === 'activity' || id === 'local' || id === 'buddies' || !tabs.has(id)) return false;
-      tabs.delete(id);
-      if (tab === id) select(online ? 'local' : 'activity');
+      const was = tab === id;
+      if (id === 'global') {
+        const g = tabs.get('global');
+        Object.assign(g, { lines: [], unread: 0, header: null, live: false, empty: GLOBAL_WAIT });
+      } else tabs.delete(id);
+      // A conversation closed while open goes back to the list; Global (a tab) to Local.
+      if (was) select(id === 'global' ? 'local' : online ? CHATS_TAB : 'activity');
       else render();
       return true;
     },
@@ -911,8 +1209,8 @@ export function mountSocialDrawer({
       items.sort((a, b) => a.at - b.at);
       return withTimeLines(items, (x) => x.at).map((x) => (x.sep ? lineNode(x) : x.act ? activityNode(x.e) : lineNode(x.e)));
     },
-    /** A tab's label, or ''. */
-    label: (id) => tabs.get(id)?.label || '',
+    /** A tab's or conversation's name, or ''. */
+    label: (id) => (id === CHATS_TAB ? CHATS_VIEW.label : tabs.get(id)?.label || ''),
     onRender(fn) {
       renderListeners.add(fn);
       return () => renderListeners.delete(fn);
