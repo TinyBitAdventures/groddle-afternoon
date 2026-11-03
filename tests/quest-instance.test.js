@@ -397,8 +397,8 @@ describe('G311: a failed room quest is Try again in the quest log', () => {
   };
 
   it('a run lost to a reload marks a startable quest failed, not a retry prompt', async () => {
-    const { questInstancesFeature } = await import('../public/js/features/quest-instances-feature.js?v=e2f1a8c5');
-    const { ensureQuestOfferState } = await import('../public/js/quest-offers.js?v=49e0f9bd');
+    const { questInstancesFeature } = await import('../public/js/features/quest-instances-feature.js?v=cdabf9f8');
+    const { ensureQuestOfferState } = await import('../public/js/quest-offers.js?v=3bf17441');
     assert.equal(getQuestCatalog().mental_block?.needsStart, true);
     assert.notEqual(getQuestCatalog().help_juju_bandits?.needsStart, true, 'no onStarted in GSJS');
     questInstancesFeature.restore({ questId: 'mental_block', roomId: 'mental_block', memory: {}, retry: { help_juju_bandits: Date.now() - 60_000 } });
@@ -461,8 +461,8 @@ describe('G313: failed room quests the source removes', () => {
   });
 
   it('a reload removes a source-removed quest and its offers, and keeps the prompt for the three', async () => {
-    const { questInstancesFeature } = await import('../public/js/features/quest-instances-feature.js?v=e2f1a8c5');
-    const { questStatus } = await import('../public/js/quest-offers.js?v=49e0f9bd');
+    const { questInstancesFeature } = await import('../public/js/features/quest-instances-feature.js?v=cdabf9f8');
+    const { questStatus } = await import('../public/js/quest-offers.js?v=3bf17441');
     const t = Date.now() - 60_000;
     questInstancesFeature.restore({ memory: {}, retry: { tower_quest: t, le_miserable_part_2: t, smuggle_the_smuggler_part2: t } });
     const active = { tower_quest: { progress: {} }, le_miserable_part_2: { progress: {} }, smuggle_the_smuggler_part2: { progress: {} } };
@@ -489,7 +489,7 @@ describe('G313: failed room quests the source removes', () => {
   });
 
   it('has no map card', async () => {
-    const { questInstancesFeature } = await import('../public/js/features/quest-instances-feature.js?v=e2f1a8c5');
+    const { questInstancesFeature } = await import('../public/js/features/quest-instances-feature.js?v=cdabf9f8');
     assert.equal(questInstancesFeature.mapCards, undefined);
     const src = readFileSync(join(root, 'public/js/features/quest-instances-feature.js'), 'utf8');
     assert.doesNotMatch(src, /Unfinished quest places/);

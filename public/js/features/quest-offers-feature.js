@@ -79,10 +79,13 @@
  * QA: &questofferdemo=timed[:<quest>] starts a timed quest (default
  * mining_mine_in_time_period) with one second left, so it fails and shows
  * Try again in the log.
+ * QA: &questofferdemo=accept:<quest>[,<quest>] accepts them at once (one on hold for a closed
+ * road too: its card says On hold; street-jobs-feature &openroad=<job id> opens the road).
  */
 
 import {
   acceptOffer,
+  setQuestHeldCheck,
   ensureQuestOfferState,
   listDeclinedOffers,
   heldForNpcTurnIn,
@@ -105,7 +108,7 @@ import {
   COLD_COMFORT_LEAVE_TEXT,
   HOME_TREE_GROWN_TEXT,
   SEED_TO_SCYTHE,
-} from '../quest-offers.js?v=49e0f9bd';
+} from '../quest-offers.js?v=3bf17441';
 import { parseQuestConversation } from '../quests.js?v=282e1621';
 import { questRequirementText, renderQuestText, withQuestMarkup } from '../quest-text.js?v=7f5d761c';
 import { addItem, removeItem, countItem } from '../inventory.js?v=597a17a2';
@@ -576,6 +579,16 @@ function runDemo(engine, mode) {
     }
     return;
   }
+  if (kind === 'accept' && named) {
+    // QA accept:<quest>[,<quest>]: accepted at once, as from its card (a quest on hold too, to see its note).
+    for (const id of named.split(',')) if (!qs.active?.[id]) acceptOffer(qs, id, questContext(engine));
+    engine.save();
+    engine.updateHud?.();
+    if (typeof document !== 'undefined' && document.getElementById('quest-panel')?.hidden) {
+      setTimeout(() => document.getElementById('quest-btn')?.click(), 600);
+    }
+    return;
+  }
   if (kind === 'timed') {
     // G255 QA: a timed quest accepted with one second left, so it fails and shows Try again.
     const id = named || 'mining_mine_in_time_period';
@@ -618,6 +631,8 @@ export const questOffersFeature = {
 
   init(engine) {
     ensureQuestOfferState(engine.questState);
+    // A quest whose street no open road reaches yet is offered by no one (js/quest-reach.js).
+    setQuestHeldCheck((id) => Boolean(engine.query?.('questHold', id, engine)));
     // QA routes (any *demo / *autoplay / streetdemo param) stay uninterrupted
     // unless they ask for offers; ?questoffer=off silences them anywhere.
     const params = [...new URLSearchParams(globalThis.location?.search || '').keys()];

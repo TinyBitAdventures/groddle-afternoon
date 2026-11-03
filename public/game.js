@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=117337d3';
 import { createFeatureHost } from './js/feature-host.js?v=903263a4';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=5fef8621';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=41e59112';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -36,7 +36,7 @@ import {
 // Quest copy is Flash htmlText: <b>/<i>/<br> drawn as formatting, the rest dropped, never innerHTML.
 import { questRequirementText, renderQuestText, withQuestMarkup } from './js/quest-text.js?v=7f5d761c';
 // G267: the world-verb quest counters skip offer-system quests; old saves drop the boot Moloko quest.
-import { dropBootStarterQuests, routesCounter, worldVerbQuestEvents, gardenPlotEvents, makingUnitQuestEvents, shrineDonationQuestEvents } from './js/quest-offers.js?v=49e0f9bd';
+import { dropBootStarterQuests, routesCounter, worldVerbQuestEvents, gardenPlotEvents, makingUnitQuestEvents, shrineDonationQuestEvents } from './js/quest-offers.js?v=3bf17441';
 import {
   PHANTOM_QUEST_ID,
   REMEMBER_QUEST_ID,
@@ -482,7 +482,7 @@ import {
   parsePlayerSave,
   serializePlayerSave,
   restorePlayerSave,
-} from './js/player-save.js?v=3da77f2b';
+} from './js/player-save.js?v=f9b34732';
 import {
   HOME_INTERIOR_TSID,
   HOME_STREET_TSID,
@@ -926,7 +926,7 @@ import { mountNotifyView } from './js/notify-view.js?v=81d06119';
 import { mountSocialDrawer } from './js/ui/social-drawer.js?v=a0048e58';
 import { bindDragScroll } from './js/ui/drag-scroll.js?v=9a527ac8';
 import { SIDE_SHEET_IDS, bindTabs, inSideSheet, mountPanelShell, sheetKeyToWorld } from './js/ui/panel-shell.js?v=3d10b1e5';
-import { createQuestSheet, questStep } from './js/ui/quest-sheet.js?v=cacf3349';
+import { createQuestSheet, questStep } from './js/ui/quest-sheet.js?v=58c013a0';
 import { createQuestTracker } from './js/ui/quest-tracker.js?v=5487413f';
 import { createContextMenu, isContextMenuKey as isMenuKey } from './js/ui/context-menu.js?v=b3d24c15';
 import { bindCountField, countKeyValue, countStepMarkup } from './js/ui/count-chooser.js?v=893305c8';
@@ -3148,11 +3148,19 @@ function renderActivityHistory() {
   }
 }
 
+/** Why an active quest is on hold (street-jobs-feature questHold), or null. */
+function questHoldOf(classTsid) {
+  return features.query('questHold', classTsid, engine) || null;
+}
+
 function renderQuestTracker() {
   const box = document.getElementById('quest-tracker-list');
   const count = document.getElementById('quest-tracker-count');
   if (!box) return;
-  const rows = listQuestTracker(questState, 2);
+  // A quest on hold is no "what to do next": it leaves the tracker until its road opens.
+  const holds = Object.keys(questState.active || {}).filter((id) => questHoldOf(id));
+  if (app?.canvas) app.canvas.dataset.questHolds = holds.join(',');
+  const rows = listQuestTracker(questState, 2 + holds.length).filter((row) => !holds.includes(row.classTsid)).slice(0, 2);
   if (count) count.textContent = String(Object.keys(questState.active).length);
   box.innerHTML = '';
   if (!rows.length) {
@@ -5194,7 +5202,8 @@ function renderPinnedQuests() {
   if (state.started && pins.keepOnly(Object.keys(questState.active || {}))) savePlayerState();
   const rows = pins.pins().map((classTsid) => {
     const p = getQuestProgress(questState, classTsid);
-    if (!p?.active) return null;
+    // On hold: the pin stays, but it puts nothing on screen until the road opens.
+    if (!p?.active || questHoldOf(classTsid)) return null;
     return { classTsid, title: p.def.title || classTsid, ...questStep(p.requirements) };
   }).filter(Boolean);
   questTracker.render(rows, pins.collapsed());
@@ -5308,6 +5317,17 @@ function updateHud() {
       title.className = 'q-title';
       title.textContent = p.def.title + (p.completed ? ' ✓' : '');
       card.appendChild(title);
+      // Austin 2026-11-03 (js/quest-reach.js): a quest whose street no open road reaches waits,
+      // its progress kept, and comes back by itself when the road opens.
+      const hold = p.active ? questHoldOf(p.def.classTsid) : null;
+      if (hold) {
+        card.classList.add('on-hold');
+        card.dataset.questHold = hold.place;
+        const note = document.createElement('div');
+        note.className = 'q-hold';
+        note.textContent = hold.note;
+        card.appendChild(note);
+      }
       for (const r of p.requirements || []) {
         const row = document.createElement('div');
         row.className = 'q-req';

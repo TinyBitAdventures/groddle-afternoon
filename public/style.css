@@ -4223,6 +4223,13 @@ button.play-context-head:focus-visible {
   line-height: var(--lh-snug);
   display: block;
 }
+.quest-log-body .q-hold {
+  font-size: var(--fs-md);
+  font-weight: 700;
+  color: var(--warn);
+  line-height: var(--lh-normal);
+  margin-bottom: var(--sp-2);
+}
 .quest-log-body .q-req {
   font-size: var(--fs-md);
   opacity: 0.9;
@@ -11192,6 +11199,9 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
 [data-ui="modern"] #quest .qc-count { grid-row: 1 / span 2; grid-column: 2; align-self: center; font-weight: var(--fw-heavy); font-variant-numeric: tabular-nums; }
 [data-ui="modern"] #quest .qc-done { color: var(--good); font-size: var(--fs-s); }
 [data-ui="modern"] #quest .qc-step { grid-column: 1; font-size: var(--fs-s); color: var(--text-muted); }
+/* A quest on hold for a closed road (game.js, js/quest-reach.js): the head and the card say why. */
+[data-ui="modern"] #quest .qc-step.qc-hold { color: var(--warn); font-weight: var(--fw-heavy); }
+[data-ui="modern"] #quest .q-card.on-hold .qc-bar > i { background: var(--text-muted); }
 [data-ui="modern"] #quest .q-bar {
   height: 6px;
   margin: var(--space-1) 0 var(--space-2);

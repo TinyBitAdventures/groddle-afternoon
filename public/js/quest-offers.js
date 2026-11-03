@@ -432,6 +432,12 @@ function offerableStatus(questState, def) {
   return status === 'done' && def.isRepeatable;
 }
 
+/** The game's "is this quest on hold" check (features/quest-offers-feature.js init), or null. */
+let questHeldCheck = null;
+export function setQuestHeldCheck(fn) {
+  questHeldCheck = typeof fn === 'function' ? fn : null;
+}
+
 function eligibleTrigger(def, questState, pc, ctx, { npc = false } = {}) {
   // G329: in multiplayer the quests that need other players (js/quests-mp.js) are offered
   // too, by their own trigger or the one quests-mp.js gives them. Solo: def.solo alone.
@@ -439,6 +445,10 @@ function eligibleTrigger(def, questState, pc, ctx, { npc = false } = {}) {
   if (!def?.solo && !mp) return null;
   if (def.custom && !ctx.includeCustom) return null;
   if (!offerableStatus(questState, def)) return null;
+  // Austin 2026-11-03 (js/quest-reach.js): a quest that needs a street no open road reaches yet
+  // waits until one does (street-jobs-feature questHold: closed project roads, solo or the shared
+  // world), from the familiar and from every NPC (their callers' ctx, or the check the game set).
+  if ((ctx.questHeld || questHeldCheck)?.(def.classTsid)) return null;
   const triggers = (mp?.offerTriggers || def.offerTriggers || []).filter((t) => (npc ? isNpcTrigger(t) : isFamiliarTrigger(t)));
   const met = triggers.filter((t) => triggerMet(t, def, questState, pc, ctx));
   if (!met.length) return null;
@@ -1054,6 +1064,21 @@ const fill = (template, vars) => String(template).replace(/\{([ab])\}/g, (_, k) 
 export function routesCounter(counterOrEvent) {
   const counter = eventToCounter(counterOrEvent) || counterOrEvent;
   return COUNTER_ROUTES.some((route) => route.counter === counter);
+}
+
+/**
+ * The COUNTER_ROUTES rows that can advance a requirement counter, each with the {a}/{b} its
+ * counter template took from the name (js/quest-reach.js reads where they can happen).
+ * @returns {{ route: object, vars: Record<string, string> }[]}
+ */
+export function routesForCounter(name) {
+  const out = [];
+  for (const route of COUNTER_ROUTES) {
+    if (route.counter.startsWith('<')) continue;
+    const vars = matchTemplate(route.counter, String(name || ''));
+    if (vars) out.push({ route, vars });
+  }
+  return out;
 }
 
 /**

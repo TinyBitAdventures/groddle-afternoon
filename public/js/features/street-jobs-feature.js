@@ -96,6 +96,8 @@ import {
   upgradeOption,
 } from '../street-jobs.js?v=0235351c';
 import { gainMetabolic, loseEnergy } from '../metabolics.js?v=8504134e';
+import { closuresInTheWay, holdNote, placeIndex, questHold, reachableStreets } from '../quest-reach.js?v=73ff8fd2';
+import { getQuestCatalog as questCatalog } from '../content-catalogs.js?v=10b118dd';
 import { saveStore } from '../save-store.js?v=8839ba7b';
 import {
   HALL_TEXT,
@@ -205,10 +207,104 @@ function loadWays() {
       for (const a of SUBWAY_STREETS) for (const b of SUBWAY_STREETS) if (a !== b) add(a, b);
       const g = (t) => String(t || '').replace(/^L/, 'G');
       for (const t of [...TELEPORTERS, ...WINTRY_PORTAL_TELEPORTERS]) add(g(t.from), g(t.to));
-      return { graph: routeGraph(json).graph, free };
+      waysReady = { graph: routeGraph(json).graph, free };
+      return waysReady;
     })
     .catch(() => null);
   return ways;
+}
+let waysReady = null;
+
+/**
+ * Quests on hold (Austin, 2026-11-03; js/quest-reach.js): the streets the roads as they stand
+ * let you reach, worked out again only when the roads change (a project built here or in the
+ * shared world, a street opened by arriving on it), so asking for every quest costs a lookup.
+ * The starts: the starter street, where you stand and every street already open to you.
+ */
+let reachCache = { key: '', reach: null, shut: null, starts: [], holds: new Map() };
+let placeIdx = null;
+function roadsKey(engine) {
+  let done = 0;
+  for (const row of Object.values(state.jobs)) if (row?.doneAt) done += 1;
+  return `${state.grandfathered.length}|${done}|${engine?.streetTsid || ''}|${demo?.jobId || ''}`;
+}
+function questReach(engine) {
+  if (!catalog || !streetIndex) return null;
+  if (!waysReady) {
+    loadWays();
+    return null;
+  }
+  const key = roadsKey(engine);
+  if (reachCache.key !== key) {
+    placeIdx ||= placeIndex(streetIndex);
+    const shut = new Set(closedStreets(state, catalog, opts()));
+    const starts = [streetIndex.default, engine?.streetTsid, ...state.grandfathered].filter(Boolean);
+    reachCache = { key, shut, starts, reach: reachableStreets({ ...waysReady, shut, starts }), holds: new Map() };
+  }
+  return reachCache;
+}
+/** Each project street's board streets (street-jobs.json connecting), G tsids. */
+let boardsMap = null;
+function boardsOf() {
+  if (boardsMap) return boardsMap;
+  boardsMap = {};
+  for (const job of Object.values(catalog?.jobs || {})) {
+    if (job.kind !== 'street') continue;
+    (boardsMap[job.street] ||= []).push(...(job.connecting || []).map((t) => String(t).replace(/^L/, 'G')));
+  }
+  return boardsMap;
+}
+let lastRoadsCheck = 0;
+let lastRoadsKey = '';
+/**
+ * QA &openroad=<job id>[,<job id>] or for:<quest> (every street project on the way to that
+ * quest's street, the chain its On hold note starts), &openroadms=<ms> (default 8000): those
+ * projects count as built once the wait is up, as when they are finished (solo) or the shared
+ * world builds them (online, project_built), so a quest on hold comes back. Nothing goes to the server.
+ */
+let qaRoadOpened = false;
+function qaOpenRoad(engine, now) {
+  const want = qaRoadOpened ? '' : String(engine.param?.('openroad') || '');
+  if (!want || !waysReady) return;
+  qaOpenAt ||= now + Math.max(0, Number(engine.param('openroadms')) || 8000);
+  if (now < qaOpenAt) return;
+  qaRoadOpened = true;
+  let ids = want.split(',');
+  if (want.startsWith('for:')) {
+    const r = questReach(engine);
+    const hold = r && questHold(questCatalog()?.[want.slice(4)], r.reach, placeIdx);
+    const chain = hold ? closuresInTheWay({ ...waysReady, shut: r.shut, starts: r.starts, targets: hold.streets, boards: boardsOf() }) : [];
+    ids = chain.map(({ street }) => Object.keys(catalog.jobs).find((id) => catalog.jobs[id].kind === 'street' && catalog.jobs[id].street === street));
+  }
+  const opened = [];
+  for (const jobId of ids) {
+    if (!jobId || !jobDef(catalog, jobId)) continue;
+    (state.jobs[jobId] ||= normalizeStreetJobState({ jobs: { [jobId]: {} } }).jobs[jobId]).doneAt = now;
+    opened.push(jobId);
+  }
+  engine.setData?.('openRoad', opened.join(','));
+  drawBarricades(engine);
+  publish(engine);
+}
+let qaOpenAt = 0;
+
+/** Why a quest waits for a road, with the project that opens it, or null (cached per roads). */
+function questHoldFor(classTsid, engine) {
+  const r = questReach(engine);
+  const def = r && questCatalog()?.[classTsid];
+  if (!def) return null;
+  if (r.holds.has(classTsid)) return r.holds.get(classTsid);
+  let out = null;
+  const hold = questHold(def, r.reach, placeIdx);
+  if (hold) {
+    const first = closuresInTheWay({ ...waysReady, shut: r.shut, starts: r.starts, targets: hold.streets, boards: boardsOf() })[0] || null;
+    const jobId = first ? Object.keys(catalog.jobs || {}).find((id) => catalog.jobs[id].kind === 'street' && catalog.jobs[id].street === first.street) || '' : '';
+    const job = jobId ? catalog.jobs[jobId] : null;
+    out = { ...hold, street: first?.street || '', jobId, building: job ? job.label || streetLabel(first.street) : '', board: first?.board ? streetLabel(first.board) : '' };
+    out.note = holdNote(out, { building: out.building, board: out.board });
+  }
+  r.holds.set(classTsid, out);
+  return out;
 }
 
 /** No closed road may cut this street off from the rest of the world: open the fewest that would. */
@@ -1925,6 +2021,14 @@ export const streetJobsFeature = {
   onTick(dtMs, now, engine) {
     if (!catalog) return;
     if (mpMode) ensureMp(engine)?.tick(now);
+    // A road opened (a project built, here or in the shared world): held quests come back now.
+    if (now - lastRoadsCheck > 1000) {
+      lastRoadsCheck = now;
+      const key = roadsKey(engine);
+      if (lastRoadsKey && key !== lastRoadsKey && questReach(engine)) engine.updateHud?.();
+      lastRoadsKey = key;
+    }
+    qaOpenRoad(engine, now);
     const px = engine.player?.x;
     for (const b of barricades) {
       if (b.barricadeTag && !b.destroyed) b.barricadeTag.visible = Number.isFinite(px) && Math.abs(px - b.x) < 160;
@@ -1974,6 +2078,15 @@ export const streetJobsFeature = {
    * and no teleport target (location.js 2915-2935 not_a_destination; InteractionMenuController.as
    * 151-153, 206-208). Returns the note the greyed entries show, or null when its road is open.
    */
+  /**
+   * Austin 2026-11-03 (js/quest-reach.js): a quest whose requirement needs a street no open road
+   * reaches yet: { place, note, building, board } (quest-offers.js holds its offer, game.js shows
+   * an accepted one On hold), or null. Derived from the roads every time; nothing is stored.
+   */
+  questHold(classTsid, engine) {
+    return questHoldFor(classTsid, engine);
+  },
+
   streetUnderConstruction(tsid, engine) {
     if (!catalog || !tsid) return null;
     const closed = roadClosure(state, catalog, tsid, [tsid], opts());

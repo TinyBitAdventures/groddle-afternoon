@@ -1934,6 +1934,9 @@
 :root[data-ui="classic"] #game-root #quest-panel .qc-head { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: calc(5 * var(--cu)); width: 100%; }
 :root[data-ui="classic"] #game-root #quest-panel .qc-head .qc-title { flex: 1 0 100%; }
 :root[data-ui="classic"] #game-root #quest-panel .qc-head .qc-step { order: 1; color: var(--c-classic-text); font: calc(var(--fs-classic-row) * var(--cu-n, 1))/var(--lh-normal) var(--font-classic-body); }
+/* On hold for a closed road (game.js, js/quest-reach.js). */
+:root[data-ui="classic"] #game-root #quest-panel .qc-head .qc-step.qc-hold { font-style: italic; font-weight: 700; }
+:root[data-ui="classic"] #game-root #quest-panel .q-hold { font: calc(var(--fs-classic-row) * var(--cu-n, 1))/var(--lh-normal) var(--font-classic-body); font-weight: 700; margin: 0 0 6px; }
 :root[data-ui="classic"] #game-root #quest-panel .qc-head .qc-count { order: 2; color: var(--c-classic-offline); font: 700 calc(var(--fs-classic-row) * var(--cu-n, 1))/var(--lh-normal) var(--font-classic-body); }
 :root[data-ui="classic"] #game-root #quest-panel .qc-head .qc-step + .qc-count::before,
 :root[data-ui="classic"] #game-root #quest-panel .qc-head .qc-count:has(+ .qc-step)::before { content: "("; }

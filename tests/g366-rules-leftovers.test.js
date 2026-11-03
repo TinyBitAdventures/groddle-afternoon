@@ -26,10 +26,10 @@ import { loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/c
 import { worldVerbAchievementCounters } from '../public/js/achievements.js?v=631d7daa';
 import { createAnimalState, resetAnimalDay } from '../public/js/animals.js?v=35a443e9';
 import { createQuestState } from '../public/js/quests.js?v=282e1621';
-import { acceptOffer, routeQuestEvent } from '../public/js/quest-offers.js?v=49e0f9bd';
+import { acceptOffer, routeQuestEvent } from '../public/js/quest-offers.js?v=3bf17441';
 import { applyBuff, createBuffState } from '../public/js/buffs.js?v=c7727c43';
 import { BUFF_ICONS, QUEST_TIMER_BUFFS } from '../public/js/buff-triggers.js?v=a3093922';
-import { EMERGENCY_RETRY_MS } from '../public/js/features/quest-offers-feature.js?v=7b978923';
+import { EMERGENCY_RETRY_MS } from '../public/js/features/quest-offers-feature.js?v=10d91ea6';
 import { QUOIN_CLASSES, quoinClassAmount, quoinRespawnMs } from '../public/js/quoins.js?v=dfe1ff0a';
 import { COIN_BACK_MS, COIN_CLASS, COIN_TYPE, room as rainbowRoom } from '../public/js/quest-rooms/rainbow-run.js?v=0d3b9189';
 

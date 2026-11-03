@@ -50,7 +50,7 @@
 
 import { ITEM_CATALOG, countItem, ensureItem, itemIcon } from '../inventory.js?v=597a17a2';
 import { canUseTool, useToolCondition } from '../tools.js?v=3974f57e';
-import { acceptOffer, npcQuestOffers } from '../quest-offers.js?v=49e0f9bd';
+import { acceptOffer, npcQuestOffers } from '../quest-offers.js?v=3bf17441';
 import { getQuestCatalog } from '../content-catalogs.js?v=10b118dd';
 import { XP_FOR_LEVEL } from '../progression.js?v=33462eaa';
 import {

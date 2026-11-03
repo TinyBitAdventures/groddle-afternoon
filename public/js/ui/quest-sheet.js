@@ -149,7 +149,13 @@ export function createQuestSheet({ document: doc = globalThis.document, questInf
       count.textContent = 'Done';
       head.appendChild(count);
     }
-    if (step?.step) {
+    if (card.dataset.questHold) {
+      // On hold (game.js, js/quest-reach.js): the closed head says so; the open card says why.
+      const h = doc.createElement('span');
+      h.className = 'qc-step qc-hold';
+      h.textContent = `On hold: waiting for the road to ${card.dataset.questHold}`;
+      head.appendChild(h);
+    } else if (step?.step) {
       const s = doc.createElement('span');
       s.className = 'qc-step';
       renderText(s, step.step);
