@@ -1,0 +1,451 @@
+{
+ "about": "The hi signs (js/hi-signs.js HI_ART_CELLS / hiArtSheet, js/features/hi-signs-feature.js) from Tiny Speck's CC0 glitch-overlays/hi_overlay.swf: per variant the sprite <variant> (state \"1\", the missile icon, and the 65-frame \"hi\" overlay) and <variant>2x (the 37-frame \"hi\" bonus). The OGA sheets are drawn at 1 in the street, 2.5 device px per art px on a Retina window, so each has a 3x twin (a variant's three sheets are all-or-nothing), swapped in when first drawn. Run: node tools/vector-sprites/build.mjs --manifest tools/vector-sprites/hi-signs.json",
+ "firstDraw": true,
+ "webp": true,
+ "budget": {
+  "maxSide": 8192,
+  "maxMB": 64
+ },
+ "jobs": [
+  {
+   "name": "hi-bats",
+   "character": "hi-bats",
+   "swf": "../glitch-overlays/hi_overlay.swf",
+   "sprite": 224,
+   "sheets": [
+    {
+     "path": "assets/sprites/hi-signs/hi_bats_1.webp",
+     "label": "1",
+     "fw": 149,
+     "fh": 114,
+     "cols": 1,
+     "frames": 1
+    },
+    {
+     "path": "assets/sprites/hi-signs/hi_bats_hi.webp",
+     "label": "hi",
+     "fw": 149,
+     "fh": 114,
+     "cols": 6,
+     "frames": 65
+    }
+   ]
+  },
+  {
+   "name": "hi-bats-2x",
+   "character": "hi-bats",
+   "swf": "../glitch-overlays/hi_overlay.swf",
+   "sprite": 220,
+   "sheets": [
+    {
+     "path": "assets/sprites/hi-signs/hi_bats_2x.webp",
+     "label": "hi",
+     "fw": 149,
+     "fh": 114,
+     "cols": 6,
+     "frames": 37
+    }
+   ]
+  },
+  {
+   "name": "hi-birds",
+   "character": "hi-birds",
+   "swf": "../glitch-overlays/hi_overlay.swf",
+   "sprite": 211,
+   "sheets": [
+    {
+     "path": "assets/sprites/hi-signs/hi_birds_1.webp",
+     "label": "1",
+     "fw": 146,
+     "fh": 114,
+     "cols": 1,
+     "frames": 1
+    },
+    {
+     "path": "assets/sprites/hi-signs/hi_birds_hi.webp",
+     "label": "hi",
+     "fw": 146,
+     "fh": 114,
+     "cols": 6,
+     "frames": 65
+    }
+   ]
+  },
+  {
+   "name": "hi-birds-2x",
+   "character": "hi-birds",
+   "swf": "../glitch-overlays/hi_overlay.swf",
+   "sprite": 184,
+   "sheets": [
+    {
+     "path": "assets/sprites/hi-signs/hi_birds_2x.webp",
+     "label": "hi",
+     "fw": 149,
+     "fh": 114,
+     "cols": 6,
+     "frames": 37
+    }
+   ]
+  },
+  {
+   "name": "hi-butterflies",
+   "character": "hi-butterflies",
+   "swf": "../glitch-overlays/hi_overlay.swf",
+   "sprite": 151,
+   "sheets": [
+    {
+     "path": "assets/sprites/hi-signs/hi_butterflies_1.webp",
+     "label": "1",
+     "fw": 154,
+     "fh": 120,
+     "cols": 1,
+     "frames": 1
+    },
+    {
+     "path": "assets/sprites/hi-signs/hi_butterflies_hi.webp",
+     "label": "hi",
+     "fw": 154,
+     "fh": 120,
+     "cols": 6,
+     "frames": 65
+    }
+   ]
+  },
+  {
+   "name": "hi-butterflies-2x",
+   "character": "hi-butterflies",
+   "swf": "../glitch-overlays/hi_overlay.swf",
+   "sprite": 139,
+   "sheets": [
+    {
+     "path": "assets/sprites/hi-signs/hi_butterflies_2x.webp",
+     "label": "hi",
+     "fw": 149,
+     "fh": 114,
+     "cols": 6,
+     "frames": 37
+    }
+   ]
+  },
+  {
+   "name": "hi-cubes",
+   "character": "hi-cubes",
+   "swf": "../glitch-overlays/hi_overlay.swf",
+   "sprite": 96,
+   "sheets": [
+    {
+     "path": "assets/sprites/hi-signs/hi_cubes_1.webp",
+     "label": "1",
+     "fw": 147,
+     "fh": 122,
+     "cols": 1,
+     "frames": 1
+    },
+    {
+     "path": "assets/sprites/hi-signs/hi_cubes_hi.webp",
+     "label": "hi",
+     "fw": 147,
+     "fh": 122,
+     "cols": 6,
+     "frames": 65
+    }
+   ]
+  },
+  {
+   "name": "hi-cubes-2x",
+   "character": "hi-cubes",
+   "swf": "../glitch-overlays/hi_overlay.swf",
+   "sprite": 86,
+   "sheets": [
+    {
+     "path": "assets/sprites/hi-signs/hi_cubes_2x.webp",
+     "label": "hi",
+     "fw": 149,
+     "fh": 114,
+     "cols": 6,
+     "frames": 37
+    }
+   ]
+  },
+  {
+   "name": "hi-flowers",
+   "character": "hi-flowers",
+   "swf": "../glitch-overlays/hi_overlay.swf",
+   "sprite": 73,
+   "sheets": [
+    {
+     "path": "assets/sprites/hi-signs/hi_flowers_1.webp",
+     "label": "1",
+     "fw": 145,
+     "fh": 118,
+     "cols": 1,
+     "frames": 1
+    },
+    {
+     "path": "assets/sprites/hi-signs/hi_flowers_hi.webp",
+     "label": "hi",
+     "fw": 145,
+     "fh": 118,
+     "cols": 6,
+     "frames": 65
+    }
+   ]
+  },
+  {
+   "name": "hi-flowers-2x",
+   "character": "hi-flowers",
+   "swf": "../glitch-overlays/hi_overlay.swf",
+   "sprite": 72,
+   "sheets": [
+    {
+     "path": "assets/sprites/hi-signs/hi_flowers_2x.webp",
+     "label": "hi",
+     "fw": 149,
+     "fh": 114,
+     "cols": 6,
+     "frames": 37
+    }
+   ]
+  },
+  {
+   "name": "hi-hands",
+   "character": "hi-hands",
+   "swf": "../glitch-overlays/hi_overlay.swf",
+   "sprite": 66,
+   "sheets": [
+    {
+     "path": "assets/sprites/hi-signs/hi_hands_1.webp",
+     "label": "1",
+     "fw": 135,
+     "fh": 111,
+     "cols": 1,
+     "frames": 1
+    },
+    {
+     "path": "assets/sprites/hi-signs/hi_hands_hi.webp",
+     "label": "hi",
+     "fw": 135,
+     "fh": 111,
+     "cols": 7,
+     "frames": 65
+    }
+   ]
+  },
+  {
+   "name": "hi-hands-2x",
+   "character": "hi-hands",
+   "swf": "../glitch-overlays/hi_overlay.swf",
+   "sprite": 63,
+   "sheets": [
+    {
+     "path": "assets/sprites/hi-signs/hi_hands_2x.webp",
+     "label": "hi",
+     "fw": 149,
+     "fh": 114,
+     "cols": 6,
+     "frames": 37
+    }
+   ]
+  },
+  {
+   "name": "hi-hearts",
+   "character": "hi-hearts",
+   "swf": "../glitch-overlays/hi_overlay.swf",
+   "sprite": 60,
+   "sheets": [
+    {
+     "path": "assets/sprites/hi-signs/hi_hearts_1.webp",
+     "label": "1",
+     "fw": 143,
+     "fh": 112,
+     "cols": 1,
+     "frames": 1
+    },
+    {
+     "path": "assets/sprites/hi-signs/hi_hearts_hi.webp",
+     "label": "hi",
+     "fw": 143,
+     "fh": 112,
+     "cols": 6,
+     "frames": 65
+    }
+   ]
+  },
+  {
+   "name": "hi-hearts-2x",
+   "character": "hi-hearts",
+   "swf": "../glitch-overlays/hi_overlay.swf",
+   "sprite": 59,
+   "sheets": [
+    {
+     "path": "assets/sprites/hi-signs/hi_hearts_2x.webp",
+     "label": "hi",
+     "fw": 149,
+     "fh": 114,
+     "cols": 6,
+     "frames": 37
+    }
+   ]
+  },
+  {
+   "name": "hi-hi",
+   "character": "hi-hi",
+   "swf": "../glitch-overlays/hi_overlay.swf",
+   "sprite": 56,
+   "sheets": [
+    {
+     "path": "assets/sprites/hi-signs/hi_hi_1.webp",
+     "label": "1",
+     "fw": 148,
+     "fh": 116,
+     "cols": 1,
+     "frames": 1
+    },
+    {
+     "path": "assets/sprites/hi-signs/hi_hi_hi.webp",
+     "label": "hi",
+     "fw": 148,
+     "fh": 116,
+     "cols": 6,
+     "frames": 65
+    }
+   ]
+  },
+  {
+   "name": "hi-hi-2x",
+   "character": "hi-hi",
+   "swf": "../glitch-overlays/hi_overlay.swf",
+   "sprite": 54,
+   "sheets": [
+    {
+     "path": "assets/sprites/hi-signs/hi_hi_2x.webp",
+     "label": "hi",
+     "fw": 149,
+     "fh": 114,
+     "cols": 6,
+     "frames": 37
+    }
+   ]
+  },
+  {
+   "name": "hi-pigs",
+   "character": "hi-pigs",
+   "swf": "../glitch-overlays/hi_overlay.swf",
+   "sprite": 51,
+   "sheets": [
+    {
+     "path": "assets/sprites/hi-signs/hi_pigs_1.webp",
+     "label": "1",
+     "fw": 132,
+     "fh": 112,
+     "cols": 1,
+     "frames": 1
+    },
+    {
+     "path": "assets/sprites/hi-signs/hi_pigs_hi.webp",
+     "label": "hi",
+     "fw": 132,
+     "fh": 112,
+     "cols": 7,
+     "frames": 65
+    }
+   ]
+  },
+  {
+   "name": "hi-pigs-2x",
+   "character": "hi-pigs",
+   "swf": "../glitch-overlays/hi_overlay.swf",
+   "sprite": 50,
+   "sheets": [
+    {
+     "path": "assets/sprites/hi-signs/hi_pigs_2x.webp",
+     "label": "hi",
+     "fw": 149,
+     "fh": 114,
+     "cols": 6,
+     "frames": 37
+    }
+   ]
+  },
+  {
+   "name": "hi-rocketships",
+   "character": "hi-rocketships",
+   "swf": "../glitch-overlays/hi_overlay.swf",
+   "sprite": 47,
+   "sheets": [
+    {
+     "path": "assets/sprites/hi-signs/hi_rocketships_1.webp",
+     "label": "1",
+     "fw": 153,
+     "fh": 123,
+     "cols": 1,
+     "frames": 1
+    },
+    {
+     "path": "assets/sprites/hi-signs/hi_rocketships_hi.webp",
+     "label": "hi",
+     "fw": 153,
+     "fh": 123,
+     "cols": 6,
+     "frames": 65
+    }
+   ]
+  },
+  {
+   "name": "hi-rocketships-2x",
+   "character": "hi-rocketships",
+   "swf": "../glitch-overlays/hi_overlay.swf",
+   "sprite": 46,
+   "sheets": [
+    {
+     "path": "assets/sprites/hi-signs/hi_rocketships_2x.webp",
+     "label": "hi",
+     "fw": 149,
+     "fh": 114,
+     "cols": 6,
+     "frames": 37
+    }
+   ]
+  },
+  {
+   "name": "hi-stars",
+   "character": "hi-stars",
+   "swf": "../glitch-overlays/hi_overlay.swf",
+   "sprite": 42,
+   "sheets": [
+    {
+     "path": "assets/sprites/hi-signs/hi_stars_1.webp",
+     "label": "1",
+     "fw": 152,
+     "fh": 121,
+     "cols": 1,
+     "frames": 1
+    },
+    {
+     "path": "assets/sprites/hi-signs/hi_stars_hi.webp",
+     "label": "hi",
+     "fw": 152,
+     "fh": 121,
+     "cols": 6,
+     "frames": 65
+    }
+   ]
+  },
+  {
+   "name": "hi-stars-2x",
+   "character": "hi-stars",
+   "swf": "../glitch-overlays/hi_overlay.swf",
+   "sprite": 26,
+   "sheets": [
+    {
+     "path": "assets/sprites/hi-signs/hi_stars_2x.webp",
+     "label": "hi",
+     "fw": 149,
+     "fh": 114,
+     "cols": 6,
+     "frames": 37
+    }
+   ]
+  }
+ ]
+}

@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=bad66806';
 import { createFeatureHost } from './js/feature-host.js?v=903263a4';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=899ca2e0';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=72173cf7';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -555,7 +555,7 @@ import {
   recipeToolInUse,
 } from './js/making.js?v=68521d02';
 import { MAKE_TOOL_SHEETS } from './js/make-tool-sheets.js?v=6f758e09';
-import { LOW_FUEL_LINE, craftSessionElapsedMs, isLowFuel, isMachineArt, machineArtHtml, packMakeState, playMachineHandOver, setMachineArtFrame } from './js/machine-art.js?v=a62fac48';
+import { LOW_FUEL_LINE, craftSessionElapsedMs, isLowFuel, isMachineArt, machineArtHtml, packMakeState, playMachineHandOver, setMachineArtFrame } from './js/machine-art.js?v=0515343f';
 import {
   createGarden,
   tickGarden,
@@ -912,7 +912,7 @@ import { createAudioBuses, fadeGain } from './js/audio-buses.js?v=af167b54';
 import { installTopBar, renderTopBar } from './js/ui/topbar.js?v=9cfbbd95';
 import { installFocusReturn } from './js/ui/focus-return.js?v=8885653a';
 import { QUOIN_FRAME_BOB, advanceQuoinClock, quoinBobBetweenFrames } from './js/quoin-motion.js?v=ea0bd408';
-import { installHiresFirstDraw, installHiresSprites, upgradeSource } from './js/sprite-hires.js?v=5965385e';
+import { installHiresFirstDraw, installHiresSprites, upgradeSource } from './js/sprite-hires.js?v=425a438f';
 import { denseSprite } from './js/sprite-dense.js?v=8e0109eb';
 import { wholeStatAmounts, wholeEffects } from './js/stat-text.js?v=f96d8fd3';
 import { createNotifier, effectTokens, floatKey, offerCardDrop, stackFloat, tokenText } from './js/notify.js?v=d85330ff';
@@ -29224,6 +29224,46 @@ async function main() {
         gpuTextureMB: +(bytes / 1048576).toFixed(1),
         images: textureUrls.textureStats(),
       };
+    },
+    /**
+     * SHARP QA: every visible sprite on the stage whose label or texture URL contains `match`
+     * (the Rook, its halo, the hi signs, `overlay:<key>`, play_glitch): the texture it draws from
+     * now (a 3x file or part reports resolution 3 and its @3x URL; an overlay drawn from its SVG
+     * frames is a canvas at the screen's density), its on-screen width in device px and its box on
+     * the page (CSS px).
+     */
+    drawnArt(match = '') {
+      const out = [];
+      const dpr = app?.renderer?.resolution || 1;
+      // Stage px to CSS px of the page (the canvas may be drawn bigger than its stage).
+      const rect = app?.canvas?.getBoundingClientRect?.() || { x: 0, y: 0, width: app?.screen?.width || 1 };
+      const css = rect.width / (app?.screen?.width || rect.width || 1);
+      const walk = (node) => {
+        if (!node || node.destroyed || node.visible === false) return;
+        const src = node.texture?.source;
+        if (src) {
+          const url = src.hiresSrc || src.label || textureUrls.sourceUrl(src) || '';
+          const label = node.label || '';
+          if (!match || label.includes(match) || url.includes(match)) {
+            const b = node.getBounds();
+            out.push({
+              label,
+              url,
+              canvas: typeof HTMLCanvasElement === 'function' && src.resource instanceof HTMLCanvasElement,
+              resolution: src.resolution,
+              pixelWidth: src.pixelWidth,
+              pixelHeight: src.pixelHeight,
+              frameWidth: node.texture.frame?.width ?? 0,
+              deviceWidth: +(b.width * dpr).toFixed(1),
+              // On the page, in CSS px.
+              bounds: { x: Math.round(rect.x + b.x * css), y: Math.round(rect.y + b.y * css), width: Math.round(b.width * css), height: Math.round(b.height * css) },
+            });
+          }
+        }
+        for (const c of node.children || []) walk(c);
+      };
+      walk(app?.stage);
+      return out;
     },
     /**
      * WHEELSHARP QA: the Spinning Wheel's whole-cell box in screen px and the texture its current

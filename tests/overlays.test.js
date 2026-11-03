@@ -66,6 +66,9 @@ const G448_MORE = ['321_countdown', 'rook_feathers_falling', 'musicblock_notes',
 const G397_VECTOR = ['crown_game_winner_you', 'crown_game_winner_someone_else'];
 /** G448: the overlays.json rows that do. */
 const G448_ART = ['overlay_sneezing_powder', 'focusing_orb_laser_beam', 'shrine_laser_beam_1', 'shrine_laser_beam_2', 'shrine_laser_beam_3', 'smoke_puff', 'proto_puff', 'secret_location_marker', 'icon_giant_love', 'race_winner', 'grabemgood_winner', 'thegreathoghaul_winner', 'game_of_crowns_winner', 'focusing_orb_attack'];
+/** The sharpness audit's first batch (2026-11-02, tests/sharp-rook-hi-overlays.test.js): the rest of the sheets the game shows. */
+const SHARP1_MORE = ['trading', 'fox_bait_ignite', 'dice_overlay', 'twelve_sided_die', 'petrified_rock_open_overlay', 'right_arrow', 'crown_game_indicator_you', 'crown_game_indicator_someone_else', 'game_of_crowns_throbber'];
+const SHARP1_ART = ['poisoned', 'rooked', 'amorous_philtre_heart', 'play_glitch'];
 
 const overlays = () => import('../public/js/overlays.js?v=90f4b1ba');
 const flush = async (n = 3) => {
@@ -284,7 +287,7 @@ describe('G441: the super harvest arc drawn from its SVG frames on dense screens
     // 0.82 MB as built (about 100 KB gzipped), under the 1.3 MB sheet.
     assert.ok(readFileSync(vfile).length < 1_000_000);
     // G446: every 400 px rainbow (and the charades arc); G448: the other FLA overlays the audit found soft.
-    for (const [key, m] of Object.entries(manifest)) assert.equal(Boolean(m.vector), /^rainbow_|^charades_gameover$/.test(key) || G448_MORE.includes(key) || G397_VECTOR.includes(key), key);
+    for (const [key, m] of Object.entries(manifest)) assert.equal(Boolean(m.vector), /^rainbow_|^charades_gameover$/.test(key) || G448_MORE.includes(key) || G397_VECTOR.includes(key) || SHARP1_MORE.includes(key), key);
   });
 
   it('vectorDensity: the sheet on a 1x screen, the SVG frames from 1.5 device px per stage px, capped', async () => {
@@ -295,7 +298,7 @@ describe('G441: the super harvest arc drawn from its SVG frames on dense screens
     assert.equal(at(2), Math.ceil((400 / 330) * 2 * 4) / 4);
     assert.ok(at(3.3) >= (400 / 330) * 3.3);
     assert.ok(at(40) * Math.max(r.box[2], r.box[3]) <= VECTOR_MAX_SIDE + 1);
-    assert.equal(vectorDensity(manifest.trading, 4), 0, 'no SVG frames: the sheet');
+    assert.equal(vectorDensity(manifest.click_to_donate, 4), 0, 'no SVG frames: the sheet');
   });
 
   it('vectorFrameSvgs: each frame carries only the shared shapes it uses, sized to the canvas', async () => {
@@ -523,7 +526,7 @@ describe('G441: the super harvest arc drawn from its SVG frames on dense screens
       }
     }
     // Every overlays.json row with SVG frames is a G446 rainbow or one of these.
-    for (const [key, m] of Object.entries(art)) assert.equal(Boolean(m.vector), /^rainbow_(youdidit|fullyrevived|secretspot)$/.test(key) || G448_ART.includes(key), key);
+    for (const [key, m] of Object.entries(art)) assert.equal(Boolean(m.vector), /^rainbow_(youdidit|fullyrevived|secretspot)$/.test(key) || G448_ART.includes(key) || SHARP1_ART.includes(key), key);
     // game.js sets the default resolution, so callers that pass none (puffs, the marker, giant love) draw them too.
     assert.match(read('game.js'), /setOverlayResolution\(\(\) => app\?\.renderer\?\.resolution \|\| 1\)/);
   });

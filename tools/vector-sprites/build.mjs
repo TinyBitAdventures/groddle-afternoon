@@ -60,7 +60,8 @@
  *    rewrite), so art drawn outside the authored stage is kept: the tools'
  *    tool_animation scenes (hand-tools.json).
  *  - job "frameRange": [a, b] exports only SWF frames a-b of the sprite (a
- *    477-frame Street Spirit whose porthole clips are the last 93).
+ *    477-frame Street Spirit whose porthole clips are the last 93), or of the
+ *    root timeline (sprite 0: emotional_bear.swf's rooked_halo scene, 479-508).
  *  - manifest "density": N (an integer, default 3) renders at zoom N and
  *    writes <name>@Nx files, placed and scored by an N:1 box downscale, for
  *    art drawn bigger than its 1x frames (the loneliness porthole: 1x cells
@@ -265,8 +266,8 @@ async function exportSprite(swf, id, zoom = 3, renderer = 'png', range = null) {
   const done = join(dir, '.done');
   // Sprite 0 is the root timeline (FFDec frame export, stage colour left out).
   const find = (d) => (id === 0 ? (existsSync(join(d, 'root')) ? 'root' : null) : readdirSync(d).find((n) => n === `DefineSprite_${id}` || n.startsWith(`DefineSprite_${id}_`)));
-  // range: only those frames (FFDec -select <id>:a-b; files keep their frame numbers).
-  const ffdec = (format, out) => execFileSync(JAVA, ['-jar', FFDEC, '-zoom', String(zoom), ...(range && id !== 0 ? ['-select', `${id}:${range[0]}-${range[1]}`] : []),
+  // range: only those frames (FFDec -select <id>:a-b, or a-b of the root timeline; files keep their frame numbers).
+  const ffdec = (format, out) => execFileSync(JAVA, ['-jar', FFDEC, '-zoom', String(zoom), ...(range ? ['-select', id !== 0 ? `${id}:${range[0]}-${range[1]}` : `${range[0]}-${range[1]}`] : []),
     ...(id === 0 ? ['-ignorebackground', '-format', `frame:${format}`, '-export', 'frame', join(out, 'root')] : ['-selectid', String(id), '-format', `sprite:${format}`, '-export', 'sprite', out]),
     swf], { stdio: 'ignore' });
   if (!existsSync(done)) {

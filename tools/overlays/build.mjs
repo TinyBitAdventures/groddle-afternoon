@@ -63,7 +63,7 @@ const rainbow = (k) => ({ fla: fla(k), scale: 1.25, step: 1, webp: 0.8, vector: 
  */
 export const OVERLAYS = Object.freeze({
   // G383 inc_trading.js 188-205: the 70 px bubble over a trading player.
-  trading: small('trading'),
+  trading: small('trading', { vector: true }),
   // G374-G376, G373 show_rainbow (players/player.js 3014-3029): 400 x 400 over the 330 x 200 stage
   // (rainbow_randomkindness waits on the Random Kindness bestow verb; not built).
   rainbow_100coinstoday: rainbow('rainbow_100coinstoday'),
@@ -76,7 +76,7 @@ export const OVERLAYS = Object.freeze({
   // G394: 350 px over the 362 x 199 stage; the one main frame holds the 106-frame 321go clip (stop()).
   '321_countdown': { fla: fla('321_countdown'), scale: 1.5, step: 1, webp: 0.85, vector: true },
   // G373 fox_bait.js 127-138: 150 x 150.
-  fox_bait_ignite: { fla: fla('fox_bait_ignite'), scale: 1.5, step: 1, webp: 0.85 },
+  fox_bait_ignite: { fla: fla('fox_bait_ignite'), scale: 1.5, step: 1, webp: 0.85, vector: true },
   // G372 dust_trap.js organelleOverlay 214-233.
   vacuoles: small('vacuoles'),
   endoplasmic_reticulum: small('endoplasmic_reticulum'),
@@ -84,15 +84,16 @@ export const OVERLAYS = Object.freeze({
   golgi_apparatus: small('golgi_apparatus'),
   // G377: the feathers clip plays once (stop()); the dice and the 12-sided die have states.
   rook_feathers_falling: { fla: fla('rook_feathers_falling'), scale: 1, step: 1, webp: 0.85, vector: true },
-  dice_overlay: small('dice_overlay', { scale: 1.5, states: { symbol: 'diceOverlay', labels: ['spin', 'roll1', 'roll2', 'roll3', 'roll4', 'roll5', 'roll6'] } }),
+  dice_overlay: small('dice_overlay', { scale: 1.5, vector: true, states: { symbol: 'diceOverlay', labels: ['spin', 'roll1', 'roll2', 'roll3', 'roll4', 'roll5', 'roll6'] } }),
   twelve_sided_die: small('twelve_sided_die', {
     scale: 1.5,
+    vector: true,
     states: { symbol: 'twelveSidedDie', labels: ['spin', 'roll_alph', 'roll_cosma', 'roll_friendly', 'roll_grendaline', 'roll_humbaba', 'roll_lem', 'roll_mab', 'roll_pot', 'roll_spriggan', 'roll_ti', 'roll_zille', 'roll_rook'] },
   }),
   // G378 (jellisac_splatter_on_shrine waits on the Jellisac Hands slather verb; not built).
   musicblock_notes: small('musicblock_notes', { vector: true }),
   // G379.
-  petrified_rock_open_overlay: { fla: fla('petrified_rock_open_overlay'), scale: 1.5, step: 1, webp: 0.85 },
+  petrified_rock_open_overlay: { fla: fla('petrified_rock_open_overlay'), scale: 1.5, step: 1, webp: 0.85, vector: true },
   // G380: 300 px over the ~200 px stages.
   target_effect_powder_extreme: { fla: fla('target_effect_powder_extreme'), scale: 1.5, step: 1, webp: 0.85, vector: true },
   target_effect_powder_mild: { fla: fla('target_effect_powder_mild'), scale: 1.5, step: 1, webp: 0.85, vector: true },
@@ -102,7 +103,7 @@ export const OVERLAYS = Object.freeze({
   click_to_donate: { fla: fla('click_to_donate'), scale: 1.5, step: 1, webp: 0.85 },
   shrine_power_up: { fla: fla('shrine_power_up'), scale: 1, step: 1, webp: 0.85, states: { symbol: 'shrinePowerUp', labels: ['charge', 'ready', 'off'] }, vector: true },
   // G391: the Hell Hole hint arrow (75 px over the 140 px stage).
-  right_arrow: { fla: fla('right_arrow'), scale: 1, step: 1, webp: 0.85 },
+  right_arrow: { fla: fla('right_arrow'), scale: 1, step: 1, webp: 0.85, vector: true },
   // G389.
   phantom_glitch: { fla: fla('phantom_glitch'), scale: 1.25, step: 1, webp: 0.85, vector: true },
   // G390: charge, ready, off.
@@ -120,9 +121,9 @@ export const OVERLAYS = Object.freeze({
   thegreathoghaul_logo: { fla: fla('thegreathoghaul_logo'), scale: 1.5, step: 1, webp: 0.9 },
   game_of_crowns_logo: { fla: fla('game_of_crowns_logo'), scale: 1.5, step: 1, webp: 0.9 },
   // G396.
-  crown_game_indicator_you: small('crown_game_indicator_you', { webp: 0.9 }),
-  crown_game_indicator_someone_else: small('crown_game_indicator_someone_else', { webp: 0.9 }),
-  game_of_crowns_throbber: small('game_of_crowns_throbber'),
+  crown_game_indicator_you: small('crown_game_indicator_you', { webp: 0.9, vector: true }),
+  crown_game_indicator_someone_else: small('crown_game_indicator_someone_else', { webp: 0.9, vector: true }),
+  game_of_crowns_throbber: small('game_of_crowns_throbber', { vector: true }),
   // G397: Math Mayhem's end (players/inc_games.js games_end_math_mayhem 1065-1147): the winner's
   // picture 500 wide, the other 330, the two buttons 150 (drawn at 1.5x for the 500 px picture).
   crown_game_winner_you: { fla: fla('crown_game_winner_you'), scale: 1.5, step: 1, webp: 0.85, vector: true },

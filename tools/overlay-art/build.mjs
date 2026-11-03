@@ -100,10 +100,10 @@ export const OVERLAYS = Object.freeze({
   // items/include/trants.js 1252-1260, 1272-1284 (and wood_tree.js 578-586)
   // applyPoison / onPlayerEnter: itemstack_overlay poisoned, delta_y 20, no
   // width (1:1, the 150 x 50 stage), for the 3-minute poison; 24 fps loop.
-  poisoned: { fla: 'glitch-overlays/poisoned.fla', kind: 'sheet', scale: 2, step: 1, webp: 0.85 },
+  poisoned: { fla: 'glitch-overlays/poisoned.fla', kind: 'sheet', scale: 2, step: 1, webp: 0.8, vector: true },
   // items/npc_swoonerfly.js 45-62 land(): itemstack_overlay rooked, delta_y
   // 20, 3 s (a swoonerfly that has fallen); 24 fps loop.
-  rooked: { fla: 'glitch-overlays/rooked.fla', kind: 'sheet', scale: 2, step: 1, webp: 0.85 },
+  rooked: { fla: 'glitch-overlays/rooked.fla', kind: 'sheet', scale: 2, step: 1, webp: 0.8, vector: true },
   // locations/location.js 4180-4190 triggerSecretLocationMarker and the
   // marker's overlay_cancel 600 ms later: the clip secretLocationMarker loops
   // 'active' (frame 89 gotoAndPlay('active')) and plays 'off' to its stop()
@@ -133,7 +133,7 @@ export const OVERLAYS = Object.freeze({
   // items/catalog_buffs.js 710-722 feeling_called_love on_apply:
   // announce_add_indicator('feeling_called_love', 'amorous_philtre_heart'), one
   // frame (G272; js/features/potions-feature.js draws its own heart for now).
-  amorous_philtre_heart: { fla: 'glitch-overlays/amorous_philtre_heart.fla', kind: 'sheet', scale: 2, step: 1, webp: 0.9 },
+  amorous_philtre_heart: { fla: 'glitch-overlays/amorous_philtre_heart.fla', kind: 'sheet', scale: 2, step: 1, webp: 0., vector: true },
   // G299: the ticket races' and the Hog Haul's end splash (players/inc_games.js
   // games_end_race 1330-1390, games_end_quoin_grab 1529-1600,
   // games_end_hogtie_piggy 2088-2183): a
@@ -161,6 +161,7 @@ export const OVERLAYS = Object.freeze({
     scale: 2,
     step: 2,
     webp: 0.85, // G272: the PNG was 1.37 MB
+    vector: true,
     // The Glitch wordmark is a trademark, not part of the CC0 release: the
     // title card's logo (symbol "all", Layer 21) and the small one in the
     // mock client's top bar (Layer 4, top left) are left out.

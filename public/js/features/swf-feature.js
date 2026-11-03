@@ -28,13 +28,26 @@
  *   play: a Game in the pack (&swfautoplay=1 plays it, &swffast=1 plays for
  *   2.45 s instead of 24.5 s).
  *   Canvas data: swfLast, swfGame (stage), swfGames, swfPlaying (ms left),
- *   swfLocked, swfCounts.
+ *   swfLocked, swfCounts, swfPlayArt (vector | sheet: the overlay drawn from
+ *   its SVG frames on a dense screen, else its 2x sheet).
  */
 
 import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=b0e33301';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=db2ce452';
-import { OVERLAY_BASE, cellRect, loadOverlayManifest, overlayAlpha, overlayFrameAt, standPlacement, trackOverlay } from '../overlay-art.js?v=3753a0d2';
+import {
+  OVERLAY_BASE,
+  cellRect,
+  defaultOverlayResolution,
+  holdVectorTexture,
+  loadOverlayManifest,
+  overlayAlpha,
+  overlayDensity,
+  overlayFrameAt,
+  standPlacement,
+  trackOverlay,
+  vectorDensity,
+} from '../overlay-art.js?v=3753a0d2';
 import { vpOverlay } from '../quest-rooms/vp-overlay.js?v=47f01202';
 import {
   GAME_BOX,
@@ -70,6 +83,8 @@ let badgeGone = false;
 let playArt = null; // overlays.json play_glitch, once loaded
 let playArtFailed = false;
 const playFrames = new Map(); // sheet cell -> Texture
+/** The badge's SVG frames on a dense screen (overlay-art vectorTexture: { texture, draw, destroy }), or null. */
+let playVector = null;
 let demoDone = false;
 let fast = false;
 
@@ -279,6 +294,39 @@ function clearBadge() {
   releaseBadge = null;
   if (badge && !badge.destroyed) badge.destroy();
   badge = null;
+  // The canvas, its texture and the decoded frames go with the badge.
+  playVector?.destroy();
+  playVector = null;
+}
+
+/**
+ * The 110 px play_glitch box's device px per stage px on this screen, as playSheetOverlay
+ * reads it (the renderer's resolution x the layer's scale): over 1.2 x the sheet's 2 texels per
+ * stage px (a Retina window draws it at about 2.5), the badge draws the overlay's SVG frames
+ * (overlays.json play_glitch.vector) at that density instead (vectorDensity; 0 = the sheet).
+ */
+function playDensity(layer) {
+  if (typeof Image !== 'function' || !playArt?.vector) return 0;
+  const layerScale = Math.hypot(layer?.worldTransform?.a ?? 1, layer?.worldTransform?.b ?? 0) || 1;
+  return vectorDensity(playArt, overlayDensity(playArt, { wh: 110, resolution: defaultOverlayResolution(), layerScale }));
+}
+
+/** Draw the badge from the SVG frames once they are decoded; the sheet if they cannot load. */
+function holdPlayVector(PIXI, density) {
+  const mine = badge;
+  mine.playArt = 'wait';
+  holdVectorTexture(PIXI, PLAY_OVERLAY.key, playArt, density).then((tex) => {
+    if (badge !== mine || mine.destroyed) {
+      tex?.destroy();
+      return;
+    }
+    mine.playArt = tex ? 'vector' : 'sheet';
+    if (!tex) return;
+    playVector = tex;
+    mine.texture = tex.texture;
+  }, () => {
+    if (badge === mine) mine.playArt = 'sheet';
+  });
 }
 
 /*
@@ -333,11 +381,15 @@ function showBadge(engine) {
       });
   }
   if (playArt) {
-    badge = new PIXI.Sprite(playTexture(playArt.order[0]));
+    // On a dense screen the SVG frames draw it and the sheet is never fetched (it stays the fallback).
+    const density = playDensity(layer);
+    badge = new PIXI.Sprite(density > 0 ? PIXI.Texture.EMPTY : playTexture(playArt.order[0]));
     badge.label = 'play_glitch';
+    badge.playArt = 'sheet';
     badge.zIndex = 60;
     badge.eventMode = 'none';
     layer.addChild(badge);
+    if (density > 0) holdPlayVector(PIXI, density);
     return;
   }
   const url = ITEM_CATALOG[GAME_BOX]?.icon || `assets/sprites/icons/${GAME_BOX}.png`;
@@ -359,7 +411,9 @@ function tickBadge(now, engine) {
     // The overlay's own clock: 24.5 s of the 744-frame clip (QA &swffast=1 runs it 10x).
     const ms = ((now - (state.playUntil - playMs())) / playMs()) * PLAY.durationMs;
     const frame = overlayFrameAt(playArt, ms, { loop: false });
-    badge.texture = playTexture(playArt.order[frame]);
+    // The SVG frames are numbered on their own (identical frames kept once, play_glitch.vector.order).
+    if (playVector) playVector.draw(playArt.vector.order[frame]);
+    else if (badge.playArt !== 'wait') badge.texture = playTexture(playArt.order[frame]);
     // A pc_overlay stands on its point (center_bottom, G251): the 110 x 80 stage fitted to 110.
     const at = standPlacement(playArt, p.x, p.y + PLAY_OVERLAY.dy, 110);
     badge.x = at.left;
@@ -368,6 +422,7 @@ function tickBadge(now, engine) {
     badge.height = at.height;
     badge.alpha = overlayAlpha(ms, PLAY.durationMs);
     engine.setData?.('swfPlayFrame', String(frame));
+    engine.setData?.('swfPlayArt', badge.playArt === 'vector' ? 'vector' : badge.playArt === 'wait' ? '' : 'sheet');
     return;
   }
   // play_glitch's pc_overlay sat at delta_y -140 above the avatar.
