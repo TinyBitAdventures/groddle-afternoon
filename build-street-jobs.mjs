@@ -488,6 +488,15 @@ for (const [id, def] of Object.entries(classes)) {
   classReasons[key] = (classReasons[key] || 0) + 1;
 }
 
+// Projects every new world starts with built (tools/street-jobs-built-from-start.json): Austin's
+// chosen roads, solo and online. Glitch's admins opened a street by unlocking it without its job
+// (locations/inc_admin.js admin_jobs_set_unlocked 431-439); js/street-jobs.js isJobBuilt reads this.
+const builtFromStart = JSON.parse(await readFile(join(root, 'tools/street-jobs-built-from-start.json'), 'utf8')).jobs || {};
+for (const [jobId, reason] of Object.entries(builtFromStart)) {
+  if (jobs[jobId]?.kind !== 'street') throw new Error(`built from the start: ${jobId} is no street project`);
+  jobs[jobId].builtFromStart = String(reason);
+}
+
 const catalog = {
   source: 'tinyspeck/glitch-GameServerJS quests/job_*.js + glitch-locations location XML jobs (CC0)',
   counts: {

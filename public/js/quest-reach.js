@@ -5,8 +5,9 @@
  * remake replays the build-out: js/street-jobs.js roadClosure). Glitch's own world
  * ended with every project street standing (jobs_is_locked false in the location
  * dump), so its quests never asked for a street behind a barricade; here some do:
- * "To Xalanga, And Beyond" wants a teleport point in Xalanga, and no open road
- * leads there on a fresh world. Glitch gated such offers by where you could go
+ * "Well, I Neva!" wants you on Neva Neva, 29 projects away on a fresh world. ("To
+ * Xalanga, And Beyond" did too, until Hazy Gate 3 was built from the start:
+ * tools/street-jobs-built-from-start.json.) Glitch gated such offers by where you could go
  * (quests/*.js canOffer, e.g. the region and location checks); the remake holds them:
  *  - an offer whose requirement needs such a street waits until one of its streets
  *    can be reached (quest-offers.js eligibleTrigger, ctx.questHeld);

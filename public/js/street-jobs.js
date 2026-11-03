@@ -323,14 +323,17 @@ export function currentReqGroup(reqs, bucket) {
 export const SUBWAY_STREETS = Object.freeze(SUBWAY_LINE.stations.map((s) => gTsid(s.surfaceStreetTsid || s.connects_to)).filter(Boolean));
 
 /**
- * A street project counts as built when finished, grandfathered (a street you have stood on: see
- * noteArrival), exempt, or a subway station's street. `force` lists jobs to run regardless (QA demo boards).
+ * A street project counts as built when finished, built from the start (job.builtFromStart: Austin's
+ * chosen roads, tools/street-jobs-built-from-start.json, solo and online alike), grandfathered (a
+ * street you have stood on: see noteArrival), exempt, or a subway station's street. `force` lists
+ * jobs to run regardless (QA demo boards).
  */
 export function isJobBuilt(state, catalog, jobId, { exemptFrom = [], force = [] } = {}) {
   const job = jobDef(catalog, jobId);
   if (!job) return true;
   if (state.jobs[jobId]?.doneAt) return true;
   if (force.includes(jobId)) return false;
+  if (job.builtFromStart) return true;
   if (job.kind !== 'street') return false;
   if (state.grandfathered.includes(job.street)) return true;
   if (SUBWAY_STREETS.includes(job.street)) return true;

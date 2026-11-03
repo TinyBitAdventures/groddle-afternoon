@@ -16,6 +16,8 @@
  *    (quest.js getCurrentReqGroup), base cost, type and item class; the
  *    class rewards, the performance rewards and their drop tables, and
  *    performance_percent / performance_cutoff (quest.js getWinners 1617-1633);
+ *  - `built` on a street project every new world starts with built
+ *    (job.builtFromStart, tools/street-jobs-built-from-start.json);
  *  - the drop tables (items/catalog_drop_tables.js, as the catalog has them)
  *    and each upgrade's option ids (the vote, quest.js getOptions).
  * Restorations (homes, kind 'restore', lane HOMES3): each worn-out
@@ -36,7 +38,7 @@ import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { requireServer, serverPath } from './repos.mjs';
-import { SOLO_DIVISOR, STREET_JOB_COOLDOWN_MS, WORK_UNIT_MS, jobDivisor, soloNeed } from '../public/js/street-jobs.js?v=0235351c';
+import { SOLO_DIVISOR, STREET_JOB_COOLDOWN_MS, WORK_UNIT_MS, jobDivisor, soloNeed } from '../public/js/street-jobs.js?v=7381e03e';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 export const CATALOG = join(root, 'public/assets/content/street-jobs.json');
@@ -104,6 +106,8 @@ export function projectTable(catalog = JSON.parse(readFileSync(CATALOG, 'utf8'))
       phases,
     };
     if (job.kind === 'street') row.connecting = [...job.connecting];
+    // Built in every new world (tools/street-jobs-built-from-start.json; projects.go load marks it done).
+    if (job.builtFromStart) row.built = true;
     if (job.kind === 'upgrade') row.options = (catalog.upgrades?.[job.street]?.options || []).map((o) => String(o.id));
     if (job.kind === 'hall') {
       // quest.js claimJob 1297-1338: the claim's currants (the remake's amount, as every other requirement), and

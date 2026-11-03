@@ -22,7 +22,7 @@ import { learnTimeReductions } from '../public/js/imagination.js?v=b4f0eaf6';
 import { emblemUnlockSkillFor, skillRemakeNote, skillTitle, skillTreeEntry, spendEmblemForSkill } from '../public/js/skill-tree.js?v=53795620';
 import { acceptOffer, pendingQuestOffers } from '../public/js/quest-offers.js?v=3bf17441';
 import { createQuestState } from '../public/js/quests.js?v=282e1621';
-import { normalizeStreetJobState, phaseRequirements, workCheck } from '../public/js/street-jobs.js?v=0235351c';
+import { normalizeStreetJobState, phaseRequirements, workCheck } from '../public/js/street-jobs.js?v=7381e03e';
 import { skillArtFor } from '../public/js/familiar.js?v=c7e902af';
 import { CARD_ART_LAYERS } from '../public/js/imagination-data.js?v=4a85e7fe';
 

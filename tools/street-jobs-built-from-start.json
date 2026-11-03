@@ -1,0 +1,6 @@
+{
+  "about": "Street projects that count as built in every new world, solo and the shared online world, read by build-street-jobs.mjs into street-jobs.json (job.builtFromStart) and by tools/build-realtime-projects.mjs into the realtime server's data/projects.json (built). Every other project starts closed (Austin, 2026-11-02). Glitch's admins opened a street the same way, by unlocking it without its job (locations/inc_admin.js admin_jobs_set_unlocked 431-439).",
+  "jobs": {
+    "524": "Austin 2026-11-03: Hazy Gate 3, the one road into Xalanga (from Yellow Yawning, Moshi Moshi Oshilatis); its own project board stands on Ramble Way 4, inside Xalanga, so nobody could build it"
+  }
+}
