@@ -19,7 +19,7 @@ const SITE = String(args.site || 'https://groddle.localhost').replace(/\/$/, '')
 /** The bands in page order: Tiny Speck's groups, then what survives. */
 export const BANDS = [
   ['themes', 'theme', 'Theme tracks', 'The themes of Ur’s regions as Tiny Speck published them: the Groddle forests, the caverns, the Firebogs, the winter lands and the rest.'],
-  ['sketches', 'sketch', 'Theme sketches', 'Four shorter pieces. The remake plays them underground, in the subway and in Ix, and out on the savanna.'],
+  ['sketches', 'sketch', 'Theme sketches', 'Four shorter pieces. Three of them play in the subway, whose own hum is still missing.'],
   ['activity', 'activity', 'Activity music', 'Tunes for things you did rather than places you went: meditating, making metal, spinning thread.'],
   ['rube', 'ringtone', 'The Rube Song', 'Tiny Speck also published the Rube’s own song, as a ringtone.'],
 ];
@@ -35,12 +35,12 @@ export function streetMusicContent() {
     group('header', 'masthead', null, [group('div', 'wrap', null, [
       p('kicker', 'Groddle Field Notes · Music'),
       h(1, 'Street music'),
-      p('lead', 'Every region of Ur had its own set of tunes, and one of them played whenever you walked in. Those loops were never archived, but the music Tiny Speck published for everyone to download survives, and Groddle Afternoon plays it in the places it fits. Press play on any track.'),
+      p('lead', 'Every region of Ur had its own set of tunes, and one of them played whenever you walked in. Those loops are back: Groddle Afternoon plays the originals again in every region. This page is the music Tiny Speck published for everyone to download. Press play on any track.'),
       p('jump', jump),
     ])]),
     ...BANDS.map(([id, set, title, lead], i) => band(id, i % 2 === 1, title, [p('section-lead', lead), data('street-music', { group: set })])),
     band('survives', BANDS.length % 2 === 1, 'What survives', [
-      p('section-lead', 'Glitch played its street music from a library of loops on Tiny Speck’s servers, and none of those files were saved when the game closed. What survives is the music on Tiny Speck’s downloads page, released into the public domain with the rest of the game. The remake plays each track in the regions it was written for, and fills the others with the closest in mood; the places under each track are the remake’s choices.'),
+      p('section-lead', 'Glitch played its street music from a library of loops on Tiny Speck’s servers. Those files were thought lost when the game closed, until a fan’s copy of the server’s sound folder turned up, file for file the same as Tiny Speck’s. Groddle Afternoon now plays the original loops in every region and on many streets and party spaces. A few are still missing, such as the subway hum and the Enchanted Wood themes, and the remake fills those with tracks from this page. The places under each track are where it plays now.'),
       p('', 'The six Musicblock tunes from the same page are on the <a href="/musicblocks/">Musicblocks</a> page, with the rest of the Musicblocks.'),
     ]),
     group('div', 'wrap report-foot', null, [

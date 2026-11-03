@@ -100,12 +100,14 @@ The art and game data come from Tiny Speck's release of Glitch into the public d
 [Glitch public-domain game art](https://www.glitchthegame.com/public-domain-game-art/) and the
 [tinyspeck repositories on GitHub](https://github.com/tinyspeck).
 
-The sounds are Tiny Speck's original recordings, shipped as the originals. Most come from the
-Glitch audio sets on archive.org (three tagged CC0 and one untagged, all from the same uploader);
-the rest come from Glitch's own servers through the Wayback Machine, and one from a copy of
-Slack's sounds on archive.org. Tiny Speck's public-domain page names its art, not its sounds, so
-for the sounds this rests on those uploads. Sounds that were never recovered play short tones the
-game makes itself. Thank you, Tiny Speck, and everyone who played and recorded the game.
+The sounds are Tiny Speck's original recordings, shipped as the originals: from the Glitch audio
+sets on archive.org (three tagged CC0 and one untagged, all from the same uploader), from Glitch's
+own servers through the Wayback Machine, one from a copy of Slack's sounds on archive.org, and from
+a fan's copy of the game server's sound folder, file for file the same as Tiny Speck's, which
+brought back the music of every region. Tiny Speck's public-domain page names its art, not its
+sounds, so for the sounds this rests on those copies. Music that was never recovered plays a track
+from Tiny Speck's downloads page instead, and other sounds that were never recovered play short
+tones the game makes itself. Thank you, Tiny Speck, and everyone who played and recorded the game.
 
 The game's type is [Nunito](https://github.com/googlefonts/nunito) by The Nunito Project Authors,
 served from this site (`public/assets/fonts/nunito/`) under the

@@ -5,7 +5,7 @@
  * ../restoration/data.json so it stays in step with development.
  */
 
-import { STATUS_KEYS, oursCell, oursNumbers, tallyColumn } from './compare-data.js?v=c0ceb0f2';
+import { STATUS_KEYS, factText, longDate, oursCell, oursNumbers, tallyColumn } from './compare-data.js?v=9622fcb3';
 
 const $ = (sel, root = document) => root.querySelector(sel);
 const el = (tag, attrs = {}, ...kids) => {
@@ -21,7 +21,6 @@ const el = (tag, attrs = {}, ...kids) => {
   return node;
 };
 const fmt = (n) => Number(n || 0).toLocaleString('en-US');
-const longDate = (iso) => new Date(`${iso}T12:00:00Z`).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
 const isExternal = (url) => /^https?:/.test(url);
 const linkAttrs = (url) => (isExternal(url) ? { href: url, target: '_blank', rel: 'noopener noreferrer' } : { href: url });
 
@@ -49,7 +48,7 @@ function renderCards(data, restoration, src) {
   for (const p of data.projects) {
     const factList = (list) => el('dl', { class: 'facts' }, list.map((f) => [
       el('dt', {}, f.label),
-      el('dd', {}, f.text, ' ', src.refs(f.sources)),
+      el('dd', {}, factText(f.text, restoration), ' ', src.refs(f.sources)),
     ]));
     // The other projects lead with what a visitor asks first; the build details fold away.
     const lead = p.ours ? p.facts : p.facts.filter((f) => CARD_LEAD_FACTS.includes(f.label));
@@ -245,6 +244,11 @@ const [data, restoration] = await Promise.all([load('compare.json'), load('../re
 if (data) {
   $('#checked-date').textContent = longDate(data.checked);
   $('#checked-date').setAttribute('datetime', data.checked);
+  const footChecked = $('#foot-checked');
+  if (footChecked) {
+    footChecked.textContent = longDate(data.checked);
+    footChecked.setAttribute('datetime', data.checked);
+  }
   const src = makeSourceIndex(data);
   renderCards(data, restoration, src);
   renderMatrix(data, restoration, src);

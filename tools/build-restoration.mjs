@@ -11,11 +11,13 @@
  *
  *   node tools/build-restoration.mjs          write data.json
  *   node tools/build-restoration.mjs --check  exit 1 if data.json is stale
+ *   --release=<live.json>                     the release file to name (default tools/deploy/live.json)
  */
 import { existsSync, readFileSync, readdirSync, writeFileSync, mkdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
 
 import { CHECKLIST, GROUPS, STATUS } from './restoration/checklist.mjs';
 import { QUEST_ROOMS, BUILT_ROOMS } from '../public/js/quest-rooms/catalog.js?v=9ebeb502';
@@ -163,12 +165,30 @@ function streetStats() {
   };
 }
 
-function soundStats() {
+/** Where each playable sound key's recording comes from, by the catalog's origin (build-sound-keys.mjs). */
+export const SOUND_SOURCES = Object.freeze([
+  ['soundsZip', 'sounds-zip'],
+  ['archiveorgSfx', 'archiveorg-sfx'],
+  ['recoveredWayback', 'wayback-c2'],
+  ['downloadsBestFit', 'downloads-best-fit'],
+]);
+
+export function soundStats() {
   const { counts, keys } = json('assets/content/sound-keys.json');
-  const ambient = readdirSync(join(pub, 'assets/audio/ambient')).filter((f) => f.endsWith('.mp3')).length;
-  // Ringtone-set music (Musicblocks, Goodnight Groddle, Round Two in Seven ...) installed under sfx/.
-  const archiveMusic = Object.values(keys).filter((r) => r.origin === 'archiveorg-sfx' && r.category === 'music'
-    && r.archiveItem === 'esquebeth-quest').length;
+  const rows = Object.values(keys);
+  const own = rows.filter((r) => r.file);
+  const byOrigin = (origin) => own.filter((r) => r.origin === origin).length;
+  const sources = Object.fromEntries(SOUND_SOURCES.map(([name, origin]) => [name, byOrigin(origin)]));
+  // Every other origin with a file (Esquibeth's overlay sources, the Slack mirror).
+  const otherFiles = own.filter((r) => !SOUND_SOURCES.some(([, origin]) => origin === r.origin)).length;
+  // Keys with no file of their own that play another key's recording.
+  const aliases = rows.filter((r) => !r.file && r.alias && keys[r.alias]?.file).length;
+  // Music recordings the game ships: every music key's own file and the published tracks in
+  // assets/audio/ambient (soundtrack, ringtones, Musicblocks), counted once per distinct recording.
+  const ambientDir = join(pub, 'assets/audio/ambient');
+  const ambient = readdirSync(ambientDir).filter((f) => f.endsWith('.mp3')).map((f) => `assets/audio/ambient/${f}`);
+  const musicFiles = new Set([...own.filter((r) => r.category === 'music').map((r) => r.file), ...ambient]);
+  const recordings = new Set([...musicFiles].map((f) => createHash('sha256').update(readFileSync(join(pub, f))).digest('hex')));
   return {
     // Keys the final client could play: those whose every call site is commented
     // out (trumpet, TALK_FROG, CRAFTYBOT_IDLE_1) are not counted (build-sound-keys.mjs).
@@ -176,10 +196,11 @@ function soundStats() {
     deadKeys: counts.dead || 0,
     withFile: counts.withFile,
     playable: counts.playable,
-    recoveredWayback: counts.recoveredWayback,
-    archiveorgSfx: counts.archiveorgSfx,
-    ambientTracks: ambient,
-    musicTracks: ambient + archiveMusic,
+    ...sources,
+    otherFiles,
+    aliases,
+    ambientTracks: ambient.length,
+    musicTracks: recordings.size,
   };
 }
 
@@ -253,6 +274,26 @@ export function historyLog() {
   }
 }
 
+/**
+ * The game release production runs, from tools/deploy/live.json (or --release=<file>, a deploy's own
+ * copy, as tools/deploy/kinsta.sh passes it): the version and the day it went live, for the Compare
+ * page's Status line, so it never names an old version.
+ */
+export function releaseInfo(file = releaseFile()) {
+  try {
+    const live = JSON.parse(readFileSync(file, 'utf8'));
+    if (!/^v\d+\.\d+\.\d+$/.test(live.game || '') || !/^\d{4}-\d{2}-\d{2}$/.test(live.deployed || '')) return null;
+    return { game: live.game.slice(1), deployed: live.deployed };
+  } catch {
+    return null;
+  }
+}
+
+function releaseFile() {
+  const arg = process.argv.find((a) => a.startsWith('--release='));
+  return arg ? arg.slice('--release='.length) : join(root, 'tools', 'deploy', 'live.json');
+}
+
 function testFileCount() {
   return readdirSync(join(root, 'tests')).filter((f) => f.endsWith('.test.js')).length;
 }
@@ -313,6 +354,7 @@ export async function buildRestorationData() {
     imagination: imaginationStats(),
     jobs: jobStats(),
     seasons: seasonsData(),
+    release: releaseInfo(),
     git: gitStats(),
     tests: testFileCount(),
   };

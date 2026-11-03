@@ -1,5 +1,5 @@
 /**
- * Reimagined wardrobe articles (row G52). Seventeen of Tiny Speck's article
+ * Reimagined wardrobe articles (row G52). Nineteen of Tiny Speck's article
  * SWFs are greyscale masters GSJS never listed, so the original game never
  * gave them colours. The remake ships them with colourways borrowed from a
  * sibling GSJS article (or designed in the same palette when none fits), and

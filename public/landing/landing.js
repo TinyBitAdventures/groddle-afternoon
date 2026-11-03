@@ -1,11 +1,12 @@
 // Home page: fill the numbers and the recent changes from the restoration
 // report's data (restoration/data.json, rebuilt with every commit). The HTML
-// carries reasonable numbers so the page reads fine if this fetch fails.
+// carries the same numbers as of the last build (tools/deploy/landing-stats.mjs), so the page reads
+// true if this fetch fails.
 // Every photo opens full size in the viewer (landing/viewer.js).
 import { mountViewer } from './viewer.js?v=9a919381';
+import { landingStats } from './stats.js?v=26a4d16f';
 
 const fmt = (n) => Number(n || 0).toLocaleString('en-US');
-const of = (a, b) => `${fmt(a)} of ${fmt(b)}`;
 
 function setStat(key, text) {
   const el = document.querySelector(`[data-stat="${key}"]`);
@@ -27,18 +28,7 @@ async function main() {
     return;
   }
 
-  const t = data.tally || {};
-  const playable = (t.source || 0) + (t.rebuilt || 0) + (t.solo || 0) + (t.reimagined || 0);
-  const all = Object.values(t).reduce((a, b) => a + b, 0);
-  if (all) setStat('systems', of(playable, all));
-  if (data.quests) setStat('quests', fmt(data.quests.playable));
-  if (data.rooms) setStat('rooms', of(data.rooms.built, data.rooms.total));
-  if (data.streets) setStat('streets', fmt(data.streets.onMapsImported ?? data.streets.imported));
-  if (data.skills) setStat('skills', of(data.skills.counts?.live, data.skills.total));
-  if (data.sounds) setStat('sounds', fmt(data.sounds.playable ?? data.sounds.withFile));
-  if (data.jobs) setStat('jobs', fmt(data.jobs.playableJobs));
-  const img = data.imagination;
-  if (img?.counts && img.total) setStat('cards', of((img.counts.live || 0) + (img.counts.starter || 0), img.total));
+  for (const [key, text] of Object.entries(landingStats(data))) setStat(key, text);
 
   const recent = (data.git?.recent || []).filter((r) => r.kind === 'new' || r.kind === 'improve' || r.kind === 'fix').slice(0, 5);
   const list = document.getElementById('log-list');

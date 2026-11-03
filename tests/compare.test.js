@@ -10,7 +10,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { STATUS_KEYS, FROM_RESTORATION, oursCell, oursNumbers } from '../public/compare/compare-data.js?v=c0ceb0f2';
+import { STATUS_KEYS, FROM_RESTORATION, factText, oursCell, oursNumbers } from '../public/compare/compare-data.js?v=9622fcb3';
 import { STATUS as RESTORATION_STATUS } from '../tools/restoration/checklist.mjs';
 import { servedByMinn } from './minn-served.js';
 
@@ -143,6 +143,24 @@ describe('compare page', () => {
   it('hosts no other project\'s images', () => {
     for (const m of html.matchAll(/<img[^>]+src="([^"]+)"/g)) assert.ok(m[1].startsWith('../assets/') || m[1].startsWith('../favicon.svg'), m[1]);
     assert.ok(!/<img[^>]+src="https?:/.test(html));
+  });
+
+  it('our Status names the live version from the restoration data, never a typed-in one', () => {
+    const ours = data.projects.find((p) => p.ours);
+    const status = ours.facts.find((f) => f.label === 'Status').text;
+    assert.ok(status.includes('{release}'), status);
+    for (const p of data.projects.filter((x) => x.ours)) for (const f of p.facts) assert.doesNotMatch(f.text, /version \d+\.\d+/, f.label);
+    const restoration = JSON.parse(readFileSync(join(root, 'public/restoration/data.json'), 'utf8'));
+    assert.match(factText(status, restoration), new RegExp(`development: version ${restoration.release.game.replace(/\./g, '\\.')} came out on \\d+ [A-Z][a-z]+ \\d{4}\\. The source`));
+    assert.equal(factText(status, { release: { game: '1.2.3', deployed: '2026-11-03' } }).includes('version 1.2.3 came out on 3 November 2026.'), true);
+    assert.match(factText(status, null), /still in active development\. The source/);
+    assert.equal(factText('No token here.', restoration), 'No token here.');
+  });
+
+  it('the page states its research date as compare.json does', () => {
+    for (const id of ['checked-date', 'foot-checked']) {
+      assert.match(html, new RegExp(`<time id="${id}" datetime="${data.checked}">`), id);
+    }
   });
 
   it('the matrix is an accessible table', () => {

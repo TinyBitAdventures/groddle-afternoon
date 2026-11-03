@@ -22,7 +22,7 @@ import {
   RETIRED_BODY_STYLES,
   appearanceCacheKey,
   STORAGE_KEY,
-} from '../public/js/character-builder.js?v=1cb9713f';
+} from '../public/js/character-builder.js?v=38301e2f';
 import { expandCatalog, lookKey, resolveLook } from '../public/js/avatar-looks.js?v=64fab53e';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));

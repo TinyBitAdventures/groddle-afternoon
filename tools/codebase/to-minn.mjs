@@ -55,7 +55,7 @@ export function codebaseContent() {
     ]),
     knot('spindle', 'Spindle', 'The build tools, which spin those scraps into the data and sprites the game reads.'),
     patch('server', true, 'The realtime server', [
-      p('section-lead', '<a href="' + GH + '/groddle-afternoon-server">groddle-afternoon-server</a> is the multiplayer side: one Go program that keeps who is where, chat, parties and groups, and the parts of the world players share, such as quoins, rocks, races, Rook attacks and trades. Players connect over a WebSocket (coder/websocket), and each shared system is a module of its own that registers with one hub. It saves its state to files when it stops; on the live server it runs under systemd behind Caddy. Its world data is written by the game’s build tools, so both sides read the same numbers.'),
+      p('section-lead', '<a href="' + GH + '/groddle-afternoon-server">groddle-afternoon-server</a> is the multiplayer side: one Go program that keeps who is where, chat, IMs, parties and groups, and the parts of the world players share, such as quoins, rocks, races, Rook attacks and trades. Players connect over a WebSocket (coder/websocket), and each shared system is a module of its own that registers with one hub. It saves its state to files when it stops; on the live server it runs under systemd behind Caddy. Its world data is written by the game’s build tools, so both sides read the same numbers.'),
       links('groddle-afternoon-server'),
       data('server'),
     ]),

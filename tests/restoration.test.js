@@ -8,12 +8,13 @@
  */
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { CHECKLIST, GROUPS, STATUS } from '../tools/restoration/checklist.mjs';
 import { SHOTS } from '../tools/restoration/shots.mjs';
-import { buildRestorationData, comparable, historyLog } from '../tools/build-restoration.mjs';
+import { buildRestorationData, comparable, historyLog, releaseInfo, soundStats } from '../tools/build-restoration.mjs';
 import { QUEST_ROOMS } from '../public/js/quest-rooms/catalog.js?v=9ebeb502';
 import { ROOM_NOTES } from '../tools/restoration/rooms.mjs';
 import { DESIGNER_LEVELS, TEXT_LEVELS } from '../tools/restoration/designer-levels.mjs';
@@ -105,6 +106,33 @@ describe('restoration data', () => {
     }
     const firefly = data.rooms.rooms.find((r) => r.id === 'firefly_whistle');
     assert.equal(firefly?.title, 'Firefly Whistle', "GSJS quests/firefly_whistle.js title");
+  });
+});
+
+describe('sound and release numbers', () => {
+  it('the Music tracks tile names a source for every playable sound key (Sounds.zip included)', () => {
+    const s = soundStats();
+    const keys = JSON.parse(readFileSync(join(root, 'public/assets/content/sound-keys.json'), 'utf8')).keys;
+    assert.equal(s.soundsZip, Object.values(keys).filter((r) => r.file && r.origin === 'sounds-zip').length);
+    assert.ok(s.soundsZip > 100, 'the Sounds.zip keys are counted');
+    assert.equal(s.soundsZip + s.archiveorgSfx + s.recoveredWayback + s.downloadsBestFit + s.otherFiles + s.aliases, s.playable);
+    assert.ok(s.playable <= s.keys);
+    // Each distinct music recording once: three files of the Groddle Forest theme are one.
+    assert.ok(s.musicTracks > s.ambientTracks && s.musicTracks < s.ambientTracks + Object.values(keys).filter((r) => r.category === 'music' && r.file).length);
+    const js = readFileSync(join(root, 'public/restoration/restoration.js'), 'utf8');
+    for (const field of ['soundsZip', 'archiveorgSfx', 'recoveredWayback', 'downloadsBestFit', 'otherFiles', 'aliases']) assert.ok(js.includes(`s.${field}`), `the tile says ${field}`);
+  });
+
+  it('names the release production runs from tools/deploy/live.json, or a deploy\'s own copy', () => {
+    const live = JSON.parse(readFileSync(join(root, 'tools/deploy/live.json'), 'utf8'));
+    assert.deepEqual(releaseInfo(), { game: live.game.replace(/^v/, ''), deployed: live.deployed });
+    const dir = mkdtempSync(join(tmpdir(), 'release-'));
+    writeFileSync(join(dir, 'live.json'), JSON.stringify({ game: 'v9.8.7', deployed: '2027-01-02' }));
+    assert.deepEqual(releaseInfo(join(dir, 'live.json')), { game: '9.8.7', deployed: '2027-01-02' });
+    writeFileSync(join(dir, 'bad.json'), JSON.stringify({ game: 'main', deployed: 'today' }));
+    assert.equal(releaseInfo(join(dir, 'bad.json')), null);
+    assert.equal(releaseInfo(join(dir, 'missing.json')), null);
+    assert.match(readFileSync(join(root, 'tools/deploy/kinsta.sh'), 'utf8'), /build-restoration\.mjs --release="\$RELEASE"/);
   });
 });
 

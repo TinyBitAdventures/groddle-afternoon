@@ -51,6 +51,23 @@ export function oursNumbers(restoration) {
   ];
 }
 
+/** A date as the page writes it: 3 November 2026. */
+export const longDate = (iso) => new Date(`${iso}T12:00:00Z`).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
+
+/** Where a fact's text says {release}: the version production runs and the day it went live. */
+export const RELEASE_TOKEN = '{release}';
+
+/**
+ * A fact's text as shown. Our Status names the live version from data.json's release block
+ * (tools/deploy/live.json at build time), so it is never typed in by hand; without it the
+ * sentence simply ends.
+ */
+export function factText(text, restoration) {
+  if (!text.includes(RELEASE_TOKEN)) return text;
+  const r = restoration?.release;
+  return text.replace(RELEASE_TOKEN, r?.game && r?.deployed ? `: version ${r.game} came out on ${longDate(r.deployed)}` : '');
+}
+
 /** Count statuses in a project's column (for the little tally under each header). */
 export function tallyColumn(cells) {
   const out = Object.fromEntries(STATUS_KEYS.map((k) => [k, 0]));

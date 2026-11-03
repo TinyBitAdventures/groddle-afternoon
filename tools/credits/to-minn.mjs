@@ -27,16 +27,14 @@ export const SECTIONS = [
     'Item names, descriptions and the game’s dialogue are Tiny Speck’s own words, from the game’s code.',
   ]],
   ['Sounds', [
-    'The sounds are Tiny Speck’s original recordings, shipped as the originals: from the Glitch audio sets on archive.org (most tagged CC0, one untagged) and from Glitch’s own servers through the Wayback Machine.',
-    'Sounds that were never recovered play short tones the game makes itself.',
-  ]],
-  ['Type', [
-    'The game’s type is <a href="https://github.com/googlefonts/nunito">Nunito</a> by The Nunito Project Authors, served from this site under the SIL Open Font License 1.1 (its licence sits beside the font files, in <code>assets/fonts/nunito/OFL.txt</code>).',
+    'The sounds are Tiny Speck’s original recordings, shipped as the originals: from the Glitch audio sets on archive.org (most tagged CC0, one untagged), from Glitch’s own servers through the Wayback Machine, and from a fan’s copy of the game server’s sound folder, file for file the same as Tiny Speck’s, which brought back the music of every region.',
+    'Music that was never recovered plays a track from Tiny Speck’s downloads page instead, and other sounds that were never recovered play short tones the game makes itself.',
   ]],
   ['The Glitch name', [
     'The Glitch name and logo belong to Tiny Speck and were never part of their release. Groddle Afternoon uses no Glitch logo, and it is not made by or affiliated with Tiny Speck or Slack.',
   ]],
   ['This project', [
+    'The game’s type is <a href="https://github.com/googlefonts/nunito">Nunito</a> by The Nunito Project Authors, served from this site under the SIL Open Font License 1.1 (its licence sits beside the font files, in <code>assets/fonts/nunito/OFL.txt</code>).',
     'Groddle Afternoon’s own code, the realtime server, this site and the Groddle mark are MIT licensed. The <a href="/code/">Code</a> page has the three repos.',
     'Screenshots are from the remake itself. Recordings of the original game were watched for reference and never ship in the game.',
   ]],

@@ -207,12 +207,13 @@
    "group": "world",
    "name": "Music and sounds",
    "status": "source",
-   "blurb": "The published soundtrack per region, every recovered Musicblock and meditation track, Esquibeth's melody from her own overlay files, real recordings for most sound keys (Wayback files plus Tiny Speck's archived sound effects set), and gentle synth stand-ins for the sounds still lost.",
+   "blurb": "Every region’s own music again, Urwok, Kloro Haoma and Jal included, from a fan’s copy of the game server’s sound folder, file for file the same as Tiny Speck’s, and the original tracks on many streets and party spaces. Every recovered Musicblock and meditation track, Esquibeth’s melody from her own overlay files, and real recordings for most sound keys (that copy, Wayback files and Tiny Speck’s archived sound effects). Where a theme is still missing (the subway, the Enchanted Wood, Eesti, the Rook) a track from Tiny Speck’s downloads page plays instead, and gentle synth stand-ins play the other sounds still lost.",
    "multiplayer": null,
    "spot": null,
    "evidence": [
     "public/js/ambient-music.js",
     "public/js/sound-board.js",
+    "tools/sound/sounds-zip-map.json",
     "tools/sound/archiveorg-sfx-map.json"
    ],
    "shot": null,
@@ -998,7 +999,7 @@
    "name": "Your house and yard",
    "status": "source",
    "blurb": "Get your house and home street free, as in 2012: the Magic Rock hands you a Home Street Ticket and the Home Street Selection Machine takes it for a Meadow, Firebog or Uralia street. Paper it wall by wall with Tiny Speck’s own 109 wallpapers, floors and ceilings, decorate rooms, cultivate the street (and move its Mailbox, Magic Rock and Mail Dispatcher wherever you like) and the private back yard left of the house (walk out through the house’s open end; worn-out rocks, gardens and patches become protos you restore with a project), expand both (the yard from 5 to 20 segments, which with a full-width street earns Landgrabber), restyle the street as any of 36 of the original 37 street styles and the back yard as any of 34 of its 37 (Change Style, level x 10 iMG; each rebuilt from Tiny Speck’s own scenery, a yard drawn like the street of its template family), keep animals. A Butler arrives in a box, stitched part by part from Tiny Speck’s own pieces (choose its head, face, accessory, body, arms and legs), to greet you home, hold what neighbours leave, invite you to join the club and hear about it, and swap daily hi signs with you (press 5; outrun its hi for the evasion badges). Add a second and third floor with a Door (the Furniture Store, or recipe 260): set it on your top floor and put 100 Planks into Build a New Floor. Give any piece a new style in Decorate: the original’s 565 furniture upgrades in Tiny Speck’s own art, 113 of them free and the 452 that cost credits sold for currants instead, at 1,000 currants a credit (reimagined: the going rate players sold credit furniture at in the 2012 Marketplace forum), so a 15 credit Chair style is 15,000 currants; Bonus Furniture Upgrade I to III turn 5% of the furniture you make into a style that cost credits.",
-   "multiplayer": "Visitors on your home street fill your Magic Rock’s daily iMG, and you collect it there the next game day.",
+   "multiplayer": "Visitors on your home street fill your Magic Rock’s daily iMG, and you collect it there the next game day; your page on the site shows your home street as a diorama drawn from the game’s own art.",
    "spot": "mailbox",
    "evidence": [
     "public/js/homes.js",
@@ -1008,7 +1009,8 @@
     "public/js/home-cultivation.js",
     "public/js/home-styles.js",
     "public/js/hi-signs.js",
-    "public/js/home-pool-mp.js"
+    "public/js/home-pool-mp.js",
+    "public/js/home-layout.js"
    ],
    "shot": "shots/homes.webp",
    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&timedemo=day&homedemo=decorate&practice=1"
@@ -1081,8 +1083,8 @@
    "group": "home",
    "name": "Other players and chat",
    "status": "source",
-   "blurb": "Make a character with an email and a password, right in the game, and finish it from the link we email you; in multiplayer you share the street with other players: see them walk and emote, chat on the street, form a party with its own chat, keep buddies (who is online and where) and block players. Global Chat, Live Help and the Trade Channel are open to everyone the original let in, and players make, find and join groups with their own chat. Say hi with 5 and your daily hi sign flies to another player; a player with no sign catches it, matching signs share a bonus, and the clock shows the day’s Hi sign leaderboard. Follow another player and your Glitch walks after them wherever they go, teleports included.",
-   "multiplayer": "See other players and chat on the street, form parties, keep buddies, join groups and channels, trade hi signs, follow another player from street to street, and see a little “…” over a player who is starting to say something. Hug, high five, kiss, moon or splank another player from their menu, soak them with a Watering Can or play them a Musicblock, play Charades on the street (the first to say your word wins), and throw a house party big enough for Epic Blowout.",
+   "blurb": "Make a character with an email and a password, right in the game, and finish it from the link we email you; in multiplayer you share the street with other players: see them walk and emote, chat on the street, form a party with its own chat, keep buddies (who is online and where) and block players. Global Chat, Live Help and the Trade Channel are open to everyone the original let in, and players make, find and join groups with their own chat. Say hi with 5 and your daily hi sign flies to another player; a player with no sign catches it, matching signs share a bonus, and the clock shows the day’s Hi sign leaderboard. Follow another player and your Glitch walks after them wherever they go, teleports included. Send anyone an IM from their menu, the Buddies tab or their page on the site, even when they are offline (it waits until they are back); every conversation beyond Local, Global and Buddies is in the Chats tab.",
+   "multiplayer": "See other players and chat on the street, form parties, keep buddies, send IMs, join groups and channels, trade hi signs, follow another player from street to street, and see a little “…” over a player who is starting to say something. Hug, high five, kiss, moon or splank another player from their menu, soak them with a Watering Can or play them a Musicblock, play Charades on the street (the first to say your word wins), and throw a house party big enough for Epic Blowout.",
    "spot": null,
    "evidence": [
     "public/js/realtime-client.js",
@@ -1091,7 +1093,9 @@
     "public/js/account-forms.js",
     "public/js/features/buddies-feature.js",
     "public/js/features/groups-feature.js",
-    "public/js/follow-mp.js"
+    "public/js/follow-mp.js",
+    "public/js/player-im.js",
+    "public/js/features/player-im-feature.js"
    ],
    "shot": null,
    "play": null
@@ -2222,10 +2226,14 @@
   "deadKeys": 3,
   "withFile": 426,
   "playable": 514,
-  "recoveredWayback": 38,
+  "soundsZip": 141,
   "archiveorgSfx": 216,
+  "recoveredWayback": 38,
+  "downloadsBestFit": 27,
+  "otherFiles": 4,
+  "aliases": 88,
   "ambientTracks": 34,
-  "musicTracks": 58
+  "musicTracks": 200
  },
  "recipes": {
   "imported": 327,
@@ -2681,6 +2689,10 @@
     "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&streetdemo=GA51B2OQAK623EF&caredemo=egg&carereset=1&practice=1"
    }
   ]
+ },
+ "release": {
+  "game": "0.14.0",
+  "deployed": "2026-11-03"
  },
  "git": {
   "commits": 962,

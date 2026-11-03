@@ -20,7 +20,7 @@ import {
   starterFields,
   starterRowFields,
 } from '../public/js/avatar-starter.js?v=2ba02b11';
-import { APPEARANCE_PRESETS, PRESET_GROUPS } from '../public/js/character-builder.js?v=1cb9713f';
+import { APPEARANCE_PRESETS, PRESET_GROUPS } from '../public/js/character-builder.js?v=38301e2f';
 import { expandCatalog, normalizeVectorFields, resolveLook } from '../public/js/avatar-looks.js?v=64fab53e';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');

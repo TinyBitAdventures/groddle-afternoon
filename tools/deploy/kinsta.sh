@@ -53,7 +53,7 @@ git -C "$here" worktree add --detach --quiet "$work/game" "$game_c"
 # The restoration and catalog builds read the original sources and the research inventory beside the game.
 for d in glitch-GameServerJS streets glitch-client glitch-items glitch-overlays research; do [ -e "$AUDIT/$d" ] && ln -s "$AUDIT/$d" "$work/$d"; done
 ln -s "$here/node_modules" "$work/game/node_modules"
-(cd "$work/game" && node tools/build-restoration.mjs >/dev/null)
+(cd "$work/game" && node tools/build-restoration.mjs --release="$RELEASE" >/dev/null)
 [ "$(git -C "$work/game" status --porcelain -- public/restoration/history.json)" ] || echo "note: the restoration history was already current"
 # The Code page measures the repos at the tags this release names (the tagged copy describes the one before).
 # It reads the other two repos through git at their tags, so it is pointed at the real clones (the export has no .git).
@@ -75,6 +75,8 @@ if [ -n "$menu" ]; then
 	case "$nav" in "site nav:"*) ;; *) echo "the menu was not written into the built pages" >&2; exit 1;; esac
 fi
 GAME="$work/game/public"
+# The home page's numbers as of this build, so they read true before landing.js fills them (tools/deploy/landing-stats.mjs).
+node "$work/game/tools/deploy/landing-stats.mjs" "$GAME" || { echo "the home page numbers were not written" >&2; exit 1; }
 # Fathom analytics on the static game pages; the theme carries it for the pages Minn renders (tools/deploy/fathom.mjs).
 node "$work/game/tools/deploy/fathom.mjs" "$GAME" || { echo "fathom was not added to the built pages" >&2; exit 1; }
 # Link previews (Open Graph and Twitter cards) on the static game pages; the theme adds them to Minn's pages (tools/deploy/social.mjs).

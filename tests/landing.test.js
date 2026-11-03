@@ -3,6 +3,7 @@ import { describe, it } from 'node:test';
 import { existsSync, readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { servedByMinn } from './minn-served.js';
+import { landingStats, stampStats } from '../public/landing/stats.js?v=26a4d16f';
 
 const pub = join(import.meta.dirname, '..', 'public');
 const read = (p) => readFileSync(join(pub, p), 'utf8');
@@ -44,6 +45,32 @@ describe('home page and /play/', () => {
       if (ref === '../' || servedByMinn(ref)) continue;
       assert.ok(existsSync(resolve(pub, ref)), ref);
     }
+  });
+
+  it('the built page carries the numbers from restoration/data.json (tools/deploy/landing-stats.mjs)', () => {
+    const data = JSON.parse(read('restoration/data.json'));
+    const stats = landingStats(data);
+    const keys = [...home.matchAll(/data-stat="([a-z]+)"/g)].map((m) => m[1]);
+    assert.deepEqual(Object.keys(stats).sort(), [...keys].sort(), 'every number on the page comes from the data');
+    const stamped = stampStats(home, stats);
+    for (const [key, text] of Object.entries(stats)) assert.ok(stamped.includes(`data-stat="${key}">${text}</span>`), key);
+    assert.equal(stampStats(stamped, stats), stamped, 'idempotent');
+    assert.equal(stampStats(home, {}), home);
+    const t = data.tally;
+    assert.equal(stats.systems, `${t.source + t.rebuilt + t.solo + t.reimagined} of ${Object.values(t).reduce((a, b) => a + b, 0)}`);
+    assert.match(read('landing/landing.js'), /landingStats\(data\)/);
+    assert.match(readFileSync(join(pub, '..', 'tools/deploy/kinsta.sh'), 'utf8'), /landing-stats\.mjs" "\$GAME"/);
+  });
+
+  it('counts the reimagined wardrobe pieces as the catalog does', () => {
+    const catalog = JSON.parse(read('assets/avatar/catalog.json'));
+    const n = Object.values(catalog.types).flat().filter((i) => i.reimagined).length;
+    const words = { 17: 'seventeen', 18: 'eighteen', 19: 'nineteen', 20: 'twenty', 21: 'twenty-one' };
+    const word = words[n];
+    assert.ok(word, `add ${n} to the words`);
+    assert.match(home, new RegExp(`${word[0].toUpperCase()}${word.slice(1)} pieces in Tiny Speck's wardrobe files`));
+    assert.match(home, new RegExp(`All ${word} are in the character builder`));
+    for (const w of Object.values(words).filter((x) => x !== word)) assert.ok(!home.toLowerCase().includes(`all ${w} are`), w);
   });
 
   it('the reports link Home and Play', () => {

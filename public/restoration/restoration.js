@@ -189,6 +189,21 @@ function setupBoard(data) {
 }
 
 /* —— Numbers ———————————————————————————— */
+/** The Music tracks tile's note: where every playable sound key's recording comes from (build-restoration.mjs soundStats). */
+function soundNote(s) {
+  const playable = s.playable ?? s.withFile;
+  const from = [
+    [s.soundsZip, 'from a fan’s copy of the game server’s sound folder'],
+    [s.archiveorgSfx, 'from Tiny Speck’s archived sound effects'],
+    [s.recoveredWayback, 'from web archives'],
+    [s.downloadsBestFit, 'from the closest track on Tiny Speck’s downloads page'],
+    [s.otherFiles, 'from other recovered files'],
+    [s.aliases, 'share another key’s recording'],
+  ].filter(([n]) => n).map(([n, words]) => `${fmt(n)} ${words}`);
+  const list = from.length > 1 ? `${from.slice(0, -1).join(', ')} and ${from.at(-1)}` : from.join('');
+  return `Distinct music recordings: every region’s own tracks, party spaces, Musicblocks, meditation, and Tiny Speck’s published soundtrack and ringtones. ${fmt(playable)} of ${fmt(s.keys)} sound keys play a real recording${list ? `: ${list}` : ''}. The other ${fmt(s.keys - playable)} play gentle synth stand-ins.`;
+}
+
 function renderNumbers(data) {
   const tiles = $('#tiles');
   if (!tiles) return;
@@ -210,7 +225,7 @@ function renderNumbers(data) {
     tile(data.jobs.playableJobs, data.jobs.sourceJobs, 'Street projects', `Build-a-street jobs offered on ${fmt(data.jobs.offeringStreets)} streets.`, data.jobs.playableJobs / data.jobs.sourceJobs),
     tile(data.recipes.imported, null, 'Recipes', `From the original catalog; ${data.recipes.skipped} belong to tools or items that never shipped.`),
     tile(data.icons.items, null, 'Item icons', `${fmt(data.icons.sharp)} re-rendered at triple resolution from the original vector art.`),
-    tile(data.sounds.musicTracks ?? data.sounds.ambientTracks, null, 'Music tracks', `The published soundtrack and ringtones. ${fmt(data.sounds.playable ?? data.sounds.withFile)} of ${fmt(data.sounds.keys)} sound keys play a real recording (${data.sounds.recoveredWayback} from web archives, ${data.sounds.archiveorgSfx ?? 0} from Tiny Speck's archived sound effects); the rest are gentle synth stand-ins.`),
+    tile(data.sounds.musicTracks ?? data.sounds.ambientTracks, null, 'Music tracks', soundNote(data.sounds)),
   );
 
   const bar = $('#quest-bar');
