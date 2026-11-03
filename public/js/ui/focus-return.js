@@ -42,7 +42,12 @@ const CONTROL = `button, [role="button"], [role="tab"], [role="menuitem"], a[hre
 const KEEPS_FOCUS = 'input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="button"]):not([type="submit"]):not([type="reset"]), textarea, select, [contenteditable="true"], [contenteditable=""]';
 /** Windows that keep every key while open (the game hands them its Escape: escapeOpenFeatureDialog). */
 const KEEPS_KEYS = '[aria-modal="true"], dialog[open]';
-const MODAL = 'dialog[open], [role="dialog"], [aria-modal="true"], .glitch-modal:not([hidden]), #verb-menu, #pack-popover, .count-pop';
+/**
+ * Windows and menus that keep the focus a click gave them. RIGHTCLICK: the shared menu
+ * (js/ui/context-menu.js .ctx-menu) too, so the menu a click on a chat name or a buddy row opens
+ * keeps its keys (Esc, Up/Down, 1-9) as the verb menu does.
+ */
+const MODAL = 'dialog[open], [role="dialog"], [aria-modal="true"], .glitch-modal:not([hidden]), #verb-menu, #pack-popover, .count-pop, .ctx-menu:not([hidden])';
 /** The world: the game's canvas (game.js main: role=application, tabIndex 0). */
 export const WORLD_SELECTOR = '#game-root > canvas[role="application"]';
 /** Keys that say nothing about how the player is playing (a screenshot chord, Caps Lock). */

@@ -19,7 +19,7 @@ import {
   hubStep,
   hubTileForKey,
   isHubCloseKey,
-} from '../public/js/ui/imagination-hub.js?v=31e8c38c';
+} from '../public/js/ui/imagination-hub.js?v=1d96f241';
 import { hotkeySections } from '../public/js/client-hotkeys.js?v=5a0e7cc7';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');

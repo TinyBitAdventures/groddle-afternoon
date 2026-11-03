@@ -21,8 +21,8 @@
  */
 
 import { escapeText } from './verb-menu.js?v=74b6dfa0';
-import { bindContextTrigger, MORE_KEYS_LABEL } from './context-menu.js?v=c92fbdd5';
-import { focusWorld } from './focus-return.js?v=c34f16a0';
+import { bindContextTrigger, MORE_KEYS_LABEL } from './context-menu.js?v=9c02015d';
+import { focusWorld } from './focus-return.js?v=da190597';
 
 export const QUEST_TABS = Object.freeze(['active', 'offered', 'done']);
 const TAB_LABELS = { active: 'Active', offered: 'Offered', done: 'Done' };

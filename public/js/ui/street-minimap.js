@@ -76,7 +76,7 @@
  * (snapshot|lines), streetMapSnapMs, streetMapWalk (the last click's kind:x, or "refused").
  */
 
-import { bindContextTrigger } from './context-menu.js?v=c92fbdd5';
+import { bindContextTrigger } from './context-menu.js?v=9c02015d';
 
 export const MAP_WIDTH = 160;
 export const MAX_CONTRACTED_H = 70;

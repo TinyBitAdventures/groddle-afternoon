@@ -5,8 +5,8 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { WORLD_SELECTOR, focusBack, focusBackTarget, focusWorld, installFocusReturn, lastInput, pressedBy, tabbedSincePointer } from '../public/js/ui/focus-return.js?v=c34f16a0';
-import { mountPanelShell } from '../public/js/ui/panel-shell.js?v=3d10b1e5';
+import { WORLD_SELECTOR, focusBack, focusBackTarget, focusWorld, installFocusReturn, lastInput, pressedBy, tabbedSincePointer } from '../public/js/ui/focus-return.js?v=da190597';
+import { mountPanelShell } from '../public/js/ui/panel-shell.js?v=6812fe04';
 
 const read = (p) => readFileSync(join(import.meta.dirname, '..', p), 'utf8');
 

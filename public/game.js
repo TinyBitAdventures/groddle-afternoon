@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=117337d3';
 import { createFeatureHost } from './js/feature-host.js?v=903263a4';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=1bd215ca';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=d14d9a04';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -723,9 +723,9 @@ import { MODERN, onUiModeChange, uiState } from './js/classic/ui-mode.js?v=587c0
 // ZOOM: the world zoom (a device preference) and Classic's frame scale under it; both load before main().
 import { worldZoom, setWorldZoom, stepWorldZoom, onZoomChange, zoomKeyAction, zoomKeyToast } from './js/world-zoom.js?v=b262a6c7';
 import { nightTint, nightTintOn, onNightTintChange, worldTintOpacity } from './js/night-tint.js?v=1dfc9c89';
-import { streetMapSetting, toggleStreetMap } from './js/ui/street-minimap.js?v=630b6a0a';
+import { streetMapSetting, toggleStreetMap } from './js/ui/street-minimap.js?v=49eecba5';
 import './js/classic/classic-zoom.js?v=1ef4b9a5';
-import { mountImaginationHub } from './js/ui/imagination-hub.js?v=31e8c38c';
+import { mountImaginationHub } from './js/ui/imagination-hub.js?v=1d96f241';
 import { newDayBubble, shuffleNewDayMessages, waitForScreenGates } from './js/screen-queue.js?v=cf0132c0';
 import { applyFamiliarLook, familiarCardHeading, familiarLook, skillArtFor, skillLearnedActivity } from './js/familiar.js?v=c7e902af';
 import { armPromptTimeout, promptTimeoutMs } from './js/prompt-timeout.js?v=c13ee4f6';
@@ -914,8 +914,8 @@ import { installHiresIcons } from './js/icon-hires.js?v=5b68aeaa';
 import { installHiresDecos } from './js/deco-hires.js?v=cb905e17';
 import { loadAudioLevels, loadMutedPreference, saveAudioLevel, saveMutedPreference } from './js/audio-pref.js?v=6fe817bc';
 import { createAudioBuses, fadeGain } from './js/audio-buses.js?v=af167b54';
-import { installTopBar, renderTopBar } from './js/ui/topbar.js?v=ee8111a2';
-import { focusBack, installFocusReturn, lastInput } from './js/ui/focus-return.js?v=c34f16a0';
+import { installTopBar, renderTopBar } from './js/ui/topbar.js?v=47cf20b2';
+import { focusBack, installFocusReturn, lastInput } from './js/ui/focus-return.js?v=da190597';
 import { installContextGuard } from './js/ui/context-guard.js?v=0f71ac17';
 import { QUOIN_FRAME_BOB, advanceQuoinClock, quoinBobBetweenFrames } from './js/quoin-motion.js?v=ea0bd408';
 import { installHiresFirstDraw, installHiresSprites, upgradeSource } from './js/sprite-hires.js?v=96c22af7';
@@ -923,12 +923,12 @@ import { denseSprite } from './js/sprite-dense.js?v=178a711b';
 import { wholeStatAmounts, wholeEffects } from './js/stat-text.js?v=f96d8fd3';
 import { createNotifier, effectTokens, floatKey, offerCardDrop, stackFloat, tokenText } from './js/notify.js?v=d85330ff';
 import { mountNotifyView } from './js/notify-view.js?v=81d06119';
-import { mountSocialDrawer } from './js/ui/social-drawer.js?v=bb926f9b';
+import { mountSocialDrawer } from './js/ui/social-drawer.js?v=eeffcc39';
 import { bindDragScroll } from './js/ui/drag-scroll.js?v=9a527ac8';
-import { SIDE_SHEET_IDS, bindTabs, inSideSheet, mountPanelShell, sheetKeyToWorld } from './js/ui/panel-shell.js?v=3d10b1e5';
-import { createQuestSheet, questStep } from './js/ui/quest-sheet.js?v=cc0ecd4e';
-import { createQuestTracker } from './js/ui/quest-tracker.js?v=e37a374b';
-import { bindContextTrigger, createContextMenu, isContextMenuKey as isMenuKey, MORE_KEYS_LABEL } from './js/ui/context-menu.js?v=c92fbdd5';
+import { SIDE_SHEET_IDS, bindTabs, inSideSheet, mountPanelShell, sheetKeyToWorld } from './js/ui/panel-shell.js?v=6812fe04';
+import { createQuestSheet, questStep } from './js/ui/quest-sheet.js?v=87d411e8';
+import { createQuestTracker } from './js/ui/quest-tracker.js?v=e0f370ff';
+import { bindContextTrigger, createContextMenu, isContextMenuKey as isMenuKey, MORE_KEYS_LABEL } from './js/ui/context-menu.js?v=9c02015d';
 import { bindCountField, countKeyValue, countStepMarkup } from './js/ui/count-chooser.js?v=893305c8';
 import { bindVerbMenu, focusVerbRow, lockVerbMenuSize, makePickTile, makeVerbRow, pickGridCols, placeVerbMenu, plainWords, refuseVerbRow, syncVerbDetail, verbMenuKey, verbRowAttrs, verbRowInner, verbRowKeys } from './js/ui/verb-menu.js?v=74b6dfa0';
 import { createPromptSettler, promptId } from './js/prompt-settle.js?v=509ba9cc';
@@ -955,7 +955,7 @@ import { itemZ } from './js/item-bands.js?v=e98b10bc';
 import { SLUG_ANIMATION, SLUG_LAYOUT, SLUG_STYLES, SLUG_TARGETS, drawSlugIcon, formatRawSlugs, formatSlugList, layoutSlugRow, slugBox, slugNumber, slugPillPath, slugSign, speechSlugList } from './js/speech-slugs.js?v=130338f9';
 import { filterText } from './js/word-filter.js?v=9a7a7ebb'; // the remake's own word filter
 // The interface skin (js/classic/ui-mode.js) sets <html data-ui> as it loads: before main(), so before the boot cover lifts.
-import { installInterfaceSettings } from './js/classic/classic-prefs.js?v=a8948b86';
+import { installInterfaceSettings } from './js/classic/classic-prefs.js?v=5dad1dff';
 
 /** @type {object|null} assets/maps/index.json */
 let mapIndexCache = null;
@@ -23261,7 +23261,8 @@ function openSignpostArmsMenu(hit, at) {
  */
 let playerCtxMenu = null;
 function playerContextMenu() {
-  if (!playerCtxMenu) playerCtxMenu = createContextMenu({ doc: document, host: document.getElementById('game-root'), id: 'player-ctx-menu', className: 'player-ctx-menu', rowData: 'playerRow', setData: setCanvasData });
+  // fixed: it opens from the chat column too, which Classic draws beside #game-root (outside its clip).
+  if (!playerCtxMenu) playerCtxMenu = createContextMenu({ doc: document, host: document.getElementById('game-root'), id: 'player-ctx-menu', className: 'player-ctx-menu', rowData: 'playerRow', fixed: true, setData: setCanvasData });
   return playerCtxMenu;
 }
 

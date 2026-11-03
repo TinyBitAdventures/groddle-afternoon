@@ -24,7 +24,7 @@
  * [data-picture-lightbox-close].
  */
 
-import { focusBackTarget, lastInput, pressedBy } from './focus-return.js?v=c34f16a0';
+import { focusBackTarget, lastInput, pressedBy } from './focus-return.js?v=da190597';
 
 export const LIGHTBOX_TEXT = Object.freeze({
   label: 'Picture',

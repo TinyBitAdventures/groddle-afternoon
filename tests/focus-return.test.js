@@ -3,7 +3,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { releaseTarget, releasesFocus, installFocusReturn } from '../public/js/ui/focus-return.js?v=c34f16a0';
+import { releaseTarget, releasesFocus, installFocusReturn } from '../public/js/ui/focus-return.js?v=da190597';
 
 /** A tiny element: closest() over a chain of selectors it matches. */
 function node(matches, parent = null) {
@@ -78,6 +78,9 @@ test('toggles let go after a click: the world outside a window that keeps the ke
   assert.equal(releaseTarget(node(['select'], menu)), '', 'a select too');
   const verbs = node(['#verb-menu']);
   assert.equal(releaseTarget(node(['button'], verbs)), '', 'the verb menu keeps its keys');
+  // RIGHTCLICK: the shared menu a click on a chat name opens keeps them too (Esc closes it).
+  const ctx = node(['.ctx-menu:not([hidden])']);
+  assert.equal(releaseTarget(node(['[role="menuitem"]', 'button'], ctx)), '', 'the shared menu keeps its keys');
 });
 
 test('installed: a slider keeps focus while dragged and lets go on pointerup; a modal toggle hands focus to the title', () => {

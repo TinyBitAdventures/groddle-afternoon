@@ -12,8 +12,8 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { FakeEl, matches } from './social-fake-dom.js';
-import { createQuestTracker } from '../public/js/ui/quest-tracker.js?v=e37a374b';
-import { isPinMenuKey, placePinMenu, LONG_PRESS_MS, PIN_MENU_ROWS } from '../public/js/ui/quest-pin-menu.js?v=81e6a243';
+import { createQuestTracker } from '../public/js/ui/quest-tracker.js?v=e0f370ff';
+import { isPinMenuKey, placePinMenu, LONG_PRESS_MS, PIN_MENU_ROWS } from '../public/js/ui/quest-pin-menu.js?v=a4bef7a8';
 import { questPinsFeature } from '../public/js/features/quest-pins-feature.js?v=e59012f1';
 
 const PUBLIC = join(dirname(fileURLToPath(import.meta.url)), '../public');

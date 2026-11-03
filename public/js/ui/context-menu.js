@@ -33,7 +33,7 @@
  */
 
 import { bindVerbMenu, focusVerbRow, lockVerbMenuSize, makeVerbRow, verbMenuKey, verbRowKeys } from './verb-menu.js?v=74b6dfa0';
-import { focusWorld } from './focus-return.js?v=c34f16a0';
+import { focusWorld } from './focus-return.js?v=da190597';
 
 /** How long a finger holds before the menu opens, and how far it may drift. */
 export const LONG_PRESS_MS = 500;
@@ -81,10 +81,13 @@ function anchorRect(anchor) {
 /**
  * One menu element in `host` (built on first open). open() fills it with rows each time.
  * @param {{ doc: Document, host: HTMLElement|null, id?: string, className?: string, headClass?: string,
- *   titleClass?: string, rowData?: string, setData?: (k: string, v: string) => void }} opts
+ *   titleClass?: string, rowData?: string, fixed?: boolean, setData?: (k: string, v: string) => void }} opts
  *   rowData: the dataset key each row's id goes in (default ctxRow: data-ctx-row="unpin").
+ *   fixed: placed in the window, not in the host (data-fixed: position fixed in both skins), for a
+ *   menu opened from something outside the host's box (Classic's chat column stands beside
+ *   #game-root, which clips what is absolutely placed in it).
  */
-export function createContextMenu({ doc, host, id = '', className = '', headClass = '', titleClass = '', rowData = 'ctxRow', setData = () => {} } = {}) {
+export function createContextMenu({ doc, host, id = '', className = '', headClass = '', titleClass = '', rowData = 'ctxRow', fixed = false, setData = () => {} } = {}) {
   let el = null;
   let head = null;
   let titleEl = null;
@@ -100,6 +103,7 @@ export function createContextMenu({ doc, host, id = '', className = '', headClas
     if (id) el.id = id;
     el.className = ['ctx-menu', className].filter(Boolean).join(' ');
     el.setAttribute('role', 'menu');
+    if (fixed) el.dataset.fixed = '';
     el.hidden = true;
     el.dataset.vmDefault = '';
     head = doc.createElement('div');
@@ -177,7 +181,10 @@ export function createContextMenu({ doc, host, id = '', className = '', headClas
     el.style.left = '0px';
     el.style.top = '0px';
     lockVerbMenuSize(el);
-    const hostRect = host.getBoundingClientRect();
+    const win = doc.defaultView;
+    const hostRect = fixed
+      ? { left: 0, top: 0, width: win?.innerWidth || doc.documentElement?.clientWidth || 0, height: win?.innerHeight || doc.documentElement?.clientHeight || 0 }
+      : host.getBoundingClientRect();
     const box = el.getBoundingClientRect();
     const a = anchorRect(anchor);
     const p = placeContextMenu({

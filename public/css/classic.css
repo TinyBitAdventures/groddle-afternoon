@@ -1171,6 +1171,9 @@
 @media (prefers-reduced-motion: reduce) {
   :root[data-ui="classic"] #game-root .ctx-menu { animation: none; }
 }
+/* Placed in the window (data-fixed): it opens from the chat column, which stands beside #game-root
+   (outside the clip of what is absolutely placed in it). */
+:root[data-ui="classic"] #game-root .ctx-menu[data-fixed]:not([hidden]) { position: fixed; }
 /* Opened from a full-screen panel (the Manage buddies panel): over it. */
 :root[data-ui="classic"] #game-root .ctx-menu[data-layer="screen"]:not([hidden]) { z-index: calc(var(--z-screen) + 1); }
 :root[data-ui="classic"] .ctx-menu .ctx-head { padding: 0 calc(5 * var(--cu)); margin: 0 0 calc(3 * var(--cu)); border: 0; background: none; }
@@ -1199,7 +1202,9 @@
 :root[data-ui="classic"] .ctx-menu .verb-choice[aria-disabled="true"] { color: var(--c-classic-disabled); background: none; border-color: transparent; cursor: default; }
 :root[data-ui="classic"] .ctx-menu .vm-label { flex: 1; min-width: 0; }
 :root[data-ui="classic"] .ctx-menu :is(.vm-key, .vm-lock) { display: none; }
-:root[data-ui="classic"] .ctx-menu .vm-detail { margin: calc(3 * var(--cu)) calc(5 * var(--cu)) 0; font: var(--fs-classic-count)/var(--lh-snug) var(--font-classic-body); color: var(--c-classic-text); }
+/* The footer line wraps inside the card the rows make (width 0, min-width 100%: it adds nothing to the
+   card's width), so a long tip never widens the card past where it was placed. */
+:root[data-ui="classic"] .ctx-menu .vm-detail { box-sizing: border-box; width: 0; min-width: calc(100% - 10 * var(--cu)); margin: calc(3 * var(--cu)) calc(5 * var(--cu)) 0; font: var(--fs-classic-count)/var(--lh-snug) var(--font-classic-body); color: var(--c-classic-text); }
 :root[data-ui="classic"] .ctx-menu .vm-detail.bad { color: var(--c-classic-disabled); }
 :root[data-ui="classic"] .ctx-menu .vm-detail[hidden] { display: none; }
 /* A pack stack's menu (#pack-popover) draws VERBS' rows too: the same, without key caps or the lock. */

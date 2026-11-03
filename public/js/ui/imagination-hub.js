@@ -24,7 +24,7 @@
  * <html data-ui="modern">. The pure helpers below are tested without a DOM
  * (tests/imagination-hub.test.js).
  */
-import { focusBack } from './focus-return.js?v=c34f16a0';
+import { focusBack } from './focus-return.js?v=da190597';
 
 const ART = 'assets/imagination/cards/';
 

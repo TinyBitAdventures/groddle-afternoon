@@ -44,8 +44,8 @@
  */
 
 import { REPORT_FILTER_MIN, REPORT_MAX, REPORT_TEXT as T, STATUS_WORDS, canEditFirst, matchesReport, pictureRefused, pictureSrc, refusalWords, ticketLine, unreadCount, whenWords } from '../reports.js?v=aae32361';
-import { focusBack } from './focus-return.js?v=c34f16a0';
-import { lightboxLink } from './picture-lightbox.js?v=070900ad';
+import { focusBack } from './focus-return.js?v=da190597';
+import { lightboxLink } from './picture-lightbox.js?v=0d2814c8';
 
 /** How long Send waits for a picture still drawing before it sends the world-only one (ms). */
 export const PICTURE_WAIT_MS = 6000;

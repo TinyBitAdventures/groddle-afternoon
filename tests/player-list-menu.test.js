@@ -111,3 +111,27 @@ describe('game.js openPlayerListMenu (the shared menu, engine.openPlayerMenu)', 
     assert.match(classic, /:root\[data-ui="classic"\] #game-root \.ctx-menu\[data-layer="screen"\]:not\(\[hidden\]\) \{ z-index: calc\(var\(--z-screen\) \+ 1\); \}/);
   });
 });
+
+describe('the player menu opens from the chat column too (fixed, both skins)', () => {
+  it('placed in the window, not in #game-root (Classic draws the column beside it, outside its clip)', () => {
+    const glue = readFileSync(new URL('../public/game.js', import.meta.url), 'utf8');
+    assert.match(glue, /id: 'player-ctx-menu', className: 'player-ctx-menu', rowData: 'playerRow', fixed: true,/);
+    const cm = readFileSync(new URL('../public/js/ui/context-menu.js', import.meta.url), 'utf8');
+    assert.match(cm, /if \(fixed\) el\.dataset\.fixed = '';/);
+    assert.match(cm, /const hostRect = fixed\n\s+\? \{ left: 0, top: 0, width: win\?\.innerWidth/);
+    const css = readFileSync(new URL('../public/style.css', import.meta.url), 'utf8');
+    const classic = readFileSync(new URL('../public/css/classic.css', import.meta.url), 'utf8');
+    assert.match(css, /\[data-ui="modern"\] #game-root \.ctx-menu\[data-fixed\]:not\(\[hidden\]\) \{ position: fixed; \}/);
+    assert.match(classic, /:root\[data-ui="classic"\] #game-root \.ctx-menu\[data-fixed\]:not\(\[hidden\]\) \{ position: fixed; \}/);
+  });
+
+  it('Classic: the footer line wraps inside the card the rows make, so a long tip never widens it past where it was placed', () => {
+    const classic = readFileSync(new URL('../public/css/classic.css', import.meta.url), 'utf8');
+    assert.match(classic, /:root\[data-ui="classic"\] \.ctx-menu \.vm-detail \{ box-sizing: border-box; width: 0; min-width: calc\(100% - 10 \* var\(--cu\)\);/);
+  });
+
+  it('a click on a name keeps the menu\'s keys (js/ui/focus-return.js: the shared menu is one that keeps them)', () => {
+    const fr = readFileSync(new URL('../public/js/ui/focus-return.js', import.meta.url), 'utf8');
+    assert.match(fr, /#verb-menu, #pack-popover, \.count-pop, \.ctx-menu:not\(\[hidden\]\)';/);
+  });
+});

@@ -16,7 +16,7 @@
  *
  * QA: canvas data uiSheet (the open side sheet's id, or ""), uiSheetInset (its --inset-l px).
  */
-import { focusBack } from './focus-return.js?v=c34f16a0';
+import { focusBack } from './focus-return.js?v=da190597';
 
 /**
  * @param {{ root: HTMLElement, sheets: { id: string, kind?: 'side'|'center', close?: () => void }[],

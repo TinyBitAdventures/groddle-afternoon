@@ -37,7 +37,7 @@ import { partySpacesFeature } from './party-spaces-feature.js?v=8d1a043a';
 import { seasonsFeature } from './seasons-feature.js?v=8206924b';
 import { cameraModeFeature } from './camera-mode-feature.js?v=ad1ae5ea';
 import { newxpFeature } from './newxp-feature.js?v=5109ff3e';
-import { streetMinimapFeature } from './street-minimap-feature.js?v=4679baa5';
+import { streetMinimapFeature } from './street-minimap-feature.js?v=392fa29e';
 
 export { questFlagsFeature };
 
@@ -138,7 +138,7 @@ import { partyFeature } from './party-feature.js?v=97ccb6cc'; FEATURES.push(part
 import { sharedQuoinsFeature } from './shared-quoins-feature.js?v=0c3fa98a'; FEATURES.push(sharedQuoinsFeature);
 import { tradeFeature } from './trade-feature.js?v=c410b78d'; FEATURES.push(tradeFeature);
 import { ledgerFeature } from './ledger-feature.js?v=488ca796'; FEATURES.push(ledgerFeature);
-import { buddiesFeature } from './buddies-feature.js?v=091dd17e'; FEATURES.push(buddiesFeature);
+import { buddiesFeature } from './buddies-feature.js?v=64dd0486'; FEATURES.push(buddiesFeature);
 import { profilesFeature } from './profiles-feature.js?v=e13a1145'; FEATURES.push(profilesFeature);
 import { neighboursMpFeature } from './neighbours-mp-feature.js?v=11742008'; FEATURES.push(neighboursMpFeature);
 import { questsMpFeature } from './quests-mp-feature.js?v=72cdf529'; FEATURES.push(questsMpFeature);
@@ -149,7 +149,7 @@ import { playerMailFeature } from './player-mail-feature.js?v=0c45c5b2'; FEATURE
 import { followMpFeature } from './follow-mp-feature.js?v=e5a26e1b'; FEATURES.push(followMpFeature);
 import { hogHaulMpFeature } from './hog-haul-mp-feature.js?v=bd99708a'; FEATURES.push(hogHaulMpFeature);
 import { dropsMpFeature } from './drops-mp-feature.js?v=054ccb2c'; FEATURES.push(dropsMpFeature);
-import { bugReportFeature } from './bug-report-feature.js?v=ba4dbfd0'; FEATURES.push(bugReportFeature);
+import { bugReportFeature } from './bug-report-feature.js?v=dd0464d4'; FEATURES.push(bugReportFeature);
 import { playerVerbsMpFeature } from './player-verbs-mp-feature.js?v=bed4d98e'; FEATURES.push(playerVerbsMpFeature);
 import { snapsFeature } from './snaps-feature.js?v=e2980571'; FEATURES.push(snapsFeature);
 import { homeStreetMpFeature } from './home-street-mp-feature.js?v=a15d9743'; FEATURES.push(homeStreetMpFeature);
@@ -157,7 +157,7 @@ import { swoonerfliesFeature } from './swoonerflies-feature.js?v=b7e2dd17'; FEAT
 import { homePoolMpFeature } from './home-pool-mp-feature.js?v=575920f2'; FEATURES.push(homePoolMpFeature);
 import { yardVerbsMpFeature } from './yard-verbs-mp-feature.js?v=aad1d750'; FEATURES.push(yardVerbsMpFeature);
 import { homeMachinesFeature } from './home-machines-feature.js?v=e3a86e99'; FEATURES.push(homeMachinesFeature);
-import { homeStorageFeature } from './home-storage-feature.js?v=db956dd5'; FEATURES.push(homeStorageFeature);
+import { homeStorageFeature } from './home-storage-feature.js?v=91188334'; FEATURES.push(homeStorageFeature);
 import { questVerbsFeature } from './quest-verbs-feature.js?v=0ae7c7ff'; FEATURES.push(questVerbsFeature);
 import { itemVerbsMoreFeature } from './item-verbs-more-feature.js?v=0ffd904f'; FEATURES.push(itemVerbsMoreFeature);
 import { yourLooksFeature } from './your-looks-feature.js?v=38cfe4e8'; FEATURES.push(yourLooksFeature);
