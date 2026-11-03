@@ -22,7 +22,7 @@
  */
 
 import { countItem } from '../inventory.js?v=b0e33301';
-import { getToolCondition } from '../tools.js?v=6a9e1314';
+import { getToolCondition } from '../tools.js?v=3974f57e';
 import {
   PACK_TREE_REACH,
   deadTreeSide,

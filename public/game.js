@@ -2,9 +2,9 @@
  * Groddle Afternoon — original street geometry + layered decos
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
-import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=47edbd39';
+import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=fc9bd9f3';
 import { createFeatureHost } from './js/feature-host.js?v=903263a4';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=14d91d99';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=f1aa92e1';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -36,7 +36,7 @@ import {
 // Quest copy is Flash htmlText: <b>/<i>/<br> drawn as formatting, the rest dropped, never innerHTML.
 import { questRequirementText, renderQuestText, withQuestMarkup } from './js/quest-text.js?v=7f5d761c';
 // G267: the world-verb quest counters skip offer-system quests; old saves drop the boot Moloko quest.
-import { dropBootStarterQuests, routesCounter, worldVerbQuestEvents, makingUnitQuestEvents, shrineDonationQuestEvents } from './js/quest-offers.js?v=3c7925ca';
+import { dropBootStarterQuests, routesCounter, worldVerbQuestEvents, makingUnitQuestEvents, shrineDonationQuestEvents } from './js/quest-offers.js?v=7dfa8eae';
 import {
   PHANTOM_QUEST_ID,
   REMEMBER_QUEST_ID,
@@ -220,7 +220,7 @@ import {
   rookEggStateForProgress,
   rookWoodsObjective,
   rookWoodsRemainingMs,
-} from './js/rook-woods.js?v=0a7bd931';
+} from './js/rook-woods.js?v=da8a71b0';
 import {
   ROOK_HALL_QUEST_ID,
   ROOK_HALL_START_QUEST_ID,
@@ -464,8 +464,8 @@ import {
 } from './js/inventory.js?v=b0e33301';
 import { PACK_COPY, isBagClass, unitRankAt } from './js/pack-slots.js?v=ba0a895f';
 import { createPackRow, mountPackClearance, packBandRange, packCountText, packSearchEntries, packSlotTip } from './js/ui/pack-row.js?v=65c0f180';
-import { listAnimalFeedOptions } from './js/animals.js?v=630619c4';
-import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=630619c4';
+import { listAnimalFeedOptions } from './js/animals.js?v=d40ef695';
+import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=d40ef695';
 import {
   createDroppedItemState,
   parseDroppedItemState,
@@ -482,7 +482,7 @@ import {
   parsePlayerSave,
   serializePlayerSave,
   restorePlayerSave,
-} from './js/player-save.js?v=3eceebbb';
+} from './js/player-save.js?v=65fef209';
 import {
   HOME_INTERIOR_TSID,
   HOME_STREET_TSID,
@@ -527,7 +527,8 @@ import {
   firstWorkingTool,
   bindToolInventory,
   TOOL_CONDITION_CATALOG as TOOL_WEAR,
-} from './js/tools.js?v=6a9e1314';
+  brokenToolIcon,
+} from './js/tools.js?v=3974f57e';
 import {
   listRecipes,
   listRecipesForTool,
@@ -556,7 +557,7 @@ import {
   MAKING_TOOL_SKILLS,
   recipeTaskLimit,
   recipeToolInUse,
-} from './js/making.js?v=68521d02';
+} from './js/making.js?v=adfa8a29';
 import { MAKE_TOOL_SHEETS } from './js/make-tool-sheets.js?v=6f758e09';
 import { LOW_FUEL_LINE, craftSessionElapsedMs, isLowFuel, isMachineArt, machineArtHtml, packMakeState, playMachineHandOver, setMachineArtFrame } from './js/machine-art.js?v=8c93c616';
 import {
@@ -583,7 +584,7 @@ import {
   cropIcon,
   hasWateringCan,
   hasHoe,
-} from './js/garden.js?v=86ed507d';
+} from './js/garden.js?v=d2afc936';
 import { GARDEN_SCALE, PLOT_H as GARDEN_PLOT_H, PLOT_W as GARDEN_PLOT_W, gardenFrame, gardenLayout, gardenStyle, plotPieces } from './js/garden-view.js?v=05651e76';
 import {
   ROCK_CATALOG,
@@ -596,7 +597,7 @@ import {
   starterMiningTools,
   STARTER_MINING_SKILLS,
   findWorkingPick,
-} from './js/mining.js?v=ff73fa4b';
+} from './js/mining.js?v=541dfb88';
 import {
   loadStreetData,
   STREET_INDEX,
@@ -786,20 +787,20 @@ import {
   createVendorSellQuote,
   vendorSellUnitPrice,
   vendorBuyUnitPrice,
-} from './js/vendor.js?v=998821e3';
+} from './js/vendor.js?v=cabea7b7';
 import {
   animalAnchorX,
   createAnimalState,
   resetAnimalDay,
   animalStatusLabel,
-} from './js/animals.js?v=630619c4';
+} from './js/animals.js?v=d40ef695';
 import {
   ensureWoodTreeState,
   pickWoodTool,
   resetWoodTreeDay,
   woodToolLabel,
   woodTreeStatusLabel,
-} from './js/woodcutting.js?v=13b9e3b4';
+} from './js/woodcutting.js?v=6d2ad054';
 import {
   GIANTS,
   createShrineState,
@@ -822,7 +823,7 @@ import {
   emblemRelationNote,
   formatSpeedUpTime,
 } from './js/shrines.js?v=4b395ddf';
-import { shrinePowderOptions, shrinePowderAchievementCounters } from './js/powders.js?v=3c3e9997';
+import { shrinePowderOptions, shrinePowderAchievementCounters } from './js/powders.js?v=d355981a';
 import {
   GAMESHOW_TICKET_ID,
   applySpinningWheelReward,
@@ -907,7 +908,7 @@ import {
   soundForVerb,
 } from './js/sound-moments.js?v=2f8597cd';
 import { loseMood, moodMax, setMetabolicGainGate, setMetabolicLossGate } from './js/metabolics.js?v=8504134e';
-import { installHiresIcons } from './js/icon-hires.js?v=5357d4b4';
+import { installHiresIcons } from './js/icon-hires.js?v=5b68aeaa';
 import { installHiresDecos } from './js/deco-hires.js?v=cb905e17';
 import { loadAudioLevels, loadMutedPreference, saveAudioLevel, saveMutedPreference } from './js/audio-pref.js?v=6fe817bc';
 import { createAudioBuses, fadeGain } from './js/audio-buses.js?v=af167b54';
@@ -4559,16 +4560,8 @@ function renderPackRow(box, slots, opts = {}) {
     slot.draggable = true;
     if (s.icon) {
       const img = document.createElement('img');
-      const brokenToolIcons = {
-        tinkertool: 'assets/sprites/icons/tinkertool_broken.png',
-        hatchet: 'assets/sprites/icons/hatchet_broken.png',
-        class_axe: 'assets/sprites/icons/class_axe_broken.png',
-        watering_can: 'assets/sprites/icons/watering_can_broken.png',
-        irrigator_9000: 'assets/sprites/icons/irrigator_9000_broken.png',
-      };
-      img.src = toolCondition?.broken && brokenToolIcons[s.classTsid]
-        ? brokenToolIcons[s.classTsid]
-        : s.icon;
+      // Ticket 63: every tool with a broken_iconic state shows it (js/tools.js BROKEN_TOOL_ICONS).
+      img.src = (toolCondition?.broken && brokenToolIcon(s.classTsid)) || s.icon;
       img.alt = s.label;
       img.loading = 'lazy';
       img.onerror = () => {
@@ -29592,7 +29585,7 @@ async function main() {
   }
   // Garden talkback QA (js/garden-talk-qa.js): ?gardentalkdemo=herb|crop.
   if (new URLSearchParams(location.search).has('gardentalkdemo')) {
-    import('./js/garden-talk-qa.js?v=712201be').then((m) => m.runGardenTalkDemo({ engine, executeVerb, params: new URLSearchParams(location.search) }));
+    import('./js/garden-talk-qa.js?v=a4c0310d').then((m) => m.runGardenTalkDemo({ engine, executeVerb, params: new URLSearchParams(location.search) }));
   }
   // Loading card QA (js/loading-card-qa.js): ?loadcarddemo=<tsid>[,<tsid>].
   if (new URLSearchParams(location.search).has('loadcarddemo')) {

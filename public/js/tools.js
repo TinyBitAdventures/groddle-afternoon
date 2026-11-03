@@ -77,6 +77,25 @@ export const TOOL_CONDITION_CATALOG = Object.freeze({
  *   order the source's own conditions name them).
  */
 export const HOE_TOOLS = Object.freeze(['high_class_hoe', 'hoe']);
+
+/**
+ * Ticket 63: the tools whose pack icon turns broken (assets/sprites/icons/<class>_broken.png):
+ * every tool_base item's SWF has a broken_iconic state, which the client drew for a broken
+ * tool in the pack (ItemstackAnimation.as 178-186: tool_state.is_broken -> 'broken_iconic').
+ * Butterfly Lotion, the Quill, the Fox Brush's own frames and the four machines have none.
+ */
+export const BROKEN_TOOL_ICONS = Object.freeze(new Set([
+  'ace_of_spades', 'alchemical_tongs', 'awesome_pot', 'blender', 'cauldron', 'class_axe', 'cocktail_shaker',
+  'construction_tool', 'crystallizer', 'fancy_pick', 'fox_brush', 'frying_pan', 'grand_ol_grinder', 'hatchet',
+  'high_class_hoe', 'hoe', 'irrigator_9000', 'knife_and_board', 'loomer', 'mike_tyson_grill', 'ore_grinder',
+  'pick', 'saucepan', 'scraper', 'shovel', 'smelter', 'spindle', 'splendid_spindle', 'super_scraper',
+  'tincturing_kit', 'tinkertool', 'watering_can',
+]));
+
+/** The broken pack icon of a tool class, or null when it has none. */
+export function brokenToolIcon(classTsid) {
+  return BROKEN_TOOL_ICONS.has(classTsid) ? `assets/sprites/icons/${classTsid}_broken.png` : null;
+}
 export const GRINDER_TOOLS = Object.freeze(['ore_grinder', 'grand_ol_grinder']);
 export const WATERING_CAN_TOOLS = Object.freeze(['irrigator_9000', 'watering_can']);
 

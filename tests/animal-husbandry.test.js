@@ -46,10 +46,10 @@ import {
   stickPlaceState,
   takePlop,
 } from '../public/js/animal-husbandry.js?v=8de6bc84';
-import { pickerMaxCount, pickerOptionsFor, pickerTakesCount, listAnimalFeedOptions, createAnimalState } from '../public/js/animals.js?v=630619c4';
-import { getVerbsFor, runVerb } from '../public/content.js?v=47edbd39';
+import { pickerMaxCount, pickerOptionsFor, pickerTakesCount, listAnimalFeedOptions, createAnimalState } from '../public/js/animals.js?v=d40ef695';
+import { getVerbsFor, runVerb } from '../public/content.js?v=fc9bd9f3';
 import { setStreetEcologyCatalog } from '../public/js/street-ecology.js?v=53cdde1b';
-import { batterflyPlacementGroups, normalizeHusbandrySlot } from '../public/js/features/animal-husbandry-feature.js?v=0c55d2d3';
+import { batterflyPlacementGroups, normalizeHusbandrySlot } from '../public/js/features/animal-husbandry-feature.js?v=0bd593bc';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const publicDir = join(here, '../public');

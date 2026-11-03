@@ -10,7 +10,7 @@
  * stack where `class_tsid == 'hatchet' || class_tsid == 'class_axe'`.
  */
 
-import { canUseTool, useToolCondition } from './tools.js?v=6a9e1314';
+import { canUseTool, useToolCondition } from './tools.js?v=3974f57e';
 import { woodHarvestOverrides } from './imagination-effects.js?v=70169933';
 import { ENCHANTED_WOOD_TREE } from './enchanted-forests.js?v=d986bff5';
 import { loseEnergy } from './metabolics.js?v=8504134e';

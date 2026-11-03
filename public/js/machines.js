@@ -22,7 +22,7 @@
  */
 
 import { addItem, countItem, removeItem } from './inventory.js?v=b0e33301';
-import { getToolCondition, receiveToolCopy, setToolRemaining, toolCopies } from './tools.js?v=6a9e1314';
+import { getToolCondition, receiveToolCopy, setToolRemaining, toolCopies } from './tools.js?v=3974f57e';
 import { distillingBonus, hasMasterAssembler, hasMasterExploder, machinePartInstallMs } from './imagination-effects.js?v=70169933';
 import { loseEnergy } from './metabolics.js?v=8504134e';
 

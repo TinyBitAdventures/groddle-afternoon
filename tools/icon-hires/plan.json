@@ -379,6 +379,11 @@
   "swf": "~/Documents/glitch-audit/glitch-items/quest_items/esquibeth_note_5/esquibeth_note_5.swf",
   "oga": "~/Documents/glitch-audit/opengameart/extracted_g174/glitch-assets/esquibeth_note_5/esquibeth_note_5__x1_1_png_1354840203.png"
  },
+ "fancy_pick_broken": {
+  "swf": "~/Documents/glitch-audit/glitch-items/tools/pick/fancy_pick/fancy_pick.swf",
+  "frame": "broken_iconic",
+  "oga": "~/Documents/glitch-audit/opengameart/extracted_mining/glitch-assets/fancy_pick/fancy_pick__x1_broken_iconic_png_1354831492.png"
+ },
  "fiber": {
   "swf": "~/Documents/glitch-audit/glitch-items/misc/fiber/strips_of_fabric.swf",
   "frame": "iconic"
@@ -587,6 +592,11 @@
   "frame": "iconic",
   "oga": "~/Documents/glitch-audit/opengameart/extracted_g174/glitch-assets/grand_ol_grinder/grand_ol_grinder__x1_iconic_png_1354836355.png"
  },
+ "grand_ol_grinder_broken": {
+  "swf": "~/Documents/glitch-audit/glitch-items/tools/ore_grinder/grand_ol_grinder/grand_ol_grinder.swf",
+  "frame": "broken_iconic",
+  "oga": "~/Documents/glitch-audit/opengameart/extracted_g174/glitch-assets/grand_ol_grinder/grand_ol_grinder__x1_broken_iconic_png_1354836355.png"
+ },
  "graveside_marker": {
   "swf": "~/Documents/glitch-audit/glitch-items/misc/graveside_marker/graveside_marker.swf",
   "seed": true
@@ -635,6 +645,16 @@
   "swf": "~/Documents/glitch-audit/glitch-items/tools/hoe/high_class_hoe/high_class_hoe.swf",
   "frame": "iconic",
   "oga": "~/Documents/glitch-audit/opengameart/extracted_g174/glitch-assets/high_class_hoe/high_class_hoe__x1_iconic_png_1354836364.png"
+ },
+ "high_class_hoe_broken": {
+  "swf": "~/Documents/glitch-audit/glitch-items/tools/hoe/high_class_hoe/high_class_hoe.swf",
+  "frame": "broken_iconic",
+  "oga": "~/Documents/glitch-audit/opengameart/extracted_g174/glitch-assets/high_class_hoe/high_class_hoe__x1_broken_iconic_png_1354836364.png"
+ },
+ "hoe_broken": {
+  "swf": "~/Documents/glitch-audit/glitch-items/tools/tool_base/hoe/hoe.swf",
+  "frame": "broken_iconic",
+  "oga": "~/Documents/glitch-audit/opengameart/extracted/glitch-assets/hoe/hoe__x1_broken_iconic_png_1354829607.png"
  },
  "homestreet_ticket": {
   "swf": "~/Documents/glitch-audit/glitch-items/misc/homestreet_ticket/homestreet_ticket.swf",
@@ -890,6 +910,11 @@
   "sprite": 82,
   "frame": "iconic"
  },
+ "ore_grinder_broken": {
+  "swf": "~/Documents/glitch-audit/glitch-items/tools/tool_base/ore_grinder/ore_grinder.swf",
+  "frame": "broken_iconic",
+  "oga": "~/Documents/glitch-audit/opengameart/extracted_mining/glitch-assets/ore_grinder/ore_grinder__x1_broken_iconic_png_1354831498.png"
+ },
  "paper_tree": {
   "swf": "~/Documents/glitch-audit/glitch-items/harvestable_resources/paper_tree/paper_tree.swf",
   "seed": true
@@ -972,6 +997,11 @@
  "peat_3": {
   "swf": "~/Documents/glitch-audit/glitch-items/harvestable_resources/peat_base/peat_3/peat_3.swf",
   "seed": true
+ },
+ "pick_broken": {
+  "swf": "~/Documents/glitch-audit/glitch-items/tools/tool_base/pick/pick.swf",
+  "frame": "broken_iconic",
+  "oga": "~/Documents/glitch-audit/opengameart/extracted_mining/glitch-assets/pick/pick__x1_broken_iconic_png_1354831488.png"
  },
  "pile_of_currants": {
   "swf": "~/Documents/glitch-audit/glitch-items/misc/pile_of_currants/pile_of_currants.swf",
@@ -1202,6 +1232,11 @@
   "swf": "~/Documents/glitch-audit/glitch-items/misc/signpost_permit/signpost_permit.swf",
   "frame": "iconic",
   "seed": true
+ },
+ "smelter_broken": {
+  "swf": "~/Documents/glitch-audit/glitch-items/tools/tool_base/smelter/smelter.swf",
+  "frame": "broken_iconic",
+  "oga": "~/Documents/glitch-audit/opengameart/extracted_mining/glitch-assets/smelter/smelter__x1_broken_iconic_png_1354832633.png"
  },
  "special_item_that_only_beta_testers_get": {
   "swf": "~/Documents/glitch-audit/glitch-items/misc/special_item_that_only_beta_testers_get/special_item_that_only_beta_testers_get.swf",

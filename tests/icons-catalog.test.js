@@ -10,7 +10,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { HIRES_ICONS } from '../public/js/icon-hires.js?v=5357d4b4';
+import { HIRES_ICONS } from '../public/js/icon-hires.js?v=5b68aeaa';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const icons = join(root, 'public/assets/sprites/icons');
@@ -34,7 +34,9 @@ describe('G174 catalog icons', () => {
     const catalog = new Set(JSON.parse(readFileSync(join(root, 'public/encyclopedia/items/data.json'), 'utf8')).items.map((i) => i.id));
     // Items left out by decision drop from the catalog but keep their recovered icon (G333: greeters, Austin 2026-10-27).
     const leftOut = new Set(['bag_greeter_badge']);
-    for (const [id] of added) if (!leftOut.has(id)) assert.ok(catalog.has(id), `${id} is not a catalog item`);
+    // A tool's broken pack icon (ticket 63, js/tools.js BROKEN_TOOL_ICONS) is its item's other state.
+    const state = (id) => (id.endsWith('_broken') ? id.slice(0, -'_broken'.length) : id);
+    for (const [id] of added) if (!leftOut.has(id)) assert.ok(catalog.has(state(id)), `${id} is not a catalog item`);
   });
 
   it('each one is a 1x PNG plus an @3x PNG exactly three times its size, and listed', () => {

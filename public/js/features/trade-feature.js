@@ -41,7 +41,7 @@
  */
 
 import { ITEM_CATALOG, addItem, countItem, itemIcon, listPackSlots, removeItem } from '../inventory.js?v=b0e33301';
-import { TOOL_CONDITION_CATALOG, leavingToolWear, receiveToolCopy, setToolRemaining, toolCopies } from '../tools.js?v=6a9e1314';
+import { TOOL_CONDITION_CATALOG, leavingToolWear, receiveToolCopy, setToolRemaining, toolCopies } from '../tools.js?v=3974f57e';
 import { saveStore } from '../save-store.js?v=8839ba7b';
 import { playOverlay } from '../overlays.js?v=90f4b1ba';
 import {

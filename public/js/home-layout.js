@@ -38,10 +38,10 @@
  * nothing the game sends is shown as words except a Tower's filtered name.
  */
 import { HIRES_SPRITES, SPLIT_SPRITES } from './sprite-hires.js?v=96c22af7';
-import { HIRES_ICONS } from './icon-hires.js?v=5357d4b4';
+import { HIRES_ICONS } from './icon-hires.js?v=5b68aeaa';
 import { CULTIVATION_CLASSES } from './homes-catalog.js?v=7aa9beb0';
 import { TOWER_CHASSIS, TOWER_PROTO } from './home-tower.js?v=6a203c8f';
-import { GROWN_TREE_LABELS } from './patches.js?v=6bfdcfa9';
+import { GROWN_TREE_LABELS } from './patches.js?v=d4e17227';
 import { shortHash } from './profiles.js?v=174a1a84';
 
 export const HOME_LAYOUT_VERSION = 1;

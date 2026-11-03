@@ -15,7 +15,7 @@ import {
 import {
   quoteTrantCare,
   performTrantCare,
-} from './js/trant-care.js?v=2fd75e4b';
+} from './js/trant-care.js?v=38c0207f';
 import {
   listPlantableSeeds,
   waterAllPlots,
@@ -28,7 +28,8 @@ import {
   hasWateringCan,
   hasHoe,
   plotStatusLabel,
-} from './js/garden.js?v=86ed507d';
+} from './js/garden.js?v=d2afc936';
+import { firstWorkingTool, HOE_TOOLS, WATERING_CAN_TOOLS } from './js/tools.js?v=3974f57e';
 import {
   ROCK_CATALOG,
   MINING_COSTS,
@@ -38,18 +39,18 @@ import {
   findWorkingPick,
   rockStatusLabel,
   ensureMiningItems,
-} from './js/mining.js?v=ff73fa4b';
+} from './js/mining.js?v=541dfb88';
 import {
   ANIMAL_CLASS_IDS,
   ensureAnimalState,
   listAnimalFeedOptions,
   feedAnimal,
-} from './js/animals.js?v=630619c4';
+} from './js/animals.js?v=d40ef695';
 import {
   quoteAnimalKinship,
   performAnimalKinship,
   highestAnimalKinshipRank,
-} from './js/animal-kinship.js?v=695ad092';
+} from './js/animal-kinship.js?v=2757bb52';
 import {
   MUSICBLOCK_CATALOG,
   collectMusicblock,
@@ -61,8 +62,8 @@ import {
   quoteWoodTreeHarvest,
   harvestWoodTree,
   woodTreeStatusLabel,
-} from './js/woodcutting.js?v=13b9e3b4';
-import { findWorkingRookTool } from './js/rook-woods.js?v=0a7bd931';
+} from './js/woodcutting.js?v=6d2ad054';
+import { findWorkingRookTool } from './js/rook-woods.js?v=da8a71b0';
 import {
   HERDKEEPING,
   INCUBATION,
@@ -826,11 +827,19 @@ export function getVerbsFor(target, ctx) {
   }
 
   // Whole garden bed — water-all only (no dialog). Plots are tended individually on the street.
+  // Ticket 63: a garden with only a broken can or hoe refuses at once with its talkback
+  // (include/garden.js 125-130, 217-228: no working one, sendResponse('broken_watering_can')
+  // before any skill package runs), so the verb takes no time and plays no animation.
+  const brokenOnly = (tools) => {
+    const found = firstWorkingTool(ctx.tools || null, inv, tools);
+    return found.owned && !found.tool;
+  };
   if (classId === 'garden_new' || classId === 'garden') {
     const canWater = hasWateringCan(inv);
     add('water_all', 'water all', {
       sort: 10,
       energy: 2,
+      ...(brokenOnly(WATERING_CAN_TOOLS) ? { durationMs: 0 } : {}),
       enabled: canWater,
       reason: canWater ? '' : 'Need a Watering Can',
       tooltip: canWater
@@ -863,6 +872,7 @@ export function getVerbsFor(target, ctx) {
       add('water', 'water', {
         sort: 10,
         energy: gardenCost('water'),
+        ...(brokenOnly(WATERING_CAN_TOOLS) ? { durationMs: 0 } : {}),
         enabled: hasWateringCan(inv),
         reason: hasWateringCan(inv) ? '' : 'Need a Watering Can',
         tooltip: 'Water so this plot can grow',
@@ -882,6 +892,7 @@ export function getVerbsFor(target, ctx) {
       add('clear', 'clear', {
         sort: 10,
         energy: gardenCost('clear'),
+        ...(brokenOnly(HOE_TOOLS) ? { durationMs: 0 } : {}),
         enabled: hasHoe(inv),
         reason: hasHoe(inv) ? '' : 'Need a Hoe',
         tooltip: 'Hoe the dirt so you can plant again',
@@ -899,7 +910,10 @@ export function getVerbsFor(target, ctx) {
   if (ROCK_CATALOG[classId] || classId === 'mineable_rock') {
     const rock = s.rock || s;
     tickMineRock(rock);
-    const pick = findWorkingPick(inv);
+    // Ticket 63: a broken pick is no pick. The rock's mine verb counts only a working one
+    // (rock_beryl_1.js verbs.mine conditions 193-214: it.is_pick && it.isWorking(), else
+    // disabled "You'll need a pick first."), so the swing never starts.
+    const pick = findWorkingPick(inv, ctx.tools || null);
     const learned = ctx.learned || ctx.skills?.learned || [];
     const hasSkill =
       learned.includes('mining_1') ||

@@ -54,8 +54,8 @@
  */
 
 import { cultivationDef, hiveFireflySpots } from './home-cultivation.js?v=11616085';
-import { createMineRock, tickMineRock } from './mining.js?v=ff73fa4b';
-import { createResourceNode, getResourceNodeDef, normalizeResourceNode, regrowDelayMs, tickResourceNode } from './resource-nodes.js?v=a3c19f90';
+import { createMineRock, tickMineRock } from './mining.js?v=541dfb88';
+import { createResourceNode, getResourceNodeDef, normalizeResourceNode, regrowDelayMs, tickResourceNode } from './resource-nodes.js?v=89cd018f';
 
 /** The node classes a visitor may use on a home street (HOMES2: the hive's Fireflies too). */
 export const STOCK_NODE_CLASSES = Object.freeze(['peat_1', 'dirt_pile', 'mortar_barnacle', 'jellisac', 'npc_firefly']);
