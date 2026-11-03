@@ -35,7 +35,8 @@
  * the radiator's end (js/radiance-mp.js). Every meditation is told to the
  * street (meditate_start / meditate_stop) so others see the orb bubble over a
  * meditating player and the server counts who meditates together; your own
- * chat line breaks a meditation unless you hold Mantra Meditation
+ * chat line or IM breaks a meditation unless you hold Mantra Meditation, and
+ * an IM from another player unless Tune Out The Chatter
  * (players/player.js:1846-1883). Canvas data: radianceLast, radianceGot,
  * radianceStatus, meditationTogether, meditatorsHere.
  */
@@ -84,6 +85,7 @@ import {
   RADIATE_COOLDOWN_SECONDS,
   burstLines,
   chatInterrupts,
+  imInterrupts,
   cleanName,
   playersInRange,
   pulseCost,
@@ -95,7 +97,7 @@ import {
   radiationRank,
   radiatorEnd,
   radiatorLine,
-} from '../radiance-mp.js?v=21492b23';
+} from '../radiance-mp.js?v=922dd513';
 
 export const MEDITATION_FEATURE_ID = 'meditation';
 /** metabolics_get_max_energy: the energy tank (100 plus Energy Tank cards). */
@@ -560,6 +562,11 @@ function attachMp(engine, c) {
   c.on('said', (m) => { if (m?.mine) chatSaid(engine); });
   c.on('msg:party_said', (m) => { if (Number(m.id) === mpMe()) chatSaid(engine); });
   c.on('msg:channel_said', (m) => { if (Number(m.id) === mpMe()) chatSaid(engine); });
+  // An IM: yours is a chat line (Mantra lets it by); one from another player breaks it unless Tune Out The Chatter (player.js 1851-1858).
+  c.on('msg:im', (m) => {
+    if (Number(m?.line?.from) === mpMe()) chatSaid(engine);
+    else if (session && imInterrupts(upgrades(engine))) end(engine, 'chat');
+  });
   c.on('error', (e) => {
     if (e?.code !== 'radiance') return;
     if (mp.pending) {

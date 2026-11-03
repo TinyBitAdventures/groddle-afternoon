@@ -34,8 +34,8 @@
  *   addToBuddyGroup and removeBuddy's achievements_set do, inc_buddies.js:196 and 276).
  *
  * - The modern skin's Social drawer (engine.social) has a Buddies tab: who is
- *   online (here, or the street they are on) and offline, Visit where homes
- *   can be visited, who added you, and Manage buddies for this panel. Its head
+ *   online (here, or the street they are on) and offline, IM (player-im-feature),
+ *   Visit where homes can be visited, who added you, and Manage buddies for this panel. Its head
  *   counts the buddies online (drawerView()).
  *
  * QA: canvas data buddiesCount, buddiesOnline (name@street,...),
@@ -205,7 +205,9 @@ function createSession(engine, client) {
       const sorted = [...list.buddies].sort((a, b) => Number(online.has(b.id)) - Number(online.has(a.id)) || a.name.localeCompare(b.name));
       // G328: Visit their home street (PlayerInfoDialog.as 155-160), when a feature can take you there.
       const visit = (b) => (engine.query?.('canVisitHomes', engine) ? [{ kind: 'visit', label: 'Visit', run: () => { close(); engine.query?.('visitHome', b.id, b.name, engine); } }] : []);
-      for (const b of sorted) mine.append(row(b, { buttons: [...visit(b), { kind: 'remove', label: 'Remove', run: () => confirmRemove(b) }] }));
+      // IM a buddy, online or not (player-im-feature; the source's buddy list opened the player menu with IM, ContactElement.as:270).
+      const im = (b) => (engine.query?.('imReady', engine) ? [{ kind: 'im', label: 'IM', run: () => { close(); engine.query?.('imOpen', b.id, b.name, engine); } }] : []);
+      for (const b of sorted) mine.append(row(b, { buttons: [...im(b), ...visit(b), { kind: 'remove', label: 'Remove', run: () => confirmRemove(b) }] }));
       panel.append(sorted.length ? mine : el('p', { class: 'buddies-none' }, BUDDY_TEXT.empty));
       const back = addedYouOnly(list);
       if (back.length) {
@@ -462,13 +464,17 @@ function createSession(engine, client) {
       if (!list) return null;
       const here = String(engine.streetTsid || '');
       const canVisit = Boolean(engine.query?.('canVisitHomes', engine));
+      const canIm = Boolean(engine.query?.('imReady', engine));
       const rows = [...list.buddies]
         .sort((a, b) => Number(online.has(b.id)) - Number(online.has(a.id)) || a.name.localeCompare(b.name))
         .map((b) => {
           const p = online.get(b.id);
           const on = Boolean(p);
           const where = !on ? BUDDY_TEXT.offlineWhere : p.street && p.street === here ? `Here on ${streetLabel(engine, here)}` : `Online: ${buddyWhere(p, (t) => streetLabel(engine, t))}`;
-          const actions = canVisit ? [{ label: 'Visit', run: () => engine.query?.('visitHome', b.id, b.name, engine) }] : [];
+          const actions = [
+            ...(canIm ? [{ label: 'IM', run: () => engine.query?.('imOpen', b.id, b.name, engine) }] : []),
+            ...(canVisit ? [{ label: 'Visit', run: () => engine.query?.('visitHome', b.id, b.name, engine) }] : []),
+          ];
           return { id: b.id, name: b.name, online: on, where, actions };
         });
       const back = addedYouOnly(list);

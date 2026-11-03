@@ -23,8 +23,8 @@ import {
   smallEnlightenmentSeconds,
   smeltItDealtItFreeSmelts,
 } from '../public/js/buff-triggers.js?v=a3093922';
-import { MIRRORED_BUFFS, buffTriggersFeature } from '../public/js/features/buff-triggers-feature.js?v=19ab6063';
-import { meditationFeature } from '../public/js/features/meditation-feature.js?v=2c9ace38';
+import { MIRRORED_BUFFS, buffTriggersFeature } from '../public/js/features/buff-triggers-feature.js?v=7e96a0ec';
+import { meditationFeature } from '../public/js/features/meditation-feature.js?v=a67faef3';
 import { teleportationFeature } from '../public/js/features/teleportation-feature.js?v=fb12e2dc';
 import { rookAttackFeature } from '../public/js/features/rook-attack-feature.js?v=8d2fffe9';
 import { rubeFeature } from '../public/js/features/rube-feature.js?v=66147dad';

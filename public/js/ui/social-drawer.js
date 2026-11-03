@@ -1158,6 +1158,14 @@ export function mountSocialDrawer({
       render();
       return true;
     },
+    /** A conversation's unread count as its owner knows it (an IM's kept on the server); none while it shows. */
+    setUnread(id, n) {
+      const t = tabs.get(id);
+      if (!t || t.kind !== 'chat') return false;
+      t.unread = visible(id) ? 0 : Math.max(0, Math.floor(Number(n)) || 0);
+      render();
+      return true;
+    },
     lines: (id) => (tabs.get(id)?.lines || []).map((l) => ({ ...l })),
     /**
      * A Local chat line (game.js showLocalChatBubble: the player, a companion, another

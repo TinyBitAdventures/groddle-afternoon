@@ -223,6 +223,11 @@ export function chatInterrupts(upgrades = []) {
   return !(Array.isArray(upgrades) && upgrades.includes('meditative_arts_less_distraction_2'));
 }
 
+/** players/player.js 1851-1858: an IM from another player breaks a meditation, unless Tune Out The Chatter (meditative_arts_less_distraction). */
+export function imInterrupts(upgrades = []) {
+  return !(Array.isArray(upgrades) && upgrades.includes('meditative_arts_less_distraction'));
+}
+
 /** A radiation id from the server ("7-3"). */
 export function radId(v) {
   const s = String(v ?? '');
