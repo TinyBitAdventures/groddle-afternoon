@@ -579,14 +579,17 @@ const keyedArt = (url) => (typeof globalThis.groddleDataUrl === 'function' ? glo
  * Uses local bg/fg art when present.
  * @param {ReturnType<typeof buildHubMapView>} view
  */
-/** The map's viewBox [x, y, w, h]: the painted map, grown just enough to take in every GO button and its sign. */
-export function hubMapFrame(hubs, mapW = 760, mapH = 460) {
+/**
+ * The map's viewBox [x, y, w, h]: the painted map, grown just enough to take in every GO button and
+ * its sign, and any other box in `extra` ({ x0, y0, x1, y1 }: a street name or line at the edge,
+ * ticket 21).
+ */
+export function hubMapFrame(hubs, mapW = 760, mapH = 460, extra = []) {
   let x0 = 0;
   let y0 = 0;
   let x1 = mapW;
   let y1 = mapH;
-  for (const g of hubs || []) {
-    const b = goBox(g, mapH);
+  for (const b of [...(hubs || []).map((h) => goBox(h, mapH)), ...(extra || [])]) {
     x0 = Math.min(x0, Math.floor(b.x0 - 2));
     y0 = Math.min(y0, Math.floor(b.y0 - 2));
     x1 = Math.max(x1, Math.ceil(b.x1 + 2));
@@ -743,8 +746,14 @@ export function renderHubMapSvg(view) {
     );
   }
 
-  // The frame grows to take in a GO button at the very edge (28 of 193 reach past it), so none is cut off.
-  const frame = hubMapFrame(view.hubs || [], w, h);
+  // The frame grows to take in a GO button at the very edge (28 of 193 reach past it), so none is cut off,
+  // and a street name or line there (ticket 21: Rushlane Steading's name ran past Groddle Meadow's top).
+  const edges = labels.map((lab) => quadBox(labelQuad(lab.x, lab.y, lab.w, lab.h, lab.rot)));
+  for (const s of view.streets || []) {
+    if (s.hidden) continue;
+    edges.push({ x0: Math.min(s.x1, s.x2) - 3, y0: Math.min(s.y1, s.y2) - 3, x1: Math.max(s.x1, s.x2) + 3, y1: Math.max(s.y1, s.y2) + 3 });
+  }
+  const frame = hubMapFrame(view.hubs || [], w, h, edges);
   return (
     `<svg viewBox="${frame.join(' ')}" xmlns="http://www.w3.org/2000/svg" ` +
     `role="${icons.length ? 'group' : 'img'}" aria-label="${escapeXml(view.hubName)} street map" class="hub-map-svg">` +

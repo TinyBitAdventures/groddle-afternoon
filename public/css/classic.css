@@ -1907,8 +1907,11 @@
 /* The Map: the hub art at its 760 x 460 under the 60 px head (HubMapDialog.as 58-1107); the street
    labels at the 2012 size; the extras (homes, shortcuts, routes) a list under it. */
 :root[data-ui="classic"] #game-root #map-panel .map-head { min-height: calc(60 * var(--cu)); }
-:root[data-ui="classic"] #game-root #map-panel .map-canvas { flex: none; height: calc(460 * var(--cu)); max-height: calc(var(--cvh) - 200 * var(--cu)); padding: 0; background: var(--c-classic-well); }
+/* Ticket 21: the hub art keeps its shape and gives way on a short window (the rows above it never
+   push its bottom out of the window); the drawing scales into it whole (style.css .hub-map-svg). */
+:root[data-ui="classic"] #game-root #map-panel .map-canvas { flex: 0 1 auto; height: auto; aspect-ratio: var(--map-aspect, 760 / 460); min-height: min(calc(180 * var(--cu)), 30vh); max-height: calc(460 * var(--cu)); padding: 0; background: var(--c-classic-well); }
 :root[data-ui="classic"] #game-root #map-panel .map-canvas svg { width: 100%; height: 100%; }
+:root[data-ui="classic"] #game-root #map-panel .map-extras-grid { padding: calc(10 * var(--cu)); border: 0; border-radius: 4px; background: var(--c-classic-panel); box-shadow: 0 0 0 1px color-mix(in srgb, var(--c-classic-ink) 37%, transparent), 0 0 1px 7px color-mix(in srgb, var(--c-classic-ink) 15%, transparent); }
 :root[data-ui="classic"] #game-root #map-panel .map-label { font-family: var(--font-classic-title); font-weight: 800; }
 :root[data-ui="classic"] #game-root #map-panel .map-sub { color: var(--c-classic-offline); font-size: calc(var(--fs-classic-body) * var(--cu-n, 1)); }
 :root[data-ui="classic"] #game-root #map-panel .map-extras { color: var(--c-classic-text); font-size: calc(var(--fs-classic-row) * var(--cu-n, 1)); }

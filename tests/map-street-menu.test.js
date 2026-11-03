@@ -9,7 +9,7 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { renderHubMapSvg } from '../public/js/map-graph.js?v=a0cec3f3';
+import { renderHubMapSvg } from '../public/js/map-graph.js?v=5b1575ad';
 
 const game = readFileSync(new URL('../public/game.js', import.meta.url), 'utf8');
 const css = readFileSync(new URL('../public/style.css', import.meta.url), 'utf8');

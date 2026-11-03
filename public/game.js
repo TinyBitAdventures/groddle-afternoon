@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=117337d3';
 import { createFeatureHost } from './js/feature-host.js?v=903263a4';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=250ea9e7';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=ec27dee8';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -390,7 +390,7 @@ import {
   recordStreetEntry,
   streetLoadingVisit,
 } from './js/exploration.js?v=19c6758f';
-import { createCombobox, createSuggestBox, watchSelects } from './js/combobox.js?v=31679d26';
+import { createCombobox, createSuggestBox, watchSelects } from './js/combobox.js?v=c98ee401';
 import {
   INCANTATION_LINES,
   INCANTATION_FEAT_TITLE,
@@ -881,7 +881,7 @@ import {
   pickMapSpot,
   MAP_INDEX_URL,
   HUB_56_MAP_URL,
-} from './js/map-graph.js?v=a0cec3f3';
+} from './js/map-graph.js?v=5b1575ad';
 import { hubMapArtNote, hubMapSubtitle, questLogSummary } from './js/panel-copy.js?v=9fc1b2da';
 import { bindMapIconTips } from './js/ui/map-icon-tips.js?v=6b3eb3f9';
 import {
@@ -23706,7 +23706,9 @@ async function openMap(hubId, { find = '' } = {}) {
       hubSelect.value = targetHub;
     }
     // Themed type-to-search picker in front of the (hidden) select.
-    hubCombobox ||= createCombobox(hubSelect, { placeholder: 'Find a region or street…', label: 'Regions and streets' });
+    // Ticket 21: the box shows the region on show, with a magnifier; a click empties it for a search
+    // (the client's LocationSearchMap: its magnifier and "Search" text, HubMapDialog.as 197-202).
+    hubCombobox ||= createCombobox(hubSelect, { placeholder: 'Search a region or street', label: 'Regions and streets', search: true });
     hubCombobox.refresh();
   }
 
@@ -23734,6 +23736,9 @@ async function openMap(hubId, { find = '' } = {}) {
   canvas.innerHTML = renderHubMapSvg(view);
   // The street icons' tips on hover and keyboard focus (vendor, shrine, subway; MapHub.as).
   bindMapIconTips(canvas);
+  // Ticket 21: the canvas keeps the drawn frame's shape (style.css .map-canvas aspect-ratio).
+  const frame = canvas.querySelector('svg')?.getAttribute('viewBox')?.split(' ').map(Number) || [];
+  if (frame[2] > 0 && frame[3] > 0) canvas.style.setProperty('--map-aspect', `${frame[2]} / ${frame[3]}`);
 
   canvas.querySelectorAll('.map-street.travelable').forEach((g) => {
     g.addEventListener('click', (e) => {
@@ -23832,17 +23837,35 @@ function showFoundStreet(canvas, tsid, view) {
  * into one Shortcuts line above the route card, so the map itself stays in
  * view; quest cards and the route card stay out. Open or shut is kept while
  * the game runs.
+ *
+ * Ticket 21 (Friendly: the Shortcuts and the destination squeezed the map, and the Shortcuts needed a
+ * scrollbar): the Shortcuts line and the route card share one row (.map-bar), and the Shortcuts open
+ * over the map at their full size; a click anywhere else on the Map shuts them.
  */
 let mapExtrasOpen = false;
 function arrangeMapCards(panel) {
   const card = panel?.querySelector('.map-card');
   const canvas = panel?.querySelector('.map-canvas');
   if (!card || !canvas) return;
+  // The row from the last open: its route card goes back in front of the map before the row is made again.
+  for (const bar of card.querySelectorAll(':scope > .map-bar')) {
+    for (const el of [...bar.children]) if (!el.classList.contains('map-extras')) card.insertBefore(el, bar);
+    bar.remove();
+  }
   card.querySelectorAll(':scope > .map-extras').forEach((el) => el.remove());
   const extras = [...card.children].filter((el) =>
     (el.classList.contains('map-home-card') || el.classList.contains('map-feature-card')) &&
     !el.matches('[data-map-route], .nx-map-card'));
-  if (!extras.length) return;
+  const route = card.querySelector(':scope > [data-map-route]');
+  const bar = document.createElement('div');
+  bar.className = 'map-bar';
+  if (!extras.length) {
+    if (route) {
+      card.insertBefore(bar, route);
+      bar.append(route);
+    }
+    return;
+  }
   const titleOf = (el) => (el.dataset.mapTitle || el.querySelector('strong, h3, h4')?.textContent || el.firstElementChild?.textContent || '').trim().replace(/\s+/g, ' ');
   const details = document.createElement('details');
   details.className = 'map-extras';
@@ -23860,7 +23883,16 @@ function arrangeMapCards(panel) {
   details.addEventListener('toggle', () => {
     mapExtrasOpen = details.open;
   });
-  card.insertBefore(details, card.querySelector(':scope > [data-map-route]') || canvas);
+  card.insertBefore(bar, route || canvas);
+  bar.append(details);
+  if (route) bar.append(route);
+  if (!card.dataset.extrasShut) {
+    card.dataset.extrasShut = '1';
+    card.addEventListener('pointerdown', (e) => {
+      const open = card.querySelector(':scope > .map-bar > .map-extras[open]');
+      if (open && !open.contains(e.target)) open.open = false;
+    });
+  }
 }
 
 /**

@@ -318,7 +318,10 @@ function buildCombo(wrap, input, source, opts) {
   }
 
   input.addEventListener('focus', () => {
-    if (!free) input.select();
+    // A search box (opts.search) empties for typing, so its placeholder shows; leaving it puts the
+    // current value back (close restores it).
+    if (opts.search && !free) input.value = '';
+    else if (!free) input.select();
     open(free ? input.value : '');
   });
   input.addEventListener('input', () => { if (!choosing) open(input.value); });
@@ -379,8 +382,10 @@ function buildCombo(wrap, input, source, opts) {
 
 /**
  * @param {HTMLSelectElement} select
- * @param {{ placeholder?: string, label?: string, className?: string, minListWidth?: number }} [opts]
+ * @param {{ placeholder?: string, label?: string, className?: string, minListWidth?: number, search?: boolean }} [opts]
  *   className: an extra class on the wrap (a look of its own, e.g. 'combo-pick' in Decoration Mode);
+ *   search: a magnifier at the field's start, and the field empties when focused so its placeholder
+ *   asks for a search (the Map's region box, ticket 21); leaving it shows the current value again;
  *   minListWidth: the list may be wider than a narrow field.
  *   Called again on a select it already stands in front of, it takes the new options and returns
  *   the same handle.
@@ -477,7 +482,15 @@ export function createCombobox(select, opts = {}) {
 
   function configure(next = {}) {
     Object.assign(opts, next);
-    wrap.className = ['combo', opts.className || select.dataset.comboClass || ''].filter(Boolean).join(' ');
+    wrap.className = ['combo', opts.search ? 'combo-search' : '', opts.className || select.dataset.comboClass || ''].filter(Boolean).join(' ');
+    // A search box shows a magnifier at its start (ticket 21: the Map's region box searches too).
+    if (opts.search && !wrap.querySelector('.combo-mag')) {
+      const mag = document.createElement('span');
+      mag.className = 'combo-mag';
+      mag.setAttribute('aria-hidden', 'true');
+      mag.innerHTML = '<svg viewBox="0 0 16 16" width="14" height="14"><circle cx="6.8" cy="6.8" r="4.6" fill="none" stroke="currentColor" stroke-width="1.9"/><path d="M10.3 10.3l3.9 3.9" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"/></svg>';
+      wrap.prepend(mag);
+    }
     input.placeholder = opts.placeholder || select.dataset.comboPlaceholder || (select.options.length > 12 ? 'Search…' : '');
     if (!opts.minListWidth && select.dataset.comboWidth) opts.minListWidth = Number(select.dataset.comboWidth) || 0;
     combo.setLabel(opts.label || select.getAttribute('aria-label') || select.title || labelWords(select));

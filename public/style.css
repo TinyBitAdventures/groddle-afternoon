@@ -5998,14 +5998,35 @@ body.buff-purple-pulse::after {
   flex-direction: column;
 }
 .map-card.map-hub > * { flex: none; }
+/* Ticket 21 (Safari 26): the whole hub always shows. The canvas keeps the hub's own shape (its frame,
+   game.js --map-aspect) and gives way when the window is short; the drawing fills it absolutely and
+   scales into it, so no street, name or GO button is ever cut off. Safari sized the old height: 100%
+   SVG by its width and clipped its bottom (53 of 54 hubs at 1536 x 702). */
 .map-card.map-hub > .map-canvas {
-  flex: 1 1 420px;
+  flex: 0 1 auto;
   height: auto;
-  min-height: 230px;
-  max-height: min(420px, 56vh);
+  aspect-ratio: var(--map-aspect, 760 / 460);
+  min-height: min(200px, 34vh);
+  max-height: none;
 }
 .map-card.map-hub .map-sub { margin: 0.2rem 0 var(--sp-4); }
 .map-card.map-hub .map-hint { margin-top: var(--sp-4); }
+/* Ticket 21: the Shortcuts line and the route card share one row above the map (game.js
+   arrangeMapCards), and the Shortcuts open over the map at their full size instead of pushing it down. */
+.map-bar {
+  position: relative;
+  z-index: calc(var(--z-raised) + 1);
+  gap: var(--sp-4);
+  min-width: 0;
+  margin: 0 0 var(--sp-4);
+}
+.map-card.map-hub > .map-bar { display: flex; align-items: center; }
+.map-bar > * { margin: 0 !important; min-width: 0; }
+.map-bar > .map-extras { flex: 0 1 auto; max-width: 52%; }
+.map-bar > .map-extras:only-child { flex: 1 1 auto; max-width: none; }
+.map-bar > [data-map-route] { flex: 1 1 0; }
+.map-bar > [data-map-route] .map-route-body { flex: 1 1 0; min-width: 8rem; }
+.map-bar > [data-map-route] .map-route-actions { flex: none; display: flex; gap: var(--sp-2); }
 .map-extras {
   margin: 0 0 var(--sp-4);
   border-radius: var(--radius-lg);
@@ -6039,12 +6060,23 @@ body.buff-purple-pulse::after {
 .map-extras > summary strong { flex: none; color: var(--c-sand-33); }
 .map-extras > summary span { min-width: 0; overflow: hidden; text-overflow: ellipsis; opacity: 0.85; }
 .map-extras-grid {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  z-index: var(--z-raised);
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  align-items: start;
   gap: var(--sp-4);
-  padding: 0 var(--sp-4) var(--sp-4);
-  max-height: 150px;
+  padding: var(--sp-4);
+  /* Its full size over the map; only a very short window scrolls it. */
+  max-height: min(72vh, 520px);
   overflow: auto;
+  border-radius: var(--radius-lg);
+  background: var(--surface-card);
+  border: 1px solid color-mix(in srgb, var(--c-gold-59) 60%, transparent);
+  box-shadow: var(--shadow-4);
 }
 .map-extras-grid > * { margin: 0 !important; min-width: 0; }
 .map-extras-grid > .map-home-card { padding: var(--sp-4) var(--sp-5); }
@@ -6162,6 +6194,19 @@ body.buff-purple-pulse::after {
   cursor: pointer;
 }
 .combo-toggle:hover { background: color-mix(in srgb, var(--c-gold-59) 15%, transparent); }
+/* A search box (combobox.js search: the Map's region box): the magnifier at its start. */
+.combo-mag {
+  position: absolute;
+  top: 50%;
+  left: 0.62rem;
+  transform: translateY(-50%);
+  display: grid;
+  place-items: center;
+  color: var(--c-umber-48);
+  pointer-events: none;
+}
+.combo-search .combo-input { padding-left: 1.95rem; }
+[data-ui="modern"] .combo-search .combo-mag { color: var(--text-muted); }
 .combo-toggle svg { transition: transform 0.15s; }
 .combo.is-open .combo-toggle svg { transform: rotate(180deg); }
 .combo-list {
@@ -6343,6 +6388,12 @@ body.buff-purple-pulse::after {
   width: 100%;
   height: 100%;
   display: block;
+}
+/* Ticket 21: the drawing fills the canvas box itself (a percentage height in a flex item is not
+   reliable: Safari took it from the width), and its viewBox scales into it whole. */
+.map-canvas > .hub-map-svg {
+  position: absolute;
+  inset: 0;
 }
 /* Original hub geometry segments */
 .map-seg {
@@ -11295,8 +11346,12 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
    own place on a short window. */
 [data-ui="modern"] #map-panel .map-card.map-hub { overflow: hidden; }
 [data-ui="modern"] #map-panel .map-card.map-hub > .map-head { flex: none; }
-[data-ui="modern"] #map-panel .map-card.map-hub > .map-canvas { min-height: 160px; }
-[data-ui="modern"] #map-panel .map-card.map-hub > :not(.map-head, .map-canvas, .map-sub, .map-hint) { flex: 0 1 auto; min-height: 0; overflow-y: auto; }
+[data-ui="modern"] #map-panel .map-card.map-hub > .map-canvas { min-height: min(180px, 30vh); }
+/* What else sits above the map (a quest's card, the room picker under the route card) gives way first
+   and scrolls in its own place; the row of Shortcuts and the route stays one line, open over the map. */
+[data-ui="modern"] #map-panel .map-card.map-hub > :not(.map-head, .map-canvas, .map-sub, .map-hint, .map-bar) { flex: 0 8 auto; min-height: 0; overflow-y: auto; }
+[data-ui="modern"] #map-panel .map-bar > [data-map-route] { max-height: 40vh; overflow-y: auto; }
+[data-ui="modern"] #map-panel .map-extras-grid { background: var(--surface); border-color: var(--border); box-shadow: var(--shadow-3); }
 [data-ui="modern"] #map-panel .map-head h2 { color: var(--text); }
 [data-ui="modern"] #map-panel .map-card.map-hub .map-sub { color: var(--text-muted); font-size: var(--fs-s); }
 [data-ui="modern"] #map-panel .map-card.map-hub .map-hint {
