@@ -40,7 +40,7 @@ import { keyOf as moduleKeyOf } from '../module-keys/build.mjs';
 import { literalFrom, readItemTags } from '../inventory/gsjs-data.mjs';
 import { supplyConversions } from '../job-obtainable.mjs';
 import { loadEncyclopedia } from '../encyclopedia/data.mjs';
-import { makeParts } from '../encyclopedia/parts.mjs';
+import { makeParts, sep } from '../encyclopedia/parts.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = join(here, '..', '..');
@@ -109,6 +109,8 @@ export function gsjsHtml(text, linkItem) {
     } else if (tag === 'a' && close) {
       if (open === 'a') out.push('</a>');
       open = null;
+      // Tiny Speck's peat text runs a link into the next word ("Shovel</a>or", items/peat_1.js:608).
+      if (/^[a-z]/i.test(src.slice(at))) out.push(' ');
     }
   }
   out.push(esc(src.slice(at)));
@@ -944,7 +946,7 @@ ${usesHtml.length ? `          <ul class="cat-list">
     if (it.stackmax > 1) list.push(P.chip(`stacks to ${fmt(it.stackmax)}`));
     if (use?.energy) list.push(P.chip(`${fmt(use.energy)} energy`));
     if (use?.mood) list.push(P.chip(`${fmt(use.mood)} mood`));
-    return list.length ? `<p class="ency-chips cat-stats">${list.join('')}</p>` : '';
+    return P.chips(list, 'cat-stats');
   }
   // The encyclopedia's way back to this item: quests, creatures and people, places, achievements.
   const backs = ency.back.get(`item:${it.id}`) || [];
@@ -1027,8 +1029,8 @@ ${verbs.map((v) => `          <div><dt>${esc(v.name)}</dt><dd>${v.tooltip ? esc(
     <nav class="band${((encyBody ? 1 : 0) + (verbs.length ? 1 : 0)) % 2 ? ' band-alt' : ''} note-after" aria-label="More items">
       <div class="wrap">
         <div class="note-pager">
-          ${ctx.prev ? `<a class="note-pager-older" href="../${esc(ctx.prev.it.id)}/" rel="prev"><span>Previous</span>${esc(ctx.prev.it.name)}</a>` : '<span></span>'}
-          ${ctx.next ? `<a class="note-pager-newer" href="../${esc(ctx.next.it.id)}/" rel="next"><span>Next</span>${esc(ctx.next.it.name)}</a>` : '<span></span>'}
+          ${ctx.prev ? `<a class="note-pager-older" href="../${esc(ctx.prev.it.id)}/" rel="prev"><span>Previous${sep(':')}</span> ${esc(ctx.prev.it.name)}</a>` : '<span></span>'}
+          ${ctx.next ? `<a class="note-pager-newer" href="../${esc(ctx.next.it.id)}/" rel="next"><span>Next${sep(':')}</span> ${esc(ctx.next.it.name)}</a>` : '<span></span>'}
         </div>
         <p class="note-all"><a href="../">All ${fmt(ctx.total)} items</a> · <a href="../../">Search the encyclopedia</a></p>
       </div>

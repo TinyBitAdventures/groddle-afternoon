@@ -63,8 +63,8 @@ async function search(input) {
   let section = params.get('s') || '';
   const chips = $('sections');
   chips.innerHTML = [['', 'All'], ...data.sections.map((s) => [s.key, s.label])]
-    .map(([k, l]) => `<button type="button" class="chip" data-s="${esc(k)}" aria-pressed="${k === section}">${esc(l)}</button>`).join('');
-  const tile = (e) => `<li><a class="ency-tile${inRemake.has(e.st) ? '' : ' ency-tile-out'}" href="${base}${e.h}"><span class="ency-tile-pic">${e.ic ? `<img class="ency-ic" src="${base}${esc(e.ic)}" alt="" loading="lazy" decoding="async" />` : '<span class="ency-ic cat-ph" aria-hidden="true"></span>'}</span><span class="ency-tile-name">${esc(e.n)}</span><span class="ency-tile-sub"><span class="cat-st st-${esc(e.st)}">${esc(data.statuses[e.st] || e.st)}</span></span></a></li>`;
+    .map(([k, l]) => `<button type="button" class="chip" data-s="${esc(k)}" aria-pressed="${k === section}">${esc(l)}</button>`).join(' ');
+  const tile = (e) => `<li><a class="ency-tile${inRemake.has(e.st) ? '' : ' ency-tile-out'}" href="${base}${e.h}"><span class="ency-tile-pic">${e.ic ? `<img class="ency-ic" src="${base}${esc(e.ic)}" alt="" loading="lazy" decoding="async" />` : '<span class="ency-ic cat-ph" aria-hidden="true"></span>'}</span> <span class="ency-tile-name">${esc(e.n)}<span class="ency-sep">,</span></span> <span class="ency-tile-sub"><span class="cat-st st-${esc(e.st)}">${esc(data.statuses[e.st] || e.st)}</span></span></a></li>`;
   const run = () => {
     const words = fold(input.value).split(' ').filter(Boolean);
     const p = new URLSearchParams();

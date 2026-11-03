@@ -26,6 +26,18 @@ export const STATUS = {
 };
 export const statusLabel = (s) => STATUS[s]?.label || s;
 export const inRemake = (s) => Boolean(STATUS[s]?.inRemake);
+/**
+ * A comma or full stop that is read but not seen (".ency-sep" in catalog.css):
+ * where the page shows two lines as separate boxes ("Beelzebooze" over
+ * "involves it"), copied text, Reader mode and screen readers would join them
+ * ("Beelzeboozeinvolves it", ticket 65). It goes at the end of the first line's
+ * own span, with a real space after that span, so Chrome copies
+ * "Beelzebooze,\ninvolves it" and Firefox and Reader mode "Beelzebooze, involves it".
+ */
+export const sep = (mark = ',') => `<span class="ency-sep">${mark}</span>`;
+/** A chip's label ends in its last <span>: the comma goes inside it (a flex item of its own would add a gap). */
+const sepChip = (html) => html.replace(/<\/span>(<\/(?:a|span)>)$/, `${sep()}</span>$1`);
+
 export const badge = (s) => `<span class="pill st-${esc(s)}">${esc(statusLabel(s))}</span>`;
 
 /** The site-root path of an entry key: item:<id> or <section>:<id>. */
@@ -53,8 +65,8 @@ export function makeParts(p, info) {
     const it = info(key);
     const name = opts.name || it?.name || key.slice(key.indexOf(':') + 1);
     const n = opts.n && Number(opts.n) !== 1 ? `<span class="ency-n">×${esc(fmt(opts.n))}</span>` : '';
-    const sub = opts.sub ? `<span class="ency-tile-sub">${opts.sub}</span>` : '';
-    const body = `<span class="ency-tile-pic">${img(it?.icon, 'ency-ic', 48)}${n}</span><span class="ency-tile-name">${esc(name)}</span>${sub}`;
+    const sub = opts.sub ? ` <span class="ency-tile-sub">${opts.sub}</span>` : '';
+    const body = `<span class="ency-tile-pic">${img(it?.icon, 'ency-ic', 48)}${n}</span> <span class="ency-tile-name">${esc(name)}${sub ? sep() : ''}</span>${sub}`;
     const st = it?.status && !inRemake(it.status) ? ' ency-tile-out' : '';
     return it
       ? `<li><a class="ency-tile${st}" href="${href(key)}${opts.anchor ? `#${esc(opts.anchor)}` : ''}">${body}</a></li>`
@@ -66,7 +78,9 @@ export function makeParts(p, info) {
     const inner = `${pic ? img(pic, 'ency-chip-ic', 20) : ''}<span>${label}</span>`;
     return link ? `<a class="ency-chip${cls ? ` ${cls}` : ''}" href="${link}">${inner}</a>` : `<span class="ency-chip${cls ? ` ${cls}` : ''}">${inner}</span>`;
   };
-  const chips = (list) => (list.length ? `<p class="ency-chips">${list.join('')}</p>` : '');
+  /** A row of chips, read as a list: "75 iMG, 10 favor with Pot, Recipe: Tasty Pasta". */
+  const chipRow = (list) => list.map((c, i) => (i < list.length - 1 ? sepChip(c) : c)).join(' ');
+  const chips = (list, cls = '') => (list.length ? `<p class="ency-chips${cls ? ` ${cls}` : ''}">${chipRow(list)}</p>` : '');
   /** A recipe as ingredients, an arrow and the result, with the tool and skill as chips. */
   const recipeRow = (r, { id = '', note = '' } = {}) => {
     const ins = (r.inputs || []).map((i) => tile(`item:${i.classTsid}`, { n: i.qty }));
@@ -77,19 +91,19 @@ export function makeParts(p, info) {
     if (r.skill && info(`skills:${r.skill}`)) extras.push(chip(`needs ${esc(info(`skills:${r.skill}`).name)}`, { pic: info(`skills:${r.skill}`).icon, link: href(`skills:${r.skill}`) }));
     if (note) extras.push(chip(note));
     return `<div class="ency-recipe"${id ? ` id="${esc(id)}"` : ''}>
-            ${r.name ? `<p class="ency-recipe-name">${esc(r.name)}</p>` : ''}<div class="ency-recipe-row"><ul class="ency-tiles ency-ins">${ins.join('<li class="ency-plus" aria-hidden="true">+</li>')}</ul><span class="ency-arrow" aria-label="makes">→</span><ul class="ency-tiles ency-outs">${outs.join('')}</ul></div>
+            ${r.name ? `<p class="ency-recipe-name">${esc(r.name)}</p>` : ''}<div class="ency-recipe-row"><ul class="ency-tiles ency-ins">${ins.join('<li class="ency-plus" aria-hidden="true">+</li>')}</ul> <span class="ency-arrow" aria-label="makes">→</span> <ul class="ency-tiles ency-outs">${outs.join('')}</ul></div>
             ${chips(extras)}
           </div>`;
   };
   /** A store card: the keeper's picture, the store's name and the price in currants. */
-  const currants = (n, cls = 'ency-price') => `<span class="${cls}">${img(info('item:pile_of_currants')?.icon || null, 'ency-chip-ic', 18)}${esc(fmt(n))} currants</span>`;
+  const currants = (n, cls = 'ency-price') => `<span class="${cls}">${img(info('item:pile_of_currants')?.icon || null, 'ency-chip-ic', 18)}<span>${esc(fmt(n))} currants</span></span>`;
   const vendorCard = (key, { price, label } = {}) => {
     const it = info(key);
-    const body = `${img(it?.icon, 'ency-vendor-ic', 52)}<span class="ency-vendor-text"><span class="ency-vendor-name">${esc(label || it?.name || key)}</span>${price ? currants(price) : ''}</span>`;
+    const body = `${img(it?.icon, 'ency-vendor-ic', 52)}<span class="ency-vendor-text"><span class="ency-vendor-name">${esc(label || it?.name || key)}${price ? sep() : ''}</span>${price ? ` ${currants(price)}` : ''}</span>`;
     return it ? `<li><a class="ency-vendor" href="${href(key)}">${body}</a></li>` : `<li><span class="ency-vendor">${body}</span></li>`;
   };
   const vendors = (list) => (list.length ? `<ul class="ency-vendors">${list.join('')}</ul>` : '');
-  return { href, img, tile, tiles, chip, chips, recipeRow, vendorCard, vendors, currants };
+  return { href, img, tile, tiles, chip, chips, chipRow, recipeRow, vendorCard, vendors, currants };
 }
 
 /**
@@ -120,6 +134,8 @@ export function tsHtml(text, linkFor) {
     } else if (tag === 'a' && close) {
       if (open === 'a') out.push('</a>');
       open = null;
+      // Tiny Speck's peat text runs a link into the next word ("Shovel</a>or", items/peat_1.js:608).
+      if (/^[a-z]/i.test(src.slice(at))) out.push(' ');
     }
   }
   out.push(esc(src.slice(at)));

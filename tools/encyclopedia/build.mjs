@@ -23,7 +23,7 @@ import { siteNav } from '../changelog/build.mjs';
 import { committedMap, keyAssetUrls, mapTags } from '../data-versions/build.mjs';
 import { keyOf as moduleKeyOf } from '../module-keys/build.mjs';
 import { GIANTS, PUB, SECTIONS, giantIcon, loadEncyclopedia, picture } from './data.mjs';
-import { STATUS, andList, article, badge, esc, fmt, inRemake, makeParts, pathOf, plainText, statusLabel, tsHtml } from './parts.mjs';
+import { STATUS, andList, article, badge, esc, fmt, inRemake, makeParts, pathOf, plainText, sep, statusLabel, tsHtml } from './parts.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const OUT = 'encyclopedia';
@@ -155,8 +155,8 @@ function pager(list, i, label) {
     <nav class="band note-after" aria-label="More ${esc(label.toLowerCase())}">
       <div class="wrap">
         <div class="note-pager">
-          ${prev ? `<a class="note-pager-older" href="../${esc(prev.id)}/" rel="prev"><span>Previous</span>${esc(prev.name)}</a>` : '<span></span>'}
-          ${next ? `<a class="note-pager-newer" href="../${esc(next.id)}/" rel="next"><span>Next</span>${esc(next.name)}</a>` : '<span></span>'}
+          ${prev ? `<a class="note-pager-older" href="../${esc(prev.id)}/" rel="prev"><span>Previous${sep(':')}</span> ${esc(prev.name)}</a>` : '<span></span>'}
+          ${next ? `<a class="note-pager-newer" href="../${esc(next.id)}/" rel="next"><span>Next${sep(':')}</span> ${esc(next.name)}</a>` : '<span></span>'}
         </div>
         <p class="note-all"><a href="../">All ${fmt(list.length)} ${esc(label.toLowerCase())}</a> · <a href="../../">Search the encyclopedia</a></p>
       </div>
@@ -520,7 +520,7 @@ function homePage(bySection, items, info) {
   const P = makeParts(p, info);
   const itemsIn = [...items.values()].filter((i) => inRemake(i.status)).length;
   const sample = { quests: 'quests:animalkinship_nibble_meat', animals: 'animals:npc_piggy', people: 'people:street_spirit', skills: 'skills:animalkinship_1', places: 'places:groddle-meadow', achievements: 'achievements:bacon_biter' };
-  const card = (href, label, n, blurb, pic) => `<li><a class="ency-card" href="${href}">${P.img(pic, 'ency-card-ic', 64)}<span class="ency-card-text"><span class="ency-card-name">${esc(label)} <span class="count">${fmt(n)}</span></span><span class="ency-card-blurb">${esc(blurb)}</span></span></a></li>`;
+  const card = (href, label, n, blurb, pic) => `<li><a class="ency-card" href="${href}">${P.img(pic, 'ency-card-ic', 64)}<span class="ency-card-text"><span class="ency-card-name">${esc(label)} <span class="count">${fmt(n)}</span>${sep('.')}</span> <span class="ency-card-blurb">${esc(blurb)}</span></span></a></li>`;
   const cards = [
     card('items/', 'Items', items.size, `Every item, how to get it and what it is for. ${fmt(itemsIn)} are in the remake.`, info('item:apple')?.icon),
     ...SECTIONS.map((s) => card(`${s.key}/`, s.label, bySection[s.key].length, s.blurb, info(sample[s.key])?.icon || bySection[s.key][0]?.icon)),

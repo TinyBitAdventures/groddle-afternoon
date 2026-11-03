@@ -297,3 +297,8 @@ a.ency-card:hover { border-color: var(--moss); }
   .cbx-list { width: 100%; }
 }
 .ency-filter[hidden] { display: none; }
+
+/* A comma or full stop that is read but not seen (parts.mjs sep(), ticket 65): copied text, Reader mode
+   and screen readers get "Beelzebooze, involves it" where the page shows two lines. Inline, so Chrome keeps
+   it on its word (the absolute .visually-hidden would put it on a line of its own), with no width. */
+.ency-sep { display: inline-block; width: 1px; height: 1px; margin-right: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
