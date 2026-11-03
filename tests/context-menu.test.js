@@ -15,7 +15,7 @@ import { fileURLToPath } from 'node:url';
 import { FakeEl, matches } from './social-fake-dom.js';
 import {
   bindContextTrigger, createContextMenu, isContextMenuKey, placeContextMenu, ECHO_MS, LONG_PRESS_MS, MORE_KEYS_LABEL,
-} from '../public/js/ui/context-menu.js?v=b3d24c15';
+} from '../public/js/ui/context-menu.js?v=c92fbdd5';
 
 const PUBLIC = join(dirname(fileURLToPath(import.meta.url)), '../public');
 const read = (p) => readFileSync(join(PUBLIC, p), 'utf8');

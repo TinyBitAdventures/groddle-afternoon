@@ -11481,6 +11481,8 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
   width: 232px;
   transform-origin: 0 0;
 }
+/* Opened from a full-screen panel (the Manage buddies panel, js/ui/player-menu.js): over it. */
+[data-ui="modern"] #game-root .ctx-menu[data-layer="screen"]:not([hidden]) { z-index: calc(var(--z-screen) + 1); }
 [data-ui="modern"] .ctx-menu .ctx-head { padding: 2px var(--sp-3) var(--sp-2); }
 [data-ui="modern"] .ctx-menu .ctx-title {
   margin: 0;

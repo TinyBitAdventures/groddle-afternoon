@@ -1171,6 +1171,8 @@
 @media (prefers-reduced-motion: reduce) {
   :root[data-ui="classic"] #game-root .ctx-menu { animation: none; }
 }
+/* Opened from a full-screen panel (the Manage buddies panel): over it. */
+:root[data-ui="classic"] #game-root .ctx-menu[data-layer="screen"]:not([hidden]) { z-index: calc(var(--z-screen) + 1); }
 :root[data-ui="classic"] .ctx-menu .ctx-head { padding: 0 calc(5 * var(--cu)); margin: 0 0 calc(3 * var(--cu)); border: 0; background: none; }
 :root[data-ui="classic"] .ctx-menu .ctx-title { margin: 0; color: var(--c-classic-title); font: 800 var(--fs-classic-body)/var(--lh-snug) var(--font-classic-title); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 :root[data-ui="classic"] .ctx-menu .ctx-title:empty { display: none; }

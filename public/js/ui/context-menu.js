@@ -155,9 +155,10 @@ export function createContextMenu({ doc, host, id = '', className = '', headClas
    * `keys`: the keys opened it (focus goes back to `opener`, or what `findOpener()` gives, on close).
    * `owner`: what it is about, for the QA data ("quest:happy_endings"); `data`: more canvas data
    * keys set to their values while it is open and to "" on close. `focusIndex`: the row to focus
-   * (default: the first one that can be done).
+   * (default: the first one that can be done). `layer`: 'screen' lifts it over a full-screen panel
+   * it was opened from (the Manage buddies panel): data-layer on the menu, both skins' CSS.
    */
-  function open({ title = '', rows = [], at = null, anchor = null, keys = false, opener = null, findOpener = null, owner = '', data = null, onPick = null, onClose = null, focusIndex = null } = {}) {
+  function open({ title = '', rows = [], at = null, anchor = null, keys = false, opener = null, findOpener = null, owner = '', data = null, onPick = null, onClose = null, focusIndex = null, layer = '' } = {}) {
     if (!rows.length || !build()) return false;
     if (cur) close({ focus: false });
     const capKeys = verbRowKeys(rows);
@@ -169,6 +170,8 @@ export function createContextMenu({ doc, host, id = '', className = '', headClas
     });
     cur = { owner: String(owner || ''), rows: built, keys: Boolean(keys), opener, findOpener, onPick, onClose, data };
     titleEl.textContent = title;
+    if (layer) el.dataset.layer = String(layer);
+    else delete el.dataset.layer;
     el.replaceChildren(head, ...built.map((r) => r.btn), detail);
     el.hidden = false;
     el.style.left = '0px';

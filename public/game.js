@@ -926,9 +926,9 @@ import { mountNotifyView } from './js/notify-view.js?v=81d06119';
 import { mountSocialDrawer } from './js/ui/social-drawer.js?v=a0048e58';
 import { bindDragScroll } from './js/ui/drag-scroll.js?v=9a527ac8';
 import { SIDE_SHEET_IDS, bindTabs, inSideSheet, mountPanelShell, sheetKeyToWorld } from './js/ui/panel-shell.js?v=3d10b1e5';
-import { createQuestSheet, questStep } from './js/ui/quest-sheet.js?v=58c013a0';
-import { createQuestTracker } from './js/ui/quest-tracker.js?v=5487413f';
-import { createContextMenu, isContextMenuKey as isMenuKey } from './js/ui/context-menu.js?v=b3d24c15';
+import { createQuestSheet, questStep } from './js/ui/quest-sheet.js?v=cc0ecd4e';
+import { createQuestTracker } from './js/ui/quest-tracker.js?v=e37a374b';
+import { createContextMenu, isContextMenuKey as isMenuKey } from './js/ui/context-menu.js?v=c92fbdd5';
 import { bindCountField, countKeyValue, countStepMarkup } from './js/ui/count-chooser.js?v=893305c8';
 import { bindVerbMenu, focusVerbRow, lockVerbMenuSize, makePickTile, makeVerbRow, pickGridCols, placeVerbMenu, plainWords, refuseVerbRow, syncVerbDetail, verbMenuKey, verbRowAttrs, verbRowInner, verbRowKeys } from './js/ui/verb-menu.js?v=74b6dfa0';
 import { createPromptSettler, promptId } from './js/prompt-settle.js?v=509ba9cc';
@@ -936,6 +936,7 @@ import { clientKeyAction, createHotkeysSheet, isHotkeySheetRelease, isPlainKey }
 import { EAT_PICK_TEXT, bestFoodIndex, eatChoices, eatTip } from './js/eat-pick.js?v=8fb763d0';
 import { installHeldKeyGuard, isMacPlatform } from './js/held-keys.js?v=98b96620';
 import { signpostArmRows, worldContextAction } from './js/world-context-menu.js?v=f3f48805';
+import { listPlayerTarget, opensPlayerMenu, playerMenuRows } from './js/ui/player-menu.js?v=37103fe8';
 import { forgetTexture, frameTexture, isFailed, isLoaded, onFailed, onLoaded, textureFromUrl, whenLoaded } from './js/textures.js?v=db2ce452';
 import { FALLBACK_MAX as WORLD_ART_FALLBACK_MAX, worldArtFor } from './js/world-art.js?v=df476660';
 import { sceneAnim, syncAnim } from './js/deco-anim.js?v=6f548fd1';
@@ -11227,6 +11228,14 @@ const engine = {
   usePackItem: (classTsid) => usePackItem(classTsid),
   /** A target's verb menu, and starting one of its verbs as a menu click would (features/pack-tree-verbs-feature.js). */
   targetVerbs: (target) => menuVerbsFor(target),
+  /**
+   * RIGHTCLICK (js/ui/player-menu.js): another player's menu from a list (a chat name, a buddy row):
+   * { id, name, at, anchor, keys, opener, findOpener, before, after, omit, layer }; false for you.
+   */
+  openPlayerMenu: (opts) => openPlayerListMenu(opts),
+  /** Whether that player's menu is open (a trigger's echo guard), and closing it. */
+  isPlayerMenuOpen: (id) => Boolean(playerCtxMenu?.isOpenFor(`player:${Number(id) || 0}`)),
+  closePlayerMenu: (opts) => playerCtxMenu?.close(opts),
   beginVerb: (target, verb) => beginVerbAction(target, verb),
   /**
    * Multiplayer street objects: run a verb's effect now (the realtime server's
@@ -23227,6 +23236,64 @@ function openSignpostArmsMenu(hit, at) {
     onPick: (id) => {
       const row = rows.find((r) => r.id === id);
       if (row) takeSignBoard({ view, board: row.board });
+    },
+  });
+}
+
+/**
+ * RIGHTCLICK (audit later batch item 1, js/ui/player-menu.js): another player's menu "from a list"
+ * (a chat name, a buddy row, a Chats row, a minimap dot), as Glitch's startPcMenuFromList
+ * (InteractionMenuController.as 664-693). On your street it is their whole world menu; anywhere
+ * else the rows that work at a distance. Your own name opens nothing. `before` and `after`: a
+ * surface's own rows around it ({ id, label, tip, run }); `omit`: verb ids it already has.
+ * Returns whether it opened.
+ */
+let playerCtxMenu = null;
+function playerContextMenu() {
+  if (!playerCtxMenu) playerCtxMenu = createContextMenu({ doc: document, host: document.getElementById('game-root'), id: 'player-ctx-menu', className: 'player-ctx-menu', rowData: 'playerRow', setData: setCanvasData });
+  return playerCtxMenu;
+}
+
+/** Another player's Glitch on this street (the party feature's target), or null. */
+function streetPlayerTarget(id) {
+  const pid = Number(id) || 0;
+  return interactables.find((t) => t?.classId === 'pc_remote' && Number(t.playerId) === pid && t.sprite && !t.sprite.destroyed) || null;
+}
+
+function selfPlayerId() {
+  return Number(features.query('realtimeClient', engine)?.me?.id) || 0;
+}
+
+function openPlayerListMenu({ id, name = '', at = null, anchor = null, keys = false, opener = null, findOpener = null, before = [], after = [], omit = [], layer = '' } = {}) {
+  if (GAME_MODE !== 'multiplayer' || !opensPlayerMenu(id, selfPlayerId())) return false;
+  const pid = Number(id);
+  const here = streetPlayerTarget(pid);
+  const target = here || listPlayerTarget({ id: pid, name });
+  const rows = [...before, ...playerMenuRows(menuVerbsFor(target) || [], { here: Boolean(here), omit }), ...after];
+  return playerContextMenu().open({
+    title: here?.label || target.label,
+    rows,
+    at,
+    anchor,
+    keys,
+    opener,
+    findOpener,
+    layer,
+    owner: `player:${pid}`,
+    data: { playerMenu: here ? 'here' : 'list' },
+    onPick: (rowId, { row }) => {
+      if (typeof row?.run === 'function') {
+        row.run();
+        return;
+      }
+      // As they are now: they may have left the street (or come) while it was open.
+      const now = streetPlayerTarget(pid) || listPlayerTarget({ id: pid, name: target.label });
+      const verb = (menuVerbsFor(now) || []).find((v) => v.id === rowId);
+      if (!verb || verb.enabled === false) return;
+      setCanvasData('playerMenuPick', `${pid}:${rowId}`);
+      // No Glitch to walk to (or a verb running): the row's own action, as the instant ones are.
+      if (!now.sprite || (currentAction && !(Number(verb.durationMs) > 0))) executeVerb(now, verb.id);
+      else requestVerb(now, verb);
     },
   });
 }
