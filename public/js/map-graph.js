@@ -672,7 +672,8 @@ export function renderHubMapSvg(view) {
     parts.push(
       `<g class="map-street ${s.current ? 'current' : 'travelable'}${building ? ' building' : ''}" ` +
         `data-tsid="${escapeXml(travelTsid)}" data-label="${escapeXml(s.label)}" ` +
-        `data-segment="${escapeXml(s.tsid)}"${building ? ' data-building="1"' : ''}>` +
+        // RIGHTCLICK: a street has a menu of ours (game.js openMapStreetMenu), never the browser's.
+        `data-segment="${escapeXml(s.tsid)}" data-ctx="map-street"${building ? ' data-building="1"' : ''}>` +
         (building ? `<title>${escapeXml(s.label)}: under construction</title>` : '') +
         `<line class="${cls}" x1="${s.x1}" y1="${s.y1}" x2="${s.x2}" y2="${s.y2}"/>` +
         (building ? `<line class="map-seg-stripes" x1="${s.x1}" y1="${s.y1}" x2="${s.x2}" y2="${s.y2}"/>` : '') +

@@ -881,7 +881,7 @@ import {
   pickMapSpot,
   MAP_INDEX_URL,
   HUB_56_MAP_URL,
-} from './js/map-graph.js?v=c321ea32';
+} from './js/map-graph.js?v=a0cec3f3';
 import { hubMapArtNote, hubMapSubtitle, questLogSummary } from './js/panel-copy.js?v=9fc1b2da';
 import { bindMapIconTips } from './js/ui/map-icon-tips.js?v=6b3eb3f9';
 import {
@@ -23664,10 +23664,28 @@ async function openMap(hubId, { find = '' } = {}) {
       }
       openMapStreetMenu(canvas, e, { tsid: plan.toTsid, label: plan.label || label, hubId: targetHub, hubName: view.hubName });
     });
+    // RIGHTCLICK: a right-click opens the same menu (the world never sees it: the Map is over it).
+    g.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+      const tsid = g.getAttribute('data-tsid');
+      const label = g.getAttribute('data-label') || tsid;
+      const plan = mapClickTravel(currentStreetTsid, tsid, STREET_INDEX.streets);
+      if (!plan.ok) {
+        if (plan.reason === 'already_here') openMapStreetMenu(canvas, e, { tsid, label, hubId: targetHub, hubName: view.hubName }, { here: true });
+        return;
+      }
+      openMapStreetMenu(canvas, e, { tsid: plan.toTsid, label: plan.label || label, hubId: targetHub, hubName: view.hubName });
+    });
   });
 
   canvas.querySelectorAll('.map-street.current').forEach((g) => {
-    g.addEventListener('click', () => toast('You are already here.'));
+    g.addEventListener('click', () => toast(MAP_ALREADY_HERE));
+    // RIGHTCLICK: your own street's menu, both rows greyed with why.
+    g.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+      const tsid = g.getAttribute('data-tsid');
+      openMapStreetMenu(canvas, e, { tsid, label: g.getAttribute('data-label') || tsid, hubId: targetHub, hubName: view.hubName }, { here: true });
+    });
   });
 
   canvas.querySelectorAll('.map-hub-go').forEach((g) => {
@@ -23761,72 +23779,67 @@ function arrangeMapCards(panel) {
  * the teleportation feature allows only with Teleportation IV, to a visited street,
  * with the energy and off cooldown (teleportation_map_teleport). The original never
  * moved you just for clicking a street.
+ *
+ * RIGHTCLICK (right-click audit later batch item 4): it is the shared menu (js/ui/context-menu.js):
+ * key caps, the footer line with what a row does or why it can't be done, both skins' art. A left
+ * click and a right-click on a street open it at the pointer; on your own street (a right-click; a
+ * left click there still only says so) both rows are greyed with "You are already here."
+ * QA: canvas data contextMenu map:<tsid>, mapStreetMenu <tsid>:teleport|route|here.
  */
-function openMapStreetMenu(canvas, event, street) {
-  canvas.querySelector('.map-street-menu')?.remove();
-  const menu = document.createElement('div');
-  menu.className = 'map-street-menu';
-  menu.setAttribute('role', 'menu');
-  menu.dataset.tsid = street.tsid;
-  const title = document.createElement('strong');
-  title.textContent = street.label;
-  menu.appendChild(title);
-  const close = () => {
-    menu.remove();
-    document.removeEventListener('pointerdown', outside, true);
-    document.removeEventListener('keydown', onKey, true);
-  };
-  const outside = (e) => { if (!menu.contains(e.target)) close(); };
-  const onKey = (e) => { if (e.key === 'Escape') { e.stopPropagation(); close(); } };
-  const entry = (text, note, enabled, run) => {
-    const b = document.createElement('button');
-    b.type = 'button';
-    b.setAttribute('role', 'menuitem');
-    b.textContent = text;
-    b.disabled = !enabled;
-    if (note) {
-      const n = document.createElement('span');
-      n.textContent = note;
-      b.appendChild(n);
-      b.title = note;
-    }
-    b.addEventListener('click', () => { close(); run(); });
-    menu.appendChild(b);
-    return b;
-  };
+const MAP_ALREADY_HERE = 'You are already here.';
+let mapCtxMenu = null;
+function mapStreetContextMenu() {
+  if (!mapCtxMenu) mapCtxMenu = createContextMenu({ doc: document, host: document.getElementById('game-root'), id: 'map-street-menu', className: 'map-ctx-menu', rowData: 'mapRow', setData: setCanvasData });
+  return mapCtxMenu;
+}
+
+function openMapStreetMenu(canvas, event, street, { here = false } = {}) {
   // Ticket 37 follow-up: a street still being built is no destination and no teleport target
   // (GSJS location.js 2915-2935 not_a_destination; InteractionMenuController.as 151-153, 206-208).
-  const building = features.query('streetUnderConstruction', street.tsid, engine);
-  entry('Set as Destination', building ? building.note : 'Get a guided path to this location', !building, () => {
-    const res = features.query('mapRoute', 'set', { to: street.tsid, source: 'player' }, engine);
-    // Routes never go through a closed road (js/map-routes.js findRoute): say which street is in the way.
-    const through = res && res.ok === false ? routeThroughConstruction(res.through) : null;
-    if (through) toast(`No open road leads to ${street.label} yet: the way runs through ${through.label}, which is still under construction. ${through.note}`, 6000);
-    else if (res && res.ok === false) toast(res.error || 'No path to there.', 2600);
-    else {
-      pushActivity(`Destination set: ${street.label}.`);
-      openMap(street.hubId);
-    }
+  const building = here ? null : features.query('streetUnderConstruction', street.tsid, engine);
+  const tp = here
+    ? { ok: false, error: MAP_ALREADY_HERE }
+    : features.query('mapTeleport', 'check', street, engine) || { ok: false, error: 'You cannot teleport from here.' };
+  const rows = [
+    {
+      id: 'destination',
+      label: 'Set as Destination',
+      tip: 'Get a guided path to this location',
+      disabled: here || Boolean(building),
+      reason: here ? MAP_ALREADY_HERE : building ? building.note : '',
+    },
+    {
+      id: 'teleport',
+      label: tp.ok && tp.energyCost ? `Teleport Here · ${tp.energyCost} energy` : 'Teleport Here',
+      tip: tp.ok ? tp.tooltip || '' : '',
+      disabled: !tp.ok,
+      reason: tp.ok ? '' : tp.error || '',
+    },
+  ];
+  const opened = mapStreetContextMenu().open({
+    title: street.label,
+    rows,
+    at: { x: event.clientX, y: event.clientY },
+    owner: `map:${street.tsid}`,
+    onPick: (id) => {
+      if (id === 'teleport') {
+        features.query('mapTeleport', 'go', street, engine);
+        return;
+      }
+      if (id !== 'destination') return;
+      const res = features.query('mapRoute', 'set', { to: street.tsid, source: 'player' }, engine);
+      // Routes never go through a closed road (js/map-routes.js findRoute): say which street is in the way.
+      const through = res && res.ok === false ? routeThroughConstruction(res.through) : null;
+      if (through) toast(`No open road leads to ${street.label} yet: the way runs through ${through.label}, which is still under construction. ${through.note}`, 6000);
+      else if (res && res.ok === false) toast(res.error || 'No path to there.', 2600);
+      else {
+        pushActivity(`Destination set: ${street.label}.`);
+        openMap(street.hubId);
+      }
+    },
   });
-  const tp = features.query('mapTeleport', 'check', street, engine) || { ok: false, error: 'You cannot teleport from here.' };
-  entry(
-    tp.ok && tp.energyCost ? `Teleport Here · ${tp.energyCost} energy` : 'Teleport Here',
-    tp.ok ? tp.tooltip : tp.error,
-    tp.ok,
-    () => features.query('mapTeleport', 'go', street, engine)
-  );
-  canvas.appendChild(menu);
-  const box = canvas.getBoundingClientRect();
-  const x = Math.min(Math.max(8, event.clientX - box.left), box.width - menu.offsetWidth - 8);
-  const y = Math.min(Math.max(8, event.clientY - box.top + 10), box.height - menu.offsetHeight - 8);
-  menu.style.left = `${Math.max(8, x)}px`;
-  menu.style.top = `${Math.max(8, y)}px`;
-  if (app?.canvas) app.canvas.dataset.mapStreetMenu = `${street.tsid}:${tp.ok ? 'teleport' : 'route'}`;
-  setTimeout(() => {
-    document.addEventListener('pointerdown', outside, true);
-    document.addEventListener('keydown', onKey, true);
-  }, 0);
-  menu.querySelector('button:not([disabled])')?.focus();
+  if (opened && app?.canvas) app.canvas.dataset.mapStreetMenu = `${street.tsid}:${here ? 'here' : tp.ok ? 'teleport' : 'route'}`;
+  return opened;
 }
 
 /**
@@ -23845,6 +23858,7 @@ function routeThroughConstruction(streets) {
 function closeMap() {
   const panel = document.getElementById('map-panel');
   if (panel) panel.hidden = true;
+  if (mapCtxMenu?.isOpen()) mapCtxMenu.close({ focus: false });
   mapPanelHubId = null;
 }
 
