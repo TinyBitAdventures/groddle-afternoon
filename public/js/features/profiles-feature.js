@@ -37,13 +37,23 @@
  *   character count, Save, and "See your profile"), through the
  *   accountProfile query account-backup-feature asks.
  *
+ * - Open Profile Page (Austin 2026-11-03, right-click audit decision 2): another
+ *   player's menu (their Glitch, by a left or a right click) starts with the
+ *   client's "Open Profile Page ..." row (InteractionMenuController.as 573-578,
+ *   sort_on -10; its choice opened the page in a new window, 829). It opens
+ *   /players/<slug>.<id>/ (profiles.js profilePagePath) in a new tab. Whether
+ *   the page is public is looked up once per player on the street (a GET of
+ *   that page: below level 5 the site answers 404), so the row can say why it
+ *   cannot open; until the answer comes it opens anyway.
+ *
  * Uploads are throttled (profiles.js shouldUpload: one try a minute, five
  * minutes after a failure; the site refuses a second within 15 s).
  * Multiplayer only: solo never loads a profile or draws anything.
  * QA: window.groddleProfiles (state, uploadAvatar, uploadHome, layout,
  * uploadLayout); canvas data profileAvatar / profileHome / profileHomeLayout
  * (idle, uploading, uploaded, failed),
- * profileAboutSaved (saved, failed).
+ * profileAboutSaved (saved, failed), profilePage (the last opened page's path),
+ * profilePages (id:public|none, the players looked up).
  */
 
 import { createMinnAccount } from '../minn-account.js?v=eb300264';
@@ -52,11 +62,11 @@ import { drawListBounds } from '../avatar-rig.js?v=b67f0da8';
 import { lookKey, resolveLook } from '../avatar-looks.js?v=64fab53e';
 import {
   AVATAR_FRAME, AVATAR_STILL, AVATAR_TILE, FAILURE_BACKOFF_MS, HOME_BACKDROP, HOME_MAX_BYTES, HOME_QUALITY, HOME_RESOLUTION, HOME_SETTLE_MS, HOME_TYPES,
-  PICTURE_RESOLUTION, PROFILE_COPY,
-  aboutCounter, avatarKeyOf, base64Bytes, homeKeyOf, homeSizes, imageBase64, pngBase64, shouldUpload, stillTransform,
-} from '../profiles.js?v=174a1a84';
-import { homeLayoutJson, homeLayoutKeyOf, HOME_LAYOUT_LIMITS } from '../home-layout.js?v=bbb94dc1';
-import { collectHomeLayout } from '../home-layout-scene.js?v=ac4644ad';
+  PICTURE_RESOLUTION, PROFILE_COPY, PROFILE_PAGE_VERB,
+  aboutCounter, profilePagePath, profilePageVerb, avatarKeyOf, base64Bytes, homeKeyOf, homeSizes, imageBase64, pngBase64, shouldUpload, stillTransform,
+} from '../profiles.js?v=06d5732b';
+import { homeLayoutJson, homeLayoutKeyOf, HOME_LAYOUT_LIMITS } from '../home-layout.js?v=df93054e';
+import { collectHomeLayout } from '../home-layout-scene.js?v=64c89883';
 
 export const PROFILES_FEATURE_ID = 'profiles';
 
@@ -64,6 +74,58 @@ export const PROFILES_FEATURE_ID = 'profiles';
 const CHECK_MS = 1000;
 
 let state = null;
+
+/** Open Profile Page: each player looked up (id -> { status: 'public'|'none'|'', path, at }), one fetch at a time. */
+const pages = new Map();
+let pageFetch = null;
+/** A lookup is kept this long (a player who reaches level 5 gets a page). */
+const PAGE_TTL_MS = 10 * 60 * 1000;
+/** Guards verbOverride's own call to engine.targetVerbs (the composed player menu). */
+let menuGuard = false;
+
+/** The page a player's row opens: the site's own address once looked up, else the id path. */
+function pageFor(id, name) {
+  const known = pages.get(String(id));
+  return known?.path || profilePagePath(name, id);
+}
+
+/** Looks up one player's page (a same-origin GET; below level 5 the site answers 404). */
+async function lookUpPage(id, name, engine) {
+  const key = String(id);
+  const path = profilePagePath(name, id);
+  if (!path || typeof fetch !== 'function') return;
+  const entry = { status: '', path, at: Date.now() };
+  pages.set(key, entry);
+  try {
+    const r = await fetch(new URL(path, document.baseURI).href, { credentials: 'same-origin', redirect: 'follow', headers: { Accept: 'text/html' } });
+    if (r.ok) {
+      entry.status = 'public';
+      // The page's own address (the site sends /players/<slug>.<id>/ on to it).
+      try { entry.path = new URL(r.url).pathname || path; } catch { entry.path = path; }
+    } else if (r.status === 404) entry.status = 'none';
+    r.body?.cancel?.().catch?.(() => {});
+  } catch {
+    entry.status = '';
+  }
+  engine?.setData?.('profilePages', [...pages].map(([k, v]) => `${k}:${v.status || '?'}`).join(','));
+}
+
+/**
+ * Each tick: the first player on the street not looked up (or looked up long ago) gets looked up.
+ * Returns the lookup running (tests wait on it), or null.
+ */
+export function lookUpPlayersHere(engine) {
+  if (pageFetch) return pageFetch;
+  const client = engine.query?.('realtimeClient');
+  const now = Date.now();
+  for (const p of client?.players || []) {
+    const known = pages.get(String(p.id));
+    if (known && now - known.at < PAGE_TTL_MS) continue;
+    pageFetch = lookUpPage(p.id, p.name, engine).finally(() => { pageFetch = null; });
+    return pageFetch;
+  }
+  return null;
+}
 
 function create(engine) {
   // The REST nonce /play/online/ booted with (js/online-boot.js), as buddies-feature and realtime-feature use.
@@ -429,6 +491,7 @@ export const profilesFeature = {
     const t = Date.now();
     if (t < state.checkAt) return;
     state.checkAt = t + CHECK_MS;
+    lookUpPlayersHere(engine);
     if (!saving()) return;
     if (!state.avatar.busy) uploadAvatar(engine, state);
     const ctx = engine.homeContext?.();
@@ -441,6 +504,33 @@ export const profilesFeature = {
     } else {
       state.homeSince = 0;
     }
+  },
+
+  /**
+   * Another player's Glitch (pc_remote, drawn by realtime and party): its menu starts with Open
+   * Profile Page (the client's sort_on -10), disabled with the reason when they have no public page.
+   */
+  verbOverride(target, engine) {
+    if (menuGuard || target?.classId !== 'pc_remote' || !target.playerId || engine?.mode !== 'multiplayer') return null;
+    menuGuard = true;
+    let base;
+    try {
+      base = engine.targetVerbs?.(target) || [];
+    } finally {
+      menuGuard = false;
+    }
+    const name = target.label || target.name || '';
+    return [profilePageVerb(name, pages.get(String(target.playerId))?.status || ''), ...base.filter((v) => v.id !== PROFILE_PAGE_VERB)];
+  },
+
+  runVerbOverride(target, verbId, engine) {
+    if (verbId !== PROFILE_PAGE_VERB || target?.classId !== 'pc_remote' || !target.playerId) return null;
+    const path = pageFor(target.playerId, target.label || target.name || '');
+    if (!path || typeof window === 'undefined') return true;
+    const url = new URL(path, document.baseURI).href;
+    window.open(url, '_blank', 'noopener');
+    engine?.setData?.('profilePage', path);
+    return true;
   },
 
   /** account-backup-feature's multiplayer Account panel asks for the profile section. */

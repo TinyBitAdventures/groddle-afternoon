@@ -73,6 +73,50 @@ export function profileSlug(name) {
   return String(name ?? '').toLowerCase().replace(/[ _-]+/g, '-').replace(/^-+|-+$/g, '');
 }
 
+/**
+ * The level a character's page goes public at (site src/Profiles.php LISTED_LEVEL, Austin
+ * 2026-10-26): below it only its owner sees it, and the site answers anyone else 404.
+ */
+export const PROFILE_LISTED_LEVEL = 5;
+
+/**
+ * Another player's page on the site (site src/PlayerPages.php find): /players/<slug>.<id>/ names
+ * exactly that character, even when two names make one slug ("Bo Peep", "bo-peep"); the site
+ * sends it on to the page's own address (/players/<slug>/ for the first owner of a slug).
+ * Without an id, the slug alone.
+ */
+export function profilePagePath(name, id = null) {
+  const slug = profileSlug(name);
+  if (!slug) return '';
+  const n = Number(id);
+  return Number.isInteger(n) && n > 0 ? `/players/${slug}.${n}/` : `/players/${slug}/`;
+}
+
+/** The player menu's row (InteractionMenuController.as 573-578: "Open Profile Page ...", sort_on -10, first). */
+export const PROFILE_PAGE_VERB = 'profile_page';
+export const PROFILE_PAGE_COPY = Object.freeze({
+  label: 'Open Profile Page',
+  // The client's tooltip, then where it goes.
+  tooltip: 'View more information about this person: their page on the Groddle site, in a new tab.',
+  none: (name) => `${name || 'This player'} has no public page yet. Pages show from level ${PROFILE_LISTED_LEVEL}.`,
+});
+
+/**
+ * PURE: the row for one player. `status`: 'public' | 'none' | '' (not known yet: it opens, and
+ * the site says if there is no page).
+ */
+export function profilePageVerb(name, status = '') {
+  const none = status === 'none';
+  return {
+    id: PROFILE_PAGE_VERB,
+    label: PROFILE_PAGE_COPY.label,
+    tooltip: PROFILE_PAGE_COPY.tooltip,
+    enabled: !none,
+    reason: none ? PROFILE_PAGE_COPY.none(name) : '',
+    durationMs: 0,
+  };
+}
+
 /** FNV-1a 32-bit, hex: a short stable key for a long string. */
 export function shortHash(text) {
   let h = 0x811c9dc5;
