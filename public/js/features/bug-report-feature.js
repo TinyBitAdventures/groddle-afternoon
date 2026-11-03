@@ -50,8 +50,8 @@
  * window.groddleBugReport.open('list'|'new'), .openTicket(id), .refresh() in multiplayer.
  */
 
-import { createReportsApi, REPORT_PICTURE, REPORT_TEXT, UNREAD_POLL_MS, base64Size, pictureSize, reportFromHash } from '../reports.js?v=e83d5ec3';
-import { mountReportsSheet } from '../ui/reports-sheet.js?v=c493c923';
+import { createReportsApi, REPORT_PICTURE, REPORT_TEXT, UNREAD_POLL_MS, base64Size, pictureSize, reportFromHash } from '../reports.js?v=5271872b';
+import { mountReportsSheet } from '../ui/reports-sheet.js?v=0041ba7b';
 
 export const BUG_REPORT_FEATURE_ID = 'bug-report';
 

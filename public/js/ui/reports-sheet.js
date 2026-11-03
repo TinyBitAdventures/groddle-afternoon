@@ -39,7 +39,7 @@
  * [data-reports-edit-save], [data-reports-edit-cancel], [data-edited] on a changed message.
  */
 
-import { REPORT_MAX, REPORT_TEXT as T, STATUS_WORDS, canEditFirst, pictureRefused, pictureSrc, refusalWords, ticketLine, unreadCount, whenWords } from '../reports.js?v=e83d5ec3';
+import { REPORT_MAX, REPORT_TEXT as T, STATUS_WORDS, canEditFirst, pictureRefused, pictureSrc, refusalWords, ticketLine, unreadCount, whenWords } from '../reports.js?v=5271872b';
 
 /** How long Send waits for a picture still drawing before it sends the world-only one (ms). */
 export const PICTURE_WAIT_MS = 6000;

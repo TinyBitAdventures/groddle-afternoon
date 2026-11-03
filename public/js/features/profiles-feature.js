@@ -20,6 +20,15 @@
  *   shows the next visit). Up to 1920 wide as WebP, or JPEG where the
  *   browser cannot write WebP (profiles.js HOME_*). The website's profile
  *   header was a panorama of the home street (homes/.../header-*.jpg).
+ * - The home street as a layout (js/home-layout.js, js/home-layout-scene.js):
+ *   the same settled moment, what is drawn in the view read off the stage
+ *   (each image's art and box, the sky and field, the things on it), sent
+ *   to profile/home-layout so the page draws a diorama from the game's own
+ *   art. Sent when the site has none, or the layout's key moved on (the
+ *   picture's style and six hours, or a change in what is on the street),
+ *   and only to a site that answers with a homeLayout field, so the game
+ *   can go live before the site. QA in solo: &homelayoutdemo=1 gives
+ *   window.groddleHomeLayout() (the manifest of the view now).
  * - The description: Menu > Account gets "Your profile" (a text box with a
  *   character count, Save, and "See your profile"), through the
  *   accountProfile query account-backup-feature asks.
@@ -27,12 +36,13 @@
  * Uploads are throttled (profiles.js shouldUpload: one try a minute, five
  * minutes after a failure; the site refuses a second within 15 s).
  * Multiplayer only: solo never loads a profile or draws anything.
- * QA: window.groddleProfiles (state, uploadAvatar, uploadHome); canvas data
- * profileAvatar / profileHome (idle, uploading, uploaded, failed),
+ * QA: window.groddleProfiles (state, uploadAvatar, uploadHome, layout,
+ * uploadLayout); canvas data profileAvatar / profileHome / profileHomeLayout
+ * (idle, uploading, uploaded, failed),
  * profileAboutSaved (saved, failed).
  */
 
-import { createMinnAccount } from '../minn-account.js?v=ea900c51';
+import { createMinnAccount } from '../minn-account.js?v=eb300264';
 import { drawListFor, loadCatalog, paintItems, prepareLook } from '../avatar-compositor.js?v=dcd906ae';
 import { drawListBounds } from '../avatar-rig.js?v=b67f0da8';
 import { lookKey, resolveLook } from '../avatar-looks.js?v=64fab53e';
@@ -41,6 +51,8 @@ import {
   PICTURE_RESOLUTION, PROFILE_COPY,
   aboutCounter, avatarKeyOf, base64Bytes, homeKeyOf, homeSizes, imageBase64, pngBase64, shouldUpload, stillTransform,
 } from '../profiles.js?v=174a1a84';
+import { homeLayoutJson, homeLayoutKeyOf, HOME_LAYOUT_LIMITS } from '../home-layout.js?v=43e1bf99';
+import { collectHomeLayout } from '../home-layout-scene.js?v=888aa199';
 
 export const PROFILES_FEATURE_ID = 'profiles';
 
@@ -62,18 +74,23 @@ function create(engine) {
     homeSince: 0,
     avatar: { lastTry: 0, failedAt: 0, busy: false, status: 'idle' },
     home: { lastTry: 0, failedAt: 0, busy: false, status: 'idle', picture: null },
+    layout: { lastTry: 0, failedAt: 0, busy: false, status: 'idle', bytes: 0, key: '' },
   };
   globalThis.groddleProfiles = {
-    state: () => ({ profile: s.profile, avatar: { ...s.avatar }, home: { ...s.home }, homeSince: s.homeSince }),
+    state: () => ({ profile: s.profile, avatar: { ...s.avatar }, home: { ...s.home }, layout: { ...s.layout }, homeSince: s.homeSince }),
     uploadAvatar: () => uploadAvatar(engine, s, { force: true }),
     uploadHome: () => uploadHome(engine, s, { force: true }),
+    layout: () => collectHomeLayout(engine),
+    uploadLayout: () => uploadLayout(engine, s, { force: true }),
   };
   return s;
 }
 
+const DATA_KEYS = { avatar: 'profileAvatar', home: 'profileHome', layout: 'profileHomeLayout' };
+
 function mark(engine, s, which, status) {
   s[which].status = status;
-  engine.setData?.(which === 'avatar' ? 'profileAvatar' : 'profileHome', status);
+  engine.setData?.(DATA_KEYS[which], status);
 }
 
 /** The profile the site holds (once, then after each write). */
@@ -255,6 +272,44 @@ async function uploadHome(engine, s, { force = false } = {}) {
   }
 }
 
+/**
+ * The home street's layout, sent beside the picture (js/home-layout.js). Only
+ * to a site that knows layouts (its profile answer has a homeLayout field);
+ * keyed by the picture's style and six hours and by what is on the street.
+ */
+async function uploadLayout(engine, s, { force = false } = {}) {
+  if (s.layout.busy || (!force && Date.now() - s.layout.failedAt < FAILURE_BACKOFF_MS)) return false;
+  const ctx = engine.homeContext?.();
+  if (!ctx?.inHome || ctx.room !== 'street') return false;
+  s.layout.busy = true;
+  try {
+    const profile = await load(s);
+    if (!profile || !Object.hasOwn(profile, 'homeLayout')) return false;
+    const layout = collectHomeLayout(engine);
+    if (!layout) return false;
+    const key = homeLayoutKeyOf(layout, homeKeyOf(ctx.style));
+    const now = Date.now();
+    if (!force && !shouldUpload({ held: profile.homeLayout, key, now, lastTry: s.layout.lastTry, failedAt: s.layout.failedAt })) return false;
+    const { bytes } = homeLayoutJson(layout);
+    if (bytes > HOME_LAYOUT_LIMITS.bytes) throw new Error(`the layout is ${bytes} bytes`);
+    s.layout.lastTry = now;
+    s.layout.bytes = bytes;
+    s.layout.key = key;
+    mark(engine, s, 'layout', 'uploading');
+    s.profile = await s.account.uploadHomeLayout({ key, layout });
+    s.layout.failedAt = 0;
+    mark(engine, s, 'layout', 'uploaded');
+    return true;
+  } catch (err) {
+    s.layout.failedAt = Date.now();
+    mark(engine, s, 'layout', 'failed');
+    console.warn('[profiles] home layout', err?.message || err);
+    return false;
+  } finally {
+    s.layout.busy = false;
+  }
+}
+
 const STYLE = `
 .account-profile { margin-top: var(--sp-8); padding-top: 0.8rem; border-top: 1px solid var(--border); }
 .account-profile h3 { margin: 0 0 0.3rem; font-size: var(--fs-lg); }
@@ -354,6 +409,8 @@ export const profilesFeature = {
   id: PROFILES_FEATURE_ID,
 
   init(engine) {
+    // QA (solo too): &homelayoutdemo=1 reads the home street's layout off the stage; nothing is sent.
+    if (engine.param?.('homelayoutdemo') && typeof window !== 'undefined') window.groddleHomeLayout = () => collectHomeLayout(engine);
     if (engine.mode !== 'multiplayer' || typeof document === 'undefined' || globalThis.groddlePractice === true) return;
     state = create(engine);
   },
@@ -372,7 +429,10 @@ export const profilesFeature = {
     const ctx = engine.homeContext?.();
     if (ctx?.inHome && ctx.room === 'street') {
       state.homeSince ||= t;
-      if (t - state.homeSince >= HOME_SETTLE_MS && !state.home.busy && viewClear(engine)) uploadHome(engine, state);
+      if (t - state.homeSince >= HOME_SETTLE_MS && viewClear(engine)) {
+        if (!state.layout.busy) uploadLayout(engine, state);
+        if (!state.home.busy) uploadHome(engine, state);
+      }
     } else {
       state.homeSince = 0;
     }

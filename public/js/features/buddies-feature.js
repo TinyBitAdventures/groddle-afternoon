@@ -43,7 +43,7 @@
  * buddiesLast (the last notice); window.groddleBuddies.
  */
 
-import { createMinnAccount } from '../minn-account.js?v=ea900c51';
+import { createMinnAccount } from '../minn-account.js?v=eb300264';
 import { STREET_INDEX } from '../street-loader.js?v=33d2b8bc';
 import {
   BUDDY_COUNTER,

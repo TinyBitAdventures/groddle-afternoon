@@ -378,9 +378,12 @@ function spawnStreet(engine, { item, x, groundY }) {
       drawExterior(engine, box);
       label = towerLabel(tower);
       subtitle = `${tower.floors} floors${tower.expanding ? ' · a new floor is going up' : ''}`;
+      // The profile's diorama (js/home-layout.js): floors, and the name the player gave it.
+      box.homeLayout = { k: 'tower', i: TOWER_CHASSIS, n: tower.floors, ...(tower.name ? { name: tower.name } : {}) };
     } else {
       const perc = projectPercent(TOWER_JOB, tower.project);
       box.addChild(protoSprite(PIXI, protoArtState(perc)));
+      box.homeLayout = { k: 'scaffolding', i: TOWER_PROTO, p: Math.round(perc * 100) };
       subtitle = perc > 0 ? `Tower project ${Math.round(perc * 100)}% done` : 'Start a project to build a tower here';
     }
     engine.entityLayer.addChild(box);

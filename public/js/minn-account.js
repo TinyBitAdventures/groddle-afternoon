@@ -390,6 +390,11 @@ export function createMinnAccount({ baseUri, fetch: fetchFn = globalThis.fetch?.
       return buddyCall('Saving your home picture', 'profile/home', { method: 'PUT', body: { key, home } });
     },
 
+    /** The home street as a layout (js/home-layout.js), drawn on the profile as a diorama. */
+    async uploadHomeLayout({ key, layout }) {
+      return buddyCall('Saving your home street', 'profile/home-layout', { method: 'PUT', body: { key, layout } });
+    },
+
     /**
      * Homes and house keys (register G328, groddle-afternoon-site/src/Neighbours.php).
      * home(id) and visitRandom() answer { owner: { id, name }, home: { owned,

@@ -56,7 +56,7 @@
  * administrator sent you to, once there); window.groddleRealtime in multiplayer.
  */
 
-import { createMinnAccount } from '../minn-account.js?v=ea900c51';
+import { createMinnAccount } from '../minn-account.js?v=eb300264';
 import { EMOTES, createRealtimeClient, createTrack, pushSample, sampleTrack } from '../realtime-client.js?v=f19c76a1';
 import { ANIM_FPS, EMOTION_MS, animForState, crowdScaleX } from '../avatar-anims.js?v=fb921bf4';
 import { movedLine } from '../admin-teleport.js?v=fa56e8df';

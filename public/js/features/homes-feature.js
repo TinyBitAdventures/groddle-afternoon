@@ -192,9 +192,9 @@ import { MOVABLE_FIXTURES, MOVABLE_FIXTURE_IDS, fixtureFits, fixtureText, savedF
 import { displayTopOf, itemstackOverlayPoint, overlayAlpha, overlayLifeMs, playPoofIn, trackOverlay } from '../overlay-art.js?v=3753a0d2';
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=6e3278fe';
 import { fadeInNewNear } from '../poof-fade.js?v=06fed92f';
-import { projectApi } from './street-jobs-feature.js?v=8016372f';
+import { projectApi } from './street-jobs-feature.js?v=fdd3e6cf';
 import { TOWER_CHASSIS, TOWER_CONFIG, TOWER_DOOR_DX, TOWER_GEO, TOWER_PROTO, normalizeTowerState } from '../home-tower.js?v=6a203c8f';
-import { drawTowerElevator, drawTowerExit, towerApi, visitorTowerView } from './home-tower-feature.js?v=18e56c4c';
+import { drawTowerElevator, drawTowerExit, towerApi, visitorTowerView } from './home-tower-feature.js?v=1c6c42c3';
 import { pieceUrl, roomPieces, surfaceAt, swatchPiece, wallTargetAt } from '../home-wallpaper.js?v=e676f00f';
 import { wantsHiresDecos } from '../deco-hires.js?v=cb905e17';
 import { resourceNodesFeature } from './resource-nodes-feature.js?v=be183531';
@@ -1649,6 +1649,8 @@ function drawLandscape(engine, root, style, seed, { width, groundY, lift, skipNe
   const { PIXI } = engine;
   const sky = new PIXI.Sprite(gradientTexture(PIXI, ...style.sky));
   sky.zIndex = -100;
+  // The profile's diorama (js/home-layout-scene.js) draws these from their colours.
+  sky.homeLayoutSky = style.sky;
   root.addChild(sky);
 
   const parallax = [];
@@ -1680,6 +1682,7 @@ function drawLandscape(engine, root, style, seed, { width, groundY, lift, skipNe
     if (layer.band) {
       const band = new PIXI.Graphics();
       band.rect(-200, layer.band.y + lift, span + 200, layer.band.h).fill({ color: layer.band.color, alpha: layer.band.alpha ?? 1 });
+      band.homeLayoutFills = [[-200, layer.band.y + lift, span + 200, layer.band.h, layer.band.color, layer.band.alpha ?? 1]];
       lc.addChild(band);
     }
     for (const item of layer.items || []) {
@@ -1703,14 +1706,17 @@ function drawLandscape(engine, root, style, seed, { width, groundY, lift, skipNe
   field.zIndex = -40;
   field.rect(-50, 586 + lift, width + 100, OLD_STREET_GROUND_Y - 586 + 40).fill(style.field);
   field.rect(-50, groundY + 10, width + 100, 30).fill({ color: style.fieldDark, alpha: 0.5 });
+  field.homeLayoutFills = [[-50, 586 + lift, width + 100, OLD_STREET_GROUND_Y - 586 + 40, style.field, 1], [-50, groundY + 10, width + 100, 30, style.fieldDark, 0.5]];
   root.addChild(field);
   const soilFill = new PIXI.Graphics();
   soilFill.zIndex = -39.5;
   soilFill.rect(-50, groundY + 30, width + 100, 240).fill(style.soilColor || 0x5c3b25);
+  soilFill.homeLayoutFills = [[-50, groundY + 30, width + 100, 240, style.soilColor || 0x5c3b25, 1]];
   root.addChild(soilFill);
   const soilW = 1038 * 0.6;
   if (!style.soil) {
     soilFill.rect(-50, groundY + 30, width + 100, 6).fill({ color: 0x000000, alpha: 0.22 });
+    soilFill.homeLayoutFills.push([-50, groundY + 30, width + 100, 6, 0x000000, 0.22]);
     for (let x = 30; x < width; x += 140) {
       const r = 6 + hash01(`pebble:${x}`) * 10;
       soilFill.ellipse(x + hash01(`p2:${x}`) * 60, groundY + 70 + hash01(`p3:${x}`) * 50, r * 1.6, r).fill({ color: 0x000000, alpha: 0.14 });
@@ -1771,6 +1777,7 @@ function streetBackground(engine, styleKey, houseStyle = 'meadow') {
   house.x = layout.houseX;
   house.y = STREET_GROUND_Y + 14;
   house.zIndex = -20;
+  house.homeLayout = { k: 'house', s: HOUSES[houseStyle] ? houseStyle : 'meadow' };
   root.addChild(house);
   // A planted border along the front of the house, from its left corner, clear of the doorway (PORCH).
   const trim = new PIXI.Container();
@@ -2005,6 +2012,8 @@ function makeHomeSignpost(engine) {
   // FRIENDPOST: the Enter hint sits over the post's top, clear of its arms (game.js, as a street post's T hint).
   post._promptLift = SIGN_PROMPT_LIFT;
   post.label = 'home-signpost';
+  // The profile's diorama writes the arm's words itself (js/home-layout.js HOME_LAYOUT_TEXTS).
+  for (const board of post.signBoards || []) if (board.label) board.label.homeLayoutText = 'way_out';
   return post;
 }
 
@@ -2328,6 +2337,14 @@ function spawnCultivations(engine, st = activeCult()) {
       detached: true,
     });
     if (target?.state?.garden) st.gardens[item.id] = target.state.garden;
+    // The profile's diorama names the garden by its kind (js/home-layout.js).
+    if (target?.sprite) {
+      target.sprite.homeLayout = { k: 'cultivation', i: item.protoClass };
+      // The bed and its plots are drawn beside the target's own (invisible) foot: they are the garden's art.
+      const bed = target._gardenRoot;
+      if (bed) bed.homeLayoutPartOf = target.sprite;
+      for (const cell of Object.values(bed?.plotViews || {})) cell.homeLayoutPartOf = target.sprite;
+    }
   }
   // Pods, mounds and hives: their recovered art, then the resource nodes.
   for (const item of liveItems(st.items)) {

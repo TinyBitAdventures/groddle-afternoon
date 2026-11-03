@@ -52,10 +52,10 @@ import { textureFromUrl } from '../textures.js?v=db2ce452';
 import { addSignBoard, signArmWidth, signLabel } from '../street-render.js?v=41c545c5';
 import { openNotePicker, openNoteView } from '../note-view.js?v=21c55475';
 import { homeStreetName, possessive, readVisitScene } from '../neighbours-mp.js?v=a8d5544e';
-import { BACK_YARD_GROUND_Y, SIGN_PROMPT_LIFT, STREET_GROUND_Y, homesFeature, visitorHomeState } from './homes-feature.js?v=e72e44c4';
-import { projectApi } from './street-jobs-feature.js?v=8016372f';
+import { BACK_YARD_GROUND_Y, SIGN_PROMPT_LIFT, STREET_GROUND_Y, homesFeature, visitorHomeState } from './homes-feature.js?v=cffa23b2';
+import { projectApi } from './street-jobs-feature.js?v=fdd3e6cf';
 import { saveStore } from '../save-store.js?v=8839ba7b';
-import { giveCarriedNote, takeCarriedNote, writtenCarriedNotes } from './street-furniture-feature.js?v=1fb0089f';
+import { giveCarriedNote, takeCarriedNote, writtenCarriedNotes } from './street-furniture-feature.js?v=dc9e6277';
 import {
   GOOD_NEIGHBOUR_AT,
   GOOD_NEIGHBOUR_COUNTER,
@@ -394,6 +394,8 @@ function createSession(engine, client) {
         y = geo.house.floorY;
       }
       const box = poleSprite(pole);
+      // The profile's diorama (js/home-layout.js): a pole and whether a note is up, never its words.
+      box.homeLayout = { k: 'note_pole', i: 'note_pole', n: pole.note ? 1 : 0 };
       box.x = Math.round(x);
       box.y = y + 2;
       box.zIndex = 17;

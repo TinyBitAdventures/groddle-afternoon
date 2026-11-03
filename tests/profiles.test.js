@@ -19,8 +19,8 @@ import {
   PROFILE_ABOUT_MAX, PROFILE_COPY, RETRY_MS,
   aboutCounter, aboutLength, avatarKeyOf, base64Bytes, cleanAbout, homeKeyOf, homeSizes, imageBase64, pngBase64, profileSlug, shortHash, shouldUpload, stillTransform,
 } from '../public/js/profiles.js?v=174a1a84';
-import { createMinnAccount } from '../public/js/minn-account.js?v=ea900c51';
-import { FEATURES } from '../public/js/features/index.js?v=cbbbd72e';
+import { createMinnAccount } from '../public/js/minn-account.js?v=eb300264';
+import { FEATURES } from '../public/js/features/index.js?v=736c4f9d';
 import { SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
 import { loadContentCatalogsFromDir, getSkillCatalog } from '../public/js/content-catalogs.js?v=10b118dd';
 import { skillTitle } from '../public/js/skill-tree.js?v=17787a09';
@@ -182,7 +182,8 @@ describe('the profiles feature', () => {
     f.init(engine);
     f.onTick(16, 0, engine);
     assert.equal(f.accountProfile({}, engine), null);
-    assert.match(src, /init\(engine\) \{\n\s*if \(engine\.mode !== 'multiplayer'/);
+    // Only the QA hook (&homelayoutdemo=1, reads the stage, sends nothing) comes before the multiplayer gate.
+    assert.match(src, /init\(engine\) \{\n\s*\/\/ QA[^\n]*\n\s*if \(engine\.param\?\.\('homelayoutdemo'\)[^\n]*\n\s*if \(engine\.mode !== 'multiplayer'/);
     assert.match(src, /onTick\(dtMs, now, engine\) \{\n\s*if \(!state \|\| engine\.mode !== 'multiplayer'/);
   });
 
@@ -233,6 +234,7 @@ describe('the site side (groddle-afternoon-site)', { skip: skipWithoutSite }, ()
       'Put /groddle/v1/profile SignedIn',
       'Put /groddle/v1/profile/avatar SignedIn',
       'Put /groddle/v1/profile/home SignedIn',
+      'Put /groddle/v1/profile/home-layout SignedIn',
     ]);
     assert.deepEqual(routes('PlayerPages.php'), [
       'Get /players Public',
