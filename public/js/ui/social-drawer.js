@@ -48,8 +48,11 @@
  * and lines with no player behind them (notes, the Butler, Feat lines) have no button. A Buddies
  * row opens the same menu (item 3): a click on the row, a right-click, a long press on touch, Enter
  * or Shift+F10 on its name; its IM and Visit chips act as before (Glitch's contact rows,
- * view/ui/chat/ContactElement.as 267-271). The menu closes when the drawer collapses or the tab
- * changes.
+ * view/ui/chat/ContactElement.as 267-271). A Chats row (item 5) has a menu of its own, by a
+ * right-click, a long press, Shift+F10 or the Menu key: Open (what a click does), then that
+ * conversation's head buttons (Who is here and Close for a group or a channel, Leave for the
+ * party, Close for an IM), and for an IM the other player's menu from a list (without IM: Open is
+ * the IM). The menu closes when the drawer collapses or the tab changes.
  *
  * QA: canvas data socialOpen (open|rail), socialTab (the tab selected: activity, local, global,
  * buddies or chats), socialChat (the conversation open in Chats, or ''), socialTabs (the row),
@@ -57,7 +60,8 @@
  * news, chats:n the Chats total); window.groddleSocial.
  */
 import { colorizeAmounts } from '../notify-view.js?v=81d06119';
-import { bindContextTrigger } from './context-menu.js?v=c92fbdd5';
+import { bindContextTrigger, MORE_KEYS_LABEL } from './context-menu.js?v=c92fbdd5';
+import { IM_VERB_ID } from '../player-im.js?v=04c55d2f';
 import { selectionCovers } from './context-guard.js?v=0f71ac17';
 
 export const SOCIAL_STORE_KEY = 'groddle-social-drawer';
@@ -592,7 +596,11 @@ export function mountSocialDrawer({
           class: `social-chat-row${n ? ' is-unread' : ''}`,
           'data-social-chat': t.id,
           'data-section': t.section,
-          'aria-label': [t.label, note, n ? `${n} new` : '', last].filter(Boolean).join(', '),
+          // RIGHTCLICK: its menu (Open, the conversation's head buttons).
+          'data-ctx': 'chat',
+          'aria-haspopup': 'menu',
+          'aria-keyshortcuts': 'Shift+F10',
+          'aria-label': `${[t.label, note, n ? `${n} new` : '', last].filter(Boolean).join(', ')}. ${MORE_KEYS_LABEL}`,
         });
         const txt = el('span', { class: 'social-chat-txt' });
         const name = el('span', { class: 'social-chat-name' });
@@ -1006,6 +1014,83 @@ export function mountSocialDrawer({
     rowOf: buddyRow,
     isOpenFor: (li) => Boolean(contextMenu?.()?.isOpenFor?.(`player:${Number(li.getAttribute('data-social-buddy')) || 0}`)),
     open: (li, { at, keys }) => openBuddy(li, { at, keys }),
+    longPress: true,
+  });
+
+  // RIGHTCLICK: a Chats row's menu (right-click, long press, Shift+F10 or the Menu key on it).
+  const chatRow = (t) => {
+    if (current().kind !== 'chats') return null;
+    const b = t?.closest?.('[data-social-chat]');
+    return b && log.contains(b) && tabs.has(b.getAttribute('data-social-chat')) ? b : null;
+  };
+  /** The head buttons a conversation shows over its lines, as rows (each presses its button). */
+  const HEAD_ACTIONS = ['[data-groups-who]', '[data-groups-close-chat]', '[data-party-leave]', '[data-im-close]'];
+  function headRows(t) {
+    const out = [];
+    for (const sel of HEAD_ACTIONS) {
+      const btn = t.header?.querySelector?.(sel);
+      if (!btn || btn.hidden || btn.disabled) continue;
+      const label = String(btn.textContent || '').trim();
+      if (!label) continue;
+      const who = sel === '[data-groups-who]';
+      out.push({
+        id: sel.slice(1, -1),
+        label,
+        tip: btn.title || btn.getAttribute('aria-label') || '',
+        focusBack: false,
+        // Who is here answers in the conversation: open it first, so the answer shows.
+        run: () => {
+          if (who) select(t.id);
+          btn.click();
+        },
+      });
+    }
+    return out;
+  }
+  function openChatMenu(row, { at = null, keys = false } = {}) {
+    const id = row.getAttribute('data-social-chat');
+    const t = tabs.get(id);
+    if (!t) return false;
+    const find = () => log.querySelector(`[data-social-chat="${CSS.escape(id)}"]`);
+    const openRow = {
+      id: 'open',
+      label: 'Open',
+      tip: `Shows ${t.label} here.`,
+      focusBack: false,
+      run: () => {
+        select(id);
+        // Opened from the keys, the keys go in as Enter on the row sends them.
+        if (keys) (current().compose && !compose.hidden ? input : log)?.focus?.({ preventScroll: true });
+      },
+    };
+    const im = /^im:(\d+)$/.exec(id);
+    if (im && playerMenu) {
+      return openPlayer(Number(im[1]), t.label, row, { at, keys, find, before: [openRow], after: headRows(t), omit: [IM_VERB_ID] });
+    }
+    const menu = contextMenu?.();
+    if (!menu) return false;
+    const opened = menu.open({
+      title: t.label,
+      rows: [openRow, ...headRows(t)],
+      at,
+      anchor: row,
+      keys,
+      opener: row,
+      findOpener: find,
+      owner: `chat:${id}`,
+      onPick: (rowId, { row: picked }) => picked?.run?.(),
+    });
+    if (opened) drawerMenu = `chat:${id}`;
+    return opened;
+  }
+  bindContextTrigger(log, {
+    rowOf: chatRow,
+    isOpenFor: (row) => {
+      const id = row.getAttribute('data-social-chat');
+      const im = /^im:(\d+)$/.exec(id);
+      return Boolean(contextMenu?.()?.isOpenFor?.(im ? `player:${im[1]}` : `chat:${id}`));
+    },
+    open: (row, { at, keys }) => openChatMenu(row, { at, keys }),
     longPress: true,
   });
 
