@@ -52,6 +52,13 @@
  *   has no keyboard way, as the client had none. A pointer click never leaves the focus on a
  *   mark (Space stays your jump). The client drew no destination marker; here a small ring
  *   stands on the goal while the walk runs (setDestination).
+ * - RIGHTCLICK (Austin 2026-11-03, right-click audit later batch item 6): a right-click, a long
+ *   press on touch, Shift+F10 or the Menu key on another player's dot opens their menu (the
+ *   world's player menu: they are on your street); on a signpost, Walk here (what a click does)
+ *   and that post's arms (opts.onMenu, features/street-minimap-feature.js). Anywhere else on the
+ *   map (the picture, you, the Rube, a companion, its buttons) nothing opens and the browser's
+ *   menu is stopped (data-ctx on the card). Glitch's minimap had no menus (MiniMapView.as
+ *   430-460); a right-click never walks.
  * - Left out: the GPS it carried (the route card is js/features/map-routes-feature.js),
  *   drawRangesFromCPLS (the white lines of an item's placement ranges while placing furniture,
  *   a placement aid), the editor's view rectangle and checkboxes.
@@ -68,6 +75,8 @@
  * streetMapFog, streetMapExpanded, streetMapDots, streetMapSigns, streetMapPicture
  * (snapshot|lines), streetMapSnapMs, streetMapWalk (the last click's kind:x, or "refused").
  */
+
+import { bindContextTrigger } from './context-menu.js?v=c92fbdd5';
 
 export const MAP_WIDTH = 160;
 export const MAX_CONTRACTED_H = 70;
@@ -206,6 +215,15 @@ export function dotLook(mark) {
   const text = String(mark?.gameText || '');
   const r = text ? OTHER_DOT.r + 2 : OTHER_DOT.r;
   return { fill, stroke: text ? fill : OTHER_DOT.stroke, r, ring: OTHER_DOT.ring, glow: null, size: 2 * (r + OTHER_DOT.ring / 2), text };
+}
+
+/**
+ * PURE: whether a mark opens a menu (RIGHTCLICK): another player's dot (not solo's companions,
+ * drawn as players with a local- id) and a signpost; not you, not the Rube.
+ */
+export function markHasMenu(mark) {
+  if (mark?.kind === 'sign') return true;
+  return mark?.kind === 'player' && !String(mark.id ?? '').startsWith('local-') && Number(mark.id) > 0;
 }
 
 /** PURE: a mark's tip (getTip 923-970): a post's places one per line, a player's or item's label, none for you. */
@@ -498,6 +516,8 @@ export function createStreetMinimap(doc, host, opts = {}) {
   root.id = 'street-minimap';
   root.className = 'street-minimap';
   root.setAttribute('aria-label', 'Street map');
+  // RIGHTCLICK: the map is ours; only a player's dot and a signpost open a menu.
+  root.dataset.ctx = 'minimap';
   root.hidden = true;
   root.dataset.expanded = 'false';
   root.innerHTML = `
@@ -778,6 +798,26 @@ export function createStreetMinimap(doc, host, opts = {}) {
     }
     opts.onWalk?.(goal, { keyboard });
   });
+  // —— Menus (RIGHTCLICK): a player's dot and a signpost ——
+  const menuMark = (t) => {
+    const el = t?.closest?.('[data-mark]');
+    if (!el || !geom || state !== 'shown' || !opts.onMenu) return null;
+    const row = signs.get(el.dataset.mark) || dots.get(el.dataset.mark);
+    return row && markHasMenu(row.mark) ? el : null;
+  };
+  bindContextTrigger(card, {
+    rowOf: menuMark,
+    isOpenFor: (el) => Boolean(opts.isMenuOpen?.(el.dataset.mark)),
+    open: (el, { at, keys }) => {
+      const row = signs.get(el.dataset.mark) || dots.get(el.dataset.mark);
+      if (!row) return;
+      hideTip();
+      opts.onMenu?.({ kind: row.mark.kind, id: row.mark.id, label: row.mark.label || '', x: row.mark.x, y: row.mark.y }, { at, keys, el, mark: el.dataset.mark });
+    },
+    longPress: true,
+  });
+  // Nowhere else on the map opens a menu, and the browser's never opens over it.
+  root.addEventListener('contextmenu', (e) => e.preventDefault());
   hideBtn.addEventListener('click', () => opts.onHide?.());
   showBtn.addEventListener('click', () => opts.onShow?.());
   showBtn.addEventListener('keydown', (e) => {

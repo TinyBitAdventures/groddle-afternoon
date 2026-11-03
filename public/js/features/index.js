@@ -37,7 +37,7 @@ import { partySpacesFeature } from './party-spaces-feature.js?v=8d1a043a';
 import { seasonsFeature } from './seasons-feature.js?v=8206924b';
 import { cameraModeFeature } from './camera-mode-feature.js?v=ad1ae5ea';
 import { newxpFeature } from './newxp-feature.js?v=5109ff3e';
-import { streetMinimapFeature } from './street-minimap-feature.js?v=380c53d5';
+import { streetMinimapFeature } from './street-minimap-feature.js?v=4679baa5';
 
 export { questFlagsFeature };
 

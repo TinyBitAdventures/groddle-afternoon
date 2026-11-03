@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=117337d3';
 import { createFeatureHost } from './js/feature-host.js?v=903263a4';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=9060131a';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=f0a9f6f3';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -723,7 +723,7 @@ import { MODERN, onUiModeChange, uiState } from './js/classic/ui-mode.js?v=587c0
 // ZOOM: the world zoom (a device preference) and Classic's frame scale under it; both load before main().
 import { worldZoom, setWorldZoom, stepWorldZoom, onZoomChange, zoomKeyAction, zoomKeyToast } from './js/world-zoom.js?v=b262a6c7';
 import { nightTint, nightTintOn, onNightTintChange, worldTintOpacity } from './js/night-tint.js?v=1dfc9c89';
-import { streetMapSetting, toggleStreetMap } from './js/ui/street-minimap.js?v=abefc4d6';
+import { streetMapSetting, toggleStreetMap } from './js/ui/street-minimap.js?v=630b6a0a';
 import './js/classic/classic-zoom.js?v=1ef4b9a5';
 import { mountImaginationHub } from './js/ui/imagination-hub.js?v=31e8c38c';
 import { newDayBubble, shuffleNewDayMessages, waitForScreenGates } from './js/screen-queue.js?v=cf0132c0';
@@ -914,7 +914,7 @@ import { installHiresIcons } from './js/icon-hires.js?v=5b68aeaa';
 import { installHiresDecos } from './js/deco-hires.js?v=cb905e17';
 import { loadAudioLevels, loadMutedPreference, saveAudioLevel, saveMutedPreference } from './js/audio-pref.js?v=6fe817bc';
 import { createAudioBuses, fadeGain } from './js/audio-buses.js?v=af167b54';
-import { installTopBar, renderTopBar } from './js/ui/topbar.js?v=25559100';
+import { installTopBar, renderTopBar } from './js/ui/topbar.js?v=ee8111a2';
 import { focusBack, installFocusReturn, lastInput } from './js/ui/focus-return.js?v=c34f16a0';
 import { installContextGuard } from './js/ui/context-guard.js?v=0f71ac17';
 import { QUOIN_FRAME_BOB, advanceQuoinClock, quoinBobBetweenFrames } from './js/quoin-motion.js?v=ea0bd408';
@@ -955,7 +955,7 @@ import { itemZ } from './js/item-bands.js?v=e98b10bc';
 import { SLUG_ANIMATION, SLUG_LAYOUT, SLUG_STYLES, SLUG_TARGETS, drawSlugIcon, formatRawSlugs, formatSlugList, layoutSlugRow, slugBox, slugNumber, slugPillPath, slugSign, speechSlugList } from './js/speech-slugs.js?v=130338f9';
 import { filterText } from './js/word-filter.js?v=9a7a7ebb'; // the remake's own word filter
 // The interface skin (js/classic/ui-mode.js) sets <html data-ui> as it loads: before main(), so before the boot cover lifts.
-import { installInterfaceSettings } from './js/classic/classic-prefs.js?v=2261b80a';
+import { installInterfaceSettings } from './js/classic/classic-prefs.js?v=a8948b86';
 
 /** @type {object|null} assets/maps/index.json */
 let mapIndexCache = null;
@@ -11239,6 +11239,14 @@ const engine = {
   /** Whether that player's menu is open (a trigger's echo guard), and closing it. */
   isPlayerMenuOpen: (id) => Boolean(playerCtxMenu?.isOpenFor(`player:${Number(id) || 0}`)),
   closePlayerMenu: (opts) => playerCtxMenu?.close(opts),
+  /** RIGHTCLICK: a signpost on the minimap: Walk here and its arms (features/street-minimap-feature.js). */
+  openSignpostMenu: (opts) => openMinimapSignpostMenu(opts),
+  /** Whether a minimap mark's menu is open (its trigger's echo guard): a player's or a signpost's. */
+  isMinimapMenuOpen: (mark) => {
+    const m = String(mark || '');
+    // A dot is "player:<id>"; a signpost's mark is its own id (js/ui/street-minimap.js markButton).
+    return m.startsWith('player:') ? Boolean(playerCtxMenu?.isOpenFor(m)) : Boolean(worldCtxMenu?.isOpenFor(`minimap-sign:${m}`));
+  },
   beginVerb: (target, verb) => beginVerbAction(target, verb),
   /**
    * Multiplayer street objects: run a verb's effect now (the realtime server's
@@ -23297,6 +23305,51 @@ function openPlayerListMenu({ id, name = '', at = null, anchor = null, keys = fa
       // No Glitch to walk to (or a verb running): the row's own action, as the instant ones are.
       if (!now.sprite || (currentAction && !(Number(verb.durationMs) > 0))) executeVerb(now, verb.id);
       else requestVerb(now, verb);
+    },
+  });
+}
+
+/**
+ * RIGHTCLICK (audit later batch item 6): a signpost on the minimap (features/street-minimap-feature.js):
+ * Walk here (what a click on it does), then the post's arms, each taking its road as a click on
+ * that arm in the world does (takeSignBoard). `id`, `x`, `y`: the mark (js/ui/street-minimap.js
+ * signpostMarks / sceneSignMarks, street px). QA: contextMenu minimap-sign:<id>.
+ */
+function minimapSignViews(id, x, y) {
+  const key = String(id || '');
+  if (key.startsWith('scene:')) {
+    return sceneSignViews().filter((v) => Math.abs(Math.round(v.x) - x) <= 8 && Math.abs(Math.round(v.y) - y) <= 8);
+  }
+  const l = Number(currentStreet?.bounds?.l) || 0;
+  const t = Number(currentStreet?.bounds?.t) || 0;
+  const views = portalSprites || [];
+  const byId = views.filter((v) => v?.signpost && String(v.signpost.id || '') === key);
+  if (byId.length) return byId;
+  return views.filter((v) => v?.signpost && Math.abs(Number(v.signpost.x) - l - x) < 2 && Math.abs(Number(v.signpost.y) - t - y) < 2);
+}
+
+function openMinimapSignpostMenu({ id, x, y, at = null, anchor = null, keys = false, opener = null, findOpener = null, walk = null } = {}) {
+  const views = minimapSignViews(id, Number(x) || 0, Number(y) || 0);
+  const boards = views.flatMap((view) => (view.signBoards || []).map((board) => ({ board, view })));
+  const avail = availableStreetTsids();
+  const arms = signpostArmRows(boards, {
+    inGame: (board) => board.scene || Boolean(pickConnection({ connects: [board.connection] }, avail)),
+    label: signBoardLabel,
+    notInGame: ROAD_NOT_IN_GAME,
+  }).map((r) => ({ ...r, id: `arm${r.id}`, view: boards.find((b) => b.board === r.board)?.view }));
+  const rows = [{ id: 'walk', label: 'Walk here', tip: 'Walk to this signpost.' }, ...arms];
+  return worldContextMenu().open({
+    title: 'Signpost',
+    rows,
+    at,
+    anchor,
+    keys,
+    opener,
+    findOpener,
+    owner: `minimap-sign:${id}`,
+    onPick: (rowId, { row }) => {
+      if (rowId === 'walk') walk?.();
+      else if (row?.view && row.board) takeSignBoard({ view: row.view, board: row.board });
     },
   });
 }

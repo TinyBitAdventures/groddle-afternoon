@@ -27,13 +27,18 @@
  *   the keys back from a text field first, so the arrows and Space reach the avatar. While the
  *   walk runs its goal shows as a ring on the map (engine.userWalkGoal).
  *
+ * - RIGHTCLICK (right-click audit later batch item 6): a right-click, a long press, Shift+F10 or
+ *   the Menu key on another player's dot opens their menu (engine.openPlayerMenu: they are here, so
+ *   the whole world menu), on a signpost Walk here and its arms (engine.openSignpostMenu, game.js);
+ *   nothing else on the map opens one (menuFromMap).
+ *
  * Canvas data: streetMap (shown|off|no-map|hidden), streetMapFog, streetMapExpanded,
  * streetMapDots, streetMapDotIds, streetMapSigns, streetMapPicture (lines|snapshot),
  * streetMapSnapMs (the last snapshot's cost), streetMapSnaps (how many taken), streetMapWalk (the last click: kind:x, or
  * refused). QA: &streetmapexpand=1 expands it on each street.
  */
 
-import { createStreetMinimap, minimapVisibility, onStreetMapChange, sceneSignMarks, setStreetMap, snapshotStreetView, snapsWithScene, streetMapOn } from '../ui/street-minimap.js?v=abefc4d6';
+import { createStreetMinimap, minimapVisibility, onStreetMapChange, sceneSignMarks, setStreetMap, snapshotStreetView, snapsWithScene, streetMapOn } from '../ui/street-minimap.js?v=630b6a0a';
 import { classicArtUrl } from '../classic/classic-art.js?v=5745e669';
 import { onUiModeChange } from '../classic/ui-mode.js?v=587c014a';
 import { focusBack } from '../ui/focus-return.js?v=c34f16a0';
@@ -259,6 +264,21 @@ function sync(engine, force = false) {
   syncLiveScene(engine);
 }
 
+/**
+ * RIGHTCLICK: a mark's menu (the view's onMenu): a player's (their id and name) or a signpost's
+ * (Walk here, as a click on it, then its arms). Returns whether one opened.
+ */
+export function menuFromMap(engine, goal, { at = null, keys = false, el = null, mark = '' } = {}) {
+  const findOpener = () => (mark ? view?.root.querySelector(`[data-mark="${globalThis.CSS?.escape ? CSS.escape(mark) : mark}"]`) || null : null);
+  if (goal?.kind === 'player') {
+    return Boolean(engine.openPlayerMenu?.({ id: goal.id, name: goal.label, at, keys, anchor: el, opener: el, findOpener }));
+  }
+  if (goal?.kind === 'sign') {
+    return Boolean(engine.openSignpostMenu?.({ id: goal.id, x: goal.x, y: goal.y, at, keys, anchor: el, opener: el, findOpener, walk: () => walkFromMap(engine, goal, { keyboard: keys }) }));
+  }
+  return false;
+}
+
 /** MAPWALK: a click on the map (or Enter on a mark) walks you there. */
 export function walkFromMap(engine, goal, { keyboard = false, doc = globalThis.document } = {}) {
   if (!keyboard) {
@@ -292,6 +312,8 @@ export const streetMinimapFeature = {
       maxHeight: () => Math.max(120, (host.clientHeight || 600) * 0.55),
       onResnap: () => scheduleSnaps(engine, [60]),
       onWalk: (goal, how) => walkFromMap(engine, goal, how),
+      onMenu: (goal, how) => menuFromMap(engine, goal, how),
+      isMenuOpen: (mark) => Boolean(engine.isMinimapMenuOpen?.(mark)),
     });
     onStreetMapChange((on) => {
       sync(engine, true);
