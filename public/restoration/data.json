@@ -2691,132 +2691,132 @@
   ]
  },
  "release": {
-  "game": "0.15.0",
+  "game": "0.16.0",
   "deployed": "2026-11-03"
  },
  "git": {
-  "commits": 1157,
+  "commits": 1185,
   "since": "2026-10-19",
   "recent": [
    {
     "date": "2026-11-03",
-    "kind": "improve",
-    "text": "A report's picture opens over the game, not in a new browser tab"
+    "kind": "fix",
+    "text": "A long session no longer piles up every street's decorations in memory, which made Safari reload the page around Naraka"
+   },
+   {
+    "date": "2026-11-03",
+    "kind": "fix",
+    "text": "The ground under Valuka Himsa's bottom edge carries on as its red rock instead of a flat dark red block"
+   },
+   {
+    "date": "2026-11-03",
+    "kind": "fix",
+    "text": "The Map always shows the whole region on Safari, the Shortcuts open over it in full, and the region box is a search box"
    },
    {
     "date": "2026-11-03",
     "kind": "new",
-    "text": "Right-click a bag in the pack for its options"
+    "text": "A Contribute page: play and report, send original materials, or donate at Pot's shrine, with an open ledger"
    },
    {
     "date": "2026-11-03",
     "kind": "fix",
-    "text": "Item menus and the encyclopedia no longer cite the game's source files"
+    "text": "A player you block can't reach you through party chat, and their menu keeps only Un-Block and Friends"
    },
    {
     "date": "2026-11-03",
     "kind": "fix",
-    "text": "Clicking Mute, a switch or a slider gives the keys back to the world, so Space jumps"
-   },
-   {
-    "date": "2026-11-03",
-    "kind": "fix",
-    "text": "A Ticket to Paradise used in your house brings you back into your house"
-   },
-   {
-    "date": "2026-11-03",
-    "kind": "fix",
-    "text": "After a click opens a window, Esc gives the keys back to the world, so Space jumps"
-   },
-   {
-    "date": "2026-11-03",
-    "kind": "improve",
-    "text": "The start card lists V for a vendor nearby again"
+    "text": "A player's menu opened by a click on a name keeps the keys, and shows whole beside the Classic chat column"
    },
    {
     "date": "2026-11-03",
     "kind": "new",
-    "text": "Your looks in the character builder: the looks you have worn, one click to wear again or remove"
+    "text": "Right-click a storage slot to take it out, or a vendor's item to buy one or as many as you can"
    },
    {
     "date": "2026-11-03",
     "kind": "new",
-    "text": "F asks \"Eat what?\" with the best food picked, / jumps to chat and R opens Report a bug"
-   },
-   {
-    "date": "2026-11-03",
-    "kind": "improve",
-    "text": "Clicking the street name at the top opens the Map"
+    "text": "Right-click another player's dot on the minimap for their menu, or a signpost to walk there or take a road"
    },
    {
     "date": "2026-11-03",
     "kind": "new",
-    "text": "Open your cabinets, and sell from a Storage Display Box to visitors"
-   },
-   {
-    "date": "2026-11-03",
-    "kind": "new",
-    "text": "Your whole home street goes on your profile, so visitors can look along it like Camera Mode"
-   },
-   {
-    "date": "2026-11-03",
-    "kind": "fix",
-    "text": "The Esquibeth notes and the tour Chain read \"In the remake\" on their encyclopedia pages"
-   },
-   {
-    "date": "2026-11-03",
-    "kind": "fix",
-    "text": "A tree, rock or Piggy is never set where you can't reach it from beside it"
-   },
-   {
-    "date": "2026-11-03",
-    "kind": "fix",
-    "text": "The new broken tool icons and the changed encyclopedia and ecology files load fresh, not from an old cache"
-   },
-   {
-    "date": "2026-11-03",
-    "kind": "fix",
-    "text": "The encyclopedia knows the notes and things you find in quest rooms"
-   },
-   {
-    "date": "2026-11-03",
-    "kind": "fix",
-    "text": "Encyclopedia text reads right when copied or read aloud"
+    "text": "Right-click a conversation in Chats to open it, close it, leave the party or see who is there"
    },
    {
     "date": "2026-11-03",
     "kind": "improve",
-    "text": "The Map shows which streets are still under construction"
+    "text": "The Map's street menu is the game's own menu, and a right-click opens it too"
+   },
+   {
+    "date": "2026-11-03",
+    "kind": "new",
+    "text": "A buddy's row opens their menu, in the Buddies tab and in Manage buddies"
+   },
+   {
+    "date": "2026-11-03",
+    "kind": "new",
+    "text": "A player's name in any chat opens their menu, by a click or a right-click"
+   },
+   {
+    "date": "2026-11-03",
+    "kind": "new",
+    "text": "Another player's menu opens from a list too, with the rows that work when they are not on your street"
+   },
+   {
+    "date": "2026-11-03",
+    "kind": "improve",
+    "text": "The encyclopedia leaves out blank pages: never finished, no picture, no description and nothing that uses them"
+   },
+   {
+    "date": "2026-11-03",
+    "kind": "new",
+    "text": "The road from Yellow Yawning into Xalanga is open from the start, so To Xalanga, And Beyond can be done"
+   },
+   {
+    "date": "2026-11-03",
+    "kind": "new",
+    "text": "A quest that needs a street no road reaches yet waits: it is not offered, and one you have shows On hold until the road is built"
    },
    {
     "date": "2026-11-03",
     "kind": "fix",
-    "text": "Every star in Constellation shows, clear of the windows and the EXIT door"
+    "text": "Planting and picking a garden plot by hand counts for your quests and garden badges again"
    },
    {
     "date": "2026-11-03",
     "kind": "fix",
-    "text": "A broken pick no longer swings, and broken picks, hoes and grinders look broken in the pack"
+    "text": "The Classic right-click menu takes its layer from the tokens"
+   },
+   {
+    "date": "2026-11-03",
+    "kind": "new",
+    "text": "Right-click a Quests card to pin, unpin, open or start it"
    },
    {
     "date": "2026-11-03",
     "kind": "fix",
-    "text": "Include the game's UI shows unticked when no picture goes, and you can search your reports"
+    "text": "In Decorate and Cultivate a right-click no longer opens the browser's menu over a piece's actions"
    },
    {
     "date": "2026-11-03",
-    "kind": "fix",
-    "text": "Rocks, quoins and Musicblocks no longer sit on floors nobody can reach"
+    "kind": "new",
+    "text": "Open Profile Page in another player's menu, by a left or a right click"
    },
    {
     "date": "2026-11-03",
-    "kind": "fix",
-    "text": "No blue line around the whole screen when the game gets the keyboard back"
+    "kind": "new",
+    "text": "Right-click a stack or a tool in the pack for its menu"
    },
    {
     "date": "2026-11-03",
-    "kind": "fix",
-    "text": "After visiting a friend's home from yours, the World menu's Home offers Teleport home again"
+    "kind": "new",
+    "text": "Right-click a tree, an animal or anything in the world for its menu"
+   },
+   {
+    "date": "2026-11-03",
+    "kind": "improve",
+    "text": "One right-click menu for the HUD, drawn in both skins"
    }
   ]
  },
