@@ -27,9 +27,9 @@ import {
   populationForStreet,
   setStreetEcologyCatalog,
   streetReservedSpots,
-} from '../public/js/street-ecology.js?v=75086599';
+} from '../public/js/street-ecology.js?v=53cdde1b';
 import { placementRequests } from '../tools/build-realtime-objects.mjs';
-import { adoptedPlan } from '../public/js/features/patches-feature.js?v=ed2f7ee8';
+import { adoptedPlan } from '../public/js/features/patches-feature.js?v=bbdfcb06';
 import { createPlot } from '../public/js/patches.js?v=6bfdcfa9';
 import { serverPath, skipWithoutServer } from '../tools/repos.mjs';
 

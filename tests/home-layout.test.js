@@ -20,7 +20,7 @@ import {
 } from '../public/js/home-layout.js?v=43e1bf99';
 import { walkHomeScene } from '../public/js/home-layout-scene.js?v=888aa199';
 import { AVATAR_STILL, homeKeyOf } from '../public/js/profiles.js?v=174a1a84';
-import { HOUSE_STYLE_KEYS } from '../public/js/features/homes-feature.js?v=8bfb6cb1';
+import { HOUSE_STYLE_KEYS } from '../public/js/features/homes-feature.js?v=c5debf49';
 import { SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');

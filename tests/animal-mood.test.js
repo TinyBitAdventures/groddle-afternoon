@@ -29,13 +29,13 @@ import {
   piggyTwiceDailyTick,
   piggyWalkSpeed,
 } from '../public/js/animal-mood.js?v=a49495fc';
-import { createAnimalState, animalStatusLabel, resetAnimalDay } from '../public/js/animals.js?v=1b6a9bf0';
+import { createAnimalState, animalStatusLabel, resetAnimalDay } from '../public/js/animals.js?v=630619c4';
 import { performAnimalKinship } from '../public/js/animal-kinship.js?v=695ad092';
-import { advanceYard, capturePiggy, captureVerbState, feedPiggyStack, normalizeHusbandryPack } from '../public/js/animal-husbandry.js?v=b64fe814';
-import { getVerbsFor, runVerb } from '../public/content.js?v=61c5424d';
-import { animalMoodFeature, describeAnimalPlace } from '../public/js/features/animal-mood-feature.js?v=dc6ebb6c';
+import { advanceYard, capturePiggy, captureVerbState, feedPiggyStack, normalizeHusbandryPack } from '../public/js/animal-husbandry.js?v=8de6bc84';
+import { getVerbsFor, runVerb } from '../public/content.js?v=47edbd39';
+import { animalMoodFeature, describeAnimalPlace } from '../public/js/features/animal-mood-feature.js?v=8c155589';
 import { remakeStatus } from '../public/js/imagination-remake.js?v=ca0a48d5';
-import { animalHusbandryFeature, deathRollFor, normalizeHusbandrySlot } from '../public/js/features/animal-husbandry-feature.js?v=37a4d876';
+import { animalHusbandryFeature, deathRollFor, normalizeHusbandrySlot } from '../public/js/features/animal-husbandry-feature.js?v=0c55d2d3';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const GSJS = join(homedir(), 'Documents/glitch-audit/glitch-GameServerJS/items');

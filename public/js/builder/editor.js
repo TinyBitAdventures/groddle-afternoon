@@ -39,14 +39,14 @@
 import { buildStreetView, loadDecoManifest, loadSignpostTextures, DECO_TWINS, flashBlurSize } from '../street-render.js?v=f98221f2';
 import { worldToScreen, platformsScreen, isStandable, streetWidth, streetHeight, navigableSignposts } from '../street-model.js?v=505d8990';
 import { ensureStreetIndex, STREET_INDEX, resolveIndexTsid } from '../street-loader.js?v=33d2b8bc';
-import { loadStreetEcologyCatalog, ecologyForStreet } from '../street-ecology.js?v=75086599';
+import { loadStreetEcologyCatalog, ecologyForStreet } from '../street-ecology.js?v=53cdde1b';
 import { createBuilderApi } from './api.js?v=9560d68f';
 import { DraftSession, statusWords, SAVE_MS, POLL_MS } from './session.js?v=e3e42dc2';
 import { forkStreet, forkOps, newTsid, streetKeyFrom, relayerPosition, isLayerLocal, withDecoIds, floorUnder, libraryAsset, screenToDeco, streetWithEdits, editsOn, linkEdit } from './zone.js?v=dff4acc0';
 import { mountPicker, PICK_MIME } from './editor-picker.js?v=724352b6';
 import { newDraftDialog, newStreetDialog, hubMapDialog, populationSection, zoneSection, plannedSpots, SPOT_GROUPS, spotGroup } from './editor-zone.js?v=03afc47c';
 import { decoFor, NEW_ART_BUNDLE } from './deco-search.js?v=fda9b16b';
-import { populationForStreet, planStreetPlacements, streetReservedSpots } from '../street-ecology.js?v=75086599';
+import { populationForStreet, planStreetPlacements, streetReservedSpots } from '../street-ecology.js?v=53cdde1b';
 import { nextDecoId, findDeco, applyOps } from './ops.js?v=27c7796f';
 import { postOffFloor, offFloorWords, settlePostOps, arrivalOps, followPostOps } from './posts.js?v=3f65c33b';
 import { decoBox, contains, handlePoints, resizeBy, rotationTo, meetsRect, corners } from './handles.js?v=0a4b08d0';
@@ -737,7 +737,7 @@ async function boot() {
   }
   function loadValidateMod() {
     if (S.validateModLoading) return;
-    S.validateModLoading = import('./validate.js?v=c3df8fc4').then((m) => { S.validateMod = m; S.geoDrawn = ''; }).catch(() => { S.validateModLoading = null; });
+    S.validateModLoading = import('./validate.js?v=3b7df9e3').then((m) => { S.validateMod = m; S.geoDrawn = ''; }).catch(() => { S.validateModLoading = null; });
   }
 
   /** The reach to draw: the validator's for a draft street, else the one worked out here. */
@@ -2482,7 +2482,7 @@ async function boot() {
     // `new URL(...)` written here would not be keyed by tools/module-keys).
     if (!V.workerUrl) {
       if (!V.loading) {
-        V.loading = import('./validate-worker.js?v=65f6be0c').then((m) => { V.workerUrl = m.WORKER_URL; V.dataPaths = m.VALIDATOR_DATA; runValidate(); }).catch(() => { V.state = 'off'; ensureLocalReach(); });
+        V.loading = import('./validate-worker.js?v=9990c7c5').then((m) => { V.workerUrl = m.WORKER_URL; V.dataPaths = m.VALIDATOR_DATA; runValidate(); }).catch(() => { V.state = 'off'; ensureLocalReach(); });
       }
       return null;
     }

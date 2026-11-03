@@ -27,7 +27,7 @@ import {
   createResourceNode,
 } from '../public/js/resource-nodes.js?v=a3c19f90';
 import { createFeatureHost, normalizeFeatureSlices } from '../public/js/feature-host.js?v=903263a4';
-import { populationForStreet, planStreetPlacements } from '../public/js/street-ecology.js?v=75086599';
+import { populationForStreet, planStreetPlacements } from '../public/js/street-ecology.js?v=53cdde1b';
 import { STORE_CATALOG } from '../public/js/store-catalog.js?v=79d4de8a';
 
 const population = (classes) => ({ resourceNodeClasses: classes });

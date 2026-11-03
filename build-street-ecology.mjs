@@ -419,5 +419,13 @@ const catalog = {
 };
 
 mergeZoneEcology(catalog, listZones(files(root)).map((z) => z.zone));
+// Ticket 64: the unreached floor runs are built by tools/ecology/build-unreached-floors.mjs
+// (a few minutes of reach graphs); carry them over from the file this run replaces.
+try {
+  const before = JSON.parse(await readFile(outputPath, 'utf8'));
+  if (before.unreachedFloors) Object.assign(catalog, { unreachedFloorsNote: before.unreachedFloorsNote, unreachedFloors: before.unreachedFloors });
+} catch {
+  // No catalog yet: run tools/ecology/build-unreached-floors.mjs after this.
+}
 await writeFile(outputPath, `${JSON.stringify(catalog, null, 2)}\n`);
 console.log(`Wrote ${catalog.streetCount} official street ecologies${catalog.zoneStreetCount ? ` and ${catalog.zoneStreetCount} from published zones` : ''} to ${outputPath}`);

@@ -192,6 +192,47 @@ export async function loadStreetEcologyCatalog(fetchImpl = globalThis.fetch) {
   return catalog;
 }
 
+/**
+ * Ticket 64: the floor runs nobody reaches on a street ({ [line id]: [[x1, x2]] },
+ * screen x), from the catalog's unreachedFloors section (tools/ecology/build-unreached-floors.mjs:
+ * the builder's reach graph from every arrival; each line's runs kept as "x1-x2 x1-x2").
+ * The planner puts nothing there. Null: none known.
+ */
+export function unreachedFloorsFor(tsid, source = catalog) {
+  for (const alias of streetEcologyAliases(tsid)) {
+    const row = source?.unreachedFloors?.[alias];
+    if (row) return parseUnreachedRow(row);
+  }
+  return null;
+}
+
+const unreachedParsed = new WeakMap();
+function parseUnreachedRow(row) {
+  if (unreachedParsed.has(row)) return unreachedParsed.get(row);
+  const out = {};
+  for (const [line, runs] of Object.entries(row)) {
+    out[line] = Array.isArray(runs) ? runs : String(runs).split(' ').map((r) => r.split('-').map(Number)).filter((r) => r.length === 2 && r.every(Number.isFinite));
+  }
+  unreachedParsed.set(row, out);
+  return out;
+}
+
+/** PURE: whether x on `line` is in one of the street's unreached runs. */
+export function inUnreachedRun(unreached, line, x) {
+  const runs = unreached && line?.id != null ? unreached[line.id] : null;
+  return Boolean(runs && runs.some(([lo, hi]) => x >= lo && x <= hi));
+}
+
+/** PURE: a line no arrival reaches anywhere along it (its runs cover it end to end). */
+function wholeLineUnreached(unreached, line) {
+  const runs = unreached && line?.id != null ? unreached[line.id] : null;
+  if (!runs) return false;
+  const lo = Math.min(line.x1, line.x2);
+  const hi = Math.max(line.x1, line.x2);
+  // Stand points start 24 px in from the street's edges (reach-graph.js buildReachGraph).
+  return runs.some(([a, b]) => a <= lo + 28 && b >= hi - 28);
+}
+
 export function ecologyForStreet(tsid, source = catalog) {
   for (const alias of streetEcologyAliases(tsid)) {
     if (source?.streets?.[alias]) return source.streets[alias];
@@ -633,7 +674,7 @@ function roomAt(spans, x) {
 }
 
 /** Build dense, stable candidates along the lower reachable platform bands. */
-export function buildPlatformCandidates(platforms, { worldW = 2500, seed = '' } = {}) {
+export function buildPlatformCandidates(platforms, { worldW = 2500, seed = '', unreached = null } = {}) {
   // Only lines the avatar stands on (street-model.js isStandable): an underside or
   // ceiling (pc_perm 1) floats a tree (the cave roof on Meadow's Edge), and a soft
   // line (pc_perm 0) is one the player falls through, so a spot there (the arrival
@@ -641,10 +682,16 @@ export function buildPlatformCandidates(platforms, { worldW = 2500, seed = '' } 
   // Each spot also says whether the line holds items (`item`, isItemSolid): every
   // planned thing is an item in the original and needs one (planStreetPlacements);
   // only the arrival goes by the avatar's rule alone.
-  const clean = (platforms || []).filter((platform) => {
+  // Ticket 64: nor a floor nobody gets to (unreachedFloorsFor): Level 3 East's floor
+  // line under the whole cave walk held its rocks, quoins and Musicblock. In the
+  // original they were set by hand where a player reaches them.
+  const standable = (platforms || []).filter((platform) => {
     return [platform?.x1, platform?.y1, platform?.x2, platform?.y2].every(Number.isFinite)
       && isStandable(platform);
   });
+  const reachable = unreached ? standable.filter((platform) => !wholeLineUnreached(unreached, platform)) : standable;
+  const clean = reachable.length ? reachable : standable;
+  const skipRuns = reachable.length ? unreached : null;
   if (!clean.length) {
     return Array.from({ length: 32 }, (_, index) => ({
       id: `fallback:${index}`,
@@ -684,6 +731,7 @@ export function buildPlatformCandidates(platforms, { worldW = 2500, seed = '' } 
       const x = platform.x1 + (platform.x2 - platform.x1) * t;
       const y = platform.y1 + (platform.y2 - platform.y1) * t;
       if (x < 34 || x > worldW - 34) continue;
+      if (skipRuns && inUnreachedRun(skipRuns, platform, x)) continue;
       const key = `${Math.round(x / 22)}:${Math.round(y / 14)}`;
       if (seen.has(key)) continue;
       seen.add(key);
@@ -741,15 +789,18 @@ function scaledDistance(a, b, verticalScale = 1.75) {
  * spot is left the thing goes on the best covering one and the plan lists it
  * under `blocked` ({ key, index, fixture }).
  *
+ * Ticket 64: no spot is on a floor run no arrival reaches (`unreached`, by default
+ * the catalog's unreachedFloorsFor(`tsid`), `tsid` defaulting to the seed).
+ *
  * @param {any[]} platforms
  * @param {{key:string,count:number,clearance:number,footprint?:number}[]} requests
  */
 export function planStreetPlacements(
   platforms,
   requests,
-  { worldW = 2500, seed = '', reserved = [] } = {}
+  { worldW = 2500, seed = '', reserved = [], tsid = seed, unreached = unreachedFloorsFor(tsid) } = {}
 ) {
-  const candidates = buildPlatformCandidates(platforms, { worldW, seed });
+  const candidates = buildPlatformCandidates(platforms, { worldW, seed, unreached });
   const occupied = (reserved || []).filter((p) => Number.isFinite(p?.x) && Number.isFinite(p?.y))
     .map((point, index) => ({ ...point, key: point.key || `reserved:${index}`, clearance: whole(point.clearance, 120, 600) }));
   const fixtures = occupied.filter((point) => point.block);

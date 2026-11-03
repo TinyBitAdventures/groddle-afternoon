@@ -13,7 +13,7 @@ import {
   planStreetPlacements,
   nearestPlacementGap,
   STREET_ECOLOGY_URL,
-} from '../public/js/street-ecology.js?v=75086599';
+} from '../public/js/street-ecology.js?v=53cdde1b';
 import {
   platformsScreen,
   platformYAt,
