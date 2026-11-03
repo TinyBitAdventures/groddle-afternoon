@@ -510,10 +510,11 @@ function createSession(engine) {
     }
   });
   client.on('roster', syncRoster);
-  client.on('joined', (p) => addLog({ note: true, text: `${p.name} is here.` }));
+  // Someone you block comes and goes unannounced (Glitch's chatUpdate dropped every line about an ignored player, RightSideManager.as 218-223).
+  client.on('joined', (p) => { if (!engine.query?.('realtimeHidden', p.id)) addLog({ note: true, text: `${p.name} is here.` }); });
   client.on('left', ({ id }) => {
     const r = remotes.get(id);
-    if (r) addLog({ note: true, text: `${r.name} left.` });
+    if (r && !engine.query?.('realtimeHidden', id)) addLog({ note: true, text: `${r.name} left.` });
   });
   client.on('moved', (p) => {
     const r = remotes.get(p.id);

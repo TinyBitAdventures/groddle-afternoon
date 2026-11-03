@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=117337d3';
 import { createFeatureHost } from './js/feature-host.js?v=903263a4';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=d14d9a04';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=250ea9e7';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -723,7 +723,7 @@ import { MODERN, onUiModeChange, uiState } from './js/classic/ui-mode.js?v=587c0
 // ZOOM: the world zoom (a device preference) and Classic's frame scale under it; both load before main().
 import { worldZoom, setWorldZoom, stepWorldZoom, onZoomChange, zoomKeyAction, zoomKeyToast } from './js/world-zoom.js?v=b262a6c7';
 import { nightTint, nightTintOn, onNightTintChange, worldTintOpacity } from './js/night-tint.js?v=1dfc9c89';
-import { streetMapSetting, toggleStreetMap } from './js/ui/street-minimap.js?v=49eecba5';
+import { streetMapSetting, toggleStreetMap } from './js/ui/street-minimap.js?v=ce66d251';
 import './js/classic/classic-zoom.js?v=1ef4b9a5';
 import { mountImaginationHub } from './js/ui/imagination-hub.js?v=1d96f241';
 import { newDayBubble, shuffleNewDayMessages, waitForScreenGates } from './js/screen-queue.js?v=cf0132c0';
@@ -914,7 +914,7 @@ import { installHiresIcons } from './js/icon-hires.js?v=5b68aeaa';
 import { installHiresDecos } from './js/deco-hires.js?v=cb905e17';
 import { loadAudioLevels, loadMutedPreference, saveAudioLevel, saveMutedPreference } from './js/audio-pref.js?v=6fe817bc';
 import { createAudioBuses, fadeGain } from './js/audio-buses.js?v=af167b54';
-import { installTopBar, renderTopBar } from './js/ui/topbar.js?v=47cf20b2';
+import { installTopBar, renderTopBar } from './js/ui/topbar.js?v=5135f874';
 import { focusBack, installFocusReturn, lastInput } from './js/ui/focus-return.js?v=da190597';
 import { installContextGuard } from './js/ui/context-guard.js?v=0f71ac17';
 import { QUOIN_FRAME_BOB, advanceQuoinClock, quoinBobBetweenFrames } from './js/quoin-motion.js?v=ea0bd408';
@@ -923,12 +923,12 @@ import { denseSprite } from './js/sprite-dense.js?v=178a711b';
 import { wholeStatAmounts, wholeEffects } from './js/stat-text.js?v=f96d8fd3';
 import { createNotifier, effectTokens, floatKey, offerCardDrop, stackFloat, tokenText } from './js/notify.js?v=d85330ff';
 import { mountNotifyView } from './js/notify-view.js?v=81d06119';
-import { mountSocialDrawer } from './js/ui/social-drawer.js?v=eeffcc39';
+import { mountSocialDrawer } from './js/ui/social-drawer.js?v=d008629d';
 import { bindDragScroll } from './js/ui/drag-scroll.js?v=9a527ac8';
 import { SIDE_SHEET_IDS, bindTabs, inSideSheet, mountPanelShell, sheetKeyToWorld } from './js/ui/panel-shell.js?v=6812fe04';
-import { createQuestSheet, questStep } from './js/ui/quest-sheet.js?v=87d411e8';
-import { createQuestTracker } from './js/ui/quest-tracker.js?v=e0f370ff';
-import { bindContextTrigger, createContextMenu, isContextMenuKey as isMenuKey, MORE_KEYS_LABEL } from './js/ui/context-menu.js?v=9c02015d';
+import { createQuestSheet, questStep } from './js/ui/quest-sheet.js?v=6ae8ede0';
+import { createQuestTracker } from './js/ui/quest-tracker.js?v=05d7910b';
+import { bindContextTrigger, createContextMenu, isContextMenuKey as isMenuKey, MORE_KEYS_LABEL } from './js/ui/context-menu.js?v=e2993b1c';
 import { bindCountField, countKeyValue, countStepMarkup } from './js/ui/count-chooser.js?v=893305c8';
 import { bindVerbMenu, focusVerbRow, lockVerbMenuSize, makePickTile, makeVerbRow, pickGridCols, placeVerbMenu, plainWords, refuseVerbRow, syncVerbDetail, verbMenuKey, verbRowAttrs, verbRowInner, verbRowKeys } from './js/ui/verb-menu.js?v=74b6dfa0';
 import { createPromptSettler, promptId } from './js/prompt-settle.js?v=509ba9cc';
@@ -936,7 +936,7 @@ import { clientKeyAction, createHotkeysSheet, isHotkeySheetRelease, isPlainKey }
 import { EAT_PICK_TEXT, bestFoodIndex, eatChoices, eatTip } from './js/eat-pick.js?v=8fb763d0';
 import { installHeldKeyGuard, isMacPlatform } from './js/held-keys.js?v=98b96620';
 import { signpostArmRows, worldContextAction } from './js/world-context-menu.js?v=f3f48805';
-import { listPlayerTarget, opensPlayerMenu, playerMenuRows } from './js/ui/player-menu.js?v=1dd2cf52';
+import { blockedPlayerVerbs, listPlayerTarget, opensPlayerMenu, playerMenuRows } from './js/ui/player-menu.js?v=4c174d02';
 import { forgetTexture, frameTexture, isFailed, isLoaded, onFailed, onLoaded, textureFromUrl, whenLoaded } from './js/textures.js?v=db2ce452';
 import { FALLBACK_MAX as WORLD_ART_FALLBACK_MAX, worldArtFor } from './js/world-art.js?v=df476660';
 import { sceneAnim, syncAnim } from './js/deco-anim.js?v=6f548fd1';
@@ -955,7 +955,7 @@ import { itemZ } from './js/item-bands.js?v=e98b10bc';
 import { SLUG_ANIMATION, SLUG_LAYOUT, SLUG_STYLES, SLUG_TARGETS, drawSlugIcon, formatRawSlugs, formatSlugList, layoutSlugRow, slugBox, slugNumber, slugPillPath, slugSign, speechSlugList } from './js/speech-slugs.js?v=130338f9';
 import { filterText } from './js/word-filter.js?v=9a7a7ebb'; // the remake's own word filter
 // The interface skin (js/classic/ui-mode.js) sets <html data-ui> as it loads: before main(), so before the boot cover lifts.
-import { installInterfaceSettings } from './js/classic/classic-prefs.js?v=5dad1dff';
+import { installInterfaceSettings } from './js/classic/classic-prefs.js?v=a20020a9';
 
 /** @type {object|null} assets/maps/index.json */
 let mapIndexCache = null;
@@ -7356,7 +7356,7 @@ function menuVerbsFor(target) {
   // Legalize It's steps on the station's stairs and the street's hall door (legalizeRealTarget).
   target = legalizeRealTarget(target) || target;
   // A feature may take over any target's menu (rooked trees/animals, shrines under attack).
-  return features.query('verbOverride', target, engine) ?? features.verbsFor(target, engine) ?? features.decorateVerbs(target, getVerbsFor(target, {
+  const verbs = features.query('verbOverride', target, engine) ?? features.verbsFor(target, engine) ?? features.decorateVerbs(target, getVerbsFor(target, {
     pc,
     inv,
     tools: toolState,
@@ -7366,6 +7366,9 @@ function menuVerbsFor(target) {
     achievements: achieveState.unlocked || [],
     streetTsid: currentStreetTsid,
   }), engine);
+  // Another player you block (buddies-feature realtimeHidden): only the rows Glitch kept (js/ui/player-menu.js).
+  if (target?.classId === 'pc_remote' && target.playerId && features.query('realtimeHidden', Number(target.playerId), engine)) return blockedPlayerVerbs(verbs);
+  return verbs;
 }
 
 function openVerbMenu(target) {
@@ -11236,6 +11239,8 @@ const engine = {
    * { id, name, at, anchor, keys, opener, findOpener, before, after, omit, layer }; false for you.
    */
   openPlayerMenu: (opts) => openPlayerListMenu(opts),
+  /** A player's menu, open now, drawn again from their verbs (features/profiles-feature.js: a page lookup answered). */
+  refreshPlayerMenu: (id) => refreshPlayerMenus(id),
   /** Whether that player's menu is open (a trigger's echo guard), and closing it. */
   isPlayerMenuOpen: (id) => Boolean(playerCtxMenu?.isOpenFor(`player:${Number(id) || 0}`)),
   closePlayerMenu: (opts) => playerCtxMenu?.close(opts),
@@ -23276,11 +23281,15 @@ function selfPlayerId() {
   return Number(features.query('realtimeClient', engine)?.me?.id) || 0;
 }
 
+/** The name the open player menu was made with (refreshPlayerMenus draws its rows again from it). */
+let playerListMenuName = '';
+
 function openPlayerListMenu({ id, name = '', at = null, anchor = null, keys = false, opener = null, findOpener = null, before = [], after = [], omit = [], layer = '' } = {}) {
   if (GAME_MODE !== 'multiplayer' || !opensPlayerMenu(id, selfPlayerId())) return false;
   const pid = Number(id);
   const here = streetPlayerTarget(pid);
   const target = here || listPlayerTarget({ id: pid, name });
+  playerListMenuName = target.label;
   const rows = [...before, ...playerMenuRows(menuVerbsFor(target) || [], { here: Boolean(here), omit }), ...after];
   return playerContextMenu().open({
     title: here?.label || target.label,
@@ -23308,6 +23317,33 @@ function openPlayerListMenu({ id, name = '', at = null, anchor = null, keys = fa
       else requestVerb(now, verb);
     },
   });
+}
+
+/**
+ * A player's menu open now, drawn again from their verbs as they are now (a row's state changed:
+ * features/profiles-feature.js once a page lookup answers): the menu from a list updates its rows
+ * in place, the world's verb menu on their Glitch (at its verbs, not a picker) is drawn again with
+ * the focus where it was. Returns whether a menu was open for them.
+ */
+function refreshPlayerMenus(id) {
+  const pid = Number(id) || 0;
+  if (!pid) return false;
+  let open = false;
+  if (playerCtxMenu?.isOpenFor(`player:${pid}`)) {
+    open = true;
+    const here = streetPlayerTarget(pid);
+    const target = here || listPlayerTarget({ id: pid, name: playerListMenuName });
+    playerCtxMenu.update(playerMenuRows(menuVerbsFor(target) || [], { here: Boolean(here) }));
+  }
+  const menu = document.getElementById('verb-menu');
+  if (menuTarget?.classId === 'pc_remote' && Number(menuTarget.playerId) === pid && menu && !menu.hidden && !menu.dataset.vmLevel) {
+    open = true;
+    const rows = [...menu.querySelectorAll('.vm-row')];
+    const at = rows.indexOf(document.activeElement);
+    renderVerbMenu(menuTarget, menuVerbsFor(menuTarget));
+    if (at >= 0) focusVerbRow(menu, at);
+  }
+  return open;
 }
 
 /**

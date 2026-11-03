@@ -691,6 +691,8 @@ function createSession(engine, client) {
     const from = n0(msg.from?.id);
     const text = String(msg.text || '');
     if (!from || !text) return;
+    // Someone you block: the server never tells you (requests.go toStreet); nor does the game.
+    if (msg.mine !== true && engine.query?.('realtimeHidden', from)) return;
     const timeout = Math.max(1, Math.min(300, n0(msg.timeout) || 300));
     if (msg.mine === true) {
       if (myRequest) engine.removePrompt?.(myRequest);

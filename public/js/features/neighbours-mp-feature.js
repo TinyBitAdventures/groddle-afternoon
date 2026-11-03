@@ -1136,6 +1136,11 @@ function createSession(engine, client) {
   client.on('msg:home_knocked', (msg) => {
     const id = Number(msg.id) || 0;
     if (!id) return;
+    // Someone you block: the server refuses their knock (homes.go blocked); if one comes, it goes unanswered.
+    if (engine.query?.('realtimeHidden', id)) {
+      client.send('home_answer', { id, allow: false });
+      return;
+    }
     engine.playSound?.('POL_GATE_KNOCKED', { volume: 0.7 });
     const text = String(msg.text || T.knocking(String(msg.name || 'Someone')));
     last = text;

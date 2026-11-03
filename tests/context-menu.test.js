@@ -15,7 +15,7 @@ import { fileURLToPath } from 'node:url';
 import { FakeEl, matches } from './social-fake-dom.js';
 import {
   bindContextTrigger, createContextMenu, isContextMenuKey, placeContextMenu, ECHO_MS, LONG_PRESS_MS, MORE_KEYS_LABEL,
-} from '../public/js/ui/context-menu.js?v=9c02015d';
+} from '../public/js/ui/context-menu.js?v=e2993b1c';
 
 const PUBLIC = join(dirname(fileURLToPath(import.meta.url)), '../public');
 const read = (p) => readFileSync(join(PUBLIC, p), 'utf8');
@@ -30,6 +30,13 @@ class El extends FakeEl {
     return null;
   }
   get ownerDocument() { return globalThis.document; }
+  replaceWith(n) {
+    const p = this.parentElement;
+    const i = p.children.indexOf(this);
+    p.adopt([n]);
+    p.children.splice(i, 1, n);
+    this.parentElement = null;
+  }
   get isConnected() { for (let n = this; n; n = n.parentElement) if (n === globalThis.document.body) return true; return false; }
 }
 
@@ -99,6 +106,24 @@ describe('the shared context menu (js/ui/context-menu.js)', () => {
     assert.equal(s.data.contextMenu, 'quest-card:porcine');
     assert.equal(el.style.left, '300px');
     assert.equal(el.style.top, '160px', 'in the host\'s px');
+  });
+
+  it('update() draws a changed row again in place: its key cap, the focus, and a pick by its new state', () => {
+    const picks = [];
+    const LOOKING = { id: 'profile', label: 'Open Profile Page', tip: 'Their page.', disabled: true, reason: 'Looking for their page.' };
+    s.menu.open({ rows: [LOOKING, ...ROWS.slice(0, 2)], keys: true, onPick: (id) => picks.push(id) });
+    const el = s.menu.element();
+    el.querySelectorAll('.vm-row')[0].focus();
+    assert.equal(s.menu.update([LOOKING, { ...ROWS[0] }]), 0, 'nothing changed: nothing drawn again');
+    assert.equal(s.menu.update([{ ...LOOKING, disabled: false, reason: '' }, { id: 'not-open', label: 'X' }]), 1, 'a row that is not open is not added');
+    const rows = el.querySelectorAll('.vm-row');
+    assert.deepEqual(rows.map((r) => r.dataset.ctxRow), ['profile', 'pin', 'open']);
+    assert.equal(rows[0].getAttribute('aria-disabled'), null);
+    assert.match(rows[0]._html, /vm-key kcap" aria-hidden="true">1</);
+    assert.equal(s.doc.activeElement, rows[0], 'the focus stays on the row');
+    rows[0].dispatch('click');
+    assert.deepEqual(picks, ['profile']);
+    assert.equal(s.menu.update([LOOKING]), 0, 'closed: nothing to update');
   });
 
   it('a pick closes it and runs the row; a disabled row says why and does nothing', () => {

@@ -22,9 +22,9 @@ import {
   normalState,
   refusalText,
 } from '../public/js/player-im.js?v=04c55d2f';
-import { playerImFeature } from '../public/js/features/player-im-feature.js?v=17dd1b9c';
-import { FEATURES } from '../public/js/features/index.js?v=d14d9a04';
-import { mountSocialDrawer } from '../public/js/ui/social-drawer.js?v=eeffcc39';
+import { playerImFeature } from '../public/js/features/player-im-feature.js?v=8bb50d68';
+import { FEATURES } from '../public/js/features/index.js?v=250ea9e7';
+import { mountSocialDrawer } from '../public/js/ui/social-drawer.js?v=d008629d';
 import { createNotifier } from '../public/js/notify.js?v=d85330ff';
 import { memoryStore, page } from './social-fake-dom.js';
 import { serverPath, sitePath, skipWithoutSite } from '../tools/repos.mjs';
@@ -241,6 +241,14 @@ describe('IMs: in the Social drawer, against a fake server', () => {
     client.emit('msg:im', { t: 'im', with: { id: 11, name: 'Cy', online: true }, line: { id: 3, from: 11, text: 'hello??', at: 5000 }, unread: 3 });
     playerImFeature.onTick(16, 3000, engine);
     assert.equal(drawer.has('im:11'), false);
+    // Opening one anyway (a player's page's IM link, a name in an old line): the source's refusal, no conversation.
+    const toasts = [];
+    engine.toast = (x) => toasts.push(x);
+    assert.equal(playerImFeature.imOpen(11, 'Cy', engine), true);
+    assert.deepEqual(toasts, ['Cy is on your ignore list.']);
+    assert.equal(drawer.has('im:11'), false);
+    assert.equal(sounds.at(-1), 'CLICK_FAILURE');
+    assert.equal(data.imLast, 'no:on your ignore list');
 
     // Close: the server is told, and it leaves the list.
     p.dock.querySelector('[data-im-close="9"]').click();

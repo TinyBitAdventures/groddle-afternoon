@@ -22,9 +22,9 @@ import {
   normalizeParty,
   partiersLine,
   partyCommand,
-} from '../public/js/party.js?v=b86bf389';
-import { partyFeature } from '../public/js/features/party-feature.js?v=97ccb6cc';
-import { FEATURES } from '../public/js/features/index.js?v=d14d9a04';
+} from '../public/js/party.js?v=8a98d6dd';
+import { partyFeature } from '../public/js/features/party-feature.js?v=136328ee';
+import { FEATURES } from '../public/js/features/index.js?v=250ea9e7';
 import { serverPath, skipWithoutServer } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');

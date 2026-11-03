@@ -44,7 +44,12 @@
  *   /players/<slug>.<id>/ (profiles.js profilePagePath) in a new tab. Whether
  *   the page is public is looked up once per player on the street (a GET of
  *   that page: below level 5 the site answers 404), so the row can say why it
- *   cannot open; until the answer comes it opens anyway.
+ *   cannot open. The menu from a list (a chat name, a buddy row, a Chats row:
+ *   js/ui/player-menu.js) looks its player up when it opens, with the same
+ *   10-minute cache. Until the answer comes the row is off ("Looking for
+ *   <name>'s page"), and it is drawn again in the open menu when the answer
+ *   lands (engine.refreshPlayerMenu), so it never opens the site's not-found
+ *   page; a lookup that fails says so and is tried again after 15 s.
  *
  * Uploads are throttled (profiles.js shouldUpload: one try a minute, five
  * minutes after a failure; the site refuses a second within 15 s).
@@ -64,9 +69,9 @@ import {
   AVATAR_FRAME, AVATAR_STILL, AVATAR_TILE, FAILURE_BACKOFF_MS, HOME_BACKDROP, HOME_MAX_BYTES, HOME_QUALITY, HOME_RESOLUTION, HOME_SETTLE_MS, HOME_TYPES,
   PICTURE_RESOLUTION, PROFILE_COPY, PROFILE_PAGE_VERB,
   aboutCounter, profilePagePath, profilePageVerb, avatarKeyOf, base64Bytes, homeKeyOf, homeSizes, imageBase64, pngBase64, shouldUpload, stillTransform,
-} from '../profiles.js?v=06d5732b';
-import { homeLayoutJson, homeLayoutKeyOf, HOME_LAYOUT_LIMITS } from '../home-layout.js?v=df93054e';
-import { collectHomeLayout } from '../home-layout-scene.js?v=64c89883';
+} from '../profiles.js?v=86423d98';
+import { homeLayoutJson, homeLayoutKeyOf, HOME_LAYOUT_LIMITS } from '../home-layout.js?v=fa15d1c8';
+import { collectHomeLayout } from '../home-layout-scene.js?v=d69c2f76';
 
 export const PROFILES_FEATURE_ID = 'profiles';
 
@@ -80,6 +85,15 @@ const pages = new Map();
 let pageFetch = null;
 /** A lookup is kept this long (a player who reaches level 5 gets a page). */
 const PAGE_TTL_MS = 10 * 60 * 1000;
+/** A lookup that failed (or never answered) is tried again after this long. */
+const PAGE_RETRY_MS = 15 * 1000;
+
+/** Whether a lookup still stands (or is under way), so no new one is needed. */
+function lookupStands(entry, now = Date.now()) {
+  if (!entry) return false;
+  if (entry.pending) return true;
+  return now - entry.at < (entry.status === 'public' || entry.status === 'none' ? PAGE_TTL_MS : PAGE_RETRY_MS);
+}
 /** Guards verbOverride's own call to engine.targetVerbs (the composed player menu). */
 let menuGuard = false;
 
@@ -89,25 +103,35 @@ function pageFor(id, name) {
   return known?.path || profilePagePath(name, id);
 }
 
-/** Looks up one player's page (a same-origin GET; below level 5 the site answers 404). */
-async function lookUpPage(id, name, engine) {
+/**
+ * Looks up one player's page (a same-origin GET; below level 5 the site answers 404). The entry
+ * is in `pages` at once (status '' until the answer), so a menu drawn meanwhile does not ask again.
+ * When the answer lands, a menu open for that player is drawn again (engine.refreshPlayerMenu).
+ */
+function lookUpPage(id, name, engine) {
   const key = String(id);
   const path = profilePagePath(name, id);
-  if (!path || typeof fetch !== 'function') return;
-  const entry = { status: '', path, at: Date.now() };
+  if (!path || typeof fetch !== 'function' || typeof document === 'undefined') return null;
+  const entry = { status: '', path, at: Date.now(), pending: null };
   pages.set(key, entry);
-  try {
-    const r = await fetch(new URL(path, document.baseURI).href, { credentials: 'same-origin', redirect: 'follow', headers: { Accept: 'text/html' } });
-    if (r.ok) {
-      entry.status = 'public';
-      // The page's own address (the site sends /players/<slug>.<id>/ on to it).
-      try { entry.path = new URL(r.url).pathname || path; } catch { entry.path = path; }
-    } else if (r.status === 404) entry.status = 'none';
-    r.body?.cancel?.().catch?.(() => {});
-  } catch {
-    entry.status = '';
-  }
-  engine?.setData?.('profilePages', [...pages].map(([k, v]) => `${k}:${v.status || '?'}`).join(','));
+  entry.pending = (async () => {
+    try {
+      const r = await fetch(new URL(path, document.baseURI).href, { credentials: 'same-origin', redirect: 'follow', headers: { Accept: 'text/html' } });
+      if (r.ok) {
+        entry.status = 'public';
+        // The page's own address (the site sends /players/<slug>.<id>/ on to it).
+        try { entry.path = new URL(r.url).pathname || path; } catch { entry.path = path; }
+      } else entry.status = r.status === 404 ? 'none' : 'failed';
+      r.body?.cancel?.().catch?.(() => {});
+    } catch {
+      entry.status = 'failed';
+    }
+    entry.at = Date.now();
+    entry.pending = null;
+    engine?.setData?.('profilePages', [...pages].map(([k, v]) => `${k}:${v.status || '?'}`).join(','));
+    engine?.refreshPlayerMenu?.(Number(id));
+  })();
+  return entry.pending;
 }
 
 /**
@@ -119,9 +143,10 @@ export function lookUpPlayersHere(engine) {
   const client = engine.query?.('realtimeClient');
   const now = Date.now();
   for (const p of client?.players || []) {
-    const known = pages.get(String(p.id));
-    if (known && now - known.at < PAGE_TTL_MS) continue;
-    pageFetch = lookUpPage(p.id, p.name, engine).finally(() => { pageFetch = null; });
+    if (lookupStands(pages.get(String(p.id)), now)) continue;
+    const running = lookUpPage(p.id, p.name, engine);
+    if (!running) return null;
+    pageFetch = running.finally(() => { pageFetch = null; });
     return pageFetch;
   }
   return null;
@@ -520,11 +545,15 @@ export const profilesFeature = {
       menuGuard = false;
     }
     const name = target.label || target.name || '';
+    // Not known (a name in a list, a player just arrived): look them up now; the row is off until the answer.
+    if (!lookupStands(pages.get(String(target.playerId)))) lookUpPage(target.playerId, name, engine);
     return [profilePageVerb(name, pages.get(String(target.playerId))?.status || ''), ...base.filter((v) => v.id !== PROFILE_PAGE_VERB)];
   },
 
   runVerbOverride(target, verbId, engine) {
     if (verbId !== PROFILE_PAGE_VERB || target?.classId !== 'pc_remote' || !target.playerId) return null;
+    // Only a page known to be there (the row is off otherwise): never the site's not-found page.
+    if (pages.get(String(target.playerId))?.status !== 'public') return true;
     const path = pageFor(target.playerId, target.label || target.name || '');
     if (!path || typeof window === 'undefined') return true;
     const url = new URL(path, document.baseURI).href;

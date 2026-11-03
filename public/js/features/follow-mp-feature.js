@@ -168,6 +168,11 @@ function createSession(engine, client) {
   client.on('msg:follow_asked', (msg) => {
     const id = Number(msg?.id) || 0;
     if (!id) return;
+    // Someone you block: the server refuses their ask (follow.go); if one comes, it is a no unseen.
+    if (engine.query?.('realtimeHidden', id)) {
+      client.send('follow_answer', { id, accept: false });
+      return;
+    }
     const name = String(msg.name || 'A Glitch');
     if (asks.has(id)) engine.removePrompt?.(asks.get(id));
     const answer = (accept) => {

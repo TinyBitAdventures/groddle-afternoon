@@ -19,6 +19,11 @@
  *   invites someone online by name; /leaveparty leaves. Party lines show in
  *   the panel and in the chat stream marked "Party".
  * - Party Spaces between the members (and their quoins) are party-spaces-feature.js (G334).
+ * - Someone you block (buddies-feature realtimeHidden): their party lines are never shown (the
+ *   server does not send them either, party.go chatLine), as Glitch's client dropped any chat
+ *   from an ignored player (RightSideManager.as chatUpdate 218-223); an invite from them is
+ *   declined unseen (also one that was waiting when you blocked them), they get no Invite button,
+ *   and inviting them says the server's refusal (inc_trading.js:128).
  * - The modern skin's Social drawer (engine.social): while you are in a party it
  *   has a Party chat (under Private in its Chats list, with how many are in it), with
  *   the roster, invites and Leave over the party's lines, and what you type there goes
@@ -39,7 +44,7 @@ import {
   normalizeParty,
   partiersLine,
   partyCommand,
-} from '../party.js?v=b86bf389';
+} from '../party.js?v=8a98d6dd';
 
 export const PARTY_FEATURE_ID = 'party';
 /** The hit box over another player's Glitch and name plate (realtime-feature PLATE_Y -150). */
@@ -146,6 +151,9 @@ function createSession(engine, client) {
     return client.me?.id || 0;
   }
 
+  /** Someone you block (buddies-feature). */
+  const hidden = (id) => Boolean(Number(id) && engine.query?.('realtimeHidden', Number(id)));
+
   function render() {
     const n = party?.members.length || 0;
     pill.textContent = n ? `Party (${n})` : 'Party';
@@ -159,7 +167,7 @@ function createSession(engine, client) {
       li.append(el('span', { class: 'party-where' }, memberWhere(m, (t) => streetLabel(engine, t))));
       return li;
     }));
-    const here = inviteCandidates(client.players, party);
+    const here = inviteCandidates(client.players, party, hidden);
     const buttons = here.map((p) => {
       const b = el('button', { type: 'button', 'data-party-invite': String(p.id), title: PARTY_TEXT.inviteTip }, `Invite ${p.name}`);
       b.addEventListener('click', () => invite({ id: p.id }));
@@ -219,6 +227,10 @@ function createSession(engine, client) {
 
   // —— Sending ——
   function invite(who) {
+    if (who?.id && hidden(who.id)) {
+      activity(PARTY_TEXT.blocked);
+      return false;
+    }
     if (!client.send('party_invite', who)) {
       engine.toast?.('You are offline, so nobody can be invited right now.', 2600);
       return false;
@@ -255,6 +267,7 @@ function createSession(engine, client) {
   });
   client.on('msg:party_activity', (msg) => activity(String(msg.text || '')));
   client.on('msg:party_said', (msg) => {
+    if (Number(msg.id) !== me() && hidden(msg.id)) return;
     const name = String(msg.name || 'A Glitch');
     const text = String(msg.text || '');
     lastSaid = `${name}:${text}`;
@@ -266,6 +279,10 @@ function createSession(engine, client) {
   client.on('msg:party_invited', (msg) => {
     const from = Number(msg.from?.id) || 0;
     if (!from) return;
+    if (hidden(from)) {
+      client.send('party_decline', { from });
+      return;
+    }
     if (invites.has(from)) engine.removePrompt?.(invites.get(from));
     const uid = engine.prompt?.({
       text: String(msg.text || `${msg.from?.name || 'Someone'} has invited you to join their Party Chat.`),
@@ -311,6 +328,17 @@ function createSession(engine, client) {
     targets.delete(id);
   }
 
+  /** An invite waiting from someone you have since blocked goes, declined. */
+  function dropBlockedInvites() {
+    for (const [from, uid] of [...invites]) {
+      if (!hidden(from)) continue;
+      if (uid) engine.removePrompt?.(uid);
+      invites.delete(from);
+      client.send('party_decline', { from });
+      publish();
+    }
+  }
+
   function syncTargets() {
     const layer = engine.entityLayer;
     const PIXI = engine.PIXI;
@@ -353,7 +381,10 @@ function createSession(engine, client) {
     say,
     setOpen,
     confirmLeave,
-    tick() { syncTargets(); },
+    tick() {
+      syncTargets();
+      if (invites.size) dropBlockedInvites();
+    },
     clear() {
       for (const t of targets.values()) if (!t.box.destroyed) t.box.destroy();
       targets.clear();

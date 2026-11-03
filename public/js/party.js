@@ -26,6 +26,7 @@ export const PARTY_TEXT = Object.freeze({
   leaveNo: 'Never mind.', // RightSideManager.as:724
   hidden: 'A secret place', // player.js:2094 make_hash_with_location, a hidden location
   notInParty: "You're not in a party!", // inc_party.js:360
+  blocked: 'You are blocking or blocked by that player.', // inc_trading.js:128, the server's refusal (party.go invite)
 });
 
 /** A member as the server sends it (groddle-afternoon-server/party.go roster). */
@@ -114,8 +115,8 @@ export function inviteVerb(player, party) {
   };
 }
 
-/** Players on this street you could invite: not already in your party. */
-export function inviteCandidates(players, party) {
+/** Players on this street you could invite: not already in your party, and not someone you block (`hidden`). */
+export function inviteCandidates(players, party, hidden = () => false) {
   const inParty = new Set((party?.members || []).map((m) => m.id));
-  return (players || []).filter((p) => p && !inParty.has(p.id));
+  return (players || []).filter((p) => p && !inParty.has(p.id) && !hidden(p.id));
 }

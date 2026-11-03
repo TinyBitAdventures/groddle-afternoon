@@ -227,9 +227,38 @@ export function createContextMenu({ doc, host, id = '', className = '', headClas
     return true;
   }
 
+  /**
+   * Rows that changed while it is open (a lookup answered: Open Profile Page): each row whose
+   * label, tip, state or reason differs is drawn again in place, keeping its key cap and the
+   * focus. Rows not open now are left alone. Returns how many changed.
+   */
+  function update(rows = []) {
+    if (!el || !cur) return 0;
+    let changed = 0;
+    for (const next of rows || []) {
+      const i = cur.rows.findIndex((r) => r.id === String(next?.id));
+      if (i < 0) continue;
+      const was = cur.rows[i];
+      const same = was.label === next.label && Boolean(was.disabled) === Boolean(next.disabled)
+        && (was.reason || '') === (next.reason || '') && (was.tip || '') === (next.tip || '');
+      if (same) continue;
+      const key = verbRowKeys(cur.rows)[i];
+      const btn = makeVerbRow(doc, { key, label: next.label, tip: next.tip || '', disabled: Boolean(next.disabled), reason: next.reason || '' });
+      btn.classList.add('verb-choice');
+      btn.dataset[rowData] = String(was.id);
+      const focused = doc.activeElement === was.btn;
+      was.btn.replaceWith(btn);
+      cur.rows[i] = { ...was, ...next, id: was.id, btn };
+      if (focused) focusVerbRow(el, i);
+      changed += 1;
+    }
+    return changed;
+  }
+
   return {
     open,
     close,
+    update,
     isOpen: () => Boolean(cur),
     owner: () => cur?.owner || '',
     isOpenFor: (owner) => Boolean(cur && cur.owner === String(owner)),

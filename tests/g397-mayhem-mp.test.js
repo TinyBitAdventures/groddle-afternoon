@@ -34,7 +34,7 @@ import {
 import { mayhemData } from '../tools/build-realtime-mayhem.mjs';
 import { CROWNS_START_POINTS, CROWNS_STREET } from '../public/js/game-of-crowns.js?v=98e21baf';
 import { OVERLAY_USES } from '../public/js/overlays.js?v=90f4b1ba';
-import { sharedStreet } from '../public/js/features/realtime-feature.js?v=95c330f4';
+import { sharedStreet } from '../public/js/features/realtime-feature.js?v=9cc093c0';
 import { HAS_SERVER, serverPath, sitePath, skipWithoutServer, skipWithoutSite } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');

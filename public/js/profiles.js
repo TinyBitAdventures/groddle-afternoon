@@ -99,20 +99,24 @@ export const PROFILE_PAGE_COPY = Object.freeze({
   // The client's tooltip, then where it goes.
   tooltip: 'View more information about this person: their page on the Groddle site, in a new tab.',
   none: (name) => `${name || 'This player'} has no public page yet. Pages show from level ${PROFILE_LISTED_LEVEL}.`,
+  looking: (name) => `Looking for ${name || 'this player'}'s page on the Groddle site.`,
+  failed: () => 'The Groddle site did not answer just now. Open the menu again in a moment.',
 });
 
 /**
- * PURE: the row for one player. `status`: 'public' | 'none' | '' (not known yet: it opens, and
- * the site says if there is no page).
+ * PURE: the row for one player. `status`: 'public' (it opens), 'none' (no public page: the
+ * reason), 'failed' (the lookup did not answer), or '' (not known yet: the lookup is under way).
+ * Only a page known to be there opens, so the row never leads to the site's not-found page.
  */
 export function profilePageVerb(name, status = '') {
-  const none = status === 'none';
+  const open = status === 'public';
+  const reason = open ? '' : status === 'none' ? PROFILE_PAGE_COPY.none(name) : status === 'failed' ? PROFILE_PAGE_COPY.failed() : PROFILE_PAGE_COPY.looking(name);
   return {
     id: PROFILE_PAGE_VERB,
     label: PROFILE_PAGE_COPY.label,
     tooltip: PROFILE_PAGE_COPY.tooltip,
-    enabled: !none,
-    reason: none ? PROFILE_PAGE_COPY.none(name) : '',
+    enabled: open,
+    reason,
     durationMs: 0,
   };
 }

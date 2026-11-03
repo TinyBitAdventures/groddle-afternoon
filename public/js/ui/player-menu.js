@@ -14,16 +14,23 @@
  *   The rows are the features' own (engine.targetVerbs on a target built from the id and the name),
  *   so their labels, tips and reasons are the world menu's.
  * - Your own name: no menu (ContactElement.as 269 skipped yourself).
+ * - Someone you block, here or from a list: only the rows Glitch kept for a blocked player
+ *   (BLOCKED_PLAYER_VERBS). Its client built none of its own rows when the server said
+ *   is_blocked (InteractionMenuController.as 522-523: no Give, Offer to Trade, IM, Open Profile
+ *   Page, Invite to Party, Follow or Visit Home Street), and the server built no emotes for
+ *   them (main.js 3557); the server's own rows stayed: Un-Block, Add to / Remove from Friends,
+ *   stopping a follow and the Party Space creator's Kick out (main.js 3590-3739).
  *
  * The menu is the shared one (js/ui/context-menu.js): at the pointer for a click or a right-click,
  * beside the name or the row for the keys; game.js openPlayerListMenu opens it (engine.openPlayerMenu
  * for the features). QA: canvas data contextMenu "player:<id>", playerMenu here|list.
  */
 
-import { PROFILE_PAGE_VERB } from '../profiles.js?v=06d5732b';
+import { PROFILE_PAGE_VERB } from '../profiles.js?v=86423d98';
 import { IM_VERB_ID } from '../player-im.js?v=04c55d2f';
 import { BUDDY_VERBS } from '../buddies.js?v=df41a3bb';
 import { VISIT_VERB } from '../neighbours-mp.js?v=a8d5544e';
+import { FOLLOW_STOP_VERB } from '../follow-mp.js?v=7c5cda9a';
 
 /** The feature that draws other players and owns their targets (features/party-feature.js PARTY_FEATURE_ID). */
 export const PLAYER_TARGET_FEATURE = 'party';
@@ -39,6 +46,24 @@ export const FROM_LIST_VERBS = Object.freeze([
   BUDDY_VERBS.ignore,
   BUDDY_VERBS.unignore,
 ]);
+
+/**
+ * The rows a blocked player's menu keeps (the server-built ones, main.js 3590-3739): Add to /
+ * Remove from Friends, Un-Block, Stop following, and Kick out of your Party Space
+ * (party-spaces-mp.js kickVerb).
+ */
+export const BLOCKED_PLAYER_VERBS = Object.freeze([
+  BUDDY_VERBS.add,
+  BUDDY_VERBS.remove,
+  BUDDY_VERBS.unignore,
+  FOLLOW_STOP_VERB,
+  'party_space_kick',
+]);
+
+/** PURE: a player's verbs when you block them: only BLOCKED_PLAYER_VERBS. */
+export function blockedPlayerVerbs(verbs) {
+  return (verbs || []).filter((v) => v && BLOCKED_PLAYER_VERBS.includes(v.id));
+}
 
 const n0 = (v) => (Number.isFinite(Number(v)) && Number(v) > 0 ? Math.floor(Number(v)) : 0);
 

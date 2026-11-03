@@ -202,7 +202,15 @@ function createSession(engine, client) {
   /** Opens the conversation with a player in the drawer, with the keyboard in its input. */
   function open(id, name = '', { focus = true } = {}) {
     id = Math.floor(Number(id));
-    if (!(id > 0) || id === me() || hidden(id) || !social) return false;
+    if (!(id > 0) || id === me() || !social) return false;
+    if (hidden(id)) {
+      // Someone you block (a player's page's IM link, a name in an old line): the server's
+      // refusal in the source's words (main.js:4350, RightSideManager.as:600), and no conversation.
+      engine.playSound?.(IM_SOUND_FAIL, { volume: 0.4 });
+      engine.toast?.(refusalText('on your ignore list', nameOf(id, name)), 2800);
+      note('no:on your ignore list');
+      return true;
+    }
     const c = conv(id, name);
     handOver(c);
     social.select(imId(id));

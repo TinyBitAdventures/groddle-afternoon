@@ -289,6 +289,8 @@ function createSession(engine, client) {
     if (seen.size > 300) seen.delete(seen.values().next().value);
     const verbId = String(m.verb || '');
     const from = { id: Number(m.from?.id) || 0, name: cleanName(m.from?.name) };
+    // Someone you block: the server refuses their verb on you (verbs.go); if one comes, it does nothing.
+    if (from.id && engine.query?.('realtimeHidden', from.id)) return;
     const side = targetSide(verbId, { from: from.name, garlic: m.garlic === true });
     if (!side) return;
     const player = pc();

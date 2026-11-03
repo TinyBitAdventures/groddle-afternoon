@@ -10,8 +10,8 @@ import { afterEach, describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { PROFILE_LISTED_LEVEL, PROFILE_PAGE_COPY, PROFILE_PAGE_VERB, profilePagePath, profilePageVerb, profileSlug } from '../public/js/profiles.js?v=06d5732b';
-import { lookUpPlayersHere, profilesFeature } from '../public/js/features/profiles-feature.js?v=e13a1145';
+import { PROFILE_LISTED_LEVEL, PROFILE_PAGE_COPY, PROFILE_PAGE_VERB, profilePagePath, profilePageVerb, profileSlug } from '../public/js/profiles.js?v=86423d98';
+import { lookUpPlayersHere, profilesFeature } from '../public/js/features/profiles-feature.js?v=5b9e2708';
 import { SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
 
 const realFetch = globalThis.fetch;
@@ -35,11 +35,15 @@ describe('the row (js/profiles.js)', () => {
     const open = profilePageVerb('Bo', 'public');
     assert.deepEqual([open.id, open.enabled, open.reason, open.durationMs], [PROFILE_PAGE_VERB, true, '', 0]);
     assert.match(open.tooltip, /^View more information about this person/);
-    assert.equal(profilePageVerb('Bo', '').enabled, true, 'not looked up yet: it opens, the site answers');
     const none = profilePageVerb('Bo', 'none');
     assert.equal(none.enabled, false);
     assert.equal(none.reason, `Bo has no public page yet. Pages show from level ${PROFILE_LISTED_LEVEL}.`);
-    assert.doesNotMatch(none.reason + open.tooltip, /—/, 'no em-dashes in player words');
+    // Not known yet, or the lookup failed: off, never a link to the site's not-found page.
+    const looking = profilePageVerb('Bo', '');
+    assert.deepEqual([looking.enabled, looking.reason], [false, "Looking for Bo's page on the Groddle site."]);
+    const failed = profilePageVerb('Bo', 'failed');
+    assert.deepEqual([failed.enabled, failed.reason], [false, 'The Groddle site did not answer just now. Open the menu again in a moment.']);
+    assert.doesNotMatch(none.reason + open.tooltip + looking.reason + failed.reason, /—/, 'no em-dashes in player words');
   });
 });
 
@@ -63,11 +67,15 @@ describe('the player menu (features/profiles-feature.js)', () => {
     assert.equal(profilesFeature.verbOverride(target, { ...e, mode: 'solo' }), null);
   });
 
-  it('opens the page in a new tab', () => {
+  it('opens the page in a new tab, once it is known to be there', async () => {
     const opened = [];
     globalThis.document = { baseURI: 'https://groddle.localhost/play/online/' };
     globalThis.window = { open: (...a) => opened.push(a) };
-    const e = engine([]);
+    globalThis.fetch = async (url) => ({ ok: true, status: 200, url });
+    const e = engine([], [{ id: 91, name: 'Cy Zed' }]);
+    assert.equal(profilesFeature.runVerbOverride({ classId: 'pc_remote', playerId: 91, label: 'Cy Zed' }, PROFILE_PAGE_VERB, e), true);
+    assert.deepEqual(opened, [], 'not looked up yet: nothing opens');
+    await lookUpPlayersHere(e);
     assert.equal(profilesFeature.runVerbOverride({ classId: 'pc_remote', playerId: 91, label: 'Cy Zed' }, PROFILE_PAGE_VERB, e), true);
     assert.deepEqual(opened, [['https://groddle.localhost/players/cy-zed.91/', '_blank', 'noopener']]);
     assert.equal(e.data.profilePage, '/players/cy-zed.91/');
@@ -93,12 +101,66 @@ describe('the player menu (features/profiles-feature.js)', () => {
     const lo = profilesFeature.verbOverride({ classId: 'pc_remote', playerId: 58, label: 'Lo' }, { mode: 'multiplayer', targetVerbs: () => [] })[0];
     assert.equal(lo.enabled, false);
     assert.match(lo.reason, /Lo has no public page yet/);
-    assert.equal(e.data.profilePages, '58:none,59:public');
+    assert.match(e.data.profilePages, /(^|,)58:none,59:public$/, 'the players looked up, the earlier test\'s too');
     // Al's row opens the page's own address.
     const opened = [];
     globalThis.window = { open: (...a) => opened.push(a[0]) };
     profilesFeature.runVerbOverride({ classId: 'pc_remote', playerId: 59, label: 'Al' }, PROFILE_PAGE_VERB, e);
     assert.deepEqual(opened, ['https://groddle.localhost/players/al/']);
+  });
+});
+
+describe('the menu from a list (a chat name, a buddy row, a Chats row)', () => {
+  it('looks the player up when it opens: off while looking, drawn again when the answer lands', async () => {
+    globalThis.document = { baseURI: 'https://groddle.localhost/play/online/' };
+    const asked = [];
+    let answer;
+    globalThis.fetch = (url) => { asked.push(url); return new Promise((r) => { answer = r; }); };
+    const refreshed = [];
+    const e = { mode: 'multiplayer', targetVerbs: () => [], setData() {}, refreshPlayerMenu: (id) => refreshed.push(id) };
+    const low = { classId: 'pc_remote', playerId: 70, label: 'Lowbie', fromList: true };
+    let row = profilesFeature.verbOverride(low, e)[0];
+    assert.deepEqual([row.id, row.enabled, row.reason], [PROFILE_PAGE_VERB, false, "Looking for Lowbie's page on the Groddle site."]);
+    profilesFeature.verbOverride(low, e);
+    assert.deepEqual(asked, ['https://groddle.localhost/players/lowbie.70/'], 'one lookup, however often the menu is drawn');
+    answer({ ok: false, status: 404, url: asked[0] });
+    await new Promise((r) => setTimeout(r, 0));
+    assert.deepEqual(refreshed, [70], 'the open menu is told');
+    row = profilesFeature.verbOverride(low, e)[0];
+    assert.deepEqual([row.enabled, row.reason], [false, `Lowbie has no public page yet. Pages show from level ${PROFILE_LISTED_LEVEL}.`]);
+    assert.equal(asked.length, 1, 'kept: no second lookup');
+    // A level-5 player's page opens.
+    globalThis.fetch = async (url) => ({ ok: true, status: 200, url: 'https://groddle.localhost/players/high/' });
+    const high = { classId: 'pc_remote', playerId: 71, label: 'High', fromList: true };
+    profilesFeature.verbOverride(high, e);
+    await new Promise((r) => setTimeout(r, 0));
+    assert.equal(profilesFeature.verbOverride(high, e)[0].enabled, true);
+    const opened = [];
+    globalThis.window = { open: (u) => opened.push(u) };
+    profilesFeature.runVerbOverride(high, PROFILE_PAGE_VERB, { setData() {} });
+    assert.deepEqual(opened, ['https://groddle.localhost/players/high/']);
+  });
+
+  it('a lookup that fails says so and is tried again', async () => {
+    globalThis.document = { baseURI: 'https://groddle.localhost/play/online/' };
+    let calls = 0;
+    globalThis.fetch = async () => { calls += 1; throw new Error('offline'); };
+    const e = { mode: 'multiplayer', targetVerbs: () => [], setData() {} };
+    const t = { classId: 'pc_remote', playerId: 72, label: 'Flaky', fromList: true };
+    profilesFeature.verbOverride(t, e);
+    await new Promise((r) => setTimeout(r, 0));
+    const row = profilesFeature.verbOverride(t, e)[0];
+    assert.deepEqual([row.enabled, row.reason], [false, 'The Groddle site did not answer just now. Open the menu again in a moment.']);
+    assert.equal(calls, 1, 'not again at once');
+  });
+
+  it('game.js draws an open player menu again from the verbs as they are now', () => {
+    const game = readFileSync(join(import.meta.dirname, '../public/game.js'), 'utf8');
+    assert.match(game, /refreshPlayerMenu: \(id\) => refreshPlayerMenus\(id\),/);
+    const fn = game.slice(game.indexOf('function refreshPlayerMenus('), game.indexOf('function minimapSignViews('));
+    assert.match(fn, /playerCtxMenu\.update\(playerMenuRows\(menuVerbsFor\(target\) \|\| \[\], \{ here: Boolean\(here\) \}\)\);/);
+    assert.match(fn, /listPlayerTarget\(\{ id: pid, name: playerListMenuName \}\)/);
+    assert.match(fn, /menuTarget\?\.classId === 'pc_remote' && Number\(menuTarget\.playerId\) === pid && menu && !menu\.hidden && !menu\.dataset\.vmLevel/);
   });
 });
 
