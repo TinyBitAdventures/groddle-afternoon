@@ -916,6 +916,7 @@ import { loadAudioLevels, loadMutedPreference, saveAudioLevel, saveMutedPreferen
 import { createAudioBuses, fadeGain } from './js/audio-buses.js?v=af167b54';
 import { installTopBar, renderTopBar } from './js/ui/topbar.js?v=25559100';
 import { focusBack, installFocusReturn, lastInput } from './js/ui/focus-return.js?v=c34f16a0';
+import { installContextGuard } from './js/ui/context-guard.js?v=0f71ac17';
 import { QUOIN_FRAME_BOB, advanceQuoinClock, quoinBobBetweenFrames } from './js/quoin-motion.js?v=ea0bd408';
 import { installHiresFirstDraw, installHiresSprites, upgradeSource } from './js/sprite-hires.js?v=96c22af7';
 import { denseSprite } from './js/sprite-dense.js?v=178a711b';
@@ -29847,6 +29848,9 @@ async function main() {
     // MPANELS: a vendor's count is a popover over the shelf in Modern, the shelf's own detail in Classic.
     if (isVendorOpen()) renderVendorList();
   });
+  // RIGHTCLICK (R4, js/ui/context-guard.js): the browser's own menu never opens over the world, a
+  // menu of ours ([data-ctx]) or a plain HUD button; text fields, links and selected text keep it.
+  installContextGuard(document, { setData: setCanvasData });
   // Phase 2 (js/ui/topbar.js): the modern bar's tooltips, Menu groups, Sound popover and pills.
   // Enter stays the world's: a mouse click on a HUD control hands focus back (js/ui/focus-return.js).
   installFocusReturn(document);
