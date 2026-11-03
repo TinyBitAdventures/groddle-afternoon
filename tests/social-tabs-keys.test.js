@@ -10,7 +10,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { mountSocialDrawer } from '../public/js/ui/social-drawer.js?v=0a2b5b69';
+import { mountSocialDrawer } from '../public/js/ui/social-drawer.js?v=570e3a6a';
 import { createNotifier } from '../public/js/notify.js?v=d85330ff';
 import { memoryStore, page } from './social-fake-dom.js';
 

@@ -74,6 +74,7 @@ export class FakeEl {
   click() { return this.dispatch('click'); }
   focus() { globalThis.document.activeElement = this; }
   matches(sel) { return matches(this, sel); }
+  closest(sel) { for (let n = this; n; n = n.parentElement) if (n instanceof FakeEl && matches(n, sel)) return n; return null; }
   contains(n) { return n === this || this.all().includes(n); }
   all() { return this.children.flatMap((c) => (c instanceof FakeEl ? [c, ...c.all()] : [])); }
   querySelector(sel) { return this.all().find((n) => matches(n, sel)) || null; }

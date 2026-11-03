@@ -45,8 +45,11 @@
  * (glitch-client port/RightSideManager.as 305-307, view/ui/TSLinkedTextField.as 105-106). The rest
  * of the line stays plain text: selecting it and the browser's Copy work as before, and a
  * right-click on a name inside selected text keeps the browser's menu too. Your own lines ("You")
- * and lines with no player behind them (notes, the Butler, Feat lines) have no button. The menu
- * closes when the drawer collapses or the tab changes.
+ * and lines with no player behind them (notes, the Butler, Feat lines) have no button. A Buddies
+ * row opens the same menu (item 3): a click on the row, a right-click, a long press on touch, Enter
+ * or Shift+F10 on its name; its IM and Visit chips act as before (Glitch's contact rows,
+ * view/ui/chat/ContactElement.as 267-271). The menu closes when the drawer collapses or the tab
+ * changes.
  *
  * QA: canvas data socialOpen (open|rail), socialTab (the tab selected: activity, local, global,
  * buddies or chats), socialChat (the conversation open in Chats, or ''), socialTabs (the row),
@@ -757,11 +760,15 @@ export function mountSocialDrawer({
     if (!data.rows.length) out.push(el('p', { class: 'social-empty' }, data.empty || 'No buddies yet.'));
     const list = el('ul', { class: 'social-buddies', 'data-social-buddies': '' });
     for (const r of data.rows) {
-      const li = el('li', { 'data-social-buddy': String(r.id), 'data-online': String(Boolean(r.online)) });
+      // RIGHTCLICK: the row opens the buddy's menu (a click, a right-click, a long press; Enter or
+      // Shift+F10 on the name), as Glitch's contact rows did (ContactElement.as 267-271); the chips act.
+      const li = el('li', { 'data-social-buddy': String(r.id), 'data-online': String(Boolean(r.online)), 'data-ctx': playerMenu ? 'player' : false, 'data-name': r.name });
       const a = avatarOf(r.name);
       const av = el('span', { class: 'social-av', 'data-hue': String(a.hue), 'aria-hidden': 'true' }, a.initial);
       if (r.online) av.append(el('span', { class: 'social-dot' }));
-      const what = el('span', { class: 'social-buddy-what' });
+      const what = playerMenu
+        ? el('button', { type: 'button', class: 'social-buddy-what', 'data-social-buddy-who': String(r.id), 'aria-haspopup': 'menu', 'aria-keyshortcuts': 'Shift+F10' })
+        : el('span', { class: 'social-buddy-what' });
       what.append(el('span', { class: 'social-buddy-name' }, r.name), el('small', {}, r.where));
       li.append(av, what);
       for (const act of r.actions || []) {
@@ -841,7 +848,7 @@ export function mountSocialDrawer({
   function focusSelector(node) {
     if (!node || node === input || node === document.body || !dock.contains?.(node)) return null;
     const esc = (v) => (globalThis.CSS?.escape ? CSS.escape(v) : String(v).replace(/"/g, '\\"'));
-    for (const a of ['data-social-rail-tab', 'data-social-tab', 'data-social-chat', 'data-social-buddy', 'data-social-name']) {
+    for (const a of ['data-social-rail-tab', 'data-social-tab', 'data-social-chat', 'data-social-buddy-who', 'data-social-buddy', 'data-social-name']) {
       const v = node.getAttribute?.(a);
       if (v !== null && v !== undefined) return `[${a}="${esc(v)}"]`;
     }
@@ -966,6 +973,40 @@ export function mountSocialDrawer({
     if (to < 0) return;
     e.preventDefault();
     rows[to]?.focus?.({ preventScroll: false });
+  });
+
+  // RIGHTCLICK: a buddy row's menu (the Buddies tab): a click on the row (not on a chip), a
+  // right-click anywhere on it, a long press on touch, Enter or Shift+F10 on its name.
+  const buddyRow = (t) => {
+    if (!playerMenu || current().kind !== 'buddies') return null;
+    const li = t?.closest?.('[data-social-buddy]');
+    return li && log.contains(li) ? li : null;
+  };
+  const openBuddy = (li, { at = null, keys = false } = {}) => {
+    const id = Number(li.getAttribute('data-social-buddy')) || 0;
+    const who = li.querySelector('[data-social-buddy-who]');
+    return openPlayer(id, li.getAttribute('data-name') || '', li, {
+      at,
+      keys,
+      opener: who || li,
+      find: () => log.querySelector(`[data-social-buddy-who="${CSS.escape(String(id))}"]`),
+    });
+  };
+  log.addEventListener('pointerdown', (e) => {
+    // As the tabs: a press on the row does not take the keyboard (the chips are their own).
+    if (buddyRow(e.target) && !e.target?.closest?.('.social-chip') && e.button === 0 && !e.ctrlKey) e.preventDefault?.();
+  });
+  log.addEventListener('click', (e) => {
+    const li = buddyRow(e.target);
+    if (!li || e.target?.closest?.('.social-chip')) return;
+    const keys = e.detail === 0;
+    openBuddy(li, { at: keys ? null : { x: e.clientX, y: e.clientY }, keys });
+  });
+  bindContextTrigger(log, {
+    rowOf: buddyRow,
+    isOpenFor: (li) => Boolean(contextMenu?.()?.isOpenFor?.(`player:${Number(li.getAttribute('data-social-buddy')) || 0}`)),
+    open: (li, { at, keys }) => openBuddy(li, { at, keys }),
+    longPress: true,
   });
 
   // Tabs: arrow keys move along the row (the ARIA tabs pattern), Home and End to the ends, only

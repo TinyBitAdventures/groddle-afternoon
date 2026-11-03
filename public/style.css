@@ -9668,6 +9668,10 @@ html[data-street-cards] .notify-notices { visibility: hidden; }
 .social-buddies li { display: flex; align-items: center; gap: var(--sp-4); min-height: 40px; padding: var(--sp-1) var(--sp-2); border-radius: var(--radius-sm); }
 .social-buddies li[data-online="false"] .social-av { opacity: 0.55; }
 .social-buddy-what { flex: 1 1 auto; min-width: 0; font-weight: 700; }
+/* RIGHTCLICK (js/ui/player-menu.js): a row opens the buddy's menu; its name is the button for the keys. */
+.social-buddies li[data-ctx] { cursor: pointer; }
+.social-buddies li[data-ctx]:hover { background: var(--accent-soft); }
+button.social-buddy-what { margin: 0; padding: 0; border: 0; background: none; color: inherit; font: inherit; font-weight: 700; text-align: start; cursor: pointer; border-radius: var(--radius-xs); }
 .social-buddy-what small { display: block; font-size: var(--fs-sm); font-weight: 600; color: var(--text-muted); }
 /* What features hand the drawer for a tab's head: the party's roster, a channel's buttons, the emotes */
 .social-view-head .party-box { margin: 0; padding: 0; background: none; box-shadow: none; font: inherit; }

@@ -33,6 +33,11 @@
  *   Pal count real buddies (player buddies_count, set to the list's size as
  *   addToBuddyGroup and removeBuddy's achievements_set do, inc_buddies.js:196 and 276).
  *
+ * - RIGHTCLICK (right-click audit later batch item 3): every row of the panel (your buddies, who
+ *   added you, who you block) opens that player's menu from a list (engine.openPlayerMenu,
+ *   js/ui/player-menu.js): a click on the row (not on its buttons), a right-click, a long press on
+ *   touch, Enter or Shift+F10 on the name (Glitch's contact rows, ContactElement.as 267-271). The
+ *   menu sits over the panel and closes with it.
  * - The modern skin's Social drawer (engine.social) has a Buddies tab: who is
  *   online (here, or the street they are on) and offline, IM (player-im-feature),
  *   Visit where homes can be visited, who added you, and Manage buddies for this panel. Its head
@@ -44,6 +49,7 @@
  */
 
 import { createMinnAccount } from '../minn-account.js?v=eb300264';
+import { bindContextTrigger } from '../ui/context-menu.js?v=c92fbdd5';
 import { STREET_INDEX } from '../street-loader.js?v=33d2b8bc';
 import {
   BUDDY_COUNTER,
@@ -77,6 +83,9 @@ const STYLE = `
 .buddies-panel ul { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--sp-3); }
 .buddies-panel li { display: flex; flex-wrap: wrap; align-items: center; gap: 0.3rem var(--sp-5); padding: 0.45rem var(--sp-5); border-radius: var(--radius-md); background: var(--surface-parchment); }
 .buddies-panel li .buddy-what { flex: 1 1 12rem; }
+.buddies-panel li[data-ctx] { cursor: pointer; }
+.buddies-panel button.buddy-what { margin: 0; padding: 0; border: 0; background: none; color: inherit; font: inherit; text-align: start; cursor: pointer; border-radius: var(--radius-xs); }
+.buddies-panel button.buddy-what:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
 .buddies-panel li .buddy-what small { display: block; opacity: 0.8; }
 .buddies-panel li .buddy-dot { display: inline-block; width: 8px; height: 8px; margin-right: var(--sp-3); border-radius: var(--radius-round); background: var(--c-sand-67); vertical-align: 1px; }
 .buddies-panel li[data-online="true"] .buddy-dot { background: var(--c-lime-67); }
@@ -137,6 +146,39 @@ function createSession(engine, client) {
   shade.append(panel);
   document.body.append(shade);
   shade.addEventListener('pointerdown', (e) => { if (e.target === shade) close(); });
+  // RIGHTCLICK: a row's player menu, over the panel (layer screen); the panel redraws under it.
+  const rowOf = (t) => {
+    const li = t?.closest?.('li[data-buddy]');
+    return li && panel.contains(li) && engine.openPlayerMenu ? li : null;
+  };
+  let menuFor = 0;
+  const openRow = (li, { at = null, keys = false } = {}) => {
+    const id = Number(li.getAttribute('data-buddy')) || 0;
+    const opened = engine.openPlayerMenu?.({
+      id,
+      name: li.getAttribute('data-name') || '',
+      at,
+      keys,
+      anchor: li,
+      opener: li.querySelector('[data-buddy-who]') || li,
+      findOpener: () => panel.querySelector(`[data-buddy-who="${id}"]`),
+      layer: 'screen',
+    });
+    if (opened) menuFor = id;
+    return opened;
+  };
+  panel.addEventListener('click', (e) => {
+    const li = rowOf(e.target);
+    if (!li || e.target?.closest?.('button.buddy-act')) return;
+    const keys = e.detail === 0;
+    openRow(li, { at: keys ? null : { x: e.clientX, y: e.clientY }, keys });
+  });
+  bindContextTrigger(panel, {
+    rowOf,
+    isOpenFor: (li) => Boolean(engine.isPlayerMenuOpen?.(li.getAttribute('data-buddy'))),
+    open: (li, { at, keys }) => openRow(li, { at, keys }),
+    longPress: true,
+  });
   shade.addEventListener('keydown', (e) => {
     e.stopPropagation();
     if (e.key === 'Escape') close();
@@ -160,6 +202,8 @@ function createSession(engine, client) {
   function close() {
     shade.hidden = true;
     engine.setData?.('buddiesPanel', 'closed');
+    if (menuFor && engine.isPlayerMenuOpen?.(menuFor)) engine.closePlayerMenu?.({ focus: false });
+    menuFor = 0;
   }
 
   function say(text, tone = 'good') {
@@ -174,8 +218,11 @@ function createSession(engine, client) {
 
   function row(entry, { buttons = [], showWhere = true, isNew = false } = {}) {
     const on = online.has(entry.id);
-    const li = el('li', { 'data-buddy': String(entry.id), 'data-online': String(on) });
-    const what = el('span', { class: 'buddy-what' });
+    const menu = Boolean(engine.openPlayerMenu);
+    const li = el('li', { 'data-buddy': String(entry.id), 'data-online': String(on), 'data-ctx': menu ? 'player' : false, 'data-name': entry.name });
+    const what = menu
+      ? el('button', { type: 'button', class: 'buddy-what', 'data-buddy-who': String(entry.id), 'aria-haspopup': 'menu', 'aria-keyshortcuts': 'Shift+F10' })
+      : el('span', { class: 'buddy-what' });
     what.append(el('span', { class: 'buddy-dot', 'aria-hidden': 'true' }), document.createTextNode(entry.name));
     if (isNew) what.append(el('span', { class: 'buddy-new' }, 'new'));
     if (showWhere) what.append(el('small', { 'data-buddy-where': '' }, on ? `Online: ${where(entry.id)}` : BUDDY_TEXT.offlineWhere));
