@@ -13,7 +13,11 @@
  * per floor each placed row's display box contents and the piece itself.
  * A piece taken away drops whatever rested on it to the floor below (its
  * `on` cleared), as a sale does (features/home-street-mp-feature.js
- * applySales). Pure: it edits the decor states it is given.
+ * applySales). Ticket 51: a cabinet's slots (js/home-storage.js) are taken
+ * from before the cabinet itself, and a cabinet taken away spills what is
+ * left in it into `spill` (class -> count) for the pack, as the site's
+ * remove puts it in the stored save's pack. Pure: it edits the decor states
+ * (and `spill`) it is given.
  */
 
 const whole = (n) => {
@@ -26,7 +30,7 @@ const whole = (n) => {
  * @param {Record<string, number>} want class -> count still to take
  * @returns {Record<string, number>} class -> count taken
  */
-export function takeFromHouse(decors, want) {
+export function takeFromHouse(decors, want, spill = null) {
   const left = {};
   for (const [c, n] of Object.entries(want || {})) if (whole(n)) left[c] = whole(n);
   const taken = {};
@@ -57,6 +61,17 @@ export function takeFromHouse(decors, want) {
     const gone = new Set();
     const keep = [];
     for (const row of d.placed) {
+      if (Array.isArray(row?.contents)) {
+        for (let i = row.contents.length - 1; i >= 0; i -= 1) {
+          const s = row.contents[i];
+          if (!s || !(left[s.classTsid] > 0)) continue;
+          const n = Math.min(whole(s.count), left[s.classTsid]);
+          s.count = whole(s.count) - n;
+          if (Array.isArray(s.points)) s.points.length = Math.min(s.points.length, s.count);
+          if (s.count <= 0) row.contents[i] = null;
+          if (n) take(s.classTsid, n);
+        }
+      }
       const shown = row?.display?.classTsid;
       if (shown && left[shown] > 0) {
         const n = Math.min(whole(row.display.count), left[shown]);
@@ -67,6 +82,9 @@ export function takeFromHouse(decors, want) {
       if (left[row?.classTsid] > 0) {
         take(row.classTsid, 1);
         gone.add(row.id);
+        if (spill && Array.isArray(row.contents)) {
+          for (const s of row.contents) if (s && whole(s.count)) spill[s.classTsid] = (spill[s.classTsid] || 0) + whole(s.count);
+        }
         continue;
       }
       keep.push(row);

@@ -42,7 +42,8 @@
 
 import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=b0e33301';
 import { RECIPE_CATALOG, isRecipeCatalogReady, setRecipeCatalog } from '../making.js?v=adfa8a29';
-import { furnitureDef, furnitureScale, furnitureSize } from '../home-decor.js?v=39721c9f';
+import { furnitureDef, furnitureScale, furnitureSize } from '../home-decor.js?v=3ee9ea0d';
+import { isStorageClass, storageHasContents } from '../home-storage.js?v=56c6416d';
 import { pieceLabel } from '../furniture-upgrades.js?v=a3788c0d';
 import { cultivationDef, homeStreetLayout } from '../home-cultivation.js?v=11616085';
 import { signpostX as fixtureSignpostX } from '../home-street-fixtures.js?v=badcb725';
@@ -52,10 +53,10 @@ import { textureFromUrl } from '../textures.js?v=db2ce452';
 import { addSignBoard, signArmWidth, signLabel } from '../street-render.js?v=f98221f2';
 import { openNotePicker, openNoteView } from '../note-view.js?v=21c55475';
 import { homeStreetName, possessive, readVisitScene } from '../neighbours-mp.js?v=a8d5544e';
-import { BACK_YARD_GROUND_Y, SIGN_PROMPT_LIFT, STREET_GROUND_Y, homesFeature, visitorHomeState } from './homes-feature.js?v=2df0ff28';
+import { BACK_YARD_GROUND_Y, SIGN_PROMPT_LIFT, STREET_GROUND_Y, homesFeature, visitorHomeState } from './homes-feature.js?v=cb502285';
 import { projectApi } from './street-jobs-feature.js?v=b949a801';
 import { saveStore } from '../save-store.js?v=8839ba7b';
-import { giveCarriedNote, takeCarriedNote, writtenCarriedNotes } from './street-furniture-feature.js?v=2026f539';
+import { giveCarriedNote, takeCarriedNote, writtenCarriedNotes } from './street-furniture-feature.js?v=a3a6e060';
 import {
   GOOD_NEIGHBOUR_AT,
   GOOD_NEIGHBOUR_COUNTER,
@@ -87,7 +88,7 @@ import {
   saleVerbs,
   signpostArms,
   signpostCandidates,
-} from '../home-street-mp.js?v=9c8a7791';
+} from '../home-street-mp.js?v=992ace31';
 
 export { HOME_STREET_MP_ID };
 
@@ -439,25 +440,31 @@ function createSession(engine, client) {
       // G358: an upgraded piece's own size and name.
       const { w, h } = furnitureSize(row.classTsid, row.upgradeId);
       const ceiling = def.slot === 'ceiling';
-      const box = new PIXI.Container();
-      box.x = Math.round(row.x);
-      box.y = Math.round(row.y);
-      box.zIndex = 13;
-      box.addChild(hitBox(PIXI, -w / 2, ceiling ? 0 : -h, w, h));
-      box._worldHitW = w;
-      box._worldHitH = h;
-      engine.entityLayer.addChild(box);
+      // Ticket 51: cabinets and boxes have the storage feature's own target (open, deposit, purchase...);
+      // their sale verbs join it (extraVerbs below), so no second hit box lies over them.
+      const storage = isStorageClass(row.classTsid);
+      let box = null;
+      if (!storage) {
+        box = new PIXI.Container();
+        box.x = Math.round(row.x);
+        box.y = Math.round(row.y);
+        box.zIndex = 13;
+        box.addChild(hitBox(PIXI, -w / 2, ceiling ? 0 : -h, w, h));
+        box._worldHitW = w;
+        box._worldHitH = h;
+        engine.entityLayer.addChild(box);
+      }
       let tag = null;
       if (listing) {
         tag = priceTag(listing.price);
-        tag.x = box.x;
-        tag.y = ceiling ? box.y + h + 14 : box.y - h - 12;
+        tag.x = Math.round(row.x);
+        tag.y = ceiling ? Math.round(row.y) + h + 14 : Math.round(row.y) - h - 12;
         engine.entityLayer.addChild(tag);
       }
       const label = pieceLabel(row, def.label) || ITEM_CATALOG[row.classTsid]?.label || row.classTsid;
       const subtitle = listing ? T.buyTip(listing.price) : 'Yours';
-      const target = addTarget({ classId: CLASS_SALE, label, subtitle, sprite: box, state: { uid: row.uid, owner } });
-      drawn.sales.set(row.uid, { target, tag, uid: row.uid, classTsid: row.classTsid, label, listing, x: row.x });
+      const target = box ? addTarget({ classId: CLASS_SALE, label, subtitle, sprite: box, state: { uid: row.uid, owner } }) : null;
+      drawn.sales.set(row.uid, { target, box, tag, uid: row.uid, classTsid: row.classTsid, label, listing, x: row.x, row: row.source || null });
     }
   }
 
@@ -521,7 +528,7 @@ function createSession(engine, client) {
     if (!decor) return;
     const geo = ownGeometry();
     salesKey = salePlacementKey(decor.placed, geo.house.roomX);
-    drawSales(decor.placed.map((p) => ({ uid: p.id, classTsid: p.classTsid, upgradeId: p.upgradeId, x: geo.house.roomX + p.x, y: p.y })), own.listed, { owner: true });
+    drawSales(decor.placed.map((p) => ({ uid: p.id, classTsid: p.classTsid, upgradeId: p.upgradeId, x: geo.house.roomX + p.x, y: p.y, source: p })), own.listed, { owner: true });
   }
 
   // —— My own home: the site's word ——
@@ -606,6 +613,8 @@ function createSession(engine, client) {
   // —— Visiting ——
 
   async function onVisit(info) {
+    // Ticket 51: the storage feature draws the visited house's cabinets and boxes.
+    engine.query?.('homeStorageVisit', info, engine);
     visit = { owner: info.owner, name: info.name, room: info.room, key: info.key === true, view: info.view, data: null, listed: new Map(),
       pieces: info.spots?.pieces || [], roomX: Number(info.spots?.roomX) || 0, houseX: 0 };
     const v = visitorHomeState(info.view);
@@ -717,7 +726,7 @@ function createSession(engine, client) {
     if (target.classId === CLASS_SALE) {
       const e = drawn.sales.get(target.state?.uid);
       if (!e) return [];
-      return saleVerbs({ owner: w === 'house', listing: e.listing });
+      return saleVerbs({ owner: w === 'house', listing: e.listing, full: storageHasContents(e.row) });
     }
     if (target.classId === CLASS_PILE) return [{ id: 'pile_collect', label: T.collectVerb, tooltip: T.collectTip, enabled: true, reason: '', primary: true }];
     if (target.classId === CLASS_PROTO) return [{ id: 'restore', label: T.restoreVerb, tooltip: T.restoreTip, enabled: true, reason: '', primary: true }];
@@ -1184,6 +1193,17 @@ function createSession(engine, client) {
     where,
     verbsFor,
     runVerb,
+    /** Ticket 51: a cabinet's or a box's sale verbs, on the storage feature's own target (by piece id). */
+    storageSaleVerbs(uid) {
+      const e = drawn.sales.get(Number(uid));
+      if (!e) return [];
+      return saleVerbs({ owner: where() === 'house', listing: e.listing, full: storageHasContents(e.row) });
+    },
+    storageSaleRun(uid, verbId) {
+      if (!drawn.sales.has(Number(uid))) return false;
+      runSale({ state: { uid: Number(uid) } }, verbId);
+      return true;
+    },
     onVisit,
     placePole,
     loadOwn,
@@ -1343,6 +1363,17 @@ export const homeStreetMpFeature = {
 
   runVerb(target, verbId) {
     return session ? session.runVerb(target, verbId) : false;
+  },
+
+  /** Ticket 51: furniture_base's sale verbs on a cabinet or a box (the storage feature owns their target). */
+  extraVerbs(target) {
+    if (!session || target?.classId !== 'home_storage') return null;
+    return session.storageSaleVerbs(target.state?.uid);
+  },
+
+  runVerbOverride(target, verbId) {
+    if (!session || target?.classId !== 'home_storage' || !String(verbId).startsWith('furn_')) return null;
+    return session.storageSaleRun(target.state?.uid, verbId) ? true : null;
   },
 
   /** note_pole.js place (pack). */

@@ -51,6 +51,8 @@ import {
   HOME_TEXTURE_CONFIGS,
 } from './homes-catalog.js?v=7aa9beb0';
 import { cleanHistory, cleanUpgradeId, upgradeArt, upgradeRow } from './furniture-upgrades.js?v=a3788c0d';
+import { SDB_COUNT_MAX, SDB_PRICE_MAX, isCabinetClass, normalizeContents, storagePickupLock } from './home-storage.js?v=56c6416d';
+import { stackMaxOf } from './pack-slots.js?v=ba0a895f';
 
 export const SEGMENT_W = 150;
 /** Room geometry version stored with the house (2 = source 150 px segments). */
@@ -233,8 +235,19 @@ function normalizePlaced(row) {
   };
   copyStyle(row, out);
   if (classTsid === 'bag_furniture_sdb' && row?.display?.classTsid) {
-    const count = Math.max(0, Math.min(1_000_000, Math.floor(finite(row.display.count, 0))));
+    const count = Math.max(0, Math.min(SDB_COUNT_MAX, Math.floor(finite(row.display.count, 0))));
     if (count > 0) out.display = { classTsid: cleanKey(row.display.classTsid), count };
+  }
+  // Ticket 51 (G404, js/home-storage.js): a box's selling price, and a cabinet's slots. A save from
+  // before either has none, and the box is not selling, the cabinet empty.
+  if (classTsid === 'bag_furniture_sdb') {
+    const price = Math.floor(finite(row?.price, 0));
+    if (price > 0 && price <= SDB_PRICE_MAX) out.price = price;
+    if (row?.selling === true && out.display && out.price) out.selling = true;
+  }
+  if (isCabinetClass(classTsid) && Array.isArray(row?.contents) && row.contents.some(Boolean)) {
+    out.contents = normalizeContents(classTsid, row.contents, (c) => stackMaxOf(c));
+    if (!out.contents.some(Boolean)) delete out.contents;
   }
   return out;
 }
@@ -726,9 +739,10 @@ export function pickUpFurniture(state, id) {
   const item = itemById(state, id);
   if (!item) return { ok: false, reason: 'missing' };
   const lifted = [item, ...riders(state, item.id)];
-  const full = lifted.find((row) => row.display?.count > 0);
+  // canPickup (bag_furniture_cabinet.js 446-450, bag_furniture_sdb.js 878-883): storage must be empty first.
+  const full = lifted.map((row) => storagePickupLock(row)).find(Boolean);
   if (full) {
-    return { ok: false, reason: 'not_empty', msg: "You can't pick that up. Empty the Storage Display Box first." };
+    return { ok: false, reason: 'not_empty', msg: full };
   }
   const ids = new Set(lifted.map((row) => row.id));
   state.placed = state.placed.filter((row) => !ids.has(row.id));

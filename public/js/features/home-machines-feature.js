@@ -69,7 +69,7 @@ import {
   expireSolo,
   tankOf,
   TAKEN_KEEP,
-} from '../home-machines.js?v=de959487';
+} from '../home-machines.js?v=61b4ffe9';
 import { CALL_PLAYER_LINES, MACHINE_HITBOX, MACHINE_SKILLS, collectLine, machineJobMs, machineMadeLine, runningSoundKey, takeJobIngredients } from '../machine-rooms.js?v=6f8521ef';
 import { MACHINE_ART_SHEETS, LOW_FUEL_BUBBLE_MS, LOW_FUEL_LINE, isLowFuel, machineFrame, machineSheetDef, roomMachineState } from '../machine-art.js?v=8c93c616';
 import { FUEL_CELL, FUEL_PER_CELL, MAX_FUEL } from '../machines.js?v=ac30307e';
@@ -82,7 +82,7 @@ import { readVisitScene } from '../neighbours-mp.js?v=a8d5544e';
 import { saveStore } from '../save-store.js?v=8839ba7b';
 import { textureFromUrl } from '../textures.js?v=db2ce452';
 import { createSheetLoader } from '../sprite-sheets.js?v=6e3278fe';
-import { STREET_GROUND_Y, homesFeature } from './homes-feature.js?v=2df0ff28';
+import { STREET_GROUND_Y, homesFeature } from './homes-feature.js?v=cb502285';
 
 export { HOME_MACHINES_ID };
 

@@ -136,7 +136,7 @@ import {
   textureConfig,
   unexpandInterior,
   UNEXPAND_TEXT,
-} from '../home-decor.js?v=39721c9f';
+} from '../home-decor.js?v=3ee9ea0d';
 import { applyBonusUpgrade, applyUpgrade, bonusUpgradeLine, currantsText, hasUpgrades, pieceLabel, rollBonusUpgrade, upgradeVerb, UPGRADE_TEXT } from '../furniture-upgrades.js?v=a3788c0d';
 import { DOCK_GAP, DOCK_W, chooseUpgrade, closeUpgradePicker, openUpgradePicker, placeUpgradePicker, saveUpgrade, upgradePickerOpen, upgradePickerState } from '../furniture-upgrade-picker.js?v=3a637ec8';
 import {
@@ -244,7 +244,8 @@ import {
 import { getGameDayKey } from '../game-day.js?v=edb00566';
 import { HOME_TICKET, HOME_TICKET_CLASS } from '../home-ticket.js?v=dd702301';
 import { MIN_GROUND_CLEARANCE, yCamOffsetAnchor } from '../movement.js?v=a314f8a1';
-import { takeFromHouse } from '../ledger-house.js?v=258ef99e';
+import { takeFromHouse } from '../ledger-house.js?v=ffde326e';
+import { storagePickupLock } from '../home-storage.js?v=56c6416d';
 import {
   DOOR_CLASS,
   DOOR_JOB_PHASES,
@@ -266,7 +267,7 @@ import {
   quoteHouseExpansion,
   quoteHouseUnexpand,
   unexpandHouseFloors,
-} from '../home-floors.js?v=0fcc7b5e';
+} from '../home-floors.js?v=259009f8';
 
 export const HOMES_FEATURE_ID = 'homes';
 const HOME_STREET_TSID = 'RH_HOME_EXT';
@@ -2156,6 +2157,7 @@ function furnitureView(PIXI, item) {
     icon.width = 34;
     icon.height = 34;
     icon.y = displayIconY(item, upgradeId);
+    icon.label = 'sdb-icon';
     box.addChild(icon);
     const badge = new PIXI.Text({ text: String(item.display.count), style: {
       fontFamily: 'Trebuchet MS, sans-serif',
@@ -2167,6 +2169,8 @@ function furnitureView(PIXI, item) {
     badge.anchor.set(1, 1);
     badge.x = 28;
     badge.y = -6;
+    // Ticket 51: the storage feature keeps a visited box's count up to date (home-storage-feature).
+    badge.label = 'sdb-count';
     box.addChild(badge);
   }
   box.x = item.x;
@@ -4244,8 +4248,12 @@ function runFurnitureAction(engine, action, arg) {
       : null;
     // HOMES3 (multiplayer): a piece for sale stays put (furniture_bed.js:70 "You have to stop selling it first.").
     const sale = houseFloorHere() === 0 ? engine.query?.('furnitureSaleLock', decor, id, engine) : null;
+    // Ticket 51 (bag_furniture_sdb.js canPickup 872): a box with currants on it (online, the site's) stays put too.
+    const income = houseFloorHere() === 0 && placedItem(decor, id)?.classTsid === 'bag_furniture_sdb' ? Number(engine.query?.('storagePickupIncome', id, engine)) || 0 : 0;
+    const held = income > 0 ? storagePickupLock(placedItem(decor, id), { income }) : '';
     result = door && !door.ok ? { ok: false, reason: 'door', msg: door.msg }
-      : typeof sale === 'string' && sale ? { ok: false, reason: 'sale', msg: sale } : pickUpFurniture(decor, id);
+      : typeof sale === 'string' && sale ? { ok: false, reason: 'sale', msg: sale }
+        : held ? { ok: false, reason: 'not_empty', msg: held } : pickUpFurniture(decor, id);
     if (result.ok && door?.role === 'pending') {
       // A Door picked up before its project started takes the project with it.
       const jobId = doorJobId(floors);
@@ -7075,7 +7083,11 @@ export const homesFeature = {
    * house, as the site took it out of the stored save (js/ledger-house.js); answers what it took.
    */
   ledgerTakeBack(want, engine) {
-    const taken = takeFromHouse([houseDecor, ...(floors.upper || []), ...towerDecor], want);
+    // Ticket 51: a cabinet taken away leaves what was in it in the pack, as the site's remove does.
+    const spill = {};
+    const taken = takeFromHouse([houseDecor, ...(floors.upper || []), ...towerDecor], want, spill);
+    for (const [c, n] of Object.entries(spill)) engine.inv[c] = (Number(engine.inv[c]) || 0) + n;
+    if (Object.keys(spill).length) engine.refreshPack?.();
     if (Object.keys(taken).length && engine?.homeContext?.()?.inHome) engine.refreshHomeScene?.();
     return taken;
   },
@@ -7086,6 +7098,11 @@ export const homesFeature = {
    */
   homeDispatcherX() {
     return dispatcherWorldX();
+  },
+
+  /** Ticket 51: redraws the room's furniture (a box's count or a cabinet changed under it). */
+  refreshFurniture(engine) {
+    if (scene?.furnitureLayer) renderFurniture(engine);
   },
 
   /** QA / tests. */

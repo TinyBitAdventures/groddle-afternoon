@@ -138,6 +138,8 @@ export const HOME_STREET_TEXT = Object.freeze({
   priceTitle: 'Price',
   setPrice: 'Set price',
   stopFirst: 'You have to stop selling it first.',
+  /** furniture_base set_sale_price 145 (and the site's LedgerFurniture TEXT_EMPTY): a box or a cabinet with things in it. */
+  emptyFirst: 'This item must be emptied before it can be sold.',
   stopped: (label) => `You stopped selling a ${label}.`,
   forSale: (label, price) => `Your ${label} is for sale for ${currants(price)}.`,
   buying: (label) => `Buying ${label}`,
@@ -318,13 +320,14 @@ export function parsePrice(text) {
 }
 
 /** furniture_base set_sale_price / edit_sale_price / dont_sell for the owner, buy for anyone else. */
-export function saleVerbs({ owner = false, listing = null } = {}) {
+export function saleVerbs({ owner = false, listing = null, full = false } = {}) {
   const T = HOME_STREET_TEXT;
   if (!owner) {
     if (!listing) return [];
     return [{ id: 'furn_buy', label: T.buyVerb, tooltip: T.buyTip(listing.price), enabled: true, reason: '', primary: true }];
   }
-  if (!listing) return [{ id: 'furn_set_price', label: T.setPriceVerb, tooltip: T.setPriceTip, enabled: true, reason: '' }];
+  // Ticket 51: a Storage Display Box or a cabinet with things in it can't go up for sale (canSell).
+  if (!listing) return [{ id: 'furn_set_price', label: T.setPriceVerb, tooltip: T.setPriceTip, enabled: !full, reason: full ? T.emptyFirst : '' }];
   return [
     { id: 'furn_edit_price', label: T.editPriceVerb, tooltip: T.editPriceTip, enabled: true, reason: '' },
     { id: 'furn_dont_sell', label: T.dontSellVerb, tooltip: T.dontSellTip, enabled: true, reason: '' },
