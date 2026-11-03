@@ -11,6 +11,8 @@
 declare(strict_types=1);
 
 [, $engine, $extension] = $argv;
+// The built game's public/, to read its real js/sprite-hires.js (optional).
+$game = $argv[3] ?? null;
 define('ABSPATH', sys_get_temp_dir() . '/');
 define('MINN_ENGINE_DIR', $engine);
 require $engine . '/src/Minn/Autoloader.php';
@@ -40,6 +42,16 @@ $png('assets/sprites/rocks/rock_sheet.png', 400, 100);
 $png('assets/sprites/rocks/rock_sheet@3x.webp', 1200, 300);
 $png('assets/sprites/made/fire-dragon/dragon.png', 50, 50);
 $png('assets/ui/signpost/signpost_post.png', 43, 246);
+// A sheet whose 3x ships split into two parts (js/sprite-hires.js SPLIT_SPRITES): 4 x 2 cells of
+// 50 x 80 on the 1x sheet; each part holds 4 cells in 2 columns (100 x 160 in 1x units, 300 x 480 px).
+$png('assets/sprites/mail-npc/fake_left.png', 200, 160);
+$png('assets/sprites/mail-npc/fake_left.p1@3x.webp', 300, 480);
+$png('assets/sprites/mail-npc/fake_left.p2@3x.webp', 300, 480);
+@mkdir("{$root}/js", 0777, true);
+file_put_contents("{$root}/js/sprite-hires.js", "export const HIRES_SPRITES = new Map([\n]);\n\nexport const SPLIT_SPRITES = new Map([\n"
+    . '  ["assets/sprites/mail-npc/fake_left.png", { fw: 50, fh: 80, cols: 4, parts: [["assets/sprites/mail-npc/fake_left.p1@3x.webp", 0, 4, 2], ["assets/sprites/mail-npc/fake_left.p2@3x.webp", 4, 4, 2]] }],' . "\n"
+    . '  ["../../etc/passwd", { fw: 50, fh: 80, cols: 4, parts: [["../x.webp", 0, 4, 2]] }],' . "\n"
+    . "]);\n");
 $png('assets/content/secret.png', 10, 10);
 @mkdir("{$root}/encyclopedia/items/rock_metal_1", 0777, true);
 file_put_contents("{$root}/encyclopedia/items/rock_metal_1/index.html", '<!doctype html>');
@@ -212,6 +224,25 @@ $wide = $withStreet(function (&$l): void {
     $l['layers'][2]['draw'][] = ['col' => '#544232', 'x' => 0, 'y' => 357, 'w' => 6720, 'h' => 74];
 });
 $out['wideBytes'] = strlen(json_encode($wide));
+
+// Split 3x sheets: the frame drawn from its part on high-density screens, the 1x sheet below.
+$split = [
+    'v' => 1, 'w' => 960, 'h' => 476,
+    'art' => ['assets/sprites/mail-npc/fake_left.png'],
+    'draw' => [
+        ['a' => 0, 'x' => 100, 'y' => 100, 'w' => 50, 'h' => 80, 'c' => [150, 80, 50, 80], 's' => 0],
+        ['a' => 0, 'x' => 300, 'y' => 100, 'w' => 60, 'h' => 80, 'c' => [40, 0, 60, 80]],
+    ],
+    'spots' => [['k' => 'dispatcher', 'b' => [100, 100, 50, 80]]],
+];
+$out['splitSheets'] = HomeLayout::splitSheets($root);
+$out['splitFrame'] = HomeLayout::hiresFrame($root, 'assets/sprites/mail-npc/fake_left.png', [150, 80, 50, 80]);
+$out['splitSpans'] = HomeLayout::hiresFrame($root, 'assets/sprites/mail-npc/fake_left.png', [40, 0, 60, 80]);
+$out['splitNot'] = HomeLayout::hiresFrame($root, 'assets/sprites/rocks/rock_sheet.png', [0, 0, 100, 100]);
+$out['splitHtml'] = HomeLayout::render(HomeLayout::accept($split, $root), ['owner' => 'Zz', 'root' => $root, 'avatar' => null]);
+if ($game !== null) {
+    $out['realSplits'] = HomeLayout::splitSheets($game);
+}
 $out['wide'] = $try($wide);
 
 echo json_encode($out, JSON_UNESCAPED_SLASHES), "\n";

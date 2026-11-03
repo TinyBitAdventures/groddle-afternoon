@@ -20,6 +20,7 @@ import {
 } from '../public/js/home-layout.js?v=bbb94dc1';
 import { walkHomeScene } from '../public/js/home-layout-scene.js?v=ac4644ad';
 import { AVATAR_STILL, homeKeyOf } from '../public/js/profiles.js?v=174a1a84';
+import { HIRES_SPRITES, SPLIT_SPRITES } from '../public/js/sprite-hires.js?v=96c22af7';
 import { HOUSE_STYLE_KEYS } from '../public/js/features/homes-feature.js?v=475cf850';
 import { SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
 
@@ -333,5 +334,40 @@ describe('the site side (groddle-afternoon-site src/HomeLayout.php)', { skip: sk
     assert.doesNotMatch(out.html, /—/);
     assert.match(out.scriptName, /data-label="&lt;img src=x onerror=alert\(1\)&gt; · Tower · 4 floors"/);
     assert.doesNotMatch(out.scriptName, /<img src=x/);
+  });
+
+  // Austin 2026-11-03: "the mail dispatcher looks blurry but only on the home street mockup".
+  it('draws a split 3x sheet\'s frame from its part on sharp screens, as the game does (php)', { skip: !existsSync(join(engine, 'src/Minn/Autoloader.php')) && 'Minn Engine not found (set MINN_ENGINE_DIR)' }, () => {
+    let out;
+    try {
+      out = JSON.parse(execFileSync('php', [join(root, 'tests/fixtures/profiles/home-layout.php'), engine, SITE_DIR, join(root, 'public')], { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 }));
+    } catch (err) {
+      if (err.code === 'ENOENT') return;
+      throw err;
+    }
+    if (out.gd === 'no') return;
+    // The site reads every split sheet the game's generated js/sprite-hires.js lists, exactly.
+    const real = Object.fromEntries([...SPLIT_SPRITES].map(([sheet, s]) => [sheet, { fw: s.fw, fh: s.fh, cols: s.cols, parts: s.parts }]));
+    assert.deepEqual(out.realSplits, real);
+    assert.ok(out.realSplits['assets/sprites/mail-npc/dispatcher_left.png'], 'the mail dispatcher is one');
+    // Only the generated shape, paths under assets/.
+    assert.deepEqual(Object.keys(out.splitSheets), ['assets/sprites/mail-npc/fake_left.png']);
+    // Cell 7 (column 3, row 1) is the second part's fourth cell: column 1, row 1 of its 2-column grid.
+    assert.deepEqual(out.splitFrame, { src: 'assets/sprites/mail-npc/fake_left.p2@3x.webp', x: 50, y: 80, pw: 100, ph: 160 });
+    assert.equal(out.splitSpans, null, 'a frame across two cells stays on the 1x sheet (sprite-hires pointAtPart)');
+    assert.equal(out.splitNot, null);
+    const html = out.splitHtml;
+    assert.match(html, /<span class="hd-crop hd-lo" [^>]*><img src="\/assets\/sprites\/mail-npc\/fake_left\.png" [^>]*style="left:-300%;top:-100%;width:400%;height:200%" \/><\/span>/);
+    assert.match(html, /<span class="hd-crop hd-hi" [^>]*><img src="\/assets\/sprites\/mail-npc\/fake_left\.p2@3x\.webp" [^>]*style="left:-100%;top:-100%;width:200%;height:200%" \/><\/span>/);
+    assert.equal((html.match(/hd-hi/g) || []).length, 1, 'the spanning frame has no 3x crop');
+    assert.match(site('style.css'), /@media \(min-resolution: 1\.5dppx\), \(-webkit-min-device-pixel-ratio: 1\.5\) \{\n\s*\.home-diorama \.hd-stage \.hd-lo \{ display: none; \}\n\s*\.home-diorama \.hd-stage \.hd-hi \{ display: block; \}/);
+  });
+
+  it('every other sprite with a 3x render ships it beside the 1x file, where the site looks (HomeLayout::artFile)', () => {
+    // A single-file twin is <stem>@3x.webp or <stem>@3x.png; the split sheets are the case above.
+    for (const [one, three] of HIRES_SPRITES) {
+      const stem = one.replace(/\.[a-z]+$/, '');
+      assert.ok(three === `${stem}@3x.webp` || three === `${stem}@3x.png`, `${one} -> ${three}`);
+    }
   });
 });
