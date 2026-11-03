@@ -33,9 +33,9 @@ import { platformsScreen, barriersScreen, isStandable, isSolidFromBelow, isItemF
 import { planStreetPlacements, populationForStreet, streetReservedSpots } from '../street-ecology.js?v=2c82c072';
 import { JUMP_SPEED } from '../avatar-step.js?v=33ad1926';
 import { STY_RULES, styleFindings } from './style-rules.js?v=abf9bfae';
-import { EFFECT_LIMITS, effectsCost, normaliseEmitter, rumbleShare, emitterAnchor } from '../street-effects.js?v=f0fb3ce6';
+import { EFFECT_LIMITS, effectsCost, normaliseEmitter, rumbleShare, emitterAnchor } from '../street-effects.js?v=03f7fe4d';
 import { LICENCE_POLICY, provenanceProblems } from './new-art.js?v=29f0b13e';
-import { postOffFloor, offFloorWords } from './posts.js?v=3f65c33b';
+import { postOffFloor, offFloorWords } from './posts.js?v=82926ee0';
 import { floatingLines, FLOAT_REACH, FLOAT_OPEN } from './ground.js?v=a60d7c91';
 
 export const RULES = Object.freeze({

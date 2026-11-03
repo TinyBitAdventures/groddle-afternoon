@@ -58,7 +58,7 @@ import { createMineRock, mineRock, tickMineRock } from '../public/js/mining.js?v
 import { runTransform, shuckDetails } from '../public/js/item-transforms.js?v=cde562be';
 import { brushFox, createFox, foxFiberRange } from '../public/js/foxes.js?v=f03578b1';
 import { soundForMakingTool } from '../public/js/sound-moments.js?v=2f8597cd';
-import { supplyFeature } from '../public/js/features/supply-feature.js?v=d52bef9d';
+import { supplyFeature } from '../public/js/features/supply-feature.js?v=ed3383bf';
 
 const SPIKE = join(dirname(fileURLToPath(import.meta.url)), '..', 'public');
 const seq = (...values) => {

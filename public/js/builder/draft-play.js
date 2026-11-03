@@ -25,8 +25,8 @@ import { streetWithEdits, editsOn } from './zone.js?v=dff4acc0';
 import { getStreetEcologyCatalog, setStreetEcologyCatalog } from '../street-ecology.js?v=2c82c072';
 import { createBuilderApi } from './api.js?v=9560d68f';
 import { installNewArt } from './new-art.js?v=29f0b13e';
-import { loadDecoManifest } from '../street-render.js?v=f98221f2';
-import * as textureUrls from '../textures.js?v=db2ce452';
+import { loadDecoManifest } from '../street-render.js?v=9349c0e5';
+import * as textureUrls from '../textures.js?v=3149d699';
 
 export const DRAFT_REFUSED = 'That draft is not available.';
 

@@ -47,8 +47,8 @@ import { slugsFromEffects } from '../speech-slugs.js?v=130338f9';
 import { addItem, countItem, removeItem } from '../inventory.js?v=597a17a2';
 import { getToolCondition } from '../tools.js?v=3974f57e';
 import { worldToScreen } from '../street-model.js?v=505d8990';
-import { OVERLAY_USES, playOverlay } from '../overlays.js?v=90f4b1ba';
-import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=6e3278fe';
+import { OVERLAY_USES, playOverlay } from '../overlays.js?v=210ad5ee';
+import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=8f5dc6d9';
 import { nearestSurfaceY, walkSurfaceY } from '../walk-surface.js?v=c982983e';
 import { loadWildlifeCatalog, wildlifeCatalog, wildlifeFor } from '../wildlife.js?v=670c3a7f';
 import {

@@ -47,7 +47,7 @@ import { ITEM_CATALOG, addItem, countItem, ensureItem, itemIcon, removeItem } fr
 import { canUseTool, useToolCondition } from '../tools.js?v=3974f57e';
 import { ecologyForStreet } from '../street-ecology.js?v=2c82c072';
 import { worldToScreen } from '../street-model.js?v=505d8990';
-import { signArmWidth } from '../street-render.js?v=f98221f2';
+import { signArmWidth } from '../street-render.js?v=9349c0e5';
 import { getSkillCatalog } from '../content-catalogs.js?v=10b118dd';
 import { GIANTS } from '../shrines.js?v=51e09fa4';
 import { teleportationFeature } from './teleportation-feature.js?v=b46fa776';
@@ -121,7 +121,7 @@ import {
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 import { createMinnAccount } from '../minn-account.js?v=eb300264';
 import { normalizeGroups } from '../groups.js?v=14b60589';
-import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=db2ce452';
+import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=3149d699';
 import { JOB_WORK_OVERLAY, jobWorkFloatPoint, jobWorkSoundKey, jobWorkToolScale, jobWorkToolSheet } from '../job-work-fx.js?v=430b96b2';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
 import { routeGraph } from '../map-routes.js?v=130d8539';

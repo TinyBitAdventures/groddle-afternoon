@@ -102,10 +102,10 @@ import {
 } from '../powders.js?v=d355981a';
 import { itemVerbAchievementCounters } from '../item-verbs.js?v=729ccd91';
 import { DEAD_TRANT_CLASSES } from '../patches.js?v=3e9218c1';
-import { hellFeature } from './hell-feature.js?v=1f4a67d5';
+import { hellFeature } from './hell-feature.js?v=705a486b';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
-import { displayTopOf, playSheetOverlay } from '../overlay-art.js?v=3753a0d2';
-import { OVERLAY_USES, playOverlay } from '../overlays.js?v=90f4b1ba';
+import { displayTopOf, playSheetOverlay } from '../overlay-art.js?v=11b6dd7f';
+import { OVERLAY_USES, playOverlay } from '../overlays.js?v=210ad5ee';
 import {
   POWDER_MP,
   POWDER_MP_TEXT,

@@ -18,7 +18,7 @@
 
 import { stepParadiseBody, usesParadiseBody } from './paradise-courses.js?v=1a5d0aa7';
 import { SKY_PLUNGE_FILES } from './sky-plunge-art.js?v=47e01e53';
-import { isLoaded, onLoaded, textureFromUrl } from './textures.js?v=db2ce452';
+import { isLoaded, onLoaded, textureFromUrl } from './textures.js?v=3149d699';
 
 const DECO_ROOT = 'assets/decos/groddle';
 const decoUrl = (name) => `${DECO_ROOT}/${name}.png`;

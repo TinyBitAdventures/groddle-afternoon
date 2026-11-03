@@ -109,7 +109,7 @@ import {
   towerSpotsFor,
   workCheck,
 } from '../home-tower.js?v=6a203c8f';
-import { textureFromUrl } from '../textures.js?v=db2ce452';
+import { textureFromUrl } from '../textures.js?v=3149d699';
 import { denseSprite } from '../sprite-dense.js?v=178a711b';
 import { pieceUrl } from '../home-wallpaper.js?v=f1969400';
 import { wantsHiresDecos } from '../deco-hires.js?v=cb905e17';

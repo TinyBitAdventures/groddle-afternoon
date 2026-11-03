@@ -63,7 +63,7 @@ import {
   soilSpritePaths,
   tickPlot,
 } from '../patches.js?v=3e9218c1';
-import { frameTexture, isLoaded, onFailed, onLoaded, textureFromUrl } from '../textures.js?v=db2ce452';
+import { frameTexture, isLoaded, onFailed, onLoaded, textureFromUrl } from '../textures.js?v=3149d699';
 import { HOE_TOOLS, firstWorkingTool } from '../tools.js?v=3974f57e';
 import { slugsFromEffects } from '../speech-slugs.js?v=130338f9';
 

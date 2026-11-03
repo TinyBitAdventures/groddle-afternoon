@@ -277,6 +277,58 @@ export function onFailed(textureOrSource, fn) {
   whenLoaded(textureOrSource).catch((err) => fn(err));
 }
 
+/**
+ * Ticket 21 (Safari reloaded the page for its memory in Naraka, or just after): this module keeps
+ * every image it ever loaded, decoded, and Pixi frees only the GPU copy (20 s unused). After a dozen
+ * streets that was some 500 street decos and 480 megapixels, 1.9 GB as decoded pixels, carried into
+ * every street after, so a long session reached Safari's limit about the time a player croaked.
+ * An image whose URL passes `match` that has had no GPU copy for `idleMs` (none of the streets
+ * since drew it) is forgotten here: whatever still holds it (a culled deco on this street) keeps
+ * it and draws it as before, and a later textureFromUrl loads it again from the HTTP cache.
+ * `onGpu` is the renderer's managed sources (a Set). Returns how many were forgotten.
+ */
+export function releaseIdleImages({ match, onGpu, now = Date.now(), idleMs = 30000 } = {}) {
+  if (!(match instanceof RegExp) || !onGpu) return 0;
+  let released = 0;
+  for (const [url, source] of [...sources]) {
+    const state = source[LOAD];
+    if (!state?.loaded || source.destroyed || !match.test(url)) continue;
+    if (onGpu.has(source)) {
+      state.offGpuSince = 0;
+      continue;
+    }
+    if (!state.offGpuSince) {
+      state.offGpuSince = now;
+      continue;
+    }
+    if (now - state.offGpuSince < idleMs) continue;
+    sources.delete(url);
+    if (textures.get(url)?.source === source) textures.delete(url);
+    released += 1;
+  }
+  return released;
+}
+
+/**
+ * MEMQA (ticket 21): the loaded URL images by folder (assets/<a>/<b>), largest first: count and
+ * megapixels, and how many of them are in `onGpu` (a Set of the renderer's managed sources: Pixi frees
+ * a GPU copy unused for 20 s; the image stays here).
+ */
+export function textureFolders(limit = 12, onGpu = null) {
+  const rows = new Map();
+  for (const source of sources.values()) {
+    if (!source[LOAD]?.loaded || source.destroyed) continue;
+    const m = /assets\/([^/]+(?:\/[^/]+)?)\//.exec(source[LOAD].url);
+    const key = m ? m[1] : 'other';
+    const row = rows.get(key) || { folder: key, images: 0, mpx: 0, onGpu: 0 };
+    row.images += 1;
+    row.mpx += (source.pixelWidth * source.pixelHeight) / 1e6;
+    if (onGpu?.has(source)) row.onGpu += 1;
+    rows.set(key, row);
+  }
+  return [...rows.values()].sort((a, b) => b.mpx - a.mpx).slice(0, limit).map((r) => ({ ...r, mpx: +r.mpx.toFixed(1) }));
+}
+
 /** Loaded-image stats for QA (count and decoded pixels of URL images). */
 export function textureStats() {
   let loaded = 0;

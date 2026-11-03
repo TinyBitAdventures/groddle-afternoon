@@ -57,12 +57,12 @@ import { performPlotVerb, plotArtPath, plotLabel, plotStatusLabel, plotVerbs } f
 import { trantStatusLabel } from '../trants.js?v=9c2e8c0f';
 import { woodTreeStatusLabel } from '../woodcutting.js?v=6d2ad054';
 import { animalAnchorX, animalStatusLabel } from '../animals.js?v=35a443e9';
-import { frameTexture, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js?v=db2ce452';
+import { frameTexture, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js?v=3149d699';
 import { homeStreetLayout, normalizeCultivationState } from '../home-cultivation.js?v=11616085';
 import { readVisitScene } from '../neighbours-mp.js?v=a8d5544e';
 import { saveStore } from '../save-store.js?v=8839ba7b';
-import { STREET_GROUND_Y, homesFeature, wearHomeCultivation } from './homes-feature.js?v=652580fd';
-import { patchesFeature, treeFrameUrl } from './patches-feature.js?v=72ac643c';
+import { STREET_GROUND_Y, homesFeature, wearHomeCultivation } from './homes-feature.js?v=d746c0a7';
+import { patchesFeature, treeFrameUrl } from './patches-feature.js?v=310a2eec';
 import {
   YARD_STREET,
   YARD_TEXT as T,
@@ -85,7 +85,7 @@ import { ROCK_CATALOG, rockStatusLabel, tickMineRock } from '../mining.js?v=7629
 import { getResourceNodeDef, regrowDelayMs } from '../resource-nodes.js?v=7e4d7df8';
 import { getGameDayKey } from '../game-day.js?v=edb00566';
 import { rockReady } from '../street-objects.js?v=d713d18e';
-import { resourceNodesFeature } from './resource-nodes-feature.js?v=38a15cbc';
+import { resourceNodesFeature } from './resource-nodes-feature.js?v=128c01c5';
 import {
   ROCK_RESPAWN_MS,
   STOCK_NODE_VERBS,

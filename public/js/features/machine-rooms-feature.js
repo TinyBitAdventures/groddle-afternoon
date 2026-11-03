@@ -92,8 +92,8 @@ import { energyMax, moodMax } from '../metabolics.js?v=8504134e';
 import { getSkillCatalog } from '../content-catalogs.js?v=10b118dd';
 import { worldToScreen } from '../street-model.js?v=505d8990';
 import { nearestSurfaceY } from '../walk-surface.js?v=c982983e';
-import { textureFromUrl } from '../textures.js?v=db2ce452';
-import { createSheetLoader } from '../sprite-sheets.js?v=6e3278fe';
+import { textureFromUrl } from '../textures.js?v=3149d699';
+import { createSheetLoader } from '../sprite-sheets.js?v=8f5dc6d9';
 import {
   LOW_FUEL_BUBBLE_MS,
   LOW_FUEL_LINE,

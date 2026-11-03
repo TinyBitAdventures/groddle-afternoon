@@ -19,7 +19,7 @@
  */
 
 import { ITEM_CATALOG, ensureItem } from '../inventory.js?v=597a17a2';
-import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=db2ce452';
+import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=3149d699';
 import {
   CLOSE_AFTER_MS,
   DOOR_DRINK,

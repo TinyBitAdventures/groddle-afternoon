@@ -13,7 +13,7 @@ import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { homedir } from 'node:os';
 
-import * as kit from '../public/js/quest-rooms/kit.js?v=4d2f1606';
+import * as kit from '../public/js/quest-rooms/kit.js?v=4d8ab82d';
 import {
   ALLEY,
   ALLEY_ART,
@@ -43,8 +43,8 @@ import {
   nearestStation,
   room,
   stationForDoor,
-} from '../public/js/quest-rooms/back-alley.js?v=95860693';
-import * as alleySet from '../public/js/quest-rooms/back-alley-set.js?v=406515a9';
+} from '../public/js/quest-rooms/back-alley.js?v=3b1dd2f9';
+import * as alleySet from '../public/js/quest-rooms/back-alley-set.js?v=5faee32f';
 import { STATION_FLOOR, STATIONS, stationArrival, stationByTsid, surfaceStation } from '../public/js/subway.js?v=5719ffc3';
 import { BACK_ALLEY_FILES } from '../public/js/quest-rooms/back-alley-art.js?v=08af5d4f';
 import { QUEST_ROOMS } from '../public/js/quest-rooms/catalog.js?v=9ebeb502';

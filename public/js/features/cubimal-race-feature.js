@@ -54,9 +54,9 @@
  */
 
 import { addItem, countItem, removeItem } from '../inventory.js?v=597a17a2';
-import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=6e3278fe';
+import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=8f5dc6d9';
 import { landingY, walkSurfaceY } from '../walk-surface.js?v=c982983e';
-import { playPoofIn, poofInAlpha } from '../overlay-art.js?v=3753a0d2';
+import { playPoofIn, poofInAlpha } from '../overlay-art.js?v=11b6dd7f';
 import {
   CUBIMAL_FREE,
   CUBIMAL_FREE_RESPONSES,

@@ -10,7 +10,7 @@
  * hands over the layer's children from before the redraw: every child added
  * since whose bounds centre lies within `halfW` of the poof's x fades in.
  */
-import { POOF_IN, poofInAlpha } from './overlay-art.js?v=3753a0d2';
+import { POOF_IN, poofInAlpha } from './overlay-art.js?v=11b6dd7f';
 
 /** The children added since `before` whose centre (from `centreX(child)`) lies within halfW of x. */
 export function newChildrenNear(children, before, x, halfW, centreX) {

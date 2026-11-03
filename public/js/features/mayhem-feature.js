@@ -46,8 +46,8 @@ import {
 } from '../math-mayhem.js?v=7fe952aa';
 import { platformYNear } from '../location-navigation.js?v=4be109b9';
 import { hasRaceDispenser } from '../races.js?v=df0576ad';
-import { OVERLAY_USES, locationRect, playCountdownArt, playWindowOverlay } from '../overlays.js?v=90f4b1ba';
-import { textureFromUrl } from '../textures.js?v=db2ce452';
+import { OVERLAY_USES, locationRect, playCountdownArt, playWindowOverlay } from '../overlays.js?v=210ad5ee';
+import { textureFromUrl } from '../textures.js?v=3149d699';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 import { saveStore } from '../save-store.js?v=8839ba7b';
 

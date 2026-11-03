@@ -47,10 +47,10 @@ import { GENTLE_ISLAND_TSIDS, isNewxpSceneTsid } from '../newxp.js?v=1f9ce43b';
 import { SKILLQUEST_AK_TSID } from '../skillquest-ak.js?v=281b956d';
 import { setToolRemaining, TOOL_CONDITION_CATALOG } from '../tools.js?v=3974f57e';
 import { HERDKEEPING, hogtieEscapeDelayMs, husbandryPack } from '../animal-husbandry.js?v=9c649df2';
-import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=6e3278fe';
-import { sourceFromUrl, frameTexture } from '../textures.js?v=db2ce452';
+import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=8f5dc6d9';
+import { sourceFromUrl, frameTexture } from '../textures.js?v=3149d699';
 import { landingY, walkSurfaceY } from '../walk-surface.js?v=c982983e';
-import { overlayOrStandIn } from '../overlay-stand-in.js?v=1ab35105';
+import { overlayOrStandIn } from '../overlay-stand-in.js?v=4f9a6ce2';
 import {
   BUNDLE_OF_JOY,
   BUTTERFLY_NET,

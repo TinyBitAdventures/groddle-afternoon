@@ -26,7 +26,7 @@ import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { streetStats, editsOn } from '../../public/js/builder/zone.js?v=dff4acc0';
-import { arriveFor } from '../../public/js/builder/geometry-handles.js?v=6fa13da1';
+import { arriveFor } from '../../public/js/builder/geometry-handles.js?v=daefecb1';
 import { isZoneTsid, withoutZoneConnects } from '../../public/js/zone-streets.js?v=b40010d5';
 
 export const ZONES_DIR = 'public/assets/zones';

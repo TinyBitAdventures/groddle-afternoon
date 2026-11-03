@@ -14,7 +14,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { MAP_TRAIL_MAX, findCurrentStreet, noteMapTrail, pickMapSpot } from '../public/js/map-graph.js?v=5b1575ad';
 import { CAR_TSID, STATIONS, stationById } from '../public/js/subway.js?v=5719ffc3';
-import { subwayFeature } from '../public/js/features/subway-feature.js?v=423ef4d6';
+import { subwayFeature } from '../public/js/features/subway-feature.js?v=d9e69858';
 
 const pub = join(dirname(fileURLToPath(import.meta.url)), '..', 'public');
 const readJson = (rel) => JSON.parse(readFileSync(join(pub, rel), 'utf8'));

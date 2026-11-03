@@ -53,7 +53,7 @@ before(async () => {
   globalThis.PIXI = { ImageSource, Texture };
   globalThis.Image = FakeImage;
   globalThis.document = { createElement: () => ({ width: 0, height: 0, getContext: () => ({ drawImage() {} }) }) };
-  T = await import('../public/js/textures.js?v=db2ce452');
+  T = await import('../public/js/textures.js?v=3149d699');
 });
 after(() => {
   for (const [k, v] of Object.entries(saved)) globalThis[k] = v;
@@ -114,5 +114,43 @@ describe('js/textures.js', () => {
     assert.equal(loaded, false);
     assert.equal(failed, true);
     assert.equal(T.isFailed(t), true);
+  });
+});
+
+describe('ticket 21: street decos no street draws leave the image cache (releaseIdleImages)', () => {
+  it('forgets a deco image only after it has been off the GPU for idleMs; others and GPU ones stay', async () => {
+    const deco = 'assets/decos/groddle/t21_rock_100x50.webp';
+    const icon = 'assets/sprites/icons/t21_icon_40x40.png';
+    const onScreen = 'assets/decos/groddle/t21_drawn_80x80.webp';
+    const decoTex = await T.loadTexture(deco);
+    await T.loadTexture(icon);
+    const drawn = await T.loadTexture(onScreen);
+    const match = /(^|\/)assets\/decos\//;
+    const onGpu = new Set([drawn.source]);
+    assert.equal(T.releaseIdleImages({ match, onGpu, now: 1000, idleMs: 30000 }), 0, 'first seen off the GPU: noted only');
+    assert.equal(T.releaseIdleImages({ match, onGpu, now: 20000, idleMs: 30000 }), 0, 'not yet idle long enough');
+    assert.equal(T.cachedTexture(deco), decoTex);
+    assert.equal(T.releaseIdleImages({ match, onGpu, now: 31001, idleMs: 30000 }), 1);
+    assert.equal(T.cachedTexture(deco), null, 'the idle deco is forgotten');
+    assert.equal(T.cachedTexture(onScreen), drawn, 'a deco on the GPU stays');
+    assert.ok(T.cachedTexture(icon), 'an image outside the match stays');
+    // Whoever still holds it keeps it; asking again loads a fresh copy.
+    assert.equal(decoTex.source.destroyed, undefined);
+    const again = T.textureFromUrl(deco);
+    assert.notEqual(again, decoTex);
+    await T.loadTexture(deco);
+    assert.equal(T.isLoaded(again), true);
+  });
+
+  it('a deco back on the GPU starts its idle time again', async () => {
+    const url = 'assets/decos/groddle/t21_back_60x60.webp';
+    const tex = await T.loadTexture(url);
+    const match = /assets\/decos\/groddle\/t21_back/;
+    T.releaseIdleImages({ match, onGpu: new Set(), now: 0, idleMs: 30000 });
+    T.releaseIdleImages({ match, onGpu: new Set([tex.source]), now: 20000, idleMs: 30000 });
+    assert.equal(T.releaseIdleImages({ match, onGpu: new Set(), now: 40000, idleMs: 30000 }), 0, 'off again at 40 s: noted');
+    assert.equal(T.releaseIdleImages({ match, onGpu: new Set(), now: 60000, idleMs: 30000 }), 0);
+    assert.equal(T.releaseIdleImages({ match, onGpu: new Set(), now: 70001, idleMs: 30000 }), 1);
+    assert.equal(T.releaseIdleImages({ match: null, onGpu: new Set() }), 0, 'no match: nothing');
   });
 });

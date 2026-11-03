@@ -13,7 +13,7 @@ import { fileURLToPath } from 'node:url';
 import { SHARP_DECOS } from '../public/js/deco-sharp-list.js?v=3806f689';
 import { HIRES_DECOS } from '../public/js/deco-hires-list.js?v=2c460d64';
 import { FAR_SHARP_BUDGET_BYTES, SHARP_SLACK, SVG_MAX_PIXELS, SVG_MAX_SIDE, admitSharp, isSharpDeco, sharpDeco } from '../public/js/deco-hires.js?v=cb905e17';
-import { resolutionOfUrl } from '../public/js/textures.js?v=db2ce452';
+import { resolutionOfUrl } from '../public/js/textures.js?v=3149d699';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const decoDir = join(root, 'public/assets/decos/groddle');
@@ -221,7 +221,7 @@ describe('street-render draws sharp copies on the sharp layers', () => {
       }
     };
     globalThis.document = { createElement: () => ({ width: 0, height: 0, getContext: () => ({ drawImage() {} }) }) };
-    const { buildStreetView } = await import('../public/js/street-render.js?v=f98221f2');
+    const { buildStreetView } = await import('../public/js/street-render.js?v=9349c0e5');
     const handlers = {};
     const renderer = {
       resolution: 1,
@@ -267,7 +267,7 @@ describe('street-render draws sharp copies on the sharp layers', () => {
   });
 
   it('far layers: sharp copies within the street budget, the rest on their 2x files', async () => {
-    const { buildStreetView } = await import('../public/js/street-render.js?v=f98221f2');
+    const { buildStreetView } = await import('../public/js/street-render.js?v=9349c0e5');
     const manifest = new Set(JSON.parse(readFileSync(join(root, 'public/assets/decos/manifest.json'), 'utf8')));
     const renderer = { resolution: 3.9, gl: { MAX_TEXTURE_SIZE: 1, getParameter: () => 8192 }, generateTexture: () => null, on() {}, off() {} };
     for (const tsid of ['GA95U14319524O9', 'GHFC3I4EKMI20JD', 'GA9117J18492SRS']) {

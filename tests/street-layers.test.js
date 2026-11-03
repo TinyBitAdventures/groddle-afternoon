@@ -15,12 +15,13 @@ import {
   skirtBandHeight,
   skirtFadeColour,
   skirtFadeStops,
+  skirtBandOffset,
   skirtGroundOffset,
   skirtSolidAlpha,
   skirtTiles,
   SKIRT_BAND,
   SKIRT_SLIDE_MAX,
-} from '../public/js/street-render.js?v=f98221f2';
+} from '../public/js/street-render.js?v=9349c0e5';
 import { streetHeight, streetWidth } from '../public/js/street-model.js?v=505d8990';
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -206,6 +207,26 @@ describe('ground skirt (the strip under a street in the Modern UI)', () => {
       const end = parallaxLayerOffset(rocks, camX, mh - 493, 1000, 493, mw, mh);
       assert.ok(Math.abs(end.x - at.x) <= SKIRT_SLIDE_MAX / 2 + 1e-6, 'off by at most half the slide');
     }
+  });
+
+  it('ticket 21: the band takes in the back layers that show through the ground at the edge (Valuka Himsa)', () => {
+    // Valuka Himsa's red rock is on back layers 200 to 800 px narrower than the street, under a ground
+    // layer with gaps; mirrored without them the skirt was a flat dark block under a hard line.
+    const valuka = street('GA5S44RM9OE2416');
+    const W = streetWidth(valuka);
+    const H = streetHeight(valuka);
+    const ground = valuka.layers.filter((l) => skirtGroundOffset(l, W, H)).map((l) => l.id).sort();
+    assert.deepEqual(ground, ['T_1318552593684', 'middleground']);
+    const band = valuka.layers.filter((l) => skirtBandOffset(l, W, H, false)).map((l) => l.id).sort();
+    assert.equal(band.length, valuka.layers.length, 'every layer behind the avatars');
+    const rock = valuka.layers.find((l) => l.id === 'T_1318464297527');
+    assert.deepEqual(skirtBandOffset(rock, W, H, false), { x: (W - rock.w) / 2, y: H - rock.h }, 'its bottom on the edge, camera mid-street');
+    // The ground layers keep their places, and a far-sliding layer in front stays out.
+    const mid = valuka.layers.find((l) => l.id === 'T_1318552593684');
+    assert.deepEqual(skirtBandOffset(mid, W, H, false), skirtGroundOffset(mid, W, H));
+    assert.equal(skirtBandOffset({ id: 'foreground', w: 6500, h: 1000 }, 6000, 1000, true), null);
+    assert.deepEqual(skirtBandOffset({ id: 'far', w: 5000, h: 900 }, 6000, 1000, false), { x: 500, y: 100 });
+    assert.equal(skirtBandOffset(null, W, H, false), null);
   });
 
   it('leaves streets whose own art runs below the edge alone: that art draws over the skirt', () => {

@@ -22,8 +22,8 @@
  * recovered talk and offer_accept sheets (108x154 cells, facing left).
  */
 
-import { frameTexture, isLoaded, onLoaded, sourceFromUrl } from '../textures.js?v=db2ce452';
-import { YARD_FRONT, YARD_H, YARD_W, buildRubeYardBackground, yardDeco } from '../rube-yard-scene.js?v=74c9b6bd';
+import { frameTexture, isLoaded, onLoaded, sourceFromUrl } from '../textures.js?v=3149d699';
+import { YARD_FRONT, YARD_H, YARD_W, buildRubeYardBackground, yardDeco } from '../rube-yard-scene.js?v=84b947c2';
 
 const W = YARD_W;
 const H = YARD_H;

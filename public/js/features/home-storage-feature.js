@@ -44,13 +44,13 @@
 import { ITEM_CATALOG, addItem, countItem, ensureItem, itemIcon, removeItem } from '../inventory.js?v=597a17a2';
 import { displayRefusal, furnitureDef, furnitureSize, isFurniture } from '../home-decor.js?v=3ee9ea0d';
 import { pieceLabel } from '../furniture-upgrades.js?v=a3788c0d';
-import { textureFromUrl } from '../textures.js?v=db2ce452';
+import { textureFromUrl } from '../textures.js?v=3149d699';
 import { stackMaxOf, isBagClass } from '../pack-slots.js?v=ba0a895f';
 import { ELEMENT_CLASSES, NO_BAG_CLASSES, NO_SLOT_CLASSES } from '../pack-slots-data.js?v=330c51e4';
 import { TOOL_CONDITION_CATALOG, receiveToolCopy, takeToolCopy } from '../tools.js?v=3974f57e';
 import { readVisitScene } from '../neighbours-mp.js?v=a8d5544e';
 import { saveStore } from '../save-store.js?v=8839ba7b';
-import { homesFeature } from './homes-feature.js?v=652580fd';
+import { homesFeature } from './homes-feature.js?v=d746c0a7';
 import {
   SDB_PRICE_MAX,
   STORAGE_TEXT as T,

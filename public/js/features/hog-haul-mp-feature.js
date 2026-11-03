@@ -32,9 +32,9 @@ import {
   pigPose,
   touches,
 } from '../hog-haul-mp.js?v=d8605396';
-import { HOG_HAUL_SPLASH, splashFor } from '../game-splash.js?v=8b79ff4d';
+import { HOG_HAUL_SPLASH, splashFor } from '../game-splash.js?v=5e2c6eb6';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
-import { playCountdownArt } from '../overlays.js?v=90f4b1ba';
+import { playCountdownArt } from '../overlays.js?v=210ad5ee';
 import { HOG_HAUL_STREET_ID } from '../hog-haul.js?v=50d2e072';
 
 const HOLD = 'hog-haul-mp';

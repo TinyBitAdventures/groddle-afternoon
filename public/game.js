@@ -4,14 +4,14 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=117337d3';
 import { createFeatureHost } from './js/feature-host.js?v=903263a4';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=ec27dee8';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=bbbb87a2';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
 import { createVogOverlay } from './js/vog-overlay.js?v=c2a9cc07';
 import { createPromptStack } from './js/prompt-stack.js?v=c8788aeb';
 import { createWindowStack } from './js/window-stack.js?v=be3b7274';
-import { HOG_HAUL_SPLASH, createGameSplash, splashFor } from './js/game-splash.js?v=8b79ff4d';
+import { HOG_HAUL_SPLASH, createGameSplash, splashFor } from './js/game-splash.js?v=5e2c6eb6';
 import {
   actionDurationFor,
   createTimedAction,
@@ -20,7 +20,7 @@ import {
 } from './js/action-timing.js?v=2513e592';
 import { createWordProgressView, wordAnchor, heldActionDelta, MAX_PUSH_DOWN } from './js/word-progress.js?v=bffa60ac';
 // G374/G375/G378: Tiny Speck's quoin-limit and super-harvest rainbows and the musicblock notes.
-import { OVERLAY_USES, playCountdownArt, playOverlay, rainbowSound, showRainbow } from './js/overlays.js?v=90f4b1ba';
+import { OVERLAY_USES, playCountdownArt, playOverlay, rainbowSound, showRainbow } from './js/overlays.js?v=210ad5ee';
 import {
   createQuestState,
   assignQuest,
@@ -83,7 +83,7 @@ import {
   spinFourLetterBlock,
   startFourLetterPuzzle,
 } from './js/four-letter-quest.js?v=a5574ac7';
-import { KIDS_ROOM_W, buildKidsRoomScene } from './js/kids-room-scene.js?v=cfe30938';
+import { KIDS_ROOM_W, buildKidsRoomScene } from './js/kids-room-scene.js?v=b2803888';
 import {
   AXIS_DENYDE_STREET_ID,
   HOGTIED_JONES_ID,
@@ -123,7 +123,7 @@ import {
 } from './js/legalize-it.js?v=d569fd0e';
 import { HALL, HALL_LAYOUT, HALL_QUESTIONS } from './js/bureaucratic-hall.js?v=a0bc6317';
 import { STATION_X, stationArrival, stationScreen, surfaceStation } from './js/subway.js?v=5719ffc3';
-import { ALLEY, SHADY, drawAlley, inEnteredBox } from './js/quest-rooms/back-alley-set.js?v=406515a9';
+import { ALLEY, SHADY, drawAlley, inEnteredBox } from './js/quest-rooms/back-alley-set.js?v=5faee32f';
 import {
   WINTER_HAVEN_STREET_ID,
   WINTER_MOTE_REWARDS,
@@ -364,7 +364,7 @@ import {
   buildParadiseCourseArt,
   paradiseCoursePreloadUrls,
   paradiseCourseRuntime,
-} from './js/paradise-course-runtime.js?v=60e23e59';
+} from './js/paradise-course-runtime.js?v=34d56d80';
 import {
   createAchievementState,
   applyAchievementProgress as applyAchievementProgressRaw,
@@ -607,7 +607,7 @@ import {
   ensureStreetIndex,
   resolveIndexTsid,
 } from './js/street-loader.js?v=33d2b8bc';
-import { showDraftBanner, startDraftPlay } from './js/builder/draft-play.js?v=51f953bd';
+import { showDraftBanner, startDraftPlay } from './js/builder/draft-play.js?v=ab9d8e93';
 import {
   ladderTopDeck,
   groundBeneath,
@@ -635,7 +635,7 @@ import {
   setSignpostHover,
   setSignpostKeys,
   signpostBoardAt,
-} from './js/street-render.js?v=f98221f2';
+} from './js/street-render.js?v=9349c0e5';
 import {
   GAME_DAY_MS,
   shouldFireNewDay,
@@ -745,7 +745,7 @@ import { FAILED_LINE, inVerbReach, movingLine, verbRange, walkOverEnd, walkOverG
 import { hellBuffDesc, isInHell } from './js/hell.js?v=45060736';
 import { climbBobY, ladderAnimState, ladderSwap } from './js/ladder-anim.js?v=a8b327a0';
 import { VECTOR_AVATAR } from './js/avatar-vector-sheets.js?v=ad801376';
-import { createNpcGlitchKit } from './js/npc-glitch.js?v=0b81a3e4';
+import { createNpcGlitchKit } from './js/npc-glitch.js?v=894841be';
 import { bakeIdleSheet, bakeLook, loadCatalog as loadAvatarCatalog, paintPreview as paintVectorPreview, prepareLook } from './js/avatar-compositor.js?v=dcd906ae';
 import { catalogItem, lookKey, randomVectorFields, resolveLook, variantSwatch } from './js/avatar-looks.js?v=64fab53e';
 import {
@@ -936,13 +936,18 @@ import { clientKeyAction, createHotkeysSheet, isHotkeySheetRelease, isPlainKey }
 import { EAT_PICK_TEXT, bestFoodIndex, eatChoices, eatTip } from './js/eat-pick.js?v=8fb763d0';
 import { installHeldKeyGuard, isMacPlatform } from './js/held-keys.js?v=98b96620';
 import { signpostArmRows, worldContextAction } from './js/world-context-menu.js?v=f3f48805';
+<<<<<<< HEAD
 import { blockedPlayerVerbs, listPlayerTarget, opensPlayerMenu, playerMenuRows } from './js/ui/player-menu.js?v=4c174d02';
 import { forgetTexture, frameTexture, isFailed, isLoaded, onFailed, onLoaded, textureFromUrl, whenLoaded } from './js/textures.js?v=db2ce452';
+=======
+import { listPlayerTarget, opensPlayerMenu, playerMenuRows } from './js/ui/player-menu.js?v=1dd2cf52';
+import { forgetTexture, frameTexture, isFailed, isLoaded, onFailed, onLoaded, textureFromUrl, whenLoaded } from './js/textures.js?v=3149d699';
+>>>>>>> d50a5ce (🐛 FIX: A long session no longer piles up every street's decorations in memory, which made Safari reload the page around Naraka)
 import { FALLBACK_MAX as WORLD_ART_FALLBACK_MAX, worldArtFor } from './js/world-art.js?v=df476660';
-import { sceneAnim, syncAnim } from './js/deco-anim.js?v=6f548fd1';
+import { sceneAnim, syncAnim } from './js/deco-anim.js?v=8c4c784b';
 import { revealStartCard, whenSceneDrawn } from './js/start-backdrop.js?v=8510d51e';
-import { cancelAllOverlays, playPoofIn, setOverlayResolution } from './js/overlay-art.js?v=3753a0d2';
-import * as textureUrls from './js/textures.js?v=db2ce452';
+import { cancelAllOverlays, playPoofIn, setOverlayResolution } from './js/overlay-art.js?v=11b6dd7f';
+import * as textureUrls from './js/textures.js?v=3149d699';
 import { installPixiFixes } from './js/pixi-fixes.js?v=173fb649';
 import { hidesChatBubble } from './js/hi-signs.js?v=b90c7d7e';
 // Multiplayer phase 1: the mode flag and the save interface every save read/write goes through.
@@ -1338,6 +1343,9 @@ const keys = new Set();
 // it (blur, a context menu, Cmd, a text field), as the client's KeyBeacon.reset did.
 const heldKeys = installHeldKeyGuard(keys, { onRelease: (why) => setCanvasData('keysReleased', why) });
 let app, world, bgLayer, entityLayer, fxLayer, player, prompt, promptLayer, camTarget, camY, portalSprites;
+/** Ticket 21: street deco art, released from the image cache once no street draws it (releaseIdleImages). */
+const STREET_ART_URL = /(^|\/)assets\/decos\//;
+let imagesReleased = 0;
 // FEEL (js/camera-feel.js): per axis, whether the eased camera rests on its target this frame and
 // the way it last travelled.
 const cameraRest = { x: { rest: true, dir: 0 }, y: { rest: true, dir: 0 } };
@@ -27953,6 +27961,12 @@ async function main() {
     gcMaxUnusedTime: 20000,
     gcFrequency: 5000,
   });
+  // Ticket 21: street decos no street has drawn for a while leave the image cache (js/textures.js
+  // releaseIdleImages), so a long session's decoded decos do not pile up (Safari's memory reload).
+  setInterval(() => {
+    const onGpu = new Set(app?.renderer?.texture?.managedTextures || []);
+    imagesReleased += textureUrls.releaseIdleImages({ match: STREET_ART_URL, onGpu });
+  }, 10000);
   // Character, NPC and shrine sheets swap to 3x when first drawn.
   installHiresFirstDraw(app.renderer, whenLoaded);
   // G448: street overlays with SVG frames draw at the renderer's density unless told otherwise.
@@ -30031,6 +30045,27 @@ async function main() {
       /** HUB QA: how many award, new-day and Giant screens are queued or showing. */
       screensPending: () => awardsPending,
     },
+    /**
+     * MEMQA (ticket 21, tools/qa/street-memory.mjs): where memory goes, beyond renderStats: the
+     * decoded sound buffers, the loaded images by folder, and the GPU textures by kind and size.
+     */
+    memoryStats() {
+      const released = imagesReleased;
+      let audioBytes = 0;
+      const buffers = Object.values(audio.buffers || {}).filter(Boolean);
+      for (const b of buffers) audioBytes += (b.length || 0) * (b.numberOfChannels || 1) * 4;
+      const kinds = {};
+      for (const s of app?.renderer?.texture?.managedTextures || []) {
+        if (!s) continue;
+        const kind = textureUrls.sourceUrl(s) ? 'url' : s.constructor?.name || 'other';
+        const row = (kinds[kind] ||= { count: 0, mb: 0 });
+        row.count += 1;
+        row.mb += ((s.pixelWidth || 0) * (s.pixelHeight || 0) * 4) / 1048576;
+      }
+      for (const row of Object.values(kinds)) row.mb = +row.mb.toFixed(1);
+      const onGpu = new Set(app?.renderer?.texture?.managedTextures || []);
+      return { imagesReleased: released, audioBuffers: buffers.length, audioMB: +(audioBytes / 1048576).toFixed(1), gpuKinds: kinds, folders: textureUrls.textureFolders(8, onGpu) };
+    },
     /** Renderer QA: backend, Pixi version and GPU texture use (tools/perf, tools/playtest). */
     renderStats() {
       const r = app?.renderer;
@@ -30301,6 +30336,11 @@ async function main() {
   // Garden talkback QA (js/garden-talk-qa.js): ?gardentalkdemo=herb|crop.
   if (new URLSearchParams(location.search).has('gardentalkdemo')) {
     import('./js/garden-talk-qa.js?v=1812da53').then((m) => m.runGardenTalkDemo({ engine, executeVerb, params: new URLSearchParams(location.search) }));
+  }
+  // MEMQA (ticket 21, Safari's memory reload in Naraka): ?memqa=1 lets a probe walk streets through the
+  // real street trip (tools/qa/street-memory.mjs). Solo pages only: online pages drop their params.
+  if (new URLSearchParams(location.search).has('memqa')) {
+    window.groddleQA.travel = (tsid) => enterStreetWithTransition(tsid);
   }
   // Loading card QA (js/loading-card-qa.js): ?loadcarddemo=<tsid>[,<tsid>].
   if (new URLSearchParams(location.search).has('loadcarddemo')) {

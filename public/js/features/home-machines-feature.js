@@ -80,9 +80,9 @@ import { getSkillCatalog } from '../content-catalogs.js?v=10b118dd';
 import { createBackYardState, homeStreetLayout, normalizeCultivationState } from '../home-cultivation.js?v=11616085';
 import { readVisitScene } from '../neighbours-mp.js?v=a8d5544e';
 import { saveStore } from '../save-store.js?v=8839ba7b';
-import { textureFromUrl } from '../textures.js?v=db2ce452';
-import { createSheetLoader } from '../sprite-sheets.js?v=6e3278fe';
-import { STREET_GROUND_Y, homesFeature } from './homes-feature.js?v=652580fd';
+import { textureFromUrl } from '../textures.js?v=3149d699';
+import { createSheetLoader } from '../sprite-sheets.js?v=8f5dc6d9';
+import { STREET_GROUND_Y, homesFeature } from './homes-feature.js?v=d746c0a7';
 
 export { HOME_MACHINES_ID };
 

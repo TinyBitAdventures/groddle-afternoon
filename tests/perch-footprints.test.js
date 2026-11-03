@@ -29,7 +29,7 @@ import {
   streetReservedSpots,
 } from '../public/js/street-ecology.js?v=2c82c072';
 import { placementRequests } from '../tools/build-realtime-objects.mjs';
-import { adoptedPlan } from '../public/js/features/patches-feature.js?v=72ac643c';
+import { adoptedPlan } from '../public/js/features/patches-feature.js?v=310a2eec';
 import { createPlot } from '../public/js/patches.js?v=3e9218c1';
 import { serverPath, skipWithoutServer } from '../tools/repos.mjs';
 

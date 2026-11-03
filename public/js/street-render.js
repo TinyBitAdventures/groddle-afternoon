@@ -11,10 +11,10 @@ import {
   pickConnection,
 } from './street-model.js?v=505d8990';
 import { availableStreetTsids } from './street-loader.js?v=33d2b8bc';
-import { frameTexture, isLoaded, onFailed, onLoaded, textureFromUrl } from './textures.js?v=db2ce452';
+import { frameTexture, isLoaded, onFailed, onLoaded, textureFromUrl } from './textures.js?v=3149d699';
 import { admitSharp, decoUrl, isSharpDeco, maxTextureSizeOf, sharpDeco, NEW_DECOS } from './deco-hires.js?v=cb905e17';
 import { LADDER_TILE_Z, ladderTilePieces } from './ladder-tiling.js?v=4f9e07fa';
-import { attachAnim, isAnimatedDeco, setAnimSource, setDecoTexture, syncAnim } from './deco-anim.js?v=6f548fd1';
+import { attachAnim, isAnimatedDeco, setAnimSource, setDecoTexture, syncAnim } from './deco-anim.js?v=8c4c784b';
 import { drawnLayerOffset, layerScreenDir } from './camera-feel.js?v=e668afc5';
 
 const DECO_BASE = 'assets/decos/groddle/';
@@ -1382,6 +1382,22 @@ export function skirtGroundOffset(layer, W, sourceH) {
   return { x: slideX / 2, y: slideY };
 }
 
+/**
+ * PURE: where a layer is drawn in the band, or null when it is left out: skirtGroundOffset, and
+ * (ticket 21) a layer behind the avatars that slides further than that is in too, at its bottom
+ * with the camera mid-street. What shows through the ground at the street's bottom edge is that
+ * art (Valuka Himsa's red rock, 200 to 800 px narrower than the street, under a ground layer with
+ * gaps), so the mirror leaves it out at its peril: a mirror of the ground layers alone was a flat
+ * dark block under a hard line. Its copy can be off by half its slide at the street's ends, but it
+ * sits under the ground, fades within SKIRT_FADE_DEPTH and never draws over anything. A layer in
+ * front that slides far stays out (its own art goes on drawing over the skirt).
+ */
+export function skirtBandOffset(layer, W, sourceH, inFront = false) {
+  const at = skirtGroundOffset(layer, W, sourceH);
+  if (at || inFront || !layer) return at;
+  return { x: (W - layer.w) / 2, y: sourceH - layer.h };
+}
+
 const channels = (c) => [(c >> 16) & 255, (c >> 8) & 255, c & 255];
 const luma = (c) => {
   const [r, g, b] = channels(c);
@@ -1523,7 +1539,7 @@ const SKIRT_BYTES = 24 * 1024 * 1024;
 /**
  * Fill the strip under a street's bottom edge (street art ends at bounds.b; the camera can show
  * up to MIN_GROUND_CLEARANCE below it, and the canvas runs on under the overlaid pack). The
- * ground layers' bottom band (skirtGroundOffset) is rendered once into one texture per chunk
+ * ground layers' bottom band (skirtBandOffset) is rendered once into one texture per chunk
  * (4096 px, fewer on a small GPU), laid down the skirt (skirtTiles), shaded at the seam and faded
  * into skirtFadeColour, then that colour runs on to the skirt's foot. The strip sits over the
  * middleground with the middleground's solid art below bounds.b copied back on top (its
@@ -1563,7 +1579,7 @@ function buildGroundSkirt(PIXI, renderer, root, grounds, W, sourceH, depthPx, gr
     shell.sortableChildren = true;
     for (const h of homes) {
       shell.addChild(h.lc);
-      const at = skirtGroundOffset(h.lc.skirtLayer, W, sourceH) || { x: 0, y: 0 };
+      const at = h.lc.skirtAt || { x: 0, y: 0 };
       h.lc.x = at.x;
       h.lc.y = at.y;
     }
@@ -1573,7 +1589,7 @@ function buildGroundSkirt(PIXI, renderer, root, grounds, W, sourceH, depthPx, gr
       const blurred = lc.blurLayer;
       if (!blurred || !root.blurStats) continue;
       // The band in the layer's own coordinates.
-      const y1 = sourceH - (skirtGroundOffset(lc.skirtLayer, W, sourceH)?.y || 0);
+      const y1 = sourceH - (lc.skirtAt?.y || 0);
       for (const tile of blurred.tiles) {
         if (tile.y < y1 && tile.y + tile.h > y1 - Math.max(band, 24)) bakeBlurTile(tile, root.blurStats);
       }
@@ -2054,7 +2070,9 @@ export function buildStreetView(street, PIXI, opts = {}) {
   }
   const skirtDepth = H - sourceH + Math.max(0, Number(opts.skirtBelow) || 0);
   if (skirtDepth > 0 && opts.renderer) {
-    const grounds = layerContainers.filter((lc) => skirtGroundOffset(lc.skirtLayer, W, sourceH));
+    // The layers in the band and their places there (skirtBandOffset: ticket 21 adds the back layers).
+    for (const lc of layerContainers) lc.skirtAt = skirtBandOffset(lc.skirtLayer, W, sourceH, lc.inFront);
+    const grounds = layerContainers.filter((lc) => lc.skirtAt);
     // Ticket 39: black (000000) is a colour, not a missing one (Panka Surazu's skirt drew meadow green).
     const parsed = parseInt(String(street.gradient?.bottom || '').replace(/^#/, ''), 16);
     const fallback = Number.isFinite(parsed) ? parsed : 0x6b8f3c;

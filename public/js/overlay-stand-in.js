@@ -13,8 +13,8 @@
  * Call tick() every frame (a feature's onTick) to move or end the stand-in.
  */
 
-import { playSheetOverlay } from './overlay-art.js?v=3753a0d2';
-import { playOverlay } from './overlays.js?v=90f4b1ba';
+import { playSheetOverlay } from './overlay-art.js?v=11b6dd7f';
+import { playOverlay } from './overlays.js?v=210ad5ee';
 
 const STYLE = Object.freeze({ fill: 0xfffaf0, line: 0x6b5a48, text: 0x3b3128 });
 
