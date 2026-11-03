@@ -16,6 +16,8 @@
  * answers, so it never names a key that does nothing here.
  */
 
+import { COMMAND_HELP } from './slash-commands.js?v=98c2238a';
+
 /**
  * Every client key the coverage row G254 named, with the remake's answer:
  * `action` is what clientKeyAction returns, or null with `why` when the remake
@@ -134,6 +136,19 @@ export function hotkeySections({ keyring = false, hub = false, reports = false }
   ];
 }
 
+/**
+ * CMDHELP (Austin 2026-11-03): the sheet's last section, the chat commands
+ * (js/slash-commands.js COMMAND_HELP), drawn under Modes. The
+ * client's sheet had none (hotkeys.png): the remake's own.
+ */
+export function chatCommandsSection() {
+  return {
+    title: 'Chat commands',
+    note: 'Type these at the start of a chat message. / on its own shows this list in chat.',
+    commands: COMMAND_HELP.map(([cmd, what]) => [cmd, what]),
+  };
+}
+
 /** "Shift+S or K" style text for one row's keys. */
 export function hotkeyText(alternatives) {
   return alternatives.map((combo) => combo.join('+')).join(' or ');
@@ -168,6 +183,26 @@ export function createHotkeysSheet(doc, { keyring = () => false, hub = () => fal
     card.setAttribute('aria-labelledby', 'hotkeys-title');
     shade.append(card);
     doc.body.append(shade);
+  };
+  /** The Chat commands section: its note, then "/home Go to your home street" rows. */
+  const commandsBox = () => {
+    const section = chatCommandsSection();
+    const box = doc.createElement('div');
+    box.className = 'hotkeys-section hotkeys-commands';
+    const h = doc.createElement('h3');
+    h.textContent = `${section.title}:`;
+    const note = doc.createElement('small');
+    note.textContent = section.note;
+    const list = doc.createElement('ul');
+    for (const [cmd, what] of section.commands) {
+      const li = doc.createElement('li');
+      const b = doc.createElement('b');
+      b.textContent = cmd;
+      li.append(b, doc.createTextNode(` ${what}`));
+      list.append(li);
+    }
+    box.append(h, note, list);
+    return box;
   };
   const render = () => {
     const card = shade.firstChild;
@@ -205,6 +240,9 @@ export function createHotkeysSheet(doc, { keyring = () => false, hub = () => fal
       box.append(h, list);
       cols.append(box);
     }
+    // Under Modes, in the room its column leaves (a row of its own ran the sheet past a 900 px window).
+    const modes = [...cols.children].find((b) => b.firstChild?.textContent === 'Modes:');
+    (modes || cols).append(commandsBox());
     const foot = doc.createElement('p');
     foot.className = 'hotkeys-foot';
     foot.textContent = HOTKEYS_FOOTER;

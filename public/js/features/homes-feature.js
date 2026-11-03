@@ -194,7 +194,7 @@ import { MOVABLE_FIXTURES, MOVABLE_FIXTURE_IDS, fixtureFits, fixtureText, savedF
 import { displayTopOf, itemstackOverlayPoint, overlayAlpha, overlayLifeMs, playPoofIn, trackOverlay } from '../overlay-art.js?v=3753a0d2';
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=6e3278fe';
 import { fadeInNewNear } from '../poof-fade.js?v=06fed92f';
-import { projectApi } from './street-jobs-feature.js?v=bf3cabf7';
+import { projectApi } from './street-jobs-feature.js?v=ca06066e';
 import { TOWER_CHASSIS, TOWER_CONFIG, TOWER_DOOR_DX, TOWER_GEO, TOWER_PROTO, normalizeTowerState } from '../home-tower.js?v=6a203c8f';
 import { drawTowerElevator, drawTowerExit, towerApi, visitorTowerView } from './home-tower-feature.js?v=f925db96';
 import { pieceUrl, roomPieces, surfaceAt, swatchPiece, wallTargetAt } from '../home-wallpaper.js?v=f1969400';

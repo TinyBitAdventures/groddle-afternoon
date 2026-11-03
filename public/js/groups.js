@@ -48,6 +48,14 @@ export const CHANNEL_INTRO = Object.freeze({
   }),
 });
 
+/**
+ * CMDHELP (Austin 2026-11-03): the note each join of a channel ends its history with
+ * (features/groups-feature.js channel_joined), the remake's own words.
+ */
+export const CHANNEL_WELCOME = Object.freeze({
+  help: 'Ask and answer questions about the game here. Type / in chat for commands.',
+});
+
 /** Copy from the source where it has some (file:line), else short plain words. */
 export const GROUP_TEXT = Object.freeze({
   title: 'Groups',

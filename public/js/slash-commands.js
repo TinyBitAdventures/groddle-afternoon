@@ -102,6 +102,58 @@ export const STAFF_COMMANDS = Object.freeze({
   god: 'main.js:1974-2910: 88 god-only admin commands (/create item, /kill stack, /newday, ...)',
 });
 
+/**
+ * CMDHELP (Austin 2026-11-03): the chat command list players see, on the hold-? sheet
+ * (js/client-hotkeys.js) and in chat for "/" or "/help" on its own (features/slash-commands-feature.js).
+ * The source had no list and no /help (main.js doChatCommand 1842-1934 has neither): both are ours.
+ * One plain line each, in the words of what the command does here (slashPlan above), solo and online.
+ */
+export const COMMAND_HELP = Object.freeze([
+  Object.freeze(['/home', 'Go to your home street']),
+  Object.freeze(['/house', 'Go inside your house']),
+  Object.freeze(['/tower', 'Go to your tower, once it is built']),
+  Object.freeze(['/leave', 'Leave your home and go back to where you were in Ur']),
+  Object.freeze(['/stuck', 'Go back to where you arrived on this street (once every 5 minutes)']),
+  Object.freeze(['/who', 'See who is here with you']),
+  Object.freeze(['/butler', 'Talk to your Butler, if you have one']),
+]);
+
+/** Player commands the list leaves out, with why (they still work when typed). */
+export const COMMAND_HELP_LEFT_OUT = Object.freeze({
+  '/makegod': "a joke: it only answers main.js:1855's line and does nothing",
+  '/xyzzy': 'an easter egg: "Nothing happens" for a player (main.js:1865-1871; gods start the Rainbow Run)',
+  '/beans': 'an easter egg: a free Plate of Beans every time (main.js:1913-1916)',
+});
+
+/** The list's first line: where commands go. */
+export const COMMAND_HELP_INTRO = 'Chat commands go at the start of a message:';
+
+/** What shows the list in chat: "/" on its own, "/help" or "/?". */
+export function isCommandHelp(text) {
+  const t = String(text || '').trim().toLowerCase();
+  return t === '/' || t === '/help' || t === '/?';
+}
+
+/** The list as chat lines: the intro, then "/home  Go to your home street" and so on. */
+export function commandHelpLines() {
+  return [COMMAND_HELP_INTRO, ...COMMAND_HELP.map(([cmd, what]) => `${cmd}  ${what}`)];
+}
+
+/** The hint under a message that ends with a known command ("aaaa/leave" went out as chat). */
+export const commandHint = (cmd) => `Commands go at the start of a message: ${cmd}`;
+
+/**
+ * The listed command a chat line ends with when it does not start with it, or ''.
+ * "aaaa/leave" and "how do I /home" answer it; "/leave" (a command), "and/or" and
+ * a link (".../home" after "://") do not.
+ */
+export function misplacedCommand(text) {
+  const t = String(text || '').trim();
+  if (!t || t.startsWith('/') || t.includes('://')) return '';
+  const m = /(\/[a-z]+)[.!?]*$/.exec(t);
+  return m && COMMAND_HELP.some(([cmd]) => cmd === m[1]) ? m[1] : '';
+}
+
 /** main.js:1844: words = txt.split(" "). */
 export function slashWords(text) {
   return String(text || '').trim().split(' ');

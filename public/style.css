@@ -9224,6 +9224,11 @@ html[data-street-cards] .familiar-dialog,
 .hotkeys-section li { margin: 0 0 0.3rem; }
 .hotkeys-section b { color: var(--c-lime-78); }
 .hotkeys-section small { display: block; color: var(--c-grey-84); font-weight: 400; font-size: var(--fs-sm); }
+/* CMDHELP: the chat commands under Modes, their note under the title, the rows in the notes' size. */
+.hotkeys-commands { margin-top: var(--sp-6); }
+.hotkeys-commands > small { margin: calc(-1 * var(--sp-2)) 0 var(--sp-3); }
+.hotkeys-commands li { font-weight: 400; font-size: var(--fs-sm); line-height: var(--lh-tight); margin-bottom: var(--sp-2); }
+.hotkeys-commands li b { font-weight: 700; }
 .hotkeys-foot {
   width: fit-content;
   margin: 0.8rem auto 0;

@@ -46,6 +46,7 @@ import { saveStore } from '../save-store.js?v=8839ba7b';
 import {
   CHANNELS,
   CHANNEL_INTRO,
+  CHANNEL_WELCOME,
   DESCRIPTION_MAX,
   GROUP_TEXT,
   WATCH_REFRESH_MS,
@@ -64,7 +65,7 @@ import {
   tabCommand,
   tabOrder,
   writeMemory,
-} from '../groups.js?v=b9076c50';
+} from '../groups.js?v=14b60589';
 
 export const GROUPS_FEATURE_ID = 'groups';
 
@@ -787,6 +788,8 @@ function createSession(engine, client) {
       const line = chatLine(raw);
       if (line && !engine.query?.('realtimeHidden', line.id)) pushLine(chat.lines, line);
     }
+    // CMDHELP: Live Help's welcome, after its history (groups.js CHANNEL_WELCOME).
+    if (CHANNEL_WELCOME[ch]) pushLine(chat.lines, { note: true, text: CHANNEL_WELCOME[ch] });
     remember();
     renderTabs();
     social?.setLines(ch, chat.lines.map(drawerLine));

@@ -33,6 +33,13 @@
  *   only; the site's admin/teleport route decides who may, and anyone else sees
  *   the ordinary Unknown command line. Solo says /tp is not available.
  *
+ * - "/", "/help" or "/?" on its own (CMDHELP, Austin 2026-11-03; the source had no
+ *   /help): the command list (js/slash-commands.js COMMAND_HELP) as local lines in
+ *   the chat it was typed in, never sent: notes in that drawer conversation online
+ *   (Local, Live Help, a group, an IM, the party), one Activity entry solo.
+ * - A message that ends with a listed command ("aaaa/leave") is still said as typed;
+ *   a local line after it says "Commands go at the start of a message: /leave".
+ *
  * QA: type the commands into Local chat. Canvas data: slashLast
  *     (`<command>:<outcome>`, `/tp:<kind>:<outcome>` once a /tp is answered,
  *     `/stuck:<arrival|street|home-door|tower-door|refused|failed>`),
@@ -40,10 +47,10 @@
  */
 
 import { BUTLER_STRINGS } from '../butler.js?v=86316578';
-import { butlerApi } from './butler-feature.js?v=fa756a13';
+import { butlerApi } from './butler-feature.js?v=e5e8fea1';
 import { hellFeature } from './hell-feature.js?v=1f4a67d5';
 import { towerApi } from './home-tower-feature.js?v=f925db96';
-import { STUCK_COOLDOWN_MS, STUCK_TEXT, slashPlan, unknownLine } from '../slash-commands.js?v=58e63833';
+import { COMMAND_HELP_INTRO, STUCK_COOLDOWN_MS, STUCK_TEXT, commandHelpLines, commandHint, isCommandHelp, misplacedCommand, slashPlan, unknownLine } from '../slash-commands.js?v=98c2238a';
 import { parseTp, runTeleportCommand, TP_TEXT } from '../admin-teleport.js?v=fa56e8df';
 import { minnUrls } from '../minn-account.js?v=eb300264';
 import { saveStore } from '../save-store.js?v=8839ba7b';
@@ -86,6 +93,30 @@ export function slashContext(engine) {
     butlerOwned: butlerApi.owned?.() === true,
     stuckWaitMs: Math.max(0, stuckAt + STUCK_COOLDOWN_MS - now()),
   };
+}
+
+/** HTML-safe text for the solo Activity entry. */
+const esc = (v) => String(v).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+
+/**
+ * Lines shown only to you, in the chat you typed in (`where`, the drawer's
+ * conversation at submit): notes online, else one Activity log entry (solo's
+ * drawer is the Activity log, with the chat box under it). Never sent.
+ * Answers where they went: the conversation's id, or 'activity'.
+ */
+export function showLocalLines(engine, lines, where = engine.social?.showing) {
+  const social = engine.social;
+  if (engine.mode === 'multiplayer' && social) {
+    for (const id of [where, 'local']) {
+      if (!id || !social.has?.(id)) continue;
+      if (lines.every((text) => social.push(id, { note: true, text }))) return id;
+    }
+  }
+  const [head, ...rest] = lines;
+  const html = [esc(head), ...rest.map((l) => { const [cmd, ...what] = l.split('  '); return what.length ? `<b>${esc(cmd)}</b> ${esc(what.join('  '))}` : esc(l); })].join('<br>');
+  if (engine.notify?.log) engine.notify.log(lines.join(' '), { kind: 'help', html });
+  else for (const l of lines) engine.pushActivity?.(l);
+  return 'activity';
 }
 
 /** /stuck's move: the street's arrival, or the door at home. */
@@ -180,6 +211,13 @@ function teleportCommand(engine, text, args) {
 
 /** Answer one slash line; null when this feature does not know it. */
 export function runSlashCommand(engine, text) {
+  if (isCommandHelp(text)) {
+    const where = showLocalLines(engine, commandHelpLines());
+    lastLine = COMMAND_HELP_INTRO;
+    last = `/help:${where}`;
+    publish(engine);
+    return true;
+  }
   const tp = parseTp(text);
   if (tp !== null) {
     teleportCommand(engine, text, tp);
@@ -209,8 +247,42 @@ export function runSlashCommand(engine, text) {
   return true;
 }
 
+/**
+ * A message ending with a listed command ("aaaa/leave"): it goes out as typed (every
+ * chat's own submit handler), then a local hint shows in the same chat. Capture on the
+ * document, before the drawer and the chats read or clear the box.
+ */
+let engineRef = null;
+let hintBound = false;
+/** The hint waits this long, so it lands after your own line (a channel's comes back from the server). */
+export const HINT_DELAY_MS = 500;
+function onChatSubmit(e) {
+  const engine = engineRef;
+  if (!engine?.started || e?.target?.id !== 'local-chat-form') return;
+  const cmd = misplacedCommand(globalThis.document?.getElementById('local-chat-input')?.value);
+  if (!cmd) return;
+  const where = engine.social?.showing;
+  setTimeout(() => {
+    showLocalLines(engine, [commandHint(cmd)], where);
+    last = `hint:${cmd}`;
+    lastLine = commandHint(cmd);
+    publish(engine);
+  }, HINT_DELAY_MS);
+}
+
 export const slashCommandsFeature = {
   id: SLASH_COMMANDS_FEATURE_ID,
+
+  init(engine) {
+    engineRef = engine;
+    if (!hintBound && typeof document !== 'undefined') {
+      document.addEventListener('submit', onChatSubmit, true);
+      hintBound = true;
+    }
+  },
+
+  /** Tests: the hint's submit handler. */
+  _onChatSubmit: (e) => onChatSubmit(e),
 
   /** game.js local chat: main.js doChatCommand, the commands a player can use. */
   chatCommand(text, engine) {

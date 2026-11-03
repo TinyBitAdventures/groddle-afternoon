@@ -15,6 +15,7 @@ import { join } from 'node:path';
 import {
   CHANNELS,
   CHANNEL_INTRO,
+  CHANNEL_WELCOME,
   GROUPS_MAX,
   GROUP_TEXT,
   chatLabel,
@@ -30,10 +31,10 @@ import {
   tabCommand,
   tabOrder,
   writeMemory,
-} from '../public/js/groups.js?v=b9076c50';
+} from '../public/js/groups.js?v=14b60589';
 import { createMinnAccount } from '../public/js/minn-account.js?v=eb300264';
-import { groupsFeature } from '../public/js/features/groups-feature.js?v=27da4060';
-import { FEATURES } from '../public/js/features/index.js?v=d9530e47';
+import { groupsFeature } from '../public/js/features/groups-feature.js?v=6059be0e';
+import { FEATURES } from '../public/js/features/index.js?v=38383b5b';
 import { serverPath, sitePath, skipWithoutServer, skipWithoutSite } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');
@@ -370,6 +371,11 @@ describe('groups feature (js/features/groups-feature.js)', () => {
     assert.deepEqual(client.take('channel_join'), [{ t: 'channel_join', channel: 'help' }]);
     assert.equal(s.tab, 'help');
     assert.equal(JSON.parse(store.get('groddle-chats:1')).intro.help, true);
+    // CMDHELP: each join ends Live Help's history with its welcome, a note only you see.
+    client.msg({ t: 'channel_joined', channel: 'help', history: [{ id: 2, name: 'Bo', text: 'how do I get home?', at: 1 }] });
+    assert.deepEqual(s.chats.get('help').lines.at(-1), { note: true, text: CHANNEL_WELCOME.help });
+    assert.match(CHANNEL_WELCOME.help, /Type \/ in chat for commands\.$/);
+    assert.equal(client.take('channel_say').length, 0, 'the welcome is never sent');
     events.length = 0;
     await s.openChat('trade', { intro: false });
     assert.ok(events.includes(`toast:${GROUP_TEXT.needsTrade}`));
