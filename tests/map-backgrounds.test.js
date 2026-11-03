@@ -12,7 +12,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { readThumbs, regionThumbs } from '../tools/map-backgrounds/build.mjs';
 import { HUB_MAP_BACKGROUNDS } from '../public/js/hub-map-backgrounds.js?v=5889d7fa';
-import { buildHubMapView, PUBLIC_HUBS, renderHubMapSvg } from '../public/js/map-graph.js?v=afa8c721';
+import { buildHubMapView, PUBLIC_HUBS, renderHubMapSvg } from '../public/js/map-graph.js?v=c321ea32';
 import { hubMapArtNote } from '../public/js/panel-copy.js?v=9fc1b2da';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');

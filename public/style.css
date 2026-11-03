@@ -6417,6 +6417,18 @@ body.buff-purple-pulse::after {
   stroke: var(--c-yellow-95b);
   stroke-width: 9;
 }
+/* Ticket 66: under construction (MapStreet.as: a locked street paler, its name dimmed), with stripes. */
+.map-seg.travelable.building { opacity: 0.6; }
+.map-seg-stripes {
+  stroke: var(--c-sand-24);
+  stroke-width: 7;
+  stroke-dasharray: 5 6;
+  opacity: 0.55;
+  fill: none;
+  pointer-events: none;
+}
+.map-street.building:hover .map-seg-stripes { stroke-width: 9; }
+.map-label.loaded.building { opacity: 0.5; }
 .map-label {
   font-family: var(--font-ui);
   font-size: var(--fs-2xs);

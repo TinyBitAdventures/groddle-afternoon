@@ -879,7 +879,7 @@ import {
   pickMapSpot,
   MAP_INDEX_URL,
   HUB_56_MAP_URL,
-} from './js/map-graph.js?v=afa8c721';
+} from './js/map-graph.js?v=c321ea32';
 import { hubMapArtNote, hubMapSubtitle, questLogSummary } from './js/panel-copy.js?v=9fc1b2da';
 import { bindMapIconTips } from './js/ui/map-icon-tips.js?v=6b3eb3f9';
 import {
@@ -23172,9 +23172,17 @@ async function openMap(hubId, { find = '' } = {}) {
 
   // "You" on the hub map: the current street, or the street that stands for it (spot.tsid).
   const view = buildHubMapView(hubData, spot.hubId === targetHub ? spot.tsid : currentStreetTsid, STREET_INDEX.streets);
+  // Ticket 66: streets still under construction show it before you try to go (map-graph.js `building`).
+  let building = 0;
+  for (const st of view.streets || []) {
+    if (!st.loaded || st.current) continue;
+    st.building = Boolean(features.query('streetUnderConstruction', st.loadedTsid || st.tsid, engine));
+    if (st.building) building += 1;
+  }
   if (app?.canvas) {
     app.canvas.dataset.mapHub = targetHub;
     app.canvas.dataset.mapYou = view.streets?.find((st) => st.current)?.tsid || '';
+    app.canvas.dataset.mapBuilding = String(building);
   }
   if (title) title.textContent = view.hubName;
   if (sub) {

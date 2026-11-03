@@ -538,7 +538,8 @@ export function layoutStreetLabels(streets, mapW = 760, mapH = 460, { hubs = [],
     }
     if (!strong && best.score >= 1000) continue;
     if (!strong) dimCount += 1;
-    const cls = s.current ? 'map-label current' : s.loaded ? 'map-label loaded' : 'map-label dim';
+    // Ticket 66: a street under construction keeps its name, dimmed (MapStreet.as 125: TF_DIM_ALPHA for STREET_LOCKED).
+    const cls = s.current ? 'map-label current' : s.loaded ? `map-label loaded${s.building ? ' building' : ''}` : 'map-label dim';
     placed.push(best.quad);
     out.push({ name: s.name, x: best.x, y: best.y, rot, cls, w, h });
   }
@@ -661,13 +662,20 @@ export function renderHubMapSvg(view) {
   }
   for (const s of view.streets || []) {
     if (!s.loaded || s.hidden) continue;
-    const cls = s.current ? 'map-seg current' : 'map-seg travelable';
+    // Ticket 66: a street still under construction (`building`, the street-jobs feature) is drawn
+    // fainter with construction stripes, as the client drew a locked street paler with a dimmed
+    // name (MapStreet.as 16-20, 53-55, 125: STREET_LOCKED 'SL', location.js 2880-2935); its menu
+    // still opens and says where to help build it.
+    const building = Boolean(s.building && !s.current);
+    const cls = s.current ? 'map-seg current' : `map-seg travelable${building ? ' building' : ''}`;
     const travelTsid = s.loadedTsid || s.tsid;
     parts.push(
-      `<g class="map-street ${s.current ? 'current' : 'travelable'}" ` +
+      `<g class="map-street ${s.current ? 'current' : 'travelable'}${building ? ' building' : ''}" ` +
         `data-tsid="${escapeXml(travelTsid)}" data-label="${escapeXml(s.label)}" ` +
-        `data-segment="${escapeXml(s.tsid)}">` +
+        `data-segment="${escapeXml(s.tsid)}"${building ? ' data-building="1"' : ''}>` +
+        (building ? `<title>${escapeXml(s.label)}: under construction</title>` : '') +
         `<line class="${cls}" x1="${s.x1}" y1="${s.y1}" x2="${s.x2}" y2="${s.y2}"/>` +
+        (building ? `<line class="map-seg-stripes" x1="${s.x1}" y1="${s.y1}" x2="${s.x2}" y2="${s.y2}"/>` : '') +
         `<line class="map-seg-hit" x1="${s.x1}" y1="${s.y1}" x2="${s.x2}" y2="${s.y2}"/>` +
         `</g>`
     );
