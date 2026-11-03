@@ -65,6 +65,11 @@ export const REPORT_TEXT = Object.freeze({
   edited: 'edited',
   editHint: 'You can change this until an administrator reads it.',
   meta: (n) => (n === 0 ? 'No reports yet' : n === 1 ? '1 report' : `${n} reports`),
+  // Ticket 58: a search box over your own reports' subjects.
+  filterLabel: 'Search your reports',
+  filterPlaceholder: 'Search your reports',
+  filterNone: 'None of your reports match that. The search looks at each report\'s first line.',
+  filterMeta: (shown, n) => `${shown} of ${n} reports`,
   picture: 'Attach a picture of the game',
   pictureHint: 'It shows the street as you see it, with other players, their names and speech bubbles. Not your chat or these windows.',
   pictureNone: 'The game view could not be drawn, so no picture goes with this one.',
@@ -136,6 +141,24 @@ export const UNREAD_POLL_MS = 60000;
 /** How many tickets carry a reply the player has not read. */
 export function unreadCount(tickets) {
   return (Array.isArray(tickets) ? tickets : []).filter((t) => t && t.unread === true).length;
+}
+
+/** Ticket 58: the search box shows once you have this many reports. */
+export const REPORT_FILTER_MIN = 5;
+
+const fold = (x) => String(x ?? '').normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+
+/**
+ * Ticket 58: whether a report matches the search box: every word of the query is in
+ * its subject (the first line of what you wrote) or its status words, any case and
+ * accents; "#58" or "58" also finds report 58.
+ */
+export function matchesReport(t, query) {
+  const words = fold(query).split(/\s+/).filter(Boolean);
+  if (!words.length) return true;
+  const hay = `${fold(t?.subject)} ${fold(STATUS_WORDS[t?.status] || t?.status)}`;
+  const id = String(Number(t?.id) || '');
+  return words.every((w) => hay.includes(w) || (id && w.replace(/^#/, '') === id));
 }
 
 /** The report a #report=<id> link names (the reply email's link), or 0. */

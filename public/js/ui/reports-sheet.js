@@ -36,10 +36,11 @@
  * [data-reports-picture-ui] (Include the game's UI: the feature's capture({ ui })),
  * [data-reports-picture-preview], [data-reports-thread-picture]; ticket 49:
  * [data-reports-edit] (Edit), #reports-edit-text [data-reports-edit-text],
- * [data-reports-edit-save], [data-reports-edit-cancel], [data-edited] on a changed message.
+ * [data-reports-edit-save], [data-reports-edit-cancel], [data-edited] on a changed message; ticket 58:
+ * #reports-filter [data-reports-filter] (the search box, shown from REPORT_FILTER_MIN reports), [data-reports-no-match].
  */
 
-import { REPORT_MAX, REPORT_TEXT as T, STATUS_WORDS, canEditFirst, pictureRefused, pictureSrc, refusalWords, ticketLine, unreadCount, whenWords } from '../reports.js?v=5271872b';
+import { REPORT_FILTER_MIN, REPORT_MAX, REPORT_TEXT as T, STATUS_WORDS, canEditFirst, matchesReport, pictureRefused, pictureSrc, refusalWords, ticketLine, unreadCount, whenWords } from '../reports.js?v=75f4a7cc';
 
 /** How long Send waits for a picture still drawing before it sends the world-only one (ms). */
 export const PICTURE_WAIT_MS = 6000;
@@ -97,7 +98,10 @@ export function mountReportsSheet({ doc = globalThis.document, host, api, contex
   const listView = e('section', { class: 'reports-view reports-list-view', 'data-reports-list-view': '', 'aria-label': T.sheet });
   const list = e('ul', { class: 'reports-list', 'data-reports-list': '' });
   const empty = e('p', { class: 'reports-empty', 'data-reports-empty': '', hidden: true }, T.none);
-  listView.append(list, empty);
+  // Ticket 58: a search box over your reports once there are a few (their subjects, client side).
+  const filter = e('input', { type: 'search', id: 'reports-filter', class: 'reports-text reports-filter', placeholder: T.filterPlaceholder, 'aria-label': T.filterLabel, autocomplete: 'off', spellcheck: 'false', hidden: true, 'data-reports-filter': '' });
+  const noMatch = e('p', { class: 'reports-empty', 'data-reports-no-match': '', hidden: true }, T.filterNone);
+  listView.append(filter, list, empty, noMatch);
   // A thread.
   const threadView = e('section', { class: 'reports-view reports-thread-view', 'data-reports-thread-view': '', hidden: true });
   const threadHead = e('div', { class: 'reports-thread-head' });
@@ -176,8 +180,17 @@ export function mountReportsSheet({ doc = globalThis.document, host, api, contex
     node.dataset.status = s;
   }
 
+  function listMeta() {
+    const q = filter.hidden ? '' : filter.value.trim();
+    return q ? T.filterMeta(tickets.filter((t) => matchesReport(t, q)).length, tickets.length) : T.meta(tickets.length);
+  }
+
   function drawList() {
-    list.replaceChildren(...tickets.map((t) => {
+    filter.hidden = tickets.length < REPORT_FILTER_MIN && !filter.value;
+    const q = filter.hidden ? '' : filter.value.trim();
+    const shown = tickets.filter((t) => matchesReport(t, q));
+    noMatch.hidden = !(q && tickets.length && !shown.length);
+    list.replaceChildren(...shown.map((t) => {
       const li = e('li', { class: 'reports-row', 'data-ticket': t.id, 'data-unread': t.unread ? '1' : null });
       const btn = e('button', { type: 'button', class: 'reports-row-btn', 'aria-label': `${t.subject}, ${STATUS_WORDS[t.status] || t.status}${t.unread ? `, ${T.unreadDot}` : ''}` });
       const top = e('span', { class: 'reports-row-top' });
@@ -255,7 +268,7 @@ export function mountReportsSheet({ doc = globalThis.document, host, api, contex
       loading = false;
       setUnread(unreadCount(tickets));
       drawList();
-      if (view === 'list') say(T.meta(tickets.length));
+      if (view === 'list') say(listMeta());
     } catch (err) {
       loading = false;
       drawList();
@@ -295,7 +308,10 @@ export function mountReportsSheet({ doc = globalThis.document, host, api, contex
   }
 
   const okShot = (x) => (x && typeof x.url === 'string' && x.url.startsWith('data:image/jpeg;base64,') ? x : null);
-  const mode = () => (uiBox.checked ? 'ui' : 'world');
+  // Ticket 58: Include the game's UI shows unticked (and greyed) while Attach a picture is
+  // unticked; the choice is kept in wantUi and comes back when the picture is ticked again.
+  let wantUi = true;
+  const mode = () => (wantUi ? 'ui' : 'world');
 
   /** The preview and the two boxes as the pictures stand. Both boxes stay usable while a picture draws. */
   function drawPicture() {
@@ -305,14 +321,15 @@ export function mountReportsSheet({ doc = globalThis.document, host, api, contex
     const pending = Boolean(jobs[want]) || queued.has(want);
     const none = !shots.ui && !shots.world && !jobs.ui && !jobs.world && queued.size === 0;
     picBox.disabled = none;
-    uiBox.disabled = !picBox.checked;
     if (none) picBox.checked = false;
+    uiBox.disabled = !picBox.checked;
+    uiBox.checked = picBox.checked && wantUi;
     if (pending && picBox.checked) {
       picHint.textContent = T.pictureDrawing;
       picPreview.hidden = true;
       return;
     }
-    picHint.textContent = has ? (uiBox.checked ? T.pictureHintUi : T.pictureHint) : T.pictureNone;
+    picHint.textContent = has ? (wantUi ? T.pictureHintUi : T.pictureHint) : T.pictureNone;
     picPreview.hidden = !(has && picBox.checked);
     if (has) {
       picPreview.setAttribute('src', shot.url);
@@ -332,7 +349,7 @@ export function mountReportsSheet({ doc = globalThis.document, host, api, contex
       if (mine !== round) return;
       shots[which] = okShot(s);
       // A UI picture that cannot be drawn (or came out blank) falls back to the world only.
-      if (which === 'ui' && !shots.ui && uiBox.checked) uiBox.checked = false;
+      if (which === 'ui' && !shots.ui && wantUi) wantUi = false;
     })();
     jobs[which] = job;
     drawPicture();
@@ -349,6 +366,7 @@ export function mountReportsSheet({ doc = globalThis.document, host, api, contex
     jobs = { ui: null, world: null };
     queued = new Set(['world', 'ui']);
     picBox.checked = true;
+    wantUi = true;
     uiBox.checked = true;
     const mine = round;
     // After the form has painted and the box has the caret: typing never waits on a picture.
@@ -356,7 +374,7 @@ export function mountReportsSheet({ doc = globalThis.document, host, api, contex
       if (mine !== round || state === 'closed' || view !== 'new') return;
       takePicture('world').then(() => {
         if (mine !== round) return;
-        if (uiBox.checked && state !== 'closed' && queued.has('ui')) takePicture('ui');
+        if (wantUi && state !== 'closed' && queued.has('ui')) takePicture('ui');
         else { queued.delete('ui'); drawPicture(); }
       });
     };
@@ -410,8 +428,10 @@ export function mountReportsSheet({ doc = globalThis.document, host, api, contex
   function backToList() {
     if (state === 'sending') return;
     show('list');
-    say(T.meta(tickets.length));
     drawList();
+    say(listMeta());
+    // Opened straight on Write to us, the list was never fetched.
+    if (!tickets.length) refresh();
     const row = ticket ? list.querySelector(`[data-ticket="${ticket.id}"] button`) : null;
     (row || title).focus({ preventScroll: true });
   }
@@ -592,7 +612,9 @@ export function mountReportsSheet({ doc = globalThis.document, host, api, contex
   editCancel.addEventListener('click', () => cancelEdit());
   editSave.addEventListener('click', () => saveEdit());
   picBox.addEventListener('change', () => drawPicture());
+  filter.addEventListener('input', () => { drawList(); if (view === 'list') say(listMeta()); });
   uiBox.addEventListener('change', () => {
+    wantUi = uiBox.checked;
     if (!shots[mode()] && !jobs[mode()]) takePicture(mode());
     else drawPicture();
   });

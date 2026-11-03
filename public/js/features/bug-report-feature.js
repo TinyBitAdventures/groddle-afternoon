@@ -50,8 +50,8 @@
  * window.groddleBugReport.open('list'|'new'), .openTicket(id), .refresh() in multiplayer.
  */
 
-import { createReportsApi, REPORT_PICTURE, REPORT_TEXT, UNREAD_POLL_MS, base64Size, pictureSize, reportFromHash } from '../reports.js?v=5271872b';
-import { mountReportsSheet } from '../ui/reports-sheet.js?v=0041ba7b';
+import { createReportsApi, REPORT_PICTURE, REPORT_TEXT, UNREAD_POLL_MS, base64Size, pictureSize, reportFromHash } from '../reports.js?v=75f4a7cc';
+import { mountReportsSheet } from '../ui/reports-sheet.js?v=59a71a73';
 
 export const BUG_REPORT_FEATURE_ID = 'bug-report';
 
@@ -382,6 +382,9 @@ const STYLE = `
 #bug-btn-lift { position: fixed; z-index: calc(var(--z-modal) + 31); margin: 0; box-sizing: border-box; }
 #bug-btn-lift[hidden] { display: none !important; }
 #bug-report-panel .reports-check-sub { margin-left: var(--space-5); font-weight: var(--fw-regular); }
+#bug-report-panel .reports-check:has(.reports-checkbox:disabled) { opacity: 0.55; cursor: default; }
+#bug-report-panel .reports-filter { flex: none; }
+#bug-report-panel .reports-filter[hidden] { display: none; }
 @media (prefers-reduced-motion: reduce) { [data-ui="modern"] #bug-report-panel .reports-card { animation: none; } }
 `;
 

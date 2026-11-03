@@ -6,8 +6,8 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { sitePath, skipWithoutSite } from '../tools/repos.mjs';
-import { REPORT_TEXT } from '../public/js/reports.js?v=5271872b';
-import { REPORT_LEAVE_OUT, REPORT_MASK, maskClone, openPanels } from '../public/js/features/bug-report-feature.js?v=cae9ba41';
+import { REPORT_TEXT } from '../public/js/reports.js?v=75f4a7cc';
+import { REPORT_LEAVE_OUT, REPORT_MASK, maskClone, openPanels } from '../public/js/features/bug-report-feature.js?v=19bdd8bc';
 
 const root = join(import.meta.dirname, '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');
