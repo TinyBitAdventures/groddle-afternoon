@@ -2,9 +2,9 @@
  * Groddle Afternoon — original street geometry + layered decos
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
-import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=2e8397bf';
+import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=117337d3';
 import { createFeatureHost } from './js/feature-host.js?v=903263a4';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=2ecc557a';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=5fef8621';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -36,7 +36,7 @@ import {
 // Quest copy is Flash htmlText: <b>/<i>/<br> drawn as formatting, the rest dropped, never innerHTML.
 import { questRequirementText, renderQuestText, withQuestMarkup } from './js/quest-text.js?v=7f5d761c';
 // G267: the world-verb quest counters skip offer-system quests; old saves drop the boot Moloko quest.
-import { dropBootStarterQuests, routesCounter, worldVerbQuestEvents, makingUnitQuestEvents, shrineDonationQuestEvents } from './js/quest-offers.js?v=7dfa8eae';
+import { dropBootStarterQuests, routesCounter, worldVerbQuestEvents, gardenPlotEvents, makingUnitQuestEvents, shrineDonationQuestEvents } from './js/quest-offers.js?v=49e0f9bd';
 import {
   PHANTOM_QUEST_ID,
   REMEMBER_QUEST_ID,
@@ -482,7 +482,7 @@ import {
   parsePlayerSave,
   serializePlayerSave,
   restorePlayerSave,
-} from './js/player-save.js?v=7b947511';
+} from './js/player-save.js?v=3da77f2b';
 import {
   HOME_INTERIOR_TSID,
   HOME_STREET_TSID,
@@ -8701,6 +8701,13 @@ function executeVerb(target, verbId) {
     if (!achievementEvents.some((event) => event.counter === verbEvent)) emitGameEvent(verbEvent, 1, verbDetail);
     // Tree quest counters the badge events leave out (wood trees, super and last harvests, healing).
     for (const row of worldVerbQuestEvents(target, verbId, result)) emitGameEvent(row.event, row.amount, verbDetail);
+    // Ticket 68: a plot planted, watered, cleared or picked by hand counts like include/garden.js
+    // (Tater 'n' Mater, Shucks To Be You, the garden badges), at home, on a street, solo or online.
+    if (result.gardenPlot) {
+      for (const row of gardenPlotEvents(result.gardenPlot, currentStreet?.tsid || 'street')) {
+        announceAchievementUpdates(applyAchievementProgress(achieveState, row.event, row.amount, pc));
+      }
+    }
     if (ROCK_CATALOG[target.classId] && verbId === 'mine' && target.state?.rock?.depleted) {
       emitGameEvent(`rocks_depleted:${target.classId}`);
     }
@@ -27043,7 +27050,8 @@ function spawnGarden(opts = {}) {
     label: garden.label,
     subtitle: 'Water all · click plots to plant',
     sprite: bedFoot,
-    state: { garden, plotTargets: [] },
+    // detached: a home cultivation (yours, or the copy a visit draws), not a street's garden.
+    state: { garden, plotTargets: [], detached: Boolean(opts.detached) },
   });
   gardenEntity._gardenRoot = root;
   root.gardenTarget = gardenEntity;
@@ -27516,14 +27524,10 @@ function runGardenPlotAction(key, action) {
     playSound('CLICK_FAILURE', { volume: 0.45 });
     return;
   }
-  if (action === 'harvest' && r.cropId) {
-    const kind = activeGarden.gardenType === 'herb' ? 'herb_harvest' : 'garden_harvest';
-    emitGameEvent(`${kind}:${r.cropId}`, r.count || 1);
-    // include/garden.js 486-505: super_harvest_herb on an herb garden's bonus roll.
-    if (r.superHarvest && activeGarden.gardenType === 'herb') emitGameEvent(`herb_super_harvest:${r.cropId}`);
-  }
-  // include/garden.js 386-392: herb_seeds_planted (and Shucks To Be You's count).
-  if (action === 'plant' && r.seedId && activeGarden.gardenType === 'herb') emitGameEvent(`herb_seed_planted:${r.seedId}`);
+  // include/garden.js counters (ticket 68: the same ones the plot menus send).
+  const plotTarget = gardens.find((t) => t.state?.garden === activeGarden);
+  const plotEvents = gardenPlotEvents({ verb: action, gardenType: activeGarden.gardenType, home: Boolean(plotTarget?.state?.detached), seedId: r.seedId, cropId: r.cropId, count: r.count, superHarvest: r.superHarvest }, currentStreet?.tsid || 'street');
+  for (const row of plotEvents) announceAchievementUpdates(applyAchievementProgress(achieveState, row.event, row.amount, pc));
   if (r.effects) {
     pushActivity({
       base: r.msgs?.[0] || 'You tended a plot',

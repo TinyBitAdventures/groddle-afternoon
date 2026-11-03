@@ -44,7 +44,7 @@ import { emblemCostFor } from '../shrines.js?v=51e09fa4';
 import { rollDropTable } from '../drop-tables.js?v=0f922478';
 import { openNoteView, noteViewOpen } from '../note-view.js?v=21c55475';
 import { payDrop } from './drops-feature.js?v=e0102ed4';
-import { resourceNodesFeature } from './resource-nodes-feature.js?v=c1f27466';
+import { resourceNodesFeature } from './resource-nodes-feature.js?v=fbcfd31f';
 import { SEASON_DATA } from '../seasons-data.js?v=b5174bc9';
 import {
   CANDY_CLASSES,

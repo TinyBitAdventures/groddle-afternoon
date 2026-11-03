@@ -16,9 +16,9 @@ import { join } from 'node:path';
 
 import { loadContentCatalogsFromDir, getQuestCatalog } from '../public/js/content-catalogs.js?v=10b118dd';
 import { createQuestState } from '../public/js/quests.js?v=282e1621';
-import { pendingQuestOffers } from '../public/js/quest-offers.js?v=7dfa8eae';
+import { pendingQuestOffers } from '../public/js/quest-offers.js?v=49e0f9bd';
 import { MP_RACE_QUESTS, MULTIPLAYER_QUESTS, offerableMultiplayerQuest } from '../public/js/quests-mp.js?v=2beb658a';
-import { questOffersFeature } from '../public/js/features/quest-offers-feature.js?v=0956f753';
+import { questOffersFeature } from '../public/js/features/quest-offers-feature.js?v=7b978923';
 import { HUB_MAP_STREETS } from '../public/js/hub-maps-data.js?v=ffe222f1';
 import { HELL_LOCATION } from '../public/js/hell.js?v=45060736';
 import { HOG_MP_COURSE } from '../public/js/hog-haul-mp.js?v=d8605396';

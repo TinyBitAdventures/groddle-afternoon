@@ -28,7 +28,7 @@ import {
   PURPLE_JOURNEY_STREETS,
   COLD_COMFORT,
   COLD_COMFORT_LEAVE_TEXT,
-} from '../public/js/quest-offers.js?v=7dfa8eae';
+} from '../public/js/quest-offers.js?v=49e0f9bd';
 import { createResourceNode, harvestResourceNode } from '../public/js/resource-nodes.js?v=7e4d7df8';
 import { createPlot, performPlotVerb } from '../public/js/patches.js?v=3e9218c1';
 import { createToolConditionState } from '../public/js/tools.js?v=3974f57e';
@@ -39,7 +39,7 @@ import {
   SLATHER_VERB,
   SLATHER_COPY,
 } from '../public/js/features/quest-verbs-feature.js?v=0ae7c7ff';
-import { onOwnYard } from '../public/js/features/quest-offers-feature.js?v=0956f753';
+import { onOwnYard } from '../public/js/features/quest-offers-feature.js?v=7b978923';
 import {
   giveCubimalVerb,
   GIVE_CUBIMAL_VERB,
@@ -243,7 +243,8 @@ describe('herbs (G444 G448)', () => {
     assert.equal(progress(qs, id, 'herb_seeds_planted_shucks'), 6);
     route(qs, 'herb_harvest:gandlevery', 3);
     assert.equal(progress(qs, id, 'harvest_herb_shucks'), 1, 'one harvest adds 1, not its crop count');
-    assert.match(read('game.js'), /emitGameEvent\(`herb_seed_planted:\$\{r\.seedId\}`\)/);
+    // Ticket 68: the plot menus send it (quest-offers.js gardenPlotEvents, t68-garden-plot-counters.test.js).
+    assert.match(read('js/quest-offers.js'), /out\.push\(\{ event: `herb_seed_planted:\$\{plot\.seedId\}`, amount: 1 \}\)/);
     assert.match(read('js/features/supply-feature.js'), /engine\.achievement\?\.\(`herb_seeds_extracted:\$\{res\.out\}`, res\.got\)/);
   });
 
@@ -251,7 +252,8 @@ describe('herbs (G444 G448)', () => {
     const qs = accepted('herbalism_get_super_harvest');
     route(qs, 'herb_super_harvest:silvertongue');
     assert.equal(progress(qs, 'herbalism_get_super_harvest', 'super_harvest_herb'), 1);
-    assert.match(read('game.js'), /emitGameEvent\(`herb_super_harvest:\$\{r\.cropId\}`\)/);
+    // Ticket 68: sent for a plot picked by hand (quest-offers.js gardenPlotEvents).
+    assert.match(read('js/quest-offers.js'), /out\.push\(\{ event: `herb_super_harvest:\$\{plot\.cropId\}`, amount: 1 \}\)/);
   });
 });
 

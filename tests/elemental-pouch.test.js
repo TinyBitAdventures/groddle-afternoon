@@ -25,8 +25,8 @@ import {
   shakeElement,
   shakePouch,
 } from '../public/js/elemental-pouch.js?v=7ae2ad99';
-import { pouchFeature } from '../public/js/features/elemental-pouch-feature.js?v=42f1bc42';
-import { FEATURES } from '../public/js/features/index.js?v=2ecc557a';
+import { pouchFeature } from '../public/js/features/elemental-pouch-feature.js?v=d63a6def';
+import { FEATURES } from '../public/js/features/index.js?v=5fef8621';
 import { ITEM_CATALOG, countItem, createInventory } from '../public/js/inventory.js?v=597a17a2';
 import { STORE_CATALOG } from '../public/js/store-catalog.js?v=74b56af3';
 import { VENDOR_PROFILES, vendorBuy } from '../public/js/vendor.js?v=4e3cc8fb';
@@ -35,7 +35,7 @@ import { isOfferedInRemake, remakeStatus } from '../public/js/imagination-remake
 import { SKILL_REMAKE_NOTES } from '../public/js/skill-tree.js?v=53795620';
 import { loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js?v=10b118dd';
 import { createQuestState } from '../public/js/quests.js?v=282e1621';
-import { acceptOffer, pendingQuestOffers, syncItemRequirements, turnInQuest } from '../public/js/quest-offers.js?v=7dfa8eae';
+import { acceptOffer, pendingQuestOffers, syncItemRequirements, turnInQuest } from '../public/js/quest-offers.js?v=49e0f9bd';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const GSJS = decodeURIComponent(new URL('../../glitch-GameServerJS', import.meta.url).pathname);

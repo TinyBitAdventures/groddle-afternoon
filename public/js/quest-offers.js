@@ -1254,6 +1254,45 @@ export function worldVerbQuestEvents(target, verbId, result = {}) {
 }
 
 /**
+ * Ticket 68: the counters one garden plot verb done by hand sends (content.js garden_plot,
+ * its result's gardenPlot), the way items/include/garden.js counted them. Each goes through
+ * the badge path (engine.achievement), which also reaches the quests:
+ * - water: garden_plots_watered:<label> (garden.js 163); clear: garden_plots_hoed (272).
+ * - plant: garden_plots_planted or, in an herb garden, garden_herb_plots_planted (387, 399);
+ *   an herb seed also counts herb_seed_planted:<seed> (388-392: herb_seeds_planted, and Shucks
+ *   To Be You's count), and in a garden that is not a home's, herb_seeds_planted_for_others
+ *   (394-396: not a POL; a neighbour's garden is counted by features/neighbours-mp-feature.js).
+ * - harvest: garden_harvest:<crop> or herb_harvest:<crop> by the crops picked (532: Tater 'n'
+ *   Mater, Crops a-Planty, A Beltful of Onions; herbs: Shucks To Be You), garden_plots_picked
+ *   (533), and an herb garden's Super Harvest herb_super_harvest:<crop> (503-505).
+ * The Master Gardener potions send their own (features/master-garden-feature.js).
+ * @param {{ verb: string, gardenType?: string, home?: boolean, seedId?: string, cropId?: string, count?: number, superHarvest?: boolean }} plot
+ * @param {string} label  the garden's badge label (`<street>_<type>`, as master-garden-feature)
+ * @returns {{ event: string, amount: number }[]}
+ */
+export function gardenPlotEvents(plot, label = 'street') {
+  const verb = String(plot?.verb || '').split(':')[0];
+  const herb = plot?.gardenType === 'herb';
+  const tag = `${label}_${herb ? 'herb' : 'default'}`;
+  const out = [];
+  if (verb === 'water') out.push({ event: `garden_plots_watered:${tag}`, amount: 1 });
+  if (verb === 'clear') out.push({ event: `garden_plots_hoed:${tag}`, amount: 1 });
+  if (verb === 'plant' && plot.seedId) {
+    out.push({ event: `${herb ? 'garden_herb_plots_planted' : 'garden_plots_planted'}:${tag}`, amount: 1 });
+    if (herb) {
+      out.push({ event: `herb_seed_planted:${plot.seedId}`, amount: 1 });
+      if (!plot.home) out.push({ event: 'herb_seeds_planted_for_others', amount: 1 });
+    }
+  }
+  if (verb === 'harvest' && plot.cropId) {
+    out.push({ event: `${herb ? 'herb_harvest' : 'garden_harvest'}:${plot.cropId}`, amount: Math.max(1, Math.floor(Number(plot.count) || 1)) });
+    out.push({ event: `garden_plots_picked:${tag}`, amount: 1 });
+    if (herb && plot.superHarvest) out.push({ event: `herb_super_harvest:${plot.cropId}`, amount: 1 });
+  }
+  return out;
+}
+
+/**
  * Quest events one finished Making unit adds (game.js noteMadeUnit):
  * - G441: ore_grinder.js / grand_ol_grinder.js 604-611 onCrushComplete: ore_crushed
  *   by the ore crushed (never barnacle), refined_<element> by each output.

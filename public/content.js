@@ -1601,6 +1601,16 @@ export function runVerb(target, verbId, ctx) {
       anim: verbId,
       gardenChanged: true,
       gardenTarget: s.gardenEntity,
+      // Ticket 68: what the plot did, for its quest and badge counters (quest-offers.js gardenPlotEvents).
+      gardenPlot: {
+        verb: verbId,
+        gardenType: garden.gardenType || 'default',
+        home: Boolean(s.gardenEntity?.state?.detached),
+        seedId: r.seedId || null,
+        cropId: r.cropId || null,
+        count: r.count || 0,
+        superHarvest: Boolean(r.superHarvest),
+      },
       // garden_new.js talkback: the plot answers with a line and the slugs.
       speech: r.speech || null,
     };
