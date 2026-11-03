@@ -18,9 +18,9 @@ import { loadContentCatalogsFromDir, getQuestCatalog } from '../public/js/conten
 import { createQuestState } from '../public/js/quests.js?v=282e1621';
 import { pendingQuestOffers } from '../public/js/quest-offers.js?v=7dfa8eae';
 import { MP_RACE_QUESTS, MULTIPLAYER_QUESTS, offerableMultiplayerQuest } from '../public/js/quests-mp.js?v=2beb658a';
-import { questOffersFeature } from '../public/js/features/quest-offers-feature.js?v=a9eacf09';
+import { questOffersFeature } from '../public/js/features/quest-offers-feature.js?v=0956f753';
 import { HUB_MAP_STREETS } from '../public/js/hub-maps-data.js?v=ffe222f1';
-import { HELL_LOCATION } from '../public/js/hell.js?v=5349e58b';
+import { HELL_LOCATION } from '../public/js/hell.js?v=45060736';
 import { HOG_MP_COURSE } from '../public/js/hog-haul-mp.js?v=d8605396';
 import { CROWNS_TICKET } from '../public/js/game-of-crowns.js?v=98e21baf';
 import { economyCredits } from '../tools/build-economy.mjs';
@@ -161,7 +161,7 @@ describe('the dead do not race', () => {
   });
 
   it('a race_match that reaches a dead page is left at once (races-feature)', async () => {
-    const { racesFeature } = await import('../public/js/features/races-feature.js?v=7a3e8f4b');
+    const { racesFeature } = await import('../public/js/features/races-feature.js?v=eadf55c0');
     const client = fakeClient(7);
     const toasts = [];
     const engine = {
@@ -253,7 +253,7 @@ describe('a Game of Crowns reload asks the server, and the dead stay out (crowns
   });
 
   it('solo still gives a ticket back on a street change', async () => {
-    const { crownsFeature } = await import('../public/js/features/crowns-feature.js?v=f711131e');
+    const { crownsFeature } = await import('../public/js/features/crowns-feature.js?v=3afa035f');
     const engine = { mode: 'solo', inv: {}, query: () => null, toast() {}, updateHud() {}, param: () => null, instanceHold: null, setData() {} };
     crownsFeature.restore({ pendingTicket: CROWNS_TICKET }, engine);
     crownsFeature.onStreetEnter({ tsid: 'GA5' }, engine);

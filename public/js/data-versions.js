@@ -258,7 +258,7 @@
       "assets/content/ambient-music.json": "161af59d",
       "assets/content/buffs.json": "70ea503c",
       "assets/content/deco-catalog.json": "286a2344",
-      "assets/content/puzzle-triggers.json": "09810451",
+      "assets/content/puzzle-triggers.json": "f48ef073",
       "assets/content/quests.json": "d37c15d2",
       "assets/content/signpost-graph.json": "1ea27669",
       "assets/content/sound-keys.json": "d9ced09a",

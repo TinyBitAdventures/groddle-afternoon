@@ -20,7 +20,7 @@
  * Every verb works on one item or the whole stack, like the source's count.
  */
 
-import { addItem, countItem, ensureItem, removeItem } from './inventory.js?v=b0e33301';
+import { addItem, countItem, ensureItem, removeItem } from './inventory.js?v=597a17a2';
 import { skillPackageDetails } from './skill-packages.js?v=bfb87281';
 import { metabolicGain, moodMax, loseEnergy, loseMood } from './metabolics.js?v=8504134e';
 

@@ -52,7 +52,7 @@
  *   nostalgiaPotion (1 once Ancestral Spirits is used this visit).
  */
 
-import { addItem, removeItem, countItem } from '../inventory.js?v=b0e33301';
+import { addItem, removeItem, countItem } from '../inventory.js?v=597a17a2';
 import { acceptOffer, npcQuestOffers, questStatus } from '../quest-offers.js?v=7dfa8eae';
 import { groundBeneath, isItemSolid, platformYAt, platformsScreen } from '../street-model.js?v=505d8990';
 import { sheetFrames } from '../quest-rooms/kit.js?v=4d2f1606';

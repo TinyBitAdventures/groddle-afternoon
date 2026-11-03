@@ -39,18 +39,18 @@ import {
   renderX,
   roomMachineVerbs,
   tankFuel,
-} from '../public/js/machine-rooms.js?v=6f8521ef';
+} from '../public/js/machine-rooms.js?v=5fbd635d';
 import { FOREST_MACHINE_ROOM_HELD, FOREST_MACHINE_ROOM_TSID } from '../public/js/forest-machine-room.js?v=5f7e4589';
-import { FRESH_FUEL, MAX_FUEL, refuelMachine } from '../public/js/machines.js?v=ac30307e';
+import { FRESH_FUEL, MAX_FUEL, refuelMachine } from '../public/js/machines.js?v=44fc6833';
 import { DROP_TABLES, applyDropResult, rollDropTable } from '../public/js/drop-tables.js?v=0f922478';
-import { countItem, removeItem } from '../public/js/inventory.js?v=b0e33301';
+import { countItem, removeItem } from '../public/js/inventory.js?v=597a17a2';
 import { canUseTool } from '../public/js/tools.js?v=3974f57e';
-import { MACHINE_EXTRA_WAIT_MS as MAKING_EXTRA_WAIT_MS, MAKING_TOOL_SKILLS, RECIPE_CATALOG, canCraft, craftRecipe, ensureMakingItems, loadRecipeCatalogFromFile } from '../public/js/making.js?v=adfa8a29';
+import { MACHINE_EXTRA_WAIT_MS as MAKING_EXTRA_WAIT_MS, MAKING_TOOL_SKILLS, RECIPE_CATALOG, canCraft, craftRecipe, ensureMakingItems, loadRecipeCatalogFromFile } from '../public/js/making.js?v=712a9adb';
 import { fixedFurniturePoints, furniturePlacementGroups } from '../public/js/street-furniture.js?v=cb0ba050';
 import { worldToScreen } from '../public/js/street-model.js?v=505d8990';
 import { nearestSurfaceY } from '../public/js/walk-surface.js?v=c982983e';
 import { platformsScreen } from '../public/js/street-model.js?v=505d8990';
-import { machineRoomsFeature } from '../public/js/features/machine-rooms-feature.js?v=4cfe5278';
+import { machineRoomsFeature } from '../public/js/features/machine-rooms-feature.js?v=c22867c1';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const gsjs = join(spike, '../glitch-GameServerJS');

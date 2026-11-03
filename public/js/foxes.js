@@ -15,7 +15,7 @@
  * - achievements/*foxbrusher*.js, fleet_foxer.js, fox_tourist.js
  */
 
-import { addItem, countItem, ensureItem } from './inventory.js?v=b0e33301';
+import { addItem, countItem, ensureItem } from './inventory.js?v=597a17a2';
 import { canUseTool, useToolCondition } from './tools.js?v=3974f57e';
 import { foxBrushingCard, scaledToolWear } from './imagination-effects.js?v=70169933';
 import { grantMoodXp } from './mood-xp.js?v=958e7680';
@@ -640,7 +640,7 @@ export function foxRangerStoreProfile() {
     label: 'Fox Ranger',
     badge: 'F',
     color: 0x8a7a4a,
-    desc: 'Regulation Fox Brushes and Fox Bait, and absolutely no cheese. (catalog_stores.js store 22)',
+    desc: 'Regulation Fox Brushes and Fox Bait, and absolutely no cheese.',
     // buy_multiplier 0: the Ranger buys nothing back (inc_stores.js storeSell).
     buyMultiplier: FOX_RANGER_STORE.buyMultiplier,
     offers: FOX_RANGER_STORE.items.map((row) => ({

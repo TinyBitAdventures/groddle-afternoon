@@ -11,11 +11,11 @@ import {
   listPackSlots,
   ITEM_CATALOG,
   ensureItem,
-} from './inventory.js?v=b0e33301';
-import { gardenVendorOffers } from './garden.js?v=d2afc936';
-import { miningVendorOffers } from './mining.js?v=541dfb88';
+} from './inventory.js?v=597a17a2';
+import { gardenVendorOffers } from './garden.js?v=b38ab310';
+import { miningVendorOffers } from './mining.js?v=76295780';
 
-import { STORE_CATALOG, ITEM_BASE_COSTS, NO_VENDOR_ITEMS } from './store-catalog.js?v=79d4de8a';
+import { STORE_CATALOG, ITEM_BASE_COSTS, NO_VENDOR_ITEMS } from './store-catalog.js?v=74b56af3';
 
 /** @typedef {{ classTsid: string, label: string, buyPrice: number, sellPrice: number, stock?: number }} VendorOffer */
 
@@ -77,13 +77,15 @@ const MINING_VENDOR_KEYS = ['mining', 'hardware', 'tools'];
 
 /** Register official stock in the shared pack catalog. */
 export function ensureVendorItems() {
-  for (const vendor of VENDOR_SEQUENCE) {
-    for (const offer of vendor.offers) {
+  for (const store of STORE_CATALOG) {
+    for (const offer of store.offers) {
       // Keep richer metadata already registered by making, mining, or gardens.
       if (ITEM_CATALOG[offer.classTsid]) continue;
+      // The item's own description from its GSJS file (build-stores.mjs), the last line of its
+      // menu; an item with none says where it is sold.
       ensureItem(offer.classTsid, {
         label: offer.label,
-        desc: `${offer.label}, stocked by the ${vendor.label}. (GSJS catalog_stores.js)`,
+        desc: offer.desc || `${offer.label}, sold by the ${store.label}.`,
       });
     }
   }

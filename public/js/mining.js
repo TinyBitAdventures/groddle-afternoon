@@ -18,7 +18,7 @@ import {
   ensureItem,
   itemIcon,
   ITEM_CATALOG,
-} from './inventory.js?v=b0e33301';
+} from './inventory.js?v=597a17a2';
 import { GRINDER_TOOLS, canUseTool, firstWorkingTool, useToolCondition } from './tools.js?v=3974f57e';
 import { skillPackageDetails } from './skill-packages.js?v=bfb87281';
 import { grantMoodXp } from './mood-xp.js?v=958e7680';
@@ -605,30 +605,30 @@ export function rockStatusLabel(rock) {
 
 export function ensureMiningItems() {
   const defs = {
-    pick: { label: 'Pick', desc: 'A relatively sturdy pick for mining. (GSJS pick)', isTool: true },
+    pick: { label: 'Pick', desc: 'A relatively sturdy pick for mining.', isTool: true },
     fancy_pick: {
       label: 'Fancy Pick',
-      desc: 'Super-deluxe pick. More durability. (GSJS fancy_pick)',
+      desc: 'Super-deluxe pick. More durability.',
       isTool: true,
     },
     smelter: {
       label: 'Smelter',
-      desc: 'Turn metal rock into Plain Metal Ingots. (GSJS smelter)',
+      desc: 'Turn metal rock into Plain Metal Ingots.',
       isTool: true,
     },
     ore_grinder: {
       label: 'Grinder',
-      desc: 'Crush ore into alchemical elements. (GSJS ore_grinder)',
+      desc: 'Crush ore into alchemical elements.',
       isTool: true,
     },
     metalmaker: {
       label: 'Metal Machine',
-      desc: 'Forge rods and bars from metals. (GSJS metalmaker)',
+      desc: 'Forge rods and bars from metals.',
       isTool: true,
     },
     alchemical_tongs: {
       label: 'Alchemical Tongs',
-      desc: 'Transform Plain Metal with elements. (GSJS alchemy_2)',
+      desc: 'Transform Plain Metal with elements.',
       isTool: true,
     },
     metal_rock: {
@@ -642,11 +642,11 @@ export function ensureMiningItems() {
       label: 'Plain Metal Ingot',
       desc: 'Base metal for alchemy and metalworking.',
     },
-    tin: { label: 'Tin', desc: 'Alchemized metal. (GSJS recipe 174)' },
-    copper: { label: 'Copper', desc: 'Alchemized metal. (GSJS recipe 175)' },
-    molybdenum: { label: 'Molybdenum', desc: 'Alchemized metal. (GSJS recipe 176)' },
-    metal_rod: { label: 'Metal Rod', desc: 'Tin + plain metal. (GSJS recipe 279)' },
-    metal_post: { label: 'Metal Bar', desc: 'Copper + tin. (GSJS recipe 280 / metal_post)' },
+    tin: { label: 'Tin', desc: 'Alchemized metal.' },
+    copper: { label: 'Copper', desc: 'Alchemized metal.' },
+    molybdenum: { label: 'Molybdenum', desc: 'Alchemized metal.' },
+    metal_rod: { label: 'Metal Rod', desc: 'Tin + plain metal.' },
+    metal_post: { label: 'Metal Bar', desc: 'Copper + tin.' },
     fuel_cell: { label: 'Fuel Cell', desc: 'Powers Metal Machine jobs.' },
     element_red: { label: 'Red Element', desc: 'Alchemical element from refining.' },
     element_green: { label: 'Green Element', desc: 'Alchemical element from refining.' },
@@ -657,7 +657,7 @@ export function ensureMiningItems() {
     ensureItem(id, meta);
   }
   for (const rock of Object.values(ROCK_CATALOG)) {
-    ensureItem(rock.classTsid, { label: rock.label, desc: `Mineable ${rock.rockType} node.` });
+    ensureItem(rock.classTsid, { label: rock.label, desc: `A ${rock.label} to mine with a Pick.` });
   }
 }
 

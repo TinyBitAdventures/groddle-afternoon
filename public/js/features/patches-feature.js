@@ -38,7 +38,7 @@
  * `killTree` are the hooks; trees grown here die through `killPlotTree`.
  */
 
-import { ensureItem } from '../inventory.js?v=b0e33301';
+import { ensureItem } from '../inventory.js?v=597a17a2';
 import { isItemFloor, platformYAt } from '../street-model.js?v=505d8990';
 import { getStreetEcologyCatalog, streetEcologyAliases } from '../street-ecology.js?v=2c82c072';
 import { trantStatusLabel } from '../trants.js?v=9c2e8c0f';
@@ -62,7 +62,7 @@ import {
   soilSpawnClasses,
   soilSpritePaths,
   tickPlot,
-} from '../patches.js?v=d4e17227';
+} from '../patches.js?v=3e9218c1';
 import { frameTexture, isLoaded, onFailed, onLoaded, textureFromUrl } from '../textures.js?v=db2ce452';
 import { HOE_TOOLS, firstWorkingTool } from '../tools.js?v=3974f57e';
 import { slugsFromEffects } from '../speech-slugs.js?v=130338f9';

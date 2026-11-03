@@ -10,7 +10,7 @@
  * Produce counts are the GSJS seed classProps produces_count.
  */
 
-import { addItem, removeItem, countItem, ensureItem, itemIcon } from './inventory.js?v=b0e33301';
+import { addItem, removeItem, countItem, ensureItem, itemIcon } from './inventory.js?v=597a17a2';
 import { HOE_TOOLS, WATERING_CAN_TOOLS, canUseTool, firstWorkingTool, useToolCondition } from './tools.js?v=3974f57e';
 import { skillPackageDetails } from './skill-packages.js?v=bfb87281';
 import { gardenGrowModifier } from './imagination-effects.js?v=70169933';
@@ -305,13 +305,13 @@ export const GARDEN_TOOLS = {
   watering_can: {
     classTsid: 'watering_can',
     label: 'Watering Can',
-    desc: 'Water garden plots so seeds can grow. (GSJS watering_can)',
+    desc: 'Water garden plots so seeds can grow.',
     isTool: true,
   },
   hoe: {
     classTsid: 'hoe',
     label: 'Hoe',
-    desc: 'Clear dirty plots after harvest. (GSJS hoe)',
+    desc: 'Clear dirty plots after harvest.',
     isTool: true,
   },
 };
@@ -765,11 +765,11 @@ export function ensureGardenItems() {
     const bed = seed.gardenType === 'herb' ? 'herb garden' : 'crop garden';
     ensureItem(seed.seedId, {
       label: seed.label,
-      desc: `Plant in a ${bed} to grow ${seed.cropLabel}. (GSJS ${seed.source})`,
+      desc: `Plant in a ${bed} to grow ${seed.cropLabel}.`,
     });
     ensureItem(seed.cropId, {
       label: seed.cropLabel,
-      desc: `Harvested from a ${bed}. (GSJS ${seed.cropId})`,
+      desc: `Harvested from a ${bed}.`,
     });
   }
   for (const tool of Object.values(GARDEN_TOOLS)) {

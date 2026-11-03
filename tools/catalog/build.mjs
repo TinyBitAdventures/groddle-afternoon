@@ -976,7 +976,7 @@ ${usesHtml.length ? `          <ul class="cat-list">
         <div>
           <h1>${esc(it.name)}</h1>
           ${it.plural && it.plural !== it.name ? `<p class="cat-plural">Plural: ${esc(it.plural)}</p>` : '<p class="cat-plural">&nbsp;</p>'}
-          <p class="cat-status"><span class="pill st-${esc(e.status)}">${esc(status.label)}</span>${e.register ? ` <span class="cat-register">Register row ${esc(e.register)}</span>` : ''}</p>
+          <p class="cat-status"><span class="pill st-${esc(e.status)}">${esc(status.label)}</span></p>
           ${statChips()}
         </div>
       </div>
@@ -989,13 +989,12 @@ ${usesHtml.length ? `          <ul class="cat-list">
         <div>
           <h2 id="orig-h">In Tiny Speck’s game</h2>
           ${desc.length ? `<div class="cat-desc">${desc.map((d) => `<p>${d}</p>`).join('')}</div>` : '<p class="cat-muted">The game code gives it no description.</p>'}
-${extras.length ? `          <ul class="cat-list cat-extras">\n${extras.map((x) => `            <li>${x}</li>`).join('\n')}\n          </ul>\n` : ''}${buffs.length ? `          <h3>Buffs</h3>\n          <ul class="cat-list">\n            ${buffs.join('\n            ')}\n          </ul>\n` : ''}${timers.length ? `          <h3>Quest timers</h3>\n          <ul class="cat-list">\n            ${timers.join('\n            ')}\n          </ul>\n` : ''}          <p class="cat-source">From <code>${esc(it.file)}</code> in Tiny Speck’s game code.</p>
+${extras.length ? `          <ul class="cat-list cat-extras">\n${extras.map((x) => `            <li>${x}</li>`).join('\n')}\n          </ul>\n` : ''}${buffs.length ? `          <h3>Buffs</h3>\n          <ul class="cat-list">\n            ${buffs.join('\n            ')}\n          </ul>\n` : ''}${timers.length ? `          <h3>Quest timers</h3>\n          <ul class="cat-list">\n            ${timers.join('\n            ')}\n          </ul>\n` : ''}          <p class="cat-source">From Tiny Speck’s game code.</p>
         </div>
         <dl class="cat-facts">
           <dt>Category</dt><dd>${esc(e.category)}</dd>
           <dt>Base price</dt><dd>${it.baseCost ? `${fmt(it.baseCost)} currants` : 'None'}</dd>
           ${it.stackmax ? `<dt>Stacks to</dt><dd>${fmt(it.stackmax)}</dd>` : ''}
-          <dt>Item id</dt><dd><code>${esc(it.id)}</code></dd>
           ${it.tags.length ? `<dt>Tags</dt><dd><ul class="note-tags">${it.tags.map((t) => `<li>${esc(t)}</li>`).join('')}</ul></dd>` : ''}
         </dl>
       </div>

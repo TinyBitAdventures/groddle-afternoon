@@ -28,10 +28,10 @@
  *     pouchDeltas, pouchName, pouchCards, pouchPickup, pouchAutoplay.
  */
 
-import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=b0e33301';
+import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=597a17a2';
 import { getGameDayKey } from '../game-day.js?v=edb00566';
 import { acceptOffer, ensureQuestOfferState } from '../quest-offers.js?v=7dfa8eae';
-import { VENDOR_PROFILES } from '../vendor.js?v=cabea7b7';
+import { VENDOR_PROFILES } from '../vendor.js?v=4e3cc8fb';
 import {
   ELEMENT_STACKMAX,
   POUCH_CLASS,

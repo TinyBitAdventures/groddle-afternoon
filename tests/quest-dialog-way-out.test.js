@@ -25,10 +25,10 @@ import { join } from 'node:path';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=10b118dd';
 import { createQuestState } from '../public/js/quests.js?v=282e1621';
 import { markOffered, waitingOffers } from '../public/js/quest-offers.js?v=7dfa8eae';
-import { questOffersFeature, EMERGENCY_SNOOZE_MS } from '../public/js/features/quest-offers-feature.js?v=a9eacf09';
-import { hellTicketsFeature } from '../public/js/features/hell-tickets-feature.js?v=28e4ab6a';
-import { hellFeature } from '../public/js/features/hell-feature.js?v=e9d00320';
-import { HELL_LOCATION, createHellState, croak } from '../public/js/hell.js?v=5349e58b';
+import { questOffersFeature, EMERGENCY_SNOOZE_MS } from '../public/js/features/quest-offers-feature.js?v=0956f753';
+import { hellTicketsFeature } from '../public/js/features/hell-tickets-feature.js?v=b2cfd1a4';
+import { hellFeature } from '../public/js/features/hell-feature.js?v=1f4a67d5';
+import { HELL_LOCATION, createHellState, croak } from '../public/js/hell.js?v=45060736';
 
 const root = join(import.meta.dirname, '..');
 const read = (rel) => readFileSync(join(root, rel), 'utf8');

@@ -2,9 +2,9 @@
  * Groddle Afternoon — original street geometry + layered decos
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
-import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=862128f3';
+import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=2e8397bf';
 import { createFeatureHost } from './js/feature-host.js?v=903263a4';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=fe55c0bc';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=944a5db6';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -416,9 +416,9 @@ import {
   canLearnSkill,
   listLearnedSkills,
 } from './js/skills.js?v=4542bdf9';
-import { skillTitle, skillTreeCounts, spendEmblemForSkill, studyPillName } from './js/skill-tree.js?v=17787a09';
+import { skillTitle, skillTreeCounts, spendEmblemForSkill, studyPillName } from './js/skill-tree.js?v=53795620';
 import { CARD_ART_LAYERS } from './js/imagination-data.js?v=4a85e7fe';
-import { renderSkillTreePanel, focusSkillInPanel } from './js/skills-panel.js?v=f036186a';
+import { renderSkillTreePanel, focusSkillInPanel } from './js/skills-panel.js?v=4d486440';
 import {
   createBuffState,
   applyBuff,
@@ -461,11 +461,11 @@ import {
   addItem,
   removeItem,
   isToolItem,
-} from './js/inventory.js?v=b0e33301';
+} from './js/inventory.js?v=597a17a2';
 import { PACK_COPY, isBagClass, unitRankAt } from './js/pack-slots.js?v=ba0a895f';
 import { createPackRow, mountPackClearance, packBandRange, packCountText, packSearchEntries, packSlotTip } from './js/ui/pack-row.js?v=65c0f180';
-import { listAnimalFeedOptions } from './js/animals.js?v=dd5408ad';
-import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=dd5408ad';
+import { listAnimalFeedOptions } from './js/animals.js?v=35a443e9';
+import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=35a443e9';
 import {
   createDroppedItemState,
   parseDroppedItemState,
@@ -476,13 +476,13 @@ import {
   pickupDroppedStack,
   placeDroppedBag,
   takeDroppedRecord,
-} from './js/world-items.js?v=d4b33a98';
+} from './js/world-items.js?v=2276daaf';
 import {
   createPlayerSave,
   parsePlayerSave,
   serializePlayerSave,
   restorePlayerSave,
-} from './js/player-save.js?v=763f3454';
+} from './js/player-save.js?v=7b947511';
 import {
   HOME_INTERIOR_TSID,
   HOME_STREET_TSID,
@@ -496,7 +496,7 @@ import {
   imagineHome,
   isHomePlaceTsid,
 } from './js/homes.js?v=631ab6b8';
-import { HOME_MACHINE, offerHomeTicket, renderTicketMachine } from './js/home-ticket.js?v=12fecd90';
+import { HOME_MACHINE, offerHomeTicket, renderTicketMachine } from './js/home-ticket.js?v=355d8ba7';
 import {
   MAIL_COMPANIONS,
   archiveMail,
@@ -559,7 +559,7 @@ import {
   MAKING_TOOL_SKILLS,
   recipeTaskLimit,
   recipeToolInUse,
-} from './js/making.js?v=adfa8a29';
+} from './js/making.js?v=712a9adb';
 import { MAKE_TOOL_SHEETS } from './js/make-tool-sheets.js?v=6f758e09';
 import { LOW_FUEL_LINE, craftSessionElapsedMs, isLowFuel, isMachineArt, machineArtHtml, packMakeState, playMachineHandOver, setMachineArtFrame } from './js/machine-art.js?v=8c93c616';
 import {
@@ -586,7 +586,7 @@ import {
   cropIcon,
   hasWateringCan,
   hasHoe,
-} from './js/garden.js?v=d2afc936';
+} from './js/garden.js?v=b38ab310';
 import { GARDEN_SCALE, PLOT_H as GARDEN_PLOT_H, PLOT_W as GARDEN_PLOT_W, gardenFrame, gardenLayout, gardenStyle, plotPieces } from './js/garden-view.js?v=05651e76';
 import {
   ROCK_CATALOG,
@@ -599,7 +599,7 @@ import {
   starterMiningTools,
   STARTER_MINING_SKILLS,
   findWorkingPick,
-} from './js/mining.js?v=541dfb88';
+} from './js/mining.js?v=76295780';
 import {
   loadStreetData,
   STREET_INDEX,
@@ -659,7 +659,7 @@ import {
   canEatFood,
   recordFoodEat,
   resetFoodDay,
-} from './js/food.js?v=7f71894f';
+} from './js/food.js?v=a685d473';
 import {
   consumeTakesCount,
   consumeCountCap,
@@ -669,7 +669,7 @@ import {
   limitCountCap,
   useItemMany,
   recordFoodEatMany,
-} from './js/eat-many.js?v=622a2fbe';
+} from './js/eat-many.js?v=48ba26ca';
 import {
   TRIPLE_JUMP_UPGRADES,
   createJumpState,
@@ -742,7 +742,7 @@ import { holdCloseToFloor } from './js/slope-walk.js?v=9af1e505';
 import { WALK_MAX, avatarGround, coastX, stepAvatar, steerAccel, steerX, streetPhysicsExtras } from './js/avatar-step.js?v=33ad1926';
 import { createUserPath, stepUserPath } from './js/user-path.js?v=8880557f';
 import { FAILED_LINE, inVerbReach, movingLine, verbRange, walkOverEnd, walkOverGoalX } from './js/walk-over.js?v=db80ba07';
-import { hellBuffDesc, isInHell } from './js/hell.js?v=5349e58b';
+import { hellBuffDesc, isInHell } from './js/hell.js?v=45060736';
 import { climbBobY, ladderAnimState, ladderSwap } from './js/ladder-anim.js?v=a8b327a0';
 import { VECTOR_AVATAR } from './js/avatar-vector-sheets.js?v=ad801376';
 import { createNpcGlitchKit } from './js/npc-glitch.js?v=0b81a3e4';
@@ -778,7 +778,7 @@ import {
   planMusicblockDrop,
   playMusicblock,
   starterMusicblocks,
-} from './js/musicblocks.js?v=9e03edca';
+} from './js/musicblocks.js?v=383f9312';
 import {
   VENDOR_PROFILES,
   selectVendorProfile,
@@ -789,13 +789,13 @@ import {
   createVendorSellQuote,
   vendorSellUnitPrice,
   vendorBuyUnitPrice,
-} from './js/vendor.js?v=cabea7b7';
+} from './js/vendor.js?v=4e3cc8fb';
 import {
   animalAnchorX,
   createAnimalState,
   resetAnimalDay,
   animalStatusLabel,
-} from './js/animals.js?v=dd5408ad';
+} from './js/animals.js?v=35a443e9';
 import {
   ensureWoodTreeState,
   pickWoodTool,
@@ -824,7 +824,7 @@ import {
   favorRelationNote,
   emblemRelationNote,
   formatSpeedUpTime,
-} from './js/shrines.js?v=4b395ddf';
+} from './js/shrines.js?v=51e09fa4';
 import { shrinePowderOptions, shrinePowderAchievementCounters } from './js/powders.js?v=d355981a';
 import {
   GAMESHOW_TICKET_ID,
@@ -835,7 +835,7 @@ import {
   spinMeResponse,
   spinningWheelPhase,
   startSpinningWheel,
-} from './js/spinning-wheel.js?v=1e66758d';
+} from './js/spinning-wheel.js?v=545999f4';
 import {
   CUBIMAL_PACKAGE_IDS,
   cubimalCollectionProgress,
@@ -844,7 +844,7 @@ import {
   ensureCubimalItems,
   openCubimalPackage,
   setCubimalFree,
-} from './js/cubimals.js?v=1224ad3e';
+} from './js/cubimals.js?v=6cf43927';
 import {
   STOOT_DOLL_BUBBLE_MS,
   STOOT_DOLL_ID,
@@ -894,7 +894,7 @@ import {
   ANIMAL_PATROL,
   nearestPlacementGap,
 } from './js/street-ecology.js?v=2c82c072';
-import { chickenPauseRoll, easeToward, flightFloorAt, flightFloorFor, flyerLift } from './js/street-creatures.js?v=3533163e';
+import { chickenPauseRoll, easeToward, flightFloorAt, flightFloorFor, flyerLift } from './js/street-creatures.js?v=ca407a2f';
 import { createSoundBoard, DEFAULT_SFX_VOLUME, watchButtonClicks, watchPanelSounds } from './js/sound-board.js?v=f992a5c5';
 import {
   actionLoopFor,
@@ -5200,7 +5200,7 @@ function updateHud() {
     if (!log.length && !putOff.length) {
       const empty = document.createElement('div');
       empty.className = 'q-req';
-      empty.textContent = 'No active quests. Catalog loaded from GSJS.';
+      empty.textContent = 'No active quests.';
       qBox.appendChild(empty);
     }
     for (const p of log.slice(0, 40)) {
@@ -9120,9 +9120,7 @@ function makeBackground() {
     clouds.fill({ color: 0xffffff, alpha: 0.72 });
   }
 
-  const locLabel = worldSession?.location
-    ? `${worldSession.location.label} (${worldSession.location.tsid}) · T = teleport/door`
-    : 'Street';
+  const locLabel = worldSession?.location?.label || 'Street';
   const label = new PIXI.Text({ text: locLabel, style: {
     fontFamily: 'Trebuchet MS, sans-serif',
     fontSize: 13,
@@ -29760,7 +29758,7 @@ async function main() {
   }
   // Garden talkback QA (js/garden-talk-qa.js): ?gardentalkdemo=herb|crop.
   if (new URLSearchParams(location.search).has('gardentalkdemo')) {
-    import('./js/garden-talk-qa.js?v=a4c0310d').then((m) => m.runGardenTalkDemo({ engine, executeVerb, params: new URLSearchParams(location.search) }));
+    import('./js/garden-talk-qa.js?v=1812da53').then((m) => m.runGardenTalkDemo({ engine, executeVerb, params: new URLSearchParams(location.search) }));
   }
   // Loading card QA (js/loading-card-qa.js): ?loadcarddemo=<tsid>[,<tsid>].
   if (new URLSearchParams(location.search).has('loadcarddemo')) {

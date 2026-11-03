@@ -5148,7 +5148,7 @@
   },
   "GNVV9IM8PL4301V": {
    "name": "A Summer's Day",
-   "blurb": "The Giants' shared memory of a summer's day: the private five-minute instance (quests/blue_and_white_part1.js, _part2.js).",
+   "blurb": "The Giants' shared memory of a summer's day, a private five-minute walk.",
    "instance": "summers-day",
    "strict": true,
    "physics": {
@@ -5499,7 +5499,7 @@
   },
   "GHFBQQ4N68733LB": {
    "name": "Eesti Life Catalog Page 17",
-   "blurb": "De-Embiggenify's miniature room: the private two-minute 'eesti' instance of LIF10RQLPLBYV7 (quests/de_embiggenify.js, de_embiggenify_part2.js).",
+   "blurb": "De-Embiggenify's miniature room, a private two-minute visit.",
    "instance": "de-embiggenify",
    "physics": {
     "jump": 1.06

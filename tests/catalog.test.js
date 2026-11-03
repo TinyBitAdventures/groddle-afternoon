@@ -54,7 +54,8 @@ describe('item catalog', () => {
       assert.equal(item.status, inv.status, item.id);
       const html = pages.find((p) => p.id === item.id).html;
       assert.match(html, new RegExp(`<span class="pill st-${item.status}">${labels[item.status]}</span>`), item.id);
-      if (inv.register) assert.ok(html.includes(`Register row ${inv.register}`), `${item.id} register ${inv.register}`);
+      // The register row is a developer reference: players never read it (2026-11-03).
+      assert.ok(!html.includes('Register row'), `${item.id} shows no register row`);
     }
     for (const key of Object.keys(data.counts.byStatus)) {
       assert.equal(data.counts.byStatus[key], data.items.filter((i) => i.status === key).length, key);

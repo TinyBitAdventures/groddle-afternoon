@@ -21,8 +21,8 @@
  *     mgPlots, mgAutoplay, mgDrop.
  */
 
-import { ITEM_CATALOG, countItem, ensureItem } from '../inventory.js?v=b0e33301';
-import { SEED_CATALOG, listPlantableSeeds } from '../garden.js?v=d2afc936';
+import { ITEM_CATALOG, countItem, ensureItem } from '../inventory.js?v=597a17a2';
+import { SEED_CATALOG, listPlantableSeeds } from '../garden.js?v=b38ab310';
 import {
   GARDEN_POTIONS,
   MASTER_GARDENER,
@@ -34,9 +34,9 @@ import {
   potionTendGarden,
   potionUsesLeft,
   usePotion,
-} from '../master-garden.js?v=81406ff3';
+} from '../master-garden.js?v=184b7055';
 import { rollDropTable } from '../drop-tables.js?v=0f922478';
-import { payDrop } from './drops-feature.js?v=5630feea';
+import { payDrop } from './drops-feature.js?v=e0102ed4';
 import { textureFromUrl } from '../textures.js?v=db2ce452';
 
 export const MASTER_GARDEN_FEATURE_ID = 'master-garden';

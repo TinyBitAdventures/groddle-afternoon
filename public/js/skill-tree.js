@@ -243,7 +243,7 @@ export const SKILL_REMAKE_NOTES = Object.freeze({
   },
   Blockmaking: {
     status: 'live',
-    note: 'Lets you run a Blockmaker (assembled with Engineering) to press Earth and Loam into Urth Blocks. The retired Brick and Grade A/AAA Earth Block recipes are not in the source.',
+    note: 'Lets you run a Blockmaker (assembled with Engineering) to press Earth and Loam into Urth Blocks. The retired Brick and Grade A/AAA Earth Block recipes are not part of the game.',
   },
   Fuelmaking: {
     status: 'live',

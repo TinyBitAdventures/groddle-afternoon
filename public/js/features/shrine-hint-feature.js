@@ -29,7 +29,7 @@
  */
 import { questStatus } from '../quest-offers.js?v=7dfa8eae';
 import { GIANT_SCREEN_FADE_MS, giantLoveResponse } from '../giant-love.js?v=aa9ea315';
-import { GIANTS, inEmblemHitbox } from '../shrines.js?v=4b395ddf';
+import { GIANTS, inEmblemHitbox } from '../shrines.js?v=51e09fa4';
 import { vogPages } from '../newxp.js?v=1f9ce43b';
 import { screenInput } from '../screen-fx.js?v=9d4640eb';
 

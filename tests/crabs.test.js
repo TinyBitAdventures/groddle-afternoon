@@ -46,8 +46,8 @@ import {
   musicblocksInPack,
   normalizeCrabMemory,
   playToday,
-} from '../public/js/crabs.js?v=d8d9fe08';
-import { MUSICBLOCK_CATALOG } from '../public/js/musicblocks.js?v=9e03edca';
+} from '../public/js/crabs.js?v=b4ac2ff6';
+import { MUSICBLOCK_CATALOG } from '../public/js/musicblocks.js?v=383f9312';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const PUBLIC = join(ROOT, 'public');

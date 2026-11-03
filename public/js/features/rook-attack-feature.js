@@ -51,10 +51,10 @@
  */
 
 import { slugsFromEffects } from '../speech-slugs.js?v=130338f9';
-import { addItem, countItem, ensureItem, removeItem, ITEM_CATALOG } from '../inventory.js?v=b0e33301';
+import { addItem, countItem, ensureItem, removeItem, ITEM_CATALOG } from '../inventory.js?v=597a17a2';
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=6e3278fe';
 import { nearestSurfaceY } from '../walk-surface.js?v=c982983e';
-import { donationValueFor } from '../shrines.js?v=4b395ddf';
+import { donationValueFor } from '../shrines.js?v=51e09fa4';
 import { TRANT_META, trantStatusLabel } from '../trants.js?v=9c2e8c0f';
 import {
   FOREHORSEMAN_LINES,

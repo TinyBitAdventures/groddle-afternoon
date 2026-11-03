@@ -23,13 +23,13 @@ import {
   smallEnlightenmentSeconds,
   smeltItDealtItFreeSmelts,
 } from '../public/js/buff-triggers.js?v=a3093922';
-import { MIRRORED_BUFFS, buffTriggersFeature } from '../public/js/features/buff-triggers-feature.js?v=e9263df1';
-import { meditationFeature } from '../public/js/features/meditation-feature.js?v=a67faef3';
-import { teleportationFeature } from '../public/js/features/teleportation-feature.js?v=ef9887fd';
-import { rookAttackFeature } from '../public/js/features/rook-attack-feature.js?v=8d2fffe9';
-import { rubeFeature } from '../public/js/features/rube-feature.js?v=66147dad';
-import { smugglingFeature } from '../public/js/features/smuggling-feature.js?v=39f1025d';
-import { normalizeHusbandryPack } from '../public/js/animal-husbandry.js?v=433d5c3a';
+import { MIRRORED_BUFFS, buffTriggersFeature } from '../public/js/features/buff-triggers-feature.js?v=0132fdb7';
+import { meditationFeature } from '../public/js/features/meditation-feature.js?v=24a154f1';
+import { teleportationFeature } from '../public/js/features/teleportation-feature.js?v=b46fa776';
+import { rookAttackFeature } from '../public/js/features/rook-attack-feature.js?v=85b77d22';
+import { rubeFeature } from '../public/js/features/rube-feature.js?v=8e9a1426';
+import { smugglingFeature } from '../public/js/features/smuggling-feature.js?v=89cebfbc';
+import { normalizeHusbandryPack } from '../public/js/animal-husbandry.js?v=9c649df2';
 import {
   activateBuffItem,
   applyBuff,
@@ -40,9 +40,9 @@ import {
   tickBuffs,
 } from '../public/js/buffs.js?v=c7727c43';
 import { getSkillPackageOverride, skillPackageDetails } from '../public/js/skill-packages.js?v=bfb87281';
-import { miningProfile } from '../public/js/mining.js?v=541dfb88';
+import { miningProfile } from '../public/js/mining.js?v=76295780';
 import { resolveAnimalKinshipPackage } from '../public/js/animal-kinship.js?v=2757bb52';
-import { makingSkillAdjustments } from '../public/js/making.js?v=adfa8a29';
+import { makingSkillAdjustments } from '../public/js/making.js?v=712a9adb';
 import { sessionPackage } from '../public/js/meditation.js?v=380b2f3f';
 import { accelerateActiveStudy, createSkillState, startSkillStudy } from '../public/js/skills.js?v=4542bdf9';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=10b118dd';

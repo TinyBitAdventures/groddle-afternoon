@@ -55,10 +55,10 @@ export const ITEM_CATALOG = {
   all_spice: item('all_spice', 'Allspice', 'Harvested from a Spice Plant.'),
   general_vapour: item('general_vapour', 'Vapour', 'Harvested from a Gas Plant.'),
   meat: item('meat', 'Meat', 'From a nibble. Questionable ethics.'),
-  flour: item('flour', 'Flour', 'Ground grain. (GSJS recipe 138)'),
+  flour: item('flour', 'Flour', 'Ground grain.'),
   pinch_of_salt: item('pinch_of_salt', 'Pinch of Salt', 'A little salt for buns.'),
-  bun: item('bun', 'Bun', 'Soft bread. (GSJS recipe 139)'),
-  sammich: item('sammich', 'Sammich', 'Bun + meat. (GSJS recipe 12)'),
+  bun: item('bun', 'Bun', 'Soft bread.'),
+  sammich: item('sammich', 'Sammich', 'Bun + meat.'),
   waffles: item('waffles', 'Waffle', 'Fluffy waffles with extra-deep waffle-holes.', {
     baseCost: 185,
     stackMax: 20,
@@ -187,7 +187,8 @@ export function ensureItem(classTsid, meta = {}) {
     meta.label ||
     existing?.label ||
     classTsid.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
-  const desc = meta.desc || existing?.desc || `Item ${classTsid}.`;
+  // No description: the menus' own words stand in (never the class id).
+  const desc = meta.desc || existing?.desc || 'A thing from Ur.';
   ITEM_CATALOG[classTsid] = {
     classTsid,
     label,

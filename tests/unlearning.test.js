@@ -20,7 +20,7 @@ import {
   unlearnSeconds,
   unlearnStatus,
 } from '../public/js/unlearning.js?v=72d5ffe2';
-import { remakeStatus } from '../public/js/imagination-remake.js?v=ca0a48d5';
+import { remakeStatus } from '../public/js/imagination-remake.js?v=7a7f8b70';
 
 const root = join(import.meta.dirname, '..', 'public');
 const CARD = ['unlearning_ability'];

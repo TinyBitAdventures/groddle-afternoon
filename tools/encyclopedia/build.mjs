@@ -137,7 +137,7 @@ function entryHead(e, P, { kickerExtra = '', subline = '' } = {}) {
         <div>
           <h1>${esc(e.name)}</h1>
           <p class="cat-plural">${subline || '&nbsp;'}</p>
-          <p class="cat-status">${badge(e.status)}${e.register ? ` <span class="cat-register">Register row ${esc(e.register)}</span>` : ''}${caption ? ` <span class="cat-register">${esc(caption)}</span>` : ''}</p>
+          <p class="cat-status">${badge(e.status)}${caption ? ` <span class="cat-register">${esc(caption)}</span>` : ''}</p>
         </div>
       </div>
     </div>
@@ -324,7 +324,7 @@ function questPage(e, P, { linkFor, backOf, uniqBy, info, d }) {
 ${band('steps-h', 'Steps', `<ol class="ency-steps">${steps.join('\n          ')}</ol>${where.length ? `\n        ${sub('Where to go', `<ul class="cat-list">${where.map((w) => `<li>${w}</li>`).join('')}</ul>${P.tiles(whereTiles)}`)}` : ''}`, { alt: true, lead: 'Each step in Tiny Speck’s words, with what it needs.' })}
 ${band('rewards-h', 'Rewards', `${P.chips(rewards)}${P.tiles(rewardTiles)}` || '', {})}
 ${band('rel-h', 'Linked to this quest', [sub('Comes next', P.tiles(leads)), sub('Things it involves', P.tiles(involved))].filter(Boolean).join('\n        '), { alt: true })}
-${band('words-h', 'In Tiny Speck’s words', `${words}\n        <p class="cat-source">From <code>quests/${esc(e.id)}.js</code> in Tiny Speck’s game code.</p>`)}
+${band('words-h', 'In Tiny Speck’s words', `${words}\n        <p class="cat-source">From Tiny Speck’s game code.</p>`)}
 ${remakeBand(e, solo)}
   </main>`;
 }
@@ -351,15 +351,14 @@ function creaturePage(e, P, { linkFor, backOf, uniqBy, info, d }) {
   const original = c ? `<div class="cat-cols">
         <div>
           ${desc.length ? `<div class="cat-desc">${paras(desc)}</div>` : '<p class="cat-muted">The game code gives it no description.</p>'}
-          <p class="cat-source">From <code>${esc(c.file)}</code> in Tiny Speck’s game code.</p>
+          <p class="cat-source">From Tiny Speck’s game code.</p>
         </div>
         <dl class="cat-facts">
           <dt>Kind</dt><dd>${esc(e.group)}</dd>
           ${c.plural && c.plural !== c.name ? `<dt>Plural</dt><dd>${esc(c.plural)}</dd>` : ''}
-          <dt>Id</dt><dd><code>${esc(e.id)}</code></dd>
           ${e.itemPage ? `<dt>Item page</dt><dd><a href="${P.href(`item:${e.itemPage}`)}">${esc(e.name)} in the item catalog</a></dd>` : ''}
         </dl>
-      </div>` : `<p class="cat-desc">${esc(e.desc || '')}</p><p class="cat-source">A Street Spirit keeps this store on the streets below. What it sells is Tiny Speck’s store ${esc(e.store?.label || '')}, from <code>catalog_stores.js</code> in their game code; the line above is the remake’s.</p>`;
+      </div>` : `<p class="cat-desc">${esc(e.desc || '')}</p><p class="cat-source">A Street Spirit keeps this store on the streets below. What it sells is Tiny Speck’s store ${esc(e.store?.label || '')}, from their game code; the line above is the remake’s.</p>`;
   return `${entryHead(e, P, { subline: esc(SECTION[e.section].one === 'creature' ? e.group.replace(/s$/, '') : e.group) })}
   <main>
     <section class="band cat-original" aria-labelledby="orig-h">
@@ -399,7 +398,7 @@ function skillPage(e, P, { linkFor, backOf, uniqBy, info }) {
         ${s.description ? `<div class="cat-desc">${paras(tsHtml(s.description, linkFor))}</div>` : ''}
         ${s.learned ? `<h3>When you learn it</h3><div class="ency-talk">${paras(tsHtml(s.learned, linkFor))}</div>` : ''}
         ${giants.length ? `<h3>Giants</h3>${P.chips(giants)}` : ''}
-        <p class="cat-source">${own ? 'Its words are the remake’s: the original’s did not survive.' : 'From <code>inc_data_skills.js</code> in Tiny Speck’s game code.'} The learn time is how long it takes in the remake, before Better Learning.</p>
+        <p class="cat-source">${own ? 'Its words are the remake’s: the original’s did not survive.' : 'From Tiny Speck’s game code.'} The learn time is how long it takes in the remake, before Better Learning.</p>
       </div>
     </section>
 ${band('needs-h', 'What it needs', P.tiles(needs) || '<p class="cat-muted">Nothing: anyone can learn it.</p>', { alt: true })}
@@ -458,7 +457,7 @@ function achievementPage(e, P, { linkFor, backOf, uniqBy }) {
         <h2 id="orig-h">In Tiny Speck’s game</h2>
         <div class="cat-desc">${paras(tsHtml(a.desc, linkFor))}</div>
         ${a.statusText ? `<div class="ency-talk">${paras(tsHtml(a.statusText, linkFor))}</div>` : ''}
-        <p class="cat-source">From <code>achievements/${esc(e.id)}.js</code> in Tiny Speck’s game code.</p>
+        <p class="cat-source">From Tiny Speck’s game code.</p>
       </div>
     </section>
 ${band('counts-h', 'What it counts', P.tiles(counts), { alt: true })}

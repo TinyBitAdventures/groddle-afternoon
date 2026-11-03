@@ -41,7 +41,7 @@
  * open one), hstLast.
  */
 
-import { ITEM_CATALOG, addItem, countItem, ensureItem, itemIcon, removeItem } from '../inventory.js?v=b0e33301';
+import { ITEM_CATALOG, addItem, countItem, ensureItem, itemIcon, removeItem } from '../inventory.js?v=597a17a2';
 import { displayRefusal, furnitureDef, furnitureSize, isFurniture } from '../home-decor.js?v=3ee9ea0d';
 import { pieceLabel } from '../furniture-upgrades.js?v=a3788c0d';
 import { textureFromUrl } from '../textures.js?v=db2ce452';
@@ -50,7 +50,7 @@ import { ELEMENT_CLASSES, NO_BAG_CLASSES, NO_SLOT_CLASSES } from '../pack-slots-
 import { TOOL_CONDITION_CATALOG, receiveToolCopy, takeToolCopy } from '../tools.js?v=3974f57e';
 import { readVisitScene } from '../neighbours-mp.js?v=a8d5544e';
 import { saveStore } from '../save-store.js?v=8839ba7b';
-import { homesFeature } from './homes-feature.js?v=229cd8bf';
+import { homesFeature } from './homes-feature.js?v=475cf850';
 import {
   SDB_PRICE_MAX,
   STORAGE_TEXT as T,

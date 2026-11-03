@@ -44,6 +44,16 @@ const KEEP = {
 
 const SEASONAL = new Set(['glitchmas_cracker', 'glitchmas_card']);
 
+const ENTITIES = { amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", nbsp: ' ', '#39': "'" };
+function plainText(html) {
+  return String(html)
+    .replace(/<br\s*\/?>/gi, ' ')
+    .replace(/<[^>]*>/g, '')
+    .replace(/&(amp|lt|gt|quot|apos|nbsp|#39);/g, (_, e) => ENTITIES[e])
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
 function itemMeta(classTsid) {
   const path = join(gsjs, 'items', `${classTsid}.js`);
   if (!existsSync(path)) return null;
@@ -51,7 +61,11 @@ function itemMeta(classTsid) {
     const label = src.match(/^var label = "([^"]*)";/m)?.[1] || null;
     const hidden = /^var is_hidden = true;/m.test(src);
     const baseCost = Number(src.match(/^var base_cost = ([\d.]+);/m)?.[1] || 0);
-    return { label, hidden, baseCost };
+    // The item's own description, the words a player reads in its menu: plain text (its
+    // encyclopedia links <a href="/items/.." glitch="item|x">X</a> become their words).
+    const literal = src.match(/^var description = ("(?:[^"\\]|\\.)*");/m)?.[1];
+    const desc = literal ? plainText(vm.runInNewContext(literal)) : '';
+    return { label, hidden, baseCost, desc };
   });
 }
 
@@ -87,7 +101,7 @@ for (const [rawId, meta] of Object.entries(KEEP)) {
       skipped.push(`${store.name}: ${entry.class_tsid}`);
       continue;
     }
-    offers.push({ classTsid: entry.class_tsid, label: info.label || entry.class_tsid, cost: entry.cost });
+    offers.push({ classTsid: entry.class_tsid, label: info.label || entry.class_tsid, cost: entry.cost, ...(info.desc ? { desc: info.desc } : {}) });
   }
   stores.push({
     storeId: Number(rawId),

@@ -80,9 +80,9 @@
  *   powderCharges, powderNoNo, powderTreesGrown.
  */
 
-import { addItem, countItem, removeItem } from '../inventory.js?v=b0e33301';
+import { addItem, countItem, removeItem } from '../inventory.js?v=597a17a2';
 import { getGameDayKey } from '../game-day.js?v=edb00566';
-import { isPooped } from '../hell.js?v=5349e58b';
+import { isPooped } from '../hell.js?v=45060736';
 import { metabolicGain, moodMax, loseEnergy, loseMood } from '../metabolics.js?v=8504134e';
 import {
   POWDERS,
@@ -101,8 +101,8 @@ import {
   usePowderCharge,
 } from '../powders.js?v=d355981a';
 import { itemVerbAchievementCounters } from '../item-verbs.js?v=729ccd91';
-import { DEAD_TRANT_CLASSES } from '../patches.js?v=d4e17227';
-import { hellFeature } from './hell-feature.js?v=e9d00320';
+import { DEAD_TRANT_CLASSES } from '../patches.js?v=3e9218c1';
+import { hellFeature } from './hell-feature.js?v=1f4a67d5';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 import { displayTopOf, playSheetOverlay } from '../overlay-art.js?v=3753a0d2';
 import { OVERLAY_USES, playOverlay } from '../overlays.js?v=90f4b1ba';

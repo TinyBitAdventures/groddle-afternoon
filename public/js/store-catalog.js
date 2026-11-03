@@ -16,77 +16,92 @@ export const STORE_CATALOG = Object.freeze([
       {
         "classTsid": "garlic",
         "label": "Garlic",
-        "cost": 4
+        "cost": 4,
+        "desc": "A nice stinky garlic."
       },
       {
         "classTsid": "broccoli",
         "label": "Broccoli",
-        "cost": 6
+        "cost": 6,
+        "desc": "One floret of unabashedly healthy broccoli."
       },
       {
         "classTsid": "carrot",
         "label": "Carrot",
-        "cost": 7
+        "cost": 7,
+        "desc": "A fresh, firm carrot."
       },
       {
         "classTsid": "cabbage",
         "label": "Cabbage",
-        "cost": 8
+        "cost": 8,
+        "desc": "A head of tender, delicately pungent cabbage."
       },
       {
         "classTsid": "corn",
         "label": "Corn",
-        "cost": 7
+        "cost": 7,
+        "desc": "Many kernels of sweet corn, conveniently located on a sturdy cob."
       },
       {
         "classTsid": "cucumber",
         "label": "Cucumber",
-        "cost": 4
+        "cost": 4,
+        "desc": "An innocuous cucumber."
       },
       {
         "classTsid": "onion",
         "label": "Onion",
-        "cost": 4
+        "cost": 4,
+        "desc": "A patented no-tears onion."
       },
       {
         "classTsid": "parsnip",
         "label": "Parsnip",
-        "cost": 7
+        "cost": 7,
+        "desc": "A pungent parsnip."
       },
       {
         "classTsid": "potato",
         "label": "Potato",
-        "cost": 8
+        "cost": 8,
+        "desc": "A humble potato."
       },
       {
         "classTsid": "rice",
         "label": "Rice",
-        "cost": 4
+        "cost": 4,
+        "desc": "A pot of freshly made rice."
       },
       {
         "classTsid": "spinach",
         "label": "Spinach",
-        "cost": 3
+        "cost": 3,
+        "desc": "Hearty green spinach. It's strong to the finich."
       },
       {
         "classTsid": "tomato",
         "label": "Tomato",
-        "cost": 6
+        "cost": 6,
+        "desc": "A ripe, heirloom-quality tomato."
       },
       {
         "classTsid": "zucchini",
         "label": "Zucchini",
-        "cost": 6
+        "cost": 6,
+        "desc": "A teeny-weeny green zucchini."
       },
       {
         "classTsid": "bubble_tuner",
         "label": "Bubble Tuner",
-        "cost": 167
+        "cost": 167,
+        "desc": "A Bubble Tuner somehow converts plain bubbles into not-plain bubbles. How? Nobody knows."
       },
       {
         "classTsid": "gassifier",
         "label": "Gassifier",
-        "cost": 167
+        "cost": 167,
+        "desc": "An ergonomically correct gassifier. It can turn general vapour into much more exciting gases."
       }
     ]
   },
@@ -102,242 +117,290 @@ export const STORE_CATALOG = Object.freeze([
       {
         "classTsid": "gassifier",
         "label": "Gassifier",
-        "cost": 168
+        "cost": 168,
+        "desc": "An ergonomically correct gassifier. It can turn general vapour into much more exciting gases."
       },
       {
         "classTsid": "bubble_tuner",
         "label": "Bubble Tuner",
-        "cost": 168
+        "cost": 168,
+        "desc": "A Bubble Tuner somehow converts plain bubbles into not-plain bubbles. How? Nobody knows."
       },
       {
         "classTsid": "pick",
         "label": "Pick",
-        "cost": 560
+        "cost": 560,
+        "desc": "A relatively sturdy pick, without which mining cannot be done. A plain pick takes care of business, but it's not designed to last."
       },
       {
         "classTsid": "fancy_pick",
         "label": "Fancy Pick",
-        "cost": 1120
+        "cost": 1120,
+        "desc": "A super-deluxe fancy pick for fancy miners. Okay, maybe it doesn't look that fancy on the outside. It's the inside that counts."
       },
       {
         "classTsid": "focusing_orb",
         "label": "Focusing Orb",
-        "cost": 1344
+        "cost": 1344,
+        "desc": "An iridescent focusing orb. It calms your swirly thoughts, helps you meditate, levitate and fight the enemies of the imagination."
       },
       {
         "classTsid": "bag_elemental_pouch",
         "label": "Elemental Pouch",
-        "cost": 56
+        "cost": 56,
+        "desc": "An essential elemental pouch. You need it for carrying alchemical elements. What, you thought you could carry them in your HANDS? Requires Element Handling skill."
       },
       {
         "classTsid": "ore_grinder",
         "label": "Grinder",
-        "cost": 224
+        "cost": 224,
+        "desc": "A sturdy, no-nonsense grinder. Harness its awesome power to grind rocks (and those rock-like barnacles) into alchemical elements."
       },
       {
         "classTsid": "tinkertool",
         "label": "Tinkertool",
-        "cost": 560
+        "cost": 560,
+        "desc": "Are you the DIY type who likes to repair your own tools? The nitpicky type who likes to craft their own gear from scratch? Then a Tinkertool is a very handy thing for you to have."
       },
       {
         "classTsid": "bag_generic_blue",
         "label": "Generic Blue Bag",
-        "cost": 1120
+        "cost": 1120,
+        "desc": "An honest, unpretentious blue burlap sack. You could probably put things in it, perhaps 10 things, and give it a name. Just a thought."
       },
       {
         "classTsid": "bag_generic_gray",
         "label": "Generic Gray Bag",
-        "cost": 1064
+        "cost": 1064,
+        "desc": "An honest, unpretentious gray burlap sack. You could probably put things in it, perhaps 10 things, and give it a name. Just a thought."
       },
       {
         "classTsid": "bag_generic_pink",
         "label": "Generic Pink Bag",
-        "cost": 1092
+        "cost": 1092,
+        "desc": "An honest, unpretentious pink burlap sack. You could probably put things in it, perhaps 10 things, and give it a name. Just a thought."
       },
       {
         "classTsid": "hatchet",
         "label": "Hatchet",
-        "cost": 112
+        "cost": 112,
+        "desc": "A slightly dull hatchet, useful for both dead tree-clearing and showy beard-shaving."
       },
       {
         "classTsid": "bag_generic_green",
         "label": "Generic Green Bag",
-        "cost": 1036
+        "cost": 1036,
+        "desc": "An honest, unpretentious green burlap sack. You could probably put things in it, perhaps 10 things, and give it a name. Just a thought."
       },
       {
         "classTsid": "emotional_bear",
         "label": "Emotional Bear",
-        "cost": 336
+        "cost": 336,
+        "desc": "When you can't express how you're feeling, this furry companion will emote on your behalf. Particularly when equipped with Lips for kissing or a Moon for you-know-whatting…"
       },
       {
         "classTsid": "lips",
         "label": "Lips",
-        "cost": 11
+        "cost": 11,
+        "desc": "Pre-pursed, super-soft and infused with an antibacterial salve, these lips can be attached to whatever might help you kiss people better. Like, say, an Emotional Bear."
       },
       {
         "classTsid": "moon",
         "label": "Moon",
-        "cost": 111
+        "cost": 111,
+        "desc": "One full, craterous moon, without which mooning cannot happen. Most useful if attached to an Emotional Bear."
       },
       {
         "classTsid": "bag_generic",
         "label": "Generic Bag",
-        "cost": 1008
+        "cost": 1008,
+        "desc": "An honest, unpretentious burlap sack. You could probably put things in it, perhaps 10 things, and give it a name. Just a thought."
       },
       {
         "classTsid": "bag_bigger",
         "label": "Bigger Bag",
-        "cost": 2239
+        "cost": 2239,
+        "desc": "A big, big bag for putting things in. Bigger than 15 slots, but not as big as 17."
       },
       {
         "classTsid": "bag_bigger_blue",
         "label": "Bigger Blue Bag",
-        "cost": 2239
+        "cost": 2239,
+        "desc": "A big, big blue bag for putting things in. Bigger than 15 slots, but not as big as 17."
       },
       {
         "classTsid": "bag_bigger_gray",
         "label": "Bigger Gray Bag",
-        "cost": 2239
+        "cost": 2239,
+        "desc": "A big, big gray bag for putting things in. Bigger than 15 slots, but not as big as 17."
       },
       {
         "classTsid": "bag_bigger_green",
         "label": "Bigger Green Bag",
-        "cost": 2239
+        "cost": 2239,
+        "desc": "A big, big green bag for putting things in. Bigger than 15 slots, but not as big as 17."
       },
       {
         "classTsid": "bag_bigger_pink",
         "label": "Bigger Pink Bag",
-        "cost": 2239
+        "cost": 2239,
+        "desc": "A big, big pink bag for putting things in. Bigger than 15 slots, but not as big as 17."
       },
       {
         "classTsid": "bag_toolbox_chrome",
         "label": "Chrome Toolbox",
-        "cost": 2800
+        "cost": 2800,
+        "desc": "A sturdy, metal-y, chrome toolbox. It's a box. And you can put tools in it."
       },
       {
         "classTsid": "bag_toolbox_red",
         "label": "Red Toolbox",
-        "cost": 2800
+        "cost": 2800,
+        "desc": "A sturdy, metal-y, red toolbox. It's a box. And you can put tools in it."
       },
       {
         "classTsid": "bag_toolbox_green",
         "label": "Green Toolbox",
-        "cost": 2800
+        "cost": 2800,
+        "desc": "A sturdy, metal-y, green toolbox. It's a box. And you can put tools in it."
       },
       {
         "classTsid": "smelter",
         "label": "Smelter",
-        "cost": 784
+        "cost": 784,
+        "desc": "Extracting purest metal from even the dullest chunk of Metal Rock, this classic Smelter is the second step to creating all manner of exciting secondary metals. (Learning Smelting is step one.)"
       },
       {
         "classTsid": "alchemical_tongs",
         "label": "Alchemical Tongs",
-        "cost": 672
+        "cost": 672,
+        "desc": "Handy bendy Alchemical Tongs help you to create exciting metals like Tin, Copper and Molybdenum by adding elements to boring old hot smelted metal."
       },
       {
         "classTsid": "scraper",
         "label": "Scraper",
-        "cost": 336
+        "cost": 336,
+        "desc": "Wielding only this hardy flat-edged blade, a song in their heart and a will to succeed, anyone can boast a backpack of Barnacles or a pocket full of Ice. Why that glitch might want a clacking bag and potentially wet pants is not the problem of the scraper. Scraper just scrapes."
       },
       {
         "classTsid": "shovel",
         "label": "Shovel",
-        "cost": 336
+        "cost": 336,
+        "desc": "An essential for anyone that calls a spade a shovel, this simple tool masterpiece can be used to harvest Peat, dig for dirt (well, Earth), and occasionally land a juicy piece of Loam."
       },
       {
         "classTsid": "npc_garden_gnome",
         "label": "Garden Gnome",
-        "cost": 2240
+        "cost": 2240,
+        "desc": "Hey, it's that weird old tiny bearded life-companion you've been hoping for! When placed in your yard, house or on your home street, your new little chum will reveal his hidden (or \"creepy\") talents…"
       },
       {
         "classTsid": "crystallizer",
         "label": "Crystalmalizing Chamber",
-        "cost": 2800
+        "cost": 2800,
+        "desc": "With this tool, every armchair alchemist can be the master of their own future. Or at least make some Plain Crystals. Who knew Barnacle Talc and essence of Firefly would combine to make such fine new age bling?"
       },
       {
         "classTsid": "machine_stand",
         "label": "Machine Stand",
-        "cost": 560
+        "cost": 560,
+        "desc": "This generic machine stand provides just the right foundation upon which many a machine can be built. As with all good foundations, once assembled it cannot be moved."
       },
       {
         "classTsid": "blockmaker_chassis",
         "label": "Blockmaker Chassis",
-        "cost": 1680
+        "cost": 1680,
+        "desc": "It's commonly known that machines have 'personality'. Add me to a regular ol' machine stand and forever imbue it with 'blockmaker' personality."
       },
       {
         "classTsid": "blockmaker_plates",
         "label": "Blockmaker Plates",
-        "cost": 1400
+        "cost": 1400,
+        "desc": "Made from only the finest Molybdenum this side of Shimla Mirch. Once installed, the Blockmaker is complete."
       },
       {
         "classTsid": "blockmaker_engine",
         "label": "Machine Engine",
-        "cost": 2800
+        "cost": 2800,
+        "desc": "Install this engine, and your machine is one step closer to purring like the quintessential classic, thrumming like the deeply resonant inner chambers of Zille's enormous throat."
       },
       {
         "classTsid": "fuelmaker_case",
         "label": "Fuelmaker Case",
-        "cost": 1680
+        "cost": 1680,
+        "desc": "Placed on an assembled Machine Stand, this Fuelmaker Case makes a good case for a stand to become a Fuelmaker."
       },
       {
         "classTsid": "fuelmaker_core",
         "label": "Fuelmaker Core",
-        "cost": 1400
+        "cost": 1400,
+        "desc": "Install the Fuelmaker core and the final piece of the puzzle will be in place. Now you just need fuel to fuel the Fuelmaker."
       },
       {
         "classTsid": "cauldron",
         "label": "Cauldron",
-        "cost": 3920
+        "cost": 3920,
+        "desc": "A charmed pot for potioneers of all levels. This thick, heavy, magic-imbued cauldron is perfect for potions, from novice concoctions to expert unctions."
       },
       {
         "classTsid": "tincturing_kit",
         "label": "Tincturing Kit",
-        "cost": 1400
+        "cost": 1400,
+        "desc": "Anyone who wants to beef up the benefits of herbs or create ingredients for powerful potions would do well to avail themselves of this basic Tincturing Kit and the Tincturing skill. As the name suggests, it is perfect for making tinctures. And no use at all for anything else."
       },
       {
         "classTsid": "still",
         "label": "Still",
-        "cost": 2240
+        "cost": 2240,
+        "desc": "A basic Still for converting Grain, Corn, or the humble Potato into versatile, potent (if not smooth) Hooch."
       },
       {
         "classTsid": "metalmaker_mechanism",
         "label": "Metal Machine Mechanism",
-        "cost": 1512
+        "cost": 1512,
+        "desc": "The type of smooth, perfectly-honed mechanism you would expect from followers of Alph. Whatever function it is that this performs in the Metalmaker, it does it very, very well."
       },
       {
         "classTsid": "metalmaker_tooler",
         "label": "Metal Machine Tooler",
-        "cost": 1960
+        "cost": 1960,
+        "desc": "Silvery, heavy, and glistening with hot oil, lump of machinery so beautiful, complex and well crafted that it must have been tooled in some kind of academy."
       },
       {
         "classTsid": "woodworker_fuser",
         "label": "Woodworker Fuser",
-        "cost": 1960
+        "cost": 1960,
+        "desc": "The business end of the hardworking woodworking Woodworker, this is the bit that actually works the wood. Responsible for fusing planks into boards, boards into posts, posts into beams and dreams into reality (as long as you dream of wood)."
       },
       {
         "classTsid": "woodworker_chassis",
         "label": "Woodworker Chassis",
-        "cost": 1400
+        "cost": 1400,
+        "desc": "One of the four essential parts of the Woodworker, the chassis is essential in helping every upstanding wannabe woodworker gird their woodworkerly loin-parts and whittle their brown stuff into something wonderful."
       },
       {
         "classTsid": "spindle",
         "label": "Spindle",
-        "cost": 224
+        "cost": 224,
+        "desc": "In the mists of time, storytellers spoke of a magical spindle that could be used to spin starlight into downy threads to weave into a cloak of invisibility. But it's not this spindle. This is just a spindle. It's used to turn fibers into thread. But that other one sounds amazing, right?"
       },
       {
         "classTsid": "loomer",
         "label": "Loomer",
-        "cost": 448
+        "cost": 448,
+        "desc": "The Loomer (TM) is used to Loom thread into String, General Fabric and Rugs through a process of Loomeration so complex, only those with a deep enough understanding of the Fiber Arts II can perform the Loomering."
       },
       {
         "classTsid": "construction_tool",
         "label": "Construction Tool",
-        "cost": 560
+        "cost": 560,
+        "desc": "One handy pocketsized gadget for all your furniture construction needs. Comes complete with four pokey whojamaflilps, one specializing in tweaking the wotsit, one in cranking the doodah, and the other two in levering the begiantus out of any sticky-outty bits. A true professional's tool."
       },
       {
         "classTsid": "bulb",
         "label": "Bulb",
-        "cost": 56
+        "cost": 56,
+        "desc": "The glowy bit of a lamp. Without this, a lamp is just a stick with a silly hat on."
       }
     ]
   },
@@ -353,27 +416,32 @@ export const STORE_CATALOG = Object.freeze([
       {
         "classTsid": "sno_cone_blue",
         "label": "Blue Sno Cone",
-        "cost": 75
+        "cost": 75,
+        "desc": "A delicious, refreshing Blue Sno Cone with a tangy hit of iMG. Blended to perfection using ice, hooch, and the very finest elemental additives and preservatives, it tastes exactly what the the concept of blue should taste like. And a little like raspberry, weirdly."
       },
       {
         "classTsid": "sno_cone_green",
         "label": "Green Sno Cone",
-        "cost": 150
+        "cost": 150,
+        "desc": "A bright green blend of ice, hooch and elements make a drink the color of days when spring is born, or nights when the northern lights perform. Packed with a modest hit of iMG, winter cannot fade it. Mainly because it's 40% elemental additives and preservatives."
       },
       {
         "classTsid": "sno_cone_orange",
         "label": "Orange Sno Cone",
-        "cost": 300
+        "cost": 300,
+        "desc": "A chillingly refreshing bright Orange Sno Cone, with a medium amount of iMG. A perfect blend of Ice, Hooch, and elemental additives and preservatives, it is the epitome of an orange drink. Not orange the fruit, that is, orange the colour. It's more of a concept."
       },
       {
         "classTsid": "sno_cone_red",
         "label": "Red Sno Cone",
-        "cost": 600
+        "cost": 600,
+        "desc": "A tongue-tingling spine-shiveringly Red Sno Cone. A seamless blend of Ice, Hooch, and a secret blend of elemental additives, preservatives, iMG and raw energy that make you feel slightly, though not to any copyright-infringing extent, like you may have wings."
       },
       {
         "classTsid": "sno_cone_purple",
         "label": "Purple Sno Cone",
-        "cost": 1100
+        "cost": 1100,
+        "desc": "A refreshing and delicious purple Sno Cone. A sophisticated blend of Ice, Hooch and elemental additives and preservatives. Now you too can get all the social frisson of Purple but with none of the nutritional or mental expansion benefits (contains considerable iMG, though)."
       }
     ]
   },
@@ -389,97 +457,116 @@ export const STORE_CATALOG = Object.freeze([
       {
         "classTsid": "hoe",
         "label": "Hoe",
-        "cost": 65
+        "cost": 65,
+        "desc": "A garden-variety hoe. It can be used to tend weedy patches."
       },
       {
         "classTsid": "watering_can",
         "label": "Watering Can",
-        "cost": 81
+        "cost": 81,
+        "desc": "A stainless-steel 5-gallon watering can. It can be used to water plants, trees, and crops."
       },
       {
         "classTsid": "seed_pumpkin",
         "label": "Pumpkin Seed",
-        "cost": 18
+        "cost": 18,
+        "desc": "A packet of Pumpkin seeds. This can be planted to grow one mighty Pumpkin at a time in either a Crop Garden or a Herb garden."
       },
       {
         "classTsid": "seed_broccoli",
         "label": "Broccoli Seed",
-        "cost": 26
+        "cost": 26,
+        "desc": "A packet of broccoli seeds. This can be planted to grow Broccoli in a Crop Garden."
       },
       {
         "classTsid": "seed_cabbage",
         "label": "Cabbage Seed",
-        "cost": 28
+        "cost": 28,
+        "desc": "A packet of cabbage seeds. This can be planted to grow Cabbages in a Crop Garden."
       },
       {
         "classTsid": "seed_carrot",
         "label": "Carrot Seed",
-        "cost": 30
+        "cost": 30,
+        "desc": "A packet of carrot seeds. This can be planted to grow Carrot in a Crop Garden."
       },
       {
         "classTsid": "seed_corn",
         "label": "Corn Seed",
-        "cost": 27
+        "cost": 27,
+        "desc": "A packet of corn seeds. This can be planted to grow Corn in a Crop Garden."
       },
       {
         "classTsid": "seed_cucumber",
         "label": "Cucumber Seed",
-        "cost": 27
+        "cost": 27,
+        "desc": "A packet of cucumber seeds. This can be planted to grow Cucumbers in a Crop Garden."
       },
       {
         "classTsid": "seed_onion",
         "label": "Onion Seed",
-        "cost": 16
+        "cost": 16,
+        "desc": "A packet of black onion seeds. This can be planted to grow Onions in a Crop Garden."
       },
       {
         "classTsid": "seed_potato",
         "label": "Potato Seed",
-        "cost": 43
+        "cost": 43,
+        "desc": "A packet of tiny potatoes. This can be planted to grow Potatoes in a Crop Garden."
       },
       {
         "classTsid": "seed_rice",
         "label": "Rice Seed",
-        "cost": 21
+        "cost": 21,
+        "desc": "A packet of rice seeds. This can be planted to grow Rice in a Crop Garden."
       },
       {
         "classTsid": "seed_spinach",
         "label": "Spinach Seed",
-        "cost": 13
+        "cost": 13,
+        "desc": "A packet of spinach seeds. This can be planted to grow Spinach in a Crop Garden."
       },
       {
         "classTsid": "seed_tomato",
         "label": "Tomato Seed",
-        "cost": 22
+        "cost": 22,
+        "desc": "A packet of heirloom-quality tomato seeds. This can be planted to grow Tomatoes in a Crop Garden."
       },
       {
         "classTsid": "seed_zucchini",
         "label": "Zucchini Seed",
-        "cost": 37
+        "cost": 37,
+        "desc": "A packet of zucchini seeds. This can be planted to grow Zucchinis in a Crop Garden."
       },
       {
         "classTsid": "hatchet",
         "label": "Hatchet",
-        "cost": 108
+        "cost": 108,
+        "desc": "A slightly dull hatchet, useful for both dead tree-clearing and showy beard-shaving."
       },
       {
         "classTsid": "bean_seasoner",
         "label": "Bean Seasoner",
-        "cost": 189
+        "cost": 189,
+        "desc": "A Bean Seasoner seasons beans. You probably guessed that already."
       },
       {
         "classTsid": "shovel",
         "label": "Shovel",
-        "cost": 324
+        "cost": 324,
+        "desc": "An essential for anyone that calls a spade a shovel, this simple tool masterpiece can be used to harvest Peat, dig for dirt (well, Earth), and occasionally land a juicy piece of Loam."
       },
       {
         "classTsid": "npc_garden_gnome",
         "label": "Garden Gnome",
-        "cost": 2160
+        "cost": 2160,
+        "desc": "Hey, it's that weird old tiny bearded life-companion you've been hoping for! When placed in your yard, house or on your home street, your new little chum will reveal his hidden (or \"creepy\") talents…"
       },
       {
         "classTsid": "seed_parsnip",
         "label": "Parsnip Seed",
-        "cost": 26
+        "cost": 26,
+        "desc": "A packet of parsnip seeds. This can be planted to grow Parsnips in a Crop Garden."
       }
     ]
   },
@@ -495,52 +582,62 @@ export const STORE_CATALOG = Object.freeze([
       {
         "classTsid": "knife_and_board",
         "label": "Knife & Board",
-        "cost": 83
+        "cost": 83,
+        "desc": "A good knife and cutting board. They can be used to make simple foods."
       },
       {
         "classTsid": "blender",
         "label": "Blender",
-        "cost": 165
+        "cost": 165,
+        "desc": "A Blender is very good for blending juices, smoothies and other concoctions. This seems a generally sturdy model."
       },
       {
         "classTsid": "frying_pan",
         "label": "Frying Pan",
-        "cost": 138
+        "cost": 138,
+        "desc": "A useful pan for frying things in."
       },
       {
         "classTsid": "saucepan",
         "label": "Saucepan",
-        "cost": 220
+        "cost": 220,
+        "desc": "A saucepan is a must-have item for making sauces."
       },
       {
         "classTsid": "cocktail_shaker",
         "label": "Cocktail Shaker",
-        "cost": 165
+        "cost": 165,
+        "desc": "A shiny, chrome-plated cocktail shaker for making special drinks."
       },
       {
         "classTsid": "mike_tyson_grill",
         "label": "Famous Pugilist Grill",
-        "cost": 193
+        "cost": 193,
+        "desc": "For grilling food. Named after the infamous gang of Potian Grillers (all called George) who roamed the countryside in days of yore, indiscriminately punching things into submission then grilling them until they were well done. Whole continents once lived in fear of the Four Georgemen of the Apocgrillypse. You, meanwhile, get to use their tribute novelty cooking item."
       },
       {
         "classTsid": "awesome_pot",
         "label": "Awesome Pot",
-        "cost": 330
+        "cost": 330,
+        "desc": "An awesome pot is used to make special dishes. Very special."
       },
       {
         "classTsid": "fruit_changing_machine",
         "label": "Fruit Changing Machine",
-        "cost": 220
+        "cost": 220,
+        "desc": "A triple-carbine fruit-changing machine. It will transmogrify cherries into other fruit. This can come in surprisingly handy."
       },
       {
         "classTsid": "spice_mill",
         "label": "Spice Mill",
-        "cost": 165
+        "cost": 165,
+        "desc": "A basic spice mill for converting basic allspice into other more exciting spices."
       },
       {
         "classTsid": "bag_spicerack",
         "label": "Spice Rack",
-        "cost": 550
+        "cost": 550,
+        "desc": "A practical rack for storing spices."
       }
     ]
   },
@@ -556,62 +653,74 @@ export const STORE_CATALOG = Object.freeze([
       {
         "classTsid": "coffee",
         "label": "Coffee",
-        "cost": 6
+        "cost": 6,
+        "desc": "A steaming mug of strong, life-affirming coffee."
       },
       {
         "classTsid": "honey",
         "label": "Honey",
-        "cost": 5
+        "cost": 5,
+        "desc": "A brimful jar of raw golden honey."
       },
       {
         "classTsid": "mushroom",
         "label": "Mushroom",
-        "cost": 3
+        "cost": 3,
+        "desc": "An unusually sporous mushroom."
       },
       {
         "classTsid": "mustard",
         "label": "Mustard",
-        "cost": 5
+        "cost": 5,
+        "desc": "A dash of tangy mustard."
       },
       {
         "classTsid": "oats",
         "label": "Oats",
-        "cost": 9
+        "cost": 9,
+        "desc": "Regular non-wild oats."
       },
       {
         "classTsid": "oily_dressing",
         "label": "Oily Dressing",
-        "cost": 3
+        "cost": 3,
+        "desc": "A bottle of cheap, yet strangely satisfying, oily dressing."
       },
       {
         "classTsid": "olive_oil",
         "label": "Olive Oil",
-        "cost": 6
+        "cost": 6,
+        "desc": "A bottle of top-notch olive oil, no virgins required."
       },
       {
         "classTsid": "sesame_oil",
         "label": "Sesame Oil",
-        "cost": 5
+        "cost": 5,
+        "desc": "Some slippery sesame oil."
       },
       {
         "classTsid": "birch_syrup",
         "label": "Birch Syrup",
-        "cost": 5
+        "cost": 5,
+        "desc": "A bottle of sticky birch syrup."
       },
       {
         "classTsid": "beer",
         "label": "Beer",
-        "cost": 11
+        "cost": 11,
+        "desc": "A shiny can of mmm... beer."
       },
       {
         "classTsid": "garlic",
         "label": "Garlic",
-        "cost": 5
+        "cost": 5,
+        "desc": "A nice stinky garlic."
       },
       {
         "classTsid": "bun",
         "label": "Bun",
-        "cost": 10
+        "cost": 10,
+        "desc": "A nice round bun."
       }
     ]
   },
@@ -627,77 +736,92 @@ export const STORE_CATALOG = Object.freeze([
       {
         "classTsid": "still",
         "label": "Still",
-        "cost": 2140
+        "cost": 2140,
+        "desc": "A basic Still for converting Grain, Corn, or the humble Potato into versatile, potent (if not smooth) Hooch."
       },
       {
         "classTsid": "tincturing_kit",
         "label": "Tincturing Kit",
-        "cost": 1338
+        "cost": 1338,
+        "desc": "Anyone who wants to beef up the benefits of herbs or create ingredients for powerful potions would do well to avail themselves of this basic Tincturing Kit and the Tincturing skill. As the name suggests, it is perfect for making tinctures. And no use at all for anything else."
       },
       {
         "classTsid": "cauldron",
         "label": "Cauldron",
-        "cost": 3745
+        "cost": 3745,
+        "desc": "A charmed pot for potioneers of all levels. This thick, heavy, magic-imbued cauldron is perfect for potions, from novice concoctions to expert unctions."
       },
       {
         "classTsid": "bag_elemental_pouch",
         "label": "Elemental Pouch",
-        "cost": 54
+        "cost": 54,
+        "desc": "An essential elemental pouch. You need it for carrying alchemical elements. What, you thought you could carry them in your HANDS? Requires Element Handling skill."
       },
       {
         "classTsid": "bag_alchemistry_kit",
         "label": "Alchemistry Kit",
-        "cost": 107
+        "cost": 107,
+        "desc": "An alchemistry kit, lovingly handcrafted using wood harvested from ancient bean trees in Groddle Forest. Use it to keep your compounds organized and unexplode-y."
       },
       {
         "classTsid": "alchemical_tongs",
         "label": "Alchemical Tongs",
-        "cost": 642
+        "cost": 642,
+        "desc": "Handy bendy Alchemical Tongs help you to create exciting metals like Tin, Copper and Molybdenum by adding elements to boring old hot smelted metal."
       },
       {
         "classTsid": "test_tube",
         "label": "Test Tube",
-        "cost": 107
+        "cost": 107,
+        "desc": "If you want to turn elements into compounds, you need a handy-dandy test tube. It's totally tubular."
       },
       {
         "classTsid": "beaker",
         "label": "Beaker",
-        "cost": 428
+        "cost": 428,
+        "desc": "A state-of-the-art beaker, integral for converting compounds into powders. Now available in exciting Pyrex, specifically designed for today's modern clumsy alchemist."
       },
       {
         "classTsid": "pick",
         "label": "Pick",
-        "cost": 535
+        "cost": 535,
+        "desc": "A relatively sturdy pick, without which mining cannot be done. A plain pick takes care of business, but it's not designed to last."
       },
       {
         "classTsid": "fancy_pick",
         "label": "Fancy Pick",
-        "cost": 1070
+        "cost": 1070,
+        "desc": "A super-deluxe fancy pick for fancy miners. Okay, maybe it doesn't look that fancy on the outside. It's the inside that counts."
       },
       {
         "classTsid": "scraper",
         "label": "Scraper",
-        "cost": 321
+        "cost": 321,
+        "desc": "Wielding only this hardy flat-edged blade, a song in their heart and a will to succeed, anyone can boast a backpack of Barnacles or a pocket full of Ice. Why that glitch might want a clacking bag and potentially wet pants is not the problem of the scraper. Scraper just scrapes."
       },
       {
         "classTsid": "ore_grinder",
         "label": "Grinder",
-        "cost": 214
+        "cost": 214,
+        "desc": "A sturdy, no-nonsense grinder. Harness its awesome power to grind rocks (and those rock-like barnacles) into alchemical elements."
       },
       {
         "classTsid": "smelter",
         "label": "Smelter",
-        "cost": 749
+        "cost": 749,
+        "desc": "Extracting purest metal from even the dullest chunk of Metal Rock, this classic Smelter is the second step to creating all manner of exciting secondary metals. (Learning Smelting is step one.)"
       },
       {
         "classTsid": "crystallizer",
         "label": "Crystalmalizing Chamber",
-        "cost": 2675
+        "cost": 2675,
+        "desc": "With this tool, every armchair alchemist can be the master of their own future. Or at least make some Plain Crystals. Who knew Barnacle Talc and essence of Firefly would combine to make such fine new age bling?"
       },
       {
         "classTsid": "firefly_jar",
         "label": "Firefly Jar",
-        "cost": 107
+        "cost": 107,
+        "desc": "This is no ordinary jar. Well, it IS, but once filled with fireflies (seven maximum: objects in space need room to fly) just looking at it gives you a great sense of serenity."
       }
     ]
   },
@@ -713,62 +837,74 @@ export const STORE_CATALOG = Object.freeze([
       {
         "classTsid": "spindle",
         "label": "Spindle",
-        "cost": 218
+        "cost": 218,
+        "desc": "In the mists of time, storytellers spoke of a magical spindle that could be used to spin starlight into downy threads to weave into a cloak of invisibility. But it's not this spindle. This is just a spindle. It's used to turn fibers into thread. But that other one sounds amazing, right?"
       },
       {
         "classTsid": "loomer",
         "label": "Loomer",
-        "cost": 436
+        "cost": 436,
+        "desc": "The Loomer (TM) is used to Loom thread into String, General Fabric and Rugs through a process of Loomeration so complex, only those with a deep enough understanding of the Fiber Arts II can perform the Loomering."
       },
       {
         "classTsid": "magic_pig_stick",
         "label": "Pig Stick",
-        "cost": 436
+        "cost": 436,
+        "desc": "The saying \"Speak softly and carry a Pig Stick\" is wise but misleading, as the Pig Stick is not effective when carried, only once placed somewhere in your home or on your land. There, Piggies within trotting distance will feel irresistibly drawn to the precious Pig Stick, and want to stay near it."
       },
       {
         "classTsid": "magic_butterfly_stick",
         "label": "Butterfly Stick",
-        "cost": 436
+        "cost": 436,
+        "desc": "One stick imbued with purest butterfly attractant. Placed in a house or on your land, any Butterflies close enough that their wings tingle with the frequency of buttervibes the stick resonates at (a very precise range) will be irresistibly attracted to it."
       },
       {
         "classTsid": "magic_chicken_stick",
         "label": "Chicken Stick",
-        "cost": 436
+        "cost": 436,
+        "desc": "A stick for summoning and containing poultry in a happy feathery cabal. When placed in a house or on your land, chickens within walking, flapping or climbing range will feel an irresistible physical draw to this chick magnet."
       },
       {
         "classTsid": "butterfly_lotion",
         "label": "Butterfly Lotion",
-        "cost": 11
+        "cost": 11,
+        "desc": "A tiny tube of butterfly lotion, without which a butterfly cannot be massaged. Remember: butterflies chafe easily, but they still like it pretty hard."
       },
       {
         "classTsid": "pig_bait",
         "label": "Pig Bait",
-        "cost": 27
+        "cost": 27,
+        "desc": "A sack of tempting pig bait. It can be used to try to capture wild piggies."
       },
       {
         "classTsid": "quill",
         "label": "Quill",
-        "cost": 436
+        "cost": 436,
+        "desc": "This fancy quill (and the skill of Penpersonship) will let you write messages and notes. And maybe give yourself inky fingers."
       },
       {
         "classTsid": "egg_seasoner",
         "label": "Egg Seasoner",
-        "cost": 191
+        "cost": 191,
+        "desc": "An Egg Seasoner is an important tool for seasoning and incubating eggs that hatch into all kinds of exciting animals."
       },
       {
         "classTsid": "butterfly_milker",
         "label": "Butterfly Milker",
-        "cost": 436
+        "cost": 436,
+        "desc": "A mechanized butterfly milker. It will gently milk your butterflies in your absence. Good for busy farmers or those with chapped hands."
       },
       {
         "classTsid": "piggy_feeder",
         "label": "Piggy Feeder",
-        "cost": 218
+        "cost": 218,
+        "desc": "A piggy feeder is a must-have device for lazy farmers. It will feed your pigs while you are away."
       },
       {
         "classTsid": "meat_collector",
         "label": "Meat Collector",
-        "cost": 545
+        "cost": 545,
+        "desc": "A farm-grade meat collector. It works around the clock to collect meat from your piggies when you can't."
       }
     ]
   },
@@ -784,292 +920,350 @@ export const STORE_CATALOG = Object.freeze([
       {
         "classTsid": "pig_bait",
         "label": "Pig Bait",
-        "cost": 26
+        "cost": 26,
+        "desc": "A sack of tempting pig bait. It can be used to try to capture wild piggies."
       },
       {
         "classTsid": "butterfly_lotion",
         "label": "Butterfly Lotion",
-        "cost": 11
+        "cost": 11,
+        "desc": "A tiny tube of butterfly lotion, without which a butterfly cannot be massaged. Remember: butterflies chafe easily, but they still like it pretty hard."
       },
       {
         "classTsid": "meat_collector",
         "label": "Meat Collector",
-        "cost": 525
+        "cost": 525,
+        "desc": "A farm-grade meat collector. It works around the clock to collect meat from your piggies when you can't."
       },
       {
         "classTsid": "piggy_feeder",
         "label": "Piggy Feeder",
-        "cost": 210
+        "cost": 210,
+        "desc": "A piggy feeder is a must-have device for lazy farmers. It will feed your pigs while you are away."
       },
       {
         "classTsid": "butterfly_milker",
         "label": "Butterfly Milker",
-        "cost": 420
+        "cost": 420,
+        "desc": "A mechanized butterfly milker. It will gently milk your butterflies in your absence. Good for busy farmers or those with chapped hands."
       },
       {
         "classTsid": "egg_seasoner",
         "label": "Egg Seasoner",
-        "cost": 184
+        "cost": 184,
+        "desc": "An Egg Seasoner is an important tool for seasoning and incubating eggs that hatch into all kinds of exciting animals."
       },
       {
         "classTsid": "bean_seasoner",
         "label": "Bean Seasoner",
-        "cost": 184
+        "cost": 184,
+        "desc": "A Bean Seasoner seasons beans. You probably guessed that already."
       },
       {
         "classTsid": "hatchet",
         "label": "Hatchet",
-        "cost": 105
+        "cost": 105,
+        "desc": "A slightly dull hatchet, useful for both dead tree-clearing and showy beard-shaving."
       },
       {
         "classTsid": "hoe",
         "label": "Hoe",
-        "cost": 63
+        "cost": 63,
+        "desc": "A garden-variety hoe. It can be used to tend weedy patches."
       },
       {
         "classTsid": "watering_can",
         "label": "Watering Can",
-        "cost": 79
+        "cost": 79,
+        "desc": "A stainless-steel 5-gallon watering can. It can be used to water plants, trees, and crops."
       },
       {
         "classTsid": "bubble_tuner",
         "label": "Bubble Tuner",
-        "cost": 158
+        "cost": 158,
+        "desc": "A Bubble Tuner somehow converts plain bubbles into not-plain bubbles. How? Nobody knows."
       },
       {
         "classTsid": "gassifier",
         "label": "Gassifier",
-        "cost": 158
+        "cost": 158,
+        "desc": "An ergonomically correct gassifier. It can turn general vapour into much more exciting gases."
       },
       {
         "classTsid": "fruit_changing_machine",
         "label": "Fruit Changing Machine",
-        "cost": 210
+        "cost": 210,
+        "desc": "A triple-carbine fruit-changing machine. It will transmogrify cherries into other fruit. This can come in surprisingly handy."
       },
       {
         "classTsid": "spice_mill",
         "label": "Spice Mill",
-        "cost": 158
+        "cost": 158,
+        "desc": "A basic spice mill for converting basic allspice into other more exciting spices."
       },
       {
         "classTsid": "bag_alchemistry_kit",
         "label": "Alchemistry Kit",
-        "cost": 105
+        "cost": 105,
+        "desc": "An alchemistry kit, lovingly handcrafted using wood harvested from ancient bean trees in Groddle Forest. Use it to keep your compounds organized and unexplode-y."
       },
       {
         "classTsid": "bag_elemental_pouch",
         "label": "Elemental Pouch",
-        "cost": 53
+        "cost": 53,
+        "desc": "An essential elemental pouch. You need it for carrying alchemical elements. What, you thought you could carry them in your HANDS? Requires Element Handling skill."
       },
       {
         "classTsid": "test_tube",
         "label": "Test Tube",
-        "cost": 105
+        "cost": 105,
+        "desc": "If you want to turn elements into compounds, you need a handy-dandy test tube. It's totally tubular."
       },
       {
         "classTsid": "beaker",
         "label": "Beaker",
-        "cost": 420
+        "cost": 420,
+        "desc": "A state-of-the-art beaker, integral for converting compounds into powders. Now available in exciting Pyrex, specifically designed for today's modern clumsy alchemist."
       },
       {
         "classTsid": "pick",
         "label": "Pick",
-        "cost": 525
+        "cost": 525,
+        "desc": "A relatively sturdy pick, without which mining cannot be done. A plain pick takes care of business, but it's not designed to last."
       },
       {
         "classTsid": "fancy_pick",
         "label": "Fancy Pick",
-        "cost": 1050
+        "cost": 1050,
+        "desc": "A super-deluxe fancy pick for fancy miners. Okay, maybe it doesn't look that fancy on the outside. It's the inside that counts."
       },
       {
         "classTsid": "ore_grinder",
         "label": "Grinder",
-        "cost": 210
+        "cost": 210,
+        "desc": "A sturdy, no-nonsense grinder. Harness its awesome power to grind rocks (and those rock-like barnacles) into alchemical elements."
       },
       {
         "classTsid": "tinkertool",
         "label": "Tinkertool",
-        "cost": 525
+        "cost": 525,
+        "desc": "Are you the DIY type who likes to repair your own tools? The nitpicky type who likes to craft their own gear from scratch? Then a Tinkertool is a very handy thing for you to have."
       },
       {
         "classTsid": "focusing_orb",
         "label": "Focusing Orb",
-        "cost": 1260
+        "cost": 1260,
+        "desc": "An iridescent focusing orb. It calms your swirly thoughts, helps you meditate, levitate and fight the enemies of the imagination."
       },
       {
         "classTsid": "bag_generic",
         "label": "Generic Bag",
-        "cost": 945
+        "cost": 945,
+        "desc": "An honest, unpretentious burlap sack. You could probably put things in it, perhaps 10 things, and give it a name. Just a thought."
       },
       {
         "classTsid": "bag_generic_blue",
         "label": "Generic Blue Bag",
-        "cost": 1050
+        "cost": 1050,
+        "desc": "An honest, unpretentious blue burlap sack. You could probably put things in it, perhaps 10 things, and give it a name. Just a thought."
       },
       {
         "classTsid": "bag_generic_gray",
         "label": "Generic Gray Bag",
-        "cost": 998
+        "cost": 998,
+        "desc": "An honest, unpretentious gray burlap sack. You could probably put things in it, perhaps 10 things, and give it a name. Just a thought."
       },
       {
         "classTsid": "bag_generic_green",
         "label": "Generic Green Bag",
-        "cost": 971
+        "cost": 971,
+        "desc": "An honest, unpretentious green burlap sack. You could probably put things in it, perhaps 10 things, and give it a name. Just a thought."
       },
       {
         "classTsid": "bag_generic_pink",
         "label": "Generic Pink Bag",
-        "cost": 1024
+        "cost": 1024,
+        "desc": "An honest, unpretentious pink burlap sack. You could probably put things in it, perhaps 10 things, and give it a name. Just a thought."
       },
       {
         "classTsid": "alchemical_tongs",
         "label": "Alchemical Tongs",
-        "cost": 630
+        "cost": 630,
+        "desc": "Handy bendy Alchemical Tongs help you to create exciting metals like Tin, Copper and Molybdenum by adding elements to boring old hot smelted metal."
       },
       {
         "classTsid": "smelter",
         "label": "Smelter",
-        "cost": 735
+        "cost": 735,
+        "desc": "Extracting purest metal from even the dullest chunk of Metal Rock, this classic Smelter is the second step to creating all manner of exciting secondary metals. (Learning Smelting is step one.)"
       },
       {
         "classTsid": "shovel",
         "label": "Shovel",
-        "cost": 315
+        "cost": 315,
+        "desc": "An essential for anyone that calls a spade a shovel, this simple tool masterpiece can be used to harvest Peat, dig for dirt (well, Earth), and occasionally land a juicy piece of Loam."
       },
       {
         "classTsid": "scraper",
         "label": "Scraper",
-        "cost": 315
+        "cost": 315,
+        "desc": "Wielding only this hardy flat-edged blade, a song in their heart and a will to succeed, anyone can boast a backpack of Barnacles or a pocket full of Ice. Why that glitch might want a clacking bag and potentially wet pants is not the problem of the scraper. Scraper just scrapes."
       },
       {
         "classTsid": "quill",
         "label": "Quill",
-        "cost": 420
+        "cost": 420,
+        "desc": "This fancy quill (and the skill of Penpersonship) will let you write messages and notes. And maybe give yourself inky fingers."
       },
       {
         "classTsid": "machine_stand",
         "label": "Machine Stand",
-        "cost": 525
+        "cost": 525,
+        "desc": "This generic machine stand provides just the right foundation upon which many a machine can be built. As with all good foundations, once assembled it cannot be moved."
       },
       {
         "classTsid": "blockmaker_chassis",
         "label": "Blockmaker Chassis",
-        "cost": 1575
+        "cost": 1575,
+        "desc": "It's commonly known that machines have 'personality'. Add me to a regular ol' machine stand and forever imbue it with 'blockmaker' personality."
       },
       {
         "classTsid": "blockmaker_engine",
         "label": "Machine Engine",
-        "cost": 2625
+        "cost": 2625,
+        "desc": "Install this engine, and your machine is one step closer to purring like the quintessential classic, thrumming like the deeply resonant inner chambers of Zille's enormous throat."
       },
       {
         "classTsid": "blockmaker_plates",
         "label": "Blockmaker Plates",
-        "cost": 1313
+        "cost": 1313,
+        "desc": "Made from only the finest Molybdenum this side of Shimla Mirch. Once installed, the Blockmaker is complete."
       },
       {
         "classTsid": "bag_bigger",
         "label": "Bigger Bag",
-        "cost": 2099
+        "cost": 2099,
+        "desc": "A big, big bag for putting things in. Bigger than 15 slots, but not as big as 17."
       },
       {
         "classTsid": "bag_bigger_blue",
         "label": "Bigger Blue Bag",
-        "cost": 2099
+        "cost": 2099,
+        "desc": "A big, big blue bag for putting things in. Bigger than 15 slots, but not as big as 17."
       },
       {
         "classTsid": "bag_bigger_gray",
         "label": "Bigger Gray Bag",
-        "cost": 2099
+        "cost": 2099,
+        "desc": "A big, big gray bag for putting things in. Bigger than 15 slots, but not as big as 17."
       },
       {
         "classTsid": "bag_bigger_green",
         "label": "Bigger Green Bag",
-        "cost": 2099
+        "cost": 2099,
+        "desc": "A big, big green bag for putting things in. Bigger than 15 slots, but not as big as 17."
       },
       {
         "classTsid": "bag_bigger_pink",
         "label": "Bigger Pink Bag",
-        "cost": 2099
+        "cost": 2099,
+        "desc": "A big, big pink bag for putting things in. Bigger than 15 slots, but not as big as 17."
       },
       {
         "classTsid": "bag_toolbox_chrome",
         "label": "Chrome Toolbox",
-        "cost": 2625
+        "cost": 2625,
+        "desc": "A sturdy, metal-y, chrome toolbox. It's a box. And you can put tools in it."
       },
       {
         "classTsid": "bag_toolbox_red",
         "label": "Red Toolbox",
-        "cost": 2625
+        "cost": 2625,
+        "desc": "A sturdy, metal-y, red toolbox. It's a box. And you can put tools in it."
       },
       {
         "classTsid": "bag_toolbox_green",
         "label": "Green Toolbox",
-        "cost": 2625
+        "cost": 2625,
+        "desc": "A sturdy, metal-y, green toolbox. It's a box. And you can put tools in it."
       },
       {
         "classTsid": "fuelmaker_case",
         "label": "Fuelmaker Case",
-        "cost": 1575
+        "cost": 1575,
+        "desc": "Placed on an assembled Machine Stand, this Fuelmaker Case makes a good case for a stand to become a Fuelmaker."
       },
       {
         "classTsid": "fuelmaker_core",
         "label": "Fuelmaker Core",
-        "cost": 1313
+        "cost": 1313,
+        "desc": "Install the Fuelmaker core and the final piece of the puzzle will be in place. Now you just need fuel to fuel the Fuelmaker."
       },
       {
         "classTsid": "cauldron",
         "label": "Cauldron",
-        "cost": 3675
+        "cost": 3675,
+        "desc": "A charmed pot for potioneers of all levels. This thick, heavy, magic-imbued cauldron is perfect for potions, from novice concoctions to expert unctions."
       },
       {
         "classTsid": "tincturing_kit",
         "label": "Tincturing Kit",
-        "cost": 1313
+        "cost": 1313,
+        "desc": "Anyone who wants to beef up the benefits of herbs or create ingredients for powerful potions would do well to avail themselves of this basic Tincturing Kit and the Tincturing skill. As the name suggests, it is perfect for making tinctures. And no use at all for anything else."
       },
       {
         "classTsid": "still",
         "label": "Still",
-        "cost": 2100
+        "cost": 2100,
+        "desc": "A basic Still for converting Grain, Corn, or the humble Potato into versatile, potent (if not smooth) Hooch."
       },
       {
         "classTsid": "metalmaker_mechanism",
         "label": "Metal Machine Mechanism",
-        "cost": 1418
+        "cost": 1418,
+        "desc": "The type of smooth, perfectly-honed mechanism you would expect from followers of Alph. Whatever function it is that this performs in the Metalmaker, it does it very, very well."
       },
       {
         "classTsid": "metalmaker_tooler",
         "label": "Metal Machine Tooler",
-        "cost": 1838
+        "cost": 1838,
+        "desc": "Silvery, heavy, and glistening with hot oil, lump of machinery so beautiful, complex and well crafted that it must have been tooled in some kind of academy."
       },
       {
         "classTsid": "woodworker_fuser",
         "label": "Woodworker Fuser",
-        "cost": 1838
+        "cost": 1838,
+        "desc": "The business end of the hardworking woodworking Woodworker, this is the bit that actually works the wood. Responsible for fusing planks into boards, boards into posts, posts into beams and dreams into reality (as long as you dream of wood)."
       },
       {
         "classTsid": "woodworker_chassis",
         "label": "Woodworker Chassis",
-        "cost": 1313
+        "cost": 1313,
+        "desc": "One of the four essential parts of the Woodworker, the chassis is essential in helping every upstanding wannabe woodworker gird their woodworkerly loin-parts and whittle their brown stuff into something wonderful."
       },
       {
         "classTsid": "spindle",
         "label": "Spindle",
-        "cost": 210
+        "cost": 210,
+        "desc": "In the mists of time, storytellers spoke of a magical spindle that could be used to spin starlight into downy threads to weave into a cloak of invisibility. But it's not this spindle. This is just a spindle. It's used to turn fibers into thread. But that other one sounds amazing, right?"
       },
       {
         "classTsid": "loomer",
         "label": "Loomer",
-        "cost": 420
+        "cost": 420,
+        "desc": "The Loomer (TM) is used to Loom thread into String, General Fabric and Rugs through a process of Loomeration so complex, only those with a deep enough understanding of the Fiber Arts II can perform the Loomering."
       },
       {
         "classTsid": "construction_tool",
         "label": "Construction Tool",
-        "cost": 525
+        "cost": 525,
+        "desc": "One handy pocketsized gadget for all your furniture construction needs. Comes complete with four pokey whojamaflilps, one specializing in tweaking the wotsit, one in cranking the doodah, and the other two in levering the begiantus out of any sticky-outty bits. A true professional's tool."
       },
       {
         "classTsid": "bulb",
         "label": "Bulb",
-        "cost": 53
+        "cost": 53,
+        "desc": "The glowy bit of a lamp. Without this, a lamp is just a stick with a silly hat on."
       }
     ]
   },
@@ -1085,167 +1279,200 @@ export const STORE_CATALOG = Object.freeze([
       {
         "classTsid": "bean_seasoner",
         "label": "Bean Seasoner",
-        "cost": 184
+        "cost": 184,
+        "desc": "A Bean Seasoner seasons beans. You probably guessed that already."
       },
       {
         "classTsid": "hatchet",
         "label": "Hatchet",
-        "cost": 105
+        "cost": 105,
+        "desc": "A slightly dull hatchet, useful for both dead tree-clearing and showy beard-shaving."
       },
       {
         "classTsid": "hoe",
         "label": "Hoe",
-        "cost": 63
+        "cost": 63,
+        "desc": "A garden-variety hoe. It can be used to tend weedy patches."
       },
       {
         "classTsid": "watering_can",
         "label": "Watering Can",
-        "cost": 79
+        "cost": 79,
+        "desc": "A stainless-steel 5-gallon watering can. It can be used to water plants, trees, and crops."
       },
       {
         "classTsid": "bubble_tuner",
         "label": "Bubble Tuner",
-        "cost": 158
+        "cost": 158,
+        "desc": "A Bubble Tuner somehow converts plain bubbles into not-plain bubbles. How? Nobody knows."
       },
       {
         "classTsid": "gassifier",
         "label": "Gassifier",
-        "cost": 158
+        "cost": 158,
+        "desc": "An ergonomically correct gassifier. It can turn general vapour into much more exciting gases."
       },
       {
         "classTsid": "fruit_changing_machine",
         "label": "Fruit Changing Machine",
-        "cost": 210
+        "cost": 210,
+        "desc": "A triple-carbine fruit-changing machine. It will transmogrify cherries into other fruit. This can come in surprisingly handy."
       },
       {
         "classTsid": "spice_mill",
         "label": "Spice Mill",
-        "cost": 158
+        "cost": 158,
+        "desc": "A basic spice mill for converting basic allspice into other more exciting spices."
       },
       {
         "classTsid": "seed_pumpkin",
         "label": "Pumpkin Seed",
-        "cost": 18
+        "cost": 18,
+        "desc": "A packet of Pumpkin seeds. This can be planted to grow one mighty Pumpkin at a time in either a Crop Garden or a Herb garden."
       },
       {
         "classTsid": "seed_broccoli",
         "label": "Broccoli Seed",
-        "cost": 25
+        "cost": 25,
+        "desc": "A packet of broccoli seeds. This can be planted to grow Broccoli in a Crop Garden."
       },
       {
         "classTsid": "seed_cabbage",
         "label": "Cabbage Seed",
-        "cost": 27
+        "cost": 27,
+        "desc": "A packet of cabbage seeds. This can be planted to grow Cabbages in a Crop Garden."
       },
       {
         "classTsid": "seed_carrot",
         "label": "Carrot Seed",
-        "cost": 29
+        "cost": 29,
+        "desc": "A packet of carrot seeds. This can be planted to grow Carrot in a Crop Garden."
       },
       {
         "classTsid": "seed_corn",
         "label": "Corn Seed",
-        "cost": 26
+        "cost": 26,
+        "desc": "A packet of corn seeds. This can be planted to grow Corn in a Crop Garden."
       },
       {
         "classTsid": "seed_cucumber",
         "label": "Cucumber Seed",
-        "cost": 26
+        "cost": 26,
+        "desc": "A packet of cucumber seeds. This can be planted to grow Cucumbers in a Crop Garden."
       },
       {
         "classTsid": "seed_onion",
         "label": "Onion Seed",
-        "cost": 16
+        "cost": 16,
+        "desc": "A packet of black onion seeds. This can be planted to grow Onions in a Crop Garden."
       },
       {
         "classTsid": "seed_potato",
         "label": "Potato Seed",
-        "cost": 42
+        "cost": 42,
+        "desc": "A packet of tiny potatoes. This can be planted to grow Potatoes in a Crop Garden."
       },
       {
         "classTsid": "seed_rice",
         "label": "Rice Seed",
-        "cost": 20
+        "cost": 20,
+        "desc": "A packet of rice seeds. This can be planted to grow Rice in a Crop Garden."
       },
       {
         "classTsid": "seed_spinach",
         "label": "Spinach Seed",
-        "cost": 13
+        "cost": 13,
+        "desc": "A packet of spinach seeds. This can be planted to grow Spinach in a Crop Garden."
       },
       {
         "classTsid": "seed_tomato",
         "label": "Tomato Seed",
-        "cost": 21
+        "cost": 21,
+        "desc": "A packet of heirloom-quality tomato seeds. This can be planted to grow Tomatoes in a Crop Garden."
       },
       {
         "classTsid": "seed_zucchini",
         "label": "Zucchini Seed",
-        "cost": 36
+        "cost": 36,
+        "desc": "A packet of zucchini seeds. This can be planted to grow Zucchinis in a Crop Garden."
       },
       {
         "classTsid": "broccoli",
         "label": "Broccoli",
-        "cost": 5
+        "cost": 5,
+        "desc": "One floret of unabashedly healthy broccoli."
       },
       {
         "classTsid": "cabbage",
         "label": "Cabbage",
-        "cost": 7
+        "cost": 7,
+        "desc": "A head of tender, delicately pungent cabbage."
       },
       {
         "classTsid": "carrot",
         "label": "Carrot",
-        "cost": 6
+        "cost": 6,
+        "desc": "A fresh, firm carrot."
       },
       {
         "classTsid": "corn",
         "label": "Corn",
-        "cost": 6
+        "cost": 6,
+        "desc": "Many kernels of sweet corn, conveniently located on a sturdy cob."
       },
       {
         "classTsid": "cucumber",
         "label": "Cucumber",
-        "cost": 4
+        "cost": 4,
+        "desc": "An innocuous cucumber."
       },
       {
         "classTsid": "onion",
         "label": "Onion",
-        "cost": 4
+        "cost": 4,
+        "desc": "A patented no-tears onion."
       },
       {
         "classTsid": "potato",
         "label": "Potato",
-        "cost": 7
+        "cost": 7,
+        "desc": "A humble potato."
       },
       {
         "classTsid": "rice",
         "label": "Rice",
-        "cost": 4
+        "cost": 4,
+        "desc": "A pot of freshly made rice."
       },
       {
         "classTsid": "spinach",
         "label": "Spinach",
-        "cost": 3
+        "cost": 3,
+        "desc": "Hearty green spinach. It's strong to the finich."
       },
       {
         "classTsid": "tomato",
         "label": "Tomato",
-        "cost": 5
+        "cost": 5,
+        "desc": "A ripe, heirloom-quality tomato."
       },
       {
         "classTsid": "zucchini",
         "label": "Zucchini",
-        "cost": 5
+        "cost": 5,
+        "desc": "A teeny-weeny green zucchini."
       },
       {
         "classTsid": "parsnip",
         "label": "Parsnip",
-        "cost": 6
+        "cost": 6,
+        "desc": "A pungent parsnip."
       },
       {
         "classTsid": "seed_parsnip",
         "label": "Parsnip Seed",
-        "cost": 25
+        "cost": 25,
+        "desc": "A packet of parsnip seeds. This can be planted to grow Parsnips in a Crop Garden."
       }
     ]
   },
@@ -1261,127 +1488,152 @@ export const STORE_CATALOG = Object.freeze([
       {
         "classTsid": "honey",
         "label": "Honey",
-        "cost": 4
+        "cost": 4,
+        "desc": "A brimful jar of raw golden honey."
       },
       {
         "classTsid": "mushroom",
         "label": "Mushroom",
-        "cost": 3
+        "cost": 3,
+        "desc": "An unusually sporous mushroom."
       },
       {
         "classTsid": "mustard",
         "label": "Mustard",
-        "cost": 4
+        "cost": 4,
+        "desc": "A dash of tangy mustard."
       },
       {
         "classTsid": "oats",
         "label": "Oats",
-        "cost": 9
+        "cost": 9,
+        "desc": "Regular non-wild oats."
       },
       {
         "classTsid": "oily_dressing",
         "label": "Oily Dressing",
-        "cost": 3
+        "cost": 3,
+        "desc": "A bottle of cheap, yet strangely satisfying, oily dressing."
       },
       {
         "classTsid": "olive_oil",
         "label": "Olive Oil",
-        "cost": 6
+        "cost": 6,
+        "desc": "A bottle of top-notch olive oil, no virgins required."
       },
       {
         "classTsid": "sesame_oil",
         "label": "Sesame Oil",
-        "cost": 4
+        "cost": 4,
+        "desc": "Some slippery sesame oil."
       },
       {
         "classTsid": "birch_syrup",
         "label": "Birch Syrup",
-        "cost": 4
+        "cost": 4,
+        "desc": "A bottle of sticky birch syrup."
       },
       {
         "classTsid": "coffee",
         "label": "Coffee",
-        "cost": 6
+        "cost": 6,
+        "desc": "A steaming mug of strong, life-affirming coffee."
       },
       {
         "classTsid": "beer",
         "label": "Beer",
-        "cost": 11
+        "cost": 11,
+        "desc": "A shiny can of mmm... beer."
       },
       {
         "classTsid": "broccoli",
         "label": "Broccoli",
-        "cost": 6
+        "cost": 6,
+        "desc": "One floret of unabashedly healthy broccoli."
       },
       {
         "classTsid": "cabbage",
         "label": "Cabbage",
-        "cost": 8
+        "cost": 8,
+        "desc": "A head of tender, delicately pungent cabbage."
       },
       {
         "classTsid": "carrot",
         "label": "Carrot",
-        "cost": 7
+        "cost": 7,
+        "desc": "A fresh, firm carrot."
       },
       {
         "classTsid": "corn",
         "label": "Corn",
-        "cost": 7
+        "cost": 7,
+        "desc": "Many kernels of sweet corn, conveniently located on a sturdy cob."
       },
       {
         "classTsid": "cucumber",
         "label": "Cucumber",
-        "cost": 4
+        "cost": 4,
+        "desc": "An innocuous cucumber."
       },
       {
         "classTsid": "onion",
         "label": "Onion",
-        "cost": 4
+        "cost": 4,
+        "desc": "A patented no-tears onion."
       },
       {
         "classTsid": "potato",
         "label": "Potato",
-        "cost": 8
+        "cost": 8,
+        "desc": "A humble potato."
       },
       {
         "classTsid": "rice",
         "label": "Rice",
-        "cost": 4
+        "cost": 4,
+        "desc": "A pot of freshly made rice."
       },
       {
         "classTsid": "spinach",
         "label": "Spinach",
-        "cost": 3
+        "cost": 3,
+        "desc": "Hearty green spinach. It's strong to the finich."
       },
       {
         "classTsid": "tomato",
         "label": "Tomato",
-        "cost": 6
+        "cost": 6,
+        "desc": "A ripe, heirloom-quality tomato."
       },
       {
         "classTsid": "zucchini",
         "label": "Zucchini",
-        "cost": 6
+        "cost": 6,
+        "desc": "A teeny-weeny green zucchini."
       },
       {
         "classTsid": "knife_and_board",
         "label": "Knife & Board",
-        "cost": 83
+        "cost": 83,
+        "desc": "A good knife and cutting board. They can be used to make simple foods."
       },
       {
         "classTsid": "frying_pan",
         "label": "Frying Pan",
-        "cost": 138
+        "cost": 138,
+        "desc": "A useful pan for frying things in."
       },
       {
         "classTsid": "blender",
         "label": "Blender",
-        "cost": 165
+        "cost": 165,
+        "desc": "A Blender is very good for blending juices, smoothies and other concoctions. This seems a generally sturdy model."
       },
       {
         "classTsid": "parsnip",
         "label": "Parsnip",
-        "cost": 7
+        "cost": 7,
+        "desc": "A pungent parsnip."
       }
     ]
   },
@@ -1397,62 +1649,74 @@ export const STORE_CATALOG = Object.freeze([
       {
         "classTsid": "still",
         "label": "Still",
-        "cost": 2200
+        "cost": 2200,
+        "desc": "A basic Still for converting Grain, Corn, or the humble Potato into versatile, potent (if not smooth) Hooch."
       },
       {
         "classTsid": "beer",
         "label": "Beer",
-        "cost": 11
+        "cost": 11,
+        "desc": "A shiny can of mmm... beer."
       },
       {
         "classTsid": "carrot_margarita",
         "label": "Carrot Margarita",
-        "cost": 99
+        "cost": 99,
+        "desc": "A thick, warm carrot margarita."
       },
       {
         "classTsid": "coffee",
         "label": "Coffee",
-        "cost": 6
+        "cost": 6,
+        "desc": "A steaming mug of strong, life-affirming coffee."
       },
       {
         "classTsid": "creamy_martini",
         "label": "Creamy Martini",
-        "cost": 66
+        "cost": 66,
+        "desc": "A shaken-and-stirred-and-shaken-again creamy martini."
       },
       {
         "classTsid": "exotic_juice",
         "label": "Exotic Juice",
-        "cost": 59
+        "cost": 59,
+        "desc": "A goblet of mysteriously yummy exotic juice."
       },
       {
         "classTsid": "mabbish_coffee",
         "label": "Mabbish Coffee",
-        "cost": 59
+        "cost": 59,
+        "desc": "A Mabbish coffee has all the goodness of regular coffee, but gooder."
       },
       {
         "classTsid": "mega_healthy_veggie_juice",
         "label": "Mega Healthy Veggie Juice",
-        "cost": 51
+        "cost": 51,
+        "desc": "A bracing tumbler of mega-healthy veggie juice."
       },
       {
         "classTsid": "savory_smoothie",
         "label": "Savory Smoothie",
-        "cost": 106
+        "cost": 106,
+        "desc": "A savory smoothie. It sticks to your ribs and doesn't let go."
       },
       {
         "classTsid": "slow_gin_fizz",
         "label": "Slow Gin Fizz",
-        "cost": 84
+        "cost": 84,
+        "desc": "A low and lazy slow gin fizz."
       },
       {
         "classTsid": "spicy_grog",
         "label": "Spicy Grog",
-        "cost": 56
+        "cost": 56,
+        "desc": "A tall glass of exceedingly spicy grog."
       },
       {
         "classTsid": "tooberry_shake",
         "label": "Too-Berry Shake",
-        "cost": 84
+        "cost": 84,
+        "desc": "A berry tasty too-berry shake."
       }
     ]
   },
@@ -1468,92 +1732,110 @@ export const STORE_CATALOG = Object.freeze([
       {
         "classTsid": "earthshaker",
         "label": "Earthshaker",
-        "cost": 456
+        "cost": 456,
+        "desc": "A seismically upgraded earthshaker."
       },
       {
         "classTsid": "face_smelter",
         "label": "Face Smelter",
-        "cost": 176
+        "cost": 176,
+        "desc": "A powerful brew with a scent acrid enough to perm your nostril hairs."
       },
       {
         "classTsid": "flaming_humbaba",
         "label": "Flaming Humbaba",
-        "cost": 504
+        "cost": 504,
+        "desc": "A 5-alarm flaming Humbaba."
       },
       {
         "classTsid": "cheezy_sammich",
         "label": "Cheezy Sammich",
-        "cost": 46
+        "cost": 46,
+        "desc": "An easy, pleasey, cheezy sammich."
       },
       {
         "classTsid": "potato_patty",
         "label": "Potato Patty",
-        "cost": 41
+        "cost": 41,
+        "desc": "One potato, mashed and fried in a pleasing disc shape."
       },
       {
         "classTsid": "basic_omelet",
         "label": "Basic Omelet",
-        "cost": 58
+        "cost": 58,
+        "desc": "A fluffy three-egg omelet."
       },
       {
         "classTsid": "exotic_fruit_salad",
         "label": "Exotic Fruit Salad",
-        "cost": 41
+        "cost": 41,
+        "desc": "An enticing array of exotic fruits."
       },
       {
         "classTsid": "scrumptious_frittata",
         "label": "Scrumptious Frittata",
-        "cost": 98
+        "cost": 98,
+        "desc": "A truly tantalizing scrumptious frittata."
       },
       {
         "classTsid": "papl_upside_down_pizza",
         "label": "Pineapple Upside-Down Pizza",
-        "cost": 139
+        "cost": 139,
+        "desc": "A plate of exotically topsy-turvy pizza."
       },
       {
         "classTsid": "super_veggie_kebabs",
         "label": "Super Veggie Kebab",
-        "cost": 320
+        "cost": 320,
+        "desc": "Chunks of assorted vegetables on a fun pointy stick!"
       },
       {
         "classTsid": "hash",
         "label": "Hash",
-        "cost": 71
+        "cost": 71,
+        "desc": "A serving of oddly satisfying hash."
       },
       {
         "classTsid": "divine_crepes",
         "label": "Divine Crepe",
-        "cost": 349
+        "cost": 349,
+        "desc": "Life-changingly scrumptious crepes."
       },
       {
         "classTsid": "simple_bbq",
         "label": "Simple BBQ",
-        "cost": 145
+        "cost": 145,
+        "desc": "Some hot meat with tangy sauce."
       },
       {
         "classTsid": "obvious_panini",
         "label": "Obvious Panini",
-        "cost": 165
+        "cost": 165,
+        "desc": "A panini, obviously."
       },
       {
         "classTsid": "meat_gumbo",
         "label": "Meat Gumbo",
-        "cost": 281
+        "cost": 281,
+        "desc": "A bowl of thick, meaty gumbo."
       },
       {
         "classTsid": "flummery",
         "label": "Flummery",
-        "cost": 286
+        "cost": 286,
+        "desc": "Few things in this life are as tasty as a masterfully prepared flummery. \"Just like Mom used to make!\" you might say. If you had a mom, that is."
       },
       {
         "classTsid": "rich_tagine",
         "label": "Rich Tagine",
-        "cost": 415
+        "cost": 415,
+        "desc": "A steaming pot of zesty, slow-cooked tagine."
       },
       {
         "classTsid": "chillybusting_chili",
         "label": "Chilly-Busting Chili",
-        "cost": 436
+        "cost": 436,
+        "desc": "A tureen of fiery chilly-busting chili."
       }
     ]
   },
@@ -1569,52 +1851,62 @@ export const STORE_CATALOG = Object.freeze([
       {
         "classTsid": "earthshaker",
         "label": "Earthshaker",
-        "cost": 456
+        "cost": 456,
+        "desc": "A seismically upgraded earthshaker."
       },
       {
         "classTsid": "face_smelter",
         "label": "Face Smelter",
-        "cost": 204
+        "cost": 204,
+        "desc": "A powerful brew with a scent acrid enough to perm your nostril hairs."
       },
       {
         "classTsid": "flaming_humbaba",
         "label": "Flaming Humbaba",
-        "cost": 504
+        "cost": 504,
+        "desc": "A 5-alarm flaming Humbaba."
       },
       {
         "classTsid": "pick",
         "label": "Pick",
-        "cost": 750
+        "cost": 750,
+        "desc": "A relatively sturdy pick, without which mining cannot be done. A plain pick takes care of business, but it's not designed to last."
       },
       {
         "classTsid": "fancy_pick",
         "label": "Fancy Pick",
-        "cost": 1500
+        "cost": 1500,
+        "desc": "A super-deluxe fancy pick for fancy miners. Okay, maybe it doesn't look that fancy on the outside. It's the inside that counts."
       },
       {
         "classTsid": "ore_grinder",
         "label": "Grinder",
-        "cost": 300
+        "cost": 300,
+        "desc": "A sturdy, no-nonsense grinder. Harness its awesome power to grind rocks (and those rock-like barnacles) into alchemical elements."
       },
       {
         "classTsid": "smelter",
         "label": "Smelter",
-        "cost": 1050
+        "cost": 1050,
+        "desc": "Extracting purest metal from even the dullest chunk of Metal Rock, this classic Smelter is the second step to creating all manner of exciting secondary metals. (Learning Smelting is step one.)"
       },
       {
         "classTsid": "tinkertool",
         "label": "Tinkertool",
-        "cost": 750
+        "cost": 750,
+        "desc": "Are you the DIY type who likes to repair your own tools? The nitpicky type who likes to craft their own gear from scratch? Then a Tinkertool is a very handy thing for you to have."
       },
       {
         "classTsid": "bag_elemental_pouch",
         "label": "Elemental Pouch",
-        "cost": 75
+        "cost": 75,
+        "desc": "An essential elemental pouch. You need it for carrying alchemical elements. What, you thought you could carry them in your HANDS? Requires Element Handling skill."
       },
       {
         "classTsid": "alchemical_tongs",
         "label": "Alchemical Tongs",
-        "cost": 900
+        "cost": 900,
+        "desc": "Handy bendy Alchemical Tongs help you to create exciting metals like Tin, Copper and Molybdenum by adding elements to boring old hot smelted metal."
       }
     ]
   },
@@ -1630,122 +1922,146 @@ export const STORE_CATALOG = Object.freeze([
       {
         "classTsid": "dice",
         "label": "Pair of Dice",
-        "cost": 550
+        "cost": 550,
+        "desc": "Roll up!"
       },
       {
         "classTsid": "dice_12sided",
         "label": "12-sided Die",
-        "cost": 1210
+        "cost": 1210,
+        "desc": "This die has 12 sides. One for every Giant, plus a mystery guest."
       },
       {
         "classTsid": "fortune_cookie",
         "label": "Fortune Cookie",
-        "cost": 220
+        "cost": 220,
+        "desc": "Comes with or without a note inside. Add your own and give it to a friend!"
       },
       {
         "classTsid": "cubimal_package",
         "label": "Cubimal Series 1 Box",
-        "cost": 5500
+        "cost": 5500,
+        "desc": "Contains one (1) Series 1 Cubimal. Open it up to find out which one is inside. Collect them all!"
       },
       {
         "classTsid": "bag_cubimal_case",
         "label": "Cubimal Case",
-        "cost": 550
+        "cost": 550,
+        "desc": "For keeping your Cubimals in peak condition."
       },
       {
         "classTsid": "emotional_bear",
         "label": "Emotional Bear",
-        "cost": 330
+        "cost": 330,
+        "desc": "When you can't express how you're feeling, this furry companion will emote on your behalf. Particularly when equipped with Lips for kissing or a Moon for you-know-whatting…"
       },
       {
         "classTsid": "lips",
         "label": "Lips",
-        "cost": 11
+        "cost": 11,
+        "desc": "Pre-pursed, super-soft and infused with an antibacterial salve, these lips can be attached to whatever might help you kiss people better. Like, say, an Emotional Bear."
       },
       {
         "classTsid": "moon",
         "label": "Moon",
-        "cost": 109
+        "cost": 109,
+        "desc": "One full, craterous moon, without which mooning cannot happen. Most useful if attached to an Emotional Bear."
       },
       {
         "classTsid": "npc_garden_gnome",
         "label": "Garden Gnome",
-        "cost": 2200
+        "cost": 2200,
+        "desc": "Hey, it's that weird old tiny bearded life-companion you've been hoping for! When placed in your yard, house or on your home street, your new little chum will reveal his hidden (or \"creepy\") talents…"
       },
       {
         "classTsid": "party_pack_pitchen_lilliputt",
         "label": "Pitchen Lilliputt Party Pack",
-        "cost": 1100
+        "cost": 1100,
+        "desc": "Miniature Ur for Glitchean giants in one small but perfectly formed temporary party location. When activated, this ephemeral party spot includes minables, nibbles, snacks and sammiches, and one DIY fancy-cocktail bar."
       },
       {
         "classTsid": "party_pack_toxic_moon",
         "label": "Toxic Moon Party Pack",
-        "cost": 1100
+        "cost": 1100,
+        "desc": "One secluded and totally transient lunar location. When activated, temporary party spot includes ingredients for cocktails, sparkly rocks for space-mining, and a notable lack of gravity, for super-awesome-space-jumpiness."
       },
       {
         "classTsid": "party_pack_nylon_phool",
         "label": "Nylon Phool Party Pack",
-        "cost": 1100
+        "cost": 1100,
+        "desc": "One temporary underwater pool-party spot. When activated, this ephemeral party place includes a complimentary DIY juice bar, smoothie-zone and Spicy Grog spot, replenishing nibbles and unlimited floatiness."
       },
       {
         "classTsid": "party_pack_double_rainbow",
         "label": "Double Rainbow Party Pack",
-        "cost": 1100
+        "cost": 1100,
+        "desc": "One ephemeral cute-as-a-button party space, perfect for private events. When activated, temporary party location includes complimentary mineables, munchables and mixables, sparkles and lollipops and glee."
       },
       {
         "classTsid": "party_pack_mazzala_gala",
         "label": "Mazza'la Gala Party Pack",
-        "cost": 1100
+        "cost": 1100,
+        "desc": "One private and transient five-room wooden party lodge. When activated, temporary party location includes DIY hearty party feast, beer, booze, and one very dark make-out room."
       },
       {
         "classTsid": "party_pack_taster_double_rainbow",
         "label": "Double Rainbow Party Pack Taster",
-        "cost": 220
+        "cost": 220,
+        "desc": "One ephemeral cute-as-a-button party space, perfect for private events. When activated, temporary party location includes complimentary mineables, munchables and mixables, sparkles and lollipops and glee."
       },
       {
         "classTsid": "party_pack_taster_mazzala_gala",
         "label": "Mazza'la Gala Party Pack Taster",
-        "cost": 220
+        "cost": 220,
+        "desc": "One private and transient five-room wooden party lodge. When activated, temporary party location includes DIY hearty party feast, beer, booze, and one very dark make-out room."
       },
       {
         "classTsid": "party_pack_taster_nylon_phool",
         "label": "Nylon Phool Party Pack Taster",
-        "cost": 220
+        "cost": 220,
+        "desc": "One temporary underwater pool-party spot. When activated, this ephemeral party place includes a complimentary DIY juice bar, smoothie-zone and Spicy Grog spot, replenishing nibbles and unlimited floatiness."
       },
       {
         "classTsid": "party_pack_taster_pitchen_lilliputt",
         "label": "Pitchen Lilliputt Party Pack Taster",
-        "cost": 220
+        "cost": 220,
+        "desc": "Miniature Ur for Glitchean giants in one small but perfectly formed temporary party location. When activated, this ephemeral party spot includes minables, nibbles, snacks and sammiches, and one DIY fancy-cocktail bar."
       },
       {
         "classTsid": "party_pack_taster_toxic_moon",
         "label": "Toxic Moon Party Pack Taster",
-        "cost": 220
+        "cost": 220,
+        "desc": "One secluded and totally transient lunar location. When activated, temporary party spot includes ingredients for cocktails, sparkly rocks for space-mining, and a notable lack of gravity, for super-awesome-space-jumpiness."
       },
       {
         "classTsid": "cubimal_package_2",
         "label": "Cubimal Series 2 Box",
-        "cost": 5500
+        "cost": 5500,
+        "desc": "Contains one (1) Series 2 Cubimal. Open it up to find out which one is inside. Collect 'em all!"
       },
       {
         "classTsid": "party_pack_taster_val_holla",
         "label": "Val Holla Party Pack Taster",
-        "cost": 220
+        "cost": 220,
+        "desc": "Soar to new heights in this quoin-heavy party space. Grab a bunch of your closest friends, and get ready to Party Shardy!"
       },
       {
         "classTsid": "party_pack_val_holla",
         "label": "Val Holla Party Pack",
-        "cost": 1100
+        "cost": 1100,
+        "desc": "Soar to new heights in this quoin-heavy party space. Grab a bunch of your closest friends, and get ready to Party Shardy!"
       },
       {
         "classTsid": "party_pack_aquarius",
         "label": "Aquarius Party Pack",
-        "cost": 1100
+        "cost": 1100,
+        "desc": "Swim, float & drift your way around this quoin-laden party space. And, remember … quoining is always more fun with friends!"
       },
       {
         "classTsid": "party_pack_taster_aquarius",
         "label": "Aquarius Party Pack Taster",
-        "cost": 220
+        "cost": 220,
+        "desc": "Swim, float & drift your way around this quoin-laden party space. And, remember … quoining is always more fun with friends!"
       }
     ]
   }

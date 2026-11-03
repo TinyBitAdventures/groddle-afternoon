@@ -18,9 +18,9 @@
  * Canvas data: machineArtState (the frozen state or ''), machineArtDemo.
  */
 
-import { addItem, countItem } from '../inventory.js?v=b0e33301';
+import { addItem, countItem } from '../inventory.js?v=597a17a2';
 import { ensureToolCondition } from '../tools.js?v=3974f57e';
-import { MACHINE_SKILLS } from '../machine-rooms.js?v=6f8521ef';
+import { MACHINE_SKILLS } from '../machine-rooms.js?v=5fbd635d';
 import { freezeMachineState, isMachineArt } from '../machine-art.js?v=8c93c616';
 
 export const MACHINE_ART_FEATURE_ID = 'machine-art';
