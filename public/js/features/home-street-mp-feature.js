@@ -78,6 +78,7 @@ import {
   noteSold,
   parsePrice,
   philanthropicReward,
+  salePlacementKey,
   poleConfig,
   poleLayout,
   poleVerbs,
@@ -86,7 +87,7 @@ import {
   saleVerbs,
   signpostArms,
   signpostCandidates,
-} from '../home-street-mp.js?v=4039f2d5';
+} from '../home-street-mp.js?v=9c8a7791';
 
 export { HOME_STREET_MP_ID };
 
@@ -224,6 +225,8 @@ function createSession(engine, client) {
   let busy = false;
   let lastSceneKey = '';
   let tickAt = 0;
+  /** Ticket 55: the house's piece positions the sale tags were last drawn at (salePlacementKey). */
+  let salesKey = '';
 
   const me = () => Number(client.me?.id) || Number(boot.player?.id) || 0;
   const myName = () => String(client.me?.name || boot.player?.name || engine.pc?.name || 'You');
@@ -517,6 +520,7 @@ function createSession(engine, client) {
     const decor = st?.houseDecor;
     if (!decor) return;
     const geo = ownGeometry();
+    salesKey = salePlacementKey(decor.placed, geo.house.roomX);
     drawSales(decor.placed.map((p) => ({ uid: p.id, classTsid: p.classTsid, upgradeId: p.upgradeId, x: geo.house.roomX + p.x, y: p.y })), own.listed, { owner: true });
   }
 
@@ -1202,6 +1206,8 @@ function createSession(engine, client) {
       } else if (!w && lastSceneKey) {
         lastSceneKey = '';
       }
+      // Ticket 55: a piece moved (or restyled) in the house takes its price tag and hit box along.
+      if (w === 'house' && st?.houseDecor && salePlacementKey(st.houseDecor.placed, ownGeometry().house.roomX) !== salesKey) drawOwnSales();
       if (now - tickAt < 250) return;
       tickAt = now;
       // pile_of_currants.js onPlayerCollision: the pile speaks up to its owner.

@@ -11,10 +11,12 @@ import { WALLPAPER_MAPS } from '../public/js/home-wallpaper-art.js?v=9f8473e6';
 import { DOCK_GAP, DOCK_W, dockedPickerSpot } from '../public/js/furniture-upgrade-picker.js?v=3a637ec8';
 import { filterSwatches, swatchFilters } from '../public/js/ui/home-builder.js?v=d4e0cb64';
 import { listTextures } from '../public/js/home-decor.js?v=39721c9f';
+import { salePlacementKey } from '../public/js/home-street-mp.js?v=9c8a7791';
 
 const root = join(import.meta.dirname, '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');
 const homes = read('public/js/features/homes-feature.js');
+const street = read('public/js/features/home-street-mp-feature.js');
 const css = read('public/style.css');
 const gsjs = join(root, '../glitch-GameServerJS');
 const client = join(root, '../glitch-client/com/tinyspeck/engine');
@@ -132,5 +134,21 @@ describe('53: swatch categories read across, as filter buttons', () => {
       assert.ok(plan.pieces[piece]?.swf_sha, `${key}: ${piece} rendered from its SWF`);
       assert.equal(plan.pieces[piece].bundle, 'home_wallpaper', key);
     }
+  });
+});
+
+describe('55: a price tag goes where its piece goes', () => {
+  it('the placement key changes when a piece moves or is restyled, and only then', () => {
+    const placed = [{ id: 3, x: 400, y: 620 }, { id: 4, x: 700, y: 620, upgradeId: '' }];
+    const k = salePlacementKey(placed, 1280);
+    assert.equal(salePlacementKey(placed.map((p) => ({ ...p })), 1280), k);
+    assert.notEqual(salePlacementKey([{ ...placed[0], x: 520 }, placed[1]], 1280), k);
+    assert.notEqual(salePlacementKey([placed[0], { ...placed[1], upgradeId: '2' }], 1280), k);
+    assert.notEqual(salePlacementKey(placed, 1300), k, 'the room shifted (Expand)');
+  });
+
+  it('the feature redraws the tags from the key on its tick', () => {
+    assert.match(street, /salePlacementKey\(st\.houseDecor\.placed, ownGeometry\(\)\.house\.roomX\) !== salesKey\) drawOwnSales\(\)/);
+    assert.match(street, /salesKey = salePlacementKey\(decor\.placed, geo\.house\.roomX\);/);
   });
 });

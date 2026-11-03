@@ -299,6 +299,16 @@ export function canSellClass(cls) {
   return typeof cls === 'string' && /^(furniture_|bag_furniture_)/.test(cls) && !UNSELLABLE.includes(cls);
 }
 
+/**
+ * Ticket 55: where the pieces of a house stand, as one string, so the price tags and hit boxes are
+ * drawn again when one moves, is restyled or the room shifts (furniture_base getExtraConfig puts the
+ * furn_price_tag on the piece itself, so it goes where the piece goes).
+ */
+export function salePlacementKey(placed = [], roomX = 0) {
+  const rows = Array.isArray(placed) ? placed : [];
+  return `${Math.round(Number(roomX) || 0)}|${rows.map((p) => `${p?.id}:${Math.round(Number(p?.x) || 0)}:${Math.round(Number(p?.y) || 0)}:${p?.upgradeId || ''}`).join(',')}`;
+}
+
 /** A price as the site takes it: whole currants 0..999999 (0 stops the sale), or null. */
 export function parsePrice(text) {
   const digits = String(text ?? '').replace(/[^0-9]/g, '').slice(0, 6);
