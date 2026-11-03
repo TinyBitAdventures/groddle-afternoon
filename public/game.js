@@ -2,9 +2,9 @@
  * Groddle Afternoon — original street geometry + layered decos
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
-import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=fc9bd9f3';
+import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=862128f3';
 import { createFeatureHost } from './js/feature-host.js?v=903263a4';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=4e8258d9';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=32cc5b9c';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -464,8 +464,8 @@ import {
 } from './js/inventory.js?v=b0e33301';
 import { PACK_COPY, isBagClass, unitRankAt } from './js/pack-slots.js?v=ba0a895f';
 import { createPackRow, mountPackClearance, packBandRange, packCountText, packSearchEntries, packSlotTip } from './js/ui/pack-row.js?v=65c0f180';
-import { listAnimalFeedOptions } from './js/animals.js?v=d40ef695';
-import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=d40ef695';
+import { listAnimalFeedOptions } from './js/animals.js?v=dd5408ad';
+import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=dd5408ad';
 import {
   createDroppedItemState,
   parseDroppedItemState,
@@ -605,7 +605,7 @@ import {
   ensureStreetIndex,
   resolveIndexTsid,
 } from './js/street-loader.js?v=33d2b8bc';
-import { showDraftBanner, startDraftPlay } from './js/builder/draft-play.js?v=8452531b';
+import { showDraftBanner, startDraftPlay } from './js/builder/draft-play.js?v=51f953bd';
 import {
   ladderTopDeck,
   groundBeneath,
@@ -793,7 +793,7 @@ import {
   createAnimalState,
   resetAnimalDay,
   animalStatusLabel,
-} from './js/animals.js?v=d40ef695';
+} from './js/animals.js?v=dd5408ad';
 import {
   ensureWoodTreeState,
   pickWoodTool,
@@ -891,8 +891,8 @@ import {
   animalPatrolRange,
   ANIMAL_PATROL,
   nearestPlacementGap,
-} from './js/street-ecology.js?v=53cdde1b';
-import { chickenPauseRoll, easeToward, flightFloorAt, flightFloorFor, flyerLift } from './js/street-creatures.js?v=eec82291';
+} from './js/street-ecology.js?v=2c82c072';
+import { chickenPauseRoll, easeToward, flightFloorAt, flightFloorFor, flyerLift } from './js/street-creatures.js?v=3533163e';
 import { createSoundBoard, DEFAULT_SFX_VOLUME, watchButtonClicks, watchPanelSounds } from './js/sound-board.js?v=f992a5c5';
 import {
   actionLoopFor,

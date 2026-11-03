@@ -22,9 +22,9 @@ import { Worker, isMainThread, parentPort, workerData } from 'node:worker_thread
 import { fileURLToPath } from 'node:url';
 import { GAME_DIR } from '../repos.mjs';
 import { shippedStreetFiles } from './validator-context.mjs';
-import { validateShippedStreet } from '../../public/js/builder/validate.js?v=3b7df9e3';
+import { validateShippedStreet } from '../../public/js/builder/validate.js?v=38937a27';
 import { streetBuff, REACH_LIMITS } from '../../public/js/builder/reach-graph.js?v=3602d09e';
-import { plainApex } from '../../public/js/builder/validate.js?v=3b7df9e3';
+import { plainApex } from '../../public/js/builder/validate.js?v=38937a27';
 
 /** The 2012 client's plain jump peaked about 134 px (hidden-floors.js); the remake's 105. */
 export const CLIENT_2012_APEX = 134;

@@ -14,13 +14,14 @@ import { join } from 'node:path';
 
 import { platformsScreen, streetWidth } from '../public/js/street-model.js?v=505d8990';
 import {
+  hiddenBehindFloor,
   inUnreachedRun,
   planStreetPlacements,
   populationForStreet,
   setStreetEcologyCatalog,
   streetReservedSpots,
   unreachedFloorsFor,
-} from '../public/js/street-ecology.js?v=53cdde1b';
+} from '../public/js/street-ecology.js?v=2c82c072';
 import { placementRequests, streetEcology } from '../tools/build-realtime-quoins.mjs';
 import { unreachedFloorsOf } from '../tools/ecology/build-unreached-floors.mjs';
 import { shippedArrivals } from '../tools/builder/calibrate.mjs';
@@ -92,6 +93,15 @@ describe('ticket 64: nothing is planned on a floor nobody reaches', () => {
     assert.equal(all.groups.rocks.length, 3);
     const part = planStreetPlacements(lines, [{ key: 'quoins', count: 6, clearance: 28 }], { worldW: 2000, seed: 'x', unreached: { a: [[0, 600]] } });
     assert.ok(part.groups.quoins.every((p) => p.x > 600), 'a partly reached line keeps only its reached part');
+  });
+
+  it('a tree, rock or Piggy is not set behind a floor from beside it while another spot is free (Unnu Slight)', () => {
+    const r = plan('GIFUNGIBHQ1243A');
+    for (const key of ['trees', 'rocks', 'piggies']) {
+      for (const p of r.plan.groups[key] || []) assert.equal(hiddenBehindFloor(r.lines, p, key), false, `${key} ${Math.round(p.x)},${Math.round(p.y)}`);
+    }
+    // The spot the Piggy would have had: under the ledge over x 1439-1518.
+    assert.equal(hiddenBehindFloor(r.lines, { x: 1491.3, y: 1507 }, 'piggies'), true);
   });
 
   it('the ecology builder keeps the section, and the realtime builders read it through the catalog', () => {

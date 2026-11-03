@@ -3,7 +3,8 @@
  * placement on recovered locations-xml platforms.
  */
 
-import { isItemSolid, isStandable, worldToScreen } from './street-model.js?v=505d8990';
+import { avatarHeadReach, groundBeneath, isItemSolid, isStandable, worldToScreen } from './street-model.js?v=505d8990';
+import { behindFloor } from './reach.js?v=4187d746';
 
 export const STREET_ECOLOGY_URL = 'assets/content/street-ecology.json?v=official-ecology-6';
 
@@ -809,6 +810,7 @@ export function planStreetPlacements(
   const fallbacks = [];
   const perches = [];
   const blocked = [];
+  const hiddenCache = new Map();
 
   for (const request of requests || []) {
     const count = whole(request?.count, 0, 40);
@@ -869,9 +871,16 @@ export function planStreetPlacements(
         // never planted in a tree, rock or stall or on another walker, and, before a
         // crowded spot, its walk clear of them (walkInScenery).
         const scenery = walker ? walkInScenery(candidate, request.key, occupied) : 0;
+        // Ticket 64 follow-up: a tree, rock or Piggy behind a floor from beside it only when no other spot is left.
+        let hidden = 0;
+        if (REACH_BOXES[request.key]) {
+          const k = `${request.key}:${candidate.id}`;
+          if (!hiddenCache.has(k)) hiddenCache.set(k, hiddenBehindFloor(platforms, candidate, request.key));
+          hidden = hiddenCache.get(k) ? 32 : 0;
+        }
         const tier = (footprint > 0
           ? walker ? (perch ? 8 : 0) + (scenery === 2 ? 4 : 0) + (nearest < 1 ? 2 : 0) + (scenery === 1 ? 1 : 0) : (perch ? 1 : 0) + (nearest < 1 ? 2 : 0)
-          : 0) + (covers.has(candidate.id) ? (walker ? 16 : 4) : 0);
+          : 0) + (covers.has(candidate.id) ? (walker ? 16 : 4) : 0) + hidden;
         if (tier < bestTier || (tier === bestTier && score > bestScore)) {
           bestTier = tier;
           bestScore = score;
@@ -889,6 +898,29 @@ export function planStreetPlacements(
   }
 
   return { seed: String(seed), groups, occupied, candidateCount: candidates.length, fallbacks, perches, blocked };
+}
+
+/**
+ * The boxes of the things a player clicks from beside them (tests/reach.test.js: every server-laid
+ * tree, rock and piggy stays in reach). A spot whose thing would sit behind a floor from every
+ * side (js/reach.js behindFloor: the client's "can't reach that" line) is taken last.
+ */
+const REACH_BOXES = Object.freeze({ trees: [150, 200], rocks: [90, 60], piggies: [70, 50] });
+const BESIDE_DX = Object.freeze([-60, -30, 30, 60]);
+
+/** PURE: whether a thing of `key` at `spot` is behind a floor from any place beside it. */
+export function hiddenBehindFloor(platforms, spot, key) {
+  const size = REACH_BOXES[key];
+  if (!size || !Array.isArray(platforms)) return false;
+  const [w, h] = size;
+  const box = { left: spot.x - w / 2, right: spot.x + w / 2, top: spot.y - h, bottom: spot.y };
+  const half = avatarHeadReach(1).reach / 2;
+  for (const dx of BESIDE_DX) {
+    const g = groundBeneath(platforms, spot.x + dx, spot.y - 10, 30);
+    if (!g || Math.abs(g.y - spot.y) > 40) continue;
+    if (behindFloor(platforms, { x: spot.x + dx, y: g.y - half }, box, null, { feetY: g.y })) return true;
+  }
+  return false;
 }
 
 /** How near a walk may come to big scenery on its own floor (px up or down: a sloped floor). */

@@ -56,13 +56,13 @@
 import { performPlotVerb, plotArtPath, plotLabel, plotStatusLabel, plotVerbs } from '../patches.js?v=d4e17227';
 import { trantStatusLabel } from '../trants.js?v=9c2e8c0f';
 import { woodTreeStatusLabel } from '../woodcutting.js?v=6d2ad054';
-import { animalAnchorX, animalStatusLabel } from '../animals.js?v=d40ef695';
+import { animalAnchorX, animalStatusLabel } from '../animals.js?v=dd5408ad';
 import { frameTexture, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js?v=db2ce452';
 import { homeStreetLayout, normalizeCultivationState } from '../home-cultivation.js?v=11616085';
 import { readVisitScene } from '../neighbours-mp.js?v=a8d5544e';
 import { saveStore } from '../save-store.js?v=8839ba7b';
-import { STREET_GROUND_Y, homesFeature, wearHomeCultivation } from './homes-feature.js?v=80f6230d';
-import { patchesFeature, treeFrameUrl } from './patches-feature.js?v=1fe07fd7';
+import { STREET_GROUND_Y, homesFeature, wearHomeCultivation } from './homes-feature.js?v=2df0ff28';
+import { patchesFeature, treeFrameUrl } from './patches-feature.js?v=66f93233';
 import {
   YARD_STREET,
   YARD_TEXT as T,
@@ -78,13 +78,13 @@ import {
   treeSnapshot,
   visitorAnimalState,
   visitorTreeState,
-} from '../yard-verbs-mp.js?v=6f3b3814';
+} from '../yard-verbs-mp.js?v=97d66cb7';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
 import { countItem, removeItem } from '../inventory.js?v=b0e33301';
 import { ROCK_CATALOG, rockStatusLabel, tickMineRock } from '../mining.js?v=541dfb88';
 import { getResourceNodeDef, regrowDelayMs } from '../resource-nodes.js?v=89cd018f';
 import { getGameDayKey } from '../game-day.js?v=edb00566';
-import { rockReady } from '../street-objects.js?v=d6c99572';
+import { rockReady } from '../street-objects.js?v=7ab34aaa';
 import { resourceNodesFeature } from './resource-nodes-feature.js?v=f5cdad78';
 import {
   ROCK_RESPAWN_MS,

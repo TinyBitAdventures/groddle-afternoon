@@ -123,14 +123,14 @@ import {
   treeId,
   treeReady,
   treeSkill,
-} from '../street-objects.js?v=d6c99572';
+} from '../street-objects.js?v=7ab34aaa';
 import { ROCK_CATALOG } from '../mining.js?v=541dfb88';
 import { TRANT_META, trantStatusLabel } from '../trants.js?v=9c2e8c0f';
 import { quoteWoodTreeHarvest } from '../woodcutting.js?v=6d2ad054';
-import { animalStatusLabel, pickerMaxCount } from '../animals.js?v=d40ef695';
+import { animalStatusLabel, pickerMaxCount } from '../animals.js?v=dd5408ad';
 import { highestAnimalKinshipRank, quoteAnimalKinship } from '../animal-kinship.js?v=2757bb52';
-import { animalPatrolRange } from '../street-ecology.js?v=53cdde1b';
-import { INCUBATION, PIGGY_FEED, itemBaseCost, resetIncubation } from '../animal-husbandry.js?v=8de6bc84';
+import { animalPatrolRange } from '../street-ecology.js?v=2c82c072';
+import { INCUBATION, PIGGY_FEED, itemBaseCost, resetIncubation } from '../animal-husbandry.js?v=433d5c3a';
 import {
   applyCreatureState,
   batterflyAt,
@@ -149,7 +149,7 @@ import {
   restAt,
   serverPathClock,
   sharedCreatureLabel,
-} from '../street-creatures.js?v=eec82291';
+} from '../street-creatures.js?v=3533163e';
 
 export const STREET_OBJECTS_FEATURE_ID = 'street-objects';
 const RECONCILE_MS = 250;
