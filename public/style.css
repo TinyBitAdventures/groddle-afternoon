@@ -10694,6 +10694,7 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
 [data-ui="modern"] #verb-menu[hidden] { display: none !important; }
 [data-ui="modern"] #verb-menu .verb-menu-card,
 [data-ui="modern"] #quest-pin-menu,
+[data-ui="modern"] #game-root .ctx-menu,
 [data-ui="modern"] #pack-popover {
   box-sizing: border-box;
   width: var(--vm-w);
@@ -10777,6 +10778,7 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
 /* One line per verb. */
 [data-ui="modern"] #verb-menu .vm-row,
 [data-ui="modern"] #quest-pin-menu .vm-row,
+[data-ui="modern"] .ctx-menu .vm-row,
 [data-ui="modern"] #pack-popover .vm-row {
   width: 100%;
   height: 32px;
@@ -10802,15 +10804,20 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
 [data-ui="modern"] #verb-menu .vm-row.cur,
 [data-ui="modern"] #quest-pin-menu .vm-row:hover,
 [data-ui="modern"] #quest-pin-menu .vm-row.cur,
+[data-ui="modern"] .ctx-menu .vm-row:hover,
+[data-ui="modern"] .ctx-menu .vm-row.cur,
 [data-ui="modern"] #pack-popover .vm-row:hover,
 [data-ui="modern"] #pack-popover .vm-row.cur { background: var(--accent-soft); box-shadow: none; }
 [data-ui="modern"] #verb-menu .vm-row:focus,
 [data-ui="modern"] #quest-pin-menu .vm-row:focus,
+[data-ui="modern"] .ctx-menu .vm-row:focus,
 [data-ui="modern"] #pack-popover .vm-row:focus { outline: none; }
 [data-ui="modern"] #verb-menu .vm-row:focus-visible,
 [data-ui="modern"] #quest-pin-menu .vm-row:focus-visible,
+[data-ui="modern"] .ctx-menu .vm-row:focus-visible,
 [data-ui="modern"] #pack-popover .vm-row:focus-visible { outline: 2px solid var(--focus); outline-offset: -2px; box-shadow: none; }
 [data-ui="modern"] #verb-menu .vm-row[aria-disabled="true"],
+[data-ui="modern"] .ctx-menu .vm-row[aria-disabled="true"],
 [data-ui="modern"] #pack-popover .vm-row[aria-disabled="true"] { color: var(--text-muted); cursor: not-allowed; opacity: 1; }
 [data-ui="modern"] .vm-row .vm-key {
   flex: none;
@@ -10898,6 +10905,7 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
 /* The footer line: the row's explanation, or (red) why it can't be done. */
 [data-ui="modern"] #verb-menu .vm-detail,
 [data-ui="modern"] #quest-pin-menu .vm-detail,
+[data-ui="modern"] .ctx-menu .vm-detail,
 [data-ui="modern"] #pack-popover .vm-detail {
   margin: var(--sp-2) 2px 0;
   padding: var(--sp-3) var(--sp-4);
@@ -10911,8 +10919,9 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
   line-height: 1.35;
   border: 0;
 }
-[data-ui="modern"] :is(#verb-menu, #quest-pin-menu) .vm-detail[hidden] { display: none; }
+[data-ui="modern"] :is(#verb-menu, #quest-pin-menu, .ctx-menu) .vm-detail[hidden] { display: none; }
 [data-ui="modern"] #verb-menu .vm-detail.bad,
+[data-ui="modern"] .ctx-menu .vm-detail.bad,
 [data-ui="modern"] #pack-popover .vm-detail.bad { color: var(--danger); }
 /* The tail at the thing: under the card, or over it when the menu flipped below. */
 [data-ui="modern"] #verb-menu .vm-ptr {
@@ -11450,6 +11459,31 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
 [data-ui="modern"] #quest-pins .tq { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
 @media (prefers-reduced-motion: reduce) {
   [data-ui="modern"] #quest-pin-menu { animation: none; }
+}
+/* RIGHTCLICK (js/ui/context-menu.js): the shared menu a right-click, Shift+F10 or the Menu key opens
+   on a HUD surface (a Quests card, a signpost's arms): the pin menu's card and rows, at the pointer
+   or beside what opened it. Classic draws it with the 2012 verb menu (css/classic.css). */
+.ctx-menu { display: none; }
+[data-ui="modern"] #game-root .ctx-menu:not(.quest-pin-menu):not([hidden]) {
+  position: absolute;
+  z-index: var(--z-dialog);
+  display: block;
+  width: 232px;
+  transform-origin: 0 0;
+}
+[data-ui="modern"] .ctx-menu .ctx-head { padding: 2px var(--sp-3) var(--sp-2); }
+[data-ui="modern"] .ctx-menu .ctx-title {
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text-muted);
+  font-size: var(--fs-s);
+  font-weight: var(--fw-heavy);
+}
+[data-ui="modern"] .ctx-menu .ctx-title:empty { display: none; }
+@media (prefers-reduced-motion: reduce) {
+  [data-ui="modern"] #game-root .ctx-menu { animation: none; }
 }
 /* The Quests card's Pin button. */
 [data-ui="modern"] #quest .qc-pin {
