@@ -91,6 +91,30 @@ export function trayFilters(rows = []) {
   return out;
 }
 
+/**
+ * PURE, ticket 53: the Walls / Floors / Ceilings filter row (SwatchBagUI.as 98-125: an All pane and
+ * one pane per swatch category; BagFilterUI.as addItem / reflow 129-135: small buttons with the
+ * category's name, laid out left to right, sorted by name), for swatch rows ({ category }).
+ * Rows with no category go under Other (BagUI.CATEGORY_OTHER). One category alone needs no row.
+ * @returns {{ id: string, label: string, count: number }[]}
+ */
+export function swatchFilters(rows = []) {
+  const counts = new Map();
+  for (const row of rows) {
+    const cat = String(row?.category || '').trim() || 'Other';
+    counts.set(cat, (counts.get(cat) || 0) + 1);
+  }
+  if (counts.size < 2) return [];
+  const names = [...counts.keys()].sort((a, b) => a.localeCompare(b, 'en', { sensitivity: 'base' }));
+  return [{ id: 'all', label: 'All', count: rows.length }, ...names.map((name) => ({ id: name, label: name, count: counts.get(name) }))];
+}
+
+/** PURE: the swatch rows a filter shows (All, or one category's). */
+export function filterSwatches(rows = [], id = 'all') {
+  if (!id || id === 'all') return rows.slice();
+  return rows.filter((row) => (String(row?.category || '').trim() || 'Other') === id);
+}
+
 /** PURE: the tiles a filter shows (All, or a category's). */
 export function filterTiles(rows = [], paneId = 'all') {
   if (!paneId || paneId === 'all') return rows.slice();
@@ -504,7 +528,7 @@ export function createHomeBuilder({ root, doc = root?.ownerDocument }) {
     }
     parts.push(panel);
     if (m.filters?.length && !m.panelHidden) {
-      parts.push(el(doc, 'div', { class: 'hb-filters', role: 'group', 'aria-label': 'Show furniture' }, m.filters.map((f) => {
+      parts.push(el(doc, 'div', { class: 'hb-filters', role: 'group', 'aria-label': m.filtersLabel || 'Show furniture' }, m.filters.map((f) => {
         const node = el(doc, 'button', {
           type: 'button',
           class: f.id === m.filter ? 'on' : false,

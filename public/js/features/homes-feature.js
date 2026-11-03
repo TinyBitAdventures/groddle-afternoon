@@ -149,12 +149,14 @@ import {
   cultChooseText,
   decorLook,
   edgePan,
+  filterSwatches,
   filterTiles,
   panDirection,
   panKey,
   placeCostText,
+  swatchFilters,
   trayFilters,
-} from '../ui/home-builder.js?v=98b71348';
+} from '../ui/home-builder.js?v=d4e0cb64';
 import { RECIPE_CATALOG } from '../making.js?v=68521d02';
 import {
   createBackYardState,
@@ -3577,9 +3579,17 @@ function swatchTray(engine, kind) {
   const how = kind === 'wall'
     ? 'Pick a swatch, then click a wall: the middle of a segment papers just that segment, anywhere else papers the whole room.'
     : `Pick a swatch, then click the ${kind}.`;
+  // Ticket 53: the categories are the original's filter buttons under the strip (SwatchBagUI), in
+  // plain horizontal words; All keeps each category's name before its swatches, read across too.
+  const all = listTextures(kind);
+  const filters = swatchFilters(all);
+  let filter = swatchFilter[kind] || 'all';
+  if (!filters.some((f) => f.id === filter)) filter = 'all';
+  swatchFilter[kind] = filter;
   const groups = [];
-  for (const row of listTextures(kind)) {
-    if (!groups.length || groups[groups.length - 1].heading !== row.category) groups.push({ heading: row.category, tiles: [] });
+  for (const row of filterSwatches(all, filter)) {
+    const heading = filter === 'all' ? row.category : '';
+    if (!groups.length || groups[groups.length - 1].heading !== heading) groups.push({ heading, tiles: [] });
     const armed = stamping?.kind === kind && stamping.key === row.key;
     const name = row.name;
     groups[groups.length - 1].tiles.push({
@@ -3594,8 +3604,15 @@ function swatchTray(engine, kind) {
   }
   return {
     stripLabel: `${kind[0].toUpperCase()}${kind.slice(1)} swatches`,
-    stripKey: `swatch:${kind}`,
+    stripKey: `swatch:${kind}:${filter}`,
     groups,
+    filters,
+    filter,
+    filtersLabel: `Show ${kind} swatches`,
+    onFilter: (id) => {
+      swatchFilter[kind] = id;
+      renderBar(engine);
+    },
     note: stamping ? `Click the room to apply ${textureConfig(stamping.kind, stamping.key)?.name}. Esc cancels.` : `Now: ${now}. ${how} Swatches are free to apply.`,
   };
 }
@@ -4591,6 +4608,8 @@ let drag = null; // { source: 'tray'|'room', id?, over: 'room'|'tray'|null }
 let carryBy = 'pointer'; // what moves the thing you carry: 'pointer' | 'keys' | 'avatar'
 let keyCarry = null; // the keys' point while carrying with them (world)
 let trayFilter = 'all';
+/** Ticket 53: the Walls / Floors / Ceilings tabs' chosen category ('all' or a category name). */
+const swatchFilter = { wall: 'all', floor: 'all', ceiling: 'all' };
 let hoverId = null;
 let popModel = null;
 let packDrag = null; // { classTsid, count, furniture }

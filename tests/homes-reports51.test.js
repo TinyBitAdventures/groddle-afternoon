@@ -9,10 +9,13 @@ import { join } from 'node:path';
 import { END_SEAM, roomPieces } from '../public/js/home-wallpaper.js?v=f1969400';
 import { WALLPAPER_MAPS } from '../public/js/home-wallpaper-art.js?v=9f8473e6';
 import { DOCK_GAP, DOCK_W, dockedPickerSpot } from '../public/js/furniture-upgrade-picker.js?v=3a637ec8';
+import { filterSwatches, swatchFilters } from '../public/js/ui/home-builder.js?v=d4e0cb64';
+import { listTextures } from '../public/js/home-decor.js?v=39721c9f';
 
 const root = join(import.meta.dirname, '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');
 const homes = read('public/js/features/homes-feature.js');
+const css = read('public/style.css');
 const gsjs = join(root, '../glitch-GameServerJS');
 const client = join(root, '../glitch-client/com/tinyspeck/engine');
 
@@ -99,5 +102,35 @@ describe('52: the style picker stands beside its piece, not over it', () => {
     // _jigger 643-646: _w = 572, less PREVIEW_WH 250, PREVIEW_PADD 10 and _base_padd 20 in place.
     assert.match(src, /_w = 572[\s\S]{0,40}if \(_loc_mode\) \{\s*_w = _w - PREVIEW_WH - PREVIEW_PADD - _base_padd;/);
     assert.match(src, /dest_x \+= Math\.max\(\(dm\.upgrade_itemstack\.client::physWidth\/2\) \+ 50/);
+  });
+});
+
+describe('53: swatch categories read across, as filter buttons', () => {
+  it('All, then each category by name (SwatchBagUI / BagFilterUI)', () => {
+    const rows = listTextures('ceiling');
+    const f = swatchFilters(rows);
+    assert.deepEqual(f.map((x) => x.id), ['all', 'Concrete', 'Novelty', 'Stucco', 'Wood']);
+    assert.equal(f[0].count, rows.length);
+    assert.ok(filterSwatches(rows, 'Novelty').every((r) => r.category === 'Novelty'));
+    assert.ok(filterSwatches(rows, 'Novelty').some((r) => r.key === 'spaceship_ceiling'));
+    assert.equal(filterSwatches(rows, 'all').length, rows.length);
+    assert.deepEqual(swatchFilters([{ category: 'Plain' }]), [], 'one category needs no row');
+    assert.equal(swatchFilters([{ category: 'Plain' }, {}])[2].id, 'Plain');
+  });
+
+  it('the swatch tabs pass the filters to the tray; no label is turned on its side', () => {
+    assert.match(homes, /filters,\s*filter,\s*filtersLabel: `Show \$\{kind\} swatches`/);
+    const rule = css.match(/#game-root \.hb-strip \.hb-group \{[^}]*\}/)[0];
+    assert.doesNotMatch(rule, /writing-mode|rotate/);
+  });
+
+  it('the ceilings are the SWF renders the source named (the Spaceship Ceiling is its riveted panel)', () => {
+    const plan = JSON.parse(read('tools/home-wallpaper/plan.json'));
+    assert.equal(WALLPAPER_MAPS.ceilings.spaceship_ceiling.main, 'spaceship_ceililng');
+    for (const [key, map] of Object.entries(WALLPAPER_MAPS.ceilings)) {
+      const piece = String(map.main).split(',')[0];
+      assert.ok(plan.pieces[piece]?.swf_sha, `${key}: ${piece} rendered from its SWF`);
+      assert.equal(plan.pieces[piece].bundle, 'home_wallpaper', key);
+    }
   });
 });

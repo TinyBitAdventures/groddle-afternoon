@@ -11902,7 +11902,8 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
 #game-root .hb-tray .hb-panel + .hb-foot .hb-tray-note { text-align: left; }
 #game-root .hb-strip { flex: 1 1 auto; display: flex; align-items: stretch; min-width: 0; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x proximity; scrollbar-width: none; overscroll-behavior-x: contain; }
 #game-root .hb-strip::-webkit-scrollbar { display: none; }
-#game-root .hb-strip .hb-group { flex: 0 0 auto; align-self: center; writing-mode: vertical-rl; transform: rotate(180deg); }
+/* Ticket 53: a category's name before its swatches reads across, as every label in SwatchBagUI did. */
+#game-root .hb-strip .hb-group { flex: 0 0 auto; align-self: center; white-space: nowrap; }
 #game-root .hb-strip .hb-empty { align-self: center; margin: 0 auto; }
 #game-root .hb-tile { position: relative; flex: 0 0 auto; display: flex; flex-direction: column; align-items: center; justify-content: center; scroll-snap-align: start; touch-action: pan-x; cursor: grab; font: inherit; }
 #game-root .hb-tile[disabled] { cursor: not-allowed; }
@@ -11995,7 +11996,7 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
 [data-ui="modern"] #game-root .hb-tray .hb-tabs button.on { background: var(--surface-raised); color: var(--text); box-shadow: var(--shadow-1); }
 [data-ui="modern"] #game-root .hb-tray .hb-panel { gap: var(--sp-2); }
 [data-ui="modern"] #game-root .hb-strip { gap: var(--sp-3); padding: 2px; }
-[data-ui="modern"] #game-root .hb-strip .hb-group { padding: 0 var(--sp-1); color: var(--text-muted); font-size: var(--fs-2xs); font-weight: var(--fw-heavy); letter-spacing: 0.06em; text-transform: uppercase; }
+[data-ui="modern"] #game-root .hb-strip .hb-group { padding: 0 var(--sp-2); color: var(--text-muted); font-size: var(--fs-2xs); font-weight: var(--fw-heavy); letter-spacing: 0.06em; text-transform: uppercase; }
 [data-ui="modern"] #game-root .hb-tile {
   width: 76px;
   height: 80px;

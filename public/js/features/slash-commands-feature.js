@@ -40,7 +40,7 @@
  */
 
 import { BUTLER_STRINGS } from '../butler.js?v=86316578';
-import { butlerApi } from './butler-feature.js?v=58b4a597';
+import { butlerApi } from './butler-feature.js?v=3b051429';
 import { hellFeature } from './hell-feature.js?v=e9d00320';
 import { towerApi } from './home-tower-feature.js?v=fa5e5e22';
 import { STUCK_COOLDOWN_MS, STUCK_TEXT, slashPlan, unknownLine } from '../slash-commands.js?v=58e63833';
