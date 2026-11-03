@@ -98,4 +98,19 @@ describe('G174 catalog follow-ups', () => {
     assert.match(page('musicblock_d_blue_02'), /Sometimes drops when you pet a Paper Tree\./);
     assert.match(page('swf_1'), /Sometimes drops when you scrape a Barnacle\./);
   });
+
+  // Ticket 65 follow-up: things a quest room or the tour draws by hand (no class literal for the
+  // inventory scanner to see) are judged in tools/inventory/overrides.json, so the catalog no longer
+  // calls them never finished.
+  it('lists the Esquibeth notes and the tour Chain as in the remake, with where to find them', () => {
+    const overrides = JSON.parse(readFileSync(join(spike, 'tools/inventory/overrides.json'), 'utf8'));
+    for (const id of ['esquibeth_note_1', 'esquibeth_note_2', 'esquibeth_note_3', 'esquibeth_note_4', 'esquibeth_note_5', 'newxp_chain']) {
+      assert.equal(overrides[`item:${id}`]?.status, 'source', id);
+      assert.equal(data.items.find((i) => i.id === id)?.status, 'source', id);
+      assert.match(page(id), /<span class="pill st-source">In the remake<\/span>/, id);
+    }
+    assert.match(readFileSync(join(pub, 'js/quest-rooms/esquibeth.js'), 'utf8'), /function collectNote\(/, 'the room still collects its notes');
+    for (let n = 1; n <= 5; n++) assert.match(page(`esquibeth_note_${n}`), /Found in Esquibeth's grottos on the quest The Last Pilgrimage of Esquibeth/);
+    assert.match(page('newxp_chain'), /Hangs in the clouds on the new player tour/);
+  });
 });

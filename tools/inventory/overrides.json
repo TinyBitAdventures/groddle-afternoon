@@ -728,6 +728,31 @@
   "reason": "Esquibeth's ghost in the Last Pilgrimage room plays its npc_esquibeth_playback sheets (js/quest-rooms/esquibeth.js); the scanner cannot see the room's sheet loader",
   "register": "G121"
  },
+ "item:esquibeth_note_1": {
+  "status": "source",
+  "reason": "how: Found in Esquibeth's grottos on the quest The Last Pilgrimage of Esquibeth: walk into a note to collect it (js/quest-rooms/esquibeth.js:1003 collectNote) | Note 1 of the five Esquibeth hides in her grottos (items/esquibeth_note_1.js: not_selectable, the n key in the location broadcasts it; the remake rings BW_D2); the Last Pilgrimage room places it by number (js/quest-rooms/esquibeth.js stageLayout notes, setupGrotto 841-853) and walking into it collects it (collectNote 1003). The scanner sees no class literal: the room draws it from its note1 art",
+  "register": "G121"
+ },
+ "item:esquibeth_note_2": {
+  "status": "source",
+  "reason": "how: Found in Esquibeth's grottos on the quest The Last Pilgrimage of Esquibeth: walk into a note to collect it (js/quest-rooms/esquibeth.js:1003 collectNote) | Note 2 of the five Esquibeth hides in her grottos (items/esquibeth_note_2.js: not_selectable, the n key in the location broadcasts it; the remake rings BW_E2); the Last Pilgrimage room places it by number (js/quest-rooms/esquibeth.js stageLayout notes, setupGrotto 841-853) and walking into it collects it (collectNote 1003). The scanner sees no class literal: the room draws it from its note2 art",
+  "register": "G121"
+ },
+ "item:esquibeth_note_3": {
+  "status": "source",
+  "reason": "how: Found in Esquibeth's grottos on the quest The Last Pilgrimage of Esquibeth: walk into a note to collect it (js/quest-rooms/esquibeth.js:1003 collectNote) | Note 3 of the five Esquibeth hides in her grottos (items/esquibeth_note_3.js: not_selectable, the n key in the location broadcasts it; the remake rings BW_G2); the Last Pilgrimage room places it by number (js/quest-rooms/esquibeth.js stageLayout notes, setupGrotto 841-853) and walking into it collects it (collectNote 1003). The scanner sees no class literal: the room draws it from its note3 art",
+  "register": "G121"
+ },
+ "item:esquibeth_note_4": {
+  "status": "source",
+  "reason": "how: Found in Esquibeth's grottos on the quest The Last Pilgrimage of Esquibeth: walk into a note to collect it (js/quest-rooms/esquibeth.js:1003 collectNote) | Note 4 of the five Esquibeth hides in her grottos (items/esquibeth_note_4.js: not_selectable, the n key in the location broadcasts it; the remake rings BW_C2); the Last Pilgrimage room places it by number (js/quest-rooms/esquibeth.js stageLayout notes, setupGrotto 841-853) and walking into it collects it (collectNote 1003). The scanner sees no class literal: the room draws it from its note4 art",
+  "register": "G121"
+ },
+ "item:esquibeth_note_5": {
+  "status": "source",
+  "reason": "how: Found in Esquibeth's grottos on the quest The Last Pilgrimage of Esquibeth: walk into a note to collect it (js/quest-rooms/esquibeth.js:1003 collectNote) | Note 5 of the five Esquibeth hides in her grottos (items/esquibeth_note_5.js: not_selectable, the n key in the location broadcasts it; the remake rings BW_A1); the Last Pilgrimage room places it by number (js/quest-rooms/esquibeth.js stageLayout notes, setupGrotto 841-853) and walking into it collects it (collectNote 1003). The scanner sees no class literal: the room draws it from its note5 art",
+  "register": "G121"
+ },
  "npc:npc_swoonerfly": {
   "status": "source",
   "reason": "Gwendolyn's room drops one at your side as npc_squid.js:311-317 createSwoonerfly does (js/quest-rooms/gwendolyn.js swoonerfly()); the three archived world Swoonerflies (Parsin's Trail SW GA51450HIC42Q4I, Tower St West GIF5UU8FO3029OK, Pandhal Pegs GUVNIF7Q9KR2382: street-ecology.json swoonerflies, build-street-ecology.mjs) loop their onCreate 'fly-rooked' state on those streets (js/features/swoonerflies-feature.js), with no verbs and not selectable (npc_swoonerfly.js:35, :104); only the squid calls fall(), so they never fall. Area 42's four (LHF8DDDBTPF3P4U, is_instance tower_quest_desert) are a player's mid-quest squid drops, which the room makes",
@@ -1232,6 +1257,11 @@
  "item:newxp_door": {
   "status": "source",
   "reason": "locations/inc_newxp.js:82 finds the tutorial door; the rebuilt tutorial draws its door into the scene and walks you to it (js/features/newxp-feature.js 1107-1168 to_door)",
+  "register": "G125"
+ },
+ "item:newxp_chain": {
+  "status": "source",
+  "reason": "how: Hangs in the clouds on the new player tour: pull it and you drop out of the sky (js/features/newxp-feature.js:1226 pullChain) | the tutorial's Chain (items/newxp_chain.js, one-click verb pull) hangs in the clouds of the rebuilt tutorial: click it or press Enter and it plays its pull sheet, takes away your perch and you fall (js/features/newxp-feature.js 1094-1120, pullChain 1226). The scanner sees no class literal: the scene draws it from its own sheets",
   "register": "G125"
  },
  "item:moving_quoin": {

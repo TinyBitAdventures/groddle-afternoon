@@ -47,7 +47,8 @@ const root = join(here, '..', '..');
 const pub = join(root, 'public');
 const AUDIT = join(root, '..');
 export const GSJS = join(AUDIT, 'glitch-GameServerJS');
-export const INVENTORY_DB = join(AUDIT, 'research', 'coverage', 'inventory.sqlite');
+/** INVENTORY_DB=<path> reads another copy, as tools/inventory/build.mjs writes one (check a lane's overrides before the shared DB is rebuilt). */
+export const INVENTORY_DB = process.env.INVENTORY_DB || join(AUDIT, 'research', 'coverage', 'inventory.sqlite');
 const OUT = 'encyclopedia/items';
 const ICONS = join(pub, 'assets', 'sprites', 'icons');
 const js = (name) => join(pub, 'js', name);
