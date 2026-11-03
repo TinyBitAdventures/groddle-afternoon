@@ -198,7 +198,7 @@ export async function buildEncyclopedia(data = null) {
     const list = bySection[sec.key];
     list.forEach((e, i) => {
       const p = '../../../';
-      const P = makeParts(p, info);
+      const P = makeParts(p, info, d.nameOf);
       const linkFor = (id) => { const k = d.keyOf(id); return k ? P.href(k) : null; };
       const page = { quests: questPage, animals: creaturePage, people: creaturePage, skills: skillPage, places: placePage, achievements: achievementPage }[sec.key];
       // Bands alternate plain and tinted in the order they appear, whichever ones the entry has.
@@ -208,7 +208,7 @@ export async function buildEncyclopedia(data = null) {
       const desc = plainText(e.quest?.desc || e.creature?.desc || e.skill?.description || e.ach?.desc || e.desc || '').slice(0, 150);
       put(`${OUT}/${sec.key}/${e.id}/index.html`, shell({ p, title: `${e.name} · Groddle Encyclopedia`, description: `${desc ? `${desc} ` : ''}${statusLabel(e.status)}.`, body }));
     });
-    put(`${OUT}/${sec.key}/index.html`, sectionIndex(sec, list, info));
+    put(`${OUT}/${sec.key}/index.html`, sectionIndex(sec, list, info, d.nameOf));
   }
 
   // Search: every entry, items included.
@@ -217,11 +217,13 @@ export async function buildEncyclopedia(data = null) {
     ...[...entries.values()].map((e) => ({ s: e.section, id: e.id, n: e.name, g: e.group || '', st: e.status, ic: e.icon?.src || '', h: pathOf(e.key) })),
   ];
   put(`${OUT}/search.json`, `${JSON.stringify({ sections: [{ key: 'items', label: 'Items' }, ...SECTIONS.map(({ key, label }) => ({ key, label }))], statuses: Object.fromEntries(Object.entries(STATUS).map(([k, v]) => [k, v.label])), inRemake: Object.keys(STATUS).filter(inRemake), entries: search }).replace(/\{"s":/g, '\n{"s":')}\n`);
-  put(`${OUT}/index.html`, homePage(bySection, items, info));
+  put(`${OUT}/index.html`, homePage(bySection, items, info, d.nameOf));
 
   const keys = committedMap();
   for (const path of Object.keys(files)) if (path.endsWith('.html')) files[path] = keyAssetUrls(files[path], path, keys);
-  return { files, counts: Object.fromEntries(SECTIONS.map((s) => [s.key, bySection[s.key].length])), data: d };
+  // The blank stubs left out (data.mjs isBlankStub), per section, items included.
+  const leftOut = Object.fromEntries(['items', ...SECTIONS.map((s) => s.key)].map((k) => [k, [...d.stubs.values()].filter((s) => s.section === k)]));
+  return { files, counts: Object.fromEntries(SECTIONS.map((s) => [s.key, bySection[s.key].length])), leftOut, data: d };
 }
 
 /* -- Quests ------------------------------------------------- */
@@ -234,10 +236,12 @@ function questPage(e, P, { linkFor, backOf, uniqBy, info, d }) {
   const howTiles = [];
   const seen = new Set();
   const addTile = (key, sub) => { if (!seen.has(key) && has(key)) { seen.add(key); howTiles.push(P.tile(key, { sub })); } };
-  const name = (key) => (info(key) ? `<a href="${P.href(key)}">${esc(info(key).name)}</a>` : esc(key.split(':')[1]));
+  const name = (key) => (info(key) ? `<a href="${P.href(key)}">${esc(info(key).name)}</a>` : esc(d.nameOf(key) || key.split(':')[1]));
+  /** The key of a class id the quest names, a left-out stub's too (its name shows as plain text). */
+  const keyOrStub = (id) => d.keyOf(id) || d.stubKey(id);
   for (const t of q.offerTriggers) {
     if (t.type === 'skill') { how.push(`Offered when you learn ${name(`skills:${t.skill}`)}.`); addTile(`skills:${t.skill}`, 'learn it'); }
-    else if (t.type === 'npc') { const k = d.keyOf(t.npc); how.push(`Offered by ${k ? name(k) : esc(t.npc.replace(/_/g, ' '))}.`); if (k) addTile(k, 'talk to them'); }
+    else if (t.type === 'npc') { const k = keyOrStub(t.npc); how.push(`Offered by ${k ? name(k) : esc(t.npc.replace(/_/g, ' '))}.`); if (k) addTile(k, 'talk to them'); }
     else if (t.type === 'quest') { how.push(`Offered after you finish ${name(`quests:${t.quest}`)}.`); addTile(`quests:${t.quest}`, 'finish it first'); }
     else if (t.type === 'achievement') { how.push(`Offered once you earn ${name(`achievements:${t.achievement}`)}.`); addTile(`achievements:${t.achievement}`, 'earn it first'); }
     else if (t.type === 'level') how.push(`Offered once you reach level ${fmt(t.level)}.`);
@@ -277,10 +281,10 @@ function questPage(e, P, { linkFor, backOf, uniqBy, info, d }) {
       parts.push(recipe ? P.recipeRow(recipe, { note: r.num > 1 ? `make ${fmt(r.num)}` : '' }) : P.tiles([P.tile(`item:${r.outputClass}`, { n: r.num })]));
     } else if (r.type === 'counter' || r.type === 'flag') {
       if (/^toggle flag/.test(r.desc || '')) title = r.name === 'leave' ? 'Leave when you are done.' : 'Finish what this place asks of you.';
-      const k = d.keyOf(r.classId);
+      const k = keyOrStub(r.classId);
       if (k) parts.push(P.tiles([P.tile(k, { n: r.type === 'counter' ? r.num : null })]));
     } else if (r.type === 'currants') parts.push(P.chips([P.currants(r.num, 'ency-chip')]));
-    else if (r.classId) { const k = d.keyOf(r.classId); if (k) parts.push(P.tiles([P.tile(k, { n: r.num })])); }
+    else if (r.classId) { const k = keyOrStub(r.classId); if (k) parts.push(P.tiles([P.tile(k, { n: r.num })])); }
     return `<li><p class="ency-step-title">${title || 'Do what the quest asks.'}</p>${parts.join('')}</li>`;
   });
   if (q.timer?.durationSec) steps.push(`<li><p class="ency-step-title">All of it within ${learnTime(q.timer.durationSec * 10)}: a countdown runs from the moment you take the quest, and the quest fails if it runs out.</p></li>`);
@@ -289,7 +293,7 @@ function questPage(e, P, { linkFor, backOf, uniqBy, info, d }) {
   const where = [];
   const whereTiles = [];
   if (q.instanceRoom || q.instanced) where.push('This quest takes you to a place of its own: take it, and the game sends you there.');
-  const back2 = uniqBy(q.endNpcs.map((n) => d.keyOf(n)).filter(Boolean), (x) => x);
+  const back2 = uniqBy(q.endNpcs.map(keyOrStub).filter(Boolean), (x) => x);
   if (back2.length) { where.push(`Hand it in to ${andList(back2.map(name))}.`); back2.forEach((k) => whereTiles.push(P.tile(k, { sub: 'hand it in' }))); }
   else if (q.familiarTurnin) where.push('Hand it in to your Magic Rock, wherever you are.');
 
@@ -471,9 +475,9 @@ ${remakeBand(e)}
 
 const GROUP_WORD = { quests: 'Kind', animals: 'Kind', people: 'Kind', skills: 'Category', places: 'Kind', achievements: 'Category' };
 
-function sectionIndex(sec, list, info) {
+function sectionIndex(sec, list, info, nameOf) {
   const p = '../../';
-  const P = makeParts(p, info);
+  const P = makeParts(p, info, nameOf);
   const groups = [...new Set(list.map((e) => e.group))];
   const inCount = list.filter((e) => inRemake(e.status)).length;
   const groupHtml = groups.map((g) => {
@@ -514,9 +518,9 @@ ${groups.map((g) => { const pic = list.find((e) => e.group === g && e.icon)?.ico
   return shell({ p, title: `${sec.label} · Groddle Encyclopedia`, description: `${sec.blurb} ${inCount} of ${list.length} are in the Groddle Afternoon remake.`, body, script: true });
 }
 
-function homePage(bySection, items, info) {
+function homePage(bySection, items, info, nameOf) {
   const p = '../';
-  const P = makeParts(p, info);
+  const P = makeParts(p, info, nameOf);
   const itemsIn = [...items.values()].filter((i) => inRemake(i.status)).length;
   const sample = { quests: 'quests:animalkinship_nibble_meat', animals: 'animals:npc_piggy', people: 'people:street_spirit', skills: 'skills:animalkinship_1', places: 'places:groddle-meadow', achievements: 'achievements:bacon_biter' };
   const card = (href, label, n, blurb, pic) => `<li><a class="ency-card" href="${href}">${P.img(pic, 'ency-card-ic', 64)}<span class="ency-card-text"><span class="ency-card-name">${esc(label)} <span class="count">${fmt(n)}</span>${sep('.')}</span> <span class="ency-card-blurb">${esc(blurb)}</span></span></a></li>`;
@@ -584,7 +588,8 @@ export function staleFiles(files) {
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const t0 = performance.now();
-  const { files, counts } = await buildEncyclopedia();
+  const { files, counts, leftOut } = await buildEncyclopedia();
+  console.log(`Blank stubs left out: ${Object.entries(leftOut).map(([k, l]) => `${l.length} ${k}`).join(', ')}`);
   if (process.argv.includes('--check')) {
     const stale = staleFiles(files);
     if (stale.length) {

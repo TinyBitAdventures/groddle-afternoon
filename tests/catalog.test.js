@@ -11,6 +11,7 @@ import { join, resolve } from 'node:path';
 import { GSJS, INVENTORY_DB, readInventory } from '../tools/catalog/build.mjs';
 import { siteNav } from '../tools/changelog/build.mjs';
 import { committedMap, keyAssetUrls } from '../tools/data-versions/build.mjs';
+import { loadEncyclopedia } from '../tools/encyclopedia/data.mjs';
 import { servedByMinn } from './minn-served.js';
 
 const spike = join(import.meta.dirname, '..');
@@ -21,7 +22,9 @@ const data = JSON.parse(readFileSync(join(items, 'data.json'), 'utf8'));
 const skipWithoutInventory = existsSync(INVENTORY_DB) ? false : `needs the coverage inventory at ${INVENTORY_DB}`;
 const inventory = skipWithoutInventory ? new Map() : readInventory();
 const gsjsIds = readdirSync(join(GSJS, 'items')).filter((f) => f.endsWith('.js')).map((f) => f.slice(0, -3));
-const listed = gsjsIds.filter((id) => inventory.has(id) && inventory.get(id).status !== 'excluded');
+// Blank stubs get no page (tools/encyclopedia/data.mjs isBlankStub, tests/encyclopedia-stubs.test.js).
+const stubIds = skipWithoutInventory ? new Set() : new Set([...(await loadEncyclopedia()).stubs.values()].filter((s) => s.section === 'items').map((s) => s.id));
+const listed = gsjsIds.filter((id) => inventory.has(id) && inventory.get(id).status !== 'excluded' && !stubIds.has(id));
 const excluded = gsjsIds.filter((id) => inventory.get(id)?.status === 'excluded');
 const pages = data.items.map((i) => ({ id: i.id, file: `encyclopedia/items/${i.id}/index.html`, html: readFileSync(join(items, i.id, 'index.html'), 'utf8') }));
 const index = { id: '', file: 'encyclopedia/items/index.html', html: readFileSync(join(items, 'index.html'), 'utf8') };
@@ -35,7 +38,9 @@ describe('item catalog', () => {
     assert.deepEqual(data.items.map((i) => i.id).sort(), [...listed].sort());
     for (const id of listed) assert.ok(existsSync(join(items, id, 'index.html')), id);
     for (const id of excluded) assert.ok(!existsSync(join(items, id)), `excluded ${id} has a page`);
+    for (const id of stubIds) assert.ok(!existsSync(join(items, id)), `blank stub ${id} has a page`);
     assert.equal(data.counts.excluded, excluded.length);
+    assert.equal(data.counts.stubs, stubIds.size);
     assert.equal(data.counts.listed, listed.length);
     // GSJS non-items (NPCs, include/, catalogs) are not in the inventory's item list at all.
     assert.ok(!data.items.some((i) => /^npc_/.test(i.id) && !inventory.has(i.id)));
@@ -60,7 +65,9 @@ describe('item catalog', () => {
     for (const key of Object.keys(data.counts.byStatus)) {
       assert.equal(data.counts.byStatus[key], data.items.filter((i) => i.status === key).length, key);
     }
-    assert.match(index.html, new RegExp(`<strong>${data.counts.byStatus.source.toLocaleString('en-US')}</strong> of ${data.counts.listed.toLocaleString('en-US')} items are in the remake`));
+    // In the remake as the encyclopedia counts it (multiplayer included), so its home and this page agree.
+    assert.equal(data.counts.inRemake, data.counts.byStatus.source + data.counts.byStatus.multiplayer);
+    assert.match(index.html, new RegExp(`<strong>${data.counts.inRemake.toLocaleString('en-US')}</strong> of ${data.counts.listed.toLocaleString('en-US')} items are in the remake`));
   });
 
   it('gives every item in the remake a way to get it, and none to the rest', () => {

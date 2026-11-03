@@ -12,6 +12,8 @@ const ICONS = '../../assets/sprites/icons/';
 const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 const fmt = (n) => n.toLocaleString('en-US');
+/** Statuses the encyclopedia counts as in the remake (tools/encyclopedia/parts.mjs STATUS): the page's headline and this count agree. */
+const IN_REMAKE = new Set(['source', 'rebuilt', 'reimagined', 'solo', 'partial', 'multiplayer']);
 /** Lower case, accents and punctuation folded, for search. */
 const fold = (s) => String(s).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, ' ');
 
@@ -82,7 +84,7 @@ async function main() {
         && (!state.get.size || item.get.some((g) => state.get.has(g)))
         && words.every((w) => hay[i].includes(w));
       if (rows[i].hidden === ok) rows[i].hidden = !ok;
-      if (ok) { shown += 1; if (item.status === 'source') inRemake += 1; }
+      if (ok) { shown += 1; if (IN_REMAKE.has(item.status)) inRemake += 1; }
     });
     for (const c of statusChips) c.setAttribute('aria-pressed', String(c.dataset.status === state.status));
     for (const c of getChips) c.setAttribute('aria-pressed', String(state.get.has(c.dataset.get)));

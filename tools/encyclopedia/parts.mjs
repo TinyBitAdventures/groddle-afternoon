@@ -47,10 +47,12 @@ export function pathOf(key) {
 }
 
 /**
- * Parts bound to a page: `p` is the path from the page to the site root, and
- * `info(key)` names any key ({ name, icon, status } or null).
+ * Parts bound to a page: `p` is the path from the page to the site root,
+ * `info(key)` names any key that has a page ({ name, icon, status } or null),
+ * and `nameOf(key)` names one that has none (a blank stub left out,
+ * data.mjs isBlankStub), so its tile is its name in plain text.
  */
-export function makeParts(p, info) {
+export function makeParts(p, info, nameOf = () => null) {
   const href = (key) => `${p}${pathOf(key)}`;
   const img = (pic, cls = 'ency-ic', size = 48) => {
     if (!pic) return `<span class="${cls} cat-ph" aria-hidden="true"></span>`;
@@ -63,7 +65,7 @@ export function makeParts(p, info) {
   /** A small picture card for one thing. opts: sub (a short line), n (a count), anchor (#id), title. */
   const tile = (key, opts = {}) => {
     const it = info(key);
-    const name = opts.name || it?.name || key.slice(key.indexOf(':') + 1);
+    const name = opts.name || it?.name || nameOf(key) || key.slice(key.indexOf(':') + 1);
     const n = opts.n && Number(opts.n) !== 1 ? `<span class="ency-n">×${esc(fmt(opts.n))}</span>` : '';
     const sub = opts.sub ? ` <span class="ency-tile-sub">${opts.sub}</span>` : '';
     const body = `<span class="ency-tile-pic">${img(it?.icon, 'ency-ic', 48)}${n}</span> <span class="ency-tile-name">${esc(name)}${sub ? sep() : ''}</span>${sub}`;

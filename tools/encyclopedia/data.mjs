@@ -17,12 +17,17 @@
  *  - assets/maps/hubs/hub-<id>.json (the 2012 hub maps: streets, store, shrine),
  *    assets/streets/index.json and assets/content/street-ecology.json.
  *  - js/vendor.js stores, js/foxes.js Fox Ranger store, js/bureaucracy.js.
+ *  - for the blank stubs left out (isBlankStub): assets/content/recipes.json,
+ *    buffs.json, js/drop-tables-data.js, js/resource-nodes.js, js/patches.js,
+ *    js/artifacts.js and tools/job-obtainable.mjs supplyConversions.
  */
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { DatabaseSync } from 'node:sqlite';
 import { GSJS, INVENTORY_DB, readGsjsItem } from '../catalog/build.mjs';
 import { readSkills } from '../inventory/gsjs-data.mjs';
+import { supplyConversions } from '../job-obtainable.mjs';
+import { inRemake, plainText } from './parts.mjs';
 
 const root = join(import.meta.dirname, '..', '..');
 export const PUB = join(root, 'public');
@@ -371,19 +376,147 @@ export async function loadEncyclopedia({ inventory = readInventoryAll() } = {}) 
   }
 
   // The way back: key -> [{ from, rel, ...extra }].
-  const back = new Map();
-  for (const e of entries.values()) {
-    for (const r of e.refs) {
-      if (!back.has(r.to)) back.set(r.to, []);
-      back.get(r.to).push({ ...r, from: e.key });
+  const backOf = () => {
+    const out = new Map();
+    for (const e of entries.values()) {
+      for (const r of e.refs) {
+        if (!out.has(r.to)) out.set(r.to, []);
+        out.get(r.to).push({ ...r, from: e.key });
+      }
     }
+    return out;
+  };
+
+  /* Blank stubs (isBlankStub): left out of every section, and every link to one becomes its name in plain text. */
+  const stubs = await findStubs({ entries, items, back: backOf(), recipes, vendor, foxes, bureaucracy, ecology });
+  for (const s of stubs.values()) {
+    if (s.section === 'items') items.delete(s.id);
+    else entries.delete(s.key);
   }
+  for (const e of entries.values()) e.refs = e.refs.filter((r) => !stubs.has(r.to));
+  const back = backOf();
   // Skill trees: postSkills come back as needs-skill, so "unlocks" reads from back.
 
   // Store key (js/vendor.js profile, fox_ranger, bureaucracy) -> the entry that keeps it.
   const stores = new Map([...entries.values()].filter((e) => e.store).map((e) => [e.store.key, e.key]));
   if (entries.has('people:npc_rare_item_vendor')) stores.set('rare_item_vendor', 'people:npc_rare_item_vendor');
-  return { entries, items, back, recipes, keyOf, skills, stores };
+  /** A left-out stub's key for a class id named in the data (a creature, person or item), or null. */
+  const stubKey = (id) => ['animals', 'people', 'item'].map((sec) => `${sec}:${id}`).find((k) => stubs.has(k)) || null;
+  /** The name of any key, a left-out stub's included (for the plain text that replaces its links). */
+  const nameOf = (key) => (key.startsWith('item:') ? items.get(key.slice(5))?.name : entries.get(key)?.name) || stubs.get(key)?.name || null;
+  return { entries, items, back, recipes, keyOf, skills, stores, stubs, stubKey, nameOf };
+}
+
+/* -- Blank stubs ------------------------------------------- */
+
+/**
+ * A blank stub is an entry with nothing to show (Austin 2026-11-03: "leave the
+ * blank pages out of the encyclopedia"; the example was Kitty, npc_kitty). It
+ * gets no page, no search row and no place in any count, in every section
+ * (items too: tools/catalog/build.mjs reads the same list). An entry is one
+ * when ALL of these hold (each a field of `f`, filled in by findStubs):
+ *
+ *  1. status: not in the remake (never finished, not yet or lost: parts.mjs STATUS inRemake false);
+ *  2. art: no picture of its own (pack icon, still, Cubimal, Giant's icon,
+ *     badge, map). The quest book every quest shares is not one;
+ *  3. desc: Tiny Speck's description is empty, or only says its name (or its id);
+ *  4. content: no content of its own on the page: no steps or rewards (a
+ *     quest), no Giants, requirements, learn time or quest (a skill), no
+ *     conditions, rewards or status text (an achievement), no streets (a
+ *     place), no store or other shrines (a person), no info lines or buffs (an item);
+ *  5. linked: no other kept entry links to it: no quest that needs, gives,
+ *     rewards, involves or mentions it, no achievement that counts or rewards
+ *     it, no skill, creature or person that names it, no region whose streets
+ *     hold it. A quest that only names it as the one who offers the quest or
+ *     takes it back does not count: nobody met a creature or person that was
+ *     never in the game (Kitty: npc_kitty.js:731 offers The Greedy Street
+ *     Spirit only when the class is npc_piggy; Black Juju: manor_mystery.js:20
+ *     end_npcs, a quest the original never offered either);
+ *  6. used: the remake's own systems never name it: no recipe takes, makes or
+ *     needs it as the tool, no store sells it, no drop table, harvest or other
+ *     conversion gives or takes it;
+ *  7. placed: no archived street holds one (street-ecology.json counts).
+ *
+ * What a creature's or item's own class file lists (its verbs, the items it
+ * would create, the skills it checks) is not content for this rule: in a class
+ * nobody ever met, that is code it inherits (npc_kitty.js carries npc_animal's
+ * Piggy code: nibble for Meat, the Animal Kinship checks, the quest above).
+ */
+export function isBlankStub(f) {
+  return !inRemake(f.status) && !f.art && !hasWords(f.desc, f.name, f.id) && !f.content && !f.linked && !f.used && !f.placed;
+}
+
+const bare = (s) => String(s ?? '').toLowerCase().replace(/[^a-z0-9]+/g, '');
+/** Whether a description says anything beyond the name (markup stripped). */
+export function hasWords(desc, name = '', id = '') {
+  const text = bare(plainText(desc));
+  return Boolean(text) && text !== bare(name) && text !== bare(id);
+}
+
+/** Quest relations that only name who offers a quest or takes it back (rule 5). */
+const NAMING_ONLY = new Set(['giver', 'return-to']);
+const QUEST_BOOK = 'assets/ui/quest-book.png';
+const filled = (o) => Object.values(o || {}).some((v) => (v && typeof v === 'object' ? Object.keys(v).length : Boolean(v)));
+
+/** Every class id the remake's systems name (rule 6): recipes, stores, drop tables, harvests and conversions. */
+async function remakeClassIds({ recipes, vendor, foxes, bureaucracy }) {
+  const ids = new Set();
+  const collect = (v) => { for (const m of JSON.stringify(v ?? null).matchAll(/"([a-z0-9_]+)"/g)) ids.add(m[1]); };
+  collect(recipes);
+  collect(Object.values(vendor.VENDOR_PROFILES).map((p) => p.offers.map((o) => o.classTsid)));
+  collect(foxes.FOX_RANGER_STORE.items.map((o) => o.classTsid));
+  collect(Object.keys(bureaucracy.BUREAUCRACY_ITEMS));
+  collect((await import(js('drop-tables-data.js'))).DROP_TABLES);
+  const nodes = await import(js('resource-nodes.js'));
+  collect([nodes.RESOURCE_DROP_TABLES, nodes.RESOURCE_NODE_CATALOG]);
+  const patches = await import(js('patches.js'));
+  collect([patches.SOIL_DROP_TABLES, patches.SOIL_ITEM_DEFS]);
+  const artifacts = await import(js('artifacts.js'));
+  collect([artifacts.CRACK_STEPS, artifacts.ARTIFACT_MAP, artifacts.ARTIFACT_NECKLACES]);
+  collect(await supplyConversions());
+  return ids;
+}
+
+/** The blank stubs among the entries and items: key -> { key, section, id, name, status }. */
+async function findStubs({ entries, items, back, recipes, vendor, foxes, bureaucracy, ecology }) {
+  const used = await remakeClassIds({ recipes, vendor, foxes, bureaucracy });
+  const placed = new Set(Object.values(ecology).flatMap((st) => Object.keys(st.counts || {})));
+  const buffed = new Set(Object.values(content('buffs.json')).map((b) => b.itemClass).filter(Boolean));
+  const ownContent = (e) => {
+    if (e.section === 'quests') return e.quest.requirements.length > 0 || filled(e.quest.rewards) || (e.quest.giveItems || []).length > 0;
+    if (e.section === 'skills') {
+      const s = e.skill;
+      return filled(s.giants) || [s.reqSkills, s.reqQuests, s.reqAchievements].some((l) => l?.length) || Boolean(s.questId || s.requiresLevel || s.pointCost || s.learned);
+    }
+    if (e.section === 'achievements') return (e.ach.conditions || []).length > 0 || filled(e.ach.rewards) || Boolean(e.ach.statusText);
+    if (e.section === 'places') return e.streets.length > 0;
+    return Boolean(e.store?.offers?.length || e.variants?.length);
+  };
+  const candidates = [];
+  for (const e of entries.values()) {
+    if (inRemake(e.status)) continue;
+    const desc = e.quest?.desc || e.creature?.desc || e.skill?.description || e.ach?.desc || e.desc || '';
+    candidates.push({ key: e.key, section: e.section, id: e.id, name: e.name, status: e.status, art: Boolean(e.icon && e.icon.src !== QUEST_BOOK), desc, content: ownContent(e) });
+  }
+  for (const it of items.values()) {
+    if (inRemake(it.status) || it.icon) continue;
+    const g = readGsjsItem(it.id);
+    candidates.push({ key: `item:${it.id}`, section: 'items', id: it.id, name: it.name, status: it.status, art: false, desc: g.desc, content: g.extras.length > 0 || buffed.has(it.id) });
+  }
+  // Links from a stub do not keep another stub: repeat until nothing more drops out.
+  const stubs = new Map();
+  for (let grew = true; grew;) {
+    grew = false;
+    for (const c of candidates) {
+      if (stubs.has(c.key)) continue;
+      const linked = (back.get(c.key) || []).some((b) => b.from !== c.key && !stubs.has(b.from) && !NAMING_ONLY.has(b.rel));
+      if (isBlankStub({ ...c, linked, used: used.has(c.id), placed: placed.has(c.id) })) {
+        stubs.set(c.key, { key: c.key, section: c.section, id: c.id, name: c.name, status: c.status });
+        grew = true;
+      }
+    }
+  }
+  return stubs;
 }
 
 /* -- Helpers ------------------------------------------- */

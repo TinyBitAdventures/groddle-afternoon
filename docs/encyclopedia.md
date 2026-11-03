@@ -92,6 +92,30 @@ In the remake, Rebuilt (from footage), Reimagined, Adapted for solo, Partly
 in, In multiplayer, Not yet, Lost, Never finished. One sentence under the badge
 says what that means for this kind of entry (ours).
 
+## Blank stubs are left out
+
+Austin, 2026-11-03: "leave the blank pages out of the encyclopedia" (the
+example was Kitty, `npc_kitty`). An entry gets no page, no search row and no
+place in any count when it is not in the remake (Never finished, Not yet or
+Lost), has no art of its own, no description beyond its name, no content of
+its own (steps, rewards, Giants, conditions, streets, a store, info lines,
+buffs), no link from another entry (a quest that only names it as who offers
+or takes back the quest does not count), nothing in the remake's recipes,
+stores, drop tables or conversions that names it, and no archived street
+holding one. What its own class file lists (verbs, items it would create,
+skills it checks) does not count: in a class nobody met, that is inherited
+code. The rule is `isBlankStub` in `tools/encyclopedia/data.mjs`; the item
+catalog reads the same list, and both builders print how many each section
+leaves out. A link to a stub becomes its name in plain text.
+`tests/encyclopedia-stubs.test.js` checks the rule, that nothing built links
+to a stub's old address, and that every count agrees with the pages.
+
+On 2026-11-03 that left out 11: Kitty and Black Juju (animals), Dumb Bot and
+A Grendelian Stone (people), quest_map (skills), and Storage Display Box,
+Classic Axe, Fireworks, Quoin Marker, Paper Plane and Token of Appreciation
+(items). Their old addresses 404 after a deploy (`kinsta.sh` rsyncs with
+`--delete`).
+
 ## Search
 
 `/encyclopedia/search.json` lists every entry in every section (items from
