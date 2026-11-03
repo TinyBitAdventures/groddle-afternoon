@@ -152,3 +152,11 @@ describe('55: a price tag goes where its piece goes', () => {
     assert.match(street, /salesKey = salePlacementKey\(decor\.placed, geo\.house\.roomX\);/);
   });
 });
+
+describe('56: the signpost editor comes back with live buttons', () => {
+  it('the arms are drawn after busy is cleared', () => {
+    const body = street.slice(street.indexOf('async function signpostChange'), street.indexOf('function addNeighbor'));
+    assert.ok(body.indexOf('busy = false;') < body.lastIndexOf('openSignpost();'), 'openSignpost runs once the change is done');
+    assert.doesNotMatch(body.slice(body.indexOf('try {'), body.indexOf('} catch')), /openSignpost\(\)/);
+  });
+});

@@ -827,13 +827,14 @@ function createSession(engine, client) {
   async function signpostChange(run, ok) {
     if (busy) return;
     busy = true;
+    let changed = false;
     try {
       const answer = await run();
       own.neighbors = signpostArms(answer?.neighbors).filter(Boolean);
       ok?.(answer);
       if (answer?.five === true || own.neighbors.length >= GOOD_NEIGHBOUR_AT) goodNeighbour();
       client.send('home_refresh', { what: 'signpost' });
-      openSignpost();
+      changed = true;
     } catch (err) {
       panelNote(err?.message || T.couldNotAdd);
       notice(err?.message || T.couldNotAdd, 3000);
@@ -841,6 +842,9 @@ function createSession(engine, client) {
       busy = false;
       if (where() === 'street') drawOwn();
     }
+    // Ticket 56: back to the arms once the change is done, so their Add and Remove buttons are live
+    // (drawn while still busy, they stayed disabled until the panel was closed and opened again).
+    if (changed) openSignpost();
   }
 
   function addNeighbor(position, friend) {
