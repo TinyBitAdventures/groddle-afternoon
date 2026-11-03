@@ -2691,135 +2691,135 @@
   ]
  },
  "release": {
-  "game": "0.14.0",
+  "game": "0.15.0",
   "deployed": "2026-11-03"
  },
  "git": {
-  "commits": 962,
+  "commits": 1157,
   "since": "2026-10-19",
   "recent": [
    {
-    "date": "2026-10-31",
-    "kind": "new",
-    "text": "Ride the subway together: players boarding the same line share one train, and a Bureaucratic Hall's bureaucrats serve one player at a time for everyone"
+    "date": "2026-11-03",
+    "kind": "improve",
+    "text": "A report's picture opens over the game, not in a new browser tab"
    },
    {
-    "date": "2026-10-31",
+    "date": "2026-11-03",
     "kind": "new",
-    "text": "Write to other players online: a letter, a stack and currants, the Frog brings parcels, your Butler says you have mail"
+    "text": "Right-click a bag in the pack for its options"
    },
    {
-    "date": "2026-10-31",
-    "kind": "new",
-    "text": "Math Mayhem, the crowd game on the Game of Crowns arena, between real players"
-   },
-   {
-    "date": "2026-10-31",
-    "kind": "new",
-    "text": "Online, street Chickens, Butterflies and Batterflies are shared: both players see them in the same place, see each other squeeze and milk them, and an egg under a Chicken is one player's"
-   },
-   {
-    "date": "2026-10-31",
-    "kind": "new",
-    "text": "A zone's art pack can ask the Gemini API for its pictures instead of a chat by hand"
-   },
-   {
-    "date": "2026-10-31",
+    "date": "2026-11-03",
     "kind": "fix",
-    "text": "Trees, rocks and stalls keep clear of doors, ladders and signposts, and Chickens and Piggies stay on the ground"
+    "text": "Item menus and the encyclopedia no longer cite the game's source files"
    },
    {
-    "date": "2026-10-31",
-    "kind": "new",
-    "text": "A little \"…\" shows over a player starting to say something, and your Butler IMs you about visitors and speaks for you on your home street"
-   },
-   {
-    "date": "2026-10-31",
-    "kind": "new",
-    "text": "An art bible and image-model prompts for a zone, and intake for the pictures that come back"
-   },
-   {
-    "date": "2026-10-31",
-    "kind": "new",
-    "text": "On a phone, Play opens a small companion for your reports, mail and friends"
-   },
-   {
-    "date": "2026-10-31",
-    "kind": "improve",
-    "text": "Vicar's Peak is home to 6 Piggies and 4 Chickens, between its loading card and its street page"
-   },
-   {
-    "date": "2026-10-31",
-    "kind": "improve",
-    "text": "Vicar's Peak's ledges sit closer together, its top door stands on a short ledge of its own and the pine grows a row lower"
-   },
-   {
-    "date": "2026-10-31",
-    "kind": "improve",
-    "text": "The Mezzanine is the full Rook Museum lobby: pillars between the signs, a dark floor over warm floorboards, and six currant quoins hidden under it"
-   },
-   {
-    "date": "2026-10-31",
-    "kind": "improve",
-    "text": "The welcome card is easier to read: the start buttons up top, today's goals in one box, and the keys in tidy Move, Do and Open lists"
-   },
-   {
-    "date": "2026-10-31",
+    "date": "2026-11-03",
     "kind": "fix",
-    "text": "Each tool wears on its own: a new pick is new, mining wears only the pick in use, a repair mends the one you chose"
+    "text": "Clicking Mute, a switch or a slider gives the keys back to the world, so Space jumps"
    },
    {
-    "date": "2026-10-31",
+    "date": "2026-11-03",
     "kind": "fix",
-    "text": "A revive dose stays on the animal you gave it to, so the other Butterflies no longer say you already helped them"
+    "text": "A Ticket to Paradise used in your house brings you back into your house"
    },
    {
-    "date": "2026-10-31",
-    "kind": "improve",
-    "text": "Every Zoom slider names its keys, and 0 says how to zoom back out"
-   },
-   {
-    "date": "2026-10-31",
+    "date": "2026-11-03",
     "kind": "fix",
-    "text": "A stack that fills up in a bag stays in its slot, and only the extra opens a new stack"
+    "text": "After a click opens a window, Esc gives the keys back to the world, so Space jumps"
    },
    {
-    "date": "2026-10-31",
+    "date": "2026-11-03",
     "kind": "improve",
-    "text": "Piggies, Chickens and Batterflies are back where the live street pages listed them: 1,074 Piggies, 1,547 Chickens and 139 Batterflies"
+    "text": "The start card lists V for a vendor nearby again"
    },
    {
-    "date": "2026-10-31",
-    "kind": "improve",
-    "text": "Room 23 has an upper floor: the vine posts under the up arrow are a ladder up to where Gwendolyn waits"
-   },
-   {
-    "date": "2026-10-31",
-    "kind": "improve",
-    "text": "The Ventilation Room is a tall root cave of tangled trunks, rope bridges and plank steps between its three doors"
-   },
-   {
-    "date": "2026-10-31",
-    "kind": "improve",
-    "text": "Martleby Hare's cliff drops down seven staggered rows of ledges to a door in the middle of the floor"
-   },
-   {
-    "date": "2026-10-31",
-    "kind": "improve",
-    "text": "Room 15 is a dark root cave: a plank deck, two little bridges over the void and the key by a trunk door"
-   },
-   {
-    "date": "2026-10-31",
-    "kind": "improve",
-    "text": "The Stairs up Jethimadh Tower are one long tube climbing to the Mezzanine door, no ladder"
-   },
-   {
-    "date": "2026-10-31",
+    "date": "2026-11-03",
     "kind": "new",
-    "text": "Every home page photo opens full size, and the photos show today's game"
+    "text": "Your looks in the character builder: the looks you have worn, one click to wear again or remove"
+   },
+   {
+    "date": "2026-11-03",
+    "kind": "new",
+    "text": "F asks \"Eat what?\" with the best food picked, / jumps to chat and R opens Report a bug"
+   },
+   {
+    "date": "2026-11-03",
+    "kind": "improve",
+    "text": "Clicking the street name at the top opens the Map"
+   },
+   {
+    "date": "2026-11-03",
+    "kind": "new",
+    "text": "Open your cabinets, and sell from a Storage Display Box to visitors"
+   },
+   {
+    "date": "2026-11-03",
+    "kind": "new",
+    "text": "Your whole home street goes on your profile, so visitors can look along it like Camera Mode"
+   },
+   {
+    "date": "2026-11-03",
+    "kind": "fix",
+    "text": "The Esquibeth notes and the tour Chain read \"In the remake\" on their encyclopedia pages"
+   },
+   {
+    "date": "2026-11-03",
+    "kind": "fix",
+    "text": "A tree, rock or Piggy is never set where you can't reach it from beside it"
+   },
+   {
+    "date": "2026-11-03",
+    "kind": "fix",
+    "text": "The new broken tool icons and the changed encyclopedia and ecology files load fresh, not from an old cache"
+   },
+   {
+    "date": "2026-11-03",
+    "kind": "fix",
+    "text": "The encyclopedia knows the notes and things you find in quest rooms"
+   },
+   {
+    "date": "2026-11-03",
+    "kind": "fix",
+    "text": "Encyclopedia text reads right when copied or read aloud"
+   },
+   {
+    "date": "2026-11-03",
+    "kind": "improve",
+    "text": "The Map shows which streets are still under construction"
+   },
+   {
+    "date": "2026-11-03",
+    "kind": "fix",
+    "text": "Every star in Constellation shows, clear of the windows and the EXIT door"
+   },
+   {
+    "date": "2026-11-03",
+    "kind": "fix",
+    "text": "A broken pick no longer swings, and broken picks, hoes and grinders look broken in the pack"
+   },
+   {
+    "date": "2026-11-03",
+    "kind": "fix",
+    "text": "Include the game's UI shows unticked when no picture goes, and you can search your reports"
+   },
+   {
+    "date": "2026-11-03",
+    "kind": "fix",
+    "text": "Rocks, quoins and Musicblocks no longer sit on floors nobody can reach"
+   },
+   {
+    "date": "2026-11-03",
+    "kind": "fix",
+    "text": "No blue line around the whole screen when the game gets the keyboard back"
+   },
+   {
+    "date": "2026-11-03",
+    "kind": "fix",
+    "text": "After visiting a friend's home from yours, the World menu's Home offers Teleport home again"
    }
   ]
  },
  "tests": 624,
- "generatedAt": "2026-10-31"
+ "generatedAt": "2026-11-03"
 }
