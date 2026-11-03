@@ -276,8 +276,10 @@ export function createHomeBuilder({ root, doc = root?.ownerDocument }) {
   const tray = el(doc, 'div', { class: 'hb-tray', id: 'homes-tray', role: 'region' });
   const keysHelp = el(doc, 'p', { class: 'hb-sr', id: 'homes-keys-help', text: BUILDER_TEXT.keys });
   bar.append(banner, tray, keysHelp);
-  const pop = el(doc, 'div', { class: 'hb-pop', id: 'homes-pop', role: 'toolbar', hidden: true });
-  const place = el(doc, 'button', { type: 'button', class: 'hb-place', id: 'homes-place', hidden: true });
+  // RIGHTCLICK (js/ui/context-guard.js): the floating actions and Place sit over the room, where a
+  // right-click selects a piece and shows its actions: never the browser's menu over them.
+  const pop = el(doc, 'div', { class: 'hb-pop', id: 'homes-pop', role: 'toolbar', hidden: true, 'data-ctx': 'home-edit' });
+  const place = el(doc, 'button', { type: 'button', class: 'hb-place', id: 'homes-place', hidden: true, 'data-ctx': 'home-edit' });
   root.append(bar, pop, place);
   const html = doc.documentElement;
 

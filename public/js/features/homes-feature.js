@@ -156,7 +156,7 @@ import {
   placeCostText,
   swatchFilters,
   trayFilters,
-} from '../ui/home-builder.js?v=d4e0cb64';
+} from '../ui/home-builder.js?v=90f759e8';
 import { RECIPE_CATALOG } from '../making.js?v=712a9adb';
 import {
   createBackYardState,
@@ -5419,6 +5419,15 @@ function bindPointer(engine) {
     }
     endDrag(engine, e, { cancelled: e.type === 'pointercancel', overTray: Boolean(ui?.builder?.trayHit(e.clientX, e.clientY)) });
   };
+  // RIGHTCLICK (Austin 2026-11-03, audit item 6): in Decorate and Cultivate a right-click on the room
+  // selects the piece and shows its actions (the press below takes any button; only the main one
+  // drags), so the browser's menu never opens over them (the world's menu neither: game.js
+  // worldRightClick stands down while an edit mode is on). QA: canvas data contextMenu home:<kind>.
+  root.addEventListener('contextmenu', (e) => {
+    if (!mode || !scene || !isCanvas(e)) return;
+    e.preventDefault();
+    engine.setData('contextMenu', selected ? `home:${selected.kind}:${selected.id}` : '');
+  });
   root.addEventListener('pointerdown', (e) => {
     if (!mode || !scene || !isCanvas(e)) return;
     e.stopPropagation();

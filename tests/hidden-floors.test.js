@@ -50,7 +50,7 @@ import {
   teleportersOn,
 } from '../public/js/hidden-floors.js?v=5ce87a04';
 import { hiddenFloorsFeature } from '../public/js/features/hidden-floors-feature.js?v=066bdc6c';
-import { FEATURES } from '../public/js/features/index.js?v=8d691ef3';
+import { FEATURES } from '../public/js/features/index.js?v=2ecc557a';
 import { rawTripleJumpMultiplier, scaledTripleJumpMultiplier } from '../public/js/movement.js?v=a314f8a1';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
