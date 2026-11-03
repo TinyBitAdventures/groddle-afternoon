@@ -926,7 +926,7 @@ import { mountNotifyView } from './js/notify-view.js?v=81d06119';
 import { mountSocialDrawer } from './js/ui/social-drawer.js?v=a0048e58';
 import { bindDragScroll } from './js/ui/drag-scroll.js?v=9a527ac8';
 import { SIDE_SHEET_IDS, bindTabs, inSideSheet, mountPanelShell, sheetKeyToWorld } from './js/ui/panel-shell.js?v=3d10b1e5';
-import { createQuestSheet, questStep } from './js/ui/quest-sheet.js?v=4d6b1340';
+import { createQuestSheet, questStep } from './js/ui/quest-sheet.js?v=cacf3349';
 import { createQuestTracker } from './js/ui/quest-tracker.js?v=5487413f';
 import { createContextMenu, isContextMenuKey as isMenuKey } from './js/ui/context-menu.js?v=b3d24c15';
 import { bindCountField, countKeyValue, countStepMarkup } from './js/ui/count-chooser.js?v=893305c8';
@@ -5125,7 +5125,10 @@ const questSheet = createQuestSheet({
   onToggle: () => { questLogDrawn = document.getElementById('quest')?.innerHTML ?? questLogDrawn; },
   // VERBS: an active quest's card pins it to the tracker (two at most).
   extraActions: (classTsid) => (classTsid ? [questPinButton(classTsid)] : []),
+  // RIGHTCLICK (audit item 7): a card's menu (Pin or Unpin, Open, its buttons), as the tracker's rows have.
+  contextMenu: createContextMenu({ doc: document, host: document.getElementById('game-root'), id: 'quest-card-menu', className: 'quest-card-menu', setData: (key, value) => { if (app?.canvas) app.canvas.dataset[key] = value; } }),
 });
+questSheet.bindMenu(document.getElementById('quest'));
 
 /** The pins (features/quest-pins-feature.js: up to two, in the player save). */
 function questPins() {
@@ -24412,6 +24415,7 @@ function advanceQuestDialogue() {
 function closeQuestPanel() {
   const panel = document.getElementById('quest-panel');
   if (panel) panel.hidden = true;
+  questSheet.closeMenu();
 }
 
 function isQuestOpen() {

@@ -9,11 +9,20 @@
  * - A card is one line when closed: its title, the step you are on and its count, and a bar.
  *   Open, it adds the quest's words, every step, its rewards and its buttons.
  *
+ * RIGHTCLICK (Austin 2026-11-03, right-click audit item 7): a right-click on a card (Ctrl+click on
+ * a Mac), or Shift+F10 or the Menu key with its head focused, opens its menu, matching the pinned
+ * tracker's (js/ui/quest-pin-menu.js): Pin to screen or Unpin, Open or Close, then the card's own
+ * buttons (Try it, Enter ..., Not right now, a story quest's way in). Every row presses the card's
+ * own control, so nothing new is in it (R3). A left click on the head still opens or closes it.
+ *
  * The cards' classes and the buttons' hooks are game.js's (.q-card, .q-title, .q-req, .q-bar,
- * .q-put-off, .story-offer, data-quest-try ...). QA: canvas data questTab, questTabCounts.
+ * .q-put-off, .story-offer, data-quest-try ...). QA: canvas data questTab, questTabCounts,
+ * contextMenu ("quest-card:<id>").
  */
 
 import { escapeText } from './verb-menu.js?v=74b6dfa0';
+import { bindContextTrigger, MORE_KEYS_LABEL } from './context-menu.js?v=b3d24c15';
+import { focusWorld } from './focus-return.js?v=c34f16a0';
 
 export const QUEST_TABS = Object.freeze(['active', 'offered', 'done']);
 const TAB_LABELS = { active: 'Active', offered: 'Offered', done: 'Done' };
@@ -57,12 +66,52 @@ export function questStep(requirements = []) {
 }
 
 /**
+ * A drawn card's menu rows (RIGHTCLICK), each pressing one of the card's own controls (`el`):
+ * Pin to screen or Unpin (its Pin button: disabled with its reason when two are pinned), Open or
+ * Close (its head), then its buttons in the order it shows them.
+ * @param {HTMLElement} card a .q-card made collapsible by arrange()
+ * @returns {{ id: string, label: string, tip: string, disabled?: boolean, reason?: string, focusBack?: boolean, el: HTMLElement }[]}
+ */
+export function questCardMenuRows(card) {
+  const rows = [];
+  const pin = card?.querySelector?.('.qc-pin');
+  if (pin) {
+    const pinned = pin.getAttribute('aria-pressed') === 'true';
+    const full = pin.getAttribute('aria-disabled') === 'true';
+    rows.push({
+      id: 'pin',
+      label: pinned ? 'Unpin' : 'Pin to screen',
+      tip: pinned ? 'Takes it off your screen. The quest stays in Quests.' : 'Shows it on your screen with its count.',
+      disabled: full,
+      reason: full ? pin.title || '' : '',
+      el: pin,
+    });
+  }
+  const head = card?.querySelector?.('.qc-head');
+  if (head) {
+    const open = card.classList.contains('is-open');
+    rows.push({ id: 'toggle', label: open ? 'Close' : 'Open', tip: open ? 'Folds the card to one line.' : 'Shows its words, every step and its rewards.', el: head });
+  }
+  let n = 0;
+  for (const btn of card?.querySelectorAll?.('.content-action-btn') || []) {
+    const label = String(btn.textContent || '').trim();
+    if (!label) continue;
+    n += 1;
+    // What it opens (a dialog, a quest instance) takes the focus.
+    rows.push({ id: `act${n}`, label, tip: btn.title || label, disabled: btn.disabled === true || btn.getAttribute('aria-disabled') === 'true', reason: btn.title || '', focusBack: false, el: btn });
+  }
+  return rows;
+}
+
+/**
  * @param {{ document?: Document, questInfo?: (classTsid: string) => ({ requirements?: object[], desc?: string, rewards?: object } | null),
  *   renderText?: (el: HTMLElement, markup: string) => void, setData?: (k: string, v: string) => void,
  *   onToggle?: () => void, extraActions?: (classTsid: string, card: HTMLElement) => HTMLElement[] }} opts
  */
-export function createQuestSheet({ document: doc = globalThis.document, questInfo = () => null, renderText = (el, s) => { el.textContent = s; }, setData = () => {}, onToggle = () => {}, extraActions = () => [] } = {}) {
+export function createQuestSheet({ document: doc = globalThis.document, questInfo = () => null, renderText = (el, s) => { el.textContent = s; }, setData = () => {}, onToggle = () => {}, extraActions = () => [], contextMenu = null } = {}) {
   let tab = 'active';
+  /** The box the cards are drawn into (bindMenu), so a pick finds the card as drawn now. */
+  let shownBox = null;
   /** Cards the player opened or closed (by quest id); the first card of a tab starts open. */
   const toggled = new Map();
 
@@ -148,6 +197,10 @@ export function createQuestSheet({ document: doc = globalThis.document, questInf
     card.appendChild(body);
     card.classList.add('qc');
     card.classList.toggle('is-open', open);
+    // RIGHTCLICK: the card has a menu of ours (js/ui/context-guard.js stops the browser's over it).
+    card.dataset.ctx = 'quest-card';
+    head.setAttribute('aria-keyshortcuts', 'Shift+F10');
+    head.setAttribute('aria-label', `${[titleEl.textContent, step?.count || (which === 'done' ? 'Done' : ''), head.querySelector('.qc-step')?.textContent || ''].filter(Boolean).join(', ')}. ${MORE_KEYS_LABEL}`);
     head.addEventListener('click', () => {
       const now = !card.classList.contains('is-open');
       card.classList.toggle('is-open', now);
@@ -201,9 +254,61 @@ export function createQuestSheet({ document: doc = globalThis.document, questInf
     }
   }
 
+  /** The card for a quest as drawn now in the shown box. */
+  function liveCard(id) {
+    if (!shownBox || !id) return null;
+    return [...shownBox.querySelectorAll('.q-card')].find((c) => cardId(c) === id) || null;
+  }
+
+  /** RIGHTCLICK: a card's menu at the pointer, or beside its head from the keys. */
+  function openCardMenu(card, { at = null, keys = false } = {}) {
+    if (!contextMenu || !card) return false;
+    const id = cardId(card);
+    const rows = questCardMenuRows(card);
+    const head = card.querySelector('.qc-head');
+    return contextMenu.open({
+      title: card.querySelector('.qc-title')?.textContent || id,
+      rows,
+      at,
+      anchor: head || card,
+      keys,
+      opener: head,
+      findOpener: () => liveCard(id)?.querySelector('.qc-head') || null,
+      owner: `quest-card:${id}`,
+      onPick: (rowId, { keys: fromKeys }) => {
+        // The card's own control, as drawn now (the log redraws while the menu is open).
+        const now = questCardMenuRows(liveCard(id) || card).find((r) => r.id === rowId);
+        if (!now || now.disabled) return;
+        now.el.click();
+        // Opened by the pointer, the keys go back to the world (the Pin button focuses itself again).
+        if (!fromKeys && rowId !== 'toggle' && now.focusBack !== false) focusWorld(doc);
+      },
+    });
+  }
+
   return {
     arrange,
     renderTabs,
+    /**
+     * RIGHTCLICK: wire the cards' menu on the box they are shown in (once): right-click, Ctrl+click
+     * on a Mac, Shift+F10 or the Menu key on a focused head or button in a card.
+     */
+    bindMenu(box) {
+      if (!box || shownBox === box) return;
+      shownBox = box;
+      bindContextTrigger(box, {
+        rowOf: (t) => {
+          const card = t?.closest?.('.q-card.qc');
+          return card && box.contains(card) ? card : null;
+        },
+        isOpenFor: (card) => Boolean(contextMenu?.isOpenFor(`quest-card:${cardId(card)}`)),
+        open: (card, { at, keys }) => openCardMenu(card, { at, keys }),
+      });
+    },
+    /** Close the cards' menu (the sheet closed). */
+    closeMenu() {
+      if (contextMenu?.owner()?.startsWith('quest-card:')) contextMenu.close({ focus: false });
+    },
     tab: () => tab,
     setTab(id) {
       if (QUEST_TABS.includes(id)) tab = id;
