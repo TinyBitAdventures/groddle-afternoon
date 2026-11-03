@@ -33,7 +33,8 @@ describe('encyclopedia', () => {
       assert.deepEqual(have, want, sec);
     }
     for (const name of readdirSync(dir, { withFileTypes: true }).filter((x) => x.isDirectory()).map((x) => x.name)) {
-      assert.ok(BUILT_SECTIONS.includes(name), `stray section ${name}`);
+      // items/ is the Item catalog's (tools/catalog/build.mjs, tests/catalog.test.js).
+      assert.ok(BUILT_SECTIONS.includes(name) || name === 'items', `stray section ${name}`);
     }
   });
 
@@ -62,7 +63,7 @@ describe('encyclopedia', () => {
     if (BUILT_SECTIONS.includes('skills')) assert.match(html, /Offered when you learn <a href="\.\.\/\.\.\/\.\.\/encyclopedia\/skills\/animalkinship_3\/">Animal Kinship III<\/a>\./);
     else assert.match(html, /Offered when you learn /);
     assert.match(html, /<ol class="ency-steps"><li><p class="ency-step-title">Collect Meat<\/p>/);
-    assert.match(html, /href="\.\.\/\.\.\/\.\.\/items\/meat\/"><span class="ency-tile-pic">[\s\S]*?<span class="ency-n">×13<\/span>/);
+    assert.match(html, /href="\.\.\/\.\.\/\.\.\/encyclopedia\/items\/meat\/"><span class="ency-tile-pic">[\s\S]*?<span class="ency-n">×13<\/span>/);
     assert.match(html, /within 4 h: a countdown runs/);
     assert.match(html, /Hand it in to your Magic Rock/);
     assert.match(html, /175 iMG[\s\S]*120 currants[\s\S]*15 favor with Humbaba/);
@@ -136,25 +137,25 @@ describe('encyclopedia', () => {
       const p = '../'.repeat(rel.split('/').length - 1);
       assert.ok(html.includes('<nav class="site-nav"'), rel);
       assert.ok(html.includes(`<script src="${p}site/theme.js"></script>`), rel);
-      assert.ok(html.includes(`<link rel="stylesheet" href="${p}items/catalog.css`), rel);
-      assert.match(html, /<a href="[./]*items\/" aria-current="page">Items<\/a>/, rel);
+      assert.ok(html.includes(`<link rel="stylesheet" href="${p}encyclopedia/items/catalog.css`), rel);
+      assert.match(html, /<a href="[./]*encyclopedia\/items\/" aria-current="page">Items<\/a>/, rel);
     }
   });
 
   it('writes no em dashes in its own words', () => {
-    for (const f of ['tools/encyclopedia/build.mjs', 'tools/encyclopedia/data.mjs', 'tools/encyclopedia/parts.mjs', 'public/encyclopedia/encyclopedia.js', 'public/items/combobox.js', 'docs/encyclopedia.md']) {
+    for (const f of ['tools/encyclopedia/build.mjs', 'tools/encyclopedia/data.mjs', 'tools/encyclopedia/parts.mjs', 'public/encyclopedia/encyclopedia.js', 'public/encyclopedia/items/combobox.js', 'docs/encyclopedia.md']) {
       assert.ok(!readFileSync(join(spike, f), 'utf8').includes('—'), f);
     }
     assert.ok(!read('encyclopedia/index.html').includes('—'));
   });
 
   it('draws the Category, Sold by and section filters as the themed combobox over their selects', () => {
-    const items = read('items/index.html');
-    assert.match(items, /<select id="cat">[\s\S]*data-icon="\.\.\/assets\/sprites\/icons\/[a-z0-9_]+\.png"/);
-    if (BUILT_SECTIONS.includes('people')) assert.match(items, /<select id="sold">[\s\S]*<option value="produce" data-icon="\.\.\/assets\/sprites\/icons\/street_spirit\.png">Produce Vendor \(\d+\)<\/option>/);
-    const js = readFileSync(join(pub, 'items', 'catalog.js'), 'utf8');
+    const items = read('encyclopedia/items/index.html');
+    assert.match(items, /<select id="cat">[\s\S]*data-icon="\.\.\/\.\.\/assets\/sprites\/icons\/[a-z0-9_]+\.png"/);
+    if (BUILT_SECTIONS.includes('people')) assert.match(items, /<select id="sold">[\s\S]*<option value="produce" data-icon="\.\.\/\.\.\/assets\/sprites\/icons\/street_spirit\.png">Produce Vendor \(\d+\)<\/option>/);
+    const js = readFileSync(join(dir, 'items', 'catalog.js'), 'utf8');
     assert.match(js, /combobox\(cat\);\n\s*combobox\(sold\);/);
-    const cbx = readFileSync(join(pub, 'items', 'combobox.js'), 'utf8');
+    const cbx = readFileSync(join(dir, 'items', 'combobox.js'), 'utf8');
     for (const want of ['role="combobox"', 'role="listbox"', 'role="option"', 'aria-activedescendant', "'ArrowDown'", "'ArrowUp'", "'Home'", "'End'", "'Enter'", "'Escape'", "dispatchEvent(new Event('change'"]) {
       assert.ok(cbx.includes(want), `combobox.js: ${want}`);
     }

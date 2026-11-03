@@ -22,7 +22,7 @@ import { join, relative, sep } from 'node:path';
 export const FALLBACK = [
   { label: 'Restoration', href: '/restoration/', className: '' },
   { label: 'Compare', href: '/compare/', className: '' },
-  { label: 'Items', href: '/items/', className: '' },
+  { label: 'Items', href: '/encyclopedia/items/', className: '' },
   { label: 'Notes', href: '/changelog/', className: '' },
   { label: 'Play', href: '/play/', className: 'site-nav-play' },
 ];
@@ -34,9 +34,10 @@ export const FALLBACK = [
  */
 export const SECTIONS = {
   '/project/': ['/restoration/', '/compare/', '/changelog/', '/code/'],
-  // The Item catalog and the encyclopedia are one section, whichever link the menu holds (docs/encyclopedia.md).
+  // The Item catalog is the encyclopedia's Items section: a link to it marks the whole encyclopedia
+  // (docs/encyclopedia.md), at its address or at the old /items/ a menu may still hold (it redirects).
+  '/encyclopedia/items/': ['/encyclopedia/'],
   '/items/': ['/encyclopedia/'],
-  '/encyclopedia/': ['/items/'],
 };
 
 const decode = (s) => s.replace(/<[^>]*>/g, '').replace(/&(amp|lt|gt|quot|#039|#39|apos);/g, (m, e) => ({ amp: '&', lt: '<', gt: '>', quot: '"', '#039': "'", '#39': "'", apos: "'" })[e]);

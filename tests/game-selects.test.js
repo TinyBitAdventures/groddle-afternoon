@@ -23,12 +23,12 @@ const read = (p) => readFileSync(join(root, p), 'utf8');
 
 /**
  * Pages outside the game that keep their selects, and why. Each is a website page, not the game's
- * UI: its selects are already themed by the site's own combobox (items/combobox.js, warm paper),
+ * UI: its selects are already themed by the site's own combobox (encyclopedia/items/combobox.js, warm paper),
  * and without JavaScript the plain select is what a reader gets.
  */
 export const NATIVE_SELECT_ALLOW = Object.freeze({
-  'public/items/index.html': 'The item catalog page (a website page): Category and Sold by are themed by items/combobox.js.',
-  'public/items/combobox.js': 'The catalog pages\' own combobox (it names <select> in its comments).',
+  'public/encyclopedia/items/index.html': 'The item catalog page (a website page): Category and Sold by are themed by items/combobox.js.',
+  'public/encyclopedia/items/combobox.js': 'The catalog pages\' own combobox (it names <select> in its comments).',
   'public/encyclopedia/achievements/index.html': 'An encyclopedia page (website): its group picker is themed by items/combobox.js (encyclopedia.js).',
   'public/encyclopedia/animals/index.html': 'An encyclopedia page (website): themed by items/combobox.js.',
   'public/encyclopedia/people/index.html': 'An encyclopedia page (website): themed by items/combobox.js.',

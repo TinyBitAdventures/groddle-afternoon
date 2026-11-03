@@ -2,7 +2,8 @@
  * The Groddle Encyclopedia (docs/encyclopedia.md): quests, animals, people,
  * skills, places and achievements from Tiny Speck's game data, each with its
  * status in the remake, cross-linked with each other and with the Item catalog
- * (/items/, tools/catalog/build.mjs, which reads the same index).
+ * (the Items section, /encyclopedia/items/, written by tools/catalog/build.mjs,
+ * which reads the same index; this build leaves that folder to it).
  *
  *   public/encyclopedia/index.html                 the home: search across every section
  *   public/encyclopedia/search.json                every entry (items included), for the search
@@ -82,7 +83,7 @@ const SOLO_REASON = {
 const FOOT = (p) => `  <footer class="foot">
     <div class="wrap">
       <p>A <a href="https://tinybitadventures.com">fan remake</a> of Tiny Speck’s Glitch · <a href="${p}credits/">Credits</a> · <a href="${p}privacy-policy/">Privacy</a></p>
-      <p><a href="${p}">Home</a> · <a href="${p}play/">Play Groddle Afternoon</a> · <a href="${p}encyclopedia/">Encyclopedia</a> · <a href="${p}items/">Item catalog</a></p>
+      <p><a href="${p}">Home</a> · <a href="${p}play/">Play Groddle Afternoon</a> · <a href="${p}encyclopedia/">Encyclopedia</a> · <a href="${p}encyclopedia/items/">Item catalog</a></p>
     </div>
   </footer>`;
 
@@ -97,7 +98,7 @@ const shell = ({ p, title, description, body, script }) => `<!doctype html>
   <link rel="stylesheet" href="${p}changelog/changelog.css" />
   <link rel="stylesheet" href="${p}site/site-nav.css" />
 ${script ? mapTags(p) : ''}  <script src="${p}site/theme.js"></script>
-  <link rel="stylesheet" href="${p}items/catalog.css" />
+  <link rel="stylesheet" href="${p}encyclopedia/items/catalog.css" />
   <link rel="icon" href="${p}favicon.svg?v=arch" type="image/svg+xml" />
   <link rel="icon" href="${p}favicon.ico?v=arch" sizes="32x32" />
   <link rel="apple-touch-icon" href="${p}apple-touch-icon.png?v=arch" />
@@ -212,7 +213,7 @@ export async function buildEncyclopedia(data = null) {
 
   // Search: every entry, items included.
   const search = [
-    ...[...items.values()].map((it) => ({ s: 'items', id: it.id, n: it.name, st: it.status, ic: it.icon?.src || '', h: `items/${it.id}/` })),
+    ...[...items.values()].map((it) => ({ s: 'items', id: it.id, n: it.name, st: it.status, ic: it.icon?.src || '', h: pathOf(`item:${it.id}`) })),
     ...[...entries.values()].map((e) => ({ s: e.section, id: e.id, n: e.name, g: e.group || '', st: e.status, ic: e.icon?.src || '', h: pathOf(e.key) })),
   ];
   put(`${OUT}/search.json`, `${JSON.stringify({ sections: [{ key: 'items', label: 'Items' }, ...SECTIONS.map(({ key, label }) => ({ key, label }))], statuses: Object.fromEntries(Object.entries(STATUS).map(([k, v]) => [k, v.label])), inRemake: Object.keys(STATUS).filter(inRemake), entries: search }).replace(/\{"s":/g, '\n{"s":')}\n`);
@@ -521,7 +522,7 @@ function homePage(bySection, items, info) {
   const sample = { quests: 'quests:animalkinship_nibble_meat', animals: 'animals:npc_piggy', people: 'people:street_spirit', skills: 'skills:animalkinship_1', places: 'places:groddle-meadow', achievements: 'achievements:bacon_biter' };
   const card = (href, label, n, blurb, pic) => `<li><a class="ency-card" href="${href}">${P.img(pic, 'ency-card-ic', 64)}<span class="ency-card-text"><span class="ency-card-name">${esc(label)} <span class="count">${fmt(n)}</span></span><span class="ency-card-blurb">${esc(blurb)}</span></span></a></li>`;
   const cards = [
-    card(`${p}items/`, 'Items', items.size, `Every item, how to get it and what it is for. ${fmt(itemsIn)} are in the remake.`, info('item:apple')?.icon),
+    card('items/', 'Items', items.size, `Every item, how to get it and what it is for. ${fmt(itemsIn)} are in the remake.`, info('item:apple')?.icon),
     ...SECTIONS.map((s) => card(`${s.key}/`, s.label, bySection[s.key].length, s.blurb, info(sample[s.key])?.icon || bySection[s.key][0]?.icon)),
   ];
   const body = `
@@ -554,6 +555,8 @@ function homePage(bySection, items, info) {
 /* -- Write / check ------------------------------------------ */
 
 const STATIC = new Set(['encyclopedia.js']);
+/** The Items section's folder: tools/catalog/build.mjs writes and checks it, so it is never a stray here. */
+const CATALOG = `${OUT}/items`;
 
 function strays(files) {
   const out = [];
@@ -562,6 +565,7 @@ function strays(files) {
   const walk = (rel) => {
     for (const d of readdirSync(join(PUB, rel), { withFileTypes: true })) {
       const path = `${rel}/${d.name}`;
+      if (path === CATALOG) continue;
       if (d.isDirectory()) {
         if (!Object.keys(files).some((f) => f.startsWith(`${path}/`))) out.push(`${path}/`);
         else walk(path);

@@ -128,7 +128,7 @@ describe('em-dashes in player-facing copy (G215)', () => {
       const text = pageText(readFileSync(file, 'utf8'));
       if (!DASH.test(text)) continue;
       // Item pages print the item's GSJS description (tools/catalog/build.mjs).
-      const item = /^items\/([^/]+)\/index\.html$/.exec(path)?.[1];
+      const item = /^encyclopedia\/items\/([^/]+)\/index\.html$/.exec(path)?.[1];
       if (item) {
         const desc = /<div class="cat-desc"><p>([\s\S]*?)<\/p>/.exec(text)?.[1] || '';
         // The meta description is that same text plus " In the remake."

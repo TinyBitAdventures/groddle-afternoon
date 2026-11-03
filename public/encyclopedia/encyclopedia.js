@@ -4,10 +4,10 @@
  *    from every section, items included, as tiles grouped by section, with a
  *    section filter; the query lives in the address (?q=&s=);
  *  - a section's list (input[data-filter], and select[data-group] drawn as the
- *    themed combobox of ../items/combobox.js) hides the tiles that do not match
+ *    themed combobox of ./items/combobox.js) hides the tiles that do not match
  *    (?q=&g=), so the list it draws without JavaScript stays the source.
  */
-import { combobox } from '../items/combobox.js?v=5821d844';
+import { combobox } from './items/combobox.js?v=f2510e19';
 
 const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');

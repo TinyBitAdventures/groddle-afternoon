@@ -2,7 +2,7 @@
 
 A player stuck on a quest should be able to search one box and find out how to
 get the quest, every step, what each step needs and where to go. The Item
-catalog (`/items/`, tools/catalog) answered that for items only. The
+catalog (now `/encyclopedia/items/`, tools/catalog) answered that for items only. The
 encyclopedia adds quests, animals, people, skills, places and achievements, all
 generated from game data at build time, cross-linked both ways, and checked by
 a `--check` that a test enforces, as the catalog already is.
@@ -16,7 +16,7 @@ Words about the remake are ours: plain, factual, no em dashes, never the
 | Section | Index | Entry | Source of ids |
 |---|---|---|---|
 | Home (search across everything) | `/encyclopedia/` | | |
-| Items (unchanged) | `/items/` | `/items/<class>/` | GSJS item class |
+| Items (the Item catalog, tools/catalog) | `/encyclopedia/items/` | `/encyclopedia/items/<class>/` | GSJS item class |
 | Quests | `/encyclopedia/quests/` | `/encyclopedia/quests/<quest id>/` | GSJS `quests/<id>.js` |
 | Animals and creatures | `/encyclopedia/animals/` | `/encyclopedia/animals/<npc class>/` | GSJS `items/npc_*.js` |
 | People | `/encyclopedia/people/` | `/encyclopedia/people/<id>/` | npc class, item class (Street Spirit, Hell's Bartender, Magic Rock, Butler) or `vendor-<store key>` |
@@ -24,15 +24,23 @@ Words about the remake are ours: plain, factual, no em dashes, never the
 | Places | `/encyclopedia/places/` | `/encyclopedia/places/<hub slug>/`, streets as `#<street tsid>` | `inc_data_maps_prod.js` hub, slug of its name |
 | Achievements | `/encyclopedia/achievements/` | `/encyclopedia/achievements/<id>/` | GSJS `achievements/<id>.js` |
 
-Every existing `/items/<id>/` URL keeps working: items stay where they are and
-gain the cross-links. One new top-level folder (`encyclopedia/`) keeps the
-number of built folders Minn links into its webroot small.
+The catalog moved from `/items/` into the encyclopedia on 2026-11-02 (Austin:
+"for consistency" with the other sections). The old addresses keep working:
+the site repo's `src/MovedPages.php` answers `/items/` and everything under it
+with a 301 to the same path under `/encyclopedia/items/`. On groddle.localhost
+every folder address reaches PHP (Caddy's php_server serves files, not folder
+indexes), so the route answers first. Kinsta's nginx serves a folder's
+index.html itself, so there the old folder has to be gone: `tools/deploy/kinsta.sh`
+rsyncs the game with `--delete` and drops a webroot link whose game entry left,
+as `sync-to-cove.sh` does locally. One top-level folder (`encyclopedia/`)
+keeps the number of built folders Minn links into its webroot small.
+tools/catalog/build.mjs writes and checks `encyclopedia/items/`; the
+encyclopedia's own build leaves that folder alone.
 
 **Header menu.** The menu is content (Minn Admin). `tools/site-nav/apply.mjs`
-and `SiteNav::SECTIONS` gain `'/items/' => ['/encyclopedia/']` and
-`'/encyclopedia/' => ['/items/']`, so whichever link the menu holds is marked on
-both. Proposed for Austin: rename the "Items" link to "Encyclopedia" and point
-it at `/encyclopedia/` (the home searches items too).
+and `SiteNav::SECTIONS` hold `'/encyclopedia/items/' => ['/encyclopedia/']` and
+`'/items/' => ['/encyclopedia/']`, so an Items link marks the whole
+encyclopedia, at the new address or at the old one a menu may still hold.
 
 ## Data sources
 
@@ -96,7 +104,7 @@ without JavaScript) with the same search box filtering its own entries.
 ## Visual design (Austin 2026-11-01: "link up more visually")
 
 Related things are shown as pictures, not just text links. Shared parts
-(`tools/encyclopedia/parts.mjs`, styles in `items/catalog.css`, colours only
+(`tools/encyclopedia/parts.mjs`, styles in `encyclopedia/items/catalog.css`, colours only
 from the site's tokens so light and dark both work):
 
 - **Tile**: a small card with the thing's picture (item icon, creature or

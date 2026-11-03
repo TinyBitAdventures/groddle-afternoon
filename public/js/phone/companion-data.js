@@ -280,7 +280,7 @@ export function createPresenceApi({ account, fetch: fetchFn = globalThis.fetch?.
   };
 }
 
-/** The item catalog's names (items/data.json, written by tools/catalog/build.mjs), fetched only for letters that carry an item. */
+/** The item catalog's names (encyclopedia/items/data.json, written by tools/catalog/build.mjs), fetched only for letters that carry an item. */
 export function itemNamesFrom(catalog) {
   const out = new Map();
   for (const it of Array.isArray(catalog?.items) ? catalog.items : []) {

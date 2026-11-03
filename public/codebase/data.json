@@ -15,34 +15,34 @@
     "latest": "2026-11-02"
    },
    "code": {
-    "files": 1430,
-    "lines": 498884,
-    "bytes": 23298000
+    "files": 2422,
+    "lines": 616898,
+    "bytes": 31078221
    },
    "languages": [
     {
      "id": "javascript",
      "label": "JavaScript",
-     "files": 1366,
-     "lines": 469747
+     "files": 1368,
+     "lines": 469994
+    },
+    {
+     "id": "html",
+     "label": "HTML",
+     "files": 1004,
+     "lines": 119966
     },
     {
      "id": "css",
      "label": "CSS",
-     "files": 8,
-     "lines": 16971
+     "files": 9,
+     "lines": 17270
     },
     {
      "id": "python",
      "label": "Python",
      "files": 27,
      "lines": 8450
-    },
-    {
-     "id": "html",
-     "label": "HTML",
-     "files": 15,
-     "lines": 2498
     },
     {
      "id": "php",
@@ -66,6 +66,13 @@
      "lines": 167006
     },
     {
+     "id": "pages",
+     "label": "Pages and styles",
+     "path": "public/ (pages, stylesheets, page scripts)",
+     "files": 1019,
+     "lines": 138837
+    },
+    {
      "id": "tests",
      "label": "Tests",
      "path": "tests/",
@@ -85,13 +92,6 @@
      "path": "tools/, build-*.mjs",
      "files": 254,
      "lines": 59438
-    },
-    {
-     "id": "pages",
-     "label": "Pages and styles",
-     "path": "public/ (pages, stylesheets, page scripts)",
-     "files": 27,
-     "lines": 20823
     },
     {
      "id": "rooms",
@@ -139,9 +139,9 @@
     {
      "id": "generated",
      "label": "Generated modules and built pages",
-     "files": 2260,
-     "bytes": 21551220,
-     "lines": 275405
+     "files": 1268,
+     "bytes": 13770999,
+     "lines": 157391
     },
     {
      "id": "vendored",
@@ -425,7 +425,7 @@
  },
  "builtPages": [
   {
-   "path": "public/items/",
+   "path": "public/encyclopedia/items/",
    "what": "the item catalog pages (tools/catalog)"
   },
   {

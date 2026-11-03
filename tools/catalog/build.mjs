@@ -1,15 +1,18 @@
 /**
  * The Item Catalog: every item in Tiny Speck's game code, with its status in
- * the remake, generated from the game data at build time.
+ * the remake, generated from the game data at build time. It is the
+ * encyclopedia's Items section (/encyclopedia/items/, Austin 2026-11-02; it
+ * was /items/ until then, and the site repo's MovedPages sends the old
+ * addresses here).
  *
- *   public/items/data.json         the list the catalog page renders
- *   public/items/index.html        the catalog (grid, search, filters)
- *   public/items/<id>/index.html   one page per item
+ *   public/encyclopedia/items/data.json         the list the catalog page renders
+ *   public/encyclopedia/items/index.html        the catalog (grid, search, filters)
+ *   public/encyclopedia/items/<id>/index.html   one page per item
  *
  *   node tools/catalog/build.mjs          write the files
  *   node tools/catalog/build.mjs --check  exit 1 if any file is stale
  *
- * Sources (all read, nothing written outside public/items/):
+ * Sources (all read, nothing written outside public/encyclopedia/items/):
  *  - glitch-GameServerJS/items/<id>.js: name_single, name_plural, description,
  *    base_cost, stackmax, parent_classes, tags, verbs.<id> name/tooltip/sort_on
  *    and the generated info lines in getDescExtras (e.g. items/apple.js:3-18,
@@ -45,7 +48,7 @@ const pub = join(root, 'public');
 const AUDIT = join(root, '..');
 export const GSJS = join(AUDIT, 'glitch-GameServerJS');
 export const INVENTORY_DB = join(AUDIT, 'research', 'coverage', 'inventory.sqlite');
-const OUT = 'items';
+const OUT = 'encyclopedia/items';
 const ICONS = join(pub, 'assets', 'sprites', 'icons');
 const js = (name) => join(pub, 'js', name);
 const content = (name) => JSON.parse(readFileSync(join(pub, 'assets', 'content', name), 'utf8'));
@@ -704,7 +707,7 @@ function waysFor(id, remake, evidence, quests, takeable) {
 const FOOT = (p) => `  <footer class="foot">
     <div class="wrap">
       <p>A <a href="https://tinybitadventures.com">fan remake</a> of Tiny Speck’s Glitch · <a href="${p}credits/">Credits</a> · <a href="${p}privacy-policy/">Privacy</a></p>
-      <p><a href="${p}">Home</a> · <a href="${p}play/">Play Groddle Afternoon</a> · <a href="${p}restoration/">Restoration report</a> · <a href="${p}items/">Item catalog</a> · <a href="${p}encyclopedia/">Encyclopedia</a></p>
+      <p><a href="${p}">Home</a> · <a href="${p}play/">Play Groddle Afternoon</a> · <a href="${p}restoration/">Restoration report</a> · <a href="${p}encyclopedia/items/">Item catalog</a> · <a href="${p}encyclopedia/">Encyclopedia</a></p>
     </div>
   </footer>`;
 
@@ -719,11 +722,11 @@ const shell = ({ p, title, description, body, script }) => `<!doctype html>
   <link rel="stylesheet" href="${p}changelog/changelog.css" />
   <link rel="stylesheet" href="${p}site/site-nav.css" />
 ${script ? mapTags(p) : ''}  <script src="${p}site/theme.js"></script>
-  <link rel="stylesheet" href="${p}items/catalog.css" />
+  <link rel="stylesheet" href="${p}encyclopedia/items/catalog.css" />
   <link rel="icon" href="${p}favicon.svg?v=arch" type="image/svg+xml" />
   <link rel="icon" href="${p}favicon.ico?v=arch" sizes="32x32" />
   <link rel="apple-touch-icon" href="${p}apple-touch-icon.png?v=arch" />
-${script ? `  <script type="module" src="${script}?v=${moduleKeyOf(`items/${script}`, root)}"></script>\n` : ''}</head>
+${script ? `  <script type="module" src="${script}?v=${moduleKeyOf(`${OUT}/${script}`, root)}"></script>\n` : ''}</head>
 <body class="notes catalog">
 ${siteNav(p, 'items')}
 ${body}
@@ -740,11 +743,11 @@ function indexPage(data, vendorIcons = {}) {
   const body = `
   <header class="masthead note-head cat-head">
     <div class="wrap">
-      <p class="kicker">Groddle Field Notes · Items</p>
+      <p class="kicker"><a href="../">Groddle Encyclopedia</a> · Items</p>
       <h1>Item catalog</h1>
       <p class="lead">Every item in Tiny Speck’s Glitch, from the game’s own code, and whether you can get it in the remake yet.</p>
       <p class="cat-score"><strong>${fmt(s.source)}</strong> of ${fmt(c.listed)} items are in the remake. ${fmt(s.missing)} are not in yet, ${fmt(s.lost)} are lost for now because they needed other players or Tiny Speck’s own servers, and ${fmt(s.unbuilt_original)} were never finished in the original.</p>
-      <p class="cat-score ency-more">Stuck on a quest? The <a href="../encyclopedia/">Groddle Encyclopedia</a> has every quest step by step, the animals and people, skills, places and achievements, linked to these items.</p>
+      <p class="cat-score ency-more">Stuck on a quest? The rest of the <a href="../">Groddle Encyclopedia</a> has every quest step by step, the animals and people, skills, places and achievements, linked to these items.</p>
       <p class="cat-note">${fmt(c.excluded)} more classes in the item folder are server plumbing (admin tools, tests, quest markers, containers the server made for itself) and are left out.</p>
     </div>
   </header>
@@ -760,13 +763,13 @@ function indexPage(data, vendorIcons = {}) {
           <label><span>Category</span>
             <select id="cat">
               <option value="">All categories</option>
-${data.categories.map((name) => { const pic = data.items.find((i) => i.category === name && i.icon); return `              <option value="${esc(name)}"${pic ? ` data-icon="../assets/sprites/icons/${esc(pic.id)}.png"` : ''}>${esc(name)} (${fmt(data.items.filter((i) => i.category === name).length)})</option>`; }).join('\n')}
+${data.categories.map((name) => { const pic = data.items.find((i) => i.category === name && i.icon); return `              <option value="${esc(name)}"${pic ? ` data-icon="../../assets/sprites/icons/${esc(pic.id)}.png"` : ''}>${esc(name)} (${fmt(data.items.filter((i) => i.category === name).length)})</option>`; }).join('\n')}
             </select>
           </label>
           <label><span>Sold by</span>
             <select id="sold">
               <option value="">Any vendor</option>
-${data.vendors.map((v) => `              <option value="${esc(v.key)}"${vendorIcons?.[v.key] ? ` data-icon="../${esc(vendorIcons[v.key])}"` : ''}>${esc(v.label)} (${fmt(data.items.filter((i) => i.sold.includes(v.key)).length)})</option>`).join('\n')}
+${data.vendors.map((v) => `              <option value="${esc(v.key)}"${vendorIcons?.[v.key] ? ` data-icon="../../${esc(vendorIcons[v.key])}"` : ''}>${esc(v.label)} (${fmt(data.items.filter((i) => i.sold.includes(v.key)).length)})</option>`).join('\n')}
             </select>
           </label>
         </div>
@@ -786,13 +789,13 @@ ${data.vendors.map((v) => `              <option value="${esc(v.key)}"${vendorIc
     </div>
   </main>
 `;
-  return shell({ p: '../', title: 'Item catalog · Groddle Field Notes', description: `Every item in Tiny Speck's Glitch and its status in the Groddle Afternoon remake: ${fmt(s.source)} of ${fmt(c.listed)} are in.`, body, script: 'catalog.js' });
+  return shell({ p: '../../', title: 'Item catalog · Groddle Encyclopedia', description: `Every item in Tiny Speck's Glitch and its status in the Groddle Afternoon remake: ${fmt(s.source)} of ${fmt(c.listed)} are in.`, body, script: 'catalog.js' });
 }
 
 function itemPage(e, ctx) {
   const { it } = e;
   const { remake, inCatalog, names } = ctx;
-  const p = '../../';
+  const p = '../../../';
   const nameOf = (id) => names.get(id)?.name || remake.uses[id]?.label || id;
   const pluralOf = (id) => names.get(id)?.plural || nameOf(id);
   const link = (id, label = nameOf(id)) => (inCatalog.has(id) ? `<a href="../${esc(id)}/">${esc(label)}</a>` : esc(label));
@@ -964,7 +967,7 @@ ${usesHtml.length ? `          <ul class="cat-list">
   const body = `
   <header class="masthead note-head cat-item-head">
     <div class="wrap">
-      <p class="kicker"><a href="../">Groddle Field Notes · Item catalog</a> · ${esc(e.category)}</p>
+      <p class="kicker"><a href="../../">Groddle Encyclopedia</a> · <a href="../">Items</a> · ${esc(e.category)}</p>
       <div class="cat-hero">
         <div class="cat-hero-frame">${icon}</div>
         <div>
@@ -1027,7 +1030,7 @@ ${verbs.map((v) => `          <div><dt>${esc(v.name)}</dt><dd>${v.tooltip ? esc(
           ${ctx.prev ? `<a class="note-pager-older" href="../${esc(ctx.prev.it.id)}/" rel="prev"><span>Previous</span>${esc(ctx.prev.it.name)}</a>` : '<span></span>'}
           ${ctx.next ? `<a class="note-pager-newer" href="../${esc(ctx.next.it.id)}/" rel="next"><span>Next</span>${esc(ctx.next.it.name)}</a>` : '<span></span>'}
         </div>
-        <p class="note-all"><a href="../">All ${fmt(ctx.total)} items</a></p>
+        <p class="note-all"><a href="../">All ${fmt(ctx.total)} items</a> · <a href="../../">Search the encyclopedia</a></p>
       </div>
     </nav>
   </main>
@@ -1035,7 +1038,7 @@ ${verbs.map((v) => `          <div><dt>${esc(v.name)}</dt><dd>${v.tooltip ? esc(
   const plainDesc = plainText(it.desc);
   return shell({
     p,
-    title: `${it.name} · Groddle Item Catalog`,
+    title: `${it.name} · Groddle Encyclopedia`,
     description: `${plainDesc ? `${plainDesc.slice(0, 150)} ` : ''}${status.label}${e.status === 'source' ? '' : ' in the remake'}.`.trim(),
     body,
   });

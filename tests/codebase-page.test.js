@@ -43,7 +43,7 @@ describe('Code page data (tools/codebase/build-data.mjs)', () => {
     // The minified PixiJS and the built item pages are listed, never counted as code.
     assert.ok(game.notCode.some((n) => n.id === 'vendored'));
     assert.ok(game.notCode.some((n) => n.id === 'generated' && n.files > 900));
-    assert.ok(!game.largest.some((f) => f.path.startsWith('public/vendor/') || f.path.startsWith('public/items/')));
+    assert.ok(!game.largest.some((f) => f.path.startsWith('public/vendor/') || f.path.startsWith('public/encyclopedia/items/')));
   });
 
   it('counts lines and spots generated files by their header', () => {

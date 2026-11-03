@@ -24,7 +24,7 @@ import { createMinnAccount } from '../minn-account.js?v=ea900c51';
 import { mountAccountForms, resetLinkFrom, verifyLinkFrom } from '../account-forms.js?v=fe37d0de';
 import { gateFor, quietSession, suspendedNow } from '../online-boot.js?v=958c5322';
 import { REPORT_MAX, REPORT_TEXT, STATUS_WORDS, createReportsApi, pictureRefused, pictureSrc, refusalWords, reportFromHash, ticketLine, unreadCount, whenWords } from '../reports.js?v=e83d5ec3';
-import { DEVICE_KEY, PHONE_TEXT as T, POLL_MS, createPresenceApi, fitPhoto, friendsView, fullGameHref, itemNamesFrom, itemWords, mailRows, mailboxFromSave, mergePlayerMail, phoneContext, unreadLetters } from './companion-data.js?v=da54a3c8';
+import { DEVICE_KEY, PHONE_TEXT as T, POLL_MS, createPresenceApi, fitPhoto, friendsView, fullGameHref, itemNamesFrom, itemWords, mailRows, mailboxFromSave, mergePlayerMail, phoneContext, unreadLetters } from './companion-data.js?v=3881c1c2';
 
 const doc = globalThis.document;
 
@@ -515,7 +515,7 @@ let itemNames = null;
 async function namesFor(rows) {
   if (itemNames || !rows.some((r) => r.item)) return itemNames;
   try {
-    const res = await fetch(new URL('items/data.json', doc.baseURI).href, { credentials: 'same-origin' });
+    const res = await fetch(new URL('encyclopedia/items/data.json', doc.baseURI).href, { credentials: 'same-origin' });
     itemNames = itemNamesFrom(await res.json());
   } catch {
     itemNames = new Map();

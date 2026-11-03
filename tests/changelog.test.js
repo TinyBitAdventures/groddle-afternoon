@@ -200,7 +200,7 @@ describe('notes: the site header', () => {
   ];
 
   it('is the same on every page, with Items and Notes between Compare and Play', () => {
-    assert.match(home, /Compare<\/a>\n\s*<a href="items\/">Items<\/a>\n\s*<a href="changelog\/">Notes<\/a>\n\s*<a class="site-nav-play"/);
+    assert.match(home, /Compare<\/a>\n\s*<a href="encyclopedia\/items\/">Items<\/a>\n\s*<a href="changelog\/">Notes<\/a>\n\s*<a class="site-nav-play"/);
     for (const p of pages) {
       const html = read(p.file);
       assert.match(html, new RegExp(`<link rel="stylesheet" href="${p.prefix}site/site-nav\\.css" />`), p.file);

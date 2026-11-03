@@ -2,7 +2,7 @@
  * The encyclopedia's shared page parts (docs/encyclopedia.md "Visual design"):
  * tiles, recipe rows, vendor cards, chips and the status badge, drawn at build
  * time for the item pages (tools/catalog/build.mjs) and every encyclopedia
- * page (tools/encyclopedia/build.mjs). Styles: public/items/catalog.css
+ * page (tools/encyclopedia/build.mjs). Styles: public/encyclopedia/items/catalog.css
  * (".ency-*"), colours only from the site's tokens.
  */
 
@@ -31,7 +31,7 @@ export const badge = (s) => `<span class="pill st-${esc(s)}">${esc(statusLabel(s
 /** The site-root path of an entry key: item:<id> or <section>:<id>. */
 export function pathOf(key) {
   const [section, id] = [key.slice(0, key.indexOf(':')), key.slice(key.indexOf(':') + 1)];
-  return section === 'item' ? `items/${id}/` : `encyclopedia/${section}/${id}/`;
+  return section === 'item' ? `encyclopedia/items/${id}/` : `encyclopedia/${section}/${id}/`;
 }
 
 /**

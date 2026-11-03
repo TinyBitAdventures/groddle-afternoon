@@ -12,7 +12,7 @@ import { GSJS, INVENTORY_DB, ROCK_STAND_INS, ROCK_STAND_IN_ICON, esc, howOf, rea
 
 const spike = join(import.meta.dirname, '..');
 const pub = join(spike, 'public');
-const items = join(pub, 'items');
+const items = join(pub, 'encyclopedia', 'items');
 const data = JSON.parse(readFileSync(join(items, 'data.json'), 'utf8'));
 const page = (id) => readFileSync(join(items, id, 'index.html'), 'utf8');
 const skipWithoutInventory = existsSync(INVENTORY_DB) ? false : `needs the coverage inventory at ${INVENTORY_DB}`;

@@ -135,6 +135,7 @@ echo "5/6 cache"
 "${SSH[@]}" "$HOST" 'cd ~/public && wp cache flush' | tail -1
 
 echo "6/6 check"
-for p in / /play/ /play/online/ /play/build.json /restoration/ /changelog/ /musicblocks/ /items/ /wp-json/groddle/v1/me; do
+# /items/ moved to /encyclopedia/items/ (2026-11-02): the old address answers 301 (the site's MovedPages).
+for p in / /play/ /play/online/ /play/build.json /restoration/ /changelog/ /musicblocks/ /encyclopedia/ /encyclopedia/items/ /items/ /items/apple/ /wp-json/groddle/v1/me; do
 	printf '%s %s\n' "$(curl -s -o /dev/null -w '%{http_code}' "https://groddleafternoon.com$p?deploy=$RANDOM")" "$p"
 done

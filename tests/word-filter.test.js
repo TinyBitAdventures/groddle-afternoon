@@ -110,7 +110,7 @@ describe("the game's own text comes through unchanged", () => {
       strings += 1;
       if (filterText(s) !== s) changed.push(`${rel}: ${s.slice(0, 120)}`);
     };
-    const all = ['public/assets/content', 'public/assets/streets', 'public/items', 'public/encyclopedia', 'public/js'].flatMap((d) => files(d));
+    const all = ['public/assets/content', 'public/assets/streets', 'public/encyclopedia', 'public/js'].flatMap((d) => files(d));
     all.push('public/game.js', 'public/content.js');
     for (const rel of all) {
       const src = read(rel);
