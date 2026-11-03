@@ -46421,5 +46421,4669 @@
    1,
    1
   ]
+ },
+ "assets/sprites/cultivation/proto/proto_beryl_rock.webp": {
+  "animal": "proto-art",
+  "character": "proto-art",
+  "source": "tools/proto-art",
+  "swf": "misc/proto/proto_beryl_rock/proto_beryl_rock.swf",
+  "status": "ok",
+  "hires": "assets/sprites/cultivation/proto/proto_beryl_rock@3x.webp",
+  "bytes": 8670,
+  "cells": 1,
+  "fw": 110,
+  "fh": 32,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/cultivation/proto/proto_dullite_rock.webp": {
+  "animal": "proto-art",
+  "character": "proto-art",
+  "source": "tools/proto-art",
+  "swf": "misc/proto/proto_dullite_rock/proto_dullite_rock.swf",
+  "status": "ok",
+  "hires": "assets/sprites/cultivation/proto/proto_dullite_rock@3x.webp",
+  "bytes": 8854,
+  "cells": 1,
+  "fw": 110,
+  "fh": 35,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/cultivation/proto/proto_metal_rock.webp": {
+  "animal": "proto-art",
+  "character": "proto-art",
+  "source": "tools/proto-art",
+  "swf": "misc/proto/proto_metal_rock/proto_metal_rock.swf",
+  "status": "ok",
+  "hires": "assets/sprites/cultivation/proto/proto_metal_rock@3x.webp",
+  "bytes": 10148,
+  "cells": 1,
+  "fw": 103,
+  "fh": 31,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/cultivation/proto/proto_sparkly_rock.webp": {
+  "animal": "proto-art",
+  "character": "proto-art",
+  "source": "tools/proto-art",
+  "swf": "misc/proto/proto_sparkly_rock/proto_sparkly_rock.swf",
+  "status": "ok",
+  "hires": "assets/sprites/cultivation/proto/proto_sparkly_rock@3x.webp",
+  "bytes": 9306,
+  "cells": 1,
+  "fw": 110,
+  "fh": 30,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/cultivation/proto/proto_peat.webp": {
+  "animal": "proto-art",
+  "character": "proto-art",
+  "source": "tools/proto-art",
+  "swf": "misc/proto/proto_peat/proto_peat.swf",
+  "status": "ok",
+  "hires": "assets/sprites/cultivation/proto/proto_peat@3x.webp",
+  "bytes": 24380,
+  "cells": 1,
+  "fw": 183,
+  "fh": 45,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/cultivation/proto/proto_dirt_pile.webp": {
+  "animal": "proto-art",
+  "character": "proto-art",
+  "source": "tools/proto-art",
+  "swf": "misc/proto/proto_dirt_pile/proto_dirt_pile.swf",
+  "status": "ok",
+  "hires": "assets/sprites/cultivation/proto/proto_dirt_pile@3x.webp",
+  "bytes": 19514,
+  "cells": 1,
+  "fw": 181,
+  "fh": 47,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/cultivation/proto/proto_patch.webp": {
+  "animal": "proto-art",
+  "character": "proto-art",
+  "source": "tools/proto-art",
+  "swf": "misc/proto/proto_patch/proto_patch.swf",
+  "status": "ok",
+  "hires": "assets/sprites/cultivation/proto/proto_patch@3x.webp",
+  "bytes": 9016,
+  "cells": 1,
+  "fw": 106,
+  "fh": 25,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/cultivation/proto/proto_crop_garden_small.webp": {
+  "animal": "proto-art",
+  "character": "proto-art",
+  "source": "tools/proto-art",
+  "swf": "misc/proto/proto_crop_garden_small/proto_crop_garden_small.swf",
+  "status": "ok",
+  "hires": "assets/sprites/cultivation/proto/proto_crop_garden_small@3x.webp",
+  "bytes": 18878,
+  "cells": 1,
+  "fw": 211,
+  "fh": 61,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/cultivation/proto/proto_crop_garden_medium.webp": {
+  "animal": "proto-art",
+  "character": "proto-art",
+  "source": "tools/proto-art",
+  "swf": "misc/proto/proto_crop_garden_medium/proto_crop_garden_medium.swf",
+  "status": "ok",
+  "hires": "assets/sprites/cultivation/proto/proto_crop_garden_medium@3x.webp",
+  "bytes": 44086,
+  "cells": 1,
+  "fw": 325,
+  "fh": 58,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/cultivation/proto/proto_crop_garden_large.webp": {
+  "animal": "proto-art",
+  "character": "proto-art",
+  "source": "tools/proto-art",
+  "swf": "misc/proto/proto_crop_garden_large/proto_crop_garden_large.swf",
+  "status": "ok",
+  "hires": "assets/sprites/cultivation/proto/proto_crop_garden_large@3x.webp",
+  "bytes": 66846,
+  "cells": 1,
+  "fw": 411,
+  "fh": 78,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/cultivation/proto/proto_herb_garden_small.webp": {
+  "animal": "proto-art",
+  "character": "proto-art",
+  "source": "tools/proto-art",
+  "swf": "misc/proto/proto_herb_garden_small/proto_herb_garden_small.swf",
+  "status": "ok",
+  "hires": "assets/sprites/cultivation/proto/proto_herb_garden_small@3x.webp",
+  "bytes": 42964,
+  "cells": 1,
+  "fw": 215,
+  "fh": 63,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/cultivation/proto/proto_herb_garden_medium.webp": {
+  "animal": "proto-art",
+  "character": "proto-art",
+  "source": "tools/proto-art",
+  "swf": "misc/proto/proto_herb_garden_medium/proto_herb_garden_medium.swf",
+  "status": "ok",
+  "hires": "assets/sprites/cultivation/proto/proto_herb_garden_medium@3x.webp",
+  "bytes": 69818,
+  "cells": 1,
+  "fw": 324,
+  "fh": 65,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/cultivation/proto/proto_herb_garden_large.webp": {
+  "animal": "proto-art",
+  "character": "proto-art",
+  "source": "tools/proto-art",
+  "swf": "misc/proto/proto_herb_garden_large/proto_herb_garden_large.swf",
+  "status": "ok",
+  "hires": "assets/sprites/cultivation/proto/proto_herb_garden_large@3x.webp",
+  "bytes": 100506,
+  "cells": 1,
+  "fw": 408,
+  "fh": 82,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/cultivation/proto/proto_barnacle_pod.webp": {
+  "animal": "proto-art",
+  "character": "proto-art",
+  "source": "tools/proto-art",
+  "swf": "misc/proto/proto_barnacle_pod/proto_barnacle_pod.swf",
+  "status": "ok",
+  "hires": "assets/sprites/cultivation/proto/proto_barnacle_pod@3x.webp",
+  "bytes": 33362,
+  "cells": 1,
+  "fw": 174,
+  "fh": 140,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/cultivation/proto/proto_jellisac_mound.webp": {
+  "animal": "proto-art",
+  "character": "proto-art",
+  "source": "tools/proto-art",
+  "swf": "misc/proto/proto_jellisac_mound/proto_jellisac_mound.swf",
+  "status": "ok",
+  "hires": "assets/sprites/cultivation/proto/proto_jellisac_mound@3x.webp",
+  "bytes": 29488,
+  "cells": 1,
+  "fw": 261,
+  "fh": 115,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/cultivation/proto/proto_firefly_hive.webp": {
+  "animal": "proto-art",
+  "character": "proto-art",
+  "source": "tools/proto-art",
+  "swf": "misc/proto/proto_firefly_hive/proto_firefly_hive.swf",
+  "status": "ok",
+  "hires": "assets/sprites/cultivation/proto/proto_firefly_hive@3x.webp",
+  "bytes": 22002,
+  "cells": 1,
+  "fw": 182,
+  "fh": 93,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/furniture/furniture_door.png": {
+  "animal": "furniture_door",
+  "swf": "furniture/furniture_base/furniture_door/furniture_door.swf",
+  "sprite": 0,
+  "label": null,
+  "swfFrames": [
+   1,
+   1
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 117,
+  "fh": 169,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   -360,
+   -534
+  ],
+  "score": 0.9912,
+  "minFrame": 0.9912,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/furniture/furniture_door@3x.webp",
+  "bytes": 63688,
+  "firstDraw": true,
+  "frameScores": [
+   0.9912
+  ]
+ },
+ "assets/sprites/furniture/furniture_door_up_job.png": {
+  "animal": "furniture_door_up_job",
+  "swf": "furniture/furniture_base/furniture_door/furniture_door.swf",
+  "sprite": 0,
+  "label": null,
+  "swfFrames": [
+   1,
+   1
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 117,
+  "fh": 169,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   -360,
+   -534
+  ],
+  "score": 0.9912,
+  "minFrame": 0.9912,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/furniture/furniture_door_up_job@3x.webp",
+  "bytes": 63688,
+  "firstDraw": true,
+  "frameScores": [
+   0.9912
+  ]
+ },
+ "assets/sprites/furniture/furniture_door_up.png": {
+  "animal": "furniture_door_up",
+  "swf": "furniture/furniture_base/furniture_door/furniture_door.swf",
+  "sprite": 0,
+  "label": null,
+  "swfFrames": [
+   1,
+   1
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 117,
+  "fh": 169,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   -360,
+   -534
+  ],
+  "score": 0.9911,
+  "minFrame": 0.9911,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/furniture/furniture_door_up@3x.webp",
+  "bytes": 64486,
+  "firstDraw": true,
+  "frameScores": [
+   0.9911
+  ]
+ },
+ "assets/sprites/furniture/furniture_door_down.png": {
+  "animal": "furniture_door_down",
+  "swf": "furniture/furniture_base/furniture_door/furniture_door.swf",
+  "sprite": 0,
+  "label": null,
+  "swfFrames": [
+   1,
+   1
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 117,
+  "fh": 169,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   -360,
+   -534
+  ],
+  "score": 0.9911,
+  "minFrame": 0.9911,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/furniture/furniture_door_down@3x.webp",
+  "bytes": 64666,
+  "firstDraw": true,
+  "frameScores": [
+   0.9911
+  ]
+ },
+ "assets/sprites/furniture/furniture_door_down_job.png": {
+  "animal": "furniture_door_down_job",
+  "swf": "furniture/furniture_base/furniture_door/furniture_door.swf",
+  "sprite": 0,
+  "label": null,
+  "swfFrames": [
+   1,
+   1
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 117,
+  "fh": 169,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   -360,
+   -534
+  ],
+  "score": 0.9911,
+  "minFrame": 0.9911,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/furniture/furniture_door_down_job@3x.webp",
+  "bytes": 63868,
+  "firstDraw": true,
+  "frameScores": [
+   0.9911
+  ]
+ },
+ "assets/sprites/animals/magic_pig_stick_placed.png": {
+  "animal": "magic_pig_stick_placed",
+  "swf": "misc/magic_animal_stick/magic_pig_stick/magic_pig_stick.swf",
+  "sprite": 0,
+  "label": null,
+  "swfFrames": [
+   3,
+   3
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 119,
+  "fh": 185,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   -356,
+   -637
+  ],
+  "score": 0.947,
+  "minFrame": 0.947,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/animals/magic_pig_stick_placed@3x.webp",
+  "bytes": 25396,
+  "firstDraw": true,
+  "frameScores": [
+   0.947
+  ]
+ },
+ "assets/sprites/animals/magic_chicken_stick_placed.png": {
+  "animal": "magic_chicken_stick_placed",
+  "swf": "misc/magic_animal_stick/magic_chicken_stick/magic_chicken_stick.swf",
+  "sprite": 0,
+  "label": null,
+  "swfFrames": [
+   3,
+   3
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 119,
+  "fh": 185,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   -355,
+   -637
+  ],
+  "score": 0.944,
+  "minFrame": 0.944,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/animals/magic_chicken_stick_placed@3x.webp",
+  "bytes": 25848,
+  "firstDraw": true,
+  "frameScores": [
+   0.944
+  ]
+ },
+ "assets/sprites/animals/magic_butterfly_stick_placed.png": {
+  "animal": "magic_butterfly_stick_placed",
+  "swf": "misc/magic_animal_stick/magic_butterfly_stick/magic_butterfly_stick.swf",
+  "sprite": 0,
+  "label": null,
+  "swfFrames": [
+   3,
+   3
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 119,
+  "fh": 184,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   -356,
+   -634
+  ],
+  "score": 0.9455,
+  "minFrame": 0.9455,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/animals/magic_butterfly_stick_placed@3x.webp",
+  "bytes": 24924,
+  "firstDraw": true,
+  "frameScores": [
+   0.9455
+  ]
+ },
+ "assets/sprites/note-pole/poleTall_1.webp": {
+  "animal": "note-pole-art",
+  "character": "note-pole-art",
+  "source": "tools/note-pole-art",
+  "swf": "misc/note_pole/note_pole.swf",
+  "status": "ok",
+  "hires": "assets/sprites/note-pole/poleTall_1@3x.webp",
+  "bytes": 3048,
+  "cells": 1,
+  "fw": 23,
+  "fh": 181,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/note-pole/poleTall_2.webp": {
+  "animal": "note-pole-art",
+  "character": "note-pole-art",
+  "source": "tools/note-pole-art",
+  "swf": "misc/note_pole/note_pole.swf",
+  "status": "ok",
+  "hires": "assets/sprites/note-pole/poleTall_2@3x.webp",
+  "bytes": 4762,
+  "cells": 1,
+  "fw": 28,
+  "fh": 183,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/note-pole/poleTall_3.webp": {
+  "animal": "note-pole-art",
+  "character": "note-pole-art",
+  "source": "tools/note-pole-art",
+  "swf": "misc/note_pole/note_pole.swf",
+  "status": "ok",
+  "hires": "assets/sprites/note-pole/poleTall_3@3x.webp",
+  "bytes": 1372,
+  "cells": 1,
+  "fw": 18,
+  "fh": 188,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/note-pole/poleTall_4.webp": {
+  "animal": "note-pole-art",
+  "character": "note-pole-art",
+  "source": "tools/note-pole-art",
+  "swf": "misc/note_pole/note_pole.swf",
+  "status": "ok",
+  "hires": "assets/sprites/note-pole/poleTall_4@3x.webp",
+  "bytes": 1668,
+  "cells": 1,
+  "fw": 29,
+  "fh": 183,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/note-pole/poleTall_5.webp": {
+  "animal": "note-pole-art",
+  "character": "note-pole-art",
+  "source": "tools/note-pole-art",
+  "swf": "misc/note_pole/note_pole.swf",
+  "status": "ok",
+  "hires": "assets/sprites/note-pole/poleTall_5@3x.webp",
+  "bytes": 6776,
+  "cells": 1,
+  "fw": 40,
+  "fh": 191,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/note-pole/poleTall_6.webp": {
+  "animal": "note-pole-art",
+  "character": "note-pole-art",
+  "source": "tools/note-pole-art",
+  "swf": "misc/note_pole/note_pole.swf",
+  "status": "ok",
+  "hires": "assets/sprites/note-pole/poleTall_6@3x.webp",
+  "bytes": 9512,
+  "cells": 1,
+  "fw": 63,
+  "fh": 198,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/note-pole/poleTall_7.webp": {
+  "animal": "note-pole-art",
+  "character": "note-pole-art",
+  "source": "tools/note-pole-art",
+  "swf": "misc/note_pole/note_pole.swf",
+  "status": "ok",
+  "hires": "assets/sprites/note-pole/poleTall_7@3x.webp",
+  "bytes": 6388,
+  "cells": 1,
+  "fw": 39,
+  "fh": 190,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/note-pole/poleTall_8.webp": {
+  "animal": "note-pole-art",
+  "character": "note-pole-art",
+  "source": "tools/note-pole-art",
+  "swf": "misc/note_pole/note_pole.swf",
+  "status": "ok",
+  "hires": "assets/sprites/note-pole/poleTall_8@3x.webp",
+  "bytes": 4876,
+  "cells": 1,
+  "fw": 28,
+  "fh": 183,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/note-pole/poleTall_9.webp": {
+  "animal": "note-pole-art",
+  "character": "note-pole-art",
+  "source": "tools/note-pole-art",
+  "swf": "misc/note_pole/note_pole.swf",
+  "status": "ok",
+  "hires": "assets/sprites/note-pole/poleTall_9@3x.webp",
+  "bytes": 6474,
+  "cells": 1,
+  "fw": 29,
+  "fh": 193,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/note-pole/poleTall_10.webp": {
+  "animal": "note-pole-art",
+  "character": "note-pole-art",
+  "source": "tools/note-pole-art",
+  "swf": "misc/note_pole/note_pole.swf",
+  "status": "ok",
+  "hires": "assets/sprites/note-pole/poleTall_10@3x.webp",
+  "bytes": 2400,
+  "cells": 1,
+  "fw": 17,
+  "fh": 183,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/note-pole/poleMedium_1.webp": {
+  "animal": "note-pole-art",
+  "character": "note-pole-art",
+  "source": "tools/note-pole-art",
+  "swf": "misc/note_pole/note_pole.swf",
+  "status": "ok",
+  "hires": "assets/sprites/note-pole/poleMedium_1@3x.webp",
+  "bytes": 2792,
+  "cells": 1,
+  "fw": 24,
+  "fh": 125,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/note-pole/poleMedium_2.webp": {
+  "animal": "note-pole-art",
+  "character": "note-pole-art",
+  "source": "tools/note-pole-art",
+  "swf": "misc/note_pole/note_pole.swf",
+  "status": "ok",
+  "hires": "assets/sprites/note-pole/poleMedium_2@3x.webp",
+  "bytes": 3568,
+  "cells": 1,
+  "fw": 28,
+  "fh": 125,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/note-pole/poleMedium_3.webp": {
+  "animal": "note-pole-art",
+  "character": "note-pole-art",
+  "source": "tools/note-pole-art",
+  "swf": "misc/note_pole/note_pole.swf",
+  "status": "ok",
+  "hires": "assets/sprites/note-pole/poleMedium_3@3x.webp",
+  "bytes": 1212,
+  "cells": 1,
+  "fw": 18,
+  "fh": 125,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/note-pole/poleMedium_4.webp": {
+  "animal": "note-pole-art",
+  "character": "note-pole-art",
+  "source": "tools/note-pole-art",
+  "swf": "misc/note_pole/note_pole.swf",
+  "status": "ok",
+  "hires": "assets/sprites/note-pole/poleMedium_4@3x.webp",
+  "bytes": 1550,
+  "cells": 1,
+  "fw": 30,
+  "fh": 125,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/note-pole/poleMedium_5.webp": {
+  "animal": "note-pole-art",
+  "character": "note-pole-art",
+  "source": "tools/note-pole-art",
+  "swf": "misc/note_pole/note_pole.swf",
+  "status": "ok",
+  "hires": "assets/sprites/note-pole/poleMedium_5@3x.webp",
+  "bytes": 5810,
+  "cells": 1,
+  "fw": 40,
+  "fh": 134,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/note-pole/poleMedium_6.webp": {
+  "animal": "note-pole-art",
+  "character": "note-pole-art",
+  "source": "tools/note-pole-art",
+  "swf": "misc/note_pole/note_pole.swf",
+  "status": "ok",
+  "hires": "assets/sprites/note-pole/poleMedium_6@3x.webp",
+  "bytes": 6840,
+  "cells": 1,
+  "fw": 47,
+  "fh": 136,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/note-pole/poleMedium_7.webp": {
+  "animal": "note-pole-art",
+  "character": "note-pole-art",
+  "source": "tools/note-pole-art",
+  "swf": "misc/note_pole/note_pole.swf",
+  "status": "ok",
+  "hires": "assets/sprites/note-pole/poleMedium_7@3x.webp",
+  "bytes": 5170,
+  "cells": 1,
+  "fw": 40,
+  "fh": 129,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/note-pole/poleMedium_8.webp": {
+  "animal": "note-pole-art",
+  "character": "note-pole-art",
+  "source": "tools/note-pole-art",
+  "swf": "misc/note_pole/note_pole.swf",
+  "status": "ok",
+  "hires": "assets/sprites/note-pole/poleMedium_8@3x.webp",
+  "bytes": 3682,
+  "cells": 1,
+  "fw": 28,
+  "fh": 125,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/note-pole/poleMedium_9.webp": {
+  "animal": "note-pole-art",
+  "character": "note-pole-art",
+  "source": "tools/note-pole-art",
+  "swf": "misc/note_pole/note_pole.swf",
+  "status": "ok",
+  "hires": "assets/sprites/note-pole/poleMedium_9@3x.webp",
+  "bytes": 4614,
+  "cells": 1,
+  "fw": 30,
+  "fh": 129,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/note-pole/poleMedium_10.webp": {
+  "animal": "note-pole-art",
+  "character": "note-pole-art",
+  "source": "tools/note-pole-art",
+  "swf": "misc/note_pole/note_pole.swf",
+  "status": "ok",
+  "hires": "assets/sprites/note-pole/poleMedium_10@3x.webp",
+  "bytes": 1844,
+  "cells": 1,
+  "fw": 17,
+  "fh": 127,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/note-pole/poleShort_1.webp": {
+  "animal": "note-pole-art",
+  "character": "note-pole-art",
+  "source": "tools/note-pole-art",
+  "swf": "misc/note_pole/note_pole.swf",
+  "status": "ok",
+  "hires": "assets/sprites/note-pole/poleShort_1@3x.webp",
+  "bytes": 1798,
+  "cells": 1,
+  "fw": 23,
+  "fh": 46,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/note-pole/poleShort_2.webp": {
+  "animal": "note-pole-art",
+  "character": "note-pole-art",
+  "source": "tools/note-pole-art",
+  "swf": "misc/note_pole/note_pole.swf",
+  "status": "ok",
+  "hires": "assets/sprites/note-pole/poleShort_2@3x.webp",
+  "bytes": 1608,
+  "cells": 1,
+  "fw": 19,
+  "fh": 43,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/note-pole/poleShort_3.webp": {
+  "animal": "note-pole-art",
+  "character": "note-pole-art",
+  "source": "tools/note-pole-art",
+  "swf": "misc/note_pole/note_pole.swf",
+  "status": "ok",
+  "hires": "assets/sprites/note-pole/poleShort_3@3x.webp",
+  "bytes": 984,
+  "cells": 1,
+  "fw": 18,
+  "fh": 49,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/note-pole/poleShort_4.webp": {
+  "animal": "note-pole-art",
+  "character": "note-pole-art",
+  "source": "tools/note-pole-art",
+  "swf": "misc/note_pole/note_pole.swf",
+  "status": "ok",
+  "hires": "assets/sprites/note-pole/poleShort_4@3x.webp",
+  "bytes": 960,
+  "cells": 1,
+  "fw": 20,
+  "fh": 49,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/note-pole/poleShort_5.webp": {
+  "animal": "note-pole-art",
+  "character": "note-pole-art",
+  "source": "tools/note-pole-art",
+  "swf": "misc/note_pole/note_pole.swf",
+  "status": "ok",
+  "hires": "assets/sprites/note-pole/poleShort_5@3x.webp",
+  "bytes": 2550,
+  "cells": 1,
+  "fw": 26,
+  "fh": 49,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/note-pole/poleShort_6.webp": {
+  "animal": "note-pole-art",
+  "character": "note-pole-art",
+  "source": "tools/note-pole-art",
+  "swf": "misc/note_pole/note_pole.swf",
+  "status": "ok",
+  "hires": "assets/sprites/note-pole/poleShort_6@3x.webp",
+  "bytes": 3936,
+  "cells": 1,
+  "fw": 39,
+  "fh": 77,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/note-pole/poleShort_7.webp": {
+  "animal": "note-pole-art",
+  "character": "note-pole-art",
+  "source": "tools/note-pole-art",
+  "swf": "misc/note_pole/note_pole.swf",
+  "status": "ok",
+  "hires": "assets/sprites/note-pole/poleShort_7@3x.webp",
+  "bytes": 2308,
+  "cells": 1,
+  "fw": 23,
+  "fh": 49,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/note-pole/poleShort_8.webp": {
+  "animal": "note-pole-art",
+  "character": "note-pole-art",
+  "source": "tools/note-pole-art",
+  "swf": "misc/note_pole/note_pole.swf",
+  "status": "ok",
+  "hires": "assets/sprites/note-pole/poleShort_8@3x.webp",
+  "bytes": 1702,
+  "cells": 1,
+  "fw": 18,
+  "fh": 48,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/note-pole/poleShort_9.webp": {
+  "animal": "note-pole-art",
+  "character": "note-pole-art",
+  "source": "tools/note-pole-art",
+  "swf": "misc/note_pole/note_pole.swf",
+  "status": "ok",
+  "hires": "assets/sprites/note-pole/poleShort_9@3x.webp",
+  "bytes": 2348,
+  "cells": 1,
+  "fw": 22,
+  "fh": 52,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/note-pole/poleShort_10.webp": {
+  "animal": "note-pole-art",
+  "character": "note-pole-art",
+  "source": "tools/note-pole-art",
+  "swf": "misc/note_pole/note_pole.swf",
+  "status": "ok",
+  "hires": "assets/sprites/note-pole/poleShort_10@3x.webp",
+  "bytes": 1034,
+  "cells": 1,
+  "fw": 15,
+  "fh": 47,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/note-pole/sign_1.webp": {
+  "animal": "note-pole-art",
+  "character": "note-pole-art",
+  "source": "tools/note-pole-art",
+  "swf": "misc/note_pole/note_pole.swf",
+  "status": "ok",
+  "hires": "assets/sprites/note-pole/sign_1@3x.webp",
+  "bytes": 2672,
+  "cells": 1,
+  "fw": 50,
+  "fh": 32,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/note-pole/sign_2.webp": {
+  "animal": "note-pole-art",
+  "character": "note-pole-art",
+  "source": "tools/note-pole-art",
+  "swf": "misc/note_pole/note_pole.swf",
+  "status": "ok",
+  "hires": "assets/sprites/note-pole/sign_2@3x.webp",
+  "bytes": 6922,
+  "cells": 1,
+  "fw": 50,
+  "fh": 57,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/note-pole/sign_3.webp": {
+  "animal": "note-pole-art",
+  "character": "note-pole-art",
+  "source": "tools/note-pole-art",
+  "swf": "misc/note_pole/note_pole.swf",
+  "status": "ok",
+  "hires": "assets/sprites/note-pole/sign_3@3x.webp",
+  "bytes": 2312,
+  "cells": 1,
+  "fw": 42,
+  "fh": 53,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/note-pole/sign_4.webp": {
+  "animal": "note-pole-art",
+  "character": "note-pole-art",
+  "source": "tools/note-pole-art",
+  "swf": "misc/note_pole/note_pole.swf",
+  "status": "ok",
+  "hires": "assets/sprites/note-pole/sign_4@3x.webp",
+  "bytes": 3302,
+  "cells": 1,
+  "fw": 58,
+  "fh": 46,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/note-pole/sign_5.webp": {
+  "animal": "note-pole-art",
+  "character": "note-pole-art",
+  "source": "tools/note-pole-art",
+  "swf": "misc/note_pole/note_pole.swf",
+  "status": "ok",
+  "hires": "assets/sprites/note-pole/sign_5@3x.webp",
+  "bytes": 5958,
+  "cells": 1,
+  "fw": 67,
+  "fh": 52,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/note-pole/sign_6.webp": {
+  "animal": "note-pole-art",
+  "character": "note-pole-art",
+  "source": "tools/note-pole-art",
+  "swf": "misc/note_pole/note_pole.swf",
+  "status": "ok",
+  "hires": "assets/sprites/note-pole/sign_6@3x.webp",
+  "bytes": 8150,
+  "cells": 1,
+  "fw": 73,
+  "fh": 60,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/note-pole/sign_7.webp": {
+  "animal": "note-pole-art",
+  "character": "note-pole-art",
+  "source": "tools/note-pole-art",
+  "swf": "misc/note_pole/note_pole.swf",
+  "status": "ok",
+  "hires": "assets/sprites/note-pole/sign_7@3x.webp",
+  "bytes": 3968,
+  "cells": 1,
+  "fw": 71,
+  "fh": 52,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/note-pole/sign_8.webp": {
+  "animal": "note-pole-art",
+  "character": "note-pole-art",
+  "source": "tools/note-pole-art",
+  "swf": "misc/note_pole/note_pole.swf",
+  "status": "ok",
+  "hires": "assets/sprites/note-pole/sign_8@3x.webp",
+  "bytes": 4068,
+  "cells": 1,
+  "fw": 69,
+  "fh": 53,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/note-pole/sign_9.webp": {
+  "animal": "note-pole-art",
+  "character": "note-pole-art",
+  "source": "tools/note-pole-art",
+  "swf": "misc/note_pole/note_pole.swf",
+  "status": "ok",
+  "hires": "assets/sprites/note-pole/sign_9@3x.webp",
+  "bytes": 6504,
+  "cells": 1,
+  "fw": 70,
+  "fh": 54,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/note-pole/signNote_1.webp": {
+  "animal": "note-pole-art",
+  "character": "note-pole-art",
+  "source": "tools/note-pole-art",
+  "swf": "misc/note_pole/note_pole.swf",
+  "status": "ok",
+  "hires": "assets/sprites/note-pole/signNote_1@3x.webp",
+  "bytes": 3180,
+  "cells": 1,
+  "fw": 39,
+  "fh": 28,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/note-pole/signNote_2.webp": {
+  "animal": "note-pole-art",
+  "character": "note-pole-art",
+  "source": "tools/note-pole-art",
+  "swf": "misc/note_pole/note_pole.swf",
+  "status": "ok",
+  "hires": "assets/sprites/note-pole/signNote_2@3x.webp",
+  "bytes": 3372,
+  "cells": 1,
+  "fw": 29,
+  "fh": 45,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/note-pole/signNote_3.webp": {
+  "animal": "note-pole-art",
+  "character": "note-pole-art",
+  "source": "tools/note-pole-art",
+  "swf": "misc/note_pole/note_pole.swf",
+  "status": "ok",
+  "hires": "assets/sprites/note-pole/signNote_3@3x.webp",
+  "bytes": 1930,
+  "cells": 1,
+  "fw": 25,
+  "fh": 38,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/note-pole/signNote_4.webp": {
+  "animal": "note-pole-art",
+  "character": "note-pole-art",
+  "source": "tools/note-pole-art",
+  "swf": "misc/note_pole/note_pole.swf",
+  "status": "ok",
+  "hires": "assets/sprites/note-pole/signNote_4@3x.webp",
+  "bytes": 3226,
+  "cells": 1,
+  "fw": 39,
+  "fh": 28,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/note-pole/signNote_5.webp": {
+  "animal": "note-pole-art",
+  "character": "note-pole-art",
+  "source": "tools/note-pole-art",
+  "swf": "misc/note_pole/note_pole.swf",
+  "status": "ok",
+  "hires": "assets/sprites/note-pole/signNote_5@3x.webp",
+  "bytes": 3402,
+  "cells": 1,
+  "fw": 39,
+  "fh": 26,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/note-pole/signNote_6.webp": {
+  "animal": "note-pole-art",
+  "character": "note-pole-art",
+  "source": "tools/note-pole-art",
+  "swf": "misc/note_pole/note_pole.swf",
+  "status": "ok",
+  "hires": "assets/sprites/note-pole/signNote_6@3x.webp",
+  "bytes": 4418,
+  "cells": 1,
+  "fw": 43,
+  "fh": 35,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/note-pole/signNote_7.webp": {
+  "animal": "note-pole-art",
+  "character": "note-pole-art",
+  "source": "tools/note-pole-art",
+  "swf": "misc/note_pole/note_pole.swf",
+  "status": "ok",
+  "hires": "assets/sprites/note-pole/signNote_7@3x.webp",
+  "bytes": 4378,
+  "cells": 1,
+  "fw": 49,
+  "fh": 34,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/note-pole/signNote_8.webp": {
+  "animal": "note-pole-art",
+  "character": "note-pole-art",
+  "source": "tools/note-pole-art",
+  "swf": "misc/note_pole/note_pole.swf",
+  "status": "ok",
+  "hires": "assets/sprites/note-pole/signNote_8@3x.webp",
+  "bytes": 4152,
+  "cells": 1,
+  "fw": 49,
+  "fh": 33,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/note-pole/signNote_9.webp": {
+  "animal": "note-pole-art",
+  "character": "note-pole-art",
+  "source": "tools/note-pole-art",
+  "swf": "misc/note_pole/note_pole.swf",
+  "status": "ok",
+  "hires": "assets/sprites/note-pole/signNote_9@3x.webp",
+  "bytes": 3404,
+  "cells": 1,
+  "fw": 47,
+  "fh": 34,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/base_floor_ground_1.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_base/furniture_tower_chassis/furniture_tower_chassis.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/base_floor_ground_1@3x.webp",
+  "bytes": 63954,
+  "cells": 1,
+  "fw": 415,
+  "fh": 178,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/base_floor_ground_2.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_base/furniture_tower_chassis/furniture_tower_chassis.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/base_floor_ground_2@3x.webp",
+  "bytes": 60756,
+  "cells": 1,
+  "fw": 415,
+  "fh": 178,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/base_floor_ground_3.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_base/furniture_tower_chassis/furniture_tower_chassis.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/base_floor_ground_3@3x.webp",
+  "bytes": 67964,
+  "cells": 1,
+  "fw": 397,
+  "fh": 168,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/base_floor_ground_4.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_base/furniture_tower_chassis/furniture_tower_chassis.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/base_floor_ground_4@3x.webp",
+  "bytes": 67528,
+  "cells": 1,
+  "fw": 397,
+  "fh": 168,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/base_floor_ground_5.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_base/furniture_tower_chassis/furniture_tower_chassis.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/base_floor_ground_5@3x.webp",
+  "bytes": 58280,
+  "cells": 1,
+  "fw": 415,
+  "fh": 178,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/base_floor_ground_6.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_base/furniture_tower_chassis/furniture_tower_chassis.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/base_floor_ground_6@3x.webp",
+  "bytes": 61934,
+  "cells": 1,
+  "fw": 415,
+  "fh": 178,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/base_floor_ground_7.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_base/furniture_tower_chassis/furniture_tower_chassis.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/base_floor_ground_7@3x.webp",
+  "bytes": 69652,
+  "cells": 1,
+  "fw": 415,
+  "fh": 178,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/base_floor_top_1.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_base/furniture_tower_chassis/furniture_tower_chassis.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/base_floor_top_1@3x.webp",
+  "bytes": 50382,
+  "cells": 1,
+  "fw": 326,
+  "fh": 162,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/base_floor_top_2.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_base/furniture_tower_chassis/furniture_tower_chassis.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/base_floor_top_2@3x.webp",
+  "bytes": 50196,
+  "cells": 1,
+  "fw": 326,
+  "fh": 162,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/base_floor_top_3.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_base/furniture_tower_chassis/furniture_tower_chassis.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/base_floor_top_3@3x.webp",
+  "bytes": 38280,
+  "cells": 1,
+  "fw": 326,
+  "fh": 182,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/base_floor_top_4.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_base/furniture_tower_chassis/furniture_tower_chassis.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/base_floor_top_4@3x.webp",
+  "bytes": 38890,
+  "cells": 1,
+  "fw": 326,
+  "fh": 182,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/base_floor_top_5.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_base/furniture_tower_chassis/furniture_tower_chassis.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/base_floor_top_5@3x.webp",
+  "bytes": 45152,
+  "cells": 1,
+  "fw": 326,
+  "fh": 162,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/base_floor_top_6.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_base/furniture_tower_chassis/furniture_tower_chassis.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/base_floor_top_6@3x.webp",
+  "bytes": 52998,
+  "cells": 1,
+  "fw": 326,
+  "fh": 162,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/base_floor_top_7.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_base/furniture_tower_chassis/furniture_tower_chassis.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/base_floor_top_7@3x.webp",
+  "bytes": 39200,
+  "cells": 1,
+  "fw": 326,
+  "fh": 182,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/base_extra_floor_1.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_base/furniture_tower_chassis/furniture_tower_chassis.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/base_extra_floor_1@3x.webp",
+  "bytes": 27976,
+  "cells": 1,
+  "fw": 283,
+  "fh": 118,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/base_extra_floor_2.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_base/furniture_tower_chassis/furniture_tower_chassis.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/base_extra_floor_2@3x.webp",
+  "bytes": 37066,
+  "cells": 1,
+  "fw": 328,
+  "fh": 119,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/base_extra_floor_3.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_base/furniture_tower_chassis/furniture_tower_chassis.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/base_extra_floor_3@3x.webp",
+  "bytes": 37008,
+  "cells": 1,
+  "fw": 304,
+  "fh": 124,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/base_extra_floor_4.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_base/furniture_tower_chassis/furniture_tower_chassis.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/base_extra_floor_4@3x.webp",
+  "bytes": 29164,
+  "cells": 1,
+  "fw": 284,
+  "fh": 118,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/base_extra_floor_5.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_base/furniture_tower_chassis/furniture_tower_chassis.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/base_extra_floor_5@3x.webp",
+  "bytes": 40828,
+  "cells": 1,
+  "fw": 328,
+  "fh": 119,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/base_extra_floor_6.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_base/furniture_tower_chassis/furniture_tower_chassis.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/base_extra_floor_6@3x.webp",
+  "bytes": 33944,
+  "cells": 1,
+  "fw": 304,
+  "fh": 124,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/base_extra_floor_7.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_base/furniture_tower_chassis/furniture_tower_chassis.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/base_extra_floor_7@3x.webp",
+  "bytes": 24914,
+  "cells": 1,
+  "fw": 283,
+  "fh": 118,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/base_extra_floor_8.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_base/furniture_tower_chassis/furniture_tower_chassis.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/base_extra_floor_8@3x.webp",
+  "bytes": 23094,
+  "cells": 1,
+  "fw": 283,
+  "fh": 118,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/base_extra_floor_9.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_base/furniture_tower_chassis/furniture_tower_chassis.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/base_extra_floor_9@3x.webp",
+  "bytes": 29428,
+  "cells": 1,
+  "fw": 328,
+  "fh": 119,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/base_extra_floor_10.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_base/furniture_tower_chassis/furniture_tower_chassis.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/base_extra_floor_10@3x.webp",
+  "bytes": 31460,
+  "cells": 1,
+  "fw": 328,
+  "fh": 119,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/base_extra_floor_11.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_base/furniture_tower_chassis/furniture_tower_chassis.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/base_extra_floor_11@3x.webp",
+  "bytes": 28964,
+  "cells": 1,
+  "fw": 283,
+  "fh": 118,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/base_extra_floor_12.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_base/furniture_tower_chassis/furniture_tower_chassis.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/base_extra_floor_12@3x.webp",
+  "bytes": 27826,
+  "cells": 1,
+  "fw": 284,
+  "fh": 118,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/base_deco_ground_2.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_base/furniture_tower_chassis/furniture_tower_chassis.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/base_deco_ground_2@3x.webp",
+  "bytes": 25810,
+  "cells": 1,
+  "fw": 178,
+  "fh": 153,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/base_deco_ground_3.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_base/furniture_tower_chassis/furniture_tower_chassis.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/base_deco_ground_3@3x.webp",
+  "bytes": 24696,
+  "cells": 1,
+  "fw": 178,
+  "fh": 153,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/base_deco_ground_4.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_base/furniture_tower_chassis/furniture_tower_chassis.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/base_deco_ground_4@3x.webp",
+  "bytes": 18926,
+  "cells": 1,
+  "fw": 322,
+  "fh": 49,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/base_deco_ground_5.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_base/furniture_tower_chassis/furniture_tower_chassis.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/base_deco_ground_5@3x.webp",
+  "bytes": 12308,
+  "cells": 1,
+  "fw": 322,
+  "fh": 49,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/base_deco_ground_6.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_base/furniture_tower_chassis/furniture_tower_chassis.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/base_deco_ground_6@3x.webp",
+  "bytes": 13108,
+  "cells": 1,
+  "fw": 73,
+  "fh": 57,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/base_deco_ground_7.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_base/furniture_tower_chassis/furniture_tower_chassis.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/base_deco_ground_7@3x.webp",
+  "bytes": 13576,
+  "cells": 1,
+  "fw": 73,
+  "fh": 57,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/base_deco_ground_8.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_base/furniture_tower_chassis/furniture_tower_chassis.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/base_deco_ground_8@3x.webp",
+  "bytes": 82364,
+  "cells": 1,
+  "fw": 266,
+  "fh": 200,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/base_deco_ground_9.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_base/furniture_tower_chassis/furniture_tower_chassis.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/base_deco_ground_9@3x.webp",
+  "bytes": 31122,
+  "cells": 1,
+  "fw": 233,
+  "fh": 90,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/base_deco_side_2.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_base/furniture_tower_chassis/furniture_tower_chassis.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/base_deco_side_2@3x.webp",
+  "bytes": 27510,
+  "cells": 1,
+  "fw": 95,
+  "fh": 221,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/base_deco_side_3.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_base/furniture_tower_chassis/furniture_tower_chassis.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/base_deco_side_3@3x.webp",
+  "bytes": 24848,
+  "cells": 1,
+  "fw": 95,
+  "fh": 221,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/base_deco_side_4.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_base/furniture_tower_chassis/furniture_tower_chassis.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/base_deco_side_4@3x.webp",
+  "bytes": 21284,
+  "cells": 1,
+  "fw": 95,
+  "fh": 221,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/base_deco_side_5.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_base/furniture_tower_chassis/furniture_tower_chassis.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/base_deco_side_5@3x.webp",
+  "bytes": 21416,
+  "cells": 1,
+  "fw": 124,
+  "fh": 87,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/base_deco_side_6.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_base/furniture_tower_chassis/furniture_tower_chassis.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/base_deco_side_6@3x.webp",
+  "bytes": 20878,
+  "cells": 1,
+  "fw": 124,
+  "fh": 87,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/base_deco_side_7.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_base/furniture_tower_chassis/furniture_tower_chassis.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/base_deco_side_7@3x.webp",
+  "bytes": 34836,
+  "cells": 1,
+  "fw": 135,
+  "fh": 159,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/base_deco_side_8.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_base/furniture_tower_chassis/furniture_tower_chassis.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/base_deco_side_8@3x.webp",
+  "bytes": 32686,
+  "cells": 1,
+  "fw": 135,
+  "fh": 159,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/tree_floor_ground_1.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_tree_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/tree_floor_ground_1@3x.webp",
+  "bytes": 37774,
+  "cells": 1,
+  "fw": 379,
+  "fh": 163,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/tree_floor_ground_2.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_tree_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/tree_floor_ground_2@3x.webp",
+  "bytes": 53460,
+  "cells": 1,
+  "fw": 315,
+  "fh": 158,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/tree_floor_ground_3.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_tree_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/tree_floor_ground_3@3x.webp",
+  "bytes": 57038,
+  "cells": 1,
+  "fw": 315,
+  "fh": 158,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/tree_floor_ground_4.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_tree_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/tree_floor_ground_4@3x.webp",
+  "bytes": 64184,
+  "cells": 1,
+  "fw": 489,
+  "fh": 198,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/tree_floor_ground_5.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_tree_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/tree_floor_ground_5@3x.webp",
+  "bytes": 54434,
+  "cells": 1,
+  "fw": 452,
+  "fh": 166,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/tree_floor_ground_6.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_tree_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/tree_floor_ground_6@3x.webp",
+  "bytes": 71926,
+  "cells": 1,
+  "fw": 489,
+  "fh": 198,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/tree_floor_ground_7.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_tree_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/tree_floor_ground_7@3x.webp",
+  "bytes": 65420,
+  "cells": 1,
+  "fw": 453,
+  "fh": 167,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/tree_floor_top_1.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_tree_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/tree_floor_top_1@3x.webp",
+  "bytes": 33952,
+  "cells": 1,
+  "fw": 334,
+  "fh": 134,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/tree_floor_top_2.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_tree_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/tree_floor_top_2@3x.webp",
+  "bytes": 32830,
+  "cells": 1,
+  "fw": 334,
+  "fh": 134,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/tree_floor_top_3.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_tree_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/tree_floor_top_3@3x.webp",
+  "bytes": 38606,
+  "cells": 1,
+  "fw": 260,
+  "fh": 150,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/tree_floor_top_4.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_tree_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/tree_floor_top_4@3x.webp",
+  "bytes": 33486,
+  "cells": 1,
+  "fw": 283,
+  "fh": 150,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/tree_floor_top_5.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_tree_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/tree_floor_top_5@3x.webp",
+  "bytes": 17906,
+  "cells": 1,
+  "fw": 233,
+  "fh": 105,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/tree_floor_top_6.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_tree_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/tree_floor_top_6@3x.webp",
+  "bytes": 24360,
+  "cells": 1,
+  "fw": 325,
+  "fh": 138,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/tree_floor_top_7.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_tree_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/tree_floor_top_7@3x.webp",
+  "bytes": 79804,
+  "cells": 1,
+  "fw": 398,
+  "fh": 245,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/tree_floor_top_8.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_tree_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/tree_floor_top_8@3x.webp",
+  "bytes": 61660,
+  "cells": 1,
+  "fw": 471,
+  "fh": 291,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/tree_extra_floor_1.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_tree_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/tree_extra_floor_1@3x.webp",
+  "bytes": 16886,
+  "cells": 1,
+  "fw": 232,
+  "fh": 106,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/tree_extra_floor_2.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_tree_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/tree_extra_floor_2@3x.webp",
+  "bytes": 22250,
+  "cells": 1,
+  "fw": 238,
+  "fh": 106,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/tree_extra_floor_3.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_tree_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/tree_extra_floor_3@3x.webp",
+  "bytes": 27488,
+  "cells": 1,
+  "fw": 403,
+  "fh": 128,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/tree_extra_floor_4.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_tree_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/tree_extra_floor_4@3x.webp",
+  "bytes": 27864,
+  "cells": 1,
+  "fw": 429,
+  "fh": 143,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/tree_extra_floor_5.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_tree_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/tree_extra_floor_5@3x.webp",
+  "bytes": 34270,
+  "cells": 1,
+  "fw": 238,
+  "fh": 126,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/tree_extra_floor_6.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_tree_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/tree_extra_floor_6@3x.webp",
+  "bytes": 46212,
+  "cells": 1,
+  "fw": 455,
+  "fh": 172,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/tree_extra_floor_7.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_tree_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/tree_extra_floor_7@3x.webp",
+  "bytes": 42778,
+  "cells": 1,
+  "fw": 406,
+  "fh": 158,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/tree_extra_floor_8.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_tree_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/tree_extra_floor_8@3x.webp",
+  "bytes": 39730,
+  "cells": 1,
+  "fw": 432,
+  "fh": 114,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/tree_extra_floor_9.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_tree_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/tree_extra_floor_9@3x.webp",
+  "bytes": 44558,
+  "cells": 1,
+  "fw": 459,
+  "fh": 181,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/tree_extra_floor_10.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_tree_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/tree_extra_floor_10@3x.webp",
+  "bytes": 45588,
+  "cells": 1,
+  "fw": 376,
+  "fh": 227,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/tree_extra_floor_11.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_tree_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/tree_extra_floor_11@3x.webp",
+  "bytes": 32812,
+  "cells": 1,
+  "fw": 280,
+  "fh": 106,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/tree_extra_floor_12.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_tree_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/tree_extra_floor_12@3x.webp",
+  "bytes": 28552,
+  "cells": 1,
+  "fw": 254,
+  "fh": 106,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/tree_extra_floor_13.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_tree_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/tree_extra_floor_13@3x.webp",
+  "bytes": 28706,
+  "cells": 1,
+  "fw": 267,
+  "fh": 173,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/tree_extra_floor_14.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_tree_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/tree_extra_floor_14@3x.webp",
+  "bytes": 36954,
+  "cells": 1,
+  "fw": 365,
+  "fh": 198,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/tree_deco_ground_1.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_tree_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/tree_deco_ground_1@3x.webp",
+  "bytes": 14288,
+  "cells": 1,
+  "fw": 246,
+  "fh": 65,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/tree_deco_ground_2.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_tree_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/tree_deco_ground_2@3x.webp",
+  "bytes": 4680,
+  "cells": 1,
+  "fw": 156,
+  "fh": 41,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/tree_deco_ground_3.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_tree_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/tree_deco_ground_3@3x.webp",
+  "bytes": 6654,
+  "cells": 1,
+  "fw": 156,
+  "fh": 42,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/tree_deco_ground_4.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_tree_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/tree_deco_ground_4@3x.webp",
+  "bytes": 20068,
+  "cells": 1,
+  "fw": 179,
+  "fh": 111,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/tree_deco_ground_5.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_tree_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/tree_deco_ground_5@3x.webp",
+  "bytes": 20356,
+  "cells": 1,
+  "fw": 179,
+  "fh": 111,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/tree_deco_ground_6.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_tree_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/tree_deco_ground_6@3x.webp",
+  "bytes": 17236,
+  "cells": 1,
+  "fw": 218,
+  "fh": 145,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/tree_deco_ground_7.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_tree_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/tree_deco_ground_7@3x.webp",
+  "bytes": 40856,
+  "cells": 1,
+  "fw": 164,
+  "fh": 125,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/tree_deco_side_1.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_tree_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/tree_deco_side_1@3x.webp",
+  "bytes": 16022,
+  "cells": 1,
+  "fw": 107,
+  "fh": 94,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/tree_deco_side_2.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_tree_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/tree_deco_side_2@3x.webp",
+  "bytes": 16662,
+  "cells": 1,
+  "fw": 107,
+  "fh": 94,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/tree_deco_side_3.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_tree_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/tree_deco_side_3@3x.webp",
+  "bytes": 13980,
+  "cells": 1,
+  "fw": 75,
+  "fh": 106,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/tree_deco_side_4.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_tree_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/tree_deco_side_4@3x.webp",
+  "bytes": 18942,
+  "cells": 1,
+  "fw": 92,
+  "fh": 99,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/tree_deco_side_5.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_tree_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/tree_deco_side_5@3x.webp",
+  "bytes": 14258,
+  "cells": 1,
+  "fw": 83,
+  "fh": 96,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/tree_deco_side_6.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_tree_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/tree_deco_side_6@3x.webp",
+  "bytes": 16420,
+  "cells": 1,
+  "fw": 92,
+  "fh": 99,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/tree_deco_side_7.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_tree_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/tree_deco_side_7@3x.webp",
+  "bytes": 7794,
+  "cells": 1,
+  "fw": 56,
+  "fh": 73,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/quarry_floor_ground_1.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_rock_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/quarry_floor_ground_1@3x.webp",
+  "bytes": 129404,
+  "cells": 1,
+  "fw": 421,
+  "fh": 223,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/quarry_floor_ground_2.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_rock_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/quarry_floor_ground_2@3x.webp",
+  "bytes": 105194,
+  "cells": 1,
+  "fw": 424,
+  "fh": 195,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/quarry_floor_ground_3.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_rock_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/quarry_floor_ground_3@3x.webp",
+  "bytes": 129228,
+  "cells": 1,
+  "fw": 421,
+  "fh": 223,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/quarry_floor_ground_4.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_rock_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/quarry_floor_ground_4@3x.webp",
+  "bytes": 118348,
+  "cells": 1,
+  "fw": 421,
+  "fh": 194,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/quarry_floor_ground_5.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_rock_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/quarry_floor_ground_5@3x.webp",
+  "bytes": 113644,
+  "cells": 1,
+  "fw": 421,
+  "fh": 194,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/quarry_floor_top_1.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_rock_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/quarry_floor_top_1@3x.webp",
+  "bytes": 99238,
+  "cells": 1,
+  "fw": 295,
+  "fh": 143,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/quarry_floor_top_2.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_rock_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/quarry_floor_top_2@3x.webp",
+  "bytes": 118812,
+  "cells": 1,
+  "fw": 294,
+  "fh": 201,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/quarry_floor_top_3.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_rock_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/quarry_floor_top_3@3x.webp",
+  "bytes": 93822,
+  "cells": 1,
+  "fw": 364,
+  "fh": 182,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/quarry_extra_floor_1.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_rock_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/quarry_extra_floor_1@3x.webp",
+  "bytes": 77570,
+  "cells": 1,
+  "fw": 297,
+  "fh": 142,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/quarry_extra_floor_2.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_rock_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/quarry_extra_floor_2@3x.webp",
+  "bytes": 84440,
+  "cells": 1,
+  "fw": 371,
+  "fh": 153,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/quarry_extra_floor_3.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_rock_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/quarry_extra_floor_3@3x.webp",
+  "bytes": 81760,
+  "cells": 1,
+  "fw": 365,
+  "fh": 136,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/quarry_extra_floor_4.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_rock_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/quarry_extra_floor_4@3x.webp",
+  "bytes": 86528,
+  "cells": 1,
+  "fw": 298,
+  "fh": 142,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/quarry_extra_floor_5.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_rock_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/quarry_extra_floor_5@3x.webp",
+  "bytes": 91142,
+  "cells": 1,
+  "fw": 381,
+  "fh": 142,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/quarry_deco_ground_2.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_rock_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/quarry_deco_ground_2@3x.webp",
+  "bytes": 25024,
+  "cells": 1,
+  "fw": 269,
+  "fh": 154,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/quarry_deco_ground_3.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_rock_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/quarry_deco_ground_3@3x.webp",
+  "bytes": 20106,
+  "cells": 1,
+  "fw": 245,
+  "fh": 53,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/quarry_deco_ground_4.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_rock_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/quarry_deco_ground_4@3x.webp",
+  "bytes": 39776,
+  "cells": 1,
+  "fw": 343,
+  "fh": 146,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/quarry_deco_ground_5.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_rock_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/quarry_deco_ground_5@3x.webp",
+  "bytes": 12504,
+  "cells": 1,
+  "fw": 63,
+  "fh": 112,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/quarry_deco_ground_6.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_rock_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/quarry_deco_ground_6@3x.webp",
+  "bytes": 16110,
+  "cells": 1,
+  "fw": 408,
+  "fh": 39,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/quarry_deco_side_2.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_rock_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/quarry_deco_side_2@3x.webp",
+  "bytes": 18548,
+  "cells": 1,
+  "fw": 74,
+  "fh": 111,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/quarry_deco_side_3.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_rock_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/quarry_deco_side_3@3x.webp",
+  "bytes": 19542,
+  "cells": 1,
+  "fw": 132,
+  "fh": 50,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/quarry_deco_side_4.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_rock_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/quarry_deco_side_4@3x.webp",
+  "bytes": 29148,
+  "cells": 1,
+  "fw": 117,
+  "fh": 144,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/quarry_deco_side_5.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_rock_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/quarry_deco_side_5@3x.webp",
+  "bytes": 29120,
+  "cells": 1,
+  "fw": 117,
+  "fh": 119,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/quarry_deco_side_6.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_rock_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/quarry_deco_side_6@3x.webp",
+  "bytes": 7468,
+  "cells": 1,
+  "fw": 88,
+  "fh": 57,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/quarry_deco_side_7.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_rock_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/quarry_deco_side_7@3x.webp",
+  "bytes": 16918,
+  "cells": 1,
+  "fw": 69,
+  "fh": 113,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/mushroom_floor_ground_1.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_mushroom_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/mushroom_floor_ground_1@3x.webp",
+  "bytes": 49234,
+  "cells": 1,
+  "fw": 326,
+  "fh": 170,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/mushroom_floor_ground_2.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_mushroom_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/mushroom_floor_ground_2@3x.webp",
+  "bytes": 47148,
+  "cells": 1,
+  "fw": 326,
+  "fh": 170,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/mushroom_floor_ground_3.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_mushroom_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/mushroom_floor_ground_3@3x.webp",
+  "bytes": 53012,
+  "cells": 1,
+  "fw": 326,
+  "fh": 170,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/mushroom_floor_ground_4.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_mushroom_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/mushroom_floor_ground_4@3x.webp",
+  "bytes": 41840,
+  "cells": 1,
+  "fw": 326,
+  "fh": 170,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/mushroom_floor_top_1.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_mushroom_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/mushroom_floor_top_1@3x.webp",
+  "bytes": 43502,
+  "cells": 1,
+  "fw": 406,
+  "fh": 226,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/mushroom_floor_top_2.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_mushroom_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/mushroom_floor_top_2@3x.webp",
+  "bytes": 42466,
+  "cells": 1,
+  "fw": 407,
+  "fh": 231,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/mushroom_floor_top_3.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_mushroom_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/mushroom_floor_top_3@3x.webp",
+  "bytes": 34352,
+  "cells": 1,
+  "fw": 411,
+  "fh": 159,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/mushroom_floor_top_4.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_mushroom_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/mushroom_floor_top_4@3x.webp",
+  "bytes": 32418,
+  "cells": 1,
+  "fw": 407,
+  "fh": 226,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/mushroom_extra_floor_1.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_mushroom_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/mushroom_extra_floor_1@3x.webp",
+  "bytes": 10194,
+  "cells": 1,
+  "fw": 232,
+  "fh": 112,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/mushroom_extra_floor_2.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_mushroom_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/mushroom_extra_floor_2@3x.webp",
+  "bytes": 12842,
+  "cells": 1,
+  "fw": 232,
+  "fh": 112,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/mushroom_extra_floor_3.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_mushroom_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/mushroom_extra_floor_3@3x.webp",
+  "bytes": 24692,
+  "cells": 1,
+  "fw": 232,
+  "fh": 127,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/mushroom_extra_floor_4.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_mushroom_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/mushroom_extra_floor_4@3x.webp",
+  "bytes": 20946,
+  "cells": 1,
+  "fw": 241,
+  "fh": 112,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/mushroom_extra_floor_5.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_mushroom_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/mushroom_extra_floor_5@3x.webp",
+  "bytes": 17588,
+  "cells": 1,
+  "fw": 232,
+  "fh": 112,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/mushroom_deco_ground_1.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_mushroom_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/mushroom_deco_ground_1@3x.webp",
+  "bytes": 8668,
+  "cells": 1,
+  "fw": 158,
+  "fh": 45,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/mushroom_deco_ground_2.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_mushroom_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/mushroom_deco_ground_2@3x.webp",
+  "bytes": 11226,
+  "cells": 1,
+  "fw": 155,
+  "fh": 51,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/mushroom_deco_ground_3.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_mushroom_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/mushroom_deco_ground_3@3x.webp",
+  "bytes": 8172,
+  "cells": 1,
+  "fw": 151,
+  "fh": 43,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/mushroom_deco_ground_4.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_mushroom_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/mushroom_deco_ground_4@3x.webp",
+  "bytes": 16850,
+  "cells": 1,
+  "fw": 157,
+  "fh": 66,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/mushroom_deco_ground_5.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_mushroom_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/mushroom_deco_ground_5@3x.webp",
+  "bytes": 16222,
+  "cells": 1,
+  "fw": 224,
+  "fh": 58,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/mushroom_deco_side_1.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_mushroom_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/mushroom_deco_side_1@3x.webp",
+  "bytes": 9676,
+  "cells": 1,
+  "fw": 72,
+  "fh": 73,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/mushroom_deco_side_2.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_mushroom_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/mushroom_deco_side_2@3x.webp",
+  "bytes": 10060,
+  "cells": 1,
+  "fw": 72,
+  "fh": 73,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/mushroom_deco_side_3.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_mushroom_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/mushroom_deco_side_3@3x.webp",
+  "bytes": 9974,
+  "cells": 1,
+  "fw": 72,
+  "fh": 73,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/mushroom_deco_side_4.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_mushroom_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/mushroom_deco_side_4@3x.webp",
+  "bytes": 11122,
+  "cells": 1,
+  "fw": 72,
+  "fh": 65,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/spaceship_floor_ground_1.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_spaceship_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/spaceship_floor_ground_1@3x.webp",
+  "bytes": 48198,
+  "cells": 1,
+  "fw": 305,
+  "fh": 150,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/spaceship_floor_ground_2.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_spaceship_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/spaceship_floor_ground_2@3x.webp",
+  "bytes": 41358,
+  "cells": 1,
+  "fw": 307,
+  "fh": 149,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/spaceship_floor_ground_3.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_spaceship_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/spaceship_floor_ground_3@3x.webp",
+  "bytes": 44428,
+  "cells": 1,
+  "fw": 305,
+  "fh": 152,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/spaceship_floor_top_1.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_spaceship_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/spaceship_floor_top_1@3x.webp",
+  "bytes": 65980,
+  "cells": 1,
+  "fw": 632,
+  "fh": 301,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/spaceship_floor_top_2.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_spaceship_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/spaceship_floor_top_2@3x.webp",
+  "bytes": 66248,
+  "cells": 1,
+  "fw": 633,
+  "fh": 279,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/spaceship_floor_top_3.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_spaceship_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/spaceship_floor_top_3@3x.webp",
+  "bytes": 148726,
+  "cells": 1,
+  "fw": 632,
+  "fh": 268,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/spaceship_floor_top_4.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_spaceship_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/spaceship_floor_top_4@3x.webp",
+  "bytes": 119490,
+  "cells": 1,
+  "fw": 577,
+  "fh": 294,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/spaceship_extra_floor_1.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_spaceship_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/spaceship_extra_floor_1@3x.webp",
+  "bytes": 11134,
+  "cells": 1,
+  "fw": 293,
+  "fh": 124,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/spaceship_extra_floor_2.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_spaceship_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/spaceship_extra_floor_2@3x.webp",
+  "bytes": 40176,
+  "cells": 1,
+  "fw": 292,
+  "fh": 124,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/spaceship_extra_floor_3.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_spaceship_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/spaceship_extra_floor_3@3x.webp",
+  "bytes": 31314,
+  "cells": 1,
+  "fw": 292,
+  "fh": 124,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/spaceship_extra_floor_4.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_spaceship_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/spaceship_extra_floor_4@3x.webp",
+  "bytes": 26162,
+  "cells": 1,
+  "fw": 292,
+  "fh": 124,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/spaceship_extra_floor_5.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_spaceship_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/spaceship_extra_floor_5@3x.webp",
+  "bytes": 35168,
+  "cells": 1,
+  "fw": 292,
+  "fh": 124,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/spaceship_extra_floor_6.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_spaceship_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/spaceship_extra_floor_6@3x.webp",
+  "bytes": 34160,
+  "cells": 1,
+  "fw": 316,
+  "fh": 137,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/spaceship_extra_floor_7.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_spaceship_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/spaceship_extra_floor_7@3x.webp",
+  "bytes": 42838,
+  "cells": 1,
+  "fw": 372,
+  "fh": 127,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/spaceship_deco_ground_2.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_spaceship_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/spaceship_deco_ground_2@3x.webp",
+  "bytes": 23868,
+  "cells": 1,
+  "fw": 158,
+  "fh": 219,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/spaceship_deco_ground_3.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_spaceship_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/spaceship_deco_ground_3@3x.webp",
+  "bytes": 14214,
+  "cells": 1,
+  "fw": 122,
+  "fh": 107,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/spaceship_deco_ground_4.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_spaceship_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/spaceship_deco_ground_4@3x.webp",
+  "bytes": 45496,
+  "cells": 1,
+  "fw": 154,
+  "fh": 126,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/spaceship_deco_side_2.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_spaceship_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/spaceship_deco_side_2@3x.webp",
+  "bytes": 17316,
+  "cells": 1,
+  "fw": 418,
+  "fh": 101,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/spaceship_deco_side_3.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_spaceship_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/spaceship_deco_side_3@3x.webp",
+  "bytes": 12388,
+  "cells": 1,
+  "fw": 106,
+  "fh": 78,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/adobe_floor_ground_1.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_basic_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/adobe_floor_ground_1@3x.webp",
+  "bytes": 48312,
+  "cells": 1,
+  "fw": 308,
+  "fh": 159,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/adobe_floor_ground_2.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_basic_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/adobe_floor_ground_2@3x.webp",
+  "bytes": 41664,
+  "cells": 1,
+  "fw": 308,
+  "fh": 159,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/adobe_floor_ground_3.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_basic_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/adobe_floor_ground_3@3x.webp",
+  "bytes": 48014,
+  "cells": 1,
+  "fw": 308,
+  "fh": 159,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/adobe_floor_top_1.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_basic_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/adobe_floor_top_1@3x.webp",
+  "bytes": 30852,
+  "cells": 1,
+  "fw": 242,
+  "fh": 126,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/adobe_floor_top_2.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_basic_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/adobe_floor_top_2@3x.webp",
+  "bytes": 26504,
+  "cells": 1,
+  "fw": 234,
+  "fh": 137,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/adobe_floor_top_3.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_basic_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/adobe_floor_top_3@3x.webp",
+  "bytes": 23578,
+  "cells": 1,
+  "fw": 289,
+  "fh": 101,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/adobe_extra_floor_1.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_basic_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/adobe_extra_floor_1@3x.webp",
+  "bytes": 16312,
+  "cells": 1,
+  "fw": 231,
+  "fh": 100,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/adobe_extra_floor_2.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_basic_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/adobe_extra_floor_2@3x.webp",
+  "bytes": 20060,
+  "cells": 1,
+  "fw": 231,
+  "fh": 100,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/adobe_extra_floor_3.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_basic_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/adobe_extra_floor_3@3x.webp",
+  "bytes": 21126,
+  "cells": 1,
+  "fw": 265,
+  "fh": 100,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/adobe_extra_floor_4.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_basic_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/adobe_extra_floor_4@3x.webp",
+  "bytes": 23824,
+  "cells": 1,
+  "fw": 266,
+  "fh": 100,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/adobe_deco_ground_1.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_basic_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/adobe_deco_ground_1@3x.webp",
+  "bytes": 13132,
+  "cells": 1,
+  "fw": 158,
+  "fh": 48,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/adobe_deco_ground_2.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_basic_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/adobe_deco_ground_2@3x.webp",
+  "bytes": 11982,
+  "cells": 1,
+  "fw": 193,
+  "fh": 48,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/adobe_deco_ground_3.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_basic_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/adobe_deco_ground_3@3x.webp",
+  "bytes": 11584,
+  "cells": 1,
+  "fw": 146,
+  "fh": 83,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/adobe_deco_side_1.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_basic_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/adobe_deco_side_1@3x.webp",
+  "bytes": 5078,
+  "cells": 1,
+  "fw": 63,
+  "fh": 82,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/adobe_deco_side_2.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_basic_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/adobe_deco_side_2@3x.webp",
+  "bytes": 6908,
+  "cells": 1,
+  "fw": 69,
+  "fh": 67,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/adobe_deco_side_3.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "furniture/furniture_tower_chassis/furniture_tower_chassis_basic_tower.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/adobe_deco_side_3@3x.webp",
+  "bytes": 7370,
+  "cells": 1,
+  "fw": 69,
+  "fh": 66,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/proto_1.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "misc/proto/proto_furniture_tower_chassis/proto_furniture_tower_chassis.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/proto_1@3x.webp",
+  "bytes": 34620,
+  "cells": 1,
+  "fw": 344,
+  "fh": 204,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/proto_2.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "misc/proto/proto_furniture_tower_chassis/proto_furniture_tower_chassis.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/proto_2@3x.webp",
+  "bytes": 44144,
+  "cells": 1,
+  "fw": 344,
+  "fh": 204,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
+ },
+ "assets/sprites/home-tower/proto_3.webp": {
+  "animal": "tower-art",
+  "character": "tower-art",
+  "source": "tools/tower-art",
+  "swf": "misc/proto/proto_furniture_tower_chassis/proto_furniture_tower_chassis.swf",
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/proto_3@3x.webp",
+  "bytes": 68554,
+  "cells": 1,
+  "fw": 344,
+  "fh": 204,
+  "scoreKind": "one zoom-3 render; the 1x is its 3:1 box downscale",
+  "score": 1,
+  "minFrame": 1,
+  "frameScores": [
+   1
+  ],
+  "drift": []
  }
 }

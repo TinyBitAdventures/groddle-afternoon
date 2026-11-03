@@ -38,9 +38,9 @@ import {
   pickBartenderLine,
   talkStateFor,
 } from '../public/js/hell-bar.js?v=efff73f9';
-import { hellBarFeature } from '../public/js/features/hell-bar-feature.js?v=1ac80fac';
+import { hellBarFeature } from '../public/js/features/hell-bar-feature.js?v=546d8a3d';
 import { hellFeature } from '../public/js/features/hell-feature.js?v=1f2abc54';
-import { FEATURES } from '../public/js/features/index.js?v=72173cf7';
+import { FEATURES } from '../public/js/features/index.js?v=b83fc35f';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const pub = join(spike, 'public');

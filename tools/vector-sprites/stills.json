@@ -1,5 +1,5 @@
 {
- "about": "World still items the stills sweep (lane SPRITES, 2026-10-29) found drawn at 1.5+ need/available at 3 device px per world px, each from its own CC0 SWF in glitch-items: the Visiting Stone, notes, gift boxes, notice boards and the left mailbox (features/street-furniture-feature.js), the home furniture base pieces (furniture/furniture_base and bag_furniture_cabinet_base, js/home-decor.js), the street-job sign stake, the Party ATM, the Rook Hall speaker and the Butler's box (js/butler.js BUTLER_BOX_ART); G446: Hell's Bunch of Grapes on the floor (js/hell.js, four states) and Señor Funpickle's still (features/funpickle-feature.js). SHARP3 (2026-10-30, Original zoom draws the street at about 2.9 backing px per world px on a 1440 px Retina window): the Race Ticket Dispenser (features/races-feature.js); the back yard's Meat Collector, Butterfly Milker and Piggy Feeder (their filled frame 2) and plops (features/animal-husbandry-feature.js); the home street's Pile of Currants (features/home-street-mp-feature.js) and Firefly Hive (features/homes-feature.js POD_ART); Wine of the Dead (labels 1-4, frames 92-95) and the Drink Ticket on the floor (js/hell.js); the Graveside Marker of each Giant (graveside_marker.swf, each Giant's own named sprite: DefineSprite 8 giantZille ... 41 giantGeneric; the emblem is too small for the score to tell Giants apart, the named sprite scores best for every one); Pig Bait (Hog Haul); Shim Shiri's light beams (puzzles-feature.js, drawn at 2.2); the Rook Egg (Rooks' Woods, labels 5-1). Root-timeline items render from a copy with a padded stage (padStage). Run: node tools/vector-sprites/build.mjs --manifest tools/vector-sprites/stills.json",
+ "about": "World still items the stills sweep (lane SPRITES, 2026-10-29) found drawn at 1.5+ need/available at 3 device px per world px, each from its own CC0 SWF in glitch-items: the Visiting Stone, notes, gift boxes, notice boards and the left mailbox (features/street-furniture-feature.js), the home furniture base pieces (furniture/furniture_base and bag_furniture_cabinet_base, js/home-decor.js), the street-job sign stake, the Party ATM, the Rook Hall speaker and the Butler's box (js/butler.js BUTLER_BOX_ART); G446: Hell's Bunch of Grapes on the floor (js/hell.js, four states) and Señor Funpickle's still (features/funpickle-feature.js). SHARP3 (2026-10-30, Original zoom draws the street at about 2.9 backing px per world px on a 1440 px Retina window): the Race Ticket Dispenser (features/races-feature.js); the back yard's Meat Collector, Butterfly Milker and Piggy Feeder (their filled frame 2) and plops (features/animal-husbandry-feature.js); the home street's Pile of Currants (features/home-street-mp-feature.js) and Firefly Hive (features/homes-feature.js POD_ART); Wine of the Dead (labels 1-4, frames 92-95) and the Drink Ticket on the floor (js/hell.js); the Graveside Marker of each Giant (graveside_marker.swf, each Giant's own named sprite: DefineSprite 8 giantZille ... 41 giantGeneric; the emblem is too small for the score to tell Giants apart, the named sprite scores best for every one); Pig Bait (Hog Haul); Shim Shiri's light beams (puzzles-feature.js, drawn at 2.2); the Rook Egg (Rooks' Woods, labels 5-1). Root-timeline items render from a copy with a padded stage (padStage). Run: node tools/vector-sprites/build.mjs --manifest tools/vector-sprites/stills.json SHARP batch 2 (2026-11-02, homes): the Door in each of its four states (furniture_base/furniture_door.swf; the placed door_up article swapped for door_up_job / door_down / door_down_job, its config_options; furniture_door.png is the OGA's door_up_job) and the three Magic Animal Sticks as placed in the back yard (scene placed, frame 3).",
  "firstDraw": true,
  "jobs": [
   {
@@ -1451,6 +1451,154 @@
      "frames": 3,
      "swfStart": 1,
      "swfCount": 3
+    }
+   ]
+  },
+  {
+   "name": "furniture_door",
+   "swf": "furniture/furniture_base/furniture_door/furniture_door.swf",
+   "sprite": 0,
+   "padStage": 1,
+   "parts": {
+    "door_up": "door_up_job"
+   },
+   "sheets": [
+    {
+     "path": "assets/sprites/furniture/furniture_door.png",
+     "fw": 117,
+     "fh": 169,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 1,
+     "swfCount": 1
+    }
+   ]
+  },
+  {
+   "name": "furniture_door_up_job",
+   "swf": "furniture/furniture_base/furniture_door/furniture_door.swf",
+   "sprite": 0,
+   "padStage": 1,
+   "parts": {
+    "door_up": "door_up_job"
+   },
+   "sheets": [
+    {
+     "path": "assets/sprites/furniture/furniture_door_up_job.png",
+     "fw": 117,
+     "fh": 169,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 1,
+     "swfCount": 1
+    }
+   ]
+  },
+  {
+   "name": "furniture_door_up",
+   "swf": "furniture/furniture_base/furniture_door/furniture_door.swf",
+   "sprite": 0,
+   "padStage": 1,
+   "sheets": [
+    {
+     "path": "assets/sprites/furniture/furniture_door_up.png",
+     "fw": 117,
+     "fh": 169,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 1,
+     "swfCount": 1
+    }
+   ]
+  },
+  {
+   "name": "furniture_door_down",
+   "swf": "furniture/furniture_base/furniture_door/furniture_door.swf",
+   "sprite": 0,
+   "padStage": 1,
+   "parts": {
+    "door_up": "door_down"
+   },
+   "sheets": [
+    {
+     "path": "assets/sprites/furniture/furniture_door_down.png",
+     "fw": 117,
+     "fh": 169,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 1,
+     "swfCount": 1
+    }
+   ]
+  },
+  {
+   "name": "furniture_door_down_job",
+   "swf": "furniture/furniture_base/furniture_door/furniture_door.swf",
+   "sprite": 0,
+   "padStage": 1,
+   "parts": {
+    "door_up": "door_down_job"
+   },
+   "sheets": [
+    {
+     "path": "assets/sprites/furniture/furniture_door_down_job.png",
+     "fw": 117,
+     "fh": 169,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 1,
+     "swfCount": 1
+    }
+   ]
+  },
+  {
+   "name": "magic_pig_stick_placed",
+   "swf": "misc/magic_animal_stick/magic_pig_stick/magic_pig_stick.swf",
+   "sprite": 0,
+   "padStage": 1,
+   "sheets": [
+    {
+     "path": "assets/sprites/animals/magic_pig_stick_placed.png",
+     "fw": 119,
+     "fh": 185,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 3,
+     "swfCount": 1
+    }
+   ]
+  },
+  {
+   "name": "magic_chicken_stick_placed",
+   "swf": "misc/magic_animal_stick/magic_chicken_stick/magic_chicken_stick.swf",
+   "sprite": 0,
+   "padStage": 1,
+   "sheets": [
+    {
+     "path": "assets/sprites/animals/magic_chicken_stick_placed.png",
+     "fw": 119,
+     "fh": 185,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 3,
+     "swfCount": 1
+    }
+   ]
+  },
+  {
+   "name": "magic_butterfly_stick_placed",
+   "swf": "misc/magic_animal_stick/magic_butterfly_stick/magic_butterfly_stick.swf",
+   "sprite": 0,
+   "padStage": 1,
+   "sheets": [
+    {
+     "path": "assets/sprites/animals/magic_butterfly_stick_placed.png",
+     "fw": 119,
+     "fh": 184,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 3,
+     "swfCount": 1
     }
    ]
   }

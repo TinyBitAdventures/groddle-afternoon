@@ -44,7 +44,7 @@
  */
 
 import { TOWER_ROOM_SPOTS } from './tower-rooms.js?v=eeebce6f';
-import { TOWER_PART_CHOICES, TOWER_VARIANT_ART } from './home-tower-art.js?v=564b782e';
+import { TOWER_PART_CHOICES, TOWER_VARIANT_ART } from './home-tower-art.js?v=9619a093';
 import { loseEnergy } from './metabolics.js?v=8504134e';
 import { filterText } from './word-filter.js?v=9a7a7ebb';
 
@@ -468,7 +468,10 @@ export function parseTowerFacing(value) {
   return null;
 }
 
-/** proto_furniture_tower_chassis.swf: three scenes named 3, 2, 1 on one 344 x 204 stage. */
+/**
+ * proto_furniture_tower_chassis.swf: three scenes named 3, 2, 1 on one 344 x 204 stage, each a 1x
+ * file with its 3x twin (tools/tower-art, js/sprite-hires.js).
+ */
 export const PROTO_ART = Object.freeze({
   1: 'proto_1.webp',
   2: 'proto_2.webp',

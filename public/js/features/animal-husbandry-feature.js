@@ -51,7 +51,7 @@
  */
 
 import { slugsFromEffects } from '../speech-slugs.js?v=130338f9';
-import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=0c8484f1';
+import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=6e3278fe';
 import { nearestSurfaceY } from '../walk-surface.js?v=c982983e';
 import { displayTopOf, itemstackOverlayPoint, playSheetOverlay } from '../overlay-art.js?v=3753a0d2';
 import { SET_FREE, applySetFree, canSetFree, setFreeGoneLine, setFreePrompt } from '../animal-set-free.js?v=3b194fca';
@@ -107,7 +107,7 @@ import { batterflyBaseY, batterflyResponseFor, flightFloorFor } from '../street-
 import { loseEnergy, shiftMetabolic } from '../metabolics.js?v=8504134e';
 import { textureFromUrl } from '../textures.js?v=db2ce452';
 import { PIGGY_DEATH_DROPS, PIGGY_DEATH_PUFF, SAD_BABY, forcedRoll, isSadIn } from '../animal-mood.js?v=a49495fc';
-import { animalCrowdChanged, animalCrowdSad, animalPlaceIsDepressing, crowdLimit, smokePuff as sharedSmokePuff } from './animal-mood-feature.js?v=eda7e686';
+import { animalCrowdChanged, animalCrowdSad, animalPlaceIsDepressing, crowdLimit, smokePuff as sharedSmokePuff } from './animal-mood-feature.js?v=007c9462';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
 
@@ -642,8 +642,11 @@ function landStarvedRemains(engine) {
 
 // —— Sticks and machines (back yard) ——————————————————————————————————
 
+/** A placed Magic Animal Stick's world scale (its 1x art, a 3x twin on dense screens: js/sprite-hires.js). */
+export const STICK_SCALE = 0.5;
+
 function buildPlaced(engine, kind, row) {
-  const scale = kind === 'stick' ? 0.5 : 1;
+  const scale = kind === 'stick' ? STICK_SCALE : 1;
   const spr = makeSprite(engine, ART[row.classTsid], { scale, z: itemZ(row.classTsid, { background: 7, normal: 3 }) });
   spr.x = row.x;
   spr.y = surfaceAt(engine, row.x) + 2;

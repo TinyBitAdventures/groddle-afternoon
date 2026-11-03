@@ -23,8 +23,8 @@ import {
   scareChance,
   stepKitty,
 } from '../public/js/heli-kitties.js?v=8fbe314a';
-import { KITTY_SHEETS, heliKittiesFeature, kittyPlacementGroups } from '../public/js/features/heli-kitties-feature.js?v=60f84a25';
-import { foxesFeature } from '../public/js/features/foxes-feature.js?v=41d43027';
+import { KITTY_SHEETS, heliKittiesFeature, kittyPlacementGroups } from '../public/js/features/heli-kitties-feature.js?v=feaa4705';
+import { foxesFeature } from '../public/js/features/foxes-feature.js?v=89a7a4f4';
 import { createFeatureHost } from '../public/js/feature-host.js?v=903263a4';
 import { setWildlifeCatalog } from '../public/js/wildlife.js?v=670c3a7f';
 import { readFileSync } from 'node:fs';

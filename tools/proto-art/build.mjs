@@ -2,40 +2,50 @@
 /**
  * Depleted cultivation protos: the `depleted` frame of each CC0 proto SWF in
  * tinyspeck/glitch-items (misc/proto/proto_<class>/proto_<class>.swf),
- * rasterised at 2x as WebP with the stage's bottom-centre as the origin.
+ * as a 1x WebP and its sharp 3x twin, with the stage's bottom-centre as the
+ * origin.
  *
  * Every cultivation proto SWF has two main-timeline frames: frame 1 is the
  * finished item (the placement ghost) and frame 2 carries the frame label
  * `depleted` (DefineSceneAndFrameLabelData), the rubble the server shows once
  * the item wears out (items/proto_*.js onCreate setAndBroadcastState
- * 'depleted'). FFDec exports that frame as SVG at zoom 2; the stage
+ * 'depleted'). FFDec exports that frame as SVG at zoom 3; the stage
  * background rect is dropped, Chromium rasterises it (keeps the overlay
- * blend modes), ImageMagick trims it and cwebp encodes it.
+ * blend modes), and tools/vector-sprites/aligned-art.mjs trims it on the 1x
+ * grid and writes the pair: the 1x (the 3:1 box downscale) and <name>@3x.webp.
+ * Each pair is registered in tools/vector-sprites/results.json (source
+ * tools/proto-art), so js/sprite-hires.js draws the 3x on dense screens (the
+ * yard draws protos at world scale 1: about 2.5 device px per 1x px on a
+ * Retina window, where the 2x art these replace was magnified 1.26).
  *
  * Output:
- *   public/assets/sprites/cultivation/proto/<proto_class>.webp
+ *   public/assets/sprites/cultivation/proto/<proto_class>.webp (+ @3x.webp)
  *   public/js/home-proto-art.js (generated: [file, originX, originY, w, h] at 1x)
  *
  * Usage: node tools/proto-art/build.mjs [--work <dir>] [--check]
  */
 import { execFileSync } from 'node:child_process';
-import { existsSync, mkdirSync, readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, readdirSync, statSync, unlinkSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import os from 'node:os';
 import { fileURLToPath } from 'node:url';
 import { FFDEC, JAVA } from '../vector-sprites/swf-labels.mjs';
 import { rasteriseSvgs } from '../vector-sprites/svg-raster.mjs';
+import { ZOOM, checkPairs, cutPair, padSvg, registerPairs, writePair } from '../vector-sprites/aligned-art.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const ITEMS = join(os.homedir(), 'Documents/glitch-audit/glitch-items/misc/proto');
 const OUT_DIR = join(ROOT, 'public/assets/sprites/cultivation/proto');
 const OUT_JS = join(ROOT, 'public/js/home-proto-art.js');
+const PUB = join(ROOT, 'public');
+const REL_DIR = 'assets/sprites/cultivation/proto';
+const RESULTS = join(ROOT, 'tools/vector-sprites/results.json');
+const SOURCE = 'tools/proto-art';
 const args = process.argv.slice(2);
 const opt = (k, d) => { const i = args.indexOf(k); return i >= 0 ? args[i + 1] : d; };
-const WORK = opt('--work', join(os.tmpdir(), 'proto-art-work'));
+const WORK = opt('--work', join(os.tmpdir(), 'proto-art-work-3x'));
 const CHECK = args.includes('--check');
-const ZOOM = 2;
-const PAD = 20;
+const PAD = 10; // 1x px
 const ALPHA_MIN = 8;
 
 /** locations/inc_cultivation.js cultivation_classes (the Tower keeps its own art). */
@@ -66,14 +76,6 @@ function depletedFrame(swf) {
   throw new Error(`${swf}: no depleted label`);
 }
 
-function drawnBox(png) {
-  const out = execFileSync('magick', [png, '-channel', 'A', '-threshold', `${(ALPHA_MIN / 255) * 100}%`, '+channel', '-format', '%@', 'info:'], { encoding: 'utf8' }).trim();
-  const m = /^(\d+)x(\d+)\+(\d+)\+(\d+)$/.exec(out);
-  if (!m) throw new Error(`${png}: empty`);
-  const [, w, h, x, y] = m.map(Number);
-  return { w, h, x, y };
-}
-
 mkdirSync(WORK, { recursive: true });
 const jobs = [];
 const pending = [];
@@ -86,69 +88,77 @@ for (const proto of PROTOS) {
   }
   const file = readdirSync(dir).find((f) => f === `${frame}.svg`);
   if (!file) throw new Error(`${proto}: frame ${frame} not exported`);
-  const text = readFileSync(join(dir, file), 'utf8');
-  const head = /<svg[^>]*>/.exec(text)[0];
-  const w = Number(/width="([\d.]+)px"/.exec(head)[1]);
-  const h = Number(/height="([\d.]+)px"/.exec(head)[1]);
-  const W = Math.ceil(w) + 2 * PAD;
-  const H = Math.ceil(h) + 2 * PAD;
-  const svgText = text
-    .replace(head, head.replace(/width="[\d.]+px"/, `width="${W}px"`).replace(/height="[\d.]+px"/, `height="${H}px"`))
+  const text = readFileSync(join(dir, file), 'utf8')
     // The stage background colour is not part of the art.
-    .replace(/\s*<rect fill="#[0-9a-fA-F]{6}" height="[\d.]+px" width="[\d.]+px"\/>/, '')
-    .replace(/<g transform="matrix\(([^)]*)\)"/, (all, m) => {
-      const v = m.split(',').map(Number);
-      v[4] += PAD;
-      v[5] += PAD;
-      return `<g transform="matrix(${v.join(', ')})"`;
-    });
+    .replace(/\s*<rect fill="#[0-9a-fA-F]{6}" height="[\d.]+px" width="[\d.]+px"\/>/, '');
+  const stage = /<svg[^>]*>/.exec(text)[0];
+  const w = Number(/width="([\d.]+)px"/.exec(stage)[1]);
+  const h = Number(/height="([\d.]+)px"/.exec(stage)[1]);
+  const padded = padSvg(text, PAD);
   const svg = join(dir, 'depleted.pad.svg');
   const png = join(dir, 'depleted.png');
-  writeFileSync(svg, svgText);
-  jobs.push({ svg, png });
-  // Origin: the stage's bottom centre (where the item stands on the street).
-  pending.push({ proto, png, ox: PAD + w / 2, oy: PAD + h });
+  if (!existsSync(svg) || readFileSync(svg, 'utf8') !== padded.text) writeFileSync(svg, padded.text);
+  if (!existsSync(png) || statSync(png).mtimeMs < statSync(svg).mtimeMs - 1000) jobs.push({ svg, png });
+  // Origin: the stage's bottom centre (where the item stands on the street), 3x px of the padded
+  // canvas (the frame export's canvas is the stage, now PAD 1x px in).
+  pending.push({ proto, png, ox: PAD * ZOOM + w / 2, oy: PAD * ZOOM + h });
 }
 
 if (jobs.length) await rasteriseSvgs(jobs);
 if (!CHECK) mkdirSync(OUT_DIR, { recursive: true });
 const art = {};
 const files = [];
+const rows = [];
 for (const p of pending) {
-  const box = drawnBox(p.png);
+  const cut = cutPair(p.png, ALPHA_MIN);
+  if (!cut) throw new Error(`${p.png}: empty`);
   const file = `${p.proto}.webp`;
-  art[p.proto] = [file, +((p.ox - box.x) / ZOOM).toFixed(2), +((p.oy - box.y) / ZOOM).toFixed(2), box.w / ZOOM, box.h / ZOOM];
+  art[p.proto] = [file, +(p.ox / ZOOM - cut.x).toFixed(2), +(p.oy / ZOOM - cut.y).toFixed(2), cut.w, cut.h];
   files.push(file);
-  if (CHECK) continue;
-  const crop = join(dirname(p.png), 'depleted.crop.png');
-  execFileSync('magick', [p.png, '-crop', `${box.w}x${box.h}+${box.x}+${box.y}`, '+repage', crop]);
-  execFileSync('cwebp', ['-quiet', '-metadata', 'none', '-q', '88', '-m', '6', '-sharp_yuv', '-alpha_q', '100', '-alpha_filter', 'best', crop, '-o', join(OUT_DIR, file)]);
+  rows.push({ path: `${REL_DIR}/${file}`, hires: `${REL_DIR}/${p.proto}@3x.webp`, w: cut.w, h: cut.h, swf: `misc/proto/${p.proto}/${p.proto}.swf` });
+  if (!CHECK) writePair(cut, join(OUT_DIR, file));
 }
+await writePair.flush();
 
 const js = [
   '/**',
   ' * GENERATED by tools/proto-art/build.mjs. Do not edit.',
   ' *',
   ' * The `depleted` frame of each cultivation proto SWF (tinyspeck/glitch-items',
-  ' * misc/proto, CC0) as [file, originX, originY, w, h] at 1x; the 2x WebP is in',
-  ' * assets/sprites/cultivation/proto and the origin is the stage bottom centre.',
+  ' * misc/proto, CC0) as [file, originX, originY, w, h] at 1x; the 1x WebP is in',
+  ' * assets/sprites/cultivation/proto (its 3x twin <name>@3x.webp in js/sprite-hires.js)',
+  ' * and the origin is the stage bottom centre.',
   ' */',
   'export const PROTO_DEPLETED_ART = Object.freeze({',
   ...Object.entries(art).map(([k, v]) => `  ${k}: ${JSON.stringify(v)},`),
   '});',
   '',
 ].join('\n');
+const results = JSON.parse(readFileSync(RESULTS, 'utf8'));
+const want = new Set(rows.flatMap((r) => [r.path.split('/').pop(), r.hires.split('/').pop()]));
 if (CHECK) {
   const same = existsSync(OUT_JS) && readFileSync(OUT_JS, 'utf8') === js;
-  const absent = files.filter((f) => !existsSync(join(OUT_DIR, f)));
-  if (!same || absent.length) {
-    console.error(`stale: ${same ? '' : 'home-proto-art.js '}${absent.length ? `${absent.length} files missing` : ''}`);
+  const { HIRES_SPRITES } = await import('../../public/js/sprite-hires.js?v=96c22af7');
+  const bad = checkPairs(results, SOURCE, rows.map((r) => r.path), PUB, HIRES_SPRITES);
+  for (const r of rows) if (results[r.path] && results[r.path].hires !== r.hires) bad.push(`${r.path}: results name ${results[r.path].hires}`);
+  for (const f of readdirSync(OUT_DIR)) if (!want.has(f)) bad.push(`${REL_DIR}/${f}: not built here`);
+  if (!same) bad.push('home-proto-art.js is stale');
+  if (bad.length) {
+    for (const b of bad) console.error(`stale: ${b}`);
     process.exit(1);
   }
   console.log(`ok: ${files.length} protos`);
 } else {
   writeFileSync(OUT_JS, js);
-  let bytes = 0;
-  for (const f of files) bytes += statSync(join(OUT_DIR, f)).size;
-  console.log(`wrote ${files.length} protos (${(bytes / 1024).toFixed(0)} KB) and js/home-proto-art.js`);
+  for (const f of readdirSync(OUT_DIR)) if (!want.has(f)) unlinkSync(join(OUT_DIR, f));
+  registerPairs(results, SOURCE, rows, PUB);
+  writeFileSync(RESULTS, `${JSON.stringify(results, null, 1)}\n`);
+  const { writeModule } = await import('../vector-sprites/build.mjs');
+  writeModule(results);
+  let one = 0, three = 0;
+  for (const r of rows) {
+    one += statSync(join(PUB, r.path)).size;
+    three += statSync(join(PUB, r.hires)).size;
+  }
+  console.log(`wrote ${files.length} protos (1x ${(one / 1024).toFixed(0)} KB, 3x ${(three / 1024).toFixed(0)} KB), js/home-proto-art.js and their js/sprite-hires.js rows`);
 }

@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=bad66806';
 import { createFeatureHost } from './js/feature-host.js?v=903263a4';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=72173cf7';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=b83fc35f';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -555,7 +555,7 @@ import {
   recipeToolInUse,
 } from './js/making.js?v=68521d02';
 import { MAKE_TOOL_SHEETS } from './js/make-tool-sheets.js?v=6f758e09';
-import { LOW_FUEL_LINE, craftSessionElapsedMs, isLowFuel, isMachineArt, machineArtHtml, packMakeState, playMachineHandOver, setMachineArtFrame } from './js/machine-art.js?v=0515343f';
+import { LOW_FUEL_LINE, craftSessionElapsedMs, isLowFuel, isMachineArt, machineArtHtml, packMakeState, playMachineHandOver, setMachineArtFrame } from './js/machine-art.js?v=8c93c616';
 import {
   createGarden,
   tickGarden,
@@ -912,8 +912,8 @@ import { createAudioBuses, fadeGain } from './js/audio-buses.js?v=af167b54';
 import { installTopBar, renderTopBar } from './js/ui/topbar.js?v=9cfbbd95';
 import { installFocusReturn } from './js/ui/focus-return.js?v=8885653a';
 import { QUOIN_FRAME_BOB, advanceQuoinClock, quoinBobBetweenFrames } from './js/quoin-motion.js?v=ea0bd408';
-import { installHiresFirstDraw, installHiresSprites, upgradeSource } from './js/sprite-hires.js?v=425a438f';
-import { denseSprite } from './js/sprite-dense.js?v=8e0109eb';
+import { installHiresFirstDraw, installHiresSprites, upgradeSource } from './js/sprite-hires.js?v=96c22af7';
+import { denseSprite } from './js/sprite-dense.js?v=178a711b';
 import { wholeStatAmounts, wholeEffects } from './js/stat-text.js?v=f96d8fd3';
 import { createNotifier, effectTokens, floatKey, offerCardDrop, stackFloat, tokenText } from './js/notify.js?v=d85330ff';
 import { mountNotifyView } from './js/notify-view.js?v=81d06119';
@@ -29263,6 +29263,21 @@ async function main() {
         for (const c of node.children || []) walk(c);
       };
       walk(app?.stage);
+      return out;
+    },
+    /**
+     * SHARP QA: the GPU textures (uploaded, so drawn) whose URL matches `pattern` (a RegExp source),
+     * with their resolution and pixel size: a 3x twin reports resolution 3 and its @3x URL.
+     */
+    drawnTextures(pattern = '') {
+      const re = new RegExp(String(pattern || ''));
+      const out = [];
+      for (const s of app?.renderer?.texture?.managedTextures || []) {
+        if (!s || s.destroyed) continue;
+        const url = String(s.hiresSrc || s.label || textureUrls.sourceUrl(s) || '');
+        if (!url || !re.test(url)) continue;
+        out.push({ url: url.replace(/^.*?assets\//, 'assets/'), resolution: s.resolution, pixelWidth: s.pixelWidth, pixelHeight: s.pixelHeight });
+      }
       return out;
     },
     /**

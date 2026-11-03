@@ -64,6 +64,8 @@ after(() => {
 const G448_MORE = ['321_countdown', 'rook_feathers_falling', 'musicblock_notes', 'target_effect_powder_extreme', 'target_effect_powder_mild', 'glitchmas_cracker', 'shrine_power_up', 'phantom_glitch', 'avatar_power_up'];
 /** G397: Math Mayhem's two winner pictures (500 and 330 px over the view) keep SVG frames too. */
 const G397_VECTOR = ['crown_game_winner_you', 'crown_game_winner_someone_else'];
+/** SHARP batch 2 (2026-11-02): the Tower name-sign scaffolding (tests/home-sharpness.test.js). */
+const SHARP2_VECTOR = ['tower_sign_scaffolding_overlay'];
 /** G448: the overlays.json rows that do. */
 const G448_ART = ['overlay_sneezing_powder', 'focusing_orb_laser_beam', 'shrine_laser_beam_1', 'shrine_laser_beam_2', 'shrine_laser_beam_3', 'smoke_puff', 'proto_puff', 'secret_location_marker', 'icon_giant_love', 'race_winner', 'grabemgood_winner', 'thegreathoghaul_winner', 'game_of_crowns_winner', 'focusing_orb_attack'];
 /** The sharpness audit's first batch (2026-11-02, tests/sharp-rook-hi-overlays.test.js): the rest of the sheets the game shows. */
@@ -287,7 +289,7 @@ describe('G441: the super harvest arc drawn from its SVG frames on dense screens
     // 0.82 MB as built (about 100 KB gzipped), under the 1.3 MB sheet.
     assert.ok(readFileSync(vfile).length < 1_000_000);
     // G446: every 400 px rainbow (and the charades arc); G448: the other FLA overlays the audit found soft.
-    for (const [key, m] of Object.entries(manifest)) assert.equal(Boolean(m.vector), /^rainbow_|^charades_gameover$/.test(key) || G448_MORE.includes(key) || G397_VECTOR.includes(key) || SHARP1_MORE.includes(key), key);
+    for (const [key, m] of Object.entries(manifest)) assert.equal(Boolean(m.vector), /^rainbow_|^charades_gameover$/.test(key) || G448_MORE.includes(key) || G397_VECTOR.includes(key) || SHARP1_MORE.includes(key) || SHARP2_VECTOR.includes(key), key);
   });
 
   it('vectorDensity: the sheet on a 1x screen, the SVG frames from 1.5 device px per stage px, capped', async () => {

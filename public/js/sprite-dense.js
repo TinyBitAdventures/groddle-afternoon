@@ -11,6 +11,7 @@
  * in a cols-wide grid of density x cells).
  */
 export const DENSE_SPRITES = new Map([
+  ["assets/sprites/home-tower/tower_expander.png", { density: 5, fw: 112, fh: 49, cols: 1, parts: [["assets/sprites/home-tower/tower_expander@5x.webp",0,1,1]] }],
   ["assets/sprites/meditation/focusing_orb-tool.png", { density: 4, fw: 40, fh: 40, cols: 16, parts: [["assets/sprites/meditation/focusing_orb-tool@4x.webp",0,31,16]] }],
   ["assets/sprites/spinning-wheel/stoot-doll.png", { density: 5, fw: 59, fh: 59, cols: 1, parts: [["assets/sprites/spinning-wheel/stoot-doll@5x.webp",0,1,1]] }],
   ["assets/sprites/street-spirits/firebog_large_lonely_in.webp", { density: 5, fw: 181, fh: 181, cols: 8, parts: [["assets/sprites/street-spirits/firebog_large_lonely_in.p1@5x.webp",0,5,2],["assets/sprites/street-spirits/firebog_large_lonely_in.p2@5x.webp",5,5,2],["assets/sprites/street-spirits/firebog_large_lonely_in.p3@5x.webp",10,5,2],["assets/sprites/street-spirits/firebog_large_lonely_in.p4@5x.webp",15,4,2]] }],

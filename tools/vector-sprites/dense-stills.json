@@ -1,5 +1,5 @@
 {
- "about": "The Stoot Barfield Pullstring Doll at 5x (rare_items/stoot_barfield_pullstring_doll, CC0): game.js draws its 59 px art at 1.55 on the Spinning Wheel ticket (need 4.65 at 3 device px per world px). Run: node tools/vector-sprites/build.mjs --manifest tools/vector-sprites/dense-stills.json",
+ "about": "The Stoot Barfield Pullstring Doll at 5x (rare_items/stoot_barfield_pullstring_doll, CC0): game.js draws its 59 px art at 1.55 on the Spinning Wheel ticket (need 4.65 at 3 device px per world px). Run: node tools/vector-sprites/build.mjs --manifest tools/vector-sprites/dense-stills.json The Tower's Workbench (misc/tower_expander, CC0): features/home-tower-feature.js draws its 112 px art at 1.25 on a construction floor (need 3.75 at 3 device px per world px), so 5x as well.",
  "density": 5,
  "results": "results-dense.json",
  "module": "js/sprite-dense.js",
@@ -14,6 +14,23 @@
      "path": "assets/sprites/spinning-wheel/stoot-doll.png",
      "fw": 59,
      "fh": 59,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 1,
+     "swfCount": 1
+    }
+   ]
+  },
+  {
+   "name": "tower-expander",
+   "swf": "misc/tower_expander/tower_expander.swf",
+   "sprite": 0,
+   "padStage": 1,
+   "sheets": [
+    {
+     "path": "assets/sprites/home-tower/tower_expander.png",
+     "fw": 112,
+     "fh": 49,
      "cols": 1,
      "frames": 1,
      "swfStart": 1,

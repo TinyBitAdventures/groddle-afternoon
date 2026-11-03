@@ -879,7 +879,14 @@
   "cols": 1,
   "order": [0],
   "bytes": 6138,
-  "sha256": "eefcb2bd2b7a7e50fe23f4efe2be2e541e67cab91cdbb2a9e0473aa0c11fb497"
+  "sha256": "eefcb2bd2b7a7e50fe23f4efe2be2e541e67cab91cdbb2a9e0473aa0c11fb497",
+  "vector": {
+   "file": "tower_sign_scaffolding_overlay.frames.json",
+   "frames": 1,
+   "order": [0],
+   "bytes": 11624,
+   "sha256": "bbfe9402d7c28871d62a1d007e951a46008dab077aefdc6bdbb983001ab6cd74"
+  }
  },
  "trading": {
   "kind": "sheet",

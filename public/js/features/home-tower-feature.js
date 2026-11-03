@@ -108,8 +108,9 @@ import {
   towerSecretText,
   towerSpotsFor,
   workCheck,
-} from '../home-tower.js?v=3d4486de';
+} from '../home-tower.js?v=6a203c8f';
 import { textureFromUrl } from '../textures.js?v=db2ce452';
+import { denseSprite } from '../sprite-dense.js?v=178a711b';
 import { pieceUrl } from '../home-wallpaper.js?v=e676f00f';
 import { wantsHiresDecos } from '../deco-hires.js?v=cb905e17';
 import { WOTD_TEXT } from '../wine-pour.js?v=6daa23a7';
@@ -234,8 +235,8 @@ function chassisContainer(PIXI, style, extra, config, facingRight = true) {
   for (const op of composeTower(style, extra, config, facingRight)) {
     const spr = new PIXI.Sprite(textureFromUrl(`${TOWER_ART_DIR}${op.file}`));
     spr.anchor.set(op.anchorX, op.anchorY);
-    // Articles are rasterised at 2x.
-    spr.scale.set(op.scaleX * 0.5, op.scaleY * 0.5);
+    // Articles are 1x files (tools/tower-art); js/sprite-hires.js loads their 3x twins on dense screens.
+    spr.scale.set(op.scaleX, op.scaleY);
     spr.x = op.x;
     spr.y = op.y;
     box.addChild(spr);
@@ -265,8 +266,8 @@ function nameSign(PIXI, name) {
 
 function protoSprite(PIXI, state) {
   const spr = new PIXI.Sprite(textureFromUrl(`${TOWER_ART_DIR}${PROTO_ART[state]}`));
+  // The whole 344 x 204 stage at 1x (its 3x twin on dense screens, js/sprite-hires.js).
   spr.anchor.set(0.5, PROTO_ART.footY);
-  spr.scale.set(0.5);
   return spr;
 }
 
@@ -406,6 +407,20 @@ function currentFloor() {
   return tower.floor;
 }
 
+/**
+ * The Workbench (misc/tower_expander.swf, CC0): its 112 x 49 art drawn at 1.25 on the planks,
+ * which a Retina window shows at about 3.2 device px per art px, so a dense screen draws its 5x
+ * render (js/sprite-dense.js, tools/vector-sprites/dense-stills.json; js/textures.js reads
+ * resolution 5 from the name, so the drawn size is unchanged).
+ */
+export const BENCH_ART = 'assets/sprites/home-tower/tower_expander.png';
+export const BENCH_SCALE = 1.25;
+function benchTexture(engine) {
+  const dpr = engine?.app?.renderer?.resolution || globalThis.devicePixelRatio || 1;
+  const dense = denseSprite(BENCH_ART, BENCH_SCALE * dpr * Math.max(1, (globalThis.innerWidth || 960) / 960));
+  return textureFromUrl(dense?.parts.length === 1 ? dense.parts[0][0] : BENCH_ART);
+}
+
 function isConstructionFloor(floor = tower.floor) {
   return tower.built && tower.expanding && floor === tower.floors;
 }
@@ -476,9 +491,9 @@ function spawnFloor(engine, { width, groundY, doorX }) {
     });
   }
   if (isConstructionFloor(floor)) {
-    const bench = new PIXI.Sprite(textureFromUrl(`${TOWER_ART_DIR}tower_expander.png`));
+    const bench = new PIXI.Sprite(benchTexture(engine));
     bench.anchor.set(0.5, 1);
-    bench.scale.set(1.25);
+    bench.scale.set(BENCH_SCALE);
     // tower_get_bounds expansion.job: x 260 + 80, on the planks the floor is walkable to (290).
     bench.x = TOWER_GEO.workbenchX;
     bench.y = groundY + 2;

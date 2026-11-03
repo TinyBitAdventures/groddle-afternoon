@@ -108,8 +108,8 @@ export const OVERLAYS = Object.freeze({
   phantom_glitch: { fla: fla('phantom_glitch'), scale: 1.25, step: 1, webp: 0.85, vector: true },
   // G390: charge, ready, off.
   avatar_power_up: { fla: fla('avatar_power_up'), scale: 1.5, step: 1, webp: 0.85, states: { symbol: 'avatarPowerUp', labels: ['charge', 'ready', 'off'] }, vector: true },
-  // G392.
-  tower_sign_scaffolding_overlay: small('tower_sign_scaffolding_overlay'),
+  // G392 (SHARP batch 2, 2026-11-02: its 2x sheet would be magnified 1.26 on a Retina window).
+  tower_sign_scaffolding_overlay: small('tower_sign_scaffolding_overlay', { vector: true }),
   // G393: the new player's skill cards (one frame each; art only, the flow is Austin's call). The
   // three house cards draw their houses with overlay / screen blend modes the reader does not do.
   newxpchooseskill_animalkinship_overlay: small('newxpchooseskill_animalkinship_overlay', { webp: 0.9 }),

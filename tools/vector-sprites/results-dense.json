@@ -2755,5 +2755,39 @@
   "frameScores": [
    0.9828
   ]
+ },
+ "assets/sprites/home-tower/tower_expander.png": {
+  "animal": "tower-expander",
+  "swf": "misc/tower_expander/tower_expander.swf",
+  "sprite": 0,
+  "label": null,
+  "swfFrames": [
+   1,
+   1
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 112,
+  "fh": 49,
+  "mirror": false,
+  "shift": 0,
+  "density": 5,
+  "offset": [
+   -625,
+   -259
+  ],
+  "cols": 1,
+  "first": 0,
+  "score": 0.9772,
+  "minFrame": 0.9772,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/home-tower/tower_expander@5x.webp",
+  "bytes": 38182,
+  "frameScores": [
+   0.9772
+  ]
  }
 }
