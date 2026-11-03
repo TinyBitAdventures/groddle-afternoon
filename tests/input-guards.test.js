@@ -114,7 +114,8 @@ describe('held keys (report 23)', () => {
   });
 
   it('game.js installs the guard and lets go of keys on a new street and when a menu takes the avatar', () => {
-    assert.match(game, /import \{ installHeldKeyGuard \} from '\.\/js\/held-keys\.js(\?v=[0-9a-f]{8})?';/);
+    // RIGHTCLICK: game.js also takes isMacPlatform (a Mac's Ctrl+click is its right-click).
+    assert.match(game, /import \{ installHeldKeyGuard, isMacPlatform \} from '\.\/js\/held-keys\.js(\?v=[0-9a-f]{8})?';/);
     assert.match(game, /const keys = new Set\(\);\n[\s\S]{0,300}const heldKeys = installHeldKeyGuard\(keys, /);
     assert.match(game, /function clearWorldEntities\(\) \{[\s\S]{0,200}heldKeys\.releaseAll\('street'\);/);
     assert.match(game, /if \(gameplayInputBlocked\(\)\) \{[\s\S]{0,600}if \(!inputWasBlocked\) heldKeys\.releaseAll\('held'\);/);
