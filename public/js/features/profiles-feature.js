@@ -27,8 +27,12 @@
  *   art. Sent when the site has none, or the layout's key moved on (the
  *   picture's style and six hours, or a change in what is on the street),
  *   and only to a site that answers with a homeLayout field, so the game
- *   can go live before the site. QA in solo: &homelayoutdemo=1 gives
- *   window.groddleHomeLayout() (the manifest of the view now).
+ *   can go live before the site. A site whose answer lists 2 in
+ *   homeLayoutVersions gets version 2: the whole street in parallax layers,
+ *   starting at this view, which the page pans along like Camera Mode
+ *   (groddle-afternoon-site players/home-pan.js); else version 1, the view.
+ *   QA in solo: &homelayoutdemo=1 gives window.groddleHomeLayout() (the
+ *   whole street now; ({ street: false }) for the view).
  * - The description: Menu > Account gets "Your profile" (a text box with a
  *   character count, Save, and "See your profile"), through the
  *   accountProfile query account-backup-feature asks.
@@ -51,8 +55,8 @@ import {
   PICTURE_RESOLUTION, PROFILE_COPY,
   aboutCounter, avatarKeyOf, base64Bytes, homeKeyOf, homeSizes, imageBase64, pngBase64, shouldUpload, stillTransform,
 } from '../profiles.js?v=174a1a84';
-import { homeLayoutJson, homeLayoutKeyOf, HOME_LAYOUT_LIMITS } from '../home-layout.js?v=dadee3ed';
-import { collectHomeLayout } from '../home-layout-scene.js?v=84f99516';
+import { homeLayoutJson, homeLayoutKeyOf, HOME_LAYOUT_LIMITS } from '../home-layout.js?v=215b0f4f';
+import { collectHomeLayout } from '../home-layout-scene.js?v=b1174f7e';
 
 export const PROFILES_FEATURE_ID = 'profiles';
 
@@ -80,7 +84,7 @@ function create(engine) {
     state: () => ({ profile: s.profile, avatar: { ...s.avatar }, home: { ...s.home }, layout: { ...s.layout }, homeSince: s.homeSince }),
     uploadAvatar: () => uploadAvatar(engine, s, { force: true }),
     uploadHome: () => uploadHome(engine, s, { force: true }),
-    layout: () => collectHomeLayout(engine),
+    layout: () => collectHomeLayout(engine, { street: true }),
     uploadLayout: () => uploadLayout(engine, s, { force: true }),
   };
   return s;
@@ -285,7 +289,8 @@ async function uploadLayout(engine, s, { force = false } = {}) {
   try {
     const profile = await load(s);
     if (!profile || !Object.hasOwn(profile, 'homeLayout')) return false;
-    const layout = collectHomeLayout(engine);
+    // Version 2 (the whole street, to pan along) to a site that says it takes it; else version 1.
+    const layout = collectHomeLayout(engine, { street: Array.isArray(profile.homeLayoutVersions) && profile.homeLayoutVersions.includes(2) });
     if (!layout) return false;
     const key = homeLayoutKeyOf(layout, homeKeyOf(ctx.style));
     const now = Date.now();
@@ -410,7 +415,7 @@ export const profilesFeature = {
 
   init(engine) {
     // QA (solo too): &homelayoutdemo=1 reads the home street's layout off the stage; nothing is sent.
-    if (engine.param?.('homelayoutdemo') && typeof window !== 'undefined') window.groddleHomeLayout = () => collectHomeLayout(engine);
+    if (engine.param?.('homelayoutdemo') && typeof window !== 'undefined') window.groddleHomeLayout = (opts = { street: true }) => collectHomeLayout(engine, opts);
     if (engine.mode !== 'multiplayer' || typeof document === 'undefined' || globalThis.groddlePractice === true) return;
     state = create(engine);
   },

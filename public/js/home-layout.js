@@ -47,6 +47,15 @@ import { shortHash } from './profiles.js?v=174a1a84';
 export const HOME_LAYOUT_VERSION = 1;
 
 /**
+ * Version 2 (Austin 2026-11-03, "left/right arrow keys could allow the viewer to explore the html
+ * mockup, like they were in camera mode"): the whole home street, not just the view. Each draw
+ * entry sits in its layer's own coordinates, layers grouped back to front with the parallax factor
+ * the game scrolls them by (homes-feature drawLandscape: a layer at f moves f px for each px the
+ * camera moves; the street itself is 1, the sky 0), so the page can pan a camera along it.
+ */
+export const HOME_STREET_VERSION = 2;
+
+/**
  * The site's limits (src/HomeLayout.php, a test holds them together): the
  * manifest as JSON, the stage's size, how many art paths, draw entries and
  * spots, and the reach of a box past the stage's edges.
@@ -62,6 +71,19 @@ export const HOME_LAYOUT_LIMITS = Object.freeze({
   spots: 80,
   reach: 4000,
   nameMax: 40,
+});
+
+/**
+ * Version 2's limits over version 1's (src/HomeLayout.php the same): a home street is at most
+ * 40 yard segments of 150 px and the 720 px lot (homes-catalog HOME_LIMITS, 6720 px).
+ */
+export const HOME_STREET_LIMITS = Object.freeze({
+  bytes: 160 * 1024,
+  maxSw: 8000,
+  art: 240,
+  draw: 1600,
+  spots: 160,
+  layers: 24,
 });
 
 /** The kinds of thing a spot can be (the site names each: src/HomeLayout.php KINDS). */
@@ -180,7 +202,7 @@ const KIND_BY_CLASS = Object.freeze({
 });
 
 /** Class ids that are parts of something else (a garden's plots) or not things at all. */
-const NOT_A_SPOT = new Set(['garden_plot', 'pc_player', 'mp_furn_sale', 'mp_currant_pile']);
+const NOT_A_SPOT = new Set(['garden_plot', 'pc_player', 'mp_furn_sale', 'mp_currant_pile', 'npc_firefly']);
 
 const CLASS_ID = /^[a-z0-9_]{1,64}$/;
 
@@ -272,46 +294,58 @@ const overlaps = (a, w, h) => a[2] > 0 && a[3] > 0 && a[0] < w && a[1] < h;
  * none), and the counts kept under HOME_LAYOUT_LIMITS: scenery goes first,
  * smallest first, never a spot's own art. Returns null when there is no stage.
  */
-export function buildHomeLayout({ w, h, draw = [], spots = [] } = {}) {
-  const L = HOME_LAYOUT_LIMITS;
+export function buildHomeLayout({ w, h, draw = [], spots = [], street = null } = {}) {
+  const L = street ? { ...HOME_LAYOUT_LIMITS, ...HOME_STREET_LIMITS } : HOME_LAYOUT_LIMITS;
   const W = round(w);
   const H = round(h);
   if (!(W >= L.minW && W <= L.maxW && H >= L.minH && H <= L.maxH)) return null;
-  const clampReach = (v) => Math.max(-L.reach, Math.min(L.reach, round(v)));
+  // Version 2: the street's width and where the camera stood (the picture's frame).
+  const SW = street ? Math.max(W, Math.min(L.maxSw, round(street.sw))) : W;
+  const camX = street ? Math.max(0, Math.min(SW - W, Number(street.camX) || 0)) : 0;
+  const factor = (rec) => (street ? Math.max(0, Math.min(1, Math.round((Number.isFinite(rec.f) ? rec.f : 1) * 1000) / 1000)) : 1);
+  // A layer at f is in view from 0 to W + (SW - W) * f of its own x as the camera crosses the street.
+  const span = (f) => W + (SW - W) * f;
+  const clampReach = (v) => Math.max(-L.reach, Math.min(L.reach + (SW - W), round(v)));
   // Spots: the described ones, in order, with their own box when they have no art.
   const spotOut = [];
   const spotIndex = new Map();
   spots.forEach((spot, i) => {
     if (!spot?.desc || !HOME_LAYOUT_KINDS.includes(spot.desc.k)) return;
     spotIndex.set(i, spotOut.length);
-    spotOut.push({ desc: cleanSpot(spot.desc), aabb: Array.isArray(spot.aabb) ? [...spot.aabb] : null, union: null });
+    // Its own bounds were read on stage: on the street (f 1) that is camX further along.
+    const own = Array.isArray(spot.aabb) ? [spot.aabb[0] + camX, spot.aabb[1], spot.aabb[2] + camX, spot.aabb[3]] : null;
+    spotOut.push({ desc: cleanSpot(spot.desc), aabb: own, union: null });
   });
   // Draw entries on the stage.
   let entries = [];
-  for (const rec of draw) {
-    if (!rec) continue;
+  for (const raw of draw) {
+    if (!raw) continue;
+    const f = factor(raw);
+    const dx = camX * f;
+    const xMax = span(f);
+    const rec = dx ? shifted(raw, dx) : raw;
     const alpha = rec.alpha == null ? 1 : Math.max(0, Math.min(1, Number(rec.alpha)));
     if (!(alpha >= 0.02)) continue;
     if (rec.avatar) {
       const [x, y, rw, rh] = (rec.rect || []).map(Number);
       if (![x, y, rw, rh].every(Number.isFinite) || rw < 1 || rh < 1) continue;
       const aabb = [x, y, x + rw, y + rh];
-      if (!overlaps(aabb, W, H)) continue;
+      if (!overlaps(aabb, xMax, H)) continue;
       const out = { avatar: 1, x: clampReach(x), y: clampReach(y), w: Math.min(L.reach, round(rw)), h: Math.min(L.reach, round(rh)) };
       if (rec.mirrored) out.f = 1;
       if (alpha < 1) out.o = round2(alpha);
       const spot = spotIndex.has(rec.spot) ? spotIndex.get(rec.spot) : null;
-      entries.push({ kind: 'avatar', out, spot, area: rw * rh, aabb });
+      entries.push({ kind: 'avatar', out, spot, area: rw * rh, aabb, f });
       continue;
     }
     if (rec.txt) {
       if (!Object.hasOwn(HOME_LAYOUT_TEXTS, rec.txt) || !Array.isArray(rec.corners) || rec.corners.length !== 4) continue;
       const box = boxFromCorners(rec.corners);
-      if (!(box.w >= 1 && box.h >= 1) || !overlaps(box.aabb, W, H)) continue;
+      if (!(box.w >= 1 && box.h >= 1) || !overlaps(box.aabb, xMax, H)) continue;
       const out = { txt: rec.txt, x: clampReach(box.cx - box.w / 2), y: clampReach(box.cy - box.h / 2), w: Math.max(1, round(box.w)), h: Math.max(1, round(box.h)) };
       if (box.r) out.r = Math.round((box.mirrored ? box.r + 180 : box.r) * 10) / 10;
       const spot = spotIndex.has(rec.spot) ? spotIndex.get(rec.spot) : null;
-      entries.push({ kind: 'txt', out, spot, area: box.w * box.h, aabb: box.aabb });
+      entries.push({ kind: 'txt', out, spot, area: box.w * box.h, aabb: box.aabb, f });
       continue;
     }
     if (rec.sky || rec.col) {
@@ -319,40 +353,41 @@ export function buildHomeLayout({ w, h, draw = [], spots = [] } = {}) {
       if (![x, y, rw, rh].every(Number.isFinite) || rw < 1 || rh < 1) continue;
       const x0 = Math.max(0, x);
       const y0 = Math.max(0, y);
-      const x1 = Math.min(W, x + rw);
+      const x1 = Math.min(rec.sky ? W : xMax, x + rw);
       const y1 = Math.min(H, y + rh);
       if (x1 - x0 < 1 || y1 - y0 < 1) continue;
       if (rec.sky) {
         const stops = rec.sky.map(hexColour).filter(Boolean).slice(0, 6);
         if (!stops.length) continue;
         // The gradient spans the sky sprite, not just the part on stage.
-        entries.push({ kind: 'sky', out: { sky: stops, x: round(x), y: round(y), w: round(rw), h: round(rh) }, area: (x1 - x0) * (y1 - y0) });
+        entries.push({ kind: 'sky', out: { sky: stops, x: round(x), y: round(y), w: round(rw), h: round(rh) }, area: (x1 - x0) * (y1 - y0), f: street ? 0 : 1 });
       } else {
         const col = hexColour(rec.col);
         if (!col) continue;
-        const out = { col, x: round(x0), y: round(y0), w: round(x1 - x0), h: round(y1 - y0) };
+        const out = { col, x: round(x0), y: round(y0), w: Math.min(L.reach + (SW - W), round(x1 - x0)), h: Math.min(L.reach, round(y1 - y0)) };
         if (alpha < 1) out.o = round2(alpha);
-        entries.push({ kind: 'col', out, area: (x1 - x0) * (y1 - y0) });
+        entries.push({ kind: 'col', out, area: (x1 - x0) * (y1 - y0), f });
       }
       continue;
     }
     const art = layoutArtPath(rec.art);
     if (!art || !Array.isArray(rec.corners) || rec.corners.length !== 4) continue;
     const box = boxFromCorners(rec.corners);
-    if (!(box.w >= 1 && box.h >= 1) || !overlaps(box.aabb, W, H)) continue;
-    const out = { art, x: clampReach(box.cx - box.w / 2), y: clampReach(box.cy - box.h / 2), w: Math.max(1, Math.min(L.reach, round(box.w))), h: Math.max(1, Math.min(L.reach, round(box.h))) };
+    if (!(box.w >= 1 && box.h >= 1) || !overlaps(box.aabb, xMax, H)) continue;
+    const out = { art, x: clampReach(box.cx - box.w / 2), y: Math.max(-L.reach, Math.min(L.reach, round(box.cy - box.h / 2))), w: Math.max(1, Math.min(L.reach, round(box.w))), h: Math.max(1, Math.min(L.reach, round(box.h))) };
     if (box.mirrored) out.f = 1;
     if (box.r) out.r = Math.round(box.r * 10) / 10;
     if (alpha < 1) out.o = round2(alpha);
     const tint = hexColour(rec.tint);
     if (tint && tint !== '#ffffff') out.t = tint;
-    const f = rec.frame;
-    if (f && [f.x, f.y, f.width, f.height].every(Number.isFinite) && f.width >= 1 && f.height >= 1) {
-      const full = rec.sheet && Math.abs(f.x) < 0.5 && Math.abs(f.y) < 0.5 && Math.abs(f.width - rec.sheet.width) < 0.5 && Math.abs(f.height - rec.sheet.height) < 0.5;
-      if (!full) out.c = [round(f.x), round(f.y), round(f.width), round(f.height)];
+    const fr = rec.frame;
+    if (fr && [fr.x, fr.y, fr.width, fr.height].every(Number.isFinite) && fr.width >= 1 && fr.height >= 1) {
+      const full = rec.sheet && Math.abs(fr.x) < 0.5 && Math.abs(fr.y) < 0.5 && Math.abs(fr.width - rec.sheet.width) < 0.5 && Math.abs(fr.height - rec.sheet.height) < 0.5;
+      if (!full) out.c = [round(fr.x), round(fr.y), round(fr.width), round(fr.height)];
     }
-    const spot = spotIndex.has(rec.spot) ? spotIndex.get(rec.spot) : null;
-    entries.push({ kind: 'img', out, spot, area: box.w * box.h, aabb: box.aabb });
+    // A spot is on the street itself (f 1): art in a parallax layer is scenery.
+    const spot = spotIndex.has(rec.spot) && f === 1 ? spotIndex.get(rec.spot) : null;
+    entries.push({ kind: 'img', out, spot, area: box.w * box.h, aabb: box.aabb, f });
   }
   // Caps: scenery images go first, the smallest first; spot art and bands stay.
   const maxDraw = L.draw;
@@ -375,6 +410,11 @@ export function buildHomeLayout({ w, h, draw = [], spots = [] } = {}) {
   const art = [];
   const artIndex = new Map();
   const drawOut = [];
+  const drawF = new Map();
+  const push = (item, e) => {
+    drawF.set(item, e.f ?? 1);
+    drawOut.push(item);
+  };
   for (const e of entries.slice(0, maxDraw)) {
     if (e.kind === 'avatar') {
       // One avatar: the owner's.
@@ -384,17 +424,17 @@ export function buildHomeLayout({ w, h, draw = [], spots = [] } = {}) {
         item.s = e.spot;
         spotOut[e.spot].union = [...e.aabb];
       }
-      drawOut.push(item);
+      push(item, e);
       continue;
     }
     if (e.kind === 'txt') {
       const item = { ...e.out };
       if (e.spot != null) item.s = e.spot;
-      drawOut.push(item);
+      push(item, e);
       continue;
     }
     if (e.kind !== 'img') {
-      drawOut.push(e.out);
+      push(e.out, e);
       continue;
     }
     if (!artIndex.has(e.out.art)) {
@@ -409,7 +449,7 @@ export function buildHomeLayout({ w, h, draw = [], spots = [] } = {}) {
       const u = spotOut[e.spot];
       u.union = u.union ? [Math.min(u.union[0], e.aabb[0]), Math.min(u.union[1], e.aabb[1]), Math.max(u.union[2], e.aabb[2]), Math.max(u.union[3], e.aabb[3])] : [...e.aabb];
     }
-    drawOut.push(item);
+    push(item, e);
   }
   // Each spot's box: its images' union, else its own bounds; on stage, or it goes. Only a door
   // (painted on the house's art) is a spot without art of its own: a thing drawn some other way
@@ -419,10 +459,10 @@ export function buildHomeLayout({ w, h, draw = [], spots = [] } = {}) {
   spotOut.forEach((spot, i) => {
     if (!spot.union && !SPOT_WITHOUT_ART.has(spot.desc.k)) return;
     const a = spot.union || spot.aabb;
-    if (!a || !overlaps(a, W, H) || spotsOut.length >= L.spots) return;
+    if (!a || !overlaps(a, SW, H) || spotsOut.length >= L.spots) return;
     const x0 = Math.max(-L.reach, a[0]);
     const y0 = Math.max(-L.reach, a[1]);
-    const bw = Math.min(L.reach, a[2]) - x0;
+    const bw = Math.min(L.reach + (SW - W), a[2]) - x0;
     const bh = Math.min(L.reach, a[3]) - y0;
     if (bw < 1 || bh < 1) return;
     finalIndex.set(i, spotsOut.length);
@@ -433,7 +473,25 @@ export function buildHomeLayout({ w, h, draw = [], spots = [] } = {}) {
     if (finalIndex.has(item.s)) item.s = finalIndex.get(item.s);
     else delete item.s;
   }
-  return { v: HOME_LAYOUT_VERSION, w: W, h: H, art, draw: drawOut, spots: spotsOut };
+  if (!street) return { v: HOME_LAYOUT_VERSION, w: W, h: H, art, draw: drawOut, spots: spotsOut };
+  // Layers: runs of one parallax factor, back to front (the street's own art runs between them).
+  const layers = [];
+  for (const item of drawOut) {
+    const f = drawF.get(item);
+    const last = layers[layers.length - 1];
+    if (last && last.f === f) last.draw.push(item);
+    else layers.push({ f, draw: [item] });
+  }
+  if (layers.length > L.layers) return null;
+  return { v: HOME_STREET_VERSION, w: W, h: H, sw: SW, cx: round(camX), art, layers, spots: spotsOut };
+}
+
+/** A walk record moved dx px along x (its layer's own coordinates). */
+function shifted(rec, dx) {
+  const out = { ...rec };
+  if (Array.isArray(rec.corners)) out.corners = rec.corners.map((p) => ({ x: p.x + dx, y: p.y }));
+  if (Array.isArray(rec.rect)) out.rect = [rec.rect[0] + dx, ...rec.rect.slice(1)];
+  return out;
 }
 
 /** PURE: the manifest as the JSON the site takes, and its size in bytes. */
@@ -452,5 +510,5 @@ export function homeLayoutJson(layout) {
 export function homeLayoutKeyOf(layout, pictureKey) {
   const things = (layout?.spots || []).filter((s) => s.k !== 'avatar').map((s) => [s.k, s.i || '', s.n ?? '', s.s || '', s.p ?? '', s.name || ''].join(':')).join('|');
   const base = String(pictureKey || '').replace(/^h\d+-/, '');
-  return `l${HOME_LAYOUT_VERSION}-${base}-${shortHash(things)}`.slice(0, 64);
+  return `l${layout?.v === HOME_STREET_VERSION ? HOME_STREET_VERSION : HOME_LAYOUT_VERSION}-${base}-${shortHash(things)}`.slice(0, 64);
 }

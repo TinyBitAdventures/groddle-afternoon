@@ -17,8 +17,8 @@ import { homedir } from 'node:os';
 import {
   HOME_LAYOUT_ART_ROOTS, HOME_LAYOUT_KINDS, HOME_LAYOUT_LIMITS, HOME_LAYOUT_TEXTS, HOME_LAYOUT_VERSION,
   boxFromCorners, buildHomeLayout, describeHomeThing, hexColour, homeLayoutJson, homeLayoutKeyOf, layoutArtPath, splitFrameToSheet,
-} from '../public/js/home-layout.js?v=dadee3ed';
-import { walkHomeScene } from '../public/js/home-layout-scene.js?v=84f99516';
+} from '../public/js/home-layout.js?v=215b0f4f';
+import { walkHomeScene } from '../public/js/home-layout-scene.js?v=b1174f7e';
 import { AVATAR_STILL, homeKeyOf } from '../public/js/profiles.js?v=174a1a84';
 import { HOUSE_STYLE_KEYS } from '../public/js/features/homes-feature.js?v=2df0ff28';
 import { SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
@@ -66,7 +66,7 @@ describe('spots (describeHomeThing)', () => {
     assert.deepEqual(describeHomeThing({ classId: 'trant_bean' }), { k: 'cultivation', i: 'trant_bean' });
     assert.deepEqual(describeHomeThing({ classId: 'proto_peat' }), { k: 'proto', i: 'proto_peat' });
     assert.deepEqual(describeHomeThing({ classId: 'magic_rock' }), { k: 'item', i: 'magic_rock' });
-    for (const none of ['garden_plot', 'pc_player', 'mp_furn_sale', 'Bad Class', '<script>', '']) assert.equal(describeHomeThing({ classId: none }), null, none);
+    for (const none of ['garden_plot', 'pc_player', 'mp_furn_sale', 'npc_firefly', 'Bad Class', '<script>', '']) assert.equal(describeHomeThing({ classId: none }), null, none);
   });
 
   it('takes a display object\'s own description first, with only known fields in range', () => {
@@ -201,7 +201,7 @@ describe('the stage walk (walkHomeScene)', () => {
     const world = node({ sortableChildren: true }, [a, b, hidden, clear, sky, field]);
     const { draw } = walkHomeScene(world, io());
     assert.deepEqual(draw.map((d) => d.art || (d.sky ? 'sky' : 'col')), ['sky', 'col', 'assets/decos/groddle/b.webp', 'assets/decos/groddle/a.webp']);
-    assert.deepEqual(draw[1], { col: 0x123456, rect: [0, 40, 100, 10], alpha: 0.5 });
+    assert.deepEqual(draw[1], { col: 0x123456, rect: [0, 40, 100, 10], alpha: 0.5, f: 1 });
   });
 
   it('makes a target or a tagged object a spot owning the art under it, and the avatar the owner\'s still', () => {
