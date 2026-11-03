@@ -9,7 +9,9 @@
  *   (findDropTarget 571-599: an empty slot, or the same class under its
  *   stackmax); a stack dragged out onto the pack comes out; a stack dragged to
  *   another slot moves. A slot's click opens its Take out row (the verb menu's
- *   count, for touch and keys). The window leaves the pack bar uncovered, as
+ *   count, for touch and keys); a right-click, Shift+F10 or the Menu key on a
+ *   full slot opens the same row (RIGHTCLICK, right-click audit later batch item
+ *   7: the same as the click, as the pack's stacks do; it never closes it). The window leaves the pack bar uncovered, as
  *   the original's blocker covered only the location.
  * - The Storage Display Box's pricer (set_selling_price: "Price per <name>",
  *   "Quantity: N", Set price), its store (StoreBuyUI.as: the item, "N for
@@ -21,6 +23,7 @@
  */
 
 import { bindCountField, countKeyValue, countStepMarkup } from './count-chooser.js?v=893305c8';
+import { bindContextTrigger } from './context-menu.js?v=c92fbdd5';
 
 const CSS = `
 .hst-win { position: fixed; z-index: calc(var(--z-panel) - 1); left: 50%; top: max(64px, 9vh); transform: translateX(-50%);
@@ -227,6 +230,11 @@ export function openCabinetWindow(opts) {
     slots.forEach((s, i) => {
       const b = el('button', { type: 'button', class: `hst-slot${s ? ' is-full' : ''}${picked === i ? ' is-picked' : ''}`, role: 'gridcell', 'data-hst-slot': String(i),
         'aria-label': s ? `${item(s.classTsid).label} × ${s.count}` : `Empty slot ${i + 1}`, draggable: s ? 'true' : 'false' });
+      // RIGHTCLICK: a full slot's right-click is the game's (its Take out row), never the browser's.
+      if (s) {
+        b.dataset.ctx = 'storage';
+        b.setAttribute('aria-keyshortcuts', 'Shift+F10');
+      }
       if (s) {
         const meta = item(s.classTsid);
         b.append(el('img', { src: meta.icon, alt: '' }));
@@ -249,6 +257,8 @@ export function openCabinetWindow(opts) {
   function drawPick() {
     pick.replaceChildren();
     const s = picked != null ? slots[picked] : null;
+    // QA: the slot whose Take out row shows ('' for none).
+    h.root.dataset.hstPicked = s ? String(picked) : '';
     if (!s) {
       pick.hidden = true;
       return;
@@ -389,6 +399,19 @@ export function openCabinetWindow(opts) {
     picked = slots[i] && picked !== i ? i : null;
     draw();
     if (picked != null) pick.querySelector('[data-hst-take]')?.focus({ preventScroll: true });
+  });
+  // RIGHTCLICK: a right-click (Shift+F10, the Menu key) on a full slot opens its Take out row, as a
+  // click does, and leaves it open when it already is.
+  bindContextTrigger(grid, {
+    rowOf: (t) => {
+      const b = t?.closest?.('[data-hst-slot]');
+      return b && slots[Number(b.getAttribute('data-hst-slot'))] ? b : null;
+    },
+    open: (b) => {
+      picked = Number(b.getAttribute('data-hst-slot'));
+      draw();
+      pick.querySelector('[data-hst-take]')?.focus({ preventScroll: true });
+    },
   });
   grid.addEventListener('keydown', (e) => {
     const b = e.target?.closest?.('[data-hst-slot]');

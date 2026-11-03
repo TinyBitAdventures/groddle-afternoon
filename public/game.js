@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=117337d3';
 import { createFeatureHost } from './js/feature-host.js?v=903263a4';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=f0a9f6f3';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=1bd215ca';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -928,7 +928,7 @@ import { bindDragScroll } from './js/ui/drag-scroll.js?v=9a527ac8';
 import { SIDE_SHEET_IDS, bindTabs, inSideSheet, mountPanelShell, sheetKeyToWorld } from './js/ui/panel-shell.js?v=3d10b1e5';
 import { createQuestSheet, questStep } from './js/ui/quest-sheet.js?v=cc0ecd4e';
 import { createQuestTracker } from './js/ui/quest-tracker.js?v=e37a374b';
-import { createContextMenu, isContextMenuKey as isMenuKey } from './js/ui/context-menu.js?v=c92fbdd5';
+import { bindContextTrigger, createContextMenu, isContextMenuKey as isMenuKey, MORE_KEYS_LABEL } from './js/ui/context-menu.js?v=c92fbdd5';
 import { bindCountField, countKeyValue, countStepMarkup } from './js/ui/count-chooser.js?v=893305c8';
 import { bindVerbMenu, focusVerbRow, lockVerbMenuSize, makePickTile, makeVerbRow, pickGridCols, placeVerbMenu, plainWords, refuseVerbRow, syncVerbDetail, verbMenuKey, verbRowAttrs, verbRowInner, verbRowKeys } from './js/ui/verb-menu.js?v=74b6dfa0';
 import { createPromptSettler, promptId } from './js/prompt-settle.js?v=509ba9cc';
@@ -26114,6 +26114,7 @@ function openVendor() {
 
 function closeVendor() {
   closePackPopover();
+  if (vendorCtxMenu?.isOpen()) vendorCtxMenu.close({ focus: false });
   const panel = document.getElementById('vendor-panel');
   if (panel) panel.hidden = true;
   vendorSelected = null;
@@ -26891,6 +26892,88 @@ function placeVendorPop(list, detail) {
   if (app?.canvas) app.canvas.dataset.vendorPop = `${vendorSelected}:${Math.round(top)}`;
 }
 
+/**
+ * RIGHTCLICK (right-click audit later batch item 7): a vendor tile's menu, by a right-click, a long
+ * press, Shift+F10 or the Menu key: Buy... (what a click does: the count chooser), Buy 1 and Buy max
+ * (the chooser's own Max and Buy buttons, pressed), or Sell..., Sell 1 and Sell max on the Sell tab;
+ * greyed with the vendor's own words when you can't afford one. The original's store had only the
+ * click (StoreDialog.as 434-461); every row is a button its count chooser already has.
+ * QA: canvas data contextMenu vendor:<class>.
+ */
+let vendorCtxMenu = null;
+function vendorContextMenu() {
+  if (!vendorCtxMenu) vendorCtxMenu = createContextMenu({ doc: document, host: document.getElementById('game-root'), id: 'vendor-ctx-menu', className: 'vendor-ctx-menu', rowData: 'vendorRow', setData: setCanvasData });
+  return vendorCtxMenu;
+}
+
+function markVendorTile(tile, words) {
+  tile.dataset.ctx = 'vendor';
+  tile.setAttribute('aria-keyshortcuts', 'Shift+F10');
+  tile.setAttribute('aria-label', `${words}. ${MORE_KEYS_LABEL}`);
+}
+
+function openVendorTileMenu(tile, { at = null, keys = false } = {}) {
+  const cls = tile?.dataset?.vendorItem;
+  if (!cls || !activeVendor || !isVendorOpen()) return false;
+  const isBuy = vendorTab === 'buy';
+  let label;
+  let unit;
+  let most;
+  let reason = '';
+  if (isBuy) {
+    const offer = activeVendor.offers.find((o) => o.classTsid === cls);
+    if (!offer) return false;
+    label = offer.label || ITEM_CATALOG[cls]?.label || cls;
+    unit = vendorBuyUnitPrice(offer, pc.imaginationUpgrades);
+    most = unit > 0 ? Math.max(1, Math.floor((pc.currants || 0) / unit)) : 99;
+    // vendor.js vendorBuy's own refusal.
+    if (unit > (pc.currants || 0)) reason = `Need ${unit} currants (you have ${pc.currants || 0}).`;
+  } else {
+    const quote = createVendorSellQuote(inv, activeVendor.offers, cls, 1, pc.imaginationUpgrades, vendorSellOpts());
+    if (!quote?.ok) return false;
+    label = quote.label;
+    unit = quote.unitPrice;
+    most = Math.max(1, quote.maxQty ?? quote.have);
+  }
+  const verb = isBuy ? 'Buy' : 'Sell';
+  const coins = (n) => `${n} ${n === 1 ? 'currant' : 'currants'}`;
+  const rows = [
+    { id: 'choose', label: `${verb}…`, tip: `Choose how many ${label} to ${verb.toLowerCase()}.`, focusBack: false },
+    { id: 'one', label: `${verb} 1`, tip: `${verb} one for ${coins(unit)}.`, disabled: Boolean(reason), reason, focusBack: false },
+    { id: 'max', label: `${verb} max`, tip: `${verb} ${most} for ${coins(unit * most)}.`, disabled: Boolean(reason), reason, focusBack: false },
+  ];
+  return vendorContextMenu().open({
+    title: label,
+    rows,
+    at,
+    anchor: tile,
+    keys,
+    opener: tile,
+    findOpener: () => document.querySelector(`#vendor-list [data-vendor-item="${CSS.escape(cls)}"]`),
+    owner: `vendor:${cls}`,
+    onPick: (id) => {
+      if (!isVendorOpen() || vendorTab !== (isBuy ? 'buy' : 'sell')) return;
+      // As a click on the tile, then (Buy 1, Buy max) the count chooser's own buttons.
+      vendorSelected = cls;
+      vendorToolCopy = null;
+      vendorQty = id === 'max' ? Number.MAX_SAFE_INTEGER : 1;
+      renderVendorList();
+      if (id === 'choose') return;
+      document.querySelector('#vendor-detail [data-v-go]')?.click();
+    },
+  });
+}
+
+bindContextTrigger(document.getElementById('vendor-list'), {
+  rowOf: (t) => {
+    const tile = t?.closest?.('.vendor-tile[data-vendor-item]');
+    return tile && isVendorOpen() ? tile : null;
+  },
+  isOpenFor: (tile) => Boolean(vendorCtxMenu?.isOpenFor(`vendor:${tile.dataset.vendorItem}`)),
+  open: (tile, { at, keys }) => openVendorTileMenu(tile, { at, keys }),
+  longPress: true,
+});
+
 /** The shelf: what this vendor sells (Buy) or buys from your pack (Sell). */
 function drawVendorTiles(list) {
   list.hidden = false;
@@ -26904,6 +26987,7 @@ function drawVendorTiles(list) {
       tile.setAttribute('role', 'listitem');
       tile.title = row.label;
       tile.dataset.vendorItem = row.classTsid;
+      markVendorTile(tile, `${row.label}, ${row.price} currants`);
       tile.innerHTML = `
         <img src="${itemIconUrl(row.classTsid)}" alt="" />
         <span class="tile-price">◎ ${row.price}</span>
@@ -26929,6 +27013,7 @@ function drawVendorTiles(list) {
       tile.setAttribute('role', 'listitem');
       tile.title = `${row.label} ×${row.have}`;
       tile.dataset.vendorItem = row.classTsid;
+      markVendorTile(tile, `${row.label}, ${row.have} in your pack, ${row.price} currants each`);
       tile.innerHTML = `
         <img src="${itemIconUrl(row.classTsid)}" alt="" />
         <span class="tile-price">◎ ${row.price}</span>

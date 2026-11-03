@@ -260,6 +260,6 @@ describe('the wiring', () => {
   });
 
   it('game.js takes the menu key from it', () => {
-    assert.match(read('game.js'), /import \{ createContextMenu, isContextMenuKey as isMenuKey \} from '\.\/js\/ui\/context-menu\.js/);
+    assert.match(read('game.js'), /import \{ bindContextTrigger, createContextMenu, isContextMenuKey as isMenuKey, MORE_KEYS_LABEL \} from '\.\/js\/ui\/context-menu\.js/);
   });
 });
