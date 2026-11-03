@@ -21,7 +21,7 @@ import { loadAudioRestore, saveAudioRestore } from '../audio-pref.js?v=6fe817bc'
 import { ZOOM_KEYS_HINT, clampZoom, zoomLabel, zoomValueText } from '../world-zoom.js?v=b262a6c7';
 import { NIGHT_TINT_HINT, NIGHT_TINT_LABEL } from '../night-tint.js?v=1dfc9c89';
 import { STREET_MAP_HINT, STREET_MAP_LABEL } from './street-minimap.js?v=abefc4d6';
-import { focusBack } from './focus-return.js?v=78ab3c0c';
+import { focusBack } from './focus-return.js?v=c34f16a0';
 
 /** The Menu's groups, in the mock's order; Social shows only when something is in it. */
 export const MENU_GROUPS = Object.freeze([
@@ -607,6 +607,8 @@ function installSound(doc, audio) {
       names();
     });
   }
+  // It only sets things: a click on Mute, a channel or a slider gives the world the keys (focus-return.js).
+  pop.dataset.clickReleases = '';
   popover(doc, btn, pop, { onOpen: () => { draw(); names(); } });
   names();
   draw();

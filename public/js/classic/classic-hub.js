@@ -29,7 +29,7 @@
  */
 import { uiState, onUiModeChange, readUiCache, writeUiCache } from './ui-mode.js?v=587c014a';
 import { classicArtUrl } from './classic-art.js?v=5745e669';
-import { focusBack } from '../ui/focus-return.js?v=78ab3c0c';
+import { focusBack } from '../ui/focus-return.js?v=c34f16a0';
 
 /** The clouds, in the client's two rows (ImgMenuView.as 343-415). */
 export const HUB_CLOUDS = Object.freeze([

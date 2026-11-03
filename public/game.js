@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=862128f3';
 import { createFeatureHost } from './js/feature-host.js?v=903263a4';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=15865bbf';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=fe55c0bc';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -725,7 +725,7 @@ import { worldZoom, setWorldZoom, stepWorldZoom, onZoomChange, zoomKeyAction, zo
 import { nightTint, nightTintOn, onNightTintChange, worldTintOpacity } from './js/night-tint.js?v=1dfc9c89';
 import { streetMapSetting, toggleStreetMap } from './js/ui/street-minimap.js?v=abefc4d6';
 import './js/classic/classic-zoom.js?v=1ef4b9a5';
-import { mountImaginationHub } from './js/ui/imagination-hub.js?v=0ca10ad7';
+import { mountImaginationHub } from './js/ui/imagination-hub.js?v=31e8c38c';
 import { newDayBubble, shuffleNewDayMessages, waitForScreenGates } from './js/screen-queue.js?v=cf0132c0';
 import { applyFamiliarLook, familiarCardHeading, familiarLook, skillArtFor, skillLearnedActivity } from './js/familiar.js?v=c7e902af';
 import { armPromptTimeout, promptTimeoutMs } from './js/prompt-timeout.js?v=c13ee4f6';
@@ -914,8 +914,8 @@ import { installHiresIcons } from './js/icon-hires.js?v=5b68aeaa';
 import { installHiresDecos } from './js/deco-hires.js?v=cb905e17';
 import { loadAudioLevels, loadMutedPreference, saveAudioLevel, saveMutedPreference } from './js/audio-pref.js?v=6fe817bc';
 import { createAudioBuses, fadeGain } from './js/audio-buses.js?v=af167b54';
-import { installTopBar, renderTopBar } from './js/ui/topbar.js?v=7c080e30';
-import { focusBack, installFocusReturn, lastInput } from './js/ui/focus-return.js?v=78ab3c0c';
+import { installTopBar, renderTopBar } from './js/ui/topbar.js?v=25559100';
+import { focusBack, installFocusReturn, lastInput } from './js/ui/focus-return.js?v=c34f16a0';
 import { QUOIN_FRAME_BOB, advanceQuoinClock, quoinBobBetweenFrames } from './js/quoin-motion.js?v=ea0bd408';
 import { installHiresFirstDraw, installHiresSprites, upgradeSource } from './js/sprite-hires.js?v=96c22af7';
 import { denseSprite } from './js/sprite-dense.js?v=178a711b';
@@ -924,7 +924,7 @@ import { createNotifier, effectTokens, floatKey, offerCardDrop, stackFloat, toke
 import { mountNotifyView } from './js/notify-view.js?v=81d06119';
 import { mountSocialDrawer } from './js/ui/social-drawer.js?v=a0048e58';
 import { bindDragScroll } from './js/ui/drag-scroll.js?v=9a527ac8';
-import { SIDE_SHEET_IDS, bindTabs, inSideSheet, mountPanelShell, sheetKeyToWorld } from './js/ui/panel-shell.js?v=0ee0fd51';
+import { SIDE_SHEET_IDS, bindTabs, inSideSheet, mountPanelShell, sheetKeyToWorld } from './js/ui/panel-shell.js?v=3d10b1e5';
 import { createQuestSheet, questStep } from './js/ui/quest-sheet.js?v=4d6b1340';
 import { createQuestTracker } from './js/ui/quest-tracker.js?v=76c0a782';
 import { bindCountField, countKeyValue, countStepMarkup } from './js/ui/count-chooser.js?v=893305c8';
@@ -951,7 +951,7 @@ import { itemZ } from './js/item-bands.js?v=e98b10bc';
 import { SLUG_ANIMATION, SLUG_LAYOUT, SLUG_STYLES, SLUG_TARGETS, drawSlugIcon, formatRawSlugs, formatSlugList, layoutSlugRow, slugBox, slugNumber, slugPillPath, slugSign, speechSlugList } from './js/speech-slugs.js?v=130338f9';
 import { filterText } from './js/word-filter.js?v=9a7a7ebb'; // the remake's own word filter
 // The interface skin (js/classic/ui-mode.js) sets <html data-ui> as it loads: before main(), so before the boot cover lifts.
-import { installInterfaceSettings } from './js/classic/classic-prefs.js?v=8f44b336';
+import { installInterfaceSettings } from './js/classic/classic-prefs.js?v=2261b80a';
 
 /** @type {object|null} assets/maps/index.json */
 let mapIndexCache = null;
@@ -1575,6 +1575,8 @@ function installVitalsMenu() {
   const menu = document.createElement('div');
   menu.id = 'vitals-menu';
   menu.className = 'vitals-menu';
+  // A click in it (eat one) gives the world the keys, so Space jumps (js/ui/focus-return.js).
+  menu.dataset.clickReleases = '';
   menu.hidden = true;
   menu.setAttribute('role', 'dialog');
   menu.setAttribute('aria-label', 'Something from your pack');

@@ -5,8 +5,8 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { WORLD_SELECTOR, focusBack, focusBackTarget, focusWorld, installFocusReturn, lastInput, pressedBy } from '../public/js/ui/focus-return.js?v=78ab3c0c';
-import { mountPanelShell } from '../public/js/ui/panel-shell.js?v=0ee0fd51';
+import { WORLD_SELECTOR, focusBack, focusBackTarget, focusWorld, installFocusReturn, lastInput, pressedBy, tabbedSincePointer } from '../public/js/ui/focus-return.js?v=c34f16a0';
+import { mountPanelShell } from '../public/js/ui/panel-shell.js?v=3d10b1e5';
 
 const read = (p) => readFileSync(join(import.meta.dirname, '..', p), 'utf8');
 
@@ -33,9 +33,10 @@ function fakeDoc() {
       hidden: false,
       ownerDocument: doc,
       closest: (sel) => {
+        const parts = sel.split(',').map((p) => p.trim());
         for (let x = self; x; x = x.parent) {
-          if (x.control && sel.includes('button')) return x;
-          if (x.modal && sel.includes('[role="dialog"]')) return x;
+          if (x.control && parts.includes('button')) return x;
+          if (x.modal && parts.includes('[role="dialog"]')) return x;
         }
         return null;
       },
@@ -60,6 +61,24 @@ test('PURE: the opener only after a keyboard open and a keyboard close', () => {
   assert.equal(focusBackTarget({ opener: true, openerPressed: 'keyboard', last: 'pointer' }), 'world', 'Enter, then the close button clicked');
   assert.equal(focusBackTarget({ opener: true, openerPressed: '', last: '' }), 'opener', 'nothing known: as before');
   assert.equal(focusBackTarget({ opener: false, openerPressed: '', last: 'keyboard' }), 'world', 'no opener');
+  assert.equal(focusBackTarget({ opener: true, openerPressed: 'pointer', last: 'keyboard', tabbed: true }), 'opener', 'a click, Tab through it, Esc: the last input wins');
+  assert.equal(focusBackTarget({ opener: true, openerPressed: 'pointer', last: 'pointer', tabbed: true }), 'world', 'Tab, then the close button clicked');
+});
+
+test('installed: Tab after a mouse open sends Esc back to the opener; a pointer press forgets it', () => {
+  const doc = fakeDoc();
+  installFocusReturn(doc, { raf: () => {} });
+  const pill = doc.node('pill');
+  doc.fire('pointerdown', { target: pill });
+  assert.equal(tabbedSincePointer(doc), false);
+  doc.fire('keydown', { key: 'Tab', target: doc.body });
+  assert.equal(tabbedSincePointer(doc), true);
+  doc.fire('keydown', { key: 'Escape', target: doc.body });
+  assert.equal(focusBack(pill), 'opener', 'a ring on the street name: the player is on the keyboard now');
+  doc.fire('pointerdown', { target: pill });
+  doc.fire('keydown', { key: 'Escape', target: doc.body });
+  assert.equal(tabbedSincePointer(doc), false);
+  assert.equal(focusBack(pill), 'world');
 });
 
 test('installed: each control remembers how it was last pressed, and the last input of all', () => {
@@ -183,6 +202,9 @@ test('the windows that give focus back on close all go through focusBack', () =>
   assert.doesNotMatch(game, /setOpen\(false\);\n\s+btn\.focus\(\);/);
   // The clock (the hi sign board) lets a click go too.
   assert.match(read('public/js/features/hi-signs-feature.js'), /clock\.dataset\.clickReleases = '';/);
+  // Popovers that only set things: Sound, the energy and mood pills'.
+  assert.match(topbar, /pop\.dataset\.clickReleases = '';\n\s+popover\(doc, btn, pop,/);
+  assert.match(game, /menu\.className = 'vitals-menu';\n[^\n]*\n\s+menu\.dataset\.clickReleases = '';/);
   // The Social drawer: a click opens and closes it without taking the keys (ticket 37).
   const social = read('public/js/ui/social-drawer.js');
   assert.match(social, /focus: e\.detail === 0 \? 'tab' : null/);

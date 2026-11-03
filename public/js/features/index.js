@@ -37,7 +37,7 @@ import { partySpacesFeature } from './party-spaces-feature.js?v=a29c403b';
 import { seasonsFeature } from './seasons-feature.js?v=972bbf83';
 import { cameraModeFeature } from './camera-mode-feature.js?v=ad1ae5ea';
 import { newxpFeature } from './newxp-feature.js?v=78995605';
-import { streetMinimapFeature } from './street-minimap-feature.js?v=51667e3d';
+import { streetMinimapFeature } from './street-minimap-feature.js?v=380c53d5';
 
 export { questFlagsFeature };
 
@@ -149,7 +149,7 @@ import { playerMailFeature } from './player-mail-feature.js?v=6efb7f52'; FEATURE
 import { followMpFeature } from './follow-mp-feature.js?v=e5a26e1b'; FEATURES.push(followMpFeature);
 import { hogHaulMpFeature } from './hog-haul-mp-feature.js?v=bd99708a'; FEATURES.push(hogHaulMpFeature);
 import { dropsMpFeature } from './drops-mp-feature.js?v=793f04cd'; FEATURES.push(dropsMpFeature);
-import { bugReportFeature } from './bug-report-feature.js?v=5b815247'; FEATURES.push(bugReportFeature);
+import { bugReportFeature } from './bug-report-feature.js?v=0f5552ff'; FEATURES.push(bugReportFeature);
 import { playerVerbsMpFeature } from './player-verbs-mp-feature.js?v=ace410c8'; FEATURES.push(playerVerbsMpFeature);
 import { snapsFeature } from './snaps-feature.js?v=e383d31d'; FEATURES.push(snapsFeature);
 import { homeStreetMpFeature } from './home-street-mp-feature.js?v=3d669554'; FEATURES.push(homeStreetMpFeature);

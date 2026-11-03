@@ -36,7 +36,7 @@
 import { createStreetMinimap, minimapVisibility, onStreetMapChange, sceneSignMarks, setStreetMap, snapshotStreetView, snapsWithScene, streetMapOn } from '../ui/street-minimap.js?v=abefc4d6';
 import { classicArtUrl } from '../classic/classic-art.js?v=5745e669';
 import { onUiModeChange } from '../classic/ui-mode.js?v=587c014a';
-import { focusBack } from '../ui/focus-return.js?v=78ab3c0c';
+import { focusBack } from '../ui/focus-return.js?v=c34f16a0';
 
 export const STREET_MINIMAP_FEATURE_ID = 'street-minimap';
 const UPDATE_MS = 100;

@@ -10,7 +10,7 @@ import { installClassicTopbar } from './classic-topbar.js?v=d7bca1b0';
 import { installClassicGrowl } from './classic-growl.js?v=a476fea1';
 import { installClassicPanes } from './classic-panes.js?v=f141e3cf';
 import { installClassicPack } from './classic-pack.js?v=7ece52b8';
-import { installClassicHub } from './classic-hub.js?v=ba10b4c8';
+import { installClassicHub } from './classic-hub.js?v=6456b9dc';
 
 let installed = null;
 
