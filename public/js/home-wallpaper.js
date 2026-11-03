@@ -141,6 +141,14 @@ export function towerWallField(walls, i) {
   return seg;
 }
 
+/**
+ * Ticket 51: the side walls' art stops 1 px short of its inner edge (the SWF shape ends inside its
+ * 150 px stage), so with nothing behind it the sky showed in a thin line where a side wall met
+ * the back wall. Each end piece is drawn this much wider, its outer edge where it was, so its
+ * inner edge reaches under the back wall. Wall targets (stamping) keep the source's 150 px.
+ */
+export const END_SEAM = 2;
+
 function add(out, layer, piece, x, bottom, w, h, extra = {}) {
   if (!piece) return;
   out.push({ layer, piece, x, y: bottom - h, w, h, flip: false, ...extra });
@@ -193,7 +201,7 @@ function housePieces(state, W, leftOpen = false) {
       // divider shadow 82 px over the frame bottom, and the frame_open post over the way out.
       const open = split(hash.left_open);
       const bottom = B - 82;
-      add(out, 'wall', open.piece, x, bottom, SEG, 393, { flip: open.flip, segment: i });
+      add(out, 'wall', open.piece, x, bottom, SEG + END_SEAM, 393, { flip: open.flip, segment: i });
       wallTargets.push({ segment: i, x, y: bottom - 393, w: SEG, h: 393 });
       add(out, 'shadow', 'wallpaper_divider_shadow', x + 18, bottom, 133, 393);
       add(out, 'frame_v', F.openEnd, x + 1, B - (F.frameHeight + F.openEndY), F.openEndW, F.openEndH);
@@ -201,7 +209,7 @@ function housePieces(state, W, leftOpen = false) {
     }
     const { piece, flip } = split(hash[field]);
     if (field === 'left' || field === 'right') {
-      add(out, 'wall', piece, x, floorBottom, SEG, 458, { flip, segment: i });
+      add(out, 'wall', piece, field === 'right' ? x - END_SEAM : x, floorBottom, SEG + END_SEAM, 458, { flip, segment: i });
       wallTargets.push({ segment: i, x, y: floorBottom - 458, w: SEG, h: 458 });
       if (field === 'left') {
         add(out, 'shadow', 'wallpaper_end_shadow', x + 17, floorBottom, 133, 458, { flip: true });
@@ -285,7 +293,7 @@ function towerPieces(state, W, construction) {
       const field = towerWallField(walls, i);
       const { piece, flip } = split(textureHash('wall', walls[i])[field]);
       if (i === T.wallSegments) {
-        add(out, 'wall', piece, x, floorBottom, SEG, 458, { flip, segment: i });
+        add(out, 'wall', piece, x - END_SEAM, floorBottom, SEG + END_SEAM, 458, { flip, segment: i });
         add(out, 'shadow', 'wallpaper_end_shadow', x + 1, floorBottom, 133, 458);
         wallTargets.push({ segment: i, x, y: floorBottom - 458, w: SEG, h: 458 });
       } else {

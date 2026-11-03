@@ -13,7 +13,7 @@ import { readFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { SITE_DIR, sitePath, serverPath, skipWithoutSite, skipWithoutServer } from '../tools/repos.mjs';
 import { TP_TEXT, matchStreet, movedLine, parseTp, planTp, runTeleportCommand, streetKey } from '../public/js/admin-teleport.js?v=fa56e8df';
-import { slashCommandsFeature } from '../public/js/features/slash-commands-feature.js?v=dcf48df4';
+import { slashCommandsFeature } from '../public/js/features/slash-commands-feature.js?v=76827ecf';
 
 const root = join(import.meta.dirname, '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');
