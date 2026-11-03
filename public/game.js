@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=61c5424d';
 import { createFeatureHost } from './js/feature-host.js?v=903263a4';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=6dbe65e6';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=da53b251';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -123,7 +123,7 @@ import {
 } from './js/legalize-it.js?v=d569fd0e';
 import { HALL, HALL_LAYOUT, HALL_QUESTIONS } from './js/bureaucratic-hall.js?v=a0bc6317';
 import { STATION_X, stationArrival, stationScreen, surfaceStation } from './js/subway.js?v=5719ffc3';
-import { ALLEY, SHADY, drawAlley, inEnteredBox } from './js/quest-rooms/back-alley-set.js?v=f4c54caa';
+import { ALLEY, SHADY, drawAlley, inEnteredBox } from './js/quest-rooms/back-alley-set.js?v=406515a9';
 import {
   WINTER_HAVEN_STREET_ID,
   WINTER_MOTE_REWARDS,
@@ -326,6 +326,9 @@ import {
   PARADISE_COURSES,
   PARADISE_DAILY_LIMIT,
   PARADISE_TICKET_IDS,
+  PARADISE_STAR_COURSES,
+  paradisePickupTouches,
+  paradiseQuoinScale,
   CLOUD_RING_PROFILES,
   RADIAL_HEIGHTS_MOON,
   STARLIT_NIGHT_MOON,
@@ -355,13 +358,13 @@ import {
   slipTerrainY,
   starlitMoonPlainAlpha,
   starlitRevealAlpha,
-} from './js/paradise-flight.js?v=a7cdbc0f';
-import { resolveParadiseCourseAlias } from './js/paradise-courses.js?v=bb3d9051';
+} from './js/paradise-flight.js?v=b9ebc32f';
+import { resolveParadiseCourseAlias } from './js/paradise-courses.js?v=1a5d0aa7';
 import {
   buildParadiseCourseArt,
   paradiseCoursePreloadUrls,
   paradiseCourseRuntime,
-} from './js/paradise-course-runtime.js?v=6f3d1baf';
+} from './js/paradise-course-runtime.js?v=60e23e59';
 import {
   createAchievementState,
   applyAchievementProgress as applyAchievementProgressRaw,
@@ -479,7 +482,7 @@ import {
   parsePlayerSave,
   serializePlayerSave,
   restorePlayerSave,
-} from './js/player-save.js?v=895c68da';
+} from './js/player-save.js?v=3eceebbb';
 import {
   HOME_INTERIOR_TSID,
   HOME_STREET_TSID,
@@ -862,7 +865,7 @@ import {
   quoinClassType,
   resetStreetQuoinsForNewDay,
   creditQuoinStat,
-} from './js/quoins.js?v=14dd1c93';
+} from './js/quoins.js?v=dfe1ff0a';
 import {
   buildHubMapView,
   mapClickTravel,
@@ -19995,18 +19998,20 @@ function paradiseQuoinType(course, index) {
 
 function spawnParadisePickup(course, point, index) {
   let sprite;
-  if (course.id === 'radial_heights' || course.id === 'slip_n_slide') {
+  let typeId = '';
+  if (PARADISE_STAR_COURSES.includes(course.id)) {
     sprite = vectorStar(point.radius || 13, 0xffe15c, 0.96);
     sprite.rotation = index % 2 ? 0.13 : -0.13;
     sprite.baseScale = 1;
   } else {
     const quoinType = paradiseQuoinType(course, index);
+    typeId = quoinType;
     sprite = new PIXI.AnimatedSprite(quoinFrames(quoinType));
     sprite.anchor.set(0.5);
     sprite.animationSpeed = 0.28;
     sprite.loop = true;
     sprite.play();
-    sprite.baseScale = course.id === 'cloud_rings' ? SCALE * 0.9 : SCALE * 0.82;
+    sprite.baseScale = paradiseQuoinScale(course.id);
     sprite.scale.set(sprite.baseScale);
     const glow = new PIXI.Graphics();
     glow.circle(0, 0, 23).fill({ color: QUOIN_TYPES[quoinType].color, alpha: 0.18 });
@@ -20017,7 +20022,7 @@ function spawnParadisePickup(course, point, index) {
   sprite.phase = index * 0.91;
   sprite.zIndex = 30;
   entityLayer.addChild(sprite);
-  const entry = { index, sprite, point, collected: false };
+  const entry = { index, sprite, point, typeId, collected: false };
   paradisePickups.push(entry);
   return entry;
 }
@@ -20910,19 +20915,16 @@ function updateParadiseFlight(dt) {
     if (flake.x < 0) flake.x = course.width;
     else if (flake.x > course.width) flake.x = 0;
   }
+  const bodyScale = features.query('avatarBodyScale', engine) ?? 1;
   for (const entry of paradisePickups) {
     if (entry.collected || !entry.sprite?.parent) continue;
     entry.sprite.phase += 0.048 * dt;
     entry.sprite.y = entry.sprite.baseY + Math.sin(entry.sprite.phase) * 8;
     const pulse = 1 + Math.sin(entry.sprite.phase * 1.4) * 0.075;
     entry.sprite.scale.set((entry.sprite.baseScale || 1) * pulse);
-    if (
-      !menuTarget &&
-      Math.hypot(entry.sprite.x - player.x, entry.sprite.y - (player.y - 30)) <
-        (course.id === 'radial_heights' || course.id === 'slip_n_slide'
-          ? Math.max(30, entry.point.radius + 22)
-          : 47)
-    ) {
+    // Ticket 37: the street quoin's own box (items/quoin.js onPlayerCollision 156, paradise-flight.js paradisePickupTouches).
+    const pick = { x: entry.sprite.x, y: entry.sprite.y, radius: entry.point.radius };
+    if (!menuTarget && paradisePickupTouches(course, pick, player, { scale: bodyScale, typeId: entry.typeId, drawnScale: entry.sprite.baseScale })) {
       collectParadiseEntry(entry);
     }
   }
@@ -29418,6 +29420,13 @@ async function main() {
           slide: m.slide || 0,
         };
       });
+    },
+    /** Ticket 37 QA: the quoins and Paradise pickups as drawn (world px; tests a head-height touch with placeAvatar). */
+    pickups() {
+      return {
+        quoins: quoins.filter((q) => q && !q.destroyed).map((q) => ({ x: q.x, y: q.y, typeId: q.typeId || '' })),
+        paradise: paradisePickups.map((e) => ({ index: e.index, x: e.sprite?.x ?? e.point.x, y: e.sprite?.y ?? e.point.y, radius: e.point.radius || 0, typeId: e.typeId, collected: e.collected })),
+      };
     },
     /** Level builder play-tests (spec 7.4 calibration): set the avatar down at a screen-space spot. */
     placeAvatar(x, y) {

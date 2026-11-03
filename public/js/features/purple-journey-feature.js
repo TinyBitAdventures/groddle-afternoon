@@ -35,7 +35,7 @@
 
 import { addItem, countItem, ITEM_CATALOG, removeItem } from '../inventory.js?v=b0e33301';
 import { shiftMetabolic } from '../metabolics.js?v=8504134e';
-import { collectQuoin, QUOIN_SHEET, QUOIN_TYPES } from '../quoins.js?v=14dd1c93';
+import { collectQuoin, QUOIN_SHEET, QUOIN_TYPES, quoinTouches } from '../quoins.js?v=dfe1ff0a';
 import { frameTexture, sourceFromUrl } from '../textures.js?v=db2ce452';
 import { playPoofIn } from '../overlay-art.js?v=3753a0d2';
 import { STREET_INDEX } from '../street-loader.js?v=33d2b8bc';
@@ -60,7 +60,7 @@ import {
   purpleTimeline,
   scionWords,
 } from '../purple-journey.js?v=5e078ed8';
-import { VOYAGE_FLOOR, VOYAGE_H, VOYAGE_OFFSET, VOYAGE_W, buildVoyageScene } from '../purple-journey-scene.js?v=425b0b98';
+import { VOYAGE_FLOOR, VOYAGE_H, VOYAGE_OFFSET, VOYAGE_W, buildVoyageScene } from '../purple-journey-scene.js?v=d15bfc8b';
 import { homesFeature } from './homes-feature.js?v=50e26973';
 
 export const PURPLE_FEATURE_ID = 'purple-journey';
@@ -450,8 +450,11 @@ function manifestQuoin(engine) {
 function tickQuoins(engine) {
   const p = engine.player;
   if (!p) return;
+  const scale = engine.query?.('avatarBodyScale', engine) ?? 1;
   for (const q of [...quoins]) {
-    if (Math.abs(p.x - q.x) < 34 && p.y - 80 < q.y + 18 && p.y + 6 > q.y - 18) {
+    // Ticket 37: the street quoin's box (items/quoin.js onPlayerCollision 156, js/quoins.js quoinTouches).
+    const quoinScale = Math.abs(q.sprite?.scale?.y || 1);
+    if (quoinTouches({ x: q.x, y: q.y, typeId: q.type }, p.x, p.y, { scale, quoinScale })) {
       quoins = quoins.filter((x) => x !== q);
       q.sprite.parent?.removeChild(q.sprite);
       q.sprite.destroy();

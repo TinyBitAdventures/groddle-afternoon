@@ -1,7 +1,7 @@
 /** Source-authored Ticket to Paradise economy and reusable flight-course state. */
 
-import { EXTRA_PARADISE_COURSES } from './paradise-courses.js?v=bb3d9051';
-import { qrazyRewardForLevel } from './quoins.js?v=14dd1c93';
+import { EXTRA_PARADISE_COURSES } from './paradise-courses.js?v=1a5d0aa7';
+import { qrazyRewardForLevel, quoinTouches } from './quoins.js?v=dfe1ff0a';
 
 export const PARADISE_DURATION_MS = 4 * 60 * 1000;
 export const PARADISE_DAILY_LIMIT = 11;
@@ -337,6 +337,35 @@ export function createParadiseState(seed = {}, now = Date.now()) {
 export function resetParadiseDay(state, now = Date.now()) {
   Object.assign(state, normalizeParadiseState(state, now));
   return state;
+}
+
+/** Courses whose pickups are drawn as vector stars (game.js spawnParadisePickup), not quoin-sheet coins. */
+export const PARADISE_STAR_COURSES = Object.freeze(['radial_heights', 'slip_n_slide']);
+/** game.js spawnParadisePickup: quoins at SCALE (1.35) x 0.82, Cloud Rings x 0.9. */
+export function paradiseQuoinScale(courseId) {
+  return 1.35 * (courseId === 'cloud_rings' ? 0.9 : 0.82);
+}
+
+/**
+ * Ticket 37 follow-up (mr granberry, 2026-11-02): a quoin at head height was taken walking on a
+ * street but not in Radial Heights or the other Paradise courses, which kept their own 34-47 px
+ * circle 30 px over the feet. Glitch had one rule: items/quoin.js onPlayerCollision 156-159 runs
+ * for streets, games, races, Rainbow Run and isParadiseLocation() alike (only the daily limit
+ * differs), against the 59 x 112 player box (players/player.js 62-64). So a Paradise pickup is
+ * taken by the same box as a street quoin (js/quoins.js quoinTouches): the drawn coin, or the drawn
+ * star (its radius each way) on the star courses.
+ * @param {{ id: string }} course
+ * @param {{ x: number, y: number, radius?: number }} pick the pickup's centre as drawn
+ * @param {{ x: number, y: number }} feet the avatar's feet
+ */
+export function paradisePickupTouches(course, pick, feet, { scale = 1, typeId = '', drawnScale = 0 } = {}) {
+  if (!pick || !feet) return false;
+  const q = { x: pick.x, y: pick.y, typeId };
+  if (PARADISE_STAR_COURSES.includes(course?.id)) {
+    const side = 2 * (Number(pick.radius) || 13) * (drawnScale > 0 ? drawnScale : 1);
+    return quoinTouches(q, feet.x, feet.y, { scale, coinW: side, coinH: side });
+  }
+  return quoinTouches(q, feet.x, feet.y, { scale, quoinScale: drawnScale > 0 ? drawnScale : paradiseQuoinScale(course?.id) });
 }
 
 /** Exact paradise_ticket.js price curve. */

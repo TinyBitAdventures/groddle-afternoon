@@ -8,7 +8,6 @@ import {
   EXTRA_PARADISE_COURSES,
   EXTRA_PARADISE_COURSE_IDS,
   PARADISE_BODY,
-  PARADISE_PICKUP_RADIUS,
   ARBOR_NEST,
   DRAFTY_UPLIFT_JOKES,
   PARADISE_UNCONFIRMED_RELEASE_LINE,
@@ -19,7 +18,7 @@ import {
   resolveParadiseCourseAlias,
   stepParadiseBody,
   usesParadiseBody,
-} from '../public/js/paradise-courses.js?v=bb3d9051';
+} from '../public/js/paradise-courses.js?v=1a5d0aa7';
 import {
   PARADISE_COURSES,
   PARADISE_DAILY_LIMIT,
@@ -29,10 +28,11 @@ import {
   createParadiseRun,
   createParadiseState,
   finishParadiseRun,
+  paradisePickupTouches,
   paradiseTicketCost,
   resolveParadiseReward,
-} from '../public/js/paradise-flight.js?v=a7cdbc0f';
-import { QURAZY_REWARDS } from '../public/js/quoins.js?v=14dd1c93';
+} from '../public/js/paradise-flight.js?v=b9ebc32f';
+import { QURAZY_REWARDS } from '../public/js/quoins.js?v=dfe1ff0a';
 import { remakeStatus } from '../public/js/imagination-remake.js?v=ca0a48d5';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
@@ -51,8 +51,8 @@ const SOURCE = {
   updraft: ['LHF9DQTKQT53RDI', 'Updraft', 'Activate this card to ride the strong wind emanating from a mysterious cloud-hole in the sky. Glide right, and grab those quoins!'],
 };
 
-const touches = (pick, body) =>
-  Math.hypot(pick.x - body.x, pick.y - (body.y - 30)) < PARADISE_PICKUP_RADIUS;
+// Ticket 37: the street quoin's own box (items/quoin.js onPlayerCollision 156, js/quoins.js quoinTouches).
+const touches = (pick, body, course) => paradisePickupTouches(course, pick, body);
 
 test('all nine missing production templates are registered with source names and tickets', () => {
   assert.deepEqual([...EXTRA_PARADISE_COURSE_IDS].sort(), Object.keys(SOURCE).sort());
@@ -303,7 +303,7 @@ function explorePlatformCourse(course) {
                 jumpHeld: mode === 'boost',
               };
               const { events } = stepParadiseBody(course, b, input, 1);
-              course.pickups.forEach((pick, pickIndex) => { if (touches(pick, b)) got.add(pickIndex); });
+              course.pickups.forEach((pick, pickIndex) => { if (touches(pick, b, course)) got.add(pickIndex); });
               if (events.includes('respawn')) break;
               const landed = events.includes('land') || events.includes('bounce');
               if (landed && frame > 0) {
@@ -366,6 +366,14 @@ function pilot(course, maxFrames = 4 * 60 * 60, skip = () => false) {
     if (course.movement === 'swim') {
       strokeCooldown -= 1;
       if (dy < -20 && b.vy > -3 && strokeCooldown <= 0) { input.jumpPressed = true; strokeCooldown = 8; }
+      // A quoin just under the ledge you stand on (Abysmal's 16, 18 px under the right outcrop): the
+      // body box stops at the feet, so swim off the nearer end and come up at it from below.
+      const ledge = b.onGround && dy > 20 ? course.platforms[b.groundIndex] : null;
+      if (ledge && target.x > ledge.x1 && target.x < ledge.x2) {
+        const offLeft = target.x - ledge.x1 < ledge.x2 - target.x;
+        input.left = offLeft;
+        input.right = !offLeft;
+      }
     } else if (course.movement === 'glide') {
       input.up = dy < -10;
       input.down = dy > 40;
@@ -385,7 +393,7 @@ function pilot(course, maxFrames = 4 * 60 * 60, skip = () => false) {
     if (events.includes('respawn') || events.includes('back_to_top')) falls += 1;
     for (const index of [...left]) {
       if (skip(index, falls)) continue;
-      if (touches(course.pickups[index], b)) left.delete(index);
+      if (touches(course.pickups[index], b, course)) left.delete(index);
     }
     if (!left.size && Math.hypot(course.exit.x - b.x, course.exit.y - b.y) < 74) break;
   }

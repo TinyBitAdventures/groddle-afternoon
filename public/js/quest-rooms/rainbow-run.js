@@ -17,6 +17,7 @@
  */
 
 import { FLOOR, H, W, buildRainbowScene, rainbowCoins, rainbowPlatforms } from './rainbow-run-scene.js?v=b00c8824';
+import { touchesQuoin } from './kit.js?v=4d2f1606';
 
 export { rainbowCoins, rainbowPlatforms };
 export const RUN_MS = 30_000;
@@ -93,7 +94,8 @@ export const room = {
         if (c.spr && !c.spr.destroyed) c.spr.visible = true;
       }
       if (c.taken) continue;
-      if (Math.abs(p.x - c.x) < 34 && p.y - 70 < c.y + 18 && p.y + 6 > c.y - 18) {
+      // items/quoin.js 158 names the rainbow_run instance: its coins take the street quoin's box (kit.js touchesQuoin, ticket 37).
+      if (touchesQuoin(ctx, { ...c, type: COIN_TYPE })) {
         c.taken = true;
         c.backAt = now + COIN_BACK_MS;
         c.spr.visible = false;

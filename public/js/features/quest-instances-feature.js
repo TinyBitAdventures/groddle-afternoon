@@ -88,7 +88,7 @@ import {
   wayBackFrom,
 } from '../quest-instance.js?v=f0df88c3';
 import { FAMILIAR_GATES, QUEST_ROOMS, REMINISCE_ITEMS, ROOM_ITEMS, isBuiltRoom, questGiver, roomModulePath } from '../quest-rooms/catalog.js?v=9ebeb502';
-import * as kit from '../quest-rooms/kit.js?v=c7ea6e0e';
+import * as kit from '../quest-rooms/kit.js?v=4d2f1606';
 import { locationEventsApi } from './location-events-feature.js?v=df2533e4';
 import {
   acceptOffer,
@@ -104,7 +104,7 @@ import { runStreetTransition } from '../screen-fx.js?v=9d4640eb';
 import { HOME_INTERIOR_TSID, HOME_STREET_TSID } from '../homes.js?v=385f9a1a';
 import { armPromptTimeout, promptTimeoutMs } from '../prompt-timeout.js?v=c13ee4f6';
 import { applyFamiliarLook, familiarLook } from '../familiar.js?v=c7e902af';
-import { collectQuoin, QUOIN_SHEET, QUOIN_TYPES } from '../quoins.js?v=14dd1c93';
+import { collectQuoin, QUOIN_SHEET, QUOIN_TYPES } from '../quoins.js?v=dfe1ff0a';
 import { sourceFromUrl } from '../textures.js?v=db2ce452';
 
 let quoinFrames = null;
@@ -154,27 +154,27 @@ let rubeTraded = false;
  * BUILT_ROOMS: a new room gets a line here.
  */
 const ROOM_MODULES = {
-  rainbow_run: () => import('../quest-rooms/rainbow-run.js?v=ebc9b478'),
-  top_of_tree: () => import('../quest-rooms/top-of-tree.js?v=e9b472a6'),
-  color_unblocking: () => import('../quest-rooms/color-unblocking.js?v=f0931177'),
+  rainbow_run: () => import('../quest-rooms/rainbow-run.js?v=0d3b9189'),
+  top_of_tree: () => import('../quest-rooms/top-of-tree.js?v=5668c299'),
+  color_unblocking: () => import('../quest-rooms/color-unblocking.js?v=2c0876f8'),
   vision_quest: () => import('../quest-rooms/vision-quest.js?v=d9423ecf'),
   kids_room: () => import('../quest-rooms/kids-room.js?v=b89f7d69'),
   rube_yard: () => import('../quest-rooms/rube-yard.js?v=83abd456'),
-  le_miserable: () => import('../quest-rooms/le-miserable.js?v=04e30bda'),
+  le_miserable: () => import('../quest-rooms/le-miserable.js?v=b1dd41d9'),
   juju_camp: () => import('../quest-rooms/juju-camp.js?v=c92230db'),
-  picto_pattern: () => import('../quest-rooms/picto-pattern.js?v=794ab217'),
-  radiant_glare: () => import('../quest-rooms/radiant-glare.js?v=5f1c6a15'),
-  an_autumn_day: () => import('../quest-rooms/an-autumn-day.js?v=b9356fd3'),
+  picto_pattern: () => import('../quest-rooms/picto-pattern.js?v=b70d5c53'),
+  radiant_glare: () => import('../quest-rooms/radiant-glare.js?v=d3b6551b'),
+  an_autumn_day: () => import('../quest-rooms/an-autumn-day.js?v=e0b5f0f1'),
   being_watched: () => import('../quest-rooms/being-watched.js?v=ce0e95e1'),
-  back_alley: () => import('../quest-rooms/back-alley.js?v=90631324'),
-  clubhouse: () => import('../quest-rooms/clubhouse.js?v=63a867c2'),
-  light_perspective: () => import('../quest-rooms/light-perspective.js?v=fae24f72'),
-  tile_puzzle: () => import('../quest-rooms/tile-puzzle.js?v=810fb412'),
-  operation_grow: () => import('../quest-rooms/operation-grow.js?v=86ec253e'),
-  gwendolyn: () => import('../quest-rooms/gwendolyn.js?v=9ae47063'),
-  mental_block: () => import('../quest-rooms/mental-block.js?v=5a727a5f'),
+  back_alley: () => import('../quest-rooms/back-alley.js?v=95860693'),
+  clubhouse: () => import('../quest-rooms/clubhouse.js?v=2edc0b88'),
+  light_perspective: () => import('../quest-rooms/light-perspective.js?v=a26e2278'),
+  tile_puzzle: () => import('../quest-rooms/tile-puzzle.js?v=edbc051f'),
+  operation_grow: () => import('../quest-rooms/operation-grow.js?v=6be6814f'),
+  gwendolyn: () => import('../quest-rooms/gwendolyn.js?v=fbe6933e'),
+  mental_block: () => import('../quest-rooms/mental-block.js?v=d52ed261'),
   penalty: () => import('../quest-rooms/penalty.js?v=c3bc556b'),
-  esquibeth: () => import('../quest-rooms/esquibeth.js?v=eb9a2fa1'),
+  esquibeth: () => import('../quest-rooms/esquibeth.js?v=daa8b369'),
   firefly_whistle: () => import('../quest-rooms/firefly-whistle.js?v=c0d7433b'),
 };
 
@@ -780,6 +780,13 @@ function makeContext(engine) {
       const base = c.data._scale.base;
       p.baseScale = base * factor;
       p.scale.set(Math.sign(p.scale.x || 1) * base * factor, base * factor);
+    },
+    /** The avatar's size against normal (scalePlayer here, else a pc_scale shrink): the quoin body box follows it. */
+    bodyScale() {
+      const p = engine.player;
+      const base = c.data._scale?.base;
+      if (base && p?.baseScale) return p.baseScale / base;
+      return engine.query?.('avatarBodyScale', engine) ?? 1;
     },
     /** A quoin sprite (QUOIN_SHEET row for the type), not yet added. */
     quoinSprite(type, x, y, scale = 0.6) {

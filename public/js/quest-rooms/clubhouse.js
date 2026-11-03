@@ -1029,7 +1029,8 @@ function takeRoomQuoins(ctx) {
   for (const q of ctx.data.quoins || []) {
     if (q.taken || !q.spr || q.spr.destroyed) continue;
     q.spr.y = q.y + Math.sin(t * 2.4 + q.x / 80) * 5;
-    if (Math.abs(p.x - q.x) < 30 && p.y - 70 < q.y + 16 && p.y + 6 > q.y - 16) {
+    // Ticket 37: the street quoin's own box (kit.js touchesQuoin, items/quoin.js onPlayerCollision 156).
+    if (ctx.kit.touchesQuoin(ctx, q)) {
       q.taken = true;
       q.spr.visible = false;
       if (q.type === 'qurazy') {

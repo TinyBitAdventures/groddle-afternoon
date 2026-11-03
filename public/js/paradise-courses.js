@@ -61,8 +61,7 @@ export const PARADISE_BODY = Object.freeze({
   bodyHeight: 62,
 });
 
-/** Pickup collision used by game.js for quoin courses: hypot(dx, dy - 30) < 47. */
-export const PARADISE_PICKUP_RADIUS = 47;
+/** Pickup collision: paradise-flight.js paradisePickupTouches, the street quoin's own box (ticket 37). */
 
 /** One-way platform; `block` platforms are solid rock to the course floor. */
 function platform(x1, x2, y, extra = {}) {

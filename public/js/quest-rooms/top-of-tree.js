@@ -266,7 +266,8 @@ export const room = {
     for (const q of ctx.data.quoins || []) {
       if (q.taken || !q.spr || q.spr.destroyed) continue;
       q.spr.y = q.y + Math.sin(t * 2.6 + q.x / 60) * 6;
-      if (Math.abs(p.x - q.x) < 34 && p.y - 70 < q.y + 18 && p.y + 6 > q.y - 18) {
+      // Ticket 37: the street quoin's own box (kit.js touchesQuoin, items/quoin.js onPlayerCollision 156).
+      if (ctx.kit.touchesQuoin(ctx, q)) {
         q.taken = true;
         q.spr.visible = false;
         ctx.collectQuoin(q.type, q.x, q.y, { ignoreLimit: true });

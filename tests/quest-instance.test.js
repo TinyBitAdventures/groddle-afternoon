@@ -34,7 +34,7 @@ import {
   roomModulePath,
 } from '../public/js/quest-rooms/catalog.js?v=9ebeb502';
 import { loadContentCatalogsFromDir, getQuestCatalog } from '../public/js/content-catalogs.js?v=10b118dd';
-import * as kit from '../public/js/quest-rooms/kit.js?v=c7ea6e0e';
+import * as kit from '../public/js/quest-rooms/kit.js?v=4d2f1606';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -161,7 +161,7 @@ describe('quest room kit', () => {
 
 describe('Rainbow Run (numismatic_hustle)', () => {
   it('has the source 30-second, 30-coin rules and enough coins on reachable ledges', async () => {
-    const mod = await import('../public/js/quest-rooms/rainbow-run.js?v=ebc9b478');
+    const mod = await import('../public/js/quest-rooms/rainbow-run.js?v=0d3b9189');
     assert.equal(mod.RUN_MS, 30_000);
     assert.equal(mod.COINS_NEEDED, 30);
     const coins = mod.rainbowCoins();
@@ -184,7 +184,7 @@ describe('Rainbow Run (numismatic_hustle)', () => {
 
 describe('The High Jumper (top_of_tree)', () => {
   it('asks "Are you stuck?" after the source two minutes, and has branches only Spinach can reach', async () => {
-    const mod = await import('../public/js/quest-rooms/top-of-tree.js?v=e9b472a6');
+    const mod = await import('../public/js/quest-rooms/top-of-tree.js?v=5668c299');
     assert.equal(mod.EXIT_PROMPT_MS, 120_000);
     assert.equal(mod.room.exitPromptMs, 120_000);
     assert.equal(mod.room.durationMs, 0);
@@ -205,7 +205,7 @@ describe('The High Jumper (top_of_tree)', () => {
 
 describe('Color Unblocking (color_unblocking)', () => {
   it('opens a path with the four solution switches and keeps the orange bridge', async () => {
-    const mod = await import('../public/js/quest-rooms/color-unblocking.js?v=f0931177');
+    const mod = await import('../public/js/quest-rooms/color-unblocking.js?v=2c0876f8');
     const layout = mod.colorLayout();
     const on = mod.colorsAfter(layout.solution);
     for (const color of ['red', 'blue', 'green', 'purple']) assert.ok(!on.has(color), `${color} cleared`);
@@ -283,7 +283,7 @@ describe('Le Misérable (le_miserable)', () => {
   const STEP_BY_TINT = { 16777024: 1, 16750144: 2, 10436052: 3, 3394764: 4 };
 
   async function setup() {
-    const mod = await import('../public/js/quest-rooms/le-miserable.js?v=04e30bda');
+    const mod = await import('../public/js/quest-rooms/le-miserable.js?v=b1dd41d9');
     const ev = await import('../public/js/location-events.js?v=61e0c5d3');
     const { readFileSync } = await import('node:fs');
     const street = JSON.parse(readFileSync(streetFile, 'utf8'));
@@ -397,7 +397,7 @@ describe('G311: a failed room quest is Try again in the quest log', () => {
   };
 
   it('a run lost to a reload marks a startable quest failed, not a retry prompt', async () => {
-    const { questInstancesFeature } = await import('../public/js/features/quest-instances-feature.js?v=148df166');
+    const { questInstancesFeature } = await import('../public/js/features/quest-instances-feature.js?v=a6248ae0');
     const { ensureQuestOfferState } = await import('../public/js/quest-offers.js?v=3c7925ca');
     assert.equal(getQuestCatalog().mental_block?.needsStart, true);
     assert.notEqual(getQuestCatalog().help_juju_bandits?.needsStart, true, 'no onStarted in GSJS');
@@ -461,7 +461,7 @@ describe('G313: failed room quests the source removes', () => {
   });
 
   it('a reload removes a source-removed quest and its offers, and keeps the prompt for the three', async () => {
-    const { questInstancesFeature } = await import('../public/js/features/quest-instances-feature.js?v=148df166');
+    const { questInstancesFeature } = await import('../public/js/features/quest-instances-feature.js?v=a6248ae0');
     const { questStatus } = await import('../public/js/quest-offers.js?v=3c7925ca');
     const t = Date.now() - 60_000;
     questInstancesFeature.restore({ memory: {}, retry: { tower_quest: t, le_miserable_part_2: t, smuggle_the_smuggler_part2: t } });
@@ -489,7 +489,7 @@ describe('G313: failed room quests the source removes', () => {
   });
 
   it('has no map card', async () => {
-    const { questInstancesFeature } = await import('../public/js/features/quest-instances-feature.js?v=148df166');
+    const { questInstancesFeature } = await import('../public/js/features/quest-instances-feature.js?v=a6248ae0');
     assert.equal(questInstancesFeature.mapCards, undefined);
     const src = readFileSync(join(root, 'public/js/features/quest-instances-feature.js'), 'utf8');
     assert.doesNotMatch(src, /Unfinished quest places/);

@@ -10,6 +10,7 @@
  */
 
 import { frameTexture, isLoaded, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js?v=db2ce452';
+import { quoinTouches } from '../quoins.js?v=dfe1ff0a';
 
 export const DECO_DIR = 'assets/decos/groddle/';
 export const ICON_DIR = 'assets/sprites/icons/';
@@ -278,6 +279,21 @@ export function hash01(text) {
     h = Math.imul(h, 16777619);
   }
   return ((h >>> 0) % 100000) / 100000;
+}
+
+/**
+ * Whether the avatar touches room quoin q ({ x, y, type, spr }). Ticket 37 follow-up: Glitch had one
+ * rule for every quoin (items/quoin.js onPlayerCollision 156-159 runs in games, races, Rainbow Run,
+ * Paradise and quest instances alike), the 59 x 112 player box (players/player.js 62-64) on the
+ * coin, so a room's quoin is taken exactly as a street one is (js/quoins.js quoinTouches): at head
+ * height while walking, scaled with the drawn coin and the avatar.
+ */
+export function touchesQuoin(ctx, q) {
+  const p = ctx?.player;
+  if (!p || !q) return false;
+  const spr = q.spr && !q.spr.destroyed ? q.spr : null;
+  const quoinScale = spr ? Math.abs(spr.scale?.y || 1) : 1;
+  return quoinTouches({ x: q.x, y: q.y, typeId: q.type }, p.x, p.y, { scale: ctx.bodyScale?.() ?? 1, quoinScale });
 }
 
 /** Distance from the avatar's feet to a point. */

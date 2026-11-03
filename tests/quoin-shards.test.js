@@ -18,7 +18,7 @@ import {
   quoinShardSoundKey,
   quoinTypeShards,
 } from '../public/js/quoin-shards.js?v=9a2e4c37';
-import { QUOIN_TYPES, collectQuoin, createQuoinState, creditQuoinStat } from '../public/js/quoins.js?v=14dd1c93';
+import { QUOIN_TYPES, collectQuoin, createQuoinState, creditQuoinStat } from '../public/js/quoins.js?v=dfe1ff0a';
 import { SOUND_ALIASES, SOUND_FILES } from '../public/js/sound-keys.js?v=c8a66499';
 
 const here = import.meta.dirname;

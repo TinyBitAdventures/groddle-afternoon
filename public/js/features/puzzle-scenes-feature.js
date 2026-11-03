@@ -22,7 +22,7 @@
  */
 
 import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=b0e33301';
-import { QUOIN_SHEET, QUOIN_TYPES } from '../quoins.js?v=14dd1c93';
+import { QUOIN_SHEET, QUOIN_TYPES, quoinTouches } from '../quoins.js?v=dfe1ff0a';
 import {
   BEAM_ME_DOWN,
   CONSTELLATION,
@@ -422,8 +422,11 @@ function stepConstellation() {
 function stepBeam(engine) {
   const p = engine.player;
   if (!p) return;
+  const scale = engine.query?.('avatarBodyScale', engine) ?? 1;
   for (const q of active.quoins) {
-    if (active.taken.has(q.id) || Math.abs(q.x - p.x) > 36 || p.y < q.y - 20 || p.y - 60 > q.y + 20) continue;
+    // Ticket 37: Beam Me Down's quoins take the street quoin's box (items/quoin.js onPlayerCollision 156-159, js/quoins.js quoinTouches).
+    const quoinScale = Math.abs(active.quoinSprites.get(q.id)?.scale?.y || 0.6);
+    if (active.taken.has(q.id) || !quoinTouches({ x: q.x, y: q.y, typeId: q.type }, p.x, p.y, { scale, quoinScale })) continue;
     active.taken.add(q.id);
     const spr = active.quoinSprites.get(q.id);
     if (spr) spr.visible = false;

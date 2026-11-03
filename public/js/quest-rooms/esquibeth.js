@@ -1488,7 +1488,7 @@ export const room = {
       const q = d.pedestalQuoin;
       if (q && q.spr.visible && !q.taken) {
         q.spr.y = q.y + Math.sin(t * 2.4) * 5;
-        if (Math.abs(p.x - q.x) < 50 && p.y - 125 < q.y + 20 && p.y + 10 > q.y - 20) {
+        if (ctx.kit.touchesQuoin(ctx, q)) {
           q.taken = true;
           q.spr.visible = false;
           ctx.collectQuoin('xp', q.x, q.y);
@@ -1510,7 +1510,8 @@ export const room = {
     for (const q of d.quoins || []) {
       if (q.taken || q.spr.destroyed) continue;
       q.spr.y = q.y + Math.sin(t * 2.6 + q.x / 60) * 5;
-      if (Math.abs(p.x - q.x) < 36 && p.y - 90 < q.y + 18 && p.y + 8 > q.y - 18) {
+      // Ticket 37: the street quoin's own box (kit.js touchesQuoin, items/quoin.js onPlayerCollision 156).
+      if (ctx.kit.touchesQuoin(ctx, q)) {
         q.taken = true;
         q.spr.visible = false;
         ctx.collectQuoin(q.type, q.x, q.y);

@@ -326,7 +326,8 @@ export const room = {
       });
     }
     for (const q of ctx.data.quoins) {
-      if (q.taken || Math.abs(p.x - q.x) > 26 || Math.abs(p.y - 20 - q.y) > 40) continue;
+      // Ticket 37: the street quoin's own box (kit.js touchesQuoin, items/quoin.js onPlayerCollision 156).
+      if (q.taken || !ctx.kit.touchesQuoin(ctx, q)) continue;
       q.taken = true;
       if (q.spr) q.spr.visible = false;
       ctx.collectQuoin(q.type, q.x, q.y);

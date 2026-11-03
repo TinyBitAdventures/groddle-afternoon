@@ -59,14 +59,19 @@ export const FAVOR_GIANT_IDS = Object.freeze(['alph', 'cosma', 'friendly', 'gren
  */
 export const QUOIN_TOUCH = Object.freeze({ playerW: 59, playerH: 112, coinW: 26, coinH: 28, qurazyW: 38, qurazyH: 36 });
 
-/** Whether the avatar standing (or jumping) with its feet at (x, feetY) touches quoin q (its centre x, y; typeId for the Qurazy quoin). */
-export function quoinTouches(q, x, feetY, { scale = 1, quoinScale = 1 } = {}) {
+/**
+ * Whether the avatar standing (or jumping) with its feet at (x, feetY) touches quoin q (its centre x, y; typeId for the Qurazy quoin).
+ * The same test runs everywhere a quoin is (ticket 37 follow-up): items/quoin.js onPlayerCollision 156-159 is one
+ * function for streets, games, races, Rainbow Run and the Paradise locations, against the one player box.
+ * `coinW`/`coinH` give the drawn size of a pickup that is not on the quoin sheet (the Paradise stars).
+ */
+export function quoinTouches(q, x, feetY, { scale = 1, quoinScale = 1, coinW: drawnW = 0, coinH: drawnH = 0 } = {}) {
   if (!q || !Number.isFinite(q.x) || !Number.isFinite(q.y)) return false;
   const s = scale > 0 ? scale : 1;
   const k = quoinScale > 0 ? quoinScale : 1;
   const big = q.typeId === 'qurazy';
-  const coinW = (big ? QUOIN_TOUCH.qurazyW : QUOIN_TOUCH.coinW) * k;
-  const coinH = (big ? QUOIN_TOUCH.qurazyH : QUOIN_TOUCH.coinH) * k;
+  const coinW = drawnW > 0 ? drawnW : (big ? QUOIN_TOUCH.qurazyW : QUOIN_TOUCH.coinW) * k;
+  const coinH = drawnH > 0 ? drawnH : (big ? QUOIN_TOUCH.qurazyH : QUOIN_TOUCH.coinH) * k;
   const xDist = Math.abs(x - q.x);
   const yDist = Math.abs(feetY - (QUOIN_TOUCH.playerH * s) / 2 - q.y);
   return xDist < (coinW + QUOIN_TOUCH.playerW * s) / 2 && yDist < (coinH + QUOIN_TOUCH.playerH * s) / 2;

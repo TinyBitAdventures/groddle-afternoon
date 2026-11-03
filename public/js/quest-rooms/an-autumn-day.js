@@ -953,7 +953,8 @@ function tickFeeling(ctx, dt, t) {
   if (q && !q.taken) {
     q.spr.alpha = Math.min(1, (t - q.at) / 1200);
     q.spr.y = q.y + Math.sin(t / 420) * 4;
-    if (q.spr.alpha > 0.6 && bodyHits(p, { x: q.x, y: q.y, w: 52, h: 40 })) takeQurazy(ctx);
+    // Ticket 37: the street quoin's own box (kit.js touchesQuoin, items/quoin.js onPlayerCollision 156).
+    if (q.spr.alpha > 0.6 && ctx.kit.touchesQuoin(ctx, { ...q, type: 'qurazy' })) takeQurazy(ctx);
   }
   const busy = ctx.engine.acting?.() || ctx.engine.questDialogueOpen?.() || ctx.dialogOpen();
   if (!busy && !d.leaving && t - d.feelEnteredAt > 1200 && p.x <= feelingLayout(d.feeling).exit.x + 40) finish(ctx);

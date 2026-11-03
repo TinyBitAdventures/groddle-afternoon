@@ -14,7 +14,7 @@ import {
   qrazyRewardForLevel,
   quoinDailyLimitFor,
   resetQuoinDay,
-} from '../public/js/quoins.js?v=14dd1c93';
+} from '../public/js/quoins.js?v=dfe1ff0a';
 
 const publicRoot = join(import.meta.dirname, '..', 'public');
 
