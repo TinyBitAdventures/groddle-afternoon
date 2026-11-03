@@ -168,7 +168,8 @@ test('client integration uses clean recovered room and item art', () => {
     assert.ok(!game.includes(gone), gone);
   }
   // A reload resumes at the street you came from.
-  assert.match(game, /deEmbiggenifyState && deEmbiggenifySourceLocation\?\.tsid\s+\? savePlayerLocation\(deEmbiggenifySourceLocation\)/);
+  assert.match(game, /if \(deEmbiggenifyState && deEmbiggenifySourceLocation\?\.tsid\) return deEmbiggenifySourceLocation;/);
+  assert.match(game, /const back = instanceWayBack\(\);\s*return back \? savePlayerLocation\(back\) : savePlayerLocation\(\);/);
   assert.match(game, /dustBunnyTalk/);
   assert.match(content, /npc_dustbunny/);
   assert.match(content, /small_worthless/);

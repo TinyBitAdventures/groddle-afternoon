@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=862128f3';
 import { createFeatureHost } from './js/feature-host.js?v=903263a4';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=29131e8f';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=15865bbf';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -482,7 +482,7 @@ import {
   parsePlayerSave,
   serializePlayerSave,
   restorePlayerSave,
-} from './js/player-save.js?v=65fef209';
+} from './js/player-save.js?v=763f3454';
 import {
   HOME_INTERIOR_TSID,
   HOME_STREET_TSID,
@@ -492,9 +492,11 @@ import {
   endHomeVisit,
   enterHomeInterior,
   leaveHomeInterior,
+  homeStayAfterArrival,
   imagineHome,
-} from './js/homes.js?v=385f9a1a';
-import { HOME_MACHINE, offerHomeTicket, renderTicketMachine } from './js/home-ticket.js?v=dd702301';
+  isHomePlaceTsid,
+} from './js/homes.js?v=631ab6b8';
+import { HOME_MACHINE, offerHomeTicket, renderTicketMachine } from './js/home-ticket.js?v=12fecd90';
 import {
   MAIL_COMPANIONS,
   archiveMail,
@@ -3006,6 +3008,8 @@ async function enterStreetWithTransition(tsid, opts = {}) {
 }
 
 async function streetTripTo(tsid, opts = {}) {
+  // Ticket 67: a way back into your home (a Ticket to Paradise or a quest started there) goes in.
+  if (isHomePlaceTsid(tsid) && homeState.owned) return arriveInHome(tsid, opts);
   const useFx = opts.useTransition !== false;
   const el = document.getElementById('screen-transition');
   const currentWinterLabel = winterLocationLabel(currentStreetTsid);
@@ -10791,6 +10795,27 @@ function unregisterTarget(target) {
 // Each feature lives in one file and reaches the world only through `engine`.
 const features = createFeatureHost(FEATURES);
 
+/**
+ * The way back of the instance you are in (where it was entered from), or null: a reload resumes
+ * there, never inside the instance, and (ticket 67) a stay at home goes on when it leads home.
+ */
+function instanceWayBack() {
+  if (legalizeRun && legalizeSourceLocation?.tsid) return legalizeSourceLocation;
+  if (rookMuseumState && rookMuseumSourceLocation?.tsid) return rookMuseumSourceLocation;
+  if (summersDayRun && summersDaySourceLocation?.tsid) return summersDaySourceLocation;
+  if (deEmbiggenifyState && deEmbiggenifySourceLocation?.tsid) return deEmbiggenifySourceLocation;
+  if (greedyStreetState && greedyStreetSourceLocation?.tsid) return greedyStreetSourceLocation;
+  if (paradiseRun && paradiseSourceLocation?.tsid) return paradiseSourceLocation;
+  if (hogHaulState && hogHaulSourceLocation?.tsid) return hogHaulSourceLocation;
+  if (fourLetterState && fourLetterSourceLocation?.tsid) return fourLetterSourceLocation;
+  if (winterWalkState && winterWalkSourceLocation?.tsid) return winterWalkSourceLocation;
+  if (rookWoodsState && rookWoodsSourceLocation?.tsid) return rookWoodsSourceLocation;
+  if (questState.active?.[ILMENSKIE_QUEST_ID] && currentStreetTsid === AXIS_DENYDE_STREET_ID && ilmenskieStory().sourceLocation?.tsid) {
+    return ilmenskieStory().sourceLocation;
+  }
+  return null;
+}
+
 function anyTransientInstance() {
   return [
     deEmbiggenifyIsInstanced,
@@ -14647,11 +14672,11 @@ async function startHogHaulRace(opts = {}) {
     closeQuestDialogue();
     closePackPopover();
     hideHogHaulScreens();
-    hogHaulSourceLocation = opts.sourceLocation || {
+    hogHaulSourceLocation = opts.sourceLocation || instanceSourceHere({
       tsid: currentStreetTsid,
       x: player?.x,
       y: player?.y,
-    };
+    });
     hogHaulState = createHogHaulState({
       status: 'staging',
       now: Date.now(),
@@ -15179,11 +15204,11 @@ async function startFourLetterQuest(opts = {}) {
       const assigned = assignQuest(questState, FOUR_LETTER_QUEST_ID, { ignorePrereq: true });
       if (!assigned.ok) return null;
     }
-    fourLetterSourceLocation = opts.sourceLocation || {
+    fourLetterSourceLocation = opts.sourceLocation || instanceSourceHere({
       tsid: currentStreetTsid,
       x: player?.x ?? WORLD_W * 0.5,
       y: player?.y ?? GROUND_Y,
-    };
+    });
     fourLetterState = createFourLetterState();
     fourLetterPlayerBaseScale = player?.baseScale ?? null;
     savePlayerLocation(fourLetterSourceLocation);
@@ -15963,11 +15988,11 @@ async function startLegalizeIt(opts = {}) {
       const assigned = assignQuest(questState, LEGALIZE_QUEST_ID, { ignorePrereq: true });
       if (!assigned.ok) return null;
     }
-    legalizeSourceLocation = opts.sourceLocation || {
+    legalizeSourceLocation = opts.sourceLocation || instanceSourceHere({
       tsid: currentStreetTsid,
       x: player?.x ?? WORLD_W * 0.5,
       y: player?.y ?? GROUND_Y,
-    };
+    });
     legalizeRun = ensureLegalizeState(questState, legalizeSourceLocation);
     legalizeRun.sourceLocation ||= createLegalizeState(legalizeSourceLocation).sourceLocation;
     legalizeSourceLocation = legalizeRun.sourceLocation || legalizeSourceLocation;
@@ -16363,11 +16388,11 @@ async function startGreedyStreetSpirit(opts = {}) {
     closeQuestPanel();
     closeQuestDialogue({ force: true });
     closePackPopover();
-    greedyStreetSourceLocation = opts.sourceLocation || {
+    greedyStreetSourceLocation = opts.sourceLocation || instanceSourceHere({
       tsid: currentStreetTsid,
       x: player?.x ?? WORLD_W * 0.5,
       y: player?.y ?? GROUND_Y,
-    };
+    });
     greedyStreetState = createGreedyStreetSpiritState({
       repeat,
       sourceLocation: greedyStreetSourceLocation,
@@ -16964,11 +16989,11 @@ async function startWinterWalk(opts = {}) {
     closeQuestPanel();
     closeQuestDialogue();
     closePackPopover();
-    winterWalkSourceLocation = opts.sourceLocation || {
+    winterWalkSourceLocation = opts.sourceLocation || instanceSourceHere({
       tsid: currentStreetTsid,
       x: player?.x ?? WORLD_W * 0.5,
       y: player?.y ?? GROUND_Y,
-    };
+    });
     winterWalkState = createWinterWalkState({
       now: Date.now(),
       sourceLocation: winterWalkSourceLocation,
@@ -17637,11 +17662,11 @@ async function startSummersDay(opts = {}) {
     closeQuestPanel();
     closeQuestDialogue({ force: true });
     closePackPopover();
-    summersDaySourceLocation = opts.sourceLocation || {
+    summersDaySourceLocation = opts.sourceLocation || instanceSourceHere({
       tsid: currentStreetTsid,
       x: player?.x ?? WORLD_W * 0.5,
       y: player?.y ?? GROUND_Y,
-    };
+    });
     summersDayRun = createSummersDayRun({
       now: Date.now(),
       sourceLocation: summersDaySourceLocation,
@@ -18218,11 +18243,11 @@ async function startRookWoodsQuest(opts = {}) {
     closeQuestPanel();
     closeQuestDialogue();
     closePackPopover();
-    rookWoodsSourceLocation = opts.sourceLocation || {
+    rookWoodsSourceLocation = opts.sourceLocation || instanceSourceHere({
       tsid: currentStreetTsid,
       x: player?.x ?? WORLD_W * 0.5,
       y: player?.y ?? GROUND_Y,
-    };
+    });
     rookWoodsState = createRookWoodsState({
       sourceLocation: rookWoodsSourceLocation,
     });
@@ -19016,11 +19041,11 @@ async function startRookMuseum(opts = {}) {
         !questState.active?.[ROOK_HALL_START_QUEST_ID]) {
       assignQuest(questState, ROOK_HALL_START_QUEST_ID, { ignorePrereq: true });
     }
-    rookMuseumSourceLocation = {
+    rookMuseumSourceLocation = instanceSourceHere({
       tsid: currentStreetTsid,
       x: player?.x || 120,
       y: player?.y || GROUND_Y,
-    };
+    });
     rookMuseumState = createRookMuseumState({
       sourceLocation: rookMuseumSourceLocation,
     });
@@ -19438,11 +19463,11 @@ async function startDeEmbiggenify(opts = {}) {
       });
       if (!assigned.ok) return null;
     }
-    deEmbiggenifySourceLocation = opts.sourceLocation || {
+    deEmbiggenifySourceLocation = opts.sourceLocation || instanceSourceHere({
       tsid: currentStreetTsid,
       x: player?.x ?? WORLD_W * 0.5,
       y: player?.y ?? GROUND_Y,
-    };
+    });
     deEmbiggenifyPlayerBaseScale = player?.baseScale ?? null;
     if (app?.canvas) {
       app.canvas.dataset.deEmbiggenifySourceScale = String(
@@ -20502,11 +20527,11 @@ async function startParadiseFlight(courseId, opts = {}) {
     closeQuestPanel();
     closeQuestDialogue({ force: true });
     closePackPopover();
-    paradiseSourceLocation = opts.sourceLocation || {
+    paradiseSourceLocation = opts.sourceLocation || instanceSourceHere({
       tsid: currentStreetTsid,
       x: player?.x ?? WORLD_W * 0.5,
       y: player?.y ?? GROUND_Y,
-    };
+    });
     paradiseRun = createParadiseRun(courseId, {
       now: Date.now(),
       sourceLocation: paradiseSourceLocation,
@@ -21234,11 +21259,11 @@ async function teleportToAxisDenyde() {
   if (!questState.active?.[ILMENSKIE_QUEST_ID]) return false;
   const rescue = ilmenskieStory();
   if (currentStreetTsid !== AXIS_DENYDE_STREET_ID) {
-    rememberIlmenskieSource(rescue, {
+    rememberIlmenskieSource(rescue, instanceSourceHere({
       tsid: currentStreetTsid,
       x: player?.x,
       y: player?.y,
-    });
+    }));
   }
   closeMap();
   closeVerbMenu();
@@ -21333,7 +21358,7 @@ function updateHomeChrome() {
   if (button) {
     button.classList.toggle('is-owned', homeState.owned);
     button.title = homeState.owned
-      ? `${homeState.inHome ? 'At home' : 'Go home'} · ${unread} unread mail`
+      ? `${homeIsInstanced() ? 'At home' : 'Go home'} · ${unread} unread mail`
       : 'Get your home street';
   }
   if (badge) {
@@ -21360,7 +21385,7 @@ function updateHomeChrome() {
   if (app?.canvas) {
     app.canvas.dataset.homeOwned = homeState.owned ? '1' : '0';
     app.canvas.dataset.homeStyle = homeState.style || '';
-    app.canvas.dataset.homeRoom = homeState.inHome ? homeState.room : '';
+    app.canvas.dataset.homeRoom = homeIsInstanced() ? homeState.room : '';
     app.canvas.dataset.mailUnread = String(unread);
     app.canvas.dataset.mailTotal = String(mailboxState.messages.length);
   }
@@ -21393,8 +21418,10 @@ function renderHomePanel() {
   if (title) title.textContent = `${style.label} home`;
   // MPANELS: the footer line (the owned card's own words).
   const homeMeta = document.getElementById('home-meta');
-  if (homeMeta) homeMeta.textContent = homeState.inHome ? 'You are home' : 'One thought away';
-  const locationCopy = homeState.inHome
+  // Ticket 67: what it offers follows where you are (in Paradise from your house, Teleport home).
+  const atHome = homeIsInstanced();
+  if (homeMeta) homeMeta.textContent = atHome ? 'You are home' : 'One thought away';
+  const locationCopy = atHome
     ? homeState.room === 'interior'
       ? 'You are inside your house.'
       : 'You are on your home street.'
@@ -21409,7 +21436,7 @@ function renderHomePanel() {
       </div>
     </div>
     <div class="home-owned-actions">
-      ${homeState.inHome
+      ${atHome
         ? `<button type="button" class="btn-glitch-primary" data-home-action="mail">${unread ? `Open mailbox (${unread})` : 'Open mailbox'}</button>
            <button type="button" data-home-action="${homeState.room === 'interior' ? 'outside' : 'inside'}">${homeState.room === 'interior' ? 'Go outside' : 'Enter house'}</button>
            <button type="button" data-home-action="return">Return to Ur</button>`
@@ -22164,6 +22191,38 @@ async function showLocationTransition({
   return result;
 }
 
+/**
+ * Ticket 67: back into your home at the end of an instance you started there (a Ticket to
+ * Paradise, a quest street), at the spot you left, the stay still going: Glitch kept your own
+ * house as the way back (players/inc_instances.js instances_enter 81-86: get_simple_location,
+ * not pols_get_entrance_outside, for the owner) and teleported you there (instances_left 168-176).
+ */
+async function arriveInHome(tsid, opts = {}) {
+  homeState.inHome = true;
+  homeState.room = tsid === HOME_INTERIOR_TSID ? 'interior' : 'street';
+  const at = Number.isFinite(opts.spawnX) ? { spawnX: opts.spawnX, arrive: 'exact' } : {};
+  const load = () => renderHomeScene(homeState.room, at);
+  if (opts.useTransition === false) return load();
+  return showLocationTransition({
+    fromLabel: currentStreet?.label || '',
+    fromHub: currentStreet?.hubName || '',
+    toLabel: homeState.room === 'interior' ? 'Your House' : 'Your Home Street',
+    toHub: `${HOME_STYLES[homeState.style]?.label || 'Meadow'} Home`,
+    pol: { type: homeState.room === 'interior' ? 'interior' : 'exterior' },
+    load,
+  });
+}
+
+/**
+ * Ticket 67: where an instance started here leads back to: this spot, or in a feature scene
+ * (another player's home, a quest room) the street the scene leads back to, since a scene can't
+ * be entered again by its tsid (it fell back to the arrival street).
+ */
+function instanceSourceHere(here) {
+  const back = engine.inScene() ? engine.sceneReturnTo : null;
+  return back?.tsid ? { tsid: back.tsid, x: back.x, y: back.y } : here;
+}
+
 async function teleportHome({ room = 'street' } = {}) {
   if (!homeState.owned) {
     openHomePanel();
@@ -22439,6 +22498,8 @@ function clearWorldEntities() {
  * @param {{ spawnX?: number, spawnY?: number, quiet?: boolean }} [opts]
  */
 async function enterStreet(tsid, opts = {}) {
+  // Ticket 67: your home is no street file (it resolved to the arrival street, a stay still set).
+  if (isHomePlaceTsid(tsid) && homeState.owned) return arriveInHome(tsid, { ...opts, useTransition: false });
   const firstVisit = !persistentWorldState.streets?.[tsid];
   if (!opts.bypassFeatureGates) {
     const redirect = features.enterGate(tsid, engine);
@@ -22471,6 +22532,9 @@ async function enterStreet(tsid, opts = {}) {
   features.prepareStreet(data, engine);
   currentStreet = data;
   currentStreetTsid = data.tsid;
+  // Ticket 67: a world street ends a stay at home, however you got there, unless it is an
+  // instance whose way back is your home.
+  if (homeState.inHome) homeState.inHome = homeStayAfterArrival(homeState, { arrived: data.tsid, wayBack: instanceWayBack()?.tsid });
   WORLD_W = streetWidth(data);
   clearWorldEntities();
 
@@ -24120,11 +24184,11 @@ function advanceQuestDialogue() {
   }
   if (def.classTsid === ILMENSKIE_QUEST_ID) {
     const rescue = ensureIlmenskieState(questState);
-    rememberIlmenskieSource(rescue, {
+    rememberIlmenskieSource(rescue, instanceSourceHere({
       tsid: currentStreetTsid,
       x: player?.x,
       y: player?.y,
-    });
+    }));
   }
   closeQuestDialogue();
   if (
@@ -27749,6 +27813,10 @@ async function main() {
   const savedLoc = featureStart
     ? resolveSavedLocation(featureStart)
     : bootParams.has('fresh') ? null : resolveSavedLocation(loadPlayerLocation());
+  // Ticket 67: a reload whose way back is your home (a race or a quest room left from your
+  // house, Naraka after dying there) resumes in it; a home is no street, so savedLoc can't hold it.
+  const bootHomeTsid = (featureStart || (bootParams.has('fresh') ? null : loadPlayerLocation()))?.tsid;
+  const resumeHomeAt = homeState.owned && !resumeHomeAtBoot && isHomePlaceTsid(bootHomeTsid) ? bootHomeTsid : null;
   const stootDemoTsid = bootParams.has('stootdemo')
     ? resolveIndexTsid(STOOT_MEMORIAL_STREET_ID)
     : null;
@@ -27945,7 +28013,8 @@ async function main() {
   }
   try {
     await enterStreet(startTsid, startOpts);
-    if (resumeHomeAtBoot || ['home', 'interior', 'decorate', 'cultivate'].includes(homeDemo)) {
+    if (resumeHomeAtBoot || resumeHomeAt || ['home', 'interior', 'decorate', 'cultivate'].includes(homeDemo)) {
+      if (resumeHomeAt) homeState.room = resumeHomeAt === HOME_INTERIOR_TSID ? 'interior' : 'street';
       if (!homeState.returnLocation) {
         homeState.returnLocation = {
           tsid: currentStreetTsid,
@@ -28000,11 +28069,11 @@ async function main() {
     questDemo === 'jones' ||
     questDemo === 'sealed-cavern'
   ) {
-    rememberIlmenskieSource(ensureIlmenskieState(questState), {
+    rememberIlmenskieSource(ensureIlmenskieState(questState), instanceSourceHere({
       tsid: currentStreetTsid,
       x: player?.x,
       y: player?.y,
-    });
+    }));
     setTimeout(() => openMap(), 300);
   }
   if (winterDemo) {
@@ -28441,32 +28510,10 @@ async function main() {
   // Persist position while exploring (throttled) + on leave
   let lastLocSaveAt = 0;
   let lastLocSaveX = player?.x ?? 0;
-  const saveResumableLocation = () =>
-    legalizeRun && legalizeSourceLocation?.tsid
-      ? savePlayerLocation(legalizeSourceLocation)
-    : rookMuseumState && rookMuseumSourceLocation?.tsid
-      ? savePlayerLocation(rookMuseumSourceLocation)
-    : summersDayRun && summersDaySourceLocation?.tsid
-      ? savePlayerLocation(summersDaySourceLocation)
-    : deEmbiggenifyState && deEmbiggenifySourceLocation?.tsid
-      ? savePlayerLocation(deEmbiggenifySourceLocation)
-    : greedyStreetState && greedyStreetSourceLocation?.tsid
-      ? savePlayerLocation(greedyStreetSourceLocation)
-    : paradiseRun && paradiseSourceLocation?.tsid
-      ? savePlayerLocation(paradiseSourceLocation)
-      : hogHaulState && hogHaulSourceLocation?.tsid
-      ? savePlayerLocation(hogHaulSourceLocation)
-      : fourLetterState && fourLetterSourceLocation?.tsid
-        ? savePlayerLocation(fourLetterSourceLocation)
-      : winterWalkState && winterWalkSourceLocation?.tsid
-        ? savePlayerLocation(winterWalkSourceLocation)
-      : rookWoodsState && rookWoodsSourceLocation?.tsid
-        ? savePlayerLocation(rookWoodsSourceLocation)
-      : questState.active?.[ILMENSKIE_QUEST_ID] &&
-          currentStreetTsid === AXIS_DENYDE_STREET_ID &&
-          ilmenskieStory().sourceLocation?.tsid
-        ? savePlayerLocation(ilmenskieStory().sourceLocation)
-      : savePlayerLocation();
+  const saveResumableLocation = () => {
+    const back = instanceWayBack();
+    return back ? savePlayerLocation(back) : savePlayerLocation();
+  };
   const maybeAutosaveLocation = (force = false) => {
     if (!player || !currentStreetTsid || !state.started) return;
     const now = Date.now();

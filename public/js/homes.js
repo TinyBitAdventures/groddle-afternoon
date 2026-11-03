@@ -156,3 +156,21 @@ export function endHomeVisit(state) {
   return { ok: true, returnLocation };
 }
 
+
+/** Ticket 67: your home street or your house (any floor of it). */
+export function isHomePlaceTsid(tsid) {
+  return tsid === HOME_STREET_TSID || tsid === HOME_INTERIOR_TSID;
+}
+
+/**
+ * Ticket 67: whether your stay at home goes on after a street trip lands on `arrived`. Your own
+ * home is a stay. A world street ends it, unless it is an instance (a quest street, a race)
+ * whose way back (`wayBack`) is your home: Glitch kept your own house as an instance's way back
+ * and sent you back into it at the end (players/inc_instances.js instances_enter 81-86,
+ * instances_left 168-176).
+ */
+export function homeStayAfterArrival(state, { arrived, wayBack } = {}) {
+  if (state?.owned !== true) return false;
+  if (isHomePlaceTsid(arrived)) return true;
+  return state.inHome === true && isHomePlaceTsid(wayBack);
+}

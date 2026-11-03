@@ -130,7 +130,7 @@ import * as kit from '../quest-rooms/kit.js?v=4d2f1606';
 import { frameTexture, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js?v=db2ce452';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 import { displayTopOf, itemstackOverlayPoint, playPoofIn, playSheetOverlay, poofInAlpha } from '../overlay-art.js?v=3753a0d2';
-import { HOME_MACHINE } from '../home-ticket.js?v=dd702301';
+import { HOME_MACHINE } from '../home-ticket.js?v=12fecd90';
 import { animalAnchorX, createAnimalState } from '../animals.js?v=dd5408ad';
 import {
   AK_ANIMALS,
