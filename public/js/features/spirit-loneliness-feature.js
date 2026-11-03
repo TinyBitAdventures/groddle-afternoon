@@ -55,7 +55,7 @@
 
 import { STREET_INDEX } from '../street-loader.js?v=33d2b8bc';
 import { getStreetEcologyCatalog } from '../street-ecology.js?v=75086599';
-import { graphKey, routeGraph, tsidAliases } from '../map-routes.js?v=5090dbb7';
+import { graphKey, routeGraph, tsidAliases } from '../map-routes.js?v=130d8539';
 import { STREET_SPIRIT_VARIANTS, portraitFit, portraitSheet, spiritForStreet } from '../street-spirits.js?v=f9e88445';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 import { denseFrame, denseSprite } from '../sprite-dense.js?v=178a711b';

@@ -66,7 +66,7 @@ import {
   routeStep,
   sameStreet,
   tsidAliases,
-} from '../map-routes.js?v=5090dbb7';
+} from '../map-routes.js?v=130d8539';
 
 export const MAP_ROUTES_FEATURE_ID = 'map-routes';
 const GRAPH_URL = 'assets/content/signpost-graph.json?v=g198-1';

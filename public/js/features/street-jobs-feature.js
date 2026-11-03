@@ -76,6 +76,9 @@ import {
   settlePhase,
   chooseOption,
   roadClosure,
+  noteArrival,
+  openWayHome,
+  SUBWAY_STREETS,
   closedStreets,
   appliedUpgrade,
   upgradeEcologyEntry,
@@ -90,7 +93,7 @@ import {
   cancelJob,
   jobDivisor,
   upgradeOption,
-} from '../street-jobs.js?v=897619fc';
+} from '../street-jobs.js?v=6983fa1e';
 import { gainMetabolic, loseEnergy } from '../metabolics.js?v=8504134e';
 import { saveStore } from '../save-store.js?v=8839ba7b';
 import {
@@ -111,13 +114,16 @@ import {
   rowFromServer,
   sharedSlice,
   topLine,
-} from '../street-jobs-mp.js?v=d18e4b4a';
+} from '../street-jobs-mp.js?v=911c3959';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 import { createMinnAccount } from '../minn-account.js?v=ea900c51';
 import { normalizeGroups } from '../groups.js?v=b9076c50';
 import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=db2ce452';
 import { JOB_WORK_OVERLAY, jobWorkFloatPoint, jobWorkSoundKey, jobWorkToolScale, jobWorkToolSheet } from '../job-work-fx.js?v=430b96b2';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
+import { routeGraph } from '../map-routes.js?v=130d8539';
+import { TELEPORTERS } from '../hidden-floors.js?v=5ce87a04';
+import { WINTRY_PORTAL_TELEPORTERS } from '../wintry-portal.js?v=1437deda';
 
 export const STREET_JOBS_FEATURE_ID = 'street-jobs';
 const BOARD_CLASS = 'street_job_board';
@@ -181,6 +187,40 @@ function phaseTitle(job, phase, def) {
 /** The next phase's name in a phase card ("the next phase" when it has none). */
 function nextPhaseName(job, next) {
   return (next && phaseTitle(job, next, catalog?.classes?.[next.classTsid])) || 'the next phase';
+}
+
+/**
+ * Every way between streets, for openWayHome (ticket 50, Wintry Place): signposts and doors a
+ * closure can hold (assets/content/signpost-graph.json, as the Map reads it), and the ways none
+ * holds: the subway between its streets and the Collision-triggered Teleporters.
+ */
+let ways = null;
+function loadWays() {
+  ways ||= fetch('assets/content/signpost-graph.json?v=g198-1')
+    .then((r) => r.json())
+    .then((json) => {
+      const free = {};
+      const add = (a, b) => (free[a] ||= []).push(b);
+      for (const a of SUBWAY_STREETS) for (const b of SUBWAY_STREETS) if (a !== b) add(a, b);
+      const g = (t) => String(t || '').replace(/^L/, 'G');
+      for (const t of [...TELEPORTERS, ...WINTRY_PORTAL_TELEPORTERS]) add(g(t.from), g(t.to));
+      return { graph: routeGraph(json).graph, free };
+    })
+    .catch(() => null);
+  return ways;
+}
+
+/** No closed road may cut this street off from the rest of the world: open the fewest that would. */
+function keepWayHome(engine, mine) {
+  loadWays().then((w) => {
+    if (!w || mine !== generation || !catalog || demo) return;
+    const opened = openWayHome(state, catalog, { ...w, here: engine.streetTsid, homes: [streetIndex?.default, ...SUBWAY_STREETS].filter(Boolean), opts: opts() });
+    engine.setData('streetJobWayHome', opened.join(','));
+    if (!opened.length) return;
+    engine.save();
+    drawBarricades(engine);
+    publish(engine);
+  });
 }
 
 function load() {
@@ -1842,6 +1882,11 @@ export const streetJobsFeature = {
     load().then(() => {
       if (mine !== generation || !catalog) return;
       if (initializeStreetJobs(state, engine.visitedStreets ? engine.visitedStreets() : [])) engine.save();
+      // Ticket 50: a street you stand on opens its roads, so none of them can cut you off from here,
+      // and if closed roads further on still stand between here and the rest of the world, the
+      // fewest of them open too (keepWayHome).
+      if (!demo && noteArrival(state, catalog, engine.streetTsid, opts())) engine.save();
+      if (!demo && !engine.param('jobdemo')) keepWayHome(engine, mine);
       if (mpMode) ensureMp(engine);
       if (engine.param('jobdemo') && !demo && !mpMode) demo = resolveDemo(engine);
       const tsid = engine.streetTsid;

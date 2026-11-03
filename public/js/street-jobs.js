@@ -51,6 +51,7 @@
  */
 
 export const SOLO_DIVISOR = 50;
+import { SUBWAY_LINE } from './subway-line.js?v=d74b3ee0';
 import { loseEnergy } from './metabolics.js?v=8504134e';
 /** items/include/jobs.js startJobWork unit_duration. */
 export const WORK_UNIT_MS = 1500;
@@ -127,6 +128,66 @@ export function initializeStreetJobs(state, visited = []) {
   state.initialized = true;
   state.grandfathered = [...new Set([...state.grandfathered, ...visited.map((t) => clean(gTsid(t)))])].filter(Boolean);
   return true;
+}
+
+/**
+ * You arrived on `tsid` (any way: a quest, an instance's exit, a puzzle, a teleporter). If its road
+ * was still closed it opens for you now, as a grandfathered street, so the way back to wherever you
+ * came from is never a closed road (ticket 50: no street you can stand on cuts you off). Returns
+ * true when it changed the state (save it).
+ */
+export function noteArrival(state, catalog, tsid, opts = {}) {
+  const to = clean(gTsid(tsid));
+  if (!to || state.grandfathered.includes(to)) return false;
+  const closed = roadClosure(state, catalog, to, [to], opts);
+  if (!closed) return false;
+  state.grandfathered.push(to);
+  return true;
+}
+
+/**
+ * Ticket 50 and Austin's Wintry Place (2026-11-03): a closure must never cut the street you are on
+ * off from the rest of the world. Glitch locked only the roads into a street still being built
+ * (locations/inc_jobs.js jobs_modify_connections 578-603), and by its end every one of those streets
+ * stood (jobs_is_locked false in the dump), so it never met a player on the far side of one. The
+ * remake replays the build-out, and a subway, a teleporter, a quest or a door can set you down past
+ * a closed road. So when no open way leads from `here` to a home street (the starter street or a
+ * subway street), the closed roads on the way with the fewest of them open for you (grandfathered).
+ * `graph` holds the roads a closure holds (signposts, doors), `free` the ways none does (the subway,
+ * Collision-triggered Teleporters); both street -> [streets], G tsids. Returns the streets opened.
+ */
+export function openWayHome(state, catalog, { graph = {}, free = {}, here = '', homes = [], opts = {} } = {}) {
+  const from = gTsid(here);
+  const goal = new Set(homes.map(gTsid));
+  if (!from || !goal.size || goal.has(from)) return [];
+  const shut = new Set(closedStreets(state, catalog, opts));
+  // 0-1 search: entering a closed street costs one, anything else nothing.
+  const cost = new Map([[from, 0]]);
+  const prev = new Map([[from, null]]);
+  const deque = [from];
+  let end = null;
+  while (deque.length) {
+    const at = deque.shift();
+    if (goal.has(at)) {
+      end = at;
+      break;
+    }
+    const c = cost.get(at);
+    const step = (to, w) => {
+      if (cost.has(to) && cost.get(to) <= c + w) return;
+      cost.set(to, c + w);
+      prev.set(to, at);
+      if (w) deque.push(to);
+      else deque.unshift(to);
+    };
+    for (const to of graph[at] || []) step(to, shut.has(to) ? 1 : 0);
+    for (const to of free[at] || []) step(to, 0);
+  }
+  if (!end || !cost.get(end)) return [];
+  const opened = [];
+  for (let at = end; at; at = prev.get(at)) if (shut.has(at) && !state.grandfathered.includes(at)) opened.push(at);
+  state.grandfathered.push(...opened);
+  return opened.reverse();
 }
 
 const rowFor = (state, jobId) => (state.jobs[jobId] ||= cleanRow({}));
@@ -252,8 +313,18 @@ export function currentReqGroup(reqs, bucket) {
 /* ------------------------------------------------------------------ */
 
 /**
- * A street project counts as built when finished, or grandfathered/exempt.
- * `force` lists jobs to run regardless (QA demo boards).
+ * Streets the subway comes up on (subway-line.js, config_prod.js transit_instances.subway_1). Ticket
+ * 50 (calais, 2026-11-03): a fresh world closed 9 of the 12, so the subway set you down on a street
+ * still "under construction" (Somewhat Sump), you walked out, and no road led back to it. Glitch
+ * built the subway to streets that stood: every one of the 684 project streets is jobs_is_locked
+ * false in the location dump (e.g. LLI57DI72HI153U.xml 110), and the Red Line was 2012's. So a
+ * station street counts as built.
+ */
+export const SUBWAY_STREETS = Object.freeze(SUBWAY_LINE.stations.map((s) => gTsid(s.surfaceStreetTsid || s.connects_to)).filter(Boolean));
+
+/**
+ * A street project counts as built when finished, grandfathered (a street you have stood on: see
+ * noteArrival), exempt, or a subway station's street. `force` lists jobs to run regardless (QA demo boards).
  */
 export function isJobBuilt(state, catalog, jobId, { exemptFrom = [], force = [] } = {}) {
   const job = jobDef(catalog, jobId);
@@ -262,6 +333,7 @@ export function isJobBuilt(state, catalog, jobId, { exemptFrom = [], force = [] 
   if (force.includes(jobId)) return false;
   if (job.kind !== 'street') return false;
   if (state.grandfathered.includes(job.street)) return true;
+  if (SUBWAY_STREETS.includes(job.street)) return true;
   return job.connecting.some((tsid) => exemptFrom.includes(tsid));
 }
 

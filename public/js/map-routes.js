@@ -193,7 +193,10 @@ export function doorRooms(json = {}) {
  * street keys from `from` to the destination inclusive, [from] when you are
  * already there, or null. `blocked` lists streets whose road is closed
  * (street projects, js/street-jobs.js closedStreets): the route goes round
- * them when it can, and through them only when there is no other way.
+ * them and never through one (Glitch hid their signpost arms, so its global
+ * path finding had no road there: locations/inc_jobs.js jobs_modify_connections,
+ * jobs_unlock apiReloadDataForGlobalPathFinding); a closed destination is
+ * still the end of a route.
  * `locked` lists door edges ("from>to", routeGraph) that need a key: the
  * route takes one only when nothing else gets there (G192).
  * @param {Record<string, string[]>} graph
@@ -210,13 +213,7 @@ export function findRoute(graph, from, to, { blocked = null, locked = null } = {
   const closed = new Set();
   for (const t of blocked || []) for (const a of tsidAliases(t)) closed.add(a);
   const keyed = locked && locked.size ? locked : null;
-  const none = new Set();
-  return (
-    bfs(graph, start, targets, closed, keyed) ||
-    (keyed ? bfs(graph, start, targets, closed, null) : null) ||
-    (closed.size ? bfs(graph, start, targets, none, keyed) : null) ||
-    (closed.size && keyed ? bfs(graph, start, targets, none, null) : null)
-  );
+  return bfs(graph, start, targets, closed, keyed) || (keyed ? bfs(graph, start, targets, closed, null) : null);
 }
 
 function bfs(graph, start, targets, closed, locked) {
@@ -283,6 +280,14 @@ export function planRoute(state, graph, { from, to, source = 'player', quest = '
   if (!list.length) return { ok: false, state: s, error: ROUTE_TEXT.notFound };
   if (from && list.some((t) => sameStreet(t, from))) return { ok: false, state: s, error: ROUTE_TEXT.alreadyThere };
   const path = from ? findRoute(graph, from, list, { blocked, locked }) : null;
+  // Only closed roads in the way (street projects): no route, and which streets are still being built.
+  if (!path && from && graphKey(graph, from) && blocked) {
+    const open = findRoute(graph, from, list, { locked });
+    if (open) {
+      const shut = new Set([...blocked].flatMap((t) => tsidAliases(t)));
+      return { ok: false, state: s, error: ROUTE_TEXT.notFound, through: open.slice(1).filter((t) => shut.has(t)) };
+    }
+  }
   // A route from somewhere off the graph (an instance, Hell One) still keeps its
   // destination: the GPS says "Return to world for directions" until a street on
   // the graph finds the way (GpsUI moveMoveEnded asks again on every arrival).
