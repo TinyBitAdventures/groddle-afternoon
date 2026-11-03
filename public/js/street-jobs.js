@@ -661,6 +661,31 @@ export function roadClosure(state, catalog, toTsid, signpostTsids = [], opts = {
   return null;
 }
 
+/**
+ * What a closed road says (ticket 37 follow-up, mr granberry 2026-11-02). It used to end "or use
+ * the Map", but nothing reaches a street still being built: Glitch hid its signpost arms and locked
+ * its doors (locations/inc_jobs.js jobs_modify_connections 578-603), refused a teleport there ("Your
+ * teleportation target is unavailable.", players/inc_teleportation.js 219-223) and made it no
+ * destination on the Map (locations/location.js 2915-2935 not_a_destination; the client's menu greys
+ * Set as Destination and Teleport Here, InteractionMenuController.as 151-153 and 206-208). So it
+ * names the project board to build it at: the one here when you stand on a street that offers it,
+ * else the first offering street whose own road is open.
+ * @param {{ jobId: string, job: object }} closed roadClosure's answer
+ * @param {{ here?: string, via?: 'signpost'|'door'|'teleport'|'map', label?: (tsid: string) => string, opts?: object }} [o]
+ */
+export function closedRoadText(state, catalog, closed, { here = '', via = 'signpost', label = (t) => t, opts = {} } = {}) {
+  if (!closed?.job) return '';
+  const name = closed.job.label || label(closed.job.street);
+  const connecting = (closed.job.connecting || []).map(gTsid);
+  const at = gTsid(here);
+  const shut = new Set(closedStreets(state, catalog, opts));
+  const board = connecting.includes(at) ? at : connecting.find((t) => !shut.has(t)) || connecting[0] || '';
+  const where = !board ? 'at its project board' : board === at ? `at the project board here on ${label(board)}` : `at the project board on ${label(board)}`;
+  if (via === 'teleport') return `${name} is still under construction, so you can't teleport there yet. Help build it ${where}.`;
+  if (via === 'map') return `Still under construction. Help build it ${where}.`;
+  return `The road to ${name} is still under construction. Help build it ${where}, and the road opens when the project is done.`;
+}
+
 /** Every street whose road is closed right now (for QA attributes). */
 export function closedStreets(state, catalog, opts = {}) {
   const out = new Set();

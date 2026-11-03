@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=61c5424d';
 import { createFeatureHost } from './js/feature-host.js?v=903263a4';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=af97d593';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=16f32b00';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -22834,6 +22834,13 @@ function takeSceneArm(hit) {
   return true;
 }
 
+/**
+ * A signpost arm whose street is not in the game's street set (61 arms, e.g. "The Next Step"). The
+ * Map cannot reach it either; the old toast said the road was not loaded yet, which read as if it
+ * would load later (ticket 37 follow-up).
+ */
+const ROAD_NOT_IN_GAME = "That road leads somewhere that isn't in the game. Pick another destination on the Map.";
+
 function signpostArmKey(key) {
   const hit = signpostArmFor(key);
   if (!hit) return false;
@@ -22852,7 +22859,7 @@ function takeSignBoard(hit) {
   if (signpostTravelRefused()) return true;
   const conn = pickConnection({ connects: [board.connection] }, availableStreetTsids());
   if (!conn) {
-    toast('That road is not loaded yet. Use the map for another destination.');
+    toast(ROAD_NOT_IN_GAME);
     return true;
   }
   travelTo(conn.tsid, { label: conn.label, arrive: conn.arrive, via: 'signpost' });
@@ -23312,9 +23319,15 @@ function openMapStreetMenu(canvas, event, street) {
     menu.appendChild(b);
     return b;
   };
-  entry('Set as Destination', 'Get a guided path to this location', true, () => {
+  // Ticket 37 follow-up: a street still being built is no destination and no teleport target
+  // (GSJS location.js 2915-2935 not_a_destination; InteractionMenuController.as 151-153, 206-208).
+  const building = features.query('streetUnderConstruction', street.tsid, engine);
+  entry('Set as Destination', building ? building.note : 'Get a guided path to this location', !building, () => {
     const res = features.query('mapRoute', 'set', { to: street.tsid, source: 'player' }, engine);
-    if (res && res.ok === false) toast(res.error || 'No path to there.', 2600);
+    // Routes never go through a closed road (js/map-routes.js findRoute): say which street is in the way.
+    const through = res && res.ok === false ? routeThroughConstruction(res.through) : null;
+    if (through) toast(`No open road leads to ${street.label} yet: the way runs through ${through.label}, which is still under construction. ${through.note}`, 6000);
+    else if (res && res.ok === false) toast(res.error || 'No path to there.', 2600);
     else {
       pushActivity(`Destination set: ${street.label}.`);
       openMap(street.hubId);
@@ -23339,6 +23352,19 @@ function openMapStreetMenu(canvas, event, street) {
     document.addEventListener('keydown', onKey, true);
   }, 0);
   menu.querySelector('button:not([disabled])')?.focus();
+}
+
+/**
+ * The first of the streets still under construction that stand in a route's way (planRoute's
+ * `through`): routes never go through a closed road, so the Map says which one to build.
+ */
+function routeThroughConstruction(streets) {
+  if (!Array.isArray(streets)) return null;
+  for (const tsid of streets) {
+    const hit = features.query('streetUnderConstruction', tsid, engine);
+    if (hit) return hit;
+  }
+  return null;
 }
 
 function closeMap() {
@@ -28980,7 +29006,7 @@ async function main() {
         return;
       }
       openMap();
-      toast('That road is not loaded yet. Use the map for another destination.');
+      toast(ROAD_NOT_IN_GAME);
       return;
     }
 

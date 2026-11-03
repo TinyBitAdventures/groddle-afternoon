@@ -80,7 +80,7 @@ test.describe('integration playtest regressions', () => {
     assert.match(r.msgs[0], /for 1 currant\.$/);
   });
 
-  test('closed roads refuse signposts but not the Map', async () => {
+  test('closed roads refuse signposts, doors and teleports, not other ways in (ticket 37)', async () => {
     const { createFeatureHost } = await import('../public/js/feature-host.js?v=903263a4');
     const seen = [];
     const host = createFeatureHost([{ id: 'probe', travelGate: (tsid, engine, meta) => { seen.push(meta); return meta.via === 'signpost' ? { ok: false } : null; } }]);
@@ -88,7 +88,7 @@ test.describe('integration playtest regressions', () => {
     assert.equal(host.travelGate('L1', {}).ok, true);
     assert.deepEqual(seen, [{ via: 'signpost' }, {}]);
     const jobs = fs.readFileSync(path.join(root, 'public/js/features/street-jobs-feature.js'), 'utf8');
-    assert.match(jobs, /travelGate\(tsid, engine, meta = \{\}\) \{\n    if \(!catalog \|\| meta\?\.via !== 'signpost'\) return null;/);
+    assert.match(jobs, /travelGate\(tsid, engine, meta = \{\}\) \{\n    const via = meta\?\.via;\n    if \(!catalog \|\| !\['signpost', 'door', 'teleport'\]\.includes\(via\)\) return null;/);
     assert.match(game, /features\.travelGate\(toTsid, engine, \{ via: meta\.via \}\)/);
     assert.equal((game.match(/via: 'signpost' \}\)/g) || []).length, 3, 'T, signpost-board clicks and the arm keys all say signpost');
   });

@@ -187,7 +187,8 @@ function preflight(engine, target) {
   if (pending || arrival) return { ok: false, msg: 'You are already teleporting.' };
   if (engine.transientInstance()) return { ok: false, msg: NO_EXIT };
   if (target?.tsid) {
-    const gate = engine.travelGate(target.tsid);
+    // via 'teleport': teleportation_can_teleport (players/inc_teleportation.js 126, 219-223) refuses a street still being built.
+    const gate = engine.travelGate(target.tsid, { via: 'teleport' });
     if (!gate.ok) return { ok: false, msg: gate.msg || 'You cannot teleport right now.' };
   }
   return { ok: true };

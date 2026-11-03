@@ -50,7 +50,7 @@ import { worldToScreen } from '../street-model.js?v=505d8990';
 import { signArmWidth } from '../street-render.js?v=41c545c5';
 import { getSkillCatalog } from '../content-catalogs.js?v=10b118dd';
 import { GIANTS } from '../shrines.js?v=4b395ddf';
-import { teleportationFeature } from './teleportation-feature.js?v=236fbddc';
+import { teleportationFeature } from './teleportation-feature.js?v=fb12e2dc';
 import {
   SOLO_DIVISOR,
   WORK_UNIT_MS,
@@ -76,6 +76,7 @@ import {
   settlePhase,
   chooseOption,
   roadClosure,
+  closedRoadText,
   noteArrival,
   openWayHome,
   SUBWAY_STREETS,
@@ -93,7 +94,7 @@ import {
   cancelJob,
   jobDivisor,
   upgradeOption,
-} from '../street-jobs.js?v=6983fa1e';
+} from '../street-jobs.js?v=0235351c';
 import { gainMetabolic, loseEnergy } from '../metabolics.js?v=8504134e';
 import { saveStore } from '../save-store.js?v=8839ba7b';
 import {
@@ -114,7 +115,7 @@ import {
   rowFromServer,
   sharedSlice,
   topLine,
-} from '../street-jobs-mp.js?v=911c3959';
+} from '../street-jobs-mp.js?v=3db7e276';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 import { createMinnAccount } from '../minn-account.js?v=ea900c51';
 import { normalizeGroups } from '../groups.js?v=b9076c50';
@@ -1954,16 +1955,31 @@ export const streetJobsFeature = {
     return { upgradedAt, activeProject: ids.some((jobId) => jobInProgress(state, jobId)) };
   },
 
-  /** Closed roads block their signposts only; the Map still goes anywhere. */
+  /**
+   * A street still being built cannot be reached (ticket 37 follow-up): its signpost arms and doors
+   * (locations/inc_jobs.js jobs_modify_connections 578-603) and teleports there
+   * (players/inc_teleportation.js 219-223) are refused, each saying which project board builds it
+   * (js/street-jobs.js closedRoadText). Other ways in (quests, instances) are not roads and pass.
+   */
   travelGate(tsid, engine, meta = {}) {
-    if (!catalog || meta?.via !== 'signpost') return null;
-    const closed = roadClosure(state, catalog, tsid, signpostTsids(engine.street), opts());
+    const via = meta?.via;
+    if (!catalog || !['signpost', 'door', 'teleport'].includes(via)) return null;
+    const closed = roadClosure(state, catalog, tsid, via === 'signpost' ? signpostTsids(engine.street) : [tsid], opts());
     if (!closed) return null;
-    const from = closed.job.connecting.find((t) => t === engine.streetTsid) || closed.job.connecting[0];
-    return {
-      ok: false,
-      msg: `The road to ${closed.job.label} is still under construction. Help build it at the project board on ${streetLabel(from)}, or use the Map.`,
-    };
+    return { ok: false, msg: closedRoadText(state, catalog, closed, { here: engine.streetTsid, via, label: streetLabel, opts: opts() }) };
+  },
+
+  /**
+   * The Map's street menu (game.js openMapStreetMenu): a street still being built is no destination
+   * and no teleport target (location.js 2915-2935 not_a_destination; InteractionMenuController.as
+   * 151-153, 206-208). Returns the note the greyed entries show, or null when its road is open.
+   */
+  streetUnderConstruction(tsid, engine) {
+    if (!catalog || !tsid) return null;
+    const closed = roadClosure(state, catalog, tsid, [tsid], opts());
+    if (!closed) return null;
+    const text = (via) => closedRoadText(state, catalog, closed, { here: engine?.streetTsid, via, label: streetLabel, opts: opts() });
+    return { tsid: closed.job.street, label: closed.job.label || streetLabel(closed.job.street), note: text('map'), road: text('signpost') };
   },
 
   verbsFor(target, engine) {

@@ -11,7 +11,7 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { SUBWAY_STREETS, closedStreets, initializeStreetJobs, noteArrival, normalizeStreetJobState, openWayHome, roadClosure } from '../public/js/street-jobs.js?v=6983fa1e';
+import { SUBWAY_STREETS, closedStreets, initializeStreetJobs, noteArrival, normalizeStreetJobState, openWayHome, roadClosure } from '../public/js/street-jobs.js?v=0235351c';
 import { routeGraph } from '../public/js/map-routes.js?v=130d8539';
 import { TELEPORTERS } from '../public/js/hidden-floors.js?v=5ce87a04';
 import { WINTRY_PORTAL_TELEPORTERS, WINTRY_PLACE_TSID } from '../public/js/wintry-portal.js?v=1437deda';

@@ -105,7 +105,8 @@ describe('signpost arm keys: the keys', () => {
     assert.match(fn, /if \(signpostTravelRefused\(\)\) return true;/);
     assert.match(fn, /pickConnection\(\{ connects: \[board\.connection\] \}, availableStreetTsids\(\)\)/);
     assert.match(fn, /travelTo\(conn\.tsid, \{ label: conn\.label, arrive: conn\.arrive, via: 'signpost' \}\)/);
-    assert.match(fn, /That road is not loaded yet\./);
+    // Ticket 37: a road to a street not in the game says so (game.js ROAD_NOT_IN_GAME), not "not loaded yet".
+    assert.match(fn, /toast\(ROAD_NOT_IN_GAME\);/);
     assert.match(game, /function doTeleport\(\) \{\n\s*if \(signpostTravelRefused\(\)\) return;/);
   });
 
