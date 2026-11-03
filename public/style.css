@@ -9506,6 +9506,8 @@ html[data-street-cards] .notify-notices { visibility: hidden; }
 .social-tab:hover { color: var(--text); background: var(--surface-parchment); }
 .social-tab[aria-selected="true"] { color: var(--text); box-shadow: inset 0 -2px 0 var(--accent); }
 .social-tab:focus-visible { outline-offset: -2px; }
+/* Ticket 37: while a tab has the keyboard the arrow keys are the row's, not the avatar's; the row says so. */
+.social-tabs:has(.social-tab:focus-visible) { box-shadow: inset 0 0 0 2px var(--accent); border-radius: var(--radius-sm) var(--radius-sm) 0 0; }
 .social-tab .social-badge { min-width: 16px; height: 16px; padding: 0 var(--sp-2); box-shadow: none; }
 .social-view { display: flex; flex: 1 1 auto; flex-direction: column; min-height: 0; }
 .social-view-head { flex: none; max-height: 45%; overflow-y: auto; padding: var(--sp-4) var(--sp-6) 0; font-size: var(--fs-sm); }

@@ -389,6 +389,9 @@ export function mountSocialDrawer({
       });
       b.append(el('span', { class: 'social-tab-label' }, t.label));
       if (n) b.append(el('span', { class: 'social-badge', 'aria-hidden': 'true' }, badgeText(n)));
+      // Ticket 37 follow-up: a click picks the chat and leaves the keyboard where it was, so the arrow
+      // keys keep walking the avatar (Chrome would otherwise focus the tab, and its arrows would switch chats).
+      b.addEventListener('pointerdown', (e) => e.preventDefault?.());
       b.addEventListener('click', () => select(t.id, { focus: false }));
       return b;
     });
@@ -637,8 +640,15 @@ export function mountSocialDrawer({
   collapseBtn.addEventListener('click', () => setOpen(false, { chosen: true, focus: 'rail' }));
   presence.addEventListener('click', () => select('buddies', { focus: true }));
 
-  // Tabs: arrow keys move along the row (the ARIA tabs pattern), Home and End to the ends.
+  // Tabs: arrow keys move along the row (the ARIA tabs pattern), Home and End to the ends, only
+  // while a tab has the keyboard (Tab or Shift+Tab to it; a click does not take it), and the row
+  // shows a ring meanwhile. Escape hands the keys back to the game, as the client's Tab cycle let go
+  // of a chat (RightSideView.as focusCycle 134-168); its arrow keys were the avatar's otherwise.
   tablist.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      e.target?.blur?.();
+      return;
+    }
     const all = sorted();
     const i = all.findIndex((t) => t.id === tab);
     let to = -1;
