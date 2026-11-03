@@ -325,7 +325,9 @@ describe('G183: the Irrigator 9000 wears and pours first', () => {
     const game = readFileSync(join(pub, 'game.js'), 'utf8');
     assert.match(game, /IRRIGATOR_TOOL_SHEET = Object\.freeze\(\{ url: 'assets\/sprites\/making\/irrigator_9000-tool\.png', fw: 95, fh: 76, cols: 10, rows: 3 \}\)/);
     assert.match(game, /firstWorkingTool\(toolState, inv, WATERING_CAN_TOOLS\)/);
-    assert.match(game, /irrigator_9000: 'assets\/sprites\/icons\/irrigator_9000_broken\.png'/);
+    // Ticket 63: the pack's broken icons come from js/tools.js BROKEN_TOOL_ICONS.
+    assert.match(game, /brokenToolIcon\(s\.classTsid\)/);
+    assert.match(readFileSync(join(pub, 'js/tools.js'), 'utf8'), /BROKEN_TOOL_ICONS = Object\.freeze\(new Set\(\[[^\]]*'irrigator_9000'/);
     const png = readFileSync(join(pub, 'assets/sprites/making/irrigator_9000-tool.png'));
     assert.deepEqual([png.readUInt32BE(16), png.readUInt32BE(20)], [950, 228]);
   });

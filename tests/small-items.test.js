@@ -295,7 +295,9 @@ describe('Class Axe (class_axe.js, recipe 301)', () => {
     }
     const game = readFileSync(join(root, 'public/game.js'), 'utf8');
     assert.ok(game.includes("url: 'assets/sprites/tools/class-axe-tool.png'"));
-    assert.ok(game.includes("class_axe: 'assets/sprites/icons/class_axe_broken.png'"));
+    // Ticket 63: the pack's broken icons come from js/tools.js BROKEN_TOOL_ICONS (every tool with one).
+    assert.ok(game.includes('brokenToolIcon(s.classTsid)'));
+    assert.match(readFileSync(join(root, 'public/js/tools.js'), 'utf8'), /BROKEN_TOOL_ICONS = Object\.freeze\(new Set\(\[[^\]]*'class_axe'/);
   });
 });
 
