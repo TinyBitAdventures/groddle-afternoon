@@ -8,7 +8,7 @@
  *   GRODDLE_RENDER_GOLDEN_WRITE=1 node --test tests/builder-render.test.js
  */
 import assert from 'node:assert/strict';
-import { describe, it, after } from 'node:test';
+import { describe, it, after, before } from 'node:test';
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { GAME_DIR } from '../tools/repos.mjs';
@@ -55,7 +55,13 @@ describe('the render page\'s frame (pure)', async () => {
 });
 
 describe('render golden: Hechey Track at scale 0.25 (Chrome, under the browser lock)', { skip: !chromium && 'no playwright' }, () => {
-  const renderer = createRenderer({ idleMs: 500, label: 'builder render golden test' });
+  // The browser lock is waited for in before(), on its own budget, and the page stays open for both
+  // renders: other browser tests in the same run may hold the lock for minutes, and none of that
+  // counts against a test's own timeout (a 500 ms idle let the second test wait for it again).
+  const LOCK_WAIT_MS = 30 * 60_000;
+  const renderer = createRenderer({ idleMs: 120_000, lockWaitMs: LOCK_WAIT_MS, label: 'builder render golden test' });
+  const DOT = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==', 'base64');
+  before(async () => { await renderer.diff(DOT, DOT); }, { timeout: LOCK_WAIT_MS + 60_000 });
   after(() => renderer.close());
   const ctx = loadValidatorContext();
   const zone = hecheyZone();

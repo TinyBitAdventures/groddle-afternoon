@@ -24,7 +24,7 @@
  *
  * Run: node --test tests/map-fit.test.js
  */
-import { describe, it } from 'node:test';
+import { after as afterAll, before as beforeAll, describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
@@ -352,14 +352,27 @@ ${card('map-feature-card', 'Street projects here', 'Build Twickenrill Grotto (op
     }, { rank, points, confirm }).finally(() => ctx.close());
   }
 
-  it('both skins, Teleportation I-III, 0 to 3 points and the question, a tall and a short Map', { timeout: 900_000 }, async () => {
-    const { openBrowser } = await import('../tools/qa/browser.mjs');
-    const { startServer } = await import('../tools/qa/serve.mjs');
-    const server = await startServer({ root: join(root, 'public') });
-    const base = `http://127.0.0.1:${server.address().port}`;
-    const { browser, close } = await openBrowser({ label: 'map-fit shortcuts test', waitMs: 840_000 }); // other lanes' Chrome may hold the lock
-    const bad = [];
-    try {
+  describe('in Chrome', () => {
+    // The browser lock is waited for here, on its own budget: other browser tests in the same run (and
+    // other lanes' Chrome) may hold it for minutes, and none of that counts against the test's steps.
+    const LOCK_WAIT_MS = 30 * 60_000;
+    let server = null;
+    let chrome = null;
+    beforeAll(async () => {
+      const { openBrowser } = await import('../tools/qa/browser.mjs');
+      const { startServer } = await import('../tools/qa/serve.mjs');
+      chrome = await openBrowser({ label: 'map-fit shortcuts test', waitMs: LOCK_WAIT_MS });
+      server = await startServer({ root: join(root, 'public') });
+    }, { timeout: LOCK_WAIT_MS + 60_000 });
+    afterAll(async () => {
+      await chrome?.close();
+      await server?.stop();
+    });
+
+    it('both skins, Teleportation I-III, 0 to 3 points and the question, a tall and a short Map', { timeout: 300_000 }, async () => {
+      const base = `http://127.0.0.1:${server.address().port}`;
+      const { browser } = chrome;
+      const bad = [];
       for (const skin of ['modern', 'classic']) {
         for (const [rank, points, confirm, canvasH] of [[2, 0, false, 340], [2, 1, false, 340], [2, 2, false, 340], [2, 0, true, 340], [1, 0, false, 340], [3, 0, false, 340], [3, 0, false, 120], [2, 0, false, 60]]) {
           const r = await layout(browser, base, { skin, rank, points, confirm, canvasH });
@@ -383,11 +396,8 @@ ${card('map-feature-card', 'Street projects here', 'Build Twickenrill Grotto (op
           }
         }
       }
-    } finally {
-      await close();
-      await server.stop();
-    }
-    assert.deepEqual(bad, []);
+      assert.deepEqual(bad, []);
+    });
   });
 
   it('the wiring: packed rows, the box capped at the Map, the fade, and the point row', () => {

@@ -13,7 +13,7 @@
  *
  * Run: node --test tests/map-zoom.test.js
  */
-import { describe, it } from 'node:test';
+import { after as afterAll, before as beforeAll, describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
@@ -214,95 +214,118 @@ let chromium = null;
 try { chromium = (await import('playwright')).chromium; } catch { /* no Playwright */ }
 
 describe('MAPZOOM: wheel, drag, click and buttons on a real hub (Chrome)', { skip: !chromium && 'no playwright' }, () => {
-  it('both skins', { timeout: 900_000 }, async () => {
+  // The browser lock is waited for here, on its own budget: other browser tests in the same run (and
+  // other lanes' Chrome) may hold it for minutes, and none of that counts against the test's steps.
+  const LOCK_WAIT_MS = 30 * 60_000;
+  let server = null;
+  let chrome = null;
+  beforeAll(async () => {
     const { openBrowser } = await import('../tools/qa/browser.mjs');
     const { startServer } = await import('../tools/qa/serve.mjs');
-    const server = await startServer({ root: join(root, 'public') });
+    chrome = await openBrowser({ label: 'map-zoom test', waitMs: LOCK_WAIT_MS });
+    server = await startServer({ root: join(root, 'public') });
+  }, { timeout: LOCK_WAIT_MS + 60_000 });
+  afterAll(async () => {
+    await chrome?.close();
+    await server?.stop();
+  });
+
+  it('both skins', { timeout: 180_000 }, async () => {
     const base = `http://127.0.0.1:${server.address().port}`;
-    const { browser, close } = await openBrowser({ label: 'map-zoom test', waitMs: 840_000 });
+    const { browser } = chrome;
     const bad = [];
-    try {
-      for (const skin of ['modern', 'classic']) {
-        const ctx = await browser.newContext({ viewport: { width: 1000, height: 700 } });
-        const tab = await ctx.newPage();
-        await tab.goto(`${base}/style.css`);
-        await tab.setContent(`<!doctype html><html data-ui="${skin}"><head><link rel="stylesheet" href="/style.css">${skin === 'classic' ? '<link rel="stylesheet" href="/css/classic.css">' : ''}
+    for (const skin of ['modern', 'classic']) {
+      const ctx = await browser.newContext({ viewport: { width: 1000, height: 700 } });
+      const tab = await ctx.newPage();
+      await tab.goto(`${base}/style.css`);
+      await tab.setContent(`<!doctype html><html data-ui="${skin}"><head><link rel="stylesheet" href="/style.css">${skin === 'classic' ? '<link rel="stylesheet" href="/css/classic.css">' : ''}
 <style>#game-root{position:relative;width:1000px;height:700px}#map-canvas{position:relative;width:912px;height:552px}</style></head>
 <body><div id="game-root"><div id="map-panel"><div class="map-card map-hub"><div id="map-canvas" class="map-canvas"></div></div></div></div></body></html>`, { waitUntil: 'load' });
-        const r = await tab.evaluate(async () => {
-          const { buildHubMapView, renderHubMapSvg } = await import('/js/map-graph.js');
-          const { createMapZoom } = await import('/js/map-zoom.js');
-          const hub = await (await fetch('/assets/maps/hub-56-groddle-forest.json')).json();
-          const streets = (await (await fetch('/assets/streets/index.json')).json()).streets;
-          const canvas = document.getElementById('map-canvas');
-          canvas.innerHTML = renderHubMapSvg(buildHubMapView({ ...hub, hubId: '56' }, '', streets));
-          const clicks = [];
-          canvas.querySelectorAll('.map-street.travelable').forEach((g) => g.addEventListener('click', () => clicks.push(g.dataset.tsid)));
-          const z = createMapZoom(canvas);
-          z.attach(canvas.querySelector('svg'), '56');
-          window.__z = z;
-          window.__clicks = clicks;
-          const svg = canvas.querySelector('svg');
-          const g = [...canvas.querySelectorAll('.map-street.travelable')].find((n) => {
-            const b = n.querySelector('line.map-seg').getBoundingClientRect();
-            const x = b.left + b.width / 2, y = b.top + b.height / 2;
-            return x > 100 && x < 700 && y > 100 && y < 450 && document.elementFromPoint(x, y)?.closest('g.map-street') === n;
-          });
+      const r = await tab.evaluate(async () => {
+        const { buildHubMapView, renderHubMapSvg } = await import('/js/map-graph.js');
+        const { createMapZoom } = await import('/js/map-zoom.js');
+        const hub = await (await fetch('/assets/maps/hub-56-groddle-forest.json')).json();
+        const streets = (await (await fetch('/assets/streets/index.json')).json()).streets;
+        const canvas = document.getElementById('map-canvas');
+        canvas.innerHTML = renderHubMapSvg(buildHubMapView({ ...hub, hubId: '56' }, '', streets));
+        const clicks = [];
+        canvas.querySelectorAll('.map-street.travelable').forEach((g) => g.addEventListener('click', () => clicks.push(g.dataset.tsid)));
+        const z = createMapZoom(canvas);
+        z.attach(canvas.querySelector('svg'), '56');
+        window.__z = z;
+        window.__clicks = clicks;
+        const svg = canvas.querySelector('svg');
+        const g = [...canvas.querySelectorAll('.map-street.travelable')].find((n) => {
+          const b = n.querySelector('line.map-seg').getBoundingClientRect();
+          const x = b.left + b.width / 2, y = b.top + b.height / 2;
+          return x > 100 && x < 700 && y > 100 && y < 450 && document.elementFromPoint(x, y)?.closest('g.map-street') === n;
+        });
+        const b = g.querySelector('line.map-seg').getBoundingClientRect();
+        return { vb: svg.getAttribute('viewBox'), x: b.left + b.width / 2, y: b.top + b.height / 2, ctl: canvas.querySelectorAll('.map-zoom-ctl button').length };
+      });
+      const vb = () => tab.evaluate(() => document.querySelector('#map-canvas svg').getAttribute('viewBox'));
+      const zoomNow = () => tab.evaluate(() => window.__z.view().zoom);
+      const clicks = () => tab.evaluate(() => window.__clicks.length);
+      // Waits on a condition in the page (never a fixed sleep: a loaded machine is slow); false on timeout.
+      const until = (fn, arg) => tab.waitForFunction(fn, arg, { timeout: 15_000 }).then(() => true, () => false);
+      // The map at rest: the same viewBox over 8 frames running (a drag's glide runs about 0.6 s).
+      const atRest = () => tab.evaluate(() => new Promise((done) => {
+        const t0 = performance.now();
+        let last = null;
+        let same = 0;
+        const tick = () => {
+          const now = document.querySelector('#map-canvas svg').getAttribute('viewBox');
+          same = now === last ? same + 1 : 0;
+          last = now;
+          if (same >= 8 || performance.now() - t0 > 15_000) done(same >= 8);
+          else requestAnimationFrame(tick);
+        };
+        requestAnimationFrame(tick);
+      }));
+      if (r.ctl !== 3) bad.push(`${skin}: ${r.ctl} buttons`);
+      if (r.vb !== '0 0 760 460') bad.push(`${skin}: opens at ${r.vb}`);
+      // A short click at fit reaches the street.
+      await tab.mouse.click(r.x, r.y);
+      if ((await clicks()) !== 1) bad.push(`${skin}: a click at fit`);
+      // The wheel about the street: it stays under the pointer.
+      await tab.mouse.move(r.x, r.y);
+      await tab.mouse.wheel(0, -300);
+      if (!(await until(() => window.__z.view().zoom > 1.5))) bad.push(`${skin}: the wheel did not zoom`);
+      const still = await tab.evaluate(([x, y]) => document.elementFromPoint(x, y)?.closest('g.map-street') != null, [r.x, r.y]);
+      if (!still) bad.push(`${skin}: the street left the pointer`);
+      // A drag from the street pans, and its click never reaches the street.
+      const before = await vb();
+      await tab.mouse.down();
+      for (let i = 1; i <= 6; i++) await tab.mouse.move(r.x + i * 15, r.y + i * 8);
+      await tab.mouse.up();
+      if (!(await until((b) => document.querySelector('#map-canvas svg').getAttribute('viewBox') !== b, before))) bad.push(`${skin}: the drag did not pan`);
+      if ((await clicks()) !== 1) bad.push(`${skin}: the drag clicked the street`);
+      // The drag's glide carries the map on for a moment: a street picked while it moves is gone from
+      // under the pointer by the press (the full suite's "wobbly click was lost", 2026-11-04).
+      if (!(await atRest())) bad.push(`${skin}: the map never came to rest after the drag`);
+      // A wobbly click (3 px) is a click.
+      const s = await tab.evaluate(() => {
+        for (const g of document.querySelectorAll('#map-canvas .map-street.travelable')) {
           const b = g.querySelector('line.map-seg').getBoundingClientRect();
-          return { vb: svg.getAttribute('viewBox'), x: b.left + b.width / 2, y: b.top + b.height / 2, ctl: canvas.querySelectorAll('.map-zoom-ctl button').length };
-        });
-        const vb = () => tab.evaluate(() => document.querySelector('#map-canvas svg').getAttribute('viewBox'));
-        const zoomNow = () => tab.evaluate(() => window.__z.view().zoom);
-        const clicks = () => tab.evaluate(() => window.__clicks.length);
-        if (r.ctl !== 3) bad.push(`${skin}: ${r.ctl} buttons`);
-        if (r.vb !== '0 0 760 460') bad.push(`${skin}: opens at ${r.vb}`);
-        // A short click at fit reaches the street.
-        await tab.mouse.click(r.x, r.y);
-        if ((await clicks()) !== 1) bad.push(`${skin}: a click at fit`);
-        // The wheel about the street: it stays under the pointer.
-        await tab.mouse.move(r.x, r.y);
-        await tab.mouse.wheel(0, -300);
-        await tab.waitForTimeout(100);
-        if (!((await zoomNow()) > 1.5)) bad.push(`${skin}: the wheel did not zoom`);
-        const still = await tab.evaluate(([x, y]) => document.elementFromPoint(x, y)?.closest('g.map-street') != null, [r.x, r.y]);
-        if (!still) bad.push(`${skin}: the street left the pointer`);
-        // A drag from the street pans, and its click never reaches the street.
-        const before = await vb();
-        await tab.mouse.down();
-        for (let i = 1; i <= 6; i++) await tab.mouse.move(r.x + i * 15, r.y + i * 8);
-        await tab.mouse.up();
-        await tab.waitForTimeout(50);
-        if ((await vb()) === before) bad.push(`${skin}: the drag did not pan`);
-        if ((await clicks()) !== 1) bad.push(`${skin}: the drag clicked the street`);
-        // A wobbly click (3 px) is a click.
-        const s = await tab.evaluate(() => {
-          for (const g of document.querySelectorAll('#map-canvas .map-street.travelable')) {
-            const b = g.querySelector('line.map-seg').getBoundingClientRect();
-            const x = b.left + b.width / 2, y = b.top + b.height / 2;
-            if (x > 40 && x < 820 && y > 40 && y < 500 && document.elementFromPoint(x, y)?.closest('g.map-street') === g) return { x, y };
-          }
-          return null;
-        });
-        await tab.mouse.move(s.x, s.y);
-        await tab.mouse.down();
-        await tab.mouse.move(s.x + 2, s.y + 2);
-        await tab.mouse.up();
-        if ((await clicks()) !== 2) bad.push(`${skin}: a wobbly click was lost`);
-        // The buttons: + to 3x (then it greys), Fit back to the whole region.
-        for (let i = 0; i < 4; i++) await tab.click('#map-canvas .map-zoom-ctl [data-zoom="in"]', { force: true });
-        await tab.waitForTimeout(400);
-        if ((await zoomNow()) !== 3) bad.push(`${skin}: + reached ${await zoomNow()}`);
-        if (!(await tab.isDisabled('#map-canvas .map-zoom-ctl [data-zoom="in"]'))) bad.push(`${skin}: + still on at 3x`);
-        const ink = await tab.evaluate(() => getComputedStyle(document.querySelector('#map-canvas svg')).getPropertyValue('--map-text-k').trim());
-        if (Math.abs(Number(ink) - 2.5 / 3) > 1e-3) bad.push(`${skin}: text scale ${ink}`);
-        await tab.click('#map-canvas .map-zoom-ctl [data-zoom="fit"]');
-        await tab.waitForTimeout(400);
-        if ((await vb()) !== '0 0 760 460') bad.push(`${skin}: Fit gave ${await vb()}`);
-        await ctx.close();
-      }
-    } finally {
-      await close();
-      await server.stop();
+          const x = b.left + b.width / 2, y = b.top + b.height / 2;
+          if (x > 40 && x < 820 && y > 40 && y < 500 && document.elementFromPoint(x, y)?.closest('g.map-street') === g) return { x, y };
+        }
+        return null;
+      });
+      await tab.mouse.move(s.x, s.y);
+      await tab.mouse.down();
+      await tab.mouse.move(s.x + 2, s.y + 2);
+      await tab.mouse.up();
+      if (!(await until(() => window.__clicks.length === 2))) bad.push(`${skin}: a wobbly click was lost (${await clicks()} clicks)`);
+      // The buttons: + to 3x (then it greys), Fit back to the whole region.
+      for (let i = 0; i < 4; i++) await tab.click('#map-canvas .map-zoom-ctl [data-zoom="in"]', { force: true });
+      if (!(await until(() => window.__z.view().zoom === 3))) bad.push(`${skin}: + reached ${await zoomNow()}`);
+      if (!(await tab.isDisabled('#map-canvas .map-zoom-ctl [data-zoom="in"]'))) bad.push(`${skin}: + still on at 3x`);
+      const ink = await tab.evaluate(() => getComputedStyle(document.querySelector('#map-canvas svg')).getPropertyValue('--map-text-k').trim());
+      if (Math.abs(Number(ink) - 2.5 / 3) > 1e-3) bad.push(`${skin}: text scale ${ink}`);
+      await tab.click('#map-canvas .map-zoom-ctl [data-zoom="fit"]');
+      if (!(await until(() => document.querySelector('#map-canvas svg').getAttribute('viewBox') === '0 0 760 460'))) bad.push(`${skin}: Fit gave ${await vb()}`);
+      await ctx.close();
     }
     assert.deepEqual(bad, []);
   });
