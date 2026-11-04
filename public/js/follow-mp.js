@@ -13,9 +13,18 @@
  * (AvatarController.as _endFollowing on the arrow keys and Space, 373-430);
  * the trailing gap is the solo follow's (js/local-companions.js
  * COMPANION_FOLLOW_TRAIL_DISTANCE, companionFollowVelocity).
+ *
+ * Ticket 71 (keeping pace): in Glitch a follower's own physics stopped and the
+ * server walked its avatar along the leader's path (AvatarView.as 107-119 and
+ * 255, NetController.as 199 skip the follower's own moves; GameServerJS main.js
+ * 27 follow_move_end), so it kept pace, jumped where the leader jumped and
+ * carried on under any dialog. The remake walks the follower itself:
+ * followSteer is the walk at full speed with a catch-up, the place it is put
+ * when it is lost, and the leader's take-off points it jumps at.
  */
 
 import { COMPANION_FOLLOW_TRAIL_DISTANCE, STALKER_ACHIEVEMENT_ID, companionFollowVelocity } from './local-companions.js?v=188f756c';
+import { GRAVITY, JUMP_SPEED } from './avatar-step.js?v=537aa4b7';
 
 export { STALKER_ACHIEVEMENT_ID };
 export const FOLLOW_VERB = 'mp_follow';
@@ -147,6 +156,153 @@ export function isFollowInputKey(key) {
  */
 export function followVelocity(playerX, leaderX, currentVelocity = 0, maxSpeed = 4.4) {
   return companionFollowVelocity(playerX, leaderX, currentVelocity, { trailDistance: FOLLOW_TRAIL_DISTANCE, maxSpeed });
+}
+
+/** Ticket 71: a follower further behind than this walks faster ... */
+export const FOLLOW_CATCHUP_FROM = 130;
+/** ... reaching FOLLOW_CATCHUP_SPEED x the walk speed this far behind. */
+export const FOLLOW_CATCHUP_FULL = 250;
+export const FOLLOW_CATCHUP_SPEED = 1.3;
+/** Further than this from the leader, the follower is put at the trailing spot. */
+export const FOLLOW_PLACE_DISTANCE = 1000;
+/** The leader off screen this long also puts the follower at the trailing spot. */
+export const FOLLOW_OFFSCREEN_MS = 1200;
+/** How near a take-off point the follower jumps, and how long a point is kept. */
+export const FOLLOW_TAKEOFF_REACH = 12;
+export const FOLLOW_TAKEOFF_MAX_AGE_MS = 5000;
+/** No catch-up this close before a take-off point, so the jump starts at walking speed like the leader's. */
+export const FOLLOW_TAKEOFF_STEADY = 200;
+/** A take-off point's floor and the follower's must be this close. */
+export const FOLLOW_TAKEOFF_FLOOR = 48;
+
+const FRAME_MS = 1000 / 60;
+const clampTo = (v, a, b) => Math.max(a, Math.min(b, v));
+const AIRBORNE_STATES = new Set(['lift', 'fall', 'land']);
+const CLIMB_STATES = new Set(['climb', 'climbPause']);
+
+/** The leader's avatar state stands on a floor (not jumping, falling or on a ladder). */
+export function leaderGrounded(anim) {
+  const a = String(anim || 'stand');
+  return !AIRBORNE_STATES.has(a) && !CLIMB_STATES.has(a);
+}
+
+/**
+ * The follower's top speed `gap` px from the leader: the walk speed, rising to
+ * FOLLOW_CATCHUP_SPEED x from FOLLOW_CATCHUP_FROM to FOLLOW_CATCHUP_FULL behind.
+ * A ramp, not a step: a step at 250 px would hold a follower there for good,
+ * walking exactly as fast as the leader.
+ */
+export function followSpeedLimit(gap, walkMax = 4.4) {
+  const k = clampTo((Math.abs(Number(gap) || 0) - FOLLOW_CATCHUP_FROM) / (FOLLOW_CATCHUP_FULL - FOLLOW_CATCHUP_FROM), 0, 1);
+  return Math.max(0, Number(walkMax) || 0) * (1 + (FOLLOW_CATCHUP_SPEED - 1) * k);
+}
+
+/**
+ * The walk toward `targetX` (companionFollowVelocity's blend, with the target
+ * and the top speed given): settles within 10 px, otherwise eases toward
+ * 0.085 x the distance, capped at `limit`.
+ */
+export function followSteerVelocity(playerX, targetX, currentVelocity = 0, limit = 4.4) {
+  const v = Number(currentVelocity) || 0;
+  const cap = Math.max(0, Number(limit) || 0);
+  const error = (Number(targetX) || 0) - (Number(playerX) || 0);
+  if (Math.abs(error) <= 10) {
+    const next = v * 0.62;
+    return Math.abs(next) < 0.05 ? 0 : next;
+  }
+  const desired = clampTo(error * 0.085, -cap, cap);
+  return clampTo(v * 0.58 + desired * 0.42, -cap, cap);
+}
+
+/** The trailing spot behind a leader at `leaderX` for a follower at `playerX` (it stays on its own side). */
+export function trailingX(playerX, leaderX) {
+  const side = Number(leaderX) >= Number(playerX) ? -1 : 1;
+  return Number(leaderX) + side * FOLLOW_TRAIL_DISTANCE;
+}
+
+/** A log of the leader's movement samples and the take-off points found in them. */
+export function createTakeoffLog() {
+  return { last: null, points: [], street: '' };
+}
+
+export function clearTakeoffLog(log, street = '') {
+  log.last = null;
+  log.points.length = 0;
+  log.street = street;
+}
+
+/**
+ * One movement sample of the leader ({ x, y, dir, anim, triple, t } with t in
+ * local ms): a change from anything but a ladder into the rising jump state
+ * ('lift') is a take-off. The leader's game shows 'lift' a few frames after
+ * the feet leave the floor and sends at most every 100 ms, so the point is
+ * worked back along the leader's path from how far it has risen (launch at
+ * JUMP_SPEED under GRAVITY). From 'fall' it is the air jump after walking off
+ * a ledge. Returns the new point or null.
+ */
+export function noteLeaderSample(log, sample) {
+  if (!log || !sample) return null;
+  const s = {
+    x: Number(sample.x) || 0,
+    y: Number(sample.y) || 0,
+    dir: Number(sample.dir) < 0 ? -1 : 1,
+    anim: String(sample.anim || 'stand'),
+    triple: sample.triple === true,
+    t: Number(sample.t) || 0,
+  };
+  const prev = log.last;
+  log.last = s;
+  if (!prev || s.anim !== 'lift' || prev.anim === 'lift' || CLIMB_STATES.has(prev.anim)) return null;
+  const air = prev.anim === 'fall';
+  const frames = Math.max(1, (s.t - prev.t) / FRAME_MS);
+  const dx = s.x - prev.x;
+  let k = 0;
+  if (!air) {
+    const v0 = -JUMP_SPEED * (s.triple ? 1.4 : 1);
+    const rise = Math.max(0, prev.y - s.y);
+    const disc = v0 * v0 - 2 * GRAVITY * rise;
+    const since = disc > 0 ? (v0 - Math.sqrt(disc)) / GRAVITY : frames;
+    k = clampTo(1 - since / frames, 0, 1);
+  }
+  const point = {
+    x: prev.x + dx * k,
+    y: air ? prev.y + (s.y - prev.y) * k : prev.y,
+    dir: Math.abs(dx) > 2 ? Math.sign(dx) : s.dir,
+    speed: Math.abs(dx) / frames,
+    triple: s.triple,
+    air,
+    t: s.t,
+  };
+  log.points.push(point);
+  if (log.points.length > 8) log.points.shift();
+  return point;
+}
+
+/** Drops take-off points the follower at `playerX` has passed, and those older than FOLLOW_TAKEOFF_MAX_AGE_MS. */
+export function pruneTakeoffs(log, playerX, now) {
+  const x = Number(playerX) || 0;
+  log.points = log.points.filter((p) => now - p.t <= FOLLOW_TAKEOFF_MAX_AGE_MS && (x - p.x) * p.dir <= FOLLOW_TAKEOFF_REACH);
+  return log.points;
+}
+
+/** The next take-off point ahead of the follower (the oldest one kept), or null. */
+export function nextTakeoff(log) {
+  return log?.points?.[0] || null;
+}
+
+/**
+ * Whether the follower ({ x, y, vx, onGround }) jumps now at the take-off
+ * point `p`: within FOLLOW_TAKEOFF_REACH, on the same floor, on the ground
+ * (in the air for an air jump), moving the way the leader went (a standing
+ * jump takes any way in).
+ */
+export function takeoffDue(p, { x, y, vx = 0, onGround = true } = {}) {
+  if (!p) return false;
+  if (Math.abs((Number(x) || 0) - p.x) > FOLLOW_TAKEOFF_REACH) return false;
+  if (Math.abs((Number(y) || 0) - p.y) > FOLLOW_TAKEOFF_FLOOR) return false;
+  if (p.air ? onGround : !onGround) return false;
+  if (p.speed < 0.5) return true;
+  return Math.abs(vx) > 0.3 && Math.sign(vx) === p.dir;
 }
 
 /** Where a follower lands on the leader's new street: the trailing gap behind the leader's arrival. */

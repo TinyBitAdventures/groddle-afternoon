@@ -31,10 +31,10 @@ import {
   pushSample,
   sampleTrack,
   socketUrl,
-} from '../public/js/realtime-client.js?v=f19c76a1';
+} from '../public/js/realtime-client.js?v=d890c210';
 import { createMinnAccount } from '../public/js/minn-account.js?v=eb300264';
-import { emoteCommand, lookOf, poseOf, realtimeFeature, sharedStreet, statusText } from '../public/js/features/realtime-feature.js?v=9cc093c0';
-import { FEATURES } from '../public/js/features/index.js?v=bcbccb43';
+import { emoteCommand, lookOf, poseOf, realtimeFeature, sharedStreet, statusText } from '../public/js/features/realtime-feature.js?v=f94cb4d9';
+import { FEATURES } from '../public/js/features/index.js?v=7249deb6';
 
 const root = join(import.meta.dirname, '..');
 const read = (rel) => readFileSync(join(root, rel), 'utf8');
@@ -147,6 +147,10 @@ describe('realtime-client: wire helpers', () => {
       assert.equal(decodeAnim(w), s);
     }
     assert.equal(encodeAnim('climbPause'), 'climb_pause');
+    // Ticket 71: a triple jump's rise has its own word (hub.go wordRe) and is drawn as lift.
+    assert.equal(encodeAnim('liftTriple'), 'lift_triple');
+    assert.match(encodeAnim('liftTriple'), /^[a-z0-9_]{1,24}$/);
+    assert.equal(decodeAnim('lift_triple'), 'lift');
     assert.equal(encodeAnim('jumpOver_lift'), 'stand', 'unknown states stand');
     assert.equal(decodeAnim('moonwalk'), 'stand');
   });
@@ -214,6 +218,12 @@ describe('realtime-client: connecting', () => {
     assert.equal(ctx.client.players.find((p) => p.id === 9).anim, 'climbPause');
     ws.receive({ t: 'moved', id: 8, x: 40, y: 6, dir: 1, anim: 'stand' });
     assert.deepEqual(ctx.client.players.find((p) => p.id === 8), { id: 8, name: 'Bo', x: 40, y: 6, dir: 1, anim: 'stand', look: { v: 1 } });
+    // Ticket 71: a triple jump's rise is drawn as lift and marked for a follower.
+    ws.receive({ t: 'moved', id: 8, x: 44, y: -30, dir: 1, anim: 'lift_triple' });
+    assert.equal(ctx.events.at(-1)[1].anim, 'lift');
+    assert.equal(ctx.events.at(-1)[1].triple, true);
+    ws.receive({ t: 'moved', id: 8, x: 48, y: -40, dir: 1, anim: 'lift' });
+    assert.equal(ctx.events.at(-1)[1].triple, undefined);
     ws.receive({ t: 'moved', id: 99, x: 1, y: 1 });
     ws.receive({ t: 'left', id: 9 });
     assert.equal(ctx.client.here, 2);
@@ -600,6 +610,9 @@ describe('realtime feature', () => {
     assert.equal(sharedStreet(engine({ player: null })), '');
     assert.deepEqual(poseOf(player), { x: 12.5, y: -40, dir: -1, anim: 'walk2x' });
     assert.deepEqual(poseOf({ x: 1, y: 2 }), { x: 1, y: 2, dir: 1, anim: 'stand' });
+    assert.equal(poseOf({ x: 1, y: 2, glitchState: 'lift', tripleJumping: true }).anim, 'liftTriple', 'ticket 71: a triple jump rising');
+    assert.equal(poseOf({ x: 1, y: 2, glitchState: 'lift', tripleJumping: false }).anim, 'lift');
+    assert.equal(poseOf({ x: 1, y: 2, glitchState: 'fall', tripleJumping: true }).anim, 'fall');
     assert.deepEqual(lookOf({ playerAppearance: { vector: { outfit: { hat: 'a' } } } }), { v: 1, vector: { outfit: { hat: 'a' } } });
     assert.deepEqual(lookOf({}), { v: 1, vector: {} });
   });

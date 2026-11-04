@@ -150,7 +150,7 @@ describe('map walk: game.js (startUserInitiatedPath)', () => {
 
   it('steers through the shared walk, ends on a jump, a hold or the game\'s walk', () => {
     assert.match(game, /const step = stepUserPath\(w, \{ x: player\.x, moving: userMoving, jump: hasQueuedJump\(jumpState, movementNow\(\)\), tsid: currentStreetTsid \}\);/);
-    assert.match(game, /function handleInput\(\) \{\n  if \(gameplayInputBlocked\(\)\) \{\n    \/\/ MAPWALK[^\n]*\n    endUserWalk\('held'\);/);
+    assert.match(game, /function handleInput\(\) \{\n(?:  [^\n]*\n){0,4}  if \(gameplayInputBlocked\(\)\) \{\n    \/\/ MAPWALK[^\n]*\n    endUserWalk\('held'\);/);
     assert.match(game, /function startAvatarWalk\(x, face = ''\) \{\n[^\n]*\n[^\n]*\n  endUserWalk\('game'\);/);
   });
 

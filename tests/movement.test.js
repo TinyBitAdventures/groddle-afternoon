@@ -25,7 +25,7 @@ import {
   yCamOffsetAnchor,
   cameraBottomSlack,
   cameraWorldHeightForGround,
-} from '../public/js/movement.js?v=a314f8a1';
+} from '../public/js/movement.js?v=b30f84eb';
 import { streetHeight, platformsScreen } from '../public/js/street-model.js?v=505d8990';
 import { MIN_VP_H, MAX_VP_H, VIEW_CEIL_H, VIEW_FLOOR_H, locationViewHeightFor } from '../public/js/location-view.js?v=5a0d5c0b';
 

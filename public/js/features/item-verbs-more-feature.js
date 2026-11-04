@@ -46,7 +46,7 @@ import { ELEMENT_STACKMAX, hasPouch, POUCH_CLASS } from '../elemental-pouch.js?v
 import { GENTLE_ISLAND_TSIDS, isNewxpSceneTsid } from '../newxp.js?v=6ca4702e';
 import { SKILLQUEST_AK_TSID } from '../skillquest-ak.js?v=281b956d';
 import { setToolRemaining, TOOL_CONDITION_CATALOG } from '../tools.js?v=3974f57e';
-import { HERDKEEPING, hogtieEscapeDelayMs, husbandryPack } from '../animal-husbandry.js?v=a4c7de13';
+import { HERDKEEPING, hogtieEscapeDelayMs, husbandryPack } from '../animal-husbandry.js?v=d1ea0edc';
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=8f5dc6d9';
 import { sourceFromUrl, frameTexture } from '../textures.js?v=3149d699';
 import { landingY, walkSurfaceY } from '../walk-surface.js?v=c982983e';

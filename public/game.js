@@ -2,9 +2,9 @@
  * Groddle Afternoon — original street geometry + layered decos
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
-import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=79228c68';
+import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=6218d040';
 import { createFeatureHost } from './js/feature-host.js?v=2ed3c069';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=bcbccb43';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=7249deb6';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -122,7 +122,7 @@ import {
   travelToGregarious,
 } from './js/legalize-it.js?v=d569fd0e';
 import { HALL, HALL_LAYOUT, HALL_QUESTIONS } from './js/bureaucratic-hall.js?v=a0bc6317';
-import { STATION_X, stationArrival, stationScreen, surfaceStation } from './js/subway.js?v=5719ffc3';
+import { STATION_X, stationArrival, stationScreen, surfaceStation } from './js/subway.js?v=44d1a09f';
 import { ALLEY, SHADY, drawAlley, inEnteredBox } from './js/quest-rooms/back-alley-set.js?v=5faee32f';
 import {
   WINTER_HAVEN_STREET_ID,
@@ -464,8 +464,8 @@ import {
 } from './js/inventory.js?v=597a17a2';
 import { PACK_COPY, isBagClass, unitRankAt } from './js/pack-slots.js?v=68a8fca3';
 import { createPackRow, mountPackClearance, packBandRange, packCountText, packSearchEntries, packSlotTip } from './js/ui/pack-row.js?v=65c0f180';
-import { listAnimalFeedOptions } from './js/animals.js?v=2654c807';
-import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=2654c807';
+import { listAnimalFeedOptions } from './js/animals.js?v=b60e937b';
+import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=b60e937b';
 import {
   createDroppedItemState,
   parseDroppedItemState,
@@ -676,6 +676,7 @@ import {
   queueJump,
   clearJumpQueue,
   hasQueuedJump,
+  matchLeaderJumpStep,
   noteGrounded,
   noteJumped,
   resolveQueuedJump,
@@ -687,7 +688,7 @@ import {
   yCamOffsetAnchor,
   cameraBottomSlack,
   cameraWorldHeightForGround,
-} from './js/movement.js?v=a314f8a1';
+} from './js/movement.js?v=b30f84eb';
 import { easeCameraAxis } from './js/camera-feel.js?v=e668afc5';
 import { renderResolution, RESOLUTION_STEP } from './js/render-density.js?v=ae0941e5';
 // g458: low energy and mood turn amber and red, and a click offers something from the pack.
@@ -795,7 +796,7 @@ import {
   createAnimalState,
   resetAnimalDay,
   animalStatusLabel,
-} from './js/animals.js?v=2654c807';
+} from './js/animals.js?v=b60e937b';
 import {
   ensureWoodTreeState,
   pickWoodTool,
@@ -894,7 +895,7 @@ import {
   ANIMAL_PATROL,
   nearestPlacementGap,
 } from './js/street-ecology.js?v=2c82c072';
-import { chickenPauseRoll, easeToward, flightFloorAt, flightFloorFor, flyerLift } from './js/street-creatures.js?v=e4f7ed66';
+import { chickenPauseRoll, easeToward, flightFloorAt, flightFloorFor, flyerLift } from './js/street-creatures.js?v=4f2b6178';
 import { createSoundBoard, DEFAULT_SFX_VOLUME, watchButtonClicks, watchPanelSounds } from './js/sound-board.js?v=87380a25';
 import {
   actionLoopFor,
@@ -936,7 +937,7 @@ import { clientKeyAction, createHotkeysSheet, isHotkeySheetRelease, isPlainKey }
 import { EAT_PICK_TEXT, bestFoodIndex, eatChoices, eatTip } from './js/eat-pick.js?v=8fb763d0';
 import { installHeldKeyGuard, isMacPlatform } from './js/held-keys.js?v=98b96620';
 import { signpostArmRows, worldContextAction } from './js/world-context-menu.js?v=f3f48805';
-import { blockedPlayerVerbs, listPlayerTarget, opensPlayerMenu, playerMenuRows } from './js/ui/player-menu.js?v=4c174d02';
+import { blockedPlayerVerbs, listPlayerTarget, opensPlayerMenu, playerMenuRows } from './js/ui/player-menu.js?v=18758b81';
 import { forgetTexture, frameTexture, isFailed, isLoaded, onFailed, onLoaded, textureFromUrl, whenLoaded } from './js/textures.js?v=3149d699';
 import { FALLBACK_MAX as WORLD_ART_FALLBACK_MAX, worldArtFor } from './js/world-art.js?v=df476660';
 import { sceneAnim, syncAnim } from './js/deco-anim.js?v=8c4c784b';
@@ -13551,6 +13552,29 @@ function movementNow() {
 
 function gameplayInputBlocked() {
   return Boolean(
+    avatarHeldByScene() ||
+    isQuestDialogueOpen() ||
+    isVogOpen() ||
+    isRookMuseumExhibitOpen() ||
+    isScreenFxBlocking() ||
+    isPackPopoverOpen() ||
+    isMapOpen() ||
+    // Quests, Make, Badges, Skills, Buffs, Feat and the vendors are side sheets: the avatar still walks (SIDE_SHEET_IDS).
+    isGardenOpen() ||
+    isAvatarOpen() ||
+    isShrineOpen()
+  );
+}
+
+/**
+ * What holds the avatar itself (a scene, a transition, a verb or the menu on a target, Decoration
+ * Mode), as against the cards and panels over the street that only take the keys. Ticket 71: a
+ * follower keeps walking after another player under a card, as Glitch's server-driven follow did
+ * (AvatarView.as 107-119: the follower's own physics stood aside), but not through these.
+ */
+function avatarHeldByScene() {
+  const transition = document.getElementById('screen-transition');
+  return Boolean(
     hogHaulBlocksInput() ||
     fourLetterState?.status === 'staging' ||
     rookWoodsState?.status === 'warning' ||
@@ -13560,21 +13584,44 @@ function gameplayInputBlocked() {
     summersDayTransitionBusy ||
     greedyStreetTransitionBusy ||
     rookHitFx ||
-    isQuestDialogueOpen() ||
-    isVogOpen() ||
-    isRookMuseumExhibitOpen() ||
     menuTarget ||
     currentAction ||
-    isScreenFxBlocking() ||
-    isPackPopoverOpen() ||
-    isMapOpen() ||
-    // Quests, Make, Badges, Skills, Buffs, Feat and the vendors are side sheets: the avatar still walks (SIDE_SHEET_IDS).
-    isGardenOpen() ||
-    isAvatarOpen() ||
-    isShrineOpen() ||
+    (transition && !transition.hidden && transition.classList.contains('is-visible')) ||
     // BUILDER: Decoration Mode holds the avatar (HandOfDecorator stops_avatar_on_focus); the keys scroll the room.
     features.query('homeEditMode', engine) === 'decorate'
   );
+}
+
+/** Ticket 71: the fade-in of a follower put at the trailing spot (movement clock ms, 0 when none). */
+let followPlacedAt = 0;
+const FOLLOW_PLACE_FADE_MS = 260;
+
+/**
+ * Ticket 71: a follower far from its leader (or with the leader off screen) is put at the trailing
+ * spot on the floor there, or at the leader's own spot when that has no floor, and fades in.
+ */
+function placeFollower(place, now) {
+  const near = (x, y) => walkSurfaceY(streetPlatforms, x, y - 2, { up: 48, down: 48 }, isStandable);
+  let x = clamp(Number(place.x) || 0, 24, Math.max(24, WORLD_W - 24));
+  let y = near(x, Number(place.y) || 0);
+  if (!Number.isFinite(y)) {
+    x = clamp(Number(place.leaderX ?? place.x) || 0, 24, Math.max(24, WORLD_W - 24));
+    y = near(x, Number(place.leaderY ?? place.y) || 0);
+  }
+  player.x = x;
+  player.y = Number.isFinite(y) ? y : Number(place.leaderY ?? place.y) || player.y;
+  player.vx = 0;
+  player.vy = 0;
+  player.tripleJumping = false;
+  player.alpha = 0.15;
+  followPlacedAt = now;
+}
+
+function fadeInPlacedFollower(now) {
+  if (!followPlacedAt) return;
+  const k = (now - followPlacedAt) / FOLLOW_PLACE_FADE_MS;
+  player.alpha = k >= 1 ? 1 : 0.15 + 0.85 * Math.max(0, k);
+  if (k >= 1) followPlacedAt = 0;
 }
 
 function publishJumpState(result = null) {
@@ -13599,14 +13646,15 @@ function countPlayerJump() {
   announceAchievementUpdates(applyAchievementProgress(achieveState, 'movement:jumped', 1, pc));
 }
 
-function performPlayerJump(result, baseVelocity, now) {
+function performPlayerJump(result, baseVelocity, now, { counted = true } = {}) {
   player.vy = baseVelocity * result.multiplier;
   player.onGround = false;
   // AvatarPhysicsHandler.as 268 / 437-438: a triple jump rises at up to twice vy_max.
   player.tripleJumping = result.triple === true;
   noteGrounded(jumpState, false, now);
   // G258: jumping costs no energy (no source; players/player.js onPeriodicEnergyLoss is the only drift).
-  countPlayerJump();
+  // Ticket 71: a jump the follow makes is not counted; a Glitch follower sent no jumps of its own (AvatarView.as 119).
+  if (counted) countPlayerJump();
   if (result.triple) {
     playSfx('jump', { volume: 0.58, rate: 1 });
     const boost = result.multiplier.toFixed(2).replace(/0$/, '');
@@ -13671,6 +13719,10 @@ function forgetInteractionFocus() {
 }
 
 function handleInput() {
+  const now = movementNow();
+  fadeInPlacedFollower(now);
+  // Ticket 71: following another player, a card or a panel takes the keys but not the walk.
+  let followUnderCard = false;
   if (gameplayInputBlocked()) {
     // MAPWALK: a menu or a scene that holds the avatar ends a walk you started.
     endUserWalk('held');
@@ -13678,11 +13730,13 @@ function handleInput() {
     // opened (its own keys come back on their next press), as TSMainView.blur's stopAvatar did.
     if (!inputWasBlocked) heldKeys.releaseAll('held');
     inputWasBlocked = true;
-    player.vx = 0;
     clearJumpQueue(jumpState);
-    return;
-  }
-  inputWasBlocked = false;
+    followUnderCard = !avatarHeldByScene() && !climb.active && features.query('followActive', engine) === true;
+    if (!followUnderCard) {
+      player.vx = 0;
+      return;
+    }
+  } else inputWasBlocked = false;
   if (paradiseIsInstanced()) {
     if (paradiseCourseRuntime.owns(paradiseCourse())) {
       paradiseCourseRuntime.input(paradiseCourseHost(), paradiseCourse());
@@ -13696,11 +13750,11 @@ function handleInput() {
   // Ticket 45: no freeze at 0 energy. The client never checked energy to move (AvatarController,
   // PhysicsModel); Pooped and Super Pooped halve walk and jump instead (catalog_buffs.js 1689-1717,
   // hell-feature physics). Energy gates verbs and teleports, not walking.
-  const now = movementNow();
-  let left = keys.has('ArrowLeft') || keys.has('a') || keys.has('A');
-  let right = keys.has('ArrowRight') || keys.has('d') || keys.has('D');
-  const up = keys.has('ArrowUp') || keys.has('w') || keys.has('W');
-  const down = keys.has('ArrowDown') || keys.has('s') || keys.has('S');
+  const keyed = !followUnderCard;
+  let left = keyed && (keys.has('ArrowLeft') || keys.has('a') || keys.has('A'));
+  let right = keyed && (keys.has('ArrowRight') || keys.has('d') || keys.has('D'));
+  const up = keyed && (keys.has('ArrowUp') || keys.has('w') || keys.has('W'));
+  const down = keyed && (keys.has('ArrowDown') || keys.has('s') || keys.has('S'));
   if ((left || right) && (recentInteractionTarget || hoverTarget)) forgetInteractionFocus();
   if (avatarWalk && !climb.active) {
     const steer = avatarWalkSteer(left || right || up || down);
@@ -13786,10 +13840,17 @@ function handleInput() {
   const max = WALK_MAX * movementBuff.speed;
   player.vxMax = max;
   const jumpVelocity = JUMP_SPEED * movementBuff.jump;
+  // Ticket 71: following another player (features/follow-mp-feature.js followSteer) walks here, in
+  // place of coasting, at full speed; before, it set vx after physics and the coast's 0.78 floor
+  // friction held it near 2.6 px a frame against the leader's 4.4.
+  const follow = !left && !right && !up && !down ? features.query('followSteer', engine, { max, now }) : null;
+  if (follow?.place) placeFollower(follow.place, now);
   if (left) {
     player.vx = Math.max(player.vx - accel, -max);
   } else if (right) {
     player.vx = Math.min(player.vx + accel, max);
+  } else if (follow) {
+    player.vx = follow.vx;
   } else if (companionFollowState.active && !up && !down) {
     const followee = localCompanionTarget(companionFollowState.followee);
     player.vx = followee?.sprite && !followee.sprite.destroyed
@@ -13808,6 +13869,11 @@ function handleInput() {
     startClimb(climbHit);
     return;
   }
+  // Ticket 71: the leader took off here; jump too, at the same step of a triple-jump chain.
+  if (follow?.jump) {
+    queueJump(jumpState, now);
+    matchLeaderJumpStep(jumpState, { triple: follow.triple, upgrades: movementBuff.tripleJump > 0 ? pc.imaginationUpgrades : [], now });
+  }
   const jumpResult = resolveQueuedJump(jumpState, {
     now,
     grounded: player.onGround,
@@ -13816,7 +13882,7 @@ function handleInput() {
     maxVelocityX: max,
   });
   if (jumpResult.ok) {
-    performPlayerJump(streetPhysicsTripleJump(movementBuff, jumpResult), jumpVelocity, now);
+    performPlayerJump(streetPhysicsTripleJump(movementBuff, jumpResult), jumpVelocity, now, { counted: !follow?.jump });
   } else {
     streetPhysicsJetpackStroke(movementBuff, jumpVelocity, now);
   }

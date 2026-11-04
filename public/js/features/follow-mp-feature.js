@@ -18,6 +18,14 @@
  *   (the arrow keys, WASD, Space) stops it (AvatarController.as
  *   _endFollowing). The dock shows "Following <name>" with Stop; a leader
  *   sees "Followed by <names>" and a line for each who starts or stops.
+ * - Ticket 71, keeping pace as Glitch's server-driven follow did: game.js
+ *   handleInput asks followSteer for the walk in place of coasting, so the
+ *   follower walks at full speed (up to 1.3x when behind, js/follow-mp.js
+ *   followSpeedLimit), is put at the trailing spot with a short fade when
+ *   1000 px away or the leader has been off screen a moment, keeps walking
+ *   under a card or a dialog (followActive), and jumps where the leader took
+ *   off (the leader's movement samples; a triple jump comes as the wire word
+ *   lift_triple, js/realtime-client.js), taking the same triple-jump step.
  * - Counted from what the server confirmed: Stalker, Non-Creepy Designation
  *   at the third street followed (follow_arrived streets, main.js:1479-1484);
  *   a teleport with followers (follow_teleported: teleportation_self_withfollowers,
@@ -31,7 +39,8 @@
  *
  * QA: canvas data followMpState (idle | asking:<id> | following:<id> |
  * leading:<n>), followMpFollowers (names), followMpStreets, followMpLast (the
- * last line), followMpTrain (chain:on|off); window.groddleFollowMp in
+ * last line), followMpTrain (chain:on|off), followMpJumps (take-offs jumped),
+ * followMpPlaced (times put at the trailing spot); window.groddleFollowMp in
  * multiplayer.
  */
 
@@ -43,15 +52,28 @@ import {
   FOLLOW_TEXT,
   FOLLOW_VERB,
   STALKER_ACHIEVEMENT_ID,
+  FOLLOW_OFFSCREEN_MS,
+  FOLLOW_PLACE_DISTANCE,
+  FOLLOW_TAKEOFF_STEADY,
+  FOLLOW_TRAIL_DISTANCE,
+  clearTakeoffLog,
+  createTakeoffLog,
   endedText,
   followArrival,
-  followVelocity,
+  followSpeedLimit,
+  followSteerVelocity,
   followVerbs,
   isFollowInputKey,
+  leaderGrounded,
+  nextTakeoff,
+  noteLeaderSample,
+  pruneTakeoffs,
   refusedText,
+  takeoffDue,
   teleportCounters,
   teleportKindOf,
-} from '../follow-mp.js?v=7c5cda9a';
+  trailingX,
+} from '../follow-mp.js?v=9f45db20';
 
 export const FOLLOW_MP_FEATURE_ID = 'follow-mp';
 
@@ -82,6 +104,13 @@ function createSession(engine, client) {
   let travelling = null;
   let queued = null;
   let pill = null;
+  /** Ticket 71: the leader's movement samples and take-off points, the off-screen clock, the counts. */
+  const takeoffs = createTakeoffLog();
+  let offscreenSince = 0;
+  let placedAt = -Infinity;
+  let jumps = 0;
+  let placed = 0;
+  const clock = () => globalThis.performance?.now?.() ?? Date.now();
 
   function line(text, toastMs = 0) {
     if (!text) return;
@@ -125,6 +154,8 @@ function createSession(engine, client) {
     engine.setData?.('followMpStreets', String(streets));
     engine.setData?.('followMpLast', last);
     engine.setData?.('followMpTrain', train);
+    engine.setData?.('followMpJumps', String(jumps));
+    engine.setData?.('followMpPlaced', String(placed));
     const p = ensurePill();
     if (!p) return;
     const text = p.querySelector('[data-follow-pill-text]');
@@ -215,6 +246,8 @@ function createSession(engine, client) {
     closeWaiting();
     following = { id: Number(msg?.id) || 0, name: String(msg?.name || 'them') };
     streets = Math.max(1, Number(msg?.streets) || 1);
+    clearTakeoffLog(takeoffs, String(engine.streetTsid || ''));
+    offscreenSince = 0;
     line(FOLLOW_TEXT.started(following.name), 2800);
   });
   client.on('msg:follow_list', (msg) => {
@@ -228,8 +261,16 @@ function createSession(engine, client) {
     else if (removed && before.has(removed)) line(FOLLOW_TEXT.unfollowedBy(before.get(removed)));
     else publish();
   });
+  // The leader's movement as it comes (realtime-client 'moved'): where they took off.
+  client.on('moved', (p) => {
+    if (!following || Number(p?.id) !== following.id) return;
+    const street = String(engine.streetTsid || '');
+    if (takeoffs.street !== street) clearTakeoffLog(takeoffs, street);
+    noteLeaderSample(takeoffs, { x: p.x, y: p.y, dir: p.dir, anim: p.anim, triple: p.triple === true, t: clock() });
+  });
   client.on('msg:follow_ended', (msg) => {
     const name = String(msg?.name || following?.name || 'them');
+    clearTakeoffLog(takeoffs);
     following = null;
     travelling = null;
     queued = null;
@@ -348,13 +389,72 @@ function createSession(engine, client) {
     },
     tick() {
       if (!pill?.isConnected) publish();
-      if (!following || following.stopping || travelling) return;
-      const player = engine.player;
-      const leader = globalThis.groddleRealtime?.remotes?.get?.(following.id)?.root;
-      if (!player || !leader || leader.destroyed || engine.acting?.()) return;
-      player.vx = followVelocity(player.x, leader.x, player.vx, player.vxMax || 4.4);
     },
+    /** game.js handleInput: the follow walks the avatar now (also under a card). */
+    get active() {
+      return Boolean(following && !following.stopping && !travelling && leaderSprite());
+    },
+    steer,
   };
+
+  function leaderSprite() {
+    const root = following ? globalThis.groddleRealtime?.remotes?.get?.(following.id)?.root : null;
+    return root && !root.destroyed ? root : null;
+  }
+
+  function onScreen(x, y) {
+    const cam = engine.camera;
+    if (!cam || !Number.isFinite(cam.w) || !Number.isFinite(cam.h)) return true;
+    const m = 40;
+    return x >= cam.x - m && x <= cam.x + cam.w + m && y >= cam.y - m && y <= cam.y + cam.h + m;
+  }
+
+  /**
+   * Ticket 71: this frame's follow for game.js handleInput, in place of
+   * coasting ({ vx, jump, triple, place }), or null when not following.
+   * `max` is the walk speed with buffs, `now` the movement clock.
+   */
+  function steer({ max = 4.4, now = clock() } = {}) {
+    if (!following || following.stopping || travelling) return null;
+    const player = engine.player;
+    const leader = leaderSprite();
+    if (!player || !leader || engine.acting?.()) return null;
+    const street = String(engine.streetTsid || '');
+    if (takeoffs.street !== street) clearTakeoffLog(takeoffs, street);
+    const last = takeoffs.last;
+    const grounded = last ? leaderGrounded(last.anim) : true;
+    // Lost: far away, or the leader off screen a moment; put at the trailing spot once they stand.
+    const far = Math.hypot(leader.x - player.x, leader.y - player.y) > FOLLOW_PLACE_DISTANCE;
+    if (onScreen(leader.x, leader.y)) offscreenSince = 0;
+    else if (!offscreenSince) offscreenSince = now;
+    const lost = far || (offscreenSince && now - offscreenSince >= FOLLOW_OFFSCREEN_MS);
+    if (lost && grounded && now - placedAt > 1500) {
+      placedAt = now;
+      offscreenSince = 0;
+      placed += 1;
+      clearTakeoffLog(takeoffs, street);
+      const dir = last ? last.dir : (leader.x >= player.x ? 1 : -1);
+      publish();
+      return { vx: 0, jump: false, triple: false, place: { x: leader.x - dir * FOLLOW_TRAIL_DISTANCE, y: leader.y, leaderX: leader.x, leaderY: leader.y } };
+    }
+    pruneTakeoffs(takeoffs, player.x, now);
+    const next = nextTakeoff(takeoffs);
+    const gap = Math.abs(leader.x - player.x);
+    let target = trailingX(player.x, leader.x);
+    // The leader stopped just past where they took off: walk on to it, so the jump still comes.
+    if (next && (leader.x - next.x) * next.dir > 0 && (target - next.x) * next.dir < 24) target = next.x + next.dir * 24;
+    // No catch-up in the air or just before a take-off: the jump starts at the leader's walk.
+    const steady = !player.onGround || (next && (next.x - player.x) * next.dir >= 0 && Math.abs(next.x - player.x) < FOLLOW_TAKEOFF_STEADY);
+    const limit = steady ? max : followSpeedLimit(gap, max);
+    const vx = followSteerVelocity(player.x, target, player.vx, limit);
+    if (next && takeoffDue(next, { x: player.x, y: player.y, vx, onGround: player.onGround })) {
+      takeoffs.points.shift();
+      jumps += 1;
+      publish();
+      return { vx, jump: true, triple: next.triple, place: null };
+    }
+    return { vx, jump: false, triple: false, place: null };
+  }
 }
 
 function ensure(engine) {
@@ -371,6 +471,18 @@ export const followMpFeature = {
   onTick(dtMs, now, engine) {
     if (engine.mode !== 'multiplayer' || !engine.started) return;
     ensure(engine)?.tick();
+  },
+
+  /** Ticket 71: game.js handleInput keeps walking a follower under a card (true), else null. */
+  followActive(engine) {
+    if (engine?.mode !== 'multiplayer' || !session) return null;
+    return session.active ? true : null;
+  },
+
+  /** Ticket 71: the follow's walk, jump and placing for game.js handleInput (follow-mp.js followSteer). */
+  followSteer(engine, ctx = {}) {
+    if (engine?.mode !== 'multiplayer' || !session) return null;
+    return session.steer(ctx);
   },
 
   onEvent(counter, amount, engine) {

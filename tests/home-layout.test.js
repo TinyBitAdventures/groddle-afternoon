@@ -21,7 +21,7 @@ import {
 import { walkHomeScene } from '../public/js/home-layout-scene.js?v=d23170a5';
 import { AVATAR_STILL, homeKeyOf } from '../public/js/profiles.js?v=86423d98';
 import { HIRES_SPRITES, SPLIT_SPRITES } from '../public/js/sprite-hires.js?v=96c22af7';
-import { HOUSE_STYLE_KEYS } from '../public/js/features/homes-feature.js?v=cf52d2f9';
+import { HOUSE_STYLE_KEYS } from '../public/js/features/homes-feature.js?v=3cd41c2d';
 import { SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');

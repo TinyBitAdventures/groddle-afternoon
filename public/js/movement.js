@@ -118,6 +118,25 @@ export function scaledTripleJumpMultiplier(rawMultiplier, upgradeMultiplier) {
 }
 
 /**
+ * Ticket 71: a follower's jump (js/features/follow-mp-feature.js) takes the
+ * leader's step in a triple-jump chain: the leader's triple jump is the
+ * follower's third (when the follower has a Triple Jump upgrade), and a plain
+ * jump never turns into the follower's third. Mutates the jump state before
+ * the queued jump resolves.
+ */
+export function matchLeaderJumpStep(state, { triple = false, upgrades = [], now = 0 } = {}) {
+  if (!state) return state;
+  if (triple && tripleJumpProfile(upgrades)) {
+    state.chainCount = Math.max(2, Number(state.chainCount) || 0);
+    state.chainDeadline = Math.max(Number(state.chainDeadline) || 0, now + TRIPLE_JUMP_WINDOW_MS);
+  } else if ((Number(state.chainCount) || 0) >= 2) {
+    state.chainCount = 0;
+    state.chainDeadline = 0;
+  }
+  return state;
+}
+
+/**
  * Consume a buffered request when a floor, coyote or first-air jump is
  * possible. The official boost is a third quick jump from the floor, not an
  * air jump.

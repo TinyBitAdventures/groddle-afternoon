@@ -28,8 +28,8 @@ import {
   refusedText,
   teleportCounters,
   teleportKindOf,
-} from '../public/js/follow-mp.js?v=7c5cda9a';
-import { followMpFeature } from '../public/js/features/follow-mp-feature.js?v=237cb006';
+} from '../public/js/follow-mp.js?v=9f45db20';
+import { followMpFeature } from '../public/js/features/follow-mp-feature.js?v=eba68b74';
 import { COMPANION_FOLLOW_TRAIL_DISTANCE } from '../public/js/local-companions.js?v=188f756c';
 import { loadContentCatalogsFromDir, getQuestCatalog, getAchievementCatalog } from '../public/js/content-catalogs.js?v=10b118dd';
 import { createQuestState } from '../public/js/quests.js?v=282e1621';
@@ -246,7 +246,9 @@ describe('G334 follow: the world side, from the server', () => {
     engine.remotes.set(2, { root: { x: 600, destroyed: false } });
     globalThis.groddleRealtime = { remotes: engine.remotes };
     followMpFeature.onTick(16, Date.now(), engine);
-    assert.ok(engine.player.vx > 0, 'walks toward the leader');
+    // Ticket 71: game.js handleInput takes the walk from followSteer, in place of coasting.
+    assert.ok(followMpFeature.followSteer(engine, { max: 4.4 }).vx > 0, 'walks toward the leader');
+    assert.equal(followMpFeature.followActive(engine), true);
     const verbs = followMpFeature.verbOverride({ classId: 'pc_remote', playerId: 2, label: 'Bo' }, engine);
     assert.ok(verbs.some((v) => v.id === FOLLOW_STOP_VERB));
     client.msg({ t: 'follow_go', id: 2, name: 'Bo', street: 'GA5B', x: 300, y: -80, dir: 1, via: 'walk' });
@@ -270,9 +272,8 @@ describe('G334 follow: the world side, from the server', () => {
   it('stops on any input and reads the server line', () => {
     press('ArrowLeft');
     assert.deepEqual(client.sent.at(-1), ['follow_stop', {}]);
-    const vx = (engine.player.vx = 0);
-    followMpFeature.onTick(16, Date.now(), engine);
-    assert.equal(engine.player.vx, vx, 'the walk stopped at once');
+    assert.equal(followMpFeature.followSteer(engine, { max: 4.4 }), null, 'the walk stopped at once');
+    assert.equal(followMpFeature.followActive(engine), null);
     client.msg({ t: 'follow_ended', id: 2, name: 'Bo', why: 'stopped' });
     assert.equal(engine.log.activity.at(-1), 'You stopped following Bo.');
     assert.equal(engine.log.data.followMpState, 'idle');

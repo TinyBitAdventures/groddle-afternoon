@@ -51,11 +51,14 @@ export const EMOTES = Object.freeze(['happy', 'surprise', 'angry']);
 /**
  * Avatar sheet states travel as the server's anim words (lower case, digits
  * and _, at most 24). Every state avatar-anims.js avatarAnimState returns is
- * already one except climbPause.
+ * already one except climbPause. liftTriple is the rise of a triple jump
+ * (ticket 71: a follower takes the same triple-jump step); it is drawn as lift.
  */
-const ANIM_WORDS = Object.freeze({ climbPause: 'climb_pause' });
+const ANIM_WORDS = Object.freeze({ climbPause: 'climb_pause', liftTriple: 'lift_triple' });
 const ANIM_STATES = Object.freeze(Object.fromEntries(Object.entries(ANIM_WORDS).map(([s, w]) => [w, s])));
-const KNOWN_STATES = new Set(['stand', 'idle0', 'idle1', 'idle2', 'idle3', 'idle4', 'afk', 'wake', 'walk1x', 'walk2x', 'climb', 'climbPause', 'lift', 'fall', 'land', 'hit1', 'hit2', 'happy', 'surprise', 'angry']);
+const KNOWN_STATES = new Set(['stand', 'idle0', 'idle1', 'idle2', 'idle3', 'idle4', 'afk', 'wake', 'walk1x', 'walk2x', 'climb', 'climbPause', 'lift', 'liftTriple', 'fall', 'land', 'hit1', 'hit2', 'happy', 'surprise', 'angry']);
+/** The wire word of a triple jump's rise. */
+export const TRIPLE_LIFT_WORD = ANIM_WORDS.liftTriple;
 
 /** The wire word for an avatar state (unknown states stand). */
 export function encodeAnim(state) {
@@ -63,9 +66,10 @@ export function encodeAnim(state) {
   return ANIM_WORDS[s] || s;
 }
 
-/** The avatar state a wire word names (unknown words stand). */
+/** The avatar state a wire word names (unknown words stand; a triple jump's rise is lift). */
 export function decodeAnim(word) {
   const s = ANIM_STATES[word] || word;
+  if (s === 'liftTriple') return 'lift';
   return KNOWN_STATES.has(s) ? s : 'stand';
 }
 
@@ -342,6 +346,9 @@ export function createRealtimeClient({
         p.y = Number(msg.y) || 0;
         p.dir = msg.dir < 0 ? -1 : 1;
         p.anim = decodeAnim(msg.anim);
+        // Ticket 71: a triple jump's rise (a follower takes the same step).
+        if (msg.anim === TRIPLE_LIFT_WORD) p.triple = true;
+        else delete p.triple;
         emit('moved', p);
         return;
       }

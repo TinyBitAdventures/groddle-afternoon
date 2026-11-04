@@ -88,7 +88,7 @@ import {
   stationScreen,
   stepRide,
   ticketOffer,
-} from '../subway.js?v=5719ffc3';
+} from '../subway.js?v=44d1a09f';
 import { BOARD_ANSWER_MS, SUBWAY_MP_TEXT, applyTrain, riderChanges, trainOf } from '../subway-mp.js?v=ffd57d82';
 
 export const SUBWAY_FEATURE_ID = 'subway';

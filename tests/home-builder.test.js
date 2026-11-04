@@ -238,8 +238,11 @@ describe('drags go through the existing rules', () => {
 
   it('holds the avatar while decorating and lets the builder buttons take Enter and Space', () => {
     const game = read('public/game.js');
-    const blocked = game.slice(game.indexOf('function gameplayInputBlocked() {'));
-    assert.match(blocked.slice(0, 1400), /features\.query\('homeEditMode', engine\) === 'decorate'/);
+    const blocked = game.slice(game.indexOf('function gameplayInputBlocked() {'), game.indexOf('function avatarHeldByScene() {'));
+    assert.match(blocked, /avatarHeldByScene\(\) \|\|/);
+    // Ticket 71: it holds the avatar itself, so a follow does not walk through it either.
+    const held = game.slice(game.indexOf('function avatarHeldByScene() {'));
+    assert.match(held.slice(0, 1400), /features\.query\('homeEditMode', engine\) === 'decorate'/);
     const fdb = game.slice(game.indexOf('function focusedDialogButton() {'));
     assert.match(fdb.slice(0, 700), /#pack-bar, #homes-bar, #homes-pop, #homes-place'/);
   });

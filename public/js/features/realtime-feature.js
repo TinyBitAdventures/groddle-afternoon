@@ -57,7 +57,7 @@
  */
 
 import { createMinnAccount } from '../minn-account.js?v=eb300264';
-import { EMOTES, createRealtimeClient, createTrack, pushSample, sampleTrack } from '../realtime-client.js?v=f19c76a1';
+import { EMOTES, createRealtimeClient, createTrack, pushSample, sampleTrack } from '../realtime-client.js?v=d890c210';
 import { ANIM_FPS, EMOTION_MS, animForState, crowdScaleX } from '../avatar-anims.js?v=fb921bf4';
 import { movedLine } from '../admin-teleport.js?v=fa56e8df';
 import { ADMIN_TEXT, applyAdminGive, applyAdminRefill, showAdminMessage, showBooted } from '../admin-console-mp.js?v=a2441515';
@@ -139,11 +139,13 @@ export function emoteCommand(text) {
 
 /** Where the player's Glitch stands, as the server takes it. */
 export function poseOf(player) {
+  const anim = player?.glitchState || 'stand';
   return {
     x: Number(player?.x) || 0,
     y: Number(player?.y) || 0,
     dir: player?.facing === 'left' ? -1 : 1,
-    anim: player?.glitchState || 'stand',
+    // Ticket 71: a triple jump's rise goes as its own word, so a follower takes the same step.
+    anim: anim === 'lift' && player?.tripleJumping === true ? 'liftTriple' : anim,
   };
 }
 
