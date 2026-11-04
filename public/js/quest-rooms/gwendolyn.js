@@ -340,11 +340,12 @@ export function chamberLayout(kit) {
     FLOOR,
     platforms: [kit.plat(0, FLOOR, W, FLOOR, 'invisible', { id: 'gc_floor' })],
     spawn: { x: 300, y: FLOOR },
-    gwen: { x: 820, y: FLOOR - 6 },
+    // She floats a little over the floor in both screenshots of her rooms (hover is drawn only).
+    gwen: { x: 820, y: FLOOR - 6, hover: 34 },
     exit: { x: 110, y: FLOOR },
     trees: [
-      { x: 120, h: 470, s: 1.0 }, { x: 470, h: 360, s: 0.75 }, { x: 640, h: 520, s: 1.1 }, { x: 1060, h: 430, s: 0.9 },
-      { x: 1300, h: 540, s: 1.15 }, { x: 1560, h: 380, s: 0.8 },
+      { x: 120, h: 470, s: 1.0 }, { x: 330, h: 330, s: 0.8, kind: 'stalk' }, { x: 470, h: 360, s: 0.75 }, { x: 640, h: 520, s: 1.1 },
+      { x: 1060, h: 430, s: 0.9 }, { x: 1180, h: 300, s: 0.75, kind: 'stalk' }, { x: 1300, h: 540, s: 1.15 }, { x: 1560, h: 380, s: 0.8 },
     ],
   };
 }
@@ -1373,27 +1374,74 @@ function tickInner(ctx, dtMs, now) {
 /* Gwendolyn's Chamber                                                  */
 /* ------------------------------------------------------------------ */
 
-function drawGroveTree(PIXI, x, floor, h, s, shade) {
+/**
+ * A grey ball-branched tree of the Chamber, as a player's screenshot of the
+ * room shows it (covertelephants, 2013-08-28, reference only): a thick trunk,
+ * curved boughs ending in big discs, each disc a dark rim round a lighter
+ * centre, and small beads on short twigs up the boughs. `kind` 'stalk' is the
+ * thin beaded stem that grows between the trees.
+ */
+function drawGroveTree(PIXI, x, floor, h, s, shade, kind = 'tree') {
   const g = new PIXI.Graphics();
-  const trunk = shade.trunk;
-  g.moveTo(x, floor).bezierCurveTo(x - 8 * s, floor - h * 0.4, x + 10 * s, floor - h * 0.7, x, floor - h);
-  const branches = [[-1, 0.45, 0.7], [1, 0.55, 0.6], [-1, 0.72, 0.5], [1, 0.82, 0.45]];
-  g.stroke({ width: 14 * s, color: trunk, cap: 'round' });
+  const ball = (bx, by, r) => {
+    g.circle(bx, by, r).fill(shade.leaf);
+    g.circle(bx + r * 0.08, by + r * 0.06, r * 0.7).fill(shade.edge);
+  };
+  if (kind === 'stalk') {
+    g.moveTo(x, floor).bezierCurveTo(x - 6 * s, floor - h * 0.4, x + 6 * s, floor - h * 0.75, x, floor - h);
+    g.stroke({ width: 5 * s, color: shade.trunk, cap: 'round' });
+    const beads = [];
+    for (let i = 0; i < 9; i++) {
+      const at = 0.2 + i * 0.09;
+      const dir = i % 2 ? 1 : -1;
+      const by = floor - h * at;
+      const ex = x + dir * (16 + (i % 3) * 5) * s;
+      g.moveTo(x, by).quadraticCurveTo(x + dir * 8 * s, by - 4 * s, ex, by - 10 * s);
+      beads.push([ex, by - 10 * s, (9 - i * 0.35) * s]);
+    }
+    g.stroke({ width: 3 * s, color: shade.trunk, cap: 'round' });
+    for (const [bx, by, r] of beads) ball(bx, by, r);
+    ball(x, floor - h - 6 * s, 11 * s);
+    return g;
+  }
+  g.moveTo(x, floor).bezierCurveTo(x - 10 * s, floor - h * 0.4, x + 12 * s, floor - h * 0.7, x, floor - h);
+  g.stroke({ width: 26 * s, color: shade.trunk, cap: 'round' });
+  const boughs = [[-1, 0.42, 0.75], [1, 0.52, 0.7], [-1, 0.7, 0.55], [1, 0.8, 0.5]];
   const ends = [];
-  for (const [dir, at, len] of branches) {
+  const beads = [];
+  for (const [dir, at, len] of boughs) {
     const by = floor - h * at;
-    const ex = x + dir * h * 0.32 * len;
-    const ey = by - h * 0.18 * len;
-    g.moveTo(x, by).quadraticCurveTo(x + dir * h * 0.12, by - 10, ex, ey);
+    const ex = x + dir * h * 0.36 * len;
+    const ey = by - h * 0.22 * len;
+    g.moveTo(x, by).quadraticCurveTo(x + dir * h * 0.2 * len, by - 4, ex, ey);
     ends.push([ex, ey]);
+    // Two beads on short twigs along the bough.
+    for (const t of [0.4, 0.7]) {
+      const tx = x + (ex - x) * t;
+      const ty = by + (ey - by) * t * t - 6 * s;
+      beads.push([tx, ty - 16 * s, 9 * s]);
+      g.moveTo(tx, ty).lineTo(tx, ty - 12 * s);
+    }
   }
-  ends.push([x, floor - h]);
-  g.stroke({ width: 6 * s, color: trunk, cap: 'round' });
-  for (const [i, [ex, ey]] of ends.entries()) {
-    const r = (i === ends.length - 1 ? 34 : 24) * s;
-    g.circle(ex, ey - r * 0.6, r).fill(shade.leaf);
-    g.circle(ex, ey - r * 0.6, r * 0.62).stroke({ width: 3 * s, color: shade.edge, alpha: 0.9 });
+  g.stroke({ width: 10 * s, color: shade.trunk, cap: 'round' });
+  for (const [bx, by, r] of beads) ball(bx, by, r);
+  for (const [ex, ey] of ends) ball(ex, ey - 26 * s, 30 * s);
+  ball(x, floor - h - 34 * s, 42 * s);
+  return g;
+}
+
+/** The tiny beaded sprigs at the Chamber's foot (the same screenshot). */
+function drawGroveSprig(PIXI, x, floor, s, color) {
+  const g = new PIXI.Graphics();
+  const h = 46 * s;
+  g.moveTo(x, floor).lineTo(x, floor - h).stroke({ width: 2 * s, color, cap: 'round' });
+  for (let i = 0; i < 6; i++) {
+    const dir = i % 2 ? 1 : -1;
+    const by = floor - h * (0.25 + i * 0.13);
+    g.moveTo(x, by).lineTo(x + dir * 6 * s, by - 5 * s).stroke({ width: 1.5 * s, color, cap: 'round' });
+    g.circle(x + dir * 6 * s, by - 6 * s, 2.6 * s).fill(color);
   }
+  g.circle(x, floor - h - 3 * s, 3 * s).fill(color);
   return g;
 }
 
@@ -1404,16 +1452,20 @@ function buildChamber(ctx) {
   const back = root.layer(0, 0);
   back.addChild(kit.gradient(PIXI, [[0, '#030504'], [0.7, '#0a0e0c'], [1, '#111613']], 960, 640));
   const far = root.layer(0.5, 1);
-  for (let i = 0; i < 7; i++) far.addChild(drawGroveTree(PIXI, 80 + i * 210, 700, 300 + (i % 3) * 60, 0.7, { trunk: 0x1b201e, leaf: 0x171c1a, edge: 0x252b28 }));
+  const farShade = { trunk: 0x151a18, leaf: 0x131816, edge: 0x1b2220 };
+  for (let i = 0; i < 7; i++) far.addChild(drawGroveTree(PIXI, 80 + i * 210, 700, 300 + (i % 3) * 60, 0.7, farShade, i % 2 ? 'stalk' : 'tree'));
   const world = root.layer(1, 2);
-  for (const t of L.trees) world.addChild(drawGroveTree(PIXI, t.x, L.FLOOR, t.h, t.s, { trunk: 0x3a413e, leaf: 0x2b312f, edge: 0x59625e }));
+  const shade = { trunk: 0x2b3431, leaf: 0x29322f, edge: 0x3d4b47 };
+  for (const t of L.trees) world.addChild(drawGroveTree(PIXI, t.x, L.FLOOR, t.h, t.s, shade, t.kind));
+  // The floor is the dark itself; only the sprigs mark it.
   const ground = new PIXI.Graphics();
-  ground.rect(0, L.FLOOR, L.W, 120).fill(0x070908);
-  for (let x = 30; x < L.W; x += 46) {
-    const k = kit.hash01(`g${x}`);
-    ground.ellipse(x + k * 20, L.FLOOR + 2, 16 + k * 10, 5).fill(0x1f2623);
-  }
+  ground.rect(0, L.FLOOR, L.W, 120).fill(0x030404);
   world.addChild(ground);
+  for (let x = 40; x < L.W; x += 70) {
+    const k = kit.hash01(`g${x}`);
+    if (k < 0.45) continue;
+    world.addChild(drawGroveSprig(PIXI, x + k * 30, L.FLOOR + 4, 0.7 + k * 0.6, 0x2c4f46));
+  }
   // A soft light where you came in (gwendolyn_chamber_exit).
   const exitGlow = new PIXI.Graphics();
   for (let i = 5; i >= 1; i--) exitGlow.ellipse(L.exit.x, L.FLOOR - 70, 26 + i * 12, 70 + i * 10).fill({ color: 0xcfe9e4, alpha: 0.05 * (6 - i) });
@@ -1433,14 +1485,15 @@ function enterChamber(ctx) {
   const L = chamberLayout(ctx.kit);
   ctx.data.chamber = L;
   const glow = new PIXI.Graphics();
-  for (let i = 6; i >= 1; i--) glow.circle(0, -90, 40 + i * 22).fill({ color: 0xa9f0ff, alpha: 0.035 * (7 - i) });
+  // A close, soft glow round her (the screenshots show no wide halo).
+  for (let i = 5; i >= 1; i--) glow.ellipse(0, -90, 34 + i * 9, 70 + i * 10).fill({ color: 0xa9f0ff, alpha: 0.03 * (6 - i) });
   glow.x = L.gwen.x;
-  glow.y = L.gwen.y;
+  glow.y = L.gwen.y - L.gwen.hover;
   ctx.add(glow, 38);
   ctx.data.gwenGlow = glow;
   const gwen = makeActor(ctx, 'gwendolyn', SHEETS.gwendolyn, [56 / 116, 171 / 191], 0.4);
   gwen.c.x = L.gwen.x;
-  gwen.c.y = L.gwen.y;
+  gwen.c.y = L.gwen.y - L.gwen.hover;
   ctx.add(gwen.c, 40);
   playActor(gwen, 'idle');
   gwen.target = ctx.register({ classId: 'npc_gwendolyn', label: 'Ghost of Gwendolyn', subtitle: 'Speak. With words', sprite: gwen.c });
@@ -1486,7 +1539,7 @@ function tickChamber(ctx, dtMs, now) {
   const p = ctx.player;
   if (!p || !L) return;
   if (d.gwenGlow && !d.gwenGlow.destroyed) d.gwenGlow.alpha = 0.8 + Math.sin(now / 900) * 0.2;
-  if (d.gwen && !d.gwen.c.destroyed) d.gwen.c.y = L.gwen.y + Math.sin(now / 1100) * 4;
+  if (d.gwen && !d.gwen.c.destroyed) d.gwen.c.y = L.gwen.y - L.gwen.hover + Math.sin(now / 1100) * 4;
   if (!free(ctx)) return;
   const ready = ctx.quest(PART3).active() || ctx.quest(PART3_REPEAT).active();
   if (ready && !d.talking && Math.abs(p.x - L.gwen.x) < HIT_HALF && now > (d.talkCooldownAt || 0)) {

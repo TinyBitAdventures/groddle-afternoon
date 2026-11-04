@@ -47,7 +47,7 @@ import {
   visibleDoors,
 } from '../doors.js?v=eb9510b1';
 import { isLoaded, onLoaded, textureFromUrl } from '../textures.js?v=3149d699';
-import { doorLockArt } from '../door-lock-art.js?v=ccb7b6a1';
+import { doorLockArt } from '../door-lock-art.js?v=e656851c';
 import { doorSaleArt } from '../door-sign-art.js?v=69daffff';
 
 export const DOORS_FEATURE_ID = 'doors';
@@ -137,8 +137,11 @@ function buildView(engine, door, available) {
   // `src`: art rendered at the door's own size (Jethimadh Room 16's mouth, tools/room-art), over the deco.
   const hasArt = Boolean(door.src) || (door.sprite && available.has(door.sprite));
   // A locked door shows only its key's keyhole (the deco's showLock(key_id), DoorView.as 243-244);
-  // the plain deco has all twelve stacked (tools/deco-pipeline/door-locks.py).
-  const lockArt = !door.src && hasArt && door.key_id ? doorLockArt(door.sprite, door.key_id) : null;
+  // any other door of a lock deco shows neither chains nor keyholes (hideLock(), 245-247: the
+  // Russula Involutii cliff door to Distant End). The plain deco has them all stacked
+  // (tools/deco-pipeline/door-locks.py; key 0 is the unlocked file).
+  const lockKey = door.key_id && door.is_locked !== false ? door.key_id : 0;
+  const lockArt = !door.src && hasArt ? doorLockArt(door.sprite, lockKey) : null;
   // A house shows its For Sale sign only while it is for sale (the deco's `sign`, DoorView.as
   // 228-232); the plain house decos have none (tools/deco-pipeline/door-signs.py).
   const saleArt = !door.src && !lockArt && hasArt && door.for_sale ? doorSaleArt(door.sprite) : null;

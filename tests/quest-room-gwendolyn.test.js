@@ -48,7 +48,7 @@ import {
   room,
   stageForQuest,
   thirdPartFor,
-} from '../public/js/quest-rooms/gwendolyn.js?v=32aee63f';
+} from '../public/js/quest-rooms/gwendolyn.js?v=b9f337b6';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const pub = (p) => join(root, 'public', p);
@@ -343,6 +343,12 @@ describe("Gwendolyn's Chamber", () => {
     assert.ok(d > HIT_HALF && d < 700, `distance ${d}`);
     assert.ok(L.exit.x < L.spawn.x);
     assert.ok(L.FLOOR - L.gwen.y < 20, 'she stands on the floor (within the visible band)');
+  });
+
+  it('draws her floating a little over the floor, among ball trees and beaded stalks (hunt rounds 6-7 screenshot)', () => {
+    assert.ok(L.gwen.hover > 0 && L.gwen.hover < 60, `hover ${L.gwen.hover}`);
+    assert.ok(L.trees.some((t) => t.kind === 'stalk'));
+    assert.ok(L.trees.filter((t) => !t.kind).length >= 5);
   });
 });
 

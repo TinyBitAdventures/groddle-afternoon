@@ -33,7 +33,7 @@
  *   door_asset_elevator_door for the lift (the way out), Teleporter_Base and
  *   Teleporter_Beam, the Alakol snow set (snow_skirt_01b_al1, snow_rubble_*,
  *   snow_cap_01b_al1, snow_pinecluster_01a_al1), snow patches,
- *   hanging_clothes_line and hanging_clothes_1/3/4, deco_chair_wooden_ghtest,
+ *   hanging_clothes_line and hanging_clothes_3/6/5, deco_chair_wooden_ghtest,
  *   deco_stool_wooden_ghtest, juju_grandma_campfire_01a_al1 and
  *   juju_grandma_papers. The green mat is left out (rug_green, the only green
  *   rug, reads as a hole from the side). The hall doors are art (no apartments behind them
@@ -306,8 +306,10 @@ function snowedInCampDecos() {
   return [
     deco('hanging_clothes_line', 1155, -405, 430, 18, z++, { id: 'clothesline' }),
     deco('hanging_clothes_3', 1066, -300, 62, 110, z++),
-    deco('hanging_clothes_1', 1150, -322, 52, 78, z++),
-    deco('hanging_clothes_4', 1214, -350, 52, 40, z++),
+    // A closer player shot (covertelephants, 2013-07-22, reference only): a green shirt, pink
+    // trousers and a small grey vest on the line.
+    deco('hanging_clothes_6', 1150, -328, 54, 72, z++),
+    deco('hanging_clothes_5', 1214, -342, 34, 60, z++),
     deco('deco_chair_wooden_ghtest', 1128, -122, 62, 76, z++),
     deco('juju_grandma_papers_01c_al1', 1172, -112, 54, 18, z++),
   ];

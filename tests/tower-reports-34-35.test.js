@@ -14,7 +14,7 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { DOOR_LOCK_ART, doorLockArt } from '../public/js/door-lock-art.js?v=ccb7b6a1';
+import { DOOR_LOCK_ART, doorLockArt } from '../public/js/door-lock-art.js?v=e656851c';
 import { navigableSignposts } from '../public/js/street-model.js?v=505d8990';
 import { applyStreetIndex, loadStreetDataFromFs } from '../public/js/street-loader.js?v=33d2b8bc';
 import { TOWERS, TOWER_FLOORS, TOWER_NEAR_BASE, TOWER_STANDABLE, towerFloorLayout, towerPropPlatforms, towerProps } from '../public/js/tower-floors.js?v=3d1ad8b7';
@@ -40,14 +40,26 @@ describe('report 34: a lock shows its own key', () => {
     for (const f of readdirSync(streetsDir)) {
       if (!f.endsWith('.json') || f === 'index.json') continue;
       for (const d of JSON.parse(readFileSync(join(streetsDir, f), 'utf8')).doors || []) {
-        if (!d.key_id || !d.sprite || plan.skipped[d.sprite]) continue;
-        want.add(`${d.sprite}__key${d.key_id}@1.5x.webp`);
-        assert.ok(doorLockArt(d.sprite, d.key_id), `${f} ${d.id}`);
+        if (!d.sprite || plan.skipped[d.sprite]) continue;
+        // An unlocked door of a lock deco: key 0, chains and keyholes hidden (hideLock()).
+        const k = d.key_id && d.is_locked !== false ? d.key_id : d.sprite.endsWith('_lock') ? 0 : null;
+        if (k === null) continue;
+        want.add(`${d.sprite}__key${k}@1.5x.webp`);
+        assert.ok(doorLockArt(d.sprite, k), `${f} ${d.id}`);
       }
     }
     const shipped = new Set(readdirSync(join(pub, 'assets/decos/door-locks')));
     assert.deepEqual([...shipped].sort(), [...want].sort());
     assert.equal(Object.values(DOOR_LOCK_ART).flat().length, want.size);
+  });
+
+  it('an unlocked lock door hides its chains and keyholes (DoorView.as 245-247 hideLock)', () => {
+    const door = street('GIFGKHHCIE33LTF').doors.find((d) => d.id === 'door_1352924833378');
+    assert.equal(door.connect.label, 'Distant End');
+    assert.equal(door.key_id, 0);
+    const file = doorLockArt(door.sprite, 0);
+    assert.equal(file, 'assets/decos/door-locks/door_asset_heights_door_lock__key0@1.5x.webp');
+    assert.ok(existsSync(join(pub, file)));
   });
 
   it('a door with no key, or a key with no file, keeps the plain deco', () => {
@@ -58,7 +70,7 @@ describe('report 34: a lock shows its own key', () => {
 
   it('the doors feature draws a locked door from its key\'s file', () => {
     const src = readFileSync(join(pub, 'js/features/doors-feature.js'), 'utf8');
-    assert.match(src, /doorLockArt\(door\.sprite, door\.key_id\)/);
+    assert.match(src, /doorLockArt\(door\.sprite, lockKey\)/);
   });
 });
 

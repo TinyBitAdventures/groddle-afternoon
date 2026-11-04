@@ -172,7 +172,7 @@ const ROOM_MODULES = {
   light_perspective: () => import('../quest-rooms/light-perspective.js?v=d293d41d'),
   tile_puzzle: () => import('../quest-rooms/tile-puzzle.js?v=987b6276'),
   operation_grow: () => import('../quest-rooms/operation-grow.js?v=4995f335'),
-  gwendolyn: () => import('../quest-rooms/gwendolyn.js?v=32aee63f'),
+  gwendolyn: () => import('../quest-rooms/gwendolyn.js?v=b9f337b6'),
   mental_block: () => import('../quest-rooms/mental-block.js?v=1ca9ab8c'),
   penalty: () => import('../quest-rooms/penalty.js?v=30f2e8b7'),
   esquibeth: () => import('../quest-rooms/esquibeth.js?v=22da8016'),

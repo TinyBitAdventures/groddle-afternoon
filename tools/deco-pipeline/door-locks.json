@@ -58,6 +58,17 @@
    }
   },
   "door_asset_heights_door_lock": {
+   "0": {
+    "bytes": 105196,
+    "err": 2.44,
+    "lossless": false,
+    "sha": "30026b4352c1f7c0",
+    "size": [
+     549,
+     525
+    ],
+    "swf_sha": "1a888c6af145903a"
+   },
    "1": {
     "bytes": 97010,
     "err": 3.05,
@@ -115,6 +126,17 @@
    }
   },
   "door_asset_wooden_door_lock": {
+   "0": {
+    "bytes": 14480,
+    "err": 2.51,
+    "lossless": false,
+    "sha": "1ae78bc5506d6587",
+    "size": [
+     591,
+     498
+    ],
+    "swf_sha": "9c68f7759b63d1f9"
+   },
    "9": {
     "bytes": 21232,
     "err": 2.82,
@@ -207,6 +229,17 @@
    }
   },
   "zutto_door_asset_wooden_door_lock": {
+   "0": {
+    "bytes": 14480,
+    "err": 2.51,
+    "lossless": false,
+    "sha": "1ae78bc5506d6587",
+    "size": [
+     591,
+     498
+    ],
+    "swf_sha": "f436874f34ce4db4"
+   },
    "7": {
     "bytes": 20982,
     "err": 2.94,
