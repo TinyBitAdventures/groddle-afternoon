@@ -68,6 +68,22 @@ export function factText(text, restoration) {
   return text.replace(RELEASE_TOKEN, r?.game && r?.deployed ? `: version ${r.game} came out on ${longDate(r.deployed)}` : '');
 }
 
+/** The section a row with no known group falls into, so no row is ever dropped. */
+export const UNGROUPED = 'other';
+
+/**
+ * The matrix's sections in page order: compare.json's groups that have rows,
+ * then an "Other systems" section only if some row names no known group.
+ */
+export function matrixSections(data) {
+  const groups = data.groups || [];
+  const known = new Set(groups.map((g) => g.id));
+  const used = new Set((data.rows || []).map((r) => (known.has(r.group) ? r.group : UNGROUPED)));
+  const out = groups.filter((g) => used.has(g.id));
+  if (used.has(UNGROUPED)) out.push({ id: UNGROUPED, name: 'Other systems' });
+  return out;
+}
+
 /** Count statuses in a project's column (for the little tally under each header). */
 export function tallyColumn(cells) {
   const out = Object.fromEntries(STATUS_KEYS.map((k) => [k, 0]));

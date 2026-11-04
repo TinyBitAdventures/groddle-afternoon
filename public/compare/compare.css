@@ -163,7 +163,15 @@ body.compare { background-color: var(--bg); overflow-x: hidden; }
 .col-tally { display: block; font-weight: 600; font-size: 12px; color: var(--muted); }
 .matrix tbody th { font-weight: 700; background: var(--surface); position: sticky; left: 0; z-index: 1; min-width: 150px; }
 .matrix thead .col-system { position: sticky; left: 0; z-index: 2; }
-.matrix tbody tr:last-child > * { border-bottom: 0; }
+.matrix tbody:last-child tr:last-child > * { border-bottom: 0; }
+/* Section headers: one row-group header per tbody, its label pinned left while the cells scroll. */
+.matrix .matrix-group th {
+  position: static; background: var(--track); color: var(--lead);
+  padding: 14px 10px 6px; border-bottom: 1px solid var(--border);
+  font-size: 12px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase;
+}
+.matrix tbody:not(:first-of-type) .matrix-group th { border-top: 1px solid var(--border); }
+.matrix-group-label { position: sticky; left: 10px; display: inline-block; }
 .matrix .col-ours { background: var(--ours-tint); }
 .cell {
   display: inline-flex; align-items: center; gap: 7px;

@@ -2730,9 +2730,24 @@
   "deployed": "2026-11-04"
  },
  "git": {
-  "commits": 1262,
+  "commits": 1265,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-04",
+    "kind": "new",
+    "text": "Compare shows 15 more systems in seven sections, from Rook attacks and the subway to furniture, notes and quoins"
+   },
+   {
+    "date": "2026-11-04",
+    "kind": "improve",
+    "text": "The restoration report counts Rook attacks, races and the Hog Haul as restored, and adds Notes and Notice Boards, and Furniture and decorating"
+   },
+   {
+    "date": "2026-11-04",
+    "kind": "new",
+    "text": "Emoji reactions on chat lines, in Local, Global, groups, channels, the party and IMs"
+   },
    {
     "date": "2026-11-04",
     "kind": "improve",
@@ -2837,21 +2852,6 @@
     "date": "2026-11-04",
     "kind": "improve",
     "text": "The Rook comes to a solo game once a day, a few minutes after you settle on a shrine street"
-   },
-   {
-    "date": "2026-11-04",
-    "kind": "improve",
-    "text": "The Map is its painting edge to edge, and a route takes one line beside the Shortcuts"
-   },
-   {
-    "date": "2026-11-04",
-    "kind": "fix",
-    "text": "The price on an upgrade card you cannot afford is dark and sharp, on a light tag"
-   },
-   {
-    "date": "2026-11-04",
-    "kind": "fix",
-    "text": "Quoins, rocks and animals are placed by what the full jump reaches, not the old lower jump"
    }
   ]
  },

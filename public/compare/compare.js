@@ -5,7 +5,7 @@
  * ../restoration/data.json so it stays in step with development.
  */
 
-import { STATUS_KEYS, factText, longDate, oursCell, oursNumbers, tallyColumn } from './compare-data.js?v=9622fcb3';
+import { STATUS_KEYS, UNGROUPED, factText, longDate, matrixSections, oursCell, oursNumbers, tallyColumn } from './compare-data.js?v=51e9e331';
 
 const $ = (sel, root = document) => root.querySelector(sel);
 const el = (tag, attrs = {}, ...kids) => {
@@ -113,8 +113,18 @@ function renderMatrix(data, restoration, src) {
     }));
   $('thead', table).append(head);
 
-  const body = $('tbody', table);
+  // One tbody per section, led by a row-group header that names it.
+  $('tbody', table)?.remove();
+  const bodies = new Map(matrixSections(data).map((g) => {
+    const tbody = el('tbody', { class: 'matrix-section', 'aria-labelledby': `matrix-group-${g.id}` },
+      el('tr', { class: 'matrix-group' },
+        el('th', { scope: 'rowgroup', colspan: String(projects.length + 1), id: `matrix-group-${g.id}` },
+          el('span', { class: 'matrix-group-label' }, g.name))));
+    table.append(tbody);
+    return [g.id, tbody];
+  }));
   data.rows.forEach((row, ri) => {
+    const body = bodies.get(row.group) || bodies.get(UNGROUPED);
     const tr = el('tr', {}, el('th', { scope: 'row' }, row.name));
     projects.forEach((p, pi) => {
       const cell = grid[ri][pi];

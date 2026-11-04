@@ -1,5 +1,5 @@
 {
-  "checked": "2026-10-26",
+  "checked": "2026-11-04",
   "statuses": {
     "yes": { "label": "Yes", "mark": "✓", "tone": "moss", "desc": "A public source shows it in the game." },
     "partial": { "label": "Partly", "mark": "◐", "tone": "sun", "desc": "Some of it, or adapted from the original design. The note says how." },
@@ -60,7 +60,42 @@
     "ts-gsjs": { "title": "tinyspeck/glitch-GameServerJS README (CC0 1.0, logo and trademark excluded)", "url": "https://github.com/tinyspeck/glitch-GameServerJS", "checked": "2026-10-26" },
     "ga-restoration": { "title": "Groddle Field Notes: restoration report (built from this repository)", "url": "../restoration/", "checked": "2026-10-26" },
     "ga-github": { "title": "Groddle Afternoon on GitHub: the game, the realtime server and the site", "url": "https://github.com/TinyBitAdventures/groddle-afternoon", "checked": "2026-10-28" },
-    "ga-site": { "title": "Groddle Afternoon", "url": "https://groddleafternoon.com", "checked": "2026-10-28" }
+    "ga-site": { "title": "Groddle Afternoon", "url": "https://groddleafternoon.com", "checked": "2026-10-28" },
+    "og-0-6-0": { "title": "Odd Giants 0.6.0 patch notes (2021-07-09)", "url": "https://oddgiants.com/forums/announcements/43", "checked": "2026-11-04" },
+    "og-0-11-1": { "title": "Odd Giants 0.11.1 patch notes (2022-03-26)", "url": "https://oddgiants.com/forums/announcements/248", "checked": "2026-11-04" },
+    "og-0-11-3": { "title": "Odd Giants 0.11.3 patch notes (2022-03-29)", "url": "https://oddgiants.com/forums/announcements/276", "checked": "2026-11-04" },
+    "og-0-13-0": { "title": "Odd Giants 0.13.0 patch notes (2022-08-14)", "url": "https://oddgiants.com/forums/announcements/442", "checked": "2026-11-04" },
+    "og-0-13-1": { "title": "Odd Giants 0.13.1 patch notes (2022-09-02)", "url": "https://oddgiants.com/forums/announcements/444", "checked": "2026-11-04" },
+    "og-0-14-0": { "title": "Odd Giants 0.14.0 patch notes (2022-09-27)", "url": "https://oddgiants.com/forums/announcements/459", "checked": "2026-11-04" },
+    "og-0-15-1": { "title": "Odd Giants 0.15.1 patch notes (2023-02-02)", "url": "https://oddgiants.com/forums/announcements/540", "checked": "2026-11-04" },
+    "og-0-15-2": { "title": "Odd Giants 0.15.2 patch notes (2023-03-28)", "url": "https://oddgiants.com/forums/announcements/564", "checked": "2026-11-04" },
+    "og-0-15-3": { "title": "Odd Giants 0.15.3 patch notes (2023-06-07)", "url": "https://oddgiants.com/forums/announcements/596", "checked": "2026-11-04" },
+    "og-0-15-4": { "title": "Odd Giants 0.15.4 patch notes (2023-07-25)", "url": "https://oddgiants.com/forums/announcements/617", "checked": "2026-11-04" },
+    "og-0-16-0": { "title": "Odd Giants 0.16.0 patch notes (2023-11-25)", "url": "https://oddgiants.com/forums/announcements/643", "checked": "2026-11-04" },
+    "og-0-16-2": { "title": "Odd Giants 0.16.2 patch notes (2023-12-13)", "url": "https://oddgiants.com/forums/announcements/645", "checked": "2026-11-04" },
+    "og-0-16-3": { "title": "Odd Giants 0.16.3 patch notes (2024-03-21)", "url": "https://oddgiants.com/forums/announcements/1701", "checked": "2026-11-04" },
+    "og-0-16-4": { "title": "Odd Giants 0.16.4 patch notes (2024-03-26)", "url": "https://oddgiants.com/forums/announcements/1707", "checked": "2026-11-04" },
+    "cou-client-js": { "title": "Children of Ur client script (main.dart.js, as play.childrenofur.com serves it)", "url": "https://d33wubrfki0l68.cloudfront.net/js/10a577fd088b603dbf5c1dcc1e4ac8523a8c6daa/main.dart.js", "checked": "2026-11-04" },
+    "cou-skills": { "title": "coUserver: lib/skills/skillsdata.json (its 10 skills)", "url": "https://github.com/ChildrenOfUr/coUserver/blob/master/lib/skills/skillsdata.json", "checked": "2026-11-04" },
+    "cou-note": { "title": "coUserver: lib/entities/items/actions/note.dart", "url": "https://github.com/ChildrenOfUr/coUserver/blob/master/lib/entities/items/actions/note.dart", "checked": "2026-11-04" },
+    "cou-quill": { "title": "coUserver: lib/entities/items/actions/itemgroups/quill.dart", "url": "https://github.com/ChildrenOfUr/coUserver/blob/master/lib/entities/items/actions/itemgroups/quill.dart", "checked": "2026-11-04" },
+    "cou-visiting-stone": { "title": "coUserver: lib/entities/npcs/vistingstone.dart", "url": "https://github.com/ChildrenOfUr/coUserver/blob/master/lib/entities/npcs/vistingstone.dart", "checked": "2026-11-04" },
+    "cou-quoin": { "title": "coUserver: lib/entities/quoin.dart", "url": "https://github.com/ChildrenOfUr/coUserver/blob/master/lib/entities/quoin.dart", "checked": "2026-11-04" },
+    "cou-cubimal": { "title": "coUserver: lib/entities/npcs/items/cubimal.dart", "url": "https://github.com/ChildrenOfUr/coUserver/blob/master/lib/entities/npcs/items/cubimal.dart", "checked": "2026-11-04" },
+    "cou-cubimals": { "title": "coUserver: lib/entities/items/actions/itemgroups/cubimals.dart", "url": "https://github.com/ChildrenOfUr/coUserver/blob/master/lib/entities/items/actions/itemgroups/cubimals.dart", "checked": "2026-11-04" },
+    "cou-collectibles": { "title": "coUserver: lib/entities/items/json/collectibles.json (item data)", "url": "https://github.com/ChildrenOfUr/coUserver/blob/master/lib/entities/items/json/collectibles.json", "checked": "2026-11-04" },
+    "cou-vendor": { "title": "coUserver: lib/entities/npcs/vendors/vendor.dart", "url": "https://github.com/ChildrenOfUr/coUserver/blob/master/lib/entities/npcs/vendors/vendor.dart", "checked": "2026-11-04" },
+    "cou-street-spirit": { "title": "coUserver: lib/entities/npcs/vendors/street_spirit.dart", "url": "https://github.com/ChildrenOfUr/coUserver/blob/master/lib/entities/npcs/vendors/street_spirit.dart", "checked": "2026-11-04" },
+    "cou-bag-quest": { "title": "coUserver: lib/quests/json/buy_a_bag.json", "url": "https://github.com/ChildrenOfUr/coUserver/blob/master/lib/quests/json/buy_a_bag.json", "checked": "2026-11-04" },
+    "cou-icon": { "title": "coUserver: lib/entities/npcs/items/icon.dart", "url": "https://github.com/ChildrenOfUr/coUserver/blob/master/lib/entities/npcs/items/icon.dart", "checked": "2026-11-04" },
+    "cou-icon-quest": { "title": "coUserver: lib/quests/json/create_giant_icon.json", "url": "https://github.com/ChildrenOfUr/coUserver/blob/master/lib/quests/json/create_giant_icon.json", "checked": "2026-11-04" },
+    "cou-potions": { "title": "coUserver: lib/entities/items/actions/itemgroups/potions.dart", "url": "https://github.com/ChildrenOfUr/coUserver/blob/master/lib/entities/items/actions/itemgroups/potions.dart", "checked": "2026-11-04" },
+    "cou-nonopowder": { "title": "coUserver: lib/entities/plants/respawning_items/nonopowder.dart", "url": "https://github.com/ChildrenOfUr/coUserver/blob/master/lib/entities/plants/respawning_items/nonopowder.dart", "checked": "2026-11-04" },
+    "cou-hall-door": { "title": "coUserver: lib/entities/doors/bureaucratic_hall_door.dart", "url": "https://github.com/ChildrenOfUr/coUserver/blob/master/lib/entities/doors/bureaucratic_hall_door.dart", "checked": "2026-11-04" },
+    "cou-mapdata": { "title": "coUserver: lib/common/mapdata/mapdata.dart", "url": "https://github.com/ChildrenOfUr/coUserver/blob/master/lib/common/mapdata/mapdata.dart", "checked": "2026-11-04" },
+    "cou-fox": { "title": "coUserver: lib/entities/npcs/animals/fox.dart", "url": "https://github.com/ChildrenOfUr/coUserver/blob/master/lib/entities/npcs/animals/fox.dart", "checked": "2026-11-04" },
+    "cou-batterfly": { "title": "coUserver: lib/entities/npcs/animals/batterfly.dart", "url": "https://github.com/ChildrenOfUr/coUserver/blob/master/lib/entities/npcs/animals/batterfly.dart", "checked": "2026-11-04" },
+    "cou-furniture-badges": { "title": "coUserver: lib/achievements/json/furniture.json (achievement data)", "url": "https://github.com/ChildrenOfUr/coUserver/blob/master/lib/achievements/json/furniture.json", "checked": "2026-11-04" }
   },
   "projects": [
     {
@@ -137,9 +172,18 @@
       ]
     }
   ],
+  "groups": [
+    { "id": "world", "name": "World and travel" },
+    { "id": "growing", "name": "Skills, quests and Giants" },
+    { "id": "making", "name": "Making and gathering" },
+    { "id": "trade", "name": "Quoins, shops and trade" },
+    { "id": "social", "name": "Social and homes" },
+    { "id": "games", "name": "Games and events" },
+    { "id": "collecting", "name": "Collecting" }
+  ],
   "rows": [
     {
-      "id": "streets", "name": "Original streets to explore",
+      "id": "streets", "name": "Original streets to explore", "group": "world",
       "ours": ["streets"],
       "cells": {
         "cou": { "status": "yes", "note": "1,423 street files ship in the archived server.", "sources": ["cou-streets"] },
@@ -148,178 +192,43 @@
       }
     },
     {
-      "id": "avatar", "name": "Avatar and wardrobe",
-      "ours": ["avatar"],
+      "id": "subway", "name": "The Ur subway", "group": "world",
+      "ours": ["subway"],
       "cells": {
-        "cou": { "status": "yes", "note": "A Choose Avatar window in the client, with custom avatar options.", "sources": ["cou-play"] },
-        "eleven": { "status": "yes", "note": "The project site offers a Wardrobe and Vanity tool.", "sources": ["eg-home"] },
-        "odd": { "status": "yes", "note": "Change your look in game; new clothing added in 0.18.0.", "sources": ["og-vid-look", "og-0-18-0"] }
-      }
-    },
-    {
-      "id": "animals", "name": "Piggies, chickens and butterflies",
-      "ours": ["piggies", "chickens", "butterflies"],
-      "cells": {
-        "cou": { "status": "yes", "note": "Server classes for piggy, chicken, butterfly, batterfly, fox, helikitty and more.", "sources": ["cou-entities"] },
-        "eleven": { "status": "unknown", "note": "Runs the original code, but no public source shows these working.", "sources": [] },
-        "odd": { "status": "yes", "note": "Chickens and piggies in 0.4.0, butterflies in 0.5.0.", "sources": ["og-0-4-0", "og-0-5-0"] }
-      }
-    },
-    {
-      "id": "trees", "name": "Trees and harvesting",
-      "ours": ["trants"],
-      "cells": {
-        "cou": { "status": "yes", "note": "Bean, bubble, fruit, gas, spice, paper, wood trees and egg plants.", "sources": ["cou-entities"] },
-        "eleven": { "status": "unknown", "note": "No public source.", "sources": [] },
-        "odd": { "status": "yes", "note": "Trees grow from trants since 0.5.0.", "sources": ["og-0-5-0"] }
-      }
-    },
-    {
-      "id": "gardens", "name": "Gardening",
-      "ours": ["gardens"],
-      "cells": {
-        "cou": { "status": "yes", "note": "Garden entity and croppery items in the server.", "sources": ["cou-entities"] },
-        "eleven": { "status": "unknown", "note": "No public source.", "sources": [] },
-        "odd": { "status": "yes", "note": "Home-street gardens since 0.10.0.", "sources": ["og-0-10-0"] }
-      }
-    },
-    {
-      "id": "mining", "name": "Mining",
-      "ours": ["mining"],
-      "cells": {
-        "cou": { "status": "yes", "note": "Beryl, dullite, metal and sparkly rocks.", "sources": ["cou-entities"] },
-        "eleven": { "status": "unknown", "note": "No public source.", "sources": [] },
-        "odd": { "status": "yes", "note": "Mining moved server side in 0.3.5.", "sources": ["og-0-3-5"] }
-      }
-    },
-    {
-      "id": "crafting", "name": "Crafting and cooking",
-      "ours": ["cooking", "machines"],
-      "cells": {
-        "cou": { "status": "yes", "note": "Recipe data and item actions in the server.", "sources": ["cou-entities"] },
-        "eleven": { "status": "unknown", "note": "No public source.", "sources": [] },
-        "odd": { "status": "yes", "note": "Crafting and tool wear since 0.4.0.", "sources": ["og-0-4-0"] }
-      }
-    },
-    {
-      "id": "skills", "name": "Skills",
-      "ours": ["skills"],
-      "cells": {
-        "cou": { "status": "partial", "note": "10 skills with 31 levels in the archived server data.", "sources": ["cou-lib"] },
-        "eleven": { "status": "unknown", "note": "No public source.", "sources": [] },
-        "odd": { "status": "yes", "note": "Skill learning since the early alphas; Teleportation and Piety skills mentioned in notes.", "sources": ["og-0-3-5", "og-0-8-0", "og-0-18-0"] }
-      }
-    },
-    {
-      "id": "quests", "name": "Quests",
-      "ours": ["quests"],
-      "cells": {
-        "cou": { "status": "partial", "note": "12 quests written for the project, such as Race to the Forest.", "sources": ["cou-lib"] },
-        "eleven": { "status": "unknown", "note": "No public source.", "sources": [] },
-        "odd": { "status": "yes", "note": "Quests since 0.5.0, more added since; total count not published.", "sources": ["og-0-5-0", "og-0-19-0"] }
-      }
-    },
-    {
-      "id": "instances", "name": "Private quest rooms and Paradise",
-      "ours": ["quest-rooms", "paradise"],
-      "cells": {
-        "cou": { "status": "unknown", "note": "No public source.", "sources": [] },
-        "eleven": { "status": "unknown", "note": "No public source.", "sources": [] },
-        "odd": { "status": "partial", "note": "Cloud Rings and Cloud Flight instances added in 0.19.0.", "sources": ["og-0-19-0"] }
-      }
-    },
-    {
-      "id": "achievements", "name": "Achievements and badges",
-      "ours": ["badges"],
-      "cells": {
-        "cou": { "status": "yes", "note": "639 achievements in 18 categories in the server.", "sources": ["cou-lib"] },
-        "eleven": { "status": "unknown", "note": "No public source.", "sources": [] },
-        "odd": { "status": "yes", "note": "Achievements since 0.4.0, many added since.", "sources": ["og-0-4-0", "og-0-18-0"] }
-      }
-    },
-    {
-      "id": "giants", "name": "Giants and shrines",
-      "ours": ["shrines"],
-      "cells": {
-        "cou": { "status": "yes", "note": "A shrine class for each of the eleven Giants.", "sources": ["cou-entities"] },
-        "eleven": { "status": "unknown", "note": "No public source.", "sources": [] },
-        "odd": { "status": "yes", "note": "Shrines and Giant affiliation in 0.4.0; bestowments in 0.18.0.", "sources": ["og-0-4-0", "og-0-18-0"] }
-      }
-    },
-    {
-      "id": "imagination", "name": "Imagination upgrades",
-      "ours": ["imagination"],
-      "cells": {
-        "cou": { "status": "yes", "note": "Upgrade data and an upgrade manager in the server.", "sources": ["cou-lib"] },
-        "eleven": { "status": "unknown", "note": "No public source.", "sources": [] },
-        "odd": { "status": "yes", "note": "Imagination cards since the early alphas; new cards in 0.19.0.", "sources": ["og-0-3-5", "og-0-19-0"] }
-      }
-    },
-    {
-      "id": "homes", "name": "Houses and home streets",
-      "ours": ["homes"],
-      "cells": {
-        "cou": { "status": "partial", "note": "The client picks a home street through a separate service; no house code in the archived server.", "sources": ["cou-client", "cou-lib"] },
-        "eleven": { "status": "yes", "note": "A 2019 player video tours a home street.", "sources": ["eg-vid-home"] },
-        "odd": { "status": "yes", "note": "Home streets in 0.10.0, houses in 0.12.0, wall customising in 0.18.0.", "sources": ["og-0-10-0", "og-0-12-0", "og-0-18-0"] }
-      }
-    },
-    {
-      "id": "mail", "name": "Mail",
-      "ours": ["mail"],
-      "cells": {
-        "cou": { "status": "yes", "note": "Mailbox entity in the server.", "sources": ["cou-entities"] },
-        "eleven": { "status": "unknown", "note": "No public source.", "sources": [] },
-        "odd": { "status": "yes", "note": "Mailbox between players since 0.17.0.", "sources": ["og-0-17-0"] }
-      }
-    },
-    {
-      "id": "players", "name": "Other players and chat",
-      "ours": ["chat"],
-      "cells": {
-        "cou": { "status": "yes", "note": "A massively multiplayer browser game with a chat server.", "sources": ["cou-home", "cou-lib"] },
-        "eleven": { "status": "yes", "note": "A massively multiplayer game, tested by groups of alpha players.", "sources": ["eg-home", "eg-engadget"] },
-        "odd": { "status": "yes", "note": "Online multiplayer with local, global and private chat and friends.", "sources": ["og-help", "og-0-17-0", "og-0-19-0"] }
-      }
-    },
-    {
-      "id": "trading", "name": "Trading between players",
-      "ours": ["trading"],
-      "cells": {
-        "cou": { "status": "unknown", "note": "No public source.", "sources": [] },
+        "cou": { "status": "unknown", "note": "No subway code in the archived server or client.", "sources": [] },
         "eleven": { "status": "unknown", "note": "No public source.", "sources": [] },
         "odd": { "status": "unknown", "note": "Not mentioned in its patch notes.", "sources": [] }
       }
     },
     {
-      "id": "auctions", "name": "Auction house",
-      "ours": ["auctions"],
+      "id": "maps", "name": "Hub maps and travel", "group": "world",
+      "ours": ["map"],
       "cells": {
-        "cou": { "status": "yes", "note": "An auctions service in the server.", "sources": ["cou-lib"] },
-        "eleven": { "status": "unknown", "note": "The FAQ notes the auction pages belonged to a web app Tiny Speck never released.", "sources": ["eg-faq"] },
-        "odd": { "status": "yes", "note": "A Vendor Auction (0.8.1): items players sell appear for others to buy.", "sources": ["og-0-8-1"] }
-      }
-    },
-    {
-      "id": "feats", "name": "Feats and world events",
-      "ours": ["feats"],
-      "cells": {
-        "cou": { "status": "unknown", "note": "No public source.", "sources": [] },
+        "cou": { "status": "yes", "note": "Street map data in the server; the client has a World Map, a minimap and walking directions.", "sources": ["cou-mapdata", "cou-client-js"] },
         "eleven": { "status": "unknown", "note": "No public source.", "sources": [] },
-        "odd": { "status": "yes", "note": "Feats since 0.15.0; a new feat in 0.19.0.", "sources": ["og-0-15-0", "og-0-19-0"] }
+        "odd": { "status": "yes", "note": "World map and minimap (0.3.5), map teleportation (0.8.0), a destination path drawn on the map (0.15.2).", "sources": ["og-0-3-5", "og-0-8-0", "og-0-15-2"] }
       }
     },
     {
-      "id": "holidays", "name": "Holidays",
-      "ours": ["seasons"],
+      "id": "teleport", "name": "Teleportation", "group": "world",
+      "ours": ["meditation"],
       "cells": {
-        "cou": { "status": "unknown", "note": "No public source.", "sources": [] },
-        "eleven": { "status": "yes", "note": "A 2019 player video shows Zilloween.", "sources": ["eg-vid-zilloween"] },
-        "odd": { "status": "yes", "note": "Zilloween quests (0.14.1); Glitchmas and an egg hunt on its calendar (0.18.0).", "sources": ["og-0-14-1", "og-0-18-0"] }
+        "cou": { "status": "partial", "note": "The client's map offers Teleport for 50 energy (\"You need at least 50 energy to teleport\"); its 10 skills have no Teleportation.", "sources": ["cou-client-js", "cou-skills"] },
+        "eleven": { "status": "unknown", "note": "No public source.", "sources": [] },
+        "odd": { "status": "yes", "note": "Map teleportation with the Teleportation I skill (0.8.0).", "sources": ["og-0-8-0"] }
       }
     },
     {
-      "id": "hell", "name": "Hell (Naraka)",
+      "id": "bureaucratic-halls", "name": "Bureaucratic Halls", "group": "world",
+      "ours": ["bureaucratic-halls"],
+      "cells": {
+        "cou": { "status": "partial", "note": "A Bureaucratic Hall door in the server, and the map marks the streets that have one; no hall inside.", "sources": ["cou-hall-door", "cou-client-js"] },
+        "eleven": { "status": "unknown", "note": "No public source.", "sources": [] },
+        "odd": { "status": "yes", "note": "Bureaucratic Hall behind doors on Chego Chase, Gregarious Grange and Beali Bray, with the Card Carrying Qualification (0.15.0).", "sources": ["og-0-15-0"] }
+      }
+    },
+    {
+      "id": "hell", "name": "Hell (Naraka)", "group": "world",
       "ours": ["hell"],
       "cells": {
         "cou": { "status": "yes", "note": "Hell bartender and hell grapes in the server.", "sources": ["cou-entities"] },
@@ -328,34 +237,7 @@
       }
     },
     {
-      "id": "parties", "name": "Party spaces",
-      "ours": ["parties"],
-      "cells": {
-        "cou": { "status": "unknown", "note": "No public source.", "sources": [] },
-        "eleven": { "status": "unknown", "note": "No public source.", "sources": [] },
-        "odd": { "status": "yes", "note": "Eight party locations, opened with party packs (0.18.0).", "sources": ["og-0-18-0"] }
-      }
-    },
-    {
-      "id": "street-projects", "name": "Street projects",
-      "ours": ["street-jobs"],
-      "cells": {
-        "cou": { "status": "unknown", "note": "No public source.", "sources": [] },
-        "eleven": { "status": "unknown", "note": "No public source.", "sources": [] },
-        "odd": { "status": "unknown", "note": "Not mentioned in its patch notes.", "sources": [] }
-      }
-    },
-    {
-      "id": "teleport", "name": "Teleportation",
-      "ours": ["meditation"],
-      "cells": {
-        "cou": { "status": "unknown", "note": "No public source.", "sources": [] },
-        "eleven": { "status": "unknown", "note": "No public source.", "sources": [] },
-        "odd": { "status": "yes", "note": "Map teleportation with the Teleportation I skill (0.8.0).", "sources": ["og-0-8-0"] }
-      }
-    },
-    {
-      "id": "music", "name": "Music and sound",
+      "id": "music", "name": "Music and sound", "group": "world",
       "ours": ["music"],
       "cells": {
         "cou": { "status": "yes", "note": "The client streams music through a SoundCloud helper.", "sources": ["cou-scproxy"] },
@@ -364,12 +246,309 @@
       }
     },
     {
-      "id": "tutorial", "name": "New-player tutorial",
+      "id": "tutorial", "name": "New-player tutorial", "group": "world",
       "ours": ["newxp"],
       "cells": {
         "cou": { "status": "unknown", "note": "No public source.", "sources": [] },
         "eleven": { "status": "unknown", "note": "No public source.", "sources": [] },
         "odd": { "status": "yes", "note": "A tutorial level, improved in 0.19.0.", "sources": ["og-0-19-0"] }
+      }
+    },
+    {
+      "id": "avatar", "name": "Avatar and wardrobe", "group": "growing",
+      "ours": ["avatar"],
+      "cells": {
+        "cou": { "status": "yes", "note": "A Choose Avatar window in the client, with custom avatar options.", "sources": ["cou-play"] },
+        "eleven": { "status": "yes", "note": "The project site offers a Wardrobe and Vanity tool.", "sources": ["eg-home"] },
+        "odd": { "status": "yes", "note": "Change your look in game; new clothing added in 0.18.0.", "sources": ["og-vid-look", "og-0-18-0"] }
+      }
+    },
+    {
+      "id": "skills", "name": "Skills", "group": "growing",
+      "ours": ["skills"],
+      "cells": {
+        "cou": { "status": "partial", "note": "10 skills with 31 levels in the archived server data.", "sources": ["cou-lib"] },
+        "eleven": { "status": "unknown", "note": "No public source.", "sources": [] },
+        "odd": { "status": "yes", "note": "Skill learning since the early alphas; Teleportation and Piety skills mentioned in notes.", "sources": ["og-0-3-5", "og-0-8-0", "og-0-18-0"] }
+      }
+    },
+    {
+      "id": "quests", "name": "Quests", "group": "growing",
+      "ours": ["quests"],
+      "cells": {
+        "cou": { "status": "partial", "note": "12 quests written for the project, such as Race to the Forest.", "sources": ["cou-lib"] },
+        "eleven": { "status": "unknown", "note": "No public source.", "sources": [] },
+        "odd": { "status": "yes", "note": "Quests since 0.5.0, more added since; total count not published.", "sources": ["og-0-5-0", "og-0-19-0"] }
+      }
+    },
+    {
+      "id": "instances", "name": "Private quest rooms and Paradise", "group": "growing",
+      "ours": ["quest-rooms", "paradise"],
+      "cells": {
+        "cou": { "status": "unknown", "note": "No public source.", "sources": [] },
+        "eleven": { "status": "unknown", "note": "No public source.", "sources": [] },
+        "odd": { "status": "partial", "note": "Cloud Rings and Cloud Flight instances added in 0.19.0.", "sources": ["og-0-19-0"] }
+      }
+    },
+    {
+      "id": "achievements", "name": "Achievements and badges", "group": "growing",
+      "ours": ["badges"],
+      "cells": {
+        "cou": { "status": "yes", "note": "639 achievements in 18 categories in the server.", "sources": ["cou-lib"] },
+        "eleven": { "status": "unknown", "note": "No public source.", "sources": [] },
+        "odd": { "status": "yes", "note": "Achievements since 0.4.0, many added since.", "sources": ["og-0-4-0", "og-0-18-0"] }
+      }
+    },
+    {
+      "id": "giants", "name": "Giants and shrines", "group": "growing",
+      "ours": ["shrines"],
+      "cells": {
+        "cou": { "status": "yes", "note": "A shrine class for each of the eleven Giants.", "sources": ["cou-entities"] },
+        "eleven": { "status": "unknown", "note": "No public source.", "sources": [] },
+        "odd": { "status": "yes", "note": "Shrines and Giant affiliation in 0.4.0; bestowments in 0.18.0.", "sources": ["og-0-4-0", "og-0-18-0"] }
+      }
+    },
+    {
+      "id": "icons", "name": "Giant Icons", "group": "growing",
+      "ours": ["icons"],
+      "cells": {
+        "cou": { "status": "yes", "note": "An Icon entity in the server and a quest to make a Giant Icon.", "sources": ["cou-icon", "cou-icon-quest"] },
+        "eleven": { "status": "unknown", "note": "No public source.", "sources": [] },
+        "odd": { "status": "yes", "note": "Icons with the Piety I bonus (0.8.1), iconizing (0.11.1), a giant bestowment for walking through one (0.18.0).", "sources": ["og-0-8-1", "og-0-11-1", "og-0-18-0"] }
+      }
+    },
+    {
+      "id": "imagination", "name": "Imagination upgrades", "group": "growing",
+      "ours": ["imagination"],
+      "cells": {
+        "cou": { "status": "yes", "note": "Upgrade data and an upgrade manager in the server.", "sources": ["cou-lib"] },
+        "eleven": { "status": "unknown", "note": "No public source.", "sources": [] },
+        "odd": { "status": "yes", "note": "Imagination cards since the early alphas; new cards in 0.19.0.", "sources": ["og-0-3-5", "og-0-19-0"] }
+      }
+    },
+    {
+      "id": "animals", "name": "Animals", "group": "making",
+      "ours": ["piggies", "chickens", "butterflies", "foxes", "batterflies"],
+      "cells": {
+        "cou": { "status": "yes", "note": "Server classes for piggy, chicken, butterfly, batterfly, fox, helikitty and more.", "sources": ["cou-entities", "cou-fox", "cou-batterfly"] },
+        "eleven": { "status": "unknown", "note": "Runs the original code, but no public source shows these working.", "sources": [] },
+        "odd": { "status": "yes", "note": "Chickens and piggies in 0.4.0, butterflies in 0.5.0, foxes to brush in 0.13.1. Batterflies are not mentioned.", "sources": ["og-0-4-0", "og-0-5-0", "og-0-13-1"] }
+      }
+    },
+    {
+      "id": "trees", "name": "Trees and harvesting", "group": "making",
+      "ours": ["trants"],
+      "cells": {
+        "cou": { "status": "yes", "note": "Bean, bubble, fruit, gas, spice, paper, wood trees and egg plants.", "sources": ["cou-entities"] },
+        "eleven": { "status": "unknown", "note": "No public source.", "sources": [] },
+        "odd": { "status": "yes", "note": "Trees grow from trants since 0.5.0.", "sources": ["og-0-5-0"] }
+      }
+    },
+    {
+      "id": "gardens", "name": "Gardening", "group": "making",
+      "ours": ["gardens"],
+      "cells": {
+        "cou": { "status": "yes", "note": "Garden entity and croppery items in the server.", "sources": ["cou-entities"] },
+        "eleven": { "status": "unknown", "note": "No public source.", "sources": [] },
+        "odd": { "status": "yes", "note": "Home-street gardens since 0.10.0.", "sources": ["og-0-10-0"] }
+      }
+    },
+    {
+      "id": "mining", "name": "Mining", "group": "making",
+      "ours": ["mining"],
+      "cells": {
+        "cou": { "status": "yes", "note": "Beryl, dullite, metal and sparkly rocks.", "sources": ["cou-entities"] },
+        "eleven": { "status": "unknown", "note": "No public source.", "sources": [] },
+        "odd": { "status": "yes", "note": "Mining moved server side in 0.3.5.", "sources": ["og-0-3-5"] }
+      }
+    },
+    {
+      "id": "crafting", "name": "Crafting and cooking", "group": "making",
+      "ours": ["cooking", "machines"],
+      "cells": {
+        "cou": { "status": "yes", "note": "Recipe data and item actions in the server.", "sources": ["cou-entities"] },
+        "eleven": { "status": "unknown", "note": "No public source.", "sources": [] },
+        "odd": { "status": "yes", "note": "Crafting and tool wear since 0.4.0.", "sources": ["og-0-4-0"] }
+      }
+    },
+    {
+      "id": "potions", "name": "Potions and powders", "group": "making",
+      "ours": ["potions", "powders"],
+      "cells": {
+        "cou": { "status": "partial", "note": "A small potions action file and a No-No Powder plant in the server; the other potions and powders are item data.", "sources": ["cou-potions", "cou-nonopowder"] },
+        "eleven": { "status": "unknown", "note": "No public source.", "sources": [] },
+        "odd": { "status": "partial", "note": "Garden potions (0.15.1); Charades Potion, Rainbow Juice and potions used more than once (0.15.4). Powders are not mentioned.", "sources": ["og-0-15-1", "og-0-15-4"] }
+      }
+    },
+    {
+      "id": "quoins", "name": "Quoins", "group": "trade",
+      "ours": ["quoins", "mystery-quoins"],
+      "cells": {
+        "cou": { "status": "yes", "note": "A quoin entity in the server; the client knows iMG, mood, energy, currant, mystery, favor, time and Qurazy quoins.", "sources": ["cou-quoin", "cou-client-js"] },
+        "eleven": { "status": "unknown", "note": "No public source.", "sources": [] },
+        "odd": { "status": "yes", "note": "Quoins from the early alphas (0.3.5); the Qurazy quoin in 0.13.0.", "sources": ["og-0-3-5", "og-0-13-0"] }
+      }
+    },
+    {
+      "id": "vendors", "name": "Street spirits and vendors", "group": "trade",
+      "ours": ["vendors"],
+      "cells": {
+        "cou": { "status": "yes", "note": "Vendor and Street Spirit classes in the server, with Groddle, Firebog and Zutto spirits and named vendors.", "sources": ["cou-vendor", "cou-street-spirit"] },
+        "eleven": { "status": "yes", "note": "A 2019 player video of its shops.", "sources": ["eg-vid-shops"] },
+        "odd": { "status": "yes", "note": "Buying and selling at vendors from the early alphas (0.3.5); more vendors added in 0.8.0.", "sources": ["og-0-3-5", "og-0-8-0"] }
+      }
+    },
+    {
+      "id": "bags", "name": "Bags and the pack", "group": "trade",
+      "ours": ["bags"],
+      "cells": {
+        "cou": { "status": "yes", "note": "Bags open in their own windows in the client and things drag between them; a quest sends you to buy a Generic or Bigger Bag.", "sources": ["cou-client-js", "cou-bag-quest"] },
+        "eleven": { "status": "unknown", "note": "No public source.", "sources": [] },
+        "odd": { "status": "yes", "note": "Bags of 9 or 16 slots (0.11.3), specialized bags with Internal Sortitude (0.14.1), renaming bags (0.16.2).", "sources": ["og-0-11-3", "og-0-14-1", "og-0-16-2"] }
+      }
+    },
+    {
+      "id": "trading", "name": "Trading between players", "group": "trade",
+      "ours": ["trading"],
+      "cells": {
+        "cou": { "status": "unknown", "note": "No public source.", "sources": [] },
+        "eleven": { "status": "unknown", "note": "No public source.", "sources": [] },
+        "odd": { "status": "partial", "note": "Give Item (0.14.1): give a single item to any online player. A trade window is not mentioned.", "sources": ["og-0-14-1"] }
+      }
+    },
+    {
+      "id": "auctions", "name": "Auction house", "group": "trade",
+      "ours": ["auctions"],
+      "cells": {
+        "cou": { "status": "yes", "note": "An auctions service in the server.", "sources": ["cou-lib"] },
+        "eleven": { "status": "unknown", "note": "The FAQ notes the auction pages belonged to a web app Tiny Speck never released.", "sources": ["eg-faq"] },
+        "odd": { "status": "yes", "note": "A Vendor Auction (0.8.1): items players sell appear for others to buy.", "sources": ["og-0-8-1"] }
+      }
+    },
+    {
+      "id": "players", "name": "Other players and chat", "group": "social",
+      "ours": ["chat"],
+      "cells": {
+        "cou": { "status": "yes", "note": "A massively multiplayer browser game with a chat server.", "sources": ["cou-home", "cou-lib"] },
+        "eleven": { "status": "yes", "note": "A massively multiplayer game, tested by groups of alpha players.", "sources": ["eg-home", "eg-engadget"] },
+        "odd": { "status": "yes", "note": "Online multiplayer with local, global and private chat and friends.", "sources": ["og-help", "og-0-17-0", "og-0-19-0"] }
+      }
+    },
+    {
+      "id": "mail", "name": "Mail", "group": "social",
+      "ours": ["mail"],
+      "cells": {
+        "cou": { "status": "yes", "note": "Mailbox entity in the server.", "sources": ["cou-entities"] },
+        "eleven": { "status": "unknown", "note": "No public source.", "sources": [] },
+        "odd": { "status": "yes", "note": "Mailbox between players since 0.17.0.", "sources": ["og-0-17-0"] }
+      }
+    },
+    {
+      "id": "homes", "name": "Houses and home streets", "group": "social",
+      "ours": ["homes"],
+      "cells": {
+        "cou": { "status": "partial", "note": "The client picks a home street through a separate service; no house code in the archived server.", "sources": ["cou-client", "cou-lib"] },
+        "eleven": { "status": "yes", "note": "A 2019 player video tours a home street.", "sources": ["eg-vid-home"] },
+        "odd": { "status": "yes", "note": "Home streets in 0.10.0, houses in 0.12.0, wall customising in 0.18.0.", "sources": ["og-0-10-0", "og-0-12-0", "og-0-18-0"] }
+      }
+    },
+    {
+      "id": "visiting", "name": "Visiting friends' homes", "group": "social",
+      "ours": ["neighbours"],
+      "cells": {
+        "cou": { "status": "partial", "note": "A Visiting Stone in the server; the client sets and visits your own home street with /makehome and /gohome.", "sources": ["cou-visiting-stone", "cou-client-js"] },
+        "eleven": { "status": "unknown", "note": "A 2019 player video tours a home street; no public source shows visiting another player's.", "sources": ["eg-vid-home"] },
+        "odd": { "status": "yes", "note": "Visit Home Street from another player's menu (0.10.0), house party badges for hosting guests (0.15.3), gifts left on a friend's home street (0.16.4).", "sources": ["og-0-10-0", "og-0-15-3", "og-0-16-4"] }
+      }
+    },
+    {
+      "id": "furniture", "name": "Furniture and decorating", "group": "social",
+      "ours": ["furniture"],
+      "cells": {
+        "cou": { "status": "unknown", "note": "No furniture or decorating code in the archived server; furniture appears only in its achievement data.", "sources": ["cou-furniture-badges"] },
+        "eleven": { "status": "unknown", "note": "No public source.", "sources": [] },
+        "odd": { "status": "yes", "note": "Furniture moved by drag and drop in your house (0.12.0), Storage Display Boxes (0.14.0) that sell (0.16.0), cabinets (0.16.3).", "sources": ["og-0-12-0", "og-0-14-0", "og-0-16-0", "og-0-16-3"] }
+      }
+    },
+    {
+      "id": "notes", "name": "Notes and Notice Boards", "group": "social",
+      "ours": ["notes"],
+      "cells": {
+        "cou": { "status": "partial", "note": "Note and Quill actions in the server and the Penpersonship skill; no Notice Board.", "sources": ["cou-note", "cou-quill", "cou-skills"] },
+        "eleven": { "status": "unknown", "note": "No public source.", "sources": [] },
+        "odd": { "status": "partial", "note": "Writing notes with a Quill and Penpersonship (0.16.0). Notice Boards are not mentioned.", "sources": ["og-0-16-0"] }
+      }
+    },
+    {
+      "id": "parties", "name": "Party spaces", "group": "social",
+      "ours": ["parties"],
+      "cells": {
+        "cou": { "status": "unknown", "note": "No public source.", "sources": [] },
+        "eleven": { "status": "unknown", "note": "No public source.", "sources": [] },
+        "odd": { "status": "yes", "note": "Eight party locations, opened with party packs (0.18.0).", "sources": ["og-0-18-0"] }
+      }
+    },
+    {
+      "id": "rooks", "name": "Rook attacks", "group": "games",
+      "ours": ["rooks"],
+      "cells": {
+        "cou": { "status": "unknown", "note": "No Rook attack code in the archived server or client; Rook items appear only in its item data.", "sources": [] },
+        "eleven": { "status": "unknown", "note": "No public source.", "sources": [] },
+        "odd": { "status": "unknown", "note": "Its patch notes name only a Rook Hat (0.18.0).", "sources": ["og-0-18-0"] }
+      }
+    },
+    {
+      "id": "races", "name": "Races and Game of Crowns", "group": "games",
+      "ours": ["races", "hog-haul"],
+      "cells": {
+        "cou": { "status": "unknown", "note": "Race tickets appear only in its item data; Race to the Forest is a quest written for the project.", "sources": [] },
+        "eleven": { "status": "unknown", "note": "No public source.", "sources": [] },
+        "odd": { "status": "unknown", "note": "Not mentioned in its patch notes.", "sources": [] }
+      }
+    },
+    {
+      "id": "feats", "name": "Feats and world events", "group": "games",
+      "ours": ["feats"],
+      "cells": {
+        "cou": { "status": "unknown", "note": "No public source.", "sources": [] },
+        "eleven": { "status": "unknown", "note": "No public source.", "sources": [] },
+        "odd": { "status": "yes", "note": "Feats since 0.15.0; a new feat in 0.19.0.", "sources": ["og-0-15-0", "og-0-19-0"] }
+      }
+    },
+    {
+      "id": "holidays", "name": "Holidays", "group": "games",
+      "ours": ["seasons"],
+      "cells": {
+        "cou": { "status": "unknown", "note": "No public source.", "sources": [] },
+        "eleven": { "status": "yes", "note": "A 2019 player video shows Zilloween.", "sources": ["eg-vid-zilloween"] },
+        "odd": { "status": "yes", "note": "Zilloween quests (0.14.1); Glitchmas and an egg hunt on its calendar (0.18.0).", "sources": ["og-0-14-1", "og-0-18-0"] }
+      }
+    },
+    {
+      "id": "street-projects", "name": "Street projects", "group": "games",
+      "ours": ["street-jobs"],
+      "cells": {
+        "cou": { "status": "unknown", "note": "No public source.", "sources": [] },
+        "eleven": { "status": "unknown", "note": "No public source.", "sources": [] },
+        "odd": { "status": "unknown", "note": "Not mentioned in its patch notes.", "sources": [] }
+      }
+    },
+    {
+      "id": "collectibles", "name": "Musicblocks, Cubimals and trophies", "group": "collecting",
+      "ours": ["collectibles"],
+      "cells": {
+        "cou": { "status": "partial", "note": "Cubimal code in the server; Musicblocks and trophies appear only in its item data.", "sources": ["cou-cubimal", "cou-cubimals", "cou-collectibles"] },
+        "eleven": { "status": "unknown", "note": "No public source.", "sources": [] },
+        "odd": { "status": "yes", "note": "Music blocks (0.4.2), Cubimals and trophies (0.6.0).", "sources": ["og-0-4-2", "og-0-6-0"] }
+      }
+    },
+    {
+      "id": "camera", "name": "Camera Mode and Snaps", "group": "collecting",
+      "ours": ["camera", "snaps"],
+      "cells": {
+        "cou": { "status": "unknown", "note": "No camera code in the archived server or client.", "sources": [] },
+        "eleven": { "status": "unknown", "note": "No public source.", "sources": [] },
+        "odd": { "status": "partial", "note": "Camera Mode, fixed in 0.4.0, with a hint on how to leave it (0.13.0). Snaps are not mentioned.", "sources": ["og-0-4-0", "og-0-13-0"] }
       }
     }
   ],
