@@ -381,7 +381,7 @@ describe('the site routes (groddle-afternoon-site AdminConsole, AdminConsolePage
   it('the theme serves the console\'s script and styles, keyed', () => {
     assert.ok(existsSync(sitePath('console/console.js')));
     assert.ok(existsSync(sitePath('console/console.css')));
-    assert.match(readFileSync(sitePath('src/AdminConsolePage.php'), 'utf8'), /ASSET_KEY = 'revisions-1'/);
+    assert.match(readFileSync(sitePath('src/AdminConsolePage.php'), 'utf8'), /ASSET_KEY = 'rooks-1'/);
     const css = readFileSync(sitePath('console/console.css'), 'utf8');
     for (const token of ['--surface', '--border', '--fg', '--muted', '--track', '--row-line']) assert.match(css, new RegExp(`var\\(${token}\\)`), token);
   });
@@ -500,5 +500,84 @@ describe('the chat log (Austin 2026-10-31: chat written down for spam and abuse 
     assert.match(readFileSync(serverPath('party.go'), 'utf8'), /logChatLocked\("party", p\.chatlogID\(cl\.ID\(\), m\.h\.Now\(\)\), cl, text, "", to\)/);
     assert.match(readFileSync(serverPath('deploy/groddle-realtime.service'), 'utf8'), /-chatlog-dir \/var\/lib\/groddle-realtime\/chatlog/);
     for (const t of ['TestChatlogCallIsOnlyTheSitesSignedPost', 'TestChatlogAFullQueueDropsLinesAndNeverHoldsUpChat', 'TestChatlogPrunesOldDaysAtStartAndOnANewDay']) assert.match(readFileSync(serverPath('chatlog_test.go'), 'utf8'), new RegExp(`func ${t}\\(`), t);
+  });
+});
+
+describe('ending a Rook attack from the console (Austin 2026-11-03: three players on Groddle Forest Junction could not fight one)', { skip: skipWithoutSite || skipWithoutServer }, async () => {
+  const mod = HAS_SITE ? await import(pathToFileURL(sitePath('console/console.js')).href) : {};
+  const php = (code) => JSON.parse(String(execFileSync('php', ['-r', `foreach (['ServiceCall', 'AdminConsole'] as $c) require ${JSON.stringify(SITE_DIR)} . "/src/$c.php"; use Groddle\\Minn\\AdminConsole; echo json_encode(${code}, JSON_UNESCAPED_UNICODE);`])));
+
+  it('words each attack: phase, health, stun, wing beats, who is there; End attack only while it is not leaving', () => {
+    const a = { street: { tsid: 'GCRC6VC9MAO1Q7F', label: 'Groddle Forest Junction' }, phase: 'build_up', health: 300, maxHealth: 300, stun: 0, maxStun: 200, wingBeats: 1, players: [{ id: 7, name: 'Ada' }, { id: 8, name: 'Bo' }, { id: 9, name: 'Cy' }] };
+    assert.equal(mod.rookWords(a), 'Over the street · health 300 / 300 · 1 wing beat of 3');
+    assert.equal(mod.rookWords({ ...a, phase: 'angry', angry: 'angry3', stun: 40, wingBeats: 2 }), 'Angry: about to strike · health 300 / 300 · stun 40 / 200 · 2 wing beats of 3');
+    assert.equal(mod.rookWords({ ...a, phase: 'herald', wingBeats: 0 }), 'Coming: the herald is warning the street · health 300 / 300 · 0 wing beats of 3');
+    assert.equal(mod.rookPlayers(a), 'Ada, Bo and Cy');
+    assert.equal(mod.rookPlayers({ players: [{ id: 7, name: 'Ada' }] }), 'Ada');
+    assert.equal(mod.rookPlayers({ players: [] }), 'Nobody');
+    for (const phase of ['herald', 'build_up', 'angry', 'stunned']) assert.equal(mod.rookEndable({ ...a, phase }), true, phase);
+    for (const phase of ['dead', 'departed']) assert.equal(mod.rookEndable({ ...a, phase }), false, phase);
+    assert.equal(mod.COPY.rookEndConfirm('Groddle Forest Junction'), 'End the Rook attack on Groddle Forest Junction?');
+    for (const w of [mod.COPY.rookEndNote, ...Object.values(mod.ROOK_PHASE)]) assert.ok(!/[—–]|Glitch/.test(w), w);
+  });
+
+  it('logs the end in the activity list in words', () => {
+    const line = (detail, delivery) => mod.logWords({ kind: 'rook_end', detail, delivery, player: { id: 0 } });
+    const street = { tsid: 'GCRC6VC9MAO1Q7F', label: 'Groddle Forest Junction' };
+    assert.equal(line({ street, phase: 'angry', players: 3 }, 'live'), 'ended the Rook attack on Groddle Forest Junction (3 players there)');
+    assert.equal(line({ street, phase: 'herald', players: 1 }, 'live'), 'ended the Rook attack on Groddle Forest Junction (1 player there)');
+    assert.equal(line({ street }, 'none'), 'tried to end a Rook attack on Groddle Forest Junction, but there was none');
+    assert.equal(line({ street }, 'ending'), 'tried to end the Rook attack on Groddle Forest Junction, but it was already leaving');
+    assert.equal(line({ street }, 'down'), 'tried to end the Rook attack on Groddle Forest Junction (realtime server down)');
+  });
+
+  it('the page: a Rook attacks panel on the Players tab; End attack only from a confirm step; polled with Online now', () => {
+    const page = readFileSync(sitePath('src/AdminConsolePage.php'), 'utf8');
+    for (const hook of ['data-console-rooks hidden>', 'data-console-rooks-empty', 'data-console-rooks-count', '<h2 id="console-rooks-title">Rook attacks']) assert.ok(page.includes(hook), hook);
+    const panel = page.slice(page.indexOf('<section class="console-panel console-rooks"'), page.indexOf('<section class="console-panel console-broadcast"'));
+    assert.ok(panel.length > 0 && page.indexOf('console-rooks') < page.indexOf('id="console-reports"'), 'on the Players tab');
+    assert.doesNotMatch(panel, /[—–]|Glitch/);
+    const src = readFileSync(sitePath('console/console.js'), 'utf8');
+    const end = src.slice(src.indexOf('function endRook('), src.indexOf('async function pollOnline('));
+    assert.ok(end.indexOf('dialog(COPY.rookEndConfirm(') >= 0 && end.indexOf('dialog(COPY.rookEndConfirm(') < end.indexOf("api.call('admin/rook_end'"), 'the call only from the confirm');
+    assert.match(end, /body: \{ street: a\.street\.tsid \}/);
+    assert.match(end, /\{ danger: true \}\);/);
+    assert.match(src, /renderBroadcast\(\);\s*pollRooks\(\);/, 'polled with Online now');
+    const rows = src.slice(src.indexOf('function renderRooks('), src.indexOf('async function pollRooks('));
+    assert.match(rows, /rookEndable\(a\)/);
+    assert.match(rows, /el\('b', \{ text: a\.street\.label \}\)/, 'the street name as text');
+  });
+
+  it('the routes: administrators only, the server\'s signed calls, one log line for every end', { skip: !hasPhp && 'no php' }, () => {
+    const src = readFileSync(sitePath('src/AdminConsole.php'), 'utf8');
+    assert.match(src, /#\[Route\(Method::Get, '\/groddle\/v1\/admin\/rooks', policy: new Policy\(Access::Cap, self::ADMIN\)\)\]/);
+    assert.match(src, /#\[Route\(Method::Post, '\/groddle\/v1\/admin\/rook_end', policy: new Policy\(Access::Cap, self::ADMIN\)\)\]/);
+    const end = src.slice(src.indexOf('public function rookEnd('), src.indexOf('public static function rookEndText('));
+    assert.match(end, /\(new RealtimeCall\(\$this->minn\)\)->post\('rook_end', \['street' => \$tsid\]\)/);
+    assert.equal((end.match(/->record\(/g) || []).length, 1, 'one line whatever the server said');
+    assert.match(end, /->record\(\$admin, 0, 'rook_end', \$detail, \$delivery\)/);
+    assert.ok(end.indexOf('self::STREET') < end.indexOf("post('rook_end'"), 'the street is checked before the call');
+    assert.match(readFileSync(sitePath('src/RealtimeCall.php'), 'utf8'), /preg_match\('\/\^\[a-z\]\[a-z_\]\{0,15\}\$\/', \$call\)/, 'rook_end is a call name the client sends');
+    const rows = php(`AdminConsole::rookRows([['street' => 'GCRC6VC9MAO1Q7F', 'phase' => 'angry', 'angry' => 'angry2', 'health' => 300, 'maxHealth' => 300, 'stun' => 25, 'maxStun' => 200, 'wingBeats' => 1, 'clock' => 1234, 'orbs' => 1, 'primed' => false, 'scheduled' => true, 'players' => [['id' => 7, 'name' => 'Ada'], ['id' => 0, 'name' => 'x'], 'bad']], ['street' => '../etc'], 'nope', ['street' => 'GZZ', 'phase' => 'boom']], ['GCRC6VC9MAO1Q7F' => ['label' => 'Groddle Forest Junction']])`);
+    assert.deepEqual(rows.map((r) => r.street), [{ tsid: 'GCRC6VC9MAO1Q7F', label: 'Groddle Forest Junction' }, { tsid: 'GZZ', label: 'GZZ' }], 'by street name; bad rows left out');
+    assert.deepEqual(rows[0], { street: { tsid: 'GCRC6VC9MAO1Q7F', label: 'Groddle Forest Junction' }, phase: 'angry', angry: 'angry2', health: 300, maxHealth: 300, stun: 25, maxStun: 200, wingBeats: 1, clock: 1234, orbs: 1, primed: false, scheduled: true, players: [{ id: 7, name: 'Ada' }] });
+    assert.equal(rows[1].phase, 'build_up', 'an unknown phase reads as over the street');
+    assert.equal(php(`AdminConsole::rookEndText('Groddle Forest Junction', 'live', 3)`), 'The Rook is flying off Groddle Forest Junction; 3 players there saw it go. Nobody gets iMG for it, and what it rooked stays rooked.');
+    assert.equal(php(`AdminConsole::rookEndText('Hechey Track', 'none', 0)`), 'There is no Rook over Hechey Track now.');
+    assert.equal(php(`AdminConsole::rookEndText('Hechey Track', 'ending', 0)`), 'The Rook over Hechey Track is already leaving.');
+    assert.match(php(`AdminConsole::rookEndText('Hechey Track', 'down', 0)`), /not answering/);
+    for (const d of ['live', 'none', 'ending', 'down']) assert.ok(!/[—–]/.test(php(`AdminConsole::rookEndText('X', '${d}', 2)`)), d);
+  });
+
+  it('the server: signed calls only, the departure path, nothing paid (groddle-afternoon-server rook_admin.go)', () => {
+    const src = readFileSync(serverPath('rook_admin.go'), 'utf8');
+    assert.match(src, /serviceHandlers\["rooks"\] = adminRooks/);
+    assert.match(src, /serviceHandlers\["rook_end"\] = adminRookEnd/);
+    assert.doesNotMatch(src, /r\.Handle\(/, 'no socket kinds');
+    const end = src.slice(src.indexOf('func (m *rook) endByAdmin('));
+    assert.match(end, /m\.departLocked\(a, /);
+    assert.doesNotMatch(end, /m\.defeat\(|m\.you\(|m\.youID\(|primeComplete\(/, 'no rewards, no costs');
+    assert.match(readFileSync(serverPath('rook.go'), 'utf8'), /m\.departLocked\(a, map\[string\]any\{"type": "depart"\}\)/, 'the third wing beat leaves the same way');
+    for (const t of ['TestAdminRookCallsRefuseUnsignedBadAndReplayed', 'TestAdminRookEndOnAStreetWithNoRook', 'TestAdminRooksListsAndRookEndSendsTheRookOffWithNoRewards', 'TestAdminRookEndIsKeptAcrossARestart']) assert.match(readFileSync(serverPath('rook_admin_test.go'), 'utf8'), new RegExp(`func ${t}\\(`), t);
   });
 });
