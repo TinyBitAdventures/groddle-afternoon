@@ -884,8 +884,8 @@
    "id": "races",
    "group": "quests",
    "name": "Races and Game of Crowns",
-   "status": "solo",
-   "blurb": "Seven race courses rebuilt from footage, raced against recovered rival Glitches under the final ticket-race rules, to Tiny Speck’s own finish gate: a striped post behind you, one in front and the red and white bar between (how far apart they stand is ours). In multiplayer, Grab ’Em Good, the seven finish-line races and the Game of Crowns are against the real players on your street.",
+   "status": "rebuilt",
+   "blurb": "Seven race courses rebuilt from footage, raced against recovered rival Glitches under the final ticket-race rules, to Tiny Speck’s own finish gate: a striped post behind you, one in front and the red and white bar between (how far apart they stand is ours). In multiplayer, Grab ’Em Good, the seven finish-line races and the Game of Crowns are against the real players on your street; played alone, against the rival Glitches.",
    "multiplayer": "Grab ’Em Good, the seven finish-line races, The Great Hog Haul and the Game of Crowns (four players, the crown, tags and locks decided by the server) are played against the real players on your street; a reload mid-race ends it for both, as a logout did. A reload during a Game of Crowns takes you out while the others play on, and nobody races from Naraka. Math Mayhem, the crowd game on the same arena, is played between real players too: a Game Pig beside the ticket dispensers puts four to twenty in one game, blue and red teams add and subtract numbers when they touch, and the first to make the target wins.",
    "spot": null,
    "evidence": [
@@ -902,8 +902,8 @@
    "id": "hog-haul",
    "group": "quests",
    "name": "The Great Hog Haul",
-   "status": "solo",
-   "blurb": "The piggy-wrangling race, on its real cave street, against a rival.",
+   "status": "source",
+   "blurb": "The piggy-wrangling race, on its real cave street, by the original rules: against the real players on your street in multiplayer, against a rival when played alone.",
    "multiplayer": "In multiplayer the ticket challenges the real players on your street, the server decides every sack, Piggy and pen delivery, and the challenge puts The Great Hog Haul in your quest log, finished when you win.",
    "spot": null,
    "evidence": [
@@ -998,7 +998,7 @@
    "group": "home",
    "name": "Your house and yard",
    "status": "source",
-   "blurb": "Get your house and home street free, as in 2012: the Magic Rock hands you a Home Street Ticket and the Home Street Selection Machine takes it for a Meadow, Firebog or Uralia street. Paper it wall by wall with Tiny Speck’s own 109 wallpapers, floors and ceilings, decorate rooms, cultivate the street (and move its Mailbox, Magic Rock and Mail Dispatcher wherever you like) and the private back yard left of the house (walk out through the house’s open end; worn-out rocks, gardens and patches become protos you restore with a project), expand both (the yard from 5 to 20 segments, which with a full-width street earns Landgrabber), restyle the street as any of 36 of the original 37 street styles and the back yard as any of 34 of its 37 (Change Style, level x 10 iMG; each rebuilt from Tiny Speck’s own scenery, a yard drawn like the street of its template family), keep animals. A Butler arrives in a box, stitched part by part from Tiny Speck’s own pieces (choose its head, face, accessory, body, arms and legs), to greet you home, hold what neighbours leave, invite you to join the club and hear about it, and swap daily hi signs with you (press 5; outrun its hi for the evasion badges). Add a second and third floor with a Door (the Furniture Store, or recipe 260): set it on your top floor and put 100 Planks into Build a New Floor. Give any piece a new style in Decorate: the original’s 565 furniture upgrades in Tiny Speck’s own art, 113 of them free and the 452 that cost credits sold for currants instead, at 1,000 currants a credit (reimagined: the going rate players sold credit furniture at in the 2012 Marketplace forum), so a 15 credit Chair style is 15,000 currants; Bonus Furniture Upgrade I to III turn 5% of the furniture you make into a style that cost credits.",
+   "blurb": "Get your house and home street free, as in 2012: the Magic Rock hands you a Home Street Ticket and the Home Street Selection Machine takes it for a Meadow, Firebog or Uralia street. Paper it wall by wall with Tiny Speck’s own 109 wallpapers, floors and ceilings, decorate rooms (see Furniture and decorating), cultivate the street (and move its Mailbox, Magic Rock and Mail Dispatcher wherever you like) and the private back yard left of the house (walk out through the house’s open end; worn-out rocks, gardens and patches become protos you restore with a project), expand both (the yard from 5 to 20 segments, which with a full-width street earns Landgrabber), restyle the street as any of 36 of the original 37 street styles and the back yard as any of 34 of its 37 (Change Style, level x 10 iMG; each rebuilt from Tiny Speck’s own scenery, a yard drawn like the street of its template family), keep animals. A Butler arrives in a box, stitched part by part from Tiny Speck’s own pieces (choose its head, face, accessory, body, arms and legs), to greet you home, hold what neighbours leave, invite you to join the club and hear about it, and swap daily hi signs with you (press 5; outrun its hi for the evasion badges). Add a second and third floor with a Door (the Furniture Store, or recipe 260): set it on your top floor and put 100 Planks into Build a New Floor.",
    "multiplayer": "Visitors on your home street fill your Magic Rock’s daily iMG, and you collect it there the next game day; your page on the site shows your home street as a diorama drawn from the game’s own art.",
    "spot": "mailbox",
    "evidence": [
@@ -1014,6 +1014,42 @@
    ],
    "shot": "shots/homes.webp",
    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&timedemo=day&homedemo=decorate&practice=1"
+  },
+  {
+   "id": "furniture",
+   "group": "home",
+   "name": "Furniture and decorating",
+   "status": "source",
+   "blurb": "Buy furniture at the Furniture Store or make it, then decorate in Decoration Mode: drag pieces around a full-screen room, flip them, move them forward or back, and set things from your pack on shelves, tables and seats. Give any piece a new style: the original’s 565 furniture upgrades in Tiny Speck’s own art, 113 of them free and the 452 that cost credits sold for currants instead, at 1,000 currants a credit (reimagined: the going rate players sold credit furniture at in the 2012 Marketplace forum), so a 15 credit Chair style is 15,000 currants; Bonus Furniture Upgrade I to III turn 5% of the furniture you make into a style that cost credits. Cabinets open to their own grid of slots (32, 16, 9 or 6), and a Storage Display Box shows off one kind of thing, priced for visitors to buy.",
+   "multiplayer": "Visitors in your house buy from your Storage Display Boxes, the currants waiting on the box until you collect them, and friends with your key open your cabinets.",
+   "spot": null,
+   "evidence": [
+    "public/js/home-decor.js",
+    "public/js/furniture-upgrades.js",
+    "public/js/furniture-upgrade-picker.js",
+    "public/js/home-storage.js",
+    "public/js/features/home-storage-feature.js"
+   ],
+   "shot": null,
+   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&homedemo=decorate&practice=1"
+  },
+  {
+   "id": "notes",
+   "group": "home",
+   "name": "Notes and Notice Boards",
+   "status": "source",
+   "blurb": "With Penpersonship and a working Quill, turn a sheet of Paper into a Note and write on it (a 150-character title and 1,000 characters), then read it, give it, put it in a Fortune Cookie or pin it to a Notice Board, which holds ten. Notes on the ground and on the boards read and come away as they did.",
+   "multiplayer": "A Notice Board is shared by everyone on its street: what you pin, the others read with your name on it and can take.",
+   "spot": null,
+   "evidence": [
+    "public/js/street-furniture.js",
+    "public/js/note-view.js",
+    "public/js/features/street-furniture-feature.js",
+    "public/js/boards-mp.js",
+    "public/js/features/boards-mp-feature.js"
+   ],
+   "shot": null,
+   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&notedemo=1&practice=1"
   },
   {
    "id": "mail",
@@ -1104,8 +1140,8 @@
    "id": "rooks",
    "group": "late",
    "name": "Rook attacks",
-   "status": "solo",
-   "blurb": "The herald, the attack, stuns with the Focusing Orb, primed shrines and the revival. In multiplayer, everyone on the street fights the same Rook together.",
+   "status": "source",
+   "blurb": "The herald, the attack, stuns with the Focusing Orb, primed shrines and the revival, by the original rules. In multiplayer, everyone on the street fights the same Rook together at the original’s full costs; played alone, the street’s critters, trees and shrine join your orb and the costs are lighter.",
    "multiplayer": "Everyone on the street fights the same Rook together.",
    "spot": null,
    "evidence": [
@@ -1283,15 +1319,15 @@
   }
  ],
  "tally": {
-  "source": 53,
-  "rebuilt": 10,
+  "source": 57,
+  "rebuilt": 11,
   "reimagined": 4,
-  "solo": 6,
+  "solo": 3,
   "progress": 1
  },
- "back": 73,
- "possible": 74,
- "multiplayer": 40,
+ "back": 75,
+ "possible": 76,
+ "multiplayer": 42,
  "quests": {
   "total": 445,
   "story": 245,
@@ -2694,9 +2730,104 @@
   "deployed": "2026-11-04"
  },
  "git": {
-  "commits": 1240,
+  "commits": 1262,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-04",
+    "kind": "improve",
+    "text": "A repair refused for energy says what it needs and what you have, or that your energy tank is too small"
+   },
+   {
+    "date": "2026-11-04",
+    "kind": "fix",
+    "text": "Selling, dropping, giving or storing the item you picked takes that one, not another of its kind"
+   },
+   {
+    "date": "2026-11-04",
+    "kind": "fix",
+    "text": "A tool or Firefly Jar bought after one left is new, and each jar keeps its own Fireflies"
+   },
+   {
+    "date": "2026-11-04",
+    "kind": "new",
+    "text": "A heatmap of commits by day on Every change; pick a day to list only its changes"
+   },
+   {
+    "date": "2026-11-04",
+    "kind": "fix",
+    "text": "A revived animal comes back where it lay rooked, solo and online"
+   },
+   {
+    "date": "2026-11-04",
+    "kind": "fix",
+    "text": "Five Street Creator trophy pieces in the pack become the trophy, online too"
+   },
+   {
+    "date": "2026-11-04",
+    "kind": "fix",
+    "text": "The GPS lights every signpost arm to the next street, both posts on Larceny Ladder"
+   },
+   {
+    "date": "2026-11-04",
+    "kind": "new",
+    "text": "Zoom and pan on the Map: the wheel or a pinch, a drag, and +, - and whole-region buttons"
+   },
+   {
+    "date": "2026-11-04",
+    "kind": "new",
+    "text": "Notice Boards are shared online: what you pin, everyone on the street reads and can take"
+   },
+   {
+    "date": "2026-11-04",
+    "kind": "fix",
+    "text": "Text selected in chat stays selected and copies, instead of vanishing after a second or two"
+   },
+   {
+    "date": "2026-11-04",
+    "kind": "improve",
+    "text": "The chat box wraps and grows up to five lines, so a long message stays in view"
+   },
+   {
+    "date": "2026-11-04",
+    "kind": "improve",
+    "text": "Web addresses in chat are links, and a link to another site asks first"
+   },
+   {
+    "date": "2026-11-04",
+    "kind": "new",
+    "text": "A Projects panel lists your street projects, what they still need, and takes you there"
+   },
+   {
+    "date": "2026-11-04",
+    "kind": "new",
+    "text": "Auction deliveries come by red AFLC Frog, straight into the pack"
+   },
+   {
+    "date": "2026-11-04",
+    "kind": "improve",
+    "text": "NPC quest offers that move you also say \"Accepting takes you somewhere new.\""
+   },
+   {
+    "date": "2026-11-04",
+    "kind": "fix",
+    "text": "Spinach can't be activated in Rooks' Woods or Gwendolyn's Outer Mind"
+   },
+   {
+    "date": "2026-11-04",
+    "kind": "improve",
+    "text": "The Crafty Bot's quantity box updates its fuel and ingredients as you type"
+   },
+   {
+    "date": "2026-11-04",
+    "kind": "fix",
+    "text": "An upgrade card you cannot afford has a dark, readable title"
+   },
+   {
+    "date": "2026-11-04",
+    "kind": "fix",
+    "text": "The GPS plans the route again when you fall to The Other Drop's floor"
+   },
    {
     "date": "2026-11-04",
     "kind": "fix",
@@ -2721,101 +2852,6 @@
     "date": "2026-11-04",
     "kind": "fix",
     "text": "Quoins, rocks and animals are placed by what the full jump reaches, not the old lower jump"
-   },
-   {
-    "date": "2026-11-04",
-    "kind": "improve",
-    "text": "Skipping the tutorial in solo gives High Jumper I and II, so you start with the full jump"
-   },
-   {
-    "date": "2026-11-04",
-    "kind": "fix",
-    "text": "Jumps take the same time at any frame rate: no more slow motion under 24 fps"
-   },
-   {
-    "date": "2026-11-04",
-    "kind": "improve",
-    "text": "A new character jumps low until it buys High Jumper I and II, as in the original"
-   },
-   {
-    "date": "2026-11-04",
-    "kind": "improve",
-    "text": "The Map grows with the window, so street names read at least as large as before on a big screen"
-   },
-   {
-    "date": "2026-11-04",
-    "kind": "improve",
-    "text": "The Quests sheet has a search box and a sort picker (Newest first, Oldest first, Name, Most progress)"
-   },
-   {
-    "date": "2026-11-04",
-    "kind": "fix",
-    "text": "Setting a Teleportation Point asks \"New Teleport Point?\" first, and its button says Edit"
-   },
-   {
-    "date": "2026-11-04",
-    "kind": "fix",
-    "text": "The Map's search box always empties for a search when clicked or typed in"
-   },
-   {
-    "date": "2026-11-04",
-    "kind": "fix",
-    "text": "Mail with a long subject wraps in the inbox list instead of scrolling it sideways"
-   },
-   {
-    "date": "2026-11-04",
-    "kind": "fix",
-    "text": "The Mail Dispatcher opens on a new letter without hiding the inbox's message under it"
-   },
-   {
-    "date": "2026-11-04",
-    "kind": "fix",
-    "text": "Shop buttons and every count chooser say the new count as you type it"
-   },
-   {
-    "date": "2026-11-04",
-    "kind": "fix",
-    "text": "A stack's menu with many verbs and a long description stays on the screen"
-   },
-   {
-    "date": "2026-11-04",
-    "kind": "fix",
-    "text": "The Quests sheet shows every quest, newest first, and its tabs count what its footer counts"
-   },
-   {
-    "date": "2026-11-04",
-    "kind": "fix",
-    "text": "The Enter chooser shows a stack on the ground as its item, not as its count"
-   },
-   {
-    "date": "2026-11-04",
-    "kind": "fix",
-    "text": "Routes from the bottom of The Other Drop no longer send you up a drop you can't climb"
-   },
-   {
-    "date": "2026-11-04",
-    "kind": "improve",
-    "text": "Quest offers that move you say \"Accepting takes you somewhere new.\""
-   },
-   {
-    "date": "2026-11-04",
-    "kind": "improve",
-    "text": "Your auctions splits what ended into Bought, Sold and Expired, and All auctions leaves out your own"
-   },
-   {
-    "date": "2026-11-04",
-    "kind": "fix",
-    "text": "Spinach can't be activated inside Mental Block and the other challenge rooms"
-   },
-   {
-    "date": "2026-11-04",
-    "kind": "fix",
-    "text": "Quoins in quest rooms stay put at the daily limit, as they do on streets"
-   },
-   {
-    "date": "2026-11-04",
-    "kind": "fix",
-    "text": "Trees, rocks and Piggies are no longer planted behind scenery drawn in front of the street"
    }
   ]
  },

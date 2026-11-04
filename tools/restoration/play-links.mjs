@@ -49,6 +49,10 @@ export const PLAY_ROUTES = Object.freeze({
   feats: `${BASE}&companiondemo=feat`,
   seasons: `${BASE}&season=zilloween&seasondemo=1`,
   mail: `${BASE}&homedemo=mail`,
+  // A furnished room with Decorate open: drag, flip and restyle the pieces.
+  furniture: `${BASE}&homedemo=decorate`,
+  // A Note on the ground and a Notice Board beside you.
+  notes: `${BASE}&notedemo=1`,
   tower: `${BASE}&homedemo=home&towerdemo=built&towerfloors=5`,
   craftybot: `${BASE}&homedemo=interior&homex=-200&craftybotdemo=bot`,
   artifacts: `${BASE}&artifactdemo=rocks`,
