@@ -24,9 +24,9 @@ import { ancestralClock, stealChanceForSeconds } from '../public/js/juju-bandits
 import { applyBuff, createBuffState, hasBuff, removeBuff } from '../public/js/buffs.js?v=036fee53';
 import { getBuffCatalog, loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=10b118dd';
 import { IMAGINATION_UPGRADES, buildDeck, upgradeStatus } from '../public/js/imagination.js?v=0cab36eb';
-import { isOfferedInRemake, remakeStatus } from '../public/js/imagination-remake.js?v=83dc3f68';
+import { isOfferedInRemake, remakeStatus } from '../public/js/imagination-remake.js?v=c37ad887';
 import { POTION_TEXT, ancestralCheck } from '../public/js/potions.js?v=c21bad59';
-import { FEATURES } from '../public/js/features/index.js?v=da516b80';
+import { FEATURES } from '../public/js/features/index.js?v=9552eb84';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const GSJS = join(root, '../glitch-GameServerJS');

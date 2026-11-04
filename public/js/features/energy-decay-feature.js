@@ -32,10 +32,10 @@
  */
 import { createEnergyLossClock, ENERGY_LOSS_TICK_MS, energyLossSkip, periodicEnergyLoss } from '../energy-decay.js?v=01009c8b';
 import { energyMax } from '../metabolics.js?v=8504134e';
-import { isNewxpSceneTsid } from '../newxp.js?v=20a28ea6';
-import { homesFeature } from './homes-feature.js?v=4bac1ccf';
+import { isNewxpSceneTsid } from '../newxp.js?v=8aef8287';
+import { homesFeature } from './homes-feature.js?v=98970cff';
 import { meditationFeature } from './meditation-feature.js?v=11c9ecae';
-import { newxpFeature } from './newxp-feature.js?v=9146ded2';
+import { newxpFeature } from './newxp-feature.js?v=7ed3081e';
 
 export const ENERGY_DECAY_FEATURE_ID = 'energy-decay';
 const BEAM_ME_DOWN_TSID = 'PUZZLESCENE_BEAM_ME_DOWN';

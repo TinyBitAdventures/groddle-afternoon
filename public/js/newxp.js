@@ -126,6 +126,12 @@ export const NEWXP_UPGRADES = Object.freeze({
   skill_learning: { name: 'Skill Learning Brain', cost: 500, needs: 'mappery' },
 });
 export const ISLAND_HAND_SIZE = 3;
+/**
+ * The cards a solo player who skips the tutorial is given (Austin 2026-11-04), recorded as owned
+ * with no iMG spent and no purchase history: the walk and jump cards its training levels sell.
+ * The walk already runs at Walk Speed II's pace; the jump is the classic one from the start.
+ */
+export const SKIP_TUTORIAL_CARDS = Object.freeze(['walk_speed_1', 'walk_speed_2', 'jump_1', 'jump_2']);
 
 /**
  * The hand an island quoin opens (imagination_get_next_upgrades in a newxp

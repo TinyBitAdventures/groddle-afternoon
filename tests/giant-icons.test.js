@@ -27,7 +27,7 @@ import {
   titheIcon,
   useEmblem,
 } from '../public/js/giant-icons.js?v=4639df55';
-import { remakeStatus } from '../public/js/imagination-remake.js?v=83dc3f68';
+import { remakeStatus } from '../public/js/imagination-remake.js?v=c37ad887';
 // The key every importer uses (giant-icons-feature.js too): one module, one record.
 import { CONVERSATION_RULES, conversationRecord, hasCompleted, resetConversationRecord, restoreConversationRecord } from '../public/js/conversations.js?v=7cbdfea4';
 import { CONVERSATIONS, TELLERS } from '../public/js/conversations-data.js?v=f11b7e02';

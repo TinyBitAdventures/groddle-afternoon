@@ -24,7 +24,7 @@ import { QUEST_ROOMS, BUILT_ROOMS } from '../public/js/quest-rooms/catalog.js?v=
 import { skillAuditTable } from '../public/js/skill-tree.js?v=53795620';
 import { HUB_MAP_STREETS } from '../public/js/hub-maps-data.js?v=ffe222f1';
 import { IMAGINATION_UPGRADES } from '../public/js/imagination-data.js?v=4a85e7fe';
-import { remakeStatus } from '../public/js/imagination-remake.js?v=83dc3f68';
+import { remakeStatus } from '../public/js/imagination-remake.js?v=c37ad887';
 import { SHOTS } from './restoration/shots.mjs';
 import { playFor, playHref } from './restoration/play-links.mjs';
 import { DESIGNERS, DESIGNER_LEVELS, TEXT_LEVELS } from './restoration/designer-levels.mjs';

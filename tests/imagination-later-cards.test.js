@@ -8,7 +8,7 @@ import assert from 'node:assert/strict';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { IMAGINATION_UPGRADES } from '../public/js/imagination-data.js?v=4a85e7fe';
-import { isOfferedInRemake, remakeStatus } from '../public/js/imagination-remake.js?v=83dc3f68';
+import { isOfferedInRemake, remakeStatus } from '../public/js/imagination-remake.js?v=c37ad887';
 import {
   BONUS_TOOL_CANDIDATES,
   adjustedTaskLimit,

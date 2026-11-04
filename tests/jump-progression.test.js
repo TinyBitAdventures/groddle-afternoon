@@ -30,11 +30,12 @@ import {
   remakeMovementMultipliers,
   upgradeStatus,
 } from '../public/js/imagination.js?v=0cab36eb';
-import { isOfferedInRemake, isOfferedOnline } from '../public/js/imagination-remake.js?v=83dc3f68';
-import { imaginationFeature } from '../public/js/features/imagination-feature.js?v=8afbf4e3';
+import { isOfferedInRemake, isOfferedOnline } from '../public/js/imagination-remake.js?v=c37ad887';
+import { imaginationFeature } from '../public/js/features/imagination-feature.js?v=6721e002';
 import { NORMAL_BUFF, jumpApex } from '../public/js/avatar-step.js?v=de5b3a16';
 import { reachStreet } from '../public/js/builder/reach-graph.js?v=0144f90a';
 import { WINTER_WALK_START, WINTER_WALK_TSID } from '../public/js/winter-walk-streets.js?v=8607edd3';
+import { SKIP_TUTORIAL_CARDS } from '../public/js/newxp.js?v=8aef8287';
 
 const read = (rel) => readFileSync(join(import.meta.dirname, '..', 'public', rel), 'utf8');
 
@@ -122,6 +123,7 @@ describe('High Jumper I and II are bought', () => {
     const src = read('js/imagination-remake.js');
     assert.match(src, /\[\/\^jump_1\$\/, 'live', 'A new player jumps about 69 px high; High Jumper I raises that to about 116 px\./);
     assert.match(src, /\[\/\^jump_2\$\/, 'live', 'The full jump, about 142 px high\./);
+    assert.match(src, /a solo game that skips the tutorial is given it\.'\],\n\s*\[\/\^jump_2\$\//);
   });
 });
 
@@ -225,8 +227,35 @@ describe('places laid out for the classic jump', () => {
     assert.match(read('js/features/newxp-feature.js'), /const ph = tutorialPhysics\(save\.upgrades\);/);
   });
 
-  it('skipping the tutorial gives the walk cards it already walks with, so High Jumper II can be dealt', () => {
-    const src = read('js/features/newxp-feature.js');
-    assert.match(src, /for \(const id of \['walk_speed_1', 'walk_speed_2'\]\) engine\.query\?\.\('grantTutorialUpgrade', id, engine\);/);
+});
+
+describe('skipping the tutorial in solo gives the walk and jump cards (Austin 2026-11-04)', () => {
+  const src = read('js/features/newxp-feature.js');
+
+  it('the cards are Walk Speed I and II and High Jumper I and II', () => {
+    assert.deepEqual([...SKIP_TUTORIAL_CARDS], ['walk_speed_1', 'walk_speed_2', 'jump_1', 'jump_2']);
+  });
+
+  it('both ways to skip give them: Skip to Ur on the start card and the tutorial pill\'s Skip tutorial', () => {
+    assert.match(src, /data-nx-skipstart\]'\)\.addEventListener\('click', \(\) => \{\n\s*save\.status = 'skipped';\n\s*grantSkipCards\(engine\);/);
+    assert.match(src, /async function skipTutorial\(engine\) \{\n\s*save\.status = 'skipped';\n\s*grantSkipCards\(engine\);/);
+  });
+
+  it('online is unchanged: never in multiplayer', () => {
+    assert.match(src, /function grantSkipCards\(engine\) \{\n\s*if \(engine\?\.mode === 'multiplayer'\) return;\n\s*for \(const id of SKIP_TUTORIAL_CARDS\) engine\.query\?\.\('grantTutorialUpgrade', id, engine\);/);
+  });
+
+  it('recorded as owned the way the migration records them: no iMG spent, nothing in the history; the full jump', () => {
+    for (const start of [[], [...STARTER_UPGRADES]]) {
+      const engine = fakeEngine(start);
+      imaginationFeature.restore({ starterGranted: true, cardsVersion: 2 }, engine);
+      const before = engine.pc.imagination;
+      for (const id of SKIP_TUTORIAL_CARDS) imaginationFeature.grantTutorialUpgrade(id, engine);
+      for (const id of SKIP_TUTORIAL_CARDS) assert.ok(engine.pc.imaginationUpgrades.includes(id), id);
+      assert.equal(engine.pc.imagination, before, 'no iMG spent');
+      assert.equal(imaginationFeature.save().history.length, 0, 'no purchase history');
+      assert.equal(imaginationFeature.physics(engine).jump, 1);
+      assert.equal(imaginationFeature.physics(engine).speed, 1);
+    }
   });
 });

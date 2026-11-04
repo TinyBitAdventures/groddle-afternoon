@@ -116,8 +116,9 @@ import {
   training1Layout,
   training2Layout,
   tutorialPhysics,
+  SKIP_TUTORIAL_CARDS,
   vogPages,
-} from '../newxp.js?v=20a28ea6';
+} from '../newxp.js?v=8aef8287';
 import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=602da017';
 import { QUOIN_SHEET, QUOIN_TYPES, qrazyRewardForLevel } from '../quoins.js?v=dfe1ff0a';
 import { soundForQuoin } from '../sound-moments.js?v=2f8597cd';
@@ -130,7 +131,7 @@ import * as kit from '../quest-rooms/kit.js?v=4d8ab82d';
 import { frameTexture, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js?v=3149d699';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 import { displayTopOf, itemstackOverlayPoint, playPoofIn, playSheetOverlay, poofInAlpha } from '../overlay-art.js?v=11b6dd7f';
-import { HOME_MACHINE } from '../home-ticket.js?v=cafddb60';
+import { HOME_MACHINE } from '../home-ticket.js?v=a428e443';
 import { animalAnchorX, createAnimalState } from '../animals.js?v=761b9fa7';
 import {
   AK_ANIMALS,
@@ -3409,13 +3410,19 @@ function teardown(engine) {
   if (auto) engine.setData('newxpAutoplay', save.status === 'done' ? 'done' : save.status);
 }
 
+/**
+ * Solo only (multiplayer has no skip): a player who skips the tutorial is given the walk and jump
+ * cards its training levels sell (newxp.js SKIP_TUTORIAL_CARDS), as owned cards with no iMG spent
+ * and no history, the way a save from before the jump was bought keeps them.
+ */
+function grantSkipCards(engine) {
+  if (engine?.mode === 'multiplayer') return;
+  for (const id of SKIP_TUTORIAL_CARDS) engine.query?.('grantTutorialUpgrade', id, engine);
+}
+
 async function skipTutorial(engine) {
   save.status = 'skipped';
-  // The remake's walk never drops below Walk Speed II's pace (imagination.js
-  // remakeMovementMultipliers), so a player who skips is given the two walk cards it already
-  // walks with; High Jumper II needs Walk Speed I, and both High Jumper cards are dealt in the
-  // normal hand to a player who skipped before buying them (imagination.js TUTORIAL_CARDS_DEALT).
-  for (const id of ['walk_speed_1', 'walk_speed_2']) engine.query?.('grantTutorialUpgrade', id, engine);
+  grantSkipCards(engine);
   engine.save();
   const inScene = engine.inScene() && isNewxpSceneTsid(engine.streetTsid);
   teardown(engine);
@@ -3506,6 +3513,7 @@ function showStartCard(engine) {
     });
     box.querySelector('[data-nx-skipstart]').addEventListener('click', () => {
       save.status = 'skipped';
+      grantSkipCards(engine);
       startBtn.click();
     });
     // "Customize look first" on a brand-new save is the tutorial's own path with the look

@@ -18,7 +18,7 @@ import {
   toolWearMultiplier,
 } from '../public/js/imagination-effects.js?v=70169933';
 import { IMAGINATION_UPGRADES } from '../public/js/imagination.js?v=0cab36eb';
-import { REMAKE_STATUS_RULES, isOfferedInRemake, remakeStatus } from '../public/js/imagination-remake.js?v=83dc3f68';
+import { REMAKE_STATUS_RULES, isOfferedInRemake, remakeStatus } from '../public/js/imagination-remake.js?v=c37ad887';
 import { applyRewards } from '../public/js/quests.js?v=b2856d6c';
 import { createInventory, countItem, ensureItem } from '../public/js/inventory.js?v=602da017';
 import { createMineRock, miningProfile, mineRock, smeltMetalRocks } from '../public/js/mining.js?v=d856ab96';

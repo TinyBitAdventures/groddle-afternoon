@@ -22,8 +22,8 @@ const RULES = [
   // (Austin 2026-11-04), in the tutorial or from the normal hand (imagination.js TUTORIAL_CARDS_DEALT).
   [/^(walk_speed_[12]|mappery|camera_mode|zoomability|encyclopeddling|skill_learning)$/, 'starter',
     'Bought in the tutorial; a solo game that skips the tutorial is given them. Your walk is always at least the after-tutorial pace.'],
-  [/^jump_1$/, 'live', 'A new player jumps about 69 px high; High Jumper I raises that to about 116 px. Bought in the tutorial, or dealt in your hand if you skipped it.'],
-  [/^jump_2$/, 'live', 'The full jump, about 142 px high. Bought in the tutorial, or dealt in your hand if you skipped it.'],
+  [/^jump_1$/, 'live', 'A new player jumps about 69 px high; High Jumper I raises that to about 116 px. Bought in the tutorial; a solo game that skips the tutorial is given it.'],
+  [/^jump_2$/, 'live', 'The full jump, about 142 px high. Bought in the tutorial; a solo game that skips the tutorial is given it.'],
 
   // Movement and core stats.
   [/^walk_speed_[34]$/, 'live', 'Walk speed rises by the source ratio to the post-tutorial pace (Walk Speed III 1.21x, IV 1.28x).'],

@@ -55,7 +55,7 @@ import {
 import { brainCapacityRescale, skillTimeFactor } from '../imagination-effects.js?v=70169933';
 import { betterLearningDiscount } from '../better-learning.js?v=044ff9ff';
 import { rescaleStudiesForLearningModifier } from '../skills.js?v=4542bdf9';
-import { isOfferedInRemake, isOfferedOnline, remakeStatus } from '../imagination-remake.js?v=83dc3f68';
+import { isOfferedInRemake, isOfferedOnline, remakeStatus } from '../imagination-remake.js?v=c37ad887';
 import { hellFeature } from './hell-feature.js?v=54d49b30';
 
 const ART = 'assets/imagination/cards/';

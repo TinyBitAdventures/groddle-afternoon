@@ -119,8 +119,8 @@ import {
 import { buildNeighbourBackground, neighbourLoadingColors, neighbourPlatforms } from './neighbour-scene.js?v=074126e5';
 import { closeNoteView, noteViewOpen, openBoardView, openNotePicker, openNoteView } from '../note-view.js?v=21c55475';
 import { textureFromUrl } from '../textures.js?v=3149d699';
-import { butlerApi } from './butler-feature.js?v=8619895d';
-import { neighboursMpApi } from './neighbours-mp-feature.js?v=eb6d212b';
+import { butlerApi } from './butler-feature.js?v=8b58c78b';
+import { neighboursMpApi } from './neighbours-mp-feature.js?v=0e75c3e7';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
 import { MAIL_POST_SENDER } from '../mailbox.js?v=b2bde2fe';
 

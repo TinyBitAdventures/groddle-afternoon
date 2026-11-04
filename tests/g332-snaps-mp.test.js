@@ -20,7 +20,7 @@ import {
   canSnap, cleanCaption, isSnapStreet, isSnapUrl, snapAuthor, snapPlace, snapStreet, takePictureState, withCamera,
 } from '../public/js/snaps.js?v=55d4c257';
 import { snapsFeature } from '../public/js/features/snaps-feature.js?v=9c17475e';
-import { FEATURES } from '../public/js/features/index.js?v=da516b80';
+import { FEATURES } from '../public/js/features/index.js?v=9552eb84';
 import { HAS_SITE, SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');
@@ -232,7 +232,7 @@ describe('snaps feature: solo is untouched', () => {
     assert.ok(ids.indexOf('snaps') < ids.indexOf('street-objects'));
     const game = read('public/game.js');
     assert.match(game, /for \(const feature of features\.features\) \{\s*if \(typeof feature\.vendorProfile === 'function'\) activeVendor = feature\.vendorProfile\(activeVendor, engine\) \|\| activeVendor;/);
-    const { remakeStatus, isOfferedInRemake, isOfferedOnline } = await import('../public/js/imagination-remake.js?v=83dc3f68');
+    const { remakeStatus, isOfferedInRemake, isOfferedOnline } = await import('../public/js/imagination-remake.js?v=c37ad887');
     // Snapshottery and its filter packs (js/snap-filters.js) are dealt online only.
     for (const id of ['snapshotting', 'snapshottery_basic_filter_pack', 'snapshottery_filter_pack_1', 'snapshottery_filter_pack_2', 'snapshottery_filter_pack_3']) {
       assert.equal(remakeStatus(id).status, 'online', id);

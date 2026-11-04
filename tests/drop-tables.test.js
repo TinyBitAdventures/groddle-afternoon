@@ -14,7 +14,7 @@ import {
   rollPackageDrop,
   tableItemOdds,
 } from '../public/js/drop-tables.js?v=0f922478';
-import { remakeStatus } from '../public/js/imagination-remake.js?v=83dc3f68';
+import { remakeStatus } from '../public/js/imagination-remake.js?v=c37ad887';
 
 const seq = (...vals) => {
   let i = 0;
