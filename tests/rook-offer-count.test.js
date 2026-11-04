@@ -13,8 +13,8 @@ import { describe, it, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { FakeEl, FakeText } from './social-fake-dom.js';
-import { offerDefaultCount, strikeDamageFor } from '../public/js/rook-attack.js?v=03e79296';
-import { strikeDamage as mpStrikeDamage } from '../public/js/rook-mp.js?v=d906f86e';
+import { offerDefaultCount, strikeDamageFor } from '../public/js/rook-attack.js?v=7650316d';
+import { strikeDamage as mpStrikeDamage } from '../public/js/rook-mp.js?v=49f1edfe';
 import { donationValueFor } from '../public/js/shrines.js?v=9d364845';
 
 const src = (p) => readFileSync(new URL(`../public/${p}`, import.meta.url), 'utf8');

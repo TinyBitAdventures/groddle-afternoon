@@ -18,8 +18,8 @@ import {
   strikeDamage,
   syncKeys,
   syncObjs,
-} from '../public/js/rook-mp.js?v=d906f86e';
-import { rookClockS, canStrike, canStun, rookPresent } from '../public/js/rook-attack.js?v=03e79296';
+} from '../public/js/rook-mp.js?v=49f1edfe';
+import { rookClockS, canStrike, canStun, rookPresent } from '../public/js/rook-attack.js?v=7650316d';
 import { HAS_SERVER, serverPath, skipWithoutServer } from '../tools/repos.mjs';
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -173,7 +173,7 @@ describe('rook-mp: wiring', () => {
   });
 
   it('solo never binds the realtime client or skips its own schedule', () => {
-    assert.match(feature, /if \(engine\.mode === 'multiplayer'\) \{\n\s+\/\/ The realtime server owns every attack[^\n]*\n\s+mpTick\(engine, t\);\n\s+\} else \{\n\s+\/\/ Schedule \(about hourly\)/);
+    assert.match(feature, /if \(engine\.mode === 'multiplayer'\) \{\n\s+\/\/ The realtime server owns every attack[^\n]*\n\s+mpTick\(engine, t\);\n\s+\} else \{\n\s+\/\/ Schedule: once a day, on rookable streets only/);
     assert.match(feature, /function mpBind\(engine\) \{\n\s+if \(mp\) return mp;\n\s+const client = engine\.query\?\.\('realtimeClient'\);/);
     // mpBind is reached only from mpTick, which only multiplayer calls.
     assert.equal([...feature.matchAll(/mpBind\(/g)].length, 2);

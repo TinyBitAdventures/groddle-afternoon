@@ -912,7 +912,8 @@ const SCENARIOS = {
   },
 
   async rook(t) {
-    // Natural attack, brought forward: the save's next-attack time is moved to now.
+    // Natural attack, brought forward: the save's next-attack time (the once-a-day clock) is moved to
+    // now, and &rookwait=10 drops the 2-minute dwell and the 3-20 minute wait to 10 s.
     await t.goto('?autostart=1&resetgame=1&fresh=1', 3000);
     await t.declineOffer();
     await t.context.addInitScript(() => {
@@ -931,7 +932,7 @@ const SCENARIOS = {
       localStorage.setItem(key, JSON.stringify(save));
     });
     await t.page.evaluate(() => sessionStorage.setItem('__ptRook', '1'));
-    await t.goto('?autostart=1', 2000);
+    await t.goto('?autostart=1&rookwait=10', 2000);
     // Open a verb menu right as the herald is due: the attack must wait for it.
     t.step = 'rook vs menu';
     const timeline = [];
@@ -949,7 +950,7 @@ const SCENARIOS = {
       const blocking = Object.keys(ov).filter((k) => k !== 'toast');
       if (blocking.length > 1) t.issue('overlap', `${blocking.join(' + ')} during rook ${d.rookPhase}`);
       if (ov['quest-dialogue'] && d.rookPhase && d.rookPhase !== 'none') t.issue('overlap', `quest dialogue during rook ${d.rookPhase}`);
-      if (!menuHeld && Number(d.rookNextAttack) <= 4) {
+      if (!menuHeld && /^armed:[0-4]$/.test(d.rookArm || '')) {
         menuHeld = true;
         const pig = await t.find(/^npc_piggy$/);
         const menu = pig ? await t.approach(pig) : null;
@@ -975,7 +976,7 @@ const SCENARIOS = {
     t.note(`rook end: phase=${d.rookPhase} health=${d.rookHealth} stats=${d.rookStats} rooked=${d.rookRooked}`);
     await t.goto('?autostart=1', 4000);
     const r = await t.data();
-    t.note(`reload: phase=${r.rookPhase} rooked=${r.rookRooked} next=${r.rookNextAttack}`);
+    t.note(`reload: phase=${r.rookPhase} rooked=${r.rookRooked} next=${r.rookNextAttack} (a day from the herald)`);
   },
 
   async fuzz(t) {

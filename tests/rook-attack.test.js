@@ -14,10 +14,11 @@ import {
   ROOK_SOURCE,
   ROOK_TEXT,
   applyReviveDose,
+  applyDailyRule,
   applyStrike,
-  attackDelayMs,
   canStrike,
   canStun,
+  createRookArm,
   createRookAttack,
   damageFeedText,
   defeatXpFor,
@@ -30,6 +31,9 @@ import {
   rollWingBeat,
   rookClockS,
   rookResponse,
+  rookStartDelayMs,
+  scheduleAfterHerald,
+  stepRookArm,
   rookTrantState,
   soloCost,
   stepRookAttack,
@@ -39,7 +43,7 @@ import {
   stunFeedText,
   stunTableFor,
   useBalmPoint,
-} from '../public/js/rook-attack.js?v=03e79296';
+} from '../public/js/rook-attack.js?v=7650316d';
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'public');
 
@@ -54,9 +58,9 @@ describe('rook attack source constants', () => {
     assert.equal(ROOK_SOURCE.clearAfterDeathS, 15);
     assert.equal(ROOK_SOURCE.reviveMs, 10000);
     assert.equal(ROOK_SOURCE.balmPoints, 5);
-    assert.equal(attackDelayMs(() => 0), 105 * 60 * 1000);
-    assert.equal(attackDelayMs(() => 0.5), 112 * 60 * 1000);
-    assert.ok(attackDelayMs(() => 0.999) <= 120 * 60 * 1000);
+    // The source's hourly admin schedule stays on record; the remake comes once a day (below).
+    assert.equal(ROOK_SOURCE.scheduleMinMin, 60);
+    assert.equal(ROOK_SOURCE.scheduleMaxMin, 60);
   });
 
   it('maps orb joiners to the exact stun table', () => {
@@ -280,7 +284,7 @@ describe('rooked things and cures', () => {
 });
 
 describe('rook attack feature', async () => {
-  const { ROOK_SHEETS, rookAttackFeature } = await import('../public/js/features/rook-attack-feature.js?v=ba9a81cd');
+  const { ROOK_SHEETS, rookAttackFeature } = await import('../public/js/features/rook-attack-feature.js?v=c2eca62f');
   const { createFeatureHost } = await import('../public/js/feature-host.js?v=2ed3c069');
 
   /** Pixel size from a PNG IHDR or a WebP VP8/VP8L/VP8X header. */
@@ -311,7 +315,7 @@ describe('rook attack feature', async () => {
   // of 124x46, 8 to a row. Cut as 124x92 x16 it played two frames stacked and its last two cells
   // half empty. The scene is in the SWF's loopers and its last frame leads into its first.
   it('plays the rooked halo as the SWF did: 30 single frames at 30 fps, looping seamlessly', async () => {
-    const { ROOKED_HALO } = await import('../public/js/features/rook-attack-feature.js?v=ba9a81cd');
+    const { ROOKED_HALO } = await import('../public/js/features/rook-attack-feature.js?v=c2eca62f');
     const { decodePng } = await import('../tools/builder/art-image.mjs');
     const def = ROOK_SHEETS.halo;
     assert.deepEqual({ fw: def.fw, fh: def.fh, cols: def.cols, frames: def.frames }, { fw: 124, fh: 46, cols: 8, frames: 30 });
@@ -357,7 +361,7 @@ describe('rook attack feature', async () => {
   // The rooked animals' clips: the server's cadence per class, the SWFs' 30 fps, and only the
   // scenes the SWFs list in loopers loop (the rest play once and hold, as the client did).
   it('cycles the rooked animal clips on the server cadence, looping only the SWF loopers', async () => {
-    const { ROOKED_CADENCE, ROOKED_FPS, ROOKED_LOOPERS } = await import('../public/js/features/rook-attack-feature.js?v=ba9a81cd');
+    const { ROOKED_CADENCE, ROOKED_FPS, ROOKED_LOOPERS } = await import('../public/js/features/rook-attack-feature.js?v=c2eca62f');
     assert.equal(ROOKED_FPS, 30);
     assert.deepEqual([...ROOKED_LOOPERS].sort(), ['bflyFly', 'bflyRest', 'piggy1']);
     const flat = (c) => [c.start, ...c.cycle].map(([clip, ms]) => `${clip}:${ms}`).join(' ');
@@ -386,12 +390,187 @@ describe('rook attack feature', async () => {
   });
 
   it('saves and restores its slice', () => {
-    rookAttackFeature.restore({ nextAttackAt: 123, balmPoints: 3, stats: { defeats: 1 } });
+    const next = Date.now() + 60 * 60 * 1000;
+    rookAttackFeature.restore({ rule: 'daily', nextAttackAt: next, balmPoints: 3, stats: { defeats: 1 } });
     const slice = rookAttackFeature.save();
-    assert.equal(slice.nextAttackAt, 123);
+    assert.equal(slice.nextAttackAt, next);
+    assert.equal(slice.rule, 'daily');
     assert.equal(slice.balmPoints, 3);
     assert.equal(slice.stats.defeats, 1);
     rookAttackFeature.restore(undefined);
     assert.equal(rookAttackFeature.save().active, null);
+  });
+});
+
+describe('rook schedule: once a day (Austin 2026-11-04, as online)', () => {
+  const MIN = 60 * 1000;
+  const HOUR = 60 * MIN;
+  const DAY = 24 * HOUR;
+  const T0 = Date.UTC(2026, 10, 4, 12, 0, 0);
+
+  it('keeps the rule in ROOK_SOLO: a day, a 2-minute dwell, then 3 to 20 minutes', () => {
+    assert.equal(ROOK_SOLO.dailyMs, DAY);
+    assert.equal(ROOK_SOLO.dwellMs, 2 * MIN);
+    assert.equal(ROOK_SOLO.delayMinMin, 3);
+    assert.equal(ROOK_SOLO.delayMaxMin, 20);
+    assert.equal(rookStartDelayMs(() => 0), 3 * MIN);
+    assert.equal(rookStartDelayMs(() => 0.5), 11.5 * MIN);
+    assert.equal(rookStartDelayMs(() => 1), 20 * MIN);
+    assert.equal('scheduleMinMin' in ROOK_SOLO, false);
+  });
+
+  it('counts the next attack a day from the herald start, not the end of the fight', () => {
+    const save = normalizeRookSave({ rule: 'daily', nextAttackAt: T0 - 1 });
+    const a = createRookAttack({ tsid: 'L1', now: T0 });
+    assert.equal(scheduleAfterHerald(save, a.startedAt), T0 + DAY);
+    assert.equal(save.lastHeraldAt, T0);
+    // A two-hour fight later the clock has not moved.
+    stepRookAttack(a, T0 + 2 * HOUR);
+    assert.equal(save.nextAttackAt, T0 + DAY);
+    // 23 h 59 min after the herald it is still waiting, whatever the street.
+    const arm = createRookArm();
+    assert.equal(stepRookArm(arm, { now: T0 + DAY - MIN, nextAttackAt: save.nextAttackAt, rookable: true, enteredAt: T0 }), 'wait');
+    assert.equal(arm.startAt, 0);
+    assert.equal(stepRookArm(arm, { now: T0 + DAY, nextAttackAt: save.nextAttackAt, rookable: true, enteredAt: T0 }), 'armed');
+  });
+
+  it('needs 2 minutes on a rookable street, then comes a random 3 to 20 minutes later, never on arrival', () => {
+    const next = T0;
+    for (const roll of [0, 0.37, 1]) {
+      const arm = createRookArm();
+      const enteredAt = T0 + 5 * MIN;
+      const ctx = (now, extra = {}) => ({ now, nextAttackAt: next, rookable: true, enteredAt, rng: () => roll, ...extra });
+      assert.equal(stepRookArm(arm, ctx(enteredAt)), 'dwell');
+      assert.equal(stepRookArm(arm, ctx(enteredAt + 8000)), 'dwell', 'the old 8 s arrival start is gone');
+      assert.equal(stepRookArm(arm, ctx(enteredAt + 2 * MIN - 1)), 'dwell');
+      assert.equal(stepRookArm(arm, ctx(enteredAt + 2 * MIN)), 'armed');
+      const wait = arm.startAt - (enteredAt + 2 * MIN);
+      assert.equal(wait, rookStartDelayMs(() => roll));
+      assert.ok(wait >= 3 * MIN && wait <= 20 * MIN);
+      assert.equal(stepRookArm(arm, ctx(arm.startAt - 1)), 'armed');
+      // Busy at the moment: it waits for the player, then starts.
+      assert.equal(stepRookArm(arm, ctx(arm.startAt, { busy: true })), 'busy');
+      assert.equal(stepRookArm(arm, ctx(arm.startAt + 4000, { busy: true })), 'busy');
+      assert.equal(stepRookArm(arm, ctx(arm.startAt + 5000)), 'start');
+    }
+    // Not rookable (no shrine, home, instance, hidden hub): nothing arms.
+    const off = createRookArm();
+    assert.equal(stepRookArm(off, { now: T0 + HOUR, nextAttackAt: next, rookable: false, enteredAt: T0 }), 'off');
+    assert.equal(off.startAt, 0);
+    // A new street (or a reload) starts the dwell again and drops the picked moment.
+    const arm = createRookArm();
+    assert.equal(stepRookArm(arm, { now: T0 + 3 * MIN, nextAttackAt: next, rookable: true, enteredAt: T0, rng: () => 0.5 }), 'armed');
+    assert.equal(stepRookArm(arm, { now: T0 + 4 * MIN, nextAttackAt: next, rookable: true, enteredAt: T0 + 4 * MIN }), 'dwell');
+    assert.equal(arm.startAt, 0);
+    // Already 2 minutes on the street when the day comes up: the 3-20 minutes count from then.
+    const long = createRookArm();
+    assert.equal(stepRookArm(long, { now: T0 + 3 * HOUR, nextAttackAt: T0 + 3 * HOUR, rookable: true, enteredAt: T0, rng: () => 0 }), 'armed');
+    assert.equal(long.startAt, T0 + 3 * HOUR + 3 * MIN);
+  });
+
+  it('migrates a save from before the rule calmly: a day from its first load', () => {
+    // The old 105-120 min schedule had the next attack 40 minutes away.
+    const old = normalizeRookSave({ nextAttackAt: T0 + 40 * MIN, lastStreet: 'LHV1', stats: { attacks: 7 } });
+    assert.equal(old.rule, '');
+    assert.equal(applyDailyRule(old, T0), T0 + DAY);
+    assert.equal(old.rule, 'daily');
+    // Overdue under the old rule (it was due an hour ago): a day from now too, not straight away.
+    const overdue = normalizeRookSave({ nextAttackAt: T0 - HOUR });
+    assert.equal(applyDailyRule(overdue, T0), T0 + DAY);
+    // A known herald start an hour ago (an attack saved mid-fight) would allow one sooner; the calmer wins.
+    const mid = normalizeRookSave({ nextAttackAt: T0 + HOUR, active: createRookAttack({ tsid: 'L1', now: T0 - HOUR }) });
+    assert.equal(applyDailyRule(mid, T0), T0 + DAY);
+    // A new game: the first Rook a day after the first load.
+    const fresh = normalizeRookSave();
+    assert.equal(applyDailyRule(fresh, T0), T0 + DAY);
+    // Once migrated, a later load keeps the time (the migration runs once).
+    const again = normalizeRookSave(JSON.parse(JSON.stringify(old)));
+    assert.equal(applyDailyRule(again, T0 + 5 * HOUR), T0 + DAY);
+    // A clock that went back (more than a day away): a day from now, as rook.go does.
+    const skew = normalizeRookSave({ rule: 'daily', nextAttackAt: T0 + 3 * DAY });
+    assert.equal(applyDailyRule(skew, T0), T0 + DAY);
+  });
+
+  it('counts time away: the clock is real-world time kept in the save', () => {
+    const save = normalizeRookSave({ rule: 'daily' });
+    scheduleAfterHerald(save, T0);
+    // Closed the game for 30 hours; the reload keeps the time, so the day is already up.
+    const later = normalizeRookSave(JSON.parse(JSON.stringify(save)));
+    assert.equal(applyDailyRule(later, T0 + 30 * HOUR), T0 + DAY);
+    const arm = createRookArm();
+    const back = T0 + 30 * HOUR;
+    assert.equal(stepRookArm(arm, { now: back, nextAttackAt: later.nextAttackAt, rookable: true, enteredAt: back }), 'dwell');
+    assert.equal(stepRookArm(arm, { now: back + 2 * MIN, nextAttackAt: later.nextAttackAt, rookable: true, enteredAt: back, rng: () => 0 }), 'armed');
+  });
+
+  it('drives the feature: an old save waits a day, then the dwell and the picked moment', async () => {
+    const { rookAttackFeature } = await import('../public/js/features/rook-attack-feature.js?v=c2eca62f');
+    const realNow = Date.now;
+    const prevPixi = globalThis.PIXI;
+    // Enough Pixi for the sheet loader to try (and quietly fail) its loads in node.
+    globalThis.PIXI = { Texture: class { constructor(o) { Object.assign(this, o); } }, ImageSource: class { constructor(o) { Object.assign(this, o); } on() {} once() {} emit() {} } };
+    let clock = T0;
+    Date.now = () => clock;
+    const data = {};
+    const engine = {
+      started: true, mode: 'solo', player: { x: 0, y: 0 }, streetTsid: 'LSHRINE', street: { hubId: '27' },
+      interactables: [{ classId: 'npc_shrine_mab', sprite: { x: 100, y: 0 } }],
+      camera: { x: 0, y: 0, w: 960 }, PIXI: {},
+      param: () => null, setData: (k, v) => { data[k] = v; }, busy: () => false,
+      transientInstance: () => false, homeContext: () => ({ inHome: false }), streetSlot: () => ({}),
+    };
+    try {
+      rookAttackFeature.init(engine);
+      rookAttackFeature.restore({ nextAttackAt: T0 + 10 * MIN, stats: { attacks: 3 } });
+      assert.equal(rookAttackFeature.save().nextAttackAt, T0 + DAY, 'the old save is migrated on load');
+      rookAttackFeature.onStreetEnter({}, engine);
+      clock = T0 + HOUR;
+      rookAttackFeature.onTick(16, clock, engine);
+      assert.equal(rookAttackFeature._state().armState, 'wait');
+      // The day is up (time away counts), and the player walks onto the shrine street again.
+      clock = T0 + DAY + 5 * MIN;
+      rookAttackFeature.onStreetEnter({}, engine);
+      rookAttackFeature.onTick(16, clock + 9000, engine);
+      assert.equal(rookAttackFeature._state().armState, 'dwell');
+      assert.equal(rookAttackFeature._state().save.active, null, 'no Rook on arrival');
+      rookAttackFeature.onTick(16, (clock += 2 * MIN), engine);
+      const st = rookAttackFeature._state();
+      assert.equal(st.armState, 'armed');
+      assert.ok(st.arm.startAt - clock >= 3 * MIN && st.arm.startAt - clock <= 20 * MIN);
+      assert.equal(st.save.active, null);
+      // Leaving for a street without a shrine drops the arm.
+      engine.interactables = [];
+      rookAttackFeature.onStreetClear(engine);
+      rookAttackFeature.onStreetEnter({}, engine);
+      rookAttackFeature.onTick(16, (clock += 1000), engine);
+      assert.equal(rookAttackFeature._state().armState, 'off');
+      assert.equal(rookAttackFeature._state().arm.startAt, 0);
+    } finally {
+      Date.now = realNow;
+      globalThis.PIXI = prevPixi;
+      rookAttackFeature.restore(undefined);
+    }
+  });
+
+  it('QA starts neither check nor move the clock; only the natural start sets it', () => {
+    const src = fs.readFileSync(path.join(root, 'js/features/rook-attack-feature.js'), 'utf8');
+    const begin = src.slice(src.indexOf('function beginAttack('), src.indexOf('function onAttackStart('));
+    assert.match(begin, /if \(scheduled\) scheduleAfterHerald\(save, t\);/);
+    assert.equal((src.match(/scheduleAfterHerald\(/g) || []).length, 1);
+    assert.equal((src.match(/scheduled: true/g) || []).length, 1);
+    assert.match(src, /if \(armState === 'start'\) \{\s*arm = createRookArm\(\);\s*beginAttack\(engine, \{ scheduled: true \}\);/);
+    // The rookdemo route starts on demand, whatever the clock, and passes no scheduled flag.
+    const demo = src.slice(src.indexOf('function setupDemo('), src.indexOf('function nearestEntry('));
+    assert.doesNotMatch(demo, /nextAttackAt|scheduled|applyDailyRule|stepRookArm/);
+    assert.match(demo, /beginAttack\(engine, \{ heraldMs: 0 \}\)/);
+    // A fight's end leaves the clock alone (it counted from the herald).
+    const finish = src.slice(src.indexOf('function finishAttack('), src.indexOf('function handleEvents('));
+    assert.doesNotMatch(finish, /nextAttackAt|schedule/i);
+    // The pure attack itself never touches a save.
+    const save = normalizeRookSave({ rule: 'daily', nextAttackAt: T0 + 5 * HOUR });
+    save.active = createRookAttack({ tsid: 'L1', now: T0, heraldMs: 0 });
+    stepRookAttack(save.active, T0 + HOUR);
+    assert.equal(save.nextAttackAt, T0 + 5 * HOUR);
+    assert.equal(save.lastHeraldAt, 0);
   });
 });

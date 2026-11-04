@@ -44,7 +44,7 @@ import { SHRINE_ITEM_BASE_COSTS, donationValueFor, giantForStreet } from '../pub
 import { ITEM_BASE_COSTS } from '../public/js/store-catalog.js?v=74b56af3';
 import { TOOL_CONDITION_CATALOG } from '../public/js/tools.js?v=3974f57e';
 import { placementRequests } from './build-realtime-objects.mjs';
-import { streetIsRookable } from '../public/js/rook-attack.js?v=03e79296';
+import { streetIsRookable } from '../public/js/rook-attack.js?v=7650316d';
 import { rebuiltRoomEcology } from '../public/js/rebuilt-rooms.js?v=8c2eaf24';
 import { winterStreetEcology } from '../public/js/winter-walk-streets.js?v=8607edd3';
 import { isZoneTsid } from '../public/js/zone-streets.js?v=b40010d5';

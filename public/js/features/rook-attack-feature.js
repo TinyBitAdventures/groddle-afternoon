@@ -2,8 +2,10 @@
  * Rook attacks as a feature module (see js/feature-host.js). Rules live in
  * js/rook-attack.js (source anchors and solo adaptations are listed there).
  *
- * Flow on a street with a shrine (locations/inc_rook.js isRookable), about
- * once an hour (admin.js 60/60-minute schedule):
+ * Flow on a street with a shrine (locations/inc_rook.js isRookable), once a
+ * day (ROOK_SOLO: 24 h from a herald's start, then a random 3-20 min after
+ * the player has been 2 min on the street and is not busy; the source's
+ * admin.js schedule was hourly):
  * 1. Herald (30 s): the Forehorseman gallops in ringing his bells ("THE END
  *    IS NEIGH"), rook silhouettes cross the sky, the street dims, and the
  *    2011 "¡Der Rook iz Coming!" warning fades in twice.
@@ -44,10 +46,15 @@
  *   =stunned stops at STUNNED!, =wingbeat forces a wing beat, =stun lands one
  *   stun; aftermath: revives one target with three doses and balms another).
  *   &rookfx=hold keeps the current overlay up for screenshots; =swoop holds
- *   a wing-beat swoop at its closest point.
+ *   a wing-beat swoop at its closest point. QA starts neither check nor move
+ *   the once-a-day clock (save nextAttackAt / lastHeraldAt).
+ * A natural attack (no rookdemo) once its day is up: &rookwait=<s> drops the
+ *   2-minute dwell and comes <s> seconds after the day is up (tools/playtest.mjs
+ *   rook moves the save's nextAttackAt to now and uses it); the day still holds.
  * Canvas data: rookPhase, rookHealth, rookStun, rookClock, rookAngry,
  *   rookWingBeats, rookRooked, rookRookedKeys, rookOrb, rookLast, rookFeed,
- *   rookNextAttack, rookArmor, rookBalmPoints, rookDemo, rookArt, rookStats.
+ *   rookNextAttack (s to the day being up), rookArm (wait | off | dwell:<s> |
+ *   armed:<s> | busy | start | active | qa), rookArmor, rookBalmPoints, rookDemo, rookArt, rookStats.
  */
 
 import { slugsFromEffects } from '../speech-slugs.js?v=130338f9';
@@ -60,6 +67,7 @@ import { TRANT_META, trantStatusLabel } from '../trants.js?v=9c2e8c0f';
 import {
   FOREHORSEMAN_LINES,
   ROOK_COLORS,
+  ROOK_SCHEDULE_RULE,
   ROOK_SOLO,
   ROOK_SOURCE,
   ROOK_TEXT,
@@ -83,7 +91,10 @@ import {
   rookPresent,
   rookResponse,
   rookTrantState,
-  scheduleNextAttack,
+  applyDailyRule,
+  createRookArm,
+  scheduleAfterHerald,
+  stepRookArm,
   soloCost,
   stepRookAttack,
   streetIsRookable,
@@ -91,7 +102,7 @@ import {
   strikeBeamFor,
   strikeDamageFor,
   useBalmPoint,
-} from '../rook-attack.js?v=03e79296';
+} from '../rook-attack.js?v=7650316d';
 import { shrinePrimeBonus } from '../imagination-effects.js?v=70169933';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 import { gainMetabolic, loseEnergy, loseMood } from '../metabolics.js?v=8504134e';
@@ -110,7 +121,7 @@ import {
   strikeDamage as mpStrikeDamage,
   syncKeys,
   syncObjs,
-} from '../rook-mp.js?v=d906f86e';
+} from '../rook-mp.js?v=49f1edfe';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
 import { feedZone, placeRookBadge, unionBox } from '../rook-badge-place.js?v=2bb00dfd';
 
@@ -205,6 +216,9 @@ let loader = null;
 let engineRef = null;
 let generation = 0;
 let enteredAt = 0;
+/** The schedule's runtime arm (js/rook-attack.js stepRookArm): never saved, so a reload never brings the Rook on arrival. */
+let arm = createRookArm();
+let armState = '';
 let pendingApplied = false;
 let keyOf = new WeakMap();
 let classCounters = {};
@@ -1256,9 +1270,11 @@ function stopMusic() {
   musicStop = null;
 }
 
-function beginAttack(engine, { heraldMs = ROOK_SOLO.heraldMs, health } = {}) {
+/** scheduled: the day's natural attack, which sets the next a day from this herald; QA starts leave the clock alone. */
+function beginAttack(engine, { heraldMs = ROOK_SOLO.heraldMs, health, scheduled = false } = {}) {
   const t = now();
   save.active = createRookAttack({ tsid: engine.streetTsid, now: t, heraldMs, health });
+  if (scheduled) scheduleAfterHerald(save, t);
   save.lastStreet = engine.streetTsid;
   save.stats.attacks += 1;
   lastAction = heraldMs > 0 ? 'herald' : 'attack';
@@ -1323,7 +1339,6 @@ function onDepart(engine) {
 
 function finishAttack(engine) {
   save.active = null;
-  scheduleNextAttack(save, now());
   stopMusic();
   engine.save();
 }
@@ -2766,6 +2781,8 @@ function publish(engine, force = false) {
   engine.setData('rookLast', lastAction);
   engine.setData('rookFeed', feedText);
   engine.setData('rookNextAttack', save.nextAttackAt ? String(Math.max(0, Math.round((save.nextAttackAt - t) / 1000))) : '');
+  engine.setData('rookArm', armState === 'dwell' ? `dwell:${Math.max(0, Math.ceil((arm.since + armDwellMs(engine) - t) / 1000))}`
+    : armState === 'armed' ? `armed:${Math.max(0, Math.ceil((arm.startAt - t) / 1000))}` : armState);
   engine.setData('rookArmor', armored() ? String(Math.round((save.armorUntil - t) / 1000)) : '0');
   engine.setData('rookBalmPoints', String(save.balmPoints));
   engine.setData('rookDemo', demoMode);
@@ -2796,6 +2813,17 @@ function publish(engine, force = false) {
       .sort((a, b) => Math.abs(a[1].target.sprite.x - px) - Math.abs(b[1].target.sprite.x - px));
     engine.setData('rookRookedSpots', byDistance.slice(0, 16).map(([key, row]) => `${key}@${at(row.target.sprite, -20)}`).join(' '));
   }
+}
+
+/** &rookwait=<s> (QA): no dwell, and the Rook comes <s> s once the day is up. Null without it. */
+function rookWaitMs(engine) {
+  const raw = engine.param?.('rookwait');
+  const s = raw == null || raw === '' ? NaN : Number(raw);
+  return Number.isFinite(s) && s >= 0 ? s * 1000 : null;
+}
+
+function armDwellMs(engine) {
+  return rookWaitMs(engine) == null ? ROOK_SOLO.dwellMs : 0;
 }
 
 /** Other lanes' QA routes (any *demo / *autoplay param) never get a surprise Rook. */
@@ -2880,11 +2908,22 @@ export const rookAttackFeature = {
       // The realtime server owns every attack (groddle-afternoon-server/rook.go): no local schedule or timers.
       mpTick(engine, t);
     } else {
-      // Schedule (about hourly) on rookable streets only.
-      if (!save.nextAttackAt) scheduleNextAttack(save, t);
-      if (!active() && t >= save.nextAttackAt && !demoMode && !qaRoute(engine)) {
-        const rookable = streetIsRookable({ hasShrine: hasShrine(engine), instance: engine.transientInstance(), home: engine.homeContext().inHome, hubId: engine.street?.hubId });
-        if (rookable && !engine.busy() && t - enteredAt > 8000) beginAttack(engine);
+      // Schedule: once a day, on rookable streets only (js/rook-attack.js ROOK_SOLO, stepRookArm).
+      if (!save.nextAttackAt || save.rule !== ROOK_SCHEDULE_RULE) applyDailyRule(save, t);
+      if (!active() && !demoMode && !qaRoute(engine)) {
+        const due = t >= save.nextAttackAt;
+        const rookable = due && streetIsRookable({ hasShrine: hasShrine(engine), instance: engine.transientInstance(), home: engine.homeContext().inHome, hubId: engine.street?.hubId });
+        const waitMs = rookWaitMs(engine);
+        armState = stepRookArm(arm, {
+          now: t, nextAttackAt: save.nextAttackAt, rookable, enteredAt, busy: due && engine.busy(),
+          dwellMs: armDwellMs(engine), delayMs: waitMs,
+        });
+        if (armState === 'start') {
+          arm = createRookArm();
+          beginAttack(engine, { scheduled: true });
+        }
+      } else {
+        armState = active() ? 'active' : 'qa';
       }
       const a = active();
       if (a) {
@@ -3050,10 +3089,12 @@ export const rookAttackFeature = {
 
   restore(slice) {
     save = normalizeRookSave(slice || {});
+    applyDailyRule(save, now());
+    arm = createRookArm();
   },
 
   /** QA / tests. */
   _state() {
-    return { save, tracked: tracked.size, orb: Boolean(orb), lastAction };
+    return { save, tracked: tracked.size, orb: Boolean(orb), lastAction, arm: { ...arm }, armState };
   },
 };

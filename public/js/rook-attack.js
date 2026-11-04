@@ -48,6 +48,15 @@
  * - A tree at health 1 stays at 1 instead of dying.
  * - A 30 s herald (the Forehorseman plus the 2011 "Der Rook iz Coming!"
  *   warning fades, compressed from their ~45 s cadence) precedes the attack.
+ * - Once a day (Austin 2026-11-04, the same rule as online, the server's
+ *   rook.go rookDaily/rookSettle/rookDelayMin-Max): after an attack's herald
+ *   starts, the next may not start for 24 hours (real-world time kept in the
+ *   save, so time away counts). When the day is up, the Rook comes a random
+ *   3 to 20 minutes after the player has been 2 minutes on a rookable street,
+ *   once they are not busy; never on arrival (the dwell is not saved, so a
+ *   reload or a new street starts it again). QA starts (rookdemo) neither
+ *   check nor move the clock. Saves from before the rule count the day from
+ *   their first load (applyDailyRule).
  */
 
 export const ROOK_SOURCE = Object.freeze({
@@ -104,10 +113,16 @@ export const ROOK_SOURCE = Object.freeze({
 });
 
 export const ROOK_SOLO = Object.freeze({
-  // Minutes between attacks. The source admin default is 60/60 (ROOK_SOURCE), but players logged one
-  // every 1.75-2 h (+/-10 min) in late 2011 (forum general 10986, 29929); Austin chose ~2 h (G55, 2026-10-23).
-  scheduleMinMin: 105,
-  scheduleMaxMin: 120,
+  // Once a day (Austin 2026-11-04, matching the server's rook.go). The source gave each hub its own
+  // timer at the admin default 60/60 minutes (ROOK_SOURCE); players logged one every 1.75-2 h in late
+  // 2011 (forum general 10986, 29929), and the remake used 105-120 min after an attack ended (G55)
+  // until this rule. dailyMs counts from a herald's start, not the fight's end.
+  dailyMs: 24 * 60 * 60 * 1000,
+  // When the day is up: the player must have been this long on a rookable street (rook.go rookSettle) ...
+  dwellMs: 2 * 60 * 1000,
+  // ... and the Rook then comes a random moment this many minutes later (rook.go rookDelayMin/Max).
+  delayMinMin: 3,
+  delayMaxMin: 20,
   metabolicScale: 0.2,
   heraldMs: 30000,
   heraldWarnEveryMs: 15000,
@@ -287,6 +302,8 @@ export function normalizeRookSave(seed = {}) {
   const stats = s.stats && typeof s.stats === 'object' ? s.stats : {};
   return {
     nextAttackAt: num(s.nextAttackAt, 0),
+    rule: s.rule === ROOK_SCHEDULE_RULE ? ROOK_SCHEDULE_RULE : '',
+    lastHeraldAt: num(s.lastHeraldAt, 0),
     lastStreet: typeof s.lastStreet === 'string' ? s.lastStreet : '',
     active: s.active && typeof s.active === 'object' && typeof s.active.tsid === 'string' ? normalizeAttack(s.active) : null,
     armorUntil: num(s.armorUntil, 0),
@@ -304,18 +321,68 @@ export function normalizeRookSave(seed = {}) {
   };
 }
 
-/** Time to the next attack: groups/rook_attack.js setAttackTimer picks uniformly between a min and max
- * in minutes; the remake uses the observed 105-120 (ROOK_SOLO), not the 60/60 admin default. */
-export function attackDelayMs(rng = Math.random) {
-  const min = ROOK_SOLO.scheduleMinMin;
-  const max = ROOK_SOLO.scheduleMaxMin;
-  const minutes = Math.floor(min + (max - min) * rng());
-  return minutes * 60 * 1000;
+/** Marks a save kept under the once-a-day rule (applyDailyRule). */
+export const ROOK_SCHEDULE_RULE = 'daily';
+
+/**
+ * Bring a save under the once-a-day rule (call on load and before the first schedule check).
+ * A save without the rule's mark (from before 2026-11-04, or a new game) gets the calmer of a day
+ * after its last known herald start and a day from now, which is always a day from now: a herald
+ * already past puts the first at most a day out. A save under the rule keeps its time, unless it is
+ * missing or more than a day away (a clock that went back, as rook.go treats it): then a day from now.
+ */
+export function applyDailyRule(save, now) {
+  const day = ROOK_SOLO.dailyMs;
+  if (save.rule !== ROOK_SCHEDULE_RULE) {
+    const herald = num(save.lastHeraldAt) || num(save.active?.startedAt);
+    save.nextAttackAt = Math.max(herald > 0 ? herald + day : 0, now + day);
+    save.rule = ROOK_SCHEDULE_RULE;
+  } else if (!(save.nextAttackAt > 0) || save.nextAttackAt > now + day) {
+    save.nextAttackAt = now + day;
+  }
+  return save.nextAttackAt;
 }
 
-export function scheduleNextAttack(save, now, rng = Math.random) {
-  save.nextAttackAt = now + attackDelayMs(rng);
+/** A scheduled attack's herald starts: the next may come a day later (QA starts never call this). */
+export function scheduleAfterHerald(save, heraldAt) {
+  save.lastHeraldAt = heraldAt;
+  save.nextAttackAt = heraldAt + ROOK_SOLO.dailyMs;
+  save.rule = ROOK_SCHEDULE_RULE;
   return save.nextAttackAt;
+}
+
+/** The wait once the day is up and the dwell is met: uniform over ROOK_SOLO delayMinMin..delayMaxMin. */
+export function rookStartDelayMs(rng = Math.random) {
+  const min = ROOK_SOLO.delayMinMin * 60 * 1000;
+  const max = ROOK_SOLO.delayMaxMin * 60 * 1000;
+  return Math.round(min + (max - min) * Math.min(1, Math.max(0, rng())));
+}
+
+/** The runtime arm (never saved): which street visit it counts from and when the Rook comes. */
+export function createRookArm() {
+  return { since: 0, startAt: 0 };
+}
+
+/**
+ * One schedule check. ctx: { now, nextAttackAt, rookable (this street, now), enteredAt (when the
+ * player came onto it), busy, rng, dwellMs, delayMs (QA overrides) }. Returns 'wait' (the day is not
+ * up), 'off' (not a rookable street), 'dwell' (not 2 minutes there yet), 'armed' (the moment is
+ * picked, arm.startAt), 'busy' (the moment has come, the player is busy) or 'start'.
+ */
+export function stepRookArm(arm, { now, nextAttackAt, rookable, enteredAt, busy = false, rng = Math.random, dwellMs = ROOK_SOLO.dwellMs, delayMs = null } = {}) {
+  if (now < nextAttackAt || !rookable) {
+    arm.since = 0;
+    arm.startAt = 0;
+    return now < nextAttackAt ? 'wait' : 'off';
+  }
+  if (arm.since !== enteredAt) {
+    arm.since = enteredAt;
+    arm.startAt = 0;
+  }
+  if (now - enteredAt < dwellMs) return 'dwell';
+  if (!arm.startAt) arm.startAt = now + (delayMs == null ? rookStartDelayMs(rng) : delayMs);
+  if (now < arm.startAt) return 'armed';
+  return busy ? 'busy' : 'start';
 }
 
 /**
