@@ -208,16 +208,27 @@ export const GAME_CHEAT_BLOCKS = Object.freeze({
  * focusing_orb.js levitate 290-306 refuses the same rooms (js/meditation.js unfairPlace).
  * A High Jumper already running when you come in carries on, as there (addBuffPhysics
  * is_permanent, inc_physics.js 277-283: removeAllTempPhysics keeps it).
+ * Before all of those (217-218): the Rook's trial (the humbaba instance, rook_egg_smash.js 79;
+ * the remake's Rooks' Woods) and Gwendolyn's Outer Mind (tower_quest_headspace,
+ * tower_quest_part2.js) have lines of their own. Only Spinach has these checks in the source.
  */
 export const SPINACH_UNFAIR_ROOMS = Object.freeze(['light_perspective', 'mental_block', 'radiant_glare', 'color_unblocking', 'picto_pattern']);
 export const SPINACH_TEXT = Object.freeze({
+  rook: 'The effects of the Rook hamper the power of the Spinach.',
+  headspace: "It's already crazy enough in here, don't you think?",
   pooped: "You're too Pooped to even activate some Spinach.",
   unfair: "I'd say, doing that would give you an unfair advantage.",
 });
 
-/** spinach.js conditions beyond the games: { ok: false, msg } or null. */
-export function spinachBlock({ tsid = '', pooped = false, winterWalk = false } = {}) {
+/**
+ * spinach.js activate conditions, in the source's order: the Rook's trial, the Outer Mind,
+ * Pooped, a game (GAME_CHEAT_BLOCKS), the challenge rooms. { ok: false, msg } or null.
+ */
+export function spinachBlock({ tsid = '', rook = false, headspace = false, pooped = false, inGame = false, winterWalk = false } = {}) {
+  if (rook) return { ok: false, msg: SPINACH_TEXT.rook };
+  if (headspace) return { ok: false, msg: SPINACH_TEXT.headspace };
   if (pooped) return { ok: false, msg: SPINACH_TEXT.pooped };
+  if (inGame) return { ok: false, msg: GAME_CHEAT_BLOCKS.spinach };
   const t = String(tsid || '').toLowerCase();
   if (winterWalk || (t.startsWith('qi_') && SPINACH_UNFAIR_ROOMS.some((id) => t.startsWith(`qi_${id}_`)))) return { ok: false, msg: SPINACH_TEXT.unfair };
   return null;

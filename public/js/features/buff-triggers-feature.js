@@ -56,7 +56,7 @@ import {
   skillPackageDetails,
 } from '../skill-packages.js?v=bfb87281';
 import { husbandryPack } from '../animal-husbandry.js?v=16195ac6';
-import { itemVerbAchievementCounters } from '../item-verbs.js?v=fb06ea12';
+import { itemVerbAchievementCounters } from '../item-verbs.js?v=1e20fa7d';
 // The same module instances js/features/index.js registers (tests/buff-triggers.test.js checks the tags).
 import { meditationFeature } from './meditation-feature.js?v=11c9ecae';
 import { teleportationFeature } from './teleportation-feature.js?v=bea1b608';

@@ -13,7 +13,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { setMetabolicGainGate } from '../public/js/metabolics.js?v=8504134e';
 import { createInventory, useItem } from '../public/js/inventory.js?v=602da017';
-import { ITEM_VERBS, crunchIce, runItemVerb } from '../public/js/item-verbs.js?v=fb06ea12';
+import { ITEM_VERBS, crunchIce, runItemVerb } from '../public/js/item-verbs.js?v=1e20fa7d';
 import { performAnimalKinship } from '../public/js/animal-kinship.js?v=2757bb52';
 import { createAnimalState } from '../public/js/animals.js?v=761b9fa7';
 import { performTrantCare } from '../public/js/trant-care.js?v=38c0207f';

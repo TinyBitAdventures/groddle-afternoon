@@ -7,13 +7,16 @@
  */
 import { before, beforeEach, describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { REVIVED_TRANT, createPlot, reviveDeadTree, tickPlot } from '../public/js/patches.js?v=acaae011';
-import { powdersFeature } from '../public/js/features/powders-feature.js?v=d85a7eb5';
-import { itemVerbsFeature, inGameLocation } from '../public/js/features/item-verbs-feature.js?v=da7150d5';
-import { GAME_CHEAT_BLOCKS, gameCheatBlock } from '../public/js/item-verbs.js?v=fb06ea12';
+import { powdersFeature } from '../public/js/features/powders-feature.js?v=91c48d95';
+import { HEADSPACE_SCENE, itemVerbsFeature, inGameLocation } from '../public/js/features/item-verbs-feature.js?v=1bbbfeaf';
+import { ROOK_WOODS_STREET_ID } from '../public/js/rook-woods.js?v=da8a71b0';
+import { INSTANCES as GWENDOLYN_INSTANCES, ROOM_ID as GWENDOLYN_ROOM } from '../public/js/quest-rooms/gwendolyn.js?v=dd9cec1d';
+import { questSceneTsid } from '../public/js/quest-instance.js?v=f0df88c3';
+import { GAME_CHEAT_BLOCKS, SPINACH_TEXT, gameCheatBlock } from '../public/js/item-verbs.js?v=1e20fa7d';
 import { CROWNS_STREET } from '../public/js/game-of-crowns.js?v=e32f35f5';
 import { HOG_HAUL_STREET_ID } from '../public/js/hog-haul.js?v=50d2e072';
 import { raceSceneTsid } from '../public/js/races.js?v=ab22a079';
@@ -165,6 +168,61 @@ describe('ticket 90: Spinach refuses the challenge rooms, as spinach.js activate
     for (const id of ['mental_block', 'mental_block_rem', 'mental_block_2', 'puzzle_level_light_perspective', 'radiant_glare', 'color_unblocking', 'picto_pattern', 'level_quest_winter_walk']) {
       assert.ok(src.includes(`pc.location.isInstance('${id}')) return {state:'disabled', reason: "${unfair}"}`), id);
     }
+  });
+});
+
+describe("Spinach refuses the Rook's trial and Gwendolyn's Outer Mind, as spinach.js activate did", () => {
+  const gate = (streetTsid, extra = {}) => itemVerbsFeature.packUseGate('spinach', { streetTsid, hasBuff: () => false, transientInstance: () => true, ...extra });
+  const rook = 'The effects of the Rook hamper the power of the Spinach.';
+  const headspace = "It's already crazy enough in here, don't you think?";
+
+  it("in Rooks' Woods (the humbaba instance) and the Outer Mind (tower_quest_headspace), with their own lines", () => {
+    assert.deepEqual(gate(ROOK_WOODS_STREET_ID), { ok: false, msg: rook });
+    assert.deepEqual(gate(HEADSPACE_SCENE), { ok: false, msg: headspace });
+    assert.equal(SPINACH_TEXT.rook, rook);
+    assert.equal(SPINACH_TEXT.headspace, headspace);
+    // The Outer Mind is the gwendolyn room's outer_mind stage; the chain's other rooms let Spinach be.
+    assert.equal(GWENDOLYN_INSTANCES.outer_mind.instanceId, 'tower_quest_headspace');
+    assert.equal(HEADSPACE_SCENE, questSceneTsid(GWENDOLYN_ROOM, 'outer_mind'));
+    for (const stage of ['desert', 'inner_mind', 'chamber']) assert.equal(gate(questSceneTsid(GWENDOLYN_ROOM, stage)), null, stage);
+  });
+
+  it("in the source's order: the Rook, the Outer Mind, Pooped, then a game and the challenge rooms", () => {
+    const pooped = { hasBuff: (id) => id === 'pooped' };
+    assert.deepEqual(gate(ROOK_WOODS_STREET_ID, pooped), { ok: false, msg: rook });
+    assert.deepEqual(gate(HEADSPACE_SCENE, pooped), { ok: false, msg: headspace });
+    // Pooped comes before is_game (219 before 221).
+    assert.deepEqual(gate(CROWNS_STREET, pooped), { ok: false, msg: SPINACH_TEXT.pooped });
+    assert.deepEqual(gate(CROWNS_STREET), { ok: false, msg: GAME_CHEAT_BLOCKS.spinach });
+  });
+
+  it('only Spinach: the other game-refused items keep their game line alone', () => {
+    for (const cls of ['essence_of_hairball', 'hairball_flower']) {
+      assert.equal(itemVerbsFeature.packUseGate(cls, { streetTsid: ROOK_WOODS_STREET_ID, hasBuff: () => true, transientInstance: () => true }), null, cls);
+      assert.equal(itemVerbsFeature.packUseGate(cls, { streetTsid: HEADSPACE_SCENE, transientInstance: () => true }), null, cls);
+      assert.deepEqual(itemVerbsFeature.packUseGate(cls, { streetTsid: CROWNS_STREET }), { ok: false, msg: GAME_CHEAT_BLOCKS[cls] });
+    }
+  });
+
+  const gsjs = join(root, '..', 'glitch-GameServerJS');
+  it('the source lines and order, and no other item has them', { skip: !existsSyncSafe(join(gsjs, 'items/spinach.js')) && 'no GSJS' }, () => {
+    const src = readFileSync(join(gsjs, 'items/spinach.js'), 'utf8');
+    const conds = src.slice(src.indexOf('verbs.activate'));
+    const at = (needle) => {
+      const i = conds.indexOf(needle);
+      assert.ok(i >= 0, needle);
+      return i;
+    };
+    const a = at(`if (pc.location.isInstance('humbaba')) return {state:'disabled', reason: "${rook}"};`);
+    const b = at(`if (pc.location.isInstance('tower_quest_headspace')) return {state:'disabled', reason: "${headspace}"};`);
+    const c = at(`reason: "${SPINACH_TEXT.pooped}"`);
+    const d = at('if (pc.location.is_game)');
+    assert.ok(a < b && b < c && c < d);
+    // The humbaba instance is the Rook egg quest's (the remake's Rooks' Woods).
+    assert.match(readFileSync(join(gsjs, 'quests/rook_egg_smash.js'), 'utf8'), /instance_id: 'humbaba'/);
+    const others = readdirSync(join(gsjs, 'items')).filter((f) => f.endsWith('.js') && f !== 'spinach.js')
+      .filter((f) => /isInstance\('(humbaba|tower_quest_headspace)'\)\) return \{state:\s*'disabled'/.test(readFileSync(join(gsjs, 'items', f), 'utf8')));
+    assert.deepEqual(others, []);
   });
 });
 

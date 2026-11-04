@@ -41,7 +41,7 @@
 import { addItem, countItem, removeItem } from '../inventory.js?v=602da017';
 import { getGameDayKey } from '../game-day.js?v=edb00566';
 import { levelInfoForXp, XP_FOR_LEVEL } from '../progression.js?v=33462eaa';
-import { itemVerbAchievementCounters } from '../item-verbs.js?v=fb06ea12';
+import { itemVerbAchievementCounters } from '../item-verbs.js?v=1e20fa7d';
 import { ELEMENT_STACKMAX, hasPouch, POUCH_CLASS } from '../elemental-pouch.js?v=7ae2ad99';
 import { GENTLE_ISLAND_TSIDS, isNewxpSceneTsid } from '../newxp.js?v=8aef8287';
 import { SKILLQUEST_AK_TSID } from '../skillquest-ak.js?v=281b956d';

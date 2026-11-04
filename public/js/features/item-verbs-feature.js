@@ -44,14 +44,18 @@ import {
   itemVerbButton,
   itemVerbsFor,
   runItemVerb,
-} from '../item-verbs.js?v=fb06ea12';
+} from '../item-verbs.js?v=1e20fa7d';
 import { homesFeature } from './homes-feature.js?v=3c1faa58';
 import { CROWNS_STREET } from '../game-of-crowns.js?v=e32f35f5';
 import { HOG_HAUL_STREET_ID } from '../hog-haul.js?v=50d2e072';
 import { isRaceSceneTsid } from '../races.js?v=ab22a079';
 import { WINTER_HAVEN_STREET_ID, WINTER_WALK_STREET_ID } from '../winter-walk.js?v=9961c35f';
+import { ROOK_WOODS_STREET_ID } from '../rook-woods.js?v=da8a71b0';
+import { questSceneTsid } from '../quest-instance.js?v=f0df88c3';
 
 export const ITEM_VERBS_FEATURE_ID = 'item-verbs';
+/** Gwendolyn's Outer Mind (quest-rooms/gwendolyn.js INSTANCES.outer_mind: tower_quest_headspace) as a scene. */
+export const HEADSPACE_SCENE = questSceneTsid('gwendolyn', 'outer_mind');
 
 /** players/inc_buffs.js buffs_hairball_end: the dash must beat 14,000 px. */
 export const HAIRBALL_DASH_MIN = 14000;
@@ -238,14 +242,20 @@ export const itemVerbsFeature = {
     publish(engine);
   },
 
-  /** essence_of_hairball / hairball_flower / spinach: no cheating in a game; Spinach not in the challenge rooms either. */
+  /**
+   * essence_of_hairball / hairball_flower / spinach: no cheating in a game; Spinach not in the
+   * Rook's trial, the Outer Mind or the challenge rooms either, nor while Pooped (spinachBlock).
+   */
   packUseGate(classTsid, engine) {
-    const game = gameCheatBlock(classTsid, inGameLocation(engine?.streetTsid));
-    if (game || classTsid !== 'spinach') return game;
+    const inGame = inGameLocation(engine?.streetTsid);
+    if (classTsid !== 'spinach') return gameCheatBlock(classTsid, inGame);
     const tsid = engine?.streetTsid || '';
     return spinachBlock({
       tsid,
+      rook: tsid === ROOK_WOODS_STREET_ID,
+      headspace: tsid === HEADSPACE_SCENE,
       pooped: Boolean(engine?.hasBuff?.('pooped') || engine?.hasBuff?.('super_pooped')),
+      inGame,
       winterWalk: Boolean(engine?.transientInstance?.()) && [WINTER_WALK_STREET_ID, WINTER_HAVEN_STREET_ID].includes(tsid),
     });
   },

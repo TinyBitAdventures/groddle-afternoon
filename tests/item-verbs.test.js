@@ -15,13 +15,13 @@ import {
   crunchIce,
   itemVerbButton,
   runItemVerb,
-} from '../public/js/item-verbs.js?v=fb06ea12';
+} from '../public/js/item-verbs.js?v=1e20fa7d';
 import {
   HAIRBALL_DASH_MIN,
   homeTrophyCount,
   isTrophyClass,
   itemVerbsFeature,
-} from '../public/js/features/item-verbs-feature.js?v=da7150d5';
+} from '../public/js/features/item-verbs-feature.js?v=1bbbfeaf';
 import { homesFeature } from '../public/js/features/homes-feature.js?v=3c1faa58';
 import {
   applyAchievementProgress,
