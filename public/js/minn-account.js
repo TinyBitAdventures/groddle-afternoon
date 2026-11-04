@@ -513,6 +513,29 @@ export function createMinnAccount({ baseUri, fetch: fetchFn = globalThis.fetch?.
     },
 
     /**
+     * A channel line's thread as the site keeps it (ChatHistory, every reply): key global, help, trade or
+     * group-<id>; { parent: Line|null, lines: [{ lid, id, name, text, at, web, r }] oldest first, now }.
+     */
+    async chatThread(key, lid) {
+      return buddyCall('Loading the replies', `chat/channels/${encodeURIComponent(key)}/threads/${Math.max(0, Math.floor(Number(lid)) || 0)}`);
+    },
+
+    /** An IM line's thread (the two players only): { lines: [{ id, from, text, at, r, parent }] oldest first, blocked }. */
+    async imThread(withId, lineId) {
+      return buddyCall('Loading the replies', `chat/ims/${Math.floor(Number(withId)) || 0}/threads/${Math.max(0, Math.floor(Number(lineId)) || 0)}`);
+    },
+
+    /** "Appear offline" (groddle-afternoon-site, user meta groddle_appear_offline): { off }. */
+    async presence() {
+      return buddyCall('Checking how you show', 'account/presence');
+    },
+
+    /** Switches "Appear offline": { off, live } (live: the realtime server took it at once). */
+    async setPresence(off) {
+      return buddyCall('Changing how you show', 'account/presence', { method: 'PUT', body: { off: Boolean(off) } });
+    },
+
+    /**
      * The Community boards' notices the game's Activity has not shown (groddle-afternoon-site
      * src/Community.php, POST community/notices/game): { notices: [{ id, kind, count, from, thread, url, at, text }] };
      * each comes once.

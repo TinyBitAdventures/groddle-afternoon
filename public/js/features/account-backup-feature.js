@@ -29,12 +29,12 @@
  * QA: /play/ on groddle.localhost, Menu, Account; /play/online/, Menu, Sign out.
  */
 
-import { createMinnAccount } from '../minn-account.js?v=17bdce28';
-import { mountAccountForms, mountAccountSettings } from '../account-forms.js?v=fe37d0de';
+import { createMinnAccount } from '../minn-account.js?v=9544b0a0';
+import { mountAccountForms, mountAccountSettings, mountPresenceSetting } from '../account-forms.js?v=dc451560';
 import { createBrowserSaveStore, freezeSoloSaves, restoreSoloSave, saveStore, savedAtOf, soloSaveSnapshot } from '../save-store.js?v=8839ba7b';
 import { formatGameDayLabel } from '../game-day.js?v=edb00566';
 import { multiplayerEntryUrl } from '../game-mode.js?v=1ecf2899';
-import { quietSession } from '../online-boot.js?v=0bd48920';
+import { quietSession } from '../online-boot.js?v=06e4a421';
 
 /** Which slot a new backup goes to: the first empty one, else the oldest (which then needs a yes). */
 export function slotForNewBackup(backups, slots) {
@@ -388,6 +388,8 @@ function createMultiplayerPanel(engine, account) {
       const host = el('div', { class: 'account-forms' });
       panel.append(host);
       mountAccountSettings(host, { account, email: session.account?.email || '', onChanged: ({ what }) => engine.setData?.('accountChanged', what) });
+      // Appear offline (features/presence-mp-feature.js): under the email and the password.
+      mountPresenceSetting(host.querySelector('[data-account-settings]') || host, { account, state: engine.query?.('presenceState', engine) || null });
       // Your profile (features/profiles-feature.js, G338): the description and a link to the public page.
       const profile = el('div', { class: 'account-profile-host' });
       panel.append(profile);

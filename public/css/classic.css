@@ -1604,6 +1604,36 @@
 :root[data-ui="classic"] .react-chip.is-mine { border-color: var(--c-classic-input-hi-border); background: var(--c-classic-input-hi); color: var(--c-classic-title); }
 :root[data-ui="classic"] .react-chip:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--c-classic-focus); }
 :root[data-ui="classic"] .react-chip .react-glyph { font-size: var(--fs-classic-body); }
+/* Threads (js/chat-threads.js; the remake's own): the reply button dressed as the add-reaction one, the
+   count a link-coloured chip in the chat input's grey, the thread's head as the conversation's. */
+:root[data-ui="classic"] .thread-reply {
+  width: calc(22 * var(--cu));
+  height: calc(16 * var(--cu));
+  margin-left: calc(4 * var(--cu));
+  border: 1px solid var(--c-classic-input-border);
+  border-radius: 3px;
+  background: var(--c-classic-panel);
+  color: var(--c-classic-tab-off);
+  vertical-align: calc(-3 * var(--cu));
+}
+:root[data-ui="classic"] .thread-reply svg { width: calc(14 * var(--cu)); height: calc(14 * var(--cu)); }
+:root[data-ui="classic"] .thread-reply:hover { border-color: var(--c-classic-input-hi-border); background: var(--c-classic-input-hi); color: var(--c-classic-link); }
+:root[data-ui="classic"] .thread-reply:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--c-classic-focus); }
+:root[data-ui="classic"] .thread-open {
+  min-height: calc(18 * var(--cu));
+  margin-top: calc(2 * var(--cu));
+  padding: 0 calc(5 * var(--cu));
+  border: 1px solid var(--c-classic-input-border);
+  border-radius: 3px;
+  background: var(--c-classic-input);
+  color: var(--c-classic-link);
+  font: 700 var(--fs-classic-count)/var(--lh-none) var(--font-classic-count);
+}
+:root[data-ui="classic"] .thread-open:hover { border-color: var(--c-classic-input-hi-border); background: var(--c-classic-input-hi); }
+:root[data-ui="classic"] .thread-open:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--c-classic-focus); }
+:root[data-ui="classic"] .social-drawer .social-thread-head { gap: calc(6 * var(--cu)); padding: calc(4 * var(--cu)) 0 0; }
+:root[data-ui="classic"] .social-drawer .social-thread-title { color: var(--c-classic-title); font: 800 var(--fs-classic-body)/var(--lh-normal) var(--font-classic-title); }
+:root[data-ui="classic"] .social-drawer .social-msg.is-thread-parent { border-bottom: 1px solid var(--c-classic-input-border); }
 :root[data-ui="classic"] .react-picker {
   gap: 0;
   padding: calc(3 * var(--cu));

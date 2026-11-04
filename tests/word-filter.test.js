@@ -40,7 +40,7 @@ import { teachPhrase } from '../public/js/seasons.js?v=1978c3f3';
 import { cleanCaption } from '../public/js/snaps.js?v=55d4c257';
 import { sauceLabel, sauceStreetLine } from '../public/js/potions.js?v=c21bad59';
 import { groupNameProblem } from '../public/js/groups.js?v=4c4c8d76';
-import { characterNameProblem } from '../public/js/account-forms.js?v=fe37d0de';
+import { characterNameProblem } from '../public/js/account-forms.js?v=dc451560';
 
 const ROOT = join(import.meta.dirname, '..');
 const read = (rel) => readFileSync(join(ROOT, rel), 'utf8');

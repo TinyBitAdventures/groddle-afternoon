@@ -44,9 +44,10 @@ import {
   oldestAt,
   normalState,
   refusalText,
-} from '../player-im.js?v=4afd7bc0';
+} from '../player-im.js?v=23463a96';
 import { EARLIER_TEXT } from '../groups.js?v=4c4c8d76';
-import { createMinnAccount } from '../minn-account.js?v=17bdce28';
+import { imKey } from '../chat-reactions.js?v=d65d555b';
+import { createMinnAccount } from '../minn-account.js?v=9544b0a0';
 
 export const PLAYER_IM_FEATURE_ID = 'player-im';
 
@@ -125,6 +126,8 @@ function createSession(engine, client) {
       return;
     }
     c.lines = mergeEarlierIms(c.lines, r?.lines);
+    // THREADS: the site's lines say how many replies each has.
+    for (const l of c.lines) if (l.th) social?.threads?.summary(imKey(id, l.id), l.th);
     const done = !r?.more || c.lines.length >= 200;
     button.disabled = done;
     button.textContent = done ? EARLIER_TEXT.none : EARLIER_TEXT.more;
@@ -153,8 +156,22 @@ function createSession(engine, client) {
     return fresh;
   }
 
+  // THREADS: a reply (a line with a parent) shows in its thread, never in the conversation's log.
+  const asDrawer = (c, l) => drawerLine(l, { me: me(), myName: myName(), name: c.name, withId: c.id });
   function linesFor(c) {
-    return c.lines.map((l) => drawerLine(l, { me: me(), myName: myName(), name: c.name, withId: c.id }));
+    return c.lines.filter((l) => !l.parent).map((l) => asDrawer(c, l));
+  }
+  /** The replies the conversation's kept lines have, handed to each thread (the site has the rest). */
+  function threadsFor(c) {
+    const th = social?.threads;
+    if (!th) return;
+    const by = new Map();
+    for (const l of c.lines) {
+      if (!l.parent) continue;
+      if (!by.has(l.parent)) by.set(l.parent, []);
+      by.get(l.parent).push(asDrawer(c, l));
+    }
+    for (const [parent, lines] of by) th.addReplies(imKey(c.id, parent), lines);
   }
 
   function countTalk(id) {
@@ -174,6 +191,7 @@ function createSession(engine, client) {
       c.unread = s.unread;
       handOver(c);
       social?.setLines(imId(c.id), linesFor(c));
+      threadsFor(c);
       social?.setUnread?.(imId(c.id), s.unread);
       if (s.unread && s.lines.some((l) => l.from === c.id)) countTalk(c.id);
     }
@@ -199,6 +217,18 @@ function createSession(engine, client) {
     c.online = msg.with.online === true;
     const mine = line.from === me();
     const fresh = handOver(c);
+    if (line.parent) {
+      // THREADS: a reply goes to its thread; its conversation counts it as news.
+      social?.threads?.push(imKey(id, line.parent), asDrawer(c, line));
+      countTalk(id);
+      if (!mine) {
+        c.unread = Math.max(0, Math.floor(Number(msg.unread)) || 0);
+        social?.setUnread?.(imId(id), c.unread);
+        engine.playSound?.(IM_SOUND, { volume: 0.5 });
+      }
+      note(`${mine ? 'sent' : 'got'}-reply:${id}`);
+      return;
+    }
     social?.push(imId(id), drawerLine(line, { me: me(), myName: myName(), name: c.name, withId: id }));
     countTalk(id);
     if (mine) {

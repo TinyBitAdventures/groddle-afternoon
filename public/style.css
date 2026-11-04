@@ -9904,6 +9904,56 @@ html[data-street-cards] .notify-notices { visibility: hidden; }
 /* The chips and buttons are not words: a selection across lines copies only what was said. */
 .react-add, .react-strip, .react-pick { -webkit-user-select: none; user-select: none; }
 @media (prefers-reduced-motion: reduce) { .react-add { transition: none; } }
+/* THREADS (js/chat-threads.js, the drawer): a line of a channel, a group or an IM has a reply button
+   beside its reaction button (shown as that one is), and once it has replies a "3 replies · Ada" button
+   under its chips. A thread open in place has a "Back" head and its line set off over its replies. */
+.thread-reply {
+  display: inline-grid;
+  place-items: center;
+  box-sizing: border-box;
+  width: 1.8em;
+  height: 1.3em;
+  margin-left: var(--sp-2);
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  background: var(--surface-bright);
+  color: var(--text-muted);
+  vertical-align: -0.25em;
+  opacity: 0;
+  cursor: pointer;
+  transition: opacity 0.12s ease;
+}
+.thread-reply svg { width: 1.05em; height: 1.05em; }
+.social-msg.can-thread:hover > .thread-reply, .social-msg.can-thread:focus-within > .thread-reply { opacity: 1; }
+.thread-reply:hover { border-color: var(--border-strong); color: var(--accent); }
+.thread-reply:focus-visible { opacity: 1; outline: 2px solid var(--focus); outline-offset: 1px; }
+@media (hover: none) { .thread-reply { opacity: 0.7; } }
+.thread-open {
+  display: flex;
+  align-items: center;
+  width: fit-content;
+  min-height: 22px;
+  margin-top: var(--sp-2);
+  padding: 0 var(--sp-4);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  background: var(--surface-bright);
+  color: var(--accent);
+  font: inherit;
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-bold);
+  line-height: var(--lh-none);
+  cursor: pointer;
+}
+.thread-open[hidden] { display: none; }
+.thread-open:hover { border-color: var(--accent); background: var(--accent-soft); }
+.thread-open:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; }
+.social-thread-head { display: flex; align-items: center; gap: var(--sp-4); }
+.social-thread-title { font-weight: var(--fw-bold); color: var(--text); }
+.social-msg.is-thread-parent { padding-bottom: var(--sp-3); border-bottom: 1px solid var(--border); }
+.thread-reply, .thread-open { -webkit-user-select: none; user-select: none; }
+@media (prefers-reduced-motion: reduce) { .thread-reply { transition: none; } }
 .social-act {
   display: grid;
   gap: var(--sp-1);

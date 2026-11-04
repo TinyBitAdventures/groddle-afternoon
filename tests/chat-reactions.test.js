@@ -24,10 +24,10 @@ import {
   sameWords,
   whoText,
 } from '../public/js/chat-reactions.js?v=d65d555b';
-import { mountSocialDrawer } from '../public/js/ui/social-drawer.js?v=82eb2bf2';
+import { mountSocialDrawer } from '../public/js/ui/social-drawer.js?v=debf9446';
 import { createNotifier } from '../public/js/notify.js?v=37c6b748';
 import { chatReactionsFeature } from '../public/js/features/chat-reactions-feature.js?v=96309267';
-import { drawerLine, normalLine } from '../public/js/player-im.js?v=4afd7bc0';
+import { drawerLine, normalLine } from '../public/js/player-im.js?v=23463a96';
 import { chatLine } from '../public/js/groups.js?v=4c4c8d76';
 import { FakeEl, FakeText, memoryStore, page } from './social-fake-dom.js';
 import { serverPath, skipWithoutServer } from '../tools/repos.mjs';

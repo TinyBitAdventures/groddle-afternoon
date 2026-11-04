@@ -41,7 +41,7 @@
  * window.groddleGroups.
  */
 
-import { createMinnAccount } from '../minn-account.js?v=17bdce28';
+import { createMinnAccount } from '../minn-account.js?v=9544b0a0';
 import { saveStore } from '../save-store.js?v=8839ba7b';
 import {
   CHANNELS,
@@ -238,6 +238,8 @@ function createSession(engine, client) {
       return;
     }
     chat.earlier = true;
+    // THREADS: the site's lines say how many replies each has.
+    for (const raw of Array.isArray(r?.lines) ? r.lines : []) if (raw?.th) social?.threads?.summary(reactKey(raw.lid), raw.th);
     chat.lines = mergeEarlier(chat.lines, r?.lines, { hidden: (id) => id !== userId() && Boolean(engine.query?.('realtimeHidden', id)) });
     const done = !r?.more || chat.lines.length >= EARLIER_MAX;
     button.disabled = done;
@@ -263,7 +265,8 @@ function createSession(engine, client) {
       const sig = `${label}|${i}|${note}`;
       if (handed.get(ch) === sig && social.has(ch)) return;
       handed.set(ch, sig);
-      social.channel(ch, { label, header: headFor(ch), placeholder: `Chat in ${label}`, inputLabel: label, order: 30 + i, empty: 'Nobody has said anything here yet.', note, ...(ch === 'help' ? { initial: '?' } : {}) });
+      // THREADS: every channel and group line takes replies (features/chat-threads-feature.js).
+      social.channel(ch, { label, header: headFor(ch), placeholder: `Chat in ${label}`, inputLabel: label, order: 30 + i, empty: 'Nobody has said anything here yet.', note, threads: true, ...(ch === 'help' ? { initial: '?' } : {}) });
       social.setLines(ch, (chats.get(ch)?.lines || []).map(drawerLine));
     });
     for (const ch of [...handed.keys()]) {

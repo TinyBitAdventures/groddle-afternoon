@@ -99,7 +99,9 @@ export function normalLine(l) {
   const text = String(l?.text ?? '').slice(0, 400);
   if (!(id > 0) || !(from > 0) || !text) return null;
   // r: the line's reactions as the server keeps them (features/chat-reactions-feature.js reads them).
-  return { id, from, text, at: Number(l?.at) || 0, ...(Array.isArray(l?.r) ? { r: l.r } : {}) };
+  // parent: the line whose thread this replies in (threads; the conversation's own log leaves it out); th: the site's count of a line's replies.
+  const parent = Math.floor(Number(l?.parent)) || 0;
+  return { id, from, text, at: Number(l?.at) || 0, ...(Array.isArray(l?.r) ? { r: l.r } : {}), ...(parent > 0 ? { parent } : {}), ...(l?.th ? { th: l.th } : {}) };
 }
 
 /** PURE: the conversations of an im_state: [{ id, name, online, lines, unread }], bad ones left out. */
@@ -152,6 +154,8 @@ export function channelOpts(name, { buddy = false, header = null } = {}) {
     inputLabel: IM_TEXT.inputLabel(n),
     empty: IM_TEXT.empty(n),
     order: 26,
+    // THREADS: a line of the conversation takes replies, the two of you only.
+    threads: true,
     ...(header ? { header } : {}),
   };
 }

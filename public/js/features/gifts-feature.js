@@ -36,9 +36,9 @@
 import { ITEM_CATALOG, addItem, countItem, ensureItem, itemIcon, listPackSlots, removeItem } from '../inventory.js?v=d82f3b00';
 import { TOOL_CONDITION_CATALOG, leavingCopyTag, leavingToolWear, receiveToolCopy, takeToolCopy } from '../tools.js?v=6684b484';
 import { unitRankAt } from '../pack-slots.js?v=c91d0ca3';
-import { createMinnAccount } from '../minn-account.js?v=17bdce28';
+import { createMinnAccount } from '../minn-account.js?v=9544b0a0';
 // The same key as features/index.js: one module instance holds the carried notes.
-import { giveCarriedNote, takeCarriedNote, writtenCarriedNotes } from './street-furniture-feature.js?v=39cef8fa';
+import { giveCarriedNote, takeCarriedNote, writtenCarriedNotes } from './street-furniture-feature.js?v=44dedea8';
 import {
   BOX_SLOTS,
   GIFT_BOX,

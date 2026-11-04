@@ -31,10 +31,10 @@ import {
   pushSample,
   sampleTrack,
   socketUrl,
-} from '../public/js/realtime-client.js?v=ff6d1f95';
-import { createMinnAccount } from '../public/js/minn-account.js?v=17bdce28';
-import { emoteCommand, lookOf, poseOf, realtimeFeature, sharedStreet, statusText } from '../public/js/features/realtime-feature.js?v=cff8eee1';
-import { FEATURES } from '../public/js/features/index.js?v=e7d81940';
+} from '../public/js/realtime-client.js?v=e2dde578';
+import { createMinnAccount } from '../public/js/minn-account.js?v=9544b0a0';
+import { emoteCommand, lookOf, poseOf, realtimeFeature, sharedStreet, statusText } from '../public/js/features/realtime-feature.js?v=1f7d384b';
+import { FEATURES } from '../public/js/features/index.js?v=ba718b16';
 
 const root = join(import.meta.dirname, '..');
 const read = (rel) => readFileSync(join(root, rel), 'utf8');
@@ -194,7 +194,8 @@ describe('realtime-client: connecting', () => {
     assert.deepEqual(ws.sent, [{ t: 'auth', ticket: 't1' }]);
     ws.receive({ t: 'hello', you: { id: 7, name: 'Ada' } });
     assert.equal(ctx.client.state, 'online');
-    assert.deepEqual(ctx.client.me, { id: 7, name: 'Ada' });
+    // off: "Appear offline" as the ticket said (presence-mp-feature reads it).
+    assert.deepEqual(ctx.client.me, { id: 7, name: 'Ada', off: false });
     assert.equal(ctx.client.here, 0, 'not on a street yet');
   });
 

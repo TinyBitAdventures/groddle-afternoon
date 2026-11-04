@@ -21,8 +21,8 @@ import { linkSegments } from '../public/js/chat-links.js?v=b717fac7';
 import { NAMES_SHOWN, REACTIONS } from '../public/js/chat-reactions.js?v=d65d555b';
 import { NOTICE_MAX, communityNoticeHtml, communityNoticesFrom, normalCommunityNotice } from '../public/js/community-notices.js?v=f676c372';
 import { EARLIER_MAX, WEB_TAG, chatLine, historyKey, mergeEarlier, oldestLid, shownName } from '../public/js/groups.js?v=4c4c8d76';
-import { mergeEarlierIms, oldestAt } from '../public/js/player-im.js?v=4afd7bc0';
-import { communityMpFeature, createCommunitySession } from '../public/js/features/community-mp-feature.js?v=6a40e1a8';
+import { mergeEarlierIms, oldestAt } from '../public/js/player-im.js?v=23463a96';
+import { communityMpFeature, createCommunitySession } from '../public/js/features/community-mp-feature.js?v=e3333706';
 
 const root = join(import.meta.dirname, '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');

@@ -60,20 +60,30 @@
  * the sender (reactions.connect) and hands each line's reactions over (reactions.set). A change redraws
  * only that line's chips, in place: the rows and their words stay, so a selection survives it too.
  *
- * QA: canvas data socialOpen (open|rail), socialTab (the tab selected: activity, local, global,
+ * THREADS (js/chat-threads.js; Austin 2026-11-04): a conversation handed over with `threads: true` (Global
+ * Chat, Live Help, the Trade Channel, the groups, IMs; never Local or the party) gives each line with a key a
+ * "Reply in thread" button beside its reaction button and, once it has replies, a "3 replies · Ada" button
+ * under it (redrawn in place, keyed by the line's `rk`). Either opens the thread in place: a "‹ Back" head,
+ * the line, its replies (names, links, reactions as in the log) and the input sending there; Escape or Back
+ * goes back to the conversation. Replies never show in the conversation's own log.
+ * features/chat-threads-feature.js connects the sender (threads.connect) and hands the replies over.
+ *
+ * QA: canvas data socialThread (chat|key of the thread open, or ''), socialThreadReplies (how many it
+ * shows), socialOpen (open|rail), socialTab (the tab selected: activity, local, global,
  * buddies or chats), socialChat (the conversation open in Chats, or ''), socialTabs (the row),
  * socialChats (the list's ids in order), socialUnread (id:n,... for every tab and conversation with
  * news, chats:n the Chats total); window.groddleSocial.
  */
 import { colorizeAmounts } from '../notify-view.js?v=2835afc0';
 import { bindContextTrigger, MORE_KEYS_LABEL } from './context-menu.js?v=57c5f1fe';
-import { IM_VERB_ID } from '../player-im.js?v=4afd7bc0';
+import { IM_VERB_ID } from '../player-im.js?v=23463a96';
 import { selectionCovers } from './context-guard.js?v=0f71ac17';
 import { appendLinkedText, linkifyTextNodes } from '../chat-links.js?v=b717fac7';
 import { bindChatInput } from './chat-input.js?v=3cb4ce2e';
 import { createNodeCache, pressLeavesKeys, reconcileChildren, uniqueKeys } from './keyed-nodes.js?v=9ab4de5c';
 import { createReactionUI } from './reaction-strip.js?v=5118c23b';
 import { sameWords } from '../chat-reactions.js?v=d65d555b';
+import { THREAD_TEXT, mergeReplies, normalSummary, summaryText } from '../chat-threads.js?v=42954351';
 
 export const SOCIAL_STORE_KEY = 'groddle-social-drawer';
 /** The drawer opens by default at this window width and up (the mock's 1440 rule). */
@@ -156,6 +166,7 @@ const ICONS = {
   party: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true" focusable="false"><circle cx="7" cy="7.5" r="2.5"/><circle cx="13.5" cy="8" r="2"/><path d="M2.5 16c.5-2.8 2.3-4.2 4.5-4.2s4 1.4 4.5 4.2M12 12.2c2.2-.4 4.4.8 5 3.8"/></svg>',
   channel: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M2.5 3.5h10v7h-5l-3 2.5v-2.5h-2z"/><path d="M14.5 7.5h3v7h-1.5v2.5l-3-2.5h-4v-2"/></svg>',
   chats: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M2.5 4h11M2.5 8h11M2.5 12h7"/></svg>',
+  thread: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M3 4.5h10v6.5H8l-3 2.5V11H3z"/><path d="M15 8h2v6.5h-1.5V17l-3-2.5H10"/></svg>',
   back: '<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="m7.5 3-3 3 3 3"/></svg>',
   buddies: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true" focusable="false"><circle cx="9" cy="7" r="3"/><path d="M3.5 16.5c.6-3 2.8-4.7 5.5-4.7 1.2 0 2.3.3 3.2 1M15 11.5v5M12.5 14h5"/></svg>',
   send: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M3.5 10 16.5 4l-4 12-2.5-5z"/></svg>',
@@ -321,6 +332,8 @@ export function mountSocialDrawer({
       try { fn(); } catch (e) { console.warn('social', e); }
     }
   };
+  /** How many players are online (the server's presence_count), null until it says. */
+  let onlineCount = null;
   /** Ids of buddies' "added you" already seen on the Buddies tab. */
   const seenAdds = new Set();
   let addsUnread = 0;
@@ -338,9 +351,79 @@ export function mountSocialDrawer({
       host: () => root,
     })
     : null;
-  /** A drawn row of a line: its reaction button and chips (once), as they are now. */
-  const decorateRow = (node, line) => {
+  // THREADS: tk (the line's rk) -> { n, last, replies, loaded, loading, note, parent }; the sender once a feature connects one.
+  const threadStore = new Map();
+  let threader = null;
+  /** The thread open in place of its conversation: { chat, tk }, or null. */
+  let thread = null;
+  const threadParts = new WeakMap();
+  const threadRows = new Map();
+  function storeOf(tk) {
+    let st = threadStore.get(tk);
+    if (!st) threadStore.set(tk, (st = { n: 0, last: null, replies: [], loaded: false, loading: false, note: '', parent: null }));
+    return st;
+  }
+  const threadable = (chatId, line) => Boolean(online && threader && line?.rk && !line.note && !line.sep && !line.reply && tabs.get(chatId)?.threads);
+  function paintThread(row) {
+    const p = threadParts.get(row);
+    if (!p) return;
+    const st = threadStore.get(p.tk);
+    const text = summaryText(st);
+    if (p.drawn === text) return;
+    p.drawn = text;
+    p.bar.hidden = !text;
+    p.bar.textContent = text;
+    p.bar.setAttribute('aria-label', text ? `${text}. Open the thread` : THREAD_TEXT.reply);
+    row.classList.toggle('has-thread', Boolean(text));
+  }
+  /** A line's thread controls: the reply button (after the reaction button) and the count under it. */
+  function decorateThread(row, line, chatId) {
+    if (!threadable(chatId, line)) return;
+    const tk = String(line.rk);
+    let p = threadParts.get(row);
+    if (!p || p.tk !== tk) {
+      const reply = el('button', { type: 'button', class: 'thread-reply', 'data-thread-reply': tk, 'aria-label': THREAD_TEXT.replyLabel(line.mine ? '' : line.name), title: THREAD_TEXT.reply });
+      reply.innerHTML = ICONS.thread;
+      const bar = el('button', { type: 'button', class: 'thread-open', 'data-thread-open': tk });
+      bar.hidden = true;
+      for (const b of [reply, bar]) {
+        b.addEventListener('pointerdown', (e) => {
+          if (e.button === 0) e.preventDefault?.();
+        });
+        b.addEventListener('click', (e) => openThread(chatId, tk, { focus: e.detail === 0 || b === reply }));
+      }
+      row.append(reply, bar);
+      row.classList.add('can-thread');
+      p = { tk, reply, bar, drawn: null };
+      threadParts.set(row, p);
+    }
+    // The reply button sits after the reaction button (on the line), the count last (under the chips).
+    const add = row.querySelector?.('[data-react-add]');
+    if (add && add.nextSibling !== p.reply) row.insertBefore(p.reply, add.nextSibling ?? null);
+    if (p.bar.nextSibling) row.append(p.bar);
+    if (!threadRows.has(tk)) threadRows.set(tk, new Set());
+    threadRows.get(tk).add(row);
+    paintThread(row);
+  }
+  function updateThread(tk) {
+    const set = threadRows.get(tk);
+    if (!set) return 0;
+    let n = 0;
+    for (const row of [...set]) {
+      if (row.isConnected === false) {
+        set.delete(row);
+        continue;
+      }
+      paintThread(row);
+      n += 1;
+    }
+    if (!set.size) threadRows.delete(tk);
+    return n;
+  }
+  /** A drawn row of a line: its reaction button and chips (once), as they are now; in a conversation with threads, its thread controls. */
+  const decorateRow = (node, line, chatId = '') => {
     if (reactUI && line?.rk && !line.note && !line.sep) reactUI.decorate(node, line);
+    if (chatId) decorateThread(node, line, chatId);
     return node;
   };
 
@@ -367,6 +450,8 @@ export function mountSocialDrawer({
       /** A feature has handed it over (Global is in the row before groups-feature joins it). */
       live: opts.live ?? was?.live ?? true,
       since: was?.since || Date.now(),
+      /** THREADS: its lines take replies in threads. */
+      threads: opts.threads ?? was?.threads ?? false,
     };
     tabs.set(id, t);
     return t;
@@ -416,6 +501,12 @@ export function mountSocialDrawer({
   convHead.append(backBtn, convWho);
   convHead.hidden = true;
   const viewHead = el('div', { class: 'social-view-head', 'data-social-view-head': '' });
+  // THREADS: the head over a thread open in place: "‹ Back" to its conversation, and "Thread".
+  const threadHead = el('div', { class: 'social-thread-head', 'data-social-thread-head': '' });
+  const threadBack = el('button', { type: 'button', class: 'social-back social-thread-back', 'data-social-thread-back': '', title: `${THREAD_TEXT.back} (Esc)` });
+  threadBack.innerHTML = ICONS.back;
+  threadBack.append(el('span', { class: 'social-back-label' }, THREAD_TEXT.back));
+  threadHead.append(threadBack, el('span', { class: 'social-thread-title' }, THREAD_TEXT.head));
   const log = el('div', { class: 'social-log', role: 'log', tabindex: '0', 'data-social-log': '' });
   view.append(convHead, viewHead, log);
   const compose = el('div', { class: 'social-compose', 'data-social-compose': '' });
@@ -814,6 +905,8 @@ export function mountSocialDrawer({
     const parts = [];
     if (buddies !== null) parts.push(`${buddies} ${buddies === 1 ? 'buddy' : 'buddies'} online`);
     parts.push(`${here} here`);
+    // Who's around (features/presence-mp-feature.js): everyone online you would see on the website's panel.
+    if (onlineCount !== null) parts.push(`${onlineCount} online`);
     return { buddies, here, names, label: parts.join(' · '), title: parts.join(', ') };
   }
 
@@ -871,16 +964,44 @@ export function mountSocialDrawer({
     return out;
   }
 
+  /** THREADS: the rows of a thread open in place: its line, then its replies (or why there are none). */
+  function threadNodes(t, th) {
+    const st = storeOf(th.tk);
+    const parent = t.lines.find((l) => l.rk === th.tk) || st.parent;
+    const cache = cacheFor('thread');
+    const nodes = [];
+    if (parent) {
+      const node = cache.get(`parent|${lineKey(t.id, parent)}`, () => {
+        const n = lineNode(parent);
+        n.classList.add('is-thread-parent');
+        return n;
+      });
+      nodes.push(decorateRow(node, parent));
+    }
+    const count = st.replies.length;
+    nodes.push(cache.get(`count|${count}|${st.loading}`, () => el('div', { class: 'social-time social-thread-count', 'data-social-thread-count': String(count) }, count ? THREAD_TEXT.count(count) : st.loading ? THREAD_TEXT.loading : THREAD_TEXT.empty)));
+    for (const r of st.replies) nodes.push(decorateRow(cache.get(`reply|${lineKey(t.id, r)}|${r.rk}`, () => lineNode(r)), r));
+    if (st.note) nodes.push(cache.get(`note|${st.note}`, () => lineNode({ note: true, text: st.note })));
+    cache.sweep();
+    return nodes;
+  }
+
   function renderView() {
     const t = current();
     const atEnd = log.scrollHeight - log.scrollTop - log.clientHeight < 24;
     renderConvHead(t);
+    const th = thread && thread.chat === t.id ? thread : null;
+    const headNode = th ? threadHead : t.header;
+    if (th) threadBack.setAttribute('aria-label', THREAD_TEXT.backLabel(t.label));
     // The same head stays put (moving it would drop the keyboard from a button in it).
-    if (viewHead.firstChild !== t.header || viewHead.childNodes?.length > 1) viewHead.replaceChildren(...(t.header ? [t.header] : []));
-    viewHead.hidden = !t.header;
+    if (viewHead.firstChild !== headNode || viewHead.childNodes?.length > 1) viewHead.replaceChildren(...(headNode ? [headNode] : []));
+    viewHead.hidden = !headNode;
     let nodes;
-    const own = logSource?.(t.id) || null;
-    if (own) {
+    const own = th ? null : logSource?.(t.id) || null;
+    if (th) {
+      nodes = threadNodes(t, th);
+      log.setAttribute('aria-live', 'polite');
+    } else if (own) {
       nodes = own;
       log.setAttribute('aria-live', 'polite');
     } else if (t.kind === 'activity') {
@@ -897,17 +1018,19 @@ export function mountSocialDrawer({
       log.setAttribute('aria-live', 'off');
     } else {
       nodes = t.lines.length
-        ? keyedRows(t.lines, { atOf: (l) => l.at, keyOf: (l) => lineKey(t.id, l), make: lineNode, cache: cacheFor('log'), after: decorateRow })
+        ? keyedRows(t.lines, { atOf: (l) => l.at, keyOf: (l) => lineKey(t.id, l), make: lineNode, cache: cacheFor('log'), after: (node, l) => decorateRow(node, l, t.id) })
         : t.empty ? [el('p', { class: 'social-empty' }, t.empty)] : [];
       log.setAttribute('aria-live', 'polite');
     }
     // Only the rows that changed are touched: a selection in the others stays (Cmd+C copies it).
     reconcileChildren(log, nodes);
-    log.setAttribute('aria-label', t.kind === 'activity' ? 'Activity log' : t.kind === 'buddies' ? 'Buddies' : t.kind === 'chats' ? 'Chats' : `${t.label} chat`);
+    log.setAttribute('aria-label', th ? `${THREAD_TEXT.head} in ${t.label}` : t.kind === 'activity' ? 'Activity log' : t.kind === 'buddies' ? 'Buddies' : t.kind === 'chats' ? 'Chats' : `${t.label} chat`);
     log.setAttribute('role', t.kind === 'chats' ? 'region' : 'log');
     // The list's rows take the keyboard themselves: Tab from the row of tabs lands on the first.
     log.setAttribute('tabindex', t.kind === 'chats' ? '-1' : '0');
     log.dataset.socialLog = t.id;
+    if (th) log.dataset.socialThread = th.tk;
+    else delete log.dataset.socialThread;
     if (t.kind === 'chats') log.dataset.socialList = '1';
     else delete log.dataset.socialList;
     if (atEnd || log.dataset.jump) log.scrollTop = log.scrollHeight;
@@ -918,10 +1041,11 @@ export function mountSocialDrawer({
     compose.hidden = !showCompose;
     if (input && showCompose) {
       const street = streetName();
-      const hint = t.placeholder || (isConversation(t.id) ? `Message ${t.label}` : street ? `Say something on ${street}` : 'Say something');
+      const hint = th ? THREAD_TEXT.placeholder : t.placeholder || (isConversation(t.id) ? `Message ${t.label}` : street ? `Say something on ${street}` : 'Say something');
       if (input.placeholder !== hint) input.placeholder = hint;
-      if (inputLabel) inputLabel.textContent = t.inputLabel || t.label;
+      if (inputLabel) inputLabel.textContent = th ? THREAD_TEXT.inputLabel : t.inputLabel || t.label;
     }
+    compose.dataset.socialThread = th ? th.tk : '';
   }
 
   function publish() {
@@ -929,6 +1053,8 @@ export function mountSocialDrawer({
     setData('socialOpen', open ? 'open' : 'rail');
     setData('socialTab', rowTab());
     setData('socialChat', openChat());
+    setData('socialThread', thread ? `${thread.chat}|${thread.tk}` : '');
+    setData('socialThreadReplies', thread ? String(storeOf(thread.tk).replies.length) : '');
     setData('socialTabs', row().join(','));
     setData('socialChats', listed().flatMap((sec) => sec.rows.map((r) => r.id)).join(','));
     const counts = sorted().map((t) => [t.id, unreadOf(t)]);
@@ -944,7 +1070,11 @@ export function mountSocialDrawer({
       const v = node.getAttribute?.(a);
       if (v !== null && v !== undefined) return `[${a}="${esc(v)}"]`;
     }
-    for (const a of ['data-social-expand', 'data-social-collapse', 'data-social-presence', 'data-social-manage-buddies', 'data-social-back']) if (node.getAttribute?.(a) !== null) return `[${a}]`;
+    for (const a of ['data-thread-open', 'data-thread-reply']) {
+      const v = node.getAttribute?.(a);
+      if (v !== null && v !== undefined) return `[${a}="${esc(v)}"]`;
+    }
+    for (const a of ['data-social-expand', 'data-social-collapse', 'data-social-presence', 'data-social-manage-buddies', 'data-social-back', 'data-social-thread-back']) if (node.getAttribute?.(a) !== null) return `[${a}]`;
     const label = node.getAttribute?.('aria-label');
     return label ? `[aria-label="${esc(label)}"]` : null;
   }
@@ -1008,6 +1138,7 @@ export function mountSocialDrawer({
     if (changed) {
       closeDrawerMenu();
       reactUI?.closePicker();
+      thread = null;
     }
     tab = id;
     log.dataset.jump = '1';
@@ -1038,6 +1169,8 @@ export function mountSocialDrawer({
       at: Number(line.at) || Date.now(),
       // RIGHTCLICK: who said it (their name opens their menu); 0 for a line no player said.
       playerId: Number.isFinite(playerId) && playerId > 0 ? Math.floor(playerId) : 0,
+      // THREADS: a reply in a thread (it takes reactions, never a thread of its own).
+      reply: Boolean(line.reply),
       // REACTIONS: the line's reaction key ('' for a line nobody can react to).
       rk: line.note ? '' : String(line.rk || ''),
     };
@@ -1057,6 +1190,44 @@ export function mountSocialDrawer({
     if (focus) (log.querySelector(`[data-social-chat="${CSS.escape(from)}"]`) || log.querySelector('[data-social-chat]') || log)?.focus?.({ preventScroll: true });
     return true;
   }
+  /** THREADS: opens a line's thread in place of its conversation; `focus` puts the keyboard in the input. */
+  function openThread(chatId, tk, { focus = false, parent = null } = {}) {
+    const t = tabs.get(chatId);
+    if (!online || !t || !t.threads || !threader || !tk) return false;
+    if (tab !== chatId) select(chatId);
+    const st = storeOf(tk);
+    if (parent) st.parent = normal(parent);
+    else if (!st.parent) st.parent = t.lines.find((l) => l.rk === tk) || null;
+    st.note = '';
+    st.loading = !st.loaded;
+    thread = { chat: chatId, tk };
+    closeDrawerMenu();
+    reactUI?.closePicker();
+    log.dataset.jump = '1';
+    render();
+    try {
+      threader.load?.(chatId, tk);
+    } catch (e) {
+      console.warn('social', e);
+    }
+    if (focus) input?.focus?.({ preventScroll: true });
+    return true;
+  }
+  /** Back from a thread to its conversation; `focus` puts the keyboard on the line's thread button. */
+  function closeThread({ focus = false } = {}) {
+    if (!thread) return false;
+    const { tk } = thread;
+    thread = null;
+    log.dataset.jump = '1';
+    render();
+    if (focus) {
+      const bar = log.querySelector(`[data-thread-open="${CSS.escape(tk)}"]`);
+      (bar && !bar.hidden ? bar : log.querySelector(`[data-thread-reply="${CSS.escape(tk)}"]`) || log)?.focus?.({ preventScroll: true });
+    }
+    return true;
+  }
+  threadBack.addEventListener('pointerdown', (e) => e.preventDefault?.());
+  threadBack.addEventListener('click', () => closeThread({ focus: document.activeElement === threadBack }));
   backBtn.addEventListener('pointerdown', (e) => e.preventDefault?.());
   backBtn.addEventListener('click', () => back({ focus: document.activeElement === backBtn }));
 
@@ -1216,6 +1387,12 @@ export function mountSocialDrawer({
   dock.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
       if (tablist.contains?.(e.target)) return;
+      if (thread && panel.contains?.(e.target)) {
+        e.preventDefault?.();
+        e.stopPropagation();
+        closeThread({ focus: true });
+        return;
+      }
       if (openChat() && panel.contains?.(e.target)) {
         e.preventDefault?.();
         e.stopPropagation();
@@ -1258,6 +1435,25 @@ export function mountSocialDrawer({
     if (e.target !== form || !input) return;
     const text = String(input.value || '');
     history.push(text);
+    // THREADS: a thread open in place: the words are a reply there (slash commands stay the game's).
+    if (thread && threader && thread.chat === tab && text.trim() && !text.trim().startsWith('/')) {
+      e.preventDefault?.();
+      e.stopImmediatePropagation?.();
+      e.stopPropagation?.();
+      input.value = '';
+      const { chat, tk } = thread;
+      let sent = false;
+      try {
+        sent = Boolean(threader.send(chat, tk, text));
+      } catch (err) {
+        console.warn('social', err);
+      }
+      if (!sent) {
+        storeOf(tk).note = THREAD_TEXT.offline;
+        render();
+      }
+      return;
+    }
     const t = current();
     if (t.prefix && text.trim() && !text.trim().startsWith('/')) input.value = `${t.prefix}${text.trim()}`;
   }, true);
@@ -1431,6 +1627,7 @@ export function mountSocialDrawer({
     drop(id) {
       if (id === 'activity' || id === 'local' || id === 'buddies' || !tabs.has(id)) return false;
       const was = tab === id;
+      if (thread?.chat === id) thread = null;
       if (id === 'global') {
         const g = tabs.get('global');
         Object.assign(g, { lines: [], unread: 0, header: null, live: false, empty: GLOBAL_WAIT });
@@ -1452,6 +1649,95 @@ export function mountSocialDrawer({
       render();
       return true;
     },
+    /**
+     * THREADS: online only (null solo). connect({ send(chat, tk, text) -> bool, load(chat, tk) }) (null
+     * turns them off); summary(tk, { n, last }); setReplies(tk, lines) (all of them, loaded); addReplies(tk,
+     * lines) (merged in); push(tk, line, summary?) (one new reply); note(tk, text) (a refusal or a failed
+     * load, shown in the thread); open(chat, tk, { focus, parent }) / close(); current ({ chat, tk } or
+     * null); get(tk) ({ n, last, replies, loaded }).
+     */
+    threads: online ? {
+      connect(t) {
+        threader = t && typeof t.send === 'function' ? t : null;
+        if (!threader) thread = null;
+        render();
+      },
+      summary(tk, sum) {
+        const k = String(tk || '');
+        if (!k) return false;
+        const st = storeOf(k);
+        const s = normalSummary(sum);
+        st.n = s ? Math.max(s.n, st.replies.length) : st.replies.length;
+        st.last = s?.last || st.last;
+        updateThread(k);
+        return true;
+      },
+      setReplies(tk, lines = [], { loaded = true } = {}) {
+        const k = String(tk || '');
+        if (!k) return false;
+        const st = storeOf(k);
+        st.replies = mergeReplies([], (lines || []).map((l) => normal({ ...l, reply: true })));
+        st.loaded = st.loaded || loaded;
+        st.loading = false;
+        if (st.replies.length >= st.n) {
+          st.n = st.replies.length;
+          const last = st.replies[st.replies.length - 1];
+          st.last = last ? { id: last.playerId, name: last.name } : null;
+        }
+        updateThread(k);
+        if (thread?.tk === k) render();
+        else publish();
+        return true;
+      },
+      addReplies(tk, lines = []) {
+        const k = String(tk || '');
+        if (!k) return false;
+        const st = storeOf(k);
+        return api.threads.setReplies(k, [...st.replies, ...(lines || [])], { loaded: st.loaded });
+      },
+      push(tk, line, sum = null) {
+        const k = String(tk || '');
+        if (!k || !line) return false;
+        const st = storeOf(k);
+        const had = st.replies.length;
+        st.replies = mergeReplies(st.replies, [normal({ ...line, reply: true })]);
+        const added = st.replies.length > had;
+        const s = normalSummary(sum);
+        if (s) {
+          st.n = Math.max(s.n, st.replies.length);
+          st.last = s.last;
+        } else if (added) {
+          st.n = Math.max(st.n + 1, st.replies.length);
+          const l = normal(line);
+          st.last = { id: l.playerId, name: l.name };
+        }
+        updateThread(k);
+        if (thread?.tk === k) {
+          const atEnd = log.scrollHeight - log.scrollTop - log.clientHeight < 24;
+          if (atEnd) log.dataset.jump = '1';
+          render();
+        } else publish();
+        return added;
+      },
+      note(tk, text) {
+        const k = String(tk || '');
+        if (!k) return false;
+        const st = storeOf(k);
+        st.note = String(text || '');
+        st.loading = false;
+        if (thread?.tk === k) render();
+        return true;
+      },
+      open: (chat, tk, opts) => openThread(chat, String(tk || ''), opts),
+      close: (opts) => closeThread(opts),
+      get current() {
+        return thread ? { ...thread } : null;
+      },
+      get(tk) {
+        const st = threadStore.get(String(tk || ''));
+        return st ? { n: st.n, last: st.last ? { ...st.last } : null, replies: st.replies.map((l) => ({ ...l })), loaded: st.loaded } : null;
+      },
+    } : null,
     /** A tab's lines all at once (a channel's history on joining). */
     setLines(id, lines = []) {
       const t = tabs.get(id);
@@ -1532,6 +1818,14 @@ export function mountSocialDrawer({
         rendered();
         return;
       }
+      render();
+    },
+    /** Who's around: how many players are online (null: not known), for the presence pill. */
+    setOnline(n) {
+      const v = n === null || n === undefined || !Number.isFinite(Number(n)) ? null : Math.max(0, Math.floor(Number(n)));
+      if (v === onlineCount) return;
+      onlineCount = v;
+      setData('socialOnline', v === null ? '' : String(v));
       render();
     },
     /** A feature's data changed (buddies, presence): redraw. */

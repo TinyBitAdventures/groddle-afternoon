@@ -306,7 +306,8 @@ export function createRealtimeClient({
   function handle(msg) {
     switch (msg.t) {
       case 'hello':
-        me = { id: Number(msg.you?.id), name: String(msg.you?.name || '') };
+        // off: the account's "Appear offline" (groddle-afternoon-server presence.go), as the ticket said.
+        me = { id: Number(msg.you?.id), name: String(msg.you?.name || ''), off: msg.off === true };
         attempt = 0;
         ticketRetries = 0;
         setState('online');

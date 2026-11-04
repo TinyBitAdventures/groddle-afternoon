@@ -327,6 +327,7 @@ const STYLE = `
 .acct-field .acct-error { color: var(--text-danger); font-weight: 600; font-size: var(--fs-base); }
 .acct-field .acct-error:empty { display: none; }
 .acct-check { display: flex; gap: 0.45rem; align-items: center; font-size: var(--fs-base); color: var(--c-lime-39); }
+.acct-presence-help { color: var(--c-lime-51); font-size: var(--fs-md); }
 .acct-trap { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
 .acct-submit { display: block; width: 100%; margin-top: 0.3rem; border: 0; border-radius: var(--radius-lg); padding: 0.7rem var(--sp-8); cursor: pointer;
   font: inherit; font-size: var(--fs-lg); font-weight: 700; color: var(--text-inverse); background: linear-gradient(180deg, var(--c-orange-76), var(--c-orange-68)); box-shadow: 0 3px 0 var(--c-orange-57); }
@@ -825,9 +826,72 @@ export function mountAccountForms(host, { account, start = 'signin', reset = nul
 
 /** The settings copy (plain remake copy, no em-dashes). */
 export const SETTINGS_COPY = Object.freeze({
+  presence: {
+    title: 'Appear offline',
+    label: 'Appear offline',
+    help: "You won't show as online to anyone, buddies included. You can still chat, and your lines show your name.",
+    on: "You appear offline. Nobody sees you online, buddies included.",
+    off: 'You show as online again.',
+    failed: "That didn't change. Try again in a moment.",
+  },
   email: { title: 'Email', help: 'You sign in with it, and password resets go to it.', submit: 'Change email', busy: 'Changing…', done: 'Your email changed. The old address was told.' },
   password: { title: 'Password', submit: 'Change password', busy: 'Changing…', done: 'Your password changed. Other devices were signed out.' },
 });
+
+/**
+ * "Appear offline" (Austin 2026-11-04) in the multiplayer Account panel: a checkbox the account keeps
+ * (groddle/v1/account/presence; the site tells the realtime server, which hides you from the website's
+ * Who's around panel, every buddy list, IMs and chat rosters at once). `state` is the presence feature's
+ * ({ off, setOff, onChange }), so the box follows a switch made on the website too.
+ */
+export function mountPresenceSetting(host, { account, state = null } = {}) {
+  const n = ++formCount;
+  const wrap = el('div', { class: 'acct-form acct-presence', 'data-account-presence': '' });
+  const id = `acct-presence-${n}`;
+  const row = el('label', { class: 'acct-check', for: id });
+  const box = el('input', { id, type: 'checkbox', name: 'off', 'data-account-presence-off': '', 'aria-describedby': `${id}-help` });
+  box.checked = Boolean(state?.off);
+  row.append(box, document.createTextNode(` ${SETTINGS_COPY.presence.label}`));
+  const help = el('small', { id: `${id}-help`, class: 'acct-presence-help' }, SETTINGS_COPY.presence.help);
+  const said = el('p', { class: 'acct-message', role: 'status', 'aria-live': 'polite', 'data-account-presence-said': '' });
+  wrap.append(el('strong', {}, SETTINGS_COPY.presence.title), row, help, said);
+  host.append(wrap);
+  let busy = false;
+  const stop = state?.onChange?.(({ off }) => {
+    if (!busy) box.checked = Boolean(off);
+  });
+  (async () => {
+    try {
+      const r = await account.presence();
+      if (!busy && typeof r?.off === 'boolean') {
+        box.checked = r.off;
+        state?.setOff?.(r.off);
+      }
+    } catch { /* the box keeps what the socket said */ }
+  })();
+  box.addEventListener('change', async () => {
+    if (busy) return;
+    busy = true;
+    const want = box.checked;
+    box.disabled = true;
+    said.textContent = '';
+    try {
+      const r = await account.setPresence(want);
+      box.checked = Boolean(r?.off);
+      state?.setOff?.(box.checked);
+      said.textContent = box.checked ? SETTINGS_COPY.presence.on : SETTINGS_COPY.presence.off;
+      said.dataset.tone = 'good';
+    } catch (e) {
+      box.checked = !want;
+      said.textContent = e?.message || SETTINGS_COPY.presence.failed;
+      said.dataset.tone = 'bad';
+    } finally {
+      box.disabled = false;
+      busy = false;
+    }
+  });
+  return { root: wrap, box, stop };
+}
 
 /**
  * The signed-in player's settings (the multiplayer Account panel): a new

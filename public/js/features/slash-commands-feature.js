@@ -47,12 +47,12 @@
  */
 
 import { BUTLER_STRINGS } from '../butler.js?v=86316578';
-import { butlerApi } from './butler-feature.js?v=6cba3808';
+import { butlerApi } from './butler-feature.js?v=46892148';
 import { hellFeature } from './hell-feature.js?v=4c54964f';
 import { towerApi } from './home-tower-feature.js?v=d31f1b72';
 import { COMMAND_HELP_INTRO, STUCK_COOLDOWN_MS, STUCK_TEXT, commandHelpLines, commandHint, isCommandHelp, misplacedCommand, slashPlan, unknownLine } from '../slash-commands.js?v=98c2238a';
 import { parseTp, runTeleportCommand, TP_TEXT } from '../admin-teleport.js?v=fa56e8df';
-import { minnUrls } from '../minn-account.js?v=17bdce28';
+import { minnUrls } from '../minn-account.js?v=9544b0a0';
 import { saveStore } from '../save-store.js?v=8839ba7b';
 import { STREET_INDEX } from '../street-loader.js?v=33d2b8bc';
 
