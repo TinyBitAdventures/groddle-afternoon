@@ -44,9 +44,9 @@ import {
 } from '../public/js/solo-feats.js?v=40f8c7b5';
 import { DAY_NAMES, GAME_DAY_MS } from '../public/js/game-day.js?v=edb00566';
 import { soloFeatsFeature } from '../public/js/features/solo-feats-feature.js?v=5ba19d5e';
-import { FEATURES } from '../public/js/features/index.js?v=4783c59a';
-import { createPlayerSave, parsePlayerSave, serializePlayerSave } from '../public/js/player-save.js?v=ff8746ee';
-import { createResourceNode, harvestResourceNode } from '../public/js/resource-nodes.js?v=384f63f3';
+import { FEATURES } from '../public/js/features/index.js?v=41c08a4e';
+import { createPlayerSave, parsePlayerSave, serializePlayerSave } from '../public/js/player-save.js?v=681aa8e6';
+import { createResourceNode, harvestResourceNode } from '../public/js/resource-nodes.js?v=a029b488';
 
 const ROOT = join(import.meta.dirname, '..');
 const GSJS = join(ROOT, '..', 'glitch-GameServerJS');

@@ -29,7 +29,7 @@ import {
   youBox,
 } from '../public/js/map-graph.js?v=99c13d35';
 import { mapIconStep, mapIconTipPlace } from '../public/js/ui/map-icon-tips.js?v=6b3eb3f9';
-import { selectVendorProfile } from '../public/js/vendor.js?v=464d158d';
+import { selectVendorProfile } from '../public/js/vendor.js?v=c155d9ae';
 import { CLASSIC_ART } from '../public/js/classic/classic-art.js?v=5745e669';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');

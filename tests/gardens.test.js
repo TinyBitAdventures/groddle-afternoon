@@ -40,7 +40,7 @@ import {
   GARDEN_TALKBACK_MS,
   gardenTalkbackKey,
   gardenTalkback,
-} from '../public/js/garden.js?v=2b2c8423';
+} from '../public/js/garden.js?v=800ce1a0';
 import {
   createInventory,
   countItem,
@@ -48,7 +48,7 @@ import {
   listPackToolSlots,
   isToolItem,
 } from '../public/js/inventory.js?v=d82f3b00';
-import { DEFAULT_VENDOR, vendorBuy } from '../public/js/vendor.js?v=464d158d';
+import { DEFAULT_VENDOR, vendorBuy } from '../public/js/vendor.js?v=c155d9ae';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 

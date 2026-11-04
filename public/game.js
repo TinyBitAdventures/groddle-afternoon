@@ -2,9 +2,9 @@
  * Groddle Afternoon — original street geometry + layered decos
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
-import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=4abc03fc';
+import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=b57323b2';
 import { createFeatureHost } from './js/feature-host.js?v=2ed3c069';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=4783c59a';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=41c08a4e';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -36,7 +36,7 @@ import {
 // Quest copy is Flash htmlText: <b>/<i>/<br> drawn as formatting, the rest dropped, never innerHTML.
 import { questRequirementText, renderQuestText, withQuestMarkup } from './js/quest-text.js?v=7f5d761c';
 // G267: the world-verb quest counters skip offer-system quests; old saves drop the boot Moloko quest.
-import { dropBootStarterQuests, questMoveNote, routesCounter, worldVerbQuestEvents, gardenPlotEvents, makingUnitQuestEvents, shrineDonationQuestEvents } from './js/quest-offers.js?v=1389077b';
+import { dropBootStarterQuests, questMoveNote, routesCounter, worldVerbQuestEvents, gardenPlotEvents, makingUnitQuestEvents, shrineDonationQuestEvents } from './js/quest-offers.js?v=ee047181';
 import {
   PHANTOM_QUEST_ID,
   REMEMBER_QUEST_ID,
@@ -220,7 +220,7 @@ import {
   rookEggStateForProgress,
   rookWoodsObjective,
   rookWoodsRemainingMs,
-} from './js/rook-woods.js?v=e33f01dd';
+} from './js/rook-woods.js?v=2324f304';
 import {
   ROOK_HALL_QUEST_ID,
   ROOK_HALL_START_QUEST_ID,
@@ -464,8 +464,8 @@ import {
 } from './js/inventory.js?v=d82f3b00';
 import { PACK_COPY, isBagClass, unitRankAt } from './js/pack-slots.js?v=c91d0ca3';
 import { createPackRow, mountPackClearance, packBandRange, packCountText, packSearchEntries, packSlotTip } from './js/ui/pack-row.js?v=65c0f180';
-import { listAnimalFeedOptions } from './js/animals.js?v=9d360b98';
-import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=9d360b98';
+import { listAnimalFeedOptions } from './js/animals.js?v=9f497c22';
+import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=9f497c22';
 import {
   createDroppedItemState,
   parseDroppedItemState,
@@ -482,7 +482,7 @@ import {
   parsePlayerSave,
   serializePlayerSave,
   restorePlayerSave,
-} from './js/player-save.js?v=ff8746ee';
+} from './js/player-save.js?v=681aa8e6';
 import {
   HOME_INTERIOR_TSID,
   HOME_STREET_TSID,
@@ -521,6 +521,9 @@ import {
   quoteToolRepair,
   repairToolCondition,
   toolRepairPlan,
+  repairEnergyRefusal,
+  repairTip as repairTipText,
+  tinkertoolRefusal,
   toolWornBaseCost,
   mostWornToolCopy,
   takeToolCopy,
@@ -532,7 +535,7 @@ import {
   syncToolCopies,
   TOOL_CONDITION_CATALOG as TOOL_WEAR,
   brokenToolIcon,
-} from './js/tools.js?v=092ac4f3';
+} from './js/tools.js?v=9a5a4323';
 import {
   listRecipes,
   listRecipesForTool,
@@ -563,7 +566,7 @@ import {
   MAKING_TOOL_SKILLS,
   recipeTaskLimit,
   recipeToolInUse,
-} from './js/making.js?v=6e6c53f0';
+} from './js/making.js?v=07767a47';
 import { MAKE_TOOL_SHEETS } from './js/make-tool-sheets.js?v=6f758e09';
 import { LOW_FUEL_LINE, craftSessionElapsedMs, isLowFuel, isMachineArt, machineArtHtml, packMakeState, playMachineHandOver, setMachineArtFrame } from './js/machine-art.js?v=ac629e13';
 import {
@@ -590,7 +593,7 @@ import {
   cropIcon,
   hasWateringCan,
   hasHoe,
-} from './js/garden.js?v=2b2c8423';
+} from './js/garden.js?v=800ce1a0';
 import { GARDEN_SCALE, PLOT_H as GARDEN_PLOT_H, PLOT_W as GARDEN_PLOT_W, gardenFrame, gardenLayout, gardenStyle, plotPieces } from './js/garden-view.js?v=05651e76';
 import {
   ROCK_CATALOG,
@@ -603,7 +606,7 @@ import {
   starterMiningTools,
   STARTER_MINING_SKILLS,
   findWorkingPick,
-} from './js/mining.js?v=926b4d4c';
+} from './js/mining.js?v=e0f8399a';
 import {
   loadStreetData,
   STREET_INDEX,
@@ -794,20 +797,20 @@ import {
   createVendorSellQuote,
   vendorSellUnitPrice,
   vendorBuyUnitPrice,
-} from './js/vendor.js?v=464d158d';
+} from './js/vendor.js?v=c155d9ae';
 import {
   animalAnchorX,
   createAnimalState,
   resetAnimalDay,
   animalStatusLabel,
-} from './js/animals.js?v=9d360b98';
+} from './js/animals.js?v=9f497c22';
 import {
   ensureWoodTreeState,
   pickWoodTool,
   resetWoodTreeDay,
   woodToolLabel,
   woodTreeStatusLabel,
-} from './js/woodcutting.js?v=9f8bc052';
+} from './js/woodcutting.js?v=ac7442d0';
 import {
   GIANTS,
   createShrineState,
@@ -830,7 +833,7 @@ import {
   emblemRelationNote,
   formatSpeedUpTime,
 } from './js/shrines.js?v=95d74174';
-import { shrinePowderOptions, shrinePowderAchievementCounters } from './js/powders.js?v=53d99ac9';
+import { shrinePowderOptions, shrinePowderAchievementCounters } from './js/powders.js?v=73288117';
 import {
   GAMESHOW_TICKET_ID,
   applySpinningWheelReward,
@@ -3896,11 +3899,14 @@ function beginToolRepair(classTsid, copy = null) {
   const which = Number.isInteger(copy) && copy >= 0 ? { copy } : {};
   const quote = quoteToolRepair(toolState, classTsid, skillState.learned || [], which);
   if (!quote.ok) {
+    // pick.js repair conditions 181-185: the source's words.
     const msg = quote.reason === 'skill'
-      ? 'You need Tinkering I to repair tools.'
+      ? 'You need to know Tinkering I to repair this.'
       : quote.reason === 'self_skill'
-        ? 'Repairing a Tinkertool requires Tinkering III and a spare Tinkertool.'
-        : 'That tool does not need repairing.';
+        ? 'You need to know Tinkering III to repair this.'
+        : quote.reason === 'not_repairable'
+          ? "This can't be repaired."
+          : 'That tool does not need repairing.';
     toast(msg);
     return false;
   }
@@ -3915,12 +3921,12 @@ function beginToolRepair(classTsid, copy = null) {
   // tinkertool.js onTick: the repair goes as far as the energy does (tools.js toolRepairPlan).
   const plan = toolRepairPlan(quote, pc.energy);
   if (!plan.ok) {
-    toast("You don't have enough energy to repair this.");
+    toast(repairEnergyRefusal(quote, pc), 4200);
     return false;
   }
   const tinkerCheck = canUseTool(toolState, 'tinkertool', plan.ticks);
   if (!tinkerCheck.ok) {
-    toast(tinkerCheck.msg);
+    toast(tinkertoolRefusal(tinkerCheck, plan.ticks), 4200);
     return false;
   }
 
@@ -4147,17 +4153,13 @@ function renderPackPopover(classTsid, anchor = null) {
     : !hasRepairTool
       ? 'You need a Tinkertool to repair this.'
       : !repairPlan?.ok
-        ? "You don't have enough energy to repair this."
+        ? repairEnergyRefusal(repairQuote, pc)
         : !repairTinkertoolReady
-          ? 'Your Tinkertool is too worn for this repair.'
+          ? tinkertoolRefusal(canUseTool(toolState, 'tinkertool', repairPlan.ticks), repairPlan.ticks)
           : activeToolRepair
             ? 'Finish the current repair first.'
             : '';
-  const repairTip = repairQuote?.ok
-    ? repairPlan?.ok && !repairPlan.full
-      ? `Your energy repairs it to ${Math.floor(((repairQuote.condition.remaining + repairPlan.points) / repairQuote.condition.capacity) * 100)}% (the full repair takes ${repairQuote.energy} energy and ${repairQuote.durationSeconds} seconds)`
-      : `The full repair takes ${repairQuote.energy} energy and ${repairQuote.durationSeconds} seconds`
-    : 'Repair with your Tinkertool';
+  const repairTip = repairTipText(repairQuote, repairPlan, pc);
   // The kind line under the name: the tool's wear, the food's fullness today, the bear's state.
   // A Firefly Jar's line is what it holds (firefly_jar.js getLabel 337-338: "Firefly Jar (3/7)").
   const conditionNote = toolCondition?.contents
@@ -30808,7 +30810,7 @@ async function main() {
   }
   // Garden talkback QA (js/garden-talk-qa.js): ?gardentalkdemo=herb|crop.
   if (new URLSearchParams(location.search).has('gardentalkdemo')) {
-    import('./js/garden-talk-qa.js?v=410c54fb').then((m) => m.runGardenTalkDemo({ engine, executeVerb, params: new URLSearchParams(location.search) }));
+    import('./js/garden-talk-qa.js?v=565f31a7').then((m) => m.runGardenTalkDemo({ engine, executeVerb, params: new URLSearchParams(location.search) }));
   }
   // MEMQA (ticket 21, Safari's memory reload in Naraka): ?memqa=1 lets a probe walk streets through the
   // real street trip (tools/qa/street-memory.mjs). Solo pages only: online pages drop their params.

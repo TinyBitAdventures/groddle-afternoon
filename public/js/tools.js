@@ -6,7 +6,7 @@
  */
 
 import { repairGivesMood } from './imagination-effects.js?v=70169933';
-import { loseEnergy, metabolicGain, moodMax } from './metabolics.js?v=8504134e';
+import { energyMax, loseEnergy, metabolicGain, moodMax } from './metabolics.js?v=8504134e';
 
 export const TOOL_CONDITION_CATALOG = Object.freeze({
   butterfly_lotion: {
@@ -556,6 +556,48 @@ export function quoteToolRepair(state, classTsid, learned = [], opts = {}) {
   };
 }
 
+/**
+ * Why a repair can't start for energy, with the numbers (ticket 12 follow-up, 2026-11-04: "the
+ * message was not informative enough (turns out my Energy Tank wasn't big enough)"). The source's
+ * line is pick.js 194-196: a repair needs more than its two-tick cost plus one
+ * (getEnergyPerTwoTicksRepair + 1); its words stay first, the numbers follow.
+ */
+export function repairEnergyRefusal(quote, pc) {
+  const need = Math.max(1, Number(quote?.energyPerTwoTicks) || 1) + 1;
+  const have = Math.max(0, Math.floor(Number(pc?.energy) || 0));
+  const tank = energyMax(pc);
+  const base = "You don't have enough energy to repair this.";
+  if (tank <= need) return `${base} A repair needs more than ${need} energy, and your energy tank holds only ${tank}.`;
+  return `${base} A repair needs more than ${need} energy, and you have ${have}.`;
+}
+
+/**
+ * Why the Tinkertool can't do a repair: broken (the source's line, tinkertool.js 139), or not
+ * enough left in it for the repair's ticks (each tick wears it one, tinkertool.js onTick 419).
+ */
+export function tinkertoolRefusal(check, ticks) {
+  const c = check?.condition;
+  if (!c || c.broken) return 'This Tinkertool has become broken, and must be repaired.';
+  return `Your Tinkertool is too worn for this repair: it has ${c.remaining} left and this repair takes ${Math.max(1, Math.floor(Number(ticks) || 1))}.`;
+}
+
+/**
+ * The Repair row's tip: the full repair's energy and time (tinkertool.js tooltip), how far the
+ * energy you have now takes it, and when the full repair needs more than your energy tank holds,
+ * that it takes more than one repair (each keeps what it fixed, tinkertool.js onTick 405-445).
+ */
+export function repairTip(quote, plan, pc) {
+  if (!quote?.ok) return 'Repair with your Tinkertool';
+  const full = `The full repair takes ${quote.energy} energy and ${quote.durationSeconds} seconds`;
+  const tank = energyMax(pc);
+  const more = quote.energy > tank ? `, more than your energy tank holds (${tank}), so it takes more than one repair` : '';
+  if (plan?.ok && !plan.full) {
+    const pct = Math.floor(((quote.condition.remaining + plan.points) / quote.condition.capacity) * 100);
+    return `Your energy repairs it to ${pct}% (${full.charAt(0).toLowerCase()}${full.slice(1)}${more})`;
+  }
+  return `${full}${more}`;
+}
+
 /** How long the remake shows a repair of `seconds` source ticks. */
 function repairDurationMs(seconds) {
   return Math.max(900, Math.min(8000, seconds * 180));
@@ -639,13 +681,13 @@ export function repairToolCondition(state, classTsid, pc, opts = {}) {
   // tinkertool.js onTick: the repair runs while the energy lasts and keeps what it fixed.
   const plan = toolRepairPlan(quote, pc?.energy);
   if (!plan.ok) {
-    return { ok: false, reason: 'energy', quote, msg: "You don't have enough energy to repair this." };
+    return { ok: false, reason: 'energy', quote, msg: repairEnergyRefusal(quote, pc) };
   }
   // The Tinkertool doing the repair is another copy when the one repaired is a Tinkertool itself.
   const tinkerOpts = classTsid === 'tinkertool' ? { copy: spareTinkertoolIndex(state, quote.condition.copy, plan.ticks) } : {};
   const tinkerCheck = canUseTool(state, 'tinkertool', plan.ticks, tinkerOpts);
   if (!tinkerCheck.ok) {
-    return { ok: false, reason: 'tinkertool_broken', quote, msg: tinkerCheck.msg };
+    return { ok: false, reason: 'tinkertool_broken', quote, msg: tinkertoolRefusal(tinkerCheck, plan.ticks) };
   }
   const target = ensureToolCondition(state, classTsid);
   // tinkertool.js 435: each tick is metabolics_lose_energy; 368 reports what was used.

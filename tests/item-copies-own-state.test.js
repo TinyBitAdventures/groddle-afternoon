@@ -23,26 +23,29 @@ import {
   getToolCondition,
   normalizeToolConditionState,
   quoteToolRepair,
+  repairEnergyRefusal,
+  repairTip,
   repairToolCondition,
   setToolRemaining,
   takeToolCopy,
+  tinkertoolRefusal,
   toolCopies,
   toolWornBaseCost,
   useToolCondition,
-} from '../public/js/tools.js?v=092ac4f3';
+} from '../public/js/tools.js?v=9a5a4323';
 import { ITEM_CATALOG, addItem, createInventory, ensureItem, isToolItem, removeItem } from '../public/js/inventory.js?v=d82f3b00';
-import { createPlayerSave, restorePlayerSave } from '../public/js/player-save.js?v=ff8746ee';
+import { createPlayerSave, restorePlayerSave } from '../public/js/player-save.js?v=681aa8e6';
 import { layoutPack, unitPlaces } from '../public/js/pack-slots.js?v=c91d0ca3';
-import { bagsFeature } from '../public/js/features/bags-feature.js?v=46af5b5a';
-import { VENDOR_PROFILES, vendorBuy, vendorSell } from '../public/js/vendor.js?v=464d158d';
-import { createResourceNode, harvestResourceNode, ensureResourceItems } from '../public/js/resource-nodes.js?v=384f63f3';
+import { bagsFeature } from '../public/js/features/bags-feature.js?v=30607c74';
+import { VENDOR_PROFILES, vendorBuy, vendorSell } from '../public/js/vendor.js?v=c155d9ae';
+import { createResourceNode, harvestResourceNode, ensureResourceItems } from '../public/js/resource-nodes.js?v=a029b488';
 import {
   fireflyJarCounts,
   fireflyJarInUse,
   resourceNodesFeature,
   setFireflyJar,
-} from '../public/js/features/resource-nodes-feature.js?v=cf300ffb';
-import { toolBreakEvents } from '../public/js/quest-offers.js?v=1389077b';
+} from '../public/js/features/resource-nodes-feature.js?v=c7ebd2cb';
+import { toolBreakEvents } from '../public/js/quest-offers.js?v=ee047181';
 
 const root = join(import.meta.dirname, '..');
 const read = (rel) => readFileSync(join(root, 'public', rel), 'utf8');
@@ -272,3 +275,47 @@ describe('each Firefly Jar holds its own Fireflies', () => {
   });
 });
 
+describe('a repair refused for energy says why, with the numbers', () => {
+  const fancy = () => {
+    const { inv, tools } = kit({ fancy_pick: 1, tinkertool: 1 });
+    setToolRemaining(tools, 'fancy_pick', 0);
+    return { inv, tools, quote: quoteToolRepair(tools, 'fancy_pick', ['tinkering_1']) };
+  };
+
+  it('too little energy now: the source\'s words, then what it needs and what you have', () => {
+    const { quote } = fancy();
+    assert.equal(quote.ok, true);
+    // fancy_pick.js base_cost 1000 / points_capacity 200, Tinkering I 50% x 3 a tick: 8 every two ticks.
+    assert.equal(quote.energyPerTwoTicks, 8);
+    assert.equal(repairEnergyRefusal(quote, { energy: 5, energyMax: 100 }),
+      "You don't have enough energy to repair this. A repair needs more than 9 energy, and you have 5.");
+  });
+
+  it('an energy tank too small for any repair says so', () => {
+    const { quote } = fancy();
+    assert.equal(repairEnergyRefusal({ ...quote, energyPerTwoTicks: 150 }, { energy: 120, energyMax: 120 }),
+      "You don't have enough energy to repair this. A repair needs more than 151 energy, and your energy tank holds only 120.");
+  });
+
+  it('a full repair bigger than the tank: the Repair row says it takes more than one', () => {
+    const { quote } = fancy();
+    assert.equal(quote.energy, 272);
+    const tip = repairTip(quote, { ok: true, full: false, points: 30 }, { energy: 100, energyMax: 100 });
+    assert.equal(tip, 'Your energy repairs it to 15% (the full repair takes 272 energy and 67 seconds, more than your energy tank holds (100), so it takes more than one repair)');
+    assert.doesNotMatch(tip, /—/);
+  });
+
+  it('repairToolCondition and the pack use the same words; a worn Tinkertool says how worn', () => {
+    const { tools } = fancy();
+    const r = repairToolCondition(tools, 'fancy_pick', { energy: 5, energyMax: 100 }, { learned: ['tinkering_1'], hasTinkertool: true });
+    assert.equal(r.ok, false);
+    assert.match(r.msg, /needs more than 9 energy, and you have 5\.$/);
+    setToolRemaining(tools, 'tinkertool', 3);
+    assert.equal(tinkertoolRefusal(canUseTool(tools, 'tinkertool', 10), 10), 'Your Tinkertool is too worn for this repair: it has 3 left and this repair takes 10.');
+    setToolRemaining(tools, 'tinkertool', 0);
+    assert.equal(tinkertoolRefusal(canUseTool(tools, 'tinkertool', 10), 10), 'This Tinkertool has become broken, and must be repaired.');
+    const game = read('game.js');
+    assert.match(game, /\? repairEnergyRefusal\(repairQuote, pc\)/);
+    assert.match(game, /toast\(repairEnergyRefusal\(quote, pc\), 4200\);/);
+  });
+});

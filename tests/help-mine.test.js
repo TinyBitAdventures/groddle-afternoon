@@ -35,8 +35,8 @@ import {
   requirementRoute,
   routeQuestEvent,
   turnInQuest,
-} from '../public/js/quest-offers.js?v=1389077b';
-import { createMineRock } from '../public/js/mining.js?v=926b4d4c';
+} from '../public/js/quest-offers.js?v=ee047181';
+import { createMineRock } from '../public/js/mining.js?v=e0f8399a';
 import { createQuestState } from '../public/js/quests.js?v=2ce7b3cb';
 
 const here = import.meta.dirname;

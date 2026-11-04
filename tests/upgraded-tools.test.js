@@ -27,7 +27,7 @@ import {
   loadRecipeCatalogFromFile,
   recipeToolFor,
   recipeToolInUse,
-} from '../public/js/making.js?v=6e6c53f0';
+} from '../public/js/making.js?v=07767a47';
 import { ITEM_CATALOG, countItem, createInventory, isToolItem } from '../public/js/inventory.js?v=d82f3b00';
 import {
   GRINDER_TOOLS,
@@ -38,13 +38,13 @@ import {
   firstWorkingTool,
   getToolCondition,
   setToolRemaining,
-} from '../public/js/tools.js?v=092ac4f3';
-import { crushOre } from '../public/js/mining.js?v=926b4d4c';
+} from '../public/js/tools.js?v=9a5a4323';
+import { crushOre } from '../public/js/mining.js?v=e0f8399a';
 import { MAKE_TOOL_SHEETS } from '../public/js/make-tool-sheets.js?v=6f758e09';
-import { clearPlot, createGarden, getPlot, hasHoe, hasWateringCan, plantPlot, waterPlot } from '../public/js/garden.js?v=2b2c8423';
-import { performTrantCare, quoteTrantCare } from '../public/js/trant-care.js?v=3a74e7c9';
+import { clearPlot, createGarden, getPlot, hasHoe, hasWateringCan, plantPlot, waterPlot } from '../public/js/garden.js?v=800ce1a0';
+import { performTrantCare, quoteTrantCare } from '../public/js/trant-care.js?v=02f833d2';
 import { createTrantState, setTrantTables } from '../public/js/trants.js?v=9c2e8c0f';
-import { createPlot, performPlotVerb, plotVerbs } from '../public/js/patches.js?v=956e798d';
+import { createPlot, performPlotVerb, plotVerbs } from '../public/js/patches.js?v=877b27e9';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const pub = join(here, '../public');

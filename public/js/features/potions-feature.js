@@ -67,7 +67,7 @@ import { getGameDayKey } from '../game-day.js?v=edb00566';
 import { metabolicGain, moodMax } from '../metabolics.js?v=8504134e';
 import { quoinDailyLimitFor } from '../quoins.js?v=dfe1ff0a';
 import { emblemCostFor } from '../shrines.js?v=95d74174';
-import { GROWN_TREE_LABELS, trantsformPlotTree } from '../patches.js?v=956e798d';
+import { GROWN_TREE_LABELS, trantsformPlotTree } from '../patches.js?v=877b27e9';
 import { isPoisoned } from '../tree-poison.js?v=f6e01177';
 import { furnitureSize } from '../home-decor.js?v=6dc41dcc';
 import { textureFromUrl, sourceFromUrl, frameTexture } from '../textures.js?v=3149d699';
@@ -128,10 +128,10 @@ import {
   usePotion,
 } from '../potions.js?v=c21bad59';
 import { itemVerbAchievementCounters } from '../item-verbs.js?v=1e20fa7d';
-import { patchesFeature } from './patches-feature.js?v=83be6bd0';
-import { homesFeature } from './homes-feature.js?v=9d545942';
-import { streetTreeIndex } from './tree-death-feature.js?v=8a537c97';
-import { questRoomConverse } from './quest-instances-feature.js?v=3fea1db7';
+import { patchesFeature } from './patches-feature.js?v=fda9d58d';
+import { homesFeature } from './homes-feature.js?v=4f102e41';
+import { streetTreeIndex } from './tree-death-feature.js?v=fbf714a8';
+import { questRoomConverse } from './quest-instances-feature.js?v=fce55071';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
 
 export const POTIONS_FEATURE_ID = 'potions';
