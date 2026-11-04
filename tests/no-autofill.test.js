@@ -53,7 +53,7 @@ describe('no-autofill', () => {
     for (const page of ['public/play/index.html', 'public/play/online/index.html']) {
       const html = read(page);
       assert.ok(html.indexOf('js/no-autofill.js?v=') > 0, page);
-      assert.match(html, /<input id="local-chat-input"[^>]* autocomplete="off" data-1p-ignore data-lpignore="true" data-bwignore data-form-type="other" \/>/, page);
+      assert.match(html, /<textarea id="local-chat-input"[^>]* autocomplete="off" data-1p-ignore data-lpignore="true" data-bwignore data-form-type="other"><\/textarea>/, page);
     }
   });
 });

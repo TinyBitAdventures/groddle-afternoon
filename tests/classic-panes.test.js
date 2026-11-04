@@ -8,7 +8,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { pillText, paneLayout, LOCAL_TABS, nameSlot, NAME_COLOURS, STRIP_OPEN_MIN_W, dividerHeight, PANE_MIN_H } from '../public/js/classic/classic-panes.js?v=f141e3cf';
+import { pillText, paneLayout, LOCAL_TABS, nameSlot, NAME_COLOURS, STRIP_OPEN_MIN_W, dividerHeight, PANE_MIN_H } from '../public/js/classic/classic-panes.js?v=7e961c46';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');

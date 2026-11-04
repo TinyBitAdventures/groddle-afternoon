@@ -64,6 +64,7 @@ import { bindContextTrigger, MORE_KEYS_LABEL } from './context-menu.js?v=57c5f1f
 import { IM_VERB_ID } from '../player-im.js?v=04c55d2f';
 import { selectionCovers } from './context-guard.js?v=0f71ac17';
 import { appendLinkedText, linkifyTextNodes } from '../chat-links.js?v=b717fac7';
+import { bindChatInput } from './chat-input.js?v=3cb4ce2e';
 
 export const SOCIAL_STORE_KEY = 'groddle-social-drawer';
 /** The drawer opens by default at this window width and up (the mock's 1440 rule). */
@@ -1143,22 +1144,24 @@ export function mountSocialDrawer({
     e.stopPropagation();
   });
 
+  // The box wraps and grows up to five lines (js/ui/chat-input.js); Enter sends. Up and Down walk
+  // back through what you said from its first or last line.
   if (input) {
-    input.addEventListener('keydown', (e) => {
-      if (e.key === 'ArrowUp') {
-        const prev = history.up();
-        if (prev !== null) {
+    bindChatInput(input, {
+      form,
+      onHistory(key) {
+        if (key === 'ArrowUp') {
+          const prev = history.up();
+          if (prev === null) return false;
           input.value = prev;
-          e.preventDefault();
           requestAnimationFrame?.(() => input.setSelectionRange?.(input.value.length, input.value.length));
+          return true;
         }
-      } else if (e.key === 'ArrowDown') {
         const next = history.down();
-        if (next !== null) {
-          input.value = next;
-          e.preventDefault();
-        }
-      }
+        if (next === null) return false;
+        input.value = next;
+        return true;
+      },
     });
   }
   // Before every other submit handler (they listen on the form or on this dock later):

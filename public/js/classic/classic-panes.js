@@ -26,6 +26,7 @@
  */
 import { uiState, onUiModeChange, readUiCache, writeUiCache } from './ui-mode.js?v=587c014a';
 import { classicArtUrl } from './classic-art.js?v=5745e669';
+import { bindChatInput } from '../ui/chat-input.js?v=3cb4ce2e';
 
 /** The tabs that are the bottom pane, not a pane above it. */
 export const LOCAL_TABS = Object.freeze(['local', 'activity']);
@@ -104,8 +105,10 @@ export function installClassicPanes({ doc = globalThis.document, win = globalThi
   lowerHead.append(el(doc, 'img', { class: 'classic-pane-chev', src: classicArtUrl('back_arrow'), alt: '' }), el(doc, 'h2', { class: 'classic-lower-title' }, 'Local Chat / Activity'), lowerPill);
   const lowerLog = el(doc, 'div', { class: 'classic-lower-log social-log', role: 'log', tabindex: '0', 'aria-live': 'polite' });
   const lowerForm = el(doc, 'form', { class: 'classic-lower-form', autocomplete: 'off' });
-  const lowerInput = el(doc, 'input', { type: 'text', class: 'classic-lower-input', maxlength: '180', 'aria-label': 'Local chat', placeholder: 'Local chat', 'data-1p-ignore': '', 'data-lpignore': 'true', 'data-bwignore': '', 'data-form-type': 'other' });
+  // A box that wraps and grows as the drawer's does (js/ui/chat-input.js): Enter says it.
+  const lowerInput = el(doc, 'textarea', { class: 'classic-lower-input', rows: '1', maxlength: '180', 'aria-label': 'Local chat', placeholder: 'Local chat', autocomplete: 'off', 'data-1p-ignore': '', 'data-lpignore': 'true', 'data-bwignore': '', 'data-form-type': 'other' });
   lowerForm.append(lowerInput);
+  bindChatInput(lowerInput, { form: lowerForm, win });
   // Words said here go to Local through the drawer's own field and form (the game's submit handler).
   lowerForm.addEventListener('submit', (e) => {
     e.preventDefault();

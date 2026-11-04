@@ -4735,6 +4735,7 @@ html[data-street-cards] .quest-dialogue { visibility: hidden; }
 #local-chat-input {
   min-width: 0;
   flex: 1;
+  resize: none;
   padding: var(--sp-3) 0.55rem;
   color: var(--text-heading);
   border: 1px solid color-mix(in srgb, var(--c-mauve-53) 50%, transparent);
@@ -9807,18 +9808,31 @@ button.social-buddy-what { margin: 0; padding: 0; border: 0; background: none; c
 .social-view-head .mp-emotes, .social-chan-head { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: var(--sp-2); margin: 0; }
 /* The input */
 .social-compose { flex: none; padding: var(--sp-4); border-top: 1px solid var(--border); }
-.social-drawer #local-chat-form { display: flex; align-items: center; gap: var(--sp-2); opacity: 1; }
+.social-drawer #local-chat-form { display: flex; align-items: flex-end; gap: var(--sp-2); opacity: 1; }
+/* The box wraps and grows with what you type, one line to five, then scrolls (js/ui/chat-input.js
+   sets its height); a long message stays in view. */
 .social-drawer #local-chat-input {
   flex: 1 1 auto;
+  box-sizing: border-box;
   min-width: 0;
   height: 34px;
-  padding: 0 var(--sp-6);
+  min-height: 34px;
+  margin: 0;
+  padding: 7px var(--sp-6);
   border: 1px solid var(--border-strong);
-  border-radius: var(--radius-pill);
+  border-radius: 17px;
   background: var(--surface-bright);
   box-shadow: none;
   color: var(--text);
+  font: inherit;
   font-size: var(--fs-md);
+  line-height: 18px;
+  overflow-x: hidden;
+  overflow-y: hidden;
+  overflow-wrap: break-word;
+  white-space: pre-wrap;
+  resize: none;
+  scrollbar-width: thin;
 }
 .social-drawer #local-chat-input::placeholder { color: var(--text-muted); opacity: 1; }
 .social-drawer #local-chat-input:focus-visible { border-color: var(--focus, var(--c-sky-57)); }

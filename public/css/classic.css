@@ -1398,9 +1398,20 @@
 :root[data-ui="classic"] .social-drawer .classic-lower-log { flex: 1 1 auto; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; }
 :root[data-ui="classic"] .social-drawer .classic-lower-form { flex: none; padding: calc(8 * var(--cu)) 0 calc(12 * var(--cu)); }
 :root[data-ui="classic"] .social-drawer :is(#local-chat-input, .classic-lower-input) {
+  box-sizing: border-box;
+  display: block;
   width: 100%;
   height: calc(25 * var(--cu));
-  padding: 0 calc(5 * var(--cu));
+  min-height: calc(25 * var(--cu));
+  margin: 0;
+  /* A box that wraps and grows (js/ui/chat-input.js), from the client's one line of 25: a 17 line
+     and 3 above and below, in the border. */
+  padding: calc(3 * var(--cu)) calc(5 * var(--cu));
+  resize: none;
+  overflow-x: hidden;
+  overflow-y: hidden;
+  overflow-wrap: break-word;
+  white-space: pre-wrap;
   border: 1px solid var(--c-classic-input-border);
   border-radius: 3.5px;
   background: var(--c-classic-input);
@@ -1563,7 +1574,7 @@
 :root[data-ui="classic"] .social-drawer .chat-link { color: var(--c-classic-link); }
 :root[data-ui="classic"] .social-drawer :is(.social-title[data-classic-title]::before, .classic-lower-title) { font-size: calc(var(--fs-classic-pane) * var(--cu-n, 1)); }
 :root[data-ui="classic"] .social-drawer .social-time { font-size: calc(var(--fs-classic-count) * var(--cu-n, 1)); }
-:root[data-ui="classic"] .social-drawer :is(#local-chat-input, .classic-lower-input) { font-size: calc(var(--fs-classic-chat) * var(--cu-n, 1)); }
+:root[data-ui="classic"] .social-drawer :is(#local-chat-input, .classic-lower-input) { font-size: calc(var(--fs-classic-chat) * var(--cu-n, 1)); line-height: calc(17 * var(--cu)); }
 :root[data-ui="classic"] .social-drawer .social-rail-btn[data-social-rail-tab] { font-size: calc(var(--fs-classic-contact) * var(--cu-n, 1)); height: calc(18 * var(--cu)); color: var(--c-classic-online-text); }
 
 /* The contact strip opens to 165u on its 12 x 60 tab (ContactList.as 33-44, 105-112, 281): the open
