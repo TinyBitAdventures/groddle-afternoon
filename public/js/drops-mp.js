@@ -19,8 +19,11 @@
  * Ours: a class the ledger does not carry (the trade table), a note (its
  * writing would not travel) and anything dropped in a private place (a home, a tower floor, a party
  * space, a race) stay the player's own, as in solo; a stack nobody picks up
- * in seven days goes back to its dropper.
+ * in seven days goes back to its dropper. A copy's own words (a Cubimal's
+ * name ...) ride with a one-copy stack as "t", as its wear rides as "r".
  */
+
+import { cleanCopyTag } from './tools.js?v=6684b484';
 
 /** Where the site and server ids come from (drops.go dropOpRe). */
 export const DROP_OP = /^drop-[0-9a-f]{16}$/;
@@ -90,6 +93,12 @@ export function normalizeGroundStack(raw, street = '') {
     subtitle: `${DROP_TEXT.by(by.name)} · ${count} in this pile`,
   };
   if (raw.r != null && Number.isFinite(Number(raw.r))) out.r = Math.max(0, Math.floor(Number(raw.r)));
+  // One copy's own words (a named Cubimal on the ground shows its name: game.js reads tags[0]).
+  const t = count === 1 && raw.t != null ? cleanCopyTag(classTsid, raw.t) : null;
+  if (t != null) {
+    out.t = t;
+    out.tags = [t];
+  }
   return out;
 }
 
@@ -120,6 +129,8 @@ export function normalizeItem(raw) {
   if (!c || n < 1) return null;
   const out = { c, n };
   if (raw.r != null && Number.isFinite(Number(raw.r))) out.r = Math.max(0, Math.floor(Number(raw.r)));
+  const t = n === 1 && raw.t != null ? cleanCopyTag(c, raw.t) : null;
+  if (t != null) out.t = t;
   return out;
 }
 
@@ -133,7 +144,7 @@ export function dropEffect(side, item, label = (c) => c) {
   if (!it) return null;
   const name = label(it.c, it.n);
   if (side === 'dropped') return { pack: { [it.c]: -it.n }, tool: null, line: DROP_TEXT.dropped(it.n, name), sound: 'ITEM_DROP' };
-  const tool = it.r != null ? { c: it.c, r: it.r } : null;
+  const tool = it.r != null || it.t != null ? { c: it.c, r: it.r ?? null, ...(it.t != null ? { t: it.t } : {}) } : null;
   if (side === 'back') return { pack: { [it.c]: it.n }, tool, line: DROP_TEXT.back(it.n, name), sound: 'ITEM_PICKUP' };
   return { pack: { [it.c]: it.n }, tool, line: DROP_TEXT.picked(it.n, name), sound: 'ITEM_PICKUP' };
 }

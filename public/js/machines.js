@@ -22,7 +22,7 @@
  */
 
 import { addItem, countItem, removeItem } from './inventory.js?v=d82f3b00';
-import { getToolCondition, receiveToolCopy, setToolRemaining, toolCopies } from './tools.js?v=ca00d182';
+import { getToolCondition, receiveToolCopy, setToolRemaining, toolCopies } from './tools.js?v=6684b484';
 import { distillingBonus, hasMasterAssembler, hasMasterExploder, machinePartInstallMs } from './imagination-effects.js?v=70169933';
 import { loseEnergy } from './metabolics.js?v=8504134e';
 
@@ -259,7 +259,7 @@ export const STILL = Object.freeze({
 });
 
 /** The Hoocher cards can push the hopper past hopper_size (still.js adds after the room check). */
-const HOPPER_CEILING = Math.ceil(STILL.hopperSize * 1.2);
+export const HOPPER_CEILING = Math.ceil(STILL.hopperSize * 1.2);
 
 export function createStillState(seed = {}) {
   const n = (v) => Math.max(0, Math.floor(Number(v) || 0));

@@ -40,10 +40,10 @@
  */
 
 import { ITEM_CATALOG, addItem, countItem, removeItem } from '../inventory.js?v=d82f3b00';
-import { TOOL_CONDITION_CATALOG, leavingToolWear, receiveToolCopy, takeToolCopy } from '../tools.js?v=ca00d182';
+import { TOOL_CONDITION_CATALOG, leavingCopyTag, leavingToolWear, receiveToolCopy, takeToolCopy } from '../tools.js?v=6684b484';
 import { createMinnAccount } from '../minn-account.js?v=17bdce28';
 import { saveStore } from '../save-store.js?v=8839ba7b';
-import { DROP_OP, DROP_TEXT, dropEffect, eatenStack, groundFrom, isPublicStreet, normalizeGroundStack, normalizeMine, pigAnimalKey, shareReason } from '../drops-mp.js?v=00490802';
+import { DROP_OP, DROP_TEXT, dropEffect, eatenStack, groundFrom, isPublicStreet, normalizeGroundStack, normalizeMine, pigAnimalKey, shareReason } from '../drops-mp.js?v=c88ed13d';
 
 export const DROPS_MP_FEATURE_ID = 'drops-mp';
 const TABLE_URL = 'assets/content/trade-items.json';
@@ -148,7 +148,7 @@ function createSession(engine, client) {
     }
     if (fx.tool && TOOL_CONDITION_CATALOG[fx.tool.c] && engine.toolState && (fx.pack[fx.tool.c] || 0) > 0) {
       // As a trade does (trade-feature applyDone): the tools picked up keep the stack's wear; yours keep their own.
-      receiveToolCopy(engine.toolState, fx.tool.c, fx.tool.r, fx.pack[fx.tool.c]);
+      receiveToolCopy(engine.toolState, fx.tool.c, fx.tool.r, fx.pack[fx.tool.c], fx.tool.t ?? null);
     }
     if (at && Number.isFinite(at.x)) {
       const it = item.n === 1 ? itemLabel(item.c) : itemLabel(item.c, item.n);
@@ -169,7 +169,7 @@ function createSession(engine, client) {
     leaveCopy(d.c, d.copy);
     removeItem(engine.inv, d.c, n);
     // A tool keeps its own wear on the ground (the wear sent with the drop).
-    const out = engine.dropWorldStack?.(d.c, n, d.x, d.y, d.r != null ? Array(n).fill(d.r) : undefined);
+    const out = engine.dropWorldStack?.(d.c, n, d.x, d.y, d.r != null ? Array(n).fill(d.r) : undefined, d.t != null && n === 1 ? [d.t] : undefined);
     if (!out?.ok) {
       addItem(engine.inv, d.c, n);
       return;
@@ -302,9 +302,12 @@ function createSession(engine, client) {
     const chosen = n === 1 && Number.isInteger(copy) && copy >= 0 && copy < countItem(engine.inv, c) ? copy : null;
     if (TOOL_CONDITION_CATALOG[c] && engine.toolState) {
       item.r = chosen != null ? takeToolCopy(engine.toolState, c, { copy: chosen, take: false }) : leavingToolWear(engine.toolState, c, n);
+      // Its own words go down with it (a named Cubimal on the ground keeps its name).
+      const t = leavingCopyTag(engine.toolState, c, n, chosen);
+      if (t != null) item.t = t;
     }
     const ref = `d${Date.now().toString(36)}${(refN += 1)}`;
-    dropping = { ref, c, n, r: item.r, copy: chosen, x: Number(x) || 0, y: Number(y) || 0, at: Date.now() };
+    dropping = { ref, c, n, r: item.r, t: item.t ?? null, copy: chosen, x: Number(x) || 0, y: Number(y) || 0, at: Date.now() };
     publish();
     // The ledger must have seen what the drop takes: write the save first.
     persist(engine).then(() => {

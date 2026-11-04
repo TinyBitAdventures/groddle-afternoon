@@ -34,11 +34,11 @@
  */
 
 import { ITEM_CATALOG, addItem, countItem, ensureItem, itemIcon, listPackSlots, removeItem } from '../inventory.js?v=d82f3b00';
-import { TOOL_CONDITION_CATALOG, leavingToolWear, receiveToolCopy, takeToolCopy } from '../tools.js?v=ca00d182';
+import { TOOL_CONDITION_CATALOG, leavingCopyTag, leavingToolWear, receiveToolCopy, takeToolCopy } from '../tools.js?v=6684b484';
 import { unitRankAt } from '../pack-slots.js?v=c91d0ca3';
 import { createMinnAccount } from '../minn-account.js?v=17bdce28';
 // The same key as features/index.js: one module instance holds the carried notes.
-import { giveCarriedNote, takeCarriedNote, writtenCarriedNotes } from './street-furniture-feature.js?v=21f63e88';
+import { giveCarriedNote, takeCarriedNote, writtenCarriedNotes } from './street-furniture-feature.js?v=39cef8fa';
 import {
   BOX_SLOTS,
   GIFT_BOX,
@@ -58,7 +58,7 @@ import {
   unwrapGrowl,
   unwrapPack,
   wrapBox,
-} from '../gifts.js?v=d0732a90';
+} from '../gifts.js?v=28303c16';
 
 export const GIFTS_FEATURE_ID = 'gifts';
 export const GIFT_VERB = 'gift_give';
@@ -371,6 +371,9 @@ function createSession(engine, client) {
         const rank = layout ? unitRankAt(layout, p.c, give.from.container, give.from.index) : -1;
         if (rank >= 0) giveCopy = { c: p.c, copy: rank };
         item.r = rank >= 0 ? takeToolCopy(engine.toolState, p.c, { copy: rank, take: false }) : leavingToolWear(engine.toolState, p.c, item.n);
+        // Its own words go with it (a Cubimal's name, a Draught's Giant, a Still's Hooch, a pumpkin's phrases).
+        const t = leavingCopyTag(engine.toolState, p.c, item.n, rank >= 0 ? rank : null);
+        if (t != null) item.t = t;
       }
       frame = { to: to.id, ref, item };
     }
@@ -411,7 +414,7 @@ function createSession(engine, client) {
     }
     if (fx.tool && TOOL_CONDITION_CATALOG[fx.tool.c] && engine.toolState && (fx.pack[fx.tool.c] || 0) > 0) {
       // As a trade does (trade-feature applyDone): the tools that came keep the giver's wear; yours keep their own.
-      receiveToolCopy(engine.toolState, fx.tool.c, fx.tool.r, fx.pack[fx.tool.c]);
+      receiveToolCopy(engine.toolState, fx.tool.c, fx.tool.r, fx.pack[fx.tool.c], fx.tool.t ?? null);
     }
     if (fx.removeNote) {
       const n = writtenCarriedNotes(engine).find((x) => x.title === fx.removeNote.title && x.body === fx.removeNote.body);
@@ -553,7 +556,11 @@ function createSession(engine, client) {
     if (!wrap) return;
     const picks = wrap.picks.map((p) => {
       const it = { c: p.c, n: p.n };
-      if (TOOL_CONDITION_CATALOG[p.c] && engine.toolState) it.r = leavingToolWear(engine.toolState, p.c, p.n);
+      if (TOOL_CONDITION_CATALOG[p.c] && engine.toolState) {
+        it.r = leavingToolWear(engine.toolState, p.c, p.n);
+        const t = leavingCopyTag(engine.toolState, p.c, p.n);
+        if (t != null) it.t = t;
+      }
       return it;
     });
     const out = wrapBox(slice, picks, (c) => countItem(engine.inv, c), table, (c) => ITEM_CATALOG[c]?.tags || []);
@@ -581,7 +588,7 @@ function createSession(engine, client) {
       else removeItem(engine.inv, c, Math.min(countItem(engine.inv, c), -d));
     }
     for (const it of box.items) {
-      if (it.r != null && TOOL_CONDITION_CATALOG[it.c] && engine.toolState) receiveToolCopy(engine.toolState, it.c, it.r, it.n);
+      if ((it.r != null || it.t != null) && TOOL_CONDITION_CATALOG[it.c] && engine.toolState) receiveToolCopy(engine.toolState, it.c, it.r ?? null, it.n, it.t ?? null);
     }
     const growl = unwrapGrowl(box.items, table, itemLabel);
     lastLine = growl;

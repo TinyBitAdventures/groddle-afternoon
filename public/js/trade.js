@@ -12,10 +12,14 @@
  * (holdFor). A trade_done says what this side gave and gets; settleDone
  * turns the hold into the pack changes. Cancel and void return the hold.
  *
- * Goods are { items: [{ c, n, r? }], currants }: one entry per trade slot
+ * Goods are { items: [{ c, n, r?, t? }], currants }: one entry per trade slot
  * (a slot is one stack: at most the class's stackmax), r a tool's points
- * left. Counts are { [classTsid]: n }.
+ * left, t the words of a one-copy slot (a Cubimal's name, a Draught's Giant,
+ * a Still's contents, a pumpkin's phrases: js/copy-tags.js). Counts are
+ * { [classTsid]: n }.
  */
+
+import { cleanCopyTag } from './tools.js?v=6684b484';
 
 /** TradeDialog.as:50 MAX_TRADE_SLOTS. */
 export const TRADE_SLOTS = 6;
@@ -81,6 +85,8 @@ export function normalizeGoods(g) {
     if (!c || !n) continue;
     const row = { c, n };
     if (Number.isInteger(it?.r) && it.r >= 0) row.r = it.r;
+    const t = n === 1 && it?.t != null ? cleanCopyTag(c, it.t) : null;
+    if (t != null) row.t = t;
     items.push(row);
     if (items.length >= TRADE_SLOTS) break;
   }
@@ -98,8 +104,33 @@ export function countsOf(goods) {
   return out;
 }
 
+/** The same slots and currants (a slot's words ride along from the hold, so they never make an offer differ). */
 export function sameGoods(a, b) {
-  return JSON.stringify(normalizeGoods(a)) === JSON.stringify(normalizeGoods(b));
+  const plain = (g) => {
+    const x = normalizeGoods(g);
+    return { items: x.items.map(({ t, ...rest }) => rest), currants: x.currants };
+  };
+  return JSON.stringify(plain(a)) === JSON.stringify(plain(b));
+}
+
+/**
+ * The words each one-copy slot of a class carries: the hold's copies of that class, in the order
+ * they went in (hold.tags, beside hold.points), slot by slot. Returns new goods.
+ */
+export function goodsWithHeldTags(goods, hold) {
+  const tags = hold?.tags || {};
+  const seen = {};
+  const items = (goods?.items || []).map((it) => {
+    const { t: _old, ...out } = it;
+    const list = tags[it.c];
+    if (!Array.isArray(list)) return out;
+    const j = seen[it.c] || 0;
+    seen[it.c] = j + it.n;
+    const t = it.n === 1 ? cleanCopyTag(it.c, list[j] ?? null) : null;
+    if (t != null) out.t = t;
+    return out;
+  });
+  return { items, currants: goods?.currants || 0 };
 }
 
 /**
@@ -225,7 +256,7 @@ export function settleDone(hold, done) {
   }
   for (const [c, n] of Object.entries(countsOf(got))) add(c, n);
   const currants = n0(hold?.currants) - gave.currants + got.currants;
-  const tools = got.items.filter((it) => Number.isInteger(it.r)).map((it) => ({ c: it.c, r: it.r }));
+  const tools = got.items.filter((it) => Number.isInteger(it.r) || it.t != null).map((it) => ({ c: it.c, r: Number.isInteger(it.r) ? it.r : null, ...(it.t != null ? { t: it.t } : {}) }));
   return { pack, currants, tools };
 }
 
@@ -308,9 +339,28 @@ export function normalizeSlice(slice) {
       if (clean.length) points[c] = clean;
     }
     if (Object.keys(points).length) h.points = points;
+    // Each held copy's own words (js/tools.js row.tags), in the order they went in.
+    const tags = {};
+    for (const [c, list] of Object.entries(hold.tags || {})) {
+      if (!items[c] || !Array.isArray(list)) continue;
+      const clean = list.slice(0, items[c]).map(heldTag);
+      if (clean.some((t) => t != null)) tags[c] = clean;
+    }
+    if (Object.keys(tags).length) h.tags = tags;
   }
   const applied = (Array.isArray(slice?.applied) ? slice.applied : []).filter((t) => typeof t === 'string' && t.length <= 40).slice(-APPLIED_KEEP);
   return { hold: h, applied };
+}
+
+/** A held copy's words as the pack kept them (JSON-safe and small), else null. */
+function heldTag(value) {
+  if (value == null) return null;
+  try {
+    const text = JSON.stringify(value);
+    return text && text.length <= 600 ? JSON.parse(text) : null;
+  } catch {
+    return null;
+  }
 }
 
 export function holdEmpty(hold) {

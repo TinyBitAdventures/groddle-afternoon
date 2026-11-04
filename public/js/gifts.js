@@ -19,10 +19,13 @@
  *   Gift Box again (replaceWith('bag_gift_box'), 467).
  *
  * The gifts slice (systems.features.gifts in the save) keeps the wrapped
- * boxes: { boxes: [{ id, items: [{ c, n, r? }], from?: { id, name }, at }], next }.
+ * boxes: { boxes: [{ id, items: [{ c, n, r?, t? }], from?: { id, name }, at }], next }
+ * (t: a one-copy stack's own words, js/copy-tags.js).
  * The pack holds one bag_gift_box_wrapped per box. The site's ledger counts
  * each box as one bag_gift_box and what is inside (LedgerMath::holdings).
  */
+
+import { cleanCopyTag } from './tools.js?v=6684b484';
 
 export const GIFT_BOX = 'bag_gift_box';
 export const GIFT_WRAPPED = 'bag_gift_box_wrapped';
@@ -115,6 +118,9 @@ function cleanItem(raw) {
   const out = { c, n };
   const r = Math.floor(Number(raw?.r));
   if (raw?.r != null && Number.isFinite(r) && r >= 0) out.r = r;
+  // A one-copy stack's own words (a Cubimal's name ...), checked again here.
+  const t = n === 1 && raw?.t != null ? cleanCopyTag(c, raw.t) : null;
+  if (t != null) out.t = t;
   return out;
 }
 
@@ -236,7 +242,7 @@ export function giftEffects(gift, { table, label, level = null } = {}) {
       else out.addNote = { ...gift.note, lastEditor: `player:${gift.with.id}`, lastEdited: Math.floor(Date.now() / 1000) };
     } else {
       out.pack[it.c] = sign * it.n;
-      if (!gave && it.r != null) out.tool = { c: it.c, r: it.r };
+      if (!gave && (it.r != null || it.t != null)) out.tool = { c: it.c, r: it.r ?? null, ...(it.t != null ? { t: it.t } : {}) };
     }
   }
   out.line = gave ? GIFT_TEXT.gave(name, stack) : GIFT_TEXT.got(name, stack);

@@ -9,7 +9,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createInventory, countItem } from '../public/js/inventory.js?v=d82f3b00';
-import { createToolConditionState, getToolCondition } from '../public/js/tools.js?v=ca00d182';
+import { createToolConditionState, getToolCondition } from '../public/js/tools.js?v=6684b484';
 import {
   MACHINE_ASSEMBLIES,
   MACHINE_PART_ITEMS,
@@ -22,14 +22,14 @@ import {
   distillInStill,
   advanceStill,
   collectHooch,
-} from '../public/js/machines.js?v=01be0285';
+} from '../public/js/machines.js?v=acfeb40f';
 import { runTransform, listTransformVerbs, transformEdges } from '../public/js/item-transforms.js?v=596df9fe';
-import { RECIPE_CATALOG, craftRecipe, loadRecipeCatalogFromFile } from '../public/js/making.js?v=6e3db7f0';
-import { VENDOR_PROFILES } from '../public/js/vendor.js?v=87fb770c';
-import { SEED_CATALOG } from '../public/js/garden.js?v=d93048f3';
+import { RECIPE_CATALOG, craftRecipe, loadRecipeCatalogFromFile } from '../public/js/making.js?v=621cd991';
+import { VENDOR_PROFILES } from '../public/js/vendor.js?v=c74e9e04';
+import { SEED_CATALOG } from '../public/js/garden.js?v=9c151062';
 import { obtainableItems } from '../tools/job-obtainable.mjs';
 import { supplyReport } from '../tools/supply-report.mjs';
-import { supplyFeature } from '../public/js/features/supply-feature.js?v=8d5d134c';
+import { supplyFeature } from '../public/js/features/supply-feature.js?v=107a10bb';
 
 const SPIKE = join(dirname(fileURLToPath(import.meta.url)), '..', 'public');
 const ENGINEER = ['engineering_1'];
@@ -200,7 +200,7 @@ describe('pack transforms', () => {
     assert.deepEqual(events, [['cheese_very_stinky:poke', 1], ['VERB:poke:cheese_very_stinky', 1]]);
     const quests = JSON.parse(readFileSync(join(SPIKE, 'assets/content/quests.json'), 'utf8'));
     const def = (quests.quests || quests).find ? (quests.quests || quests).find((q) => q.classTsid === 'find_shiny_intrinsic_object') : (quests.quests || quests).find_shiny_intrinsic_object;
-    const { eventCounters } = await import('../public/js/quest-offers.js?v=ef0912c2');
+    const { eventCounters } = await import('../public/js/quest-offers.js?v=33c0e39f');
     const req = def.requirements.find((r) => r.id === 'r375');
     assert.ok(eventCounters('cheese_very_stinky:poke').some((c) => c.counter === req.name), req.name);
   });

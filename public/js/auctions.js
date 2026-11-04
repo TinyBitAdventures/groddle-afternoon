@@ -27,7 +27,8 @@
  *    while you were away are announced once (800-806).
  */
 
-import { formatStack } from './gifts.js?v=d0732a90';
+import { formatStack } from './gifts.js?v=28303c16';
+import { cleanCopyTag } from './tools.js?v=6684b484';
 
 export const AUCTION_SENDER = 'Auction Fulfillment and Logistics Corporation';
 /** Our save slice keeps this many announced sales. */
@@ -234,6 +235,9 @@ export function normalizeListing(raw) {
     mine: raw.mine === true,
   };
   if (raw.r != null && Number.isFinite(Number(raw.r))) out.r = Math.max(0, Math.floor(Number(raw.r)));
+  // A one-copy listing's own words (a Cubimal's name ...), as the site keeps them.
+  const t = out.n === 1 && raw.t != null ? cleanCopyTag(c, raw.t) : null;
+  if (t != null) out.t = t;
   if (raw.ended) out.ended = n0(raw.ended);
   if (raw.buyer) out.buyer = who(raw.buyer);
   if (raw.proceeds != null) out.proceeds = n0(raw.proceeds);

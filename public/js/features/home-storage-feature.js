@@ -42,15 +42,15 @@
  */
 
 import { ITEM_CATALOG, addItem, countItem, ensureItem, itemIcon, removeItem } from '../inventory.js?v=d82f3b00';
-import { displayRefusal, furnitureDef, furnitureSize, isFurniture } from '../home-decor.js?v=6dc41dcc';
+import { displayRefusal, furnitureDef, furnitureSize, isFurniture } from '../home-decor.js?v=a53535e3';
 import { pieceLabel } from '../furniture-upgrades.js?v=a3788c0d';
 import { textureFromUrl } from '../textures.js?v=3149d699';
 import { stackMaxOf, isBagClass } from '../pack-slots.js?v=c91d0ca3';
 import { ELEMENT_CLASSES, NO_BAG_CLASSES, NO_SLOT_CLASSES } from '../pack-slots-data.js?v=800f664c';
-import { TOOL_CONDITION_CATALOG, receiveToolCopy, takeToolCopy } from '../tools.js?v=ca00d182';
+import { TOOL_CONDITION_CATALOG, copyTagKind, copyTags, receiveToolCopy, setCopyTag, takeToolCopy } from '../tools.js?v=6684b484';
 import { readVisitScene } from '../neighbours-mp.js?v=a8d5544e';
 import { saveStore } from '../save-store.js?v=8839ba7b';
-import { homesFeature } from './homes-feature.js?v=be536b90';
+import { homesFeature } from './homes-feature.js?v=1bb76435';
 import {
   SDB_PRICE_MAX,
   STORAGE_TEXT as T,
@@ -76,7 +76,7 @@ import {
   sdbVerbs,
   setSdbPrice,
   slotsUsed,
-} from '../home-storage.js?v=56c6416d';
+} from '../home-storage.js?v=a260d686';
 import {
   closeStorageWindow,
   openCabinetWindow,
@@ -522,7 +522,9 @@ function cabinetPutFromPack(engine, cls, count, { slot = null, copy = null } = {
     points = [];
     for (let i = 0; i < n; i += 1) points.push(takeToolCopy(engine.toolState, cls, i === 0 && Number.isInteger(copy) ? { copy } : {}));
   }
-  const put = cabinetPut(row.contents, cls, n, { slot: Number.isInteger(slot) ? slot : null, max: stackmax(cls), points });
+  // Its own words go in with it (the copies about to leave are the last ones now).
+  const tags = copyTagKind(cls) && engine.toolState ? copyTags(engine.toolState, cls).slice(-n) : null;
+  const put = cabinetPut(row.contents, cls, n, { slot: Number.isInteger(slot) ? slot : null, max: stackmax(cls), points, tags });
   removeItem(engine.inv, cls, put);
   engine.refreshPack?.();
   engine.playSound?.('ITEM_DROP', { volume: 0.45 });
@@ -551,6 +553,11 @@ function cabinetTakeToPack(engine, slot, n) {
   ensureItem(cls);
   addItem(engine.inv, cls, out.taken);
   if (isTool(cls) && engine.toolState) for (const p of out.points) receiveToolCopy(engine.toolState, cls, p, 1);
+  // ... and their own words, on the copies that just came (the newest).
+  if (copyTagKind(cls) && engine.toolState && out.tags?.some((t) => t != null)) {
+    const held = countItem(engine.inv, cls);
+    out.tags.forEach((t, i) => { if (t != null) setCopyTag(engine.toolState, cls, held - out.tags.length + i, t); });
+  }
   engine.refreshPack?.();
   engine.playSound?.('ITEM_PICKUP', { volume: 0.4 });
   win.slots = row.contents;

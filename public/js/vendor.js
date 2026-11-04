@@ -12,8 +12,8 @@ import {
   ITEM_CATALOG,
   ensureItem,
 } from './inventory.js?v=d82f3b00';
-import { gardenVendorOffers } from './garden.js?v=d93048f3';
-import { miningVendorOffers } from './mining.js?v=6e0d2b17';
+import { gardenVendorOffers } from './garden.js?v=9c151062';
+import { miningVendorOffers } from './mining.js?v=83421428';
 
 import { STORE_CATALOG, ITEM_BASE_COSTS, NO_VENDOR_ITEMS } from './store-catalog.js?v=74b56af3';
 

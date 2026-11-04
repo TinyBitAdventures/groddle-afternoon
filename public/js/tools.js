@@ -7,6 +7,7 @@
 
 import { repairGivesMood } from './imagination-effects.js?v=70169933';
 import { energyMax, loseEnergy, metabolicGain, moodMax } from './metabolics.js?v=8504134e';
+import { cleanCopyTagOf } from './copy-tags.js?v=e8f6c072';
 
 export const TOOL_CONDITION_CATALOG = Object.freeze({
   butterfly_lotion: {
@@ -88,8 +89,9 @@ export const TOOL_CONDITION_CATALOG = Object.freeze({
  * number counts. `contents` with `bits`: the Emotional Bear's upgrades (emotional_bear.js 620-641,
  * this.upgrades per bear), one bit each. `tags`: a copy's own words (a Cubimal's name, a lit
  * pumpkin's phrases, a Still's hopper and Hooch, a Draught's Giant), kept beside the copies in
- * row.tags; they move with the copy in the pack and its bags, and a copy that arrives from elsewhere
- * starts fresh (the ledger and the server carry numbers). baseCost 0: the vendor's catalog price.
+ * row.tags; they move with the copy in the pack and its bags, and online with it to another player
+ * (`tag` names the kind of words, js/copy-tags.js; "t" beside "r" on the wire). baseCost 0: the
+ * vendor's catalog price.
  */
 function chargeClasses() {
   const charge = (label, capacity, source, meter = 'Uses') =>
@@ -101,7 +103,7 @@ function chargeClasses() {
     potion('potion_amorous_philtre', 'Amorous Philtre', 5),
     potion('potion_elixir_of_avarice', 'Elixir of Avarice', 5),
     // potion_favor.js 25 points_capacity 11 (its initInstanceProps 35 says 5, tool_base's default; the remake gives 11).
-    ['potion_favor', { ...charge('Draught of Giant Amicability', 11, 'potion_favor.js points_capacity; favor_giant per bottle (onLoad 585-589)'), tags: true }],
+    ['potion_favor', { ...charge('Draught of Giant Amicability', 11, 'potion_favor.js points_capacity; favor_giant per bottle (onLoad 585-589)'), tags: true, tag: 'giant' }],
     potion('potion_keycutter_tonic', 'Keycutter Tonic', 5),
     potion('potion_animal_youth', 'Potion of Animal Youth', 3),
     potion('potion_avatar_large', 'Embiggenifying Potion', 5),
@@ -134,15 +136,15 @@ function chargeClasses() {
 }
 
 function taggedClasses() {
-  const tagged = (label, source) => ({ label, capacity: 0, baseCost: 0, repairable: false, contents: true, empty: 0, tags: true, noMeter: true, source });
+  const tagged = (label, source, tag) => ({ label, capacity: 0, baseCost: 0, repairable: false, contents: true, empty: 0, tags: true, tag, noMeter: true, source });
   const cubimals = ['chick', 'piggy', 'butterfly', 'crab', 'batterfly', 'frog', 'firefly', 'bureaucrat', 'cactus', 'snoconevendor', 'squid', 'juju', 'smuggler', 'deimaginator', 'greeterbot', 'dustbunny', 'gwendolyn', 'unclefriendly', 'helga', 'magicrock', 'yeti', 'rube', 'rook', 'fox', 'sloth', 'emobear', 'foxranger', 'groddlestreetspirit', 'uraliastreetspirit', 'firebogstreetspirit', 'gnome', 'butler', 'craftybot', 'phantom', 'ilmenskiejones', 'trisor', 'toolvendor', 'mealvendor', 'gardeningtoolsvendor', 'maintenancebot', 'senorfunpickle', 'hellbartender', 'scionofpurple'];
   return Object.fromEntries([
     // npc_cubimal_*.js user_name per figure (npc_cubimal_chick.js 437-483, getLabel 581-583).
-    ...cubimals.map((slug) => [`npc_cubimal_${slug}`, tagged('Cubimal', `npc_cubimal_${slug}.js user_name`)]),
+    ...cubimals.map((slug) => [`npc_cubimal_${slug}`, tagged('Cubimal', `npc_cubimal_${slug}.js user_name`, 'name')]),
     // pumpkin_lit_*.js this.phrases per pumpkin (380-391, at most 3).
-    ...[1, 2, 3, 4, 5].map((n) => [`pumpkin_lit_${n}`, tagged('Lit Pumpkin', `pumpkin_lit_${n}.js phrases`)]),
+    ...[1, 2, 3, 4, 5].map((n) => [`pumpkin_lit_${n}`, tagged('Lit Pumpkin', `pumpkin_lit_${n}.js phrases`, 'phrases')]),
     // still.js 30-31 instanceProps hooch and hopper_amount per Still.
-    ['still', tagged('Still', 'still.js hooch, hopper_amount')],
+    ['still', tagged('Still', 'still.js hooch, hopper_amount', 'still')],
     // emotional_bear.js 620-641: this.upgrades per bear. Bit 1 Lips (kiss), bit 2 Moon.
     ['emotional_bear', { label: 'Emotional Bear', capacity: 3, baseCost: 0, repairable: false, contents: true, empty: 0, bits: ['kiss', 'moon'], noMeter: true, source: 'emotional_bear.js upgrades' }],
   ]);
@@ -577,8 +579,9 @@ export function leavingToolWear(state, classTsid, n = 1) {
 /**
  * Copies that just arrived with their own wear (a dropped, given, traded or
  * auctioned tool): the newest `n` (the last ones; the count already went up) take it.
+ * `tag`: the words one copy came with (n 1; js/copy-tags.js checks them again here), else none.
  */
-export function receiveToolCopy(state, classTsid, remaining, n = 1) {
+export function receiveToolCopy(state, classTsid, remaining, n = 1, tag = null) {
   const def = TOOL_CONDITION_CATALOG[classTsid];
   if (!def) return null;
   const row = ensureToolCondition(state, classTsid);
@@ -587,8 +590,56 @@ export function receiveToolCopy(state, classTsid, remaining, n = 1) {
   for (let i = row.copies.length - k; i < row.copies.length; i += 1) row.copies[i] = clampPoints(def, remaining);
   alignTags(row, def);
   if (def.tags) for (let i = row.copies.length - k; i < row.copies.length; i += 1) row.tags[i] = null;
+  if (def.tags && k === 1 && tag != null) row.tags[row.copies.length - 1] = cleanCopyTag(classTsid, tag);
   settleRow(row, def);
   return getToolCondition(state, classTsid, { copy: row.copies.length - 1 });
+}
+
+/** The kind of words a class's copies keep and carry ('' for none): name, phrases, giant, still. */
+export function copyTagKind(classTsid) {
+  return TOOL_CONDITION_CATALOG[classTsid]?.tag || '';
+}
+
+/** A copy's words as they may travel (js/copy-tags.js rules), or null. */
+export function cleanCopyTag(classTsid, value, opts = {}) {
+  const kind = copyTagKind(classTsid);
+  return kind ? cleanCopyTagOf(kind, value, opts) : null;
+}
+
+/**
+ * The words one copy leaving the pack takes with it, as they may travel ("t"): `copy` (its place in
+ * pack order) when it names one, else the last (the one the count going down takes). Only one copy
+ * at a time carries words (n 1); null for none.
+ */
+export function leavingCopyTag(state, classTsid, n = 1, copy = null) {
+  const def = TOOL_CONDITION_CATALOG[classTsid];
+  if (!def?.tags || Math.floor(Number(n) || 0) !== 1) return null;
+  const row = ensureToolCondition(state, classTsid);
+  if (!row.copies.length) return null;
+  const c = Number(copy);
+  const at = copy != null && Number.isInteger(c) && c >= 0 && c < row.copies.length ? c : row.copies.length - 1;
+  return cleanCopyTag(classTsid, row.tags[at] ?? null);
+}
+
+/**
+ * Copies that came one to a slot, each with its own wear and words (a trade's slots of a class
+ * that holds its words): the newest list.length copies, in order, take [{ r, t }].
+ */
+export function receiveToolCopies(state, classTsid, list = []) {
+  const def = TOOL_CONDITION_CATALOG[classTsid];
+  if (!def || !Array.isArray(list) || !list.length) return false;
+  const row = ensureToolCondition(state, classTsid);
+  const k = Math.min(row.copies.length, list.length);
+  if (!k) return false;
+  alignTags(row, def);
+  const from = row.copies.length - k;
+  for (let i = 0; i < k; i += 1) {
+    const it = list[list.length - k + i] || {};
+    row.copies[from + i] = clampPoints(def, it.r ?? null);
+    if (def.tags) row.tags[from + i] = it.t == null ? null : cleanCopyTag(classTsid, it.t);
+  }
+  settleRow(row, def);
+  return true;
 }
 
 /**

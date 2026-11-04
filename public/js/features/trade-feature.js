@@ -41,7 +41,7 @@
  */
 
 import { ITEM_CATALOG, addItem, countItem, itemIcon, listPackSlots, removeItem } from '../inventory.js?v=d82f3b00';
-import { TOOL_CONDITION_CATALOG, leavingToolWear, receiveToolCopy, setToolRemaining, toolCopies } from '../tools.js?v=ca00d182';
+import { TOOL_CONDITION_CATALOG, copyTagKind, copyTags, leavingToolWear, receiveToolCopies, receiveToolCopy, setCopyTag, setToolRemaining, toolCopies } from '../tools.js?v=6684b484';
 import { saveStore } from '../save-store.js?v=8839ba7b';
 import { playOverlay } from '../overlays.js?v=210ad5ee';
 import {
@@ -67,7 +67,8 @@ import {
   slotMax,
   tradeCommand,
   untradeableReason,
-} from '../trade.js?v=d85ea665';
+  goodsWithHeldTags,
+} from '../trade.js?v=35447a40';
 
 export const TRADE_FEATURE_ID = 'trade';
 export const TRADE_VERB = 'trade_start';
@@ -287,7 +288,9 @@ function createSession(engine, client) {
     const slot = el('div', { class: 'trade-slot', 'data-trade-slot': String(index), 'data-class': it.c });
     const img = el('img', { src: iconFor(it.c), alt: '' });
     img.addEventListener('error', () => { img.style.visibility = 'hidden'; }, { once: true });
-    slot.append(img, el('span', { class: 'trade-n' }, it.n.toLocaleString('en-US')), el('span', { class: 'trade-name', title: itemLabel(it.c, it.n) }, itemLabel(it.c, it.n)));
+    // A named Cubimal shows its own name (PackItemstackView.as: the user_name as the label).
+    const named = copyTagKind(it.c) === 'name' && typeof it.t === 'string' && it.t ? `${it.t} (${itemLabel(it.c, it.n)})` : itemLabel(it.c, it.n);
+    slot.append(img, el('span', { class: 'trade-n' }, it.n.toLocaleString('en-US')), el('span', { class: 'trade-name', title: named }, named));
     if (editable) {
       const tools = el('div', { class: 'trade-tools' });
       const minus = el('button', { type: 'button', 'aria-label': `One fewer ${itemLabel(it.c)}`, 'data-trade-minus': String(index) }, '−');
@@ -419,6 +422,20 @@ function createSession(engine, client) {
     points.forEach((r, k) => setToolRemaining(engine.toolState, c, r, { copy: n - points.length + k }));
   }
 
+  /** The words of the last `n` copies of a class, about to leave the pack for the hold (js/tools.js row.tags). */
+  function toolTagsOut(c, n) {
+    if (!copyTagKind(c) || !engine.toolState) return [];
+    const all = copyTags(engine.toolState, c);
+    return all.slice(Math.max(0, all.length - n));
+  }
+
+  /** Copies just back in the pack (the newest) take the words they had. */
+  function toolTagsIn(c, tags) {
+    if (!copyTagKind(c) || !engine.toolState || !tags?.length) return;
+    const n = toolCopies(engine.toolState, c).length;
+    tags.forEach((t, k) => setCopyTag(engine.toolState, c, n - tags.length + k, t ?? null));
+  }
+
   /** Move from the pack into the hold so it covers goods. False when the pack cannot. */
   function growHold(goods) {
     const want = holdFor([{ items: Object.entries(heldCounts().items).map(([c, n]) => ({ c, n })), currants: heldCounts().currants }, goods]);
@@ -434,9 +451,12 @@ function createSession(engine, client) {
       const more = n - (have.items[c] || 0);
       if (more > 0) {
         const out = toolPointsOut(c, more);
+        const words = toolTagsOut(c, more);
         removeItem(engine.inv, c, more);
         saved.hold.items[c] = n;
         if (out.length) (saved.hold.points ||= {})[c] = [...(saved.hold.points?.[c] || []), ...out];
+        // A copy keeps its words in the hold too, lined up with its wear (goodsWithHeldTags sends them).
+        if (words.length) (saved.hold.tags ||= {})[c] = [...(saved.hold.tags?.[c] || []), ...words];
       }
     }
     const moreCur = want.currants - have.currants;
@@ -459,6 +479,8 @@ function createSession(engine, client) {
         addItem(engine.inv, c, extra);
         const held = saved.hold.points?.[c];
         if (held?.length) toolPointsIn(c, held.splice(held.length - Math.min(extra, held.length)));
+        const words = saved.hold.tags?.[c];
+        if (words?.length) toolTagsIn(c, words.splice(words.length - Math.min(extra, words.length)));
         moved = true;
         if (want.items[c]) saved.hold.items[c] = want.items[c];
         else delete saved.hold.items[c];
@@ -485,6 +507,7 @@ function createSession(engine, client) {
       if (n <= 0) continue;
       addItem(engine.inv, c, n);
       toolPointsIn(c, (hold.points?.[c] || []).slice(0, n));
+      toolTagsIn(c, (hold.tags?.[c] || []).slice(0, n));
     }
     if (hold.currants > 0) engine.pc.currants += hold.currants;
     engine.updateHud?.();
@@ -575,8 +598,10 @@ function createSession(engine, client) {
     }
     open.sentV = Math.max(open.sentV, open.mine.v) + 1;
     const v = open.sentV;
-    open.pending.set(v, goods);
-    if (!client.send('trade_offer', { trade, v, items: goods.items, currants: goods.currants })) {
+    // Each one-copy slot carries the words of the copy the hold took for it (a Cubimal's name ...).
+    const offer = goodsWithHeldTags(goods, saved.hold?.trade === trade ? saved.hold : null);
+    open.pending.set(v, offer);
+    if (!client.send('trade_offer', { trade, v, items: offer.items, currants: offer.currants })) {
       open.pending.delete(v);
       line(TRADE_TEXT.offline, 'error');
     }
@@ -899,19 +924,38 @@ function createSession(engine, client) {
     // worn (the offer carried that wear: leavingToolWear), the rest return (the newest copies, before what came).
     for (const [c, list] of Object.entries(hold?.points || {})) {
       const gaveN = Math.min(list.length, (countsOf(normalizeGoods(msg.gave))[c] || 0));
-      const back = [...list].sort((a, b) => a - b).slice(gaveN);
+      // A class whose copies keep their words went slot by slot, in hold order (goodsWithHeldTags):
+      // the first ones held were given. Any other tool: the given ones were the most worn.
+      const back = copyTagKind(c) ? list.slice(gaveN) : [...list].sort((a, b) => a - b).slice(gaveN);
       const got = countsOf(normalizeGoods(msg.got))[c] || 0;
       if (!back.length || !engine.toolState) continue;
       const n = toolCopies(engine.toolState, c).length;
       back.forEach((r, k) => setToolRemaining(engine.toolState, c, r, { copy: n - got - back.length + k }));
     }
+    for (const [c, list] of Object.entries(hold?.tags || {})) {
+      const gaveN = Math.min(list.length, (countsOf(normalizeGoods(msg.gave))[c] || 0));
+      const back = list.slice(gaveN);
+      const got = countsOf(normalizeGoods(msg.got))[c] || 0;
+      if (!back.length || !engine.toolState) continue;
+      const n = toolCopies(engine.toolState, c).length;
+      back.forEach((t, k) => setCopyTag(engine.toolState, c, n - got - back.length + k, t ?? null));
+    }
     engine.pc.currants = Math.max(0, n0(engine.pc.currants) + s.currants);
     // A traded tool keeps its wear (the source carried tool_state): the ones that came take the
     // sender's points; the ones you had keep their own (js/tools.js copies).
     const gotCounts = countsOf(normalizeGoods(msg.got));
+    const gotItems = normalizeGoods(msg.got).items;
     for (const t of s.tools) {
       if (!TOOL_CONDITION_CATALOG[t.c] || !engine.toolState || !(gotCounts[t.c] > 0)) continue;
+      if (copyTagKind(t.c)) continue;
       receiveToolCopy(engine.toolState, t.c, t.r, gotCounts[t.c]);
+    }
+    // Copies that keep their words came one to a slot: each takes its own wear and words, in slot order.
+    for (const c of Object.keys(gotCounts)) {
+      if (!copyTagKind(c) || !engine.toolState) continue;
+      const list = [];
+      for (const it of gotItems) if (it.c === c) for (let k = 0; k < it.n; k += 1) list.push({ r: it.r ?? null, t: it.n === 1 ? it.t ?? null : null });
+      receiveToolCopies(engine.toolState, c, list);
     }
     if (hold) saved.hold = null;
     saved.applied = [...saved.applied, id].slice(-APPLIED_KEEP);

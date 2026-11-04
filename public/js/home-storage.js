@@ -33,8 +33,9 @@
  *
  * Remake decisions:
  * - A placed cabinet keeps its slots on its own row (`contents`, an array of
- *   capacity slots, each null or { classTsid, count, points? }); `points` is
- *   each tool's wear (js/tools.js copies), one per unit. The ledger counts
+ *   capacity slots, each null or { classTsid, count, points?, tags? }); `points` is
+ *   each tool's wear (js/tools.js copies), one per unit, and `tags` each copy's
+ *   own words (a Cubimal's name, a Still's Hooch ...: js/tools.js row.tags). The ledger counts
  *   what a cabinet holds as the save's own (site LedgerMath::holdings).
  * - A box keeps `display` ({ classTsid, count }, as before), `selling` and
  *   `price` on its row. Online the site keeps the price and the income
@@ -169,7 +170,22 @@ function cleanSlot(raw, stackmax = () => Infinity) {
     const pts = raw.points.slice(0, count).map((p) => Math.max(0, Math.floor(Number(p) || 0)));
     if (pts.length) out.points = pts;
   }
+  if (Array.isArray(raw.tags)) {
+    const tags = raw.tags.slice(0, count).map(slotTag);
+    if (tags.some((t) => t != null)) out.tags = tags;
+  }
   return out;
+}
+
+/** A stored copy's words as the pack kept them (JSON-safe and small), else null. */
+function slotTag(value) {
+  if (value == null) return null;
+  try {
+    const text = JSON.stringify(value);
+    return text && text.length <= 600 ? JSON.parse(text) : null;
+  } catch {
+    return null;
+  }
 }
 
 /**
@@ -244,17 +260,28 @@ export function cabinetRoom(slots, cls, max, slot = null) {
  * first, then the first empty slots (bag.js addItemStack 191-232). `points`
  * is each tool's wear, in order. Mutates `slots`; returns how many went in.
  */
-export function cabinetPut(slots, cls, n, { slot = null, max = Infinity, points = null } = {}) {
+export function cabinetPut(slots, cls, n, { slot = null, max = Infinity, points = null, tags = null } = {}) {
   let left = whole(n);
   const pts = Array.isArray(points) ? [...points] : null;
+  const tg = Array.isArray(tags) ? [...tags] : null;
   const fill = (i) => {
     const room = slotRoom(slots[i], cls, max);
     const k = Math.min(room, left);
     if (!k) return;
     const s = slots[i] || { classTsid: cls, count: 0 };
+    const before = s.count;
     s.count += k;
     if (pts) {
       s.points = [...(s.points || []), ...pts.splice(0, k)];
+    }
+    // Each copy's own words, lined up with the units (null for one with none).
+    if (tg || Array.isArray(s.tags)) {
+      const had = Array.isArray(s.tags) ? s.tags.slice(0, before) : [];
+      while (had.length < before) had.push(null);
+      const came = tg ? tg.splice(0, k) : [];
+      while (came.length < k) came.push(null);
+      s.tags = [...had, ...came.map((t) => t ?? null)];
+      if (!s.tags.some((t) => t != null)) delete s.tags;
     }
     slots[i] = s;
     left -= k;
@@ -270,24 +297,35 @@ export function cabinetPut(slots, cls, n, { slot = null, max = Infinity, points 
 
 /**
  * Takes up to `n` of `cls` out: from `slot` when named, else from the last
- * stacks of the class first. Mutates `slots`; returns { taken, points } (the
+ * stacks of the class first. Mutates `slots`; returns { taken, points, tags? } (the
  * wear of the tools that came out, when the stacks kept any).
  */
 export function cabinetTake(slots, cls, n, { slot = null } = {}) {
   let left = whole(n);
   const points = [];
+  const tags = [];
   const takeAt = (i) => {
     const s = slots[i];
     if (!s || s.classTsid !== cls || !left) return;
     const k = Math.min(s.count, left);
+    const was = s.count;
     s.count -= k;
     if (Array.isArray(s.points)) points.push(...s.points.splice(s.points.length - k, k));
+    // The units that leave are the last ones: their words with them.
+    const words = Array.isArray(s.tags) ? s.tags.slice(0, was) : [];
+    while (words.length < was) words.push(null);
+    tags.push(...words.splice(words.length - k, k));
+    if (Array.isArray(s.tags)) {
+      if (words.some((t) => t != null)) s.tags = words;
+      else delete s.tags;
+    }
     left -= k;
     if (s.count <= 0) slots[i] = null;
   };
   if (Number.isInteger(slot)) takeAt(slot);
   else for (let i = slots.length - 1; i >= 0 && left; i -= 1) takeAt(i);
-  return { taken: whole(n) - left, points };
+  // `tags` only when a unit that left had words (lined up with the units taken, null for one with none).
+  return { taken: whole(n) - left, points, ...(tags.some((t) => t != null) ? { tags } : {}) };
 }
 
 /**
@@ -303,7 +341,7 @@ export function cabinetMove(slots, from, to, max = Infinity) {
   if (b && b.classTsid === a.classTsid) {
     const moved = cabinetTake(slots, a.classTsid, slotRoom(b, a.classTsid, max), { slot: from });
     if (!moved.taken) return false;
-    cabinetPut(slots, a.classTsid, moved.taken, { slot: to, max, points: moved.points.length ? moved.points : null });
+    cabinetPut(slots, a.classTsid, moved.taken, { slot: to, max, points: moved.points.length ? moved.points : null, tags: moved.tags || null });
     return true;
   }
   slots[to] = a;

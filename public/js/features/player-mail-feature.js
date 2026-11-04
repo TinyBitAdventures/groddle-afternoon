@@ -37,7 +37,7 @@
  */
 
 import { ITEM_CATALOG, addItem, countItem, removeItem } from '../inventory.js?v=d82f3b00';
-import { TOOL_CONDITION_CATALOG, leavingToolWear, receiveToolCopy } from '../tools.js?v=ca00d182';
+import { TOOL_CONDITION_CATALOG, leavingCopyTag, leavingToolWear, receiveToolCopy } from '../tools.js?v=6684b484';
 import { createMinnAccount } from '../minn-account.js?v=17bdce28';
 import { ITEM_BASE_COSTS } from '../store-catalog.js?v=74b56af3';
 import { saveStore } from '../save-store.js?v=8839ba7b';
@@ -109,7 +109,7 @@ function createSession(engine) {
   }
 
   /** One settled move, once (the trade slice's applied list): true when applied now. */
-  function applyReceipt(raw, { quiet = false, r = null } = {}) {
+  function applyReceipt(raw, { quiet = false, r = null, t = null } = {}) {
     const receipt = normalizeMailReceipt(raw);
     if (!receipt) return false;
     if (engine.query?.('ledgerReceipt', receipt.op, engine) !== true) return false;
@@ -118,7 +118,7 @@ function createSession(engine) {
     for (const [c, d] of Object.entries(fx.pack)) {
       if (d > 0) {
         addItem(inv, c, d);
-        if (r != null && TOOL_CONDITION_CATALOG[c] && engine.toolState) receiveToolCopy(engine.toolState, c, r, d);
+        if ((r != null || t != null) && TOOL_CONDITION_CATALOG[c] && engine.toolState) receiveToolCopy(engine.toolState, c, r, d, t);
       } else removeItem(inv, c, Math.min(countItem(inv, c), -d));
     }
     if (fx.currants) engine.pc.currants = Math.max(0, Math.floor(Number(engine.pc.currants) || 0) + fx.currants);
@@ -243,6 +243,9 @@ function createSession(engine) {
     if (stack && TOOL_CONDITION_CATALOG[stack.c] && engine.toolState) {
       const r = leavingToolWear(engine.toolState, stack.c, stack.n);
       if (r != null) stack.r = r;
+      // One copy's own words go with it (a Cubimal's name, a Draught's Giant ...).
+      const t = leavingCopyTag(engine.toolState, stack.c, stack.n);
+      if (t != null) stack.t = t;
     }
     const id = newLetterId();
     await persist();
@@ -304,7 +307,7 @@ function createSession(engine) {
       return false;
     }
     if (!['collected', 'done'].includes(d?.status)) return false;
-    const applied = applyReceipt(d.receipt, { r: d.letter?.item?.r ?? null });
+    const applied = applyReceipt(d.receipt, { r: d.letter?.item?.r ?? null, t: d.letter?.item?.t ?? null });
     message.attachmentsClaimed = true;
     message.read = true;
     if (message.express) message.inMailbox = true;

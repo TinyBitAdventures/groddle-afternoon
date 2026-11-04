@@ -43,7 +43,7 @@
  */
 
 import { ITEM_CATALOG, addItem, countItem, itemIcon, listPackSlots, removeItem } from '../inventory.js?v=d82f3b00';
-import { TOOL_CONDITION_CATALOG, leavingToolWear, receiveToolCopy } from '../tools.js?v=ca00d182';
+import { TOOL_CONDITION_CATALOG, leavingCopyTag, leavingToolWear, receiveToolCopy } from '../tools.js?v=6684b484';
 import { createMinnAccount } from '../minn-account.js?v=17bdce28';
 import { saveStore } from '../save-store.js?v=8839ba7b';
 import {
@@ -70,7 +70,7 @@ import {
   splitEnded,
   suggestedPrice,
   unitPrice,
-} from '../auctions.js?v=1301d2b0';
+} from '../auctions.js?v=7b5dd39b';
 
 export const AUCTIONS_FEATURE_ID = 'auctions';
 const TABLE_URL = 'assets/content/trade-items.json';
@@ -223,7 +223,7 @@ function createSession(engine) {
   }
 
   /** One settled move, once (the trade slice's applied list): true when applied now. */
-  function applyReceipt(raw, { quiet = false, r = null } = {}) {
+  function applyReceipt(raw, { quiet = false, r = null, t = null } = {}) {
     const receipt = normalizeReceipt(raw);
     if (!receipt) return false;
     if (engine.query?.('ledgerReceipt', receipt.op, engine) !== true) {
@@ -236,7 +236,8 @@ function createSession(engine) {
       if (d > 0) {
         addItem(inv, c, d);
         // The tools that came keep the listing's wear; yours keep their own (js/tools.js copies).
-        if (r != null && TOOL_CONDITION_CATALOG[c] && engine.toolState) receiveToolCopy(engine.toolState, c, r, d);
+        // ... and their own words (one copy: a Cubimal's name ...).
+        if ((r != null || t != null) && TOOL_CONDITION_CATALOG[c] && engine.toolState) receiveToolCopy(engine.toolState, c, r, d, t);
       } else removeItem(inv, c, Math.min(countItem(inv, c), -d));
     }
     if (fx.currants) engine.pc.currants = Math.max(0, Math.floor(Number(engine.pc.currants) || 0) + fx.currants);
@@ -747,7 +748,11 @@ function createSession(engine) {
     render();
     await persist();
     const listing = { id: newListingId(), c, n, cost };
-    if (TOOL_CONDITION_CATALOG[c] && engine.toolState) listing.r = leavingToolWear(engine.toolState, c, n);
+    if (TOOL_CONDITION_CATALOG[c] && engine.toolState) {
+      listing.r = leavingToolWear(engine.toolState, c, n);
+      const t = leavingCopyTag(engine.toolState, c, n);
+      if (t != null) listing.t = t;
+    }
     const r = await call(() => account.listAuction(listing));
     busy = false;
     if (!r.ok || r.data?.status !== 'listed') {
@@ -826,7 +831,7 @@ function createSession(engine) {
       return false;
     }
     const d = r.data.delivery || {};
-    const applied = applyReceipt(r.data.receipt, { r: d.item?.r ?? null });
+    const applied = applyReceipt(r.data.receipt, { r: d.item?.r ?? null, t: d.item?.t ?? null });
     claimMail(message.ledger);
     if (applied && !quiet) {
       const what = countName(message.attachment?.classTsid, message.attachment?.count, table, label);

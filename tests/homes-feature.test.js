@@ -15,13 +15,13 @@ import {
   rockClassFor,
   rockItems,
   soilKeyMap,
-} from '../public/js/features/homes-feature.js?v=be536b90';
+} from '../public/js/features/homes-feature.js?v=1bb76435';
 import { WALLPAPER_MAPS } from '../public/js/home-wallpaper-art.js?v=9f8473e6';
 import { HOME_TEXTURE_CONFIGS } from '../public/js/homes-catalog.js?v=7aa9beb0';
-import { canPlantBean } from '../public/js/patches.js?v=50dbdbfe';
+import { canPlantBean } from '../public/js/patches.js?v=056bb6ae';
 import { TOWER_PART_CHOICES, TOWER_STYLES, composeTower, towerBounds } from '../public/js/home-tower.js?v=4daa0b96';
 import { MIN_GROUND_CLEARANCE, cameraTargetY, cameraWorldHeightForGround, yCamOffsetAnchor } from '../public/js/movement.js?v=b30f84eb';
-import { INTERIOR } from '../public/js/home-decor.js?v=6dc41dcc';
+import { INTERIOR } from '../public/js/home-decor.js?v=a53535e3';
 
 const root = join(import.meta.dirname, '..', 'public');
 

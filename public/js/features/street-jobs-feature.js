@@ -44,13 +44,13 @@
  */
 
 import { ITEM_CATALOG, addItem, countItem, ensureItem, itemIcon, removeItem } from '../inventory.js?v=d82f3b00';
-import { canUseTool, useToolCondition } from '../tools.js?v=ca00d182';
+import { canUseTool, useToolCondition } from '../tools.js?v=6684b484';
 import { ecologyForStreet } from '../street-ecology.js?v=d41e5e97';
 import { worldToScreen } from '../street-model.js?v=505d8990';
 import { signArmWidth } from '../street-render.js?v=9349c0e5';
 import { getSkillCatalog } from '../content-catalogs.js?v=10b118dd';
 import { GIANTS } from '../shrines.js?v=95d74174';
-import { teleportationFeature } from './teleportation-feature.js?v=4704f5c5';
+import { teleportationFeature } from './teleportation-feature.js?v=7d175a00';
 import {
   SOLO_DIVISOR,
   WORK_UNIT_MS,
@@ -97,7 +97,7 @@ import {
   upgradeOption,
 } from '../street-jobs.js?v=eca98f2d';
 import { gainMetabolic, loseEnergy } from '../metabolics.js?v=8504134e';
-import { closuresInTheWay, holdNote, placeIndex, questHold, reachableStreets } from '../quest-reach.js?v=f4e21829';
+import { closuresInTheWay, holdNote, placeIndex, questHold, reachableStreets } from '../quest-reach.js?v=25d407b3';
 import { getQuestCatalog as questCatalog } from '../content-catalogs.js?v=10b118dd';
 import { saveStore } from '../save-store.js?v=8839ba7b';
 import {
