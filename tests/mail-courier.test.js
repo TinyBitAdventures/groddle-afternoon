@@ -326,3 +326,24 @@ describe('ticket 86: the Mail Dispatcher opens on a new letter, cleanly', () => 
     assert.doesNotMatch(fn(feature, 'openStation'), /atMailbox/);
   });
 });
+
+describe('ticket 86: a long subject wraps in the inbox list', () => {
+  const css = readFileSync(join(root, 'public/style.css'), 'utf8');
+  const rule = (sel) => { const m = css.match(new RegExp(`\\n${sel.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')} \\{([^}]*)\\}`)); assert.ok(m, sel); return m[1]; };
+
+  it('the list scrolls only up and down; a row\'s words column may shrink, so the row stays the list\'s width', () => {
+    assert.match(rule('.mail-list'), /overflow-x: hidden;\s+overflow-y: auto;/);
+    assert.match(rule('.mail-row'), /grid-template-columns: 12px minmax\(0, 1fr\) auto;/);
+    assert.match(rule('.mail-row-copy'), /min-width: 0;/);
+  });
+
+  it('the subject wraps (three lines at most) and the time stays one piece at the right', () => {
+    const subject = css.slice(css.indexOf('*/\n.mail-row-copy span {'), css.indexOf('}', css.indexOf('*/\n.mail-row-copy span {')));
+    assert.ok(subject.length > 20, 'the subject rule');
+    assert.match(subject, /white-space: normal;/);
+    assert.match(subject, /-webkit-line-clamp: 3;/);
+    assert.doesNotMatch(subject, /nowrap/);
+    assert.match(rule('.mail-row-copy strong,\n.mail-row-copy span'), /overflow-wrap: anywhere;/);
+    assert.match(rule('.mail-row time'), /white-space: nowrap;/);
+  });
+});

@@ -8579,7 +8579,9 @@ header.top-bar + .sub { display: none; }
 }
 
 .mail-list {
-  overflow: auto;
+  /* Ticket 86: rows wrap downwards; the list never scrolls sideways. */
+  overflow-x: hidden;
+  overflow-y: auto;
   border-right: 2px solid var(--border);
   background: var(--surface-parchment);
 }
@@ -8587,7 +8589,9 @@ header.top-bar + .sub { display: none; }
 .mail-row {
   display: grid;
   width: 100%;
-  grid-template-columns: 12px 1fr auto;
+  /* minmax(0, 1fr): a long subject (an auction's delivery) wraps in its column instead of making
+     the row wider than the list (its time ran off to the right, past the row's own background). */
+  grid-template-columns: 12px minmax(0, 1fr) auto;
   gap: var(--sp-4);
   padding: 13px var(--sp-7);
   border: 0;
@@ -8616,21 +8620,31 @@ header.top-bar + .sub { display: none; }
   box-shadow: 0 0 0 2px var(--c-white);
 }
 
+.mail-row-copy {
+  min-width: 0;
+}
+
 .mail-row-copy strong,
 .mail-row-copy span {
   display: block;
+  overflow-wrap: anywhere;
 }
 
+/* The subject wraps, at most three lines (the whole letter is in the reader). */
 .mail-row-copy span {
+  display: -webkit-box;
   margin-top: 3px;
   overflow: hidden;
   color: var(--c-mauve-57);
   font-size: var(--fs-xs);
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  white-space: normal;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
 }
 
 .mail-row time {
+  white-space: nowrap;
   color: var(--c-mauve-61);
   font-size: var(--fs-2xs);
 }
