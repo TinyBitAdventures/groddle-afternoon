@@ -38,6 +38,9 @@
  * Set free (G284): &homedemo=home&animaldemo=setfree puts a Chicken and a
  * Butterfly beside you in the yard; &animalautoplay=1 (or =butterfly) asks
  * and answers OK.
+ * Ticket 99: &homedemo=home&animaldemo=remote&animalyard=stacked seeds the yard as a save from
+ * before kept a stacked herd (3 Piggies, 6 Butterflies with a Butterfly Stick, 3 Chickens, each class
+ * on one spot); canvas extraWalks lists where each is drawn (id:class@x,y).
  * &animalfast=1 shortens incubation to 6 s for headless runs. Starvation:
  * &animaldemo=starve releases a Piggy beside you at hunger 10 whose next tick
  * is 3 s away (yard: &homedemo=home&animaldemo=remote&animalhunger=10 does the
@@ -46,7 +49,7 @@
  * Canvas data:
  * husbandryDemo, husbandryLast, batterflyCount, batterflyStreetCount,
  * guanoOnStreet, plopsOnStreet, pendingPlops, packPlops, incubation,
- * extraAnimals, yardMachines, yardSticks, hogtied, namedAnimal, starvedPiggies,
+ * extraAnimals, extraWalks, yardMachines, yardSticks, hogtied, namedAnimal, starvedPiggies,
  * yardStarved.
  */
 
@@ -110,6 +113,7 @@ import { PIGGY_DEATH_DROPS, PIGGY_DEATH_PUFF, SAD_BABY, forcedRoll, isSadIn } fr
 import { animalCrowdChanged, animalCrowdSad, animalPlaceIsDepressing, crowdLimit, smokePuff as sharedSmokePuff } from './animal-mood-feature.js?v=1b49c07b';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
+import { followYardPath, freeYardSpot } from '../yard-wander.js?v=25a146b5';
 
 export const HUSBANDRY_FEATURE_ID = 'animal-husbandry';
 export const BATTERFLY_GROUP = 'batterfly';
@@ -151,6 +155,11 @@ export function normalizeHusbandrySlot(slot = {}) {
   s.guano = Array.isArray(s.guano) ? s.guano.filter((g) => g && Number(g.count) > 0) : [];
   s.plops = Array.isArray(s.plops) ? s.plops.filter((p) => p && typeof p.seedClass === 'string') : [];
   s.animals = Array.isArray(s.animals) ? s.animals.filter((a) => a && ANIMAL_CLASSES.has(a.classId)) : [];
+  // Ticket 99: each animal's own spot (where it was released or hatched), its walk's middle
+  // (js/yard-wander.js). A save from before has only where it stood: that becomes its spot.
+  for (const a of s.animals) {
+    if (!Number.isFinite(Number(a.homeX))) a.homeX = Math.round(Number(a.x) || 0);
+  }
   s.sticks = Array.isArray(s.sticks) ? s.sticks.filter((k) => k && MAGIC_STICKS[k.classTsid]) : [];
   s.machines = Array.isArray(s.machines) ? s.machines.filter((m) => m && REMOTE_MACHINES[m.classTsid]) : [];
   // Back yard piggies that starved while you were away: their Meat and Plop land when you get home.
@@ -169,7 +178,7 @@ let pendingEnter = false;
 let generation = 0;
 let batterflies = []; // { key, sprite, target, state, baseX, baseY, phase, chewUntil }
 let piles = []; // { kind: 'guano'|'plop', row, sprite, target }
-let extras = []; // { row, sprite, target, vx, baseX }
+let extras = []; // { row, sprite, target, drive } (their walks: js/yard-wander.js)
 let placed = []; // { kind: 'stick'|'machine', row, sprite, target }
 let lastAction = '';
 let demoMode = '';
@@ -402,10 +411,17 @@ function removePile(engine, pile) {
 function addExtraAnimal(engine, classId, x, seedState = {}, tsid) {
   const s = slot(engine, tsid);
   s.seq += 1;
+  // Ticket 99: its own spot near where it arrived, not on top of another of its class.
+  const here = !tsid || tsid === engine.streetTsid;
+  const others = here
+    ? extras.filter((e) => e.row.classId === classId).map((e) => e.sprite?.x ?? e.row.x)
+    : s.animals.filter((a) => a.classId === classId).map((a) => a.x);
+  const spot = freeYardSpot(x, others, { min: 60, max: Math.max(60, (engine.worldW || Infinity) - 60) });
   const row = {
     id: `a${s.seq}`,
     classId,
-    x: Math.round(x),
+    x: spot,
+    homeX: spot,
     state: { ...createAnimalState(classId, seedState), careDay: getGameDayKey(now()) },
   };
   s.animals.push(row);
@@ -477,7 +493,8 @@ function buildExtraAnimal(engine, row) {
     // game.js sends it with the feed event: solo Feats count 3 feeds per animal (npc_piggy.js 734-739).
     animalKey: `${engine.streetTsid || ''}:husbandry:${row.id}`,
   });
-  const entity = { row, sprite: spr, target, vx: (row.id.length % 2 ? 1 : -1) * 0.45, baseX: row.x, phase: row.id.length };
+  // Its own walk (ticket 99, js/yard-wander.js): drive keeps its hold between frames.
+  const entity = { row, sprite: spr, target, drive: { holdUntil: 0 } };
   // G63: a piggy you own can starve; the animal-mood feature calls this when its tick says die.
   if (row.classId === 'npc_piggy') target.husbandryStarve = (opts) => starveExtra(engine, entity, opts);
   // G64: crowding sends it away; the animal-mood feature calls this when it leaves or puffs away.
@@ -490,38 +507,67 @@ function stickFor(engine, classId) {
   return slot(engine).sticks.find((k) => MAGIC_STICKS[k.classTsid].animal === classId) || null;
 }
 
+/** The walk of one of your animals (js/yard-wander.js): its id, class, spot and stick. */
+function extraWalk(engine, entity) {
+  const { row } = entity;
+  return {
+    id: row.id,
+    classId: row.classId,
+    homeX: Number.isFinite(Number(row.homeX)) ? Number(row.homeX) : row.x,
+    stick: stickFor(engine, row.classId),
+    worldW: engine.worldW,
+  };
+}
+
+/**
+ * game.js plays a massage or milk on a Butterfly's sprite (playButterflyCareAnimation) but steps
+ * the pulse only for street Butterflies: a Butterfly of yours steps it here, holding still.
+ */
+function stepButterflyCare(spr, dtMs) {
+  const care = spr._butterflyCare;
+  const dt = dtMs / 16.67;
+  care.phase += 0.16 * dt;
+  care.remaining -= dt;
+  const pulse = 1 + Math.sin(care.phase) * (care.verbId === 'milk' ? 0.11 : 0.07);
+  spr.scale.x = care.direction * care.baseScale * pulse;
+  spr.scale.y = care.baseScale * (2 - pulse * 0.96);
+  spr.rotation = Math.sin(care.phase * 0.7) * (care.verbId === 'milk' ? 0.055 : 0.035);
+  if (care.remaining <= 0) {
+    spr.scale.x = care.direction * care.baseScale;
+    spr.scale.y = care.baseScale;
+    spr.rotation = 0;
+    delete spr._butterflyCare;
+  }
+}
+
+/** Walking frames play while it walks; standing, it holds the first one (a Butterfly flaps on). */
+function setWalkPose(spr, moving, classId) {
+  if (classId === 'npc_butterfly' || !spr.loop) return;
+  if (moving && !spr.playing) spr.play?.();
+  else if (!moving && spr.playing) spr.gotoAndStop?.(0);
+}
+
 function stepExtra(engine, entity, dtMs) {
   const spr = entity.sprite;
   if (!spr || spr.destroyed) return;
-  // The animal-mood feature walks a hungry piggy to food and holds a sad one.
+  // The animal-mood feature walks a hungry piggy to food and holds a sad one; then it walks back
+  // onto its own path (followYardPath), so _moodRebase has nothing left to move.
   if (spr._moodHold) {
     entity.row.x = Math.round(spr.x);
     return;
   }
-  if (Number.isFinite(spr._moodRebase)) {
-    entity.baseX = spr._moodRebase;
-    delete spr._moodRebase;
-  }
-  if (!spr.loop) return; // mid action
-  const stick = stickFor(engine, entity.row.classId);
-  const range = stick ? Number(stick.distance) || STICK_DISTANCE : 110;
-  const center = stick ? stick.x : entity.baseX;
-  const left = Math.max(30, center - range);
-  const right = Math.min(engine.worldW - 30, center + range);
-  if (entity.row.classId === 'npc_butterfly') {
-    entity.phase += dtMs / 1000;
-    spr.x = Math.min(right, Math.max(left, center + Math.sin(entity.phase * 0.5) * Math.min(range, 140)));
-    spr.y = surfaceAt(engine, spr.x) - 90 + Math.sin(entity.phase * 1.3) * 14;
-  } else {
-    spr.x += entity.vx * (dtMs / 16.67);
-    if (spr.x < left || spr.x > right) {
-      spr.x = Math.min(right, Math.max(left, spr.x));
-      entity.vx *= -1;
-    }
-    spr.y = surfaceAt(engine, spr.x, spr.y) + 2;
-    // The walk art faces right, as game.js's street Piggies and chickens: unflipped going right.
-    spr.scale.x = Math.abs(spr.baseScale) * (entity.vx >= 0 ? 1 : -1);
-  }
+  delete spr._moodRebase;
+  if (spr._butterflyCare) stepButterflyCare(spr, dtMs);
+  // A player at this one (its menu, a verb, its own pet or nibble playing) holds it alone.
+  const held = Boolean(engine.actingOn?.(entity.target)) || !spr.loop || Boolean(spr._butterflyCare);
+  const at = followYardPath(spr, entity.drive, {
+    animal: extraWalk(engine, entity),
+    nowMs: now(),
+    dtMs,
+    held,
+    groundAt: (x, y) => surfaceAt(engine, x, entity.row.classId === 'npc_butterfly' ? undefined : y),
+  });
+  setWalkPose(spr, at.moving, entity.row.classId);
   entity.row.x = Math.round(spr.x);
 }
 
@@ -1325,7 +1371,7 @@ function setupDemo(engine) {
         // Out from under the avatar (and the start street's Jack-O-Lantern) so the remains read in a screenshot.
         const x = Math.min(engine.worldW - 120, row.x + 260);
         row.x = x;
-        entity.baseX = x;
+        row.homeX = x;
         entity.sprite.x = x;
         entity.target.subtitle = animalStatusLabel('npc_piggy', row.state);
       }
@@ -1404,6 +1450,19 @@ function setupDemo(engine) {
       feeder.inside = 40;
       yard.machines.push(collector, milker, feeder);
       for (const m of yard.machines) m.nextAt = t - back + 20 * 60 * 1000;
+      if (engine.param('animalyard') === 'stacked') {
+        // Ticket 99 QA: the reporter's yard as a save from before kept it: 3 Piggies by the Pig
+        // Stick, 4 more Butterflies (6 in all) by a Butterfly Stick and 3 Chickens, each class on one
+        // spot with no spot of its own (js/yard-wander.js spreads them on load).
+        for (const cls of ['npc_butterfly', 'npc_butterfly', 'npc_butterfly', 'npc_butterfly', 'npc_chicken', 'npc_chicken', 'npc_chicken']) {
+          addExtraAnimal(engine, cls, stickX, {}, YARD_TSID);
+        }
+        yard.sticks.push({ classTsid: 'magic_butterfly_stick', x: stickX - 200, distance: STICK_DISTANCE });
+        for (const row of yard.animals) {
+          row.x = row.classId === 'npc_piggy' ? stickX - 240 : row.classId === 'npc_butterfly' ? stickX - 200 : stickX + 150;
+          delete row.homeX;
+        }
+      }
       if (engine.param('animalyardfood') === '1') {
         // G64 QA: 3 Potatoes on the yard ground and a fruiting Fruit Tree in
         // the yard's first Patch plot (a fixture: drawn only where the yard
@@ -1579,6 +1638,8 @@ function publish(engine, force = false) {
   engine.setData('pendingPlops', String(pendingPlopCount()));
   engine.setData('packPlops', String(engine.inv.plop || 0));
   engine.setData('extraAnimals', s.animals.map((a) => `${a.classId}${a.state?.userName ? `:${a.state.userName}` : ''}`).join(','));
+  // Ticket 99 QA: where each is drawn now (id@x,y), a few times a second.
+  engine.setData('extraWalks', extras.map((e) => `${e.row.id}:${e.row.classId}@${Math.round(e.sprite?.x ?? e.row.x)},${Math.round(e.sprite?.y ?? 0)}`).join(' '));
   engine.setData('yardMachines', yard.machines.map((m) => `${m.classTsid}=${m.inside || 0}`).join(','));
   engine.setData('yardSticks', yard.sticks.map((k) => `${k.classTsid}@${k.x}`).join(','));
   engine.setData('hogtied', String(engine.inv.hogtied_piggy || 0));

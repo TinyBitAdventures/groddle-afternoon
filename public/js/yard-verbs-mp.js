@@ -44,6 +44,7 @@ import { resetTrantDay } from './trants.js?v=9c2e8c0f';
 import { GROWN_TREE_LABELS, SEASONED_BEANS, SOIL_TIMERS, seedlingTimings } from './patches.js?v=056bb6ae';
 import { GAME_DAY_MS, GAME_EPOCH_MS } from './game-day.js?v=edb00566';
 import { isNodeId, isRockId } from './yard-stock-mp.js?v=54a03422';
+import { STICK_ANIMAL } from './yard-wander.js?v=25a146b5';
 
 export const YARD_VERBS_MP_ID = 'yard-verbs-mp';
 /** js/features/homes-feature.js HOME_STREET_TSID: where an owner's save keeps the home street. */
@@ -161,13 +162,17 @@ export function normalizeYardView(answer) {
     .map((p) => ({ key: p.key, rx: Number(p.rx), plot: p.plot }));
   const animals = (Array.isArray(answer.animals) ? answer.animals : [])
     .filter((a) => isAnimalId(a?.id) && ANIMAL_VERBS[a.classId] && Number.isFinite(Number(a.x)))
-    .map((a) => ({ id: a.id, classId: a.classId, x: Number(a.x), state: plain(a.state) || {} }));
+    .map((a) => ({ id: a.id, classId: a.classId, x: Number(a.x), homeX: Number.isFinite(Number(a.homeX)) && a.homeX !== null ? Number(a.homeX) : Number(a.x), state: plain(a.state) || {} }));
+  // Ticket 99: the owner's placed Magic Sticks, so a visitor draws the animals' walks where the owner does.
+  const sticks = (Array.isArray(answer.sticks) ? answer.sticks : [])
+    .filter((k) => STICK_ANIMAL[k?.classTsid] && Number.isFinite(Number(k.x)))
+    .map((k) => ({ classTsid: k.classTsid, x: Number(k.x), distance: Number(k.distance) > 0 ? Number(k.distance) : 250 }));
   const mine = {};
   for (const [k, n] of Object.entries(plain(answer.mine) || {})) {
     if (/^[a-z]{2,8}:[A-Za-z0-9_:]{1,24}$/.test(k) && Number.isInteger(n) && n > 0) mine[k] = n;
   }
   const name = typeof answer.name === 'string' && answer.name ? answer.name.slice(0, 40) : '';
-  return { owner, name, cult: plain(answer.cult) || {}, patches, animals, mine };
+  return { owner, name, cult: plain(answer.cult) || {}, patches, animals, sticks, mine };
 }
 
 /**

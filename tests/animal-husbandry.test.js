@@ -49,7 +49,7 @@ import {
 import { pickerMaxCount, pickerOptionsFor, pickerTakesCount, listAnimalFeedOptions, createAnimalState } from '../public/js/animals.js?v=bf8fe138';
 import { getVerbsFor, runVerb } from '../public/content.js?v=b49a6da6';
 import { setStreetEcologyCatalog } from '../public/js/street-ecology.js?v=d41e5e97';
-import { batterflyPlacementGroups, normalizeHusbandrySlot } from '../public/js/features/animal-husbandry-feature.js?v=ee15ef38';
+import { batterflyPlacementGroups, normalizeHusbandrySlot } from '../public/js/features/animal-husbandry-feature.js?v=2bda1c87';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const publicDir = join(here, '../public');
@@ -409,8 +409,10 @@ describe('Batterfly flight after feeding', () => {
     const read = (f) => readFileSync(new URL(`../public/${f}`, import.meta.url), 'utf8');
     // game.js: street Piggies and chickens are unflipped going right (the walk art faces right).
     assert.match(read('game.js'), /p\.scale\.x = \(p\.vx >= 0 \? 1 : -1\) \* ps;/);
-    assert.match(read('js/features/animal-husbandry-feature.js'), /spr\.scale\.x = Math\.abs\(spr\.baseScale\) \* \(entity\.vx >= 0 \? 1 : -1\);/);
-    assert.match(read('js/features/yard-verbs-mp-feature.js'), /spr\.scale\.x = Math\.abs\(spr\.baseScale\) \* \(a\.vx >= 0 \? 1 : -1\);/);
+    // Yours and a visit's copies walk their own paths (ticket 99, js/yard-wander.js followYardPath), facing the same way.
+    assert.match(read('js/yard-wander.js'), /spr\.scale\.x = Math\.abs\(spr\.baseScale\) \* \(dir >= 0 \? 1 : -1\);/);
+    assert.match(read('js/features/animal-husbandry-feature.js'), /followYardPath\(spr, entity\.drive/);
+    assert.match(read('js/features/yard-verbs-mp-feature.js'), /followYardPath\(spr, a\.drive/);
     // A hungry Piggy walking to food (the animal-mood feature) turns the same way.
     assert.match(read('js/features/animal-mood-feature.js'), /spr\.scale\.x = Math\.abs\(spr\.baseScale \|\| spr\.scale\.x\) \* \(dir > 0 \? 1 : -1\);/);
   });

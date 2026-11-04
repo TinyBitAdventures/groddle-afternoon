@@ -78,8 +78,9 @@ import {
   treeSnapshot,
   visitorAnimalState,
   visitorTreeState,
-} from '../yard-verbs-mp.js?v=1861613c';
+} from '../yard-verbs-mp.js?v=1c770fc3';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
+import { followYardPath, stickForClass } from '../yard-wander.js?v=25a146b5';
 import { countItem, removeItem } from '../inventory.js?v=d82f3b00';
 import { ROCK_CATALOG, rockStatusLabel, tickMineRock } from '../mining.js?v=83421428';
 import { getResourceNodeDef, regrowDelayMs } from '../resource-nodes.js?v=c14bd6d8';
@@ -314,7 +315,9 @@ function createSession(engine, client) {
       state,
       yardVisit: { kind: 'animal', id: row.id },
     });
-    visit.animals.set(row.id, { id: row.id, classId: row.classId, state, sprite, target, baseX: row.x, vx: row.id.length % 2 ? 0.45 : -0.45, phase: 0, snap: animalUses(row.classId, state) });
+    // Ticket 99: its own walk, the one the owner's game draws (js/yard-wander.js: its id, spot and stick).
+    const walk = { id: row.id, classId: row.classId, homeX: row.homeX ?? row.x, stick: stickForClass(visit.view.sticks, row.classId), worldW: engine.worldW };
+    visit.animals.set(row.id, { id: row.id, classId: row.classId, state, sprite, target, walk, drive: { holdUntil: 0 }, snap: animalUses(row.classId, state) });
   }
 
   function draw(view, tsid, name) {
@@ -560,6 +563,9 @@ function createSession(engine, client) {
         const a = visit.animals.get(row.id);
         if (!a) continue;
         Object.assign(a.state, visitorAnimalState(row, view.mine));
+        // A stick placed or taken up since: the walk follows (ticket 99).
+        a.walk.homeX = row.homeX ?? row.x;
+        a.walk.stick = stickForClass(view.sticks, row.classId);
         a.snap = animalUses(a.classId, a.state);
         a.target.subtitle = animalStatusLabel(a.classId, a.state);
       }
@@ -922,23 +928,23 @@ function createSession(engine, client) {
 
   function stepAnimals(dtMs) {
     if (!visit) return;
+    const nowMs = Date.now();
     for (const a of visit.animals.values()) {
       const spr = a.sprite;
-      if (!spr || spr.destroyed || !spr.loop) continue;
-      const left = a.baseX - 110;
-      const right = a.baseX + 110;
-      if (a.classId === 'npc_butterfly') {
-        a.phase += dtMs / 1000;
-        spr.x = a.baseX + Math.sin(a.phase * 0.5) * 110;
-        spr.y = STREET_GROUND_Y - 90 + Math.sin(a.phase * 1.3) * 14;
-      } else {
-        spr.x += a.vx * (dtMs / 16.67);
-        if (spr.x < left || spr.x > right) {
-          spr.x = Math.min(right, Math.max(left, spr.x));
-          a.vx *= -1;
-        }
-        // The walk art faces right (animal-husbandry-feature.js stepExtra): unflipped going right.
-        spr.scale.x = Math.abs(spr.baseScale) * (a.vx >= 0 ? 1 : -1);
+      if (!spr || spr.destroyed) continue;
+      // The visitor at this one (its menu, a verb, its pet or squeeze playing) holds it alone.
+      const held = Boolean(engine.actingOn?.(a.target)) || !spr.loop;
+      a.walk.worldW = engine.worldW;
+      const at = followYardPath(spr, a.drive, {
+        animal: a.walk,
+        nowMs,
+        dtMs,
+        held,
+        groundAt: () => STREET_GROUND_Y,
+      });
+      if (a.classId !== 'npc_butterfly' && spr.loop) {
+        if (at.moving && !spr.playing) spr.play?.();
+        else if (!at.moving && spr.playing) spr.gotoAndStop?.(0);
       }
     }
   }
@@ -1005,6 +1011,8 @@ function createSession(engine, client) {
         trees: visit ? Object.fromEntries([...visit.trees].map(([k, t]) => [k, treeSnapshot(t.state)])) : {},
         plots: visit ? Object.fromEntries([...visit.plots].map(([k, e]) => [k, e.plot.stage])) : {},
         animals: visit ? Object.fromEntries([...visit.animals].map(([k, a]) => [k, animalUses(a.classId, a.state)])) : {},
+        // Ticket 99: where each animal is drawn now (the owner's page draws the same walk: canvas extraWalks).
+        walks: visit ? Object.fromEntries([...visit.animals].map(([k, a]) => [k, { x: Math.round(a.sprite.x), y: Math.round(a.sprite.y), stick: Boolean(a.walk.stick) }])) : {},
         stock: visit ? stockView() : '',
         applied: applied.length,
         appliedCount,
