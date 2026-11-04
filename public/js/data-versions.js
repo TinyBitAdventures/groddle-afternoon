@@ -300,7 +300,7 @@
       "assets/content/quests.json": "060ccd7a",
       "assets/content/signpost-graph.json": "de200e92",
       "assets/content/sound-keys.json": "cdd3dbd9",
-      "assets/content/street-ecology.json": "d065e008",
+      "assets/content/street-ecology.json": "d07f1dc0",
       "assets/content/street-jobs.json": "0df1291b",
       "assets/content/style-profiles.json": "edc1e135",
       "assets/content/trade-items.json": "fae9f290",
