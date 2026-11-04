@@ -73,17 +73,26 @@ function createSession(engine, client) {
 
   /** When the last IM queued shows: each comes after the one before it. */
   let lastImAt = 0;
-  /** sendIM: the Butler's IM, 0.5 to 1 s later (ours: never before an earlier one). */
+  /** The IMs waiting to show, oldest first. */
+  const waiting = [];
+  /**
+   * sendIM: the Butler's IM, 0.5 to 1 s later (ours: never before an earlier one). Each timer shows
+   * the oldest IM still waiting, so a visitor's arrival always comes before what they said, even when
+   * the wall clock the delays are spaced by and the timers' own clock disagree.
+   */
   function butlerIm(text, { toast = false } = {}) {
     if (!text) return;
     const now = Date.now();
     lastImAt = Math.max(now + imDelayMs(), lastImAt + 1);
+    waiting.push({ text, toast });
     const t = setTimeout(() => {
       timers.delete(t);
-      last = text;
-      if (ensureTab()) social.push(BUTLER_TAB, { name: name(), text });
-      else engine.pushActivity?.(`${name()}: ${text}`);
-      if (toast) engine.toast?.(`${name()}: ${text}`, 4200);
+      const im = waiting.shift();
+      if (!im) return;
+      last = im.text;
+      if (ensureTab()) social.push(BUTLER_TAB, { name: name(), text: im.text });
+      else engine.pushActivity?.(`${name()}: ${im.text}`);
+      if (im.toast) engine.toast?.(`${name()}: ${im.text}`, 4200);
       publish();
     }, lastImAt - now);
     timers.add(t);
