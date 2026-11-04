@@ -28,7 +28,7 @@ import {
   routeStep,
   signpostToward,
 } from '../public/js/map-routes.js?v=bcf2c347';
-import { mapRoutesFeature } from '../public/js/features/map-routes-feature.js?v=6ab182d5';
+import { mapRoutesFeature } from '../public/js/features/map-routes-feature.js?v=06805f8f';
 import { hellTicketsFeature } from '../public/js/features/hell-tickets-feature.js?v=55352c20';
 import { hellFeature } from '../public/js/features/hell-feature.js?v=54d49b30';
 import { createFeatureHost } from '../public/js/feature-host.js?v=2ed3c069';
@@ -663,6 +663,73 @@ describe('G192 the GPS arrow walks you there', () => {
     mapRoutesFeature._arrowClick(engine);
     walkUntilDone(engine);
     assert.deepEqual(engine.log.travel, [[DHUMA, { label: 'Dhuma Maya', arrive: { x: 50, y: 400 } }]]);
+  });
+
+  /** Fake signpost views for a street's visible posts, one board per visible arm, in the street's order. */
+  function streetSignViews(tsid) {
+    const street = streetJson(tsid);
+    return (street.signposts || []).filter((s) => !s.hidden).map((s) => {
+      const view = new FakeContainer();
+      view.x = s.x - street.bounds.l;
+      view.y = s.y - street.bounds.t;
+      view.signpost = s;
+      view.signBoards = (s.connects || []).filter((c) => !c.hidden).map((c, index) => ({ index, x: 0, y: -100 - 30 * index, rotation: 0, connection: c }));
+      return view;
+    });
+  }
+
+  it('report 96: every post with an arm to the next street glows (Larceny Ladder to Alpine Vista)', () => {
+    const LARCENY = 'GCR12SD8J4K1PCV';
+    const ALPINE = 'GCR3MQK9NPJ191K';
+    const BISHOPS = 'GCR10199TPJ1DA3';
+    const engine = onStreet(LARCENY);
+    engine.signViews = streetSignViews(LARCENY);
+    const [footlands, lower, upper] = engine.signViews;
+    assert.deepEqual(engine.signViews.map((v) => v.signpost.id), ['signpost_2', 'signpost_3', 'signpost_1']);
+    mapRoutesFeature.mapRoute('set', { to: BISHOPS, source: 'player' }, engine);
+    mapRoutesFeature.onStreetEnter(engine.street, engine);
+    assert.equal(engine.data.routeNext, 'Alpine Vista');
+    assert.equal(engine.data.routeVia, 'sign');
+    assert.equal(engine.data.routeSigns, '1+1', 'one arm on each of the two posts');
+    const glowOf = (v) => v.children.find((c) => c.label === 'route-sign-glow');
+    assert.ok(glowOf(lower) && glowOf(upper), 'the lower and the upper post both glow');
+    assert.equal(glowOf(footlands), undefined, 'the Footlands Heath post does not');
+    // The arrow and its walk: the first post in the street's list (the client's loc_path_signpost).
+    assert.equal(mapRoutesFeature._highlight().view, lower);
+    assert.equal(engine.data.routeSign, `${Math.round(lower.x)}:1`, "signpost_3's second arm is Alpine Vista");
+    assert.equal(lower.signBoards[1].connection.tsid.slice(1), ALPINE.slice(1));
+    // Leaving clears both.
+    const glows = [glowOf(lower), glowOf(upper)];
+    mapRoutesFeature.mapRoute('clear', { reason: 'test' }, engine);
+    assert.ok(glows.every((g) => g.destroyed && !g.parent));
+    assert.equal(engine.data.routeSigns, '');
+  });
+
+  it('report 96: the other streets with two posts to one neighbour light both', () => {
+    const multi = [];
+    for (const tsid of Object.keys(INDEX.streets)) {
+      const street = streetJson(tsid);
+      const posts = new Map();
+      for (const s of street.signposts || []) {
+        if (s.hidden) continue;
+        for (const c of s.connects || []) if (!c.hidden) posts.set(c.tsid.slice(1), (posts.get(c.tsid.slice(1)) || 0) + 1);
+      }
+      for (const [to, n] of posts) if (n > 1) multi.push([tsid, to]);
+    }
+    assert.equal(new Set(multi.map(([t]) => t)).size, 15, 'Groddle Heights and Northwest Passage');
+    const oneWay = JSON.parse(read(join(PUBLIC, 'assets/content/one-way-roads.json'))).streets;
+    assert.ok(multi.every(([t]) => !oneWay[t] && !oneWay[`L${t.slice(1)}`]), 'none is a one-way street');
+    for (const [tsid, to] of multi.filter((_, i) => i % 4 === 0)) {
+      mapRoutesFeature._reset();
+      mapRoutesFeature._setGraph(GRAPH_JSON);
+      const engine = onStreet(tsid);
+      engine.signViews = streetSignViews(tsid);
+      const target = Object.keys(INDEX.streets).find((k) => k.slice(1) === to);
+      mapRoutesFeature.mapRoute('set', { to: target, source: 'player' }, engine);
+      mapRoutesFeature.onStreetEnter(engine.street, engine);
+      assert.equal(engine.data.routeVia, 'sign', `${tsid} to ${to}`);
+      assert.equal(engine.data.routeSigns.split('+').reduce((a, b) => a + Number(b), 0), 2, `${INDEX.streets[tsid].label} to ${INDEX.streets[target].label}`);
+    }
   });
 
   it('a wall in the way stops the walk; a second click stops it too; at the destination the arrow closes the route', () => {

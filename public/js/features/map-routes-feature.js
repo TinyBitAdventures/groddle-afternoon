@@ -37,7 +37,8 @@
  *                            or door (&routestepms=N, default 2500), then travel on
  *   &routeautoplay=arrow     walk the route by clicking the GPS arrow on each street
  * Canvas data: routeActive, routeTo, routeDest, routeNext, routeStatus,
- * routePath, routeSource, routeQuest, routeSign, routeDoor, routeVia,
+ * routePath, routeSource, routeQuest, routeSign, routeSigns (the glowing arms on each
+ * glowing post, e.g. 1+1, report 96), routeDoor, routeVia,
  * routeWalk, routeReached, routeCleared, routeMapLines, routeMapExit,
  * routeMapPin, routeMode, routeRooms (the rooms behind doors listed for the
  * Map's hub while "Set a destination" is on, G198), routeDoorGlow
@@ -279,9 +280,10 @@ function dropRoute(engine, opts = {}) {
 /* ------------------------------------------------------------ signpost glow */
 
 function clearHighlight() {
-  if (highlight?.glow && !highlight.glow.destroyed) {
-    highlight.glow.parent?.removeChild(highlight.glow);
-    highlight.glow.destroy({ children: true });
+  for (const glow of highlight?.glows || (highlight?.glow ? [highlight.glow] : [])) {
+    if (!glow || glow.destroyed) continue;
+    glow.parent?.removeChild(glow);
+    glow.destroy({ children: true });
   }
   highlight = null;
 }
@@ -471,31 +473,48 @@ function placeDoorGlow(engine, next, key) {
   return true;
 }
 
+/**
+ * Every signpost arm on the street that leads to `next` glows (report 96: Larceny Ladder has two
+ * posts with an arm to Alpine Vista, and only the lower one lit). 15 streets have two posts to the
+ * same neighbour (Groddle Heights and Northwest Passage); none is a one-way street
+ * (one-way-roads.json), and the router decides by street, so every such arm is one the route can
+ * use. The GPS arrow and its walk still go to the first post in the street's list that links
+ * there, as the client's loc_path_signpost did (MiddleGroundLayer.as 191-201
+ * getSignpostThatLinksToLocTsid, TSFrontController.as 1790-1792); the client drew no arm glow, so
+ * the glow is the remake's.
+ */
 function placeSignGlow(engine, next, key) {
   const views = engine.signViews || [];
   const { PIXI } = engine;
+  const glows = [];
+  let first = null;
   for (const view of views) {
     if (!view || view.destroyed || view.visible === false) continue;
-    const board = (view.signBoards || []).find((b) => sameStreet(b.connection?.tsid, next));
-    if (!board) continue;
+    const boards = (view.signBoards || []).filter((b) => sameStreet(b.connection?.tsid, next));
+    if (!boards.length) continue;
     const scale = Number(view.signScale) || 1;
     const glow = new PIXI.Container();
     glow.label = 'route-sign-glow';
     glow.scale.set(scale);
-    const arm = new PIXI.Graphics();
-    const hit = board.hitArea || { x: 0, y: -15, width: 120, height: 30 };
-    arm.roundRect(hit.x - 7, hit.y - 6, hit.width + 14, hit.height + 12, 8).fill({ color: ROUTE_COLOR, alpha: 1 });
-    arm.x = board.x;
-    arm.y = board.y;
-    arm.rotation = board.rotation || 0;
-    arm.filters = [new PIXI.BlurFilter({ strength: 8, quality: 3 })];
-    glow.addChild(arm);
+    for (const board of boards) {
+      const arm = new PIXI.Graphics();
+      const hit = board.hitArea || { x: 0, y: -15, width: 120, height: 30 };
+      arm.roundRect(hit.x - 7, hit.y - 6, hit.width + 14, hit.height + 12, 8).fill({ color: ROUTE_COLOR, alpha: 1 });
+      arm.x = board.x;
+      arm.y = board.y;
+      arm.rotation = board.rotation || 0;
+      arm.filters = [new PIXI.BlurFilter({ strength: 8, quality: 3 })];
+      glow.addChild(arm);
+    }
     // Behind the post and arms: the post's own art stays on top.
     view.addChildAt(glow, 0);
-    highlight = { kind: 'sign', view, glow, key, board: board.index, connection: board.connection, x: view.x, y: view.y - 60 };
-    return true;
+    glows.push(glow);
+    first ||= { view, glow, board: boards[0] };
   }
-  return false;
+  if (!first) return false;
+  const { view, glow, board } = first;
+  highlight = { kind: 'sign', view, glow, glows, key, board: board.index, connection: board.connection, x: view.x, y: view.y - 60 };
+  return true;
 }
 
 /* ------------------------------------------------------------ GPS */
@@ -773,6 +792,7 @@ function publish(engine, step = currentStep(engine)) {
   engine.setData('routeSource', r ? r.source : '');
   engine.setData('routeQuest', r ? r.quest : '');
   engine.setData('routeSign', highlight?.kind === 'sign' ? `${Math.round(highlight.view.x)}:${highlight.board}` : '');
+  engine.setData('routeSigns', highlight?.kind === 'sign' ? highlight.glows.map((g) => g.children.length).join('+') : '');
   engine.setData('routeDoor', highlight?.kind === 'door' ? `${Math.round(highlight.x)}:${label(highlight.door?.connect?.street || highlight.door?.connect?.tsid)}` : '');
   engine.setData('routeTransport', highlight?.kind === 'transport' || (highlight?.kind === 'door' && highlight.verb) ? `${Math.round(highlight.x)}:${highlight.verb}` : '');
   engine.setData('routeVia', highlight?.kind || '');
