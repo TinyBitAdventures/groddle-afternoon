@@ -22,7 +22,7 @@
  * original's dark blocker colour (CabinetDialog blocker 0x213036).
  */
 
-import { bindCountField, countKeyValue, countStepMarkup } from './count-chooser.js?v=893305c8';
+import { bindCountField, countKeyValue, countStepMarkup } from './count-chooser.js?v=b8361b21';
 import { bindContextTrigger } from './context-menu.js?v=0453d723';
 
 const CSS = `
@@ -276,7 +276,7 @@ export function openCabinetWindow(opts) {
         step.querySelector('[data-hst-dec]')?.addEventListener('click', () => { n = Math.max(1, n - 1); render(); });
         step.querySelector('[data-hst-inc]')?.addEventListener('click', () => { n = Math.min(s.count, n + 1); render(); });
         step.querySelector('[data-hst-max]')?.addEventListener('click', () => { n = s.count; render(); });
-        bindCountField(step.querySelector('[data-hst-num]'), { max: () => s.count, set: (v) => { n = v; render(); }, confirm: (v) => { n = v; go(); }, cancel: () => { picked = null; draw(); } });
+        bindCountField(step.querySelector('[data-hst-num]'), { max: () => s.count, set: (v) => { n = v; render(); }, preview: (v) => { n = v; }, confirm: (v) => { n = v; go(); }, cancel: () => { picked = null; draw(); } });
       }
       const out = el('button', { type: 'button', class: 'hst-btn btn-glitch-primary', 'data-hst-take': '' }, opts.takeLabel || 'Take out');
       out.addEventListener('click', () => go());
@@ -516,7 +516,12 @@ export function openStoreDialog({ title, sub = '', item, have, max, text, onBuy,
     step.querySelector('[data-hst-dec]')?.addEventListener('click', () => set(n - 1));
     step.querySelector('[data-hst-inc]')?.addEventListener('click', () => set(n + 1));
     step.querySelector('[data-hst-max]')?.addEventListener('click', () => set(most));
-    bindCountField(step.querySelector('[data-hst-num]'), { max: () => Math.max(1, most), set, confirm: (v) => { set(v); body.querySelector('[data-hst-buy]')?.click(); }, cancel: () => h.close() });
+    // Ticket 92: "Buy: N for X" follows the typing, not only leaving the field.
+    const preview = (v) => {
+      n = Math.max(1, Math.min(Math.max(1, most), v));
+      buy.textContent = text.buyButton(n, n * cur.cost);
+    };
+    bindCountField(step.querySelector('[data-hst-num]'), { max: () => Math.max(1, most), set, preview, confirm: (v) => { set(v); body.querySelector('[data-hst-buy]')?.click(); }, cancel: () => h.close() });
     body.onkeydown = (e) => {
       if (e.target?.matches?.('[data-hst-num]')) return;
       const next = countKeyValue(e.key, n, Math.max(1, most));
@@ -568,7 +573,8 @@ export function openCountDialog({ title, icon = '', label = '', max, value = nul
     step.querySelector('[data-hst-dec]')?.addEventListener('click', () => set(n - 1));
     step.querySelector('[data-hst-inc]')?.addEventListener('click', () => set(n + 1));
     step.querySelector('[data-hst-max]')?.addEventListener('click', () => set(max));
-    bindCountField(step.querySelector('[data-hst-num]'), { max: () => max, set, confirm: (v) => { n = Math.max(1, Math.min(max, v)); go(); }, cancel: () => h.close() });
+    const preview = (v) => { n = Math.max(1, Math.min(max, v)); ok.textContent = `${verb} ${n}`; };
+    bindCountField(step.querySelector('[data-hst-num]'), { max: () => max, set, preview, confirm: (v) => { n = Math.max(1, Math.min(max, v)); go(); }, cancel: () => h.close() });
     ok.addEventListener('click', () => go());
   }
   const go = () => {

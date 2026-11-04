@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=b484cbad';
 import { createFeatureHost } from './js/feature-host.js?v=2ed3c069';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=adf00a4a';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=da185ed3';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -933,7 +933,7 @@ import { SIDE_SHEET_IDS, bindTabs, inSideSheet, mountPanelShell, sheetKeyToWorld
 import { createQuestSheet, questStep } from './js/ui/quest-sheet.js?v=eac7ca4f';
 import { createQuestTracker } from './js/ui/quest-tracker.js?v=eb2b8010';
 import { bindContextTrigger, createContextMenu, isContextMenuKey as isMenuKey, MORE_KEYS_LABEL } from './js/ui/context-menu.js?v=0453d723';
-import { bindCountField, countKeyValue, countStepMarkup } from './js/ui/count-chooser.js?v=893305c8';
+import { bindCountField, countKeyValue, countStepMarkup, typedCount } from './js/ui/count-chooser.js?v=b8361b21';
 import { bindVerbMenu, fitVerbMenuRows, focusVerbRow, lockVerbMenuSize, makePickTile, makeVerbRow, pickGridCols, placeVerbMenu, plainWords, refuseVerbRow, syncVerbDetail, verbMenuKey, verbRowAttrs, verbRowInner, verbRowKeys } from './js/ui/verb-menu.js?v=48f4f63c';
 import { createPromptSettler, promptId } from './js/prompt-settle.js?v=509ba9cc';
 import { clientKeyAction, createHotkeysSheet, isHotkeySheetRelease, isPlainKey } from './js/client-hotkeys.js?v=5a0e7cc7';
@@ -3937,6 +3937,24 @@ function leavingMenuBag(classTsid) {
   if (isBagClass(classTsid) && packSelectedBag) features.query('packBagLeaves', packSelectedBag, engine);
 }
 
+/**
+ * Eat how many?'s lines for a count: what it gives (the effect chips) and the note (a cap, how full
+ * today), as markup. Drawn with the chooser and again as a count is typed (ticket 92).
+ */
+function packEatDetail(eatMany, useInfo, qty) {
+  const gives = packEatPreview(eatMany, useInfo, qty);
+  const preview = Object.entries(gives)
+    .map(([stat, amount]) => `<span class="pack-pop-effect${amount < 0 ? ' loss' : ''}">${amount > 0 ? '+' : ''}${amount} ${escapeHtml(stat === 'xp' ? 'iMG' : stat)}</span>`)
+    .join('');
+  const capNote = packEatCapNote(eatMany, qty);
+  const fullNow = useInfo.food ? Math.round(useInfo.food.fullness.percent) : null;
+  const fullAfter = useInfo.food
+    ? Math.round(foodFullness({ foodToday: foodState.foodToday + (gives.energy || 0) }, 100).percent)
+    : null;
+  const fullNote = useInfo.food && fullAfter !== fullNow ? `<span>${fullNow}% full today, then ${fullAfter}%</span>` : '';
+  return { preview, note: capNote || fullNote ? `${escapeHtml(capNote)}${capNote && fullNote ? ' ' : ''}${fullNote}` : '' };
+}
+
 function renderPackPopover(classTsid, anchor = null) {
   const pop = document.getElementById('pack-popover');
   const slot = listPackSlots(inv).find((entry) => entry.classTsid === classTsid);
@@ -4165,22 +4183,14 @@ function renderPackPopover(classTsid, anchor = null) {
               : String(n);
           return `<button type="button" class="pack-eat-choice${n === qty ? ' is-selected' : ''}" data-pack-eat-choice="${n}" aria-pressed="${n === qty ? 'true' : 'false'}">${label}</button>`;
         }).join('');
-        const preview = Object.entries(packEatPreview(eatMany, useInfo, qty))
-          .map(([stat, amount]) => `<span class="pack-pop-effect${amount < 0 ? ' loss' : ''}">${amount > 0 ? '+' : ''}${amount} ${escapeHtml(stat === 'xp' ? 'iMG' : stat)}</span>`)
-          .join('');
-        const capNote = packEatCapNote(eatMany, qty);
-        const fullNow = useInfo.food ? Math.round(useInfo.food.fullness.percent) : null;
-        const fullAfter = useInfo.food
-          ? Math.round(foodFullness({ foodToday: foodState.foodToday + (packEatPreview(eatMany, useInfo, qty).energy || 0) }, 100).percent)
-          : null;
-        const fullNote = useInfo.food && fullAfter !== fullNow ? `<span>${fullNow}% full today, then ${fullAfter}%</span>` : '';
+        const { preview, note } = packEatDetail(eatMany, useInfo, qty);
         return `<div class="pack-drop-quantity pack-eat-quantity count-pop" data-pack-eat-panel role="group" aria-labelledby="pack-eat-title">
         <p id="pack-eat-title" class="pack-eat-title count-pop-title">${escapeHtml(eatMany.verb)} how many ${escapeHtml(eatMany.plural)}?</p>
         <div class="pack-eat-choices">${chips}</div>
         ${countStepMarkup({ value: qty, max: eatMany.max, verb: eatMany.verb, attrs: { dec: 'data-pack-eat-dec', inc: 'data-pack-eat-inc', num: 'data-pack-eat-num', max: 'data-pack-eat-max' } })}
         <output class="count-pop-of" aria-live="polite" data-pack-eat-count>${qty} of ${stackCount}</output>
         ${preview ? `<div class="pack-pop-effects pack-eat-preview" aria-live="polite">${preview}</div>` : ''}
-        ${capNote || fullNote ? `<p class="pack-eat-note">${escapeHtml(capNote)}${capNote && fullNote ? ' ' : ''}${fullNote}</p>` : ''}
+        ${note ? `<p class="pack-eat-note">${note}</p>` : ''}
         <div class="pack-drop-confirm-row count-pop-actions">
           <span class="count-pop-esc mp-modern-only"><span class="kcap">Esc</span> back</span>
           <button type="button" class="pack-pop-primary" data-pack-eat-confirm>${escapeHtml(eatMany.verb)} ${qty}</button>
@@ -4471,6 +4481,15 @@ function renderPackPopover(classTsid, anchor = null) {
   bindCountField(pop.querySelector('[data-pack-drop-num]'), {
     max: () => stackCount,
     set: setDropQty,
+    // Ticket 92: "Drop 5" and "5 of 12" follow the typing, not only leaving the field.
+    preview: (n) => {
+      packDropQty = normalizeStackQuantity(n, stackCount);
+      const panel = pop.querySelector('[data-pack-drop-panel]');
+      const of = panel?.querySelector('.count-pop-of');
+      if (of) of.textContent = `${packDropQty} of ${stackCount}`;
+      const go = panel?.querySelector('[data-pack-drop-confirm]');
+      if (go) go.textContent = `Drop ${packDropQty}`;
+    },
     confirm: (n) => dropPackItem(classTsid, normalizeStackQuantity(n, stackCount)),
     cancel: () => pop.querySelector('[data-pack-drop-cancel]')?.click(),
   });
@@ -4510,6 +4529,31 @@ function renderPackPopover(classTsid, anchor = null) {
     bindCountField(pop.querySelector('[data-pack-eat-num]'), {
       max: () => eatMany.max,
       set: setEatQty,
+      // Ticket 92: the button, the count, the quick picks and what it gives follow the typing.
+      preview: (n) => {
+        packEatQty = clampConsumeCount(n, eatMany.max);
+        const panel = pop.querySelector('[data-pack-eat-panel]');
+        if (!panel) return;
+        const go = panel.querySelector('[data-pack-eat-confirm]');
+        if (go) go.textContent = `${eatMany.verb} ${packEatQty}`;
+        const of = panel.querySelector('[data-pack-eat-count]');
+        if (of) of.textContent = `${packEatQty} of ${stackCount}`;
+        panel.querySelectorAll('[data-pack-eat-choice]').forEach((b) => {
+          const on = Number(b.dataset.packEatChoice) === packEatQty;
+          b.classList.toggle('is-selected', on);
+          b.setAttribute('aria-pressed', on ? 'true' : 'false');
+        });
+        const { preview, note } = packEatDetail(eatMany, useInfo, packEatQty);
+        const before = panel.querySelector('.pack-drop-confirm-row');
+        const line = (sel, html, make) => {
+          let node = panel.querySelector(sel);
+          if (!html) { node?.remove(); return; }
+          if (!node) { node = make(); panel.insertBefore(node, sel === '.pack-eat-preview' ? panel.querySelector('.pack-eat-note') || before : before); }
+          node.innerHTML = html;
+        };
+        line('.pack-eat-preview', preview, () => Object.assign(document.createElement('div'), { className: 'pack-pop-effects pack-eat-preview' }));
+        line('.pack-eat-note', note, () => Object.assign(document.createElement('p'), { className: 'pack-eat-note' }));
+      },
       confirm: (n) => {
         packEatQty = clampConsumeCount(n, eatMany.max);
         pop.querySelector('[data-pack-eat-confirm]')?.click();
@@ -7824,6 +7868,7 @@ function showFeedPickerQty(food) {
   bindCountField(input, {
     max: () => Math.max(1, pickerMaxCount(feedPickerTarget?.classId, feedPickerQtyFood?.classTsid, inv)),
     set: (n) => setFeedPickerQty(n),
+    preview: (n) => setFeedPickerQty(n, { typing: true }),
     confirm: (n) => {
       setFeedPickerQty(n);
       confirmFeedPickerQty();
@@ -7841,14 +7886,15 @@ function placeFeedPicker() {
   placeMenuAtTarget(panel, feedPickerTarget, 'feedPickerPlace');
 }
 
-function setFeedPickerQty(value) {
+/** `typing`: the count as it is typed (ticket 92): everything follows it but the field itself. */
+function setFeedPickerQty(value, { typing = false } = {}) {
   const food = feedPickerQtyFood;
   if (!food) return 1;
   const max = Math.max(1, pickerMaxCount(feedPickerTarget?.classId, food.classTsid, inv));
   const n = clamp(Math.floor(Number(value) || 1), 1, max);
   const input = document.getElementById('feed-picker-qty-input');
   const go = document.getElementById('feed-picker-qty-go');
-  if (input) input.value = String(n);
+  if (input && !typing) input.value = String(n);
   if (go) go.textContent = `${FEED_PICKER_VERB_LABELS[feedPickerVerb] || 'Feed'} ${n}`;
   // MPANELS: the step row's ends say when there is no fewer or no more.
   const minus = document.getElementById('feed-picker-qty-minus');
@@ -26571,7 +26617,27 @@ function renderShrinePanel() {
   detail.querySelector('[data-shrine-dec]')?.addEventListener('click', () => setQty(shrineQty - 1));
   detail.querySelector('[data-shrine-inc]')?.addEventListener('click', () => setQty(shrineQty + 1));
   detail.querySelector('[data-shrine-max]')?.addEventListener('click', () => setQty(quote.maxQty));
-  detail.querySelector('[data-shrine-qty]')?.addEventListener('change', (event) => setQty(event.target.value));
+  // Ticket 92: the count, what it gives and the Donate button follow the typing; leaving the field
+  // redraws only when it shows something else (a count past the most).
+  const shrineQuoteOpts = () => ({ xp: pc.xp, ...shrinePowderOpts(), ...shrineToolOpts() });
+  detail.querySelector('[data-shrine-qty]')?.addEventListener('input', (event) => {
+    const n = typedCount(event.target.value, quote.maxQty);
+    const q = n == null ? null : quoteShrineDonation(shrineState, giantId, inv, shrineSelected, n, shrineQuoteOpts());
+    if (!q?.ok) return;
+    shrineQty = q.qty;
+    const small = detail.querySelector('.shrine-detail-body h3 small');
+    if (small) small.textContent = `×${q.qty}`;
+    const gives = detail.querySelectorAll('.shrine-rewards span');
+    if (gives[0]) gives[0].textContent = `+${q.xp} iMG`;
+    if (gives[1]) gives[1].textContent = `+${q.mood} mood`;
+    if (gives[2]) gives[2].textContent = `+${q.favor} ${giant.name} favor`;
+    const go = detail.querySelector('[data-shrine-donate]');
+    if (go) go.textContent = `Donate ${q.qty}`;
+  });
+  detail.querySelector('[data-shrine-qty]')?.addEventListener('change', (event) => {
+    if (String(event.target.value).trim() === String(shrineQty)) return;
+    setQty(event.target.value);
+  });
   detail.querySelector('[data-shrine-donate]')?.addEventListener('click', performShrineDonation);
   const tip = document.getElementById('shrine-tip');
   if (tip) tip.textContent = `Official shrine value: ${quote.baseCost} · more valuable offerings earn more favor.`;
@@ -26973,6 +27039,11 @@ function renderVendorDropZone() {
   }
 }
 
+/** The vendor's Buy or Sell button: the count and what it costs or pays, "Buy: 12 for 132". */
+function vendorGoLabel(isBuy, qty, unit) {
+  return `${isBuy ? 'Buy' : 'Sell'}: ${qty} for ${unit * qty}`;
+}
+
 function renderVendorList() {
   const list = document.getElementById('vendor-list');
   const detail = document.getElementById('vendor-detail');
@@ -27012,7 +27083,6 @@ function renderVendorList() {
         : 99
       : Math.max(1, quote.maxQty ?? have);
     vendorQty = Math.max(1, Math.min(vendorQty, maxQ));
-    const total = unit * vendorQty;
     detail.style.display = 'block';
     detail.classList.toggle('count-pop', vendorPop);
     detail.setAttribute('role', 'group');
@@ -27033,7 +27103,7 @@ function renderVendorList() {
           <button type="button" data-vq="+">+</button>
           <button type="button" class="btn-max" data-vq="max">Max</button>
           <button type="button" class="btn-glitch-primary" data-v-go>
-            ${isBuy ? `Buy: ${vendorQty} for ${total}` : `Sell: ${vendorQty} for ${total}`}
+            ${vendorGoLabel(isBuy, vendorQty, unit)}
           </button>
         </div>
         <p class="count-pop-esc mp-modern-only"><span class="kcap">Esc</span> back · ${isBuy ? `◎ ${pc.currants || 0} to spend` : `${have} in your pack`}</p>
@@ -27049,9 +27119,6 @@ function renderVendorList() {
     detail.querySelector('[data-vq="-"]')?.addEventListener('click', () => applyQ(vendorQty - 1));
     detail.querySelector('[data-vq="+"]')?.addEventListener('click', () => applyQ(vendorQty + 1));
     detail.querySelector('[data-vq="max"]')?.addEventListener('click', () => applyQ(maxQ));
-    detail.querySelector('[data-vq-val]')?.addEventListener('change', (e) => {
-      applyQ(Number(e.target.value) || 1);
-    });
     // MPANELS (js/ui/count-chooser.js): the keys. Enter in the field takes what was typed and buys or
     // sells; the arrows, Page Up / Down, Home and End step; Esc goes back to the shelf.
     const backToShelf = () => {
@@ -27063,6 +27130,12 @@ function renderVendorList() {
     bindCountField(detail.querySelector('[data-vq-val]'), {
       max: () => maxQ,
       set: (n) => applyQ(n),
+      // Ticket 92: the button says the typed count at once ("Buy: 1 for 11"), not when the field is left.
+      preview: (n) => {
+        vendorQty = n;
+        const go = detail.querySelector('[data-v-go]');
+        if (go) go.textContent = vendorGoLabel(isBuy, n, unit);
+      },
       confirm: (n) => {
         vendorQty = Math.max(1, Math.min(maxQ, n));
         renderVendorList();

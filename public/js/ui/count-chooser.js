@@ -62,10 +62,44 @@ export function countStepMarkup({ value, max, min = 1, verb = 'Choose', attrs })
 }
 
 /**
+ * PURE: the count a field shows while it is being typed in, or null when there is none yet (an empty
+ * field, or a number not finished: "" as a number field reports it). Cut to one to `max`.
+ */
+export function typedCount(text, max, min = 1) {
+  const t = String(text ?? '').trim();
+  if (!t || !Number.isFinite(Number(t))) return null;
+  return countFromField(t, max, min);
+}
+
+/**
+ * The step row's ends as a count says (countStepMarkup's −, + and Max), without a redraw: − off at the
+ * least, + off and Max pressed at the most.
+ */
+export function syncCountStep(input, n, max, min = 1) {
+  const row = input?.closest?.('.count-pop-step');
+  if (!row) return;
+  const dec = row.querySelector('.count-pop-dec');
+  const inc = row.querySelector('.count-pop-inc');
+  const most = row.querySelector('.count-pop-max');
+  if (dec) dec.disabled = n <= min;
+  if (inc) inc.disabled = n >= max;
+  if (most) {
+    if (n >= max) most.setAttribute('aria-pressed', 'true');
+    else most.removeAttribute('aria-pressed');
+  }
+}
+
+/**
  * Wire a count field: Enter takes what was typed and presses OK, the arrows step it (not the field's own
  * spin), Esc goes back. `set(n)` redraws with the new count; `confirm(n)` is OK; `cancel()` is back.
+ *
+ * `preview(n)` (ticket 92): what follows the count as it is typed ("Buy: 1 for 11" while the field
+ * says 1), called on every `input` with the typed count, cut to one to the most; it updates the words
+ * in place and never redraws the field, so the typing goes on. Leaving the field (`change`) then
+ * redraws only when the field shows something else (a count past the most, an empty field): a
+ * redraw under a pressed OK button would drop the press.
  */
-export function bindCountField(input, { max, set, confirm, cancel }) {
+export function bindCountField(input, { max, set, confirm, cancel, preview = null }) {
   if (!input || input.dataset.countBound) return;
   input.dataset.countBound = '1';
   input.addEventListener('keydown', (e) => {
@@ -91,5 +125,20 @@ export function bindCountField(input, { max, set, confirm, cancel }) {
     // Typing: the keys stay in the field (never the avatar or the street's own keys).
     e.stopPropagation();
   });
-  input.addEventListener('change', () => set(countFromField(input.value, max())));
+  let previewed = null;
+  input.addEventListener('input', () => {
+    if (typeof preview !== 'function') return;
+    const most = max();
+    const n = typedCount(input.value, most);
+    if (n == null) return;
+    previewed = n;
+    syncCountStep(input, n, most);
+    preview(n);
+  });
+  input.addEventListener('change', () => {
+    const n = countFromField(input.value, max());
+    // Already shown as typed: nothing to redraw (and the OK button being pressed stays put).
+    if (typeof preview === 'function' && n === previewed && String(input.value).trim() === String(n)) return;
+    set(n);
+  });
 }

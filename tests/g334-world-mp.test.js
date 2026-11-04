@@ -35,7 +35,7 @@ import { treeDeathFeature } from '../public/js/features/tree-death-feature.js?v=
 import { patchesFeature } from '../public/js/features/patches-feature.js?v=e4a197ff';
 import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=5697fd19';
 import { helpMineFeature } from '../public/js/features/help-mine-feature.js?v=c485955b';
-import { animalMoodFeature } from '../public/js/features/animal-mood-feature.js?v=2e0cefa7';
+import { animalMoodFeature } from '../public/js/features/animal-mood-feature.js?v=feb750aa';
 
 // ---------------------------------------------------------------------------
 // Pure helpers

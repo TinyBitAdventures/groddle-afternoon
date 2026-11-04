@@ -52,7 +52,7 @@
 
 import { slugsFromEffects } from '../speech-slugs.js?v=130338f9';
 import { addItem, countItem, ensureItem, removeItem, ITEM_CATALOG } from '../inventory.js?v=602da017';
-import { bindCountField, countKeyValue, countStepMarkup } from '../ui/count-chooser.js?v=893305c8';
+import { bindCountField, countKeyValue, countStepMarkup } from '../ui/count-chooser.js?v=b8361b21';
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=8f5dc6d9';
 import { nearestSurfaceY } from '../walk-surface.js?v=c982983e';
 import { donationValueFor } from '../shrines.js?v=9d364845';
@@ -1771,11 +1771,12 @@ function openOfferPanel(engine, target) {
     some?.setAttribute('aria-expanded', 'false');
     if (refocus) some?.focus();
   };
-  const syncCount = () => {
+  // `typing` (ticket 92): the count as it is typed; everything follows it but the field itself.
+  const syncCount = ({ typing = false } = {}) => {
     if (!chooser) return;
     const { pop, o, n } = chooser;
     const num = pop.querySelector('[data-rook-count-num]');
-    if (num && String(num.value) !== String(n)) num.value = String(n);
+    if (num && !typing && String(num.value) !== String(n)) num.value = String(n);
     const dec = pop.querySelector('[data-rook-count-dec]');
     const inc = pop.querySelector('[data-rook-count-inc]');
     const max = pop.querySelector('[data-rook-count-max]');
@@ -1826,6 +1827,11 @@ function openOfferPanel(engine, target) {
     bindCountField(pop.querySelector('[data-rook-count-num]'), {
       max: () => o.count,
       set: setCount,
+      preview: (v) => {
+        if (!chooser) return;
+        chooser.n = Math.max(1, Math.min(chooser.o.count, v));
+        syncCount({ typing: true });
+      },
       confirm: (v) => giveOffering(engine, target, o, v),
       cancel: () => closeCount({ refocus: true }),
     });
