@@ -30,8 +30,8 @@ import {
   resourceSpritePaths,
   resourceItemIds,
   sheetFrameRect,
-} from '../public/js/resource-nodes.js?v=7e4d7df8';
-import { ITEM_CATALOG } from '../public/js/inventory.js?v=597a17a2';
+} from '../public/js/resource-nodes.js?v=d78746b3';
+import { ITEM_CATALOG } from '../public/js/inventory.js?v=602da017';
 import {
   TOOL_CONDITION_CATALOG,
   createToolConditionState,

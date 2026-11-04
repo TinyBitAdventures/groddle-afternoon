@@ -26,7 +26,7 @@
  * imgLast, imgShuffled, imgAutoplay, imgBrain, imgEnergyMax.
  */
 
-import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=597a17a2';
+import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=602da017';
 import { getGameDayKey } from '../game-day.js?v=edb00566';
 import { quoinDailyLimitFor } from '../quoins.js?v=dfe1ff0a';
 import { XP_FOR_LEVEL } from '../progression.js?v=33462eaa';
@@ -54,7 +54,7 @@ import { brainCapacityRescale, skillTimeFactor } from '../imagination-effects.js
 import { betterLearningDiscount } from '../better-learning.js?v=044ff9ff';
 import { rescaleStudiesForLearningModifier } from '../skills.js?v=4542bdf9';
 import { isOfferedInRemake, isOfferedOnline, remakeStatus } from '../imagination-remake.js?v=5ca4a35f';
-import { hellFeature } from './hell-feature.js?v=705a486b';
+import { hellFeature } from './hell-feature.js?v=54d49b30';
 
 const ART = 'assets/imagination/cards/';
 const UI = 'assets/imagination/ui/';

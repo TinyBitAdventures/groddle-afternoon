@@ -24,7 +24,7 @@ import {
   stepKitty,
 } from '../public/js/heli-kitties.js?v=8fbe314a';
 import { KITTY_SHEETS, heliKittiesFeature, kittyPlacementGroups } from '../public/js/features/heli-kitties-feature.js?v=b17eed58';
-import { foxesFeature } from '../public/js/features/foxes-feature.js?v=22a3a425';
+import { foxesFeature } from '../public/js/features/foxes-feature.js?v=f9ccfcc0';
 import { createFeatureHost } from '../public/js/feature-host.js?v=2ed3c069';
 import { setWildlifeCatalog } from '../public/js/wildlife.js?v=670c3a7f';
 import { readFileSync } from 'node:fs';

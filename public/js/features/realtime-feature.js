@@ -60,7 +60,7 @@ import { createMinnAccount } from '../minn-account.js?v=eb300264';
 import { EMOTES, createRealtimeClient, createTrack, pushSample, sampleTrack } from '../realtime-client.js?v=d890c210';
 import { ANIM_FPS, EMOTION_MS, animForState, crowdScaleX } from '../avatar-anims.js?v=fb921bf4';
 import { movedLine } from '../admin-teleport.js?v=fa56e8df';
-import { ADMIN_TEXT, applyAdminGive, applyAdminRefill, showAdminMessage, showBooted } from '../admin-console-mp.js?v=a2441515';
+import { ADMIN_TEXT, applyAdminGive, applyAdminRefill, showAdminMessage, showBooted } from '../admin-console-mp.js?v=57d542a4';
 import { saveStore } from '../save-store.js?v=8839ba7b';
 import { STREET_INDEX } from '../street-loader.js?v=33d2b8bc';
 

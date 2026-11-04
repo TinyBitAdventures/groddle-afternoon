@@ -40,15 +40,15 @@ import {
   GARDEN_TALKBACK_MS,
   gardenTalkbackKey,
   gardenTalkback,
-} from '../public/js/garden.js?v=b38ab310';
+} from '../public/js/garden.js?v=dd021ecc';
 import {
   createInventory,
   countItem,
   listPackItemSlots,
   listPackToolSlots,
   isToolItem,
-} from '../public/js/inventory.js?v=597a17a2';
-import { DEFAULT_VENDOR, vendorBuy } from '../public/js/vendor.js?v=4e3cc8fb';
+} from '../public/js/inventory.js?v=602da017';
+import { DEFAULT_VENDOR, vendorBuy } from '../public/js/vendor.js?v=08063e0c';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 

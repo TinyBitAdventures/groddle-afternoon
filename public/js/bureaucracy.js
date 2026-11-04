@@ -18,7 +18,7 @@
  * such as job_street_ph4_02c ask for Card-Carrying Qualifications.
  */
 
-import { addItem, countItem, removeItem } from './inventory.js?v=597a17a2';
+import { addItem, countItem, removeItem } from './inventory.js?v=602da017';
 
 export const BUREAUCRACY_STORE_ID = 17;
 export const CARD_BADGE = 'card_carrying_qualification';

@@ -24,7 +24,7 @@ import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { requireSite, sitePath } from './repos.mjs';
-import { ITEM_CATALOG, isToolItem } from '../public/js/inventory.js?v=597a17a2';
+import { ITEM_CATALOG, isToolItem } from '../public/js/inventory.js?v=602da017';
 import { BAG_DEFS, PACK_CAPACITY, isBagClass, stackMaxOf, takesNoSlot } from '../public/js/pack-slots.js?v=68a8fca3';
 import { COMPOUND_CLASSES, CUBIMAL_CLASSES, ELEMENT_CLASSES, NO_BAG_CLASSES, SPICE_CLASSES, TOOL_CLASSES } from '../public/js/pack-slots-data.js?v=800f664c';
 

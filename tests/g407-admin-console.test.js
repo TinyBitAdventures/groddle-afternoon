@@ -12,9 +12,9 @@ import { readFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { SITE_DIR, sitePath, serverPath, skipWithoutSite, skipWithoutServer, HAS_SITE } from '../tools/repos.mjs';
-import { ADMIN_TEXT, ADMIN_TEXT_MAX, adminGiveGoods, adminMessageText, applyAdminGive, applyAdminRefill, bootedLine, showAdminMessage, showBooted } from '../public/js/admin-console-mp.js?v=a2441515';
+import { ADMIN_TEXT, ADMIN_TEXT_MAX, adminGiveGoods, adminMessageText, applyAdminGive, applyAdminRefill, bootedLine, showAdminMessage, showBooted } from '../public/js/admin-console-mp.js?v=57d542a4';
 import { CLOSE_BANNED, CLOSE_BOOTED, createRealtimeClient } from '../public/js/realtime-client.js?v=d890c210';
-import { statusText } from '../public/js/features/realtime-feature.js?v=f94cb4d9';
+import { statusText } from '../public/js/features/realtime-feature.js?v=182aa81e';
 import { GATE_COPY, suspendedNow } from '../public/js/online-boot.js?v=7a36d921';
 
 const root = join(import.meta.dirname, '..');

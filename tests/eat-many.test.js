@@ -18,12 +18,12 @@ import {
   limitCountCap,
   useItemMany,
   recordFoodEatMany,
-} from '../public/js/eat-many.js?v=48ba26ca';
+} from '../public/js/eat-many.js?v=f9e8a96e';
 import { CANDY_CLASSES, CANDY_DAILY_MAX, PIE_DAILY_MAX, SOURCE_LINES, dailyEatLimit, pieEatGate } from '../public/js/seasons.js?v=1978c3f3';
-import { seasonsFeature } from '../public/js/features/seasons-feature.js?v=06828a7b';
+import { seasonsFeature } from '../public/js/features/seasons-feature.js?v=18a61c8f';
 import { getGameDayKey } from '../public/js/game-day.js?v=edb00566';
-import { createInventory, getItemUseInfo, registerItemUse, useItem, countItem } from '../public/js/inventory.js?v=597a17a2';
-import { FOOD_VARIETY_UPGRADE, createFoodState, recordFoodEat } from '../public/js/food.js?v=a685d473';
+import { createInventory, getItemUseInfo, registerItemUse, useItem, countItem } from '../public/js/inventory.js?v=602da017';
+import { FOOD_VARIETY_UPGRADE, createFoodState, recordFoodEat } from '../public/js/food.js?v=f443ef18';
 
 const root = join(import.meta.dirname, '..');
 const gsjs = join(root, '../glitch-GameServerJS');
@@ -127,6 +127,19 @@ describe('one batch, one handler call', () => {
     assert.equal(r.reason, 'mood_full');
     assert.match(r.msgs[0], /already in a perfectly good mood/);
     assert.equal(countItem(inv, 'milk_butterfly'), 3);
+  });
+
+  it('ticket 93: one mood drink is refused only at the player\'s own full mood (drink.js 38-42), not at 100', () => {
+    registerItemUse('beer', { kind: 'drink', verb: 'Drink', mood: 20 });
+    const inv = { beer: 2 };
+    const pc = { energy: 300, energyMax: 600, mood: 150 };
+    const r = useItem(inv, pc, 'beer');
+    assert.equal(r.ok, true, r.msgs?.join(' '));
+    assert.equal(countItem(inv, 'beer'), 1);
+    const full = useItem(inv, { energy: 300, energyMax: 600, mood: 600 }, 'beer');
+    assert.equal(full.reason, 'mood_full');
+    assert.match(full.msgs[0], /already in a perfectly good mood/);
+    assert.equal(countItem(inv, 'beer'), 1);
   });
 
   it('drinks two Butterfly Milks for 12 mood', () => {

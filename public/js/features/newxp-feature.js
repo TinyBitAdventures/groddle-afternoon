@@ -118,7 +118,7 @@ import {
   tutorialPhysics,
   vogPages,
 } from '../newxp.js?v=6ca4702e';
-import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=597a17a2';
+import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=602da017';
 import { QUOIN_SHEET, QUOIN_TYPES, qrazyRewardForLevel } from '../quoins.js?v=dfe1ff0a';
 import { soundForQuoin } from '../sound-moments.js?v=2f8597cd';
 import { IMAGINATION_UPGRADES } from '../imagination.js?v=133fd4d5';
@@ -130,8 +130,8 @@ import * as kit from '../quest-rooms/kit.js?v=4d8ab82d';
 import { frameTexture, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js?v=3149d699';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 import { displayTopOf, itemstackOverlayPoint, playPoofIn, playSheetOverlay, poofInAlpha } from '../overlay-art.js?v=11b6dd7f';
-import { HOME_MACHINE } from '../home-ticket.js?v=7d5e99a5';
-import { animalAnchorX, createAnimalState } from '../animals.js?v=b60e937b';
+import { HOME_MACHINE } from '../home-ticket.js?v=c96cf07c';
+import { animalAnchorX, createAnimalState } from '../animals.js?v=7bd6440a';
 import {
   AK_ANIMALS,
   AK_BUBBLE,

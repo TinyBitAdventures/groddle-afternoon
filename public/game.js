@@ -2,9 +2,9 @@
  * Groddle Afternoon — original street geometry + layered decos
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
-import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=6218d040';
+import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=8b5c8a49';
 import { createFeatureHost } from './js/feature-host.js?v=2ed3c069';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=26a6e086';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=01c5b577';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -461,11 +461,11 @@ import {
   addItem,
   removeItem,
   isToolItem,
-} from './js/inventory.js?v=597a17a2';
+} from './js/inventory.js?v=602da017';
 import { PACK_COPY, isBagClass, unitRankAt } from './js/pack-slots.js?v=68a8fca3';
 import { createPackRow, mountPackClearance, packBandRange, packCountText, packSearchEntries, packSlotTip } from './js/ui/pack-row.js?v=65c0f180';
-import { listAnimalFeedOptions } from './js/animals.js?v=b60e937b';
-import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=b60e937b';
+import { listAnimalFeedOptions } from './js/animals.js?v=7bd6440a';
+import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=7bd6440a';
 import {
   createDroppedItemState,
   parseDroppedItemState,
@@ -476,13 +476,13 @@ import {
   pickupDroppedStack,
   placeDroppedBag,
   takeDroppedRecord,
-} from './js/world-items.js?v=2276daaf';
+} from './js/world-items.js?v=132d9b8c';
 import {
   createPlayerSave,
   parsePlayerSave,
   serializePlayerSave,
   restorePlayerSave,
-} from './js/player-save.js?v=ff2c4abf';
+} from './js/player-save.js?v=ec495a80';
 import {
   HOME_INTERIOR_TSID,
   HOME_STREET_TSID,
@@ -496,7 +496,7 @@ import {
   imagineHome,
   isHomePlaceTsid,
 } from './js/homes.js?v=631ab6b8';
-import { HOME_MACHINE, offerHomeTicket, renderTicketMachine } from './js/home-ticket.js?v=7d5e99a5';
+import { HOME_MACHINE, offerHomeTicket, renderTicketMachine } from './js/home-ticket.js?v=c96cf07c';
 import {
   MAIL_COMPANIONS,
   archiveMail,
@@ -561,7 +561,7 @@ import {
   MAKING_TOOL_SKILLS,
   recipeTaskLimit,
   recipeToolInUse,
-} from './js/making.js?v=0100c686';
+} from './js/making.js?v=6b048d25';
 import { MAKE_TOOL_SHEETS } from './js/make-tool-sheets.js?v=6f758e09';
 import { LOW_FUEL_LINE, craftSessionElapsedMs, isLowFuel, isMachineArt, machineArtHtml, packMakeState, playMachineHandOver, setMachineArtFrame } from './js/machine-art.js?v=8c93c616';
 import {
@@ -588,7 +588,7 @@ import {
   cropIcon,
   hasWateringCan,
   hasHoe,
-} from './js/garden.js?v=b38ab310';
+} from './js/garden.js?v=dd021ecc';
 import { GARDEN_SCALE, PLOT_H as GARDEN_PLOT_H, PLOT_W as GARDEN_PLOT_W, gardenFrame, gardenLayout, gardenStyle, plotPieces } from './js/garden-view.js?v=05651e76';
 import {
   ROCK_CATALOG,
@@ -601,7 +601,7 @@ import {
   starterMiningTools,
   STARTER_MINING_SKILLS,
   findWorkingPick,
-} from './js/mining.js?v=76295780';
+} from './js/mining.js?v=d856ab96';
 import {
   loadStreetData,
   STREET_INDEX,
@@ -661,7 +661,7 @@ import {
   canEatFood,
   recordFoodEat,
   resetFoodDay,
-} from './js/food.js?v=a685d473';
+} from './js/food.js?v=f443ef18';
 import {
   consumeTakesCount,
   consumeCountCap,
@@ -671,7 +671,7 @@ import {
   limitCountCap,
   useItemMany,
   recordFoodEatMany,
-} from './js/eat-many.js?v=48ba26ca';
+} from './js/eat-many.js?v=f9e8a96e';
 import {
   TRIPLE_JUMP_UPGRADES,
   createJumpState,
@@ -745,7 +745,7 @@ import { holdCloseToFloor } from './js/slope-walk.js?v=9af1e505';
 import { JUMP_SPEED, WALK_MAX, avatarGround, coastX, stepAvatar, steerAccel, steerX, streetPhysicsExtras } from './js/avatar-step.js?v=537aa4b7';
 import { createUserPath, stepUserPath } from './js/user-path.js?v=8880557f';
 import { FAILED_LINE, inVerbReach, movingLine, verbRange, walkOverEnd, walkOverGoalX } from './js/walk-over.js?v=db80ba07';
-import { hellBuffDesc, isInHell } from './js/hell.js?v=45060736';
+import { hellBuffDesc, isInHell } from './js/hell.js?v=c493dadb';
 import { climbBobY, ladderAnimState, ladderSwap } from './js/ladder-anim.js?v=a8b327a0';
 import { VECTOR_AVATAR } from './js/avatar-vector-sheets.js?v=ad801376';
 import { createNpcGlitchKit } from './js/npc-glitch.js?v=894841be';
@@ -781,7 +781,7 @@ import {
   planMusicblockDrop,
   playMusicblock,
   starterMusicblocks,
-} from './js/musicblocks.js?v=c9e56377';
+} from './js/musicblocks.js?v=c7490d76';
 import {
   VENDOR_PROFILES,
   selectVendorProfile,
@@ -792,13 +792,13 @@ import {
   createVendorSellQuote,
   vendorSellUnitPrice,
   vendorBuyUnitPrice,
-} from './js/vendor.js?v=4e3cc8fb';
+} from './js/vendor.js?v=08063e0c';
 import {
   animalAnchorX,
   createAnimalState,
   resetAnimalDay,
   animalStatusLabel,
-} from './js/animals.js?v=b60e937b';
+} from './js/animals.js?v=7bd6440a';
 import {
   ensureWoodTreeState,
   pickWoodTool,
@@ -827,7 +827,7 @@ import {
   favorRelationNote,
   emblemRelationNote,
   formatSpeedUpTime,
-} from './js/shrines.js?v=c6a91b91';
+} from './js/shrines.js?v=9d364845';
 import { shrinePowderOptions, shrinePowderAchievementCounters } from './js/powders.js?v=d355981a';
 import {
   GAMESHOW_TICKET_ID,
@@ -838,7 +838,7 @@ import {
   spinMeResponse,
   spinningWheelPhase,
   startSpinningWheel,
-} from './js/spinning-wheel.js?v=d0958fab';
+} from './js/spinning-wheel.js?v=15a54f09';
 import {
   CUBIMAL_PACKAGE_IDS,
   cubimalCollectionProgress,
@@ -847,7 +847,7 @@ import {
   ensureCubimalItems,
   openCubimalPackage,
   setCubimalFree,
-} from './js/cubimals.js?v=6cf43927';
+} from './js/cubimals.js?v=14b9d9b0';
 import {
   STOOT_DOLL_BUBBLE_MS,
   STOOT_DOLL_ID,
@@ -897,7 +897,7 @@ import {
   ANIMAL_PATROL,
   nearestPlacementGap,
 } from './js/street-ecology.js?v=2c82c072';
-import { chickenPauseRoll, easeToward, flightFloorAt, flightFloorFor, flyerLift } from './js/street-creatures.js?v=4f2b6178';
+import { chickenPauseRoll, easeToward, flightFloorAt, flightFloorFor, flyerLift } from './js/street-creatures.js?v=03bece7a';
 import { createSoundBoard, DEFAULT_SFX_VOLUME, watchButtonClicks, watchPanelSounds } from './js/sound-board.js?v=87380a25';
 import {
   actionLoopFor,
@@ -30499,7 +30499,7 @@ async function main() {
   }
   // Garden talkback QA (js/garden-talk-qa.js): ?gardentalkdemo=herb|crop.
   if (new URLSearchParams(location.search).has('gardentalkdemo')) {
-    import('./js/garden-talk-qa.js?v=1812da53').then((m) => m.runGardenTalkDemo({ engine, executeVerb, params: new URLSearchParams(location.search) }));
+    import('./js/garden-talk-qa.js?v=cf86f0fc').then((m) => m.runGardenTalkDemo({ engine, executeVerb, params: new URLSearchParams(location.search) }));
   }
   // MEMQA (ticket 21, Safari's memory reload in Naraka): ?memqa=1 lets a probe walk streets through the
   // real street trip (tools/qa/street-memory.mjs). Solo pages only: online pages drop their params.

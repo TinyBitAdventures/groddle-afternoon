@@ -24,9 +24,9 @@ import {
   swfVerbs,
   wrangleMessage,
 } from '../public/js/swf.js?v=6dd72036';
-import { swfFeature } from '../public/js/features/swf-feature.js?v=e6523d0b';
-import { FEATURES } from '../public/js/features/index.js?v=26a6e086';
-import { ITEM_CATALOG } from '../public/js/inventory.js?v=597a17a2';
+import { swfFeature } from '../public/js/features/swf-feature.js?v=1a52ded4';
+import { FEATURES } from '../public/js/features/index.js?v=01c5b577';
+import { ITEM_CATALOG } from '../public/js/inventory.js?v=602da017';
 import { DROP_ITEMS, DROP_TABLES } from '../public/js/drop-tables-data.js?v=c51a6400';
 
 const here = dirname(fileURLToPath(import.meta.url));

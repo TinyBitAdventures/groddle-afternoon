@@ -52,10 +52,10 @@
  * last release: released:respawned|new:<key>, or failed:<reason>).
  */
 
-import { ITEM_CATALOG, addItem, countItem } from '../inventory.js?v=597a17a2';
+import { ITEM_CATALOG, addItem, countItem } from '../inventory.js?v=602da017';
 import { isItemFloor, platformYAt } from '../street-model.js?v=505d8990';
 import { hiresSpriteUrl } from '../sprite-hires.js?v=96c22af7';
-import { rollResourceNodeDrop } from './drops-feature.js?v=8a048c2d';
+import { rollResourceNodeDrop } from './drops-feature.js?v=35b140d2';
 import { slugsFromEffects } from '../speech-slugs.js?v=130338f9';
 import { resourceNodeResponseKey, verbResponse } from '../verb-responses.js?v=3ceb8a8c';
 import { rollSlothBonusSnails } from '../imagination-effects.js?v=70169933';
@@ -84,7 +84,7 @@ import {
   starterResourceTools,
   swimmingSalmonCount,
   tickResourceNode,
-} from '../resource-nodes.js?v=7e4d7df8';
+} from '../resource-nodes.js?v=d78746b3';
 import { frameTexture as sheetFrameTexture, loadTexture, textureFromUrl } from '../textures.js?v=3149d699';
 import { acceptOffer, markOffered, npcQuestOffers, putOffOffer, questStatus } from '../quest-offers.js?v=3bf17441';
 import { vpSequence } from '../quest-rooms/vp-overlay.js?v=b231d65a';

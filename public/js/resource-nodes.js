@@ -76,7 +76,7 @@ import {
   countItem,
   ensureItem,
   ITEM_CATALOG,
-} from './inventory.js?v=597a17a2';
+} from './inventory.js?v=602da017';
 import { canUseTool, useToolCondition } from './tools.js?v=3974f57e';
 import { getGameDayKey } from './game-day.js?v=edb00566';
 import { grantMoodXp } from './mood-xp.js?v=958e7680';

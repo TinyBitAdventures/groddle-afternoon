@@ -29,8 +29,8 @@ import {
   useItem,
   countItem,
   ITEM_CATALOG,
-} from '../public/js/inventory.js?v=597a17a2';
-import { getVerbsFor, runVerb } from '../public/content.js?v=6218d040';
+} from '../public/js/inventory.js?v=602da017';
+import { getVerbsFor, runVerb } from '../public/content.js?v=8b5c8a49';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=10b118dd';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));

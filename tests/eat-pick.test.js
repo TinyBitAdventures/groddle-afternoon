@@ -7,7 +7,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { EAT_PICK_TEXT, bestFoodIndex, compareFood, eatChoices, eatTip, isEatable } from '../public/js/eat-pick.js?v=8fb763d0';
 import { hotkeySections, hotkeyText } from '../public/js/client-hotkeys.js?fresh=eat-pick';
-import { ITEM_CATALOG, getItemUseInfo, listPackItemSlots } from '../public/js/inventory.js?v=597a17a2';
+import { ITEM_CATALOG, getItemUseInfo, listPackItemSlots } from '../public/js/inventory.js?v=602da017';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const game = readFileSync(join(root, 'public/game.js'), 'utf8');

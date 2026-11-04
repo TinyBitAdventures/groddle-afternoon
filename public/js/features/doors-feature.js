@@ -27,7 +27,7 @@
  * doorKeyDrop.
  */
 
-import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=597a17a2';
+import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=602da017';
 import { getGameDayKey } from '../game-day.js?v=edb00566';
 import { loadDecoManifest } from '../street-render.js?v=9349c0e5';
 import {

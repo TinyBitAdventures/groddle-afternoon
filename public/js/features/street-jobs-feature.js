@@ -43,14 +43,14 @@
  * 'restore', job type 5) and finishes the restore in its `onDone` hook.
  */
 
-import { ITEM_CATALOG, addItem, countItem, ensureItem, itemIcon, removeItem } from '../inventory.js?v=597a17a2';
+import { ITEM_CATALOG, addItem, countItem, ensureItem, itemIcon, removeItem } from '../inventory.js?v=602da017';
 import { canUseTool, useToolCondition } from '../tools.js?v=3974f57e';
 import { ecologyForStreet } from '../street-ecology.js?v=2c82c072';
 import { worldToScreen } from '../street-model.js?v=505d8990';
 import { signArmWidth } from '../street-render.js?v=9349c0e5';
 import { getSkillCatalog } from '../content-catalogs.js?v=10b118dd';
-import { GIANTS } from '../shrines.js?v=c6a91b91';
-import { teleportationFeature } from './teleportation-feature.js?v=b46fa776';
+import { GIANTS } from '../shrines.js?v=9d364845';
+import { teleportationFeature } from './teleportation-feature.js?v=2274acec';
 import {
   SOLO_DIVISOR,
   WORK_UNIT_MS,

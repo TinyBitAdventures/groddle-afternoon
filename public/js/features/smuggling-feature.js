@@ -36,7 +36,7 @@
  *     smugDeim, smugLast, smugCounts, smugAutoplay.
  */
 
-import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=597a17a2';
+import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=602da017';
 import { canUseTool } from '../tools.js?v=3974f57e';
 import { acceptOffer, ensureQuestOfferState, turnInQuest } from '../quest-offers.js?v=3bf17441';
 import { parseQuestConversation } from '../quests.js?v=282e1621';
@@ -44,8 +44,8 @@ import { getQuestCatalog } from '../content-catalogs.js?v=10b118dd';
 import { STREET_INDEX, resolveIndexTsid } from '../street-loader.js?v=33d2b8bc';
 import { isStandable, worldToScreen } from '../street-model.js?v=505d8990';
 import { landingY, walkSurfaceY } from '../walk-surface.js?v=c982983e';
-import { hellFeature } from './hell-feature.js?v=705a486b';
-import { questRoomConverse } from './quest-instances-feature.js?v=d5273564';
+import { hellFeature } from './hell-feature.js?v=54d49b30';
+import { questRoomConverse } from './quest-instances-feature.js?v=bd6c7485';
 import {
   CONTRABAND,
   CONTRABAND_ITEM,

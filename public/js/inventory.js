@@ -403,8 +403,9 @@ export function useItem(inv, pc, classTsid) {
   }
   const info = getItemUseInfo(classTsid);
   if (!info.usable) return { ok: false, msgs: [info.reason] };
-  // include/drink.js drink_drink: a mood drink is refused at full mood.
-  if (info.kind === 'drink' && (info.effects.mood || 0) > 0 && (pc.mood || 0) >= 100) {
+  // include/drink.js 38-42 drink_drink: a mood drink is refused only at full mood
+  // (metabolics_get_percentage('mood') == 100, the player's own maximum; ticket 93: not a fixed 100).
+  if (info.kind === 'drink' && (info.effects.mood || 0) > 0 && (pc.mood || 0) >= moodMax(pc)) {
     const label = ITEM_CATALOG[classTsid]?.label || classTsid;
     return {
       ok: false,

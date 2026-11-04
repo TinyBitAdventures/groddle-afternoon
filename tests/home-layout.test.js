@@ -17,11 +17,11 @@ import { homedir } from 'node:os';
 import {
   HOME_LAYOUT_ART_ROOTS, HOME_LAYOUT_KINDS, HOME_LAYOUT_LIMITS, HOME_LAYOUT_TEXTS, HOME_LAYOUT_VERSION,
   boxFromCorners, buildHomeLayout, describeHomeThing, hexColour, homeLayoutJson, homeLayoutKeyOf, layoutArtPath, splitFrameToSheet,
-} from '../public/js/home-layout.js?v=4cd6ceff';
-import { walkHomeScene } from '../public/js/home-layout-scene.js?v=d23170a5';
+} from '../public/js/home-layout.js?v=269f831c';
+import { walkHomeScene } from '../public/js/home-layout-scene.js?v=48b03d34';
 import { AVATAR_STILL, homeKeyOf } from '../public/js/profiles.js?v=86423d98';
 import { HIRES_SPRITES, SPLIT_SPRITES } from '../public/js/sprite-hires.js?v=96c22af7';
-import { HOUSE_STYLE_KEYS } from '../public/js/features/homes-feature.js?v=dc9deca5';
+import { HOUSE_STYLE_KEYS } from '../public/js/features/homes-feature.js?v=a98d26b7';
 import { SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');
