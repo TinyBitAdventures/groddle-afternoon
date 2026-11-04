@@ -63,6 +63,7 @@ import { colorizeAmounts } from '../notify-view.js?v=2835afc0';
 import { bindContextTrigger, MORE_KEYS_LABEL } from './context-menu.js?v=57c5f1fe';
 import { IM_VERB_ID } from '../player-im.js?v=04c55d2f';
 import { selectionCovers } from './context-guard.js?v=0f71ac17';
+import { appendLinkedText, linkifyTextNodes } from '../chat-links.js?v=b717fac7';
 
 export const SOCIAL_STORE_KEY = 'groddle-social-drawer';
 /** The drawer opens by default at this window width and up (the mock's 1440 rule). */
@@ -698,7 +699,9 @@ export function mountSocialDrawer({
     const who = el('b', {});
     if (online && playerMenu && !line.mine && line.playerId > 0) who.append(nameButton(line));
     else who.textContent = line.mine ? 'You' : line.name || 'Someone';
-    p.append(who, document.createTextNode(` ${line.text}`));
+    p.append(who, document.createTextNode(' '));
+    // LINKS (js/chat-links.js): the addresses in what was said are links (text nodes only).
+    appendLinkedText(p, String(line.text ?? ''), { doc: document });
     return p;
   }
 
@@ -712,6 +715,8 @@ export function mountSocialDrawer({
     const row = el('div', { class: 'social-act', 'data-kind': e.kind });
     const body = el('div', { class: 'social-act-text' });
     body.innerHTML = e.html || colorizeAmounts(e.text);
+    // LINKS: an entry that repeats what someone said (an IM's notice) keeps its addresses as links.
+    linkifyTextNodes(body, { doc: document });
     const meta = el('div', { class: 'social-act-when' });
     meta.append(el('time', {}, clockLabel(e.at)));
     if (e.count > 1) meta.append(el('span', { class: 'social-count' }, `×${e.count}`));

@@ -66,6 +66,7 @@ import {
   tabOrder,
   writeMemory,
 } from '../groups.js?v=14b60589';
+import { appendLinkedText } from '../chat-links.js?v=b717fac7';
 
 export const GROUPS_FEATURE_ID = 'groups';
 
@@ -323,7 +324,10 @@ function createSession(engine, client) {
     lines.replaceChildren(...chat.lines.map((line) => {
       const li = el('li', line.note ? { class: 'is-note' } : {});
       if (line.note) li.textContent = line.text;
-      else li.append(el('b', {}, `${line.name}: `), document.createTextNode(line.text));
+      else {
+        li.append(el('b', {}, `${line.name}: `));
+        appendLinkedText(li, line.text);
+      }
       return li;
     }));
     lines.scrollTop = lines.scrollHeight;

@@ -9708,6 +9708,46 @@ html[data-street-cards] .notify-notices { visibility: hidden; }
 .social-msg .social-name:hover { text-decoration: underline; text-underline-offset: 2px; }
 .social-msg .social-name:focus-visible { outline-offset: 1px; }
 .social-msg.is-note { color: var(--text-muted); font-style: italic; }
+/* LINKS (js/chat-links.js): an address in a chat line; its text selects and copies like the rest. */
+.chat-link { color: var(--accent); text-decoration: underline; text-underline-offset: 2px; overflow-wrap: anywhere; cursor: pointer; }
+.chat-link:hover { text-decoration-thickness: 2px; }
+.chat-link:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; border-radius: var(--radius-xs); }
+/* A link to another site asks first, naming where it goes. */
+.chat-link-confirm {
+  position: fixed;
+  z-index: var(--z-notice);
+  box-sizing: border-box;
+  width: max-content;
+  max-width: min(300px, calc(100vw - 16px));
+  padding: var(--sp-5) var(--sp-6);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-lg);
+  background: var(--surface-card);
+  box-shadow: var(--shadow-2);
+  color: var(--text);
+  font-family: var(--font-round);
+  font-size: var(--fs-md);
+  font-weight: var(--fw-regular);
+}
+.chat-link-confirm-text { margin: 0 0 var(--sp-4); overflow-wrap: anywhere; }
+.chat-link-confirm-text b { font-weight: var(--fw-heavy); }
+.chat-link-confirm-row { display: flex; justify-content: flex-end; gap: var(--sp-3); }
+.chat-link-confirm-row :is(a, button) {
+  display: inline-grid;
+  place-items: center;
+  min-height: 28px;
+  padding: 0 var(--sp-6);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-pill);
+  background: var(--surface-bright);
+  color: var(--text);
+  font: inherit;
+  font-weight: var(--fw-bold);
+  text-decoration: none;
+  cursor: pointer;
+}
+.chat-link-confirm-open { border-color: var(--accent) !important; background: var(--accent) !important; color: var(--text-inverse) !important; }
+.chat-link-confirm-row :is(a, button):focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
 .social-act {
   display: grid;
   gap: var(--sp-1);

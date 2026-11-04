@@ -12,7 +12,7 @@ import { PROFILE_PAGE_VERB } from '../public/js/profiles.js?v=86423d98';
 import { IM_VERB_ID } from '../public/js/player-im.js?v=04c55d2f';
 import { BUDDY_VERBS } from '../public/js/buddies.js?v=df41a3bb';
 import { VISIT_VERB } from '../public/js/neighbours-mp.js?v=a8d5544e';
-import { PARTY_FEATURE_ID } from '../public/js/features/party-feature.js?v=136328ee';
+import { PARTY_FEATURE_ID } from '../public/js/features/party-feature.js?v=45bef442';
 
 const game = readFileSync(new URL('../public/game.js', import.meta.url), 'utf8');
 const glue = game.slice(game.indexOf('let playerCtxMenu = null;'), game.indexOf('function openPlayerListMenu('));

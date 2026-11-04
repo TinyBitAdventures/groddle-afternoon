@@ -63,6 +63,7 @@ import { movedLine } from '../admin-teleport.js?v=fa56e8df';
 import { ADMIN_TEXT, applyAdminGive, applyAdminRefill, showAdminMessage, showBooted } from '../admin-console-mp.js?v=57d542a4';
 import { saveStore } from '../save-store.js?v=8839ba7b';
 import { STREET_INDEX } from '../street-loader.js?v=33d2b8bc';
+import { appendLinkedText } from '../chat-links.js?v=b717fac7';
 
 export const REALTIME_FEATURE_ID = 'realtime';
 /** Lines kept in the chat log. */
@@ -283,7 +284,10 @@ function createSession(engine) {
     const items = log.map((line) => {
       const li = el('li', line.note ? { class: 'is-note' } : {});
       if (line.note) li.textContent = line.text;
-      else li.append(el('b', {}, `${line.name}: `), document.createTextNode(line.text));
+      else {
+        li.append(el('b', {}, `${line.name}: `));
+        appendLinkedText(li, line.text);
+      }
       return li;
     });
     logList.replaceChildren(...items, emoteRow);

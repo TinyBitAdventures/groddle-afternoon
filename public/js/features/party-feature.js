@@ -45,6 +45,7 @@ import {
   partiersLine,
   partyCommand,
 } from '../party.js?v=8a98d6dd';
+import { appendLinkedText } from '../chat-links.js?v=b717fac7';
 
 export const PARTY_FEATURE_ID = 'party';
 /** The hit box over another player's Glitch and name plate (realtime-feature PLATE_Y -150). */
@@ -194,7 +195,10 @@ function createSession(engine, client) {
     logList.replaceChildren(...log.map((line) => {
       const li = el('li', line.note ? { class: 'is-note' } : {});
       if (line.note) li.textContent = line.text;
-      else li.append(el('b', {}, `${line.name}: `), document.createTextNode(line.text));
+      else {
+        li.append(el('b', {}, `${line.name}: `));
+        appendLinkedText(li, line.text);
+      }
       return li;
     }));
     logList.scrollTop = logList.scrollHeight;

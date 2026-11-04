@@ -61,6 +61,19 @@ export class FakeEl {
   append(...kids) { const ks = kids.map((k) => (typeof k === 'string' ? new FakeText(k) : k)); this.adopt(ks); this.children.push(...ks); }
   prepend(...kids) { this.adopt(kids); this.children.unshift(...kids); }
   replaceChildren(...kids) { for (const c of this.children) c.parentElement = null; this.children = []; this.append(...kids); }
+  // The tree edits a redraw that keeps its rows uses (js/ui/keyed-nodes.js reconcileChildren).
+  get childNodes() { return this.children; }
+  get firstChild() { return this.children[0] || null; }
+  get nextSibling() { return siblingAfter(this); }
+  removeChild(k) { this.children = this.children.filter((c) => c !== k); k.parentElement = null; return k; }
+  insertBefore(k, ref) {
+    this.adopt([k]);
+    const i = ref ? this.children.indexOf(ref) : -1;
+    if (i < 0) this.children.push(k);
+    else this.children.splice(i, 0, k);
+    return k;
+  }
+  remove() { this.parentElement?.removeChild(this); }
   addEventListener(type, fn, capture) { (this.listeners[type] ||= []).push({ fn, capture: Boolean(capture) }); }
   dispatch(type, init = {}) {
     // Capture from the top, then bubble from the target (enough for submit and keydown here).
@@ -84,7 +97,15 @@ export class FakeEl {
   scrollIntoView() {}
   setSelectionRange() {}
 }
-export class FakeText { constructor(t) { this.textContent = String(t); this.parentElement = null; } }
+export class FakeText {
+  constructor(t) { this.textContent = String(t); this.parentElement = null; }
+  get nextSibling() { return siblingAfter(this); }
+}
+function siblingAfter(n) {
+  const kids = n.parentElement?.children || [];
+  const i = kids.indexOf(n);
+  return i >= 0 ? kids[i + 1] || null : null;
+}
 
 export function page() {
   const doc = {

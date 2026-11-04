@@ -1559,6 +1559,8 @@
 :root[data-ui="classic"] .social-drawer .social-msg > b[data-classic-name="5"] { color: var(--c-classic-name-5); }
 :root[data-ui="classic"] .social-drawer .social-msg .social-name { color: inherit; font: inherit; }
 :root[data-ui="classic"] .social-drawer .social-msg .social-name:hover { text-decoration: underline; }
+/* Links in chat lines: the client's link colour, underlined (StringUtil.as linkify's chat_element_url). */
+:root[data-ui="classic"] .social-drawer .chat-link { color: var(--c-classic-link); }
 :root[data-ui="classic"] .social-drawer :is(.social-title[data-classic-title]::before, .classic-lower-title) { font-size: calc(var(--fs-classic-pane) * var(--cu-n, 1)); }
 :root[data-ui="classic"] .social-drawer .social-time { font-size: calc(var(--fs-classic-count) * var(--cu-n, 1)); }
 :root[data-ui="classic"] .social-drawer :is(#local-chat-input, .classic-lower-input) { font-size: calc(var(--fs-classic-chat) * var(--cu-n, 1)); }
