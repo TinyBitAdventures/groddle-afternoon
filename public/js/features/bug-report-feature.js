@@ -85,10 +85,23 @@ export const BUG_TEXT = Object.freeze({
 export const MAX_MESSAGE = 4000;
 const MAX_ERRORS = 10;
 
-/** The page's last errors, newest last, each cut short. */
+/**
+ * The browser's own ResizeObserver notice (ticket 98): a layout loop it settled itself, not a
+ * fault, so a report never carries it. Chrome, Firefox and Safari say "ResizeObserver loop
+ * completed with undelivered notifications." (the spec's words); Chrome before 2023 said
+ * "ResizeObserver loop limit exceeded". Some wrap it in "Uncaught" or "Error:".
+ */
+const BENIGN_ERROR = /^(?:uncaught\s+)?(?:error:\s*)?ResizeObserver loop (?:completed with undelivered notifications|limit exceeded)\.?$/i;
+
+/** True for a page error that is a browser notice, not a fault: left out of reports. */
+export function benignError(text) {
+  return BENIGN_ERROR.test(String(text || '').replace(/\s+/g, ' ').trim());
+}
+
+/** The page's last errors, newest last, each cut short; browser notices (benignError) left out. */
 export function rememberError(list, text) {
   const line = String(text || '').replace(/\s+/g, ' ').trim().slice(0, 300);
-  if (!line) return list;
+  if (!line || benignError(line)) return list;
   list.push(line);
   if (list.length > MAX_ERRORS) list.splice(0, list.length - MAX_ERRORS);
   return list;

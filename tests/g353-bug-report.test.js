@@ -9,7 +9,7 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { BUG_TEXT, MAX_MESSAGE, bugReportFeature, buildKey, rememberError, reportContext } from '../public/js/features/bug-report-feature.js?v=2a531cf9';
+import { BUG_TEXT, MAX_MESSAGE, benignError, bugReportFeature, buildKey, rememberError, reportContext } from '../public/js/features/bug-report-feature.js?v=f8207042';
 import { createMinnAccount } from '../public/js/minn-account.js?v=28026657';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -40,6 +40,37 @@ describe('Report a bug (G353)', () => {
     assert.equal(list.length, 10);
     assert.equal(list[0], 'Error 5 at game.js:5');
     assert.equal(list.at(-1).length, 300);
+  });
+
+  it('leaves the browser\'s ResizeObserver notice out of the errors (ticket 98)', () => {
+    const list = [];
+    // Chrome, Firefox and Safari (the spec's words), Chrome before 2023, and wrapped forms.
+    for (const notice of [
+      'ResizeObserver loop completed with undelivered notifications.',
+      'ResizeObserver loop completed with undelivered notifications',
+      'ResizeObserver loop limit exceeded',
+      'Uncaught ResizeObserver loop completed with undelivered notifications.',
+      'Error: ResizeObserver loop limit exceeded',
+      '  ResizeObserver loop completed\n with undelivered notifications. ',
+    ]) {
+      assert.equal(benignError(notice), true, notice);
+      rememberError(list, notice);
+    }
+    assert.deepEqual(list, []);
+    // Only exactly that notice: a real error that mentions it, or another ResizeObserver fault, stays.
+    for (const real of [
+      'TypeError: ResizeObserver loop completed with undelivered notifications is not a function',
+      'ResizeObserver is not defined',
+      'Unhandled: ResizeObserver loop limit exceeded in panel.js',
+      'Error 1 at game.js:1',
+    ]) {
+      assert.equal(benignError(real), false, real);
+      rememberError(list, real);
+    }
+    assert.equal(list.length, 4);
+    // The page listener feeds rememberError, so the filter covers every caught error.
+    const src = readFileSync(join(root, 'public/js/features/bug-report-feature.js'), 'utf8');
+    assert.match(src, /addEventListener\('error', \(e\) => rememberError\(pageErrors,/);
   });
 
   it('names the build from the online page and the street and place from the engine', () => {
