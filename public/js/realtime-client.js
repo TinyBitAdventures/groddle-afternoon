@@ -355,7 +355,8 @@ export function createRealtimeClient({
       case 'said': {
         const mine = Number(msg.id) === me?.id;
         if (awaitingStreet && !mine) return;
-        emit('said', { id: Number(msg.id), name: String(msg.name || ''), text: String(msg.text || ''), at: Number(msg.at) || now(), mine });
+        // lid: the line's id for reactions (groddle-afternoon-server reactions.go); 0 from a server without them.
+        emit('said', { id: Number(msg.id), name: String(msg.name || ''), text: String(msg.text || ''), at: Number(msg.at) || now(), mine, lid: Math.max(0, Math.floor(Number(msg.lid)) || 0) });
         return;
       }
       case 'typing': {

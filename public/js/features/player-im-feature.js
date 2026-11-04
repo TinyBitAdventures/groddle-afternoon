@@ -42,7 +42,7 @@ import {
   normalLine,
   normalState,
   refusalText,
-} from '../player-im.js?v=04c55d2f';
+} from '../player-im.js?v=b301574b';
 
 export const PLAYER_IM_FEATURE_ID = 'player-im';
 
@@ -122,7 +122,7 @@ function createSession(engine, client) {
   }
 
   function linesFor(c) {
-    return c.lines.map((l) => drawerLine(l, { me: me(), myName: myName(), name: c.name }));
+    return c.lines.map((l) => drawerLine(l, { me: me(), myName: myName(), name: c.name, withId: c.id }));
   }
 
   function countTalk(id) {
@@ -167,7 +167,7 @@ function createSession(engine, client) {
     c.online = msg.with.online === true;
     const mine = line.from === me();
     const fresh = handOver(c);
-    social?.push(imId(id), drawerLine(line, { me: me(), myName: myName(), name: c.name }));
+    social?.push(imId(id), drawerLine(line, { me: me(), myName: myName(), name: c.name, withId: id }));
     countTalk(id);
     if (mine) {
       if (!c.online && !c.offlineSaid) {

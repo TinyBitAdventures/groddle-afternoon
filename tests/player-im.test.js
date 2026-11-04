@@ -21,10 +21,10 @@ import {
   imVerb,
   normalState,
   refusalText,
-} from '../public/js/player-im.js?v=04c55d2f';
-import { playerImFeature } from '../public/js/features/player-im-feature.js?v=8bb50d68';
-import { FEATURES } from '../public/js/features/index.js?v=41c08a4e';
-import { mountSocialDrawer } from '../public/js/ui/social-drawer.js?v=8c8cdd4c';
+} from '../public/js/player-im.js?v=b301574b';
+import { playerImFeature } from '../public/js/features/player-im-feature.js?v=ca120549';
+import { FEATURES } from '../public/js/features/index.js?v=890aed4a';
+import { mountSocialDrawer } from '../public/js/ui/social-drawer.js?v=9470c534';
 import { createNotifier } from '../public/js/notify.js?v=37c6b748';
 import { memoryStore, page } from './social-fake-dom.js';
 import { serverPath, sitePath, skipWithoutSite } from '../tools/repos.mjs';
@@ -82,9 +82,9 @@ describe('IMs: rules and copy', () => {
     assert.equal(s.length, 1);
     assert.deepEqual(s[0].lines.map((l) => l.text), ['a', 'b']);
     assert.equal(s[0].name, 'Bo');
-    assert.deepEqual(drawerLine({ from: 7, text: 'a', at: 1 }, { me: 7, myName: 'Ada', name: 'Bo' }), { name: 'Ada', text: 'a', mine: true, at: 1, playerId: 0 });
+    assert.deepEqual(drawerLine({ from: 7, text: 'a', at: 1 }, { me: 7, myName: 'Ada', name: 'Bo' }), { name: 'Ada', text: 'a', mine: true, at: 1, playerId: 0, rk: '' });
     // RIGHTCLICK: the other player's line carries their id (their name opens their menu).
-    assert.deepEqual(drawerLine({ from: 8, text: 'b', at: 2 }, { me: 7, myName: 'Ada', name: 'Bo' }), { name: 'Bo', text: 'b', mine: false, at: 2, playerId: 8 });
+    assert.deepEqual(drawerLine({ from: 8, text: 'b', at: 2 }, { me: 7, myName: 'Ada', name: 'Bo' }), { name: 'Bo', text: 'b', mine: false, at: 2, playerId: 8, rk: '' });
   });
 });
 

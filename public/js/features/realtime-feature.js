@@ -57,13 +57,14 @@
  */
 
 import { createMinnAccount } from '../minn-account.js?v=28026657';
-import { EMOTES, createRealtimeClient, createTrack, pushSample, sampleTrack } from '../realtime-client.js?v=d890c210';
+import { EMOTES, createRealtimeClient, createTrack, pushSample, sampleTrack } from '../realtime-client.js?v=ff6d1f95';
 import { ANIM_FPS, EMOTION_MS, animForState, crowdScaleX } from '../avatar-anims.js?v=fb921bf4';
 import { movedLine } from '../admin-teleport.js?v=fa56e8df';
 import { ADMIN_TEXT, applyAdminGive, applyAdminRefill, showAdminMessage, showBooted } from '../admin-console-mp.js?v=7c028ca0';
 import { saveStore } from '../save-store.js?v=8839ba7b';
 import { STREET_INDEX } from '../street-loader.js?v=33d2b8bc';
 import { appendLinkedText } from '../chat-links.js?v=b717fac7';
+import { lineKey } from '../chat-reactions.js?v=d65d555b';
 
 export const REALTIME_FEATURE_ID = 'realtime';
 /** Lines kept in the chat log. */
@@ -526,7 +527,7 @@ function createSession(engine) {
     const r = remotes.get(p.id);
     if (r) pushSample(r.track, { x: p.x, y: p.y, dir: p.dir, anim: p.anim }, performance.now());
   });
-  client.on('said', ({ id, name, text, mine }) => {
+  client.on('said', ({ id, name, text, mine, lid }) => {
     // A blocked player's words never reach you (buddies-feature: the source's buddy_ignore).
     if (!mine && engine.query?.('realtimeHidden', id)) return;
     addLog({ name, text });
@@ -539,7 +540,8 @@ function createSession(engine) {
     }
     if (r) engine.say?.(r.target, text, BUBBLE_MS, { speaker: name });
     // RIGHTCLICK: who said it, so their name in Local opens their menu (js/ui/player-menu.js).
-    engine.chatLine?.(name, text, { playerId: Number(id) || 0 });
+    // REACTIONS: the line's key (features/chat-reactions-feature.js claims your own lines' keys).
+    engine.chatLine?.(name, text, { playerId: Number(id) || 0, rk: lineKey(lid) });
   });
   client.on('typing', ({ id }) => {
     if (engine.query?.('realtimeHidden', id)) return;

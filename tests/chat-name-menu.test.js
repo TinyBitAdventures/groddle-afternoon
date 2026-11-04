@@ -12,7 +12,7 @@ import { describe, it, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { memoryStore, page } from './social-fake-dom.js';
-import { mountSocialDrawer } from '../public/js/ui/social-drawer.js?v=8c8cdd4c';
+import { mountSocialDrawer } from '../public/js/ui/social-drawer.js?v=9470c534';
 import { createNotifier } from '../public/js/notify.js?v=37c6b748';
 import { browserMenuPolicy } from '../public/js/ui/context-guard.js?v=0f71ac17';
 
@@ -129,16 +129,16 @@ describe('a speaker\'s name in the drawer (js/ui/social-drawer.js)', () => {
 
 describe('the sender\'s id on every line path', () => {
   it('Local: realtime-feature passes it to engine.chatLine, game.js on to the drawer', () => {
-    assert.match(src('js/features/realtime-feature.js'), /engine\.chatLine\?\.\(name, text, \{ playerId: Number\(id\) \|\| 0 \}\);/);
+    assert.match(src('js/features/realtime-feature.js'), /engine\.chatLine\?\.\(name, text, \{ playerId: Number\(id\) \|\| 0, rk: lineKey\(lid\) \}\);/);
     const game = src('game.js');
-    assert.match(game, /chatLine: \(speaker, text, \{ playerId = 0 \} = \{\}\) => showLocalChatBubble\(String\(speaker \|\| ''\), String\(text \|\| ''\), \{ playerId: Number\(playerId\) \|\| 0 \}\),/);
-    assert.match(game, /socialDrawer\.localLine\(participant, message, \{ feat, mine, playerId \}\);/);
+    assert.match(game, /chatLine: \(speaker, text, \{ playerId = 0, rk = '' \} = \{\}\) => showLocalChatBubble\(String\(speaker \|\| ''\), String\(text \|\| ''\), \{ playerId: Number\(playerId\) \|\| 0, rk: String\(rk \|\| ''\) \}\),/);
+    assert.match(game, /socialDrawer\.localLine\(participant, message, \{ feat, mine, playerId, rk \}\);/);
     assert.match(game, /playerMenu: \(opts\) => openPlayerListMenu\(opts\),\n\s+contextMenu: \(\) => playerContextMenu\(\),/);
   });
 
   it('Global, groups, Live Help and the Trade Channel (groups-feature), the party and IMs', () => {
-    assert.match(src('js/features/groups-feature.js'), /const drawerLine = \(line\) => \(line\.note \? \{ note: true, text: line\.text \} : \{ name: line\.name, text: line\.text, mine: line\.id === userId\(\), at: line\.at, playerId: line\.id \}\);/);
-    assert.match(src('js/features/party-feature.js'), /social\?\.push\('party', \{ name, text, mine: Number\(msg\.id\) === me\(\), at: Number\(msg\.at\) \|\| Date\.now\(\), playerId: Number\(msg\.id\) \|\| 0 \}\)/);
+    assert.match(src('js/features/groups-feature.js'), /const drawerLine = \(line\) => \(line\.note \? \{ note: true, text: line\.text \} : \{ name: line\.name, text: line\.text, mine: line\.id === userId\(\), at: line\.at, playerId: line\.id, rk: reactKey\(line\.lid\) \}\);/);
+    assert.match(src('js/features/party-feature.js'), /social\?\.push\('party', \{ name, text, mine: Number\(msg\.id\) === me\(\), at: Number\(msg\.at\) \|\| Date\.now\(\), playerId: Number\(msg\.id\) \|\| 0, rk: lineKey\(msg\.lid\) \}\)/);
     assert.match(src('js/player-im.js'), /playerId: mine \? 0 : Number\(line\.from\) \|\| 0/);
   });
 

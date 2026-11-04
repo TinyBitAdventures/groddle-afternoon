@@ -7,12 +7,12 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { FROM_LIST_VERBS, PLAYER_TARGET_FEATURE, listPlayerTarget, opensPlayerMenu, playerMenuRows } from '../public/js/ui/player-menu.js?v=51949c59';
+import { FROM_LIST_VERBS, PLAYER_TARGET_FEATURE, listPlayerTarget, opensPlayerMenu, playerMenuRows } from '../public/js/ui/player-menu.js?v=cc2a8016';
 import { PROFILE_PAGE_VERB } from '../public/js/profiles.js?v=86423d98';
-import { IM_VERB_ID } from '../public/js/player-im.js?v=04c55d2f';
+import { IM_VERB_ID } from '../public/js/player-im.js?v=b301574b';
 import { BUDDY_VERBS } from '../public/js/buddies.js?v=df41a3bb';
 import { VISIT_VERB } from '../public/js/neighbours-mp.js?v=a8d5544e';
-import { PARTY_FEATURE_ID } from '../public/js/features/party-feature.js?v=45bef442';
+import { PARTY_FEATURE_ID } from '../public/js/features/party-feature.js?v=3a7cf4c6';
 
 const game = readFileSync(new URL('../public/game.js', import.meta.url), 'utf8');
 const glue = game.slice(game.indexOf('let playerCtxMenu = null;'), game.indexOf('function openPlayerListMenu('));

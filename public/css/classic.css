@@ -1572,6 +1572,59 @@
 :root[data-ui="classic"] .social-drawer .social-msg .social-name:hover { text-decoration: underline; }
 /* Links in chat lines: the client's link colour, underlined (StringUtil.as linkify's chat_element_url). */
 :root[data-ui="classic"] .social-drawer .chat-link { color: var(--c-classic-link); }
+/* Reactions (js/ui/reaction-strip.js; the remake's own, the client had none): in the chat column's
+   dress. Chips are the chat input's grey with its rule (InputField.as 106-134), yours in its pale
+   yellow highlight; the add button a plain grey face; the picker the 2012 menu card (white at .95,
+   radius 5, the drop under it); who reacted in the client's pale yellow tip (TipDisplayManager). */
+:root[data-ui="classic"] .react-add {
+  width: calc(22 * var(--cu));
+  height: calc(16 * var(--cu));
+  margin-left: calc(4 * var(--cu));
+  border: 1px solid var(--c-classic-input-border);
+  border-radius: 3px;
+  background: var(--c-classic-panel);
+  color: var(--c-classic-tab-off);
+  vertical-align: calc(-3 * var(--cu));
+}
+:root[data-ui="classic"] .react-add svg { width: calc(14 * var(--cu)); height: calc(14 * var(--cu)); }
+:root[data-ui="classic"] .react-add:hover { border-color: var(--c-classic-input-hi-border); background: var(--c-classic-input-hi); color: var(--c-classic-link); }
+:root[data-ui="classic"] .react-add:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--c-classic-focus); }
+:root[data-ui="classic"] .react-strip { gap: calc(3 * var(--cu)); margin-top: calc(2 * var(--cu)); }
+:root[data-ui="classic"] .react-chip {
+  gap: calc(3 * var(--cu));
+  min-height: calc(18 * var(--cu));
+  padding: 0 calc(5 * var(--cu));
+  border: 1px solid var(--c-classic-input-border);
+  border-radius: 3px;
+  background: var(--c-classic-input);
+  color: var(--c-classic-text);
+  font: 700 var(--fs-classic-count)/var(--lh-none) var(--font-classic-count);
+}
+:root[data-ui="classic"] .react-chip:hover { border-color: var(--c-classic-input-hi-border); background: var(--c-classic-input-hi); }
+:root[data-ui="classic"] .react-chip.is-mine { border-color: var(--c-classic-input-hi-border); background: var(--c-classic-input-hi); color: var(--c-classic-title); }
+:root[data-ui="classic"] .react-chip:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--c-classic-focus); }
+:root[data-ui="classic"] .react-chip .react-glyph { font-size: var(--fs-classic-body); }
+:root[data-ui="classic"] .react-picker {
+  gap: 0;
+  padding: calc(3 * var(--cu));
+  border: 0;
+  border-radius: 5px;
+  background: color-mix(in srgb, var(--c-classic-panel) 95%, transparent);
+  box-shadow: 0 2px 1px color-mix(in srgb, var(--c-classic-ink) 60%, transparent);
+}
+:root[data-ui="classic"] .react-pick { width: calc(28 * var(--cu)); height: calc(26 * var(--cu)); border: 1px solid transparent; border-radius: 3px; }
+:root[data-ui="classic"] .react-pick .react-glyph { font-size: var(--fs-classic-pane); }
+:root[data-ui="classic"] .react-pick:is(:hover, :focus-visible) { outline: none; background: var(--c-classic-verb-hi); border-color: var(--c-classic-verb-edge); }
+:root[data-ui="classic"] .react-pick[aria-checked="true"] { background: var(--c-classic-input-hi); border-color: var(--c-classic-input-hi-border); box-shadow: none; }
+:root[data-ui="classic"] .react-tip {
+  padding: calc(3 * var(--cu)) calc(6 * var(--cu));
+  border: 1px solid color-mix(in srgb, var(--c-classic-ink) 37%, transparent);
+  border-radius: calc(4 * var(--cu));
+  background: var(--c-classic-tip);
+  box-shadow: 0 1px 2px color-mix(in srgb, var(--c-classic-ink) 15%, transparent);
+  color: var(--c-classic-text);
+  font: var(--fs-classic-body)/var(--lh-tight) var(--font-classic-body);
+}
 :root[data-ui="classic"] .social-drawer :is(.social-title[data-classic-title]::before, .classic-lower-title) { font-size: calc(var(--fs-classic-pane) * var(--cu-n, 1)); }
 :root[data-ui="classic"] .social-drawer .social-time { font-size: calc(var(--fs-classic-count) * var(--cu-n, 1)); }
 :root[data-ui="classic"] .social-drawer :is(#local-chat-input, .classic-lower-input) { font-size: calc(var(--fs-classic-chat) * var(--cu-n, 1)); line-height: calc(17 * var(--cu)); }

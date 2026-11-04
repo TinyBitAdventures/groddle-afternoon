@@ -182,7 +182,8 @@ export function chatLine(m) {
   const id = n0(m?.id);
   const text = String(m?.text ?? '').slice(0, 200);
   if (!id || !text) return null;
-  return { id, name: str(m?.name, 32) || 'A Glitch', text, at: Number(m?.at) || 0 };
+  // lid: the line's id for reactions (the server's reactions.go), 0 without one.
+  return { id, name: str(m?.name, 32) || 'A Glitch', text, at: Number(m?.at) || 0, lid: Math.max(0, Math.floor(Number(m?.lid)) || 0) };
 }
 
 /** Appends to a tab's lines, keeping the last CHAT_LINES. */

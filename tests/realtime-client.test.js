@@ -31,10 +31,10 @@ import {
   pushSample,
   sampleTrack,
   socketUrl,
-} from '../public/js/realtime-client.js?v=d890c210';
+} from '../public/js/realtime-client.js?v=ff6d1f95';
 import { createMinnAccount } from '../public/js/minn-account.js?v=28026657';
-import { emoteCommand, lookOf, poseOf, realtimeFeature, sharedStreet, statusText } from '../public/js/features/realtime-feature.js?v=9ddd4a70';
-import { FEATURES } from '../public/js/features/index.js?v=41c08a4e';
+import { emoteCommand, lookOf, poseOf, realtimeFeature, sharedStreet, statusText } from '../public/js/features/realtime-feature.js?v=8e716a0e';
+import { FEATURES } from '../public/js/features/index.js?v=890aed4a';
 
 const root = join(import.meta.dirname, '..');
 const read = (rel) => readFileSync(join(root, rel), 'utf8');
@@ -327,7 +327,7 @@ describe('realtime-client: moves, chat, emotes', () => {
     ws.receive({ t: 'said', id: 7, name: 'Ada', text: 'hello there', at: 5 });
     ws.receive({ t: 'said', id: 8, name: 'Bo', text: 'hi Ada', at: 6 });
     const said = ctx.events.filter(([k]) => k === 'said').map(([, d]) => d);
-    assert.deepEqual(said, [{ id: 7, name: 'Ada', text: 'hello there', at: 5, mine: true }, { id: 8, name: 'Bo', text: 'hi Ada', at: 6, mine: false }]);
+    assert.deepEqual(said, [{ id: 7, name: 'Ada', text: 'hello there', at: 5, mine: true, lid: 0 }, { id: 8, name: 'Bo', text: 'hi Ada', at: 6, mine: false, lid: 0 }]);
     ws.receive({ t: 'error', code: 'slow_down', message: 'Slow down a little.' });
     assert.deepEqual(ctx.events.at(-1), ['error', { code: 'slow_down', message: 'Slow down a little.' }]);
   });

@@ -23,6 +23,8 @@
  * the Social drawer's Chats list, under Private, noted Buddy or Player.
  */
 
+import { imKey } from './chat-reactions.js?v=d65d555b';
+
 /** A conversation's id in the Social drawer: im:<player id>. */
 export const IM_PREFIX = 'im:';
 
@@ -96,7 +98,8 @@ export function normalLine(l) {
   const from = Math.floor(Number(l?.from));
   const text = String(l?.text ?? '').slice(0, 400);
   if (!(id > 0) || !(from > 0) || !text) return null;
-  return { id, from, text, at: Number(l?.at) || 0 };
+  // r: the line's reactions as the server keeps them (features/chat-reactions-feature.js reads them).
+  return { id, from, text, at: Number(l?.at) || 0, ...(Array.isArray(l?.r) ? { r: l.r } : {}) };
 }
 
 /** PURE: the conversations of an im_state: [{ id, name, online, lines, unread }], bad ones left out. */
@@ -112,10 +115,12 @@ export function normalState(msg) {
 }
 
 /** PURE: a server line as the drawer draws it ({ name, text, mine, at }). */
-export function drawerLine(line, { me = 0, myName = 'You', name = '' } = {}) {
+export function drawerLine(line, { me = 0, myName = 'You', name = '', withId = 0 } = {}) {
   const mine = Number(line.from) === Number(me);
   // RIGHTCLICK: the other player's id, so their name in the conversation opens their menu.
-  return { name: mine ? myName : name || IM_TEXT.someone, text: line.text, mine, at: line.at || Date.now(), playerId: mine ? 0 : Number(line.from) || 0 };
+  // REACTIONS: the line's key, the other player and its id in the conversation (js/chat-reactions.js).
+  const other = Number(withId) || (mine ? 0 : Number(line.from)) || 0;
+  return { name: mine ? myName : name || IM_TEXT.someone, text: line.text, mine, at: line.at || Date.now(), playerId: mine ? 0 : Number(line.from) || 0, rk: imKey(other, line.id) };
 }
 
 /** PURE: what a refusal says in the conversation. */

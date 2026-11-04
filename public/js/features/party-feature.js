@@ -46,6 +46,7 @@ import {
   partyCommand,
 } from '../party.js?v=8a98d6dd';
 import { appendLinkedText } from '../chat-links.js?v=b717fac7';
+import { lineKey } from '../chat-reactions.js?v=d65d555b';
 
 export const PARTY_FEATURE_ID = 'party';
 /** The hit box over another player's Glitch and name plate (realtime-feature PLATE_Y -150). */
@@ -277,7 +278,8 @@ function createSession(engine, client) {
     lastSaid = `${name}:${text}`;
     addLog({ name, text });
     // RIGHTCLICK: the sender's id goes with the line, so their name opens their menu.
-    if (!social?.push('party', { name, text, mine: Number(msg.id) === me(), at: Number(msg.at) || Date.now(), playerId: Number(msg.id) || 0 })) engine.chatLine?.(`Party · ${name}`, text);
+    // REACTIONS: the line's key from its id (js/chat-reactions.js).
+    if (!social?.push('party', { name, text, mine: Number(msg.id) === me(), at: Number(msg.at) || Date.now(), playerId: Number(msg.id) || 0, rk: lineKey(msg.lid) })) engine.chatLine?.(`Party · ${name}`, text);
     publish();
   });
   client.on('msg:party_invited', (msg) => {

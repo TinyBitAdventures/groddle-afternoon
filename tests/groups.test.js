@@ -31,10 +31,10 @@ import {
   tabCommand,
   tabOrder,
   writeMemory,
-} from '../public/js/groups.js?v=14b60589';
+} from '../public/js/groups.js?v=ec9689ca';
 import { createMinnAccount } from '../public/js/minn-account.js?v=28026657';
-import { groupsFeature } from '../public/js/features/groups-feature.js?v=4e697338';
-import { FEATURES } from '../public/js/features/index.js?v=41c08a4e';
+import { groupsFeature } from '../public/js/features/groups-feature.js?v=a970e0e5';
+import { FEATURES } from '../public/js/features/index.js?v=890aed4a';
 import { serverPath, sitePath, skipWithoutServer, skipWithoutSite } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');
@@ -112,7 +112,7 @@ describe('groups rules (js/groups.js)', () => {
     assert.equal(lines.length, 50);
     assert.equal(lines[0].text, '10');
     assert.equal(chatLine({ id: 0, text: 'x' }), null);
-    assert.deepEqual(chatLine({ id: 2, name: 'Bo', text: 'hi', at: 5 }), { id: 2, name: 'Bo', text: 'hi', at: 5 });
+    assert.deepEqual(chatLine({ id: 2, name: 'Bo', text: 'hi', at: 5 }), { id: 2, name: 'Bo', text: 'hi', at: 5, lid: 0 });
     const store = new Map();
     const storage = { getItem: (k) => store.get(k) ?? null, setItem: (k, v) => store.set(k, v) };
     assert.ok(writeMemory(storage, 5, { open: ['global', 'group:3', 'bogus', 'global'], tab: 'group:3', intro: { help: true } }));

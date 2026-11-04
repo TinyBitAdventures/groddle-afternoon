@@ -31,7 +31,7 @@ import {
 } from '../public/js/buddies.js?v=df41a3bb';
 import { createMinnAccount } from '../public/js/minn-account.js?v=28026657';
 import { buddiesFeature } from '../public/js/features/buddies-feature.js?v=01fc8d91';
-import { FEATURES } from '../public/js/features/index.js?v=41c08a4e';
+import { FEATURES } from '../public/js/features/index.js?v=890aed4a';
 import { serverPath, sitePath, skipWithoutServer, skipWithoutSite } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');

@@ -54,6 +54,12 @@
  * party, Close for an IM), and for an IM the other player's menu from a list (without IM: Open is
  * the IM). The menu closes when the drawer collapses or the tab changes.
  *
+ * REACTIONS (js/chat-reactions.js, js/ui/reaction-strip.js; Austin 2026-11-04): online, a line handed over
+ * with a reaction key (`rk`: a Local, party, channel or group line's id from the server, or an IM line's)
+ * has an add-reaction button and its chips under the words; features/chat-reactions-feature.js connects
+ * the sender (reactions.connect) and hands each line's reactions over (reactions.set). A change redraws
+ * only that line's chips, in place: the rows and their words stay, so a selection survives it too.
+ *
  * QA: canvas data socialOpen (open|rail), socialTab (the tab selected: activity, local, global,
  * buddies or chats), socialChat (the conversation open in Chats, or ''), socialTabs (the row),
  * socialChats (the list's ids in order), socialUnread (id:n,... for every tab and conversation with
@@ -61,11 +67,13 @@
  */
 import { colorizeAmounts } from '../notify-view.js?v=2835afc0';
 import { bindContextTrigger, MORE_KEYS_LABEL } from './context-menu.js?v=57c5f1fe';
-import { IM_VERB_ID } from '../player-im.js?v=04c55d2f';
+import { IM_VERB_ID } from '../player-im.js?v=b301574b';
 import { selectionCovers } from './context-guard.js?v=0f71ac17';
 import { appendLinkedText, linkifyTextNodes } from '../chat-links.js?v=b717fac7';
 import { bindChatInput } from './chat-input.js?v=3cb4ce2e';
 import { createNodeCache, pressLeavesKeys, reconcileChildren, uniqueKeys } from './keyed-nodes.js?v=9ab4de5c';
+import { createReactionUI } from './reaction-strip.js?v=5118c23b';
+import { sameWords } from '../chat-reactions.js?v=d65d555b';
 
 export const SOCIAL_STORE_KEY = 'groddle-social-drawer';
 /** The drawer opens by default at this window width and up (the mock's 1440 rule). */
@@ -316,6 +324,25 @@ export function mountSocialDrawer({
   /** Ids of buddies' "added you" already seen on the Buddies tab. */
   const seenAdds = new Set();
   let addsUnread = 0;
+
+  // REACTIONS: rk -> the line's reactions ([{ key, by }]); the sender once a feature connects one.
+  const reactStore = new Map();
+  let reactor = null;
+  const reactUI = online
+    ? createReactionUI({
+      doc: document,
+      reactions: (rk) => reactStore.get(rk) || [],
+      me: () => Number(reactor?.me?.()) || 0,
+      send: (rk, key, on) => Boolean(reactor?.send?.(rk, key, on)),
+      enabled: () => Boolean(reactor),
+      host: () => root,
+    })
+    : null;
+  /** A drawn row of a line: its reaction button and chips (once), as they are now. */
+  const decorateRow = (node, line) => {
+    if (reactUI && line?.rk && !line.note && !line.sep) reactUI.decorate(node, line);
+    return node;
+  };
 
   function addTab(id, opts) {
     const was = tabs.get(id);
@@ -722,7 +749,7 @@ export function mountSocialDrawer({
    * The rows for `items` (oldest first) with their time lines, each row the one made before for the
    * same key (`keyOf`), else `make(item)`; the cache forgets the rest.
    */
-  function keyedRows(items, { atOf, keyOf, make, cache }) {
+  function keyedRows(items, { atOf, keyOf, make, cache, after = null }) {
     const keys = uniqueKeys(items, keyOf);
     const nodes = [];
     let i = 0;
@@ -738,7 +765,8 @@ export function mountSocialDrawer({
         nodes.push(cache.get(`sep|${label}|${key}`, () => lineNode({ sep: label })));
         sep = null;
       }
-      nodes.push(cache.get(key, () => make(x)));
+      const node = cache.get(key, () => make(x));
+      nodes.push(after ? after(node, x) : node);
     }
     cache.sweep();
     return nodes;
@@ -869,7 +897,7 @@ export function mountSocialDrawer({
       log.setAttribute('aria-live', 'off');
     } else {
       nodes = t.lines.length
-        ? keyedRows(t.lines, { atOf: (l) => l.at, keyOf: (l) => lineKey(t.id, l), make: lineNode, cache: cacheFor('log') })
+        ? keyedRows(t.lines, { atOf: (l) => l.at, keyOf: (l) => lineKey(t.id, l), make: lineNode, cache: cacheFor('log'), after: decorateRow })
         : t.empty ? [el('p', { class: 'social-empty' }, t.empty)] : [];
       log.setAttribute('aria-live', 'polite');
     }
@@ -958,7 +986,10 @@ export function mountSocialDrawer({
     if (next !== open) {
       open = next;
       if (open) log.dataset.jump = '1';
-      else closeDrawerMenu();
+      else {
+        closeDrawerMenu();
+        reactUI?.closePicker();
+      }
     }
     render();
     if (focus === 'tab') tablist.querySelector('[aria-selected="true"]')?.focus({ preventScroll: true }) || log.focus({ preventScroll: true });
@@ -974,7 +1005,10 @@ export function mountSocialDrawer({
   function select(id, { focus = false } = {}) {
     if (id === CHATS_TAB ? !row().includes(CHATS_TAB) : !tabs.has(id)) return false;
     const changed = id !== tab;
-    if (changed) closeDrawerMenu();
+    if (changed) {
+      closeDrawerMenu();
+      reactUI?.closePicker();
+    }
     tab = id;
     log.dataset.jump = '1';
     render();
@@ -1004,6 +1038,8 @@ export function mountSocialDrawer({
       at: Number(line.at) || Date.now(),
       // RIGHTCLICK: who said it (their name opens their menu); 0 for a line no player said.
       playerId: Number.isFinite(playerId) && playerId > 0 ? Math.floor(playerId) : 0,
+      // REACTIONS: the line's reaction key ('' for a line nobody can react to).
+      rk: line.note ? '' : String(line.rk || ''),
     };
   }
 
@@ -1435,11 +1471,53 @@ export function mountSocialDrawer({
     },
     lines: (id) => (tabs.get(id)?.lines || []).map((l) => ({ ...l })),
     /**
+     * REACTIONS: your own line said on Local comes back from the server with its id (the drawer showed
+     * it as you said it): the oldest of your last lines there without a key and with these words gets
+     * `rk`. True when one did.
+     */
+    claimLine(id, text, rk) {
+      const t = tabs.get(id);
+      if (!t || t.kind !== 'chat' || !rk || t.lines.some((l) => l.rk === rk)) return false;
+      const l = t.lines.slice(-20).find((x) => x.mine && !x.rk && !x.note && sameWords(x.text, text));
+      if (!l) return false;
+      l.rk = String(rk);
+      render();
+      return true;
+    },
+    /** REACTIONS: online only (null solo). */
+    reactions: reactUI ? {
+      /** The sender: { send(rk, key, on) -> bool, me() -> your player id }; null turns reactions off. */
+      connect(r) {
+        reactor = r && typeof r.send === 'function' ? r : null;
+        if (!reactor) reactUI.closePicker();
+        render();
+      },
+      /** A line's reactions now ([{ key, by: [{ id, name }] }]): its chips are drawn again in place. */
+      set(rk, list) {
+        const k = String(rk || '');
+        if (!k) return false;
+        if (list?.length) reactStore.set(k, list);
+        else reactStore.delete(k);
+        const atEnd = log.scrollHeight - log.scrollTop - log.clientHeight < 24;
+        const n = reactUI.update(k);
+        if (n && atEnd) log.scrollTop = log.scrollHeight;
+        setData('socialReactions', String(reactStore.size));
+        return true;
+      },
+      get: (rk) => (reactStore.get(String(rk || '')) || []).map((c) => ({ key: c.key, by: c.by.map((b) => ({ ...b })) })),
+      /** Opens the picker for a drawn row (QA and the keys); false without one. */
+      openPicker: (row, opts) => reactUI.openPicker(row, opts),
+      closePicker: (opts) => reactUI.closePicker(opts),
+      get pickerOpen() {
+        return reactUI.pickerOpen;
+      },
+    } : null,
+    /**
      * A Local chat line (game.js showLocalChatBubble: the player, a companion, another
      * player). Online it goes to Local; solo it is the Activity log's chat line.
      */
-    localLine(name, text, { mine = false, feat = false, playerId = 0 } = {}) {
-      if (online) return api.push('local', { name, text, mine, feat, playerId });
+    localLine(name, text, { mine = false, feat = false, playerId = 0, rk = '' } = {}) {
+      if (online) return api.push('local', { name, text, mine, feat, playerId, rk });
       notifier.chat(`${name}: ${text}`);
       return true;
     },
@@ -1488,6 +1566,7 @@ export function mountSocialDrawer({
         keyOf: (x) => (x.act ? entryKey(x.e) : lineKey(x.id, x.e)),
         make: (x) => (x.act ? activityNode(x.e) : lineNode(x.e)),
         cache: cacheFor(cache),
+        after: (node, x) => (x.act ? node : decorateRow(node, x.e)),
       });
     },
     /**

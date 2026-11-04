@@ -121,7 +121,7 @@ import {
 } from '../street-jobs-mp.js?v=59f9e769';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 import { createMinnAccount } from '../minn-account.js?v=28026657';
-import { normalizeGroups } from '../groups.js?v=14b60589';
+import { normalizeGroups } from '../groups.js?v=ec9689ca';
 import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=3149d699';
 import { JOB_WORK_OVERLAY, jobWorkFloatPoint, jobWorkSoundKey, jobWorkToolScale, jobWorkToolSheet } from '../job-work-fx.js?v=33f097ad';
 import { itemZ } from '../item-bands.js?v=e98b10bc';

@@ -65,8 +65,9 @@ import {
   tabCommand,
   tabOrder,
   writeMemory,
-} from '../groups.js?v=14b60589';
+} from '../groups.js?v=ec9689ca';
 import { appendLinkedText } from '../chat-links.js?v=b717fac7';
+import { lineKey as reactKey } from '../chat-reactions.js?v=d65d555b';
 
 export const GROUPS_FEATURE_ID = 'groups';
 
@@ -194,7 +195,8 @@ function createSession(engine, client) {
   /** channel -> its head in the drawer (Who is here, Close). */
   const heads = new Map();
   // RIGHTCLICK: the sender's id goes with the line, so their name opens their menu (js/ui/player-menu.js).
-  const drawerLine = (line) => (line.note ? { note: true, text: line.text } : { name: line.name, text: line.text, mine: line.id === userId(), at: line.at, playerId: line.id });
+  // REACTIONS: a line's reaction key from its id (js/chat-reactions.js).
+  const drawerLine = (line) => (line.note ? { note: true, text: line.text } : { name: line.name, text: line.text, mine: line.id === userId(), at: line.at, playerId: line.id, rk: reactKey(line.lid) });
   function headFor(channel) {
     let h = heads.get(channel);
     if (!h) {

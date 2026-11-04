@@ -9801,6 +9801,109 @@ html[data-street-cards] .notify-notices { visibility: hidden; }
 }
 .chat-link-confirm-open { border-color: var(--accent) !important; background: var(--accent) !important; color: var(--text-inverse) !important; }
 .chat-link-confirm-row :is(a, button):focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+/* REACTIONS (js/ui/reaction-strip.js): a line that can take reactions has a small add button after
+   its last word (it keeps its room, so nothing moves and no word is covered), shown while the line is
+   hovered or has the keyboard (always there for Tab), and its chips under the words. Calm: the
+   paper's own surfaces, the accent only on your own. */
+.react-add {
+  display: inline-grid;
+  place-items: center;
+  box-sizing: border-box;
+  width: 1.8em;
+  height: 1.3em;
+  margin-left: var(--sp-2);
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  background: var(--surface-bright);
+  color: var(--text-muted);
+  vertical-align: -0.25em;
+  opacity: 0;
+  cursor: pointer;
+  transition: opacity 0.12s ease;
+}
+.react-add svg { width: 1.05em; height: 1.05em; }
+.social-msg.can-react:hover > .react-add, .social-msg.can-react:focus-within > .react-add, .react-add[aria-expanded="true"] { opacity: 1; }
+.react-add:hover { border-color: var(--border-strong); color: var(--accent); }
+.react-add:focus-visible { opacity: 1; outline: 2px solid var(--focus); outline-offset: 1px; }
+@media (hover: none) { .react-add { opacity: 0.7; } }
+.react-strip { display: flex; flex-wrap: wrap; gap: var(--sp-2); margin-top: var(--sp-2); }
+.react-strip[hidden] { display: none; }
+.react-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  min-height: 22px;
+  padding: 0 var(--sp-4);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  background: var(--surface-bright);
+  color: var(--text);
+  font: inherit;
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-bold);
+  line-height: var(--lh-none);
+  cursor: pointer;
+}
+.react-chip:hover { border-color: var(--border-strong); background: var(--surface-card); }
+.react-chip.is-mine { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); }
+.react-chip:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; }
+.react-glyph { font-size: var(--fs-base); line-height: var(--lh-none); }
+/* Tiny Speck's "Hi" sign (CC0), its letters cut from the frame: the art is 444 x 348 at 3x, the letters
+   at 197,171 and 74 x 60. */
+.react-glyph-hi {
+  display: inline-block;
+  width: 1.5em;
+  height: calc(1.5em * 60 / 74);
+  background: url("assets/sprites/hi-signs/hi_hi_1@3x.webp?v=fe92c120") no-repeat;
+  background-size: calc(1.5em * 444 / 74) calc(1.5em * 348 / 74);
+  background-position: calc(1.5em * -197 / 74) calc(1.5em * -171 / 74);
+}
+.react-picker {
+  position: fixed;
+  z-index: var(--z-notice);
+  display: flex;
+  gap: var(--sp-1);
+  padding: var(--sp-2);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-pill);
+  background: var(--surface-card);
+  box-shadow: var(--shadow-2);
+}
+.react-pick {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-round);
+  background: transparent;
+  cursor: pointer;
+}
+.react-pick .react-glyph { font-size: var(--fs-xl); }
+.react-pick:hover { background: var(--surface-parchment); }
+.react-pick[aria-checked="true"] { background: var(--accent-soft); box-shadow: inset 0 0 0 1px var(--accent); }
+.react-pick:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; }
+.react-tip {
+  position: fixed;
+  z-index: var(--z-notice);
+  max-width: 240px;
+  padding: var(--sp-2) var(--sp-4);
+  border-radius: var(--radius-sm);
+  background: var(--surface-tip);
+  box-shadow: var(--shadow-1);
+  color: var(--text-tip);
+  font-family: var(--font-round);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-bold);
+  overflow-wrap: anywhere;
+  pointer-events: none;
+}
+.react-tip[hidden] { display: none; }
+/* The chips and buttons are not words: a selection across lines copies only what was said. */
+.react-add, .react-strip, .react-pick { -webkit-user-select: none; user-select: none; }
+@media (prefers-reduced-motion: reduce) { .react-add { transition: none; } }
 .social-act {
   display: grid;
   gap: var(--sp-1);
