@@ -209,7 +209,7 @@ export function doorRooms(json = {}) {
  * @param {string|string[]} to
  * @param {{ blocked?: Iterable<string>, locked?: Set<string>|null }} [opts]
  */
-export function findRoute(graph, from, to, { blocked = null, locked = null } = {}) {
+export function findRoute(graph, from, to, { blocked = null, locked = null, rides = null } = {}) {
   const start = graphKey(graph, from);
   if (!start) return null;
   const targets = new Set((Array.isArray(to) ? to : [to]).map((t) => graphKey(graph, t)).filter(Boolean));
@@ -218,15 +218,40 @@ export function findRoute(graph, from, to, { blocked = null, locked = null } = {
   const closed = new Set();
   for (const t of blocked || []) for (const a of tsidAliases(t)) closed.add(a);
   const keyed = locked && locked.size ? locked : null;
-  return bfs(graph, start, targets, closed, keyed) || (keyed ? bfs(graph, start, targets, closed, null) : null);
+  const walk = (extra) => bfs(graph, start, targets, closed, keyed, extra) || (keyed ? bfs(graph, start, targets, closed, null, extra) : null);
+  // The subway only when no road gets there (Austin, 2026-11-03: the way to Xalanga rides to Onto Parada).
+  return walk(null) || (rides ? walk(rides) : null);
 }
 
-function bfs(graph, start, targets, closed, locked) {
+/**
+ * The subway as route links (Austin, 2026-11-03): between every two of its surface streets, a
+ * ride (js/subway.js: in at the street's subway entrance, a Red Line or Blue Line ticket, off at
+ * the other stop, up its stairs). findRoute takes one only when no road leads there.
+ * @param {string[]} streets  the stations' surface street keys (js/street-jobs.js SUBWAY_STREETS)
+ * @returns {Record<string, string[]>}
+ */
+export function subwayRides(streets = []) {
+  const list = [...new Set(streets.filter(Boolean))];
+  const out = {};
+  for (const a of list) out[a] = list.filter((b) => b !== a);
+  return out;
+}
+
+/** Whether the hop from `a` to `b` is a subway ride and no road (subwayRides). */
+export function isRide(graph, rides, a, b) {
+  if (!rides || !a || !b) return false;
+  const ka = graphKey(graph, a) || a;
+  const kb = graphKey(graph, b) || b;
+  return Boolean(rides[ka]?.includes(kb)) && !(graph?.[ka] || []).includes(kb);
+}
+
+function bfs(graph, start, targets, closed, locked, rides = null) {
   const prev = new Map([[start, null]]);
   const queue = [start];
   for (let i = 0; i < queue.length; i++) {
     const cur = queue[i];
-    for (const next of graph[cur] || []) {
+    const on = rides?.[cur] ? [...(graph[cur] || []), ...rides[cur]] : graph[cur] || [];
+    for (const next of on) {
       if (prev.has(next)) continue;
       if (locked && locked.has(`${cur}>${next}`)) continue;
       if (closed.has(next) && !targets.has(next)) continue;
@@ -278,16 +303,16 @@ export function normalizeRouteState(seed = {}) {
  * several destinations: the closest one wins.
  * @returns {{ ok: boolean, state: object, route?: object, error?: string }}
  */
-export function planRoute(state, graph, { from, to, source = 'player', quest = '', inHome = false, blocked = null, locked = null, now = Date.now() } = {}) {
+export function planRoute(state, graph, { from, to, source = 'player', quest = '', inHome = false, blocked = null, locked = null, rides = null, now = Date.now() } = {}) {
   const s = normalizeRouteState(state);
   if (inHome) return { ok: false, state: s, error: ROUTE_TEXT.fromHome };
   const list = (Array.isArray(to) ? to : [to]).filter(Boolean);
   if (!list.length) return { ok: false, state: s, error: ROUTE_TEXT.notFound };
   if (from && list.some((t) => sameStreet(t, from))) return { ok: false, state: s, error: ROUTE_TEXT.alreadyThere };
-  const path = from ? findRoute(graph, from, list, { blocked, locked }) : null;
+  const path = from ? findRoute(graph, from, list, { blocked, locked, rides }) : null;
   // Only closed roads in the way (street projects): no route, and which streets are still being built.
   if (!path && from && graphKey(graph, from) && blocked) {
-    const open = findRoute(graph, from, list, { locked });
+    const open = findRoute(graph, from, list, { locked, rides });
     if (open) {
       const shut = new Set([...blocked].flatMap((t) => tsidAliases(t)));
       return { ok: false, state: s, error: ROUTE_TEXT.notFound, through: open.slice(1).filter((t) => shut.has(t)) };
@@ -340,7 +365,7 @@ export function routeStep(route, graph, currentTsid) {
  * know (homes, instances, Hell One).
  * @returns {{ state: object, events: string[] }}
  */
-export function enterStreet(state, graph, currentTsid, { now = Date.now(), offWorld = false, blocked = null, locked = null } = {}) {
+export function enterStreet(state, graph, currentTsid, { now = Date.now(), offWorld = false, blocked = null, locked = null, rides = null } = {}) {
   let s = normalizeRouteState(state);
   const events = [];
   const r = s.route;
@@ -359,7 +384,7 @@ export function enterStreet(state, graph, currentTsid, { now = Date.now(), offWo
   }
   const step = routeStep(r, graph, currentTsid);
   if (step.status === 'off' && !offWorld && graphKey(graph, currentTsid)) {
-    const path = findRoute(graph, currentTsid, r.destination, { blocked, locked });
+    const path = findRoute(graph, currentTsid, r.destination, { blocked, locked, rides });
     if (path && path.length > 1) {
       s = { ...s, route: { ...r, path } };
       events.push('rerouted');

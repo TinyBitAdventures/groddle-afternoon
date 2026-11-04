@@ -7,6 +7,8 @@
  * server's data/projects.json "built", projects.go buildFromStart). Glitch's admins opened a
  * street by unlocking it and left its job alone (locations/inc_admin.js admin_jobs_set_unlocked
  * 431-439), so a save with the project under way keeps what it holds and pays nothing out.
+ * The same day Austin added Konemaen Jaunt (206), Simo Steer (201) and Kala Close (240) in Jethimadh:
+ * the only walkable way to Xalanga for To Xalanga, And Beyond, by the subway to Onto Parada.
  */
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
@@ -25,6 +27,8 @@ const HOME = index.default;
 const opts = { exemptFrom: [HOME] };
 const list = JSON.parse(read('tools/street-jobs-built-from-start.json')).jobs;
 const HAZY = catalog.jobs['524'];
+const LIST = ['201', '206', '240', '524'];
+const JETHIMADH = { 201: 'Simo Steer', 206: 'Konemaen Jaunt', 240: 'Kala Close' };
 const yellow = Object.keys(index.streets).find((t) => index.streets[t].label === 'Yellow Yawning');
 const fresh = () => {
   const s = normalizeStreetJobState({});
@@ -33,12 +37,17 @@ const fresh = () => {
 };
 
 describe('Hazy Gate 3 stands from the start (tools/street-jobs-built-from-start.json)', () => {
-  it('the list holds just job 524, and the catalog carries it', () => {
-    assert.deepEqual(Object.keys(list), ['524']);
+  it('the list holds jobs 201, 206, 240 and 524, and the catalog carries them', () => {
+    assert.deepEqual(Object.keys(list), LIST);
     assert.equal(HAZY.label, 'Hazy Gate 3');
     assert.equal(HAZY.hub, 'Xalanga');
-    assert.equal(HAZY.builtFromStart, list['524']);
-    assert.deepEqual(Object.entries(catalog.jobs).filter(([, j]) => j.builtFromStart).map(([id]) => id), ['524']);
+    for (const id of LIST) assert.equal(catalog.jobs[id].builtFromStart, list[id]);
+    for (const [id, label] of Object.entries(JETHIMADH)) {
+      assert.equal(catalog.jobs[id].label, label);
+      assert.equal(catalog.jobs[id].hub, 'Jethimadh');
+      assert.match(list[id], /the only walkable way to Xalanga for To Xalanga, And Beyond, via the subway to Onto Parada/);
+    }
+    assert.deepEqual(Object.entries(catalog.jobs).filter(([, j]) => j.builtFromStart).map(([id]) => id), LIST);
     assert.match(read('build-street-jobs.mjs'), /tools\/street-jobs-built-from-start\.json/);
   });
 
@@ -49,30 +58,37 @@ describe('Hazy Gate 3 stands from the start (tools/street-jobs-built-from-start.
     assert.equal(roadClosure(state, catalog, HAZY.street, [HAZY.street], opts), null);
     const shut = new Set(closedStreets(state, catalog, opts));
     assert.equal(shut.has(HAZY.street), false);
-    assert.equal(shut.size, 672, 'the other street projects stay closed');
+    assert.equal(shut.size, 669, 'the other street projects stay closed');
+    for (const id of Object.keys(JETHIMADH)) {
+      assert.equal(isJobBuilt(state, catalog, id, opts), true, id);
+      assert.equal(shut.has(catalog.jobs[id].street), false, id);
+    }
     // Its board (Ramble Way 4) offers nothing.
     assert.equal(streetHasOpenProject(state, catalog, HAZY.connecting[0], 0, opts), false);
     assert.ok(yellow, 'Yellow Yawning is a street');
   });
 
   it('a save with it under way gets it built on load and keeps its row (nothing paid, nothing taken)', () => {
-    const saved = { initialized: true, grandfathered: [HOME], jobs: { 524: { phase: 0, got: { r1: 2 }, startedAt: 5 } } };
+    const saved = { initialized: true, grandfathered: [HOME], jobs: { 524: { phase: 0, got: { r1: 2 }, startedAt: 5 }, 206: { phase: 1, got: { r3: 4 }, startedAt: 6 } } };
     const state = normalizeStreetJobState(JSON.parse(JSON.stringify(saved)));
     const row = JSON.stringify(state.jobs['524']);
+    const row206 = JSON.stringify(state.jobs['206']);
     assert.equal(jobStatus(state, catalog, '524', 10, opts).status, 'built');
+    assert.equal(jobStatus(state, catalog, '206', 10, opts).status, 'built', 'Konemaen Jaunt under way: built too');
     assert.equal(JSON.stringify(state.jobs['524']), row, 'the row is as it was');
+    assert.equal(JSON.stringify(state.jobs['206']), row206, 'what was given to Konemaen Jaunt is kept');
     assert.equal(jobStatus(normalizeStreetJobState(JSON.parse(JSON.stringify(state))), catalog, '524', 10, opts).status, 'built', 'again: the same');
   });
 
   it('the realtime server\'s table marks it built', () => {
     const t = projectTable(catalog);
     assert.equal(t.jobs['524'].built, true);
-    assert.deepEqual(Object.keys(t.jobs).filter((id) => t.jobs[id].built), ['524']);
+    assert.deepEqual(Object.keys(t.jobs).filter((id) => t.jobs[id].built).sort(), LIST);
   });
 
   it('the server repo has the table and marks it done on start', { skip: skipWithoutServer }, () => {
     const data = JSON.parse(readFileSync(serverPath('data', 'projects.json'), 'utf8'));
-    assert.equal(data.jobs['524'].built, true);
+    for (const id of LIST) assert.equal(data.jobs[id].built, true, id);
     assert.match(readFileSync(serverPath('projects.go'), 'utf8'), /func \(m \*projects\) buildFromStart\(\) \[\]string/);
   });
 });

@@ -46,6 +46,8 @@
  */
 
 import { STREET_INDEX } from '../street-loader.js?v=33d2b8bc';
+import { SUBWAY_STREETS } from '../street-jobs.js?v=7381e03e';
+import { STATIONS, isCarTsid, stationByTsid } from '../subway.js?v=5719ffc3';
 import { hellFeature } from './hell-feature.js?v=705a486b';
 import {
   ROUTE_COLOR,
@@ -59,14 +61,16 @@ import {
   enterStreet,
   gpsText,
   hubRouteDrawing,
+  isRide,
   normalizeRouteState,
   planRoute,
   resurrectRoute,
   routeGraph,
   routeStep,
   sameStreet,
+  subwayRides,
   tsidAliases,
-} from '../map-routes.js?v=86a4df52';
+} from '../map-routes.js?v=91cc8e46';
 
 export const MAP_ROUTES_FEATURE_ID = 'map-routes';
 const GRAPH_URL = 'assets/content/signpost-graph.json?v=g198-1';
@@ -75,6 +79,10 @@ let state = createRouteState();
 let graph = null;
 /** Locked door edges ("from>to"): a route takes one only when it must (G192). */
 let lockedDoors = null;
+/** The subway between its surface streets (map-routes.js subwayRides): a route rides it when no road leads there. */
+const rides = subwayRides(SUBWAY_STREETS);
+/** The rebuilt stations' street keys (js/subway.js): a surface street's subway entrance is its door to one. */
+const STATION_STREETS = new Set(STATIONS.map((st) => st.streetTsid));
 /** Rooms behind doors that no hub map draws (map-routes.js doorRooms, G198). */
 let rooms = [];
 let graphPromise = null;
@@ -133,7 +141,17 @@ function offWorld(engine) {
 function currentStep(engine) {
   if (!state.route) return { status: 'none', index: -1, next: '', remaining: [] };
   if (offWorld(engine)) return { status: 'off', index: -1, next: '', remaining: state.route.path || [] };
-  return routeStep(state.route, graph || {}, engine.streetTsid);
+  return routeStep(state.route, graph || {}, routeStreet(engine));
+}
+
+/** Underground (a station or the train) the route goes on from the station's surface street (subway-feature mapStreet). */
+function underground(engine) {
+  const t = engine.streetTsid;
+  return Boolean(t && (stationByTsid(t) || isCarTsid(t)));
+}
+function routeStreet(engine) {
+  if (underground(engine)) return engine.query?.('mapStreet', engine)?.tsid || engine.streetTsid;
+  return engine.streetTsid;
 }
 
 /** Streets still under construction (street-jobs-feature closedRoads): routes go round them. */
@@ -157,6 +175,7 @@ function setRoute(engine, opts = {}) {
     inHome: !opts.from && Boolean(engine.homeContext?.().inHome),
     blocked: closedRoads(engine),
     locked: lockedDoors,
+    rides,
   });
   engine.setData?.('routeLast', res.ok ? `set:${res.route.source}` : res.error);
   if (!res.ok) return res;
@@ -208,8 +227,62 @@ function placeHighlight(engine, next) {
   if (highlight && highlight.key === key && highlight.glow && !highlight.glow.destroyed) return;
   clearHighlight();
   if (!next) return;
+  // A way on that is neither post nor door (Shim Shiri's Light Beams: the posts there hang from the ceiling).
+  if (placeTransportGlow(engine, next, key)) return;
+  if (underground(engine)) {
+    placeSubwayGlow(engine, next, key);
+    return;
+  }
+  if (isRide(graph, rides, routeStreet(engine), next) && placeSubwayGlow(engine, next, key)) return;
   if (placeSignGlow(engine, next, key)) return;
   placeDoorGlow(engine, next, key);
+}
+
+/**
+ * Things a feature registers with `routeTo` (the street label or tsid they take you to) and
+ * `routeVerb` (the verb that does it): Shim Shiri's six Light Beams (puzzles-feature, items/light_beam.js
+ * beam_up "Travel to " + dest). The GPS lights the beam and the arrow walks there and beams up.
+ */
+function transportTargets(engine) {
+  return (engine.interactables || []).filter((t) => t?.routeTo && t.sprite && !t.sprite.destroyed);
+}
+function placeTransportGlow(engine, next, key) {
+  const target = transportTargets(engine).find((t) => sameStreet(t.routeTo, next) || t.routeTo === label(next));
+  return target ? glowTarget(engine, key, target, 'transport', target.routeVerb || '') : false;
+}
+/**
+ * A subway hop: on the surface street its entrance (the door into the station), in the station A Red
+ * Button (subway-feature's gate: a ticket on either line), in the train nothing (the stop prompt says
+ * "This stop is X. Get off train?"). Off at the route's stop, the station's stairs up to its street.
+ */
+function placeSubwayGlow(engine, next, key) {
+  if (isCarTsid(engine.streetTsid)) return false;
+  if (stationByTsid(engine.streetTsid)) {
+    if (!isRide(graph, rides, routeStreet(engine), next)) {
+      const stairs = doorTargets(engine).find((t) => sameStreet(t.door?.connect?.street, routeStreet(engine)));
+      return stairs ? glowTarget(engine, key, stairs, 'door', 'enter') : false;
+    }
+    const gate = (engine.interactables || []).find((t) => t?.classId === 'subway_gate' && t.sprite && !t.sprite.destroyed);
+    return gate ? glowTarget(engine, key, gate, 'transport', 'push') : false;
+  }
+  const entrance = doorTargets(engine).find((t) => STATION_STREETS.has(t.door?.connect?.street));
+  return entrance ? glowTarget(engine, key, entrance, 'door', 'enter') : false;
+}
+function glowTarget(engine, key, target, kind, verb) {
+  const { PIXI } = engine;
+  const sprite = target.sprite;
+  const door = target.door || null;
+  const w = Math.max(24, Number(door?.w) || Math.abs(Number(sprite.width)) || 60);
+  const h = Math.max(40, Number(door?.h) || Math.abs(Number(sprite.height)) || 110);
+  const glow = doorEdgeGlow(PIXI, sprite, w, h);
+  glow.x = sprite.x;
+  glow.y = sprite.y;
+  glow.zIndex = (Number(sprite.zIndex) || 3) - 0.5;
+  const layer = sprite.parent === engine.entityLayer ? routeGlowLayer(engine) : null;
+  (layer || sprite.parent || engine.entityLayer).addChild(glow);
+  highlight = { kind, view: sprite, glow, key, target, door, verb, x: sprite.x, y: sprite.y - h / 2, w, h };
+  if (kind === 'door') syncDoorGlow(highlight);
+  return true;
 }
 
 /** The unfiltered container the door glow sits in (G200, routeGlowLayer). */
@@ -527,7 +600,7 @@ function startWalk(engine, now) {
   stopWalk(engine);
   if (!highlight || !engine.player) return false;
   bindWalkInput();
-  const x = highlight.kind === 'door' ? highlight.x : highlight.view.x;
+  const x = highlight.kind === 'sign' ? highlight.view.x : highlight.x;
   walk = { engine, kind: highlight.kind, key: highlight.key, x, startedAt: now, lastX: engine.player.x, lastMoveAt: now, dir: 0 };
   gps?.arrow?.classList.add('walking');
   engine.setData?.('routeWalkEnd', '');
@@ -538,6 +611,14 @@ function startWalk(engine, now) {
 function takeHop(engine) {
   if (!highlight || !state.route) return;
   const step = currentStep(engine);
+  if (highlight.kind === 'transport') {
+    engine.setData?.('routeHop', `${highlight.verb}:${step.next}`);
+    const verbs = engine.targetVerbs?.(highlight.target) || [];
+    const verb = verbs.find((v) => v.id === highlight.verb);
+    if (verb && verb.enabled !== false) engine.beginVerb?.(highlight.target, verb);
+    else if (verb?.reason) engine.toast?.(verb.reason, 2400);
+    return;
+  }
   if (highlight.kind === 'door') {
     engine.setData?.('routeHop', `door:${step.next}`);
     // The door's own Enter verb, as a menu click would run it (doors-feature: key, level and gate checks).
@@ -620,6 +701,7 @@ function publish(engine, step = currentStep(engine)) {
   engine.setData('routeQuest', r ? r.quest : '');
   engine.setData('routeSign', highlight?.kind === 'sign' ? `${Math.round(highlight.view.x)}:${highlight.board}` : '');
   engine.setData('routeDoor', highlight?.kind === 'door' ? `${Math.round(highlight.x)}:${label(highlight.door?.connect?.street || highlight.door?.connect?.tsid)}` : '');
+  engine.setData('routeTransport', highlight?.kind === 'transport' || (highlight?.kind === 'door' && highlight.verb) ? `${Math.round(highlight.x)}:${highlight.verb}` : '');
   engine.setData('routeVia', highlight?.kind || '');
   engine.setData('routeWalk', walk ? `${walk.kind}:${Math.round(walk.x)}` : '');
   engine.setData('routeReached', String(state.reached));
@@ -744,7 +826,10 @@ function mapCard(engine) {
     const text = gpsText(r, step, label);
     const rest = step.status === 'on' ? step.remaining.slice(1) : [];
     head = shared ? quest.title : `${ROUTE_TEXT.to}${dest}`;
-    lines.push(rest.length > 1 ? `Route: ${rest.map(label).join(' → ')}` : text.arrived ? ROUTE_TEXT.arrived : text.next);
+    // A subway hop reads "by subway" (map-routes.js isRide).
+    const from = step.remaining[0];
+    const hop = (t, i) => (isRide(graph, rides, i ? rest[i - 1] : from, t) ? `${label(t)} (by subway)` : label(t));
+    lines.push(rest.length > 1 ? `Route: ${rest.map(hop).join(' → ')}` : text.arrived ? ROUTE_TEXT.arrived : text.next);
     if (quest && !shared) lines.push(`${quest.title}. ${quest.text}`);
   } else if (quest) {
     head = quest.title;
@@ -881,7 +966,7 @@ function autoplay(engine, now) {
   }
   if (auto.key !== key) {
     auto = { key, at: now };
-    engine.player.x = highlight.x - (highlight.kind === 'door' ? 0 : 40);
+    engine.player.x = highlight.x - (highlight.kind === 'sign' ? 40 : 0);
     engine.player.vx = 0;
     engine.snapCamera?.();
     return;
@@ -937,7 +1022,7 @@ export const mapRoutesFeature = {
     demoSetup(engine);
     const apply = () => {
       if (state.route) {
-        const res = enterStreet(state, graph || {}, engine.streetTsid, { offWorld: offWorld(engine), blocked: closedRoads(engine), locked: lockedDoors });
+        const res = enterStreet(state, graph || {}, engine.streetTsid, { offWorld: offWorld(engine) || underground(engine), blocked: closedRoads(engine), locked: lockedDoors, rides });
         state = res.state;
         if (res.events.includes('arrived')) {
           // locations/location.js 310-313: pc.quests_inc_counter('map_dest_reached', 1).

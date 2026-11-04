@@ -27,7 +27,7 @@
  *   rider's own, as in solo. The fare is the client's 50 currants, as before.
  *
  * QA: ?autostart=1&questoffer=off&subwaydemo=<station id | name | tsid>
- *   enters that station by the stairs. &subwaypapers=1 grants You Have
+ *   enters that station by the stairs. &subwaypapers=1 (with or without a demo) grants You Have
  *   Papers!, &subwaycurrants=N sets currants, &subwayfast=1 runs the ride at
  *   a quarter of its timings, &subwayhold=1 keeps it moving between stations
  *   (screenshots). &subwayautoplay=gate opens the ticket dialog;
@@ -894,7 +894,13 @@ function demoStation(engine) {
 
 const clickChoice = (value) => dialog?.el.querySelector(`button[data-value="${value}"]`)?.click();
 
+let qaPapersDone = false;
 function demoStep(engine, now) {
+  // &subwaypapers=1 without a subway demo too (a Map route that rides the subway, xalanga-open3 QA).
+  if (!qaPapersDone && engine.started && engine.param('subwaypapers') === '1') {
+    qaPapersDone = true;
+    if (!hasPapers(engine)) engine.grantAchievement?.(PAPERS_BADGE);
+  }
   const station = demoStation(engine);
   if (!station || demo.stage === 'done' || now < demo.at) return;
   const mode = engine.param('subwayautoplay') || '';

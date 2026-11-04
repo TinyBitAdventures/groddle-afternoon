@@ -14,8 +14,10 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { SIGN_ARMS, doorToward, findRoute, planRoute, createRouteState, routeGraph, signpostToward } from '../public/js/map-routes.js?v=86a4df52';
-import { closedStreets, initializeStreetJobs, normalizeStreetJobState } from '../public/js/street-jobs.js?v=7381e03e';
+import { SIGN_ARMS, doorToward, findRoute, isRide, planRoute, createRouteState, routeGraph, signpostToward, subwayRides } from '../public/js/map-routes.js?v=91cc8e46';
+import { SUBWAY_STREETS, closedStreets, initializeStreetJobs, normalizeStreetJobState } from '../public/js/street-jobs.js?v=7381e03e';
+import { stationByTsid } from '../public/js/subway.js?v=5719ffc3';
+import { reachRoutes, reachStreet } from '../public/js/builder/reach-graph.js?v=3602d09e';
 import { applyWorld } from '../public/js/street-jobs-mp.js?v=8fa46a7d';
 import { SIGN_MAX_ARMS } from '../public/js/street-render.js?v=9349c0e5';
 import { obtainableItems } from '../tools/job-obtainable.mjs';
@@ -34,6 +36,10 @@ const HAZY_GATE_3 = byLabel('Hazy Gate 3');
 const LEVEL_2_WEST = 'GHH1011JSO11ORS';
 const OPPIDAN = 'GDOHDJ84BST2UI2';
 const label = (t) => index.streets[t]?.label || t;
+const RIDES = subwayRides(SUBWAY_STREETS);
+const PUZZLES = json('assets/content/puzzle-triggers.json').streets;
+/** A surface street's subway entrance: its archived door to a station (subway-feature prepareStreet). */
+const entrance = (t) => (street(t).doors || []).find((d) => d?.connect && stationByTsid(d.connect.tsid || d.connect.street));
 
 const streetCache = new Map();
 const street = (t) => streetCache.get(t) || streetCache.set(t, json(index.streets[t].file)).get(t);
@@ -100,31 +106,95 @@ describe('every way in the route graph is one a player can take', () => {
   });
 });
 
-describe("Austin's route: Thicket to Hazy Gate 3", () => {
-  it('a fresh world has no way there yet: Path not found, and the roads still being built', () => {
-    const shut = shutIn(fresh());
-    assert.equal(findRoute(graph, THICKET, HAZY_GATE_3, { blocked: shut, locked }), null);
-    const res = planRoute(createRouteState(), graph, { from: THICKET, to: HAZY_GATE_3, blocked: shut, locked });
-    assert.equal(res.ok, false);
-    assert.equal(res.error, 'Path not found');
-    assert.ok(res.through.length > 0, 'the closed roads in the way');
+describe("Austin's route: Thicket to Hazy Gate 3 (Set a destination on the Map)", () => {
+  const shut = () => shutIn(fresh());
+  const route = () => findRoute(graph, THICKET, HAZY_GATE_3, { blocked: shut(), locked, rides: RIDES });
+
+  it('a fresh world rides the subway to Onto Parada and walks the roads opened from the start', () => {
+    assert.deepEqual(route().map(label), ['Thicket', "Pasha's Place", 'Groddle Forest Junction', 'Onto Parada', 'Konemaen Jaunt', 'Simo Steer', 'Kala Close', 'Shinso Ello', 'Ramyeon Kon', 'Teobocci Shasha', 'Glutton Greens', 'Shim Shiri', 'Yellow Yawning', 'Hazy Gate 3']);
+    assert.equal(findRoute(graph, THICKET, HAZY_GATE_3, { blocked: shut(), locked }), null, 'no road alone gets there');
+    const res = planRoute(createRouteState(), graph, { from: THICKET, to: HAZY_GATE_3, blocked: shut(), locked, rides: RIDES });
+    assert.equal(res.ok, true);
+    assert.ok(!route().includes(OPPIDAN), 'not through Oppidan Avenue');
   });
 
-  it('with every project built the route goes round the sealed door, and every hop can be taken', () => {
-    const path = findRoute(graph, THICKET, HAZY_GATE_3, { locked });
-    assert.ok(!path.includes(OPPIDAN), 'not through Oppidan Avenue');
-    assertWalkable(path, 'all built');
-    assert.deepEqual(path.slice(-5).map(label), ['Teobocci Shasha', 'Glutton Greens', 'Shim Shiri', 'Yellow Yawning', 'Hazy Gate 3'], 'into Moshi Moshi Oshilatis by the dinosaur door, Xalanga by Yellow Yawning');
+  it('every hop is a subway ride from an entrance, or a way the GPS lights that a keyboard player can reach from where the last hop set them down', () => {
+    const path = route();
+    let arrive = null;
+    const how = [];
+    for (let i = 0; i < path.length - 1; i++) {
+      const [a, b] = [path[i], path[i + 1]];
+      const s = street(a);
+      if (isRide(graph, RIDES, a, b)) {
+        assert.ok(SUBWAY_STREETS.includes(a) && SUBWAY_STREETS.includes(b), `${label(a)} -> ${label(b)}: both subway stops`);
+        assert.ok(entrance(a), `${label(a)} has its subway entrance`);
+        const up = entrance(b);
+        arrive = up ? { x: up.x, y: up.y } : null;
+        how.push(`${label(a)} subway ${label(b)}`);
+        continue;
+      }
+      // A Light Beam to the next street (puzzles-feature routeTo): the GPS lights it, not the post.
+      const beam = (PUZZLES[a]?.triggers || []).find((t) => t.verb && t.dest === label(b));
+      if (beam) {
+        how.push(`${label(a)} beam ${label(b)}`);
+        arrive = null;
+        continue;
+      }
+      const h = hop(a, b);
+      assert.ok(h.ok, `${label(a)} -> ${label(b)}: ${h.why}`);
+      const sp = signpostToward(s.signposts, b);
+      const exit = sp ? s.signposts[sp.sign] : s.doors[doorToward(s.doors, b)];
+      if (arrive && !PUZZLES[a]) {
+        const plan = reachRoutes(s, arrive).routes.find((r) => r.id === exit.id);
+        assert.ok(plan?.steps, `${label(a)}: the way to ${label(b)} can be reached from where you come in`);
+      }
+      arrive = sp ? (sp && s.signposts[sp.sign].connects.filter((c) => c && !c.hidden)[sp.board]?.arrive) || null : exit.connect?.arrive || null;
+      how.push(`${label(a)} ${sp ? 'sign' : 'door'} ${label(b)}`);
+    }
+    assert.ok(how.includes('Groddle Forest Junction subway Onto Parada'));
+    assert.ok(how.includes('Shim Shiri beam Yellow Yawning'), 'Shim Shiri: the yellow Light Beam');
   });
 
-  it('once Tlemcen, Heckes and Viscid Pud stand, the walk from Somewhat Sump (a subway stop) can be taken hop by hop', () => {
-    const state = fresh();
-    const ids = ['163', '167', '178'];
-    assert.deepEqual(ids.map((id) => catalog.jobs[id].label), ['Tlemcen', 'Heckes', 'Viscid Pud']);
-    applyWorld(state, catalog, { built: Object.fromEntries(ids.map((id) => [id, { at: 5 }])) });
-    const path = findRoute(graph, byLabel('Somewhat Sump'), HAZY_GATE_3, { blocked: shutIn(state), locked });
-    assertWalkable(path, 'three projects built');
-    assert.ok(path.includes(byLabel('Viscid Pud')) && path.includes(byLabel('Khanda Jarra')));
+  it("Shim Shiri's posts hang from the ceiling: no arrival reaches them, so each road on from there is its Light Beam", () => {
+    const shim = byLabel('Shim Shiri');
+    const s = street(shim);
+    const beams = PUZZLES[shim].triggers.filter((t) => t.verb === 'beam_up');
+    assert.equal(beams.length, 6);
+    // Where the gut tubes set you down (Glutton Greens' gut_bottom: 3447, 0) and the floor under each beam.
+    const arrivals = [{ x: 3447, y: 0 }, ...beams.map((b) => ({ x: b.x, y: b.y - 10 }))];
+    const r = reachStreet(s, arrivals.map((a) => ({ ...a, from: 'x' })));
+    for (const t of r.targets.filter((x) => x.kind === 'signpost')) assert.equal(t.reached, false, `${t.label}: out of reach`);
+    for (const b of beams) assert.ok(graph[shim].includes(byLabel(b.dest)), `the route graph has Shim Shiri -> ${b.dest}`);
+  });
+
+  it('every verb way (a Light Beam) names a street the route graph links to, so the GPS can light it', () => {
+    let n = 0;
+    for (const [t, row] of Object.entries(PUZZLES)) {
+      for (const tr of row.triggers || []) {
+        if (!tr.verb || !tr.dest) continue;
+        n += 1;
+        assert.ok(graph[t]?.includes(byLabel(tr.dest)), `${label(t)} -> ${tr.dest}`);
+      }
+    }
+    assert.equal(n, 6);
+  });
+
+  it('the GPS lights a Light Beam or a subway entrance before a post (map-routes-feature placeHighlight)', () => {
+    const feature = readFileSync(join(PUB, 'js/features/map-routes-feature.js'), 'utf8');
+    assert.match(feature, /if \(placeTransportGlow\(engine, next, key\)\) return;\n\s+if \(underground\(engine\)\) \{\n\s+placeSubwayGlow\(engine, next, key\);\n\s+return;\n\s+\}\n\s+if \(isRide\(graph, rides, routeStreet\(engine\), next\) && placeSubwayGlow\(engine, next, key\)\) return;\n\s+if \(placeSignGlow\(engine, next, key\)\) return;/);
+    // Underground: the Red Button for a ride, the stairs once off at the route's stop.
+    assert.match(feature, /const stairs = doorTargets\(engine\)\.find\(\(t\) => sameStreet\(t\.door\?\.connect\?\.street, routeStreet\(engine\)\)\);/);
+    assert.match(readFileSync(join(PUB, 'js/features/puzzles-feature.js'), 'utf8'), /routeTo: t\.dest,\n\s+routeVerb: BEAM_UP_VERB,/);
+  });
+
+  it('the subway is only taken when no road gets there', () => {
+    const toy = { GA: ['GB'], GB: ['GA', 'GC'], GC: ['GB'], GD: [] };
+    const rides = subwayRides(['GA', 'GC', 'GD']);
+    assert.deepEqual(findRoute(toy, 'GA', 'GC', { rides }), ['GA', 'GB', 'GC'], 'the road');
+    assert.deepEqual(findRoute(toy, 'GA', 'GD', { rides }), ['GA', 'GD'], 'the ride');
+    assert.equal(findRoute(toy, 'GA', 'GD'), null);
+    assert.equal(isRide(toy, rides, 'GA', 'GD'), true);
+    assert.equal(isRide(toy, rides, 'GA', 'GB'), false);
   });
 
   it('every street a fresh world reaches over roads has a route from the starter street that can be walked', () => {

@@ -1,6 +1,9 @@
 {
   "about": "Street projects that count as built in every new world, solo and the shared online world, read by build-street-jobs.mjs into street-jobs.json (job.builtFromStart) and by tools/build-realtime-projects.mjs into the realtime server's data/projects.json (built). Every other project starts closed (Austin, 2026-11-02). Glitch's admins opened a street the same way, by unlocking it without its job (locations/inc_admin.js admin_jobs_set_unlocked 431-439).",
   "jobs": {
+    "201": "Austin 2026-11-03: the only walkable way to Xalanga for To Xalanga, And Beyond, via the subway to Onto Parada (Konemaen Jaunt, Simo Steer, Kala Close, then Shinso Ello on to Yellow Yawning and Hazy Gate 3); the way through Level 2 West needs a key nothing gives and Viscid Pud's post to Pandhal Pegs is out of a jump's reach: Simo Steer, Jethimadh",
+    "206": "Austin 2026-11-03: the only walkable way to Xalanga for To Xalanga, And Beyond, via the subway to Onto Parada (Konemaen Jaunt, Simo Steer, Kala Close, then Shinso Ello on to Yellow Yawning and Hazy Gate 3); the way through Level 2 West needs a key nothing gives and Viscid Pud's post to Pandhal Pegs is out of a jump's reach: Konemaen Jaunt, Jethimadh",
+    "240": "Austin 2026-11-03: the only walkable way to Xalanga for To Xalanga, And Beyond, via the subway to Onto Parada (Konemaen Jaunt, Simo Steer, Kala Close, then Shinso Ello on to Yellow Yawning and Hazy Gate 3); the way through Level 2 West needs a key nothing gives and Viscid Pud's post to Pandhal Pegs is out of a jump's reach: Kala Close, Jethimadh",
     "524": "Austin 2026-11-03: Hazy Gate 3, the one road into Xalanga (from Yellow Yawning, Moshi Moshi Oshilatis); its own project board stands on Ramble Way 4, inside Xalanga, so nobody could build it"
   }
 }

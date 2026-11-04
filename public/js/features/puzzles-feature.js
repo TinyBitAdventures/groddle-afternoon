@@ -379,6 +379,9 @@ function spawnVerbTargets(engine, def) {
       subtitle: LIGHT_BEAM.tooltip(t.dest),
       sprite: view.spr,
       state: { trigger: t.id },
+      // The Map's GPS lights the beam, not the post on the ceiling, for a route on to its street (map-routes-feature).
+      routeTo: t.dest,
+      routeVerb: BEAM_UP_VERB,
     });
   }
 }

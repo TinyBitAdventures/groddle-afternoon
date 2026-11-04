@@ -263,7 +263,7 @@
       "assets/content/signpost-graph.json": "de200e92",
       "assets/content/sound-keys.json": "d9ced09a",
       "assets/content/street-ecology.json": "d065e008",
-      "assets/content/street-jobs.json": "819c2dd2",
+      "assets/content/street-jobs.json": "0df1291b",
       "assets/content/style-profiles.json": "9d2e7ec4",
       "assets/content/trade-items.json": "fae9f290",
       "assets/content/zone.schema.json": "c829be11",
