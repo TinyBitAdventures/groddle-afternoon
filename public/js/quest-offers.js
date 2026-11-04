@@ -481,6 +481,21 @@ export function pendingQuestOffers(questState, pc = null, ctx = {}) {
   );
 }
 
+/** #83: the offer's line when accepting moves you (ours: the source's offer text was the only hint). */
+export const QUEST_MOVES_NOTE = 'Accepting takes you somewhere new.';
+
+/**
+ * #83: the note for a quest whose start moves you, else ''. movesOnStart is
+ * the source's (build-quests.mjs: onStarted calls questInstanceLocation,
+ * instances_create_delayed or teleportToLocationDelayed; 47 of the 62
+ * startable quests). The remake moves you where it rebuilt the room
+ * (instanceRoom) or the quest's own module runs it (custom); a start it
+ * cannot carry (soilappreciation_1: the practice street is lost) says nothing.
+ */
+export function questMoveNote(def) {
+  return def?.movesOnStart && (def.instanceRoom || def.custom) ? QUEST_MOVES_NOTE : '';
+}
+
 function offerCard(row, waitMs = 0) {
   const def = row.def;
   return {
@@ -494,6 +509,7 @@ function offerCard(row, waitMs = 0) {
     declineLabel: def.declineLabel || 'Not right now',
     // G229: only a startable quest (onStarted, quest.js 1105-1117) has the second button.
     startable: offerCanWait(def),
+    moveNote: questMoveNote(def),
     waitMs,
   };
 }

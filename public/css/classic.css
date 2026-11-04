@@ -2019,6 +2019,7 @@
 :root[data-ui="classic"] .quest-dialogue:not([data-look="familiar"], [data-look="vog"]) .quest-dialogue-copy,
 :root[data-ui="classic"] #award-screen[data-kind="quest"] :is(.award-body, .award-sub) { min-height: 0; margin: 0; color: var(--c-classic-dialog-text); font: inherit; }
 :root[data-ui="classic"] .quest-dialogue[data-look="conversation"] #quest-dialogue-copy { margin-top: calc(12 * var(--cu)); } /* the title rides in the header */
+:root[data-ui="classic"] .quest-dialogue:not([data-look="familiar"], [data-look="vog"]) .quest-dialogue-note { margin: calc(8 * var(--cu)) 0 0; color: var(--c-classic-dialog-text); font: inherit; font-weight: 700; } /* #83 */
 :root[data-ui="classic"] #award-screen[data-kind="quest"] .award-sub { margin-top: calc(6 * var(--cu)); color: var(--c-classic-slug-gain); font-weight: 700; }
 :root[data-ui="classic"] .quest-dialogue:not([data-look="familiar"], [data-look="vog"]) .quest-dialogue-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: calc(8 * var(--cu)); margin-top: calc(14 * var(--cu)); }
 /* Dark conversation buttons (Button TYPE_DARK; PROPOSED colours from "Yeah!" in the same frame): 38 tall. */

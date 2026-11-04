@@ -108,7 +108,7 @@ import {
   COLD_COMFORT_LEAVE_TEXT,
   HOME_TREE_GROWN_TEXT,
   SEED_TO_SCYTHE,
-} from '../quest-offers.js?v=3bf17441';
+} from '../quest-offers.js?v=7790a130';
 import { parseQuestConversation } from '../quests.js?v=282e1621';
 import { questRequirementText, renderQuestText, withQuestMarkup } from '../quest-text.js?v=7f5d761c';
 import { addItem, removeItem, countItem } from '../inventory.js?v=602da017';
@@ -463,6 +463,7 @@ function openOffer(engine, card, { inLog = false } = {}) {
     acceptLabel: card.acceptLabel,
     declineLabel: card.declineLabel,
     declinable: card.startable === true,
+    note: card.moveNote, // #83: accepting moves you
     // ConversationManager.as 582-585: accept_and_start is disabled under no_starting_quests.
     acceptBlocked: card.startable === true ? startBlockedReason(engine) : '',
     onAccept: accept,

@@ -40,7 +40,7 @@ import {
   npcQuestOffers,
   questAwardPayload,
   turnInQuest,
-} from '../quest-offers.js?v=3bf17441';
+} from '../quest-offers.js?v=7790a130';
 import {
   GOT_QUEST_TEXT,
   VENDOR_NPCS,
@@ -200,6 +200,7 @@ function offer(engine, npc, card) {
     beats: card.beats,
     acceptLabel: card.acceptLabel,
     declineLabel: card.declineLabel,
+    note: card.moveNote, // #83: accepting moves you
     onAccept: () => {
       const result = acceptOffer(engine.questState, card.classTsid, questCtx(engine));
       last = result.ok ? `accepted:${card.classTsid}` : `accept-failed:${card.classTsid}`;

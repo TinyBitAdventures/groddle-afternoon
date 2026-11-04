@@ -86,7 +86,7 @@ import {
   tickResourceNode,
 } from '../resource-nodes.js?v=d78746b3';
 import { frameTexture as sheetFrameTexture, loadTexture, textureFromUrl } from '../textures.js?v=3149d699';
-import { acceptOffer, markOffered, npcQuestOffers, putOffOffer, questStatus } from '../quest-offers.js?v=3bf17441';
+import { acceptOffer, markOffered, npcQuestOffers, putOffOffer, questStatus } from '../quest-offers.js?v=7790a130';
 import { vpSequence } from '../quest-rooms/vp-overlay.js?v=b231d65a';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
 
@@ -1130,6 +1130,7 @@ function checkFireflyOffer(engine) {
       acceptLabel: card.acceptLabel,
       declineLabel: card.declineLabel,
       declinable: startable,
+      note: card.moveNote, // #83: accepting moves you
       urgent: card.emergency === true,
       acceptBlocked: startable && engine.query?.('noStartingQuests', engine) === true ? 'Starting new quests is not allowed right now!' : '',
       onAccept: () => {

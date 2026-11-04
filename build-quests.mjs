@@ -17,6 +17,8 @@
  *   silentComplete, showAlert, acceptLabel, declineLabel,
  *   prerequisites[{condition,value,not}]  (GSJS npc_quests.js gate list)
  *   endNpcs[], locations[], instanced, needsStart (has onStarted),
+ *   movesOnStart (onStarted moves you: questInstanceLocation,
+ *     instances_create_delayed or teleportToLocationDelayed; #83's offer note)
  *   timer {buff, durationSec}  (onStarted buffs_apply time limit)
  *   giveItems[{classTsid,count}]  (doProvided: createItemFromFamiliar on accept)
  *   chainOffers[]  (quests offered from this quest's completion code)
@@ -396,6 +398,15 @@ function fnSource(ctx, name) {
   return typeof ctx[name] === 'function' ? String(ctx[name]) : '';
 }
 
+/**
+ * #83: does accepting move you? onStarted sends you into an instance
+ * (quest_scripting.js questInstanceLocation, inc_instances.js
+ * instances_create_delayed) or teleports you (teleportToLocationDelayed).
+ */
+function questMovesOnStart(started) {
+  return /\b(questInstanceLocation|teleportToLocationDelayed)\(|callback:\s*'instances_create_delayed'/.test(stripLineComments(String(started || '')));
+}
+
 function extractQuest(classTsid, ctx, buffs) {
   const isJob = !!ctx.is_job || ctx.performance_rewards !== undefined;
   const reqs = Object.entries(ctx.requirements || {}).map(([id, r]) => normalizeRequirement(id, r));
@@ -448,6 +459,7 @@ function extractQuest(classTsid, ctx, buffs) {
     locations,
     instanced: locations.length > 0,
     needsStart: !!started,
+    movesOnStart: questMovesOnStart(started) || undefined,
     hasCanOffer: typeof ctx.canOffer === 'function',
     timer,
     giveItems: giveItems.length ? giveItems : undefined,

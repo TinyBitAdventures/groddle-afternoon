@@ -65,7 +65,7 @@
  * Canvas data: hiMpLast, hiBoard (sign:count,...), hiBoardOpen, hiYesterday.
  */
 
-import { butlerApi } from './butler-feature.js?v=16083d00';
+import { butlerApi } from './butler-feature.js?v=0ebc1e32';
 import { metabolicGain, moodMax } from '../metabolics.js?v=8504134e';
 import { frameTexture, sourceFromUrl } from '../textures.js?v=3149d699';
 import {

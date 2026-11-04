@@ -241,6 +241,7 @@
   ],
   "instanced": true,
   "needsStart": true,
+  "movesOnStart": true,
   "hasCanOffer": false,
   "offerTriggers": [
    {
@@ -304,6 +305,7 @@
   ],
   "instanced": true,
   "needsStart": true,
+  "movesOnStart": true,
   "hasCanOffer": true,
   "offerTriggers": [
    {
@@ -521,6 +523,7 @@
   "locations": [],
   "instanced": false,
   "needsStart": true,
+  "movesOnStart": true,
   "hasCanOffer": false,
   "chainOffers": [
    "animalkinship_pet_piggies"
@@ -1741,6 +1744,7 @@
   ],
   "instanced": true,
   "needsStart": true,
+  "movesOnStart": true,
   "hasCanOffer": true,
   "offerTriggers": [
    {
@@ -1809,6 +1813,7 @@
   ],
   "instanced": true,
   "needsStart": true,
+  "movesOnStart": true,
   "hasCanOffer": true,
   "offerTriggers": [
    {
@@ -2069,6 +2074,7 @@
   ],
   "instanced": true,
   "needsStart": true,
+  "movesOnStart": true,
   "hasCanOffer": false,
   "offerTriggers": [
    {
@@ -2130,6 +2136,7 @@
   ],
   "instanced": true,
   "needsStart": true,
+  "movesOnStart": true,
   "hasCanOffer": true,
   "offerTriggers": [
    {
@@ -2573,6 +2580,7 @@
   "locations": [],
   "instanced": false,
   "needsStart": true,
+  "movesOnStart": true,
   "hasCanOffer": false,
   "offerTriggers": [
    {
@@ -3622,6 +3630,7 @@
   "locations": [],
   "instanced": false,
   "needsStart": true,
+  "movesOnStart": true,
   "hasCanOffer": false,
   "offerTriggers": [],
   "solo": true,
@@ -4331,6 +4340,7 @@
   ],
   "instanced": true,
   "needsStart": true,
+  "movesOnStart": true,
   "hasCanOffer": false,
   "offerTriggers": [
    {
@@ -4389,6 +4399,7 @@
   "locations": [],
   "instanced": false,
   "needsStart": true,
+  "movesOnStart": true,
   "hasCanOffer": false,
   "chainOffers": [
    "ezcooking_make_level1_recipes"
@@ -4681,6 +4692,7 @@
   "locations": [],
   "instanced": false,
   "needsStart": true,
+  "movesOnStart": true,
   "hasCanOffer": false,
   "offerTriggers": [
    {
@@ -4959,6 +4971,7 @@
   ],
   "instanced": true,
   "needsStart": true,
+  "movesOnStart": true,
   "hasCanOffer": false,
   "offerTriggers": [
    {
@@ -5580,6 +5593,7 @@
   "locations": [],
   "instanced": false,
   "needsStart": true,
+  "movesOnStart": true,
   "hasCanOffer": false,
   "offerTriggers": [
    {
@@ -5817,6 +5831,7 @@
   ],
   "instanced": true,
   "needsStart": true,
+  "movesOnStart": true,
   "hasCanOffer": true,
   "offerTriggers": [
    {
@@ -5907,6 +5922,7 @@
   ],
   "instanced": true,
   "needsStart": true,
+  "movesOnStart": true,
   "hasCanOffer": true,
   "offerTriggers": [
    {
@@ -6529,6 +6545,7 @@
   ],
   "instanced": true,
   "needsStart": true,
+  "movesOnStart": true,
   "hasCanOffer": false,
   "offerTriggers": [
    {
@@ -6883,6 +6900,7 @@
   "locations": [],
   "instanced": false,
   "needsStart": true,
+  "movesOnStart": true,
   "hasCanOffer": false,
   "offerTriggers": [
    {
@@ -27948,6 +27966,7 @@
   ],
   "instanced": true,
   "needsStart": true,
+  "movesOnStart": true,
   "hasCanOffer": false,
   "offerTriggers": [
    {
@@ -28024,6 +28043,7 @@
   ],
   "instanced": true,
   "needsStart": true,
+  "movesOnStart": true,
   "hasCanOffer": true,
   "offerTriggers": [
    {
@@ -28180,6 +28200,7 @@
   ],
   "instanced": true,
   "needsStart": true,
+  "movesOnStart": true,
   "hasCanOffer": false,
   "offerTriggers": [
    {
@@ -28254,6 +28275,7 @@
   ],
   "instanced": true,
   "needsStart": true,
+  "movesOnStart": true,
   "hasCanOffer": true,
   "offerTriggers": [
    {
@@ -28348,6 +28370,7 @@
   ],
   "instanced": true,
   "needsStart": true,
+  "movesOnStart": true,
   "hasCanOffer": true,
   "offerTriggers": [
    {
@@ -28465,6 +28488,7 @@
   ],
   "instanced": true,
   "needsStart": true,
+  "movesOnStart": true,
   "hasCanOffer": true,
   "offerTriggers": [
    {
@@ -28604,6 +28628,7 @@
   ],
   "instanced": true,
   "needsStart": true,
+  "movesOnStart": true,
   "hasCanOffer": false,
   "offerTriggers": [
    {
@@ -28659,6 +28684,7 @@
   ],
   "instanced": true,
   "needsStart": true,
+  "movesOnStart": true,
   "hasCanOffer": false,
   "offerTriggers": [
    {
@@ -28710,6 +28736,7 @@
   ],
   "instanced": true,
   "needsStart": true,
+  "movesOnStart": true,
   "hasCanOffer": false,
   "offerTriggers": [
    {
@@ -28768,6 +28795,7 @@
   "locations": [],
   "instanced": false,
   "needsStart": true,
+  "movesOnStart": true,
   "hasCanOffer": false,
   "chainOffers": [
    "lightgreenthumb_water_trees"
@@ -29456,6 +29484,7 @@
   ],
   "instanced": true,
   "needsStart": true,
+  "movesOnStart": true,
   "hasCanOffer": true,
   "offerTriggers": [
    {
@@ -29523,6 +29552,7 @@
   ],
   "instanced": true,
   "needsStart": true,
+  "movesOnStart": true,
   "hasCanOffer": false,
   "offerTriggers": [
    {
@@ -29600,6 +29630,7 @@
   ],
   "instanced": true,
   "needsStart": true,
+  "movesOnStart": true,
   "hasCanOffer": true,
   "offerTriggers": [
    {
@@ -30012,6 +30043,7 @@
   "locations": [],
   "instanced": false,
   "needsStart": true,
+  "movesOnStart": true,
   "hasCanOffer": false,
   "offerTriggers": [
    {
@@ -30309,6 +30341,7 @@
   ],
   "instanced": true,
   "needsStart": true,
+  "movesOnStart": true,
   "hasCanOffer": false,
   "offerTriggers": [
    {
@@ -30893,6 +30926,7 @@
   ],
   "instanced": true,
   "needsStart": true,
+  "movesOnStart": true,
   "hasCanOffer": false,
   "offerTriggers": [
    {
@@ -30957,6 +30991,7 @@
   ],
   "instanced": true,
   "needsStart": true,
+  "movesOnStart": true,
   "hasCanOffer": true,
   "offerTriggers": [
    {
@@ -31022,6 +31057,7 @@
   ],
   "instanced": true,
   "needsStart": true,
+  "movesOnStart": true,
   "hasCanOffer": true,
   "offerTriggers": [
    {
@@ -31105,6 +31141,7 @@
   ],
   "instanced": true,
   "needsStart": true,
+  "movesOnStart": true,
   "hasCanOffer": true,
   "offerTriggers": [
    {
@@ -31223,6 +31260,7 @@
   ],
   "instanced": true,
   "needsStart": true,
+  "movesOnStart": true,
   "hasCanOffer": true,
   "offerTriggers": [
    {
@@ -31301,6 +31339,7 @@
   ],
   "instanced": true,
   "needsStart": true,
+  "movesOnStart": true,
   "hasCanOffer": true,
   "offerTriggers": [
    {
@@ -31718,6 +31757,7 @@
   "locations": [],
   "instanced": false,
   "needsStart": true,
+  "movesOnStart": true,
   "hasCanOffer": false,
   "offerTriggers": [],
   "solo": true,
@@ -31864,6 +31904,7 @@
   ],
   "instanced": true,
   "needsStart": true,
+  "movesOnStart": true,
   "hasCanOffer": false,
   "offerTriggers": [
    {
@@ -32243,6 +32284,7 @@
   "locations": [],
   "instanced": false,
   "needsStart": true,
+  "movesOnStart": true,
   "hasCanOffer": false,
   "offerTriggers": [
    {
@@ -32491,6 +32533,7 @@
   "locations": [],
   "instanced": false,
   "needsStart": true,
+  "movesOnStart": true,
   "hasCanOffer": false,
   "chainOffers": [
    "soilappreciation_dig_earth"
@@ -33531,6 +33574,7 @@
   ],
   "instanced": true,
   "needsStart": true,
+  "movesOnStart": true,
   "hasCanOffer": false,
   "offerTriggers": [
    {
@@ -35668,6 +35712,7 @@
   ],
   "instanced": true,
   "needsStart": true,
+  "movesOnStart": true,
   "hasCanOffer": false,
   "offerTriggers": [
    {
@@ -35792,6 +35837,7 @@
   ],
   "instanced": true,
   "needsStart": true,
+  "movesOnStart": true,
   "hasCanOffer": true,
   "offerTriggers": [
    {
@@ -35860,6 +35906,7 @@
   ],
   "instanced": true,
   "needsStart": true,
+  "movesOnStart": true,
   "hasCanOffer": true,
   "offerTriggers": [
    {

@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=b484cbad';
 import { createFeatureHost } from './js/feature-host.js?v=2ed3c069';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=7198f3bb';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=af54d27f';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -36,7 +36,7 @@ import {
 // Quest copy is Flash htmlText: <b>/<i>/<br> drawn as formatting, the rest dropped, never innerHTML.
 import { questRequirementText, renderQuestText, withQuestMarkup } from './js/quest-text.js?v=7f5d761c';
 // G267: the world-verb quest counters skip offer-system quests; old saves drop the boot Moloko quest.
-import { dropBootStarterQuests, routesCounter, worldVerbQuestEvents, gardenPlotEvents, makingUnitQuestEvents, shrineDonationQuestEvents } from './js/quest-offers.js?v=3bf17441';
+import { dropBootStarterQuests, questMoveNote, routesCounter, worldVerbQuestEvents, gardenPlotEvents, makingUnitQuestEvents, shrineDonationQuestEvents } from './js/quest-offers.js?v=7790a130';
 import {
   PHANTOM_QUEST_ID,
   REMEMBER_QUEST_ID,
@@ -482,7 +482,7 @@ import {
   parsePlayerSave,
   serializePlayerSave,
   restorePlayerSave,
-} from './js/player-save.js?v=ec495a80';
+} from './js/player-save.js?v=69862c50';
 import {
   HOME_INTERIOR_TSID,
   HOME_STREET_TSID,
@@ -11422,7 +11422,8 @@ const engine = {
   // G229: declinable false is an offer with only its accept button (quest.js 1119-1124: a quest that
   // cannot be started later has one choice); the X and Escape still close it where they would.
   // G255: acceptBlocked (a reason) disables the accept, as no_starting_quests does accept_and_start (ConversationManager.as 582-585).
-  offerQuestDialogue({ title, kicker, beats, acceptLabel, declineLabel, onAccept, onDecline, urgent = false, inLog = false, declinable = true, acceptBlocked = '' }) {
+  // #83: note (quest-offers questMoveNote) is a line under the last page: accepting moves you.
+  offerQuestDialogue({ title, kicker, beats, acceptLabel, declineLabel, onAccept, onDecline, urgent = false, inLog = false, declinable = true, acceptBlocked = '', note = '' }) {
     openScriptedQuestDialogue({
       title,
       kicker,
@@ -11439,6 +11440,7 @@ const engine = {
       cancelable: true,
       noDecline: declinable === false,
       primaryBlocked: acceptBlocked || '',
+      note,
       primaryLabel: acceptLabel || 'OK',
       cancelLabel: declineLabel || 'Not right now',
     });
@@ -24332,6 +24334,18 @@ function renderQuestDialogueBeat() {
     title.textContent = def?.title || questDialogueState.title || 'Quest';
   }
   if (copy) renderQuestText(copy, beat.markup ?? beat.text);
+  // #83: on the last page, a line when accepting moves you.
+  let note = document.getElementById('quest-dialogue-note');
+  if (!note && copy) {
+    note = document.createElement('p');
+    note.id = 'quest-dialogue-note';
+    note.className = 'quest-dialogue-note';
+    copy.after(note);
+  }
+  if (note) {
+    note.textContent = index >= beats.length - 1 ? questDialogueState.note || '' : '';
+    note.hidden = !note.textContent;
+  }
   if (next) {
     const finalBeat = index >= beats.length - 1;
     next.textContent =
@@ -24399,6 +24413,7 @@ function openQuestDialogue(classTsid) {
     beats: withQuestMarkup(parseQuestConversation(def.offer), def.offer),
     index: 0,
     kicker: 'Magic Rock',
+    note: questMoveNote(def),
   };
   renderQuestDialogueBeat();
 }
@@ -24458,6 +24473,7 @@ function openScriptedQuestDialogue({
   inLog = false,
   noDecline = false,
   primaryBlocked = '',
+  note = '',
 }) {
   // G217: an offer or prompt that arrives over the Enter chooser or a verb menu waits until they close.
   if (holdScriptedDialog(arguments[0])) return;
@@ -24484,6 +24500,7 @@ function openScriptedQuestDialogue({
     cancelLabel,
     noDecline: noDecline === true,
     primaryBlocked: String(primaryBlocked || ''),
+    note: String(note || ''),
   };
   renderQuestDialogueBeat();
   armQuestDialogueTimeout({ timeout, timeoutMs, timeoutValue, onTimeout });

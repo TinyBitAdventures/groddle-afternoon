@@ -4301,6 +4301,10 @@ html[data-street-cards] .quest-dialogue { visibility: hidden; }
   font-size: var(--fs-lg);
   line-height: var(--lh-loose);
 }
+/* #83: "Accepting takes you somewhere new." under an offer's last page. */
+.quest-dialogue-note { margin: calc(-1 * var(--sp-4)) 0 var(--sp-6); font-size: var(--fs-sm); font-weight: 700; line-height: var(--lh-snug); color: var(--c-violet-39); }
+.quest-dialogue-note[hidden] { display: none; }
+.quest-dialogue:is([data-look="familiar"], [data-look="conversation"]) .quest-dialogue-note { margin: var(--sp-4) 0 0; color: var(--c-yellow-91); }
 .quest-dialogue-card .btn-glitch-primary {
   min-width: 190px;
 }
