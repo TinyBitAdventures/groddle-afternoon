@@ -20,15 +20,15 @@ import {
 import { IMAGINATION_UPGRADES } from '../public/js/imagination.js?v=0cab36eb';
 import { REMAKE_STATUS_RULES, isOfferedInRemake, remakeStatus } from '../public/js/imagination-remake.js?v=c37ad887';
 import { applyRewards } from '../public/js/quests.js?v=2ce7b3cb';
-import { createInventory, countItem, ensureItem } from '../public/js/inventory.js?v=602da017';
-import { createMineRock, miningProfile, mineRock, smeltMetalRocks } from '../public/js/mining.js?v=d856ab96';
-import { craftRecipe, makingSkillAdjustments } from '../public/js/making.js?v=6b048d25';
-import { createToolConditionState, getToolCondition, repairToolCondition, setToolRemaining } from '../public/js/tools.js?v=3974f57e';
-import { quoteWoodTreeHarvest } from '../public/js/woodcutting.js?v=6d2ad054';
-import { resolveAnimalKinshipPackage } from '../public/js/animal-kinship.js?v=2757bb52';
-import { createGarden, getPlot, plantPlot, plotKey } from '../public/js/garden.js?v=dd021ecc';
-import { vendorBuy, vendorSell, vendorBuyUnitPrice } from '../public/js/vendor.js?v=08063e0c';
-import { normalizePlayerSnapshot } from '../public/js/player-save.js?v=86bb897a';
+import { createInventory, countItem, ensureItem } from '../public/js/inventory.js?v=d82f3b00';
+import { createMineRock, miningProfile, mineRock, smeltMetalRocks } from '../public/js/mining.js?v=926b4d4c';
+import { craftRecipe, makingSkillAdjustments } from '../public/js/making.js?v=6e6c53f0';
+import { createToolConditionState, getToolCondition, repairToolCondition, setToolRemaining } from '../public/js/tools.js?v=092ac4f3';
+import { quoteWoodTreeHarvest } from '../public/js/woodcutting.js?v=9f8bc052';
+import { resolveAnimalKinshipPackage } from '../public/js/animal-kinship.js?v=33e695a9';
+import { createGarden, getPlot, plantPlot, plotKey } from '../public/js/garden.js?v=2b2c8423';
+import { vendorBuy, vendorSell, vendorBuyUnitPrice } from '../public/js/vendor.js?v=464d158d';
+import { normalizePlayerSnapshot } from '../public/js/player-save.js?v=ff8746ee';
 import { loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js?v=10b118dd';
 import { createSkillState, getStudyStatus, pauseSkillStudy, startSkillStudy } from '../public/js/skills.js?v=4542bdf9';
 

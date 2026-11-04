@@ -23,25 +23,25 @@ import {
   loadRecipeCatalogFromFile,
   starterToolsInventory,
   STARTER_TOOL_IDS,
-} from '../public/js/making.js?v=6b048d25';
+} from '../public/js/making.js?v=6e6c53f0';
 import {
   ITEM_CATALOG,
   createInventory,
   countItem,
   getItemUseInfo,
   useItem,
-} from '../public/js/inventory.js?v=602da017';
+} from '../public/js/inventory.js?v=d82f3b00';
 import {
   FOOD_VARIETY_UPGRADE,
   createFoodState,
   isFoodBonusItem,
   quoteFoodVarietyBonus,
-} from '../public/js/food.js?v=f443ef18';
+} from '../public/js/food.js?v=e03d5f01';
 import {
   TOOL_CONDITION_CATALOG,
   createToolConditionState,
   getToolCondition,
-} from '../public/js/tools.js?v=3974f57e';
+} from '../public/js/tools.js?v=092ac4f3';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const publicRoot = join(here, '../public');

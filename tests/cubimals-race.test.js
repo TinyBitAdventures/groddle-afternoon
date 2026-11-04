@@ -33,12 +33,12 @@ import {
   rollCubimalRace,
   sanitizeCubimalName,
   setCubimalFree,
-} from '../public/js/cubimals.js?v=14b9d9b0';
-import { addItem, countItem, createInventory } from '../public/js/inventory.js?v=602da017';
+} from '../public/js/cubimals.js?v=8950bf83';
+import { addItem, countItem, createInventory } from '../public/js/inventory.js?v=d82f3b00';
 import { applyAchievementProgress, createAchievementState } from '../public/js/achievements.js?v=ad0b5a5a';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=10b118dd';
-import { FEATURES } from '../public/js/features/index.js?v=9bedddda';
-import { cubimalRaceFeature, CUBIMAL_RACE_FEATURE_ID } from '../public/js/features/cubimal-race-feature.js?v=5acbab17';
+import { FEATURES } from '../public/js/features/index.js?v=b3babad4';
+import { cubimalRaceFeature, CUBIMAL_RACE_FEATURE_ID } from '../public/js/features/cubimal-race-feature.js?v=94213b86';
 import { FIRST_DRAW_SPRITES, HIRES_SPRITES } from '../public/js/sprite-hires.js?v=3f97bf07';
 
 const here = dirname(fileURLToPath(import.meta.url));

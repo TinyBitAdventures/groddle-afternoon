@@ -40,11 +40,11 @@ import {
   TROPHY_PIECES,
   planStreetTrophies,
 } from '../public/js/street-jobs.js?v=eca98f2d';
-import { streetJobsFeature } from '../public/js/features/street-jobs-feature.js?v=75be52e9';
+import { streetJobsFeature } from '../public/js/features/street-jobs-feature.js?v=653a8ea7';
 import { createAchievementState, applyAchievementProgress } from '../public/js/achievements.js?v=ad0b5a5a';
 import { applyRewards } from '../public/js/quests.js?v=2ce7b3cb';
 import { loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js?v=10b118dd';
-import { addItem, countItem } from '../public/js/inventory.js?v=602da017';
+import { addItem, countItem } from '../public/js/inventory.js?v=d82f3b00';
 import { obtainableItems } from '../tools/job-obtainable.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..', 'public');

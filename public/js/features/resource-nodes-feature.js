@@ -52,10 +52,11 @@
  * last release: released:respawned|new:<key>, or failed:<reason>).
  */
 
-import { ITEM_CATALOG, addItem, countItem } from '../inventory.js?v=602da017';
+import { ITEM_CATALOG, addItem, countItem } from '../inventory.js?v=d82f3b00';
+import { setToolRemaining, toolCopies } from '../tools.js?v=092ac4f3';
 import { isItemFloor, platformYAt } from '../street-model.js?v=505d8990';
 import { hiresSpriteUrl } from '../sprite-hires.js?v=3f97bf07';
-import { rollResourceNodeDrop } from './drops-feature.js?v=35b140d2';
+import { rollResourceNodeDrop } from './drops-feature.js?v=fffa1f9e';
 import { slugsFromEffects } from '../speech-slugs.js?v=130338f9';
 import { resourceNodeResponseKey, verbResponse } from '../verb-responses.js?v=3ceb8a8c';
 import { rollSlothBonusSnails } from '../imagination-effects.js?v=70169933';
@@ -65,7 +66,7 @@ import {
   RESOURCE_ITEM_DEFS,
   RESOURCE_NODE_CATALOG,
   SALMON_RELEASE,
-  createFireflyJarState,
+  FIREFLY_JAR_MAX,
   createResourceNode,
   ensureResourceItems,
   fireflyJarSheet,
@@ -84,9 +85,9 @@ import {
   starterResourceTools,
   swimmingSalmonCount,
   tickResourceNode,
-} from '../resource-nodes.js?v=d78746b3';
+} from '../resource-nodes.js?v=384f63f3';
 import { frameTexture as sheetFrameTexture, loadTexture, textureFromUrl } from '../textures.js?v=3149d699';
-import { acceptOffer, markOffered, npcQuestOffers, putOffOffer, questStatus } from '../quest-offers.js?v=c6b0ab10';
+import { acceptOffer, markOffered, npcQuestOffers, putOffOffer, questStatus } from '../quest-offers.js?v=1389077b';
 import { vpSequence } from '../quest-rooms/vp-overlay.js?v=b231d65a';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
 
@@ -199,7 +200,9 @@ export function prepareStreetResourceNodes(slot, plan, { tsid = '', now = Date.n
 export function normalizeResourceFeatureSlice(slice) {
   const bonusSnailsAt = Number(slice?.bonusSnailsAt);
   return {
+    // Saves from before each jar kept its own Fireflies (2026-11-04) carry one count for them all.
     jar: normalizeFireflyJarState(slice?.jar || {}),
+    jarCopies: slice?.jarCopies === true,
     starterKit: slice?.starterKit === true,
     // pc['last_bonus_snails'] (npc_sloth.js Friend of Metal), kept only once set.
     ...(Number.isFinite(bonusSnailsAt) && bonusSnailsAt > 0 ? { bonusSnailsAt } : {}),
@@ -472,7 +475,41 @@ function svgDataUrl(svg) {
 // Runtime state
 // ---------------------------------------------------------------------------
 
-let jar = createFireflyJarState();
+/*
+ * Each Firefly Jar holds its own Fireflies (ticket 12 follow-up, 2026-11-04: "when I buy any
+ * empty jars, they are automatically full"). Glitch kept num_flies on each jar (firefly_jar.js
+ * 25-27 initInstanceProps "0", addFirefly 239-262 on the jar opened); the remake kept one count
+ * for every jar. The count is now each jar's own, held with the tools' wear (js/tools.js
+ * firefly_jar, a contents class: a new jar is empty), so it goes with the jar into bags, onto the
+ * ground, to another player and back, solo and online (the ledger's `r`).
+ */
+const JAR = 'firefly_jar';
+/** The engine init saw (QA _state reads the jars through it). */
+let engineRef = null;
+
+/** Every jar's Fireflies, in pack order. */
+export function fireflyJarCounts(engine) {
+  return engine?.toolState ? toolCopies(engine.toolState, JAR).map((c) => c.remaining) : [];
+}
+
+/**
+ * The jar a whistle fills: the first in pack order with room (pc.findFirst, as the pumpkins look
+ * for a full one, pumpkin_carved_1.js 178-180), else the first. { copy, flies }, copy -1 with none.
+ */
+export function fireflyJarInUse(engine) {
+  const counts = fireflyJarCounts(engine);
+  if (!counts.length) return { copy: -1, flies: 0 };
+  const room = counts.findIndex((n) => n < FIREFLY_JAR_MAX);
+  const copy = room >= 0 ? room : 0;
+  return { copy, flies: counts[copy] };
+}
+
+/** Set one jar's Fireflies (its place in pack order). */
+export function setFireflyJar(engine, copy, flies) {
+  if (!engine?.toolState || !(copy >= 0)) return false;
+  setToolRemaining(engine.toolState, JAR, flies, { copy });
+  return true;
+}
 /** The Firefly's quest offer: once a session (npc_firefly.js '!firefly_collision'); QA routes opt in. */
 const fireflyOffer = { shown: false, allowed: true };
 /** Last Friend of Metal spit (ms), and the sloth the player is standing under. */
@@ -629,7 +666,8 @@ function publish(engine) {
     Object.keys(counts).sort().map((id) => `${id}:${counts[id]}`).join(',')
   );
   engine.setData('resourceLastHarvest', lastHarvest);
-  engine.setData('fireflyJar', String(jar.flies));
+  engine.setData('fireflyJar', String(fireflyJarInUse(engine).flies));
+  engine.setData('fireflyJars', fireflyJarCounts(engine).join(','));
   engine.setData(
     'resourceDemo',
     demoEntity ? `${demoEntity.classTsid}:${demoEntity.node.units}:${resourceNodeStatusLabel(demoEntity.node)}` : ''
@@ -1066,7 +1104,8 @@ function verbContext(engine, entity, verbId) {
     achievements: engine.unlockedAchievements,
     toolState: engine.toolState,
     now: Date.now(),
-    jar,
+    // The jar this whistle fills (its own Fireflies); `copy` is which one, for applyResult.
+    jar: entity.classTsid === 'npc_firefly' ? (({ copy, flies }) => ({ flies, copy }))(fireflyJarInUse(engine)) : { flies: 0 },
     nearby: entity.classTsid === 'npc_firefly' ? nearbyFireflies(engine, entity) : [],
     // The QA Sloth skips the Animal Kinship 3 gate; real Sloths keep it.
     requireSkill: entity !== demoEntity,
@@ -1233,7 +1272,8 @@ function applyResult(engine, entity, result) {
   engine.playSound(sfxFor(result), { volume: 0.6, jitter: 0.05 });
 
   if (entity.classTsid === 'npc_firefly') {
-    jar = normalizeFireflyJarState(result.jar || jar);
+    const filled = normalizeFireflyJarState(result.jar || {});
+    if (Number.isInteger(result.jar?.copy) && result.jar.copy >= 0) setFireflyJar(engine, result.jar.copy, filled.flies);
     (result.captured || []).forEach((node, index) => {
       const owner = entities.find((other) => other.node === node);
       if (owner?.view) {
@@ -1241,7 +1281,7 @@ function applyResult(engine, entity, result) {
         dropTarget(engine, owner);
       }
     });
-    showJar(engine, jar.flies);
+    showJar(engine, filled.flies);
   } else if (entity.classTsid === 'npc_sloth' && result.verbId === 'feed') {
     const view = entity.view;
     if (view) {
@@ -1532,6 +1572,7 @@ export const resourceNodesFeature = {
   id: RESOURCE_FEATURE_ID,
 
   init(engine) {
+    engineRef = engine;
     ensureResourceItems();
     // QA routes (any *demo / *autoplay param) stay quiet unless they ask (&fireflyoffer=1), like the Magic Rock.
     const params = [...new URLSearchParams(globalThis.location?.search || '').keys()];
@@ -1543,12 +1584,16 @@ export const resourceNodesFeature = {
   },
 
   save() {
-    return { jar: { ...jar }, starterKit: kit.starterKit, ...(bonusSnailsAt ? { bonusSnailsAt } : {}) };
+    return { jarCopies: true, starterKit: kit.starterKit, ...(bonusSnailsAt ? { bonusSnailsAt } : {}) };
   },
 
   restore(slice, engine) {
     const normalized = normalizeResourceFeatureSlice(slice);
-    jar = normalized.jar;
+    // An older save's one count for every jar becomes the first jar's (the one a whistle filled:
+    // the first in pack order); any other jar held is empty, as each one bought was.
+    if (!normalized.jarCopies && normalized.jar.flies > 0 && engine?.toolState && countItem(engine.inv, JAR) > 0) {
+      setFireflyJar(engine, 0, normalized.jar.flies);
+    }
     kit.starterKit = normalized.starterKit;
     bonusSnailsAt = normalized.bonusSnailsAt || 0;
     if (engine) migrateResourceStarterKit(engine.inv, kit);
@@ -1669,6 +1714,6 @@ export const resourceNodesFeature = {
 
   /** QA / tests. */
   _state() {
-    return { jar: { ...jar }, starterKit: kit.starterKit, entities: entities.length };
+    return { jars: fireflyJarCounts(engineRef), starterKit: kit.starterKit, entities: entities.length };
   },
 };

@@ -31,8 +31,8 @@
  */
 
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=db7c442f';
-import { addItem, countItem, ensureItem, registerItemUse, removeItem } from '../inventory.js?v=602da017';
-import { MUSICBLOCK_CATALOG, ensureMusicblockItems } from '../musicblocks.js?v=c7490d76';
+import { addItem, countItem, ensureItem, registerItemUse, removeItem } from '../inventory.js?v=d82f3b00';
+import { MUSICBLOCK_CATALOG, ensureMusicblockItems } from '../musicblocks.js?v=f5adbf0c';
 import { energyMax, loseMood, metabolicGain, moodMax, shiftMetabolic } from '../metabolics.js?v=8504134e';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 import { slugsFromEffects } from '../speech-slugs.js?v=130338f9';
@@ -70,7 +70,7 @@ import {
   musicblocksInPack,
   normalizeCrabMemory,
   playToday,
-} from '../crabs.js?v=3d887c82';
+} from '../crabs.js?v=0ec02c50';
 
 const ART = 'assets/sprites/crabs/';
 /** OGA npc_crab sheets: 131x129 cells, 6 columns; populated counts measured. */

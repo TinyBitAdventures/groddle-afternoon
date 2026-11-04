@@ -8,8 +8,8 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { createInventory, countItem } from '../public/js/inventory.js?v=602da017';
-import { createToolConditionState, getToolCondition } from '../public/js/tools.js?v=3974f57e';
+import { createInventory, countItem } from '../public/js/inventory.js?v=d82f3b00';
+import { createToolConditionState, getToolCondition } from '../public/js/tools.js?v=092ac4f3';
 import {
   MACHINE_ASSEMBLIES,
   MACHINE_PART_ITEMS,
@@ -22,14 +22,14 @@ import {
   distillInStill,
   advanceStill,
   collectHooch,
-} from '../public/js/machines.js?v=34a894cf';
-import { runTransform, listTransformVerbs, transformEdges } from '../public/js/item-transforms.js?v=909f90e4';
-import { RECIPE_CATALOG, craftRecipe, loadRecipeCatalogFromFile } from '../public/js/making.js?v=6b048d25';
-import { VENDOR_PROFILES } from '../public/js/vendor.js?v=08063e0c';
-import { SEED_CATALOG } from '../public/js/garden.js?v=dd021ecc';
+} from '../public/js/machines.js?v=8cf4b13e';
+import { runTransform, listTransformVerbs, transformEdges } from '../public/js/item-transforms.js?v=596df9fe';
+import { RECIPE_CATALOG, craftRecipe, loadRecipeCatalogFromFile } from '../public/js/making.js?v=6e6c53f0';
+import { VENDOR_PROFILES } from '../public/js/vendor.js?v=464d158d';
+import { SEED_CATALOG } from '../public/js/garden.js?v=2b2c8423';
 import { obtainableItems } from '../tools/job-obtainable.mjs';
 import { supplyReport } from '../tools/supply-report.mjs';
-import { supplyFeature } from '../public/js/features/supply-feature.js?v=2ae7c9b4';
+import { supplyFeature } from '../public/js/features/supply-feature.js?v=c5a48294';
 
 const SPIKE = join(dirname(fileURLToPath(import.meta.url)), '..', 'public');
 const ENGINEER = ['engineering_1'];
@@ -200,7 +200,7 @@ describe('pack transforms', () => {
     assert.deepEqual(events, [['cheese_very_stinky:poke', 1], ['VERB:poke:cheese_very_stinky', 1]]);
     const quests = JSON.parse(readFileSync(join(SPIKE, 'assets/content/quests.json'), 'utf8'));
     const def = (quests.quests || quests).find ? (quests.quests || quests).find((q) => q.classTsid === 'find_shiny_intrinsic_object') : (quests.quests || quests).find_shiny_intrinsic_object;
-    const { eventCounters } = await import('../public/js/quest-offers.js?v=c6b0ab10');
+    const { eventCounters } = await import('../public/js/quest-offers.js?v=1389077b');
     const req = def.requirements.find((r) => r.id === 'r375');
     assert.ok(eventCounters('cheese_very_stinky:poke').some((c) => c.counter === req.name), req.name);
   });

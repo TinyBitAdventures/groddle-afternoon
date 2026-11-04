@@ -25,7 +25,7 @@
  * pushes no item_give, its createItem leaves nothing over).
  */
 
-import { addItem, countItem, ensureItem, removeItem } from './inventory.js?v=602da017';
+import { addItem, countItem, ensureItem, removeItem } from './inventory.js?v=d82f3b00';
 import { skillPackageDetails } from './skill-packages.js?v=bfb87281';
 import { metabolicGain, moodMax, loseEnergy, loseMood } from './metabolics.js?v=8504134e';
 

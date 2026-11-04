@@ -2,9 +2,9 @@
  * Groddle Afternoon — original street geometry + layered decos
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
-import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=2e6bc3fd';
+import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=4abc03fc';
 import { createFeatureHost } from './js/feature-host.js?v=2ed3c069';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=9bedddda';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=b3babad4';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -36,7 +36,7 @@ import {
 // Quest copy is Flash htmlText: <b>/<i>/<br> drawn as formatting, the rest dropped, never innerHTML.
 import { questRequirementText, renderQuestText, withQuestMarkup } from './js/quest-text.js?v=7f5d761c';
 // G267: the world-verb quest counters skip offer-system quests; old saves drop the boot Moloko quest.
-import { dropBootStarterQuests, questMoveNote, routesCounter, worldVerbQuestEvents, gardenPlotEvents, makingUnitQuestEvents, shrineDonationQuestEvents } from './js/quest-offers.js?v=c6b0ab10';
+import { dropBootStarterQuests, questMoveNote, routesCounter, worldVerbQuestEvents, gardenPlotEvents, makingUnitQuestEvents, shrineDonationQuestEvents } from './js/quest-offers.js?v=1389077b';
 import {
   PHANTOM_QUEST_ID,
   REMEMBER_QUEST_ID,
@@ -220,7 +220,7 @@ import {
   rookEggStateForProgress,
   rookWoodsObjective,
   rookWoodsRemainingMs,
-} from './js/rook-woods.js?v=da8a71b0';
+} from './js/rook-woods.js?v=e33f01dd';
 import {
   ROOK_HALL_QUEST_ID,
   ROOK_HALL_START_QUEST_ID,
@@ -461,11 +461,11 @@ import {
   addItem,
   removeItem,
   isToolItem,
-} from './js/inventory.js?v=602da017';
-import { PACK_COPY, isBagClass, unitRankAt } from './js/pack-slots.js?v=68a8fca3';
+} from './js/inventory.js?v=d82f3b00';
+import { PACK_COPY, isBagClass, unitRankAt } from './js/pack-slots.js?v=c91d0ca3';
 import { createPackRow, mountPackClearance, packBandRange, packCountText, packSearchEntries, packSlotTip } from './js/ui/pack-row.js?v=65c0f180';
-import { listAnimalFeedOptions } from './js/animals.js?v=761b9fa7';
-import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=761b9fa7';
+import { listAnimalFeedOptions } from './js/animals.js?v=9d360b98';
+import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=9d360b98';
 import {
   createDroppedItemState,
   parseDroppedItemState,
@@ -476,13 +476,13 @@ import {
   pickupDroppedStack,
   placeDroppedBag,
   takeDroppedRecord,
-} from './js/world-items.js?v=132d9b8c';
+} from './js/world-items.js?v=34690771';
 import {
   createPlayerSave,
   parsePlayerSave,
   serializePlayerSave,
   restorePlayerSave,
-} from './js/player-save.js?v=86bb897a';
+} from './js/player-save.js?v=ff8746ee';
 import {
   HOME_INTERIOR_TSID,
   HOME_STREET_TSID,
@@ -496,7 +496,7 @@ import {
   imagineHome,
   isHomePlaceTsid,
 } from './js/homes.js?v=631ab6b8';
-import { HOME_MACHINE, offerHomeTicket, renderTicketMachine } from './js/home-ticket.js?v=a428e443';
+import { HOME_MACHINE, offerHomeTicket, renderTicketMachine } from './js/home-ticket.js?v=841363a3';
 import {
   MAIL_COMPANIONS,
   archiveMail,
@@ -528,9 +528,10 @@ import {
   WATERING_CAN_TOOLS,
   firstWorkingTool,
   bindToolInventory,
+  syncToolCopies,
   TOOL_CONDITION_CATALOG as TOOL_WEAR,
   brokenToolIcon,
-} from './js/tools.js?v=3974f57e';
+} from './js/tools.js?v=092ac4f3';
 import {
   listRecipes,
   listRecipesForTool,
@@ -561,7 +562,7 @@ import {
   MAKING_TOOL_SKILLS,
   recipeTaskLimit,
   recipeToolInUse,
-} from './js/making.js?v=6b048d25';
+} from './js/making.js?v=6e6c53f0';
 import { MAKE_TOOL_SHEETS } from './js/make-tool-sheets.js?v=6f758e09';
 import { LOW_FUEL_LINE, craftSessionElapsedMs, isLowFuel, isMachineArt, machineArtHtml, packMakeState, playMachineHandOver, setMachineArtFrame } from './js/machine-art.js?v=ac629e13';
 import {
@@ -588,7 +589,7 @@ import {
   cropIcon,
   hasWateringCan,
   hasHoe,
-} from './js/garden.js?v=dd021ecc';
+} from './js/garden.js?v=2b2c8423';
 import { GARDEN_SCALE, PLOT_H as GARDEN_PLOT_H, PLOT_W as GARDEN_PLOT_W, gardenFrame, gardenLayout, gardenStyle, plotPieces } from './js/garden-view.js?v=05651e76';
 import {
   ROCK_CATALOG,
@@ -601,7 +602,7 @@ import {
   starterMiningTools,
   STARTER_MINING_SKILLS,
   findWorkingPick,
-} from './js/mining.js?v=d856ab96';
+} from './js/mining.js?v=926b4d4c';
 import {
   loadStreetData,
   STREET_INDEX,
@@ -661,7 +662,7 @@ import {
   canEatFood,
   recordFoodEat,
   resetFoodDay,
-} from './js/food.js?v=f443ef18';
+} from './js/food.js?v=e03d5f01';
 import {
   consumeTakesCount,
   consumeCountCap,
@@ -671,7 +672,7 @@ import {
   limitCountCap,
   useItemMany,
   recordFoodEatMany,
-} from './js/eat-many.js?v=f9e8a96e';
+} from './js/eat-many.js?v=10974c7c';
 import {
   TRIPLE_JUMP_UPGRADES,
   createJumpState,
@@ -745,7 +746,7 @@ import { holdCloseToFloor } from './js/slope-walk.js?v=9af1e505';
 import { JUMP_SPEED, MAX_TICK_FRAMES, WALK_MAX, avatarGround, coastX, frameSteps, stepAvatar, steerAccel, steerX, streetPhysicsExtras } from './js/avatar-step.js?v=de5b3a16';
 import { createUserPath, stepUserPath } from './js/user-path.js?v=8880557f';
 import { FAILED_LINE, inVerbReach, movingLine, verbRange, walkOverEnd, walkOverGoalX } from './js/walk-over.js?v=db80ba07';
-import { hellBuffDesc, isInHell } from './js/hell.js?v=c493dadb';
+import { hellBuffDesc, isInHell } from './js/hell.js?v=52b4fcfc';
 import { climbBobY, ladderAnimState, ladderSwap } from './js/ladder-anim.js?v=a8b327a0';
 import { VECTOR_AVATAR } from './js/avatar-vector-sheets.js?v=ad801376';
 import { createNpcGlitchKit } from './js/npc-glitch.js?v=894841be';
@@ -781,7 +782,7 @@ import {
   planMusicblockDrop,
   playMusicblock,
   starterMusicblocks,
-} from './js/musicblocks.js?v=c7490d76';
+} from './js/musicblocks.js?v=f5adbf0c';
 import {
   VENDOR_PROFILES,
   selectVendorProfile,
@@ -792,20 +793,20 @@ import {
   createVendorSellQuote,
   vendorSellUnitPrice,
   vendorBuyUnitPrice,
-} from './js/vendor.js?v=08063e0c';
+} from './js/vendor.js?v=464d158d';
 import {
   animalAnchorX,
   createAnimalState,
   resetAnimalDay,
   animalStatusLabel,
-} from './js/animals.js?v=761b9fa7';
+} from './js/animals.js?v=9d360b98';
 import {
   ensureWoodTreeState,
   pickWoodTool,
   resetWoodTreeDay,
   woodToolLabel,
   woodTreeStatusLabel,
-} from './js/woodcutting.js?v=6d2ad054';
+} from './js/woodcutting.js?v=9f8bc052';
 import {
   GIANTS,
   createShrineState,
@@ -827,8 +828,8 @@ import {
   favorRelationNote,
   emblemRelationNote,
   formatSpeedUpTime,
-} from './js/shrines.js?v=9d364845';
-import { shrinePowderOptions, shrinePowderAchievementCounters } from './js/powders.js?v=d355981a';
+} from './js/shrines.js?v=95d74174';
+import { shrinePowderOptions, shrinePowderAchievementCounters } from './js/powders.js?v=53d99ac9';
 import {
   GAMESHOW_TICKET_ID,
   applySpinningWheelReward,
@@ -838,7 +839,7 @@ import {
   spinMeResponse,
   spinningWheelPhase,
   startSpinningWheel,
-} from './js/spinning-wheel.js?v=15a54f09';
+} from './js/spinning-wheel.js?v=482cd151';
 import {
   CUBIMAL_PACKAGE_IDS,
   cubimalCollectionProgress,
@@ -847,7 +848,7 @@ import {
   ensureCubimalItems,
   openCubimalPackage,
   setCubimalFree,
-} from './js/cubimals.js?v=14b9d9b0';
+} from './js/cubimals.js?v=8950bf83';
 import {
   STOOT_DOLL_BUBBLE_MS,
   STOOT_DOLL_ID,
@@ -899,7 +900,7 @@ import {
   ANIMAL_PATROL,
   nearestPlacementGap,
 } from './js/street-ecology.js?v=d41e5e97';
-import { chickenPauseRoll, easeToward, flightFloorAt, flightFloorFor, flyerLift } from './js/street-creatures.js?v=af1311cd';
+import { chickenPauseRoll, easeToward, flightFloorAt, flightFloorFor, flyerLift } from './js/street-creatures.js?v=d4685f47';
 import { createSoundBoard, DEFAULT_SFX_VOLUME, watchButtonClicks, watchPanelSounds } from './js/sound-board.js?v=87380a25';
 import {
   actionLoopFor,
@@ -3287,6 +3288,7 @@ function takeFromMenuStack(classTsid, n, wait = undefined) {
   return Boolean(features.query('packTakeFrom', classTsid, n, engine, { wait }));
 }
 
+
 /** Which of a class's tools the open pack popover is about (its slot's place in pack order), or null. */
 let packSelectedCopy = null;
 
@@ -4135,7 +4137,10 @@ function renderPackPopover(classTsid, anchor = null) {
       : `The full repair takes ${repairQuote.energy} energy and ${repairQuote.durationSeconds} seconds`
     : 'Repair with your Tinkertool';
   // The kind line under the name: the tool's wear, the food's fullness today, the bear's state.
-  const conditionNote = toolCondition?.tracked
+  // A Firefly Jar's line is what it holds (firefly_jar.js getLabel 337-338: "Firefly Jar (3/7)").
+  const conditionNote = toolCondition?.contents
+    ? `<span class="pack-tool-condition">Fireflies ${toolCondition.remaining}/${toolCondition.capacity}</span>`
+    : toolCondition?.tracked
     ? `<span class="pack-tool-condition${toolCondition.broken ? ' broken' : ''}">${toolCondition.broken ? 'Broken' : 'Condition'} ${toolCondition.remaining}/${toolCondition.capacity}</span>`
     : slot.isTool
       ? '<span class="pack-tool-unlimited">No wear meter</span>'
@@ -4679,7 +4684,7 @@ function renderPackRow(box, slots, opts = {}) {
     slot.setAttribute('aria-expanded', packSelected === s.classTsid && (!packSelectedPlace || (packSelectedPlace.container === s.container && packSelectedPlace.index === s.index)) ? 'true' : 'false');
     slot.setAttribute(
       'aria-label',
-      `${shownLabel} × ${s.count}${toolCondition?.tracked ? `, ${toolCondition.broken ? 'broken' : `${Math.round(toolCondition.percent * 100)} percent condition`}` : ''}`
+      `${shownLabel} × ${s.count}${toolCondition?.contents ? `, ${toolCondition.remaining} of ${toolCondition.capacity} Fireflies` : toolCondition?.tracked ? `, ${toolCondition.broken ? 'broken' : `${Math.round(toolCondition.percent * 100)} percent condition`}` : ''}`
     );
     if (toolCondition?.broken) slot.classList.add('is-broken');
     // The modern row's tooltip (js/ui/pack-row.js packSlotTip) says this; no browser title on top of it.
@@ -13488,6 +13493,7 @@ function savePlayerState() {
   if (!state.started) return false;
   try {
     syncAnimalWorldState();
+    syncToolCopies(toolState);
     const serialized = serializePlayerSave(createPlayerSave({
       inventory: inv,
       player: pc,
@@ -30743,7 +30749,7 @@ async function main() {
   }
   // Garden talkback QA (js/garden-talk-qa.js): ?gardentalkdemo=herb|crop.
   if (new URLSearchParams(location.search).has('gardentalkdemo')) {
-    import('./js/garden-talk-qa.js?v=cf86f0fc').then((m) => m.runGardenTalkDemo({ engine, executeVerb, params: new URLSearchParams(location.search) }));
+    import('./js/garden-talk-qa.js?v=410c54fb').then((m) => m.runGardenTalkDemo({ engine, executeVerb, params: new URLSearchParams(location.search) }));
   }
   // MEMQA (ticket 21, Safari's memory reload in Naraka): ?memqa=1 lets a probe walk streets through the
   // real street trip (tools/qa/street-memory.mjs). Solo pages only: online pages drop their params.
@@ -30865,6 +30871,8 @@ async function main() {
     // sub-steps of at most one frame (js/avatar-step.js frameSteps): air time and walking match
     // 60 fps at any frame rate. Everything after runs once with the whole tick.
     const dt = Math.min(ticker.deltaTime, MAX_TICK_FRAMES);
+    // Each tool or jar held is its own (js/tools.js): one that left this frame is gone before another arrives.
+    syncToolCopies(toolState);
     updateCurrentAction((1000 / 60) * dt);
     updateMakeCraft((1000 / 60) * dt);
     for (const step of frameSteps(dt)) {

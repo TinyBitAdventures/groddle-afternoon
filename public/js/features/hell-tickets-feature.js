@@ -38,13 +38,13 @@
  * hellTicketWine, hellTicketVisits.
  */
 
-import { addItem, countItem, removeItem } from '../inventory.js?v=602da017';
+import { addItem, countItem, removeItem } from '../inventory.js?v=d82f3b00';
 import { OVERLAY_USES, playWindowOverlay } from '../overlays.js?v=210ad5ee';
-import { acceptOffer, ensureQuestOfferState, markOffered } from '../quest-offers.js?v=c6b0ab10';
+import { acceptOffer, ensureQuestOfferState, markOffered } from '../quest-offers.js?v=1389077b';
 import { getQuestCatalog } from '../content-catalogs.js?v=10b118dd';
 import { parseQuestConversation } from '../quests.js?v=2ce7b3cb';
-import { HELL_LOCATION, HELL_QUESTS, isInHell, isInHellOne } from '../hell.js?v=c493dadb';
-import { BARTENDER, PANKA_DOOR, PANKA_TSID, isHellBarTsid } from '../hell-bar.js?v=eb25dea9';
+import { HELL_LOCATION, HELL_QUESTS, isInHell, isInHellOne } from '../hell.js?v=52b4fcfc';
+import { BARTENDER, PANKA_DOOR, PANKA_TSID, isHellBarTsid } from '../hell-bar.js?v=99ffcb87';
 import {
   GRAVE_VISIT,
   HELL_HOLE_ACCEPTED_TEXT,
@@ -60,9 +60,9 @@ import {
   planGraveVisit,
   recognitionBranch,
   ticketDue,
-} from '../hell-tickets.js?v=3746d2ce';
-import { hellFeature } from './hell-feature.js?v=54d49b30';
-import { doorsFeature } from './doors-feature.js?v=fa98d010';
+} from '../hell-tickets.js?v=4f3be74c';
+import { hellFeature } from './hell-feature.js?v=4c54964f';
+import { doorsFeature } from './doors-feature.js?v=5c5d34ee';
 
 export const HELL_TICKETS_FEATURE_ID = 'hell-tickets';
 

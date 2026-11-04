@@ -20,12 +20,12 @@ import {
   rulesVerbId,
   surfaceNear,
   verbTooltip,
-} from '../public/js/features/resource-nodes-feature.js?v=fede20a6';
+} from '../public/js/features/resource-nodes-feature.js?v=cf300ffb';
 import {
   RESOURCE_NODE_CATALOG,
   RESOURCE_NODE_CLASS_IDS,
   createResourceNode,
-} from '../public/js/resource-nodes.js?v=d78746b3';
+} from '../public/js/resource-nodes.js?v=384f63f3';
 import { createFeatureHost, normalizeFeatureSlices } from '../public/js/feature-host.js?v=2ed3c069';
 import { populationForStreet, planStreetPlacements } from '../public/js/street-ecology.js?v=d41e5e97';
 import { STORE_CATALOG } from '../public/js/store-catalog.js?v=74b56af3';
@@ -155,24 +155,25 @@ describe('resource node street slots', () => {
 });
 
 describe('resource feature save slice', () => {
-  it('normalizes the Firefly Jar and starter kit flag', () => {
-    assert.deepEqual(normalizeResourceFeatureSlice(undefined), { jar: { flies: 0 }, starterKit: false });
+  it('normalizes the old one-count Firefly Jar, the per-jar marker and starter kit flag', () => {
+    assert.deepEqual(normalizeResourceFeatureSlice(undefined), { jar: { flies: 0 }, jarCopies: false, starterKit: false });
     assert.deepEqual(
       normalizeResourceFeatureSlice({ jar: { flies: 99 }, starterKit: true }),
-      { jar: { flies: 7 }, starterKit: true }
+      { jar: { flies: 7 }, jarCopies: false, starterKit: true }
     );
     assert.deepEqual(
       normalizeResourceFeatureSlice({ jar: { num_flies: '3' }, starterKit: 'yes' }),
-      { jar: { flies: 3 }, starterKit: false }
+      { jar: { flies: 3 }, jarCopies: false, starterKit: false }
     );
+    assert.equal(normalizeResourceFeatureSlice({ jarCopies: true }).jarCopies, true);
   });
 
   it('round-trips through the feature host save and restore', () => {
     const host = createFeatureHost([resourceNodesFeature]);
     const engine = { inv: {} };
-    host.restore({ [RESOURCE_FEATURE_ID]: { jar: { flies: 5 }, starterKit: true } }, engine);
+    host.restore({ [RESOURCE_FEATURE_ID]: { jarCopies: true, starterKit: true } }, engine);
     const saved = host.save();
-    assert.deepEqual(saved[RESOURCE_FEATURE_ID], { jar: { flies: 5 }, starterKit: true });
+    assert.deepEqual(saved[RESOURCE_FEATURE_ID], { jarCopies: true, starterKit: true });
     assert.deepEqual(engine.inv, {});
   });
 });

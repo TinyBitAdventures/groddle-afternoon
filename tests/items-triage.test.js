@@ -8,8 +8,8 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { ITEM_CATALOG, createInventory, countItem } from '../public/js/inventory.js?v=602da017';
-import { listTransformVerbs, runTransform, transformEdges } from '../public/js/item-transforms.js?v=909f90e4';
+import { ITEM_CATALOG, createInventory, countItem } from '../public/js/inventory.js?v=d82f3b00';
+import { listTransformVerbs, runTransform, transformEdges } from '../public/js/item-transforms.js?v=596df9fe';
 import { obtainableItems } from '../tools/job-obtainable.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -68,7 +68,7 @@ describe('Bushel of Grain (grain.js bundle, grain_bushel.js unbundle)', () => {
 
 describe('Extremely Rare Items Vendor (store 25) in the Penalty Box', () => {
   it('sells store 25 at the source prices, minus the sold-out trophy', async () => {
-    const { RARE_STORE, RARE_ITEMS, RARE_ICONS, rareStoreProfile, ensureRareItems, room } = await import('../public/js/quest-rooms/penalty.js?v=74b6fd5f');
+    const { RARE_STORE, RARE_ITEMS, RARE_ICONS, rareStoreProfile, ensureRareItems, room } = await import('../public/js/quest-rooms/penalty.js?v=2c7657ce');
     const src = gsjs('items/catalog_stores.js');
     const block = src.slice(src.indexOf('Extremely Rare Items Vendor'), src.indexOf('// generated ok'));
     const rows = [...block.matchAll(/class_tsid: "([a-z0-9_]+)",\s*cost: (\d+),\s*total_quantity: (\d+)/g)].map((m) => ({ classTsid: m[1], cost: Number(m[2]), stock: Number(m[3]) }));

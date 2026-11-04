@@ -97,10 +97,10 @@ import {
   questAwardPayload,
   questMoveNote,
   turnInQuest,
-} from '../quest-offers.js?v=c6b0ab10';
+} from '../quest-offers.js?v=1389077b';
 import { parseQuestConversation } from '../quests.js?v=2ce7b3cb';
 import { getQuestCatalog } from '../content-catalogs.js?v=10b118dd';
-import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=602da017';
+import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=d82f3b00';
 import { runStreetTransition } from '../screen-fx.js?v=9d4640eb';
 import { HOME_INTERIOR_TSID, HOME_STREET_TSID } from '../homes.js?v=631ab6b8';
 import { armPromptTimeout, promptTimeoutMs } from '../prompt-timeout.js?v=c13ee4f6';
@@ -160,7 +160,7 @@ const ROOM_MODULES = {
   top_of_tree: () => import('../quest-rooms/top-of-tree.js?v=5668c299'),
   color_unblocking: () => import('../quest-rooms/color-unblocking.js?v=ec27dcd8'),
   vision_quest: () => import('../quest-rooms/vision-quest.js?v=4d3f6bac'),
-  kids_room: () => import('../quest-rooms/kids-room.js?v=18177a73'),
+  kids_room: () => import('../quest-rooms/kids-room.js?v=1f266673'),
   rube_yard: () => import('../quest-rooms/rube-yard.js?v=f443dc92'),
   le_miserable: () => import('../quest-rooms/le-miserable.js?v=c15ad933'),
   juju_camp: () => import('../quest-rooms/juju-camp.js?v=d19a6628'),
@@ -169,13 +169,13 @@ const ROOM_MODULES = {
   an_autumn_day: () => import('../quest-rooms/an-autumn-day.js?v=37340a72'),
   being_watched: () => import('../quest-rooms/being-watched.js?v=94119dc6'),
   back_alley: () => import('../quest-rooms/back-alley.js?v=657b2221'),
-  clubhouse: () => import('../quest-rooms/clubhouse.js?v=3fbb7ecc'),
+  clubhouse: () => import('../quest-rooms/clubhouse.js?v=6b297d54'),
   light_perspective: () => import('../quest-rooms/light-perspective.js?v=319bd577'),
   tile_puzzle: () => import('../quest-rooms/tile-puzzle.js?v=52045bab'),
   operation_grow: () => import('../quest-rooms/operation-grow.js?v=843ff345'),
-  gwendolyn: () => import('../quest-rooms/gwendolyn.js?v=1f7fce3a'),
+  gwendolyn: () => import('../quest-rooms/gwendolyn.js?v=11ca971b'),
   mental_block: () => import('../quest-rooms/mental-block.js?v=c0afd86d'),
-  penalty: () => import('../quest-rooms/penalty.js?v=74b6fd5f'),
+  penalty: () => import('../quest-rooms/penalty.js?v=2c7657ce'),
   esquibeth: () => import('../quest-rooms/esquibeth.js?v=ed42ce79'),
   firefly_whistle: () => import('../quest-rooms/firefly-whistle.js?v=9e94f646'),
 };

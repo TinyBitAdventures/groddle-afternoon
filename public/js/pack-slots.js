@@ -317,7 +317,7 @@ function classOrder(inv, opts) {
  * The pack's slots, each bag's slots and what the magic rock holds.
  * @param {Record<string, number>} inv
  * @param {object} prefs saved arrangement (normalizePrefs)
- * @param {{ capacity?: number, catalog?: object, isTool?: (cls: string) => boolean, order?: string[], labels?: Record<string,string>, takeFirst?: { container: string, index: number }[] }} [opts]
+ * @param {{ capacity?: number, catalog?: object, isTool?: (cls: string) => boolean, lastFirst?: (cls: string) => boolean, order?: string[], labels?: Record<string,string>, takeFirst?: { container: string, index: number }[] }} [opts]
  *   takeFirst: saved places (prefs place keys and indexes) whose stacks a class's
  *   fewer comes off before the first-in-slot-order rule: the stack a verb was
  *   used on (main.js doVerb 3239-3250 acts on the stack the client named).
@@ -477,6 +477,10 @@ export function layoutPack(inv, prefs = null, opts = {}) {
         if (where.has(s)) firstFirst.push(where.get(s));
         else if (s.kind === 'bag') for (const t of boxes.get(s.key).slots) if (where.has(t)) firstFirst.push(where.get(t));
       }
+      // A class whose units each carry their own state (js/tools.js copies: a tool's wear, a jar's
+      // Fireflies) gives its last unit first: the copy js/tools.js lets go when no verb chose one,
+      // so the slot that empties is always the one whose wear left (2026-11-04).
+      if (opts.lastFirst?.(cls)) firstFirst.reverse();
       // The stack a verb was used on gives first (takeFirst), then the rest in slot order.
       const first = [];
       for (const p of Array.isArray(opts.takeFirst) ? opts.takeFirst : []) {

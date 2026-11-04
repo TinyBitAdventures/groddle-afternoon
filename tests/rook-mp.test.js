@@ -200,7 +200,7 @@ describe('rook-mp: wiring', () => {
 
   it('the server prices every offering the browser can make, so none reads as too small (ticket 38)', { skip: skipWithoutServer }, async () => {
     const data = JSON.parse(fs.readFileSync(serverPath('data/rook.json'), 'utf8'));
-    const { MUSICBLOCK_CATALOG } = await import('../public/js/musicblocks.js?v=c7490d76');
+    const { MUSICBLOCK_CATALOG } = await import('../public/js/musicblocks.js?v=f5adbf0c');
     const { ITEM_BASE_COSTS } = await import('../public/js/store-catalog.js?v=74b56af3');
     // Registered at run time in the browser, so a catalog-only build left them at the server's floor of 1.
     for (const [id, def] of Object.entries(MUSICBLOCK_CATALOG)) assert.equal(data.values[id], def.baseCost, id);

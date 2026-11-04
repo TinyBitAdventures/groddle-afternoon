@@ -24,11 +24,11 @@ import { join } from 'node:path';
 
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=10b118dd';
 import { createQuestState } from '../public/js/quests.js?v=2ce7b3cb';
-import { markOffered, waitingOffers } from '../public/js/quest-offers.js?v=c6b0ab10';
-import { questOffersFeature, EMERGENCY_SNOOZE_MS } from '../public/js/features/quest-offers-feature.js?v=7380566a';
-import { hellTicketsFeature } from '../public/js/features/hell-tickets-feature.js?v=81c7ea1b';
-import { hellFeature } from '../public/js/features/hell-feature.js?v=54d49b30';
-import { HELL_LOCATION, createHellState, croak } from '../public/js/hell.js?v=c493dadb';
+import { markOffered, waitingOffers } from '../public/js/quest-offers.js?v=1389077b';
+import { questOffersFeature, EMERGENCY_SNOOZE_MS } from '../public/js/features/quest-offers-feature.js?v=f40162fd';
+import { hellTicketsFeature } from '../public/js/features/hell-tickets-feature.js?v=e3b523d2';
+import { hellFeature } from '../public/js/features/hell-feature.js?v=4c54964f';
+import { HELL_LOCATION, createHellState, croak } from '../public/js/hell.js?v=52b4fcfc';
 
 const root = join(import.meta.dirname, '..');
 const read = (rel) => readFileSync(join(root, rel), 'utf8');

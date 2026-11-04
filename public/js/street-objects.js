@@ -32,13 +32,13 @@
  * keeps a dig crew (diggers) as a rock keeps miners.
  */
 
-import { ROCK_CATALOG, findWorkingPick, miningProfile } from './mining.js?v=d856ab96';
+import { ROCK_CATALOG, findWorkingPick, miningProfile } from './mining.js?v=926b4d4c';
 import { MINING_EXPERT_UPGRADES } from './imagination-effects.js?v=70169933';
 import { TRANT_META, canHarvestTrant, fruitCapacityAt, resolveArborologyPackage } from './trants.js?v=9c2e8c0f';
-import { highestLightGreenThumbRank, quoteTrantCare } from './trant-care.js?v=38c0207f';
-import { RESOURCE_NODE_ALIASES, RESOURCE_NODE_CATALOG, resolveResourceSkillPackage } from './resource-nodes.js?v=d78746b3';
-import { highestAnimalKinshipRank } from './animal-kinship.js?v=2757bb52';
-import { applyCreatureState, clockOffset, pathFrom } from './street-creatures.js?v=af1311cd';
+import { highestLightGreenThumbRank, quoteTrantCare } from './trant-care.js?v=3a74e7c9';
+import { RESOURCE_NODE_ALIASES, RESOURCE_NODE_CATALOG, resolveResourceSkillPackage } from './resource-nodes.js?v=384f63f3';
+import { highestAnimalKinshipRank } from './animal-kinship.js?v=33e695a9';
+import { applyCreatureState, clockOffset, pathFrom } from './street-creatures.js?v=d4685f47';
 
 /** The resource-node classes whose stock is shared (the "N uses left, then regrows" nodes). */
 export const SHARED_NODE_CLASSES = Object.freeze(['mortar_barnacle', 'ice_knob', 'jellisac', 'dirt_pile', 'peat_1', 'paper_tree']);

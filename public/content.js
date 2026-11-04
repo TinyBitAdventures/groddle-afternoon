@@ -15,7 +15,7 @@ import {
 import {
   quoteTrantCare,
   performTrantCare,
-} from './js/trant-care.js?v=38c0207f';
+} from './js/trant-care.js?v=3a74e7c9';
 import {
   listPlantableSeeds,
   waterAllPlots,
@@ -28,8 +28,8 @@ import {
   hasWateringCan,
   hasHoe,
   plotStatusLabel,
-} from './js/garden.js?v=dd021ecc';
-import { firstWorkingTool, HOE_TOOLS, WATERING_CAN_TOOLS } from './js/tools.js?v=3974f57e';
+} from './js/garden.js?v=2b2c8423';
+import { firstWorkingTool, HOE_TOOLS, WATERING_CAN_TOOLS } from './js/tools.js?v=092ac4f3';
 import {
   ROCK_CATALOG,
   MINING_COSTS,
@@ -39,31 +39,31 @@ import {
   findWorkingPick,
   rockStatusLabel,
   ensureMiningItems,
-} from './js/mining.js?v=d856ab96';
+} from './js/mining.js?v=926b4d4c';
 import {
   ANIMAL_CLASS_IDS,
   ensureAnimalState,
   listAnimalFeedOptions,
   feedAnimal,
-} from './js/animals.js?v=761b9fa7';
+} from './js/animals.js?v=9d360b98';
 import {
   quoteAnimalKinship,
   performAnimalKinship,
   highestAnimalKinshipRank,
-} from './js/animal-kinship.js?v=2757bb52';
+} from './js/animal-kinship.js?v=33e695a9';
 import {
   MUSICBLOCK_CATALOG,
   collectMusicblock,
   isMusicblock,
-} from './js/musicblocks.js?v=c7490d76';
+} from './js/musicblocks.js?v=f5adbf0c';
 import { nextDialogue, formatSpokenLine } from './js/dialogue.js?v=fcfed1af';
 import {
   ensureWoodTreeState,
   quoteWoodTreeHarvest,
   harvestWoodTree,
   woodTreeStatusLabel,
-} from './js/woodcutting.js?v=6d2ad054';
-import { findWorkingRookTool } from './js/rook-woods.js?v=da8a71b0';
+} from './js/woodcutting.js?v=9f8bc052';
+import { findWorkingRookTool } from './js/rook-woods.js?v=e33f01dd';
 import {
   HERDKEEPING,
   INCUBATION,
@@ -73,13 +73,13 @@ import {
   namingVerbs,
   queuePlops,
   startIncubation,
-} from './js/animal-husbandry.js?v=16195ac6';
+} from './js/animal-husbandry.js?v=2c391fae';
 import { loseEnergy, metabolicGain, moodMax } from './js/metabolics.js?v=8504134e';
 import { SET_FREE, setFreeVerbState } from './js/animal-set-free.js?v=3b194fca';
 import { BUTTER_UP, SING_TO, butterUpVerbState, butterUpChicken, singToVerbState, singToButterfly } from './js/animal-flattery.js?v=63001f58';
 import { levelInfoForXp } from './js/progression.js?v=33462eaa';
 import { getGameDayKey } from './js/game-day.js?v=edb00566';
-import { ITEM_CATALOG } from './js/inventory.js?v=602da017';
+import { ITEM_CATALOG } from './js/inventory.js?v=d82f3b00';
 import { slugsFromEffects } from './js/speech-slugs.js?v=130338f9';
 import { animalResponseKey, failureResponseKey, trantCareResponseKey, rockResponseKey, verbResponse } from './js/verb-responses.js?v=3ceb8a8c';
 

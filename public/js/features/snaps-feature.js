@@ -38,7 +38,7 @@
  */
 
 import { createMinnAccount } from '../minn-account.js?v=28026657';
-import { ITEM_CATALOG, countItem, ensureItem, itemIcon } from '../inventory.js?v=602da017';
+import { ITEM_CATALOG, countItem, ensureItem, itemIcon } from '../inventory.js?v=d82f3b00';
 import { STREET_INDEX, resolveIndexTsid } from '../street-loader.js?v=33d2b8bc';
 import {
   CAMERA_CLASS, CAPTION_MAX, FORGET_RECHARGE_SEC, RECHARGE_BUFF, SNAP_COPY as T, SNAP_MAX_BYTES, SNAP_QUALITY, SNAP_WIDTHS, TRAVEL,

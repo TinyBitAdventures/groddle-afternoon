@@ -312,6 +312,9 @@ export function listPackRows(inv) {
   };
 }
 
+/** js/tools.js bindToolInventory sets this hook on a bound inventory (not saved: a symbol). */
+const ITEM_ARRIVING = Symbol.for('groddle.itemArriving');
+
 /**
  * @param {Partial<Inventory>} [seed]
  * @returns {Inventory}
@@ -341,6 +344,8 @@ export function createInventory(seed = {}) {
  */
 export function addItem(inv, classTsid, n = 1) {
   if (!ITEM_CATALOG[classTsid]) ensureItem(classTsid);
+  // Per-copy state (js/tools.js bindToolInventory): the copies that left go before new ones arrive.
+  if (n > 0) inv[ITEM_ARRIVING]?.(classTsid);
   if (inv[classTsid] === undefined) inv[classTsid] = 0;
   inv[classTsid] = (inv[classTsid] || 0) + n;
   return inv[classTsid];

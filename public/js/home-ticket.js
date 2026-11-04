@@ -24,7 +24,7 @@
  * Austin 2026-10-25).
  */
 
-import { addItem, countItem, ensureItem, removeItem } from './inventory.js?v=602da017';
+import { addItem, countItem, ensureItem, removeItem } from './inventory.js?v=d82f3b00';
 import { HOME_STYLES, imagineHome, normalizeHomeState } from './homes.js?v=631ab6b8';
 import { LINES, talkPages } from './newxp.js?v=8aef8287';
 

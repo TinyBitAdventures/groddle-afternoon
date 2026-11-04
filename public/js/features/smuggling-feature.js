@@ -36,16 +36,16 @@
  *     smugDeim, smugLast, smugCounts, smugAutoplay.
  */
 
-import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=602da017';
-import { canUseTool } from '../tools.js?v=3974f57e';
-import { acceptOffer, ensureQuestOfferState, turnInQuest } from '../quest-offers.js?v=c6b0ab10';
+import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=d82f3b00';
+import { canUseTool } from '../tools.js?v=092ac4f3';
+import { acceptOffer, ensureQuestOfferState, turnInQuest } from '../quest-offers.js?v=1389077b';
 import { parseQuestConversation } from '../quests.js?v=2ce7b3cb';
 import { getQuestCatalog } from '../content-catalogs.js?v=10b118dd';
 import { STREET_INDEX, resolveIndexTsid } from '../street-loader.js?v=33d2b8bc';
 import { isStandable, worldToScreen } from '../street-model.js?v=505d8990';
 import { landingY, walkSurfaceY } from '../walk-surface.js?v=c982983e';
-import { hellFeature } from './hell-feature.js?v=54d49b30';
-import { questRoomConverse } from './quest-instances-feature.js?v=57f5a7ef';
+import { hellFeature } from './hell-feature.js?v=4c54964f';
+import { questRoomConverse } from './quest-instances-feature.js?v=3fea1db7';
 import {
   CONTRABAND,
   CONTRABAND_ITEM,

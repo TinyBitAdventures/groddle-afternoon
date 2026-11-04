@@ -17,13 +17,13 @@ import {
   loadRecipeCatalogFromFile,
   starterCraftIngredients,
   starterToolsInventory,
-} from '../public/js/making.js?v=6b048d25';
+} from '../public/js/making.js?v=6e6c53f0';
 import {
   ITEM_CATALOG,
   countItem,
   createInventory,
   listPackToolSlots,
-} from '../public/js/inventory.js?v=602da017';
+} from '../public/js/inventory.js?v=d82f3b00';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const publicRoot = join(here, '../public');

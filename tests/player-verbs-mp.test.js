@@ -27,10 +27,10 @@ import {
   targetSide,
   underTheInfluence,
 } from '../public/js/player-verbs-mp.js?v=21706489';
-import { playerVerbsMpFeature } from '../public/js/features/player-verbs-mp-feature.js?v=8a857500';
+import { playerVerbsMpFeature } from '../public/js/features/player-verbs-mp-feature.js?v=9106fb95';
 import { loadContentCatalogsFromDir, getQuestCatalog } from '../public/js/content-catalogs.js?v=10b118dd';
 import { createQuestState } from '../public/js/quests.js?v=2ce7b3cb';
-import { pendingQuestOffers, acceptOffer } from '../public/js/quest-offers.js?v=c6b0ab10';
+import { pendingQuestOffers, acceptOffer } from '../public/js/quest-offers.js?v=1389077b';
 import { MULTIPLAYER_QUESTS, MULTIPLAYER_QUESTS_LEFT_OUT, MP_FACTS, offerableMultiplayerQuest } from '../public/js/quests-mp.js?v=2beb658a';
 import { createAchievementState, applyAchievementProgress } from '../public/js/achievements.js?v=ad0b5a5a';
 import { economyCredits } from '../tools/build-economy.mjs';

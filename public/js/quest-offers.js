@@ -70,7 +70,7 @@
 import { VENDOR_NPCS, VENDOR_NPC_CLASSES } from './vendor-npcs.js?v=616c0568';
 import { getQuestCatalog } from './content-catalogs.js?v=10b118dd';
 import { levelInfoForXp } from './progression.js?v=33462eaa';
-import { brokenToolCopies } from './tools.js?v=3974f57e';
+import { brokenToolCopies } from './tools.js?v=092ac4f3';
 import { offerableMultiplayerQuest } from './quests-mp.js?v=2beb658a';
 import {
   assignQuest,
@@ -1375,7 +1375,7 @@ export function toolBreakEvents(previous, toolState) {
   const events = [];
   for (const [classTsid, row] of Object.entries(toolState?.condition || {})) {
     // Each tool held breaks on its own (js/tools.js copies): one event per tool that broke since.
-    const n = brokenToolCopies(row);
+    const n = brokenToolCopies(row, classTsid);
     broken[classTsid] = n;
     const before = previous ? Number(previous[classTsid] === true ? 1 : previous[classTsid]) || 0 : n;
     for (let k = before; k < n; k += 1) {

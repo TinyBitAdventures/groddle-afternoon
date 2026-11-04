@@ -93,7 +93,7 @@
  * grant(class, n) to gain something the way a reward does.
  */
 
-import { ITEM_CATALOG, addItem, isToolItem, removeItem } from '../inventory.js?v=602da017';
+import { ITEM_CATALOG, addItem, isToolItem, removeItem } from '../inventory.js?v=d82f3b00';
 import {
   BAG_DEFS,
   PACK_CAPACITY,
@@ -123,8 +123,8 @@ import {
   unitOrder,
   unitPlaces,
   unitRankAt,
-} from '../pack-slots.js?v=68a8fca3';
-import { TOOL_CONDITION_CATALOG, moveToolCopy, pickToolCopies, placeToolCopies } from '../tools.js?v=3974f57e';
+} from '../pack-slots.js?v=c91d0ca3';
+import { TOOL_CONDITION_CATALOG, moveToolCopy, pickToolCopies, placeToolCopies } from '../tools.js?v=092ac4f3';
 import { createMinnAccount } from '../minn-account.js?v=28026657';
 import { BAG_NAME_MAX, BAG_RENAME_COPY, bagLabel, canRenameBag, cleanBagName, renamedTo } from '../bag-names.js?v=22391c55';
 import { openNamePrompt } from '../ui/name-prompt.js?v=142b551a';
@@ -184,7 +184,7 @@ let starterAsked = false;
 function opts() {
   const labels = {};
   for (const [cls, meta] of Object.entries(ITEM_CATALOG)) labels[cls] = meta.label;
-  return { capacity: PACK_CAPACITY, catalog: ITEM_CATALOG, isTool: isToolItem, order: Object.keys(ITEM_CATALOG), labels, sortitude: hasCard(engineRef, SORT_CARDS.sortitude) };
+  return { capacity: PACK_CAPACITY, catalog: ITEM_CATALOG, isTool: isToolItem, lastFirst: hasCopies, order: Object.keys(ITEM_CATALOG), labels, sortitude: hasCard(engineRef, SORT_CARDS.sortitude) };
 }
 
 function nameOf(cls, n) {
@@ -398,6 +398,41 @@ function savedCount(prefs, cls) {
   return n;
 }
 
+/** A class whose units each keep their own state in js/tools.js (a tool's wear, a jar's Fireflies). */
+function hasCopies(cls) {
+  return Boolean(TOOL_CONDITION_CATALOG[cls]);
+}
+
+/**
+ * Tools (and jars) that just arrived take their own places among the class's copies (2026-11-04).
+ * js/tools.js adds a new copy last, but the pack may put the new stack ahead of one already held
+ * (a Red Toolbox fills before the pack, pack-slots.js routeRank), and then the new tool showed the
+ * old one's wear and the old one the new one's ("the new one came pre-broken"). With the layout
+ * before and after, the units at places that were not there before are the new ones: the newest
+ * copies move to those places in pack order (js/tools.js placeToolCopies, values kept).
+ */
+function placeArrivals(engine, before, after) {
+  const state = engine?.toolState;
+  if (!state || !before || !after) return;
+  for (const cls of Object.keys(state.condition || {})) {
+    if (!hasCopies(cls) || (after.rock?.[cls] || 0) > 0 || (before.rock?.[cls] || 0) > 0) continue;
+    const was = unitPlaces(before, cls);
+    const now = unitPlaces(after, cls);
+    const k = now.length - was.length;
+    if (k <= 0 || now.length !== (Number(engine.inv?.[cls]) || 0)) continue;
+    const old = new Map();
+    for (const p of was) old.set(`${p.container}:${p.index}`, (old.get(`${p.container}:${p.index}`) || 0) + 1);
+    const ranks = [];
+    now.forEach((p, r) => {
+      const key = `${p.container}:${p.index}`;
+      if (old.get(key) > 0) old.set(key, old.get(key) - 1);
+      else ranks.push(r);
+    });
+    if (ranks.length !== k || ranks.every((r, i) => r === now.length - k + i)) continue;
+    placeToolCopies(state, cls, ranks);
+  }
+}
+
 function reconcile(engine) {
   const inv = engine?.inv || {};
   if (engine?.started) migrate(engine);
@@ -421,6 +456,7 @@ function reconcile(engine) {
     slice.prefs = layout.prefs;
     slice.rock = { ...layout.rock };
     if (slice.open && !layout.bags[slice.open]) slice.open = '';
+    placeArrivals(engine, before, layout);
     lastLayout = layout;
     // What came off counts against the takes asked for; one fully taken, or whose stack is gone, ends.
     if (prefsBefore) {
@@ -871,6 +907,8 @@ export const bagsFeature = {
         });
         if (ranks.length) placeToolCopies(engine.toolState, tcls, ranks, points);
       }
+      // Its tools are already in their places: the next look must not place them again (placeArrivals).
+      if (lastLayout) lastLayout = layout;
     }
     engine.setData?.('packLast', `bag_in:${cls}:${list.length}`);
     return { ok: true, key: res.key };

@@ -20,7 +20,7 @@ import {
   streetWidth,
   worldToScreen,
 } from '../public/js/street-model.js?v=505d8990';
-import { giantForStreet } from '../public/js/shrines.js?v=9d364845';
+import { giantForStreet } from '../public/js/shrines.js?v=95d74174';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const publicRoot = join(__dirname, '../public');

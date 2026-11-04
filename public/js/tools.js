@@ -63,7 +63,23 @@ export const TOOL_CONDITION_CATALOG = Object.freeze({
   woodworker: { label: 'Woodworker', capacity: 200, baseCost: 0, repairable: false, fuel: true, source: 'woodworker.js machine_base max_fuel' },
   fuelmaker: { label: 'Fuelmaker', capacity: 200, baseCost: 0, repairable: false, fuel: true, source: 'fuelmaker.js machine_base max_fuel' },
   blockmaker: { label: 'Blockmaker', capacity: 200, baseCost: 0, repairable: false, fuel: true, source: 'blockmaker.js machine_base max_fuel' },
+  // Not wear: what one jar holds. firefly_jar.js 25-27 initInstanceProps num_flies "0" (a new
+  // jar is empty), 239-262 addFirefly and 444-451 removeFirefly change only that jar, max 7
+  // (469 max_consumable), stackmax 1 (15). Held here so each jar keeps its own Fireflies and they
+  // go with it wherever a tool's wear goes (bags, drops, gifts, trades, auctions, storage, the
+  // site's ledger `r`). `contents`: a new copy starts at `empty`, never breaks, never wears.
+  firefly_jar: { label: 'Firefly Jar', capacity: 7, baseCost: 100, repairable: false, contents: true, empty: 0, source: 'firefly_jar.js num_flies' },
 });
+
+/** Whether a class's copies hold contents (a Firefly Jar's Fireflies), not wear. */
+export function isContentsClass(classTsid) {
+  return TOOL_CONDITION_CATALOG[classTsid]?.contents === true;
+}
+
+/** What a new copy of a class holds: a full meter for a tool, `empty` for contents. */
+function newPoints(def) {
+  return def.contents ? Math.max(0, Math.min(def.capacity, finiteInt(def.empty, 0))) : def.capacity;
+}
 
 /**
  * Tools that stand in for one another, in the order the source looks for a
@@ -170,13 +186,20 @@ export function createToolConditionState(seed = {}) {
 export function bindToolInventory(state, inv) {
   if (!state || typeof state !== 'object') return state;
   Object.defineProperty(state, 'inv', { value: inv || null, writable: true, configurable: true, enumerable: false });
+  // js/inventory.js addItem asks before more of a class arrive: the copies that left go first.
+  if (inv && typeof inv === 'object') {
+    Object.defineProperty(inv, ITEM_ARRIVING, { value: (cls) => syncToolCopies(state, cls), writable: true, configurable: true, enumerable: false });
+  }
   return state;
 }
 
-/** A copy's points, clamped to the class's capacity; none given (null: the site's "new") is full. */
+/** The hook js/inventory.js addItem calls (Symbol.for, so neither module imports the other). */
+export const ITEM_ARRIVING = Symbol.for('groddle.itemArriving');
+
+/** A copy's points, clamped to the class's capacity; none given (null: the site's "new") is new (full, or an empty jar). */
 function clampPoints(def, value) {
-  if (value == null || value === '') return def.capacity;
-  return Math.max(0, Math.min(def.capacity, finiteInt(value, def.capacity)));
+  if (value == null || value === '') return newPoints(def);
+  return Math.max(0, Math.min(def.capacity, finiteInt(value, newPoints(def))));
 }
 
 function heldCount(state, classTsid) {
@@ -196,9 +219,9 @@ function inUseIndex(copies, wear = 1) {
 /** Repeat the copy in use on the row (older readers, and break events). */
 function settleRow(row, def) {
   const copies = row.copies;
-  const r = copies.length ? copies[inUseIndex(copies)] : def.capacity;
+  const r = copies.length ? copies[def.contents ? 0 : inUseIndex(copies)] : newPoints(def);
   row.remaining = r;
-  row.broken = r <= 0;
+  row.broken = !def.contents && r <= 0;
   return row;
 }
 
@@ -214,7 +237,7 @@ export function normalizeToolConditionState(seed = {}) {
       : [row.broken === true ? 0 : clampPoints(def, row.remaining)];
     condition[classTsid] = settleRow({
       copies,
-      remaining: def.capacity,
+      remaining: newPoints(def),
       broken: false,
       uses: Math.max(0, finiteInt(row.uses, 0)),
       repairs: Math.max(0, finiteInt(row.repairs, 0)),
@@ -239,7 +262,7 @@ export function ensureToolCondition(state, classTsid) {
   if (!state.condition || typeof state.condition !== 'object') state.condition = {};
   let row = state.condition[classTsid];
   if (!row) {
-    row = { copies: [], remaining: def.capacity, broken: false, uses: 0, repairs: 0 };
+    row = { copies: [], remaining: newPoints(def), broken: false, uses: 0, repairs: 0 };
     state.condition[classTsid] = row;
   }
   if (!Array.isArray(row.copies)) {
@@ -248,8 +271,29 @@ export function ensureToolCondition(state, classTsid) {
   const held = heldCount(state, classTsid);
   const want = held == null ? Math.max(1, row.copies.length) : held;
   if (row.copies.length > want) row.copies.length = want;
-  while (row.copies.length < want) row.copies.push(def.capacity);
+  while (row.copies.length < want) row.copies.push(newPoints(def));
   return settleRow(row, def);
+}
+
+/**
+ * Bring every row's copies in step with the pack now (ticket 12 follow-up, 2026-11-04: a Fancy
+ * Pick dropped broken and then bought again "came pre-broken"). The copies used to follow the
+ * count only when a tool was next looked at, so a tool that left and a new one that arrived
+ * before then (a drop and a purchase, or a save in between) were the same copy to them, and the
+ * new one took the old one's wear. game.js calls this every frame, before a save and after a
+ * load, and addItem calls it for a class just before more of it arrive (ITEM_ARRIVING), so a
+ * copy that left is gone before a new one comes. Rows are never created here.
+ */
+export function syncToolCopies(state, classTsid = null) {
+  if (!state?.condition || !state.inv) return state;
+  const rows = classTsid ? [classTsid] : Object.keys(state.condition);
+  for (const cls of rows) {
+    const row = state.condition[cls];
+    if (!row || !TOOL_CONDITION_CATALOG[cls]) continue;
+    const held = heldCount(state, cls);
+    if (!Array.isArray(row.copies) || row.copies.length !== held) ensureToolCondition(state, cls);
+  }
+  return state;
 }
 
 /** Every copy's wear, in pack order (what each tool slot shows). */
@@ -257,7 +301,7 @@ export function toolCopies(state, classTsid) {
   const def = TOOL_CONDITION_CATALOG[classTsid];
   if (!def) return [];
   const row = ensureToolCondition(state, classTsid);
-  return row.copies.map((r) => ({ remaining: r, capacity: def.capacity, percent: def.capacity ? r / def.capacity : 1, broken: r <= 0 }));
+  return row.copies.map((r) => ({ remaining: r, capacity: def.capacity, percent: def.capacity ? r / def.capacity : 1, broken: !def.contents && r <= 0 }));
 }
 
 function copyIndexFor(row, opts, wear = 1) {
@@ -287,7 +331,7 @@ export function getToolCondition(state, classTsid, opts = {}) {
   }
   const row = ensureToolCondition(state, classTsid);
   const copy = row?.copies.length ? copyIndexFor(row, opts, opts?.wear) : -1;
-  const remaining = copy >= 0 ? Math.max(0, Math.min(def.capacity, Number(row.copies[copy]) || 0)) : def.capacity;
+  const remaining = copy >= 0 ? Math.max(0, Math.min(def.capacity, Number(row.copies[copy]) || 0)) : newPoints(def);
   return {
     classTsid,
     label: def.label,
@@ -297,9 +341,10 @@ export function getToolCondition(state, classTsid, opts = {}) {
     remaining,
     capacity: def.capacity,
     percent: def.capacity ? remaining / def.capacity : 1,
-    broken: remaining <= 0,
-    needsRepair: remaining < def.capacity,
+    broken: !def.contents && remaining <= 0,
+    needsRepair: !def.contents && remaining < def.capacity,
     repairable: def.repairable !== false,
+    ...(def.contents ? { contents: true } : {}),
     uses: row?.uses || 0,
     repairs: row?.repairs || 0,
   };
@@ -308,7 +353,8 @@ export function getToolCondition(state, classTsid, opts = {}) {
 /** Whether a copy can take `wear`: the first working one (findFirst isWorking), or `opts.copy`. */
 export function canUseTool(state, classTsid, wear = 1, opts = {}) {
   const condition = getToolCondition(state, classTsid, { ...opts, wear });
-  if (!condition.tracked) return { ok: true, condition, wear: 0 };
+  // Contents (a jar's Fireflies) never wear: a jar is always usable as a jar.
+  if (!condition.tracked || condition.contents) return { ok: true, condition, wear: 0 };
   const cost = points(wear);
   if (condition.broken || condition.remaining < cost) {
     return {
@@ -330,7 +376,7 @@ export function canUseTool(state, classTsid, wear = 1, opts = {}) {
  */
 export function useToolCondition(state, classTsid, wear = 1, opts = {}) {
   const check = canUseTool(state, classTsid, wear, opts);
-  if (!check.ok || !check.condition.tracked) return check;
+  if (!check.ok || !check.condition.tracked || check.condition.contents) return check;
   const row = ensureToolCondition(state, classTsid);
   const def = TOOL_CONDITION_CATALOG[classTsid];
   const at = check.condition.copy;
@@ -368,7 +414,7 @@ export function takeToolCopy(state, classTsid, { copy, take = true } = {}) {
   const def = TOOL_CONDITION_CATALOG[classTsid];
   if (!def) return null;
   const row = ensureToolCondition(state, classTsid);
-  if (!row.copies.length) return def.capacity;
+  if (!row.copies.length) return newPoints(def);
   const n = Number(copy);
   const at = Number.isInteger(n) && n >= 0 && n < row.copies.length ? n : row.copies.length - 1;
   const r = row.copies[at];
@@ -392,7 +438,8 @@ export function leavingToolWear(state, classTsid, n = 1) {
   const row = ensureToolCondition(state, classTsid);
   const k = Math.max(1, Math.floor(Number(n) || 1));
   const leaving = row.copies.slice(Math.max(0, row.copies.length - k));
-  return leaving.length ? Math.min(...leaving) : def.capacity;
+  if (!leaving.length) return newPoints(def);
+  return def.contents ? Math.max(...leaving) : Math.min(...leaving);
 }
 
 /**
@@ -458,7 +505,9 @@ export function moveToolCopy(state, classTsid, from, to) {
 }
 
 /** How many copies of a class are broken now (break events, js/quest-offers.js toolBreakEvents). */
-export function brokenToolCopies(row) {
+export function brokenToolCopies(row, classTsid = null) {
+  // A Firefly Jar never breaks; an empty one is just empty.
+  if (classTsid && TOOL_CONDITION_CATALOG[classTsid]?.contents) return 0;
   if (Array.isArray(row?.copies)) return row.copies.filter((r) => Number(r) <= 0).length;
   return row?.broken === true || Number(row?.remaining) <= 0 ? 1 : 0;
 }
@@ -552,12 +601,18 @@ export function toolRepairPlan(quote, energy) {
 export function toolWornBaseCost(state, classTsid, opts = {}) {
   const def = TOOL_CONDITION_CATALOG[classTsid];
   if (!def) return null;
+  if (def.contents) return fireflyJarBaseCost(getToolCondition(state, classTsid, opts).remaining);
   // A machine's tank is fuel, not points_capacity: getBaseCost's else branch, the item's full
   // base cost, which the caller's catalog holds (this catalog keeps 0 for machines).
   if (def.fuel || !(def.baseCost > 0)) return null;
   const c = getToolCondition(state, classTsid, opts);
   const left = Math.max(0, Math.min(def.capacity, Number(c.remaining) || 0));
   return def.baseCost * 0.2 + def.baseCost * 0.8 * (left / def.capacity);
+}
+
+/** firefly_jar.js getBaseCost 306-335: an empty jar is 100, then 110, 120, 130, 150, 175, 225 and 300 full. */
+export function fireflyJarBaseCost(flies) {
+  return [100, 110, 120, 130, 150, 175, 225, 300][Math.max(0, Math.min(7, finiteInt(flies, 0)))];
 }
 
 /** The copy a sale or a donation takes: the most worn one (its place in pack order). */

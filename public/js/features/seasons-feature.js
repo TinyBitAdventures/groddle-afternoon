@@ -31,20 +31,20 @@
  *     pack), seasonTrophy, seasonPlaced.
  */
 
-import { addItem, countItem, ensureItem, removeItem, registerItemUse, ITEM_CATALOG } from '../inventory.js?v=602da017';
+import { addItem, countItem, ensureItem, removeItem, registerItemUse, ITEM_CATALOG } from '../inventory.js?v=d82f3b00';
 import { dametimeParts, getGameDayKey } from '../game-day.js?v=edb00566';
-import { setSeasonalSeedCheck as setGardenSeasonGate } from '../garden.js?v=dd021ecc';
-import { setSeasonalSeedCheck as setMasterGardenSeasonGate } from '../garden.js?v=dd021ecc';
-import { setSeasonalRecipeCheck } from '../making.js?v=6b048d25';
-import { getToolCondition } from '../tools.js?v=3974f57e';
+import { setSeasonalSeedCheck as setGardenSeasonGate } from '../garden.js?v=2b2c8423';
+import { setSeasonalSeedCheck as setMasterGardenSeasonGate } from '../garden.js?v=2b2c8423';
+import { setSeasonalRecipeCheck } from '../making.js?v=6e6c53f0';
+import { getToolCondition } from '../tools.js?v=092ac4f3';
 import { landingY, nearestSurfaceY } from '../walk-surface.js?v=c982983e';
 import { isStandable } from '../street-model.js?v=505d8990';
-import { isBatterflyHabitat } from '../animal-husbandry.js?v=16195ac6';
-import { emblemCostFor } from '../shrines.js?v=9d364845';
+import { isBatterflyHabitat } from '../animal-husbandry.js?v=2c391fae';
+import { emblemCostFor } from '../shrines.js?v=95d74174';
 import { rollDropTable } from '../drop-tables.js?v=0f922478';
 import { openNoteView, noteViewOpen } from '../note-view.js?v=a5e518d1';
-import { payDrop } from './drops-feature.js?v=35b140d2';
-import { resourceNodesFeature } from './resource-nodes-feature.js?v=fede20a6';
+import { payDrop } from './drops-feature.js?v=fffa1f9e';
+import { fireflyJarCounts, setFireflyJar } from './resource-nodes-feature.js?v=cf300ffb';
 import { SEASON_DATA } from '../seasons-data.js?v=b5174bc9';
 import {
   CANDY_CLASSES,
@@ -234,13 +234,15 @@ function hasWorkingTool(engine, id) {
   return !c.tracked || !c.broken;
 }
 
-function jarFlies() {
-  return Number(resourceNodesFeature.save()?.jar?.flies) || 0;
+/** The most Fireflies any one jar holds: lighting needs a jar of seven (pumpkin_carved_1.js 174-180). */
+function jarFlies(engine) {
+  return Math.max(0, ...fireflyJarCounts(engine));
 }
 
+/** Lighting empties the first full jar (pumpkin_carved_1.js 198-201 findFirst num_flies 7, set to 0). */
 function emptyJar(engine) {
-  const slice = resourceNodesFeature.save();
-  resourceNodesFeature.restore({ ...slice, jar: { ...(slice.jar || {}), flies: 0 } }, engine);
+  const at = fireflyJarCounts(engine).findIndex((n) => n >= 7);
+  if (at >= 0) setFireflyJar(engine, at, 0);
 }
 
 function outdoors(engine) {
@@ -686,7 +688,7 @@ function tickCarve(engine, now) {
 }
 
 function lightPumpkin(engine, cls) {
-  const check = lightCheck(jarFlies());
+  const check = lightCheck(jarFlies(engine));
   if (!check.ok) return say(engine, check.msg, false), true;
   if (countItem(engine.inv, cls) < 1) return true;
   removeItem(engine.inv, cls, 1);
@@ -1128,9 +1130,8 @@ function demoSetup(engine) {
     need('knife_and_board', 1);
     need('birch_candy', 4);
     need('corn_syrup_squares', 2);
-    const slice = resourceNodesFeature.save();
-    resourceNodesFeature.restore({ ...slice, jar: { ...(slice.jar || {}), flies: 7 } }, engine);
     need('firefly_jar', 1);
+    setFireflyJar(engine, 0, 7);
   }
   if (isOn('glitchmas')) {
     need('glitchmas_cracker', 2);
@@ -1470,7 +1471,7 @@ export const seasonsFeature = {
       });
       rows.push({ id: 'carve', label: 'Carve', enabled: check.ok, reason: check.msg || '', tooltip: 'Carve a pumpkin', primary: check.ok });
     } else if (CARVED_CLASSES.includes(classTsid)) {
-      const check = lightCheck(jarFlies());
+      const check = lightCheck(jarFlies(engine));
       rows.push({ id: 'light', label: 'Light', enabled: check.ok, reason: check.msg || '', tooltip: 'Light this pumpkin', primary: check.ok });
       rows.push({ id: 'smash', label: 'Smash', enabled: true, tooltip: 'Smash it' });
       rows.push({ id: 'place', label: 'Place', enabled: true, tooltip: 'Drop it on the ground' });

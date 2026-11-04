@@ -5,8 +5,8 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { packStamp } from '../public/js/inventory.js?v=602da017';
-import { bindToolInventory, createToolConditionState, getToolCondition, repairToolCondition, setToolRemaining, useToolCondition } from '../public/js/tools.js?v=3974f57e';
+import { packStamp } from '../public/js/inventory.js?v=d82f3b00';
+import { bindToolInventory, createToolConditionState, getToolCondition, repairToolCondition, setToolRemaining, useToolCondition } from '../public/js/tools.js?v=092ac4f3';
 import { createPackRow } from '../public/js/ui/pack-row.js?v=65c0f180';
 import { FakeEl, page } from './social-fake-dom.js';
 

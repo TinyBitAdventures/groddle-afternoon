@@ -44,8 +44,8 @@
  */
 
 import { slugsFromEffects } from '../speech-slugs.js?v=130338f9';
-import { addItem, countItem, removeItem } from '../inventory.js?v=602da017';
-import { getToolCondition } from '../tools.js?v=3974f57e';
+import { addItem, countItem, removeItem } from '../inventory.js?v=d82f3b00';
+import { getToolCondition } from '../tools.js?v=092ac4f3';
 import { worldToScreen } from '../street-model.js?v=505d8990';
 import { OVERLAY_USES, playOverlay } from '../overlays.js?v=210ad5ee';
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=db7c442f';
@@ -81,8 +81,8 @@ import {
   rangerGreeting,
   splitConversation,
   stepFox,
-} from '../foxes.js?v=3bce87a2';
-import { FOX_FLURRY_COUNTER, igniteBaitXs, normalizeBaits, normalizeFoxes, preserveOverCapacity, serverId } from '../foxes-mp.js?v=b38c250b';
+} from '../foxes.js?v=9d178fa3';
+import { FOX_FLURRY_COUNTER, igniteBaitXs, normalizeBaits, normalizeFoxes, preserveOverCapacity, serverId } from '../foxes-mp.js?v=39b5da1d';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
 
 export const FOX_FEATURE_ID = 'foxes';

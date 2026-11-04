@@ -90,8 +90,8 @@
  *       (=restorehold stops on the proto, =restoreaward on the award)
  */
 
-import { countItem, ensureItem, ITEM_CATALOG, removeItem } from '../inventory.js?v=602da017';
-import { isBagClass } from '../pack-slots.js?v=68a8fca3';
+import { countItem, ensureItem, ITEM_CATALOG, removeItem } from '../inventory.js?v=d82f3b00';
+import { isBagClass } from '../pack-slots.js?v=c91d0ca3';
 import { createCombobox } from '../combobox.js?v=d43209e8';
 import {
   CULTIVATION_CLASSES,
@@ -136,7 +136,7 @@ import {
   textureConfig,
   unexpandInterior,
   UNEXPAND_TEXT,
-} from '../home-decor.js?v=fff7788d';
+} from '../home-decor.js?v=6dc41dcc';
 import { applyBonusUpgrade, applyUpgrade, bonusUpgradeLine, currantsText, hasUpgrades, pieceLabel, rollBonusUpgrade, upgradeVerb, UPGRADE_TEXT } from '../furniture-upgrades.js?v=a3788c0d';
 import { DOCK_GAP, DOCK_W, chooseUpgrade, closeUpgradePicker, openUpgradePicker, placeUpgradePicker, saveUpgrade, upgradePickerOpen, upgradePickerState } from '../furniture-upgrade-picker.js?v=3a637ec8';
 import {
@@ -157,7 +157,7 @@ import {
   swatchFilters,
   trayFilters,
 } from '../ui/home-builder.js?v=90f759e8';
-import { RECIPE_CATALOG } from '../making.js?v=6b048d25';
+import { RECIPE_CATALOG } from '../making.js?v=6e6c53f0';
 import {
   createBackYardState,
   fixtureObstacles,
@@ -194,14 +194,14 @@ import { MOVABLE_FIXTURES, MOVABLE_FIXTURE_IDS, fixtureFits, fixtureText, savedF
 import { displayTopOf, itemstackOverlayPoint, overlayAlpha, overlayLifeMs, playPoofIn, trackOverlay } from '../overlay-art.js?v=11b6dd7f';
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=db7c442f';
 import { fadeInNewNear } from '../poof-fade.js?v=54ef2431';
-import { projectApi } from './street-jobs-feature.js?v=75be52e9';
+import { projectApi } from './street-jobs-feature.js?v=653a8ea7';
 import { TOWER_CHASSIS, TOWER_CONFIG, TOWER_DOOR_DX, TOWER_GEO, TOWER_PROTO, normalizeTowerState } from '../home-tower.js?v=4daa0b96';
-import { drawTowerElevator, drawTowerExit, towerApi, visitorTowerView } from './home-tower-feature.js?v=a07be979';
+import { drawTowerElevator, drawTowerExit, towerApi, visitorTowerView } from './home-tower-feature.js?v=efdb4340';
 import { pieceUrl, roomPieces, surfaceAt, swatchPiece, wallTargetAt } from '../home-wallpaper.js?v=f1969400';
 import { wantsHiresDecos } from '../deco-hires.js?v=cb905e17';
-import { resourceNodesFeature } from './resource-nodes-feature.js?v=fede20a6';
-import { patchesFeature } from './patches-feature.js?v=e4a197ff';
-import { GROWN_TREE_LABELS, createPlot, growTree, plotLabel } from '../patches.js?v=acaae011';
+import { resourceNodesFeature } from './resource-nodes-feature.js?v=cf300ffb';
+import { patchesFeature } from './patches-feature.js?v=83be6bd0';
+import { GROWN_TREE_LABELS, createPlot, growTree, plotLabel } from '../patches.js?v=956e798d';
 import { WOTD_DEPLETE_MS, WOTD_TEXT, nearestPourTarget, pourButton, pourConditions, pourConfirmText } from '../wine-pour.js?v=6daa23a7';
 import { WOTD_TOOL, pourApproach, pourDropTip } from '../wine-pour-fx.js?v=364e22d2';
 import { XP_FOR_LEVEL } from '../progression.js?v=33462eaa';
@@ -224,7 +224,7 @@ import {
 import { frameTexture, isLoaded, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js?v=3149d699';
 import { FALLBACK_MAX as WORLD_ART_FALLBACK_MAX, worldArtFor } from '../world-art.js?v=df476660';
 import { oneArmSignpost } from '../street-render.js?v=9349c0e5';
-import { ROCK_CATALOG } from '../mining.js?v=d856ab96';
+import { ROCK_CATALOG } from '../mining.js?v=926b4d4c';
 import {
   HOUSE_SIGN,
   IMG_BUBBLE_MS,
@@ -242,7 +242,7 @@ import {
   ROCK_VERB_IDS,
 } from '../magic-rock-home.js?v=39921139';
 import { getGameDayKey } from '../game-day.js?v=edb00566';
-import { HOME_TICKET, HOME_TICKET_CLASS } from '../home-ticket.js?v=a428e443';
+import { HOME_TICKET, HOME_TICKET_CLASS } from '../home-ticket.js?v=841363a3';
 import { MIN_GROUND_CLEARANCE, yCamOffsetAnchor } from '../movement.js?v=b30f84eb';
 import { takeFromHouse } from '../ledger-house.js?v=ffde326e';
 import { storagePickupLock } from '../home-storage.js?v=56c6416d';
@@ -267,7 +267,7 @@ import {
   quoteHouseExpansion,
   quoteHouseUnexpand,
   unexpandHouseFloors,
-} from '../home-floors.js?v=3defebb8';
+} from '../home-floors.js?v=3cca1e09';
 
 export const HOMES_FEATURE_ID = 'homes';
 const HOME_STREET_TSID = 'RH_HOME_EXT';

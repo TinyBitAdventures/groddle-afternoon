@@ -19,8 +19,8 @@ import {
   listPackRows,
   isToolItem,
   getItemUseInfo,
-} from '../public/js/inventory.js?v=602da017';
-import { starterToolsInventory, ensureMakingItems } from '../public/js/making.js?v=6b048d25';
+} from '../public/js/inventory.js?v=d82f3b00';
+import { starterToolsInventory, ensureMakingItems } from '../public/js/making.js?v=6e6c53f0';
 import {
   createQuestState,
   assignQuest,
@@ -42,7 +42,7 @@ import {
   listBuyOffers,
   listSellOffers,
   createVendorSellQuote,
-} from '../public/js/vendor.js?v=08063e0c';
+} from '../public/js/vendor.js?v=464d158d';
 import {
   buildMapGraph,
   buildHubMapView,

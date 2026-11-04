@@ -1,9 +1,9 @@
 /** Persistent player systems + per-street world snapshot. */
-import { normalizeShrineState } from './shrines.js?v=9d364845';
+import { normalizeShrineState } from './shrines.js?v=95d74174';
 import { normalizeQuoinState } from './quoins.js?v=dfe1ff0a';
-import { normalizeToolConditionState } from './tools.js?v=3974f57e';
+import { normalizeToolConditionState, syncToolCopies } from './tools.js?v=092ac4f3';
 import { normalizeSkillState } from './skills.js?v=4542bdf9';
-import { normalizeFoodState } from './food.js?v=f443ef18';
+import { normalizeFoodState } from './food.js?v=e03d5f01';
 import { createGhostQuestState } from './ghost-quest.js?v=43feac5c';
 import { normalizeParadiseState } from './paradise-flight.js?v=b9ebc32f';
 import { normalizeFeatSnapshot } from './feats.js?v=77f4e4ef';
@@ -11,7 +11,7 @@ import { normalizeEmotionalBearState } from './emotional-bear.js?v=1dd276f7';
 import { normalizeHomeState } from './homes.js?v=631ab6b8';
 import { normalizeMailboxState } from './mailbox.js?v=1d97704f';
 import { normalizeFeatureSlices } from './feature-host.js?v=2ed3c069';
-import { normalizeQuestOfferState } from './quest-offers.js?v=c6b0ab10';
+import { normalizeQuestOfferState } from './quest-offers.js?v=1389077b';
 
 export const PLAYER_SAVE_VERSION = 7;
 
@@ -392,6 +392,9 @@ export function restorePlayerSave(snapshot, inventory, player, targets = {}) {
   replace(targets.skills, normalized.systems.skills);
   replace(targets.buffs, normalized.systems.buffs);
   replace(targets.tools, normalized.systems.tools);
+  // A tool (or jar) that had left the pack is no longer held: its copy goes, so one bought next is
+  // new (2026-11-04). Only a bound state (game.js bindToolInventory) knows the pack.
+  if (targets.tools) syncToolCopies(targets.tools);
   replace(targets.musicblocks, normalized.systems.musicblocks);
   replace(targets.shrines, normalized.systems.shrines);
   replace(targets.quoins, normalized.systems.quoins);

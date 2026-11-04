@@ -26,9 +26,9 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
 import { FURNITURE_STARTER_KIT } from '../public/js/homes-catalog.js?v=7aa9beb0';
-import { arrangeStarterRoom, createHomeDecorState, grantStarterKit } from '../public/js/home-decor.js?v=fff7788d';
+import { arrangeStarterRoom, createHomeDecorState, grantStarterKit } from '../public/js/home-decor.js?v=6dc41dcc';
 import { takeFromHouse } from '../public/js/ledger-house.js?v=ffde326e';
-import { applyCorrection } from '../public/js/features/ledger-feature.js?v=a9e7d066';
+import { applyCorrection } from '../public/js/features/ledger-feature.js?v=66d50ed1';
 
 const root = join(import.meta.dirname, '..');
 const hasPhp = spawnSync('php', ['-v']).status === 0;
