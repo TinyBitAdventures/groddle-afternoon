@@ -157,3 +157,38 @@ describe('quoin client integration', () => {
     assert.match(html, /game\.js\?v=[0-9a-f]{8}/);
   });
 });
+
+describe('ticket 94: quest rooms keep the daily quoin limit as a street does', () => {
+  const gsjs = join(import.meta.dirname, '..', '..', 'glitch-GameServerJS', 'items/quoin.js');
+
+  it('the source: only games, races, rainbow_run, Paradise, ignore_quoin_limit places and Qurazy skip it', { skip: !existsSync(gsjs) && 'no GSJS' }, () => {
+    const src = readFileSync(gsjs, 'utf8');
+    assert.match(src, /if \(!this\.container\.is_game && !this\.container\.is_race && !this\.container\.isInstance\('rainbow_run'\) && !this\.container\.isParadiseLocation\(\) && this\.instanceProps\.type != 'qurazy' && pc\.stats\.quoins_today\.value >= pc\.stats\.quoins_today\.top\) return;/);
+  });
+
+  it('at the limit a room quoin stays where it is and nothing is taken', async () => {
+    const { takeQuoins } = await import('../public/js/quest-rooms/puzzle-kit.js?v=78ce0250');
+    const q = { id: 'q0', type: 'xp', x: 100, y: 500, taken: false, spr: { visible: true, destroyed: false, scale: { y: 1 } } };
+    let refuse = true;
+    const ctx = { player: { x: 100, y: 540 }, bodyScale: () => 1, collectQuoin: () => (refuse ? { ok: false, reason: 'daily_limit', dailyLimit: 100 } : { ok: true }) };
+    assert.equal(takeQuoins(ctx, [q]), 0);
+    assert.equal(q.taken, false);
+    assert.equal(q.spr.visible, true);
+    refuse = false;
+    assert.equal(takeQuoins(ctx, [q]), 1);
+    assert.equal(q.taken, true);
+  });
+
+  it('every room and box that pays quoins leaves them at the limit, and none floats "Daily quoin limit"', () => {
+    const read = (p) => readFileSync(join(publicRoot, p), 'utf8');
+    for (const f of ['clubhouse', 'esquibeth', 'gwendolyn', 'le-miserable', 'puzzle-kit']) {
+      const src = read(`js/quest-rooms/${f}.js`);
+      assert.match(src, /collectQuoin\([^)]*\)\?\.reason (===|!==) 'daily_limit'/, f);
+    }
+    for (const f of ['features/quest-instances-feature.js', 'features/puzzles-feature.js', 'features/purple-journey-feature.js']) {
+      const src = read(`js/${f}`);
+      assert.doesNotMatch(src, /'Daily quoin limit'/, f);
+      assert.match(src, /Wowza! You've reached today's \$\{[a-zA-Z.]+\}-quoin limit\./, f);
+    }
+  });
+});

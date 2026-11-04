@@ -48,7 +48,7 @@ import {
   room,
   stageForQuest,
   thirdPartFor,
-} from '../public/js/quest-rooms/gwendolyn.js?v=b9f337b6';
+} from '../public/js/quest-rooms/gwendolyn.js?v=6aa72040';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const pub = (p) => join(root, 'public', p);

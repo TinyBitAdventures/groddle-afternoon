@@ -157,25 +157,25 @@ let rubeTraded = false;
 const ROOM_MODULES = {
   rainbow_run: () => import('../quest-rooms/rainbow-run.js?v=1bcf4222'),
   top_of_tree: () => import('../quest-rooms/top-of-tree.js?v=5668c299'),
-  color_unblocking: () => import('../quest-rooms/color-unblocking.js?v=3a0ffffe'),
+  color_unblocking: () => import('../quest-rooms/color-unblocking.js?v=ec27dcd8'),
   vision_quest: () => import('../quest-rooms/vision-quest.js?v=4d3f6bac'),
   kids_room: () => import('../quest-rooms/kids-room.js?v=7a489cb9'),
   rube_yard: () => import('../quest-rooms/rube-yard.js?v=f443dc92'),
-  le_miserable: () => import('../quest-rooms/le-miserable.js?v=1e448cde'),
+  le_miserable: () => import('../quest-rooms/le-miserable.js?v=c15ad933'),
   juju_camp: () => import('../quest-rooms/juju-camp.js?v=54a9a686'),
-  picto_pattern: () => import('../quest-rooms/picto-pattern.js?v=db65be7d'),
-  radiant_glare: () => import('../quest-rooms/radiant-glare.js?v=28231178'),
+  picto_pattern: () => import('../quest-rooms/picto-pattern.js?v=86b3ad1f'),
+  radiant_glare: () => import('../quest-rooms/radiant-glare.js?v=c7b8e82f'),
   an_autumn_day: () => import('../quest-rooms/an-autumn-day.js?v=37340a72'),
   being_watched: () => import('../quest-rooms/being-watched.js?v=94119dc6'),
   back_alley: () => import('../quest-rooms/back-alley.js?v=657b2221'),
-  clubhouse: () => import('../quest-rooms/clubhouse.js?v=395cd5f4'),
-  light_perspective: () => import('../quest-rooms/light-perspective.js?v=d293d41d'),
-  tile_puzzle: () => import('../quest-rooms/tile-puzzle.js?v=987b6276'),
-  operation_grow: () => import('../quest-rooms/operation-grow.js?v=4995f335'),
-  gwendolyn: () => import('../quest-rooms/gwendolyn.js?v=b9f337b6'),
-  mental_block: () => import('../quest-rooms/mental-block.js?v=1ca9ab8c'),
+  clubhouse: () => import('../quest-rooms/clubhouse.js?v=cf372005'),
+  light_perspective: () => import('../quest-rooms/light-perspective.js?v=319bd577'),
+  tile_puzzle: () => import('../quest-rooms/tile-puzzle.js?v=52045bab'),
+  operation_grow: () => import('../quest-rooms/operation-grow.js?v=843ff345'),
+  gwendolyn: () => import('../quest-rooms/gwendolyn.js?v=6aa72040'),
+  mental_block: () => import('../quest-rooms/mental-block.js?v=c0afd86d'),
   penalty: () => import('../quest-rooms/penalty.js?v=74b6fd5f'),
-  esquibeth: () => import('../quest-rooms/esquibeth.js?v=22da8016'),
+  esquibeth: () => import('../quest-rooms/esquibeth.js?v=ed42ce79'),
   firefly_whistle: () => import('../quest-rooms/firefly-whistle.js?v=9e94f646'),
 };
 
@@ -818,9 +818,17 @@ function makeContext(engine) {
       if (result.ok) {
         if (result.amount) engine.floatText(x, y - 16, `+${result.amount} ${lab}`, '#ffffff');
         engine.playSound(`QUOIN_${String(result.typeId || 'xp').toUpperCase()}`, { volume: 0.5 });
-      } else {
-        engine.floatText(x, y - 16, 'Daily quoin limit', '#ffe7a8');
-        engine.playSound('QUOIN_XP', { volume: 0.3 });
+      } else if (result.reason === 'daily_limit') {
+        // Ticket 94: a quest room keeps the limit as a street does (items/quoin.js 159: only games,
+        // races, rainbow_run, Paradise, ignore_quoin_limit places and Qurazy quoins skip it), and
+        // as on a street the quoin stays where it is (the rooms take it only when this is ok) and
+        // the limit's line shows at most every 5 s (game.js grabWorldQuoin).
+        const now = Date.now();
+        if (now - (c.data._quoinLimitAt || 0) > 5000) {
+          c.data._quoinLimitAt = now;
+          engine.toast(`Wowza! You've reached today's ${result.dailyLimit}-quoin limit.`);
+        }
+        return result;
       }
       engine.updateHud();
       return result;

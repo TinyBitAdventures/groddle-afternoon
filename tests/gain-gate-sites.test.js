@@ -26,7 +26,7 @@ import { runVerb } from '../public/content.js?v=b484cbad';
 import { applySetFree } from '../public/js/animal-set-free.js?v=3b194fca';
 import { RESOURCE_SKILL_PACKAGES, createResourceNode, harvestResourceNode } from '../public/js/resource-nodes.js?v=d78746b3';
 import { room as topOfTree } from '../public/js/quest-rooms/top-of-tree.js?v=5668c299';
-import { room as esquibeth } from '../public/js/quest-rooms/esquibeth.js?v=22da8016';
+import { room as esquibeth } from '../public/js/quest-rooms/esquibeth.js?v=ed42ce79';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const pub = join(here, '../public');

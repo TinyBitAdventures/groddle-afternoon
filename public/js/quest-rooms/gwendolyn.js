@@ -1355,10 +1355,11 @@ function tickInner(ctx, dtMs, now) {
     q.spr.y = q.y + Math.sin(t * 3 + q.x / 90) * 5;
     // Ticket 37: the street quoin's own box (kit.js touchesQuoin, items/quoin.js onPlayerCollision 156).
     if (ctx.kit.touchesQuoin(ctx, q)) {
+      // Ticket 94: at the daily limit it stays, as a street quoin does.
+      if (ctx.collectQuoin(q.type, q.x, q.y)?.reason === 'daily_limit') continue;
       q.taken = true;
       q.spr.visible = false;
       d.quoinsTaken = (d.quoinsTaken || 0) + 1;
-      ctx.collectQuoin(q.type, q.x, q.y);
     }
   }
   if (!d.drinkTaken && Math.abs(p.x - L.drink.x) < 34 && Math.abs(p.y - L.drink.y) < 24) takeDrink(ctx);

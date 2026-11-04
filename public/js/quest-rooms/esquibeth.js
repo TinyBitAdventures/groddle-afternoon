@@ -1488,10 +1488,10 @@ export const room = {
       const q = d.pedestalQuoin;
       if (q && q.spr.visible && !q.taken) {
         q.spr.y = q.y + Math.sin(t * 2.4) * 5;
-        if (ctx.kit.touchesQuoin(ctx, q)) {
+        // Ticket 94: at the daily limit it stays, as a street quoin does.
+        if (ctx.kit.touchesQuoin(ctx, q) && ctx.collectQuoin('xp', q.x, q.y)?.reason !== 'daily_limit') {
           q.taken = true;
           q.spr.visible = false;
-          ctx.collectQuoin('xp', q.x, q.y);
         }
       }
       if (d.exitOpen && !d.exiting && p.x >= HOLLOW.exit.x1 + 40) {
@@ -1512,9 +1512,10 @@ export const room = {
       q.spr.y = q.y + Math.sin(t * 2.6 + q.x / 60) * 5;
       // Ticket 37: the street quoin's own box (kit.js touchesQuoin, items/quoin.js onPlayerCollision 156).
       if (ctx.kit.touchesQuoin(ctx, q)) {
+        // Ticket 94: at the daily limit it stays, as a street quoin does.
+        if (ctx.collectQuoin(q.type, q.x, q.y)?.reason === 'daily_limit') continue;
         q.taken = true;
         q.spr.visible = false;
-        ctx.collectQuoin(q.type, q.x, q.y);
       }
     }
     if (d.sockets) refreshSockets(ctx);

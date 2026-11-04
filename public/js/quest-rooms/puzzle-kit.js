@@ -76,9 +76,10 @@ export function takeQuoins(ctx, quoins) {
     if (q.spr && !q.spr.destroyed) q.spr.y = q.y + Math.sin(t * 2.6 + q.x / 70) * 5;
     // Ticket 37: the street quoin's own box (kit.js touchesQuoin, items/quoin.js onPlayerCollision 156).
     if (touchesQuoin(ctx, q)) {
+      // Ticket 94: at the daily limit it stays, as a street quoin does.
+      if (ctx.collectQuoin(q.type || 'xp', q.x, q.y)?.reason === 'daily_limit') continue;
       q.taken = true;
       if (q.spr) q.spr.visible = false;
-      ctx.collectQuoin(q.type || 'xp', q.x, q.y);
       n += 1;
     }
   }

@@ -38,7 +38,7 @@
  * LIFFFRAHB4A3JHJ, reference only).
  */
 
-import { BODY_H, JUMP_GAP, JUMP_RISE, spawnQuoins, takeQuoins } from './puzzle-kit.js?v=b883ada9';
+import { BODY_H, JUMP_GAP, JUMP_RISE, spawnQuoins, takeQuoins } from './puzzle-kit.js?v=78ce0250';
 
 export const W = 1100;
 export const H = 3400;

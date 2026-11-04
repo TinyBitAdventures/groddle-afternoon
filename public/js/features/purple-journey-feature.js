@@ -455,17 +455,23 @@ function tickQuoins(engine) {
     // Ticket 37: the street quoin's box (items/quoin.js onPlayerCollision 156, js/quoins.js quoinTouches).
     const quoinScale = Math.abs(q.sprite?.scale?.y || 1);
     if (quoinTouches({ x: q.x, y: q.y, typeId: q.type }, p.x, p.y, { scale, quoinScale })) {
+      // quoin.js onPlayerCollision: the daily limit holds here (not a game or Paradise). Ticket 94: at
+      // the limit the quoin stays, as on a street, and the line shows at most every 5 s (game.js grabWorldQuoin).
+      const res = collectQuoin(engine.quoinState, q.type, engine.pc, { amount: q.amount });
+      if (res.reason === 'daily_limit') {
+        if (Date.now() - (q.limitAt || 0) > 5000) {
+          q.limitAt = Date.now();
+          engine.toast?.(`Wowza! You've reached today's ${res.dailyLimit}-quoin limit.`);
+        }
+        continue;
+      }
       quoins = quoins.filter((x) => x !== q);
       q.sprite.parent?.removeChild(q.sprite);
       q.sprite.destroy();
-      // quoin.js onPlayerCollision: the daily limit holds here (not a game or Paradise).
-      const res = collectQuoin(engine.quoinState, q.type, engine.pc, { amount: q.amount });
       if (res.ok) {
         const lab = QUOIN_TYPES[res.resolvedTypeId || q.type]?.label || 'iMG';
         engine.floatText?.(q.x, q.y - 16, `+${res.amount} ${lab}`, '#ffffff');
         engine.playSound?.(`QUOIN_${String(res.typeId || 'xp').toUpperCase()}`, { volume: 0.5 });
-      } else {
-        engine.floatText?.(q.x, q.y - 16, 'Daily quoin limit', '#ffe7a8');
       }
       engine.refreshPack?.();
       last = `quoin:${q.type}:${q.amount}`;

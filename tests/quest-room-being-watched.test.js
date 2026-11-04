@@ -12,7 +12,7 @@ import { fileURLToPath } from 'node:url';
 import { homedir } from 'node:os';
 
 import * as kit from '../public/js/quest-rooms/kit.js?v=4d8ab82d';
-import { JUMP_RISE, JUMP_GAP } from '../public/js/quest-rooms/puzzle-kit.js?v=b883ada9';
+import { JUMP_RISE, JUMP_GAP } from '../public/js/quest-rooms/puzzle-kit.js?v=78ce0250';
 import {
   DAIS,
   DRINK_TEXT,

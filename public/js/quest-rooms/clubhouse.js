@@ -1031,6 +1031,8 @@ function takeRoomQuoins(ctx) {
     q.spr.y = q.y + Math.sin(t * 2.4 + q.x / 80) * 5;
     // Ticket 37: the street quoin's own box (kit.js touchesQuoin, items/quoin.js onPlayerCollision 156).
     if (ctx.kit.touchesQuoin(ctx, q)) {
+      // Ticket 94: at the daily limit it stays, as a street quoin does.
+      if (ctx.collectQuoin(q.type, q.x, q.y)?.reason === 'daily_limit') continue;
       q.taken = true;
       q.spr.visible = false;
       if (q.type === 'qurazy') {
@@ -1038,7 +1040,6 @@ function takeRoomQuoins(ctx) {
         ctx.data.qurazy = (ctx.data.qurazy || 0) + 1;
         ctx.sound('QUORAZY_QUOIN', { volume: 0.6 });
       }
-      ctx.collectQuoin(q.type, q.x, q.y);
     }
   }
 }
