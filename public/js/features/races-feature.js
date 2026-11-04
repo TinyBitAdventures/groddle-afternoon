@@ -76,7 +76,7 @@ import {
   settleRace,
   startDelayMessage,
   tickRace,
-} from '../races.js?v=df0576ad';
+} from '../races.js?v=ab22a079';
 import { platformUnder, raceCourse, RACE_COURSE_IDS } from '../race-courses.js?v=565822aa';
 import {
   drawCheckpointFlag,
@@ -89,7 +89,7 @@ import { runStreetTransition } from '../screen-fx.js?v=9d4640eb';
 import { CROWNS_STREET, CROWNS_TICKET, CROWNS_TITLE } from '../game-of-crowns.js?v=e32f35f5';
 import { HOG_HAUL_STREET_ID } from '../hog-haul.js?v=50d2e072';
 import { QUOIN_GRAB_SPLASH, RACE_SPLASH, splashFor } from '../game-splash.js?v=5e2c6eb6';
-import { crownsMpChallenge, startCrowns } from './crowns-feature.js?v=7419a146';
+import { crownsMpChallenge, startCrowns } from './crowns-feature.js?v=243a4dd9';
 import { startHogHaulMp } from './hog-haul-mp-feature.js?v=12bab068';
 import { textureFromUrl } from '../textures.js?v=3149d699';
 import { QUOIN_SHEET, QUOIN_TYPES } from '../quoins.js?v=dfe1ff0a';
@@ -220,6 +220,15 @@ function ticketRaceId(classTsid) {
   if (classTsid === CROWNS_TICKET) return 'it_game';
   if (classTsid === HOG_HAUL_TICKET.classTsid) return HOG_HAUL_GAME_ID;
   return classTsid === RACE_GENERIC_TICKET ? null : raceForTicket(classTsid)?.id || null;
+}
+
+/**
+ * The pending ticket was used: its race reached GO or its instance opened.
+ * A Race Ticket's roll goes with it, so the next one rolls again.
+ */
+function spendPendingTicket() {
+  if (record.pendingTicket === RACE_GENERIC_TICKET) record.ticketRace = null;
+  record.pendingTicket = null;
 }
 
 function playable(raceId) {
@@ -441,7 +450,12 @@ function activateTicket(classTsid, engine, opts = {}) {
     return false;
   }
   if (countItem(engine.inv, classTsid) < 1) return false;
-  const raceId = ticketRaceId(classTsid) || pickGenericRace(Math.random());
+  // Solo: a Race Ticket refunded before GO goes back to the race it rolled
+  // (record.ticketRace), so a reload never rerolls it (Austin 2026-11-04).
+  // Multiplayer keeps the source's roll per activation: the server refunds
+  // only a challenge that failed (inc_games.js 2448-2450).
+  const generic = classTsid === RACE_GENERIC_TICKET;
+  const raceId = ticketRaceId(classTsid) || (!isMp(engine) && record.ticketRace) || pickGenericRace(Math.random());
   if (!playable(raceId)) {
     engine.toast('That race is not in this remake yet.');
     return false;
@@ -457,6 +471,7 @@ function activateTicket(classTsid, engine, opts = {}) {
   if (isMp(engine) && raceId === 'it_game') return crownsMpChallenge(classTsid, engine);
   removeItem(engine.inv, classTsid, 1);
   record.pendingTicket = classTsid;
+  if (generic) record.ticketRace = raceId;
   engine.updateHud();
   engine.save();
   if (raceId === HOG_HAUL_GAME_ID) return activateHogHaul(classTsid, engine, opts);
@@ -466,14 +481,16 @@ function activateTicket(classTsid, engine, opts = {}) {
   const names = crowns ? 'Lily Linguistic' : rival.name;
   engine.pushActivity(`You activated a ${ITEM_LABEL(classTsid)}. ${crowns ? 'Three challengers' : rival.name} accepted your challenge!`);
   buildChrome(engine);
-  hud.banner.textContent = startDelayMessage(raceTitle(raceId), crowns ? 'you, Amp, Bumbishfish' : 'you', names);
-  hud.banner.hidden = false;
+  if (hud) {
+    hud.banner.textContent = startDelayMessage(raceTitle(raceId), crowns ? 'you, Amp, Bumbishfish' : 'you', names);
+    hud.banner.hidden = false;
+  }
   engine.playSound('GAME_STARTING_SOON', { volume: 0.5 });
   starting = true;
   const delay = opts.delayMs ?? RACE_START_DELAY_MS;
   clearTimeout(startTimer);
   startTimer = setTimeout(() => {
-    hud.banner.hidden = true;
+    if (hud) hud.banner.hidden = true;
     const go = crowns ? startCrowns(engine, { ticket: classTsid }) : startRace(raceId, engine, { rival, ticket: classTsid });
     record.pendingTicket = crowns ? null : record.pendingTicket;
     Promise.resolve(go).finally(() => {
@@ -506,7 +523,7 @@ function activateHogHaul(classTsid, engine, opts = {}) {
   clearTimeout(startTimer);
   startTimer = setTimeout(() => {
     if (hud) hud.banner.hidden = true;
-    record.pendingTicket = null;
+    spendPendingTicket();
     engine.save();
     Promise.resolve(engine.startHogHaulRace({ rivalLabel: rival.name, ticket: classTsid })).finally(() => {
       starting = false;
@@ -871,7 +888,7 @@ function raceTick(engine, now) {
         if (run?.status === 'running') hud.countdown.hidden = true;
       }, 650);
       engine.playSound('READY', { volume: 0.65 });
-      record.pendingTicket = null;
+      spendPendingTicket();
       autoplayStartAt = now;
       engine.save();
     }
@@ -1037,7 +1054,9 @@ function showResult(engine) {
   soonTimer = null;
   hud.countdown.classList.remove('race-soon');
   const settled = settleRace(run, record);
+  const spentRoll = record.pendingTicket === RACE_GENERIC_TICKET;
   record = { ...settled.record, returnTo: record.returnTo, pendingTicket: null };
+  if (spentRoll) record.ticketRace = null;
   const pc = engine.pc;
   // inc_race.js 368, 400 / inc_games.js 1373, 1573: stats_add_xp(n, false)
   // takes the mood bonus, and the splash names what landed.
@@ -1155,6 +1174,8 @@ function mpClearPrompts(engine) {
 function mpRefund(engine) {
   if (!record.pendingTicket) return;
   addItem(engine.inv, record.pendingTicket, 1);
+  // A failed challenge rolls again next time (multiplayer keeps the source's roll).
+  if (record.pendingTicket === RACE_GENERIC_TICKET) record.ticketRace = null;
   record.pendingTicket = null;
   engine.updateHud();
   engine.save();
@@ -1171,7 +1192,8 @@ function mpRefund(engine) {
 function mpAskPending(engine) {
   const c = mpClient;
   if (!c || c.state !== 'online' || mpAsked || run || mpChallenging || starting || !record.pendingTicket) return;
-  const course = ticketRaceId(record.pendingTicket);
+  // A Race Ticket's course is the one it rolled (record.ticketRace).
+  const course = ticketRaceId(record.pendingTicket) || (record.pendingTicket === RACE_GENERIC_TICKET ? record.ticketRace : null);
   if (!course) return;
   mpAsked = c.send('race_pending', { course }) !== false;
   mpNote(engine, `pending:${course}`);
@@ -1191,6 +1213,7 @@ function mpChallenge(classTsid, raceId, engine) {
   }
   removeItem(engine.inv, classTsid, 1);
   record.pendingTicket = classTsid;
+  if (classTsid === RACE_GENERIC_TICKET) record.ticketRace = raceId;
   engine.updateHud();
   engine.save();
   engine.pushActivity(`You activated a ${ITEM_LABEL(classTsid)}.`);
@@ -1317,7 +1340,7 @@ function mpAttach(engine) {
       // leave the match at once. The server normally leaves a player in Naraka out (races.go start).
       if (msg?.match) c.send('race_leave', { match: String(msg.match) });
       if (hud) hud.banner.hidden = true;
-      record.pendingTicket = null;
+      spendPendingTicket();
       starting = false;
       engine.toast(MP_TOO_DEAD, 3600);
       engine.pushActivity(MP_TOO_DEAD);
@@ -1329,7 +1352,7 @@ function mpAttach(engine) {
     if (msg?.course === HOG_HAUL_GAME_ID && !run) {
       // The Great Hog Haul runs on its own street (hog-haul-mp-feature); the ticket is spent once it opens.
       if (hud) hud.banner.hidden = true;
-      record.pendingTicket = null;
+      spendPendingTicket();
       starting = false;
       mpNote(engine, `hog:${String(msg.match || '')}`);
       engine.save();
@@ -1347,7 +1370,7 @@ function mpAttach(engine) {
     mp = { ...info, myId, rows: info.players.map((p) => ({ id: p.id, name: p.name, score: 0 })), remaining: info.total, ready: false, acked: false, calledOff: null };
     if (hud) hud.banner.hidden = true;
     // The ticket is spent once the instance opens (as the Hog Haul and the crowns tickets).
-    record.pendingTicket = null;
+    spendPendingTicket();
     mpNote(engine, `match:${info.match}`);
     Promise.resolve(startRace(info.course, engine, { mp: info })).finally(() => {
       starting = false;
@@ -1420,7 +1443,7 @@ function mpAttach(engine) {
       mpRefund(engine);
       engine.toast(String(msg.text || 'Your race never started, so your ticket was returned.'), 3600);
     } else {
-      record.pendingTicket = null;
+      spendPendingTicket();
       engine.save();
     }
     mpNote(engine, `ticket:${msg.refund === true ? 'refund' : 'spent'}`);
@@ -1879,7 +1902,9 @@ export const racesFeature = {
     // race_ticket.js:121, multiplayer: disabled with nobody else on the street.
     const alone = isMp(engine) && (!raceId || raceId === 'it_game' || raceId === HOG_HAUL_GAME_ID || MP_RACE_COURSES.includes(raceId)) && !(engine.query('realtimeClient')?.players.length > 0);
     const block = activationBlock(engine) || (alone ? 'You need at least one other player here.' : '');
-    const name = raceId ? raceTitle(raceId) : 'a random race';
+    // Solo: a refunded Race Ticket names the race it goes back to.
+    const rolled = classTsid === RACE_GENERIC_TICKET && !isMp(engine) ? record.ticketRace : null;
+    const name = raceId || rolled ? raceTitle(raceId || rolled) : 'a random race';
     return [{
       id: 'activate',
       label: 'Activate',

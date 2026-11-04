@@ -27,7 +27,7 @@ import {
 } from '../public/js/races-mp.js?v=c61cc7b5';
 import { raceData } from '../tools/build-realtime-races.mjs';
 import { RACE_COURSE_IDS, raceCourse } from '../public/js/race-courses.js?v=565822aa';
-import { quoinGrabWinner } from '../public/js/races.js?v=df0576ad';
+import { quoinGrabWinner } from '../public/js/races.js?v=ab22a079';
 import { sharedStreet } from '../public/js/features/realtime-feature.js?v=f94cb4d9';
 import { HAS_SERVER, serverPath, skipWithoutServer } from '../tools/repos.mjs';
 
@@ -184,7 +184,7 @@ describe('the shared street of a race scene', () => {
   });
 
   it('races-feature answers only in a multiplayer match', async () => {
-    const { racesFeature } = await import('../public/js/features/races-feature.js?v=41bd1501');
+    const { racesFeature } = await import('../public/js/features/races-feature.js?v=83c04bb1');
     assert.equal(racesFeature.realtimeStreet({ inScene: () => true }), null, 'no match: nothing shared');
     // No hub line: getLoadingInfo sends instances no hub_name (locations/location.js 3311).
     assert.deepEqual(racesFeature.labelFor('RACE_00000000000000A1'), { street: 'A race', hub: '', hubId: 'scene' });

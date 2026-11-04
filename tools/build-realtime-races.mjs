@@ -26,7 +26,7 @@ import { fileURLToPath } from 'node:url';
 import { requireServer, serverPath } from './repos.mjs';
 
 import { RACE_COURSE_IDS, raceCourse } from '../public/js/race-courses.js?v=565822aa';
-import { RACES } from '../public/js/races.js?v=df0576ad';
+import { RACES } from '../public/js/races.js?v=ab22a079';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const outPath = serverPath('data', 'races.json');

@@ -280,6 +280,9 @@ export function pickGenericRace(roll = Math.random()) {
   return RACE_IDS[choice % n];
 }
 
+/** Every game the generic Race Ticket can roll (pickGenericRace). */
+export const GENERIC_RACE_IDS = Object.freeze([...RACE_IDS, HOG_HAUL_GAME_ID, GRAB_EM_GOOD_ID]);
+
 export function pickRival(raceId, seed = 0) {
   const index = Math.abs(
     [...String(raceId || '')].reduce((sum, ch) => sum + ch.charCodeAt(0), 0) + Math.floor(seed)
@@ -317,7 +320,10 @@ export function normalizeRaceRecord(seed = {}) {
     Number.isFinite(Number(back.x)) && Number.isFinite(Number(back.y))
       ? { tsid: back.tsid, x: Math.round(Number(back.x)), y: Math.round(Number(back.y)) }
       : null;
-  const pending = seed?.pendingTicket;
+  // Older saves keep the ticket as a bare class string; { ticket, raceId } is read too.
+  const pendingSeed = seed?.pendingTicket;
+  const pending = typeof pendingSeed === 'string' ? pendingSeed : pendingSeed?.ticket;
+  const rolled = seed?.ticketRace ?? pendingSeed?.raceId;
   return {
     wins: cleanCounts(seed?.wins),
     losses: cleanCounts(seed?.losses),
@@ -325,6 +331,10 @@ export function normalizeRaceRecord(seed = {}) {
     returnTo,
     // A ticket spent on a race that never reached GO (refunded on reload).
     pendingTicket: typeof pending === 'string' && /^race_ticket[a-z_]*$/.test(pending) ? pending : null,
+    // The game a generic Race Ticket rolled and has not yet run: a ticket
+    // refunded before GO goes back to this race instead of rolling again
+    // (Austin 2026-11-04), cleared once a Race Ticket is spent on it.
+    ticketRace: GENERIC_RACE_IDS.includes(rolled) ? rolled : null,
   };
 }
 

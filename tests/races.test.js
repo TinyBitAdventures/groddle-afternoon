@@ -54,7 +54,7 @@ import {
   settleRace,
   startDelayMessage,
   tickRace,
-} from '../public/js/races.js?v=df0576ad';
+} from '../public/js/races.js?v=ab22a079';
 import { RACE_COURSE_IDS, platformUnder, raceCourse } from '../public/js/race-courses.js?v=565822aa';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..', 'public');
@@ -573,5 +573,141 @@ describe("Grab 'Em Good (quoin_grab)", () => {
   it('ships the ticket art and only recovered decos', () => {
     assert.ok(existsSync(join(root, 'assets/sprites/races/race_ticket_grab_em_good.png')));
     for (const d of course.decor) assert.ok(existsSync(join(root, 'assets/decos/groddle', `${d.name}.webp`)), d.name);
+  });
+});
+
+/**
+ * Austin 2026-11-04: a ticket spent on a solo race that never reached GO is
+ * still refunded on the next load, but a generic Race Ticket goes back to the
+ * race it rolled, so reloading before GO cannot reroll it. Each fresh import
+ * of races-feature stands in for one page load.
+ */
+describe('solo Race Ticket refund keeps its race', () => {
+  const TICKET = 'race_ticket';
+  const street = { tsid: 'GA5' };
+  const pageLoad = (n) => import(`../public/js/features/races-feature.js?fresh=ticket-roll-${n}`);
+  function soloEngine(inv) {
+    return {
+      mode: 'solo',
+      inv,
+      pc: { currants: 0 },
+      player: { x: 100, y: 500 },
+      streetTsid: 'GA5',
+      toasts: [],
+      query: () => null,
+      toast(text) { this.toasts.push(text); },
+      updateHud() {},
+      save() {},
+      setData() {},
+      pushActivity() {},
+      playSound() {},
+      placement: () => [],
+      transientInstance: () => false,
+      homeContext: () => ({ inHome: false }),
+      travelGate: () => null,
+      param: () => null,
+      inScene: () => false,
+      startHogHaulRace: () => Promise.resolve(true),
+    };
+  }
+  // pickGenericRace: choice = floor(roll * 9); 1 = canyon_run, 7 = the Hog Haul, 8 = Grab 'Em Good.
+  const rollFor = (choice) => (choice + 0.5) / (RACE_IDS.length + 2);
+  function withRoll(roll, fn) {
+    const real = Math.random;
+    Math.random = () => roll;
+    try { return fn(); } finally { Math.random = real; }
+  }
+  const reload = (saved) => JSON.parse(JSON.stringify(saved));
+
+  it('reads older saves and the { ticket, raceId } shape', () => {
+    assert.equal(normalizeRaceRecord({ pendingTicket: 'race_ticket' }).pendingTicket, 'race_ticket');
+    assert.equal(normalizeRaceRecord({ pendingTicket: 'race_ticket' }).ticketRace, null);
+    assert.deepEqual(
+      (({ pendingTicket, ticketRace }) => ({ pendingTicket, ticketRace }))(normalizeRaceRecord({ pendingTicket: { ticket: 'race_ticket', raceId: 'lava_leap' } })),
+      { pendingTicket: 'race_ticket', ticketRace: 'lava_leap' }
+    );
+    assert.equal(normalizeRaceRecord({ ticketRace: GRAB_EM_GOOD_ID }).ticketRace, GRAB_EM_GOOD_ID);
+    assert.equal(normalizeRaceRecord({ ticketRace: 'hogtie_piggy' }).ticketRace, 'hogtie_piggy');
+    assert.equal(normalizeRaceRecord({ ticketRace: 'it_game' }).ticketRace, null, 'not a game the Race Ticket rolls');
+    assert.equal(normalizeRaceRecord({ ticketRace: 'bogus' }).ticketRace, null);
+  });
+
+  it('refunds on reload into the same race, then spends it at the start', async (t) => {
+    t.mock.timers.enable({ apis: ['setTimeout'] });
+    const inv = { [TICKET]: 2 };
+    let page = (await pageLoad(1)).racesFeature;
+    const engine = soloEngine(inv);
+    page.restore({});
+    assert.ok(withRoll(rollFor(1), () => page.runPackVerb(TICKET, 'activate', engine)));
+    assert.equal(inv[TICKET], 1, 'spent at activation');
+    let saved = reload(page.save());
+    assert.equal(saved.pendingTicket, TICKET);
+    assert.equal(saved.ticketRace, 'canyon_run', 'the roll is saved with the spent ticket');
+
+    // The page dies before GO; the next load gives the ticket back.
+    page = (await pageLoad(2)).racesFeature;
+    page.restore(saved);
+    page.onStreetEnter(street, engine);
+    assert.equal(inv[TICKET], 2, 'no ticket is lost to a crash');
+    assert.equal(page._state().record.pendingTicket, null);
+    assert.equal(page._state().record.ticketRace, 'canyon_run', 'the refunded ticket keeps its race');
+    assert.match(page.packVerbs(TICKET, engine)[0].tooltip, /Canyon Run$/);
+
+    // Another load and a different roll: the refunded ticket stages the same race.
+    saved = reload(page.save());
+    page = (await pageLoad(3)).racesFeature;
+    page.restore(saved);
+    assert.ok(withRoll(rollFor(5), () => page.runPackVerb(TICKET, 'activate', engine)));
+    assert.equal(page._state().record.ticketRace, 'canyon_run');
+    assert.equal(inv[TICKET], 1);
+  });
+
+  it('keeps the race across a specific ticket and clears it once a Race Ticket is used', async (t) => {
+    t.mock.timers.enable({ apis: ['setTimeout'] });
+    const inv = { [TICKET]: 1, race_ticket_hogtie_piggy: 1 };
+    const engine = soloEngine(inv);
+    // A refunded Race Ticket bound to the Hog Haul.
+    let page = (await pageLoad(4)).racesFeature;
+    page.restore({ ticketRace: 'hogtie_piggy' });
+    assert.ok(page.runPackVerb('race_ticket_hogtie_piggy', 'activate', engine));
+    t.mock.timers.tick(5_000);
+    assert.equal(page._state().record.pendingTicket, null, 'the Hog Haul Ticket was spent');
+    assert.equal(page._state().record.ticketRace, 'hogtie_piggy', 'a specific ticket leaves the Race Ticket\'s race alone');
+
+    page = (await pageLoad(5)).racesFeature;
+    page.restore({ ticketRace: 'hogtie_piggy' });
+    assert.ok(withRoll(rollFor(0), () => page.runPackVerb(TICKET, 'activate', engine)));
+    assert.equal(page._state().record.ticketRace, 'hogtie_piggy', 'staged the bound race, not the roll');
+    t.mock.timers.tick(5_000);
+    assert.equal(page._state().record.pendingTicket, null);
+    assert.equal(page._state().record.ticketRace, null, 'once used for its race, the binding clears');
+    assert.match(page.packVerbs(TICKET, engine)[0].tooltip, /a random race$/);
+  });
+
+  it('multiplayer asks the server about a Race Ticket by the race it rolled, and rolls afresh after a refund', async () => {
+    const sent = [];
+    const handlers = new Map();
+    const client = {
+      state: 'online', street: 'GA5', me: { id: 7 }, players: [{ id: 8, name: 'Bo', x: 0, y: 0 }],
+      on(type, fn) { handlers.set(type, [...(handlers.get(type) || []), fn]); },
+      send(kind, payload) { sent.push({ kind, ...payload }); return true; },
+    };
+    const inv = {};
+    const engine = { ...soloEngine(inv), mode: 'multiplayer', query: (hook) => (hook === 'realtimeClient' ? client : null), prompt: () => 'p1', removePrompt() {} };
+    const page = (await pageLoad(6)).racesFeature;
+    page.restore({ pendingTicket: TICKET, ticketRace: 'canyon_run' });
+    page.onStreetEnter(street, engine);
+    assert.deepEqual(sent.filter((m) => m.kind === 'race_pending'), [{ kind: 'race_pending', course: 'canyon_run' }]);
+    for (const fn of handlers.get('msg:race_ticket')) fn({ t: 'race_ticket', course: 'canyon_run', refund: true });
+    assert.equal(inv[TICKET], 1, 'refunded by the server');
+    assert.equal(page._state().record.ticketRace, null, 'a failed challenge rolls again (inc_games.js 2448-2450)');
+  });
+
+  it('every spent pending ticket goes through spendPendingTicket', async () => {
+    const { readFileSync } = await import('node:fs');
+    const src = readFileSync(join(root, 'js/features/races-feature.js'), 'utf8');
+    // Only the helper itself, the multiplayer refund and the solo reload refund null it by hand.
+    assert.equal(src.match(/record\.pendingTicket = null;/g).length, 3);
+    assert.match(src, /addItem\(engine\.inv, record\.pendingTicket, 1\);\n\s+engine\.toast\('Your race never started/);
   });
 });

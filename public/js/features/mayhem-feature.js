@@ -45,7 +45,7 @@ import {
   normalizeMayhemState,
 } from '../math-mayhem.js?v=7fe952aa';
 import { platformYNear } from '../location-navigation.js?v=4be109b9';
-import { hasRaceDispenser } from '../races.js?v=df0576ad';
+import { hasRaceDispenser } from '../races.js?v=ab22a079';
 import { OVERLAY_USES, locationRect, playCountdownArt, playWindowOverlay } from '../overlays.js?v=210ad5ee';
 import { textureFromUrl } from '../textures.js?v=3149d699';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';

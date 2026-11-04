@@ -12,11 +12,11 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { REVIVED_TRANT, createPlot, reviveDeadTree, tickPlot } from '../public/js/patches.js?v=9b252cc6';
 import { powdersFeature } from '../public/js/features/powders-feature.js?v=988c870b';
-import { itemVerbsFeature, inGameLocation } from '../public/js/features/item-verbs-feature.js?v=51a03748';
+import { itemVerbsFeature, inGameLocation } from '../public/js/features/item-verbs-feature.js?v=b9a94cb9';
 import { GAME_CHEAT_BLOCKS, gameCheatBlock } from '../public/js/item-verbs.js?v=729ccd91';
 import { CROWNS_STREET } from '../public/js/game-of-crowns.js?v=e32f35f5';
 import { HOG_HAUL_STREET_ID } from '../public/js/hog-haul.js?v=50d2e072';
-import { raceSceneTsid } from '../public/js/races.js?v=df0576ad';
+import { raceSceneTsid } from '../public/js/races.js?v=ab22a079';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=10b118dd';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');

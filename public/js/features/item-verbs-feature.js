@@ -47,7 +47,7 @@ import {
 import { homesFeature } from './homes-feature.js?v=3cd41c2d';
 import { CROWNS_STREET } from '../game-of-crowns.js?v=e32f35f5';
 import { HOG_HAUL_STREET_ID } from '../hog-haul.js?v=50d2e072';
-import { isRaceSceneTsid } from '../races.js?v=df0576ad';
+import { isRaceSceneTsid } from '../races.js?v=ab22a079';
 
 export const ITEM_VERBS_FEATURE_ID = 'item-verbs';
 
