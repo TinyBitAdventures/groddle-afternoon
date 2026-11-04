@@ -339,19 +339,22 @@ const CARD_CSS = `
 .tp-map-card header strong{display:block;font-size:var(--fs-base)}
 .tp-map-card header span{display:block;font-size:var(--fs-xs);color:var(--c-violet-55)}
 .tp-map-card ol{list-style:none;margin:9px 0 0;padding:0;display:grid;gap:var(--sp-3)}
-.tp-map-card li{display:grid;grid-template-columns:1fr auto auto;align-items:center;gap:var(--sp-4);padding:var(--sp-3) var(--sp-4);border-radius:var(--radius-md);background:color-mix(in srgb, var(--surface-bright) 55%, transparent)}
+.tp-map-card li{display:flex;flex-wrap:wrap;align-items:center;gap:var(--sp-3) var(--sp-4);padding:var(--sp-3) var(--sp-4);border-radius:var(--radius-md);background:color-mix(in srgb, var(--surface-bright) 55%, transparent)}
+.tp-map-card li>div:first-child{flex:1 1 11rem;min-width:min(100%,9rem)}
 .tp-map-card li b{display:block;font-size:var(--fs-sm)}
-.tp-map-card li span{display:block;font-size:var(--fs-xs);color:var(--c-violet-55);overflow-wrap:anywhere}
+.tp-map-card li span{display:block;font-size:var(--fs-xs);color:var(--c-violet-55);overflow-wrap:break-word}
+.tp-map-card .tp-actions{display:flex;flex:0 1 auto;align-items:center;gap:var(--sp-3);max-width:100%}
+.tp-map-card .tp-actions>.tp-set{flex:0 1 auto;min-width:0}
+.tp-map-card .tp-actions>.content-action-btn{flex:none}
 .tp-map-card button{margin:0;white-space:nowrap}
 .tp-map-card .tp-set{background:var(--surface-bright);border:1px solid var(--c-violet-75);color:var(--c-violet-44);border-radius:var(--radius-md);padding:5px 9px;font:inherit;font-size:var(--fs-sm);cursor:pointer}
 .tp-map-card button[disabled]{opacity:.5;cursor:not-allowed}
-.tp-map-card li .tp-set{white-space:normal;max-width:12rem;text-align:center}
+.tp-map-card li .tp-set{white-space:normal;text-align:center}
 .tp-map-card ol[hidden]{display:none}
 .tp-map-card .tp-confirm{margin-top:9px;padding:var(--sp-4);border-radius:var(--radius-md);background:color-mix(in srgb, var(--surface-bright) 55%, transparent)}
 .tp-map-card .tp-confirm strong{display:block}
 .tp-map-card .tp-confirm p{margin:var(--sp-2) 0 var(--sp-4);font-size:var(--fs-sm)}
 .tp-map-card .tp-confirm-actions{display:flex;gap:var(--sp-3);flex-wrap:wrap}
-@media (max-width:480px){.tp-map-card li{grid-template-columns:1fr 1fr}.tp-map-card li>div{grid-column:1/-1}}
 `;
 
 function ensureCss() {
@@ -422,7 +425,13 @@ function buildMapCard(engine) {
             : "You don't have enough energy.";
     }
     go.addEventListener('click', () => teleportPoint(engine, id));
-    row.append(info, set, go);
+    // SHORTCUTS (Austin 2026-11-04, Groddle Meadow at 1000 x 700): the point's name and its line keep a
+    // readable width and the two buttons stay together, beside them when the card is wide and under
+    // them when it is not (CARD_CSS li, .tp-actions); three columns squeezed the words to one a line.
+    const actions = document.createElement('div');
+    actions.className = 'tp-actions';
+    actions.append(set, go);
+    row.append(info, actions);
     list.appendChild(row);
   }
   card.append(head, list);

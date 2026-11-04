@@ -6119,15 +6119,24 @@ body.buff-purple-pulse::after {
   align-items: start;
   gap: var(--sp-4);
   padding: var(--sp-4);
-  /* Its full size over the map; only a very short window scrolls it. */
-  max-height: min(72vh, 520px);
+  /* Its full size over the map, never past the Map's bottom edge (game.js fitMapExtras); when the
+     cards do not fit it scrolls, and its bottom fades while there is more. */
+  max-height: var(--map-extras-room, min(72vh, 520px));
   overflow: auto;
+  overscroll-behavior: contain;
   border-radius: var(--radius-lg);
   background: var(--surface-card);
   border: 1px solid color-mix(in srgb, var(--c-gold-59) 60%, transparent);
   box-shadow: var(--shadow-4);
 }
 .map-extras-grid > * { margin: 0 !important; min-width: 0; }
+/* SHORTCUTS (Austin 2026-11-04): packed (game.js fitMapExtras), each card spans its own height in 1 px
+   rows and takes the first place that fits, so a short card never leaves a hole beside a tall one. */
+.map-extras-grid[data-packed] { grid-auto-rows: 1px; grid-auto-flow: row dense; row-gap: 0; }
+.map-extras-grid[data-more="1"] {
+  -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 2.5rem), rgb(0 0 0 / 0.2));
+  mask-image: linear-gradient(to bottom, #000 calc(100% - 2.5rem), rgb(0 0 0 / 0.2));
+}
 .map-extras-grid > .map-home-card { padding: var(--sp-4) var(--sp-5); }
 .map-hub-picker {
   margin-left: auto;

@@ -40,7 +40,7 @@ import { SUBWAY_STREETS } from '../public/js/quest-rooms/back-alley.js?v=657b222
 import { doorRooms, doorToward, routeGraph } from '../public/js/map-routes.js?v=bcf2c347';
 import { afterStreetCard, runStreetTransition, streetCardUp } from '../public/js/screen-fx.js?v=9d4640eb';
 import { EMITTED_EVENTS } from '../public/js/quest-offers.js?v=c78cd30e';
-import { smugglingFeature } from '../public/js/features/smuggling-feature.js?v=b9953b91';
+import { smugglingFeature } from '../public/js/features/smuggling-feature.js?v=c5a1f43e';
 import { addItem } from '../public/js/inventory.js?v=602da017';
 import { resurrect } from '../public/js/hell.js?v=c493dadb';
 
@@ -856,7 +856,7 @@ describe('G192 the Map keeps the map in view', () => {
   it('the extra cards fold into one Shortcuts line; the canvas takes the room left', () => {
     const game = read(join(PUBLIC, 'game.js'));
     assert.match(game, /arrangeMapCards\(panel\);\n  panel\.hidden = false;/);
-    assert.match(game, /!el\.matches\('\[data-map-route\], \.nx-map-card'\)/, 'the route card and quest cards stay out');
+    assert.match(read(join(PUBLIC, 'js/map-extras.js')), /!el\.matches\('\[data-map-route\], \.nx-map-card'\)/, 'the route card and quest cards stay out');
     const css = read(join(PUBLIC, 'style.css'));
     // Ticket 21: the canvas keeps the hub's shape and gives way on a short window (tests/map-fit.test.js).
     assert.match(css, /\.map-card\.map-hub > \.map-canvas \{\n  flex: 0 1 auto;\n  height: auto;\n  aspect-ratio: var\(--map-aspect, 760 \/ 460\);/);

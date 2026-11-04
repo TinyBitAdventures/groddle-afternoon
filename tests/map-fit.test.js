@@ -86,7 +86,7 @@ describe('ticket 21: the Map always shows the whole hub', () => {
   });
 
   it('the Shortcuts and the route card share one row, and the Shortcuts open over the map', () => {
-    const game = read('public/game.js');
+    const game = read('public/js/map-extras.js');
     assert.match(game, /bar\.className = 'map-bar';/);
     assert.match(game, /bar\.append\(details\);\n  if \(route\) bar\.append\(route\);/);
     assert.match(game, /if \(open && !open\.contains\(e\.target\)\) open\.open = false;/, 'a click elsewhere on the Map shuts them');
@@ -270,5 +270,137 @@ describe('MAPFRAME: the map is its painting, and the window around it is two sho
     assert.match(read('public/game.js'), /sub\.title = sub\.textContent;/);
     // Classic keeps its head, its region line under it and the client's 764 wide window.
     assert.doesNotMatch(read('public/css/classic.css'), /\.map-sub \{[^}]*order:/);
+  });
+});
+
+/**
+ * SHORTCUTS (Austin 2026-11-04, Groddle Meadow at 1000 x 700, a route set, Teleportation II with no
+ * points): each point row was three columns (its words, "Set this location as Teleport Point",
+ * Teleport), which squeezed the words to 31 px, one word a line and broken mid-word; the cards sat in
+ * rows as tall as the Teleportation card, leaving a hole under the home card, and the last row ran past
+ * the Map's bottom edge, cut off (the box was capped at 72% of the window, not at the Map).
+ * Laid out for real in Chrome (under the browser lock): the game's stylesheets, the Teleportation
+ * feature's own card and js/map-extras.js, in both skins.
+ */
+let chromium = null;
+try { chromium = (await import('playwright')).chromium; } catch { /* no Playwright */ }
+
+describe('SHORTCUTS: the Map\'s Shortcuts pack, never cut a card, and Teleportation rows read (Chrome)', { skip: !chromium && 'no playwright' }, () => {
+  const card = (cls, title, body) => `<section class="${cls}"><div><strong>${title}</strong><span>${body}</span></div></section>`;
+  const pills = (names) => names.map((n) => `<button type="button" class="content-action-btn">${n}</button>`).join('');
+  const page = (skin, canvasH) => `<!doctype html><html data-ui="${skin}"><head>
+<link rel="stylesheet" href="/style.css">${skin === 'classic' ? '<link rel="stylesheet" href="/css/classic.css">' : ''}
+<style>#game-root{position:relative;width:1000px;height:700px}#map-panel{position:absolute;inset:0}#map-panel .map-canvas{height:${canvasH}px!important;aspect-ratio:auto!important;flex:none!important}</style></head>
+<body><div id="game-root"><div id="map-panel" class="map-panel ui-sheet ui-sheet-center"><div class="map-card map-hub ui-sheet-card">
+<div class="map-head ui-sheet-head"><h2 class="ui-sheet-title">Groddle Meadow</h2></div>
+<p class="map-sub">40 streets · 40 playable here</p>
+<section class="map-home-card"><div><strong>Your Firebog home</strong><span>Your mailbox is quiet · remembers where to return</span></div><button type="button" class="content-action-btn">Teleport home</button></section>
+<section class="map-feature-card" data-map-title="Puzzle streets"><strong>Puzzle streets</strong><div>${pills(['Griinolyza', 'Amberlyza', 'Purplysa', 'Blooian', 'Fernucopia', 'Piryan', 'Orangian', 'Piano Party'])}</div></section>
+<section class="map-feature-card" data-map-title="Lost puzzle levels"><strong>Lost puzzle levels</strong><div>${pills(['Constellation', 'Beam Me Down (ticket: 0)'])}</div></section>
+${card('map-feature-card', 'Street projects here', 'Build Twickenrill Grotto (open) · Build Twickenrill Grotto (open)')}
+<div class="map-route-card" data-map-route><div class="map-route-body"><b>To: Forest Community Machine Room</b></div><div class="map-route-actions"><button type="button">Clear route</button></div></div>
+<div id="map-canvas" class="map-canvas"></div>
+<p class="map-hint"><kbd>M</kbd> map</p>
+</div></div></div></body></html>`;
+
+  async function layout(browser, base, { skin, rank, points = 0, canvasH = 340, confirm = false }) {
+    const ctx = await browser.newContext({ viewport: { width: 1000, height: 700 } });
+    const tab = await ctx.newPage();
+    await tab.goto(`${base}/style.css`);
+    await tab.setContent(page(skin, canvasH), { waitUntil: 'load' });
+    return tab.evaluate(async ({ rank, points, confirm }) => {
+      const { arrangeMapCards } = await import('/js/map-extras.js');
+      const { teleportationFeature } = await import('/js/features/teleportation-feature.js');
+      const learnedSkills = ['meditativearts_1', ...Array.from({ length: rank }, (_, i) => `teleportation_${i + 1}`)];
+      const engine = {
+        learnedSkills, streetTsid: 'GLI334UG2UD1IKQ', street: { label: 'Waylon Way', hubId: '58', hubName: 'Groddle Meadow' }, player: { x: 0, y: 0 },
+        pc: { energy: 100 }, homeContext: () => ({ inHome: false }), transientInstance: () => null, param: () => null, setData: () => {},
+      };
+      const targets = {};
+      for (let id = 1; id <= points; id++) targets[id] = { tsid: 'GCR101UN0NJ1QPQ', label: 'Middle Arbor', hubName: 'Groddle Meadow' };
+      teleportationFeature.restore({ targets });
+      const panel = document.getElementById('map-panel');
+      const mapCard = panel.querySelector('.map-card');
+      for (const el of teleportationFeature.mapCards(engine)) {
+        el.classList.add('map-feature-card');
+        mapCard.insertBefore(el, panel.querySelector('.map-canvas'));
+      }
+      arrangeMapCards(panel);
+      panel.querySelector('.map-extras').open = true;
+      const settle = () => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(() => setTimeout(r, 30))));
+      await document.fonts.ready;
+      await settle();
+      if (confirm) { panel.querySelector('[data-teleport-set="1"]').click(); await settle(); }
+      const grid = panel.querySelector('.map-extras-grid');
+      const g = grid.getBoundingClientRect();
+      const cardBottom = mapCard.getBoundingClientRect().bottom;
+      const cards = [...grid.children].map((el) => { const b = el.getBoundingClientRect(); return { t: el.querySelector('strong')?.textContent, top: b.top, bottom: b.bottom, left: b.left, right: b.right }; });
+      const rows = [...grid.querySelectorAll('.tp-map-card li')].filter((li) => li.offsetParent).map((li) => {
+        const info = li.querySelector(':scope > div').getBoundingClientRect();
+        const span = li.querySelector('span');
+        const lines = Math.round(span.getBoundingClientRect().height / parseFloat(getComputedStyle(span).lineHeight));
+        const btns = [...li.querySelectorAll('button')].map((b) => b.getBoundingClientRect());
+        return { infoW: info.width, lines, wrap: getComputedStyle(span).overflowWrap, buttonsClear: btns.every((b) => b.top >= info.bottom - 1 || b.left >= info.right - 1), sameLine: Math.abs(btns[0].top + btns[0].height / 2 - (btns[1].top + btns[1].height / 2)) < 2 };
+      });
+      const scrolls = grid.scrollHeight > grid.clientHeight + 1;
+      const moreBefore = grid.dataset.more;
+      const dbg = `${grid.scrollHeight}/${grid.clientHeight}/${getComputedStyle(grid).maxHeight}`;
+      grid.scrollTop = grid.scrollHeight;
+      grid.dispatchEvent(new Event('scroll'));
+      const lastVisible = Math.max(...[...grid.children].map((el) => el.getBoundingClientRect().bottom)) <= grid.getBoundingClientRect().bottom + 1;
+      return { dbg, gridBottom: g.bottom, gridTop: g.top, cardBottom, cards, rows, scrolls, moreBefore, moreAfter: grid.dataset.more, lastVisible, confirmShown: Boolean(panel.querySelector('[data-teleport-confirm]')) };
+    }, { rank, points, confirm }).finally(() => ctx.close());
+  }
+
+  it('both skins, Teleportation I-III, 0 to 3 points and the question, a tall and a short Map', { timeout: 900_000 }, async () => {
+    const { openBrowser } = await import('../tools/qa/browser.mjs');
+    const { startServer } = await import('../tools/qa/serve.mjs');
+    const server = await startServer({ root: join(root, 'public') });
+    const base = `http://127.0.0.1:${server.address().port}`;
+    const { browser, close } = await openBrowser({ label: 'map-fit shortcuts test', waitMs: 840_000 }); // other lanes' Chrome may hold the lock
+    const bad = [];
+    try {
+      for (const skin of ['modern', 'classic']) {
+        for (const [rank, points, confirm, canvasH] of [[2, 0, false, 340], [2, 1, false, 340], [2, 2, false, 340], [2, 0, true, 340], [1, 0, false, 340], [3, 0, false, 340], [3, 0, false, 120], [2, 0, false, 60]]) {
+          const r = await layout(browser, base, { skin, rank, points, confirm, canvasH });
+          const key = `${skin} T${rank} ${points} points${confirm ? ' asking' : ''} map ${canvasH}`;
+          if (r.gridBottom > r.cardBottom + 0.5) bad.push(`${key}: the box runs ${Math.round(r.gridBottom - r.cardBottom)} px past the Map`);
+          if (!r.scrolls && r.cards.some((c) => c.bottom > r.gridBottom + 1)) bad.push(`${key}: a card is cut and the box does not scroll`);
+          if (r.scrolls && (r.moreBefore !== '1' || r.moreAfter !== '0' || !r.lastVisible)) bad.push(`${key}: scrolls without its fade, or the last card never shows (${r.moreBefore}/${r.moreAfter}/${r.lastVisible} ${r.dbg})`);
+          if (confirm !== r.confirmShown) bad.push(`${key}: the question`);
+          for (const row of r.rows) {
+            if (row.infoW < 150) bad.push(`${key}: a point's words are ${Math.round(row.infoW)} px wide`);
+            if (row.lines > 3) bad.push(`${key}: a point's line takes ${row.lines} lines`);
+            if (row.wrap === 'anywhere') bad.push(`${key}: words break mid-word`);
+            if (!row.buttonsClear || !row.sameLine) bad.push(`${key}: the buttons sit over the words or apart`);
+          }
+          if (!confirm && r.rows.length !== Math.min(rank, 3)) bad.push(`${key}: ${r.rows.length} rows`);
+          // Packed: no card has a hole above it in its column bigger than the gap.
+          for (const c of r.cards) {
+            const above = r.cards.filter((o) => o !== c && o.bottom <= c.top + 1 && o.left < c.right - 1 && c.left < o.right - 1);
+            const floor = above.length ? Math.max(...above.map((o) => o.bottom)) : r.gridTop;
+            if (c.top - floor > 24) bad.push(`${key}: a ${Math.round(c.top - floor)} px hole above ${c.t}`);
+          }
+        }
+      }
+    } finally {
+      await close();
+      await server.stop();
+    }
+    assert.deepEqual(bad, []);
+  });
+
+  it('the wiring: packed rows, the box capped at the Map, the fade, and the point row', () => {
+    const css = read('public/style.css');
+    assert.match(css, /max-height: var\(--map-extras-room, min\(72vh, 520px\)\);/);
+    assert.match(css, /\.map-extras-grid\[data-packed\] \{ grid-auto-rows: 1px; grid-auto-flow: row dense; row-gap: 0; \}/);
+    const mod = read('public/js/map-extras.js');
+    assert.match(mod, /el\.style\.gridRowEnd = `span \$\{Math\.max\(1, Math\.ceil\(el\.offsetHeight \+ gap\)\)\}`;/);
+    assert.match(mod, /const room = Math\.floor\(card\.getBoundingClientRect\(\)\.bottom - grid\.getBoundingClientRect\(\)\.top - 8\);/);
+    assert.match(read('public/game.js'), /\n  fitMapExtras\(card\);\n  if \(!mapFitObserver\)/, 'a resize packs and caps it again');
+    const tp = read('public/js/features/teleportation-feature.js');
+    assert.match(tp, /\.tp-map-card li\{display:flex;flex-wrap:wrap;/);
+    assert.match(tp, /actions\.append\(set, go\);\n    row\.append\(info, actions\);/);
+    assert.doesNotMatch(tp, /overflow-wrap:anywhere/);
   });
 });

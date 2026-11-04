@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=2e6bc3fd';
 import { createFeatureHost } from './js/feature-host.js?v=2ed3c069';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=292caab6';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=8a41f1c3';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -959,6 +959,7 @@ import { shrineDonationResponseKey, verbResponse } from './js/verb-responses.js?
 import { itemZ } from './js/item-bands.js?v=e98b10bc';
 import { SLUG_ANIMATION, SLUG_LAYOUT, SLUG_STYLES, SLUG_TARGETS, drawSlugIcon, formatRawSlugs, formatSlugList, layoutSlugRow, slugBox, slugNumber, slugPillPath, slugSign, speechSlugList } from './js/speech-slugs.js?v=130338f9';
 import { filterText } from './js/word-filter.js?v=9a7a7ebb'; // the remake's own word filter
+import { arrangeMapCards, fitMapExtras } from './js/map-extras.js?v=9f38c312'; // the Map's Shortcuts
 // The interface skin (js/classic/ui-mode.js) sets <html data-ui> as it loads: before main(), so before the boot cover lifts.
 import { installInterfaceSettings } from './js/classic/classic-prefs.js?v=0a75db72';
 
@@ -24112,6 +24113,7 @@ function fitMapCanvas(panel = document.getElementById('map-panel')) {
   } finally {
     mapFitBusy = false;
   }
+  fitMapExtras(card);
   if (!mapFitObserver) {
     let queued = false;
     const again = () => {
@@ -24146,69 +24148,6 @@ function showFoundStreet(canvas, tsid, view) {
   g.classList.add('is-found');
   toast(`${label}, ${view.hubName}`, 2600);
   setTimeout(() => g.classList.remove('is-found'), 4200);
-}
-
-/**
- * G192: the Map's shortcut cards (home, puzzle streets, projects, ...) fold
- * into one Shortcuts line above the route card, so the map itself stays in
- * view; quest cards and the route card stay out. Open or shut is kept while
- * the game runs.
- *
- * Ticket 21 (Friendly: the Shortcuts and the destination squeezed the map, and the Shortcuts needed a
- * scrollbar): the Shortcuts line and the route card share one row (.map-bar), and the Shortcuts open
- * over the map at their full size; a click anywhere else on the Map shuts them.
- */
-let mapExtrasOpen = false;
-function arrangeMapCards(panel) {
-  const card = panel?.querySelector('.map-card');
-  const canvas = panel?.querySelector('.map-canvas');
-  if (!card || !canvas) return;
-  // The row from the last open: its route card goes back in front of the map before the row is made again.
-  for (const bar of card.querySelectorAll(':scope > .map-bar')) {
-    for (const el of [...bar.children]) if (!el.classList.contains('map-extras')) card.insertBefore(el, bar);
-    bar.remove();
-  }
-  card.querySelectorAll(':scope > .map-extras').forEach((el) => el.remove());
-  const extras = [...card.children].filter((el) =>
-    (el.classList.contains('map-home-card') || el.classList.contains('map-feature-card')) &&
-    !el.matches('[data-map-route], .nx-map-card'));
-  const route = card.querySelector(':scope > [data-map-route]');
-  const bar = document.createElement('div');
-  bar.className = 'map-bar';
-  if (!extras.length) {
-    if (route) {
-      card.insertBefore(bar, route);
-      bar.append(route);
-    }
-    return;
-  }
-  const titleOf = (el) => (el.dataset.mapTitle || el.querySelector('strong, h3, h4')?.textContent || el.firstElementChild?.textContent || '').trim().replace(/\s+/g, ' ');
-  const details = document.createElement('details');
-  details.className = 'map-extras';
-  details.open = mapExtrasOpen;
-  const summary = document.createElement('summary');
-  const head = document.createElement('strong');
-  head.textContent = 'Shortcuts';
-  const list = document.createElement('span');
-  list.textContent = extras.map(titleOf).filter(Boolean).join(' · ');
-  summary.append(head, list);
-  const grid = document.createElement('div');
-  grid.className = 'map-extras-grid';
-  grid.append(...extras);
-  details.append(summary, grid);
-  details.addEventListener('toggle', () => {
-    mapExtrasOpen = details.open;
-  });
-  card.insertBefore(bar, route || canvas);
-  bar.append(details);
-  if (route) bar.append(route);
-  if (!card.dataset.extrasShut) {
-    card.dataset.extrasShut = '1';
-    card.addEventListener('pointerdown', (e) => {
-      const open = card.querySelector(':scope > .map-bar > .map-extras[open]');
-      if (open && !open.contains(e.target)) open.open = false;
-    });
-  }
 }
 
 /**
