@@ -32,9 +32,9 @@ import {
   periodicMoodLoss,
 } from '../mood-decay.js?v=49175993';
 import { loseMood, moodMax } from '../metabolics.js?v=8504134e';
-import { GENTLE_ISLAND_TSIDS, isNewxpSceneTsid } from '../newxp.js?v=6ca4702e';
-import { homesFeature } from './homes-feature.js?v=28f61bbd';
-import { newxpFeature } from './newxp-feature.js?v=e55ad5c7';
+import { GENTLE_ISLAND_TSIDS, isNewxpSceneTsid } from '../newxp.js?v=20a28ea6';
+import { homesFeature } from './homes-feature.js?v=4bac1ccf';
+import { newxpFeature } from './newxp-feature.js?v=9146ded2';
 import { meditationFeature } from './meditation-feature.js?v=11c9ecae';
 
 export const MOOD_DECAY_FEATURE_ID = 'mood-decay';

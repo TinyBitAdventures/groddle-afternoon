@@ -8,9 +8,9 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { validateZone, RULES, hash16, healOps, plainApex, badWords, zoneArrivals } from '../public/js/builder/validate.js?v=02767566';
-import { streetWorld, jumpArc, jumpArcs, reachStreet } from '../public/js/builder/reach-graph.js?v=40bfbc44';
-import { GRAVITY, stepAvatar, avatarGround, steerX, coastX, NORMAL_BUFF } from '../public/js/avatar-step.js?v=537aa4b7';
+import { validateZone, RULES, hash16, healOps, plainApex, badWords, zoneArrivals } from '../public/js/builder/validate.js?v=6b06c9fb';
+import { streetWorld, jumpArc, jumpArcs, reachStreet } from '../public/js/builder/reach-graph.js?v=0144f90a';
+import { GRAVITY, stepAvatar, avatarGround, steerX, coastX, NORMAL_BUFF } from '../public/js/avatar-step.js?v=de5b3a16';
 import { platformsScreen } from '../public/js/street-model.js?v=505d8990';
 import { loadValidatorContext } from '../tools/builder/validator-context.mjs';
 
@@ -77,7 +77,7 @@ describe('the stepper the game and the validator share (js/avatar-step.js)', () 
   it('game.js runs the shared frame', () => {
     const game = read('public/game.js');
     // assert.ok, not assert.match: a failing match would print the whole of game.js.
-    assert.ok(/import \{ JUMP_SPEED, WALK_MAX, avatarGround, coastX, stepAvatar, steerAccel, (?:steerX, )?streetPhysicsExtras \} from '\.\/js\/avatar-step\.js\?v=[0-9a-f]{8}';/.test(game), 'imports js/avatar-step.js');
+    assert.ok(/import \{ JUMP_SPEED, (?:MAX_TICK_FRAMES, )?WALK_MAX, avatarGround, coastX, (?:frameSteps, )?stepAvatar, steerAccel, (?:steerX, )?streetPhysicsExtras \} from '\.\/js\/avatar-step\.js\?v=[0-9a-f]{8}';/.test(game), 'imports js/avatar-step.js');
     assert.ok(/stepAvatar\(player, \{\n\s+dt,\n\s+buff: combinedPhysics\(\),/.test(game), 'physics() steps through stepAvatar');
     assert.ok(game.includes('return avatarGround(streetPlatforms, px, py, player?.vy ?? 0, { street: currentStreet, fallback: GROUND_Y });'), 'resolveGround is avatarGround');
     assert.ok(!/function streetPhysicsFreeFall|const STREET_PHYSICS_TERMINAL_VY/.test(game), 'no second copy of the frame');

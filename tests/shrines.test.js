@@ -197,6 +197,7 @@ describe('emblem hitbox (2012-09-22: a waiting emblem is given as you walk past)
     const src = readFileSync(join(publicRoot, 'game.js'), 'utf8');
     assert.match(src, /function updateShrineWalkBy\(\)/);
     assert.match(src, /entered && !isScreenFxBlocking\(\) && canClaimEmblem\(shrineState, target\.state\?\.giantId\)/);
-    assert.match(src, /physics\(dt\);\n\s+tickAvatarAfk\(\);\n\s+updateShrineWalkBy\(\);/);
+    // The movement runs in sub-steps (js/avatar-step.js frameSteps); the walk-by check after them.
+    assert.match(src, /physics\(step\);\n\s+\}\n\s+tickAvatarAfk\(\);\n\s+updateShrineWalkBy\(\);/);
   });
 });

@@ -2,9 +2,9 @@
  * Groddle Afternoon — original street geometry + layered decos
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
-import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=b484cbad';
+import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=2e6bc3fd';
 import { createFeatureHost } from './js/feature-host.js?v=2ed3c069';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=fc0fa9b9';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=da516b80';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -464,8 +464,8 @@ import {
 } from './js/inventory.js?v=602da017';
 import { PACK_COPY, isBagClass, unitRankAt } from './js/pack-slots.js?v=68a8fca3';
 import { createPackRow, mountPackClearance, packBandRange, packCountText, packSearchEntries, packSlotTip } from './js/ui/pack-row.js?v=65c0f180';
-import { listAnimalFeedOptions } from './js/animals.js?v=bc5f9f35';
-import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=bc5f9f35';
+import { listAnimalFeedOptions } from './js/animals.js?v=761b9fa7';
+import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=761b9fa7';
 import {
   createDroppedItemState,
   parseDroppedItemState,
@@ -496,7 +496,7 @@ import {
   imagineHome,
   isHomePlaceTsid,
 } from './js/homes.js?v=631ab6b8';
-import { HOME_MACHINE, offerHomeTicket, renderTicketMachine } from './js/home-ticket.js?v=c96cf07c';
+import { HOME_MACHINE, offerHomeTicket, renderTicketMachine } from './js/home-ticket.js?v=cafddb60';
 import {
   MAIL_COMPANIONS,
   archiveMail,
@@ -742,7 +742,7 @@ import { facingScaleX, facingFromVelocity } from './js/avatar.js?v=c4da73ea';
 import { AFK_SEQUENCE, AFK_TIMEOUT_MS, ANIMS, ANIM_FPS, EMOTIONS, EMOTION_MS, FALL_LOOP, IDLE_SHEETS, RANDOM_IDLE_MS, RANDOM_IDLE_WAIT_MS, animForState, avatarAnimState, createIdleClock, crowdScaleX, frameRef, idleSheetFor } from './js/avatar-anims.js?v=fb921bf4';
 import { landingY, stackRestY, walkSurfaceY } from './js/walk-surface.js?v=c982983e';
 import { holdCloseToFloor } from './js/slope-walk.js?v=9af1e505';
-import { JUMP_SPEED, WALK_MAX, avatarGround, coastX, stepAvatar, steerAccel, steerX, streetPhysicsExtras } from './js/avatar-step.js?v=537aa4b7';
+import { JUMP_SPEED, MAX_TICK_FRAMES, WALK_MAX, avatarGround, coastX, frameSteps, stepAvatar, steerAccel, steerX, streetPhysicsExtras } from './js/avatar-step.js?v=de5b3a16';
 import { createUserPath, stepUserPath } from './js/user-path.js?v=8880557f';
 import { FAILED_LINE, inVerbReach, movingLine, verbRange, walkOverEnd, walkOverGoalX } from './js/walk-over.js?v=db80ba07';
 import { hellBuffDesc, isInHell } from './js/hell.js?v=c493dadb';
@@ -798,7 +798,7 @@ import {
   createAnimalState,
   resetAnimalDay,
   animalStatusLabel,
-} from './js/animals.js?v=bc5f9f35';
+} from './js/animals.js?v=761b9fa7';
 import {
   ensureWoodTreeState,
   pickWoodTool,
@@ -898,7 +898,7 @@ import {
   ANIMAL_PATROL,
   nearestPlacementGap,
 } from './js/street-ecology.js?v=d41e5e97';
-import { chickenPauseRoll, easeToward, flightFloorAt, flightFloorFor, flyerLift } from './js/street-creatures.js?v=3a7abcef';
+import { chickenPauseRoll, easeToward, flightFloorAt, flightFloorFor, flyerLift } from './js/street-creatures.js?v=af1311cd';
 import { createSoundBoard, DEFAULT_SFX_VOLUME, watchButtonClicks, watchPanelSounds } from './js/sound-board.js?v=87380a25';
 import {
   actionLoopFor,
@@ -941,7 +941,7 @@ import { clientKeyAction, createHotkeysSheet, isHotkeySheetRelease, isPlainKey }
 import { EAT_PICK_TEXT, bestFoodIndex, eatChoices, eatTip } from './js/eat-pick.js?v=8fb763d0';
 import { installHeldKeyGuard, isMacPlatform } from './js/held-keys.js?v=98b96620';
 import { signpostArmRows, worldContextAction } from './js/world-context-menu.js?v=f3f48805';
-import { blockedPlayerVerbs, listPlayerTarget, opensPlayerMenu, playerMenuRows } from './js/ui/player-menu.js?v=18758b81';
+import { blockedPlayerVerbs, listPlayerTarget, opensPlayerMenu, playerMenuRows } from './js/ui/player-menu.js?v=51949c59';
 import { forgetTexture, frameTexture, isFailed, isLoaded, onFailed, onLoaded, textureFromUrl, whenLoaded } from './js/textures.js?v=3149d699';
 import { FALLBACK_MAX as WORLD_ART_FALLBACK_MAX, worldArtFor } from './js/world-art.js?v=df476660';
 import { sceneAnim, syncAnim } from './js/deco-anim.js?v=8c4c784b';
@@ -28326,6 +28326,9 @@ async function main() {
     gcMaxUnusedTime: 20000,
     gcFrequency: 5000,
   });
+  // QA: &maxfps=N holds the game to N frames a second (jump timing at a low frame rate).
+  const qaMaxFps = Number(new URLSearchParams(location.search).get('maxfps'));
+  if (qaMaxFps > 0) app.ticker.maxFPS = qaMaxFps;
   // Ticket 21: street decos no street has drawn for a while leave the image cache (js/textures.js
   // releaseIdleImages), so a long session's decoded decos do not pile up (Safari's memory reload).
   setInterval(() => {
@@ -30825,11 +30828,16 @@ async function main() {
       drawStreetFrame();
       return;
     }
-    const dt = Math.min(ticker.deltaTime, 2.5);
+    // The frames this tick stands for (at most MAX_TICK_FRAMES), and the input and movement in
+    // sub-steps of at most one frame (js/avatar-step.js frameSteps): air time and walking match
+    // 60 fps at any frame rate. Everything after runs once with the whole tick.
+    const dt = Math.min(ticker.deltaTime, MAX_TICK_FRAMES);
     updateCurrentAction((1000 / 60) * dt);
     updateMakeCraft((1000 / 60) * dt);
-    handleInput();
-    physics(dt);
+    for (const step of frameSteps(dt)) {
+      handleInput();
+      physics(step);
+    }
     tickAvatarAfk();
     updateShrineWalkBy();
     updateBuriedSignposts();

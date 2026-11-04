@@ -117,7 +117,7 @@ import {
   training2Layout,
   tutorialPhysics,
   vogPages,
-} from '../newxp.js?v=6ca4702e';
+} from '../newxp.js?v=20a28ea6';
 import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=602da017';
 import { QUOIN_SHEET, QUOIN_TYPES, qrazyRewardForLevel } from '../quoins.js?v=dfe1ff0a';
 import { soundForQuoin } from '../sound-moments.js?v=2f8597cd';
@@ -125,13 +125,13 @@ import { IMAGINATION_UPGRADES } from '../imagination.js?v=0cab36eb';
 import { assignQuest, completeQuest } from '../quests.js?v=b2856d6c';
 import { acceptOffer, enqueueQuestOffer, questAwardPayload, turnInQuest } from '../quest-offers.js?v=c78cd30e';
 import { getQuestCatalog } from '../content-catalogs.js?v=10b118dd';
-import { locationEventsApi } from './location-events-feature.js?v=6aca5a98';
+import { locationEventsApi } from './location-events-feature.js?v=baea1395';
 import * as kit from '../quest-rooms/kit.js?v=4d8ab82d';
 import { frameTexture, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js?v=3149d699';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 import { displayTopOf, itemstackOverlayPoint, playPoofIn, playSheetOverlay, poofInAlpha } from '../overlay-art.js?v=11b6dd7f';
-import { HOME_MACHINE } from '../home-ticket.js?v=c96cf07c';
-import { animalAnchorX, createAnimalState } from '../animals.js?v=bc5f9f35';
+import { HOME_MACHINE } from '../home-ticket.js?v=cafddb60';
+import { animalAnchorX, createAnimalState } from '../animals.js?v=761b9fa7';
 import {
   AK_ANIMALS,
   AK_BUBBLE,

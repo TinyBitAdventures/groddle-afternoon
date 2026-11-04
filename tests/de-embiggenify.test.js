@@ -36,7 +36,7 @@ import {
   expireDeEmbiggenify,
   findSmallWorthless,
 } from '../public/js/de-embiggenify.js?v=7ff7ffba';
-import { jumpApex, NORMAL_BUFF } from '../public/js/avatar-step.js?v=537aa4b7';
+import { jumpApex, NORMAL_BUFF } from '../public/js/avatar-step.js?v=de5b3a16';
 import { SOURCE_PHYSICS, triggerHit } from '../public/js/puzzle-triggers.js?v=114b052b';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');

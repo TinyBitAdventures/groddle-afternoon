@@ -34,7 +34,7 @@ import { createDroppedItemState, dropInventoryStack, pickupDroppedStack } from '
 import { layoutPack, unitPlaces, unitRankAt } from '../public/js/pack-slots.js?v=68a8fca3';
 import { toolBreakEvents } from '../public/js/quest-offers.js?v=c78cd30e';
 import { performAnimalKinship } from '../public/js/animal-kinship.js?v=2757bb52';
-import { createAnimalState } from '../public/js/animals.js?v=bc5f9f35';
+import { createAnimalState } from '../public/js/animals.js?v=761b9fa7';
 
 const remaining = (tools, cls) => toolCopies(tools, cls).map((c) => c.remaining);
 

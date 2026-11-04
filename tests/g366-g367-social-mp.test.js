@@ -13,9 +13,9 @@ import { join } from 'node:path';
 import { createRealtimeClient, CORE_KINDS } from '../public/js/realtime-client.js?v=d890c210';
 import { TYPING_EVERY_MS, TYPING_MS, typingCounts, typingDotAlpha } from '../public/js/features/realtime-feature.js?v=182aa81e';
 import { BUTLER_IM_TEXT, BUTLER_IM_VERBS, HELP_AGAIN_MS, commandHelp, imDelayMs, imLine, imText, normalizeImPrefs, parseButlerIm } from '../public/js/butler-im.js?v=44783638';
-import { butlerImFeature, BUTLER_TAB } from '../public/js/features/butler-im-feature.js?v=bc8c9929';
-import { slashCommandsFeature } from '../public/js/features/slash-commands-feature.js?v=b33bcc0b';
-import { FEATURES } from '../public/js/features/index.js?v=fc0fa9b9';
+import { butlerImFeature, BUTLER_TAB } from '../public/js/features/butler-im-feature.js?v=83659959';
+import { slashCommandsFeature } from '../public/js/features/slash-commands-feature.js?v=f8ce747e';
+import { FEATURES } from '../public/js/features/index.js?v=da516b80';
 
 const root = join(import.meta.dirname, '..');
 const read = (rel) => readFileSync(join(root, rel), 'utf8');
@@ -179,7 +179,7 @@ describe('G367 the Butler IM: the feature', () => {
 
   it('IMs, commands and the Butler on the street, end to end against a fake server', async (t) => {
     t.mock.timers.enable({ apis: ['setTimeout'] });
-    const { butlerApi } = await import('../public/js/features/butler-feature.js?v=ca008eae');
+    const { butlerApi } = await import('../public/js/features/butler-feature.js?v=8619895d');
     t.mock.method(butlerApi, 'owned', () => true);
     t.mock.method(butlerApi, 'label', () => 'Jeeves');
     const streetSaid = [];

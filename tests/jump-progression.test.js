@@ -32,8 +32,8 @@ import {
 } from '../public/js/imagination.js?v=0cab36eb';
 import { isOfferedInRemake, isOfferedOnline } from '../public/js/imagination-remake.js?v=83dc3f68';
 import { imaginationFeature } from '../public/js/features/imagination-feature.js?v=8afbf4e3';
-import { NORMAL_BUFF, jumpApex } from '../public/js/avatar-step.js?v=537aa4b7';
-import { reachStreet } from '../public/js/builder/reach-graph.js?v=40bfbc44';
+import { NORMAL_BUFF, jumpApex } from '../public/js/avatar-step.js?v=de5b3a16';
+import { reachStreet } from '../public/js/builder/reach-graph.js?v=0144f90a';
 import { WINTER_WALK_START, WINTER_WALK_TSID } from '../public/js/winter-walk-streets.js?v=8607edd3';
 
 const read = (rel) => readFileSync(join(import.meta.dirname, '..', 'public', rel), 'utf8');

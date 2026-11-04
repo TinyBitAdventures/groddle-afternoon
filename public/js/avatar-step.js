@@ -47,6 +47,28 @@ export const AIR_FRICTION = -0.22;
  * (features/quest-instances-feature.js) until they are laid out again at the client's scale.
  */
 export const REMAKE_ROOM_PHYSICS = Object.freeze({ gravity: 0.42 / GRAVITY, jump: 9.6 / -JUMP_SPEED, airFriction: 0 });
+/**
+ * The most 60 fps frames one game tick stands for: 6 is 10 fps, Pixi's ticker minFPS. Below that
+ * the game slows down instead of catching up (a hidden tab or a long stall is dropped, never
+ * replayed as a burst of steps that would slow the next tick further).
+ */
+export const MAX_TICK_FRAMES = 6;
+
+/**
+ * PURE: one tick of `frames` (Pixi ticker.deltaTime: 1 at 60 fps, 4 at 15 fps, 0.5 at 120) as
+ * equal movement steps of at most one frame each, at most MAX_TICK_FRAMES in all. The avatar is
+ * stepped as the client stepped it (17 ms slices, StageBeacon.as TARGET_PHYSICS_FRAMERATE 60)
+ * at any frame rate, so a jump is in the air as long at 15 fps as at 120. Until 2026-11-04 the
+ * tick was one step capped at 2.5 frames: below 24 fps the world ran in slow motion (a 0.98 s
+ * jump took 1.2 s at 20 fps and 1.6 s at 15).
+ */
+export function frameSteps(frames, max = MAX_TICK_FRAMES) {
+  const total = Math.min(Math.max(0, Number(frames) || 0), max);
+  if (!(total > 0)) return [];
+  const n = Math.max(1, Math.ceil(total - 1e-9));
+  return Array.from({ length: n }, () => total / n);
+}
+
 /** The avatar's height against walls at scale 1 (blockBarrierCrossing bodyH); ceilings use avatarHeadReach. */
 export const AVATAR_BODY_H = 80;
 /** The street ground resolve's snap (resolveGround's `snap`), as game.js calls it. */

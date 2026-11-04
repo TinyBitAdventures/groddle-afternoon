@@ -15,17 +15,17 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { AIR_FRICTION, GRAVITY, JUMP_SPEED, NORMAL_BUFF, REMAKE_ROOM_PHYSICS, TERMINAL_VY, flatJump, jumpApex, stepAvatar, avatarGround } from '../public/js/avatar-step.js?v=537aa4b7';
-import { questInstancesFeature } from '../public/js/features/quest-instances-feature.js?v=6ad9cff3';
+import { AIR_FRICTION, GRAVITY, JUMP_SPEED, MAX_TICK_FRAMES, NORMAL_BUFF, REMAKE_ROOM_PHYSICS, TERMINAL_VY, flatJump, frameSteps, jumpApex, stepAvatar, avatarGround } from '../public/js/avatar-step.js?v=de5b3a16';
+import { questInstancesFeature } from '../public/js/features/quest-instances-feature.js?v=50dc2dc3';
 import { buffPhysics } from '../public/js/buffs.js?v=036fee53';
 import { physicsMultipliers } from '../public/js/location-events.js?v=05663361';
-import { NEWXP_DEFAULT_PHYSICS, NEWXP_UPGRADES, reachFor } from '../public/js/newxp.js?v=6ca4702e';
+import { NEWXP_DEFAULT_PHYSICS, NEWXP_UPGRADES, reachFor } from '../public/js/newxp.js?v=20a28ea6';
 import { NO_UPGRADE_PHYSICS_STREETS, ignoresUpgradePhysics, remakeMovementMultipliers } from '../public/js/imagination.js?v=0cab36eb';
 import { rawTripleJumpMultiplier, scaledTripleJumpMultiplier, TRIPLE_JUMP_UPGRADES } from '../public/js/movement.js?v=b30f84eb';
-import { reachStreet } from '../public/js/builder/reach-graph.js?v=40bfbc44';
-import { plainApex, LEDGE_RISE } from '../public/js/builder/validate.js?v=02767566';
+import { reachStreet } from '../public/js/builder/reach-graph.js?v=0144f90a';
+import { plainApex, LEDGE_RISE } from '../public/js/builder/validate.js?v=6b06c9fb';
 import { SOURCE_PHYSICS } from '../public/js/puzzle-triggers.js?v=114b052b';
-import { CANOPY_PHYSICS } from '../public/js/hidden-floors.js?v=518fce9e';
+import { CANOPY_PHYSICS } from '../public/js/hidden-floors.js?v=1de85d03';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const PUBLIC = join(ROOT, 'public');
@@ -225,5 +225,75 @@ describe('the game frame steps the same jump', () => {
     const triple = { x: 500, y: 1000, vx: 0, vy: JUMP_SPEED * 1.8, onGround: false, tripleJumping: true };
     stepAvatar(triple, { platforms, worldW: 4000, ground });
     assert.ok(triple.vy < -TERMINAL_VY);
+  });
+});
+
+describe('air time at any frame rate (sub-steps, 2026-11-04)', () => {
+  const platforms = [{ id: 'f', x1: 0, y1: 1000, x2: 4000, y2: 1000, pcPerm: -1 }];
+  const ground = (x, y, vy) => avatarGround(platforms, x, y, vy, { fallback: 1000 });
+  /** One plain jump at `fps`, ticked as game.js ticks: `stepsOf(frames)` per tick. Seconds in the air and apex px. */
+  function jumpAt(fps, stepsOf, mult = 1) {
+    const frames = 60 / fps;
+    const body = { x: 500, y: 1000, vx: 0, vy: 0, onGround: true };
+    let ticks = 0;
+    let top = 1000;
+    let launched = false;
+    while (ticks < 2000) {
+      ticks += 1;
+      for (const step of stepsOf(frames)) {
+        if (!launched) {
+          // handleInput's launch, on the tick's first step.
+          body.vy = JUMP_SPEED * mult;
+          body.onGround = false;
+          launched = true;
+        }
+        stepAvatar(body, { dt: step, platforms, worldW: 4000, ground });
+        top = Math.min(top, body.y);
+      }
+      if (body.onGround) break;
+    }
+    return { seconds: ticks / fps, apex: 1000 - top };
+  }
+
+  it('splits a tick into steps of at most one frame, at most MAX_TICK_FRAMES in all', () => {
+    assert.deepEqual(frameSteps(1), [1]);
+    assert.deepEqual(frameSteps(0.5), [0.5]);
+    assert.deepEqual(frameSteps(4), [1, 1, 1, 1]);
+    assert.deepEqual(frameSteps(2.5).map((x) => +x.toFixed(4)), [0.8333, 0.8333, 0.8333]);
+    assert.equal(MAX_TICK_FRAMES, 6);
+    assert.equal(frameSteps(600).reduce((a, b) => a + b, 0), 6, 'a long stall is dropped, not replayed');
+    assert.equal(frameSteps(600).length, 6);
+    assert.deepEqual(frameSteps(0), []);
+    assert.deepEqual(frameSteps(NaN), []);
+  });
+
+  it('a plain jump is in the air about 0.98 s and peaks at 142 px at 15, 20, 24, 30, 60 and 120 fps', () => {
+    for (const fps of [15, 20, 24, 30, 60, 120]) {
+      const { seconds, apex } = jumpAt(fps, (f) => frameSteps(f));
+      // One rendered frame of slack either way: landing is seen on the first frame back on the floor.
+      assert.ok(Math.abs(seconds - 0.983) <= 1 / fps + 0.01, `${fps} fps: ${seconds.toFixed(3)} s`);
+      assert.ok(Math.abs(apex - jumpApex(1)) < 3, `${fps} fps: apex ${apex.toFixed(1)}`);
+    }
+  });
+
+  it('a new player\'s jump keeps its 0.70 s too', () => {
+    for (const fps of [15, 30, 60]) {
+      const { seconds } = jumpAt(fps, (f) => frameSteps(f), 0.7105);
+      assert.ok(Math.abs(seconds - 0.70) <= 1 / fps + 0.01, `${fps} fps: ${seconds.toFixed(3)} s`);
+    }
+  });
+
+  it('the old single step capped at 2.5 frames ran slow under 24 fps', () => {
+    const old = (fps) => jumpAt(fps, (f) => [Math.min(f, 2.5)]).seconds;
+    assert.ok(old(20) > 1.15, `20 fps: ${old(20)}`);
+    assert.ok(old(15) > 1.5, `15 fps: ${old(15)}`);
+    assert.ok(Math.abs(old(30) - 0.983) < 0.05);
+  });
+
+  it('game.js runs the input and movement in those steps', () => {
+    const src = readFileSync(join(PUBLIC, 'game.js'), 'utf8');
+    assert.match(src, /const dt = Math\.min\(ticker\.deltaTime, MAX_TICK_FRAMES\);/);
+    assert.match(src, /for \(const step of frameSteps\(dt\)\) \{\n\s*handleInput\(\);\n\s*physics\(step\);\n\s*\}/);
+    assert.doesNotMatch(src, /Math\.min\(ticker\.deltaTime, 2\.5\)/);
   });
 });
