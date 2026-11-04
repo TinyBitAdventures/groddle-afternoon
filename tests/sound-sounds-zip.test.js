@@ -10,7 +10,7 @@ import { createHash } from 'node:crypto';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { SOUND_ALIASES, SOUND_FILES, SOUND_KEY_COUNTS } from '../public/js/sound-keys.js?v=a8aaeb9d';
+import { SOUND_ALIASES, SOUND_FILES, SOUND_KEY_COUNTS } from '../public/js/sound-keys.js?v=6aedc206';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const pub = join(root, 'public');
@@ -103,6 +103,12 @@ describe('Sounds.zip originals', () => {
     for (const n of [1, 2, 3]) assert.match(catalog[`CARD_DEAL${n}`].zipFile, new RegExp(`card_deal_${n}\\.`));
     // ImaginationHandUI.as 493 plays CARD_DEAL<slot+1>; inc_imagination.js 497 deals three slots.
     for (const n of [4, 5, 6, 7]) assert.equal(catalog[`CARD_DEAL${n}`], undefined, `CARD_DEAL${n}`);
+    // Round 8: Le Miserable's switches; the rainbow and triple jump takes match what already ships, so they wait.
+    assert.equal(catalog.TEST_SOUND.zipFile, '1308092086-Test_1.1.mp3');
+    for (const k of ['RAINBOW_70F', 'RAINBOW_75F', 'TRIPLE_JUMP_1_4']) assert.ok(map.held.some((r) => r.key === k), k);
+    assert.equal(catalog.RAINBOW_RANDOMKINDNESS.alias, 'RAINBOW_SUPERHARVEST');
+    assert.equal(catalog.TRIPLE_JUMP.file, 'assets/audio/triple_jump.mp3');
+    assert.equal(catalog.OPENING_SCREEN.zipFile, '1331738581-Opening_Screen_Chimes_1.1.mp3');
   });
 
   it('the remake plays them where the original does', () => {

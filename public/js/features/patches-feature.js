@@ -62,7 +62,7 @@ import {
   soilSpawnClasses,
   soilSpritePaths,
   tickPlot,
-} from '../patches.js?v=d036e0b8';
+} from '../patches.js?v=9b252cc6';
 import { frameTexture, isLoaded, onFailed, onLoaded, textureFromUrl } from '../textures.js?v=3149d699';
 import { HOE_TOOLS, firstWorkingTool } from '../tools.js?v=3974f57e';
 import { slugsFromEffects } from '../speech-slugs.js?v=130338f9';

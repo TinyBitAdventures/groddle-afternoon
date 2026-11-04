@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { SOUND_ALIASES, SOUND_FILES, SOUND_KEY_COUNTS } from '../public/js/sound-keys.js?v=a8aaeb9d';
+import { SOUND_ALIASES, SOUND_FILES, SOUND_KEY_COUNTS } from '../public/js/sound-keys.js?v=6aedc206';
 import {
   SYNTH_KEY_RECIPES,
   SYNTH_RECIPE_NAMES,
@@ -12,7 +12,7 @@ import {
   playSynthRecipe,
   recipeForKey,
 } from '../public/js/synth-sfx.js?v=030fad18';
-import { createSoundBoard, resolveSound } from '../public/js/sound-board.js?v=3f7738d5';
+import { createSoundBoard, resolveSound } from '../public/js/sound-board.js?v=87380a25';
 import {
   LEGACY_SFX_KEYS,
   actionLoopFor,

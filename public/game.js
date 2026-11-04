@@ -2,9 +2,9 @@
  * Groddle Afternoon — original street geometry + layered decos
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
-import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=b12ffac4';
+import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=79228c68';
 import { createFeatureHost } from './js/feature-host.js?v=2ed3c069';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=530e1b70';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=93630a6e';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -464,8 +464,8 @@ import {
 } from './js/inventory.js?v=597a17a2';
 import { PACK_COPY, isBagClass, unitRankAt } from './js/pack-slots.js?v=ba0a895f';
 import { createPackRow, mountPackClearance, packBandRange, packCountText, packSearchEntries, packSlotTip } from './js/ui/pack-row.js?v=65c0f180';
-import { listAnimalFeedOptions } from './js/animals.js?v=bc97a19d';
-import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=bc97a19d';
+import { listAnimalFeedOptions } from './js/animals.js?v=2654c807';
+import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=2654c807';
 import {
   createDroppedItemState,
   parseDroppedItemState,
@@ -482,7 +482,7 @@ import {
   parsePlayerSave,
   serializePlayerSave,
   restorePlayerSave,
-} from './js/player-save.js?v=362b5abe';
+} from './js/player-save.js?v=ff2c4abf';
 import {
   HOME_INTERIOR_TSID,
   HOME_STREET_TSID,
@@ -778,7 +778,7 @@ import {
   planMusicblockDrop,
   playMusicblock,
   starterMusicblocks,
-} from './js/musicblocks.js?v=303edb0e';
+} from './js/musicblocks.js?v=c9e56377';
 import {
   VENDOR_PROFILES,
   selectVendorProfile,
@@ -795,7 +795,7 @@ import {
   createAnimalState,
   resetAnimalDay,
   animalStatusLabel,
-} from './js/animals.js?v=bc97a19d';
+} from './js/animals.js?v=2654c807';
 import {
   ensureWoodTreeState,
   pickWoodTool,
@@ -824,7 +824,7 @@ import {
   favorRelationNote,
   emblemRelationNote,
   formatSpeedUpTime,
-} from './js/shrines.js?v=20828cc9';
+} from './js/shrines.js?v=c6a91b91';
 import { shrinePowderOptions, shrinePowderAchievementCounters } from './js/powders.js?v=d355981a';
 import {
   GAMESHOW_TICKET_ID,
@@ -835,7 +835,7 @@ import {
   spinMeResponse,
   spinningWheelPhase,
   startSpinningWheel,
-} from './js/spinning-wheel.js?v=1fd03a61';
+} from './js/spinning-wheel.js?v=d0958fab';
 import {
   CUBIMAL_PACKAGE_IDS,
   cubimalCollectionProgress,
@@ -894,8 +894,8 @@ import {
   ANIMAL_PATROL,
   nearestPlacementGap,
 } from './js/street-ecology.js?v=2c82c072';
-import { chickenPauseRoll, easeToward, flightFloorAt, flightFloorFor, flyerLift } from './js/street-creatures.js?v=d97ae766';
-import { createSoundBoard, DEFAULT_SFX_VOLUME, watchButtonClicks, watchPanelSounds } from './js/sound-board.js?v=3f7738d5';
+import { chickenPauseRoll, easeToward, flightFloorAt, flightFloorFor, flyerLift } from './js/street-creatures.js?v=e4f7ed66';
+import { createSoundBoard, DEFAULT_SFX_VOLUME, watchButtonClicks, watchPanelSounds } from './js/sound-board.js?v=87380a25';
 import {
   actionLoopFor,
   legacySoundKey,
@@ -30323,7 +30323,7 @@ async function main() {
     },
   };
   if (new URLSearchParams(location.search).has('soundtest')) {
-    import('./js/sound-test.js?v=635741ee').then((m) => m.openSoundTest({ document, playSound, board: () => audio.board, unmute: async () => {
+    import('./js/sound-test.js?v=988a2a33').then((m) => m.openSoundTest({ document, playSound, board: () => audio.board, unmute: async () => {
       state.muted = false;
       if (audio.ctx?.state === 'suspended') {
         try { await audio.ctx.resume(); } catch (_) { /* opt-in */ }

@@ -40,10 +40,10 @@ import {
   quoteWoodTreeHarvest,
   woodTreeStatusLabel,
 } from '../public/js/woodcutting.js?v=6d2ad054';
-import { noteWoodTreeCare } from '../public/js/patches.js?v=d036e0b8';
-import { isTreeTarget } from '../public/js/features/tree-death-feature.js?v=524c0700';
-import { enchantedForestFeature, hollowTrees, treeScreenSpots } from '../public/js/features/enchanted-forest-feature.js?v=b06e8aab';
-import { FEATURES } from '../public/js/features/index.js?v=530e1b70';
+import { noteWoodTreeCare } from '../public/js/patches.js?v=9b252cc6';
+import { isTreeTarget } from '../public/js/features/tree-death-feature.js?v=48b6ec5e';
+import { enchantedForestFeature, hollowTrees, treeScreenSpots } from '../public/js/features/enchanted-forest-feature.js?v=b4598dfe';
+import { FEATURES } from '../public/js/features/index.js?v=93630a6e';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const streets = join(spike, 'public/assets/streets');

@@ -1071,6 +1071,13 @@
    "match": "music_map"
   },
   {
+   "key": "TEST_SOUND",
+   "zip": "1308092086-Test_1.1.mp3",
+   "md5": "29a1ead9113e046959942bce0278f00b",
+   "match": "filename",
+   "why": "Le Miserable's light switches (p1/p2/p3_sounds_a*, 15 street events) play TEST_SOUND; Test_1.1 is the zip's only test file (0.24 s blip; TEST is another url, Glowing_Orb_Summer). Name match only"
+  },
+  {
    "key": "TRANSCENDENTAL_MEDITATION_01",
    "zip": "1297359285-meditation_berg.mp3",
    "md5": "c276f6d24cbfefd5213085b6a19be888",
@@ -1239,10 +1246,28 @@
    "why": "Machine part step (blockmaker.js:796); not played by the remake."
   },
   {
+   "key": "RAINBOW_70F",
+   "zip": "1305742525-rainbow_70f.mp3",
+   "md5": "c1486c9ef25a41a31f5a45db677f8c43",
+   "why": "The rainbow overlay's sting (uploaded 2011-05-18, between the rainbow SWFs). Every RAINBOW_* key already plays the same recording: archive.org's Tiny Speck rainbow.mp3 (spectral cos 0.92, 4.7 vs 4.9 s). No url says which RAINBOW_* key took which take, so nothing changes"
+  },
+  {
+   "key": "RAINBOW_75F",
+   "zip": "1305742599-rainbow_75f.mp3",
+   "md5": "a5a43346d40b359efbdf0c418c44d9c1",
+   "why": "A longer take of the rainbow sting (6.0 s, cos 0.80 to the shipped rainbow.mp3), probably for a 75-frame overlay; no key or url ties it to one RAINBOW_* moment"
+  },
+  {
    "key": "READY",
    "zip": "1322173657-Ready_1.1.mp3",
    "md5": "f1d531c34b66a6e6a3e938296d68cb60",
    "why": "In the original READY is the making machine's done sound (players/inc_making.js:830; Ready_1.1 sits beside Collect_1.3 in the 2011-11 machine set). The remake plays READY only at the Game of Crowns countdown, so this file would put a machine chime on the race start."
+  },
+  {
+   "key": "TRIPLE_JUMP_1_4",
+   "zip": "1320940407-Triple_Jump_1.4.mp3",
+   "md5": "f178f80e0d6e471bb1a57cb4ac2a3519",
+   "why": "TRIPLE_JUMP already plays the downloads page's triple_jump.mp3, the same recording (cos 0.93, 1.06 vs 1.12 s); the client's url for the key is unknown, so the shipped take stays"
   },
   {
    "key": "URALIA_BIG_STAR_1",

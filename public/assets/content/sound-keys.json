@@ -10,11 +10,11 @@
   "mirrored": 1,
   "downloadsBestFit": 27,
   "archiveorgSfx": 216,
-  "soundsZip": 177,
+  "soundsZip": 178,
   "overlayFla": 3,
-  "withFile": 462,
+  "withFile": 463,
   "aliases": 88,
-  "playable": 550,
+  "playable": 551,
   "dead": 3,
   "live": 634
  },
@@ -9276,7 +9276,13 @@
     "street:GIFM4BD43383DKV (Le Miserable p2_sounds_a1)",
     "street:GIFM4BD43383DKV (Le Miserable p2_sounds_a2)",
     "street:GIFM4BD43383DKV (Le Miserable p2_sounds_a3)"
-   ]
+   ],
+   "file": "assets/audio/sfx/TEST_SOUND.mp3",
+   "origin": "sounds-zip",
+   "why": "Le Miserable's light switches (p1/p2/p3_sounds_a*, 15 street events) play TEST_SOUND; Test_1.1 is the zip's only test file (0.24 s blip; TEST is another url, Glowing_Orb_Summer). Name match only",
+   "zipFile": "1308092086-Test_1.1.mp3",
+   "zipMd5": "29a1ead9113e046959942bce0278f00b",
+   "zipMatch": "filename"
   },
   "TEST_TUBE": {
    "category": "tool",

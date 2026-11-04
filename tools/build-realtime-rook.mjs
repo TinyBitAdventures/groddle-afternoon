@@ -40,7 +40,7 @@ import { platformsScreen, streetWidth } from '../public/js/street-model.js?v=505
 import { ecologyForStreet, planStreetPlacements, populationForStreet, setStreetEcologyCatalog, streetReservedSpots } from '../public/js/street-ecology.js?v=2c82c072';
 import { ITEM_CATALOG } from '../public/js/inventory.js?v=597a17a2';
 import { loadRecipeCatalogFromFile } from '../public/js/making.js?v=712a9adb';
-import { SHRINE_ITEM_BASE_COSTS, donationValueFor, giantForStreet } from '../public/js/shrines.js?v=20828cc9';
+import { SHRINE_ITEM_BASE_COSTS, donationValueFor, giantForStreet } from '../public/js/shrines.js?v=c6a91b91';
 import { ITEM_BASE_COSTS } from '../public/js/store-catalog.js?v=74b56af3';
 import { TOOL_CONDITION_CATALOG } from '../public/js/tools.js?v=3974f57e';
 import { placementRequests } from './build-realtime-objects.mjs';

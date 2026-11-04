@@ -39,12 +39,12 @@ import { setSeasonalRecipeCheck } from '../making.js?v=712a9adb';
 import { getToolCondition } from '../tools.js?v=3974f57e';
 import { landingY, nearestSurfaceY } from '../walk-surface.js?v=c982983e';
 import { isStandable } from '../street-model.js?v=505d8990';
-import { isBatterflyHabitat } from '../animal-husbandry.js?v=213cd2fe';
-import { emblemCostFor } from '../shrines.js?v=20828cc9';
+import { isBatterflyHabitat } from '../animal-husbandry.js?v=a4c7de13';
+import { emblemCostFor } from '../shrines.js?v=c6a91b91';
 import { rollDropTable } from '../drop-tables.js?v=0f922478';
 import { openNoteView, noteViewOpen } from '../note-view.js?v=21c55475';
-import { payDrop } from './drops-feature.js?v=64e3d63f';
-import { resourceNodesFeature } from './resource-nodes-feature.js?v=28aad31d';
+import { payDrop } from './drops-feature.js?v=8a048c2d';
+import { resourceNodesFeature } from './resource-nodes-feature.js?v=9bb9d81e';
 import { SEASON_DATA } from '../seasons-data.js?v=b5174bc9';
 import {
   CANDY_CLASSES,

@@ -5,7 +5,7 @@
  * button per row, a category filter and a search box.
  */
 
-import { resolveSound } from './sound-board.js?v=3f7738d5';
+import { resolveSound } from './sound-board.js?v=87380a25';
 
 const CSS = `
 .sound-test{position:fixed;inset:12px 12px auto auto;width:min(560px,calc(100vw - 24px));max-height:calc(100vh - 24px);

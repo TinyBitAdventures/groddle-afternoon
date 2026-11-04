@@ -16,7 +16,7 @@ import { readFileSync, writeFileSync, mkdirSync, readdirSync, existsSync } from 
 import { dirname, join, relative } from 'node:path';
 import { loadPosts } from './build.mjs';
 import { plain } from './html.mjs';
-import { MUSICBLOCK_SERIES } from '../../public/js/musicblocks.js?v=303edb0e';
+import { MUSICBLOCK_SERIES } from '../../public/js/musicblocks.js?v=c9e56377';
 import { SITE_DIR, requireSite } from '../repos.mjs';
 
 const THEME = SITE_DIR;
