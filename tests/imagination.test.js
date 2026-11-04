@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
-import { existsSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import {
   BRAIN_CAPACITY_LIMIT,
@@ -32,6 +32,8 @@ import {
   resurrectionCardCost,
   upgradeStatus,
 } from '../public/js/imagination.js?v=0cab36eb';
+import { resolveTokens } from './css-tokens.js';
+import { parseColour } from '../tools/tokens/colour.mjs';
 
 const publicRoot = join(import.meta.dirname, '..', 'public');
 
@@ -268,5 +270,50 @@ describe('imagination starters and physics', () => {
 
   it('collects learning-speed reductions by category', () => {
     assert.deepEqual(learnTimeReductions(['learntime_alchemy_1', 'learntime_alchemy_3', 'learntime_animal_2']), { 6: 10, 14: 5 });
+  });
+});
+
+// Ticket 75 (Friendly, Safari): the price on a card you cannot afford was pale pink (--c-red-90) with a
+// dark 1.5 px blurred shadow, about 1-2.5:1 on the gold, green, yellow and blue cards, so it read as a
+// smudge. The client darkens it instead (ImgCardUI.as 300-310: colorize(0), alpha .5, no drop shadow);
+// the remake keeps that dark, unshadowed price and sets it on a light chip so it stays readable on
+// the dark grey and red cards too, where black at half alpha would vanish.
+describe('unaffordable card price (ticket 75)', () => {
+  const src = readFileSync(join(publicRoot, 'js/features/imagination-feature.js'), 'utf8');
+  const css = resolveTokens(/const PANEL_CSS = `([\s\S]*?)`;/.exec(src)[1]);
+  const rule = /\.img-card\.poor \.img-front \.img-cost\{([^}]*)\}/.exec(css);
+  const decls = Object.fromEntries((rule?.[1] || '').split(';').map((d) => d.split(/:(.*)/s).map((x) => x.trim())).filter((d) => d[0]));
+  const lum = ([r, g, b]) => {
+    const f = (v) => ((v /= 255) <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4);
+    return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b);
+  };
+  const over = ([r, g, b, a], under) => [r, g, b].map((v, i) => v * a + under[i] * (1 - a));
+  const contrast = (x, y) => (Math.max(lum(x), lum(y)) + 0.05) / (Math.min(lum(x), lum(y)) + 0.05);
+
+  it('is dark text with no blurred shadow, like the client', () => {
+    assert.ok(rule, 'the poor price rule is in PANEL_CSS');
+    assert.equal(decls['text-shadow'], 'none');
+    assert.equal(decls.filter, undefined);
+    assert.equal(decls.opacity, undefined);
+    const text = parseColour(decls.color);
+    const chip = parseColour(decls.background);
+    assert.ok(text && chip, `${decls.color} / ${decls.background}`);
+    assert.ok(lum(text) < 0.05 && lum(chip) > 0.8, 'dark on light');
+  });
+
+  it('reads at 4.5:1 or better on every card background the deck uses', () => {
+    const text = parseColour(decls.color);
+    const chip = parseColour(decls.background);
+    const dir = join(publicRoot, 'assets/imagination/cards');
+    const bgs = readdirSync(dir).filter((f) => /^bg_(?!back)\w+\.svg$/.test(f));
+    assert.ok(bgs.length >= 10, bgs.join(' '));
+    for (const f of bgs) {
+      for (const [hex] of readFileSync(join(dir, f), 'utf8').matchAll(/#[0-9a-f]{6}\b/gi)) {
+        const card = parseColour(hex);
+        const under = over(chip, card);
+        const ratio = contrast(over(text, under), under);
+        assert.ok(ratio >= 4.5, `${f} ${hex}: ${ratio.toFixed(2)}`);
+      }
+    }
   });
 });

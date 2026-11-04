@@ -20,7 +20,7 @@
  * QA: ?imgdemo=1 opens the shop with plenty of iMG (&imglevel=N sets the
  * level, &imgseed=N makes the deal deterministic, &imgflip=0-2 shows a card's
  * back, &imgview=owned opens the owned list, &imgcard=<id> deals that card
- * into slot 1); &imgautoplay=buy buys the
+ * into slot 1, &imgbalance=N leaves N iMG to show unaffordable cards); &imgautoplay=buy buys the
  * first affordable card, uses the free re-deal and buys again; =owned opens
  * the owned list after buying; =card buys slot 1. Canvas attributes: imgHand, imgOwned,
  * imgLast, imgShuffled, imgAutoplay, imgBrain, imgEnergyMax.
@@ -329,7 +329,8 @@ const PANEL_CSS = `
 .img-front .img-cost{position:absolute;top:9px;right:12px;color:var(--text-inverse);font-weight:800;font-size:var(--fs-lg);text-shadow:0 -1px 1.5px color-mix(in srgb, var(--c-black) 55%, transparent)}
 .img-front.keepable .img-title{background:none;color:var(--c-grey-45);text-shadow:none;bottom:31px}
 .img-front.keepable .img-cost{color:var(--c-grey-53);text-shadow:none}
-.img-card.poor .img-front .img-cost{color:var(--c-red-90)}
+.img-card.poor .img-front .img-cost{right:6px;padding:0 var(--sp-3);border-radius:var(--radius-pill);background:color-mix(in srgb, var(--surface-bright) 80%, transparent);
+  color:color-mix(in srgb, var(--c-black) 70%, transparent);text-shadow:none}
 .img-card.poor .img-front img.art,.img-card.poor .img-front img.icon{opacity:.35}
 .img-card.poor .img-front .img-title{background:color-mix(in srgb, var(--surface-bright) 30%, transparent)}
 .img-back{transform:rotateY(180deg);color:var(--c-navy-36);text-align:left}
@@ -742,6 +743,9 @@ function setupDemo(engine) {
     pc.level = level;
   }
   pc.imagination = Math.max(Number(pc.imagination) || 0, 250000);
+  // QA: &imgbalance=N leaves the player exactly N iMG, so the dear cards show unaffordable.
+  const balance = engine.param('imgbalance');
+  if (balance !== null && balance !== '' && Number.isFinite(Number(balance))) pc.imagination = Math.max(0, Math.floor(Number(balance)));
   if (engine.param('imgseed')) rng = seededRng(engine.param('imgseed'));
   state.hand = Array(HAND_SIZE).fill(null);
   state.shuffledDay = null;
