@@ -254,7 +254,13 @@ describe('who may read the kept chat (src/ChatHistory.php)', { skip: skipWithout
   it('signed-in players only; the server\'s batches signed; visitors and crawlers get nothing', () => {
     const c = src('src/ChatHistory.php');
     const routes = [...c.matchAll(/#\[Route\(Method::(\w+), '([^']+)', policy: new Policy\(Access::(\w+)\)\)\]/g)].map((m) => [m[1], m[2], m[3]]);
-    assert.deepEqual(routes.map((r) => r[1]), ['/groddle/v1/chat/ingest', '/groddle/v1/chat/channels', '/groddle/v1/chat/channels/{key:global|help|trade|group-[1-9][0-9]{0,18}}', '/groddle/v1/chat/channels/{key:global|help|trade}', '/groddle/v1/chat/ims/{with:[1-9][0-9]{0,18}}']);
+    assert.deepEqual(routes.map((r) => r[1]), [
+      '/groddle/v1/chat/ingest', '/groddle/v1/chat/channels', '/groddle/v1/chat/channels/{key:global|help|trade|group-[1-9][0-9]{0,18}}', '/groddle/v1/chat/channels/{key:global|help|trade}',
+      // The website's chat app (Austin 2026-11-04): your IM conversations, an IM written there, threads on channel and IM lines.
+      '/groddle/v1/chat/ims', '/groddle/v1/chat/ims/{with:[1-9][0-9]{0,18}}', '/groddle/v1/chat/ims/{with:[1-9][0-9]{0,18}}',
+      '/groddle/v1/chat/channels/{key:global|help|trade|group-[1-9][0-9]{0,18}}/threads/{lid:[1-9][0-9]{0,18}}', '/groddle/v1/chat/channels/{key:global|help|trade}/threads/{lid:[1-9][0-9]{0,18}}',
+      '/groddle/v1/chat/ims/{with:[1-9][0-9]{0,18}}/threads/{line:[1-9][0-9]{0,18}}',
+    ]);
     for (const [, path, access] of routes) assert.equal(access, path.endsWith('/ingest') ? 'Public' : 'SignedIn', path);
     assert.match(c, /ServiceCall::verify\(\$request->header\(ServiceCall::HEADER\), 'POST', '\/groddle\/v1\/chat\/ingest', \$request->body, \$secret, time\(\)\)/);
     assert.match(c, /->withHeader\('Cache-Control', 'private, no-store'\)->withHeader\('X-Robots-Tag', 'noindex'\)/);
@@ -263,6 +269,15 @@ describe('who may read the kept chat (src/ChatHistory.php)', { skip: skipWithout
     assert.match(pages, /\$channels = \$viewer\['id'\] > 0\s*\? \$this->channelsPanel\(\$viewer\)/);
     assert.match(pages, /'channelsSignedOut' => 'Sign in to see what players are saying in the game\.'/);
     assert.doesNotMatch(src('src/SocialTags.php'), /ChatHistory|chat_lines/);
+    // Presence and the chat app's people and setting: signed-in players only (Austin 2026-11-04).
+    for (const f of ['src/PresenceSetting.php', 'src/ChatPeople.php']) {
+      const r = [...src(f).matchAll(/policy: new Policy\(Access::(\w+)\)/g)].map((m) => m[1]);
+      assert.ok(r.length > 0 && r.every((x) => x === 'SignedIn'), f);
+    }
+    // The app's live parts (IMs, buddies, Who's around, the thread panel) are drawn for a signed-in reader only.
+    const shell = pages.slice(pages.indexOf('private function shell('));
+    assert.match(shell, /if \(\$signed\) \{[\s\S]*data-cx-ims[\s\S]*\}/);
+    assert.match(shell, /\$side = '';\s*if \(\$signed\) \{[\s\S]*data-cx-people/);
   });
 
   it('IMs: only the two players read a conversation; no other code reads the table', () => {
