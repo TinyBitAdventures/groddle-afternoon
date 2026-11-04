@@ -402,7 +402,7 @@ describe('delivery and wiring', () => {
 
 describe('craftybot feature: the ingredient source and the job menu', async () => {
   // The feature imports these with their browser cache tags; load the same module instances.
-  const { craftybotFeature } = await import('../public/js/features/craftybot-feature.js?v=feadc9f9');
+  const { craftybotFeature } = await import('../public/js/features/craftybot-feature.js?v=3cd29b32');
   const { homesFeature } = await import('../public/js/features/homes-feature.js?v=3c1faa58');
   const cbMod = await import('../public/js/craftybot.js?v=41eacd5d');
   const making = await import('../public/js/making.js?v=6b048d25');
@@ -503,5 +503,40 @@ describe('craftybot feature: the ingredient source and the job menu', async () =
     const cook = craftybotFeature._menu(fakeEngine({ learnedSkills: ['ezcooking_1', 'ezcooking_2', 'cheffery_1', 'cheffery_2'] }));
     assert.ok(cook.some((r) => r.tool === 'knife_and_board'));
     assert.ok(cook.every((r) => !r.outputs[0].classTsid.startsWith('furniture_') && !r.fuel));
+  });
+});
+
+// Ticket 92 follow-up: the quantity box updates as you type, like every other count field
+// (js/ui/count-chooser.js typedCount), without redrawing the box (focus and caret stay). Its fuel,
+// status and ingredient lines are redrawn in place; leaving the box redraws only when it shows
+// something else; Add to Queue and Done read the count at the press.
+describe('the quantity box follows the count as it is typed', () => {
+  const src = readFileSync(join(PUBLIC, 'js/features/craftybot-feature.js'), 'utf8');
+  const fn = (name) => {
+    const at = src.indexOf(`\nfunction ${name}(`);
+    assert.ok(at >= 0, name);
+    return src.slice(at, src.indexOf('\n}\n', at));
+  };
+
+  it('input previews the typed count (one to the most, at least what is done) in place; change redraws only when needed', () => {
+    const details = fn('renderDetails');
+    assert.match(details, /input\.addEventListener\('input', \(\) => \{\n\s+const n = typedCount\(input\.value, hi, min\);\n\s+if \(n == null\) return;\n\s+previewed = n;\n\s+panelState\.qty = n;\n\s+showQtyParts\(engine, body, cls, n\);/);
+    assert.match(details, /input\.addEventListener\('change', \(\) => \{\n\s+const n = countFromField\(input\.value, hi, min\);\n\s+if \(n === previewed && String\(input\.value\)\.trim\(\) === String\(n\)\) return;\n\s+setQty\(n\);/);
+    assert.doesNotMatch(details, /addEventListener\('change', \(\) => setQty\(input\.value\)\)/, 'the old change-only redraw is gone');
+    assert.match(details, /addJob\(engine, cls, pickedQty\(\)\)/);
+    assert.match(details, /const total = pickedQty\(\);/);
+    assert.match(details, /setQty\(panelState\.qty - 1\)/);
+    assert.match(details, /setQty\(panelState\.qty \+ 1\)/);
+  });
+
+  it('showQtyParts redraws the fuel, the status and the ingredient lines, never the box, and marks the panel drawn', () => {
+    const parts = fn('showQtyParts');
+    assert.match(parts, /const cost = costCheck\(world, cls, qty\);/);
+    assert.match(parts, /\[data-cb-fuel-use\][\s\S]*?`Uses: \$\{cost \? cost\.fuel_cost : 0\} Fuel`/);
+    assert.match(parts, /\[data-cb-status\][\s\S]*?qtyStatus\(qty\)[\s\S]*?appendComponents\(engine, body, cost\?\.components \|\| \[\], world\)/);
+    assert.doesNotMatch(parts, /renderPanel|replaceChildren|cbQty|data-cb-qty/);
+    assert.match(parts, /lastPanelKey = panelKey\(engine\);/);
+    // The panel's own refresh still never rebuilds under a focused box.
+    assert.match(fn('renderPanel'), /if \(!force && panel\.contains\(document\.activeElement\) && document\.activeElement\?\.tagName === 'INPUT'\) return;/);
   });
 });

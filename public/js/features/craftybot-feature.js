@@ -87,6 +87,7 @@ import { frameTexture, isLoaded, onLoaded, sourceFromUrl, textureFromUrl } from 
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 import { displayTopOf, itemstackOverlayPoint, playSheetOverlay } from '../overlay-art.js?v=11b6dd7f';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
+import { countFromField, typedCount } from '../ui/count-chooser.js?v=b8361b21';
 
 export const CRAFTYBOT_FEATURE_ID = 'craftybot';
 const HOME_STREET_TSID = 'RH_HOME_EXT';
@@ -1118,12 +1119,17 @@ function menuRecipes(engine) {
   });
 }
 
+/** What the panel shows, for renderPanel's skip-if-unchanged check. */
+function panelKey(engine, v = craftybotView(bot, labelFor)) {
+  return JSON.stringify([panelState, v, bot.fuel, countItem(engine.inv, 'fuel_cell')]);
+}
+
 function renderPanel(engine, force = false) {
   if (!panel || panel.hidden) return;
   // Never rebuild under someone typing in the search or quantity box.
   if (!force && panel.contains(document.activeElement) && document.activeElement?.tagName === 'INPUT') return;
   const v = craftybotView(bot, labelFor);
-  const key = JSON.stringify([panelState, v, bot.fuel, countItem(engine.inv, 'fuel_cell')]);
+  const key = panelKey(engine, v);
   if (!force && key === lastPanelKey) return;
   lastPanelKey = key;
   const q = (s) => panel.querySelector(s);
@@ -1336,7 +1342,7 @@ function renderDetails(engine, body, v) {
   const job = v.jobs.find((j) => j.item_class === cls) || null;
   const world = makeWorld(engine);
   const qtyMode = !job || panelState.editing;
-  const qty = Math.max(1, Math.min(CRAFTYBOT.MAX_QUANTITY, panelState.qty || 1));
+  const qty = pickedQty();
   const cost = qtyMode ? costCheck(world, cls, qty) : null;
   const head = el('div', { class: `cb-dhead${job?.status.is_complete ? ' is-complete' : ''}` });
   if (qtyMode) {
@@ -1347,15 +1353,31 @@ function renderDetails(engine, body, v) {
     const minus = el('button', { type: 'button', class: 'minus', 'aria-label': 'Fewer' }, '−');
     const input = el('input', { type: 'number', min: String(min), max: String(Math.max(min, max)), value: String(qty), 'aria-label': 'How many?', dataset: { cbQty: '1' } });
     const plus = el('button', { type: 'button', class: 'plus', 'aria-label': 'More' }, '+');
+    const hi = Math.max(min, max);
     const setQty = (n) => {
-      panelState.qty = Math.max(min, Math.min(Math.max(min, max), Math.floor(Number(n) || min)));
+      panelState.qty = Math.max(min, Math.min(hi, Math.floor(Number(n) || min)));
       renderPanel(engine, true);
     };
-    minus.addEventListener('click', () => setQty(qty - 1));
-    plus.addEventListener('click', () => setQty(qty + 1));
-    input.addEventListener('change', () => setQty(input.value));
+    minus.addEventListener('click', () => setQty(panelState.qty - 1));
+    plus.addEventListener('click', () => setQty(panelState.qty + 1));
+    // As you type (ticket 92's count fields, js/ui/count-chooser.js typedCount): the fuel, the status
+    // and the ingredient lines follow the count in place, so the field keeps its focus and caret; an
+    // empty or unfinished field waits. Leaving the field redraws only when it shows something else.
+    let previewed = null;
+    input.addEventListener('input', () => {
+      const n = typedCount(input.value, hi, min);
+      if (n == null) return;
+      previewed = n;
+      panelState.qty = n;
+      showQtyParts(engine, body, cls, n);
+    });
+    input.addEventListener('change', () => {
+      const n = countFromField(input.value, hi, min);
+      if (n === previewed && String(input.value).trim() === String(n)) return;
+      setQty(n);
+    });
     picker.append(minus, input, plus);
-    wrap.append(picker, el('div', { class: 'cb-fuel-use' }, `Uses: ${cost ? cost.fuel_cost : 0} Fuel`));
+    wrap.append(picker, el('div', { class: 'cb-fuel-use', dataset: { cbFuelUse: '1' } }, `Uses: ${cost ? cost.fuel_cost : 0} Fuel`));
     head.append(wrap, el('span', { class: 'cb-spacer' }));
     if (!job) {
       const add = el('button', { type: 'button', class: 'cb-btn primary', dataset: { cbQueue: cls } }, '+ Add to Queue');
@@ -1365,7 +1387,7 @@ function renderDetails(engine, body, v) {
       add.addEventListener('click', () => {
         click(engine, !add.disabled);
         if (add.disabled) return;
-        addJob(engine, cls, qty);
+        addJob(engine, cls, pickedQty());
       });
       head.append(add);
     } else {
@@ -1373,7 +1395,7 @@ function renderDetails(engine, body, v) {
       ok.addEventListener('click', () => {
         click(engine);
         // onStageClick: unlock, then shrink (remove) or grow (add) to the picked total.
-        const total = qty;
+        const total = pickedQty();
         panelState.editing = false;
         act(engine, (w) => setLocked(bot, cls, false));
         if (job.total > total) requestRemove(engine, cls, job.total - total);
@@ -1411,26 +1433,10 @@ function renderDetails(engine, body, v) {
     head.append(remove, pause);
   }
   body.append(head);
-  const status = el('div', { class: `cb-status${job?.status.is_halted && !job.status.is_complete ? ' is-halted' : ''}` });
-  status.textContent = job && !panelState.editing ? String(job.status.txt || CRAFTYBOT_COPY.defaultStatus) : `To make ${qty > 1 ? 'these' : 'this'} I'll need to...`;
+  const status = el('div', { class: `cb-status${job?.status.is_halted && !job.status.is_complete ? ' is-halted' : ''}`, dataset: { cbStatus: '1' } });
+  status.textContent = job && !panelState.editing ? String(job.status.txt || CRAFTYBOT_COPY.defaultStatus) : qtyStatus(qty);
   body.append(status);
-  const comps = job && !panelState.editing ? job.components : cost?.components || [];
-  let halted = null;
-  for (const c of comps) {
-    body.append(componentRow(c));
-    if (c.status === 'halted') halted = c.status_txt;
-  }
-  if (halted) {
-    const h = el('div', { class: 'cb-halted' });
-    h.append(el('b', {}, 'Job Halted!'), document.createTextNode(halted));
-    if (canAutoRefuel(bot, world)) {
-      const a = el('a', {}, ' Add More');
-      a.style.cursor = 'pointer';
-      a.addEventListener('click', () => refuelFromLocation(engine));
-      h.append(a);
-    }
-    body.append(h);
-  }
+  appendComponents(engine, body, job && !panelState.editing ? job.components : cost?.components || [], world);
   const tail = panel.querySelector('[data-cb-tail]');
   if (job && (job.status.is_complete || job.done > 0)) {
     const done = el('div', { class: 'cb-done' });
@@ -1448,6 +1454,49 @@ function renderDetails(engine, body, v) {
     done.append(p, c);
     tail.append(done);
   }
+}
+
+/** The quantity picked (renderDetails' qty, read when a button is pressed: typing changes it in place). */
+const pickedQty = () => Math.max(1, Math.min(CRAFTYBOT.MAX_QUANTITY, panelState.qty || 1));
+const qtyStatus = (qty) => `To make ${qty > 1 ? 'these' : 'this'} I'll need to...`;
+
+/** The ingredient lines, then Job Halted! when one is halted (CraftyComponentUI, CraftyJobDetailsUI). */
+function appendComponents(engine, body, comps, world) {
+  let halted = null;
+  for (const c of comps) {
+    body.append(componentRow(c));
+    if (c.status === 'halted') halted = c.status_txt;
+  }
+  if (halted) {
+    const h = el('div', { class: 'cb-halted' });
+    h.append(el('b', {}, 'Job Halted!'), document.createTextNode(halted));
+    if (canAutoRefuel(bot, world)) {
+      const a = el('a', {}, ' Add More');
+      a.style.cursor = 'pointer';
+      a.addEventListener('click', () => refuelFromLocation(engine));
+      h.append(a);
+    }
+    body.append(h);
+  }
+}
+
+/**
+ * The quantity picker's count as it is typed: the fuel it uses, the status line and the ingredient
+ * lines below it, redrawn without the picker (renderDetails draws the same from panelState.qty).
+ */
+function showQtyParts(engine, body, cls, qty) {
+  const world = makeWorld(engine);
+  const cost = costCheck(world, cls, qty);
+  const fuel = body.querySelector('[data-cb-fuel-use]');
+  if (fuel) fuel.textContent = `Uses: ${cost ? cost.fuel_cost : 0} Fuel`;
+  const status = body.querySelector('[data-cb-status]');
+  if (status) {
+    status.textContent = qtyStatus(qty);
+    while (status.nextSibling) status.nextSibling.remove();
+    appendComponents(engine, body, cost?.components || [], world);
+  }
+  // Drawn as it stands: the panel's own refresh has nothing new to rebuild under a press.
+  lastPanelKey = panelKey(engine);
 }
 
 function renderConfirm(engine, body) {
