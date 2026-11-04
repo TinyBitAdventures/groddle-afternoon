@@ -382,7 +382,7 @@ describe('the site keeps the notes (src/LedgerBoard.php, src/AdminBoards.php)', 
 
   it('a report is a ticket with the note\'s words, once a player a note, under the report limits', () => {
     const m = php(`LedgerBoard::reportMessage('Gregarious Towers', '${OP}', 'Lost hat', 'Blue.', 'Ada', 'Rude')`);
-    assert.equal(m, `I am reporting a note on the notice board in Gregarious Towers.\n\nTitle: Lost hat\nWritten by: Ada\n\nBlue.\n\nWhy: Rude\nNote: ${OP}`);
+    assert.equal(m, `Reporting a notice board note in Gregarious Towers\n\nTitle: Lost hat\nWritten by: Ada\n\nBlue.\n\nWhy: Rude\nNote: ${OP}`);
     assert.ok(!/[—–]|Glitch/.test(m));
     const src = readFileSync(sitePath('src/LedgerBoard.php'), 'utf8');
     const rep = src.slice(src.indexOf('public function report('), src.indexOf('public static function reportMessage('));
