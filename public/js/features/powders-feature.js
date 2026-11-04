@@ -101,7 +101,7 @@ import {
   usePowderCharge,
 } from '../powders.js?v=d355981a';
 import { itemVerbAchievementCounters } from '../item-verbs.js?v=729ccd91';
-import { DEAD_TRANT_CLASSES } from '../patches.js?v=3e9218c1';
+import { DEAD_TRANT_CLASSES } from '../patches.js?v=d036e0b8';
 import { hellFeature } from './hell-feature.js?v=705a486b';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 import { displayTopOf, playSheetOverlay } from '../overlay-art.js?v=11b6dd7f';

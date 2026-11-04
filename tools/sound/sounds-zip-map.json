@@ -478,6 +478,90 @@
    "match": "music_map"
   },
   {
+   "key": "BIG_STAR_1",
+   "zip": "1340317716-CM1.mp3",
+   "md5": "5acdd6601c959556f6b824d2eabd53d8",
+   "match": "note-set",
+   "why": "chord 1 of the 12-triad set uploaded with the notes: C major (C4 E4 G4); Piano Party bigstar1_on and Radial Heights play it; two recordings of Radial Heights (Varaeth Glitch, uploaded 2012-08-02, and Lily Linguistic) aligned with the street's show_star_01-53 script play this order (36 and 26 of 53 stars matched, against 20 and 19 for the reverse order), the Varaeth run with BIG_STAR_1-3 as C major, D minor, E minor three weeks after the Uralia_Big_Star uploads The Star-Jinglers (items/toy_star_2.js 27 BIG_STAR_1, toy_star_1.js 27 BIG_STAR_3) play it too."
+  },
+  {
+   "key": "BIG_STAR_10",
+   "zip": "1340317870-GM2.mp3",
+   "md5": "d20ed7fe492424f20d0da8707517b423",
+   "match": "note-set",
+   "why": "chord 10 of the 12-triad set uploaded with the notes: G major (G5 B5 D6); Piano Party bigstar10_on and Radial Heights play it; two recordings of Radial Heights (Varaeth Glitch, uploaded 2012-08-02, and Lily Linguistic) aligned with the street's show_star_01-53 script play this order (36 and 26 of 53 stars matched, against 20 and 19 for the reverse order)"
+  },
+  {
+   "key": "BIG_STAR_11",
+   "zip": "1342112834-Am2_corrected.mp3",
+   "md5": "3b84e99ad5332585240a7d54280e2620",
+   "match": "note-set",
+   "why": "chord 11 of the 12-triad set uploaded with the notes: A minor (A5 C6 E6) (the corrected take, uploaded 2012-07-12, replaces 1340317881-Am2); Piano Party bigstar11_on and Radial Heights play it; two recordings of Radial Heights (Varaeth Glitch, uploaded 2012-08-02, and Lily Linguistic) aligned with the street's show_star_01-53 script play this order (36 and 26 of 53 stars matched, against 20 and 19 for the reverse order)"
+  },
+  {
+   "key": "BIG_STAR_12",
+   "zip": "1340317898-CM3.mp3",
+   "md5": "c66c8114b7e88c88b241b0d0d3371ecf",
+   "match": "note-set",
+   "why": "chord 12 of the 12-triad set uploaded with the notes: C major (C6 E6 G6); Piano Party bigstar12_on and Radial Heights play it; two recordings of Radial Heights (Varaeth Glitch, uploaded 2012-08-02, and Lily Linguistic) aligned with the street's show_star_01-53 script play this order (36 and 26 of 53 stars matched, against 20 and 19 for the reverse order)"
+  },
+  {
+   "key": "BIG_STAR_2",
+   "zip": "1340317730-Dm1.mp3",
+   "md5": "7fe99ca505944f5b84d5047cc3db7b3e",
+   "match": "note-set",
+   "why": "chord 2 of the 12-triad set uploaded with the notes: D minor (D4 F4 A4); Piano Party bigstar2_on and Radial Heights play it; two recordings of Radial Heights (Varaeth Glitch, uploaded 2012-08-02, and Lily Linguistic) aligned with the street's show_star_01-53 script play this order (36 and 26 of 53 stars matched, against 20 and 19 for the reverse order), the Varaeth run with BIG_STAR_1-3 as C major, D minor, E minor three weeks after the Uralia_Big_Star uploads"
+  },
+  {
+   "key": "BIG_STAR_3",
+   "zip": "1340317741-Em1.mp3",
+   "md5": "6b52ff03a1e452eb5373ec95b8e098dc",
+   "match": "note-set",
+   "why": "chord 3 of the 12-triad set uploaded with the notes: E minor (E4 G4 B4); Piano Party bigstar3_on and Radial Heights play it; two recordings of Radial Heights (Varaeth Glitch, uploaded 2012-08-02, and Lily Linguistic) aligned with the street's show_star_01-53 script play this order (36 and 26 of 53 stars matched, against 20 and 19 for the reverse order), the Varaeth run with BIG_STAR_1-3 as C major, D minor, E minor three weeks after the Uralia_Big_Star uploads The Star-Jinglers (items/toy_star_2.js 27 BIG_STAR_1, toy_star_1.js 27 BIG_STAR_3) play it too."
+  },
+  {
+   "key": "BIG_STAR_4",
+   "zip": "1340317768-GM1.mp3",
+   "md5": "9b9c6d1a0aa21f79da681a7b895233e3",
+   "match": "note-set",
+   "why": "chord 4 of the 12-triad set uploaded with the notes: G major (G4 B4 D5); Piano Party bigstar4_on and Radial Heights play it; two recordings of Radial Heights (Varaeth Glitch, uploaded 2012-08-02, and Lily Linguistic) aligned with the street's show_star_01-53 script play this order (36 and 26 of 53 stars matched, against 20 and 19 for the reverse order)"
+  },
+  {
+   "key": "BIG_STAR_5",
+   "zip": "1340317777-Am1.mp3",
+   "md5": "8132eee1d67aa2500913fb73ae112e7d",
+   "match": "note-set",
+   "why": "chord 5 of the 12-triad set uploaded with the notes: A minor (A4 C5 E5); Piano Party bigstar5_on and Radial Heights play it; two recordings of Radial Heights (Varaeth Glitch, uploaded 2012-08-02, and Lily Linguistic) aligned with the street's show_star_01-53 script play this order (36 and 26 of 53 stars matched, against 20 and 19 for the reverse order)"
+  },
+  {
+   "key": "BIG_STAR_6",
+   "zip": "1340317790-CM2.mp3",
+   "md5": "abc36215dac755ba9b7bf88185f1112a",
+   "match": "note-set",
+   "why": "chord 6 of the 12-triad set uploaded with the notes: C major (C5 E5 G5); Piano Party bigstar6_on and Radial Heights play it; two recordings of Radial Heights (Varaeth Glitch, uploaded 2012-08-02, and Lily Linguistic) aligned with the street's show_star_01-53 script play this order (36 and 26 of 53 stars matched, against 20 and 19 for the reverse order)"
+  },
+  {
+   "key": "BIG_STAR_7",
+   "zip": "1340317815-Dm2.mp3",
+   "md5": "087fac1d4e9c581bfbb87e97e6d2f8d2",
+   "match": "note-set",
+   "why": "chord 7 of the 12-triad set uploaded with the notes: D minor (D5 F5 A5); Piano Party bigstar7_on and Radial Heights play it; two recordings of Radial Heights (Varaeth Glitch, uploaded 2012-08-02, and Lily Linguistic) aligned with the street's show_star_01-53 script play this order (36 and 26 of 53 stars matched, against 20 and 19 for the reverse order)"
+  },
+  {
+   "key": "BIG_STAR_8",
+   "zip": "1340317851-Em2.mp3",
+   "md5": "e19fdf65dc205822f735c7e19b8212e7",
+   "match": "note-set",
+   "why": "chord 8 of the 12-triad set uploaded with the notes: E minor (E5 G5 B5); Piano Party bigstar8_on and Radial Heights play it; two recordings of Radial Heights (Varaeth Glitch, uploaded 2012-08-02, and Lily Linguistic) aligned with the street's show_star_01-53 script play this order (36 and 26 of 53 stars matched, against 20 and 19 for the reverse order)"
+  },
+  {
+   "key": "BIG_STAR_9",
+   "zip": "1340317860-FM2.mp3",
+   "md5": "9700b455d235a9f91c0755b911ef782f",
+   "match": "note-set",
+   "why": "chord 9 of the 12-triad set uploaded with the notes: F major (F5 A5 C6); Piano Party bigstar9_on and Radial Heights play it; two recordings of Radial Heights (Varaeth Glitch, uploaded 2012-08-02, and Lily Linguistic) aligned with the street's show_star_01-53 script play this order (36 and 26 of 53 stars matched, against 20 and 19 for the reverse order) Starlit Night's moon plays it (Lily Linguistic, 2012-12-06, matched 0.91)."
+  },
+  {
    "key": "BLUE__WHITE",
    "zip": "1335837087-Blue_Quest_Ambient_Loop_1.1.mp3",
    "md5": "80d1344e680a1fc098e6e3142181ac61",
@@ -502,6 +586,20 @@
    "md5": "cbd006710be8a49c9e0608f08d5cbde1",
    "match": "filename",
    "why": "Imagination: the hand is dealt (ImaginationHandUI.as:199; imagination-feature.js plays CARD_DEAL1)"
+  },
+  {
+   "key": "CARD_DEAL2",
+   "zip": "1338483160-card_deal_2.2.mp3",
+   "md5": "20b7a2a7afbeddecfc6c8ef91cb1478b",
+   "match": "filename",
+   "why": "ImaginationHandUI.as 493 plays CARD_DEAL<slot+1> for each card as it is dealt; the hand has three slots (inc_imagination.js 497), so CARD_DEAL1-3 are the whole set"
+  },
+  {
+   "key": "CARD_DEAL3",
+   "zip": "1338483169-card_deal_3.2.mp3",
+   "md5": "038df8f3a35dea9695f0f94acfb75d60",
+   "match": "filename",
+   "why": "ImaginationHandUI.as 493: the third card of the hand"
   },
   {
    "key": "CAVE_MUSIC1",
@@ -546,6 +644,13 @@
    "md5": "741471ee915e742825d9d982cf24f5f6",
    "match": "filename",
    "why": "blockmaker/fuelmaker/metalmaker/woodworker.js 605/665: a machine hands over what it made (machine rooms, home machines, yard collectors)"
+  },
+  {
+   "key": "COMEDIAN",
+   "zip": "1316228012-Laugh_3_.mp3",
+   "md5": "6a093e00d33d3154ecb47a190ab8fd51",
+   "match": "forum",
+   "why": "forum general/29544 (the thread whose 789 files are Sounds.zip) lists \"Beta Pickle induced Comedian buff laughter\"; the zip's only laugh. catalog_buffs.js 466 plays it as everyone laughs (the remake's Fun Pickle buff); Radial Heights star_appear plays it under \"You're a star!\", where Lily Linguistic's run has a laugh just after the moon"
   },
   {
    "key": "CRUSHER_IMPACT",
@@ -703,6 +808,13 @@
    "match": "music_map"
   },
   {
+   "key": "INTERACT_DISPATCHER",
+   "zip": "1308718626-Interact.mp3",
+   "md5": "a6476a236f118d23f1dc43e8fe1e8a21",
+   "match": "batch",
+   "why": "uploaded 10 s before Package_Sent (PACKAGE_SENT, the dispatcher batch); the other Interact take ships as INTERACT_MAILBOX; forum 29544 \"Interact with Mail Dispatcher / Mailbox\". npc_mail_dispatcher.js 308 sendMail; mail-courier-feature.js plays it when the station opens"
+  },
+  {
    "key": "JAL1",
    "zip": "1350945525-Jal_1.8.mp3",
    "md5": "14fde3e5f1b83de82e057fbcff70fcee",
@@ -713,6 +825,139 @@
    "zip": "1350945525-Jal_2.4.mp3",
    "md5": "2b77e9a0d316f18cc830ea6398df2f43",
    "match": "music_map"
+  },
+  {
+   "key": "LITTLE_STAR_1",
+   "zip": "1340317938-C1.mp3",
+   "md5": "49f665654fcf9cc5860edb2dd7dff9d1",
+   "match": "note-set",
+   "why": "note 1 of the 19-note set uploaded 2012-06-21 (C4 measured; the files run C4 to C7 in upload order, C D E G A B per octave); Piano Party key19, its small stars, Starlit Night and Radial Heights play it; two recordings of Radial Heights (Varaeth Glitch, uploaded 2012-08-02, and Lily Linguistic) aligned with the street's show_star_01-53 script play this order (36 and 26 of 53 stars matched, against 20 and 19 for the reverse order)"
+  },
+  {
+   "key": "LITTLE_STAR_10",
+   "zip": "1340318042-G2.mp3",
+   "md5": "f8ae891582dbc9ad0aa664c5f94df949",
+   "match": "note-set",
+   "why": "note 10 of the 19-note set uploaded 2012-06-21 (G5 measured; the files run C4 to C7 in upload order, C D E G A B per octave); Piano Party key10, its small stars, Starlit Night and Radial Heights play it; two recordings of Radial Heights (Varaeth Glitch, uploaded 2012-08-02, and Lily Linguistic) aligned with the street's show_star_01-53 script play this order (36 and 26 of 53 stars matched, against 20 and 19 for the reverse order)"
+  },
+  {
+   "key": "LITTLE_STAR_11",
+   "zip": "1340318079-A2.mp3",
+   "md5": "500e9b3f4c08468a052a812929b25f70",
+   "match": "note-set",
+   "why": "note 11 of the 19-note set uploaded 2012-06-21 (A5 measured; the files run C4 to C7 in upload order, C D E G A B per octave); Piano Party key9, its small stars, Starlit Night and Radial Heights play it; two recordings of Radial Heights (Varaeth Glitch, uploaded 2012-08-02, and Lily Linguistic) aligned with the street's show_star_01-53 script play this order (36 and 26 of 53 stars matched, against 20 and 19 for the reverse order)"
+  },
+  {
+   "key": "LITTLE_STAR_12",
+   "zip": "1340318091-B2.mp3",
+   "md5": "93abf8c9f5c7580273afeb80b0d380f5",
+   "match": "note-set",
+   "why": "note 12 of the 19-note set uploaded 2012-06-21 (B5 measured; the files run C4 to C7 in upload order, C D E G A B per octave); Piano Party key8, its small stars, Starlit Night and Radial Heights play it; two recordings of Radial Heights (Varaeth Glitch, uploaded 2012-08-02, and Lily Linguistic) aligned with the street's show_star_01-53 script play this order (36 and 26 of 53 stars matched, against 20 and 19 for the reverse order)"
+  },
+  {
+   "key": "LITTLE_STAR_13",
+   "zip": "1340318105-C3.mp3",
+   "md5": "411d39e59a987d56964cf3ba06937c30",
+   "match": "note-set",
+   "why": "note 13 of the 19-note set uploaded 2012-06-21 (C6 measured; the files run C4 to C7 in upload order, C D E G A B per octave); Piano Party key7, its small stars, Starlit Night and Radial Heights play it; two recordings of Radial Heights (Varaeth Glitch, uploaded 2012-08-02, and Lily Linguistic) aligned with the street's show_star_01-53 script play this order (36 and 26 of 53 stars matched, against 20 and 19 for the reverse order)"
+  },
+  {
+   "key": "LITTLE_STAR_14",
+   "zip": "1340318127-D3.mp3",
+   "md5": "22baca96d6bb46be385c942f0bc52d6d",
+   "match": "note-set",
+   "why": "note 14 of the 19-note set uploaded 2012-06-21 (D6 measured; the files run C4 to C7 in upload order, C D E G A B per octave); Piano Party key6, its small stars, Starlit Night and Radial Heights play it; two recordings of Radial Heights (Varaeth Glitch, uploaded 2012-08-02, and Lily Linguistic) aligned with the street's show_star_01-53 script play this order (36 and 26 of 53 stars matched, against 20 and 19 for the reverse order)"
+  },
+  {
+   "key": "LITTLE_STAR_15",
+   "zip": "1340318163-E3.mp3",
+   "md5": "7a47f45b864a03a8d1d1cdce68b87036",
+   "match": "note-set",
+   "why": "note 15 of the 19-note set uploaded 2012-06-21 (E6 measured; the files run C4 to C7 in upload order, C D E G A B per octave); Piano Party key5, its small stars, Starlit Night and Radial Heights play it; two recordings of Radial Heights (Varaeth Glitch, uploaded 2012-08-02, and Lily Linguistic) aligned with the street's show_star_01-53 script play this order (36 and 26 of 53 stars matched, against 20 and 19 for the reverse order)"
+  },
+  {
+   "key": "LITTLE_STAR_16",
+   "zip": "1340318174-G3.mp3",
+   "md5": "c969c72d9c6be3be72838e9653818667",
+   "match": "note-set",
+   "why": "note 16 of the 19-note set uploaded 2012-06-21 (G6 measured; the files run C4 to C7 in upload order, C D E G A B per octave); Piano Party key4, its small stars, Starlit Night and Radial Heights play it; two recordings of Radial Heights (Varaeth Glitch, uploaded 2012-08-02, and Lily Linguistic) aligned with the street's show_star_01-53 script play this order (36 and 26 of 53 stars matched, against 20 and 19 for the reverse order)"
+  },
+  {
+   "key": "LITTLE_STAR_17",
+   "zip": "1340318211-A3.mp3",
+   "md5": "f2649063e53a11ce03539a194eb0593a",
+   "match": "note-set",
+   "why": "note 17 of the 19-note set uploaded 2012-06-21 (A6 measured; the files run C4 to C7 in upload order, C D E G A B per octave); Piano Party key3, its small stars, Starlit Night and Radial Heights play it; two recordings of Radial Heights (Varaeth Glitch, uploaded 2012-08-02, and Lily Linguistic) aligned with the street's show_star_01-53 script play this order (36 and 26 of 53 stars matched, against 20 and 19 for the reverse order)"
+  },
+  {
+   "key": "LITTLE_STAR_18",
+   "zip": "1340318221-B3.mp3",
+   "md5": "1d7f8706fa82fb855c9becace6cfe9db",
+   "match": "note-set",
+   "why": "note 18 of the 19-note set uploaded 2012-06-21 (B6 measured; the files run C4 to C7 in upload order, C D E G A B per octave); Piano Party key2, its small stars, Starlit Night and Radial Heights play it; two recordings of Radial Heights (Varaeth Glitch, uploaded 2012-08-02, and Lily Linguistic) aligned with the street's show_star_01-53 script play this order (36 and 26 of 53 stars matched, against 20 and 19 for the reverse order)"
+  },
+  {
+   "key": "LITTLE_STAR_19",
+   "zip": "1340343774-C4.mp3",
+   "md5": "99dbf3d0019a0d34492faa6ba4ffadce",
+   "match": "note-set",
+   "why": "note 19 of the 19-note set uploaded 2012-06-21 (C7 measured; the files run C4 to C7 in upload order, C D E G A B per octave); Piano Party key1, its small stars, Starlit Night and Radial Heights play it; two recordings of Radial Heights (Varaeth Glitch, uploaded 2012-08-02, and Lily Linguistic) aligned with the street's show_star_01-53 script play this order (36 and 26 of 53 stars matched, against 20 and 19 for the reverse order)"
+  },
+  {
+   "key": "LITTLE_STAR_2",
+   "zip": "1340317951-D1.mp3",
+   "md5": "28269ad314d94f4f260ebb087793f8e8",
+   "match": "note-set",
+   "why": "note 2 of the 19-note set uploaded 2012-06-21 (D4 measured; the files run C4 to C7 in upload order, C D E G A B per octave); Piano Party key18, its small stars, Starlit Night and Radial Heights play it; two recordings of Radial Heights (Varaeth Glitch, uploaded 2012-08-02, and Lily Linguistic) aligned with the street's show_star_01-53 script play this order (36 and 26 of 53 stars matched, against 20 and 19 for the reverse order)"
+  },
+  {
+   "key": "LITTLE_STAR_3",
+   "zip": "1340317960-E1.mp3",
+   "md5": "94a18eaf0b86fed2832423c0b034b2ba",
+   "match": "note-set",
+   "why": "note 3 of the 19-note set uploaded 2012-06-21 (E4 measured; the files run C4 to C7 in upload order, C D E G A B per octave); Piano Party key17, its small stars, Starlit Night and Radial Heights play it; two recordings of Radial Heights (Varaeth Glitch, uploaded 2012-08-02, and Lily Linguistic) aligned with the street's show_star_01-53 script play this order (36 and 26 of 53 stars matched, against 20 and 19 for the reverse order)"
+  },
+  {
+   "key": "LITTLE_STAR_4",
+   "zip": "1340317972-G1.mp3",
+   "md5": "68260ef0d1737a5e28073d9b902e00c9",
+   "match": "note-set",
+   "why": "note 4 of the 19-note set uploaded 2012-06-21 (G4 measured; the files run C4 to C7 in upload order, C D E G A B per octave); Piano Party key16, its small stars, Starlit Night and Radial Heights play it; two recordings of Radial Heights (Varaeth Glitch, uploaded 2012-08-02, and Lily Linguistic) aligned with the street's show_star_01-53 script play this order (36 and 26 of 53 stars matched, against 20 and 19 for the reverse order)"
+  },
+  {
+   "key": "LITTLE_STAR_5",
+   "zip": "1340317986-A1.mp3",
+   "md5": "d9726be82f15c54a386556663a1eb967",
+   "match": "note-set",
+   "why": "note 5 of the 19-note set uploaded 2012-06-21 (A4 measured; the files run C4 to C7 in upload order, C D E G A B per octave); Piano Party key15, its small stars, Starlit Night and Radial Heights play it; two recordings of Radial Heights (Varaeth Glitch, uploaded 2012-08-02, and Lily Linguistic) aligned with the street's show_star_01-53 script play this order (36 and 26 of 53 stars matched, against 20 and 19 for the reverse order)"
+  },
+  {
+   "key": "LITTLE_STAR_6",
+   "zip": "1340317996-B1.mp3",
+   "md5": "ccba45e35c3bc9b6e9f49f25e11e39f6",
+   "match": "note-set",
+   "why": "note 6 of the 19-note set uploaded 2012-06-21 (B4 measured; the files run C4 to C7 in upload order, C D E G A B per octave); Piano Party key14, its small stars, Starlit Night and Radial Heights play it; two recordings of Radial Heights (Varaeth Glitch, uploaded 2012-08-02, and Lily Linguistic) aligned with the street's show_star_01-53 script play this order (36 and 26 of 53 stars matched, against 20 and 19 for the reverse order)"
+  },
+  {
+   "key": "LITTLE_STAR_7",
+   "zip": "1340318006-C2.mp3",
+   "md5": "06626662edf9e82e838d90313ce65c6c",
+   "match": "note-set",
+   "why": "note 7 of the 19-note set uploaded 2012-06-21 (C5 measured; the files run C4 to C7 in upload order, C D E G A B per octave); Piano Party key13, its small stars, Starlit Night and Radial Heights play it; two recordings of Radial Heights (Varaeth Glitch, uploaded 2012-08-02, and Lily Linguistic) aligned with the street's show_star_01-53 script play this order (36 and 26 of 53 stars matched, against 20 and 19 for the reverse order)"
+  },
+  {
+   "key": "LITTLE_STAR_8",
+   "zip": "1340318018-D2.mp3",
+   "md5": "ab5c742890593f9851ecdf873d76405d",
+   "match": "note-set",
+   "why": "note 8 of the 19-note set uploaded 2012-06-21 (D5 measured; the files run C4 to C7 in upload order, C D E G A B per octave); Piano Party key12, its small stars, Starlit Night and Radial Heights play it; two recordings of Radial Heights (Varaeth Glitch, uploaded 2012-08-02, and Lily Linguistic) aligned with the street's show_star_01-53 script play this order (36 and 26 of 53 stars matched, against 20 and 19 for the reverse order)"
+  },
+  {
+   "key": "LITTLE_STAR_9",
+   "zip": "1340318030-E2.mp3",
+   "md5": "5fa7176eec49c082053dcc6c05aed410",
+   "match": "note-set",
+   "why": "note 9 of the 19-note set uploaded 2012-06-21 (E5 measured; the files run C4 to C7 in upload order, C D E G A B per octave); Piano Party key11, its small stars, Starlit Night and Radial Heights play it; two recordings of Radial Heights (Varaeth Glitch, uploaded 2012-08-02, and Lily Linguistic) aligned with the street's show_star_01-53 script play this order (36 and 26 of 53 stars matched, against 20 and 19 for the reverse order)"
   },
   {
    "key": "NEW_XP_BEFORE_CHAIN_PULL",
@@ -813,6 +1058,13 @@
    "match": "music_map"
   },
   {
+   "key": "STAND1",
+   "zip": "1302285923-blockmaker_base_30.mp3",
+   "md5": "f23eb1084c8bc1222cbdae229203c151",
+   "match": "batch",
+   "why": "the 2011-04 machine-part batch (chassis1/2, engine1/2, plates1/2, fuelmaker_* name their keys); blockmaker_base is the stand the parts go on and STAND1 its only key without a file; forum 29544 \"Assemble Machine Stand\". machine_stand.js 693 plays it when assembly starts, as the remake now does"
+  },
+  {
    "key": "TEST",
    "zip": "1339778284-Glowing_Orb_Summer_2.2.mp3",
    "md5": "a41e255f3ca3a5e1752f1d8eb1f74b10",
@@ -890,36 +1142,6 @@
   "HOME_STREET_GRODDLE_WHISTLE": "music_map names the 2012-08 re-upload 1344474851-Snappy_w_and_wo_whistle_Loop.mp3; the zip has only the 2011-09 upload (SNAPPY_LOOP), which may differ"
  },
  "held": [
-  {
-   "key": "BIG_STAR_1",
-   "zip": "1341949648-Uralia_Big_Star_1.3.mp3",
-   "md5": "ebaf840ab30f2f6e1861e1add4556e2f",
-   "why": "Uralia_Big_Star 1.3 is an 8 s phrase (ten note onsets), not one note; only BIG_STAR_1-3 of 12 survive, and the Piano Party and Radial Heights play BIG_STAR_1-12 as one set of notes (the synth plays them as Twinkle Twinkle), so three originals among nine stand-ins would break the tune. Star-Jinglers use BIG_STAR_1/3 alone."
-  },
-  {
-   "key": "BIG_STAR_2",
-   "zip": "1342110498-Uralia_Big_Star_2.2.mp3",
-   "md5": "eeb0d7b9f1772f237efd7f9aad6eef7d",
-   "why": "Uralia_Big_Star 2.2 is a 10.6 s low C drone, not a star note; same set problem as BIG_STAR_1."
-  },
-  {
-   "key": "BIG_STAR_3",
-   "zip": "1342036246-Uralia_Big_Star_3.1.mp3",
-   "md5": "c94c4d83465c2dd87dabf6a4cd49fa9e",
-   "why": "Uralia_Big_Star 3.1 is a 9.5 s A5 swell; Star-Jinglers (Symphonious Maximus) play it on touch, but the Piano Party set problem of BIG_STAR_1 holds."
-  },
-  {
-   "key": "CARD_DEAL2",
-   "zip": "1338483160-card_deal_2.2.mp3",
-   "md5": "20b7a2a7afbeddecfc6c8ef91cb1478b",
-   "why": "Right by name, but the remake deals with CARD_DEAL1 only (the client plays CARD_DEAL1-7, one per card; 4-7 are lost)."
-  },
-  {
-   "key": "CARD_DEAL3",
-   "zip": "1338483169-card_deal_3.2.mp3",
-   "md5": "038df8f3a35dea9695f0f94acfb75d60",
-   "why": "Right by name, but the remake deals with CARD_DEAL1 only."
-  },
   {
    "key": "CHASSIS1",
    "zip": "1302285963-chassis1_30.mp3",
@@ -1021,6 +1243,24 @@
    "zip": "1322173657-Ready_1.1.mp3",
    "md5": "f1d531c34b66a6e6a3e938296d68cb60",
    "why": "In the original READY is the making machine's done sound (players/inc_making.js:830; Ready_1.1 sits beside Collect_1.3 in the 2011-11 machine set). The remake plays READY only at the Game of Crowns countdown, so this file would put a machine chime on the race start."
+  },
+  {
+   "key": "URALIA_BIG_STAR_1",
+   "zip": "1341949648-Uralia_Big_Star_1.3.mp3",
+   "md5": "ebaf840ab30f2f6e1861e1add4556e2f",
+   "why": "not BIG_STAR_1: Radial Heights plays the C major / D minor / E minor chords for BIG_STAR_1-3 three weeks after these uploads (Varaeth Glitch, 2012-08-02). Forum 29544 calls them \"Symphonious Maximus large star variations 1, 2, 3\": sounds of that street (added 2012-11-30), whose location file and keys are lost, so nothing in the remake can name them"
+  },
+  {
+   "key": "URALIA_BIG_STAR_2",
+   "zip": "1342110498-Uralia_Big_Star_2.2.mp3",
+   "md5": "eeb0d7b9f1772f237efd7f9aad6eef7d",
+   "why": "not BIG_STAR_2: Radial Heights plays the C major / D minor / E minor chords for BIG_STAR_1-3 three weeks after these uploads (Varaeth Glitch, 2012-08-02). Forum 29544 calls them \"Symphonious Maximus large star variations 1, 2, 3\": sounds of that street (added 2012-11-30), whose location file and keys are lost, so nothing in the remake can name them"
+  },
+  {
+   "key": "URALIA_BIG_STAR_3",
+   "zip": "1342036246-Uralia_Big_Star_3.1.mp3",
+   "md5": "c94c4d83465c2dd87dabf6a4cd49fa9e",
+   "why": "not BIG_STAR_3: Radial Heights plays the C major / D minor / E minor chords for BIG_STAR_1-3 three weeks after these uploads (Varaeth Glitch, 2012-08-02). Forum 29544 calls them \"Symphonious Maximus large star variations 1, 2, 3\": sounds of that street (added 2012-11-30), whose location file and keys are lost, so nothing in the remake can name them"
   },
   {
    "key": "WM_A1",

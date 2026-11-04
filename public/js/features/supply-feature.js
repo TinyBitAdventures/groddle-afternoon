@@ -269,7 +269,8 @@ function runMachineVerb(classTsid, verbId, engine) {
     if (res.ok) {
       work = res.pending;
       engine.updateHud?.();
-      engine.playSound?.('ENGINE1');
+      // machine_stand.js 693: the stand's assembly starts with STAND1.
+      engine.playSound?.('STAND1');
       settleWork(engine);
     }
     say(engine, res.ok && work ? `${res.msg} (${(res.durationMs / 1000).toFixed(0)} s)` : res.msg, res.ok);

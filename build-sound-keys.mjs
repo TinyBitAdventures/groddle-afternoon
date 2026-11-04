@@ -473,7 +473,9 @@ for (const file of walk(CLIENT, '.as')) {
     }
   });
 }
-for (let n = 1; n <= 7; n += 1) note(`CARD_DEAL${n}`, { category: 'ui', where: 'client:com/tinyspeck/engine/view/ui/imagination/ImaginationHandUI.as:199', context: 'deal cards', via: 'family' });
+// ImaginationHandUI.as 493 plays 'CARD_DEAL'+(card id+1) per dealt card; the id is the
+// hand slot and the hand has three (players/inc_imagination.js 497), so the family is 1-3.
+for (let n = 1; n <= 3; n += 1) note(`CARD_DEAL${n}`, { category: 'ui', where: 'client:com/tinyspeck/engine/view/ui/imagination/ImaginationHandUI.as:493', context: 'deal cards', via: 'family' });
 note('FLIP_OVER', { category: 'ui', where: 'client:com/tinyspeck/engine/view/ui/imagination/ImgCardUI.as:540', context: 'flip', via: 'client' });
 note('Prisencolinensinainciusol', { category: 'ui', where: 'client:TSEngineAssets/src/Assets.as:8', context: 'embedded easter egg', via: 'embedded' });
 note('trumpet', { category: 'ui', where: 'client:TSEngineAssets/src/Assets.as:10', context: 'embedded', via: 'embedded' });

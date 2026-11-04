@@ -5,7 +5,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { SLOTH_POOF_ART, slothPoofBase } from '../public/js/features/newxp-feature.js?v=41aef5e1';
+import { SLOTH_POOF_ART, slothPoofBase } from '../public/js/features/newxp-feature.js?v=935e6069';
 import { itemstackOverlayPoint, standPlacement } from '../public/js/overlay-art.js?v=11b6dd7f';
 import { training1Layout } from '../public/js/newxp.js?v=6ca4702e';
 

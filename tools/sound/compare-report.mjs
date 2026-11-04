@@ -56,8 +56,10 @@ const missing = existsSync(missingPath) ? JSON.parse(readFileSync(missingPath, '
 const rows = [];
 const verdictOf = new Map();
 for (const f of zipMap.files) {
-  const v = f.match === 'filename' ? `wired: ${f.why}` : f.nearest ? `shipped, nearest surviving take: ${f.nearest}` : f.match === 'client-url' ? "shipped: the client's own url" : f.sameAs ? `shipped: already shipped as ${f.sameAs.split('/').pop()}` : 'shipped: exact music_map file';
-  verdictOf.set(f.key, { verdict: f.match === 'filename' || f.nearest ? (f.nearest ? 'likely' : 'wired') : 'exact', text: v, zip: f.zip });
+  // filename, note-set, batch and forum rows are wired on evidence (`why`); music_map and client-url are exact urls.
+  const wired = f.why && !f.sameAs;
+  const v = wired ? `wired: ${f.why}` : f.nearest ? `shipped, nearest surviving take: ${f.nearest}` : f.match === 'client-url' ? "shipped: the client's own url" : f.sameAs ? `shipped: already shipped as ${f.sameAs.split('/').pop()}` : 'shipped: exact music_map file';
+  verdictOf.set(f.key, { verdict: f.nearest ? 'likely' : wired ? 'wired' : 'exact', text: v, zip: f.zip });
 }
 const ZIP_SRC = process.env.GLITCH_SOUNDS_ZIP
   || join(process.env.HOME || '', 'Documents/glitch-audit/research/audio-hunt/raw/sounds-zip-drive/x/Sounds');
@@ -91,6 +93,17 @@ for (const key of Object.keys(now.keys).sort((a, b) => a.localeCompare(b))) {
     verdict: v?.verdict || '', verdictText: v?.text || '',
     heldZip: v?.verdict === 'held' ? v.zip : '',
     heldFile: v?.verdict === 'held' ? v.heldFile : null,
+  });
+}
+
+// Held Sounds.zip files whose key is not catalogued (the Uralia big stars: their street's keys are lost).
+for (const h of zipMap.held.filter((r) => !now.keys[r.key])) {
+  const v = verdictOf.get(h.key);
+  const none = { status: 'missing', label: 'nothing', file: null };
+  rows.push({
+    group: 'Held, no catalogued key', kind: 'key', id: h.key, moment: h.zip,
+    original: null, missing: 'no key in the source plays it', now: none, before: none, changed: false,
+    verdict: 'held', verdictText: v.text, heldZip: h.zip, heldFile: v.heldFile,
   });
 }
 

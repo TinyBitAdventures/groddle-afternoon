@@ -19,7 +19,7 @@ import {
   quoinTypeShards,
 } from '../public/js/quoin-shards.js?v=9a2e4c37';
 import { QUOIN_TYPES, collectQuoin, createQuoinState, creditQuoinStat } from '../public/js/quoins.js?v=dfe1ff0a';
-import { SOUND_ALIASES, SOUND_FILES } from '../public/js/sound-keys.js?v=c8a66499';
+import { SOUND_ALIASES, SOUND_FILES } from '../public/js/sound-keys.js?v=a8aaeb9d';
 
 const here = import.meta.dirname;
 const pub = join(here, '../public');

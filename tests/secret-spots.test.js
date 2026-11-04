@@ -44,8 +44,8 @@ import {
 } from '../public/js/secret-spots.js?v=0127532b';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=10b118dd';
 import { applyAchievementProgress, createAchievementState } from '../public/js/achievements.js?v=631d7daa';
-import { SOUND_CATEGORIES } from '../public/js/sound-keys.js?v=c8a66499';
-import { SYNTH_RECIPES, recipeForKey } from '../public/js/synth-sfx.js?v=9853c8e7';
+import { SOUND_CATEGORIES } from '../public/js/sound-keys.js?v=a8aaeb9d';
+import { SYNTH_RECIPES, recipeForKey } from '../public/js/synth-sfx.js?v=030fad18';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const publicRoot = join(here, '../public');

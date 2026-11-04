@@ -162,6 +162,14 @@ function dayKey() {
   return getGameDayKey(Date.now());
 }
 
+/** The deal sound of hand slot `slot` (CARD_DEAL1-3), `order` cards after the first. */
+export const DEAL_STAGGER_MS = 90;
+function dealSound(slot, order) {
+  const key = `CARD_DEAL${slot + 1}`;
+  if (!order) play(key);
+  else setTimeout(() => play(key), order * DEAL_STAGGER_MS);
+}
+
 function play(key, opts = {}) {
   try {
     engineRef?.playSound?.(key, { volume: 0.6, ...opts });
@@ -573,7 +581,6 @@ function openPanel(opts = {}) {
   refillHand(engineRef);
   panel.hidden = false;
   flipped = -1;
-  play('CARD_DEAL1');
   render(true);
   publish(engineRef);
 }
@@ -617,7 +624,11 @@ function render(dealing = false) {
   }
   const hand = el('div', { class: 'img-hand' });
   state.hand.forEach((card, slot) => {
-    if (card) hand.append(buildCard(card, slot, ctx, { dealing }));
+    if (!card) return;
+    // ImaginationHandUI.as 485-493: each card's tween starts CARD_ANI_TIME*i after the
+    // first and plays CARD_DEAL<slot+1> as it starts; here at the CSS deal delays (.09 s).
+    if (dealing) dealSound(slot, hand.children.length);
+    hand.append(buildCard(card, slot, ctx, { dealing }));
   });
   if (!hand.children.length) {
     body.append(el('div', { class: 'img-empty' }, 'Your hand is empty. Level up, learn skills and earn badges to unlock more upgrades.'));

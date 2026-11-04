@@ -4,15 +4,15 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { SOUND_ALIASES, SOUND_FILES, SOUND_KEY_COUNTS } from '../public/js/sound-keys.js?v=c8a66499';
+import { SOUND_ALIASES, SOUND_FILES, SOUND_KEY_COUNTS } from '../public/js/sound-keys.js?v=a8aaeb9d';
 import {
   SYNTH_KEY_RECIPES,
   SYNTH_RECIPE_NAMES,
   SYNTH_RECIPES,
   playSynthRecipe,
   recipeForKey,
-} from '../public/js/synth-sfx.js?v=9853c8e7';
-import { createSoundBoard, resolveSound } from '../public/js/sound-board.js?v=f992a5c5';
+} from '../public/js/synth-sfx.js?v=030fad18';
+import { createSoundBoard, resolveSound } from '../public/js/sound-board.js?v=3f7738d5';
 import {
   LEGACY_SFX_KEYS,
   actionLoopFor,
@@ -126,9 +126,11 @@ describe('sound-key catalog', () => {
         } else if (catalog.keys[key].origin === 'sounds-zip') {
           // Sounds.zip (2026-11-02): the zip's file name, md5 and how the key was matched.
           assert.match(catalog.keys[key].zipMd5, /^[0-9a-f]{32}$/, key);
-          assert.ok(['music_map', 'client-url', 'filename'].includes(catalog.keys[key].zipMatch), key);
-          if (catalog.keys[key].zipMatch !== 'filename') assert.match(catalog.keys[key].url, /^http:\/\/c2\.glitch\.bz\/sounds\/20\d\d-\d\d\//);
-          if (catalog.keys[key].zipMatch !== 'filename' && !catalog.keys[key].doubt) assert.ok(catalog.keys[key].url.endsWith(`/${catalog.keys[key].zipFile}`), key);
+          assert.ok(['music_map', 'client-url', 'filename', 'note-set', 'batch', 'forum'].includes(catalog.keys[key].zipMatch), key);
+          // music_map and client-url rows are the url's own file; the others are matched on evidence (no url survives).
+          const exact = ['music_map', 'client-url'].includes(catalog.keys[key].zipMatch);
+          if (exact) assert.match(catalog.keys[key].url, /^http:\/\/c2\.glitch\.bz\/sounds\/20\d\d-\d\d\//);
+          if (exact && !catalog.keys[key].doubt) assert.ok(catalog.keys[key].url.endsWith(`/${catalog.keys[key].zipFile}`), key);
         } else {
           assert.match(catalog.keys[key].url, /^http:\/\/c2\.glitch\.bz\/sounds\/20\d\d-\d\d\//);
           assert.equal(catalog.keys[key].origin, 'wayback-c2');
@@ -152,9 +154,9 @@ describe('sound-key catalog', () => {
       if (r.recipe) assert.ok(SYNTH_RECIPES[r.recipe], `${key} → missing recipe ${r.recipe}`);
       if (!r.file) synthesized += 1;
     }
-    // Recipes still cover the keys no recovered file answers (puzzle notes,
-    // card deals, remake moments ...).
-    assert.ok(synthesized >= 100 && synthesized <= 200, `${synthesized} synthesized`);
+    // Recipes still cover the keys no recovered file answers (music-box notes,
+    // remake moments ...); the Piano Party stars and card deals ship since hunt 6-7.
+    assert.ok(synthesized >= 50 && synthesized <= 120, `${synthesized} synthesized`);
     const real = Object.keys(catalog.keys).filter((k) => resolveSound(k).file).length;
     assert.ok(real >= 350, `only ${real} keys play a real file`);
   });
@@ -289,11 +291,11 @@ describe('sound board', () => {
 
   test('plays a recipe for a synthesized key and respects mute', () => {
     const h = host();
-    const handle = h.board.play('CARD_DEAL3');
+    const handle = h.board.play('HAND_SWIPE');
     assert.equal(handle.kind, 'synth');
-    assert.equal(handle.recipe, recipeForKey('CARD_DEAL3', 'ui'));
+    assert.equal(handle.recipe, recipeForKey('HAND_SWIPE', 'ui'));
     const muted = host({ muted: true });
-    assert.equal(muted.board.play('CARD_DEAL3'), null);
+    assert.equal(muted.board.play('HAND_SWIPE'), null);
   });
 
   test('prefers a recovered file over the recipe once it is warm', async () => {

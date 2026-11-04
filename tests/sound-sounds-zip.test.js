@@ -10,7 +10,7 @@ import { createHash } from 'node:crypto';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { SOUND_ALIASES, SOUND_FILES, SOUND_KEY_COUNTS } from '../public/js/sound-keys.js?v=c8a66499';
+import { SOUND_ALIASES, SOUND_FILES, SOUND_KEY_COUNTS } from '../public/js/sound-keys.js?v=a8aaeb9d';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const pub = join(root, 'public');
@@ -75,5 +75,43 @@ describe('Sounds.zip originals', () => {
     assert.ok(map.held.some((r) => r.key === 'READY'));
     // A name-only SFX match ships only where the game plays the key; each says where.
     for (const row of map.files.filter((r) => r.match === 'filename')) assert.ok(row.why, row.key);
+  });
+
+  it('the star notes and chords: LITTLE_STAR_1-19 and BIG_STAR_1-12 in upload order, the Uralia stars held without a key', () => {
+    // 2012-06-21: 19 notes C1..C4 (C D E G A B per octave, measured C4..C7) and 12 triads CM1..CM3.
+    const notes = ['C1', 'D1', 'E1', 'G1', 'A1', 'B1', 'C2', 'D2', 'E2', 'G2', 'A2', 'B2', 'C3', 'D3', 'E3', 'G3', 'A3', 'B3', 'C4'];
+    notes.forEach((n, i) => {
+      assert.match(catalog[`LITTLE_STAR_${i + 1}`].zipFile, new RegExp(`^134\\d+-${n}\\.mp3$`), `LITTLE_STAR_${i + 1}`);
+      assert.equal(catalog[`LITTLE_STAR_${i + 1}`].zipMatch, 'note-set');
+    });
+    const chords = ['CM1', 'Dm1', 'Em1', 'GM1', 'Am1', 'CM2', 'Dm2', 'Em2', 'FM2', 'GM2', 'Am2_corrected', 'CM3'];
+    chords.forEach((c, i) => assert.match(catalog[`BIG_STAR_${i + 1}`].zipFile, new RegExp(`^134\\d+-${c}\\.mp3$`), `BIG_STAR_${i + 1}`));
+    // The zip's uploads run in key order: each note and chord after the one before.
+    const ts = (k) => Number(catalog[k].zipFile.split('-')[0]);
+    for (let n = 2; n <= 19; n += 1) assert.ok(ts(`LITTLE_STAR_${n}`) > ts(`LITTLE_STAR_${n - 1}`), `LITTLE_STAR_${n}`);
+    for (let n = 2; n <= 10; n += 1) assert.ok(ts(`BIG_STAR_${n}`) > ts(`BIG_STAR_${n - 1}`), `BIG_STAR_${n}`);
+    // Uralia_Big_Star 1-3 are not BIG_STAR_1-3 (Radial Heights, 2012-08, plays the chords): held, no key.
+    const uralia = map.held.filter((r) => /Uralia_Big_Star/.test(r.zip)).map((r) => r.key).sort();
+    assert.deepEqual(uralia, ['URALIA_BIG_STAR_1', 'URALIA_BIG_STAR_2', 'URALIA_BIG_STAR_3']);
+    for (const k of uralia) assert.equal(catalog[k], undefined, k);
+  });
+
+  it('COMEDIAN, INTERACT_DISPATCHER, STAND1 and CARD_DEAL1-3 ship; the client never dealt a fourth card', () => {
+    assert.equal(catalog.COMEDIAN.zipFile, '1316228012-Laugh_3_.mp3');
+    assert.equal(catalog.INTERACT_DISPATCHER.zipFile, '1308718626-Interact.mp3');
+    assert.equal(catalog.STAND1.zipFile, '1302285923-blockmaker_base_30.mp3');
+    for (const n of [1, 2, 3]) assert.match(catalog[`CARD_DEAL${n}`].zipFile, new RegExp(`card_deal_${n}\\.`));
+    // ImaginationHandUI.as 493 plays CARD_DEAL<slot+1>; inc_imagination.js 497 deals three slots.
+    for (const n of [4, 5, 6, 7]) assert.equal(catalog[`CARD_DEAL${n}`], undefined, `CARD_DEAL${n}`);
+  });
+
+  it('the remake plays them where the original does', () => {
+    const img = readFileSync(join(pub, 'js/features/imagination-feature.js'), 'utf8');
+    assert.match(img, /CARD_DEAL\$\{slot \+ 1\}/);
+    assert.doesNotMatch(img, /play\('CARD_DEAL1'\)/);
+    const supply = readFileSync(join(pub, 'js/features/supply-feature.js'), 'utf8');
+    assert.match(supply, /machine_stand\.js 693[^\n]*\n\s*engine\.playSound\?\.\('STAND1'\)/);
+    const mail = readFileSync(join(pub, 'js/features/mail-courier-feature.js'), 'utf8');
+    assert.match(mail, /playSound\?\.\('INTERACT_DISPATCHER'/);
   });
 });

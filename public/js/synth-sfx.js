@@ -126,30 +126,36 @@ function rand(opts, salt = 0) {
 }
 
 /**
- * Piano Party (GA96OS42D6F3M9P) notes, whose files never survived: its 19
- * keys and 34 small stars play LITTLE_STAR_1..19, its 12 constellation stars
- * BIG_STAR_1..12. Key 1 (leftmost) plays LITTLE_STAR_19, so the numbers run
- * high to low: a C major scale from G6 (1) down to C4 (19). The big stars,
- * hit in their scripted order, play the opening of "Twinkle Twinkle Little
- * Star" (the sounds' namesake); MOON_APPEARS resolves it when the moon smiles.
+ * Piano Party (GA96OS42D6F3M9P), Starlit Night and Radial Heights star notes,
+ * for when the original files (Sounds.zip, shipped since hunt rounds 6-7) do
+ * not load. LITTLE_STAR_1..19 are the 2012-06-21 note set in upload order, C4
+ * up to C7 on C D E G A B (no F); BIG_STAR_1..12 its twelve triads, C Dm Em
+ * G Am / C Dm Em F G Am / C. Key 1 of the Piano Party (leftmost) plays
+ * LITTLE_STAR_19, so its keyboard runs high to low from left to right, as
+ * the street's script has it. Measured from the files and two Radial Heights
+ * recordings (tools/sound/sounds-zip-map.json).
  */
-const C_MAJOR = [0, 2, 4, 5, 7, 9, 11];
-const scaleSemitones = (i) => 12 * Math.floor(i / 7) + C_MAJOR[i % 7];
+const STAR_SCALE = [0, 2, 4, 7, 9, 11];
+const scaleSemitones = (i) => 12 * Math.floor(i / 6) + STAR_SCALE[i % 6];
 const C4 = 261.63;
-const TWINKLE = [0, 0, 7, 7, 9, 9, 7, 5, 5, 4, 4, 2];
+const TRIADS = [[0, 4, 7], [2, 5, 9], [4, 7, 11], [7, 11, 14], [9, 12, 16],
+  [12, 16, 19], [14, 17, 21], [16, 19, 23], [17, 21, 24], [19, 23, 26], [21, 24, 28], [24, 28, 31]];
 const PIANO_RECIPES = {};
 const PIANO_KEY_RECIPES = {};
 for (let n = 1; n <= 19; n += 1) {
-  const f = C4 * 2 ** (scaleSemitones(19 - n) / 12);
+  const f = C4 * 2 ** (scaleSemitones(n - 1) / 12);
   PIANO_RECIPES[`littleStar${n}`] = (c, o, t, p) => {
     tone(c, o, t, { type: 'triangle', f: f * p.r, peak: 0.09, attack: 0.004, decay: 0.7 });
     return bell(c, o, t, { f: f * p.r, peak: 0.05, decay: 0.9, bright: 0.35 });
   };
   PIANO_KEY_RECIPES[`LITTLE_STAR_${n}`] = `littleStar${n}`;
 }
-TWINKLE.forEach((semitones, i) => {
-  PIANO_RECIPES[`bigStar${i + 1}`] = (c, o, t, p) =>
-    bell(c, o, t, { f: 523.25 * 2 ** (semitones / 12) * p.r, peak: 0.12, decay: 1.1, bright: 0.7 });
+TRIADS.forEach((chord, i) => {
+  PIANO_RECIPES[`bigStar${i + 1}`] = (c, o, t, p) => {
+    let len = 0;
+    for (const semitones of chord) len = bell(c, o, t, { f: C4 * 2 ** (semitones / 12) * p.r, peak: 0.06, decay: 1.1, bright: 0.6 });
+    return len;
+  };
   PIANO_KEY_RECIPES[`BIG_STAR_${i + 1}`] = `bigStar${i + 1}`;
 });
 PIANO_RECIPES.moonAppears = (c, o, t, p) => arp(c, o, t, [0, 4, 7, 12, 16, 19, 24], { base: C4 * p.r, step: 0.11, peak: 0.08, decay: 1.4 });

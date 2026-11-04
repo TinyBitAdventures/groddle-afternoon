@@ -12,7 +12,7 @@
  */
 import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
-import { recipeForKey } from '../../public/js/synth-sfx.js?v=9853c8e7';
+import { recipeForKey } from '../../public/js/synth-sfx.js?v=030fad18';
 
 const root = join(import.meta.dirname, '..', '..');
 
