@@ -43,7 +43,9 @@ function card(item, statusLabel) {
   const icon = item.icon
     ? `<img class="cat-ic" src="${ICONS}${item.id}.png"${item.icon === 3 ? ` srcset="${ICONS}${item.id}.png 1x, ${ICONS}${item.id}@3x.png 3x"` : ''} alt="" width="52" height="52" loading="lazy" decoding="async" />`
     : '<span class="cat-ic cat-ph" aria-hidden="true"></span>';
-  return `<li><a class="cat-card" href="${item.id}/" title="${esc(item.name)}">${icon}<span class="cat-name">${esc(item.name)}<span class="ency-sep">,</span></span> <span class="cat-st st-${item.status}">${statusLabel[item.status]}</span></a></li>`;
+  // Never released in Glitch (tools/encyclopedia/never-released.mjs): a small tag over the picture.
+  const tag = item.nr ? '<span class="ency-unreleased cat-card-tag">Never released<span class="ency-sep">,</span></span> ' : '';
+  return `<li><a class="cat-card${item.nr ? ' cat-card-nr' : ''}" href="${item.id}/" title="${esc(item.name)}">${tag}${icon}<span class="cat-name">${esc(item.name)}<span class="ency-sep">,</span></span> <span class="cat-st st-${item.status}">${statusLabel[item.status]}</span></a></li>`;
 }
 
 async function main() {

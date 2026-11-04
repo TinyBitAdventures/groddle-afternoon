@@ -41,6 +41,7 @@ import { literalFrom, readItemTags } from '../inventory/gsjs-data.mjs';
 import { supplyConversions } from '../job-obtainable.mjs';
 import { loadEncyclopedia } from '../encyclopedia/data.mjs';
 import { inRemake, makeParts, sep } from '../encyclopedia/parts.mjs';
+import { neverReleased, neverReleasedNote, neverReleasedTag } from '../encyclopedia/never-released.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = join(here, '..', '..');
@@ -658,6 +659,8 @@ export async function buildCatalog({ inventory = readInventory(), evidence = rea
       get: e.get,
       sold: [...new Set(e.ways.filter((w) => w.vendor).map((w) => w.vendor))],
       desc: plainText(e.it.desc).slice(0, 220),
+      // Never released in Glitch (tools/encyclopedia/never-released.mjs): catalog.js tags its card.
+      ...(neverReleased(`item:${e.it.id}`) ? { nr: 1 } : {}),
     })),
   };
 
@@ -925,6 +928,7 @@ function itemPage(e, ctx) {
   });
 
   const status = STATUS[e.status];
+  const nr = neverReleased(`item:${it.id}`);
   const isMusic = it.id.startsWith('musicblock_') || it.tags.includes('musicblock');
   const musicHref = `${p}musicblocks/${ctx.musicCards.has(it.id) ? `#${esc(it.id)}` : ''}`;
   const icon = e.icon
@@ -943,8 +947,8 @@ ${vendorCards.length ? `          ${P.vendors(vendorCards)}\n` : ''}${recipeRows
 ${usesHtml.length ? `          <ul class="cat-list">
             ${usesHtml.join('\n            ')}
           </ul>\n` : ''}${useTiles ? `          ${useTiles}\n` : ''}` : ''}${isMusic ? `          <p class="cat-music"><a href="${musicHref}">Hear it on the Musicblocks page</a></p>\n` : ''}`
-    : `${isMusic ? `\n          <p class="cat-music"><a href="${musicHref}">Hear the Musicblocks on their own page</a></p>` : ''}
-          <p class="cat-muted">${e.status === 'missing' ? 'You can’t get it in the remake yet, so there is nothing to make with it or use it for here.' : 'There is no way to get it in the remake.'}</p>`;
+    : `${isMusic ? `\n          <p class="cat-music"><a href="${musicHref}">Hear the Musicblocks on their own page</a></p>` : ''}${nr ? '' : `
+          <p class="cat-muted">${e.status === 'missing' ? 'You can’t get it in the remake yet, so there is nothing to make with it or use it for here.' : 'There is no way to get it in the remake.'}</p>`}`;
 
   function statChips() {
     const list = [];
@@ -984,8 +988,8 @@ ${usesHtml.length ? `          <ul class="cat-list">
         <div>
           <h1>${esc(it.name)}</h1>
           ${it.plural && it.plural !== it.name ? `<p class="cat-plural">Plural: ${esc(it.plural)}</p>` : '<p class="cat-plural">&nbsp;</p>'}
-          <p class="cat-status"><span class="pill st-${esc(e.status)}">${esc(status.label)}</span></p>
-          ${statChips()}
+          <p class="cat-status"><span class="pill st-${esc(e.status)}">${esc(status.label)}</span>${nr ? ` ${neverReleasedTag()}` : ''}</p>
+          ${statChips()}${nr ? `\n          ${neverReleasedNote(nr)}` : ''}
         </div>
       </div>
     </div>
@@ -1012,7 +1016,7 @@ ${extras.length ? `          <ul class="cat-list cat-extras">\n${extras.map((x) 
       <div class="wrap">
         <h2 id="remake-h">In the remake</h2>
         <div class="cat-remake-body">
-          <p class="cat-status-text">${esc(STATUS_TEXT[e.status])}</p>${remakeBody}
+          <p class="cat-status-text">${esc(nr ? nr.remake : STATUS_TEXT[e.status])}</p>${remakeBody}
         </div>
       </div>
     </section>

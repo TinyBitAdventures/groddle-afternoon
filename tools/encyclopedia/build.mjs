@@ -26,6 +26,7 @@ import { keyOf as moduleKeyOf } from '../module-keys/build.mjs';
 import { EMAIL } from '../contribute/to-minn.mjs';
 import { GIANTS, PUB, SECTIONS, giantIcon, loadEncyclopedia, picture } from './data.mjs';
 import { SOUND_GROUPS } from './sounds.mjs';
+import { neverReleased, neverReleasedNote, neverReleasedTag } from './never-released.mjs';
 import { STATUS, andList, article, badge, esc, fmt, inRemake, makeParts, pathOf, plainText, sep, statusLabel, tsHtml } from './parts.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
@@ -136,6 +137,8 @@ function entryHead(e, P, { kickerExtra = '', subline = '' } = {}) {
   const sec = SECTION[e.section];
   const pic = e.icon ? P.img(e.icon, 'cat-hero-icon', 144) : '<span class="cat-hero-icon cat-ph" aria-hidden="true"></span>';
   const caption = e.icon?.caption || e.iconCaption || '';
+  // Never released in Glitch (never-released.mjs): a tag beside the status and a note under it.
+  const nr = neverReleased(e.key);
   return `
   <header class="masthead note-head cat-item-head">
     <div class="wrap">
@@ -145,7 +148,7 @@ function entryHead(e, P, { kickerExtra = '', subline = '' } = {}) {
         <div>
           <h1>${esc(e.name)}</h1>
           <p class="cat-plural">${subline || '&nbsp;'}</p>
-          <p class="cat-status">${badge(e.status)}${caption ? ` <span class="cat-register">${esc(caption)}</span>` : ''}</p>
+          <p class="cat-status">${badge(e.status)}${nr ? ` ${neverReleasedTag()}` : ''}${caption ? ` <span class="cat-register">${esc(caption)}</span>` : ''}</p>${nr ? `\n          ${neverReleasedNote(nr)}` : ''}
         </div>
       </div>
     </div>
@@ -153,7 +156,8 @@ function entryHead(e, P, { kickerExtra = '', subline = '' } = {}) {
 }
 
 function remakeBand(e, extra = '') {
-  return band('remake-h', 'In the remake', `<div class="cat-remake-body"><p class="cat-status-text">${esc(statusText(e.section, e.status))}</p>${extra}</div>`, { alt: true });
+  const nr = neverReleased(e.key);
+  return band('remake-h', 'In the remake', `<div class="cat-remake-body"><p class="cat-status-text">${esc(nr ? nr.remake : statusText(e.section, e.status))}</p>${extra}</div>`, { alt: true });
 }
 
 function pager(list, i, label) {
@@ -717,7 +721,7 @@ function sectionIndex(sec, list, info, nameOf) {
   const groups = [...new Set(list.map((e) => e.group))];
   const inCount = list.filter((e) => inRemake(e.status)).length;
   const groupHtml = groups.map((g) => {
-    const rows = list.filter((e) => e.group === g).map((e) => P.tile(e.key, { sub: `<span class="cat-st st-${esc(e.status)}">${esc(statusLabel(e.status))}</span>` }).replace('<li>', `<li data-name="${esc(e.name.toLowerCase())}">`));
+    const rows = list.filter((e) => e.group === g).map((e) => P.tile(e.key, { sub: `<span class="cat-st st-${esc(e.status)}">${esc(statusLabel(e.status))}</span>${neverReleased(e.key) ? ` ${neverReleasedTag()}` : ''}` }).replace('<li>', `<li data-name="${esc(e.name.toLowerCase())}">`));
     return `<section class="ency-group" aria-label="${esc(g)}" data-group="${esc(g)}"><h2>${esc(g)} <span class="count">${fmt(rows.length)}</span></h2>${P.tiles(rows, 'ency-grid')}</section>`;
   }).join('\n      ');
   const body = `

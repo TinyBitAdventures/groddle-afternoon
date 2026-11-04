@@ -6326,7 +6326,7 @@
       "brand/share.jpg": "fb033ab8",
       "compare/compare.json": "bd2788bc",
       "contribute/data.json": "f3183da4",
-      "encyclopedia/items/data.json": "ea024e31",
+      "encyclopedia/items/data.json": "170a7ef8",
       "encyclopedia/search.json": "78711097",
       "landing/card-explore.webp": "9fa06b9d",
       "landing/card-grow.webp": "65e5704b",
