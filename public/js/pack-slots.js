@@ -44,7 +44,31 @@
  * have different names; the bag's label (its tray's head, its slot's tip and
  * aria-label, Put in / Take out) is the name when it has one.
  *
- * prefs = { bags: [{ key, cls, name? }], place: { pack: [entry], <bagKey>: [cls] }, n: { pack: [count], <bagKey>: [count] } }
+ * Bag sorting (the three pack cards; items/bag_generic_gray.js verbs.sort_* 30-415,
+ * magic_sort 417-447, stack_up 449-473; items/bag.js doSpecialize 783-801,
+ * removeSpecialize 774-781, stackMatchesBagCategory 803-808, addItemStack 113-150):
+ *  - Internal Sortitude (pack_internal_sortitude): a Generic or Bigger Bag can be
+ *    specialized (BAG_SORTS). Its row keeps `sort` (the sort's id) and `sortNamed`
+ *    when the bag took the sort's name because it had none of the player's
+ *    (doSpecialize sets user_name and specialization_name only then; a rename
+ *    makes the name the player's: verbs.rename 516). With the card, what arrives
+ *    goes first into the bags sorted for it, then the pack, then the bags not
+ *    sorted, then the rest (addItemStack 125-150), limited bags still first
+ *    (157-188); more of a class tops up its stacks in that order too (191-206).
+ *  - Magic Sort (pack_magic_sort): on a sorted bag, or a bag that only takes one
+ *    kind (toolbox, spice rack: getCustomBagCategories), moves the stacks it is
+ *    for into it from the pack and the other bags, swapping out what it is not
+ *    for (magicSort). apiInventoryMagicSort ran in the server's Java, so the moves
+ *    follow its card text: "Automatically swaps items around across all your
+ *    bags so that the distribution of items most closely matches your bags'
+ *    specializations" (inc_data_imagination.js 5703-5723).
+ *  - Stack Up (pack_stack_up_bags): partial stacks of a class across the pack and
+ *    its bags fill up the first ones in slot order (stackUp; apiInventoryStackUp
+ *    was also Java: "Finds all partial stacks in all your bags and cleans them up").
+ *  A sort is kept on the bag's row, so it saves with the player; a bag that is
+ *  dropped and picked up comes back unsorted (only its player-given name goes with it).
+ *
+ * prefs = { bags: [{ key, cls, name?, sort?, sortNamed? }], place: { pack: [entry], <bagKey>: [cls] }, n: { pack: [count], <bagKey>: [count] } }
  *   pack entries are a class (one stack) or '@<bagKey>' (a bag in that slot);
  *   n runs beside place, the count of the stack in each slot (0 for a bag, or unknown).
  */
@@ -55,10 +79,11 @@ import {
   ELEMENT_CLASSES,
   NO_BAG_CLASSES,
   NO_SLOT_CLASSES,
+  SORT_TAG_CLASSES,
   SPICE_CLASSES,
   STACKMAX,
   TOOL_CLASSES,
-} from './pack-slots-data.js?v=330c51e4';
+} from './pack-slots-data.js?v=800f664c';
 import { bagLabel, canRenameBag, cleanBagName, renamedTo } from './bag-names.js?v=22391c55';
 
 /** PC.as:48 pack_slots; items/bag.js:1. */
@@ -89,6 +114,60 @@ export const BAG_DEFS = Object.freeze({
   // canContain 651-659: one stack of each element, up to its stackmax; onCreate 694-699 capacity 4.
   bag_elemental_pouch: bag(4, 'element', true, 'bag_elemental_pouch.js:651-659, onCreate 694-699', { onePerClass: true }),
 });
+
+/** can_specialize 'true' (bag_generic.js and bag_bigger.js classProps, line 23 in each colour's file). */
+export const SPECIALIZABLE_BAGS = Object.freeze(['bag_generic', 'bag_generic_blue', 'bag_generic_gray', 'bag_generic_green', 'bag_generic_pink', 'bag_bigger', 'bag_bigger_blue', 'bag_bigger_gray', 'bag_bigger_green', 'bag_bigger_pink']);
+const SPECIALIZABLE = new Set(SPECIALIZABLE_BAGS);
+
+const sortRow = (id, label, tooltip, name, tags, reason, sortOn) => Object.freeze({ id, label, tooltip, name, tags: Object.freeze(tags.split(',')), reason, sortOn });
+/** verbs.sort_* (bag_generic_gray.js 53-415): label, tooltip, the name doSpecialize gives, its categories, the disabled reason, sort_on. */
+export const BAG_SORTS = Object.freeze([
+  sortRow('sort_keys', 'Sort: Keys', 'Specialize this bag for keys', 'Keys', 'key', 'This bag is currently sorted by keys', 51),
+  sortRow('sort_cards', 'Sort: Cards', 'Specialize this bag for upgrade cards', 'Cards', 'upgrade_card', 'This bag is currently sorted by cards', 52),
+  sortRow('sort_alchemy', 'Sort: Alchemy', 'Specialize this bag for compounds and powders', 'Alchemy', 'compound,powder', 'This bag is currently sorted by alchemy goods', 53),
+  sortRow('sort_manufacturing', 'Sort: Manufacturing', 'Specialize this bag for ingredients and products of earth, cloth, fuel, wood and metal', 'Manufacturing', 'earth,firebogproduct,advanced_resource,fiberarts,woodproduct', 'This bag is currently sorted by manufacturing goods', 54),
+  sortRow('sort_mining', 'Sort: Mining, etc.', 'Specialize this bag for ore chunks, rock chunks and metal ingots', 'Mining, etc.', 'rock,metal,gem', 'This bag is currently sorted by mining goods', 55),
+  sortRow('sort_herbs', 'Sort: Herbs, etc.', 'Specialize this bag for herbs, herb seeds and tinctures', 'Herbs, etc.', 'herb,herb_seed,tincture', 'This bag is currently sorted by herbs', 56),
+  sortRow('sort_crops', 'Sort: Crops, etc.', 'Specialize this bag for crops and crop seeds', 'Crops, etc.', 'crop,seed', 'This bag is currently sorted by crops', 57),
+  sortRow('sort_musicblocks', 'Sort: Musicblocks', 'Specialize this bag for musicblocks', 'Musicblocks', 'musicblock', 'This bag is currently sorted by musicblocks', 58),
+  sortRow('sort_emblems', 'Sort: Emblems', 'Specialize this bag for emblems', 'Emblems', 'emblem', 'This bag is currently sorted by emblems', 59),
+  sortRow('sort_drinks', 'Sort: Drinks', 'Specialize this bag for drinks', 'Drinks', 'drink', 'This bag is currently sorted by drinks', 60),
+  sortRow('sort_food', 'Sort: Food', 'Specialize this bag for food', 'Food', 'foodbonus', 'This bag is currently sorted by food', 61),
+  sortRow('sort_staples_ab', 'Sort: Staples A+B', 'Specialize this bag for Staples A and B', 'Staples A+B', 'animalproduct,trantproduct', 'This bag is currently sorted by both sets of staples', 62),
+  // The source names these two "Sort: Staples B" / "Sort: Staples A" (doSpecialize's name argument, 386 and 412).
+  sortRow('sort_staples_b', 'Sort: Staples B', 'Specialize this bag for Allspice, Plain Beans, Plain Bubbles, Cherries, Eggs, and General Vapour', 'Sort: Staples B', 'trantproduct', 'This bag is currently sorted by this set of staples', 63),
+  sortRow('sort_staples_a', 'Sort: Staples A', 'Specialize this bag for Meat, Grain and Milk', 'Sort: Staples A', 'animalproduct', 'This bag is currently sorted by this set of staples', 64),
+]);
+const SORT_BY_ID = new Map(BAG_SORTS.map((r) => [r.id, r]));
+
+/** The other bag verbs' words (verbs.sort_all 30-51, magic_sort 417-447, stack_up 449-473). */
+export const BAG_SORT_COPY = Object.freeze({
+  all: Object.freeze({ id: 'sort_all', label: 'Sort: All', tooltip: 'Remove specialization from this bag', sortOn: 50 }),
+  magic: Object.freeze({ id: 'magic_sort', label: 'Magic sort', tooltip: 'Magically sort your items based on bag specialization', sortOn: 65, unsorted: 'This bag needs to be specialized before it can be magically sorted.', done: 'You have sorted your bag quite magically!' }),
+  stackUp: Object.freeze({ id: 'stack_up', label: 'Stack up', tooltip: 'Finds all partial stacks in all your bags and cleans them up', sortOn: 66, done: 'Your inventory has been stacked up!' }),
+});
+
+export function canSpecializeBag(cls) {
+  return SPECIALIZABLE.has(String(cls || ''));
+}
+
+/** A sort row by id, or null. */
+export function bagSort(id) {
+  return SORT_BY_ID.get(String(id || '')) || null;
+}
+
+/** stackMatchesBagCategory (bag.js:803-808): the class carries one of the sort's tags (the catalog's tags count too). */
+export function sortTakes(sortId, cls, opts = {}) {
+  const row = bagSort(sortId);
+  if (!row) return false;
+  const own = opts.catalog?.[cls]?.tags;
+  return row.tags.some((t) => SORT_TAG_CLASSES.get(t)?.has(cls) || (Array.isArray(own) && own.includes(t) && !own.includes(`nobag_${t}`)));
+}
+
+/** The words a sorted bag is called when the sort gave its name. */
+export function sortName(sortId) {
+  return bagSort(sortId)?.name || '';
+}
 
 /** The player-facing words, from the source where it has them. */
 export const PACK_COPY = Object.freeze({
@@ -187,7 +266,12 @@ export function normalizePrefs(seed) {
     if (!key || !isBagClass(cls) || seen.has(key)) continue;
     seen.add(key);
     const name = canRenameBag(cls) ? cleanBagName(row?.name) : '';
-    out.bags.push(name ? { key, cls, name } : { key, cls });
+    const sort = canSpecializeBag(cls) && bagSort(row?.sort) ? row.sort : '';
+    const kept = { key, cls };
+    if (name) kept.name = name;
+    if (sort) kept.sort = sort;
+    if (sort && !name && row?.sortNamed === true) kept.sortNamed = true;
+    out.bags.push(kept);
   }
   const place = seed.place && typeof seed.place === 'object' ? seed.place : {};
   const counts = seed.n && typeof seed.n === 'object' ? seed.n : {};
@@ -257,11 +341,11 @@ export function layoutPack(inv, prefs = null, opts = {}) {
     if (!isBagClass(cls)) continue;
     const n = Math.max(0, Math.floor(Number(inv[cls]) || 0));
     const rows = (savedByCls.get(cls) || []).slice(0, n);
-    for (const row of rows) instances.push({ key: row.key, cls, placed: false, name: row.name || '' });
+    for (const row of rows) instances.push({ key: row.key, cls, placed: false, name: row.name || '', sort: row.sort || '', sortNamed: Boolean(row.sortNamed) });
     for (let i = rows.length; i < n; i += 1) {
       const key = nextBagKey(used);
       used.add(key);
-      instances.push({ key, cls, placed: false, fresh: true, name: '' });
+      instances.push({ key, cls, placed: false, fresh: true, name: '', sort: '', sortNamed: false });
     }
   }
   const byKey = new Map(instances.map((b) => [b.key, b]));
@@ -277,7 +361,11 @@ export function layoutPack(inv, prefs = null, opts = {}) {
   const openBox = (inst) => {
     const def = BAG_DEFS[inst.cls];
     // getLabel 592-598: the bag's own name, else its class label (className keeps the latter).
-    const box = { key: inst.key, cls: inst.cls, label: bagLabel(inst.name, labelOf(inst.cls)), name: inst.name, className: labelOf(inst.cls), capacity: def.capacity, holds: def.holds, limited: def.limited, onePerClass: Boolean(def.onePerClass), slots: [] };
+    // A sorted bag with no name of the player's shows the sort's (doSpecialize 796-799).
+    const label = inst.name ? bagLabel(inst.name, labelOf(inst.cls)) : inst.sortNamed && inst.sort ? sortName(inst.sort) : labelOf(inst.cls);
+    const box = { key: inst.key, cls: inst.cls, label, name: inst.name, className: labelOf(inst.cls), capacity: def.capacity, holds: def.holds, limited: def.limited, onePerClass: Boolean(def.onePerClass), slots: [] };
+    if (inst.sort) box.sort = inst.sort;
+    if (inst.sortNamed && inst.sort) box.sortNamed = true;
     boxes.set(inst.key, box);
     return box;
   };
@@ -291,6 +379,16 @@ export function layoutPack(inv, prefs = null, opts = {}) {
     if (!bagAccepts(BAG_DEFS[box.cls], cls, opts)) return false;
     if (box.onePerClass && box.slots.some((s) => s.cls === cls)) return false;
     return true;
+  };
+  // addItemStack's candidate order (bag.js:113-188): limited bags 0; with Internal Sortitude the bags
+  // sorted for the class 1, the pack 2, bags not sorted 3, bags sorted for something else 4; without
+  // it the pack 2 and every other bag 3 (stable: bags keep their pack order within a rank).
+  const routeRank = (box, cls) => {
+    if (box === pack) return 2;
+    if (box.limited) return 0;
+    if (!opts.sortitude) return 3;
+    if (box.sort) return sortTakes(box.sort, cls, opts) ? 1 : 4;
+    return 3;
   };
   const putStack = (container, cls) => {
     const queue = left.get(cls);
@@ -360,7 +458,7 @@ export function layoutPack(inv, prefs = null, opts = {}) {
     }
     if (total >= sum) {
       let more = total - sum;
-      const rank = (h) => (h.container === pack ? 1 : h.container.limited ? 0 : 2);
+      const rank = (h) => routeRank(h.container, cls);
       const topUp = [...list].sort((a, b) => rank(a) - rank(b));
       for (const h of topUp) {
         if (more <= 0) break;
@@ -415,15 +513,16 @@ export function layoutPack(inv, prefs = null, opts = {}) {
     pack.slots.splice(lastBag + 1, 0, slot);
     if (swallowed) boxes.get(inst.key).slots.push(swallowed);
   }
-  // Phase 2b: every other stack, the source's order: limited bags, then the pack, then the other bags.
+  // Phase 2b: every other stack, the source's order: limited bags, then the pack, then the other bags
+  // (with Internal Sortitude: the bags sorted for it, the pack, the bags not sorted, the rest).
   const bagSlots = () => pack.slots.filter((s) => s.kind === 'bag').map((s) => boxes.get(s.key));
   for (const cls of order) {
     while (has(cls)) {
       const all = bagSlots();
-      const target =
-        all.find((b) => b.limited && boxTakes(b, cls)) ||
-        (pack.slots.length < capacity && packAccepts(cls) ? pack : null) ||
-        all.find((b) => !b.limited && boxTakes(b, cls));
+      const options = [...all.filter((b) => boxTakes(b, cls))];
+      if (pack.slots.length < capacity && packAccepts(cls)) options.push(pack);
+      options.sort((a, b) => routeRank(a, cls) - routeRank(b, cls));
+      const target = options[0];
       if (!target) break;
       putStack(target, cls);
     }
@@ -449,7 +548,13 @@ export function layoutPack(inv, prefs = null, opts = {}) {
     }
   }
   const nextPrefs = {
-    bags: instances.map((b) => (b.name ? { key: b.key, cls: b.cls, name: b.name } : { key: b.key, cls: b.cls })),
+    bags: instances.map((b) => {
+      const row = { key: b.key, cls: b.cls };
+      if (b.name) row.name = b.name;
+      if (b.sort) row.sort = b.sort;
+      if (b.sort && b.sortNamed && !b.name) row.sortNamed = true;
+      return row;
+    }),
     place: { pack: pack.slots.map((s) => (s.kind === 'bag' ? `@${s.key}` : s.cls)) },
     n: { pack: pack.slots.map((s) => (s.kind === 'bag' ? 0 : s.count)) },
   };
@@ -876,8 +981,222 @@ export function renameBag(prefs, key, value) {
   const row = next.bags.find((b) => b.key === String(key || ''));
   if (!row) return { ok: false, reason: 'missing', prefs: next };
   if (!canRenameBag(row.cls)) return { ok: false, reason: 'not_renamable', prefs: next };
-  const name = renamedTo(row.name, value);
-  const changed = name !== (row.name || '');
+  // verbs.rename 516: the name is the player's from now on, a sort's name included
+  // (OK on the sort's name, as the box shows it, keeps it as the player's).
+  const name = renamedTo(row.name || (row.sortNamed ? sortName(row.sort) : ''), value);
+  const changed = name !== (row.name || '') || Boolean(row.sortNamed);
   if (name) row.name = name;
+  delete row.sortNamed;
   return { ok: true, prefs: next, name, changed };
+}
+
+/**
+ * Specialize one bag (verbs.sort_* handlers, bag.js doSpecialize 783-801), or
+ * take its sort off with 'sort_all' (removeSpecialize 774-781). A bag with no
+ * name of the player's takes the sort's name (and loses it with the sort); one
+ * the player named keeps the name. key: the bag's prefs key.
+ * Returns { ok, prefs, changed } or { ok: false, reason }.
+ */
+export function specializeBag(prefs, key, sortId) {
+  const next = normalizePrefs(prefs);
+  const row = next.bags.find((b) => b.key === String(key || ''));
+  if (!row) return { ok: false, reason: 'missing', prefs: next };
+  if (!canSpecializeBag(row.cls)) return { ok: false, reason: 'not_sortable', prefs: next };
+  if (sortId === BAG_SORT_COPY.all.id) {
+    const changed = Boolean(row.sort);
+    delete row.sort;
+    delete row.sortNamed;
+    return { ok: true, prefs: next, changed };
+  }
+  const sort = bagSort(sortId);
+  if (!sort) return { ok: false, reason: 'unknown_sort', prefs: next };
+  if (row.sort === sort.id) return { ok: false, reason: sort.reason, prefs: next };
+  row.sort = sort.id;
+  if (!row.name) row.sortNamed = true;
+  return { ok: true, prefs: next, changed: true };
+}
+
+/** What a bag box is for: its sort's categories, or the one kind a toolbox or spice rack takes (getCustomBagCategories). */
+function boxIsFor(box, cls, opts) {
+  if (!box) return false;
+  if (!bagAccepts(BAG_DEFS[box.cls], cls, opts)) return false;
+  if (box.sort) return sortTakes(box.sort, cls, opts);
+  return box.holds !== 'any';
+}
+
+/** magic_sort conditions (bag_generic_gray.js 428-436): a sorted bag, or one with custom categories. */
+export function canMagicSort(box) {
+  return Boolean(box && (box.sort || box.holds !== 'any'));
+}
+
+/**
+ * Magic Sort on one bag (verbs.magic_sort 438-445, apiInventoryMagicSort): the
+ * stacks the bag is for come into it from the pack and the other bags (not out
+ * of a bag that is itself sorted for them, nor a limited one); when it is full,
+ * one it is not for swaps places with the one coming in; then what it is not
+ * for goes to another bag that is for it when one has room. Counts never change.
+ * Returns { ok, prefs, moved } or { ok: false, reason }.
+ */
+export function magicSort(inv, prefs, key, opts = {}) {
+  const layout = layoutPack(inv, prefs, opts);
+  const box = layout.bags[String(key || '')];
+  if (!box) return { ok: false, reason: 'missing', prefs: layout.prefs };
+  if (!canMagicSort(box)) return { ok: false, reason: BAG_SORT_COPY.magic.unsorted, prefs: layout.prefs };
+  const next = JSON.parse(JSON.stringify(layout.prefs));
+  const keyOf = (container) => (container === layout.pack ? 'pack' : container.key);
+  const boxes = Object.values(layout.bags);
+  const accepts = (container, cls) => {
+    if (container === layout.pack) return packAccepts(cls);
+    const def = BAG_DEFS[container.cls];
+    if (!bagAccepts(def, cls, opts)) return false;
+    if (def.onePerClass && (next.place[container.key] || []).includes(cls)) return false;
+    return true;
+  };
+  const here = () => next.place[box.key];
+  const hereN = () => next.n[box.key];
+  // Where each stack started ("key#index"), moved with it: a tool's wear rides with its unit (unitOrder).
+  const ids = Object.fromEntries(Object.entries(next.place).map(([k, list]) => [k, list.map((_, i) => `${k}#${i}`)]));
+  const hereId = () => ids[box.key];
+  let moved = 0;
+  // Sources in slot order: the pack's stacks, then each other bag's where it sits.
+  const sources = [];
+  layout.pack.slots.forEach((s, i) => {
+    if (s.kind === 'bag') {
+      const other = layout.bags[s.key];
+      if (!other || other.key === box.key || other.limited) return;
+      other.slots.forEach((t) => { if (!boxIsFor(other, t.cls, opts)) sources.push({ container: other, cls: t.cls }); });
+    } else {
+      sources.push({ container: layout.pack, cls: s.cls });
+    }
+  });
+  for (const src of sources) {
+    if (!boxIsFor(box, src.cls, opts)) continue;
+    const srcKey = keyOf(src.container);
+    const list = next.place[srcKey];
+    const nums = next.n[srcKey];
+    const at = list.indexOf(src.cls);
+    if (at < 0) continue;
+    let count = nums[at];
+    // Top up the bag's own stacks of the class first (bag.js:191-206).
+    const max = stackMaxOf(src.cls, opts.catalog);
+    here().forEach((c, i) => {
+      if (count <= 0 || c !== src.cls) return;
+      const add = Math.min(count, Math.max(0, max - hereN()[i]));
+      hereN()[i] += add;
+      count -= add;
+    });
+    if (count <= 0) {
+      list.splice(at, 1);
+      nums.splice(at, 1);
+      ids[srcKey].splice(at, 1);
+      moved += 1;
+      continue;
+    }
+    if (box.onePerClass && here().includes(src.cls)) {
+      nums[at] = count;
+      continue;
+    }
+    if (here().length < box.capacity) {
+      list.splice(at, 1);
+      nums.splice(at, 1);
+      const [id] = ids[srcKey].splice(at, 1);
+      here().push(src.cls);
+      hereN().push(count);
+      hereId().push(id);
+      moved += 1;
+      continue;
+    }
+    // Full: swap out the first stack it is not for, when the source's place can hold it.
+    const out = here().findIndex((c) => !boxIsFor(box, c, opts) && (src.container === layout.pack ? packAccepts(c) : bagAccepts(BAG_DEFS[src.container.cls], c, opts)));
+    if (out < 0) {
+      nums[at] = count;
+      continue;
+    }
+    const [outCls] = here().splice(out, 1, src.cls);
+    const [outN] = hereN().splice(out, 1, count);
+    const [outId] = hereId().splice(out, 1, ids[srcKey][at]);
+    list.splice(at, 1, outCls);
+    nums.splice(at, 1, outN);
+    ids[srcKey].splice(at, 1, outId);
+    moved += 1;
+  }
+  // What the bag is not for: to another bag that is for it, with room.
+  for (let i = here().length - 1; i >= 0; i -= 1) {
+    const cls = here()[i];
+    if (boxIsFor(box, cls, opts)) continue;
+    const dest = boxes.find((b) => b.key !== box.key && boxIsFor(b, cls, opts) && (next.place[b.key] || []).length < b.capacity && accepts(b, cls));
+    if (!dest) continue;
+    const [c] = here().splice(i, 1);
+    const [n] = hereN().splice(i, 1);
+    const [id] = hereId().splice(i, 1);
+    (next.place[dest.key] ||= []).push(c);
+    (next.n[dest.key] ||= []).push(n);
+    (ids[dest.key] ||= []).push(id);
+    moved += 1;
+  }
+  const after = layoutPack(inv, next, opts);
+  if (overflowOf(after) > overflowOf(layout)) return { ok: true, prefs: layout.prefs, moved: 0, trace: null };
+  return { ok: true, prefs: after.prefs, moved, trace: ids };
+}
+
+/**
+ * The units of a class after a magicSort, in unitPlaces order, as their ranks
+ * before it: order[newRank] = oldRank (null when it can't be told). trace: what
+ * magicSort returned (each final place's "key#index" before the sort).
+ */
+export function unitOrder(before, after, trace, cls) {
+  if (!trace) return null;
+  const was = new Map();
+  unitPlaces(before, cls).forEach((p, r) => { if (!was.has(`${p.container}#${p.index}`)) was.set(`${p.container}#${p.index}`, r); });
+  const out = [];
+  for (const p of unitPlaces(after, cls)) {
+    const id = trace[p.container]?.[p.index];
+    const r = id ? was.get(id) : undefined;
+    if (r === undefined) return null;
+    out.push(r);
+  }
+  return out;
+}
+
+/**
+ * Stack Up (verbs.stack_up 466-471, apiInventoryStackUp): for each class, its
+ * partial stacks across the pack and its bags fill the first ones in slot order
+ * (a bag's slots where the bag sits), and the stacks left empty free their slots.
+ * Nothing changes container. Returns { ok, prefs, merged } (merged: stacks freed).
+ */
+export function stackUp(inv, prefs, opts = {}) {
+  const layout = layoutPack(inv, prefs, opts);
+  const next = JSON.parse(JSON.stringify(layout.prefs));
+  const refs = new Map(); // cls -> [{ key, index }] in slot order
+  const add = (key, cls, index) => {
+    if (!refs.has(cls)) refs.set(cls, []);
+    refs.get(cls).push({ key, index });
+  };
+  next.place.pack.forEach((e, i) => {
+    if (e.startsWith('@')) (next.place[e.slice(1)] || []).forEach((cls, j) => add(e.slice(1), cls, j));
+    else add('pack', e, i);
+  });
+  const drop = new Map(); // key -> Set of indexes
+  let merged = 0;
+  for (const [cls, list] of refs) {
+    if (list.length < 2) continue;
+    const max = stackMaxOf(cls, opts.catalog);
+    let total = list.reduce((a, r) => a + (next.n[r.key][r.index] || 0), 0);
+    for (const r of list) {
+      const take = Math.min(max, total);
+      total -= take;
+      if (take > 0) next.n[r.key][r.index] = take;
+      else {
+        if (!drop.has(r.key)) drop.set(r.key, new Set());
+        drop.get(r.key).add(r.index);
+        merged += 1;
+      }
+    }
+  }
+  for (const [key, idx] of drop) {
+    next.place[key] = next.place[key].filter((_, i) => !idx.has(i));
+    next.n[key] = next.n[key].filter((_, i) => !idx.has(i));
+  }
+  const after = layoutPack(inv, next, opts);
+  return { ok: true, prefs: after.prefs, merged };
 }

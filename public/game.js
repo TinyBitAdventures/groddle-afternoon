@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=79228c68';
 import { createFeatureHost } from './js/feature-host.js?v=2ed3c069';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=459b5ce7';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=e9c1cdac';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -462,7 +462,7 @@ import {
   removeItem,
   isToolItem,
 } from './js/inventory.js?v=597a17a2';
-import { PACK_COPY, isBagClass, unitRankAt } from './js/pack-slots.js?v=ba0a895f';
+import { PACK_COPY, isBagClass, unitRankAt } from './js/pack-slots.js?v=95438d4a';
 import { createPackRow, mountPackClearance, packBandRange, packCountText, packSearchEntries, packSlotTip } from './js/ui/pack-row.js?v=65c0f180';
 import { listAnimalFeedOptions } from './js/animals.js?v=2654c807';
 import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=2654c807';

@@ -12,7 +12,7 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { bagLeavesLast, giveBag, layoutPack, takeBag, unitPlaces } from '../public/js/pack-slots.js?v=ba0a895f';
+import { bagLeavesLast, giveBag, layoutPack, takeBag, unitPlaces } from '../public/js/pack-slots.js?v=95438d4a';
 import {
   createDroppedItemState,
   dropInventoryStack,

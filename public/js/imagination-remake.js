@@ -152,7 +152,10 @@ const RULES = [
   [/^snapshotting$/, 'multiplayer', 'Snaps in Camera Mode (Enter), kept on the site for other players\' Cameras.'],
   [/^snapshottery_/, 'interface', 'Photo filters are a client feature not in the remake.'],
   [/^(map_search|inventory_search)$/, 'none', 'Secret card with no server effect.'],
-  [/^pack_(stack_up_bags|internal_sortitude|magic_sort)$/, 'interface', 'Bag sorting verbs; the remake pack has no bags.'],
+  // items/bag_generic_gray.js 30-473, bag.js 113-150 / 774-808 (js/pack-slots.js, features/bags-feature.js).
+  [/^pack_internal_sortitude$/, 'live', 'Adds Sort: verbs to your Generic and Bigger Bags: a bag sorted for keys, food, mining goods and more takes them first when they come into your pack.'],
+  [/^pack_magic_sort$/, 'live', 'Adds Magic sort to a sorted bag (and to toolboxes, spice racks and other one-kind bags): it gathers in what it is for from the rest of your pack.'],
+  [/^pack_stack_up_bags$/, 'live', 'Adds Stack up to your bags: partial stacks of one thing across your pack and bags join into full ones.'],
 ];
 
 /** { status, note } for an upgrade id. */

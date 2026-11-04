@@ -2246,11 +2246,11 @@
  "imagination": {
   "total": 275,
   "counts": {
-   "live": 243,
+   "live": 246,
    "starter": 9,
    "none": 6,
    "multiplayer": 10,
-   "interface": 7
+   "interface": 4
   }
  },
  "jobs": {
@@ -2820,6 +2820,6 @@
    }
   ]
  },
- "tests": 651,
+ "tests": 652,
  "generatedAt": "2026-11-03"
 }

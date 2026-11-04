@@ -34,7 +34,7 @@ import { performAnimalKinship } from '../public/js/animal-kinship.js?v=2757bb52'
 import { advanceYard, capturePiggy, captureVerbState, feedPiggyStack, normalizeHusbandryPack } from '../public/js/animal-husbandry.js?v=a4c7de13';
 import { getVerbsFor, runVerb } from '../public/content.js?v=79228c68';
 import { animalMoodFeature, describeAnimalPlace } from '../public/js/features/animal-mood-feature.js?v=4d6acc94';
-import { remakeStatus } from '../public/js/imagination-remake.js?v=7a7f8b70';
+import { remakeStatus } from '../public/js/imagination-remake.js?v=7ec61ba6';
 import { animalHusbandryFeature, deathRollFor, normalizeHusbandrySlot } from '../public/js/features/animal-husbandry-feature.js?v=e073f032';
 
 const here = dirname(fileURLToPath(import.meta.url));

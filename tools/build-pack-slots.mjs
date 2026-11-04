@@ -15,6 +15,10 @@
  *  - What takes no pack slot at all: furniture (furniture_base parent) and
  *    trophies (`var is_trophy = true`), which the source kept in hidden bags
  *    (items/bag.js:98-104).
+ *  - What a specialized bag sorts in (Internal Sortitude): the classes with
+ *    each category tag the bag_generic sort verbs name (bag_generic_gray.js
+ *    53-415 doSpecialize categories), less those tagged nobag_<tag>
+ *    (bag.js:803-808 stackMatchesBagCategory), from items/catalog_tags.js.
  *
  * Run from the game repo root:
  *   node tools/build-pack-slots.mjs           writes public/js/pack-slots-data.js
@@ -30,6 +34,9 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 export const GSJS = join(root, '..', 'glitch-GameServerJS');
 export const OUT = join(root, 'public/js/pack-slots-data.js');
 
+/** The category tags the sort verbs specialize a bag for (bag_generic_gray.js 53-415). */
+export const SORT_TAGS = Object.freeze(['key', 'upgrade_card', 'compound', 'powder', 'earth', 'firebogproduct', 'advanced_resource', 'fiberarts', 'woodproduct', 'rock', 'metal', 'gem', 'herb', 'herb_seed', 'tincture', 'crop', 'seed', 'musicblock', 'emblem', 'drink', 'foodbonus', 'animalproduct', 'trantproduct']);
+
 const flag = (text, name) => new RegExp(`^\\s*this\\.${name}\\s*=\\s*(1|true)\\s*;`, 'm').test(text);
 
 /** The generated module text for one GameServerJS checkout. */
@@ -37,6 +44,7 @@ export function packSlotsSource(gsjs = GSJS) {
   const items = readItems(gsjs, readItemTags(gsjs));
   const stackmax = {};
   const sets = { spice: [], compound: [], element: [], cubimal: [], tool: [], noBag: [], noSlot: [] };
+  const sortTags = Object.fromEntries(SORT_TAGS.map((t) => [t, []]));
   for (const it of items) {
     const text = readFileSync(join(gsjs, 'items', `${it.id}.js`), 'utf8');
     const m = /^var stackmax\s*=\s*(\d+)\s*;/m.exec(text);
@@ -50,6 +58,7 @@ export function packSlotsSource(gsjs = GSJS) {
     if (parents.includes('npc_cubimal_base')) sets.cubimal.push(it.id);
     if (it.tags.includes('tool')) sets.tool.push(it.id);
     if (it.tags.includes('no_bag')) sets.noBag.push(it.id);
+    for (const t of SORT_TAGS) if (it.tags.includes(t) && !it.tags.includes(`nobag_${t}`)) sortTags[t].push(it.id);
     const trophy = /^var is_trophy\s*=\s*true/m.test(text) || flag(text, 'is_trophy');
     if (trophy || parents.includes('furniture_base')) sets.noSlot.push(it.id);
   }
@@ -81,6 +90,13 @@ export function packSlotsSource(gsjs = GSJS) {
     `export const NO_BAG_CLASSES = new Set(${JSON.stringify(sets.noBag.sort())});`,
     '/** Furniture and trophies: the source kept them in hidden bags, never in pack slots (items/bag.js:98-104). */',
     `export const NO_SLOT_CLASSES = new Set(${JSON.stringify(sets.noSlot.sort())});`,
+    '',
+    '/** Internal Sortitude: the classes each sort category takes (catalog_tags.js; bag.js:803-808 leaves out nobag_<tag>). */',
+    'const SORT_TAG_GROUPS = {',
+    ...SORT_TAGS.map((t) => `  ${t}: ${JSON.stringify(sortTags[t].sort().join(' '))},`),
+    '};',
+    '/** @type {Map<string, Set<string>>} */',
+    "export const SORT_TAG_CLASSES = new Map(Object.entries(SORT_TAG_GROUPS).map(([t, ids]) => [t, new Set(ids ? ids.split(' ') : [])]));",
     '',
   ];
   return lines.join('\n');

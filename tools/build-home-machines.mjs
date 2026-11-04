@@ -28,10 +28,10 @@ import { requireSite, sitePath } from './repos.mjs';
 export const OUT = sitePath('data', 'home-machines.json');
 
 export async function homeMachinesJson() {
-  const hm = await import('../public/js/home-machines.js?v=a472a14b');
+  const hm = await import('../public/js/home-machines.js?v=c7b260e4');
   const { MACHINE_SKILLS } = await import('../public/js/machine-rooms.js?v=5fbd635d');
   const { FRESH_FUEL, MACHINE_IDS } = await import('../public/js/machines.js?v=44fc6833');
-  const decor = await import('../public/js/home-decor.js?v=3ee9ea0d');
+  const decor = await import('../public/js/home-decor.js?v=fc25037c');
   const { HOME_LIMITS } = await import('../public/js/homes-catalog.js?v=7aa9beb0');
   const tower = decor.interiorBounds({ layout: 'tower' });
   const rooms = { segmentW: decor.SEGMENT_W, minSegments: HOME_LIMITS.MIN_WALL_SEGMENTS, startSegments: HOME_LIMITS.START_WALL_SEGMENTS, maxSegments: HOME_LIMITS.MAX_WALL_SEGMENTS, endCap: decor.INTERIOR.endCapW, towerLeft: tower.left, towerRight: tower.right };

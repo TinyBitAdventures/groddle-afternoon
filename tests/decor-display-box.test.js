@@ -18,7 +18,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { createHomeDecorState, DISPLAY_TEXT, displayDeposit, displayRefusal, surfaceHeight } from '../public/js/home-decor.js?v=3ee9ea0d';
+import { createHomeDecorState, DISPLAY_TEXT, displayDeposit, displayRefusal, surfaceHeight } from '../public/js/home-decor.js?v=fc25037c';
 import { FURNITURE_UPGRADES } from '../public/js/furniture-upgrades-data.js?v=ced89b64';
 import { basePlats } from '../tools/furniture-upgrades/build.mjs';
 

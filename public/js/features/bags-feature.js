@@ -72,6 +72,14 @@
  * ground menu; renameDroppedBag). A bag given, traded, mailed or sold goes as a
  * class and a count (trade goods { c, n, r }), so it arrives with its class name.
  *
+ * Sorting (the pack cards; pack-slots.js BAG_SORTS, specializeBag, magicSort,
+ * stackUp): a bag's menu lists, in sort_on order before Rename, Sort: All and
+ * the fourteen Sort: verbs with Internal Sortitude (Generic and Bigger Bags),
+ * Magic sort with Magic Sort (a sorted bag, or a toolbox, spice rack, kit,
+ * pouch or case), and Stack up with Stack Up (every bag). Each is the menu's
+ * bag (packBagMenu); the activity lines are the source's. With Internal
+ * Sortitude what arrives goes into the bags sorted for it first (opts().sortitude).
+ *
  * QA: `?autostart=1&fresh=1&resetgame=1&questoffer=off&bagdemo=1` empties the
  * pack to a Generic Bag and 15 stacks (16/16, the bag empty) and drops 5 Plums
  * beside you; `bagdemo=full` fills the bag's 10 slots too, so the Plums can't
@@ -93,8 +101,17 @@ import {
   isBagClass,
   layoutPack,
   arrangeIntoBags,
+  BAG_SORTS,
+  BAG_SORT_COPY,
   bagLeavesLast,
+  bagSort,
+  canMagicSort,
+  canSpecializeBag,
   giveBag,
+  magicSort,
+  sortName,
+  specializeBag,
+  stackUp,
   isBagClass as isBag,
   moveStack,
   normalizePrefs,
@@ -102,9 +119,10 @@ import {
   renameBag,
   roomFor,
   takeBag,
+  unitOrder,
   unitPlaces,
   unitRankAt,
-} from '../pack-slots.js?v=ba0a895f';
+} from '../pack-slots.js?v=95438d4a';
 import { TOOL_CONDITION_CATALOG, moveToolCopy, pickToolCopies, placeToolCopies } from '../tools.js?v=3974f57e';
 import { createMinnAccount } from '../minn-account.js?v=eb300264';
 import { BAG_NAME_MAX, BAG_RENAME_COPY, bagLabel, canRenameBag, cleanBagName, renamedTo } from '../bag-names.js?v=22391c55';
@@ -146,6 +164,16 @@ const TAKE_SOON_MS = 1500;
 let demoDone = false;
 /** The bag whose menu is open (game.js renderPackPopover: packBagMenu), its prefs key, or ''. */
 let menuBag = '';
+/** The engine init saw: opts() reads the player's cards from it (Internal Sortitude routes arrivals). */
+let engineRef = null;
+
+/** The three pack cards (inc_data_imagination.js 5674-5746). */
+const SORT_CARDS = Object.freeze({ sortitude: 'pack_internal_sortitude', magic: 'pack_magic_sort', stackUp: 'pack_stack_up_bags' });
+
+function hasCard(engine, id) {
+  const owned = engine?.pc?.imaginationUpgrades;
+  return Array.isArray(owned) && owned.includes(id);
+}
 /** The site's answers that settle the starter question: granted, none, or refused (new, nosave). */
 const STARTER_DONE = new Set(['granted', 'none', 'new', 'nosave']);
 const STARTER_TRADE = /^starter-bags-[1-9][0-9]{0,18}$/;
@@ -155,7 +183,7 @@ let starterAsked = false;
 function opts() {
   const labels = {};
   for (const [cls, meta] of Object.entries(ITEM_CATALOG)) labels[cls] = meta.label;
-  return { capacity: PACK_CAPACITY, catalog: ITEM_CATALOG, isTool: isToolItem, order: Object.keys(ITEM_CATALOG), labels };
+  return { capacity: PACK_CAPACITY, catalog: ITEM_CATALOG, isTool: isToolItem, order: Object.keys(ITEM_CATALOG), labels, sortitude: hasCard(engineRef, SORT_CARDS.sortitude) };
 }
 
 function nameOf(cls, n) {
@@ -539,10 +567,109 @@ function pickupRoom(target, verbs, engine) {
   return verbs.map((v) => (v?.id === 'pickup' ? { ...v, enabled: false, reason: PACK_COPY.pickupDisabled } : v));
 }
 
+/**
+ * A bag's sorting verbs, in sort_on order (bag_generic_gray.js 30-473): Sort: All
+ * and the Sort: verbs need Internal Sortitude and a bag that can_specialize
+ * (the one it is sorted by is disabled with the source's reason), Magic sort
+ * needs Magic Sort and a sorted bag (or one with custom categories), Stack up
+ * needs Stack Up. The bag is the menu's (packBagMenu), else the first of its class.
+ */
+function sortVerbs(engine, cls) {
+  const out = [];
+  const layout = layoutPack(engine.inv, slice.prefs, opts());
+  const key = bagKeyFor(layout, cls);
+  const box = key ? layout.bags[key] : null;
+  if (!box) return out;
+  if (canSpecializeBag(cls) && hasCard(engine, SORT_CARDS.sortitude)) {
+    out.push({ id: 'bags_sort:sort_all', label: BAG_SORT_COPY.all.label, enabled: true, reason: '', tooltip: BAG_SORT_COPY.all.tooltip });
+    for (const row of BAG_SORTS) {
+      const current = box.sort === row.id;
+      out.push({ id: `bags_sort:${row.id}`, label: row.label, enabled: !current, reason: current ? row.reason : '', tooltip: row.tooltip });
+    }
+  }
+  if (hasCard(engine, SORT_CARDS.magic) && (canSpecializeBag(cls) || box.holds !== 'any')) {
+    const ok = canMagicSort(box);
+    out.push({ id: 'bags_magic_sort', label: BAG_SORT_COPY.magic.label, enabled: ok, reason: ok ? '' : BAG_SORT_COPY.magic.unsorted, tooltip: BAG_SORT_COPY.magic.tooltip });
+  }
+  if (hasCard(engine, SORT_CARDS.stackUp)) {
+    out.push({ id: 'bags_stack_up', label: BAG_SORT_COPY.stackUp.label, enabled: true, reason: '', tooltip: BAG_SORT_COPY.stackUp.tooltip });
+  }
+  return out;
+}
+
+/** Re-order each tool class's wear after a magic sort moved its units (order[newRank] = oldRank). */
+function keepToolWear(engine, before, after, trace) {
+  for (const cls of Object.keys(TOOL_CONDITION_CATALOG)) {
+    if ((Number(engine.inv?.[cls]) || 0) < 2) continue;
+    const order = unitOrder(before, after, trace, cls);
+    if (!order || order.every((r, i) => r === i)) continue;
+    // Selection by moves: bring the unit that belongs at each place there in turn.
+    const at = [...Array(order.length).keys()]; // at[k]: the old rank of the copy now in place k
+    for (let t = 0; t < order.length; t += 1) {
+      const from = at.indexOf(order[t]);
+      if (from === t) continue;
+      moveToolCopy(engine.toolState, cls, from, t);
+      const [v] = at.splice(from, 1);
+      at.splice(t, 0, v);
+    }
+  }
+}
+
+/** Run a sorting verb on the menu's bag. True when handled. */
+function runSortVerb(engine, cls, verbId) {
+  if (!isBagClass(cls) || !engine?.inv) return false;
+  const o = opts();
+  const layout = layoutPack(engine.inv, slice.prefs, o);
+  const key = bagKeyFor(layout, cls);
+  if (!key) return false;
+  let res;
+  let line = '';
+  let last = '';
+  if (verbId.startsWith('bags_sort:')) {
+    const id = verbId.slice('bags_sort:'.length);
+    if (!hasCard(engine, SORT_CARDS.sortitude) || !canSpecializeBag(cls)) return false;
+    res = specializeBag(layout.prefs, key, id);
+    last = `sorted:${key}:${id}`;
+  } else if (verbId === 'bags_magic_sort') {
+    if (!hasCard(engine, SORT_CARDS.magic)) return false;
+    res = magicSort(engine.inv, layout.prefs, key, o);
+    line = BAG_SORT_COPY.magic.done;
+    last = `magic_sorted:${key}:${res.moved || 0}`;
+  } else {
+    if (!hasCard(engine, SORT_CARDS.stackUp)) return false;
+    res = stackUp(engine.inv, layout.prefs, o);
+    line = BAG_SORT_COPY.stackUp.done;
+    last = `stacked_up:${res.merged || 0}`;
+  }
+  if (!res?.ok) {
+    if (res?.reason) engine.toast?.(res.reason, 3000);
+    engine.playSound?.('CLICK_FAILURE', { volume: 0.45 });
+    return true;
+  }
+  slice.prefs = normalizePrefs(res.prefs);
+  // A tool's wear rides with its unit (a drag keeps the same rule): stack up never moves a tool
+  // (a tool stacks one to a slot), magic sort may, so its trace re-orders the wear.
+  if (engine.toolState && res.trace) keepToolWear(engine, layout, layoutPack(engine.inv, slice.prefs, o), res.trace);
+  focus = null;
+  takes = [];
+  engine.setData?.('packLast', last);
+  if (line) {
+    engine.pushActivity?.(line);
+    engine.toast?.(line, 2600);
+  }
+  engine.playSound?.('CLICK_SUCCESS', { volume: 0.45 });
+  engine.save?.();
+  publish(engine, reconcile(engine));
+  engine.updateHud?.();
+  engine.refreshPack?.();
+  return true;
+}
+
 export const bagsFeature = {
   id: BAGS_FEATURE_ID,
 
   init(engine) {
+    engineRef = engine || null;
     if (typeof globalThis === 'undefined') return;
     globalThis.groddlePack = {
       layout: () => layoutPack(engine.inv, slice.prefs, opts()),
@@ -774,9 +901,11 @@ export const bagsFeature = {
 
   packVerbs(classTsid, engine) {
     const cls = String(classTsid || '');
-    if (cls && isBagClass(cls) && engine?.inv && canRenameBag(cls)) {
+    if (cls && isBagClass(cls) && engine?.inv) {
+      const out = sortVerbs(engine, cls);
       // verbs.rename (sort_on 67): always enabled for a bag in the pack.
-      return [{ id: 'bags_rename', label: BAG_RENAME_COPY.label, enabled: true, reason: '', tooltip: BAG_RENAME_COPY.tooltip }];
+      if (canRenameBag(cls)) out.push({ id: 'bags_rename', label: BAG_RENAME_COPY.label, enabled: true, reason: '', tooltip: BAG_RENAME_COPY.tooltip });
+      return out.length ? out : null;
     }
     if (!cls || isBagClass(cls) || !engine?.inv) return null;
     const layout = layoutPack(engine.inv, slice.prefs, opts());
@@ -811,9 +940,12 @@ export const bagsFeature = {
       const layout = layoutPack(engine.inv, slice.prefs, opts());
       const key = bagKeyFor(layout, cls);
       if (!key) return false;
-      askBagName(layout.bags[key].name, (value) => applyBagName(engine, key, value));
+      // verbs.rename 515: the box shows user_name, a sort's name included.
+      const box = layout.bags[key];
+      askBagName(box.name || (box.sortNamed ? sortName(box.sort) : ''), (value) => applyBagName(engine, key, value));
       return true;
     }
+    if (/^bags_(sort:[a-z_]+|magic_sort|stack_up)$/.test(String(verbId || ''))) return runSortVerb(engine, String(classTsid || ''), String(verbId));
     const m = /^bags_(put|take):([a-zA-Z0-9_]+)$/.exec(String(verbId || ''));
     if (!m) return false;
     const layout = layoutPack(engine.inv, slice.prefs, opts());
