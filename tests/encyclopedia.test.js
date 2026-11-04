@@ -29,7 +29,8 @@ describe('encyclopedia', () => {
     for (const sec of BUILT_SECTIONS) {
       const want = [...d.entries.values()].filter((e) => e.section === sec).map((e) => e.id).sort();
       assert.ok(want.length > 10, `${sec}: only ${want.length}`);
-      const have = readdirSync(join(dir, sec), { withFileTypes: true }).filter((x) => x.isDirectory()).map((x) => x.name).sort();
+      // Music and sounds keeps its Still missing list beside the entries.
+      const have = readdirSync(join(dir, sec), { withFileTypes: true }).filter((x) => x.isDirectory() && !(sec === 'sounds' && x.name === 'still-missing')).map((x) => x.name).sort();
       assert.deepEqual(have, want, sec);
     }
     for (const name of readdirSync(dir, { withFileTypes: true }).filter((x) => x.isDirectory()).map((x) => x.name)) {
@@ -85,7 +86,7 @@ describe('encyclopedia', () => {
     for (const file of files) {
       const html = read(file);
       for (const [, href] of html.matchAll(/ (?:href|src|data-icon)="([^"]+)"/g)) {
-        if (/^https?:/.test(href) || servedByMinn(href)) continue;
+        if (/^(?:https?|mailto):/.test(href) || servedByMinn(href)) continue;
         const [path, hash] = href.replace(/\?[^#]*/, '').split('#');
         const target = resolve(pub, file, '..', path);
         const f = path.endsWith('/') || path === '' ? join(target, 'index.html') : target;
@@ -107,6 +108,7 @@ describe('encyclopedia', () => {
       skills: ['needs-skill', 'after'],
       achievements: ['counts', 'rewards'],
       places: ['lives'],
+      sounds: null, // every relation of a sound: its item, creature, person, quest and place pages list it
     };
     let checked = 0;
     const cache = new Map();
@@ -143,7 +145,7 @@ describe('encyclopedia', () => {
   });
 
   it('writes no em dashes in its own words', () => {
-    for (const f of ['tools/encyclopedia/build.mjs', 'tools/encyclopedia/data.mjs', 'tools/encyclopedia/parts.mjs', 'public/encyclopedia/encyclopedia.js', 'public/encyclopedia/items/combobox.js', 'docs/encyclopedia.md']) {
+    for (const f of ['tools/encyclopedia/build.mjs', 'tools/encyclopedia/data.mjs', 'tools/encyclopedia/parts.mjs', 'tools/encyclopedia/sounds.mjs', 'tools/sound/sound-model.mjs', 'public/encyclopedia/encyclopedia.js', 'public/encyclopedia/items/combobox.js', 'docs/encyclopedia.md']) {
       assert.ok(!readFileSync(join(spike, f), 'utf8').includes('—'), f);
     }
     assert.ok(!read('encyclopedia/index.html').includes('—'));

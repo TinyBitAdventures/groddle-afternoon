@@ -1,6 +1,6 @@
 /**
  * The Groddle Encyclopedia (docs/encyclopedia.md): quests, animals, people,
- * skills, places and achievements from Tiny Speck's game data, each with its
+ * skills, places, achievements and music and sounds from Tiny Speck's game data, each with its
  * status in the remake, cross-linked with each other and with the Item catalog
  * (the Items section, /encyclopedia/items/, written by tools/catalog/build.mjs,
  * which reads the same index; this build leaves that folder to it).
@@ -9,6 +9,7 @@
  *   public/encyclopedia/search.json                every entry (items included), for the search
  *   public/encyclopedia/<section>/index.html       a section's list, drawn in full
  *   public/encyclopedia/<section>/<id>/index.html  one page per entry
+ *   public/encyclopedia/sounds/still-missing/       every sound whose recording is still missing
  *
  *   node tools/encyclopedia/build.mjs          write the files
  *   node tools/encyclopedia/build.mjs --check  exit 1 if any file is stale (tests/encyclopedia.test.js)
@@ -22,7 +23,9 @@ import { fileURLToPath } from 'node:url';
 import { siteNav } from '../changelog/build.mjs';
 import { committedMap, keyAssetUrls, mapTags } from '../data-versions/build.mjs';
 import { keyOf as moduleKeyOf } from '../module-keys/build.mjs';
+import { EMAIL } from '../contribute/to-minn.mjs';
 import { GIANTS, PUB, SECTIONS, giantIcon, loadEncyclopedia, picture } from './data.mjs';
+import { SOUND_GROUPS } from './sounds.mjs';
 import { STATUS, andList, article, badge, esc, fmt, inRemake, makeParts, pathOf, plainText, sep, statusLabel, tsHtml } from './parts.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
@@ -124,6 +127,11 @@ const paras = (list) => list.map((x) => `<p>${x}</p>`).join('');
 
 /* -- Shared bits of entry pages --------------------------- */
 
+/** The sounds that link to an entry (tools/encyclopedia/sounds.mjs refs), as tiles. */
+function soundTiles(key, P, backOf, uniqBy, test = () => true) {
+  return uniqBy(backOf(key, (b) => b.from.startsWith('sounds:') && test(b)), (b) => b.from).map((b) => P.tile(b.from));
+}
+
 function entryHead(e, P, { kickerExtra = '', subline = '' } = {}) {
   const sec = SECTION[e.section];
   const pic = e.icon ? P.img(e.icon, 'cat-hero-icon', 144) : '<span class="cat-hero-icon cat-ph" aria-hidden="true"></span>';
@@ -200,15 +208,19 @@ export async function buildEncyclopedia(data = null) {
       const p = '../../../';
       const P = makeParts(p, info, d.nameOf);
       const linkFor = (id) => { const k = d.keyOf(id); return k ? P.href(k) : null; };
-      const page = { quests: questPage, animals: creaturePage, people: creaturePage, skills: skillPage, places: placePage, achievements: achievementPage }[sec.key];
+      const page = { quests: questPage, animals: creaturePage, people: creaturePage, skills: skillPage, places: placePage, achievements: achievementPage, sounds: soundPage }[sec.key];
       // Bands alternate plain and tinted in the order they appear, whichever ones the entry has.
       let band = 0;
       const body = (page(e, P, { linkFor, backOf, uniqBy, info, d }) + pager(list, i, sec.label))
         .replace(/<(section|nav) class="band(?: band-alt)?/g, (m, tag) => `<${tag} class="band${band++ % 2 ? ' band-alt' : ''}`);
-      const desc = plainText(e.quest?.desc || e.creature?.desc || e.skill?.description || e.ach?.desc || e.desc || '').slice(0, 150);
-      put(`${OUT}/${sec.key}/${e.id}/index.html`, shell({ p, title: `${e.name} · Groddle Encyclopedia`, description: `${desc ? `${desc} ` : ''}${statusLabel(e.status)}.`, body }));
+      const desc = plainText(e.quest?.desc || e.creature?.desc || e.skill?.description || e.ach?.desc || e.desc || e.sound?.moment || '').slice(0, 150);
+      // A sound's page loads the encyclopedia's script for its synth stand-in and its players.
+      put(`${OUT}/${sec.key}/${e.id}/index.html`, shell({ p, title: `${e.name} · Groddle Encyclopedia`, description: `${desc ? `${desc} ` : ''}${statusLabel(e.status)}.`, body, script: sec.key === 'sounds' }));
     });
-    put(`${OUT}/${sec.key}/index.html`, sectionIndex(sec, list, info, d.nameOf));
+    if (sec.key === 'sounds') {
+      put(`${OUT}/sounds/index.html`, soundsIndex(sec, list, info, d.nameOf));
+      put(`${OUT}/sounds/${STILL_MISSING}/index.html`, stillMissingPage(list, info, d.nameOf));
+    } else put(`${OUT}/${sec.key}/index.html`, sectionIndex(sec, list, info, d.nameOf));
   }
 
   // Search: every entry, items included.
@@ -327,7 +339,7 @@ function questPage(e, P, { linkFor, backOf, uniqBy, info, d }) {
   <main>${band('how-h', 'How to get this quest', `<ul class="cat-list">${how.map((h) => `<li>${h}</li>`).join('')}</ul>\n        ${P.tiles(howTiles)}`)}
 ${band('steps-h', 'Steps', `<ol class="ency-steps">${steps.join('\n          ')}</ol>${where.length ? `\n        ${sub('Where to go', `<ul class="cat-list">${where.map((w) => `<li>${w}</li>`).join('')}</ul>${P.tiles(whereTiles)}`)}` : ''}`, { alt: true, lead: 'Each step in Tiny Speck’s words, with what it needs.' })}
 ${band('rewards-h', 'Rewards', `${P.chips(rewards)}${P.tiles(rewardTiles)}` || '', {})}
-${band('rel-h', 'Linked to this quest', [sub('Comes next', P.tiles(leads)), sub('Things it involves', P.tiles(involved))].filter(Boolean).join('\n        '), { alt: true })}
+${band('rel-h', 'Linked to this quest', [sub('Comes next', P.tiles(leads)), sub('Things it involves', P.tiles(involved)), sub('Sounds', P.tiles(soundTiles(e.key, P, backOf, uniqBy)))].filter(Boolean).join('\n        '), { alt: true })}
 ${band('words-h', 'In Tiny Speck’s words', `${words}\n        <p class="cat-source">From Tiny Speck’s game code.</p>`)}
 ${remakeBand(e, solo)}
   </main>`;
@@ -374,7 +386,7 @@ function creaturePage(e, P, { linkFor, backOf, uniqBy, info, d }) {
 ${band('give-h', e.store ? 'What they sell' : 'What it gives', [sells.length ? P.tiles(sells, 'ency-shop') : '', gives.length ? (e.store ? sub('Also gives', P.tiles(gives)) : P.tiles(gives)) : ''].filter(Boolean).join('\n        '), { alt: true, lead: e.store ? 'Prices in currants, as the remake sells them.' : 'The items its game code hands out.' })}
 ${band('verbs-h', 'What you can do', [verbList(c?.verbs || []), sub('Skills that change it', P.tiles(skills))].filter(Boolean).join('\n        '), { lead: c?.verbs?.length ? 'Its verbs, with Tiny Speck’s tooltips.' : '' })}
 ${band('where-h', 'Where to find it', placeChips.length ? `<p class="ency-lead-small">On ${fmt(totalStreets)} street${totalStreets === 1 ? '' : 's'} in ${fmt(lives.length)} region${lives.length === 1 ? '' : 's'}, by the 2012 map and the streets’ own files.</p>${P.chips(placeChips)}` : '', { alt: true })}
-${band('rel-h', 'Quests and achievements', [sub('Quests', P.tiles(quests)), sub('Achievements', P.tiles(achs)), sub('Where it comes from', P.tiles(comesFrom)), sub('Skills this Giant favors', P.tiles(giantSkills)), sub('Other shrines to this Giant', P.tiles(variants))].filter(Boolean).join('\n        '))}
+${band('rel-h', 'Quests and achievements', [sub('Quests', P.tiles(quests)), sub('Achievements', P.tiles(achs)), sub('Sounds', P.tiles(soundTiles(e.key, P, backOf, uniqBy))), sub('Where it comes from', P.tiles(comesFrom)), sub('Skills this Giant favors', P.tiles(giantSkills)), sub('Other shrines to this Giant', P.tiles(variants))].filter(Boolean).join('\n        '))}
 ${remakeBand(e)}
   </main>`;
 }
@@ -413,7 +425,7 @@ ${remakeBand(e)}
 
 /* -- Places ------------------------------------------------ */
 
-function placePage(e, P, { info, d }) {
+function placePage(e, P, { info, d, backOf, uniqBy }) {
   const lives = e.refs.filter((r) => r.rel === 'lives').sort((a, b) => b.streets - a.streets || b.n - a.n);
   const who = lives.filter((r) => !r.to.startsWith('item:')).map((r) => P.tile(r.to, { sub: `on ${fmt(r.streets)} street${r.streets === 1 ? '' : 's'}` }));
   const things = lives.filter((r) => r.to.startsWith('item:')).map((r) => P.tile(r.to, { n: null, sub: `${fmt(r.n)} in all` }));
@@ -423,6 +435,7 @@ function placePage(e, P, { info, d }) {
     if (st.store) { const k = storeKey(st.store); chips.push(P.chip(esc(`${st.store} vendor`), { pic: info('item:street_spirit')?.icon, link: k ? P.href(k) : null })); }
     if (st.shrine) chips.push(P.chip(esc(`Shrine to ${GIANTS[st.shrine] || st.shrine}`), { pic: picture(giantIcon(st.shrine)), link: info(`people:npc_shrine_${st.shrine}`) ? P.href(`people:npc_shrine_${st.shrine}`) : null }));
     if (st.subway) chips.push(P.chip('Subway station'));
+    for (const b of uniqBy(backOf(e.key, (x) => x.rel === 'street-music' && x.anchor === st.tsid), (x) => x.from)) chips.push(P.chip(`Music: ${esc(info(b.from).name)}`, { pic: info(b.from).icon, link: P.href(b.from) }));
     for (const [id, n] of Object.entries(st.counts).sort((a, b) => b[1] - a[1])) {
       if (id === 'street_spirit' || id === 'garden') continue;
       const k = d.keyOf(id);
@@ -435,7 +448,8 @@ function placePage(e, P, { info, d }) {
   return `${entryHead(e, P, { subline: esc(`Region on the map · ${fmt(e.streets.length)} streets, ${fmt(inCount)} in the remake`) })}
   <main>
 ${band('who-h', 'Who and what lives here', [P.tiles(who), sub('Trees, rocks and more', P.tiles(things))].filter(Boolean).join('\n        '), { lead: 'Counts from the streets’ own files.' })}
-${band('streets-h', 'Streets', `<ul class="ency-streets">${streets.join('\n          ')}</ul>`, { alt: true, lead: 'As the 2012 map named them, with each street’s vendor, shrine, animals, trees and rocks.' })}
+${band('streets-h', 'Streets', `<ul class="ency-streets">${streets.join('\n          ')}</ul>`, { alt: true, lead: 'As the 2012 map named them, with each street’s vendor, shrine, animals, trees, rocks and music of its own.' })}
+${band('music-h', 'Music and sounds', [sub('Region music', P.tiles(soundTiles(e.key, P, backOf, uniqBy, (b) => b.rel === 'region-music'))), sub('Street music', P.tiles(soundTiles(e.key, P, backOf, uniqBy, (b) => b.rel === 'street-music'))), sub('Sounds on its streets', P.tiles(soundTiles(e.key, P, backOf, uniqBy, (b) => b.rel === 'plays-in')))].filter(Boolean).join('\n        '), { lead: 'The music the remake plays here, and the sounds of its streets.' })}
 ${remakeBand(e)}
   </main>`;
 }
@@ -471,9 +485,231 @@ ${remakeBand(e)}
   </main>`;
 }
 
+/* -- Music and sounds ------------------------------------------- */
+
+const STILL_MISSING = 'still-missing';
+/** A sound of the original whose recording is still missing (the Still missing page and its counts). */
+export const stillMissing = (e) => e.section === 'sounds' && !e.sound.remakeOnly && !e.sound.original && e.status !== 'snd_silent';
+const SOUND_LICENCE = 'Every recording here is Tiny Speck’s own: the sounds as their game played them, and the music they published for everyone to download. A synth stand-in is a short tone the remake makes itself.';
+const SOUND_MEANS = {
+  snd_original: 'Tiny Speck’s own recording plays.',
+  snd_standin: 'Another recording plays in its place.',
+  snd_synth: 'A short tone the remake makes itself plays in its place.',
+  snd_silent: 'Nothing plays, as in the original.',
+  snd_missing: 'Nothing plays yet, and the original recording is still missing.',
+};
+const SOUND_STATUSES = Object.keys(SOUND_MEANS);
+const askBox = (p) => `<div class="snd-ask"><p>Have this sound? Email <a href="mailto:${EMAIL}">${EMAIL}</a>.</p><p>The <a href="${p}contribute/">Contribute</a> page says what else helps.</p></div>`;
+const stop = (s) => (/[.!?]$/.test(s) ? s : `${s}.`);
+let synthUrl = null;
+/** The synth module's keyed address, for the stand-in's Play button (encyclopedia.js imports it on the first press). */
+const synthModule = () => (synthUrl ||= `js/synth-sfx.js?v=${moduleKeyOf('js/synth-sfx.js', root)}`);
+
+/** How a sound's stand-in recording is named: the sound it belongs to, a downloads-page title, or its name. */
+function standinWords(f, P, info) {
+  if (f.key) {
+    const k = `sounds:${f.key.toLowerCase()}`;
+    return `the ${info(k) ? `<a href="${P.href(k)}">${esc(info(k).name)}</a>` : esc(f.key)} recording`;
+  }
+  return f.downloads ? `“${esc(f.title)}” from Tiny Speck’s downloads page` : `“${esc(f.title)}”`;
+}
+
+/** The players for what plays now: one per recording, or the synth stand-in's button. */
+function soundPlayers(e, p, info) {
+  const s = e.sound;
+  if (s.recipe) return `<ul class="snd-players"><li class="snd-player"><button type="button" class="snd-synth" data-synth="${esc(s.recipe)}" data-synth-module="${p}${synthModule()}" hidden>Play the synth stand-in</button></li></ul>`;
+  if (!s.files.length) return '';
+  const label = (f) => {
+    const owner = s.standins.find((x) => x.file === f);
+    if (owner?.key && info(`sounds:${owner.key.toLowerCase()}`)) return info(`sounds:${owner.key.toLowerCase()}`).name;
+    if (owner?.title) return owner.title;
+    return e.name;
+  };
+  return `<ul class="snd-players">${s.files.map((f) => `<li class="snd-player"><span class="snd-player-name">${esc(label(f))}</span> <audio controls preload="none" src="${p}${esc(f)}"></audio></li>`).join('')}</ul>`;
+}
+
+/** Where a sound plays, in a few words (the Still missing list). */
+function soundFor(e, info) {
+  const s = e.sound;
+  if (s.moment) return s.moment;
+  const parts = [
+    ...s.where.things.map((t) => (t.key ? info(t.key)?.name : t.name)).filter(Boolean),
+    ...s.where.streets.map((x) => x.name),
+    ...s.where.systems,
+    ...s.themeWords.map((w) => `${w} music`),
+  ];
+  const uniq = [...new Set(parts)];
+  if (uniq.length) return andList(uniq.slice(0, 4)) + (uniq.length > 4 ? ` and ${fmt(uniq.length - 4)} more` : '');
+  return ['region', 'street', 'event', 'musicblock'].includes(e.groupKey) ? 'Music' : '';
+}
+
+function soundPage(e, P, { info, d }) {
+  const p = '../../../';
+  const s = e.sound;
+  const link = (key) => (info(key) ? `<a href="${P.href(key)}">${esc(info(key).name)}</a>` : esc(d.nameOf(key) || key));
+  // One stand-in by name; a set of them (a music set the remake picks one of) as the players below.
+  const standins = s.standins.length === 1 ? standinWords(s.standins[0], P, info) : 'one of these recordings';
+  const NOW = {
+    snd_original: s.remakeOnly ? 'New in the remake, it plays one of Tiny Speck’s own recordings.' : 'The remake plays Tiny Speck’s own recording.',
+    snd_standin: s.remakeOnly ? `New in the remake, it borrows ${standins}.` : `The original recording is still missing, so the remake plays ${standins} in its place.`,
+    snd_synth: s.remakeOnly ? 'New in the remake: a short tone the remake makes itself.' : 'The original recording is still missing, so the remake plays a short tone it makes itself.',
+    snd_silent: s.dead ? 'Silent, as in the original: Tiny Speck’s final game no longer played this sound.' : 'Silent, as in the original: the street is meant to be quiet.',
+    snd_missing: 'Nothing plays yet: the original recording is still missing, and the remake has no stand-in for it.',
+  };
+  const now = `<p class="cat-status-text">${NOW[e.status]}</p>${soundPlayers(e, p, info)}`;
+
+  const orig = [];
+  if (s.moment) orig.push(`<p class="cat-desc">${esc(stop(s.moment))}</p>`);
+  if (s.themeWords.length) orig.push(`<p>Part of the ${andList(s.themeWords.map(esc))} music.</p>`);
+  if (s.remakeOnly) orig.push('<p>The original game had no sound here. This one is new in the remake, so nothing is missing.</p>');
+  else if (s.original) {
+    const from = s.original.from ? `, from ${esc(s.original.from)}${s.original.bestFit ? ', the closest match by name' : ''}` : '';
+    orig.push(`<p>The original recording: ${s.original.name ? `<strong>${esc(s.original.name)}</strong>` : 'Tiny Speck’s own'}${from}.</p>`);
+    if (s.original.shared) orig.push(`<p>It is the same recording as ${link(`sounds:${s.original.shared.toLowerCase()}`)}.</p>`);
+  } else if (s.dead) orig.push('<p>Tiny Speck’s code still names this sound, but the line that played it was switched off before the game closed.</p>');
+  else if (e.status === 'snd_silent') orig.push('<p>Tiny Speck’s streets name it for a street that plays no music.</p>');
+  else {
+    orig.push(`<p>The original recording has not been found yet. ${s.lostName ? `Tiny Speck’s file was called <strong class="snd-miss-file">${esc(s.lostName)}</strong>.` : 'Its file name is not known.'}</p>${askBox(p)}`);
+  }
+  orig.push(`<p class="cat-source">${SOUND_LICENCE}</p>`);
+
+  // Where it plays.
+  const plainTile = (name) => `<li><span class="ency-tile ency-tile-plain"><span class="ency-tile-pic">${P.img(null)}</span> <span class="ency-tile-name">${esc(name)}</span></span></li>`;
+  const things = s.where.things.map((t) => (t.key && info(t.key) ? P.tile(t.key) : plainTile(t.key ? d.nameOf(t.key) || t.key : t.name)));
+  const streetChip = (st) => P.chip(`${esc(st.name)}${st.place && info(st.place) ? `, ${esc(info(st.place).name)}` : ''}`, { link: st.place && info(st.place) ? `${P.href(st.place)}#${esc(st.anchor)}` : null, cls: 'ency-place' });
+  const loops = s.where.streets.filter((x) => x.music).map(streetChip);
+  const plays = s.where.streets.filter((x) => !x.music).map(streetChip);
+  const regions = e.refs.filter((r) => r.rel === 'region-music').map((r) => P.chip(esc(info(r.to).name), { pic: info(r.to).icon, link: P.href(r.to), cls: 'ency-place' }));
+  const region = s.region ? d.sounds.regions.find((r) => r.id === s.region.id) : null;
+  const where = [
+    regions.length ? sub('Regions', `<p class="ency-lead-small">The remake plays ${region.tracks > 1 ? `the ${esc(region.label)} set` : 'it'} in ${regions.length === 1 ? 'this region' : `these ${fmt(regions.length)} regions`}${region.tracks > 1 ? ', one track after another' : ''}${region.others.length ? `; ${region.others.length === regions.length ? 'they are' : 'some are'} the regions with no set of their own` : ''}.</p>${P.chips(regions)}`) : '',
+    loops.length ? sub('Streets it loops on', P.chips(loops)) : '',
+    things.length ? sub('Things that play it', P.tiles(things)) : '',
+    plays.length ? sub('Streets it plays on', P.chips(plays)) : '',
+    s.where.systems.length ? sub('In the game', P.chips(s.where.systems.map((w) => P.chip(esc(w))))) : '',
+  ].filter(Boolean).join('\n        ');
+  const whereBody = where || `<p class="cat-muted">${s.remakeOnly ? 'The remake plays it at the moment above.' : 'Tiny Speck’s game lists it, but nothing that survives says where it played.'}</p>`;
+  return `${entryHead(e, P, { subline: `Sound key <span class="ency-key">${esc(s.key)}</span>` })}
+  <main>
+${band('now-h', 'What plays now', now)}
+${band('orig-h', s.remakeOnly ? 'About this sound' : 'In Tiny Speck’s game', orig.join('\n        '), { alt: true })}
+${band('where-h', 'Where it plays', whereBody)}
+  </main>`;
+}
+
+/** The section's counts, from the entries: the sounds of the original by status, and those new in the remake. */
+export function soundCounts(list) {
+  const orig = list.filter((e) => !e.sound.remakeOnly);
+  const miss = orig.filter(stillMissing);
+  const n = (l, st) => l.filter((e) => e.status === st).length;
+  return {
+    all: list.length, total: orig.length, original: n(orig, 'snd_original'), silent: n(orig, 'snd_silent'),
+    still: miss.length, stillStandin: n(miss, 'snd_standin'), stillSynth: n(miss, 'snd_synth'), stillNothing: n(miss, 'snd_missing'),
+    back: orig.filter((e) => e.sound.original && e.status !== 'snd_original').length, remake: list.length - orig.length,
+    byStatus: Object.fromEntries(SOUND_STATUSES.map((st) => [st, n(list, st)])),
+  };
+}
+const plural = (n, one, many) => `${fmt(n)} ${n === 1 ? one : many}`;
+const stillWords = (c) => `${plural(c.stillStandin, 'plays', 'play')} a stand-in recording for now, ${fmt(c.stillSynth)} a synth stand-in, and ${plural(c.stillNothing, 'plays', 'play')} nothing yet`;
+
+function soundsIndex(sec, list, info, nameOf) {
+  const p = '../../';
+  const P = makeParts(p, info, nameOf);
+  const c = soundCounts(list);
+  const groups = SOUND_GROUPS.map((g) => ({ ...g, list: list.filter((e) => e.groupKey === g.key) })).filter((g) => g.list.length);
+  const tile = (e) => P.tile(e.key, { sub: `<span class="cat-st st-${esc(e.status)}">${esc(statusLabel(e.status))}</span>` })
+    .replace('<li>', `<li data-name="${esc(`${e.name} ${e.sound.key}`.toLowerCase())}" data-status="${esc(e.status)}">`);
+  const groupHtml = groups.map((g) => {
+    let inner;
+    if (g.key === 'region') {
+      const sets = [...new Set(g.list.map((e) => e.sound.region.id))];
+      inner = sets.map((id) => {
+        const tracks = g.list.filter((e) => e.sound.region.id === id).sort((a, b) => a.sound.region.n - b.sound.region.n);
+        const places = tracks[0].refs.filter((r) => r.rel === 'region-music' && info(r.to)).map((r) => P.chip(esc(info(r.to).name), { link: P.href(r.to), cls: 'ency-place' }));
+        const label = tracks[0].name.replace(/ track \d+$/, '');
+        return `<div class="snd-sub"><h3>${esc(label)} <span class="count">${fmt(tracks.length)}</span></h3>${P.chips(places)}${P.tiles(tracks.map(tile), 'ency-grid')}</div>`;
+      }).join('\n        ');
+    } else inner = P.tiles(g.list.map(tile), 'ency-grid');
+    return `<section class="ency-group" id="g-${esc(g.key)}" aria-label="${esc(g.label)}" data-group="${esc(g.label)}"><h2>${esc(g.label)} <span class="count">${fmt(g.list.length)}</span></h2><p class="snd-blurb">${esc(g.blurb)}</p>${inner}</section>`;
+  }).join('\n      ');
+  const chips = SOUND_STATUSES.map((st) => `<li><a class="chip" href="#st-${st}" data-st="${st}"><span class="dot st-${st}" aria-hidden="true"></span><span>${esc(statusLabel(st))}</span> <span class="count">${fmt(c.byStatus[st])}</span></a></li>`).join('');
+  const byStatus = SOUND_STATUSES.filter((st) => c.byStatus[st]).map((st) => `<h3 id="st-${st}"><span class="dot st-${st}" aria-hidden="true"></span> ${esc(statusLabel(st))} <span class="count">${fmt(c.byStatus[st])}</span></h3>
+        <p class="snd-blurb">${esc(SOUND_MEANS[st])}</p>
+        <ul class="snd-names">${list.filter((e) => e.status === st).map((e) => `<li><a href="${e.id}/">${esc(e.name)}</a></li>`).join('')}</ul>`).join('\n        ');
+  const body = `
+  <header class="masthead note-head cat-head">
+    <div class="wrap">
+      <p class="kicker"><a href="../">Groddle Encyclopedia</a> · ${esc(sec.label)}</p>
+      <h1>${esc(sec.label)}</h1>
+      <p class="lead">Every tune and sound Tiny Speck’s game played, what the remake plays for it today, and where it plays. If you are here to help, the <a href="${STILL_MISSING}/">Still missing</a> list shows what we are still looking for.</p>
+      <p class="cat-score"><strong>${fmt(c.original)}</strong> of ${fmt(c.total)} sounds and tunes from the original game play Tiny Speck’s own recording.</p>
+      <p class="cat-note">${fmt(c.still)} are still missing their recording: ${stillWords(c)}. ${c.back ? `${plural(c.back, 'has', 'have')} its recording back but ${c.back === 1 ? 'plays' : 'play'} another for now. ` : ''}${plural(c.silent, 'is', 'are')} silent, as in the original. ${plural(c.remake, 'more is', 'more are')} new in the remake.</p>
+      <ul class="snd-status" role="group" aria-label="Status">${chips}</ul>
+    </div>
+  </header>
+
+  <main class="band cat-main">
+    <div class="wrap">
+      <div class="cat-tools">
+        <label class="history-search cat-search" for="q">
+          <span class="visually-hidden">Filter music and sounds</span>
+          <input id="q" type="search" placeholder="Filter by name or sound key" autocomplete="off" spellcheck="false" data-filter />
+        </label>
+        <div class="cat-selects">
+          <label><span>Group</span>
+            <select id="grp" data-group>
+              <option value="">All groups</option>
+${groups.map((g) => `              <option value="${esc(g.label)}">${esc(g.label)} (${fmt(g.list.length)})</option>`).join('\n')}
+            </select>
+          </label>
+        </div>
+      </div>
+      <ul class="snd-jump" aria-label="Groups">${groups.map((g) => `<li><a href="#g-${esc(g.key)}">${esc(g.label)}</a></li>`).join(' ')}</ul>
+      <p class="cat-count" id="count" aria-live="polite">${fmt(list.length)} sounds</p>
+      ${groupHtml}
+      <section class="snd-by-status" id="by-status" aria-labelledby="by-status-h">
+        <h2 id="by-status-h">By status</h2>
+        ${byStatus}
+      </section>
+      <p class="cat-source">${SOUND_LICENCE}</p>
+    </div>
+  </main>
+`;
+  return shell({ p, title: `${sec.label} · Groddle Encyclopedia`, description: `${sec.blurb} ${c.original} of ${c.total} play Tiny Speck’s own recording in the Groddle Afternoon remake.`, body, script: true });
+}
+
+function stillMissingPage(list, info, nameOf) {
+  const p = '../../../';
+  const P = makeParts(p, info, nameOf);
+  const c = soundCounts(list);
+  const miss = list.filter(stillMissing);
+  const groups = SOUND_GROUPS.map((g) => ({ ...g, list: miss.filter((e) => e.groupKey === g.key) })).filter((g) => g.list.length);
+  const row = (e) => `<li id="${esc(e.id)}"><span class="snd-miss-name"><a href="${P.href(e.key)}">${esc(e.name)}</a> <span class="ency-key">${esc(e.sound.key)}</span></span> <span class="snd-miss-file">${e.sound.lostName ? esc(e.sound.lostName) : 'file name not known'}</span> <span class="snd-miss-for">${esc(soundFor(e, info))}</span> <span class="cat-st st-${esc(e.status)}">${esc(statusLabel(e.status))}</span></li>`;
+  const body = `
+  <header class="masthead note-head cat-head">
+    <div class="wrap">
+      <p class="kicker"><a href="../../">Groddle Encyclopedia</a> · <a href="../">Music and sounds</a> · Still missing</p>
+      <h1>Still missing</h1>
+      <p class="lead">${fmt(c.still)} sounds and tunes from the original game are still missing their recording: ${stillWords(c)}. If you kept any of them, from the game, its website or anywhere else, they would help.</p>
+      ${askBox(p)}
+    </div>
+  </header>
+
+  <main class="band cat-main">
+    <div class="wrap">
+      <p class="ency-lead-small">Each one with the name of Tiny Speck’s file, where it is known, what it was for, and what the remake plays for now.</p>
+      ${groups.map((g) => `<section class="ency-group" id="g-${esc(g.key)}" aria-label="${esc(g.label)}"><h2>${esc(g.label)} <span class="count">${fmt(g.list.length)}</span></h2><ul class="snd-miss">${g.list.map(row).join('')}</ul></section>`).join('\n      ')}
+      ${askBox(p)}
+      <p class="cat-source">${SOUND_LICENCE}</p>
+    </div>
+  </main>
+`;
+  return shell({ p, title: 'Still missing · Music and sounds · Groddle Encyclopedia', description: `${c.still} sounds and tunes from Tiny Speck’s game whose recordings are still missing. Have one? Email ${EMAIL}.`, body, script: true });
+}
+
 /* -- Indexes -------------------------------------------------- */
 
-const GROUP_WORD = { quests: 'Kind', animals: 'Kind', people: 'Kind', skills: 'Category', places: 'Kind', achievements: 'Category' };
+const GROUP_WORD = { quests: 'Kind', animals: 'Kind', people: 'Kind', skills: 'Category', places: 'Kind', achievements: 'Category', sounds: 'Group' };
 
 function sectionIndex(sec, list, info, nameOf) {
   const p = '../../';
@@ -522,18 +758,23 @@ function homePage(bySection, items, info, nameOf) {
   const p = '../';
   const P = makeParts(p, info, nameOf);
   const itemsIn = [...items.values()].filter((i) => inRemake(i.status)).length;
-  const sample = { quests: 'quests:animalkinship_nibble_meat', animals: 'animals:npc_piggy', people: 'people:street_spirit', skills: 'skills:animalkinship_1', places: 'places:groddle-meadow', achievements: 'achievements:bacon_biter' };
+  const sample = { quests: 'quests:animalkinship_nibble_meat', animals: 'animals:npc_piggy', people: 'people:street_spirit', skills: 'skills:animalkinship_1', places: 'places:groddle-meadow', achievements: 'achievements:bacon_biter', sounds: 'sounds:musicblock_d_green_01' };
+  const blurbOf = (s) => {
+    if (s.key !== 'sounds') return s.blurb;
+    const c = soundCounts(bySection.sounds);
+    return `${s.blurb} ${fmt(c.original)} of ${fmt(c.total)} play Tiny Speck’s own recording.`;
+  };
   const card = (href, label, n, blurb, pic) => `<li><a class="ency-card" href="${href}">${P.img(pic, 'ency-card-ic', 64)}<span class="ency-card-text"><span class="ency-card-name">${esc(label)} <span class="count">${fmt(n)}</span>${sep('.')}</span> <span class="ency-card-blurb">${esc(blurb)}</span></span></a></li>`;
   const cards = [
     card('items/', 'Items', items.size, `Every item, how to get it and what it is for. ${fmt(itemsIn)} are in the remake.`, info('item:apple')?.icon),
-    ...SECTIONS.map((s) => card(`${s.key}/`, s.label, bySection[s.key].length, s.blurb, info(sample[s.key])?.icon || bySection[s.key][0]?.icon)),
+    ...SECTIONS.map((s) => card(`${s.key}/`, s.label, bySection[s.key].length, blurbOf(s), info(sample[s.key])?.icon || bySection[s.key][0]?.icon)),
   ];
   const body = `
   <header class="masthead note-head cat-head">
     <div class="wrap">
       <p class="kicker">Groddle Field Notes · Encyclopedia</p>
       <h1>Groddle Encyclopedia</h1>
-      <p class="lead">Stuck on a quest? Look up the quest, the creature, the person or the place: how to get it, every step, and where to go. Everything here comes from Tiny Speck’s own game code, with what the remake has today.</p>
+      <p class="lead">Stuck on a quest? Look up the quest, the creature, the person or the place: how to get it, every step, and where to go. Everything here comes from Tiny Speck’s own game code, with what the remake has today, down to every tune and sound.</p>
       <label class="history-search cat-search ency-search" for="q">
         <span class="visually-hidden">Search the encyclopedia</span>
         <input id="q" type="search" placeholder="Search, e.g. rasher, piggy, alchemy, Groddle Meadow" autocomplete="off" spellcheck="false" data-search="search.json" />
@@ -552,7 +793,7 @@ function homePage(bySection, items, info, nameOf) {
     </div>
   </main>
 `;
-  return shell({ p, title: 'Groddle Encyclopedia', description: 'Quests, animals, people, skills, places, achievements and items from Tiny Speck’s game, with how to get each one and its status in the Groddle Afternoon remake.', body, script: true });
+  return shell({ p, title: 'Groddle Encyclopedia', description: 'Quests, animals, people, skills, places, achievements, music and sounds, and items from Tiny Speck’s game, with how to get each one and its status in the Groddle Afternoon remake.', body, script: true });
 }
 
 /* -- Write / check ------------------------------------------ */

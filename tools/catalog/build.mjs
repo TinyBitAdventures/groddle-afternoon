@@ -965,11 +965,14 @@ ${usesHtml.length ? `          <ul class="cat-list">
   const placeChips = fromAll((b) => b.from.startsWith('places:') && b.rel === 'lives').sort((a, b) => b.n - a.n)
     .map((b) => P.chip(`${esc(ency.entries.get(b.from).name)} <b>${fmt(b.n)}</b>`, { link: P.href(b.from), cls: 'ency-place' }));
   const achTiles = fromAll((b) => b.from.startsWith('achievements:')).map((b) => P.tile(b.from, { sub: b.n > 1 ? `${fmt(b.n)} times` : '' }));
+  // Music and sounds (tools/encyclopedia/sounds.mjs): the sounds Tiny Speck's game played from this item.
+  const soundTiles = fromAll((b) => b.from.startsWith('sounds:')).map((b) => P.tile(b.from));
   const encyBody = [
     questTiles.length ? `<h3>Quests</h3>\n        ${P.tiles(questTiles)}` : '',
     whoTiles.length ? `<h3>Creatures and people that give it</h3>\n        ${P.tiles(whoTiles)}` : '',
     placeChips.length ? `<h3>Where it is found</h3>\n        <p class="ency-lead-small">Regions on the map, with how many there are in each, from the streets’ own files.</p>\n        ${P.chips(placeChips)}` : '',
     achTiles.length ? `<h3>Achievements</h3>\n        ${P.tiles(achTiles)}` : '',
+    soundTiles.length ? `<h3>Sounds</h3>\n        ${P.tiles(soundTiles)}` : '',
   ].filter(Boolean).join('\n        ');
 
   const body = `

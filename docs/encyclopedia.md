@@ -23,6 +23,7 @@ Words about the remake are ours: plain, factual, no em dashes, never the
 | Skills | `/encyclopedia/skills/` | `/encyclopedia/skills/<skill id>/` | `inc_data_skills.js` class (`alchemy_1`) |
 | Places | `/encyclopedia/places/` | `/encyclopedia/places/<hub slug>/`, streets as `#<street tsid>` | `inc_data_maps_prod.js` hub, slug of its name |
 | Achievements | `/encyclopedia/achievements/` | `/encyclopedia/achievements/<id>/` | GSJS `achievements/<id>.js` |
+| Music and sounds | `/encyclopedia/sounds/`, the list `/encyclopedia/sounds/still-missing/` | `/encyclopedia/sounds/<key in lower case>/` | `assets/content/sound-keys.json` keys, street music keys and music set keys of `ambient-music.json` |
 
 The catalog moved from `/items/` into the encyclopedia on 2026-11-02 (Austin:
 "for consistency" with the other sections). The old addresses keep working:
@@ -115,6 +116,53 @@ A Grendelian Stone (people), quest_map (skills), and Storage Display Box,
 Classic Axe, Fireworks, Quoin Marker, Paper Plane and Token of Appreciation
 (items). Their old addresses 404 after a deploy (`kinsta.sh` rsyncs with
 `--delete`).
+
+## Music and sounds
+
+Austin, 2026-11-03: "a music/sound effects section ... a good way for
+contributors to see what we've managed to recover vs what is still missing
+from the original game." `tools/encyclopedia/sounds.mjs` adds one entry per
+sound key of the catalog (`build-sound-keys.mjs` writes it), per street
+music_file key and per key a music set names in `ambient-music.json`, read
+through `tools/sound/sound-model.mjs`, the model the sound compare report
+(`tools/sound/compare-report.mjs`) reads too: what Glitch played (the
+original, if it survives, and where it came from) and what the remake plays
+now. Nothing is copied by hand: rerun the builders after the catalog changes
+and every count follows.
+
+- **Status** (parts.mjs `snd_*`): Original (Tiny Speck's own recording, with
+  its file name and where it came from: the downloads page, the game's own
+  servers through web archives, Tiny Speck's sound sets on the Internet
+  Archive, a fan's copy of the server's sound folder, their animation files),
+  Stand-in (another recording plays: named and linked), Synth stand-in (a
+  recipe of `js/synth-sfx.js`, playable on the page), Silent (as in the
+  original: switched off before the game closed, or `NO_MUSIC`), Missing.
+  A street music key takes what its street plays; a key of a music set the
+  set's track in its place.
+- **Groups**: Region music (the hub sets, by set, with their regions), Street
+  music, Party and event music, Musicblocks, UI and the world, Creatures and
+  trees, Tools and verbs, Machines and making, Quests, games and puzzles,
+  Voices, New in the remake (moments the original had no sound for: never
+  missing).
+- **Index**: the headline counts the original's sounds only; status chips and
+  group links are anchors without JavaScript (the By status lists, the group
+  sections), and `encyclopedia.js` turns them into filters (`?st=`, `?g=`, `?q=`).
+- **Entry**: plain name from the key (the item's own name when a tool or a
+  Musicblock plays its class name), the key in small type for contributors,
+  what plays now with `preload="none"` players on the game's own files under
+  `assets/audio` (one at a time), the original's file name and source or the
+  lost file's name with the ask, and where it plays: items, creatures, people
+  and quests from the catalog's sources, streets and regions linked to Places
+  (`#<street tsid>`), and the parts of the game in player words. Places,
+  creatures, people, quests and item pages list their sounds back.
+- **Still missing**: every sound of the original with no recording found,
+  with Tiny Speck's file name where known, what it was for and what plays
+  now, and the ask (hello@groddleafternoon.com, the Contribute page).
+- **Words**: the catalog's moments only when they are player words
+  (`playerMoment`: no file names, street tsids or music_map rows); the
+  licence line says the recordings are Tiny Speck's own and the music what
+  they published for everyone to download, never public domain.
+  `tests/encyclopedia-sounds.test.js` holds the counts, the list and the words.
 
 ## Search
 

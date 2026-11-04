@@ -28,6 +28,7 @@ import { GSJS, INVENTORY_DB, readGsjsItem } from '../catalog/build.mjs';
 import { readSkills } from '../inventory/gsjs-data.mjs';
 import { supplyConversions } from '../job-obtainable.mjs';
 import { inRemake, plainText } from './parts.mjs';
+import { addSounds } from './sounds.mjs';
 
 const root = join(import.meta.dirname, '..', '..');
 export const PUB = join(root, 'public');
@@ -35,7 +36,7 @@ const content = (name) => JSON.parse(readFileSync(join(PUB, 'assets', 'content',
 const js = (name) => join(PUB, 'js', name);
 
 /** The sections built so far (docs/encyclopedia.md "Order of work"). */
-export const BUILT_SECTIONS = ['quests', 'animals', 'people', 'skills', 'places', 'achievements'];
+export const BUILT_SECTIONS = ['quests', 'animals', 'people', 'skills', 'places', 'achievements', 'sounds'];
 
 const ALL_SECTIONS = [
   { key: 'quests', label: 'Quests', one: 'quest', blurb: 'How to get each quest, every step, what it needs and what it gives.' },
@@ -44,6 +45,7 @@ const ALL_SECTIONS = [
   { key: 'skills', label: 'Skills', one: 'skill', blurb: 'What each skill needs, how long it takes and what it opens.' },
   { key: 'places', label: 'Places', one: 'region', blurb: 'Every region on the map, its streets and what lives on them.' },
   { key: 'achievements', label: 'Achievements', one: 'achievement', blurb: 'Every badge, what earns it and what it rewards.' },
+  { key: 'sounds', label: 'Music and sounds', one: 'sound', blurb: 'Every tune and sound of the original, what the remake plays for it, and what is still missing.' },
 ];
 export const SECTIONS = ALL_SECTIONS.filter((s) => BUILT_SECTIONS.includes(s.key));
 
@@ -394,7 +396,6 @@ export async function loadEncyclopedia({ inventory = readInventoryAll() } = {}) 
     else entries.delete(s.key);
   }
   for (const e of entries.values()) e.refs = e.refs.filter((r) => !stubs.has(r.to));
-  const back = backOf();
   // Skill trees: postSkills come back as needs-skill, so "unlocks" reads from back.
 
   // Store key (js/vendor.js profile, fox_ranger, bureaucracy) -> the entry that keeps it.
@@ -404,7 +405,11 @@ export async function loadEncyclopedia({ inventory = readInventoryAll() } = {}) 
   const stubKey = (id) => ['animals', 'people', 'item'].map((sec) => `${sec}:${id}`).find((k) => stubs.has(k)) || null;
   /** The name of any key, a left-out stub's included (for the plain text that replaces its links). */
   const nameOf = (key) => (key.startsWith('item:') ? items.get(key.slice(5))?.name : entries.get(key)?.name) || stubs.get(key)?.name || null;
-  return { entries, items, back, recipes, keyOf, skills, stores, stubs, stubKey, nameOf };
+  /* Music and sounds (tools/encyclopedia/sounds.mjs): added once the stubs are known, so a sound keeps none of them. */
+  const sounds = addSounds({ entries, items, keyOf, stubKey, nameOf }, { picture });
+  for (const s of sounds.stubs) stubs.set(s.key, s);
+  const back = backOf();
+  return { entries, items, back, recipes, keyOf, skills, stores, stubs, stubKey, nameOf, sounds };
 }
 
 /* -- Blank stubs ------------------------------------------- */

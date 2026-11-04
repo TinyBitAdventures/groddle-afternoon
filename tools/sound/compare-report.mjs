@@ -20,10 +20,10 @@
  * Rerun after any recovery: it reads only the catalog, the music config and git.
  */
 import { execFileSync } from 'node:child_process';
-import { copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
+import { copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { recipeForKey } from '../../public/js/synth-sfx.js?v=9853c8e7';
+import { GROUPS, keyState, loadSoundData, originalOf, streetMusicKeys, streetStatus, themeStatus } from './sound-model.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const args = Object.fromEntries(process.argv.slice(2).map((a) => a.replace(/^--/, '').split('=')).map(([k, v]) => [k, v ?? true]));
@@ -35,10 +35,7 @@ if (!OUT || OUT === true) {
 const BASE = args.base && args.base !== true ? String(args.base) : 'main';
 const AUDIO_BASE = args['audio-base'] && args['audio-base'] !== true ? String(args['audio-base']) : 'http://127.0.0.1:8797/';
 
-const now = {
-  keys: JSON.parse(readFileSync(join(root, 'public/assets/content/sound-keys.json'), 'utf8')).keys,
-  music: JSON.parse(readFileSync(join(root, 'public/assets/content/ambient-music.json'), 'utf8')),
-};
+const now = loadSoundData(root);
 const fromGit = (path) => {
   try {
     return JSON.parse(execFileSync('git', ['show', `${BASE}:${path}`], { cwd: root, encoding: 'utf8', maxBuffer: 1 << 28 }));
@@ -55,57 +52,6 @@ const zipMap = existsSync(join(root, 'tools/sound/sounds-zip-map.json'))
   : { files: [], held: [], aliases: {}, aliasDoubts: {} };
 const missingPath = join(root, '..', 'research/audio-hunt/missing-keys.json');
 const missing = existsSync(missingPath) ? JSON.parse(readFileSync(missingPath, 'utf8')) : {};
-
-const SOURCE = {
-  'wayback-c2': 'c2.glitch.bz via the Wayback Machine',
-  'sounds-zip': 'Sounds.zip (fan re-upload of the c2 files)',
-  'archiveorg-sfx': 'archive.org Glitch sets',
-  'overlay-fla': 'a CC0 overlay source (.fla)',
-  'slack-mirror': "Slack's mirror (archive.org slack_sfx)",
-  'downloads-best-fit': 'downloads page (best fit by name)',
-};
-const GROUPS = {
-  ui: 'UI sounds', animal: 'Creatures', tool: 'Tools and verbs', making: 'Making and machines', nature: 'Trees and nature',
-  item: 'Items', reward: 'Rewards', travel: 'Travel', event: 'Events and puzzles', music: 'Music keys', voice: 'Voices',
-  quoin: 'Quoins', powder: 'Powders', remake: 'Remake-only (no original)', recovered: 'Recovered c2 files without a key',
-  downloads: 'Downloads page',
-};
-
-/** What the catalog `keys` plays for `key`: { file, via, recipe }. */
-function resolve(keys, key) {
-  const row = keys[key];
-  if (!row) return { file: null, recipe: null };
-  if (row.file) return { file: row.file, via: key, origin: row.origin };
-  if (row.alias && keys[row.alias]?.file) return { file: keys[row.alias].file, via: row.alias, origin: keys[row.alias].origin };
-  return { file: null, recipe: recipeForKey(key, row.category) };
-}
-
-/** The original of a key, if it survives: { file, source, note } (an alias sharing its music_map url counts). */
-function originalOf(keys, key) {
-  const row = keys[key];
-  if (!row) return null;
-  if (row.file) {
-    const note = [row.fit && `best fit: ${row.fit}`, row.doubt].filter(Boolean).join('; ');
-    return { file: row.file, source: SOURCE[row.origin] || row.origin, origin: row.origin, note, zip: row.zipFile || '' };
-  }
-  const target = row.alias && keys[row.alias];
-  if (target?.file && row.url && target.url === row.url) {
-    return { file: target.file, source: `${SOURCE[target.origin] || target.origin} (same file as ${row.alias})`, origin: target.origin, note: row.doubt || '', zip: target.zipFile || '' };
-  }
-  return null;
-}
-
-function keyState(keys, key) {
-  const row = keys[key];
-  if (!row) return { status: 'absent', label: 'not catalogued', file: null };
-  const r = resolve(keys, key);
-  const orig = originalOf(keys, key);
-  if (row.dead) return { status: 'silent', label: 'nothing (dead in the final client)', file: null };
-  if (r.file && orig && orig.file === r.file) return { status: 'original', label: 'the original', file: r.file };
-  if (r.file) return { status: 'stand-in', label: `stand-in: ${r.via === key ? r.file.split('/').pop() : `${r.via}'s file`}`, file: r.file };
-  if (r.recipe) return { status: 'synth', label: `synth: ${r.recipe}`, file: null };
-  return { status: orig ? 'silent' : 'missing', label: 'nothing', file: null };
-}
 
 const rows = [];
 const verdictOf = new Map();
@@ -149,15 +95,6 @@ for (const key of Object.keys(now.keys).sort((a, b) => a.localeCompare(b))) {
 }
 
 // Music themes.
-const themeStatus = (music, keys, id) => {
-  const t = music.themes[id];
-  if (!t) return { status: 'absent', label: 'no such theme', tracks: [] };
-  const originals = (t.gsjsKeys || []).map((k) => originalOf(keys, k)?.file).filter(Boolean);
-  const tracks = t.tracks || [];
-  const own = tracks.filter((u) => originals.includes(u)).length;
-  const status = !tracks.length ? 'silent' : own === tracks.length ? 'original' : own ? 'mixed' : 'stand-in';
-  return { status, label: `${tracks.length} track${tracks.length === 1 ? '' : 's'}${t.order === 'library' ? ', played in order' : ', one looped per hub'}`, tracks };
-};
 for (const id of Object.keys(now.music.themes)) {
   const t = now.music.themes[id];
   const after = themeStatus(now.music, now.keys, id);
@@ -171,36 +108,11 @@ for (const id of Object.keys(now.music.themes)) {
 }
 
 // Street music_file keys, as streets name them.
-const streetsDir = join(root, 'public/assets/streets');
-const streetKeys = new Map();
-for (const name of readdirSync(streetsDir).filter((f) => /^G[A-Z0-9]+\.json$/.test(f))) {
-  let s;
-  try { s = JSON.parse(readFileSync(join(streetsDir, name), 'utf8')); } catch { continue; }
-  if (!s.musicFile) continue;
-  const e = streetKeys.get(s.musicFile) || { n: 0, example: `${s.label} (${s.tsid})`, hubId: s.hubId, hubName: s.hubName };
-  e.n += 1;
-  streetKeys.set(s.musicFile, e);
-}
-for (const k of Object.keys(now.music.streetMusic)) if (!streetKeys.has(k)) streetKeys.set(k, { n: 0, example: 'no imported street (feature or party)', hubId: null });
-const streetState = (music, key, hubId) => {
-  if (key === 'NO_MUSIC') return { status: 'silent', label: 'silence (NO_MUSIC)', tracks: [] };
-  const theme = music.streetMusic?.[key];
-  if (theme && music.themes[theme]) return { status: 'theme', label: `theme ${theme}`, tracks: music.themes[theme].tracks, theme };
-  const hubTheme = (hubId != null && music.hubMap[String(hubId)]) || music.defaultTheme;
-  return { status: 'hub', label: `the hub's music (${hubTheme})`, tracks: music.themes[hubTheme]?.tracks || [], theme: hubTheme };
-};
+const streetKeys = streetMusicKeys(now.music, root);
 for (const [key, e] of [...streetKeys].sort((a, b) => b[1].n - a[1].n)) {
   const orig = originalOf(now.keys, key);
-  const a = streetState(now.music, key, e.hubId);
-  const b = streetState(before.music, key, e.hubId);
-  const st = (s, keys) => {
-    const o = originalOf(keys, key);
-    if (s.status === 'silent') return { ...s, status: 'silent' };
-    if (o && s.tracks.length === 1 && s.tracks[0] === o.file) return { ...s, status: 'original' };
-    return { ...s, status: 'stand-in', label: `stand-in: ${s.label}` };
-  };
-  const after = st(a, now.keys);
-  const was = st(b, before.keys);
+  const after = streetStatus(now.music, now.keys, key, e.hubId);
+  const was = streetStatus(before.music, before.keys, key, e.hubId);
   rows.push({
     group: 'Street music keys', kind: 'street', id: key, moment: `${e.n} street${e.n === 1 ? '' : 's'}, e.g. ${e.example}`,
     original: orig ? { file: orig.file, source: orig.source, note: orig.note, zip: orig.zip } : null,

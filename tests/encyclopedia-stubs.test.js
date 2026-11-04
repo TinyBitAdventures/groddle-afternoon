@@ -89,12 +89,14 @@ describe('blank stubs', () => {
   it('keeps every count in step with the pages', { skip: skipWithoutInventory }, () => {
     const home = read('encyclopedia/index.html');
     const card = (label) => Number(new RegExp(`ency-card-name">${label} <span class="count">([\\d,]+)</span>`).exec(home)?.[1].replace(/,/g, ''));
-    const SECTION_LABEL = { quests: 'Quests', animals: 'Animals and creatures', people: 'People', skills: 'Skills', places: 'Places', achievements: 'Achievements' };
+    const SECTION_LABEL = { quests: 'Quests', animals: 'Animals and creatures', people: 'People', skills: 'Skills', places: 'Places', achievements: 'Achievements', sounds: 'Music and sounds' };
     for (const sec of BUILT_SECTIONS) {
-      const pages = readdirSync(join(pub, 'encyclopedia', sec), { withFileTypes: true }).filter((x) => x.isDirectory()).length;
+      // Music and sounds keeps its Still missing list beside the entries (tests/encyclopedia-sounds.test.js counts it).
+      const pages = readdirSync(join(pub, 'encyclopedia', sec), { withFileTypes: true }).filter((x) => x.isDirectory() && !(sec === 'sounds' && x.name === 'still-missing')).length;
       const rows = search.entries.filter((x) => x.s === sec);
       assert.equal(card(SECTION_LABEL[sec]), pages, `${sec}: home card`);
       assert.equal(rows.length, pages, `${sec}: search rows`);
+      if (sec === 'sounds') continue;
       const index = read(`encyclopedia/${sec}/index.html`);
       const inCount = rows.filter((x) => inRemake(x.st)).length;
       assert.match(index, new RegExp(`<strong>${inCount.toLocaleString('en-US')}</strong> of ${pages.toLocaleString('en-US')} are in the remake`), sec);
@@ -113,6 +115,7 @@ describe('blank stubs', () => {
     // The list's own "N of them in the remake" counts the same statuses (public/encyclopedia/items/catalog.js).
     const set = /const IN_REMAKE = new Set\((\[[^\]]*\])\)/.exec(read('encyclopedia/items/catalog.js'))?.[1];
     assert.ok(set, 'catalog.js IN_REMAKE');
-    assert.deepEqual(JSON.parse(set.replace(/'/g, '"')).sort(), Object.keys(STATUS).filter(inRemake).sort());
+    // The sounds' own statuses (snd_*) never reach the item list.
+    assert.deepEqual(JSON.parse(set.replace(/'/g, '"')).sort(), Object.keys(STATUS).filter((k) => inRemake(k) && !k.startsWith('snd_')).sort());
   });
 });

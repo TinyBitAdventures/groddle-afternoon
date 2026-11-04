@@ -5,7 +5,12 @@
  *    section filter; the query lives in the address (?q=&s=);
  *  - a section's list (input[data-filter], and select[data-group] drawn as the
  *    themed combobox of ./items/combobox.js) hides the tiles that do not match
- *    (?q=&g=), so the list it draws without JavaScript stays the source.
+ *    (?q=&g=), so the list it draws without JavaScript stays the source; on
+ *    Music and sounds the status chips (a[data-st], anchors to the By status
+ *    lists without JavaScript) filter it by status too (?st=);
+ *  - a sound's page plays its synth stand-in (button[data-synth], shown only
+ *    here) through the game's own recipes, loaded on the first press, and one
+ *    player at a time.
  */
 import { combobox } from './items/combobox.js?v=f2510e19';
 
@@ -19,8 +24,11 @@ const LIMIT = 60;
 function filterList(input) {
   const tiles = [...document.querySelectorAll('li[data-name]')];
   const hay = tiles.map((li) => fold(li.dataset.name));
-  const groups = [...document.querySelectorAll('.ency-group')];
+  const groups = [...document.querySelectorAll('.ency-group, .snd-sub')];
   const count = $('count');
+  const chips = [...document.querySelectorAll('a[data-st]')];
+  const inStatus = tiles.map((li) => li.dataset.status || '');
+  let status = '';
   const total = tiles.length;
   const label = count.textContent.replace(/^[\d,]+ /, '');
   const pick = document.querySelector('select[data-group]');
@@ -30,7 +38,7 @@ function filterList(input) {
     const group = pick?.value || '';
     let shown = 0;
     tiles.forEach((li, i) => {
-      const ok = (!group || inGroup[i] === group) && words.every((w) => hay[i].includes(w));
+      const ok = (!group || inGroup[i] === group) && (!status || inStatus[i] === status) && words.every((w) => hay[i].includes(w));
       li.hidden = !ok;
       if (ok) shown += 1;
     });
@@ -38,18 +46,49 @@ function filterList(input) {
     const p = new URLSearchParams();
     if (input.value) p.set('q', input.value);
     if (group) p.set('g', group);
+    if (status) p.set('st', status);
+    for (const c of chips) c.setAttribute('aria-pressed', String(c.dataset.st === status));
     history.replaceState(null, '', p.toString() ? `?${p}` : location.pathname);
     count.textContent = shown === total ? `${fmt(total)} ${label}` : `${fmt(shown)} of ${fmt(total)} ${label}`;
   };
   const params = new URLSearchParams(location.search);
   if (params.get('q')) input.value = params.get('q');
   if (pick && [...pick.options].some((o) => o.value === params.get('g'))) pick.value = params.get('g');
+  if (chips.some((c) => c.dataset.st === params.get('st'))) status = params.get('st');
+  for (const c of chips) {
+    c.setAttribute('role', 'button');
+    c.setAttribute('aria-pressed', 'false');
+    c.addEventListener('click', (ev) => {
+      ev.preventDefault();
+      status = status === c.dataset.st ? '' : c.dataset.st;
+      run();
+    });
+  }
   input.addEventListener('input', run);
   if (pick) {
     pick.addEventListener('change', run);
     combobox(pick);
   }
-  if (input.value || pick?.value) run();
+  if (input.value || pick?.value || status) run();
+}
+
+/** A sound's synth stand-in, played with the game's own recipe (public/js/synth-sfx.js). */
+function synthButtons() {
+  let ctx = null;
+  for (const b of document.querySelectorAll('button[data-synth]')) {
+    b.hidden = false;
+    b.addEventListener('click', async () => {
+      const { playSynthRecipe } = await import(b.dataset.synthModule);
+      ctx ||= new AudioContext();
+      if (ctx.state === 'suspended') await ctx.resume();
+      for (const a of document.querySelectorAll('audio')) a.pause();
+      playSynthRecipe(ctx, ctx.destination, b.dataset.synth, { volume: 1.6 });
+    });
+  }
+  // One recording at a time.
+  document.addEventListener('play', (ev) => {
+    for (const a of document.querySelectorAll('audio')) if (a !== ev.target) a.pause();
+  }, true);
 }
 
 async function search(input) {
@@ -101,5 +140,6 @@ async function search(input) {
 
 const filter = document.querySelector('input[data-filter]');
 if (filter) filterList(filter);
+if (document.querySelector('button[data-synth], audio')) synthButtons();
 const box = document.querySelector('input[data-search]');
 if (box) search(box).catch(() => { $('count').textContent = 'The search could not be loaded.'; });
