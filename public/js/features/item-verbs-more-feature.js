@@ -45,7 +45,8 @@ import { itemVerbAchievementCounters } from '../item-verbs.js?v=1e20fa7d';
 import { ELEMENT_STACKMAX, hasPouch, POUCH_CLASS } from '../elemental-pouch.js?v=7ae2ad99';
 import { GENTLE_ISLAND_TSIDS, isNewxpSceneTsid } from '../newxp.js?v=8aef8287';
 import { SKILLQUEST_AK_TSID } from '../skillquest-ak.js?v=281b956d';
-import { setToolRemaining, TOOL_CONDITION_CATALOG } from '../tools.js?v=2337f66a';
+import { getToolCondition, migrateClassValue, setToolRemaining, TOOL_CONDITION_CATALOG, toolCopies, useToolCondition } from '../tools.js?v=2337f66a';
+import { copyChargesLeft, keepsCopies, spendCopyCharge, verbCopy } from '../copy-charges.js?v=174642e2';
 import { HERDKEEPING, hogtieEscapeDelayMs, husbandryPack } from '../animal-husbandry.js?v=2c391fae';
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=db7c442f';
 import { sourceFromUrl, frameTexture } from '../textures.js?v=3149d699';
@@ -129,9 +130,68 @@ const now = () => Date.now();
 const rng = () => Math.random();
 
 let daily = { day: '', broccoli: 0, rookSummons: 0 };
+/*
+ * Each Juju Shoo-Shoo Powder's charges, each Butterfly Net's wear and each Dusty Stick's points are
+ * that item's own (powder_base charges; tool_base points_remaining: butterfly_net.js 32,
+ * dusty_stick.js 32), kept per copy in js/tools.js (2026-11-04: one value each made a new one
+ * inherit the old one's). The three below only stand in for an engine with no tool state.
+ */
 let jujuCharges = null; // the open jar's charges (null: full)
 let netPoints = null; // the Butterfly Net's points (null: full)
 let stickEmptiedAt = null; // the Dusty Stick, empty since (null: full)
+/**
+ * The Dusty Sticks' recharge clock: every 12 minutes since it each stick short of 20 gets a point
+ * back (dusty_stick.js onRejuvination 336-343: a timer on each stick; here one clock for all of
+ * them, so a stick's next point can come up to 12 minutes sooner than its own timer would have).
+ */
+let stickClock = 0;
+/** The copy the pack menu is about while its verbs are drawn or run (feature-host opts.copy). */
+let picked = null;
+
+function withCopy(copy, fn) {
+  const was = picked;
+  picked = copy == null ? null : copy;
+  try {
+    return fn();
+  } finally {
+    picked = was;
+  }
+}
+
+function netPointsNow(engine) {
+  if (!keepsCopies(engine, 'butterfly_net')) return netPoints;
+  return getToolCondition(engine.toolState, 'butterfly_net', picked != null ? { copy: picked } : {}).remaining;
+}
+
+function jujuChargesNow(engine) {
+  return keepsCopies(engine, 'juju_shoo_shoo_powder') ? copyChargesLeft(engine, 'juju_shoo_shoo_powder', picked) : jujuCharges;
+}
+
+/** A Dusty Stick's points as the old single value read them: emptiedAt for stickPoints. */
+function stickEmptiedNow(engine, t) {
+  if (!keepsCopies(engine, 'dusty_stick')) return stickEmptiedAt;
+  const at = verbCopy(engine, 'dusty_stick', picked);
+  if (at < 0) return null;
+  const p = getToolCondition(engine.toolState, 'dusty_stick', { copy: at }).remaining;
+  return p >= DUSTY_STICK.capacity ? null : t - p * DUSTY_STICK.rechargeMs - (t - stickClock) % DUSTY_STICK.rechargeMs;
+}
+
+/** onRejuvination: a point back on every stick short of 20, each 12 minutes of the clock. */
+function rechargeSticks(engine, t) {
+  if (!keepsCopies(engine, 'dusty_stick')) return;
+  const copies = countItem(engine.inv, 'dusty_stick') > 0 ? toolCopies(engine.toolState, 'dusty_stick') : [];
+  const short = copies.some((c) => c.remaining < DUSTY_STICK.capacity);
+  if (!short || !stickClock) {
+    stickClock = t;
+    return;
+  }
+  const ticks = Math.floor((t - stickClock) / DUSTY_STICK.rechargeMs);
+  if (ticks <= 0) return;
+  stickClock += ticks * DUSTY_STICK.rechargeMs;
+  copies.forEach((c, i) => {
+    if (c.remaining < DUSTY_STICK.capacity) setToolRemaining(engine.toolState, 'dusty_stick', Math.min(DUSTY_STICK.capacity, c.remaining + ticks), { copy: i });
+  });
+}
 const rolling = { dice: null, dice_12sided: null };
 let joys = []; // Bundles of Joy: { id, tsid, x, y, dir, moveDistance, toX, bornAt, phase, excited, view }
 let joySeq = 0;
@@ -155,7 +215,7 @@ function publish(engine) {
   engine.setData('packVerbMessage', lastMessage);
   engine.setData('packVerbDice', ['dice', 'dice_12sided'].map((k) => (rolling[k] ? `${k}:${rolling[k].phase}` : '')).filter(Boolean).join(','));
   engine.setData('packVerbJoy', joys.filter((j) => j.tsid === engine.streetTsid).map((j) => j.phase).join(','));
-  engine.setData('packVerbNet', `${netPointsLeft(netPoints)}${attracted ? ':waiting' : ''}`);
+  engine.setData('packVerbNet', `${netPointsLeft(netPointsNow(engine))}${attracted ? ':waiting' : ''}`);
   engine.setData('packVerbDefect', defect ? defect.phase : '');
 }
 
@@ -243,11 +303,11 @@ function buttonsFor(classTsid, engine) {
     case 'dice_12sided':
       return [dieButton(pc, { rolling: Boolean(rolling.dice_12sided) })];
     case 'juju_shoo_shoo_powder':
-      return [jujuPowderButton(jujuCharges)];
+      return [jujuPowderButton(jujuChargesNow(engine))];
     case 'butterfly_net':
-      return [netButton(netPoints)];
+      return [netButton(netPointsNow(engine))];
     case 'dusty_stick':
-      return [stickButton(stickEmptiedAt, now())];
+      return [stickButton(stickEmptiedNow(engine, now()), now())];
     case 'npc_cubimal_factorydefect_chick': {
       const b = defectRaceButton({ racing: Boolean(defect) });
       return b ? [b] : [];
@@ -454,14 +514,19 @@ function tickTwelve(engine, t) {
 function blowPowder(engine) {
   // pc.location.item_exists('npc_juju_boss'): the remake's streets have no Juju boss (only Dust Trap bandits).
   const bossHere = (engine.interactables || []).some((t) => t?.classId === 'npc_juju_boss');
-  const out = blowJujuPowder(jujuCharges, { bossHere });
+  const out = blowJujuPowder(jujuChargesNow(engine), { bossHere });
   if (out.ok) {
     engine.playSound?.(JUJU_POWDER.sound, { volume: 0.6 });
     engine.query?.('jujuPowderBlow', engine);
-    jujuCharges = out.charges;
-    if (out.emptied) {
-      removeItem(engine.inv, 'juju_shoo_shoo_powder', 1);
-      jujuCharges = null;
+    if (keepsCopies(engine, 'juju_shoo_shoo_powder')) {
+      // That jar's charge (the one picked, else the one in use); emptied, that jar is gone.
+      spendCopyCharge(engine, 'juju_shoo_shoo_powder', picked);
+    } else {
+      jujuCharges = out.charges;
+      if (out.emptied) {
+        removeItem(engine.inv, 'juju_shoo_shoo_powder', 1);
+        jujuCharges = null;
+      }
     }
   }
   return finish(engine, 'juju_shoo_shoo_powder', 'blow_on', out);
@@ -487,9 +552,11 @@ function closestButterfly(engine) {
 
 function attract(engine) {
   const target = closestButterfly(engine);
-  const out = attractWithNet(engine.pc, netPoints, target);
+  const out = attractWithNet(engine.pc, netPointsNow(engine), target);
   if (out.ok) {
-    netPoints = out.points;
+    // tool_base use(1) on that net (the one picked, else the first that works).
+    if (keepsCopies(engine, 'butterfly_net')) useToolCondition(engine.toolState, 'butterfly_net', 1, picked != null ? { copy: picked } : {});
+    else netPoints = out.points;
     // onWaitStart: it stops and flies to wait beside you (was_attracted is set and only ever cleared).
     endAttraction();
     attracted = { target };
@@ -566,8 +633,14 @@ function dropJoyView(joy) {
 
 function unleash(engine) {
   const p = engine.player;
-  if (!p || stickPoints(stickEmptiedAt, now()) !== DUSTY_STICK.capacity) return null;
-  stickEmptiedAt = now();
+  if (!p || stickPoints(stickEmptiedNow(engine, now()), now()) !== DUSTY_STICK.capacity) return null;
+  if (keepsCopies(engine, 'dusty_stick')) {
+    // That stick empties (dusty_stick.js 298); the others keep their points.
+    rechargeSticks(engine, now());
+    setToolRemaining(engine.toolState, 'dusty_stick', 0, { copy: verbCopy(engine, 'dusty_stick', picked) });
+  } else {
+    stickEmptiedAt = now();
+  }
   joySeq += 1;
   const joy = { id: `joy${joySeq}`, tsid: engine.streetTsid, x: Math.round(p.x), y: Math.round(p.y), dir: 'left', moveDistance: 100, toX: null, bornAt: now(), phase: 'born', excited: 0, view: null };
   joys.push(joy);
@@ -802,6 +875,7 @@ export const itemVerbsMoreFeature = {
     tickPair(engine, t);
     tickTwelve(engine, t);
     tickJoys(engine, t, dtMs);
+    rechargeSticks(engine, t);
     tickAttracted(engine);
     tickDefect(engine, t);
     checkHogtie(engine, t);
@@ -825,12 +899,14 @@ export const itemVerbsMoreFeature = {
     return null;
   },
 
-  packVerbs(classTsid, engine) {
+  packVerbs(classTsid, engine, opts = {}) {
+    if (opts?.copy != null && picked == null) return withCopy(opts.copy, () => itemVerbsMoreFeature.packVerbs(classTsid, engine));
     if (countItem(engine.inv, classTsid) < 1) return [];
     return buttonsFor(classTsid, engine);
   },
 
-  runPackVerb(classTsid, verbId, engine) {
+  runPackVerb(classTsid, verbId, engine, opts = {}) {
+    if (opts?.copy != null && picked == null) return withCopy(opts.copy, () => itemVerbsMoreFeature.runPackVerb(classTsid, verbId, engine));
     if (!buttonsFor(classTsid, engine).some((b) => b.id === verbId)) return false;
     runMoreVerb(engine, classTsid, verbId);
     return true;
@@ -858,21 +934,39 @@ export const itemVerbsMoreFeature = {
 
   save() {
     return {
-      version: 1,
+      // version 2: each jar's, net's and stick's own number is saved with the pack's tools (js/tools.js).
+      version: 2,
       daily: { ...daily },
       jujuCharges,
       netPoints,
       stickEmptiedAt,
+      stickClock,
       fibers: fibers.map((f) => ({ ...f })),
     };
   },
 
-  restore(slice) {
+  restore(slice, engine) {
     const d = slice?.daily || {};
     daily = { day: String(d.day || ''), broccoli: Math.max(0, Math.floor(Number(d.broccoli) || 0)), rookSummons: Math.max(0, Math.floor(Number(d.rookSummons) || 0)) };
     jujuCharges = slice?.jujuCharges == null ? null : jujuChargesLeft(slice.jujuCharges);
     netPoints = slice?.netPoints == null ? null : netPointsLeft(slice.netPoints);
     stickEmptiedAt = Number.isFinite(Number(slice?.stickEmptiedAt)) && slice?.stickEmptiedAt != null ? Number(slice.stickEmptiedAt) : null;
+    stickClock = Math.max(0, Number(slice?.stickClock) || 0);
+    // An older save's one value each is the first copy's (the one a verb used); others are new.
+    if (engine?.toolState) {
+      if (jujuCharges != null && keepsCopies(engine, 'juju_shoo_shoo_powder') && jujuCharges > 0) migrateClassValue(engine.toolState, 'juju_shoo_shoo_powder', jujuCharges);
+      if (netPoints != null && keepsCopies(engine, 'butterfly_net')) migrateClassValue(engine.toolState, 'butterfly_net', netPoints);
+      if (stickEmptiedAt != null && keepsCopies(engine, 'dusty_stick')) {
+        const t = now();
+        const pts = stickPoints(stickEmptiedAt, t);
+        migrateClassValue(engine.toolState, 'dusty_stick', pts);
+        // Its next point comes when it would have (the 12-minute phase since it was emptied).
+        stickClock = stickEmptiedAt + pts * DUSTY_STICK.rechargeMs;
+      }
+      jujuCharges = null;
+      netPoints = null;
+      stickEmptiedAt = null;
+    }
     fibers = (Array.isArray(slice?.fibers) ? slice.fibers : []).filter((f) => f && typeof f.tsid === 'string').map((f) => ({ tsid: f.tsid, x: Number(f.x) || 0, y: Number(f.y) || 0 }));
   },
 
@@ -897,6 +991,8 @@ export const itemVerbsMoreFeature = {
     jujuCharges = null;
     netPoints = null;
     stickEmptiedAt = null;
+    stickClock = 0;
+    picked = null;
     rolling.dice = null;
     rolling.dice_12sided = null;
     joys = [];
