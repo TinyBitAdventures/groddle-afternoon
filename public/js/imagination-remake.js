@@ -8,7 +8,7 @@
  * Statuses:
  *   live        effect wired with source numbers
  *   partial     main effect wired; a side effect waits on a missing system
- *   starter     one of the nine tutorial cards, granted to every save
+ *   starter     one of the seven tutorial cards granted to a save that skips the tutorial
  *   online      effect wired in multiplayer, where the system it changes
  *               lives (chat, Snaps, radiation); dealt online only
  *   later       the system it improves is not in the remake yet
@@ -18,9 +18,12 @@
  */
 
 const RULES = [
-  // Tutorial cards (type 1 condition), granted as starters.
-  [/^(walk_speed_[12]|jump_[12]|mappery|camera_mode|zoomability|encyclopeddling|skill_learning)$/, 'starter',
-    'Granted to every save: the remake skips the tutorial island where these were bought, and its movement is the post-tutorial feel.'],
+  // Tutorial cards (type 1 condition): seven are starters; High Jumper I and II are bought
+  // (Austin 2026-11-04), in the tutorial or from the normal hand (imagination.js TUTORIAL_CARDS_DEALT).
+  [/^(walk_speed_[12]|mappery|camera_mode|zoomability|encyclopeddling|skill_learning)$/, 'starter',
+    'Bought in the tutorial; a solo game that skips the tutorial is given them. Your walk is always at least the after-tutorial pace.'],
+  [/^jump_1$/, 'live', 'A new player jumps about 69 px high; High Jumper I raises that to about 116 px. Bought in the tutorial, or dealt in your hand if you skipped it.'],
+  [/^jump_2$/, 'live', 'The full jump, about 142 px high. Bought in the tutorial, or dealt in your hand if you skipped it.'],
 
   // Movement and core stats.
   [/^walk_speed_[34]$/, 'live', 'Walk speed rises by the source ratio to the post-tutorial pace (Walk Speed III 1.21x, IV 1.28x).'],

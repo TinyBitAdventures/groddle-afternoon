@@ -42,6 +42,8 @@ import {
   dealHand,
   grantStarterUpgrades,
   grantUpgrade,
+  migrateImaginationState,
+  IMAGINATION_SAVE_VERSION,
   learnTimeReductions,
   normalizeImaginationState,
   ownedUpgradeList,
@@ -49,11 +51,11 @@ import {
   remakeMovementMultipliers,
   ignoresUpgradePhysics,
   reshuffleHand,
-} from '../imagination.js?v=133fd4d5';
+} from '../imagination.js?v=0cab36eb';
 import { brainCapacityRescale, skillTimeFactor } from '../imagination-effects.js?v=70169933';
 import { betterLearningDiscount } from '../better-learning.js?v=044ff9ff';
 import { rescaleStudiesForLearningModifier } from '../skills.js?v=4542bdf9';
-import { isOfferedInRemake, isOfferedOnline, remakeStatus } from '../imagination-remake.js?v=5ca4a35f';
+import { isOfferedInRemake, isOfferedOnline, remakeStatus } from '../imagination-remake.js?v=83dc3f68';
 import { hellFeature } from './hell-feature.js?v=54d49b30';
 
 const ART = 'assets/imagination/cards/';
@@ -824,6 +826,22 @@ function runAutoplay(engine, mode) {
   steps.forEach((fn, i) => setTimeout(fn, 900 + i * 1500));
 }
 
+/**
+ * Where a card jump under x1 counts as x1: the remake's own layouts, built for the classic
+ * 142 px jump (or, in the rebuilt quest rooms, its old 105 px one) that every source player
+ * had once out of the tutorial (High Jumper II, bought in training level 2). Those are the
+ * private instances (engine.transientInstance: every feature-built scene, such as the scene
+ * quest rooms, races, puzzle scenes and the tutorial's own training levels, whose jump is the
+ * tutorial's (newxp-feature physics); and game.js's memories and quests: Winter Walk and Winter
+ * Haven, whose 90 px steps a 69 px jump misses, A Summer's Day and its Annex, De-Embiggenify,
+ * Legalize It, the Rook quests and the rest of anyTransientInstance) and any place a feature
+ * claims with the `classicJumpPlace` query (a quest-instances run on a street).
+ */
+function classicJumpPlace(engine) {
+  if (engine?.transientInstance?.() === true || engine?.inScene?.() === true) return true;
+  return engine?.query?.('classicJumpPlace', engine) === true;
+}
+
 // ---------------------------------------------------------------------------
 // Feature
 // ---------------------------------------------------------------------------
@@ -835,8 +853,9 @@ export const imaginationFeature = {
     engineRef = engine;
     ensureKeepableItems();
     installChrome();
-    // Fresh games never call restore(): grant the tutorial cards here too.
-    // A new multiplayer player (js/new-player.js) buys them in the tutorial
+    // Fresh games never call restore(): grant the starter tutorial cards here too
+    // (not High Jumper I or II: a new character buys those, imagination.js JUMP_CARDS).
+    // A new multiplayer player (js/new-player.js) buys them all in the tutorial
     // instead (grantTutorialUpgrade), so they are marked as handled, not granted.
     if (engine.newPlayer) state.starterGranted = true;
     else grantStarterUpgrades(state, owned(engine));
@@ -857,9 +876,11 @@ export const imaginationFeature = {
     engineRef = engine || engineRef;
     state = normalizeImaginationState(slice);
     if (engineRef?.pc) {
-      // Every save gets the tutorial cards once (fresh games and saves from
+      // Every save gets the starter tutorial cards once (fresh games and saves from
       // before the shop). Triple Jump granted by the old stopgap stays owned.
       grantStarterUpgrades(state, owned(engineRef));
+      // A save from before High Jumper was bought (slice version 1) keeps the x1 jump it had.
+      migrateImaginationState(state, owned(engineRef));
       syncEnergyTank(engineRef);
     }
   },
@@ -869,10 +890,15 @@ export const imaginationFeature = {
     if (panel && !panel.hidden) render();
   },
 
+  /** A solo game started as a new player (game.js startAsNewPlayer): tutorial cards handled, none owned. */
+  startNewPlayer(engine) {
+    this.restore({ starterGranted: true, cardsVersion: IMAGINATION_SAVE_VERSION }, engine);
+  },
+
   /**
    * A card bought in the tutorial (newxp-feature gotCard) becomes owned
-   * (imagination_grant). Solo already owns every tutorial card, so this only
-   * adds cards for a new multiplayer player.
+   * (imagination_grant): a new player's cards, a solo game's High Jumper cards,
+   * and the walk cards of a player who skips the tutorial (newxp-feature skipTutorial).
    */
   grantTutorialUpgrade(id, engine) {
     const list = owned(engine || engineRef);
@@ -885,7 +911,11 @@ export const imaginationFeature = {
   physics(engine) {
     // The plain setting where the location ignores upgrade physics: no cards, no triple jump.
     if (ignoresUpgradePhysics(engine?.streetTsid)) return { speed: 1, jump: 1, gravity: 1, tripleJump: 0 };
-    return remakeMovementMultipliers(owned(engine));
+    const m = remakeMovementMultipliers(owned(engine));
+    // Places the remake laid out for the classic jump every player had after the source's
+    // tutorial keep it for a player without High Jumper II (classicJumpPlace).
+    if (m.jump < 1 && classicJumpPlace(engine)) m.jump = 1;
+    return m;
   },
 
   /** skills_points_to_seconds factor for one skill (brain capacity + category cards + Better Learning). */

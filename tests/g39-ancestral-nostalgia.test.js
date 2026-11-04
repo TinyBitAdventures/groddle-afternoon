@@ -23,10 +23,10 @@ import { BOOT_SOURCE_TSIDS, buildRows, render } from '../tools/build-ancestral-n
 import { ancestralClock, stealChanceForSeconds } from '../public/js/juju-bandits.js?v=6cf92f4f';
 import { applyBuff, createBuffState, hasBuff, removeBuff } from '../public/js/buffs.js?v=036fee53';
 import { getBuffCatalog, loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=10b118dd';
-import { IMAGINATION_UPGRADES, buildDeck, upgradeStatus } from '../public/js/imagination.js?v=133fd4d5';
-import { isOfferedInRemake, remakeStatus } from '../public/js/imagination-remake.js?v=5ca4a35f';
+import { IMAGINATION_UPGRADES, buildDeck, upgradeStatus } from '../public/js/imagination.js?v=0cab36eb';
+import { isOfferedInRemake, remakeStatus } from '../public/js/imagination-remake.js?v=83dc3f68';
 import { POTION_TEXT, ancestralCheck } from '../public/js/potions.js?v=c21bad59';
-import { FEATURES } from '../public/js/features/index.js?v=fe3a7ea9';
+import { FEATURES } from '../public/js/features/index.js?v=fc0fa9b9';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const GSJS = join(root, '../glitch-GameServerJS');

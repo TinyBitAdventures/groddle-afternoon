@@ -2246,8 +2246,8 @@
  "imagination": {
   "total": 275,
   "counts": {
-   "live": 246,
-   "starter": 9,
+   "live": 248,
+   "starter": 7,
    "none": 6,
    "online": 14
   }
@@ -2819,6 +2819,6 @@
    }
   ]
  },
- "tests": 663,
+ "tests": 664,
  "generatedAt": "2026-11-03"
 }

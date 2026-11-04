@@ -121,7 +121,7 @@ import {
 import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=602da017';
 import { QUOIN_SHEET, QUOIN_TYPES, qrazyRewardForLevel } from '../quoins.js?v=dfe1ff0a';
 import { soundForQuoin } from '../sound-moments.js?v=2f8597cd';
-import { IMAGINATION_UPGRADES } from '../imagination.js?v=133fd4d5';
+import { IMAGINATION_UPGRADES } from '../imagination.js?v=0cab36eb';
 import { assignQuest, completeQuest } from '../quests.js?v=b2856d6c';
 import { acceptOffer, enqueueQuestOffer, questAwardPayload, turnInQuest } from '../quest-offers.js?v=c78cd30e';
 import { getQuestCatalog } from '../content-catalogs.js?v=10b118dd';
@@ -589,7 +589,7 @@ async function gotCard(t, buy) {
   const pc = engineRef.pc;
   pc.imagination = Math.max(0, (Number(pc.imagination) || 0) - cost);
   if (!save.upgrades.includes(buy)) save.upgrades.push(buy);
-  // The card is owned from now on (a no-op in solo, which starts owning every tutorial card).
+  // The card is owned from now on (a no-op for a card the save already owns).
   engineRef.query?.('grantTutorialUpgrade', buy, engineRef);
   engineRef.updateHud();
   engineRef.save();
@@ -3411,6 +3411,11 @@ function teardown(engine) {
 
 async function skipTutorial(engine) {
   save.status = 'skipped';
+  // The remake's walk never drops below Walk Speed II's pace (imagination.js
+  // remakeMovementMultipliers), so a player who skips is given the two walk cards it already
+  // walks with; High Jumper II needs Walk Speed I, and both High Jumper cards are dealt in the
+  // normal hand to a player who skipped before buying them (imagination.js TUTORIAL_CARDS_DEALT).
+  for (const id of ['walk_speed_1', 'walk_speed_2']) engine.query?.('grantTutorialUpgrade', id, engine);
   engine.save();
   const inScene = engine.inScene() && isNewxpSceneTsid(engine.streetTsid);
   teardown(engine);
@@ -3437,6 +3442,8 @@ function startTutorial(engine, stage = 'clouds') {
   if (STAGES.indexOf(stage) > STAGES.indexOf('training2')) {
     for (const id of ['jump_2', 'walk_speed_2']) if (!save.upgrades.includes(id)) save.upgrades.push(id);
   }
+  // A forced later stage owns what the training levels before it sold, as gotCard records it.
+  for (const id of save.upgrades) engine.query?.('grantTutorialUpgrade', id, engine);
   engine.stopFollowing?.();
   engine.closeMap?.();
   beginStage(engine, save.stage);

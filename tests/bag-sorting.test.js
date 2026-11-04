@@ -34,7 +34,7 @@ import { SORT_TAG_CLASSES } from '../public/js/pack-slots-data.js?v=800f664c';
 import { ITEM_CATALOG, isToolItem } from '../public/js/inventory.js?v=602da017';
 import { bagsFeature } from '../public/js/features/bags-feature.js?v=87415a3f';
 import { createToolConditionState } from '../public/js/tools.js?v=3974f57e';
-import { remakeStatus, isOfferedInRemake } from '../public/js/imagination-remake.js?v=5ca4a35f';
+import { remakeStatus, isOfferedInRemake } from '../public/js/imagination-remake.js?v=83dc3f68';
 
 const ROOT = join(import.meta.dirname, '..');
 const ITEMS = join(ROOT, '..', 'glitch-GameServerJS', 'items');

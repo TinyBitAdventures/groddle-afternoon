@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=b484cbad';
 import { createFeatureHost } from './js/feature-host.js?v=2ed3c069';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=fe3a7ea9';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=fc0fa9b9';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -11153,8 +11153,9 @@ const engine = {
     restorePlayerSave(fresh, inv, pc, systems);
     starterSkills = new Set();
     state.questDone = false;
-    // The imagination shop as a new player has it: the tutorial cards handled, none owned.
-    features.get('imagination')?.restore({ starterGranted: true }, engine);
+    // The imagination shop as a new player has it: the tutorial cards handled, none owned
+    // (a new save's slice version, so no High Jumper card is granted as to an old save).
+    features.get('imagination')?.startNewPlayer(engine);
     bootHadPlayerSave = true;
     updateHud();
     return true;

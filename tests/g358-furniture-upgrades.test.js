@@ -35,8 +35,8 @@ import {
   surfaceHeight,
 } from '../public/js/home-decor.js?v=fff7788d';
 import { FURNITURE_CATALOG } from '../public/js/homes-catalog.js?v=7aa9beb0';
-import { IMAGINATION_UPGRADES, upgradeStatus, DEALT_SECRET_CARDS } from '../public/js/imagination.js?v=133fd4d5';
-import { isOfferedInRemake, remakeStatus } from '../public/js/imagination-remake.js?v=5ca4a35f';
+import { IMAGINATION_UPGRADES, upgradeStatus, DEALT_SECRET_CARDS } from '../public/js/imagination.js?v=0cab36eb';
+import { isOfferedInRemake, remakeStatus } from '../public/js/imagination-remake.js?v=83dc3f68';
 import { visitorHomeState } from '../public/js/features/homes-feature.js?v=28f61bbd';
 
 const spike = join(import.meta.dirname, '..');

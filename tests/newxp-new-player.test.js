@@ -21,7 +21,7 @@ import { createInventory } from '../public/js/inventory.js?v=602da017';
 import { PARADISE_TICKET_IDS } from '../public/js/paradise-flight.js?v=b9ebc32f';
 import { createPlayerSave, parsePlayerSave, restorePlayerSave, serializePlayerSave, normalizePlayerSnapshot } from '../public/js/player-save.js?v=8e544dde';
 import { cloudsLayout, SCENE_TSIDS, GENTLE_ISLAND } from '../public/js/newxp.js?v=6ca4702e';
-import { newxpFeature, __newxpTest, cloudEdge, cloudStepOff, cloudStepOffAny, CLOUD_BODY_DEPTH, CLOUD_EDGE_CLEAR, CLOUD_END_PUFFS } from '../public/js/features/newxp-feature.js?v=bf765f5f';
+import { newxpFeature, __newxpTest, cloudEdge, cloudStepOff, cloudStepOffAny, CLOUD_BODY_DEPTH, CLOUD_EDGE_CLEAR, CLOUD_END_PUFFS } from '../public/js/features/newxp-feature.js?v=e55ad5c7';
 
 const root = join(import.meta.dirname, '..');
 const read = (rel) => readFileSync(join(root, rel), 'utf8');
@@ -63,7 +63,7 @@ describe('1. the tutorial path starts from zero; Skip to Ur keeps the kit', () =
     assert.match(fn, /player: \{ \.\.\.newPlayerStats\(\), startedFresh: true \},/, 'the multiplayer stats');
     assert.match(fn, /restorePlayerSave\(fresh, inv, pc, systems\);/);
     assert.match(fn, /starterSkills = new Set\(\);/);
-    assert.match(fn, /features\.get\('imagination'\)\?\.restore\(\{ starterGranted: true \}, engine\);/);
+    assert.match(fn, /features\.get\('imagination'\)\?\.startNewPlayer\(engine\);/);
     // Only a save with no player state at boot: an existing solo save is never reset.
     assert.match(game, /const savedPlayerState = loadPlayerState\(\);\n\s+bootHadPlayerSave = Boolean\(savedPlayerState\);/);
     // Its reloads: no Tinkering I migration, no demo-kit starter skills off the First Eleven count.

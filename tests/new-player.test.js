@@ -20,7 +20,7 @@ import { normalizePlayerSnapshot } from '../public/js/player-save.js?v=8e544dde'
 import { createQuoinState } from '../public/js/quoins.js?v=dfe1ff0a';
 import { createShrineState } from '../public/js/shrines.js?v=9d364845';
 import { PARADISE_TICKET_IDS } from '../public/js/paradise-flight.js?v=b9ebc32f';
-import { imaginationFeature, STARTER_UPGRADES } from '../public/js/features/imagination-feature.js?v=a5f59c57';
+import { imaginationFeature, STARTER_UPGRADES } from '../public/js/features/imagination-feature.js?v=8afbf4e3';
 import { RESOURCE_FEATURE_ID, resourceNodesFeature } from '../public/js/features/resource-nodes-feature.js?v=ebe52849';
 
 const here = import.meta.dirname;
@@ -137,14 +137,15 @@ describe('features with a starter kit', () => {
 
   it('imagination: a tutorial purchase becomes owned once; solo already owns them', () => {
     const engine = { pc: { imaginationUpgrades: [], energy: 55 }, setData() {}, param: () => null };
-    imaginationFeature.restore({ starterGranted: true }, engine);
-    assert.deepEqual(engine.pc.imaginationUpgrades, [], 'restore of a handled save grants nothing');
+    imaginationFeature.startNewPlayer(engine);
+    assert.deepEqual(engine.pc.imaginationUpgrades, [], 'a new player is granted nothing');
     assert.equal(imaginationFeature.grantTutorialUpgrade('walk_speed_1', engine), true);
     assert.equal(imaginationFeature.grantTutorialUpgrade('walk_speed_1', engine), null);
     assert.deepEqual(engine.pc.imaginationUpgrades, ['walk_speed_1']);
     const solo = { pc: { imaginationUpgrades: [], energy: 80 }, setData() {}, param: () => null };
     imaginationFeature.restore({}, solo);
-    assert.deepEqual([...solo.pc.imaginationUpgrades].sort(), [...STARTER_UPGRADES]);
+    // A save from before 2026-11-04 (no slice version) also keeps High Jumper I and II.
+    assert.deepEqual([...solo.pc.imaginationUpgrades].sort(), [...STARTER_UPGRADES, 'jump_1', 'jump_2'].sort());
     assert.equal(imaginationFeature.grantTutorialUpgrade('walk_speed_1', solo), null);
     assert.equal(imaginationFeature.grantTutorialUpgrade('no_such_card', engine), null);
   });

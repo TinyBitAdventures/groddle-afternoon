@@ -23,10 +23,14 @@
  * - doImaginationShuffle: one free re-deal per game day. The Reshuffle Card
  *   (keepable_reshuffle → upgrade_card_reshuffle) re-deals without using it.
  *
- * Remake choices (documented in the skill doc): the remake has no tutorial
- * island, so the nine tutorial cards are granted as starter upgrades (every
- * source player bought them on the way out of the tutorial) and the remake's
- * movement feel is the post-tutorial baseline.
+ * Remake choices (documented in the skill doc): the tutorial is optional in
+ * solo, so seven of the nine tutorial cards are granted as starter upgrades
+ * (every source player bought them on the way out of the tutorial) and the
+ * remake's walk is the post-tutorial pace. High Jumper I and II are not
+ * starters (Austin 2026-11-04): a new character jumps at the source's
+ * x0.7105 (inc_physics.js setDefaultPhysics 97-106) until it buys them, in
+ * the tutorial or, outside it, from the normal hand (TUTORIAL_CARDS_DEALT).
+ * Saves from before that change keep both (migrateImaginationState).
  */
 
 import { IMAGINATION_UPGRADES, SHUFFLE_CARD_COST, CARD_ART_LAYERS } from './imagination-data.js?v=4a85e7fe';
@@ -45,13 +49,34 @@ export const BRAIN_CAPACITY_DISCOUNTS = Object.freeze([0, 0.05, 0.1]);
 export const QUOIN_MULTIPLIER_AMOUNTS = Object.freeze([0.25, 0.5, 1]);
 export const OPTION_CARDS = Object.freeze(['energy_tank', 'brain_capacity', 'quoin_multiplier']);
 
-/** The nine type-1 (tutorial) cards, granted as starters in the remake. */
-export const STARTER_UPGRADES = Object.freeze(
+/** The nine type-1 (tutorial) cards (inc_data_imagination.js condition type 1). */
+export const TUTORIAL_UPGRADES = Object.freeze(
   Object.entries(IMAGINATION_UPGRADES)
     .filter(([, u]) => u.conditions.some((c) => c.type === 1))
     .map(([id]) => id)
     .sort()
 );
+
+/** High Jumper I and II: bought, never granted, since 2026-11-04 (saves from before keep them). */
+export const JUMP_CARDS = Object.freeze(['jump_1', 'jump_2']);
+
+/** The tutorial cards granted to every solo save that skips the tutorial: all but the jump cards. */
+export const STARTER_UPGRADES = Object.freeze(TUTORIAL_UPGRADES.filter((id) => !JUMP_CARDS.includes(id)));
+
+/**
+ * Tutorial cards the normal hand deals outside the tutorial, to a player who does not own
+ * them yet: the remake's tutorial can be skipped in solo, and the source dealt these only in
+ * it (condition type 1), so a player who skipped it could never jump higher. The other
+ * conditions still hold (High Jumper II needs Walk Speed I, a solo starter).
+ */
+export const TUTORIAL_CARDS_DEALT = new Set(JUMP_CARDS);
+
+/**
+ * The imagination save slice's version. 1 (or none): High Jumper I and II were free
+ * starters, and every player jumped at least x1. 2: they are bought (a new character
+ * jumps at x0.7105 until it buys them).
+ */
+export const IMAGINATION_SAVE_VERSION = 2;
 
 /** Source walk/jump physics rewards (reward type 1) and the starting values. */
 export const SOURCE_DEFAULT_PHYSICS = Object.freeze({ vx_max: 0.4597, vy_jump: 0.7105, gravity: 1 });
@@ -74,6 +99,8 @@ export function createImaginationState() {
     brainCapacity: BRAIN_CAPACITY_DEFAULT,
     energyTankBonus: 0,
     starterGranted: false,
+    // A new character starts at the current version (no free High Jumper cards).
+    cardsVersion: IMAGINATION_SAVE_VERSION,
   };
 }
 
@@ -90,7 +117,10 @@ function cleanCard(card) {
 
 export function normalizeImaginationState(raw) {
   const base = createImaginationState();
+  // A save with no slice, or a slice with no version, is from before High Jumper was bought.
+  base.cardsVersion = 1;
   if (!raw || typeof raw !== 'object') return base;
+  base.cardsVersion = Math.max(1, Math.min(IMAGINATION_SAVE_VERSION, Math.floor(finite(raw.cardsVersion, 1))));
   const hand = Array.isArray(raw.hand) ? raw.hand : [];
   base.hand = Array.from({ length: HAND_SIZE }, (_, i) => cleanCard(hand[i]));
   base.history = (Array.isArray(raw.history) ? raw.history : [])
@@ -174,8 +204,12 @@ export function upgradeStatus(id, ctx = {}) {
   const got = owned.has(id);
   const reqs = u.conditions.map((c) => checkCondition(c, ctx));
   const isTutorial = u.conditions.some((c) => c.type === 1);
+  // TUTORIAL_CARDS_DEALT: outside the tutorial their tutorial condition is met.
+  if (TUTORIAL_CARDS_DEALT.has(id) && ctx.inTutorial !== true) {
+    reqs.forEach((r, i) => { if (r.type === 1) reqs[i] = { type: 1, ok: true }; });
+  }
   let canLearn = (!u.is_secret || DEALT_SECRET_CARDS.has(id)) && !(got && u.max_uses);
-  if (canLearn && isTutorial && ctx.inTutorial !== true) canLearn = false;
+  if (canLearn && isTutorial && ctx.inTutorial !== true && !TUTORIAL_CARDS_DEALT.has(id)) canLearn = false;
   if (canLearn) canLearn = reqs.every((r) => r.ok);
   return { id, got, reqs, can_learn: canLearn, is_secret: Boolean(u.is_secret), is_tutorial: isTutorial };
 }
@@ -412,7 +446,8 @@ export function reshuffleHand(state, ctx = {}, { dayKey = '', free = true, rng =
 }
 
 /**
- * Grant the tutorial cards once per save. Returns the ids newly granted.
+ * Grant the starter tutorial cards (STARTER_UPGRADES, not High Jumper) once per save.
+ * Returns the ids newly granted.
  */
 export function grantStarterUpgrades(state, owned, now = Date.now()) {
   if (state.starterGranted) return [];
@@ -423,6 +458,25 @@ export function grantStarterUpgrades(state, owned, now = Date.now()) {
     added.push(id);
   }
   state.starterGranted = true;
+  return added;
+}
+
+/**
+ * Bring a restored slice up to IMAGINATION_SAVE_VERSION. A save from version 1 jumped at
+ * x1 at least (High Jumper I and II were starters, and the jump never went below x1), so it
+ * keeps that jump: the jump cards it lacks are recorded as owned (no history, no iMG spent).
+ * Returns the ids newly granted.
+ */
+export function migrateImaginationState(state, owned, now = Date.now()) {
+  const added = [];
+  if ((state.cardsVersion || 1) < 2) {
+    for (const id of JUMP_CARDS) {
+      if (owned.includes(id)) continue;
+      grantUpgrade(state, owned, id, { now, history: false });
+      added.push(id);
+    }
+  }
+  state.cardsVersion = IMAGINATION_SAVE_VERSION;
   return added;
 }
 
@@ -453,9 +507,11 @@ function physicsOrder(id) {
 }
 
 /**
- * Remake movement multipliers. The remake's tuned walk and jump are the
- * source's post-tutorial values (Walk Speed II vx 0.8268, High Jumper II
- * vy 1.0), so later cards scale relative to those.
+ * Remake movement multipliers relative to the source's post-tutorial values
+ * (Walk Speed II vx 0.8268, High Jumper II vy 1.0, the classic 142 px jump).
+ * The jump follows the cards as the source's did: x0.7105 with neither High
+ * Jumper card (69 px), x0.907 with I (116 px), x1 with II, x1.05 with III.
+ * The walk never drops below Walk Speed II's pace (the remake's walk).
  */
 export const REMAKE_BASELINE_PHYSICS = Object.freeze({ vx_max: 0.8268, vy_jump: 1, gravity: 1 });
 
@@ -476,7 +532,7 @@ export function remakeMovementMultipliers(owned) {
   const p = imaginationPhysics(owned);
   return {
     speed: Math.max(1, p.vx_max / REMAKE_BASELINE_PHYSICS.vx_max),
-    jump: Math.max(1, p.vy_jump / REMAKE_BASELINE_PHYSICS.vy_jump),
+    jump: p.vy_jump / REMAKE_BASELINE_PHYSICS.vy_jump,
     gravity: 1,
   };
 }

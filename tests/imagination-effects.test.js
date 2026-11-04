@@ -17,8 +17,8 @@ import {
   skillTimeFactor,
   toolWearMultiplier,
 } from '../public/js/imagination-effects.js?v=70169933';
-import { IMAGINATION_UPGRADES } from '../public/js/imagination.js?v=133fd4d5';
-import { REMAKE_STATUS_RULES, isOfferedInRemake, remakeStatus } from '../public/js/imagination-remake.js?v=5ca4a35f';
+import { IMAGINATION_UPGRADES } from '../public/js/imagination.js?v=0cab36eb';
+import { REMAKE_STATUS_RULES, isOfferedInRemake, remakeStatus } from '../public/js/imagination-remake.js?v=83dc3f68';
 import { applyRewards } from '../public/js/quests.js?v=b2856d6c';
 import { createInventory, countItem, ensureItem } from '../public/js/inventory.js?v=602da017';
 import { createMineRock, miningProfile, mineRock, smeltMetalRocks } from '../public/js/mining.js?v=d856ab96';
@@ -49,7 +49,10 @@ describe('remake status for every card', () => {
       counts[status] = (counts[status] || 0) + 1;
       assert.equal(isOfferedInRemake(id), status === 'live' || status === 'partial', id);
     }
-    assert.equal(counts.starter, 9);
+    // Seven starters; High Jumper I and II are live cards since 2026-11-04.
+    assert.equal(counts.starter, 7);
+    assert.equal(remakeStatus('jump_1').status, 'live');
+    assert.equal(remakeStatus('jump_2').status, 'live');
     assert.ok(counts.live > 150, JSON.stringify(counts));
     // No catalog card falls through to the default rule.
     for (const id of Object.keys(IMAGINATION_UPGRADES)) {

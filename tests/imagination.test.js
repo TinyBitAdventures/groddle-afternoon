@@ -8,6 +8,11 @@ import {
   HAND_SIZE,
   IMAGINATION_UPGRADES,
   STARTER_UPGRADES,
+  TUTORIAL_UPGRADES,
+  JUMP_CARDS,
+  TUTORIAL_CARDS_DEALT,
+  IMAGINATION_SAVE_VERSION,
+  migrateImaginationState,
   buildDeck,
   canFreeReshuffle,
   cardText,
@@ -26,7 +31,7 @@ import {
   reshuffleHand,
   resurrectionCardCost,
   upgradeStatus,
-} from '../public/js/imagination.js?v=133fd4d5';
+} from '../public/js/imagination.js?v=0cab36eb';
 
 const publicRoot = join(import.meta.dirname, '..', 'public');
 
@@ -39,7 +44,8 @@ function seeded(seed = 1) {
   };
 }
 
-const POST_TUTORIAL = [...STARTER_UPGRADES];
+/** What a source player owned once out of the tutorial: all nine tutorial cards. */
+const POST_TUTORIAL = [...TUTORIAL_UPGRADES];
 
 describe('imagination catalog', () => {
   it('imports all 275 source cards with their art config', () => {
@@ -63,11 +69,16 @@ describe('imagination catalog', () => {
     assert.ok(CARD_ART_LAYERS.includes('bg_back'));
   });
 
-  it('names the nine tutorial cards as starters', () => {
-    assert.deepEqual(STARTER_UPGRADES, [
+  it('names the nine tutorial cards, and the seven starters (not High Jumper I or II)', () => {
+    assert.deepEqual(TUTORIAL_UPGRADES, [
       'camera_mode', 'encyclopeddling', 'jump_1', 'jump_2', 'mappery',
       'skill_learning', 'walk_speed_1', 'walk_speed_2', 'zoomability',
     ]);
+    assert.deepEqual(STARTER_UPGRADES, [
+      'camera_mode', 'encyclopeddling', 'mappery',
+      'skill_learning', 'walk_speed_1', 'walk_speed_2', 'zoomability',
+    ]);
+    assert.deepEqual(JUMP_CARDS, ['jump_1', 'jump_2']);
   });
 });
 
@@ -221,9 +232,10 @@ describe('imagination starters and physics', () => {
   it('grants the tutorial cards once', () => {
     const state = createImaginationState();
     const owned = ['jump_triple_1'];
-    assert.equal(grantStarterUpgrades(state, owned).length, 9);
+    assert.equal(grantStarterUpgrades(state, owned).length, 7);
     assert.equal(grantStarterUpgrades(state, owned).length, 0);
-    assert.equal(owned.length, 10);
+    assert.equal(owned.length, 8);
+    assert.equal(owned.includes('jump_1') || owned.includes('jump_2'), false);
     assert.equal(state.history.length, 0);
   });
 
@@ -241,7 +253,14 @@ describe('imagination starters and physics', () => {
 
   it('scales remake movement relative to the post-tutorial baseline', () => {
     assert.deepEqual(remakeMovementMultipliers(POST_TUTORIAL), { speed: 1, jump: 1, gravity: 1 });
-    assert.deepEqual(remakeMovementMultipliers([]), { speed: 1, jump: 1, gravity: 1 });
+    // The jump follows the High Jumper cards (inc_physics.js 97-106, inc_data_imagination.js 3240-3337);
+    // the walk never drops below Walk Speed II's pace.
+    assert.deepEqual(remakeMovementMultipliers([]), { speed: 1, jump: 0.7105, gravity: 1 });
+    assert.deepEqual(remakeMovementMultipliers(STARTER_UPGRADES), { speed: 1, jump: 0.7105, gravity: 1 });
+    assert.equal(remakeMovementMultipliers([...STARTER_UPGRADES, 'jump_1']).jump, 0.907);
+    assert.equal(remakeMovementMultipliers([...STARTER_UPGRADES, 'jump_1', 'jump_2']).jump, 1);
+    assert.equal(remakeMovementMultipliers(['jump_2']).jump, 1);
+    assert.equal(remakeMovementMultipliers([...STARTER_UPGRADES, 'jump_triple_3', 'jump_3']).jump, 1.05);
     const fast = remakeMovementMultipliers([...POST_TUTORIAL, 'walk_speed_3', 'jump_3']);
     assert.ok(Math.abs(fast.speed - 1 / 0.8268) < 1e-9);
     assert.equal(fast.jump, 1.05);

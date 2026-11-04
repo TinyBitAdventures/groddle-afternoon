@@ -1489,6 +1489,15 @@ export const questInstancesFeature = {
     street.hubName = '';
   },
 
+  /**
+   * A quest room on an imported street (De-Embiggenify's chair climb, tuned with its own jump)
+   * was laid out for the classic jump, as the scene rooms were: a player without High
+   * Jumper II jumps at x1 in it (imagination-feature classicJumpPlace).
+   */
+  classicJumpPlace() {
+    return run ? true : null;
+  },
+
   physics(engine) {
     if (!run) return null;
     const own = room?.physics?.(ctx) || null;

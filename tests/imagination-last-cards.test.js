@@ -15,7 +15,7 @@ import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 
 import { IMAGINATION_UPGRADES } from '../public/js/imagination-data.js?v=4a85e7fe';
-import { isOfferedInRemake, isOfferedOnline, remakeStatus } from '../public/js/imagination-remake.js?v=5ca4a35f';
+import { isOfferedInRemake, isOfferedOnline, remakeStatus } from '../public/js/imagination-remake.js?v=83dc3f68';
 import { FILTER_PACKS } from '../public/js/snap-filters.js?v=32315cf1';
 
 const ROOT = join(import.meta.dirname, '..');
@@ -42,7 +42,7 @@ describe('every card is accounted for', () => {
       counts[s] = (counts[s] || 0) + 1;
     }
     assert.equal(Object.keys(IMAGINATION_UPGRADES).length, 275);
-    assert.deepEqual(counts, { live: 246, starter: 9, online: 14, none: 6 });
+    assert.deepEqual(counts, { live: 248, starter: 7, online: 14, none: 6 });
     assert.deepEqual(Object.keys(IMAGINATION_UPGRADES).filter((id) => remakeStatus(id).status === 'none').sort(), [...NONE].sort());
   });
 

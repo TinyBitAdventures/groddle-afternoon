@@ -34,8 +34,8 @@ import {
 import { DROP_TABLES } from '../public/js/drop-tables.js?v=0f922478';
 import { REMAKE_QUEST_NPCS } from '../public/js/quest-offers.js?v=c78cd30e';
 import { OFFER_OVERRIDES } from '../public/js/quest-rooms/catalog.js?v=9ebeb502';
-import { FEATURES } from '../public/js/features/index.js?v=fe3a7ea9';
-import { remakeStatus } from '../public/js/imagination-remake.js?v=5ca4a35f';
+import { FEATURES } from '../public/js/features/index.js?v=fc0fa9b9';
+import { remakeStatus } from '../public/js/imagination-remake.js?v=83dc3f68';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const gsjs = join(spike, '../glitch-GameServerJS');
