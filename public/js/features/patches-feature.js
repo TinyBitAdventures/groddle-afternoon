@@ -40,7 +40,7 @@
 
 import { ensureItem } from '../inventory.js?v=602da017';
 import { isItemFloor, platformYAt } from '../street-model.js?v=505d8990';
-import { getStreetEcologyCatalog, streetEcologyAliases } from '../street-ecology.js?v=2c82c072';
+import { getStreetEcologyCatalog, streetEcologyAliases } from '../street-ecology.js?v=d41e5e97';
 import { trantStatusLabel } from '../trants.js?v=9c2e8c0f';
 import { woodTreeStatusLabel } from '../woodcutting.js?v=6d2ad054';
 import {

@@ -21,7 +21,7 @@ import {
   resolveGround,
   streetWidth,
 } from '../public/js/street-model.js?v=505d8990';
-import { buildPlatformCandidates, planStreetPlacements } from '../public/js/street-ecology.js?v=2c82c072';
+import { buildPlatformCandidates, planStreetPlacements } from '../public/js/street-ecology.js?v=d41e5e97';
 import { landingY } from '../public/js/walk-surface.js?v=c982983e';
 import { OWNED_STREETS } from '../public/js/location-events.js?v=05663361';
 

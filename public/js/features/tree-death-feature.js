@@ -85,7 +85,7 @@ import {
   quotePoisonVerb,
   treeDeathOutcome,
 } from '../tree-poison.js?v=f6e01177';
-import { patchesFeature } from './patches-feature.js?v=cc542605';
+import { patchesFeature } from './patches-feature.js?v=e4a197ff';
 
 export const TREE_DEATH_FEATURE_ID = 'tree-death';
 const VERB_PREFIX = 'treepoison:';

@@ -592,14 +592,65 @@ export function streetReservedSpots(street) {
     const w = Number(ladder.w) > 0 ? Number(ladder.w) : 50;
     out.push({ ...foot, key: `ladder:${ladder.id}`, clearance: Math.round(w / 2), block: box(foot.x, foot.y, w, Math.min(ladder.h, LADDER_FOOT_PX)) });
   }
+  out.push(...frontDecoCovers(street));
   return out;
+}
+
+/** The smallest deco on a layer in front of the player that can hide a tree, rock or Piggy (px). */
+export const FRONT_DECO_MIN = Object.freeze({ w: 120, h: 90 });
+/** How much of a thing's box a front deco has to cover for the thing to count as behind it. */
+export const FRONT_HIDE_SHARE = 0.6;
+/** Front decos that are see-through (shadows, light and haze overlays): they hide nothing. */
+export const FRONT_SEE_THROUGH = /shadow|overlay|trans|glow|light|haze|fog|mist|ray|beam|gradient/i;
+
+/**
+ * Ticket 89: the decos drawn in front of the avatar and the street's items (a layer with z > 0:
+ * middleplus, foreground; game.js syncStreetFront draws them over the middleground), as keep-clear spots
+ * `{ key, front: true, block }` in screen space. They never take a clearance or keep anything
+ * away; planStreetPlacements only takes a spot whose tree, rock or Piggy (REACH_BOXES) they would
+ * mostly hide last, as it does a spot behind a floor. The original set those by hand where they
+ * showed (Flipside's Spice Plant sat inside the Swiss-cheese pipe's front half). Only layers as
+ * wide as the street: a parallax layer moves against the street as the camera does.
+ */
+export function frontDecoCovers(street) {
+  const out = [];
+  const width = street?.bounds ? street.bounds.r - street.bounds.l : 0;
+  for (const layer of street?.layers || []) {
+    if (!(Number(layer?.z) > 0) || !width || Number(layer.w) !== width) continue;
+    (layer.decos || []).forEach((d, i) => {
+      const w = Number(d?.w) || 0;
+      const h = Number(d?.h) || 0;
+      if (w < FRONT_DECO_MIN.w || h < FRONT_DECO_MIN.h || !Number.isFinite(d.x) || !Number.isFinite(d.y) || Number(d.r)) return;
+      if (FRONT_SEE_THROUGH.test(String(d.sprite || ''))) return;
+      out.push({ x: d.x, y: d.y, key: `front:${layer.name || layer.id}:${i}`, front: true, block: { l: d.x - w / 2, r: d.x + w / 2, t: d.y - h, b: d.y } });
+    });
+  }
+  return out;
+}
+
+/** PURE: whether a thing of `key` at `spot` is mostly behind one front deco (frontDecoCovers). */
+export function hiddenBehindFront(spot, key, fronts) {
+  const size = REACH_BOXES[key];
+  if (!size || !fronts?.length) return false;
+  const [w, h] = size;
+  const l = spot.x - w / 2;
+  const r = spot.x + w / 2;
+  const t = spot.y - h;
+  for (const f of fronts) {
+    const b = f.block;
+    const ox = Math.min(r, b.r) - Math.max(l, b.l);
+    const oy = Math.min(spot.y, b.b) - Math.max(t, b.t);
+    if (ox > 0 && oy > 0 && ox * oy >= FRONT_HIDE_SHARE * w * h) return true;
+  }
+  return false;
 }
 
 /** The first fixture a thing at `spot` would cover: big scenery by its box, the rest by the doorways. */
 export function blockingFixture(spot, fixtures, { footprint = 0, height = 0 } = {}) {
   for (const fixture of fixtures || []) {
     const b = fixture?.block;
-    if (!b) continue;
+    // A front deco (frontDecoCovers) covers things; nothing covers it.
+    if (!b || fixture.front) continue;
     if (footprint > 0 && height > 0) {
       if (spot.x - footprint / 2 < b.r && b.l < spot.x + footprint / 2 && spot.y - height < b.b && b.t < spot.y) return fixture;
     } else if (fixture.doorway && spot.x > b.l && spot.x < b.r && spot.y >= b.t && spot.y <= b.b + DOORWAY_DROP_PX) {
@@ -802,7 +853,9 @@ export function planStreetPlacements(
   { worldW = 2500, seed = '', reserved = [], tsid = seed, unreached = unreachedFloorsFor(tsid) } = {}
 ) {
   const candidates = buildPlatformCandidates(platforms, { worldW, seed, unreached });
-  const occupied = (reserved || []).filter((p) => Number.isFinite(p?.x) && Number.isFinite(p?.y))
+  // Front decos (frontDecoCovers) keep nothing clear; they only rank the spots they hide.
+  const fronts = (reserved || []).filter((p) => p?.front && p.block);
+  const occupied = (reserved || []).filter((p) => !p?.front && Number.isFinite(p?.x) && Number.isFinite(p?.y))
     .map((point, index) => ({ ...point, key: point.key || `reserved:${index}`, clearance: whole(point.clearance, 120, 600) }));
   const fixtures = occupied.filter((point) => point.block);
   const used = new Set();
@@ -875,7 +928,7 @@ export function planStreetPlacements(
         let hidden = 0;
         if (REACH_BOXES[request.key]) {
           const k = `${request.key}:${candidate.id}`;
-          if (!hiddenCache.has(k)) hiddenCache.set(k, hiddenBehindFloor(platforms, candidate, request.key));
+          if (!hiddenCache.has(k)) hiddenCache.set(k, hiddenBehindFloor(platforms, candidate, request.key) || hiddenBehindFront(candidate, request.key, fronts));
           hidden = hiddenCache.get(k) ? 32 : 0;
         }
         const tier = (footprint > 0

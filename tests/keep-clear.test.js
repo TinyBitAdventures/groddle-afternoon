@@ -33,11 +33,13 @@ import {
   blockingFixture,
   buildPlatformCandidates,
   ecologyForStreet,
+  frontDecoCovers,
+  hiddenBehindFront,
   planStreetPlacements,
   populationForStreet,
   setStreetEcologyCatalog,
   streetReservedSpots,
-} from '../public/js/street-ecology.js?v=2c82c072';
+} from '../public/js/street-ecology.js?v=d41e5e97';
 import { placementRequests } from '../tools/build-realtime-objects.mjs';
 import { serverPath, skipWithoutServer } from '../tools/repos.mjs';
 import { applyStreetIndex, loadStreetDataFromFs, setZoneStreetsShown } from '../public/js/street-loader.js?v=33d2b8bc';
@@ -109,7 +111,9 @@ describe('the keep-clear spots (streetReservedSpots)', () => {
       assert.deepEqual(spot.block, { l: foot.x - 25, r: foot.x + 25, t: foot.y - LADDER_FOOT_PX, b: foot.y });
       assert.equal(spot.doorway, undefined);
     }
-    assert.equal(spots.length, data.signposts.length + data.doors.length + data.ladders.length);
+    // Ticket 89: the front decos (frontDecoCovers) ride along, marked `front`, and keep nothing clear.
+    assert.equal(spots.filter((s) => !s.front).length, data.signposts.length + data.doors.length + data.ladders.length);
+    assert.ok(spots.filter((s) => s.front).every((s) => s.block && !s.clearance && !s.doorway));
   });
 
   it('leave out hidden doors, which are never drawn', () => {
@@ -245,5 +249,41 @@ describe('every shared street', () => {
       checked += 1;
     }
     assert.ok(checked >= 50, String(checked)); // 59 on 2026-10-31
+  });
+});
+
+describe('ticket 89: nothing is planted behind a deco drawn in front of the street', () => {
+  const FLIPSIDE = 'GM410QQ0CHARO';
+  const streets = Object.keys(index.streets).filter((tsid) => !/^GZ/.test(tsid)).sort();
+
+  it('reads the front layers as wide as the street, not their see-through shadows', () => {
+    const fronts = frontDecoCovers(street(FLIPSIDE));
+    // middleplus cl2_swissPipe_02_front (457 x 165 at 1417, 1972): the pipe the Spice Plant stood in.
+    assert.ok(fronts.some((f) => f.block.l === 1417 - 228.5 && f.block.t === 1972 - 165), JSON.stringify(fronts.map((f) => f.block)));
+    const s = { bounds: { l: -1000, r: 1000, t: -1000, b: 0 }, layers: [
+      { name: 'middleplus', z: 1, w: 2000, decos: [{ sprite: 'groddle_shadow_spot_1', x: 500, y: 900, w: 800, h: 300 }, { sprite: 'rock', x: 900, y: 900, w: 300, h: 200 }] },
+      { name: 'foreground', z: 2, w: 2400, decos: [{ sprite: 'bush', x: 500, y: 900, w: 400, h: 300 }] },
+      { name: 'middleground', z: 0, w: 2000, decos: [{ sprite: 'rock', x: 0, y: -100, w: 300, h: 200 }] },
+    ] };
+    assert.deepEqual(frontDecoCovers(s).map((f) => f.key), ['front:middleplus:1']);
+    assert.equal(hiddenBehindFront({ x: 900, y: 900 }, 'trees', frontDecoCovers(s)), true);
+    assert.equal(hiddenBehindFront({ x: 1200, y: 900 }, 'trees', frontDecoCovers(s)), false);
+  });
+
+  it('Flipside plants its Spice Plants where they show, and every shared street does', async () => {
+    const { plan, reserved } = layoutOf(street(FLIPSIDE));
+    const fronts = reserved.filter((r) => r.front);
+    for (const p of plan.groups.trees) assert.equal(hiddenBehindFront(p, 'trees', fronts), false, `${Math.round(p.x)},${Math.round(p.y)}`);
+    const hidden = [];
+    for (const tsid of streets) {
+      let data;
+      try { data = await loaded(tsid); } catch { continue; }
+      const { plan: pl, reserved: rs } = layoutOf(data);
+      const fr = rs.filter((r) => r.front);
+      if (!fr.length) continue;
+      for (const key of ['trees', 'rocks', 'piggies']) for (const p of pl.groups[key] || []) if (hiddenBehindFront(p, key, fr)) hidden.push(`${tsid} ${key} ${Math.round(p.x)},${Math.round(p.y)}`);
+    }
+    // Census of the server's data (2026-11-04): before, 229 trees, rocks and Piggies mostly behind a front deco; after, none.
+    assert.deepEqual(hidden, []);
   });
 });

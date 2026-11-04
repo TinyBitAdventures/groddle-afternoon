@@ -38,15 +38,15 @@ import {
   takeObjs,
   treeReady,
   treeSkill,
-} from '../public/js/street-objects.js?v=4d8af009';
-import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=a28fd714';
-import { FEATURES } from '../public/js/features/index.js?v=01c5b577';
+} from '../public/js/street-objects.js?v=75fc6cc9';
+import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=5697fd19';
+import { FEATURES } from '../public/js/features/index.js?v=91621fc7';
 import { createMineRock, mineRock } from '../public/js/mining.js?v=d856ab96';
 import { createResourceNode } from '../public/js/resource-nodes.js?v=d78746b3';
 import { createTrantState, fruitCapacityAt, setTrantTables } from '../public/js/trants.js?v=9c2e8c0f';
 import { placementRequests, ruleTables, streetObjectLayout } from '../tools/build-realtime-objects.mjs';
 import { STREET_INDEX, applyStreetIndex, loadStreetDataFromFs } from '../public/js/street-loader.js?v=33d2b8bc';
-import { setStreetEcologyCatalog } from '../public/js/street-ecology.js?v=2c82c072';
+import { setStreetEcologyCatalog } from '../public/js/street-ecology.js?v=d41e5e97';
 import { serverPath, skipWithoutServer } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');

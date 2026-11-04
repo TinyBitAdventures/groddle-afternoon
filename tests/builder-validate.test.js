@@ -8,7 +8,7 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { validateZone, RULES, hash16, healOps, plainApex, badWords, zoneArrivals } from '../public/js/builder/validate.js?v=dfad07b5';
+import { validateZone, RULES, hash16, healOps, plainApex, badWords, zoneArrivals } from '../public/js/builder/validate.js?v=02767566';
 import { streetWorld, jumpArc, jumpArcs, reachStreet } from '../public/js/builder/reach-graph.js?v=40bfbc44';
 import { GRAVITY, stepAvatar, avatarGround, steerX, coastX, NORMAL_BUFF } from '../public/js/avatar-step.js?v=537aa4b7';
 import { platformsScreen } from '../public/js/street-model.js?v=505d8990';

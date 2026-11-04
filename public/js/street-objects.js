@@ -38,7 +38,7 @@ import { TRANT_META, canHarvestTrant, fruitCapacityAt, resolveArborologyPackage 
 import { highestLightGreenThumbRank, quoteTrantCare } from './trant-care.js?v=38c0207f';
 import { RESOURCE_NODE_ALIASES, RESOURCE_NODE_CATALOG, resolveResourceSkillPackage } from './resource-nodes.js?v=d78746b3';
 import { highestAnimalKinshipRank } from './animal-kinship.js?v=2757bb52';
-import { applyCreatureState, clockOffset, pathFrom } from './street-creatures.js?v=03bece7a';
+import { applyCreatureState, clockOffset, pathFrom } from './street-creatures.js?v=3a7abcef';
 
 /** The resource-node classes whose stock is shared (the "N uses left, then regrows" nodes). */
 export const SHARED_NODE_CLASSES = Object.freeze(['mortar_barnacle', 'ice_knob', 'jellisac', 'dirt_pile', 'peat_1', 'paper_tree']);
