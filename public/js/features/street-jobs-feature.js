@@ -56,7 +56,8 @@ import {
   WORK_UNIT_MS,
   PHASE_WINNER_COUNTER,
   PARTICIPANT_COUNTER,
-  TROPHY_FAMILIES,
+  TROPHY_PIECES,
+  planStreetTrophies,
   normalizeStreetJobState,
   initializeStreetJobs,
   jobDef,
@@ -94,9 +95,9 @@ import {
   cancelJob,
   jobDivisor,
   upgradeOption,
-} from '../street-jobs.js?v=ccf76b74';
+} from '../street-jobs.js?v=eca98f2d';
 import { gainMetabolic, loseEnergy } from '../metabolics.js?v=8504134e';
-import { closuresInTheWay, holdNote, placeIndex, questHold, reachableStreets } from '../quest-reach.js?v=a840235a';
+import { closuresInTheWay, holdNote, placeIndex, questHold, reachableStreets } from '../quest-reach.js?v=c520e7e0';
 import { getQuestCatalog as questCatalog } from '../content-catalogs.js?v=10b118dd';
 import { saveStore } from '../save-store.js?v=8839ba7b';
 import {
@@ -117,7 +118,7 @@ import {
   rowFromServer,
   sharedSlice,
   topLine,
-} from '../street-jobs-mp.js?v=ab23c4df';
+} from '../street-jobs-mp.js?v=59f9e769';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 import { createMinnAccount } from '../minn-account.js?v=28026657';
 import { normalizeGroups } from '../groups.js?v=14b60589';
@@ -127,8 +128,8 @@ import { itemZ } from '../item-bands.js?v=e98b10bc';
 import { SIGN_ARMS, routeGraph } from '../map-routes.js?v=bcf2c347';
 import { TELEPORTERS } from '../hidden-floors.js?v=1de85d03';
 import { WINTRY_PORTAL_TELEPORTERS } from '../wintry-portal.js?v=1437deda';
-import { PROJECTS_TEXT, contributedJobs, mineTotal, projectList } from '../projects-tracker.js?v=054465e9';
-import { PROJECTS_PANEL_ID, buildProjectsPanel, renderProjects } from '../ui/projects-sheet.js?v=ea38bf0f';
+import { PROJECTS_TEXT, contributedJobs, mineTotal, projectList } from '../projects-tracker.js?v=f46bfff9';
+import { PROJECTS_PANEL_ID, buildProjectsPanel, renderProjects } from '../ui/projects-sheet.js?v=18387022';
 import { SIDE_SHEET_IDS } from '../ui/panel-shell.js?v=e2abdf9e';
 
 export const STREET_JOBS_FEATURE_ID = 'street-jobs';
@@ -616,17 +617,44 @@ function grantItems(engine, items) {
   grantFinishedTrophies(engine);
 }
 
-/** The collection badges' item reward: the whole trophy, once. */
+/**
+ * The collection badges' trophy (planStreetTrophies): one of each piece goes, the whole trophy
+ * comes, once a family.
+ */
 function grantFinishedTrophies(engine) {
-  const unlocked = engine.unlockedAchievements || [];
-  for (const family of TROPHY_FAMILIES) {
-    const badge = `collection_street_creator_${family}`;
-    if (!unlocked.includes(badge) || state.trophiesGranted.includes(family)) continue;
-    state.trophiesGranted.push(family);
-    const id = `trophy_street_creator_${family}`;
-    grantItems(engine, [{ classTsid: id, count: 1 }]);
-    engine.pushActivity(`You assembled the ${itemLabel(id)}!`);
+  if (!engine?.inv) return;
+  const plans = planStreetTrophies(state, engine.unlockedAchievements, (cls) => countItem(engine.inv, cls));
+  for (const plan of plans) {
+    state.trophiesGranted.push(plan.family);
+    for (const cls of plan.take) removeItem(engine.inv, cls, 1);
+    grantItems(engine, [{ classTsid: plan.trophy, count: 1 }]);
+    const name = itemLabel(plan.trophy);
+    engine.pushActivity(plan.take.length === 5 ? `Your five pieces became the ${name}!` : `You got the ${name}!`);
   }
+  if (plans.length) {
+    piecesOwned = new Set(TROPHY_PIECES.filter((cls) => countItem(engine.inv, cls) > 0));
+    engine.refreshPack?.();
+    engine.save?.();
+  }
+}
+
+/**
+ * Report 97: pieces reach the pack from a project's reward (solo, or online through the site's
+ * ledger, which puts a reward settled while you were away straight into the save), a trade, a
+ * gift, mail or the ground, so the pack is watched, as for the Egg Hunter's eggs: each piece counts
+ * for its badge the first time it shows up (and every piece held at the first look, so a save
+ * that already holds all five gets its trophy on load). Then the trophy exchange runs.
+ */
+let piecesOwned = null;
+let piecesCheckAt = 0;
+function tickTrophyPieces(engine, now) {
+  if (!engine?.inv || now < piecesCheckAt) return;
+  piecesCheckAt = now + 1000;
+  const owned = TROPHY_PIECES.filter((cls) => countItem(engine.inv, cls) > 0);
+  const fresh = piecesOwned ? owned.filter((cls) => !piecesOwned.has(cls)) : owned;
+  piecesOwned = new Set(owned);
+  for (const cls of fresh) engine.achievement?.(`in_inventory:${cls}`, 1);
+  grantFinishedTrophies(engine);
 }
 
 function afterContribution(engine, res) {
@@ -2241,6 +2269,8 @@ export const streetJobsFeature = {
     // Ticket 81: a save from before the Projects panel counts what finished before as seen.
     if (state.trackerSeen == null) state.trackerSeen = Date.now();
     mineRows.clear();
+    // A save loaded: its pieces are looked at afresh (tickTrophyPieces).
+    piecesOwned = null;
     pj.answered = false;
     pj.badge = -1;
     if (engine) mpMode = engine.mode === 'multiplayer';
@@ -2328,6 +2358,7 @@ export const streetJobsFeature = {
       lastRoadsKey = key;
     }
     qaOpenRoad(engine, now);
+    tickTrophyPieces(engine, now);
     const px = engine.player?.x;
     for (const b of barricades) {
       if (b.barricadeTag && !b.destroyed) b.barricadeTag.visible = Number.isFinite(px) && Math.abs(px - b.x) < 160;

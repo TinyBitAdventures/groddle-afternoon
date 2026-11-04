@@ -246,6 +246,9 @@ export function roundTo5(value) {
  * @param {object} rewards
  * @param {{ bonus?: number, factor?: number }} [opts] factor multiplies after the bonus (Completist level/4)
  */
+/** config.giants: the eleven Giants, as the save keys their favor (js/shrines.js GIANTS). */
+const ALL_GIANTS = Object.freeze(['alph', 'cosma', 'friendly', 'grendaline', 'humbaba', 'lem', 'mab', 'pot', 'spriggan', 'ti', 'zille']);
+
 export function applyRewards(pc, rewards, opts = {}) {
   if (!pc || !rewards) return pc;
   const buffMultiplier = Math.max(1, Number(pc.rewardMultiplier) || 1);
@@ -275,7 +278,10 @@ export function applyRewards(pc, rewards, opts = {}) {
   if (favor && typeof favor === 'object') {
     for (const entry of favorRewards) {
       if (!entry.points) continue;
-      favor[entry.giant] = Math.max(0, Number(favor[entry.giant]) || 0) + entry.points;
+      // stats_add_favor_points('all', n) gives n to every Giant (inc_stats.js 956-961), as the
+      // Street Creator trophies' 30 do (report 97); 'tii' is the save's 'ti'.
+      const giants = entry.giant === 'all' ? ALL_GIANTS : [entry.giant === 'tii' ? 'ti' : entry.giant];
+      for (const g of giants) favor[g] = Math.max(0, Number(favor[g]) || 0) + entry.points;
     }
   }
   if (buffMultiplier > 1 && (energy || mood || xp || currants || favorPoints)) {

@@ -23,7 +23,7 @@ import {
   applyAchievementProgress,
   createAchievementState,
   seedAchievementNearCompletion,
-} from '../public/js/achievements.js?v=cca6a4d8';
+} from '../public/js/achievements.js?v=ad0b5a5a';
 import { getGameDayKey } from '../public/js/game-day.js?v=edb00566';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=10b118dd';
 

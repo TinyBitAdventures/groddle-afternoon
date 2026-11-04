@@ -45,7 +45,7 @@
  */
 
 import { insideBottomRect } from '../doors.js?v=eb9510b1';
-import { assignQuest } from '../quests.js?v=b2856d6c';
+import { assignQuest } from '../quests.js?v=2ce7b3cb';
 import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=3149d699';
 import { pixiSpeed } from '../sprite-sheets.js?v=db7c442f';
 import {

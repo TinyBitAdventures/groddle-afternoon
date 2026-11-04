@@ -21,8 +21,8 @@ import {
   homeTrophyCount,
   isTrophyClass,
   itemVerbsFeature,
-} from '../public/js/features/item-verbs-feature.js?v=6e9906e5';
-import { homesFeature } from '../public/js/features/homes-feature.js?v=f5903c3b';
+} from '../public/js/features/item-verbs-feature.js?v=efa87e58';
+import { homesFeature } from '../public/js/features/homes-feature.js?v=adaa5124';
 import {
   applyAchievementProgress,
   createAchievementState,
@@ -31,7 +31,7 @@ import {
   resetAchievementCounter,
   seedAchievementNearCompletion,
   worldVerbAchievementCounters,
-} from '../public/js/achievements.js?v=cca6a4d8';
+} from '../public/js/achievements.js?v=ad0b5a5a';
 import { applyBuff, buffPhysics, createBuffState, getBuffItemInfo, tickBuffs } from '../public/js/buffs.js?v=036fee53';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=10b118dd';
 

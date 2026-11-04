@@ -29,7 +29,7 @@ import {
   rowFromServer,
   sharedSlice,
   topLine,
-} from '../public/js/street-jobs-mp.js?v=ab23c4df';
+} from '../public/js/street-jobs-mp.js?v=59f9e769';
 import {
   isJobBuilt,
   jobStatus,
@@ -38,7 +38,7 @@ import {
   phaseRequirements,
   roadClosure,
   soloNeed,
-} from '../public/js/street-jobs.js?v=ccf76b74';
+} from '../public/js/street-jobs.js?v=eca98f2d';
 
 const root = join(import.meta.dirname, '..');
 const catalog = JSON.parse(readFileSync(join(root, 'public/assets/content/street-jobs.json'), 'utf8'));

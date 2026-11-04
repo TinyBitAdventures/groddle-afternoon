@@ -39,8 +39,8 @@ import {
 } from '../public/js/shrines.js?v=9d364845';
 import { emblemUnlockSkillFor } from '../public/js/skill-tree.js?v=53795620';
 import { studyGiantsLine } from '../public/js/skills-panel.js?v=4d486440';
-import { EMITTED_EVENTS, routeQuestEvent, acceptOffer, requirementRoute } from '../public/js/quest-offers.js?v=12fe3117';
-import { createQuestState } from '../public/js/quests.js?v=b2856d6c';
+import { EMITTED_EVENTS, routeQuestEvent, acceptOffer, requirementRoute } from '../public/js/quest-offers.js?v=c6b0ab10';
+import { createQuestState } from '../public/js/quests.js?v=2ce7b3cb';
 import { getQuestCatalog } from '../public/js/content-catalogs.js?v=10b118dd';
 import { normalizeShrineState } from '../public/js/shrines.js?v=9d364845';
 

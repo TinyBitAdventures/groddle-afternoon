@@ -68,6 +68,30 @@ export const CONTRIBUTION_BADGES = Object.freeze([
   ['deeply_concerned_citizen', 253],
 ]);
 export const TROPHY_FAMILIES = Object.freeze(['wood', 'earth', 'rock', 'dirt']);
+/** The five pieces of each Street Creator Trophy (items/trophy_street_creator_<family>_piece1..5.js). */
+export const TROPHY_PIECES = Object.freeze(TROPHY_FAMILIES.flatMap((f) => [1, 2, 3, 4, 5].map((n) => `trophy_street_creator_${f}_piece${n}`)));
+
+/**
+ * The Street Creator Trophies, the source way (report 97). collection_street_creator_<family>
+ * (collection_type 2) is earned holding one of each of its five pieces, however they came
+ * (players/inc_items.js items_added 593-597, inc_achievements.js achievements_check_in_inventory
+ * 520-544); granting it destroys one of each piece (inc_achievements.js 392-401, items_destroy, so
+ * a missing one is skipped) and onComplete makes the whole trophy (createItemFromFamiliar). Once
+ * per family: a save that got its trophy before keeps its pieces. Returns
+ * [{ family, badge, trophy, take }] for the families whose badge is unlocked and trophy not given.
+ * countOf(classTsid) is the pack count.
+ */
+export function planStreetTrophies(state, unlocked, countOf) {
+  const out = [];
+  const given = state?.trophiesGranted || [];
+  for (const family of TROPHY_FAMILIES) {
+    const badge = `collection_street_creator_${family}`;
+    if (!(unlocked || []).includes(badge) || given.includes(family)) continue;
+    const take = [1, 2, 3, 4, 5].map((n) => `trophy_street_creator_${family}_piece${n}`).filter((cls) => (Number(countOf(cls)) || 0) > 0);
+    out.push({ family, badge, trophy: `trophy_street_creator_${family}`, take });
+  }
+  return out;
+}
 
 const clean = (value) => String(value || '').replace(/[^a-zA-Z0-9_-]/g, '').slice(0, 64);
 const whole = (value) => Math.max(0, Math.floor(Number(value) || 0));

@@ -93,8 +93,8 @@ import {
   resumeTarget,
   setCurrentState,
 } from '../conversations.js?v=7cbdfea4';
-import { questStatus } from '../quest-offers.js?v=12fe3117';
-import { questDoneAt } from '../quests.js?v=b2856d6c';
+import { questStatus } from '../quest-offers.js?v=c6b0ab10';
+import { questDoneAt } from '../quests.js?v=2ce7b3cb';
 
 export const STREET_SPIRITS_FEATURE_ID = 'street-spirits';
 const TALK_MS = 5000; // the remake's talk bubble; the source talks until the conversation ends

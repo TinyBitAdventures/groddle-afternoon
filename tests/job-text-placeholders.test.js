@@ -11,8 +11,8 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { contributionsText, jobText, phaseName, plainText } from '../public/js/street-jobs.js?v=ccf76b74';
-import { cleanQuestMarkup } from '../public/js/quests.js?v=b2856d6c';
+import { contributionsText, jobText, phaseName, plainText } from '../public/js/street-jobs.js?v=eca98f2d';
+import { cleanQuestMarkup } from '../public/js/quests.js?v=2ce7b3cb';
 
 const root = join(import.meta.dirname, '..');
 const catalog = JSON.parse(readFileSync(join(root, 'public/assets/content/street-jobs.json'), 'utf8'));

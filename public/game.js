@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=2e6bc3fd';
 import { createFeatureHost } from './js/feature-host.js?v=2ed3c069';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=447d6aec';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=2913af72';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -32,11 +32,11 @@ import {
   parseQuestConversation,
   cleanQuestMarkup,
   questDoneAt,
-} from './js/quests.js?v=b2856d6c';
+} from './js/quests.js?v=2ce7b3cb';
 // Quest copy is Flash htmlText: <b>/<i>/<br> drawn as formatting, the rest dropped, never innerHTML.
 import { questRequirementText, renderQuestText, withQuestMarkup } from './js/quest-text.js?v=7f5d761c';
 // G267: the world-verb quest counters skip offer-system quests; old saves drop the boot Moloko quest.
-import { dropBootStarterQuests, questMoveNote, routesCounter, worldVerbQuestEvents, gardenPlotEvents, makingUnitQuestEvents, shrineDonationQuestEvents } from './js/quest-offers.js?v=12fe3117';
+import { dropBootStarterQuests, questMoveNote, routesCounter, worldVerbQuestEvents, gardenPlotEvents, makingUnitQuestEvents, shrineDonationQuestEvents } from './js/quest-offers.js?v=c6b0ab10';
 import {
   PHANTOM_QUEST_ID,
   REMEMBER_QUEST_ID,
@@ -381,7 +381,7 @@ import {
   consumeAchievementCounters,
   resetAchievementCounter,
   purchaseAchievementUpdates,
-} from './js/achievements.js?v=cca6a4d8';
+} from './js/achievements.js?v=ad0b5a5a';
 import {
   applyStreetVisit,
   STREET_VISITS_SLOT,
@@ -482,7 +482,7 @@ import {
   parsePlayerSave,
   serializePlayerSave,
   restorePlayerSave,
-} from './js/player-save.js?v=e575fb77';
+} from './js/player-save.js?v=86bb897a';
 import {
   HOME_INTERIOR_TSID,
   HOME_STREET_TSID,
@@ -3005,7 +3005,8 @@ function announceAchievementUpdates(updates = []) {
     if (rewards.currants) rewardBits.push(`+${Number(rewards.currants).toLocaleString()} currants`);
     if (rewards.favor?.points && rewards.favor?.giant) {
       const giant = String(rewards.favor.giant);
-      rewardBits.push(`+${Number(rewards.favor.points).toLocaleString()} ${giant[0].toUpperCase()}${giant.slice(1)} favor`);
+      // 'all': every Giant (stats_add_favor_points), report 97.
+      rewardBits.push(`+${Number(rewards.favor.points).toLocaleString()} ${giant === 'all' ? 'favor with every Giant' : `${giant[0].toUpperCase()}${giant.slice(1)} favor`}`);
     }
     if (app?.canvas) {
       app.canvas.dataset.achievementUnlocked = update.classTsid || update.def.classTsid;
@@ -14408,7 +14409,7 @@ function announceQuestCompletions(updates = []) {
     if (favorReward?.points && favorReward?.giant) {
       const giant = String(favorReward.giant);
       rewardBits.push(
-        `+${Number(favorReward.points).toLocaleString()} ${giant[0].toUpperCase()}${giant.slice(1)} favor`
+        `+${Number(favorReward.points).toLocaleString()} ${giant === 'all' ? 'favor with every Giant' : `${giant[0].toUpperCase()}${giant.slice(1)} favor`}`
       );
     }
     const completionPages = parseQuestConversation(update.def.completion);

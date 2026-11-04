@@ -31,7 +31,7 @@ import {
   createAchievementState,
   getAchievementProgress,
   seedAchievementNearCompletion,
-} from '../public/js/achievements.js?v=cca6a4d8';
+} from '../public/js/achievements.js?v=ad0b5a5a';
 import { createShrineState, donateToShrine, quoteShrineDonation } from '../public/js/shrines.js?v=9d364845';
 import { applyBuff, createBuffState, tickBuffs } from '../public/js/buffs.js?v=036fee53';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=10b118dd';

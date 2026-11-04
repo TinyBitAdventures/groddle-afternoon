@@ -37,7 +37,14 @@ import {
   contributionBadgesReached,
   jobText,
   plainText,
-} from '../public/js/street-jobs.js?v=ccf76b74';
+  TROPHY_PIECES,
+  planStreetTrophies,
+} from '../public/js/street-jobs.js?v=eca98f2d';
+import { streetJobsFeature } from '../public/js/features/street-jobs-feature.js?v=75be52e9';
+import { createAchievementState, applyAchievementProgress } from '../public/js/achievements.js?v=ad0b5a5a';
+import { applyRewards } from '../public/js/quests.js?v=2ce7b3cb';
+import { loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js?v=10b118dd';
+import { addItem, countItem } from '../public/js/inventory.js?v=602da017';
 import { obtainableItems } from '../tools/job-obtainable.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..', 'public');
@@ -325,5 +332,122 @@ describe('street project phase names', () => {
     assert.match(src, /function phaseTitle\(job, phase, def\)[\s\S]{0,120}phaseName\(/);
     // Every phase/def title reaches the UI through phaseTitle, never raw.
     assert.doesNotMatch(src, /\$\{[^}]*(phase\.label|def\.title)[^}]*\}/);
+  });
+});
+
+describe('report 97: the Street Creator Trophies', () => {
+  const gsjs = join(root, '../../glitch-GameServerJS');
+  const GIANT_IDS = ['alph', 'cosma', 'friendly', 'grendaline', 'humbaba', 'lem', 'mab', 'pot', 'spriggan', 'ti', 'zille'];
+  const rock = [1, 2, 3, 4, 5].map((n) => `trophy_street_creator_rock_piece${n}`);
+
+  it('the source: five distinct pieces held at once, consumed for the trophy; a project rolls one at random', { skip: !existsSync(gsjs) && 'no GSJS checkout' }, () => {
+    for (const family of ['rock', 'dirt', 'earth', 'wood']) {
+      const src = readFileSync(join(gsjs, `achievements/collection_street_creator_${family}.js`), 'utf8');
+      assert.match(src, /var collection_type\t= 2;/);
+      assert.match(src, /pc\.stats_add_xp\(round_to_5\(1000 \* multiplier\), true\);/);
+      assert.match(src, /pc\.stats_add_favor_points\("all", round_to_5\(30 \* multiplier\)\);/);
+      assert.match(src, new RegExp(`pc\\.createItemFromFamiliar\\("trophy_street_creator_${family}", 1\\);`));
+      for (let n = 1; n <= 5; n++) assert.match(src, new RegExp(`group\\t: "in_inventory",\\n\\t\\tlabel\\t: "trophy_street_creator_${family}_piece${n}"`));
+    }
+    const ach = readFileSync(join(gsjs, 'players/inc_achievements.js'), 'utf8');
+    assert.match(ach, /if \(achievement\.collection_type == 2\) this\.items_destroy\(condition\.label, condition\.value\);/);
+    assert.match(ach, /if \(this\.countItemClass\(data\.label\) < intval\(data\.value\)\)\{/);
+    assert.match(readFileSync(join(gsjs, 'players/inc_items.js'), 'utf8'), /var achievements_to_check = this\.achievements_get_from_counter\('in_inventory', stack\.class_id\);/);
+    // One roll per performance reward: repeats were possible in the original too.
+    assert.match(readFileSync(join(gsjs, 'quests/job_standard5_for_new_streets.js'), 'utf8'), /var items = pc\.runDropTable\("street_creation_trophies"\);/);
+    assert.match(readFileSync(join(gsjs, 'players/inc_skill_packages.js'), 'utf8'), /var chance = \/\*this\.buffs_has\('max_luck'\) \? 0 : \*\/ randInt\(0, 100\);/);
+  });
+
+  it('the piece says what it is for', () => {
+    for (const cls of TROPHY_PIECES.filter((c) => c.includes('_rock_'))) {
+      assert.equal(catalog.items[cls].desc, 'One fifth of a trophy celebrating top street-creators. Four more pieces similar to it, and one mighty Rock Trophy would be born.');
+    }
+    assert.equal(TROPHY_PIECES.length, 20);
+  });
+
+  it('planStreetTrophies: an unlocked badge takes one of each piece held, once a family', () => {
+    const held = { trophy_street_creator_rock_piece1: 2, trophy_street_creator_rock_piece3: 1 };
+    const countOf = (c) => held[c] || 0;
+    assert.deepEqual(planStreetTrophies({ trophiesGranted: [] }, [], countOf), []);
+    assert.deepEqual(planStreetTrophies({ trophiesGranted: [] }, ['collection_street_creator_rock'], countOf), [
+      { family: 'rock', badge: 'collection_street_creator_rock', trophy: 'trophy_street_creator_rock', take: ['trophy_street_creator_rock_piece1', 'trophy_street_creator_rock_piece3'] },
+    ]);
+    assert.deepEqual(planStreetTrophies({ trophiesGranted: ['rock'] }, ['collection_street_creator_rock'], countOf), []);
+  });
+
+  it("applyRewards: 'all' favor goes to every Giant (stats_add_favor_points)", () => {
+    const pc = { giantFavor: {} };
+    applyRewards(pc, { favor: { giant: 'all', points: 30 } });
+    assert.deepEqual(Object.keys(pc.giantFavor).sort(), GIANT_IDS);
+    assert.ok(Object.values(pc.giantFavor).every((v) => v === 30));
+    // The badge and quest cards say so, not "+30 All favor".
+    const game = readFileSync(join(root, 'game.js'), 'utf8');
+    assert.equal(game.split("giant === 'all' ? 'favor with every Giant'").length - 1, 2);
+  });
+
+  it('a save already holding all five completes the badge on load: pieces go, the trophy comes, once', async () => {
+    resetContentCatalogs();
+    await loadContentCatalogsFromDir(join(root, 'assets/content'));
+    const realFetch = globalThis.fetch;
+    globalThis.fetch = async (url) => ({ ok: true, json: async () => JSON.parse(readFileSync(join(root, String(url).split('?')[0]), 'utf8')) });
+    try {
+      const achieve = createAchievementState();
+      const pc = { level: 10, xp: 0, imagination: 0, giantFavor: {}, energy: 50, mood: 50 };
+      const log = [];
+      const engine = {
+        mode: 'multiplayer',
+        streetTsid: HECHEY,
+        inv: {},
+        pc,
+        param: () => null,
+        setData() {},
+        save() {},
+        updateHud() {},
+        refreshPack() {},
+        pushActivity: (t) => log.push(t),
+        get unlockedAchievements() {
+          return achieve.unlocked;
+        },
+        achievement: (counter, n = 1) => applyAchievementProgress(achieve, counter, n, pc),
+      };
+      // Online, the rewards came through the ledger into the stored save: no gain event ever ran.
+      for (const cls of rock) addItem(engine.inv, cls, 1);
+      addItem(engine.inv, 'trophy_street_creator_earth_piece2', 1);
+      streetJobsFeature.init(engine);
+      streetJobsFeature.restore({}, engine);
+      for (let i = 0; i < 200 && !streetJobsFeature._state().catalog; i++) await new Promise((r) => setTimeout(r, 10));
+      streetJobsFeature.onTick(16, 10_000, engine);
+      assert.ok(achieve.unlocked.includes('collection_street_creator_rock'));
+      assert.equal(achieve.unlocked.includes('collection_street_creator_earth'), false);
+      assert.deepEqual(rock.map((c) => countItem(engine.inv, c)), [0, 0, 0, 0, 0], 'one of each piece destroyed (collection_type 2)');
+      assert.equal(countItem(engine.inv, 'trophy_street_creator_rock'), 1);
+      assert.equal(countItem(engine.inv, 'trophy_street_creator_earth_piece2'), 1);
+      assert.equal(pc.imagination, 1000);
+      assert.deepEqual(Object.keys(pc.giantFavor).sort(), GIANT_IDS);
+      assert.ok(Object.values(pc.giantFavor).every((v) => v === 30), '30 with every Giant');
+      assert.deepEqual(log, ['Your five pieces became the Street Creator Rock Trophy!']);
+      // Five more pieces later (a trade): the badge is had, nothing more.
+      for (const cls of rock) addItem(engine.inv, cls, 1);
+      streetJobsFeature.onTick(16, 12_000, engine);
+      assert.equal(countItem(engine.inv, 'trophy_street_creator_rock'), 1);
+      assert.equal(countItem(engine.inv, rock[0]), 1);
+      // The save keeps the family as given (online too: sharedSlice keeps it), so a reload gives nothing again.
+      const slice = JSON.parse(JSON.stringify(streetJobsFeature.save()));
+      assert.deepEqual(slice.trophiesGranted, ['rock']);
+      streetJobsFeature.restore(slice, engine);
+      streetJobsFeature.onTick(16, 14_000, engine);
+      assert.equal(countItem(engine.inv, 'trophy_street_creator_rock'), 1);
+      // Four earth pieces: nothing; the fifth arrives (a gift) and the next look completes it.
+      for (const n of [1, 3, 4]) addItem(engine.inv, `trophy_street_creator_earth_piece${n}`, 1);
+      streetJobsFeature.onTick(16, 16_000, engine);
+      assert.equal(achieve.unlocked.includes('collection_street_creator_earth'), false);
+      addItem(engine.inv, 'trophy_street_creator_earth_piece5', 1);
+      streetJobsFeature.onTick(16, 18_000, engine);
+      assert.ok(achieve.unlocked.includes('collection_street_creator_earth'));
+      assert.equal(countItem(engine.inv, 'trophy_street_creator_earth'), 1);
+      assert.equal(countItem(engine.inv, 'trophy_street_creator_earth_piece5'), 0);
+    } finally {
+      globalThis.fetch = realFetch;
+    }
   });
 });

@@ -16,7 +16,7 @@
  * [data-pj-act="route|teleport|map"], [data-pj-needs], #projects-meta, #projects-close.
  */
 
-import { PROJECTS_TEXT as T, shareLine, statusLine } from '../projects-tracker.js?v=054465e9';
+import { PROJECTS_TEXT as T, shareLine, statusLine } from '../projects-tracker.js?v=f46bfff9';
 
 export const PROJECTS_PANEL_ID = 'projects-panel';
 const ICON = 'assets/sprites/street-jobs/sign_stake.png';

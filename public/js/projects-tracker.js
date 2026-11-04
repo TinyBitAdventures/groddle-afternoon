@@ -16,7 +16,7 @@
  * and only the player's own share is read from it (`mine`). Words come from `labels`.
  */
 
-import { jobDef, jobDivisor, jobStatus, phaseBaseCost, phaseClass, phaseName, phaseRequirements } from './street-jobs.js?v=ccf76b74';
+import { jobDef, jobDivisor, jobStatus, phaseBaseCost, phaseClass, phaseName, phaseRequirements } from './street-jobs.js?v=eca98f2d';
 
 /** The projects the panel follows: a street's build or upgrade, and online a group hall. Homes' restorations stay their home's. */
 export const TRACKED_KINDS = Object.freeze(['street', 'upgrade', 'hall']);

@@ -3,7 +3,7 @@
  */
 
 import { getAchievementCatalog } from './content-catalogs.js?v=10b118dd';
-import { applyRewards } from './quests.js?v=b2856d6c';
+import { applyRewards } from './quests.js?v=2ce7b3cb';
 import { achievementRewardModifier, scaleRewards } from './imagination-effects.js?v=70169933';
 
 export function createAchievementState() {
