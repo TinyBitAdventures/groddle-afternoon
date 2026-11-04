@@ -27,7 +27,7 @@ import {
 } from '../tools/overlay-art/xfl-svg.mjs';
 import { OVERLAYS, checkOverlays, framePlan, scrub } from '../tools/overlay-art/build.mjs';
 import { POOF_IN, poofInAlpha, stateFrameAt } from '../public/js/overlay-art.js?v=11b6dd7f';
-import { orbLookFor } from '../public/js/rook-attack.js?v=55853232';
+import { orbLookFor } from '../public/js/rook-attack.js?v=03e79296';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const pub = join(here, '../public');

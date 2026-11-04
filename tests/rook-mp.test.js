@@ -18,8 +18,8 @@ import {
   strikeDamage,
   syncKeys,
   syncObjs,
-} from '../public/js/rook-mp.js?v=6012319e';
-import { rookClockS, canStrike, canStun, rookPresent } from '../public/js/rook-attack.js?v=55853232';
+} from '../public/js/rook-mp.js?v=d906f86e';
+import { rookClockS, canStrike, canStun, rookPresent } from '../public/js/rook-attack.js?v=03e79296';
 import { HAS_SERVER, serverPath, skipWithoutServer } from '../tools/repos.mjs';
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');

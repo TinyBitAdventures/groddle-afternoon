@@ -552,6 +552,16 @@ export function strikeDamageFor({ baseCost = 0, count = 1, emblem = false, solo 
   return Math.max(ROOK_SOLO.strikeFloor, source * ROOK_SOLO.strikeCrowd);
 }
 
+/**
+ * The first count the offering's How many chooser shows (ticket 70): half the stack, rounded, as the
+ * client's quantity picker opened (glitch-client InteractionMenuController.as getCountChoices
+ * 1724-1730, `value: Math.round(max_count/2)`), one to the stack.
+ */
+export function offerDefaultCount(max) {
+  const hi = Math.max(1, Math.floor(Number(max)) || 1);
+  return Math.max(1, Math.min(hi, Math.round(hi / 2)));
+}
+
 /** Shrine laser size (shrine_laser_beam_1/2/3). */
 export function strikeBeamFor(damage, emblem = false) {
   if (emblem) return 3;

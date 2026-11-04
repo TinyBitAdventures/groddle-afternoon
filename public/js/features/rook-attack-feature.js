@@ -52,6 +52,7 @@
 
 import { slugsFromEffects } from '../speech-slugs.js?v=130338f9';
 import { addItem, countItem, ensureItem, removeItem, ITEM_CATALOG } from '../inventory.js?v=597a17a2';
+import { bindCountField, countKeyValue, countStepMarkup } from '../ui/count-chooser.js?v=893305c8';
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=8f5dc6d9';
 import { nearestSurfaceY } from '../walk-surface.js?v=c982983e';
 import { donationValueFor } from '../shrines.js?v=c6a91b91';
@@ -86,10 +87,11 @@ import {
   soloCost,
   stepRookAttack,
   streetIsRookable,
+  offerDefaultCount,
   strikeBeamFor,
   strikeDamageFor,
   useBalmPoint,
-} from '../rook-attack.js?v=55853232';
+} from '../rook-attack.js?v=03e79296';
 import { shrinePrimeBonus } from '../imagination-effects.js?v=70169933';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 import { gainMetabolic, loseEnergy, loseMood } from '../metabolics.js?v=8504134e';
@@ -108,7 +110,7 @@ import {
   strikeDamage as mpStrikeDamage,
   syncKeys,
   syncObjs,
-} from '../rook-mp.js?v=6012319e';
+} from '../rook-mp.js?v=d906f86e';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
 import { feedZone, placeRookBadge, unionBox } from '../rook-badge-place.js?v=2bb00dfd';
 
@@ -226,6 +228,8 @@ let musicFor = '';
 let primed = null; // { target, until, damage, strikeAt }
 let orb = null; // runtime orb
 let offerPanel = null;
+/** rook.go rookMaxCount: an online offering is at most 999 of a stack. */
+const MP_OFFER_MAX = 999;
 /** Multiplayer only (see the Multiplayer section): the server's attack for this street, or null in solo. */
 let mp = null;
 
@@ -1649,14 +1653,16 @@ function offerOptions(engine, giantId) {
     const emblem = classTsid === `emblem_${giantId}`;
     if (!emblem && (meta.tags || []).includes('emblem')) continue;
     const base = donationValueFor(classTsid);
+    const damageFor = (k) => strikeDamageFor({ baseCost: base, count: k, emblem, primeBonus: primeBonusFor(engine) });
     out.push({
       classTsid,
       label: meta.label || classTsid,
       icon: meta.icon,
       count: n,
       emblem,
-      one: strikeDamageFor({ baseCost: base, count: 1, emblem, primeBonus: primeBonusFor(engine) }),
-      all: strikeDamageFor({ baseCost: base, count: n, emblem, primeBonus: primeBonusFor(engine) }),
+      one: damageFor(1),
+      all: damageFor(n),
+      damageFor,
     });
   }
   return out.sort((a, b) => b.all - a.all).slice(0, 24);
@@ -1703,7 +1709,27 @@ function closeOfferPanel() {
   offerPanel = null;
 }
 
-/** "(Donate To) what?": the shrine's offering grid, one or all of a stack. */
+/** The offering chooser's hooks on the How many step row (js/ui/count-chooser.js countStepMarkup). */
+const OFFER_COUNT_ATTRS = Object.freeze({ dec: 'data-rook-count-dec', inc: 'data-rook-count-inc', num: 'data-rook-count-num', max: 'data-rook-count-max' });
+
+/** The chooser's line under the step row: how many of the stack, and the damage they will do. */
+function offerCountLine(o, n) {
+  return `${n} of ${o.count} · ${o.damageFor(n)} damage`;
+}
+
+/** Give `n` of an offering: the row's 1 and All and the How many chooser all end here. */
+function giveOffering(engine, target, o, n) {
+  closeOfferPanel();
+  return strike(engine, target, o.classTsid, Math.max(1, Math.min(o.count, Math.floor(Number(n)) || 1)));
+}
+
+/**
+ * "(Donate To) what?": the shrine's offering grid. Each stack gives 1, All, or How many (ticket 70):
+ * the donate verb has requires_target_item_count (GSJS items/npc_shrine_zille.js 352), so the client
+ * asked how many of the chosen stack, its quantity picker opening at half the stack beside All and 1
+ * (glitch-client InteractionMenuController.as 1338-1343, getCountChoices 1724-1765). The damage is
+ * the count's (items/include/shrines.js 1007, 1034).
+ */
 function openOfferPanel(engine, target) {
   closeOfferPanel();
   if (typeof document === 'undefined') return;
@@ -1721,37 +1747,130 @@ function openOfferPanel(engine, target) {
   wrap.setAttribute('role', 'dialog');
   wrap.setAttribute('aria-modal', 'true');
   wrap.innerHTML = `
-    <div class="verb-menu-card" style="max-width:420px">
+    <div class="verb-menu-card" style="width:min(460px, 94vw);max-width:none">
       <div class="verb-menu-head">
         <div class="verb-menu-title">Strike the Rook with what?</div>
         <button type="button" class="verb-menu-x" aria-label="Close">×</button>
       </div>
       <div class="verb-menu-sub" style="padding:0 0.85rem">A primed shrine turns an offering into a beam of holy vengeance.</div>
-      <ul class="rook-offer-list" style="list-style:none;margin:0;padding:0.5rem 0.85rem 0.85rem;display:grid;gap:0.35rem;max-height:260px;overflow:auto"></ul>
+      <ul class="rook-offer-list" style="list-style:none;margin:0;padding:0.5rem 0.85rem 0.85rem;display:grid;gap:0.35rem;max-height:320px;overflow:auto"></ul>
     </div>`;
   const list = wrap.querySelector('.rook-offer-list');
   if (!options.length) {
     list.innerHTML = '<li style="opacity:0.7">You don\'t have anything the shrine wants!</li>';
   }
+  const chip = 'width:auto;padding:0.25rem 0.55rem;border-radius:8px;white-space:nowrap';
+  /** The open How many chooser: { pop, o, n, row }, or null. */
+  let chooser = null;
+  const closeCount = ({ refocus = false } = {}) => {
+    if (!chooser) return;
+    const { pop, row } = chooser;
+    chooser = null;
+    pop.parentElement?.removeChild(pop);
+    const some = row.querySelector('[data-rook-some]');
+    some?.setAttribute('aria-expanded', 'false');
+    if (refocus) some?.focus();
+  };
+  const syncCount = () => {
+    if (!chooser) return;
+    const { pop, o, n } = chooser;
+    const num = pop.querySelector('[data-rook-count-num]');
+    if (num && String(num.value) !== String(n)) num.value = String(n);
+    const dec = pop.querySelector('[data-rook-count-dec]');
+    const inc = pop.querySelector('[data-rook-count-inc]');
+    const max = pop.querySelector('[data-rook-count-max]');
+    if (dec) dec.disabled = n <= 1;
+    if (inc) inc.disabled = n >= o.count;
+    if (max) {
+      if (n >= o.count) max.setAttribute('aria-pressed', 'true');
+      else max.removeAttribute('aria-pressed');
+    }
+    const line = pop.querySelector('.count-pop-of');
+    if (line) line.textContent = offerCountLine(o, n);
+    const give = pop.querySelector('[data-rook-count-give]');
+    if (give) give.textContent = `Give ${n}`;
+  };
+  const setCount = (v) => {
+    if (!chooser) return;
+    chooser.n = Math.max(1, Math.min(chooser.o.count, Math.floor(Number(v)) || 1));
+    syncCount();
+  };
+  const openCount = (o, row) => {
+    closeCount();
+    const n = offerDefaultCount(o.count);
+    const pop = document.createElement('li');
+    pop.className = 'count-pop rook-offer-count';
+    pop.dataset.rookCount = o.classTsid;
+    pop.setAttribute('role', 'group');
+    const plural = ITEM_CATALOG[o.classTsid]?.namePlural || `${o.label}s`;
+    pop.setAttribute('aria-label', `Strike with how many ${plural}?`);
+    pop.style.cssText = 'padding:0.35rem 0 0.25rem 2.4rem';
+    pop.innerHTML = `<p class="count-pop-title"></p>
+      ${countStepMarkup({ value: n, max: o.count, verb: 'Give', attrs: OFFER_COUNT_ATTRS })}
+      <output class="count-pop-of" aria-live="polite"></output>
+      <div class="count-pop-actions">
+        <span class="count-pop-esc mp-modern-only"><span class="kcap">Esc</span> back</span>
+        <button type="button" class="rook-offer-give" data-rook-count-give></button>
+      </div>`;
+    pop.querySelector('.count-pop-title').textContent = `Strike with how many ${plural}?`;
+    row.after(pop);
+    chooser = { pop, o, n, row };
+    row.querySelector('[data-rook-some]')?.setAttribute('aria-expanded', 'true');
+    syncCount();
+    // MPANELS (js/ui/count-chooser.js): − / + / Max, the number field (Enter gives what was typed, Esc
+    // goes back to the offerings) and the keys on the step row.
+    pop.querySelector('[data-rook-count-dec]')?.addEventListener('click', () => setCount(chooser.n - 1));
+    pop.querySelector('[data-rook-count-inc]')?.addEventListener('click', () => setCount(chooser.n + 1));
+    pop.querySelector('[data-rook-count-max]')?.addEventListener('click', () => setCount(o.count));
+    pop.querySelector('[data-rook-count-give]')?.addEventListener('click', () => giveOffering(engine, target, o, chooser.n));
+    bindCountField(pop.querySelector('[data-rook-count-num]'), {
+      max: () => o.count,
+      set: setCount,
+      confirm: (v) => giveOffering(engine, target, o, v),
+      cancel: () => closeCount({ refocus: true }),
+    });
+    pop.addEventListener('keydown', (e) => {
+      if (e.target?.matches?.('[data-rook-count-num]')) return;
+      const next = countKeyValue(e.key, chooser?.n ?? n, o.count);
+      if (next != null) {
+        e.preventDefault();
+        e.stopPropagation();
+        setCount(next);
+      } else if (e.key === 'Escape') {
+        e.preventDefault();
+        e.stopPropagation();
+        closeCount({ refocus: true });
+      } else if (e.key === 'Enter' || e.key === ' ') {
+        e.stopPropagation();
+      }
+    });
+    pop.querySelector('[data-rook-count-num]')?.focus();
+  };
   for (const o of options) {
     const li = document.createElement('li');
-    li.style.cssText = 'display:grid;grid-template-columns:32px 1fr auto auto;gap:0.45rem;align-items:center';
+    li.className = 'rook-offer-row';
+    li.dataset.rookOffer = o.classTsid;
+    li.style.cssText = 'display:grid;grid-template-columns:32px 1fr auto auto auto;gap:0.45rem;align-items:center';
+    // 1 and All are the quick picks; How many asks for the rest of a stack of three or more (two is 1 or All).
+    const some = o.count > 2
+      ? `<button type="button" class="verb-choice" data-rook-some aria-expanded="false" style="${chip};border:1px solid #e4d9c4">How many?</button>`
+      : '<span></span>';
     li.innerHTML = `<img alt="" width="28" height="28" style="object-fit:contain" />
       <span style="font-size:0.85rem"></span>
-      <button type="button" class="verb-choice" data-n="1" style="width:auto;padding:0.25rem 0.55rem;border:1px solid #e4d9c4;border-radius:8px"></button>
-      <button type="button" class="verb-choice" data-n="all" style="width:auto;padding:0.25rem 0.55rem;border:1px solid #d9a3ad;border-radius:8px;background:#fbecee;font-weight:700"></button>`;
+      <button type="button" class="verb-choice" data-rook-give="1" style="${chip};border:1px solid #e4d9c4"></button>
+      ${some}
+      <button type="button" class="verb-choice" data-rook-give="all" style="${chip};border:1px solid #d9a3ad;background:#fbecee;font-weight:700"></button>`;
     li.querySelector('img').src = o.icon || '';
     li.querySelector('span').textContent = `${o.label} ×${o.count}`;
-    const [one, all] = li.querySelectorAll('button');
+    const one = li.querySelector('[data-rook-give="1"]');
+    const all = li.querySelector('[data-rook-give="all"]');
     one.textContent = `1 · ${o.one}`;
     all.textContent = `All · ${o.all}`;
-    one.addEventListener('click', () => {
-      closeOfferPanel();
-      strike(engine, target, o.classTsid, 1);
-    });
-    all.addEventListener('click', () => {
-      closeOfferPanel();
-      strike(engine, target, o.classTsid, o.count);
+    one.addEventListener('click', () => giveOffering(engine, target, o, 1));
+    all.addEventListener('click', () => giveOffering(engine, target, o, o.count));
+    li.querySelector('[data-rook-some]')?.addEventListener('click', () => {
+      if (chooser?.row === li) closeCount({ refocus: true });
+      else openCount(o, li);
     });
     list.appendChild(li);
   }
@@ -2476,10 +2595,12 @@ function mpOfferOptions(engine, giantId) {
     if (!offerAllowed(classTsid, meta, giantId)) continue;
     const emblem = classTsid === `emblem_${giantId}`;
     const base = donationValueFor(classTsid);
-    const one = mpStrikeDamage({ baseCost: base, count: 1, emblem, primeBonus: bonus });
-    const all = mpStrikeDamage({ baseCost: base, count: Math.min(n, 999), emblem, primeBonus: bonus });
+    const damageFor = (k) => mpStrikeDamage({ baseCost: base, count: k, emblem, primeBonus: bonus });
+    const one = damageFor(1);
+    // rook.go rookMaxCount: the server takes at most 999 of a stack in one offering.
+    const all = damageFor(Math.min(n, MP_OFFER_MAX));
     if (all <= 0) continue;
-    out.push({ classTsid, label: meta.label || classTsid, icon: meta.icon, count: Math.min(n, 999), emblem, one, all });
+    out.push({ classTsid, label: meta.label || classTsid, icon: meta.icon, count: Math.min(n, MP_OFFER_MAX), emblem, one, all, damageFor });
   }
   return out.sort((x, y) => y.all - x.all).slice(0, 24);
 }
@@ -2490,7 +2611,7 @@ function mpStrike(engine, target, classTsid, count) {
     engine.toast(gate.reason || ROOK_TEXT.strikeNeedsPrime, 2000);
     return false;
   }
-  const n = Math.max(1, Math.min(count, countItem(engine.inv, classTsid), 999));
+  const n = Math.max(1, Math.min(count, countItem(engine.inv, classTsid), MP_OFFER_MAX));
   if (countItem(engine.inv, classTsid) <= 0) return false;
   // shrineAttack 967: the donate overlay comes back after 3 s.
   mp.strikeAt = now() + ROOK_SOURCE.strikeCooldownMs;
