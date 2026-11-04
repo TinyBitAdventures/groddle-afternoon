@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=4abc03fc';
 import { createFeatureHost } from './js/feature-host.js?v=2ed3c069';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=b3babad4';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=4783c59a';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -524,6 +524,7 @@ import {
   toolWornBaseCost,
   mostWornToolCopy,
   takeToolCopy,
+  moveToolCopy,
   setToolRemaining,
   WATERING_CAN_TOOLS,
   firstWorkingTool,
@@ -2090,6 +2091,8 @@ let vendorQty = 1;
 let vendorDragTsid = null;
 /** The tool copy being dragged to the vendor (ticket 43), else null. */
 let vendorDragCopy = null;
+/** The pack stack being dragged to the vendor ({ cls, container, index }), so that one sells. */
+let vendorDragPlace = null;
 /** @type {null|{ label:string, qty:number, gain:number }} */
 let vendorSellReceipt = null;
 let vendorReceiptTimer = 0;
@@ -3288,6 +3291,25 @@ function takeFromMenuStack(classTsid, n, wait = undefined) {
   return Boolean(features.query('packTakeFrom', classTsid, n, engine, { wait }));
 }
 
+/**
+ * A verb on one chosen item takes it, not just one of its class (Austin 2026-11-04: of two
+ * Tinkertools the one in a bag was sold, not the one picked). Glitch's verbs named the itemstack
+ * (main.js doVerb sends its tsid; inc_stores.js storeSell sells the stack it was given). A tool or
+ * jar is found by its copy (its place in pack order, js/tools.js); any other stack by its place
+ * ({ cls, container, index }). That stack gives the n that leave (features/bags-feature.js
+ * packTakeUnit / packTakeFrom); the copy's own wear leaves with it where the caller calls
+ * takeToolCopy at the removal. Returns whether a stack was marked.
+ */
+function takeChosenStack(classTsid, n, { copy = null, place = null, wait } = {}) {
+  const k = Math.max(1, Math.floor(Number(n) || 1));
+  if (TOOL_WEAR[classTsid] && Number.isInteger(copy) && copy >= 0) {
+    return Boolean(features.query('packTakeUnit', classTsid, copy, k, engine, { wait }));
+  }
+  if (place && place.cls === classTsid && place.container != null && Number.isFinite(Number(place.index))) {
+    return Boolean(features.query('packTakeFrom', classTsid, k, engine, { place: { cls: classTsid, container: place.container, index: Number(place.index) }, wait }));
+  }
+  return false;
+}
 
 /** Which of a class's tools the open pack popover is about (its slot's place in pack order), or null. */
 let packSelectedCopy = null;
@@ -4452,8 +4474,9 @@ function renderPackPopover(classTsid, anchor = null) {
   pop.querySelector('[data-pack-sell]')?.addEventListener('click', () => {
     leavingMenuBag(classTsid);
     const copy = slot.isTool ? packSelectedCopy : null;
+    const place = packSelectedStack ? { cls: classTsid, container: packSelectedStack.container, index: packSelectedStack.index } : null;
     closePackPopover();
-    stageVendorSell(classTsid, copy);
+    stageVendorSell(classTsid, copy, place);
   });
   pop.querySelector('[data-pack-drop]')?.addEventListener('click', () => {
     // A bag is one bag: drop the one this menu is about, with what it holds (no count chooser).
@@ -4861,6 +4884,7 @@ function renderPackRow(box, slots, opts = {}) {
         if (s.bag) features.query('packBagLeaves', s.bag.key, engine);
         vendorDragTsid = s.classTsid;
         vendorDragCopy = toolSlot && s.copy != null ? s.copy : null;
+        vendorDragPlace = inLayout ? { cls: s.classTsid, container: s.container, index: s.index } : null;
         vendorSellReceipt = null;
         vendorTab = 'sell';
         vendorSelected = null;
@@ -11878,10 +11902,11 @@ const engine = {
   /** The persistent per-street world slot (gardens, trees, rocks). */
   streetWorld: (tsid) => streetWorldState(tsid),
   /** createItemStack on the current street: a ground stack anyone can pick up. */
-  dropWorldStack(classTsid, count, x, y) {
+  dropWorldStack(classTsid, count, x, y, points = undefined) {
     // createItemStack(WithPoof) puts it in at the caller's point and it falls to the line under it.
     y = restingStackY(x, y);
-    const result = dropInventoryStack(droppedItemState, { [classTsid]: count }, droppedStacksTsid(), classTsid, count, { x, y }, { now: Date.now(), merge: false });
+    // `points`: a tool's own wear (or a jar's Fireflies) per unit, so it comes back up the same.
+    const result = dropInventoryStack(droppedItemState, { [classTsid]: count }, droppedStacksTsid(), classTsid, count, { x, y }, { now: Date.now(), merge: false, ...(Array.isArray(points) ? { points } : {}) });
     if (result.ok) {
       saveDroppedItems();
       refreshDroppedWorldItems();
@@ -12924,6 +12949,8 @@ function dropPackItem(classTsid, requested = 1) {
   }
   // Online the stack leaves when the server answers: the take waits for it.
   takeFromMenuStack(classTsid, count, 60000);
+  // A tool's own slot names which tool it is: that one goes down, with its own wear (2026-11-04).
+  const dropCopy = TOOL_WEAR[classTsid] && count === 1 && packSelected === classTsid && Number.isInteger(packSelectedCopy) ? packSelectedCopy : null;
   const facing = player.facing === 'left' ? -1 : 1;
   const x = clamp(player.x + facing * 72, 24, Math.max(24, WORLD_W - 24));
   // Tiny Speck's takeable_drop (items/include/takeable.js 157-206) puts the stack in
@@ -12934,10 +12961,13 @@ function dropPackItem(classTsid, requested = 1) {
   // With no line under it (off the street's edge) it stays by the avatar's feet.
   const y = landingY(streetPlatforms, x, player.y - 20) ?? player.y;
   // G332: in multiplayer a public street's drop is everyone's, through the server (features/drops-mp-feature.js).
-  if (features.query('sharedDrop', { classTsid, count, x, y }, engine)) {
+  if (features.query('sharedDrop', { classTsid, count, x, y, copy: dropCopy }, engine)) {
     closePackPopover();
     return;
   }
+  // The chosen tool moves last (js/tools.js takeToolCopy), so its wear is the one that goes down.
+  const held = countItem(inv, classTsid);
+  if (dropCopy != null) takeToolCopy(toolState, classTsid, { copy: dropCopy });
   const result = dropInventoryStack(
     droppedItemState,
     inv,
@@ -12949,6 +12979,8 @@ function dropPackItem(classTsid, requested = 1) {
   );
   closePackPopover();
   if (!result.ok) {
+    // Still held: back to its own place among the class's tools.
+    if (dropCopy != null) moveToolCopy(toolState, classTsid, held - 1, dropCopy);
     toast('Could not drop that item.');
     return;
   }
@@ -26776,7 +26808,11 @@ function performShrineDonation() {
   const result = donateToShrine(shrineState, giantId, inv, pc, shrineSelected, shrineQty, {
     ...shrinePowderOpts(),
     toolBaseCost: toolCopy != null ? () => toolWorth : shrineToolOpts().toolBaseCost,
-    beforeRemove: toolCopy != null ? () => takeToolCopy(toolState, shrineSelected, { copy: toolCopy }) : null,
+    beforeRemove: toolCopy != null ? () => {
+      // That tool's own slot empties, and its wear goes with it.
+      takeChosenStack(shrineSelected, 1, { copy: toolCopy });
+      takeToolCopy(toolState, shrineSelected, { copy: toolCopy });
+    } : null,
   });
   if (!result.ok) {
     toast('That donation could not be completed.');
@@ -27112,6 +27148,9 @@ function vendorSellChosenCopy(classTsid) {
   return vendorToolCopy?.classTsid === classTsid ? vendorToolCopy.copy : null;
 }
 
+/** The pack stack the Sell detail was staged from (the pack menu or a drag), or null. */
+let vendorSellPlace = null;
+
 function vendorSellOpts() {
   return {
     buyMultiplier: activeVendor?.buyMultiplier,
@@ -27121,11 +27160,13 @@ function vendorSellOpts() {
 }
 
 /** Stage a pack item in the Sell detail without mutating inventory (`copy`: the tool copy, from the pack menu). */
-function stageVendorSell(classTsid, copy = null) {
+function stageVendorSell(classTsid, copy = null, place = null) {
   vendorToolCopy = copy != null && TOOL_WEAR[classTsid] ? { classTsid, copy } : null;
+  vendorSellPlace = place?.cls === classTsid ? { ...place } : null;
   const quote = createVendorSellQuote(inv, activeVendor.offers, classTsid, 1, pc.imaginationUpgrades, vendorSellOpts());
   if (!quote.ok) {
     vendorToolCopy = null;
+    vendorSellPlace = null;
     toast(quote.msgs?.[0] || 'That item cannot be sold here.');
     return quote;
   }
@@ -27423,6 +27464,7 @@ function openVendorTileMenu(tile, { at = null, keys = false } = {}) {
       // As a click on the tile, then (Buy 1, Buy max) the count chooser's own buttons.
       vendorSelected = cls;
       vendorToolCopy = null;
+      vendorSellPlace = null;
       vendorQty = id === 'max' ? Number.MAX_SAFE_INTEGER : 1;
       renderVendorList();
       if (id === 'choose') return;
@@ -27488,6 +27530,7 @@ function drawVendorTiles(list) {
       tile.addEventListener('click', () => {
         vendorSelected = row.classTsid;
         vendorToolCopy = null;
+        vendorSellPlace = null;
         vendorQty = 1;
         renderVendorList();
       });
@@ -27504,11 +27547,25 @@ function sellToVendor(classTsid, qty) {
     const worn = leavingToolBaseCost(classTsid, vendorSellChosenCopy(classTsid));
     const copy = leavingToolCopy(classTsid, vendorSellChosenCopy(classTsid));
     opts.toolBaseCost = () => worn;
-    const r = vendorSell(pc, inv, activeVendor.offers, classTsid, qty, { ...opts, beforeRemove: () => takeToolCopy(toolState, classTsid, { copy }) });
-    if (r.ok) vendorToolCopy = null;
+    const r = vendorSell(pc, inv, activeVendor.offers, classTsid, qty, {
+      ...opts,
+      // The chosen tool's own slot is the one that empties (not the first of its class in the pack).
+      beforeRemove: () => {
+        takeChosenStack(classTsid, 1, { copy });
+        takeToolCopy(toolState, classTsid, { copy });
+      },
+    });
+    if (r.ok) {
+      vendorToolCopy = null;
+      vendorSellPlace = null;
+    }
     return r;
   }
-  return vendorSell(pc, inv, activeVendor.offers, classTsid, qty, opts);
+  // A stack staged from the pack (its menu or a drag) gives the ones sold.
+  const place = vendorSellPlace?.cls === classTsid ? vendorSellPlace : null;
+  const r = vendorSell(pc, inv, activeVendor.offers, classTsid, qty, place ? { ...opts, beforeRemove: () => takeChosenStack(classTsid, qty, { place }) } : opts);
+  if (r.ok) vendorSellPlace = null;
+  return r;
 }
 
 async function ensureShrineTextures(giantId) {
@@ -30071,10 +30128,12 @@ async function main() {
       event.dataTransfer?.getData('text/plain') ||
       vendorDragTsid;
     const copy = classTsid === vendorDragTsid ? vendorDragCopy : null;
+    const place = classTsid === vendorDragTsid ? vendorDragPlace : null;
     vendorDragTsid = null;
     vendorDragCopy = null;
-    // A dragged tool sells the copy that was dragged (stageVendorSell's chosen copy).
-    if (classTsid) stageVendorSell(classTsid, copy);
+    vendorDragPlace = null;
+    // A dragged tool sells the copy that was dragged, any other stack the one dragged (stageVendorSell).
+    if (classTsid) stageVendorSell(classTsid, copy, place);
   });
 
   document.getElementById('garden-close')?.addEventListener('click', closeGardenPanel);

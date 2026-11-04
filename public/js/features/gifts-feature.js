@@ -34,7 +34,8 @@
  */
 
 import { ITEM_CATALOG, addItem, countItem, ensureItem, itemIcon, listPackSlots, removeItem } from '../inventory.js?v=d82f3b00';
-import { TOOL_CONDITION_CATALOG, leavingToolWear, receiveToolCopy } from '../tools.js?v=092ac4f3';
+import { TOOL_CONDITION_CATALOG, leavingToolWear, receiveToolCopy, takeToolCopy } from '../tools.js?v=092ac4f3';
+import { unitRankAt } from '../pack-slots.js?v=c91d0ca3';
 import { createMinnAccount } from '../minn-account.js?v=28026657';
 // The same key as features/index.js: one module instance holds the carried notes.
 import { giveCarriedNote, takeCarriedNote, writtenCarriedNotes } from './street-furniture-feature.js?v=f4c44d55';
@@ -351,6 +352,7 @@ function createSession(engine, client) {
     if (!others().some((o) => o.id === to.id)) return say(GIFT_TEXT.nobody, 'error');
     const ref = p.kind === 'box' ? p.boxId : `g${Date.now().toString(36)}${(refN += 1)}`;
     let frame;
+    let giveCopy = null;
     if (p.kind === 'box') {
       const box = slice.boxes.find((b) => b.id === p.boxId);
       if (!box) return say('That Gift Box is gone.', 'error');
@@ -362,14 +364,20 @@ function createSession(engine, client) {
     } else {
       const item = { c: p.c, n: Math.min(p.n, countItem(engine.inv, p.c)) };
       if (item.n < 1) return say("You don't have enough of that item.", 'error');
-      // Each tool wears on its own (js/tools.js): the given ones carry their own wear (the most worn of them).
-      if (TOOL_CONDITION_CATALOG[p.c] && engine.toolState) item.r = leavingToolWear(engine.toolState, p.c, item.n);
+      // Each tool wears on its own (js/tools.js): the one given from its own slot carries its own
+      // wear (2026-11-04), else the given ones carry the most worn of theirs.
+      if (TOOL_CONDITION_CATALOG[p.c] && engine.toolState) {
+        const layout = p.kind === 'stack' && give.from?.cls === p.c && item.n === 1 ? engine.query?.('packLayout', engine) : null;
+        const rank = layout ? unitRankAt(layout, p.c, give.from.container, give.from.index) : -1;
+        if (rank >= 0) giveCopy = { c: p.c, copy: rank };
+        item.r = rank >= 0 ? takeToolCopy(engine.toolState, p.c, { copy: rank, take: false }) : leavingToolWear(engine.toolState, p.c, item.n);
+      }
       frame = { to: to.id, ref, item };
     }
     if (!client.send('gift_give', frame)) return say("You're offline.", 'error');
     // The give leaves the pack when the server settles it: from the stack it was opened on.
     if (p.kind === 'stack' && give.from?.cls === p.c) engine.query?.('packTakeFrom', p.c, frame.item.n, engine, { place: give.from, wait: 60000 });
-    sending.set(ref, { kind: p.kind, noteId: p.noteId || null, boxId: p.boxId || null, to, at: Date.now() });
+    sending.set(ref, { kind: p.kind, noteId: p.noteId || null, boxId: p.boxId || null, to, at: Date.now(), ...(giveCopy ? { tool: giveCopy } : {}) });
     give.waiting = true;
     say('Giving…');
     render();
@@ -386,7 +394,7 @@ function createSession(engine, client) {
   }
 
   /** One settled give, from the server's message or the site's list: true when it was applied now. */
-  function apply(raw, side, level = null) {
+  function apply(raw, side, level = null, tool = null) {
     const gift = normalizeGift(raw, side);
     if (!gift) return false;
     if (engine.query?.('ledgerReceipt', gift.op, engine) !== true) return false;
@@ -394,6 +402,8 @@ function createSession(engine, client) {
     const inv = engine.inv;
     const blankNote = gift.side === 'gave' && gift.item?.c === GIFT_NOTE && !gift.note;
     for (const [c, d] of Object.entries(fx.pack)) {
+      // The tool given from its own slot is the one that leaves (its copy moves last first).
+      if (d < 0 && tool?.c === c && engine.toolState && tool.copy < countItem(inv, c)) takeToolCopy(engine.toolState, c, { copy: tool.copy });
       if (d > 0) addItem(inv, c, d);
       else if (blankNote && c === GIFT_NOTE) {
         if (!takeBlankNote()) removeItem(inv, c, Math.min(countItem(inv, c), -d));
@@ -427,6 +437,7 @@ function createSession(engine, client) {
 
   client.on('msg:gift_given', (msg) => {
     const ref = String(msg.ref || '');
+    const tool = sending.get(ref)?.tool || null;
     sending.delete(ref);
     if (give) give.waiting = false;
     if (msg.status !== 'settled') {
@@ -438,7 +449,7 @@ function createSession(engine, client) {
       render();
       return;
     }
-    apply(msg, 'gave', Number(msg.level) || null);
+    apply(msg, 'gave', Number(msg.level) || null, tool);
     if (give) {
       give.pick = null;
       say(lastLine);

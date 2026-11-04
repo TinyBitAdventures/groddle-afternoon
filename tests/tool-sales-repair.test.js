@@ -163,7 +163,7 @@ describe('vendors buy tools (inc_stores.js storeSell)', () => {
     assert.match(game, /const toolSlot = Boolean\(s\.isTool \|\| opts\.toolRow\);\n\s*const canDragToVendor = true;/);
     assert.match(game, /if \(!toolSlot && !s\.bag && features\.query\('packDragStart', s\.classTsid, event, engine\)\) return;/);
     assert.match(game, /vendorDragCopy = toolSlot && s\.copy != null \? s\.copy : null;/);
-    assert.match(game, /if \(classTsid\) stageVendorSell\(classTsid, copy\);/);
+    assert.match(game, /if \(classTsid\) stageVendorSell\(classTsid, copy, place\);/);
   });
 
   it('sells one copy, the worn one, through the caller\'s last step', () => {

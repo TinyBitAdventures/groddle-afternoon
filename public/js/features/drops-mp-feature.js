@@ -40,7 +40,7 @@
  */
 
 import { ITEM_CATALOG, addItem, countItem, removeItem } from '../inventory.js?v=d82f3b00';
-import { TOOL_CONDITION_CATALOG, leavingToolWear, receiveToolCopy } from '../tools.js?v=092ac4f3';
+import { TOOL_CONDITION_CATALOG, leavingToolWear, receiveToolCopy, takeToolCopy } from '../tools.js?v=092ac4f3';
 import { createMinnAccount } from '../minn-account.js?v=28026657';
 import { saveStore } from '../save-store.js?v=8839ba7b';
 import { DROP_OP, DROP_TEXT, dropEffect, eatenStack, groundFrom, isPublicStreet, normalizeGroundStack, normalizeMine, pigAnimalKey, shareReason } from '../drops-mp.js?v=00490802';
@@ -126,13 +126,23 @@ function createSession(engine, client) {
     return client.state === 'online' && s && s === String(engine.streetTsid || '') && isPublicStreet(s) ? s : '';
   }
 
-  /** One settled op: true when it was applied now. */
-  function apply(op, side, item, at = null) {
+  /**
+   * The chosen tool (its copy, pack order) moves last just before it leaves, so its own wear is
+   * the one that goes (js/tools.js takeToolCopy); null leaves the last one, as before.
+   */
+  function leaveCopy(c, copy) {
+    if (copy == null || !TOOL_CONDITION_CATALOG[c] || !engine.toolState) return;
+    if (copy < countItem(engine.inv, c)) takeToolCopy(engine.toolState, c, { copy });
+  }
+
+  /** One settled op: true when it was applied now (`copy`: the tool chosen for a drop). */
+  function apply(op, side, item, at = null, copy = null) {
     if (!op || engine.query?.('ledgerReceipt', op, engine) !== true) return false;
     const fx = dropEffect(side, item, itemLabel);
     if (!fx) return false;
     const inv = engine.inv;
     for (const [c, d] of Object.entries(fx.pack)) {
+      if (d < 0 && side === 'dropped') leaveCopy(c, copy);
       if (d > 0) addItem(inv, c, d);
       else removeItem(inv, c, Math.min(countItem(inv, c), -d));
     }
@@ -156,8 +166,10 @@ function createSession(engine, client) {
     const have = countItem(engine.inv, d.c);
     const n = Math.min(have, d.n);
     if (n < 1) return;
+    leaveCopy(d.c, d.copy);
     removeItem(engine.inv, d.c, n);
-    const out = engine.dropWorldStack?.(d.c, n, d.x, d.y);
+    // A tool keeps its own wear on the ground (the wear sent with the drop).
+    const out = engine.dropWorldStack?.(d.c, n, d.x, d.y, d.r != null ? Array(n).fill(d.r) : undefined);
     if (!out?.ok) {
       addItem(engine.inv, d.c, n);
       return;
@@ -213,7 +225,7 @@ function createSession(engine, client) {
       return;
     }
     const s = normalizeGroundStack(msg.stack, street);
-    apply(String(msg.op || ''), 'dropped', s ? { c: s.classTsid, n: s.count } : d ? { c: d.c, n: d.n } : null, s);
+    apply(String(msg.op || ''), 'dropped', s ? { c: s.classTsid, n: s.count } : d ? { c: d.c, n: d.n } : null, s, d?.copy ?? null);
   });
 
   client.on('msg:ground_taken', (msg) => {
@@ -267,7 +279,7 @@ function createSession(engine, client) {
   sync();
 
   /** dropPackItem: true when the drop went to the server (the pack changes on its answer). */
-  function drop({ classTsid, count, x, y }) {
+  function drop({ classTsid, count, x, y, copy = null }) {
     const s = here();
     const c = String(classTsid || '');
     if (!s) return null;
@@ -286,9 +298,13 @@ function createSession(engine, client) {
     const n = Math.min(Math.max(1, Math.floor(Number(count) || 1)), countItem(engine.inv, c));
     if (n < 1) return null;
     const item = { c, n };
-    if (TOOL_CONDITION_CATALOG[c] && engine.toolState) item.r = leavingToolWear(engine.toolState, c, n);
+    // The tool chosen (its own slot) carries its own wear; else the most worn of those that leave.
+    const chosen = n === 1 && Number.isInteger(copy) && copy >= 0 && copy < countItem(engine.inv, c) ? copy : null;
+    if (TOOL_CONDITION_CATALOG[c] && engine.toolState) {
+      item.r = chosen != null ? takeToolCopy(engine.toolState, c, { copy: chosen, take: false }) : leavingToolWear(engine.toolState, c, n);
+    }
     const ref = `d${Date.now().toString(36)}${(refN += 1)}`;
-    dropping = { ref, c, n, r: item.r, x: Number(x) || 0, y: Number(y) || 0, at: Date.now() };
+    dropping = { ref, c, n, r: item.r, copy: chosen, x: Number(x) || 0, y: Number(y) || 0, at: Date.now() };
     publish();
     // The ledger must have seen what the drop takes: write the save first.
     persist(engine).then(() => {

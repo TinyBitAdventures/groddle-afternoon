@@ -23,8 +23,8 @@ import {
   normalizeMine,
   shareReason,
 } from '../public/js/drops-mp.js?v=00490802';
-import { dropsMpFeature } from '../public/js/features/drops-mp-feature.js?v=3c79885d';
-import { giftsFeature } from '../public/js/features/gifts-feature.js?v=485b0580';
+import { dropsMpFeature } from '../public/js/features/drops-mp-feature.js?v=08d3b275';
+import { giftsFeature } from '../public/js/features/gifts-feature.js?v=43cdada0';
 import { HAS_SERVER, HAS_SITE, SITE_DIR, serverPath, sitePath } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');
@@ -105,7 +105,7 @@ describe('solo is untouched', () => {
     assert.ok(index.indexOf('drops-mp-feature.js') > index.indexOf('trade-feature.js'), 'after trade-feature (ledgerReceipt)');
     assert.ok(index.indexOf('drops-mp-feature.js') < index.indexOf('street-objects-feature.js'));
     const game = readFileSync(join(root, 'public/game.js'), 'utf8');
-    assert.match(game, /features\.query\('sharedDrop', \{ classTsid, count, x, y \}, engine\)/);
+    assert.match(game, /features\.query\('sharedDrop', \{ classTsid, count, x, y, copy: dropCopy \}, engine\)/);
     assert.match(game, /features\.query\('sharedPickup', target, engine\)/);
     assert.match(game, /features\.query\('sharedDroppedStacks', droppedStacksTsid\(\), engine\)/);
     assert.match(game, /features\.query\('packDragStart', s\.classTsid, event, engine\)/);

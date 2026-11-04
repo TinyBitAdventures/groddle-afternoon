@@ -96,7 +96,7 @@ describe('the game draws loose street things at rest', () => {
     assert.match(rest, /homeIsInstanced\(\) && currentStreetTsid === HOME_INTERIOR_TSID\) return y/, 'home rooms keep their furniture tops');
     const spawn = fnText(src, 'spawnDroppedItemStack');
     assert.match(spawn, /spr\.baseY = restingStackY\(stack\.x, stack\.y\);\n\s+spr\.y = spr\.baseY;/, 'drawn at rest (shared stacks too)');
-    assert.match(src, /dropWorldStack\(classTsid, count, x, y\) \{[^}]*y = restingStackY\(x, y\);/, 'created stacks fall to the line');
+    assert.match(src, /dropWorldStack\(classTsid, count, x, y, points = undefined\) \{[^}]*y = restingStackY\(x, y\);/, 'created stacks fall to the line');
     assert.match(fnText(src, 'dropPackItem'), /landingY\(streetPlatforms, x, player\.y - 20\)/, 'a player drop lands (takeable.js 166-167)');
   });
 

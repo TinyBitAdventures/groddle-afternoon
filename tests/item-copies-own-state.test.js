@@ -33,7 +33,7 @@ import {
 import { ITEM_CATALOG, addItem, createInventory, ensureItem, isToolItem, removeItem } from '../public/js/inventory.js?v=d82f3b00';
 import { createPlayerSave, restorePlayerSave } from '../public/js/player-save.js?v=ff8746ee';
 import { layoutPack, unitPlaces } from '../public/js/pack-slots.js?v=c91d0ca3';
-import { bagsFeature } from '../public/js/features/bags-feature.js?v=c640689a';
+import { bagsFeature } from '../public/js/features/bags-feature.js?v=46af5b5a';
 import { VENDOR_PROFILES, vendorBuy, vendorSell } from '../public/js/vendor.js?v=464d158d';
 import { createResourceNode, harvestResourceNode, ensureResourceItems } from '../public/js/resource-nodes.js?v=384f63f3';
 import {
@@ -121,6 +121,73 @@ describe('a tool that left is gone before a new one comes (the Fancy Pick that c
     assert.equal(places.length, 2);
     assert.equal(places[0].container, layout.pack.slots.find((s) => s.kind === 'bag').key, 'the new one is in the bag, first in pack order');
     assert.deepEqual(wear(tools, 'pick'), [100, 0], 'the new Pick (in the bag) is new, the old one (in the pack) stays broken');
+  });
+});
+
+describe('a verb on the item you chose acts on that one (two Tinkertools, one in a bag)', () => {
+  function twoTinkertools() {
+    const { inv, tools } = kit({ bag_bigger: 1, tinkertool: 2 });
+    const engine = packEngine(inv, tools);
+    bagsFeature.restore({ v: 1, migrated: true, prefs: { bags: [{ key: 'b1', cls: 'bag_bigger' }], place: { pack: ['@b1', 'tinkertool'], b1: ['tinkertool'] }, n: { pack: [0, 1], b1: [1] } } }, engine);
+    const layout = bagsFeature.packLayout(engine);
+    // Pack order (bag.js findFirst): the bag's Tinkertool first, the pack slot's second.
+    assert.deepEqual(unitPlaces(layout, 'tinkertool'), [{ container: 'b1', index: 0 }, { container: 'pack', index: 1 }]);
+    setToolRemaining(tools, 'tinkertool', 40, { copy: 0 }); // the bag's: worn
+    setToolRemaining(tools, 'tinkertool', 190, { copy: 1 }); // the pack's: nearly new
+    return { inv, tools, engine };
+  }
+  const worth = (tools) => (cls) => toolWornBaseCost(tools, cls, {});
+
+  it('selling the one picked in the pack sells it; the one in the bag stays, with its own wear', () => {
+    const { inv, tools, engine } = twoTinkertools();
+    const copy = 1; // the pack slot's
+    const price = toolWornBaseCost(tools, 'tinkertool', { copy });
+    const r = vendorSell({ currants: 0 }, inv, [], 'tinkertool', 1, {
+      toolBaseCost: () => price,
+      beforeRemove: () => {
+        engine.query('packTakeUnit', 'tinkertool', copy, 1, engine);
+        takeToolCopy(tools, 'tinkertool', { copy });
+      },
+    });
+    assert.equal(r.ok, true, r.msgs?.join(' '));
+    const layout = bagsFeature.packLayout(engine);
+    assert.deepEqual(unitPlaces(layout, 'tinkertool'), [{ container: 'b1', index: 0 }], 'the bag keeps its Tinkertool');
+    assert.ok(!layout.pack.slots.some((s) => s.cls === 'tinkertool'), 'the pack slot picked is the one that emptied');
+    assert.deepEqual(wear(tools, 'tinkertool'), [40], 'and the one left is the worn one from the bag');
+  });
+
+  it('with no stack chosen, the slot that empties is the tool whose wear left (the last one)', () => {
+    const { inv, tools, engine } = twoTinkertools();
+    removeItem(inv, 'tinkertool', 1);
+    const layout = bagsFeature.packLayout(engine);
+    assert.deepEqual(unitPlaces(layout, 'tinkertool'), [{ container: 'b1', index: 0 }]);
+    assert.deepEqual(wear(tools, 'tinkertool'), [40]);
+  });
+
+  it('pack-slots gives a copies class\'s last unit first, any other class its first', () => {
+    const inv = { bag_bigger: 1, tinkertool: 2, apple: 2 };
+    const prefs = { bags: [{ key: 'b1', cls: 'bag_bigger' }], place: { pack: ['@b1', 'tinkertool', 'apple'], b1: ['tinkertool', 'apple'] }, n: { pack: [0, 1, 1], b1: [1, 1] } };
+    const opts = { catalog: ITEM_CATALOG, isTool: isToolItem, lastFirst: (c) => Boolean(TOOL_CONDITION_CATALOG[c]) };
+    const after = layoutPack({ ...inv, tinkertool: 1, apple: 1 }, prefs, opts);
+    assert.equal(after.bags.b1.slots.some((s) => s.cls === 'tinkertool'), true, 'the bag\'s Tinkertool (first) stays');
+    assert.equal(after.pack.slots.some((s) => s.cls === 'apple'), true, 'an apple still comes off the first stack (the bag\'s)');
+  });
+
+  it('game.js sells, donates and drops the chosen one (pack menu, drag, vendor list, shrine)', () => {
+    const game = read('game.js');
+    assert.match(game, /function takeChosenStack\(classTsid, n, \{ copy = null, place = null, wait \} = \{\}\)/);
+    assert.match(game, /beforeRemove: \(\) => \{\n\s*takeChosenStack\(classTsid, 1, \{ copy \}\);\n\s*takeToolCopy\(toolState, classTsid, \{ copy \}\);/);
+    assert.match(game, /takeChosenStack\(shrineSelected, 1, \{ copy: toolCopy \}\);/);
+    assert.match(game, /stageVendorSell\(classTsid, copy, place\);/);
+    assert.match(game, /vendorDragPlace = inLayout \? \{ cls: s\.classTsid, container: s\.container, index: s\.index \} : null;/);
+    assert.match(game, /if \(dropCopy != null\) takeToolCopy\(toolState, classTsid, \{ copy: dropCopy \}\);/);
+    // Online drops and gives carry the chosen tool's own wear and take that one when the server answers.
+    const drops = read('js/features/drops-mp-feature.js');
+    assert.match(drops, /takeToolCopy\(engine\.toolState, c, \{ copy: chosen, take: false \}\)/);
+    const gifts = read('js/features/gifts-feature.js');
+    assert.match(gifts, /unitRankAt\(layout, p\.c, give\.from\.container, give\.from\.index\)/);
+    const storage = read('js/features/home-storage-feature.js');
+    assert.match(storage, /engine\.query\?\.\('packTakeUnit', cls, copy, 1, engine\)/);
   });
 });
 

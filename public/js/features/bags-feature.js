@@ -807,6 +807,22 @@ export const bagsFeature = {
     return true;
   },
 
+  /**
+   * A verb on one chosen tool (or jar) is about to take it: its stack, found by the tool's place
+   * among the class's units in pack order (js/tools.js copies, pack-slots.js unitPlaces), gives
+   * the n that leave, so the slot that empties is the chosen one and not the first in slot order
+   * (Austin 2026-11-04: of two Tinkertools, the one in a bag was sold instead of the one picked).
+   * Glitch's verbs named the itemstack they were used on (main.js doVerb, inc_stores.js storeSell).
+   */
+  packTakeUnit(cls, rank, n, engine, { wait = TAKE_SOON_MS } = {}) {
+    const c = String(cls || '');
+    const r = Math.floor(Number(rank));
+    if (!c || !(r >= 0) || !engine?.inv) return false;
+    const p = unitPlaces(reconcile(engine), c)[r];
+    if (!p) return false;
+    return bagsFeature.packTakeFrom(c, n, engine, { place: { cls: c, container: p.container, index: p.index }, wait });
+  },
+
   /** The stack the last menu of this class was about, with its count now ({ cls, container, index, count }), or null. */
   packFocused(cls, engine) {
     if (!focus || focus.cls !== String(cls || '') || !engine?.inv) return null;

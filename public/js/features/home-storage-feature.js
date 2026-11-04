@@ -517,6 +517,8 @@ function cabinetPutFromPack(engine, cls, count, { slot = null, copy = null } = {
   // A tool takes its wear in with it (js/tools.js copies): the dragged copy first.
   let points = null;
   if (isTool(cls) && engine.toolState) {
+    // The dragged tool's own slot is the one that empties (bags-feature packTakeUnit), not the first of its class.
+    if (Number.isInteger(copy)) engine.query?.('packTakeUnit', cls, copy, 1, engine);
     points = [];
     for (let i = 0; i < n; i += 1) points.push(takeToolCopy(engine.toolState, cls, i === 0 && Number.isInteger(copy) ? { copy } : {}));
   }
