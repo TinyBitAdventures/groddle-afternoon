@@ -8,7 +8,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { pillText, paneLayout, LOCAL_TABS, nameSlot, NAME_COLOURS, STRIP_OPEN_MIN_W, dividerHeight, PANE_MIN_H } from '../public/js/classic/classic-panes.js?v=7e961c46';
+import { pillText, paneLayout, LOCAL_TABS, nameSlot, NAME_COLOURS, STRIP_OPEN_MIN_W, dividerHeight, PANE_MIN_H } from '../public/js/classic/classic-panes.js?v=ec21a6f9';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');
@@ -28,10 +28,13 @@ describe('Classic panes', () => {
 
   it('the drawer draws both views of the logs (logNodes) and says when it redraws (onRender)', () => {
     const drawer = read('public/js/ui/social-drawer.js');
-    assert.match(drawer, /logNodes\(ids = \[\]\) \{/);
+    assert.match(drawer, /logNodes\(ids = \[\], \{ cache = 'logNodes' \} = \{\}\) \{/);
     assert.match(drawer, /onRender\(fn\) \{/);
+    assert.match(drawer, /setLogSource\(fn\) \{/);
     const panes = read('public/js/classic/classic-panes.js');
-    assert.match(panes, /d\.logNodes\(LOCAL_TABS\)/);
+    // Each pane keeps its own rows (a row is in one place), so a selection in either survives a redraw.
+    assert.match(panes, /reconcileChildren\(lowerLog, d\.logNodes\(LOCAL_TABS, \{ cache: 'classic-lower' \}\)\)/);
+    assert.match(panes, /d\.setLogSource\?\.\(\(id\) => \(classic\(\) && paneLayout\(\{ online, tab: id \}\)\.mergeLocal \? d\.logNodes\(LOCAL_TABS, \{ cache: 'log' \}\) : null\)\)/);
     // Words said in the lower pane go through the drawer's own form, so the game's submit handler hears them.
     assert.match(panes, /form\.requestSubmit\(\)/);
   });

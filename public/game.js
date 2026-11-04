@@ -928,7 +928,7 @@ import { wholeStatAmounts, wholeEffects } from './js/stat-text.js?v=f96d8fd3';
 import { createNotifier, effectTokens, floatKey, offerCardDrop, stackFloat, tokenText } from './js/notify.js?v=37c6b748';
 import { holdMs } from './js/read-time.js?v=60ae7efc';
 import { mountNotifyView } from './js/notify-view.js?v=2835afc0';
-import { mountSocialDrawer } from './js/ui/social-drawer.js?v=1ae30463';
+import { mountSocialDrawer } from './js/ui/social-drawer.js?v=8c8cdd4c';
 import { bindChatLinks } from './js/chat-links.js?v=b717fac7';
 import { bindDragScroll } from './js/ui/drag-scroll.js?v=9a527ac8';
 import { SIDE_SHEET_IDS, bindTabs, inSideSheet, mountPanelShell, sheetKeyToWorld } from './js/ui/panel-shell.js?v=e2abdf9e';
@@ -962,7 +962,7 @@ import { SLUG_ANIMATION, SLUG_LAYOUT, SLUG_STYLES, SLUG_TARGETS, drawSlugIcon, f
 import { filterText } from './js/word-filter.js?v=9a7a7ebb'; // the remake's own word filter
 import { arrangeMapCards, fitMapExtras } from './js/map-extras.js?v=9f38c312'; // the Map's Shortcuts
 // The interface skin (js/classic/ui-mode.js) sets <html data-ui> as it loads: before main(), so before the boot cover lifts.
-import { installInterfaceSettings } from './js/classic/classic-prefs.js?v=9c21b26f';
+import { installInterfaceSettings } from './js/classic/classic-prefs.js?v=3cee06d7';
 
 /** @type {object|null} assets/maps/index.json */
 let mapIndexCache = null;

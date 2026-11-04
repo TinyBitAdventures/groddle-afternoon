@@ -27,6 +27,7 @@
 import { uiState, onUiModeChange, readUiCache, writeUiCache } from './ui-mode.js?v=587c014a';
 import { classicArtUrl } from './classic-art.js?v=5745e669';
 import { bindChatInput } from '../ui/chat-input.js?v=3cb4ce2e';
+import { pressLeavesKeys, reconcileChildren } from '../ui/keyed-nodes.js?v=9ab4de5c';
 
 /** The tabs that are the bottom pane, not a pane above it. */
 export const LOCAL_TABS = Object.freeze(['local', 'activity']);
@@ -165,6 +166,8 @@ export function installClassicPanes({ doc = globalThis.document, win = globalThi
     const now = Number(divider.getAttribute('aria-valuenow')) || (body.getBoundingClientRect().height || 0);
     setUpper(now + (e.key === 'ArrowDown' ? 10 : -10), true);
   });
+  // As the drawer's log: selecting words here leaves the arrow keys with the avatar.
+  pressLeavesKeys(lowerLog, { doc });
   lower.append(divider, lowerHead, lowerLog, lowerForm);
   dock.append(lower);
   added.push(lower);
@@ -258,19 +261,16 @@ export function installClassicPanes({ doc = globalThis.document, win = globalThi
       if (layout.lowerOwn && !wasShown) restoreUpper();
       if (layout.lowerOwn) {
         const atEnd = lowerLog.scrollHeight - lowerLog.scrollTop - lowerLog.clientHeight < 24;
-        lowerLog.replaceChildren(...d.logNodes(LOCAL_TABS));
+        // Only the rows that changed: a selection in this pane stays (js/ui/keyed-nodes.js).
+        reconcileChildren(lowerLog, d.logNodes(LOCAL_TABS, { cache: 'classic-lower' }));
         if (atEnd) lowerLog.scrollTop = lowerLog.scrollHeight;
         lowerPill.textContent = pillText(d.unread('local') + d.unread('activity'));
         lowerPill.style.display = lowerPill.textContent ? '' : 'none';
         const street = (doc.getElementById('street-name')?.textContent || '').split('·')[0].trim();
         lowerInput.placeholder = street && street !== '…' ? `Say something on ${street}` : 'Local chat';
       }
-      // Local picked online: its pane is Local's lines and the Activity log together.
-      if (layout.mergeLocal) {
-        const atEnd = log.scrollHeight - log.scrollTop - log.clientHeight < 24;
-        log.replaceChildren(...d.logNodes(LOCAL_TABS));
-        if (atEnd) log.scrollTop = log.scrollHeight;
-      }
+      // Local picked online: its pane is Local's lines and the Activity log together (the drawer draws
+      // them through setLogSource below, so its log is drawn once a change, keeping a selection).
       colourNames(log);
       if (layout.lowerOwn) colourNames(lowerLog);
       if (root.dataset.classicStrip === 'open') renderContacts();
@@ -280,13 +280,18 @@ export function installClassicPanes({ doc = globalThis.document, win = globalThi
   }
   d.onRender(sync);
   d.onTab(sync);
+  // Local picked online, under Classic: the drawer's log is Local's lines and the Activity log together.
+  d.setLogSource?.((id) => (classic() && paneLayout({ online, tab: id }).mergeLocal ? d.logNodes(LOCAL_TABS, { cache: 'log' }) : null));
 
   const show = (state) => {
     const on = state.mode === 'classic';
     for (const n of added) n.style.display = on ? '' : 'none';
     applyStrip();
-    if (on) sync();
-    else {
+    if (on) {
+      // The drawer's log follows the skin (Local alone, or Local and Activity together).
+      d.refresh?.();
+      sync();
+    } else {
       delete dock.dataset.classicUpper;
       d.refresh?.();
     }

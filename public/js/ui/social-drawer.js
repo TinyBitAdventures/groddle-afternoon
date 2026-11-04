@@ -65,6 +65,7 @@ import { IM_VERB_ID } from '../player-im.js?v=04c55d2f';
 import { selectionCovers } from './context-guard.js?v=0f71ac17';
 import { appendLinkedText, linkifyTextNodes } from '../chat-links.js?v=b717fac7';
 import { bindChatInput } from './chat-input.js?v=3cb4ce2e';
+import { createNodeCache, pressLeavesKeys, reconcileChildren, uniqueKeys } from './keyed-nodes.js?v=9ab4de5c';
 
 export const SOCIAL_STORE_KEY = 'groddle-social-drawer';
 /** The drawer opens by default at this window width and up (the mock's 1440 rule). */
@@ -706,6 +707,46 @@ export function mountSocialDrawer({
     return p;
   }
 
+  // —— Rows kept between redraws (js/ui/keyed-nodes.js): a selection in the log survives a redraw ——
+  /** name -> the rows drawn into one container ('log': this drawer's own log). */
+  const caches = new Map();
+  function cacheFor(name) {
+    let c = caches.get(name);
+    if (!c) caches.set(name, (c = createNodeCache()));
+    return c;
+  }
+  const lineKey = (id, l) => JSON.stringify(['l', id, l.at, l.playerId, l.mine, l.feat, l.note, l.name, l.text]);
+  const entryKey = (e) => JSON.stringify(['a', e.id ?? 0, e.kind, e.text, e.html || '', e.count || 1, e.at]);
+
+  /**
+   * The rows for `items` (oldest first) with their time lines, each row the one made before for the
+   * same key (`keyOf`), else `make(item)`; the cache forgets the rest.
+   */
+  function keyedRows(items, { atOf, keyOf, make, cache }) {
+    const keys = uniqueKeys(items, keyOf);
+    const nodes = [];
+    let i = 0;
+    let sep = null;
+    for (const x of withTimeLines(items, atOf)) {
+      if (x && x.sep !== undefined && Object.keys(x).length === 1) {
+        sep = x.sep;
+        continue;
+      }
+      const key = keys[i++];
+      if (sep !== null) {
+        const label = sep;
+        nodes.push(cache.get(`sep|${label}|${key}`, () => lineNode({ sep: label })));
+        sep = null;
+      }
+      nodes.push(cache.get(key, () => make(x)));
+    }
+    cache.sweep();
+    return nodes;
+  }
+
+  /** A skin's own log for a tab (the Classic skin's Local Chat / Activity), or null for the drawer's. */
+  let logSource = null;
+
   function activityNode(e) {
     if (e.sep) return lineNode(e);
     if (e.kind === 'chat') {
@@ -810,9 +851,15 @@ export function mountSocialDrawer({
     if (viewHead.firstChild !== t.header || viewHead.childNodes?.length > 1) viewHead.replaceChildren(...(t.header ? [t.header] : []));
     viewHead.hidden = !t.header;
     let nodes;
-    if (t.kind === 'activity') {
+    const own = logSource?.(t.id) || null;
+    if (own) {
+      nodes = own;
+      log.setAttribute('aria-live', 'polite');
+    } else if (t.kind === 'activity') {
       const entries = notifier.entries;
-      nodes = entries.length ? withTimeLines(entries).map(activityNode) : [el('p', { class: 'social-empty' }, t.empty)];
+      nodes = entries.length
+        ? keyedRows(entries, { atOf: (e) => e.at, keyOf: entryKey, make: activityNode, cache: cacheFor('log') })
+        : [el('p', { class: 'social-empty' }, t.empty)];
       log.setAttribute('aria-live', 'off');
     } else if (t.kind === 'buddies') {
       nodes = renderBuddies();
@@ -821,10 +868,13 @@ export function mountSocialDrawer({
       nodes = renderChats();
       log.setAttribute('aria-live', 'off');
     } else {
-      nodes = t.lines.length ? withTimeLines(t.lines).map(lineNode) : t.empty ? [el('p', { class: 'social-empty' }, t.empty)] : [];
+      nodes = t.lines.length
+        ? keyedRows(t.lines, { atOf: (l) => l.at, keyOf: (l) => lineKey(t.id, l), make: lineNode, cache: cacheFor('log') })
+        : t.empty ? [el('p', { class: 'social-empty' }, t.empty)] : [];
       log.setAttribute('aria-live', 'polite');
     }
-    log.replaceChildren(...nodes);
+    // Only the rows that changed are touched: a selection in the others stays (Cmd+C copies it).
+    reconcileChildren(log, nodes);
     log.setAttribute('aria-label', t.kind === 'activity' ? 'Activity log' : t.kind === 'buddies' ? 'Buddies' : t.kind === 'chats' ? 'Chats' : `${t.label} chat`);
     log.setAttribute('role', t.kind === 'chats' ? 'region' : 'log');
     // The list's rows take the keyboard themselves: Tab from the row of tabs lands on the first.
@@ -1006,6 +1056,8 @@ export function mountSocialDrawer({
       find: () => log.querySelector(`[data-social-buddy-who="${CSS.escape(String(id))}"]`),
     });
   };
+  // Selecting words in the log (or clicking them) leaves the arrow keys with the avatar; the selection stays.
+  pressLeavesKeys(log, { doc: document });
   log.addEventListener('pointerdown', (e) => {
     // As the tabs: a press on the row does not take the keyboard (the chips are their own).
     if (buddyRow(e.target) && !e.target?.closest?.('.social-chip') && e.button === 0 && !e.ctrlKey) e.preventDefault?.();
@@ -1421,16 +1473,30 @@ export function mountSocialDrawer({
      * Some tabs' logs as one, oldest first, with the time lines, drawn as this drawer draws them (the
      * Classic skin's "Local Chat / Activity" pane: Local's lines and the Activity log together).
      */
-    logNodes(ids = []) {
+    logNodes(ids = [], { cache = 'logNodes' } = {}) {
       const items = [];
       for (const id of ids) {
         const t = tabs.get(id);
         if (!t) continue;
-        if (t.kind === 'activity') for (const e of notifier.entries) items.push({ at: Number(e.at) || 0, e, act: true });
-        else if (t.kind === 'chat') for (const l of t.lines) items.push({ at: l.at, e: l, act: false });
+        if (t.kind === 'activity') for (const e of notifier.entries) items.push({ at: Number(e.at) || 0, e, act: true, id });
+        else if (t.kind === 'chat') for (const l of t.lines) items.push({ at: l.at, e: l, act: false, id });
       }
       items.sort((a, b) => a.at - b.at);
-      return withTimeLines(items, (x) => x.at).map((x) => (x.sep ? lineNode(x) : x.act ? activityNode(x.e) : lineNode(x.e)));
+      // `cache` names the container the rows go in (one row can only be in one place); each keeps its rows.
+      return keyedRows(items, {
+        atOf: (x) => x.at,
+        keyOf: (x) => (x.act ? entryKey(x.e) : lineKey(x.id, x.e)),
+        make: (x) => (x.act ? activityNode(x.e) : lineNode(x.e)),
+        cache: cacheFor(cache),
+      });
+    },
+    /**
+     * A skin draws the drawer's log for some tabs itself: fn(tabId) gives its rows (logNodes with
+     * cache 'log'), or null for the drawer's own. The drawer redraws with it.
+     */
+    setLogSource(fn) {
+      logSource = typeof fn === 'function' ? fn : null;
+      render();
     },
     /** A tab's or conversation's name, or ''. */
     label: (id) => (id === CHATS_TAB ? CHATS_VIEW.label : tabs.get(id)?.label || ''),
