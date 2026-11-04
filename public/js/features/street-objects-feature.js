@@ -179,6 +179,7 @@ function clearPaths() {
   for (const spr of pathed) {
     if (spr && spr._path) delete spr._path;
     if (spr) delete spr._pathPoint;
+    if (spr) delete spr._pathHold;
   }
   pathed = new Set();
 }
@@ -386,6 +387,9 @@ function setPath(engine, obj) {
   if (!step) return;
   spr._path = step;
   spr._pathPoint = pointAt;
+  // How long its path still holds (ms on the server's clock): a rooked one holds until it is revived
+  // (objects_creatures.go rookHoldCreature), so rook-attack-feature lays it where its path stopped.
+  spr._pathHold = () => (Number(t.sharedPath?.holdEnd) || 0) - (Date.now() + (Number(copy.offset) || 0));
   pathed.add(spr);
 }
 

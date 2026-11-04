@@ -668,6 +668,25 @@ export function rookClockS(a, now) {
 // Rooked things on a street
 // ---------------------------------------------------------------------------
 
+/**
+ * Where a rooked animal lies (Austin 2026-11-04: "when reviving animals, they seem to spawn
+ * randomly. Can we have them spawn where they're currently stuck at?"). In the source a rooked
+ * animal is one item that stays where the Rook struck it (include/rook.js rookAttack 53-63
+ * fullStop; npc_butterfly.js onRooked 1395-1404 and npc_chicken.js 1397-1405 drop it to the
+ * platform line under it) and onRevived sets it off from there (unRook 82-92; npc_piggy.js
+ * 1090-1095, npc_chicken.js 1393-1395 startMoving, npc_butterfly.js 1390-1393 flyAround). The
+ * remake spawns a street's animals at their planned spots on every visit, so the rooked row keeps
+ * the spot (x, y) and the feature lays the animal there again. Trees stand where they grow: none.
+ */
+export function rookedSpotOf(classId, x, y) {
+  if (isTreeClass(classId) || x == null || y == null || x === '' || y === '' || !Number.isFinite(Number(x)) || !Number.isFinite(Number(y))) return null;
+  return { x: Math.round(Number(x) * 10) / 10, y: Math.round(Number(y) * 10) / 10 };
+}
+
+function rookedRow(t, now) {
+  return { classId: t.classId, doses: 0, at: now, ...(rookedSpotOf(t.classId, t.x, t.y) || {}) };
+}
+
 export function normalizeRookedSlot(slot = {}) {
   const out = { rooked: {}, pendingBeats: Math.max(0, Math.floor(num(slot?.pendingBeats))) };
   for (const [key, row] of Object.entries(slot?.rooked || {})) {
@@ -676,6 +695,7 @@ export function normalizeRookedSlot(slot = {}) {
       classId: row.classId,
       doses: Math.max(0, Math.min(ROOK_SOURCE.reviveHealers - 1, Math.floor(num(row.doses)))),
       at: num(row.at),
+      ...(rookedSpotOf(row.classId, row.x, row.y) || {}),
     };
   }
   return out;
@@ -687,7 +707,7 @@ export function rollWingBeat(slot, targets, now, rng = Math.random, chance = ROO
   for (const t of targets) {
     if (!t?.key || !isRookableClass(t.classId) || slot.rooked[t.key]) continue;
     if (rng() < chance) {
-      slot.rooked[t.key] = { classId: t.classId, doses: 0, at: now };
+      slot.rooked[t.key] = rookedRow(t, now);
       hit.push(t.key);
     }
   }
@@ -696,7 +716,7 @@ export function rollWingBeat(slot, targets, now, rng = Math.random, chance = ROO
 
 export function forceRook(slot, target, now) {
   if (!target?.key || !isRookableClass(target.classId)) return false;
-  if (!slot.rooked[target.key]) slot.rooked[target.key] = { classId: target.classId, doses: 0, at: now };
+  if (!slot.rooked[target.key]) slot.rooked[target.key] = rookedRow(target, now);
   return true;
 }
 

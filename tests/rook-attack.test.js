@@ -43,7 +43,7 @@ import {
   stunFeedText,
   stunTableFor,
   useBalmPoint,
-} from '../public/js/rook-attack.js?v=7650316d';
+} from '../public/js/rook-attack.js?v=4a0fb648';
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'public');
 
@@ -217,6 +217,29 @@ describe('rooked things and cures', () => {
     assert.deepEqual(rollWingBeat(slot, targets, 6, () => 0), ['trant_bean:0']);
   });
 
+  // Austin 2026-11-04: "when reviving animals, they seem to spawn randomly". A rooked animal stays
+  // where the Rook struck it (include/rook.js rookAttack 53-63 fullStop) and is revived there
+  // (unRook 82-92, onRevived), so its row keeps the spot for the next visit; a tree stands put anyway.
+  it('keeps where a rooked animal lies, through a save, and nothing for a tree', () => {
+    const slot = normalizeRookedSlot({});
+    rollWingBeat(slot, [
+      { key: 'npc_butterfly:3', classId: 'npc_butterfly', x: 1234.56, y: 812.04 },
+      { key: 'trant_bean:0', classId: 'trant_bean', x: 900, y: 880 },
+    ], 5, () => 0);
+    forceRook(slot, { key: 'npc_piggy:2', classId: 'npc_piggy', x: 3127, y: 804 }, 6);
+    forceRook(slot, { key: 'npc_chicken:0', classId: 'npc_chicken' }, 7);
+    assert.deepEqual(slot.rooked['npc_butterfly:3'], { classId: 'npc_butterfly', doses: 0, at: 5, x: 1234.6, y: 812 });
+    assert.deepEqual(slot.rooked['npc_piggy:2'], { classId: 'npc_piggy', doses: 0, at: 6, x: 3127, y: 804 });
+    assert.deepEqual(slot.rooked['trant_bean:0'], { classId: 'trant_bean', doses: 0, at: 5 });
+    assert.deepEqual(slot.rooked['npc_chicken:0'], { classId: 'npc_chicken', doses: 0, at: 7 }, 'no spot without one');
+    const saved = normalizeRookedSlot(JSON.parse(JSON.stringify(slot)));
+    assert.deepEqual(saved.rooked, slot.rooked);
+    // An older save's row (no spot) or a bad one reads without a spot.
+    const old = normalizeRookedSlot({ rooked: { 'npc_piggy:0': { classId: 'npc_piggy', doses: 1, at: 2 }, 'npc_piggy:1': { classId: 'npc_piggy', x: 'left', y: null } } });
+    assert.deepEqual(old.rooked['npc_piggy:0'], { classId: 'npc_piggy', doses: 1, at: 2 });
+    assert.deepEqual(old.rooked['npc_piggy:1'], { classId: 'npc_piggy', doses: 0, at: 0 });
+  });
+
   it('takes three revive doses, then pays the final bonus and favor', () => {
     const slot = normalizeRookedSlot({});
     forceRook(slot, { key: 'npc_chicken:1', classId: 'npc_chicken' }, 1);
@@ -284,7 +307,7 @@ describe('rooked things and cures', () => {
 });
 
 describe('rook attack feature', async () => {
-  const { ROOK_SHEETS, rookAttackFeature } = await import('../public/js/features/rook-attack-feature.js?v=6a1ec64d');
+  const { ROOK_SHEETS, rookAttackFeature } = await import('../public/js/features/rook-attack-feature.js?v=28b0550f');
   const { createFeatureHost } = await import('../public/js/feature-host.js?v=2ed3c069');
 
   /** Pixel size from a PNG IHDR or a WebP VP8/VP8L/VP8X header. */
@@ -315,7 +338,7 @@ describe('rook attack feature', async () => {
   // of 124x46, 8 to a row. Cut as 124x92 x16 it played two frames stacked and its last two cells
   // half empty. The scene is in the SWF's loopers and its last frame leads into its first.
   it('plays the rooked halo as the SWF did: 30 single frames at 30 fps, looping seamlessly', async () => {
-    const { ROOKED_HALO } = await import('../public/js/features/rook-attack-feature.js?v=6a1ec64d');
+    const { ROOKED_HALO } = await import('../public/js/features/rook-attack-feature.js?v=28b0550f');
     const { decodePng } = await import('../tools/builder/art-image.mjs');
     const def = ROOK_SHEETS.halo;
     assert.deepEqual({ fw: def.fw, fh: def.fh, cols: def.cols, frames: def.frames }, { fw: 124, fh: 46, cols: 8, frames: 30 });
@@ -361,7 +384,7 @@ describe('rook attack feature', async () => {
   // The rooked animals' clips: the server's cadence per class, the SWFs' 30 fps, and only the
   // scenes the SWFs list in loopers loop (the rest play once and hold, as the client did).
   it('cycles the rooked animal clips on the server cadence, looping only the SWF loopers', async () => {
-    const { ROOKED_CADENCE, ROOKED_FPS, ROOKED_LOOPERS } = await import('../public/js/features/rook-attack-feature.js?v=6a1ec64d');
+    const { ROOKED_CADENCE, ROOKED_FPS, ROOKED_LOOPERS } = await import('../public/js/features/rook-attack-feature.js?v=28b0550f');
     assert.equal(ROOKED_FPS, 30);
     assert.deepEqual([...ROOKED_LOOPERS].sort(), ['bflyFly', 'bflyRest', 'piggy1']);
     const flat = (c) => [c.start, ...c.cycle].map(([clip, ms]) => `${clip}:${ms}`).join(' ');
@@ -504,7 +527,7 @@ describe('rook schedule: once a day (Austin 2026-11-04, as online)', () => {
   });
 
   it('drives the feature: an old save waits a day, then the dwell and the picked moment', async () => {
-    const { rookAttackFeature } = await import('../public/js/features/rook-attack-feature.js?v=6a1ec64d');
+    const { rookAttackFeature } = await import('../public/js/features/rook-attack-feature.js?v=28b0550f');
     const realNow = Date.now;
     const prevPixi = globalThis.PIXI;
     // Enough Pixi for the sheet loader to try (and quietly fail) its loads in node.

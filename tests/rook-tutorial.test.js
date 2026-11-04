@@ -12,7 +12,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { ROOK_HIDDEN_HUBS, streetIsRookable } from '../public/js/rook-attack.js?v=7650316d';
+import { ROOK_HIDDEN_HUBS, streetIsRookable } from '../public/js/rook-attack.js?v=4a0fb648';
 import { GENTLE_ISLAND_TSIDS } from '../public/js/newxp.js?v=8aef8287';
 import { serverPath, skipWithoutServer } from '../tools/repos.mjs';
 

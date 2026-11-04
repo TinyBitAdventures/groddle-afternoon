@@ -61,7 +61,7 @@ import { slugsFromEffects } from '../speech-slugs.js?v=130338f9';
 import { addItem, countItem, ensureItem, removeItem, ITEM_CATALOG } from '../inventory.js?v=602da017';
 import { bindCountField, countKeyValue, countStepMarkup } from '../ui/count-chooser.js?v=b8361b21';
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=db7c442f';
-import { nearestSurfaceY } from '../walk-surface.js?v=c982983e';
+import { landingY, nearestSurfaceY } from '../walk-surface.js?v=c982983e';
 import { donationValueFor } from '../shrines.js?v=9d364845';
 import { TRANT_META, trantStatusLabel } from '../trants.js?v=9c2e8c0f';
 import {
@@ -80,6 +80,7 @@ import {
   forceRook,
   ROOK_LOOSE_KEY_BASE,
   isRookableClass,
+  isTreeClass,
   rookKeyFor,
   normalizeRookSave,
   normalizeRookedSlot,
@@ -102,7 +103,7 @@ import {
   strikeBeamFor,
   strikeDamageFor,
   useBalmPoint,
-} from '../rook-attack.js?v=7650316d';
+} from '../rook-attack.js?v=4a0fb648';
 import { shrinePrimeBonus } from '../imagination-effects.js?v=70169933';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 import { gainMetabolic, loseEnergy, loseMood } from '../metabolics.js?v=8504134e';
@@ -121,7 +122,7 @@ import {
   strikeDamage as mpStrikeDamage,
   syncKeys,
   syncObjs,
-} from '../rook-mp.js?v=49f1edfe';
+} from '../rook-mp.js?v=decf0604';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
 import { feedZone, placeRookBadge, unionBox } from '../rook-badge-place.js?v=2bb00dfd';
 
@@ -359,10 +360,56 @@ function rookedSubtitle() {
   return 'Rooked! It needs reviving';
 }
 
+/**
+ * The platform line under a rooked flyer, where it lies (npc_butterfly.js onRooked 1395-1404:
+ * apiGetPointOnTheClosestPlatformLineBelow(x, y - 1)); the nearest line when nothing is under it.
+ */
+function groundUnder(engine, x, y) {
+  const below = landingY(engine.platforms, x, y);
+  return Number.isFinite(below) ? below : nearestSurfaceY(engine.platforms, x, y + 40);
+}
+
+/** A shared animal held longer than this is held by the Rook (objects_creatures.go rookedHold). */
+const ROOKED_PATH_HOLD_MS = 60 * 60 * 1000;
+
+/**
+ * Where a shared Chicken or Butterfly's path stopped when the Rook struck it, or null (solo, an
+ * animal this server does not share, or a server that does not stop it). Every page draws it from
+ * the same stopped path, so everyone sees it lie in the same place and go on from there.
+ */
+function rookedPathPoint(spr) {
+  if (typeof spr?._pathPoint !== 'function' || !(Number(spr._pathHold?.()) > ROOKED_PATH_HOLD_MS)) return null;
+  const p = spr._pathPoint();
+  return Number.isFinite(p?.x) ? p : null;
+}
+
+/**
+ * Lay a rooked animal at x: a Butterfly on the line under (x, y), a walker at y (game.js keeps it
+ * on its floor). y null keeps its height.
+ */
+function layRooked(engine, target, x, y) {
+  const spr = target.sprite;
+  if (!Number.isFinite(x) || Math.abs(spr.x - x) < 0.5) return false;
+  spr.x = x;
+  if (target.classId === 'npc_butterfly') {
+    const ground = groundUnder(engine, x, Number.isFinite(y) ? y : spr.y);
+    if (Number.isFinite(ground)) spr._groundY = ground - 2;
+  } else if (Number.isFinite(y)) {
+    spr.y = y;
+  }
+  return true;
+}
+
 function applyRookedVisual(engine, entry) {
   const { target, key } = entry;
   if (tracked.has(key)) return;
   const spr = target.sprite;
+  // It lies where the Rook struck it, not where the street spawned it on this visit: solo, the
+  // spot its rooked row keeps (js/rook-attack.js rookedSpotOf); online, where its shared path stopped.
+  const spot = mp ? null : slot(engine).rooked[key];
+  const shared = rookedPathPoint(spr);
+  const lay = shared || (Number.isFinite(spot?.x) && !isTreeClass(target.classId) ? spot : null);
+  if (lay) layRooked(engine, target, lay.x, lay.y);
   const saved = {
     subtitle: target.subtitle,
     tint: spr.tint,
@@ -384,7 +431,8 @@ function applyRookedVisual(engine, entry) {
   } else if (cls === 'npc_butterfly') {
     spr.vx = 0;
     spr._ambient = false;
-    const ground = nearestSurfaceY(engine.platforms, spr.x, spr.y + 40);
+    // It drops to the line under it (npc_butterfly.js onRooked 1395-1404), not the nearest one.
+    const ground = groundUnder(engine, spr.x, Number.isFinite(lay?.y) ? lay.y : spr.y);
     spr._groundY = Number.isFinite(ground) ? ground - 2 : (spr._groundY ?? engine.groundY);
   }
   // No tint (player report 2026-11-01: trees stayed red until hovered). The client marks a rooked
@@ -506,6 +554,10 @@ function updateRookedVisuals(engine) {
       if (sad?.length && spr.textures?.[0] !== sad[0]) setRookedClip(row, row.step);
     }
     if (row.clip && t >= row.clipAt) setRookedClip(row, row.step + 1);
+    // Online it lies where its shared path stopped, whichever came first to this page: the Rook's
+    // word or the path's.
+    const shared = rookedPathPoint(spr);
+    if (shared) layRooked(engine, row.target, shared.x, shared.y);
     // fullStop (include/rook.js 53-63): a rooked Piggy or Chicken stays put until it is revived.
     if (row.target.classId === 'npc_piggy' || row.target.classId === 'npc_chicken') spr.vx = 0;
     // Its label says so until then, whatever else relabels it (the mood ticks, the shared Piggy and

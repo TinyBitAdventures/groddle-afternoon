@@ -23,10 +23,10 @@ import {
   smallEnlightenmentSeconds,
   smeltItDealtItFreeSmelts,
 } from '../public/js/buff-triggers.js?v=a3093922';
-import { MIRRORED_BUFFS, buffTriggersFeature } from '../public/js/features/buff-triggers-feature.js?v=ddbbfd88';
+import { MIRRORED_BUFFS, buffTriggersFeature } from '../public/js/features/buff-triggers-feature.js?v=6fc260d6';
 import { meditationFeature } from '../public/js/features/meditation-feature.js?v=ecf45d0f';
 import { teleportationFeature } from '../public/js/features/teleportation-feature.js?v=3e397fee';
-import { rookAttackFeature } from '../public/js/features/rook-attack-feature.js?v=6a1ec64d';
+import { rookAttackFeature } from '../public/js/features/rook-attack-feature.js?v=28b0550f';
 import { rubeFeature } from '../public/js/features/rube-feature.js?v=cb66009e';
 import { smugglingFeature } from '../public/js/features/smuggling-feature.js?v=a2e15f39';
 import { normalizeHusbandryPack } from '../public/js/animal-husbandry.js?v=16195ac6';

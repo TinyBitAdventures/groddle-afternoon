@@ -4,8 +4,8 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { createAnimalState } from '../public/js/animals.js?v=761b9fa7';
-import { animalMoodFeature } from '../public/js/features/animal-mood-feature.js?v=d1247320';
-import { rookAttackFeature } from '../public/js/features/rook-attack-feature.js?v=6a1ec64d';
+import { animalMoodFeature } from '../public/js/features/animal-mood-feature.js?v=ea0b7f6c';
+import { rookAttackFeature } from '../public/js/features/rook-attack-feature.js?v=28b0550f';
 
 const TSID = 'GLI2HVHUM4F16B0'; // Pasha's Place, Groddle Forest: where Austin met it
 
@@ -139,5 +139,74 @@ describe('a Piggy that reached its food', () => {
     } finally {
       Date.now = realNow;
     }
+  });
+});
+
+// Austin 2026-11-04: "when reviving animals, they seem to spawn randomly. Can we have them spawn
+// where they're currently stuck at?" In the source a rooked animal is one item that stays where the
+// Rook struck it (include/rook.js rookAttack 53-63 fullStop; npc_butterfly.js onRooked 1395-1404
+// drops it to the platform line under it) and onRevived sets it off from there (unRook 82-92;
+// npc_butterfly.js 1390-1393 flyAround, npc_chicken.js 1393-1395 startMoving).
+describe('a rooked animal lies where the Rook struck it and is revived there', () => {
+  const FLOOR = { x1: 0, y1: 1000, x2: 6000, y2: 1000 };
+  const LEDGE = { x1: 2500, y1: 790, x2: 2700, y2: 790 }; // just over the Butterfly when it was struck
+  function animals() {
+    const { engine, slots } = setup();
+    const bfly = { classId: 'npc_butterfly', airborne: true, classIndex: 4, sprite: { x: 250, y: 900, vx: 0.65, _ambient: true, visible: true, destroyed: false, scale: { x: 1 }, gotoAndPlay() {} } };
+    const chick = { classId: 'npc_chicken', classIndex: 1, sprite: { x: 2569, y: 1000, vx: 0.5, baseX: 2569, range: 100, visible: true, destroyed: false, scale: { x: 1 }, gotoAndPlay() {} } };
+    engine.interactables = [bfly, chick];
+    engine.platforms = [FLOOR, LEDGE];
+    return { engine, slots, bfly, chick };
+  }
+  // The feature scans the street every 400 ms of its tick clock (module state): each tick moves on.
+  let clock = 2_000_000_000;
+  const tick = (engine) => rookAttackFeature.onTick(500, (clock += 500), engine);
+
+  it('solo: a later visit lays it at the spot its rooked row kept, a flyer on the line under it', () => {
+    const { engine, slots, bfly, chick } = animals();
+    rookAttackFeature.onStreetClear(engine);
+    // Rooked on an earlier visit: the Butterfly over x 2600 under the ledge, the Chicken at 2660.
+    slots['rook-attack'] = { rooked: {
+      'npc_butterfly:4': { classId: 'npc_butterfly', doses: 0, at: 1, x: 2600, y: 800 },
+      'npc_chicken:1': { classId: 'npc_chicken', doses: 0, at: 1, x: 2660, y: 1000 },
+    } };
+    tick(engine);
+    assert.equal(bfly.sprite.x, 2600, 'not at its planned spot (x 250)');
+    assert.equal(bfly.sprite._groundY, 998, 'on the floor under it, not the ledge over it');
+    assert.equal(bfly.sprite._ambient, false);
+    assert.equal(chick.sprite.x, 2660);
+    assert.equal(chick.sprite.vx, 0);
+    // Revived: it goes on from there.
+    slots['rook-attack'].rooked = {};
+    tick(engine);
+    assert.equal(bfly.sprite.x, 2600);
+    assert.equal(bfly.sprite._ambient, true, 'it flies again');
+    assert.equal(chick.sprite.x, 2660);
+    assert.ok(Math.abs(chick.sprite.vx) > 0.3, 'it walks again');
+    rookAttackFeature.onStreetClear(engine);
+  });
+
+  it('online: it lies where its shared path stopped, for every page (not on a server that does not stop it)', () => {
+    const { engine, slots, bfly } = animals();
+    rookAttackFeature.onStreetClear(engine);
+    let hold = 30 * 24 * 3600 * 1000;
+    let pathX = 3333;
+    bfly.sprite._pathPoint = () => ({ x: pathX, y: 900 });
+    bfly.sprite._pathHold = () => hold;
+    slots['rook-attack'] = { rooked: { 'npc_butterfly:4': { classId: 'npc_butterfly', doses: 0, at: 1 } } };
+    tick(engine);
+    assert.equal(bfly.sprite.x, 3333, 'a page that came after the strike lays it where its path stopped');
+    assert.equal(bfly.sprite._groundY, 998);
+    tick(engine);
+    assert.equal(bfly.sprite.x, 3333);
+    // A server that does not hold the path (no long hold): the page leaves it where it stopped here.
+    rookAttackFeature.onStreetClear(engine);
+    hold = 0;
+    pathX = 4000;
+    bfly.sprite.x = 1200;
+    tick(engine);
+    tick(engine);
+    assert.equal(bfly.sprite.x, 1200);
+    rookAttackFeature.onStreetClear(engine);
   });
 });
