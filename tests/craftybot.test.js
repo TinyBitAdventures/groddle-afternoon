@@ -35,7 +35,7 @@ import {
   setJobTotal,
   setPaused,
   serializeCraftybotState,
-} from '../public/js/craftybot.js?v=2cff4c78';
+} from '../public/js/craftybot.js?v=41eacd5d';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const PUBLIC = join(ROOT, 'public');
@@ -402,9 +402,9 @@ describe('delivery and wiring', () => {
 
 describe('craftybot feature: the ingredient source and the job menu', async () => {
   // The feature imports these with their browser cache tags; load the same module instances.
-  const { craftybotFeature } = await import('../public/js/features/craftybot-feature.js?v=ff8efa9a');
+  const { craftybotFeature } = await import('../public/js/features/craftybot-feature.js?v=148840de');
   const { homesFeature } = await import('../public/js/features/homes-feature.js?v=dc9deca5');
-  const cbMod = await import('../public/js/craftybot.js?v=2cff4c78');
+  const cbMod = await import('../public/js/craftybot.js?v=41eacd5d');
   const making = await import('../public/js/making.js?v=0100c686');
 
   function fakeEngine(extra = {}) {
@@ -447,6 +447,38 @@ describe('craftybot feature: the ingredient source and the job menu', async () =
     craftybotFeature.restore({ owned: true, where: 'street', x: 300 });
     const street = craftybotFeature._world(engine);
     assert.equal(street.count('cherry'), 0, 'the street does not see the house');
+  });
+
+  it('ticket 85: indoors it also sees what the cabinets hold (find_items_including_bags), tools with their own wear', () => {
+    cbMod.setCraftybotSpecs(JSON.parse(readFileSync(CATALOG, 'utf8')).specs);
+    const contents = Array(32).fill(null);
+    contents[2] = { classTsid: 'milk_butterfly', count: 5 };
+    contents[4] = { classTsid: 'knife_and_board', count: 1, points: [0] };
+    contents[5] = { classTsid: 'knife_and_board', count: 1, points: [40] };
+    homesFeature.restore({ decor: { starterKit: true, placed: [{ id: 9, classTsid: 'bag_furniture_cabinet', x: 700, y: 560, contents }] } });
+    craftybotFeature.restore({ owned: true, where: 'interior', x: 300 });
+    const engine = fakeEngine();
+    const world = craftybotFeature._world(engine);
+    assert.equal(world.count('milk_butterfly'), 5);
+    assert.equal(world.count('knife_and_board', { toolWear: 1 }), 1, 'the broken copy does not count');
+    assert.equal(world.count('knife_and_board', { toolWear: 50 }), 0);
+    // The Cheese Plate job of the report: 3 Butterfly Milks and a Knife & Board, nothing missing.
+    const seq = buildSequence(world, craftybotSpec('cheese_plate'), 1);
+    const last = seq[seq.length - 1].data;
+    assert.deepEqual(last.missing_ingredients, {});
+    assert.deepEqual(last.missing_tools, {});
+    const cab = homesFeature._state().houseDecor.placed[0];
+    assert.equal(world.find('milk_butterfly').id, 'cab:9:2');
+    assert.equal(world.take('cab:9:2', 'milk_butterfly', 3), 3);
+    assert.equal(cab.contents[2].count, 2);
+    assert.equal(world.take('cab:9:2', 'milk_butterfly', 9), 2);
+    assert.equal(cab.contents[2], null);
+    assert.equal(world.find('knife_and_board', { toolWear: 1 }).id, 'cab:9:5');
+    assert.deepEqual(world.wear('knife_and_board', 1, 'cab:9:5'), { broke: false });
+    assert.deepEqual(cab.contents[5].points, [39], 'the working copy in the cabinet wears, not the pack tool');
+    assert.deepEqual(cab.contents[4].points, [0]);
+    craftybotFeature.restore({ owned: true, where: 'pack' });
+    assert.equal(craftybotFeature._world(fakeEngine()).count('milk_butterfly'), 0, 'from the pack it sees only the pack');
   });
 
   it('works from the pack: counts, takes and drops go through the pack', () => {

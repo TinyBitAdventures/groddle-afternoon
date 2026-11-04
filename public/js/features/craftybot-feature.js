@@ -47,6 +47,7 @@ import { canUseTool, getToolCondition, setToolRemaining } from '../tools.js?v=39
 import { MAKING_TOOL_SKILLS, listRecipes, recipeKnown, TOOL_CATALOG } from '../making.js?v=0100c686';
 import { listDroppedStacks } from '../world-items.js?v=2276daaf';
 import { BACK_YARD_GROUND_Y, homesFeature } from './homes-feature.js?v=dc9deca5';
+import { cabinetTake, isCabinetClass } from '../home-storage.js?v=56c6416d';
 import {
   CRAFTYBOT,
   CRAFTYBOT_BOX,
@@ -81,7 +82,7 @@ import {
   setJobTotal,
   setLocked,
   setPaused,
-} from '../craftybot.js?v=2cff4c78';
+} from '../craftybot.js?v=41eacd5d';
 import { frameTexture, isLoaded, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js?v=3149d699';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 import { displayTopOf, itemstackOverlayPoint, playSheetOverlay } from '../overlay-art.js?v=11b6dd7f';
@@ -223,10 +224,40 @@ function locationRows(engine, where) {
     for (const p of interiorDecor()?.placed || []) {
       if (p.classTsid === 'bag_furniture_sdb' && p.display?.count > 0) {
         rows.push({ id: `sdb:${p.id}`, cls: p.display.classTsid, count: p.display.count, x: x0 + p.x, sdb: true });
+      } else if (isCabinetClass(p.classTsid) && Array.isArray(p.contents)) {
+        // Ticket 85: count_items_including_bags and find_items_including_bags look inside
+        // every container in the location (npc_crafty_bot.js 1918-1926: SDBs first, "then
+        // other containers"), so a cabinet's stacks are the bot's too. One row per slot.
+        p.contents.forEach((slot, i) => {
+          if (slot?.classTsid && slot.count > 0) {
+            rows.push({ id: `cab:${p.id}:${i}`, cls: slot.classTsid, count: slot.count, x: x0 + p.x, sdb: false, points: slot.points || null });
+          }
+        });
       }
     }
   }
   return rows;
+}
+
+/** A cabinet slot's tool copies that can take `wear` (count_tools: points_remaining >= tool_wear). */
+function cabinetToolCount(row, wear) {
+  if (!row.id.startsWith('cab:') || !isToolClass(row.cls)) return row.count;
+  const cap = getToolCondition(null, row.cls).capacity;
+  const need = Math.max(1, Number(wear) || 0);
+  let n = 0;
+  for (let i = 0; i < row.count; i += 1) {
+    const left = Array.isArray(row.points) && row.points[i] != null ? Number(row.points[i]) : cap;
+    if (left >= need) n += 1;
+  }
+  return n;
+}
+
+function cabinetSlot(id) {
+  const m = /^cab:(\d+):(\d+)$/.exec(String(id));
+  if (!m) return null;
+  const row = interiorDecor()?.placed?.find((p) => String(p.id) === m[1]);
+  const i = Number(m[2]);
+  return row && Array.isArray(row.contents) && row.contents[i] ? { row, i, slot: row.contents[i] } : null;
 }
 
 function toolUsable(engine, cls, wear) {
@@ -245,25 +276,25 @@ function makeWorld(engine) {
   const tsid = homeTsid(where);
   const rows = () => (inLocation ? locationRows(engine, where) : null);
   const usable = (cls, toolWear) => !isToolClass(cls) || toolUsable(engine, cls, toolWear);
+  // A cabinet's tools carry their own wear (slot points); the floor's and the pack's are the pack's tool state.
+  const rowCount = (r, toolWear) => (r.id.startsWith('cab:') ? cabinetToolCount(r, toolWear) : usable(r.cls, toolWear) ? r.count : 0);
   const world = {
     inLocation,
     count(cls, { toolWear } = {}) {
       let n = 0;
       for (const c of String(cls).split('|')) {
-        if (!usable(c, toolWear)) continue;
-        if (inLocation) n += rows().filter((r) => r.cls === c).reduce((s, r) => s + r.count, 0);
-        else n += countItem(engine.inv, c);
+        if (inLocation) n += rows().filter((r) => r.cls === c).reduce((s, r) => s + rowCount(r, toolWear), 0);
+        else if (usable(c, toolWear)) n += countItem(engine.inv, c);
       }
       return n;
     },
     find(cls, { toolWear } = {}) {
       for (const c of String(cls).split('|')) {
-        if (!usable(c, toolWear)) continue;
         if (!inLocation) {
-          if (countItem(engine.inv, c) > 0) return { id: c, cls: c, x: bot.x };
+          if (usable(c, toolWear) && countItem(engine.inv, c) > 0) return { id: c, cls: c, x: bot.x };
           continue;
         }
-        const list = rows().filter((r) => r.cls === c && r.count > 0);
+        const list = rows().filter((r) => r.cls === c && r.count > 0 && rowCount(r, toolWear) > 0);
         // findItem: Storage Display Boxes first, then anywhere else.
         const pick = list.filter((r) => r.sdb).sort((a, b) => Math.abs(a.x - bot.x) - Math.abs(b.x - bot.x))[0]
           || list.sort((a, b) => Math.abs(a.x - bot.x) - Math.abs(b.x - bot.x))[0];
@@ -279,6 +310,13 @@ function makeWorld(engine) {
         const k = Math.min(have, n);
         if (k > 0) removeItem(engine.inv, id, k);
         if (k > 0) engine.refreshPack?.();
+        return k;
+      }
+      if (String(id).startsWith('cab:')) {
+        const at = cabinetSlot(id);
+        if (!at) return 0;
+        const k = cabinetTake(at.row.contents, at.slot.classTsid, n, { slot: at.i }).taken;
+        if (k > 0) dirty = 'sdb';
         return k;
       }
       if (String(id).startsWith('sdb:')) {
@@ -301,7 +339,25 @@ function makeWorld(engine) {
       dirty = dirty || 'ground';
       return k;
     },
-    wear(cls, n) {
+    wear(cls, n, tsid) {
+      const at = String(tsid || '').startsWith('cab:') ? cabinetSlot(tsid) : null;
+      if (at && isToolClass(cls)) {
+        // The tool stays in its cabinet slot: the copy that can take the wear wears (use()).
+        const cap = getToolCondition(null, cls).capacity;
+        const pts = Array.isArray(at.slot.points) ? at.slot.points : [];
+        while (pts.length < at.slot.count) pts.push(cap);
+        at.slot.points = pts;
+        let i = pts.findIndex((p) => p >= Math.max(1, n));
+        if (i < 0) i = pts.findIndex((p) => p > 0);
+        if (i < 0) return { broke: false };
+        dirty = 'sdb';
+        if (pts[i] > n) {
+          pts[i] -= n;
+          return { broke: false };
+        }
+        pts[i] = 0;
+        return { broke: true };
+      }
       const c = getToolCondition(engine.toolState, cls);
       if (!c.tracked) return { broke: false };
       // wearTool: points_remaining > wear subtracts; otherwise the tool hits 0 and breaks.

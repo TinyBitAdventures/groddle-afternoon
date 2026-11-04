@@ -1207,7 +1207,8 @@ function wearTool(bot, world, wear, toolCls) {
   if (!wear) return;
   const h = bot.queue[bot.active]?.holder?.general?.[toolCls];
   if (!h || !h.tsid) return;
-  const res = world.wear(toolCls, wear);
+  // The held tool's id (a cabinet slot keeps its own wear: craftybot-feature world.wear).
+  const res = world.wear(toolCls, wear, Object.keys(h.tsid)[0]);
   if (res?.broke) {
     world.sound?.('TOOL_BREAKS');
     world.say?.(CRAFTYBOT_COPY.brokeTool);
