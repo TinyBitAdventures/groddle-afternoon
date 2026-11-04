@@ -63,17 +63,21 @@ import {
   hubRouteDrawing,
   isRide,
   normalizeRouteState,
+  oneWayRoads,
   planRoute,
   resurrectRoute,
   routeGraph,
   routeStep,
   sameStreet,
+  startCut,
   subwayRides,
   tsidAliases,
-} from '../map-routes.js?v=91cc8e46';
+} from '../map-routes.js?v=bcf2c347';
 
 export const MAP_ROUTES_FEATURE_ID = 'map-routes';
 const GRAPH_URL = 'assets/content/signpost-graph.json?v=g198-1';
+/** One-way roads (player report 82, tools/routes/build-one-way.mjs); js/data-urls.js keys the URL. */
+const ONE_WAY_URL = 'assets/content/one-way-roads.json';
 
 let state = createRouteState();
 let graph = null;
@@ -86,6 +90,10 @@ const STATION_STREETS = new Set(STATIONS.map((st) => st.streetTsid));
 /** Rooms behind doors that no hub map draws (map-routes.js doorRooms, G198). */
 let rooms = [];
 let graphPromise = null;
+/** The signposts a one-way street does not lead to from where you came in (map-routes.js oneWayRoads). */
+let oneWay = null;
+/** The street JSON you are on (its platforms and bounds, for where you stand on a one-way street). */
+let streetHere = null;
 /**
  * What leads on from this street: a signpost board or a door, glowing.
  * { kind: 'sign'|'door', view, glow, key, board?, target?, x, y }
@@ -107,13 +115,17 @@ let canvasBound = false;
 
 function loadGraph() {
   if (graph) return Promise.resolve(graph);
-  graphPromise ||= fetch(GRAPH_URL)
-    .then((r) => r.json())
-    .then((json) => {
+  // Without the one-way file every road is two-way, as before it.
+  graphPromise ||= Promise.all([
+    fetch(GRAPH_URL).then((r) => r.json()),
+    fetch(ONE_WAY_URL).then((r) => r.json()).then((json) => oneWayRoads(json)).catch(() => ({})),
+  ])
+    .then(([json, roads]) => {
       const built = routeGraph(json);
       graph = built.graph;
       lockedDoors = built.locked;
       rooms = doorRooms(json);
+      oneWay = roads;
       return graph;
     })
     .catch(() => {
@@ -154,6 +166,18 @@ function routeStreet(engine) {
   return engine.streetTsid;
 }
 
+/**
+ * The roads out of reach from where you stand, on a one-way street (map-routes.js startCut):
+ * null anywhere else. engine.player is in screen pixels; the street file in street coordinates
+ * (street-model.js screenToWorld).
+ */
+function cutHere(engine) {
+  const key = oneWay && engine.streetTsid ? tsidAliases(engine.streetTsid).find((k) => oneWay[k]) : null;
+  if (!key || !streetHere || !sameStreet(streetHere.tsid, engine.streetTsid) || !engine.player || offWorld(engine) || underground(engine)) return null;
+  const b = streetHere.bounds || {};
+  return startCut(oneWay[key], streetHere.platforms, Number(engine.player.x) + (Number(b.l) || 0), Number(engine.player.y) + (Number(b.t) || 0));
+}
+
 /** Streets still under construction (street-jobs-feature closedRoads): routes go round them. */
 function closedRoads(engine) {
   return engine.query?.('closedRoads', engine) || null;
@@ -176,6 +200,9 @@ function setRoute(engine, opts = {}) {
     blocked: closedRoads(engine),
     locked: lockedDoors,
     rides,
+    oneWay,
+    // From where you stand, when the route starts on the street you are on.
+    startCut: opts.from && !sameStreet(opts.from, engine.streetTsid) ? null : cutHere(engine),
   });
   engine.setData?.('routeLast', res.ok ? `set:${res.route.source}` : res.error);
   if (!res.ok) return res;
@@ -1014,7 +1041,8 @@ export const mapRoutesFeature = {
     return null;
   },
 
-  onStreetEnter(_street, engine) {
+  onStreetEnter(street, engine) {
+    streetHere = street || null;
     stopWalk(engine);
     // The glow layer outlives the street (G200): a glow left there goes now.
     clearHighlight();
@@ -1022,7 +1050,7 @@ export const mapRoutesFeature = {
     demoSetup(engine);
     const apply = () => {
       if (state.route) {
-        const res = enterStreet(state, graph || {}, engine.streetTsid, { offWorld: offWorld(engine) || underground(engine), blocked: closedRoads(engine), locked: lockedDoors, rides });
+        const res = enterStreet(state, graph || {}, engine.streetTsid, { offWorld: offWorld(engine) || underground(engine), blocked: closedRoads(engine), locked: lockedDoors, rides, oneWay, startCut: cutHere(engine) });
         state = res.state;
         if (res.events.includes('arrived')) {
           // locations/location.js 310-313: pc.quests_inc_counter('map_dest_reached', 1).
@@ -1103,6 +1131,10 @@ export const mapRoutesFeature = {
       lockedDoors = null;
       rooms = [];
     }
+  },
+  /** Tests (report 82): one-way-roads.json as fetched, or null for none. */
+  _setOneWay(json) {
+    oneWay = json ? oneWayRoads(json) : null;
   },
   /** Tests (G198): the rooms behind doors listed for a hub, and picking one. */
   _roomsInHub(hubId) {

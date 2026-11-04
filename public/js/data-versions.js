@@ -295,6 +295,7 @@
       "assets/content/ambient-music.json": "161af59d",
       "assets/content/buffs.json": "70ea503c",
       "assets/content/deco-catalog.json": "0862584f",
+      "assets/content/one-way-roads.json": "1724d02b",
       "assets/content/puzzle-triggers.json": "54e6c673",
       "assets/content/quests.json": "060ccd7a",
       "assets/content/signpost-graph.json": "de200e92",

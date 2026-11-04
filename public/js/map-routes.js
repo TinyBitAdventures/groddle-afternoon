@@ -204,12 +204,14 @@ export function doorRooms(json = {}) {
  * still the end of a route.
  * `locked` lists door edges ("from>to", routeGraph) that need a key: the
  * route takes one only when nothing else gets there (G192).
+ * `oneWay` (oneWayRoads) and `startCut` (startCut) keep a route off the roads a one-way street
+ * does not lead to from where you came in, or from where you stand (player report 82).
  * @param {Record<string, string[]>} graph
  * @param {string} from
  * @param {string|string[]} to
- * @param {{ blocked?: Iterable<string>, locked?: Set<string>|null }} [opts]
+ * @param {{ blocked?: Iterable<string>, locked?: Set<string>|null, rides?: Record<string, string[]>|null, oneWay?: Record<string, object>|null, startCut?: Iterable<string>|null }} [opts]
  */
-export function findRoute(graph, from, to, { blocked = null, locked = null, rides = null } = {}) {
+export function findRoute(graph, from, to, { blocked = null, locked = null, rides = null, oneWay = null, startCut = null } = {}) {
   const start = graphKey(graph, from);
   if (!start) return null;
   const targets = new Set((Array.isArray(to) ? to : [to]).map((t) => graphKey(graph, t)).filter(Boolean));
@@ -218,9 +220,84 @@ export function findRoute(graph, from, to, { blocked = null, locked = null, ride
   const closed = new Set();
   for (const t of blocked || []) for (const a of tsidAliases(t)) closed.add(a);
   const keyed = locked && locked.size ? locked : null;
-  const walk = (extra) => bfs(graph, start, targets, closed, keyed, extra) || (keyed ? bfs(graph, start, targets, closed, null, extra) : null);
+  const ways = { oneWay: oneWay && Object.keys(oneWay).length ? oneWay : null, startCut: startCut ? new Set(startCut) : null };
+  const walk = (extra) => bfs(graph, start, targets, closed, keyed, extra, ways) || (keyed ? bfs(graph, start, targets, closed, null, extra, ways) : null);
   // The subway only when no road gets there (Austin, 2026-11-03: the way to Xalanga rides to Onto Parada).
   return walk(null) || (rides ? walk(rides) : null);
+}
+
+/**
+ * One-way roads (player report 82): public/assets/content/one-way-roads.json
+ * (tools/routes/build-one-way.mjs) lists, per street, the signposts a player cannot reach from
+ * where another signpost drops them, from the street's floors, ladders and jump height. The Other
+ * Drop (GLI1D5DO1671QPA) only goes down: from Level 4 East or Arjun Plunge you land on its floor,
+ * 1,100 px under the next ledge, and Eastern Approach's signpost is at the top. findRoute follows
+ * a street's `cut[from]` for the street it entered from, and `startCut` (startCut below) on the
+ * street the route starts on. A street the file does not list, an arrival it does not know (a
+ * door, a ride, a teleport) and a start with no position are two-way.
+ * @param {{ streets?: Record<string, { cut?: Record<string, string[]>, reach?: Record<string, string[]> }> }} json
+ * @returns {Record<string, { cut: Record<string, string[]>, reach: Record<string, string[]> }>}
+ */
+export function oneWayRoads(json = {}) {
+  const out = {};
+  for (const [k, v] of Object.entries(json?.streets || {})) {
+    if (!v || typeof v !== 'object') continue;
+    out[k] = { cut: { ...(v.cut || {}) }, reach: { ...(v.reach || {}) } };
+  }
+  return out;
+}
+
+/** A floor the avatar stands on (street-model.js isStandable: platform_pc_perm not 1 or 0). */
+const standable = (p) => p && p.pc_perm !== 1 && p.pc_perm !== 0;
+const floorY = (p, x) => {
+  const [x1, y1, x2, y2] = p.x1 <= p.x2 ? [p.x1, p.y1, p.x2, p.y2] : [p.x2, p.y2, p.x1, p.y1];
+  const at = Math.max(x1, Math.min(x2, x));
+  return x2 === x1 ? (y1 + y2) / 2 : y1 + ((y2 - y1) * (at - x1)) / (x2 - x1);
+};
+
+/**
+ * The floor under a point in street (world) coordinates, as tools/routes/build-one-way.mjs finds
+ * the floor an arrival lands on: the highest floor at or below the feet there, else the lowest one
+ * at that x, else the nearest floor end. Returns the platform's id, or ''.
+ * @param {{ id: string, x1: number, y1: number, x2: number, y2: number, pc_perm?: number|null }[]} platforms
+ */
+export function floorBeneath(platforms, x, y) {
+  let best = null;
+  let bestY = 0;
+  let lowest = null;
+  let lowY = 0;
+  let near = null;
+  let nearD = Infinity;
+  for (const p of platforms || []) {
+    if (!standable(p)) continue;
+    const lo = Math.min(p.x1, p.x2);
+    const hi = Math.max(p.x1, p.x2);
+    if (x >= lo - 4 && x <= hi + 4) {
+      const fy = floorY(p, x);
+      if (fy >= y - 10 && (!best || fy < bestY)) [best, bestY] = [p, fy];
+      if (!lowest || fy > lowY) [lowest, lowY] = [p, fy];
+    } else {
+      for (const [px, py] of [[p.x1, p.y1], [p.x2, p.y2]]) {
+        const d = Math.hypot(px - x, py - y);
+        if (d < nearD) [near, nearD] = [p, d];
+      }
+    }
+  }
+  return String((best || lowest || near)?.id || '');
+}
+
+/**
+ * The roads out of reach from where you stand on a one-way street (oneWayRoads `reach`: the
+ * floors each listed signpost is reached from). `x`, `y` are street coordinates (street-model.js
+ * screenToWorld). Returns street keys, [] when everything is in reach or nothing is known.
+ * @param {{ reach?: Record<string, string[]> }|null|undefined} entry  oneWayRoads()[street]
+ * @param {object[]} platforms  the street JSON's platforms
+ */
+export function startCut(entry, platforms, x, y) {
+  if (!entry?.reach || !Number.isFinite(x) || !Number.isFinite(y)) return [];
+  const floor = floorBeneath(platforms, x, y);
+  if (!floor) return [];
+  return Object.entries(entry.reach).filter(([, ids]) => !(ids || []).includes(floor)).map(([to]) => to).sort();
 }
 
 /**
@@ -245,23 +322,45 @@ export function isRide(graph, rides, a, b) {
   return Boolean(rides[ka]?.includes(kb)) && !(graph?.[ka] || []).includes(kb);
 }
 
-function bfs(graph, start, targets, closed, locked, rides = null) {
-  const prev = new Map([[start, null]]);
-  const queue = [start];
+/** Whether the route back from `state` already passes `street`. */
+function onChain(seen, state, street) {
+  for (let at = state; at != null; at = seen.get(at).back) if (seen.get(at).street === street) return true;
+  return false;
+}
+
+/**
+ * Breadth first over (street, the street you came in from) on the one-way streets and over plain
+ * streets elsewhere, so a one-way street can be passed one way and still be a dead end the other.
+ */
+function bfs(graph, start, targets, closed, locked, rides = null, { oneWay = null, startCut = null } = {}) {
+  // A state is the street key, or "street<from" on a street with one-way roads.
+  const stateOf = (street, from) => (oneWay?.[street] ? `${street}<${from}` : street);
+  const first = stateOf(start, '');
+  const seen = new Map([[first, { street: start, from: '', back: null }]]);
+  const queue = [first];
   for (let i = 0; i < queue.length; i++) {
     const cur = queue[i];
-    const on = rides?.[cur] ? [...(graph[cur] || []), ...rides[cur]] : graph[cur] || [];
+    const { street, from } = seen.get(cur);
+    const cut = i === 0 ? startCut : oneWay?.[street]?.cut?.[from] ? new Set(oneWay[street].cut[from]) : null;
+    const roads = graph[street] || [];
+    const on = rides?.[street] ? [...roads, ...rides[street]] : roads;
     for (const next of on) {
-      if (prev.has(next)) continue;
-      if (locked && locked.has(`${cur}>${next}`)) continue;
+      if (cut && cut.has(next)) continue;
+      if (locked && locked.has(`${street}>${next}`)) continue;
       if (closed.has(next) && !targets.has(next)) continue;
-      prev.set(next, cur);
+      // A ride comes up the station stairs, not off a signpost: an arrival the file does not know.
+      const came = roads.includes(next) ? street : '';
+      const state = stateOf(next, came);
+      if (seen.has(state)) continue;
+      // A one-way street is a state per arrival: never twice on one route (routeStep finds its place by street).
+      if (oneWay?.[next] && onChain(seen, cur, next)) continue;
+      seen.set(state, { street: next, from: came, back: cur });
       if (targets.has(next)) {
-        const path = [next];
-        for (let at = cur; at != null; at = prev.get(at)) path.unshift(at);
+        const path = [];
+        for (let at = state; at != null; at = seen.get(at).back) path.unshift(seen.get(at).street);
         return path;
       }
-      queue.push(next);
+      queue.push(state);
     }
   }
   return null;
@@ -303,16 +402,16 @@ export function normalizeRouteState(seed = {}) {
  * several destinations: the closest one wins.
  * @returns {{ ok: boolean, state: object, route?: object, error?: string }}
  */
-export function planRoute(state, graph, { from, to, source = 'player', quest = '', inHome = false, blocked = null, locked = null, rides = null, now = Date.now() } = {}) {
+export function planRoute(state, graph, { from, to, source = 'player', quest = '', inHome = false, blocked = null, locked = null, rides = null, oneWay = null, startCut = null, now = Date.now() } = {}) {
   const s = normalizeRouteState(state);
   if (inHome) return { ok: false, state: s, error: ROUTE_TEXT.fromHome };
   const list = (Array.isArray(to) ? to : [to]).filter(Boolean);
   if (!list.length) return { ok: false, state: s, error: ROUTE_TEXT.notFound };
   if (from && list.some((t) => sameStreet(t, from))) return { ok: false, state: s, error: ROUTE_TEXT.alreadyThere };
-  const path = from ? findRoute(graph, from, list, { blocked, locked, rides }) : null;
+  const path = from ? findRoute(graph, from, list, { blocked, locked, rides, oneWay, startCut }) : null;
   // Only closed roads in the way (street projects): no route, and which streets are still being built.
   if (!path && from && graphKey(graph, from) && blocked) {
-    const open = findRoute(graph, from, list, { locked, rides });
+    const open = findRoute(graph, from, list, { locked, rides, oneWay, startCut });
     if (open) {
       const shut = new Set([...blocked].flatMap((t) => tsidAliases(t)));
       return { ok: false, state: s, error: ROUTE_TEXT.notFound, through: open.slice(1).filter((t) => shut.has(t)) };
@@ -365,7 +464,7 @@ export function routeStep(route, graph, currentTsid) {
  * know (homes, instances, Hell One).
  * @returns {{ state: object, events: string[] }}
  */
-export function enterStreet(state, graph, currentTsid, { now = Date.now(), offWorld = false, blocked = null, locked = null, rides = null } = {}) {
+export function enterStreet(state, graph, currentTsid, { now = Date.now(), offWorld = false, blocked = null, locked = null, rides = null, oneWay = null, startCut = null } = {}) {
   let s = normalizeRouteState(state);
   const events = [];
   const r = s.route;
@@ -383,8 +482,11 @@ export function enterStreet(state, graph, currentTsid, { now = Date.now(), offWo
     return { state: s, events };
   }
   const step = routeStep(r, graph, currentTsid);
-  if (step.status === 'off' && !offWorld && graphKey(graph, currentTsid)) {
-    const path = findRoute(graph, currentTsid, r.destination, { blocked, locked, rides });
+  // On the path, but its next road is out of reach from where you came in (a one-way street, or a
+  // route saved before one-way roads were known): a new route from here, as off the path.
+  const cutOff = step.status === 'on' && Boolean(startCut?.length) && startCut.includes(graphKey(graph, step.next) || step.next);
+  if ((step.status === 'off' || cutOff) && !offWorld && graphKey(graph, currentTsid)) {
+    const path = findRoute(graph, currentTsid, r.destination, { blocked, locked, rides, oneWay, startCut });
     if (path && path.length > 1) {
       s = { ...s, route: { ...r, path } };
       events.push('rerouted');

@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=b484cbad';
 import { createFeatureHost } from './js/feature-host.js?v=2ed3c069';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=af54d27f';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=e4ea6ce9';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';

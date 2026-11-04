@@ -124,7 +124,7 @@ import { normalizeGroups } from '../groups.js?v=14b60589';
 import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=3149d699';
 import { JOB_WORK_OVERLAY, jobWorkFloatPoint, jobWorkSoundKey, jobWorkToolScale, jobWorkToolSheet } from '../job-work-fx.js?v=33f097ad';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
-import { SIGN_ARMS, routeGraph } from '../map-routes.js?v=91cc8e46';
+import { SIGN_ARMS, routeGraph } from '../map-routes.js?v=bcf2c347';
 import { TELEPORTERS } from '../hidden-floors.js?v=518fce9e';
 import { WINTRY_PORTAL_TELEPORTERS } from '../wintry-portal.js?v=1437deda';
 
