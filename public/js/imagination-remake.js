@@ -1,15 +1,18 @@
 /**
  * What each imagination upgrade does in this remake. The shop only deals
- * cards whose effect is wired (`live`) or mostly wired (`partial`); every
- * other card stays in the catalog with an honest note, the same way the
- * Skills panel keeps "not here yet" skills (see skill-tree.js).
+ * cards whose effect is wired (`live`) or mostly wired (`partial`), and in
+ * multiplayer also the cards whose effect only exists between players
+ * (`online`); every other card stays in the catalog with an honest note, the
+ * same way the Skills panel keeps "not here yet" skills (see skill-tree.js).
  *
  * Statuses:
  *   live        effect wired with source numbers
  *   partial     main effect wired; a side effect waits on a missing system
  *   starter     one of the nine tutorial cards, granted to every save
+ *   online      effect wired in multiplayer, where the system it changes
+ *               lives (chat, Snaps, radiation); dealt online only
  *   later       the system it improves is not in the remake yet
- *   multiplayer needs other players
+ *   multiplayer needs other players and is not wired online yet
  *   interface   a client UI convenience with no gameplay effect here
  *   none        GameServerJS never applied it
  */
@@ -23,7 +26,10 @@ const RULES = [
   [/^walk_speed_[34]$/, 'live', 'Walk speed rises by the source ratio to the post-tutorial pace (Walk Speed III 1.21x, IV 1.28x).'],
   [/^jump_3$/, 'live', 'Jump velocity 1.05x.'],
   [/^jump_triple_[123]$/, 'live', 'Triple Jump height 0.7 / 0.82 / 1 of the full boost.'],
-  [/^jump_wall$/, 'none', 'Secret card that was never dealt; the original game took it away from anyone who had it.'],
+  // Secret (inc_data_imagination.js 3457-3489, never dealt: inc_imagination.js 552 skips is_secret). Its reward
+  // was can_wall_jump, which the Flash client honoured (AvatarPhysicsHandler.as), so a card granted by hand
+  // did something; a player reset took it with every movement card (inc_physics.js 36).
+  [/^jump_wall$/, 'none', 'Secret card that was never dealt, so no player could get it.'],
   [/^energy_tank$/, 'live', 'Raises the energy tank and refills it.'],
   [/^quoin_multiplier$/, 'live', 'Adds to the quoin multiplier (cap 100).'],
   [/^daily_quoin_limit_[1-5]$/, 'live', 'Daily quoin limit 110 / 120 / 130 / 140 / 150, effective at once.'],
@@ -50,7 +56,8 @@ const RULES = [
   [/^mining_drop_[1-4]$/, 'live', 'Mining can turn up a small gem (amber to diamond).'],
   [/^mining_expert_(beryl|dullite|metal_rock|sparkly)$/, 'live', '15% more chunks from that rock.'],
   [/^mining_high_capacity_rock$/, 'live', 'Rocks you clear come back as 150-chunk mega rocks 50% more often (dullite 7.5%, beryl 15%, sparkly 30%).'],
-  [/^mining_multitasking$/, 'none', 'Secret card with no server effect.'],
+  // inc_data_imagination.js 5557-5572: secret, no rewards, and nothing anywhere checks it (server or client).
+  [/^mining_multitasking$/, 'none', 'Secret card with no effect: nothing in the original game checks it.'],
   [/^refining_time_[12]$/, 'live', 'Grinding ore takes 20 / 40% less time.'],
   [/^refining_drop_[12]$/, 'live', 'Grinding a batch of 5+ ore rolls the refining drop table (4 / 8%).'],
   [/^smelting_energy$/, 'live', 'Smelting costs 3 energy instead of 5.'],
@@ -64,6 +71,7 @@ const RULES = [
   [/^(ezcooking|grilling)_less_imagination$/, 'live', 'A chance of bonus iMG worth a share of what you make with that tool.'],
   [/^intermediate_admixing_imagination_[12]$/, 'live', 'A chance of bonus iMG when making with the Beaker.'],
   [/^toolcrafting_imagination_[12]$/, 'live', 'A chance of bonus iMG when making with the Tinkertool.'],
+  // inc_data_imagination.js 5888-5908; items/cauldron.js 320-329 rolls cocktail_crafting_imagination instead.
   [/^potionmaking_imagination$/, 'none', 'The original game never checks this upgrade (the Cauldron rolls Shake Things Up instead).'],
   [/^(cheffery|saucery|master_chef|blending|cocktail_crafting|ezcooking|grilling)_tool_wear$/, 'live', 'That cooking tool wears at half rate.'],
   [/^recipe_task_limit_(food|drink|transmog|machines)_1$/, 'live', 'Make 50% more per batch with these tools (the recipe batch limit x1.5).'],
@@ -82,7 +90,8 @@ const RULES = [
   [/^fiber_arts_bonus_1$/, 'live', '4% of spins on a Spindle make String instead of Thread.'],
   [/^fiber_arts_bonus_2$/, 'live', '4% of General Fabric batches on a Loomer give 2 more Fabric.'],
   [/^distilling_(corn|grain|potato)$/, 'live', 'That crop puts 20% more into the Still hopper.'],
-  [/^crystallography_craft_multiple_crystals$/, 'none', 'Secret card with no server effect.'],
+  // inc_data_imagination.js 1321-1348: secret, no rewards; items/crystallizer.js never checks it.
+  [/^crystallography_craft_multiple_crystals$/, 'none', 'Secret card with no effect: nothing in the original game checks it.'],
   // bag_elemental_pouch.js verbs.shake 53-114 + doShake 669-690 (js/elemental-pouch.js).
   [/^element_handling_bonus_1$/, 'live', 'Adds Shake to your Elemental Pouch: once a day, each element in it grows by 4, 5 or 6% (rounded), up to 5000 of each.'],
   [/^element_handling_bonus_2$/, 'live', 'Super Shake: each element grows by 8 to 12% instead (rounded), up to 5000 of each.'],
@@ -132,13 +141,21 @@ const RULES = [
   [/^meditative_arts_max_relax$/, 'live', 'A Max Relax pays double energy, mood and iMG.'],
   [/^meditative_arts_imagination$/, 'live', '8% of meditations also pay bonus iMG equal to the energy and mood gained.'],
   [/^focused_meditation_imagination$/, 'live', '8% of focused meditations also pay bonus iMG equal to the energy (or mood) gained.'],
-  [/^meditative_arts_less_distraction(_2)?$/, 'multiplayer', 'Chat messages that interrupt meditation come from other players.'],
+  // players/player.js 1851-1863 (radiance-mp.js imInterrupts / chatInterrupts, meditation-feature).
+  [/^meditative_arts_less_distraction$/, 'online', 'An instant message from another player no longer breaks your meditation (online, where IMs are).'],
+  [/^meditative_arts_less_distraction_2$/, 'online', 'Your own chat lines and instant messages no longer break your meditation (online).'],
   [/^levitation_time$/, 'live', 'Levitation lasts 8 seconds instead of 5 and costs 12 energy instead of 20.'],
   [/^levitation_physics$/, 'live', 'Levitation floats longer: lighter gravity and stronger lifts.'],
   [/^piety_shrine_prime_bonus_[12]$/, 'live', 'Offerings through a shrine you primed hit the Rook 25 / 50% harder.'],
   [/^icon_tithe_[1-4]$/, 'live', 'Tithing an Icon costs 3 / 5 / 10 / 20% fewer currants.'],
   [/^icon_bestow_chance_[1-3]$/, 'live', 'Placed Icons bestow Giant Love 5.5 / 6 / 6.5% of the time (from 5%).'],
-  [/^transcendental_/, 'multiplayer', 'Transcendental Radiation needs other players.'],
+  // inc_imagination.js 906-933, focusing_orb.js 1152-1311 (G330: radiance-mp.js, server radiance.go).
+  [/^transcendental_radius_1$/, 'online', 'Transcendental Radiation reaches 50% further (online, where there are players to radiate to).'],
+  [/^transcendental_radius_2$/, 'online', 'Transcendental Radiation reaches twice as far (online).'],
+  [/^transcendental_radius_3$/, 'online', 'Transcendental Radiation reaches everyone on the street (online).'],
+  [/^transcendental_benefits_1$/, 'online', 'Transcendental Radiation lasts 20% longer (online).'],
+  [/^transcendental_benefits_2$/, 'online', 'Transcendental Radiation lasts 50% longer (online).'],
+  [/^transcendental_imagination$/, 'online', '5% of radiations also pay you bonus iMG (online).'],
   // inc_special_locations.js 46-51 / 133-138, catalog_buffs.js 31-36, inc_imagination.js 175-176 (G39, js/ancestral-nostalgia.js).
   [/^ancestral_lands_time_1$/, 'live', 'Overwhelming Ancestral Nostalgia lasts 11 minutes instead of 10, so you can stay a minute longer in the Ancestral Lands before you are sent away.'],
   [/^ancestral_lands_time_2$/, 'live', 'Overwhelming Ancestral Nostalgia lasts 12 minutes.'],
@@ -148,10 +165,18 @@ const RULES = [
   [/^unlearning_time_[12]$/, 'live', 'Unlearning takes 25 / 50% less time.'],
 
   // Interface conveniences.
-  [/^trade_channel$/, 'multiplayer', 'The trade chat channel needs other players.'],
-  [/^snapshotting$/, 'multiplayer', 'Snaps in Camera Mode (Enter), kept on the site for other players\' Cameras.'],
-  [/^snapshottery_/, 'interface', 'Photo filters are a client feature not in the remake.'],
-  [/^(map_search|inventory_search)$/, 'none', 'Secret card with no server effect.'],
+  // player.js 3404-3406 canJoinTradeChat, inc_imagination.js 181-187 (G326: groups-feature, site Groups.php).
+  [/^trade_channel$/, 'online', 'Opens the Trade Channel in the chat (online).'],
+  // player.js 2148-2173 getCameraAbilities (G332: snaps-feature, site Snaps.php).
+  [/^snapshotting$/, 'online', 'Snaps in Camera Mode (Enter), kept on the site for other players\' Cameras (online, where Snaps are).'],
+  // main.js 6871-6893 lists each pack's filters for Camera Mode; glitch-client glitchr/filters (js/snap-filters.js).
+  [/^snapshottery_basic_filter_pack$/, 'online', 'The Boost, B&W, Historic and Chilliwack filters for your Snaps (online).'],
+  [/^snapshottery_filter_pack_1$/, 'online', 'The Piggy, Beryl and Fire Fly filters for your Snaps (online).'],
+  [/^snapshottery_filter_pack_2$/, 'online', 'The Holga, Vintage and Ancient filters for your Snaps (online).'],
+  [/^snapshottery_filter_pack_3$/, 'online', 'The Dither, Shift and Outline filters for your Snaps (online).'],
+  // inc_data_imagination.js 3123-3144 / 5006-5027: secret, no rewards; the Flash client gave every player
+  // inventory search and map search (InventorySearchManager.as, LocationSearchMap.as) without the card.
+  [/^(map_search|inventory_search)$/, 'none', 'Secret card with no effect: the original gave everyone this search without it.'],
   // items/bag_generic_gray.js 30-473, bag.js 113-150 / 774-808 (js/pack-slots.js, features/bags-feature.js).
   [/^pack_internal_sortitude$/, 'live', 'Adds Sort: verbs to your Generic and Bigger Bags: a bag sorted for keys, food, mining goods and more takes them first when they come into your pack.'],
   [/^pack_magic_sort$/, 'live', 'Adds Magic sort to a sorted bag (and to toolboxes, spice racks and other one-kind bags): it gathers in what it is for from the rest of your pack.'],
@@ -168,6 +193,11 @@ export function remakeStatus(id) {
 export function isOfferedInRemake(id) {
   const { status } = remakeStatus(id);
   return status === 'live' || status === 'partial';
+}
+
+/** Cards the multiplayer shop deals: the solo ones, and those whose effect is wired online. */
+export function isOfferedOnline(id) {
+  return isOfferedInRemake(id) || remakeStatus(id).status === 'online';
 }
 
 export const REMAKE_STATUS_RULES = RULES;

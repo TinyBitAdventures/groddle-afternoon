@@ -11,10 +11,10 @@ import {
   moodWarningFor,
   periodicMoodLoss,
 } from '../public/js/mood-decay.js?v=49175993';
-import { isOfferedInRemake, remakeStatus } from '../public/js/imagination-remake.js?v=7ec61ba6';
+import { isOfferedInRemake, remakeStatus } from '../public/js/imagination-remake.js?v=5ca4a35f';
 import { IMAGINATION_UPGRADES } from '../public/js/imagination.js?v=133fd4d5';
 // The feature imports these with their browser cache tags; load the same module instances.
-import { moodDecayContext, moodDecayFeature, runMoodDecayMinute } from '../public/js/features/mood-decay-feature.js?v=7a92b757';
+import { moodDecayContext, moodDecayFeature, runMoodDecayMinute } from '../public/js/features/mood-decay-feature.js?v=a5f74842';
 import { __newxpTest } from '../public/js/features/newxp-feature.js?v=7103d7f9';
 import { GENTLE_ISLAND_TSIDS } from '../public/js/newxp.js?v=6ca4702e';
 

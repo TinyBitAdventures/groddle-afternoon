@@ -19,8 +19,8 @@ import {
   CAMERA_OFFER, FORGET_RECHARGE_SEC, RECHARGE_BUFF, SNAP_COPY, SNAPSHOTTERY, TRAVEL,
   canSnap, cleanCaption, isSnapStreet, isSnapUrl, snapAuthor, snapPlace, snapStreet, takePictureState, withCamera,
 } from '../public/js/snaps.js?v=55d4c257';
-import { snapsFeature } from '../public/js/features/snaps-feature.js?v=e2980571';
-import { FEATURES } from '../public/js/features/index.js?v=e9c1cdac';
+import { snapsFeature } from '../public/js/features/snaps-feature.js?v=e1e5a4e2';
+import { FEATURES } from '../public/js/features/index.js?v=18cf0a32';
 import { HAS_SITE, SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');
@@ -226,15 +226,19 @@ describe('snaps feature: solo is untouched', () => {
     assert.equal(snapsFeature.cameraSnapHint(solo, 400), null);
   });
 
-  it('is registered before street-objects; vendorProfile answers chain; the card is dealt only online', () => {
+  it('is registered before street-objects; vendorProfile answers chain; the card is dealt only online', async () => {
     const ids = FEATURES.map((f) => f.id);
     assert.ok(ids.includes('snaps'));
     assert.ok(ids.indexOf('snaps') < ids.indexOf('street-objects'));
     const game = read('public/game.js');
     assert.match(game, /for \(const feature of features\.features\) \{\s*if \(typeof feature\.vendorProfile === 'function'\) activeVendor = feature\.vendorProfile\(activeVendor, engine\) \|\| activeVendor;/);
-    const imagination = read('public/js/features/imagination-feature.js');
-    assert.match(imagination, /MULTIPLAYER_OFFERS = new Set\(\[[^\]]*'snapshotting'/);
-    assert.doesNotMatch(imagination.match(/MULTIPLAYER_OFFERS = new Set\(\[[^\]]*\]/)[0], /snapshottery_/);
+    const { remakeStatus, isOfferedInRemake, isOfferedOnline } = await import('../public/js/imagination-remake.js?v=5ca4a35f');
+    // Snapshottery and its filter packs (js/snap-filters.js) are dealt online only.
+    for (const id of ['snapshotting', 'snapshottery_basic_filter_pack', 'snapshottery_filter_pack_1', 'snapshottery_filter_pack_2', 'snapshottery_filter_pack_3']) {
+      assert.equal(remakeStatus(id).status, 'online', id);
+      assert.equal(isOfferedInRemake(id), false, id);
+      assert.equal(isOfferedOnline(id), true, id);
+    }
     assert.match(read('build-stores.mjs'), /entry\.class_tsid === 'camera'/, 'solo stores still leave the Camera out');
     const cam = read('public/js/features/camera-mode-feature.js');
     assert.match(cam, /k === 'enter'[^\n]*engine\.query\?\.\('cameraSnap', engine, \{ end: \(\) => setActive\(engine, false\) \}\) === true/);

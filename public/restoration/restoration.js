@@ -190,6 +190,12 @@ function setupBoard(data) {
 
 /* —— Numbers ———————————————————————————— */
 /** The Music tracks tile's note: where every playable sound key's recording comes from (build-restoration.mjs soundStats). */
+/** Cards that work: wired (live), the tutorial cards every save has (starter), and those wired online (js/imagination-remake.js). */
+function imaginationWorking(img) {
+  const c = img?.counts || {};
+  return (c.live || 0) + (c.starter || 0) + (c.online || 0);
+}
+
 function soundNote(s) {
   const playable = s.playable ?? s.withFile;
   const from = [
@@ -221,7 +227,7 @@ function renderNumbers(data) {
     tile(data.streets.imported, null, 'Original streets', `Every street the public archive kept, across ${data.streets.hubs} regions, with their real geometry and art.`),
     tile(data.badges.officialArt, data.badges.total, 'Badges with original art', `${data.badges.reimaginedArt} were never archived, so their art is reimagined.`, data.badges.officialArt / data.badges.total),
     tile(s.counts.live || 0, s.total, 'Skills that work', 'Learnable with their real effects; the rest need other players or lost systems.', (s.counts.live || 0) / s.total),
-    tile(data.imagination.counts.live || 0, data.imagination.total, 'Imagination cards in play', 'Upgrade cards whose effects are wired in.', (data.imagination.counts.live || 0) / data.imagination.total),
+    tile(imaginationWorking(data.imagination), data.imagination.total, 'Imagination cards in play', 'Upgrade cards whose effects are wired in, a few of them online only.', imaginationWorking(data.imagination) / data.imagination.total),
     tile(data.jobs.playableJobs, data.jobs.sourceJobs, 'Street projects', `Build-a-street jobs offered on ${fmt(data.jobs.offeringStreets)} streets.`, data.jobs.playableJobs / data.jobs.sourceJobs),
     tile(data.recipes.imported, null, 'Recipes', `From the original catalog; ${data.recipes.skipped} belong to tools or items that never shipped.`),
     tile(data.icons.items, null, 'Item icons', `${fmt(data.icons.sharp)} re-rendered at triple resolution from the original vector art.`),

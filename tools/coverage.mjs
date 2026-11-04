@@ -56,7 +56,7 @@ const measures = [
   ['Private quest rooms', data.rooms.built, data.rooms.total, ''],
   ['Streets on the maps imported', data.streets.onMapsImported, data.streets.onMaps, `${data.streets.imported} imported in all`],
   ['Skills live', data.skills.counts.live, data.skills.total, `${data.skills.counts.partial} partial`],
-  ['Imagination cards live', data.imagination.counts.live + data.imagination.counts.starter, data.imagination.total, `${data.imagination.counts.later} later`],
+  ['Imagination cards live', data.imagination.counts.live + data.imagination.counts.starter + (data.imagination.counts.online || 0), data.imagination.total, `${data.imagination.counts.online || 0} online only, ${data.imagination.counts.later || 0} later`],
   ['Street projects playable', data.jobs.playableJobs, data.jobs.sourceJobs, ''],
   ['Sound keys with a real recording', data.sounds.playable, data.sounds.keys, `the rest are synth stand-ins${data.sounds.deadKeys ? `; ${data.sounds.deadKeys} dead in the final client not counted` : ''}`],
   ['Item icons sharp (3x)', data.icons.sharp, data.icons.items, ''],

@@ -8,7 +8,7 @@ import assert from 'node:assert/strict';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { IMAGINATION_UPGRADES } from '../public/js/imagination-data.js?v=4a85e7fe';
-import { isOfferedInRemake, remakeStatus } from '../public/js/imagination-remake.js?v=7ec61ba6';
+import { isOfferedInRemake, remakeStatus } from '../public/js/imagination-remake.js?v=5ca4a35f';
 import {
   BONUS_TOOL_CANDIDATES,
   adjustedTaskLimit,
@@ -91,8 +91,8 @@ describe('statuses (imagination-remake.js)', () => {
       assert.equal(isOfferedInRemake(id), true, id);
     }
     assert.equal(remakeStatus('jump_wall').status, 'none');
-    assert.equal(remakeStatus('meditative_arts_less_distraction').status, 'multiplayer');
-    assert.equal(remakeStatus('meditative_arts_less_distraction_2').status, 'multiplayer');
+    assert.equal(remakeStatus('meditative_arts_less_distraction').status, 'online');
+    assert.equal(remakeStatus('meditative_arts_less_distraction_2').status, 'online');
     const later = Object.keys(IMAGINATION_UPGRADES).filter((id) => remakeStatus(id).status === 'later').sort();
     // G358 dealt the three Bonus Furniture Upgrade cards (tests/g358-furniture-upgrades.test.js);
     // G39 the two Prepared For Ancestral Nostalgia cards (tests/g39-ancestral-nostalgia.test.js).

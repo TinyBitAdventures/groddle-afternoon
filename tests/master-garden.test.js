@@ -18,7 +18,7 @@ import {
   potionTendGarden,
   usePotion,
 } from '../public/js/master-garden.js?v=184b7055';
-import { remakeStatus } from '../public/js/imagination-remake.js?v=7ec61ba6';
+import { remakeStatus } from '../public/js/imagination-remake.js?v=5ca4a35f';
 
 const MG = ['croppery_1', 'mastergardener_1'];
 

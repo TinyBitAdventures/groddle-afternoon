@@ -21,6 +21,16 @@
  *   (7617-7623) recharges for 15 s. Nothing in 10 s: "Your camera seems to
  *   have gone all wonky."
  *
+ * - Filters: each Snapshottery filter pack card adds its filters (main.js
+ *   6871-6893, js/snap-filters.js) to a row under the polaroid's picture
+ *   (GlitchroidSnapshot.as setFiltersView, GlitchrFiltersView.as): Normal
+ *   first, then the owned filters on the client's chicken thumbnail
+ *   (assets/filterthumb.png, FilterThumbnailView.as setupBitmap); a chosen
+ *   filter shows its strength slider, from its defaultAlpha (FilterSlider.as);
+ *   Save snap keeps the picture as filtered (getOutputBitmapData). The client
+ *   also sent the filter's tsid with the snap (API.saveCameraSnap); the site
+ *   keeps only the picture.
+ *
  * The site decides who may snap (the card and level 5 from the save), the
  * limits, and which Snap the Camera sees; pictures are checked and written
  * again there. Canvas data: snapStage, snapTravelStreet, snapDialog,
@@ -34,6 +44,7 @@ import {
   CAMERA_CLASS, CAPTION_MAX, FORGET_RECHARGE_SEC, RECHARGE_BUFF, SNAP_COPY as T, SNAP_MAX_BYTES, SNAP_QUALITY, SNAP_WIDTHS, TRAVEL,
   base64Bytes, canSnap, cleanCaption, isSnapUrl, jpegBase64, snapAuthor, snapPlace, snapStreet, takePictureState, withCamera,
 } from '../snaps.js?v=55d4c257';
+import { VINTAGE_TEXT, applyFilter, filterComponents, filtersFor } from '../snap-filters.js?v=c41c0db6';
 
 export const SNAPS_FEATURE_ID = 'snaps';
 const VERB = 'take_picture';
@@ -83,6 +94,15 @@ const STYLE = `
 .snap-card i { font-size: var(--fs-sm); color: var(--c-mauve-46); overflow-wrap: anywhere; }
 .snap-card .snap-link { align-self: flex-start; font-size: var(--fs-sm); }
 .snap-note { color: var(--text-subtle); margin: var(--sp-3) 0; }
+.snap-filters { display: flex; gap: var(--sp-4); justify-content: center; flex-wrap: wrap; margin: var(--sp-4) 0 0; }
+.snap-filter { display: flex; flex-direction: column; align-items: center; gap: var(--sp-1); border: 0; background: transparent; padding: 0; cursor: pointer; font: 600 var(--fs-xs)/var(--lh-tight) var(--font-system); color: var(--text-subtle); }
+.snap-polaroid .snap-filter img { width: 46px; height: 46px; border-radius: var(--radius-md); border: 4px solid var(--surface-bright); box-shadow: 0 0 0 1px var(--c-mauve-85); background: var(--surface-dark); }
+.snap-filter.is-on { color: var(--text); }
+.snap-polaroid .snap-filter.is-on img { box-shadow: 0 0 0 2px var(--c-gold-55); }
+.snap-filter:disabled { cursor: progress; }
+.snap-filter-strength { display: flex; align-items: center; justify-content: center; gap: var(--sp-3); margin: var(--sp-3) 0 0; font-size: var(--fs-sm); color: var(--text-subtle); }
+.snap-filter-strength[hidden] { display: none; }
+.snap-filter-strength input { width: min(220px, 60%); accent-color: var(--accent); }
 `;
 
 function el(tag, attrs = {}, text = '') {
@@ -193,9 +213,197 @@ function drawSnap(engine) {
     ctx.drawImage(view, 0, 0, w, h);
     const url = c.toDataURL('image/jpeg', SNAP_QUALITY);
     const b64 = jpegBase64(url);
-    if (b64 && base64Bytes(b64) <= SNAP_MAX_BYTES) return { url, b64, w, h };
+    if (b64 && base64Bytes(b64) <= SNAP_MAX_BYTES) return { url, b64, w, h, canvas: c };
   }
   return null;
+}
+
+/* ------------------------------------------------------------------ */
+/* Filters (js/snap-filters.js)                                          */
+/* ------------------------------------------------------------------ */
+
+const FILTER_THUMB = 'assets/ui/snaps/filter-thumb.png';
+/** FilterThumbnailView.as: the thumbnail is filtered at 300 px (FILTER_SCALEUP_DIMENSION), shown at 46. */
+const THUMB_WORK = 300;
+let thumbImage = null;
+
+function loadThumb() {
+  thumbImage ||= new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = () => resolve(null);
+    img.src = FILTER_THUMB;
+  });
+  return thumbImage;
+}
+
+/** VintageFilter.as addBorder: the caption drawn on its 300x250 border bitmap. */
+function drawVintageText(spec) {
+  const c = document.createElement('canvas');
+  c.width = spec.width;
+  c.height = spec.height;
+  const ctx = c.getContext('2d');
+  ctx.setTransform(spec.scaleX, 0, 0, spec.scaleY, 0, 0);
+  ctx.fillStyle = spec.color;
+  ctx.font = '11px sans-serif';
+  ctx.textBaseline = 'top';
+  ctx.fillText(spec.text, 6, 2);
+  return ctx.getImageData(0, 0, spec.width, spec.height);
+}
+
+const FILTER_OPTS = { drawText: drawVintageText };
+
+function imageDataOf(canvas) {
+  return canvas.getContext('2d').getImageData(0, 0, canvas.width, canvas.height);
+}
+
+function canvasOf(img) {
+  const c = document.createElement('canvas');
+  c.width = img.width;
+  c.height = img.height;
+  c.getContext('2d').putImageData(new ImageData(img.data, img.width, img.height), 0, 0);
+  return c;
+}
+
+/** One filter's thumbnail: the chicken scaled to 300, through the filter at full strength, shown at 46 px. */
+async function drawThumb(target, tsid) {
+  const img = await loadThumb();
+  if (!img) return;
+  const big = document.createElement('canvas');
+  big.width = THUMB_WORK;
+  big.height = THUMB_WORK;
+  const ctx = big.getContext('2d');
+  ctx.imageSmoothingQuality = 'high';
+  ctx.drawImage(img, 0, 0, THUMB_WORK, THUMB_WORK);
+  const out = tsid ? canvasOf(applyFilter(imageDataOf(big), tsid, 1, FILTER_OPTS)) : big;
+  // An <img>, not a canvas: #game-root canvas is the game's own (style.css, and QA reads the first one).
+  const small = document.createElement('canvas');
+  small.width = 92;
+  small.height = 92;
+  const t = small.getContext('2d');
+  t.imageSmoothingQuality = 'high';
+  t.drawImage(out, 0, 0, small.width, small.height);
+  target.src = small.toDataURL('image/png');
+}
+
+/** The picture as the site keeps it: a JPEG under the cap, made smaller until it fits. */
+function encodeSnap(canvas) {
+  for (const width of [canvas.width, ...SNAP_WIDTHS.filter((w) => w < canvas.width)]) {
+    // On white, as drawSnap draws the view (a JPEG has no alpha: Shift's edge would go black).
+    const c = document.createElement('canvas');
+    c.width = width;
+    c.height = Math.round((canvas.height * width) / canvas.width);
+    const ctx = c.getContext('2d');
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, c.width, c.height);
+    ctx.imageSmoothingQuality = 'high';
+    ctx.drawImage(canvas, 0, 0, c.width, c.height);
+    const url = c.toDataURL('image/jpeg', SNAP_QUALITY);
+    const b64 = jpegBase64(url);
+    if (b64 && base64Bytes(b64) <= SNAP_MAX_BYTES) return { url, b64, w: c.width, h: c.height, canvas: c };
+  }
+  return null;
+}
+
+/**
+ * The polaroid's filter row (GlitchrFiltersView.as): Normal and the owned
+ * filters; a click bakes that filter into the picture at its defaultAlpha
+ * (onThumbnailClicked), the slider changes the strength
+ * (onFilterAlphaChanged). Returns { el, picture() } (picture: the Snap as it
+ * would be saved now), or null with no filters.
+ */
+function filterRow(engine, s, picture, img) {
+  const owned = filtersFor(upgrades(engine));
+  if (!owned.length || !picture.canvas) return null;
+  const base = imageDataOf(picture.canvas);
+  const wrap = el('div', { class: 'snap-filter-wrap' });
+  const row = el('div', { class: 'snap-filters', role: 'radiogroup', 'aria-label': 'Filters' });
+  const strength = el('label', { class: 'snap-filter-strength', hidden: true });
+  const range = el('input', { type: 'range', min: '0', max: '1', step: '0.01', value: '1', 'data-snap-strength': '', 'aria-label': 'Filter strength' });
+  strength.append(el('span', {}, 'Strength'), range);
+  const state = { tsid: '', alpha: 1, filtered: null, out: picture, busy: false, pending: 0 };
+  const rows = [{ tsid: '', label: 'Normal', defaultAlpha: 1 }, ...owned];
+  const buttons = new Map();
+  const mark = () => {
+    for (const [t, b] of buttons) {
+      b.classList.toggle('is-on', t === state.tsid);
+      b.setAttribute('aria-checked', t === state.tsid ? 'true' : 'false');
+    }
+    strength.hidden = !state.tsid;
+    engine.setData?.('snapFilter', state.tsid);
+    engine.setData?.('snapFilterAlpha', state.tsid ? String(state.alpha) : '');
+  };
+  const render = () => {
+    if (!state.tsid) {
+      state.out = picture;
+      img.src = picture.url;
+      return;
+    }
+    const out = canvasOf(applyFilter(base, state.tsid, state.alpha, { ...FILTER_OPTS, filtered: state.filtered }));
+    state.out = { canvas: out };
+    img.src = out.toDataURL('image/png');
+  };
+  const choose = (tsid, alpha) => {
+    if (state.tsid === tsid) return;
+    state.tsid = tsid;
+    state.alpha = alpha;
+    range.value = String(alpha);
+    state.filtered = null;
+    mark();
+    if (!tsid) {
+      render();
+      return;
+    }
+    // Filtering a full Snap takes a moment: let the row show the choice first.
+    wrap.dataset.busy = '1';
+    const want = tsid;
+    setTimeout(() => {
+      if (state.tsid !== want) return;
+      state.filtered = filterComponents(base, want);
+      render();
+      delete wrap.dataset.busy;
+      engine.setData?.('snapFilterReady', want);
+    }, 30);
+  };
+  for (const f of rows) {
+    const b = el('button', { type: 'button', class: 'snap-filter', role: 'radio', 'data-snap-filter': f.tsid || 'normal', title: f.label });
+    const c = el('img', { alt: '', width: '46', height: '46' });
+    b.append(c, el('span', {}, f.label));
+    b.addEventListener('click', () => choose(f.tsid, f.defaultAlpha));
+    buttons.set(f.tsid, b);
+    row.append(b);
+  }
+  // Thumbnails one at a time, so the polaroid opens at once.
+  (async () => {
+    for (const f of rows) {
+      await new Promise((r) => setTimeout(r, 0));
+      if (!wrap.isConnected) return;
+      await drawThumb(buttons.get(f.tsid).querySelector('img'), f.tsid);
+    }
+  })();
+  range.addEventListener('input', () => {
+    state.alpha = Math.max(0, Math.min(1, Number(range.value) || 0));
+    engine.setData?.('snapFilterAlpha', String(state.alpha));
+    if (state.pending) return;
+    state.pending = requestAnimationFrame(() => {
+      state.pending = 0;
+      if (state.filtered) render();
+    });
+  });
+  wrap.append(row, strength);
+  mark();
+  engine.setData?.('snapFilters', owned.map((f) => f.tsid).join(','));
+  return {
+    el: wrap,
+    /** What Save snap keeps (getOutputBitmapData): the picture as filtered now, encoded under the cap. */
+    picture() {
+      if (!state.tsid) return picture;
+      if (!state.filtered) state.filtered = filterComponents(base, state.tsid);
+      const out = canvasOf(applyFilter(base, state.tsid, state.alpha, { ...FILTER_OPTS, filtered: state.filtered }));
+      return encodeSnap(out);
+    },
+    get tsid() { return state.tsid; },
+  };
 }
 
 /** Where the Snap was taken: the street (or '' for a private place) and the avatar's spot. */
@@ -264,12 +472,14 @@ function openPolaroid(engine, s, picture, spot, ctx) {
   const discard = el('button', { type: 'button', class: 'snap-link', 'data-snap-discard': '' }, T.discard);
   const msg = el('p', { role: 'status', 'aria-live': 'polite' });
   row.append(save, discard);
-  card.append(img, input, row, msg);
+  const filters = filterRow(engine, s, picture, img);
+  card.append(img, ...(filters ? [filters.el] : []), input, row, msg);
   shade.append(card);
   root().append(shade);
   s.dialog = { el: shade, stage: 'open' };
   publish(engine, s);
   setTimeout(() => input.focus(), 30);
+  let shown = picture;
 
   const doSave = async () => {
     if (!s.dialog || s.dialog.stage === 'saving') return;
@@ -279,12 +489,19 @@ function openPolaroid(engine, s, picture, spot, ctx) {
     discard.disabled = true;
     input.disabled = true;
     msg.textContent = T.saving;
+    for (const b of card.querySelectorAll('.snap-filter, [data-snap-strength]')) b.disabled = true;
     try {
-      const out = await s.account.saveSnap({ image: picture.b64, caption: cleanCaption(input.value), street: spot.street, x: spot.x, y: spot.y });
+      // The filter baked in as it shows (GlitchrSnapshotView.as 299-301: getFiltererdBMD).
+      await new Promise((r) => setTimeout(r, 0));
+      const kept = filters ? filters.picture() : picture;
+      if (!kept?.b64) throw Object.assign(new Error('the filtered picture is too large'), { code: 'too_large' });
+      if (filters?.tsid) note(engine, s, `filter:${filters.tsid}`);
+      shown = kept;
+      const out = await s.account.saveSnap({ image: kept.b64, caption: cleanCaption(input.value), street: spot.street, x: spot.x, y: spot.y });
       s.album = { snaps: (out?.snaps || []).filter((x) => isSnapUrl(x?.url)), max: Number(out?.max) || 60 };
       note(engine, s, `saved:${out?.snap?.id || ''}`);
       ctx?.end?.();
-      showSaved(engine, s, picture);
+      showSaved(engine, s, shown);
     } catch (err) {
       if (!s.dialog) return;
       s.dialog.stage = 'error';

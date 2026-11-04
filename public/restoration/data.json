@@ -2249,8 +2249,7 @@
    "live": 246,
    "starter": 9,
    "none": 6,
-   "multiplayer": 10,
-   "interface": 4
+   "online": 14
   }
  },
  "jobs": {
@@ -2695,9 +2694,19 @@
   "deployed": "2026-11-03"
  },
  "git": {
-  "commits": 1201,
+  "commits": 1203,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-03",
+    "kind": "new",
+    "text": "Photo filters for your Snaps, and the upgrade cards that work online are dealt there"
+   },
+   {
+    "date": "2026-11-03",
+    "kind": "new",
+    "text": "Sort your bags with the Internal Sortitude, Magic Sort and Stack Up upgrade cards"
+   },
    {
     "date": "2026-11-03",
     "kind": "improve",
@@ -2807,19 +2816,9 @@
     "date": "2026-11-03",
     "kind": "improve",
     "text": "The Map's street menu is the game's own menu, and a right-click opens it too"
-   },
-   {
-    "date": "2026-11-03",
-    "kind": "new",
-    "text": "A buddy's row opens their menu, in the Buddies tab and in Manage buddies"
-   },
-   {
-    "date": "2026-11-03",
-    "kind": "new",
-    "text": "A player's name in any chat opens their menu, by a click or a right-click"
    }
   ]
  },
- "tests": 652,
+ "tests": 654,
  "generatedAt": "2026-11-03"
 }

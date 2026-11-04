@@ -53,7 +53,7 @@ import {
 import { brainCapacityRescale, skillTimeFactor } from '../imagination-effects.js?v=70169933';
 import { betterLearningDiscount } from '../better-learning.js?v=044ff9ff';
 import { rescaleStudiesForLearningModifier } from '../skills.js?v=4542bdf9';
-import { isOfferedInRemake, remakeStatus } from '../imagination-remake.js?v=7ec61ba6';
+import { isOfferedInRemake, isOfferedOnline, remakeStatus } from '../imagination-remake.js?v=5ca4a35f';
 import { hellFeature } from './hell-feature.js?v=705a486b';
 
 const ART = 'assets/imagination/cards/';
@@ -123,31 +123,19 @@ function ctxFor(engine = engineRef) {
 }
 
 /**
- * Cards that need other players, dealt in multiplayer only: Trade Channelling
- * opens the Trade Channel there (register G326, groups-feature; player.js:3404
- * canJoinTradeChat); the Transcendental cards change a radiation between real
- * players (G330, radiance.go: Radius I-III the range, Prolonger and
- * Prolongest the time; Transcendental Highway the radiator's bonus,
- * meditation-feature); Mantra Meditation keeps your own chat from breaking a
- * meditation, and Tune Out The Chatter, which lets an incoming instant message
- * by (players/player.js:1854-1859), is dealt as its prerequisite
- * (inc_data_imagination.js:5192). Solo deals what it always did.
+ * Cards that need other players, dealt in multiplayer only: the `online`
+ * status in js/imagination-remake.js (each rule cites where it is wired):
+ * Trade Channelling opens the Trade Channel there (register G326,
+ * groups-feature; player.js:3404 canJoinTradeChat); the Transcendental cards
+ * change a radiation between real players (G330, radiance.go: Radius I-III the
+ * range, Prolonger and Prolongest the time; Transcendental Highway the
+ * radiator's bonus, meditation-feature); Tune Out The Chatter lets an incoming
+ * instant message by and Mantra Meditation your own chat (players/player.js
+ * 1851-1863); Snapshottery lets Enter take a Snap in Camera Mode (G332,
+ * player.js 2148-2173, snaps-feature) and the four filter packs add filters to
+ * the Snap (main.js 6871-6893, js/snap-filters.js). Solo deals what it always did.
  */
-const MULTIPLAYER_OFFERS = new Set([
-  'trade_channel',
-  'transcendental_radius_1',
-  'transcendental_radius_2',
-  'transcendental_radius_3',
-  'transcendental_benefits_1',
-  'transcendental_benefits_2',
-  'transcendental_imagination',
-  'meditative_arts_less_distraction',
-  'meditative_arts_less_distraction_2',
-  // G332: Snapshottery lets Enter take a Snap in Camera Mode (player.js 2148-2173, snaps-feature);
-  // the filter packs stay out (the remake has no photo filters).
-  'snapshotting',
-]);
-const offeredInMultiplayer = (id) => isOfferedInRemake(id) || MULTIPLAYER_OFFERS.has(id);
+const offeredInMultiplayer = isOfferedOnline;
 
 /** Keep the player's tank in step with purchased Energy Tank cards. */
 function syncEnergyTank(engine = engineRef, refill = false) {
@@ -665,8 +653,9 @@ function renderOwned(body, list) {
     mini.append(card);
     if (row.count > 1) mini.append(el('span', { class: 'img-count' }, `×${row.count}`));
     mini.append(el('b', {}, row.name));
-    const live = status.status === 'live' || (engineRef?.mode === 'multiplayer' && MULTIPLAYER_OFFERS.has(row.id));
-    const tag = row.starter ? 'Tutorial card' : live ? '' : status.status === 'partial' ? 'Partly here' : 'Not here yet';
+    const online = status.status === 'online';
+    const live = status.status === 'live' || (engineRef?.mode === 'multiplayer' && online);
+    const tag = row.starter ? 'Tutorial card' : live ? '' : status.status === 'partial' ? 'Partly here' : online ? 'Works online' : 'Not here yet';
     if (tag) mini.append(el('span', { class: 'img-tag' }, tag));
     grid.append(mini);
   }

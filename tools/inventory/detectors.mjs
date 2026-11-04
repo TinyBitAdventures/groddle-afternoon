@@ -633,7 +633,7 @@ export function judgeSkills({ skills, audit, statusOf, unlocks, itemReachable, r
   return rows;
 }
 
-const IMG_STATUS = { live: 'source', starter: 'source', partial: 'partial', later: 'missing', interface: 'excluded', multiplayer: 'lost', none: 'unbuilt_original' };
+const IMG_STATUS = { live: 'source', starter: 'source', online: 'source', partial: 'partial', later: 'missing', interface: 'excluded', multiplayer: 'lost', none: 'unbuilt_original' };
 
 export function judgeImagination({ ids, remakeStatus, names = {} }) {
   return ids.map((id) => {

@@ -36,7 +36,7 @@ import {
 } from '../public/js/home-decor.js?v=fc25037c';
 import { FURNITURE_CATALOG } from '../public/js/homes-catalog.js?v=7aa9beb0';
 import { IMAGINATION_UPGRADES, upgradeStatus, DEALT_SECRET_CARDS } from '../public/js/imagination.js?v=133fd4d5';
-import { isOfferedInRemake, remakeStatus } from '../public/js/imagination-remake.js?v=7ec61ba6';
+import { isOfferedInRemake, remakeStatus } from '../public/js/imagination-remake.js?v=5ca4a35f';
 import { visitorHomeState } from '../public/js/features/homes-feature.js?v=b268e2ca';
 
 const spike = join(import.meta.dirname, '..');

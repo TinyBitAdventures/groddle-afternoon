@@ -213,11 +213,10 @@ export function radiatorLine({ energy = 0, img = 0, imgBonus = 0, reached = fals
 
 /**
  * players/player.js:1846-1883 in multiplayer: does the player's own chat line
- * (local, party or group chat) break a meditation? Mantra Meditation
- * (meditative_arts_less_distraction_2) lets it by. Nothing incoming breaks one
- * here: the source's only incoming distraction is an instant message
- * (im_recv), which Tune Out The Chatter lets by, and players have no instant
- * messages in the remake.
+ * (local, party, group or global chat, or an instant message they send) break
+ * a meditation? Mantra Meditation (meditative_arts_less_distraction_2) lets it
+ * by. The source's only incoming distraction is an instant message (im_recv):
+ * imInterrupts below, which Tune Out The Chatter lets by.
  */
 export function chatInterrupts(upgrades = []) {
   return !(Array.isArray(upgrades) && upgrades.includes('meditative_arts_less_distraction_2'));

@@ -33,8 +33,8 @@ import {
   trCostSkillMultiplier,
   trCostTankMultiplier,
   trSkillMultiplier,
-} from '../public/js/radiance-mp.js?v=922dd513';
-import { meditationFeature } from '../public/js/features/meditation-feature.js?v=79567a8c';
+} from '../public/js/radiance-mp.js?v=dd99d51f';
+import { meditationFeature } from '../public/js/features/meditation-feature.js?v=f0086476';
 import { createInventory } from '../public/js/inventory.js?v=597a17a2';
 import { createToolConditionState } from '../public/js/tools.js?v=3974f57e';
 import { HAS_SERVER, HAS_SITE, serverPath, sitePath } from '../tools/repos.mjs';
@@ -374,11 +374,15 @@ describe('solo is untouched', () => {
     assert.equal(fetched.length, 0);
   });
 
-  it('the cards stay out of the solo shop', () => {
+  it('the cards stay out of the solo shop', async () => {
     const src = read('public/js/features/imagination-feature.js');
     assert.match(src, /offerable: engine\?\.mode === 'multiplayer' \? offeredInMultiplayer : isOfferedInRemake/);
+    assert.match(src, /const offeredInMultiplayer = isOfferedOnline;/);
+    const { remakeStatus, isOfferedInRemake, isOfferedOnline } = await import('../public/js/imagination-remake.js?v=5ca4a35f');
     for (const id of ['transcendental_radius_1', 'transcendental_radius_2', 'transcendental_radius_3', 'transcendental_benefits_1', 'transcendental_benefits_2', 'transcendental_imagination', 'meditative_arts_less_distraction', 'meditative_arts_less_distraction_2']) {
-      assert.match(src, new RegExp(`MULTIPLAYER_OFFERS = new Set\\(\\[[^\\]]*'${id}'`), id);
+      assert.equal(remakeStatus(id).status, 'online', id);
+      assert.equal(isOfferedInRemake(id), false, id);
+      assert.equal(isOfferedOnline(id), true, id);
     }
   });
 

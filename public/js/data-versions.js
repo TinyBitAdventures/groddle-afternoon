@@ -6364,6 +6364,7 @@
       "assets/ui/signpost/signpost_arm@3x.webp": "a67c86e4",
       "assets/ui/signpost/signpost_post@3x.webp": "afdb7515",
       "assets/ui/signpost/signpost_shadow@3x.png": "dc99d4c5",
+      "assets/ui/snaps/filter-thumb.png": "66d82b2b",
       "brand/share.jpg": "fb033ab8",
       "compare/compare.json": "bd2788bc",
       "contribute/data.json": "f3183da4",
