@@ -29,7 +29,7 @@
  * accepted | declined | quiet), room23Last, room23RepeatPaid, room23ExitIn.
  */
 
-import { acceptOffer, declineOffer, npcQuestOffers } from '../quest-offers.js?v=c78cd30e';
+import { acceptOffer, declineOffer, npcQuestOffers } from '../quest-offers.js?v=12fe3117';
 import { XP_FOR_LEVEL } from '../progression.js?v=33462eaa';
 import { textureFromUrl } from '../textures.js?v=3149d699';
 import * as kit from '../quest-rooms/kit.js?v=4d8ab82d';
@@ -433,6 +433,7 @@ export function offerTask(engine) {
     beats: card.beats,
     acceptLabel: card.acceptLabel,
     declineLabel: card.declineLabel,
+    note: card.moveNote, // #83: tower_quest.js onAccepted takes you to Area 42
     onAccept: () => {
       const res = acceptOffer(engine.questState, TASK, questCtx(engine));
       if (res.ok) {

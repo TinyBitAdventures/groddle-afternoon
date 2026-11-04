@@ -17,7 +17,7 @@ import { fileURLToPath } from 'node:url';
 import vm from 'node:vm';
 
 import { getQuestCatalog, loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js?v=10b118dd';
-import { QUEST_MOVES_NOTE, questMoveNote, questOfferCard } from '../public/js/quest-offers.js?v=c78cd30e';
+import { QUEST_MOVES_NOTE, questMoveNote, questOfferCard } from '../public/js/quest-offers.js?v=12fe3117';
 import { QUEST_ROOMS } from '../public/js/quest-rooms/catalog.js?v=9ebeb502';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -89,5 +89,57 @@ describe('#83 quests that move you on accept', () => {
     assert.match(game, /note\.textContent = index >= beats\.length - 1 \? questDialogueState\.note \|\| '' : '';/);
     assert.match(game, /kicker: 'Magic Rock',\n\s*note: questMoveNote\(def\),/);
     assert.match(read('public/css/classic.css'), /\.quest-dialogue-note/);
+  });
+});
+
+// An NPC's offer has no start step: accepting it runs the quest's onAccepted (quest.js onAccept
+// 59-76), and some of those move you the same ways. build-quests.mjs records that as
+// movesOnAccept; the same note shows on those offers: Gwendolyn in Room 23 (tower_quest), Zzybzfrx
+// in the Gwendolyn rooms (parts 2 and 3) and the Juju Bandit (help_juju_bandits).
+describe('#83 follow-up: NPC offers whose accept moves you', () => {
+  /** Every quest in the catalog whose GSJS onAccepted moves you, read from the source itself. */
+  function sourceAccepts() {
+    const out = [];
+    for (const id of Object.keys(getQuestCatalog())) {
+      const file = join(GS_QUESTS, `${id}.js`);
+      if (!existsSync(file)) continue;
+      const ctx = {};
+      vm.runInNewContext(readFileSync(file, 'utf8'), ctx, { timeout: 2000 });
+      if (typeof ctx.onAccepted !== 'function') continue;
+      const body = String(ctx.onAccepted).split('\n').filter((line) => !/^\s*\/\//.test(line)).join('\n');
+      if (/\b(questInstanceLocation|teleportToLocationDelayed)\(|callback:\s*'instances_create_delayed'/.test(body)) out.push(id);
+    }
+    return out.sort();
+  }
+
+  it('movesOnAccept is exactly the quests whose onAccepted moves you', { skip: existsSync(GS_QUESTS) ? false : 'no glitch-GameServerJS checkout' }, () => {
+    const inData = Object.values(getQuestCatalog()).filter((def) => def.movesOnAccept).map((def) => def.classTsid).sort();
+    assert.deepEqual(inData, sourceAccepts());
+    assert.deepEqual(inData, ['chris_test', 'help_juju_bandits', 'rook_hall', 'tower_quest', 'tower_quest_part2', 'tower_quest_part3', 'tower_quest_part3repeat']);
+  });
+
+  it('those offers carry the note where the remake moves you (a rebuilt room or its own module), the test quest does not', () => {
+    const cat = getQuestCatalog();
+    for (const id of ['tower_quest', 'tower_quest_part2', 'tower_quest_part3', 'tower_quest_part3repeat', 'help_juju_bandits', 'rook_hall']) {
+      assert.equal(questMoveNote(cat[id]), QUEST_MOVES_NOTE, id);
+      assert.equal(questOfferCard(id).moveNote, QUEST_MOVES_NOTE, id);
+    }
+    assert.equal(questMoveNote(cat.chris_test), '', 'a dev test quest with no room');
+    // A quest whose onAccepted stays put (hell_quest.js) keeps no note.
+    assert.ok(cat.hell_quest);
+    assert.equal(cat.hell_quest.movesOnAccept, undefined);
+    assert.equal(questMoveNote(cat.hell_quest), '');
+  });
+
+  it("Gwendolyn's, the Juju Bandit's and Zzybzfrx's offers pass it to the card, which shows it on the last page", () => {
+    assert.match(read('public/js/features/gwendolyn-room-23-feature.js'), /kicker: GWENDOLYN_LABEL,[\s\S]{0,200}note: card\.moveNote,/);
+    assert.match(read('public/js/features/juju-bandits-feature.js'), /kicker: JUJU_BANDIT\.label,[\s\S]{0,200}note: card\.moveNote,/);
+    const qi = read('public/js/features/quest-instances-feature.js');
+    assert.match(qi, /export async function offerInRoom\([\s\S]*?note: questMoveNote\(def\),[\s\S]*?\n\}/);
+    assert.match(qi, /<p class="quest-dialogue-note" data-qi-note hidden><\/p>/);
+    assert.match(qi, /dialog\.note\.textContent = last \? note \|\| '' : '';/);
+    // The rooms offer parts 2 and 3 through offerInRoom.
+    assert.match(read('public/js/quest-rooms/gwendolyn.js'), /ctx\.offerQuest\(PART2, \{ kicker: 'Zzybzfrx' \}\)/);
+    assert.match(read('public/js/quest-rooms/gwendolyn.js'), /ctx\.offerQuest\(third, \{ kicker: 'Zzybzfrx' \}\)/);
   });
 });

@@ -2869,6 +2869,7 @@
   "locations": [],
   "instanced": false,
   "needsStart": false,
+  "movesOnAccept": true,
   "hasCanOffer": false,
   "offerTriggers": [],
   "solo": false,
@@ -6477,6 +6478,7 @@
   ],
   "instanced": true,
   "needsStart": false,
+  "movesOnAccept": true,
   "hasCanOffer": false,
   "chainOffers": [
    "help_juju_bandits_2"
@@ -31804,6 +31806,7 @@
   ],
   "instanced": true,
   "needsStart": false,
+  "movesOnAccept": true,
   "hasCanOffer": false,
   "offerTriggers": [
    {
@@ -34733,6 +34736,7 @@
   "locations": [],
   "instanced": false,
   "needsStart": false,
+  "movesOnAccept": true,
   "hasCanOffer": false,
   "offerTriggers": [
    {
@@ -34773,6 +34777,7 @@
   "locations": [],
   "instanced": false,
   "needsStart": false,
+  "movesOnAccept": true,
   "hasCanOffer": false,
   "offerTriggers": [
    {
@@ -34827,6 +34832,7 @@
   "locations": [],
   "instanced": false,
   "needsStart": false,
+  "movesOnAccept": true,
   "hasCanOffer": false,
   "offerTriggers": [
    {
@@ -34877,6 +34883,7 @@
   "locations": [],
   "instanced": false,
   "needsStart": false,
+  "movesOnAccept": true,
   "hasCanOffer": false,
   "offerTriggers": [
    {

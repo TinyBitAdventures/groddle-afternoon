@@ -50,7 +50,7 @@ import { ELEMENT_CLASSES, NO_BAG_CLASSES, NO_SLOT_CLASSES } from '../pack-slots-
 import { TOOL_CONDITION_CATALOG, receiveToolCopy, takeToolCopy } from '../tools.js?v=3974f57e';
 import { readVisitScene } from '../neighbours-mp.js?v=a8d5544e';
 import { saveStore } from '../save-store.js?v=8839ba7b';
-import { homesFeature } from './homes-feature.js?v=3c1faa58';
+import { homesFeature } from './homes-feature.js?v=325b3117';
 import {
   SDB_PRICE_MAX,
   STORAGE_TEXT as T,

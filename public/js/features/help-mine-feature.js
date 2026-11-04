@@ -51,7 +51,7 @@ import { addItem } from '../inventory.js?v=602da017';
 import { MEGA_ROCK_CHUNKS, megaRockChance } from '../imagination-effects.js?v=70169933';
 import { crowdScaleX } from '../avatar-anims.js?v=fb921bf4';
 import { frameTexture, loadTexture } from '../textures.js?v=3149d699';
-import { acceptOffer } from '../quest-offers.js?v=c78cd30e';
+import { acceptOffer } from '../quest-offers.js?v=12fe3117';
 import { HELP_DIG_COUNTER, HELP_DIG_LABEL, digHelpFrom, helpDigMessage, othersDigging } from '../help-dig.js?v=7b8a9733';
 import {
   COMPANION_MINE_RULES,

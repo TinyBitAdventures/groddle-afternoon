@@ -19,6 +19,8 @@
  *   endNpcs[], locations[], instanced, needsStart (has onStarted),
  *   movesOnStart (onStarted moves you: questInstanceLocation,
  *     instances_create_delayed or teleportToLocationDelayed; #83's offer note)
+ *   movesOnAccept (onAccepted does the same: the NPC offers whose accept moves
+ *     you, quest.js onAccept 68; Gwendolyn's Task, Juju Bandits, the Rook hall)
  *   timer {buff, durationSec}  (onStarted buffs_apply time limit)
  *   giveItems[{classTsid,count}]  (doProvided: createItemFromFamiliar on accept)
  *   chainOffers[]  (quests offered from this quest's completion code)
@@ -407,6 +409,15 @@ function questMovesOnStart(started) {
   return /\b(questInstanceLocation|teleportToLocationDelayed)\(|callback:\s*'instances_create_delayed'/.test(stripLineComments(String(started || '')));
 }
 
+/**
+ * #83 follow-up: an NPC's offer has no "start" step. Accepting it runs the
+ * quest's onAccepted (quest.js onAccept 59-76, from the conversation's accept
+ * choice), and some of those move you the same ways: Gwendolyn's Task and its
+ * parts send instances_create_delayed (tower_quest.js 38-42), Help the Juju
+ * Bandits and It's Educational II call questInstanceLocation.
+ */
+const questMovesOnAccept = questMovesOnStart;
+
 function extractQuest(classTsid, ctx, buffs) {
   const isJob = !!ctx.is_job || ctx.performance_rewards !== undefined;
   const reqs = Object.entries(ctx.requirements || {}).map(([id, r]) => normalizeRequirement(id, r));
@@ -460,6 +471,7 @@ function extractQuest(classTsid, ctx, buffs) {
     instanced: locations.length > 0,
     needsStart: !!started,
     movesOnStart: questMovesOnStart(started) || undefined,
+    movesOnAccept: questMovesOnAccept(fnSource(ctx, 'onAccepted')) || undefined,
     hasCanOffer: typeof ctx.canOffer === 'function',
     timer,
     giveItems: giveItems.length ? giveItems : undefined,

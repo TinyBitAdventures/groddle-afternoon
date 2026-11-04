@@ -297,7 +297,7 @@
       "assets/content/deco-catalog.json": "0862584f",
       "assets/content/one-way-roads.json": "1724d02b",
       "assets/content/puzzle-triggers.json": "54e6c673",
-      "assets/content/quests.json": "060ccd7a",
+      "assets/content/quests.json": "54e536b2",
       "assets/content/signpost-graph.json": "de200e92",
       "assets/content/sound-keys.json": "cdd3dbd9",
       "assets/content/street-ecology.json": "d07f1dc0",

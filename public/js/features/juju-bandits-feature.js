@@ -53,7 +53,7 @@
  */
 
 import { addItem, removeItem, countItem } from '../inventory.js?v=602da017';
-import { acceptOffer, npcQuestOffers, questStatus } from '../quest-offers.js?v=c78cd30e';
+import { acceptOffer, npcQuestOffers, questStatus } from '../quest-offers.js?v=12fe3117';
 import { groundBeneath, isItemSolid, platformYAt, platformsScreen } from '../street-model.js?v=505d8990';
 import { sheetFrames } from '../quest-rooms/kit.js?v=4d8ab82d';
 import {
@@ -600,6 +600,7 @@ function giveQuest(engine, now) {
     beats: card.beats,
     acceptLabel: card.acceptLabel,
     declineLabel: card.declineLabel,
+    note: card.moveNote, // #83: help_juju_bandits.js onAccepted takes you to the camp
     onAccept: () => finish(true),
     onDecline: () => finish(false),
   });

@@ -95,8 +95,9 @@ import {
   ensureQuestOfferState,
   npcQuestOffers,
   questAwardPayload,
+  questMoveNote,
   turnInQuest,
-} from '../quest-offers.js?v=c78cd30e';
+} from '../quest-offers.js?v=12fe3117';
 import { parseQuestConversation } from '../quests.js?v=b2856d6c';
 import { getQuestCatalog } from '../content-catalogs.js?v=10b118dd';
 import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=602da017';
@@ -168,11 +169,11 @@ const ROOM_MODULES = {
   an_autumn_day: () => import('../quest-rooms/an-autumn-day.js?v=37340a72'),
   being_watched: () => import('../quest-rooms/being-watched.js?v=94119dc6'),
   back_alley: () => import('../quest-rooms/back-alley.js?v=657b2221'),
-  clubhouse: () => import('../quest-rooms/clubhouse.js?v=93474799'),
+  clubhouse: () => import('../quest-rooms/clubhouse.js?v=b05c28e5'),
   light_perspective: () => import('../quest-rooms/light-perspective.js?v=319bd577'),
   tile_puzzle: () => import('../quest-rooms/tile-puzzle.js?v=52045bab'),
   operation_grow: () => import('../quest-rooms/operation-grow.js?v=843ff345'),
-  gwendolyn: () => import('../quest-rooms/gwendolyn.js?v=dd9cec1d'),
+  gwendolyn: () => import('../quest-rooms/gwendolyn.js?v=e7256cf9'),
   mental_block: () => import('../quest-rooms/mental-block.js?v=c0afd86d'),
   penalty: () => import('../quest-rooms/penalty.js?v=74b6fd5f'),
   esquibeth: () => import('../quest-rooms/esquibeth.js?v=ed42ce79'),
@@ -488,6 +489,7 @@ function buildChrome(engine) {
       <p class="mr-kicker" data-qi-kicker></p>
       <h2 id="qi-dialogue-title" data-qi-dtitle></h2>
       <p class="quest-dialogue-copy" data-qi-copy></p>
+      <p class="quest-dialogue-note" data-qi-note hidden></p>
       <div data-qi-choices style="display:flex;flex-direction:column;gap:6px;align-items:center"></div>
     </div>`);
   dlgHost.appendChild(modal);
@@ -508,6 +510,7 @@ function buildChrome(engine) {
     kicker: modal.querySelector('[data-qi-kicker]'),
     title: modal.querySelector('[data-qi-dtitle]'),
     copy: modal.querySelector('[data-qi-copy]'),
+    note: modal.querySelector('[data-qi-note]'),
     choices: modal.querySelector('[data-qi-choices]'),
     resolve: null,
   };
@@ -528,7 +531,7 @@ function buildChrome(engine) {
  * `timeout` (source seconds) closes it on its own and resolves with
  * `timeoutValue` or null (G198, js/prompt-timeout.js).
  */
-function converse(engine, { title = '', kicker = '', text = '', beats = null, choices = null, timeout = 0, timeoutValue = null, look: lookOpt = '', width = 0 } = {}) {
+function converse(engine, { title = '', kicker = '', text = '', beats = null, choices = null, timeout = 0, timeoutValue = null, look: lookOpt = '', width = 0, note = '' } = {}) {
   // G225: Magic Rock lines take the FamiliarDialog CONVERSATION panel unless the caller names a look.
   const look = familiarLook({ look: lookOpt, kicker });
   buildChrome(engine);
@@ -555,6 +558,11 @@ function converse(engine, { title = '', kicker = '', text = '', beats = null, ch
       dialog.copy.innerHTML = String(page.text || '').replace(/\n/g, '<br>');
       dialog.choices.innerHTML = '';
       const last = index === pages.length - 1;
+      // #83: on the last page, a line when accepting moves you (as engine.offerQuestDialogue's note).
+      if (dialog.note) {
+        dialog.note.textContent = last ? note || '' : '';
+        dialog.note.hidden = !dialog.note.textContent;
+      }
       const opts = last && choices?.length ? choices : [{ label: page.response || (last ? 'OK' : 'Continue'), value: last ? 'ok' : null }];
       opts.forEach((opt, i) => {
         const b = el('button', { type: 'button', class: i === 0 ? 'btn-glitch-primary' : 'quest-dialogue-cancel' });
@@ -1724,6 +1732,8 @@ export async function offerInRoom(engine, questId, { kicker = '' } = {}) {
     title: def.title,
     kicker,
     text: def.offer || def.desc,
+    // #83: Zzybzfrx's parts 2 and 3 move you on accept (tower_quest_part2.js onAccepted).
+    note: questMoveNote(def),
     choices: [
       { label: def.acceptLabel || "Ok, I'll do it!", value: 'yes' },
       { label: def.declineLabel || 'Not right now', value: 'no' },
