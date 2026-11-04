@@ -60,6 +60,7 @@ import {
   doorToward,
   enterStreet,
   gpsText,
+  graphKey,
   hubRouteDrawing,
   isRide,
   normalizeRouteState,
@@ -94,6 +95,10 @@ let graphPromise = null;
 let oneWay = null;
 /** The street JSON you are on (its platforms and bounds, for where you stand on a one-way street). */
 let streetHere = null;
+/** This street's key in oneWay, looked up once per street ({ tsid, ways, key }). */
+let oneWayAt = { tsid: '', ways: null, key: null };
+/** In the air on a one-way street since the last landing (checkLanding). */
+let airborne = false;
 /**
  * What leads on from this street: a signpost board or a door, glowing.
  * { kind: 'sign'|'door', view, glow, key, board?, target?, x, y }
@@ -173,11 +178,50 @@ function routeStreet(engine) {
  * null anywhere else. engine.player is in screen pixels; the street file in street coordinates
  * (street-model.js screenToWorld).
  */
+function oneWayKey(engine) {
+  const t = engine.streetTsid || '';
+  if (oneWayAt.tsid !== t || oneWayAt.ways !== oneWay) {
+    oneWayAt = { tsid: t, ways: oneWay, key: oneWay && t ? tsidAliases(t).find((k) => oneWay[k]) || null : null };
+  }
+  return oneWayAt.key;
+}
+
 function cutHere(engine) {
-  const key = oneWay && engine.streetTsid ? tsidAliases(engine.streetTsid).find((k) => oneWay[k]) : null;
+  const key = oneWayKey(engine);
   if (!key || !streetHere || !sameStreet(streetHere.tsid, engine.streetTsid) || !engine.player || offWorld(engine) || underground(engine)) return null;
   const b = streetHere.bounds || {};
   return startCut(oneWay[key], streetHere.platforms, Number(engine.player.x) + (Number(b.l) || 0), Number(engine.player.y) + (Number(b.t) || 0));
+}
+
+/**
+ * A fall on a one-way street (report 82): you start on The Other Drop's top ledge with Next:
+ * Eastern Approach and drop to the floor, 1,100 px under it. Landing on a floor from which the
+ * route's next road is out of reach plans the route again from where you stand, as entering the
+ * street there would (enterStreet's startCut). Only on the streets one-way-roads.json lists, and
+ * only on the frame you land (game.js counts airFrames; a few frames off the floor is a jump or a
+ * fall, fewer is a slope).
+ */
+function checkLanding(engine) {
+  const p = engine.player;
+  if (!state.route || !p || !oneWayKey(engine) || !streetHere) {
+    airborne = false;
+    return;
+  }
+  if (p.onGround !== true) {
+    if ((Number(p.airFrames) || 0) > 3) airborne = true;
+    return;
+  }
+  if (!airborne) return;
+  airborne = false;
+  const step = currentStep(engine);
+  if (step.status !== 'on' || !step.next) return;
+  const cut = cutHere(engine);
+  if (!cut?.length || !cut.includes(graphKey(graph || {}, step.next) || step.next)) return;
+  const res = enterStreet(state, graph || {}, engine.streetTsid, { offWorld: offWorld(engine) || underground(engine), blocked: closedRoads(engine), locked: lockedDoors, rides, oneWay, startCut: cut });
+  state = res.state;
+  engine.setData?.('routeLast', `landed:${res.events.join(',')}`);
+  if (res.events.length) engine.save?.();
+  refresh(engine);
 }
 
 /** Streets still under construction (street-jobs-feature closedRoads): routes go round them. */
@@ -1066,6 +1110,7 @@ export const mapRoutesFeature = {
 
   onStreetEnter(street, engine) {
     streetHere = street || null;
+    airborne = false;
     stopWalk(engine);
     // The glow layer outlives the street (G200): a glow left there goes now.
     clearHighlight();
@@ -1110,6 +1155,7 @@ export const mapRoutesFeature = {
       highlight.glow.alpha = 0.8 + 0.2 * Math.sin(now / 260);
       if (highlight.kind === 'door') syncDoorGlow(highlight);
     }
+    checkLanding(engine);
     stepWalk(engine, now);
     if (now - lastPublish > 120) {
       lastPublish = now;
@@ -1141,6 +1187,8 @@ export const mapRoutesFeature = {
     pickMode = false;
     demoDone = false;
     lastHudKey = '';
+    airborne = false;
+    oneWayAt = { tsid: '', ways: null, key: null };
   },
   /** Tests: a plain adjacency map, or signpost-graph.json as fetched ({ streets, doors, doorKeys }). */
   _setGraph(g) {

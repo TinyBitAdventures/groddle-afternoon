@@ -21,7 +21,7 @@ import {
   subwayRides,
 } from '../public/js/map-routes.js?v=bcf2c347';
 import { SUBWAY_STREETS } from '../public/js/street-jobs.js?v=7381e03e';
-import { mapRoutesFeature } from '../public/js/features/map-routes-feature.js?v=52b41d02';
+import { mapRoutesFeature } from '../public/js/features/map-routes-feature.js?v=da285027';
 import { createFeatureHost } from '../public/js/feature-host.js?v=2ed3c069';
 import { applyStreetIndex } from '../public/js/street-loader.js?v=33d2b8bc';
 import { buildOneWay } from '../tools/routes/build-one-way.mjs';
@@ -239,6 +239,65 @@ describe('report 82: enterStreet and the feature', () => {
     mapRoutesFeature.onStreetEnter(DROP, high);
     const up = mapRoutesFeature.mapRoute('set', { to: FOLLYBOTTOM, source: 'player' }, high);
     assert.equal(up.route.path[1], EASTERN_APPROACH);
+  });
+
+  /** Fall from where the engine stands to `at`: a few frames in the air, then on the floor there. */
+  function fallTo(engine, at, frames = 30) {
+    const s = toScreen(at);
+    Object.assign(engine.player, { onGround: false, airFrames: frames });
+    mapRoutesFeature.onTick(16, 1000, engine);
+    Object.assign(engine.player, { x: s.x, y: s.y, onGround: true, airFrames: 0 });
+    mapRoutesFeature.onTick(16, 1016, engine);
+  }
+
+  it('a fall from the top ledge to the floor plans the route again: Next goes from Eastern Approach to Level 4 East', () => {
+    const engine = engineOn(TOP);
+    engine.player.onGround = true;
+    mapRoutesFeature.onStreetEnter(DROP, engine);
+    const set = mapRoutesFeature.mapRoute('set', { to: FOLLYBOTTOM, source: 'player' }, engine);
+    assert.equal(set.route.path[1], EASTERN_APPROACH);
+    assert.equal(engine.data.routeNext, 'Eastern Approach');
+    // A hop on the ledge lands where Eastern Approach is still in reach: the route stays.
+    fallTo(engine, TOP);
+    assert.equal(engine.data.routeNext, 'Eastern Approach');
+    assert.equal(mapRoutesFeature._state().route.path[1], EASTERN_APPROACH);
+    fallTo(engine, BOTTOM);
+    assert.equal(engine.data.routeLast, 'landed:rerouted');
+    assert.equal(mapRoutesFeature._state().route.path[1], LEVEL_4_EAST);
+    assert.equal(mapRoutesFeature._state().route.destination, FOLLYBOTTOM);
+    assert.equal(engine.data.routeNext, 'Level 4 East');
+  });
+
+  it('only a real landing re-plans: a slope flicker (3 frames off the floor or fewer) and standing still do not', () => {
+    const engine = engineOn(TOP);
+    engine.player.onGround = true;
+    mapRoutesFeature.onStreetEnter(DROP, engine);
+    mapRoutesFeature.mapRoute('set', { to: FOLLYBOTTOM, source: 'player' }, engine);
+    // Moved to the floor without a fall (a teleport within the street): no landing, no re-plan.
+    Object.assign(engine.player, toScreen(BOTTOM));
+    for (let i = 0; i < 5; i++) mapRoutesFeature.onTick(16, 1000 + i * 16, engine);
+    assert.equal(mapRoutesFeature._state().route.path[1], EASTERN_APPROACH);
+    fallTo(engine, BOTTOM, 3);
+    assert.equal(mapRoutesFeature._state().route.path[1], EASTERN_APPROACH);
+    fallTo(engine, BOTTOM, 4);
+    assert.equal(mapRoutesFeature._state().route.path[1], LEVEL_4_EAST);
+  });
+
+  it('on a two-way street a landing never looks at where you stand', () => {
+    const engine = engineOn(BOTTOM);
+    // The street after Eastern Approach on the way to Follybottom Stritt: two-way.
+    engine.streetTsid = 'GLI32G3NUTD100I';
+    mapRoutesFeature.onStreetEnter(street(engine.streetTsid), engine);
+    mapRoutesFeature.mapRoute('set', { to: FOLLYBOTTOM, source: 'player' }, engine);
+    const before = JSON.stringify(mapRoutesFeature._state().route);
+    assert.ok(mapRoutesFeature._state().route);
+    let reads = 0;
+    const real = engine.player;
+    engine.player = new Proxy(real, { get: (t, k) => { if (k === 'x' || k === 'y') reads++; return t[k]; } });
+    fallTo(engine, BOTTOM);
+    assert.equal(JSON.stringify(mapRoutesFeature._state().route), before);
+    assert.equal(engine.data.routeLast?.startsWith('landed:') ?? false, false);
+    assert.equal(reads, 0, 'no floor lookup off the one-way streets');
   });
 
   it('fetches one-way-roads.json with the graph, and without it every road is two-way', () => {
