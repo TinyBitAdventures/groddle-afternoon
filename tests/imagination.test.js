@@ -278,11 +278,20 @@ describe('imagination starters and physics', () => {
 // smudge. The client darkens it instead (ImgCardUI.as 300-310: colorize(0), alpha .5, no drop shadow);
 // the remake keeps that dark, unshadowed price and sets it on a light chip so it stays readable on
 // the dark grey and red cards too, where black at half alpha would vanish.
-describe('unaffordable card price (ticket 75)', () => {
+// The title had the same trouble: white with a shadow on the band the card whitens. The client
+// darkens it too (ImgCardUI.as 296-297: colorize(0), alpha .5, on a white .3 band, 316-319); the
+// remake darkens it and lightens the band enough for 4.5:1 on the dark grey card as well.
+describe('unaffordable card price and title (ticket 75)', () => {
   const src = readFileSync(join(publicRoot, 'js/features/imagination-feature.js'), 'utf8');
   const css = resolveTokens(/const PANEL_CSS = `([\s\S]*?)`;/.exec(src)[1]);
-  const rule = /\.img-card\.poor \.img-front \.img-cost\{([^}]*)\}/.exec(css);
-  const decls = Object.fromEntries((rule?.[1] || '').split(';').map((d) => d.split(/:(.*)/s).map((x) => x.trim())).filter((d) => d[0]));
+  const declsOf = (re) => {
+    const rule = re.exec(css);
+    return rule ? Object.fromEntries(rule[1].split(';').map((d) => d.split(/:(.*)/s).map((x) => x.trim())).filter((d) => d[0])) : null;
+  };
+  const parts = {
+    price: declsOf(/\.img-card\.poor \.img-front \.img-cost\{([^}]*)\}/),
+    title: declsOf(/\.img-card\.poor \.img-front \.img-title\{([^}]*)\}/),
+  };
   const lum = ([r, g, b]) => {
     const f = (v) => ((v /= 255) <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4);
     return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b);
@@ -290,30 +299,40 @@ describe('unaffordable card price (ticket 75)', () => {
   const over = ([r, g, b, a], under) => [r, g, b].map((v, i) => v * a + under[i] * (1 - a));
   const contrast = (x, y) => (Math.max(lum(x), lum(y)) + 0.05) / (Math.min(lum(x), lum(y)) + 0.05);
 
-  it('is dark text with no blurred shadow, like the client', () => {
-    assert.ok(rule, 'the poor price rule is in PANEL_CSS');
-    assert.equal(decls['text-shadow'], 'none');
-    assert.equal(decls.filter, undefined);
-    assert.equal(decls.opacity, undefined);
-    const text = parseColour(decls.color);
-    const chip = parseColour(decls.background);
-    assert.ok(text && chip, `${decls.color} / ${decls.background}`);
-    assert.ok(lum(text) < 0.05 && lum(chip) > 0.8, 'dark on light');
-  });
+  for (const [name, decls] of Object.entries(parts)) {
+    it(`the ${name} is dark text with no blurred shadow, like the client`, () => {
+      assert.ok(decls, `the poor ${name} rule is in PANEL_CSS`);
+      assert.equal(decls['text-shadow'], 'none');
+      assert.equal(decls.filter, undefined);
+      assert.equal(decls.opacity, undefined);
+      const text = parseColour(decls.color);
+      const chip = parseColour(decls.background);
+      assert.ok(text && chip, `${decls.color} / ${decls.background}`);
+      assert.ok(lum(text) < 0.05 && lum(chip) > 0.8, 'dark on light');
+    });
 
-  it('reads at 4.5:1 or better on every card background the deck uses', () => {
-    const text = parseColour(decls.color);
-    const chip = parseColour(decls.background);
-    const dir = join(publicRoot, 'assets/imagination/cards');
-    const bgs = readdirSync(dir).filter((f) => /^bg_(?!back)\w+\.svg$/.test(f));
-    assert.ok(bgs.length >= 10, bgs.join(' '));
-    for (const f of bgs) {
-      for (const [hex] of readFileSync(join(dir, f), 'utf8').matchAll(/#[0-9a-f]{6}\b/gi)) {
-        const card = parseColour(hex);
-        const under = over(chip, card);
-        const ratio = contrast(over(text, under), under);
-        assert.ok(ratio >= 4.5, `${f} ${hex}: ${ratio.toFixed(2)}`);
+    it(`the ${name} reads at 4.5:1 or better on every card background the deck uses`, () => {
+      const text = parseColour(decls.color);
+      const chip = parseColour(decls.background);
+      const dir = join(publicRoot, 'assets/imagination/cards');
+      const bgs = readdirSync(dir).filter((f) => /^bg_(?!back)\w+\.svg$/.test(f));
+      assert.ok(bgs.length >= 10, bgs.join(' '));
+      for (const f of bgs) {
+        for (const [hex] of readFileSync(join(dir, f), 'utf8').matchAll(/#[0-9a-f]{6}\b/gi)) {
+          const card = parseColour(hex);
+          const under = over(chip, card);
+          const ratio = contrast(over(text, under), under);
+          assert.ok(ratio >= 4.5, `${f} ${hex}: ${ratio.toFixed(2)}`);
+        }
       }
-    }
+    });
+  }
+
+  it('an affordable title stays light on a dark band, so the dark title still says "not affordable"', () => {
+    const plain = declsOf(/\.img-front \.img-title\{([^}]*)\}/);
+    assert.ok(plain);
+    assert.ok(lum(parseColour(plain.color)) > 0.8, plain.color);
+    assert.ok(lum(parseColour(plain.background)) < 0.05, plain.background);
+    assert.ok(lum(parseColour(parts.title.color)) < 0.05);
   });
 });

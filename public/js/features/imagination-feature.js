@@ -332,7 +332,7 @@ const PANEL_CSS = `
 .img-card.poor .img-front .img-cost{right:6px;padding:0 var(--sp-3);border-radius:var(--radius-pill);background:color-mix(in srgb, var(--surface-bright) 80%, transparent);
   color:color-mix(in srgb, var(--c-black) 70%, transparent);text-shadow:none}
 .img-card.poor .img-front img.art,.img-card.poor .img-front img.icon{opacity:.35}
-.img-card.poor .img-front .img-title{background:color-mix(in srgb, var(--surface-bright) 30%, transparent)}
+.img-card.poor .img-front .img-title{background:color-mix(in srgb, var(--surface-bright) 60%, transparent);color:color-mix(in srgb, var(--c-black) 70%, transparent);text-shadow:none}
 .img-back{transform:rotateY(180deg);color:var(--c-navy-36);text-align:left}
 .img-back .img-back-text{position:absolute;inset:0;padding:var(--sp-8) var(--sp-8) var(--sp-6);display:flex;flex-direction:column}
 .img-back h3{margin:0 0 var(--sp-4);font-size:var(--fs-base);line-height:var(--lh-tight);color:var(--text);text-shadow:0 1px 0 var(--c-white)}

@@ -20,7 +20,7 @@ import { GATE_COPY, SAVE_ALERT_COPY, bootDataFrom, deliverHandoff, gateFor, save
 import { SAVE_STOPPED } from '../public/js/save-store.js?v=8839ba7b';
 import { FORM_COPY, SETTINGS_COPY, resetLinkFrom } from '../public/js/account-forms.js?v=fe37d0de';
 import { restoreNeedsAsking, sizeLabel, slotForNewBackup, accountBackupFeature } from '../public/js/features/account-backup-feature.js?v=80ff3f6b';
-import { FEATURES } from '../public/js/features/index.js?v=4e50b2a1';
+import { FEATURES } from '../public/js/features/index.js?v=651a7545';
 import { multiplayerEntryUrl } from '../public/js/game-mode.js?v=1ecf2899';
 import { SAVE_ENTRY_NAMES, createMultiplayerSaveStore } from '../public/js/save-store.js?v=8839ba7b';
 import { HAS_SITE, SITE_DIR, serverPath, skipWithoutServer, skipWithoutSite } from '../tools/repos.mjs';
