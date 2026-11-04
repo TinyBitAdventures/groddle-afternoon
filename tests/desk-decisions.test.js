@@ -67,6 +67,15 @@ describe('DROPHOVER: a street Musicblock sits on the ground', () => {
     assert.doesNotMatch(game, /for \(const block of worldMusicblocks\)/);
     assert.doesNotMatch(game, /block\.baseScale \* pulse/);
   });
+
+  it('ticket 78: draws at the size of the same block put down (its world art, own size), not 1.65x its icon', () => {
+    const spawn = fnBody(game, 'spawnMusicblockDrop');
+    assert.doesNotMatch(spawn, /baseScale = 1\.65|scale\.set\(1\.65/);
+    assert.match(spawn, /worldArtFor\(def\.classTsid, 1, icon\)/);
+    assert.match(spawn, /sizeDroppedItemSprite\(spr\)/);
+    // musicblock_*.js adjusted_scale 1: the SWF's own size.
+    if (haveGsjs) assert.match(gsjs('items/musicblock_d_blue_01.js'), /var adjusted_scale = 1;/);
+  });
 });
 
 describe('RAINBOW: ticket races end on the splash', () => {

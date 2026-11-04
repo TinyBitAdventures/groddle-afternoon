@@ -12611,10 +12611,16 @@ function spawnMusicblockDrop(point, exactPlacement = false) {
   const def = planMusicblockDrop(musicblockState, inv, currentStreetTsid);
   if (!def || !point) return [];
   const collection = listMusicblockCollection(inv);
-  const spr = new PIXI.Sprite(textureFromUrl(ITEM_CATALOG[def.classTsid]?.icon || `assets/sprites/icons/${def.classTsid}.png`));
+  // Ticket 78: the block on the street is the same stack a player puts down, so it draws as one
+  // (spawnDroppedItemStack): its '1' scene at the SWF's own size (musicblock_*.js adjusted_scale 1,
+  // LocationItemstackView.as 853-854), about 37 px, not the pack icon blown up 1.65 times.
+  const icon = ITEM_CATALOG[def.classTsid]?.icon || `assets/sprites/icons/${def.classTsid}.png`;
+  const worldArt = worldArtFor(def.classTsid, 1, icon);
+  const spr = new PIXI.Sprite(textureFromUrl(worldArt?.url || icon));
   spr.anchor.set(0.5, 1);
-  spr.baseScale = 1.65;
-  spr.scale.set(spr.baseScale);
+  spr.worldArt = worldArt;
+  sizeDroppedItemSprite(spr);
+  if (!isLoaded(spr.texture?.source)) onLoaded(spr.texture?.source, () => sizeDroppedItemSprite(spr));
   spr.x = clamp(point.x + (exactPlacement ? 0 : 92), 44, Math.max(44, WORLD_W - 44));
   // Desk DROPHOVER (G297): it sits on the ground like every other dropped
   // item (no hover, bob or pulse), drawn in front of street furniture as they are.
