@@ -49,7 +49,7 @@ import {
 } from '../public/js/street-furniture.js?v=d5716ef6';
 import { REMAKE_NOTE_BYLINE, REMAKE_NOTE_MARKER, isRemakeNote, normalizeNote as normalizeNoteRow } from '../public/js/street-furniture.js?v=d5716ef6';
 import { streetFurnitureFeature } from '../public/js/features/street-furniture-feature.js?v=ea0130e5';
-import { FEATURES } from '../public/js/features/index.js?v=7f8bb2e8';
+import { FEATURES } from '../public/js/features/index.js?v=cea07c0f';
 import { createFeatureHost } from '../public/js/feature-host.js?v=020c9329';
 import { setWildlifeCatalog } from '../public/js/wildlife.js?v=670c3a7f';
 

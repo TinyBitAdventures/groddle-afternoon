@@ -35,10 +35,11 @@ import {
   setCubimalFree,
 } from '../public/js/cubimals.js?v=8950bf83';
 import { addItem, countItem, createInventory } from '../public/js/inventory.js?v=d82f3b00';
+import { bindToolInventory, copyTags, createToolConditionState } from '../public/js/tools.js?v=2337f66a';
 import { applyAchievementProgress, createAchievementState } from '../public/js/achievements.js?v=ad0b5a5a';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=10b118dd';
-import { FEATURES } from '../public/js/features/index.js?v=7f8bb2e8';
-import { cubimalRaceFeature, CUBIMAL_RACE_FEATURE_ID } from '../public/js/features/cubimal-race-feature.js?v=94213b86';
+import { FEATURES } from '../public/js/features/index.js?v=cea07c0f';
+import { cubimalRaceFeature, CUBIMAL_RACE_FEATURE_ID } from '../public/js/features/cubimal-race-feature.js?v=bcc080a4';
 import { FIRST_DRAW_SPRITES, HIRES_SPRITES } from '../public/js/sprite-hires.js?v=3f97bf07';
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -315,6 +316,7 @@ describe('cubimal-race feature', () => {
       PIXI: { AnimatedSprite: Sprite, Graphics: Shape, Texture: { EMPTY: {} } },
       started: true,
       inv: createInventory({}),
+      toolState: null,
       player: { x: 300, y: 500 },
       platforms: [{ x1: 0, y1: 500, x2: 3000, y2: 500 }],
       worldW: 3000,
@@ -336,6 +338,8 @@ describe('cubimal-race feature', () => {
       param: (k) => (k in params ? params[k] : null),
       scriptedDialogue: (opts) => { engine.dialogue = opts; },
     };
+    // As game.js: each figure's name is its copy's words in the pack's tool state (js/tools.js row.tags).
+    engine.toolState = bindToolInventory(createToolConditionState(), engine.inv);
     return { engine, data, log };
   }
 
@@ -351,6 +355,7 @@ describe('cubimal-race feature', () => {
     assert.deepEqual(cubimalRaceFeature.packVerbs('npc_cubimal_chick', engine), []);
     addItem(engine.inv, 'npc_cubimal_chick', 1);
     assert.deepEqual(cubimalRaceFeature.packVerbs('npc_cubimal_chick', engine).map((v) => v.label), ['Name', 'Race']);
+    // An older save's one name per class goes to the figure held.
     cubimalRaceFeature.restore({ names: { npc_cubimal_chick: 'Sprocket' } }, engine);
     assert.deepEqual(cubimalRaceFeature.packVerbs('npc_cubimal_chick', engine).map((v) => v.label), ['Rename', 'Race']);
     assert.deepEqual(cubimalRaceFeature.packVerbs('apple', engine), []);
@@ -360,6 +365,8 @@ describe('cubimal-race feature', () => {
     const { engine } = fakeEngine();
     cubimalRaceFeature.restore({}, engine);
     assert.equal(cubimalRaceFeature.itemDisplayName('npc_cubimal_chick'), null);
+    addItem(engine.inv, 'npc_cubimal_chick', 1);
+    addItem(engine.inv, 'npc_cubimal_emobear', 1);
     cubimalRaceFeature.restore({ names: { npc_cubimal_chick: 'Sprocket', npc_cubimal_emobear: 'Teddy' } }, engine);
     assert.deepEqual(cubimalRaceFeature.itemDisplayName('npc_cubimal_chick'), { label: 'Sprocket', kind: 'Chick Cubimal' });
     assert.deepEqual(cubimalRaceFeature.itemDisplayName('npc_cubimal_emobear'), { label: 'Teddy', kind: 'Emo-Bear Cubimal' });
@@ -368,6 +375,8 @@ describe('cubimal-race feature', () => {
     // game.js asks for it on the pack card, the pack slot tooltip and the dropped stack.
     const game = readFileSync(join(publicRoot, 'game.js'), 'utf8');
     assert.equal(game.match(/features\.query\('itemDisplayName'/g)?.length, 3);
+    // A ground stack names its own first figure's words (world-items keeps them beside its points).
+    assert.deepEqual(cubimalRaceFeature.itemDisplayName('npc_cubimal_fox', null, engine, 'Rusty'), { label: 'Rusty', kind: 'Fox Cubimal' });
     assert.match(game, /pack-pop-kind">\$\{named \? escapeHtml\(named\.kind\) : kind\}/);
     assert.match(game, /label: named\?\.label \|\| item\.label \|\| stack\.classTsid/);
   });
@@ -438,7 +447,8 @@ describe('cubimal-race feature', () => {
     cubimalRaceFeature.restore({ names: { npc_cubimal_chick: 'Sprocket', apple: 'x' }, out: ['npc_cubimal_chick', 'apple'] }, engine);
     assert.equal(countItem(engine.inv, 'npc_cubimal_chick'), 1);
     assert.equal(countItem(engine.inv, 'apple'), 0);
-    assert.deepEqual(cubimalRaceFeature.save().names, { npc_cubimal_chick: 'Sprocket' });
+    assert.deepEqual(copyTags(engine.toolState, 'npc_cubimal_chick'), ['Sprocket']);
+    assert.equal(cubimalRaceFeature.save().names, undefined);
   });
 
   it('31 figures racing at once earn The Swarm', () => {
@@ -458,8 +468,8 @@ describe('cubimal-race feature', () => {
   it('set free: the conversation, the figure leaves the pack, says goodbye, and is paid at 2.5 s', () => {
     Date.now = () => clock;
     const { engine, log } = fakeEngine({ cubimalfreeroll: '0.7' });
-    cubimalRaceFeature.restore({ names: { npc_cubimal_chick: 'Sprocket' } }, engine);
     addItem(engine.inv, 'npc_cubimal_chick', 1);
+    cubimalRaceFeature.restore({ names: { npc_cubimal_chick: 'Sprocket' } }, engine);
     const calls = [];
     const done = (extra) => {
       calls.push(extra);
@@ -485,7 +495,7 @@ describe('cubimal-race feature', () => {
     assert.ok(log.includes('sound:SPINACHJUMP'));
     assert.deepEqual(calls, [{ responseRoll: 0.7 }]);
     assert.equal(countItem(engine.inv, 'npc_cubimal_chick'), 0);
-    assert.deepEqual(cubimalRaceFeature.save(), { names: {}, out: [] });
+    assert.deepEqual(cubimalRaceFeature.save(), { version: 2, out: [], outNames: [] });
     clock += 1500;
     cubimalRaceFeature.onTick(16, clock, engine);
   });

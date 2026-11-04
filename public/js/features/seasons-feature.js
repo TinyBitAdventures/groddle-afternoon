@@ -36,7 +36,41 @@ import { dametimeParts, getGameDayKey } from '../game-day.js?v=edb00566';
 import { setSeasonalSeedCheck as setGardenSeasonGate } from '../garden.js?v=4bcd97f3';
 import { setSeasonalSeedCheck as setMasterGardenSeasonGate } from '../garden.js?v=4bcd97f3';
 import { setSeasonalRecipeCheck } from '../making.js?v=3f6c5965';
-import { getToolCondition } from '../tools.js?v=2337f66a';
+import { getToolCondition, copyForVerb, copyTag, migrateClassTag, setCopyTag, takeToolCopy } from '../tools.js?v=2337f66a';
+
+/*
+ * Each lit pumpkin's phrases are its own (pumpkin_lit_*.js this.phrases, 380-391, at most 3), kept
+ * as that copy's words in js/tools.js (row.tags; 2026-11-04: one list per face made a new pumpkin
+ * speak the old one's). state.pumpkinPhrases stands in only for an engine with no tool state.
+ */
+function keepsPumpkins(engine, cls) {
+  return Boolean(engine?.toolState && isLitPumpkin(cls));
+}
+
+function phrasesOf(engine, cls, copy = null) {
+  if (!keepsPumpkins(engine, cls)) return [...(state.pumpkinPhrases[cls] || [])];
+  const at = copyForVerb(engine.toolState, cls, copy);
+  const t = at >= 0 ? copyTag(engine.toolState, cls, at) : null;
+  return Array.isArray(t) ? t.filter((p) => typeof p === 'string') : [];
+}
+
+function setPhrases(engine, cls, copy, list) {
+  if (!keepsPumpkins(engine, cls)) {
+    state.pumpkinPhrases[cls] = [...list];
+    return;
+  }
+  const at = copyForVerb(engine.toolState, cls, copy);
+  if (at >= 0) setCopyTag(engine.toolState, cls, at, list.length ? [...list] : null);
+}
+
+/** The pumpkin picked leaves the pack from its own slot, its phrases with it. */
+function takePumpkin(engine, cls, copy) {
+  if (!keepsPumpkins(engine, cls)) return;
+  const at = copyForVerb(engine.toolState, cls, copy);
+  if (at < 0) return;
+  engine.query?.('packTakeUnit', cls, at, 1, engine);
+  takeToolCopy(engine.toolState, cls, { copy: at });
+}
 import { landingY, nearestSurfaceY } from '../walk-surface.js?v=c982983e';
 import { isStandable } from '../street-model.js?v=505d8990';
 import { isBatterflyHabitat } from '../animal-husbandry.js?v=2c391fae';
@@ -703,9 +737,10 @@ function lightPumpkin(engine, cls) {
   return true;
 }
 
-function smashPumpkin(engine, cls) {
+function smashPumpkin(engine, cls, copy = null) {
   const out = smashOutcome(cls);
   if (!out || countItem(engine.inv, cls) < 1) return true;
+  takePumpkin(engine, cls, copy);
   removeItem(engine.inv, cls, 1);
   for (const [id, qty] of out.items) addItem(engine.inv, id, qty);
   if (isLitPumpkin(cls)) delete state.pumpkinPhrases[cls];
@@ -716,7 +751,7 @@ function smashPumpkin(engine, cls) {
   return true;
 }
 
-function placePumpkin(engine, cls) {
+function placePumpkin(engine, cls, copy = null) {
   const ctx = engine.homeContext?.() || {};
   const check = placeCheck({ inHome: ctx.inHome || HOME_TSIDS.has(engine.streetTsid), partySpace: false });
   if (!check.ok) return say(engine, check.msg, false), true;
@@ -729,10 +764,11 @@ function placePumpkin(engine, cls) {
     tsid: engine.streetTsid,
     x,
     y: Math.round(p?.y || engine.groundY),
-    phrases: isLitPumpkin(cls) ? [...(state.pumpkinPhrases[cls] || [])] : [],
+    phrases: isLitPumpkin(cls) ? phrasesOf(engine, cls, copy) : [],
   };
+  takePumpkin(engine, cls, copy);
   removeItem(engine.inv, cls, 1);
-  if (isLitPumpkin(cls)) delete state.pumpkinPhrases[cls];
+  if (isLitPumpkin(cls) && !keepsPumpkins(engine, cls)) delete state.pumpkinPhrases[cls];
   state.placed.push(row);
   spawnPlaced(engine, row);
   if (isOn('zilloween')) engine.achievement?.(`pumpkins_placed:${isLitPumpkin(cls) ? 'lit' : 'carved'}`, 1);
@@ -1513,14 +1549,20 @@ export const seasonsFeature = {
     return rows;
   },
 
-  runPackVerb(classTsid, verbId, engine) {
+  runPackVerb(classTsid, verbId, engine, opts = {}) {
+    const copy = opts?.copy ?? null;
     if (classTsid === 'pumpkin' && verbId === 'carve') return startCarve(engine);
     if (verbId === 'light' && CARVED_CLASSES.includes(classTsid)) return lightPumpkin(engine, classTsid);
-    if (verbId === 'smash' && PUMPKIN_CLASSES.includes(classTsid)) return smashPumpkin(engine, classTsid);
-    if (verbId === 'place' && PUMPKIN_CLASSES.includes(classTsid)) return placePumpkin(engine, classTsid);
+    if (verbId === 'smash' && PUMPKIN_CLASSES.includes(classTsid)) return smashPumpkin(engine, classTsid, copy);
+    if (verbId === 'place' && PUMPKIN_CLASSES.includes(classTsid)) return placePumpkin(engine, classTsid, copy);
     if (verbId === 'teach' && LIT_CLASSES.includes(classTsid)) {
-      state.pumpkinPhrases[classTsid] ||= [];
-      teachDialog(engine, state.pumpkinPhrases[classTsid], () => engine.save?.());
+      // The pumpkin picked learns (its own phrases).
+      const at = keepsPumpkins(engine, classTsid) ? copyForVerb(engine.toolState, classTsid, copy) : null;
+      const list = phrasesOf(engine, classTsid, at);
+      teachDialog(engine, list, () => {
+        setPhrases(engine, classTsid, at, list);
+        engine.save?.();
+      });
       return true;
     }
     if (verbId === 'lament' && classTsid === 'seed_pumpkin') {
@@ -1618,7 +1660,8 @@ export const seasonsFeature = {
       if (verbId === 'pickup') {
         state.placed = state.placed.filter((r) => r !== d.row);
         addItem(engine.inv, d.row.cls, 1);
-        if (isLitPumpkin(d.row.cls) && d.row.phrases?.length) state.pumpkinPhrases[d.row.cls] = [...d.row.phrases];
+        // It comes back with its own phrases (the copy that just arrived is the last).
+        if (isLitPumpkin(d.row.cls) && d.row.phrases?.length) setPhrases(engine, d.row.cls, countItem(engine.inv, d.row.cls) - 1, d.row.phrases);
         clearDecor(engine, (x) => x === d);
         say(engine, `You picked up ${ITEM_CATALOG[d.row.cls]?.label || 'the pumpkin'}.`);
         engine.save?.();
@@ -1634,6 +1677,13 @@ export const seasonsFeature = {
 
   restore(slice, engine) {
     state = createSeasonState(slice || {});
+    // An older save's one list per face is the first such pumpkin's; any other lit pumpkin knows none.
+    if (engine?.toolState) {
+      for (const [cls, list] of Object.entries(state.pumpkinPhrases)) {
+        if (keepsPumpkins(engine, cls) && Array.isArray(list) && list.length && countItem(engine.inv, cls) > 0) migrateClassTag(engine.toolState, cls, list.filter((p) => typeof p === 'string').slice(0, 3));
+      }
+      state.pumpkinPhrases = {};
+    }
     state.notes = Array.isArray(slice?.notes) ? slice.notes.filter((n) => n && typeof n.cls === 'string') : [];
     if (engine) publish(engine);
   },

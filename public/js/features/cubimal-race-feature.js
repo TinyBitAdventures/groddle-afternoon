@@ -54,6 +54,7 @@
  */
 
 import { addItem, countItem, removeItem } from '../inventory.js?v=d82f3b00';
+import { copyForVerb, copyTag, copyTags, migrateClassTag, setCopyTag, takeToolCopy } from '../tools.js?v=2337f66a';
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=db7c442f';
 import { landingY, walkSurfaceY } from '../walk-surface.js?v=c982983e';
 import { playPoofIn, poofInAlpha } from '../overlay-art.js?v=11b6dd7f';
@@ -87,8 +88,26 @@ const DEMO_DEFAULT = 'npc_cubimal_chick';
 const RACER_Z = 40;
 
 let loader = null;
-/** Figure names by class (one per class; the remake's pack has no item instances). */
-let names = {};
+/**
+ * Each figure's own name (npc_cubimal_chick.js 437-483 user_name, an instance prop): the copy's words
+ * in js/tools.js (row.tags), so a new figure has none and two of a kind keep their own (2026-11-04;
+ * before, one name per class). `eng` is the engine the last verb or restore ran with.
+ */
+let eng = null;
+
+function nameOf(classTsid, copy = null) {
+  const tools = eng?.toolState;
+  if (!tools || !isCubimal(classTsid)) return '';
+  const at = copyForVerb(tools, classTsid, copy);
+  const t = at >= 0 ? copyTag(tools, classTsid, at) : null;
+  return typeof t === 'string' ? t : '';
+}
+
+/** The pure rules' { class: name } view of one copy (js/cubimals.js nameCubimal / cubimalNameVerb). */
+function namesOf(classTsid, copy = null) {
+  const n = nameOf(classTsid, copy);
+  return n ? { [classTsid]: n } : {};
+}
 /** Live racers: { classTsid, sprite, target, state, x, y, startX, speed, secs, ... }. */
 let racers = [];
 /** Farewell flights after a set free. */
@@ -117,7 +136,14 @@ function publish(engine) {
   engine.setData('cubimalRaceMessage', lastRace?.message || '');
   engine.setData('cubimalLongDistance', lastRace?.longDistance ? '1' : '0');
   engine.setData('cubimalRaced', String(racedTotal));
-  engine.setData('cubimalName', Object.entries(names).map(([k, v]) => `${k.replace('npc_cubimal_', '')}:${v}`).join(','));
+  const named = [];
+  if (engine.toolState && engine.inv) {
+    for (const k of Object.keys(engine.inv)) {
+      if (!isCubimal(k)) continue;
+      for (const t of copyTags(engine.toolState, k)) if (typeof t === 'string' && t) named.push(`${k.replace('npc_cubimal_', '')}:${t}`);
+    }
+  }
+  engine.setData('cubimalName', named.join(','));
   engine.setData('cubimalNameBubble', nameBubble);
   engine.setData('cubimalFlight', flights.length ? flights[0].phase : '');
   engine.setData('cubimalStep', step);
@@ -127,8 +153,8 @@ function publish(engine) {
   }
 }
 
-function labelFor(classTsid) {
-  return names[classTsid] || cubimalInfo(classTsid)?.label || 'Cubimal';
+function labelFor(classTsid, copy = null, name = null) {
+  return (name ?? nameOf(classTsid, copy)) || cubimalInfo(classTsid)?.label || 'Cubimal';
 }
 
 function feetY(engine, x, y) {
@@ -181,13 +207,21 @@ function poof(engine, x, y) {
 
 // —— Race ———————————————————————————————————————————————————————————————
 
-function startRace(engine, classTsid) {
+function startRace(engine, classTsid, copy = null) {
+  eng = engine;
   const info = cubimalInfo(classTsid);
   const player = engine.player;
   if (!info || !player || !engine.started) return false;
   if (engine.busy?.()) {
     engine.toast?.('Not right now.');
     return false;
+  }
+  // The figure picked races, with its own name; it leaves the pack from its own slot.
+  const at = engine.toolState ? copyForVerb(engine.toolState, classTsid, copy) : -1;
+  const raceName = at >= 0 ? nameOf(classTsid, at) : '';
+  if (at >= 0) {
+    engine.query?.('packTakeUnit', classTsid, at, 1, engine);
+    takeToolCopy(engine.toolState, classTsid, { copy: at });
   }
   if (countItem(engine.inv, classTsid) < 1 || !removeItem(engine.inv, classTsid, 1)) {
     engine.toast?.('That Cubimal is no longer in your pack.');
@@ -198,6 +232,7 @@ function startRace(engine, classTsid) {
   const sprite = makeFigure(engine, classTsid, x, y);
   const racer = {
     classTsid,
+    name: raceName,
     sprite,
     target: null,
     state: 'windup',
@@ -214,7 +249,7 @@ function startRace(engine, classTsid) {
   racer.target = engine.register({
     classId: 'cubimal_racer',
     featureId: CUBIMAL_RACE_FEATURE_ID,
-    label: labelFor(classTsid),
+    label: labelFor(classTsid, null, raceName),
     subtitle: info.label,
     sprite,
     state: { classTsid },
@@ -279,6 +314,8 @@ function returnToPack(engine, racer, { quiet = false } = {}) {
   if (racer.state === 'returned') return;
   racer.state = 'returned';
   addItem(engine.inv, racer.classTsid, 1);
+  // Back in the pack with its own name (the copy that just arrived is the last).
+  if (racer.name && engine.toolState) setCopyTag(engine.toolState, racer.classTsid, countItem(engine.inv, racer.classTsid) - 1, racer.name);
   if (racer.target) engine.unregister?.(racer.target);
   else destroySprite(racer.sprite);
   racer.sprite = null;
@@ -325,15 +362,17 @@ function closeNameModal() {
   nameModal = null;
 }
 
-function applyName(engine, classTsid, value) {
-  const res = nameCubimal(names, classTsid, value);
+function applyName(engine, classTsid, value, copy = null) {
+  eng = engine;
+  const at = engine.toolState ? copyForVerb(engine.toolState, classTsid, copy) : -1;
+  const res = nameCubimal(namesOf(classTsid, at), classTsid, value);
   if (!res.ok) return false;
+  if (at >= 0) setCopyTag(engine.toolState, classTsid, at, res.name);
   nameBubble = res.bubble;
   const player = engine.player;
   if (player) engine.say?.({ sprite: player, label: cubimalInfo(classTsid)?.label || '' }, res.bubble, res.bubbleMs);
   else engine.toast?.(res.bubble, res.bubbleMs);
   engine.achievement?.(res.counter, 1);
-  for (const racer of racers) if (racer.classTsid === classTsid && racer.target) racer.target.label = res.name;
   // The pack card and slot tooltip read the name (itemDisplayName).
   engine.refreshPack?.();
   engine.save?.();
@@ -342,10 +381,11 @@ function applyName(engine, classTsid, value) {
 }
 
 /** askPlayer 'Name Me!' / 'Rename Me!' with input_label 'My new name:' (verbs.name 446, verbs.rename 478). */
-function openNameModal(engine, classTsid) {
+function openNameModal(engine, classTsid, copy = null) {
+  eng = engine;
   closeNameModal();
   if (typeof document === 'undefined') return null;
-  const verb = cubimalNameVerb(names, classTsid);
+  const verb = cubimalNameVerb(namesOf(classTsid, copy), classTsid);
   const host = document.getElementById('verb-menu')?.parentElement || document.body;
   const wrap = document.createElement('div');
   wrap.className = 'verb-menu animal-name-modal cubimal-name-modal';
@@ -379,7 +419,7 @@ function openNameModal(engine, classTsid) {
     e.preventDefault();
     const value = input.value;
     closeNameModal();
-    applyName(engine, classTsid, value);
+    applyName(engine, classTsid, value, copy);
   });
   input.addEventListener('keydown', (e) => {
     e.stopPropagation();
@@ -457,14 +497,15 @@ function tickFlights(engine) {
  * set free (pack removal, Imagination, cubimals_freed badge counter, award)
  * through `done`, then the figure says goodbye and flies off.
  */
-function confirmFree(engine, classTsid, done) {
+function confirmFree(engine, classTsid, done, copy = null) {
+  eng = engine;
   const question = cubimalFreeQuestion(classTsid);
   if (!question || typeof done !== 'function' || !engine.scriptedDialogue) return null;
   const info = cubimalInfo(classTsid);
   engine.scriptedDialogue({
-    title: labelFor(classTsid),
+    title: labelFor(classTsid, copy),
     // A named figure keeps its kind on the kicker line.
-    kicker: names[classTsid] ? info.label : '',
+    kicker: nameOf(classTsid, copy) ? info.label : '',
     beats: [{ text: question, response: CUBIMAL_FREE.yes }],
     cancelable: true,
     primaryLabel: CUBIMAL_FREE.yes,
@@ -472,6 +513,12 @@ function confirmFree(engine, classTsid, done) {
     onComplete: () => {
       // onConversation 855-862: the pack figure is deleted now, a new one poofs in
       // beside the player, says goodbye at 300 ms, and setFree pays at 2.5 s.
+      // The figure picked is the one set free, its name with it (onTrade deletes user_name).
+      const at = engine.toolState ? copyForVerb(engine.toolState, classTsid, copy) : -1;
+      if (at >= 0 && countItem(engine.inv, classTsid) > 0) {
+        engine.query?.('packTakeUnit', classTsid, at, 1, engine);
+        takeToolCopy(engine.toolState, classTsid, { copy: at });
+      }
       if (countItem(engine.inv, classTsid) < 1 || !removeItem(engine.inv, classTsid, 1)) {
         engine.toast?.('That Cubimal is no longer in your pack.');
         return;
@@ -502,8 +549,6 @@ function payFlight(engine, f) {
     engine.refreshPack?.();
     return;
   }
-  // A freed figure takes its name with it when no other copy remains (onTrade deletes user_name).
-  if (countItem(engine.inv, f.classTsid) < 1) delete names[f.classTsid];
   engine.save?.();
 }
 
@@ -700,23 +745,25 @@ export const cubimalRaceFeature = {
   },
 
   /** Source sort_on: name 55, rename 56, race 57 (set free 54 is game.js's primary button). */
-  packVerbs(classTsid, engine) {
+  packVerbs(classTsid, engine, opts = {}) {
     if (!isCubimal(classTsid) || countItem(engine.inv, classTsid) < 1) return [];
-    const nameVerb = cubimalNameVerb(names, classTsid);
+    eng = engine;
+    const nameVerb = cubimalNameVerb(namesOf(classTsid, opts?.copy), classTsid);
     return [
       { id: `cubimal_${nameVerb.id}`, label: nameVerb.label, tooltip: nameVerb.tooltip },
       { id: 'cubimal_race', label: 'Race', tooltip: 'Race it against another Cubimal' },
     ];
   },
 
-  runPackVerb(classTsid, verbId, engine) {
+  runPackVerb(classTsid, verbId, engine, opts = {}) {
     if (!isCubimal(classTsid)) return false;
+    eng = engine;
     if (verbId === 'cubimal_race') {
-      startRace(engine, classTsid);
+      startRace(engine, classTsid, opts?.copy);
       return true;
     }
     if (verbId === 'cubimal_name' || verbId === 'cubimal_rename') {
-      openNameModal(engine, classTsid);
+      openNameModal(engine, classTsid, opts?.copy);
       return true;
     }
     return false;
@@ -730,31 +777,39 @@ export const cubimalRaceFeature = {
    * the client showed that label in place of the item's (Itemstack.as
    * getLabel 445, PackItemstackView.as 102).
    */
-  itemDisplayName(classTsid) {
-    const name = isCubimal(classTsid) ? names[classTsid] : '';
+  itemDisplayName(classTsid, copy = null, engine = null, tag = undefined) {
+    if (engine) eng = engine;
+    // A ground stack names its first figure's own words (`tag`); a pack slot its copy's.
+    const name = !isCubimal(classTsid) ? '' : tag !== undefined ? (typeof tag === 'string' ? tag : '') : nameOf(classTsid, copy);
     return name ? { label: name, kind: cubimalInfo(classTsid)?.label || 'Cubimal' } : null;
   },
 
   /** game.js setPackedCubimalFree: the source conversation instead of window.confirm. */
-  confirmCubimalFree(classTsid, engine, done) {
-    return confirmFree(engine, classTsid, done);
+  confirmCubimalFree(classTsid, engine, done, copy = null) {
+    return confirmFree(engine, classTsid, done, copy);
   },
 
   save() {
     const out = racers.filter((r) => r.state !== 'returned').map((r) => r.classTsid);
     // A figure saying goodbye has not been paid for yet: a reload keeps it.
     for (const f of flights) if (!f.paid) out.push(f.classTsid);
-    return { names: { ...names }, out };
+    // Names are each figure's own (js/tools.js row.tags, saved with the pack's tools); a racer's rides with it.
+    return { version: 2, out, outNames: racers.filter((r) => r.state !== 'returned').map((r) => r.name || '') };
   },
 
   restore(slice, engine) {
-    names = {};
+    eng = engine || eng;
+    // A reload mid-race: the figure goes home to the pack, with its name.
+    const outNames = Array.isArray(slice?.outNames) ? slice.outNames : [];
+    (Array.isArray(slice?.out) ? slice.out : []).forEach((classTsid, i) => {
+      if (!isCubimal(classTsid) || !engine?.inv) return;
+      addItem(engine.inv, classTsid, 1);
+      const n = typeof outNames[i] === 'string' ? outNames[i].slice(0, CUBIMAL_NAMING.maxLength) : '';
+      if (n && engine.toolState) setCopyTag(engine.toolState, classTsid, countItem(engine.inv, classTsid) - 1, n);
+    });
+    // An older save's one name per class (2026-11-04) is the first figure's; any other is unnamed.
     for (const [k, v] of Object.entries(slice?.names || {})) {
-      if (isCubimal(k) && typeof v === 'string' && v) names[k] = v.slice(0, CUBIMAL_NAMING.maxLength);
-    }
-    // A reload mid-race: the figure goes home to the pack.
-    for (const classTsid of Array.isArray(slice?.out) ? slice.out : []) {
-      if (isCubimal(classTsid) && engine?.inv) addItem(engine.inv, classTsid, 1);
+      if (isCubimal(k) && typeof v === 'string' && v && engine?.toolState) migrateClassTag(engine.toolState, k, v.slice(0, CUBIMAL_NAMING.maxLength));
     }
     racers = [];
     flights = [];

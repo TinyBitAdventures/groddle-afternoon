@@ -41,6 +41,24 @@ function cleanPoints(value, count) {
   return out.some((r) => r != null) ? out : null;
 }
 
+/**
+ * A stack's copies' own words (js/tools.js row.tags: a Cubimal's name, a pumpkin's phrases, a
+ * Still's contents), lined up with its first units like `points`; null when none has any.
+ */
+function cleanTags(value, count) {
+  if (!Array.isArray(value)) return null;
+  const out = value.slice(0, count).map((t) => {
+    if (t == null) return null;
+    try {
+      const text = JSON.stringify(t);
+      return text && text.length <= 600 ? JSON.parse(text) : null;
+    } catch {
+      return null;
+    }
+  });
+  return out.some((t) => t != null) ? out : null;
+}
+
 /** `points` padded to `count` tools (null for a full one), for stacking one stack's tools on another's. */
 function pointsFor(points, count) {
   const out = (points || []).slice(0, count);
@@ -75,6 +93,7 @@ function cleanRecord(row, streetTsid, fallbackId) {
   if (!classTsid || count < 1) return null;
   const id = String(row?.id || fallbackId).trim() || fallbackId;
   const points = cleanPoints(row?.points, count);
+  const tags = cleanTags(row?.tags, count);
   // A bag with things in it is one bag (bags never stack, stackmax 1).
   const contents = count === 1 ? cleanContents(row?.contents) : null;
   // A named bag is one bag too, and keeps its name (items/bag_bigger.js getLabel 592-598; js/bag-names.js).
@@ -88,6 +107,7 @@ function cleanRecord(row, streetTsid, fallbackId) {
     y: finite(row?.y, 0),
     droppedAt: Math.max(0, Math.floor(finite(row?.droppedAt, 0))),
     ...(points ? { points } : {}),
+    ...(tags ? { tags } : {}),
     ...(contents ? { contents } : {}),
     ...(name ? { name } : {}),
     // In a house: the placed piece (its id in that room's decor) the stack rests on (js/home-decor.js settleStacks).
@@ -182,10 +202,12 @@ export function dropInventoryStack(state, inv, streetTsid, classTsid, requested,
     : null;
 
   const points = cleanPoints(opts.points, count);
+  const tags = cleanTags(opts.tags, count);
   if (!removeItem(inv, item, count)) return { ok: false, reason: 'missing' };
   if (merge) {
     // Tools keep their own wear: a stack's points line up with its first tools, any without one are full.
     if (points || merge.points) merge.points = [...pointsFor(merge.points, merge.count), ...pointsFor(points, count)];
+    if (tags || merge.tags) merge.tags = [...pointsFor(merge.tags, merge.count), ...pointsFor(tags, count)];
     merge.count += count;
     merge.droppedAt = Math.max(0, Math.floor(finite(opts.now, Date.now())));
     return { ok: true, count, stack: { ...merge }, merged: true, remaining: inv[item] || 0 };
@@ -200,6 +222,7 @@ export function dropInventoryStack(state, inv, streetTsid, classTsid, requested,
     y,
     droppedAt: Math.max(0, Math.floor(finite(opts.now, Date.now()))),
     ...(points ? { points } : {}),
+    ...(tags ? { tags } : {}),
   };
   rows.push(stack);
   return { ok: true, count, stack: { ...stack }, merged: false, remaining: inv[item] || 0 };
@@ -220,6 +243,8 @@ export function pickupDroppedStack(state, inv, streetTsid, stackId, requested = 
   addItem(inv, stack.classTsid, count);
   const points = Array.isArray(stack.points) ? stack.points.splice(0, count) : [];
   if (Array.isArray(stack.points) && !stack.points.length) delete stack.points;
+  const tags = Array.isArray(stack.tags) ? stack.tags.splice(0, count) : [];
+  if (Array.isArray(stack.tags) && !stack.tags.length) delete stack.tags;
   stack.count -= count;
   const removed = stack.count <= 0;
   if (removed) rows.splice(index, 1);
@@ -231,6 +256,7 @@ export function pickupDroppedStack(state, inv, streetTsid, stackId, requested = 
     removed,
     remaining: Math.max(0, stack.count),
     ...(points.some((r) => r != null) ? { points } : {}),
+    ...(tags.some((t) => t != null) ? { tags } : {}),
   };
 }
 

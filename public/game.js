@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=1c45ada0';
 import { createFeatureHost } from './js/feature-host.js?v=020c9329';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=7f8bb2e8';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=cea07c0f';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -476,7 +476,7 @@ import {
   pickupDroppedStack,
   placeDroppedBag,
   takeDroppedRecord,
-} from './js/world-items.js?v=34690771';
+} from './js/world-items.js?v=78125f8f';
 import {
   createPlayerSave,
   parsePlayerSave,
@@ -534,6 +534,10 @@ import {
   bindToolInventory,
   syncToolCopies,
   TOOL_CONDITION_CATALOG as TOOL_WEAR,
+  copyMeterNote,
+  copyTag,
+  setCopyTag,
+  migrateClassValue,
   brokenToolIcon,
 } from './js/tools.js?v=2337f66a';
 import {
@@ -3426,9 +3430,42 @@ function paradiseCourseForTicket(classTsid) {
   return Object.values(PARADISE_COURSES).find((course) => course.ticketId === classTsid) || null;
 }
 
+/*
+ * Each Emotional Bear's upgrades are its own (emotional_bear.js 620-641: this.upgrades on the bear),
+ * one bit each in js/tools.js copies (1 Lips, 2 Moon; 2026-11-04: one list for every bear made a new
+ * bear come upgraded). emotionalBearState keeps what is the player's (companions' mood, emotes, the
+ * daily cheer); its `upgrades` is set from the bear in hand before each use (bearView).
+ */
+const BEAR_BITS = Object.freeze({ kiss: 1, moon: 2 });
+/** The bear the open menu, picker or upgrade is about (its place in pack order), or null: the first. */
+let emotionalBearCopy = null;
+
+function bearUpgradesOf(bits) {
+  const n = Math.max(0, Math.floor(Number(bits) || 0));
+  return Object.entries(BEAR_BITS).filter(([, b]) => n & b).map(([u]) => u);
+}
+
+function bearBitsAt(copy) {
+  if (countItem(inv, EMOTIONAL_BEAR_ID) < 1) return 0;
+  return getToolCondition(toolState, EMOTIONAL_BEAR_ID, copy != null ? { copy } : {}).remaining;
+}
+
+/** emotionalBearState with the upgrades of bear `copy` (null: the first). */
+function bearView(copy = emotionalBearCopy) {
+  emotionalBearState.upgrades = bearUpgradesOf(bearBitsAt(copy));
+  return emotionalBearState;
+}
+
+/** An older save's one list of upgrades is the first bear's; any other bear is plain. */
+function migrateBearUpgrades() {
+  if (toolState.condition?.[EMOTIONAL_BEAR_ID] || !emotionalBearState.upgrades?.length) return;
+  if (countItem(inv, EMOTIONAL_BEAR_ID) < 1) return;
+  migrateClassValue(toolState, EMOTIONAL_BEAR_ID, emotionalBearState.upgrades.reduce((n, u) => n | (BEAR_BITS[u] || 0), 0));
+}
+
 function syncEmotionalBearCatalog() {
   const meta = ITEM_CATALOG[EMOTIONAL_BEAR_ID];
-  if (meta) meta.icon = emotionalBearIcon(emotionalBearState);
+  if (meta) meta.icon = emotionalBearIcon({ upgrades: bearUpgradesOf(bearBitsAt(null)) });
 }
 
 function isEmotionalBearPickerOpen() {
@@ -3471,7 +3508,7 @@ function runEmotionalBearAction(actionId, target = '') {
     return false;
   }
   const result = performEmotionalBearAction(
-    emotionalBearState,
+    bearView(),
     pc,
     actionId,
     target,
@@ -3562,7 +3599,7 @@ function openEmotionalBearPicker(actionId) {
   const action = EMOTIONAL_BEAR_ACTIONS[actionId];
   if (!action) return false;
   const quote = emotionalBearActionQuote(
-    emotionalBearState,
+    bearView(),
     pc,
     actionId,
     EMOTIONAL_BEAR_COMPANIONS[0],
@@ -3605,7 +3642,10 @@ function openEmotionalBearPicker(actionId) {
 }
 
 function upgradePackedEmotionalBear(upgrade) {
-  const result = upgradeEmotionalBear(emotionalBearState, inv, upgrade);
+  const copy = emotionalBearCopy;
+  const result = upgradeEmotionalBear(bearView(copy), inv, upgrade);
+  // The upgrade is that bear's own.
+  if (result.ok) setToolRemaining(toolState, EMOTIONAL_BEAR_ID, emotionalBearState.upgrades.reduce((n, u) => n | (BEAR_BITS[u] || 0), 0), copy != null ? { copy } : {});
   if (!result.ok) {
     const message = result.reason === 'missing_accessory'
       ? `You need ${upgrade === 'kiss' ? 'Lips' : 'a Moon'} in your pack.`
@@ -4040,6 +4080,11 @@ function renderPackPopover(classTsid, anchor = null) {
   const sourceAnchor = (anchor?.isConnected ? anchor : null) || findPackSlotElement(classTsid, packSelectedCopy, packSelectedBag, packSelectedPlace);
   const useInfo = getPackUseInfo(classTsid);
   const isEmotionalBear = classTsid === EMOTIONAL_BEAR_ID;
+  // This menu's bear: its own upgrades.
+  if (isEmotionalBear) {
+    emotionalBearCopy = packSelectedCopy != null ? packSelectedCopy : null;
+    bearView(emotionalBearCopy);
+  }
   const bearActions = isEmotionalBear
     ? listEmotionalBearActions(emotionalBearState, pc, {
         dayKey: getGameDayKey(Date.now()),
@@ -4162,8 +4207,13 @@ function renderPackPopover(classTsid, anchor = null) {
   const repairTip = repairTipText(repairQuote, repairPlan, pc);
   // The kind line under the name: the tool's wear, the food's fullness today, the bear's state.
   // A Firefly Jar's line is what it holds (firefly_jar.js getLabel 337-338: "Firefly Jar (3/7)").
-  const conditionNote = toolCondition?.contents
-    ? `<span class="pack-tool-condition">Fireflies ${toolCondition.remaining}/${toolCondition.capacity}</span>`
+  // Potions and powders say their uses or charges (tool_base getTooltipLabel "(3/5)"); a bear, a Cubimal
+  // or a pumpkin has no meter (its own state shows elsewhere).
+  const meterNote = copyMeterNote(classTsid, toolCondition);
+  const conditionNote = meterNote
+    ? `<span class="pack-tool-condition">${meterNote}</span>`
+    : toolCondition?.noMeter || toolCondition?.contents
+    ? ''
     : toolCondition?.tracked
     ? `<span class="pack-tool-condition${toolCondition.broken ? ' broken' : ''}">${toolCondition.broken ? 'Broken' : 'Condition'} ${toolCondition.remaining}/${toolCondition.capacity}</span>`
     : slot.isTool
@@ -4294,7 +4344,9 @@ function renderPackPopover(classTsid, anchor = null) {
     ...(typeof verb.current === 'boolean' ? { current: verb.current } : {}),
   });
   let subVerb = null;
-  for (const verb of features.packVerbs(classTsid, engine)) {
+  // A verb on one picked copy (a potion, a powder, a named Cubimal) acts on that one (js/tools.js copyForVerb).
+  const verbCopy = TOOL_WEAR[classTsid] && packSelectedCopy != null ? { copy: packSelectedCopy } : {};
+  for (const verb of features.packVerbs(classTsid, engine, verbCopy)) {
     if (Array.isArray(verb.sub) && verb.sub.length) {
       if (verb.id === packSubLevel) subVerb = verb;
       rows.push({
@@ -4343,7 +4395,7 @@ function renderPackPopover(classTsid, anchor = null) {
   // a bag's menu is that one bag's, named or not, its class on the kind line when it has a name.
   const named = menuBag?.cls === classTsid
     ? { label: menuBag.label, kind: menuBag.name ? menuBag.className : kind, one: true }
-    : features.query('itemDisplayName', classTsid);
+    : features.query('itemDisplayName', classTsid, TOOL_WEAR[classTsid] ? packSelectedCopy : null, engine);
   pop.hidden = false;
   pop.dataset.vmDefault = plainWords(slot.desc || 'A thing from Ur.');
   pop.dataset.vmLevel = level === 'sub' ? `sub:${subVerb.id}` : level;
@@ -4408,8 +4460,10 @@ function renderPackPopover(classTsid, anchor = null) {
   pop.querySelectorAll('[data-feature-pack-verb]').forEach((button) => {
     button.addEventListener('click', () => {
       leavingMenuBag(classTsid);
+      // The copy the menu was about, read before the close forgets it.
+      const picked = TOOL_WEAR[classTsid] && packSelectedCopy != null ? { copy: packSelectedCopy } : {};
       closePackPopover();
-      features.runPackVerb(classTsid, button.dataset.featurePackVerb, engine, button.dataset.featureId);
+      features.runPackVerb(classTsid, button.dataset.featurePackVerb, engine, button.dataset.featureId, picked);
     });
   });
   // A feature verb's second level (a bag's Sort): in, its first choice takes the focus; Back (0,
@@ -4699,7 +4753,7 @@ function renderPackRow(box, slots, opts = {}) {
       : s.isTool || opts.toolRow
         ? trackedCondition
         : null;
-    const named = packNamed(s.classTsid);
+    const named = packNamed(s.classTsid, s.copy);
     const shownLabel = named ? `${named.label} (${named.kind})` : s.label;
     const slot = document.createElement('button');
     slot.type = 'button';
@@ -4709,7 +4763,7 @@ function renderPackRow(box, slots, opts = {}) {
     slot.setAttribute('aria-expanded', packSelected === s.classTsid && (!packSelectedPlace || (packSelectedPlace.container === s.container && packSelectedPlace.index === s.index)) ? 'true' : 'false');
     slot.setAttribute(
       'aria-label',
-      `${shownLabel} × ${s.count}${toolCondition?.contents ? `, ${toolCondition.remaining} of ${toolCondition.capacity} Fireflies` : toolCondition?.tracked ? `, ${toolCondition.broken ? 'broken' : `${Math.round(toolCondition.percent * 100)} percent condition`}` : ''}`
+      `${shownLabel} × ${s.count}${toolCondition?.noMeter ? '' : copyMeterNote(s.classTsid, toolCondition) ? `, ${copyMeterNote(s.classTsid, toolCondition)}` : toolCondition?.tracked ? `, ${toolCondition.broken ? 'broken' : `${Math.round(toolCondition.percent * 100)} percent condition`}` : ''}`
     );
     if (toolCondition?.broken) slot.classList.add('is-broken');
     // The modern row's tooltip (js/ui/pack-row.js packSlotTip) says this; no browser title on top of it.
@@ -4742,7 +4796,10 @@ function renderPackRow(box, slots, opts = {}) {
     if (s.icon) {
       const img = document.createElement('img');
       // Ticket 63: every tool with a broken_iconic state shows it (js/tools.js BROKEN_TOOL_ICONS).
-      img.src = (toolCondition?.broken && brokenToolIcon(s.classTsid)) || s.icon;
+      // An Emotional Bear shows its own upgrades (emotional_bear.js updateState 665-683, per bear).
+      img.src = (toolCondition?.broken && brokenToolIcon(s.classTsid))
+        || (s.classTsid === EMOTIONAL_BEAR_ID && toolCondition?.tracked ? emotionalBearIcon({ upgrades: bearUpgradesOf(toolCondition.remaining) }) : '')
+        || s.icon;
       img.alt = s.label;
       img.loading = 'lazy';
       img.onerror = () => {
@@ -4777,7 +4834,7 @@ function renderPackRow(box, slots, opts = {}) {
       c.textContent = s.count;
       slot.appendChild(c);
     }
-    if (toolCondition?.tracked) {
+    if (toolCondition?.tracked && !toolCondition.noMeter) {
       const wear = document.createElement('span');
       wear.className = 'pack-slot-wear';
       const fill = document.createElement('i');
@@ -4918,8 +4975,9 @@ function renderPackRow(box, slots, opts = {}) {
 }
 
 /** A stack's shown name in the pack: a named Cubimal goes by its name (features/cubimal-race-feature.js). */
-function packNamed(classTsid) {
-  return features.query('itemDisplayName', classTsid);
+function packNamed(classTsid, copy = null) {
+  // A named Cubimal is that one copy's name (js/tools.js row.tags).
+  return features.query('itemDisplayName', classTsid, copy, engine);
 }
 
 /** What a pack row draws, as text: the same text draws the same buttons (renderPackRow). */
@@ -4930,7 +4988,7 @@ function packRowSignature(slots, opts) {
     slots.map((s) => {
       const c = getToolCondition(toolState, s.classTsid, s.copy != null ? { copy: s.copy } : {});
       return [s.classTsid, s.count, s.container ?? '', s.index ?? '', s.icon || '', s.bag ? [s.bag.used, s.bag.capacity, s.bag.open, s.bag.label] : 0,
-        s.inBag?.label || '', packNamed(s.classTsid)?.label || '', c.tracked ? [c.remaining, c.broken] : 0];
+        s.inBag?.label || '', packNamed(s.classTsid, s.copy)?.label || '', c.tracked ? [c.remaining, c.broken] : 0];
     }),
   ]);
 }
@@ -5247,7 +5305,7 @@ function renderPackBar() {
         found.push({ ...packLayoutEntry(slot, box.key, i, packLayout, openKey), inBag: { cls: box.cls, label: box.label } });
       });
     }
-    const labelOf = (e) => packNamed(e.classTsid)?.label || e.label;
+    const labelOf = (e) => packNamed(e.classTsid, e.copy)?.label || e.label;
     const hits = packSearchEntries(found, query, labelOf);
     renderPackRow(itemsBox, hits, { emptyCount: 0, container: 'pack', query });
     if (!hits.length) packRow.markNoMatches(itemsBox, query);
@@ -5729,7 +5787,8 @@ function usePackItem(classTsid, count = 1) {
     return;
   }
   if (cubimalInfo(classTsid)) {
-    setPackedCubimalFree(classTsid);
+    // The figure picked is the one set free (its own name goes with it).
+    setPackedCubimalFree(classTsid, packSelected === classTsid && packSelectedCopy != null ? { copy: packSelectedCopy } : {});
     return;
   }
   const paradiseCourse = paradiseCourseForTicket(classTsid);
@@ -5927,7 +5986,7 @@ function setPackedCubimalFree(classTsid, opts = {}) {
     return false;
   }
   // The source conversation and farewell flight (features/cubimal-race-feature.js).
-  if (opts.confirm !== false && features.query('confirmCubimalFree', classTsid, engine, (extra = {}) => setPackedCubimalFree(classTsid, { ...opts, ...extra, confirm: false })) === true) {
+  if (opts.confirm !== false && features.query('confirmCubimalFree', classTsid, engine, (extra = {}) => setPackedCubimalFree(classTsid, { ...opts, ...extra, confirm: false }), opts.copy ?? null) === true) {
     return false;
   }
   if (
@@ -12835,7 +12894,7 @@ function spawnDroppedItemStack(stack) {
   entityLayer.addChild(spr);
   droppedItemSprites.push(spr);
   // A named bag goes by its own name, its class first on the subtitle (items/bag_bigger.js getLabel 592-598).
-  const named = stack.name ? { label: filterText(stack.name), kind: item.label || stack.classTsid } : features.query('itemDisplayName', stack.classTsid);
+  const named = stack.name ? { label: filterText(stack.name), kind: item.label || stack.classTsid } : features.query('itemDisplayName', stack.classTsid, null, engine, Array.isArray(stack.tags) ? stack.tags[0] : null);
   register({
     classId: 'dropped_item',
     label: named?.label || item.label || stack.classTsid,
@@ -12923,8 +12982,22 @@ function leavingToolPoints(classTsid, n) {
   return out;
 }
 
-/** Tools that just came into the pack with their own wear (null: a new, full one). */
-function arrivingToolPoints(classTsid, n, points) {
+/** The words of the `n` copies about to go down (js/tools.js row.tags), lined up as leavingToolPoints. */
+function leavingToolTags(classTsid, n) {
+  if (!TOOL_WEAR[classTsid]?.tags) return undefined;
+  const held = countItem(inv, classTsid);
+  const copies = getToolCondition(toolState, classTsid).copies || 0;
+  const out = [];
+  for (let k = Math.max(0, Math.min(held, copies) - n); k < Math.min(held, copies); k += 1) out.push(copyTag(toolState, classTsid, k));
+  return out;
+}
+
+/** Tools that just came into the pack with their own wear (null: a new, full one), and their own words. */
+function arrivingToolPoints(classTsid, n, points, tags = null) {
+  if (TOOL_WEAR[classTsid]?.tags && Array.isArray(tags)) {
+    const held = getToolCondition(toolState, classTsid).copies || 0;
+    for (let k = 0; k < Math.min(n, tags.length); k += 1) setCopyTag(toolState, classTsid, held - n + k, tags[k] ?? null);
+  }
   if (!TOOL_WEAR[classTsid] || !Array.isArray(points) || !points.length) return;
   const copies = getToolCondition(toolState, classTsid).copies || 0;
   for (let k = 0; k < Math.min(n, points.length); k += 1) {
@@ -12977,7 +13050,7 @@ function dropPackItem(classTsid, requested = 1) {
     classTsid,
     count,
     { x, y },
-    { now: Date.now(), points: leavingToolPoints(classTsid, count) }
+    { now: Date.now(), points: leavingToolPoints(classTsid, count), tags: leavingToolTags(classTsid, count) }
   );
   closePackPopover();
   if (!result.ok) {
@@ -13121,7 +13194,7 @@ function pickupDroppedWorldItem(target) {
     refreshDroppedWorldItems();
     return false;
   }
-  arrivingToolPoints(result.classTsid, result.count, result.points);
+  arrivingToolPoints(result.classTsid, result.count, result.points, result.tags);
   saveDroppedItems();
   const label = ITEM_CATALOG[result.classTsid]?.label || result.classTsid.replace(/_/g, ' ');
   const line = `You picked up ${result.count}× ${label}.`;
@@ -28576,6 +28649,7 @@ async function main() {
       world: persistentWorldState,
     });
     features.restore(savedFeatureSlices, engine);
+    migrateBearUpgrades();
     restoreAnimalStateCache();
     rehydrateSavedBuffs();
     dropBootStarterQuests(questState);

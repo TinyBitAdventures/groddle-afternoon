@@ -29,7 +29,7 @@
  */
 
 import { ITEM_CATALOG, addItem, countItem, ensureItem } from '../inventory.js?v=d82f3b00';
-import { getToolCondition } from '../tools.js?v=2337f66a';
+import { getToolCondition, copyForVerb, copyTag, migrateClassTag, setCopyTag } from '../tools.js?v=2337f66a';
 import {
   MACHINE_ASSEMBLIES,
   MACHINE_IDS,
@@ -80,7 +80,37 @@ const EXTRA_ITEMS = {
   },
 };
 
+/*
+ * Each Still's hopper and Hooch are its own (still.js 30-31: hooch and hopper_amount are instance
+ * props), kept as that copy's words in js/tools.js (row.tags; 2026-11-04: one hopper for every Still
+ * made a second Still, or one bought after one was sold, come with the first one's Hooch). `still` is
+ * the Still a verb is working on (loadStill), and the only one for an engine with no tool state.
+ */
 let still = createStillState();
+
+function keepsStills(engine) {
+  return Boolean(engine?.toolState && countItem(engine.inv, STILL.classTsid) > 0);
+}
+
+/** Load Still `copy` (null: the first) into `still`; returns its place, or -1. */
+function loadStill(engine, copy = null) {
+  if (!keepsStills(engine)) return -1;
+  const at = copyForVerb(engine.toolState, STILL.classTsid, copy);
+  if (at < 0) return -1;
+  still = createStillState(copyTag(engine.toolState, STILL.classTsid, at) || {});
+  advanceStill(still);
+  return at;
+}
+
+/** Write `still` back to its copy. */
+function storeStill(engine, at) {
+  if (at < 0 || !engine?.toolState) return;
+  const empty = !still.hopper && !still.hooch && !still.workingSince;
+  setCopyTag(engine.toolState, STILL.classTsid, at, empty ? null : { ...still });
+}
+
+/** The copy the pack menu is about while its verbs are drawn or run (feature-host opts.copy). */
+let pickedStill = null;
 /** Machine parts being installed or uninstalled: { kind, machine, energy, readyAt, full? }. */
 let work = null;
 /** metalmaker.js music_on: on by default, toggled by Turn Music Off / On. */
@@ -172,7 +202,9 @@ function publish(engine) {
       .map((id) => `${id}:${getToolCondition(engine.toolState, id).remaining}`)
       .join(',') || 'none'
   );
+  const shown = loadStill(engine, null);
   advanceStill(still);
+  if (shown >= 0) storeStill(engine, shown);
   engine.setData('supplyStill', `hopper=${still.hopper},hooch=${still.hooch},working=${still.workingSince ? 1 : 0}`);
   engine.setData('supplyLast', last || 'none');
 }
@@ -232,7 +264,9 @@ function machineVerbs(classTsid, engine) {
     return rows;
   }
   if (classTsid === STILL.classTsid) {
+    const at = loadStill(engine, pickedStill);
     advanceStill(still);
+    if (at >= 0) storeStill(engine, at);
     const skill = learned(engine).includes(STILL.skill);
     const rows = [];
     for (const [id, value] of Object.entries(STILL.distillables)) {
@@ -300,12 +334,15 @@ function runMachineVerb(classTsid, verbId, engine) {
     return true;
   }
   if (classTsid === STILL.classTsid) {
+    // The Still picked (else the first): its own hopper and Hooch.
+    const at = loadStill(engine, pickedStill);
     const res = verb === 'distill'
       ? distillInStill(still, inv, arg, learned(engine), Date.now(), upgrades(engine))
       : verb === 'collect'
         ? collectHooch(still, inv, learned(engine))
         : null;
     if (!res) return false;
+    storeStill(engine, at);
     // still.js:454-455 giveHooch: only Hooch collected in your own home (POL) counts.
     if (res.ok && verb === 'collect' && engine.homeContext?.().inHome) engine.achievement?.('still:collected_in_pol', res.got);
     // still.js:453 giveHooch: quests_inc_counter('make_hooch', hooch) on every collect, for the
@@ -380,6 +417,7 @@ function demoSetup(engine) {
   for (const [id, n] of Object.entries(grants)) if (countItem(engine.inv, id) < n) addItem(engine.inv, id, n - countItem(engine.inv, id));
   // A Still that has already been working: three Hooch waiting.
   still = createStillState({ hopper: 0, hooch: 3 });
+  if (keepsStills(engine)) storeStill(engine, copyForVerb(engine.toolState, STILL.classTsid, null));
   engine.pc.energy = Math.max(engine.pc.energy || 0, 400);
   engine.pc.mood = Math.max(engine.pc.mood || 0, 200);
   engine.updateHud?.();
@@ -451,7 +489,15 @@ export const supplyFeature = {
     if (autoplayAt && !autoplayDone && now >= autoplayAt) autoplay(engine);
   },
 
-  packVerbs(classTsid, engine) {
+  packVerbs(classTsid, engine, opts = {}) {
+    if (classTsid === STILL.classTsid) {
+      pickedStill = opts?.copy ?? null;
+      try {
+        return machineVerbs(classTsid, engine) || [];
+      } finally {
+        pickedStill = null;
+      }
+    }
     if (classTsid === PAPERS) {
       const check = completePapersCheck(engine.inv, achievements(engine));
       return [{ id: 'complete', label: 'Complete', enabled: check.ok, reason: check.msg || '', tooltip: 'Fill these out and your papers will be "in order"', primary: check.ok }];
@@ -459,7 +505,15 @@ export const supplyFeature = {
     return machineVerbs(classTsid, engine) || transformVerbs(classTsid, engine) || [];
   },
 
-  runPackVerb(classTsid, verbId, engine) {
+  runPackVerb(classTsid, verbId, engine, opts = {}) {
+    if (classTsid === STILL.classTsid) {
+      pickedStill = opts?.copy ?? null;
+      try {
+        return runMachineVerb(classTsid, verbId, engine);
+      } finally {
+        pickedStill = null;
+      }
+    }
     if (classTsid === PAPERS && verbId === 'complete') {
       const res = completePapers(engine.inv, achievements(engine));
       if (res.ok) engine.grantAchievement?.(res.badge);
@@ -498,12 +552,17 @@ export const supplyFeature = {
 
   save() {
     advanceStill(still);
-    return { version: 1, still: { ...still }, ...(work ? { work: { ...work } } : {}), ...(metalMusicOn ? {} : { metalMusic: false }) };
+    // version 2: with a tool state each Still is saved as its copy's words; `still` is the fallback.
+    return { version: 2, still: { ...still }, ...(work ? { work: { ...work } } : {}), ...(metalMusicOn ? {} : { metalMusic: false }) };
   },
 
   restore(slice, engine) {
     still = createStillState(slice?.still || {});
     advanceStill(still);
+    // An older save's one Still state is the first Still's; any other Still starts empty.
+    if ((slice?.version || 1) < 2 && engine?.toolState && keepsStills(engine) && (still.hopper || still.hooch || still.workingSince)) {
+      migrateClassTag(engine.toolState, STILL.classTsid, { ...still });
+    }
     metalMusicOn = slice?.metalMusic !== false;
     // A reload mid-install finishes the job (the overlays were seconds long).
     const saved = slice?.work;

@@ -70,6 +70,6 @@ describe('ticket 63: a broken tool is no tool', () => {
     for (const cls of ['pick', 'fancy_pick', 'hoe', 'high_class_hoe', 'smelter', 'ore_grinder', 'grand_ol_grinder']) assert.ok(BROKEN_TOOL_ICONS.has(cls), cls);
     assert.equal(brokenToolIcon('pick'), 'assets/sprites/icons/pick_broken.png');
     assert.equal(brokenToolIcon('butterfly_lotion'), null);
-    assert.match(readFileSync(join(root, 'public/game.js'), 'utf8'), /img\.src = \(toolCondition\?\.broken && brokenToolIcon\(s\.classTsid\)\) \|\| s\.icon;/);
+    assert.match(readFileSync(join(root, 'public/game.js'), 'utf8'), /img\.src = \(toolCondition\?\.broken && brokenToolIcon\(s\.classTsid\)\)\n\s+\|\| \(s\.classTsid === EMOTIONAL_BEAR_ID[^\n]+\n\s+\|\| s\.icon;/);
   });
 });

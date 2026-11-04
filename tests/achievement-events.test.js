@@ -25,8 +25,8 @@ import {
 import { createResourceNode, harvestResourceNode } from '../public/js/resource-nodes.js?v=7c982611';
 import { createPlot, growTree, tickPlot } from '../public/js/patches.js?v=bfda863e';
 import { slothsChewing } from '../public/js/features/resource-nodes-feature.js?v=9b886cac';
-import { supplyFeature } from '../public/js/features/supply-feature.js?v=83f0559a';
-import { createToolConditionState } from '../public/js/tools.js?v=2337f66a';
+import { supplyFeature } from '../public/js/features/supply-feature.js?v=57a65c14';
+import { bindToolInventory, createToolConditionState } from '../public/js/tools.js?v=2337f66a';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=10b118dd';
 import { normalizeAchievementSnapshot } from '../public/js/player-save.js?v=a9c44696';
 
@@ -332,21 +332,28 @@ describe('GSJS counter groups wired for G116-G119', () => {
   it('still:collected_in_pol only in your own home (still.js:454-455)', () => {
     supplyFeature._reset();
     const counted = [];
-    const engine = (inHome) => ({
-      inv: { still: 1 },
-      pc: { energy: 100 },
-      toolState: createToolConditionState(),
-      learnedSkills: ['distilling_1'],
-      param: () => null,
-      setData: () => {},
-      homeContext: () => ({ inHome }),
-      achievement: (counter, amount) => counted.push(`${counter}=${amount}`),
-    });
-    supplyFeature.restore({ still: { hopper: 0, hooch: 2 } });
-    supplyFeature.runPackVerb('still', 'collect', engine(false));
+    const engine = (inHome) => {
+      const inv = { still: 1 };
+      return {
+        inv,
+        pc: { energy: 100 },
+        // As game.js: the pack's tools follow the pack (each Still's Hooch is its copy's, js/tools.js).
+        toolState: bindToolInventory(createToolConditionState(), inv),
+        learnedSkills: ['distilling_1'],
+        param: () => null,
+        setData: () => {},
+        homeContext: () => ({ inHome }),
+        achievement: (counter, amount) => counted.push(`${counter}=${amount}`),
+      };
+    };
+    // An older save's one Still state becomes the Still's own.
+    const away = engine(false);
+    supplyFeature.restore({ still: { hopper: 0, hooch: 2 } }, away);
+    supplyFeature.runPackVerb('still', 'collect', away);
     assert.deepEqual(counted, []);
-    supplyFeature.restore({ still: { hopper: 0, hooch: 3 } });
-    supplyFeature.runPackVerb('still', 'collect', engine(true));
+    const home = engine(true);
+    supplyFeature.restore({ still: { hopper: 0, hooch: 3 } }, home);
+    supplyFeature.runPackVerb('still', 'collect', home);
     assert.deepEqual(counted, ['still:collected_in_pol=3']);
     assertEarns('moonshiner', [{ counter: 'still:collected_in_pol', amount: 3 }], 3);
   });
