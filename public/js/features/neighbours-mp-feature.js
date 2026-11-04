@@ -83,7 +83,7 @@
  * multiplayer.
  */
 
-import { createMinnAccount } from '../minn-account.js?v=28026657';
+import { createMinnAccount } from '../minn-account.js?v=63ba1e0b';
 import { runStreetTransition } from '../screen-fx.js?v=9d4640eb';
 import { STREET_INDEX } from '../street-loader.js?v=33d2b8bc';
 import { ITEM_CATALOG, countItem, listPackItemSlots, removeItem } from '../inventory.js?v=d82f3b00';

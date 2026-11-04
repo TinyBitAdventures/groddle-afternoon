@@ -98,6 +98,8 @@ html { scroll-padding-top: calc(var(--site-nav-h) + 12px); }
   .site-nav-links::-webkit-scrollbar { display: none; }
   .site-nav-links a:not(.site-nav-play) { font-size: 13.5px; white-space: nowrap; }
   .site-nav-play { padding: 0 11px; font-size: 13.5px; flex-shrink: 0; }
+  /* A menu longer than the bar scrolls under Play, which stays in view at the bar's end. */
+  .site-nav-links .site-nav-play { position: sticky; right: 0; box-shadow: -8px 0 8px -2px var(--bg); }
   :root[data-theme-mode] .site-nav-theme { width: 30px; height: 30px; }
   .site-nav-theme::before { width: 16px; height: 16px; }
 }

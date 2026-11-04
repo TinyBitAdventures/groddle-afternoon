@@ -2,8 +2,8 @@
 // picture was unticked; and a search box over your own reports.
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { mountReportsSheet, PICTURE_WAIT_MS } from '../public/js/ui/reports-sheet.js?v=b94f8fd4';
-import { REPORT_FILTER_MIN, REPORT_TEXT, matchesReport } from '../public/js/reports.js?v=7744973e';
+import { mountReportsSheet, PICTURE_WAIT_MS } from '../public/js/ui/reports-sheet.js?v=87d1d9c8';
+import { REPORT_FILTER_MIN, REPORT_TEXT, matchesReport } from '../public/js/reports.js?v=eb9eab3b';
 
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 const JPEG = (n) => `data:image/jpeg;base64,${'A'.repeat(n)}`;

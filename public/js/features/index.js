@@ -168,6 +168,7 @@ import { updateReadyFeature } from './update-ready-feature.js?v=257c1dcb'; FEATU
 import { butlerImFeature } from './butler-im-feature.js?v=fc3338c5'; FEATURES.push(butlerImFeature);
 import { playerImFeature } from './player-im-feature.js?v=ca120549'; FEATURES.push(playerImFeature);
 import { chatReactionsFeature } from './chat-reactions-feature.js?v=96309267'; FEATURES.push(chatReactionsFeature);
+import { communityMpFeature } from './community-mp-feature.js?v=ff546ed0'; FEATURES.push(communityMpFeature);
 import { questPlateFeature } from './quest-plate-feature.js?v=c96b9570'; FEATURES.push(questPlateFeature);
 import { streetObjectsFeature } from './street-objects-feature.js?v=cfef124f'; FEATURES.push(streetObjectsFeature);
 import { realtimeFeature } from './realtime-feature.js?v=8e716a0e'; FEATURES.push(realtimeFeature);

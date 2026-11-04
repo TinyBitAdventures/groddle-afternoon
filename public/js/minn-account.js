@@ -499,6 +499,15 @@ export function createMinnAccount({ baseUri, fetch: fetchFn = globalThis.fetch?.
       return buddyCall('Checking your notice board notes', 'boards/mine');
     },
 
+    /**
+     * The Community boards' notices the game's Activity has not shown (groddle-afternoon-site
+     * src/Community.php, POST community/notices/game): { notices: [{ id, kind, count, from, thread, url, at, text }] };
+     * each comes once.
+     */
+    async communityNotices() {
+      return buddyCall('Checking the Community boards', 'community/notices/game', { method: 'POST' });
+    },
+
     /** Report a note on a notice board: { status: reported|already, ticket? }; a refusal throws with the site's words. */
     async reportBoardNote(id, why = '') {
       return buddyCall('Reporting that note', `boards/notes/${encodeURIComponent(id)}/report`, { method: 'POST', body: { why } });
