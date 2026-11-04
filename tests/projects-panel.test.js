@@ -28,7 +28,7 @@ import {
 import { buildProjectsPanel, projectCard, renderProjects } from '../public/js/ui/projects-sheet.js?v=ea38bf0f';
 import { MENU_ROWS } from '../public/js/ui/topbar.js?v=00387e52';
 import { SIDE_SHEET_IDS } from '../public/js/ui/panel-shell.js?v=e2abdf9e';
-import { hotkeySections, hotkeyText } from '../public/js/client-hotkeys.js?v=b8b8b5b3';
+import { hotkeySections, hotkeyText } from '../public/js/client-hotkeys.js?v=c42fbb76';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');

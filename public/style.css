@@ -6349,8 +6349,8 @@ body.buff-purple-pulse::after {
 .badge-category-select .combo-input:focus { border-color: var(--c-lime-68b); box-shadow: 0 0 0 2px color-mix(in srgb, var(--c-lime-67) 20%, transparent); }
 /* A street found with the Map's search flashes (MapHub.as alert()). */
 .map-street.is-found .map-seg { animation: map-found 0.55s ease-in-out 6 alternate; }
-@keyframes map-found { to { stroke: var(--c-white); stroke-width: 11; } }
-@media (prefers-reduced-motion: reduce) { .map-street.is-found .map-seg { animation: none; stroke: var(--c-white); stroke-width: 11; } }
+@keyframes map-found { to { stroke: var(--c-white); stroke-width: calc(11px * var(--map-line-k, 1)); } }
+@media (prefers-reduced-motion: reduce) { .map-street.is-found .map-seg { animation: none; stroke: var(--c-white); stroke-width: calc(11px * var(--map-line-k, 1)); } }
 .combo-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .combo-name mark { background: var(--c-gold-89c); color: inherit; border-radius: var(--radius-xs); padding: 0 1px; }
 .combo-count {
@@ -6454,30 +6454,82 @@ body.buff-purple-pulse::after {
   position: absolute;
   inset: 0;
 }
+/* MAPZOOM (ticket 76, Austin 2026-11-04; js/map-zoom.js): the wheel, a pinch and a drag zoom and pan the
+   map (the viewBox narrows, so every line and name stays sharp); the page never scrolls or zooms under it.
+   Past 2x the names grow more slowly (--map-text-k), the GO buttons, star and icons past 1.25x
+   (--map-mark-k), the lines past 1.5x (--map-line-k), so nothing gets huge. */
+.map-canvas { touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
+.map-canvas[data-zoomed] { cursor: grab; }
+.map-canvas[data-map-dragging],
+.map-canvas[data-map-dragging] * { cursor: grabbing !important; }
+.hub-map-svg :is(.map-go-ring, .map-go-text, .map-you, .map-icon > *) {
+  transform-box: fill-box;
+  transform-origin: center;
+  transform: scale(var(--map-mark-k, 1));
+}
+.hub-map-svg .map-route-line { stroke-width: calc(8px * var(--map-line-k, 1)); }
+.hub-map-svg .map-route-under { stroke-width: calc(13px * var(--map-line-k, 1)); }
+.hub-map-svg .map-route-ants { stroke-width: calc(2px * var(--map-line-k, 1)); }
+.hub-map-svg .map-route-exit { stroke-width: calc(6px * var(--map-line-k, 1)); }
+/* The quiet corner of buttons: +, - and the whole region. */
+.map-zoom-ctl {
+  position: absolute;
+  right: var(--sp-3);
+  bottom: var(--sp-3);
+  z-index: var(--z-raised);
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  box-shadow: var(--shadow-1);
+  opacity: 0.82;
+  transition: opacity var(--motion-fast, 0.12s) ease;
+}
+.map-zoom-ctl[data-corner^="t"] { top: var(--sp-3); bottom: auto; }
+.map-zoom-ctl[data-corner$="l"] { left: var(--sp-3); right: auto; }
+.map-zoom-ctl[data-row="1"] { flex-direction: row; }
+.map-zoom-ctl:hover,
+.map-zoom-ctl:focus-within { opacity: 1; }
+.map-zoom-ctl > button {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  background: color-mix(in srgb, var(--surface-bright) 92%, transparent);
+  color: var(--c-sand-33);
+  cursor: pointer;
+}
+.map-zoom-ctl > button > svg { width: 14px; height: 14px; display: block; position: static; }
+.map-zoom-ctl > button:hover:not(:disabled) { background: var(--surface-bright); color: var(--c-sand-21); }
+.map-zoom-ctl > button:focus-visible { outline: 2px solid var(--focus); outline-offset: -2px; }
+.map-zoom-ctl > button:disabled { cursor: default; color: color-mix(in srgb, var(--c-sand-33) 35%, transparent); }
 /* Original hub geometry segments */
 .map-seg {
   stroke: var(--c-cream-91);
-  stroke-width: 5;
+  stroke-width: calc(5px * var(--map-line-k, 1));
   stroke-linecap: round;
   fill: none;
 }
 .map-seg.dim {
   stroke: var(--c-sand-86);
-  stroke-width: 3.5;
+  stroke-width: calc(3.5px * var(--map-line-k, 1));
   opacity: 0.55;
 }
 .map-seg.travelable {
   stroke: var(--c-yellow-91);
-  stroke-width: 7;
+  stroke-width: calc(7px * var(--map-line-k, 1));
   opacity: 0.95;
 }
 .map-seg.current {
   stroke: var(--c-yellow-90);
-  stroke-width: 8;
+  stroke-width: calc(8px * var(--map-line-k, 1));
 }
 .map-seg-hit {
   stroke: transparent;
-  stroke-width: 18;
+  stroke-width: calc(18px * var(--map-line-k, 1));
   stroke-linecap: round;
   fill: none;
   cursor: pointer;
@@ -6485,49 +6537,49 @@ body.buff-purple-pulse::after {
 .map-street.travelable { cursor: pointer; }
 .map-street.travelable:hover .map-seg.travelable {
   stroke: var(--c-yellow-95b);
-  stroke-width: 9;
+  stroke-width: calc(9px * var(--map-line-k, 1));
 }
 /* Ticket 66: under construction (MapStreet.as: a locked street paler, its name dimmed), with stripes. */
 .map-seg.travelable.building { opacity: 0.6; }
 .map-seg-stripes {
   stroke: var(--c-sand-24);
-  stroke-width: 7;
-  stroke-dasharray: 5 6;
+  stroke-width: calc(7px * var(--map-line-k, 1));
+  stroke-dasharray: calc(5px * var(--map-line-k, 1)) calc(6px * var(--map-line-k, 1));
   opacity: 0.55;
   fill: none;
   pointer-events: none;
 }
-.map-street.building:hover .map-seg-stripes { stroke-width: 9; }
+.map-street.building:hover .map-seg-stripes { stroke-width: calc(9px * var(--map-line-k, 1)); }
 .map-label.loaded.building { opacity: 0.5; }
 .map-label {
   font-family: var(--font-ui);
-  font-size: var(--fs-2xs);
+  font-size: calc(var(--fs-2xs) * var(--map-text-k, 1));
   font-weight: 700;
   fill: var(--c-sand-24);
   pointer-events: none;
   paint-order: stroke fill;
   stroke: var(--text-on-dark);
-  stroke-width: 2.5px;
+  stroke-width: calc(2.5px * var(--map-text-k, 1));
   stroke-linejoin: round;
 }
 .map-label.dim {
-  font-size: var(--fs-2xs);
+  font-size: calc(var(--fs-2xs) * var(--map-text-k, 1));
   font-weight: 600;
   fill: var(--c-sand-33);
   opacity: 0.72;
-  stroke-width: 2px;
+  stroke-width: calc(2px * var(--map-text-k, 1));
 }
 .map-label.loaded {
   fill: var(--c-sand-21);
-  font-size: var(--fs-xs);
+  font-size: calc(var(--fs-xs) * var(--map-text-k, 1));
   font-weight: 800;
-  stroke-width: 3px;
+  stroke-width: calc(3px * var(--map-text-k, 1));
 }
 .map-label.current {
   fill: var(--c-red-41b);
-  font-size: var(--fs-xs);
+  font-size: calc(var(--fs-xs) * var(--map-text-k, 1));
   font-weight: 800;
-  stroke-width: 3px;
+  stroke-width: calc(3px * var(--map-text-k, 1));
 }
 .map-you {
   fill: var(--c-red-61);
@@ -6552,13 +6604,13 @@ body.buff-purple-pulse::after {
 }
 .map-go-sub {
   font-family: var(--font-ui);
-  font-size: var(--fs-2xs);
+  font-size: calc(var(--fs-2xs) * var(--map-text-k, 1));
   font-weight: 700;
   fill: var(--c-sand-24);
   pointer-events: none;
   paint-order: stroke fill;
   stroke: var(--text-on-dark);
-  stroke-width: 2.5px;
+  stroke-width: calc(2.5px * var(--map-text-k, 1));
 }
 /* legacy schematic nodes (unused when hub geometry loads) */
 .map-node { cursor: pointer; }

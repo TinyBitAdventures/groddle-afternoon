@@ -20,7 +20,7 @@ import {
   hubTileForKey,
   isHubCloseKey,
 } from '../public/js/ui/imagination-hub.js?v=1d96f241';
-import { hotkeySections } from '../public/js/client-hotkeys.js?v=b8b8b5b3';
+import { hotkeySections } from '../public/js/client-hotkeys.js?v=c42fbb76';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const PUBLIC = join(root, 'public');

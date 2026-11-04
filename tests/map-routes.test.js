@@ -28,7 +28,7 @@ import {
   routeStep,
   signpostToward,
 } from '../public/js/map-routes.js?v=bcf2c347';
-import { mapRoutesFeature } from '../public/js/features/map-routes-feature.js?v=0fffdbf3';
+import { mapRoutesFeature } from '../public/js/features/map-routes-feature.js?v=6ab182d5';
 import { hellTicketsFeature } from '../public/js/features/hell-tickets-feature.js?v=55352c20';
 import { hellFeature } from '../public/js/features/hell-feature.js?v=54d49b30';
 import { createFeatureHost } from '../public/js/feature-host.js?v=2ed3c069';

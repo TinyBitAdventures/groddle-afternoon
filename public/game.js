@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=2e6bc3fd';
 import { createFeatureHost } from './js/feature-host.js?v=2ed3c069';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=b156c364';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=663b8a60';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -888,6 +888,7 @@ import {
 } from './js/map-graph.js?v=99c13d35';
 import { hubMapArtNote, hubMapSubtitle, questLogSummary } from './js/panel-copy.js?v=9fc1b2da';
 import { bindMapIconTips } from './js/ui/map-icon-tips.js?v=6b3eb3f9';
+import { createMapZoom } from './js/map-zoom.js?v=4c2ce0e3';
 import {
   loadStreetEcologyCatalog,
   ecologyForStreet,
@@ -938,7 +939,7 @@ import { bindContextTrigger, createContextMenu, isContextMenuKey as isMenuKey, M
 import { bindCountField, countKeyValue, countStepMarkup, typedCount } from './js/ui/count-chooser.js?v=b8361b21';
 import { bindVerbMenu, fitVerbMenuRows, focusVerbRow, lockVerbMenuSize, makePickTile, makeVerbRow, pickGridCols, placeVerbMenu, plainWords, refuseVerbRow, syncVerbDetail, verbMenuKey, verbRowAttrs, verbRowInner, verbRowKeys } from './js/ui/verb-menu.js?v=6cc4df84';
 import { createPromptSettler, promptId } from './js/prompt-settle.js?v=509ba9cc';
-import { clientKeyAction, createHotkeysSheet, isHotkeySheetRelease, isPlainKey } from './js/client-hotkeys.js?v=b8b8b5b3';
+import { clientKeyAction, createHotkeysSheet, isHotkeySheetRelease, isPlainKey } from './js/client-hotkeys.js?v=c42fbb76';
 import { EAT_PICK_TEXT, bestFoodIndex, eatChoices, eatTip } from './js/eat-pick.js?v=8fb763d0';
 import { installHeldKeyGuard, isMacPlatform } from './js/held-keys.js?v=98b96620';
 import { signpostArmRows, worldContextAction } from './js/world-context-menu.js?v=f3f48805';
@@ -23850,7 +23851,7 @@ function renderHomeMapCallout(panel) {
 /**
  * @param {string} [hubId]  Open a specific hub map; default = player's hub
  */
-async function openMap(hubId, { find = '' } = {}) {
+async function openMap(hubId, { find = '', focus = '' } = {}) {
   // On the subway train: the line you are riding (features/subway-feature.js openMapOverride).
   if (!hubId && !find && features.query('openMapOverride', engine) === true) return;
   if (homeIsInstanced()) {
@@ -23983,6 +23984,8 @@ async function openMap(hubId, { find = '' } = {}) {
   // Ticket 21: the canvas keeps the drawn frame's shape (style.css .map-canvas aspect-ratio).
   const frame = canvas.querySelector('svg')?.getAttribute('viewBox')?.split(' ').map(Number) || [];
   if (frame[2] > 0 && frame[3] > 0) canvas.style.setProperty('--map-aspect', `${frame[2]} / ${frame[3]}`);
+  // MAPZOOM: zoom and pan (js/map-zoom.js); a redraw of the region on show keeps the view, another region opens at fit.
+  mapZoomFor(canvas).attach(canvas.querySelector('svg'), targetHub);
 
   canvas.querySelectorAll('.map-street.travelable').forEach((g) => {
     g.addEventListener('click', (e) => {
@@ -24059,6 +24062,42 @@ async function openMap(hubId, { find = '' } = {}) {
   panel.hidden = false;
   fitMapCanvas(panel);
   if (find) showFoundStreet(canvas, find, view);
+  else if (focus) focusMapOn(canvas, focus);
+}
+
+/**
+ * MAPZOOM (ticket 76, Austin 2026-11-04; G521): the Map's zoom and pan, one for the Map's canvas
+ * (js/map-zoom.js). QA: canvas data mapZoom "<zoom>@<cx>,<cy>" (map units).
+ */
+let mapZoom = null;
+function mapZoomFor(canvas) {
+  mapZoom ||= createMapZoom(canvas, {
+    onChange: (v) => setCanvasData('mapZoom', `${v.zoom.toFixed(2)}@${Math.round(v.cx)},${Math.round(v.cy)}`),
+  });
+  return mapZoom;
+}
+
+/** Where a street sits on the Map now drawn (its line's middle), or the route's pin for a room behind a door. */
+function mapSpotOf(canvas, tsid) {
+  const g = [...canvas.querySelectorAll('.map-street')].find((n) => n.getAttribute('data-tsid') === tsid);
+  const line = g?.querySelector('line.map-seg');
+  if (line) {
+    const n = (k) => Number(line.getAttribute(k)) || 0;
+    return { x: (n('x1') + n('x2')) / 2, y: (n('y1') + n('y2')) / 2 };
+  }
+  const pin = canvas.querySelector('.map-route-pin');
+  if (pin?.getBBox) {
+    const b = pin.getBBox();
+    return { x: b.x + b.width / 2, y: b.y + b.height };
+  }
+  return null;
+}
+
+/** MAPZOOM: the Map centred on a street (a search pick, Show destination), zoomed in to it. */
+function focusMapOn(canvas, tsid) {
+  const at = mapSpotOf(canvas, tsid);
+  if (at) mapZoomFor(canvas).focus(at.x, at.y);
+  return Boolean(at);
 }
 
 /**
@@ -24078,7 +24117,9 @@ function fitMapCanvas(panel = document.getElementById('map-panel')) {
   const card = panel?.querySelector('.map-card');
   const canvas = panel?.querySelector('.map-canvas');
   if (!card || !canvas || panel.hidden || mapFitBusy) return null;
-  const [, , frameW, frameH] = (canvas.querySelector('svg')?.getAttribute('viewBox') || '').split(' ').map(Number);
+  // MAPZOOM: the frame the region was drawn in (a zoomed map's viewBox is only part of it).
+  const svgEl = canvas.querySelector('svg');
+  const [, , frameW, frameH] = (svgEl?.dataset.frame || svgEl?.getAttribute('viewBox') || '').split(' ').map(Number);
   if (!(frameW > 0 && frameH > 0)) return null;
   mapFitBusy = true;
   let fit = null;
@@ -24124,6 +24165,8 @@ function fitMapCanvas(panel = document.getElementById('map-panel')) {
   } finally {
     mapFitBusy = false;
   }
+  // MAPZOOM: the zoom buttons take the corner that covers the least of this region.
+  mapZoom?.placeControls();
   fitMapExtras(card);
   if (!mapFitObserver) {
     let queued = false;
@@ -24157,6 +24200,8 @@ function showFoundStreet(canvas, tsid, view) {
   g.classList.remove('is-found');
   void g.getBoundingClientRect();
   g.classList.add('is-found');
+  // MAPZOOM: the Map zooms in to it and centres it.
+  focusMapOn(canvas, tsid);
   toast(`${label}, ${view.hubName}`, 2600);
   setTimeout(() => g.classList.remove('is-found'), 4200);
 }
@@ -24248,6 +24293,8 @@ function closeMap() {
   if (panel) panel.hidden = true;
   if (mapCtxMenu?.isOpen()) mapCtxMenu.close({ focus: false });
   mapPanelHubId = null;
+  // MAPZOOM: the next open starts at fit (the zoom is kept only while the Map stays open).
+  mapZoom?.reset();
 }
 
 function isMapOpen() {
@@ -29642,6 +29689,13 @@ async function main() {
     if (isMapOpen()) {
       // G254: M closes it too (TSMainView.as mKeyHandler 733-741, toggleHubMapDialog).
       if (e.key === 'g' || e.key === 'G' || isPlainKey(e, 'm')) closeMap();
+      // MAPZOOM: the world zoom's keys zoom the Map while it is open (= or + in, - out, 0 the whole region).
+      const mapZoomKey = zoomKeyAction(e);
+      if (mapZoomKey && mapZoom) {
+        e.preventDefault();
+        keys.delete(e.key);
+        mapZoom.step(mapZoomKey);
+      }
       return;
     }
     if (

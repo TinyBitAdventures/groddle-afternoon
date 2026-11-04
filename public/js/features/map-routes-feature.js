@@ -947,7 +947,8 @@ function mapCard(engine) {
   // Another hub's destination: a button to its map (a door-only room in this hub is pinned on its street, G192).
   const shownHub = hubOf(document.querySelector('#map-canvas g.map-street[data-tsid]')?.getAttribute('data-tsid') || '');
   if (r && hubOf(r.destination) && document.querySelector('#map-canvas svg') && hubOf(r.destination) !== shownHub) {
-    button('Show destination', () => engine.openMap?.(hubOf(r.destination)));
+    // MAPZOOM: its region opens zoomed in on it (game.js focusMapOn).
+    button('Show destination', () => engine.openMap?.(hubOf(r.destination), { focus: r.destination }));
   }
   button('Set a destination', () => {
     pickMode = !pickMode;

@@ -105,6 +105,8 @@ export function hotkeySections({ keyring = false, hub = false, reports = false }
       title: 'Interface',
       rows: [
         ['Show Map', [['M'], ['G']]],
+        // MAPZOOM (ticket 76): the world zoom's keys zoom the Map while it is open (game.js; js/map-zoom.js).
+        ['Map Zoom', [['='], ['-'], ['0']], '(While the Map is open: in, out, the whole region; the wheel or a pinch zooms and a drag moves it)'],
         ['Street Map', [['Shift', 'M']]],
         ['Teleport', [['Shift', 'T']]],
         ...(keyring ? [['Key Ring', [['Shift', 'K']]]] : []),

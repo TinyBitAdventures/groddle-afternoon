@@ -1991,6 +1991,18 @@
 :root[data-ui="classic"] #game-root #map-panel > .map-card[data-map-compact="1"] > .map-hint > * { display: none; }
 :root[data-ui="classic"] #game-root #map-panel .map-extras-grid { padding: calc(10 * var(--cu)); border: 0; border-radius: 4px; background: var(--c-classic-panel); box-shadow: 0 0 0 1px color-mix(in srgb, var(--c-classic-ink) 37%, transparent), 0 0 1px 7px color-mix(in srgb, var(--c-classic-ink) 15%, transparent); }
 :root[data-ui="classic"] #game-root #map-panel .map-label { font-family: var(--font-classic-title); font-weight: 800; }
+/* MAPZOOM (ticket 76, Austin 2026-11-04): the client's map had no zoom; the remake's +, - and whole-region
+   buttons take the client's minor button (as Preferences' Done), stacked in the well's corner. */
+:root[data-ui="classic"] #game-root #map-panel .map-zoom-ctl { right: calc(8 * var(--cu)); bottom: calc(8 * var(--cu)); gap: 0; border: 1px solid var(--c-classic-btn-minor-border); border-radius: var(--radius-xs); box-shadow: 0 1px 0 color-mix(in srgb, var(--c-classic-ink) 30%, transparent); opacity: 0.9; }
+:root[data-ui="classic"] #game-root #map-panel .map-zoom-ctl[data-corner^="t"] { top: calc(8 * var(--cu)); bottom: auto; }
+:root[data-ui="classic"] #game-root #map-panel .map-zoom-ctl[data-corner$="l"] { left: calc(8 * var(--cu)); right: auto; }
+:root[data-ui="classic"] #game-root #map-panel .map-zoom-ctl > button { width: calc(24 * var(--cu)); height: calc(24 * var(--cu)); color: var(--c-classic-btn-minor-label); background: linear-gradient(180deg, var(--c-classic-btn-minor-top), var(--c-classic-btn-minor-bottom)); }
+:root[data-ui="classic"] #game-root #map-panel .map-zoom-ctl > button + button { border-top: 1px solid var(--c-classic-btn-minor-border); }
+:root[data-ui="classic"] #game-root #map-panel .map-zoom-ctl[data-row="1"] > button + button { border-top: 0; border-left: 1px solid var(--c-classic-btn-minor-border); }
+:root[data-ui="classic"] #game-root #map-panel .map-zoom-ctl > button:hover:not(:disabled) { background: linear-gradient(180deg, var(--c-classic-panel), var(--c-classic-btn-minor-top)); }
+:root[data-ui="classic"] #game-root #map-panel .map-zoom-ctl > button:disabled { color: color-mix(in srgb, var(--c-classic-btn-minor-label) 35%, transparent); }
+:root[data-ui="classic"] #game-root #map-panel .map-zoom-ctl > button:focus-visible { outline: 2px solid var(--c-classic-focus); outline-offset: -2px; }
+:root[data-ui="classic"] #game-root #map-panel .map-zoom-ctl > button > svg { width: calc(12 * var(--cu)); height: calc(12 * var(--cu)); }
 :root[data-ui="classic"] #game-root #map-panel .map-sub { color: var(--c-classic-offline); font-size: calc(var(--fs-classic-body) * var(--cu-n, 1)); }
 :root[data-ui="classic"] #game-root #map-panel .map-extras { color: var(--c-classic-text); font-size: calc(var(--fs-classic-row) * var(--cu-n, 1)); }
 :root[data-ui="classic"] #game-root #map-panel :is(.map-feature-card, .map-home-card, .map-route-card) { border: 0; border-bottom: 1px solid var(--c-classic-row-rule); border-radius: 0; background: none; box-shadow: none; }
