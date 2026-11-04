@@ -39,15 +39,17 @@ import {
   ITEM_VERBS,
   crunchIce,
   gameCheatBlock,
+  spinachBlock,
   iceCrunchButton,
   itemVerbButton,
   itemVerbsFor,
   runItemVerb,
-} from '../item-verbs.js?v=729ccd91';
+} from '../item-verbs.js?v=fb06ea12';
 import { homesFeature } from './homes-feature.js?v=4399d4f5';
 import { CROWNS_STREET } from '../game-of-crowns.js?v=e32f35f5';
 import { HOG_HAUL_STREET_ID } from '../hog-haul.js?v=50d2e072';
 import { isRaceSceneTsid } from '../races.js?v=ab22a079';
+import { WINTER_HAVEN_STREET_ID, WINTER_WALK_STREET_ID } from '../winter-walk.js?v=9961c35f';
 
 export const ITEM_VERBS_FEATURE_ID = 'item-verbs';
 
@@ -236,9 +238,16 @@ export const itemVerbsFeature = {
     publish(engine);
   },
 
-  /** essence_of_hairball / hairball_flower / spinach: no cheating in a game. */
+  /** essence_of_hairball / hairball_flower / spinach: no cheating in a game; Spinach not in the challenge rooms either. */
   packUseGate(classTsid, engine) {
-    return gameCheatBlock(classTsid, inGameLocation(engine?.streetTsid));
+    const game = gameCheatBlock(classTsid, inGameLocation(engine?.streetTsid));
+    if (game || classTsid !== 'spinach') return game;
+    const tsid = engine?.streetTsid || '';
+    return spinachBlock({
+      tsid,
+      pooped: Boolean(engine?.hasBuff?.('pooped') || engine?.hasBuff?.('super_pooped')),
+      winterWalk: Boolean(engine?.transientInstance?.()) && [WINTER_WALK_STREET_ID, WINTER_HAVEN_STREET_ID].includes(tsid),
+    });
   },
 
   packVerbs(classTsid, engine) {

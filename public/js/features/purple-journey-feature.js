@@ -41,7 +41,7 @@ import { playPoofIn } from '../overlay-art.js?v=11b6dd7f';
 import { STREET_INDEX } from '../street-loader.js?v=33d2b8bc';
 import { getAchievementCatalog } from '../content-catalogs.js?v=10b118dd';
 import { POTION_ART } from '../potion-art.js?v=27ccc756';
-import { itemVerbAchievementCounters } from '../item-verbs.js?v=729ccd91';
+import { itemVerbAchievementCounters } from '../item-verbs.js?v=fb06ea12';
 import {
   EMPEROR,
   ESSENCE,

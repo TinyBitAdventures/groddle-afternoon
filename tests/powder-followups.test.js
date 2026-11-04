@@ -11,9 +11,9 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { REVIVED_TRANT, createPlot, reviveDeadTree, tickPlot } from '../public/js/patches.js?v=acaae011';
-import { powdersFeature } from '../public/js/features/powders-feature.js?v=b8308172';
-import { itemVerbsFeature, inGameLocation } from '../public/js/features/item-verbs-feature.js?v=d20de761';
-import { GAME_CHEAT_BLOCKS, gameCheatBlock } from '../public/js/item-verbs.js?v=729ccd91';
+import { powdersFeature } from '../public/js/features/powders-feature.js?v=d85a7eb5';
+import { itemVerbsFeature, inGameLocation } from '../public/js/features/item-verbs-feature.js?v=124d99b9';
+import { GAME_CHEAT_BLOCKS, gameCheatBlock } from '../public/js/item-verbs.js?v=fb06ea12';
 import { CROWNS_STREET } from '../public/js/game-of-crowns.js?v=e32f35f5';
 import { HOG_HAUL_STREET_ID } from '../public/js/hog-haul.js?v=50d2e072';
 import { raceSceneTsid } from '../public/js/races.js?v=ab22a079';
@@ -140,3 +140,39 @@ describe('Juju Shoo-Shoo Powder', () => {
     assert.equal(overrides['item:juju_shoo_shoo_powder'].status, 'excluded');
   });
 });
+
+describe('ticket 90: Spinach refuses the challenge rooms, as spinach.js activate did', () => {
+  const gate = (streetTsid, extra = {}) => itemVerbsFeature.packUseGate('spinach', { streetTsid, hasBuff: () => false, transientInstance: () => true, ...extra });
+  const unfair = "I'd say, doing that would give you an unfair advantage.";
+
+  it('Mental Block (all its scenes), Light Perspective, Radiant Glare, Color Unblocking and Picto Pattern refuse it', () => {
+    for (const tsid of ['QI_MENTAL_BLOCK_MB1', 'QI_MENTAL_BLOCK_MB2', 'QI_LIGHT_PERSPECTIVE_A', 'QI_RADIANT_GLARE_X', 'QI_COLOR_UNBLOCKING_1', 'QI_PICTO_PATTERN_1']) {
+      assert.deepEqual(gate(tsid), { ok: false, msg: unfair }, tsid);
+    }
+    // The Winter Walk's streets only while the walk holds them.
+    assert.deepEqual(gate('GIFH2AKJ5I735SV'), { ok: false, msg: unfair });
+    assert.equal(gate('GIFH2AKJ5I735SV', { transientInstance: () => false }), null);
+    // Elsewhere it works, a room not in the list too (Join the Club).
+    assert.equal(gate('GLI3272LOTD1B1F'), null);
+    assert.equal(gate('QI_CLUBHOUSE_CLUBHOUSE'), null);
+    assert.deepEqual(gate('GLI3272LOTD1B1F', { hasBuff: (id) => id === 'super_pooped' }), { ok: false, msg: "You're too Pooped to even activate some Spinach." });
+    // Games keep their own line.
+    assert.deepEqual(gate(CROWNS_STREET), { ok: false, msg: GAME_CHEAT_BLOCKS.spinach });
+  });
+
+  it('the source lines', { skip: !existsSyncSafe(join(root, '..', 'glitch-GameServerJS', 'items/spinach.js')) && 'no GSJS' }, () => {
+    const src = readFileSync(join(root, '..', 'glitch-GameServerJS', 'items/spinach.js'), 'utf8');
+    for (const id of ['mental_block', 'mental_block_rem', 'mental_block_2', 'puzzle_level_light_perspective', 'radiant_glare', 'color_unblocking', 'picto_pattern', 'level_quest_winter_walk']) {
+      assert.ok(src.includes(`pc.location.isInstance('${id}')) return {state:'disabled', reason: "${unfair}"}`), id);
+    }
+  });
+});
+
+function existsSyncSafe(p) {
+  try {
+    readFileSync(p);
+    return true;
+  } catch {
+    return false;
+  }
+}

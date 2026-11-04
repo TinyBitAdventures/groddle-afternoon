@@ -100,7 +100,7 @@ import {
   sprinkleHallowed,
   usePowderCharge,
 } from '../powders.js?v=d355981a';
-import { itemVerbAchievementCounters } from '../item-verbs.js?v=729ccd91';
+import { itemVerbAchievementCounters } from '../item-verbs.js?v=fb06ea12';
 import { DEAD_TRANT_CLASSES } from '../patches.js?v=acaae011';
 import { hellFeature } from './hell-feature.js?v=54d49b30';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';

@@ -127,7 +127,7 @@ import {
   trantsformOutcome,
   usePotion,
 } from '../potions.js?v=c21bad59';
-import { itemVerbAchievementCounters } from '../item-verbs.js?v=729ccd91';
+import { itemVerbAchievementCounters } from '../item-verbs.js?v=fb06ea12';
 import { patchesFeature } from './patches-feature.js?v=e4a197ff';
 import { homesFeature } from './homes-feature.js?v=4399d4f5';
 import { streetTreeIndex } from './tree-death-feature.js?v=919615ba';

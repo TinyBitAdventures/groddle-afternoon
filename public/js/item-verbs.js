@@ -199,6 +199,30 @@ export const GAME_CHEAT_BLOCKS = Object.freeze({
   spinach: 'Nice try, cheater!',
 });
 
+/**
+ * Ticket 90: spinach.js activate conditions 217-245 also refuse Spinach while Pooped or Super
+ * Pooped (219) and in the challenge rooms (223-243: light_perspective, mental_block and its
+ * reminisce and part 2, blue_and_white, radiant_glare, color_unblocking, the Winter Walk and
+ * Winter Haven memories, picto_pattern). The remake's own room ids for those (QI_<ROOM>_<STAGE>
+ * scenes, js/quest-instance.js) and the Winter Walk's two streets while the walk holds them.
+ * focusing_orb.js levitate 290-306 refuses the same rooms (js/meditation.js unfairPlace).
+ * A High Jumper already running when you come in carries on, as there (addBuffPhysics
+ * is_permanent, inc_physics.js 277-283: removeAllTempPhysics keeps it).
+ */
+export const SPINACH_UNFAIR_ROOMS = Object.freeze(['light_perspective', 'mental_block', 'radiant_glare', 'color_unblocking', 'picto_pattern']);
+export const SPINACH_TEXT = Object.freeze({
+  pooped: "You're too Pooped to even activate some Spinach.",
+  unfair: "I'd say, doing that would give you an unfair advantage.",
+});
+
+/** spinach.js conditions beyond the games: { ok: false, msg } or null. */
+export function spinachBlock({ tsid = '', pooped = false, winterWalk = false } = {}) {
+  if (pooped) return { ok: false, msg: SPINACH_TEXT.pooped };
+  const t = String(tsid || '').toLowerCase();
+  if (winterWalk || (t.startsWith('qi_') && SPINACH_UNFAIR_ROOMS.some((id) => t.startsWith(`qi_${id}_`)))) return { ok: false, msg: SPINACH_TEXT.unfair };
+  return null;
+}
+
 /** The refusal for `classTsid` while `inGame`, or null. */
 export function gameCheatBlock(classTsid, inGame = false) {
   if (!inGame) return null;
