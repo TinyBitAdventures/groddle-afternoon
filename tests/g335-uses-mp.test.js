@@ -14,7 +14,7 @@ import { execFileSync, spawnSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
-import { powdersFeature } from '../public/js/features/powders-feature.js?v=9cd66bd5';
+import { powdersFeature } from '../public/js/features/powders-feature.js?v=b366b7dd';
 
 const hasPhp = spawnSync('php', ['-v']).status === 0;
 const skip = skipWithoutSite || !hasPhp;
@@ -29,8 +29,10 @@ function php(op, args) {
     $a = $in['args'];
     $out = match ($in['op']) {
       'step' => LedgerUse::step($a[0], $a[1], $a[2], $a[3]),
-      'savedLeft' => LedgerUse::savedLeft($a[0], $a[1]),
-      'catchUp' => LedgerUse::catchUp($a[0], ['trade' => $a[1], 'gave' => $a[2], 'got' => ['items' => [], 'currants' => 0]]),
+      'savedLeft' => LedgerUse::savedLeft($a[0], $a[1], $a[2] ?? null),
+      'catchUp' => LedgerUse::catchUp($a[0], ['trade' => $a[1], 'gave' => $a[2], 'got' => ['items' => [], 'currants' => 0], 'k' => $a[3] ?? []]),
+      'keptRef' => LedgerUse::keptRef($a[0], $a[1]),
+      'refCopy' => LedgerUse::refCopy($a[0]),
       'isUse' => LedgerUse::isUse($a[0]),
       'onlineSeconds' => LedgerCredits::onlineSeconds($a[0], $a[1], $a[2], $a[3]),
       'event' => LedgerCredits::event($a[0], Economy::shared()),
@@ -43,9 +45,9 @@ function php(op, args) {
   return JSON.parse(String(execFileSync('php', ['-r', code], { input: JSON.stringify({ op, args }) })));
 }
 
-/** A save's entries with this pack and these feature slices. */
-function save(inv = {}, features = {}) {
-  return { playerState: JSON.stringify({ version: 7, inventory: inv, player: { currants: 0 }, systems: { features } }) };
+/** A save's entries with this pack and these feature slices (and the game's tool state, js/tools.js). */
+function save(inv = {}, features = {}, condition = null) {
+  return { playerState: JSON.stringify({ version: 7, inventory: inv, player: { currants: 0 }, systems: { features, ...(condition ? { tools: { condition } } : {}) } }) };
 }
 
 describe('connected minutes refill the budget, the wall clock does not (Ledger, LedgerCredits)', { skip }, () => {
@@ -142,6 +144,30 @@ describe('jars and bottles on shared trees are the ledger\'s (LedgerUse)', { ski
     assert.equal(php('savedLeft', [save(), 'fertilidust_lite']), null);
     assert.equal(php('isUse', ['use-0123456789abcdef']), true);
     assert.equal(php('isUse', ['party-0123456789abcdef']), false);
+  });
+
+  it('each jar keeps its own charges: a use names the copy, a load takes that very copy out (2026-11-04)', () => {
+    // The game's tool state keeps each jar's (js/tools.js copies, pack order); null: a full one.
+    const both = save({ fertilidust: 2 }, {}, { fertilidust: { copies: [2, 5] } });
+    assert.equal(php('savedLeft', [both, 'fertilidust']), 2, 'the one in use: the first');
+    assert.equal(php('savedLeft', [both, 'fertilidust', 1]), null, 'the second is full');
+    assert.equal(php('savedLeft', [save({ fertilidust: 2 }, {}, { fertilidust: { copies: [5, 3] } }), 'fertilidust', 1]), 3);
+    // An older save's one slice value is the first jar's only.
+    const old = save({ fertilidust: 2 }, { powders: { charges: { fertilidust: 3 } } });
+    assert.equal(php('savedLeft', [old, 'fertilidust', 0]), 3);
+    assert.equal(php('savedLeft', [old, 'fertilidust', 1]), null);
+    // Kept rows: the class for the first copy (older rows read the same), class#k for the others.
+    assert.equal(php('keptRef', ['fertilidust', 0]), 'fertilidust');
+    assert.equal(php('keptRef', ['fertilidust', 2]), 'fertilidust#2');
+    assert.deepEqual(php('refCopy', ['fertilidust#2']), ['fertilidust', 2]);
+    assert.deepEqual(php('refCopy', ['potion_tree_poison']), ['potion_tree_poison', 0]);
+    assert.equal(php('refCopy', ['x#y']), null);
+    // The jar the ledger emptied was the second: it leaves, the first keeps its own charges.
+    const out = JSON.parse(php('catchUp', [save({ fertilidust: 2 }, {}, { fertilidust: { copies: [3, 1] } }), 'use-00000000000000b2', { items: { fertilidust: 1 }, currants: 0 }, { fertilidust: 1 }]).playerState);
+    assert.equal(out.inventory.fertilidust, 1);
+    assert.deepEqual(out.systems.tools.condition.fertilidust.copies, [3]);
+    const src = readFileSync(join(SITE_DIR, 'src/LedgerUse.php'), 'utf8');
+    assert.match(src, /'k' => \$at\]/, 'the emptied copy rides with the spend');
   });
 
   it('a load applies an emptied jar: out of the pack, its charges forgotten, the op applied', () => {

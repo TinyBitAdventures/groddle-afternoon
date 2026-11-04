@@ -39,8 +39,8 @@ import {
   treeReady,
   treeSkill,
 } from '../public/js/street-objects.js?v=136cdd1f';
-import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=5154687c';
-import { FEATURES } from '../public/js/features/index.js?v=88294a3c';
+import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=149812b1';
+import { FEATURES } from '../public/js/features/index.js?v=ebd58d9a';
 import { createMineRock, mineRock } from '../public/js/mining.js?v=4f8dc32e';
 import { createResourceNode } from '../public/js/resource-nodes.js?v=7c982611';
 import { createTrantState, fruitCapacityAt, setTrantTables } from '../public/js/trants.js?v=9c2e8c0f';
@@ -369,7 +369,8 @@ describe('street objects: the feature', () => {
 
   it('G361 / G335: powders-feature asks sharedFertilize as the jar is used, and the dust lands on its own', () => {
     const src = read('public/js/features/powders-feature.js');
-    assert.match(src, /return engine\.query\?\.\('sharedFertilize', targets, lite, engine, classTsid\) === true;/);
+    // The jar used goes with the ask (its place in pack order), so the ledger uses that jar's charge.
+    assert.match(src, /return engine\.query\?\.\('sharedFertilize', targets, lite, engine, classTsid, copy\) === true;/);
     assert.match(src, /if \(out\.ok && askDust\(engine, classTsid, trees, false\)\) return 'asked';/);
     assert.match(src, /if \(out\.ok && askDust\(engine, classTsid, \[out\.tree\.target\], true\)\) return 'asked';/);
     assert.doesNotMatch(src.slice(src.indexOf('function fertilize(')), /^[^\n]*sharedFertilize/m, 'fertilize no longer tells the server');

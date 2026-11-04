@@ -101,6 +101,8 @@ import {
   usePowderCharge,
 } from '../powders.js?v=1444b02d';
 import { itemVerbAchievementCounters } from '../item-verbs.js?v=1e20fa7d';
+import { copyChargesLeft, copyFromLedger, keepsCopies, spendCopyCharge, verbCopy } from '../copy-charges.js?v=174642e2';
+import { migrateClassValue } from '../tools.js?v=2337f66a';
 import { DEAD_TRANT_CLASSES } from '../patches.js?v=bfda863e';
 import { hellFeature } from './hell-feature.js?v=4c54964f';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
@@ -118,7 +120,16 @@ import {
 
 export const POWDERS_FEATURE_ID = 'powders';
 
+/*
+ * Each jar's charges are its own (powder_base charges, an instance prop: <powder>.js 33), kept per
+ * copy in js/tools.js (2026-11-04: one count per class made a new jar start where the last left off).
+ * `charges` only stands in for an engine with no tool state (pure callers, older tests).
+ */
 let charges = {};
+/** The jar a verb acts on while it runs (the pack menu's copy, or null: the one in use). */
+let activeCopy = null;
+/** The engine last drawn with (tests' _state). */
+let lastEngine = null;
 let noNo = { day: '', sniffs: 0, startAt: 0 };
 let pending = [];
 let last = '';
@@ -126,9 +137,28 @@ let demoDone = false;
 /** G335: the server's go-ahead for a jar on shared trees, while its verb runs: { classTsid, use }. */
 let granted = null;
 
+/** The charges per class as the canvas and tests read them: the jar in use's, when not full. */
+function chargesView(engine) {
+  if (!engine?.toolState) return { ...charges };
+  const out = {};
+  for (const [cls, def] of Object.entries(POWDERS)) {
+    if (!def.maxCharges || !keepsCopies(engine, cls) || countItem(engine.inv, cls) < 1) continue;
+    const n = copyChargesLeft(engine, cls, null);
+    if (n > 0 && n < def.maxCharges) out[cls] = n;
+  }
+  return out;
+}
+
+/** The charges left in the jar a verb acts on (undefined: a full one). */
+function chargesFor(engine, classTsid, copy = activeCopy) {
+  if (keepsCopies(engine, classTsid)) return copyChargesLeft(engine, classTsid, copy);
+  return charges[classTsid];
+}
+
 function publish(engine) {
+  if (engine) lastEngine = engine;
   engine.setData?.('powderLast', last);
-  engine.setData?.('powderCharges', Object.entries(charges).map(([k, v]) => `${k}:${v}`).join(','));
+  engine.setData?.('powderCharges', Object.entries(chargesView(engine)).map(([k, v]) => `${k}:${v}`).join(','));
   engine.setData?.('powderNoNo', `${noNo.sniffs}@${noNo.day}${noNo.startAt ? ':rush' : ''}`);
 }
 
@@ -215,6 +245,25 @@ function finishUse(engine, classTsid) {
   const def = POWDERS[classTsid];
   if (def.sound) engine.playSound?.(def.sound, { volume: 0.6 });
   const use = granted?.classTsid === classTsid ? granted.use : null;
+  if (def.maxCharges && keepsCopies(engine, classTsid)) {
+    // The jar this verb used: the ledger's word first (it used that jar's charge), then the one use here.
+    const at = verbCopy(engine, classTsid, activeCopy);
+    if (use) {
+      if (use.spent && engine.query?.('ledgerReceipt', String(use.op || ''), engine) === false) {
+        // Already applied once (a load): that jar is gone.
+        notify(engine, classTsid, def.verb);
+        engine.refreshPack?.();
+        engine.save?.();
+        return;
+      }
+      copyFromLedger(engine, classTsid, at, use);
+    }
+    spendCopyCharge(engine, classTsid, at);
+    notify(engine, classTsid, def.verb);
+    engine.refreshPack?.();
+    engine.save?.();
+    return;
+  }
   if (use && def.maxCharges) {
     // The ledger used this charge (LedgerUse.php): the jar holds what it says is left, and an
     // emptied jar leaves the pack once (the trade slice's applied list holds its op).
@@ -246,7 +295,8 @@ function finishUse(engine, classTsid) {
  */
 function askDust(engine, classTsid, targets, lite) {
   if (granted?.classTsid === classTsid) return false;
-  return engine.query?.('sharedFertilize', targets, lite, engine, classTsid) === true;
+  const copy = keepsCopies(engine, classTsid) ? verbCopy(engine, classTsid, activeCopy) : null;
+  return engine.query?.('sharedFertilize', targets, lite, engine, classTsid, copy) === true;
 }
 
 function fertilize(engine, targets) {
@@ -404,10 +454,11 @@ function runnerFor(classTsid) {
 }
 
 /** Run a powder's verb (also the QA autoplay and tests). */
-export function runPowder(engine, classTsid) {
+export function runPowder(engine, classTsid, copy = null) {
   const def = POWDERS[classTsid];
   if (!def || countItem(engine.inv, classTsid) < 1) return null;
-  const button = powderVerbFor(classTsid, { charges: charges[classTsid], cooldown: engine.hasBuff('fecundity_cooldown') });
+  if (copy != null && activeCopy == null) return withJar(copy, () => runPowder(engine, classTsid));
+  const button = powderVerbFor(classTsid, { charges: chargesFor(engine, classTsid), cooldown: engine.hasBuff('fecundity_cooldown') });
   if (!button.enabled) {
     engine.toast?.(button.reason, 2400);
     return null;
@@ -416,7 +467,9 @@ export function runPowder(engine, classTsid) {
   if (SPREAD_POWDERS.has(classTsid) && ensureMp(engine)?.state === 'online') {
     if (asking) return null;
     asking = classTsid;
-    mpc.send('powder_spread', { cls: classTsid });
+    // The jar picked: the ledger uses that one's charge (its place in pack order).
+    askingCopy = keepsCopies(engine, classTsid) ? verbCopy(engine, classTsid, activeCopy) : null;
+    mpc.send('powder_spread', { cls: classTsid, ...(askingCopy != null && askingCopy >= 0 ? { k: askingCopy } : {}) });
     last = `${classTsid}:asked`;
     mpNote(engine, last);
     publish(engine);
@@ -433,6 +486,18 @@ export function runPowder(engine, classTsid) {
 
 let mpc = null;
 let asking = '';
+let askingCopy = null;
+
+/** Run `fn` with the verb aimed at one jar (null: the one in use). */
+function withJar(copy, fn) {
+  const was = activeCopy;
+  activeCopy = copy == null ? null : copy;
+  try {
+    return fn();
+  } finally {
+    activeCopy = was;
+  }
+}
 
 function ensureMp(engine) {
   if (mpc) return mpc;
@@ -508,8 +573,10 @@ function onSpread(engine, m) {
   if (countItem(engine.inv, cls) < 1) return;
   // G335 slice 5: the server used this charge through the site's ledger first; the jar holds what it left.
   granted = m.use && typeof m.use === 'object' ? { classTsid: cls, use: m.use } : null;
+  const jar = askingCopy != null && askingCopy >= 0 && askingCopy < countItem(engine.inv, cls) ? askingCopy : null;
+  askingCopy = null;
   try {
-    last = `${cls}:${runnerFor(cls)(engine, cls)}:${Number(m.players) || 0}`;
+    last = `${cls}:${withJar(jar, () => runnerFor(cls)(engine, cls))}:${Number(m.players) || 0}`;
   } finally {
     granted = null;
   }
@@ -619,14 +686,14 @@ export const powdersFeature = {
     publish(engine);
   },
 
-  packVerbs(classTsid, engine) {
+  packVerbs(classTsid, engine, opts = {}) {
     if (!POWDERS[classTsid] || countItem(engine.inv, classTsid) < 1) return [];
-    return [powderVerbFor(classTsid, { charges: charges[classTsid], cooldown: engine.hasBuff('fecundity_cooldown') })];
+    return [powderVerbFor(classTsid, { charges: chargesFor(engine, classTsid, opts?.copy ?? null), cooldown: engine.hasBuff('fecundity_cooldown') })];
   },
 
-  runPackVerb(classTsid, verbId, engine) {
+  runPackVerb(classTsid, verbId, engine, opts = {}) {
     if (!POWDERS[classTsid] || POWDERS[classTsid].verb !== verbId) return false;
-    runPowder(engine, classTsid);
+    runPowder(engine, classTsid, opts?.copy ?? null);
     return true;
   },
 
@@ -635,11 +702,12 @@ export const powdersFeature = {
    * obj_dust_used): the verb runs now with the charges the ledger left (use: { op, c, left, spent },
    * or null when the server has no ledger and the jar is this page's own word).
    */
-  powderUseGranted(classTsid, use, engine) {
+  powderUseGranted(classTsid, use, engine, copy = null) {
     if (!POWDERS[classTsid] || !engine || countItem(engine.inv, classTsid) < 1) return null;
     granted = { classTsid, use: use && typeof use === 'object' ? use : null };
+    const jar = Number.isInteger(copy) && copy >= 0 && copy < countItem(engine.inv, classTsid) ? copy : null;
     try {
-      last = `${classTsid}:${runnerFor(classTsid)(engine, classTsid)}:granted`;
+      last = `${classTsid}:${withJar(jar, () => runnerFor(classTsid)(engine, classTsid))}:granted`;
     } finally {
       granted = null;
     }
@@ -648,14 +716,19 @@ export const powdersFeature = {
   },
 
   save() {
-    return { version: 1, charges: { ...charges }, noNo: { ...noNo } };
+    // version 2: each jar's charges are saved with the pack's tools (js/tools.js).
+    return { version: 2, charges: { ...charges }, noNo: { ...noNo } };
   },
 
-  restore(slice) {
+  restore(slice, engine) {
+    lastEngine = engine || lastEngine;
     charges = {};
+    // An older save's one count per class is the first jar's (the one a verb used); other jars are full.
     for (const [k, v] of Object.entries(slice?.charges || {})) {
       const n = Math.floor(Number(v));
-      if (POWDERS[k]?.maxCharges && n > 0 && n < POWDERS[k].maxCharges) charges[k] = n;
+      if (!(POWDERS[k]?.maxCharges && n > 0 && n < POWDERS[k].maxCharges)) continue;
+      if (keepsCopies(engine, k)) migrateClassValue(engine.toolState, k, n);
+      else charges[k] = n;
     }
     const s = slice?.noNo || {};
     noNo = { day: String(s.day || ''), sniffs: Math.max(0, Math.floor(Number(s.sniffs) || 0)), startAt: Math.max(0, Number(s.startAt) || 0) };
@@ -664,7 +737,7 @@ export const powdersFeature = {
 
   /** Tests. */
   _state() {
-    return { charges, noNo, pending: pending.length, last };
+    return { charges: chargesView(lastEngine), noNo, pending: pending.length, last };
   },
   _attachMp(engine, client) {
     attachMp(engine, client);

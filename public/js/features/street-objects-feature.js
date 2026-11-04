@@ -246,7 +246,7 @@ function bind(engine) {
     pending.delete(msg.req);
     lastAnswer = `dust:used:${msg.use ? `${Number(msg.use.left) || 0}${msg.use.spent ? ':spent' : ''}` : 'local'}`;
     publish(engine);
-    engine.query?.('powderUseGranted', p.classTsid, msg.use || null, engine);
+    engine.query?.('powderUseGranted', p.classTsid, msg.use || null, engine, p.copy ?? null);
   });
   // G361: the trees a Fertilidust grew (their new state comes as objs, to everyone).
   c.on('msg:obj_dusted', (msg) => {
@@ -894,7 +894,7 @@ export const streetObjectsFeature = {
    * their new state. True when the server was asked, null when the trees are local (solo, a
    * private place, a tree in your Patch).
    */
-  sharedFertilize(targets, lite, engine, classTsid = lite ? 'fertilidust_lite' : 'fertilidust') {
+  sharedFertilize(targets, lite, engine, classTsid = lite ? 'fertilidust_lite' : 'fertilidust', copy = null) {
     if (!engine || engine.mode !== 'multiplayer' || !shared(engine)) return null;
     const trees = (targets || []).filter(isStreetTree);
     if (!trees.length || (lite && trees.length !== 1)) return null;
@@ -908,8 +908,10 @@ export const streetObjectsFeature = {
     reqSeq += 1;
     const msg = { req: reqSeq };
     if (lite) msg.id = treeId(trees[0].treeIndex);
+    // The jar used (its place among the class's jars in pack order): the ledger uses that one's charge.
+    if (Number.isInteger(copy) && copy >= 0) msg.k = copy;
     if (!c?.send('obj_dust', msg)) return null;
-    pending.set(reqSeq, { id: msg.id || 'dust', target: null, verbId: 'dust', classTsid, at: Date.now() });
+    pending.set(reqSeq, { id: msg.id || 'dust', target: null, verbId: 'dust', classTsid, copy: Number.isInteger(copy) ? copy : null, at: Date.now() });
     return true;
   },
 
