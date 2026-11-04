@@ -275,7 +275,7 @@ describe('the site side (groddle-afternoon-site)', { skip: skipWithoutSite }, ()
 
   it('draws the page in the site\'s look: the header menu with the theme button, the stylesheets, the footer', () => {
     const pages = site('src/PlayerPages.php');
-    assert.match(pages, /SiteNav::nav\(SiteNav::links\(\$this->minn, 0\), \$path\)/);
+    assert.match(pages, /SiteNav::nav\(SiteNav::links\(\$this->minn, 0\), \$path, SiteNav::badges\(\$this->minn\)\)/);
     assert.match(pages, /Extension::head\(\)/);
     assert.match(site('src/Extension.php'), /'<script src="\/site\/theme\.js"><\/script>'/);
     assert.match(site('style.css'), /\.players-grid \{/);

@@ -112,7 +112,7 @@ describe('groups rules (js/groups.js)', () => {
     assert.equal(lines.length, 50);
     assert.equal(lines[0].text, '10');
     assert.equal(chatLine({ id: 0, text: 'x' }), null);
-    assert.deepEqual(chatLine({ id: 2, name: 'Bo', text: 'hi', at: 5 }), { id: 2, name: 'Bo', text: 'hi', at: 5, lid: 0 });
+    assert.deepEqual(chatLine({ id: 2, name: 'Bo', text: 'hi', at: 5 }), { id: 2, name: 'Bo', text: 'hi', at: 5, lid: 0, web: false });
     const store = new Map();
     const storage = { getItem: (k) => store.get(k) ?? null, setItem: (k, v) => store.set(k, v) };
     assert.ok(writeMemory(storage, 5, { open: ['global', 'group:3', 'bogus', 'global'], tab: 'group:3', intro: { help: true } }));

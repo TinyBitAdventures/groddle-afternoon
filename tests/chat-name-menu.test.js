@@ -137,7 +137,7 @@ describe('the sender\'s id on every line path', () => {
   });
 
   it('Global, groups, Live Help and the Trade Channel (groups-feature), the party and IMs', () => {
-    assert.match(src('js/features/groups-feature.js'), /const drawerLine = \(line\) => \(line\.note \? \{ note: true, text: line\.text \} : \{ name: line\.name, text: line\.text, mine: line\.id === userId\(\), at: line\.at, playerId: line\.id, rk: reactKey\(line\.lid\) \}\);/);
+    assert.match(src('js/features/groups-feature.js'), /const drawerLine = \(line\) => \(line\.note \? \{ note: true, text: line\.text \} : \{ name: shownName\(line\), text: line\.text, mine: line\.id === userId\(\), at: line\.at, playerId: line\.id, rk: reactKey\(line\.lid\) \}\);/);
     assert.match(src('js/features/party-feature.js'), /social\?\.push\('party', \{ name, text, mine: Number\(msg\.id\) === me\(\), at: Number\(msg\.at\) \|\| Date\.now\(\), playerId: Number\(msg\.id\) \|\| 0, rk: lineKey\(msg\.lid\) \}\)/);
     assert.match(src('js/player-im.js'), /playerId: mine \? 0 : Number\(line\.from\) \|\| 0/);
   });
