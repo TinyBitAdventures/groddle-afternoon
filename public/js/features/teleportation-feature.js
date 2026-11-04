@@ -635,6 +635,25 @@ export const teleportationFeature = {
     return null;
   },
 
+  /**
+   * Ticket 81 (the Projects panel's Teleport): a Teleportation Script in the pack that goes to
+   * `tsid` (an imbued one from a finished project, or one you wrote), read as its pack verb reads it.
+   * 'check' -> null when you hold none, else { ok, error, scriptId, imbued, energyCost }; 'go' reads it.
+   */
+  teleportScriptTo(action, tsid, engine) {
+    const want = String(tsid || '').replace(/^L/, 'G');
+    const script = want ? state.scripts.find((row) => String(row.destination?.tsid || '').replace(/^L/, 'G') === want) : null;
+    if (!script || !countItem(engine.inv, SCRIPT_CLASS)) return null;
+    if (action === 'go') return readAloud(engine, script.id);
+    if (action !== 'check') return null;
+    const pre = preflight(engine, script.destination);
+    if (!pre.ok) return { ok: false, error: pre.msg, scriptId: script.id, imbued: script.imbued };
+    const ctx = jumpCtx(engine);
+    const check = useScript(state, script.id, ctx);
+    const energyCost = script.imbued ? 0 : teleportEnergyCost(ctx.learned, TANK) || 0;
+    return { ok: check.ok, error: check.ok ? '' : check.error, scriptId: script.id, imbued: script.imbued, energyCost };
+  },
+
   mapCards(engine) {
     const card = buildMapCard(engine);
     return card ? [card] : [];

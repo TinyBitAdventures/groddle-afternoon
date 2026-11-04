@@ -15,7 +15,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { closedStreets, initializeStreetJobs, isJobBuilt, jobStatus, normalizeStreetJobState, roadClosure, streetHasOpenProject } from '../public/js/street-jobs.js?v=7381e03e';
+import { closedStreets, initializeStreetJobs, isJobBuilt, jobStatus, normalizeStreetJobState, roadClosure, streetHasOpenProject } from '../public/js/street-jobs.js?v=ccf76b74';
 import { projectTable } from '../tools/build-realtime-projects.mjs';
 import { serverPath, skipWithoutServer } from '../tools/repos.mjs';
 

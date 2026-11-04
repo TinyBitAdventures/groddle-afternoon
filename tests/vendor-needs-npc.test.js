@@ -16,8 +16,8 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { hotkeySections } from '../public/js/client-hotkeys.js?v=5a0e7cc7';
-import { MENU_ROWS, menuRowFor } from '../public/js/ui/topbar.js?v=7509db0a';
+import { hotkeySections } from '../public/js/client-hotkeys.js?v=b8b8b5b3';
+import { MENU_ROWS, menuRowFor } from '../public/js/ui/topbar.js?v=00387e52';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const read = (p) => readFileSync(join(here, '../public', p), 'utf8');

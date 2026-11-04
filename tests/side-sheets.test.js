@@ -9,7 +9,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { SIDE_SHEET_IDS, sheetKeyToWorld } from '../public/js/ui/panel-shell.js?v=6812fe04';
+import { SIDE_SHEET_IDS, sheetKeyToWorld } from '../public/js/ui/panel-shell.js?v=e2abdf9e';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const game = readFileSync(join(root, 'public/game.js'), 'utf8');
@@ -40,7 +40,7 @@ describe('side sheets are not modal', () => {
   });
 
   it('game.js: no side sheet blocks movement or makes the game busy; a text field still takes the keys', () => {
-    assert.deepEqual([...SIDE_SHEET_IDS], ['quest-panel', 'make-panel', 'achieve-panel', 'skills-panel', 'buffs-panel', 'feat-panel', 'vendor-panel']);
+    assert.deepEqual([...SIDE_SHEET_IDS], ['quest-panel', 'make-panel', 'achieve-panel', 'skills-panel', 'buffs-panel', 'feat-panel', 'vendor-panel', 'projects-panel']);
     const blocked = game.slice(game.indexOf('function gameplayInputBlocked() {'), game.indexOf('function publishJumpState('));
     for (const open of ['isQuestOpen()', 'isMakeOpen()', 'isAchieveOpen()', 'isSkillsOpen()', 'isBuffsOpen()', 'isFeatOpen()', 'isVendorOpen()']) {
       assert.ok(!blocked.includes(open), `${open} does not stop the avatar`);

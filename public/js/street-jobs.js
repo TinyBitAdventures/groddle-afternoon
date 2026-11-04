@@ -116,6 +116,8 @@ export function normalizeStreetJobState(seed = {}) {
     phasesContributed: list(src.phasesContributed),
     phaseWins: whole(src.phaseWins),
     trophiesGranted: list(src.trophiesGranted),
+    // Ticket 81: when the Projects panel was last open (ms); null until a save has one (the feature sets it).
+    trackerSeen: src.trackerSeen == null ? null : whole(src.trackerSeen),
   };
 }
 

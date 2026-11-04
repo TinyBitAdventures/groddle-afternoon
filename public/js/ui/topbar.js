@@ -48,6 +48,8 @@ export const MENU_ROWS = Object.freeze({
   'avatar-btn': { group: 'me', rank: 5, key: 'L' },
   'home-btn': { group: 'world', rank: 0 },
   'feat-btn': { group: 'world', rank: 1, key: 'H' },
+  // Ticket 81: the Projects panel (features/street-jobs-feature.js).
+  'projects-btn': { group: 'world', rank: 2, key: 'P' },
   'snaps-btn': { group: 'world', rank: 3 },
   'buddies-btn': { group: 'social', rank: 0 },
   'groups-btn': { group: 'social', rank: 1 },

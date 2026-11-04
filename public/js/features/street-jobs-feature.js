@@ -50,7 +50,7 @@ import { worldToScreen } from '../street-model.js?v=505d8990';
 import { signArmWidth } from '../street-render.js?v=9349c0e5';
 import { getSkillCatalog } from '../content-catalogs.js?v=10b118dd';
 import { GIANTS } from '../shrines.js?v=9d364845';
-import { teleportationFeature } from './teleportation-feature.js?v=bea1b608';
+import { teleportationFeature } from './teleportation-feature.js?v=3e397fee';
 import {
   SOLO_DIVISOR,
   WORK_UNIT_MS,
@@ -94,7 +94,7 @@ import {
   cancelJob,
   jobDivisor,
   upgradeOption,
-} from '../street-jobs.js?v=7381e03e';
+} from '../street-jobs.js?v=ccf76b74';
 import { gainMetabolic, loseEnergy } from '../metabolics.js?v=8504134e';
 import { closuresInTheWay, holdNote, placeIndex, questHold, reachableStreets } from '../quest-reach.js?v=a840235a';
 import { getQuestCatalog as questCatalog } from '../content-catalogs.js?v=10b118dd';
@@ -117,7 +117,7 @@ import {
   rowFromServer,
   sharedSlice,
   topLine,
-} from '../street-jobs-mp.js?v=8fa46a7d';
+} from '../street-jobs-mp.js?v=ab23c4df';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 import { createMinnAccount } from '../minn-account.js?v=eb300264';
 import { normalizeGroups } from '../groups.js?v=14b60589';
@@ -127,6 +127,9 @@ import { itemZ } from '../item-bands.js?v=e98b10bc';
 import { SIGN_ARMS, routeGraph } from '../map-routes.js?v=bcf2c347';
 import { TELEPORTERS } from '../hidden-floors.js?v=1de85d03';
 import { WINTRY_PORTAL_TELEPORTERS } from '../wintry-portal.js?v=1437deda';
+import { PROJECTS_TEXT, contributedJobs, mineTotal, projectList } from '../projects-tracker.js?v=054465e9';
+import { PROJECTS_PANEL_ID, buildProjectsPanel, renderProjects } from '../ui/projects-sheet.js?v=ea38bf0f';
+import { SIDE_SHEET_IDS } from '../ui/panel-shell.js?v=e2abdf9e';
 
 export const STREET_JOBS_FEATURE_ID = 'street-jobs';
 const BOARD_CLASS = 'street_job_board';
@@ -998,6 +1001,8 @@ const PANEL_CSS = `
 .sj-map-card img{width:24px;height:38px;object-fit:contain}
 .sj-map-card strong{display:block;font-size:var(--fs-md);color:var(--c-umber-33)}
 .sj-map-card span{display:block}
+.sj-map-card .sj-map-mine{margin-top:var(--sp-3);font:inherit;font-size:var(--fs-sm);font-weight:700;border-radius:var(--radius-md);border:1px solid var(--c-gold-78);background:var(--surface-bright);color:var(--c-umber-45);padding:.25rem .55rem;cursor:pointer}
+.sj-map-card .sj-map-mine:hover,.sj-map-card .sj-map-mine:focus-visible{background:var(--c-cream-96c)}
 .sj-hall{margin:var(--sp-1) 0 var(--sp-4);padding:.45rem var(--sp-5);border-radius:var(--radius-md);background:color-mix(in srgb, var(--surface-bright) 86%, transparent);border:1px solid var(--border);font-size:var(--fs-md);color:var(--c-sand-39)}
 .sj-hall p{margin:var(--sp-1) 0}
 .sj-hall .sj-hall-row{display:flex;flex-wrap:wrap;gap:var(--sp-3);align-items:center;margin-top:var(--sp-3)}
@@ -1437,7 +1442,9 @@ function createMp(engine, client) {
   };
   s.sync = () => {
     synced = client.street || '';
-    client.send('project_sync', {});
+    // Ticket 81: with the Projects panel open, the answer brings your projects too (project_mine).
+    if (pj.open) pj.asked = Date.now();
+    client.send('project_sync', pj.open ? { mine: true } : {});
   };
   client.on('hello', () => s.sync());
   client.on('roster', ({ street } = {}) => {
@@ -1451,10 +1458,23 @@ function createMp(engine, client) {
     drawBarricades(engine);
     refresh();
   });
+  // Ticket 81: the answer to project_sync with mine: every project of yours, anywhere (the whole list).
+  client.on('msg:project_mine', (msg) => {
+    clock(msg);
+    mineRows.clear();
+    for (const [wire, row] of Object.entries(msg.jobs || {})) {
+      const jobId = localOf(wire);
+      if (isSharedJob(catalog, jobId)) mineRows.set(jobId, rowFromServer(row, offset));
+    }
+    pj.answered = true;
+    projectsChanged(engine);
+  });
   client.on('msg:project_built', (msg) => {
     clock(msg);
     const jobId = String(msg.job || '');
     applyWorld(state, catalog, { built: { [jobId]: { at: msg.at, option: msg.option } }, rest: msg.rest }, offset);
+    if (mineRows.has(jobId)) mineRows.get(jobId).doneAt = localTime(msg.at, offset) || 1;
+    if (pj.open) askMine();
     const job = jobDef(catalog, jobId);
     if (work?.jobId === jobId) stopWork(engine, '');
     // locations/inc_jobs.js jobs_modify_connections: the road opens for everyone.
@@ -1472,6 +1492,7 @@ function createMp(engine, client) {
     for (const [wire, row] of Object.entries(msg.jobs || {})) {
       const jobId = localOf(wire);
       if (isSharedJob(catalog, jobId)) state.jobs[jobId] = rowFromServer(row, offset);
+      if (mineRows.has(jobId) || mineTotal(state.jobs[jobId]) > 0) mineRows.set(jobId, state.jobs[jobId]);
     }
     refresh();
   });
@@ -1483,10 +1504,13 @@ function createMp(engine, client) {
     if (msg.gone === true) {
       delete state.jobs[jobId];
       if (work?.jobId === jobId) stopWork(engine, '');
+      mineRows.delete(jobId);
       refresh();
       return;
     }
     state.jobs[jobId] = rowFromServer(msg.row, offset);
+    // Ticket 81: the Projects panel follows the board for a project of yours.
+    if (mineRows.has(jobId) || mineTotal(state.jobs[jobId]) > 0) mineRows.set(jobId, state.jobs[jobId]);
     if (work?.mp && work.jobId === jobId && !work.awaiting) {
       const req = phaseRequirements(state, catalog, jobId).find((r) => r.id === work.rid);
       if (!req || !req.open) stopWork(engine, '');
@@ -1495,7 +1519,10 @@ function createMp(engine, client) {
   });
   client.on('msg:project_given', (msg) => applyGiven(msg));
   client.on('msg:project_worked', (msg) => mpWorked(engine, msg));
-  client.on('msg:project_reward', (msg) => applyReward(msg));
+  client.on('msg:project_reward', (msg) => {
+    applyReward(msg);
+    if (pj.open) askMine();
+  });
   client.on('msg:project_expired', (msg) => applyExpired(msg));
   client.on('error', ({ code, message } = {}) => {
     if (code !== 'project' || !message) return;
@@ -1916,6 +1943,271 @@ function publish(engine) {
     const hall = head && jobDef(catalog, head.jobId)?.kind === 'hall' ? row?.hall : null;
     engine.setData('streetJobHall', hall ? `${hall.owned ? 'owned' : hall.claimed ? 'claimed' : hall.claiming ? 'claiming' : 'open'}:${hall.group?.name || ''}` : '');
   }
+  projectsChanged(engine);
+}
+
+/* ------------------------------------------------------------------ */
+/* Projects panel (ticket 81)                                           */
+/* ------------------------------------------------------------------ */
+
+/*
+ * Ticket 81 (G520): the Projects panel lists every street project you have put something into
+ * (js/projects-tracker.js has the data and the source notes, js/ui/projects-sheet.js the panel).
+ * Solo reads the save's rows. Online asks the realtime server for your rows on every street
+ * (project_sync with mine: project_mine, projects.go), keeps them in `mineRows`, and follows the
+ * board messages for them; a server without it answers the sync as before, and the panel shows
+ * what this page knows. Opened from the Menu (Projects), P, and the Map's "Street projects here".
+ * A project that finished since you last opened the panel has a quiet dot on the Menu row and the
+ * Menu button, and a New mark in the panel until it closes (state.trackerSeen); nothing else is said.
+ */
+const mineRows = new Map();
+const pj = { panel: null, btn: null, dot: null, open: false, sessionSeen: 0, sig: '', badge: -1, asked: 0, answered: false, openNeeds: new Set(), last: '' };
+
+/** The rows the panel reads: the save's in solo; online the server's list, then this page's live board rows. */
+function trackerRows() {
+  if (!mpMode) return state.jobs;
+  const rows = {};
+  for (const [id, row] of mineRows) rows[id] = row;
+  for (const [id, row] of Object.entries(state.jobs || {})) {
+    if (rows[id] || !isSharedJob(catalog, id)) continue;
+    // A finished project the world told of (project_world: when, not who): partial, its share unknown.
+    rows[id] = mineTotal(row) > 0 ? row : { ...row, partial: true };
+  }
+  return rows;
+}
+
+/** A street's name, region and map hub (assets/streets/index.json). */
+const streetMeta = (tsid) => {
+  const g = String(tsid || '').replace(/^L/, 'G');
+  const meta = streetIndex?.streets?.[g];
+  return { tsid: g, label: meta?.label || g, hubId: String(meta?.hubId || ''), hubName: meta?.hubName || '' };
+};
+
+function trackerList(engine, seenAt) {
+  if (!catalog) return { active: [], done: [], fresh: 0 };
+  const rows = trackerRows();
+  const known = {};
+  // Only rows the board would read: a world-only row (doneAt, no share) still lists a job you joined.
+  for (const [id, row] of Object.entries(rows)) known[id] = row?.partial && !row.doneAt ? null : row;
+  const list = projectList(state, catalog, known, {
+    now: Date.now(),
+    opts: opts(),
+    seenAt,
+    closed: closedStreets(state, catalog, opts()),
+    labels: { item: (cls, n) => itemLabel(cls, n), skill: skillLabel },
+  });
+  for (const e of [...list.active, ...list.done]) {
+    if (known[e.jobId]?.partial) e.known = false;
+    const where = streetMeta(e.place);
+    e.placeLabel = where.label;
+    e.placeTip = e.finished ? `A guided path to ${where.label}` : `A guided path to the project board on ${where.label}`;
+  }
+  return list;
+}
+
+/** How many projects of yours finished since you last looked (the Menu's dot). */
+function freshCount() {
+  if (!catalog) return 0;
+  const seen = Number(state.trackerSeen) || 0;
+  const rows = trackerRows();
+  let n = 0;
+  for (const id of contributedJobs(state, catalog, rows)) {
+    const at = Number(rows[id]?.doneAt || state.jobs[id]?.doneAt) || 0;
+    if (at > seen) n += 1;
+  }
+  return n;
+}
+
+function mountProjects(engine) {
+  if (pj.panel || typeof document === 'undefined' || !document.getElementById) return;
+  const root = document.getElementById('game-root');
+  if (!root) return;
+  pj.panel = buildProjectsPanel(document, root);
+  pj.panel.querySelector('#projects-close')?.addEventListener('click', () => closeProjects(engine));
+  engine.panelShell?.add?.({ id: PROJECTS_PANEL_ID, close: () => closeProjects(engine) });
+  // Classic has no panel shell: one 2012 window at a time, as opening Quests closes the rest there.
+  if (typeof MutationObserver === 'function') {
+    const watch = new MutationObserver(() => {
+      if (!pj.open || engine.panelShell) return;
+      if (SIDE_SHEET_IDS.some((id) => id !== PROJECTS_PANEL_ID && document.getElementById(id) && !document.getElementById(id).hidden)) closeProjects(engine);
+    });
+    for (const id of SIDE_SHEET_IDS) {
+      const node = document.getElementById(id);
+      if (node) watch.observe(node, { attributes: true, attributeFilter: ['hidden'] });
+    }
+  }
+  const menu = document.getElementById('more-list');
+  if (menu && !document.getElementById('projects-btn')) {
+    pj.btn = document.createElement('button');
+    pj.btn.id = 'projects-btn';
+    pj.btn.type = 'button';
+    pj.btn.className = 'chrome-btn';
+    pj.btn.title = 'Your street projects (P)';
+    pj.btn.textContent = PROJECTS_TEXT.title;
+    pj.dot = document.createElement('span');
+    pj.dot.className = 'pj-dot';
+    pj.dot.dataset.projectsNew = '';
+    pj.dot.hidden = true;
+    pj.dot.setAttribute('aria-hidden', 'true');
+    pj.btn.append(pj.dot);
+    pj.btn.addEventListener('click', () => {
+      document.getElementById('more-list')?.setAttribute('hidden', '');
+      document.getElementById('more-btn')?.setAttribute('aria-expanded', 'false');
+      toggleProjects(engine);
+    });
+    menu.append(pj.btn);
+  }
+}
+
+/** Online: ask the server for your projects (at most every 2 s; the answer is project_mine). */
+function askMine(force = false) {
+  if (!mp?.client) return false;
+  const now = Date.now();
+  if (!force && now - pj.asked < 2000) return false;
+  pj.asked = now;
+  return mp.client.send('project_sync', { mine: true });
+}
+
+function openProjects(engine) {
+  if (!catalog) {
+    load().then(() => catalog && openProjects(engine));
+    return;
+  }
+  mountProjects(engine);
+  if (!pj.panel) return;
+  if (!engine.panelShell) engine.closeContentPanels?.();
+  pj.open = true;
+  // The New marks hold while the panel is open; the dot goes now.
+  pj.sessionSeen = Number(state.trackerSeen) || 0;
+  state.trackerSeen = Date.now();
+  engine.save?.();
+  pj.sig = '';
+  pj.panel.hidden = false;
+  if (mpMode) {
+    ensureMp(engine);
+    askMine(true);
+  }
+  renderProjectsPanel(engine);
+  syncProjectsBadge(engine);
+}
+
+function closeProjects(engine) {
+  if (!pj.panel || pj.panel.hidden) {
+    pj.open = false;
+    return false;
+  }
+  pj.panel.hidden = true;
+  pj.open = false;
+  // Anything that finished while it was open was seen.
+  state.trackerSeen = Date.now();
+  engine?.save?.();
+  syncProjectsBadge(engine);
+  engine?.setData?.('projectsOpen', '');
+  return true;
+}
+
+function toggleProjects(engine) {
+  if (pj.open && pj.panel && !pj.panel.hidden) closeProjects(engine);
+  else openProjects(engine);
+}
+
+/** The Teleport button: the Map's Teleport Here rule, else a Teleportation Script to the street; hidden with neither. */
+function projectTeleport(engine, e) {
+  if (!e.place || e.place === engine.streetTsid) return null;
+  const target = streetMeta(e.place);
+  // The Map's Teleport Here needs Teleportation IV (js/teleportation.js canMapTeleport); without it only a script can.
+  const rank4 = (engine.learnedSkills || []).some((id) => /^teleportation_[45]$/.test(id));
+  const map = rank4 ? engine.query?.('mapTeleport', 'check', target, engine) || null : null;
+  if (map?.ok) return { show: true, ok: true, how: 'map', label: map.energyCost ? `${PROJECTS_TEXT.teleport} · ${map.energyCost} energy` : PROJECTS_TEXT.teleport, tip: map.tooltip || '' };
+  const script = engine.query?.('teleportScriptTo', 'check', e.place, engine) || null;
+  if (script) return { show: true, ok: script.ok, how: 'script', label: script.energyCost ? `Read Script · ${script.energyCost} energy` : 'Read Script', reason: script.error, tip: `Your Teleportation Script to ${target.label}` };
+  // No Teleportation IV and no script: no button (the Map greys its row, the panel leaves it out).
+  if (!map) return null;
+  return { show: true, ok: false, how: 'map', label: PROJECTS_TEXT.teleport, reason: map.error || '' };
+}
+
+function projectAction(engine, act, e) {
+  const where = streetMeta(e.place);
+  pj.last = `${act}:${e.jobId}:${where.tsid}`;
+  engine.setData?.('projectsLast', pj.last);
+  if (act === 'map') {
+    closeProjects(engine);
+    if (where.hubId) engine.openMap?.(where.hubId, { find: where.tsid });
+    else engine.openMap?.();
+    return;
+  }
+  if (act === 'teleport') {
+    const tp = projectTeleport(engine, e);
+    if (!tp?.ok) {
+      if (tp?.reason) engine.toast(tp.reason, 3200);
+      return;
+    }
+    const went = tp.how === 'script'
+      ? engine.query?.('teleportScriptTo', 'go', e.place, engine)
+      : engine.query?.('mapTeleport', 'go', where, engine);
+    if (went) closeProjects(engine);
+    return;
+  }
+  if (act === 'route') {
+    if (where.tsid === engine.streetTsid) {
+      engine.toast(e.finished ? `You are on ${where.label}.` : `The project board is here on ${where.label}.`, 2600);
+      return;
+    }
+    const res = engine.query?.('mapRoute', 'set', { to: where.tsid, source: 'player' }, engine);
+    if (res && res.ok === false) {
+      // Routes never go through a closed road (js/map-routes.js findRoute): say which street is in the way.
+      const through = (Array.isArray(res.through) ? res.through : []).map((t) => streetJobsFeature.streetUnderConstruction(t, engine)).find(Boolean);
+      engine.toast(through ? `No open road leads to ${where.label} yet: the way runs through ${through.label}, which is still under construction. ${through.note}` : res.error || 'No path to there.', 6000);
+      return;
+    }
+    engine.pushActivity(`Destination set: ${where.label}.`);
+    engine.toast(`Destination set: ${where.label}.`, 2600);
+  }
+}
+
+function renderProjectsPanel(engine) {
+  if (!pj.panel || pj.panel.hidden || !catalog) return;
+  const list = trackerList(engine, pj.sessionSeen);
+  const tps = new Map();
+  const teleport = (e) => {
+    if (!tps.has(e.jobId)) tps.set(e.jobId, projectTeleport(engine, e));
+    return tps.get(e.jobId);
+  };
+  let meta = mpMode ? PROJECTS_TEXT.online : PROJECTS_TEXT.solo;
+  if (mpMode && (!mp || mp.client?.state !== 'online')) meta = PROJECTS_TEXT.offline;
+  else if (mpMode && !pj.answered && list.active.some((e) => !e.known)) meta = PROJECTS_TEXT.loading;
+  // Redraw only when something shown changed: a redraw would take the focus off a button.
+  const sig = JSON.stringify([
+    meta,
+    ...[...list.active, ...list.done].map((e) => [e.jobId, e.status, e.phase, Math.round(e.progress * 1000), e.known, e.isNew, e.doneAt ? agoMinute(e.doneAt) : 0, e.needs.map((n) => `${n.id}:${n.left}:${n.open}`).join(','), e.shares.map((s) => Math.round(s.share * 100)).join(','), JSON.stringify(teleport(e)), e.place]),
+  ]);
+  if (sig !== pj.sig) {
+    pj.sig = sig;
+    renderProjects(document, list, { meta, teleport, onAction: (act, e) => projectAction(engine, act, e), openNeeds: pj.openNeeds });
+  }
+  engine.setData?.('projectsOpen', '1');
+  engine.setData?.('projectsCount', `${list.active.length}/${list.done.length}`);
+  engine.setData?.('projectsNewShown', String(list.fresh));
+  engine.setData?.('projectsSource', mpMode ? (pj.answered ? 'server' : 'local') : 'solo');
+}
+
+/** Minutes since a time, for the redraw check ("5 min ago" moves on). */
+const agoMinute = (t) => Math.floor((Date.now() - t) / 60000);
+
+function syncProjectsBadge(engine) {
+  const n = pj.open ? 0 : freshCount();
+  if (n === pj.badge) return;
+  pj.badge = n;
+  if (pj.dot) pj.dot.hidden = n === 0;
+  if (pj.btn) pj.btn.setAttribute('aria-label', n ? `${PROJECTS_TEXT.title}, ${n} finished since you last looked` : PROJECTS_TEXT.title);
+  engine?.setData?.('projectsNew', String(n));
+}
+
+/** After any change to the board's state: the badge, and the open panel when it shows something new. */
+function projectsChanged(engine) {
+  if (!engine || !catalog) return;
+  syncProjectsBadge(engine);
+  if (pj.open) renderProjectsPanel(engine);
 }
 
 /* ------------------------------------------------------------------ */
@@ -1933,7 +2225,9 @@ export const streetJobsFeature = {
   init(engine) {
     engineRef = engine;
     mpMode = engine?.mode === 'multiplayer';
-    load();
+    if (state.trackerSeen == null) state.trackerSeen = Date.now();
+    mountProjects(engine);
+    load().then(() => projectsChanged(engine));
   },
 
   save() {
@@ -1944,6 +2238,11 @@ export const streetJobsFeature = {
 
   restore(slice, engine) {
     state = normalizeStreetJobState(slice || {});
+    // Ticket 81: a save from before the Projects panel counts what finished before as seen.
+    if (state.trackerSeen == null) state.trackerSeen = Date.now();
+    mineRows.clear();
+    pj.answered = false;
+    pj.badge = -1;
     if (engine) mpMode = engine.mode === 'multiplayer';
     mpLists = mpMode ? listsFrom(slice) : { applied: [], rewarded: [] };
     mpMigrated = false;
@@ -2125,7 +2424,26 @@ export const streetJobsFeature = {
     text.append(el('strong', {}, 'Street projects here'), el('span', {}, rows.map((r) => `${jobDef(catalog, r.jobId).title} (${r.status})`).join(' · ')));
     head.append(icon, text);
     card.append(head);
+    // Ticket 81: every project of yours, from here.
+    const mine = el('button', { type: 'button', class: 'sj-map-mine', dataset: { sjMine: '' } }, 'Your projects (P)');
+    mine.addEventListener('click', () => {
+      engine.closeMap?.();
+      openProjects(engine);
+    });
+    card.append(mine);
     return [card];
+  },
+
+  /**
+   * Ticket 81: the Projects panel ('open' | 'close' | 'toggle' | 'isOpen'), for game.js's P key,
+   * Escape and the panel closers.
+   */
+  projectsPanel(action, engine) {
+    if (action === 'open') return openProjects(engine), true;
+    if (action === 'toggle') return toggleProjects(engine), true;
+    if (action === 'close') return closeProjects(engine);
+    if (action === 'isOpen') return Boolean(pj.open && pj.panel && !pj.panel.hidden);
+    return null;
   },
 
   /** QA / tests. */

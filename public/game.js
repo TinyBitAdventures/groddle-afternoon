@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=2e6bc3fd';
 import { createFeatureHost } from './js/feature-host.js?v=2ed3c069';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=d9d494ac';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=aac194eb';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -918,7 +918,7 @@ import { installHiresIcons } from './js/icon-hires.js?v=5b68aeaa';
 import { installHiresDecos } from './js/deco-hires.js?v=cb905e17';
 import { loadAudioLevels, loadMutedPreference, saveAudioLevel, saveMutedPreference } from './js/audio-pref.js?v=6fe817bc';
 import { createAudioBuses, fadeGain } from './js/audio-buses.js?v=af167b54';
-import { installTopBar, renderTopBar } from './js/ui/topbar.js?v=7509db0a';
+import { installTopBar, renderTopBar } from './js/ui/topbar.js?v=00387e52';
 import { focusBack, installFocusReturn, lastInput } from './js/ui/focus-return.js?v=da190597';
 import { installContextGuard } from './js/ui/context-guard.js?v=0f71ac17';
 import { QUOIN_FRAME_BOB, advanceQuoinClock, quoinBobBetweenFrames } from './js/quoin-motion.js?v=ea0bd408';
@@ -930,14 +930,14 @@ import { holdMs } from './js/read-time.js?v=60ae7efc';
 import { mountNotifyView } from './js/notify-view.js?v=2835afc0';
 import { mountSocialDrawer } from './js/ui/social-drawer.js?v=80af6a15';
 import { bindDragScroll } from './js/ui/drag-scroll.js?v=9a527ac8';
-import { SIDE_SHEET_IDS, bindTabs, inSideSheet, mountPanelShell, sheetKeyToWorld } from './js/ui/panel-shell.js?v=6812fe04';
+import { SIDE_SHEET_IDS, bindTabs, inSideSheet, mountPanelShell, sheetKeyToWorld } from './js/ui/panel-shell.js?v=e2abdf9e';
 import { createQuestSheet, questStep } from './js/ui/quest-sheet.js?v=3bf54502';
 import { createQuestTracker } from './js/ui/quest-tracker.js?v=8f823ac2';
 import { bindContextTrigger, createContextMenu, isContextMenuKey as isMenuKey, MORE_KEYS_LABEL } from './js/ui/context-menu.js?v=57c5f1fe';
 import { bindCountField, countKeyValue, countStepMarkup, typedCount } from './js/ui/count-chooser.js?v=b8361b21';
 import { bindVerbMenu, fitVerbMenuRows, focusVerbRow, lockVerbMenuSize, makePickTile, makeVerbRow, pickGridCols, placeVerbMenu, plainWords, refuseVerbRow, syncVerbDetail, verbMenuKey, verbRowAttrs, verbRowInner, verbRowKeys } from './js/ui/verb-menu.js?v=6cc4df84';
 import { createPromptSettler, promptId } from './js/prompt-settle.js?v=509ba9cc';
-import { clientKeyAction, createHotkeysSheet, isHotkeySheetRelease, isPlainKey } from './js/client-hotkeys.js?v=5a0e7cc7';
+import { clientKeyAction, createHotkeysSheet, isHotkeySheetRelease, isPlainKey } from './js/client-hotkeys.js?v=b8b8b5b3';
 import { EAT_PICK_TEXT, bestFoodIndex, eatChoices, eatTip } from './js/eat-pick.js?v=8fb763d0';
 import { installHeldKeyGuard, isMacPlatform } from './js/held-keys.js?v=98b96620';
 import { signpostArmRows, worldContextAction } from './js/world-context-menu.js?v=f3f48805';
@@ -11939,8 +11939,10 @@ const engine = {
   travelGate: (tsid, meta) => features.travelGate(tsid, engine, meta),
   /** Every feature's metabolic gate, e.g. the dead gain no energy. */
   metabolicGate: (stat, direction) => features.metabolicGate(stat, direction, engine),
-  openMap: (hubId) => openMap(hubId),
+  openMap: (hubId, opts) => openMap(hubId, opts),
   closeMap: () => closeMap(),
+  /** Ticket 81: the content panels close (Classic's Projects window opens alone, as Quests does). */
+  closeContentPanels: () => closeContentPanels(),
   /** QA routes: learn a skill outright (prerequisites skipped). */
   grantSkill: (classTsid) => grantSkill(skillState, classTsid, true),
   /** Austin 2026-11-01: true while a number key would take an arm of the post at hand (hi-signs keeps 5 for that). */
@@ -24248,7 +24250,17 @@ function isMapOpen() {
   return panel && !panel.hidden;
 }
 
+/** Ticket 81: the Projects panel (features/street-jobs-feature.js projectsPanel, js/ui/projects-sheet.js). */
+function isProjectsOpen() {
+  return features.query('projectsPanel', 'isOpen', engine) === true;
+}
+
+function closeProjectsPanel() {
+  features.query('projectsPanel', 'close', engine);
+}
+
 function closeContentPanels() {
+  closeProjectsPanel();
   closeQuestPanel();
   closeAchievePanel();
   closeFeatPanel();
@@ -24728,6 +24740,7 @@ const PANEL_CLOSERS = Object.freeze({
   'feat-panel': () => closeFeatPanel(),
   'skills-panel': () => closeSkillsPanel(),
   'buffs-panel': () => closeBuffsPanel(),
+  'projects-panel': () => closeProjectsPanel(),
   'make-panel': () => closeMakePanel(),
   'garden-panel': () => closeGardenPanel(),
   'avatar-panel': () => closeAvatarPanel(),
@@ -24775,6 +24788,7 @@ function escapeHasWork() {
     isFeatOpen() ||
     isSkillsOpen() ||
     isBuffsOpen() ||
+    isProjectsOpen() ||
     isMakeOpen() ||
     isGardenOpen() ||
     isAvatarOpen() ||
@@ -29544,6 +29558,7 @@ async function main() {
       closeFeatPanel();
       closeSkillsPanel();
       closeBuffsPanel();
+      closeProjectsPanel();
       closeMakePanel();
       closeGardenPanel();
       closeAvatarPanel();
@@ -29633,12 +29648,15 @@ async function main() {
       isFeatOpen() ||
       isSkillsOpen() ||
       isBuffsOpen() ||
+      isProjectsOpen() ||
       isMakeOpen() ||
       isGardenOpen() ||
       isAvatarOpen() ||
       isShrineOpen()
     ) {
       if (e.key === 'q' || e.key === 'Q') closeQuestPanel();
+      // Ticket 81: P closes the Projects panel it opened.
+      if (isPlainKey(e, 'p') && !e.repeat) closeProjectsPanel();
       if (e.key === 'b' || e.key === 'B') closeAchievePanel();
       if (e.key === 'h' || e.key === 'H') closeFeatPanel();
       // G254: Shift+K is the keyring and Shift+L only opens the looks (TSMainView.as
@@ -29755,6 +29773,9 @@ async function main() {
     // (TSMainView.as 790-800) only starts Camera Mode, and where Camera Mode cannot start
     // (a quest instance, a verb, a panel) C does nothing, so it never falls through to Make.
     if (isPlainKey(e, 'n')) openMakePanel();
+    // Ticket 81 (G520): P opens the Projects panel, your street projects. P was free here and in the
+    // client (TSMainView.as startListeningtoKeys 637-661 has no P).
+    if (isPlainKey(e, 'p') && !e.repeat) features.query('projectsPanel', 'open', engine);
     // Austin 2026-11-02: a store opens only from its vendor's verbs, as in the original
     // (street_spirit.js buy_sell -> inc_stores.js openStoreInterface). VENDORKEY (Austin, later that
     // day, ticket 42): V runs a vendor in reach's own Browse goods; the client had no store key

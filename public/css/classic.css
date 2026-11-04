@@ -1643,7 +1643,7 @@
    the 20 px title; the body a #ececec well between #d2d2d2 rules; the red 10 x 10 cross in a white
    30 x 30 square, 16 in from the top right. Widths: Quests 615, Map 764 (spec §12b); Skills, Buffs
    and Badges, which have no 2012 width, take the Quest Log's. */
-:root[data-ui="classic"] #game-root :is(#skills-panel, #buffs-panel, #achieve-panel, #quest-panel, #map-panel, #make-panel):not([hidden]) {
+:root[data-ui="classic"] #game-root :is(#skills-panel, #buffs-panel, #achieve-panel, #quest-panel, #projects-panel, #map-panel, #make-panel):not([hidden]) {
   position: absolute;
   inset: 0 0 auto 0;
   height: var(--cvh);
@@ -1659,7 +1659,7 @@
   pointer-events: none;
   transform: none;
 }
-:root[data-ui="classic"] #game-root :is(#skills-panel, #buffs-panel, #achieve-panel, #quest-panel) > .side-card,
+:root[data-ui="classic"] #game-root :is(#skills-panel, #buffs-panel, #achieve-panel, #quest-panel, #projects-panel) > .side-card,
 :root[data-ui="classic"] #game-root #make-panel > .make-card,
 :root[data-ui="classic"] #game-root #map-panel > .map-card {
   position: relative;
@@ -1684,7 +1684,7 @@
   animation: classic-fade 0.2s linear;
 }
 :root[data-ui="classic"] #game-root #map-panel > .map-card { width: min(calc(764 * var(--cu)), 100%); }
-:root[data-ui="classic"] #game-root :is(#skills-panel, #buffs-panel, #achieve-panel, #quest-panel, #map-panel, #make-panel) :is(.side-head, .map-head, .ui-sheet-head) {
+:root[data-ui="classic"] #game-root :is(#skills-panel, #buffs-panel, #achieve-panel, #quest-panel, #projects-panel, #map-panel, #make-panel) :is(.side-head, .map-head, .ui-sheet-head) {
   flex: none;
   display: flex;
   align-items: center;
@@ -1695,18 +1695,18 @@
   border: 0;
   background: var(--c-classic-panel);
 }
-:root[data-ui="classic"] #game-root :is(#skills-panel, #buffs-panel, #achieve-panel, #quest-panel, #map-panel, #make-panel) :is(.side-head, .map-head, .ui-sheet-head) h2 {
+:root[data-ui="classic"] #game-root :is(#skills-panel, #buffs-panel, #achieve-panel, #quest-panel, #projects-panel, #map-panel, #make-panel) :is(.side-head, .map-head, .ui-sheet-head) h2 {
   margin: 0;
   color: var(--c-classic-title);
   font: 800 calc(var(--fs-classic-window) * var(--cu-n, 1))/var(--lh-tight) var(--font-classic-title);
 }
-:root[data-ui="classic"] #game-root :is(#skills-panel, #buffs-panel, #achieve-panel, #quest-panel, #map-panel, #make-panel) .kcap { display: none; }
+:root[data-ui="classic"] #game-root :is(#skills-panel, #buffs-panel, #achieve-panel, #quest-panel, #projects-panel, #map-panel, #make-panel) .kcap { display: none; }
 /* The title leads the head (the Quests sheet put it after its icon and pushed it right). */
-:root[data-ui="classic"] #game-root :is(#skills-panel, #buffs-panel, #achieve-panel, #quest-panel, #map-panel, #make-panel) :is(.side-head, .map-head, .ui-sheet-head) { justify-content: flex-start; }
-:root[data-ui="classic"] #game-root :is(#skills-panel, #buffs-panel, #achieve-panel, #quest-panel, #map-panel, #make-panel) :is(.side-head, .map-head, .ui-sheet-head) h2 { order: 0; flex: 0 1 auto; text-align: left; }
-:root[data-ui="classic"] #game-root :is(#skills-panel, #buffs-panel, #achieve-panel, #quest-panel, #map-panel, #make-panel) :is(.side-head, .map-head, .ui-sheet-head) h2:is(:focus:not(:focus-visible), [tabindex="-1"]:focus) { outline: none; } /* a title takes focus to be read out, not to be used */
+:root[data-ui="classic"] #game-root :is(#skills-panel, #buffs-panel, #achieve-panel, #quest-panel, #projects-panel, #map-panel, #make-panel) :is(.side-head, .map-head, .ui-sheet-head) { justify-content: flex-start; }
+:root[data-ui="classic"] #game-root :is(#skills-panel, #buffs-panel, #achieve-panel, #quest-panel, #projects-panel, #map-panel, #make-panel) :is(.side-head, .map-head, .ui-sheet-head) h2 { order: 0; flex: 0 1 auto; text-align: left; }
+:root[data-ui="classic"] #game-root :is(#skills-panel, #buffs-panel, #achieve-panel, #quest-panel, #projects-panel, #map-panel, #make-panel) :is(.side-head, .map-head, .ui-sheet-head) h2:is(:focus:not(:focus-visible), [tabindex="-1"]:focus) { outline: none; } /* a title takes focus to be read out, not to be used */
 /* The close: a white 30 x 30 square with the red cross (Dialog.as 221-243). */
-:root[data-ui="classic"] #game-root :is(#skills-panel, #buffs-panel, #achieve-panel, #quest-panel, #map-panel, #make-panel) :is(.side-head, .map-head, .ui-sheet-head) .verb-menu-x {
+:root[data-ui="classic"] #game-root :is(#skills-panel, #buffs-panel, #achieve-panel, #quest-panel, #projects-panel, #map-panel, #make-panel) :is(.side-head, .map-head, .ui-sheet-head) .verb-menu-x {
   position: absolute;
   top: calc(6 * var(--cu));
   right: calc(16 * var(--cu));
@@ -1723,8 +1723,8 @@
   font-size: 0;
   cursor: pointer;
 }
-:root[data-ui="classic"] #game-root :is(#skills-panel, #buffs-panel, #achieve-panel, #quest-panel, #map-panel, #make-panel) :is(.side-head, .map-head, .ui-sheet-head) .verb-menu-x::before,
-:root[data-ui="classic"] #game-root :is(#skills-panel, #buffs-panel, #achieve-panel, #quest-panel, #map-panel, #make-panel) :is(.side-head, .map-head, .ui-sheet-head) .verb-menu-x::after {
+:root[data-ui="classic"] #game-root :is(#skills-panel, #buffs-panel, #achieve-panel, #quest-panel, #projects-panel, #map-panel, #make-panel) :is(.side-head, .map-head, .ui-sheet-head) .verb-menu-x::before,
+:root[data-ui="classic"] #game-root :is(#skills-panel, #buffs-panel, #achieve-panel, #quest-panel, #projects-panel, #map-panel, #make-panel) :is(.side-head, .map-head, .ui-sheet-head) .verb-menu-x::after {
   content: "";
   position: absolute;
   left: 50%;
@@ -1734,11 +1734,11 @@
   background: var(--c-classic-close);
   transform: translate(-50%, -50%) rotate(45deg);
 }
-:root[data-ui="classic"] #game-root :is(#skills-panel, #buffs-panel, #achieve-panel, #quest-panel, #map-panel, #make-panel) :is(.side-head, .map-head, .ui-sheet-head) .verb-menu-x::after { transform: translate(-50%, -50%) rotate(-45deg); }
-:root[data-ui="classic"] #game-root :is(#skills-panel, #buffs-panel, #achieve-panel, #quest-panel, #map-panel, #make-panel) :is(.side-head, .map-head, .ui-sheet-head) .verb-menu-x:hover { box-shadow: inset 0 0 6px var(--c-classic-close-hover); }
-:root[data-ui="classic"] #game-root :is(#skills-panel, #buffs-panel, #achieve-panel, #quest-panel, #map-panel, #make-panel) :is(.side-head, .map-head, .ui-sheet-head) .verb-menu-x:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--c-classic-focus); }
+:root[data-ui="classic"] #game-root :is(#skills-panel, #buffs-panel, #achieve-panel, #quest-panel, #projects-panel, #map-panel, #make-panel) :is(.side-head, .map-head, .ui-sheet-head) .verb-menu-x::after { transform: translate(-50%, -50%) rotate(-45deg); }
+:root[data-ui="classic"] #game-root :is(#skills-panel, #buffs-panel, #achieve-panel, #quest-panel, #projects-panel, #map-panel, #make-panel) :is(.side-head, .map-head, .ui-sheet-head) .verb-menu-x:hover { box-shadow: inset 0 0 6px var(--c-classic-close-hover); }
+:root[data-ui="classic"] #game-root :is(#skills-panel, #buffs-panel, #achieve-panel, #quest-panel, #projects-panel, #map-panel, #make-panel) :is(.side-head, .map-head, .ui-sheet-head) .verb-menu-x:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--c-classic-focus); }
 /* The body: the grey well between two rules, scrolling inside the window (BigDialog.as 41-42). */
-:root[data-ui="classic"] #game-root :is(#skills-panel, #buffs-panel, #achieve-panel, #quest-panel) > .side-card > :not(.side-head),
+:root[data-ui="classic"] #game-root :is(#skills-panel, #buffs-panel, #achieve-panel, #quest-panel, #projects-panel) > .side-card > :not(.side-head),
 :root[data-ui="classic"] #game-root #make-panel > .make-card > :not(.ui-sheet-head),
 :root[data-ui="classic"] #game-root #map-panel > .map-card > :not(.map-head) {
   margin: 0;
@@ -1746,14 +1746,14 @@
   padding-right: calc(20 * var(--cu));
   background: var(--c-classic-well);
 }
-:root[data-ui="classic"] #game-root :is(#skills-panel, #buffs-panel, #achieve-panel, #quest-panel) > .side-card > .side-head + *,
+:root[data-ui="classic"] #game-root :is(#skills-panel, #buffs-panel, #achieve-panel, #quest-panel, #projects-panel) > .side-card > .side-head + *,
 :root[data-ui="classic"] #game-root #make-panel > .make-card > .ui-sheet-head + *,
 :root[data-ui="classic"] #game-root #map-panel > .map-card > .map-head + * { border-top: 1px solid var(--c-classic-rule); padding-top: calc(10 * var(--cu)); }
-:root[data-ui="classic"] #game-root :is(#skills-panel, #buffs-panel, #achieve-panel, #quest-panel) > .side-card > :last-child,
+:root[data-ui="classic"] #game-root :is(#skills-panel, #buffs-panel, #achieve-panel, #quest-panel, #projects-panel) > .side-card > :last-child,
 :root[data-ui="classic"] #game-root #make-panel > .make-card > :last-child,
 :root[data-ui="classic"] #game-root #map-panel > .map-card > :last-child { flex: 1 1 auto; min-height: 0; overflow-y: auto; padding-bottom: calc(12 * var(--cu)); border-bottom: 1px solid var(--c-classic-rule); }
-:root[data-ui="classic"] #game-root :is(#skills-panel, #buffs-panel, #achieve-panel, #quest-panel) .quest-log-body { margin-top: 0; }
-:root[data-ui="classic"] #game-root :is(#skills-panel, #buffs-panel, #achieve-panel, #quest-panel) .panel-meta { color: var(--c-classic-offline); }
+:root[data-ui="classic"] #game-root :is(#skills-panel, #buffs-panel, #achieve-panel, #quest-panel, #projects-panel) .quest-log-body { margin-top: 0; }
+:root[data-ui="classic"] #game-root :is(#skills-panel, #buffs-panel, #achieve-panel, #quest-panel, #projects-panel) .panel-meta { color: var(--c-classic-offline); }
 /* The Quest Log's tabs and the Map's region picker on the head's line, as small minor buttons. */
 :root[data-ui="classic"] #game-root #quest-panel .ui-sheet-tabs button,
 :root[data-ui="classic"] #game-root :is(#achieve-panel) .badge-status-filters button {
@@ -1829,7 +1829,7 @@
   font-size: 0;
 }
 @media (prefers-reduced-motion: reduce) {
-  :root[data-ui="classic"] #game-root :is(#skills-panel, #buffs-panel, #achieve-panel, #quest-panel) > .side-card,
+  :root[data-ui="classic"] #game-root :is(#skills-panel, #buffs-panel, #achieve-panel, #quest-panel, #projects-panel) > .side-card,
   :root[data-ui="classic"] #game-root #map-panel > .map-card { animation: none; }
 }
 
@@ -1837,16 +1837,16 @@
    frames (--fs-classic-row 14, --fs-classic-row-title 16, --fs-classic-button 13, the 22 px title;
    all FROM FRAME in the token block), scaled with u. Rows sit on the grey well with the Quest Log's
    1 px #e2e2e2 dividers; buttons are the client's minor buttons, 29 tall in the footer. */
-:root[data-ui="classic"] #game-root :is(#skills-panel, #buffs-panel, #achieve-panel, #quest-panel, #map-panel, #make-panel) :is(.side-card, .map-card, .make-card) {
+:root[data-ui="classic"] #game-root :is(#skills-panel, #buffs-panel, #achieve-panel, #quest-panel, #projects-panel, #map-panel, #make-panel) :is(.side-card, .map-card, .make-card) {
   font-size: calc(var(--fs-classic-row) * var(--cu-n, 1));
   line-height: var(--lh-normal);
 }
 :root[data-ui="classic"] #game-root #make-panel > .make-card { width: min(calc(614 * var(--cu)), 100%); min-width: min(calc(614 * var(--cu)), calc(100vw - 32px)); } /* the tool tabs no longer hold it open */
 :root[data-ui="classic"] #game-root #make-panel .ui-sheet-head { min-height: calc(67 * var(--cu)); flex-wrap: wrap; }
-:root[data-ui="classic"] #game-root :is(#quest-panel, #make-panel, #map-panel) .ui-sheet-icon { width: auto; height: calc(28 * var(--cu)); }
+:root[data-ui="classic"] #game-root :is(#quest-panel, #projects-panel, #make-panel, #map-panel) .ui-sheet-icon { width: auto; height: calc(28 * var(--cu)); }
 /* The sheet's body scrolls; its foot is the window's white footer (Making: head 67, body 320, foot 64). */
-:root[data-ui="classic"] #game-root :is(#quest-panel, #make-panel) .ui-sheet-body { flex: 1 1 auto; min-height: calc(200 * var(--cu)); overflow-y: auto; padding-top: calc(10 * var(--cu)); padding-bottom: calc(10 * var(--cu)); }
-:root[data-ui="classic"] #game-root :is(#quest-panel, #make-panel) > :is(.side-card, .make-card) > .ui-sheet-foot {
+:root[data-ui="classic"] #game-root :is(#quest-panel, #projects-panel, #make-panel) .ui-sheet-body { flex: 1 1 auto; min-height: calc(200 * var(--cu)); overflow-y: auto; padding-top: calc(10 * var(--cu)); padding-bottom: calc(10 * var(--cu)); }
+:root[data-ui="classic"] #game-root :is(#quest-panel, #projects-panel, #make-panel) > :is(.side-card, .make-card) > .ui-sheet-foot {
   flex: none;
   display: flex;
   align-items: center;
@@ -1858,10 +1858,10 @@
   border-bottom: 0;
   background: var(--c-classic-panel);
 }
-:root[data-ui="classic"] #game-root :is(#quest-panel, #make-panel) .ui-sheet-foot .panel-meta { margin: 0; color: var(--c-classic-offline); font-size: calc(var(--fs-classic-body) * var(--cu-n, 1)); }
-:root[data-ui="classic"] #game-root :is(#quest-panel, #make-panel) .ui-sheet-esc { display: none; }
+:root[data-ui="classic"] #game-root :is(#quest-panel, #projects-panel, #make-panel) .ui-sheet-foot .panel-meta { margin: 0; color: var(--c-classic-offline); font-size: calc(var(--fs-classic-body) * var(--cu-n, 1)); }
+:root[data-ui="classic"] #game-root :is(#quest-panel, #projects-panel, #make-panel) .ui-sheet-esc { display: none; }
 /* Minor buttons (PROPOSED colours, build-plan §3; 29 px tall and Nunito 800 13 FROM FRAME). */
-:root[data-ui="classic"] #game-root :is(#skills-panel, #buffs-panel, #achieve-panel, #quest-panel, #map-panel, #make-panel) :is(.content-action-btn, [data-mr-back], [data-mr-more], [data-mr-done], [data-make-back], [data-make-go], [data-mq], .qc-pin, .badge-load-more, .make-tool-chip) {
+:root[data-ui="classic"] #game-root :is(#skills-panel, #buffs-panel, #achieve-panel, #quest-panel, #projects-panel, #map-panel, #make-panel) :is(.content-action-btn, [data-mr-back], [data-mr-more], [data-mr-done], [data-make-back], [data-make-go], [data-mq], .qc-pin, .badge-load-more, .make-tool-chip) {
   min-height: calc(29 * var(--cu));
   padding: 0 calc(16 * var(--cu));
   border: 1px solid var(--c-classic-btn-minor-border);
@@ -1873,7 +1873,7 @@
   text-shadow: none;
   cursor: pointer;
 }
-:root[data-ui="classic"] #game-root :is(#skills-panel, #buffs-panel, #achieve-panel, #quest-panel, #map-panel, #make-panel) :is(.content-action-btn, [data-mr-back], [data-mr-more], [data-mr-done], [data-make-back], [data-make-go], [data-mq], .qc-pin, .badge-load-more, .make-tool-chip):is(:hover, :focus-visible) { background: linear-gradient(180deg, var(--c-classic-panel), var(--c-classic-btn-minor-top)); outline: none; box-shadow: 0 0 0 2px var(--c-classic-focus); }
+:root[data-ui="classic"] #game-root :is(#skills-panel, #buffs-panel, #achieve-panel, #quest-panel, #projects-panel, #map-panel, #make-panel) :is(.content-action-btn, [data-mr-back], [data-mr-more], [data-mr-done], [data-make-back], [data-make-go], [data-mq], .qc-pin, .badge-load-more, .make-tool-chip):is(:hover, :focus-visible) { background: linear-gradient(180deg, var(--c-classic-panel), var(--c-classic-btn-minor-top)); outline: none; box-shadow: 0 0 0 2px var(--c-classic-focus); }
 /* The footer's "Done" (and Make's go) is the large one at the right (ref/video-2011-make-result.jpg: 84 x 34). */
 :root[data-ui="classic"] #game-root #make-panel :is([data-mr-done], [data-make-go]) { min-height: calc(34 * var(--cu)); min-width: calc(84 * var(--cu)); font-size: calc(var(--fs-classic-row) * var(--cu-n, 1)); }
 :root[data-ui="classic"] #game-root #make-panel [data-mr-done] { margin-left: auto; }
@@ -1930,6 +1930,23 @@
 :root[data-ui="classic"] #game-root #quest-panel .qc-chip img { width: calc(23 * var(--cu)); height: calc(23 * var(--cu)); }
 :root[data-ui="classic"] #game-root #quest-panel .q-bar { height: 4px; border-radius: 2px; background: var(--c-classic-wear-track); }
 :root[data-ui="classic"] #game-root #quest-panel .q-bar > i { background: var(--c-classic-wear); }
+/* Projects (ticket 81): rows as the Quest Log's, the bar as its wear bar, the buttons its minor ones. */
+:root[data-ui="classic"] #game-root #projects-list { margin: 0; }
+:root[data-ui="classic"] #game-root #projects-list .pj-section-title { margin: calc(10 * var(--cu)) 0 0; color: var(--c-classic-offline); font: 800 calc(var(--fs-classic-body) * var(--cu-n, 1))/var(--lh-tight) var(--font-classic-title); }
+:root[data-ui="classic"] #game-root #projects-list .pj-card { margin: 0; padding: calc(10 * var(--cu)) 0; border-bottom: 1px solid var(--c-classic-row-rule); color: var(--c-classic-text); font: calc(var(--fs-classic-row) * var(--cu-n, 1))/var(--lh-normal) var(--font-classic-body); }
+:root[data-ui="classic"] #game-root #projects-list .pj-title { margin: 0; color: var(--c-classic-title); font: 800 calc(var(--fs-classic-row-title) * var(--cu-n, 1))/var(--lh-snug) var(--font-classic-title); }
+:root[data-ui="classic"] #game-root #projects-list .pj-new { color: var(--c-classic-link); font: 800 calc(var(--fs-classic-count) * var(--cu-n, 1))/1 var(--font-classic-title); text-transform: uppercase; }
+:root[data-ui="classic"] #game-root #projects-list :is(.pj-where, .pj-note, .pj-later) { margin: 0; color: var(--c-classic-offline); }
+:root[data-ui="classic"] #game-root #projects-list .pj-share { margin: calc(4 * var(--cu)) 0 0; }
+:root[data-ui="classic"] #game-root #projects-list .pj-bar { height: 4px; margin: calc(6 * var(--cu)) 0 calc(2 * var(--cu)); border-radius: 2px; background: var(--c-classic-wear-track); overflow: hidden; }
+:root[data-ui="classic"] #game-root #projects-list .pj-bar > i { display: block; height: 100%; background: var(--c-classic-wear); }
+:root[data-ui="classic"] #game-root #projects-list .pj-needs { margin: calc(6 * var(--cu)) 0 0; }
+:root[data-ui="classic"] #game-root #projects-list .pj-needs summary { color: var(--c-classic-link); font-weight: 700; cursor: pointer; }
+:root[data-ui="classic"] #game-root #projects-list .pj-needs ul { margin: calc(4 * var(--cu)) 0 0; padding-left: calc(18 * var(--cu)); }
+:root[data-ui="classic"] #game-root #projects-list .pj-needs li.is-later { color: var(--c-classic-offline); }
+:root[data-ui="classic"] #game-root #projects-list .pj-acts { display: flex; flex-wrap: wrap; gap: calc(8 * var(--cu)); margin-top: calc(8 * var(--cu)); }
+:root[data-ui="classic"] #game-root #projects-list .pj-acts .content-action-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+:root[data-ui="classic"] #game-root #projects-list .pj-empty { margin: 0; padding: calc(10 * var(--cu)) 0; color: var(--c-classic-offline); }
 /* Search fields and selects: the 2012 field (InputField.as). */
 :root[data-ui="classic"] #game-root :is(#skills-panel, #achieve-panel, #make-panel, #map-panel) :is(input[type="search"], input[type="text"], select, .combo-input) {
   min-height: calc(25 * var(--cu));

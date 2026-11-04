@@ -6,7 +6,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { WORLD_SELECTOR, focusBack, focusBackTarget, focusWorld, installFocusReturn, lastInput, pressedBy, tabbedSincePointer } from '../public/js/ui/focus-return.js?v=da190597';
-import { mountPanelShell } from '../public/js/ui/panel-shell.js?v=6812fe04';
+import { mountPanelShell } from '../public/js/ui/panel-shell.js?v=e2abdf9e';
 
 const read = (p) => readFileSync(join(import.meta.dirname, '..', p), 'utf8');
 

@@ -97,6 +97,8 @@ export function hotkeySections({ keyring = false, hub = false, reports = false }
         ['Badges', [['B']]],
         ['Feat', [['H']]],
         ['Buffs', [['Y']]],
+        // Ticket 81: the remake's Projects panel (the client had no P).
+        ['Projects', [['P']]],
       ],
     },
     {

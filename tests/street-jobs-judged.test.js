@@ -15,7 +15,7 @@ import { fileURLToPath } from 'node:url';
 import { homedir } from 'node:os';
 
 import { judgeJobs } from '../tools/inventory/detectors.mjs';
-import { closedStreets, initializeStreetJobs, normalizeStreetJobState } from '../public/js/street-jobs.js?v=7381e03e';
+import { closedStreets, initializeStreetJobs, normalizeStreetJobState } from '../public/js/street-jobs.js?v=ccf76b74';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const overrides = JSON.parse(readFileSync(join(spike, 'tools/inventory/overrides.json'), 'utf8'));

@@ -2299,7 +2299,7 @@ body.nx-hide-mood.nx-hide-energy .meta-vitals { visibility: hidden; }
 }
 .more-btn[aria-expanded="true"] .more-chevron { transform: translateY(1px) rotate(225deg); }
 /* Unread mail sits on Home, inside the menu; show it on the Menu button too. */
-.more-menu:has(.mail-unread-badge:not([hidden])) .more-btn::after {
+.more-menu:has(.mail-unread-badge:not([hidden]), .pj-dot:not([hidden])) .more-btn::after {
   content: '';
   display: inline-block;
   width: 7px;
@@ -11385,6 +11385,52 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
 [data-ui="modern"] #game-root #quest-panel .qc-sort:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; }
 [data-ui="modern"] #game-root #quest-panel .qc-sort-chev { display: inline-flex; }
 [data-ui="modern"] #game-root #quest-panel .qc-sort .vm-chev { transform: rotate(90deg); }
+
+/* Projects (ticket 81, js/ui/projects-sheet.js): your street projects, cards in the Quest Log's look. */
+[data-ui="modern"] #projects-list { display: flex; flex-direction: column; gap: var(--space-3); margin: 0; font-size: var(--fs-m); }
+[data-ui="modern"] #projects-list .pj-section { display: flex; flex-direction: column; gap: var(--space-2); }
+[data-ui="modern"] #projects-list .pj-section-title { margin: var(--space-2) 0 0; color: var(--text-muted); font-size: var(--fs-s); font-weight: var(--fw-heavy); letter-spacing: 0.04em; text-transform: uppercase; }
+[data-ui="modern"] #projects-list .pj-card { margin: 0; padding: var(--space-2) var(--space-3) var(--space-3); border: 1px solid var(--border); border-radius: var(--radius-m); background: var(--surface-raised); line-height: var(--lh-body); }
+[data-ui="modern"] #projects-list .pj-card.is-new { border-color: var(--accent); }
+[data-ui="modern"] #projects-list .pj-title { margin: 0; color: var(--text); font-size: var(--fs-l); font-weight: var(--fw-heavy); line-height: var(--lh-tight); }
+[data-ui="modern"] #projects-list .pj-new { display: inline-flex; align-items: center; height: 18px; padding: 0 var(--space-2); border-radius: var(--radius-pill); background: var(--accent-soft); color: var(--accent); font-size: var(--fs-xs); font-weight: var(--fw-heavy); vertical-align: middle; }
+[data-ui="modern"] #projects-list .pj-where { margin: 2px 0 0; color: var(--text-muted); font-size: var(--fs-s); }
+[data-ui="modern"] #projects-list .pj-bar { height: 6px; margin: var(--space-2) 0 var(--space-1); border-radius: 3px; background: var(--track); overflow: hidden; }
+[data-ui="modern"] #projects-list .pj-bar > i { display: block; height: 100%; border-radius: inherit; background: var(--good); }
+[data-ui="modern"] #projects-list :is(.pj-share, .pj-note) { margin: var(--space-1) 0 0; font-size: var(--fs-s); }
+[data-ui="modern"] #projects-list .pj-note { color: var(--text-muted); }
+[data-ui="modern"] #projects-list .pj-needs { margin: var(--space-2) 0 0; font-size: var(--fs-s); }
+[data-ui="modern"] #projects-list .pj-needs summary { cursor: pointer; font-weight: var(--fw-heavy); }
+[data-ui="modern"] #projects-list .pj-needs summary:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; border-radius: var(--radius-xs); }
+[data-ui="modern"] #projects-list .pj-needs ul { margin: var(--space-1) 0 0; padding-left: var(--space-4); }
+[data-ui="modern"] #projects-list .pj-needs li.is-later { color: var(--text-muted); }
+[data-ui="modern"] #projects-list .pj-acts { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-top: var(--space-2); }
+[data-ui="modern"] #projects-list .pj-acts .content-action-btn {
+  display: inline-flex;
+  align-items: center;
+  width: auto;
+  height: 30px;
+  margin: 0;
+  padding: 0 var(--space-2);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: var(--fs-s);
+  font-weight: var(--fw-heavy);
+  cursor: pointer;
+}
+[data-ui="modern"] #projects-list .pj-acts .content-action-btn[data-pj-act="route"] { border-color: var(--accent); background: var(--accent); color: var(--accent-text); }
+[data-ui="modern"] #projects-list .pj-acts .content-action-btn:hover:not(:disabled) { background: var(--surface-hover); }
+[data-ui="modern"] #projects-list .pj-acts .content-action-btn[data-pj-act="route"]:hover:not(:disabled) { background: var(--accent-hover); }
+[data-ui="modern"] #projects-list .pj-acts .content-action-btn:disabled { background: var(--surface-sunken); border-color: var(--border); color: var(--text-muted); cursor: not-allowed; }
+[data-ui="modern"] #projects-list .pj-acts .content-action-btn:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; }
+[data-ui="modern"] #projects-list .pj-empty { margin: 0; padding: var(--space-3) var(--space-2); color: var(--text-muted); font-size: var(--fs-m); text-align: center; }
+/* The quiet mark for a project finished since you last looked: a dot on the Menu row and the Menu button. */
+.more-list #projects-btn .pj-dot { display: inline-block; width: 7px; height: 7px; margin-left: var(--space-2); border-radius: var(--radius-round); background: var(--accent); vertical-align: middle; }
+.more-list #projects-btn .pj-dot[hidden] { display: none; }
+[data-ui="modern"] .top-bar .more-menu:has(.pj-dot:not([hidden])) .more-btn::before { content: ''; position: absolute; top: 6px; right: 6px; width: 7px; height: 7px; border-radius: var(--radius-round); background: var(--accent); box-shadow: 0 0 0 2px var(--surface-raised); pointer-events: none; }
 
 /* Make: the tool strip (its fade in the sheet's colour), search and "Can make now", a 3-column grid. */
 [data-ui="modern"] #make-panel .make-tool-tabs { order: 3; flex: 1 1 100%; margin: var(--space-1) 0 0; padding-right: var(--space-2); }
