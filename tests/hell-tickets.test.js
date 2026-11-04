@@ -29,10 +29,10 @@ import {
 } from '../public/js/hell-tickets.js?v=3746d2ce';
 import { hellTicketsFeature } from '../public/js/features/hell-tickets-feature.js?v=55352c20';
 import { hellFeature } from '../public/js/features/hell-feature.js?v=54d49b30';
-import { hellBarFeature } from '../public/js/features/hell-bar-feature.js?v=28782c49';
+import { hellBarFeature } from '../public/js/features/hell-bar-feature.js?v=c45e993e';
 import { questOffersFeature } from '../public/js/features/quest-offers-feature.js?v=499c20c8';
 import { questFlagsFeature } from '../public/js/features/quest-flags-feature.js?v=17c6ef48';
-import { FEATURES } from '../public/js/features/index.js?v=df76edfb';
+import { FEATURES } from '../public/js/features/index.js?v=d9d494ac';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const CONTENT = join(spike, 'public/assets/content');

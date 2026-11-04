@@ -57,7 +57,7 @@ export const AUCTION_TEXT = Object.freeze({
   nothingToSell: "You don't have anything to sell!",
   offline: 'The Auction House is not answering. Try again in a moment.',
   listed: (stack, cost) => `You put ${stack} up for auction for ${cost.toLocaleString('en-US')} currants.`,
-  bought: (stack, cost) => `You bought ${stack} for ${cost.toLocaleString('en-US')} currants. It will arrive in your mailbox in 10 minutes.`,
+  bought: (stack, cost) => `You bought ${stack} for ${cost.toLocaleString('en-US')} currants. An AFLC Frog will bring it in about 10 minutes.`,
   cancelled: (stack) => `You cancelled your auction of ${stack}. It will come back to you by mail.`,
   expired: (stack) => `Your auction of ${stack} ended without a buyer. It will come back to you by mail.`,
   arrived: 'An auction delivery is waiting in your mailbox.',
@@ -297,6 +297,8 @@ export function deliveryMail(d) {
     deliveryAt: n0(d.at),
     attachment: { classTsid: String(d.item.c), count: Math.max(1, n0(d.item.n)) },
     ledger: `auc-${id}-d`,
+    // Ticket 74: what the red AFLC Frog says it brought (auction_action).
+    auction: d.kind === 'cancelled' || d.kind === 'expired' ? d.kind : 'purchased',
   };
 }
 

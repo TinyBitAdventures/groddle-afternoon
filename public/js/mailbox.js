@@ -96,6 +96,9 @@ function normalizeMessage(seed = {}, index = 0) {
     // Multiplayer only (G333): an attachment the site's ledger holds until it is received
     // (features/auctions-feature.js mailReceive). Solo letters never carry one.
     ...(/^(auc-[0-9a-f]{16}-d|mail-[0-9a-f]{16}-c)$/.test(String(seed?.ledger || '')) ? { ledger: String(seed.ledger) } : {}),
+    // Ticket 74: an auction delivery (purchased, cancelled or expired) the red AFLC Frog brings
+    // (js/mail-courier.js isAuctionPending; mail_add_stack 1290-1296 auction_action).
+    ...(['purchased', 'cancelled', 'expired'].includes(seed?.auction) ? { auction: seed.auction } : {}),
     // Multiplayer only (G478): a letter from (or back to) a real player, kept by the site
     // (features/player-mail-feature.js): its id there, the sender's id for a reply, the words it answers.
     ...(/^[0-9a-f]{16}$/.test(String(seed?.playerMail || '')) ? { playerMail: String(seed.playerMail) } : {}),
@@ -155,9 +158,11 @@ export function deliverMail(state, message = {}) {
   const normalized = normalizeMailboxState(state);
   Object.assign(state, normalized);
   // G121: an item makes a letter express unless the caller says otherwise (express: false);
-  // a letter the site's ledger settles (G333 auctions) is never the frog's.
+  // a letter the site's ledger settles (G333 auctions) is the frog's only when asked.
   // A player's parcel (G478, ledger mail-) is the frog's too; it hands it over through the site.
-  const express = message.express !== false && (!message.ledger || /^mail-/.test(message.ledger)) && Boolean(normalizeAttachment(message.attachment || message.item));
+  // An auction delivery (ticket 74) is the red frog's when the auctions feature says so (express: true).
+  const ledgerOk = !message.ledger || /^mail-/.test(message.ledger) || (message.express === true && Boolean(message.auction));
+  const express = message.express !== false && ledgerOk && Boolean(normalizeAttachment(message.attachment || message.item));
   const row = normalizeMessage({
     ...message,
     id: message.id || nextMessageId(state),

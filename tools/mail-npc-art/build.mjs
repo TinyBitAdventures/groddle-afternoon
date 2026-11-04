@@ -22,10 +22,16 @@
  * OGA cells by the offset that lays sprite 88 (red) over the OGA none+frogRed
  * cells; that red fit is scored per label as the check.
  *
+ * The red frog (lane frog-auctions, ticket 74): auction deliveries came by a
+ * frogRed frog (inc_mail.js answer_mail_prompt 335-339: courier mail blue,
+ * auction mail red), first with its box and then without it. Both are
+ * OpenGameArt sheets (box+frogRed, none+frogRed), copied as they are.
+ *
  * Output:
  *   public/assets/sprites/mail-npc/dispatcher_left.png      the dispatcher sheet (1x)
  *   public/assets/sprites/mail-npc/frog_blue_box_<label>.png  copied OGA sheets
  *   public/assets/sprites/mail-npc/frog_blue_none_<label>.png built here
+ *   public/assets/sprites/mail-npc/frog_red_<box|none>_<label>.png  copied OGA sheets
  *   public/js/mail-npc-art.js  (generated: cells, columns, label ranges, origins)
  *
  * Origins follow each item's getAssetInfo position (the client's placement
@@ -265,6 +271,8 @@ for (const label of FROG_LABELS) {
   frogSheets[label] = [cols, count];
   if (CHECK) continue;
   copyFileSync(ogaSheet('box', 'frogBlue', label), join(OUT_DIR, `frog_blue_box_${label}.png`));
+  copyFileSync(ogaSheet('box', 'frogRed', label), join(OUT_DIR, `frog_red_box_${label}.png`));
+  copyFileSync(ogaSheet('none', 'frogRed', label), join(OUT_DIR, `frog_red_none_${label}.png`));
   const out = blank(ref.w, ref.h);
   for (let i = 0; i < count; i += 1) {
     const cx = (i % cols) * FROG_CELL.w;
@@ -283,9 +291,11 @@ const js = [
   ' *',
   ' * The Mail Dispatcher (glitch-items npc_mail_dispatcher.swf, dispatcherLeft at',
   ' * the item\'s 1.135 scale) and the AFLC Frog (OGA npc_yoga_frog box+frogBlue',
-  ' * sheets; the frog without its box built from the SWF\'s frogBlue sprite), all',
-  ' * CC0. Labels are [first cell, count]; origins are the item\'s x, y inside a',
-  ' * cell (the client\'s getAssetInfo placement box).',
+  ' * sheets; the frog without its box built from the SWF\'s frogBlue sprite; the',
+  ' * red auction frog, OGA box+frogRed and none+frogRed), all CC0. Labels are',
+  ' * [first cell, count]; origins are the item\'s x, y inside a cell (the',
+  ' * client\'s getAssetInfo placement box). files is the blue frog; variants',
+  ' * names both colours by the item\'s variant (npc_yoga_frog.js 42).',
   ' */',
   'export const MAIL_NPC_ART_DIR = \'assets/sprites/mail-npc/\';',
   `export const DISPATCHER_ART = Object.freeze(${JSON.stringify({
@@ -299,6 +309,10 @@ const js = [
     cell: FROG_CELL,
     origin: fOrigin,
     files: { box: 'frog_blue_box_', none: 'frog_blue_none_' },
+    variants: {
+      frogBlue: { box: 'frog_blue_box_', none: 'frog_blue_none_' },
+      frogRed: { box: 'frog_red_box_', none: 'frog_red_none_' },
+    },
     sheets: frogSheets,
     redFit: fits,
   })});`,
@@ -307,7 +321,7 @@ const js = [
 
 if (CHECK) {
   const have = existsSync(OUT_JS) ? readFileSync(OUT_JS, 'utf8') : '';
-  const files = ['dispatcher_left.png', ...FROG_LABELS.flatMap((l) => [`frog_blue_box_${l}.png`, `frog_blue_none_${l}.png`])];
+  const files = ['dispatcher_left.png', ...FROG_LABELS.flatMap((l) => [`frog_blue_box_${l}.png`, `frog_blue_none_${l}.png`, `frog_red_box_${l}.png`, `frog_red_none_${l}.png`])];
   const lost = files.filter((f) => !existsSync(join(OUT_DIR, f)));
   if (have !== js || lost.length) {
     console.error(`mail npc art is stale${lost.length ? ` (${lost.length} files missing)` : ''}: run node tools/mail-npc-art/build.mjs`);

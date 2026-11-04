@@ -24,7 +24,7 @@ import { createMinnAccount } from '../minn-account.js?v=eb300264';
 import { mountAccountForms, resetLinkFrom, verifyLinkFrom } from '../account-forms.js?v=fe37d0de';
 import { gateFor, quietSession, suspendedNow } from '../online-boot.js?v=7a36d921';
 import { REPORT_MAX, REPORT_TEXT, STATUS_WORDS, createReportsApi, pictureRefused, pictureSrc, refusalWords, reportFromHash, ticketLine, unreadCount, whenWords } from '../reports.js?v=aae32361';
-import { DEVICE_KEY, PHONE_TEXT as T, POLL_MS, createPresenceApi, fitPhoto, friendsView, fullGameHref, itemNamesFrom, itemWords, mailRows, mailboxFromSave, mergePlayerMail, phoneContext, unreadLetters } from './companion-data.js?v=d0a8b37a';
+import { DEVICE_KEY, PHONE_TEXT as T, POLL_MS, createPresenceApi, fitPhoto, friendsView, fullGameHref, itemNamesFrom, itemWords, mailRows, mailboxFromSave, mergePlayerMail, phoneContext, unreadLetters } from './companion-data.js?v=d1cdfdfe';
 
 const doc = globalThis.document;
 

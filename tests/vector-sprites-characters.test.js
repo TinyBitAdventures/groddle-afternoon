@@ -18,7 +18,7 @@ import {
   pointAtPart,
   sourceSheet,
   upgradeSource,
-} from '../public/js/sprite-hires.js?v=96c22af7';
+} from '../public/js/sprite-hires.js?v=3f97bf07';
 import { packParts } from '../tools/vector-sprites/build.mjs';
 
 /** A js/textures.js stand-in: records the URL routes it is given. */

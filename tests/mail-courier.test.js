@@ -5,17 +5,27 @@
  */
 import { describe, it, mock } from 'node:test';
 import assert from 'node:assert/strict';
-import { existsSync, openSync, readFileSync, readSync, closeSync } from 'node:fs';
+import { existsSync, openSync, readFileSync, readSync, readdirSync, closeSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import os from 'node:os';
 import { fileURLToPath } from 'node:url';
 import {
+  AUCTION_ACTIONS,
+  AUCTION_PAGE,
   COURIER,
   COURIER_TEXT,
   FROG_EPIPHANIES,
+  FROG_MORE_AUCTIONS,
   FROG_RAMBLINGS,
+  FROG_VARIANT,
   PARCEL,
+  auctionDescribe,
+  auctionGotLine,
   courierDueAt,
+  dueAuctions,
+  handOverAuction,
+  isAuctionPending,
+  nextAuction,
   flyStep,
   handOver,
   isExpressPending,
@@ -24,23 +34,25 @@ import {
   nextRamble,
   normalizeCourierState,
   pickPose,
+  sendAuctionsToMailbox,
   sendCarriedToMailbox,
   sendDueToMailbox,
-} from '../public/js/mail-courier.js?v=12d7d7a4';
+} from '../public/js/mail-courier.js?v=e872c17e';
 import {
   createMailboxState,
   deliverMail,
   normalizeMailboxState,
   receiveMailAttachments,
   seedMailbox,
-} from '../public/js/mailbox.js?v=b2bde2fe';
-import { DISPATCHER_ART, FROG_ART, MAIL_NPC_ART_DIR } from '../public/js/mail-npc-art.js?v=790f980a';
+} from '../public/js/mailbox.js?v=1d97704f';
+import { DISPATCHER_ART, FROG_ART, MAIL_NPC_ART_DIR } from '../public/js/mail-npc-art.js?v=031c4e2e';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = join(here, '..');
 const pub = join(root, 'public');
 const GSJS = join(os.homedir(), 'Documents/glitch-audit/glitch-GameServerJS');
 const hasGsjs = existsSync(join(GSJS, 'players/inc_mail.js'));
+const OGA_FROG = join(os.homedir(), 'Documents/glitch-audit/opengameart/extracted_vendors/glitch-assets');
 const read = (p) => readFileSync(join(GSJS, p), 'utf8');
 /** House style: the source's em-dashes became a comma or a colon. */
 const plain = (s) => s.replace(/\s*—\s*/g, ' ').replace(/[,:]\s*/g, ' ').replace(/\s+/g, ' ').trim();
@@ -84,7 +96,11 @@ describe('express mail rules (players/inc_mail.js)', () => {
   });
 
   it('player copy has no em-dashes', () => {
-    for (const v of Object.values(COURIER_TEXT)) assert.ok(!v.includes('—'), v);
+    for (const v of Object.values(COURIER_TEXT)) {
+      const t = typeof v === 'function' ? v(['an Apple', '3 Cherries']) : v;
+      assert.ok(!t.includes('—'), t);
+    }
+    for (const t of FROG_MORE_AUCTIONS) assert.ok(!t.includes('—'), t);
     for (const [a, b] of FROG_RAMBLINGS) assert.ok(!a.includes('—') && !b.includes('—'));
     for (const e of FROG_EPIPHANIES) assert.ok(!e.includes('—'));
   });
@@ -194,6 +210,102 @@ describe('express mail rules (players/inc_mail.js)', () => {
   });
 });
 
+describe('ticket 74: auction deliveries come by red AFLC Frog (inc_mail.js, npc_yoga_frog.js)', () => {
+  const ID = '0123456789abcdef';
+  const auc = (st, extra = {}) => deliverMail(st, {
+    id: `auction-${extra.id || ID}`, sender: 'Auction Fulfillment and Logistics Corporation', text: 'x',
+    attachment: { classTsid: 'cherry', count: 3 }, ledger: `auc-${extra.id || ID}-d`, auction: 'purchased', express: true, deliveryAt: 1000, ...extra,
+  });
+
+  it('cites the source: red for auctions, blue for courier mail, the frog\'s words', { skip: !hasGsjs && 'needs glitch-GameServerJS beside the game' }, () => {
+    const mail = read('players/inc_mail.js');
+    assert.match(mail, /if\(this\.delivery_type == 'courier'\) \{\s*frog\.setInstanceProp\('variant', 'frogBlue'\);\s*\} else \{\s*frog\.setInstanceProp\('variant', 'frogRed'\);/);
+    assert.deepEqual(FROG_VARIANT, { courier: 'frogBlue', auction: 'frogRed', pickup: 'frogBlue' });
+    assert.match(mail, /this\.sendActivity\("Mail time! You got "\+mailItems\[0\]\+'\.'\);/);
+    assert.match(mail, /deets\.mailType == 'auction' && deets\.delivery_time <= time\(\) \+ 60/);
+    assert.match(read('config_prod.js'), /var auction_delivery_time = 600;/);
+    const auctions = read('players/inc_auctions.js');
+    for (const kind of AUCTION_ACTIONS) assert.ok(auctions.includes(`config.auction_delivery_time, uid, this.tsid, '${kind}')`), kind);
+    const frog = read('items/npc_yoga_frog.js');
+    assert.ok(frog.includes("var conv_start = 'Got your ' + rewards.describe + (rewards.items.length > 1 ? ' auctions, brah.' : ' auction, brah.');"));
+    assert.match(frog, /mail_build_auction_rewards\(0, 10\)/);
+    assert.equal(AUCTION_PAGE, 10);
+    for (const line of FROG_MORE_AUCTIONS) assert.ok(frog.includes(line.replace(/'/g, "\\'")) || frog.includes(line), line);
+    assert.match(frog, /if\(this\.pc\.get_auction_mail\(\)\) \{\s*this\.deliveryFailed\(pc, msg\);/);
+  });
+
+  it('an auction row is the red frog\'s only when the auctions feature says so; never the blue one\'s', () => {
+    const st = createMailboxState();
+    const old = deliverMail(st, { sender: 'AFLC', text: 'x', attachment: { classTsid: 'apple', count: 1 }, ledger: `auc-${ID}-d` });
+    assert.equal('express' in old, false, 'a row from before keeps waiting in the mailbox');
+    assert.equal(isAuctionPending(old), false);
+    const m = auc(st, { id: 'fedcba9876543210' });
+    assert.equal(m.express, true);
+    assert.equal(m.auction, 'purchased');
+    assert.equal(isAuctionPending(m), true);
+    assert.equal(isExpressPending(m), false);
+    const again = normalizeMailboxState(JSON.parse(JSON.stringify(st)));
+    assert.equal(again.messages[1].auction, 'purchased');
+    assert.equal(again.messages[1].express, true);
+    assert.equal(normalizeMailboxState({ messages: [{ id: 'x', auction: 'stolen' }] }).messages[0].auction, undefined);
+  });
+
+  it('the next delivery is due within 60 s; the frog carries only what the site will hand over', () => {
+    const st = createMailboxState();
+    auc(st, { id: '1111111111111111', deliveryAt: 100_000 });
+    auc(st, { id: '2222222222222222', deliveryAt: 130_000, auction: 'expired' });
+    const [a, b] = st.messages;
+    assert.equal(nextAuction(st.messages, 0), null);
+    assert.equal(nextAuction(st.messages, 0, { future: true }).id, a.id);
+    assert.equal(nextAuction(st.messages, 40_000).id, a.id);
+    assert.deepEqual(dueAuctions(st.messages, 100_000).map((m) => m.id), [a.id]);
+    assert.deepEqual(dueAuctions(st.messages, 130_000).map((m) => m.id), [a.id, b.id]);
+    a.attachmentsClaimed = true;
+    assert.equal(nextAuction(st.messages, 130_000).id, b.id);
+    // The solo demo's rows (no site) look 60 s ahead as the source did.
+    const solo = createMailboxState();
+    deliverMail(solo, { sender: 'AFLC', text: 'x', attachment: { classTsid: 'apple', count: 1 }, auction: 'cancelled', express: true, deliveryAt: 50_000 });
+    assert.equal(dueAuctions(solo.messages, 0).length, 1);
+  });
+
+  it('the frog follows to inside its stopping distance, either side of you (the middle of the source\'s flying area)', () => {
+    for (const dx of [COURIER.followLeftDx, COURIER.followRightDx]) assert.ok(Math.abs(dx + COURIER.followArea / 2) < COURIER.followNear, String(dx));
+    if (hasGsjs) assert.match(read('items/npc_yoga_frog.js'), /apiStartFlyingInTheAreaX\(this\.pc\.x - 100, this\.pc\.y - 50, 50, 50, 200, false\)/);
+  });
+
+  it('says what it brought as the source did', () => {
+    const row = (auction) => ({ auction });
+    assert.equal(auctionDescribe([row('purchased')]), 'purchased');
+    assert.equal(auctionGotLine([row('purchased')]), 'Got your purchased auction, brah.');
+    assert.equal(auctionGotLine([row('purchased'), row('purchased'), row('purchased')]), 'Got your 3 purchased auctions, brah.');
+    assert.equal(auctionGotLine([row('purchased'), row('expired'), row('purchased')]), 'Got your 2 purchased and 1 expired auctions, brah.');
+    assert.equal(auctionDescribe([row('purchased'), row('expired'), row('cancelled')]), '1 purchased, 1 expired and 1 cancelled');
+    assert.equal(COURIER_TEXT.mailTime(['3 Cherries']), 'Mail time! You got 3 Cherries.');
+    assert.equal(COURIER_TEXT.mailTime(['3 Cherries', 'an Apple']), 'Mail time! You got 3 Cherries, and an Apple.');
+    assert.equal(COURIER_TEXT.mailTime(['a', 'b', 'c']), 'Mail time! You got a, b, and c.');
+  });
+
+  it('a full pack keeps it; Just send it to my mailbox leaves it there; login sweeps what came while away', () => {
+    const st = createMailboxState();
+    deliverMail(st, { sender: 'AFLC', text: 'x', attachment: { classTsid: 'apple', count: 3 }, auction: 'purchased', express: true, deliveryAt: 10 });
+    const [m] = st.messages;
+    const inv = { apple: 1 };
+    assert.deepEqual(handOverAuction(m, inv, { room: 2 }), { ok: false, reason: 'pack_full', item: m.attachment });
+    assert.equal(inv.apple, 1);
+    assert.equal(handOverAuction(m, inv, { room: 3 }).ok, true);
+    assert.equal(inv.apple, 4);
+    assert.equal(isAuctionPending(m), false);
+    // A row from the site is never handed over here: the site does it.
+    const mp = createMailboxState();
+    const r = auc(mp);
+    assert.equal(handOverAuction(r, {}, {}).ok, false);
+    assert.deepEqual(sendAuctionsToMailbox(mp.messages, 999).map((x) => x.id), []);
+    assert.deepEqual(sendAuctionsToMailbox(mp.messages, 1000).map((x) => x.id), [r.id]);
+    assert.equal(r.inMailbox, true);
+    assert.equal(isAuctionPending(r), false);
+  });
+});
+
 describe('mail npc art (tools/mail-npc-art/build.mjs)', () => {
   it('every sheet is in the build and its size matches the module', () => {
     const dir = join(pub, MAIL_NPC_ART_DIR);
@@ -204,24 +316,39 @@ describe('mail npc art (tools/mail-npc-art/build.mjs)', () => {
     assert.equal(dh, Math.ceil(frames / DISPATCHER_ART.cols) * DISPATCHER_ART.cell.h);
     for (const label of ['idle', 'interact', 'cancel', 'prepare_package', 'waiting_for_frog', 'package_sent']) assert.ok(DISPATCHER_ART.labels[label], label);
     assert.equal(Object.keys(FROG_ART.sheets).length, 14);
+    assert.deepEqual(FROG_ART.variants.frogBlue, FROG_ART.files);
+    assert.deepEqual(Object.keys(FROG_ART.variants).sort(), ['frogBlue', 'frogRed']);
     for (const [label, [cols, count]] of Object.entries(FROG_ART.sheets)) {
-      for (const kind of ['box', 'none']) {
-        const [w, h] = pngSize(join(dir, `${FROG_ART.files[kind]}${label}.png`));
-        assert.equal(w, cols * FROG_ART.cell.w, `${kind} ${label}`);
-        assert.ok(h >= Math.ceil(count / cols) * FROG_ART.cell.h, `${kind} ${label}`);
+      for (const files of Object.values(FROG_ART.variants)) {
+        for (const kind of ['box', 'none']) {
+          const [w, h] = pngSize(join(dir, `${files[kind]}${label}.png`));
+          assert.equal(w, cols * FROG_ART.cell.w, `${files[kind]} ${label}`);
+          assert.ok(h >= Math.ceil(count / cols) * FROG_ART.cell.h, `${files[kind]} ${label}`);
+        }
       }
     }
     // The built frog lines up with Tiny Speck's own renders.
     for (const fit of Object.values(FROG_ART.redFit)) assert.ok(fit >= 0.8);
   });
 
-  it('G448: the frog\'s 28 sheets have 3x renders from npc_yoga_frog.swf that swap in on first draw', async () => {
-    const { FIRST_DRAW_SPRITES, HIRES_SPRITES, hiresSpriteUrl } = await import('../public/js/sprite-hires.js?v=96c22af7');
+  it('ticket 74: the red frog\'s sheets are Tiny Speck\'s own OGA renders, byte for byte', { skip: !existsSync(OGA_FROG) && 'needs the OpenGameArt archive' }, () => {
+    for (const label of Object.keys(FROG_ART.sheets)) {
+      for (const [box, file] of [['box', FROG_ART.variants.frogRed.box], ['none', FROG_ART.variants.frogRed.none]]) {
+        const ogaDir = join(OGA_FROG, `npc_yoga_frog_box_${box}_variant_frogRed`);
+        const oga = readdirSync(ogaDir).find((f) => f.includes(`_x1_${label}_png_`));
+        assert.ok(oga, `${box} ${label}`);
+        assert.ok(readFileSync(join(ogaDir, oga)).equals(readFileSync(join(pub, MAIL_NPC_ART_DIR, `${file}${label}.png`))), `${file}${label}`);
+      }
+    }
+  });
+
+  it('G448: the frog\'s 56 sheets (blue and red) have 3x renders from npc_yoga_frog.swf that swap in on first draw', async () => {
+    const { FIRST_DRAW_SPRITES, HIRES_SPRITES, hiresSpriteUrl } = await import('../public/js/sprite-hires.js?v=3f97bf07');
     const results = JSON.parse(readFileSync(join(root, 'tools/vector-sprites/results.json'), 'utf8'));
     let n = 0;
     for (const label of Object.keys(FROG_ART.sheets)) {
-      for (const kind of ['box', 'none']) {
-        const path = `${MAIL_NPC_ART_DIR}${FROG_ART.files[kind]}${label}.png`.replace(/^.*?(assets\/)/, '$1');
+      for (const [variant, kind] of ['frogBlue', 'frogRed'].flatMap((v) => [[v, 'box'], [v, 'none']])) {
+        const path = `${MAIL_NPC_ART_DIR}${FROG_ART.variants[variant][kind]}${label}.png`.replace(/^.*?(assets\/)/, '$1');
         const r = results[path];
         assert.equal(r?.status, 'ok', path);
         assert.ok(r.score >= 0.9 && r.minFrame >= 0.8 && r.drift.length === 0, `${path} ${r.score}`);
@@ -231,7 +358,7 @@ describe('mail npc art (tools/mail-npc-art/build.mjs)', () => {
         n += 1;
       }
     }
-    assert.equal(n, 28);
+    assert.equal(n, 56);
   });
 });
 
@@ -244,7 +371,7 @@ describe('mail courier feature', () => {
   it('calls the frog with the source prompt once a letter is due, and waits in an instance', async () => {
     mock.timers.enable({ apis: ['Date'], now: 1_000_000 });
     try {
-      const { mailCourierFeature } = await import('../public/js/features/mail-courier-feature.js?v=f1906fde');
+      const { mailCourierFeature } = await import('../public/js/features/mail-courier-feature.js?v=5f673c11');
       const st = createMailboxState();
       const prompts = [];
       let instance = false;
@@ -295,6 +422,70 @@ describe('mail courier feature', () => {
     } finally {
       mock.timers.reset();
     }
+  });
+});
+
+describe('ticket 74: the courier calls the red frog for an auction delivery', () => {
+  it('takes whichever delivery is next, prompts the same way, and sweeps what came while away', async () => {
+    mock.timers.enable({ apis: ['Date'], now: 2_000_000 });
+    try {
+      const { mailCourierFeature } = await import('../public/js/features/mail-courier-feature.js?fresh=auction-frog');
+      const st = createMailboxState();
+      const prompts = [];
+      const data = {};
+      const activity = [];
+      const engine = {
+        started: true,
+        player: { x: 500, y: 600 },
+        streetTsid: 'GA5101HF7F429V5',
+        interactables: [],
+        mailMessages: () => st.messages,
+        param: () => null,
+        prompt: (p) => prompts.push(p),
+        busy: () => false,
+        acting: () => false,
+        questDialogueOpen: () => false,
+        streetCardUp: () => false,
+        transientInstance: () => false,
+        homeContext: () => ({ inHome: false }),
+        setData: (k, v) => { data[k] = v; },
+        pushActivity: (t) => activity.push(t),
+        refreshPack: () => {},
+        save: () => {},
+      };
+      const row = (id, at, extra = {}) => deliverMail(st, { id: `auction-${id}`, sender: 'Auction Fulfillment and Logistics Corporation', text: 'x', attachment: { classTsid: 'cherry', count: 3 }, ledger: `auc-${id}-d`, auction: 'purchased', express: true, deliveryAt: at, ...extra });
+      mailCourierFeature.restore({});
+      const away = row('aaaaaaaaaaaaaaaa', 1_999_000);
+      mailCourierFeature.onTick(16, 0, engine);
+      assert.equal(st.messages[0].inMailbox, true, 'mail_login: an auction that came while away is in the mailbox');
+      assert.equal(data.mailCourierLast, 'login:1');
+      assert.ok(activity.includes(COURIER_TEXT.growl));
+      assert.equal(away.id, 'auction-aaaaaaaaaaaaaaaa');
+      // A letter due later and an auction due now: the auction comes first.
+      deliverMail(st, { sender: 'Amp', text: 'hi', attachment: { classTsid: 'apple', count: 1 }, deliveryAt: Date.now() + 120_000 });
+      row('bbbbbbbbbbbbbbbb', Date.now(), { auction: 'expired' });
+      mailCourierFeature.onTick(16, 0, engine);
+      assert.equal(prompts.length, 0, 'not before 30 s');
+      mock.timers.tick(30_000);
+      mailCourierFeature.onTick(16, 0, engine);
+      assert.equal(prompts.length, 1);
+      assert.equal(prompts[0].text, 'Special delivery! A package has arrived for you.');
+      assert.equal(data.mailCourierLast, 'courier:prompt:auction');
+    } finally {
+      mock.timers.reset();
+    }
+  });
+
+  it('the red frog hands auctions straight to the pack through the site, and leaves no letter behind', () => {
+    const src = readFileSync(join(pub, 'js/features/mail-courier-feature.js'), 'utf8');
+    assert.match(src, /engine\.query\?\.\('mailReceive', m, engine, \{ quiet: true \}\)/);
+    assert.match(src, /m\.deleted = true;/);
+    assert.match(src, /spawnCourier\(engine, kind\)/);
+    const feat = readFileSync(join(pub, 'js/features/auctions-feature.js'), 'utf8');
+    assert.match(feat, /mailReceive\(message, engine, opts = \{\}\) \{[\s\S]{0,200}?session\.receive\(message, opts\)/);
+    assert.match(feat, /engine\.deliverMail\?\.\(\{ \.\.\.row, express: true, inMailbox: cameAway \}\)/);
+    const game = readFileSync(join(pub, 'game.js'), 'utf8');
+    assert.match(game, /!\(m\.auction && m\.express && !m\.inMailbox\)/, 'a delivery on its way is not waiting at a mailbox');
   });
 });
 

@@ -44,7 +44,7 @@ import { emblemCostFor } from '../shrines.js?v=9d364845';
 import { rollDropTable } from '../drop-tables.js?v=0f922478';
 import { openNoteView, noteViewOpen } from '../note-view.js?v=21c55475';
 import { payDrop } from './drops-feature.js?v=35b140d2';
-import { resourceNodesFeature } from './resource-nodes-feature.js?v=ae0108ec';
+import { resourceNodesFeature } from './resource-nodes-feature.js?v=898c9728';
 import { SEASON_DATA } from '../seasons-data.js?v=b5174bc9';
 import {
   CANDY_CLASSES,
@@ -102,7 +102,7 @@ import {
 import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=3149d699';
 import { playOverlay } from '../overlays.js?v=210ad5ee';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
-import { MAIL_POST_SENDER } from '../mailbox.js?v=b2bde2fe';
+import { MAIL_POST_SENDER } from '../mailbox.js?v=1d97704f';
 import { filterText } from '../word-filter.js?v=9a7a7ebb';
 
 export const SEASONS_FEATURE_ID = 'seasons';

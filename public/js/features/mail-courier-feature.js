@@ -40,17 +40,39 @@
  *   calls sendParcel (no caller in the 2012 snapshot); this calls it for an
  *   item letter sent from the station (reimagined trigger, source sequence).
  *
+ * Auction deliveries (ticket 74, G518; rules in js/mail-courier.js)
+ *   A purchase, a cancelled or an expired listing comes 10 minutes later by
+ *   a red frog (answer_mail_prompt 335-339: variant frogRed), called the
+ *   same way as the blue one and in turn with it (schedule_next_delivery
+ *   takes whichever is next). Talk to it: "Got your purchased auction,
+ *   brah." with the stacks (ten at a time, then one of showMoreAuctionItems'
+ *   lines), Thanks!, and every stack that fits goes straight into the pack
+ *   ("Mail time! You got ..."), through the site's ledger online
+ *   (features/auctions-feature.js mailReceive). A full pack: make room and
+ *   talk again, or send them to the mailbox, where they wait to be collected
+ *   at a mailbox. Remake rule: players' parcels are collected only at a
+ *   mailbox (js/player-mail.js, HOMES2); auction deliveries follow the source
+ *   and come to you (lane frog-auctions, 2026-11-04). A delivery the frog
+ *   handed over leaves no letter behind (the source made one only for the
+ *   mailbox, send_auction_to_inbox 725-776).
+ *
  * Departures: MOVE_FROG / IDLE_FROG play once per change (the source loops
  * them 999 times; their stand-ins are synth ribbits); one-shot clips
  * (moveStart, poses in and out) play through before the source's next timer
- * step; the auction (red) frog is not used: auction deliveries are ledger
- * letters (G333) the mailbox settles through the site; give_cubimal is not
- * offered (the remake has no mini_me_mini_you yet).
+ * step; the frog is your own (the source's stood on the street for everyone
+ * and told others "On delivery for <name>! No time to talk, brah."); the
+ * frog's 'to-mailbox' says only the growl (the source also said "...arrived
+ * while you were out", send_unsent_auctions_to_inbox 800-807, though you
+ * were there); give_cubimal is not offered (the remake has no
+ * mini_me_mini_you yet).
  *
  * QA (solo): ?autostart=1&fresh=1&resetgame=1&questoffer=off&maildemo=courier
  *   (a Groddle Afternoon Post special delivery, 5 Awesome Stew, the frog called 1.5 s
  *   later) &mailautoplay=1 (OK, talk, hand over, yoga, leave), =talk (stops
- *   at the first line), =hold (holds the yoga pose). Dispatcher:
+ *   at the first line), =hold (holds the yoga pose). The red frog:
+ *   &maildemo=auction (a purchased auction of 3 Cherries, no site: handed
+ *   over locally), &mailauctions=N (N deliveries, mixed kinds; 11 or more
+ *   shows the next-ten line), &mailautoplay as above. Dispatcher:
  *   &homedemo=home&maildemo=dispatcher&mailautoplay=1 (Send mail, an Apple
  *   to Amp, close, the parcel run); &mailautoplay=open stops with the window
  *   open. Other lanes' QA routes (any *demo / *autoplay param) never get a
@@ -62,27 +84,37 @@
 
 import { ITEM_CATALOG, itemIcon } from '../inventory.js?v=602da017';
 import { frameTexture, sourceFromUrl } from '../textures.js?v=3149d699';
-import { questRoomConverse } from './quest-instances-feature.js?v=11a2b795';
+import { questRoomConverse } from './quest-instances-feature.js?v=a97cbd77';
 import { hellFeature } from './hell-feature.js?v=54d49b30';
-import { DISPATCHER_ART, FROG_ART, MAIL_NPC_ART_DIR } from '../mail-npc-art.js?v=790f980a';
+import { DISPATCHER_ART, FROG_ART, MAIL_NPC_ART_DIR } from '../mail-npc-art.js?v=031c4e2e';
 import { DISPATCHER_GAP, DISPATCHER_HALF, SIGNPOST } from '../home-street-fixtures.js?v=badcb725';
-import { MAIL_POST_SENDER } from '../mailbox.js?v=b2bde2fe';
+import { MAIL_POST_SENDER } from '../mailbox.js?v=1d97704f';
 import {
+  AUCTION_PAGE,
   COURIER,
   COURIER_TEXT,
   FROG_EPIPHANIES,
+  FROG_MORE_AUCTIONS,
+  FROG_VARIANT,
   PARCEL,
+  auctionGotLine,
   courierDueAt,
+  dueAuctions,
   flyStep,
   handOver,
+  handOverAuction,
   letterLine,
+  nextAuction,
   nextExpress,
   nextRamble,
   normalizeCourierState,
   pickPose,
+  sendAuctionsToMailbox,
   sendCarriedToMailbox,
   sendDueToMailbox,
-} from '../mail-courier.js?v=12d7d7a4';
+} from '../mail-courier.js?v=e872c17e';
+import { AUCTION_SENDER, mailText } from '../auctions.js?v=1301d2b0';
+import { formatStack } from '../gifts.js?v=d0732a90';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
 
 export const MAIL_COURIER_FEATURE_ID = 'mail-courier';
@@ -112,6 +144,8 @@ let station = null;
 let booted = false;
 let nextAt = null;
 let nextFor = null;
+/** schedule_next_delivery's delivery_type: 'courier' (blue frog) or 'auction' (red frog). */
+let nextType = 'courier';
 let promptOpen = false;
 let talking = false;
 let last = '';
@@ -130,12 +164,13 @@ const param = (engine, k) => String(engine.param?.(k) || '');
 
 /* ------------------------------------------------------------------ art */
 
-function frogFrames(engine, box, label) {
-  const key = `${box ? 'box' : 'none'}:${label}`;
+function frogFrames(engine, variant, box, label) {
+  const key = `${variant}:${box ? 'box' : 'none'}:${label}`;
   if (sheetCache.has(key)) return sheetCache.get(key);
   const [cols, count] = FROG_ART.sheets[label];
   const { PIXI } = engine;
-  const base = sourceFromUrl(`${MAIL_NPC_ART_DIR}${FROG_ART.files[box ? 'box' : 'none']}${label}.png`);
+  const files = FROG_ART.variants?.[variant] || FROG_ART.files;
+  const base = sourceFromUrl(`${MAIL_NPC_ART_DIR}${files[box ? 'box' : 'none']}${label}.png`);
   const list = [];
   for (let i = 0; i < count; i += 1) {
     list.push(frameTexture(base, new PIXI.Rectangle((i % cols) * FROG_ART.cell.w, Math.floor(i / cols) * FROG_ART.cell.h, FROG_ART.cell.w, FROG_ART.cell.h)));
@@ -162,7 +197,7 @@ function dispatcherFrames(engine, label) {
 function setFrogClip(engine, f, clip, onDone = null) {
   if (!f?.sprite || f.sprite.destroyed || !FROG_ART.sheets[clip]) return;
   const spr = f.sprite;
-  spr.textures = frogFrames(engine, f.box, clip);
+  spr.textures = frogFrames(engine, f.variant, f.box, clip);
   spr.loop = FROG_LOOPERS.has(clip);
   spr.animationSpeed = FPS / 60;
   spr.onComplete = onDone;
@@ -214,12 +249,13 @@ function makeFrog(engine, kind, x, y, box) {
   spr._worldHitW = 70;
   spr._worldHitH = 80;
   engine.entityLayer.addChild(spr);
+  const variant = FROG_VARIANT[kind] || 'frogBlue';
   const f = {
-    kind, sprite: spr, target: null, x, y, box, clip: '', mode: '', move: null, timers: [],
+    kind, variant, sprite: spr, target: null, x, y, box, clip: '', mode: '', move: null, timers: [],
     follow: { state: 'move', isClose: 0, flying: false, travel: '', nextAt: 0 }, moving: false,
-    delivered: false, waitForSpace: false, previous: 0, pose: '', current: null,
+    delivered: false, waitForSpace: false, previous: 0, pose: '', current: null, shown: 0, total: 0,
   };
-  for (const label of Object.keys(FROG_ART.sheets)) frogFrames(engine, box, label);
+  for (const label of Object.keys(FROG_ART.sheets)) frogFrames(engine, variant, box, label);
   return f;
 }
 
@@ -239,19 +275,19 @@ function moveTo(f, x, y, speed, then = null) {
   f.move = { x, y, speed, then };
 }
 
-/** answer_mail_prompt 328-343, then fall 364-379 (onContainerChanged). */
-function spawnCourier(engine) {
+/** answer_mail_prompt 328-343 (blue for courier mail, red for auctions), then fall 364-379 (onContainerChanged). */
+function spawnCourier(engine, type = 'courier') {
   const p = engine.player;
   if (!p || frog) return;
   const side = rng() < 0.5 ? -1 : 1;
   const w = Number(engine.worldW) || 3000;
   const x = Math.max(-200, Math.min(w + 200, p.x + side * COURIER.spawnDx));
-  frog = makeFrog(engine, 'courier', x, p.y + COURIER.spawnDy, true);
+  frog = makeFrog(engine, type === 'auction' ? 'auction' : 'courier', x, p.y + COURIER.spawnDy, true);
   frog.target = engine.register({
     classId: FROG_CLASS,
     featureId: MAIL_COURIER_FEATURE_ID,
     label: COURIER_TEXT.label,
-    subtitle: 'Express mail',
+    subtitle: frog.kind === 'auction' ? 'Auction delivery' : 'Express mail',
     sprite: frog.sprite,
     state: {},
   });
@@ -300,7 +336,8 @@ function followStep(engine, f) {
     if (fl.state !== 'move' || f.clip !== 'move') setFrogClip(engine, f, 'move');
     fl.state = 'move';
     fl.flying = true;
-    const tx = f.x < p.x ? p.x + COURIER.followLeftDx : p.x + COURIER.followRightDx;
+    // The middle of the source's flying area (COURIER.followArea).
+    const tx = (f.x < p.x ? p.x + COURIER.followLeftDx : p.x + COURIER.followRightDx) + COURIER.followArea / 2;
     faceTo(f, tx);
     moveTo(f, tx, p.y + COURIER.followDy, COURIER.followSpeed);
     frogSound(engine, f, true);
@@ -372,6 +409,72 @@ function stuffHtml(message) {
   return bits.length ? `<span style="display:flex;flex-wrap:wrap;gap:12px;margin-top:10px" data-mail-courier-stuff>${bits.join('')}</span>` : '';
 }
 
+function stackLabel(classTsid, n) {
+  const meta = ITEM_CATALOG[classTsid];
+  return formatStack(classTsid, n, null, (c, k) => (k === 1 ? meta?.label : meta?.namePlural || meta?.label) || String(c).replace(/_/g, ' '));
+}
+
+/** mail_build_auction_rewards: the stacks the frog shows (rewards.items). */
+function auctionStuffHtml(list) {
+  const bits = list.map((m) => {
+    const item = m.attachment;
+    const label = ITEM_CATALOG[item.classTsid]?.label || item.classTsid;
+    const icon = ITEM_CATALOG[item.classTsid]?.icon || itemIcon(item.classTsid);
+    return `<span style="display:inline-flex;align-items:center;gap:6px"><img src="${escapeHtml(icon)}" alt="" style="width:40px;height:40px;object-fit:contain" />${escapeHtml(`${item.count} × ${label}`)}</span>`;
+  });
+  return bits.length ? `<span style="display:flex;flex-wrap:wrap;gap:12px;margin-top:10px" data-mail-courier-stuff>${bits.join('')}</span>` : '';
+}
+
+/** doDelivery 238-251 / showMoreAuctionItems 702-721: the next ten, and the reply's value. */
+function auctionPage(f, list, rambles) {
+  const page = list.slice(f.shown, f.shown + AUCTION_PAGE);
+  f.shown += AUCTION_PAGE;
+  const value = f.shown >= f.total ? (rambles ? 'thx' : 'bye') : 'auction-more-items';
+  return { page, value };
+}
+
+/**
+ * onConversation 'bye' (auction) 582-590, get_auction_mail / get_mail_items
+ * 959-1058: every due stack the pack can take goes in (online through the
+ * site), one at a time so each counts the room the last one left; the
+ * frog's line names them all. Returns how many could not fit.
+ */
+async function handOverAuctions(engine, f) {
+  const got = [];
+  let undelivered = 0;
+  for (const m of dueAuctions(engine.mailMessages?.(), now())) {
+    const item = m.attachment;
+    const room = engine.query?.('packRoom', item.classTsid, item.count, engine);
+    if (room != null && Number(room) < Number(item.count)) {
+      undelivered += 1;
+      continue;
+    }
+    let ok = false;
+    if (m.ledger) {
+      ok = Boolean(await engine.query?.('mailReceive', m, engine, { quiet: true }));
+    } else {
+      ok = handOverAuction(m, engine.inv, { room }).ok;
+    }
+    if (!ok) continue;
+    // The source made no letter for a delivery the frog handed over (send_auction_to_inbox only for the mailbox).
+    m.attachmentsClaimed = true;
+    m.read = true;
+    m.deleted = true;
+    got.push(stackLabel(item.classTsid, item.count));
+    state.delivered += 1;
+    last = `frog:handed:${item.classTsid}`;
+  }
+  if (got.length) {
+    engine.pushActivity?.(COURIER_TEXT.mailTime(got));
+    engine.playSound?.('CONFIRM_DELIVERY', { volume: 0.45 });
+    engine.refreshPack?.();
+    engine.updateHud?.();
+    engine.save?.();
+  }
+  f.handed = (f.handed || 0) + got.length;
+  return undelivered;
+}
+
 /** One conversation_start / conversation_reply: resolves with the chosen value (null if closed). */
 async function say3(engine, html, choices) {
   if (autoplayMode(engine) === 'talk' && autoStep === 0) {
@@ -413,9 +516,23 @@ async function talkToFrog(engine) {
   frogSound(engine, f, false);
   try {
     let choice;
+    const auction = f.kind === 'auction';
     if (f.waitForSpace) {
       const e = FROG_EPIPHANIES[Math.floor(rng() * FROG_EPIPHANIES.length)];
       choice = await say3(engine, escapeHtml(COURIER_TEXT.epiphany + e), [{ label: COURIER_TEXT.epiphanyReply, value: 'bye' }]);
+    } else if (auction) {
+      // doDelivery 238-251: the first ten deliveries due, by kind.
+      const list = dueAuctions(engine.mailMessages?.(), now());
+      if (!list.length) {
+        // Collected at a mailbox while the frog was on its way: nothing left to bring.
+        finishDelivery(engine, f);
+        return;
+      }
+      f.total = list.length;
+      f.shown = 0;
+      const { page, value } = auctionPage(f, list, rng() < COURIER.rambleChance);
+      last = `frog:auction:${f.total}`;
+      choice = await say3(engine, `${escapeHtml(auctionGotLine(page))}${auctionStuffHtml(page)}`, [{ label: COURIER_TEXT.thanks, value }]);
     } else {
       choice = await say3(engine, escapeHtml(COURIER_TEXT.gotMail), [{ label: COURIER_TEXT.thanks, value: rng() < COURIER.rambleChance ? 'thx' : 'bye' }]);
     }
@@ -428,6 +545,24 @@ async function talkToFrog(engine) {
         choice = await say3(engine, escapeHtml(r.line), [{ label: r.reply, value: 'deliver' }]);
       } else if (choice === 'deliver') {
         choice = await say3(engine, escapeHtml(COURIER_TEXT.namaste), [{ label: COURIER_TEXT.namasteReply, value: 'bye' }]);
+      } else if (choice === 'auction-more-items') {
+        // showMoreAuctionItems 702-721.
+        const list = dueAuctions(engine.mailMessages?.(), now());
+        const { page, value } = auctionPage(f, list, rng() < COURIER.rambleChance);
+        const line = FROG_MORE_AUCTIONS[Math.floor(rng() * FROG_MORE_AUCTIONS.length)];
+        choice = await say3(engine, `${escapeHtml(line)}${auctionStuffHtml(page)}`, [{ label: COURIER_TEXT.thanks, value }]);
+      } else if (choice === 'bye' && auction) {
+        // onConversation 'bye' 582-590: get_auction_mail, then deliveryFailed or finishDelivery.
+        const undelivered = await handOverAuctions(engine, f);
+        if (undelivered) {
+          choice = await say3(engine, escapeHtml(COURIER_TEXT.packFull), [
+            { label: COURIER_TEXT.makeRoom, value: 'make-room' },
+            { label: COURIER_TEXT.toMailbox, value: 'to-mailbox' },
+          ]);
+        } else {
+          finishDelivery(engine, f);
+          return;
+        }
       } else if (choice === 'bye') {
         const msg = nextExpress(engine.mailMessages?.(), now());
         if (!msg) {
@@ -459,7 +594,9 @@ async function talkToFrog(engine) {
         f.waitForSpace = true;
         break;
       } else if (choice === 'to-mailbox') {
-        sendCarriedToMailbox(engine.mailMessages?.(), now());
+        // sendMailToInbox 674-682: this frog's kind of mail only.
+        if (auction) sendAuctionsToMailbox(engine.mailMessages?.(), now());
+        else sendCarriedToMailbox(engine.mailMessages?.(), now());
         engine.refreshPack?.();
         engine.pushActivity?.(COURIER_TEXT.growl);
         choice = await say3(engine, escapeHtml(COURIER_TEXT.karma), [{ label: COURIER_TEXT.karmaReply, value: 'take-off' }]);
@@ -592,8 +729,8 @@ function scheduleTick(engine) {
   const messages = engine.mailMessages?.() || [];
   if (!booted) {
     booted = true;
-    // mail_login: what came due while you were away is in the mailbox now.
-    const moved = sendDueToMailbox(messages, now());
+    // mail_login: what came due while you were away is in the mailbox now (send_unsent_mail_to_inbox 845-862: letters and auctions).
+    const moved = sendDueToMailbox(messages, now()) + sendAuctionsToMailbox(messages, now()).length;
     if (moved) {
       engine.pushActivity?.(COURIER_TEXT.growl);
       engine.refreshPack?.();
@@ -601,17 +738,25 @@ function scheduleTick(engine) {
     }
   }
   if (frog || promptOpen) return;
-  const msg = nextExpress(messages, now(), { future: true });
+  // schedule_next_delivery 894-953: the next pending delivery of either kind, the earlier first.
+  const letter = nextExpress(messages, now(), { future: true });
+  const parcel = nextAuction(messages, now(), { future: true });
+  const type = parcel && (!letter || Number(parcel.deliveryAt) < Number(letter.deliveryAt)) ? 'auction' : 'courier';
+  const msg = type === 'auction' ? parcel : letter;
   if (!msg) {
     nextAt = null;
     nextFor = null;
     return;
   }
-  if (nextAt == null || nextFor !== msg.id) {
-    const due = param(engine, 'maildemo') === 'courier' ? Math.max(Number(msg.deliveryAt) || 0, now() + 1500) : courierDueAt(msg, now());
+  // The site may move a delivery's time (its answer is the truth, auctions-feature mailDeliveries): a new time is a new call.
+  const key = `${type}:${msg.id}:${msg.deliveryAt}`;
+  if (nextAt == null || nextFor !== key) {
+    const demo = param(engine, 'maildemo');
+    const due = demo === 'courier' || demo === 'auction' ? Math.max(Number(msg.deliveryAt) || 0, now() + 1500) : courierDueAt(msg, now());
     // A sooner call already set stays (inc_mail.js 941-943).
     nextAt = nextAt != null && nextAt > now() && nextAt < due ? nextAt : due;
-    nextFor = msg.id;
+    nextFor = key;
+    nextType = type;
   }
   if (now() < nextAt || qaHold(engine)) return;
   if (blockedPlace(engine)) {
@@ -619,16 +764,19 @@ function scheduleTick(engine) {
     last = 'courier:rescheduled';
     return;
   }
-  if (busy(engine) || !nextExpress(messages, now())) return;
+  // deliver_mail 312: mail_has_deliveries(delivery_type).
+  const has = nextType === 'auction' ? dueAuctions(messages, now()).length > 0 : Boolean(nextExpress(messages, now()));
+  if (busy(engine) || !has) return;
   promptOpen = true;
-  last = 'courier:prompt';
+  last = `courier:prompt${nextType === 'auction' ? ':auction' : ''}`;
+  const kind = nextType;
   engine.prompt?.({
     modal: true,
     text: COURIER_TEXT.prompt,
     choices: [{ label: 'OK', value: 'ok' }],
     onChoice: () => {
       promptOpen = false;
-      spawnCourier(engine);
+      spawnCourier(engine, kind);
     },
   });
   if (autoplayMode(engine)) setTimeout(() => clickPrompt(), 600);
@@ -842,6 +990,25 @@ function demoSetup(engine) {
     booted = true;
     last = 'demo:courier';
   }
+  if (demo === 'auction') {
+    // Ticket 74 QA: purchased (and, with mailauctions=N, cancelled and expired) auctions, no site.
+    const n = Math.max(1, Math.min(30, Math.floor(Number(param(engine, 'mailauctions')) || 1)));
+    const kinds = ['purchased', 'expired', 'cancelled'];
+    const classes = ['cherry', 'apple', 'potato', 'meat', 'grain'].filter((c) => ITEM_CATALOG[c]);
+    for (let i = 0; i < n; i += 1) {
+      const kind = i === 0 ? 'purchased' : kinds[i % kinds.length];
+      engine.deliverMail?.({
+        sender: AUCTION_SENDER,
+        text: mailText(kind),
+        deliveryAt: now(),
+        attachment: { classTsid: classes[i % classes.length] || 'apple', count: i === 0 ? 3 : 1 + (i % 4) },
+        auction: kind,
+        express: true,
+      });
+    }
+    booted = true;
+    last = 'demo:auction';
+  }
 }
 
 function autoplayTick(engine) {
@@ -849,7 +1016,7 @@ function autoplayTick(engine) {
   if (!mode || now() < autoAt) return;
   autoAt = now() + 400;
   const demo = param(engine, 'maildemo');
-  if (demo === 'courier' && frog && !talking && !frog.delivered && frog.mode === 'follow' && frog.follow.state === 'idle' && mode !== 'talk-done') {
+  if ((demo === 'courier' || demo === 'auction') && frog && !talking && !frog.delivered && frog.mode === 'follow' && frog.follow.state === 'idle' && mode !== 'talk-done') {
     if (autoStep === 0 || mode !== 'talk') talkToFrog(engine);
   }
   if (demo === 'dispatcher' && station && !autoStep && busy(engine)) {

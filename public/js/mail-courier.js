@@ -34,11 +34,35 @@
  *   1000 ms) and the frog's pickup (npc_yoga_frog.js startPickup 721-728,
  *   doPickup 260-292).
  *
+ * Auction deliveries by red AFLC Frog (ticket 74, players/inc_mail.js and
+ * items/npc_yoga_frog.js; G518):
+ * - a purchase, a cancel and an expiry all go through
+ *   mail_add_auction_delivery (inc_auctions.js 271, 318, 498), due
+ *   config.auction_delivery_time (600 s, config_prod.js:44) later;
+ * - schedule_next_delivery 894-953 calls whichever is next, auction or
+ *   courier mail; answer_mail_prompt 335-339 sends a frogBlue frog for
+ *   courier mail and a frogRed frog for auctions;
+ * - doDelivery 238-251: "Got your <describe> auction(s), brah." over the
+ *   first ten deliveries due within 60 s (mail_build_auction_rewards
+ *   425-476: "purchased", "2 purchased", "purchased and expired"), the next
+ *   ten with showMoreAuctionItems 702-721;
+ * - onConversation 'bye' 582-590 / get_mail_items 959-1058: every stack that
+ *   fits goes straight into the pack ("Mail time! You got ..."); one that
+ *   does not fit makes the frog ask (deliveryFailed 202-204), and "Just send
+ *   it to my mailbox." puts them in the mailbox (send_unsent_auctions_to_inbox
+ *   778-811), where the remake's mailbox rule takes over (js/player-mail.js:
+ *   collected only at a mailbox);
+ * - mail_login 1463-1468: auctions that came while you were away go to the
+ *   mailbox ("Your purchased auctions arrived while you were out...").
+ * Remake rule: Austin's HOMES2 rule keeps a player's parcel at the mailbox;
+ * auction deliveries follow the source instead (lane frog-auctions,
+ * 2026-11-04): the red frog hands them over wherever you are.
+ *
  * Copy: the source's words; its em-dashes became a comma or a colon (house
  * style), and a letter's sender stands in for getPlayer(sender).label.
  */
 
-import { mailSender } from './mailbox.js?v=b2bde2fe';
+import { mailSender } from './mailbox.js?v=1d97704f';
 
 export const COURIER = Object.freeze({
   /** inc_mail.js 936-938. */
@@ -58,6 +82,12 @@ export const COURIER = Object.freeze({
   followLeftDx: -100,
   followRightDx: 50,
   followDy: -50,
+  /**
+   * apiStartFlyingInTheAreaX(x, y, 50, 50): the frog flies about a 50 px area from those
+   * corners, so it ends nearer than followNear; aiming at the corner itself left it exactly
+   * 100 px behind you, never close enough to stop (the courier hovered on, ticket 74 QA).
+   */
+  followArea: 50,
   followSpeed: 200,
   followSettleDx: 60,
   followStepMs: 100,
@@ -144,6 +174,8 @@ export const COURIER_TEXT = Object.freeze({
   offToYoga: "Off to my yoga session, dude. You should drop in sometime, it's good for your, like, chi.",
   /** nextPlayerMailItem 664-688. */
   cool: 'Cool.',
+  /** get_mail_items 1035-1049: what the frog handed over. */
+  mailTime: (things) => `Mail time! You got ${things.length === 1 ? things[0] : things.map((t, i) => (i === things.length - 1 ? `and ${t}` : `${t}, `)).join('')}.`,
   /** Dispatcher: send_mail verb, 176-186. */
   dispatcher: 'Mail Dispatcher',
   sendMail: 'Send mail',
@@ -160,6 +192,23 @@ export const FROG_RAMBLINGS = Object.freeze([
   ['So I said to my boss, "Ever seen an eagle take a shower? Ever seen a, like, bear use soap?" and he was all like, "But you smell like feet."', 'Can I seriously please just have my mail?'],
   ["Sometimes I get the feeling like you don't appreciate my wisdom.", "I'd appreciate my mail."],
 ]);
+
+/** showMoreAuctionItems 703-710: the frog's words over each ten deliveries after the first. */
+export const FROG_MORE_AUCTIONS = Object.freeze([
+  "Oh, I guess there's this stuff too.",
+  'I found this stuff in there too. Is it yours?',
+  'Whoa, look at all this stuff.',
+  'Did you order all this stuff to, like, fill some void? Because materialism is a dead end, dude.',
+  'Before you just keep buying stuff you should think about like all the starving piggies in the world.',
+  "Possessions aren't going to set you free, brah.",
+]);
+
+/** mail_add_stack 1290-1296: deliveryPacket.auction_action. */
+export const AUCTION_ACTIONS = Object.freeze(['purchased', 'cancelled', 'expired']);
+/** doDelivery 239 and showMoreAuctionItems 712: ten deliveries a line. */
+export const AUCTION_PAGE = 10;
+/** answer_mail_prompt 335-339: the frog's colour by what it carries. */
+export const FROG_VARIANT = Object.freeze({ courier: 'frogBlue', auction: 'frogRed', pickup: 'frogBlue' });
 
 /** responses.epiphanies, npc_yoga_frog.js 894-901. */
 export const FROG_EPIPHANIES = Object.freeze([
@@ -184,6 +233,7 @@ const int = (v, d = 0) => {
 export function isExpressPending(message) {
   return Boolean(message) &&
     message.express === true &&
+    !message.auction &&
     message.inMailbox !== true &&
     message.outgoing !== true &&
     message.deleted !== true &&
@@ -259,6 +309,99 @@ export function handOver(message, inventory, player, { room = null } = {}) {
   message.inMailbox = true;
   message.expedited = true;
   return { ok: true, currants, item };
+}
+
+/**
+ * An auction delivery the red frog brings (ticket 74): a mailbox row from the
+ * Auction Fulfillment and Logistics Corporation (features/auctions-feature.js;
+ * the site's ledger op auc-<id>-d, or none for the solo QA demo), not yet in
+ * the mailbox and not yet collected.
+ */
+export function isAuctionPending(message) {
+  return Boolean(message) &&
+    message.express === true &&
+    AUCTION_ACTIONS.includes(message.auction) &&
+    message.inMailbox !== true &&
+    message.attachmentsClaimed !== true &&
+    message.outgoing !== true &&
+    message.deleted !== true &&
+    Boolean(message.attachment) &&
+    (!message.ledger || /^auc-[0-9a-f]{16}-d$/.test(String(message.ledger)));
+}
+
+/** mail_has_deliveries('auction') 350-363: the earliest pending delivery due within 60 s (or any, with `future`). */
+export function nextAuction(messages, now = Date.now(), { future = false } = {}) {
+  let best = null;
+  for (const m of Array.isArray(messages) ? messages : []) {
+    if (!isAuctionPending(m)) continue;
+    if (!best || int(m.deliveryAt) < int(best.deliveryAt)) best = m;
+  }
+  if (!best) return null;
+  return future || int(best.deliveryAt) <= now + COURIER.lookAheadMs ? best : null;
+}
+
+/**
+ * The deliveries the frog carries now, oldest first. The source looked 60 s
+ * ahead (get_mail_items 989); the site hands a stack over only once it is
+ * due (LedgerAuction collect: "That delivery is still on its way."), so a
+ * row from the site counts when it is due, the next one comes by the next frog.
+ */
+export function dueAuctions(messages, now = Date.now()) {
+  return (Array.isArray(messages) ? messages : [])
+    .filter((m) => isAuctionPending(m) && int(m.deliveryAt) <= now + (m.ledger ? 0 : COURIER.lookAheadMs))
+    .sort((a, b) => int(a.deliveryAt) - int(b.deliveryAt));
+}
+
+/** mail_build_auction_rewards 458-473: "purchased", "3 purchased", "2 purchased and 1 expired". */
+export function auctionDescribe(list) {
+  const types = new Map();
+  for (const m of Array.isArray(list) ? list : []) types.set(m.auction, (types.get(m.auction) || 0) + 1);
+  const many = types.size > 1;
+  let out = '';
+  let c = 1;
+  for (const [kind, n] of types) {
+    if (c === types.size && many) out += ' and ';
+    else if (c > 1) out += ', ';
+    out += many || n > 1 ? `${n} ${kind}` : kind;
+    c += 1;
+  }
+  return out;
+}
+
+/** doDelivery 248: the frog's first words over the first ten. */
+export function auctionGotLine(list) {
+  const shown = Array.isArray(list) ? list : [];
+  return `Got your ${auctionDescribe(shown)}${shown.length > 1 ? ' auctions, brah.' : ' auction, brah.'}`;
+}
+
+/**
+ * send_unsent_auctions_to_inbox 778-811 (mail_login, or 'to-mailbox' through
+ * sendMailToInbox): every pending delivery due by `until` waits in the mailbox
+ * now. Returns the rows moved.
+ */
+export function sendAuctionsToMailbox(messages, until = Date.now()) {
+  const moved = [];
+  for (const m of Array.isArray(messages) ? messages : []) {
+    if (!isAuctionPending(m) || int(m.deliveryAt) > until) continue;
+    m.inMailbox = true;
+    moved.push(m);
+  }
+  return moved;
+}
+
+/**
+ * The solo QA demo's hand-over (maildemo=auction: a delivery with no ledger
+ * op). Online every delivery is handed over by the site (mailReceive).
+ */
+export function handOverAuction(message, inventory, { room = null } = {}) {
+  if (!isAuctionPending(message) || message.ledger) return { ok: false, reason: 'missing' };
+  const item = message.attachment;
+  if (room != null && int(room) < int(item.count)) return { ok: false, reason: 'pack_full', item };
+  if (inventory) inventory[item.classTsid] = Math.max(0, int(inventory[item.classTsid])) + int(item.count);
+  message.attachmentsClaimed = true;
+  message.read = true;
+  message.inMailbox = true;
+  return { ok: true, item };
 }
 
 /** sayFunnyThings: delivery_order starts at 0 and steps on each time (mod 7). */

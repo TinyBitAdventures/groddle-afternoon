@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=2e6bc3fd';
 import { createFeatureHost } from './js/feature-host.js?v=2ed3c069';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=df76edfb';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=d9d494ac';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -482,7 +482,7 @@ import {
   parsePlayerSave,
   serializePlayerSave,
   restorePlayerSave,
-} from './js/player-save.js?v=7ba36bee';
+} from './js/player-save.js?v=e575fb77';
 import {
   HOME_INTERIOR_TSID,
   HOME_STREET_TSID,
@@ -511,7 +511,7 @@ import {
   seedMailbox,
   sendMail,
   unreadMailCount,
-} from './js/mailbox.js?v=b2bde2fe';
+} from './js/mailbox.js?v=1d97704f';
 import {
   TOOL_CONDITION_CATALOG,
   createToolConditionState,
@@ -563,7 +563,7 @@ import {
   recipeToolInUse,
 } from './js/making.js?v=6b048d25';
 import { MAKE_TOOL_SHEETS } from './js/make-tool-sheets.js?v=6f758e09';
-import { LOW_FUEL_LINE, craftSessionElapsedMs, isLowFuel, isMachineArt, machineArtHtml, packMakeState, playMachineHandOver, setMachineArtFrame } from './js/machine-art.js?v=8c93c616';
+import { LOW_FUEL_LINE, craftSessionElapsedMs, isLowFuel, isMachineArt, machineArtHtml, packMakeState, playMachineHandOver, setMachineArtFrame } from './js/machine-art.js?v=ac629e13';
 import {
   createGarden,
   tickGarden,
@@ -922,7 +922,7 @@ import { installTopBar, renderTopBar } from './js/ui/topbar.js?v=7509db0a';
 import { focusBack, installFocusReturn, lastInput } from './js/ui/focus-return.js?v=da190597';
 import { installContextGuard } from './js/ui/context-guard.js?v=0f71ac17';
 import { QUOIN_FRAME_BOB, advanceQuoinClock, quoinBobBetweenFrames } from './js/quoin-motion.js?v=ea0bd408';
-import { installHiresFirstDraw, installHiresSprites, upgradeSource } from './js/sprite-hires.js?v=96c22af7';
+import { installHiresFirstDraw, installHiresSprites, upgradeSource } from './js/sprite-hires.js?v=3f97bf07';
 import { denseSprite } from './js/sprite-dense.js?v=178a711b';
 import { wholeStatAmounts, wholeEffects } from './js/stat-text.js?v=f96d8fd3';
 import { createNotifier, effectTokens, floatKey, offerCardDrop, stackFloat, tokenText } from './js/notify.js?v=37c6b748';
@@ -1971,9 +1971,13 @@ let mailboxSelectedId = null;
  */
 let mailboxAt = false;
 
-/** HOMES2: letters whose things wait in the site's ledger (js/player-mail.js parcelWaits). */
+/**
+ * HOMES2: letters whose things wait in the site's ledger (js/player-mail.js parcelWaits). An auction
+ * delivery the red AFLC Frog is still bringing (ticket 74: express, not yet left in the mailbox) is
+ * not waiting at a mailbox.
+ */
 function parcelsWaitingCount() {
-  return mailboxState.messages.filter((m) => !m.outgoing && m.ledger && !m.attachmentsClaimed).length;
+  return mailboxState.messages.filter((m) => !m.outgoing && m.ledger && !m.attachmentsClaimed && !(m.auction && m.express && !m.inMailbox)).length;
 }
 let mailboxComposeReplyTo = null;
 

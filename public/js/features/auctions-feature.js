@@ -16,10 +16,16 @@
  *   picked a stack from your pack; the pack popover goes straight to it).
  * - Another player's menu, View Auctions (InteractionMenuController.as:
  *   560-562, "View active auctions from this person.").
- * - Deliveries arrive by mail (inc_mail.js mail_add_auction_delivery, 764-771):
- *   a letter from the Auction Fulfillment and Logistics Corporation with the
- *   stack attached, 10 minutes after the sale, cancel or expiry. Receive
- *   asks the site (mailReceive), which puts the stack in your ledger first.
+ * - Deliveries (inc_mail.js mail_add_auction_delivery 1209-1212) come 10
+ *   minutes after the sale, cancel or expiry, by red AFLC Frog (ticket 74,
+ *   features/mail-courier-feature.js: answer_mail_prompt 335-339), which
+ *   hands the stack straight into your pack wherever you are, as the source
+ *   did; the remake's mailbox-only rule is kept for players' parcels, not
+ *   for auctions. Each is also a letter from the Auction Fulfillment and
+ *   Logistics Corporation with the stack attached (inc_mail.js 764-771):
+ *   what came while you were away, or what you asked the frog to leave
+ *   there, waits in the mailbox, and Receive at a mailbox asks the site
+ *   (mailReceive), which puts the stack in your ledger first.
  *
  * Every move the site settled (listing, purchase, proceeds, delivery) comes
  * back as a receipt the save applies once (engine.query('ledgerReceipt'),
@@ -64,7 +70,7 @@ import {
   splitEnded,
   suggestedPrice,
   unitPrice,
-} from '../auctions.js?v=576b723e';
+} from '../auctions.js?v=1301d2b0';
 
 export const AUCTIONS_FEATURE_ID = 'auctions';
 const TABLE_URL = 'assets/content/trade-items.json';
@@ -264,21 +270,28 @@ function createSession(engine) {
     for (const d of list) {
       const row = deliveryMail(d);
       if (!row) continue;
-      const have = (engine.mailMessages?.() || []).find((m) => m.id === row.id);
+      // mail_login (send_unsent_auctions_to_inbox): what came while you were away is in the mailbox.
+      const cameAway = d.at <= startedAt;
+      let have = (engine.mailMessages?.() || []).find((m) => m.id === row.id);
       if (have) {
         if (d.collected) claimMail(row.ledger);
         else if (have.deleted) have.deleted = false;
         if (!have.ledger) have.ledger = row.ledger;
+        if (!have.auction) have.auction = row.auction;
         // The site says when it arrives.
         if (row.deliveryAt && have.deliveryAt !== row.deliveryAt && !d.collected) have.deliveryAt = row.deliveryAt;
+        // A row saved before the frog carried auctions, still on its way: the frog brings it.
+        if (!have.express && !d.collected && d.at > now) Object.assign(have, { express: true, inMailbox: false });
+        if (have.express && !have.inMailbox && cameAway) have.inMailbox = true;
       } else if (!d.collected) {
-        engine.deliverMail?.(row);
+        have = engine.deliverMail?.({ ...row, express: true, inMailbox: cameAway });
         added += 1;
       }
       if (!d.collected && d.at <= now && d.at > slice.seenOut) {
         newest = Math.max(newest, d.at);
-        if (d.at <= startedAt) away.push(d.kind);
-        else arrived += 1;
+        if (cameAway) away.push(d.kind);
+        // The red frog announces its own ("Special delivery!"); only one already in the mailbox is told here.
+        else if (!have?.express || have.inMailbox) arrived += 1;
       }
     }
     if (newest > slice.seenOut) slice.seenOut = newest;
@@ -804,17 +817,18 @@ function createSession(engine) {
 
   // —— The mailbox's Receive ——
 
-  async function receive(message) {
+  /** `quiet` (the red frog's hand-over): the frog says what came ("Mail time!"), so no toast or line here. */
+  async function receive(message, { quiet = false } = {}) {
     const id = String(message.ledger || '').slice(4, 20);
     const r = await call(() => account.collectAuction(id));
     if (!r.ok || !['collected', 'done'].includes(r.data?.status)) {
-      engine.toast?.(r.text || 'There is nothing left to receive.', 3200);
+      if (!quiet) engine.toast?.(r.text || 'There is nothing left to receive.', 3200);
       return false;
     }
     const d = r.data.delivery || {};
     const applied = applyReceipt(r.data.receipt, { r: d.item?.r ?? null });
     claimMail(message.ledger);
-    if (applied) {
+    if (applied && !quiet) {
       const what = countName(message.attachment?.classTsid, message.attachment?.count, table, label);
       engine.toast?.(`Received ${what}.`, 3200);
       engine.pushActivity?.(`Auction delivery collected: ${what}`);
@@ -876,10 +890,10 @@ export const auctionsFeature = {
     return engine?.mode === 'multiplayer' && session ? true : null;
   },
 
-  /** The mailbox's Receive on an auction delivery (game.js renderMailboxReader): settled by the site. */
-  mailReceive(message) {
+  /** The mailbox's Receive on an auction delivery (game.js renderMailboxReader) and the red frog's hand-over: settled by the site. */
+  mailReceive(message, engine, opts = {}) {
     if (!multiplayer || !session || !/^auc-[0-9a-f]{16}-d$/.test(String(message?.ledger || ''))) return null;
-    return session.receive(message);
+    return session.receive(message, opts);
   },
 
   /** Another player's Glitch: its menu plus View Auctions (InteractionMenuController.as:560-562). */

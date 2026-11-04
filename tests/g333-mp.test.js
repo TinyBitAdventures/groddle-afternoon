@@ -39,9 +39,9 @@ import {
   splitEnded,
   suggestedPrice,
   unitPrice,
-} from '../public/js/auctions.js?v=576b723e';
-import { auctionsFeature } from '../public/js/features/auctions-feature.js?v=a85b60bc';
-import { normalizeMailboxState } from '../public/js/mailbox.js?v=b2bde2fe';
+} from '../public/js/auctions.js?v=1301d2b0';
+import { auctionsFeature } from '../public/js/features/auctions-feature.js?v=e9838c81';
+import { normalizeMailboxState } from '../public/js/mailbox.js?v=1d97704f';
 import { MULTIPLAYER_QUESTS, MULTIPLAYER_QUESTS_LEFT_OUT, offerableMultiplayerQuest } from '../public/js/quests-mp.js?v=2beb658a';
 import { auctionJson } from '../tools/build-auctions.mjs';
 import { HAS_SITE, SITE_DIR, sitePath } from '../tools/repos.mjs';
@@ -111,7 +111,11 @@ describe('the source\'s words', () => {
     assert.equal(mailText('expired'), 'Your expired auction, courtesy of the Auction Fulfillment and Logistics Corporation.');
     assert.match(arrivedWhileOutText('purchased'), /^Your purchased auctions arrived while you were out\./);
     const row = deliveryMail({ id: ID, kind: 'purchased', item: { c: 'potato', n: 50 }, at: 5000 });
-    assert.deepEqual(row, { id: `auction-${ID}`, sender: AUCTION_SENDER, text: mailText('purchased'), sentAt: 5000, deliveryAt: 5000, attachment: { classTsid: 'potato', count: 50 }, ledger: `auc-${ID}-d` });
+    assert.deepEqual(row, { id: `auction-${ID}`, sender: AUCTION_SENDER, text: mailText('purchased'), sentAt: 5000, deliveryAt: 5000, attachment: { classTsid: 'potato', count: 50 }, ledger: `auc-${ID}-d`, auction: 'purchased' });
+    // Ticket 74: the red frog says what it brought (auction_action).
+    assert.equal(deliveryMail({ id: ID, kind: 'expired', item: { c: 'potato', n: 1 }, at: 1 }).auction, 'expired');
+    assert.equal(deliveryMail({ id: ID, kind: 'cancelled', item: { c: 'potato', n: 1 }, at: 1 }).auction, 'cancelled');
+    assert.match(AUCTION_TEXT.bought('3x Tomatoes', 120), /An AFLC Frog will bring it in about 10 minutes\.$/);
     assert.equal(deliveryMail({ id: 'nope', item: { c: 'potato', n: 1 } }), null);
   });
 

@@ -71,7 +71,7 @@ import {
   TAKEN_KEEP,
 } from '../home-machines.js?v=c0204c07';
 import { CALL_PLAYER_LINES, MACHINE_HITBOX, MACHINE_SKILLS, collectLine, machineJobMs, machineMadeLine, runningSoundKey, takeJobIngredients } from '../machine-rooms.js?v=7e790c4e';
-import { MACHINE_ART_SHEETS, LOW_FUEL_BUBBLE_MS, LOW_FUEL_LINE, isLowFuel, machineFrame, machineSheetDef, roomMachineState } from '../machine-art.js?v=8c93c616';
+import { MACHINE_ART_SHEETS, LOW_FUEL_BUBBLE_MS, LOW_FUEL_LINE, isLowFuel, machineFrame, machineSheetDef, roomMachineState } from '../machine-art.js?v=ac629e13';
 import { FUEL_CELL, FUEL_PER_CELL, MAX_FUEL } from '../machines.js?v=34a894cf';
 import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=602da017';
 import { receiveToolCopy, takeToolCopy } from '../tools.js?v=3974f57e';
@@ -81,8 +81,8 @@ import { createBackYardState, homeStreetLayout, normalizeCultivationState } from
 import { readVisitScene } from '../neighbours-mp.js?v=a8d5544e';
 import { saveStore } from '../save-store.js?v=8839ba7b';
 import { textureFromUrl } from '../textures.js?v=3149d699';
-import { createSheetLoader } from '../sprite-sheets.js?v=8f5dc6d9';
-import { STREET_GROUND_Y, homesFeature } from './homes-feature.js?v=325b3117';
+import { createSheetLoader } from '../sprite-sheets.js?v=db7c442f';
+import { STREET_GROUND_Y, homesFeature } from './homes-feature.js?v=140a8a21';
 
 export { HOME_MACHINES_ID };
 
