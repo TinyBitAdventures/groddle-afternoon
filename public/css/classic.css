@@ -1951,8 +1951,10 @@
    the grey well and its rules stay the client's. Half the usual margin above and below. Compact (a
    window too short for 760 x 460) folds the key hint's words away and keeps the well's bottom rule. */
 :root[data-ui="classic"] #game-root #map-panel:not([hidden]) { padding: calc(10 * var(--cu)) calc(20 * var(--cu)); grid-template: minmax(0, 1fr) / minmax(0, 1fr); }
+/* MAPFRAME (Austin 2026-11-04): the map is its painting edge to edge (centred in the client's 764 wide
+   window when a short window draws it smaller; a narrower window wrapped the route row and drew less). */
 :root[data-ui="classic"] #game-root #map-panel > .map-card[data-map-fit] { width: min(max(calc(764 * var(--cu)), var(--map-card-w, 0px)), 100%); }
-:root[data-ui="classic"] #game-root #map-panel > .map-card[data-map-fit="on"] > .map-canvas { flex: 0 1 auto; height: var(--map-fit-h); aspect-ratio: auto; max-height: none; }
+:root[data-ui="classic"] #game-root #map-panel > .map-card[data-map-fit="on"] > .map-canvas { flex: 0 1 auto; align-self: center; width: var(--map-fit-w, 100%); height: var(--map-fit-h); aspect-ratio: auto; max-height: none; }
 :root[data-ui="classic"] #game-root #map-panel > .map-card[data-map-fit="measure"] { max-height: none; }
 :root[data-ui="classic"] #game-root #map-panel > .map-card[data-map-fit="measure"] > .map-canvas { flex: none; height: 0; min-height: 0; aspect-ratio: auto; }
 :root[data-ui="classic"] #game-root #map-panel > .map-card[data-map-compact="1"] > .map-hint { display: block; padding-top: 0; font-size: 0; line-height: 0; }

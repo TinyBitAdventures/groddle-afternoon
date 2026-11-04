@@ -52,7 +52,7 @@ import {
   segmentMid,
   listHubsFromIndex,
   resolveHubId,
-} from '../public/js/map-graph.js?v=750beb4a';
+} from '../public/js/map-graph.js?v=99c13d35';
 import { STREET_INDEX } from '../public/js/street-loader.js?v=33d2b8bc';
 import { listMapDestinations } from '../public/js/travel.js?v=7fd6e363';
 import { readFileSync } from 'node:fs';
@@ -409,7 +409,7 @@ describe('GSJS hub-56 geometry map', () => {
     assert.equal(mid.y, 25);
     const view = buildHubMapView(HUB56, 'GLI2V0UN7RD1T2J', STREET_INDEX.streets);
     const svg = renderHubMapSvg(view);
-    // The painted 760 x 460 map, grown to take in GO buttons at its edge (map-graph.js hubMapFrame).
+    // The painted 760 x 460 map (map-graph.js hubMapFrame: GO buttons at its edge step in, MAPFRAME).
     const [vx, vy, vw, vh] = /viewBox="([^"]+)"/.exec(svg)[1].split(' ').map(Number);
     assert.ok(vx <= 0 && vy <= 0 && vx + vw >= 760 && vy + vh >= 460, `${vx} ${vy} ${vw} ${vh}`);
     assert.match(svg, /map-you/);

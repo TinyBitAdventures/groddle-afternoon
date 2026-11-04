@@ -143,8 +143,10 @@ export function buildHubMapView(hubData, currentTsid, streetIndex = {}) {
     hubId: String(h.hub_id || h.hubId || ''),
     hubName: h.hubName || h.label || 'Hub',
     label: h.label || (h.hubName ? `To: ${h.hubName}` : 'GO'),
-    x: h.x,
-    y: h.y,
+    // MAPFRAME (Austin 2026-11-04): the frame is the painting itself, so a GO button at the very edge
+    // (28 of 193 reached past it) steps in until its ring is whole, a few map units at most.
+    x: clampGo(h.x, mapW),
+    y: clampGo(h.y, mapH),
     arrow: h.arrow,
     travelable: false,
   }));
@@ -456,14 +458,35 @@ export function segmentHitsQuad(x1, y1, x2, y2, q) {
 
 /** A GO button's sign: under the button, or over it where the map ends below (player report 2026-11-01). */
 export function goLabelY(h, mapH = 460) {
-  return h.y + 34 <= mapH - 4 ? h.y + 34 : h.y - 30;
+  return h.y + 34 <= mapH - 5 ? h.y + 34 : h.y - 30;
+}
+
+/** How far a GO button's ring (and its stroke) reaches from its middle, in map units. */
+const GO_REACH = 26;
+/** A GO button's middle kept far enough in for its ring to draw whole inside the painting (MAPFRAME). */
+function clampGo(v, size) {
+  const n = Number(v) || 0;
+  return size > 2 * GO_REACH ? Math.min(Math.max(n, GO_REACH), size - GO_REACH) : n;
+}
+
+/** Half a GO button's sign, in map units. */
+const goSignHalf = (h) => String(h.label || '').length * 2.9 + 4;
+
+/**
+ * A GO button's sign is centred under it, slid along (never off the button) where it would run past
+ * the painting's side (MAPFRAME: "To: Groddle Meadow" by Groddle Forest's left edge).
+ */
+export function goSignX(h, mapW = 760) {
+  const half = goSignHalf(h);
+  return Math.min(Math.max(h.x, half + 2), mapW - half - 2);
 }
 
 /** The room a GO button and its sign take, as a box. */
-function goBox(h, mapH) {
-  const sub = String(h.label || '').length * 2.9 + 4;
+function goBox(h, mapH, mapW = 760) {
+  const half = goSignHalf(h);
+  const sx = goSignX(h, mapW);
   const ly = goLabelY(h, mapH);
-  return { x0: Math.min(h.x - 24, h.x - sub), y0: Math.min(h.y - 24, ly - 9), x1: Math.max(h.x + 24, h.x + sub), y1: Math.max(h.y + 24, ly + 3) };
+  return { x0: Math.min(h.x - 24, sx - half), y0: Math.min(h.y - 24, ly - 9), x1: Math.max(h.x + 24, sx + half), y1: Math.max(h.y + 24, ly + 3) };
 }
 
 /**
@@ -489,7 +512,7 @@ export function layoutStreetLabels(streets, mapW = 760, mapH = 460, { hubs = [],
   });
   /** @type {number[][][]} */
   const placed = [];
-  const blockers = [...(hubs || []).map((h) => boxQuad(goBox(h, mapH))), ...(avoid || [])];
+  const blockers = [...(hubs || []).map((h) => boxQuad(goBox(h, mapH, mapW))), ...(avoid || [])];
   const you = shown.find((s) => s.current);
   if (you) blockers.push(boxQuad(youBox(you.mx, you.my)));
   const out = [];
@@ -533,7 +556,8 @@ export function layoutStreetLabels(streets, mapW = 760, mapH = 460, { hubs = [],
         for (const q of blockers) if (quadsOverlap(pad, q)) score += 300;
         for (const o of shown) if (o !== s && segmentHitsQuad(o.x1, o.y1, o.x2, o.y2, quad)) score += 40;
         const box = quadBox(quad);
-        if (box.x0 < 2 || box.y0 < 2 || box.x1 > mapW - 2 || box.y1 > mapH - 2) score += 150;
+        // MAPFRAME: the frame is the painting, so a name past its edge would be cut: the worst of all.
+        if (box.x0 < 2 || box.y0 < 2 || box.x1 > mapW - 2 || box.y1 > mapH - 2) score += 5000;
         if (!best || score < best.score) best = { x, y, quad, score };
         if (score < 1) break;
       }
@@ -592,11 +616,12 @@ export function hubMapFrame(hubs, mapW = 760, mapH = 460, extra = []) {
   let y0 = 0;
   let x1 = mapW;
   let y1 = mapH;
-  for (const b of [...(hubs || []).map((h) => goBox(h, mapH)), ...(extra || [])]) {
-    x0 = Math.min(x0, Math.floor(b.x0 - 2));
-    y0 = Math.min(y0, Math.floor(b.y0 - 2));
-    x1 = Math.max(x1, Math.ceil(b.x1 + 2));
-    y1 = Math.max(y1, Math.ceil(b.y1 + 2));
+  for (const b of [...(hubs || []).map((h) => goBox(h, mapH, mapW)), ...(extra || [])]) {
+    // (1e-6: a box that just meets the edge, give or take float sums, does not grow it.)
+    x0 = Math.min(x0, Math.floor(b.x0 - 2 + 1e-6));
+    y0 = Math.min(y0, Math.floor(b.y0 - 2 + 1e-6));
+    x1 = Math.max(x1, Math.ceil(b.x1 + 2 - 1e-6));
+    y1 = Math.max(y1, Math.ceil(b.y1 + 2 - 1e-6));
   }
   return [x0, y0, x1 - x0, y1 - y0];
 }
@@ -774,17 +799,20 @@ export function renderHubMapSvg(view) {
       `<g class="map-hub-go" data-hub="${escapeXml(h.hubId)}" data-label="${escapeXml(h.label)}">` +
         `<circle class="map-go-ring" cx="${h.x}" cy="${h.y}" r="22"/>` +
         `<text class="map-go-text" x="${h.x}" y="${h.y + 1}" text-anchor="middle" dominant-baseline="middle">GO</text>` +
-        `<text class="map-go-sub" x="${h.x}" y="${goLabelY(h, mapH)}" text-anchor="middle">${escapeXml(h.label)}</text>` +
+        `<text class="map-go-sub" x="${+goSignX(h, w).toFixed(1)}" y="${goLabelY(h, mapH)}" text-anchor="middle">${escapeXml(h.label)}</text>` +
         `</g>`
     );
   }
 
-  // The frame grows to take in a GO button at the very edge (28 of 193 reach past it), so none is cut off,
-  // and a street name or line there (ticket 21: Rushlane Steading's name ran past Groddle Meadow's top).
+  // The frame would grow to take in a GO button, street name or line past the painting's edge (ticket 21:
+  // Rushlane Steading's name ran past Groddle Meadow's top). MAPFRAME (Austin 2026-11-04): it no longer
+  // has to: GO buttons step in, their signs slide along and names keep inside, so every public region's
+  // frame is its painting (no plain bands round it; tests/map-fit.test.js). It stays as the safety net.
   const edges = labels.map((lab) => quadBox(labelQuad(lab.x, lab.y, lab.w, lab.h, lab.rot)));
   for (const s of view.streets || []) {
     if (s.hidden) continue;
-    edges.push({ x0: Math.min(s.x1, s.x2) - 3, y0: Math.min(s.y1, s.y2) - 3, x1: Math.max(s.x1, s.x2) + 3, y1: Math.max(s.y1, s.y2) + 3 });
+    // Half its 5 unit stroke with the frame's own 2 (MAPFRAME: a line by the edge no longer pushes it out).
+    edges.push({ x0: Math.min(s.x1, s.x2) - 0.5, y0: Math.min(s.y1, s.y2) - 0.5, x1: Math.max(s.x1, s.x2) + 0.5, y1: Math.max(s.y1, s.y2) + 0.5 });
   }
   const frame = hubMapFrame(view.hubs || [], w, h, edges);
   return (

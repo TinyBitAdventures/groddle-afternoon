@@ -5986,6 +5986,7 @@ body.buff-purple-pulse::after {
 
 /* Hub map */
 .map-card.map-hub {
+  --map-card-min: 520px;
   width: min(820px, 96%);
   max-height: 88%;
   background:
@@ -6019,13 +6020,16 @@ body.buff-purple-pulse::after {
    head and lines are measured at their own size; compact folds the key hint away when the map would
    otherwise draw under the client's 760 x 460. */
 .map-card.map-hub[data-map-fit] {
-  /* Never narrower than before (a narrower window wraps its head and lines and leaves the map less). */
-  width: min(max(820px, var(--map-card-w, 820px)), 96%);
+  /* MAPFRAME (Austin 2026-11-04): the map's own width, so the map is the painting edge to edge with no
+     plain bands beside it; a floor keeps the head and its row usable on a short, wide window. */
+  width: min(max(var(--map-card-min), var(--map-card-w, 820px)), 100%);
   max-width: 100%;
   max-height: 100%;
 }
 .map-card.map-hub[data-map-fit="on"] > .map-canvas {
   flex: 0 1 auto;
+  align-self: center;
+  width: var(--map-fit-w, 100%);
   height: var(--map-fit-h);
   aspect-ratio: auto;
   max-height: none;
@@ -6056,6 +6060,22 @@ body.buff-purple-pulse::after {
 .map-bar > [data-map-route] { flex: 1 1 0; }
 .map-bar > [data-map-route] .map-route-body { flex: 1 1 0; min-width: 8rem; }
 .map-bar > [data-map-route] .map-route-actions { flex: none; display: flex; gap: var(--sp-2); }
+/* MAPFRAME (Austin 2026-11-04): the route is one line beside the Shortcuts, so the map keeps the height
+   a wrapped route took (up to 170 px): where it is going, then the streets in order, cut short with the
+   whole route in its tip; a click on the line opens it out (map-routes-feature.js).
+   The Shortcuts give way first (down to their name); only a narrow window puts the route on a line
+   of its own under them. */
+.map-bar { flex-wrap: wrap; }
+/* Both grow from their least (the Shortcuts' name; the route's buttons and a few words), the route the more. */
+.map-bar > .map-extras:not(:only-child) { flex: 1 1 6.5rem; min-width: 6.5rem; max-width: 36%; }
+.map-bar > [data-map-route] { flex: 3 1 0; min-width: max-content; padding: 3px var(--sp-3) 3px var(--sp-4); gap: var(--sp-3); }
+.map-bar > [data-map-route]:not(:has(> .map-route-rooms)) { flex-wrap: nowrap; }
+/* width 0: the line's own length never sets the row's minimum (it ellipsizes instead). */
+.map-bar > [data-map-route] .map-route-body { width: 0; min-width: 5rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; }
+.map-bar > [data-map-route] .map-route-body[data-open] { white-space: normal; }
+.map-bar > [data-map-route] .map-route-actions > button { white-space: nowrap; padding: 2px var(--sp-3); }
+.map-bar > [data-map-route] .map-route-body br { display: none; }
+.map-bar > [data-map-route] .map-route-body > span:not(:first-child)::before { content: ' · '; }
 .map-extras {
   margin: 0 0 var(--sp-4);
   border-radius: var(--radius-lg);
@@ -11440,18 +11460,42 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
 [data-ui="modern"] #map-panel.ui-sheet-center {
   padding: calc(var(--hud-h) + 6px) max(var(--hud-inset), var(--inset-r, 0px)) 0 max(var(--hud-inset), var(--inset-l, 0px));
 }
-/* Compact: a little less air between the head and its lines, so 1440 x 707 still draws 760 x 460. */
-[data-ui="modern"] #map-panel .map-card.map-hub[data-map-compact="1"] { padding-bottom: var(--space-2); }
+/* MAPFRAME (Austin 2026-11-04): two short rows over the map (the head; the Shortcuts and the route on
+   one line) and one quiet line under it: the region's line ("40 streets · ...") with the keys at its
+   right end (the key hint sits over the line's end, so the two take one row). */
+[data-ui="modern"] #map-panel .map-card.map-hub { position: relative; }
+[data-ui="modern"] #map-panel .map-card.map-hub > .map-sub {
+  order: 1;
+  margin: var(--space-2) calc(-1 * var(--space-4)) 0;
+  padding: var(--space-2) calc(var(--space-4) + 11rem) var(--space-2) var(--space-4);
+  border-top: 1px solid var(--border);
+  line-height: var(--lh-tight);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+[data-ui="modern"] #map-panel .map-card.map-hub > .map-hint,
+[data-ui="modern"] #map-panel .map-card.map-hub[data-map-compact="1"] > .map-hint {
+  position: absolute;
+  right: var(--space-4);
+  bottom: 0;
+  display: block;
+  margin: 0;
+  padding: var(--space-2) 0;
+  border: 0;
+  line-height: var(--lh-tight);
+  white-space: nowrap;
+}
+[data-ui="modern"] #map-panel .map-card.map-hub > .map-bar { margin-bottom: var(--space-2); }
+/* Compact (a window too short for 760 x 460): a little less air round the rows. */
 [data-ui="modern"] #map-panel .map-card.map-hub[data-map-compact="1"] > .map-head { padding: var(--space-2) 0 var(--space-1); }
-[data-ui="modern"] #map-panel .map-card.map-hub[data-map-compact="1"] > .map-sub { margin: 0 0 var(--space-1); }
 [data-ui="modern"] #map-panel .map-card.map-hub[data-map-compact="1"] > .map-bar { margin-bottom: var(--space-1); }
+[data-ui="modern"] #map-panel .map-card.map-hub[data-map-compact="1"] > .map-sub { margin-top: var(--space-1); padding-top: var(--space-1); padding-bottom: var(--space-1); }
+[data-ui="modern"] #map-panel .map-card.map-hub[data-map-compact="1"] > .map-hint { padding: var(--space-1) 0; }
 [data-ui="modern"] #map-panel .map-extras-grid { background: var(--surface); border-color: var(--border); box-shadow: var(--shadow-3); }
 [data-ui="modern"] #map-panel .map-head h2 { color: var(--text); }
 [data-ui="modern"] #map-panel .map-card.map-hub .map-sub { color: var(--text-muted); font-size: var(--fs-s); }
 [data-ui="modern"] #map-panel .map-card.map-hub .map-hint {
-  margin: var(--space-2) calc(-1 * var(--space-4)) 0;
-  padding: var(--space-2) var(--space-4);
-  border-top: 1px solid var(--border);
   color: var(--text-muted);
   font-size: var(--fs-s);
   opacity: 1;

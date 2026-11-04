@@ -104,6 +104,8 @@ let walk = null;
 let gps = null;
 let lastDead = null;
 let pickMode = false;
+/** The Map row's route line opened out (a click on it; MAPFRAME). */
+let routeLineOpen = false;
 let lastPublish = 0;
 let lastLook = 0;
 let lastHudKey = '';
@@ -867,6 +869,27 @@ function mapCard(engine) {
   card.dataset.mapRouteQuest = quest ? quest.source : '';
   const body = `${lead}<div class="map-route-body">${head ? `<strong>${esc(head)}</strong><br>` : ''}${lines.map((l) => `<span>${esc(l)}</span>`).join('<br>')}</div>`;
   card.innerHTML = `${body}<span class="map-route-actions"></span>`;
+  // MAPFRAME (Austin 2026-11-04): in the Map's row the route is one line cut short (style.css .map-bar):
+  // its tip has the whole of it, and a click (or Enter) opens it out and back.
+  const bodyEl = card.querySelector('.map-route-body');
+  bodyEl.title = [head, ...lines].filter(Boolean).join('\n');
+  bodyEl.tabIndex = 0;
+  bodyEl.setAttribute('role', 'button');
+  const showOpen = () => {
+    bodyEl.toggleAttribute('data-open', routeLineOpen);
+    bodyEl.setAttribute('aria-expanded', String(routeLineOpen));
+  };
+  showOpen();
+  const flip = () => {
+    routeLineOpen = !routeLineOpen;
+    showOpen();
+  };
+  bodyEl.addEventListener('click', flip);
+  bodyEl.addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter') return;
+    e.preventDefault();
+    flip();
+  });
   const actions = card.querySelector('.map-route-actions');
   const button = (text, fn, pressed) => {
     const b = document.createElement('button');

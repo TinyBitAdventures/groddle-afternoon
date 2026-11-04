@@ -21,7 +21,7 @@ import {
   subwayRides,
 } from '../public/js/map-routes.js?v=bcf2c347';
 import { SUBWAY_STREETS } from '../public/js/street-jobs.js?v=7381e03e';
-import { mapRoutesFeature } from '../public/js/features/map-routes-feature.js?v=a33a2371';
+import { mapRoutesFeature } from '../public/js/features/map-routes-feature.js?v=52b41d02';
 import { createFeatureHost } from '../public/js/feature-host.js?v=2ed3c069';
 import { applyStreetIndex } from '../public/js/street-loader.js?v=33d2b8bc';
 import { buildOneWay } from '../tools/routes/build-one-way.mjs';

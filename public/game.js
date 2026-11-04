@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=2e6bc3fd';
 import { createFeatureHost } from './js/feature-host.js?v=2ed3c069';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=07aa49d6';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=15974cf5';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -885,7 +885,7 @@ import {
   pickMapSpot,
   MAP_INDEX_URL,
   HUB_56_MAP_URL,
-} from './js/map-graph.js?v=750beb4a';
+} from './js/map-graph.js?v=99c13d35';
 import { hubMapArtNote, hubMapSubtitle, questLogSummary } from './js/panel-copy.js?v=9fc1b2da';
 import { bindMapIconTips } from './js/ui/map-icon-tips.js?v=6b3eb3f9';
 import {
@@ -23961,6 +23961,8 @@ async function openMap(hubId, { find = '' } = {}) {
     // The painted-or-geometry note is for QA only (js/panel-copy.js), not the player's subtitle.
     sub.textContent = hubMapSubtitle(view);
     sub.dataset.mapArt = hubMapArtNote(view);
+    // Modern folds it onto the one quiet line under the map, where a narrow window cuts it short.
+    sub.title = sub.textContent;
   }
 
   canvas.innerHTML = renderHubMapSvg(view);
@@ -24052,7 +24054,9 @@ async function openMap(hubId, { find = '' } = {}) {
  * box (style.css / classic.css: under the top bar, over the pack, inside --inset-l / --inset-r)
  * less the window's own head and lines gives the map's size (map-graph.js mapFitSize): its frame's
  * shape, the client's 760 x 460 at least when there is room (the key hint folds away first), up to
- * 1.5 times it. Measured again on a window resize and whenever the panel or the card changes size
+ * 1.5 times it. MAPFRAME (Austin 2026-11-04): the card takes the map's own width (the canvas is the
+ * painting's shape exactly, never a wider box with bands beside the art). Measured again on a window
+ * resize and whenever the panel or the card changes size
  * (the Social drawer, a side sheet, a route card). A 1x screen takes the Retina painting once the
  * map draws larger than 760 x 460. QA: canvas data mapFit "<w>x<h>@<scale>" plus " compact".
  */
@@ -24073,9 +24077,12 @@ function fitMapCanvas(panel = document.getElementById('map-panel')) {
     const availH = panel.clientHeight - px(ps.paddingTop) - px(ps.paddingBottom);
     const minH = px(getComputedStyle(canvas).minHeight);
     // The window's head and lines at the width it will have: measured with the map at its smallest
-    // (no height, or the skin's floor), so nothing above it gives way; again at the new width, which can
-    // wrap a line, until it holds.
-    for (let pass = 0; pass < 3; pass++) {
+    // (no height, or the skin's floor), so nothing above it gives way; first across the whole room, then
+    // again at the map's own width (MAPFRAME: the card hugs the map, so no plain bands beside it), which
+    // can wrap a line, until it holds.
+    let trialW = availW;
+    for (let pass = 0; pass < 5; pass++) {
+      card.style.setProperty('--map-card-w', `${Math.floor(trialW)}px`);
       card.dataset.mapFit = 'measure';
       card.dataset.mapCompact = '0';
       const chromeW = card.offsetWidth - canvas.offsetWidth;
@@ -24084,13 +24091,15 @@ function fitMapCanvas(panel = document.getElementById('map-panel')) {
       const compactChromeH = card.offsetHeight - canvas.offsetHeight;
       const next = mapFitSize({ availW, availH, chromeW, chromeH, compactChromeH, frameW, frameH, minH });
       if (!next) break;
-      const same = fit && fit.w === next.w && fit.h === next.h;
       fit = next;
-      card.style.setProperty('--map-card-w', `${fit.w + chromeW}px`);
+      const cardW = fit.w + chromeW;
+      card.style.setProperty('--map-card-w', `${cardW}px`);
+      card.style.setProperty('--map-fit-w', `${fit.w}px`);
       card.style.setProperty('--map-fit-h', `${fit.h}px`);
       card.dataset.mapCompact = fit.compact ? '1' : '0';
       card.dataset.mapFit = 'on';
-      if (same) break;
+      if (Math.abs(cardW - trialW) < 1) break;
+      trialW = cardW;
     }
     if (!fit) {
       delete card.dataset.mapFit;

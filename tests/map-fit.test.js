@@ -17,6 +17,11 @@
  * (map-graph.js mapFitSize, game.js fitMapCanvas), at least the client's 760 x 460 where there is
  * room, up to 1.5 times it. Zoom and pan inside the Map are not part of it.
  *
+ * MAPFRAME (Austin 2026-11-04, a route set at 1000 x 636): a band of plain colour ran above the painting
+ * and beside it, and a route card wrapped to three lines over the map. The frame is now the painting
+ * (GO buttons step in, their signs slide along, names keep inside), the card takes the map's width, the
+ * route is one line beside the Shortcuts and the region's line shares one quiet row with the keys.
+ *
  * Run: node --test tests/map-fit.test.js
  */
 import { describe, it } from 'node:test';
@@ -26,6 +31,8 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
   buildHubMapView,
+  goLabelY,
+  goSignX,
   hubMapFrame,
   labelQuad,
   layoutHubMapMarks,
@@ -34,7 +41,7 @@ import {
   mapFitSize,
   quadBox,
   renderHubMapSvg,
-} from '../public/js/map-graph.js?v=750beb4a';
+} from '../public/js/map-graph.js?v=99c13d35';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');
@@ -108,11 +115,11 @@ describe('ticket 21: the Map always shows the whole hub', () => {
 });
 
 describe('ticket 76: the Map grows with the window (MAPSIZE)', () => {
-  // Measured in Chrome and WebKit (Modern, Groddle Forest): the head, the region line and the Shortcuts
-  // row take 165 px (114 compact, the key hint folded away), the card's sides 34 px; the map's floor
-  // is 180 px. The room: under the top bar (50 px) and over the pack, left of the Social drawer
+  // Measured in Chrome and WebKit (Modern, Groddle Meadow, MAPFRAME): the head, the Shortcuts and route
+  // row and the line under the map take 130 px (106 compact, a little less air), the card's sides 34 px;
+  // the map's floor is 180 px. Before MAPFRAME: 165 (114), and 247 with a route set. The room: under the top bar (50 px) and over the pack, left of the Social drawer
   // (316 px open, 60 px as the rail). Before, the card was 820 px wide (a 786 px canvas) and 88% tall.
-  const MODERN = { chromeW: 34, chromeH: 165, compactChromeH: 114, minH: 180 };
+  const MODERN = { chromeW: 34, chromeH: 130, compactChromeH: 106, minH: 180 };
   const WINDOWS = [
     { name: '1440x707 (Friendly)', availW: 1440 - 8 - 316, availH: 707 - 72 - 50, before: [786, 391] },
     { name: '1280x720', availW: 1280 - 8 - 60, availH: 720 - 72 - 50, before: [786, 403] },
@@ -149,7 +156,7 @@ describe('ticket 76: the Map grows with the window (MAPSIZE)', () => {
     assert.equal(mapFitSize({ availW: 600, availH: 250, chromeW: 34, chromeH: 165, compactChromeH: 114, frameW: 760, frameH: 460, minH: 180 }).h, 180);
   });
 
-  it('at 1440 x 707 every region draws at least the client size, but Groddle Meadow (its GO signs make it 492 tall)', () => {
+  it('at 1440 x 707 every region draws at least the client size (Groddle Meadow too, its frame no longer 492 tall)', () => {
     const win = WINDOWS[0];
     const small = [];
     for (const f of frames()) {
@@ -157,7 +164,7 @@ describe('ticket 76: the Map grows with the window (MAPSIZE)', () => {
       if (fit.scale < 1) small.push(`${f.name} ${fit.scale.toFixed(2)}`);
       else assert.ok(fit.w >= 760 && fit.h >= 460, `${f.name} ${fit.w}x${fit.h}`);
     }
-    assert.deepEqual(small, ['Groddle Meadow 0.96']);
+    assert.deepEqual(small, []);
   });
 
   it('every region, at every window tried, is larger than before and fits the room', () => {
@@ -172,7 +179,7 @@ describe('ticket 76: the Map grows with the window (MAPSIZE)', () => {
       }
     }
     // 1920 x 1080 reaches the cap; 1024 x 600 folds the hint.
-    const gf = { frameW: 788, frameH: 466 };
+    const gf = { frameW: 760, frameH: 460 };
     assert.equal(mapFitSize({ ...MODERN, ...WINDOWS[2], ...gf }).scale, 1.5);
     assert.equal(mapFitSize({ ...MODERN, ...WINDOWS[3], ...gf }).compact, true);
   });
@@ -183,7 +190,10 @@ describe('ticket 76: the Map grows with the window (MAPSIZE)', () => {
     assert.match(game, /const availW = panel\.clientWidth - px\(ps\.paddingLeft\) - px\(ps\.paddingRight\);/);
     assert.match(game, /const chromeH = card\.offsetHeight - canvas\.offsetHeight;/);
     assert.match(game, /const next = mapFitSize\(\{ availW, availH, chromeW, chromeH, compactChromeH, frameW, frameH, minH \}\);/);
-    assert.match(game, /card\.style\.setProperty\('--map-card-w', `\$\{fit\.w \+ chromeW\}px`\);/);
+    // MAPFRAME: measured across the whole room first, then again at the map's own width until it holds.
+    assert.match(game, /let trialW = availW;\n    for \(let pass = 0; pass < 5; pass\+\+\) \{\n      card\.style\.setProperty\('--map-card-w', `\$\{Math\.floor\(trialW\)\}px`\);/);
+    assert.match(game, /const cardW = fit\.w \+ chromeW;\n      card\.style\.setProperty\('--map-card-w', `\$\{cardW\}px`\);\n      card\.style\.setProperty\('--map-fit-w', `\$\{fit\.w\}px`\);/);
+    assert.match(game, /if \(Math\.abs\(cardW - trialW\) < 1\) break;/);
     assert.match(game, /card\.style\.setProperty\('--map-fit-h', `\$\{fit\.h\}px`\);/);
     assert.match(game, /mapFitObserver\.observe\(panel\);\n\s+mapFitObserver\.observe\(card\);/);
     assert.match(game, /globalThis\.addEventListener\?\.\('resize', again\);/);
@@ -195,12 +205,70 @@ describe('ticket 76: the Map grows with the window (MAPSIZE)', () => {
   it('the room is between the top bar and the pack, inside the side sheets and the Social drawer (both skins)', () => {
     const css = read('public/style.css');
     assert.match(css, /\[data-ui="modern"\] #map-panel\.ui-sheet-center \{\n  padding: calc\(var\(--hud-h\) \+ 6px\) max\(var\(--hud-inset\), var\(--inset-r, 0px\)\) 0 max\(var\(--hud-inset\), var\(--inset-l, 0px\)\);/);
-    assert.match(css, /\.map-card\.map-hub\[data-map-fit\] \{\n[^}]*width: min\(max\(820px, var\(--map-card-w, 820px\)\), 96%\);/, 'never narrower than before');
-    assert.match(css, /\.map-card\.map-hub\[data-map-fit="on"\] > \.map-canvas \{\n  flex: 0 1 auto;\n  height: var\(--map-fit-h\);/);
+    assert.match(css, /\.map-card\.map-hub\[data-map-fit\] \{\n[^}]*width: min\(max\(var\(--map-card-min\), var\(--map-card-w, 820px\)\), 100%\);/, 'the map\'s own width');
+    assert.match(css, /\.map-card\.map-hub \{\n  --map-card-min: 520px;/);
+    assert.match(css, /\.map-card\.map-hub\[data-map-fit="on"\] > \.map-canvas \{\n  flex: 0 1 auto;\n  align-self: center;\n  width: var\(--map-fit-w, 100%\);\n  height: var\(--map-fit-h\);/);
     assert.match(css, /\.map-card\.map-hub\[data-map-compact="1"\] > \.map-hint \{ display: none; \}/);
     const classic = read('public/css/classic.css');
     assert.match(classic, /#map-panel:not\(\[hidden\]\) \{ padding: calc\(10 \* var\(--cu\)\) calc\(20 \* var\(--cu\)\); grid-template: minmax\(0, 1fr\) \/ minmax\(0, 1fr\); \}/);
     assert.match(classic, /#map-panel > \.map-card\[data-map-fit\] \{ width: min\(max\(calc\(764 \* var\(--cu\)\), var\(--map-card-w, 0px\)\), 100%\); \}/);
-    assert.match(classic, /#map-panel > \.map-card\[data-map-fit="on"\] > \.map-canvas \{ flex: 0 1 auto; height: var\(--map-fit-h\);/);
+    assert.match(classic, /#map-panel > \.map-card\[data-map-fit="on"\] > \.map-canvas \{ flex: 0 1 auto; align-self: center; width: var\(--map-fit-w, 100%\); height: var\(--map-fit-h\);/);
+  });
+});
+
+describe('MAPFRAME: the map is its painting, and the window around it is two short rows and one line', () => {
+  const regions = () => {
+    const idx = JSON.parse(read('public/assets/maps/index.json'));
+    const streets = JSON.parse(read('public/assets/streets/index.json')).streets;
+    return listHubsFromIndex(idx).map((h) => buildHubMapView({ ...JSON.parse(read(join('public', idx.hubs[h.hubId].file))), hubId: h.hubId }, '', streets));
+  };
+
+  it('every public region\'s frame is exactly its painting: no plain band above, below or beside it', () => {
+    const grown = [];
+    for (const view of regions()) {
+      const vb = renderHubMapSvg(view).match(/viewBox="([^"]+)"/)[1];
+      if (vb !== `0 0 ${view.mapW || 760} ${view.mapH || 460}`) grown.push(`${view.hubName} ${vb}`);
+    }
+    assert.deepEqual(grown, []);
+  });
+
+  it('a GO button at the edge steps in, its sign slides along, and a name keeps inside', () => {
+    const view = buildHubMapView({ hubId: '1', streets: [], hubs: [{ hub_id: 2, label: 'To: Groddle Meadow', x: 10, y: 455 }, { hub_id: 3, label: 'To: Ix', x: 400, y: 200 }] }, '', {});
+    assert.deepEqual([view.hubs[0].x, view.hubs[0].y], [26, 434], 'the ring is whole inside the painting');
+    assert.deepEqual([view.hubs[1].x, view.hubs[1].y], [400, 200], 'one away from the edge stays put');
+    // "To: Groddle Meadow" is about 112 units wide: centred under x 26 it would start at -30.
+    assert.equal(goSignX(view.hubs[0], 760), 18 * 2.9 + 4 + 2);
+    assert.equal(goSignX(view.hubs[1], 760), 400);
+    assert.equal(goSignX({ x: 740, label: 'To: Ix' }, 760), 760 - (6 * 2.9 + 4) - 2);
+    assert.equal(goLabelY({ y: 422 }, 460), 392, 'a sign that would touch the bottom goes over its button');
+    const svg = renderHubMapSvg(view);
+    assert.match(svg, /<text class="map-go-sub" x="58.2" y="404" text-anchor="middle">To: Groddle Meadow<\/text>/);
+    assert.match(svg, /viewBox="0 0 760 460"/);
+    // The name layout treats the painting's edge as worse than any overlap (Rushlane Steading's name
+    // ran 30 units over Groddle Meadow's top).
+    assert.match(read('public/js/map-graph.js'), /if \(box\.x0 < 2 \|\| box\.y0 < 2 \|\| box\.x1 > mapW - 2 \|\| box\.y1 > mapH - 2\) score \+= 5000;/);
+  });
+
+  it('the route is one line beside the Shortcuts, its whole text in its tip, and a click opens it out', () => {
+    const css = read('public/style.css');
+    assert.match(css, /\.map-bar > \.map-extras:not\(:only-child\) \{ flex: 1 1 6\.5rem; min-width: 6\.5rem; max-width: 36%; \}/);
+    assert.match(css, /\.map-bar > \[data-map-route\] \{ flex: 3 1 0; min-width: max-content;/);
+    assert.match(css, /\.map-bar > \[data-map-route\]:not\(:has\(> \.map-route-rooms\)\) \{ flex-wrap: nowrap; \}/, 'the room picker still has its own line');
+    assert.match(css, /\.map-bar > \[data-map-route\] \.map-route-body \{ width: 0; min-width: 5rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; \}/);
+    assert.match(css, /\.map-bar > \[data-map-route\] \.map-route-body\[data-open\] \{ white-space: normal; \}/);
+    assert.match(css, /\.map-bar > \[data-map-route\] \.map-route-body br \{ display: none; \}/);
+    const feature = read('public/js/features/map-routes-feature.js');
+    assert.match(feature, /bodyEl\.title = \[head, \.\.\.lines\]\.filter\(Boolean\)\.join\('\\n'\);/);
+    assert.match(feature, /routeLineOpen = !routeLineOpen;/);
+    assert.match(feature, /bodyEl\.setAttribute\('aria-expanded', String\(routeLineOpen\)\);/);
+  });
+
+  it('Modern: the region\'s line goes under the map and shares its row with the keys', () => {
+    const css = read('public/style.css');
+    assert.match(css, /\[data-ui="modern"\] #map-panel \.map-card\.map-hub > \.map-sub \{\n  order: 1;[^}]*white-space: nowrap;\n  overflow: hidden;\n  text-overflow: ellipsis;\n\}/);
+    assert.match(css, /\[data-ui="modern"\] #map-panel \.map-card\.map-hub\[data-map-compact="1"\] > \.map-hint \{\n  position: absolute;\n  right: var\(--space-4\);\n  bottom: 0;\n  display: block;/);
+    assert.match(read('public/game.js'), /sub\.title = sub\.textContent;/);
+    // Classic keeps its head, its region line under it and the client's 764 wide window.
+    assert.doesNotMatch(read('public/css/classic.css'), /\.map-sub \{[^}]*order:/);
   });
 });
