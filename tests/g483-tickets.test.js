@@ -17,8 +17,8 @@ import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { SITE_DIR, sitePath, skipWithoutSite } from '../tools/repos.mjs';
 import { REPORT_MAX, REPORT_PICTURE, REPORT_TEXT, STATUS_WORDS, UNREAD_POLL_MS, base64Size, canEditFirst, createReportsApi, pictureRefused, pictureSize, pictureSrc, refusalWords, reportFromHash, ticketLine, unreadCount, whenWords } from '../public/js/reports.js?v=aae32361';
-import { mountReportsSheet } from '../public/js/ui/reports-sheet.js?v=51d1dfa0';
-import { BUG_TEXT, badgeFor, bugReportFeature, capturePicture } from '../public/js/features/bug-report-feature.js?v=dd0464d4';
+import { mountReportsSheet } from '../public/js/ui/reports-sheet.js?v=13a8c5b1';
+import { BUG_TEXT, badgeFor, bugReportFeature, capturePicture } from '../public/js/features/bug-report-feature.js?v=b5ee3618';
 
 const root = join(import.meta.dirname, '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');
@@ -268,8 +268,8 @@ describe('the Reports sheet (js/ui/reports-sheet.js)', () => {
     assert.ok(host.find((n) => n.textContent === 'We\'d love to hear from you!' && n.className === 'reports-new-title'));
     text.value = 'The pig floated\nup and away';
     byData(host, 'bugReportSend').click();
-    await flush();
-    await flush();
+    // Send draws the picture with the UI after a paint, so "Sending…" shows first (ticket 73).
+    await settle();
     assert.deepEqual(api.calls.find((c) => c[0] === 'create'), ['create', 'The pig floated\nup and away', { street: 'GA5101HF7F429V5' }]);
     assert.deepEqual(toasts, [REPORT_TEXT.sent]);
     assert.equal(panel.dataset.reportsView, 'list');
@@ -326,23 +326,24 @@ describe('a picture of the game with a report (Austin 2026-10-30)', () => {
     assert.match(REPORT_TEXT.pictureHint, /other players, their names and speech bubbles/, 'says what the canvas shows');
   });
 
-  it('capturePicture draws the location view through snapshotView, downscaled, then lower quality, then narrower, until it fits', () => {
+  it('capturePicture draws the location view out of the canvas, downscaled, then lower quality, then narrower, until it fits', () => {
     const made = [];
     // Bytes a fake JPEG comes to: width x quality decides, so the steps show.
     const doc = { createElement: () => {
       const c = { width: 0, height: 0, drawn: [], getContext: () => ({ fillRect() {}, drawImage: (...a) => c.drawn.push(a) }), toDataURL: (type, q) => { made.push([c.width, q, type]); return JPEG(Math.round((c.width * q * 400) * 4 / 3)); } };
       return c;
     } };
-    const view = { width: 1920, height: 1080 };
+    // Ticket 73: one read-back of the whole canvas; the location view is its top rows (camera h).
+    const view = { width: 1920, height: 1260 };
     const asked = [];
-    const engine = { snapshotView: (o) => { asked.push(o); return view; } };
+    const engine = { camera: { w: 1920, h: 1080 }, snapshotCanvas: (o) => { asked.push(o); return view; } };
     // 1280 x 0.8 x 400 = 409,600 bytes: too big; 0.7 too; 0.6 = 307,200 fits.
     const shot = capturePicture(engine, doc);
-    assert.deepEqual(asked, [{ resolution: 1 }]);
+    assert.deepEqual(asked, [{ width: 1280 }]);
     assert.deepEqual(made.map((m) => m.slice(0, 2)), [[1280, 0.8], [1280, 0.7], [1280, 0.6]]);
     assert.equal(made[0][2], 'image/jpeg');
     assert.equal(shot.width, 1280);
-    assert.equal(shot.height, 720);
+    assert.equal(shot.height, 720, 'the location view, the strip under the pack left out');
     assert.ok(shot.bytes <= 307200);
     assert.ok(shot.url.startsWith('data:image/jpeg;base64,'));
     // Tighter limits: narrower once every quality is too big at the widest.
@@ -352,15 +353,17 @@ describe('a picture of the game with a report (Austin 2026-10-30)', () => {
     assert.equal(narrow.width, 1024);
     assert.equal(capturePicture(engine, doc, { ...REPORT_PICTURE, maxBytes: 10 }), null, 'never fits: no picture');
     assert.equal(capturePicture({}, doc), null, 'no renderer yet');
-    assert.equal(capturePicture({ snapshotView: () => { throw new Error('lost context'); } }, doc), null);
+    assert.equal(capturePicture({ snapshotCanvas: () => { throw new Error('lost context'); } }, doc), null);
     // The world-only picture is the canvas alone: it never reads the page's HUD or chat.
     const f = read('public/js/features/bug-report-feature.js');
     const fn = f.slice(f.indexOf('export function capturePicture('), f.indexOf('export function encodePicture('));
-    assert.match(fn, /engine\?\.snapshotView\?\.\(\{ resolution: 1 \}\)/);
-    assert.doesNotMatch(fn, /querySelector|getElementById|html2canvas|innerHTML/);
+    assert.match(fn, /captureFrame\(engine, doc, limits\)/);
+    const frameFn = f.slice(f.indexOf('export function captureFrame('), f.indexOf('export function viewRows('));
+    assert.match(frameFn, /engine\?\.snapshotCanvas\?\.\(/);
+    assert.doesNotMatch(fn + frameFn, /getElementById|html2canvas|innerHTML|getComputedStyle/);
     // With the game's UI ticked (the default), the page too (tests/report-ui-picture.test.js).
-    assert.match(f, /capture: \(\{ ui = false \} = \{\}\) => \(ui \? capturePictureWithUi\(engine\) : capturePicture\(engine\)\),/);
-    // snapshotView is the stage inside the location view (the pack strip below it left out).
+    assert.match(f, /capture: \(\{ ui = false, world = null \} = \{\}\) => \(ui \? capturePictureWithUi\(engine, document, REPORT_PICTURE, world\?\.frame\) : capturePicture\(engine\)\),/);
+    // snapshotView (profiles, snaps) is the stage inside the location view (the pack strip below it left out).
     assert.match(read('public/game.js'), /snapshotView\(\{ resolution = 1 \} = \{\}\) \{[\s\S]*?app\.renderer\.extract\.canvas\(\{ target: app\.stage, frame: new PIXI\.Rectangle\(0, 0, VIEW_W, LOCATION_VIEW_H\), resolution \}\)/);
   });
 
@@ -403,27 +406,26 @@ describe('a picture of the game with a report (Austin 2026-10-30)', () => {
     assert.equal(box.attrs.type, 'checkbox');
     assert.equal(box.checked, true, 'on by default');
     assert.equal(box.disabled, false);
-    assert.equal(taken, 2, 'drawn behind the form once it opens: the world, then with the UI');
+    assert.equal(taken, 1, 'the world drawn behind the form once it opens; with the UI after a pause in typing or at Send (ticket 73)');
     const preview = byData(host, 'reportsPicturePreview');
     assert.equal(preview.hidden, false);
-    assert.equal(preview.getAttribute('src'), shot.url);
+    assert.equal(preview.children[0].getAttribute('src'), preview.getAttribute('href'), 'the picture, opening in the lightbox');
     assert.ok(host.find((n) => n.tagName === 'LABEL' && n.textContent.includes('Attach a picture of the game')));
     byId(host, 'bug-report-text').value = 'Pigs float';
     byData(host, 'bugReportSend').click();
-    await flush();
-    await flush();
+    await settle();
     assert.deepEqual(api.calls[0], ['create', 'Pigs float', shot.url]);
+    assert.equal(taken, 2, 'the one with the UI drawn at Send');
     // A second report, unticked: no picture.
     sheet.open('new');
     await settle();
-    assert.equal(taken, 4, 'fresh pictures for each new report');
+    assert.equal(taken, 3, 'fresh pictures for each new report');
     box.checked = false;
     box.dispatch('change');
     assert.equal(preview.hidden, true);
     byId(host, 'bug-report-text').value = 'No picture please';
     byData(host, 'bugReportSend').click();
-    await flush();
-    await flush();
+    await settle();
     assert.deepEqual(api.calls[1], ['create', 'No picture please', null]);
   });
 
@@ -441,7 +443,7 @@ describe('a picture of the game with a report (Austin 2026-10-30)', () => {
     await settle();
     byId(host, 'bug-report-text').value = 'Pigs float';
     byData(host, 'bugReportSend').click();
-    for (let i = 0; i < 4; i++) await flush();
+    await settle();
     assert.equal(api.calls.length, 2);
     assert.ok(api.calls[0][2], 'first with the picture');
     assert.equal(api.calls[1][2], null, 'then without it');
@@ -453,8 +455,7 @@ describe('a picture of the game with a report (Austin 2026-10-30)', () => {
     await settle();
     byId(m.host, 'bug-report-text').value = 'x';
     byData(m.host, 'bugReportSend').click();
-    await flush();
-    await flush();
+    await settle();
     assert.equal(odd.calls[0][2], null);
   });
 

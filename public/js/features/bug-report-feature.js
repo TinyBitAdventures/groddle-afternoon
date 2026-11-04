@@ -32,13 +32,23 @@
  * With the game's UI (player report 2026-11-01, Austin's design): Include the
  * game's UI, ticked by default, draws the whole game window instead
  * (capturePictureWithUi): the page (#wrap) through modern-screenshot 4.7.0
- * (MIT, public/vendor/modern-screenshot, imported only when a report opens),
- * with the canvas's own picture in place of the WebGL canvas
+ * (MIT, public/vendor/modern-screenshot, imported only when that picture is
+ * first drawn), with the canvas's own picture in place of the WebGL canvas
  * (engine.snapshotCanvas: render then extract). The Reports window and its
  * scrim are left out; chat, mail, Activity and group chat keep their boxes
  * with the words blanked (REPORT_MASK), since they hold other players' names
  * and words. The same size and JPEG budget as before. The report's context
  * names the windows that were open (openPanels: "donate:mab", "make:gassifier").
+ *
+ * Ticket 73 (Safari 26.5: "Drawing the picture..." and no typing until it
+ * loaded): the canvas is read once as the form opens (captureFrame), the world
+ * picture is its location view, and the picture with the UI is drawn from that
+ * same frame later, when the player pauses typing or presses Send
+ * (js/ui/reports-sheet.js UI_IDLE_MS). Measured there, nearly all of that
+ * drawing is the library copying each element's computed style; WebKit lists
+ * every CSS custom property (the design tokens) in it, so only the standard
+ * properties are copied (STYLE_NAMES): the custom ones are already resolved
+ * into the standard values.
  *
  * Over other windows (the same report): a window's scrim covers the top bar,
  * so the bug icon could not be clicked while Donate or another window was
@@ -51,7 +61,7 @@
  */
 
 import { createReportsApi, REPORT_PICTURE, REPORT_TEXT, UNREAD_POLL_MS, base64Size, pictureSize, reportFromHash } from '../reports.js?v=aae32361';
-import { mountReportsSheet } from '../ui/reports-sheet.js?v=51d1dfa0';
+import { mountReportsSheet } from '../ui/reports-sheet.js?v=13a8c5b1';
 
 export const BUG_REPORT_FEATURE_ID = 'bug-report';
 
@@ -157,20 +167,50 @@ export function reportContext(engine, errors = [], env = globalThis) {
 }
 
 /**
- * The game's canvas as a report's picture: { url, width, height, bytes } (a
- * JPEG data URL), or null when the view cannot be drawn or never fits.
+ * The canvas drawn once as a report opens (ticket 73): the whole canvas (the location view and
+ * the strip under the pack), at least as wide as it shows and as the picture can be, with the
+ * "Enter: choose" hint left out (engine.snapshotCanvas: render then extract). Both pictures come
+ * from it: the world one is its location view, and the one with the UI draws it in place of the
+ * WebGL canvas, so the canvas is read back once, not twice. Null before the renderer starts.
  */
-export function capturePicture(engine, doc = globalThis.document, limits = REPORT_PICTURE) {
-  let view = null;
-  try { view = engine?.snapshotView?.({ resolution: 1 }); } catch { view = null; }
-  return encodePicture(view, doc, limits);
+export function captureFrame(engine, doc = globalThis.document, limits = REPORT_PICTURE) {
+  const canvas = doc?.querySelector?.('#game-root canvas');
+  const cssW = canvas?.getBoundingClientRect?.().width || canvas?.clientWidth || 0;
+  const viewW = Number(engine?.camera?.w) || 0;
+  const width = Math.max(cssW, Math.min(viewW || cssW, limits.maxWidth));
+  let frame = null;
+  try { frame = engine?.snapshotCanvas?.(width ? { width } : {}) || null; } catch { frame = null; }
+  return frame?.width && frame?.height ? frame : null;
 }
 
-/** A drawn view (a canvas) as the report's JPEG within the site's limits, or null. */
-export function encodePicture(view, doc = globalThis.document, limits = REPORT_PICTURE) {
+/** PURE: the rows of a frame that hold the location view (camera h of camera w, the frame's width across). */
+export function viewRows(frameW, frameH, camera) {
+  const w = Number(camera?.w) || 0;
+  const h = Number(camera?.h) || 0;
+  if (!(frameW > 0 && frameH > 0)) return 0;
+  if (!(w > 0 && h > 0)) return frameH;
+  return Math.max(1, Math.min(frameH, Math.round((h * frameW) / w)));
+}
+
+/**
+ * The game's canvas as a report's picture: { url, width, height, bytes, frame } (a JPEG data
+ * URL of the location view; `frame`, not enumerable, is the whole canvas for the picture with
+ * the UI), or null when the view cannot be drawn or never fits.
+ */
+export function capturePicture(engine, doc = globalThis.document, limits = REPORT_PICTURE) {
+  const frame = captureFrame(engine, doc, limits);
+  if (!frame) return null;
+  const out = encodePicture(frame, doc, limits, viewRows(frame.width, frame.height, engine?.camera));
+  if (out) Object.defineProperty(out, 'frame', { value: frame });
+  return out;
+}
+
+/** A drawn view (a canvas; its top `rows` only, when given) as the report's JPEG within the site's limits, or null. */
+export function encodePicture(view, doc = globalThis.document, limits = REPORT_PICTURE, rows = 0) {
   if (!view?.width || !view?.height || !doc?.createElement) return null;
+  const srcH = rows > 0 ? Math.min(rows, view.height) : view.height;
   for (const widest of limits.widths) {
-    const [w, h] = pictureSize(view.width, view.height, Math.min(widest, limits.maxWidth), limits.maxHeight);
+    const [w, h] = pictureSize(view.width, srcH, Math.min(widest, limits.maxWidth), limits.maxHeight);
     if (!w || !h) return null;
     const c = doc.createElement('canvas');
     c.width = w;
@@ -181,7 +221,7 @@ export function encodePicture(view, doc = globalThis.document, limits = REPORT_P
     ctx.fillRect(0, 0, w, h);
     ctx.imageSmoothingEnabled = true;
     ctx.imageSmoothingQuality = 'high';
-    ctx.drawImage(view, 0, 0, w, h);
+    ctx.drawImage(view, 0, 0, view.width, srcH, 0, 0, w, h);
     for (const q of limits.qualities) {
       let url = '';
       try { url = c.toDataURL(limits.type, q); } catch { return null; }
@@ -248,6 +288,27 @@ export function blankPicture(canvas, doc = globalThis.document) {
   }
 }
 
+/**
+ * The standard CSS properties a computed style lists, the custom ones (--*) left out: what the
+ * page's copy carries for each element (ticket 73). WebKit lists every custom property in a
+ * computed style, and the game's design tokens made each copied element carry them all (about
+ * 23 KB each, 6 MB for the window); their values are already resolved into the standard ones.
+ * Read once per page; null leaves the library's own list.
+ */
+let styleNames = null;
+export function standardStyleNames(win = globalThis) {
+  if (styleNames) return styleNames;
+  let cs = null;
+  try { cs = win.getComputedStyle?.(win.document.documentElement); } catch { cs = null; }
+  const out = [];
+  for (let i = 0; i < (cs?.length || 0); i++) {
+    const name = cs.item(i);
+    if (name && !name.startsWith('--')) out.push(name);
+  }
+  if (out.length) styleNames = out;
+  return styleNames;
+}
+
 /** WebKit draws the page's copy again while its pictures decode (the library's fixSvgXmlDecode): a few passes, not one per picture. */
 const REDRAWS = 4;
 
@@ -255,12 +316,14 @@ const REDRAWS = 4;
  * The whole game window as a report's picture: the page with its HUD and open windows over
  * the canvas's own picture, the Reports window left out, chat and mail blanked. Resolves to
  * { url, width, height, bytes, ui: true } or null (the caller then sends the world only).
+ * `frame` is the canvas as the report opened (captureFrame, ticket 73): the Reports window is
+ * modal, so the windows under it are the ones open then, and the canvas is not read again.
  * Kept quick (ticket 30: Safari took most of a minute and froze typing): only what is drawn
  * is copied, the canvas goes in as a JPEG, WebKit redraws a few times instead of once per
  * picture, images that never load (closed windows' lazy ones) are not waited on, and a blank
  * result is refused.
  */
-export async function capturePictureWithUi(engine, doc = globalThis.document, limits = REPORT_PICTURE) {
+export async function capturePictureWithUi(engine, doc = globalThis.document, limits = REPORT_PICTURE, frame = null) {
   const root = doc?.getElementById?.('wrap') || doc?.body;
   const canvas = doc?.querySelector?.('#game-root canvas');
   if (!root || !canvas) return null;
@@ -269,8 +332,8 @@ export async function capturePictureWithUi(engine, doc = globalThis.document, li
   let lib;
   try { lib = await loadShotLib(); } catch { return null; }
   const cssW = canvas.getBoundingClientRect().width || canvas.clientWidth;
-  let world = null;
-  try { world = engine?.snapshotCanvas?.({ width: cssW }); } catch { world = null; }
+  let world = frame?.width && frame?.height ? frame : null;
+  if (!world) { try { world = engine?.snapshotCanvas?.({ width: cssW }); } catch { world = null; } }
   if (!world) return null;
   // A JPEG, not a PNG: a fifth of the bytes for the copy to carry and WebKit to decode.
   const worldUrl = world.toDataURL('image/jpeg', 0.92);
@@ -291,6 +354,7 @@ export async function capturePictureWithUi(engine, doc = globalThis.document, li
       timeout: 1500,
       drawImageInterval: 60,
       filter: (node) => !leftOut(node),
+      includeStyleProperties: standardStyleNames(),
       onCloneNode: (clone) => { maskClone(clone); },
       onEmbedNode: () => { if (context) context.drawImageCount = Math.min(context.drawImageCount, REDRAWS); },
     });
@@ -376,7 +440,10 @@ const STYLE = `
 [data-ui="modern"] #bug-report-panel .reports-checkbox:disabled { cursor: default; }
 [data-ui="modern"] #bug-report-panel .reports-checkbox:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
 [data-ui="modern"] #bug-report-panel .reports-hint { margin: 0; color: var(--text-muted); font-size: var(--fs-s); line-height: var(--lh-body); }
-[data-ui="modern"] #bug-report-panel .reports-picture-thumb { flex: none; width: 128px; height: auto; max-height: 96px; object-fit: cover; border: 1px solid var(--border); border-radius: var(--radius-s); }
+/* Ticket 73: the picture at its own shape, big enough to read, a link to the lightbox. */
+[data-ui="modern"] #bug-report-panel .reports-picture-thumb { flex: none; display: block; width: 216px; max-width: 45%; border: 1px solid var(--border); border-radius: var(--radius-s); overflow: hidden; line-height: 0; cursor: zoom-in; }
+[data-ui="modern"] #bug-report-panel .reports-picture-thumb img { display: block; width: 100%; height: auto; }
+[data-ui="modern"] #bug-report-panel .reports-picture-thumb:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
 [data-ui="modern"] #bug-report-panel .reports-picture { display: block; margin-top: var(--space-2); width: fit-content; max-width: 100%; border: 1px solid var(--border); border-radius: var(--radius-s); overflow: hidden; line-height: 0; cursor: zoom-in; }
 [data-ui="modern"] #bug-report-panel .reports-picture:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
 [data-ui="modern"] #bug-report-panel .reports-picture img { display: block; max-width: 100%; width: auto; height: auto; max-height: 180px; }
@@ -452,7 +519,8 @@ function createSession(engine, errors) {
     host,
     api,
     context: () => reportContext(engine, errors),
-    capture: ({ ui = false } = {}) => (ui ? capturePictureWithUi(engine) : capturePicture(engine)),
+    // The picture with the UI draws the canvas as the world picture found it when the form opened (ticket 73).
+    capture: ({ ui = false, world = null } = {}) => (ui ? capturePictureWithUi(engine, document, REPORT_PICTURE, world?.frame) : capturePicture(engine)),
     toast: (t, ms) => engine.toast?.(t, ms),
     opener: () => btn,
     onState: ({ state, view, unread, last }) => {

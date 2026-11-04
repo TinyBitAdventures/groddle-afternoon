@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=6218d040';
 import { createFeatureHost } from './js/feature-host.js?v=2ed3c069';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=fe99f294';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=cd9e163f';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -11510,13 +11510,21 @@ const engine = {
   },
   /**
    * The whole canvas as the player sees it, `width` CSS pixels wide (render-then-extract, so it
-   * works without preserveDrawingBuffer): the world under a report picture that includes the
-   * page's windows (features/bug-report-feature.js). Null before the renderer starts.
+   * works without preserveDrawingBuffer): a report's one read-back of the canvas, its world
+   * picture (the location view's rows) and the world under the picture that includes the page's
+   * windows (features/bug-report-feature.js captureFrame, ticket 73). The "Enter: choose" prompt
+   * is left out, as snapshotView leaves it. Null before the renderer starts.
    */
   snapshotCanvas({ width = VIEW_W } = {}) {
     if (!app?.renderer || !app.stage) return null;
     const resolution = Math.max(0.25, Math.min(4, (Number(width) || VIEW_W) / VIEW_W));
-    return app.renderer.extract.canvas({ target: app.stage, frame: new PIXI.Rectangle(0, 0, VIEW_W, VIEW_H), resolution });
+    const hint = prompt?.visible;
+    if (prompt) prompt.visible = false;
+    try {
+      return app.renderer.extract.canvas({ target: app.stage, frame: new PIXI.Rectangle(0, 0, VIEW_W, VIEW_H), resolution });
+    } finally {
+      if (prompt) prompt.visible = hint;
+    }
   },
   /**
    * Hold the camera centred `dx`/`dy` world pixels away from the avatar

@@ -5,8 +5,8 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { mountReportsSheet, PICTURE_WAIT_MS } from '../public/js/ui/reports-sheet.js?v=51d1dfa0';
-import { blankPicture, leftOut } from '../public/js/features/bug-report-feature.js?v=dd0464d4';
+import { mountReportsSheet, PICTURE_WAIT_MS } from '../public/js/ui/reports-sheet.js?v=13a8c5b1';
+import { blankPicture, leftOut } from '../public/js/features/bug-report-feature.js?v=b5ee3618';
 
 const root = join(import.meta.dirname, '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');
@@ -53,14 +53,15 @@ function mount(capture, opts = {}) {
 describe('the report form is usable at once (ticket 30)', () => {
   it('opens with the box ready and both ticks usable; the pictures are drawn after, the world first', async () => {
     const asked = [];
-    const { doc, host, sheet } = mount(({ ui }) => { asked.push(ui ? 'ui' : 'world'); return { url: JPEG(40), width: 1280, height: 628 }; });
+    // Ticket 73: the one with the UI after a pause in typing (uiIdle, 1.5 s in the game).
+    const { doc, host, sheet } = mount(({ ui }) => { asked.push(ui ? 'ui' : 'world'); return { url: JPEG(40), width: 1280, height: 628 }; }, { uiIdle: 20 });
     sheet.open('new');
     assert.deepEqual(asked, [], 'nothing is drawn as the form opens');
     assert.equal(byId(host, 'reports-picture').disabled, false);
     assert.equal(byId(host, 'reports-picture-ui').disabled, false);
     await wait(5);
     assert.equal(doc.activeElement, byId(host, 'bug-report-text'), 'the caret is in the box');
-    await wait(120);
+    await wait(200);
     assert.deepEqual(asked, ['world', 'ui']);
     assert.equal(byData(host, 'reportsPicturePreview').hidden, false);
     assert.ok(PICTURE_WAIT_MS >= 3000 && PICTURE_WAIT_MS <= 10000);
@@ -91,12 +92,12 @@ describe('the report form is usable at once (ticket 30)', () => {
 
   it('a UI picture that fails or comes out blank leaves the world picture, the UI tick off', async () => {
     const world = { url: JPEG(40), width: 1280, height: 628 };
-    const { host, sheet } = mount(({ ui }) => (ui ? null : world));
+    const { host, sheet } = mount(({ ui }) => (ui ? null : world), { uiIdle: 20 });
     sheet.open('new');
-    await wait(150);
+    await wait(200);
     assert.equal(byId(host, 'reports-picture-ui').checked, false);
     assert.equal(byId(host, 'reports-picture').checked, true);
-    assert.equal(byData(host, 'reportsPicturePreview').getAttribute('src'), world.url);
+    assert.equal(byData(host, 'reportsPicturePreview').dataset.which, 'world');
   });
 });
 
