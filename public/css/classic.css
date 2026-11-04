@@ -1766,6 +1766,41 @@
 }
 :root[data-ui="classic"] #game-root #quest-panel .ui-sheet-tabs button[aria-selected="true"],
 :root[data-ui="classic"] #game-root #achieve-panel .badge-status-filters button.active { background: var(--c-classic-panel); color: var(--c-classic-title); border-color: var(--c-classic-rule); }
+/* Ticket 77: the Quest Log's search box and sort picker (not in the 2012 log): a row in the well, the
+   2012 field and a minor button. */
+:root[data-ui="classic"] #game-root #quest-panel .qc-tools { flex: none; display: flex; align-items: center; gap: calc(8 * var(--cu)); padding-top: calc(4 * var(--cu)); padding-bottom: calc(4 * var(--cu)); }
+:root[data-ui="classic"] #game-root #quest-panel .qc-tools[hidden] { display: none; }
+:root[data-ui="classic"] #game-root #quest-panel .qc-search {
+  flex: 1 1 auto;
+  min-width: 0;
+  box-sizing: border-box;
+  min-height: calc(25 * var(--cu));
+  padding: 0 calc(8 * var(--cu));
+  border: 1px solid var(--c-classic-input-border);
+  border-radius: 3.5px;
+  background: var(--c-classic-input);
+  color: var(--c-classic-text);
+  font: calc(var(--fs-classic-row) * var(--cu-n, 1))/var(--lh-normal) var(--font-classic-body);
+}
+:root[data-ui="classic"] #game-root #quest-panel .qc-search:is(:hover, :focus) { background: var(--c-classic-input-hi); border-color: var(--c-classic-input-hi-border); outline: none; }
+:root[data-ui="classic"] #game-root #quest-panel .qc-sort {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: calc(4 * var(--cu));
+  min-height: calc(25 * var(--cu));
+  padding: 0 calc(8 * var(--cu));
+  border: 1px solid var(--c-classic-btn-minor-border);
+  border-radius: var(--radius-xs);
+  background: linear-gradient(180deg, var(--c-classic-btn-minor-top), var(--c-classic-btn-minor-bottom));
+  color: var(--c-classic-btn-minor-label);
+  font: 800 var(--fs-classic-body)/var(--lh-normal) var(--font-classic-title);
+  white-space: nowrap;
+  cursor: pointer;
+}
+:root[data-ui="classic"] #game-root #quest-panel .qc-sort:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--c-classic-focus); }
+:root[data-ui="classic"] #game-root #quest-panel .qc-sort-chev { display: inline-flex; }
+:root[data-ui="classic"] #game-root #quest-panel .qc-sort .vm-chev { transform: rotate(90deg); }
 
 /* Upgrades is the hub's sub-screen, not a window, in the client (ImgMenuView.as 330-335): solid black
    .7 over the viewport, the white "Upgrade" title, the hub's close; the cards keep their own art. */

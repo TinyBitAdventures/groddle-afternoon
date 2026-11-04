@@ -13,7 +13,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { isPinMenuKey } from '../public/js/ui/quest-pin-menu.js?v=a56891cf';
+import { isPinMenuKey } from '../public/js/ui/quest-pin-menu.js?v=c4dbee13';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const game = readFileSync(join(root, 'public/game.js'), 'utf8');

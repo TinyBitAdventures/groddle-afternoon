@@ -11291,6 +11291,46 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
 [data-ui="modern"] #quest .qc-body .content-action-btn:hover:not(:disabled) { background: var(--accent-hover); }
 [data-ui="modern"] #quest .qc-body .content-action-btn:disabled { background: var(--surface-sunken); border-color: var(--border); color: var(--text-muted); cursor: not-allowed; }
 [data-ui="modern"] #quest .qc-empty { margin: 0; padding: var(--space-6) var(--space-2); text-align: center; color: var(--text-muted); font-size: var(--fs-m); }
+/* Ticket 77: the search box and the sort picker under the tabs (a long log only). */
+[data-ui="modern"] #game-root #quest-panel .qc-tools { flex: none; display: flex; align-items: center; gap: var(--space-2); margin: 0 var(--space-4) var(--space-2); }
+[data-ui="modern"] #game-root #quest-panel .qc-tools[hidden] { display: none; }
+[data-ui="modern"] #game-root #quest-panel .qc-search {
+  flex: 1 1 auto;
+  min-width: 0;
+  box-sizing: border-box;
+  height: 32px;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-pill);
+  background: var(--surface-raised);
+  color: var(--text);
+  font: inherit;
+  font-size: var(--fs-m);
+}
+[data-ui="modern"] #game-root #quest-panel .qc-search::placeholder { color: var(--text-muted); opacity: 1; }
+[data-ui="modern"] #game-root #quest-panel .qc-search:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; }
+[data-ui="modern"] #game-root #quest-panel .qc-sort {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  height: 32px;
+  padding: 0 var(--space-2) 0 var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  background: var(--surface-sunken);
+  color: var(--text-muted);
+  font: inherit;
+  font-size: var(--fs-s);
+  font-weight: var(--fw-heavy);
+  white-space: nowrap;
+  cursor: pointer;
+}
+[data-ui="modern"] #game-root #quest-panel .qc-sort:hover,
+[data-ui="modern"] #game-root #quest-panel .qc-sort[aria-expanded="true"] { color: var(--text); background: var(--surface-hover); }
+[data-ui="modern"] #game-root #quest-panel .qc-sort:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; }
+[data-ui="modern"] #game-root #quest-panel .qc-sort-chev { display: inline-flex; }
+[data-ui="modern"] #game-root #quest-panel .qc-sort .vm-chev { transform: rotate(90deg); }
 
 /* Make: the tool strip (its fade in the sheet's colour), search and "Can make now", a 3-column grid. */
 [data-ui="modern"] #make-panel .make-tool-tabs { order: 3; flex: 1 1 100%; margin: var(--space-1) 0 0; padding-right: var(--space-2); }

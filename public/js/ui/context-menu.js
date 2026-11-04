@@ -32,7 +32,7 @@
  * QA: canvas data contextMenu ("<surface>:<id>", "" when closed).
  */
 
-import { bindVerbMenu, focusVerbRow, lockVerbMenuSize, makeVerbRow, verbMenuKey, verbRowKeys } from './verb-menu.js?v=48f4f63c';
+import { bindVerbMenu, focusVerbRow, lockVerbMenuSize, makeVerbRow, verbMenuKey, verbRowKeys } from './verb-menu.js?v=6cc4df84';
 import { focusWorld } from './focus-return.js?v=da190597';
 
 /** How long a finger holds before the menu opens, and how far it may drift. */
@@ -153,7 +153,7 @@ export function createContextMenu({ doc, host, id = '', className = '', headClas
   }
 
   /**
-   * Open it. `rows`: [{ id, label, tip?, disabled?, reason?, focusBack? }] (focusBack false: picking
+   * Open it. `rows`: [{ id, label, tip?, disabled?, reason?, focusBack?, current? }] (current: a choice, checked when true; focusBack false: picking
    * it leaves focus where the pick sends it, e.g. a sheet it opens). `at`: the pointer in client px
    * (a right-click); without it the menu sits beside `anchor` (an element or { right, top }).
    * `keys`: the keys opened it (focus goes back to `opener`, or what `findOpener()` gives, on close).
@@ -167,7 +167,8 @@ export function createContextMenu({ doc, host, id = '', className = '', headClas
     if (cur) close({ focus: false });
     const capKeys = verbRowKeys(rows);
     const built = rows.map((r, i) => {
-      const btn = makeVerbRow(doc, { key: capKeys[i], label: r.label, tip: r.tip || '', disabled: Boolean(r.disabled), reason: r.reason || '' });
+      // A row of a choice (`current` true or false: the Quests sheet's sorts) is a radio, checked when in use.
+      const btn = makeVerbRow(doc, { key: capKeys[i], label: r.label, tip: r.tip || '', disabled: Boolean(r.disabled), reason: r.reason || '', ...(typeof r.current === 'boolean' ? { current: r.current } : {}) });
       btn.classList.add('verb-choice');
       btn.dataset[rowData] = String(r.id);
       return { ...r, btn };

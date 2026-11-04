@@ -95,7 +95,13 @@ export function makeVerbRow(doc, row) {
   const btn = doc.createElement('button');
   btn.type = 'button';
   btn.className = `vm-row${row.back ? ' vm-back' : ''}${row.className ? ` ${row.className}` : ''}`;
-  btn.setAttribute('role', 'menuitem');
+  // A level of choices (`current` true or false on each) is a radio group, as verbRowAttrs says.
+  if (typeof row.current === 'boolean') {
+    btn.setAttribute('role', 'menuitemradio');
+    btn.setAttribute('aria-checked', String(row.current));
+  } else {
+    btn.setAttribute('role', 'menuitem');
+  }
   if (row.disabled) btn.setAttribute('aria-disabled', 'true');
   if (row.tip) btn.dataset.vmTip = plainWords(row.tip);
   if (row.disabled && row.reason) btn.dataset.vmReason = plainWords(row.reason);

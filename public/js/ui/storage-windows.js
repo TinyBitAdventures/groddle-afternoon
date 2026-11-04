@@ -23,7 +23,7 @@
  */
 
 import { bindCountField, countKeyValue, countStepMarkup } from './count-chooser.js?v=b8361b21';
-import { bindContextTrigger } from './context-menu.js?v=0453d723';
+import { bindContextTrigger } from './context-menu.js?v=57c5f1fe';
 
 const CSS = `
 .hst-win { position: fixed; z-index: calc(var(--z-panel) - 1); left: 50%; top: max(64px, 9vh); transform: translateX(-50%);
