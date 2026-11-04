@@ -28,7 +28,7 @@ import {
   getQuestProgress,
   listQuestTracker,
   QUEST_CATALOG,
-} from '../public/js/quests.js?v=282e1621';
+} from '../public/js/quests.js?v=b2856d6c';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=10b118dd';
 
 const __dirnameUi = dirname(fileURLToPath(import.meta.url));

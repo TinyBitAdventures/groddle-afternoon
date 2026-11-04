@@ -22,8 +22,9 @@ import {
   applyQuestProgress,
   getQuestProgress,
   listQuestLog,
+  listQuestLogNewestFirst,
   listQuests,
-} from '../public/js/quests.js?v=282e1621';
+} from '../public/js/quests.js?v=b2856d6c';
 import {
   createAchievementState,
   applyAchievementProgress,
@@ -32,7 +33,7 @@ import {
   browseAchievementLog,
   achievementCategories,
   getAchievementProgress,
-} from '../public/js/achievements.js?v=631d7daa';
+} from '../public/js/achievements.js?v=cca6a4d8';
 import {
   createSkillState,
   canLearnSkill,
@@ -110,6 +111,40 @@ describe('quest runner on mined catalog', () => {
     assert.equal(p.completed, true);
     const log = listQuestLog(state);
     assert.ok(log.some((row) => row.def.classTsid === 'animalkinship_pet_piggies'));
+  });
+
+  it('ticket 87: the Quests sheet lists every quest, newest first, and the footer counts the same rows', () => {
+    const state = createQuestState();
+    const ids = listQuests().map((q) => q.classTsid).slice(0, 72);
+    assert.equal(ids.length, 72);
+    // 45 taken at t = 1000..1044, then 27 of another set finished at t = 2000..2026.
+    ids.slice(0, 45).forEach((id, i) => {
+      assert.equal(assignQuest(state, id, { ignorePrereq: true }).ok, true);
+      state.active[id].startedAt = 1000 + i;
+    });
+    ids.slice(45).forEach((id, i) => {
+      state.completed.push(id);
+      (state.doneAt ||= {})[id] = 2000 + i;
+    });
+    const log = listQuestLogNewestFirst(state);
+    assert.equal(log.length, 72);
+    assert.deepEqual(log.slice(0, 45).map((r) => r.def.classTsid), ids.slice(0, 45).reverse());
+    assert.deepEqual(log.slice(45).map((r) => r.def.classTsid), ids.slice(45).reverse());
+    assert.ok(log.slice(0, 45).every((r) => r.status === 'active') && log.slice(45).every((r) => r.status === 'completed'));
+    // An older save with no times: its place in the save, the later ones first.
+    const old = createQuestState();
+    for (const id of ids.slice(0, 3)) { assignQuest(old, id, { ignorePrereq: true }); delete old.active[id].startedAt; }
+    old.completed.push(ids[10], ids[11]);
+    assert.deepEqual(listQuestLogNewestFirst(old).map((r) => r.def.classTsid), [ids[2], ids[1], ids[0], ids[11], ids[10]]);
+    assert.equal(listQuestLog(state).length, 72, 'the plain log keeps its order and size');
+
+    const game = readFileSync(join(dirname(fileURLToPath(import.meta.url)), '../public/game.js'), 'utf8');
+    const at = game.indexOf('const log = listQuestLogNewestFirst(questState);');
+    assert.ok(at > 0, 'the sheet draws the newest-first log');
+    const draw = game.slice(at, game.indexOf('questSheet.renderTabs(', at));
+    assert.match(draw, /for \(const p of log\) \{/, 'no cap on the rows drawn');
+    assert.doesNotMatch(draw, /log\.slice\(/);
+    assert.match(draw, /done: log\.filter\(\(r\) => r\.status === 'completed'\)\.length,/);
   });
 
   it('listQuests returns large catalog', () => {

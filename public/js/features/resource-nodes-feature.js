@@ -86,7 +86,7 @@ import {
   tickResourceNode,
 } from '../resource-nodes.js?v=d78746b3';
 import { frameTexture as sheetFrameTexture, loadTexture, textureFromUrl } from '../textures.js?v=3149d699';
-import { acceptOffer, markOffered, npcQuestOffers, putOffOffer, questStatus } from '../quest-offers.js?v=7790a130';
+import { acceptOffer, markOffered, npcQuestOffers, putOffOffer, questStatus } from '../quest-offers.js?v=c78cd30e';
 import { vpSequence } from '../quest-rooms/vp-overlay.js?v=b231d65a';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
 

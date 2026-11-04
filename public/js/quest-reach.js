@@ -22,7 +22,7 @@
  * (quest-offers.js routesForCounter): a requirement is bound to streets only when
  * every route that can advance it happens on named streets.
  */
-import { routesForCounter, WINTRY_PLACE_STREETS } from './quest-offers.js?v=7790a130';
+import { routesForCounter, WINTRY_PLACE_STREETS } from './quest-offers.js?v=c78cd30e';
 
 const G = (t) => String(t || '').replace(/^L/, 'G');
 const slug = (s) => String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '');

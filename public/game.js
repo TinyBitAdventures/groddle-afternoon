@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=b484cbad';
 import { createFeatureHost } from './js/feature-host.js?v=2ed3c069';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=e4ea6ce9';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=4e54491e';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -27,16 +27,16 @@ import {
   applyQuestProgress,
   completeQuest,
   getQuestProgress,
-  listQuestLog,
+  listQuestLogNewestFirst,
   listQuestTracker,
   parseQuestConversation,
   cleanQuestMarkup,
   questDoneAt,
-} from './js/quests.js?v=282e1621';
+} from './js/quests.js?v=b2856d6c';
 // Quest copy is Flash htmlText: <b>/<i>/<br> drawn as formatting, the rest dropped, never innerHTML.
 import { questRequirementText, renderQuestText, withQuestMarkup } from './js/quest-text.js?v=7f5d761c';
 // G267: the world-verb quest counters skip offer-system quests; old saves drop the boot Moloko quest.
-import { dropBootStarterQuests, questMoveNote, routesCounter, worldVerbQuestEvents, gardenPlotEvents, makingUnitQuestEvents, shrineDonationQuestEvents } from './js/quest-offers.js?v=7790a130';
+import { dropBootStarterQuests, questMoveNote, routesCounter, worldVerbQuestEvents, gardenPlotEvents, makingUnitQuestEvents, shrineDonationQuestEvents } from './js/quest-offers.js?v=c78cd30e';
 import {
   PHANTOM_QUEST_ID,
   REMEMBER_QUEST_ID,
@@ -381,7 +381,7 @@ import {
   consumeAchievementCounters,
   resetAchievementCounter,
   purchaseAchievementUpdates,
-} from './js/achievements.js?v=631d7daa';
+} from './js/achievements.js?v=cca6a4d8';
 import {
   applyStreetVisit,
   STREET_VISITS_SLOT,
@@ -482,7 +482,7 @@ import {
   parsePlayerSave,
   serializePlayerSave,
   restorePlayerSave,
-} from './js/player-save.js?v=69862c50';
+} from './js/player-save.js?v=8e544dde';
 import {
   HOME_INTERIOR_TSID,
   HOME_STREET_TSID,
@@ -5362,7 +5362,9 @@ function updateHud() {
   const qShown = document.getElementById('quest');
   if (qShown && isQuestOpen()) {
     const qBox = document.createElement('div');
-    const log = listQuestLog(questState);
+    // Ticket 87: every quest, newest first (QuestManager.as sortQuests 404-410). The log drew only its
+    // first 40 rows, oldest first, so a long log lost its Done tab and the tabs disagreed with the footer.
+    const log = listQuestLogNewestFirst(questState);
     // G229: quests put off with "Not right now" wait in the log to be started (quest-offers-feature).
     const putOff = features.collect('questLogCards', engine);
     if (!log.length && !putOff.length) {
@@ -5371,7 +5373,7 @@ function updateHud() {
       empty.textContent = 'No active quests.';
       qBox.appendChild(empty);
     }
-    for (const p of log.slice(0, 40)) {
+    for (const p of log) {
       const card = document.createElement('div');
       card.className = 'q-card' + (p.completed ? ' done' : '');
       // VERBS: an active card names its quest, so the Quests sheet can show its step and rewards.
@@ -5526,7 +5528,7 @@ function updateHud() {
       meta.textContent = questLogSummary({
         active: log.filter((r) => r.status === 'active').length,
         offered: qBox.querySelectorAll('.q-put-off, .story-offer').length,
-        done: questState.completed.length,
+        done: log.filter((r) => r.status === 'completed').length,
         catalog: Object.keys(getQuestCatalog()).length,
       });
     }

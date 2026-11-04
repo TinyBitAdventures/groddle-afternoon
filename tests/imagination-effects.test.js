@@ -19,7 +19,7 @@ import {
 } from '../public/js/imagination-effects.js?v=70169933';
 import { IMAGINATION_UPGRADES } from '../public/js/imagination.js?v=133fd4d5';
 import { REMAKE_STATUS_RULES, isOfferedInRemake, remakeStatus } from '../public/js/imagination-remake.js?v=5ca4a35f';
-import { applyRewards } from '../public/js/quests.js?v=282e1621';
+import { applyRewards } from '../public/js/quests.js?v=b2856d6c';
 import { createInventory, countItem, ensureItem } from '../public/js/inventory.js?v=602da017';
 import { createMineRock, miningProfile, mineRock, smeltMetalRocks } from '../public/js/mining.js?v=d856ab96';
 import { craftRecipe, makingSkillAdjustments } from '../public/js/making.js?v=6b048d25';
@@ -28,7 +28,7 @@ import { quoteWoodTreeHarvest } from '../public/js/woodcutting.js?v=6d2ad054';
 import { resolveAnimalKinshipPackage } from '../public/js/animal-kinship.js?v=2757bb52';
 import { createGarden, getPlot, plantPlot, plotKey } from '../public/js/garden.js?v=dd021ecc';
 import { vendorBuy, vendorSell, vendorBuyUnitPrice } from '../public/js/vendor.js?v=08063e0c';
-import { normalizePlayerSnapshot } from '../public/js/player-save.js?v=69862c50';
+import { normalizePlayerSnapshot } from '../public/js/player-save.js?v=8e544dde';
 import { loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js?v=10b118dd';
 import { createSkillState, getStudyStatus, pauseSkillStudy, startSkillStudy } from '../public/js/skills.js?v=4542bdf9';
 

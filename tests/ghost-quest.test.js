@@ -25,7 +25,7 @@ import {
   grantFadedHeart,
   rememberWithFadedHeart,
 } from '../public/js/ghost-quest.js?v=43feac5c';
-import { createQuestState, parseQuestConversation } from '../public/js/quests.js?v=282e1621';
+import { createQuestState, parseQuestConversation } from '../public/js/quests.js?v=b2856d6c';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 

@@ -30,7 +30,7 @@ import { playFor, playHref } from './restoration/play-links.mjs';
 import { DESIGNERS, DESIGNER_LEVELS, TEXT_LEVELS } from './restoration/designer-levels.mjs';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=10b118dd';
 import { ROOM_NOTES } from './restoration/rooms.mjs';
-import { parseQuestConversation } from '../public/js/quests.js?v=282e1621';
+import { parseQuestConversation } from '../public/js/quests.js?v=b2856d6c';
 import { seasonsData } from './restoration/seasons.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');

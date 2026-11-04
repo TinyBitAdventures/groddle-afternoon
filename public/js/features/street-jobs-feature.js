@@ -96,7 +96,7 @@ import {
   upgradeOption,
 } from '../street-jobs.js?v=7381e03e';
 import { gainMetabolic, loseEnergy } from '../metabolics.js?v=8504134e';
-import { closuresInTheWay, holdNote, placeIndex, questHold, reachableStreets } from '../quest-reach.js?v=4ab4e441';
+import { closuresInTheWay, holdNote, placeIndex, questHold, reachableStreets } from '../quest-reach.js?v=caad6dfe';
 import { getQuestCatalog as questCatalog } from '../content-catalogs.js?v=10b118dd';
 import { saveStore } from '../save-store.js?v=8839ba7b';
 import {

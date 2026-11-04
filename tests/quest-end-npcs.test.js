@@ -18,10 +18,10 @@ import { before, describe, it } from 'node:test';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { getQuestCatalog, loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=10b118dd';
-import { classifyQuests, heldForNpcTurnIn } from '../public/js/quest-offers.js?v=7790a130';
+import { classifyQuests, heldForNpcTurnIn } from '../public/js/quest-offers.js?v=c78cd30e';
 import { vendorStreetsFor } from '../public/js/vendor-npcs.js?v=616c0568';
 import { findRoute, routeGraph, ROUTE_SOURCES } from '../public/js/map-routes.js?v=bcf2c347';
-import { MERCHANT_ROUTE_SOURCE, routeHeldQuests } from '../public/js/features/vendor-npcs-feature.js?v=a2d30e36';
+import { MERCHANT_ROUTE_SOURCE, routeHeldQuests } from '../public/js/features/vendor-npcs-feature.js?v=2bb5e65c';
 
 const PUBLIC = join(import.meta.dirname, '..', 'public');
 const json = (p) => JSON.parse(readFileSync(join(PUBLIC, p), 'utf8'));

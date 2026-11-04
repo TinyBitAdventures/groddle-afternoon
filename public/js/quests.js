@@ -428,6 +428,27 @@ export function listQuestLog(state) {
 }
 
 /**
+ * The Quests sheet's order: the log newest first, as the client listed it (QuestManager.as
+ * sortQuests 404-410: unfinished before finished, then offered_time DESCENDING). An active quest
+ * goes by when it was taken (startedAt), a finished one by when it was finished (doneAt); one
+ * without a time (an older save) goes by its place in the save, the later ones first.
+ * @param {ReturnType<typeof createQuestState>} state
+ */
+export function listQuestLogNewestFirst(state) {
+  const rows = listQuestLog(state);
+  const activeIds = Object.keys(state.active || {});
+  const doneIds = state.completed || [];
+  const when = (row) => (row.status === 'active'
+    ? Number(state.active[row.def.classTsid]?.startedAt) || 0
+    : questDoneAt(state, row.def.classTsid));
+  const place = (row) => (row.status === 'active' ? activeIds : doneIds).indexOf(row.def.classTsid);
+  return rows
+    .map((row) => ({ row, at: when(row), n: place(row) }))
+    .sort((a, b) => (a.row.status === 'active' ? 0 : 1) - (b.row.status === 'active' ? 0 : 1) || b.at - a.at || b.n - a.n)
+    .map((x) => x.row);
+}
+
+/**
  * Compact active-quest projection for the always-visible play HUD.
  * Keeps UI concerns out of the quest runner while providing stable progress values.
  * @param {ReturnType<typeof createQuestState>} state
