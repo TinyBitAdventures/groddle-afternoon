@@ -565,3 +565,62 @@ a.play-link:focus-visible { outline: 3px solid var(--accent); outline-offset: 2p
 .history-older p { margin: 0; color: var(--muted); }
 .history-older a { font-weight: 700; color: var(--moss); }
 @media (max-width: 640px) { .history-item { grid-template-columns: 1fr; gap: 2px; } }
+
+/* —— Every change: commits by day (history/heatmap.js) ——
+   Shades mix the moss tone into the empty track, so both themes keep their own ramp. */
+.heat {
+  margin-top: 22px; padding: 16px 18px 12px; max-width: 100%; width: fit-content; min-width: min(100%, 420px);
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg);
+}
+.heat[hidden] { display: none; }
+.heat-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 14px; margin-bottom: 8px; }
+.heat-head h2 { font-size: 20px; margin: 0; }
+.heat-sum { margin: 0; font-size: 14px; color: var(--muted); }
+.heat-scroll { overflow-x: auto; overscroll-behavior-x: contain; padding: 4px 2px 6px; scrollbar-width: thin; }
+.heat-grid { --cell: 14px; border-collapse: separate; border-spacing: 4px; margin: -4px; table-layout: fixed; }
+.heat-grid th { font-weight: 400; font-size: 12px; color: var(--muted); padding: 0; line-height: 1; }
+.heat-month { height: 16px; text-align: left; vertical-align: bottom; white-space: nowrap; overflow: visible; }
+.heat-month > span { display: inline-block; width: 0; overflow: visible; }
+.heat-weekday { text-align: right; padding-right: 4px !important; white-space: nowrap; position: sticky; left: 0; z-index: 1; background: var(--surface); }
+.heat-corner { position: sticky; left: 0; z-index: 1; background: var(--surface); }
+.heat-cell, .heat-pad { width: var(--cell); height: var(--cell); min-width: var(--cell); padding: 0; border-radius: 3px; }
+.heat-cell { background: var(--track); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--fg) 6%, transparent); cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.heat-cell[aria-disabled="true"] { cursor: default; }
+.heat-cell[data-level="1"], .heat-legend li[data-level="1"] { background: color-mix(in srgb, var(--moss) 32%, var(--track)); }
+.heat-cell[data-level="2"], .heat-legend li[data-level="2"] { background: color-mix(in srgb, var(--moss) 55%, var(--track)); }
+.heat-cell[data-level="3"], .heat-legend li[data-level="3"] { background: color-mix(in srgb, var(--moss) 78%, var(--track)); }
+.heat-cell[data-level="4"], .heat-legend li[data-level="4"] { background: var(--moss); }
+.heat-cell:hover { box-shadow: inset 0 0 0 2px var(--fg); }
+.heat-cell:focus { outline: none; }
+.heat-cell:focus-visible { outline: 3px solid var(--accent); outline-offset: 1px; }
+/* The picked day: a ring and a dot, so it shows without telling colours apart. */
+.heat-cell[aria-selected="true"] { box-shadow: inset 0 0 0 2px var(--fg), 0 0 0 2px var(--surface), 0 0 0 4px var(--fg); position: relative; }
+.heat-cell[aria-selected="true"]::after {
+  content: ''; position: absolute; inset: 0; margin: auto; width: 30%; height: 30%; min-width: 4px; min-height: 4px;
+  border-radius: 50%; background: var(--fg);
+}
+.heat-foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 18px; margin-top: 8px; }
+.heat-help { margin: 0; font-size: 13px; color: var(--muted); max-width: 34em; }
+.heat-legend { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted); }
+.heat-legend ul { list-style: none; display: flex; gap: 3px; margin: 0; padding: 0; }
+.heat-legend li { width: 12px; height: 12px; border-radius: 3px; background: var(--track); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--fg) 6%, transparent); }
+.heat-tip {
+  position: fixed; z-index: 30; max-width: min(320px, calc(100vw - 16px)); padding: 9px 12px;
+  display: grid; gap: 2px; font-size: 13px; line-height: 1.4; pointer-events: none;
+  background: var(--fg); color: var(--surface); border-radius: var(--radius);
+  animation: heat-tip-in 0.12s ease-out;
+}
+.heat-tip[hidden] { display: none; }
+.heat-tip b { font-size: 14px; }
+.heat-tip-list { margin-top: 3px; font-weight: 700; }
+@keyframes heat-tip-in { from { opacity: 0; } to { opacity: 1; } }
+.history-day-filter {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; margin: 0 0 18px; padding: 10px 14px;
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); max-width: 60em;
+}
+.history-day-filter[hidden] { display: none; }
+.history-day-filter p { margin: 0; }
+.history-day-filter .chip:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) {
+  .heat-tip { animation: none; }
+}

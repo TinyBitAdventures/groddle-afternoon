@@ -32,6 +32,7 @@ import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=1
 import { ROOM_NOTES } from './restoration/rooms.mjs';
 import { parseQuestConversation } from '../public/js/quests.js?v=2ce7b3cb';
 import { seasonsData } from './restoration/seasons.mjs';
+import { HAS_SERVER, HAS_SITE, SERVER_DIR, SITE_DIR } from './repos.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const pub = join(root, 'public');
@@ -253,10 +254,12 @@ function gitStats() {
 
 /**
  * Every player-visible change (📦 NEW, 👌 IMPROVE, 🐛 FIX commits), newest first, with each commit's
- * "- " bullets, for /restoration/history/. Written to history.json beside data.json; it is all git
- * metadata, so --check ignores it like the git block.
+ * "- " bullets, for /restoration/history/, plus `activity`: every commit of the three repos counted by
+ * day (the page's heatmap). Written to history.json beside data.json; it is all git metadata, so --check
+ * ignores it like the git block (tests check the per-day counts against the changes instead).
+ * `refs` names the site and server revisions to count (a deploy passes the release's tags; default HEAD).
  */
-export function historyLog() {
+export function historyLog({ refs = {} } = {}) {
   try {
     const raw = execFileSync('git', ['log', '--format=%h%x1f%cs%x1f%s%x1f%b%x1e'], { cwd: root, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
     const kinds = { '📦 NEW': 'new', '👌 IMPROVE': 'improve', '🐛 FIX': 'fix' };
@@ -268,9 +271,98 @@ export function historyLog() {
       const details = body.split('\n').filter((l) => /^- /.test(l)).map((l) => l.slice(2).trim()).filter(Boolean);
       changes.push({ hash, date, kind: kinds[m[1]], text: m[2].trim(), details });
     }
-    return { since: changes.length ? changes[changes.length - 1].date : '', changes };
+    return { since: changes.length ? changes[changes.length - 1].date : '', changes, activity: activityLog(refs) };
   } catch {
-    return { since: '', changes: [] };
+    return { since: '', changes: [], activity: null };
+  }
+}
+
+/** Emoji-Log subject prefix -> the heatmap's kinds; RELEASE, REMOVE, MERGE, CHORE and the rest are 'other'. */
+const COMMIT_KINDS = [
+  [/^📦 NEW:/u, 'new'],
+  [/^👌 IMPROVE:/u, 'improve'],
+  [/^🐛 FIX:/u, 'fix'],
+  [/^📖 DOCS?:/u, 'doc'],
+  [/^🤖 TESTS?:/u, 'test'],
+];
+export const ACTIVITY_KINDS = ['new', 'improve', 'fix', 'doc', 'test', 'other'];
+
+/** A commit subject's heatmap kind. */
+export function commitKind(subject = '') {
+  for (const [re, kind] of COMMIT_KINDS) if (re.test(subject)) return kind;
+  return 'other';
+}
+
+/**
+ * Per-day activity from each repo's commits and release tags (pure):
+ * repos = [{ name, commits: [{ date, key, subject }], tags: [{ date, tag }] }], the game first.
+ * The site and server were split out of the game repo with their history, so a commit whose key
+ * (author time + subject) an earlier repo already counted is counted once, under that repo.
+ * Returns { repos, days: { <date>: { <repo>: { <kind>: n } } }, releases: { <date>: ['game v0.1.0'] } },
+ * days and releases oldest first.
+ */
+export function dayActivity(repos) {
+  const seen = new Set();
+  const days = {};
+  const releases = {};
+  for (const { name, commits = [], tags = [] } of repos) {
+    for (const c of commits) {
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(c.date || '')) continue;
+      if (c.key) {
+        if (seen.has(c.key)) continue;
+        seen.add(c.key);
+      }
+      const kind = commitKind(c.subject);
+      const day = (days[c.date] ||= {});
+      const repo = (day[name] ||= {});
+      repo[kind] = (repo[kind] || 0) + 1;
+    }
+    for (const t of tags) {
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(t.date || '')) continue;
+      (releases[t.date] ||= []).push(`${name} ${t.tag}`);
+    }
+  }
+  const sorted = (o) => Object.fromEntries(Object.keys(o).sort().map((k) => [k, o[k]]));
+  return { repos: repos.map((r) => r.name), days: sorted(days), releases: sorted(releases) };
+}
+
+/** One repo's commits and v<semver> release tags at `ref`, or null when it is not checked out. */
+function repoHistory(name, dir, ref = 'HEAD') {
+  try {
+    const git = (...args) => execFileSync('git', args, { cwd: dir, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024, stdio: ['ignore', 'pipe', 'ignore'] });
+    const commits = git('log', '--format=%cs%x1f%aI%x1f%s', ref, '--').split('\n').filter(Boolean).map((line) => {
+      const [date, at, subject = ''] = line.split('\x1f');
+      return { date, key: `${at}\x1f${subject}`, subject };
+    });
+    const tags = git('tag', '--merged', ref, '--format=%(creatordate:short)%09%(refname:short)').split('\n')
+      .map((line) => line.split('\t'))
+      .filter(([, tag]) => /^v\d+\.\d+\.\d+$/.test(tag || ''))
+      .map(([date, tag]) => ({ date, tag }))
+      .sort((a, b) => a.date.localeCompare(b.date) || a.tag.localeCompare(b.tag, 'en', { numeric: true }));
+    return { name, commits, tags };
+  } catch {
+    return null;
+  }
+}
+
+/** Every commit of the game, site and server (those checked out), by day. */
+export function activityLog(refs = {}) {
+  const repos = [
+    repoHistory('game', root),
+    HAS_SITE ? repoHistory('site', SITE_DIR, refs.site || 'HEAD') : null,
+    HAS_SERVER ? repoHistory('server', SERVER_DIR, refs.server || 'HEAD') : null,
+  ].filter(Boolean);
+  return repos.length ? dayActivity(repos) : null;
+}
+
+/** The site and server tags a release file names (for a deploy's history), else {} (each repo's HEAD). */
+function releaseRefs(file) {
+  try {
+    const live = JSON.parse(readFileSync(file, 'utf8'));
+    const tag = (v) => (/^v\d+\.\d+\.\d+$/.test(v || '') ? v : undefined);
+    return { site: tag(live.site), server: tag(live.server) };
+  } catch {
+    return {};
   }
 }
 
@@ -380,7 +472,8 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     const now = new Date();
     data.generatedAt = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
     writeFileSync(out, `${JSON.stringify(data, null, 1)}\n`);
-    const history = historyLog();
+    // A deploy (--release=<file>) counts the site and server at the tags it ships; a plain run, each repo's HEAD.
+    const history = historyLog({ refs: process.argv.some((a) => a.startsWith('--release=')) ? releaseRefs(releaseFile()) : {} });
     writeFileSync(join(pub, 'restoration', 'history.json'), `${JSON.stringify({ generatedAt: data.generatedAt, ...history })}\n`);
     console.log(`${data.back}/${data.possible} systems back · ${data.quests.playable} playable quests · ${data.rooms.built}/${data.rooms.total} rooms -> ${out}`);
     // The item catalog reads the same game data and the coverage inventory, so it is rebuilt with the report.

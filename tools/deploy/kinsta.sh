@@ -53,7 +53,10 @@ git -C "$here" worktree add --detach --quiet "$work/game" "$game_c"
 # The restoration and catalog builds read the original sources and the research inventory beside the game.
 for d in glitch-GameServerJS streets glitch-client glitch-items glitch-overlays research; do [ -e "$AUDIT/$d" ] && ln -s "$AUDIT/$d" "$work/$d"; done
 ln -s "$here/node_modules" "$work/game/node_modules"
-(cd "$work/game" && node tools/build-restoration.mjs --release="$RELEASE" >/dev/null)
+# The history page's heatmap counts the site and server commits too, at the tags this release names (the
+# export has no sibling clones, so it is pointed at the real ones, as the Code page below is).
+(cd "$work/game" && GRODDLE_SERVER_DIR=${GRODDLE_SERVER_DIR:-$AUDIT/groddle-afternoon-server} GRODDLE_SITE_DIR="$SITE_REPO" \
+  node tools/build-restoration.mjs --release="$RELEASE" >/dev/null)
 [ "$(git -C "$work/game" status --porcelain -- public/restoration/history.json)" ] || echo "note: the restoration history was already current"
 # The Code page measures the repos at the tags this release names (the tagged copy describes the one before).
 # It reads the other two repos through git at their tags, so it is pointed at the real clones (the export has no .git).
