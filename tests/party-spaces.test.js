@@ -240,7 +240,7 @@ describe('party lifecycle (groups/party.js, party_atm.js)', () => {
 
 describe('party spaces feature wiring', async () => {
   const { partySpacesFeature } = await import('../public/js/features/party-spaces-feature.js?v=df0f76c8');
-  const { FEATURES } = await import('../public/js/features/index.js?v=18cf0a32');
+  const { FEATURES } = await import('../public/js/features/index.js?v=efa812b8');
 
   it('is registered with the feature host', () => {
     assert.ok(FEATURES.some((f) => f.id === partySpacesFeature.id));

@@ -4,8 +4,8 @@ import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
-  FILTERS, FILTER_PACKS, applyFilter, colorize, dither, filtersFor, noise, outline, toFloat,
-} from '../public/js/snap-filters.js?v=c41c0db6';
+  FILTERS, FILTER_PACKS, VINTAGE_TEXT, applyFilter, colorize, dither, filtersFor, noise, outline, toFloat,
+} from '../public/js/snap-filters.js?v=32315cf1';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const MAIN = join(root, '..', 'glitch-GameServerJS', 'main.js');
@@ -112,5 +112,12 @@ describe('components', () => {
     for (let i = 0; i < a.length; i += 1) assert.equal(a[i], 1);
     const g = toFloat(gradient());
     assert.deepEqual(noise(g, 64, 48, { alpha: 0.07 }), noise(g, 64, 48, { alpha: 0.07 }));
+  });
+});
+
+describe('the Vintage border caption', () => {
+  it('keeps the Glitch trademark out of player pictures', () => {
+    assert.match(VINTAGE_TEXT.text, /GRODDLE SNP 6005/);
+    assert.doesNotMatch(VINTAGE_TEXT.text, /glitch/i);
   });
 });

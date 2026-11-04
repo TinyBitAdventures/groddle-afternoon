@@ -16,7 +16,7 @@ import { join } from 'node:path';
 
 import { IMAGINATION_UPGRADES } from '../public/js/imagination-data.js?v=4a85e7fe';
 import { isOfferedInRemake, isOfferedOnline, remakeStatus } from '../public/js/imagination-remake.js?v=5ca4a35f';
-import { FILTER_PACKS } from '../public/js/snap-filters.js?v=c41c0db6';
+import { FILTER_PACKS } from '../public/js/snap-filters.js?v=32315cf1';
 
 const ROOT = join(import.meta.dirname, '..');
 const GSJS = join(ROOT, '..', 'glitch-GameServerJS');

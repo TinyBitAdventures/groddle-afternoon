@@ -48,9 +48,9 @@ export const FILTER_PACKS = Object.freeze({
   ]),
 });
 
-/** VintageFilter.as addBorder: the border's caption (class glitchr_filters_sepia; its colour is not in the client source). */
+/** VintageFilter.as addBorder: the border's caption (class glitchr_filters_sepia; its colour is not in the client source). The client printed GLITCH; the remake keeps the trademark out of player pictures. */
 export const VINTAGE_TEXT = Object.freeze({
-  text: '52                     GLITCH SNP 6005                          53',
+  text: '52                     GRODDLE SNP 6005                          53',
   width: 300,
   height: 250,
   scaleX: 0.9,
