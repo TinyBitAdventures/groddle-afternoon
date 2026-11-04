@@ -169,6 +169,19 @@ describe('game.js wiring', () => {
     assert.match(here, /interactReach\(t\)/);
     assert.match(here, /if \(d < 100\)/);
   });
+
+  it('ticket 80: a stack on the ground shows its item icon, never its count badge', () => {
+    const at = game.indexOf('function enterChoiceIcon(');
+    const icon = game.slice(at, game.indexOf('\n}\n', at));
+    // Every dropped stack (not only the classes in content.js ITEM_ICONS) takes the item's icon.
+    assert.match(icon, /if \(dropped && cls\) return itemIconUrl\(cls\);/);
+    assert.ok(icon.indexOf('itemIconUrl(cls)') < icon.indexOf('renderer.extract'), 'before any drawing');
+    // A drawn sprite with a count badge child is drawn from its own frame, without the badge.
+    assert.match(icon, /const badged = Boolean\(spr\.countBadge \|\| spr\._countBadge\);/);
+    assert.match(icon, /spr\.texture && \(!spr\.children\?\.length \|\| badged\) \? new PIXI\.Sprite\(spr\.texture\) : spr/);
+    // The stack's badge lives on the sprite as countBadge, the guano pile's as _countBadge.
+    assert.match(game, /spr\.countBadge = badge;\n\s+spr\.addChild\(badge\);/);
+  });
 });
 
 describe('client source', { skip: !existsSync(client) && 'glitch-client not beside the spike' }, () => {

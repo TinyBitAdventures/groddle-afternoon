@@ -8857,15 +8857,22 @@ function enterChoicesHere() {
 
 /** Chooser tile art: the item's icon, else the thing as drawn (InteractionMenu.buildTargetItemCUIs). */
 function enterChoiceIcon(choice) {
-  const cls = choice.target?.classId === 'dropped_item' ? choice.target.state?.classTsid : choice.classId;
+  const dropped = choice.target?.classId === 'dropped_item';
+  const cls = dropped ? choice.target.state?.classTsid : choice.classId;
   if (cls && ITEM_ICONS[cls]) return ITEM_ICONS[cls];
+  // Ticket 80: a stack on the ground is its item's icon (the client's ItemIconView), never the
+  // drawn stack: that sprite carries its count badge as a child, and drawn whole it came out as
+  // the count alone ("50" for a Chunk of Dullite).
+  if (dropped && cls) return itemIconUrl(cls);
   const spr = choice.kind === 'signpost'
     ? (bgLayer?.signViews || []).find((v) => v.signpost === choice.signpost)
     : choice.target?._gardenRoot || choice.target?.sprite;
   if (!spr || spr.destroyed || !app?.renderer) return null;
   // A bare (animated) sprite is drawn from its current frame: extract renders a
-  // leaf with its own street transform, which lands outside the frame.
-  const art = spr.texture && !spr.children?.length ? new PIXI.Sprite(spr.texture) : spr;
+  // leaf with its own street transform, which lands outside the frame. A sprite with a
+  // count badge (a guano pile) is drawn from its frame too, without the badge.
+  const badged = Boolean(spr.countBadge || spr._countBadge);
+  const art = spr.texture && (!spr.children?.length || badged) ? new PIXI.Sprite(spr.texture) : spr;
   try {
     if (art !== spr) art.anchor.copyFrom(spr.anchor);
     const b = art.getLocalBounds();
