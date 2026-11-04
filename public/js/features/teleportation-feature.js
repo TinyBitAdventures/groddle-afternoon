@@ -246,7 +246,7 @@ function setPoint(engine, id) {
   state = out.state;
   for (const event of out.events) engine.achievement(event.counter, event.amount);
   engine.pushActivity(`Teleportation Point ${id} set: ${placeLabel(out.target)}.`);
-  engine.toast(`Teleportation Point ${id} saved here.`, 2200);
+  engine.toast(`Teleportation location set to ${placeLabel(out.target)}`, 2200); // TeleportationManager.as 78
   engine.save();
   publish(engine);
   return true;
@@ -345,6 +345,12 @@ const CARD_CSS = `
 .tp-map-card button{margin:0;white-space:nowrap}
 .tp-map-card .tp-set{background:var(--surface-bright);border:1px solid var(--c-violet-75);color:var(--c-violet-44);border-radius:var(--radius-md);padding:5px 9px;font:inherit;font-size:var(--fs-sm);cursor:pointer}
 .tp-map-card button[disabled]{opacity:.5;cursor:not-allowed}
+.tp-map-card li .tp-set{white-space:normal;max-width:12rem;text-align:center}
+.tp-map-card ol[hidden]{display:none}
+.tp-map-card .tp-confirm{margin-top:9px;padding:var(--sp-4);border-radius:var(--radius-md);background:color-mix(in srgb, var(--surface-bright) 55%, transparent)}
+.tp-map-card .tp-confirm strong{display:block}
+.tp-map-card .tp-confirm p{margin:var(--sp-2) 0 var(--sp-4);font-size:var(--fs-sm)}
+.tp-map-card .tp-confirm-actions{display:flex;gap:var(--sp-3);flex-wrap:wrap}
 @media (max-width:480px){.tp-map-card li{grid-template-columns:1fr 1fr}.tp-map-card li>div{grid-column:1/-1}}
 `;
 
@@ -387,15 +393,18 @@ function buildMapCard(engine) {
     const where = document.createElement('span');
     where.textContent = target ? placeLabel(target) : 'Not set yet. Stand somewhere you love and set it.';
     info.append(name, where);
+    // Ticket 91: the client's labels, "Edit" on a set point and "Set this location as Teleport Point"
+    // on an empty one (TeleportationDialog.as 283-305), and a press only asks (confirmSetPoint): "Move
+    // here" beside "Teleport" saved over a point on one click.
     const set = document.createElement('button');
     set.type = 'button';
     set.className = 'tp-set';
-    set.textContent = target ? 'Move here' : 'Set here';
+    set.dataset.teleportSet = String(id);
+    set.textContent = target ? 'Edit' : 'Set this location as Teleport Point';
+    if (target) set.setAttribute('aria-label', `Edit Point ${id}`);
     set.disabled = !savable;
     if (!savable) set.title = "You can't save this location as a Teleportation Point.";
-    set.addEventListener('click', () => {
-      if (setPoint(engine, id)) engine.openMap();
-    });
+    set.addEventListener('click', () => confirmSetPoint(engine, card, id));
     const go = document.createElement('button');
     go.type = 'button';
     go.className = 'content-action-btn';
@@ -418,6 +427,63 @@ function buildMapCard(engine) {
   }
   card.append(head, list);
   return card;
+}
+
+/**
+ * "New Teleport Point?" (TeleportationDialog.as onTeleportSetClick 381-401, onConfirmClick 403-415):
+ * the card's points give way to the question, and only "Save this point" sets it; Cancel (or Esc)
+ * brings the points back, unchanged.
+ */
+function confirmSetPoint(engine, card, id) {
+  const list = card.querySelector('ol');
+  card.querySelector('[data-teleport-confirm]')?.remove();
+  const pane = document.createElement('div');
+  pane.className = 'tp-confirm';
+  pane.dataset.teleportConfirm = String(id);
+  pane.setAttribute('role', 'group');
+  const title = document.createElement('strong');
+  title.id = `tp-confirm-title-${id}`;
+  title.textContent = 'New Teleport Point?';
+  pane.setAttribute('aria-labelledby', title.id);
+  const body = document.createElement('p');
+  const place = placeLabel(here(engine));
+  body.append('Make a teleport point to ');
+  const where = document.createElement('b');
+  where.textContent = place || 'your current position';
+  body.append(where, "? When you teleport, you'll arrive here.");
+  const actions = document.createElement('div');
+  actions.className = 'tp-confirm-actions';
+  const save = document.createElement('button');
+  save.type = 'button';
+  save.className = 'content-action-btn';
+  save.dataset.teleportSave = String(id);
+  save.textContent = 'Save this point';
+  const cancel = document.createElement('button');
+  cancel.type = 'button';
+  cancel.className = 'tp-set';
+  cancel.dataset.teleportCancel = String(id);
+  cancel.textContent = 'Cancel';
+  actions.append(save, cancel);
+  pane.append(title, body, actions);
+  const back = () => {
+    pane.remove();
+    if (list) list.hidden = false;
+    card.querySelector(`[data-teleport-set="${id}"]`)?.focus({ preventScroll: true });
+  };
+  save.addEventListener('click', () => {
+    if (setPoint(engine, id)) engine.openMap();
+    else back();
+  });
+  cancel.addEventListener('click', back);
+  pane.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape') return;
+    e.preventDefault();
+    e.stopPropagation();
+    back();
+  });
+  if (list) list.hidden = true;
+  card.append(pane);
+  save.focus({ preventScroll: true });
 }
 
 /* ------------------------------------------------------------------ */

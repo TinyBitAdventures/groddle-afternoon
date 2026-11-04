@@ -5,7 +5,7 @@
  */
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { existsSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -157,5 +157,33 @@ describe('teleportation scripts', () => {
     const back = reconcileScripts(dropped.state, 2);
     assert.deepEqual(back.state.scripts.map((r) => r.destination.tsid), [MEADOW.tsid, XALANGA.tsid]);
     assert.equal(reconcileScripts(createTeleportState(), 1).unknown, 1);
+  });
+});
+
+describe('ticket 91: setting a Teleportation Point asks first, in the client\'s words', () => {
+  const src = readFileSync(join(root, 'js/features/teleportation-feature.js'), 'utf8');
+  const fn = (name) => { const at = src.indexOf(`\nfunction ${name}(`); assert.ok(at >= 0, name); return src.slice(at, src.indexOf('\n}\n', at)); };
+
+  it('labels: "Edit" on a set point, "Set this location as Teleport Point" on an empty one (TeleportationDialog.as 283-305)', () => {
+    const card = fn('buildMapCard');
+    assert.match(card, /set\.textContent = target \? 'Edit' : 'Set this location as Teleport Point';/);
+    assert.doesNotMatch(src, /'Move here'|'Set here'/);
+    // A press only asks: setPoint is reached from the question's Save, never from the row.
+    assert.match(card, /set\.addEventListener\('click', \(\) => confirmSetPoint\(engine, card, id\)\);/);
+    assert.doesNotMatch(card, /setPoint\(engine, id\)/);
+  });
+
+  it('"New Teleport Point?": only "Save this point" sets it; Cancel and Esc bring the points back', () => {
+    const ask = fn('confirmSetPoint');
+    assert.match(ask, /title\.textContent = 'New Teleport Point\?';/);
+    assert.match(ask, /body\.append\('Make a teleport point to '\);/);
+    assert.match(ask, /body\.append\(where, "\? When you teleport, you'll arrive here\."\);/);
+    assert.match(ask, /where\.textContent = place \|\| 'your current position';/);
+    assert.match(ask, /save\.textContent = 'Save this point';/);
+    assert.match(ask, /cancel\.textContent = 'Cancel';/);
+    assert.match(ask, /save\.addEventListener\('click', \(\) => \{\n\s+if \(setPoint\(engine, id\)\) engine\.openMap\(\);/);
+    assert.match(ask, /cancel\.addEventListener\('click', back\);/);
+    assert.match(ask, /if \(e\.key !== 'Escape'\) return;[\s\S]*?back\(\);/);
+    assert.equal((src.match(/[^ ]setPoint\(engine, id\)/g) || []).length, 1, 'one way to set a point (the QA demo sets point 1 itself)');
   });
 });

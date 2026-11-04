@@ -50,7 +50,7 @@ import { worldToScreen } from '../street-model.js?v=505d8990';
 import { signArmWidth } from '../street-render.js?v=9349c0e5';
 import { getSkillCatalog } from '../content-catalogs.js?v=10b118dd';
 import { GIANTS } from '../shrines.js?v=9d364845';
-import { teleportationFeature } from './teleportation-feature.js?v=2274acec';
+import { teleportationFeature } from './teleportation-feature.js?v=491b614a';
 import {
   SOLO_DIVISOR,
   WORK_UNIT_MS,
