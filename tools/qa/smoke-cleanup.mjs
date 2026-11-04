@@ -8,7 +8,8 @@
  * What goes, for each throwaway: every message in their report tickets (the administrators'
  * replies too) and the tickets, every wp_groddle_* row keyed to them (any column ending in
  * user_id, a_id/b_id, from_id/to_id, owner_id, holder_id, visitor_id, dropper_id/taker_id,
- * buyer_id/seller_id, buddy_id/ignored_id, neighbor_id, claimer_id, actor_id: saves, characters,
+ * buyer_id/seller_id, buddy_id/ignored_id, neighbor_id, claimer_id, actor_id, poster_id/author_id/reporter_id
+ * (notice board notes and reports): saves, characters,
  * profiles, buddies, the ledger tables, signups, ...), their mail_sends rows (by email hash),
  * their posts and postmeta, usermeta, the users, and the sign-ups held for their addresses.
  *
@@ -23,7 +24,7 @@ import { createHash } from 'node:crypto';
 export const PROTECTED_IDS = Object.freeze([1, 54]);
 
 /** Columns that key a wp_groddle_* row to a user. */
-export const ID_COLUMN_REGEXP = '(user_id|^a_id|^b_id|from_id|to_id|owner_id|holder_id|visitor_id|dropper_id|taker_id|buyer_id|seller_id|buddy_id|ignored_id|neighbor_id|claimer_id|actor_id)$';
+export const ID_COLUMN_REGEXP = '(user_id|^a_id|^b_id|from_id|to_id|owner_id|holder_id|visitor_id|dropper_id|taker_id|buyer_id|seller_id|buddy_id|ignored_id|neighbor_id|claimer_id|actor_id|poster_id|author_id|reporter_id)$';
 
 /** The domain each mode's throwaways use (local: Mailpit shows them; live: never delivered). */
 export const DOMAINS = { local: 'groddle.localhost', live: 'example.com' };

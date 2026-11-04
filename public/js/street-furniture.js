@@ -314,6 +314,8 @@ export function normalizeNote(seed = {}) {
     title: cleanText(seed.title, NOTE_LIMITS.title),
     body: cleanText(seed.body, NOTE_LIMITS.body),
     ...(seed.remakeText ? { remakeText: true } : {}),
+    // Multiplayer: the writer's character name on a note another player wrote (js/boards-mp.js).
+    ...(seed.authorName ? { authorName: cleanText(seed.authorName, 64) } : {}),
     lastEditor: seed.lastEditor ? String(seed.lastEditor) : null,
     lastEdited: whole(seed.lastEdited, Number.MAX_SAFE_INTEGER),
     history: history.map((h) => ({

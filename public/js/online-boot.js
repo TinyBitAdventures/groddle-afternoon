@@ -17,7 +17,7 @@
  * play/index.html by tools/play-online/build.mjs.
  */
 
-import { createMinnAccount } from './minn-account.js?v=eb300264';
+import { createMinnAccount } from './minn-account.js?v=28026657';
 import { mountAccountForms, resetLinkFrom, verifyLinkFrom } from './account-forms.js?v=fe37d0de';
 import { claimCharacter, newWriterId, takeHandoff } from './save-claim.js?v=30cf5250';
 

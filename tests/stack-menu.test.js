@@ -19,7 +19,7 @@ import { fileURLToPath } from 'node:url';
 
 import { ITEM_CATALOG, isToolItem, removeItem } from '../public/js/inventory.js?v=602da017';
 import { PACK_CAPACITY, layoutPack } from '../public/js/pack-slots.js?v=68a8fca3';
-import { bagsFeature } from '../public/js/features/bags-feature.js?v=87415a3f';
+import { bagsFeature } from '../public/js/features/bags-feature.js?v=1e5c4d1b';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const OPTS = { capacity: PACK_CAPACITY, catalog: ITEM_CATALOG, isTool: isToolItem, order: Object.keys(ITEM_CATALOG) };

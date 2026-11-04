@@ -84,7 +84,7 @@ import { kittyPlacementGroups } from '../public/js/features/heli-kitties-feature
 import { BATTERFLY_GROUP, batterflyPlacementGroups } from '../public/js/features/animal-husbandry-feature.js?v=dfcc0b6b';
 import { hasRaceDispenser } from '../public/js/races.js?v=ab22a079';
 import { setWildlifeCatalog, wildlifeFor } from '../public/js/wildlife.js?v=670c3a7f';
-import { boardSpotRow, furnitureFor, furniturePlacementGroups } from '../public/js/street-furniture.js?v=cb0ba050';
+import { boardSpotRow, furnitureFor, furniturePlacementGroups } from '../public/js/street-furniture.js?v=d5716ef6';
 import { INCUBATION } from '../public/js/animal-husbandry.js?v=16195ac6';
 import { SHARED_NODE_CLASSES, freshTreePlan } from '../public/js/street-objects.js?v=84be1e02';
 import { isZoneTsid } from '../public/js/zone-streets.js?v=b40010d5';

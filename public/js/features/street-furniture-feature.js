@@ -12,6 +12,9 @@
  *   Quill use) and picked up. Paper becomes a Note through the pack ("Write
  *   on"); carried notes keep their text and can be read from the pack.
  * - Notice Boards (7 archived) hold up to 10 notes: view, read, take, add.
+ *   In multiplayer a board is everyone's on the street (features/boards-mp-feature.js
+ *   answers sharedBoard and friends; the realtime server and the site keep the notes),
+ *   with Report on a note; solo keeps each board in the player's own save.
  * - Visiting Stones (199 archived): flip, visit, get visitors, stop random
  *   visitors, and the first-sighting VOG. "Visit" sends you to a neighbour's
  *   home street (js/features/neighbour-scene.js) with a door note, one small
@@ -96,7 +99,7 @@ import {
   streetNoteSeeds,
   takePinnedNote,
   writePaperNote,
-} from '../street-furniture.js?v=cb0ba050';
+} from '../street-furniture.js?v=d5716ef6';
 import {
   CHORES,
   NEIGHBOURS,
@@ -117,10 +120,11 @@ import {
   visitorLetter,
 } from '../neighbours.js?v=862857f9';
 import { buildNeighbourBackground, neighbourLoadingColors, neighbourPlatforms } from './neighbour-scene.js?v=074126e5';
-import { closeNoteView, noteViewOpen, openBoardView, openNotePicker, openNoteView } from '../note-view.js?v=21c55475';
+import { closeNoteView, noteViewOpen, openBoardView, openNotePicker, openNoteView, openReportView } from '../note-view.js?v=a5e518d1';
+import { BOARD_MP_TEXT, boardByline } from '../boards-mp.js?v=36c35534';
 import { textureFromUrl } from '../textures.js?v=3149d699';
-import { butlerApi } from './butler-feature.js?v=4e61c59f';
-import { neighboursMpApi } from './neighbours-mp-feature.js?v=eeb2082d';
+import { butlerApi } from './butler-feature.js?v=09e26823';
+import { neighboursMpApi } from './neighbours-mp-feature.js?v=9049ad21';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
 import { MAIL_POST_SENDER } from '../mailbox.js?v=1d97704f';
 
@@ -293,6 +297,12 @@ export function takeCarriedNote(engine, id) {
   return removeCarried(engine, id);
 }
 
+/** Every carried note, written or not, as copies (boards-mp-feature finds the one a pin took). */
+export function carriedNoteList(engine) {
+  syncCarried(engine);
+  return carried.map((n) => normalizeNote(n));
+}
+
 function bylineFor(note) {
   const n = normalizeNote(note);
   if (n.lastEditor === PLAYER_ID) {
@@ -301,6 +311,8 @@ function bylineFor(note) {
   }
   // STREET_NOTES / BOARD_PINS are remake text, said so plainly (G175).
   if (isRemakeNote(note)) return REMAKE_NOTE_BYLINE;
+  // Multiplayer: another player's note names them (bag_notice_board.js 203-210 listed the last editor).
+  if (n.authorName) return boardByline(n);
   return n.initialText || n.initialTitle ? 'Left by a Glitch who passed this way' : '';
 }
 
@@ -576,34 +588,119 @@ function buildBoard(engine, x, y, index, opts = {}) {
   return entity;
 }
 
+/**
+ * Multiplayer: the street's board is everyone's (boards-mp-feature sharedBoard: { ready, capacity,
+ * notes }), or null when it is the player's own (solo, a demo board, a private place).
+ */
+function sharedBoardOf(engine, entity) {
+  if (!entity || entity.pins || entity.index !== 0) return null;
+  return engine.query?.('sharedBoard', engine.streetTsid, engine) ?? null;
+}
+
 function pinsFor(engine, entity) {
+  const shared = sharedBoardOf(engine, entity);
+  if (shared) return shared.notes;
   return entity.pins || boardPins(engine, entity.index);
+}
+
+function drawPins(entity, count) {
+  if (!entity?.sprite || entity.sprite.destroyed) return;
+  entity.sprite.texture = textureFromUrl(BOARD_ART.path(Math.min(BOARD_CAPACITY, count)));
+  entity.target.subtitle = `${count} of ${BOARD_CAPACITY} notes pinned`;
 }
 
 function setPins(engine, entity, pins) {
   if (entity.pins) entity.pins = pins;
   else slot(engine).boards[entity.index] = pins;
-  entity.sprite.texture = textureFromUrl(BOARD_ART.path(Math.min(BOARD_CAPACITY, pins.length)));
-  entity.target.subtitle = `${pins.length} of ${BOARD_CAPACITY} notes pinned`;
+  drawPins(entity, pins.length);
   lastAction = `board:${boardArtState(pins.length)}`;
+}
+
+/** The board window open now, to draw again when a shared board changes. */
+let boardView = null;
+
+/**
+ * boards-mp-feature: a shared board changed (a pin, a take, the server's list). Each board's art
+ * shows its count ("m" + count, bag_notice_board.js updateStatus), and an open board window is
+ * drawn again.
+ */
+export function refreshSharedBoards(engine) {
+  for (const entity of boards) {
+    const shared = sharedBoardOf(engine, entity);
+    if (!shared) continue;
+    drawPins(entity, shared.notes.length);
+    lastAction = `board:${boardArtState(shared.notes.length)}`;
+    if (boardView === entity && noteViewOpen() && typeof document !== 'undefined' && document.querySelector('.note-view .board-card')) openBoard(engine, entity);
+  }
+  publish(engine, true);
+}
+
+function sharedReason(engine, shared) {
+  if (!shared || shared.ready) return '';
+  return engine.query?.('realtimeClient')?.state === 'online' ? BOARD_MP_TEXT.loading : BOARD_MP_TEXT.offline;
+}
+
+/** A shared note's window: Back to the board, and Report when somebody else wrote it. */
+function showSharedNote(engine, entity, note) {
+  const back = { label: 'Back to the board', onClick: () => openBoard(engine, entity) };
+  const extra = [back];
+  if (normalizeNote(note).lastEditor !== PLAYER_ID) {
+    extra.push({ label: BOARD_MP_TEXT.report, onClick: () => reportSharedNote(engine, entity, note) });
+  }
+  showNote(engine, note, { kicker: 'Notice Board', extra });
+}
+
+function reportSharedNote(engine, entity, note) {
+  openReportView({
+    kicker: `Notice Board · ${noteTitle(note)}`,
+    title: BOARD_MP_TEXT.reportTitle,
+    label: BOARD_MP_TEXT.reportLabel,
+    hint: BOARD_MP_TEXT.reportHint,
+    send: BOARD_MP_TEXT.reportSend,
+    onBack: () => showSharedNote(engine, entity, note),
+    onSend: async (why) => {
+      const out = await (engine.query?.('sharedBoardReport', note.id, why, engine) ?? { ok: false, text: BOARD_MP_TEXT.reportFailed });
+      lastAction = out?.ok ? `board:report:${note.id}` : 'board:report:failed';
+      publish(engine, true);
+      return out;
+    },
+  });
+  lastAction = 'board:report';
+  publish(engine, true);
 }
 
 function openBoard(engine, entity) {
   syncCarried(engine);
+  const shared = sharedBoardOf(engine, entity);
+  if (sharedReason(engine, shared)) {
+    boardView = null;
+    return engine.toast(sharedReason(engine, shared), 2600);
+  }
   const pins = pinsFor(engine, entity);
   const add = boardAddVerb(pins, carried.length);
   openBoardView({
     title: 'Notice Board',
     count: pins.length,
     capacity: BOARD_CAPACITY,
-    pins: pins.map((p) => ({ id: p.id, title: noteTitle(p), preview: noteContent(p).body.slice(0, 200), marker: isRemakeNote(p) ? REMAKE_NOTE_MARKER : '' })),
+    pins: pins.map((p) => ({ id: p.id, title: noteTitle(p), preview: noteContent(p).body.slice(0, 200), marker: isRemakeNote(p) ? REMAKE_NOTE_MARKER : '', by: shared && p.authorName ? `by ${p.authorName}` : '' })),
     addEnabled: add.enabled,
     addReason: add.reason,
     onRead: (id) => {
+      if (shared) {
+        const note = pinsFor(engine, entity).find((p) => p.id === id);
+        if (note) showSharedNote(engine, entity, note);
+        return;
+      }
       const note = pinsFor(engine, entity).find((p) => p.id === id);
       if (note) showNote(engine, note, { kicker: 'Notice Board', extra: [{ label: 'Back to the board', onClick: () => openBoard(engine, entity) }] });
     },
     onTake: (id) => {
+      if (shared) {
+        // The server's answer moves it into the pack (boards-mp-feature board_taken).
+        if (engine.query?.('sharedBoardTake', id, engine)) lastAction = `board:take:${id}`;
+        publish(engine, true);
+        return;
+      }
       syncCarried(engine);
       const out = takePinnedNote(pinsFor(engine, entity), carried, id);
       if (!out.ok) return;
@@ -616,15 +713,26 @@ function openBoard(engine, entity) {
     },
     onAdd: () => addToBoard(engine, entity),
   });
+  boardView = entity;
   publish(engine, true);
 }
 
 function addToBoard(engine, entity, { reopen = true } = {}) {
   syncCarried(engine);
+  const shared = sharedBoardOf(engine, entity);
+  if (sharedReason(engine, shared)) return engine.toast(sharedReason(engine, shared), 2600);
   const pins = pinsFor(engine, entity);
   const gate = boardAddVerb(pins, carried.length);
   if (!gate.enabled) return engine.toast(gate.reason, 2200);
   const pin = (id) => {
+    if (shared) {
+      // Online the server pins it for everyone; the pack changes on its answer (board_pinned).
+      const note = carried.find((n) => n.id === id);
+      if (note && engine.query?.('sharedBoardPin', note, engine)) lastAction = `board:pin:${noteTitle(note)}`;
+      if (reopen) openBoard(engine, entity);
+      publish(engine, true);
+      return;
+    }
     const out = pinNote(pinsFor(engine, entity), carried, id);
     if (!out.ok) return engine.toast(out.error, 2600);
     removeCarried(engine, id);
@@ -1386,6 +1494,7 @@ export const streetFurnitureFeature = {
     stones = [];
     notes = [];
     boards = [];
+    boardView = null;
     neighbourTargets = null;
     currentRow = null;
   },

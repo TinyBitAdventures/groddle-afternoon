@@ -491,6 +491,20 @@ export function createMinnAccount({ baseUri, fetch: fetchFn = globalThis.fetch?.
     },
 
     /**
+     * Notice Boards shared online (groddle-afternoon-site/src/LedgerBoard.php):
+     * { boards: [{ op, side: pinned|took, id, note: { id, title, body, author, remake, at } }] },
+     * the pins and takes the site settled that this save has not applied yet.
+     */
+    async boards() {
+      return buddyCall('Checking your notice board notes', 'boards/mine');
+    },
+
+    /** Report a note on a notice board: { status: reported|already, ticket? }; a refusal throws with the site's words. */
+    async reportBoardNote(id, why = '') {
+      return buddyCall('Reporting that note', `boards/notes/${encodeURIComponent(id)}/report`, { method: 'POST', body: { why } });
+    },
+
+    /**
      * A bug report from the game's header (groddle-afternoon-site src/BugReports.php):
      * { status: sent, id }. A refusal (an empty message, too many just now) throws with the site's words.
      */

@@ -5,6 +5,10 @@
  * `notice_board_start` / `notice_board_status` (read or take each pinned note,
  * capacity shown). Used by js/features/street-furniture-feature.js.
  *
+ * Multiplayer (js/features/boards-mp-feature.js): a pin names who wrote it, as
+ * the source's board listed each note's last editor (bag_notice_board.js
+ * 203-210), and openReportView asks why a player reports a note.
+ *
  * The window uses the shared `.glitch-modal` shell, so engine.busy() and the
  * pack-safe layout treat it like every other panel.
  */
@@ -38,6 +42,7 @@ const CSS = `
 .note-view .board-pin:nth-child(even) { transform: rotate(1.1deg); }
 .note-view .board-pin strong { font-size: var(--fs-base); color: var(--c-sand-33); overflow-wrap: anywhere; }
 .note-view .board-pin p { margin: 0; font-size: var(--fs-sm); color: var(--c-sand-44b); flex: 1; overflow-wrap: anywhere; }
+.note-view .board-pin .board-by { font-size: var(--fs-2xs); color: var(--c-gold-59); font-style: italic; overflow-wrap: anywhere; }
 .note-view .board-pin .note-actions { margin-top: 0.2rem; justify-content: flex-start; gap: 0.3rem; }
 .note-view .board-pin .note-actions button { padding: 0.2rem 0.55rem; font-size: var(--fs-sm); }
 .note-view .board-empty { background: color-mix(in srgb, var(--surface-card) 90%, transparent); border-radius: var(--radius-sm); padding: 0.8rem; font-size: var(--fs-base); color: var(--c-sand-44b); }
@@ -186,7 +191,7 @@ export function openNoteView(opts = {}) {
 
 /**
  * The notice board: pinned notes with Read / Take, plus Add a note.
- * opts: { title, count, capacity, pins: [{ id, title, preview, marker? }], addLabel,
+ * opts: { title, count, capacity, pins: [{ id, title, preview, marker?, by? }], addLabel,
  *         addEnabled, addReason, onRead(id), onTake(id), onAdd(), onClose }
  */
 export function openBoardView(opts = {}) {
@@ -216,6 +221,7 @@ export function openBoardView(opts = {}) {
       if (pin.marker) box.appendChild(el('span', { className: 'note-marker', 'data-remake': '1' }, pin.marker));
       box.appendChild(el('strong', {}, pin.title));
       box.appendChild(el('p', {}, pin.preview));
+      if (pin.by) box.appendChild(el('span', { className: 'board-by' }, pin.by));
       const actions = el('div', { className: 'note-actions' });
       actions.appendChild(button('Read', () => opts.onRead?.(pin.id)));
       actions.appendChild(button('Take', () => opts.onTake?.(pin.id)));
@@ -246,5 +252,44 @@ export function openNotePicker(opts = {}) {
   actions.appendChild(button('Cancel', () => closeNoteView()));
   card.appendChild(actions);
   mount(card, { label: opts.title || 'Your notes', onClose: opts.onClose });
+  return wrap;
+}
+
+/**
+ * Report a note (multiplayer): why, in the player's words (optional), then Send.
+ * opts: { kicker, title, label, hint, send, maxWhy, onSend(why) -> Promise<{ ok, text }>, onBack? }
+ */
+export function openReportView(opts = {}) {
+  if (typeof document === 'undefined') return null;
+  const card = el('div', { className: 'note-card', 'data-note-report': '' });
+  card.appendChild(el('div', { className: 'note-kicker' }, opts.kicker || 'Notice Board'));
+  card.appendChild(el('h2', {}, opts.title || 'Report this note?'));
+  const form = el('form');
+  form.appendChild(el('label', { for: 'note-report-why' }, opts.label || 'Why?'));
+  const why = el('textarea', { id: 'note-report-why', maxlength: String(opts.maxWhy || 500), spellcheck: 'true' });
+  form.appendChild(why);
+  if (opts.hint) form.appendChild(el('div', { className: 'note-byline' }, opts.hint));
+  const status = el('div', { className: 'note-reason', role: 'status' });
+  form.appendChild(status);
+  const actions = el('div', { className: 'note-actions' });
+  actions.appendChild(button('Cancel', () => (opts.onBack ? opts.onBack() : closeNoteView())));
+  const send = el('button', { type: 'submit', className: 'is-primary' }, opts.send || 'Send');
+  actions.appendChild(send);
+  form.appendChild(actions);
+  form.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    send.disabled = true;
+    status.textContent = '';
+    const out = await Promise.resolve(opts.onSend ? opts.onSend(why.value) : { ok: true });
+    send.disabled = false;
+    if (out && out.ok === false) {
+      status.textContent = out.text || '';
+      return;
+    }
+    closeNoteView();
+  });
+  card.appendChild(form);
+  mount(card, { label: opts.title || 'Report', onClose: opts.onClose });
+  requestAnimationFrame(() => why.focus());
   return wrap;
 }

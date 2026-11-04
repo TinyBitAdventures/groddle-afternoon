@@ -41,7 +41,7 @@
  * window.groddleGroups.
  */
 
-import { createMinnAccount } from '../minn-account.js?v=eb300264';
+import { createMinnAccount } from '../minn-account.js?v=28026657';
 import { saveStore } from '../save-store.js?v=8839ba7b';
 import {
   CHANNELS,

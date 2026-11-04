@@ -83,7 +83,7 @@
  * multiplayer.
  */
 
-import { createMinnAccount } from '../minn-account.js?v=eb300264';
+import { createMinnAccount } from '../minn-account.js?v=28026657';
 import { runStreetTransition } from '../screen-fx.js?v=9d4640eb';
 import { STREET_INDEX } from '../street-loader.js?v=33d2b8bc';
 import { ITEM_CATALOG, countItem, listPackItemSlots, removeItem } from '../inventory.js?v=602da017';
@@ -91,8 +91,8 @@ import { cultivationDef, homeStreetLayout } from '../home-cultivation.js?v=ff172
 import { tickGarden } from '../garden.js?v=dd021ecc';
 import { BUTLER_RIG_SCALE, ButlerPainter, butlerRigNow, loadButlerRig } from '../butler-rig.js?v=e81817d9';
 import { butlerPostRx, normalizeButlerParts } from '../butler.js?v=86316578';
-import { butlerApi } from './butler-feature.js?v=4e61c59f';
-import { homesFeature, visitorHomeScene, visitorHomeState } from './homes-feature.js?v=c93cd168';
+import { butlerApi } from './butler-feature.js?v=09e26823';
+import { homesFeature, visitorHomeScene, visitorHomeState } from './homes-feature.js?v=f5903c3b';
 import {
   BUTLER_MESSAGE_MAX,
   KEY_VERB,
