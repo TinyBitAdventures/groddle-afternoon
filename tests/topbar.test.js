@@ -17,7 +17,7 @@ import {
   vitalRing,
   volumeLevel,
   soundChannelToggle,
-} from '../public/js/ui/topbar.js?v=5135f874';
+} from '../public/js/ui/topbar.js?v=2e6605ef';
 
 const pub = join(import.meta.dirname, '..', 'public');
 const read = (f) => readFileSync(join(pub, f), 'utf8');

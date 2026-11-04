@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=79228c68';
 import { createFeatureHost } from './js/feature-host.js?v=2ed3c069';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=efa812b8';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=6508399f';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -462,7 +462,7 @@ import {
   removeItem,
   isToolItem,
 } from './js/inventory.js?v=597a17a2';
-import { PACK_COPY, isBagClass, unitRankAt } from './js/pack-slots.js?v=95438d4a';
+import { PACK_COPY, isBagClass, unitRankAt } from './js/pack-slots.js?v=68a8fca3';
 import { createPackRow, mountPackClearance, packBandRange, packCountText, packSearchEntries, packSlotTip } from './js/ui/pack-row.js?v=65c0f180';
 import { listAnimalFeedOptions } from './js/animals.js?v=2654c807';
 import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=2654c807';
@@ -723,7 +723,7 @@ import { MODERN, onUiModeChange, uiState } from './js/classic/ui-mode.js?v=587c0
 // ZOOM: the world zoom (a device preference) and Classic's frame scale under it; both load before main().
 import { worldZoom, setWorldZoom, stepWorldZoom, onZoomChange, zoomKeyAction, zoomKeyToast } from './js/world-zoom.js?v=b262a6c7';
 import { nightTint, nightTintOn, onNightTintChange, worldTintOpacity } from './js/night-tint.js?v=1dfc9c89';
-import { streetMapSetting, toggleStreetMap } from './js/ui/street-minimap.js?v=ce66d251';
+import { streetMapSetting, toggleStreetMap } from './js/ui/street-minimap.js?v=fb6e86e8';
 import './js/classic/classic-zoom.js?v=1ef4b9a5';
 import { mountImaginationHub } from './js/ui/imagination-hub.js?v=1d96f241';
 import { newDayBubble, shuffleNewDayMessages, waitForScreenGates } from './js/screen-queue.js?v=cf0132c0';
@@ -914,7 +914,7 @@ import { installHiresIcons } from './js/icon-hires.js?v=5b68aeaa';
 import { installHiresDecos } from './js/deco-hires.js?v=cb905e17';
 import { loadAudioLevels, loadMutedPreference, saveAudioLevel, saveMutedPreference } from './js/audio-pref.js?v=6fe817bc';
 import { createAudioBuses, fadeGain } from './js/audio-buses.js?v=af167b54';
-import { installTopBar, renderTopBar } from './js/ui/topbar.js?v=5135f874';
+import { installTopBar, renderTopBar } from './js/ui/topbar.js?v=2e6605ef';
 import { focusBack, installFocusReturn, lastInput } from './js/ui/focus-return.js?v=da190597';
 import { installContextGuard } from './js/ui/context-guard.js?v=0f71ac17';
 import { QUOIN_FRAME_BOB, advanceQuoinClock, quoinBobBetweenFrames } from './js/quoin-motion.js?v=ea0bd408';
@@ -923,14 +923,14 @@ import { denseSprite } from './js/sprite-dense.js?v=178a711b';
 import { wholeStatAmounts, wholeEffects } from './js/stat-text.js?v=f96d8fd3';
 import { createNotifier, effectTokens, floatKey, offerCardDrop, stackFloat, tokenText } from './js/notify.js?v=d85330ff';
 import { mountNotifyView } from './js/notify-view.js?v=81d06119';
-import { mountSocialDrawer } from './js/ui/social-drawer.js?v=d008629d';
+import { mountSocialDrawer } from './js/ui/social-drawer.js?v=b99fb56c';
 import { bindDragScroll } from './js/ui/drag-scroll.js?v=9a527ac8';
 import { SIDE_SHEET_IDS, bindTabs, inSideSheet, mountPanelShell, sheetKeyToWorld } from './js/ui/panel-shell.js?v=6812fe04';
-import { createQuestSheet, questStep } from './js/ui/quest-sheet.js?v=6ae8ede0';
-import { createQuestTracker } from './js/ui/quest-tracker.js?v=05d7910b';
-import { bindContextTrigger, createContextMenu, isContextMenuKey as isMenuKey, MORE_KEYS_LABEL } from './js/ui/context-menu.js?v=e2993b1c';
+import { createQuestSheet, questStep } from './js/ui/quest-sheet.js?v=c8976bed';
+import { createQuestTracker } from './js/ui/quest-tracker.js?v=abf94213';
+import { bindContextTrigger, createContextMenu, isContextMenuKey as isMenuKey, MORE_KEYS_LABEL } from './js/ui/context-menu.js?v=990e8c56';
 import { bindCountField, countKeyValue, countStepMarkup } from './js/ui/count-chooser.js?v=893305c8';
-import { bindVerbMenu, focusVerbRow, lockVerbMenuSize, makePickTile, makeVerbRow, pickGridCols, placeVerbMenu, plainWords, refuseVerbRow, syncVerbDetail, verbMenuKey, verbRowAttrs, verbRowInner, verbRowKeys } from './js/ui/verb-menu.js?v=74b6dfa0';
+import { bindVerbMenu, focusVerbRow, lockVerbMenuSize, makePickTile, makeVerbRow, pickGridCols, placeVerbMenu, plainWords, refuseVerbRow, syncVerbDetail, verbMenuKey, verbRowAttrs, verbRowInner, verbRowKeys } from './js/ui/verb-menu.js?v=e65f7462';
 import { createPromptSettler, promptId } from './js/prompt-settle.js?v=509ba9cc';
 import { clientKeyAction, createHotkeysSheet, isHotkeySheetRelease, isPlainKey } from './js/client-hotkeys.js?v=5a0e7cc7';
 import { EAT_PICK_TEXT, bestFoodIndex, eatChoices, eatTip } from './js/eat-pick.js?v=8fb763d0';
@@ -955,7 +955,7 @@ import { itemZ } from './js/item-bands.js?v=e98b10bc';
 import { SLUG_ANIMATION, SLUG_LAYOUT, SLUG_STYLES, SLUG_TARGETS, drawSlugIcon, formatRawSlugs, formatSlugList, layoutSlugRow, slugBox, slugNumber, slugPillPath, slugSign, speechSlugList } from './js/speech-slugs.js?v=130338f9';
 import { filterText } from './js/word-filter.js?v=9a7a7ebb'; // the remake's own word filter
 // The interface skin (js/classic/ui-mode.js) sets <html data-ui> as it loads: before main(), so before the boot cover lifts.
-import { installInterfaceSettings } from './js/classic/classic-prefs.js?v=a20020a9';
+import { installInterfaceSettings } from './js/classic/classic-prefs.js?v=b23e21e4';
 
 /** @type {object|null} assets/maps/index.json */
 let mapIndexCache = null;
@@ -2110,6 +2110,8 @@ let packDropQty = 1;
 /** Pack action-card "Eat how many?" chooser (js/eat-many.js). */
 let packEatMode = false;
 let packEatQty = 1;
+/** The feature verb whose second level the pack menu shows (a bag's Sort: features/bags-feature.js), or ''. */
+let packSubLevel = '';
 let vendorSprite = null;
 /** Active Phantom Glitch echo/final encounter for the authored ghost quest. */
 let phantomTarget = null;
@@ -3286,6 +3288,7 @@ function closePackPopover() {
   packDropQty = 1;
   packEatMode = false;
   packEatQty = 1;
+  packSubLevel = '';
   const pop = document.getElementById('pack-popover');
   if (pop) {
     pop.hidden = true;
@@ -3935,6 +3938,7 @@ function renderPackPopover(classTsid, anchor = null) {
     packDropQty = 1;
     packEatMode = false;
     packEatQty = 1;
+    packSubLevel = '';
   }
   // A tool's own slot says which tool it is (its wear and its repair are that one's).
   if (packSelected !== classTsid) {
@@ -4217,16 +4221,35 @@ function renderPackPopover(classTsid, anchor = null) {
   if (emblemSpend) {
     rows.push({ attrs: 'data-pack-emblem-spend', cls: 'pack-bear-action', label: 'Spend', disabled: !emblemSpend.enabled, tip: emblemSpend.tooltip, reason: emblemSpend.reason });
   }
+  // A feature verb with `sub` opens a second level of its own verbs (a bag's Sort: All and the
+  // sorts, features/bags-feature.js sortVerbs); each of those is a feature verb like the rest.
+  const featureVerbRow = (verb) => ({
+    attrs: `data-feature-pack-verb="${escapeHtml(verb.id)}" data-feature-id="${escapeHtml(verb.featureId)}"`,
+    cls: `pack-bear-action pack-feature-verb${verb.primary ? ' pack-pop-primary' : ''}`,
+    label: verb.label,
+    disabled: verb.enabled === false,
+    reason: verb.reason || '',
+    tip: verb.tooltip || '',
+    ...(typeof verb.current === 'boolean' ? { current: verb.current } : {}),
+  });
+  let subVerb = null;
   for (const verb of features.packVerbs(classTsid, engine)) {
-    rows.push({
-      attrs: `data-feature-pack-verb="${escapeHtml(verb.id)}" data-feature-id="${escapeHtml(verb.featureId)}"`,
-      cls: `pack-bear-action pack-feature-verb${verb.primary ? ' pack-pop-primary' : ''}`,
-      label: verb.label,
-      disabled: verb.enabled === false,
-      reason: verb.reason || '',
-      tip: verb.tooltip || '',
-    });
+    if (Array.isArray(verb.sub) && verb.sub.length) {
+      if (verb.id === packSubLevel) subVerb = verb;
+      rows.push({
+        attrs: `data-feature-pack-sub="${escapeHtml(verb.id)}"`,
+        cls: 'pack-bear-action pack-feature-verb',
+        label: verb.label,
+        next: true,
+        disabled: verb.enabled === false,
+        reason: verb.reason || '',
+        tip: verb.tooltip || '',
+      });
+      continue;
+    }
+    rows.push(featureVerbRow(verb));
   }
+  if (!subVerb) packSubLevel = '';
   if (recipeTarget) rows.push({ attrs: 'data-pack-make', label: makeLabel, tip: recipeNote ? `${recipeNote} · opens Make` : 'Opens Make' });
   const dropBlock = packDropBlockReason(classTsid);
   rows.push({
@@ -4240,10 +4263,18 @@ function renderPackPopover(classTsid, anchor = null) {
   if (canSellHere) rows.push({ attrs: 'data-pack-sell', cls: 'pack-pop-sell', label: 'Sell', gain: `◎ ${sellPrice}`, tip: `Sell one to this vendor for ${sellPrice} currants` });
 
   // Eat more and Drop (more than one) are second levels: a back row (0 or Backspace) and the count.
-  const level = eatPrompt ? 'eat' : dropPrompt ? 'drop' : '';
+  // A feature verb's level (a bag's Sort) is a back row and its verbs, picked as any row is (1-9).
+  const level = eatPrompt ? 'eat' : dropPrompt ? 'drop' : subVerb ? 'sub' : '';
   const keys = verbRowKeys(rows);
   const rowMarkup = (row, key) => `<button type="button" class="vm-row${row.cls ? ` ${row.cls}` : ''}" ${row.attrs} ${verbRowAttrs(row)}>${verbRowInner({ ...row, key })}</button>`;
-  const rowsMarkup = level
+  const subRows = level === 'sub'
+    ? [{ attrs: 'data-pack-sub-cancel', cls: 'vm-back', label: 'Back', back: true, tip: subVerb.backTip || 'Back to what you can do with it' },
+      ...subVerb.sub.map((v) => featureVerbRow({ ...v, featureId: subVerb.featureId }))]
+    : null;
+  const subKeys = subRows ? verbRowKeys(subRows) : null;
+  const rowsMarkup = subRows
+    ? subRows.map((row, i) => rowMarkup(row, subKeys[i])).join('')
+    : level
     ? `<button type="button" class="vm-row vm-back" ${level === 'eat' ? 'data-pack-eat-cancel' : 'data-pack-drop-cancel'} ${verbRowAttrs({ back: true, tip: 'Back to what you can do with it' })}>${verbRowInner({ key: '0', label: 'Back', back: true })}</button>`
     : rows.map((row, i) => rowMarkup(row, keys[i])).join('');
 
@@ -4254,7 +4285,7 @@ function renderPackPopover(classTsid, anchor = null) {
     : features.query('itemDisplayName', classTsid);
   pop.hidden = false;
   pop.dataset.vmDefault = plainWords(slot.desc || 'A thing from Ur.');
-  pop.dataset.vmLevel = level;
+  pop.dataset.vmLevel = level === 'sub' ? `sub:${subVerb.id}` : level;
   const markup = `
     <div class="pack-pop-head vm-head"${isEmotionalBear ? ` data-bear-state="${bearStateName}"` : ''}>
       <div class="pack-pop-icon"><img src="${slot.icon}" alt="" /></div>
@@ -4319,6 +4350,23 @@ function renderPackPopover(classTsid, anchor = null) {
       closePackPopover();
       features.runPackVerb(classTsid, button.dataset.featurePackVerb, engine, button.dataset.featureId);
     });
+  });
+  // A feature verb's second level (a bag's Sort): in, its first choice takes the focus; Back (0,
+  // Backspace or Esc) returns to the row that opened it.
+  pop.querySelectorAll('[data-feature-pack-sub]').forEach((button) => {
+    button.addEventListener('click', () => {
+      packSubLevel = button.dataset.featurePackSub;
+      renderPackPopover(classTsid, sourceAnchor);
+      focusVerbRow(pop);
+    });
+  });
+  pop.querySelector('[data-pack-sub-cancel]')?.addEventListener('click', () => {
+    const from = packSubLevel;
+    packSubLevel = '';
+    renderPackPopover(classTsid, sourceAnchor);
+    const row = [...pop.querySelectorAll('[data-feature-pack-sub]')].find((b) => b.dataset.featurePackSub === from);
+    const at = row ? [...pop.querySelectorAll('.vm-row')].indexOf(row) : -1;
+    if (at >= 0) focusVerbRow(pop, at);
   });
   pop.querySelector('[data-pack-use]')?.addEventListener('click', () => {
     takeFromMenuStack(classTsid, 1);
@@ -4673,6 +4721,7 @@ function renderPackRow(box, slots, opts = {}) {
           packDropQty = 1;
           packEatMode = false;
           packEatQty = 1;
+          packSubLevel = '';
         }
         renderPackPopover(s.classTsid, slot);
         // VERBS: opened from the keyboard, the first row takes focus (a click leaves the footer on what it is).
@@ -4896,6 +4945,8 @@ let packMenuSwallowClickUntil = 0;
  */
 function openPackBagOptions(s, slot, { keys = false, swallowClick = false } = {}) {
   // RIGHTCLICK R9: opening a menu never cancels the running verb (a pick does: the popover's capture click).
+  // It opens fresh, on the bag's first level (not on its Sort level from last time).
+  packSubLevel = '';
   renderPackPopover(s.classTsid, slot);
   packBagMenuEchoUntil = Date.now() + 1000;
   if (swallowClick) packMenuSwallowClickUntil = Date.now() + 700;
@@ -4915,6 +4966,7 @@ function openPackStackMenu(s, slot, { keys = false, swallowClick = false } = {})
   packDropQty = 1;
   packEatMode = false;
   packEatQty = 1;
+  packSubLevel = '';
   renderPackPopover(s.classTsid, slot);
   packMenuEchoUntil = Date.now() + 1000;
   if (swallowClick) packMenuSwallowClickUntil = Date.now() + 700;
@@ -29181,7 +29233,10 @@ async function main() {
         return;
       }
       if (isPackPopoverOpen()) {
-        closePackPopover();
+        // A second level (a bag's Sort) goes back to the menu, as Eat more's and Drop's do.
+        const back = packSubLevel ? document.querySelector('#pack-popover [data-pack-sub-cancel]') : null;
+        if (back) back.click();
+        else closePackPopover();
         return;
       }
       // MPANELS: a vendor's How many goes first, back to the shelf.

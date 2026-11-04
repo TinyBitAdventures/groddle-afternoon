@@ -20,8 +20,8 @@
  * contextMenu ("quest-card:<id>").
  */
 
-import { escapeText } from './verb-menu.js?v=74b6dfa0';
-import { bindContextTrigger, MORE_KEYS_LABEL } from './context-menu.js?v=e2993b1c';
+import { escapeText } from './verb-menu.js?v=e65f7462';
+import { bindContextTrigger, MORE_KEYS_LABEL } from './context-menu.js?v=990e8c56';
 import { focusWorld } from './focus-return.js?v=da190597';
 
 export const QUEST_TABS = Object.freeze(['active', 'offered', 'done']);

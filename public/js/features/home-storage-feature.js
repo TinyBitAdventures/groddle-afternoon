@@ -42,15 +42,15 @@
  */
 
 import { ITEM_CATALOG, addItem, countItem, ensureItem, itemIcon, removeItem } from '../inventory.js?v=597a17a2';
-import { displayRefusal, furnitureDef, furnitureSize, isFurniture } from '../home-decor.js?v=fc25037c';
+import { displayRefusal, furnitureDef, furnitureSize, isFurniture } from '../home-decor.js?v=fff7788d';
 import { pieceLabel } from '../furniture-upgrades.js?v=a3788c0d';
 import { textureFromUrl } from '../textures.js?v=3149d699';
-import { stackMaxOf, isBagClass } from '../pack-slots.js?v=95438d4a';
+import { stackMaxOf, isBagClass } from '../pack-slots.js?v=68a8fca3';
 import { ELEMENT_CLASSES, NO_BAG_CLASSES, NO_SLOT_CLASSES } from '../pack-slots-data.js?v=800f664c';
 import { TOOL_CONDITION_CATALOG, receiveToolCopy, takeToolCopy } from '../tools.js?v=3974f57e';
 import { readVisitScene } from '../neighbours-mp.js?v=a8d5544e';
 import { saveStore } from '../save-store.js?v=8839ba7b';
-import { homesFeature } from './homes-feature.js?v=b268e2ca';
+import { homesFeature } from './homes-feature.js?v=cf52d2f9';
 import {
   SDB_PRICE_MAX,
   STORAGE_TEXT as T,
@@ -85,7 +85,7 @@ import {
   openPriceDialog,
   openStoreDialog,
   storageWindowKind,
-} from '../ui/storage-windows.js?v=002383c2';
+} from '../ui/storage-windows.js?v=c1499fef';
 
 export const HOME_STORAGE_ID = 'home-storage';
 export const CLASS_STORAGE = 'home_storage';

@@ -31,7 +31,7 @@ import {
   normalizeHomeDecorState,
   pickUpFurniture,
   placeFurniture,
-} from '../public/js/home-decor.js?v=fc25037c';
+} from '../public/js/home-decor.js?v=fff7788d';
 import { SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');

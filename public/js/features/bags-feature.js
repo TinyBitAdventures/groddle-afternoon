@@ -73,10 +73,11 @@
  * class and a count (trade goods { c, n, r }), so it arrives with its class name.
  *
  * Sorting (the pack cards; pack-slots.js BAG_SORTS, specializeBag, magicSort,
- * stackUp): a bag's menu lists, in sort_on order before Rename, Sort: All and
- * the fourteen Sort: verbs with Internal Sortitude (Generic and Bigger Bags),
- * Magic sort with Magic Sort (a sorted bag, or a toolbox, spice rack, kit,
- * pouch or case), and Stack up with Stack Up (every bag). Each is the menu's
+ * stackUp): a bag's menu lists, in sort_on order before Rename, one Sort row
+ * with Internal Sortitude (Generic and Bigger Bags) whose second level holds
+ * All and the fourteen sorts, Magic sort with Magic Sort (a sorted bag, or a
+ * toolbox, spice rack, kit, pouch or case), and Stack up with Stack Up (every
+ * bag). Each is the menu's
  * bag (packBagMenu); the activity lines are the source's. With Internal
  * Sortitude what arrives goes into the bags sorted for it first (opts().sortitude).
  *
@@ -122,7 +123,7 @@ import {
   unitOrder,
   unitPlaces,
   unitRankAt,
-} from '../pack-slots.js?v=95438d4a';
+} from '../pack-slots.js?v=68a8fca3';
 import { TOOL_CONDITION_CATALOG, moveToolCopy, pickToolCopies, placeToolCopies } from '../tools.js?v=3974f57e';
 import { createMinnAccount } from '../minn-account.js?v=eb300264';
 import { BAG_NAME_MAX, BAG_RENAME_COPY, bagLabel, canRenameBag, cleanBagName, renamedTo } from '../bag-names.js?v=22391c55';
@@ -567,12 +568,25 @@ function pickupRoom(target, verbs, engine) {
   return verbs.map((v) => (v?.id === 'pickup' ? { ...v, enabled: false, reason: PACK_COPY.pickupDisabled } : v));
 }
 
+/** A sort's plain name on the Sort level: "Mining, etc." for the source's "Sort: Mining, etc.". */
+const plainSortLabel = (label) => String(label).replace(/^Sort: /, '');
+
 /**
- * A bag's sorting verbs, in sort_on order (bag_generic_gray.js 30-473): Sort: All
- * and the Sort: verbs need Internal Sortitude and a bag that can_specialize
- * (the one it is sorted by is disabled with the source's reason), Magic sort
- * needs Magic Sort and a sorted bag (or one with custom categories), Stack up
- * needs Stack Up. The bag is the menu's (packBagMenu), else the first of its class.
+ * A bag's sorting verbs, in sort_on order (bag_generic_gray.js 30-473). With
+ * Internal Sortitude and a bag that can_specialize, one Sort row (id bags_sort,
+ * `sub` its second level): All (verbs.sort_all) and the fourteen sorts by their
+ * plain names, each still its own verb (bags_sort:<id>). The one the bag is
+ * sorted by is the current choice (`current`), disabled with the source's
+ * reason; an unsorted bag's current choice is All. Magic sort needs Magic Sort
+ * and a sorted bag (or one with custom categories), Stack up needs Stack Up.
+ * The bag is the menu's (packBagMenu), else the first of its class.
+ *
+ * Remake choice (Austin 2026-11-03, "too many sort options on the options
+ * menu"): the original listed every Sort: verb flat on the bag's menu, one
+ * button per verb in sort_on order (glitch-client InteractionMenu.as
+ * buildVerbCUIs 768-822; bag_generic_gray.js verbs.sort_all 30 to
+ * sort_staples_a 391, sort_on 50-64). Here they sit on a second level, the
+ * way the menu's Eat more and Drop open theirs.
  */
 function sortVerbs(engine, cls) {
   const out = [];
@@ -581,11 +595,29 @@ function sortVerbs(engine, cls) {
   const box = key ? layout.bags[key] : null;
   if (!box) return out;
   if (canSpecializeBag(cls) && hasCard(engine, SORT_CARDS.sortitude)) {
-    out.push({ id: 'bags_sort:sort_all', label: BAG_SORT_COPY.all.label, enabled: true, reason: '', tooltip: BAG_SORT_COPY.all.tooltip });
+    const unsorted = !box.sort;
+    const sub = [{
+      id: 'bags_sort:sort_all',
+      label: plainSortLabel(BAG_SORT_COPY.all.label),
+      enabled: !unsorted,
+      current: unsorted,
+      reason: unsorted ? BAG_SORT_COPY.all.unsorted : '',
+      tooltip: BAG_SORT_COPY.all.tooltip,
+    }];
     for (const row of BAG_SORTS) {
       const current = box.sort === row.id;
-      out.push({ id: `bags_sort:${row.id}`, label: row.label, enabled: !current, reason: current ? row.reason : '', tooltip: row.tooltip });
+      sub.push({ id: `bags_sort:${row.id}`, label: plainSortLabel(row.label), enabled: !current, current, reason: current ? row.reason : '', tooltip: row.tooltip });
     }
+    const now = sub.find((v) => v.current);
+    out.push({
+      id: 'bags_sort',
+      label: BAG_SORT_COPY.menu.label,
+      enabled: true,
+      reason: '',
+      tooltip: unsorted ? BAG_SORT_COPY.menu.tooltip : BAG_SORT_COPY.menu.sortedBy(now.label),
+      backTip: BAG_SORT_COPY.menu.back,
+      sub,
+    });
   }
   if (hasCard(engine, SORT_CARDS.magic) && (canSpecializeBag(cls) || box.holds !== 'any')) {
     const ok = canMagicSort(box);

@@ -142,7 +142,9 @@ const SORT_BY_ID = new Map(BAG_SORTS.map((r) => [r.id, r]));
 
 /** The other bag verbs' words (verbs.sort_all 30-51, magic_sort 417-447, stack_up 449-473). */
 export const BAG_SORT_COPY = Object.freeze({
-  all: Object.freeze({ id: 'sort_all', label: 'Sort: All', tooltip: 'Remove specialization from this bag', sortOn: 50 }),
+  all: Object.freeze({ id: 'sort_all', label: 'Sort: All', tooltip: 'Remove specialization from this bag', sortOn: 50, unsorted: 'This bag is not sorted' }),
+  // The remake's one Sort row (features/bags-feature.js sortVerbs): its second level lists All and the sorts.
+  menu: Object.freeze({ label: 'Sort', tooltip: 'Choose what this bag is sorted for', sortedBy: (name) => `Sorted for ${name} · choose another sort`, back: 'Back to the bag\'s menu' }),
   magic: Object.freeze({ id: 'magic_sort', label: 'Magic sort', tooltip: 'Magically sort your items based on bag specialization', sortOn: 65, unsorted: 'This bag needs to be specialized before it can be magically sorted.', done: 'You have sorted your bag quite magically!' }),
   stackUp: Object.freeze({ id: 'stack_up', label: 'Stack up', tooltip: 'Finds all partial stacks in all your bags and cleans them up', sortOn: 66, done: 'Your inventory has been stacked up!' }),
 });

@@ -16,7 +16,7 @@ import {
   normalizeHomeDecorState,
   quoteInteriorUnexpand,
   unexpandInterior,
-} from '../public/js/home-decor.js?v=fc25037c';
+} from '../public/js/home-decor.js?v=fff7788d';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const homes = join(spike, '../glitch-GameServerJS/locations/inc_homes.js');

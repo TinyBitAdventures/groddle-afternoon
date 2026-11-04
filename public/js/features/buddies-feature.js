@@ -49,7 +49,7 @@
  */
 
 import { createMinnAccount } from '../minn-account.js?v=eb300264';
-import { bindContextTrigger } from '../ui/context-menu.js?v=e2993b1c';
+import { bindContextTrigger } from '../ui/context-menu.js?v=990e8c56';
 import { STREET_INDEX } from '../street-loader.js?v=33d2b8bc';
 import {
   BUDDY_COUNTER,

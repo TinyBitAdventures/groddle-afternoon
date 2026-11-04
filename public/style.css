@@ -10893,6 +10893,7 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
 [data-ui="modern"] .vm-row .vm-chev,
 [data-ui="modern"] .vm-row .vm-lock,
 [data-ui="modern"] .vm-row .vm-backicon { flex: none; color: var(--text-muted); }
+[data-ui="modern"] .vm-row .vm-check { flex: none; color: var(--good); }
 [data-ui="modern"] .vm-row.vm-back .vm-label { color: var(--text-muted); }
 /* A verb's picture level (Feed what?, Incubate what?, Deposit what?; makePickTile): the stacks as
    their pictures in 50 px buttons 2 px apart, one row up to 7, then a grid, centred, the card as

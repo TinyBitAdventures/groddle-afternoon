@@ -29,10 +29,10 @@ import {
   specializeBag,
   stackUp,
   unitOrder,
-} from '../public/js/pack-slots.js?v=95438d4a';
+} from '../public/js/pack-slots.js?v=68a8fca3';
 import { SORT_TAG_CLASSES } from '../public/js/pack-slots-data.js?v=800f664c';
 import { ITEM_CATALOG, isToolItem } from '../public/js/inventory.js?v=597a17a2';
-import { bagsFeature } from '../public/js/features/bags-feature.js?v=53774dcd';
+import { bagsFeature } from '../public/js/features/bags-feature.js?v=4b6cf185';
 import { createToolConditionState } from '../public/js/tools.js?v=3974f57e';
 import { remakeStatus, isOfferedInRemake } from '../public/js/imagination-remake.js?v=5ca4a35f';
 
@@ -273,11 +273,62 @@ describe('the bag menu (features/bags-feature.js)', () => {
     bagsFeature.restore({ v: 1, prefs, migrated: true }, all);
     bagsFeature.packBagMenu('b1');
     const verbs = bagsFeature.packVerbs('bag_bigger', all);
-    assert.deepEqual(verbs.map((v) => v.label), ['Sort: All', ...BAG_SORTS.map((r) => r.label), 'Magic sort', 'Stack up', 'Rename']);
+    // One Sort row (its sorts on a second level: the next test), then Magic sort, Stack up, Rename.
+    assert.deepEqual(verbs.map((v) => v.label), ['Sort', 'Magic sort', 'Stack up', 'Rename']);
+    assert.deepEqual(verbs.map((v) => v.id), ['bags_sort', 'bags_magic_sort', 'bags_stack_up', 'bags_rename']);
     assert.equal(verbs.find((v) => v.id === 'bags_magic_sort').enabled, false);
+    // Stack Up alone: Stack up and Rename, no Sort row.
+    const stackOnly = engineWith({ ...inv }, ['pack_stack_up_bags']);
+    bagsFeature.init(stackOnly);
+    bagsFeature.restore({ v: 1, prefs, migrated: true }, stackOnly);
+    bagsFeature.packBagMenu('b1');
+    assert.deepEqual(bagsFeature.packVerbs('bag_bigger', stackOnly).map((v) => v.id), ['bags_stack_up', 'bags_rename']);
+    bagsFeature.init(all);
+    bagsFeature.restore({ v: 1, prefs, migrated: true }, all);
     // A toolbox: no Sort: verbs, but Magic sort (custom categories) and Stack up.
     bagsFeature.packBagMenu('b3');
     assert.deepEqual(bagsFeature.packVerbs('bag_toolbox_red', all).map((v) => v.id), ['bags_magic_sort', 'bags_stack_up', 'bags_rename']);
+  });
+
+  it('the Sort row\'s second level: All, then the sorts in sort_on order by their plain names, the current one checked', () => {
+    const { inv, prefs } = kit();
+    const engine = engineWith({ ...inv }, ['pack_internal_sortitude']);
+    bagsFeature.init(engine);
+    bagsFeature.restore({ v: 1, prefs, migrated: true }, engine);
+    bagsFeature.packBagMenu('b1');
+    const sortRow = () => bagsFeature.packVerbs('bag_bigger', engine).find((v) => v.id === 'bags_sort');
+    let row = sortRow();
+    assert.equal(row.label, 'Sort');
+    assert.equal(row.enabled, true);
+    const sub = row.sub;
+    // The verb ids are the flat list's (bags_sort:<id>), in sort_on order (verbs.sort_all 50 to sort_staples_a 64).
+    assert.deepEqual(sub.map((v) => v.id), ['bags_sort:sort_all', ...BAG_SORTS.map((r) => `bags_sort:${r.id}`)]);
+    assert.deepEqual(BAG_SORTS.map((r) => r.sortOn), [...BAG_SORTS.map((r) => r.sortOn)].sort((a, b) => a - b));
+    assert.deepEqual(sub.map((v) => v.label), ['All', 'Keys', 'Cards', 'Alchemy', 'Manufacturing', 'Mining, etc.', 'Herbs, etc.', 'Crops, etc.', 'Musicblocks', 'Emblems', 'Drinks', 'Food', 'Staples A+B', 'Staples B', 'Staples A']);
+    assert.ok(sub.every((v) => !/^Sort: /.test(v.label)));
+    // The source's tooltips stay on each choice.
+    assert.equal(sub[0].tooltip, BAG_SORT_COPY.all.tooltip);
+    assert.equal(sub.find((v) => v.id === 'bags_sort:sort_mining').tooltip, 'Specialize this bag for ore chunks, rock chunks and metal ingots');
+    // Unsorted: All is the current choice (every choice says whether it is current).
+    assert.ok(sub.every((v) => typeof v.current === 'boolean'));
+    assert.deepEqual(sub.filter((v) => v.current).map((v) => v.id), ['bags_sort:sort_all']);
+    assert.equal(sub[0].enabled, false);
+    assert.equal(sub[0].reason, BAG_SORT_COPY.all.unsorted);
+    assert.equal(row.tooltip, BAG_SORT_COPY.menu.tooltip);
+    // Sorted for mining: that choice is current, disabled with the source's reason; All can be picked again.
+    assert.equal(bagsFeature.runPackVerb('bag_bigger', 'bags_sort:sort_mining', engine), true);
+    row = sortRow();
+    const mining = row.sub.find((v) => v.id === 'bags_sort:sort_mining');
+    assert.deepEqual(row.sub.filter((v) => v.current).map((v) => v.id), ['bags_sort:sort_mining']);
+    assert.equal(mining.enabled, false);
+    assert.equal(mining.reason, 'This bag is currently sorted by mining goods');
+    assert.equal(row.sub[0].enabled, true);
+    assert.equal(row.sub[0].reason, '');
+    assert.equal(row.tooltip, 'Sorted for Mining, etc. · choose another sort');
+    // All takes the sort off again through the same verb id.
+    assert.equal(bagsFeature.runPackVerb('bag_bigger', 'bags_sort:sort_all', engine), true);
+    assert.equal(engine.data.packLast, `sorted:b1:sort_all`);
+    assert.equal(sortRow().sub[0].current, true);
   });
 
   it('runs on the menu\'s bag: sort, magic sort and stack up, with the source\'s lines, and saves', () => {
@@ -292,7 +343,7 @@ describe('the bag menu (features/bags-feature.js)', () => {
     assert.equal(L.bags.b2.label, 'Mining, etc.');
     assert.equal(L.bags.b1.sort, undefined);
     const sorted = bagsFeature.packVerbs('bag_bigger', engine);
-    assert.equal(sorted.find((v) => v.id === 'bags_sort:sort_mining').enabled, false);
+    assert.equal(sorted.find((v) => v.id === 'bags_sort').sub.find((v) => v.id === 'bags_sort:sort_mining').enabled, false);
     assert.equal(sorted.find((v) => v.id === 'bags_magic_sort').enabled, true);
     assert.equal(bagsFeature.runPackVerb('bag_bigger', 'bags_magic_sort', engine), true);
     assert.deepEqual(engine.lines, ['You have sorted your bag quite magically!']);

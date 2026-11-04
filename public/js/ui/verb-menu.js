@@ -5,13 +5,14 @@
  * their rows with it:
  *
  * - one line per verb: a 1-9 key cap, the verb, and its energy cost (or what it gives, or a
- *   chevron when it opens a second level, or a lock when it can't be done now);
+ *   chevron when it opens a second level, a check on a second level's current choice, or a lock
+ *   when it can't be done now);
  * - the explanation of the row under the pointer or focus, or why it can't be done, in one
  *   footer line, so the rows stay one line high;
  * - a tail that points at the thing; the menu sits above it and flips below when there is no
  *   room, and steps sideways to keep clear of the avatar (placeVerbMenu);
  * - keys: Up/Down or W/S move, Enter picks, 1-9 pick a row, 0 or Backspace go back from a
- *   second level (Feed, Eat more, Drop some), Esc closes (game.js);
+ *   second level (Feed, Eat more, Drop some, a bag's Sort), Esc closes (game.js);
  * - a verb that takes a thing from the pack (Feed what?) shows the things as pictures in a grid
  *   (makePickTile, the original's target-item menu), walked with the arrows.
  *
@@ -28,6 +29,8 @@ export const BOLT_ICON = '<svg class="vm-bolt" viewBox="0 0 12 12" width="11" he
 export const CHEVRON_ICON = SVG('<path d="m6 4 4 4-4 4"/>', 'vm-chev');
 export const LOCK_ICON = SVG('<rect x="3.5" y="7" width="9" height="6.5" rx="1.5"/><path d="M5.5 7V5a2.5 2.5 0 0 1 5 0v2"/>', 'vm-lock');
 export const BACK_ICON = SVG('<path d="M10 4 6 8l4 4"/>', 'vm-backicon');
+/** A second level's current choice (a bag's sort): it stands in for the lock on that row. */
+export const CHECK_ICON = SVG('<path d="m3.5 8.5 3 3 6-7"/>', 'vm-check');
 
 /** The highest number key a row can have. */
 export const MAX_KEYED_ROWS = 9;
@@ -49,14 +52,15 @@ export function plainWords(s) {
 /**
  * A row's inner markup: the key cap, the words and what sits on the right.
  * @param {{ key?: string, label: string, cost?: number, gain?: string, count?: string,
- *   next?: boolean, back?: boolean, disabled?: boolean }} row
+ *   next?: boolean, back?: boolean, disabled?: boolean, current?: boolean }} row
  */
 export function verbRowInner(row) {
   const key = row.key ? `<span class="vm-key kcap" aria-hidden="true">${escapeText(row.key)}</span>` : '<span class="vm-key vm-key-none" aria-hidden="true"></span>';
   const back = row.back ? BACK_ICON : '';
   const label = `<span class="vm-label">${escapeText(row.label)}</span>`;
   let end = '';
-  if (row.disabled) end = LOCK_ICON;
+  if (row.current) end = CHECK_ICON;
+  else if (row.disabled) end = LOCK_ICON;
   else if (Number(row.cost) > 0) end = `<span class="vm-cost" aria-label="${Number(row.cost)} energy">${BOLT_ICON}${Number(row.cost)}</span>`;
   else if (row.gain) end = `<span class="vm-cost vm-gain">${escapeText(row.gain)}</span>`;
   else if (row.count) end = `<span class="vm-cost vm-count">${escapeText(row.count)}</span>`;
@@ -65,9 +69,10 @@ export function verbRowInner(row) {
 }
 
 /** The row's attributes as markup (for menus drawn as one string, like the pack's). */
-export function verbRowAttrs({ tip = '', reason = '', disabled = false, back = false } = {}) {
+export function verbRowAttrs({ tip = '', reason = '', disabled = false, back = false, current } = {}) {
   return [
-    'role="menuitem"',
+    // A level of choices (a bag's sorts: `current` true or false on each) is a radio group.
+    typeof current === 'boolean' ? `role="menuitemradio" aria-checked="${current}"` : 'role="menuitem"',
     disabled ? 'aria-disabled="true"' : '',
     tip ? `data-vm-tip="${escapeText(plainWords(tip))}"` : '',
     disabled && reason ? `data-vm-reason="${escapeText(plainWords(reason))}"` : '',

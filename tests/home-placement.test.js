@@ -17,7 +17,7 @@ import {
   placementRoom,
   placementSpan,
   snapPlacement,
-} from '../public/js/home-decor.js?v=fc25037c';
+} from '../public/js/home-decor.js?v=fff7788d';
 
 const GS = join(import.meta.dirname, '..', '..', 'glitch-GameServerJS');
 const haveGs = existsSync(GS);
