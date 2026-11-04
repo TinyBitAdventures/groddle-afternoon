@@ -61,7 +61,7 @@ import { effectInspector, rumbleSection } from './editor-effects.js?v=220287cb';
 import { setLayerOffsets } from './geometry-handles.js?v=daefecb1';
 import { GEO_KINDS, GEO_LIST, GEO_WORDS, PERMS, geoKey, parseGeoKey, geoItem, geoKindOf, geoShape, geoHits, geoHandles, handleWorld, dragHandle, moveBy, changedFields, drawnItem, postOnFloor, defaultItem, permKey, permValue, permName, dashes, arriveFor, newConnect, shapeBounds } from './geometry-handles.js?v=daefecb1';
 import { SNAP_PX, GUIDE_PX, endPoints, joinedEnds, snapPlatform, snapDrawnPlatform, snapPoint, floorSnapY, rulerTicks, bestPull } from './snap.js?v=66012b50';
-import { watchSelects } from '../combobox.js?v=c98ee401';
+import { watchSelects } from '../combobox.js?v=d43209e8';
 
 export const ZOOM_MIN = 0.05;
 export const ZOOM_MAX = 4;

@@ -92,7 +92,7 @@
 
 import { countItem, ensureItem, ITEM_CATALOG, removeItem } from '../inventory.js?v=602da017';
 import { isBagClass } from '../pack-slots.js?v=68a8fca3';
-import { createCombobox } from '../combobox.js?v=c98ee401';
+import { createCombobox } from '../combobox.js?v=d43209e8';
 import {
   CULTIVATION_CLASSES,
   FURNITURE_CATALOG,

@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=b484cbad';
 import { createFeatureHost } from './js/feature-host.js?v=2ed3c069';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=16c017e5';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=2d1e7a89';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -390,7 +390,7 @@ import {
   recordStreetEntry,
   streetLoadingVisit,
 } from './js/exploration.js?v=19c6758f';
-import { createCombobox, createSuggestBox, watchSelects } from './js/combobox.js?v=c98ee401';
+import { createCombobox, createSuggestBox, watchSelects } from './js/combobox.js?v=d43209e8';
 import {
   INCANTATION_LINES,
   INCANTATION_FEAT_TITLE,

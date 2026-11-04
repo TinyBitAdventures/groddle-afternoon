@@ -90,4 +90,12 @@ describe('ticket 21: the Map always shows the whole hub', () => {
     assert.match(combo, /if \(restore && !free\) input\.value = source\.currentLabel\(\);/, 'leaving it shows the region again');
     assert.match(read('public/style.css'), /\.combo-search \.combo-input \{ padding-left: 1\.95rem; \}/);
   });
+
+  it('ticket 76: it empties for a search on every press or typed letter, not only a fresh focus', () => {
+    const combo = read('public/js/combobox.js');
+    // Focused with its list shut (the chevron shut it and put the region back), a click sends no focus.
+    assert.match(combo, /const emptyForSearch = \(\) => \{\n\s+if \(!opts\.search \|\| free \|\| !list\.hidden \|\| document\.activeElement !== input\) return false;\n\s+input\.value = '';/);
+    assert.match(combo, /input\.addEventListener\('pointerdown', \(\) => \{ if \(emptyForSearch\(\)\) open\(''\); \}\);/);
+    assert.match(combo, /if \(e\.key\.length === 1 && !e\.metaKey && !e\.ctrlKey && !e\.altKey && input\.value === source\.currentLabel\(\)\) emptyForSearch\(\);/);
+  });
 });

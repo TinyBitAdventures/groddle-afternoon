@@ -324,9 +324,21 @@ function buildCombo(wrap, input, source, opts) {
     else if (!free) input.select();
     open(free ? input.value : '');
   });
+  // Ticket 76 (Safari): a search box that kept the focus with its list shut (the chevron shut it,
+  // which puts the current value back) showed the region's name again, and a click in it sent no
+  // new focus, so it never emptied for the search; typing went on after the name. A press in it, or
+  // a key typed into it, while its list is shut empties it the way a fresh focus does.
+  const emptyForSearch = () => {
+    if (!opts.search || free || !list.hidden || document.activeElement !== input) return false;
+    input.value = '';
+    return true;
+  };
+  input.addEventListener('pointerdown', () => { if (emptyForSearch()) open(''); });
   input.addEventListener('input', () => { if (!choosing) open(input.value); });
   input.addEventListener('blur', () => close());
   input.addEventListener('keydown', (e) => {
+    // A letter typed into a shut search box replaces the region's name (its input event opens the list).
+    if (e.key.length === 1 && !e.metaKey && !e.ctrlKey && !e.altKey && input.value === source.currentLabel()) emptyForSearch();
     const isOpen = !list.hidden;
     if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
       e.preventDefault();
