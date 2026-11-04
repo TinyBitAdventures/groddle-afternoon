@@ -31,7 +31,7 @@ import {
   stackMaxFor,
 } from '../public/js/artifacts.js?v=fc419ecf';
 import { artifactsFeature, finishCrack } from '../public/js/features/artifacts-feature.js?v=44cffcee';
-import { FEATURES } from '../public/js/features/index.js?v=fcce9221';
+import { FEATURES } from '../public/js/features/index.js?v=26a6e086';
 import { DROP_ITEMS, DROP_TABLES, rollDropTable } from '../public/js/drop-tables.js?v=0f922478';
 import { ITEM_CATALOG } from '../public/js/inventory.js?v=597a17a2';
 import { createToolConditionState, getToolCondition } from '../public/js/tools.js?v=3974f57e';

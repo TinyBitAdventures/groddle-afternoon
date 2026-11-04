@@ -296,7 +296,7 @@
       "assets/content/buffs.json": "70ea503c",
       "assets/content/deco-catalog.json": "0862584f",
       "assets/content/puzzle-triggers.json": "54e6c673",
-      "assets/content/quests.json": "d37c15d2",
+      "assets/content/quests.json": "553a69d6",
       "assets/content/signpost-graph.json": "de200e92",
       "assets/content/sound-keys.json": "cdd3dbd9",
       "assets/content/street-ecology.json": "d065e008",

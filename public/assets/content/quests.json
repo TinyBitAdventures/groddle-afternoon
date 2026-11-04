@@ -4593,7 +4593,7 @@
    {
     "id": "r375",
     "type": "counter",
-    "name": "VERB:very_stinky_cheese:poke",
+    "name": "VERB:cheese_very_stinky:poke",
     "num": 3,
     "classId": "cheese_very_stinky",
     "desc": "Poke 3 Very Stinky Cheese"

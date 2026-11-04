@@ -52,7 +52,7 @@ import {
   stillEtaSeconds,
   stillRoom,
 } from '../machines.js?v=44fc6833';
-import { HERB_SEEDS, ITEM_TRANSFORMS, listTransformVerbs, runTransform } from '../item-transforms.js?v=cde562be';
+import { HERB_SEEDS, ITEM_TRANSFORMS, listTransformVerbs, runTransform } from '../item-transforms.js?v=792891d6';
 import {
   BUREAUCRACY_ITEMS,
   HALL_STREETS,
@@ -329,6 +329,13 @@ function runTransformVerb(classTsid, verbId, engine) {
   const res = runTransform(classTsid, verb, count === 'all' ? 'all' : 1, engine.inv, engine.pc, learned(engine));
   // G444: gandlevery.js 359-372: the seeds that landed count seeds_extracted (Shucks To Be You).
   if (res.ok && HERB_SEEDS[classTsid] && res.got > 0 && res.out) engine.achievement?.(`herb_seeds_extracted:${res.out}`, res.got);
+  // items/item.js 719-739 notifyVerb after a handler that succeeded: quests count VERB:<class>:<verb>
+  // by the verb's count (the `<class>:<verb>` event, quest-offers.js COUNTER_ROUTES 'verbs'), and the
+  // badges VERB:<verb>:<class>. Ticket 88: Seeker of the Shiny counts its Very Stinky Cheese pokes.
+  if (res.ok && ITEM_TRANSFORMS[classTsid] && res.count > 0) {
+    engine.achievement?.(`${classTsid}:${verb}`, res.count);
+    engine.achievement?.(`VERB:${verb}:${classTsid}`, res.count);
+  }
   // butterfly_butter.js:211: compressing Butterfly Butter into Cheese grants Cheesemongerer.
   if (res.ok && classTsid === 'butterfly_butter' && verb === 'compress') engine.grantAchievement?.('cheesemongerer');
   engine.updateHud?.();

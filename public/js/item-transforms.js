@@ -17,7 +17,12 @@
  *   2 seeds per herb (seed_failure per herb class), success_rate roll,
  *   bonus_chance x bonus_multiplier
  *
- * Every verb works on one item or the whole stack, like the source's count.
+ * Every verb works on one item or the whole stack, like the source's count,
+ * except Poke (is_single). The rows with `past` say what they did as the
+ * source's buildVerbMessage (items/item.js 26-77): "You shook 3 Butterfly
+ * Milks. <line> -6 Energy +3 Butterfly Butter", each effect in the handler's
+ * order (energy, mood, then the item_give with its `gives` label; the poke
+ * pushes no item_give, its createItem leaves nothing over).
  */
 
 import { addItem, countItem, ensureItem, removeItem } from './inventory.js?v=597a17a2';
@@ -33,16 +38,16 @@ import { metabolicGain, moodMax, loseEnergy, loseMood } from './metabolics.js?v=
  */
 export const ITEM_TRANSFORMS = Object.freeze({
   milk_butterfly: Object.freeze([
-    { id: 'shake', label: 'Shake', out: 'butterfly_butter', energy: 2, tooltip: 'Make butter.', line: 'You shake the butterfly milk vigorously. Butterfly butter!', source: 'milk_butterfly.js shake' },
+    { id: 'shake', label: 'Shake', past: 'shook', names: ['a', 'Butterfly Milk', 'Butterfly Milks'], gives: 'Butterfly Butter', out: 'butterfly_butter', energy: 2, tooltip: 'Make butter.', line: 'You shake the butterfly milk vigorously. Butterfly butter!', source: 'milk_butterfly.js shake' },
   ]),
   butterfly_butter: Object.freeze([
-    { id: 'compress', label: 'Compress', out: 'cheese', energy: 5, tooltip: 'Makes cheese.', line: 'You squeeze the butterfly butter with all your might and cheese appears!', source: 'butterfly_butter.js compress' },
+    { id: 'compress', label: 'Compress', past: 'compressed', names: ['a', 'Butterfly Butter', 'Butterfly Butter'], gives: 'Cheese', out: 'cheese', energy: 5, tooltip: 'Makes cheese.', line: 'You squeeze the butterfly butter with all your might and cheese appears!', source: 'butterfly_butter.js compress' },
   ]),
   cheese: Object.freeze([
-    { id: 'age', label: 'Age', out: 'cheese_stinky', energy: 5, mood: 5, tooltip: 'Add some stink.', line: 'You put the cheese in your pocket for a while and it ages nicely. It left a bit of a smell in your pocket though.', source: 'cheese.js age' },
+    { id: 'age', label: 'Age', past: 'aged', names: ['a', 'Cheese', 'Cheeses'], gives: 'Stinky Cheese', out: 'cheese_stinky', energy: 5, mood: 5, tooltip: 'Add some stink.', line: 'You put the cheese in your pocket for a while and it ages nicely. It left a bit of a smell in your pocket though.', source: 'cheese.js age' },
   ]),
   cheese_stinky: Object.freeze([
-    { id: 'age', label: 'Age', out: 'cheese_very_stinky', energy: 10, tooltip: 'Increase the stink.', line: 'If you concentrate really hard on it, the cheese does indeed age.', source: 'cheese_stinky.js age' },
+    { id: 'age', label: 'Age', past: 'aged', names: ['a', 'Stinky Cheese', 'Stinky Cheese'], gives: 'Very Stinky Cheese', out: 'cheese_very_stinky', energy: 10, tooltip: 'Increase the stink.', line: 'If you concentrate really hard on it, the cheese does indeed age.', source: 'cheese_stinky.js age' },
   ]),
   grain: Object.freeze([
     { id: 'bundle', label: 'Bundle', out: 'grain_bushel', per: 250, energy: 20, strict: true, single: true, tooltip: 'Bundle this grain into a nifty Bushel.', tired: "You're far too tired to bundle grain.", line: 'You bundled 250 Grains.', source: 'grain.js bundle' },
@@ -51,10 +56,14 @@ export const ITEM_TRANSFORMS = Object.freeze({
     { id: 'unbundle', label: 'Unbundle', out: 'grain', outQty: 250, energy: 5, moodGain: 10, strict: true, tooltip: 'Unpack this bundle into 250 sheaves of Grain.', tired: 'You are too tired to unbundle things!', line: (n) => (n > 1 ? `You unbundled ${n} Bushels of Grain.` : 'You unbundled a Bushel of Grain.'), source: 'grain_bushel.js unbundle' },
   ]),
   cheese_very_stinky: Object.freeze([
-    { id: 'age', label: 'Age', out: 'cheese_very_very_stinky', energy: 20, mood: 20, tooltip: 'Increase the stink.', line: 'Wow, is that ever draining. But the cheese is visibly aged.', source: 'cheese_very_stinky.js age' },
+    { id: 'age', label: 'Age', past: 'aged', names: ['a', 'Very Stinky Cheese', 'Very Stinky Cheese'], gives: 'Very, Very Stinky Cheese', out: 'cheese_very_very_stinky', energy: 20, mood: 20, tooltip: 'Increase the stink.', line: 'Wow, is that ever draining. But the cheese is visibly aged.', source: 'cheese_very_stinky.js age' },
     {
       id: 'poke',
       label: 'Poke',
+      // verbs.poke is_single 1: one cheese a poke (main.js 3229, the client's count chooser skips it).
+      single: true,
+      past: 'poked',
+      names: ['a', 'Very Stinky Cheese', 'Very Stinky Cheese'],
       out: 'small_worthless',
       energy: 10,
       becomes: 'cheese_stinky',
@@ -183,9 +192,19 @@ export function runTransform(classTsid, verb, count, inv, pc, learned = [], rng 
   if (moodGain) pc.mood = Math.min(moodMax(pc), (pc.mood || 0) + moodGain);
   addItem(inv, t.out, got);
   if (t.becomes) addItem(inv, t.becomes, n);
-  const cost = [`-${check.energy} energy`, ...(check.mood ? [`-${check.mood} mood`] : []), ...(moodGain ? [`+${moodGain} mood`] : [])].join(', ');
   const line = typeof t.line === 'function' ? t.line(n) : t.line;
-  return { ok: true, out: t.out, got, energy: check.energy, mood: check.mood, moodGain, msg: `${line} (${cost})` };
+  if (t.past) return { ok: true, out: t.out, got, count: n, energy: check.energy, mood: check.mood, moodGain, msg: verbLine(t, n, line, check) };
+  const cost = [`-${check.energy} energy`, ...(check.mood ? [`-${check.mood} mood`] : []), ...(moodGain ? [`+${moodGain} mood`] : [])].join(', ');
+  return { ok: true, out: t.out, got, count: n, energy: check.energy, mood: check.mood, moodGain, msg: `${line} (${cost})` };
+}
+
+/** item.js buildVerbMessage + transformEffects for a transform row with `past`. */
+function verbLine(t, n, line, check) {
+  const [article, single, plural] = t.names;
+  const effects = [`-${check.energy} Energy`];
+  if (check.mood) effects.push(`-${check.mood} Mood`);
+  if (t.gives) effects.push(`+${n} ${t.gives}`);
+  return `You ${t.past} ${n > 1 ? `${n} ${plural}` : `${article} ${single}`}. ${line} ${effects.join(' ')}`;
 }
 
 function shuck(classTsid, n, inv, pc, learned, rng) {

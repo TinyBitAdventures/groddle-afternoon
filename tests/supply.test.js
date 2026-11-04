@@ -23,13 +23,13 @@ import {
   advanceStill,
   collectHooch,
 } from '../public/js/machines.js?v=44fc6833';
-import { runTransform, listTransformVerbs, transformEdges } from '../public/js/item-transforms.js?v=cde562be';
+import { runTransform, listTransformVerbs, transformEdges } from '../public/js/item-transforms.js?v=792891d6';
 import { RECIPE_CATALOG, craftRecipe, loadRecipeCatalogFromFile } from '../public/js/making.js?v=0100c686';
 import { VENDOR_PROFILES } from '../public/js/vendor.js?v=4e3cc8fb';
 import { SEED_CATALOG } from '../public/js/garden.js?v=b38ab310';
 import { obtainableItems } from '../tools/job-obtainable.mjs';
 import { supplyReport } from '../tools/supply-report.mjs';
-import { supplyFeature } from '../public/js/features/supply-feature.js?v=c748c652';
+import { supplyFeature } from '../public/js/features/supply-feature.js?v=8dde8b13';
 
 const SPIKE = join(dirname(fileURLToPath(import.meta.url)), '..', 'public');
 const ENGINEER = ['engineering_1'];
@@ -181,6 +181,28 @@ describe('pack transforms', () => {
     assert.equal(countItem(inv, 'small_worthless'), 1);
     assert.equal(countItem(inv, 'cheese_stinky'), 1);
     assert.equal(runTransform('cheese', 'age', 1, inv, { energy: 100, mood: 2 }).reason, 'mood');
+  });
+
+  it('ticket 88: Poke is one cheese at a time (is_single), lines read as buildVerbMessage, and pokes count for Seeker of the Shiny', async () => {
+    const inv = createInventory({ cheese_very_stinky: 3, milk_butterfly: 3 });
+    const pc = { energy: 200, mood: 30 };
+    const ids = listTransformVerbs('cheese_very_stinky', inv, pc).map((v) => v.id);
+    assert.ok(ids.includes('poke:1') && !ids.includes('poke:all'), ids.join());
+    assert.ok(ids.includes('age:all'), 'age still takes the stack');
+    const poke = runTransform('cheese_very_stinky', 'poke', 1, inv, pc);
+    assert.equal(poke.msg, "You poked a Very Stinky Cheese. After sticking an investigatory pinkie in the soft, gooey cheese, you encounter a hard object. You pull it out. It's a small shiny object with no intrinsic value! -10 Energy");
+    const shake = runTransform('milk_butterfly', 'shake', 'all', inv, pc);
+    assert.equal(shake.msg, 'You shook 3 Butterfly Milks. You shake the butterfly milk vigorously. Butterfly butter! -6 Energy +3 Butterfly Butter');
+    // The pack verb reports the verb (notifyVerb) and the quest's counter is the class the source counts.
+    const events = [];
+    const engine = { inv: createInventory({ cheese_very_stinky: 1 }), pc: { energy: 50 }, learnedSkills: [], achievement: (c, n) => events.push([c, n]), updateHud() {}, say() {}, toast() {}, pushActivity() {} };
+    supplyFeature.runPackVerb('cheese_very_stinky', 'poke:1', engine);
+    assert.deepEqual(events, [['cheese_very_stinky:poke', 1], ['VERB:poke:cheese_very_stinky', 1]]);
+    const quests = JSON.parse(readFileSync(join(SPIKE, 'assets/content/quests.json'), 'utf8'));
+    const def = (quests.quests || quests).find ? (quests.quests || quests).find((q) => q.classTsid === 'find_shiny_intrinsic_object') : (quests.quests || quests).find_shiny_intrinsic_object;
+    const { eventCounters } = await import('../public/js/quest-offers.js?v=3bf17441');
+    const req = def.requirements.find((r) => r.id === 'r375');
+    assert.ok(eventCounters('cheese_very_stinky:poke').some((c) => c.counter === req.name), req.name);
   });
 
   it('shucks herbs into two seeds each (herbalism_extract_seeds)', () => {

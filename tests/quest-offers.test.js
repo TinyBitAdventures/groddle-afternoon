@@ -315,7 +315,7 @@ describe('familiar delivery, decline and accept', () => {
     assert.ok(ids(pendingQuestOffers(state, pc, {})).includes('find_shiny_intrinsic_object'));
     const inv = { small_worthless: 3 };
     acceptOffer(state, 'find_shiny_intrinsic_object', { inv });
-    routeQuestEvent(state, 'very_stinky_cheese:poke', 3, { inv });
+    routeQuestEvent(state, 'cheese_very_stinky:poke', 3, { inv });
     assert.equal(turnInQuest(state, 'find_shiny_intrinsic_object', pc, { inv }).ok, true);
     assert.equal(inv.small_worthless, 0);
     assert.ok(ids(pendingQuestOffers(state, pc, {})).includes('find_shiny_intrinsic_object'));

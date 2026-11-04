@@ -175,6 +175,13 @@ const REQUIREMENT_OVERRIDES = {
     { id: 'r370a', type: 'counter', name: 'patches_tended', num: 1, classId: 'patch', desc: 'Tend a Patch' },
     { id: 'r370b', type: 'counter', name: 'dig_dirt', num: 1, classId: 'shovel', desc: 'Dig a Dirt Pile or a Patch' },
   ],
+  // Ticket 88: the source counter is VERB:very_stinky_cheese:poke, but notifyVerb counts the item's class
+  // (items/item.js 726: 'VERB:'+class_tsid+':'+verb), cheese_very_stinky, so the source line never moved.
+  // The class the requirement itself names is the one counted. r390 is the source's own.
+  find_shiny_intrinsic_object: [
+    { id: 'r375', type: 'counter', name: 'VERB:cheese_very_stinky:poke', num: 3, classId: 'cheese_very_stinky', desc: 'Poke 3 Very Stinky Cheese' },
+    { id: 'r390', type: 'item', name: 'r390', num: 3, classId: 'small_worthless', desc: 'Retrieved 3 Small shiny object with no intrinsic value', remove: true },
+  ],
 };
 
 // Requirement lines whose GSJS `desc` is a raw key, not words: the quest log showed "black_pepper_made"
