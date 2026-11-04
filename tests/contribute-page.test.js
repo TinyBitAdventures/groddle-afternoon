@@ -177,9 +177,9 @@ describe('the site draws the ledger and the shrine (groddle-afternoon-site src/C
 describe('the Contribute page (tools/contribute/to-minn.mjs)', () => {
   const content = contributeContent();
 
-  it('is words in core blocks around its two data blocks, in the house style', { skip: skipWithoutSite }, () => {
+  it('is words in core blocks around its three data blocks, in the house style', { skip: skipWithoutSite }, () => {
     const names = new Set([...content.matchAll(/<!-- wp:([a-z0-9/-]+)/g)].map((m) => m[1]));
-    assert.deepEqual([...names].sort(), ['groddle/contribute-ledger', 'groddle/contribute-shrine', 'group', 'heading', 'list', 'list-item', 'paragraph']);
+    assert.deepEqual([...names].sort(), ['groddle/contribute-credits', 'groddle/contribute-ledger', 'groddle/contribute-shrine', 'group', 'heading', 'list', 'list-item', 'paragraph']);
     const declared = JSON.parse(readFileSync(sitePath('minn.json'), 'utf8')).blocks;
     for (const name of names) if (name.startsWith('groddle/')) assert.ok(declared.includes(name), name);
     assert.doesNotMatch(content, /\u2014/, 'no em-dashes');
