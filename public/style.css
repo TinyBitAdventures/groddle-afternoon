@@ -6013,6 +6013,31 @@ body.buff-purple-pulse::after {
   min-height: min(200px, 34vh);
   max-height: none;
 }
+/* MAPSIZE (ticket 76, Austin 2026-11-04): the Map takes the room the window leaves (game.js
+   fitMapCanvas sets --map-card-w and --map-fit-h from map-graph.js mapFitSize). The rules above stay
+   the shape it keeps before it is measured. "measure" draws the map at no height for a moment, so the
+   head and lines are measured at their own size; compact folds the key hint away when the map would
+   otherwise draw under the client's 760 x 460. */
+.map-card.map-hub[data-map-fit] {
+  /* Never narrower than before (a narrower window wraps its head and lines and leaves the map less). */
+  width: min(max(820px, var(--map-card-w, 820px)), 96%);
+  max-width: 100%;
+  max-height: 100%;
+}
+.map-card.map-hub[data-map-fit="on"] > .map-canvas {
+  flex: 0 1 auto;
+  height: var(--map-fit-h);
+  aspect-ratio: auto;
+  max-height: none;
+}
+.map-card.map-hub[data-map-fit="measure"] { max-height: none; }
+.map-card.map-hub[data-map-fit="measure"] > .map-canvas {
+  flex: none;
+  height: 0;
+  min-height: 0;
+  aspect-ratio: auto;
+}
+.map-card.map-hub[data-map-compact="1"] > .map-hint { display: none; }
 .map-card.map-hub .map-sub { margin: 0.2rem 0 var(--sp-4); }
 .map-card.map-hub .map-hint { margin-top: var(--sp-4); }
 /* Ticket 21: the Shortcuts line and the route card share one row above the map (game.js
@@ -11410,6 +11435,16 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
    and scrolls in its own place; the row of Shortcuts and the route stays one line, open over the map. */
 [data-ui="modern"] #map-panel .map-card.map-hub > :not(.map-head, .map-canvas, .map-sub, .map-hint, .map-bar) { flex: 0 8 auto; min-height: 0; overflow-y: auto; }
 [data-ui="modern"] #map-panel .map-bar > [data-map-route] { max-height: 40vh; overflow-y: auto; }
+/* MAPSIZE: the Map's room is the window between the top bar and the pack (the panel already stops
+   above it), inside an open side sheet (--inset-l) and the Social drawer or its rail (--inset-r). */
+[data-ui="modern"] #map-panel.ui-sheet-center {
+  padding: calc(var(--hud-h) + 6px) max(var(--hud-inset), var(--inset-r, 0px)) 0 max(var(--hud-inset), var(--inset-l, 0px));
+}
+/* Compact: a little less air between the head and its lines, so 1440 x 707 still draws 760 x 460. */
+[data-ui="modern"] #map-panel .map-card.map-hub[data-map-compact="1"] { padding-bottom: var(--space-2); }
+[data-ui="modern"] #map-panel .map-card.map-hub[data-map-compact="1"] > .map-head { padding: var(--space-2) 0 var(--space-1); }
+[data-ui="modern"] #map-panel .map-card.map-hub[data-map-compact="1"] > .map-sub { margin: 0 0 var(--space-1); }
+[data-ui="modern"] #map-panel .map-card.map-hub[data-map-compact="1"] > .map-bar { margin-bottom: var(--space-1); }
 [data-ui="modern"] #map-panel .map-extras-grid { background: var(--surface); border-color: var(--border); box-shadow: var(--shadow-3); }
 [data-ui="modern"] #map-panel .map-head h2 { color: var(--text); }
 [data-ui="modern"] #map-panel .map-card.map-hub .map-sub { color: var(--text-muted); font-size: var(--fs-s); }

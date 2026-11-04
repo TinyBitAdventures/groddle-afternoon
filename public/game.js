@@ -876,6 +876,7 @@ import {
   buildHubMapView,
   mapClickTravel,
   renderHubMapSvg,
+  mapFitSize,
   findCurrentStreet,
   listHubsFromIndex,
   mapSearchStreets,
@@ -884,7 +885,7 @@ import {
   pickMapSpot,
   MAP_INDEX_URL,
   HUB_56_MAP_URL,
-} from './js/map-graph.js?v=5b1575ad';
+} from './js/map-graph.js?v=750beb4a';
 import { hubMapArtNote, hubMapSubtitle, questLogSummary } from './js/panel-copy.js?v=9fc1b2da';
 import { bindMapIconTips } from './js/ui/map-icon-tips.js?v=6b3eb3f9';
 import {
@@ -24041,7 +24042,84 @@ async function openMap(hubId, { find = '' } = {}) {
   }
   arrangeMapCards(panel);
   panel.hidden = false;
+  fitMapCanvas(panel);
   if (find) showFoundStreet(canvas, find, view);
+}
+
+/**
+ * MAPSIZE (ticket 76, Austin 2026-11-04): the Map takes the room the window leaves. The map panel's
+ * box (style.css / classic.css: under the top bar, over the pack, inside --inset-l / --inset-r)
+ * less the window's own head and lines gives the map's size (map-graph.js mapFitSize): its frame's
+ * shape, the client's 760 x 460 at least when there is room (the key hint folds away first), up to
+ * 1.5 times it. Measured again on a window resize and whenever the panel or the card changes size
+ * (the Social drawer, a side sheet, a route card). A 1x screen takes the Retina painting once the
+ * map draws larger than 760 x 460. QA: canvas data mapFit "<w>x<h>@<scale>" plus " compact".
+ */
+let mapFitObserver = null;
+let mapFitBusy = false;
+function fitMapCanvas(panel = document.getElementById('map-panel')) {
+  const card = panel?.querySelector('.map-card');
+  const canvas = panel?.querySelector('.map-canvas');
+  if (!card || !canvas || panel.hidden || mapFitBusy) return null;
+  const [, , frameW, frameH] = (canvas.querySelector('svg')?.getAttribute('viewBox') || '').split(' ').map(Number);
+  if (!(frameW > 0 && frameH > 0)) return null;
+  mapFitBusy = true;
+  let fit = null;
+  try {
+    const ps = getComputedStyle(panel);
+    const px = (v) => parseFloat(v) || 0;
+    const availW = panel.clientWidth - px(ps.paddingLeft) - px(ps.paddingRight);
+    const availH = panel.clientHeight - px(ps.paddingTop) - px(ps.paddingBottom);
+    const minH = px(getComputedStyle(canvas).minHeight);
+    // The window's head and lines at the width it will have: measured with the map at its smallest
+    // (no height, or the skin's floor), so nothing above it gives way; again at the new width, which can
+    // wrap a line, until it holds.
+    for (let pass = 0; pass < 3; pass++) {
+      card.dataset.mapFit = 'measure';
+      card.dataset.mapCompact = '0';
+      const chromeW = card.offsetWidth - canvas.offsetWidth;
+      const chromeH = card.offsetHeight - canvas.offsetHeight;
+      card.dataset.mapCompact = '1';
+      const compactChromeH = card.offsetHeight - canvas.offsetHeight;
+      const next = mapFitSize({ availW, availH, chromeW, chromeH, compactChromeH, frameW, frameH, minH });
+      if (!next) break;
+      const same = fit && fit.w === next.w && fit.h === next.h;
+      fit = next;
+      card.style.setProperty('--map-card-w', `${fit.w + chromeW}px`);
+      card.style.setProperty('--map-fit-h', `${fit.h}px`);
+      card.dataset.mapCompact = fit.compact ? '1' : '0';
+      card.dataset.mapFit = 'on';
+      if (same) break;
+    }
+    if (!fit) {
+      delete card.dataset.mapFit;
+      delete card.dataset.mapCompact;
+      return null;
+    }
+    const soft = canvas.querySelector('image.map-bg-soft[data-hi]');
+    if (soft && fit.scale * (Number(globalThis.devicePixelRatio) || 1) > 1.01) soft.setAttribute('href', soft.dataset.hi);
+    setCanvasData('mapFit', `${fit.w}x${fit.h}@${fit.scale.toFixed(2)}${fit.compact ? ' compact' : ''}`);
+  } finally {
+    mapFitBusy = false;
+  }
+  if (!mapFitObserver) {
+    let queued = false;
+    const again = () => {
+      if (queued) return;
+      queued = true;
+      requestAnimationFrame(() => {
+        queued = false;
+        if (isMapOpen()) fitMapCanvas(panel);
+      });
+    };
+    globalThis.addEventListener?.('resize', again);
+    if (typeof ResizeObserver === 'function') {
+      mapFitObserver = new ResizeObserver(again);
+      mapFitObserver.observe(panel);
+      mapFitObserver.observe(card);
+    } else mapFitObserver = true;
+  }
+  return fit;
 }
 
 /** A street found with the Map's search: its line flashes (MapHub.as 785-828 alert()), or a note when the map does not draw it. */

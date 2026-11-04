@@ -177,6 +177,8 @@ export function buildHubMapView(hubData, currentTsid, streetIndex = {}) {
   const soft = bgLocal ? null : HUB_MAP_BACKGROUNDS[String(hubData.hubId || '')] || null;
   const dpr = Number(globalThis.devicePixelRatio) || 1;
   const bgSoft = soft ? (dpr > 1 ? soft.x2 : soft.x1) : '';
+  // MAPSIZE: the Retina file too, which a 1x screen takes once the Map draws past 760 x 460 (game.js fitMapCanvas).
+  const bgSoftHi = soft ? soft.x2 : '';
 
   return {
     hubId: String(hubData.hubId || ''),
@@ -189,6 +191,7 @@ export function buildHubMapView(hubData, currentTsid, streetIndex = {}) {
     fgLocal,
     thumbLocal,
     bgSoft,
+    bgSoftHi,
     color: hubData.color || '#5f721d',
     currentTsid: currentResolved,
     streets,
@@ -598,6 +601,36 @@ export function hubMapFrame(hubs, mapW = 760, mapH = 460, extra = []) {
   return [x0, y0, x1 - x0, y1 - y0];
 }
 
+/**
+ * MAPSIZE (ticket 76, Austin 2026-11-04): the Map grows with the window. The client drew it at a
+ * fixed 760 x 460 (HubMapDialog.as MAP_W / MAP_ACTUAL_W); here it takes the room the window leaves
+ * between the top bar and the pack (inside the side sheets and the Social drawer), keeping the
+ * frame's shape, from 1 (the client's own size) up to MAP_FIT_MAX_SCALE. Street names, lines and GO
+ * buttons are drawn in map units, so they grow with it.
+ */
+export const MAP_FIT_MAX_SCALE = 1.5;
+
+/**
+ * The Map's drawn size for the room it has (pure). `availW` x `availH` is the box the window leaves;
+ * `chromeW` / `chromeH` what the window's head, lines and borders take around the map;
+ * `compactChromeH` the same with the compact layout (the key hint hidden), used only when the full
+ * layout would draw the map under the client's own size. `minH` is the floor the map never goes
+ * under (a very short window then scrolls nothing: the map gives way inside its box).
+ * Returns { w, h, scale, compact } in whole CSS pixels, or null without a frame.
+ */
+export function mapFitSize({ availW, availH, chromeW = 0, chromeH = 0, compactChromeH = chromeH, frameW, frameH, minH = 0, maxScale = MAP_FIT_MAX_SCALE } = {}) {
+  if (!(frameW > 0 && frameH > 0) || !(availW > 0 && availH > 0)) return null;
+  const fit = (ch) => Math.min((availW - chromeW) / frameW, (availH - ch) / frameH, maxScale);
+  let compact = false;
+  let scale = fit(chromeH);
+  if (scale < 1 && compactChromeH < chromeH) {
+    compact = true;
+    scale = fit(compactChromeH);
+  }
+  scale = Math.max(scale, minH / frameH, 0);
+  return { w: Math.floor(frameW * scale + 1e-6), h: Math.floor(frameH * scale + 1e-6), scale, compact };
+}
+
 export function renderHubMapSvg(view) {
   const w = view.mapW || 760;
   const h = view.mapH || 460;
@@ -635,7 +668,7 @@ export function renderHubMapSvg(view) {
     // lines, labels and GO buttons read on it as they are (no wash): every street of a painted
     // region is playable, so none is drawn in the pale unvisited style.
     parts.push(
-      `<image class="map-bg map-bg-soft" href="${escapeXml(keyedArt(view.bgSoft))}" x="0" y="0" width="${w}" height="${h}" preserveAspectRatio="none"/>`
+      `<image class="map-bg map-bg-soft" href="${escapeXml(keyedArt(view.bgSoft))}"${view.bgSoftHi && view.bgSoftHi !== view.bgSoft ? ` data-hi="${escapeXml(keyedArt(view.bgSoftHi))}"` : ''} x="0" y="0" width="${w}" height="${h}" preserveAspectRatio="none"/>`
     );
   } else {
     parts.push(`<rect class="map-terrain" width="${w}" height="${h}" fill="url(#hubTerrain)"/>`);

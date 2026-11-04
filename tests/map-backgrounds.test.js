@@ -12,7 +12,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { readThumbs, regionThumbs } from '../tools/map-backgrounds/build.mjs';
 import { HUB_MAP_BACKGROUNDS } from '../public/js/hub-map-backgrounds.js?v=5889d7fa';
-import { buildHubMapView, PUBLIC_HUBS, renderHubMapSvg } from '../public/js/map-graph.js?v=5b1575ad';
+import { buildHubMapView, PUBLIC_HUBS, renderHubMapSvg } from '../public/js/map-graph.js?v=750beb4a';
 import { hubMapArtNote } from '../public/js/panel-copy.js?v=9fc1b2da';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -84,7 +84,8 @@ describe('region map backgrounds (tools/map-backgrounds/build.mjs)', () => {
     const svg = renderHubMapSvg(view);
     const at = svg.indexOf('class="map-bg map-bg-soft"');
     assert.ok(at > 0);
-    assert.match(svg, /<image class="map-bg map-bg-soft" href="assets\/maps\/art\/bg\/muufo\.webp" x="0" y="0" width="760" height="460" preserveAspectRatio="none"\/>/);
+    // MAPSIZE (ticket 76): with the Retina file beside it, for a 1x screen once the Map draws larger.
+    assert.match(svg, /<image class="map-bg map-bg-soft" href="assets\/maps\/art\/bg\/muufo\.webp" data-hi="assets\/maps\/art\/bg\/muufo@2x\.webp" x="0" y="0" width="760" height="460" preserveAspectRatio="none"\/>/);
     for (const cls of ['class="map-seg', 'class="map-label', 'class="map-hub-go"', 'class="map-icons"']) {
       assert.ok(svg.indexOf(cls) > at, `${cls} draws on top`);
     }

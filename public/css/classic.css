@@ -1946,6 +1946,17 @@
    push its bottom out of the window); the drawing scales into it whole (style.css .hub-map-svg). */
 :root[data-ui="classic"] #game-root #map-panel .map-canvas { flex: 0 1 auto; height: auto; aspect-ratio: var(--map-aspect, 760 / 460); min-height: min(calc(180 * var(--cu)), 30vh); max-height: calc(460 * var(--cu)); padding: 0; background: var(--c-classic-well); }
 :root[data-ui="classic"] #game-root #map-panel .map-canvas svg { width: 100%; height: 100%; }
+/* MAPSIZE (ticket 76, Austin 2026-11-04): the remake lets the Map grow past the client's 764 wide
+   window (spec §12b) into the room the world cell leaves, on purpose (game.js fitMapCanvas); the head,
+   the grey well and its rules stay the client's. Half the usual margin above and below. Compact (a
+   window too short for 760 x 460) folds the key hint's words away and keeps the well's bottom rule. */
+:root[data-ui="classic"] #game-root #map-panel:not([hidden]) { padding: calc(10 * var(--cu)) calc(20 * var(--cu)); grid-template: minmax(0, 1fr) / minmax(0, 1fr); }
+:root[data-ui="classic"] #game-root #map-panel > .map-card[data-map-fit] { width: min(max(calc(764 * var(--cu)), var(--map-card-w, 0px)), 100%); }
+:root[data-ui="classic"] #game-root #map-panel > .map-card[data-map-fit="on"] > .map-canvas { flex: 0 1 auto; height: var(--map-fit-h); aspect-ratio: auto; max-height: none; }
+:root[data-ui="classic"] #game-root #map-panel > .map-card[data-map-fit="measure"] { max-height: none; }
+:root[data-ui="classic"] #game-root #map-panel > .map-card[data-map-fit="measure"] > .map-canvas { flex: none; height: 0; min-height: 0; aspect-ratio: auto; }
+:root[data-ui="classic"] #game-root #map-panel > .map-card[data-map-compact="1"] > .map-hint { display: block; padding-top: 0; font-size: 0; line-height: 0; }
+:root[data-ui="classic"] #game-root #map-panel > .map-card[data-map-compact="1"] > .map-hint > * { display: none; }
 :root[data-ui="classic"] #game-root #map-panel .map-extras-grid { padding: calc(10 * var(--cu)); border: 0; border-radius: 4px; background: var(--c-classic-panel); box-shadow: 0 0 0 1px color-mix(in srgb, var(--c-classic-ink) 37%, transparent), 0 0 1px 7px color-mix(in srgb, var(--c-classic-ink) 15%, transparent); }
 :root[data-ui="classic"] #game-root #map-panel .map-label { font-family: var(--font-classic-title); font-weight: 800; }
 :root[data-ui="classic"] #game-root #map-panel .map-sub { color: var(--c-classic-offline); font-size: calc(var(--fs-classic-body) * var(--cu-n, 1)); }
