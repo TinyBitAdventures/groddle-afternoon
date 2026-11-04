@@ -2690,135 +2690,135 @@
   ]
  },
  "release": {
-  "game": "0.16.0",
-  "deployed": "2026-11-03"
+  "game": "0.17.0",
+  "deployed": "2026-11-04"
  },
  "git": {
-  "commits": 1203,
+  "commits": 1240,
   "since": "2026-10-19",
   "recent": [
    {
-    "date": "2026-11-03",
-    "kind": "new",
-    "text": "Photo filters for your Snaps, and the upgrade cards that work online are dealt there"
+    "date": "2026-11-04",
+    "kind": "fix",
+    "text": "The Map's Shortcuts pack together and never cut a card, and each Teleportation point reads on full lines"
    },
    {
-    "date": "2026-11-03",
-    "kind": "new",
-    "text": "Sort your bags with the Internal Sortitude, Magic Sort and Stack Up upgrade cards"
-   },
-   {
-    "date": "2026-11-03",
+    "date": "2026-11-04",
     "kind": "improve",
-    "text": "The Encyclopedia's Music and sounds pages show the newly recovered star notes, chords and other sounds as Tiny Speck's originals"
+    "text": "The Rook comes to a solo game once a day, a few minutes after you settle on a shrine street"
    },
    {
-    "date": "2026-11-03",
+    "date": "2026-11-04",
     "kind": "improve",
-    "text": "In Room 23 the Ghost of Gwendolyn floats a little over the mound in a soft glow, as in a player's picture of the room"
+    "text": "The Map is its painting edge to edge, and a route takes one line beside the Shortcuts"
    },
    {
-    "date": "2026-11-03",
+    "date": "2026-11-04",
     "kind": "fix",
-    "text": "Unlocked doors in rock and wood no longer show a chain and a rainbow keyhole, and Gwendolyn's Chamber and Snowed In look more like players' pictures of them"
+    "text": "The price on an upgrade card you cannot afford is dark and sharp, on a light tag"
    },
    {
-    "date": "2026-11-03",
+    "date": "2026-11-04",
+    "kind": "fix",
+    "text": "Quoins, rocks and animals are placed by what the full jump reaches, not the old lower jump"
+   },
+   {
+    "date": "2026-11-04",
     "kind": "improve",
-    "text": "Le Miserable's light switches click with Tiny Speck's own test blip"
+    "text": "Skipping the tutorial in solo gives High Jumper I and II, so you start with the full jump"
    },
    {
-    "date": "2026-11-03",
+    "date": "2026-11-04",
+    "kind": "fix",
+    "text": "Jumps take the same time at any frame rate: no more slow motion under 24 fps"
+   },
+   {
+    "date": "2026-11-04",
     "kind": "improve",
-    "text": "The Piano Party, Starlit Night and Radial Heights stars play Tiny Speck's own notes and chords, and the Comedian laugh, the mail dispatcher, the machine stand and all three card deals have their own sounds"
+    "text": "A new character jumps low until it buys High Jumper I and II, as in the original"
    },
    {
-    "date": "2026-11-03",
+    "date": "2026-11-04",
     "kind": "improve",
-    "text": "The Encyclopedia marks Updraft, Aerial Boost and Drafty Uplift as never released in Glitch"
+    "text": "The Map grows with the window, so street names read at least as large as before on a big screen"
    },
    {
-    "date": "2026-11-03",
-    "kind": "fix",
-    "text": "Your jump reaches as high as it did in Glitch: 143 px instead of 105, so ledges like Viscid Pud's signpost are in reach"
-   },
-   {
-    "date": "2026-11-03",
-    "kind": "new",
-    "text": "To Xalanga, And Beyond can be done: the Map rides the subway to Onto Parada and walks three Jethimadh roads open from the start, and the GPS lights Shim Shiri's yellow Light Beam"
-   },
-   {
-    "date": "2026-11-03",
-    "kind": "new",
-    "text": "A scoring tool for report credits, and the testers board on the Contribute page"
-   },
-   {
-    "date": "2026-11-03",
+    "date": "2026-11-04",
     "kind": "improve",
-    "text": "Music and sounds: a music page without art of its own says it is shown as a Musicblock, and Enchanted Wood III reads its numeral"
+    "text": "The Quests sheet has a search box and a sort picker (Newest first, Oldest first, Name, Most progress)"
    },
    {
-    "date": "2026-11-03",
-    "kind": "new",
-    "text": "The Encyclopedia has Music and sounds: every tune and sound of the original, what plays now, and what is still missing"
-   },
-   {
-    "date": "2026-11-03",
+    "date": "2026-11-04",
     "kind": "fix",
-    "text": "Map routes no longer go through a locked door no key opens, so the way to Hazy Gate 3 is never an impossible one"
+    "text": "Setting a Teleportation Point asks \"New Teleport Point?\" first, and its button says Edit"
    },
    {
-    "date": "2026-11-03",
+    "date": "2026-11-04",
     "kind": "fix",
-    "text": "A long session no longer piles up every street's decorations in memory, which made Safari reload the page around Naraka"
+    "text": "The Map's search box always empties for a search when clicked or typed in"
    },
    {
-    "date": "2026-11-03",
+    "date": "2026-11-04",
     "kind": "fix",
-    "text": "The ground under Valuka Himsa's bottom edge carries on as its red rock instead of a flat dark red block"
+    "text": "Mail with a long subject wraps in the inbox list instead of scrolling it sideways"
    },
    {
-    "date": "2026-11-03",
+    "date": "2026-11-04",
     "kind": "fix",
-    "text": "The Map always shows the whole region on Safari, the Shortcuts open over it in full, and the region box is a search box"
+    "text": "The Mail Dispatcher opens on a new letter without hiding the inbox's message under it"
    },
    {
-    "date": "2026-11-03",
-    "kind": "new",
-    "text": "A Contribute page: play and report, send original materials, or donate at Pot's shrine, with an open ledger"
-   },
-   {
-    "date": "2026-11-03",
+    "date": "2026-11-04",
     "kind": "fix",
-    "text": "A player you block can't reach you through party chat, and their menu keeps only Un-Block and Friends"
+    "text": "Shop buttons and every count chooser say the new count as you type it"
    },
    {
-    "date": "2026-11-03",
+    "date": "2026-11-04",
     "kind": "fix",
-    "text": "A player's menu opened by a click on a name keeps the keys, and shows whole beside the Classic chat column"
+    "text": "A stack's menu with many verbs and a long description stays on the screen"
    },
    {
-    "date": "2026-11-03",
-    "kind": "new",
-    "text": "Right-click a storage slot to take it out, or a vendor's item to buy one or as many as you can"
+    "date": "2026-11-04",
+    "kind": "fix",
+    "text": "The Quests sheet shows every quest, newest first, and its tabs count what its footer counts"
    },
    {
-    "date": "2026-11-03",
-    "kind": "new",
-    "text": "Right-click another player's dot on the minimap for their menu, or a signpost to walk there or take a road"
+    "date": "2026-11-04",
+    "kind": "fix",
+    "text": "The Enter chooser shows a stack on the ground as its item, not as its count"
    },
    {
-    "date": "2026-11-03",
-    "kind": "new",
-    "text": "Right-click a conversation in Chats to open it, close it, leave the party or see who is there"
+    "date": "2026-11-04",
+    "kind": "fix",
+    "text": "Routes from the bottom of The Other Drop no longer send you up a drop you can't climb"
    },
    {
-    "date": "2026-11-03",
+    "date": "2026-11-04",
     "kind": "improve",
-    "text": "The Map's street menu is the game's own menu, and a right-click opens it too"
+    "text": "Quest offers that move you say \"Accepting takes you somewhere new.\""
+   },
+   {
+    "date": "2026-11-04",
+    "kind": "improve",
+    "text": "Your auctions splits what ended into Bought, Sold and Expired, and All auctions leaves out your own"
+   },
+   {
+    "date": "2026-11-04",
+    "kind": "fix",
+    "text": "Spinach can't be activated inside Mental Block and the other challenge rooms"
+   },
+   {
+    "date": "2026-11-04",
+    "kind": "fix",
+    "text": "Quoins in quest rooms stay put at the daily limit, as they do on streets"
+   },
+   {
+    "date": "2026-11-04",
+    "kind": "fix",
+    "text": "Trees, rocks and Piggies are no longer planted behind scenery drawn in front of the street"
    }
   ]
  },
  "tests": 664,
- "generatedAt": "2026-11-03"
+ "generatedAt": "2026-11-04"
 }
