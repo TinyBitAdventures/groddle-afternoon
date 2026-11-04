@@ -20,7 +20,9 @@ import { reactionsFile, reactionsJson } from '../tools/build-reactions.mjs';
 import { linkSegments } from '../public/js/chat-links.js?v=b717fac7';
 import { NAMES_SHOWN, REACTIONS } from '../public/js/chat-reactions.js?v=d65d555b';
 import { NOTICE_MAX, communityNoticeHtml, communityNoticesFrom, normalCommunityNotice } from '../public/js/community-notices.js?v=f676c372';
-import { communityMpFeature, createCommunitySession } from '../public/js/features/community-mp-feature.js?v=ff546ed0';
+import { EARLIER_MAX, WEB_TAG, chatLine, historyKey, mergeEarlier, oldestLid, shownName } from '../public/js/groups.js?v=4c4c8d76';
+import { mergeEarlierIms, oldestAt } from '../public/js/player-im.js?v=4afd7bc0';
+import { communityMpFeature, createCommunitySession } from '../public/js/features/community-mp-feature.js?v=6a40e1a8';
 
 const root = join(import.meta.dirname, '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');
@@ -28,7 +30,7 @@ const hasPhp = spawnSync('php', ['-v']).status === 0;
 const skipPhp = skipWithoutSite || (!hasPhp && 'no php');
 
 function php(body) {
-  const code = `foreach (['WordFilter', 'BugReports', 'AdminConsole', 'CommunityText'] as $c) require ${JSON.stringify(SITE_DIR)} . "/src/$c.php"; use Groddle\\Minn\\CommunityText as T; echo json_encode(${body}, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);`;
+  const code = `foreach (['WordFilter', 'BugReports', 'AdminConsole', 'CommunityText', 'Community', 'ChatHistory'] as $c) require ${JSON.stringify(SITE_DIR)} . "/src/$c.php"; use Groddle\\Minn\\CommunityText as T; use Groddle\\Minn\\ChatHistory; echo json_encode(${body}, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);`;
   return JSON.parse(execFileSync('php', ['-r', code]).toString());
 }
 const phpString = (s) => `base64_decode('${Buffer.from(s).toString('base64')}')`;
@@ -208,5 +210,87 @@ describe('the routes (src/Community.php, CommunityPages.php, AdminCommunity.php)
     const js = src('console/console.js');
     for (const k of ['comm_remove', 'comm_restore', 'comm_pin', 'comm_lock', 'comm_stop', 'comm_unstop']) assert.ok(js.includes(`case '${k}'`), k);
     assert.match(js, /admin\/community_posts\?show=/);
+  });
+});
+
+describe('the game\'s chat kept for good, on the website and in the drawer (ChatHistory, groups.js, player-im.js)', () => {
+  it('a line said on the website shows (web) after the name in the game', () => {
+    const l = chatLine({ id: 7, name: 'Ada', text: 'hi', at: 5, lid: 9, web: true });
+    assert.equal(l.web, true);
+    assert.equal(shownName(l), `Ada ${WEB_TAG}`);
+    assert.equal(shownName(chatLine({ id: 7, name: 'Ada', text: 'hi', lid: 9 })), 'Ada');
+    assert.equal(chatLine({ id: 7, name: 'Ada', text: 'hi', web: 'yes' }).web, false);
+    const feature = read('public/js/features/groups-feature.js');
+    assert.match(feature, /name: shownName\(line\)/, 'the drawer');
+    assert.match(feature, /el\('b', \{\}, `\$\{shownName\(line\)\}: `\)/, 'the old chat box');
+  });
+
+  it('earlier channel lines come from the site, before the oldest one, each once, blocks left out', () => {
+    assert.deepEqual(['global', 'help', 'trade', 'group:12', 'street', 'party'].map(historyKey), ['global', 'help', 'trade', 'group-12', '', '']);
+    const have = [{ id: 7, name: 'Ada', text: 'c', at: 3, lid: 30 }, { id: 9, name: 'Bo', text: 'd', at: 4, lid: 40 }];
+    assert.equal(oldestLid(have), 30);
+    const site = [{ lid: 30, id: 7, name: 'Ada', text: 'c', at: 3 }, { lid: 20, id: 11, name: 'Cy', text: 'b', at: 2 }, { lid: 10, id: 7, name: 'Ada', text: 'a', at: 1 }];
+    assert.deepEqual(mergeEarlier(have, site).map((l) => l.lid), [10, 20, 30, 40]);
+    assert.deepEqual(mergeEarlier(have, site, { hidden: (id) => id === 11 }).map((l) => l.lid), [10, 30, 40]);
+    const many = Array.from({ length: 300 }, (_, i) => ({ lid: i + 1, id: 7, name: 'Ada', text: 'x', at: i }));
+    assert.equal(mergeEarlier([], many).length, EARLIER_MAX);
+    const feature = read('public/js/features/groups-feature.js');
+    assert.match(feature, /account\.chatEarlier\(historyKey\(channel\), oldestLid\(chat\.lines\)/);
+    assert.match(feature, /pushLine\(chat\.lines, line, chat\.earlier \? EARLIER_MAX : undefined\)/, 'new lines do not push the earlier ones out at once');
+  });
+
+  it('earlier IM lines come from the site for the conversation, by id and time', () => {
+    const have = [{ id: 1, from: 7, text: 'new', at: 500 }];
+    assert.equal(oldestAt(have), 500);
+    const site = [{ id: 1, from: 7, text: 'new', at: 500 }, { id: 3, from: 9, text: 'old conv', at: 200 }, { id: 1, from: 7, text: 'older conv', at: 100 }];
+    assert.deepEqual(mergeEarlierIms(have, site).map((l) => l.text), ['older conv', 'old conv', 'new']);
+    assert.match(read('public/js/minn-account.js'), /`chat\/ims\/\$\{Math\.floor\(Number\(withId\)\) \|\| 0\}\?before_at=/);
+  });
+});
+
+describe('who may read the kept chat (src/ChatHistory.php)', { skip: skipWithoutSite }, () => {
+  const src = (f) => readFileSync(sitePath(f), 'utf8');
+
+  it('signed-in players only; the server\'s batches signed; visitors and crawlers get nothing', () => {
+    const c = src('src/ChatHistory.php');
+    const routes = [...c.matchAll(/#\[Route\(Method::(\w+), '([^']+)', policy: new Policy\(Access::(\w+)\)\)\]/g)].map((m) => [m[1], m[2], m[3]]);
+    assert.deepEqual(routes.map((r) => r[1]), ['/groddle/v1/chat/ingest', '/groddle/v1/chat/channels', '/groddle/v1/chat/channels/{key:global|help|trade|group-[1-9][0-9]{0,18}}', '/groddle/v1/chat/channels/{key:global|help|trade}', '/groddle/v1/chat/ims/{with:[1-9][0-9]{0,18}}']);
+    for (const [, path, access] of routes) assert.equal(access, path.endsWith('/ingest') ? 'Public' : 'SignedIn', path);
+    assert.match(c, /ServiceCall::verify\(\$request->header\(ServiceCall::HEADER\), 'POST', '\/groddle\/v1\/chat\/ingest', \$request->body, \$secret, time\(\)\)/);
+    assert.match(c, /->withHeader\('Cache-Control', 'private, no-store'\)->withHeader\('X-Robots-Tag', 'noindex'\)/);
+    // The page draws the channels only for a signed-in reader; a visitor gets the sign-in line alone.
+    const pages = src('src/CommunityPages.php');
+    assert.match(pages, /\$channels = \$viewer\['id'\] > 0\s*\? \$this->channelsPanel\(\$viewer\)/);
+    assert.match(pages, /'channelsSignedOut' => 'Sign in to see what players are saying in the game\.'/);
+    assert.doesNotMatch(src('src/SocialTags.php'), /ChatHistory|chat_lines/);
+  });
+
+  it('IMs: only the two players read a conversation; no other code reads the table', () => {
+    const c = src('src/ChatHistory.php');
+    assert.match(c, /\[\$a, \$b\] = \$me < \$other \? \[\$me, \$other\] : \[\$other, \$me\];/, 'the pair is the reader and the other: nobody else\'s');
+    assert.match(c, /WHERE i\.a_id = \? AND i\.b_id = \?/);
+    const dir = sitePath('src');
+    for (const f of execFileSync('ls', [dir]).toString().trim().split('\n')) {
+      if (f === 'ChatHistory.php') continue;
+      const text = readFileSync(join(dir, f), 'utf8');
+      assert.doesNotMatch(text, /groddle_im_lines|ChatHistory::IMS/, `${f} reads IMs`);
+    }
+    assert.doesNotMatch(src('console/console.js'), /chat\/ims|im_lines/);
+  });
+
+  it('kept reactions read as the chat\'s, blocks and gone accounts left out', { skip: skipPhp }, () => {
+    assert.equal(php(`ChatHistory::reactionsJson([['e' => 'like', 'by' => [7, 9, 7, 'x', -1]], ['e' => 'nope', 'by' => [7]], ['e' => 'hi', 'by' => []]])`), '[{"e":"like","by":[7,9]}]');
+    assert.equal(php(`ChatHistory::reactionsJson('x')`), null);
+    assert.equal(php(`ChatHistory::reactionsJson([])`), '[]');
+    const out = php(`ChatHistory::reactionsOut('[{"e":"heart","by":[9]},{"e":"like","by":[7,9,11]}]', [7 => 'Ada', 9 => 'Bo'], [9 => true])`);
+    assert.deepEqual(out, [{ e: 'like', by: [{ id: 7, name: 'Ada' }] }], 'the set\'s order; Bo blocked; 11 gone');
+    const line = php(`ChatHistory::lineOut(['lid' => 5, 'author_id' => 7, 'name' => 'Old name', 'text' => 'hi', 'at_ms' => 9, 'web' => 1, 'reactions' => null], [7 => 'Ada'], [])`);
+    assert.deepEqual(line, { lid: 5, id: 7, name: 'Ada', text: 'hi', at: 9, web: true, r: [] });
+  });
+
+  it('the tables are declared; the server repo\'s chatstore.go is the sender', () => {
+    const tables = JSON.parse(src('minn.json')).tables;
+    assert.ok(tables.groddle_chat_lines.includes('PRIMARY KEY  (lid)'));
+    assert.ok(tables.groddle_im_lines.includes('UNIQUE KEY pair_line (a_id,b_id,line_id,at_ms)'));
   });
 });

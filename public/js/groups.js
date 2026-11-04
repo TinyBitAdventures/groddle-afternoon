@@ -183,7 +183,16 @@ export function chatLine(m) {
   const text = String(m?.text ?? '').slice(0, 200);
   if (!id || !text) return null;
   // lid: the line's id for reactions (the server's reactions.go), 0 without one.
-  return { id, name: str(m?.name, 32) || 'A Glitch', text, at: Number(m?.at) || 0, lid: Math.max(0, Math.floor(Number(m?.lid)) || 0) };
+  // web: said on the website's /chat/ (groddle-afternoon-server webchat.go); shown as "(web)" after the name.
+  return { id, name: str(m?.name, 32) || 'A Glitch', text, at: Number(m?.at) || 0, lid: Math.max(0, Math.floor(Number(m?.lid)) || 0), web: m?.web === true };
+}
+
+/** The tag after the name of a line said on the website. */
+export const WEB_TAG = '(web)';
+
+/** PURE: the name a chat line shows: with WEB_TAG when it was said on the website. */
+export function shownName(line) {
+  return line?.web ? `${line.name} ${WEB_TAG}` : String(line?.name || '');
 }
 
 /** Appends to a tab's lines, keeping the last CHAT_LINES. */
@@ -235,4 +244,45 @@ export function writeMemory(storage, userId, memory) {
   } catch {
     return false;
   }
+}
+
+/**
+ * Scrolling back past the lines the realtime server keeps (Austin 2026-11-04): the site keeps every
+ * channel and group line (groddle-afternoon-site src/ChatHistory.php, GET chat/channels/<key>?before=<lid>).
+ */
+export const EARLIER_TEXT = Object.freeze({ more: 'Earlier messages', loading: 'Loading', none: 'No earlier messages', failed: 'Earlier messages did not load. Try again.' });
+
+/** How many lines a chat holds once earlier ones are brought in (the drawer's LINE_LIMIT). */
+export const EARLIER_MAX = 200;
+
+/** PURE: the site's word for a chat ('global', 'help', 'trade', 'group-12'), or '' (Local, party). */
+export function historyKey(channel) {
+  if (channel === 'global' || channel === 'help' || channel === 'trade') return channel;
+  const g = groupIdOf(channel);
+  return g > 0 ? `group-${g}` : '';
+}
+
+/**
+ * PURE: older lines from the site (newest first, as it answers) put before a chat's lines, oldest
+ * first: each line once (by lid), none `hidden(id)` says you block, at most max (the newest kept).
+ */
+export function mergeEarlier(lines, older, { max = EARLIER_MAX, hidden = () => false } = {}) {
+  const have = new Set(lines.filter((l) => l.lid).map((l) => l.lid));
+  const add = [];
+  for (const raw of Array.isArray(older) ? older : []) {
+    const l = chatLine(raw);
+    if (!l || !l.lid || have.has(l.lid) || hidden(l.id)) continue;
+    have.add(l.lid);
+    add.push(l);
+  }
+  add.sort((a, b) => a.lid - b.lid);
+  const out = [...add, ...lines];
+  return out.length > max ? out.slice(out.length - max) : out;
+}
+
+/** PURE: the lid to ask before: the oldest line's, 0 when there is none. */
+export function oldestLid(lines) {
+  let min = 0;
+  for (const l of lines) if (l.lid && (!min || l.lid < min)) min = l.lid;
+  return min;
 }

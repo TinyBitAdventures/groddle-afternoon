@@ -41,7 +41,7 @@
  * window.groddleGroups.
  */
 
-import { createMinnAccount } from '../minn-account.js?v=63ba1e0b';
+import { createMinnAccount } from '../minn-account.js?v=17bdce28';
 import { saveStore } from '../save-store.js?v=8839ba7b';
 import {
   CHANNELS,
@@ -63,9 +63,15 @@ import {
   pushLine,
   readMemory,
   tabCommand,
+  EARLIER_MAX,
+  EARLIER_TEXT,
+  historyKey,
+  mergeEarlier,
+  oldestLid,
+  shownName,
   tabOrder,
   writeMemory,
-} from '../groups.js?v=ec9689ca';
+} from '../groups.js?v=4c4c8d76';
 import { appendLinkedText } from '../chat-links.js?v=b717fac7';
 import { lineKey as reactKey } from '../chat-reactions.js?v=d65d555b';
 
@@ -196,7 +202,7 @@ function createSession(engine, client) {
   const heads = new Map();
   // RIGHTCLICK: the sender's id goes with the line, so their name opens their menu (js/ui/player-menu.js).
   // REACTIONS: a line's reaction key from its id (js/chat-reactions.js).
-  const drawerLine = (line) => (line.note ? { note: true, text: line.text } : { name: line.name, text: line.text, mine: line.id === userId(), at: line.at, playerId: line.id, rk: reactKey(line.lid) });
+  const drawerLine = (line) => (line.note ? { note: true, text: line.text } : { name: shownName(line), text: line.text, mine: line.id === userId(), at: line.at, playerId: line.id, rk: reactKey(line.lid) });
   function headFor(channel) {
     let h = heads.get(channel);
     if (!h) {
@@ -206,9 +212,39 @@ function createSession(engine, client) {
       w.addEventListener('click', () => who(channel));
       c.addEventListener('click', () => closeChat(channel));
       h.append(w, c);
+      if (historyKey(channel)) {
+        // The site keeps every line: scroll back past the server's last CHAT_LINES (ChatHistory).
+        const e = el('button', { type: 'button', 'data-groups-earlier': channel }, EARLIER_TEXT.more);
+        e.addEventListener('click', () => earlier(channel, e));
+        h.prepend(e);
+      }
       heads.set(channel, h);
     }
     return h;
+  }
+  /** Brings in the lines before the oldest one shown, from the site's kept history. */
+  async function earlier(channel, button) {
+    const chat = chats.get(channel);
+    if (!chat || button.disabled) return;
+    button.disabled = true;
+    button.textContent = EARLIER_TEXT.loading;
+    let r = null;
+    try {
+      r = await account.chatEarlier(historyKey(channel), oldestLid(chat.lines) || Number.MAX_SAFE_INTEGER);
+    } catch {
+      button.disabled = false;
+      button.textContent = EARLIER_TEXT.more;
+      addNote(channel, EARLIER_TEXT.failed);
+      return;
+    }
+    chat.earlier = true;
+    chat.lines = mergeEarlier(chat.lines, r?.lines, { hidden: (id) => id !== userId() && Boolean(engine.query?.('realtimeHidden', id)) });
+    const done = !r?.more || chat.lines.length >= EARLIER_MAX;
+    button.disabled = done;
+    button.textContent = done ? EARLIER_TEXT.none : EARLIER_TEXT.more;
+    engine.setData?.('groupsEarlier', `${channel}:${chat.lines.length}`);
+    if (channel === tab) renderBox();
+    social?.setLines(channel, chat.lines.map(drawerLine));
   }
   /** A group's member count, for the note by its name in the drawer's Chats list. */
   function membersNote(ch) {
@@ -327,7 +363,7 @@ function createSession(engine, client) {
       const li = el('li', line.note ? { class: 'is-note' } : {});
       if (line.note) li.textContent = line.text;
       else {
-        li.append(el('b', {}, `${line.name}: `));
+        li.append(el('b', {}, `${shownName(line)}: `));
         appendLinkedText(li, line.text);
       }
       return li;
@@ -791,6 +827,7 @@ function createSession(engine, client) {
     allowed?.open.add(ch);
     const chat = chatOf(ch);
     chat.lines = [];
+    chat.earlier = false;
     for (const raw of Array.isArray(msg.history) ? msg.history : []) {
       const line = chatLine(raw);
       if (line && !engine.query?.('realtimeHidden', line.id)) pushLine(chat.lines, line);
@@ -817,7 +854,8 @@ function createSession(engine, client) {
     // The original's client drops an ignored player's lines (RightSideManager.as:218-223).
     if (line.id !== userId() && engine.query?.('realtimeHidden', line.id)) return;
     const chat = chats.get(ch);
-    pushLine(chat.lines, line);
+    // Earlier lines brought in stay while the chat is open (up to EARLIER_MAX).
+    pushLine(chat.lines, line, chat.earlier ? EARLIER_MAX : undefined);
     lastSaid = `${ch}|${line.name}|${line.text}`;
     if (ch !== tab && line.id !== userId()) chat.unread += 1;
     if (ch === tab) renderBox();

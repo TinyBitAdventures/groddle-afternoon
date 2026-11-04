@@ -67,7 +67,7 @@
  */
 import { colorizeAmounts } from '../notify-view.js?v=2835afc0';
 import { bindContextTrigger, MORE_KEYS_LABEL } from './context-menu.js?v=57c5f1fe';
-import { IM_VERB_ID } from '../player-im.js?v=b301574b';
+import { IM_VERB_ID } from '../player-im.js?v=4afd7bc0';
 import { selectionCovers } from './context-guard.js?v=0f71ac17';
 import { appendLinkedText, linkifyTextNodes } from '../chat-links.js?v=b717fac7';
 import { bindChatInput } from './chat-input.js?v=3cb4ce2e';

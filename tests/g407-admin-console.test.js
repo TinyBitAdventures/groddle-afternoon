@@ -14,8 +14,8 @@ import { pathToFileURL } from 'node:url';
 import { SITE_DIR, sitePath, serverPath, skipWithoutSite, skipWithoutServer, HAS_SITE } from '../tools/repos.mjs';
 import { ADMIN_TEXT, ADMIN_TEXT_MAX, adminGiveGoods, adminMessageText, applyAdminGive, applyAdminRefill, bootedLine, showAdminMessage, showBooted } from '../public/js/admin-console-mp.js?v=7c028ca0';
 import { CLOSE_BANNED, CLOSE_BOOTED, createRealtimeClient } from '../public/js/realtime-client.js?v=ff6d1f95';
-import { statusText } from '../public/js/features/realtime-feature.js?v=fcad86da';
-import { GATE_COPY, suspendedNow } from '../public/js/online-boot.js?v=8d8e6ef3';
+import { statusText } from '../public/js/features/realtime-feature.js?v=cff8eee1';
+import { GATE_COPY, suspendedNow } from '../public/js/online-boot.js?v=0bd48920';
 
 const root = join(import.meta.dirname, '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');
@@ -469,7 +469,10 @@ describe('the chat log (Austin 2026-10-31: chat written down for spam and abuse 
     assert.match(route, /'server' => 'down'/);
     assert.doesNotMatch(route, /INSERT|UPDATE|DELETE/);
     const manifest = JSON.parse(readFileSync(sitePath('minn.json'), 'utf8'));
-    assert.ok(!Object.keys(manifest.tables).some((t) => /chat/.test(t)), 'the log lives on the realtime server');
+    // The moderation log lives on the realtime server; the site's chat tables are the players' long-term
+    // history (src/ChatHistory.php, Austin 2026-11-04), which the console never reads.
+    assert.deepEqual(Object.keys(manifest.tables).filter((t) => /chat/.test(t)), ['groddle_chat_lines']);
+    assert.doesNotMatch(src, /ChatHistory|groddle_chat_lines|groddle_im_lines/);
   });
 
   it('passes the filters as the server takes them, and leaves out what does not fit', { skip: !hasPhp && 'no php' }, () => {

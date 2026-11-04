@@ -500,6 +500,19 @@ export function createMinnAccount({ baseUri, fetch: fetchFn = globalThis.fetch?.
     },
 
     /**
+     * A chat's lines before a line (groddle-afternoon-site src/ChatHistory.php): key global, help,
+     * trade or group-<id>; { lines: [{ lid, id, name, text, at, web, r }] newest first, more }.
+     */
+    async chatEarlier(key, before, limit = 50) {
+      return buddyCall('Loading earlier messages', `chat/channels/${encodeURIComponent(key)}?before=${Math.max(0, Math.floor(Number(before)) || 0)}&limit=${limit}`);
+    },
+
+    /** An IM conversation's lines before a time (ms): { lines: [{ id, from, text, at, r }] newest first, more, blocked }. */
+    async imEarlier(withId, beforeAt, limit = 50) {
+      return buddyCall('Loading earlier messages', `chat/ims/${Math.floor(Number(withId)) || 0}?before_at=${Math.max(0, Math.floor(Number(beforeAt)) || 0)}&limit=${limit}`);
+    },
+
+    /**
      * The Community boards' notices the game's Activity has not shown (groddle-afternoon-site
      * src/Community.php, POST community/notices/game): { notices: [{ id, kind, count, from, thread, url, at, text }] };
      * each comes once.

@@ -39,10 +39,14 @@ import {
   imLinkFrom,
   imPeer,
   imVerb,
+  mergeEarlierIms,
   normalLine,
+  oldestAt,
   normalState,
   refusalText,
-} from '../player-im.js?v=b301574b';
+} from '../player-im.js?v=4afd7bc0';
+import { EARLIER_TEXT } from '../groups.js?v=4c4c8d76';
+import { createMinnAccount } from '../minn-account.js?v=17bdce28';
 
 export const PLAYER_IM_FEATURE_ID = 'player-im';
 
@@ -93,11 +97,39 @@ function createSession(engine, client) {
       h = el('div', { class: 'social-chan-head', 'data-im-head': String(id) });
       const close = el('button', { type: 'button', 'data-im-close': String(id) }, IM_TEXT.close);
       close.addEventListener('click', () => closeConv(id));
-      h.append(close);
+      // The site keeps the conversation for the two of you: scroll back past the server's last lines.
+      const back = el('button', { type: 'button', 'data-im-earlier': String(id) }, EARLIER_TEXT.more);
+      back.addEventListener('click', () => earlier(id, back));
+      h.append(back, close);
       heads.set(id, h);
     }
     h.querySelector('[data-im-close]')?.setAttribute('aria-label', IM_TEXT.closeLabel(nameOf(id)));
     return h;
+  }
+
+  let account = null;
+  /** Brings in the conversation's lines before the oldest one shown (ChatHistory, the two players only). */
+  async function earlier(id, button) {
+    const c = convs.get(id);
+    if (!c || button.disabled || typeof document === 'undefined') return;
+    account ??= createMinnAccount({ baseUri: document.baseURI, nonce: globalThis.GRODDLE_MP_BOOT?.nonce || '' });
+    button.disabled = true;
+    button.textContent = EARLIER_TEXT.loading;
+    let r = null;
+    try {
+      r = await account.imEarlier(id, oldestAt(c.lines) || Date.now() + 1);
+    } catch {
+      button.disabled = false;
+      button.textContent = EARLIER_TEXT.more;
+      social?.push(imId(id), { note: true, text: EARLIER_TEXT.failed });
+      return;
+    }
+    c.lines = mergeEarlierIms(c.lines, r?.lines);
+    const done = !r?.more || c.lines.length >= 200;
+    button.disabled = done;
+    button.textContent = done ? EARLIER_TEXT.none : EARLIER_TEXT.more;
+    engine.setData?.('imEarlier', `${id}:${c.lines.length}`);
+    social?.setLines(imId(id), linesFor(c));
   }
 
   function conv(id, name = '') {

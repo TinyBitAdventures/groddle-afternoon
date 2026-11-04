@@ -50,7 +50,7 @@
  * #reports-filter [data-reports-filter] (the search box, shown from REPORT_FILTER_MIN reports), [data-reports-no-match].
  */
 
-import { REPORT_FILTER_MIN, REPORT_MAX, REPORT_TEXT as T, STATUS_WORDS, canEditFirst, matchesReport, pictureRefused, pictureSrc, refusalWords, ticketLine, unreadCount, whenWords } from '../reports.js?v=eb9eab3b';
+import { REPORT_FILTER_MIN, REPORT_MAX, REPORT_TEXT as T, STATUS_WORDS, canEditFirst, matchesReport, pictureRefused, pictureSrc, refusalWords, ticketLine, unreadCount, whenWords } from '../reports.js?v=58483596';
 import { focusBack } from './focus-return.js?v=da190597';
 import { lightboxLink } from './picture-lightbox.js?v=0d2814c8';
 

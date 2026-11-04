@@ -32,7 +32,7 @@ import {
 } from '../public/js/pack-slots.js?v=c91d0ca3';
 import { SORT_TAG_CLASSES } from '../public/js/pack-slots-data.js?v=800f664c';
 import { ITEM_CATALOG, isToolItem } from '../public/js/inventory.js?v=d82f3b00';
-import { bagsFeature } from '../public/js/features/bags-feature.js?v=74ab3b68';
+import { bagsFeature } from '../public/js/features/bags-feature.js?v=44cf3d60';
 import { createToolConditionState } from '../public/js/tools.js?v=2337f66a';
 import { remakeStatus, isOfferedInRemake } from '../public/js/imagination-remake.js?v=c37ad887';
 

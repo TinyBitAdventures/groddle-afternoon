@@ -155,3 +155,33 @@ export function channelOpts(name, { buddy = false, header = null } = {}) {
     ...(header ? { header } : {}),
   };
 }
+
+/** How many lines a conversation holds once earlier ones are brought in (the drawer's LINE_LIMIT). */
+export const IM_EARLIER_MAX = 200;
+
+/**
+ * PURE: older IM lines from the site (groddle-afternoon-site src/ChatHistory.php, GET chat/ims/<with>,
+ * newest first) put before a conversation's lines, oldest first: each line once (by id and time),
+ * at most max (the newest kept).
+ */
+export function mergeEarlierIms(lines, older, max = IM_EARLIER_MAX) {
+  const key = (l) => `${l.id}:${l.at}`;
+  const have = new Set(lines.map(key));
+  const add = [];
+  for (const raw of Array.isArray(older) ? older : []) {
+    const l = normalLine(raw);
+    if (!l || have.has(key(l))) continue;
+    have.add(key(l));
+    add.push(l);
+  }
+  add.sort((a, b) => a.at - b.at || a.id - b.id);
+  const out = [...add, ...lines];
+  return out.length > max ? out.slice(out.length - max) : out;
+}
+
+/** PURE: the time to ask before: the oldest line's, 0 when there is none. */
+export function oldestAt(lines) {
+  let min = 0;
+  for (const l of lines) if (l.at && (!min || l.at < min)) min = l.at;
+  return min;
+}
