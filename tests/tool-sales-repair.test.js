@@ -18,9 +18,9 @@ import {
   takeToolCopy,
   toolRepairPlan,
   toolWornBaseCost,
-} from '../public/js/tools.js?v=2337f66a';
+} from '../public/js/tools.js?v=ca00d182';
 import { addItem, countItem, createInventory, ensureItem } from '../public/js/inventory.js?v=d82f3b00';
-import { createVendorSellQuote, listSellOffers, vendorSell } from '../public/js/vendor.js?v=2f8d159f';
+import { createVendorSellQuote, listSellOffers, vendorSell } from '../public/js/vendor.js?v=87fb770c';
 import { createShrineState, donateToShrine, listShrineDonationOptions, quoteShrineDonation } from '../public/js/shrines.js?v=95d74174';
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');

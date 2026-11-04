@@ -34,8 +34,8 @@
  */
 
 import { createTrantState, fruitCapacityAt, resetTrantDay } from './trants.js?v=9c2e8c0f';
-import { ensureWoodTreeState, resetWoodTreeDay } from './woodcutting.js?v=0fcfd26e';
-import { canUseTool, useToolCondition } from './tools.js?v=2337f66a';
+import { ensureWoodTreeState, resetWoodTreeDay } from './woodcutting.js?v=80333d48';
+import { canUseTool, useToolCondition } from './tools.js?v=ca00d182';
 import { musicblockItemMeta } from './musicblocks.js?v=f5adbf0c';
 import { grantMoodXp } from './mood-xp.js?v=958e7680';
 import { metabolicGain, loseEnergy } from './metabolics.js?v=8504134e';

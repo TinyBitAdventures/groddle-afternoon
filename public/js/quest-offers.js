@@ -70,7 +70,7 @@
 import { VENDOR_NPCS, VENDOR_NPC_CLASSES } from './vendor-npcs.js?v=616c0568';
 import { getQuestCatalog } from './content-catalogs.js?v=10b118dd';
 import { levelInfoForXp } from './progression.js?v=33462eaa';
-import { brokenToolCopies } from './tools.js?v=2337f66a';
+import { brokenToolCopies } from './tools.js?v=ca00d182';
 import { offerableMultiplayerQuest } from './quests-mp.js?v=2beb658a';
 import {
   assignQuest,

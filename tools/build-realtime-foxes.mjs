@@ -31,8 +31,8 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { requireServer, serverPath } from './repos.mjs';
 
-import { FOX_TEXT, FOX_TIMING } from '../public/js/foxes.js?v=46027f3f';
-import { FOX_LEAVE_MS, FOX_PLAYERS_PER_FOX } from '../public/js/foxes-mp.js?v=284f34c3';
+import { FOX_TEXT, FOX_TIMING } from '../public/js/foxes.js?v=78f116dc';
+import { FOX_LEAVE_MS, FOX_PLAYERS_PER_FOX } from '../public/js/foxes-mp.js?v=0e315158';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const outPath = serverPath('data', 'foxes.json');

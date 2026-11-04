@@ -124,6 +124,8 @@ import {
   syncObjs,
 } from '../rook-mp.js?v=decf0604';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
+import { copyChargesLeft, copyFromLedger, keepsCopies, spendCopyCharge, verbCopy } from '../copy-charges.js?v=e5c958cf';
+import { migrateClassValue } from '../tools.js?v=ca00d182';
 import { feedZone, placeRookBadge, unionBox } from '../rook-badge-place.js?v=2bb00dfd';
 
 export const ROOK_FEATURE_ID = 'rook-attack';
@@ -2006,6 +2008,33 @@ function balmCount(engine) {
   return countItem(engine.inv, BALM_CLASS);
 }
 
+/*
+ * Each tube keeps its own pours (potion_rook_balm.js 25 points_capacity 5, 36 instanceProps
+ * points_remaining; tool_base use(1) lowers only that tube), kept per copy in js/tools.js (2026-11-04:
+ * one balmPoints for every tube made a new tube start where the last one left off). save.balmPoints
+ * only stands in for an engine with no tool state (pure callers, older tests).
+ */
+function balmCopies(engine) {
+  return keepsCopies(engine, BALM_CLASS);
+}
+
+/** Pours left in the tube a verb acts on (copy null: the one in use), or 0 with none. */
+function balmLeft(engine, copy = null) {
+  if (balmCopies(engine)) return balmCount(engine) > 0 ? copyChargesLeft(engine, BALM_CLASS, copy) : 0;
+  return save.balmPoints || (balmCount(engine) > 0 ? ROOK_SOURCE.balmPoints : 0);
+}
+
+/** One pour off the tube (copy null: the one in use); an emptied tube leaves the pack. */
+function pourBalm(engine, copy = null) {
+  if (balmCopies(engine)) {
+    const used = spendCopyCharge(engine, BALM_CLASS, copy);
+    return { ok: Boolean(used?.ok) };
+  }
+  const use = useBalmPoint(save, balmCount(engine));
+  if (use.ok && use.consumeItem) removeItem(engine.inv, BALM_CLASS, 1);
+  return { ok: use.ok };
+}
+
 function nearestRooked(engine, range = ROOK_SOURCE.balmRange) {
   const p = engine.player;
   let best = null;
@@ -2018,18 +2047,17 @@ function nearestRooked(engine, range = ROOK_SOURCE.balmRange) {
   return best;
 }
 
-function revive(engine, target, { balm = false } = {}) {
-  if (mp) return mpRevive(engine, target, { balm });
+function revive(engine, target, { balm = false, copy = null } = {}) {
+  if (mp) return mpRevive(engine, target, { balm, copy });
   const key = keyOf.get(target);
   const s = slot(engine);
   if (!key || !s.rooked[key]) return false;
   if (balm) {
-    const use = useBalmPoint(save, balmCount(engine));
+    const use = pourBalm(engine, copy);
     if (!use.ok) {
       engine.toast(ROOK_TEXT.balmNothing, 2000);
       return false;
     }
-    if (use.consumeItem) removeItem(engine.inv, BALM_CLASS, 1);
     save.stats.balms += 1;
     engine.achievement(`potions_used:${BALM_CLASS}`, 1);
     engine.refreshPack();
@@ -2077,7 +2105,7 @@ function rookedVerbs(engine, target) {
   const label = rookLabel(target);
   const energy = costOf(ROOK_SOURCE.reviveEnergy);
   const verbs = [];
-  if (balmCount(engine) > 0 || save.balmPoints > 0) {
+  if (balmLeft(engine) > 0) {
     verbs.push({
       id: 'rook_apply_balm',
       label: 'Apply Balm to',
@@ -2443,8 +2471,20 @@ function mpOnYou(engine, msg) {
     // G335 slice 5: the server used this pour's point through the site's ledger first: the tube holds
     // what the ledger left, and a tube it emptied leaves the pack once (ledgerReceipt holds its op).
     const ledger = msg.use && typeof msg.use === 'object' ? msg.use : null;
+    // The tube this pour was asked with (its place among the tubes in the pack; k on rook_revive).
+    const tube = mp.balmCopy != null && mp.balmCopy < balmCount(engine) ? mp.balmCopy : null;
+    mp.balmCopy = null;
     let applied = false;
-    if (ledger) {
+    if (balmCopies(engine)) {
+      // The ledger used that tube's pour: it holds what the ledger left, then the one pour here. A spend
+      // already applied once (a load) has taken that tube already.
+      const already = ledger?.spent && engine.query?.('ledgerReceipt', String(ledger.op || ''), engine) === false;
+      if (!already) {
+        if (ledger) copyFromLedger(engine, BALM_CLASS, tube, ledger);
+        pourBalm(engine, tube);
+      }
+      applied = true;
+    } else if (ledger) {
       const left = Math.max(0, Math.floor(Number(ledger.left) || 0));
       if (ledger.spent && engine.query?.('ledgerReceipt', String(ledger.op || ''), engine) === false) {
         save.balmPoints = 0;
@@ -2453,8 +2493,7 @@ function mpOnYou(engine, msg) {
         save.balmPoints = ledger.spent ? 1 : Math.min(ROOK_SOURCE.balmPoints - 1, left) + 1;
       }
     }
-    const use = applied ? { ok: false } : useBalmPoint(save, balmCount(engine));
-    if (use.ok && use.consumeItem) removeItem(engine.inv, BALM_CLASS, 1);
+    if (!applied) pourBalm(engine, null);
     save.stats.balms += 1;
     engine.achievement(`potions_used:${BALM_CLASS}`, 1);
     engine.refreshPack();
@@ -2691,11 +2730,11 @@ function mpStrike(engine, target, classTsid, count) {
   return Boolean(mp.client.send('rook_strike', { item: classTsid, count: n }));
 }
 
-function mpRevive(engine, target, { balm = false } = {}) {
+function mpRevive(engine, target, { balm = false, copy = null } = {}) {
   const key = keyOf.get(target);
   const row = key ? mp.slot.rooked[key] : null;
   if (!row) return false;
-  if (balm && save.balmPoints <= 0 && balmCount(engine) <= 0) {
+  if (balm && balmLeft(engine) <= 0) {
     engine.toast(ROOK_TEXT.balmNothing, 2000);
     return false;
   }
@@ -2703,7 +2742,10 @@ function mpRevive(engine, target, { balm = false } = {}) {
     engine.toast('You have already helped revive this one.', 2000);
     return false;
   }
-  return Boolean(mp.client.send('rook_revive', { key, balm }));
+  // The tube picked goes with the ask (k, its place among the tubes in the pack): the ledger uses that one's pour.
+  const k = balm && balmCopies(engine) ? verbCopy(engine, BALM_CLASS, copy) : -1;
+  if (balm) mp.balmCopy = k >= 0 ? k : null;
+  return Boolean(mp.client.send('rook_revive', { key, balm, ...(k >= 0 ? { k } : {}) }));
 }
 
 // ---------------------------------------------------------------------------
@@ -2836,7 +2878,7 @@ function publish(engine, force = false) {
   engine.setData('rookArm', armState === 'dwell' ? `dwell:${Math.max(0, Math.ceil((arm.since + armDwellMs(engine) - t) / 1000))}`
     : armState === 'armed' ? `armed:${Math.max(0, Math.ceil((arm.startAt - t) / 1000))}` : armState);
   engine.setData('rookArmor', armored() ? String(Math.round((save.armorUntil - t) / 1000)) : '0');
-  engine.setData('rookBalmPoints', String(save.balmPoints));
+  engine.setData('rookBalmPoints', String(balmCopies(engine) ? (balmCount(engine) > 0 ? balmLeft(engine) : 0) : save.balmPoints));
   engine.setData('rookDemo', demoMode);
   engine.setData('rookArt', `rook=${ui?.rook && !ui.rook.destroyed ? 'glitch-overlays-rook_fly_forward' : 'none'},head=${ui?.headClip || ''},halo=${tracked.size}`);
   engine.setData('rookStats', Object.entries(save.stats).map(([k, v]) => `${k}=${v}`).join(','));
@@ -3068,7 +3110,7 @@ export const rookAttackFeature = {
     return true;
   },
 
-  packVerbs(classTsid, engine) {
+  packVerbs(classTsid, engine, opts = {}) {
     const a = here(engine);
     if (classTsid === ORB_CLASS) {
       if (mp) return mpOrbPackVerbs(engine);
@@ -3091,7 +3133,7 @@ export const rookAttackFeature = {
         label: 'Pour',
         enabled: Boolean(near),
         reason: near ? '' : ROOK_TEXT.balmNothing,
-        tooltip: `${ROOK_TEXT.balmTooltip} · ${save.balmPoints || ROOK_SOURCE.balmPoints}/${ROOK_SOURCE.balmPoints} pours in this tube`,
+        tooltip: `${ROOK_TEXT.balmTooltip} · ${balmLeft(engine, opts?.copy ?? null) || ROOK_SOURCE.balmPoints}/${ROOK_SOURCE.balmPoints} pours in this tube`,
         primary: true,
       }];
     }
@@ -3108,7 +3150,7 @@ export const rookAttackFeature = {
     return [];
   },
 
-  runPackVerb(classTsid, verbId, engine) {
+  runPackVerb(classTsid, verbId, engine, opts = {}) {
     if (verbId === 'rook_stun') return startStun(engine) || true;
     if (String(verbId).startsWith('rook_join:')) {
       mpJoinOrb(engine, Number(String(verbId).slice('rook_join:'.length)));
@@ -3120,7 +3162,7 @@ export const rookAttackFeature = {
     }
     if (verbId === 'rook_pour') {
       const near = nearestRooked(engine);
-      if (near) revive(engine, near.row.target, { balm: true });
+      if (near) revive(engine, near.row.target, { balm: true, copy: opts?.copy ?? null });
       else engine.toast(ROOK_TEXT.balmNothing, 2000);
       return true;
     }
@@ -3139,8 +3181,13 @@ export const rookAttackFeature = {
     return save;
   },
 
-  restore(slice) {
+  restore(slice, engine) {
     save = normalizeRookSave(slice || {});
+    // An older save's one balmPoints is the first tube's (the open one); every other tube is full.
+    if (save.balmPoints > 0 && keepsCopies(engine, BALM_CLASS) && countItem(engine.inv, BALM_CLASS) > 0) {
+      migrateClassValue(engine.toolState, BALM_CLASS, save.balmPoints);
+      save.balmPoints = 0;
+    }
     applyDailyRule(save, now());
     arm = createRookArm();
   },

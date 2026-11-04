@@ -13,8 +13,8 @@ import { fileURLToPath } from 'node:url';
 
 import { loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js?v=10b118dd';
 import { createQuestState } from '../public/js/quests.js?v=2ce7b3cb';
-import { questStatus, waitingOffers } from '../public/js/quest-offers.js?v=a68ee230';
-import { questCountToast, questOffersFeature, showWaitingOffer } from '../public/js/features/quest-offers-feature.js?v=d1510b11';
+import { questStatus, waitingOffers } from '../public/js/quest-offers.js?v=ef0912c2';
+import { questCountToast, questOffersFeature, showWaitingOffer } from '../public/js/features/quest-offers-feature.js?v=889fdfb8';
 
 const PUBLIC = join(dirname(fileURLToPath(import.meta.url)), '../public');
 const read = (p) => readFileSync(join(PUBLIC, p), 'utf8');

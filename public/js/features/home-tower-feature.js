@@ -49,8 +49,8 @@
  */
 
 import { ITEM_CATALOG, countItem, ensureItem, itemIcon } from '../inventory.js?v=d82f3b00';
-import { canUseTool, useToolCondition } from '../tools.js?v=2337f66a';
-import { acceptOffer, npcQuestOffers } from '../quest-offers.js?v=a68ee230';
+import { canUseTool, useToolCondition } from '../tools.js?v=ca00d182';
+import { acceptOffer, npcQuestOffers } from '../quest-offers.js?v=ef0912c2';
 import { getQuestCatalog } from '../content-catalogs.js?v=10b118dd';
 import { XP_FOR_LEVEL } from '../progression.js?v=33462eaa';
 import {

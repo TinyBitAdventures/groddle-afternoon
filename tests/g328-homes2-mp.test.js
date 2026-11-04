@@ -32,9 +32,9 @@ import {
   tendedText,
 } from '../public/js/neighbours-mp.js?v=a8d5544e';
 import { createButlerState, nextHandover, normalizeButlerState, packagesAndMessagesForOwner } from '../public/js/butler.js?v=86316578';
-import { createGarden, tickGarden } from '../public/js/garden.js?v=4bcd97f3';
-import { butlerApi } from '../public/js/features/butler-feature.js?v=190c2a19';
-import { neighboursMpFeature } from '../public/js/features/neighbours-mp-feature.js?v=0fa7a26c';
+import { createGarden, tickGarden } from '../public/js/garden.js?v=d93048f3';
+import { butlerApi } from '../public/js/features/butler-feature.js?v=8ca2d32e';
+import { neighboursMpFeature } from '../public/js/features/neighbours-mp-feature.js?v=d20435bc';
 import { createMinnAccount } from '../public/js/minn-account.js?v=17bdce28';
 import { HAS_SERVER, HAS_SITE, SITE_DIR, serverPath, sitePath } from '../tools/repos.mjs';
 

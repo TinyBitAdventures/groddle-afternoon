@@ -53,7 +53,7 @@ import {
   tickQuestTimers,
   restartTimedQuest,
   questTimerStatus,
-} from '../public/js/quest-offers.js?v=a68ee230';
+} from '../public/js/quest-offers.js?v=ef0912c2';
 import { XP_FOR_LEVEL } from '../public/js/progression.js?v=33462eaa';
 
 const CONTENT = join(dirname(fileURLToPath(import.meta.url)), '../public/assets/content');

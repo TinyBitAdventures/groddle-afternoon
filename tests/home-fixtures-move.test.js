@@ -31,7 +31,7 @@ import {
   fixtureText,
   savedFixtureRx,
 } from '../public/js/home-street-fixtures.js?v=badcb725';
-import { HOUSE_STYLE_KEYS, homesFeature, houseDoorway, houseFixtureX } from '../public/js/features/homes-feature.js?v=25eb8911';
+import { HOUSE_STYLE_KEYS, homesFeature, houseDoorway, houseFixtureX } from '../public/js/features/homes-feature.js?v=be536b90';
 
 const read = (rel) => readFileSync(join(import.meta.dirname, '..', 'public', 'js', rel), 'utf8');
 const atFor = (layout, style) => {

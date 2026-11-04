@@ -21,7 +21,7 @@ import {
   serializeDroppedItemState,
   takeDroppedRecord,
 } from '../public/js/world-items.js?v=78125f8f';
-import { bindToolInventory, createToolConditionState, pickToolCopies, placeToolCopies, toolCopies } from '../public/js/tools.js?v=2337f66a';
+import { bindToolInventory, createToolConditionState, pickToolCopies, placeToolCopies, toolCopies } from '../public/js/tools.js?v=ca00d182';
 
 const root = join(import.meta.dirname, '..');
 

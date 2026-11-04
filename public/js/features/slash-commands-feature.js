@@ -47,9 +47,9 @@
  */
 
 import { BUTLER_STRINGS } from '../butler.js?v=86316578';
-import { butlerApi } from './butler-feature.js?v=190c2a19';
+import { butlerApi } from './butler-feature.js?v=8ca2d32e';
 import { hellFeature } from './hell-feature.js?v=4c54964f';
-import { towerApi } from './home-tower-feature.js?v=1c650463';
+import { towerApi } from './home-tower-feature.js?v=60eed9f3';
 import { COMMAND_HELP_INTRO, STUCK_COOLDOWN_MS, STUCK_TEXT, commandHelpLines, commandHint, isCommandHelp, misplacedCommand, slashPlan, unknownLine } from '../slash-commands.js?v=98c2238a';
 import { parseTp, runTeleportCommand, TP_TEXT } from '../admin-teleport.js?v=fa56e8df';
 import { minnUrls } from '../minn-account.js?v=17bdce28';

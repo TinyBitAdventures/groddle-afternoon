@@ -303,7 +303,7 @@
       "assets/content/street-ecology.json": "f4e5c99b",
       "assets/content/street-jobs.json": "0df1291b",
       "assets/content/style-profiles.json": "edc1e135",
-      "assets/content/trade-items.json": "90de8dfd",
+      "assets/content/trade-items.json": "3671f1e1",
       "assets/content/zone.schema.json": "c829be11",
       "assets/decos/animated/Glints_3.json": "1f110e8e",
       "assets/decos/animated/Glints_3.webp": "9942c793",

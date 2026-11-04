@@ -109,6 +109,8 @@ function chargeClasses() {
     potion('potion_trantsformation_fluid', 'Trantsformation Fluid', 3),
     potion('potion_xp', 'Draught of Wisdom', 5),
     potion('potion_rocky_regeneration_solution', 'Rocky Regeneration Solution', 3),
+    // potion_rook_balm.js 25 points_capacity 5, 36 points_remaining 5: five pours a tube (rook-attack-feature).
+    potion('potion_rook_balm', 'Rook Balm', 5),
     // js/tree-poison.js POTION_USES (potion_tree_poison.js 36, potion_tree_poison_antidote.js 36).
     potion('potion_tree_poison', 'Tree Poison', 5),
     potion('potion_tree_poison_antidote', 'Tree Poison Antidote', 5),

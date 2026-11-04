@@ -33,7 +33,7 @@ import {
   cellStep,
   hasWorkingTool,
   room,
-} from '../public/js/quest-rooms/penalty.js?v=fb83e0c7';
+} from '../public/js/quest-rooms/penalty.js?v=dff4407a';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const GSJS = join(homedir(), 'Documents/glitch-audit/glitch-GameServerJS');

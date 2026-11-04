@@ -29,18 +29,18 @@ import {
   rangerGreeting,
   splitConversation,
   stepFox,
-} from '../public/js/foxes.js?v=46027f3f';
-import { createToolConditionState, getToolCondition } from '../public/js/tools.js?v=2337f66a';
+} from '../public/js/foxes.js?v=78f116dc';
+import { createToolConditionState, getToolCondition } from '../public/js/tools.js?v=ca00d182';
 import { ITEM_CATALOG } from '../public/js/inventory.js?v=d82f3b00';
 import { getAchievementCatalog, loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=10b118dd';
 import {
   inReach,
   isPreserveRow,
   preserveEcologyEntry,
-} from '../public/js/features/foxes-feature.js?v=05ceb7a4';
+} from '../public/js/features/foxes-feature.js?v=beec0da9';
 import { wildlifeFor } from '../public/js/wildlife.js?v=670c3a7f';
 import { createFeatureHost } from '../public/js/feature-host.js?v=020c9329';
-import { foxesFeature } from '../public/js/features/foxes-feature.js?v=05ceb7a4';
+import { foxesFeature } from '../public/js/features/foxes-feature.js?v=beec0da9';
 
 const ecology = JSON.parse(readFileSync(new URL('../public/assets/content/street-ecology.json', import.meta.url)));
 

@@ -11,11 +11,11 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { getVerbsFor } from '../public/content.js?v=cafa7d30';
+import { getVerbsFor } from '../public/content.js?v=1b8245ab';
 import { createInventory } from '../public/js/inventory.js?v=d82f3b00';
-import { createMineRock } from '../public/js/mining.js?v=4f8dc32e';
-import { createGarden } from '../public/js/garden.js?v=4bcd97f3';
-import { BROKEN_TOOL_ICONS, TOOL_CONDITION_CATALOG, brokenToolIcon, createToolConditionState, setToolRemaining } from '../public/js/tools.js?v=2337f66a';
+import { createMineRock } from '../public/js/mining.js?v=6e0d2b17';
+import { createGarden } from '../public/js/garden.js?v=d93048f3';
+import { BROKEN_TOOL_ICONS, TOOL_CONDITION_CATALOG, brokenToolIcon, createToolConditionState, setToolRemaining } from '../public/js/tools.js?v=ca00d182';
 import { HIRES_ICONS } from '../public/js/icon-hires.js?v=5b68aeaa';
 
 const root = join(import.meta.dirname, '..');
