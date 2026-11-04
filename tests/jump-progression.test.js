@@ -32,10 +32,10 @@ import {
 } from '../public/js/imagination.js?v=0cab36eb';
 import { isOfferedInRemake, isOfferedOnline } from '../public/js/imagination-remake.js?v=c37ad887';
 import { imaginationFeature } from '../public/js/features/imagination-feature.js?v=47bb9dc9';
-import { NORMAL_BUFF, jumpApex } from '../public/js/avatar-step.js?v=de5b3a16';
-import { reachStreet } from '../public/js/builder/reach-graph.js?v=0144f90a';
+import { NORMAL_BUFF, jumpApex } from '../public/js/avatar-step.js?v=d48908a5';
+import { reachStreet } from '../public/js/builder/reach-graph.js?v=7a0078a2';
 import { WINTER_WALK_START, WINTER_WALK_TSID } from '../public/js/winter-walk-streets.js?v=8607edd3';
-import { SKIP_TUTORIAL_CARDS } from '../public/js/newxp.js?v=8aef8287';
+import { SKIP_TUTORIAL_CARDS } from '../public/js/newxp.js?v=ceff0028';
 
 const read = (rel) => readFileSync(join(import.meta.dirname, '..', 'public', rel), 'utf8');
 

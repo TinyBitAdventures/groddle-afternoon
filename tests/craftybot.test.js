@@ -402,8 +402,8 @@ describe('delivery and wiring', () => {
 
 describe('craftybot feature: the ingredient source and the job menu', async () => {
   // The feature imports these with their browser cache tags; load the same module instances.
-  const { craftybotFeature } = await import('../public/js/features/craftybot-feature.js?v=05e4e8b4');
-  const { homesFeature } = await import('../public/js/features/homes-feature.js?v=de18f21c');
+  const { craftybotFeature } = await import('../public/js/features/craftybot-feature.js?v=f36a2b5e');
+  const { homesFeature } = await import('../public/js/features/homes-feature.js?v=7545b162');
   const cbMod = await import('../public/js/craftybot.js?v=41eacd5d');
   const making = await import('../public/js/making.js?v=3f6c5965');
 

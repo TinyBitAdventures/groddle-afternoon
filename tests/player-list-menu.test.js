@@ -7,7 +7,7 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { FROM_LIST_VERBS, PLAYER_TARGET_FEATURE, listPlayerTarget, opensPlayerMenu, playerMenuRows } from '../public/js/ui/player-menu.js?v=cc2a8016';
+import { FROM_LIST_VERBS, PLAYER_TARGET_FEATURE, listPlayerTarget, opensPlayerMenu, playerMenuRows } from '../public/js/ui/player-menu.js?v=bd890bf8';
 import { PROFILE_PAGE_VERB } from '../public/js/profiles.js?v=86423d98';
 import { IM_VERB_ID } from '../public/js/player-im.js?v=b301574b';
 import { BUDDY_VERBS } from '../public/js/buddies.js?v=df41a3bb';

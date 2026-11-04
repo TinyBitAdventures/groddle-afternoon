@@ -18,7 +18,7 @@
  */
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { JUMP_SPEED, NORMAL_BUFF, avatarFall } from '../public/js/avatar-step.js?v=de5b3a16';
+import { JUMP_SPEED, NORMAL_BUFF, avatarFall } from '../public/js/avatar-step.js?v=d48908a5';
 import { readFileSync, readdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -71,7 +71,9 @@ function step(geo, pl, { left = false, right = false, gravity = 1 } = {}) {
   const hit = resolveGround(plats, pl.x, pl.y, pl.vy, 16);
   let ground = hit?.y;
   if (ground == null) {
-    ground = Math.max(...plats.filter((p) => isStandable(p) && platformYAt(p, pl.x, 8) != null).map((p) => (p.y1 + p.y2) / 2));
+    // avatarGround's seam fallback: the lowest standable line within 8 px, read at x (ticket 98).
+    const at = (p) => platformYAt(p, Math.min(Math.max(p.x1, p.x2), Math.max(Math.min(p.x1, p.x2), pl.x)), 0);
+    ground = Math.max(...plats.filter((p) => isStandable(p) && platformYAt(p, pl.x, 8) != null).map(at));
     if (!(pl.y >= ground - 80)) ground = Infinity;
   }
   if (pl.y >= ground && pl.vy >= 0) {

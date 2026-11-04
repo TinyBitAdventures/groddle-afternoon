@@ -7,10 +7,10 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { GAME_DIR } from '../repos.mjs';
-import { GRAVITY, JUMP_SPEED, WALK_MAX, FLOOR_ACCEL, AIR_ACCEL_RATIO, STREET_PHYSICS_TERMINAL_VY, AVATAR_BODY_H, GROUND_SNAP, NORMAL_BUFF } from '../../public/js/avatar-step.js?v=de5b3a16';
+import { GRAVITY, JUMP_SPEED, WALK_MAX, FLOOR_ACCEL, AIR_ACCEL_RATIO, STREET_PHYSICS_TERMINAL_VY, AVATAR_BODY_H, GROUND_SNAP, NORMAL_BUFF } from '../../public/js/avatar-step.js?v=d48908a5';
 import { FLOAT_REACH, FLOAT_OPEN, FLOOR_SKIRT } from '../../public/js/builder/ground.js?v=8beea23c';
-import { RULES, LIMITS, MIN_VIEW, PARALLAX_VIEW, LICENCES, plainApex, LEDGE_RISE } from '../../public/js/builder/validate.js?v=6b06c9fb';
-import { REACH_LIMITS, POST_REACH_X, POST_BELOW, DOOR_REACH_X, TIGHT_MARGIN, LANDING_TRIES, AIR_JUMP_TRIES, LANDING_SHARE, streetWorld, jumpArc } from '../../public/js/builder/reach-graph.js?v=0144f90a';
+import { RULES, LIMITS, MIN_VIEW, PARALLAX_VIEW, LICENCES, plainApex, LEDGE_RISE } from '../../public/js/builder/validate.js?v=9ca7077a';
+import { REACH_LIMITS, POST_REACH_X, POST_BELOW, DOOR_REACH_X, TIGHT_MARGIN, LANDING_TRIES, AIR_JUMP_TRIES, LANDING_SHARE, streetWorld, jumpArc } from '../../public/js/builder/reach-graph.js?v=7a0078a2';
 import { OP_NAMES } from '../../public/js/builder/ops.js?v=27c7796f';
 import { LAYER_ROLES } from '../../public/js/builder/layer-role.js?v=e585f610';
 import { POPULATION_CLASSES } from '../../public/js/builder/zone.js?v=dff4acc0';

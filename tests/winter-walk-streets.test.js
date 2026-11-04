@@ -38,7 +38,7 @@ import {
   winterStreetEcology,
 } from '../public/js/winter-walk-streets.js?v=8607edd3';
 import { rebuiltRoomsFeature } from '../public/js/features/rebuilt-rooms-feature.js?v=8baf41e0';
-import { reachStreet } from '../public/js/builder/reach-graph.js?v=0144f90a';
+import { reachStreet } from '../public/js/builder/reach-graph.js?v=7a0078a2';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const pub = join(spike, 'public');

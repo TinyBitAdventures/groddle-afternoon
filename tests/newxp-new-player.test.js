@@ -20,8 +20,8 @@ import { newPlayerInventory, newPlayerStats } from '../public/js/new-player.js?v
 import { createInventory } from '../public/js/inventory.js?v=d82f3b00';
 import { PARADISE_TICKET_IDS } from '../public/js/paradise-flight.js?v=b9ebc32f';
 import { createPlayerSave, parsePlayerSave, restorePlayerSave, serializePlayerSave, normalizePlayerSnapshot } from '../public/js/player-save.js?v=a9c44696';
-import { cloudsLayout, SCENE_TSIDS, GENTLE_ISLAND } from '../public/js/newxp.js?v=8aef8287';
-import { newxpFeature, __newxpTest, cloudEdge, cloudStepOff, cloudStepOffAny, CLOUD_BODY_DEPTH, CLOUD_EDGE_CLEAR, CLOUD_END_PUFFS } from '../public/js/features/newxp-feature.js?v=2f5c42d6';
+import { cloudsLayout, SCENE_TSIDS, GENTLE_ISLAND } from '../public/js/newxp.js?v=ceff0028';
+import { newxpFeature, __newxpTest, cloudEdge, cloudStepOff, cloudStepOffAny, CLOUD_BODY_DEPTH, CLOUD_EDGE_CLEAR, CLOUD_END_PUFFS } from '../public/js/features/newxp-feature.js?v=3598bb29';
 
 const root = join(import.meta.dirname, '..');
 const read = (rel) => readFileSync(join(root, rel), 'utf8');
@@ -222,7 +222,7 @@ describe('4. the Cloud Level ends in a soft cloud, and the edge drops cleanly', 
     const read = (f) => readFileSync(join(root, f), 'utf8');
     // The slack it clears: platformYAt's 4 px margin and resolveGround's 8 px seam bridge.
     assert.match(read('public/js/street-model.js'), /export function platformYAt\(p, x, margin = 4\)/);
-    assert.match(read('public/js/avatar-step.js'), /const maxX = Math\.max\(p\.x1, p\.x2\) \+ 8;/);
+    assert.match(read('public/js/avatar-step.js'), /if \(px < minX - 8 \|\| px > maxX \+ 8\) continue;/);
     assert.ok(CLOUD_EDGE_CLEAR > 8);
     assert.equal(cloudStepOff(edge, { x: edge + 4, onGround: true }), edge + CLOUD_EDGE_CLEAR, 'the QA stick: x 3354 standing on air');
     assert.equal(cloudStepOff(edge, { x: edge + 1, onGround: true }), edge + CLOUD_EDGE_CLEAR);

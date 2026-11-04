@@ -8,7 +8,7 @@
  * Units are px per frame at 60 fps (spec 2.3). A body is { x, y, vx, vy, onGround } with the feet
  * at x, y in screen space (the street's top-left origin, y down).
  */
-import { avatarHeadReach, blockBarrierCrossing, buriedSignpostUnder, headCeiling, isStandable, resolveGround, worldToScreen } from './street-model.js?v=505d8990';
+import { avatarHeadReach, blockBarrierCrossing, buriedSignpostUnder, headCeiling, isStandable, platformYAt, resolveGround, worldToScreen } from './street-model.js?v=505d8990';
 import { stickToSlope } from './slope-walk.js?v=9af1e505';
 
 /*
@@ -196,6 +196,8 @@ export function streetPhysicsFreeFall(body, buff, dt) {
 /**
  * The floor under the feet (screen y): the street ground resolve, else the lowest standable line
  * near x (imported streets have seams, so a small gap is bridged), else the bottom of every line.
+ * The near line is read at x, not at its middle (ticket 98): a sloped flight's middle height made
+ * a flat ledge in the air over its low half, and a fall stopped on it.
  * A gap over a buried signpost is a hole to jump into (the Great Hole to Ix): fall, and never get
  * pulled back up onto the rim from below. `fallback` is the floor of a street with no lines.
  */
@@ -207,10 +209,11 @@ export function avatarGround(platforms, px, py, vy, { street = null, fallback = 
     let bestY = -Infinity;
     for (const p of platforms) {
       if (!isStandable(p)) continue; // an underside is never the floor (pc_perm 1)
-      const y = (p.y1 + p.y2) / 2;
-      const minX = Math.min(p.x1, p.x2) - 8;
-      const maxX = Math.max(p.x1, p.x2) + 8;
-      if (px >= minX && px <= maxX && y > bestY) {
+      const minX = Math.min(p.x1, p.x2);
+      const maxX = Math.max(p.x1, p.x2);
+      if (px < minX - 8 || px > maxX + 8) continue;
+      const y = platformYAt(p, Math.min(maxX, Math.max(minX, px)), 0);
+      if (y != null && y > bestY) {
         bestY = y;
         best = y;
       }

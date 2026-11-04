@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { WALK_MAX, jumpApex } from '../public/js/avatar-step.js?v=de5b3a16';
+import { WALK_MAX, jumpApex } from '../public/js/avatar-step.js?v=d48908a5';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';

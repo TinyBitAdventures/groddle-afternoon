@@ -8,7 +8,7 @@ import { join } from 'node:path';
 
 import { QUOIN_TOUCH, quoinTouches } from '../public/js/quoins.js?v=dfe1ff0a';
 import { serverPath, skipWithoutServer } from '../tools/repos.mjs';
-import { GRAVITY, JUMP_SPEED, WALK_MAX } from '../public/js/avatar-step.js?v=de5b3a16';
+import { GRAVITY, JUMP_SPEED, WALK_MAX } from '../public/js/avatar-step.js?v=d48908a5';
 
 const root = join(import.meta.dirname, '..');
 const game = readFileSync(join(root, 'public/game.js'), 'utf8');

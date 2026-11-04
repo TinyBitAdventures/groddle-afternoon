@@ -24,7 +24,7 @@
  */
 
 import { COMPANION_FOLLOW_TRAIL_DISTANCE, STALKER_ACHIEVEMENT_ID, companionFollowVelocity } from './local-companions.js?v=188f756c';
-import { GRAVITY, JUMP_SPEED } from './avatar-step.js?v=de5b3a16';
+import { GRAVITY, JUMP_SPEED } from './avatar-step.js?v=d48908a5';
 
 export { STALKER_ACHIEVEMENT_ID };
 export const FOLLOW_VERB = 'mp_follow';

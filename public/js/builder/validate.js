@@ -28,10 +28,10 @@
  *   profiles     assets/content/style-profiles.json, for the STY rules (P5's js/builder/style-rules.js)
  */
 import { compileSchema } from './schema-check.js?v=cc9d1af4';
-import { reachStreet, REACH_LIMITS, TIGHT_MARGIN, LANDING_TRIES, AIR_JUMP_TRIES, LANDING_SHARE, streetBuff } from './reach-graph.js?v=0144f90a';
+import { reachStreet, REACH_LIMITS, TIGHT_MARGIN, LANDING_TRIES, AIR_JUMP_TRIES, LANDING_SHARE, streetBuff } from './reach-graph.js?v=7a0078a2';
 import { platformsScreen, barriersScreen, isStandable, isSolidFromBelow, isItemFloor, assertStreetGeometry, avatarHeadReach, platformYAt, worldToScreen, streetWidth, streetHeight } from '../street-model.js?v=505d8990';
 import { planStreetPlacements, populationForStreet, streetReservedSpots } from '../street-ecology.js?v=d41e5e97';
-import { jumpApex } from '../avatar-step.js?v=de5b3a16';
+import { jumpApex } from '../avatar-step.js?v=d48908a5';
 import { STY_RULES, styleFindings } from './style-rules.js?v=abf9bfae';
 import { EFFECT_LIMITS, effectsCost, normaliseEmitter, rumbleShare, emitterAnchor } from '../street-effects.js?v=03f7fe4d';
 import { LICENCE_POLICY, provenanceProblems } from './new-art.js?v=29f0b13e';

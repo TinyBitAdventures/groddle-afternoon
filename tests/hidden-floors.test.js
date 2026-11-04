@@ -48,11 +48,11 @@ import {
   inTeleporter,
   jumpApex,
   teleportersOn,
-} from '../public/js/hidden-floors.js?v=1de85d03';
-import { hiddenFloorsFeature } from '../public/js/features/hidden-floors-feature.js?v=ebf834c6';
-import { FEATURES } from '../public/js/features/index.js?v=cea07c0f';
+} from '../public/js/hidden-floors.js?v=d49b76df';
+import { hiddenFloorsFeature } from '../public/js/features/hidden-floors-feature.js?v=86d189e9';
+import { FEATURES } from '../public/js/features/index.js?v=896dd5ab';
 import { rawTripleJumpMultiplier, scaledTripleJumpMultiplier } from '../public/js/movement.js?v=b30f84eb';
-import { GRAVITY, JUMP_SPEED, WALK_MAX } from '../public/js/avatar-step.js?v=de5b3a16';
+import { GRAVITY, JUMP_SPEED, WALK_MAX } from '../public/js/avatar-step.js?v=d48908a5';
 import { buffPhysics } from '../public/js/buffs.js?v=036fee53';
 
 /** Spinach's High Jumper buff, running (buffs.js buffPhysics). */

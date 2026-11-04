@@ -81,12 +81,12 @@ import { locationIsDepressing } from '../public/js/animal-mood.js?v=a49495fc';
 import { resourcePlacementGroups, resourceSpawnPlan } from '../public/js/features/resource-nodes-feature.js?v=9b886cac';
 import { soilCountsForStreet, soilPlacementGroups } from '../public/js/features/patches-feature.js?v=1a8e729f';
 import { kittyPlacementGroups } from '../public/js/features/heli-kitties-feature.js?v=e66f1ad2';
-import { BATTERFLY_GROUP, batterflyPlacementGroups } from '../public/js/features/animal-husbandry-feature.js?v=ca041674';
+import { BATTERFLY_GROUP, batterflyPlacementGroups } from '../public/js/features/animal-husbandry-feature.js?v=02903f06';
 import { hasRaceDispenser } from '../public/js/races.js?v=ab22a079';
 import { setWildlifeCatalog, wildlifeFor } from '../public/js/wildlife.js?v=670c3a7f';
 import { boardSpotRow, furnitureFor, furniturePlacementGroups } from '../public/js/street-furniture.js?v=d5716ef6';
-import { INCUBATION } from '../public/js/animal-husbandry.js?v=2c391fae';
-import { SHARED_NODE_CLASSES, freshTreePlan } from '../public/js/street-objects.js?v=136cdd1f';
+import { INCUBATION } from '../public/js/animal-husbandry.js?v=b9be6584';
+import { SHARED_NODE_CLASSES, freshTreePlan } from '../public/js/street-objects.js?v=dd7327e3';
 import { isZoneTsid } from '../public/js/zone-streets.js?v=b40010d5';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');

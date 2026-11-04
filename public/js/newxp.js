@@ -42,7 +42,7 @@
  * placed in front of what they point at.
  */
 
-import { WALK_MAX, flatJump } from './avatar-step.js?v=de5b3a16';
+import { WALK_MAX, flatJump } from './avatar-step.js?v=d48908a5';
 
 export const NEWXP_SAVE_VERSION = 1;
 
