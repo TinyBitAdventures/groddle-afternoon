@@ -49,7 +49,7 @@ import { fileURLToPath } from 'node:url';
 import { requireServer, serverPath } from './repos.mjs';
 
 import { readItemTags, readItems } from './inventory/gsjs-data.mjs';
-import { TOOL_CONDITION_CATALOG } from '../public/js/tools.js?v=9a5a4323';
+import { TOOL_CONDITION_CATALOG } from '../public/js/tools.js?v=2337f66a';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 export const GSJS = join(root, '..', 'glitch-GameServerJS');

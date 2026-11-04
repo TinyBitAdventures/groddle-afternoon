@@ -67,8 +67,8 @@ import { getGameDayKey } from '../game-day.js?v=edb00566';
 import { metabolicGain, moodMax } from '../metabolics.js?v=8504134e';
 import { quoinDailyLimitFor } from '../quoins.js?v=dfe1ff0a';
 import { emblemCostFor } from '../shrines.js?v=95d74174';
-import { GROWN_TREE_LABELS, trantsformPlotTree } from '../patches.js?v=877b27e9';
-import { isPoisoned } from '../tree-poison.js?v=f6e01177';
+import { GROWN_TREE_LABELS, trantsformPlotTree } from '../patches.js?v=bfda863e';
+import { isPoisoned } from '../tree-poison.js?v=f80aeb85';
 import { furnitureSize } from '../home-decor.js?v=6dc41dcc';
 import { textureFromUrl, sourceFromUrl, frameTexture } from '../textures.js?v=3149d699';
 import { POTION_ART } from '../potion-art.js?v=27ccc756';
@@ -128,11 +128,13 @@ import {
   usePotion,
 } from '../potions.js?v=c21bad59';
 import { itemVerbAchievementCounters } from '../item-verbs.js?v=1e20fa7d';
-import { patchesFeature } from './patches-feature.js?v=fda9d58d';
-import { homesFeature } from './homes-feature.js?v=4de51029';
-import { streetTreeIndex } from './tree-death-feature.js?v=fbf714a8';
-import { questRoomConverse } from './quest-instances-feature.js?v=058beb63';
+import { patchesFeature } from './patches-feature.js?v=1a8e729f';
+import { homesFeature } from './homes-feature.js?v=de18f21c';
+import { streetTreeIndex } from './tree-death-feature.js?v=90c86a77';
+import { questRoomConverse } from './quest-instances-feature.js?v=47558dc5';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
+import { copyChargesLeft, keepsCopies, spendCopyCharge, verbCopy } from '../copy-charges.js?v=174642e2';
+import { copyTag, migrateClassTag, migrateClassValue, setCopyTag, toolCopies } from '../tools.js?v=2337f66a';
 
 export const POTIONS_FEATURE_ID = 'potions';
 const LOVE = 'feeling_called_love';
@@ -140,8 +142,19 @@ const CRAZY = 'crazy_coin_collector';
 const TREE_DEATH = 'tree-death';
 const RUG_SYNC_MS = 400;
 
-let uses = {}; // open bottle uses per class
-let favorGiant = ''; // the open Draught of Giant Amicability's Giant
+/*
+ * Each bottle's uses (tool_base points_remaining) and each Draught's Giant (potion_favor.js onLoad
+ * 585-589, favor_giant on the bottle) are that bottle's own (2026-11-04: one number per class and
+ * one Giant made a new bottle start where the last one left off). They live in js/tools.js per copy
+ * (charges classes; the Giant in row.tags). `uses` and `favorGiant` only stand in for an engine with
+ * no tool state (pure callers, older tests).
+ */
+let uses = {};
+let favorGiant = '';
+/** The copy the open pack menu is about while its verbs are drawn or run (feature-host opts.copy). */
+let picked = null;
+/** The engine the feature last drew or restored with (tests' _state). */
+let lastEngine = null;
 let daily = { day: '', quaffed: {}, shakes: 0 };
 let items = []; // physics items: { id, classTsid, tsid, x, y, expiresAt }
 let seq = 0;
@@ -167,15 +180,17 @@ const views = new Map(); // item id -> sprite
 const now = () => Date.now();
 
 function publish(engine) {
+  if (engine) lastEngine = engine;
   if (!engine?.setData) return;
   engine.setData('potionLast', last);
-  engine.setData('potionUses', Object.entries(uses).map(([k, v]) => `${k}:${v}`).join(','));
+  engine.setData('potionUses', Object.entries(usesView(engine)).map(([k, v]) => `${k}:${v}`).join(','));
   engine.setData('potionItems', items.filter((i) => i.tsid === engine.streetTsid).map((i) => i.classTsid).join(','));
   const phys = physicsOf(effects, now());
   engine.setData('potionScale', String(phys.scale));
   engine.setData('potionGravity', String(phys.gravity));
   engine.setData('potionRugs', String(rugTargets.length));
-  engine.setData('potionFavorGiant', favorGiant);
+  engine.setData('potionFavorGiant', giantOf(engine, null) || '');
+  if (keepsCopies(engine, 'potion_favor')) engine.setData('potionFavorGiants', (toolCopies(engine.toolState, 'potion_favor') || []).map((_, i) => giantOf(engine, i) || '-').join(','));
   engine.setData('potionSauce', sauces.filter((i) => i.tsid === engine.streetTsid).map((i) => i.word).join(','));
   engine.setData('potionLetter', letter || '');
 }
@@ -253,9 +268,46 @@ function maxFavorFor(engine, giant) {
   return shrine ? emblemCostFor(shrine, giant) : 0;
 }
 
-function ensureFavorGiant() {
-  if (!favorGiant) favorGiant = chooseFavorGiant();
-  return favorGiant;
+/** The uses left per class as the canvas and tests read them: the copy in use's, when it is not full. */
+function usesView(engine) {
+  if (!engine?.toolState) return { ...uses };
+  const out = {};
+  for (const [cls, def] of Object.entries(POTIONS)) {
+    if (!keepsCopies(engine, cls) || countItem(engine.inv, cls) < 1) continue;
+    const n = copyChargesLeft(engine, cls, null);
+    if (n > 0 && n < def.capacity) out[cls] = n;
+  }
+  return out;
+}
+
+/** Uses left in the copy a verb acts on (undefined: a full one, as potionUsesLeft reads it). */
+function usesFor(engine, classTsid, copy = picked) {
+  if (keepsCopies(engine, classTsid)) return copyChargesLeft(engine, classTsid, copy);
+  return uses[classTsid];
+}
+
+/** A Draught's own Giant (null when none is held or rolled yet). */
+function giantOf(engine, copy = picked) {
+  if (!keepsCopies(engine, 'potion_favor')) return favorGiant || null;
+  const at = verbCopy(engine, 'potion_favor', copy);
+  const g = at >= 0 ? copyTag(engine.toolState, 'potion_favor', at) : null;
+  return typeof g === 'string' ? g : null;
+}
+
+/** onLoad: a bottle without a Giant chooses one (choose_one(config.giants)), once, for that bottle. */
+function ensureFavorGiant(engine, copy = picked) {
+  if (!keepsCopies(engine, 'potion_favor')) {
+    if (!favorGiant) favorGiant = chooseFavorGiant();
+    return favorGiant;
+  }
+  const at = verbCopy(engine, 'potion_favor', copy);
+  if (at < 0) return chooseFavorGiant();
+  let g = copyTag(engine.toolState, 'potion_favor', at);
+  if (typeof g !== 'string' || !g) {
+    g = chooseFavorGiant();
+    setCopyTag(engine.toolState, 'potion_favor', at, g);
+  }
+  return g;
 }
 
 /** canQuaff / canPour for the open bottle, as { ok, error, tooltip } (plus the chosen target). */
@@ -266,7 +318,7 @@ function checkFor(classTsid, engine) {
     case 'potion_elixir_of_avarice':
       return avariceCheck({ crazyActive: engine.hasBuff(CRAZY) });
     case 'potion_favor': {
-      const giant = ensureFavorGiant();
+      const giant = ensureFavorGiant(engine);
       return favorCheck({
         giant,
         quaffedToday: Boolean(today().quaffed[classTsid]),
@@ -311,7 +363,18 @@ function checkFor(classTsid, engine) {
 }
 
 function buttonFor(classTsid, engine) {
-  return potionButton(classTsid, { uses: uses[classTsid], dead: isDead(engine), check: checkFor(classTsid, engine) });
+  return potionButton(classTsid, { uses: usesFor(engine, classTsid), dead: isDead(engine), check: checkFor(classTsid, engine) });
+}
+
+/** Run `fn` with the verbs aimed at one copy (null: the one in use). */
+function withCopy(copy, fn) {
+  const was = picked;
+  picked = copy == null ? null : copy;
+  try {
+    return fn();
+  } finally {
+    picked = was;
+  }
 }
 
 /* ------------------------------------------------------------------ */
@@ -353,6 +416,8 @@ function stopFx() {
 export function usePotionNow(engine, classTsid, extra = {}) {
   const def = POTIONS[classTsid];
   if (!def || countItem(engine.inv, classTsid) < 1 || pending) return null;
+  // The bottle picked (extra.copy) is the one quaffed or poured, all the way to its effect.
+  if (extra.copy != null && picked == null) return withCopy(extra.copy, () => usePotionNow(engine, classTsid, extra));
   const button = buttonFor(classTsid, engine);
   if (!button.enabled) {
     engine.toast?.(button.reason, 2600);
@@ -364,7 +429,8 @@ export function usePotionNow(engine, classTsid, extra = {}) {
   const target = check.target || null;
   // potion_base: announce_sound('POTION_GENERIC'); the client's tool sound is POTION_<CLASS>.
   engine.playSound?.(classTsid.toUpperCase(), { volume: 0.6 });
-  pending = { classTsid, at: now() + POTION_ACTION_MS, target, extra, tsid: engine.streetTsid };
+  const copy = keepsCopies(engine, classTsid) ? verbCopy(engine, classTsid, picked) : null;
+  pending = { classTsid, at: now() + POTION_ACTION_MS, target, extra, tsid: engine.streetTsid, copy };
   pending.fx = bottleFx(engine, classTsid, target);
   last = `${classTsid}:${def.verb}ing`;
   publish(engine);
@@ -373,13 +439,19 @@ export function usePotionNow(engine, classTsid, extra = {}) {
 
 /** onQuaffComplete / onPourComplete. */
 function complete(engine) {
-  const { classTsid, target, extra } = pending;
+  const { classTsid, target, extra, copy } = pending;
   stopFx();
   pending = null;
   if (countItem(engine.inv, classTsid) < 1) return;
-  const result = EFFECTS[classTsid]?.(engine, { target, extra }) || { ok: false };
+  // A copy that is no longer there (sold or given during the 2.5 s) falls back to the one in use.
+  const at = copy != null && copy < countItem(engine.inv, classTsid) ? copy : null;
+  const result = withCopy(at, () => EFFECTS[classTsid]?.(engine, { target, extra })) || { ok: false };
   const def = POTIONS[classTsid];
-  if (result.ok && !result.noUse) {
+  if (result.ok && !result.noUse && keepsCopies(engine, classTsid)) {
+    spendCopyCharge(engine, classTsid, at);
+    engine.achievement(`potions_used:${classTsid}`, 1);
+    for (const row of itemVerbAchievementCounters(classTsid, def.verb)) engine.achievement(row.counter, row.amount);
+  } else if (result.ok && !result.noUse) {
     const used = usePotion(classTsid, uses[classTsid]);
     if (used.emptied) {
       removeItem(engine.inv, classTsid, 1);
@@ -476,7 +548,7 @@ const EFFECTS = {
   },
 
   potion_favor(engine) {
-    const giant = ensureFavorGiant();
+    const giant = ensureFavorGiant(engine);
     const check = checkFor('potion_favor', engine);
     if (!check.ok) return { ok: false, msg: check.error };
     today().quaffed.potion_favor = 1;
@@ -571,14 +643,20 @@ const EFFECTS = {
 };
 
 /** potion_favor.js verbs.shake. */
-export function shakeFavor(engine) {
+export function shakeFavor(engine, copy = picked) {
   const button = favorShakeButton(today().shakes);
   if (!button.enabled) {
     engine.toast?.(button.reason, 2600);
     return false;
   }
-  const out = shakeFavorGiant(ensureFavorGiant());
-  favorGiant = out.giant;
+  // verbs.shake changes this bottle's Giant (setFavorGiant on the bottle shaken).
+  const out = shakeFavorGiant(ensureFavorGiant(engine, copy));
+  if (keepsCopies(engine, 'potion_favor')) {
+    const at = verbCopy(engine, 'potion_favor', copy);
+    if (at >= 0) setCopyTag(engine.toolState, 'potion_favor', at, out.giant);
+  } else {
+    favorGiant = out.giant;
+  }
   today().shakes += 1;
   engine.pushActivity?.(out.message);
   last = `potion_favor:shake:${out.giant}`;
@@ -1058,6 +1136,42 @@ async function runAutoplay(engine) {
 /* Feature                                                              */
 /* ------------------------------------------------------------------ */
 
+
+/** One pack verb on a potion (the copy `copy`, or the one in use). */
+function runPotionVerb(classTsid, verbId, engine, copy) {
+  const def = POTIONS[classTsid];
+  if (classTsid === 'potion_favor' && verbId === 'shake') {
+    shakeFavor(engine, copy);
+    return true;
+  }
+  if (!def || def.verb !== verbId) return false;
+  if (classTsid === 'potion_keycutter_tonic') {
+    const keys = keyChoices(engine.inv);
+    const button = buttonFor(classTsid, engine);
+    if (!button.enabled || pending) {
+      if (!button.enabled) engine.toast?.(button.reason, 2600);
+      return true;
+    }
+    // valid_items: the client asks which key.
+    questRoomConverse(engine, {
+      title: def.name,
+      kicker: 'Quaff',
+      text: def.tooltip,
+      choices: [...keys.map((k) => ({ label: labelOf(k), value: k })), { label: 'Cancel', value: 'cancel' }],
+    }).then((key) => {
+      if (key && key !== 'cancel' && key !== 'ok') usePotionNow(engine, classTsid, { key, copy });
+    });
+    return true;
+  }
+  if (classTsid === 'potion_alphabet_sauce') {
+    if (pending) return true;
+    askSauce(engine, (value) => pourSauce(engine, value));
+    return true;
+  }
+  usePotionNow(engine, classTsid, { copy });
+  return true;
+}
+
 export const potionsFeature = {
   id: POTIONS_FEATURE_ID,
 
@@ -1129,45 +1243,18 @@ export const potionsFeature = {
     daily = { day: getGameDayKey(t), quaffed: {}, shakes: 0 };
   },
 
-  packVerbs(classTsid, engine) {
+  packVerbs(classTsid, engine, opts = {}) {
     if (!POTIONS[classTsid] || countItem(engine.inv, classTsid) < 1) return [];
-    const out = [buttonFor(classTsid, engine)];
-    if (classTsid === 'potion_favor') out.push(favorShakeButton(today().shakes));
-    return out;
+    return withCopy(opts?.copy, () => {
+      const out = [buttonFor(classTsid, engine)];
+      if (classTsid === 'potion_favor') out.push(favorShakeButton(today().shakes));
+      return out;
+    });
   },
 
-  runPackVerb(classTsid, verbId, engine) {
-    const def = POTIONS[classTsid];
-    if (classTsid === 'potion_favor' && verbId === 'shake') {
-      shakeFavor(engine);
-      return true;
-    }
-    if (!def || def.verb !== verbId) return false;
-    if (classTsid === 'potion_keycutter_tonic') {
-      const keys = keyChoices(engine.inv);
-      const button = buttonFor(classTsid, engine);
-      if (!button.enabled || pending) {
-        if (!button.enabled) engine.toast?.(button.reason, 2600);
-        return true;
-      }
-      // valid_items: the client asks which key.
-      questRoomConverse(engine, {
-        title: def.name,
-        kicker: 'Quaff',
-        text: def.tooltip,
-        choices: [...keys.map((k) => ({ label: labelOf(k), value: k })), { label: 'Cancel', value: 'cancel' }],
-      }).then((key) => {
-        if (key && key !== 'cancel' && key !== 'ok') usePotionNow(engine, classTsid, { key });
-      });
-      return true;
-    }
-    if (classTsid === 'potion_alphabet_sauce') {
-      if (pending) return true;
-      askSauce(engine, (value) => pourSauce(engine, value));
-      return true;
-    }
-    usePotionNow(engine, classTsid);
-    return true;
+  runPackVerb(classTsid, verbId, engine, opts = {}) {
+    if (!POTIONS[classTsid]) return false;
+    return withCopy(opts?.copy, () => runPotionVerb(classTsid, verbId, engine, picked));
   },
 
   verbsFor(target) {
@@ -1181,16 +1268,26 @@ export const potionsFeature = {
   },
 
   save() {
-    return { version: 1, uses: { ...uses }, favorGiant, daily: { ...daily, quaffed: { ...daily.quaffed } }, items: items.map((i) => ({ ...i })), seq, sauces: sauces.map((i) => ({ ...i })), letter };
+    // version 2: each bottle's uses and Giant are saved with the pack's tools (js/tools.js); uses and
+    // favorGiant stay only for an engine with no tool state.
+    return { version: 2, ...(Object.keys(uses).length ? { uses: { ...uses } } : {}), ...(favorGiant ? { favorGiant } : {}), daily: { ...daily, quaffed: { ...daily.quaffed } }, items: items.map((i) => ({ ...i })), seq, sauces: sauces.map((i) => ({ ...i })), letter };
   },
 
-  restore(slice) {
+  restore(slice, engine) {
+    lastEngine = engine || lastEngine;
     uses = {};
+    favorGiant = '';
+    // An older save's one count per class (and one Giant) is the first bottle's: the one a quaff
+    // used. Every other bottle held is new, full and rolls its own Giant (2026-11-04).
     for (const [k, v] of Object.entries(slice?.uses || {})) {
       const n = Math.floor(Number(v));
-      if (POTIONS[k] && n > 0 && n < POTIONS[k].capacity) uses[k] = n;
+      if (!(POTIONS[k] && n > 0 && n < POTIONS[k].capacity)) continue;
+      if (keepsCopies(engine, k)) migrateClassValue(engine.toolState, k, n);
+      else uses[k] = n;
     }
-    favorGiant = typeof slice?.favorGiant === 'string' ? slice.favorGiant : '';
+    const g = typeof slice?.favorGiant === 'string' ? slice.favorGiant : '';
+    if (g && keepsCopies(engine, 'potion_favor')) migrateClassTag(engine.toolState, 'potion_favor', g);
+    else favorGiant = g;
     const d = slice?.daily || {};
     daily = { day: String(d.day || ''), quaffed: { ...(d.quaffed || {}) }, shakes: Math.max(0, Math.floor(Number(d.shakes) || 0)) };
     const t = now();
@@ -1210,7 +1307,7 @@ export const potionsFeature = {
 
   /** Tests. */
   _state() {
-    return { uses: { ...uses }, favorGiant, daily, items: items.map((i) => ({ ...i })), effects: { ...effects }, pending: pending ? pending.classTsid : null, last, rugs: rugTargets.length, sauces: sauces.map((i) => ({ ...i })), letter };
+    return { uses: usesView(lastEngine), favorGiant: giantOf(lastEngine, null) || favorGiant, daily, items: items.map((i) => ({ ...i })), effects: { ...effects }, pending: pending ? pending.classTsid : null, last, rugs: rugTargets.length, sauces: sauces.map((i) => ({ ...i })), letter };
   },
   _complete(engine) {
     if (pending) complete(engine);

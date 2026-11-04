@@ -43,7 +43,7 @@ test.describe('integration playtest regressions', () => {
   });
 
   test('the Magic Rock waits out rook attacks, Naraka and meditation', async () => {
-    const { createFeatureHost } = await import('../public/js/feature-host.js?v=2ed3c069');
+    const { createFeatureHost } = await import('../public/js/feature-host.js?v=020c9329');
     const { rookAttackFeature } = await import('../public/js/features/rook-attack-feature.js?v=1f9292b9');
     const { hellFeature } = await import('../public/js/features/hell-feature.js?v=4c54964f');
     const { createRookAttack } = await import('../public/js/rook-attack.js?v=4a0fb648');
@@ -69,7 +69,7 @@ test.describe('integration playtest regressions', () => {
   });
 
   test('vendor receipts say "1 currant"', async () => {
-    const { vendorSell } = await import('../public/js/vendor.js?v=c155d9ae');
+    const { vendorSell } = await import('../public/js/vendor.js?v=2f8d159f');
     const { createInventory } = await import('../public/js/inventory.js?v=d82f3b00');
     const inv = createInventory();
     inv.grain = 1;
@@ -81,7 +81,7 @@ test.describe('integration playtest regressions', () => {
   });
 
   test('closed roads refuse signposts, doors and teleports, not other ways in (ticket 37)', async () => {
-    const { createFeatureHost } = await import('../public/js/feature-host.js?v=2ed3c069');
+    const { createFeatureHost } = await import('../public/js/feature-host.js?v=020c9329');
     const seen = [];
     const host = createFeatureHost([{ id: 'probe', travelGate: (tsid, engine, meta) => { seen.push(meta); return meta.via === 'signpost' ? { ok: false } : null; } }]);
     assert.equal(host.travelGate('L1', {}, { via: 'signpost' }).ok, false);

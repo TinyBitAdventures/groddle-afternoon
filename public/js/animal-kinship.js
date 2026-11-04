@@ -17,7 +17,7 @@ import {
   setToolRemaining,
   takeToolCopy,
   useToolCondition,
-} from './tools.js?v=9a5a4323';
+} from './tools.js?v=2337f66a';
 import { SKILL_PACKAGES, getSkillPackageOverride, skillPackageDetails } from './skill-packages.js?v=bfb87281';
 import { loseEnergy, metabolicGain, moodMax } from './metabolics.js?v=8504134e';
 import { grantMoodXp } from './mood-xp.js?v=958e7680';

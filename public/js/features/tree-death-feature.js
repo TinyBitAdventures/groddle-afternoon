@@ -54,9 +54,11 @@
  * treeGuilt, treeDeaths, treePoisonAutoplay.
  */
 
+import { copyFromLedger, keepsCopies } from '../copy-charges.js?v=174642e2';
+import { migrateClassValue } from '../tools.js?v=2337f66a';
 import { ITEM_CATALOG, ensureItem } from '../inventory.js?v=d82f3b00';
 import { moodMax } from '../metabolics.js?v=8504134e';
-import { plantChoices } from '../patches.js?v=877b27e9';
+import { plantChoices } from '../patches.js?v=bfda863e';
 import { textureFromUrl } from '../textures.js?v=3149d699';
 import { displayTopOf, itemstackOverlayPoint, playSheetOverlay } from '../overlay-art.js?v=11b6dd7f';
 import {
@@ -84,8 +86,8 @@ import {
   quoteAntidoteVerb,
   quotePoisonVerb,
   treeDeathOutcome,
-} from '../tree-poison.js?v=f6e01177';
-import { patchesFeature } from './patches-feature.js?v=fda9d58d';
+} from '../tree-poison.js?v=f80aeb85';
+import { patchesFeature } from './patches-feature.js?v=1a8e729f';
 
 export const TREE_DEATH_FEATURE_ID = 'tree-death';
 const VERB_PREFIX = 'treepoison:';
@@ -224,7 +226,7 @@ function publish(engine) {
     .map((t) => `${t.classId}@${Math.round(t.sprite.x)}:${Math.ceil(poisonRemainingMs(t.state, now) / 1000)}`);
   engine.setData('treePoisoned', poisoned.join(',') || 'none');
   engine.setData('treePoisonLast', last || 'none');
-  engine.setData('treePoisonUses', `poison:${bottleUsesLeft(bottles, TREE_POISON, engine.inv)},antidote:${bottleUsesLeft(bottles, TREE_ANTIDOTE, engine.inv)}`);
+  engine.setData('treePoisonUses', `poison:${bottleUsesLeft(bottlesFor(engine), TREE_POISON, engine.inv)},antidote:${bottleUsesLeft(bottlesFor(engine), TREE_ANTIDOTE, engine.inv)}`);
   engine.setData('treeGuilt', guiltLabel(guiltNow(engine)));
   const replaced = engine.streetSlot ? engine.streetSlot(TREE_DEATH_FEATURE_ID).replaced || {} : {};
   engine.setData('treeDeaths', Object.keys(replaced).length);
@@ -347,11 +349,22 @@ function askServer(engine, kind, target) {
 function bottleFromLedger(engine, potionClass, use) {
   const left = Math.max(0, Math.floor(Number(use.left) || 0));
   if (use.spent) engine.query?.('ledgerReceipt', String(use.op || ''), engine);
-  bottles.uses[potionClass] = use.spent ? 1 : Math.min(4, left) + 1;
+  // The ledger used the bottle in use (the first in pack order), as the pour here does online.
+  if (keepsCopies(engine, potionClass)) copyFromLedger(engine, potionClass, null, use);
+  else bottles.uses[potionClass] = use.spent ? 1 : Math.min(4, left) + 1;
+}
+
+/**
+ * The bottles a pour uses: each bottle's own uses in the pack's tool state (js/tools.js copies), the
+ * one picked (`copy`) or the one in use; `bottles.uses` only for an engine without a tool state.
+ */
+function bottlesFor(engine, copy = null) {
+  if (!engine?.toolState) return bottles;
+  return { uses: bottles.uses, tools: engine.toolState, copy: Number.isInteger(copy) ? copy : null };
 }
 
 /** onPourComplete for either potion on a tree target. */
-function completePour(engine, kind, target) {
+function completePour(engine, kind, target, copy = null) {
   if (!isTreeTarget(target) || !(engine.interactables || []).includes(target)) {
     say(engine, kind === 'poison' ? "I can't find a tree anywhere!" : POISON_COPY.noAntidoteTarget, false);
     return false;
@@ -362,7 +375,8 @@ function completePour(engine, kind, target) {
     if (!q.enabled) return say(engine, q.reason || POISON_COPY.noPoisonTarget, false), false;
     // Multiplayer: the street hears of it first; its go-ahead runs this pour again (the grant).
     if (askServer(engine, kind, target)) return true;
-    const res = performPoisonPour(target.state, { ...ctx, now: Date.now(), durationMs: poisonMs(engine), bottles });
+    // Online the ledger used the bottle in use; solo the bottle picked in the pack (pouring.copy).
+    const res = performPoisonPour(target.state, { ...ctx, now: Date.now(), durationMs: poisonMs(engine), bottles: bottlesFor(engine, sharedTree(engine, target) ? null : copy) });
     if (!res.ok) return say(engine, res.msg, false), false;
     applyGuiltChange(engine, res.guilt);
     if (res.moodLost) engine.floatText?.(engine.player.x + 20, engine.player.y - 90, `-${res.moodLost} mood`, 0xff8888);
@@ -374,7 +388,7 @@ function completePour(engine, kind, target) {
     if (askServer(engine, kind, target)) return true;
     // G268: the pour asks the metabolic gate itself, after it lands, and the
     // gate says "You would have gained some mood, but you're dead!".
-    const res = performAntidotePour(target.state, { ...ctx, bottles });
+    const res = performAntidotePour(target.state, { ...ctx, bottles: bottlesFor(engine, sharedTree(engine, target) ? null : copy) });
     if (!res.ok) return say(engine, res.msg, false), false;
     dropOverlay(target);
     if (res.moodGained) engine.floatText?.(engine.player.x + 20, engine.player.y - 90, `+${res.moodGained} mood`, 0xffe066);
@@ -432,20 +446,21 @@ function hideReplacedTrees(engine) {
   }
 }
 
-function startPackPour(engine, kind) {
+function startPackPour(engine, kind, copy = null) {
   if (pouring) return say(engine, 'You are already pouring a potion.', false), true;
   const ctx = ctxFor(engine);
   const target = closestTree(engine, kind === 'antidote');
   const check = kind === 'poison' ? canPourPoison(target, ctx) : canPourAntidote(target, ctx);
   if (!check.ok) return say(engine, check.msg, false), true;
-  beginPour(engine, kind, target, true);
+  beginPour(engine, kind, target, true, copy);
   return true;
 }
 
-function beginPour(engine, kind, target, timed) {
+function beginPour(engine, kind, target, timed, copy = null) {
   stopPourFx();
   engine.playSound?.('POTION_GENERIC', { volume: 0.6 });
-  pouring = { kind, target, at: Date.now(), timed, fx: pourFx(engine, kind === 'poison' ? TREE_POISON : TREE_ANTIDOTE, target) };
+  // The bottle picked in the pack (its place in pack order) is the one poured.
+  pouring = { kind, target, at: Date.now(), timed, copy: Number.isInteger(copy) ? copy : null, fx: pourFx(engine, kind === 'poison' ? TREE_POISON : TREE_ANTIDOTE, target) };
 }
 
 // ---------------------------------------------------------------------------
@@ -619,10 +634,10 @@ export const treeDeathFeature = {
     if (pouring) {
       tickPourFx(pouring.fx, engine, dtMs);
       if (now - pouring.at >= POUR_MS) {
-        const { kind, target, timed } = pouring;
+        const { kind, target, timed, copy } = pouring;
         stopPourFx();
         pouring = null;
-        if (timed) completePour(engine, kind, target);
+        if (timed) completePour(engine, kind, target, copy);
       }
     }
     for (const target of [...overlays.keys()]) {
@@ -685,13 +700,13 @@ export const treeDeathFeature = {
     return true;
   },
 
-  packVerbs(classTsid, engine) {
+  packVerbs(classTsid, engine, opts = {}) {
     if (classTsid !== TREE_POISON && classTsid !== TREE_ANTIDOTE) return [];
     const kind = classTsid === TREE_POISON ? 'poison' : 'antidote';
     const ctx = ctxFor(engine);
     const target = closestTree(engine, kind === 'antidote');
     const check = kind === 'poison' ? canPourPoison(target, ctx) : canPourAntidote(target, ctx);
-    const uses = `${bottleUsesLeft(bottles, classTsid, engine.inv)} of 5 left`;
+    const uses = `${bottleUsesLeft(bottlesFor(engine, opts?.copy ?? null), classTsid, engine.inv)} of 5 left`;
     const tip = kind === 'poison' ? POISON_COPY.pourPoisonTip : POISON_COPY.pourAntidoteTip;
     return [{ id: 'pour', label: 'Pour', enabled: check.ok, reason: check.msg || '', tooltip: `${tip} · ${uses}`, primary: check.ok }];
   },
@@ -709,9 +724,9 @@ export const treeDeathFeature = {
     return true;
   },
 
-  runPackVerb(classTsid, verbId, engine) {
+  runPackVerb(classTsid, verbId, engine, opts = {}) {
     if (verbId !== 'pour' || (classTsid !== TREE_POISON && classTsid !== TREE_ANTIDOTE)) return false;
-    return startPackPour(engine, classTsid === TREE_POISON ? 'poison' : 'antidote');
+    return startPackPour(engine, classTsid === TREE_POISON ? 'poison' : 'antidote', opts?.copy ?? null);
   },
 
   /** patch.js plantBean: planting a bean eases Poisoner's Guilt. */
@@ -725,11 +740,19 @@ export const treeDeathFeature = {
   },
 
   save() {
-    return { version: 1, ...bottles };
+    // version 2: each bottle's uses are saved with the pack's tools (js/tools.js); `uses` only without them.
+    return { version: 2, ...bottles };
   },
 
-  restore(slice) {
+  restore(slice, engine) {
     bottles = createPoisonBottleState(slice || {});
+    // An older save's one count per class is the first bottle's (the one a pour used); others are full.
+    if (engine?.toolState) {
+      for (const [cls, n] of Object.entries(bottles.uses)) {
+        if (keepsCopies(engine, cls) && n > 0 && n < 5) migrateClassValue(engine.toolState, cls, n);
+      }
+      bottles = createPoisonBottleState();
+    }
   },
 
   /** QA / tests. */

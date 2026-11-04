@@ -30,11 +30,11 @@ import {
   rollCrack,
   stackMaxFor,
 } from '../public/js/artifacts.js?v=fc419ecf';
-import { artifactsFeature, finishCrack } from '../public/js/features/artifacts-feature.js?v=0a512e1d';
-import { FEATURES } from '../public/js/features/index.js?v=890aed4a';
+import { artifactsFeature, finishCrack } from '../public/js/features/artifacts-feature.js?v=05c56eed';
+import { FEATURES } from '../public/js/features/index.js?v=88294a3c';
 import { DROP_ITEMS, DROP_TABLES, rollDropTable } from '../public/js/drop-tables.js?v=0f922478';
 import { ITEM_CATALOG } from '../public/js/inventory.js?v=d82f3b00';
-import { createToolConditionState, getToolCondition } from '../public/js/tools.js?v=9a5a4323';
+import { createToolConditionState, getToolCondition } from '../public/js/tools.js?v=2337f66a';
 import { HIRES_ICONS } from '../public/js/icon-hires.js?v=5b68aeaa';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');

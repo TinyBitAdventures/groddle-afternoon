@@ -5,7 +5,7 @@
  */
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { createGarden, SEED_CATALOG } from '../public/js/garden.js?v=800ce1a0';
+import { createGarden, SEED_CATALOG } from '../public/js/garden.js?v=4bcd97f3';
 import {
   GARDEN_POTIONS,
   POTION_USES,
@@ -17,7 +17,7 @@ import {
   pickedMessage,
   potionTendGarden,
   usePotion,
-} from '../public/js/master-garden.js?v=03f7810a';
+} from '../public/js/master-garden.js?v=0a861152';
 import { remakeStatus } from '../public/js/imagination-remake.js?v=c37ad887';
 
 const MG = ['croppery_1', 'mastergardener_1'];

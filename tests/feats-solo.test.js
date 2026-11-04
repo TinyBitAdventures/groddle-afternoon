@@ -44,9 +44,9 @@ import {
 } from '../public/js/solo-feats.js?v=40f8c7b5';
 import { DAY_NAMES, GAME_DAY_MS } from '../public/js/game-day.js?v=edb00566';
 import { soloFeatsFeature } from '../public/js/features/solo-feats-feature.js?v=5ba19d5e';
-import { FEATURES } from '../public/js/features/index.js?v=890aed4a';
-import { createPlayerSave, parsePlayerSave, serializePlayerSave } from '../public/js/player-save.js?v=681aa8e6';
-import { createResourceNode, harvestResourceNode } from '../public/js/resource-nodes.js?v=a029b488';
+import { FEATURES } from '../public/js/features/index.js?v=88294a3c';
+import { createPlayerSave, parsePlayerSave, serializePlayerSave } from '../public/js/player-save.js?v=a9c44696';
+import { createResourceNode, harvestResourceNode } from '../public/js/resource-nodes.js?v=7c982611';
 
 const ROOT = join(import.meta.dirname, '..');
 const GSJS = join(ROOT, '..', 'glitch-GameServerJS');
@@ -523,7 +523,7 @@ describe('G178 Feat follow-ups', () => {
   });
 
   it('hands the detail to every onEvent through the feature host', async () => {
-    const { createFeatureHost } = await import('../public/js/feature-host.js?v=2ed3c069');
+    const { createFeatureHost } = await import('../public/js/feature-host.js?v=020c9329');
     const seen = [];
     const host = createFeatureHost([{ id: 't', onEvent: (...args) => seen.push(args) }]);
     host.event('npc_batterfly:feed', 1, 'E', { animal: 'x' });

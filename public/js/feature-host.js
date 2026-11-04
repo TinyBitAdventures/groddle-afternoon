@@ -29,9 +29,11 @@
  *                                         //    airAccel, friction, tripleJump (multiply), airDrag
  *                                         //    (per second, max wins), airFriction (signed
  *                                         //    friction_air, max wins), jetpack (any true)
- *   packVerbs(classTsid, engine)          // -> [{ id, label, enabled, reason, tooltip, primary }]
- *                                         //    extra buttons on that item's pack popover
- *   runPackVerb(classTsid, verbId, engine)// -> true when handled
+ *   packVerbs(classTsid, engine, opts)    // -> [{ id, label, enabled, reason, tooltip, primary }]
+ *                                         //    extra buttons on that item's pack popover;
+ *                                         //    opts.copy: which of the class's copies the menu is
+ *                                         //    about (js/tools.js, its place in pack order), or null
+ *   runPackVerb(classTsid, verbId, engine, opts) // -> true when handled (opts as packVerbs)
  *   mapCards(engine)                      // -> [HTMLElement] cards shown above the Map canvas
  *   furnitureRow(street, base, engine)    // -> street furniture row (base = the archived row or null),
  *                                         //    row.at[classTsid] = fixed screen points (engine.query)
@@ -190,22 +192,22 @@ export function createFeatureHost(features = []) {
       return out;
     },
     /** Pack popover verbs every feature offers for one item class. */
-    packVerbs(classTsid, engine) {
+    packVerbs(classTsid, engine, opts = {}) {
       const out = [];
       for (const feature of list) {
         if (typeof feature.packVerbs !== 'function') continue;
-        for (const verb of feature.packVerbs(classTsid, engine) || []) {
+        for (const verb of feature.packVerbs(classTsid, engine, opts) || []) {
           if (verb && typeof verb.id === 'string') out.push({ ...verb, featureId: feature.id });
         }
       }
       return out;
     },
     /** Route a pack verb to the feature that offered it (or the first that handles it). */
-    runPackVerb(classTsid, verbId, engine, featureId = '') {
+    runPackVerb(classTsid, verbId, engine, featureId = '', opts = {}) {
       const owners = featureId && byId.has(featureId) ? [byId.get(featureId)] : list;
       for (const feature of owners) {
         if (typeof feature.runPackVerb !== 'function') continue;
-        if (feature.runPackVerb(classTsid, verbId, engine) === true) return true;
+        if (feature.runPackVerb(classTsid, verbId, engine, opts) === true) return true;
       }
       return false;
     },

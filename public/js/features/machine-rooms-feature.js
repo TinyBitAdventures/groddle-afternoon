@@ -84,8 +84,8 @@ import {
   secondsToString,
   takeJobIngredients,
   tankFuel,
-} from '../machine-rooms.js?v=c06f81bf';
-import { refuelMachine, MAX_FUEL } from '../machines.js?v=0283be81';
+} from '../machine-rooms.js?v=147cd1ca';
+import { refuelMachine, MAX_FUEL } from '../machines.js?v=35fdd416';
 import { DROP_ITEMS, applyDropResult, isEmptyDrop, rollDropTable } from '../drop-tables.js?v=0f922478';
 import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=d82f3b00';
 import { energyMax, moodMax } from '../metabolics.js?v=8504134e';

@@ -25,10 +25,10 @@ import { BUTTER_UP, butterUpChicken } from '../public/js/animal-flattery.js?v=63
 import { SET_FREE, applySetFree } from '../public/js/animal-set-free.js?v=3b194fca';
 import { applyVerbReward, getVerbReward } from '../public/js/verb-rewards.js?v=d3ce41d5';
 import { createInventory, countItem } from '../public/js/inventory.js?v=d82f3b00';
-import { startAssembly, startDisassembly } from '../public/js/machines.js?v=0283be81';
-import { createToolConditionState, repairToolCondition, setToolRemaining } from '../public/js/tools.js?v=9a5a4323';
-import { smeltMetalRocks } from '../public/js/mining.js?v=e0f8399a';
-import { craftRecipe } from '../public/js/making.js?v=07767a47';
+import { startAssembly, startDisassembly } from '../public/js/machines.js?v=35fdd416';
+import { createToolConditionState, repairToolCondition, setToolRemaining } from '../public/js/tools.js?v=2337f66a';
+import { smeltMetalRocks } from '../public/js/mining.js?v=4f8dc32e';
+import { craftRecipe } from '../public/js/making.js?v=3f6c5965';
 import { doChore, neighbourById, normalizeNeighbourState } from '../public/js/neighbours.js?v=862857f9';
 
 const here = dirname(fileURLToPath(import.meta.url));

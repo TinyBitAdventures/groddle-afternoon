@@ -68,8 +68,103 @@ export const TOOL_CONDITION_CATALOG = Object.freeze({
   // (469 max_consumable), stackmax 1 (15). Held here so each jar keeps its own Fireflies and they
   // go with it wherever a tool's wear goes (bags, drops, gifts, trades, auctions, storage, the
   // site's ledger `r`). `contents`: a new copy starts at `empty`, never breaks, never wears.
-  firefly_jar: { label: 'Firefly Jar', capacity: 7, baseCost: 100, repairable: false, contents: true, empty: 0, source: 'firefly_jar.js num_flies' },
+  firefly_jar: { label: 'Firefly Jar', capacity: 7, baseCost: 100, repairable: false, contents: true, empty: 0, jar: true, source: 'firefly_jar.js num_flies' },
+  // A Butterfly Net is a tool like any other (butterfly_net.js 16, 25, 32: base_cost 150,
+  // points_capacity 100, points_remaining 100; tool_base repair).
+  butterfly_net: { label: 'Butterfly Net', capacity: 100, baseCost: 150, source: 'butterfly_net.js' },
+  // dusty_stick.js 25, 32: points_capacity 20, points_remaining 20; Unleash empties it (298) and
+  // it comes back one point every 12 minutes (onRejuvination 336-343). No repair: it refills itself.
+  // Held as contents (it never breaks, it recharges): a new stick holds 20.
+  dusty_stick: { label: 'Dusty Stick', capacity: 20, baseCost: 0, repairable: false, contents: true, empty: 20, meter: 'Points', source: 'dusty_stick.js' },
+  ...chargeClasses(),
+  ...taggedClasses(),
 });
+
+/*
+ * Per copy, as Glitch kept them per item (2026-11-04: a type-level value made a new copy inherit the
+ * old one's). `charges`: uses or charges that run down and empty the copy, which then leaves the pack
+ * (tool_base use(1) and apiConsume at 0 for potions; powder_base use() and apiDelete at 0 for
+ * powders); a new copy holds `capacity`, never breaks and is never repaired. `meter` names what the
+ * number counts. `contents` with `bits`: the Emotional Bear's upgrades (emotional_bear.js 620-641,
+ * this.upgrades per bear), one bit each. `tags`: a copy's own words (a Cubimal's name, a lit
+ * pumpkin's phrases, a Still's hopper and Hooch, a Draught's Giant), kept beside the copies in
+ * row.tags; they move with the copy in the pack and its bags, and a copy that arrives from elsewhere
+ * starts fresh (the ledger and the server carry numbers). baseCost 0: the vendor's catalog price.
+ */
+function chargeClasses() {
+  const charge = (label, capacity, source, meter = 'Uses') =>
+    ({ label, capacity, baseCost: 0, repairable: false, charges: true, meter, source });
+  const potion = (cls, label, capacity) => [cls, charge(label, capacity, `${cls}.js points_remaining`)];
+  const powder = (cls, label) => [cls, charge(label, 5, `${cls}.js charges (powder_base maxCharges 5)`, 'Charges')];
+  return Object.fromEntries([
+    // js/potions.js POTIONS (the bottles with more than one use; one-use bottles hold nothing).
+    potion('potion_amorous_philtre', 'Amorous Philtre', 5),
+    potion('potion_elixir_of_avarice', 'Elixir of Avarice', 5),
+    // potion_favor.js 25 points_capacity 11 (its initInstanceProps 35 says 5, tool_base's default; the remake gives 11).
+    ['potion_favor', { ...charge('Draught of Giant Amicability', 11, 'potion_favor.js points_capacity; favor_giant per bottle (onLoad 585-589)'), tags: true }],
+    potion('potion_keycutter_tonic', 'Keycutter Tonic', 5),
+    potion('potion_animal_youth', 'Potion of Animal Youth', 3),
+    potion('potion_avatar_large', 'Embiggenifying Potion', 5),
+    potion('potion_avatar_small', 'De-Embiggenifying Potion', 5),
+    potion('potion_trantsformation_fluid', 'Trantsformation Fluid', 3),
+    potion('potion_xp', 'Draught of Wisdom', 5),
+    potion('potion_rocky_regeneration_solution', 'Rocky Regeneration Solution', 3),
+    // js/tree-poison.js POTION_USES (potion_tree_poison.js 36, potion_tree_poison_antidote.js 36).
+    potion('potion_tree_poison', 'Tree Poison', 5),
+    potion('potion_tree_poison_antidote', 'Tree Poison Antidote', 5),
+    // js/master-garden.js POTION_USES 5 (potion_garden_*.js 36 points_remaining 5).
+    potion('potion_garden_water', 'Soak-All Solution', 5),
+    potion('potion_garden_plant', 'Seed-Dibber Libation', 5),
+    potion('potion_garden_harvest', 'Manyharvest Cordial', 5),
+    potion('potion_garden_clear', 'Liquid Super-Hoe', 5),
+    potion('potion_garden_fertilize', 'Dung-Kicker Drops', 5),
+    // js/powders.js POWDERS with maxCharges 5 (<powder>.js 23, 33).
+    powder('sneezing_powder', 'Sneezing Powder'),
+    powder('sparkle_powder', 'Sparkle Powder'),
+    powder('powder_of_mild_fecundity', 'Powder of Mild Fecundity'),
+    powder('powder_of_startling_fecundity', 'Powder of Startling Fecundity'),
+    powder('fertilidust', 'Fertilidust'),
+    powder('fertilidust_lite', 'Fertilidust Lite'),
+    powder('fairly_hallowed_shrine_powder', 'Fairly Hallowed Shrine Powder'),
+    powder('extremely_hallowed_shrine_powder', 'Extremely Hallowed Shrine Powder'),
+    powder('juju_shoo_shoo_powder', 'Juju Shoo-Shoo Powder'),
+  ]);
+}
+
+function taggedClasses() {
+  const tagged = (label, source) => ({ label, capacity: 0, baseCost: 0, repairable: false, contents: true, empty: 0, tags: true, noMeter: true, source });
+  const cubimals = ['chick', 'piggy', 'butterfly', 'crab', 'batterfly', 'frog', 'firefly', 'bureaucrat', 'cactus', 'snoconevendor', 'squid', 'juju', 'smuggler', 'deimaginator', 'greeterbot', 'dustbunny', 'gwendolyn', 'unclefriendly', 'helga', 'magicrock', 'yeti', 'rube', 'rook', 'fox', 'sloth', 'emobear', 'foxranger', 'groddlestreetspirit', 'uraliastreetspirit', 'firebogstreetspirit', 'gnome', 'butler', 'craftybot', 'phantom', 'ilmenskiejones', 'trisor', 'toolvendor', 'mealvendor', 'gardeningtoolsvendor', 'maintenancebot', 'senorfunpickle', 'hellbartender', 'scionofpurple'];
+  return Object.fromEntries([
+    // npc_cubimal_*.js user_name per figure (npc_cubimal_chick.js 437-483, getLabel 581-583).
+    ...cubimals.map((slug) => [`npc_cubimal_${slug}`, tagged('Cubimal', `npc_cubimal_${slug}.js user_name`)]),
+    // pumpkin_lit_*.js this.phrases per pumpkin (380-391, at most 3).
+    ...[1, 2, 3, 4, 5].map((n) => [`pumpkin_lit_${n}`, tagged('Lit Pumpkin', `pumpkin_lit_${n}.js phrases`)]),
+    // still.js 30-31 instanceProps hooch and hopper_amount per Still.
+    ['still', tagged('Still', 'still.js hooch, hopper_amount')],
+    // emotional_bear.js 620-641: this.upgrades per bear. Bit 1 Lips (kiss), bit 2 Moon.
+    ['emotional_bear', { label: 'Emotional Bear', capacity: 3, baseCost: 0, repairable: false, contents: true, empty: 0, bits: ['kiss', 'moon'], noMeter: true, source: 'emotional_bear.js upgrades' }],
+  ]);
+}
+
+/** Whether a class is a tool that wears (not charges, contents or a copy's own words): the catalog's and the job board's tools. */
+export function isWearTool(classTsid) {
+  const def = TOOL_CONDITION_CATALOG[classTsid];
+  return Boolean(def && !def.charges && !def.tags && !def.bits && !def.jar);
+}
+
+/** Whether a class's copies run down and empty (potions, powders). */
+export function isChargesClass(classTsid) {
+  return TOOL_CONDITION_CATALOG[classTsid]?.charges === true;
+}
+
+/** What a copy's number says in the pack menu: "Uses 3/5", "Charges 4/5", "Fireflies 2/7", wear, or null (no meter). */
+export function copyMeterNote(classTsid, condition) {
+  const def = TOOL_CONDITION_CATALOG[classTsid];
+  if (!def || !condition?.tracked || def.noMeter) return null;
+  if (def.jar) return `Fireflies ${condition.remaining}/${condition.capacity}`;
+  if (def.charges || def.meter) return `${def.meter || 'Uses'} ${condition.remaining}/${condition.capacity}`;
+  return null;
+}
 
 /** Whether a class's copies hold contents (a Firefly Jar's Fireflies), not wear. */
 export function isContentsClass(classTsid) {
@@ -199,7 +294,31 @@ export const ITEM_ARRIVING = Symbol.for('groddle.itemArriving');
 /** A copy's points, clamped to the class's capacity; none given (null: the site's "new") is new (full, or an empty jar). */
 function clampPoints(def, value) {
   if (value == null || value === '') return newPoints(def);
-  return Math.max(0, Math.min(def.capacity, finiteInt(value, newPoints(def))));
+  // A potion or powder held always has a use left: an empty one has already left the pack.
+  return Math.max(def.charges ? 1 : 0, Math.min(def.capacity, finiteInt(value, newPoints(def))));
+}
+
+/** A copy's own words, JSON-safe and small (a name, phrases, a Still's contents), else null. */
+function cleanTag(value) {
+  if (value == null) return null;
+  try {
+    const text = JSON.stringify(value);
+    return text && text.length <= 600 ? JSON.parse(text) : null;
+  } catch {
+    return null;
+  }
+}
+
+/** Keep row.tags beside row.copies (tagged classes only): same length, null for a copy with none. */
+function alignTags(row, def) {
+  if (!def.tags) {
+    delete row.tags;
+    return row;
+  }
+  if (!Array.isArray(row.tags)) row.tags = [];
+  if (row.tags.length > row.copies.length) row.tags.length = row.copies.length;
+  while (row.tags.length < row.copies.length) row.tags.push(null);
+  return row;
 }
 
 function heldCount(state, classTsid) {
@@ -218,6 +337,7 @@ function inUseIndex(copies, wear = 1) {
 
 /** Repeat the copy in use on the row (older readers, and break events). */
 function settleRow(row, def) {
+  alignTags(row, def);
   const copies = row.copies;
   const r = copies.length ? copies[def.contents ? 0 : inUseIndex(copies)] : newPoints(def);
   row.remaining = r;
@@ -237,6 +357,7 @@ export function normalizeToolConditionState(seed = {}) {
       : [row.broken === true ? 0 : clampPoints(def, row.remaining)];
     condition[classTsid] = settleRow({
       copies,
+      ...(def.tags ? { tags: (Array.isArray(row.tags) ? row.tags : []).slice(0, copies.length).map(cleanTag) } : {}),
       remaining: newPoints(def),
       broken: false,
       uses: Math.max(0, finiteInt(row.uses, 0)),
@@ -342,9 +463,11 @@ export function getToolCondition(state, classTsid, opts = {}) {
     capacity: def.capacity,
     percent: def.capacity ? remaining / def.capacity : 1,
     broken: !def.contents && remaining <= 0,
-    needsRepair: !def.contents && remaining < def.capacity,
+    needsRepair: !def.contents && !def.charges && remaining < def.capacity,
     repairable: def.repairable !== false,
     ...(def.contents ? { contents: true } : {}),
+    ...(def.charges ? { charges: true } : {}),
+    ...(def.noMeter ? { noMeter: true } : {}),
     uses: row?.uses || 0,
     repairs: row?.repairs || 0,
   };
@@ -364,7 +487,9 @@ export function canUseTool(state, classTsid, wear = 1, opts = {}) {
       wear: cost,
       msg: TOOL_CONDITION_CATALOG[classTsid]?.fuel
         ? "That machine doesn't have enough fuel left."
-        : `This ${condition.label} has become broken, and must be repaired.`,
+        : TOOL_CONDITION_CATALOG[classTsid]?.charges
+          ? `This ${condition.label} is empty.`
+          : `This ${condition.label} has become broken, and must be repaired.`,
     };
   }
   return { ok: true, condition, wear: cost };
@@ -419,9 +544,14 @@ export function takeToolCopy(state, classTsid, { copy, take = true } = {}) {
   const at = Number.isInteger(n) && n >= 0 && n < row.copies.length ? n : row.copies.length - 1;
   const r = row.copies[at];
   if (take && at !== row.copies.length - 1) {
-    // The count drops next: move this copy last so it is the one that goes.
+    // The count drops next: move this copy last so it is the one that goes (its own words with it).
     row.copies.splice(at, 1);
     row.copies.push(r);
+    if (def.tags) {
+      alignTags(row, def);
+      const [t] = row.tags.splice(at, 1);
+      row.tags.push(t ?? null);
+    }
     settleRow(row, def);
   }
   return r;
@@ -453,6 +583,8 @@ export function receiveToolCopy(state, classTsid, remaining, n = 1) {
   if (!row.copies.length) return null;
   const k = Math.min(row.copies.length, Math.max(1, Math.floor(Number(n) || 1)));
   for (let i = row.copies.length - k; i < row.copies.length; i += 1) row.copies[i] = clampPoints(def, remaining);
+  alignTags(row, def);
+  if (def.tags) for (let i = row.copies.length - k; i < row.copies.length; i += 1) row.tags[i] = null;
   settleRow(row, def);
   return getToolCondition(state, classTsid, { copy: row.copies.length - 1 });
 }
@@ -469,6 +601,13 @@ export function pickToolCopies(state, classTsid, ranks = []) {
   const set = new Set(ranks.filter((r) => Number.isInteger(r) && r >= 0 && r < row.copies.length));
   const out = row.copies.filter((_, i) => set.has(i));
   row.copies = [...row.copies.filter((_, i) => !set.has(i)), ...out];
+  if (def.tags) {
+    alignTags(row, def);
+    const tags = row.tags.filter((_, i) => set.has(i));
+    row.tags = [...row.tags.filter((_, i) => !set.has(i)), ...tags];
+    // The words ride along beside the points (bags-feature keeps them with the bag's contents).
+    Object.defineProperty(out, 'tags', { value: tags, enumerable: false });
+  }
   settleRow(row, def);
   return out;
 }
@@ -478,15 +617,21 @@ export function pickToolCopies(state, classTsid, ranks = []) {
  * newest copies (the count already went up) take `points` (null: full) and move to
  * `ranks`, their places in pack order, ascending.
  */
-export function placeToolCopies(state, classTsid, ranks = [], points = []) {
+export function placeToolCopies(state, classTsid, ranks = [], points = [], tags = []) {
   const def = TOOL_CONDITION_CATALOG[classTsid];
   if (!def) return false;
   const row = ensureToolCondition(state, classTsid);
   const k = Math.min(ranks.length, row.copies.length);
   if (!k) return false;
+  alignTags(row, def);
   const fresh = row.copies.splice(row.copies.length - k, k).map((r, i) => (points[i] === undefined ? r : clampPoints(def, points[i])));
-  const order = ranks.slice(0, k).map((r, i) => [r, fresh[i]]).sort((a, b) => a[0] - b[0]);
-  for (const [r, v] of order) row.copies.splice(Math.max(0, Math.min(row.copies.length, r)), 0, v);
+  const freshTags = def.tags ? row.tags.splice(row.tags.length - k, k).map((t, i) => cleanTag(tags?.[i] ?? t)) : [];
+  const order = ranks.slice(0, k).map((r, i) => [r, fresh[i], freshTags[i] ?? null]).sort((a, b) => a[0] - b[0]);
+  for (const [r, v, t] of order) {
+    const at = Math.max(0, Math.min(row.copies.length, r));
+    row.copies.splice(at, 0, v);
+    if (def.tags) row.tags.splice(at, 0, t);
+  }
   settleRow(row, def);
   return true;
 }
@@ -500,14 +645,19 @@ export function moveToolCopy(state, classTsid, from, to) {
   if (!(from >= 0 && from < n && to >= 0 && to < n) || from === to) return false;
   const [r] = row.copies.splice(from, 1);
   row.copies.splice(to, 0, r);
+  if (def.tags) {
+    alignTags(row, def);
+    const [t] = row.tags.splice(from, 1);
+    row.tags.splice(to, 0, t ?? null);
+  }
   settleRow(row, def);
   return true;
 }
 
 /** How many copies of a class are broken now (break events, js/quest-offers.js toolBreakEvents). */
 export function brokenToolCopies(row, classTsid = null) {
-  // A Firefly Jar never breaks; an empty one is just empty.
-  if (classTsid && TOOL_CONDITION_CATALOG[classTsid]?.contents) return 0;
+  // A Firefly Jar never breaks (an empty one is just empty), nor does a potion or a powder (an empty one is gone).
+  if (classTsid && (TOOL_CONDITION_CATALOG[classTsid]?.contents || TOOL_CONDITION_CATALOG[classTsid]?.charges)) return 0;
   if (Array.isArray(row?.copies)) return row.copies.filter((r) => Number(r) <= 0).length;
   return row?.broken === true || Number(row?.remaining) <= 0 ? 1 : 0;
 }
@@ -643,7 +793,7 @@ export function toolRepairPlan(quote, energy) {
 export function toolWornBaseCost(state, classTsid, opts = {}) {
   const def = TOOL_CONDITION_CATALOG[classTsid];
   if (!def) return null;
-  if (def.contents) return fireflyJarBaseCost(getToolCondition(state, classTsid, opts).remaining);
+  if (def.jar) return fireflyJarBaseCost(getToolCondition(state, classTsid, opts).remaining);
   // A machine's tank is fuel, not points_capacity: getBaseCost's else branch, the item's full
   // base cost, which the caller's catalog holds (this catalog keeps 0 for machines).
   if (def.fuel || !(def.baseCost > 0)) return null;
@@ -663,6 +813,8 @@ export function mostWornToolCopy(state, classTsid) {
   if (!def) return null;
   const row = ensureToolCondition(state, classTsid);
   if (!row.copies.length) return null;
+  // Copies that hold something (a jar's Fireflies, a bear's upgrades, words) are all worth the same here: the last goes.
+  if (def.contents) return row.copies.length - 1;
   let at = 0;
   for (let i = 1; i < row.copies.length; i += 1) if (row.copies[i] < row.copies[at]) at = i;
   return at;
@@ -762,4 +914,101 @@ export function setToolRemaining(state, classTsid, remaining, opts = {}) {
   row.copies[at] = clampPoints(def, remaining);
   settleRow(row, def);
   return getToolCondition(state, classTsid, { copy: at });
+}
+
+/** A copy's own words (row.tags), or null. */
+export function copyTag(state, classTsid, copy) {
+  const def = TOOL_CONDITION_CATALOG[classTsid];
+  if (!def?.tags) return null;
+  const row = ensureToolCondition(state, classTsid);
+  const n = Number(copy);
+  return Number.isInteger(n) && n >= 0 && n < row.copies.length ? row.tags[n] ?? null : null;
+}
+
+/** Set a copy's own words (null clears them). Returns whether that copy is held. */
+export function setCopyTag(state, classTsid, copy, value) {
+  const def = TOOL_CONDITION_CATALOG[classTsid];
+  if (!def?.tags) return false;
+  const row = ensureToolCondition(state, classTsid);
+  const n = Number(copy);
+  if (!(Number.isInteger(n) && n >= 0 && n < row.copies.length)) return false;
+  row.tags[n] = cleanTag(value);
+  return true;
+}
+
+/** Every copy's words, in pack order (tests, the canvas). */
+export function copyTags(state, classTsid) {
+  const def = TOOL_CONDITION_CATALOG[classTsid];
+  if (!def?.tags) return [];
+  return [...ensureToolCondition(state, classTsid).tags];
+}
+
+/**
+ * The copy a verb on a class acts on: `copy` when that one is held (the stack picked in the pack:
+ * Glitch's verbs named the itemstack, main.js doVerb), else the one in use (the first in pack order
+ * with something left, findFirst). -1 when none is held.
+ */
+export function copyForVerb(state, classTsid, copy = null) {
+  const def = TOOL_CONDITION_CATALOG[classTsid];
+  if (!def) return -1;
+  const row = ensureToolCondition(state, classTsid);
+  if (!row.copies.length) return -1;
+  const n = Number(copy);
+  if (copy != null && Number.isInteger(n) && n >= 0 && n < row.copies.length) return n;
+  return def.contents ? 0 : inUseIndex(row.copies);
+}
+
+/** Uses or charges left in one copy (a new copy is full). */
+export function chargesLeft(state, classTsid, copy = null) {
+  const def = TOOL_CONDITION_CATALOG[classTsid];
+  if (!def) return 0;
+  const at = copyForVerb(state, classTsid, copy);
+  if (at < 0) return 0;
+  return ensureToolCondition(state, classTsid).copies[at];
+}
+
+/**
+ * One use or charge off one copy (tool_base use(1), powder_base use()). Emptied, the copy is moved
+ * last so the count going down takes it (the caller removes the item: `emptied`), and the others keep
+ * theirs. Returns { ok, copy, left, emptied }.
+ */
+export function useCharge(state, classTsid, copy = null, n = 1) {
+  const def = TOOL_CONDITION_CATALOG[classTsid];
+  if (!def) return { ok: false, copy: -1, left: 0, emptied: false };
+  const at = copyForVerb(state, classTsid, copy);
+  if (at < 0) return { ok: false, copy: -1, left: 0, emptied: false };
+  const row = ensureToolCondition(state, classTsid);
+  const left = Math.max(0, row.copies[at] - Math.max(1, Math.floor(Number(n) || 1)));
+  if (left <= 0) {
+    takeToolCopy(state, classTsid, { copy: at });
+    return { ok: true, copy: at, left: 0, emptied: true };
+  }
+  row.copies[at] = left;
+  settleRow(row, def);
+  return { ok: true, copy: at, left, emptied: false };
+}
+
+/**
+ * An older save's one value for a whole class (2026-11-04): it goes to the first copy, the one a
+ * verb used, and every other copy is new, as each new one was in Glitch. Nothing is lost: the value
+ * was only ever spent on one copy at a time.
+ */
+export function migrateClassValue(state, classTsid, value) {
+  const def = TOOL_CONDITION_CATALOG[classTsid];
+  if (!def || value == null) return false;
+  const row = ensureToolCondition(state, classTsid);
+  if (!row.copies.length) return false;
+  row.copies[0] = clampPoints(def, value);
+  settleRow(row, def);
+  return true;
+}
+
+/** An older save's words for a whole class: the first copy's (see migrateClassValue). */
+export function migrateClassTag(state, classTsid, value) {
+  const def = TOOL_CONDITION_CATALOG[classTsid];
+  if (!def?.tags || value == null) return false;
+  const row = ensureToolCondition(state, classTsid);
+  if (!row.copies.length) return false;
+  row.tags[0] = cleanTag(value);
+  return true;
 }

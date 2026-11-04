@@ -31,11 +31,12 @@
  * growModifier }. Growth uses SEED_CATALOG grow1Ms / grow2Ms.
  */
 
-import { SEED_CATALOG, stageElapsedMs, wetPlot } from './garden.js?v=800ce1a0';
+import { SEED_CATALOG, stageElapsedMs, wetPlot } from './garden.js?v=4bcd97f3';
 import { gardenGrowModifier } from './imagination-effects.js?v=70169933';
 import { skillPackageDetails } from './skill-packages.js?v=bfb87281';
 import { metabolicGain, moodMax, loseEnergy } from './metabolics.js?v=8504134e';
 import { grantMoodXp } from './mood-xp.js?v=958e7680';
+import { chargesLeft, useCharge } from './tools.js?v=2337f66a';
 
 export const MASTER_GARDENER = 'mastergardener_1';
 export const POTION_USES = 5;
@@ -315,14 +316,28 @@ export function createPotionState(seed = {}) {
   return { uses };
 }
 
+/*
+ * Each bottle's pours are its own (tool_base points_remaining, potion_garden_*.js 36): with
+ * `state.tools` (the pack's js/tools.js state) they live per copy, `state.copy` the bottle poured
+ * (null: the one in use); `state.uses` (one per class) is for callers without one.
+ */
 export function potionUsesLeft(state, potionClass, inv) {
   if (!(Number(inv?.[potionClass]) > 0)) return 0;
+  if (state?.tools) return chargesLeft(state.tools, potionClass, state.copy ?? null);
   return state.uses[potionClass] || POTION_USES;
 }
 
-/** tool_base use(1); at 0 the bottle is consumed (apiConsume) and the next starts full. */
+/** tool_base use(1); at 0 that bottle is consumed (apiConsume), any other keeps its own pours. */
 export function usePotion(state, potionClass, inv) {
   if (!(Number(inv?.[potionClass]) > 0)) return { ok: false, emptied: false };
+  if (state?.tools) {
+    const used = useCharge(state.tools, potionClass, state.copy ?? null);
+    if (used.emptied) {
+      inv[potionClass] -= 1;
+      if (inv[potionClass] <= 0) delete inv[potionClass];
+    }
+    return { ok: used.ok, emptied: used.emptied, left: used.left, copy: used.copy };
+  }
   const left = (state.uses[potionClass] || POTION_USES) - 1;
   if (left <= 0) {
     inv[potionClass] -= 1;

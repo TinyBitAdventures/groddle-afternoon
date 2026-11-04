@@ -468,7 +468,8 @@ async function readRemake(names) {
     'hatchet',
   ]);
 
-  const isTool = new Set([...Object.keys(making.TOOL_CATALOG), ...Object.keys(tools.TOOL_CONDITION_CATALOG)]);
+  // Tools that wear (js/tools.js also keeps potions, powders, a bear's upgrades and Cubimal names per copy).
+  const isTool = new Set([...Object.keys(making.TOOL_CATALOG), ...Object.keys(tools.TOOL_CONDITION_CATALOG).filter(tools.isWearTool)]);
   const itemBuffs = new Map();
   for (const b of Object.values(buffs)) if (b.itemClass) push(itemBuffs, b.itemClass, b);
   const questTimers = readQuestTimers();

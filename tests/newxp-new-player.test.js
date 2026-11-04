@@ -19,9 +19,9 @@ import { join } from 'node:path';
 import { newPlayerInventory, newPlayerStats } from '../public/js/new-player.js?v=553c5481';
 import { createInventory } from '../public/js/inventory.js?v=d82f3b00';
 import { PARADISE_TICKET_IDS } from '../public/js/paradise-flight.js?v=b9ebc32f';
-import { createPlayerSave, parsePlayerSave, restorePlayerSave, serializePlayerSave, normalizePlayerSnapshot } from '../public/js/player-save.js?v=681aa8e6';
+import { createPlayerSave, parsePlayerSave, restorePlayerSave, serializePlayerSave, normalizePlayerSnapshot } from '../public/js/player-save.js?v=a9c44696';
 import { cloudsLayout, SCENE_TSIDS, GENTLE_ISLAND } from '../public/js/newxp.js?v=8aef8287';
-import { newxpFeature, __newxpTest, cloudEdge, cloudStepOff, cloudStepOffAny, CLOUD_BODY_DEPTH, CLOUD_EDGE_CLEAR, CLOUD_END_PUFFS } from '../public/js/features/newxp-feature.js?v=d4378267';
+import { newxpFeature, __newxpTest, cloudEdge, cloudStepOff, cloudStepOffAny, CLOUD_BODY_DEPTH, CLOUD_EDGE_CLEAR, CLOUD_END_PUFFS } from '../public/js/features/newxp-feature.js?v=2f5c42d6';
 
 const root = join(import.meta.dirname, '..');
 const read = (rel) => readFileSync(join(root, rel), 'utf8');

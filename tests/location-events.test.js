@@ -21,7 +21,7 @@ import {
   runLocationEvent,
   streetOwner,
 } from '../public/js/location-events.js?v=05663361';
-import { createFeatureHost } from '../public/js/feature-host.js?v=2ed3c069';
+import { createFeatureHost } from '../public/js/feature-host.js?v=020c9329';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const streetsDir = join(root, 'public/assets/streets');

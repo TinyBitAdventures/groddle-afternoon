@@ -177,7 +177,7 @@ export async function obtainableItems() {
   // Tools a player can hold: anything above that is a tool.
   const toolIds = new Set([
     ...Object.keys(making.TOOL_CATALOG),
-    ...Object.keys(tools.TOOL_CONDITION_CATALOG),
+    ...Object.keys(tools.TOOL_CONDITION_CATALOG).filter(tools.isWearTool),
     'focusing_orb',
     'still',
   ]);

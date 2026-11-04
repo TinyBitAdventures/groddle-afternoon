@@ -30,6 +30,7 @@
  */
 
 import { loseMood, metabolicGain } from './metabolics.js?v=8504134e';
+import { chargesLeft, useCharge } from './tools.js?v=2337f66a';
 
 export const TREE_POISON = 'potion_tree_poison';
 export const TREE_ANTIDOTE = 'potion_tree_poison_antidote';
@@ -275,14 +276,28 @@ export function createPoisonBottleState(seed = {}) {
   return { uses };
 }
 
+/*
+ * Each bottle's uses are its own (tool_base points_remaining, potion_tree_poison.js 36): with
+ * `state.tools` (the pack's js/tools.js state) they live per copy, `state.copy` the bottle poured (null:
+ * the one in use, the first in pack order); `state.uses` (one per class) is for callers without one.
+ */
 export function bottleUsesLeft(state, potionClass, inv) {
   if (count(inv, potionClass) < 1) return 0;
+  if (state?.tools) return chargesLeft(state.tools, potionClass, state.copy ?? null);
   return state.uses[potionClass] || POTION_USES;
 }
 
-/** onPourComplete use(1); at 0 apiConsume(1) and the next bottle starts full. */
+/** onPourComplete use(1); at 0 apiConsume(1) and that bottle is gone (any other keeps its own uses). */
 export function useBottle(state, potionClass, inv) {
   if (count(inv, potionClass) < 1) return { ok: false, emptied: false, left: 0 };
+  if (state?.tools) {
+    const used = useCharge(state.tools, potionClass, state.copy ?? null);
+    if (used.emptied) {
+      inv[potionClass] = count(inv, potionClass) - 1;
+      if (inv[potionClass] <= 0) delete inv[potionClass];
+    }
+    return { ok: used.ok, emptied: used.emptied, left: used.left, copy: used.copy };
+  }
   const left = (state.uses[potionClass] || POTION_USES) - 1;
   if (left <= 0) {
     inv[potionClass] = count(inv, potionClass) - 1;

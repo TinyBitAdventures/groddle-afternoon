@@ -40,7 +40,7 @@
  */
 
 import { ITEM_CATALOG, addItem, countItem, removeItem } from '../inventory.js?v=d82f3b00';
-import { TOOL_CONDITION_CATALOG, leavingToolWear, receiveToolCopy, takeToolCopy } from '../tools.js?v=9a5a4323';
+import { TOOL_CONDITION_CATALOG, leavingToolWear, receiveToolCopy, takeToolCopy } from '../tools.js?v=2337f66a';
 import { createMinnAccount } from '../minn-account.js?v=28026657';
 import { saveStore } from '../save-store.js?v=8839ba7b';
 import { DROP_OP, DROP_TEXT, dropEffect, eatenStack, groundFrom, isPublicStreet, normalizeGroundStack, normalizeMine, pigAnimalKey, shareReason } from '../drops-mp.js?v=00490802';

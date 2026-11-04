@@ -21,8 +21,9 @@
  *     mgPlots, mgAutoplay, mgDrop.
  */
 
+import { TOOL_CONDITION_CATALOG, migrateClassValue } from '../tools.js?v=2337f66a';
 import { ITEM_CATALOG, countItem, ensureItem } from '../inventory.js?v=d82f3b00';
-import { SEED_CATALOG, listPlantableSeeds } from '../garden.js?v=800ce1a0';
+import { SEED_CATALOG, listPlantableSeeds } from '../garden.js?v=4bcd97f3';
 import {
   GARDEN_POTIONS,
   MASTER_GARDENER,
@@ -34,7 +35,7 @@ import {
   potionTendGarden,
   potionUsesLeft,
   usePotion,
-} from '../master-garden.js?v=03f7810a';
+} from '../master-garden.js?v=0a861152';
 import { rollDropTable } from '../drop-tables.js?v=0f922478';
 import { payDrop } from './drops-feature.js?v=fffa1f9e';
 import { textureFromUrl } from '../textures.js?v=3149d699';
@@ -42,6 +43,12 @@ import { textureFromUrl } from '../textures.js?v=3149d699';
 export const MASTER_GARDEN_FEATURE_ID = 'master-garden';
 
 let potions = createPotionState();
+
+/** The bottles a pour uses: per copy in the pack's tool state (js/tools.js), `potions.uses` without one. */
+function bottlesFor(engine, copy = null) {
+  if (!engine?.toolState) return potions;
+  return { uses: potions.uses, tools: engine.toolState, copy: Number.isInteger(copy) ? copy : null };
+}
 let last = '';
 let pouring = null;
 let demoDone = false;
@@ -80,7 +87,7 @@ function publish(engine) {
   engine.setData('mgGarden', garden ? `${garden.gardenType}:${Object.keys(garden.plots).length}` : 'none');
   engine.setData('mgPlots', garden ? Object.values(garden.plots).map((p) => `${p.state}${p.wet ? 'w' : ''}${p.fertilized ? 'f' : ''}`).join(',') : 'none');
   engine.setData('mgLast', last || 'none');
-  engine.setData('mgUses', Object.keys(GARDEN_POTIONS).map((id) => `${id.replace('potion_garden_', '')}:${potionUsesLeft(potions, id, engine.inv)}`).join(','));
+  engine.setData('mgUses', Object.keys(GARDEN_POTIONS).map((id) => `${id.replace('potion_garden_', '')}:${potionUsesLeft(bottlesFor(engine), id, engine.inv)}`).join(','));
 }
 
 function say(engine, msg, ok = true) {
@@ -141,7 +148,7 @@ function tickFx(fx, dtMs) {
 
 /* ------------------------------------------------------------ pour */
 
-function startPour(engine, potionClass, seedId = null) {
+function startPour(engine, potionClass, seedId = null, copy = null) {
   if (pouring) return say(engine, 'You are already pouring a potion.', false), true;
   const potion = GARDEN_POTIONS[potionClass];
   const target = nearestGarden(engine);
@@ -149,13 +156,14 @@ function startPour(engine, potionClass, seedId = null) {
   const check = canPour(potionClass, garden, ctxFor(engine, seedId));
   if (!check.ok) return say(engine, check.msg, false), true;
   engine.playSound?.('POTION_GENERIC', { volume: 0.6 });
-  pouring = { potionClass, seedId, target, at: Date.now(), fx: pourFx(engine, potionClass, target) };
+  // The bottle picked in the pack (its place in pack order) is the one poured.
+  pouring = { potionClass, seedId, target, at: Date.now(), copy: Number.isInteger(copy) ? copy : null, fx: pourFx(engine, potionClass, target) };
   engine.setData?.('mgPouring', potion.action);
   return true;
 }
 
 function finishPour(engine) {
-  const { potionClass, seedId, target, fx } = pouring;
+  const { potionClass, seedId, target, fx, copy } = pouring;
   pouring = null;
   if (fx && !fx.root.destroyed) fx.root.destroy({ children: true });
   engine.setData?.('mgPouring', 'none');
@@ -169,7 +177,7 @@ function finishPour(engine) {
     engine.playSound?.('CLICK_FAILURE', { volume: 0.5 });
     return say(engine, `You tried to pour a ${potion.label}. ${res.msg}`, false);
   }
-  const used = usePotion(potions, potionClass, engine.inv);
+  const used = usePotion(bottlesFor(engine, copy), potionClass, engine.inv);
   // onPourComplete: "You poured a Soak-All Solution." then the garden growl.
   engine.pushActivity?.(`You poured a ${potion.label}.`);
   if (used.emptied) engine.pushActivity?.(`Your ${potion.label} is all used up.`);
@@ -323,12 +331,12 @@ export const masterGardenFeature = {
     if (autoplayAt && now >= autoplayAt) autoplay(engine, now);
   },
 
-  packVerbs(classTsid, engine) {
+  packVerbs(classTsid, engine, opts = {}) {
     const potion = GARDEN_POTIONS[classTsid];
     if (!potion) return [];
     const target = nearestGarden(engine);
     const garden = target?.state?.garden;
-    const uses = `${potionUsesLeft(potions, classTsid, engine.inv)} pours left in this bottle`;
+    const uses = `${potionUsesLeft(bottlesFor(engine, opts?.copy ?? null), classTsid, engine.inv)} pours left in this bottle`;
     if (potion.action === 'plant') {
       const seeds = garden ? listPlantableSeeds(engine.inv, garden.gardenType) : [];
       if (!seeds.length) {
@@ -352,18 +360,26 @@ export const masterGardenFeature = {
     return [{ id: 'pour', label: 'Pour', enabled: check.ok, reason: check.msg || '', tooltip: `${potion.tooltip} · ${uses}`, primary: check.ok }];
   },
 
-  runPackVerb(classTsid, verbId, engine) {
+  runPackVerb(classTsid, verbId, engine, opts = {}) {
     if (!GARDEN_POTIONS[classTsid]) return false;
     const seedId = String(verbId).startsWith('plant:') ? String(verbId).slice(6) : null;
-    return startPour(engine, classTsid, seedId);
+    return startPour(engine, classTsid, seedId, opts?.copy ?? null);
   },
 
   save() {
-    return { version: 1, ...potions };
+    // version 2: each bottle's pours are saved with the pack's tools (js/tools.js); `uses` only without them.
+    return { version: 2, ...potions };
   },
 
-  restore(slice) {
+  restore(slice, engine) {
     potions = createPotionState(slice || {});
+    // An older save's one count per class is the first bottle's (the one a pour used); others are full.
+    if (engine?.toolState) {
+      for (const [cls, n] of Object.entries(potions.uses)) {
+        if (TOOL_CONDITION_CATALOG[cls] && n > 0 && n < 5) migrateClassValue(engine.toolState, cls, n);
+      }
+      potions = createPotionState();
+    }
   },
 
   /** QA / tests. */
