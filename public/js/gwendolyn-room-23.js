@@ -227,7 +227,7 @@ export const ROOM_23 = Object.freeze({
   ]),
   floorRight: -1600,
   greeter: Object.freeze({ x: -1730, hover: 40 }),
-  gwen: Object.freeze({ x: -760 }),
+  gwen: Object.freeze({ x: -760, hover: 34 }),
   gourd: Object.freeze({ x: -120 }),
   ladder: Object.freeze({ x: 1700 }),
   posts: Object.freeze({ x1: 1674, x2: 1726, top: -1250, bottom: -560 }),

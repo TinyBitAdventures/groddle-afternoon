@@ -63,7 +63,7 @@ import {
   isRoom23,
   leadPath,
   toScreen,
-} from '../gwendolyn-room-23.js?v=e4c44773';
+} from '../gwendolyn-room-23.js?v=46e417b9';
 
 export const GWENDOLYN_ROOM_23_FEATURE_ID = 'gwendolyn-room-23';
 const CHECK_MS = 120;
@@ -173,9 +173,11 @@ function drawGwendolyn(engine) {
   const upper = ROOM_23.tiers.find((t) => t.id === 'upper');
   const x = ROOM_23.gwen.x;
   const y = upper.y;
-  const p = toScreen(x, y);
+  // She floats a little over the mound with a close, soft glow (a player's screenshot of the
+  // room, mercurialmalcontent 2013-12, reference only; the same as in her Chamber).
+  const p = toScreen(x, y - ROOM_23.gwen.hover);
   const glow = new PIXI.Graphics();
-  for (let i = 6; i >= 1; i--) glow.circle(0, -90, 40 + i * 22).fill({ color: 0xa9f0ff, alpha: 0.035 * (7 - i) });
+  for (let i = 5; i >= 1; i--) glow.ellipse(0, -90, 34 + i * 9, 70 + i * 10).fill({ color: 0xa9f0ff, alpha: 0.03 * (6 - i) });
   glow.x = p.x;
   glow.y = p.y;
   glow.eventMode = 'none';

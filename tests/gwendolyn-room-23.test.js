@@ -49,8 +49,8 @@ import {
   gwendolynOffers,
   leadPath,
   room23Street,
-} from '../public/js/gwendolyn-room-23.js?v=e4c44773';
-import { gwendolynRoom23Feature } from '../public/js/features/gwendolyn-room-23-feature.js?v=443fd7ef';
+} from '../public/js/gwendolyn-room-23.js?v=46e417b9';
+import { gwendolynRoom23Feature } from '../public/js/features/gwendolyn-room-23-feature.js?v=7beb7aba';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const pub = (p) => join(spike, 'public', p);
