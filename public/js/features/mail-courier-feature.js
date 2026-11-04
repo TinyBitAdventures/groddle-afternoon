@@ -687,8 +687,8 @@ function outgoingParcels(engine) {
 function openStation(engine) {
   const s = station;
   if (!s) return;
-  engine.openMailbox?.();
-  if (typeof document !== 'undefined') document.getElementById('mail-compose-btn')?.click();
+  // On a new letter, the inbox left unread under it (ticket 86; MailManager.as start 54-61: COMPOSE).
+  engine.openMailbox?.({ compose: true });
   s.session = { parcels: outgoingParcels(engine) };
   if (!s.parcels) setStationClip(engine, s, 'interact');
   engine.playSound?.('INTERACT_DISPATCHER', { volume: 0.5 });

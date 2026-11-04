@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=b484cbad';
 import { createFeatureHost } from './js/feature-host.js?v=2ed3c069';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=da185ed3';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=16c017e5';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -11687,7 +11687,7 @@ const engine = {
     return true;
   },
   /** Open the shared mail panel from a street mailbox (no home needed, like npc_mailbox.js). */
-  openMailbox: (opts = {}) => openMailboxPanel({ anywhere: true, atMailbox: opts?.atMailbox === true }),
+  openMailbox: (opts = {}) => openMailboxPanel({ anywhere: true, atMailbox: opts?.atMailbox === true, compose: opts?.compose === true }),
   mailboxOpen: () => isMailboxOpen(),
   /** HOMES2: the mail panel is open at a mailbox (things in a player's letter are received only there). */
   atMailbox: () => mailboxAt && isMailboxOpen(),
@@ -21899,6 +21899,9 @@ function mailAttachmentLabel(message) {
 function renderMailboxCompose(recipient = '', replyTo = null) {
   const reader = document.getElementById('mail-reader');
   if (!reader) return;
+  // Ticket 86: a new letter is not any message in the list, so none shows as the one open (a reply
+  // keeps its message marked); a click on a message, or on a folder, reads it.
+  if (!replyTo) document.querySelectorAll('#mail-list .mail-row.is-selected').forEach((row) => row.classList.remove('is-selected'));
   // G478: in multiplayer the letter goes to a real player through the site (player-mail-feature).
   const online = engine.mode === 'multiplayer' ? features.query('mailCompose', engine) : null;
   if (online) {
@@ -22238,7 +22241,8 @@ function renderMailboxPanel() {
   for (const message of rows) {
     const button = document.createElement('button');
     button.type = 'button';
-    button.className = `mail-row${message.id === mailboxSelectedId ? ' is-selected' : ''}${!message.read && !message.outgoing ? ' is-unread' : ''}`;
+    const open = message.id === mailboxSelectedId && mailboxComposeReplyTo !== '__new_mail__';
+    button.className = `mail-row${open ? ' is-selected' : ''}${!message.read && !message.outgoing ? ' is-unread' : ''}`;
     button.dataset.mailId = message.id;
     const party = message.outgoing ? message.recipient : message.sender;
     button.innerHTML = `
@@ -22248,6 +22252,8 @@ function renderMailboxPanel() {
     `;
     button.addEventListener('click', () => {
       mailboxSelectedId = message.id;
+      // A message clicked while a letter is being written is read (the letter was over it, ticket 86).
+      mailboxComposeReplyTo = null;
       renderMailboxPanel();
     });
     list.appendChild(button);
@@ -22259,7 +22265,13 @@ function renderMailboxPanel() {
   updateHomeChrome();
 }
 
-function openMailboxPanel({ anywhere = false, atMailbox = false } = {}) {
+/**
+ * `compose` (the Mail Dispatcher): open on a new letter, as the client's MailManager.start opened the
+ * mail window on MailDialog.COMPOSE (a mailbox opened it on the inbox, parseMessages). The inbox is
+ * not read underneath it (ticket 86: its first message was marked read and drawn, then covered by
+ * the letter, so the Inbox tab looked open on a message it was not showing).
+ */
+function openMailboxPanel({ anywhere = false, atMailbox = false, compose = false } = {}) {
   if (!homeState.owned && !anywhere) {
     openHomePanel();
     toast('A mailbox comes with your home street.');
@@ -22270,11 +22282,12 @@ function openMailboxPanel({ anywhere = false, atMailbox = false } = {}) {
   closeMap();
   closePackPopover();
   mailboxFolder = 'inbox';
-  mailboxComposeReplyTo = null;
+  mailboxComposeReplyTo = compose ? '__new_mail__' : null;
   mailboxAt = atMailbox === true;
   renderMailboxPanel();
   const panel = document.getElementById('mail-panel');
   if (panel) panel.hidden = false;
+  if (compose) renderMailboxCompose();
   if (homeMailboxTarget?.sprite) {
     homeMailboxTarget.sprite.scale.set(1.05, 0.94);
     setTimeout(() => {

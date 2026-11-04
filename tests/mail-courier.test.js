@@ -244,7 +244,7 @@ describe('mail courier feature', () => {
   it('calls the frog with the source prompt once a letter is due, and waits in an instance', async () => {
     mock.timers.enable({ apis: ['Date'], now: 1_000_000 });
     try {
-      const { mailCourierFeature } = await import('../public/js/features/mail-courier-feature.js?v=00c1b187');
+      const { mailCourierFeature } = await import('../public/js/features/mail-courier-feature.js?v=de4f6a67');
       const st = createMailboxState();
       const prompts = [];
       let instance = false;
@@ -295,5 +295,34 @@ describe('mail courier feature', () => {
     } finally {
       mock.timers.reset();
     }
+  });
+});
+
+describe('ticket 86: the Mail Dispatcher opens on a new letter, cleanly', () => {
+  const game = readFileSync(join(root, 'public/game.js'), 'utf8');
+  const feature = readFileSync(join(root, 'public/js/features/mail-courier-feature.js'), 'utf8');
+  const fn = (src, name) => { const at = src.indexOf(`\nfunction ${name}(`); assert.ok(at >= 0, name); return src.slice(at, src.indexOf('\n}\n', at)); };
+
+  it('the station asks for the window on Compose (MailManager.as start: MailDialog.COMPOSE), no click on Write mail', () => {
+    const open = fn(feature, 'openStation');
+    assert.match(open, /engine\.openMailbox\?\.\(\{ compose: true \}\);/);
+    assert.doesNotMatch(open, /mail-compose-btn/);
+    assert.match(game, /openMailbox: \(opts = \{\}\) => openMailboxPanel\(\{ anywhere: true, atMailbox: opts\?\.atMailbox === true, compose: opts\?\.compose === true \}\),/);
+  });
+
+  it('the inbox is not read under the letter, and no message shows as open while it is written', () => {
+    const panel = fn(game, 'openMailboxPanel');
+    assert.match(panel, /mailboxComposeReplyTo = compose \? '__new_mail__' : null;\n\s+mailboxAt = atMailbox === true;\n\s+renderMailboxPanel\(\);/, 'the draft is set before the panel draws, so its reader (readMail) is skipped');
+    assert.match(panel, /if \(compose\) renderMailboxCompose\(\);/);
+    const list = fn(game, 'renderMailboxPanel');
+    assert.match(list, /const open = message\.id === mailboxSelectedId && mailboxComposeReplyTo !== '__new_mail__';/);
+    assert.match(list, /mailboxSelectedId = message\.id;\n\s+\/\/[^\n]*\n\s+mailboxComposeReplyTo = null;\n\s+renderMailboxPanel\(\);/, 'a click on a message reads it');
+    assert.match(fn(game, 'renderMailboxCompose'), /if \(!replyTo\) document\.querySelectorAll\('#mail-list \.mail-row\.is-selected'\)/);
+    // The folder tabs already leave the letter (mailboxComposeReplyTo = null), the Inbox tab too.
+    assert.match(game, /mailboxFolder = button\.dataset\.mailFolder \|\| 'inbox';\n\s+mailboxSelectedId = null;\n\s+mailboxComposeReplyTo = null;/);
+  });
+
+  it('receiving things stays a mailbox\'s (the station does not pass atMailbox)', () => {
+    assert.doesNotMatch(fn(feature, 'openStation'), /atMailbox/);
   });
 });
