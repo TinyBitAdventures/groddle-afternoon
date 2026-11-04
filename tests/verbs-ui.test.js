@@ -7,10 +7,10 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { placeVerbMenu, plainWords, verbRowKeys, verbRowInner, verbRowAttrs } from '../public/js/ui/verb-menu.js?v=e65f7462';
-import { questCardTab, questRewardChips, questStep } from '../public/js/ui/quest-sheet.js?v=c8976bed';
+import { MIN_ROWS_BOX, menuRowsCap, placeVerbMenu, plainWords, verbRowKeys, verbRowInner, verbRowAttrs } from '../public/js/ui/verb-menu.js?v=48f4f63c';
+import { questCardTab, questRewardChips, questStep } from '../public/js/ui/quest-sheet.js?v=eac7ca4f';
 import { MAX_QUEST_PINS, normalizeQuestPins, questPinsFeature } from '../public/js/features/quest-pins-feature.js?v=e59012f1';
-import { FEATURES } from '../public/js/features/index.js?v=4e54491e';
+import { FEATURES } from '../public/js/features/index.js?v=adf00a4a';
 
 const PUBLIC = join(dirname(fileURLToPath(import.meta.url)), '../public');
 const read = (p) => readFileSync(join(PUBLIC, p), 'utf8');
@@ -115,5 +115,28 @@ describe('the panel shell and the pinned quests', () => {
     assert.deepEqual(questPinsFeature.pins(), ['legalize_it']);
     assert.deepEqual(normalizeQuestPins({ pins: ['a', 'a', 'b', 'c', '<bad>'], collapsed: 'yes' }), { pins: ['a', 'b'], collapsed: false });
     questPinsFeature.restore(undefined);
+  });
+});
+
+describe('ticket 87: a tall menu stays on the screen', () => {
+  it('menuRowsCap: the rows give up what the card is over the room, keeping three rows', () => {
+    assert.equal(menuRowsCap({ card: 386, rows: 300, room: 588 }), null, 'fits: no cap');
+    assert.equal(menuRowsCap({ card: 700, rows: 420, room: 588 }), 308);
+    assert.equal(menuRowsCap({ card: 700, rows: 420, room: 200 }), MIN_ROWS_BOX, 'never under about three rows');
+    assert.equal(menuRowsCap({ card: 700, rows: 60, room: 200 }), 60, 'a short rows box is left as it is');
+    assert.equal(menuRowsCap({ card: 700, rows: 420, room: 0 }), null, 'no room measured: no cap');
+  });
+
+  it('the pack menu and the world menu both cap their rows to the room under the top band', () => {
+    const game = read('game.js');
+    const fn = (name) => { const at = game.indexOf(`\nfunction ${name}(`); return game.slice(at, game.indexOf('\n}\n', at)); };
+    const pack = fn('positionPackPopover');
+    assert.match(pack, /fitVerbMenuRows\(pop, pop\.querySelector\('\.pack-pop-actions'\), floor - 9 - ceiling\);/);
+    assert.match(pack, /const ceiling = rootTop \+ \(Number\.isFinite\(hudH\) \? hudH : 44\) \+ 8;/);
+    const world = fn('placeMenuAtTarget');
+    assert.match(world, /fitVerbMenuRows\(card, card\.querySelector\('\.verb-menu-list'\), roomFloor - 4 - roomTop\);/);
+    assert.ok(world.indexOf('fitVerbMenuRows(') < world.indexOf('size: { w: card.offsetWidth, h: card.offsetHeight }'), 'capped before it is measured');
+    const vm = read('js/ui/verb-menu.js');
+    assert.match(vm, /if \(row\.closest\?\.\('\.vm-scroll'\)\) row\.scrollIntoView\?\.\(\{ block: 'nearest' \}\);/, 'the keys bring a scrolled row into sight');
   });
 });

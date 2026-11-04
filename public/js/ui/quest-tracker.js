@@ -14,9 +14,9 @@
  * questPins ("id:count,id:count", "" when none), questPinsCollapsed.
  */
 
-import { escapeText } from './verb-menu.js?v=e65f7462';
-import { createQuestPinMenu } from './quest-pin-menu.js?v=54cb9451';
-import { bindContextTrigger, MORE_KEYS_LABEL } from './context-menu.js?v=990e8c56';
+import { escapeText } from './verb-menu.js?v=48f4f63c';
+import { createQuestPinMenu } from './quest-pin-menu.js?v=a56891cf';
+import { bindContextTrigger, MORE_KEYS_LABEL } from './context-menu.js?v=0453d723';
 
 /**
  * @param {{ el: HTMLElement|null, onOpen?: (classTsid: string) => void, onCollapse?: (on: boolean) => void,

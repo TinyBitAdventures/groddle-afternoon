@@ -253,6 +253,8 @@ export function focusVerbRow(el, index = null, { focus = true } = {}) {
   if (index == null) row = rows.find((r) => r.getAttribute('aria-disabled') !== 'true' && !r.hasAttribute('data-vm-back')) || rows.find((r) => !r.hasAttribute('data-vm-back')) || rows[0];
   else row = rows[(index + rows.length) % rows.length];
   if (focus) row.focus({ preventScroll: true });
+  // A capped rows box (fitVerbMenuRows) brings the row into sight; the page itself never scrolls.
+  if (row.closest?.('.vm-scroll')) row.scrollIntoView?.({ block: 'nearest' });
   setDetail(el, row);
   return row;
 }
@@ -405,6 +407,43 @@ export function placeVerbMenu({ anchor, size, room, avoid = null, gap = 12 }) {
   if (y < top) y = top;
   if (cx < x + 6 || cx > x + w - 6) tail = null;
   return { x: Math.round(x), y: Math.round(y), below, tail: tail == null ? null : Math.round(tail) };
+}
+
+/** The least a capped rows box keeps (about three rows), so a menu never shrinks to nothing. */
+export const MIN_ROWS_BOX = 96;
+
+/**
+ * PURE (ticket 87): the most a menu's rows may take so its card, `card` px tall with rows `rows`
+ * px tall, fits in `room` px; null when it fits as it is. The head and the footer keep their size:
+ * the rows scroll inside the card instead of the card running off the top of the screen.
+ */
+export function menuRowsCap({ card, rows, room, min = MIN_ROWS_BOX }) {
+  const c = Number(card) || 0;
+  const r = Number(rows) || 0;
+  const space = Number(room);
+  if (!(space > 0) || c <= space || r <= 0) return null;
+  return Math.max(Math.min(r, min), Math.floor(r - (c - space)));
+}
+
+/**
+ * Fit a menu in `room` px of height (ticket 87: Very Stinky Cheese's menu, many verbs and a long
+ * description, ran off the top): its rows box (`rowsEl`) gets a max-height and scrolls when the
+ * card is too tall, and loses both when it fits again. Returns the cap, or null.
+ * @param {HTMLElement} card the card that is placed
+ * @param {HTMLElement} rowsEl the rows box inside it
+ * @param {number} room the height it may take
+ */
+export function fitVerbMenuRows(card, rowsEl, room) {
+  if (!card || !rowsEl) return null;
+  rowsEl.style.maxHeight = '';
+  rowsEl.style.overflowY = '';
+  const cap = menuRowsCap({ card: card.offsetHeight, rows: rowsEl.offsetHeight, room });
+  if (cap != null) {
+    rowsEl.style.maxHeight = `${cap}px`;
+    rowsEl.style.overflowY = 'auto';
+  }
+  rowsEl.classList.toggle('vm-scroll', cap != null);
+  return cap;
 }
 
 /** A row that can't be done (now): its reason in the footer, with a shake. */

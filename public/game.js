@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=b484cbad';
 import { createFeatureHost } from './js/feature-host.js?v=2ed3c069';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=4e54491e';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=adf00a4a';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -726,7 +726,7 @@ import { MODERN, onUiModeChange, uiState } from './js/classic/ui-mode.js?v=587c0
 // ZOOM: the world zoom (a device preference) and Classic's frame scale under it; both load before main().
 import { worldZoom, setWorldZoom, stepWorldZoom, onZoomChange, zoomKeyAction, zoomKeyToast } from './js/world-zoom.js?v=b262a6c7';
 import { nightTint, nightTintOn, onNightTintChange, worldTintOpacity } from './js/night-tint.js?v=1dfc9c89';
-import { streetMapSetting, toggleStreetMap } from './js/ui/street-minimap.js?v=fb6e86e8';
+import { streetMapSetting, toggleStreetMap } from './js/ui/street-minimap.js?v=efd350a4';
 import './js/classic/classic-zoom.js?v=1ef4b9a5';
 import { mountImaginationHub } from './js/ui/imagination-hub.js?v=1d96f241';
 import { newDayBubble, shuffleNewDayMessages, waitForScreenGates } from './js/screen-queue.js?v=cf0132c0';
@@ -917,7 +917,7 @@ import { installHiresIcons } from './js/icon-hires.js?v=5b68aeaa';
 import { installHiresDecos } from './js/deco-hires.js?v=cb905e17';
 import { loadAudioLevels, loadMutedPreference, saveAudioLevel, saveMutedPreference } from './js/audio-pref.js?v=6fe817bc';
 import { createAudioBuses, fadeGain } from './js/audio-buses.js?v=af167b54';
-import { installTopBar, renderTopBar } from './js/ui/topbar.js?v=2e6605ef';
+import { installTopBar, renderTopBar } from './js/ui/topbar.js?v=89d306d7';
 import { focusBack, installFocusReturn, lastInput } from './js/ui/focus-return.js?v=da190597';
 import { installContextGuard } from './js/ui/context-guard.js?v=0f71ac17';
 import { QUOIN_FRAME_BOB, advanceQuoinClock, quoinBobBetweenFrames } from './js/quoin-motion.js?v=ea0bd408';
@@ -927,14 +927,14 @@ import { wholeStatAmounts, wholeEffects } from './js/stat-text.js?v=f96d8fd3';
 import { createNotifier, effectTokens, floatKey, offerCardDrop, stackFloat, tokenText } from './js/notify.js?v=37c6b748';
 import { holdMs } from './js/read-time.js?v=60ae7efc';
 import { mountNotifyView } from './js/notify-view.js?v=2835afc0';
-import { mountSocialDrawer } from './js/ui/social-drawer.js?v=3b9c69f9';
+import { mountSocialDrawer } from './js/ui/social-drawer.js?v=8b819d51';
 import { bindDragScroll } from './js/ui/drag-scroll.js?v=9a527ac8';
 import { SIDE_SHEET_IDS, bindTabs, inSideSheet, mountPanelShell, sheetKeyToWorld } from './js/ui/panel-shell.js?v=6812fe04';
-import { createQuestSheet, questStep } from './js/ui/quest-sheet.js?v=c8976bed';
-import { createQuestTracker } from './js/ui/quest-tracker.js?v=abf94213';
-import { bindContextTrigger, createContextMenu, isContextMenuKey as isMenuKey, MORE_KEYS_LABEL } from './js/ui/context-menu.js?v=990e8c56';
+import { createQuestSheet, questStep } from './js/ui/quest-sheet.js?v=eac7ca4f';
+import { createQuestTracker } from './js/ui/quest-tracker.js?v=eb2b8010';
+import { bindContextTrigger, createContextMenu, isContextMenuKey as isMenuKey, MORE_KEYS_LABEL } from './js/ui/context-menu.js?v=0453d723';
 import { bindCountField, countKeyValue, countStepMarkup } from './js/ui/count-chooser.js?v=893305c8';
-import { bindVerbMenu, focusVerbRow, lockVerbMenuSize, makePickTile, makeVerbRow, pickGridCols, placeVerbMenu, plainWords, refuseVerbRow, syncVerbDetail, verbMenuKey, verbRowAttrs, verbRowInner, verbRowKeys } from './js/ui/verb-menu.js?v=e65f7462';
+import { bindVerbMenu, fitVerbMenuRows, focusVerbRow, lockVerbMenuSize, makePickTile, makeVerbRow, pickGridCols, placeVerbMenu, plainWords, refuseVerbRow, syncVerbDetail, verbMenuKey, verbRowAttrs, verbRowInner, verbRowKeys } from './js/ui/verb-menu.js?v=48f4f63c';
 import { createPromptSettler, promptId } from './js/prompt-settle.js?v=509ba9cc';
 import { clientKeyAction, createHotkeysSheet, isHotkeySheetRelease, isPlainKey } from './js/client-hotkeys.js?v=5a0e7cc7';
 import { EAT_PICK_TEXT, bestFoodIndex, eatChoices, eatTip } from './js/eat-pick.js?v=8fb763d0';
@@ -959,7 +959,7 @@ import { itemZ } from './js/item-bands.js?v=e98b10bc';
 import { SLUG_ANIMATION, SLUG_LAYOUT, SLUG_STYLES, SLUG_TARGETS, drawSlugIcon, formatRawSlugs, formatSlugList, layoutSlugRow, slugBox, slugNumber, slugPillPath, slugSign, speechSlugList } from './js/speech-slugs.js?v=130338f9';
 import { filterText } from './js/word-filter.js?v=9a7a7ebb'; // the remake's own word filter
 // The interface skin (js/classic/ui-mode.js) sets <html data-ui> as it loads: before main(), so before the boot cover lifts.
-import { installInterfaceSettings } from './js/classic/classic-prefs.js?v=83e10b91';
+import { installInterfaceSettings } from './js/classic/classic-prefs.js?v=f32804db';
 
 /** @type {object|null} assets/maps/index.json */
 let mapIndexCache = null;
@@ -3373,6 +3373,13 @@ function positionPackPopover(pop, anchor) {
   const tray = anchor.closest?.('#pack-bag');
   const floor = tray ? tray.getBoundingClientRect().top : barRect.top;
   pop.style.bottom = `${Math.round(barRect.bottom - floor + 9)}px`;
+  // Ticket 87: it hangs up from the row, so a stack with many verbs and a long description (Very
+  // Stinky Cheese) ran off the top of the screen: its rows scroll so it stays under the top band.
+  const root = document.getElementById('game-root');
+  const rootTop = root ? root.getBoundingClientRect().top : 0;
+  const hudH = root ? parseFloat(getComputedStyle(root).getPropertyValue('--hud-h')) : NaN;
+  const ceiling = rootTop + (Number.isFinite(hudH) ? hudH : 44) + 8;
+  fitVerbMenuRows(pop, pop.querySelector('.pack-pop-actions'), floor - 9 - ceiling);
   const arrowLeft = clamp(anchorCenter - left, 20, popWidth - 20);
   pop.style.setProperty('--pack-arrow-left', `${Math.round(arrowLeft)}px`);
 }
@@ -7661,14 +7668,19 @@ function placeMenuAtTarget(menu, target, dataKey) {
     return Number.isFinite(v) ? v : fallback;
   };
   const pack = document.getElementById('pack-row')?.getBoundingClientRect();
+  const roomTop = px('--hud-h', 44) + 8;
+  const roomFloor = Math.min(rr.height, pack && pack.height ? pack.top - rr.top : rr.height);
+  // Ticket 87: a menu taller than the room between the top band and the pack scrolls its rows
+  // (placeVerbMenu keeps it under the band; a taller card ran off the top of the screen).
+  fitVerbMenuRows(card, card.querySelector('.verb-menu-list'), roomFloor - 4 - roomTop);
   const placed = placeVerbMenu({
     anchor,
     size: { w: card.offsetWidth, h: card.offsetHeight },
     room: {
       w: rr.width,
       h: rr.height,
-      top: px('--hud-h', 44) + 8,
-      floor: pack && pack.height ? pack.top - rr.top : rr.height,
+      top: roomTop,
+      floor: roomFloor,
       left: Math.max(8, px('--inset-l', 0)),
       right: Math.max(8, px('--inset-r', 0)),
     },
