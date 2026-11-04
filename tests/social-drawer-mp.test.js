@@ -10,8 +10,8 @@
 import { describe, it, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import { FakeEl, memoryStore, page } from './social-fake-dom.js';
-import { mountSocialDrawer } from '../public/js/ui/social-drawer.js?v=b99fb56c';
-import { createNotifier } from '../public/js/notify.js?v=d85330ff';
+import { mountSocialDrawer } from '../public/js/ui/social-drawer.js?v=3b9c69f9';
+import { createNotifier } from '../public/js/notify.js?v=37c6b748';
 import { partyFeature } from '../public/js/features/party-feature.js?v=136328ee';
 import { groupsFeature } from '../public/js/features/groups-feature.js?v=e3033084';
 

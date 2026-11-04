@@ -136,6 +136,7 @@ import {
   visitorsReport,
 } from '../butler.js?v=86316578';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
+import { holdMs } from '../read-time.js?v=60ae7efc';
 
 export const BUTLER_FEATURE_ID = 'butler';
 const HOME_STREET_TSID = 'RH_HOME_EXT';
@@ -1144,6 +1145,9 @@ function greetOwner(engine) {
   }, 1200));
 }
 
+/** Ticket 69: the pause between the greeting going and the after-greeting line (was 3.8 s after a 3.5 s bubble). */
+export const BUTLER_GREET_GAP_MS = 300;
+
 function greetNow(engine) {
   const g = rt.greeting;
   rt.greeting = null;
@@ -1152,7 +1156,10 @@ function greetNow(engine) {
   if (engine.player) faceX(engine.player.x);
   command();
   oneOff(engine, 'bow');
-  say(engine, g.greeting, 3500, { activity: true });
+  // Ticket 69: the greeting stays up its reading time (js/read-time.js; the source's next
+  // line came 10 s later, bag_butler.js greetPlayer 2854/2872 apiSetTimerX afterGreeting).
+  const greetMs = holdMs(g.greeting, 3500);
+  say(engine, g.greeting, greetMs, { activity: true });
   const parts = [];
   if (g.after.text) parts.push(g.after.text);
   if (g.mail && /mail\.$/.test(g.mail)) parts.push(g.after.text ? BUTLER_STRINGS.ownerMailAlso.trim() : BUTLER_STRINGS.ownerMail);
@@ -1163,7 +1170,7 @@ function greetNow(engine) {
     command();
     say(engine, parts.join(' '), 6000, { activity: true });
     if (reactionAllowedLoose()) oneOff(engine, 'talk');
-  }, 3800));
+  }, greetMs + BUTLER_GREET_GAP_MS));
 }
 
 // ---------------------------------------------------------------------------

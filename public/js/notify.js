@@ -7,8 +7,11 @@
  * TSFrontController.as screen_view_q):
  *
  * - notice: info, top centre under the street name, at most NOTICE_LIMIT showing,
- *   the newest replacing the oldest, gone after its time; the same words again
- *   within REPEAT_MS show once with a count instead of a second card.
+ *   the newest replacing the oldest once that has been up NOTICE_KEEP_MS (until
+ *   then the newer waits its turn, as GrowlQueue.as 30 MIN_STAY_TIME held a growl
+ *   before the next), gone after its time (at least its reading time,
+ *   js/read-time.js); the same words again within REPEAT_MS show once with a
+ *   count instead of a second card.
  * - gain: a small reward or cost (iMG, currants, mood, energy, items). It rises
  *   from the avatar or the item (game.js floatText) and lands in the log; gains
  *   in one burst (GAIN_BATCH_MS) become one log line.
@@ -22,9 +25,18 @@
  * the view, the zones it measures and game.js call into it.
  */
 
+import { holdMs } from './read-time.js?v=60ae7efc';
+
 export const NOTICE_LIMIT = 2;
-/** GrowlQueue.as 25-30: a growl held 4 s. */
+/** GrowlQueue.as 25-30: a growl held 4 s. Ticket 69: a longer line holds its reading time (js/read-time.js). */
 export const NOTICE_MS = 4000;
+/**
+ * Ticket 69: a notice up less than this long is not pushed out by a newer one; the newer
+ * waits (GrowlQueue.as 30 MIN_STAY_TIME: a growl on screen stayed at least 0.5 s before the next).
+ */
+export const NOTICE_KEEP_MS = 1500;
+/** Notices waiting their turn at most; past this the oldest waiting one goes (its line stays in the log). */
+export const NOTICE_WAIT_LIMIT = 4;
 export const NOTICE_MIN_MS = 1500;
 export const NOTICE_MAX_MS = 12000;
 /** The same words again within this long count on the first card instead of raising a second. */
@@ -176,6 +188,8 @@ export function createNotifier({
 } = {}) {
   /** Showing notices, oldest first. */
   const notices = [];
+  /** Notices waiting for a place (ticket 69), oldest first. */
+  const waiting = [];
   /** key → { count, at, entry } of notices raised lately (for counts after a card has gone). */
   const recent = new Map();
   /** The Activity log, oldest first. */
@@ -193,6 +207,38 @@ export function createNotifier({
     } catch (e) {
       console.warn('notify', e);
     }
+  }
+
+  /** How long a showing notice has been on screen (its held time not counted). */
+  function shownFor(n, t) {
+    return t - n.at - (n.paused || 0);
+  }
+
+  /** Whether the oldest showing notice may give its place to a newer one now. */
+  function roomFor(t) {
+    return notices.length < limit || shownFor(notices[0], t) >= NOTICE_KEEP_MS;
+  }
+
+  /** Shows `n` now, pushing the oldest out when the stack is full. */
+  function show(n, t) {
+    n.at = t;
+    n.until = t + n.ms;
+    n.paused = 0;
+    notices.push(n);
+    while (notices.length > limit) {
+      notices.shift();
+      stats.dropped += 1;
+    }
+  }
+
+  /** Waiting notices take places as they come free. Returns whether one did. */
+  function promote(t) {
+    let moved = false;
+    while (waiting.length && roomFor(t)) {
+      show(waiting.shift(), t);
+      moved = true;
+    }
+    return moved;
   }
 
   function pushEntry(entry) {
@@ -220,8 +266,9 @@ export function createNotifier({
     if (!plain) return null;
     const t = now();
     const key = noticeKey(plain) || plain.toLowerCase();
-    const life = Math.min(NOTICE_MAX_MS, Math.max(NOTICE_MIN_MS, Number(ms) || NOTICE_MS));
-    const showing = notices.find((n) => n.key === key);
+    // Ticket 69: never shorter than its reading time (js/read-time.js).
+    const life = Math.min(NOTICE_MAX_MS, Math.max(NOTICE_MIN_MS, holdMs(plain, Number(ms) || NOTICE_MS)));
+    const showing = notices.find((n) => n.key === key) || waiting.find((n) => n.key === key);
     const before = recent.get(key);
     if (showing) {
       // The same event said twice at once (a toast and its activity line) is not a repeat.
@@ -246,11 +293,15 @@ export function createNotifier({
       return showing;
     }
     const count = before && t - before.at <= repeatMs ? before.count + 1 : 1;
-    const n = { id: ++seq, key, text: plain, html, count, at: t, ms: life, until: t + life };
-    notices.push(n);
-    while (notices.length > limit) {
-      notices.shift();
-      stats.dropped += 1;
+    const n = { id: ++seq, key, text: plain, html, count, raised: t, at: t, ms: life, until: t + life, paused: 0 };
+    // Ticket 69: behind any already waiting, and behind a full stack whose oldest is still new.
+    if (!waiting.length && roomFor(t)) show(n, t);
+    else {
+      waiting.push(n);
+      while (waiting.length > NOTICE_WAIT_LIMIT) {
+        waiting.shift();
+        stats.dropped += 1;
+      }
     }
     stats.notices += 1;
     let entry = null;
@@ -327,8 +378,10 @@ export function createNotifier({
     stats.moments += 1;
     // The words may already be on a notice (a feature's own toast): that card goes, the screen says it.
     const key = noticeKey(text);
-    const i = notices.findIndex((n) => n.key === key);
-    if (i >= 0) notices.splice(i, 1);
+    for (const list of [notices, waiting]) {
+      const i = list.findIndex((n) => n.key === key);
+      if (i >= 0) list.splice(i, 1);
+    }
     return log(text, { kind: 'moment' });
   }
 
@@ -354,22 +407,33 @@ export function createNotifier({
       const n = notices[i];
       if (paused) {
         n.until += dt;
+        n.paused += dt;
         continue;
       }
-      if (t >= n.until || n.at < dropBefore) {
+      if (t >= n.until || n.raised < dropBefore) {
         notices.splice(i, 1);
         gone = true;
       }
     }
+    for (let i = waiting.length - 1; i >= 0; i--) {
+      if (waiting[i].raised < dropBefore) {
+        waiting.splice(i, 1);
+        gone = true;
+      }
+    }
+    if (!paused && promote(t)) gone = true;
     for (const [key, r] of recent) if (t - r.at > repeatMs) recent.delete(key);
     if (gone) changed('notice');
     return notices;
   }
 
   function dismiss(id) {
-    const i = notices.findIndex((n) => n.id === id);
+    const list = notices.some((n) => n.id === id) ? notices : waiting;
+    const i = list.findIndex((n) => n.id === id);
     if (i < 0) return false;
-    notices.splice(i, 1);
+    list.splice(i, 1);
+    // A place came free: the next waiting one shows at once.
+    if (list === notices) promote(now());
     changed('notice');
     return true;
   }
@@ -409,6 +473,10 @@ export function createNotifier({
     markRead,
     get notices() {
       return notices;
+    },
+    /** Notices waiting for a place (ticket 69). */
+    get waiting() {
+      return waiting;
     },
     get entries() {
       return entries;

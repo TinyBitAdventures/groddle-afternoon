@@ -1,6 +1,10 @@
 /**
  * The Classic growl line (classic-spec spec §11, GrowlQueue.as 25-26, 122-127): the game's notices
  * one at a time on a single line at the viewport's bottom-left, each 0.2 s in, 4 s up, 0.6 s out.
+ * Ticket 69: a line stays up its reading time (js/read-time.js, at least the 4 s). With one line
+ * waiting it gives way after the 4 s; with more waiting (a burst) after NOTICE_KEEP_MS (js/notify.js),
+ * as the client's growl gave way to the next after MIN_STAY_TIME (GrowlQueue.as 30, 152-164),
+ * instead of a backlog of full holds that showed a line long after it happened.
  *
  * It is a second view on the same notices: js/notify-view.js keeps drawing #notify-notices (Classic
  * keeps it mounted with visibility: hidden, so playtest.mjs and tests/notify.test.js still hold) and
@@ -8,12 +12,26 @@
  * hidden stack no longer speaks.
  */
 import { uiState, onUiModeChange } from './ui-mode.js?v=587c014a';
+import { readMs } from '../read-time.js?v=60ae7efc';
+import { NOTICE_KEEP_MS } from '../notify.js?v=37c6b748';
 
 export const GROWL_IN_MS = 200;
 export const GROWL_HOLD_MS = 4000;
 export const GROWL_OUT_MS = 600;
 /** More waiting than this and the oldest go (the client's queue only ever held a few). */
 export const GROWL_QUEUE_MAX = 6;
+
+/**
+ * PURE: how long a line stays up (after its fade in) with `waiting` lines behind it: its reading
+ * time alone, the 4 s with one behind it, NOTICE_KEEP_MS in a burst.
+ */
+export function growlStayMs(html, waiting = 0) {
+  const text = String(html || '').replace(/<[^>]+>/g, ' ');
+  const n = Number(waiting) || 0;
+  if (n >= 2) return NOTICE_KEEP_MS;
+  const read = Math.max(GROWL_HOLD_MS, readMs(text));
+  return n === 1 ? GROWL_HOLD_MS : read;
+}
 
 /** PURE: the queue after a card shows or changes: new html joins the end, a repeat of the waiting tail does not. */
 export function enqueue(queue, html, max = GROWL_QUEUE_MAX) {
@@ -40,6 +58,9 @@ export function installClassicGrowl({ doc = globalThis.document, win = globalThi
   let queue = [];
   let timer = 0;
   let showing = false;
+  /** The line up now: its html, when it began, when its fade out starts (0 once fading). */
+  let current = null;
+  const clock = () => (win.performance?.now ? win.performance.now() : Date.now());
   const seen = new WeakMap();
   const classic = () => uiState().mode === 'classic';
   const reduced = () => Boolean(win.matchMedia?.('(prefers-reduced-motion: reduce)').matches);
@@ -57,11 +78,26 @@ export function installClassicGrowl({ doc = globalThis.document, win = globalThi
     line.innerHTML = html;
     line.classList.add('is-on');
     const inMs = reduced() ? 0 : GROWL_IN_MS;
-    const outMs = reduced() ? 0 : GROWL_OUT_MS;
+    current = { html, at: clock(), inMs, fadeAt: 0 };
+    fadeIn(inMs + growlStayMs(html, queue.length));
+  }
+
+  /** Starts the fade out `ms` from now. */
+  function fadeIn(ms) {
+    clearTimeout(timer);
+    current.fadeAt = clock() + ms;
     timer = setTimeout(() => {
+      current.fadeAt = 0;
       line.classList.remove('is-on');
-      timer = setTimeout(next, outMs);
-    }, inMs + GROWL_HOLD_MS);
+      timer = setTimeout(next, reduced() ? 0 : GROWL_OUT_MS);
+    }, ms);
+  }
+
+  /** Another line joined the queue: the one up gives way sooner (growlStayMs), never before NOTICE_KEEP_MS. */
+  function hurry() {
+    if (!current?.fadeAt) return;
+    const at = current.at + current.inMs + growlStayMs(current.html, queue.length);
+    if (at < current.fadeAt) fadeIn(Math.max(0, at - clock()));
   }
 
   function take(card) {
@@ -72,6 +108,7 @@ export function installClassicGrowl({ doc = globalThis.document, win = globalThi
     seen.set(card, html);
     queue = enqueue(queue, html);
     if (!showing) next();
+    else hurry();
   }
 
   if (stack && typeof win.MutationObserver === 'function') {

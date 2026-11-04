@@ -26,7 +26,11 @@ import {
   REPEAT_MS,
   GAIN_BATCH_MS,
   FLOAT_LINE_PX,
-} from '../public/js/notify.js?v=d85330ff';
+  NOTICE_KEEP_MS,
+  NOTICE_WAIT_LIMIT,
+  NOTICE_MAX_MS,
+} from '../public/js/notify.js?v=37c6b748';
+import { readMs } from '../public/js/read-time.js?v=60ae7efc';
 import { REMAKE_SCREEN_GATES, SCREEN_GATES, screenQueueHold, waitForScreenGates } from '../public/js/screen-queue.js?v=cf0132c0';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -91,22 +95,114 @@ describe('notices: de-duplication', () => {
 });
 
 describe('notices: at most two, newest replaces oldest, auto-dismiss', () => {
-  it('keeps the newest NOTICE_LIMIT', () => {
+  it('keeps NOTICE_LIMIT; a third waits until the oldest has been up NOTICE_KEEP_MS, then replaces it (ticket 69)', () => {
     assert.equal(NOTICE_LIMIT, 2);
-    const { n } = notifier();
+    assert.equal(NOTICE_KEEP_MS, 1500);
+    const { n, clock } = notifier();
     n.notice('one');
     n.notice('two');
     n.notice('three');
-    assert.deepEqual(n.notices.map((x) => x.text), ['two', 'three']);
-    assert.equal(n.stats.dropped, 1);
-    // Every one is still in the log.
+    assert.deepEqual(n.notices.map((x) => x.text), ['one', 'two'], 'the oldest is too new to go');
+    assert.deepEqual(n.waiting.map((x) => x.text), ['three']);
+    assert.equal(n.stats.dropped, 0);
+    // Every one is in the log at once.
     assert.deepEqual(n.entries.map((e) => e.text), ['one', 'two', 'three']);
+    clock.advance(NOTICE_KEEP_MS - 1);
+    n.tick();
+    assert.deepEqual(n.notices.map((x) => x.text), ['one', 'two']);
+    clock.advance(1);
+    n.tick();
+    assert.deepEqual(n.notices.map((x) => x.text), ['two', 'three']);
+    assert.equal(n.waiting.length, 0);
+    assert.equal(n.stats.dropped, 1);
+    // Its own time starts when it shows.
+    assert.equal(n.notices[1].at, clock.now());
+    assert.equal(n.notices[1].until, clock.now() + readMs('three'));
+  });
+
+  it('a newer notice replaces an oldest that has been up NOTICE_KEEP_MS at once', () => {
+    const { n, clock } = notifier();
+    n.notice('one');
+    clock.advance(200);
+    n.notice('two');
+    clock.advance(NOTICE_KEEP_MS);
+    n.notice('three');
+    assert.deepEqual(n.notices.map((x) => x.text), ['two', 'three']);
+    assert.equal(n.waiting.length, 0);
+  });
+
+  it('waiting notices keep their order, a newer one never jumps the queue, and the queue is capped', () => {
+    const { n, clock } = notifier();
+    for (const w of ['a', 'b', 'c', 'd']) n.notice(w);
+    assert.deepEqual(n.waiting.map((x) => x.text), ['c', 'd']);
+    clock.advance(NOTICE_KEEP_MS);
+    n.tick();
+    // 'a' and 'b' were raised together, so both have been up long enough: 'c' and 'd' take both places.
+    assert.deepEqual(n.notices.map((x) => x.text), ['c', 'd']);
+    // A long burst: the queue keeps the newest NOTICE_WAIT_LIMIT; every line stays in the log.
+    const { n: m } = notifier();
+    for (let i = 0; i < 10; i++) m.notice(`line ${i}`);
+    assert.equal(m.notices.length, 2);
+    assert.equal(m.waiting.length, NOTICE_WAIT_LIMIT);
+    assert.deepEqual(m.waiting.map((x) => x.text), ['line 6', 'line 7', 'line 8', 'line 9']);
+    assert.equal(m.entries.length, 10);
+  });
+
+  it('held time does not count toward NOTICE_KEEP_MS, and nothing waiting shows while held', () => {
+    let held = false;
+    const { n, clock } = notifier({ held: () => held });
+    n.notice('one');
+    n.notice('two');
+    held = true;
+    n.notice('three');
+    clock.advance(5000);
+    n.tick();
+    assert.deepEqual(n.notices.map((x) => x.text), ['one', 'two']);
+    held = false;
+    clock.advance(NOTICE_KEEP_MS - 10);
+    n.tick();
+    assert.deepEqual(n.waiting.map((x) => x.text), ['three'], 'up 1.49 s on screen: still kept');
+    clock.advance(10);
+    n.tick();
+    assert.deepEqual(n.notices.map((x) => x.text), ['two', 'three']);
+  });
+
+  it('a repeat of a waiting notice counts on it; dismiss and a moment free or clear a place', () => {
+    const { n, clock } = notifier();
+    const a = n.notice('one');
+    n.notice('two');
+    n.notice('three');
+    clock.advance(500);
+    n.notice('three');
+    assert.equal(n.waiting.length, 1);
+    assert.equal(n.waiting[0].count, 2);
+    n.dismiss(a.id);
+    assert.deepEqual(n.notices.map((x) => x.text), ['two', 'three'], 'the place a dismiss frees goes to the next waiting');
+    n.notice('four');
+    n.moment('four');
+    assert.equal(n.waiting.length, 0, 'a moment takes its words off the queue too');
+  });
+
+  it('a panel opened after a waiting notice was raised sends it too', () => {
+    const { n, clock } = notifier();
+    n.notice('one');
+    n.notice('two');
+    n.notice('three');
+    clock.advance(10);
+    n.tick({ dropBefore: clock.now() });
+    assert.equal(n.notices.length, 0);
+    assert.equal(n.waiting.length, 0);
+    assert.equal(n.entries.length, 3);
   });
 
   it('goes after its time; a held clock (loading card) stops it', () => {
     let held = false;
     const { n, clock } = notifier({ held: () => held });
-    n.notice('Arrived: Groddle Meadow', { ms: 3000 });
+    const text = 'Arrived: Groddle Meadow';
+    // Ticket 69: 3 s asked, but three words read in 4.9 s.
+    n.notice(text, { ms: 3000 });
+    assert.equal(n.notices[0].ms, readMs(text));
+    assert.equal(readMs(text), 4900);
     clock.advance(1000);
     n.tick();
     held = true;
@@ -114,12 +210,20 @@ describe('notices: at most two, newest replaces oldest, auto-dismiss', () => {
     n.tick();
     assert.equal(n.notices.length, 1, 'held under the card');
     held = false;
-    clock.advance(1900);
+    clock.advance(3800);
     n.tick();
     assert.equal(n.notices.length, 1, 'its remaining time runs after the card');
     clock.advance(200);
     n.tick();
     assert.equal(n.notices.length, 0);
+  });
+
+  it('holds its reading time, or the time asked when that is longer, up to NOTICE_MAX_MS (ticket 69)', () => {
+    const { n } = notifier();
+    const long = 'Your Butler says: welcome home, there are three packages and a letter waiting for you inside the house, and the garden needs water.';
+    assert.equal(n.notice(long).ms, 10_000, 'a long line holds the 10 s cap of the bubble rule');
+    assert.equal(n.notice('Short one.', { ms: 8000 }).ms, 8000, 'a longer time asked is kept');
+    assert.equal(n.notice('Very short.', { ms: 60_000 }).ms, NOTICE_MAX_MS);
   });
 
   it('a view hold (no room, a screen up) pauses it too, and a panel opened after it sends it early', () => {

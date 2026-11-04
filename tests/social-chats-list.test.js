@@ -21,8 +21,8 @@ import {
   mountSocialDrawer,
   sectionOf,
   tabRow,
-} from '../public/js/ui/social-drawer.js?v=b99fb56c';
-import { createNotifier } from '../public/js/notify.js?v=d85330ff';
+} from '../public/js/ui/social-drawer.js?v=3b9c69f9';
+import { createNotifier } from '../public/js/notify.js?v=37c6b748';
 import { paneLayout } from '../public/js/classic/classic-panes.js?v=f141e3cf';
 import { memoryStore, page } from './social-fake-dom.js';
 

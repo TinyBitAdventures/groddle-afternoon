@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=6218d040';
 import { createFeatureHost } from './js/feature-host.js?v=2ed3c069';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=7249deb6';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=bd53c22b';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -922,9 +922,10 @@ import { QUOIN_FRAME_BOB, advanceQuoinClock, quoinBobBetweenFrames } from './js/
 import { installHiresFirstDraw, installHiresSprites, upgradeSource } from './js/sprite-hires.js?v=96c22af7';
 import { denseSprite } from './js/sprite-dense.js?v=178a711b';
 import { wholeStatAmounts, wholeEffects } from './js/stat-text.js?v=f96d8fd3';
-import { createNotifier, effectTokens, floatKey, offerCardDrop, stackFloat, tokenText } from './js/notify.js?v=d85330ff';
-import { mountNotifyView } from './js/notify-view.js?v=81d06119';
-import { mountSocialDrawer } from './js/ui/social-drawer.js?v=b99fb56c';
+import { createNotifier, effectTokens, floatKey, offerCardDrop, stackFloat, tokenText } from './js/notify.js?v=37c6b748';
+import { holdMs } from './js/read-time.js?v=60ae7efc';
+import { mountNotifyView } from './js/notify-view.js?v=2835afc0';
+import { mountSocialDrawer } from './js/ui/social-drawer.js?v=3b9c69f9';
 import { bindDragScroll } from './js/ui/drag-scroll.js?v=9a527ac8';
 import { SIDE_SHEET_IDS, bindTabs, inSideSheet, mountPanelShell, sheetKeyToWorld } from './js/ui/panel-shell.js?v=6812fe04';
 import { createQuestSheet, questStep } from './js/ui/quest-sheet.js?v=c8976bed';
@@ -956,7 +957,7 @@ import { itemZ } from './js/item-bands.js?v=e98b10bc';
 import { SLUG_ANIMATION, SLUG_LAYOUT, SLUG_STYLES, SLUG_TARGETS, drawSlugIcon, formatRawSlugs, formatSlugList, layoutSlugRow, slugBox, slugNumber, slugPillPath, slugSign, speechSlugList } from './js/speech-slugs.js?v=130338f9';
 import { filterText } from './js/word-filter.js?v=9a7a7ebb'; // the remake's own word filter
 // The interface skin (js/classic/ui-mode.js) sets <html data-ui> as it loads: before main(), so before the boot cover lifts.
-import { installInterfaceSettings } from './js/classic/classic-prefs.js?v=b23e21e4';
+import { installInterfaceSettings } from './js/classic/classic-prefs.js?v=83e10b91';
 
 /** @type {object|null} assets/maps/index.json */
 let mapIndexCache = null;
@@ -7095,12 +7096,14 @@ function showSpeechBubble(target, speech) {
   bubble.eventMode = 'none';
   bubble._speechFx = {
     target,
+    text,
     width,
     height,
     bg,
     flipped: null,
     life: 0,
-    max: Math.max(210, Number(speech.durationMs || 5000) / (1000 / 60)),
+    // Ticket 69: at least its reading time (js/read-time.js: AvaChatBubbleManager.as 18-20, 51).
+    max: holdMs(text, speech.durationMs || 5000) / (1000 / 60),
   };
   speechBubbles.push(bubble);
   fxLayer.addChild(bubble);
@@ -30328,6 +30331,10 @@ async function main() {
           speaker: spr ? { wx: Math.round(spr.x), x: Math.round(spr.x - cx), feet: Math.round(spr.y - cy), art: Math.round(Number(m.target.artHeight) || 0) } : null,
           box: { left: Math.round(b.x - m.width / 2 - cx), right: Math.round(b.x + m.width / 2 - cx), top: Math.round(top - cy), bottom: Math.round(top + m.height + 11 - cy) },
           flipped: Boolean(m.flipped),
+          // Ticket 69: its words, how long it stays up and how long it has been up (ms).
+          text: m.text || '',
+          ms: Math.round((m.max || 0) * (1000 / 60)),
+          upMs: Math.round((m.life || 0) * (1000 / 60)),
           hold: m.hold ? { ...m.hold } : null,
           slide: m.slide || 0,
         };

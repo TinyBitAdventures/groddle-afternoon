@@ -25,8 +25,8 @@ import {
   splitChat,
   withTimeLines,
   writeChoice,
-} from '../public/js/ui/social-drawer.js?v=b99fb56c';
-import { createNotifier } from '../public/js/notify.js?v=d85330ff';
+} from '../public/js/ui/social-drawer.js?v=3b9c69f9';
+import { createNotifier } from '../public/js/notify.js?v=37c6b748';
 import { resolveTokens } from './css-tokens.js';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
