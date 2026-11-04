@@ -34,7 +34,7 @@ import { createEnergyLossClock, ENERGY_LOSS_TICK_MS, energyLossSkip, periodicEne
 import { energyMax } from '../metabolics.js?v=8504134e';
 import { isNewxpSceneTsid } from '../newxp.js?v=6ca4702e';
 import { homesFeature } from './homes-feature.js?v=cf52d2f9';
-import { meditationFeature } from './meditation-feature.js?v=f0086476';
+import { meditationFeature } from './meditation-feature.js?v=8016326d';
 import { newxpFeature } from './newxp-feature.js?v=7103d7f9';
 
 export const ENERGY_DECAY_FEATURE_ID = 'energy-decay';

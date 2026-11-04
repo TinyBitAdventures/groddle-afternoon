@@ -121,9 +121,20 @@ let lastPublish = 0;
 
 const dayKey = () => getGameDayKey(Date.now());
 
-function rng(engine) {
-  const roll = Number(engine.param('meditateroll'));
+/**
+ * The session's random source: Math.random, or a fixed roll for QA (?meditateroll=0.5).
+ * engine.param is null without the parameter, and Number(null) is 0, so the null check
+ * matters: without it every player rolled 0, the shortest session (ticket 72: always
+ * +21 mood and +21 energy, always "Darn. Got distracted.").
+ */
+export function meditationRng(raw) {
+  if (raw === null || raw === undefined || String(raw).trim() === '') return Math.random;
+  const roll = Number(raw);
   return Number.isFinite(roll) && roll >= 0 && roll < 1 ? () => roll : Math.random;
+}
+
+function rng(engine) {
+  return meditationRng(engine.param('meditateroll'));
 }
 
 function learned(engine) {
