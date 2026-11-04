@@ -50,7 +50,8 @@ import {
   recoverableToggles,
   runLocationEvent,
   streetOwner,
-} from '../location-events.js?v=61e0c5d3';
+} from '../location-events.js?v=05663361';
+import { JUMP_SPEED } from '../avatar-step.js?v=537aa4b7';
 
 export const LOCATION_EVENTS_FEATURE_ID = 'location-events';
 const DATA_MS = 250;
@@ -384,7 +385,7 @@ function demoStep(engine, now) {
     engine.setData('physicsDemo', 'arrived');
     if (engine.param('physicsautoplay') === 'jump' && p.onGround) {
       const mult = physicsMultipliers(effectiveSetting(clock) || NORMAL_PHYSICS);
-      p.vy = -9.6 * mult.jump;
+      p.vy = JUMP_SPEED * mult.jump;
       p.onGround = false;
       engine.setData('physicsDemo', 'jumped');
     }
@@ -564,13 +565,13 @@ export const locationEventsFeature = {
       speed: m.speed,
       jump: m.jump,
       gravity: m.gravity,
-      // The source caps fall speed everywhere; the remake only does where the
-      // street or an event changes gravity or the cap itself.
-      vyMax: m.vyMax !== 1 || m.gravity !== 1 ? m.vyMax : undefined,
+      // The stepper caps vy at normal vy_max everywhere; this is the street's own cap.
+      vyMax: m.vyMax,
       accel: m.accel,
       airAccel: m.airAccel,
       friction: m.friction,
       airDrag: m.airDrag,
+      airFriction: m.airFriction,
       jetpack: m.jetpack,
       tripleJump: m.tripleJump,
     };

@@ -2,9 +2,9 @@
  * Groddle Afternoon — original street geometry + layered decos
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
-import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=117337d3';
-import { createFeatureHost } from './js/feature-host.js?v=903263a4';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=e078538f';
+import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=eb7378cd';
+import { createFeatureHost } from './js/feature-host.js?v=2ed3c069';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=aa6fadfd';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -436,7 +436,7 @@ import {
   formatBuffRemaining,
   consumeRewardBuff,
   studyBuffBlockReason,
-} from './js/buffs.js?v=c7727c43';
+} from './js/buffs.js?v=036fee53';
 import { grantMoodXp, moodXpMultiplierFor, setMoodXpEnv } from './js/mood-xp.js?v=958e7680';
 import {
   loadContentCatalogs,
@@ -464,8 +464,8 @@ import {
 } from './js/inventory.js?v=597a17a2';
 import { PACK_COPY, isBagClass, unitRankAt } from './js/pack-slots.js?v=ba0a895f';
 import { createPackRow, mountPackClearance, packBandRange, packCountText, packSearchEntries, packSlotTip } from './js/ui/pack-row.js?v=65c0f180';
-import { listAnimalFeedOptions } from './js/animals.js?v=35a443e9';
-import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=35a443e9';
+import { listAnimalFeedOptions } from './js/animals.js?v=1dc87cbf';
+import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=1dc87cbf';
 import {
   createDroppedItemState,
   parseDroppedItemState,
@@ -482,7 +482,7 @@ import {
   parsePlayerSave,
   serializePlayerSave,
   restorePlayerSave,
-} from './js/player-save.js?v=f9b34732';
+} from './js/player-save.js?v=4d7dc096';
 import {
   HOME_INTERIOR_TSID,
   HOME_STREET_TSID,
@@ -496,7 +496,7 @@ import {
   imagineHome,
   isHomePlaceTsid,
 } from './js/homes.js?v=631ab6b8';
-import { HOME_MACHINE, offerHomeTicket, renderTicketMachine } from './js/home-ticket.js?v=355d8ba7';
+import { HOME_MACHINE, offerHomeTicket, renderTicketMachine } from './js/home-ticket.js?v=7d5e99a5';
 import {
   MAIL_COMPANIONS,
   archiveMail,
@@ -739,7 +739,7 @@ import { facingScaleX, facingFromVelocity } from './js/avatar.js?v=c4da73ea';
 import { AFK_SEQUENCE, AFK_TIMEOUT_MS, ANIMS, ANIM_FPS, EMOTIONS, EMOTION_MS, FALL_LOOP, IDLE_SHEETS, RANDOM_IDLE_MS, RANDOM_IDLE_WAIT_MS, animForState, avatarAnimState, createIdleClock, crowdScaleX, frameRef, idleSheetFor } from './js/avatar-anims.js?v=fb921bf4';
 import { landingY, stackRestY, walkSurfaceY } from './js/walk-surface.js?v=c982983e';
 import { holdCloseToFloor } from './js/slope-walk.js?v=9af1e505';
-import { WALK_MAX, avatarGround, coastX, stepAvatar, steerAccel, steerX, streetPhysicsExtras } from './js/avatar-step.js?v=33ad1926';
+import { JUMP_SPEED, WALK_MAX, avatarGround, coastX, stepAvatar, steerAccel, steerX, streetPhysicsExtras } from './js/avatar-step.js?v=537aa4b7';
 import { createUserPath, stepUserPath } from './js/user-path.js?v=8880557f';
 import { FAILED_LINE, inVerbReach, movingLine, verbRange, walkOverEnd, walkOverGoalX } from './js/walk-over.js?v=db80ba07';
 import { hellBuffDesc, isInHell } from './js/hell.js?v=45060736';
@@ -795,7 +795,7 @@ import {
   createAnimalState,
   resetAnimalDay,
   animalStatusLabel,
-} from './js/animals.js?v=35a443e9';
+} from './js/animals.js?v=1dc87cbf';
 import {
   ensureWoodTreeState,
   pickWoodTool,
@@ -894,7 +894,7 @@ import {
   ANIMAL_PATROL,
   nearestPlacementGap,
 } from './js/street-ecology.js?v=2c82c072';
-import { chickenPauseRoll, easeToward, flightFloorAt, flightFloorFor, flyerLift } from './js/street-creatures.js?v=ca407a2f';
+import { chickenPauseRoll, easeToward, flightFloorAt, flightFloorFor, flyerLift } from './js/street-creatures.js?v=8f2cbb85';
 import { createSoundBoard, DEFAULT_SFX_VOLUME, watchButtonClicks, watchPanelSounds } from './js/sound-board.js?v=f992a5c5';
 import {
   actionLoopFor,
@@ -10824,7 +10824,7 @@ function startClimb(wallHit) {
   setPlayerAnim('climb');
 }
 
-function stopClimb({ jumpOff = false, side = 0, jumpVelocity = -9.6, maxSpeed = 4.4 } = {}) {
+function stopClimb({ jumpOff = false, side = 0, jumpVelocity = JUMP_SPEED, maxSpeed = 4.4 } = {}) {
   if (!climb.active && !player?.climbing) return;
   climb.active = false;
   climb.wall = null;
@@ -10833,6 +10833,7 @@ function stopClimb({ jumpOff = false, side = 0, jumpVelocity = -9.6, maxSpeed = 
   climb.regrabLock = true;
   if (player) {
     player.climbing = false;
+    player.tripleJumping = false;
     if (jumpOff) {
       // vy_jump / 10 and vx_off_ladder (300 of vx_max 335) sideways; a full jump straight up.
       player.vy = side ? jumpVelocity / 10 : jumpVelocity;
@@ -13549,6 +13550,8 @@ function countPlayerJump() {
 function performPlayerJump(result, baseVelocity, now) {
   player.vy = baseVelocity * result.multiplier;
   player.onGround = false;
+  // AvatarPhysicsHandler.as 268 / 437-438: a triple jump rises at up to twice vy_max.
+  player.tripleJumping = result.triple === true;
   noteGrounded(jumpState, false, now);
   // G258: jumping costs no energy (no source; players/player.js onPeriodicEnergyLoss is the only drift).
   countPlayerJump();
@@ -13677,7 +13680,7 @@ function handleInput() {
       const side = left && !right ? -1 : right && !left ? 1 : 0;
       clearJumpQueue(jumpState);
       noteGrounded(jumpState, false, now);
-      stopClimb({ jumpOff: true, side, jumpVelocity: -9.6 * movementBuff.jump, maxSpeed: 4.4 * movementBuff.speed });
+      stopClimb({ jumpOff: true, side, jumpVelocity: JUMP_SPEED * movementBuff.jump, maxSpeed: 4.4 * movementBuff.speed });
       if (!side) {
         noteJumped(jumpState);
         countPlayerJump();
@@ -13730,7 +13733,7 @@ function handleInput() {
   const accel = steerAccel(player.onGround, movementBuff);
   const max = WALK_MAX * movementBuff.speed;
   player.vxMax = max;
-  const jumpVelocity = -9.6 * movementBuff.jump;
+  const jumpVelocity = JUMP_SPEED * movementBuff.jump;
   if (left) {
     player.vx = Math.max(player.vx - accel, -max);
   } else if (right) {

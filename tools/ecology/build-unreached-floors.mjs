@@ -31,7 +31,7 @@ import { cpus } from 'node:os';
 import { Worker, isMainThread, parentPort, workerData } from 'node:worker_threads';
 import { fileURLToPath } from 'node:url';
 import { GAME_DIR } from '../repos.mjs';
-import { reachStreet, streetBuff, STAND_STEP } from '../../public/js/builder/reach-graph.js?v=3602d09e';
+import { reachStreet, streetBuff, STAND_STEP } from '../../public/js/builder/reach-graph.js?v=40bfbc44';
 
 /** Jump multiplier for the reach run: the best triple jump (movement.js rawTripleJumpMultiplier 1.8). */
 export const UNREACHED_JUMP = 1.8;

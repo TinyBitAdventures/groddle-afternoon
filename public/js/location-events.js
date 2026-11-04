@@ -20,9 +20,10 @@
  *   Collision-triggered Event Box `cteb.js` onEnter/onExit, quoins, light
  *   beams, buttons) whose positions and instanceProps were not archived.
  *
- * The remake's movement is its own (game.js handleInput/physics: 4.4 px/frame
- * walk, -9.6 jump, 0.42 gravity), so source settings become multipliers
- * against the normal preset rather than raw px/s values.
+ * The remake's movement runs in px per 60 fps frame (js/avatar-step.js: the
+ * normal preset's gravity, vy_jump, vy_max and friction_air converted, walk
+ * 4.4), so source settings become multipliers against the normal preset
+ * rather than raw px/s values.
  */
 
 /** config_base.js physics_configs.normal. */
@@ -216,24 +217,26 @@ export function applyPhysicsAdjustments(setting, adjustments = {}) {
 
 /**
  * Movement multipliers for the remake (feature host physics()) from an
- * effective PhysicsSetting. Jump uses the capped launch speed (vy_max also
- * bounds upward velocity in AvatarPhysicsHandler.boundAvatarVelocities).
+ * effective PhysicsSetting. Jump is the full vy_jump: the shared stepper bounds
+ * vy at vy_max after the launch frame's gravity, as AvatarPhysicsHandler
+ * boundAvatarVelocities 433-442 does (so a triple jump on a low-cap street
+ * still gets its x2 room). airFriction is the signed friction_air.
  */
 export function physicsMultipliers(setting) {
   const s = { ...NORMAL_PHYSICS, ...(setting || {}) };
   const n = NORMAL_PHYSICS;
   const ratio = (a, b) => (Number.isFinite(a) && b ? a / b : 1);
-  const launch = Math.min(Math.abs(s.vy_jump), Math.abs(s.vy_max) || Infinity);
   const accel = (a, base) => (a > 0 ? Math.sqrt(a / base) : 0.05);
   return {
     speed: ratio(s.vx_max, n.vx_max),
-    jump: ratio(launch, Math.abs(n.vy_jump)),
+    jump: ratio(Math.abs(s.vy_jump), Math.abs(n.vy_jump)),
     gravity: ratio(s.gravity, n.gravity),
     vyMax: ratio(Math.abs(s.vy_max), n.vy_max),
     accel: accel(s.vx_accel_add_in_floor, n.vx_accel_add_in_floor),
     airAccel: accel(s.vx_accel_add_in_air, n.vx_accel_add_in_air),
     friction: Math.max(0, ratio(s.friction_floor, n.friction_floor)),
     airDrag: s.friction_air > 0 ? s.friction_air : 0,
+    airFriction: Number.isFinite(s.friction_air) ? s.friction_air : n.friction_air,
     jetpack: Number(s.jetpack) === 1 || s.jetpack === true,
     tripleJump: Number.isFinite(s.multiplier_3_jump) ? Math.max(0, s.multiplier_3_jump) : 1,
     scale: s.pc_scale > 0 ? s.pc_scale : 1,

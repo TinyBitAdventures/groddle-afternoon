@@ -6,6 +6,7 @@
  * pc_perm) stay plain floors, and Penumbra, rebuilt from video, uses -1 floors.
  */
 import assert from 'node:assert/strict';
+import { JUMP_SPEED, NORMAL_BUFF, avatarFall } from '../public/js/avatar-step.js?v=537aa4b7';
 import { describe, it } from 'node:test';
 import { readFileSync } from 'node:fs';
 import { avatarHeadReach, headCeiling, isSolidFromBelow, isStandable, platformYAt, platformsScreen } from '../public/js/street-model.js?v=505d8990';
@@ -63,13 +64,16 @@ describe('the head reaches as high as the client\'s head circle', () => {
   const lines = platformsScreen(flipside);
   const floor = 1950; // pl1257582196548, world y -50
   const roofAt = (x) => Math.max(...lines.filter((p) => isSolidFromBelow(p)).map((p) => platformYAt(p, x, 0) ?? -Infinity));
-  /** A plain jump stepped as game.js physics() does (vy -9.6, +0.42 a frame), head against the lines. */
+  /** A plain jump stepped as game.js physics() does (js/avatar-step.js avatarFall), head against the lines. */
   const peak = (x, head) => {
     let y = floor;
-    let vy = -9.6;
+    const body = { vy: JUMP_SPEED, onGround: false };
+    let vy = JUMP_SPEED;
     let top = y;
     for (let i = 0; i < 80; i++) {
-      vy += 0.42;
+      body.vy = vy;
+      avatarFall(body, NORMAL_BUFF, 1);
+      vy = body.vy;
       const prev = y;
       y += vy;
       const stop = headCeiling(lines, x, prev, x, y, head);

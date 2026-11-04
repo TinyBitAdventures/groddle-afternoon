@@ -6,10 +6,10 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 
-import { createFeatureHost } from '../public/js/feature-host.js?v=903263a4';
+import { createFeatureHost } from '../public/js/feature-host.js?v=2ed3c069';
 import { createInventory, countItem } from '../public/js/inventory.js?v=597a17a2';
 import { createToolConditionState } from '../public/js/tools.js?v=3974f57e';
-import { meditationFeature } from '../public/js/features/meditation-feature.js?v=6f4fd517';
+import { meditationFeature } from '../public/js/features/meditation-feature.js?v=79567a8c';
 import { teleportationFeature } from '../public/js/features/teleportation-feature.js?v=b46fa776';
 
 function fakeEngine(overrides = {}) {

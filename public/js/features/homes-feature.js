@@ -188,15 +188,15 @@ import {
   quoteYardExpansion,
   removeCultivation,
   towerItem,
-} from '../home-cultivation.js?v=11616085';
+} from '../home-cultivation.js?v=ff17225a';
 import { PROTO_DEPLETED_ART } from '../home-proto-art.js?v=9309e9f3';
 import { MOVABLE_FIXTURES, MOVABLE_FIXTURE_IDS, fixtureFits, fixtureText, savedFixtureRx, signpostX } from '../home-street-fixtures.js?v=badcb725';
 import { displayTopOf, itemstackOverlayPoint, overlayAlpha, overlayLifeMs, playPoofIn, trackOverlay } from '../overlay-art.js?v=11b6dd7f';
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=8f5dc6d9';
 import { fadeInNewNear } from '../poof-fade.js?v=54ef2431';
-import { projectApi } from './street-jobs-feature.js?v=b7692d01';
-import { TOWER_CHASSIS, TOWER_CONFIG, TOWER_DOOR_DX, TOWER_GEO, TOWER_PROTO, normalizeTowerState } from '../home-tower.js?v=6a203c8f';
-import { drawTowerElevator, drawTowerExit, towerApi, visitorTowerView } from './home-tower-feature.js?v=552041c3';
+import { projectApi } from './street-jobs-feature.js?v=ce1804d3';
+import { TOWER_CHASSIS, TOWER_CONFIG, TOWER_DOOR_DX, TOWER_GEO, TOWER_PROTO, normalizeTowerState } from '../home-tower.js?v=4daa0b96';
+import { drawTowerElevator, drawTowerExit, towerApi, visitorTowerView } from './home-tower-feature.js?v=011c7688';
 import { pieceUrl, roomPieces, surfaceAt, swatchPiece, wallTargetAt } from '../home-wallpaper.js?v=f1969400';
 import { wantsHiresDecos } from '../deco-hires.js?v=cb905e17';
 import { resourceNodesFeature } from './resource-nodes-feature.js?v=128c01c5';
@@ -242,7 +242,7 @@ import {
   ROCK_VERB_IDS,
 } from '../magic-rock-home.js?v=39921139';
 import { getGameDayKey } from '../game-day.js?v=edb00566';
-import { HOME_TICKET, HOME_TICKET_CLASS } from '../home-ticket.js?v=355d8ba7';
+import { HOME_TICKET, HOME_TICKET_CLASS } from '../home-ticket.js?v=7d5e99a5';
 import { MIN_GROUND_CLEARANCE, yCamOffsetAnchor } from '../movement.js?v=a314f8a1';
 import { takeFromHouse } from '../ledger-house.js?v=ffde326e';
 import { storagePickupLock } from '../home-storage.js?v=56c6416d';

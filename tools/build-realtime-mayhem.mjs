@@ -24,7 +24,7 @@ import { dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { requireServer, serverPath } from './repos.mjs';
 
-import { CROWNS_START_POINTS, CROWNS_STREET, CROWNS_TAG_DISTANCE, CROWNS_TAG_REACH_Y } from '../public/js/game-of-crowns.js?v=98e21baf';
+import { CROWNS_START_POINTS, CROWNS_STREET, CROWNS_TAG_DISTANCE, CROWNS_TAG_REACH_Y } from '../public/js/game-of-crowns.js?v=e32f35f5';
 import {
   MAYHEM_COUNTDOWN_MS,
   MAYHEM_LOCK_MS,

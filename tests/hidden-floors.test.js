@@ -14,7 +14,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { assertStreetGeometry } from '../public/js/street-model.js?v=505d8990';
 import { arrivalInTarget } from '../public/js/location-navigation.js?v=4be109b9';
-import { SOURCE_PHYSICS } from '../public/js/puzzle-triggers.js?v=3ee2f2c8';
+import { SOURCE_PHYSICS } from '../public/js/puzzle-triggers.js?v=114b052b';
 import {
   AVATAR_BODY_H,
   CANOPY_PHYSICS,
@@ -48,10 +48,15 @@ import {
   inTeleporter,
   jumpApex,
   teleportersOn,
-} from '../public/js/hidden-floors.js?v=5ce87a04';
-import { hiddenFloorsFeature } from '../public/js/features/hidden-floors-feature.js?v=066bdc6c';
-import { FEATURES } from '../public/js/features/index.js?v=e078538f';
+} from '../public/js/hidden-floors.js?v=518fce9e';
+import { hiddenFloorsFeature } from '../public/js/features/hidden-floors-feature.js?v=bd268b3c';
+import { FEATURES } from '../public/js/features/index.js?v=aa6fadfd';
 import { rawTripleJumpMultiplier, scaledTripleJumpMultiplier } from '../public/js/movement.js?v=a314f8a1';
+import { GRAVITY, JUMP_SPEED, WALK_MAX } from '../public/js/avatar-step.js?v=537aa4b7';
+import { buffPhysics } from '../public/js/buffs.js?v=036fee53';
+
+/** Spinach's High Jumper buff, running (buffs.js buffPhysics). */
+const SPINACH_ON = { active: { high_jumper: { classTsid: 'high_jumper', appliedAt: 0, expiresAt: 7000 } } };
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const pub = join(spike, 'public');
@@ -74,9 +79,9 @@ const yAt = (p, x) => p.y1 + ((x - p.x1) / (p.x2 - p.x1 || 1)) * (p.y2 - p.y1);
 /** Floor segments one plain jump (at `phys` multipliers) apart, as a graph. */
 function reachable(s, fromId, phys = { speed: 1, gravity: 1, jump: 1 }) {
   const segs = s.platforms.filter((p) => p.pc_perm == null || Number(p.pc_perm) === -1);
-  const V = 9.6 * phys.jump;
-  const G = 0.42 * phys.gravity;
-  const VX = 4.4 * phys.speed;
+  const V = -JUMP_SPEED * phys.jump;
+  const G = GRAVITY * phys.gravity;
+  const VX = WALK_MAX * phys.speed;
   const reach = (up) => {
     const disc = V * V - 2 * G * up;
     return disc < 0 ? -1 : VX * ((V + Math.sqrt(disc)) / G);
@@ -195,19 +200,21 @@ describe('Hidden floor teleporters (items/teleporter.js)', () => {
     }
   });
 
-  it('Goorsh Gam: the 2011-12-15 treetop route is one walk with the client\'s jump, and broken with the remake\'s', () => {
+  it('Goorsh Gam: the 2011-12-15 treetop route is one walk with the client\'s run, and broken with the remake\'s walk', () => {
     // From the ladder top's canopy (plat_1310611729880) and the middle canopy.
     const target = 'plat_1323982673202';
     assert.ok(reachable(goorsh, 'plat_1310611729880', CANOPY_PHYSICS).has(target));
     assert.ok(reachable(goorsh, 'plat_1337048686021', CANOPY_PHYSICS).has(target));
-    assert.equal(reachable(goorsh, 'plat_1337048686021').has(target), false, 'plain remake physics cannot make plat_...191 -> 206');
+    // The jump is the client's everywhere now (js/avatar-step.js); the hop still needs the client's
+    // vx_max 335 the canopy gives, not the remake's 264 px/s walk.
+    assert.equal(reachable(goorsh, 'plat_1337048686021').has(target), false, 'the remake walk cannot make plat_...191 -> 206');
     assert.deepEqual({ ...CANOPY_PHYSICS, jump: undefined }, { ...SOURCE_PHYSICS, jump: undefined });
     // The canopy line sits between the forest floor and the lowest treetop.
     const ladder = goorsh.ladders[0];
     assert.ok(CANOPY_Y < -100 && CANOPY_Y > ladder.y - ladder.h, 'the ladder climbs through it');
   });
 
-  it('Odena Odes: in the ceiling pocket over the right end; a plain jump falls short, a triple jump does not', () => {
+  it('Odena Odes: in the ceiling pocket over the right end; a plain jump falls short, a quick triple jump does not', () => {
     const row = tp('odena_to_forgotten');
     const { l, t } = odena.bounds;
     const wall = odena.barriers.find((w) => w.id === 'wall_1323982673162');
@@ -217,14 +224,18 @@ describe('Hidden floor teleporters (items/teleporter.js)', () => {
     const floor = plat(odena, 'plat_1311895253649');
     assert.equal(Math.round(yAt(floor, row.box.x + l)), ODENA_POCKET_FLOOR_Y);
     const rise = ODENA_POCKET_FLOOR_Y - t - row.box.y;
-    assert.equal(rise, 160);
+    assert.equal(rise, 384);
+    // The client's numbers (js/avatar-step.js): a triple jump rises at twice vy_max.
+    const triple = (ms, speed, upgrade) => jumpApex(scaledTripleJumpMultiplier(rawTripleJumpMultiplier(ms, speed), upgrade), 1, { triple: true });
     assert.ok(jumpApex(1) < rise, `plain jump ${Math.round(jumpApex(1))}`);
-    // Big 'Un Triple Jump, even standing and 150 ms late; Medium off a quick landing; spinach (vy_jump x1.5).
-    assert.ok(jumpApex(scaledTripleJumpMultiplier(rawTripleJumpMultiplier(150, 0), 1)) > rise);
-    assert.ok(jumpApex(scaledTripleJumpMultiplier(rawTripleJumpMultiplier(250, 0), 0.82)) < rise, 'a slow Medium one falls short');
-    assert.ok(jumpApex(scaledTripleJumpMultiplier(rawTripleJumpMultiplier(150, 0), 0.7)) < rise, 'a lazy Baby one falls short');
-    assert.ok(jumpApex(scaledTripleJumpMultiplier(rawTripleJumpMultiplier(50, 1), 0.82)) > rise);
-    assert.ok(jumpApex(1.5) > rise, 'spinach');
+    assert.ok(jumpApex(1.05) < rise, 'High Jumper III');
+    assert.ok(triple(0, 1, 1) > rise, 'a running Big \'Un off a quick landing');
+    assert.ok(triple(50, 1, 1) > rise, 'a running Big \'Un, a little late');
+    assert.ok(triple(0, 1, 0.82) > rise, 'a running Medium off a quick landing');
+    assert.ok(triple(0, 0, 1) < rise, 'a standing Big \'Un falls short');
+    assert.ok(triple(50, 1, 0.82) < rise, 'a late Medium falls short');
+    assert.ok(triple(0, 1, 0.7) < rise, 'a Baby one never gets there');
+    assert.ok(jumpApex(1, buffPhysics(SPINACH_ON, 1000)) > rise, 'spinach');
     // The avatar can stand under it (x clamp WORLD_W - 24).
     assert.ok(inTeleporter(row, odena.bounds.r - l - 24, row.box.y - 1));
     assert.equal(inTeleporter(row, row.box.x, ODENA_POCKET_FLOOR_Y - t), false, 'standing under it does nothing');
@@ -332,7 +343,7 @@ describe('Ilmenskie\'s top-right corner (2011-12-15)', () => {
   const { l, t } = ilmenskie.bounds;
   const row = tp('ilmenskie_to_missing');
   const cap = plat(ilmenskie, 'pl1271412334381');
-  const apex = (ms, speed, upgrade) => jumpApex(scaledTripleJumpMultiplier(rawTripleJumpMultiplier(ms, speed), upgrade), CANOPY_PHYSICS.gravity);
+  const apex = (ms, speed, upgrade) => jumpApex(scaledTripleJumpMultiplier(rawTripleJumpMultiplier(ms, speed), upgrade), CANOPY_PHYSICS.gravity, { triple: true });
 
   it('keeps the archived ledge, walls and ceilings the box is laid on', () => {
     const ledge = plat(ilmenskie, 'plat_1323982673210');
@@ -348,22 +359,25 @@ describe('Ilmenskie\'s top-right corner (2011-12-15)', () => {
     assert.equal(cap.y1, ILMENSKIE_LAUNCH_Y);
   });
 
-  it('a running Triple Jump off the mushroom cap gets there; a standing one, a plain jump or spinach does not', () => {
+  it('a Big \'Un or running Triple Jump off the mushroom cap gets there; a standing Medium or Baby one or a plain jump does not', () => {
     assert.ok(apex(0, 1, 1) > ILMENSKIE_RISE + 100, 'Big \'Un at full speed');
     assert.ok(apex(50, 1, 1) > ILMENSKIE_RISE, 'Big \'Un, a little late');
     assert.ok(apex(0, 1, 0.82) > ILMENSKIE_RISE, 'Medium at full speed');
     assert.ok(apex(0, 1, 0.7) > ILMENSKIE_RISE, 'Baby at full speed, landing and jumping as one');
-    assert.ok(apex(0, 0, 1) < ILMENSKIE_RISE, 'a standing Big \'Un falls short');
-    assert.ok(apex(50, 1, 0.82) < ILMENSKIE_RISE, 'a late Medium falls short');
+    // With the client's jump (since 2026-11-03) a standing Big 'Un (337 px) and a late running
+    // Medium (334 px) clear the 310 px too; standing Medium and Baby ones do not.
+    assert.ok(apex(0, 0, 1) > ILMENSKIE_RISE, 'a standing Big \'Un');
+    assert.ok(apex(0, 0, 0.82) < ILMENSKIE_RISE, 'a standing Medium falls short');
+    assert.ok(apex(0, 0, 0.7) < ILMENSKIE_RISE, 'a standing Baby falls short');
     assert.ok(jumpApex(1, CANOPY_PHYSICS.gravity) < ILMENSKIE_RISE / 2);
-    assert.ok(jumpApex(1.5, CANOPY_PHYSICS.gravity) < ILMENSKIE_RISE, 'spinach alone');
-    // Nothing else under the box is within a full-speed Big 'Un of it.
+    // Nothing else under the box is within a slightly late full-speed Big 'Un of it (with the
+    // client's jump a perfect one, 500 px, also gets there from the slope left of the cap).
     for (const p of ilmenskie.platforms) {
       if (p === cap || ILMENSKIE_CEILINGS.includes(p.id) || p.id === 'plat_1323982673210') continue;
       if (Math.max(p.x1, p.x2) - l < row.box.x - row.box.w / 2 - 150 || Math.min(p.x1, p.x2) - l > row.box.x + row.box.w / 2) continue;
       const top = Math.min(p.y1, p.y2) - t;
       if (p.id === 'pl1271412363973') continue; // the Entrance ledge: shut off by the ceilings (below)
-      assert.ok(top - row.box.y > apex(0, 1, 1), p.id);
+      assert.ok(top - row.box.y > apex(50, 1, 1), p.id);
     }
   });
 
@@ -372,7 +386,7 @@ describe('Ilmenskie\'s top-right corner (2011-12-15)', () => {
     assert.deepEqual(ceilings.map((c) => c.id).sort(), [...ILMENSKIE_CEILINGS].sort());
     const ledgeY = -438 - t;
     for (const x of [2760, 2800, 2900, 2990].map((wx) => wx - l)) {
-      // A standing Big 'Un from the ledge rises ~306 px: the head meets the ceiling first.
+      // A standing Big 'Un from the ledge rises ~337 px: the head meets the ceiling first.
       const y = bumpCeiling(ceilings, x, ledgeY, x, ledgeY - apex(0, 0, 1));
       assert.ok(y !== null && y > row.box.y, `x ${x + l}`);
     }
@@ -385,7 +399,8 @@ describe('Ilmenskie\'s top-right corner (2011-12-15)', () => {
   it('the slope to the caps is a client jump over the ground: the right end moves as the client did', () => {
     // Ground (pl1266967749448) -> slope (pl1271412282623) -> flat -> mushroom cap.
     assert.ok(reachable(ilmenskie, 'pl1266967749448', CANOPY_PHYSICS).has('pl1271412334381'));
-    assert.equal(reachable(ilmenskie, 'pl1266967749448').has('pl1271412282623'), false, 'not with the remake\'s jump');
+    // The plain jump is the client's now (js/avatar-step.js), so the slope is in reach on plain physics too.
+    assert.ok(reachable(ilmenskie, 'pl1266967749448').has('pl1271412282623'), 'with the plain jump');
     const slope = plat(ilmenskie, 'pl1271412282623');
     assert.ok(ILMENSKIE_ZONE.x < slope.x1 - 150, 'the run-up is in the zone');
   });

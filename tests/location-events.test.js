@@ -20,8 +20,8 @@ import {
   reachableEvents,
   runLocationEvent,
   streetOwner,
-} from '../public/js/location-events.js?v=61e0c5d3';
-import { createFeatureHost } from '../public/js/feature-host.js?v=903263a4';
+} from '../public/js/location-events.js?v=05663361';
+import { createFeatureHost } from '../public/js/feature-host.js?v=2ed3c069';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const streetsDir = join(root, 'public/assets/streets');
@@ -49,8 +49,9 @@ describe('street physics', () => {
     const m = physicsMultipliers(street('GUV10AGQOOA3MOE').physics.setting);
     assert.ok(Math.abs(m.speed - 223 / 335) < 1e-9);
     assert.ok(Math.abs(m.gravity - 362 / 1190) < 1e-9);
-    // vy_max 447 also bounds the -713 launch (boundAvatarVelocities)
-    assert.ok(Math.abs(m.jump - 447 / 570) < 1e-9);
+    // The full -713 launch; the stepper bounds it at vy_max 447 (boundAvatarVelocities)
+    assert.ok(Math.abs(m.jump - 713 / 570) < 1e-9);
+    assert.equal(m.airFriction, 0.745);
     assert.ok(Math.abs(m.vyMax - 447 / 670) < 1e-9);
     assert.equal(m.jetpack, true);
     assert.equal(m.airDrag, 0.745);
@@ -197,7 +198,7 @@ describe('location events', () => {
 
 describe('walkable fallback', () => {
   test('only platforms the arrival chain re-enables may be switched off', async () => {
-    const { recoverableToggles } = await import('../public/js/location-events.js?v=61e0c5d3');
+    const { recoverableToggles } = await import('../public/js/location-events.js?v=05663361');
     const events = {
       player_enter: [{ type: 'plat', plat: 'p1', pc_perm: 0 }, { type: 'event', event: 'cycle', delay: 2000 }],
       cycle: [{ type: 'plat', plat: 'p1', pc_perm: -1 }, { type: 'wall', wall: 'w1', pc_perm: 0 }],

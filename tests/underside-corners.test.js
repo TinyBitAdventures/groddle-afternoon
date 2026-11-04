@@ -18,6 +18,7 @@
  */
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
+import { JUMP_SPEED, NORMAL_BUFF, avatarFall } from '../public/js/avatar-step.js?v=537aa4b7';
 import { readFileSync, readdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -52,7 +53,7 @@ function step(geo, pl, { left = false, right = false, gravity = 1 } = {}) {
   if (left) pl.vx = -2.8;
   else if (right) pl.vx = 2.8;
   else pl.vx = 0;
-  pl.vy += 0.42 * gravity;
+  avatarFall(pl, { ...NORMAL_BUFF, gravity }, 1);
   const prevX = pl.x;
   const prevY = pl.y;
   pl.x += pl.vx;
@@ -127,7 +128,7 @@ describe('an underside is never ground', () => {
 
 describe('a rising head stops under an underside', () => {
   it('a jump under the small slab bumps its underside and falls back to the floor', () => {
-    const pl = { x: P(880, 0).x, y: floor, vx: 0, vy: -9.6, onGround: false };
+    const pl = { x: P(880, 0).x, y: floor, vx: 0, vy: JUMP_SPEED, onGround: false };
     let top = Infinity;
     for (let i = 0; i < 120; i++) {
       step(geo, pl);
@@ -183,7 +184,7 @@ describe("Purplysa's slab corner (Austin's playtest)", () => {
     // Up to the underside, the head stops there.
     for (let i = 0; i < 200; i++) step(geo, pl, { gravity: -0.1 });
     assert.ok(Math.abs(pl.y - (slab.y1 + geo.head.reach)) < 0.5, `pressed under the slab (feet ${pl.y})`);
-    for (let i = 0; i < 60; i++) step(geo, pl, { left: true, gravity: -0.1 });
+    for (let i = 0; i < 80; i++) step(geo, pl, { left: true, gravity: -0.1 }); // 1190 px/s^2 gravity: a slower float than the old 0.42
     assert.ok(pl.x < wall.x - 20, `walked out past the corner (x ${pl.x})`);
     assert.ok(pl.y < slab.y1, 'and floats on up beside the slab');
   });

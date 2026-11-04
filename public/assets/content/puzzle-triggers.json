@@ -5502,9 +5502,9 @@
    "blurb": "De-Embiggenify's miniature room, a private two-minute visit.",
    "instance": "de-embiggenify",
    "physics": {
-    "jump": 1.06
+    "jump": 1.03
    },
-   "physicsWhy": "The way up to the tabletop is the street's own: the sneaker (plats to y -133), the chair seat (-276 at its high end, x 568), the chair back (_pl1285356305652, y -407, x 641-698), the table's curl and the tabletop (-449). The seat to the chair back is a 131 px rise. The client caught ledges with its 15 px collision circles (AvatarPhysicsHandler calcCircleGap), so its 134 px apex still landed there; the remake lands on the line itself and, measured by real input at source physics, peaks 2 px over the chair back and falls past it. x1.06 puts the apex at the client's reach (135 to 152 px); every other step on the way is lower",
+   "physicsWhy": "The way up to the tabletop is the street's own: the sneaker (plats to y -133), the chair seat (-276 at its high end, x 568), the chair back (_pl1285356305652, y -407, x 641-698), the table's curl and the tabletop (-449). The seat to the chair back is a 131 px rise. The client caught ledges with its 15 px collision circles (AvatarPhysicsHandler calcCircleGap), so its 143 px apex still landed there; the remake lands on the line itself and, measured by real input (2026-10, a 134 px jump), peaked 2 px over the chair back and fell past it. x1.03 keeps the apex at the client's reach (143 to 152 px, js/avatar-step.js since 2026-11-03); every other step on the way is lower",
    "mapCard": false,
    "emptyEcology": true,
    "start": {

@@ -10,7 +10,7 @@
  * 2. Jump and fall edges from stand points every 16 px and from line ends: a straight-up jump, a
  *    standing jump and a running jump holding toward each side, a walk off each free line end (at
  *    a run and at a step) with the one air jump tried every 4th frame. Each arc runs the shared
- *    stepper for at most 240 frames; a landing joins the nearest stand point.
+ *    stepper for at most MAX_FRAMES (360) frames; a landing joins the nearest stand point.
  * 3. Ladders: any stand point in grabbing reach mounts; from the ladder the avatar reaches its
  *    top deck (ladderTopDeck), drops off the bottom, hops off sideways and jumps off at heights
  *    every 48 px.
@@ -24,13 +24,14 @@
  * Pure: no DOM, no Pixi.
  */
 import { platformsScreen, barriersScreen, wallsScreen, isStandable, platformYAt, resolveGround, ladderTopDeck, worldToScreen, streetWidth, streetHeight, navigableSignposts, isBuriedSignpost, blockBarrierCrossing } from '../street-model.js?v=505d8990';
-import { stepAvatar, avatarGround, steerX, NORMAL_BUFF, JUMP_SPEED, WALK_MAX, OFF_LADDER_RATIO } from '../avatar-step.js?v=33ad1926';
+import { stepAvatar, avatarGround, steerX, NORMAL_BUFF, JUMP_SPEED, WALK_MAX, OFF_LADDER_RATIO } from '../avatar-step.js?v=537aa4b7';
 import { ladderTopSignpostLadder } from '../ladder-top-signposts.js?v=40abe6f5';
-import { physicsMultipliers } from '../location-events.js?v=61e0c5d3';
+import { physicsMultipliers } from '../location-events.js?v=05663361';
 
 export const STAND_STEP = 8;
 export const JUMP_STEP = 16;
-export const MAX_FRAMES = 240;
+/** An arc's longest run: 6 s, a 4,000 px fall at vy_max 670 px/s (js/avatar-step.js TERMINAL_VY), as the client capped it. */
+export const MAX_FRAMES = 360;
 export const JOIN_X = 4;
 export const JOIN_Y = 16;
 /** A signpost is in reach from a stand point this close across (stricter than signpostNear's 140). */
@@ -67,7 +68,7 @@ export function streetBuff(street) {
   if (!street?.physics?.setting) return { buff: NORMAL_BUFF, scale: 1, approximate: false };
   const m = physicsMultipliers(street.physics.setting);
   return {
-    buff: { speed: m.speed, jump: m.jump, gravity: m.gravity, vyMax: m.vyMax > 0 ? m.vyMax : null, accel: m.accel, airAccel: m.airAccel, friction: m.friction, airDrag: m.airDrag, jetpack: m.jetpack, tripleJump: m.tripleJump },
+    buff: { speed: m.speed, jump: m.jump, gravity: m.gravity, vyMax: m.vyMax > 0 ? m.vyMax : null, accel: m.accel, airAccel: m.airAccel, friction: m.friction, airDrag: m.airDrag, airFriction: m.airFriction, jetpack: m.jetpack, tripleJump: m.tripleJump },
     scale: m.scale,
     // A swim street (jetpack) strokes on every airborne press: far more reach than the model has.
     approximate: m.jetpack === true,
@@ -652,7 +653,7 @@ export function reachStreet(street, arrivals, opts = {}) {
   // Arrivals: drop from the point to the floor under it.
   const arr = arrivals.map((a) => {
     const snapped = resolveGround(world.col(a.x), a.x, a.y, 0, 12);
-    const r = runArc(world, { x: a.x, y: a.y, vx: 0, vy: 0, onGround: false }, { maxFrames: 240 });
+    const r = runArc(world, { x: a.x, y: a.y, vx: 0, vy: 0, onGround: false }, { maxFrames: MAX_FRAMES });
     let node = r.landed ? landingNode(r.landed.x, r.landed.y) : -1;
     if (node < 0 && snapped) node = landingNode(a.x, snapped.y);
     return { ...a, floor: Boolean(snapped), node, landed: r.landed };
@@ -773,7 +774,7 @@ export function reachRoutes(street, arrival, opts = {}) {
   const built = buildReachGraph(street, { ...opts, keepSpecs: true });
   const { world, graph: g, landingNode } = built;
   const snapped = resolveGround(world.col(arrival.x), arrival.x, arrival.y, 0, 12);
-  const r = runArc(world, { x: arrival.x, y: arrival.y, vx: 0, vy: 0, onGround: false }, { maxFrames: 240 });
+  const r = runArc(world, { x: arrival.x, y: arrival.y, vx: 0, vy: 0, onGround: false }, { maxFrames: MAX_FRAMES });
   let start = r.landed ? landingNode(r.landed.x, r.landed.y) : -1;
   if (start < 0 && snapped) start = landingNode(arrival.x, snapped.y);
   const targets = streetTargets(street);

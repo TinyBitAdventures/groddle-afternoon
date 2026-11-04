@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { WALK_MAX, jumpApex } from '../public/js/avatar-step.js?v=537aa4b7';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -231,20 +232,11 @@ test('every Crusher can be passed on foot: a sweep clears a standing head, a dro
   // The frame lives in js/avatar-step.js (shared with the level builder); game.js uses its WALK_MAX.
   const step = fs.readFileSync(path.join(root, 'public/js/avatar-step.js'), 'utf8');
   assert.match(game, /const max = WALK_MAX \* movementBuff\.speed;/);
-  const walkPerFrame = Number(/export const WALK_MAX = ([\d.]+);/.exec(step)[1]);
-  const jumpVelocity = Number(/const jumpVelocity = -([\d.]+) \* movementBuff\.jump;/.exec(game)[1]);
-  assert.match(step, /body\.vy \+= GRAVITY \* \(buff\.gravity \?\? 1\) \* dt;/);
-  const gravity = Number(/export const GRAVITY = ([\d.]+);/.exec(step)[1]);
-  const walkPxPerMs = (walkPerFrame * 60) / 1000;
-  let vy = -jumpVelocity;
-  let rise = 0;
-  let lift = 0;
-  while (vy < 0) {
-    vy += gravity;
-    lift -= vy;
-    rise = Math.max(rise, lift);
-  }
-  assert.ok(rise > 90 && rise < 130, `jump rise ${rise}`);
+  assert.match(game, /const jumpVelocity = JUMP_SPEED \* movementBuff\.jump;/);
+  assert.match(step, /avatarFall\(body, buff, dt\);/);
+  const walkPxPerMs = (WALK_MAX * 60) / 1000;
+  const rise = jumpApex(1);
+  assert.ok(rise > 130 && rise < 160, `jump rise ${rise}`);
 
   const avatarAt = (x, up = 0) => ({ x, y: rookWoodsGroundY(x) - up, ...ROOK_AVATAR_HIT });
   const hitAt = (spec, ms, avatar) => crusherHitsAvatar(spec, crusherPosition(spec, ms), avatar);

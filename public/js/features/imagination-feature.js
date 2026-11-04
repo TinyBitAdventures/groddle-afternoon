@@ -47,8 +47,9 @@ import {
   ownedUpgradeList,
   purchaseCard,
   remakeMovementMultipliers,
+  ignoresUpgradePhysics,
   reshuffleHand,
-} from '../imagination.js?v=b4f0eaf6';
+} from '../imagination.js?v=133fd4d5';
 import { brainCapacityRescale, skillTimeFactor } from '../imagination-effects.js?v=70169933';
 import { betterLearningDiscount } from '../better-learning.js?v=044ff9ff';
 import { rescaleStudiesForLearningModifier } from '../skills.js?v=4542bdf9';
@@ -882,6 +883,8 @@ export const imaginationFeature = {
   },
 
   physics(engine) {
+    // The plain setting where the location ignores upgrade physics: no cards, no triple jump.
+    if (ignoresUpgradePhysics(engine?.streetTsid)) return { speed: 1, jump: 1, gravity: 1, tripleJump: 0 };
     return remakeMovementMultipliers(owned(engine));
   },
 

@@ -48,9 +48,9 @@ import {
   writePaperNote,
 } from '../public/js/street-furniture.js?v=cb0ba050';
 import { REMAKE_NOTE_BYLINE, REMAKE_NOTE_MARKER, isRemakeNote, normalizeNote as normalizeNoteRow } from '../public/js/street-furniture.js?v=cb0ba050';
-import { streetFurnitureFeature } from '../public/js/features/street-furniture-feature.js?v=96b07841';
-import { FEATURES } from '../public/js/features/index.js?v=e078538f';
-import { createFeatureHost } from '../public/js/feature-host.js?v=903263a4';
+import { streetFurnitureFeature } from '../public/js/features/street-furniture-feature.js?v=4a2d7a2c';
+import { FEATURES } from '../public/js/features/index.js?v=aa6fadfd';
+import { createFeatureHost } from '../public/js/feature-host.js?v=2ed3c069';
 import { setWildlifeCatalog } from '../public/js/wildlife.js?v=670c3a7f';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..', 'public');

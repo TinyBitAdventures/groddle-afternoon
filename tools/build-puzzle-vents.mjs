@@ -13,7 +13,7 @@
 // Run from the spike root after build-street-events.mjs:
 //   node tools/build-puzzle-vents.mjs
 import { readFileSync, writeFileSync, readdirSync } from 'node:fs';
-import { streetOwner } from '../public/js/location-events.js?v=61e0c5d3';
+import { streetOwner } from '../public/js/location-events.js?v=05663361';
 
 const root = new URL('../public/', import.meta.url);
 const dataUrl = new URL('assets/content/puzzle-triggers.json', root);

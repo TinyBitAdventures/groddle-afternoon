@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { NORMAL_BUFF, WALK_MAX, flatJump } from '../public/js/avatar-step.js?v=537aa4b7';
 import {
   SOURCE_PHYSICS,
   completionReward,
@@ -14,13 +15,13 @@ import {
   rewardBits,
   stepTriggers,
   triggerHit,
-} from '../public/js/puzzle-triggers.js?v=3ee2f2c8';
+} from '../public/js/puzzle-triggers.js?v=114b052b';
 import {
   createEventRuntime,
   dueEventTimers,
   eventPlatformIds,
   runLocationEvent,
-} from '../public/js/location-events.js?v=61e0c5d3';
+} from '../public/js/location-events.js?v=05663361';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const raw = JSON.parse(readFileSync(join(root, 'public/assets/content/puzzle-triggers.json'), 'utf8'));
@@ -75,20 +76,23 @@ describe('puzzle trigger rules', () => {
   });
 
   test('source-faithful movement puts the remake arc back on the client curve', () => {
-    // Normal jump distance/apex with the remake integrator and the factors.
-    let x = 0;
+    // The game's own frame (js/avatar-step.js) with the factors, against the client's loop:
+    // AvatarPhysicsHandler 17 ms slices, friction_air -0.22, gravity 1190, vx_max 335.
+    const { apex, frames } = flatJump(1, { ...NORMAL_BUFF, gravity: SOURCE_PHYSICS.gravity });
+    const x = frames * WALK_MAX * SOURCE_PHYSICS.speed;
+    let vy = -570;
     let y = 0;
-    let vy = -9.6;
-    let apex = 0;
-    for (let t = 0; t < 200; t += 1) {
-      vy += 0.42 * SOURCE_PHYSICS.gravity;
-      x += 4.4 * SOURCE_PHYSICS.speed;
-      y += vy;
-      apex = Math.min(apex, y);
-      if (y >= 0 && t > 2) break;
+    let top = 0;
+    let t = 0;
+    for (; t < 5000; t += 1) {
+      vy += 0.22 * vy * 0.017 + 1190 * 0.017;
+      y += vy * 0.017;
+      top = Math.min(top, y);
+      if (y >= 0 && vy > 0) break;
     }
-    assert.ok(Math.abs(x - 318) < 15, `distance ${x} vs client 318`);
-    assert.ok(Math.abs(-apex - 134) < 6, `apex ${-apex} vs client 134`);
+    const clientX = 335 * (t + 1) * 0.017;
+    assert.ok(Math.abs(x - clientX) < 15, `distance ${x} vs client ${clientX}`);
+    assert.ok(Math.abs(apex + top) < 3, `apex ${apex} vs client ${-top}`);
   });
 });
 
@@ -193,7 +197,7 @@ describe('location-events trigger API', () => {
   });
 
   test('without a strict hook, a platform only lost boxes switch back stays walkable', async () => {
-    const { locationEventsFeature, locationEventsApi } = await import('../public/js/features/location-events-feature.js?v=df2533e4');
+    const { locationEventsFeature, locationEventsApi } = await import('../public/js/features/location-events-feature.js?v=6aca5a98');
     const street = make();
     const engine = fakeEngine(street);
     locationEventsFeature.onStreetEnter(street, engine);
@@ -203,7 +207,7 @@ describe('location-events trigger API', () => {
   });
 
   test('a strict hook runs the scripts as written and restart re-applies them', async () => {
-    const { locationEventsFeature, locationEventsApi } = await import('../public/js/features/location-events-feature.js?v=df2533e4');
+    const { locationEventsFeature, locationEventsApi } = await import('../public/js/features/location-events-feature.js?v=6aca5a98');
     let strict = false;
     locationEventsApi.register({ strict: (s) => strict && s.tsid === 'GTESTPUZZLE0001' });
     const street = make();

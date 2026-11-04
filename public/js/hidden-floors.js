@@ -50,14 +50,15 @@
  *   back: walking right past the EXIT sign into the corner (t0093) brings up
  *   Odena Odes' card (t0096).
  * Inferred, not in source: every teleporter's box and landing point (the
- * instance props are lost), and the lost floor's layout. The remake's plain
- * jump peaks at ~105 px against the client's ~134, so the Odena Odes box
- * starts 160 px above the floor instead of the pocket's 384 (2.9 plain
- * jumps in the client, 1.5 here): out of reach of a plain jump (105 px) and
- * of slow triple jumps, in reach of a Big 'Un triple jump whose third hop
- * comes inside 200 ms of landing (179-347 px peak), a quicker Medium or
- * Baby one, spinach (240 px) or levitation.
+ * instance props are lost), and the lost floor's layout. The Odena Odes box
+ * starts at the ceiling pocket, 384 px above the floor (2.7 plain jumps of
+ * 142 px, the client's own numbers in js/avatar-step.js): out of reach of a
+ * plain jump, High Jumper III (158 px), a Baby triple jump (367 px at best)
+ * and a standing one; in reach of a quick running Big 'Un or Medium triple
+ * jump (up to 500 / 417 px), spinach (720 px) or levitation.
  */
+
+import { NORMAL_BUFF, jumpApex as stepperJumpApex } from './avatar-step.js?v=537aa4b7';
 
 export const LOST_FLOOR_TSID = 'GA9QUBPI49J2MOB';
 export const LOST_FLOOR_SOURCE_TSID = 'LA9QUBPI49J2MOB';
@@ -630,15 +631,15 @@ export function missingFloorIndexEntry(street = missingFloorStreet()) {
 /* ------------------------------------------------------------------ */
 
 /**
- * The client's walk and jump against the remake's (the puzzle streets'
- * SOURCE_PHYSICS, js/puzzle-triggers.js: vx_max 335 vs 264 px/s, gravity
- * 1190 vs 1512 px/s^2). Goorsh Gam's treetop route was laid for the
- * client's jump: its one hop from plat_1323982673191 (-2169, -595) up to
- * plat_1323982673206 (-2354, -708) needs 113 px of rise over 185 px, which
- * the client's running jump clears (~230 px) and the remake's plain jump
- * (~105 px peak) cannot. Up in the canopy the street moves as the client did.
+ * The client's walk against the remake's (the puzzle streets'
+ * SOURCE_PHYSICS, js/puzzle-triggers.js: vx_max 335 vs 264 px/s; the jump
+ * and gravity are the client's everywhere now, js/avatar-step.js). Goorsh
+ * Gam's treetop route was laid for the client's run: its one hop from
+ * plat_1323982673191 (-2169, -595) up to plat_1323982673206 (-2354, -708)
+ * needs 113 px of rise over 185 px. Up in the canopy the street moves as
+ * the client did.
  */
-export const CANOPY_PHYSICS = Object.freeze({ speed: 335 / 264, jump: 1, gravity: 1190 / 1512 });
+export const CANOPY_PHYSICS = Object.freeze({ speed: 335 / 264, jump: 1, gravity: 1 });
 /** Feet above this world y (the forest floor is -20..-85, the lowest canopy -466) count as in the canopy. */
 export const CANOPY_Y = -300;
 export const isGoorshGamTsid = (tsid) => isTsid(tsid, GOORSH_GAM_TSID);
@@ -727,27 +728,22 @@ export function bumpCeiling(ceilings, px, py, x, y, body = AVATAR_BODY_H, centre
 /* ------------------------------------------------------------------ */
 
 /**
- * Peak of a jump at `multiplier` times the plain jump speed, stepped frame
- * by frame as game.js physics() does at 60 fps (vy += 0.42 * gravity, then
- * y += vy; the jump starts at vy -9.6). A plain jump peaks at ~105 px.
+ * Peak of a jump at `multiplier` times the plain jump speed under `gravity`
+ * (or a whole buff, as buffPhysics gives it), stepped with the game's own
+ * frame (js/avatar-step.js jumpApex: the client's gravity, vy_jump, vy_max
+ * and friction_air). `triple` lets it rise at twice vy_max, as a triple jump
+ * does. A plain jump peaks at ~142 px.
  */
-export function jumpApex(multiplier = 1, gravity = 1) {
-  let vy = -9.6 * multiplier;
-  let y = 0;
-  let top = 0;
-  for (let i = 0; i < 1000 && vy < 0; i += 1) {
-    vy += 0.42 * gravity;
-    y += vy;
-    top = Math.min(top, y);
-  }
-  return -top;
+export function jumpApex(multiplier = 1, gravity = 1, { triple = false } = {}) {
+  const buff = typeof gravity === 'object' && gravity ? { ...NORMAL_BUFF, ...gravity } : { ...NORMAL_BUFF, gravity };
+  return stepperJumpApex(multiplier, buff, { triple });
 }
 export const PLAIN_JUMP_APEX = jumpApex(1);
 
 /** Odena Odes' floor under the ceiling pocket (plat_1311895253649, world y at x 1316). */
 export const ODENA_POCKET_FLOOR_Y = -157;
 /** How far above that floor the feet must rise to reach the teleporter. */
-export const ODENA_RISE = 160;
+export const ODENA_RISE = 384;
 
 /**
  * Collision-triggered Teleporters. `box` is the hit box in the street's

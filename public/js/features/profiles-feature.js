@@ -70,8 +70,8 @@ import {
   PICTURE_RESOLUTION, PROFILE_COPY, PROFILE_PAGE_VERB,
   aboutCounter, profilePagePath, profilePageVerb, avatarKeyOf, base64Bytes, homeKeyOf, homeSizes, imageBase64, pngBase64, shouldUpload, stillTransform,
 } from '../profiles.js?v=86423d98';
-import { homeLayoutJson, homeLayoutKeyOf, HOME_LAYOUT_LIMITS } from '../home-layout.js?v=fa15d1c8';
-import { collectHomeLayout } from '../home-layout-scene.js?v=d69c2f76';
+import { homeLayoutJson, homeLayoutKeyOf, HOME_LAYOUT_LIMITS } from '../home-layout.js?v=aad595fd';
+import { collectHomeLayout } from '../home-layout-scene.js?v=90a5460d';
 
 export const PROFILES_FEATURE_ID = 'profiles';
 

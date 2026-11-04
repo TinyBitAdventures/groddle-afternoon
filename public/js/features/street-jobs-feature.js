@@ -125,7 +125,7 @@ import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=31
 import { JOB_WORK_OVERLAY, jobWorkFloatPoint, jobWorkSoundKey, jobWorkToolScale, jobWorkToolSheet } from '../job-work-fx.js?v=430b96b2';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
 import { SIGN_ARMS, routeGraph } from '../map-routes.js?v=91cc8e46';
-import { TELEPORTERS } from '../hidden-floors.js?v=5ce87a04';
+import { TELEPORTERS } from '../hidden-floors.js?v=518fce9e';
 import { WINTRY_PORTAL_TELEPORTERS } from '../wintry-portal.js?v=1437deda';
 
 export const STREET_JOBS_FEATURE_ID = 'street-jobs';

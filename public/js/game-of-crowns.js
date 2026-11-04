@@ -260,6 +260,7 @@ export function crownsStandings(game) {
 /* Navigation graph for the stand-in players                          */
 /* ------------------------------------------------------------------ */
 
+/** The stand-ins' own reach model (not the avatar's stepper, js/avatar-step.js); crowns-feature scales its jump. */
 const NAV = Object.freeze({ runSpeed: 4.4, jumpVelocity: 9.6, gravity: 0.42, spacing: 90 });
 
 function yAt(p, x) {

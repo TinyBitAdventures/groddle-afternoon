@@ -8,7 +8,7 @@ import { join } from 'node:path';
 
 import { QUOIN_TOUCH, quoinTouches } from '../public/js/quoins.js?v=dfe1ff0a';
 import { serverPath, skipWithoutServer } from '../tools/repos.mjs';
-import { GRAVITY, JUMP_SPEED, WALK_MAX } from '../public/js/avatar-step.js?v=33ad1926';
+import { GRAVITY, JUMP_SPEED, WALK_MAX } from '../public/js/avatar-step.js?v=537aa4b7';
 
 const root = join(import.meta.dirname, '..');
 const game = readFileSync(join(root, 'public/game.js'), 'utf8');
@@ -32,7 +32,7 @@ describe('32 and 37: a quoin is taken when the avatar\'s body touches the coin',
   });
 
   it('37: walking through a quoin at standing height takes it; a jump over it does not', () => {
-    // js/avatar-step.js: gravity 0.42 and a -9.6 jump per frame, 4.4 px per frame at a run.
+    // js/avatar-step.js: GRAVITY and JUMP_SPEED per frame, 4.4 px per frame at a run.
     const run = (q, lead) => {
       let x = q.x - 300;
       let y = 800;

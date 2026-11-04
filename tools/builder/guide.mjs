@@ -7,10 +7,10 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { GAME_DIR } from '../repos.mjs';
-import { GRAVITY, JUMP_SPEED, WALK_MAX, FLOOR_ACCEL, AIR_ACCEL_RATIO, STREET_PHYSICS_TERMINAL_VY, AVATAR_BODY_H, GROUND_SNAP, NORMAL_BUFF } from '../../public/js/avatar-step.js?v=33ad1926';
-import { FLOAT_REACH, FLOAT_OPEN, FLOOR_SKIRT } from '../../public/js/builder/ground.js?v=a60d7c91';
-import { RULES, LIMITS, MIN_VIEW, PARALLAX_VIEW, LICENCES, plainApex } from '../../public/js/builder/validate.js?v=8575a4a0';
-import { REACH_LIMITS, POST_REACH_X, POST_BELOW, DOOR_REACH_X, TIGHT_MARGIN, LANDING_TRIES, AIR_JUMP_TRIES, LANDING_SHARE, streetWorld, jumpArc } from '../../public/js/builder/reach-graph.js?v=3602d09e';
+import { GRAVITY, JUMP_SPEED, WALK_MAX, FLOOR_ACCEL, AIR_ACCEL_RATIO, STREET_PHYSICS_TERMINAL_VY, AVATAR_BODY_H, GROUND_SNAP, NORMAL_BUFF } from '../../public/js/avatar-step.js?v=537aa4b7';
+import { FLOAT_REACH, FLOAT_OPEN, FLOOR_SKIRT } from '../../public/js/builder/ground.js?v=8beea23c';
+import { RULES, LIMITS, MIN_VIEW, PARALLAX_VIEW, LICENCES, plainApex, LEDGE_RISE } from '../../public/js/builder/validate.js?v=dfad07b5';
+import { REACH_LIMITS, POST_REACH_X, POST_BELOW, DOOR_REACH_X, TIGHT_MARGIN, LANDING_TRIES, AIR_JUMP_TRIES, LANDING_SHARE, streetWorld, jumpArc } from '../../public/js/builder/reach-graph.js?v=40bfbc44';
 import { OP_NAMES } from '../../public/js/builder/ops.js?v=27c7796f';
 import { LAYER_ROLES } from '../../public/js/builder/layer-role.js?v=e585f610';
 import { POPULATION_CLASSES } from '../../public/js/builder/zone.js?v=dff4acc0';
@@ -61,7 +61,7 @@ export function builderGuide() {
       groundSnap: GROUND_SNAP,
       plainApex: Math.round(plainApex(NORMAL_BUFF) * 10) / 10,
       runningJump: runningJumpLength(),
-      rule: 'Keep a ledge you must jump to at most 100 px over the floor you jump from (8 px of margin under the 105 px apex), or add a ladder.',
+      rule: `Keep a ledge you must jump to at most ${LEDGE_RISE} px over the floor you jump from (${TIGHT_MARGIN} px of margin under the ${Math.floor(plainApex(NORMAL_BUFF))} px apex), or add a ladder.`,
     },
     reach: {
       signpostX: POST_REACH_X, signpostBelow: POST_BELOW, doorX: DOOR_REACH_X, tightMargin: TIGHT_MARGIN, limits: REACH_LIMITS,

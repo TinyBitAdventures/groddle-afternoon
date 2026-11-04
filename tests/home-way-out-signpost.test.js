@@ -15,10 +15,10 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
-import { getVerbsFor } from '../public/content.js?v=117337d3';
+import { getVerbsFor } from '../public/content.js?v=eb7378cd';
 import { SIGN_FIRST_ARM_Y, SIGN_POST_W, SIGN_SCALE } from '../public/js/street-render.js?v=9349c0e5';
-import { WAY_OUT_ARM, WAY_OUT_HIT, wayOutTarget } from '../public/js/features/homes-feature.js?v=c68a24c0';
-import { FRIENDS_HIT_H } from '../public/js/features/home-street-mp-feature.js?v=b6bd2975';
+import { WAY_OUT_ARM, WAY_OUT_HIT, wayOutTarget } from '../public/js/features/homes-feature.js?v=aa43ae76';
+import { FRIENDS_HIT_H } from '../public/js/features/home-street-mp-feature.js?v=19377dbb';
 import {
   SIGNPOST_POST_HALF,
   createCultivationState,
@@ -28,7 +28,7 @@ import {
   homeStreetLayout,
   normalizeCultivationState,
   placementCheck,
-} from '../public/js/home-cultivation.js?v=11616085';
+} from '../public/js/home-cultivation.js?v=ff17225a';
 import { DISPATCHER_TEXT, SIGNPOST, dispatcherDefaultRx, dispatcherFits, signpostX, streetFixtures } from '../public/js/home-street-fixtures.js?v=badcb725';
 import { sceneSignMarks } from '../public/js/ui/street-minimap.js?v=ce66d251';
 import { HUB_TILES, hubTileBackground, hubTileForKey, hubTileState } from '../public/js/ui/imagination-hub.js?v=1d96f241';

@@ -459,6 +459,19 @@ function physicsOrder(id) {
  */
 export const REMAKE_BASELINE_PHYSICS = Object.freeze({ vx_max: 0.8268, vy_jump: 1, gravity: 1 });
 
+/**
+ * The three locations whose geometry sets no_upgrade_physics_adjustments true (glitch-locations
+ * GHFFV931FRF3TMS Game of Crowns, GHVECS766MC3LHP Distant End, GHVJQH26ERF3VMJ The Great Hog
+ * Haul): GSJS players/inc_physics.js makeStackedPhysics 303-366 leaves the imagination hash out
+ * there, so High Jumper III, the walk-speed cards and the triple jump do not apply.
+ */
+export const NO_UPGRADE_PHYSICS_STREETS = Object.freeze(['GHFFV931FRF3TMS', 'GHVECS766MC3LHP', 'GHVJQH26ERF3VMJ']);
+
+/** True on a street that ignores imagination physics (NO_UPGRADE_PHYSICS_STREETS). */
+export function ignoresUpgradePhysics(tsid) {
+  return NO_UPGRADE_PHYSICS_STREETS.includes(String(tsid || '').replace(/^L/, 'G'));
+}
+
 export function remakeMovementMultipliers(owned) {
   const p = imaginationPhysics(owned);
   return {

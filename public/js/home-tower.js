@@ -43,7 +43,7 @@
  *   choice per part as the client's ChassisManager / ConfiggerUI did.
  */
 
-import { TOWER_ROOM_SPOTS } from './tower-rooms.js?v=eeebce6f';
+import { TOWER_ROOM_SPOTS } from './tower-rooms.js?v=f238eaa9';
 import { TOWER_PART_CHOICES, TOWER_VARIANT_ART } from './home-tower-art.js?v=9619a093';
 import { loseEnergy } from './metabolics.js?v=8504134e';
 import { filterText } from './word-filter.js?v=9a7a7ebb';

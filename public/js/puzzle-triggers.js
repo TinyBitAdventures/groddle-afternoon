@@ -26,13 +26,12 @@ export const PUZZLE_DATA_URL = 'assets/content/puzzle-triggers.json';
 
 /**
  * Source-faithful movement for hand-tuned puzzle geometry. The remake walks
- * at 4.4 px/frame (264 px/s against the source vx_max 335) and falls at 0.42
- * px/frame^2 (1512 px/s^2 against gravity 1190), so its jumps cover ~62% of
- * the source distance: Griinolyza's 140 px board gaps became impossible.
- * These two factors put the arc back on the source curve (normal: 324 px /
- * 135 px apex vs the client's 318 / 134; Griinolyza 199 / 99 vs 197 / 99).
+ * at 4.4 px/frame (264 px/s against the source vx_max 335); its jump and
+ * gravity are the client's (js/avatar-step.js: gravity 1190, vy_jump -570,
+ * friction_air -0.22, vy_max 670). The speed factor puts the run back on the
+ * source curve, so Griinolyza's 140 px board gaps are clear again.
  */
-export const SOURCE_PHYSICS = Object.freeze({ speed: 335 / 264, gravity: 1190 / 1512 });
+export const SOURCE_PHYSICS = Object.freeze({ speed: 335 / 264, gravity: 1 });
 
 const num = (v, d = 0) => (Number.isFinite(Number(v)) ? Number(v) : d);
 const list = (v) => (Array.isArray(v) ? v : v == null || v === '' ? [] : String(v).split(',').map((s) => s.trim()).filter(Boolean));

@@ -135,21 +135,22 @@ Every build script skips a street that has no Tiny Speck XML (`build-street-laye
 
 ### 2.3 Physics the validator must match
 
-All values are in px per frame at 60 fps. They come from `public/game.js` `handleInput` and `physics()`.
+All values are in px per frame at 60 fps. They live in `public/js/avatar-step.js`, the frame `public/game.js` `physics()` and the validator both step. Gravity, jump, terminal speed and air friction are the client's normal setting (GSJS `config_base.js` physics_configs.normal 58-77, px/s) converted (since 2026-11-03).
 
 | Quantity | Value | Cite |
 |---|---|---|
-| Gravity | 0.42 x street multiplier | `public/game.js:12496` |
-| Jump speed | -9.6 x jump multiplier | `public/game.js:12420`, `public/js/hidden-floors.js:734-745` |
+| Gravity | 1190/3600, about 0.331 x street multiplier | `public/js/avatar-step.js` GRAVITY |
+| Jump speed | -570/60 = -9.5 x jump multiplier | `public/js/avatar-step.js` JUMP_SPEED |
+| Air friction | vy x (1 + 0.22/60) a frame in the air (friction_air -0.22); a street's own friction_air replaces it | `AvatarPhysicsHandler.as` 411-415 |
 | Walk max / floor accel / air accel | 4.4 / 0.58 / 0.58 x 0.22/0.3 | `public/game.js:12417-12418` |
-| Terminal fall | 9.6 x 670/570, about 11.3 | `public/game.js:12247` |
+| Terminal speed | 670/60, about 11.17, falling and rising (twice that while a triple jump rises) | `AvatarPhysicsHandler.as` 433-442 |
 | Body height, head reach | 80 px; 111 px over the feet at scale 1 | `public/game.js:11816`, `public/js/street-model.js:362-368` |
-| Plain jump apex | 105 px measured, 104.9 simulated | `public/js/summers-day.js:91-96` |
-| Running jump, same height | 198 px measured, 198 simulated | `public/js/summers-day.js:91` |
+| Plain jump apex | 142.5 simulated (the client: 143 at its 17 ms steps; 105 before 2026-11-03) | `public/js/avatar-step.js` jumpApex |
+| Running jump, same height | `tools/builder/guide.mjs` runningJumpLength (198 before 2026-11-03) | `public/js/builder/reach-graph.js` jumpArc |
 | Air jump | one, only after walking off a ledge; the triple jump needs Imagination upgrades | `public/js/movement.js:125-185, 141` |
 | Ground snap | 12 px, more when falling fast (FRAME_DT_CAP 2.5) | `public/js/street-model.js:419-455` |
 
-The 2012 client jumped higher (about 134 px, `public/js/hidden-floors.js:54`). A few shipped spots are therefore out of reach in the remake, and the validator's calibration run (section 7.4) will list them. The validator uses the remake's 105 px jump (decided, section 15): it must match what players can actually do.
+Until 2026-11-03 the remake fell at 0.42 (1512 px/s^2) with no air friction, so its jump peaked at 105 px against the client's 143, and a few shipped spots were out of reach. The jump is the client's now. The validator uses the game's own jump (decided, section 15): it must match what players can actually do.
 
 **Line rules:**
 
@@ -676,7 +677,7 @@ A **waiver** (schema `waivers[]`) accepts one finding at one place after a play-
    - `blockBarrierCrossing`;
    - landing through `resolveGround`.
 
-   A landing adds an edge to the nearest stand point. Arcs stop after 240 frames or outside the bounds.
+   A landing adds an edge to the nearest stand point. Arcs stop after 360 frames (MAX_FRAMES: a 4,000 px fall at vy_max) or outside the bounds.
 3. **Ladder edges.** Bottom floor to top deck, both ways (`ladderTopDeck`).
 4. **Search.** Breadth-first from each arrival.
    - Targets are signposts (PHY-003) and doors (PHY-004).
@@ -685,7 +686,7 @@ A **waiver** (schema `waivers[]`) accepts one finding at one place after a play-
 
 **One stepper, shared with the game.** In phase 2 the stepper is a copy of the physics constants with a parity test:
 
-- it must reproduce the 105 px apex and the 198 px running jump;
+- it must reproduce the game's apex (105 px then, 142.5 since 2026-11-03) and running jump;
 - its arcs must match `?physicsdemo=1&physicsautoplay=jump` on the normal street to within 2 px.
 
 Phase 2 also extracts the airborne step from `game.js physics()` into `public/js/avatar-step.js`, which both the game and the validator use. That is a careful refactor of the game, covered by the movement tests and the physics QA route.
@@ -1388,7 +1389,7 @@ Numbered as they were asked.
 - **Q5, the world map and badges:** new zones are just new content. They stay off the world map (`noMap`) and do not count toward Completist badges (`hub-maps-data.js` is not merged). **Future work:** zones may get a map system of their own later, with links to the existing world.
 - **Q6, multiplayer:** "potentially". Not in the first release: zones are solo only, and `/play/online/` never sees them. The design keeps it possible later: each zone street has one tsid and one population row, so the per-street realtime builders (`build-realtime-*.mjs`) can run over zone streets in a later release (section 11).
 - **Q7, agent keys:** local agents only for now. Builder keys (8.4) are for agents on Austin's machine; a remote connector waits for a later decision. The 30-day default expiry stands.
-- **Q8, the reach standard:** the remake's 105 px jump, so the validator matches what players can actually do (2.3, 7.4).
+- **Q8, the reach standard:** the remake's own jump, so the validator matches what players can actually do (2.3, 7.4). It was 105 px; since 2026-11-03 it is the client's 142.5 px.
 
 ### Decided by the lead, 2026-10-31 (Austin can overrule)
 

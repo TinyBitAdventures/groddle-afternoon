@@ -34,7 +34,7 @@ import {
   floorUnder,
   flyerAt,
   flyerLift,
-} from '../public/js/street-creatures.js?v=ca407a2f';
+} from '../public/js/street-creatures.js?v=8f2cbb85';
 import { setCreatureEcology, streetObjectLayout } from '../tools/build-realtime-objects.mjs';
 import { STREET_INDEX, applyStreetIndex, loadStreetDataFromFs, setZoneStreetsShown } from '../public/js/street-loader.js?v=33d2b8bc';
 import { setStreetEcologyCatalog } from '../public/js/street-ecology.js?v=2c82c072';

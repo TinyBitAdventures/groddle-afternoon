@@ -43,7 +43,7 @@
  * ladder, plaque, lantern and wall helpers are exported for js/tower-mid-rooms.js.
  */
 
-import { BRIDGE_LINE, WALKWAY_LINE, decoPoint, hangingSign, stepsPiece, TOWER_ROOMS, towerRoomIndexEntry, towerRoomStreet } from './tower-rooms.js?v=eeebce6f';
+import { BRIDGE_LINE, WALKWAY_LINE, decoPoint, hangingSign, stepsPiece, TOWER_ROOMS, towerRoomIndexEntry, towerRoomStreet } from './tower-rooms.js?v=f238eaa9';
 import { TOWER_ROOM_4_FILES } from './tower-room-4-art.js?v=6a934af6';
 import { TOWER_ROOM_16_FILES } from './tower-room-16-art.js?v=eaafb5f7';
 
@@ -582,7 +582,7 @@ function buildRoom16() {
   route.push(outPiece);
 
   // Spinach, and the key it reaches: "Contains Spinach, which is used to get a Red-Green Triangle Key" (W).
-  const keyWhy = 'W rooms table: Room 16 "Contains Spinach, which is used to get a Red-Green Triangle Key" (door_key_5, opens Room 23 in C5); W Key spawn table "Challenge Room 16, once per instance". Remake: one a game day on a high shelf 245 px over the top of the last left ledge (plain jump apex 110 px, spinach 296).';
+  const keyWhy = 'W rooms table: Room 16 "Contains Spinach, which is used to get a Red-Green Triangle Key" (door_key_5, opens Room 23 in C5); W Key spawn table "Challenge Room 16, once per instance". Remake: one a game day on a high shelf 245 px over the top of the last left ledge (plain jump apex 142 px, spinach 720).';
   const left = climb(c, 'r16_left', [
     [-640, -190, 200, false],
     [-420, -265, 200, true],

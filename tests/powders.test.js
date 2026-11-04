@@ -33,7 +33,7 @@ import {
   seedAchievementNearCompletion,
 } from '../public/js/achievements.js?v=631d7daa';
 import { createShrineState, donateToShrine, quoteShrineDonation } from '../public/js/shrines.js?v=51e09fa4';
-import { applyBuff, createBuffState, tickBuffs } from '../public/js/buffs.js?v=c7727c43';
+import { applyBuff, createBuffState, tickBuffs } from '../public/js/buffs.js?v=036fee53';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=10b118dd';
 
 const publicRoot = join(dirname(fileURLToPath(import.meta.url)), '../public');

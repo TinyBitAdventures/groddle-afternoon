@@ -42,6 +42,8 @@
  * placed in front of what they point at.
  */
 
+import { WALK_MAX, flatJump } from './avatar-step.js?v=537aa4b7';
+
 export const NEWXP_SAVE_VERSION = 1;
 
 export const NEWXP_LOCATIONS = Object.freeze({
@@ -161,16 +163,16 @@ export function tutorialPhysics(upgrades = []) {
 }
 
 /**
- * Safe reach for level design in remake pixels: the avatar's apex is 110 px
- * at jump 1 (jump velocity -9.6 * jump, gravity 0.42/frame), scaling with
- * jump squared; the horizontal reach is 60% of the airborne run.
+ * Safe reach for level design in remake pixels: the plain jump's apex
+ * (js/avatar-step.js flatJump, the client's numbers: 142 px at jump 1, 69 px
+ * at the new player's 0.7105) less 10 px; the horizontal reach is 60% of the
+ * airborne run.
  */
 export function reachFor(physics) {
   const jump = physics?.jump ?? 1;
   const speed = physics?.speed ?? 1;
-  const apex = 110 * jump * jump;
-  const airFrames = (2 * 9.6 * jump) / 0.42;
-  return { rise: Math.floor(apex - 10), gap: Math.floor(0.6 * 4.4 * speed * airFrames) };
+  const { apex, frames } = flatJump(jump);
+  return { rise: Math.floor(apex - 10), gap: Math.floor(0.6 * WALK_MAX * speed * frames) };
 }
 
 /** Platform ids reachable from `startId` by walking, jumping, dropping and ladders. */

@@ -557,10 +557,14 @@ export function buffPhysics(state, now = Date.now()) {
     result.speed *= 0.7;
     result.gravity *= 0.5;
   }
+  // Spinach's High Jumper: addBuffPhysics({ vx_max: 1.7, vy_jump: 4.5, gravity: 0.35 })
+  // (catalog_buffs.js 1026-1030). The launch is held to vy_max 670 px/s (the stepper's cap,
+  // AvatarPhysicsHandler.as boundAvatarVelocities), so under a third of the gravity the
+  // feet rise about 720 px.
   if (hasBuff(state, 'high_jumper', now)) {
     result.speed *= 1.7;
-    result.jump *= 1.5;
-    result.gravity *= 0.35 / 0.42;
+    result.jump *= 4.5;
+    result.gravity *= 0.35;
   }
   return result;
 }

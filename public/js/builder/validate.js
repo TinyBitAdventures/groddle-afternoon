@@ -28,15 +28,15 @@
  *   profiles     assets/content/style-profiles.json, for the STY rules (P5's js/builder/style-rules.js)
  */
 import { compileSchema } from './schema-check.js?v=cc9d1af4';
-import { reachStreet, REACH_LIMITS, TIGHT_MARGIN, LANDING_TRIES, AIR_JUMP_TRIES, LANDING_SHARE, streetBuff } from './reach-graph.js?v=3602d09e';
+import { reachStreet, REACH_LIMITS, TIGHT_MARGIN, LANDING_TRIES, AIR_JUMP_TRIES, LANDING_SHARE, streetBuff } from './reach-graph.js?v=40bfbc44';
 import { platformsScreen, barriersScreen, isStandable, isSolidFromBelow, isItemFloor, assertStreetGeometry, avatarHeadReach, platformYAt, worldToScreen, streetWidth, streetHeight } from '../street-model.js?v=505d8990';
 import { planStreetPlacements, populationForStreet, streetReservedSpots } from '../street-ecology.js?v=2c82c072';
-import { JUMP_SPEED } from '../avatar-step.js?v=33ad1926';
+import { jumpApex } from '../avatar-step.js?v=537aa4b7';
 import { STY_RULES, styleFindings } from './style-rules.js?v=abf9bfae';
 import { EFFECT_LIMITS, effectsCost, normaliseEmitter, rumbleShare, emitterAnchor } from '../street-effects.js?v=03f7fe4d';
 import { LICENCE_POLICY, provenanceProblems } from './new-art.js?v=29f0b13e';
 import { postOffFloor, offFloorWords } from './posts.js?v=82926ee0';
-import { floatingLines, FLOAT_REACH, FLOAT_OPEN } from './ground.js?v=a60d7c91';
+import { floatingLines, FLOAT_REACH, FLOAT_OPEN } from './ground.js?v=8beea23c';
 
 export const RULES = Object.freeze({
   'SCH-001': ['fatal', 'Zone does not fit the schema'],
@@ -190,18 +190,13 @@ export function healOps(key, street) {
   return ops;
 }
 
-/** PURE: a plain jump's apex with these multipliers, stepped as the game steps it (105 px at normal). */
+/** PURE: a plain jump's apex with these multipliers, stepped as the game steps it (142.5 px at normal). */
 export function plainApex(buff = {}) {
-  let vy = JUMP_SPEED * (buff.jump ?? 1);
-  let y = 0;
-  let top = 0;
-  for (let i = 0; i < 1000 && vy < 0; i += 1) {
-    vy += 0.42 * (buff.gravity ?? 1);
-    y += vy;
-    top = Math.min(top, y);
-  }
-  return -top;
+  return jumpApex(1, buff);
 }
+
+/** The highest ledge to ask for over a floor: the plain jump less the tight-jump margin (134 px). */
+export const LEDGE_RISE = Math.floor(plainApex()) - TIGHT_MARGIN;
 
 // —— Arrivals ——
 
@@ -326,7 +321,7 @@ export function reachFindings(key, street, arrivals, { want = () => true, reach 
         closest,
         fallback: real.length === 0,
       }, closest && closest.rise > 0
-        ? `The nearest place you can stand is ${closest.rise} px under it. Lower its ledge to 100 px or less over a floor you can reach, or add a ladder.`
+        ? `The nearest place you can stand is ${closest.rise} px under it. Lower its ledge to ${LEDGE_RISE} px or less over a floor you can reach, or add a ladder.`
         : 'Add a floor, a ledge within a jump, or a ladder up to it.');
     } else if (t.reached && t.margin >= 0 && t.margin < 1) {
       // The route's tightest jump: too little height to spare, or (P7) a landing so near a ledge's

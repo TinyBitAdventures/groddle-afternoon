@@ -20,9 +20,9 @@ import {
   towerRoomByTsid,
   towerRoomStreet,
   turned,
-} from '../public/js/tower-rooms.js?v=eeebce6f';
-import { inTowerSpot, towerSpotsFor } from '../public/js/home-tower.js?v=6a203c8f';
-import { restockGarden, towerRoomsFeature } from '../public/js/features/tower-rooms-feature.js?v=cfbc572c';
+} from '../public/js/tower-rooms.js?v=f238eaa9';
+import { inTowerSpot, towerSpotsFor } from '../public/js/home-tower.js?v=4daa0b96';
+import { restockGarden, towerRoomsFeature } from '../public/js/features/tower-rooms-feature.js?v=f35d6ca6';
 import {
   ALL_TOWER_ROOMS,
   CHALLENGE_ROOMS,
@@ -37,8 +37,9 @@ import {
   anyTowerRoomByTsid,
   anyTowerRoomStreet,
   flats,
-} from '../public/js/tower-challenge-rooms.js?v=8877b6a7';
+} from '../public/js/tower-challenge-rooms.js?v=7502a893';
 import { ladderTopDeck } from '../public/js/street-model.js?v=505d8990';
+import { GRAVITY, JUMP_SPEED, TERMINAL_VY, WALK_MAX, jumpApex } from '../public/js/avatar-step.js?v=537aa4b7';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const streets = join(spike, 'public/assets/streets');
@@ -46,8 +47,8 @@ const street = (tsid) => JSON.parse(readFileSync(join(streets, `${tsid}.json`), 
 const room15 = towerRoomByTsid(ROOM_15_TSID);
 const vent = towerRoomByTsid(VENT_ROOM_TSID);
 
-/** Plain jump in remake units (game.js): vy -9.6 px/frame, gravity 0.42, walk 4.4. */
-const JUMP = { vy: 9.6, g: 0.42, vx: 4.4 };
+/** Plain jump in remake units (js/avatar-step.js, the client's numbers): vy -9.5 px/frame, gravity 0.331, walk 4.4. */
+const JUMP = { vy: -JUMP_SPEED, g: GRAVITY, vx: WALK_MAX };
 const apex = (k = 1, g = 1) => (JUMP.vy * k) ** 2 / (2 * JUMP.g * g);
 /** Horizontal reach of a running jump that lands `rise` px higher (negative: lower). */
 function reach(rise, { jump = 1, gravity = 1, speed = 1 } = {}) {
@@ -57,7 +58,8 @@ function reach(rise, { jump = 1, gravity = 1, speed = 1 } = {}) {
   if (disc < 0) return -1;
   return ((v + Math.sqrt(disc)) / g) * JUMP.vx * speed;
 }
-const SPINACH = { jump: 1.5, gravity: 0.35 / 0.42, speed: 1.7 }; // buffs.js high_jumper
+// buffs.js high_jumper: vy_jump x4.5 held to vy_max (TERMINAL_VY), gravity x0.35, vx_max x1.7.
+const SPINACH = { jump: TERMINAL_VY / -JUMP_SPEED, gravity: 0.35, speed: 1.7 };
 
 /** The top of the floor under x within a platform list (world), nearest to y. */
 function floorAt(platforms, x, y) {
@@ -250,6 +252,7 @@ describe('rebuilt tower rooms: the secret spots', () => {
     // A plain jump from the deck falls short of the box; spinach (High Jumper) reaches it and the shelf.
     const rise = deckY - (box.y + s.bounds.t + 100); // feet must rise until the avatar's 100 px box meets the spot
     assert.ok(apex() < rise, `plain apex ${apex()} vs ${rise}`);
+    assert.ok(jumpApex(1.05) < rise, `High Jumper III apex ${jumpApex(1.05)} vs ${rise}`);
     assert.ok(apex(SPINACH.jump, SPINACH.gravity) > deckY - shelfY + 10, `spinach apex vs ${deckY - shelfY}`);
     // The shelf hangs over the deck, so the spinach jump goes straight up.
     assert.ok(floorAt(room15.platforms, shelf.left + 10, door.y) != null && floorAt(room15.platforms, shelf.right - 10, door.y) != null);

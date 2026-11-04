@@ -13,9 +13,9 @@ import { describe, it } from 'node:test';
 import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { reachStreet, reachRoutes, runUpSpeed, jumpArc, streetWorld, LANDING_TRIES, AIR_JUMP_TRIES, LANDING_SHARE, REACH_LIMITS } from '../public/js/builder/reach-graph.js?v=3602d09e';
-import { validateShippedStreet } from '../public/js/builder/validate.js?v=8575a4a0';
-import { NORMAL_BUFF, WALK_MAX } from '../public/js/avatar-step.js?v=33ad1926';
+import { reachStreet, reachRoutes, runUpSpeed, jumpArc, streetWorld, LANDING_TRIES, AIR_JUMP_TRIES, LANDING_SHARE, REACH_LIMITS } from '../public/js/builder/reach-graph.js?v=40bfbc44';
+import { validateShippedStreet } from '../public/js/builder/validate.js?v=dfad07b5';
+import { NORMAL_BUFF, WALK_MAX } from '../public/js/avatar-step.js?v=537aa4b7';
 import { run, connectOps, floorAt, newArtFilterNote } from '../tools/builder/cli.mjs';
 import { createWorker, staleFiles } from '../tools/builder/worker.mjs';
 import { signWorker } from '../tools/builder/sign.mjs';
@@ -77,7 +77,7 @@ describe('the reach model: run-ups and a keyboard player\'s landings (P7)', () =
   });
 
   it('a jump with little height to spare still says so (PHY-006 by height)', () => {
-    const t = target(bay({ A: [400, 700, -800], B: [760, 1100, -898] }));
+    const t = target(bay({ A: [400, 700, -800], B: [760, 1100, -938] }));
     assert.ok(t.reached && t.margin < 1);
     assert.ok(Number.isFinite(t.tight.rise) && t.tight.rise < 8);
   });

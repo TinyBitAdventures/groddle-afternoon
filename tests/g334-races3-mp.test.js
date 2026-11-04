@@ -22,7 +22,7 @@ import { questOffersFeature } from '../public/js/features/quest-offers-feature.j
 import { HUB_MAP_STREETS } from '../public/js/hub-maps-data.js?v=ffe222f1';
 import { HELL_LOCATION } from '../public/js/hell.js?v=45060736';
 import { HOG_MP_COURSE } from '../public/js/hog-haul-mp.js?v=d8605396';
-import { CROWNS_TICKET } from '../public/js/game-of-crowns.js?v=98e21baf';
+import { CROWNS_TICKET } from '../public/js/game-of-crowns.js?v=e32f35f5';
 import { economyCredits } from '../tools/build-economy.mjs';
 import { tradeTable } from '../tools/build-realtime-trade.mjs';
 import { serverPath, skipWithoutServer } from '../tools/repos.mjs';
@@ -161,7 +161,7 @@ describe('the dead do not race', () => {
   });
 
   it('a race_match that reaches a dead page is left at once (races-feature)', async () => {
-    const { racesFeature } = await import('../public/js/features/races-feature.js?v=b8789363');
+    const { racesFeature } = await import('../public/js/features/races-feature.js?v=41bd1501');
     const client = fakeClient(7);
     const toasts = [];
     const engine = {
@@ -244,7 +244,7 @@ describe('a Game of Crowns reload asks the server, and the dead stay out (crowns
 
   it('a page reloaded out of the arena is told once that it left (instance.js player_logout)', async () => {
     const { crownsFeature, client, engine, log } = await setup();
-    const { CROWNS_STREET } = await import('../public/js/game-of-crowns.js?v=98e21baf');
+    const { CROWNS_STREET } = await import('../public/js/game-of-crowns.js?v=e32f35f5');
     crownsFeature.restore({ returnTo: { tsid: 'GA5', x: 1, y: 2 } }, engine);
     assert.deepEqual(crownsFeature.reloadLocation({ tsid: CROWNS_STREET }, engine), { tsid: 'GA5', x: 1, y: 2 });
     crownsFeature.onStreetEnter({ tsid: 'GA5' }, engine);
@@ -253,7 +253,7 @@ describe('a Game of Crowns reload asks the server, and the dead stay out (crowns
   });
 
   it('solo still gives a ticket back on a street change', async () => {
-    const { crownsFeature } = await import('../public/js/features/crowns-feature.js?v=81d9cba0');
+    const { crownsFeature } = await import('../public/js/features/crowns-feature.js?v=7419a146');
     const engine = { mode: 'solo', inv: {}, query: () => null, toast() {}, updateHud() {}, param: () => null, instanceHold: null, setData() {} };
     crownsFeature.restore({ pendingTicket: CROWNS_TICKET }, engine);
     crownsFeature.onStreetEnter({ tsid: 'GA5' }, engine);

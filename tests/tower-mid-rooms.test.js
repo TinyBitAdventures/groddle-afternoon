@@ -7,6 +7,7 @@
  */
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
+import { GRAVITY, JUMP_SPEED, WALK_MAX } from '../public/js/avatar-step.js?v=537aa4b7';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -29,11 +30,11 @@ import {
   boxToScreen,
   midTowerRoomByTsid,
   midTowerRoomStreet,
-} from '../public/js/tower-mid-rooms.js?v=b38e8578';
-import { greet, greeterAction, midTowerFeature } from '../public/js/features/mid-tower-feature.js?v=add6dd98';
-import { towerRoomsFeature } from '../public/js/features/tower-rooms-feature.js?v=cfbc572c';
+} from '../public/js/tower-mid-rooms.js?v=02071191';
+import { greet, greeterAction, midTowerFeature } from '../public/js/features/mid-tower-feature.js?v=8321191f';
+import { towerRoomsFeature } from '../public/js/features/tower-rooms-feature.js?v=f35d6ca6';
 import { populationForStreet } from '../public/js/street-ecology.js?v=2c82c072';
-import { reachStreet } from '../public/js/builder/reach-graph.js?v=3602d09e';
+import { reachStreet } from '../public/js/builder/reach-graph.js?v=40bfbc44';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const streets = join(spike, 'public/assets/streets');
@@ -44,8 +45,8 @@ const stairs = midTowerRoomByTsid(STAIRS_TSID);
 const mezz = midTowerRoomByTsid(MEZZANINE_TSID);
 const DOOR_H = mezz.doors[0].h;
 
-/** Plain jump in remake units (game.js): vy -9.6 px/frame, gravity 0.42, walk 4.4 (as tests/tower-rooms.test.js). */
-const JUMP = { vy: 9.6, g: 0.42, vx: 4.4 };
+/** Plain jump in remake units (js/avatar-step.js, the client's numbers), as tests/tower-rooms.test.js. */
+const JUMP = { vy: -JUMP_SPEED, g: GRAVITY, vx: WALK_MAX };
 const APEX = JUMP.vy ** 2 / (2 * JUMP.g);
 function reach(rise) {
   const disc = JUMP.vy ** 2 - 2 * JUMP.g * rise;
@@ -454,14 +455,14 @@ describe('G97: hopping along the Stairs\' tube on slow frames', () => {
     const to = stairs.flight.high.x - L - 60;
     for (let x0 = from; x0 <= to; x0 += 7) {
       for (const vx of [-4.4, 4.4]) {
-        // game.js physics(): vy += 0.42 * dt; x += vx * dt; y += vy * dt; land when y >= ground.
+        // game.js physics(): vy += GRAVITY * dt; x += vx * dt; y += vy * dt; land when y >= ground.
         let x = x0;
         let y = tubeFloorAt(x0);
         if (y == null) continue;
         let vy = -8.3; // a hop
         let landed = null;
         for (let i = 0; i < 40 && !landed; i++) {
-          vy += 0.42 * FRAME_DT_CAP;
+          vy += GRAVITY * FRAME_DT_CAP;
           x += vx * FRAME_DT_CAP;
           y += vy * FRAME_DT_CAP;
           const hit = resolveGround(plats, x, y, vy, 16);

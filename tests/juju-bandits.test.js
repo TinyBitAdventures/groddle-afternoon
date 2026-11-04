@@ -34,7 +34,7 @@ import {
 import { DROP_TABLES } from '../public/js/drop-tables.js?v=0f922478';
 import { REMAKE_QUEST_NPCS } from '../public/js/quest-offers.js?v=3bf17441';
 import { OFFER_OVERRIDES } from '../public/js/quest-rooms/catalog.js?v=9ebeb502';
-import { FEATURES } from '../public/js/features/index.js?v=e078538f';
+import { FEATURES } from '../public/js/features/index.js?v=aa6fadfd';
 import { remakeStatus } from '../public/js/imagination-remake.js?v=7a7f8b70';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');

@@ -40,8 +40,8 @@ import {
   useBottle,
 } from '../public/js/tree-poison.js?v=f6e01177';
 import { createPlot, killPlotTree, performPlotVerb, growTree } from '../public/js/patches.js?v=3e9218c1';
-import { createFeatureHost } from '../public/js/feature-host.js?v=903263a4';
-import { FEATURES } from '../public/js/features/index.js?v=e078538f';
+import { createFeatureHost } from '../public/js/feature-host.js?v=2ed3c069';
+import { FEATURES } from '../public/js/features/index.js?v=aa6fadfd';
 import { adoptedPlan } from '../public/js/features/patches-feature.js?v=310a2eec';
 import { patchesFeature } from '../public/js/features/patches-feature.js?v=310a2eec';
 import {

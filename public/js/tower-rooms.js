@@ -233,8 +233,8 @@ function buildRoom15() {
   const doorY = Math.round(lineY(trunkDeck.platforms, doorX));
 
   // Secret spot 5: "a quoin at the top of the screen, near the way out ... Bring Spinach" (W, G).
-  const spotWhy = 'W [5] "a quoin at the top of the screen, near the way out"; G "spinach-jumping to the quoin at the top of the room": a plank panel ~250 px over the trunk deck, above the door (spinach apex 296 px, plain jump 110).';
-  const spotShelf = piece(mg('platform_bottletree_single', spotX, -650, 200, 115, 9), PANEL_LINE, 'r15_secret', spotWhy);
+  const spotWhy = 'W [5] "a quoin at the top of the screen, near the way out"; G "spinach-jumping to the quoin at the top of the room": a plank panel ~300 px over the trunk deck, above the door (spinach apex 720 px; plain jump 142, High Jumper III 158, js/avatar-step.js).';
+  const spotShelf = piece(mg('platform_bottletree_single', spotX, -700, 200, 115, 9), PANEL_LINE, 'r15_secret', spotWhy);
 
   // A fall lands on the void's floor; a vine climbs back to the deck by the left wall.
   const pitWhy = 'Remake (as Room 8): the picture shows only dark under the bridges; a fall lands on a floor out of view, and a vine (firebog_ladder_tile_*_vine) climbs back to the arrival deck by the left wall.';

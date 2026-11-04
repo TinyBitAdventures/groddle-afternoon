@@ -25,7 +25,7 @@ async function stageScale() {
 
 /** Every sharpened home graphic: { name, paths (1x URLs from public/), scale (largest world scale it is drawn at) }. */
 async function homeArt() {
-  const { TOWER_ART, TOWER_ART_DIR, TOWER_STYLES, TOWER_VARIANT_ART, PROTO_ART, composeTower } = await import('../public/js/home-tower.js?v=6a203c8f');
+  const { TOWER_ART, TOWER_ART_DIR, TOWER_STYLES, TOWER_VARIANT_ART, PROTO_ART, composeTower } = await import('../public/js/home-tower.js?v=4daa0b96');
   const { PROTO_DEPLETED_ART } = await import('../public/js/home-proto-art.js?v=9309e9f3');
   const { NOTE_POLE_PARTS } = await import('../public/js/note-pole-art.js?v=fbda2f8a');
   const { moduleConsts } = await import('./sheet-sources.js');

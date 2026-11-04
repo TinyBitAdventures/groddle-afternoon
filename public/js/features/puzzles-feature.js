@@ -41,7 +41,7 @@
  * puzzleRespawns, puzzleComplete, puzzleReward, puzzleDemo.
  */
 
-import { locationEventsApi } from './location-events-feature.js?v=df2533e4';
+import { locationEventsApi } from './location-events-feature.js?v=6aca5a98';
 import { collectQuoin, QUOIN_SHEET, QUOIN_TYPES } from '../quoins.js?v=dfe1ff0a';
 import {
   PUZZLE_DATA_URL,
@@ -54,7 +54,7 @@ import {
   respawnPoint,
   rewardBits,
   stepTriggers,
-} from '../puzzle-triggers.js?v=3ee2f2c8';
+} from '../puzzle-triggers.js?v=114b052b';
 import { energyMax, metabolicGain, moodMax } from '../metabolics.js?v=8504134e';
 import { isLoaded, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js?v=3149d699';
 

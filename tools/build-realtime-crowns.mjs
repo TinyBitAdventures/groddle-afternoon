@@ -46,7 +46,7 @@ import {
   CROWNS_WIN_MS,
   CROWNS_WIN_REWARD,
   playLineScreenY,
-} from '../public/js/game-of-crowns.js?v=98e21baf';
+} from '../public/js/game-of-crowns.js?v=e32f35f5';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const outPath = serverPath('data', 'crowns.json');

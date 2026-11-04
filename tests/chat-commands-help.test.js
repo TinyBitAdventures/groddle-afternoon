@@ -23,9 +23,9 @@ import {
   slashPlan,
 } from '../public/js/slash-commands.js?v=98c2238a';
 import { chatCommandsSection, createHotkeysSheet } from '../public/js/client-hotkeys.js?v=5a0e7cc7';
-import { HINT_DELAY_MS, showLocalLines, slashCommandsFeature } from '../public/js/features/slash-commands-feature.js?v=bf302a9a';
-import { FEATURES } from '../public/js/features/index.js?v=e078538f';
-import { createFeatureHost } from '../public/js/feature-host.js?v=903263a4';
+import { HINT_DELAY_MS, showLocalLines, slashCommandsFeature } from '../public/js/features/slash-commands-feature.js?v=ca6fc2a9';
+import { FEATURES } from '../public/js/features/index.js?v=aa6fadfd';
+import { createFeatureHost } from '../public/js/feature-host.js?v=2ed3c069';
 import { CHANNEL_WELCOME, tabCommand } from '../public/js/groups.js?v=14b60589';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');

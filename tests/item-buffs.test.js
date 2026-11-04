@@ -25,10 +25,10 @@ import {
   hasBuff,
   consumeRewardBuff,
   studyBuffBlockReason,
-} from '../public/js/buffs.js?v=c7727c43';
+} from '../public/js/buffs.js?v=036fee53';
 import { accelerateActiveStudy, createSkillState, getStudyStatus, startSkillStudy } from '../public/js/skills.js?v=4542bdf9';
 import { applyRewards } from '../public/js/quests.js?v=282e1621';
-import { normalizeBuffSnapshot } from '../public/js/player-save.js?v=f9b34732';
+import { normalizeBuffSnapshot } from '../public/js/player-save.js?v=4d7dc096';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '../public');
 
@@ -72,10 +72,11 @@ describe('official item buff mappings', () => {
     assert.equal(result.ok, true);
     assert.equal(inv.spinach, 1);
     assert.equal(listActiveBuffs(state, 1000)[0].classTsid, 'high_jumper');
+    // catalog_buffs.js High Jumper: vx_max 1.7, vy_jump 4.5, gravity 0.35 (the stepper holds the launch to vy_max).
     assert.deepEqual(buffPhysics(state, 1000), {
       speed: 1.7,
-      jump: 1.5,
-      gravity: 0.35 / 0.42,
+      jump: 4.5,
+      gravity: 0.35,
     });
     const duplicate = activateBuffItem(state, inv, pc, 'spinach', 2000);
     assert.equal(duplicate.ok, false);

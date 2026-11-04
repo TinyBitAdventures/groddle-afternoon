@@ -8,8 +8,12 @@
  * runs three stand-in players with a platform/ladder navigation graph: they
  * chase whoever holds the crown, and flee when they hold it.
  *
- * The arena's ledges sit up to ~135 px apart, above the remake's 110 px jump,
- * so the arena grants a 1.15x jump (the rivals' graph uses the same reach).
+ * The arena's ledges sit up to ~135 px apart, inside the plain jump's 142 px
+ * (js/avatar-step.js, the client's numbers). The arena is one of the three
+ * locations with no_upgrade_physics_adjustments (GHFFV931FRF3TMS.xml), so it
+ * plays at the plain jump with no triple jump (js/imagination.js
+ * NO_UPGRADE_PHYSICS_STREETS). The rivals' graph keeps its own reach
+ * (RIVAL_JUMP_SCALE), about the player's.
  *
  * QA:
  *   ?autostart=1&racedemo=it_game            enter, auto-ready
@@ -53,9 +57,9 @@ import {
   playLineScreenY,
   tagCrowns,
   tickCrowns,
-} from '../game-of-crowns.js?v=98e21baf';
+} from '../game-of-crowns.js?v=e32f35f5';
 import { RACE_RIVALS } from '../races.js?v=df0576ad';
-import { mayhemHoldsArena } from './mayhem-feature.js?v=1efbaf68';
+import { mayhemHoldsArena } from './mayhem-feature.js?v=3c4369b5';
 import { wallsScreen } from '../street-model.js?v=505d8990';
 import { addItem, countItem, removeItem } from '../inventory.js?v=597a17a2';
 import { textureFromUrl } from '../textures.js?v=3149d699';
@@ -76,7 +80,8 @@ import {
 const ICON = 'assets/sprites/races/';
 const CROWN_DIR = 'assets/sprites/races/crowns/';
 const RIVAL_SCALE = 1.35 * 0.4;
-const JUMP_SCALE = 1.15;
+/** game-of-crowns.js buildNavGraph's jump in its own 9.6 / 0.42 model: a 145 px peak (123 px with its 0.85 margin), about the player's 142. */
+const RIVAL_JUMP_SCALE = 1.15;
 const AI_SPEED = 3.7; // px per 60 Hz frame (the avatar runs 4.4)
 
 
@@ -184,7 +189,7 @@ export async function startCrowns(engine, opts = {}) {
 function setupArena(street, engine) {
   const { PIXI } = engine;
   playLineY = playLineScreenY(street);
-  nav = buildNavGraph(engine.platforms || [], wallsScreen(street), { jumpScale: JUMP_SCALE });
+  nav = buildNavGraph(engine.platforms || [], wallsScreen(street), { jumpScale: RIVAL_JUMP_SCALE });
   const params = new URLSearchParams(location.search);
   const players = [{ id: 'you', name: 'You' }, ...rivals().map((r) => ({ id: r.name, name: r.name }))];
   const crownStart = Number(params.get('crownstart'));
@@ -1473,10 +1478,10 @@ export const crownsFeature = {
   },
 
   physics(engine) {
-    if (mp && engine.streetTsid === CROWNS_STREET) return mp.status === 'running' ? { jump: JUMP_SCALE } : { speed: 0, jump: 0 };
+    if (mp && engine.streetTsid === CROWNS_STREET) return mp.status === 'running' ? null : { speed: 0, jump: 0 };
     if (engine.streetTsid !== CROWNS_STREET || !game) return null;
     if (game.status !== 'running') return { speed: 0, jump: 0 };
-    return { jump: JUMP_SCALE };
+    return null;
   },
 
   onTick(dtMs, now, engine) {

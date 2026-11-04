@@ -153,7 +153,8 @@ describe('holdCloseToFloor (AvatarAnimationState close_limit)', () => {
     assert.match(game, /import \{ holdCloseToFloor \} from '\.\/js\/slope-walk\.js\?v=[0-9a-f]{8}';/);
     assert.match(step, /import \{ stickToSlope \} from '\.\/slope-walk\.js\?v=[0-9a-f]{8}';/);
     assert.match(game, /stepAvatar\(player, \{/);
-    assert.match(step, /const wasGrounded = body\.onGround === true;[\s\S]{0,400}body\.vy \+= GRAVITY \* \(buff\.gravity \?\? 1\) \* dt;/);
+    assert.match(step, /const wasGrounded = body\.onGround === true;[\s\S]{0,400}avatarFall\(body, buff, dt\);/);
+    assert.match(step, /body\.vy \+= GRAVITY \* \(buff\.gravity \?\? 1\) \* dt;/);
     assert.match(step, /stickToSlope\(\{ wasGrounded, vy: body\.vy, dx: body\.x - prevX, feetY: body\.y, groundY: floor \}\)/);
     assert.match(game, /holdCloseToFloor\(avatarAnimState\(/);
   });

@@ -34,7 +34,7 @@ import { arriveFor, newConnect, POST_W, POST_H, LADDER_W } from '../../public/js
 import { arrivalOps, settlePostOps, followPostOps } from '../../public/js/builder/posts.js?v=82926ee0';
 import { platformsScreen, isStandable } from '../../public/js/street-model.js?v=505d8990';
 import { DECO_TWINS } from '../../public/js/street-render.js?v=9349c0e5';
-import { groundOps, floatingLines, FLOAT_REACH } from '../../public/js/builder/ground.js?v=a60d7c91';
+import { groundOps, floatingLines, FLOAT_REACH } from '../../public/js/builder/ground.js?v=8beea23c';
 import { EFFECT_KINDS, EFFECT_DEFAULTS, EFFECT_LIMITS, RUMBLE_DEFAULTS, effectsCost, normaliseEmitter, rumbleShare } from '../../public/js/street-effects.js?v=03f7fe4d';
 
 export const PERM_WORDS = Object.freeze({ floor: -1, roof: 1, soft: 0, hard: null });
@@ -1165,7 +1165,7 @@ export async function run(argv, { env = process.env, fetchImpl = globalThis.fetc
       let report;
       let rev;
       if (local()) {
-        const { validateZone } = await import('../../public/js/builder/validate.js?v=8575a4a0');
+        const { validateZone } = await import('../../public/js/builder/validate.js?v=dfad07b5');
         const { loadValidatorContext } = await import('./validator-context.mjs');
         const zone = readJson(resolve(flags.file));
         rev = zone.rev;

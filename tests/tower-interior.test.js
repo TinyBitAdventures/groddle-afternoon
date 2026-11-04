@@ -19,10 +19,10 @@ import {
   setStreetEcologyCatalog,
 } from '../public/js/street-ecology.js?v=2c82c072';
 import { applyIndexHub, loadStreetDataFromFs } from '../public/js/street-loader.js?v=33d2b8bc';
-import { TOWER_ROOMS, VENT } from '../public/js/tower-rooms.js?v=eeebce6f';
-import { ALL_TOWER_ROOMS } from '../public/js/tower-challenge-rooms.js?v=8877b6a7';
-import { towerRoomsFeature } from '../public/js/features/tower-rooms-feature.js?v=cfbc572c';
-import { seasonsFeature } from '../public/js/features/seasons-feature.js?v=01414915';
+import { TOWER_ROOMS, VENT } from '../public/js/tower-rooms.js?v=f238eaa9';
+import { ALL_TOWER_ROOMS } from '../public/js/tower-challenge-rooms.js?v=7502a893';
+import { towerRoomsFeature } from '../public/js/features/tower-rooms-feature.js?v=f35d6ca6';
+import { seasonsFeature } from '../public/js/features/seasons-feature.js?v=43e32ba4';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (rel) => JSON.parse(readFileSync(join(spike, rel), 'utf8'));

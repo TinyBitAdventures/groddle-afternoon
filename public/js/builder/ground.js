@@ -18,7 +18,7 @@ import { nextDecoId } from './ops.js?v=27c7796f';
 
 /**
  * A walkable line this close to the surface below it (px) is low: it should stand on something.
- * About four plain jumps (105 px, spec 2.3); over Tiny Speck's streets 75% of lines this low have
+ * About three plain jumps (142 px, spec 2.3); over Tiny Speck's streets 75% of lines this low have
  * art under them and 55% of higher ones do, so higher lines may float or sit against a wall.
  */
 export const FLOAT_REACH = 450;

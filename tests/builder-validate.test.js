@@ -8,9 +8,9 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { validateZone, RULES, hash16, healOps, plainApex, badWords, zoneArrivals } from '../public/js/builder/validate.js?v=8575a4a0';
-import { streetWorld, jumpArc, jumpArcs, reachStreet } from '../public/js/builder/reach-graph.js?v=3602d09e';
-import { stepAvatar, avatarGround, steerX, coastX, NORMAL_BUFF } from '../public/js/avatar-step.js?v=33ad1926';
+import { validateZone, RULES, hash16, healOps, plainApex, badWords, zoneArrivals } from '../public/js/builder/validate.js?v=dfad07b5';
+import { streetWorld, jumpArc, jumpArcs, reachStreet } from '../public/js/builder/reach-graph.js?v=40bfbc44';
+import { GRAVITY, stepAvatar, avatarGround, steerX, coastX, NORMAL_BUFF } from '../public/js/avatar-step.js?v=537aa4b7';
 import { platformsScreen } from '../public/js/street-model.js?v=505d8990';
 import { loadValidatorContext } from '../tools/builder/validator-context.mjs';
 
@@ -33,22 +33,22 @@ function fire(rule, change = () => {}, extra = {}) {
 const flat = { tsid: 'GZTEST000000001', label: 'Flat', bounds: { l: -2000, r: 2000, t: -1000, b: 0 }, platforms: [{ id: 'plat_1', x1: -1990, y1: -60, x2: 1990, y2: -60, pc_perm: -1 }], layers: [], signposts: [] };
 
 describe('the stepper the game and the validator share (js/avatar-step.js)', () => {
-  it('a plain jump peaks at 105 px and a flat running jump lands 198 px on (spec 2.3)', () => {
+  it('a plain jump peaks at 142.5 px (the client: 143) and a flat running jump lands 260 px on (spec 2.3)', () => {
     const w = streetWorld(flat);
     const up = jumpArc(w, { x: 2000, y: 940 }, { dir: 0 });
-    assert.ok(Math.abs(940 - up.minY - 104.94) < 0.01, `apex ${940 - up.minY}`);
-    assert.equal(Math.round(plainApex()), 105);
+    assert.ok(Math.abs(940 - up.minY - 142.49) < 0.01, `apex ${940 - up.minY}`);
+    assert.equal(Math.round(plainApex()), 142);
     const run = jumpArc(w, { x: 1000, y: 940 }, { dir: 1, run: true });
-    assert.ok(Math.abs(run.landed.x - 1000 - 198) < 0.5, `running ${run.landed.x - 1000}`);
-    assert.equal(run.frames, 45);
+    assert.ok(Math.abs(run.landed.x - 1000 - 259.6) < 0.5, `running ${run.landed.x - 1000}`);
+    assert.equal(run.frames, 59);
   });
 
-  it('steps a frame as game.js did before the extract (gravity, move, floor)', () => {
+  it('steps a frame as game.js does (gravity, move, floor)', () => {
     const lines = platformsScreen(flat);
     const body = { x: 500, y: 900, vx: 2, vy: 0, onGround: false };
     const ground = (x, y, vy) => avatarGround(lines, x, y, vy, { street: flat });
     stepAvatar(body, { platforms: lines, worldW: 4000, ground });
-    assert.deepEqual(body, { x: 502, y: 900.42, vx: 2, vy: 0.42, onGround: false });
+    assert.deepEqual(body, { x: 502, y: 900 + GRAVITY, vx: 2, vy: GRAVITY, onGround: false, tripleJumping: false });
     for (let i = 0; i < 60 && !body.onGround; i += 1) stepAvatar(body, { platforms: lines, worldW: 4000, ground });
     assert.equal(body.y, 940);
     assert.equal(body.onGround, true);
@@ -77,7 +77,7 @@ describe('the stepper the game and the validator share (js/avatar-step.js)', () 
   it('game.js runs the shared frame', () => {
     const game = read('public/game.js');
     // assert.ok, not assert.match: a failing match would print the whole of game.js.
-    assert.ok(/import \{ WALK_MAX, avatarGround, coastX, stepAvatar, steerAccel, (?:steerX, )?streetPhysicsExtras \} from '\.\/js\/avatar-step\.js\?v=[0-9a-f]{8}';/.test(game), 'imports js/avatar-step.js');
+    assert.ok(/import \{ JUMP_SPEED, WALK_MAX, avatarGround, coastX, stepAvatar, steerAccel, (?:steerX, )?streetPhysicsExtras \} from '\.\/js\/avatar-step\.js\?v=[0-9a-f]{8}';/.test(game), 'imports js/avatar-step.js');
     assert.ok(/stepAvatar\(player, \{\n\s+dt,\n\s+buff: combinedPhysics\(\),/.test(game), 'physics() steps through stepAvatar');
     assert.ok(game.includes('return avatarGround(streetPlatforms, px, py, player?.vy ?? 0, { street: currentStreet, fallback: GROUND_Y });'), 'resolveGround is avatarGround');
     assert.ok(!/function streetPhysicsFreeFall|const STREET_PHYSICS_TERMINAL_VY/.test(game), 'no second copy of the frame');
@@ -85,10 +85,10 @@ describe('the stepper the game and the validator share (js/avatar-step.js)', () 
 });
 
 describe('reach (js/builder/reach-graph.js)', () => {
-  it('a ledge 90 px up is reached, 132 px up is not (spec 8.7)', () => {
+  it('a ledge 130 px up is reached, 170 px up is not (spec 8.7, the client jump and the 16 px ground snap)', () => {
     const at = (rise) => ({ ...flat, platforms: [...flat.platforms, { id: 'plat_2', x1: 1250, y1: -60 - rise, x2: 1450, y2: -60 - rise, pc_perm: -1 }], signposts: [{ id: 'signpost_1', x: 1350, y: -60 - rise, w: 100, h: 200, connects: [{ tsid: 'GLI2V0UN7RD1T2J', label: 'Hechey Track' }] }] });
-    assert.equal(reachStreet(at(90), [{ x: 150, y: 940, from: 'a' }]).targets[0].reached, true);
-    const r = reachStreet(at(132), [{ x: 150, y: 940, from: 'a' }]);
+    assert.equal(reachStreet(at(130), [{ x: 150, y: 940, from: 'a' }]).targets[0].reached, true);
+    const r = reachStreet(at(170), [{ x: 150, y: 940, from: 'a' }]);
     assert.equal(r.targets[0].reached, false);
     assert.equal(r.targets[0].closest.y, 940);
   });
@@ -116,8 +116,8 @@ describe('the validator (js/builder/validate.js): one fixture per rule', () => {
     assert.ok(r.limits.length >= 4);
   });
 
-  /** Spec 8.7 before the fix: the ledge 132 px over the floor (the other street's arm lands on it). */
-  const raise132 = (z) => { const p = lane(z).platforms[1]; p.y1 = -192; p.y2 = -192; lane(z).signposts[0].y = -192; end(z).signposts[0].connects[0].arrive.y = 808; };
+  /** Spec 8.7 before the fix, out of the client jump: the ledge 170 px over the floor (the other street's arm lands on it). */
+  const raise170 = (z) => { const p = lane(z).platforms[1]; p.y1 = -230; p.y2 = -230; lane(z).signposts[0].y = -230; end(z).signposts[0].connects[0].arrive.y = 770; };
   const cases = [
     ['SCH-001', (z) => { z.title = ''; }],
     ['STR-001', (z) => { lane(z).platforms.push({ ...lane(z).platforms[0] }); }],
@@ -129,7 +129,7 @@ describe('the validator (js/builder/validate.js): one fixture per rule', () => {
     ['STR-007', (z) => { lane(z).platforms.push({ id: 'plat_9', x1: 0, y1: -60, x2: 10, y2: -300, pc_perm: -1 }); }],
     ['PHY-001', (z) => { end(z).signposts[0].connects[0].arrive = { x: 2850, y: 600 }; }],
     ['PHY-002', (z) => { lane(z).barriers = [{ id: 'wall_1', x: -1350, y: -160, h: 160, pc_perm: null }]; }],
-    ['PHY-003', raise132],
+    ['PHY-003', raise170],
     ['PHY-004', (z) => { end(z).doors = [{ id: 'door_1', x: 1500, y: 600, w: 80, h: 200, sprite: 'bush_3', hidden: false, is_locked: false, key_id: 0, requires_level: 0, connect: { tsid: 'GLI2V0UN7RD1T2J', label: 'Hechey Track' } }]; }],
     ['PHY-005', (z) => {
       // A pit with walls: you can fall in from the floor's end, never climb out.
@@ -138,7 +138,7 @@ describe('the validator (js/builder/validate.js): one fixture per rule', () => {
       s.platforms.push({ id: 'plat_2', x1: 610, y1: -10, x2: 980, y2: -10, pc_perm: -1 });
       s.barriers = [{ id: 'wall_1', x: 610, y: -200, h: 190, pc_perm: null }];
     }],
-    ['PHY-006', (z) => { const p = lane(z).platforms[1]; p.y1 = -160; p.y2 = -160; lane(z).signposts[0].y = -160; }],
+    ['PHY-006', (z) => { const p = lane(z).platforms[1]; p.y1 = -198; p.y2 = -198; lane(z).signposts[0].y = -198; }],
     ['PHY-007', (z) => { lane(z).platforms.push({ id: 'plat_9', x1: -400, y1: -600, x2: -200, y2: -600, pc_perm: -1 }); }],
     ['PHY-008', (z) => { lane(z).ladders = [{ id: 'ladder_1', x: -1000, y: -60, w: 50, h: 400 }]; }],
     // P7: the ledge under lane/signpost_1 moved 40 px down, its arm worked out again, the post left floating.
@@ -205,7 +205,7 @@ describe('the validator (js/builder/validate.js): one fixture per rule', () => {
 
   it('a waiver accepts one finding at one place until the geometry changes; fatal and AST-004 never', () => {
     const zone = structuredClone(base);
-    raise132(zone);
+    raise170(zone);
     const before = validateZone(zone, ctx);
     const f = before.findings.find((x) => x.rule === 'PHY-003');
     zone.waivers = [{ rule: f.rule, at: f.at, reason: 'played it, fine', by: 'austin', fingerprint: f.fingerprint }];
@@ -221,11 +221,11 @@ describe('the validator (js/builder/validate.js): one fixture per rule', () => {
   });
 
   it('the PHY-003 message and data read as the spec shows them', () => {
-    const [f] = fire('PHY-003', raise132);
+    const [f] = fire('PHY-003', raise170);
     assert.equal(f.at, 'lane/signpost_1');
     assert.match(f.message, /^Signpost signpost_1 \(to Hollow End\) cannot be reached from the arrival at 150, 940\.$/);
     assert.deepEqual(f.data.from, ['world:GLI2V0UN7RD1T2J']);
-    assert.deepEqual({ ...f.data.closest, x: 0 }, { x: 0, y: 940, rise: 132, jump: 105 });
+    assert.deepEqual({ ...f.data.closest, x: 0 }, { x: 0, y: 940, rise: 170, jump: 142 });
     assert.equal(f.where.space, 'screen');
   });
 
@@ -246,7 +246,7 @@ describe('the validator (js/builder/validate.js): one fixture per rule', () => {
 describe('calibration (tools/builder/calibration.json, spec 7.4)', () => {
   const cal = JSON.parse(read('tools/builder/calibration.json'));
   it('covers every shipped street within the time limit and keeps every PHY-003/004/005/006 finding', () => {
-    assert.equal(cal.summary.streets, 1460);
+    assert.equal(cal.summary.streets, Object.keys(JSON.parse(read('public/assets/streets/index.json')).streets).length);
     assert.ok(cal.summary.wallMs < 10 * 60 * 1000);
     assert.deepEqual(cal.summary.errors, []);
     for (const k of ['PHY-003', 'PHY-004', 'PHY-005', 'PHY-006']) assert.equal(cal.findings.filter((f) => f.rule === k).length, cal.summary.kept[k]);
@@ -276,7 +276,7 @@ describe('ART-001: art that floats (js/builder/ground.js, lane GROUNDED)', () =>
   const rock = { id: 'd_5', sprite: 'gz_rock', x: 0, y: -40, w: 300, h: 120, z: 0, r: 0 };
 
   it('a low ledge with open space under it floats; the floor past the bottom edge does not; a high one may float', async () => {
-    const { floatingLines, FLOAT_REACH, FLOAT_OPEN } = await import('../public/js/builder/ground.js?v=a60d7c91');
+    const { floatingLines, FLOAT_REACH, FLOAT_OPEN } = await import('../public/js/builder/ground.js?v=8beea23c');
     assert.equal(FLOAT_REACH, 450);
     assert.equal(FLOAT_OPEN, 24);
     const f = floatingLines(street());

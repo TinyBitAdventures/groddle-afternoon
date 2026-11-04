@@ -214,8 +214,8 @@ describe('catalog, style and guide', () => {
   });
   it('guide: the jump numbers come from the stepper', async () => {
     const g = (await cli('guide')).out;
-    assert.equal(g.jump.plainApex, 104.9);
-    assert.equal(g.jump.runningJump, 198);
+    assert.equal(g.jump.plainApex, 142.5);
+    assert.equal(g.jump.runningJump, 260);
     assert.ok(g.rules.some((r) => r.id === 'PHY-003' && r.severity === 'error'));
     assert.ok(g.ops.includes('deco.add'));
     assert.equal(g.limits.ratesPerMinute.render, 20);

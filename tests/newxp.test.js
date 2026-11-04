@@ -60,7 +60,7 @@ import {
   training2Layout,
   tutorialPhysics,
   vogPages,
-} from '../public/js/newxp.js?v=1f9ce43b';
+} from '../public/js/newxp.js?v=6ca4702e';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', 'public');
 const street = (tsid) => JSON.parse(readFileSync(join(ROOT, 'assets/streets', `${tsid}.json`), 'utf8'));

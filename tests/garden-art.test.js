@@ -12,7 +12,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { GARDEN_ART } from '../public/js/garden-art.js?v=c947ccf4';
 import { bedPieces, GARDEN_SCALE, gardenHalfWidth, gardenLayout, gardenMetrics, gardenStyle, plotOrigin, plotPieces, PLOT_H, PLOT_W } from '../public/js/garden-view.js?v=05651e76';
-import { createCultivationState, cultivateDemoYard, cultivationDef, dispatcherRx, footprint, groundFixtures, homeStreetLayout, normalizeCultivationState, placementCheck, SIGNPOST_POST_HALF } from '../public/js/home-cultivation.js?v=11616085';
+import { createCultivationState, cultivateDemoYard, cultivationDef, dispatcherRx, footprint, groundFixtures, homeStreetLayout, normalizeCultivationState, placementCheck, SIGNPOST_POST_HALF } from '../public/js/home-cultivation.js?v=ff17225a';
 import { DISPATCHER_HALF } from '../public/js/home-street-fixtures.js?v=badcb725';
 import { SEED_CATALOG } from '../public/js/garden.js?v=b38ab310';
 import { HIRES_SPRITES, FIRST_DRAW_SPRITES } from '../public/js/sprite-hires.js?v=96c22af7';

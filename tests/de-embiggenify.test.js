@@ -36,7 +36,8 @@ import {
   expireDeEmbiggenify,
   findSmallWorthless,
 } from '../public/js/de-embiggenify.js?v=7ff7ffba';
-import { SOURCE_PHYSICS, triggerHit } from '../public/js/puzzle-triggers.js?v=3ee2f2c8';
+import { jumpApex, NORMAL_BUFF } from '../public/js/avatar-step.js?v=537aa4b7';
+import { SOURCE_PHYSICS, triggerHit } from '../public/js/puzzle-triggers.js?v=114b052b';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const LOCATIONS = path.join(root, '../streets/mnt/stos/location_data');
@@ -268,17 +269,8 @@ test('the landmarks run left to right as the runthrough walks them', () => {
 });
 
 test('the way up to the cake is the street\'s own and the remake jump reaches every step', () => {
-  // Remake arc at source physics times the street's jump (puzzle-triggers.test.js integrator).
-  const jump = eestiPuzzle.physics.jump;
-  let vy = -9.6 * jump;
-  let y = 0;
-  let apex = 0;
-  for (let t = 0; t < 200; t += 1) {
-    vy += 0.42 * SOURCE_PHYSICS.gravity;
-    y += vy;
-    apex = Math.min(apex, y);
-    if (y >= 0 && t > 2) break;
-  }
+  // The game's own arc (js/avatar-step.js, the client's numbers) times the street's jump.
+  const apex = -jumpApex(eestiPuzzle.physics.jump, { ...NORMAL_BUFF, gravity: SOURCE_PHYSICS.gravity });
   // The steps: sneaker top to chair seat, chair seat to chair back (the highest), onto the table.
   const plat = (id) => eestiStreet.platforms.find((pl) => pl.id === id);
   const seatHigh = Math.min(plat('_pl1257983875546').y2, plat('_pl1285356022521').y1);

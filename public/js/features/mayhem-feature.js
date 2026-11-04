@@ -28,7 +28,7 @@
  * screen's buttons [data-mayhem-end-again] and [data-mayhem-end-leave].
  */
 
-import { CROWNS_START_POINTS, CROWNS_STREET } from '../game-of-crowns.js?v=98e21baf';
+import { CROWNS_START_POINTS, CROWNS_STREET } from '../game-of-crowns.js?v=e32f35f5';
 import {
   MAYHEM_END,
   MAYHEM_ID,

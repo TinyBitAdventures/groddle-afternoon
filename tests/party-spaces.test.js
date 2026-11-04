@@ -33,8 +33,8 @@ import {
   stackAvailable,
   startParty,
   teleporterPhase,
-} from '../public/js/party-spaces.js?v=6fea0ad5';
-import { OWNED_STREETS } from '../public/js/location-events.js?v=61e0c5d3';
+} from '../public/js/party-spaces.js?v=0bfad685';
+import { OWNED_STREETS } from '../public/js/location-events.js?v=05663361';
 import { populationForStreet } from '../public/js/street-ecology.js?v=2c82c072';
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -90,8 +90,8 @@ describe('party spaces (config_prod.js party_spaces)', () => {
     for (const tsid of ['GDOK0A8OG1E2C7O', 'GUVNGTHAGP93U34', 'GUVU11R1HP9341R']) {
       assert.equal(partyPhysics(street(tsid).physics.setting).jetpack, true, tsid);
     }
-    // Val Holla caps vertical speed at 351 (vy_max), below its 371 jump.
-    assert.ok(Math.abs(partyPhysics(street('GUVNGTHAGP93U34').physics.setting).jump - 351 / 570) < 1e-9);
+    // Val Holla jumps at 371; the stepper caps vertical speed at its vy_max 351.
+    assert.ok(Math.abs(partyPhysics(street('GUVNGTHAGP93U34').physics.setting).jump - 371 / 570) < 1e-9);
     assert.equal(partyPhysics(null), null);
     assert.equal(street('GDOE67MFL6E2FBR').physics, undefined);
   });
@@ -239,8 +239,8 @@ describe('party lifecycle (groups/party.js, party_atm.js)', () => {
 });
 
 describe('party spaces feature wiring', async () => {
-  const { partySpacesFeature } = await import('../public/js/features/party-spaces-feature.js?v=da8f8c9b');
-  const { FEATURES } = await import('../public/js/features/index.js?v=e078538f');
+  const { partySpacesFeature } = await import('../public/js/features/party-spaces-feature.js?v=df0f76c8');
+  const { FEATURES } = await import('../public/js/features/index.js?v=aa6fadfd');
 
   it('is registered with the feature host', () => {
     assert.ok(FEATURES.some((f) => f.id === partySpacesFeature.id));

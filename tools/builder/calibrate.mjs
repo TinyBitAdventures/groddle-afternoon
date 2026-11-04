@@ -22,13 +22,16 @@ import { Worker, isMainThread, parentPort, workerData } from 'node:worker_thread
 import { fileURLToPath } from 'node:url';
 import { GAME_DIR } from '../repos.mjs';
 import { shippedStreetFiles } from './validator-context.mjs';
-import { validateShippedStreet } from '../../public/js/builder/validate.js?v=8575a4a0';
-import { streetBuff, REACH_LIMITS } from '../../public/js/builder/reach-graph.js?v=3602d09e';
-import { plainApex } from '../../public/js/builder/validate.js?v=8575a4a0';
+import { validateShippedStreet } from '../../public/js/builder/validate.js?v=dfad07b5';
+import { streetBuff, REACH_LIMITS } from '../../public/js/builder/reach-graph.js?v=40bfbc44';
+import { plainApex } from '../../public/js/builder/validate.js?v=dfad07b5';
 
-/** The 2012 client's plain jump peaked about 134 px (hidden-floors.js); the remake's 105. */
-export const CLIENT_2012_APEX = 134;
-/** The jump multiplier that gives a 134 px apex with the remake's steps. */
+/**
+ * The 2012 client's plain jump: 143 px (AvatarPhysicsHandler.as at its 17 ms steps). Since
+ * 2026-11-03 the remake steps the client's numbers (142.5 px, js/avatar-step.js); it was 105.
+ */
+export const CLIENT_2012_APEX = 143;
+/** The jump multiplier that gives the client apex with the remake's steps. */
 export function jumpFor(apex) {
   let lo = 1;
   let hi = 2;

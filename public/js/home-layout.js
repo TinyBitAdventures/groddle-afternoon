@@ -40,7 +40,7 @@
 import { HIRES_SPRITES, SPLIT_SPRITES } from './sprite-hires.js?v=96c22af7';
 import { HIRES_ICONS } from './icon-hires.js?v=5b68aeaa';
 import { CULTIVATION_CLASSES } from './homes-catalog.js?v=7aa9beb0';
-import { TOWER_CHASSIS, TOWER_PROTO } from './home-tower.js?v=6a203c8f';
+import { TOWER_CHASSIS, TOWER_PROTO } from './home-tower.js?v=4daa0b96';
 import { GROWN_TREE_LABELS } from './patches.js?v=3e9218c1';
 import { shortHash } from './profiles.js?v=86423d98';
 

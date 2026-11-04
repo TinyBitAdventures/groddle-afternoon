@@ -27,7 +27,8 @@
  *   physics(engine)                       // -> { speed, jump, gravity } multipliers, plus optional
  *                                         //    vyMax (terminal-speed multiplier, min wins), accel,
  *                                         //    airAccel, friction, tripleJump (multiply), airDrag
- *                                         //    (per second, max wins), jetpack (any true)
+ *                                         //    (per second, max wins), airFriction (signed
+ *                                         //    friction_air, max wins), jetpack (any true)
  *   packVerbs(classTsid, engine)          // -> [{ id, label, enabled, reason, tooltip, primary }]
  *                                         //    extra buttons on that item's pack popover
  *   runPackVerb(classTsid, verbId, engine)// -> true when handled
@@ -182,6 +183,8 @@ export function createFeatureHost(features = []) {
         }
         if (Number.isFinite(p.vyMax) && p.vyMax > 0) out.vyMax = out.vyMax == null ? p.vyMax : Math.min(out.vyMax, p.vyMax);
         if (Number.isFinite(p.airDrag) && p.airDrag > 0) out.airDrag = Math.max(out.airDrag || 0, p.airDrag);
+        // A street's signed friction_air (js/avatar-step.js airFriction); the most drag wins.
+        if (Number.isFinite(p.airFriction)) out.airFriction = out.airFriction == null ? p.airFriction : Math.max(out.airFriction, p.airFriction);
         if (p.jetpack === true) out.jetpack = true;
       }
       return out;
