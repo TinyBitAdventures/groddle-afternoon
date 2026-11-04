@@ -8,6 +8,7 @@
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { obtainableItems } from './job-obtainable.mjs';
 
 const check = process.argv.includes('--check');
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -30,8 +31,18 @@ const graph = {};
 // Visible doors with one fixed destination; random-destination doors and
 // same-street doors are not edges. Locked doors are kept with their key, so a
 // route takes them only when there is no other way (js/map-routes.js).
+// A door whose key nothing gives is no way at all (Austin, 2026-11-03: a route to Hazy Gate 3
+// went through Level 2 West's Yellow-Teal Square Key door into Oppidan Avenue). Keys 7-12 had
+// no source in Glitch (items/door_key_7..12.js are in no drop table, store or quest reward;
+// keys 1-6 drop from Dust Traps, catalog_drop_tables.js dust_trap), and tools/job-obtainable.mjs
+// is the remake's own list of what a player can get, so such a door is left out of `doors`
+// and listed under `sealed` ("from>to": key id) instead: routes, the Map's rooms and the quest
+// hold's reachability (js/quest-reach.js) never count it.
+const { items: obtainable } = await obtainableItems();
+const keyGiven = (keyId) => obtainable.has(`door_key_${keyId}`);
 const doors = {};
 const doorKeys = {};
+const sealed = {};
 let edges = 0;
 let doorEdges = 0;
 for (const [key, meta] of Object.entries(index.streets)) {
@@ -48,13 +59,19 @@ for (const [key, meta] of Object.entries(index.streets)) {
   graph[key] = [...out].sort();
   edges += out.size;
   const through = new Map();
+  // Two doors to one room: an unlocked one wins, then one whose key can be had.
+  const rank = (keyId) => (!keyId ? 0 : keyGiven(keyId) ? 1 : 2);
   for (const door of data.doors || []) {
     if (!door || door.hidden || door.destinations?.length) continue;
     const to = resolve(door.connect?.street || door.connect?.tsid);
     if (!to || to === key) continue;
     const keyId = Number(door.key_id) || 0;
-    // Two doors to one room: an unlocked one wins.
-    if (!through.has(to) || !keyId) through.set(to, keyId);
+    if (!through.has(to) || rank(keyId) < rank(through.get(to))) through.set(to, keyId);
+  }
+  for (const [to, keyId] of [...through]) {
+    if (rank(keyId) < 2) continue;
+    sealed[`${key}>${to}`] = keyId;
+    through.delete(to);
   }
   if (through.size) {
     doors[key] = [...through.keys()].sort();
@@ -86,8 +103,8 @@ if (existsSync(mapIndexFile)) {
 const offMap = [...keys].filter((k) => !drawn.has(k)).sort();
 
 const file = join(pub, 'assets/content/signpost-graph.json');
-const text = `${JSON.stringify({ source: 'tools/build-signpost-graph.mjs from assets/streets/*.json visible signposts and doors, assets/maps/hubs/*.json drawn streets', streets: graph, doors, doorKeys, offMap })}\n`;
-const summary = `${Object.keys(graph).length} streets, ${edges} links, ${doorEdges} door links (${Object.keys(doorKeys).length} locked), ${offMap.length} off the hub maps`;
+const text = `${JSON.stringify({ source: 'tools/build-signpost-graph.mjs from assets/streets/*.json visible signposts and doors (not the doors whose key nothing gives, tools/job-obtainable.mjs), assets/maps/hubs/*.json drawn streets', streets: graph, doors, doorKeys, sealed, offMap })}\n`;
+const summary = `${Object.keys(graph).length} streets, ${edges} links, ${doorEdges} door links (${Object.keys(doorKeys).length} locked), ${Object.keys(sealed).length} doors no key opens, ${offMap.length} off the hub maps`;
 if (check) {
   const current = existsSync(file) ? readFileSync(file, 'utf8') : '';
   if (current !== text) {

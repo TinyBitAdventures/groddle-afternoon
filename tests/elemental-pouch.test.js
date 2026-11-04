@@ -26,7 +26,7 @@ import {
   shakePouch,
 } from '../public/js/elemental-pouch.js?v=7ae2ad99';
 import { pouchFeature } from '../public/js/features/elemental-pouch-feature.js?v=a71fe5d3';
-import { FEATURES } from '../public/js/features/index.js?v=50ed7317';
+import { FEATURES } from '../public/js/features/index.js?v=634eb66e';
 import { ITEM_CATALOG, countItem, createInventory } from '../public/js/inventory.js?v=597a17a2';
 import { STORE_CATALOG } from '../public/js/store-catalog.js?v=74b56af3';
 import { VENDOR_PROFILES, vendorBuy } from '../public/js/vendor.js?v=4e3cc8fb';

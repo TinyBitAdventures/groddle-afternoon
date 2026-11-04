@@ -27,8 +27,8 @@ import {
   resurrectRoute,
   routeStep,
   signpostToward,
-} from '../public/js/map-routes.js?v=130d8539';
-import { mapRoutesFeature } from '../public/js/features/map-routes-feature.js?v=bba768b5';
+} from '../public/js/map-routes.js?v=86a4df52';
+import { mapRoutesFeature } from '../public/js/features/map-routes-feature.js?v=4cf1cd15';
 import { hellTicketsFeature } from '../public/js/features/hell-tickets-feature.js?v=68ecac40';
 import { hellFeature } from '../public/js/features/hell-feature.js?v=705a486b';
 import { createFeatureHost } from '../public/js/feature-host.js?v=903263a4';
@@ -37,10 +37,10 @@ import { loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/c
 import { createQuestState } from '../public/js/quests.js?v=282e1621';
 import { HELL_QUESTS, createHellState, croak } from '../public/js/hell.js?v=45060736';
 import { SUBWAY_STREETS } from '../public/js/quest-rooms/back-alley.js?v=3b1dd2f9';
-import { doorRooms, doorToward, routeGraph } from '../public/js/map-routes.js?v=130d8539';
+import { doorRooms, doorToward, routeGraph } from '../public/js/map-routes.js?v=86a4df52';
 import { afterStreetCard, runStreetTransition, streetCardUp } from '../public/js/screen-fx.js?v=9d4640eb';
 import { EMITTED_EVENTS } from '../public/js/quest-offers.js?v=3bf17441';
-import { smugglingFeature } from '../public/js/features/smuggling-feature.js?v=3d931b84';
+import { smugglingFeature } from '../public/js/features/smuggling-feature.js?v=102338c6';
 import { addItem } from '../public/js/inventory.js?v=597a17a2';
 import { resurrect } from '../public/js/hell.js?v=45060736';
 
@@ -497,8 +497,10 @@ describe('G192 doors in the route graph', () => {
     assert.ok(built.graph[PANKA].includes(HELL_BAR));
     assert.ok(!GRAPH_JSON.streets[PANKA].includes(HELL_BAR), 'the signpost list stays signposts only (smuggling routes)');
     assert.ok(built.locked.has(`${THORNFAD}>${VICARS}`));
-    // Visible doors with one fixed destination on another street, and nothing else.
+    // Visible doors with one fixed destination on another street, and nothing else: not a door
+    // whose key nothing gives (Door Keys 7-12, `sealed`), unless another door to that room opens.
     const expected = {};
+    const sealed = {};
     let skipped = 0;
     for (const [key, meta] of Object.entries(INDEX.streets)) {
       for (const d of JSON.parse(read(join(PUBLIC, meta.file))).doors || []) {
@@ -507,8 +509,12 @@ describe('G192 doors in the route graph', () => {
           skipped += 1;
           continue;
         }
-        (expected[key] ||= new Set()).add(to);
+        if (Number(d.key_id) >= 7) (sealed[key] ||= new Set()).add(to);
+        else (expected[key] ||= new Set()).add(to);
       }
+    }
+    for (const [key, list] of Object.entries(sealed)) {
+      for (const to of list) if (!expected[key]?.has(to)) assert.ok(GRAPH_JSON.sealed[`${key}>${to}`] >= 7, `${key}>${to} is sealed`);
     }
     assert.deepEqual(Object.fromEntries(Object.entries(GRAPH_JSON.doors).map(([k, v]) => [k, [...v].sort()])), Object.fromEntries(Object.entries(expected).map(([k, v]) => [k, [...v].sort()])));
     assert.ok(skipped >= 30, `hidden, random and same-street doors: ${skipped}`);
@@ -883,7 +889,7 @@ describe('G198 rooms behind doors as destinations', () => {
 
   it('signpost-graph.json is current (tools/build-signpost-graph.mjs --check)', () => {
     const out = execFileSync(process.execPath, [join(spike, 'tools/build-signpost-graph.mjs'), '--check'], { encoding: 'utf8', stdio: 'pipe' });
-    assert.match(out, /signpost graph current: \d+ streets, \d+ links, \d+ door links \(\d+ locked\), \d+ off the hub maps/);
+    assert.match(out, /signpost graph current: \d+ streets, \d+ links, \d+ door links \(\d+ locked\), \d+ doors no key opens, \d+ off the hub maps/);
   });
 
   it('offMap lists the streets no hub map draws', () => {

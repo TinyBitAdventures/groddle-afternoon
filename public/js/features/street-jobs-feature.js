@@ -96,7 +96,7 @@ import {
   upgradeOption,
 } from '../street-jobs.js?v=7381e03e';
 import { gainMetabolic, loseEnergy } from '../metabolics.js?v=8504134e';
-import { closuresInTheWay, holdNote, placeIndex, questHold, reachableStreets } from '../quest-reach.js?v=5ab83f49';
+import { closuresInTheWay, holdNote, placeIndex, questHold, reachableStreets } from '../quest-reach.js?v=ab5ef272';
 import { getQuestCatalog as questCatalog } from '../content-catalogs.js?v=10b118dd';
 import { saveStore } from '../save-store.js?v=8839ba7b';
 import {
@@ -124,7 +124,7 @@ import { normalizeGroups } from '../groups.js?v=14b60589';
 import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=3149d699';
 import { JOB_WORK_OVERLAY, jobWorkFloatPoint, jobWorkSoundKey, jobWorkToolScale, jobWorkToolSheet } from '../job-work-fx.js?v=430b96b2';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
-import { routeGraph } from '../map-routes.js?v=130d8539';
+import { SIGN_ARMS, routeGraph } from '../map-routes.js?v=86a4df52';
 import { TELEPORTERS } from '../hidden-floors.js?v=5ce87a04';
 import { WINTRY_PORTAL_TELEPORTERS } from '../wintry-portal.js?v=1437deda';
 
@@ -480,7 +480,7 @@ function drawBarricades(engine) {
   if (!street?.signposts?.length || !street.bounds) return;
   const { PIXI } = engine;
   for (const s of street.signposts) {
-    const shown = (s.connects || []).filter((c) => c && (c.label || c.tsid)).slice(0, 4);
+    const shown = (s.connects || []).filter((c) => c && (c.label || c.tsid)).slice(0, SIGN_ARMS);
     const closed = shown.filter((c) => roadClosure(state, catalog, c.tsid, [c.tsid], opts()));
     if (!closed.length) continue;
     const pos = worldToScreen(street, s.x, s.y);

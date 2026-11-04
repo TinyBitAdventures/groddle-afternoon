@@ -260,7 +260,7 @@
       "assets/content/deco-catalog.json": "286a2344",
       "assets/content/puzzle-triggers.json": "f48ef073",
       "assets/content/quests.json": "d37c15d2",
-      "assets/content/signpost-graph.json": "1ea27669",
+      "assets/content/signpost-graph.json": "de200e92",
       "assets/content/sound-keys.json": "d9ced09a",
       "assets/content/street-ecology.json": "d065e008",
       "assets/content/street-jobs.json": "819c2dd2",

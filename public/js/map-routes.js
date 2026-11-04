@@ -51,7 +51,9 @@
  * and a door second (TSFrontController.startLocationPath 1791-1799,
  * loc_path_door; Location.getDoorThatLinksToLocTsid), and so do
  * signpostToward() / doorToward() here. A locked door is taken only when no
- * other way exists. Unlike player.js, resurrecting forgets the stored route
+ * other way exists, and a door whose key nothing gives (Door Keys 7-12, the
+ * signpost-graph's `sealed` list) is no way at all: a route to Hazy Gate 3 once
+ * went through Level 2 West's Yellow-Teal Square Key door (Austin, 2026-11-03). Unlike player.js, resurrecting forgets the stored route
  * once it is restored (the source kept previous_map_path for ever and could
  * restore a stale one after a later croak).
  */
@@ -79,6 +81,9 @@ export const ROUTE_TEXT = Object.freeze({
   /** items/npc_bureaucrat.js 897 (Legalize It proposition, last beat). */
   bureaucratHall: "You can go back to wherever you were now: I'll set the closest Bureaucratic Hall as the destination on your map.",
 });
+
+/** The most boards a post draws (street-render.js SIGN_MAX_ARMS; this module stays free of Pixi). */
+export const SIGN_ARMS = 9;
 
 /** MapHub.as 72: CSSManager hub_map_path_color, default 0xf0f258. */
 export const ROUTE_COLOR = 0xf0f258;
@@ -395,14 +400,15 @@ export function gpsText(route, step, label = (t) => t) {
  * Which signpost board on this street leads to `nextTsid`
  * (Location.getSignpostThatLinksToLocTsid). signposts: street JSON signposts
  * ({ connects: [{ tsid }] }). Returns { sign, board } indexes or null.
- * Boards past the fourth are not drawn (street-render.js shows four arms).
+ * A post draws up to SIGN_ARMS boards (street-render.js SIGN_MAX_ARMS, one per number key:
+ * the Sabudana Drama Towers posts have five), so the fifth is a road the GPS can light too.
  */
 export function signpostToward(signposts, nextTsid) {
   if (!nextTsid) return null;
   for (let sign = 0; sign < (signposts || []).length; sign++) {
     const s = signposts[sign];
     if (!s || s.hidden) continue;
-    const shown = (s.connects || []).filter((c) => c && (c.label || c.tsid)).slice(0, 4);
+    const shown = (s.connects || []).filter((c) => c && (c.label || c.tsid)).slice(0, SIGN_ARMS);
     for (let board = 0; board < shown.length; board++) {
       const c = shown[board];
       if (!c.hidden && sameStreet(c.tsid, nextTsid)) return { sign, board };
