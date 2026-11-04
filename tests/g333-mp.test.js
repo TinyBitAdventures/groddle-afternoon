@@ -17,6 +17,7 @@ import { join } from 'node:path';
 import {
   AUCTION_SENDER,
   AUCTION_TEXT,
+  ENDED_GROUPS,
   ago,
   arrivedWhileOutText,
   commission,
@@ -29,15 +30,17 @@ import {
   normalizeAuctionsSlice,
   normalizeListing,
   normalizeReceipt,
+  othersListings,
   proceeds,
   purchaseBadges,
   receiptEffects,
   saleCounters,
   soldText,
+  splitEnded,
   suggestedPrice,
   unitPrice,
-} from '../public/js/auctions.js?v=bb302355';
-import { auctionsFeature } from '../public/js/features/auctions-feature.js?v=9bca9fa5';
+} from '../public/js/auctions.js?v=576b723e';
+import { auctionsFeature } from '../public/js/features/auctions-feature.js?v=a85b60bc';
 import { normalizeMailboxState } from '../public/js/mailbox.js?v=b2bde2fe';
 import { MULTIPLAYER_QUESTS, MULTIPLAYER_QUESTS_LEFT_OUT, offerableMultiplayerQuest } from '../public/js/quests-mp.js?v=2beb658a';
 import { auctionJson } from '../tools/build-auctions.mjs';
@@ -155,6 +158,33 @@ describe('what a sale or a purchase counts', () => {
     assert.match(newListingId(), /^[0-9a-f]{16}$/);
     const s = normalizeAuctionsSlice({ told: [ID, ID, 'nope'], seenOut: 9 });
     assert.deepEqual(s, { told: [ID], seenOut: 9 });
+  });
+});
+
+describe('Your auctions and All auctions (#84)', () => {
+  const row = (n, status, mine) => normalizeListing({ id: `00000000000000b${n}`, c: 'potato', n: 1, cost: 10, status, mine });
+
+  it('splits the ended list into Bought, Sold and Expired, keeping the site\'s order', () => {
+    assert.deepEqual(ENDED_GROUPS.map(([, text]) => text), ['Bought', 'Sold', 'Expired']);
+    const ended = [row(1, 'bought', true), row(2, 'bought', false), row(3, 'expired', true), row(4, 'cancelled', true), row(5, 'bought', true)];
+    const parts = splitEnded(ended);
+    assert.deepEqual(parts.bought.map((a) => a.id.slice(-1)), ['2']);
+    assert.deepEqual(parts.sold.map((a) => a.id.slice(-1)), ['1', '5']);
+    assert.deepEqual(parts.expired.map((a) => a.id.slice(-1)), ['3', '4']);
+    for (const [id] of ENDED_GROUPS) assert.ok(AUCTION_TEXT.endedNone[id]);
+  });
+
+  it('leaves your own listings out of All auctions unless you asked for them', () => {
+    const list = [row(1, 'active', true), row(2, 'active', false)];
+    assert.deepEqual(othersListings(list).map((a) => a.id.slice(-1)), ['2']);
+    assert.equal(othersListings(list, { keepMine: true }).length, 2);
+    const src = readFileSync(join(root, 'public/js/features/auctions-feature.js'), 'utf8');
+    assert.match(src, /if \(!filters\.seller\?\.mine\) params\.others = 1;/);
+  });
+
+  it('asks the site to leave them out, so the pages count right', { skip: HAS_SITE ? false : 'no groddle-afternoon-site checkout' }, () => {
+    const site = readFileSync(sitePath('src/LedgerAuction.php'), 'utf8');
+    assert.match(site, /query\('others', ''\) === '1'\) \{\s*\$where\[\] = 'a\.seller_id <> \?';/);
   });
 });
 

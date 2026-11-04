@@ -61,7 +61,36 @@ export const AUCTION_TEXT = Object.freeze({
   cancelled: (stack) => `You cancelled your auction of ${stack}. It will come back to you by mail.`,
   expired: (stack) => `Your auction of ${stack} ended without a buyer. It will come back to you by mail.`,
   arrived: 'An auction delivery is waiting in your mailbox.',
+  // Ours (#84): Your auctions splits what ended; the 2012 page was never released.
+  endedNone: Object.freeze({ bought: "You haven't bought anything at auction yet.", sold: 'None of your auctions have sold yet.', expired: 'None of your auctions have expired or been cancelled.' }),
 });
+
+/** Your auctions' ended parts, in order (#84): what you bought, what you sold, and what came back unsold (expired or cancelled). */
+export const ENDED_GROUPS = Object.freeze([['bought', 'Bought'], ['sold', 'Sold'], ['expired', 'Expired']]);
+
+/** Which part of Your auctions an ended listing goes in. */
+export function endedGroup(a) {
+  if (a?.status === 'bought') return a.mine ? 'sold' : 'bought';
+  return 'expired';
+}
+
+/** The ended listings split into { bought, sold, expired }, each keeping the site's order (newest first). */
+export function splitEnded(list) {
+  const out = { bought: [], sold: [], expired: [] };
+  for (const a of Array.isArray(list) ? list : []) if (a) out[endedGroup(a)].push(a);
+  return out;
+}
+
+/**
+ * All auctions without your own listings (#84: they are in Your auctions).
+ * The site leaves them out when asked (others=1, so the pages count right);
+ * this drops any an older site still sends. Asking for your own (your name
+ * on one of your listings, as the seller filter) keeps them.
+ */
+export function othersListings(list, { keepMine = false } = {}) {
+  const rows = (Array.isArray(list) ? list : []).filter(Boolean);
+  return keepMine ? rows : rows.filter((a) => !a.mine);
+}
 
 const n0 = (v) => {
   const n = Math.floor(Number(v));

@@ -43,6 +43,7 @@ import { saveStore } from '../save-store.js?v=8839ba7b';
 import {
   AUCTION_TEXT as T,
   DEFAULT_RULES,
+  ENDED_GROUPS,
   ago,
   arrivedWhileOutText,
   commission,
@@ -55,13 +56,15 @@ import {
   normalizeListing,
   normalizeReceipt,
   normalizeRules,
+  othersListings,
   purchaseBadges,
   receiptEffects,
   saleCounters,
   soldText,
+  splitEnded,
   suggestedPrice,
   unitPrice,
-} from '../auctions.js?v=bb302355';
+} from '../auctions.js?v=576b723e';
 
 export const AUCTIONS_FEATURE_ID = 'auctions';
 const TABLE_URL = 'assets/content/trade-items.json';
@@ -125,6 +128,9 @@ const STYLE = `
 .auc-costs { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-5); margin-top: var(--sp-3); }
 .auc-costs small { display: block; color: var(--text-subtle); font-size: var(--fs-xs); line-height: var(--lh-tight); }
 .auc-sec { margin: 0.7rem 0 var(--sp-3); font: 700 var(--fs-sm)/var(--lh-snug) var(--font-system); color: var(--c-sand-42); }
+.auc-seg { display: flex; gap: 0.3rem; flex-wrap: wrap; margin: 0.7rem 0 var(--sp-3); }
+.auc-seg button { border: 0; font: 700 var(--fs-xs)/var(--lh-tight) var(--font-system); padding: var(--sp-2) var(--sp-5); border-radius: var(--radius-pill); cursor: pointer; color: var(--text-heading); background: var(--surface-parchment); }
+.auc-seg button[aria-selected="true"] { color: var(--text-inverse); background: var(--c-violet-50); }
 @media (max-width: 520px) { .auc-row { grid-template-columns: 40px 1fr; } .auc-price { grid-column: 1 / -1; text-align: left; display: flex; gap: var(--sp-5); align-items: center; flex-wrap: wrap; } .auc-costs { grid-template-columns: 1fr; } }
 `;
 
@@ -151,6 +157,7 @@ function createSession(engine) {
   let mine = { active: [], ended: [], deliveries: [], listable: {}, receipts: [] };
   let haveMine = false;
   let tab = 'browse';
+  let endedTab = ''; // Your auctions' ended part: bought, sold or expired (#84)
   let open = false;
   const filters = { q: '', cat: '', c: '', seller: null, sort: 'new', page: 1 };
   let results = { auctions: [], total: 0, page: 1, per: 20 };
@@ -446,12 +453,14 @@ function createSession(engine) {
     if (filters.cat) params.cat = filters.cat;
     if (filters.c) params.c = filters.c;
     if (filters.seller) params.seller = filters.seller.id;
+    // Your own listings are in Your auctions (#84), unless you asked for them.
+    if (!filters.seller?.mine) params.others = 1;
     busy = true;
     if (tab === 'browse') renderBrowse();
     const r = await call(() => account.auctions(params));
     busy = false;
     if (r.ok && r.data) {
-      results = { auctions: (r.data.auctions || []).map(normalizeListing).filter(Boolean), total: Number(r.data.total) || 0, page: Number(r.data.page) || 1, per: Number(r.data.per) || 20 };
+      results = { auctions: othersListings((r.data.auctions || []).map(normalizeListing), { keepMine: !!filters.seller?.mine }), total: Number(r.data.total) || 0, page: Number(r.data.page) || 1, per: Number(r.data.per) || 20 };
       if (Array.isArray(r.data.cats)) cats = r.data.cats;
       rules = normalizeRules(r.data.rules);
     } else say(r.text, 'error');
@@ -469,7 +478,7 @@ function createSession(engine) {
     const meta = el('div', { class: 'auc-meta' });
     meta.append('Seller: ');
     const who = el('button', { type: 'button', 'data-auction-seller': String(a.seller.id) }, a.seller.name);
-    who.addEventListener('click', () => { Object.assign(filters, { seller: a.seller, q: '', c: '', cat: '', page: 1 }); show('browse'); });
+    who.addEventListener('click', () => { Object.assign(filters, { seller: { ...a.seller, mine: a.mine }, q: '', c: '', cat: '', page: 1 }); show('browse'); });
     meta.append(who, ` · ${ago(a.at)}`);
     if (a.status === 'active') meta.append(` · Ends in ${endsIn(a.ends)}`);
     if (a.r != null && TOOL_CONDITION_CATALOG[a.c]) meta.append(` · ${a.r} uses left`);
@@ -766,9 +775,19 @@ function createSession(engine) {
     for (const a of mine.active) list.append(listingRow(a));
     nodes.push(list);
     if (mine.ended.length) {
-      nodes.push(el('h3', { class: 'auc-sec' }, 'Ended'));
-      const done = el('div', { class: 'auc-list', 'data-auctions-ended': '' });
-      for (const a of mine.ended) {
+      // Ended in three parts (#84): Bought, Sold, Expired (cancelled ones too: both came back unsold).
+      const parts = splitEnded(mine.ended);
+      if (!parts[endedTab]) endedTab = ENDED_GROUPS.find(([id]) => parts[id].length)?.[0] || 'bought';
+      const seg = el('div', { class: 'auc-seg', role: 'tablist', 'aria-label': 'Ended auctions', 'data-auctions-ended-tabs': '' });
+      for (const [id, text] of ENDED_GROUPS) {
+        const b = el('button', { type: 'button', role: 'tab', 'aria-selected': String(id === endedTab), 'data-auctions-ended-tab': id }, `${text} (${parts[id].length})`);
+        b.addEventListener('click', () => { endedTab = id; renderMine(); });
+        seg.append(b);
+      }
+      nodes.push(seg);
+      const done = el('div', { class: 'auc-list', 'data-auctions-ended': endedTab });
+      if (!parts[endedTab].length) done.append(el('div', { class: 'auc-none' }, T.endedNone[endedTab]));
+      for (const a of parts[endedTab]) {
         const row = listingRow(a, { actions: false });
         const why = a.status === 'bought'
           ? (a.mine ? `Sold to ${a.buyer?.name || 'someone'}: you got ${money(a.proceeds)}` : `You bought it for ${money(a.cost)}`)
