@@ -686,7 +686,7 @@
    "group": "economy",
    "name": "Bags and the 16-slot pack",
    "status": "source",
-   "blurb": "The pack holds 16 stacks; Generic and Bigger Bags, Toolboxes, the Spice Rack, Alchemistry Kit, Cubimal Case and Elemental Pouch add their own slots and open above the pack. A full pack refuses pickups and vendor buys with the original words, and the magic rock holds anything else until there is room. Online characters made before bags were given starter bags through the ledger, once.",
+   "blurb": "The pack holds 16 stacks; Generic and Bigger Bags, Toolboxes, the Spice Rack, Alchemistry Kit, Cubimal Case and Elemental Pouch add their own slots and open above the pack. A full pack refuses pickups and vendor buys with the original words, the Grinder destroys the elements it makes that you can’t carry (Barnacle Talc falls to the ground), and the magic rock holds anything else until there is room. Online characters made before bags were given starter bags through the ledger, once.",
    "multiplayer": null,
    "spot": null,
    "evidence": [

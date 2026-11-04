@@ -75,14 +75,14 @@ import { MACHINE_ART_SHEETS, LOW_FUEL_BUBBLE_MS, LOW_FUEL_LINE, isLowFuel, machi
 import { FUEL_CELL, FUEL_PER_CELL, MAX_FUEL } from '../machines.js?v=44fc6833';
 import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=597a17a2';
 import { receiveToolCopy, takeToolCopy } from '../tools.js?v=3974f57e';
-import { RECIPE_CATALOG } from '../making.js?v=712a9adb';
+import { RECIPE_CATALOG } from '../making.js?v=0100c686';
 import { getSkillCatalog } from '../content-catalogs.js?v=10b118dd';
 import { createBackYardState, homeStreetLayout, normalizeCultivationState } from '../home-cultivation.js?v=ff17225a';
 import { readVisitScene } from '../neighbours-mp.js?v=a8d5544e';
 import { saveStore } from '../save-store.js?v=8839ba7b';
 import { textureFromUrl } from '../textures.js?v=3149d699';
 import { createSheetLoader } from '../sprite-sheets.js?v=8f5dc6d9';
-import { STREET_GROUND_Y, homesFeature } from './homes-feature.js?v=3cd41c2d';
+import { STREET_GROUND_Y, homesFeature } from './homes-feature.js?v=dc9deca5';
 
 export { HOME_MACHINES_ID };
 

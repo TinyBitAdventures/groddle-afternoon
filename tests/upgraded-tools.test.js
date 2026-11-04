@@ -11,21 +11,23 @@
  */
 import { describe, it, before } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
   RECIPE_CATALOG,
   TOOL_CATALOG,
+  buildCraftBatchResult,
   canCraft,
   craftRecipe,
   ensureMakingItems,
+  grinderResultLine,
   hasTool,
   listRecipesForTool,
   loadRecipeCatalogFromFile,
   recipeToolFor,
   recipeToolInUse,
-} from '../public/js/making.js?v=712a9adb';
+} from '../public/js/making.js?v=0100c686';
 import { ITEM_CATALOG, countItem, createInventory, isToolItem } from '../public/js/inventory.js?v=597a17a2';
 import {
   GRINDER_TOOLS,
@@ -360,5 +362,89 @@ describe('G183: isToolItem and the Grand Ol\' Grinder animation', () => {
     const toolState = createToolConditionState();
     assert.equal(recipeToolInUse(createInventory({ ore_grinder: 1, grand_ol_grinder: 1 }), 'ore_grinder', toolState, 1), 'ore_grinder');
     assert.equal(recipeToolInUse(createInventory({ grand_ol_grinder: 1 }), 'ore_grinder', toolState, 1), 'grand_ol_grinder');
+  });
+});
+
+/**
+ * Austin 2026-11-04: the Grinder destroys what it makes that the pack can't
+ * carry, as Glitch did (grand_ol_grinder.js 613-619, players/inc_items.js
+ * 292-319 createItemFromGround with destroy_remainder), instead of handing it
+ * to the magic rock; Barnacle Talc falls to the ground. Player report #95:
+ * the line names what was crushed and the elements made, not the recipe.
+ */
+describe('Grinder overflow and its line (grand_ol_grinder.js onCrushComplete)', () => {
+  const learned = ['refining_1'];
+  const crushBatch = (inv, key, qty, room) => {
+    const pc = { energy: 500, imagination: 0, xp: 0 };
+    const units = [];
+    for (let i = 1; i <= qty; i++) units.push(craftRecipe(inv, pc, key, { learned, room, unitIndex: i, batchQty: qty }));
+    return { units, result: buildCraftBatchResult(inv, pc, key, qty, qty, { learned }) };
+  };
+
+  it('keeps what fits and destroys the rest, with Glitch\'s line', () => {
+    const inv = createInventory({ ore_grinder: 1, dullite: 3, element_red: 4990 });
+    // The pouch has room for 10 more Red Elements and plenty of Green.
+    const room = (cls, n) => (cls === 'element_red' ? Math.min(n, 5000 - countItem(inv, cls)) : n);
+    const { units, result } = crushBatch(inv, 'crush_dullite', 3, room);
+    assert.ok(units.every((u) => u.ok));
+    assert.equal(countItem(inv, 'element_red'), 5000, 'the pouch is full, nothing for the magic rock');
+    assert.equal(countItem(inv, 'element_green'), 24);
+    assert.deepEqual(units.map((u) => u.destroyed.element_red || 0), [0, 0, 5]);
+    assert.equal(
+      result.activityLine,
+      "You crushed 3 Chunks of Dullite (+3 iMG, -12 energy). 5 Red Elements were created, but destroyed, because you couldn't carry them. You got 10 Red Elements, and 24 Green Elements."
+    );
+    assert.equal(result.headline, 'You crushed 3 Chunks of Dullite!');
+    assert.deepEqual(result.outputs.map((o) => [o.classTsid, o.qty]), [['element_red', 10], ['element_green', 24]]);
+    assert.doesNotMatch(result.activityLine, /You made|Crush Dullite/);
+  });
+
+  it('says only what was destroyed when nothing fits', () => {
+    assert.equal(
+      grinderResultLine({ input: 'beryl', crushed: 1, xp: 1, energy: -4, outputs: [
+        { classTsid: 'element_red', made: 20, destroyed: 20 },
+        { classTsid: 'element_green', made: 2, destroyed: 2 },
+        { classTsid: 'element_blue', made: 4, destroyed: 4 },
+      ] }),
+      "You crushed 1 Chunk of Beryl (+1 iMG, -4 energy). 20 Red Elements were created, but destroyed, because you couldn't carry them. 2 Green Elements were created, but destroyed, because you couldn't carry them. 4 Blue Elements were created, but destroyed, because you couldn't carry them."
+    );
+    assert.equal(
+      grinderResultLine({ input: 'sparkly', crushed: 2, energy: 0, outputs: [
+        { classTsid: 'element_red', made: 10 }, { classTsid: 'element_green', made: 2 },
+        { classTsid: 'element_blue', made: 8 }, { classTsid: 'element_shiny', made: 12 },
+      ] }),
+      'You crushed 2 Chunks of Sparkly (0 energy). You got 10 Red Elements, 2 Green Elements, 8 Blue Elements, and 12 Shiny Elements.'
+    );
+  });
+
+  it('hands Barnacle Talc it cannot carry back for the ground, never destroyed', () => {
+    const inv = createInventory({ ore_grinder: 1, barnacle: 2 });
+    const { units, result } = crushBatch(inv, 'crush_barnacle', 2, () => 0);
+    assert.deepEqual(units.map((u) => u.dropped), [{ barnacle_talc: 1 }, { barnacle_talc: 1 }]);
+    assert.deepEqual(units.map((u) => u.destroyed), [{}, {}]);
+    assert.equal(countItem(inv, 'barnacle_talc'), 0);
+    assert.equal(result.activityLine, 'You crushed 2 Mortar Barnacles (+2 iMG, -6 energy). You got 2 Barnacle Talc.');
+  });
+
+  it('without a pack check (other callers) everything lands as before', () => {
+    const inv = createInventory({ ore_grinder: 1, dullite: 1 });
+    const { units } = crushBatch(inv, 'crush_dullite', 1, undefined);
+    assert.deepEqual(units[0].destroyed, {});
+    assert.equal(countItem(inv, 'element_red'), 5);
+  });
+
+  it('the Make panel passes the pack check to Grinder sessions and drops the talc at the feet', () => {
+    const game = readFileSync(join(pub, 'game.js'), 'utf8');
+    assert.match(game, /isGrinderRecipe\(recipe\) \? \{ \.\.\.opts, room: grinderPackRoom \} : opts/);
+    assert.match(game, /features\.query\('packRoom', cls, n, engine\)/);
+    assert.match(game, /engine\.dropWorldStack\(cls, n, player\.x, player\.y - GRINDER_DROP_RISE\)/);
+    assert.match(game, /dropGrinderRemainder\(result\.dropped\);\n\s+record\.made \+= 1;/);
+  });
+
+  it('matches the source', { skip: !existsSync(join(here, '../../glitch-GameServerJS')) && 'needs glitch-GameServerJS' }, () => {
+    const src = readFileSync(join(here, '../../glitch-GameServerJS/items/grand_ol_grinder.js'), 'utf8');
+    assert.match(src, /createItemFromGround\(outputs\[i\]\.class_tsid, to_get, \(this\.class_crushing != "barnacle"\)\)/);
+    assert.match(src, / were created, but destroyed, because you couldn't carry them\./);
+    assert.match(src, /rsp \+= " You got "\+pretty_list\(you_got, ", and "\)\+"\.";/);
   });
 });

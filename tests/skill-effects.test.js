@@ -44,7 +44,7 @@ import {
   craftRecipeBatch,
   craftUnitDurations,
   MACHINE_EXTRA_WAIT_MS,
-} from '../public/js/making.js?v=712a9adb';
+} from '../public/js/making.js?v=0100c686';
 import { createInventory, countItem } from '../public/js/inventory.js?v=597a17a2';
 import { createToolConditionState, getToolCondition } from '../public/js/tools.js?v=3974f57e';
 

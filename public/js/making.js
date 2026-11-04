@@ -368,9 +368,58 @@ export function transmogUnitSeconds(n) {
 export function batchWearUnits(recipe, count) {
   const n = Math.max(0, Math.floor(Number(count) || 0));
   if (!n) return 0;
-  const grinder = recipe?.tool === 'ore_grinder' || recipe?.tool === 'grand_ol_grinder';
+  const grinder = isGrinderRecipe(recipe);
   const barnacle = (recipe?.inputs || []).some((inp) => inp.classTsid === 'barnacle');
   return grinder && !barnacle ? Math.round(n / 3) || 1 : n;
+}
+
+/** A Grinder or Grand Ol' Grinder recipe (ore_grinder.js / grand_ol_grinder.js onCrushComplete). */
+export function isGrinderRecipe(recipe) {
+  return recipe?.tool === 'ore_grinder' || recipe?.tool === 'grand_ol_grinder';
+}
+
+/**
+ * grand_ol_grinder.js 613-619 (ore_grinder.js the same): each output is
+ * createItemFromGround(class, n, destroy_remainder) with destroy_remainder
+ * true except for barnacle talc ("don't destroy the remainder if it's
+ * barnacle talc"), which falls to the ground at the player's feet
+ * (players/inc_items.js 292-319, location.createItem at y - 29). Earlier
+ * builds destroyed talc too (forum general/25471, "19 Barnacle Talc were
+ * created, but destroyed"); the final source drops it.
+ */
+export const GRINDER_DROPS_REMAINDER = Object.freeze(['barnacle_talc']);
+export const GRINDER_DROP_RISE = 29;
+
+/** common.js pluralize: "1 Red Element", "12 Red Elements". */
+function pluralizeItem(n, classTsid) {
+  const meta = ITEM_CATALOG[classTsid];
+  const single = meta?.label || classTsid;
+  return n === 1 ? `1 ${single}` : `${n} ${meta?.namePlural || single}`;
+}
+
+/** common.js pretty_list(list, joiner): "a, b, and c" with joiner ", and ". */
+function prettyList(list, joiner) {
+  if (list.length < 2) return list[0] || '';
+  return `${list.slice(0, -1).join(', ')}${joiner}${list[list.length - 1]}`;
+}
+
+/**
+ * grand_ol_grinder.js 594-627 onCrushComplete's activity line: "You crushed
+ * 3 Chunks of Dullite (+3 iMG, -12 energy). 12 Red Elements were created, but
+ * destroyed, because you couldn't carry them. You got 3 Red Elements, and 24
+ * Green Elements." `outputs` = [{ classTsid, made, destroyed }].
+ */
+export function grinderResultLine({ input, crushed, xp = 0, energy = 0, outputs = [] }) {
+  const meta = xp ? `+${xp} iMG, ${energy} energy` : `${energy} energy`;
+  let line = `You crushed ${pluralizeItem(crushed, input)} (${meta}).`;
+  const got = [];
+  for (const out of outputs) {
+    const destroyed = Math.max(0, out.destroyed || 0);
+    if (destroyed) line += ` ${pluralizeItem(destroyed, out.classTsid)} were created, but destroyed, because you couldn't carry them.`;
+    if (destroyed !== out.made) got.push(pluralizeItem(out.made - destroyed, out.classTsid));
+  }
+  if (got.length) line += ` You got ${prettyList(got, ', and ')}.`;
+  return line;
 }
 
 /** making_required_skill: the skill a tool needs, or null (transmogrifiers). */
@@ -1034,7 +1083,7 @@ export function craftRecipe(inv, pc, recipeKey, opts = {}) {
   const recipeXp = recipe.xpReward ? grantMoodXp(pc, recipe.xpReward) : 0;
   const rng = opts.rng || Math.random;
   if (unitIndex === 1 || batchExtras?.recipeKey !== recipeKey) {
-    batchExtras = { recipeKey, swap: null, items: [], lines: [], xp: 0 };
+    batchExtras = { recipeKey, swap: null, items: [], lines: [], xp: 0, destroyed: {} };
     // spindle.js:425: one 4% roll per spin (Max Luck deliberately left out).
     if (SPINDLE_TOOLS.includes(recipe.tool) && spellboundSpindle(upgrades, rng)) {
       batchExtras.swap = { from: 'thread', to: 'string' };
@@ -1043,8 +1092,27 @@ export function craftRecipe(inv, pc, recipeKey, opts = {}) {
   }
   batchExtras.xp = (Number(batchExtras.xp) || 0) + recipeXp;
   const swap = batchExtras.swap;
+  // The Grinder keeps what the pack can carry (opts.room(cls, n) -> how many
+  // fit) and destroys the rest instead of handing it to the magic rock;
+  // barnacle talc it cannot carry is returned in `dropped` for the ground.
+  const grinding = isGrinderRecipe(recipe) && typeof opts.room === 'function';
+  const destroyed = {};
+  const dropped = {};
   for (const out of recipe.outputs || []) {
-    addItem(inv, swap && out.classTsid === swap.from ? swap.to : out.classTsid, out.qty);
+    const cls = swap && out.classTsid === swap.from ? swap.to : out.classTsid;
+    if (!grinding) {
+      addItem(inv, cls, out.qty);
+      continue;
+    }
+    const fits = Math.max(0, Math.min(out.qty, Math.floor(Number(opts.room(cls, out.qty)) || 0)));
+    if (fits) addItem(inv, cls, fits);
+    const over = out.qty - fits;
+    if (!over) continue;
+    if (GRINDER_DROPS_REMAINDER.includes(cls)) dropped[cls] = over;
+    else {
+      destroyed[cls] = over;
+      batchExtras.destroyed[cls] = (batchExtras.destroyed[cls] || 0) + over;
+    }
   }
   if (unitIndex === batchQty) {
     // loomer.js:307-312 onMakingComplete: Wondrous Weave, +2 General Fabric.
@@ -1097,6 +1165,8 @@ export function craftRecipe(inv, pc, recipeKey, opts = {}) {
     toolUse,
     xp: recipeXp,
     bonusImagination,
+    destroyed,
+    dropped,
     // for tests / rollback inspection
     _before: { energy: beforeE, imagination: beforeImg, xp: beforeXp },
   };
@@ -1285,9 +1355,11 @@ export function buildCraftBatchResult(inv, pc, recipeKey, made, qtyRequested = m
     label: ITEM_CATALOG[input.classTsid]?.label || input.classTsid,
   }));
   const swapped = (id) => (extras?.swap && id === extras.swap.from ? extras.swap.to : id);
+  const lost = extras?.destroyed || {};
   const outputs = (recipe.outputs || []).map((output) => ({
     classTsid: swapped(output.classTsid),
-    qty: output.qty * count,
+    qty: output.qty * count - (lost[swapped(output.classTsid)] || 0),
+    ...(lost[swapped(output.classTsid)] ? { destroyed: lost[swapped(output.classTsid)] } : {}),
     label: ITEM_CATALOG[swapped(output.classTsid)]?.label || swapped(output.classTsid),
   }));
   for (const item of extras?.items || []) {
@@ -1295,13 +1367,25 @@ export function buildCraftBatchResult(inv, pc, recipeKey, made, qtyRequested = m
   }
   const canMakeMore = canCraft(inv, recipe, opts).ok
     && (pc.energy || 0) >= recipeEnergyCost(recipe, opts.learned);
+  // The Grinder says what it crushed and the elements made (player report #95).
+  const grinder = isGrinderRecipe(recipe);
+  const input = recipe.inputs?.[0];
+  const crushed = (Number(input?.qty) || 1) * count;
   const activityLine = [
-    formatCraftResultLine({
-      made: count,
-      recipeName: recipe.name,
-      energy,
-      xp,
-    }),
+    grinder
+      ? grinderResultLine({
+        input: input?.classTsid,
+        crushed,
+        xp,
+        energy,
+        outputs: (recipe.outputs || []).map((o) => ({ classTsid: o.classTsid, made: o.qty * count, destroyed: lost[o.classTsid] || 0 })),
+      })
+      : formatCraftResultLine({
+        made: count,
+        recipeName: recipe.name,
+        energy,
+        xp,
+      }),
     ...(extras?.lines || []),
   ].join(' ');
 
@@ -1316,7 +1400,9 @@ export function buildCraftBatchResult(inv, pc, recipeKey, made, qtyRequested = m
     used,
     canMakeMore,
     activityLine,
-    headline: count === 1
+    headline: grinder
+      ? `You crushed ${pluralizeItem(crushed, input?.classTsid)}!`
+      : count === 1
       ? `You made ${recipe.name}!`
       : `You made ${count} ${recipe.name}${recipe.name.endsWith('s') ? '' : 's'}!`,
   };

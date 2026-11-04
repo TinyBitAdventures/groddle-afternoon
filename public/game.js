@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=6218d040';
 import { createFeatureHost } from './js/feature-host.js?v=2ed3c069';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=9050c9c2';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=ae6b6a6c';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -547,6 +547,8 @@ import {
   advanceCraftSession,
   cancelCraftSession,
   buildCraftBatchResult,
+  isGrinderRecipe,
+  GRINDER_DROP_RISE,
   canCraftAgain,
   canCraft,
   ensureMakingItems,
@@ -559,7 +561,7 @@ import {
   MAKING_TOOL_SKILLS,
   recipeTaskLimit,
   recipeToolInUse,
-} from './js/making.js?v=712a9adb';
+} from './js/making.js?v=0100c686';
 import { MAKE_TOOL_SHEETS } from './js/make-tool-sheets.js?v=6f758e09';
 import { LOW_FUEL_LINE, craftSessionElapsedMs, isLowFuel, isMachineArt, machineArtHtml, packMakeState, playMachineHandOver, setMachineArtFrame } from './js/machine-art.js?v=8c93c616';
 import {
@@ -25830,6 +25832,7 @@ function updateMakeCraft(deltaMs) {
       // machine_base use -> lowFuelAlert (fuelmaker.js:1553-1566, :1228-1233): the machine says so in the result.
       record.lowFuel = true;
     }
+    dropGrinderRemainder(result.dropped);
     record.made += 1;
     noteMadeUnit(record, inv, stringBefore);
     updateHud();
@@ -25837,6 +25840,25 @@ function updateMakeCraft(deltaMs) {
   }
   updateMakeProgressUi(record);
   if (record.timer.status === 'complete') finishMakeCraft(record);
+}
+
+/** How many of `n` the pack can carry now without the magic rock (bags-feature packRoom). */
+function grinderPackRoom(cls, n) {
+  const room = features.query('packRoom', cls, n, engine);
+  return Number.isFinite(room) ? room : n;
+}
+
+/**
+ * Barnacle talc the Grinder made but the pack can't carry falls to the ground
+ * at the player's feet (players/inc_items.js 314-316, location.createItem at
+ * y - 29); where nothing can be set down, the pack takes it as before.
+ */
+function dropGrinderRemainder(dropped) {
+  for (const [cls, n] of Object.entries(dropped || {})) {
+    if (!(n > 0)) continue;
+    const res = player && currentStreetTsid ? engine.dropWorldStack(cls, n, player.x, player.y - GRINDER_DROP_RISE) : null;
+    if (!res?.ok) addItem(inv, cls, n);
+  }
 }
 
 /** One made unit's game events and badge counters (the panel's session and room machines, G175). */
@@ -25920,7 +25942,9 @@ function runMakeCraft(key, qty) {
     durationMs: craftDurationFor(recipe, opts.learned, opts.upgrades),
     durations: craftUnitDurations(recipe, n, opts.learned, opts.upgrades),
   });
-  activeCraftSession = { timer, key, recipe, qty: n, made: 0, opts };
+  // The Grinder keeps only what the pack can carry; the rest is destroyed, never the magic rock's (grand_ol_grinder.js 613-619).
+  const sessionOpts = isGrinderRecipe(recipe) ? { ...opts, room: grinderPackRoom } : opts;
+  activeCraftSession = { timer, key, recipe, qty: n, made: 0, opts: sessionOpts };
   document.getElementById('make-list')?.setAttribute('hidden', '');
   document.getElementById('make-detail')?.setAttribute('hidden', '');
   const result = document.getElementById('make-result');

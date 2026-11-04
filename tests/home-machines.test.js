@@ -30,8 +30,8 @@ import {
   settleSolo,
   soloRow,
 } from '../public/js/home-machines.js?v=58d2eab9';
-import { homeMachinesFeature } from '../public/js/features/home-machines-feature.js?v=f3063af5';
-import { RECIPE_CATALOG, setRecipeCatalog } from '../public/js/making.js?v=712a9adb';
+import { homeMachinesFeature } from '../public/js/features/home-machines-feature.js?v=f10077d4';
+import { RECIPE_CATALOG, setRecipeCatalog } from '../public/js/making.js?v=0100c686';
 import { HAS_SERVER, HAS_SITE, SITE_DIR, serverPath } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');
