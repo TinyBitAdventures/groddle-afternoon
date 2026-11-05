@@ -31,12 +31,15 @@ import {
   beginDeEmbiggenifySearch,
   completeDeEmbiggenify,
   createDeEmbiggenifyState,
+  deEmbiggenifyEndDrops,
+  deEmbiggenifyEndLine,
   deEmbiggenifyObjective,
+  deEmbiggenifyPart2Lost,
   eestiRemainingMs,
   eestiStreetPoint,
   expireDeEmbiggenify,
   findSmallWorthless,
-} from '../public/js/de-embiggenify.js?v=37c4724f';
+} from '../public/js/de-embiggenify.js?v=db347ac1';
 import { jumpApex, NORMAL_BUFF } from '../public/js/avatar-step.js?v=d48908a5';
 import { SOURCE_PHYSICS, triggerHit } from '../public/js/puzzle-triggers.js?v=b341f855';
 import { barriersScreen, blockBarrierCrossing } from '../public/js/street-model.js?v=505d8990';
@@ -307,4 +310,34 @@ test('#109: off the tabletop\'s right end you can always walk back past the tabl
   const game = fs.readFileSync(path.join(root, 'public/game.js'), 'utf8');
   const setup = game.slice(game.indexOf('async function setupDeEmbiggenifyInstance('), game.indexOf('async function startDeEmbiggenify('));
   assert.match(setup, /applyEestiWallFix\(currentStreet\);/);
+});
+
+test('#109: time running out after Mr. Hairball keeps De-Embiggenify II in the log to try again', () => {
+  // The source: part one completes silently on meeting him; part two has no failure path, the
+  // instance only asks "Are you stuck?" (inc_instances.js), so part two stays todo.
+  const gs = path.join(root, '../glitch-GameServerJS');
+  if (fs.existsSync(gs)) {
+    assert.match(fs.readFileSync(path.join(gs, 'quests/de_embiggenify.js'), 'utf8'), /var silent_complete = 1;/);
+    const part2 = fs.readFileSync(path.join(gs, 'quests/de_embiggenify_part2.js'), 'utf8');
+    assert.doesNotMatch(part2, /fail/i);
+    assert.match(fs.readFileSync(path.join(gs, 'players/inc_instances.js'), 'utf8'), /txt\s*: 'Are you stuck\? Do you want to leave this place\?'/);
+  }
+  assert.deepEqual(deEmbiggenifyEndDrops({ part2: true }), [], 'after Mr. Hairball nothing is dropped');
+  assert.deepEqual(deEmbiggenifyEndDrops({ part2: false }), [DE_EMBIGGENIFY_QUEST_ID], 'before him part one goes back to its offer');
+  assert.match(deEmbiggenifyEndLine({ expired: true, part2: true }), /^The catalogue page closed before you could finish\. De-Embiggenify II is still in your quest log/);
+  assert.equal(deEmbiggenifyEndLine({ expired: false, part2: false }), 'You left the miniature room before helping Mr. Hairball.');
+  for (const line of [deEmbiggenifyEndLine({ expired: true, part2: true }), deEmbiggenifyEndLine({ part2: true })]) assert.doesNotMatch(line, /—/);
+  // A save from before the fix (part one done, part two dropped) gets part two back; finished saves don't.
+  assert.equal(deEmbiggenifyPart2Lost({ completed: [DE_EMBIGGENIFY_QUEST_ID], active: {} }), true);
+  assert.equal(deEmbiggenifyPart2Lost({ completed: [DE_EMBIGGENIFY_QUEST_ID, DE_EMBIGGENIFY_PART2_QUEST_ID], active: {} }), false);
+  assert.equal(deEmbiggenifyPart2Lost({ completed: [DE_EMBIGGENIFY_QUEST_ID], active: { [DE_EMBIGGENIFY_PART2_QUEST_ID]: {} } }), false);
+  assert.equal(deEmbiggenifyPart2Lost({ completed: [], active: {} }), false);
+  const game = fs.readFileSync(path.join(root, 'public/game.js'), 'utf8');
+  const back = game.slice(game.indexOf('async function returnFromDeEmbiggenify('), game.indexOf('function confirmLeaveDeEmbiggenify('));
+  assert.match(back, /for \(const id of deEmbiggenifyEndDrops\(\{ part2 \}\)\) delete questState\.active\[id\];/);
+  assert.doesNotMatch(back, /delete questState\.active\[DE_EMBIGGENIFY_PART2_QUEST_ID\]/);
+  assert.match(game, /if \(!eestiDemo && deEmbiggenifyPart2Lost\(questState\)\) \{\n\s+assignQuest\(questState, DE_EMBIGGENIFY_PART2_QUEST_ID, \{ ignorePrereq: true \}\);/);
+  // The log's Enter button resumes part two at the search (startDeEmbiggenify resumingPart2).
+  assert.match(game, /\[DE_EMBIGGENIFY_QUEST_ID, DE_EMBIGGENIFY_PART2_QUEST_ID\]\.includes\(p\.def\.classTsid\) &&\n\s+!deEmbiggenifyIsInstanced\(\)/);
+  assert.match(game, /if \(resumingPart2\) beginDeEmbiggenifySearch\(deEmbiggenifyState, Date\.now\(\)\);/);
 });

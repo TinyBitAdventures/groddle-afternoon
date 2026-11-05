@@ -268,12 +268,15 @@ import {
   beginDeEmbiggenifySearch,
   completeDeEmbiggenify,
   createDeEmbiggenifyState,
+  deEmbiggenifyEndDrops,
+  deEmbiggenifyEndLine,
   deEmbiggenifyObjective,
+  deEmbiggenifyPart2Lost,
   eestiRemainingMs,
   eestiStreetPoint,
   expireDeEmbiggenify,
   findSmallWorthless,
-} from './js/de-embiggenify.js?v=37c4724f';
+} from './js/de-embiggenify.js?v=db347ac1';
 import {
   EMOTIONAL_BEAR_ACTIONS,
   EMOTIONAL_BEAR_COMPANIONS,
@@ -20234,14 +20237,14 @@ async function returnFromDeEmbiggenify({ abandon = false, expired = false } = {}
   const source = deEmbiggenifySourceLocation || deEmbiggenifyState.sourceLocation;
   const status = expired ? 'expired' : abandon ? 'abandoned' : deEmbiggenifyState.status;
   if ((abandon || expired) && deEmbiggenifyState.status !== 'complete') {
-    delete questState.active[DE_EMBIGGENIFY_QUEST_ID];
-    delete questState.active[DE_EMBIGGENIFY_PART2_QUEST_ID];
+    // #109: part one is done once you meet Mr. Hairball (de_embiggenify.js silent_complete), so
+    // part two stays in the log to try again, as the source's stays todo (de_embiggenify_part2.js:
+    // the instance only offers an exit, instances_show_exit_prompt). Dropping it left the log
+    // showing De-Embiggenify done with no way back. The log's Enter button resumes the search.
+    const part2 = Boolean(questState.active?.[DE_EMBIGGENIFY_PART2_QUEST_ID]);
+    for (const id of deEmbiggenifyEndDrops({ part2 })) delete questState.active[id];
     removeItem(inv, SMALL_WORTHLESS_ID, countItem(inv, SMALL_WORTHLESS_ID));
-    pushActivity(
-      expired
-        ? 'The catalogue page closed before you could finish.'
-        : 'You left the miniature room before helping Mr. Hairball.'
-    );
+    pushActivity(deEmbiggenifyEndLine({ expired, part2 }));
   }
   closeQuestDialogue({ force: true });
   if (deEmbiggenifyPlayerBaseScale && player) {
@@ -20279,12 +20282,15 @@ async function returnFromDeEmbiggenify({ abandon = false, expired = false } = {}
 
 function confirmLeaveDeEmbiggenify() {
   if (!deEmbiggenifyIsInstanced()) return;
+  const part2 = Boolean(questState.active?.[DE_EMBIGGENIFY_PART2_QUEST_ID]);
   openScriptedQuestDialogue({
     title: 'De-Embiggenify',
     kicker: 'Leave the catalogue page?',
     cancelable: true,
     beats: [{
-      text: 'Leaving now will abandon this tiny attempt. You can accept the quest again later.',
+      text: part2
+        ? 'Leaving now will end this tiny attempt. You can come back from your quest log to look again.'
+        : 'Leaving now will abandon this tiny attempt. You can accept the quest again later.',
       response: 'Return to normal size',
     }],
     onComplete: () => returnFromDeEmbiggenify({ abandon: true }),
@@ -29216,6 +29222,10 @@ async function main() {
     'catalogue',
     'catalog',
   ].includes(questDemo);
+  // #109: an attempt that ran out after Mr. Hairball dropped part two; it goes back in the log.
+  if (!eestiDemo && deEmbiggenifyPart2Lost(questState)) {
+    assignQuest(questState, DE_EMBIGGENIFY_PART2_QUEST_ID, { ignorePrereq: true });
+  }
   if (questDemo === 'phantom' || questDemo === 'ghost') {
     questState.completed = questState.completed.filter((id) => id !== PHANTOM_QUEST_ID);
     if (!questState.active[PHANTOM_QUEST_ID]) {

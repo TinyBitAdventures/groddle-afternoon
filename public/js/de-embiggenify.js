@@ -228,3 +228,27 @@ export function deEmbiggenifyObjective(state) {
   return 'The catalogue page closed';
 }
 
+/**
+ * #109: what is left of the quest when an attempt ends early (time ran out, or you left).
+ * Before Mr. Hairball, part one goes back to its offer; after him part one is done
+ * (de_embiggenify.js silent_complete) and part two stays in the log, as the source's stays
+ * todo, so you can go back and look again. Returns the quest ids to drop from `active`.
+ */
+export function deEmbiggenifyEndDrops({ part2 = false } = {}) {
+  return part2 ? [] : [DE_EMBIGGENIFY_QUEST_ID];
+}
+
+/** #109: the activity line for an attempt that ended early. */
+export function deEmbiggenifyEndLine({ expired = false, part2 = false } = {}) {
+  const how = expired ? 'The catalogue page closed before you could finish.' : 'You left the miniature room before helping Mr. Hairball.';
+  return part2 ? `${how} De-Embiggenify II is still in your quest log: enter the catalogue page from there to look again.` : how;
+}
+
+/**
+ * #109: a save from before the fix whose attempt ran out after Mr. Hairball: part one done,
+ * part two dropped, so nothing could start it again. Part two goes back into the log.
+ */
+export function deEmbiggenifyPart2Lost(questState) {
+  const done = Array.isArray(questState?.completed) ? questState.completed : [];
+  return done.includes(DE_EMBIGGENIFY_QUEST_ID) && !done.includes(DE_EMBIGGENIFY_PART2_QUEST_ID) && !questState?.active?.[DE_EMBIGGENIFY_PART2_QUEST_ID];
+}
