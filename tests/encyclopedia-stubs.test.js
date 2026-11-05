@@ -88,7 +88,8 @@ describe('blank stubs', () => {
 
   it('keeps every count in step with the pages', { skip: skipWithoutInventory }, () => {
     const home = read('encyclopedia/index.html');
-    const card = (label) => Number(new RegExp(`ency-card-name">${label} <span class="count">([\\d,]+)</span>`).exec(home)?.[1].replace(/,/g, ''));
+    // A card may name what it counts ("30 tools · 327 recipes"): the first number is the section's pages.
+    const card = (label) => Number(new RegExp(`ency-card-name">${label} <span class="count">([\\d,]+)[^<]*</span>`).exec(home)?.[1].replace(/,/g, ''));
     const SECTION_LABEL = Object.fromEntries(SECTIONS.map((s) => [s.key, s.label]));
     for (const sec of BUILT_SECTIONS) {
       // Music and sounds keeps its Still missing list beside the entries (tests/encyclopedia-sounds.test.js counts it).
@@ -99,8 +100,14 @@ describe('blank stubs', () => {
       if (sec === 'sounds') continue;
       const index = read(`encyclopedia/${sec}/index.html`);
       const inCount = rows.filter((x) => inRemake(x.st)).length;
-      assert.match(index, new RegExp(`<strong>${inCount.toLocaleString('en-US')}</strong> of ${pages.toLocaleString('en-US')} are in the remake`), sec);
+      assert.match(index, new RegExp(`<strong>${inCount.toLocaleString('en-US')}</strong> of ${pages.toLocaleString('en-US')}(?: [a-z]+)? are in the remake`), sec);
     }
+    // Tools and recipes counts tools, and names the recipes they make beside them, on the card and the index.
+    const recipeCount = readdirSync(join(pub, 'encyclopedia/recipes'), { withFileTypes: true }).filter((x) => x.isDirectory())
+      .reduce((n, x) => n + (read(`encyclopedia/recipes/${x.name}/index.html`).match(/id="r(?!ecipes-h"|emake-h")[^"]+"/g) || []).length, 0);
+    assert.ok(recipeCount > 300, `recipes counted from the tool pages: ${recipeCount}`);
+    assert.match(home, new RegExp(`ency-card-name">Tools and recipes <span class="count">[\\d,]+ tools · ${recipeCount.toLocaleString('en-US')} recipes</span>`));
+    assert.match(read('encyclopedia/recipes/index.html'), new RegExp(`Between them they make ${recipeCount.toLocaleString('en-US')} recipes\\.`));
     // Items: the home card, the catalog page, its data and the search all count the same items.
     const itemPages = readdirSync(join(pub, 'encyclopedia/items'), { withFileTypes: true }).filter((x) => x.isDirectory()).length;
     const itemRows = search.entries.filter((x) => x.s === 'items');

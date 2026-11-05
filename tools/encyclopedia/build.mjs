@@ -143,7 +143,7 @@ function entryHead(e, P, { kickerExtra = '', subline = '', hero = '' } = {}) {
   return `
   <header class="masthead note-head cat-item-head">
     <div class="wrap">
-      <p class="kicker"><a href="../../">Groddle Encyclopedia</a> · <a href="../">${esc(sec.label)}</a>${e.group ? ` · ${esc(e.group)}` : ''}${kickerExtra}</p>
+      <p class="kicker"><a href="../../">Groddle Encyclopedia</a> · <a href="../">${esc(sec.label)}</a>${e.group && e.group !== sec.label && e.group !== `${sec.label} of Ur` ? ` · ${esc(e.group)}` : ''}${kickerExtra}</p>
       <div class="cat-hero">
         <div class="cat-hero-frame">${pic}</div>
         <div>
@@ -731,7 +731,7 @@ function sectionIndex(sec, list, info, nameOf) {
       <p class="kicker"><a href="../">Groddle Encyclopedia</a> · ${esc(sec.label)}</p>
       <h1>${esc(sec.label)}</h1>
       <p class="lead">${esc(sec.blurb)}</p>
-      <p class="cat-score"><strong>${fmt(inCount)}</strong> of ${fmt(list.length)} are in the remake.</p>
+      <p class="cat-score"><strong>${fmt(inCount)}</strong> of ${fmt(list.length)}${sec.noun ? ` ${esc(sec.noun)}` : ''} are in the remake.${sec.scoreMore ? ` ${sec.scoreMore(list)}` : ''}</p>
     </div>
   </header>
 
@@ -739,7 +739,7 @@ function sectionIndex(sec, list, info, nameOf) {
     <div class="wrap">
       <div class="cat-tools">
         <label class="history-search cat-search" for="q">
-          <span class="visually-hidden">Filter ${esc(sec.label.toLowerCase())}</span>
+          <span class="visually-hidden">Filter ${esc(sec.noun || sec.label.toLowerCase())}</span>
           <input id="q" type="search" placeholder="Filter by name" autocomplete="off" spellcheck="false" data-filter />
         </label>
 ${groups.length > 1 ? `        <div class="cat-selects">
@@ -751,12 +751,12 @@ ${groups.map((g) => { const pic = list.find((e) => e.group === g && e.icon)?.ico
           </label>
         </div>\n` : ''}
       </div>
-      <p class="cat-count" id="count" aria-live="polite">${fmt(list.length)} ${esc(sec.label.toLowerCase())}</p>
+      <p class="cat-count" id="count" aria-live="polite">${fmt(list.length)} ${esc(sec.noun || sec.label.toLowerCase())}</p>
       ${groupHtml}
     </div>
   </main>
 `;
-  return shell({ p, title: `${sec.label} · Groddle Encyclopedia`, description: `${sec.blurb} ${inCount} of ${list.length} are in the Groddle Afternoon remake.`, body, script: true, css: sec.css });
+  return shell({ p, title: `${sec.label} · Groddle Encyclopedia`, description: `${sec.blurb} ${inCount} of ${list.length}${sec.noun ? ` ${sec.noun}` : ''} are in the Groddle Afternoon remake.`, body, script: true, css: sec.css });
 }
 
 function homePage(bySection, items, info, nameOf) {
@@ -769,10 +769,10 @@ function homePage(bySection, items, info, nameOf) {
     const c = soundCounts(bySection.sounds);
     return `${s.blurb} ${fmt(c.original)} of ${fmt(c.total)} play Tiny Speck’s own recording.`;
   };
-  const card = (href, label, n, blurb, pic) => `<li><a class="ency-card" href="${href}">${P.img(pic, 'ency-card-ic', 64)}<span class="ency-card-text"><span class="ency-card-name">${esc(label)} <span class="count">${fmt(n)}</span>${sep('.')}</span> <span class="ency-card-blurb">${esc(blurb)}</span></span></a></li>`;
+  const card = (href, label, n, blurb, pic) => `<li><a class="ency-card" href="${href}">${P.img(pic, 'ency-card-ic', 64)}<span class="ency-card-text"><span class="ency-card-name">${esc(label)} <span class="count">${typeof n === 'string' ? esc(n) : fmt(n)}</span>${sep('.')}</span> <span class="ency-card-blurb">${esc(blurb)}</span></span></a></li>`;
   const cards = [
     card('items/', 'Items', items.size, `Every item, how to get it and what it is for. ${fmt(itemsIn)} are in the remake.`, info('item:apple')?.icon),
-    ...SECTIONS.map((s) => card(`${s.key}/`, s.label, bySection[s.key].length, blurbOf(s), info(sample[s.key] || s.sample)?.icon || bySection[s.key][0]?.icon)),
+    ...SECTIONS.map((s) => card(`${s.key}/`, s.label, s.cardCount ? s.cardCount(bySection[s.key]) : bySection[s.key].length, blurbOf(s), info(sample[s.key] || s.sample)?.icon || bySection[s.key][0]?.icon)),
   ];
   const body = `
   <header class="masthead note-head cat-head">

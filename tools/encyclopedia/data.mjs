@@ -48,7 +48,7 @@ const ALL_SECTIONS = [
   { key: 'achievements', label: 'Achievements', one: 'achievement', blurb: 'Every badge, what earns it and what it rewards.' },
   { key: 'sounds', label: 'Music and sounds', one: 'sound', blurb: 'Every tune and sound of the original, what the remake plays for it, and what is still missing.' },
   // Imagination upgrades, recipes, buffs, feats and street projects, Giants (tools/encyclopedia/sections.mjs).
-  ...MORE_SECTIONS.map(({ key, label, one, blurb, groupWord, sample, css }) => ({ key, label, one, blurb, groupWord, sample, css })),
+  ...MORE_SECTIONS.map(({ key, label, one, noun, blurb, groupWord, sample, css, cardCount, scoreMore }) => ({ key, label, one, noun, blurb, groupWord, sample, css, cardCount, scoreMore })),
 ];
 export const SECTIONS = ALL_SECTIONS.filter((s) => BUILT_SECTIONS.includes(s.key));
 

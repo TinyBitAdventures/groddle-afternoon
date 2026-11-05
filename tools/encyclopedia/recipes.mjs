@@ -102,8 +102,13 @@ ${band('remake-h', 'In the remake', `<div class="cat-remake-body"><p class="cat-
   </main>`;
 }
 
+const recipeTotal = (list) => list.reduce((n, e) => n + (e.recipes?.length || 0), 0);
+
 export const SECTION = {
-  key: 'recipes', label: 'Recipes', one: 'tool', groupWord: 'Kind', sample: 'recipes:frying_pan', css: '',
-  blurb: 'Every recipe, tool by tool: what goes in, what comes out, the skill it needs, energy and time.',
+  key: 'recipes', label: 'Tools and recipes', one: 'tool', noun: 'tools', groupWord: 'Kind', sample: 'recipes:frying_pan', css: '',
+  blurb: 'The tools and machines you make things with, and every recipe each one makes: what goes in, what comes out, the skill it needs, energy and time.',
+  /** The section counts tools; the recipes they make are counted beside them. */
+  cardCount: (list) => `${fmt(list.length)} tools · ${fmt(recipeTotal(list))} recipes`,
+  scoreMore: (list) => `Between them they make ${fmt(recipeTotal(list))} recipes.`,
   add, page,
 };
