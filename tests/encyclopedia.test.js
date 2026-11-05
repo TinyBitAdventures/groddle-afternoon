@@ -114,6 +114,7 @@ describe('encyclopedia', () => {
       // their links to items, skills, quests and achievements are one-way until those pages read them back.
       imagination: ['needs-card'],
       recipes: [],
+      buffs: ['after'],
       giants: ['shrine'],
     };
     let checked = 0;
@@ -151,7 +152,7 @@ describe('encyclopedia', () => {
   });
 
   it('writes no em dashes in its own words', () => {
-    for (const f of ['tools/encyclopedia/build.mjs', 'tools/encyclopedia/data.mjs', 'tools/encyclopedia/parts.mjs', 'tools/encyclopedia/sounds.mjs', 'tools/encyclopedia/sections.mjs', 'tools/encyclopedia/imagination.mjs', 'tools/encyclopedia/recipes.mjs', 'tools/encyclopedia/giants.mjs', 'public/encyclopedia/sections.css', 'tools/sound/sound-model.mjs', 'public/encyclopedia/encyclopedia.js', 'public/encyclopedia/items/combobox.js', 'docs/encyclopedia.md']) {
+    for (const f of ['tools/encyclopedia/build.mjs', 'tools/encyclopedia/data.mjs', 'tools/encyclopedia/parts.mjs', 'tools/encyclopedia/sounds.mjs', 'tools/encyclopedia/sections.mjs', 'tools/encyclopedia/imagination.mjs', 'tools/encyclopedia/recipes.mjs', 'tools/encyclopedia/buffs.mjs', 'tools/encyclopedia/giants.mjs', 'public/encyclopedia/sections.css', 'tools/sound/sound-model.mjs', 'public/encyclopedia/encyclopedia.js', 'public/encyclopedia/items/combobox.js', 'docs/encyclopedia.md']) {
       assert.ok(!readFileSync(join(spike, f), 'utf8').includes('—'), f);
     }
     assert.ok(!read('encyclopedia/index.html').includes('—'));
