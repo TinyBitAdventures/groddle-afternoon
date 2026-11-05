@@ -23,7 +23,7 @@ import {
   refusalText,
 } from '../public/js/player-im.js?v=23463a96';
 import { playerImFeature } from '../public/js/features/player-im-feature.js?v=67c7906f';
-import { FEATURES } from '../public/js/features/index.js?v=4776273e';
+import { FEATURES } from '../public/js/features/index.js?v=db589098';
 import { mountSocialDrawer } from '../public/js/ui/social-drawer.js?v=debf9446';
 import { createNotifier } from '../public/js/notify.js?v=37c6b748';
 import { memoryStore, page } from './social-fake-dom.js';

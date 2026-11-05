@@ -5,7 +5,7 @@
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=28b6b0a6';
 import { createFeatureHost } from './js/feature-host.js?v=020c9329';
 import { giantDisplayName } from './js/giant-names.js?v=0e295891';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=4776273e';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=db589098';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -2215,6 +2215,14 @@ let packEatMode = false;
 let packEatQty = 1;
 /** The feature verb whose second level the pack menu shows (a bag's Sort: features/bags-feature.js), or ''. */
 let packSubLevel = '';
+/**
+ * The feature verb whose How many the pack menu shows (a verb with `count`: Shake, Compress, Age,
+ * Unbundle and Shuck, js/item-transforms.js), or '', and the count it is on. Report #101: the client
+ * asked how many of the stack (InteractionMenuController.as 976-990 getCountChoices) for any verb that
+ * is not is_single, and the server capped it at the stack (main.js doVerb 3228-3234).
+ */
+let packCountVerb = '';
+let packCountQty = 1;
 let vendorSprite = null;
 /** Active Phantom Glitch echo/final encounter for the authored ghost quest. */
 let phantomTarget = null;
@@ -3415,6 +3423,8 @@ function closePackPopover() {
   packEatMode = false;
   packEatQty = 1;
   packSubLevel = '';
+  packCountVerb = '';
+  packCountQty = 1;
   const pop = document.getElementById('pack-popover');
   if (pop) {
     pop.hidden = true;
@@ -4129,6 +4139,8 @@ function renderPackPopover(classTsid, anchor = null) {
     packEatMode = false;
     packEatQty = 1;
     packSubLevel = '';
+    packCountVerb = '';
+    packCountQty = 1;
   }
   // A tool's own slot says which tool it is (its wear and its repair are that one's).
   if (packSelected !== classTsid) {
@@ -4424,9 +4436,25 @@ function renderPackPopover(classTsid, anchor = null) {
     ...(typeof verb.current === 'boolean' ? { current: verb.current } : {}),
   });
   let subVerb = null;
+  let countVerb = null;
   // A verb on one picked copy (a potion, a powder, a named Cubimal) acts on that one (js/tools.js copyForVerb).
   const verbCopy = TOOL_WEAR[classTsid] && packSelectedCopy != null ? { copy: packSelectedCopy } : {};
-  for (const verb of features.packVerbs(classTsid, engine, verbCopy)) {
+  // A verb with `count` ({ max, verb, plural, idPrefix, quote(n) }) asks How many of this stack
+  // (report #101): its row opens the chooser, and OK runs `<idPrefix>:<n>`.
+  for (const verb of features.packVerbs(classTsid, engine, { ...verbCopy, stackCount })) {
+    if (verb.count && Number(verb.count.max) > 1) {
+      if (verb.id === packCountVerb) countVerb = verb;
+      rows.push({
+        attrs: `data-feature-pack-count="${escapeHtml(verb.id)}" data-feature-id="${escapeHtml(verb.featureId)}"`,
+        cls: 'pack-bear-action pack-feature-verb pack-feature-count',
+        label: verb.label,
+        next: true,
+        disabled: verb.enabled === false,
+        reason: verb.reason || '',
+        tip: verb.tooltip || `Choose how many to ${String(verb.count.verb || verb.label).toLowerCase()}`,
+      });
+      continue;
+    }
     if (Array.isArray(verb.sub) && verb.sub.length) {
       if (verb.id === packSubLevel) subVerb = verb;
       rows.push({
@@ -4443,6 +4471,28 @@ function renderPackPopover(classTsid, anchor = null) {
     rows.push(featureVerbRow(verb));
   }
   if (!subVerb) packSubLevel = '';
+  if (!countVerb) packCountVerb = '';
+  const countMax = countVerb ? Math.max(1, Math.min(stackCount, Math.floor(Number(countVerb.count.max)) || 1)) : 1;
+  if (countVerb) packCountQty = normalizeStackQuantity(packCountQty, countMax);
+  const countQuote = (n) => (countVerb && typeof countVerb.count.quote === 'function' ? countVerb.count.quote(n) : null) || { ok: true };
+  const countPrompt = countVerb && !packDropMode && !packEatMode
+    ? (() => {
+        const c = countVerb.count;
+        const verbWord = c.verb || countVerb.label;
+        const quote = countQuote(packCountQty);
+        const note = quote.ok ? quote.tip || '' : quote.reason || '';
+        return `<div class="pack-drop-quantity count-pop" data-pack-count-panel="${escapeHtml(countVerb.id)}" role="group" aria-labelledby="pack-count-title">
+        <p id="pack-count-title" class="pack-eat-title count-pop-title">${escapeHtml(verbWord)} how many ${escapeHtml(c.plural || slot.label)}?</p>
+        ${countStepMarkup({ value: packCountQty, max: countMax, verb: verbWord, attrs: { dec: 'data-pack-count-dec', inc: 'data-pack-count-inc', num: 'data-pack-count-num', max: 'data-pack-count-max' } })}
+        <output class="count-pop-of" aria-live="polite" data-pack-count-of>${packCountQty} of ${countMax}</output>
+        <p class="count-pop-note${quote.ok ? '' : ' is-blocked'}" data-pack-count-note aria-live="polite">${escapeHtml(note)}</p>
+        <div class="pack-drop-confirm-row count-pop-actions">
+          <span class="count-pop-esc mp-modern-only"><span class="kcap">Esc</span> back</span>
+          <button type="button" class="pack-pop-primary" data-pack-count-confirm${quote.ok ? '' : ' disabled'}>${escapeHtml(verbWord)} ${packCountQty}</button>
+        </div>
+      </div>`;
+      })()
+    : '';
   if (recipeTarget) rows.push({ attrs: 'data-pack-make', label: makeLabel, tip: recipeNote ? `${recipeNote} · opens Make` : 'Opens Make' });
   const dropBlock = packDropBlockReason(classTsid);
   rows.push({
@@ -4457,7 +4507,7 @@ function renderPackPopover(classTsid, anchor = null) {
 
   // Eat more and Drop (more than one) are second levels: a back row (0 or Backspace) and the count.
   // A feature verb's level (a bag's Sort) is a back row and its verbs, picked as any row is (1-9).
-  const level = eatPrompt ? 'eat' : dropPrompt ? 'drop' : subVerb ? 'sub' : '';
+  const level = eatPrompt ? 'eat' : dropPrompt ? 'drop' : subVerb ? 'sub' : countPrompt ? 'count' : '';
   const keys = verbRowKeys(rows);
   const rowMarkup = (row, key) => `<button type="button" class="vm-row${row.cls ? ` ${row.cls}` : ''}" ${row.attrs} ${verbRowAttrs(row)}>${verbRowInner({ ...row, key })}</button>`;
   const subRows = level === 'sub'
@@ -4468,7 +4518,7 @@ function renderPackPopover(classTsid, anchor = null) {
   const rowsMarkup = subRows
     ? subRows.map((row, i) => rowMarkup(row, subKeys[i])).join('')
     : level
-    ? `<button type="button" class="vm-row vm-back" ${level === 'eat' ? 'data-pack-eat-cancel' : 'data-pack-drop-cancel'} ${verbRowAttrs({ back: true, tip: 'Back to what you can do with it' })}>${verbRowInner({ key: '0', label: 'Back', back: true })}</button>`
+    ? `<button type="button" class="vm-row vm-back" ${level === 'eat' ? 'data-pack-eat-cancel' : level === 'count' ? 'data-pack-count-cancel' : 'data-pack-drop-cancel'} ${verbRowAttrs({ back: true, tip: 'Back to what you can do with it' })}>${verbRowInner({ key: '0', label: 'Back', back: true })}</button>`
     : rows.map((row, i) => rowMarkup(row, keys[i])).join('');
 
   // A named Cubimal goes by its name, its figure type on the kind line (features/cubimal-race-feature.js);
@@ -4478,7 +4528,7 @@ function renderPackPopover(classTsid, anchor = null) {
     : features.query('itemDisplayName', classTsid, TOOL_WEAR[classTsid] ? packSelectedCopy : null, engine);
   pop.hidden = false;
   pop.dataset.vmDefault = plainWords(slot.desc || 'A thing from Ur.');
-  pop.dataset.vmLevel = level === 'sub' ? `sub:${subVerb.id}` : level;
+  pop.dataset.vmLevel = level === 'sub' ? `sub:${subVerb.id}` : level === 'count' ? `count:${countVerb.id}` : level;
   // ENCYC: the card's "In the Encyclopedia" when the item has a page (GetInfoDialog.as 142-163: "See in Encyclopedia").
   const markup = `
     <div class="pack-pop-head vm-head"${isEmotionalBear ? ` data-bear-state="${bearStateName}"` : ''}>
@@ -4492,6 +4542,7 @@ function renderPackPopover(classTsid, anchor = null) {
     <div class="pack-pop-actions vm-rows" role="menu" aria-labelledby="pack-popover-title">${rowsMarkup}</div>
     ${eatPrompt}
     ${dropPrompt}
+    ${countPrompt}
     <p class="vm-detail pack-pop-desc" aria-live="polite">${escapeHtml(plainWords(slot.desc || 'A thing from Ur.'))}</p>
     ${encyclopedia.linkMarkup(encyclopediaItemSubject(classTsid), 'pack-pop-ency')}`;
   // updateHud redraws an open popover on every HUD change (buff timers, energy): rebuilding
@@ -4501,7 +4552,8 @@ function renderPackPopover(classTsid, anchor = null) {
   const focusedEat = pop.contains(document.activeElement) ? document.activeElement : null;
   const keepFocus = focusedEat
     ? ['data-pack-eat-choice', 'data-pack-eat-dec', 'data-pack-eat-inc', 'data-pack-eat-confirm', 'data-pack-eat-cancel', 'data-pack-eat-many', 'data-pack-eat-num', 'data-pack-eat-max',
-      'data-pack-drop-dec', 'data-pack-drop-inc', 'data-pack-drop-num', 'data-pack-drop-max', 'data-pack-drop-confirm']
+      'data-pack-drop-dec', 'data-pack-drop-inc', 'data-pack-drop-num', 'data-pack-drop-max', 'data-pack-drop-confirm',
+      'data-pack-count-dec', 'data-pack-count-inc', 'data-pack-count-num', 'data-pack-count-max', 'data-pack-count-confirm']
         .filter((name) => focusedEat.hasAttribute(name))
         .map((name) => `[${name}${name === 'data-pack-eat-choice' ? `="${focusedEat.getAttribute(name)}"` : ''}]`)[0] || null
     : null;
@@ -4518,7 +4570,7 @@ function renderPackPopover(classTsid, anchor = null) {
     delete pop.dataset.vmLock;
     if (keepFocus) {
       const again = pop.querySelector(keepFocus);
-      const target = again && !again.disabled ? again : pop.querySelector('[data-pack-eat-confirm], [data-pack-drop-confirm]');
+      const target = again && !again.disabled ? again : pop.querySelector('[data-pack-eat-confirm], [data-pack-drop-confirm], [data-pack-count-num]');
       target?.focus({ preventScroll: true });
     } else if (focusedRow >= 0) focusVerbRow(pop, focusedRow);
     syncVerbDetail(pop);
@@ -4548,6 +4600,93 @@ function renderPackPopover(classTsid, anchor = null) {
       features.runPackVerb(classTsid, button.dataset.featurePackVerb, engine, button.dataset.featureId, picked);
     });
   });
+  // A feature verb's How many (report #101): in, the number field takes the focus (type a count, Enter
+  // runs it); Back (0, Backspace or Esc) returns to the row that opened it.
+  pop.querySelectorAll('[data-feature-pack-count]').forEach((button) => {
+    button.addEventListener('click', () => {
+      packCountVerb = button.dataset.featurePackCount;
+      packCountQty = 1;
+      packDropMode = false;
+      packEatMode = false;
+      renderPackPopover(classTsid, sourceAnchor);
+      const num = pop.querySelector('[data-pack-count-num]');
+      num?.focus({ preventScroll: true });
+      num?.select?.();
+    });
+  });
+  if (countVerb) {
+    const runCount = (n) => {
+      const count = normalizeStackQuantity(n, countMax);
+      if (!countQuote(count).ok) {
+        packCountQty = count;
+        renderPackPopover(classTsid, sourceAnchor);
+        return;
+      }
+      leavingMenuBag(classTsid);
+      const picked = TOOL_WEAR[classTsid] && packSelectedCopy != null ? { copy: packSelectedCopy } : {};
+      const runId = `${countVerb.count.idPrefix || countVerb.id}:${count}`;
+      const featureId = countVerb.featureId;
+      closePackPopover();
+      features.runPackVerb(classTsid, runId, engine, featureId, picked);
+    };
+    const setCountQty = (value) => {
+      packCountQty = normalizeStackQuantity(value, countMax);
+      renderPackPopover(classTsid, sourceAnchor);
+    };
+    pop.querySelector('[data-pack-count-dec]')?.addEventListener('click', () => setCountQty(packCountQty - 1));
+    pop.querySelector('[data-pack-count-inc]')?.addEventListener('click', () => setCountQty(packCountQty + 1));
+    pop.querySelector('[data-pack-count-max]')?.addEventListener('click', () => setCountQty(countMax));
+    bindCountField(pop.querySelector('[data-pack-count-num]'), {
+      max: () => countMax,
+      set: setCountQty,
+      // The OK button, "3 of 80" and what it costs follow the typing (ticket 92's rule).
+      preview: (n) => {
+        packCountQty = normalizeStackQuantity(n, countMax);
+        const panel = pop.querySelector('[data-pack-count-panel]');
+        if (!panel) return;
+        const quote = countQuote(packCountQty);
+        const of = panel.querySelector('[data-pack-count-of]');
+        if (of) of.textContent = `${packCountQty} of ${countMax}`;
+        const go = panel.querySelector('[data-pack-count-confirm]');
+        if (go) {
+          go.textContent = `${countVerb.count.verb || countVerb.label} ${packCountQty}`;
+          go.disabled = !quote.ok;
+        }
+        const note = panel.querySelector('[data-pack-count-note]');
+        if (note) {
+          note.textContent = quote.ok ? quote.tip || '' : quote.reason || '';
+          note.classList.toggle('is-blocked', !quote.ok);
+        }
+      },
+      confirm: (n) => runCount(n),
+      cancel: () => pop.querySelector('[data-pack-count-cancel]')?.click(),
+    });
+    pop.querySelector('[data-pack-count-confirm]')?.addEventListener('click', () => runCount(packCountQty));
+    pop.querySelector('[data-pack-count-cancel]')?.addEventListener('click', () => {
+      const from = packCountVerb;
+      packCountVerb = '';
+      packCountQty = 1;
+      renderPackPopover(classTsid, sourceAnchor);
+      const row = [...pop.querySelectorAll('[data-feature-pack-count]')].find((b) => b.dataset.featurePackCount === from);
+      const at = row ? [...pop.querySelectorAll('.vm-row')].indexOf(row) : -1;
+      if (at >= 0) focusVerbRow(pop, at);
+    });
+    pop.querySelector('[data-pack-count-panel]')?.addEventListener('keydown', (e) => {
+      if (e.target?.matches?.('[data-pack-count-num]')) return;
+      const next = countKeyValue(e.key, packCountQty, countMax);
+      if (next != null) {
+        e.preventDefault();
+        e.stopPropagation();
+        setCountQty(next);
+      } else if (e.key === 'Escape') {
+        e.preventDefault();
+        e.stopPropagation();
+        pop.querySelector('[data-pack-count-cancel]')?.click();
+      } else if (e.key === 'Enter' || e.key === ' ') {
+        e.stopPropagation();
+      }
+    });
+  }
   // A feature verb's second level (a bag's Sort): in, its first choice takes the focus; Back (0,
   // Backspace or Esc) returns to the row that opened it.
   pop.querySelectorAll('[data-feature-pack-sub]').forEach((button) => {
@@ -4957,6 +5096,7 @@ function renderPackRow(box, slots, opts = {}) {
           packEatMode = false;
           packEatQty = 1;
           packSubLevel = '';
+          packCountVerb = '';
         }
         renderPackPopover(s.classTsid, slot);
         // VERBS: opened from the keyboard, the first row takes focus (a click leaves the footer on what it is).
@@ -5184,6 +5324,7 @@ function openPackBagOptions(s, slot, { keys = false, swallowClick = false } = {}
   // RIGHTCLICK R9: opening a menu never cancels the running verb (a pick does: the popover's capture click).
   // It opens fresh, on the bag's first level (not on its Sort level from last time).
   packSubLevel = '';
+  packCountVerb = '';
   renderPackPopover(s.classTsid, slot);
   packBagMenuEchoUntil = Date.now() + 1000;
   if (swallowClick) packMenuSwallowClickUntil = Date.now() + 700;
@@ -5204,6 +5345,7 @@ function openPackStackMenu(s, slot, { keys = false, swallowClick = false } = {})
   packEatMode = false;
   packEatQty = 1;
   packSubLevel = '';
+  packCountVerb = '';
   renderPackPopover(s.classTsid, slot);
   packMenuEchoUntil = Date.now() + 1000;
   if (swallowClick) packMenuSwallowClickUntil = Date.now() + 700;
@@ -29810,7 +29952,9 @@ async function main() {
       }
       if (isPackPopoverOpen()) {
         // A second level (a bag's Sort) goes back to the menu, as Eat more's and Drop's do.
-        const back = packSubLevel ? document.querySelector('#pack-popover [data-pack-sub-cancel]') : null;
+        const back = packSubLevel
+          ? document.querySelector('#pack-popover [data-pack-sub-cancel]')
+          : packCountVerb ? document.querySelector('#pack-popover [data-pack-count-cancel]') : null;
         if (back) back.click();
         else closePackPopover();
         return;

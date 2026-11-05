@@ -12716,6 +12716,8 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
 [data-ui="modern"] .count-pop .count-pop-title,
 [data-ui="modern"] #pack-popover .count-pop .pack-eat-title { margin: 0 0 var(--space-2); color: var(--text); font-size: var(--fs-m); font-weight: var(--fw-heavy); }
 [data-ui="modern"] .count-pop .count-pop-note { margin: 0 0 var(--space-2); color: var(--text-muted); font-size: var(--fs-s); line-height: var(--lh-body); }
+/* A count the player cannot afford (Shake more: not enough energy for that many) says why, and OK is off. */
+[data-ui="modern"] .count-pop .count-pop-note.is-blocked { color: var(--danger); }
 [data-ui="modern"] .count-pop :is(.count-pop-step, .feed-picker-qty-row, .qty-row) { display: flex; align-items: center; justify-content: flex-start; gap: 6px; margin: 0; flex-wrap: nowrap; }
 [data-ui="modern"] .count-pop :is(.count-pop-dec, .count-pop-inc, .feed-picker-qty-step, .qty-row [data-vq="-"], .qty-row [data-vq="+"]) {
   flex: none;

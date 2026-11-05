@@ -18,7 +18,7 @@ import { createToolConditionState, repairToolCondition, setToolRemaining } from 
 import { HERDKEEPING, capturePiggy, normalizeHusbandryPack } from '../public/js/animal-husbandry.js?v=c78ee940';
 import { KITTY_PET, createKitty, petKitty } from '../public/js/heli-kitties.js?v=8fbe314a';
 import { createMusicblockState, playMusicblock } from '../public/js/musicblocks.js?v=f5adbf0c';
-import { runTransform } from '../public/js/item-transforms.js?v=596df9fe';
+import { runTransform } from '../public/js/item-transforms.js?v=f4f49729';
 import { applyTreePoison, performAntidotePour } from '../public/js/tree-poison.js?v=83953de2';
 import { createPlot, performPlotVerb } from '../public/js/patches.js?v=056bb6ae';
 import { doChore, neighbourById, normalizeNeighbourState } from '../public/js/neighbours.js?v=862857f9';

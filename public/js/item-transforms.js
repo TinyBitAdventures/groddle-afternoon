@@ -17,15 +17,21 @@
  *   2 seeds per herb (seed_failure per herb class), success_rate roll,
  *   bonus_chance x bonus_multiplier
  *
- * Every verb works on one item or the whole stack, like the source's count,
- * except Poke (is_single). The rows with `past` say what they did as the
+ * Every verb works on one item or on as many of the stack as the player asks,
+ * like the source's count, except Poke and Bundle (is_single). Report #101: the
+ * client's count chooser asked "Shake how many Butterfly Milks?" over the one
+ * stack it was opened on (InteractionMenuController.as 976-990, getCountChoices
+ * 1712-1747: All, Just One, a number field, x) and doVerb capped the count at the
+ * stack (main.js 3228-3234); the remake had only one or every one in the pack.
+ * The pack row is the verb for one, then "<Verb> more" opens the How many
+ * chooser (js/ui/count-chooser.js) up to the stack's count. The rows with `past` say what they did as the
  * source's buildVerbMessage (items/item.js 26-77): "You shook 3 Butterfly
  * Milks. <line> -6 Energy +3 Butterfly Butter", each effect in the handler's
  * order (energy, mood, then the item_give with its `gives` label; the poke
  * pushes no item_give, its createItem leaves nothing over).
  */
 
-import { addItem, countItem, ensureItem, removeItem } from './inventory.js?v=d82f3b00';
+import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from './inventory.js?v=d82f3b00';
 import { skillPackageDetails } from './skill-packages.js?v=bfb87281';
 import { metabolicGain, moodMax, loseEnergy, loseMood } from './metabolics.js?v=8504134e';
 
@@ -103,10 +109,46 @@ export function transformEdges() {
   return edges;
 }
 
-/** Pack buttons for one class: [{ id, label, enabled, reason, tooltip }]. */
-export function listTransformVerbs(classTsid, inv, pc, learned = []) {
+/**
+ * PURE: the most a How many chooser offers: the stack the menu is on (`stackCount`, or the whole pack
+ * when the menu is about the item), never more than the pack holds.
+ */
+export function transformCountMax(have, stackCount = null) {
+  const all = Math.max(0, Math.floor(Number(have) || 0));
+  const stack = Math.floor(Number(stackCount));
+  return Number.isFinite(stack) && stack > 0 ? Math.min(all, stack) : all;
+}
+
+/** The How many chooser of a verb (game.js renderPackPopover reads `count`). */
+function countRow(classTsid, id, label, max, plural, inv, pc, learned, tip, one) {
+  return {
+    id: `${id}:count`,
+    label: `${label} more`,
+    enabled: one.ok,
+    reason: one.msg || '',
+    tooltip: `Choose how many to ${label.toLowerCase()} (up to ${max})`,
+    count: {
+      max,
+      verb: label,
+      plural,
+      idPrefix: id,
+      quote: (n) => {
+        const check = transformCheck(classTsid, id, n, inv, pc, learned);
+        return { ok: check.ok, reason: check.msg || '', tip: tip(n) };
+      },
+    },
+  };
+}
+
+/**
+ * Pack buttons for one class: [{ id, label, enabled, reason, tooltip, count? }]. `opts.stackCount` is
+ * the stack the menu was opened on: "<Verb> more" asks how many of it (report #101).
+ */
+export function listTransformVerbs(classTsid, inv, pc, learned = [], opts = {}) {
   const have = countItem(inv, classTsid);
   if (have < 1) return [];
+  const max = transformCountMax(have, opts.stackCount);
+  const plural = ITEM_CATALOG[classTsid]?.namePlural || '';
   const out = [];
   for (const t of ITEM_TRANSFORMS[classTsid] || []) {
     const per = t.per || 1;
@@ -114,21 +156,26 @@ export function listTransformVerbs(classTsid, inv, pc, learned = []) {
     if (have < per) continue;
     const one = transformCheck(classTsid, t.id, 1, inv, pc, learned);
     out.push({ id: `${t.id}:1`, label: t.label, enabled: one.ok, reason: one.msg || '', tooltip: costTip(t, 1) });
-    if (have > 1 && !t.single) {
-      const all = transformCheck(classTsid, t.id, have, inv, pc, learned);
-      out.push({ id: `${t.id}:all`, label: `${t.label} all ${have}`, enabled: all.ok, reason: all.msg || '', tooltip: costTip(t, have) });
+    const most = Math.floor(max / per);
+    if (most > 1 && !t.single) {
+      out.push(countRow(classTsid, t.id, t.label, most, t.names?.[2] || plural, inv, pc, learned, (n) => costTip(t, n), one));
     }
   }
   if (HERB_SEEDS[classTsid]) {
     const one = transformCheck(classTsid, 'shuck', 1, inv, pc, learned);
     const energy = shuckDetails(learned).energy;
     out.push({ id: 'shuck:1', label: 'Shuck', enabled: one.ok, reason: one.msg || '', tooltip: `Pull the herb vigorously, destroying it but gaining seeds. Costs ${energy} energy.` });
-    if (have > 1) {
-      const all = transformCheck(classTsid, 'shuck', have, inv, pc, learned);
-      out.push({ id: 'shuck:all', label: `Shuck all ${have}`, enabled: all.ok, reason: all.msg || '', tooltip: `Costs ${energy * have} energy.` });
-    }
+    if (max > 1) out.push(countRow(classTsid, 'shuck', 'Shuck', max, plural, inv, pc, learned, (n) => `Costs ${energy * n} energy.`, one));
   }
   return out;
+}
+
+/** PURE: a transform pack verb id's count: `shake:1`, `shake:12`, `shake:all` (every one in the pack). */
+export function transformVerbCount(verbId) {
+  const raw = String(verbId || '').split(':')[1];
+  if (raw === 'all') return 'all';
+  const n = Math.floor(Number(raw));
+  return Number.isFinite(n) && n > 0 ? n : 1;
 }
 
 function costTip(t, n) {

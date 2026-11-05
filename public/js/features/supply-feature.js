@@ -52,7 +52,7 @@ import {
   stillEtaSeconds,
   stillRoom,
 } from '../machines.js?v=acfeb40f';
-import { HERB_SEEDS, ITEM_TRANSFORMS, listTransformVerbs, runTransform } from '../item-transforms.js?v=596df9fe';
+import { HERB_SEEDS, ITEM_TRANSFORMS, listTransformVerbs, runTransform, transformVerbCount } from '../item-transforms.js?v=f4f49729';
 import {
   BUREAUCRACY_ITEMS,
   HALL_STREETS,
@@ -355,15 +355,16 @@ function runMachineVerb(classTsid, verbId, engine) {
   return false;
 }
 
-function transformVerbs(classTsid, engine) {
+function transformVerbs(classTsid, engine, opts = {}) {
   if (!ITEM_TRANSFORMS[classTsid] && !HERB_SEEDS[classTsid]) return null;
-  return listTransformVerbs(classTsid, engine.inv, engine.pc, learned(engine));
+  return listTransformVerbs(classTsid, engine.inv, engine.pc, learned(engine), { stackCount: opts?.stackCount });
 }
 
 function runTransformVerb(classTsid, verbId, engine) {
   if (!ITEM_TRANSFORMS[classTsid] && !HERB_SEEDS[classTsid]) return false;
-  const [verb, count] = String(verbId).split(':');
-  const res = runTransform(classTsid, verb, count === 'all' ? 'all' : 1, engine.inv, engine.pc, learned(engine));
+  const [verb] = String(verbId).split(':');
+  // `<verb>:<n>` from the How many chooser (report #101), `:1`, or `:all` (the supply demo).
+  const res = runTransform(classTsid, verb, transformVerbCount(verbId), engine.inv, engine.pc, learned(engine));
   // G444: gandlevery.js 359-372: the seeds that landed count seeds_extracted (Shucks To Be You).
   if (res.ok && HERB_SEEDS[classTsid] && res.got > 0 && res.out) engine.achievement?.(`herb_seeds_extracted:${res.out}`, res.got);
   // items/item.js 719-739 notifyVerb after a handler that succeeded: quests count VERB:<class>:<verb>
@@ -502,7 +503,7 @@ export const supplyFeature = {
       const check = completePapersCheck(engine.inv, achievements(engine));
       return [{ id: 'complete', label: 'Complete', enabled: check.ok, reason: check.msg || '', tooltip: 'Fill these out and your papers will be "in order"', primary: check.ok }];
     }
-    return machineVerbs(classTsid, engine) || transformVerbs(classTsid, engine) || [];
+    return machineVerbs(classTsid, engine) || transformVerbs(classTsid, engine, opts) || [];
   },
 
   runPackVerb(classTsid, verbId, engine, opts = {}) {

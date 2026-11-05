@@ -23,13 +23,13 @@ import {
   advanceStill,
   collectHooch,
 } from '../public/js/machines.js?v=acfeb40f';
-import { runTransform, listTransformVerbs, transformEdges } from '../public/js/item-transforms.js?v=596df9fe';
+import { runTransform, listTransformVerbs, transformCountMax, transformEdges, transformVerbCount } from '../public/js/item-transforms.js?v=f4f49729';
 import { RECIPE_CATALOG, craftRecipe, loadRecipeCatalogFromFile } from '../public/js/making.js?v=621cd991';
 import { VENDOR_PROFILES } from '../public/js/vendor.js?v=c74e9e04';
 import { SEED_CATALOG } from '../public/js/garden.js?v=9c151062';
 import { obtainableItems } from '../tools/job-obtainable.mjs';
 import { supplyReport } from '../tools/supply-report.mjs';
-import { supplyFeature } from '../public/js/features/supply-feature.js?v=107a10bb';
+import { supplyFeature } from '../public/js/features/supply-feature.js?v=9a7e5dc5';
 
 const SPIKE = join(dirname(fileURLToPath(import.meta.url)), '..', 'public');
 const ENGINEER = ['engineering_1'];
@@ -188,7 +188,7 @@ describe('pack transforms', () => {
     const pc = { energy: 200, mood: 30 };
     const ids = listTransformVerbs('cheese_very_stinky', inv, pc).map((v) => v.id);
     assert.ok(ids.includes('poke:1') && !ids.includes('poke:all'), ids.join());
-    assert.ok(ids.includes('age:all'), 'age still takes the stack');
+    assert.ok(ids.includes('age:count'), 'age still asks how many of the stack');
     const poke = runTransform('cheese_very_stinky', 'poke', 1, inv, pc);
     assert.equal(poke.msg, "You poked a Very Stinky Cheese. After sticking an investigatory pinkie in the soft, gooey cheese, you encounter a hard object. You pull it out. It's a small shiny object with no intrinsic value! -10 Energy");
     const shake = runTransform('milk_butterfly', 'shake', 'all', inv, pc);
@@ -215,7 +215,55 @@ describe('pack transforms', () => {
     assert.equal(ok.got, 4);
     assert.equal(countItem(inv, 'herb_seed_rookswort'), 4);
     assert.equal(countItem(inv, 'rookswort'), 0);
-    assert.ok(listTransformVerbs('milk_butterfly', createInventory({ milk_butterfly: 2 }), { energy: 50 }).some((v) => v.id === 'shake:all'));
+    assert.ok(listTransformVerbs('milk_butterfly', createInventory({ milk_butterfly: 2 }), { energy: 50 }).some((v) => v.id === 'shake:count'));
+  });
+
+  it('report #101: Shake more asks how many of the stack (not every milk in the pack), and runs the count typed', () => {
+    // Three stacks of Butterfly Milk: 80 + 80 + 12. The menu opened on one full stack offers up to 80.
+    const inv = createInventory({ milk_butterfly: 172 });
+    const pc = { energy: 1000, mood: 100 };
+    const verbs = listTransformVerbs('milk_butterfly', inv, pc, [], { stackCount: 80 });
+    assert.deepEqual(verbs.map((v) => v.id), ['shake:1', 'shake:count']);
+    assert.ok(!verbs.some((v) => /all/i.test(v.label)), 'no "all" that reaches past the stack');
+    const more = verbs.find((v) => v.id === 'shake:count');
+    assert.equal(more.label, 'Shake more');
+    assert.deepEqual([more.count.max, more.count.verb, more.count.plural, more.count.idPrefix], [80, 'Shake', 'Butterfly Milks', 'shake']);
+    assert.deepEqual(more.count.quote(25), { ok: true, reason: '', tip: 'Make butter. Costs 50 energy.' });
+    // milk_butterfly.js shake 130: refused when energy <= 2 * count.
+    const tired = listTransformVerbs('milk_butterfly', inv, { energy: 41 }, [], { stackCount: 80 }).find((v) => v.id === 'shake:count');
+    assert.equal(tired.count.quote(20).ok, true);
+    assert.deepEqual(tired.count.quote(21), { ok: false, reason: "You don't have enough energy to do that.", tip: 'Make butter. Costs 42 energy.' });
+    // The small stack's menu stops at 12; a menu about the item as a whole (no stack) at the pack.
+    assert.equal(listTransformVerbs('milk_butterfly', inv, pc, [], { stackCount: 12 }).find((v) => v.count).count.max, 12);
+    assert.equal(listTransformVerbs('milk_butterfly', inv, pc).find((v) => v.count).count.max, 172);
+    // One in the stack: just the one verb, no chooser.
+    assert.deepEqual(listTransformVerbs('milk_butterfly', inv, pc, [], { stackCount: 1 }).map((v) => v.id), ['shake:1']);
+    assert.deepEqual([transformCountMax(172, 80), transformCountMax(5, 80), transformCountMax(5), transformCountMax(5, 0)], [80, 5, 5, 5]);
+    assert.deepEqual(['shake:1', 'shake:37', 'shake:all', 'shake:count', 'shake:x'].map(transformVerbCount), [1, 37, 'all', 1, 1]);
+    // OK on 37 shakes 37: the pack verb takes the typed count.
+    const events = [];
+    const engine = { inv, pc, learnedSkills: [], achievement: (c, n) => events.push([c, n]), updateHud() {}, say() {}, toast() {}, pushActivity() {} };
+    assert.equal(supplyFeature.runPackVerb('milk_butterfly', 'shake:37', engine), true);
+    assert.deepEqual([countItem(inv, 'milk_butterfly'), countItem(inv, 'butterfly_butter'), pc.energy], [135, 37, 926]);
+    assert.deepEqual(events, [['milk_butterfly:shake', 37], ['VERB:shake:milk_butterfly', 37]]);
+    // The feature passes the menu's stack through (game.js renderPackPopover opts.stackCount).
+    const offered = supplyFeature.packVerbs('milk_butterfly', engine, { stackCount: 80 });
+    assert.equal(offered.find((v) => v.count).count.max, 80);
+    // Shuck, Compress and Age share the chooser; Poke and Bundle stay one at a time.
+    assert.ok(listTransformVerbs('rookswort', createInventory({ rookswort: 9 }), pc, [], { stackCount: 9 }).some((v) => v.id === 'shuck:count' && v.count.max === 9));
+    assert.ok(!listTransformVerbs('cheese_very_stinky', createInventory({ cheese_very_stinky: 9 }), pc).some((v) => v.id === 'poke:count'));
+  });
+
+  it('report #101: the pack menu draws the How many for a verb with count, in both interfaces', () => {
+    const game = readFileSync(join(SPIKE, 'game.js'), 'utf8');
+    assert.match(game, /features\.packVerbs\(classTsid, engine, \{ \.\.\.verbCopy, stackCount \}\)/);
+    assert.match(game, /data-feature-pack-count=/);
+    assert.match(game, /countStepMarkup\(\{ value: packCountQty, max: countMax, verb: verbWord, attrs: \{ dec: 'data-pack-count-dec', inc: 'data-pack-count-inc', num: 'data-pack-count-num', max: 'data-pack-count-max' \} \}\)/);
+    assert.match(game, /bindCountField\(pop\.querySelector\('\[data-pack-count-num\]'\)/);
+    assert.match(game, /const runId = `\$\{countVerb\.count\.idPrefix \|\| countVerb\.id\}:\$\{count\}`;/);
+    const classic = readFileSync(join(SPIKE, 'css/classic.css'), 'utf8');
+    assert.match(classic, /:root\[data-ui="classic"\] \[data-pack-count-panel\]/);
+    assert.match(classic, /\[data-pack-count-confirm\]/);
   });
 
   it('every transform output and shucked herb has a seed in the garden', () => {
