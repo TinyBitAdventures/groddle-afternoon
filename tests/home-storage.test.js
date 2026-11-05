@@ -357,6 +357,9 @@ describe('#108: a bag goes into a cabinet whole and comes back whole (CabinetDia
     assert.match(feature, /if \(held\) engine\.query\?\.\('packBagLeaves', held\.key\);/);
     // A key-holder moves only empty bags.
     assert.match(feature, /if \(slotHoldsBag\(s\)\) \{\n\s+win\.handle\.note\(T\.ownerBags, true\);/);
+    // A bag that can't come back after all stays in its slot as it was (a copy from before the take).
+    assert.match(feature, /const keep = JSON\.parse\(JSON\.stringify\(s\)\);\n\s+const out = cabinetTake\(row\.contents, cls, 1, \{ slot \}\);/);
+    assert.match(feature, /row\.contents\[slot\] = keep;/);
   });
 
   it('a correction takes from inside a stored bag first and spills the rest when the bag goes (js/ledger-house.js)', () => {

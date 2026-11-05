@@ -617,14 +617,15 @@ function cabinetTakeToPack(engine, slot, n) {
       win.handle.note(T.noRoom, true);
       return 0;
     }
+    const keep = JSON.parse(JSON.stringify(s));
     const out = cabinetTake(row.contents, cls, 1, { slot });
     if (!out.taken) return 0;
     ensureItem(cls);
     for (const c of contents) ensureItem(c.cls);
     const res = engine.query('packGiveBag', cls, contents, engine, out.name || '');
     if (!res?.ok) {
-      // It didn't fit after all: it stays in its slot.
-      row.contents[slot] = s;
+      // It didn't fit after all: it stays in its slot, as it was.
+      row.contents[slot] = keep;
       win.handle.note(T.noRoom, true);
       return 0;
     }
