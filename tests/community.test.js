@@ -267,7 +267,7 @@ describe('who may read the kept chat (src/ChatHistory.php)', { skip: skipWithout
     assert.match(c, /->withHeader\('Cache-Control', 'private, no-store'\)->withHeader\('X-Robots-Tag', 'noindex'\)/);
     // The page draws the channels only for a signed-in reader; a visitor gets the sign-in line alone.
     const pages = src('src/CommunityPages.php');
-    assert.match(pages, /\$channels = \$viewer\['id'\] > 0\s*\? \$this->channelsPanel\(\$viewer\)/);
+    assert.match(pages, /\$channels = \$viewer\['id'\] > 0\s*\? \$this->channelsPanel\(\$viewer, /);
     assert.match(pages, /'channelsSignedOut' => 'Sign in to see what players are saying in the game\.'/);
     assert.doesNotMatch(src('src/SocialTags.php'), /ChatHistory|chat_lines/);
     // Presence and the chat app's people and setting: signed-in players only (Austin 2026-11-04).
@@ -412,7 +412,7 @@ describe('the chat app\'s header, its bell and its right-click menus (/chat/, Au
     }
     assert.match(foot, />fan remake<\/a> of Tiny Speck’s Glitch · <a href="\/credits\/">Credits<\/a> · <a href="\/privacy-policy\/">Privacy<\/a><\/p>$/);
     assert.match(pages, /'<div class="cx-rail"><nav class="cx-rail-list" aria-label="Community">' \. \$rail \. '<\/nav>' \. self::RAIL_FOOT \. '<\/div>'/, 'drawn for every reader');
-    assert.match(pages, /\$this->shell\(\$community, \$viewer, \$viewer\['id'\] > 0 \? 'chan' : 'boards', \$channels, 'list'\)/, 'a phone opens /chat/ on the rail');
+    assert.match(pages, /\$this->shell\(\$community, \$viewer, \$viewer\['id'\] > 0 \? 'chan' : 'boards', \$channels, 'list', \[\], is_string\(\$asked\) \? \$asked : ''\)/, 'a phone opens /chat/ on the rail (the channel asked for marked)');
     // The page never scrolls; the app fills what the header leaves; its parts scroll inside themselves.
     const css = src('community/community.css').replace(/\/\*[\s\S]*?\*\//g, '');
     const rule = (sel) => { const i = css.indexOf(`\n${sel} {`); assert.ok(i >= 0, sel); return css.slice(i, css.indexOf('}', i)); };
