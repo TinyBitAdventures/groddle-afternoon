@@ -17,6 +17,7 @@ import {
   quoteShrineDonation,
   resetShrineDay,
 } from '../public/js/shrines.js?v=95d74174';
+import { GIANT_NAMES, giantDisplayName } from '../public/js/giant-names.js?v=0e295891';
 
 const publicRoot = join(import.meta.dirname, '..', 'public');
 
@@ -199,5 +200,44 @@ describe('emblem hitbox (2012-09-22: a waiting emblem is given as you walk past)
     assert.match(src, /entered && !isScreenFxBlocking\(\) && canClaimEmblem\(shrineState, target\.state\?\.giantId\)/);
     // The movement runs in sub-steps (js/avatar-step.js frameSteps); the walk-by check after them.
     assert.match(src, /physics\(step\);\n\s+\}\n\s+tickAvatarAfk\(\);\n\s+updateShrineWalkBy\(\);/);
+  });
+});
+
+describe('Giant names players read (report #102)', () => {
+  it('giant-names.js has every shrine Giant under the same name as GIANTS, and Ti reads Tii', () => {
+    for (const [id, giant] of Object.entries(GIANTS)) assert.equal(GIANT_NAMES[id], giant.name, id);
+    assert.equal(GIANTS.ti.name, 'Tii');
+    assert.equal(giantDisplayName('ti'), 'Tii');
+    assert.equal(giantDisplayName('tii'), 'Tii');
+    assert.equal(giantDisplayName('Ti'), 'Tii');
+    assert.equal(giantDisplayName('humbaba'), 'Humbaba');
+    assert.equal(giantDisplayName('rook'), 'Rook');
+    assert.equal(giantDisplayName(''), '');
+  });
+
+  it('no message capitalizes a giant id itself (the way "Ti" reached the loading card)', () => {
+    const files = [
+      'js/exploration.js', 'js/drop-tables.js', 'js/hell.js', 'js/puzzle-triggers.js', 'js/secret-spots.js',
+      'js/item-verbs-more.js', 'js/giant-icons.js', 'js/features/rook-attack-feature.js',
+      'js/features/street-jobs-feature.js', 'js/features/giant-icons-feature.js', 'js/quests.js', 'js/feats-mp.js', 'game.js',
+    ];
+    const capitalized = /(?:\bcapitalize(?:First)?\((?:street\.shrineGiant|f\.giant|giant|giantId|face)\)|\b(?:giant|giantId|f\.giant|id)(?:\.charAt\(0\)|\[0\])\.toUpperCase\(\)|\$\{(?:f\.giant|rewardDef\.giantId)(?: \|\| '\w+')?\} favor)/;
+    for (const file of files) {
+      const src = readFileSync(join(publicRoot, file), 'utf8');
+      assert.doesNotMatch(src, capitalized, file);
+    }
+  });
+
+  it('the favor, dice, grave and emblem lines say Tii', async () => {
+    const { capitalizeGiant } = await import('../public/js/secret-spots.js?v=59a37384');
+    const { dieOutcome } = await import('../public/js/item-verbs-more.js?v=ad7b8d03');
+    const { graveRecognitionText } = await import('../public/js/hell.js?v=aca145ba');
+    const { emblemVerbCheck } = await import('../public/js/giant-icons.js?v=0d6b4965');
+    assert.equal(capitalizeGiant('ti'), 'Tii');
+    assert.equal(dieOutcome({ mood: 100, energy: 100 }, 'ti').line, 'rolled "Tii"');
+    assert.match(graveRecognitionText('mourn', 'Someone', 'ti', 5), /favor with Tii, who is pleased/);
+    const { GIANT_ICON_DATA } = await import('../public/js/giant-icons-data.js?v=5026b09c');
+    const used = { used: { [`${GIANT_ICON_DATA.ti.emblemClass}:caress`]: 1 } };
+    assert.equal(emblemVerbCheck(used, 'ti', 'caress').msg, "You've already caressed an Emblem of Tii today.");
   });
 });

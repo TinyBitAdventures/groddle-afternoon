@@ -56,7 +56,7 @@ import { ITEM_CATALOG, addItem, countItem } from '../inventory.js?v=d82f3b00';
 import { setToolRemaining, toolCopies } from '../tools.js?v=6684b484';
 import { isItemFloor, platformYAt } from '../street-model.js?v=505d8990';
 import { hiresSpriteUrl } from '../sprite-hires.js?v=3f97bf07';
-import { rollResourceNodeDrop } from './drops-feature.js?v=fffa1f9e';
+import { rollResourceNodeDrop } from './drops-feature.js?v=43984e8f';
 import { slugsFromEffects } from '../speech-slugs.js?v=130338f9';
 import { resourceNodeResponseKey, verbResponse } from '../verb-responses.js?v=3ceb8a8c';
 import { rollSlothBonusSnails } from '../imagination-effects.js?v=70169933';
@@ -87,7 +87,7 @@ import {
   tickResourceNode,
 } from '../resource-nodes.js?v=c14bd6d8';
 import { frameTexture as sheetFrameTexture, loadTexture, textureFromUrl } from '../textures.js?v=3149d699';
-import { acceptOffer, markOffered, npcQuestOffers, putOffOffer, questStatus } from '../quest-offers.js?v=33c0e39f';
+import { acceptOffer, markOffered, npcQuestOffers, putOffOffer, questStatus } from '../quest-offers.js?v=8599dbf9';
 import { vpSequence } from '../quest-rooms/vp-overlay.js?v=b231d65a';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
 

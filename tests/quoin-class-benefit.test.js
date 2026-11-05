@@ -22,7 +22,7 @@ import {
   streetQuoinClass,
 } from '../public/js/quoins.js?v=dfe1ff0a';
 import { setMetabolicGainGate } from '../public/js/metabolics.js?v=8504134e';
-import { applyDropResult, createDropResult } from '../public/js/drop-tables.js?v=0f922478';
+import { applyDropResult, createDropResult } from '../public/js/drop-tables.js?v=16e12632';
 import { applyBuff, createBuffState, tickBuffs } from '../public/js/buffs.js?v=036fee53';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=10b118dd';
 import { applyVerbReward } from '../public/js/verb-rewards.js?v=d3ce41d5';

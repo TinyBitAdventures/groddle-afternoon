@@ -19,7 +19,7 @@ import {
   rewardChips,
   rewardIcon,
 } from '../public/js/ui/moment-card.js?v=077703c8';
-import { awardRewardTokens } from '../public/js/screen-fx.js?v=9d4640eb';
+import { awardRewardTokens } from '../public/js/screen-fx.js?v=428f4022';
 import { readTokens } from '../tools/tokens/css-sources.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');

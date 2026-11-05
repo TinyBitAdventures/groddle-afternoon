@@ -13,6 +13,7 @@
 import { getQuestCatalog } from './content-catalogs.js?v=10b118dd';
 import { questRewardModifier } from './imagination-effects.js?v=70169933';
 import { metabolicGain, moodMax } from './metabolics.js?v=8504134e';
+import { giantDisplayName } from './giant-names.js?v=0e295891';
 
 /**
  * @typedef {{
@@ -307,10 +308,7 @@ function questRewardRows(bucket) {
   return Array.isArray(bucket) ? bucket : Object.values(bucket);
 }
 
-const giantLabel = (giant) => {
-  const id = String(giant || '');
-  return id ? id[0].toUpperCase() + id.slice(1) : id;
-};
+const giantLabel = (giant) => giantDisplayName(giant || '');
 
 /**
  * Reward lines for the award screen (screen-fx.js awardRewardTokens reads the

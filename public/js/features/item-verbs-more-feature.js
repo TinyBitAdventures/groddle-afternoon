@@ -47,7 +47,7 @@ import { GENTLE_ISLAND_TSIDS, isNewxpSceneTsid } from '../newxp.js?v=249fdf4c';
 import { SKILLQUEST_AK_TSID } from '../skillquest-ak.js?v=281b956d';
 import { getToolCondition, migrateClassValue, setToolRemaining, TOOL_CONDITION_CATALOG, toolCopies, useToolCondition } from '../tools.js?v=6684b484';
 import { copyChargesLeft, keepsCopies, spendCopyCharge, verbCopy } from '../copy-charges.js?v=39c41fb0';
-import { HERDKEEPING, hogtieEscapeDelayMs, husbandryPack } from '../animal-husbandry.js?v=b9be6584';
+import { HERDKEEPING, hogtieEscapeDelayMs, husbandryPack } from '../animal-husbandry.js?v=c78ee940';
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=db7c442f';
 import { sourceFromUrl, frameTexture } from '../textures.js?v=3149d699';
 import { landingY, walkSurfaceY } from '../walk-surface.js?v=c982983e';
@@ -114,7 +114,7 @@ import {
   trophySmash,
   vvSniffButton,
   JUJU_POWDER,
-} from '../item-verbs-more.js?v=ca6cc8aa';
+} from '../item-verbs-more.js?v=ad7b8d03';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
 
 export const ITEM_VERBS_MORE_FEATURE_ID = 'item-verbs-more';

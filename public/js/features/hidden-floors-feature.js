@@ -55,7 +55,7 @@ import {
   isMissingFloorTsid,
   teleportersOn,
 } from '../hidden-floors.js?v=d49b76df';
-import { narakaTeleportersOn } from '../hell.js?v=52b4fcfc';
+import { narakaTeleportersOn } from '../hell.js?v=aca145ba';
 import { wintryPortalTeleportersOn } from '../wintry-portal.js?v=1437deda';
 
 export const HIDDEN_FLOORS_FEATURE_ID = 'hidden-floors';

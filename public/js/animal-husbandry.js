@@ -35,7 +35,7 @@
  */
 
 import { ITEM_CATALOG, ensureItem, getItemUseInfo } from './inventory.js?v=d82f3b00';
-import { DROP_TABLES, applyDropResult, rollDropTable } from './drop-tables.js?v=0f922478';
+import { DROP_TABLES, applyDropResult, rollDropTable } from './drop-tables.js?v=16e12632';
 import { loseEnergy, loseMood, metabolicGain, moodMax } from './metabolics.js?v=8504134e';
 import { grantMoodXp } from './mood-xp.js?v=958e7680';
 import { musicblockItemMeta } from './musicblocks.js?v=f5adbf0c';

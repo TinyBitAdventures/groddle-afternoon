@@ -63,6 +63,7 @@ import { bindCountField, countKeyValue, countStepMarkup } from '../ui/count-choo
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=db7c442f';
 import { landingY, nearestSurfaceY } from '../walk-surface.js?v=c982983e';
 import { donationValueFor } from '../shrines.js?v=95d74174';
+import { giantDisplayName } from '../giant-names.js?v=0e295891';
 import { TRANT_META, trantStatusLabel } from '../trants.js?v=9c2e8c0f';
 import {
   FOREHORSEMAN_LINES,
@@ -2703,7 +2704,7 @@ function mpOfferOptions(engine, giantId) {
     if (!(n > 0)) continue;
     // An emblem carries no catalog row until one is claimed at a shrine this session (shrines.js claimEmblem).
     const own = classTsid === `emblem_${giantId}`;
-    const meta = ITEM_CATALOG[classTsid] || (own ? { label: `Emblem of ${giantId.charAt(0).toUpperCase()}${giantId.slice(1)}`, tags: ['emblem'] } : null);
+    const meta = ITEM_CATALOG[classTsid] || (own ? { label: `Emblem of ${giantDisplayName(giantId)}`, tags: ['emblem'] } : null);
     if (!offerAllowed(classTsid, meta, giantId)) continue;
     const emblem = classTsid === `emblem_${giantId}`;
     const base = donationValueFor(classTsid);

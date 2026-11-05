@@ -15,7 +15,7 @@ import {
   rewardBits,
   stepTriggers,
   triggerHit,
-} from '../public/js/puzzle-triggers.js?v=114b052b';
+} from '../public/js/puzzle-triggers.js?v=b341f855';
 import {
   createEventRuntime,
   dueEventTimers,
@@ -67,7 +67,7 @@ describe('puzzle trigger rules', () => {
     const def = { reward: { xp: 250, energy: 100, favor: [{ giant: 'ti', points: 50 }] } };
     assert.ok(completionReward(def, { completed: {} }, 'G1'));
     assert.equal(completionReward(def, { completed: { G1: 1 } }, 'G1'), null);
-    assert.deepEqual(rewardBits(def.reward), ['+250 iMG', '+100 energy', '+50 Ti favor']);
+    assert.deepEqual(rewardBits(def.reward), ['+250 iMG', '+100 energy', '+50 Tii favor']);
     assert.deepEqual(normalizePuzzleSave({ completed: { GABC: 2, bad: 3 }, returnTo: { tsid: 'GX', x: 1 } }), {
       completed: { GABC: 2 },
       best: {},

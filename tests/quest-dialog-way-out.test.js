@@ -23,12 +23,12 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=10b118dd';
-import { createQuestState } from '../public/js/quests.js?v=2ce7b3cb';
-import { markOffered, waitingOffers } from '../public/js/quest-offers.js?v=33c0e39f';
-import { questOffersFeature, EMERGENCY_SNOOZE_MS } from '../public/js/features/quest-offers-feature.js?v=aab56fa8';
-import { hellTicketsFeature } from '../public/js/features/hell-tickets-feature.js?v=79463da6';
-import { hellFeature } from '../public/js/features/hell-feature.js?v=4c54964f';
-import { HELL_LOCATION, createHellState, croak } from '../public/js/hell.js?v=52b4fcfc';
+import { createQuestState } from '../public/js/quests.js?v=c8d9d0a4';
+import { markOffered, waitingOffers } from '../public/js/quest-offers.js?v=8599dbf9';
+import { questOffersFeature, EMERGENCY_SNOOZE_MS } from '../public/js/features/quest-offers-feature.js?v=c6f19dc4';
+import { hellTicketsFeature } from '../public/js/features/hell-tickets-feature.js?v=d13c2b58';
+import { hellFeature } from '../public/js/features/hell-feature.js?v=13196575';
+import { HELL_LOCATION, createHellState, croak } from '../public/js/hell.js?v=aca145ba';
 
 const root = join(import.meta.dirname, '..');
 const read = (rel) => readFileSync(join(root, rel), 'utf8');

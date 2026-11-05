@@ -19,6 +19,7 @@
 
 import { grantMoodXp } from './mood-xp.js?v=958e7680';
 import { gainMetabolic, loseEnergy, loseMood } from './metabolics.js?v=8504134e';
+import { giantDisplayName } from './giant-names.js?v=0e295891';
 
 /* ------------------------------------------------------------------ */
 /* Names and the activity line                                          */
@@ -521,8 +522,8 @@ export function pairOutcome(left, right) {
   return { total, toys: total >= 9 ? 2 : 0, line: `rolled a ${total} (${left} and a ${right})` };
 }
 
-/** capitalize(giant) (common.js): "Ti", not the potion's "Tii". */
-export const dieFaceName = (face) => capitalize(face);
+/** The source's common.js capitalize printed "Ti" for the Tii face; the remake says Tii (giant-names.js). */
+export const dieFaceName = (face) => giantDisplayName(face);
 
 /**
  * onDiceRollLand 192-228: a Giant face only announces it; a Rook is

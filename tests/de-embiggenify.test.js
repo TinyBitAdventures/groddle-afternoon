@@ -37,7 +37,7 @@ import {
   findSmallWorthless,
 } from '../public/js/de-embiggenify.js?v=7ff7ffba';
 import { jumpApex, NORMAL_BUFF } from '../public/js/avatar-step.js?v=d48908a5';
-import { SOURCE_PHYSICS, triggerHit } from '../public/js/puzzle-triggers.js?v=114b052b';
+import { SOURCE_PHYSICS, triggerHit } from '../public/js/puzzle-triggers.js?v=b341f855';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const LOCATIONS = path.join(root, '../streets/mnt/stos/location_data');

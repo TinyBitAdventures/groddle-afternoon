@@ -37,6 +37,8 @@
  *   index was 0) and puts a space before "You gain".
  */
 
+import { giantDisplayName } from './giant-names.js?v=0e295891';
+
 export const ELEVEN_GROUP = 'eleven_secret_locations';
 export const ELEVEN_BADGE = 'eleven_secret_locations';
 export const ELEVEN_TOTAL = 11;
@@ -445,9 +447,9 @@ export function progressText(count) {
   return `You stumbled on another unique cluster of genetic dust, triggering a DNA deja vu... (${count}/11)`;
 }
 
-/** common.js capitalize. */
+/** The Giant's name (common.js capitalize in the source, which printed Ti; giant-names.js says Tii). */
 export function capitalizeGiant(giant) {
-  return String(giant || '').replace(/\w+/g, (a) => a.charAt(0).toUpperCase() + a.slice(1).toLowerCase());
+  return giantDisplayName(giant || '');
 }
 
 /**

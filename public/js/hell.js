@@ -47,6 +47,7 @@
 
 import { ensureItem } from './inventory.js?v=d82f3b00';
 import { GAME_DAY_MS, getGameDayKey, getGameDayStartMs } from './game-day.js?v=edb00566';
+import { giantDisplayName } from './giant-names.js?v=0e295891';
 
 export const HELL_STATE_VERSION = 1;
 
@@ -1380,7 +1381,7 @@ export function graveRecognitionText(type, ownerLabel, giant = 'generic', favor 
     ? `You mourn the passing of ${ownerLabel}. They have departed from this vale of tears only too soon, and we will not see their like again.`
     : `You celebrate the life of ${ownerLabel}. They were a good Glitch, a kind Glitch, and they left this world a better place than they found it.`;
   if (!giant || giant === 'generic') return base;
-  const name = giant.charAt(0).toUpperCase() + giant.slice(1);
+  const name = giantDisplayName(giant);
   return `${base} You receive ${favor} favor with ${name}, who is pleased by the respect you have shown.`;
 }
 

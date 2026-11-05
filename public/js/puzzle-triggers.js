@@ -22,6 +22,8 @@
  * }
  */
 
+import { giantDisplayName } from './giant-names.js?v=0e295891';
+
 export const PUZZLE_DATA_URL = 'assets/content/puzzle-triggers.json';
 
 /**
@@ -168,7 +170,7 @@ export function rewardBits(r) {
   if (r.currants) bits.push(`+${r.currants.toLocaleString()} currants`);
   if (r.energy) bits.push(`+${r.energy.toLocaleString()} energy`);
   if (r.mood) bits.push(`+${r.mood.toLocaleString()} mood`);
-  for (const f of r.favor || []) bits.push(`+${f.points} ${f.giant[0].toUpperCase()}${f.giant.slice(1)} favor`);
+  for (const f of r.favor || []) bits.push(`+${f.points} ${giantDisplayName(f.giant)} favor`);
   return bits;
 }
 

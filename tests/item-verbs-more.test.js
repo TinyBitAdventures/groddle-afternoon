@@ -50,8 +50,8 @@ import {
   trophySmash,
   verbMessage,
   vvSniffButton,
-} from '../public/js/item-verbs-more.js?v=ca6cc8aa';
-import { itemVerbsMoreFeature, runMoreVerb, eatLicoriceNow } from '../public/js/features/item-verbs-more-feature.js?v=3f45f8bf';
+} from '../public/js/item-verbs-more.js?v=ad7b8d03';
+import { itemVerbsMoreFeature, runMoreVerb, eatLicoriceNow } from '../public/js/features/item-verbs-more-feature.js?v=0736847f';
 import {
   LETTER_WEIGHTS,
   POTIONS,
@@ -71,8 +71,8 @@ import {
   wisdomCheck,
   wisdomMessage,
 } from '../public/js/potions.js?v=c21bad59';
-import { potionsFeature, usePotionNow, pourSauce } from '../public/js/features/potions-feature.js?v=f8b212e5';
-import { husbandryPack } from '../public/js/animal-husbandry.js?v=b9be6584';
+import { potionsFeature, usePotionNow, pourSauce } from '../public/js/features/potions-feature.js?v=813c749f';
+import { husbandryPack } from '../public/js/animal-husbandry.js?v=c78ee940';
 import { XP_FOR_LEVEL } from '../public/js/progression.js?v=33462eaa';
 import { moodScaledXp } from '../public/js/mood-xp.js?v=958e7680';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=10b118dd';
@@ -345,7 +345,7 @@ describe('G420 / G421 dice', () => {
     const r = dieOutcome(pc, 'rook', { rng: () => 0.1, rookable: true });
     assert.deepEqual([pc.mood, r.toys, r.attack, r.moodLine], [30, 3, true, 'You lose 50 mood for attracting the rook.']);
     assert.equal(dieOutcome(pcAt(), 'rook', { rng: () => 0.2, rookable: true }).attack, false);
-    assert.equal(dieOutcome(pcAt(), 'ti').line, 'rolled "Ti"');
+    assert.equal(dieOutcome(pcAt(), 'ti').line, 'rolled "Tii"');
   });
   it('the pair: the street hears the total; 9 or more is toys +2 (dice.js 156-167)', () => {
     assert.deepEqual(pairOutcome(4, 5), { total: 9, toys: 2, line: 'rolled a 9 (4 and a 5)' });

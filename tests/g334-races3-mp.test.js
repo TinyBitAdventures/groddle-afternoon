@@ -15,12 +15,12 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import { loadContentCatalogsFromDir, getQuestCatalog } from '../public/js/content-catalogs.js?v=10b118dd';
-import { createQuestState } from '../public/js/quests.js?v=2ce7b3cb';
-import { pendingQuestOffers } from '../public/js/quest-offers.js?v=33c0e39f';
+import { createQuestState } from '../public/js/quests.js?v=c8d9d0a4';
+import { pendingQuestOffers } from '../public/js/quest-offers.js?v=8599dbf9';
 import { MP_RACE_QUESTS, MULTIPLAYER_QUESTS, offerableMultiplayerQuest } from '../public/js/quests-mp.js?v=2beb658a';
-import { questOffersFeature } from '../public/js/features/quest-offers-feature.js?v=aab56fa8';
+import { questOffersFeature } from '../public/js/features/quest-offers-feature.js?v=c6f19dc4';
 import { HUB_MAP_STREETS } from '../public/js/hub-maps-data.js?v=ffe222f1';
-import { HELL_LOCATION } from '../public/js/hell.js?v=52b4fcfc';
+import { HELL_LOCATION } from '../public/js/hell.js?v=aca145ba';
 import { HOG_MP_COURSE } from '../public/js/hog-haul-mp.js?v=d8605396';
 import { CROWNS_TICKET } from '../public/js/game-of-crowns.js?v=e32f35f5';
 import { economyCredits } from '../tools/build-economy.mjs';
@@ -161,7 +161,7 @@ describe('the dead do not race', () => {
   });
 
   it('a race_match that reaches a dead page is left at once (races-feature)', async () => {
-    const { racesFeature } = await import('../public/js/features/races-feature.js?v=8ab676cd');
+    const { racesFeature } = await import('../public/js/features/races-feature.js?v=d0ac52b0');
     const client = fakeClient(7);
     const toasts = [];
     const engine = {

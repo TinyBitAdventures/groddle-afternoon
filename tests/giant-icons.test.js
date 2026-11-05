@@ -26,7 +26,7 @@ import {
   titheCost,
   titheIcon,
   useEmblem,
-} from '../public/js/giant-icons.js?v=4639df55';
+} from '../public/js/giant-icons.js?v=0d6b4965';
 import { remakeStatus } from '../public/js/imagination-remake.js?v=c37ad887';
 // The key every importer uses (giant-icons-feature.js too): one module, one record.
 import { CONVERSATION_RULES, conversationRecord, hasCompleted, resetConversationRecord, restoreConversationRecord } from '../public/js/conversations.js?v=7cbdfea4';
@@ -260,7 +260,7 @@ describe('icon conversations (G202: the shared record)', () => {
   });
 
   it('a version 1 save hands its talked list to the record once, in either restore order', async () => {
-    const { giantIconsFeature } = await import('../public/js/features/giant-icons-feature.js?v=c3ebf7ef');
+    const { giantIconsFeature } = await import('../public/js/features/giant-icons-feature.js?v=920a0d00');
     const old = { version: 1, talked: ['icon_humbaba_1', 'icon_alph_1'] };
     const saved = { completed: { npc_chicken: { chickens_cautionary_tales_1: 700 } } };
     const t0 = Date.now();
@@ -299,7 +299,7 @@ describe('imagination cards', () => {
 
 describe('giant icons feature', () => {
   it('offers the source pack verbs and iconizes through the engine', async () => {
-    const { giantIconsFeature } = await import('../public/js/features/giant-icons-feature.js?v=c3ebf7ef');
+    const { giantIconsFeature } = await import('../public/js/features/giant-icons-feature.js?v=920a0d00');
     giantIconsFeature._reset();
     const events = [];
     const granted = [];
@@ -332,7 +332,7 @@ describe('giant icons feature', () => {
   });
 
   it('Caress adds mood up to the real limit and never takes any away; the popup says what landed (ticket 48)', async () => {
-    const { giantIconsFeature } = await import('../public/js/features/giant-icons-feature.js?v=c3ebf7ef');
+    const { giantIconsFeature } = await import('../public/js/features/giant-icons-feature.js?v=920a0d00');
     giantIconsFeature._reset();
     const toasts = [];
     const engine = {

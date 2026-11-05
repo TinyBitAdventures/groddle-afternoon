@@ -54,7 +54,7 @@ import {
   respawnPoint,
   rewardBits,
   stepTriggers,
-} from '../puzzle-triggers.js?v=114b052b';
+} from '../puzzle-triggers.js?v=b341f855';
 import { energyMax, metabolicGain, moodMax } from '../metabolics.js?v=8504134e';
 import { isLoaded, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js?v=3149d699';
 

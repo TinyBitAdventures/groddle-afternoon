@@ -18,6 +18,7 @@ import { DROP_ITEMS, DROP_TABLES } from './drop-tables-data.js?v=c51a6400';
 import { skillPackageDetails } from './skill-packages.js?v=bfb87281';
 import { grantMoodXp } from './mood-xp.js?v=958e7680';
 import { metabolicGain } from './metabolics.js?v=8504134e';
+import { giantDisplayName } from './giant-names.js?v=0e295891';
 
 export { DROP_ITEMS, DROP_TABLES };
 
@@ -93,7 +94,6 @@ export function rollPackageDrop(packageId, ctx = {}) {
   };
 }
 
-const capitalize = (s) => String(s || '').charAt(0).toUpperCase() + String(s || '').slice(1);
 const pluralize = (n, single, plural) => (n === 1 ? `1 ${single}` : `${n} ${plural}`);
 
 export function dropItemName(classTsid, qty, meta = DROP_ITEMS[classTsid]) {
@@ -134,7 +134,7 @@ export function applyDropResult(result, target = {}) {
       }
     }
     landed.favor += total;
-    lines.push(`You got ${f.points} favor with ${f.giant === 'all' ? 'all the Giants' : capitalize(f.giant)}!`);
+    lines.push(`You got ${f.points} favor with ${f.giant === 'all' ? 'all the Giants' : giantDisplayName(f.giant)}!`);
   }
   // G227: runDropTable adds through metabolics_add_mood / _energy
   // (inc_skill_packages.js 85, 96), refused while dead or (energy) Super Pooped,

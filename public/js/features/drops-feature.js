@@ -46,7 +46,7 @@ import {
   rollDropTable,
   rollPackageDrop,
   tableItemOdds,
-} from '../drop-tables.js?v=0f922478';
+} from '../drop-tables.js?v=16e12632';
 
 export const DROPS_FEATURE_ID = 'drops';
 const BATCH_GAP_MS = 4000;

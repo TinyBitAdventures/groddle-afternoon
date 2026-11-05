@@ -11,16 +11,16 @@ import {
   createAchievementState,
   applyAchievementProgress,
   groupLabelCount,
-} from '../public/js/achievements.js?v=ad0b5a5a';
+} from '../public/js/achievements.js?v=f8ccfd34';
 import { loadContentCatalogsFromDir, getAchievementCatalog } from '../public/js/content-catalogs.js?v=10b118dd';
-import { normalizeAchievementSnapshot } from '../public/js/player-save.js?v=5d620deb';
+import { normalizeAchievementSnapshot } from '../public/js/player-save.js?v=30ecb8d0';
 import {
   applyStreetVisit,
   availableHubStreets,
   countsTowardHub,
   hubMapStreetCount,
   streetVisitCounters,
-} from '../public/js/exploration.js?v=19c6758f';
+} from '../public/js/exploration.js?v=aa0bd00c';
 import { HUB_MAP_STREETS } from '../public/js/hub-maps-data.js?v=ffe222f1';
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -165,7 +165,7 @@ import {
   recordStreetEntry,
   streetFeaturesFromTargets,
   streetLoadingVisit,
-} from '../public/js/exploration.js?v=19c6758f';
+} from '../public/js/exploration.js?v=aa0bd00c';
 
 describe('location loading card (LoadingLocationView.as, location.js getLoadingInfo)', () => {
   it('formats time and ordinals like StringUtil', () => {
@@ -210,7 +210,7 @@ describe('location loading card (LoadingLocationView.as, location.js getLoadingI
       gardens: { herb: 6 },
     }), [
       'A <b>Hardware Vendor</b>.',
-      'A shrine dedicated to <b>Ti</b>.',
+      'A shrine dedicated to <b>Tii</b>.',
       'Plus <b>3 Piggies</b>, <b>1 Butterfly</b>, <b>2 Chickens</b>, <b>3 Bean Trees</b>, <b>1 Bubble Tree</b>, <b>2 Metal Rocks for mining</b>, and <b>6 Herb Garden plots</b>.',
     ]);
     assert.deepEqual(homeToFeatures({ vendor: 'Alchemical Goods Vendor' }), ['An <b>Alchemical Goods Vendor</b>.']);
@@ -218,6 +218,15 @@ describe('location loading card (LoadingLocationView.as, location.js getLoadingI
     assert.deepEqual(homeToFeatures({ counts: { npc_piggy: 8, npc_butterfly: 7, npc_chicken: 9 }, gardens: { herb: 36 } }),
       ['<b>8 Piggies</b>, <b>7 Butterflies</b>, <b>9 Chickens</b>, and <b>36 Herb Garden plots</b>.']);
     assert.deepEqual(homeToFeatures({}), []);
+  });
+
+  it('names a Tii shrine Tii on the loading card, not its id (report #102, Kura Kura)', () => {
+    for (const classId of ['npc_shrine_ti', 'npc_shrine_tii', 'npc_shrine_ix_ti', 'npc_shrine_uralia_tii']) {
+      const street = streetFeaturesFromTargets([{ classId }]);
+      assert.equal(street.shrineGiant, 'ti', classId);
+      assert.deepEqual(homeToFeatures(street), ['A shrine dedicated to <b>Tii</b>.'], classId);
+    }
+    assert.deepEqual(homeToFeatures({ shrineGiant: 'grendaline' }), ['A shrine dedicated to <b>Grendaline</b>.']);
   });
 
   it('counts the spawned targets', () => {

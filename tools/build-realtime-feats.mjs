@@ -46,7 +46,7 @@ import {
   TOP_PLACES,
   epicSizes,
   mpGoals,
-} from '../public/js/feats-mp.js?v=70ffb0f7';
+} from '../public/js/feats-mp.js?v=a1864075';
 
 export const OUT_SERVER = serverPath('data', 'feats.json');
 

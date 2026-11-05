@@ -13,7 +13,7 @@ import {
   rollDropTable,
   rollPackageDrop,
   tableItemOdds,
-} from '../public/js/drop-tables.js?v=0f922478';
+} from '../public/js/drop-tables.js?v=16e12632';
 import { remakeStatus } from '../public/js/imagination-remake.js?v=c37ad887';
 
 const seq = (...vals) => {
@@ -103,7 +103,7 @@ describe('paying drops', () => {
 
 describe('drops feature wiring', () => {
   it('maps world events and making batches to packages', async () => {
-    const { packageForEvent, rollResourceNodeDrop, RESOURCE_NODE_DROP_PACKAGES, dropsFeature } = await import('../public/js/features/drops-feature.js?v=fffa1f9e');
+    const { packageForEvent, rollResourceNodeDrop, RESOURCE_NODE_DROP_PACKAGES, dropsFeature } = await import('../public/js/features/drops-feature.js?v=43984e8f');
     const engine = { interactables: [], player: { x: 0, y: 0 } };
     assert.equal(packageForEvent('trant_bean:pet', engine), 'light_green_thumb_pet');
     assert.equal(packageForEvent('trant_egg:pet', engine), 'lgt_egg_plant_pet');

@@ -28,8 +28,8 @@ import { requireSite, sitePath } from './repos.mjs';
 export const OUT = sitePath('data', 'home-machines.json');
 
 export async function homeMachinesJson() {
-  const hm = await import('../public/js/home-machines.js?v=e6b6fb83');
-  const { MACHINE_SKILLS } = await import('../public/js/machine-rooms.js?v=bc0ec73b');
+  const hm = await import('../public/js/home-machines.js?v=7547b6d2');
+  const { MACHINE_SKILLS } = await import('../public/js/machine-rooms.js?v=bcd6a405');
   const { FRESH_FUEL, MACHINE_IDS } = await import('../public/js/machines.js?v=acfeb40f');
   const decor = await import('../public/js/home-decor.js?v=a53535e3');
   const { HOME_LIMITS } = await import('../public/js/homes-catalog.js?v=7aa9beb0');

@@ -19,6 +19,7 @@
  */
 
 import { HUB_MAP_STREETS } from './hub-maps-data.js?v=ffe222f1';
+import { giantDisplayName } from './giant-names.js?v=0e295891';
 
 // js/hell.js noteNarakaVisit already counts Naraka's streets (its index rows
 // leave Hell One Clone's hub blank), so hub 40 is left to it.
@@ -220,7 +221,7 @@ export function loadingVisitLine(info = {}) {
   return txt;
 }
 
-/** common.js pluralize / pretty_list / capitalize. */
+/** common.js pluralize / pretty_list. */
 function pluralize(count, single, plural) {
   return count === 1 ? `1 ${single}` : `${count} ${plural}`;
 }
@@ -228,9 +229,6 @@ function prettyList(list, joiner) {
   if (!list.length) return '';
   if (list.length === 1) return list[0];
   return `${list.slice(0, -1).join(', ')}${joiner}${list[list.length - 1]}`;
-}
-function capitalize(str) {
-  return String(str).replace(/\w+/g, (a) => a.charAt(0).toUpperCase() + a.slice(1).toLowerCase());
 }
 
 /** location.js plus_parts order and words. */
@@ -276,7 +274,8 @@ const ROCK_WORDS = {
 /**
  * location.js getLoadingInfo street_details.features ("Home to:"), from what
  * is on the street: a vendor (store name with A/An), a shrine ("A shrine
- * dedicated to <b>Ti</b>." uses capitalize(get_giant())), then one "Plus ..."
+ * dedicated to <b>Tii</b>."; the source's capitalize(get_giant()) printed Ti,
+ * giant-names.js), then one "Plus ..."
  * line of animals, nodes, trees, rocks for mining and garden plots.
  * @param {{
  *   vendor?: string,
@@ -296,7 +295,7 @@ export function homeToFeatures(street = {}) {
     const article = /^[aeiou]/i.test(street.vendor) ? 'An' : 'A';
     features.push(`${article} <b>${street.vendor}</b>.`);
   }
-  if (street.shrineGiant) features.push(`A shrine dedicated to <b>${capitalize(street.shrineGiant)}</b>.`);
+  if (street.shrineGiant) features.push(`A shrine dedicated to <b>${giantDisplayName(street.shrineGiant)}</b>.`);
   const counts = street.counts || {};
   const plus = [];
   for (const [id, single, plural] of PLUS_SPECIES) {

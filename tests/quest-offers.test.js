@@ -23,7 +23,7 @@ import {
   applyQuestRewards,
   questRewardSummary,
   listQuestLog,
-} from '../public/js/quests.js?v=2ce7b3cb';
+} from '../public/js/quests.js?v=c8d9d0a4';
 import { builtInstanceQuests } from '../public/js/quest-rooms/catalog.js?v=9ebeb502';
 import {
   OFFER_INTERVAL_MS,
@@ -53,7 +53,7 @@ import {
   tickQuestTimers,
   restartTimedQuest,
   questTimerStatus,
-} from '../public/js/quest-offers.js?v=33c0e39f';
+} from '../public/js/quest-offers.js?v=8599dbf9';
 import { XP_FOR_LEVEL } from '../public/js/progression.js?v=33462eaa';
 
 const CONTENT = join(dirname(fileURLToPath(import.meta.url)), '../public/assets/content');
@@ -435,7 +435,7 @@ describe('quest rewards', () => {
     assert.equal(pc.giantFavor.ti, 10);
     assert.equal(pc.imagination, 125);
     assert.equal(inv.element_blue, 100);
-    assert.equal(done.rewards.subtitle, '+125 iMG · +75 currants · +25 mood · +10 Ti favor · 100× Red Element · 100× Green Element · 100× Blue Element');
+    assert.equal(done.rewards.subtitle, '+125 iMG · +75 currants · +25 mood · +10 Tii favor · 100× Red Element · 100× Green Element · 100× Blue Element');
     assert.equal(done.award.kind, 'quest');
     assert.ok(done.award.steps.length >= 1);
     assert.equal(done.award.steps.at(-1).response, '');

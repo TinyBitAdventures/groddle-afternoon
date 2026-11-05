@@ -10,7 +10,7 @@ import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js?v=10b118dd';
-import { createQuestState } from '../public/js/quests.js?v=2ce7b3cb';
+import { createQuestState } from '../public/js/quests.js?v=c8d9d0a4';
 import {
   acceptOffer,
   routeQuestEvent,
@@ -28,7 +28,7 @@ import {
   PURPLE_JOURNEY_STREETS,
   COLD_COMFORT,
   COLD_COMFORT_LEAVE_TEXT,
-} from '../public/js/quest-offers.js?v=33c0e39f';
+} from '../public/js/quest-offers.js?v=8599dbf9';
 import { createResourceNode, harvestResourceNode } from '../public/js/resource-nodes.js?v=c14bd6d8';
 import { createPlot, performPlotVerb } from '../public/js/patches.js?v=056bb6ae';
 import { createToolConditionState } from '../public/js/tools.js?v=6684b484';
@@ -39,7 +39,7 @@ import {
   SLATHER_VERB,
   SLATHER_COPY,
 } from '../public/js/features/quest-verbs-feature.js?v=52517603';
-import { onOwnYard } from '../public/js/features/quest-offers-feature.js?v=aab56fa8';
+import { onOwnYard } from '../public/js/features/quest-offers-feature.js?v=c6f19dc4';
 import {
   giveCubimalVerb,
   GIVE_CUBIMAL_VERB,

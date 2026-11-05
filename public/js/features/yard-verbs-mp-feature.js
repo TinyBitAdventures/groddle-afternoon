@@ -56,12 +56,12 @@
 import { performPlotVerb, plotArtPath, plotLabel, plotStatusLabel, plotVerbs } from '../patches.js?v=056bb6ae';
 import { trantStatusLabel } from '../trants.js?v=9c2e8c0f';
 import { woodTreeStatusLabel } from '../woodcutting.js?v=d71073bd';
-import { animalAnchorX, animalStatusLabel } from '../animals.js?v=bf8fe138';
+import { animalAnchorX, animalStatusLabel } from '../animals.js?v=71f981cb';
 import { frameTexture, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js?v=3149d699';
 import { homeStreetLayout, normalizeCultivationState } from '../home-cultivation.js?v=ff17225a';
 import { readVisitScene } from '../neighbours-mp.js?v=a8d5544e';
 import { saveStore } from '../save-store.js?v=8839ba7b';
-import { STREET_GROUND_Y, homesFeature, wearHomeCultivation } from './homes-feature.js?v=552544c7';
+import { STREET_GROUND_Y, homesFeature, wearHomeCultivation } from './homes-feature.js?v=374ff527';
 import { patchesFeature, treeFrameUrl } from './patches-feature.js?v=3b664dfa';
 import {
   YARD_STREET,
@@ -78,15 +78,15 @@ import {
   treeSnapshot,
   visitorAnimalState,
   visitorTreeState,
-} from '../yard-verbs-mp.js?v=1c770fc3';
+} from '../yard-verbs-mp.js?v=49ffcbc1';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
-import { followYardPath, stickForClass } from '../yard-wander.js?v=25a146b5';
+import { followYardPath, stickForClass } from '../yard-wander.js?v=08ffb759';
 import { countItem, removeItem } from '../inventory.js?v=d82f3b00';
 import { ROCK_CATALOG, rockStatusLabel, tickMineRock } from '../mining.js?v=83421428';
 import { getResourceNodeDef, regrowDelayMs } from '../resource-nodes.js?v=c14bd6d8';
 import { getGameDayKey } from '../game-day.js?v=edb00566';
-import { rockReady } from '../street-objects.js?v=32b31c97';
-import { resourceNodesFeature } from './resource-nodes-feature.js?v=9c637fb5';
+import { rockReady } from '../street-objects.js?v=3fbe6387';
+import { resourceNodesFeature } from './resource-nodes-feature.js?v=d00b988a';
 import {
   ROCK_RESPAWN_MS,
   STOCK_NODE_VERBS,

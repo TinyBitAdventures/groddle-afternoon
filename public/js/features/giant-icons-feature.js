@@ -38,6 +38,7 @@ import { addItem, countItem, ensureItem } from '../inventory.js?v=d82f3b00';
 import { getGameDayKey } from '../game-day.js?v=edb00566';
 import { XP_FOR_LEVEL } from '../progression.js?v=33462eaa';
 import { emblemCostFor } from '../shrines.js?v=95d74174';
+import { giantDisplayName } from '../giant-names.js?v=0e295891';
 import { landingY } from '../walk-surface.js?v=c982983e';
 import {
   EMBLEM_VERBS,
@@ -65,7 +66,7 @@ import {
   titheCost,
   titheIcon,
   useEmblem,
-} from '../giant-icons.js?v=4639df55';
+} from '../giant-icons.js?v=0d6b4965';
 import { textureFromUrl } from '../textures.js?v=3149d699';
 import { playSheetOverlay } from '../overlay-art.js?v=11b6dd7f';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
@@ -166,7 +167,7 @@ function emblemPackVerbs(giant, engine) {
   const def = GIANT_ICON_DATA[giant];
   const rows = [];
   if (countItem(inv, def.emblemClass) >= ICONIZE_COUNT) {
-    rows.push({ id: 'iconize', label: 'Iconize', enabled: true, tooltip: `Combine 11 Emblems of ${giant.charAt(0).toUpperCase() + giant.slice(1)} to form an Icon`, primary: true });
+    rows.push({ id: 'iconize', label: 'Iconize', enabled: true, tooltip: `Combine 11 Emblems of ${giantDisplayName(giant)} to form an Icon`, primary: true });
   }
   for (const [verb, v] of Object.entries(EMBLEM_VERBS)) {
     const check = emblemVerbCheck(state, giant, verb);

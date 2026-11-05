@@ -12,10 +12,10 @@ import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js?v=10b118dd';
-import { createQuestState } from '../public/js/quests.js?v=2ce7b3cb';
-import { acceptOffer, routeQuestEvent, gardenPlotEvents } from '../public/js/quest-offers.js?v=33c0e39f';
+import { createQuestState } from '../public/js/quests.js?v=c8d9d0a4';
+import { acceptOffer, routeQuestEvent, gardenPlotEvents } from '../public/js/quest-offers.js?v=8599dbf9';
 import { createGarden, listPlotKeys } from '../public/js/garden.js?v=9c151062';
-import { runVerb } from '../public/content.js?v=b49a6da6';
+import { runVerb } from '../public/content.js?v=28b6b0a6';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const PUB = join(here, '../public');

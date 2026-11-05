@@ -82,7 +82,7 @@
 
 import { addItem, countItem, removeItem } from '../inventory.js?v=d82f3b00';
 import { getGameDayKey } from '../game-day.js?v=edb00566';
-import { isPooped } from '../hell.js?v=52b4fcfc';
+import { isPooped } from '../hell.js?v=aca145ba';
 import { metabolicGain, moodMax, loseEnergy, loseMood } from '../metabolics.js?v=8504134e';
 import {
   POWDERS,
@@ -104,7 +104,7 @@ import { itemVerbAchievementCounters } from '../item-verbs.js?v=1e20fa7d';
 import { copyChargesLeft, copyFromLedger, keepsCopies, spendCopyCharge, verbCopy } from '../copy-charges.js?v=39c41fb0';
 import { migrateClassValue } from '../tools.js?v=6684b484';
 import { DEAD_TRANT_CLASSES } from '../patches.js?v=056bb6ae';
-import { hellFeature } from './hell-feature.js?v=4c54964f';
+import { hellFeature } from './hell-feature.js?v=13196575';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 import { displayTopOf, playSheetOverlay } from '../overlay-art.js?v=11b6dd7f';
 import { OVERLAY_USES, playOverlay } from '../overlays.js?v=210ad5ee';

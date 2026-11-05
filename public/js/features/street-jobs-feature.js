@@ -50,6 +50,7 @@ import { worldToScreen } from '../street-model.js?v=505d8990';
 import { signArmWidth } from '../street-render.js?v=9349c0e5';
 import { getSkillCatalog } from '../content-catalogs.js?v=10b118dd';
 import { GIANTS } from '../shrines.js?v=95d74174';
+import { giantDisplayName } from '../giant-names.js?v=0e295891';
 import { teleportationFeature } from './teleportation-feature.js?v=7d175a00';
 import {
   SOLO_DIVISOR,
@@ -97,7 +98,7 @@ import {
   upgradeOption,
 } from '../street-jobs.js?v=eca98f2d';
 import { gainMetabolic, loseEnergy } from '../metabolics.js?v=8504134e';
-import { closuresInTheWay, holdNote, placeIndex, questHold, reachableStreets } from '../quest-reach.js?v=25d407b3';
+import { closuresInTheWay, holdNote, placeIndex, questHold, reachableStreets } from '../quest-reach.js?v=9a001ac1';
 import { getQuestCatalog as questCatalog } from '../content-catalogs.js?v=10b118dd';
 import { saveStore } from '../save-store.js?v=8839ba7b';
 import {
@@ -597,7 +598,7 @@ function rewardBits(r) {
   if (r.energy) bits.push(`+${r.energy.toLocaleString()} energy`);
   for (const f of r.favor || []) {
     if (!f.points) continue;
-    const who = f.giant === 'all' ? 'favor with every Giant' : `${f.giant[0].toUpperCase()}${f.giant.slice(1)} favor`;
+    const who = f.giant === 'all' ? 'favor with every Giant' : `${giantDisplayName(f.giant)} favor`;
     bits.push(`+${f.points.toLocaleString()} ${who}`);
   }
   for (const it of r.items || []) bits.push(`+${it.count} ${itemLabel(it.classTsid, it.count)}`);
