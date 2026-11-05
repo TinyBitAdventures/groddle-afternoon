@@ -2732,9 +2732,14 @@
   "deployed": "2026-11-05"
  },
  "git": {
-  "commits": 1323,
+  "commits": 1324,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-05",
+    "kind": "improve",
+    "text": "Groddle Meadow's map has a new painting, repainted from Tiny Speck's thumbnail of the lost original"
+   },
    {
     "date": "2026-11-05",
     "kind": "fix",
@@ -2849,11 +2854,6 @@
     "date": "2026-11-05",
     "kind": "new",
     "text": "I opens the Encyclopedia on what you are looking at, with links from the Menu, item cards, Skills and Quests"
-   },
-   {
-    "date": "2026-11-05",
-    "kind": "new",
-    "text": "The Encyclopedia has Feats and street projects: goals, rewards, solo or with others, and where each project is offered"
    }
   ]
  },

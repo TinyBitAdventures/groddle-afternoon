@@ -659,6 +659,25 @@ export function mapFitSize({ availW, availH, chromeW = 0, chromeH = 0, compactCh
   return { w: Math.floor(frameW * scale + 1e-6), h: Math.floor(frameH * scale + 1e-6), scale, compact };
 }
 
+/**
+ * The vendor and shrine icons' glow (MapHub.as: StaticFilters.white2px40percent_GlowA, a white
+ * 2 px glow at 40%, over Tiny Speck's art, which is black at 40%). That read on the soft
+ * thumbnail paintings but turned into pale grey smudges on a detailed one (the Groddle Meadow
+ * repaint, G522), so the remake draws the same shape stronger: a cream halo at 75% and the
+ * icon's ink at 1.75 times its alpha (black at 70%), in Modern and Classic. The subway icon is
+ * full colour and opaque, and keeps the client's no glow.
+ */
+export const MAP_ICON_GLOW = Object.freeze({ halo: '#fffbea', haloOpacity: 0.75, spread: 1.2, ink: 1.75 });
+const MAP_ICON_FILTER =
+  `<filter id="mapIconGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="${MAP_ICON_GLOW.spread}"/>
+      <feComponentTransfer result="spread"><feFuncA type="linear" slope="9"/></feComponentTransfer>
+      <feFlood flood-color="${MAP_ICON_GLOW.halo}" flood-opacity="${MAP_ICON_GLOW.haloOpacity}"/>
+      <feComposite in2="spread" operator="in" result="glow"/>
+      <feComponentTransfer in="SourceGraphic" result="ink"><feFuncA type="linear" slope="${MAP_ICON_GLOW.ink}"/></feComponentTransfer>
+      <feMerge><feMergeNode in="glow"/><feMergeNode in="ink"/></feMerge>
+    </filter>`;
+
 export function renderHubMapSvg(view) {
   const w = view.mapW || 760;
   const h = view.mapH || 460;
@@ -677,13 +696,7 @@ export function renderHubMapSvg(view) {
     <filter id="labelHalo" x="-20%" y="-20%" width="140%" height="140%">
       <feDropShadow dx="0" dy="0" stdDeviation="1.2" flood-color="#f0e8c8" flood-opacity="0.95"/>
     </filter>
-    <filter id="mapIconGlow" x="-50%" y="-50%" width="200%" height="200%">
-      <feGaussianBlur in="SourceAlpha" stdDeviation="1"/>
-      <feComponentTransfer result="spread"><feFuncA type="linear" slope="9"/></feComponentTransfer>
-      <feFlood flood-color="#ffffff" flood-opacity="0.4"/>
-      <feComposite in2="spread" operator="in" result="glow"/>
-      <feMerge><feMergeNode in="glow"/><feMergeNode in="SourceGraphic"/></feMerge>
-    </filter>
+    ${MAP_ICON_FILTER}
   </defs>`);
 
   if (view.bgLocal) {
@@ -763,8 +776,8 @@ export function renderHubMapSvg(view) {
     );
   }
 
-  // MapHub.as drawStreet: each icon turned with its street; the vendor and shrine keep the
-  // client's white 2 px glow at 40% (StaticFilters.white2px40percent_GlowA), the subway none.
+  // MapHub.as drawStreet: each icon turned with its street; the vendor and shrine get the
+  // client's glow, drawn stronger so they read on any painting (MAP_ICON_GLOW), the subway none.
   // One tab stop for them all (arrow keys move between them, js/ui/map-icon-tips.js), left to right.
   const ordered = [...icons].sort((a, b) => a.box.x0 - b.box.x0 || a.box.y0 - b.box.y0);
   if (ordered.length) {
