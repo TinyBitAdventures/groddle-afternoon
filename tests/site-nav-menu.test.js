@@ -4,7 +4,7 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
-import { FALLBACK, SECTIONS, applyToHtml, currentChild, currentIndex, parseMenu, renderItem, renderLinks } from '../tools/site-nav/apply.mjs';
+import { FALLBACK, SECTIONS, applyToHtml, currentChild, currentIndex, panelLinks, parseMenu, renderItem, renderLinks } from '../tools/site-nav/apply.mjs';
 import { sitePath, skipWithoutSite } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');
@@ -115,8 +115,10 @@ describe('the header menu in the built pages (tools/site-nav/apply.mjs)', () => 
   const fixtures = join(root, 'tests/fixtures/site-nav');
   const HEADER = readFileSync(join(fixtures, 'header-menu.html'), 'utf8');
   const SUBMENUS = readFileSync(join(fixtures, 'submenus.html'), 'utf8');
+  // The Header menu with the Encyclopedia's three groups and footer row (Austin 2026-11-05).
+  const GROUPED = readFileSync(join(fixtures, 'grouped.html'), 'utf8');
 
-  it('reads a submenu with the links inside it, one level deep (the Header menu, Austin 2026-10-28)', () => {
+  it('reads a submenu with the links inside it (the Header menu, Austin 2026-10-28)', () => {
     const links = parseMenu(HEADER);
     assert.deepEqual(links.map((l) => l.label), ['Items', 'Players', 'Project', 'Play']);
     assert.deepEqual(links[2], {
@@ -129,8 +131,10 @@ describe('the header menu in the built pages (tools/site-nav/apply.mjs)', () => 
     assert.deepEqual(links[2].children.map((c) => c.href), SECTIONS['/project/'], 'the menu holds the pages Project gathers');
     const odd = parseMenu(SUBMENUS);
     assert.equal(odd[1].label, "Tom's & Jerry's");
-    assert.deepEqual(odd[1].children.map((c) => `${c.label} ${c.className}`.trim()), ['Cartoons cartoons', 'Deeper', 'Deepest', 'Away'],
-      'deeper submenus join the list; a block that is not a submenu (the group) and a link without a url are skipped');
+    assert.deepEqual(odd[1].children.map((c) => `${c.label} ${c.className}`.trim()), ['Cartoons cartoons', 'Deeper', 'Away'],
+      'a block that is not a submenu (the group) and a link without a url are skipped');
+    assert.deepEqual(odd[1].children[1], { label: 'Deeper', href: '/tj/deeper/', className: '', children: [{ label: 'Deepest', href: '/deepest/', className: '' }] },
+      'a submenu inside a submenu is a group');
     assert.ok(!('children' in odd[2]), 'an empty submenu is a plain link');
   });
 
@@ -160,7 +164,8 @@ describe('the header menu in the built pages (tools/site-nav/apply.mjs)', () => 
     // Without SECTIONS: the submenu's own links make the section, a link straight to the page still wins.
     const odd = parseMenu(SUBMENUS);
     assert.equal(currentIndex(odd, '/deepest/'), 1);
-    assert.equal(currentChild(odd[1].children, '/tj/cartoons/one/'), 0);
+    assert.equal(currentChild(odd[1].children, '/tj/cartoons/one/'), 2, 'counted as drawn: the group (its heading, its link), then the footer');
+    assert.equal(currentChild(odd[1].children, '/tj/deeper/'), 0, 'a group heading with a url is a link');
     assert.equal(currentChild(odd[1].children, '/tj/'), -1, 'the submenu\'s own page marks no child');
     assert.equal(currentIndex([...odd, { label: 'Deep', href: '/deepest/', className: '' }], '/deepest/'), 4);
     assert.equal(currentIndex(odd, '/play/online/'), -1);
@@ -176,9 +181,87 @@ describe('the header menu in the built pages (tools/site-nav/apply.mjs)', () => 
     assert.match(once, /<div class="site-nav-links">\n {8}<a href="\/items\/">Items<\/a>\n {8}<a href="\/players\/">Players<\/a>\n {8}<div class="site-nav-sub">[^\n]*<\/div><\/div>\n {8}<a class="site-nav-play" href="\/play\/online\/">Play<\/a>\n {6}<\/div>\n {6}<button class="site-nav-theme"/);
   });
 
+  it('reads the Encyclopedia submenu as three groups and a footer row (Austin 2026-11-05)', () => {
+    const links = parseMenu(GROUPED);
+    assert.deepEqual(links.map((l) => l.label), ['Encyclopedia', 'Players', 'Community', 'Project', 'Play']);
+    const enc = links[0];
+    assert.deepEqual(enc.children.map((c) => (c.children ? `${c.label}: ${c.children.map((l) => l.label).join(', ')}` : c.label)), [
+      'Things: Items, Tools and recipes, Imagination upgrades, Buffs',
+      'World: Places, Streets, Stores, People, Animals and creatures, Giants, Music and sounds',
+      'Doing: Quests, Skills, Achievements, Feats and projects',
+      'Search the Encyclopedia',
+      'All sections',
+    ]);
+    assert.ok(enc.children.slice(0, 3).every((g) => g.href === ''), 'the headings are plain text');
+    const keys = ['items', 'recipes', 'imagination', 'buffs', 'places', 'streets', 'stores', 'people', 'animals', 'giants', 'sounds', 'quests', 'skills', 'achievements', 'feats'];
+    assert.deepEqual(panelLinks(enc.children).map((l) => l.href), [...keys.map((k) => `/encyclopedia/${k}/`), '/encyclopedia/#q', '/encyclopedia/']);
+    // Every section the encyclopedia home lists is in the menu, so a new one is not forgotten.
+    const home = readFileSync(join(root, 'public/encyclopedia/index.html'), 'utf8');
+    const cards = [...home.matchAll(/<a class="ency-card" href="([a-z-]+)\/">/g)].map((m) => m[1]);
+    assert.deepEqual([...cards].sort(), [...keys].sort());
+    assert.match(home, /<input id="q" type="search"/, 'the footer search link lands on the home page\'s search box');
+  });
+
+  it('draws a grouped panel: labelled groups side by side, then the footer row, on one line', () => {
+    const [enc] = parseMenu(GROUPED);
+    const line = renderItem(enc, 0, false, '/players/');
+    assert.ok(!line.includes('\n'));
+    const g = (n, head, rows) => `<div class="site-nav-group" role="group" aria-labelledby="site-nav-sub-0-h${n}"><span class="site-nav-head" id="site-nav-sub-0-h${n}">${head}</span>`
+      + rows.map(([label, key]) => `<a href="/encyclopedia/${key}/">${label}</a>`).join('') + '</div>';
+    assert.equal(line, '<div class="site-nav-sub"><a href="/encyclopedia/">Encyclopedia</a>'
+      + '<button class="site-nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav-sub-0" aria-label="More in Encyclopedia"></button>'
+      + '<div class="site-nav-panel site-nav-panel-groups" id="site-nav-sub-0" hidden><div class="site-nav-groups">'
+      + g(0, 'Things', [['Items', 'items'], ['Tools and recipes', 'recipes'], ['Imagination upgrades', 'imagination'], ['Buffs', 'buffs']])
+      + g(1, 'World', [['Places', 'places'], ['Streets', 'streets'], ['Stores', 'stores'], ['People', 'people'], ['Animals and creatures', 'animals'], ['Giants', 'giants'], ['Music and sounds', 'sounds']])
+      + g(2, 'Doing', [['Quests', 'quests'], ['Skills', 'skills'], ['Achievements', 'achievements'], ['Feats and projects', 'feats']])
+      + '</div><div class="site-nav-panel-foot"><a href="/encyclopedia/#q">Search the Encyclopedia</a><a href="/encyclopedia/">All sections</a></div></div></div>');
+    // A heading with a url is a link; a group's class rides on the group.
+    const linked = renderItem({ label: 'A', href: '/a/', className: '', children: [{ label: 'B', href: '/b/', className: 'x', children: [{ label: 'C', href: '/c/', className: '' }] }] }, 3, false, '/');
+    assert.match(linked, /<div class="site-nav-group x" role="group" aria-labelledby="site-nav-sub-3-h0"><span class="site-nav-head" id="site-nav-sub-3-h0"><a href="\/b\/">B<\/a><\/span><a href="\/c\/">C<\/a><\/div><\/div><\/div><\/div>$/, 'no footer row without loose links');
+  });
+
+  it('keeps a plain submenu exactly as it was beside a grouped one', () => {
+    const plain = parseMenu(HEADER)[2];
+    const project = parseMenu(GROUPED)[3];
+    assert.ok(project.children.every((c) => !c.children), 'Project holds plain links only');
+    assert.equal(renderItem(project, 3, false, '/players/'), '<div class="site-nav-sub"><a href="/project/">Project</a>'
+      + '<button class="site-nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav-sub-3" aria-label="More in Project"></button>'
+      + '<div class="site-nav-panel" id="site-nav-sub-3" hidden>' + project.children.map((c) => `<a href="${c.href}">${c.label}</a>`).join('') + '</div></div>');
+    assert.ok(!renderLinks(parseMenu(HEADER), '/compare/').includes('site-nav-group'), 'no groups in a menu without nested submenus');
+    assert.equal(renderItem(plain, 2, true, '/compare/'), renderItem(plain, 2, true, '/compare/').replace('site-nav-panel-groups', ''));
+  });
+
+  it('marks the section being read inside a group, the longest path winning', () => {
+    const links = parseMenu(GROUPED);
+    for (const [path, label] of [
+      ['/encyclopedia/streets/groddle-meadow/', 'Streets'], ['/encyclopedia/feats/', 'Feats and projects'], ['/encyclopedia/items/apple/', 'Items'],
+      ['/encyclopedia/sounds/x/', 'Music and sounds'], ['/encyclopedia/', 'All sections'],
+    ]) {
+      assert.equal(currentIndex(links, path), 0, path);
+      const html = renderLinks(links, path);
+      assert.match(html, /<a href="\/encyclopedia\/" aria-current="page">Encyclopedia<\/a>/, path);
+      const marked = [...html.matchAll(/<a href="[^"]*" aria-current="page">([^<]+)<\/a>/g)].map((m) => m[1]);
+      assert.deepEqual(marked, ['Encyclopedia', label], path);
+    }
+    assert.equal(currentChild(links[0].children, '/encyclopedia/'), 16, 'the footer counts after the groups');
+    assert.equal(currentIndex(links, '/restoration/'), 3, 'Project still gathers its pages');
+    assert.equal(currentIndex(links, '/players/'), 1);
+    assert.doesNotMatch(renderLinks(links, '/players/x/'), /site-nav-panel-groups[^\n]*aria-current/, 'nothing in the panel marked off its section');
+  });
+
+  it('a built page takes the grouped menu and goes back to plain links', () => {
+    const html = readFileSync(join(root, 'public/compare/index.html'), 'utf8');
+    const links = parseMenu(GROUPED);
+    const once = applyToHtml(html, '/encyclopedia/', links);
+    assert.equal(applyToHtml(once, '/encyclopedia/', links), once);
+    assert.equal(applyToHtml(once, '/compare/', FALLBACK), applyToHtml(html, '/compare/', FALLBACK));
+    assert.match(once, /<div class="site-nav-links">\n {8}<div class="site-nav-sub">[^\n]*site-nav-panel-groups[^\n]*<\/div><\/div><\/div>\n {8}<a href="\/players\/">Players<\/a>/);
+  });
+
   it('draws the same markup as the theme, and the chat app\'s layout of it (php: SiteNav::parse and nav)', { skip: (skipWithoutSite || (!existsSync(join(engine, 'src/Minn/Autoloader.php')) && 'Minn Engine not found (set MINN_ENGINE_DIR)')) }, () => {
-    const paths = ['/', '/items/', '/players/', '/project/', '/restoration/history/', '/compare/', '/changelog/a-note/', '/code/', '/codex/', '/tj/', '/tj/cartoons/x/', '/deepest/', '/empty/', '/play/online/'];
-    for (const file of ['header-menu.html', 'submenus.html']) {
+    const paths = ['/', '/items/', '/players/', '/project/', '/restoration/history/', '/compare/', '/changelog/a-note/', '/code/', '/codex/', '/tj/', '/tj/cartoons/x/', '/tj/deeper/', '/deepest/', '/empty/', '/play/online/',
+      '/encyclopedia/', '/encyclopedia/streets/groddle-meadow/', '/encyclopedia/feats/', '/encyclopedia/items/apple/'];
+    for (const file of ['header-menu.html', 'submenus.html', 'grouped.html']) {
       let out;
       try {
         out = JSON.parse(execFileSync('php', [join(fixtures, 'site-nav.php'), engine, sitePath(''), join(fixtures, file), ...paths], { encoding: 'utf8' }));

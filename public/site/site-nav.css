@@ -127,7 +127,7 @@ html { scroll-padding-top: calc(var(--site-nav-h) + 12px); }
 }
 
 /* A submenu (a Navigation submenu block in the Minn menu): its link, a caret toggle and a panel
-   of its links, one line of markup. site/theme.js opens the panel (hover with a mouse, the toggle
+   of its links (or of its groups, below), one line of markup. site/theme.js opens the panel (hover with a mouse, the toggle
    anywhere); without it the toggle stays hidden and the link is a plain link. The panel hangs from
    .site-nav-row, never the item, because at narrow widths .site-nav-links scrolls sideways and would
    clip it: wide, theme.js sets --site-nav-panel-left to sit it under the link; narrow, it spans the row. */
@@ -171,6 +171,27 @@ html { scroll-padding-top: calc(var(--site-nav-h) + 12px); }
   text-decoration: underline; text-decoration-color: var(--accent);
   text-decoration-thickness: 2px; text-underline-offset: 6px;
 }
+/* A panel with groups (a Navigation submenu inside the submenu, Austin 2026-11-05: the Encyclopedia's
+   Things, World and Doing): its groups side by side as columns, each under its heading, then the
+   submenu's own links in a footer row under a hairline. */
+.site-nav-panel-groups { padding: 10px 8px 8px; gap: 0; }
+.site-nav-groups { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(150px, max-content); gap: 0 8px; }
+.site-nav-group { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.site-nav-head {
+  display: block; padding: 2px 12px 6px; color: var(--muted);
+  font-size: 12px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; white-space: nowrap;
+}
+.site-nav-links .site-nav-group a { padding-top: 6px; padding-bottom: 6px; }
+.site-nav-links .site-nav-panel .site-nav-head a {
+  display: inline; padding: 0; border-radius: 4px; color: inherit; font-size: inherit; font-weight: inherit;
+}
+.site-nav-links .site-nav-panel .site-nav-head a:hover { color: var(--fg); background: none; }
+.site-nav-panel-foot {
+  display: flex; flex-wrap: wrap; justify-content: space-between; gap: 2px 12px;
+  margin-top: 8px; padding-top: 6px; border-top: 1px solid var(--border);
+}
+.site-nav-links .site-nav-panel-foot a { font-size: 14px; color: var(--muted); }
+.site-nav-links .site-nav-panel-foot a:hover, .site-nav-links .site-nav-panel-foot a[aria-current="page"] { color: var(--fg); }
 @media (max-width: 640px) {
   .site-nav-panel {
     top: calc(100% + 1px); left: 0; right: 0; min-width: 0;
@@ -178,6 +199,18 @@ html { scroll-padding-top: calc(var(--site-nav-h) + 12px); }
     border-width: 0 0 1px; border-radius: 0 0 12px 12px; padding: 8px 12px 10px;
   }
   .site-nav-panel::before { height: 20px; }
+}
+/* Narrow, the groups stack under their headings, two links to a row, and the panel scrolls
+   inside the screen when it is taller than it. */
+@media (max-width: 640px) {
+  .site-nav-panel-groups {
+    display: block; padding: 8px 12px 10px;
+    max-height: calc(100dvh - var(--site-nav-h) - 8px); overflow-y: auto; overscroll-behavior: contain;
+  }
+  .site-nav-groups { display: flex; flex-direction: column; gap: 8px; }
+  .site-nav-group { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0; }
+  .site-nav-head { grid-column: 1 / -1; padding: 4px 12px 2px; }
+  .site-nav-links .site-nav-panel a, .site-nav-links .site-nav-group a { padding-top: 8px; padding-bottom: 8px; white-space: normal; }
 }
 @media (max-width: 440px) {
   :root[data-theme-mode] .site-nav-toggle { width: 22px; margin-right: -3px; }

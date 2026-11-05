@@ -7,7 +7,9 @@
  * the header (<div class="site-nav-links">), with the section being read
  * marked, so one edit changes every page. A Navigation submenu becomes the
  * link with a toggle and a panel of the links inside it (site/theme.js opens
- * it), one line per top-level item: applyToHtml ends the links at the first
+ * it); a submenu inside it is a headed group of that panel, the groups side by
+ * side, and the submenu's own plain links then make the panel's footer row
+ * (Austin 2026-11-05). One line per top-level item: applyToHtml ends the links at the first
  * line that is only </div>. sync-to-cove.sh runs it on the copy in the
  * site's game/ folder; the spike's own pages keep their links.
  *
@@ -44,44 +46,88 @@ const decode = (s) => s.replace(/<[^>]*>/g, '').replace(/&(amp|lt|gt|quot|#039|#
 // As the theme's Html::esc (htmlspecialchars with ENT_QUOTES), so both draw the same bytes.
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
 
+/** wp_navigation block markup as a tree of { name, json, inner } (the shape SiteNav reads through Minn's Parser). */
+function blockTree(markup) {
+  const top = { inner: [] };
+  const stack = [top];
+  for (const m of String(markup).matchAll(/<!--\s+(\/)?wp:([a-z0-9/-]+)(?:\s+(\{[\s\S]*?\}))?\s+(\/)?-->/g)) {
+    const [, closing, rawName, json, selfClosing] = m;
+    if (closing) {
+      if (stack.length > 1) stack.pop();
+      continue;
+    }
+    const node = { name: rawName.includes('/') ? rawName : `core/${rawName}`, json, inner: [] };
+    stack.at(-1).inner.push(node);
+    if (!selfClosing) stack.push(node);
+  }
+  return top.inner;
+}
+
+const SUBMENU = 'core/navigation-submenu';
+
+/** A link, or with needsUrl false a group's heading (its href may be ''); null otherwise (SiteNav::link). */
+function readLink(node, needsUrl = true) {
+  if (node.name !== 'core/navigation-link' && node.name !== SUBMENU) return null;
+  let attrs = {};
+  try { attrs = node.json ? JSON.parse(node.json) : {}; } catch { attrs = {}; }
+  const label = decode(String(attrs.label ?? '')).trim();
+  const href = String(attrs.url ?? '').trim();
+  return label && (href || !needsUrl) ? { label, href, className: String(attrs.className ?? '').trim() } : null;
+}
+
+/** A submenu's blocks, deeper submenus' blocks in their place after them (SiteNav::inner). */
+const flatInner = (node) => (node.name === SUBMENU ? node.inner.flatMap((b) => [b, ...flatInner(b)]) : []);
+
+/**
+ * A submenu's panel (SiteNav::children): its links, and each submenu inside it
+ * with links of its own as a group { label, href or '', className, children }.
+ * A group's deeper submenus' links join it; an empty one is a plain link, and
+ * one without a label gives its links to the panel.
+ */
+function panelChildren(node) {
+  if (node.name !== SUBMENU) return [];
+  const out = [];
+  for (const inner of node.inner) {
+    if (inner.name === SUBMENU) {
+      const links = flatInner(inner).map((b) => readLink(b)).filter(Boolean);
+      const head = readLink(inner, false);
+      if (links.length && head) { out.push({ ...head, children: links }); continue; }
+      if (links.length) { out.push(...links); continue; }
+    }
+    const link = readLink(inner);
+    if (link) out.push(link);
+  }
+  return out;
+}
+
 /**
  * The menu's top-level navigation links from wp_navigation block markup; a
- * submenu also carries `children`, the links inside it (one level: deeper
- * submenus' links join the list), as SiteNav::parse reads them.
+ * submenu also carries `children`, its panel, as SiteNav::parse reads them.
  */
 export function parseMenu(markup) {
   const links = [];
-  const open = []; // the blocks we are inside, outermost first
-  let parent = null;
-  const read = (json) => {
-    let attrs = {};
-    try { attrs = json ? JSON.parse(json) : {}; } catch { attrs = {}; }
-    const label = decode(String(attrs.label ?? '')).trim();
-    const href = String(attrs.url ?? '').trim();
-    return label && href ? { label, href, className: String(attrs.className ?? '').trim() } : null;
-  };
-  for (const m of String(markup).matchAll(/<!--\s+(\/)?wp:([a-z0-9/-]+)(?:\s+(\{[\s\S]*?\}))?\s+(\/)?-->/g)) {
-    const [, closing, rawName, json, selfClosing] = m;
-    const name = rawName.includes('/') ? rawName : `core/${rawName}`;
-    if (closing) {
-      open.pop();
-      if (!open.length) parent = null;
-      continue;
-    }
-    if (name === 'core/navigation-link' || name === 'core/navigation-submenu') {
-      if (!open.length) {
-        const link = read(json);
-        if (link) links.push(link);
-        parent = link && name === 'core/navigation-submenu' && !selfClosing ? link : null;
-      } else if (parent && open.every((n) => n === 'core/navigation-submenu')) {
-        // Inside submenus only (SiteNav::inner never looks inside another block).
-        const child = read(json);
-        if (child) (parent.children ||= []).push(child);
-      }
-    }
-    if (!selfClosing) open.push(name);
+  for (const node of blockTree(markup)) {
+    const link = readLink(node);
+    if (!link) continue;
+    const children = panelChildren(node);
+    links.push(children.length ? { ...link, children } : link);
   }
   return links.length ? links : FALLBACK;
+}
+
+const isGroup = (c) => Array.isArray(c.children);
+
+/**
+ * A panel's links in the order it draws them (SiteNav::panelLinks): a plain
+ * panel's list, or each group's heading link (when it has a url) and links,
+ * then the footer row's.
+ */
+export function panelLinks(children = []) {
+  if (!children.some(isGroup)) return children;
+  return [
+    ...children.filter(isGroup).flatMap((g) => [...(g.href ? [{ label: g.label, href: g.href, className: '' }] : []), ...g.children]),
+    ...children.filter((c) => !isGroup(c)),
+  ];
 }
 
 const sitePath = (href) => href !== '/' && href.startsWith('/') && !href.startsWith('//');
@@ -99,7 +145,7 @@ export function currentIndex(links, pagePath) {
   links.forEach(({ href, className, children = [] }, i) => {
     if (!sitePath(href) || className.split(/\s+/).includes('site-nav-play')) return;
     const own = section(href);
-    const sections = [own, ...(SECTIONS[own] || []), ...children.filter((c) => sitePath(c.href)).map((c) => section(c.href))];
+    const sections = [own, ...(SECTIONS[own] || []), ...panelLinks(children).filter((c) => sitePath(c.href)).map((c) => section(c.href))];
     for (const s of sections) {
       const points = s.length * 2 + (s === own ? 1 : 0);
       if (path.startsWith(s) && points > score) { best = i; score = points; }
@@ -108,12 +154,12 @@ export function currentIndex(links, pagePath) {
   return best;
 }
 
-/** The submenu link whose path holds the page (the longest), or -1 (SiteNav::currentChild). */
+/** The submenu link whose path holds the page (the longest), or -1: an index into panelLinks(), so a link inside a group counts too (SiteNav::currentChild). */
 export function currentChild(children, pagePath) {
   let best = -1;
   let length = 0;
   const path = section(pagePath);
-  children.forEach(({ href }, j) => {
+  panelLinks(children).forEach(({ href }, j) => {
     const own = section(href);
     if (sitePath(href) && path.startsWith(own) && own.length > length) { best = j; length = own.length; }
   });
@@ -135,7 +181,29 @@ export function renderItem(link, index, current, pagePath) {
   const child = current ? currentChild(children, pagePath) : -1;
   return `<div class="site-nav-sub">${a}`
     + `<button class="site-nav-toggle" type="button" aria-expanded="false" aria-controls="${id}" aria-label="${esc(`More in ${link.label}`)}"></button>`
-    + `<div class="site-nav-panel" id="${id}" hidden>${children.map((c, j) => anchor(c, j === child)).join('')}</div></div>`;
+    + `${renderPanel(children, id, child)}</div>`;
+}
+
+/**
+ * A submenu's panel (SiteNav::panel). Plain links: one list. With groups: the
+ * groups side by side (.site-nav-groups; site-nav.css stacks them on a phone),
+ * each a labelled group under its heading, then the panel's own links in the
+ * footer row (.site-nav-panel-foot). `child` counts the links in panelLinks() order.
+ */
+export function renderPanel(children, id, child) {
+  let k = 0;
+  const mark = () => k++ === child;
+  const loose = () => children.filter((c) => !isGroup(c)).map((c) => anchor(c, mark())).join('');
+  if (!children.some(isGroup)) return `<div class="site-nav-panel" id="${id}" hidden>${loose()}</div>`;
+  const groups = children.filter(isGroup).map((g, n) => {
+    const hid = `${id}-h${n}`;
+    const head = g.href ? anchor({ label: g.label, href: g.href, className: '' }, mark()) : esc(g.label);
+    return `<div class="site-nav-group${g.className ? ` ${esc(g.className)}` : ''}" role="group" aria-labelledby="${hid}">`
+      + `<span class="site-nav-head" id="${hid}">${head}</span>${g.children.map((c) => anchor(c, mark())).join('')}</div>`;
+  }).join('');
+  const foot = loose();
+  return `<div class="site-nav-panel site-nav-panel-groups" id="${id}" hidden><div class="site-nav-groups">${groups}</div>`
+    + `${foot ? `<div class="site-nav-panel-foot">${foot}</div>` : ''}</div>`;
 }
 
 /** The links' markup, in the built pages' indentation. */
