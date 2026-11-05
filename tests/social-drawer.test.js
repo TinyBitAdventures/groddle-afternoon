@@ -21,11 +21,14 @@ import {
   createHistory,
   defaultOpen,
   mountSocialDrawer,
+  PHONE_SIDE,
+  phoneSized,
   readChoice,
+  startsOpen,
   splitChat,
   withTimeLines,
   writeChoice,
-} from '../public/js/ui/social-drawer.js?v=debf9446';
+} from '../public/js/ui/social-drawer.js?v=926568a8';
 import { createNotifier } from '../public/js/notify.js?v=37c6b748';
 import { resolveTokens } from './css-tokens.js';
 
@@ -408,5 +411,123 @@ describe('the Social drawer: wiring', () => {
     assert.match(buddies, /drawerView\(\) \{/);
     assert.match(buddies, /engine\.social\?\.refresh\(\);/);
     assert.match(game, /get social\(\) \{\n\s+return socialDrawer;/);
+  });
+});
+
+describe('report #100: on a phone the drawer starts as the rail and its close arrow takes the tap', () => {
+  it('a phone-sized window (short side under 500, either way round) starts as the rail, whatever was chosen', () => {
+    assert.equal(PHONE_SIDE, 500);
+    for (const [w, h] of [[375, 667], [390, 844], [844, 390], [667, 375], [932, 430]]) {
+      assert.equal(phoneSized(w, h), true, `${w}x${h}`);
+      assert.equal(startsOpen(w, h, true), false, `${w}x${h} after choosing open`);
+      assert.equal(startsOpen(w, h, null), false);
+    }
+    // A tablet, a laptop and a desktop keep the choice and the 1440 default; an unknown height is not a phone.
+    assert.equal(phoneSized(1024, 768), false);
+    assert.equal(startsOpen(1024, 768, true), true);
+    assert.equal(startsOpen(1280, 800, null), false);
+    assert.equal(startsOpen(1440, 900, null), true);
+    assert.equal(startsOpen(1440, 900, false), false);
+    assert.equal(phoneSized(1280, 0), false);
+    assert.equal(startsOpen(1600, undefined, null), true);
+    const src = readFileSync(join(root, 'public/js/ui/social-drawer.js'), 'utf8');
+    assert.match(src, /let open = startsOpen\(width\(\), height\(\), choice\);/);
+    assert.match(src, /restore: \(\) => setOpen\(startsOpen\(width\(\), height\(\), choice\)\),/);
+  });
+});
+
+let chromium = null;
+try { chromium = (await import('playwright')).chromium; } catch { /* no Playwright */ }
+
+describe('report #100: the open drawer and the top bar on phone screens (Chrome)', { skip: !chromium && 'no playwright' }, () => {
+  // The browser lock is waited for on its own budget (other lanes' Chrome may hold it for minutes).
+  const LOCK_WAIT_MS = 30 * 60_000;
+  let server = null;
+  let chrome = null;
+  before(async () => {
+    const { openBrowser } = await import('../tools/qa/browser.mjs');
+    const { startServer } = await import('../tools/qa/serve.mjs');
+    chrome = await openBrowser({ label: 'social-drawer phone test', waitMs: LOCK_WAIT_MS });
+    server = await startServer({ root: join(root, 'public') });
+  }, { timeout: LOCK_WAIT_MS + 60_000 });
+  after(async () => {
+    await chrome?.close();
+    await server?.stop();
+  });
+
+  it('portrait and landscape phones: the rail first; open, the close arrow is the element under a finger on it; Report a problem is on screen', { timeout: 180_000 }, async () => {
+    const base = `http://127.0.0.1:${server.address().port}`;
+    const html = readFileSync(join(root, 'public/play/online/index.html'), 'utf8');
+    // The real top bar and dock markup of the online page.
+    const header = html.slice(html.indexOf('<header class="top-bar"'), html.indexOf('</header>') + '</header>'.length);
+    const dockAt = html.indexOf('<section id="local-chat-dock"');
+    const dock = html.slice(dockAt, html.indexOf('</section>', dockAt) + '</section>'.length);
+    assert.ok(header.includes('hud-actions') && dock.includes('local-chat-form'));
+    const bad = [];
+    for (const [w, h] of [[375, 667], [390, 844], [844, 390], [667, 375]]) {
+      const ctx = await chrome.browser.newContext({ viewport: { width: w, height: h }, isMobile: true, hasTouch: true, deviceScaleFactor: 2 });
+      const tab = await ctx.newPage();
+      await tab.goto(`${base}/style.css`);
+      await tab.setContent(`<!doctype html><html data-ui="modern"><head><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="stylesheet" href="/style.css">
+<style>html,body{margin:0;height:100%;overflow:hidden}#wrap{position:fixed;inset:0}#game-root{position:absolute;inset:0}</style></head>
+<body><div id="wrap" class="glitch-chrome">${header}<div id="game-root">${dock}</div></div></body></html>`, { waitUntil: 'load' });
+      const r = await tab.evaluate(async () => {
+        const { mountSocialDrawer } = await import('/js/ui/social-drawer.js');
+        const { createNotifier } = await import('/js/notify.js');
+        // As the player had it: online, playing somewhere else too, with people around.
+        window.groddleRealtime = { client: { state: 'online', here: 3, players: [{ name: 'Ada' }, { name: 'Bo' }] } };
+        const store = new Map([['groddle-social-drawer', 'open']]);
+        const storage = { getItem: (k) => store.get(k) ?? null, setItem: (k, v) => store.set(k, String(v)) };
+        const d = mountSocialDrawer({ root: document.getElementById('game-root'), dock: document.getElementById('local-chat-dock'), notifier: createNotifier({}), mode: 'online', storage });
+        const startedOpen = d.isOpen();
+        d.statusSlot.append(Object.assign(document.createElement('span'), { className: 'mp-state', textContent: 'Playing somewhere else' }), Object.assign(document.createElement('button'), { type: 'button', textContent: 'Play here' }));
+        d.setOnline(12);
+        // The report button goes before Sound, as features/bug-report-feature.js puts it.
+        const bug = Object.assign(document.createElement('button'), { id: 'bug-btn', type: 'button', className: 'chrome-btn mute-btn bug-btn' });
+        bug.append(Object.assign(document.createElement('img'), { alt: '', width: 23, height: 20 }));
+        const sound = document.getElementById('sound-btn');
+        sound.parentElement.insertBefore(bug, sound);
+        document.getElementById('study-chip').hidden = false;
+        document.getElementById('study-chip').textContent = 'Skills · 4 available';
+        d.open();
+        await new Promise((res) => requestAnimationFrame(() => requestAnimationFrame(res)));
+        const x = document.querySelector('[data-social-collapse]');
+        const b = x.getBoundingClientRect();
+        const cx = b.left + b.width / 2;
+        const cy = b.top + b.height / 2;
+        // The centre and a finger's width round it (the 44 px round button: 20 px out straight, 15 px on
+        // the diagonals) all land on the arrow.
+        const misses = [];
+        for (const [dx, dy] of [[0, 0], [-15, -15], [15, -15], [-15, 15], [15, 15], [0, 20], [0, -20], [20, 0], [-20, 0]]) {
+          const at = document.elementFromPoint(cx + dx, cy + dy);
+          if (!at?.closest?.('[data-social-collapse]')) misses.push(`${dx},${dy}:${at?.className || at?.tagName}`);
+        }
+        const status = document.querySelector('.social-status').getBoundingClientRect();
+        const bb = bug.getBoundingClientRect();
+        const bugAt = document.elementFromPoint(bb.left + bb.width / 2, bb.top + bb.height / 2);
+        const more = document.getElementById('more-btn').getBoundingClientRect();
+        x.click();
+        return {
+          startedOpen,
+          size: [Math.round(b.width), Math.round(b.height)],
+          gap: Math.round(status.top - b.bottom),
+          misses,
+          bugOnScreen: bb.left >= 0 && bb.right <= innerWidth && bb.top >= 0 && bb.bottom <= innerHeight,
+          bugHit: Boolean(bugAt?.closest?.('#bug-btn')),
+          menuOnScreen: more.right <= innerWidth,
+          closed: !d.isOpen(),
+        };
+      });
+      const where = `${w}x${h}`;
+      if (r.startedOpen) bad.push(`${where}: started open`);
+      if (r.size[0] < 44 || r.size[1] < 44) bad.push(`${where}: close arrow ${r.size.join('x')}`);
+      if (r.misses.length) bad.push(`${where}: taps near the arrow missed it: ${r.misses.join(' ')}`);
+      if (r.gap < 0) bad.push(`${where}: the status row overlaps the arrow by ${-r.gap}px`);
+      if (!r.bugOnScreen || !r.bugHit) bad.push(`${where}: Report a problem not reachable`);
+      if (!r.menuOnScreen) bad.push(`${where}: Menu off screen`);
+      if (!r.closed) bad.push(`${where}: the arrow did not close the drawer`);
+      await ctx.close();
+    }
+    assert.deepEqual(bad, []);
   });
 });

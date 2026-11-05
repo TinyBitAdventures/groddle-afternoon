@@ -9613,6 +9613,18 @@ html[data-street-cards] .notify-notices { visibility: hidden; }
 .social-x { display: grid; place-items: center; width: 32px; height: 32px; border: 0; border-radius: var(--radius-pill); background: transparent; color: var(--text-muted); cursor: pointer; }
 .social-x svg { width: 16px; height: 16px; }
 .social-x:hover { background: var(--surface-parchment); color: var(--text); }
+/* Report #100 (a phone): the head and the status row never shrink under the drawer's height, and on a
+   phone or a touch screen (the short side under 500 px either way round, js PHONE_SIDE) the close arrow
+   is a finger-sized target with clear space under it. A tap near the 32 px arrow went to the
+   "X online, X here" row just under it, which opens Buddies, so the drawer could not be closed. */
+.social-head,
+.social-status { flex: none; }
+@media (max-width: 499px), (max-height: 499px), (pointer: coarse) {
+  .social-drawer .social-head { padding-top: var(--sp-2); padding-right: var(--sp-2); padding-bottom: var(--sp-2); }
+  .social-drawer .social-x { width: 44px; height: 44px; }
+  .social-drawer .social-x svg { width: 20px; height: 20px; }
+  .social-drawer .social-status { margin-top: var(--sp-4); }
+}
 .social-status { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-2); margin: 0 var(--sp-4) var(--sp-2); }
 .social-status-slot { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-2); }
 .social-status-slot:empty { display: none; }
@@ -10628,6 +10640,15 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
   [data-ui="modern"] .street-nameplate,
   [data-ui="modern"] .street-nameplate.is-placed { top: calc(var(--hud-h) + var(--space-2)); left: 50%; transform: translateX(-50%); max-width: calc(100% - 2 * var(--hud-inset)); }
   [data-ui="modern"] #buff-strip { top: calc(2 * var(--hud-h) + var(--space-4)); }
+}
+/* Report #100: a phone held upright is narrower than the two pills. The actions pill gives way (the
+   study chip shortens with an ellipsis) and Report a problem and Menu come first in it, so both stay
+   on screen; whatever does not fit runs off the right edge as before. */
+@media (max-width: 560px) {
+  [data-ui="modern"] .top-bar .hud-actions { flex: 0 1 auto; min-width: 0; }
+  [data-ui="modern"] .top-bar .hud-actions > #bug-btn { order: -2; flex: none; }
+  [data-ui="modern"] .top-bar .hud-actions #more-btn { order: -1; flex: none; }
+  [data-ui="modern"] .top-bar #study-chip { flex: 0 1 auto; min-width: 64px; overflow: hidden; text-overflow: ellipsis; }
 }
 /* —— end PAPER —— */
 /* The quest pill (player report 37; features/quest-plate-feature.js, js/quest-plate.js): in a quest

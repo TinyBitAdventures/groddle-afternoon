@@ -19,6 +19,10 @@
  *   total of its conversations). It opens by default at 1440 px wide and up and starts as the rail
  *   below; the player's own choice is kept (localStorage SOCIAL_STORE_KEY, every access in
  *   try/catch: a private window just gets the default again).
+ * - A phone (report #100: the window's short side under PHONE_SIDE, portrait or landscape) always
+ *   starts as the rail, whatever was chosen before: open, the drawer covers most of a phone's screen.
+ *   There the close arrow is a full finger-sized target, clear of the "X online, X here" row under it
+ *   (style.css SOCIAL phone rules): a tap near the small arrow had gone to that row, which opens Buddies.
  * - The drawer is #local-chat-dock (so the tutorial's rule hiding Local chat,
  *   body.nx-hide-chat #local-chat-dock in newxp-feature, hides it too) and holds
  *   #local-chat-form and #local-chat-input as they were, so the game's submit
@@ -205,6 +209,24 @@ export function defaultOpen(width) {
   return Number(width) >= OPEN_MIN_WIDTH;
 }
 
+/** A window whose short side is under this is a phone's (report #100): the drawer starts as the rail there. */
+export const PHONE_SIDE = 500;
+
+/** PURE: a phone-sized window (its shorter known side under PHONE_SIDE; an unknown size is not). */
+export function phoneSized(width, height) {
+  const sides = [Number(width), Number(height)].filter((n) => Number.isFinite(n) && n > 0);
+  return sides.length > 0 && Math.min(...sides) < PHONE_SIDE;
+}
+
+/**
+ * PURE: open or the rail when the game starts: the rail on a phone (report #100), else the player's
+ * choice (true, false or null), else the window's default.
+ */
+export function startsOpen(width, height, choice = null) {
+  if (phoneSized(width, height)) return false;
+  return choice ?? defaultOpen(width);
+}
+
 /** The player's choice: true (open), false (rail) or null (none yet). */
 export function readChoice(storage) {
   try {
@@ -308,6 +330,7 @@ export function mountSocialDrawer({
   setData = () => {},
   storage = storageOf(),
   width = () => globalThis.innerWidth || 0,
+  height = () => globalThis.innerHeight || 0,
   playerMenu = null,
   contextMenu = () => null,
 } = {}) {
@@ -323,7 +346,7 @@ export function mountSocialDrawer({
   const tabs = new Map();
   let tab = 'activity';
   let choice = readChoice(storage);
-  let open = choice ?? defaultOpen(width());
+  let open = startsOpen(width(), height(), choice);
   const listeners = new Set();
   /** fn() after each redraw, so a second view of a log keeps up (the Classic skin's lower pane). */
   const renderListeners = new Set();
@@ -1484,7 +1507,7 @@ export function mountSocialDrawer({
   // Until the player chooses, the window's width decides.
   globalThis.addEventListener?.('resize', () => {
     if (choice !== null) return;
-    const want = defaultOpen(width());
+    const want = startsOpen(width(), height(), null);
     if (want !== open) setOpen(want);
   });
   document.addEventListener('visibilitychange', () => {
@@ -1603,7 +1626,7 @@ export function mountSocialDrawer({
     /** Opens or closes it without keeping that as the player's choice (the Classic skin's column). */
     present: (next) => setOpen(next),
     /** Back to the player's own choice, or the default for the window (leaving the Classic skin). */
-    restore: () => setOpen(choice ?? defaultOpen(width())),
+    restore: () => setOpen(startsOpen(width(), height(), choice)),
     select,
     focusInput,
     /** Opens the drawer on a tab with the input (the Feat panel's Gather fills it in), without keeping that as the player's choice. */
