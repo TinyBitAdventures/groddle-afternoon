@@ -5,7 +5,7 @@
  * region's page; each page's vendor, shrine, roads, closures and reachability as the game
  * itself works them out; one page per store with its stock, prices and streets; item pages
  * naming the stores that sell them and what gives them, with street counts that agree with
- * the other pages; and the size of the whole section kept in check.
+ * the other pages, each source once with how you get it; and the size of the whole section kept in check.
  */
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
@@ -15,6 +15,7 @@ import { INVENTORY_DB } from '../tools/catalog/build.mjs';
 import { loadEncyclopedia } from '../tools/encyclopedia/data.mjs';
 import { pathOf } from '../tools/encyclopedia/parts.mjs';
 import { waysFromStart } from '../tools/encyclopedia/streets.mjs';
+import { GSJS_GIVER_HOW, sourcesOf } from '../tools/encyclopedia/where-to-find.mjs';
 import { VENDOR_PROFILES, selectVendorProfile } from '../public/js/vendor.js?v=c74e9e04';
 import { ecologyForStreet, populationForStreet } from '../public/js/street-ecology.js?v=d41e5e97';
 import { closedStreets, initializeStreetJobs, normalizeStreetJobState } from '../public/js/street-jobs.js?v=eca98f2d';
@@ -187,12 +188,66 @@ describe('item pages: Where to find it', () => {
   it('names what gives a resource, linked, with the streets that have one', { skip }, () => {
     const cherry = read('encyclopedia/items/cherry/index.html');
     assert.ok(cherry.includes('href="../../../encyclopedia/items/trant_fruit/"'));
-    assert.match(text(cherry), new RegExp(`Fruit Tree , on ${d.streetsHaving('trant_fruit')} streets`));
+    assert.match(text(cherry), new RegExp(`Fruit Tree , harvest it, on ${d.streetsHaving('trant_fruit')} streets`));
     const meat = read('encyclopedia/items/meat/index.html');
-    assert.match(text(meat), new RegExp(`Where to find it .*Piggy , on ${d.streetsHaving('npc_piggy')} streets`));
+    assert.match(text(meat), new RegExp(`Where to find it .*Piggy , nibble it, on ${d.streetsHaving('npc_piggy')} streets`));
     const paper = text(read('encyclopedia/items/paper/index.html'));
-    assert.match(paper, /Dust Trap , on \d+ streets/);
-    assert.match(paper, /Paper Tree , on \d+ streets/);
+    assert.match(paper, /Dust Trap , sometimes when you walk into it, on \d+ streets/);
+    assert.match(paper, /Paper Tree , harvest it, on \d+ streets/);
+  });
+
+  it('names every source once: one block, no source twice on any item page (Austin 2026-11-05)', { skip }, () => {
+    // Before the fold, 8 item pages named the same animal under Where to find it and again
+    // under "Creatures and people that give it" (Piggy on Meat, Chicken on Grain).
+    const dir = join(pub, 'encyclopedia/items');
+    let pages = 0;
+    let blocks = 0;
+    for (const id of readdirSync(dir)) {
+      const f = join(dir, id, 'index.html');
+      if (!existsSync(f)) continue;
+      pages += 1;
+      const ency = /<section class="band ency-band cat-ency"[\s\S]*?<\/section>/.exec(readFileSync(f, 'utf8'))?.[0];
+      if (!ency) continue;
+      assert.ok(!ency.includes('Creatures and people that give it'), `${id}: the old list is folded into Where to find it`);
+      assert.ok((ency.match(/<h3>Where to find it<\/h3>/g) || []).length <= 1, `${id}: one Where to find it`);
+      if (ency.includes('<h3>Where to find it</h3>')) blocks += 1;
+      // Every cross-link block of the section (where to find it, quests, places, achievements, sounds): each page once.
+      const hrefs = [...ency.matchAll(/href="([^"#]+)/g)].map((m) => m[1]);
+      const twice = hrefs.filter((h, i) => hrefs.indexOf(h) !== i);
+      assert.deepEqual(twice, [], `${id} links the same page twice in In the encyclopedia`);
+    }
+    assert.ok(pages > 900, `${pages} item pages`);
+    assert.ok(blocks > 200, `${blocks} pages with Where to find it`);
+  });
+
+  it('folds in the creatures and people that give or sell it, with how you get it', { skip }, () => {
+    const where = (id) => text(read(`encyclopedia/items/${id}/index.html`)).split('Where to find it')[1]?.split(/ (Quests|Where it is found|Achievements|Sounds|Verbs) /)[0] || '';
+    // A person with a store of their own and no Stores page: the price and their streets.
+    assert.match(where('fox_bait'), new RegExp(`Fox Ranger , 30 currants , on ${d.streetsHaving('npc_fox_ranger')} streets`));
+    // Tiny Speck's own creatures and people, with the verb or conversation that gives it.
+    assert.match(where('grain'), /Chicken , squeeze it, on \d+ streets.*Heli Kitty , squeeze it/);
+    assert.match(where('crabato_juice'), /Crab , hug it/);
+    assert.match(where('gem_diamond'), /Dust Trap , sometimes when you walk into it.*Smuggler , talk to them/);
+    // A remake giver Tiny Speck's file also names keeps the remake's words, once.
+    assert.match(where('boot'), /^ What gives it, how you get it, and how many streets have one\. Salmon , sometimes when you pocket it, on \d+ streets$/);
+    // Not sources: the Batterfly's Milk verb gives nothing, the bartender only hands your own ticket back.
+    assert.doesNotMatch(where('milk_butterfly'), /Batterfly/);
+    assert.equal(where('drink_ticket'), '');
+    // Every creature or person whose file gives an item has its way in our words, never a bare "gives it".
+    for (const [key, backs] of d.back) {
+      if (!key.startsWith('item:')) continue;
+      for (const b of backs) {
+        if (b.rel !== 'gives' || !/^(animals|people):/.test(b.from) || !d.entries.has(b.from)) continue;
+        const cls = d.entries.get(b.from).id;
+        // The remake's rules say how, or they sell it (the Fox Ranger).
+        if ((d.givers.get(key.slice(5)) || []).some((g) => g.cls === cls) || sourcesOf(key.slice(5), d).some((x) => x.key === b.from && x.kind === 'seller')) continue;
+        assert.ok(`${cls}>${key.slice(5)}` in GSJS_GIVER_HOW, `${b.from} gives ${key}: add how to GSJS_HOW`);
+      }
+    }
+    for (const id of d.items.keys()) {
+      const keys = sourcesOf(id, d).map((s) => s.key);
+      assert.equal(new Set(keys).size, keys.length, id);
+    }
   });
 
   it('is a part of its own, registered on the item page in one line', () => {

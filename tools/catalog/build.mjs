@@ -1002,14 +1002,14 @@ ${usesHtml.length ? `          <ul class="cat-list">
     if (use?.mood) list.push(P.chip(`${fmt(use.mood)} mood`));
     return P.chips(list, 'cat-stats');
   }
-  // The encyclopedia's way back to this item: quests, creatures and people, places, achievements.
+  // The encyclopedia's way back to this item: where to find it (every store, creature, person and
+  // thing that sells or gives it, once: tools/encyclopedia/where-to-find.mjs), quests, places, achievements.
   const backs = ency.back.get(`item:${it.id}`) || [];
   const fromAll = (test) => backs.filter((b) => test(b) && ency.entries.has(b.from)).filter((b, i, a) => a.findIndex((x) => x.from === b.from) === i);
   const QUEST_REL = { needs: 'needs it', tool: 'needs it as a tool', rewards: 'a reward', gives: 'given to you', mentions: 'named in it', involves: 'involves it' };
   const qRank = { needs: 0, tool: 1, rewards: 2, gives: 3, involves: 4, mentions: 5 };
   const questTiles = fromAll((b) => b.from.startsWith('quests:')).map((b) => ({ ...b, rel: backs.filter((x) => x.from === b.from).sort((x, y) => qRank[x.rel] - qRank[y.rel])[0].rel }))
     .sort((a, b) => qRank[a.rel] - qRank[b.rel]).map((b) => P.tile(b.from, { sub: QUEST_REL[b.rel] || '' }));
-  const whoTiles = fromAll((b) => (b.from.startsWith('animals:') || b.from.startsWith('people:')) && b.rel !== 'sells' && b.rel !== 'mentions').map((b) => P.tile(b.from, { sub: 'gives it' }));
   const placeChips = fromAll((b) => b.from.startsWith('places:') && b.rel === 'lives').sort((a, b) => b.n - a.n)
     .map((b) => P.chip(`${esc(ency.entries.get(b.from).name)} <b>${fmt(b.n)}</b>`, { link: P.href(b.from), cls: 'ency-place' }));
   const achTiles = fromAll((b) => b.from.startsWith('achievements:')).map((b) => P.tile(b.from, { sub: b.n > 1 ? `${fmt(b.n)} times` : '' }));
@@ -1018,7 +1018,6 @@ ${usesHtml.length ? `          <ul class="cat-list">
   const encyBody = [
     whereToFind(it.id, P, ency),
     questTiles.length ? `<h3>Quests</h3>\n        ${P.tiles(questTiles)}` : '',
-    whoTiles.length ? `<h3>Creatures and people that give it</h3>\n        ${P.tiles(whoTiles)}` : '',
     placeChips.length ? `<h3>Where it is found</h3>\n        <p class="ency-lead-small">Regions on the map, with how many there are in each, from the streets’ own files.</p>\n        ${P.chips(placeChips)}` : '',
     achTiles.length ? `<h3>Achievements</h3>\n        ${P.tiles(achTiles)}` : '',
     soundTiles.length ? `<h3>Sounds</h3>\n        ${P.tiles(soundTiles)}` : '',
