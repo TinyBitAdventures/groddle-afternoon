@@ -131,6 +131,23 @@ describe('iconize and emblem verbs', () => {
     rollIconDay(state, 'd2');
     assert.equal(useEmblem(state, 'alph', 'caress').ok, true);
   });
+
+  it('holding several Emblems of one Giant gives no more: one emblem a slot, so the count is always 1 (#106)', { skip: !existsSync(join(GSJS, 'items', 'emblem_lem.js')) && 'needs glitch-GameServerJS' }, () => {
+    // emblem_base: caress is 25 * msg.count, but every emblem has stackmax 1, and the client only
+    // asks how many when the clicked stack holds more than one (InteractionMenuController.as 976),
+    // so msg.count was always 1. The daily lock is per Giant (canUse, the class's daily count).
+    for (const g of GIANT_ICON_IDS) {
+      const src = readFileSync(join(GSJS, 'items', `${GIANT_ICON_DATA[g].emblemClass}.js`), 'utf8');
+      assert.match(src, /^var stackmax = 1;$/m, g);
+      assert.match(src, /metabolics_add_mood\(25 \* msg\.count\)/, g);
+    }
+    const items = JSON.parse(readFileSync(join(root, 'assets', 'content', 'trade-items.json'), 'utf8'));
+    for (const g of GIANT_ICON_IDS) assert.equal(items.items[GIANT_ICON_DATA[g].emblemClass].max, 1, g);
+    const state = createIconState();
+    rollIconDay(state, 'd1');
+    assert.equal(useEmblem(state, 'lem', 'contemplate').amount, 30);
+    assert.equal(useEmblem(state, 'lem', 'contemplate').ok, false, 'a second Emblem of Lem the same day');
+  });
 });
 
 describe('icon verbs', () => {
