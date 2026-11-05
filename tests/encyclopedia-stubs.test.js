@@ -10,7 +10,7 @@ import { describe, it } from 'node:test';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { INVENTORY_DB } from '../tools/catalog/build.mjs';
-import { BUILT_SECTIONS, hasWords, isBlankStub, loadEncyclopedia } from '../tools/encyclopedia/data.mjs';
+import { BUILT_SECTIONS, SECTIONS, hasWords, isBlankStub, loadEncyclopedia } from '../tools/encyclopedia/data.mjs';
 import { STATUS, inRemake, pathOf } from '../tools/encyclopedia/parts.mjs';
 
 const spike = join(import.meta.dirname, '..');
@@ -89,7 +89,7 @@ describe('blank stubs', () => {
   it('keeps every count in step with the pages', { skip: skipWithoutInventory }, () => {
     const home = read('encyclopedia/index.html');
     const card = (label) => Number(new RegExp(`ency-card-name">${label} <span class="count">([\\d,]+)</span>`).exec(home)?.[1].replace(/,/g, ''));
-    const SECTION_LABEL = { quests: 'Quests', animals: 'Animals and creatures', people: 'People', skills: 'Skills', places: 'Places', achievements: 'Achievements', sounds: 'Music and sounds' };
+    const SECTION_LABEL = Object.fromEntries(SECTIONS.map((s) => [s.key, s.label]));
     for (const sec of BUILT_SECTIONS) {
       // Music and sounds keeps its Still missing list beside the entries (tests/encyclopedia-sounds.test.js counts it).
       const pages = readdirSync(join(pub, 'encyclopedia', sec), { withFileTypes: true }).filter((x) => x.isDirectory() && !(sec === 'sounds' && x.name === 'still-missing')).length;

@@ -6426,7 +6426,7 @@
       "compare/compare.json": "ff991903",
       "contribute/data.json": "f3183da4",
       "encyclopedia/items/data.json": "170a7ef8",
-      "encyclopedia/search.json": "7647df4b",
+      "encyclopedia/search.json": "d0e76a43",
       "landing/card-explore.webp": "9fa06b9d",
       "landing/card-grow.webp": "65e5704b",
       "landing/card-home.webp": "47031870",

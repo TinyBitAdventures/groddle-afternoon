@@ -1,0 +1,23 @@
+/*
+ * The encyclopedia's newer sections (tools/encyclopedia/sections.mjs): what
+ * catalog.css does not already draw. No colours of its own: the card art is
+ * Tiny Speck's, everything else is catalog.css and the site's tokens.
+ */
+
+/* An Imagination card: the game's art layers stacked, as the Imagination panel draws them. */
+.ency-card-art {
+  position: relative;
+  display: inline-block;
+  width: 108px;
+  aspect-ratio: 230 / 310;
+  flex: none;
+}
+.ency-card-art img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.ency-card-hero {
+  width: 132px;
+}

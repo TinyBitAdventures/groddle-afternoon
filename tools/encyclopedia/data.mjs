@@ -29,6 +29,7 @@ import { readSkills } from '../inventory/gsjs-data.mjs';
 import { supplyConversions } from '../job-obtainable.mjs';
 import { inRemake, plainText } from './parts.mjs';
 import { addSounds } from './sounds.mjs';
+import { MORE_SECTIONS, addMoreSections } from './sections.mjs';
 
 const root = join(import.meta.dirname, '..', '..');
 export const PUB = join(root, 'public');
@@ -36,7 +37,7 @@ const content = (name) => JSON.parse(readFileSync(join(PUB, 'assets', 'content',
 const js = (name) => join(PUB, 'js', name);
 
 /** The sections built so far (docs/encyclopedia.md "Order of work"). */
-export const BUILT_SECTIONS = ['quests', 'animals', 'people', 'skills', 'places', 'achievements', 'sounds'];
+export const BUILT_SECTIONS = ['quests', 'animals', 'people', 'skills', 'places', 'achievements', 'sounds', ...MORE_SECTIONS.map((s) => s.key)];
 
 const ALL_SECTIONS = [
   { key: 'quests', label: 'Quests', one: 'quest', blurb: 'How to get each quest, every step, what it needs and what it gives.' },
@@ -46,6 +47,8 @@ const ALL_SECTIONS = [
   { key: 'places', label: 'Places', one: 'region', blurb: 'Every region on the map, its streets and what lives on them.' },
   { key: 'achievements', label: 'Achievements', one: 'achievement', blurb: 'Every badge, what earns it and what it rewards.' },
   { key: 'sounds', label: 'Music and sounds', one: 'sound', blurb: 'Every tune and sound of the original, what the remake plays for it, and what is still missing.' },
+  // Imagination upgrades, recipes, buffs, feats and street projects, Giants (tools/encyclopedia/sections.mjs).
+  ...MORE_SECTIONS.map(({ key, label, one, blurb, groupWord, sample, css }) => ({ key, label, one, blurb, groupWord, sample, css })),
 ];
 export const SECTIONS = ALL_SECTIONS.filter((s) => BUILT_SECTIONS.includes(s.key));
 
@@ -408,6 +411,7 @@ export async function loadEncyclopedia({ inventory = readInventoryAll() } = {}) 
   /* Music and sounds (tools/encyclopedia/sounds.mjs): added once the stubs are known, so a sound keeps none of them. */
   const sounds = addSounds({ entries, items, keyOf, stubKey, nameOf }, { picture });
   for (const s of sounds.stubs) stubs.set(s.key, s);
+  addMoreSections({ add, entries, items, keyOf, nameOf, picture, itemIcon, recipes, skills, ecology });
   const back = backOf();
   return { entries, items, back, recipes, keyOf, skills, stores, stubs, stubKey, nameOf, sounds };
 }

@@ -26,6 +26,7 @@ import { keyOf as moduleKeyOf } from '../module-keys/build.mjs';
 import { EMAIL } from '../contribute/to-minn.mjs';
 import { GIANTS, PUB, SECTIONS, giantIcon, loadEncyclopedia, picture } from './data.mjs';
 import { SOUND_GROUPS } from './sounds.mjs';
+import { MORE_PAGES } from './sections.mjs';
 import { neverReleased, neverReleasedNote, neverReleasedTag } from './never-released.mjs';
 import { STATUS, andList, article, badge, esc, fmt, inRemake, makeParts, pathOf, plainText, sep, statusLabel, tsHtml } from './parts.mjs';
 
@@ -91,7 +92,7 @@ const FOOT = (p) => `  <footer class="foot">
     </div>
   </footer>`;
 
-const shell = ({ p, title, description, body, script }) => `<!doctype html>
+const shell = ({ p, title, description, body, script, css }) => `<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
@@ -103,7 +104,7 @@ const shell = ({ p, title, description, body, script }) => `<!doctype html>
   <link rel="stylesheet" href="${p}site/site-nav.css" />
 ${script ? mapTags(p) : ''}  <script src="${p}site/theme.js"></script>
   <link rel="stylesheet" href="${p}encyclopedia/items/catalog.css" />
-  <link rel="icon" href="${p}favicon.svg?v=arch" type="image/svg+xml" />
+${css ? `  <link rel="stylesheet" href="${p}${css}" />\n` : ''}  <link rel="icon" href="${p}favicon.svg?v=arch" type="image/svg+xml" />
   <link rel="icon" href="${p}favicon.ico?v=arch" sizes="32x32" />
   <link rel="apple-touch-icon" href="${p}apple-touch-icon.png?v=arch" />
 ${script ? `  <script type="module" src="${p}encyclopedia/encyclopedia.js?v=${moduleKeyOf('encyclopedia/encyclopedia.js', root)}"></script>\n` : ''}</head>
@@ -133,9 +134,9 @@ function soundTiles(key, P, backOf, uniqBy, test = () => true) {
   return uniqBy(backOf(key, (b) => b.from.startsWith('sounds:') && test(b)), (b) => b.from).map((b) => P.tile(b.from));
 }
 
-function entryHead(e, P, { kickerExtra = '', subline = '' } = {}) {
+function entryHead(e, P, { kickerExtra = '', subline = '', hero = '' } = {}) {
   const sec = SECTION[e.section];
-  const pic = e.icon ? P.img(e.icon, 'cat-hero-icon', 144) : '<span class="cat-hero-icon cat-ph" aria-hidden="true"></span>';
+  const pic = hero || (e.icon ? P.img(e.icon, 'cat-hero-icon', 144) : '<span class="cat-hero-icon cat-ph" aria-hidden="true"></span>');
   const caption = e.icon?.caption || e.iconCaption || '';
   // Never released in Glitch (never-released.mjs): a tag beside the status and a note under it.
   const nr = neverReleased(e.key);
@@ -212,14 +213,14 @@ export async function buildEncyclopedia(data = null) {
       const p = '../../../';
       const P = makeParts(p, info, d.nameOf);
       const linkFor = (id) => { const k = d.keyOf(id); return k ? P.href(k) : null; };
-      const page = { quests: questPage, animals: creaturePage, people: creaturePage, skills: skillPage, places: placePage, achievements: achievementPage, sounds: soundPage }[sec.key];
+      const page = { quests: questPage, animals: creaturePage, people: creaturePage, skills: skillPage, places: placePage, achievements: achievementPage, sounds: soundPage, ...MORE_PAGES }[sec.key];
       // Bands alternate plain and tinted in the order they appear, whichever ones the entry has.
-      let band = 0;
-      const body = (page(e, P, { linkFor, backOf, uniqBy, info, d }) + pager(list, i, sec.label))
-        .replace(/<(section|nav) class="band(?: band-alt)?/g, (m, tag) => `<${tag} class="band${band++ % 2 ? ' band-alt' : ''}`);
+      let nth = 0;
+      const body = (page(e, P, { linkFor, backOf, uniqBy, info, d, kit: { band, sub, paras, entryHead, verbList, learnTime } }) + pager(list, i, sec.label))
+        .replace(/<(section|nav) class="band(?: band-alt)?/g, (m, tag) => `<${tag} class="band${nth++ % 2 ? ' band-alt' : ''}`);
       const desc = plainText(e.quest?.desc || e.creature?.desc || e.skill?.description || e.ach?.desc || e.desc || e.sound?.moment || '').slice(0, 150);
       // A sound's page loads the encyclopedia's script for its synth stand-in and its players.
-      put(`${OUT}/${sec.key}/${e.id}/index.html`, shell({ p, title: `${e.name} · Groddle Encyclopedia`, description: `${desc ? `${desc} ` : ''}${statusLabel(e.status)}.`, body, script: sec.key === 'sounds' }));
+      put(`${OUT}/${sec.key}/${e.id}/index.html`, shell({ p, title: `${e.name} · Groddle Encyclopedia`, description: `${desc ? `${desc} ` : ''}${statusLabel(e.status)}.`, body, script: sec.key === 'sounds', css: sec.css }));
     });
     if (sec.key === 'sounds') {
       put(`${OUT}/sounds/index.html`, soundsIndex(sec, list, info, d.nameOf));
@@ -390,7 +391,7 @@ function creaturePage(e, P, { linkFor, backOf, uniqBy, info, d }) {
 ${band('give-h', e.store ? 'What they sell' : 'What it gives', [sells.length ? P.tiles(sells, 'ency-shop') : '', gives.length ? (e.store ? sub('Also gives', P.tiles(gives)) : P.tiles(gives)) : ''].filter(Boolean).join('\n        '), { alt: true, lead: e.store ? 'Prices in currants, as the remake sells them.' : 'The items its game code hands out.' })}
 ${band('verbs-h', 'What you can do', [verbList(c?.verbs || []), sub('Skills that change it', P.tiles(skills))].filter(Boolean).join('\n        '), { lead: c?.verbs?.length ? 'Its verbs, with Tiny Speck’s tooltips.' : '' })}
 ${band('where-h', 'Where to find it', placeChips.length ? `<p class="ency-lead-small">On ${fmt(totalStreets)} street${totalStreets === 1 ? '' : 's'} in ${fmt(lives.length)} region${lives.length === 1 ? '' : 's'}, by the 2012 map and the streets’ own files.</p>${P.chips(placeChips)}` : '', { alt: true })}
-${band('rel-h', 'Quests and achievements', [sub('Quests', P.tiles(quests)), sub('Achievements', P.tiles(achs)), sub('Sounds', P.tiles(soundTiles(e.key, P, backOf, uniqBy))), sub('Where it comes from', P.tiles(comesFrom)), sub('Skills this Giant favors', P.tiles(giantSkills)), sub('Other shrines to this Giant', P.tiles(variants))].filter(Boolean).join('\n        '))}
+${band('rel-h', 'Quests and achievements', [sub('Quests', P.tiles(quests)), sub('Achievements', P.tiles(achs)), sub('Sounds', P.tiles(soundTiles(e.key, P, backOf, uniqBy))), sub('Where it comes from', P.tiles(comesFrom)), sub('The Giant', P.tiles(uniqBy(backOf(e.key, (b) => b.from.startsWith('giants:')), (b) => b.from).map((b) => P.tile(b.from)))), sub('Skills this Giant favors', P.tiles(giantSkills)), sub('Other shrines to this Giant', P.tiles(variants))].filter(Boolean).join('\n        '))}
 ${remakeBand(e)}
   </main>`;
 }
@@ -400,7 +401,7 @@ ${remakeBand(e)}
 function skillPage(e, P, { linkFor, backOf, uniqBy, info }) {
   const s = e.skill;
   const giants = Object.entries(s.giants || {}).sort((a, b) => b[1].primary - a[1].primary)
-    .map(([g, v]) => P.chip(`${esc(GIANTS[g] || g)}${v.primary ? ' (primary)' : ''}`, { pic: picture(giantIcon(g)), link: info(`people:npc_shrine_${g}`) ? P.href(`people:npc_shrine_${g}`) : null }));
+    .map(([g, v]) => P.chip(`${esc(GIANTS[g] || g)}${v.primary ? ' (primary)' : ''}`, { pic: picture(giantIcon(g)), link: info(`giants:${g}`) ? P.href(`giants:${g}`) : info(`people:npc_shrine_${g}`) ? P.href(`people:npc_shrine_${g}`) : null }));
   const needs = uniqBy(e.refs.filter((r) => ['needs-skill', 'after'].includes(r.rel)), (r) => r.to).map((r) => P.tile(r.to, { sub: r.to.startsWith('quests:') ? 'finish it first' : r.to.startsWith('achievements:') ? 'earn it first' : 'learn it first' }));
   const unlocks = uniqBy(backOf(e.key, (b) => b.rel === 'needs-skill' && b.from.startsWith('skills:')), (b) => b.from).map((b) => P.tile(b.from));
   const quests = uniqBy([...e.refs.filter((r) => r.rel === 'opens').map((r) => ({ from: r.to })), ...backOf(e.key, (b) => b.from.startsWith('quests:'))], (b) => b.from)
@@ -742,9 +743,9 @@ function sectionIndex(sec, list, info, nameOf) {
           <input id="q" type="search" placeholder="Filter by name" autocomplete="off" spellcheck="false" data-filter />
         </label>
 ${groups.length > 1 ? `        <div class="cat-selects">
-          <label><span>${esc(GROUP_WORD[sec.key])}</span>
+          <label><span>${esc(GROUP_WORD[sec.key] || sec.groupWord)}</span>
             <select id="grp" data-group>
-              <option value="">All ${esc(GROUP_WORD[sec.key].toLowerCase())}s</option>
+              <option value="">All ${esc((GROUP_WORD[sec.key] || sec.groupWord).toLowerCase())}s</option>
 ${groups.map((g) => { const pic = list.find((e) => e.group === g && e.icon)?.icon; return `              <option value="${esc(g)}"${pic ? ` data-icon="${p}${esc(pic.src)}"` : ''}>${esc(g)} (${fmt(list.filter((e) => e.group === g).length)})</option>`; }).join('\n')}
             </select>
           </label>
@@ -755,7 +756,7 @@ ${groups.map((g) => { const pic = list.find((e) => e.group === g && e.icon)?.ico
     </div>
   </main>
 `;
-  return shell({ p, title: `${sec.label} · Groddle Encyclopedia`, description: `${sec.blurb} ${inCount} of ${list.length} are in the Groddle Afternoon remake.`, body, script: true });
+  return shell({ p, title: `${sec.label} · Groddle Encyclopedia`, description: `${sec.blurb} ${inCount} of ${list.length} are in the Groddle Afternoon remake.`, body, script: true, css: sec.css });
 }
 
 function homePage(bySection, items, info, nameOf) {
@@ -771,14 +772,14 @@ function homePage(bySection, items, info, nameOf) {
   const card = (href, label, n, blurb, pic) => `<li><a class="ency-card" href="${href}">${P.img(pic, 'ency-card-ic', 64)}<span class="ency-card-text"><span class="ency-card-name">${esc(label)} <span class="count">${fmt(n)}</span>${sep('.')}</span> <span class="ency-card-blurb">${esc(blurb)}</span></span></a></li>`;
   const cards = [
     card('items/', 'Items', items.size, `Every item, how to get it and what it is for. ${fmt(itemsIn)} are in the remake.`, info('item:apple')?.icon),
-    ...SECTIONS.map((s) => card(`${s.key}/`, s.label, bySection[s.key].length, blurbOf(s), info(sample[s.key])?.icon || bySection[s.key][0]?.icon)),
+    ...SECTIONS.map((s) => card(`${s.key}/`, s.label, bySection[s.key].length, blurbOf(s), info(sample[s.key] || s.sample)?.icon || bySection[s.key][0]?.icon)),
   ];
   const body = `
   <header class="masthead note-head cat-head">
     <div class="wrap">
       <p class="kicker">Groddle Field Notes · Encyclopedia</p>
       <h1>Groddle Encyclopedia</h1>
-      <p class="lead">Stuck on a quest? Look up the quest, the creature, the person or the place: how to get it, every step, and where to go. Everything here comes from Tiny Speck’s own game code, with what the remake has today, down to every tune and sound.</p>
+      <p class="lead">Stuck on a quest? Look up the quest, the creature, the person or the place: how to get it, every step, and where to go. Everything here comes from Tiny Speck’s own game code, with what the remake has today, down to every tune and sound, every recipe, buff and Imagination card, the Feats, street projects and the Giants.</p>
       <label class="history-search cat-search ency-search" for="q">
         <span class="visually-hidden">Search the encyclopedia</span>
         <input id="q" type="search" placeholder="Search, e.g. rasher, piggy, alchemy, Groddle Meadow" autocomplete="off" spellcheck="false" data-search="search.json" />
@@ -797,12 +798,12 @@ function homePage(bySection, items, info, nameOf) {
     </div>
   </main>
 `;
-  return shell({ p, title: 'Groddle Encyclopedia', description: 'Quests, animals, people, skills, places, achievements, music and sounds, and items from Tiny Speck’s game, with how to get each one and its status in the Groddle Afternoon remake.', body, script: true });
+  return shell({ p, title: 'Groddle Encyclopedia', description: 'Quests, animals, people, skills, places, achievements, music and sounds, Imagination upgrades, recipes, buffs, feats and street projects, Giants and items from Tiny Speck’s game, with how to get each one and its status in the Groddle Afternoon remake.', body, script: true });
 }
 
 /* -- Write / check ------------------------------------------ */
 
-const STATIC = new Set(['encyclopedia.js']);
+const STATIC = new Set(['encyclopedia.js', 'sections.css']);
 /** The Items section's folder: tools/catalog/build.mjs writes and checks it, so it is never a stray here. */
 const CATALOG = `${OUT}/items`;
 
