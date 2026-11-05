@@ -21,6 +21,10 @@ export const FROM_RESTORATION = Object.freeze({
 /**
  * Our cell for one matrix row: every restoration item the row names, folded
  * into one status. All yes -> yes, all no -> no, anything else -> partial.
+ * A row may carry "oursCell": { status, note } in compare.json when the matrix
+ * should read differently from the checklist (Austin 2026-11-04: the Rook and
+ * the races are back by the source rules online, but solo still plays lighter,
+ * so they read Partly). Its status replaces the derived one and its note leads.
  */
 export function oursCell(row, restoration) {
   const items = (row.ours || []).map((id) => restoration.items.find((it) => it.id === id));
@@ -35,6 +39,10 @@ export function oursCell(row, restoration) {
   const note = items
     .map((it) => `${it.name} (${restoration.status[it.status]?.label || it.status}): ${it.blurb}`)
     .join(' ');
+  const override = row.oursCell;
+  if (override && STATUS_KEYS.includes(override.status)) {
+    return { status: override.status, note: override.note ? `${override.note} ${note}` : note, items: items.map((it) => it.id), override: true };
+  }
   return { status, note, items: items.map((it) => it.id) };
 }
 

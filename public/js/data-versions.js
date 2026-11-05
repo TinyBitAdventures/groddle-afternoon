@@ -6423,7 +6423,7 @@
       "assets/ui/signpost/signpost_shadow@3x.png": "dc99d4c5",
       "assets/ui/snaps/filter-thumb.png": "66d82b2b",
       "brand/share.jpg": "fb033ab8",
-      "compare/compare.json": "ad61d7e0",
+      "compare/compare.json": "ff991903",
       "contribute/data.json": "f3183da4",
       "encyclopedia/items/data.json": "170a7ef8",
       "encyclopedia/search.json": "7647df4b",

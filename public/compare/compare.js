@@ -5,7 +5,7 @@
  * ../restoration/data.json so it stays in step with development.
  */
 
-import { STATUS_KEYS, UNGROUPED, factText, longDate, matrixSections, oursCell, oursNumbers, tallyColumn } from './compare-data.js?v=51e9e331';
+import { STATUS_KEYS, UNGROUPED, factText, longDate, matrixSections, oursCell, oursNumbers, tallyColumn } from './compare-data.js?v=8b025e0c';
 
 const $ = (sel, root = document) => root.querySelector(sel);
 const el = (tag, attrs = {}, ...kids) => {

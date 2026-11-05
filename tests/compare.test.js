@@ -10,7 +10,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { STATUS_KEYS, FROM_RESTORATION, UNGROUPED, factText, matrixSections, oursCell, oursNumbers } from '../public/compare/compare-data.js?v=51e9e331';
+import { STATUS_KEYS, FROM_RESTORATION, UNGROUPED, factText, matrixSections, oursCell, oursNumbers } from '../public/compare/compare-data.js?v=8b025e0c';
 import { STATUS as RESTORATION_STATUS } from '../tools/restoration/checklist.mjs';
 import { servedByMinn } from './minn-served.js';
 
@@ -135,8 +135,40 @@ describe('our column', () => {
     const players = data.rows.find((r) => r.id === 'players');
     // Multiplayer has street, party, global, help, trade and group chat, buddies and blocks (G326).
     assert.equal(oursCell(players, restoration).status, 'yes', 'other players and chat are back, in multiplayer');
-    // Rook attacks and the races run between real players by the source rules (rook.go, races.go, hoghaul.go, crowns.go).
-    for (const id of ['rooks', 'races']) assert.equal(oursCell(data.rows.find((r) => r.id === id), restoration).status, 'yes', id);
+  });
+
+  it('a row\'s oursCell override replaces the derived mark and leads the note', () => {
+    // Rook attacks and the races run between real players by the source rules online (rook.go, races.go,
+    // hoghaul.go, crowns.go), but solo still plays lighter (ROOK_SOLO, stand-in rivals): Partly (Austin 2026-11-04).
+    for (const id of ['rooks', 'races']) {
+      const row = data.rows.find((r) => r.id === id);
+      const derived = oursCell({ ...row, oursCell: undefined }, restoration);
+      assert.equal(derived.status, 'yes', `${id}: the checklist still reads yes`);
+      const cell = oursCell(row, restoration);
+      assert.equal(cell.status, 'partial', id);
+      assert.ok(cell.override, id);
+      assert.ok(cell.note.startsWith(row.oursCell.note), `${id}: the override note shows first`);
+      assert.ok(cell.note.includes(derived.note), `${id}: the checklist detail follows`);
+      assert.deepEqual(cell.items, row.ours);
+    }
+    assert.match(data.rows.find((r) => r.id === 'rooks').oursCell.note, /solo keeps lighter rules/);
+    assert.match(data.rows.find((r) => r.id === 'races').oursCell.note, /stand-in rival/);
+    // Rows without one still follow the checklist.
+    assert.equal(oursCell(data.rows.find((r) => r.id === 'players'), restoration).override, undefined);
+  });
+
+  it('every oursCell override names a status the page knows and carries a plain note', () => {
+    const overrides = data.rows.filter((r) => r.oursCell);
+    assert.ok(overrides.length >= 2);
+    for (const row of overrides) {
+      assert.ok(STATUS_KEYS.includes(row.oursCell.status) && data.statuses[row.oursCell.status], `${row.id}: ${row.oursCell.status}`);
+      assert.ok(row.oursCell.note?.trim(), `${row.id} note`);
+      assert.doesNotMatch(row.oursCell.note, /—/, row.id);
+      assert.deepEqual(Object.keys(row.oursCell).sort(), ['note', 'status'], row.id);
+    }
+    // An override with a status the page does not know is ignored, never drawn.
+    const row = { ...data.rows.find((r) => r.id === 'rooks'), oursCell: { status: 'partly', note: 'x' } };
+    assert.equal(oursCell(row, restoration).status, 'yes');
   });
 
   it('headline numbers come from data.json', () => {

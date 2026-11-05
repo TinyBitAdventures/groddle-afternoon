@@ -491,6 +491,7 @@
     {
       "id": "rooks", "name": "Rook attacks", "group": "games",
       "ours": ["rooks"],
+      "oursCell": { "status": "partial", "note": "Online the Rook runs Glitch's rules at full cost; solo keeps lighter rules for one player." },
       "cells": {
         "cou": { "status": "unknown", "note": "No Rook attack code in the archived server or client; Rook items appear only in its item data.", "sources": [] },
         "eleven": { "status": "unknown", "note": "No public source.", "sources": [] },
@@ -500,6 +501,7 @@
     {
       "id": "races", "name": "Races and Game of Crowns", "group": "games",
       "ours": ["races", "hog-haul"],
+      "oursCell": { "status": "partial", "note": "Online races use Glitch's rules; solo races are against a stand-in rival." },
       "cells": {
         "cou": { "status": "unknown", "note": "Race tickets appear only in its item data; Race to the Forest is a quest written for the project.", "sources": [] },
         "eleven": { "status": "unknown", "note": "No public source.", "sources": [] },
