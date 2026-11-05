@@ -1,0 +1,19 @@
+/*
+ * The encyclopedia's Streets and Stores pages (tools/encyclopedia/streets.mjs, stores.mjs):
+ * a street's pictures (Tiny Speck's loading picture, the region map with the street drawn
+ * on it) and a store's streets by region. One file for every street and store page; the
+ * rest comes from encyclopedia/items/catalog.css. Colours only from the site's tokens
+ * (restoration.css), so light and dark both work.
+ */
+.st-figs { display: grid; gap: 16px; margin: 0 0 8px; }
+.st-fig { margin: 0; }
+.st-fig img { display: block; width: 100%; height: auto; border-radius: 10px; border: 1px solid var(--border); background: var(--surface); }
+.st-fig figcaption { margin: 6px 0 0; font-size: 13px; color: var(--muted); }
+.st-map-frame { position: relative; max-width: 520px; }
+.st-map-frame svg { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.st-map-frame line { stroke-linecap: round; }
+.st-near { stroke: var(--surface); stroke-width: 5; opacity: 0.9; }
+.st-here { stroke: var(--accent); stroke-width: 9; }
+.st-region h3 { margin: 14px 0 8px; }
+.st-region h3 a { color: inherit; }
+.cat-facts .ency-chips { margin: 0; }

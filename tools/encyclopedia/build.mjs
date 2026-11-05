@@ -29,12 +29,16 @@ import { SOUND_GROUPS } from './sounds.mjs';
 import { MORE_PAGES } from './sections.mjs';
 import { neverReleased, neverReleasedNote, neverReleasedTag } from './never-released.mjs';
 import { STATUS, andList, article, badge, esc, fmt, inRemake, makeParts, pathOf, plainText, sep, statusLabel, tsHtml } from './parts.mjs';
+import { regionMoreStreets, regionStreetName, streetPage, streetsIndex } from './streets.mjs';
+import { storePage } from './stores.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const OUT = 'encyclopedia';
 const SECTION = Object.fromEntries(SECTIONS.map((s) => [s.key, s]));
 
 /* -- What each status means, per kind of entry (our words) -- */
+
+/** Sections whose pages also load encyclopedia/streets.css (streets.mjs, stores.mjs). */
 
 const STATUS_TEXT = {
   quests: {
@@ -207,16 +211,18 @@ export async function buildEncyclopedia(data = null) {
   const files = {};
   const put = (path, html) => { files[path] = html; };
 
+  // The page frame's parts, for the sections drawn in their own modules (streets.mjs, stores.mjs).
+  const kit = { entryHead, band, sub, picture, shell };
   for (const sec of SECTIONS) {
     const list = bySection[sec.key];
     list.forEach((e, i) => {
       const p = '../../../';
       const P = makeParts(p, info, d.nameOf);
       const linkFor = (id) => { const k = d.keyOf(id); return k ? P.href(k) : null; };
-      const page = { quests: questPage, animals: creaturePage, people: creaturePage, skills: skillPage, places: placePage, achievements: achievementPage, sounds: soundPage, ...MORE_PAGES }[sec.key];
+      const page = { quests: questPage, animals: creaturePage, people: creaturePage, skills: skillPage, places: placePage, achievements: achievementPage, sounds: soundPage, streets: streetPage, stores: storePage, ...MORE_PAGES }[sec.key];
       // Bands alternate plain and tinted in the order they appear, whichever ones the entry has.
       let nth = 0;
-      const body = (page(e, P, { linkFor, backOf, uniqBy, info, d, kit: { band, sub, paras, entryHead, verbList, learnTime } }) + pager(list, i, sec.label))
+      const body = (page(e, P, { linkFor, backOf, uniqBy, info, d, kit: { ...kit, p, paras, verbList, learnTime } }) + pager(list, i, sec.label))
         .replace(/<(section|nav) class="band(?: band-alt)?/g, (m, tag) => `<${tag} class="band${nth++ % 2 ? ' band-alt' : ''}`);
       const desc = plainText(e.quest?.desc || e.creature?.desc || e.skill?.description || e.ach?.desc || e.desc || e.sound?.moment || '').slice(0, 150);
       // A sound's page loads the encyclopedia's script for its synth stand-in and its players.
@@ -225,7 +231,8 @@ export async function buildEncyclopedia(data = null) {
     if (sec.key === 'sounds') {
       put(`${OUT}/sounds/index.html`, soundsIndex(sec, list, info, d.nameOf));
       put(`${OUT}/sounds/${STILL_MISSING}/index.html`, stillMissingPage(list, info, d.nameOf));
-    } else put(`${OUT}/${sec.key}/index.html`, sectionIndex(sec, list, info, d.nameOf));
+    } else if (sec.key === 'streets') put(`${OUT}/streets/index.html`, streetsIndex(sec, list, { info, d, kit }));
+    else put(`${OUT}/${sec.key}/index.html`, sectionIndex(sec, list, info, d.nameOf));
   }
 
   // Search: every entry, items included.
@@ -447,13 +454,13 @@ function placePage(e, P, { info, d, backOf, uniqBy }) {
       const it = k ? info(k) : null;
       if (it) chips.push(P.chip(`${esc(it.name)}${n > 1 ? ` <b>${fmt(n)}</b>` : ''}`, { pic: it.icon, link: P.href(k) }));
     }
-    return `<li id="${esc(st.tsid)}" class="ency-street"><p class="ency-street-name"><span class="dot st-${st.inRemake ? 'source' : 'missing'}" aria-hidden="true"></span>${esc(st.name)}${st.inRemake ? '' : ' <span class="cat-muted">(not in the remake yet)</span>'}</p>${P.chips(chips)}</li>`;
+    return `<li id="${esc(st.tsid)}" class="ency-street"><p class="ency-street-name"><span class="dot st-${st.inRemake ? 'source' : 'missing'}" aria-hidden="true"></span>${regionStreetName(st, P, d)}${st.inRemake ? '' : ' <span class="cat-muted">(not in the remake yet)</span>'}</p>${P.chips(chips)}</li>`;
   });
   const inCount = e.streets.filter((x) => x.inRemake).length;
   return `${entryHead(e, P, { subline: esc(`Region on the map · ${fmt(e.streets.length)} streets, ${fmt(inCount)} in the remake`) })}
   <main>
 ${band('who-h', 'Who and what lives here', [P.tiles(who), sub('Trees, rocks and more', P.tiles(things))].filter(Boolean).join('\n        '), { lead: 'Counts from the streets’ own files.' })}
-${band('streets-h', 'Streets', `<ul class="ency-streets">${streets.join('\n          ')}</ul>`, { alt: true, lead: 'As the 2012 map named them, with each street’s vendor, shrine, animals, trees, rocks and music of its own.' })}
+${band('streets-h', 'Streets', `<ul class="ency-streets">${streets.join('\n          ')}</ul>${regionMoreStreets(e, P, d)}`, { alt: true, lead: 'As the 2012 map named them, with each street’s vendor, shrine, animals, trees, rocks and music of its own. A street’s name opens its own page.' })}
 ${band('music-h', 'Music and sounds', [sub('Region music', P.tiles(soundTiles(e.key, P, backOf, uniqBy, (b) => b.rel === 'region-music'))), sub('Street music', P.tiles(soundTiles(e.key, P, backOf, uniqBy, (b) => b.rel === 'street-music'))), sub('Sounds on its streets', P.tiles(soundTiles(e.key, P, backOf, uniqBy, (b) => b.rel === 'plays-in')))].filter(Boolean).join('\n        '), { lead: 'The music the remake plays here, and the sounds of its streets.' })}
 ${remakeBand(e)}
   </main>`;
@@ -714,7 +721,7 @@ function stillMissingPage(list, info, nameOf) {
 
 /* -- Indexes -------------------------------------------------- */
 
-const GROUP_WORD = { quests: 'Kind', animals: 'Kind', people: 'Kind', skills: 'Category', places: 'Kind', achievements: 'Category', sounds: 'Group' };
+const GROUP_WORD = { quests: 'Kind', animals: 'Kind', people: 'Kind', skills: 'Category', places: 'Kind', achievements: 'Category', sounds: 'Group', streets: 'Region', stores: 'Kind' };
 
 function sectionIndex(sec, list, info, nameOf) {
   const p = '../../';
@@ -763,7 +770,7 @@ function homePage(bySection, items, info, nameOf) {
   const p = '../';
   const P = makeParts(p, info, nameOf);
   const itemsIn = [...items.values()].filter((i) => inRemake(i.status)).length;
-  const sample = { quests: 'quests:animalkinship_nibble_meat', animals: 'animals:npc_piggy', people: 'people:street_spirit', skills: 'skills:animalkinship_1', places: 'places:groddle-meadow', achievements: 'achievements:bacon_biter', sounds: 'sounds:musicblock_d_green_01' };
+  const sample = { quests: 'quests:animalkinship_nibble_meat', animals: 'animals:npc_piggy', people: 'people:street_spirit', skills: 'skills:animalkinship_1', places: 'places:groddle-meadow', achievements: 'achievements:bacon_biter', sounds: 'sounds:musicblock_d_green_01', streets: 'streets:hechey-track', stores: 'stores:produce' };
   const blurbOf = (s) => {
     if (s.key !== 'sounds') return s.blurb;
     const c = soundCounts(bySection.sounds);
@@ -803,7 +810,7 @@ function homePage(bySection, items, info, nameOf) {
 
 /* -- Write / check ------------------------------------------ */
 
-const STATIC = new Set(['encyclopedia.js', 'sections.css']);
+const STATIC = new Set(['encyclopedia.js', 'sections.css', 'streets.css']);
 /** The Items section's folder: tools/catalog/build.mjs writes and checks it, so it is never a stray here. */
 const CATALOG = `${OUT}/items`;
 

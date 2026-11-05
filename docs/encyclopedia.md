@@ -29,6 +29,8 @@ Words about the remake are ours: plain, factual, no em dashes, never the
 | Buffs | `/encyclopedia/buffs/` | `/encyclopedia/buffs/<buff id>/` | `buffs.json` class |
 | Feats and street projects | `/encyclopedia/feats/` | `/encyclopedia/feats/<feat id or project class>/` | `js/solo-feats.js` ids, `street-jobs.json` classes |
 | Giants | `/encyclopedia/giants/` | `/encyclopedia/giants/<giant id>/` (`ti` is Tii) | GSJS `config_base.js` `giants` |
+| Streets | `/encyclopedia/streets/` | `/encyclopedia/streets/<slug of its name>/`, with `-<tsid>` when streets share a name | `assets/streets/index.json` street, named as the 2012 map names it |
+| Stores | `/encyclopedia/stores/` | `/encyclopedia/stores/<store key>/` | `js/vendor.js` VENDOR_PROFILES key (from `catalog_stores.js`) |
 
 The sections added on 2026-11-05 (Imagination upgrades to Giants) each live in
 their own module, listed in `tools/encyclopedia/sections.mjs`, which says what a
@@ -95,6 +97,44 @@ Every entry: picture, name, status badge, Tiny Speck's description, then:
 Cross-links are built from one index (`tools/encyclopedia/data.mjs` `xref`)
 so every link has its way back: a quest needing an item puts the quest on the
 item page, an animal creating an item puts the animal there, and so on.
+
+## Streets and Stores (Austin 2026-11-05)
+
+`tools/encyclopedia/streets.mjs` adds a page for every street of the remake that
+belongs to a region on the map: the region pages link each street's name to it,
+and list the streets the map does not draw (subway stations, rooms, tower floors).
+Streets that belong to no region (the May 2010 new-player streets, instanced quest
+and party places) get no page; the Streets index says how many. Each page shows:
+
+- the region, the vendor and shrine the game puts there (`populationForStreet` and
+  `selectVendorProfile`, the calls game.js makes; vendors that stand on a street of
+  their own from `street-ecology.json` `vendors`), and its music (the street file's
+  `musicFile`, else its region's);
+- Tiny Speck's loading picture when the build has it, and the region map with the
+  street drawn on it in SVG over `js/hub-map-backgrounds.js`;
+- signposts and doors (`signpost-graph.json`), one-way drops (`one-way-roads.json`)
+  and doors no key opens (`sealed`);
+- what is there: animals, trees, rocks and the rest, as the population counts them;
+- quests that happen there (`js/quest-reach.js questPlaceNeeds`) and the region's
+  Completist when the street counts toward it;
+- on a new world: closed until its street project is built (`js/street-jobs.js
+  closedStreets`, with the board that offers it), and how many projects stand
+  between the starting street and here (the same 0-1 search as `closuresInTheWay`).
+
+Tiny Speck's data has no description of a street; their words shown are the street
+project's line and a street upgrade's description. Pages are kept light (chips
+without 3x pictures, one shared `encyclopedia/streets.css`); the test holds a size
+budget.
+
+`tools/encyclopedia/stores.mjs` adds one page per store: Tiny Speck's stock at the
+remake's prices, who keeps it (with Tiny Speck's description for a vendor of its
+own), and every street that has one, by region.
+
+`tools/encyclopedia/where-to-find.mjs` is the item pages' "Where to find it": the
+stores that sell the item and how many streets have one, and for a resource the
+trees, rocks, animals and nodes that give it (`trants.js`, `mining.js`,
+`resource-nodes.js`), with their street counts. tools/catalog/build.mjs registers
+it in one line. `tests/encyclopedia-streets.test.js` holds all three.
 
 ## Status
 
@@ -226,6 +266,8 @@ the header and theme script are on every page, no em dashes in our words, and
 3. Skills and Places.
 4. Achievements.
 
+5. Streets and Stores, and Where to find it on item pages (2026-11-05).
+
 Later: street projects (job_* quests) as their own section, imagination
-upgrades, recipes as a section of their own, per-street pages, and creature
+upgrades, recipes as a section of their own, and creature
 sprites cut from the sheets in place of the Cubimal stand-ins.

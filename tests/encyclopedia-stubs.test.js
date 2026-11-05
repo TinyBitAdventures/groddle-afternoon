@@ -97,7 +97,8 @@ describe('blank stubs', () => {
       const rows = search.entries.filter((x) => x.s === sec);
       assert.equal(card(SECTION_LABEL[sec]), pages, `${sec}: home card`);
       assert.equal(rows.length, pages, `${sec}: search rows`);
-      if (sec === 'sounds') continue;
+      // Music and sounds and Streets draw their own index (tests/encyclopedia-sounds.test.js, tests/encyclopedia-streets.test.js).
+      if (sec === 'sounds' || sec === 'streets') continue;
       const index = read(`encyclopedia/${sec}/index.html`);
       const inCount = rows.filter((x) => inRemake(x.st)).length;
       assert.match(index, new RegExp(`<strong>${inCount.toLocaleString('en-US')}</strong> of ${pages.toLocaleString('en-US')}(?: [a-z]+)? are in the remake`), sec);

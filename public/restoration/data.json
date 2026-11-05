@@ -2730,9 +2730,74 @@
   "deployed": "2026-11-04"
  },
  "git": {
-  "commits": 1287,
+  "commits": 1305,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-05",
+    "kind": "improve",
+    "text": "The Encyclopedia's Recipes section is now Tools and recipes, counting 30 tools and the 327 recipes they make"
+   },
+   {
+    "date": "2026-11-05",
+    "kind": "fix",
+    "text": "On a phone the Social drawer starts closed, its close arrow takes the tap, and Report a problem stays on screen"
+   },
+   {
+    "date": "2026-11-05",
+    "kind": "improve",
+    "text": "Shake, Compress, Age, Unbundle and Shuck ask how many of the stack, with a number to type"
+   },
+   {
+    "date": "2026-11-05",
+    "kind": "fix",
+    "text": "Tii's name is spelled Tii on the loading card and in favor, dice and emblem lines"
+   },
+   {
+    "date": "2026-11-05",
+    "kind": "improve",
+    "text": "Every item page in the remake says what the item is for"
+   },
+   {
+    "date": "2026-11-05",
+    "kind": "improve",
+    "text": "A larger picture at the top of each item page"
+   },
+   {
+    "date": "2026-11-05",
+    "kind": "improve",
+    "text": "Item pages show each recipe's skills, energy and time, what vendors pay, and the stack size in the header"
+   },
+   {
+    "date": "2026-11-05",
+    "kind": "new",
+    "text": "I opens the Encyclopedia on what you are looking at, with links from the Menu, item cards, Skills and Quests"
+   },
+   {
+    "date": "2026-11-05",
+    "kind": "new",
+    "text": "The Encyclopedia has Feats and street projects: goals, rewards, solo or with others, and where each project is offered"
+   },
+   {
+    "date": "2026-11-05",
+    "kind": "new",
+    "text": "The Encyclopedia has Buffs: what each one does, how long it lasts and what gives it to you"
+   },
+   {
+    "date": "2026-11-05",
+    "kind": "new",
+    "text": "The Encyclopedia has Recipes by tool: what goes in and comes out, the skill, energy, time and iMG"
+   },
+   {
+    "date": "2026-11-05",
+    "kind": "new",
+    "text": "The Encyclopedia has every Imagination upgrade: cost, what it needs and opens, the card text and what it does in the remake"
+   },
+   {
+    "date": "2026-11-05",
+    "kind": "new",
+    "text": "The Encyclopedia has the Giants: one page per Giant with their shrines, the skills they favor, their Emblem and Icon"
+   },
    {
     "date": "2026-11-04",
     "kind": "improve",
@@ -2787,74 +2852,9 @@
     "date": "2026-11-04",
     "kind": "improve",
     "text": "Reports leave out the browser's harmless ResizeObserver notice and carry only real page errors"
-   },
-   {
-    "date": "2026-11-04",
-    "kind": "fix",
-    "text": "A fall over a sloped flight of stairs lands on the steps, not on an invisible ledge at the flight's middle height"
-   },
-   {
-    "date": "2026-11-04",
-    "kind": "fix",
-    "text": "Each Emotional Bear, Cubimal, Still and lit pumpkin keeps its own upgrades, name, Hooch or phrases"
-   },
-   {
-    "date": "2026-11-04",
-    "kind": "fix",
-    "text": "Each Juju Shoo-Shoo Powder, Butterfly Net and Dusty Stick keeps its own charges, wear or points"
-   },
-   {
-    "date": "2026-11-04",
-    "kind": "fix",
-    "text": "Each powder jar keeps its own charges, online too; a new jar is full"
-   },
-   {
-    "date": "2026-11-04",
-    "kind": "fix",
-    "text": "Each potion bottle keeps its own uses and each Draught its own Giant; a new bottle is full"
-   },
-   {
-    "date": "2026-11-04",
-    "kind": "new",
-    "text": "Compare shows 15 more systems in seven sections, from Rook attacks and the subway to furniture, notes and quoins"
-   },
-   {
-    "date": "2026-11-04",
-    "kind": "improve",
-    "text": "The restoration report counts Rook attacks, races and the Hog Haul as restored, and adds Notes and Notice Boards, and Furniture and decorating"
-   },
-   {
-    "date": "2026-11-04",
-    "kind": "new",
-    "text": "Emoji reactions on chat lines, in Local, Global, groups, channels, the party and IMs"
-   },
-   {
-    "date": "2026-11-04",
-    "kind": "improve",
-    "text": "A repair refused for energy says what it needs and what you have, or that your energy tank is too small"
-   },
-   {
-    "date": "2026-11-04",
-    "kind": "fix",
-    "text": "Selling, dropping, giving or storing the item you picked takes that one, not another of its kind"
-   },
-   {
-    "date": "2026-11-04",
-    "kind": "fix",
-    "text": "A tool or Firefly Jar bought after one left is new, and each jar keeps its own Fireflies"
-   },
-   {
-    "date": "2026-11-04",
-    "kind": "new",
-    "text": "A heatmap of commits by day on Every change; pick a day to list only its changes"
-   },
-   {
-    "date": "2026-11-04",
-    "kind": "fix",
-    "text": "A revived animal comes back where it lay rooked, solo and online"
    }
   ]
  },
- "tests": 685,
- "generatedAt": "2026-11-04"
+ "tests": 686,
+ "generatedAt": "2026-11-05"
 }
