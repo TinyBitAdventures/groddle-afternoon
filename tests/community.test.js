@@ -15,6 +15,7 @@ import { describe, it } from 'node:test';
 import { execFileSync, spawnSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { pathToFileURL } from 'node:url';
 import { SITE_DIR, sitePath, skipWithoutSite } from '../tools/repos.mjs';
 import { reactionsFile, reactionsJson } from '../tools/build-reactions.mjs';
 import { linkSegments } from '../public/js/chat-links.js?v=b717fac7';
@@ -30,7 +31,7 @@ const hasPhp = spawnSync('php', ['-v']).status === 0;
 const skipPhp = skipWithoutSite || (!hasPhp && 'no php');
 
 function php(body) {
-  const code = `foreach (['WordFilter', 'BugReports', 'AdminConsole', 'CommunityText', 'Community', 'ChatHistory'] as $c) require ${JSON.stringify(SITE_DIR)} . "/src/$c.php"; use Groddle\\Minn\\CommunityText as T; use Groddle\\Minn\\ChatHistory; echo json_encode(${body}, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);`;
+  const code = `foreach (['WordFilter', 'BugReports', 'AdminConsole', 'CommunityText', 'Community', 'ChatHistory', 'Notifications', 'CommunityPages'] as $c) require ${JSON.stringify(SITE_DIR)} . "/src/$c.php"; use Groddle\\Minn\\CommunityText as T; use Groddle\\Minn\\ChatHistory; use Groddle\\Minn\\Notifications as N; use Groddle\\Minn\\CommunityPages as P; echo json_encode(${body}, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);`;
   return JSON.parse(execFileSync('php', ['-r', code]).toString());
 }
 const phpString = (s) => `base64_decode('${Buffer.from(s).toString('base64')}')`;
@@ -307,5 +308,144 @@ describe('who may read the kept chat (src/ChatHistory.php)', { skip: skipWithout
     const tables = JSON.parse(src('minn.json')).tables;
     assert.ok(tables.groddle_chat_lines.includes('PRIMARY KEY  (lid)'));
     assert.ok(tables.groddle_im_lines.includes('UNIQUE KEY pair_line (a_id,b_id,line_id,at_ms)'));
+  });
+});
+
+describe('the chat app\'s header, its bell and its right-click menus (/chat/, Austin 2026-11-04)', { skip: skipWithoutSite }, () => {
+  const src = (f) => readFileSync(sitePath(f), 'utf8');
+  const pure = () => import(pathToFileURL(sitePath('community/chat-pure.js')).href);
+
+  it('/chat/ draws the chat app\'s layout of the header from the menu, with the bell for a signed-in reader', () => {
+    const pages = src('src/CommunityPages.php');
+    assert.match(pages, /SiteNav::nav\(SiteNav::links\(\$this->minn, 0\), \$path, \$badges, \['bell' => \$signed \? \(\$badges\[SiteNav::COMMUNITY\] \?\? 0\) : null\]\)/);
+    assert.match(src('src/SiteNav.php'), /\$n = \(new Notifications\(\$minn\)\)->unread\(\$reader\);/, 'the Community link counts what the bell counts');
+    // Only /chat/ takes the app layout: the other pages keep the centred header.
+    for (const f of ['src/PlayerPages.php', 'src/AdminConsolePage.php', 'src/AdminBuilderPage.php']) assert.doesNotMatch(src(f), /'bell' =>/, f);
+  });
+
+  it('the notifications are signed-in only, the caller\'s own, and IMs are read through ChatHistory alone', () => {
+    const n = src('src/Notifications.php');
+    const routes = [...n.matchAll(/#\[Route\(Method::(\w+), '([^']+)', policy: new Policy\(Access::(\w+)\)\)\]/g)].map((m) => m.slice(1));
+    assert.deepEqual(routes, [['Get', '/groddle/v1/notifications', 'SignedIn'], ['Post', '/groddle/v1/notifications/read', 'SignedIn']]);
+    assert.match(n, /\$user = \$this->minn->user\(\);/);
+    assert.doesNotMatch(n, /request->json\(\)\['(?:user|id|player)'\]/, 'never a user from the request');
+    assert.match(n, /\$chat->imNotices\(\$me, \$sinceMs\)/);
+    assert.match(src('src/ChatHistory.php'), /public function imNotices\(int \$me, int \$sinceMs, int \$limit = 20\): array/);
+    assert.match(src('src/Extension.php'), /new ChatPeople\(\$minn\), new Notifications\(\$minn\)/);
+  });
+
+  it('notifications: newest first, unread by their source and both marks; Mark all read clears the keys', { skip: skipPhp }, () => {
+    const items = [
+      { key: 'bud:7', at: 100 }, { key: 'im:9', at: 300 }, { key: 'n:4', at: 300, unread: false }, { key: 'th:global:5', at: 200 }, { key: 'tk:2', at: 50, unread: true },
+    ];
+    const merged = php(`N::merge(json_decode('${JSON.stringify(items)}', true), ['all' => 150, 'k' => ['th:global:5' => 250]], 30)`);
+    assert.deepEqual(merged.map((i) => [i.key, i.unread]), [['im:9', true], ['n:4', false], ['th:global:5', false], ['bud:7', false], ['tk:2', false]],
+      'newest first, ties by key; read by its own row, by its key mark, by Mark all read');
+    assert.equal(php(`N::count(N::merge(json_decode('${JSON.stringify(items)}', true), ['all' => 0, 'k' => []], 30))`), 4);
+    assert.equal(php(`count(N::merge(json_decode('${JSON.stringify(items)}', true), ['all' => 0, 'k' => []], 2))`), 2);
+    assert.deepEqual(php(`N::marks('{"all":10,"k":{"im:9":20,"im:8":5,"x":30,"n:1":"no"}}')`), { all: 10, k: { 'im:9': 20 } }, 'kept keys newer than all, known shapes only');
+    assert.deepEqual(php("N::marks('nope')"), { all: 0, k: [] });
+    const marked = php("N::marked(['all' => 1, 'k' => ['im:1' => 5, 'im:2' => 6, 'im:3' => 7]], 'im:1', 9, 2)");
+    assert.deepEqual(marked, { all: 1, k: { 'im:1': 9, 'im:3': 7 } }, 'the newest kept');
+    assert.deepEqual(php("N::marked(['all' => 1, 'k' => ['im:1' => 5]], null, 9, 2)"), { all: 9, k: [] });
+    for (const k of ['n:1', 'th:global:12', 'th:trade:3', 'im:9', 'bud:7', 'tk:2']) assert.equal(php(`preg_match(N::KEY, '${k}')`), 1, k);
+    for (const k of ['th:group-1:2', 'im:x', 'n:', 'all']) assert.equal(php(`preg_match(N::KEY, '${k}')`), 0, k);
+  });
+
+  it('the sample notifications show only on a .localhost site, asked with ?notifdemo=1', { skip: skipPhp }, async () => {
+    const ask = (home, host, flag) => php(`P::notifDemo('${home}', '${host}', ${flag === null ? 'null' : `'${flag}'`})`);
+    assert.equal(ask('https://groddle.localhost', 'groddle.localhost', '1'), true);
+    assert.equal(ask('https://groddle.localhost', 'groddle.localhost:8443', '1'), true);
+    assert.equal(ask('https://groddleafternoon.com', 'groddleafternoon.com', '1'), false, 'never live');
+    assert.equal(ask('https://groddleafternoon.com', 'groddle.localhost', '1'), false, 'the site\'s own home decides too');
+    assert.equal(ask('https://groddle.localhost', 'evil-localhost.com', '1'), false);
+    assert.equal(ask('https://groddle.localhost', 'groddle.localhost', '0'), false);
+    assert.equal(ask('https://groddle.localhost', 'groddle.localhost', null), false);
+    const { demoAllowed, demoNotifications, unreadCount } = await pure();
+    assert.equal(demoAllowed('groddle.localhost', true), true);
+    assert.equal(demoAllowed('groddleafternoon.com', true), false);
+    assert.equal(demoAllowed('groddle.localhost', false), false);
+    const demo = demoNotifications(1_800_000_000_000);
+    assert.deepEqual([...new Set(demo.map((i) => i.kind))].sort(), ['buddy', 'im', 'quote', 'reply', 'thread', 'ticket']);
+    assert.ok(demo.every((i) => i.sample === true), 'each marked as a sample');
+    assert.ok(demo.every((i) => !i.from || (i.from.id !== 1 && i.from.id !== 54)), 'never names user 1 or 54');
+    assert.ok(unreadCount(demo) > 0 && unreadCount(demo) < demo.length, 'some read, some not');
+    const js = src('community/notifications.js');
+    assert.match(js, /const demo = demoAllowed\(location\.hostname, document\.body\.hasAttribute\('data-notif-demo'\)\);/);
+    assert.match(js, /async function read\(key = null\) \{\n\s*items = markRead\(items, key\);\n\s*draw\(\);\n\s*if \(demo\) return true;/, 'samples are read in the page only');
+  });
+
+  it('the panel orders and reads them as the site does, and the bell and the Community link show one count', async () => {
+    const { sortNotifications, markRead, unreadCount, countLabel } = await pure();
+    const list = sortNotifications([{ key: 'b', at: 1, unread: true }, { key: 'a', at: 2, unread: true }, { key: 'c', at: 2, unread: false }]);
+    assert.deepEqual(list.map((i) => i.key), ['a', 'c', 'b']);
+    assert.equal(unreadCount(markRead(list, 'a')), 1);
+    assert.equal(unreadCount(markRead(list)), 0);
+    assert.deepEqual([0, 3, 9, 12].map(countLabel), ['', '3', '9', '9+']);
+    const js = src('community/notifications.js');
+    assert.match(js, /document\.querySelectorAll\('\.site-nav-links a\[href="\/chat\/"\]'\)/, 'the Community link follows the bell');
+    // Live where the socket says something (chat-app.js), else a poll; what you are looking at is read.
+    const app = src('community/chat-app.js');
+    assert.match(app, /if \(m\.t === 'thread_said' \|\| m\.t === 'board_post' \|\| m\.t === 'buddy_added' \|\| \(m\.t === 'im' && Number\(m\.line\?\.from\) !== ME\)\) notif\?\.soon\(\);/);
+    assert.match(js, /const POLL_MS = 60 \* 1000;/);
+    assert.match(js, /const looking = new Set\(document\.hidden \? \[\] : app\.looking\(\)\);/);
+    assert.match(src('community/community.js'), /import\(`\.\/notifications\.js\$\{v\}`\)[\s\S]*?import\(`\.\/chat-app\.js\$\{v\}`\)/, 'the bell starts first and is handed to the app');
+  });
+
+  it('right-click menus use the game\'s component, with its keys and long press, and leave the browser\'s menu on fields, selections and links', async () => {
+    const menus = src('community/chat-menus.js');
+    assert.match(menus, /^import \{ bindContextTrigger, createContextMenu \} from '\/js\/ui\/context-menu\.js';$/m);
+    const game = read('public/js/ui/context-menu.js');
+    assert.match(game, /export function createContextMenu\(/, 'the game still offers it at that path');
+    assert.match(game, /export function bindContextTrigger\(/);
+    assert.match(menus, /longPress: true,/);
+    assert.match(menus, /target\.closest\('input, textarea, select, \[contenteditable=""\], \[contenteditable="true"\]'\)/);
+    assert.match(menus, /target\.closest\('\.cchan-text a, \.cpost-body a, \.cquote p a'\)/);
+    assert.match(menus, /return selectedOver\(target\);/);
+    assert.match(menus, /press\.had = selectedOver\(e\.target\);/, 'Safari\'s own word selection on a right-click is not the reader\'s');
+    assert.match(src('community/chat-app.js'), /import\(`\.\/chat-menus\.js\$\{new URL\(import\.meta\.url\)\.search\}`\)\.then\(\(m\) => m\.startMenus\(menuApi\(\)\)\)/);
+    const { playerRows, lineRows, postRows, railRows } = await pure();
+    const ids = (rows) => rows.map((r) => r.id);
+    assert.deepEqual(playerRows({ me: 7, id: 7 }), [], 'your own name has no menu');
+    assert.deepEqual(ids(playerRows({ me: 7, id: 9, profile: '/players/bo/' })), ['profile', 'im', 'buddy', 'block', 'report']);
+    assert.deepEqual(ids(playerRows({ me: 7, id: 9, buddy: true })), ['profile', 'im', 'unbuddy', 'block', 'report']);
+    const blocked = playerRows({ me: 7, id: 9, blocked: true });
+    assert.deepEqual(ids(blocked), ['profile', 'im', 'buddy', 'unblock', 'report']);
+    assert.ok(blocked.find((r) => r.id === 'im').disabled && blocked.find((r) => r.id === 'buddy').disabled);
+    assert.ok(playerRows({ me: 7, id: 9 })[0].disabled, 'no public page: View profile says why');
+    assert.deepEqual(ids(lineRows({})), ['thread', 'react', 'copy', 'link', 'report']);
+    assert.deepEqual(ids(lineRows({ thread: false, mine: true })), ['react', 'copy', 'link'], 'a reply has no thread; your own line no Report');
+    assert.deepEqual(ids(postRows({ quote: true, react: true, report: true })), ['quote', 'react', 'copy', 'link', 'report']);
+    assert.deepEqual(ids(railRows({ kind: 'chan', unread: 2 })), ['open', 'read', 'mute']);
+    assert.deepEqual(ids(railRows({ kind: 'im', muted: true })), ['open', 'read', 'unmute']);
+    assert.deepEqual(ids(railRows({ kind: 'board' })), ['open', 'read'], 'a board: no Mute');
+    assert.ok(railRows({ kind: 'chan', unread: 0 })[1].disabled, 'nothing new: Mark as read says so');
+  });
+
+  it('a line\'s link opens /chat/ at it, a reply\'s its thread; muted rows are kept on this browser', async () => {
+    const { lineLink, lineHash, readMuted } = await pure();
+    assert.equal(lineLink('https://groddle.localhost', 'chan:global', 123), 'https://groddle.localhost/chat/?c=global#l123');
+    assert.equal(lineLink('https://groddle.localhost/', 'im:9', 4), 'https://groddle.localhost/chat/?im=9#l4');
+    assert.deepEqual(lineHash('#l123'), { line: 123 });
+    assert.deepEqual(lineHash('#t55'), { thread: 55 });
+    assert.deepEqual(lineHash('#post-3'), {});
+    assert.deepEqual([...readMuted('["chan:help","im:9","nope","chan:group-1"]')], ['chan:help', 'im:9']);
+    assert.deepEqual([...readMuted('{')], []);
+    const app = src('community/chat-app.js');
+    assert.match(app, /wanted = \{ key, \.\.\.lineHash\(location\.hash\) \};/);
+    assert.match(src('community/chat-menus.js'), /lineLink\(location\.origin, of\.conv, of\.parent\)\.replace\(\/#l\(\\d\+\)\$\/, '#t\$1'\)/);
+  });
+
+  it('"N replies" under a line is a button of its own with room before the next line (the drawer, both skins, and /chat/)', () => {
+    const block = (css, sel) => css.slice(css.indexOf(`${sel} {`), css.indexOf('}', css.indexOf(`${sel} {`)));
+    const modern = block(read('public/style.css'), '\n.thread-open');
+    assert.match(modern, /margin-bottom: var\(--sp-4\);/);
+    assert.match(modern, /border: 1px solid var\(--border\);/);
+    assert.match(read('public/style.css'), /\.thread-open::before \{[^}]*mask:/, 'its thread icon');
+    assert.match(block(read('public/css/classic.css'), ':root[data-ui="classic"] .thread-open'), /margin-bottom: calc\(6 \* var\(--cu\)\);/);
+    const web = block(src('community/community.css'), '.cx-replies');
+    assert.match(web, /margin: 5px 0 6px;/);
+    assert.match(web, /border: 1px solid var\(--cx-strong\); border-radius: 999px;/);
+    assert.match(src('community/chat-app.js'), /a\.innerHTML = ICON\.thread;/);
   });
 });
