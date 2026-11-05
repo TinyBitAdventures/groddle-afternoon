@@ -31,7 +31,7 @@
  * growModifier }. Growth uses SEED_CATALOG grow1Ms / grow2Ms.
  */
 
-import { SEED_CATALOG, stageElapsedMs, wetPlot } from './garden.js?v=9c151062';
+import { SEED_CATALOG, stageElapsedMs, wetPlot } from './garden.js?v=97737c93';
 import { gardenGrowModifier } from './imagination-effects.js?v=70169933';
 import { skillPackageDetails } from './skill-packages.js?v=bfb87281';
 import { metabolicGain, moodMax, loseEnergy } from './metabolics.js?v=8504134e';
@@ -117,7 +117,8 @@ const plotsOf = (garden) => Object.entries(garden?.plots || {});
 /** Plots a potion would act on (getValidTargets' per-potion test). */
 export function plotsFor(garden, action) {
   return plotsOf(garden).filter(([, p]) => {
-    if (action === 'water') return (p.state === 'seeds' || p.state === 'shoots') && !p.wet;
+    // G537: doesPlotNeedWater (master_garden.js 1185) asks only whether the plot is dry.
+    if (action === 'water') return !p.wet;
     if (action === 'hoe') return p.state === 'dirty';
     if (action === 'plant') return p.state === 'clean';
     if (action === 'pick') return p.state === 'crop' && p.seed;

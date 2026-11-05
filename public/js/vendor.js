@@ -12,7 +12,7 @@ import {
   ITEM_CATALOG,
   ensureItem,
 } from './inventory.js?v=d82f3b00';
-import { gardenVendorOffers } from './garden.js?v=9c151062';
+import { gardenVendorOffers } from './garden.js?v=97737c93';
 import { miningVendorOffers } from './mining.js?v=83421428';
 
 import { STORE_CATALOG, ITEM_BASE_COSTS, NO_VENDOR_ITEMS } from './store-catalog.js?v=74b56af3';

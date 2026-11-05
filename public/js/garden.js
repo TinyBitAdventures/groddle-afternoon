@@ -4,7 +4,8 @@
  * Plot states (original): clean → seeds → shoots → crop → dirty → (clear) clean
  * Growth only advances while wet. Watering keeps a plot wet for 12 hours
  * (timings.water); a plot that dries pauses its growth until watered again.
- * Wetness carries over through picking, hoeing and replanting.
+ * Wetness carries over through picking, hoeing and replanting, and any dry plot
+ * takes water, an empty one too (G537), so a seed planted there grows at once.
  *
  * Grow timings are demo-scaled seconds (original used hours × garden_grow_multiplier).
  * Produce counts are the GSJS seed classProps produces_count.
@@ -1128,6 +1129,25 @@ export function plantPlot(garden, key, inv, pc, seedId, opts = {}) {
 }
 
 /**
+ * G537: any dry plot takes water, empty, growing or picked alike. include/garden.js's water
+ * action never looks at the plot's state; the client watered a dry plot whatever it held
+ * (GardenView.doesPlotNeedWater, GardenPlotView.handleDrop: water_time < max) and drew the
+ * wet soil under it (GardenPlotView.buildPlot 'wet'/'dry'). A wet empty plot starts a seed
+ * growing at once.
+ */
+export function plotNeedsWater(plot) {
+  return Boolean(plot) && !plot.wet;
+}
+
+/** Whether any plot in the garden is dry (potion_garden_water.js getValidTargets). */
+export function gardenNeedsWater(garden) {
+  return Object.values(garden?.plots || {}).some(plotNeedsWater);
+}
+
+/** potion_garden_water.js onPour, when no plot is dry. */
+export const GARDEN_NO_DRY_PLOTS_LINE = "Oops, there aren't any dry plots here.";
+
+/**
  * Water a plot (sets wet so growth can advance).
  * Requires watering_can unless opts.requireTool === false.
  * @param {ReturnType<typeof createGarden>} garden
@@ -1138,9 +1158,6 @@ export function plantPlot(garden, key, inv, pc, seedId, opts = {}) {
 export function waterPlot(garden, key, pc, opts = {}) {
   const plot = getPlot(garden, key);
   if (!plot) return { ok: false, reason: 'plot', msgs: ['No such plot.'] };
-  if (plot.state === 'clean' || plot.state === 'dirty') {
-    return { ok: false, reason: 'state', msgs: ['Nothing growing there to water.'] };
-  }
   if (plot.wet) {
     return { ok: false, reason: 'wet', msgs: ['That plot is already wet.'] };
   }
@@ -1388,12 +1405,17 @@ export function tendPlot(garden, key, inv, pc, opts = {}) {
 }
 
 /**
- * Water every dry growing plot (potion_garden_water style, simplified).
+ * Water every dry plot in the bed (potion_garden_water style, simplified with the can).
+ * G537: empty and picked plots too, as master_garden.js potionTendGarden waters every plot;
+ * with nothing dry it refuses before any energy is spent (onPour's line).
  * @param {ReturnType<typeof createGarden>} garden
  * @param {object} pc
  * @param {{ now?: number, inv?: import('./inventory.js').Inventory, requireTool?: boolean }} [opts]
  */
 export function waterAllPlots(garden, pc, opts = {}) {
+  if (!gardenNeedsWater(garden)) {
+    return { ok: false, watered: 0, reason: 'none', msgs: [GARDEN_NO_DRY_PLOTS_LINE] };
+  }
   const requireTool = opts.requireTool !== false;
   if (requireTool && opts.inv && !hasWateringCan(opts.inv)) {
     return {
@@ -1435,7 +1457,7 @@ export function waterAllPlots(garden, pc, opts = {}) {
   if (!n && failed) {
     return { ok: false, watered: 0, failed, reason: 'failed', msgs: [GARDEN_WATER_FAILED_LINE] };
   }
-  if (!n) return { ok: false, watered: 0, reason: 'none', msgs: ['No dry plots need water.'] };
+  if (!n) return { ok: false, watered: 0, reason: 'none', msgs: [GARDEN_NO_DRY_PLOTS_LINE] };
   return {
     ok: true,
     watered: n,

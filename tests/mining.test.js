@@ -40,7 +40,7 @@ import {
   ensureMakingItems,
   TOOL_CATALOG,
 } from '../public/js/making.js?v=82ce9d08';
-import { DEFAULT_VENDOR, vendorBuy } from '../public/js/vendor.js?v=c74e9e04';
+import { DEFAULT_VENDOR, vendorBuy } from '../public/js/vendor.js?v=65e22e0e';
 import { createToolConditionState, getToolCondition } from '../public/js/tools.js?v=6684b484';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));

@@ -20,7 +20,7 @@ import {
   toolWornBaseCost,
 } from '../public/js/tools.js?v=6684b484';
 import { addItem, countItem, createInventory, ensureItem } from '../public/js/inventory.js?v=d82f3b00';
-import { createVendorSellQuote, listSellOffers, vendorSell } from '../public/js/vendor.js?v=c74e9e04';
+import { createVendorSellQuote, listSellOffers, vendorSell } from '../public/js/vendor.js?v=65e22e0e';
 import { createShrineState, donateToShrine, listShrineDonationOptions, quoteShrineDonation } from '../public/js/shrines.js?v=95d74174';
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');

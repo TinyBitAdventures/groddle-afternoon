@@ -341,7 +341,7 @@ export function mergeParcels(state, parcels) {
 /**
  * The tending a key-holder did on their copy of the owner's gardens, from
  * one plot's state before and after a garden verb (js/garden.js: water sets
- * wet, plant clean to seeds, clear dirty to clean, harvest crop to dirty).
+ * a dry plot wet, plant clean to seeds, clear dirty to clean, harvest crop to dirty).
  * Growth and drying (tickGarden) are not acts.
  */
 export function tendAct(before, after) {
@@ -349,7 +349,8 @@ export function tendAct(before, after) {
   if (before.state === 'clean' && after.state === 'seeds' && after.seed) return { act: 'plant', seed: String(after.seed) };
   if (before.state === 'dirty' && after.state === 'clean') return { act: 'clear', seed: '' };
   if (before.state === 'crop' && after.state === 'dirty') return { act: 'harvest', seed: '' };
-  if (!before.wet && after.wet && (after.state === 'seeds' || after.state === 'shoots' || after.state === 'crop')) return { act: 'water', seed: '' };
+  // G537: any dry plot takes water, an empty or picked one too (js/garden.js plotNeedsWater).
+  if (!before.wet && after.wet) return { act: 'water', seed: '' };
   return null;
 }
 

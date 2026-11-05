@@ -2395,7 +2395,7 @@
  },
  "potion_garden_water": {
   "lines": [
-   "With Master Gardener, pour it to water every dry growing plot in the nearest garden at once.",
+   "With Master Gardener, pour it to water every dry plot in the nearest garden at once.",
    "Each bottle holds 5 pours; it costs energy for every plot in the garden."
   ],
   "evidence": [

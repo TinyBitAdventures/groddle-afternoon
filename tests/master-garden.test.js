@@ -5,7 +5,7 @@
  */
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { createGarden, SEED_CATALOG } from '../public/js/garden.js?v=9c151062';
+import { createGarden, SEED_CATALOG } from '../public/js/garden.js?v=97737c93';
 import {
   GARDEN_POTIONS,
   POTION_USES,
@@ -17,7 +17,7 @@ import {
   pickedMessage,
   potionTendGarden,
   usePotion,
-} from '../public/js/master-garden.js?v=3ce79613';
+} from '../public/js/master-garden.js?v=710cb895';
 import { remakeStatus } from '../public/js/imagination-remake.js?v=c37ad887';
 
 const MG = ['croppery_1', 'mastergardener_1'];
@@ -32,7 +32,11 @@ describe('pouring', () => {
   it('needs Master Gardener, a garden with work, and energy for every plot', () => {
     const g = dirtyGarden();
     assert.equal(canPour('potion_garden_clear', g, { learned: [], energy: 100 }).msg, 'You need to know Master Gardener to use this.');
-    assert.equal(canPour('potion_garden_water', g, { learned: MG, energy: 100 }).msg, 'There are no dry gardens nearby.');
+    // G537: any dry plot needs water (doesPlotNeedWater), a picked one too; a wet garden has none.
+    assert.equal(canPour('potion_garden_water', g, { learned: MG, energy: 100 }).ok, true);
+    const wet = dirtyGarden();
+    for (const p of Object.values(wet.plots)) p.wet = true;
+    assert.equal(canPour('potion_garden_water', wet, { learned: MG, energy: 100 }).msg, 'There are no dry gardens nearby.');
     assert.equal(canPour('potion_garden_harvest', g, { learned: MG, energy: 100 }).msg, 'There is nothing to harvest here.');
     assert.equal(canPour('potion_garden_clear', g, { learned: MG, energy: 24 }).msg, "You don't have enough energy to do that!");
     assert.equal(canPour('potion_garden_clear', g, { learned: MG, energy: 25 }).ok, true);

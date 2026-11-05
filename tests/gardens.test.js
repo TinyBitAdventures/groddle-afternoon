@@ -40,7 +40,13 @@ import {
   GARDEN_TALKBACK_MS,
   gardenTalkbackKey,
   gardenTalkback,
-} from '../public/js/garden.js?v=9c151062';
+  plotNeedsWater,
+  gardenNeedsWater,
+  GARDEN_NO_DRY_PLOTS_LINE,
+} from '../public/js/garden.js?v=97737c93';
+import { getVerbsFor, runVerb } from '../public/content.js?v=93df4d7b';
+import { plotPieces } from '../public/js/garden-view.js?v=05651e76';
+import { plotsFor } from '../public/js/master-garden.js?v=710cb895';
 import {
   createInventory,
   countItem,
@@ -48,7 +54,7 @@ import {
   listPackToolSlots,
   isToolItem,
 } from '../public/js/inventory.js?v=d82f3b00';
-import { DEFAULT_VENDOR, vendorBuy } from '../public/js/vendor.js?v=c74e9e04';
+import { DEFAULT_VENDOR, vendorBuy } from '../public/js/vendor.js?v=65e22e0e';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -469,5 +475,82 @@ describe('garden talkbacks (garden_new.js responses, include/garden.js talkback_
     assert.equal(r.speech.failed, true);
     assert.ok(GARDEN_TALKBACKS.herb_harvest_na_failed.includes(r.speech.text));
     assert.equal(r.speech.slugs, null);
+  });
+});
+
+describe('G537: Water all waters every dry plot, an empty one too', () => {
+  const learned = ['croppery_1'];
+  const ctxFor = (pc, inv) => ({ pc, inv, learned, skills: { learned } });
+  const bed = (garden) => ({ classId: 'garden_new', state: { garden } });
+
+  it('waters a bed of empty plots, which then draw the wet soil', () => {
+    // Austin 2026-11-05: Water all on a freshly hoed bed played the can, then every plot stayed dry.
+    const garden = createGarden({ cols: 4, rows: 2, now: 0 });
+    const inv = createInventory({ watering_can: 1 });
+    const pc = { energy: 80, mood: 40, imagination: 0, xp: 0 };
+    const verb = getVerbsFor(bed(garden), ctxFor(pc, inv)).find((v) => v.id === 'water_all');
+    assert.equal(verb.enabled, true);
+    assert.equal(verb.tooltip, 'Water every dry plot');
+    const r = runVerb(bed(garden), 'water_all', ctxFor(pc, inv));
+    assert.equal(r.ok, true, r.msgs?.join(' '));
+    assert.equal(r.gardenChanged, true);
+    for (const key of listPlotKeys(garden)) {
+      assert.equal(getPlot(garden, key).wet, true, key);
+      assert.equal(plotPieces(getPlot(garden, key)).base, 'wet', key);
+    }
+    assert.ok(pc.energy < 80, 'each plot watered costs its energy');
+  });
+
+  it('waters growing, empty and picked plots alike, and leaves wet ones be', () => {
+    const garden = createGarden({ cols: 4, rows: 1, now: 0 });
+    Object.assign(getPlot(garden, '1-1'), { state: 'seeds', seed: 'seed_spinach' });
+    Object.assign(getPlot(garden, '2-1'), { state: 'clean' });
+    Object.assign(getPlot(garden, '3-1'), { state: 'dirty' });
+    Object.assign(getPlot(garden, '4-1'), { state: 'shoots', seed: 'seed_spinach', wet: true, wetAt: 0 });
+    const pc = { energy: 100, mood: 40, imagination: 0, xp: 0 };
+    const r = waterAllPlots(garden, pc, { now: 10, inv: createInventory({ watering_can: 1 }), rng: () => 0 });
+    assert.equal(r.ok, true, r.msgs?.join(' '));
+    assert.equal(r.watered, 3);
+    assert.deepEqual(listPlotKeys(garden).map((k) => getPlot(garden, k).wet), [true, true, true, true]);
+    assert.equal(getPlot(garden, '4-1').wetAt, 0, 'the wet plot was not watered again');
+  });
+
+  it('a bed with no dry plot greys the verb with the reason and spends nothing', () => {
+    const garden = createGarden({ cols: 2, rows: 1, now: 0 });
+    for (const key of listPlotKeys(garden)) Object.assign(getPlot(garden, key), { wet: true, wetAt: 0 });
+    assert.equal(gardenNeedsWater(garden), false);
+    const inv = createInventory({ watering_can: 1 });
+    const pc = { energy: 80, mood: 40, imagination: 0, xp: 0 };
+    const verb = getVerbsFor(bed(garden), ctxFor(pc, inv)).find((v) => v.id === 'water_all');
+    assert.equal(verb.enabled, false);
+    assert.equal(verb.reason, GARDEN_NO_DRY_PLOTS_LINE);
+    assert.equal(GARDEN_NO_DRY_PLOTS_LINE, "Oops, there aren't any dry plots here.");
+    const r = waterAllPlots(garden, pc, { now: 1, inv });
+    assert.equal(r.ok, false);
+    assert.deepEqual(r.msgs, [GARDEN_NO_DRY_PLOTS_LINE]);
+    assert.equal(pc.energy, 80);
+  });
+
+  it('one dry empty plot takes water too, and a seed planted there grows at once', () => {
+    const garden = createGarden({ cols: 1, rows: 1, now: 0 });
+    const plot = getPlot(garden, '1-1');
+    assert.equal(plotNeedsWater(plot), true);
+    const inv = createInventory({ watering_can: 1, seed_spinach: 1 });
+    const pc = { energy: 80, mood: 40, imagination: 0, xp: 0 };
+    const target = { classId: 'garden_plot', state: { garden, plot, plotKey: '1-1' } };
+    const verbs = getVerbsFor(target, ctxFor(pc, inv)).map((v) => v.id);
+    assert.deepEqual(verbs, ['plant', 'water']);
+    assert.equal(waterPlot(garden, '1-1', pc, { now: 0, inv, rng: () => 0 }).ok, true);
+    assert.equal(plot.wet, true);
+    assert.deepEqual(getVerbsFor(target, ctxFor(pc, inv)).map((v) => v.id), ['plant']);
+    assert.equal(plantPlot(garden, '1-1', inv, pc, 'seed_spinach', { now: 0 }).ok, true);
+    assert.deepEqual(tickGarden(garden, SEED_CATALOG.seed_spinach.grow1Ms + 1), ['1-1']);
+  });
+
+  it('a Soak-All pours on a garden of dry empty plots (doesPlotNeedWater)', () => {
+    const garden = createGarden({ cols: 2, rows: 1, now: 0 });
+    assert.equal(plotsFor(garden, 'water').length, 2);
+    for (const key of listPlotKeys(garden)) getPlot(garden, key).wet = true;
+    assert.equal(plotsFor(garden, 'water').length, 0);
   });
 });

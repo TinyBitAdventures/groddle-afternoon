@@ -30,7 +30,7 @@ import { BAG_DEFS, PACK_CAPACITY, giveBag, layoutPack, moveStack, normalizePrefs
 import { ITEM_CATALOG, isToolItem } from '../public/js/inventory.js?v=d82f3b00';
 import { createDroppedItemState, dropInventoryStack, parseDroppedItemState, placeDroppedBag, serializeDroppedItemState } from '../public/js/world-items.js?v=78125f8f';
 import { bagsFeature } from '../public/js/features/bags-feature.js?v=b8387357';
-import { pouchFeature } from '../public/js/features/elemental-pouch-feature.js?v=1e021f3f';
+import { pouchFeature } from '../public/js/features/elemental-pouch-feature.js?v=84442e60';
 import { POUCH_CLASS } from '../public/js/elemental-pouch.js?v=7ae2ad99';
 import { HAS_SITE, SITE_DIR } from '../tools/repos.mjs';
 

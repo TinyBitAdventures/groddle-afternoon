@@ -88,7 +88,7 @@ import { runStreetTransition } from '../screen-fx.js?v=428f4022';
 import { STREET_INDEX } from '../street-loader.js?v=33d2b8bc';
 import { ITEM_CATALOG, countItem, listPackItemSlots, removeItem } from '../inventory.js?v=d82f3b00';
 import { cultivationDef, homeStreetLayout } from '../home-cultivation.js?v=ff17225a';
-import { tickGarden } from '../garden.js?v=9c151062';
+import { tickGarden } from '../garden.js?v=97737c93';
 import { BUTLER_RIG_SCALE, ButlerPainter, butlerRigNow, loadButlerRig } from '../butler-rig.js?v=e81817d9';
 import { butlerPostRx, normalizeButlerParts } from '../butler.js?v=86316578';
 import { butlerApi } from './butler-feature.js?v=46409f48';
@@ -130,7 +130,7 @@ import {
   tendedText,
   TENDED_KEEP,
   visitSceneTsid,
-} from '../neighbours-mp.js?v=a8d5544e';
+} from '../neighbours-mp.js?v=4a7dd8d6';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
 import { elevatorStops, towerLabel } from '../home-tower.js?v=4daa0b96';
 

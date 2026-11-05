@@ -28,7 +28,9 @@ import {
   hasWateringCan,
   hasHoe,
   plotStatusLabel,
-} from './js/garden.js?v=9c151062';
+  gardenNeedsWater,
+  GARDEN_NO_DRY_PLOTS_LINE,
+} from './js/garden.js?v=97737c93';
 import { firstWorkingTool, HOE_TOOLS, WATERING_CAN_TOOLS } from './js/tools.js?v=6684b484';
 import {
   ROCK_CATALOG,
@@ -836,14 +838,18 @@ export function getVerbsFor(target, ctx) {
   };
   if (classId === 'garden_new' || classId === 'garden') {
     const canWater = hasWateringCan(inv);
+    // G537: every dry plot takes water, empty ones too; a bed with none dry offers the verb
+    // greyed with onPour's line (potion_garden_water.js canPour/onPour), so it never plays
+    // the can or costs energy for nothing.
+    const dry = gardenNeedsWater(s.garden || s);
     add('water_all', 'water all', {
       sort: 10,
       energy: 2,
       ...(brokenOnly(WATERING_CAN_TOOLS) ? { durationMs: 0 } : {}),
-      enabled: canWater,
-      reason: canWater ? '' : 'Need a Watering Can',
+      enabled: canWater && dry,
+      reason: !canWater ? 'Need a Watering Can' : dry ? '' : GARDEN_NO_DRY_PLOTS_LINE,
       tooltip: canWater
-        ? 'Water every dry growing plot'
+        ? 'Water every dry plot'
         : 'Requires a Watering Can in your pack',
     });
   }
@@ -868,14 +874,16 @@ export function getVerbsFor(target, ctx) {
           : 'Buy seeds from the street spirit',
       });
     }
-    if ((st === 'seeds' || st === 'shoots') && !plot?.wet) {
+    // G537: a dry empty plot takes water too (GardenView: a click on a dry plot with nothing in
+    // it waters it), so a seed planted there grows at once.
+    if ((st === 'seeds' || st === 'shoots' || st === 'clean') && !plot?.wet) {
       add('water', 'water', {
-        sort: 10,
+        sort: st === 'clean' ? 20 : 10,
         energy: gardenCost('water'),
         ...(brokenOnly(WATERING_CAN_TOOLS) ? { durationMs: 0 } : {}),
         enabled: hasWateringCan(inv),
         reason: hasWateringCan(inv) ? '' : 'Need a Watering Can',
-        tooltip: 'Water so this plot can grow',
+        tooltip: st === 'clean' ? 'Water this plot' : 'Water so this plot can grow',
       });
     }
     if (st === 'crop') {

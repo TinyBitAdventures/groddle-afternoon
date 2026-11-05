@@ -30,11 +30,11 @@ import {
   tendAct,
   tendCounters,
   tendedText,
-} from '../public/js/neighbours-mp.js?v=a8d5544e';
+} from '../public/js/neighbours-mp.js?v=4a7dd8d6';
 import { createButlerState, nextHandover, normalizeButlerState, packagesAndMessagesForOwner } from '../public/js/butler.js?v=86316578';
-import { createGarden, tickGarden } from '../public/js/garden.js?v=9c151062';
+import { createGarden, tickGarden } from '../public/js/garden.js?v=97737c93';
 import { butlerApi } from '../public/js/features/butler-feature.js?v=46409f48';
-import { neighboursMpFeature } from '../public/js/features/neighbours-mp-feature.js?v=42dd4211';
+import { neighboursMpFeature } from '../public/js/features/neighbours-mp-feature.js?v=10c7d8a7';
 import { createMinnAccount } from '../public/js/minn-account.js?v=9544b0a0';
 import { HAS_SERVER, HAS_SITE, SITE_DIR, serverPath, sitePath } from '../tools/repos.mjs';
 
@@ -123,6 +123,9 @@ describe('key-holders tending the owner\'s gardens', () => {
     assert.deepEqual(tendAct({ state: 'dirty' }, { state: 'clean' }), { act: 'clear', seed: '' });
     assert.equal(tendAct({ state: 'seeds', wet: true }, { state: 'shoots', wet: true }), null);
     assert.equal(tendAct({ state: 'shoots', wet: true }, { state: 'shoots', wet: false }), null);
+    // G537: an empty or picked plot takes water too.
+    assert.deepEqual(tendAct({ state: 'clean', wet: false }, { state: 'clean', wet: true }), { act: 'water', seed: '' });
+    assert.deepEqual(tendAct({ state: 'dirty', wet: false }, { state: 'dirty', wet: true }), { act: 'water', seed: '' });
   });
 
   it('applies a key-holder\'s act to the owner\'s own garden as the site recorded it', () => {
@@ -209,12 +212,15 @@ describe('the site\'s Butler and tending rules', { skip: skipSite }, () => {
       $clean = (object) ['state' => 'clean'];
       $herb = HomeTending::refuse($clean, ['act' => 'plant', 'seed' => 'seed_carrot'], 'herb', 0, $seeds);
       $ok = HomeTending::refuse($clean, ['act' => 'plant', 'seed' => 'herb_seed_rubeweed'], 'herb', 0, $seeds);
+      $waterClean = HomeTending::refuse($clean, ['act' => 'water', 'seed' => ''], 'default', 0, $seeds);
+      $waterWet = HomeTending::refuse((object) ['state' => 'clean', 'wet' => true], ['act' => 'water', 'seed' => ''], 'default', 0, $seeds);
       HomeTending::applyAct($p, 'harvest', '', 60000000);
       $homes = (object) ['cult' => (object) ['gardens' => (object) ['g1' => (object) ['gardenType' => 'default', 'plots' => (object) ['1-1' => (object) ['state' => 'seeds', 'seed' => 'seed_spinach', 'wet' => false]]]]]];
       $shown = HomeTending::overlay($homes, [['yard' => 'street', 'garden' => 'g1', 'plot' => '1-1', 'act' => 'water', 'seed' => '', 'at_ms' => 99]]);
-      echo json_encode([$a, $b, $water, $harvest, $herb, $ok, $p->state, $shown->cult->gardens->g1->plots->{'1-1'}->wet, $homes->cult->gardens->g1->plots->{'1-1'}->wet]);`);
+      echo json_encode([$a, $b, $water, $harvest, $herb, $ok, $p->state, $shown->cult->gardens->g1->plots->{'1-1'}->wet, $homes->cult->gardens->g1->plots->{'1-1'}->wet, $waterClean, $waterWet]);`);
     // Spinach: 4 s to shoots, 4 s more to a crop; the watering dries after 12 h.
-    assert.deepEqual(out, [['shoots', true], ['crop', false], null, null, 'Only herb seeds go in an herb garden.', null, 'dirty', true, false]);
+    // G537: a dry empty plot takes water; a wet one does not.
+    assert.deepEqual(out, [['shoots', true], ['crop', false], null, null, 'Only herb seeds go in an herb garden.', null, 'dirty', true, false, null, 'That plot is already wet.']);
   });
 });
 

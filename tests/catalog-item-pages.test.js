@@ -23,7 +23,7 @@ const inRemake = data.items.filter((i) => i.status === 'source');
 const recipes = JSON.parse(readFileSync(join(pub, 'assets/content/recipes.json'), 'utf8'));
 const costs = await loadCosts(spike);
 const making = await import('../public/js/making.js?v=82ce9d08');
-const vendor = await import('../public/js/vendor.js?v=c74e9e04');
+const vendor = await import('../public/js/vendor.js?v=65e22e0e');
 const pack = await import('../public/js/pack-slots.js?v=c91d0ca3');
 const storage = await import('../public/js/home-storage.js?v=6c449b4e');
 const unescape = (s) => s.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"');
