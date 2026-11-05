@@ -160,7 +160,7 @@ const ROOM_MODULES = {
   top_of_tree: () => import('../quest-rooms/top-of-tree.js?v=5668c299'),
   color_unblocking: () => import('../quest-rooms/color-unblocking.js?v=ec27dcd8'),
   vision_quest: () => import('../quest-rooms/vision-quest.js?v=4d3f6bac'),
-  kids_room: () => import('../quest-rooms/kids-room.js?v=32d6fb69'),
+  kids_room: () => import('../quest-rooms/kids-room.js?v=7fd8bac5'),
   rube_yard: () => import('../quest-rooms/rube-yard.js?v=f443dc92'),
   le_miserable: () => import('../quest-rooms/le-miserable.js?v=c15ad933'),
   juju_camp: () => import('../quest-rooms/juju-camp.js?v=d19a6628'),
@@ -172,7 +172,7 @@ const ROOM_MODULES = {
   clubhouse: () => import('../quest-rooms/clubhouse.js?v=3ee06d86'),
   light_perspective: () => import('../quest-rooms/light-perspective.js?v=319bd577'),
   tile_puzzle: () => import('../quest-rooms/tile-puzzle.js?v=52045bab'),
-  operation_grow: () => import('../quest-rooms/operation-grow.js?v=843ff345'),
+  operation_grow: () => import('../quest-rooms/operation-grow.js?v=005599f0'),
   gwendolyn: () => import('../quest-rooms/gwendolyn.js?v=c3d81d00'),
   mental_block: () => import('../quest-rooms/mental-block.js?v=c0afd86d'),
   penalty: () => import('../quest-rooms/penalty.js?v=a5cb9e8a'),
@@ -519,9 +519,31 @@ function buildChrome(engine) {
       const first = dialog.choices.querySelector('button');
       first?.click();
     }
+    // #107: Escape makes the dialog's cancel choice, or no choice where the X shows
+    // (ChoicesDialog.as _escKeyHandler 1472-1500: cancel_value first, else _makeNoChoice).
+    if (event.key === 'Escape' && dialog.escape) {
+      event.preventDefault();
+      event.stopPropagation();
+      dialog.escape();
+    }
+  });
+  // #107: a click outside the card (the shade, or the open backdrop) makes the cancel choice
+  // ("Never mind"), never another one. Only those two targets count: a choice's button may be
+  // gone from the card by the time its click reaches here (the next page already drawn).
+  modal.addEventListener('click', (event) => {
+    if (dialog.cancel === undefined) return;
+    if (event.target !== modal && !event.target?.classList?.contains('quest-dialogue-shade')) return;
+    dialog.resolve?.(dialog.cancel);
   });
   // G225: the familiar conversation panel's X makes no choice (ChoicesDialog.as _escKeyHandler 1472-1500).
   dialog.close.addEventListener('click', () => dialog.resolve?.(null));
+}
+
+/** #107: the choice Escape and a click outside make: `cancel`, else the choice marked `cancel: true`. */
+export function cancelChoice(choices, cancel) {
+  if (cancel !== undefined) return cancel;
+  const marked = Array.isArray(choices) ? choices.find((c) => c?.cancel === true) : null;
+  return marked ? marked.value ?? '' : undefined;
 }
 
 /**
@@ -531,13 +553,15 @@ function buildChrome(engine) {
  * `timeout` (source seconds) closes it on its own and resolves with
  * `timeoutValue` or null (G198, js/prompt-timeout.js).
  */
-function converse(engine, { title = '', kicker = '', text = '', beats = null, choices = null, timeout = 0, timeoutValue = null, look: lookOpt = '', width = 0, note = '' } = {}) {
+function converse(engine, { title = '', kicker = '', text = '', beats = null, choices = null, timeout = 0, timeoutValue = null, look: lookOpt = '', width = 0, note = '', cancel: cancelOpt } = {}) {
   // G225: Magic Rock lines take the FamiliarDialog CONVERSATION panel unless the caller names a look.
   const look = familiarLook({ look: lookOpt, kicker });
   buildChrome(engine);
   const pages = beats || parseQuestConversation(text);
   if (!pages.length) pages.push({ text, response: 'OK' });
   let index = 0;
+  // #107: the cancel choice ("Never mind", "Not right now", "Stay"), if this dialog has one.
+  const cancel = cancelChoice(choices, cancelOpt);
   return new Promise((resolve) => {
     let timer = null;
     const finish = (value) => {
@@ -545,10 +569,14 @@ function converse(engine, { title = '', kicker = '', text = '', beats = null, ch
       timer = null;
       dialog.modal.hidden = true;
       dialog.resolve = null;
+      dialog.cancel = undefined;
+      dialog.escape = null;
       engine.setData('qiDialog', '');
       resolve(value);
     };
     dialog.resolve = finish;
+    dialog.cancel = cancel;
+    dialog.escape = cancel !== undefined ? () => finish(cancel) : look === 'conversation' ? () => finish(null) : null;
     const render = () => {
       const page = pages[index];
       dialog.kicker.textContent = kicker;
@@ -564,6 +592,11 @@ function converse(engine, { title = '', kicker = '', text = '', beats = null, ch
         dialog.note.hidden = !dialog.note.textContent;
       }
       const opts = last && choices?.length ? choices : [{ label: page.response || (last ? 'OK' : 'Continue'), value: last ? 'ok' : null }];
+      // #107: a long list scrolls on its own and the cancel choice stays pinned under it, always in view.
+      const pinned = last && cancel !== undefined && opts.length > 2 && opts.at(-1)?.value === cancel;
+      const list = pinned ? el('div', { class: 'qi-choice-list', dataset: { qiChoiceList: '' } }) : dialog.choices;
+      if (pinned) dialog.choices.appendChild(list);
+      dialog.modal.querySelector('.quest-dialogue-card')?.classList.toggle('qi-pinned', pinned);
       opts.forEach((opt, i) => {
         const b = el('button', { type: 'button', class: i === 0 ? 'btn-glitch-primary' : 'quest-dialogue-cancel' });
         b.textContent = opt.label;
@@ -573,7 +606,10 @@ function converse(engine, { title = '', kicker = '', text = '', beats = null, ch
             render();
           } else finish(opt.value ?? 'ok');
         });
-        dialog.choices.appendChild(b);
+        if (pinned && i === opts.length - 1) {
+          b.dataset.qiCancel = '';
+          dialog.choices.appendChild(b);
+        } else list.appendChild(b);
       });
       engine.setData('qiDialog', `${title}:${index + 1}/${pages.length}`);
       const opening = dialog.modal.hidden;
@@ -1088,7 +1124,7 @@ function confirmLeave(engine) {
     kicker: 'Leave this place?',
     text: room?.leaveText || 'If you leave now you will have to start over. Leave anyway?',
     choices: [
-      { label: 'Stay', value: 'stay' },
+      { label: 'Stay', value: 'stay', cancel: true },
       { label: 'Leave', value: 'leave' },
     ],
   }).then((choice) => {
@@ -1410,7 +1446,7 @@ function maybeOfferRetry(engine, now) {
     text: `Want another go at ${def?.title || 'that'}? I can take you back whenever you like.`,
     choices: [
       { label: 'Take me there', value: 'go' },
-      { label: 'Not right now', value: 'later' },
+      { label: 'Not right now', value: 'later', cancel: true },
     ],
   }).then((choice) => {
     if (choice === 'go') startInstance(engine, id);
@@ -1700,7 +1736,7 @@ function openReminisce(engine, itemClass) {
         title: 'Reminisce',
         kicker: itemClass === 'conch' ? 'Conch' : 'Play Cube',
         text: 'Which memory?',
-        choices: [...offers.map((o) => ({ label: o.title, value: o.classTsid })), { label: 'Never mind', value: '' }],
+        choices: [...offers.map((o) => ({ label: o.title, value: o.classTsid })), { label: 'Never mind', value: '', cancel: true }],
       })
     : Promise.resolve(card.classTsid);
   pick.then((id) => {
@@ -1712,7 +1748,7 @@ function openReminisce(engine, itemClass) {
       beats: chosen.beats,
       choices: [
         { label: chosen.acceptLabel || "Ok, I'll do it!", value: 'yes' },
-        { label: 'Not right now', value: 'no' },
+        { label: 'Not right now', value: 'no', cancel: true },
       ],
     }).then((answer) => {
       if (answer !== 'yes') return;
@@ -1736,7 +1772,7 @@ export async function offerInRoom(engine, questId, { kicker = '' } = {}) {
     note: questMoveNote(def),
     choices: [
       { label: def.acceptLabel || "Ok, I'll do it!", value: 'yes' },
-      { label: def.declineLabel || 'Not right now', value: 'no' },
+      { label: def.declineLabel || 'Not right now', value: 'no', cancel: true },
     ],
   });
   if (answer !== 'yes') return false;

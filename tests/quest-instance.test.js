@@ -232,7 +232,7 @@ describe('Vision Quest (vision_quest)', () => {
 
 describe("Mr. Block's playroom (kids_room)", () => {
   it('has the 24 source words, the doneSpelling tiers and letter gifts', async () => {
-    const mod = await import('../public/js/quest-rooms/kids-room.js?v=32d6fb69');
+    const mod = await import('../public/js/quest-rooms/kids-room.js?v=7fd8bac5');
     assert.equal(mod.WORD_UP_WORDS.length, 24);
     assert.equal(mod.SPELL_MS, 180_000);
     // The 5*60 exit delay is the "Are you stuck?" prompt; Word Up's 3:00 is the room's only clock.
@@ -397,7 +397,7 @@ describe('G311: a failed room quest is Try again in the quest log', () => {
   };
 
   it('a run lost to a reload marks a startable quest failed, not a retry prompt', async () => {
-    const { questInstancesFeature } = await import('../public/js/features/quest-instances-feature.js?v=b914a372');
+    const { questInstancesFeature } = await import('../public/js/features/quest-instances-feature.js?v=3c6cebc6');
     const { ensureQuestOfferState } = await import('../public/js/quest-offers.js?v=8599dbf9');
     assert.equal(getQuestCatalog().mental_block?.needsStart, true);
     assert.notEqual(getQuestCatalog().help_juju_bandits?.needsStart, true, 'no onStarted in GSJS');
@@ -461,7 +461,7 @@ describe('G313: failed room quests the source removes', () => {
   });
 
   it('a reload removes a source-removed quest and its offers, and keeps the prompt for the three', async () => {
-    const { questInstancesFeature } = await import('../public/js/features/quest-instances-feature.js?v=b914a372');
+    const { questInstancesFeature } = await import('../public/js/features/quest-instances-feature.js?v=3c6cebc6');
     const { questStatus } = await import('../public/js/quest-offers.js?v=8599dbf9');
     const t = Date.now() - 60_000;
     questInstancesFeature.restore({ memory: {}, retry: { tower_quest: t, le_miserable_part_2: t, smuggle_the_smuggler_part2: t } });
@@ -489,7 +489,7 @@ describe('G313: failed room quests the source removes', () => {
   });
 
   it('has no map card', async () => {
-    const { questInstancesFeature } = await import('../public/js/features/quest-instances-feature.js?v=b914a372');
+    const { questInstancesFeature } = await import('../public/js/features/quest-instances-feature.js?v=3c6cebc6');
     assert.equal(questInstancesFeature.mapCards, undefined);
     const src = readFileSync(join(root, 'public/js/features/quest-instances-feature.js'), 'utf8');
     assert.doesNotMatch(src, /Unfinished quest places/);
@@ -503,5 +503,38 @@ describe('leaving a quest place names where you arrive', () => {
     assert.doesNotMatch(leave, /withTransition\(engine, '',/, 'an empty label shows "An Unknown Area"');
     assert.match(leave, /else await go\(true\);/, 'back to a street: the street transition (its name, hub and picture)');
     assert.match(leave, /'Your House' : 'Your Home Street'/, 'back home: the home place by name');
+  });
+});
+
+describe('#107: a choice dialog can be dismissed', () => {
+  const src = readFileSync(join(root, 'public/js/features/quest-instances-feature.js'), 'utf8');
+
+  it('Escape and a click outside make the cancel choice (ChoicesDialog.as _escKeyHandler: cancel_value first)', async () => {
+    const { cancelChoice } = await import('../public/js/features/quest-instances-feature.js?v=3c6cebc6');
+    const memories = [{ label: 'Four Letter Words', value: 'letter_block_2' }, { label: 'Hog Haul', value: 'hogtie_piggies' }, { label: 'Never mind', value: '', cancel: true }];
+    assert.equal(cancelChoice(memories), '');
+    assert.equal(cancelChoice([{ label: 'Stay', value: 'stay', cancel: true }, { label: 'Leave', value: 'leave' }]), 'stay');
+    assert.equal(cancelChoice([{ label: 'OK', value: 'ok' }]), undefined, 'a dialog without a cancel choice keeps waiting');
+    assert.equal(cancelChoice(null, 'no'), 'no');
+    assert.match(src, /if \(event\.key === 'Escape' && dialog\.escape\) \{/);
+    assert.match(src, /dialog\.escape = cancel !== undefined \? \(\) => finish\(cancel\) : look === 'conversation' \? \(\) => finish\(null\) : null;/);
+    // Only the shade or the backdrop: a choice's button may already be gone from the card.
+    assert.match(src, /if \(event\.target !== modal && !event\.target\?\.classList\?\.contains\('quest-dialogue-shade'\)\) return;\n    dialog\.resolve\?\.\(dialog\.cancel\);/);
+  });
+
+  it('the Play Cube and Conch memory list, the offers and the leave prompts all carry their cancel choice', () => {
+    assert.match(src, /\{ label: 'Never mind', value: '', cancel: true \}\],\n      \}\)\n    : Promise\.resolve\(card\.classTsid\);/);
+    assert.match(src, /\{ label: 'Stay', value: 'stay', cancel: true \}/);
+    assert.match(src, /\{ label: 'Not right now', value: 'later', cancel: true \}/);
+    assert.match(src, /\{ label: def\.declineLabel \|\| 'Not right now', value: 'no', cancel: true \}/);
+    assert.match(readFileSync(join(root, 'public/js/quest-rooms/kids-room.js'), 'utf8'), /\{ label: 'Never mind', value: '', cancel: true \}/);
+    assert.match(readFileSync(join(root, 'public/js/quest-rooms/operation-grow.js'), 'utf8'), /\{ label: 'Stay', value: 'stay', cancel: true \}/);
+  });
+
+  it('a long list scrolls on its own and "Never mind" stays pinned under it', () => {
+    assert.match(src, /const pinned = last && cancel !== undefined && opts\.length > 2 && opts\.at\(-1\)\?\.value === cancel;/);
+    const css = readFileSync(join(root, 'public/style.css'), 'utf8');
+    assert.match(css, /\.quest-dialogue-card\.qi-pinned \{\n  display: flex;\n  flex-direction: column;\n  overflow: hidden;\n\}/);
+    assert.match(css, /\.qi-choice-list \{[^}]*overflow-y: auto;/);
   });
 });

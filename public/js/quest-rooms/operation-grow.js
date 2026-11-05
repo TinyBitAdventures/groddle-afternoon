@@ -362,7 +362,7 @@ async function wayBack(ctx) {
       title: 'Operation: Grow',
       kicker: 'Leave the bog fields?',
       text: 'The fields are still gloomy. Leave anyway? The quest will fail.',
-      choices: [{ label: 'Stay', value: 'stay' }, { label: 'Leave', value: 'leave' }],
+      choices: [{ label: 'Stay', value: 'stay', cancel: true }, { label: 'Leave', value: 'leave' }],
     });
     if (choice !== 'leave') return;
   }

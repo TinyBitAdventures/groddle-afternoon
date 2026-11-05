@@ -4318,6 +4318,25 @@ html[data-street-cards] .quest-dialogue { visibility: hidden; }
   cursor: pointer;
 }
 .quest-dialogue-cancel[hidden] { display: none; }
+/* #107: a long choice list (the Play Cube's "Which memory?") scrolls on its own; its cancel choice
+   ("Never mind") is pinned under it, always in view. */
+.quest-dialogue:not([data-look="familiar"], [data-look="vog"]) .quest-dialogue-card.qi-pinned {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.quest-dialogue-card.qi-pinned > * { flex: none; }
+.quest-dialogue-card.qi-pinned > [data-qi-choices] { flex: 0 1 auto; min-height: 0; }
+.quest-dialogue-card.qi-pinned .quest-dialogue-copy { min-height: 0; }
+.qi-choice-list {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-3);
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
 
 .rook-museum-exhibit {
   position: absolute;

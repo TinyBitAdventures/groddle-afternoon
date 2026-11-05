@@ -239,7 +239,7 @@ async function giveItem(ctx, preset) {
     title: 'Mr. Block',
     kicker: 'Give Mr. Block an item',
     text: `Give Mr. Block something that starts with ${ctx.data.letter}:`,
-    choices: [...items.slice(0, 7).map((it) => ({ label: it.label, value: it.id })), { label: 'Never mind', value: '' }],
+    choices: [...items.slice(0, 7).map((it) => ({ label: it.label, value: it.id })), { label: 'Never mind', value: '', cancel: true }],
   });
   const item = items.find((it) => it.id === choice);
   if (!item) return false;
