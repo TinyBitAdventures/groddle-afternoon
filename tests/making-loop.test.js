@@ -38,7 +38,9 @@ import {
   loadRecipeCatalogFromFile,
   starterToolsInventory,
   starterCraftIngredients,
-} from '../public/js/making.js?v=621cd991';
+  pluralizeItem,
+} from '../public/js/making.js?v=82ce9d08';
+import { outputIconsHtml, outputsPhrase, recipeOutputRows } from '../public/js/ui/recipe-outputs.js?v=73e19baf';
 import {
   createInventory,
   countItem,
@@ -461,7 +463,7 @@ describe('UI wiring', () => {
 
 describe('quest-taught recipes (learnt 3)', () => {
   it('Batterfly Bounty teaches the Batterfly Bounty Booster Bar', async () => {
-    const { RECIPE_CATALOG, canCraft, searchRecipes, recipeKnown, loadRecipeCatalog } = await import('../public/js/making.js?v=621cd991');
+    const { RECIPE_CATALOG, canCraft, searchRecipes, recipeKnown, loadRecipeCatalog } = await import('../public/js/making.js?v=82ce9d08');
     if (typeof loadRecipeCatalog === 'function') await loadRecipeCatalog?.();
     const bar = Object.values(RECIPE_CATALOG).find((r) => r.id === '305');
     assert.ok(bar, 'recipe 305 imported');
@@ -552,5 +554,67 @@ describe('Make tool strip: no scrollbar over the names (report 2026-11-01)', () 
     strip.fire('pointerdown', { pointerType: 'touch', button: 0, pointerId: 3, clientX: 80 });
     strip.fire('pointermove', { pointerId: 3, clientX: 10 });
     assert.equal(strip.scrollLeft, 260);
+  });
+});
+
+describe('#103: the Make panel shows every output of a recipe', () => {
+  const recipes = JSON.parse(readFileSync(recipesPath, 'utf8'));
+  const all = Object.values(recipes.recipes || recipes);
+  const esc = (t) => String(t).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+  const label = (cls, n) => `${n} ${cls}`;
+
+  it('the Grinder crushes give several elements (ore_grinder.js:564-587 onCrushComplete)', () => {
+    const rows = (key) => recipeOutputRows(all.find((r) => r.key === key || r.id === key)).map((o) => `${o.qty} ${o.classTsid}`);
+    assert.deepEqual(rows('crush_beryl'), ['20 element_red', '2 element_green', '4 element_blue']);
+    assert.deepEqual(rows('crush_dullite'), ['5 element_red', '8 element_green']);
+    assert.deepEqual(rows('crush_sparkly'), ['5 element_red', '1 element_green', '4 element_blue', '6 element_shiny']);
+    // Every multi-output recipe the panel can list (the sweep: three crushes and Abbasidose).
+    const many = all.filter((r) => (r.outputs || []).length > 1).map((r) => r.name).sort();
+    assert.deepEqual(many, ['Abbasidose', 'Crush Beryl', 'Crush Dullite', 'Crush Sparkly']);
+  });
+
+  it('recipeOutputRows multiplies by the count; outputsPhrase lists them in plain words', () => {
+    const beryl = { outputs: [{ classTsid: 'element_red', qty: 20 }, { classTsid: 'element_green', qty: 2 }, { classTsid: 'element_blue', qty: 4 }] };
+    assert.deepEqual(recipeOutputRows(beryl, 3), [{ classTsid: 'element_red', qty: 60 }, { classTsid: 'element_green', qty: 6 }, { classTsid: 'element_blue', qty: 12 }]);
+    assert.deepEqual(recipeOutputRows(null), []);
+    assert.equal(outputsPhrase(recipeOutputRows(beryl), label), '20 element_red, 2 element_green, and 4 element_blue');
+    assert.equal(outputsPhrase([{ classTsid: 'a', qty: 5 }, { classTsid: 'b', qty: 8 }], label), '5 a and 8 b');
+    assert.equal(outputsPhrase([{ classTsid: 'a', qty: 1 }, { classTsid: 'b', qty: 0 }], label), '1 a');
+    ensureMakingItems();
+    assert.equal(pluralizeItem(1, 'element_green'), '1 Green Element');
+    assert.equal(pluralizeItem(6, 'element_shiny'), '6 Shiny Elements');
+  });
+
+  it('outputIconsHtml draws one icon and count per output, named for screen readers', () => {
+    const html = outputIconsHtml([{ classTsid: 'element_red', qty: 5 }, { classTsid: 'element_green', qty: 8 }], {
+      iconUrl: (cls) => `icons/${cls}.png`, label, escape: esc, className: 'tile-outs', prefix: '×',
+    });
+    assert.match(html, /^<span class="recipe-outs tile-outs" data-outs="2" role="img" aria-label="5 element_red and 8 element_green">/);
+    assert.equal((html.match(/class="recipe-out"/g) || []).length, 2);
+    assert.match(html, /data-out="element_green" title="8 element_green"><img src="icons\/element_green.png" alt="" \/><b>×8<\/b>/);
+  });
+
+  it('the tile, the recipe, the making stage and the result draw every output (game.js)', () => {
+    const game = readFileSync(join(__dirname, '../public/game.js'), 'utf8');
+    const body = (name) => {
+      const start = game.indexOf(`function ${name}(`);
+      assert.ok(start >= 0, name);
+      return game.slice(start, game.indexOf('\n}\n', start));
+    };
+    for (const name of ['renderMakeProgressStage', 'showMakeResult', 'renderMakePanel']) {
+      // The icon once came from outputs[0] alone (an empty result still falls back to it).
+      assert.doesNotMatch(body(name), /const (outId|output) = (recipe|result)\.outputs\?\.\[0\]/, `${name} reads every output, not outputs[0]`);
+    }
+    assert.match(body('renderMakeProgressStage'), /recipeOutputsHtml\(outRows, \{ className: 'mp-outputs', prefix: '×' \}\)/);
+    assert.match(body('showMakeResult'), /make-detail-outs/);
+    assert.match(body('showMakeResult'), /You got \$\{outputsPhrase\(gotRows, outputCountLabel\)\}/);
+    assert.match(body('renderMakePanel'), /recipeOutputsHtml\(outRows, \{ className: 'tile-outs' \}\)/);
+    assert.match(body('renderMakePanel'), /data-make-outs/);
+    assert.match(body('recipeMakesLine'), /Each one makes/);
+    const css = readFileSync(join(__dirname, '../public/style.css'), 'utf8');
+    assert.match(css, /\.recipe-outs \{[^}]*display: flex;/);
+    assert.match(css, /\.make-progress \.mp-outputs \{ display: grid;/);
+    const classic = readFileSync(join(__dirname, '../public/css/classic.css'), 'utf8');
+    assert.match(classic, /#make-result \.make-detail-outs \.recipe-out img \{ width: calc\(50 \* var\(--cu\)\)/, 'Classic keeps the result icons small inside its 150 box');
   });
 });

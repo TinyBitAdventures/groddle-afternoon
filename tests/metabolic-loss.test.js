@@ -28,7 +28,7 @@ import { createInventory, countItem } from '../public/js/inventory.js?v=d82f3b00
 import { startAssembly, startDisassembly } from '../public/js/machines.js?v=acfeb40f';
 import { createToolConditionState, repairToolCondition, setToolRemaining } from '../public/js/tools.js?v=6684b484';
 import { smeltMetalRocks } from '../public/js/mining.js?v=83421428';
-import { craftRecipe } from '../public/js/making.js?v=621cd991';
+import { craftRecipe } from '../public/js/making.js?v=82ce9d08';
 import { doChore, neighbourById, normalizeNeighbourState } from '../public/js/neighbours.js?v=862857f9';
 
 const here = dirname(fileURLToPath(import.meta.url));

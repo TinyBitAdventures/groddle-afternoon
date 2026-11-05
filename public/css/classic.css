@@ -2115,6 +2115,12 @@
 :root[data-ui="classic"] #game-root #make-panel .mr-used-list { display: flex; gap: calc(6 * var(--cu)); }
 :root[data-ui="classic"] #game-root #make-panel .mr-used-item { display: grid; justify-items: center; padding: calc(4 * var(--cu)); border-radius: 5px; background: var(--c-classic-panel); box-shadow: 0 0 0 1px var(--c-classic-slot-ring); font-size: calc(var(--fs-classic-count) * var(--cu-n, 1)); }
 :root[data-ui="classic"] #game-root #make-panel #make-result .mr-actions { grid-column: 1 / -1; }
+/* #103: several outputs, each with its count (js/ui/recipe-outputs.js); the result's 150 box holds them as a grid. */
+:root[data-ui="classic"] #game-root #make-panel .recipe-out b { background: var(--c-classic-title); color: var(--c-classic-panel); font: 700 calc(var(--fs-classic-count) * var(--cu-n, 1))/1 var(--font-classic-body); }
+:root[data-ui="classic"] #game-root #make-panel #make-result .make-detail-outs { display: grid; place-items: center; }
+:root[data-ui="classic"] #game-root #make-panel #make-result .make-detail-outs .recipe-out { width: calc(56 * var(--cu)); height: calc(56 * var(--cu)); }
+:root[data-ui="classic"] #game-root #make-panel #make-result .make-detail-outs .recipe-out img { width: calc(50 * var(--cu)); height: calc(50 * var(--cu)); }
+:root[data-ui="classic"] #game-root #make-panel .mr-got { color: var(--c-classic-title); font: 700 calc(var(--fs-classic-body) * var(--cu-n, 1))/var(--lh-normal) var(--font-classic-body); }
 :root[data-ui="classic"] #game-root #skills-panel .skill-family { margin: 0; padding: 0; border: 0; border-radius: 0; background: none; box-shadow: none; }
 :root[data-ui="classic"] #game-root #quest-panel .qc-head { padding: 0; border: 0; background: none; box-shadow: none; text-align: left; }
 /* A row's step reads "desc (got/need)" under the quest's name (QuestTracker.as 212-214). */

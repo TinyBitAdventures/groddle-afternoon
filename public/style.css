@@ -5659,6 +5659,53 @@ body.buff-purple-pulse::after {
   color: var(--c-pink-51);
   font-weight: 700;
 }
+/* #103: a recipe with several outputs (the Grinder's crushes) shows each one with its count
+   (js/ui/recipe-outputs.js): on the tile, the recipe, the making stage and the result. */
+.recipe-outs {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: var(--sp-1) var(--sp-2);
+}
+.recipe-out {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+}
+.recipe-outs .recipe-out img {
+  width: 26px;
+  height: 26px;
+  max-width: none;
+  max-height: none;
+  object-fit: contain;
+}
+.recipe-out b {
+  position: absolute;
+  right: -5px;
+  bottom: -4px;
+  min-width: 15px;
+  height: 15px;
+  padding: 0 3px;
+  display: grid;
+  place-items: center;
+  border-radius: var(--radius-md);
+  background: var(--c-sand-44);
+  color: var(--text-inverse);
+  font-size: var(--fs-2xs);
+  font-weight: 800;
+  line-height: 1;
+}
+.make-tile .tile-outs { min-height: 40px; max-width: 100%; }
+.make-detail-icon.make-detail-outs { padding: var(--sp-2); }
+.make-detail-outs .recipe-outs { gap: var(--sp-2); }
+.make-detail-outs .recipe-out { width: 34px; height: 34px; }
+.make-detail-outs .recipe-outs .recipe-out img { width: 30px; height: 30px; }
+.make-progress .mp-outputs { display: grid; grid-template-columns: repeat(2, 30px); gap: var(--sp-3) var(--sp-4); }
+.make-detail-body .make-outs-line,
+.make-result .mr-got { font-weight: 700; }
 .vendor-detail,
 .make-detail {
   margin-top: var(--sp-5);

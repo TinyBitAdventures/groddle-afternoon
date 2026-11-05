@@ -391,7 +391,7 @@ export const GRINDER_DROPS_REMAINDER = Object.freeze(['barnacle_talc']);
 export const GRINDER_DROP_RISE = 29;
 
 /** common.js pluralize: "1 Red Element", "12 Red Elements". */
-function pluralizeItem(n, classTsid) {
+export function pluralizeItem(n, classTsid) {
   const meta = ITEM_CATALOG[classTsid];
   const single = meta?.label || classTsid;
   return n === 1 ? `1 ${single}` : `${n} ${meta?.namePlural || single}`;

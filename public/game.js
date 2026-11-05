@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=28b6b0a6';
 import { createFeatureHost } from './js/feature-host.js?v=020c9329';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=db589098';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=64751c40';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -570,7 +570,9 @@ import {
   MAKING_TOOL_SKILLS,
   recipeTaskLimit,
   recipeToolInUse,
-} from './js/making.js?v=621cd991';
+  pluralizeItem,
+} from './js/making.js?v=82ce9d08';
+import { outputIconsHtml, outputsPhrase, recipeOutputRows } from './js/ui/recipe-outputs.js?v=73e19baf';
 import { MAKE_TOOL_SHEETS } from './js/make-tool-sheets.js?v=6f758e09';
 import { LOW_FUEL_LINE, craftSessionElapsedMs, isLowFuel, isMachineArt, machineArtHtml, packMakeState, playMachineHandOver, setMachineArtFrame } from './js/machine-art.js?v=ac629e13';
 import {
@@ -26205,6 +26207,23 @@ function itemIconUrl(classTsid) {
   return ITEM_CATALOG[classTsid]?.icon || `assets/sprites/icons/${classTsid}.png`;
 }
 
+/** #103: "20 Red Elements" for one output row (making.js pluralizeItem). */
+function outputCountLabel(classTsid, qty) {
+  return pluralizeItem(qty, classTsid);
+}
+
+/** #103: every output as a small icon with its count (js/ui/recipe-outputs.js). */
+function recipeOutputsHtml(rows, opts = {}) {
+  return outputIconsHtml(rows, { iconUrl: itemIconUrl, label: outputCountLabel, escape: escapeHtml, ...opts });
+}
+
+/** #103: what one make gives, "Makes 20 Red Elements, 2 Green Elements, and 4 Blue Elements." (empty for one of one item). */
+function recipeMakesLine(recipe) {
+  const rows = recipeOutputRows(recipe);
+  if (rows.length < 2 && (rows[0]?.qty || 1) < 2) return '';
+  return `Each one makes ${outputsPhrase(rows, outputCountLabel)}.`;
+}
+
 function recipeInputLabel(recipe, input) {
   const label = ITEM_CATALOG[input.classTsid]?.label || input.classTsid;
   if (recipe?.tool === 'fruit_changing_machine' && input.classTsid === 'cherry') {
@@ -26266,8 +26285,13 @@ function renderMakeProgressStage(record) {
       <img src="${itemIconUrl(input.classTsid)}" alt="" />
       <b>${input.qty}</b>
     </span>`).join('');
-  const output = recipe.outputs?.[0];
-  const toolIcon = TOOL_CATALOG[recipe.tool]?.icon || itemIconUrl(recipe.tool);
+  // #103: every output with its count (Crush Sparkly gives four elements).
+  const outRows = recipeOutputRows(recipe);
+  const outputHtml = outRows.length > 1
+    ? recipeOutputsHtml(outRows, { className: 'mp-outputs', prefix: '×' })
+    : `<img class="mp-output" src="${itemIconUrl(outRows[0]?.classTsid)}" alt="" />
+        <b>×${outRows[0]?.qty || 1}</b>`;
+  const toolIcon =TOOL_CATALOG[recipe.tool]?.icon || itemIconUrl(recipe.tool);
   // The stand-in doing the work (dullite.js:124-133): a Grand Ol' Grinder swings its own tool_animation.
   const toolInUse = recipeToolInUse(inv, recipe.tool, record.opts?.toolState || toolState, recipe.toolWear || 1);
   const toolVisual = makeToolSheetVisual(toolInUse) || makeToolSheetVisual(recipe.tool)
@@ -26285,8 +26309,7 @@ function renderMakeProgressStage(record) {
       </div>
       <div class="mp-output-wrap">
         <span class="mp-arrow">→</span>
-        <img class="mp-output" src="${itemIconUrl(output?.classTsid)}" alt="" />
-        <b>×${output?.qty || 1}</b>
+        ${outputHtml}
       </div>
     </div>
     <div class="mp-unit-row"><span>Current item</span><span data-mp-unit>0%</span></div>
@@ -26538,7 +26561,19 @@ function showMakeResult(result, key) {
   if (!resEl) return;
   if (titleEl) titleEl.textContent = `Make ${result.recipeName}`;
 
-  const outId = result.outputs?.[0]?.classTsid;
+  // #103: everything the batch gave, each item once (a bonus of the same item adds to its row);
+  // MakingCompleteUI.as getOutputText said every output too ("You made 5 Red Elements, and 8 ...").
+  const gotRows = [];
+  for (const out of result.outputs || []) {
+    const qty = Math.max(0, Math.floor(Number(out.qty)) || 0);
+    if (!qty) continue;
+    const row = gotRows.find((r) => r.classTsid === out.classTsid);
+    if (row) row.qty += qty;
+    else gotRows.push({ classTsid: out.classTsid, qty });
+  }
+  const outId = gotRows[0]?.classTsid || result.outputs?.[0]?.classTsid;
+  const manyOut = gotRows.length > 1;
+  const gotLine = manyOut ? `You got ${outputsPhrase(gotRows, outputCountLabel)}.` : '';
   const e = result.energy || 0;
   const xp = result.xp || 0;
   const eCls = e < 0 ? 'loss' : e > 0 ? 'gain' : '';
@@ -26559,12 +26594,15 @@ function showMakeResult(result, key) {
 
   // G193: a pack machine hands its output over: ready, collectOpen, collectClose (js/machine-art.js).
   const machineArt = machineArtHtml(RECIPE_CATALOG[key]?.tool, { className: 'mr-machine' });
-  const outIcon = `<div class="make-detail-icon"><img src="${itemIconUrl(outId)}" alt=""/></div>`;
+  const outIcon = manyOut
+    ? `<div class="make-detail-icon make-detail-outs">${recipeOutputsHtml(gotRows)}</div>`
+    : `<div class="make-detail-icon"><img src="${itemIconUrl(outId)}" alt=""/></div>`;
   resEl.hidden = false;
   resEl.innerHTML = `
     ${machineArt ? `<div class="mr-machine-stage"><span class="mr-machine-box">${machineArt}${result.lowFuel ? `<span class="mr-machine-say" role="status">${LOW_FUEL_LINE}</span>` : ''}</span>${outIcon}</div>` : outIcon}
     <p class="mr-kicker">${result.made < result.qtyRequested ? 'Stopped' : 'Nice'}</p>
     <p class="mr-headline">${escapeHtml(result.headline)}</p>
+    ${gotLine ? `<p class="mr-got" data-mr-got>${escapeHtml(gotLine)}</p>` : ''}
     <div class="mr-deltas">
       ${eText ? `<span class="mr-delta ${eCls}">${escapeHtml(eText)}</span>` : ''}
       ${xpText ? `<span class="mr-delta ${xpCls}">${escapeHtml(xpText)}</span>` : ''}
@@ -26723,7 +26761,9 @@ function renderMakePanel() {
       detail.hidden = false;
       const recipe = RECIPE_CATALOG[makeSelected];
       const key = makeSelected;
-      const outId = recipe.outputs?.[0]?.classTsid;
+      const outRows = recipeOutputRows(recipe);
+      const outId = outRows[0]?.classTsid;
+      const makesLine = recipeMakesLine(recipe);
       const check = canCraft(inv, recipe, opts);
       const maxMake = (() => {
         if (!check.ok && check.reason === 'ingredients') return 0;
@@ -26746,9 +26786,12 @@ function renderMakePanel() {
         .join('');
       detail.innerHTML = `
         <button type="button" class="btn-glitch-back" data-make-back>← Back</button>
-        <div class="make-detail-icon"><img src="${itemIconUrl(outId)}" alt=""/></div>
+        ${outRows.length > 1
+          ? `<div class="make-detail-icon make-detail-outs">${recipeOutputsHtml(outRows)}</div>`
+          : `<div class="make-detail-icon"><img src="${itemIconUrl(outId)}" alt=""/></div>`}
         <div class="make-detail-body">
           <h3>${recipe.name}</h3>
+          ${makesLine ? `<p class="make-outs-line" data-make-outs>${escapeHtml(makesLine)}</p>` : ''}
           <p>You can make up to ${maxMake}. Uses ${recipeEnergyCost(recipe, skillState.learned, pc.imaginationUpgrades)} energy each.</p>
           ${makingSkillAdjustments(recipe, skillState.learned).note ? `<p class="make-skill-note">${makingSkillAdjustments(recipe, skillState.learned).note}</p>` : ''}
           ${inputsHtml}
@@ -26800,7 +26843,8 @@ function renderMakePanel() {
     const check = canCraft(inv, recipe, opts);
     const energyOk = pc.energy > recipeEnergyCost(recipe, skillState.learned, pc.imaginationUpgrades);
     const canMake = check.ok && energyOk;
-    const outId = recipe.outputs?.[0]?.classTsid;
+    const outRows = recipeOutputRows(recipe);
+    const outId = outRows[0]?.classTsid;
     const tile = document.createElement('button');
     tile.type = 'button';
     tile.className = 'make-tile'
@@ -26810,13 +26854,16 @@ function renderMakePanel() {
     const inputs = (recipe.inputs || [])
       .map((i) => `${i.qty} ${recipeInputLabel(recipe, i)}`)
       .join(', ');
+    // #103: a crush that gives several elements shows each one with its count.
     tile.innerHTML = `
-      <img src="${itemIconUrl(outId)}" alt="" />
+      ${outRows.length > 1 ? recipeOutputsHtml(outRows, { className: 'tile-outs' }) : `<img src="${itemIconUrl(outId)}" alt="" />`}
       <span class="tile-label">${recipe.name}</span>
       <span class="tile-req">${inputs}</span>`;
+    const makes = recipeMakesLine(recipe);
+    if (makes) tile.title = makes;
     tile.setAttribute(
       'aria-label',
-      `${recipe.name}. ${inputs}. ${recipeEnergyCost(recipe, skillState.learned, pc.imaginationUpgrades)} energy.${canMake ? '' : ' Not enough resources.'}`
+      `${recipe.name}. ${makes ? `${makes} ` : ''}${inputs}. ${recipeEnergyCost(recipe, skillState.learned, pc.imaginationUpgrades)} energy.${canMake ? '' : ' Not enough resources.'}`
     );
     tile.addEventListener('click', () => {
       makeSelected = key;
