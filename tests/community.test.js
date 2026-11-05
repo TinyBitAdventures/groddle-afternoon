@@ -397,6 +397,49 @@ describe('the chat app\'s header, its bell and its right-click menus (/chat/, Au
     assert.match(src('community/community.js'), /import\(`\.\/notifications\.js\$\{v\}`\)[\s\S]*?import\(`\.\/chat-app\.js\$\{v\}`\)/, 'the bell starts first and is handed to the app');
   });
 
+  it('/chat/ is the whole window: no site footer, its credit row at the foot of the rail, nothing but the app\'s parts scroll', { skip: skipPhp }, () => {
+    const pages = src('src/CommunityPages.php');
+    const page = pages.slice(pages.indexOf('private function page('));
+    assert.doesNotMatch(page, /footer\.html|class="foot"/, 'no site footer on a community page');
+    assert.match(page, /content=\\"width=device-width, initial-scale=1, viewport-fit=cover\\"/, 'the safe area is the app\'s to keep');
+    // The footer's first line, as the rail's last row (signed in and out, a phone's list screen).
+    const foot = php('P::RAIL_FOOT');
+    assert.match(foot, /^<p class="cx-rail-foot">/);
+    const footer = src('parts/footer.html');
+    for (const href of ['https://tinybitadventures.com', '/credits/', '/privacy-policy/']) {
+      assert.ok(foot.includes(`href="${href}"`), href);
+      assert.ok(footer.includes(`href="${href}"`), `the site footer still has ${href}`);
+    }
+    assert.match(foot, />fan remake<\/a> of Tiny Speck’s Glitch · <a href="\/credits\/">Credits<\/a> · <a href="\/privacy-policy\/">Privacy<\/a><\/p>$/);
+    assert.match(pages, /'<div class="cx-rail"><nav class="cx-rail-list" aria-label="Community">' \. \$rail \. '<\/nav>' \. self::RAIL_FOOT \. '<\/div>'/, 'drawn for every reader');
+    assert.match(pages, /\$this->shell\(\$community, \$viewer, \$viewer\['id'\] > 0 \? 'chan' : 'boards', \$channels, 'list'\)/, 'a phone opens /chat/ on the rail');
+    // The page never scrolls; the app fills what the header leaves; its parts scroll inside themselves.
+    const css = src('community/community.css').replace(/\/\*[\s\S]*?\*\//g, '');
+    const rule = (sel) => { const i = css.indexOf(`\n${sel} {`); assert.ok(i >= 0, sel); return css.slice(i, css.indexOf('}', i)); };
+    assert.match(rule('html:has(> body.community-page)'), /overflow: hidden;/);
+    const body = rule('body.community-page');
+    assert.match(body, /display: flex; flex-direction: column; height: 100vh; height: 100dvh;/);
+    assert.match(body, /overflow: hidden;/);
+    const cx = rule('.cx');
+    assert.match(cx, /flex: 1 1 auto;/);
+    assert.match(cx, /min-height: 0;/);
+    assert.doesNotMatch(cx, /min-height: [1-9]/, 'no floor that could push the page past the window');
+    assert.match(rule('.cx-rail-list'), /overflow-y: auto;/);
+    assert.match(rule('.cx-rail-foot'), /flex: none;/);
+    assert.match(rule('.cx-log'), /overflow-y: auto;/);
+    assert.match(rule('.cx-compose'), /flex: none;.*env\(safe-area-inset-bottom\)/);
+    assert.match(rule('.cx-around .cx-people'), /overflow-y: auto;/);
+    // Closed, Who's around leaves the grid (wide, it went under the rail and grew the page); narrow, its panel sits inside the app.
+    assert.match(css, /\n\.cx\[data-cx-around="off"\] \.cx-around \{ display: none; \}/);
+    assert.match(css, /\.cx-side \{ position: absolute; z-index: 25; grid-column: auto; grid-row: auto; top: 0; right: 0; bottom: 0;/);
+    assert.doesNotMatch(css, /position: fixed; z-index: 25;/);
+    // The header: compact, the app's palette and surface, one hairline, the page being read as a soft pill.
+    assert.match(css, /\.community-page \{ --site-nav-h: 48px;/);
+    assert.match(css, /\.community-page \.site-nav\.site-nav-app \{[^}]*background: var\(--surface\);[^}]*backdrop-filter: none;[^}]*border-bottom: 1px solid var\(--border\);/);
+    assert.match(css, /\.site-nav-app \.site-nav-links a\[aria-current="page"\] \{ color: var\(--fg\); background: var\(--cx-soft\); \}/);
+    assert.match(css, /\n\.community-page, \.cx \{\n  --bg:/, 'the header wears the app\'s tokens');
+  });
+
   it('right-click menus use the game\'s component, with its keys and long press, and leave the browser\'s menu on fields, selections and links', async () => {
     const menus = src('community/chat-menus.js');
     assert.match(menus, /^import \{ bindContextTrigger, createContextMenu \} from '\/js\/ui\/context-menu\.js';$/m);
