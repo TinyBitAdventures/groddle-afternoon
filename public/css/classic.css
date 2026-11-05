@@ -2091,6 +2091,8 @@
 :root[data-ui="classic"] #game-root #map-panel .map-sub { color: var(--c-classic-offline); font-size: calc(var(--fs-classic-body) * var(--cu-n, 1)); }
 :root[data-ui="classic"] #game-root #map-panel .map-extras { color: var(--c-classic-text); font-size: calc(var(--fs-classic-row) * var(--cu-n, 1)); }
 :root[data-ui="classic"] #game-root #map-panel :is(.map-feature-card, .map-home-card, .map-route-card) { border: 0; border-bottom: 1px solid var(--c-classic-row-rule); border-radius: 0; background: none; box-shadow: none; }
+/* #104: Classic keeps its zoom buttons at the map's top right, so the stops open at the left. */
+:root[data-ui="classic"] #game-root #map-panel .map-route-stops { right: auto; left: 0; border: 0; border-radius: 4px; background: var(--c-classic-panel); box-shadow: 0 0 0 1px var(--c-classic-slot-ring), 0 2px 6px color-mix(in srgb, var(--c-classic-ink) 25%, transparent); color: var(--c-classic-title); font: 400 calc(var(--fs-classic-body) * var(--cu-n, 1))/var(--lh-snug) var(--font-classic-body); }
 /* Make's result as the client's (ref/video-2011-make-result.jpg): the item large on the left, then
    "Nice" in big green, "You made …", the energy and iMG as slug pills, "You used" and its stacks; the
    recipe list's search goes while a recipe or its result is showing. */

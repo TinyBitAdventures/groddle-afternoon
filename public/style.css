@@ -6134,7 +6134,12 @@ body.buff-purple-pulse::after {
 .map-bar > [data-map-route]:not(:has(> .map-route-rooms)) { flex-wrap: nowrap; }
 /* width 0: the line's own length never sets the row's minimum (it ellipsizes instead). */
 .map-bar > [data-map-route] .map-route-body { width: 0; min-width: 5rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; }
-.map-bar > [data-map-route] .map-route-body[data-open] { white-space: normal; }
+/* #104: opened, the line takes a row of its own under the buttons (at most four lines, then it scrolls). */
+.map-bar > [data-map-route]:has(> .map-route-body[data-open]) { flex-wrap: wrap; }
+.map-bar > [data-map-route] .map-route-body[data-open] { order: 2; flex: 1 0 100%; white-space: normal; max-height: 6.6em; overflow-y: auto; }
+/* #104: the route's whole list of stops opens in its own box over the map (map-routes-feature.js
+   .map-route-stops, placed against the bar, not the card, so the card's own scroll never clips it). */
+.map-bar > [data-map-route] { position: static; }
 .map-bar > [data-map-route] .map-route-actions > button { white-space: nowrap; padding: 2px var(--sp-3); }
 .map-bar > [data-map-route] .map-route-body br { display: none; }
 .map-bar > [data-map-route] .map-route-body > span:not(:first-child)::before { content: ' · '; }

@@ -70,11 +70,12 @@ import {
   resurrectRoute,
   routeGraph,
   routeStep,
+  routeStopsLine,
   sameStreet,
   startCut,
   subwayRides,
   tsidAliases,
-} from '../map-routes.js?v=bcf2c347';
+} from '../map-routes.js?v=e0ac88c0';
 
 export const MAP_ROUTES_FEATURE_ID = 'map-routes';
 const GRAPH_URL = 'assets/content/signpost-graph.json?v=g198-1';
@@ -112,6 +113,8 @@ let lastDead = null;
 let pickMode = false;
 /** The Map row's route line opened out (a click on it; MAPFRAME). */
 let routeLineOpen = false;
+/** #104: the route's whole list of stops shown in its own box under the line. */
+let routeStopsOpen = false;
 let lastPublish = 0;
 let lastLook = 0;
 let lastHudKey = '';
@@ -548,6 +551,13 @@ function ensureStyle() {
 .map-route-card .map-route-body{flex:1 1 220px;min-width:0}
 .map-route-card button{font:700 var(--fs-sm) var(--font-ui);padding:3px var(--sp-4);border-radius:var(--radius-md);border:1px solid var(--c-gold-74);background:var(--surface-bright);color:var(--c-green-43);cursor:pointer}
 .map-route-card button[aria-pressed="true"]{background:${ROUTE_COLOR_CSS};border-color:var(--c-gold-58)}
+.map-route-stops{position:absolute;top:calc(100% + var(--sp-2));right:0;z-index:var(--z-raised);width:min(22rem,100%);max-height:min(16rem,45vh);overflow-y:auto;overscroll-behavior:contain;
+  margin:0;padding:var(--sp-3) var(--sp-4) var(--sp-3) calc(var(--sp-4) + 2.2em);border:1px solid var(--border-strong);border-radius:var(--radius-lg);background:var(--surface-card);box-shadow:var(--shadow-2);
+  color:var(--text);font:400 var(--fs-md)/var(--lh-snug) var(--font-ui);white-space:normal}
+.map-route-stops[hidden]{display:none}
+.map-route-stops li{padding:1px 0}
+.map-route-stops li::marker{color:var(--text-muted);font-size:var(--fs-sm)}
+.map-route-stops li.is-destination{font-weight:700}
 .map-route-rooms{flex:1 1 100%;display:flex;flex-wrap:wrap;gap:var(--sp-2) var(--sp-3);align-items:center;padding-top:var(--sp-2);border-top:1px dashed var(--c-gold-84)}
 .map-route-rooms-head{font-weight:700;color:var(--c-sand-44);margin-right:var(--sp-1)}
 .map-route-rooms button{font-weight:400}
@@ -914,6 +924,8 @@ function mapCard(engine) {
     : '<span class="map-route-swatch" aria-hidden="true"></span>';
   const lines = [];
   let head = '';
+  /** #104: every stop's words, when the line had to count some of them. */
+  let allStops = null;
   if (r) {
     const dest = `${label(r.destination)}${hubName(r.destination) ? ` (${hubName(r.destination)})` : ''}`;
     const text = gpsText(r, step, label);
@@ -922,7 +934,11 @@ function mapCard(engine) {
     // A subway hop reads "by subway" (map-routes.js isRide).
     const from = step.remaining[0];
     const hop = (t, i) => (isRide(graph, rides, i ? rest[i - 1] : from, t) ? `${label(t)} (by subway)` : label(t));
-    lines.push(rest.length > 1 ? `Route: ${rest.map(hop).join(' → ')}` : text.arrived ? ROUTE_TEXT.arrived : text.next);
+    // #104: a long route names the next few stops, counts the rest, then the destination.
+    const stops = rest.map(hop);
+    const cut = routeStopsLine(stops);
+    if (cut.hidden) allStops = stops;
+    lines.push(rest.length > 1 ? `Route: ${cut.text}` : text.arrived ? ROUTE_TEXT.arrived : text.next);
     if (quest && !shared) lines.push(`${quest.title}. ${quest.text}`);
   } else if (quest) {
     head = quest.title;
@@ -976,6 +992,29 @@ function mapCard(engine) {
     loadGraph();
     engine.openMap?.();
   }, pickMode);
+  if (allStops) {
+    // #104: the whole list in a box of its own that scrolls (style: .map-route-stops), over the map.
+    const list = document.createElement('ol');
+    list.className = 'map-route-stops';
+    list.id = 'map-route-stops';
+    list.setAttribute('aria-label', `All ${allStops.length} stops`);
+    list.innerHTML = allStops.map((t, i) => `<li${i === allStops.length - 1 ? ' class="is-destination"' : ''}>${esc(t)}</li>`).join('');
+    list.hidden = !routeStopsOpen;
+    card.appendChild(list);
+    const toggle = button(routeStopsOpen ? 'Hide stops' : `All ${allStops.length} stops`, () => {
+      routeStopsOpen = !routeStopsOpen;
+      list.hidden = !routeStopsOpen;
+      toggle.textContent = routeStopsOpen ? 'Hide stops' : `All ${allStops.length} stops`;
+      toggle.setAttribute('aria-expanded', String(routeStopsOpen));
+      engine.setData?.('routeStops', routeStopsOpen ? String(allStops.length) : '');
+    });
+    toggle.dataset.routeStopsToggle = '';
+    toggle.setAttribute('aria-expanded', String(routeStopsOpen));
+    toggle.setAttribute('aria-controls', list.id);
+    actions.prepend(toggle);
+  } else {
+    routeStopsOpen = false;
+  }
   if (r) {
     button('Clear route', () => dropRoute(engine, { reason: 'closed' }));
   }

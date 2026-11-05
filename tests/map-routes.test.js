@@ -26,9 +26,11 @@ import {
   planRoute,
   resurrectRoute,
   routeStep,
+  routeStopsLine,
+  ROUTE_STOPS_SHOWN,
   signpostToward,
-} from '../public/js/map-routes.js?v=bcf2c347';
-import { mapRoutesFeature } from '../public/js/features/map-routes-feature.js?v=da039551';
+} from '../public/js/map-routes.js?v=e0ac88c0';
+import { mapRoutesFeature } from '../public/js/features/map-routes-feature.js?v=da51a945';
 import { hellTicketsFeature } from '../public/js/features/hell-tickets-feature.js?v=d13c2b58';
 import { hellFeature } from '../public/js/features/hell-feature.js?v=13196575';
 import { createFeatureHost } from '../public/js/feature-host.js?v=020c9329';
@@ -37,10 +39,10 @@ import { loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/c
 import { createQuestState } from '../public/js/quests.js?v=c8d9d0a4';
 import { HELL_QUESTS, createHellState, croak } from '../public/js/hell.js?v=aca145ba';
 import { SUBWAY_STREETS } from '../public/js/quest-rooms/back-alley.js?v=657b2221';
-import { doorRooms, doorToward, routeGraph } from '../public/js/map-routes.js?v=bcf2c347';
+import { doorRooms, doorToward, routeGraph } from '../public/js/map-routes.js?v=e0ac88c0';
 import { afterStreetCard, runStreetTransition, streetCardUp } from '../public/js/screen-fx.js?v=428f4022';
 import { EMITTED_EVENTS } from '../public/js/quest-offers.js?v=8599dbf9';
-import { smugglingFeature } from '../public/js/features/smuggling-feature.js?v=406e634d';
+import { smugglingFeature } from '../public/js/features/smuggling-feature.js?v=93225dbb';
 import { addItem } from '../public/js/inventory.js?v=d82f3b00';
 import { resurrect } from '../public/js/hell.js?v=aca145ba';
 
@@ -1169,5 +1171,39 @@ describe('G198 the door glow follows the door art', () => {
     assert.equal(first.parent, again.world);
     assert.deepEqual(again.world.children, [again.bgLayer, first, again.engine.entityLayer, again.fx]);
     mapRoutesFeature._reset();
+  });
+});
+
+describe('#104: a long route on the Map stays one short line', () => {
+  it('routeStopsLine names the next few stops, counts the rest, then the destination', () => {
+    assert.equal(ROUTE_STOPS_SHOWN, 3);
+    assert.deepEqual(routeStopsLine([]), { text: '', hidden: 0 });
+    assert.deepEqual(routeStopsLine(['A', 'B']), { text: 'A → B', hidden: 0 });
+    // Up to two more than shown are listed whole: a count of one stop saves nothing.
+    assert.deepEqual(routeStopsLine(['A', 'B', 'C', 'D', 'E']), { text: 'A → B → C → D → E', hidden: 0 });
+    assert.deepEqual(routeStopsLine(['A', 'B', 'C', 'D', 'E', 'F']), { text: 'A → B → C → … 2 more stops … → F', hidden: 2 });
+    // Dr Flavius's Karnata route: 43 stops.
+    const stops = Array.from({ length: 43 }, (_, i) => `Street ${i + 1}`);
+    stops[1] = 'Willo Let (by subway)';
+    const line = routeStopsLine(stops);
+    assert.equal(line.hidden, 39);
+    assert.equal(line.text, 'Street 1 → Willo Let (by subway) → Street 3 → … 39 more stops … → Street 43');
+    assert.doesNotMatch(line.text, /\u2014/, 'no em-dash in player text');
+  });
+
+  it('the Map card uses it and opens the whole list in its own scrolling box (map-routes-feature.js)', () => {
+    const feature = readFileSync(join(spike, 'public/js/features/map-routes-feature.js'), 'utf8');
+    assert.match(feature, /const stops = rest\.map\(hop\);\n\s+const cut = routeStopsLine\(stops\);/, 'subway hops keep their "(by subway)" before the cut');
+    assert.match(feature, /lines\.push\(rest\.length > 1 \? `Route: \$\{cut\.text\}`/);
+    assert.doesNotMatch(feature, /rest\.map\(hop\)\.join\(' → '\)/, 'the whole route is never one line again');
+    assert.match(feature, /list\.className = 'map-route-stops';/);
+    assert.match(feature, /toggle\.dataset\.routeStopsToggle = '';/);
+    assert.match(feature, /toggle\.setAttribute\('aria-controls', list\.id\);/);
+    assert.match(feature, /`All \$\{allStops\.length\} stops`/);
+    assert.match(feature, /\.map-route-stops\{position:absolute;top:calc\(100% \+ var\(--sp-2\)\);right:0;[^}]*max-height:min\(16rem,45vh\);overflow-y:auto;/);
+    const css = readFileSync(join(spike, 'public/style.css'), 'utf8');
+    assert.match(css, /\.map-bar > \[data-map-route\] \{ position: static; \}/, 'the box is placed against the bar, so the card\'s scroll never clips it');
+    const classic = readFileSync(join(spike, 'public/css/classic.css'), 'utf8');
+    assert.match(classic, /#map-panel \.map-route-stops \{ right: auto; left: 0;/, 'Classic keeps its zoom buttons clear');
   });
 });

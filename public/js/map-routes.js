@@ -510,6 +510,25 @@ export function resurrectRoute(state) {
   return { ...s, route: null, previous: null, lastCleared: s.route ? 'resurrected' : s.lastCleared };
 }
 
+/** #104: how many of the next stops the Map's route line names before it counts the rest. */
+export const ROUTE_STOPS_SHOWN = 3;
+
+/**
+ * PURE (#104, a remake addition: GpsUI.as showed only To and Next): the Map's route line for a long
+ * route, the next few stops, a count of the rest, then the destination, so a route of dozens of
+ * stops stays one short line: "A → B → C → … 40 more stops … → Z". Short routes are listed whole.
+ * @param {string[]} stops  the stops' words in order (the destination last)
+ * @returns {{ text: string, hidden: number }}
+ */
+export function routeStopsLine(stops, shown = ROUTE_STOPS_SHOWN) {
+  const list = (stops || []).filter(Boolean);
+  const keep = Math.max(1, Math.floor(Number(shown)) || ROUTE_STOPS_SHOWN);
+  // Cutting saves room only when at least two stops would be counted.
+  if (list.length <= keep + 2) return { text: list.join(' → '), hidden: 0 };
+  const hidden = list.length - keep - 1;
+  return { text: `${list.slice(0, keep).join(' → ')} → … ${hidden} more stops … → ${list[list.length - 1]}`, hidden };
+}
+
 /**
  * The GPS lines (GpsUI.as setDestinationText / getNextText).
  * @param {(tsid: string) => string} label

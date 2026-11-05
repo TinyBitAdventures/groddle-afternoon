@@ -255,7 +255,9 @@ describe('MAPFRAME: the map is its painting, and the window around it is two sho
     assert.match(css, /\.map-bar > \[data-map-route\] \{ flex: 3 1 0; min-width: max-content;/);
     assert.match(css, /\.map-bar > \[data-map-route\]:not\(:has\(> \.map-route-rooms\)\) \{ flex-wrap: nowrap; \}/, 'the room picker still has its own line');
     assert.match(css, /\.map-bar > \[data-map-route\] \.map-route-body \{ width: 0; min-width: 5rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; \}/);
-    assert.match(css, /\.map-bar > \[data-map-route\] \.map-route-body\[data-open\] \{ white-space: normal; \}/);
+    // #104: opened, the line takes its own row under the buttons and scrolls past four lines.
+    assert.match(css, /\.map-bar > \[data-map-route\]:has\(> \.map-route-body\[data-open\]\) \{ flex-wrap: wrap; \}/);
+    assert.match(css, /\.map-bar > \[data-map-route\] \.map-route-body\[data-open\] \{ order: 2; flex: 1 0 100%; white-space: normal; max-height: 6\.6em; overflow-y: auto; \}/);
     assert.match(css, /\.map-bar > \[data-map-route\] \.map-route-body br \{ display: none; \}/);
     const feature = read('public/js/features/map-routes-feature.js');
     assert.match(feature, /bodyEl\.title = \[head, \.\.\.lines\]\.filter\(Boolean\)\.join\('\\n'\);/);
