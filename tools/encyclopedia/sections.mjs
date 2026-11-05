@@ -18,9 +18,10 @@
 import { SECTION as imagination } from './imagination.mjs';
 import { SECTION as recipes } from './recipes.mjs';
 import { SECTION as buffs } from './buffs.mjs';
+import { SECTION as feats } from './feats.mjs';
 import { SECTION as giants } from './giants.mjs';
 
-export const MORE_SECTIONS = [imagination, recipes, buffs, giants];
+export const MORE_SECTIONS = [imagination, recipes, buffs, feats, giants];
 
 export function addMoreSections(ctx) {
   for (const s of MORE_SECTIONS) s.add(ctx);
