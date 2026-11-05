@@ -26,6 +26,8 @@ import {
   cabinetTake,
   cabinetVerbs,
   cabinetView,
+  cabinetCounts,
+  slotHoldsBag,
   normalizeContents,
   parseSdbPrice,
   sdbBuyMax,
@@ -37,9 +39,9 @@ import {
   setSdbPrice,
   storageHasContents,
   storagePickupLock,
-} from '../public/js/home-storage.js?v=a260d686';
-import { createHomeDecorState, normalizeHomeDecorState, pickUpFurniture } from '../public/js/home-decor.js?v=a53535e3';
-import { takeFromHouse } from '../public/js/ledger-house.js?v=ffde326e';
+} from '../public/js/home-storage.js?v=6c449b4e';
+import { createHomeDecorState, normalizeHomeDecorState, pickUpFurniture } from '../public/js/home-decor.js?v=5551be2e';
+import { takeFromHouse } from '../public/js/ledger-house.js?v=b34f5c89';
 import { SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
 
 const GSJS = join(homedir(), 'Documents/glitch-audit/glitch-GameServerJS/items');
@@ -308,5 +310,81 @@ describe('what others did to the house comes out of that very box or cabinet (ap
     // apple: 1 from the pack, 2 from the cabinet; the cabinet taken away leaves its 2 apples and 2 plums in the pack.
     assert.deepEqual(got.inv, { apple: 2, plum: 2 });
     assert.deepEqual(got.placed, ['bag_furniture_sdb']);
+  });
+});
+
+describe('#108: a bag goes into a cabinet whole and comes back whole (CabinetDialog.as onPackDrag)', () => {
+  const held = [{ classTsid: 'grain', count: 55 }, { classTsid: 'cherry', count: 32 }, { classTsid: 'metalmaker', count: 1, points: [200] }];
+
+  it('the original let bags in: the client\'s drag has no bag check, the cabinet\'s canContain none either', { skip: !read('bag_furniture_cabinet.js') && 'no glitch-GameServerJS' }, () => {
+    const cab = read('bag_furniture_cabinet.js');
+    const canContain = cab.slice(cab.indexOf('function canContain('), cab.indexOf('function canPickup('));
+    assert.doesNotMatch(canContain, /is_bag|countContents/);
+    const client = join(homedir(), 'Documents/glitch-audit/glitch-client/com/tinyspeck/engine/port/CabinetDialog.as');
+    if (existsSync(client)) assert.match(readFileSync(client, 'utf8'), /we don't want no stinking bags - YES WE DO!\n\s*\/\/if \(dragVO\.dragged_itemstack\.slots\) return;/);
+  });
+
+  it('a slot keeps a stored bag\'s contents and name through a save, and gives them back on the way out', () => {
+    const slots = normalizeContents('bag_furniture_smallcabinet', []);
+    assert.equal(cabinetPut(slots, 'bag_bigger', 1, { contents: held, name: 'Lunchbox' }), 1);
+    const saved = normalizeContents('bag_furniture_smallcabinet', JSON.parse(JSON.stringify(slots)), () => 1);
+    assert.deepEqual(saved[0], { classTsid: 'bag_bigger', count: 1, contents: held, name: 'Lunchbox' });
+    assert.equal(slotHoldsBag(saved[0]), true);
+    assert.deepEqual(cabinetCounts(saved), { bag_bigger: 1, grain: 55, cherry: 32, metalmaker: 1 });
+    // Not by class (a key-holder's op, the last stacks first): only by its own slot.
+    assert.equal(cabinetTake(saved, 'bag_bigger', 1).taken, 0);
+    const out = cabinetTake(saved, 'bag_bigger', 1, { slot: 0 });
+    assert.deepEqual(out, { taken: 1, points: [], contents: held, name: 'Lunchbox' });
+    assert.equal(saved[0], null);
+  });
+
+  it('a stored bag never merges with another, and goes alone into an empty slot', () => {
+    const slots = normalizeContents('bag_furniture_largecabinet', []);
+    cabinetPut(slots, 'bag_bigger', 1, { contents: held });
+    cabinetPut(slots, 'bag_bigger', 1, { slot: 1 });
+    assert.equal(cabinetPut(slots, 'bag_bigger', 1, { slot: 0, contents: held }), 0, 'not onto a full slot');
+    assert.equal(cabinetMove(slots, 1, 0, 1), true, 'a swap, never a merge');
+    assert.deepEqual(slots[1].contents, held);
+    assert.equal(slots[0].contents, undefined);
+  });
+
+  it('the feature takes the chosen bag out with what it holds and gives it back the same (bags-feature packTakeBag, packGiveBag)', () => {
+    const feature = readFileSync(join(import.meta.dirname, '../public/js/features/home-storage-feature.js'), 'utf8');
+    assert.match(feature, /put: \(\{ cls, count, copy, slot, bag \}\) => cabinetPutFromPack\(engine, cls, count, \{ slot, copy, bag \}\)/);
+    assert.match(feature, /const res = engine\.query\?\.\('packTakeBag', bag\.key, engine\);/);
+    assert.match(feature, /const res = engine\.query\('packGiveBag', cls, contents, engine, out\.name \|\| ''\);/);
+    // An empty bag: the one chosen leaves, not another of its class.
+    assert.match(feature, /if \(held\) engine\.query\?\.\('packBagLeaves', held\.key\);/);
+    // A key-holder moves only empty bags.
+    assert.match(feature, /if \(slotHoldsBag\(s\)\) \{\n\s+win\.handle\.note\(T\.ownerBags, true\);/);
+  });
+
+  it('a correction takes from inside a stored bag first and spills the rest when the bag goes (js/ledger-house.js)', () => {
+    const d = room([{ id: 9, classTsid: 'bag_furniture_wallcabinet', contents: [{ classTsid: 'bag_bigger', count: 1, contents: [{ classTsid: 'grain', count: 5 }, { classTsid: 'plum', count: 2 }] }] }]);
+    const spill = {};
+    assert.deepEqual(takeFromHouse([d], { grain: 3 }, spill), { grain: 3 });
+    assert.deepEqual(d.placed[0].contents[0].contents, [{ classTsid: 'grain', count: 2 }, { classTsid: 'plum', count: 2 }]);
+    assert.deepEqual(takeFromHouse([d], { bag_bigger: 1 }, spill), { bag_bigger: 1 });
+    assert.deepEqual(spill, { grain: 2, plum: 2 });
+  });
+
+  it('the site counts a stored bag\'s contents, clamps them the same way and keeps them through a key-holder\'s op', { skip: skipPhp }, () => {
+    const save = { inventory: { apple: 1 }, player: { currants: 0 }, systems: { features: { homes: { decor: { storage: {}, placed: [
+      { id: 5, classTsid: 'bag_furniture_wallcabinet', contents: [{ classTsid: 'bag_bigger', count: 1, name: 'Lunchbox', contents: [{ classTsid: 'grain', count: 5 }, { classTsid: 'plum', count: 2 }] }, null, { classTsid: 'apple', count: 3 }] },
+    ] } } } } };
+    const got = php(`$e = ['playerState' => ${JSON.stringify(JSON.stringify(save))}];
+      $h = LedgerMath::holdings($e, Economy::shared());
+      $a = json_decode(LedgerMath::remove($e, ['items' => ['grain' => 3], 'currants' => 0])['playerState'], true);
+      $b = json_decode(LedgerMath::remove($e, ['items' => ['bag_bigger' => 1], 'currants' => 0])['playerState'], true);
+      $row = json_decode(json_encode($a['systems']['features']['homes']['decor']['placed'][0]), false);
+      echo json_encode(['h' => $h['items'], 'a' => $a['systems']['features']['homes']['decor']['placed'][0]['contents'][0], 'b' => [$b['inventory'], $b['systems']['features']['homes']['decor']['placed'][0]['contents'][0]],
+        'bag' => LedgerBoxes::holdsBag($row, 'bag_bigger', null), 'slot2' => LedgerBoxes::holdsBag($row, 'bag_bigger', 2), 'apple' => LedgerBoxes::holdsBag($row, 'apple', null)]);`);
+    assert.deepEqual(got.h, { apple: 4, bag_furniture_wallcabinet: 1, bag_bigger: 1, grain: 5, plum: 2 });
+    assert.deepEqual(got.a, { classTsid: 'bag_bigger', count: 1, name: 'Lunchbox', contents: [{ classTsid: 'grain', count: 2 }, { classTsid: 'plum', count: 2 }] });
+    assert.deepEqual(got.b, [{ apple: 1, grain: 5, plum: 2 }, null], 'the bag taken away leaves what it held in the pack');
+    assert.deepEqual([got.bag, got.slot2, got.apple], [true, false, false], 'a key-holder cannot take it (LedgerBoxes::cabinetMove)');
+    const boxes = readFileSync(join(SITE_DIR, 'src/LedgerBoxes.php'), 'utf8');
+    assert.match(boxes, /if \(\$kind === 'take' && self::holdsBag\(\$row, \$class, \$slot\)\) \{\n\s+return \$refuse\('bag', self::TEXT_BAGS\);/);
+    assert.match(boxes, /\$out->contents = json_decode\(\(string\) json_encode\(\$was\['contents'\]\), false\);/);
   });
 });

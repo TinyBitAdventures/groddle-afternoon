@@ -136,7 +136,7 @@ import {
   textureConfig,
   unexpandInterior,
   UNEXPAND_TEXT,
-} from '../home-decor.js?v=a53535e3';
+} from '../home-decor.js?v=5551be2e';
 import { applyBonusUpgrade, applyUpgrade, bonusUpgradeLine, currantsText, hasUpgrades, pieceLabel, rollBonusUpgrade, upgradeVerb, UPGRADE_TEXT } from '../furniture-upgrades.js?v=a3788c0d';
 import { DOCK_GAP, DOCK_W, chooseUpgrade, closeUpgradePicker, openUpgradePicker, placeUpgradePicker, saveUpgrade, upgradePickerOpen, upgradePickerState } from '../furniture-upgrade-picker.js?v=3a637ec8';
 import {
@@ -244,8 +244,8 @@ import {
 import { getGameDayKey } from '../game-day.js?v=edb00566';
 import { HOME_TICKET, HOME_TICKET_CLASS } from '../home-ticket.js?v=601d0004';
 import { MIN_GROUND_CLEARANCE, yCamOffsetAnchor } from '../movement.js?v=b30f84eb';
-import { takeFromHouse } from '../ledger-house.js?v=ffde326e';
-import { storagePickupLock } from '../home-storage.js?v=a260d686';
+import { takeFromHouse } from '../ledger-house.js?v=b34f5c89';
+import { storagePickupLock } from '../home-storage.js?v=6c449b4e';
 import {
   DOOR_CLASS,
   DOOR_JOB_PHASES,
@@ -267,7 +267,7 @@ import {
   quoteHouseExpansion,
   quoteHouseUnexpand,
   unexpandHouseFloors,
-} from '../home-floors.js?v=94dcfd8b';
+} from '../home-floors.js?v=e053a5c0';
 
 export const HOMES_FEATURE_ID = 'homes';
 const HOME_STREET_TSID = 'RH_HOME_EXT';

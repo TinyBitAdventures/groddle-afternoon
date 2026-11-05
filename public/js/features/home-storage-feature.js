@@ -42,7 +42,7 @@
  */
 
 import { ITEM_CATALOG, addItem, countItem, ensureItem, itemIcon, removeItem } from '../inventory.js?v=d82f3b00';
-import { displayRefusal, furnitureDef, furnitureSize, isFurniture } from '../home-decor.js?v=a53535e3';
+import { displayRefusal, furnitureDef, furnitureSize, isFurniture } from '../home-decor.js?v=5551be2e';
 import { pieceLabel } from '../furniture-upgrades.js?v=a3788c0d';
 import { textureFromUrl } from '../textures.js?v=3149d699';
 import { stackMaxOf, isBagClass } from '../pack-slots.js?v=c91d0ca3';
@@ -50,7 +50,7 @@ import { ELEMENT_CLASSES, NO_BAG_CLASSES, NO_SLOT_CLASSES } from '../pack-slots-
 import { TOOL_CONDITION_CATALOG, copyTagKind, copyTags, receiveToolCopy, setCopyTag, takeToolCopy } from '../tools.js?v=6684b484';
 import { readVisitScene } from '../neighbours-mp.js?v=a8d5544e';
 import { saveStore } from '../save-store.js?v=8839ba7b';
-import { homesFeature } from './homes-feature.js?v=9e12ae18';
+import { homesFeature } from './homes-feature.js?v=43ffde4d';
 import {
   SDB_PRICE_MAX,
   STORAGE_TEXT as T,
@@ -68,6 +68,7 @@ import {
   newOpId,
   normalizeContents,
   parseSdbPrice,
+  slotHoldsBag,
   sdbBuyMax,
   sdbCheckEmpty,
   sdbQuote,
@@ -76,7 +77,7 @@ import {
   sdbVerbs,
   setSdbPrice,
   slotsUsed,
-} from '../home-storage.js?v=a260d686';
+} from '../home-storage.js?v=6c449b4e';
 import {
   closeStorageWindow,
   openCabinetWindow,
@@ -462,7 +463,7 @@ function openCabinet(engine, uid, { owner = 0 } = {}) {
     stackmax,
     accepts,
     moveHere: T.moveHere,
-    put: ({ cls, count, copy, slot }) => cabinetPutFromPack(engine, cls, count, { slot, copy }),
+    put: ({ cls, count, copy, slot, bag }) => cabinetPutFromPack(engine, cls, count, { slot, copy, bag }),
     take: (slot, n) => cabinetTakeToPack(engine, slot, n),
     move: (from, to) => cabinetMoveSlot(engine, from, to),
     onClose: () => {
@@ -491,14 +492,67 @@ async function refreshVisitCabinet(engine) {
   }
 }
 
+/**
+ * The pack's bag a move into a cabinet means (#108): the one dragged or whose menu is open,
+ * else the one of its class that leaves last anyway. Returns { key, box } or null.
+ */
+function packBag(engine, cls, key = '') {
+  const layout = engine.query?.('packLayout', engine);
+  if (!layout?.bags) return null;
+  const named = String(key || engine.query?.('packMenuBagKey') || '');
+  if (layout.bags[named]?.cls === cls) return { key: named, box: layout.bags[named] };
+  const mine = (layout.pack?.slots || []).filter((s) => s.kind === 'bag' && s.cls === cls);
+  const last = mine.at(-1);
+  return last && layout.bags[last.key] ? { key: last.key, box: layout.bags[last.key] } : null;
+}
+
+/**
+ * A bag into the owner's cabinet whole (#108, CabinetDialog.as onPackDrag: bags go in with
+ * what they hold): it leaves the pack with its contents and name (bags-feature packTakeBag,
+ * as a drop does) and the slot keeps them. Returns 1 when it went in, else 0.
+ */
+function cabinetPutBag(engine, row, cls, bag, slot) {
+  const at = Number.isInteger(slot) ? slot : row.contents.indexOf(null);
+  if (at < 0 || at >= row.contents.length || row.contents[at]) {
+    win.handle.note(T.full, true);
+    return 0;
+  }
+  const res = engine.query?.('packTakeBag', bag.key, engine);
+  if (!res?.ok) {
+    win.handle.note(T.failed, true);
+    return 0;
+  }
+  const contents = (res.contents || []).map((c) => ({ classTsid: c.cls, count: c.count, ...(Array.isArray(c.points) ? { points: c.points } : {}) }));
+  cabinetPut(row.contents, cls, 1, { slot: at, contents, name: res.name || '' });
+  engine.refreshPack?.();
+  engine.playSound?.('ITEM_DROP', { volume: 0.45 });
+  win.slots = row.contents;
+  changed(engine);
+  return 1;
+}
+
 /** A pack stack into the cabinet (the slot named, else where it fits). Returns how many went in. */
-function cabinetPutFromPack(engine, cls, count, { slot = null, copy = null } = {}) {
+function cabinetPutFromPack(engine, cls, count, { slot = null, copy = null, bag = '' } = {}) {
   if (!win || win.kind !== 'cabinet') return 0;
   const why = accepts(cls);
   if (why) {
     win.handle.note(why, true);
     return 0;
   }
+  // #108: a bag goes in whole, with what it holds (the owner's own cabinet); a key-holder moves empty bags only.
+  const held = isBagClass(cls) ? packBag(engine, cls, bag) : null;
+  if (held && (held.box.slots?.length || held.box.name)) {
+    if (win.owner) {
+      win.handle.note(T.ownerBags, true);
+      return 0;
+    }
+    const row = ownRow(win.uid);
+    if (!row) return 0;
+    row.contents = normalizeContents(row.classTsid, row.contents, stackmax);
+    return cabinetPutBag(engine, row, cls, held, Number.isInteger(slot) ? slot : null);
+  }
+  // An empty bag: the one chosen is the one that leaves (pack-slots.js bagLeavesLast), not another of its class.
+  if (held) engine.query?.('packBagLeaves', held.key);
   const have = countItem(engine.inv, cls);
   let n = Math.min(Math.max(1, Math.floor(Number(count) || 1)), have);
   if (!n) {
@@ -545,10 +599,41 @@ function cabinetTakeToPack(engine, slot, n) {
     win.handle.note(T.noRoom, true);
     return 0;
   }
-  if (win.owner) return keyHolderMove(engine, 'take', s.classTsid, k, slot);
+  if (win.owner) {
+    // #108: a bag with things in it comes out only to the owner (the site moves counts).
+    if (slotHoldsBag(s)) {
+      win.handle.note(T.ownerBags, true);
+      return 0;
+    }
+    return keyHolderMove(engine, 'take', s.classTsid, k, slot);
+  }
   const row = ownRow(win.uid);
   if (!row) return 0;
   const cls = s.classTsid;
+  // #108: a bag comes back whole, with what it held and its name, where it fits (bags-feature packGiveBag).
+  if (isBagClass(cls) && engine.query?.('packBagRoom', cls, [], engine) != null) {
+    const contents = (s.contents || []).map((c) => ({ cls: c.classTsid, count: c.count, ...(c.points ? { points: c.points } : {}) }));
+    if (!engine.query('packBagRoom', cls, contents, engine)) {
+      win.handle.note(T.noRoom, true);
+      return 0;
+    }
+    const out = cabinetTake(row.contents, cls, 1, { slot });
+    if (!out.taken) return 0;
+    ensureItem(cls);
+    for (const c of contents) ensureItem(c.cls);
+    const res = engine.query('packGiveBag', cls, contents, engine, out.name || '');
+    if (!res?.ok) {
+      // It didn't fit after all: it stays in its slot.
+      row.contents[slot] = s;
+      win.handle.note(T.noRoom, true);
+      return 0;
+    }
+    engine.refreshPack?.();
+    engine.playSound?.('ITEM_PICKUP', { volume: 0.4 });
+    win.slots = row.contents;
+    changed(engine);
+    return 1;
+  }
   const out = cabinetTake(row.contents, cls, k, { slot });
   ensureItem(cls);
   addItem(engine.inv, cls, out.taken);
@@ -1033,7 +1118,7 @@ function qa(engine) {
       const e = drawn.get(Number(uid));
       return e ? openCabinet(engine, Number(uid), { owner: e.owner ? 0 : visit?.owner || 0 }) : false;
     },
-    put: (cls, n, slot = null) => cabinetPutFromPack(engine, cls, n, { slot }),
+    put: (cls, n, slot = null, bag = '') => cabinetPutFromPack(engine, cls, n, { slot, bag }),
     take: (slot, n) => cabinetTakeToPack(engine, slot, n),
     move: (from, to) => cabinetMoveSlot(engine, from, to),
     buy: (n, price = null) => {

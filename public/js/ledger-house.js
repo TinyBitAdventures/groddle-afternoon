@@ -16,14 +16,22 @@
  * applySales). Ticket 51: a cabinet's slots (js/home-storage.js) are taken
  * from before the cabinet itself, and a cabinet taken away spills what is
  * left in it into `spill` (class -> count) for the pack, as the site's
- * remove puts it in the stored save's pack. Pure: it edits the decor states
- * (and `spill`) it is given.
+ * remove puts it in the stored save's pack. #108: a bag stored whole gives
+ * from what it holds first, and a stored bag (or its cabinet) taken away
+ * spills what it held too. Pure: it edits the decor states (and `spill`) it
+ * is given.
  */
 
 const whole = (n) => {
   const v = Math.floor(Number(n));
   return Number.isFinite(v) && v > 0 ? v : 0;
 };
+
+/** #108: what a stored bag held goes to the pack (`spill`) when the bag or its cabinet goes. */
+function spillHeld(slot, spill) {
+  if (!spill || !Array.isArray(slot?.contents)) return;
+  for (const it of slot.contents) if (it && whole(it.count)) spill[it.classTsid] = (spill[it.classTsid] || 0) + whole(it.count);
+}
 
 /**
  * @param {object[]} decors decor states, the ground floor (which holds the shared storage) first
@@ -64,11 +72,27 @@ export function takeFromHouse(decors, want, spill = null) {
       if (Array.isArray(row?.contents)) {
         for (let i = row.contents.length - 1; i >= 0; i -= 1) {
           const s = row.contents[i];
-          if (!s || !(left[s.classTsid] > 0)) continue;
+          if (!s) continue;
+          // #108: what a stored bag holds first (the site's LedgerMath::remove).
+          if (Array.isArray(s.contents)) {
+            s.contents = s.contents.filter((it) => {
+              if (!it || !(left[it.classTsid] > 0)) return Boolean(it);
+              const n = Math.min(whole(it.count), left[it.classTsid]);
+              it.count = whole(it.count) - n;
+              if (Array.isArray(it.points)) it.points.length = Math.min(it.points.length, it.count);
+              if (n) take(it.classTsid, n);
+              return it.count > 0;
+            });
+            if (!s.contents.length) delete s.contents;
+          }
+          if (!(left[s.classTsid] > 0)) continue;
           const n = Math.min(whole(s.count), left[s.classTsid]);
           s.count = whole(s.count) - n;
           if (Array.isArray(s.points)) s.points.length = Math.min(s.points.length, s.count);
-          if (s.count <= 0) row.contents[i] = null;
+          if (s.count <= 0) {
+            spillHeld(s, spill);
+            row.contents[i] = null;
+          }
           if (n) take(s.classTsid, n);
         }
       }
@@ -83,7 +107,11 @@ export function takeFromHouse(decors, want, spill = null) {
         take(row.classTsid, 1);
         gone.add(row.id);
         if (spill && Array.isArray(row.contents)) {
-          for (const s of row.contents) if (s && whole(s.count)) spill[s.classTsid] = (spill[s.classTsid] || 0) + whole(s.count);
+          for (const s of row.contents) {
+            if (!s || !whole(s.count)) continue;
+            spill[s.classTsid] = (spill[s.classTsid] || 0) + whole(s.count);
+            spillHeld(s, spill);
+          }
         }
         continue;
       }

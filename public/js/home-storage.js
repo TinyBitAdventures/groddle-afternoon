@@ -40,8 +40,13 @@
  * - A box keeps `display` ({ classTsid, count }, as before), `selling` and
  *   `price` on its row. Online the site keeps the price and the income
  *   (groddle_home_boxes), never a client's word.
- * - Tools go in with their wear; a bag goes in as a bag (what it held stays
- *   in the pack, as when one is sold or given: bags-feature).
+ * - Tools go in with their wear. A bag goes in whole, with what it holds and
+ *   its name, and comes back out the same (#108: CabinetDialog.as onPackDrag
+ *   "we don't want no stinking bags - YES WE DO!", and inventory_move moves a
+ *   bag with its contents): the slot keeps `contents` ([{ classTsid, count,
+ *   points? }]) and `name`, as a dropped bag does (js/world-items.js). The
+ *   ledger counts them (site LedgerMath::holdings); a key-holder moves only
+ *   empty bags (site LedgerBoxes::cabinetMove).
  */
 
 /** classProps width (cols), height (rows) and rows_display of each cabinet class. */
@@ -128,6 +133,7 @@ export const STORAGE_TEXT = Object.freeze({
   soloNobody: 'Visitors to your house can buy what you sell here when you play online.', // ours
   keyOnly: 'Only the owner and their key-holders can open this.', // ours: the source shows no verb
   ownerTools: 'Only the owner can move tools in and out of a cabinet.', // ours (the ledger moves counts)
+  ownerBags: 'Only the owner can move a bag with things in it in or out of a cabinet.', // ours (#108: the ledger moves counts)
   offline: 'You are not connected to the game server right now.', // ours
   failed: 'That did not work. Try again in a moment.', // ours
 });
@@ -158,7 +164,30 @@ export function cabinetDef(cls) {
   return d ? { ...d, capacity: d.cols * d.rows } : null;
 }
 
-/** One slot as saved: { classTsid, count, points? } or null. */
+/** The most stacks a stored bag keeps (the biggest bag holds far fewer). */
+export const BAG_HELD_MAX = 64;
+
+/** One stack a stored bag holds: { classTsid, count, points? } or null. */
+function cleanHeld(raw) {
+  if (!raw || typeof raw !== 'object') return null;
+  const classTsid = cleanKey(raw.classTsid ?? raw.cls);
+  const count = whole(raw.count, SDB_COUNT_MAX);
+  if (!classTsid || !count) return null;
+  const out = { classTsid, count };
+  if (Array.isArray(raw.points)) {
+    const pts = raw.points.slice(0, count).map((p) => (p == null ? null : Math.max(0, Math.floor(Number(p) || 0))));
+    if (pts.some((p) => p != null)) out.points = pts;
+  }
+  return out;
+}
+
+/** A stored bag's contents, cleaned, or null for none. */
+export function cleanHeldList(raw) {
+  const list = (Array.isArray(raw) ? raw : []).map(cleanHeld).filter(Boolean).slice(0, BAG_HELD_MAX);
+  return list.length ? list : null;
+}
+
+/** One slot as saved: { classTsid, count, points?, tags?, contents?, name? } or null. */
 function cleanSlot(raw, stackmax = () => Infinity) {
   if (!raw || typeof raw !== 'object') return null;
   const classTsid = cleanKey(raw.classTsid);
@@ -174,7 +203,19 @@ function cleanSlot(raw, stackmax = () => Infinity) {
     const tags = raw.tags.slice(0, count).map(slotTag);
     if (tags.some((t) => t != null)) out.tags = tags;
   }
+  // #108: a bag in a slot of its own keeps what it holds and its name.
+  if (count === 1) {
+    const held = cleanHeldList(raw.contents);
+    if (held) out.contents = held;
+    const name = typeof raw.name === 'string' ? raw.name.slice(0, 64).trim() : '';
+    if (name) out.name = name;
+  }
   return out;
+}
+
+/** Whether a slot is a bag with something in it or a name of its own (it moves whole, #108). */
+export function slotHoldsBag(slot) {
+  return Boolean(slot && (slot.contents?.length || slot.name));
 }
 
 /** A stored copy's words as the pack kept them (JSON-safe and small), else null. */
@@ -213,10 +254,14 @@ export function cabinetEmpty(row) {
   return !Array.isArray(row?.contents) || row.contents.every((s) => !s);
 }
 
-/** class -> count over a cabinet's slots. */
+/** class -> count over a cabinet's slots (what a stored bag holds too). */
 export function cabinetCounts(slots) {
   const out = {};
-  for (const s of Array.isArray(slots) ? slots : []) if (s) out[s.classTsid] = (out[s.classTsid] || 0) + s.count;
+  for (const s of Array.isArray(slots) ? slots : []) {
+    if (!s) continue;
+    out[s.classTsid] = (out[s.classTsid] || 0) + s.count;
+    for (const h of s.contents || []) out[h.classTsid] = (out[h.classTsid] || 0) + h.count;
+  }
   return out;
 }
 
@@ -258,9 +303,20 @@ export function cabinetRoom(slots, cls, max, slot = null) {
  * Puts up to `n` of `cls` in: into `slot` when named (an inventory move to a
  * slot, CabinetDialog onPackDragComplete), else topping up stacks of the class
  * first, then the first empty slots (bag.js addItemStack 191-232). `points`
- * is each tool's wear, in order. Mutates `slots`; returns how many went in.
+ * is each tool's wear, in order. A bag with things in it or a name (`contents`,
+ * `name`, #108) goes alone into an empty slot. Mutates `slots`; returns how
+ * many went in.
  */
-export function cabinetPut(slots, cls, n, { slot = null, max = Infinity, points = null, tags = null } = {}) {
+export function cabinetPut(slots, cls, n, { slot = null, max = Infinity, points = null, tags = null, contents = null, name = '' } = {}) {
+  const held = cleanHeldList(contents);
+  const own = typeof name === 'string' ? name.slice(0, 64).trim() : '';
+  if (held || own) {
+    if (whole(n) < 1) return 0;
+    const at = Number.isInteger(slot) ? slot : slots.indexOf(null);
+    if (at < 0 || at >= slots.length || slots[at]) return 0;
+    slots[at] = { classTsid: cls, count: 1, ...(held ? { contents: held } : {}), ...(own ? { name: own } : {}) };
+    return 1;
+  }
   let left = whole(n);
   const pts = Array.isArray(points) ? [...points] : null;
   const tg = Array.isArray(tags) ? [...tags] : null;
@@ -298,15 +354,23 @@ export function cabinetPut(slots, cls, n, { slot = null, max = Infinity, points 
 /**
  * Takes up to `n` of `cls` out: from `slot` when named, else from the last
  * stacks of the class first. Mutates `slots`; returns { taken, points, tags? } (the
- * wear of the tools that came out, when the stacks kept any).
+ * wear of the tools that came out, when the stacks kept any). A bag that holds
+ * something or has a name (#108) comes out only on its own, by its slot, with
+ * `contents` and `name` in the answer.
  */
 export function cabinetTake(slots, cls, n, { slot = null } = {}) {
   let left = whole(n);
   const points = [];
   const tags = [];
+  if (Number.isInteger(slot) && slotHoldsBag(slots[slot])) {
+    const s = slots[slot];
+    if (s.classTsid !== cls || !left) return { taken: 0, points };
+    slots[slot] = null;
+    return { taken: 1, points, ...(s.contents ? { contents: s.contents } : {}), ...(s.name ? { name: s.name } : {}) };
+  }
   const takeAt = (i) => {
     const s = slots[i];
-    if (!s || s.classTsid !== cls || !left) return;
+    if (!s || s.classTsid !== cls || !left || slotHoldsBag(s)) return;
     const k = Math.min(s.count, left);
     const was = s.count;
     s.count -= k;
@@ -338,7 +402,7 @@ export function cabinetMove(slots, from, to, max = Infinity) {
   if (from < 0 || to < 0 || from >= slots.length || to >= slots.length || !slots[from]) return false;
   const a = slots[from];
   const b = slots[to];
-  if (b && b.classTsid === a.classTsid) {
+  if (b && b.classTsid === a.classTsid && !slotHoldsBag(a) && !slotHoldsBag(b)) {
     const moved = cabinetTake(slots, a.classTsid, slotRoom(b, a.classTsid, max), { slot: from });
     if (!moved.taken) return false;
     cabinetPut(slots, a.classTsid, moved.taken, { slot: to, max, points: moved.points.length ? moved.points : null, tags: moved.tags || null });

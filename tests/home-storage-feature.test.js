@@ -12,7 +12,7 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { saleVerbs } from '../public/js/home-street-mp.js?v=992ace31';
-import { homeStorageFeature } from '../public/js/features/home-storage-feature.js?v=585e8528';
+import { homeStorageFeature } from '../public/js/features/home-storage-feature.js?v=01c9cfb4';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');
@@ -71,7 +71,8 @@ describe('every purchase and move is the server\'s and the site\'s, applied once
 
   it('a key-holder\'s cabinet moves go through cabinet_move; the owner\'s are their own save\'s', () => {
     assert.match(feature, /if \(win\.owner\) return keyHolderMove\(engine, 'put', cls, n, slot\);/);
-    assert.match(feature, /if \(win\.owner\) return keyHolderMove\(engine, 'take', s\.classTsid, k, slot\);/);
+    // #108: a key-holder's take of a stored bag with things in it is refused before it is sent.
+    assert.match(feature, /if \(win\.owner\) \{\n(?:.*\n){1,6}?\s+return keyHolderMove\(engine, 'take', s\.classTsid, k, slot\);/);
     assert.match(feature, /client\.send\('cabinet_move', frame\)/);
   });
 });

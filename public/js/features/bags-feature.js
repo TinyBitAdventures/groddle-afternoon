@@ -940,6 +940,11 @@ export const bagsFeature = {
     return menuBag;
   },
 
+  /** The bag whose menu is open (its key), or '': home-storage-feature's Put in <cabinet> moves that one (#108). */
+  packMenuBagKey() {
+    return menuBag;
+  },
+
   /** A bag's shown name and its class's ({ key, cls, label, name, className }) for a menu title, or null. */
   packBagInfo(key, engine) {
     const box = engine?.inv ? layoutPack(engine.inv, slice.prefs, opts()).bags[String(key || '')] : null;
