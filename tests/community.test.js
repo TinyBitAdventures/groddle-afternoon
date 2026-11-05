@@ -329,8 +329,8 @@ describe('the chat app\'s header, its bell and its right-click menus (/chat/, Au
     assert.deepEqual(routes, [['Get', '/groddle/v1/notifications', 'SignedIn'], ['Post', '/groddle/v1/notifications/read', 'SignedIn']]);
     assert.match(n, /\$user = \$this->minn->user\(\);/);
     assert.doesNotMatch(n, /request->json\(\)\['(?:user|id|player)'\]/, 'never a user from the request');
-    assert.match(n, /\$chat->imNotices\(\$me, \$sinceMs\)/);
-    assert.match(src('src/ChatHistory.php'), /public function imNotices\(int \$me, int \$sinceMs, int \$limit = 20\): array/);
+    assert.match(n, /\$chat->imNotices\(\$me, \$sinceMs, 20, \$seen, \$marks\['all'\]\)/);
+    assert.match(src('src/ChatHistory.php'), /public function imNotices\(int \$me, int \$sinceMs, int \$limit = 20, array \$seen = \[\], int \$seenAll = 0\): array/);
     assert.match(src('src/Extension.php'), /new ChatPeople\(\$minn\), new Notifications\(\$minn\)/);
   });
 
@@ -372,7 +372,7 @@ describe('the chat app\'s header, its bell and its right-click menus (/chat/, Au
     assert.ok(unreadCount(demo) > 0 && unreadCount(demo) < demo.length, 'some read, some not');
     const js = src('community/notifications.js');
     assert.match(js, /const demo = demoAllowed\(location\.hostname, document\.body\.hasAttribute\('data-notif-demo'\)\);/);
-    assert.match(js, /async function read\(key = null\) \{\n\s*items = markRead\(items, key\);\n\s*draw\(\);\n\s*if \(demo\) return true;/, 'samples are read in the page only');
+    assert.match(js, /async function read\(key = null\) \{\n\s*items = markRead\(items, key\);\n[^\n]*\n\s*draw\(\);\n\s*if \(demo\) return true;/, 'samples are read in the page only');
   });
 
   it('the panel orders and reads them as the site does, and the bell and the Community link show one count', async () => {
@@ -388,6 +388,11 @@ describe('the chat app\'s header, its bell and its right-click menus (/chat/, Au
     const app = src('community/chat-app.js');
     assert.match(app, /if \(m\.t === 'thread_said' \|\| m\.t === 'board_post' \|\| m\.t === 'buddy_added' \|\| \(m\.t === 'im' && Number\(m\.line\?\.from\) !== ME\)\) notif\?\.soon\(\);/);
     assert.match(js, /const POLL_MS = 60 \* 1000;/);
+    // The socket's IM or reply under your line shows at once and stands until the site has kept it (its batches come every 3 s).
+    assert.match(js, /function hint\(next\) \{/);
+    assert.match(js, /if \(got && Number\(got\.at\) >= Number\(h\.at\)\) hinted\.delete\(key\);/);
+    assert.match(app, /notif\?\.hint\(\{ key: c\.key, kind: 'im',/);
+    assert.match(app, /notif\?\.hint\(\{ key: `th:\$\{m\.channel\}:\$\{Number\(m\.parent\)\}`, kind: 'thread',/);
     assert.match(js, /const looking = new Set\(document\.hidden \? \[\] : app\.looking\(\)\);/);
     assert.match(src('community/community.js'), /import\(`\.\/notifications\.js\$\{v\}`\)[\s\S]*?import\(`\.\/chat-app\.js\$\{v\}`\)/, 'the bell starts first and is handed to the app');
   });
