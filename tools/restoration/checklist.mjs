@@ -27,6 +27,21 @@
  * shot: a screenshot under spike/shots/ to illustrate it (optional).
  */
 
+import { readFileSync } from 'node:fs';
+
+/**
+ * What the region maps' paintings are (G471, G522): Tiny Speck's are lost, so a map shows the
+ * region's thumbnail enlarged (tools/map-backgrounds/build.mjs), or a painting repainted from it
+ * for the remake (tools/provenance/repainted-maps.json). The sentence follows that file.
+ */
+export function mapArtLine(repainted = Object.values(JSON.parse(readFileSync(new URL('../provenance/repainted-maps.json', import.meta.url), 'utf8')).regions).map((r) => r.hubName)) {
+  const lost = 'Tiny Speck’s map paintings are lost, so each region’s map shows their small thumbnail of it, enlarged';
+  if (!repainted.length) return `${lost}.`;
+  const names = repainted.map((n) => `${n}’s`);
+  const list = names.length === 1 ? names[0] : `${names.slice(0, -1).join(', ')} and ${names.at(-1)}`;
+  return `${lost}; ${list} ${names.length === 1 ? 'is repainted for the remake from its thumbnail' : 'are repainted for the remake from their thumbnails'}.`;
+}
+
 export const STATUS = Object.freeze({
   source: { label: 'Restored from source', short: 'Restored', tone: 'moss', mark: '✓',
     desc: 'Its rules, numbers and words come straight from the original server code Tiny Speck released.' },
@@ -72,8 +87,8 @@ export const CHECKLIST = Object.freeze([
     blurb: 'The official calendar: ten-second minutes, four-hour days, eight-day weeks, and a new day that refreshes Ur.',
     evidence: ['public/js/game-day.js'] },
   { id: 'map', group: 'world', name: 'Hub maps and travel', status: 'source',
-    blurb: 'Every region’s map with its streets. Travel by signpost; from the map, set a destination for a guided path, or with Teleportation IV teleport to a street you have visited.',
-    evidence: ['public/js/map-graph.js', 'public/js/travel.js', 'public/js/teleportation.js'] },
+    blurb: `Every region’s map with its streets. Travel by signpost; from the map, set a destination for a guided path, or with Teleportation IV teleport to a street you have visited. ${mapArtLine()}`,
+    evidence: ['public/js/map-graph.js', 'public/js/travel.js', 'public/js/teleportation.js', 'tools/map-backgrounds/build.mjs', 'tools/provenance/repainted-maps.json'] },
   { id: 'subway', group: 'world', name: 'The Ur subway', status: 'rebuilt',
     blurb: 'Twelve stations under Ur on one loop, the Red Line one way and the Blue Line the other. Go down the station stairs on Gregarious Grange, Groddle Forest Junction or any of the other ten, push A Red Button for a 50-currant ticket (Your Papers must be in order), ride, and get off at any stop or stay on for the next. Ride counts earn Subwayfarer, Ground Hogger, Commuter Mug and Chute Jockey. The fares, lines, announcements, gate and badges come from the source; the stations and the train were never archived, so they are rebuilt from players’ footage with Tiny Speck’s own subway art. With nobody else to wait for, the train leaves ten seconds after you board. The quests use the same stations: Legalize It starts when Gregarious Grange’s Red Button turns you away for want of papers, and the robot in We’re Off to See the Lizard waits on whichever station you go down to.',
     multiplayer: 'Trains are shared: everyone who boards the same line at the same station while a train stands there rides it together, sees the others in the carriage and can chat. A new train waits for three riders or a minute while someone else is on the platform, and each rider gets off at their own stop.',

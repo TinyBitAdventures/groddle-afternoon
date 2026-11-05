@@ -1,0 +1,87 @@
+{
+  "format": "groddle-repainted-maps/1",
+  "policy": "Region map paintings repainted for Groddle Afternoon (register G522): Tiny Speck’s 760 x 460 map paintings are lost, so a region listed here gets a new painting made from its own CC0 world-map thumbnail, dedicated CC0 1.0 with its provenance (tools/builder/licence-policy.json, \"ai-generated\"). tools/map-backgrounds/build.mjs keeps these files as they are and enlarges the thumbnail for every other region; tests/map-backgrounds.test.js checks both. To add a region: put its two WebP files in public/assets/maps/art/bg/ under the region’s usual names and add one entry here.",
+  "regions": {
+    "58": {
+      "hubName": "Groddle Meadow",
+      "x1": {
+        "file": "assets/maps/art/bg/groddlemeadow.webp",
+        "w": 760,
+        "h": 460,
+        "bytes": 55598,
+        "sha256": "b01be4d78514d0624756ef6d97279268740d42d227289265a6bbac242cce60f7"
+      },
+      "x2": {
+        "file": "assets/maps/art/bg/groddlemeadow@2x.webp",
+        "w": 1520,
+        "h": 920,
+        "bytes": 189012,
+        "sha256": "4fd4396eaafcce6cef477f6cc030005e17d12dd1d6fc4839cae9b825ceadf4da"
+      },
+      "licence": "ai-generated",
+      "author": "Austin Ginder (directed and chose it)",
+      "tool": "GPT Image 2.6 Sunburst in T3 Chat canvas (t3.chat/canvas)",
+      "model": "GPT Image 2.6 Sunburst",
+      "made": "2026-11-05",
+      "chosen": {
+        "by": "Austin Ginder",
+        "on": "2026-11-05",
+        "of": "3 generations (the third, toned down)"
+      },
+      "prompt": "Paint ONE image: the background painting for an in-game region map of \"Groddle Meadow\", a grassy meadow region in a whimsical 2D browser game. Size 1520 x 920 pixels (landscape, exactly this ratio). This is the painted landscape that sits UNDER the game's map interface. The game draws its own street lines, names, buttons and markers on top later, so the painting must contain none of them.\n\nWHAT TO PAINT\nA storybook view of one island of meadow, seen from directly above (top-down, like a painted map), not from a side or three-quarter angle: trees read as round canopies and small pointed tops with a soft shadow, with no trunks showing, and hills and cliffs read by their light and shadow. Like a hand-painted miniature diorama of a landscape:\n- The sea and margins: pale parchment white, with faint grey wavy hatching suggesting calm water. It fills the left third of the picture, the top-left corner and a thin strip along the bottom edge.\n- The land: one large landmass filling the middle and right. Its coastline must follow attachment 02 closely (same outline, same position, same proportions), because the game's streets are fixed to those positions (attachment 03).\n- The coast edge: a raised, sunlit rim of cream and sandy-ochre earth with a soft shadow below it, like the cut edge of a diorama tile, most visible along the bottom and lower-left shore.\n- The ground: a soft, slightly textured meadow in muted olive and khaki greens, a little lighter and yellower in sunny open areas, with gentle undulations. Calm, open and walkable-looking.\n- Trees: small dark trees seen from above with soft cast shadows, scattered thinly and singly across the whole meadow (round deciduous ones and small pointed conifers), with one denser grove of round trees in the lower left near the coast. Plenty of open grass between them.\n- Rocks: a few small pinkish-brown boulders, one group right of the centre and a few more near the top.\n- Flowers: one small soft patch of pale pink and white blossom just left of the centre, with a few tiny pale flowers scattered around it.\n- Top right corner: the land rises into brown rocky cliffs and a hill, toward the highlands beyond the edge.\n- Right edge: a band of dense, darker conifer forest running down the right side, toward the neighbouring forest region.\n- Light: soft warm daylight from the upper left; gentle shadows falling to the lower right.\n\nSTYLE\nMatch attachment 05: Tiny Speck's own painted plants and trees for this region (soft painterly shapes, gentle shading, no hard black outlines). The original painting was gentle and slightly muted (olive greens, cream and sand, soft shadows), storybook and calm, never grim, never photographic, never neon. Detail should be fine but calm, so that thin street lines and small labels drawn on top will stay readable.\n\nDO NOT INCLUDE\nNo text, letters, numbers or labels of any kind. No roads, paths, lines, grids or street markings. No circles, buttons, pins, arrows, icons, stars or \"you are here\" markers. No compass, legend, scale bar, border, frame, title or vignette. No people or characters. No UI of any kind.\n\nATTACHMENTS\n01  the original 150 x 91 thumbnail of this region's painting (Tiny Speck, public domain). The colours and the layout to follow.\n02  that thumbnail enlarged to 1520 x 920 with no extra detail. Follow its coastline and the placement of its darker and lighter areas; repaint everything else with real detail.\n03  where the game will draw the streets (dark lines) and region exits (yellow circles), at the same 1520 x 920 scale. For placement only: do NOT paint these lines or circles.\n04  a screenshot of how the game shows this map today: a blurry enlargement of the thumbnail with the game's interface drawn on top (street lines, street names, green GO buttons, panel and buttons). It is here only so you can see what the painting is for. Do NOT copy any of the interface; paint only the landscape underneath it.\n05  Tiny Speck's own painted trees, bushes, flowers and hills from this region's streets (public domain). The style and palette to match.\n\nReturn the single painted landscape image only.",
+      "promptNote": "The prompt as kept after the generations (prompt.txt, 16:22 CST). The three generations used an earlier revision of it (16:04 CST), before two edits: the trees seen \"from directly above (top-down, like a painted map)\" sentence and the \"muted olive\" wording of the ground and style. That earlier text was not kept.",
+      "inputs": [
+        {
+          "n": 1,
+          "file": "01-thumbnail-150x91.jpg",
+          "sha256": "80cdaa4ced1ed76175bc3817648e998310d2eed02ff6497a8405fc3bc30f2a65",
+          "what": "the region’s own 150 x 91 thumbnail of the lost painting",
+          "source": "Tiny Speck, CC0: glitch-overlays/world_map.fla LIBRARY/z_hub_maps_small/sm_groddlemeadow.jpg (byte for byte public/assets/maps/art/thumbs/sm_groddlemeadow.jpg)"
+        },
+        {
+          "n": 2,
+          "file": "02-thumbnail-enlarged-1520x920.png",
+          "sha256": "c0ad907e2d0b2e154356f53065828d96ae9dbd81f7d95a621a06f835ece9f39b",
+          "what": "input 1 enlarged to 1520 x 920 (Lanczos), nothing added: the coastline and colour guide",
+          "source": "made from input 1, CC0"
+        },
+        {
+          "n": 3,
+          "file": "03-street-layout-1520x920.png",
+          "sha256": "36caec5ece709c71bebe4edc817b35552ff3968221cf9c373009f2bef94812dc",
+          "what": "where the map draws the 40 visible streets (dark lines) and 4 exits (yellow circles), at 2x",
+          "source": "drawn from Tiny Speck’s CC0 map data (public/assets/maps/hubs/hub-58.json, from GSJS inc_data_maps_prod.js)"
+        },
+        {
+          "n": 4,
+          "file": "04-our-map-window-with-ui.png",
+          "sha256": "4a5c89ae942b095c76dab08bc1df13759def76f85eaaca575508e4dafe45fb11",
+          "what": "the remake’s own map window at 2x (its UI over the enlarged thumbnail), so the model saw what the painting is for; the prompt says to copy none of the UI",
+          "source": "our own render (Groddle Afternoon UI and the CC0 thumbnail), added at Austin’s request"
+        },
+        {
+          "n": 5,
+          "file": "05-style-cc0-groddle-decos.png",
+          "sha256": "92ac514e6ddf0ee1a4a27eabe3de67f33ebf45831a9f45fb1eb93be4a10402d6",
+          "what": "a sheet of 18 decos Tiny Speck painted this region’s streets with (the most used trees, bushes, flowers and hills): the style and palette",
+          "source": "Tiny Speck decos, CC0"
+        }
+      ],
+      "references": [
+        "A player’s capture of the original Groddle Meadow map window (Glitch Strategy wiki): reference only, never given to the model and never in the repo",
+        "A frame of the original painting from the 2012 video \"tour: The Map of Ur\" (YouTube bXxXB6GUoMU at 95.7 s): reference only, never given to the model and never in the repo; the prompt describes its composition in words"
+      ],
+      "source": {
+        "generated": "2048 x 1152 (16:9, High 2K), centre-cropped to 1520 x 920: drop/groddlemeadow-3.png",
+        "dropSha256": "5e37683657b5a3360798669cc700a2f95e736dc1cc78aa27fbe737781d355137",
+        "toning": "magick groddlemeadow-3.png -modulate 100,62,98 -fill #8a8a5a -colorize 8% master.png (calmer, toward the original’s muted olive)",
+        "masterSha256": "b47792c0967822af6379501c883aa183f97204cc232e693f29c26994e381c3b3",
+        "encode": {
+          "x1": "magick master.png -filter Lanczos -resize 760x460! -quality 82 -define webp:method=6 groddlemeadow.webp",
+          "x2": "magick master.png -quality 82 -define webp:method=6 groddlemeadow@2x.webp"
+        },
+        "pack": "research/zone-art/map-groddle-meadow (outside git): pack.md, prompt.txt, attach/, drop/, review/"
+      }
+    }
+  }
+}

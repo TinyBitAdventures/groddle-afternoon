@@ -20,8 +20,10 @@ export function hubMapSubtitle(view) {
 /** QA only (data-map-art on the subtitle): whether the region has painted art. */
 export function hubMapArtNote(view) {
   if (view?.bgLocal) return 'painted bg';
-  // Upscaled from the region's world-map thumbnail (G471, tools/map-backgrounds/build.mjs).
-  return view?.bgSoft ? 'thumbnail painting' : 'geometry only';
+  // Upscaled from the region's world-map thumbnail (G471, tools/map-backgrounds/build.mjs), or
+  // repainted from it for the remake (G522, tools/provenance/repainted-maps.json).
+  if (view?.bgSoft) return view.bgRepainted ? 'repainted painting' : 'thumbnail painting';
+  return 'geometry only';
 }
 
 /** The Quests header: active, offered (only when there are offer cards), done, catalog size. */

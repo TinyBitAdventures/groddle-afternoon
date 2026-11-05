@@ -22,6 +22,30 @@ Region backgrounds from the thumbs (G471, round 5, 2026-10-31)
   with the 2012 encyclopedia maps at scale 1 (reference only). js/map-graph.js draws one behind
   the streets when no full painting (bgLocal) exists; test, tower and POL hubs keep the plain map.
 
+Repainted region maps (G522, 2026-11-05)
+  A region listed in tools/provenance/repainted-maps.json carries a new painting made for the
+  remake from its own thumbnail, in place of the enlarged thumb, under the same two file names.
+  tools/map-backgrounds/build.mjs keeps those files as they are; tests/map-backgrounds.test.js
+  checks their sizes, hashes and provenance. The next region is one entry in that file.
+
+  Groddle Meadow (hub 58): art/bg/groddlemeadow.webp (760x460) and groddlemeadow@2x.webp (1520x920)
+    Licence      AI-generated, dedicated CC0 1.0 (tools/builder/licence-policy.json)
+    Model        GPT Image 2.6 Sunburst, in T3 Chat canvas, 2026-11-05; 3 generations at
+                 2048x1152, each centre-cropped to 1520x920
+    Chosen       by Austin Ginder, 2026-11-05: the third generation, toned down with
+                 magick in.png -modulate 100,62,98 -fill '#8a8a5a' -colorize 8% master.png
+                 to match the original's muted olive palette, then WebP q82
+    Prompt       in full in the provenance file. The generations used an earlier revision of it,
+                 before the "seen from directly above" and "muted olive" edits
+    Inputs       1. the region's 150x91 thumbnail (Tiny Speck, CC0, world_map.fla sm_groddlemeadow)
+                 2. that thumbnail enlarged to 1520x920, nothing added (made from 1)
+                 3. the street layout drawn from hubs/hub-58.json at 2x (Tiny Speck's CC0 map data)
+                 4. the remake's own map window at 2x (our UI over the thumbnail; "copy none of it")
+                 5. a sheet of 18 Tiny Speck CC0 decos from this region's streets (style, palette)
+    Reference    a player's capture of the original map window (Glitch Strategy wiki) and a frame of
+    only         the painting from the 2012 video "tour: The Map of Ur" were looked at and described
+                 in the prompt's words; neither was given to the model or is in this repo
+
 CDN hub paintings (full 760×460 bg/fg) — URLs preserved, files NOT on Wayback
   assets/maps/art-urls.txt         — 89 original c1/c2.glitch.bz URLs
   Each hub JSON keeps bg / fg CDN strings; bgLocal/fgLocal fill when recovered

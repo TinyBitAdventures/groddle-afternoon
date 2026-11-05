@@ -169,13 +169,15 @@
    "group": "world",
    "name": "Hub maps and travel",
    "status": "source",
-   "blurb": "Every region’s map with its streets. Travel by signpost; from the map, set a destination for a guided path, or with Teleportation IV teleport to a street you have visited.",
+   "blurb": "Every region’s map with its streets. Travel by signpost; from the map, set a destination for a guided path, or with Teleportation IV teleport to a street you have visited. Tiny Speck’s map paintings are lost, so each region’s map shows their small thumbnail of it, enlarged; Groddle Meadow’s is repainted for the remake from its thumbnail.",
    "multiplayer": null,
    "spot": null,
    "evidence": [
     "public/js/map-graph.js",
     "public/js/travel.js",
-    "public/js/teleportation.js"
+    "public/js/teleportation.js",
+    "tools/map-backgrounds/build.mjs",
+    "tools/provenance/repainted-maps.json"
    ],
    "shot": null,
    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&practice=1"
@@ -2730,9 +2732,19 @@
   "deployed": "2026-11-05"
  },
  "git": {
-  "commits": 1320,
+  "commits": 1323,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-05",
+    "kind": "fix",
+    "text": "The Crafty Bot no longer vanishes for a moment when it changes what it is doing"
+   },
+   {
+    "date": "2026-11-05",
+    "kind": "fix",
+    "text": "Water all waters empty and picked plots too, so the bed shows wet"
+   },
    {
     "date": "2026-11-05",
     "kind": "fix",
@@ -2842,16 +2854,6 @@
     "date": "2026-11-05",
     "kind": "new",
     "text": "The Encyclopedia has Feats and street projects: goals, rewards, solo or with others, and where each project is offered"
-   },
-   {
-    "date": "2026-11-05",
-    "kind": "new",
-    "text": "The Encyclopedia has Buffs: what each one does, how long it lasts and what gives it to you"
-   },
-   {
-    "date": "2026-11-05",
-    "kind": "new",
-    "text": "The Encyclopedia has Recipes by tool: what goes in and comes out, the skill, energy, time and iMG"
    }
   ]
  },

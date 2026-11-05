@@ -6,7 +6,7 @@
 
 import { listMapDestinations, planTravel, resolveLoadedTsid, tsidAliases } from './travel.js?v=7fd6e363';
 import { CLASSIC_ART } from './classic/classic-art.js?v=5745e669';
-import { HUB_MAP_BACKGROUNDS } from './hub-map-backgrounds.js?v=5889d7fa';
+import { HUB_MAP_BACKGROUNDS } from './hub-map-backgrounds.js?v=86278541';
 
 /** Map catalog + per-hub files. */
 export const MAP_INDEX_URL = 'assets/maps/index.json';
@@ -181,6 +181,8 @@ export function buildHubMapView(hubData, currentTsid, streetIndex = {}) {
   const bgSoft = soft ? (dpr > 1 ? soft.x2 : soft.x1) : '';
   // MAPSIZE: the Retina file too, which a 1x screen takes once the Map draws past 760 x 460 (game.js fitMapCanvas).
   const bgSoftHi = soft ? soft.x2 : '';
+  // G522: the region's painting was repainted for the remake from its thumbnail (tools/provenance/repainted-maps.json).
+  const bgRepainted = Boolean(soft?.repainted);
 
   return {
     hubId: String(hubData.hubId || ''),
@@ -194,6 +196,7 @@ export function buildHubMapView(hubData, currentTsid, streetIndex = {}) {
     thumbLocal,
     bgSoft,
     bgSoftHi,
+    bgRepainted,
     color: hubData.color || '#5f721d',
     currentTsid: currentResolved,
     streets,

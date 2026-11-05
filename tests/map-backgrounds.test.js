@@ -3,17 +3,23 @@
  * world-map file (glitch-overlays/world_map.fla), upscaled and softened into a painting behind the
  * street lines (tools/map-backgrounds/build.mjs). The real 760 x 460 paintings are lost; the
  * Tribute Blog's region maps (reference only) were the look to match.
+ *
+ * G522: a region in tools/provenance/repainted-maps.json carries a painting repainted for the
+ * remake from its thumbnail instead (Groddle Meadow first, Austin 2026-11-05); the builder keeps it.
  */
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { readThumbs, regionThumbs } from '../tools/map-backgrounds/build.mjs';
-import { HUB_MAP_BACKGROUNDS } from '../public/js/hub-map-backgrounds.js?v=5889d7fa';
-import { buildHubMapView, PUBLIC_HUBS, renderHubMapSvg } from '../public/js/map-graph.js?v=99c13d35';
-import { hubMapArtNote } from '../public/js/panel-copy.js?v=9fc1b2da';
+import { readThumbs, regionThumbs, repaints } from '../tools/map-backgrounds/build.mjs';
+import { HUB_MAP_BACKGROUNDS } from '../public/js/hub-map-backgrounds.js?v=86278541';
+import { buildHubMapView, PUBLIC_HUBS, renderHubMapSvg } from '../public/js/map-graph.js?v=beee674f';
+import { hubMapArtNote } from '../public/js/panel-copy.js?v=1d8de080';
+import { CHECKLIST } from '../tools/restoration/checklist.mjs';
+import { MAP_ART_NOTE } from '../tools/encyclopedia/streets.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');
@@ -21,6 +27,8 @@ const MANIFEST = JSON.parse(read('public/assets/maps/art/bg/backgrounds.json'));
 const INDEX = JSON.parse(read('public/assets/maps/index.json'));
 const hub = (id) => JSON.parse(read(`public/assets/maps/hubs/hub-${id}.json`));
 const STREETS = JSON.parse(read('public/assets/streets/index.json')).streets;
+const REPAINTS = JSON.parse(read('tools/provenance/repainted-maps.json'));
+const POLICY = JSON.parse(read('tools/builder/licence-policy.json'));
 
 /** WebP size from the VP8/VP8L/VP8X header. */
 function webpSize(buf) {
@@ -52,7 +60,9 @@ describe('region map backgrounds (tools/map-backgrounds/build.mjs)', () => {
         assert.ok(existsSync(p), rel);
         const buf = readFileSync(p);
         assert.deepEqual(webpSize(buf), size, rel);
-        assert.ok(buf.length < 120 * 1024, `${rel} stays light (${buf.length} bytes)`);
+        // A repaint has real detail: it may weigh more, still well under a street's art.
+        const cap = bg.repainted ? 256 * 1024 : 120 * 1024;
+        assert.ok(buf.length < cap, `${rel} stays light (${buf.length} bytes)`);
       }
     }
     // Only regions: the test, tower and POL hubs that share a region's thumb keep the plain map.
@@ -76,6 +86,60 @@ describe('region map backgrounds (tools/map-backgrounds/build.mjs)', () => {
       assert.equal(INDEX.hubs[id].thumbLocal, r.thumb);
       assert.match(r.sourceFile, /sm_[a-z]+\.jpg$/);
     }
+  });
+
+  it('a repainted region keeps its painting, at the right sizes, with its provenance (G522)', () => {
+    assert.equal(REPAINTS.format, 'groddle-repainted-maps/1');
+    const ids = Object.keys(REPAINTS.regions);
+    assert.deepEqual(Object.keys(repaints()), ids);
+    assert.ok(ids.includes('58'), 'Groddle Meadow is repainted');
+    const regions = regionThumbs();
+    const sha = (buf) => createHash('sha256').update(buf).digest('hex');
+    const needs = POLICY.licences['ai-generated'].requires.filter((k) => !['sha256', 'intake'].includes(k));
+    for (const id of ids) {
+      const r = REPAINTS.regions[id];
+      const name = `${id} ${r.hubName}`;
+      assert.equal(regions[id]?.hubName, r.hubName, `${name} is a region with a thumbnail`);
+      // The game, the build manifest and the provenance name the same two files.
+      assert.equal(HUB_MAP_BACKGROUNDS[id].repainted, true, name);
+      assert.equal(MANIFEST.regions[id].repainted, 'tools/provenance/repainted-maps.json', name);
+      for (const [d, size] of [['x1', [760, 460]], ['x2', [1520, 920]]]) {
+        assert.equal(r[d].file, HUB_MAP_BACKGROUNDS[id][d], `${name} ${d}`);
+        assert.deepEqual([r[d].w, r[d].h], size, `${name} ${d}`);
+        const buf = readFileSync(join(root, 'public', r[d].file));
+        assert.deepEqual(webpSize(buf), size, r[d].file);
+        assert.equal(buf.length, r[d].bytes, r[d].file);
+        assert.equal(sha(buf), r[d].sha256, `${r[d].file} is the file its provenance names`);
+        assert.equal(MANIFEST.regions[id][`${d}Sha256`], r[d].sha256, `${r[d].file} in backgrounds.json`);
+      }
+      // CC0 1.0 with its provenance: who and what made it, the full prompt, the inputs, who chose it.
+      assert.equal(r.licence, 'ai-generated', name);
+      assert.ok(POLICY.licences[r.licence], name);
+      for (const k of [...needs, 'model', 'made', 'prompt', 'inputs', 'chosen']) assert.ok(r[k], `${name}: ${k}`);
+      assert.match(r.made, /^\d{4}-\d{2}-\d{2}$/);
+      assert.ok(r.prompt.length > 500, `${name}: the full prompt`);
+      assert.ok(r.chosen.by && /^\d{4}-\d{2}-\d{2}$/.test(r.chosen.on), `${name}: who chose it and when`);
+      assert.ok(r.inputs.length >= 1 && r.inputs.length <= POLICY.inputs.max, name);
+      for (const i of r.inputs) {
+        assert.ok(i.file && i.what && i.source, `${name}: input ${i.n}`);
+        assert.match(i.sha256, /^[0-9a-f]{64}$/, `${name}: input ${i.n}`);
+      }
+      // Its own thumbnail is the first input, byte for byte.
+      assert.equal(r.inputs[0].sha256, MANIFEST.regions[id].sha256, `${name}: input 1 is its thumbnail`);
+      assert.match(r.source.toning, /^magick /, `${name}: the toning step`);
+      // Player captures and footage are named as reference only, never as inputs.
+      for (const i of r.inputs) assert.doesNotMatch(`${i.what} ${i.source}`, /wiki|footage|youtube|video|capture/i, `${name}: input ${i.n}`);
+      for (const ref of r.references || []) assert.match(ref, /reference only/, name);
+    }
+    assert.match(read('public/assets/maps/SOURCE.txt'), /Repainted region maps \(G522/);
+    // The map says so in its QA note, the restoration report and the encyclopedia in words.
+    assert.equal(hubMapArtNote(buildHubMapView(hub(58), '', STREETS)), 'repainted painting');
+    const blurb = CHECKLIST.find((c) => c.id === 'map').blurb;
+    assert.match(blurb, /map paintings are lost, so each region’s map shows their small thumbnail of it, enlarged/);
+    for (const id of ids) assert.ok(blurb.includes(`${REPAINTS.regions[id].hubName}’s`), `the report names ${REPAINTS.regions[id].hubName}`);
+    assert.match(MAP_ART_NOTE.repainted, /repainted for the remake/);
+    assert.match(MAP_ART_NOTE.thumbnail, /thumbnail of it, enlarged/);
+    for (const note of [blurb, ...Object.values(MAP_ART_NOTE)]) assert.doesNotMatch(note, /—|Glitch/, 'player words: no em-dash, no trademark');
   });
 
   it('the map draws it under the streets, labels, GO buttons and star', () => {

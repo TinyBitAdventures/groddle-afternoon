@@ -3,13 +3,15 @@
  * Region id -> its map background, upscaled and softened from the region's 150 x 91 thumbnail in
  * Tiny Speck's CC0 world-map file (glitch-overlays/world_map.fla, z_hub_maps_small/sm_*.jpg; G471):
  * x1 fills the 760 x 460 frame, x2 is the same at twice the size for Retina screens.
+ * `repainted`: the region's painting was repainted for the remake from that thumbnail (G522,
+ * provenance in tools/provenance/repainted-maps.json).
  * Provenance (symbol, sha256, recipe): assets/maps/art/bg/backgrounds.json.
  */
 export const HUB_MAP_BACKGROUNDS = Object.freeze({
   '27': Object.freeze({ x1: 'assets/maps/art/bg/ix.webp', x2: 'assets/maps/art/bg/ix@2x.webp' }), // Ix
   '51': Object.freeze({ x1: 'assets/maps/art/bg/uralia.webp', x2: 'assets/maps/art/bg/uralia@2x.webp' }), // Uralia
   '56': Object.freeze({ x1: 'assets/maps/art/bg/groddleforest.webp', x2: 'assets/maps/art/bg/groddleforest@2x.webp' }), // Groddle Forest
-  '58': Object.freeze({ x1: 'assets/maps/art/bg/groddlemeadow.webp', x2: 'assets/maps/art/bg/groddlemeadow@2x.webp' }), // Groddle Meadow
+  '58': Object.freeze({ x1: 'assets/maps/art/bg/groddlemeadow.webp', x2: 'assets/maps/art/bg/groddlemeadow@2x.webp', repainted: true }), // Groddle Meadow
   '63': Object.freeze({ x1: 'assets/maps/art/bg/shimlamirch.webp', x2: 'assets/maps/art/bg/shimlamirch@2x.webp' }), // Shimla Mirch
   '64': Object.freeze({ x1: 'assets/maps/art/bg/groddleheights.webp', x2: 'assets/maps/art/bg/groddleheights@2x.webp' }), // Groddle Heights
   '71': Object.freeze({ x1: 'assets/maps/art/bg/jethimadh.webp', x2: 'assets/maps/art/bg/jethimadh@2x.webp' }), // Jethimadh

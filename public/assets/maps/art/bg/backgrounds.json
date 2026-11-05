@@ -1,5 +1,5 @@
 {
-  "note": "Region map backgrounds upscaled from Tiny Speck's CC0 world-map thumbnails (G471). Built by tools/map-backgrounds/build.mjs; do not edit.",
+  "note": "Region map backgrounds upscaled from Tiny Speck's CC0 world-map thumbnails (G471); a region with `repainted` carries a repaint made from its thumbnail instead (G522), its provenance in that file. Built by tools/map-backgrounds/build.mjs; do not edit.",
   "license": "CC0 (Tiny Speck, glitch-overlays)",
   "source": {
     "fla": "glitch-overlays/world_map.fla",
@@ -116,10 +116,11 @@
       "thumbMatches": true,
       "x1": "assets/maps/art/bg/groddlemeadow.webp",
       "x2": "assets/maps/art/bg/groddlemeadow@2x.webp",
-      "x1Bytes": 11488,
-      "x1Sha256": "b4562668efc0ab3afcf2abba6d8a97f4ab8ee25537d57c4b3aebb9f78e95006a",
-      "x2Bytes": 24224,
-      "x2Sha256": "bc3af3ad252718484461e1f855b3e25bac1426d1993be49959ef3b8e4ccdb57d"
+      "repainted": "tools/provenance/repainted-maps.json",
+      "x1Bytes": 55598,
+      "x1Sha256": "b01be4d78514d0624756ef6d97279268740d42d227289265a6bbac242cce60f7",
+      "x2Bytes": 189012,
+      "x2Sha256": "4fd4396eaafcce6cef477f6cc030005e17d12dd1d6fc4839cae9b825ceadf4da"
     },
     "63": {
       "hubName": "Shimla Mirch",

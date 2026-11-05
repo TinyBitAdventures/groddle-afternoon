@@ -21,7 +21,8 @@
  *    the achievements' streets_visited_in_hub conditions with js/exploration.js countsTowardHub;
  *  - each street file's musicFile (tools/sound/sound-model.mjs streetMusicKeys);
  *  - assets/content/loading-images.json (Tiny Speck's loading pictures) and
- *    js/hub-map-backgrounds.js (the region maps from Tiny Speck's world map).
+ *    js/hub-map-backgrounds.js (the region maps from Tiny Speck's world map; the caption says
+ *    whether the painting is the thumbnail enlarged or repainted for the remake, G522).
  * Tiny Speck's data has no description of a street of its own; the words it has are
  * the street project's title and line and a street upgrade's description, and those
  * are shown as theirs. Everything else is ours.
@@ -198,7 +199,7 @@ export async function addStreets(d, { inventory, picture, slug }) {
         quests: [...(questsOn.get(g) || [])].sort(),
         achievement: completist.has(hubId) && exploration.countsTowardHub(g, hubId) ? completist.get(hubId) : null,
         strip,
-        map: map && bg ? { src: bg.x1, hi: bg.x2, w: map.w, h: map.h, line: map.line, hubId } : null,
+        map: map && bg ? { src: bg.x1, hi: bg.x2, w: map.w, h: map.h, line: map.line, hubId, repainted: Boolean(bg.repainted) } : null,
       },
     };
     d.entries.set(`streets:${k.slug}`, { key: `streets:${k.slug}`, section: 'streets', id: k.slug, ...e });
@@ -271,6 +272,12 @@ const streetChip = (t, P, d, extra = '') => {
   return P.chip(`${esc(k ? d.entries.get(k).name : d.streetLabel(t))}${extra}`, { link: k ? P.href(k) : null, cls: 'ency-place' });
 };
 
+/** What the map's painting is (G522): Tiny Speck's own paintings are lost (our words). */
+export const MAP_ART_NOTE = Object.freeze({
+  thumbnail: 'Tiny Speck’s painting of the region is lost; this is their small thumbnail of it, enlarged.',
+  repainted: 'Tiny Speck’s painting of the region is lost; this one was repainted for the remake from their small thumbnail of it.',
+});
+
 /** The region map with this street drawn on it (an SVG line over Tiny Speck's map), and its loading picture. */
 function pictures(e, p) {
   const st = e.street;
@@ -279,7 +286,7 @@ function pictures(e, p) {
   if (st.map) {
     const m = st.map;
     const line = ([x1, y1, x2, y2], cls) => `<line class="${cls}" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" />`;
-    out.push(`<figure class="st-fig st-map"><div class="st-map-frame"><img src="${p}${esc(m.src)}" srcset="${p}${esc(m.src)} 1x, ${p}${esc(m.hi)} 2x" alt="" width="${m.w}" height="${m.h}" loading="lazy" decoding="async" /><svg viewBox="0 0 ${m.w} ${m.h}" aria-hidden="true">${(m.near || []).map((l) => line(l, 'st-near')).join('')}${line(m.line, 'st-here')}</svg></div><figcaption>Where it is on the map of ${esc(e.group)}, with the streets its roads lead to.</figcaption></figure>`);
+    out.push(`<figure class="st-fig st-map"><div class="st-map-frame"><img src="${p}${esc(m.src)}" srcset="${p}${esc(m.src)} 1x, ${p}${esc(m.hi)} 2x" alt="" width="${m.w}" height="${m.h}" loading="lazy" decoding="async" /><svg viewBox="0 0 ${m.w} ${m.h}" aria-hidden="true">${(m.near || []).map((l) => line(l, 'st-near')).join('')}${line(m.line, 'st-here')}</svg></div><figcaption>Where it is on the map of ${esc(e.group)}, with the streets its roads lead to. ${MAP_ART_NOTE[m.repainted ? 'repainted' : 'thumbnail']}</figcaption></figure>`);
   }
   return out.length ? `<div class="st-figs">${out.join('')}</div>` : '';
 }
