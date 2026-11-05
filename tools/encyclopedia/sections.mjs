@@ -15,9 +15,10 @@
  *
  * data.mjs and build.mjs register the list; nothing else names a section here.
  */
+import { SECTION as imagination } from './imagination.mjs';
 import { SECTION as giants } from './giants.mjs';
 
-export const MORE_SECTIONS = [giants];
+export const MORE_SECTIONS = [imagination, giants];
 
 export function addMoreSections(ctx) {
   for (const s of MORE_SECTIONS) s.add(ctx);

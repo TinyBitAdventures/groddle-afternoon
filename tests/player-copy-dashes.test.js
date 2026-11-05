@@ -146,7 +146,8 @@ describe('em-dashes in player-facing copy (G215)', () => {
 
 let sourceText = null;
 function encyclopediaDashesAreSource(text) {
-  sourceText ??= ['quests.json', 'achievements.json', 'skills.json'].map((f) => readFileSync(join(pub, 'assets', 'content', f), 'utf8')).join('\n');
+  // The Imagination cards' own text (tools/encyclopedia/imagination.mjs) is Tiny Speck's too.
+  sourceText ??= [...['quests.json', 'achievements.json', 'skills.json'].map((f) => join('assets', 'content', f)), 'js/imagination-data.js'].map((f) => readFileSync(join(pub, f), 'utf8')).join('\n');
   const blocks = [...text.matchAll(/<div class="(?:cat-desc|ency-talk)">([\s\S]*?)<\/div>/g)].map((m) => m[1]);
   const outside = blocks.reduce((t, b) => t.replace(b, ''), text.replace(/<meta name="description"[^>]*>/, ''));
   if (DASH.test(outside)) return false;
