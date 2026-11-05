@@ -40,6 +40,8 @@ export const NATIVE_SELECT_ALLOW = Object.freeze({
   'public/encyclopedia/feats/index.html': 'An encyclopedia page (website): themed by items/combobox.js.',
   'public/encyclopedia/imagination/index.html': 'An encyclopedia page (website): themed by items/combobox.js.',
   'public/encyclopedia/recipes/index.html': 'An encyclopedia page (website): themed by items/combobox.js.',
+  'public/encyclopedia/stores/index.html': 'An encyclopedia page (website): themed by items/combobox.js.',
+  'public/encyclopedia/streets/index.html': 'An encyclopedia page (website): its region picker is themed by items/combobox.js.',
 });
 
 /** Where the game makes a select, by file (the count of places in each). */
