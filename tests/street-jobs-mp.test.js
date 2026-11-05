@@ -17,6 +17,7 @@ import { projectTable } from '../tools/build-realtime-projects.mjs';
 import {
   APPLIED_KEEP,
   applyWorld,
+  giveAfterSave,
   isSharedJob,
   listsFrom,
   localTime,
@@ -29,7 +30,7 @@ import {
   rowFromServer,
   sharedSlice,
   topLine,
-} from '../public/js/street-jobs-mp.js?v=59f9e769';
+} from '../public/js/street-jobs-mp.js?v=48a719ab';
 import {
   isJobBuilt,
   jobStatus,
@@ -164,6 +165,56 @@ describe('the shared board (js/street-jobs-mp.js)', () => {
     assert.equal(rest.rewards.xp, 354);
     assert.equal(rest.performance.currants, 0);
     assert.deepEqual(rest.performance.items, []);
+  });
+});
+
+describe('a give made with the window open (#105)', () => {
+  // The ledger (LedgerProject.php) only knows what the last save write showed it.
+  function world() {
+    const pack = { barnacle_talc: 0 };
+    const ledger = { barnacle_talc: 0 };
+    const sent = [];
+    return {
+      pack,
+      ledger,
+      sent,
+      persist: async () => {
+        await new Promise((r) => setImmediate(r));
+        Object.assign(ledger, pack);
+      },
+      // The site's answer to the give: refused when the ledger lacks it ("That item doesn't exist.").
+      send: (n) => {
+        sent.push(ledger.barnacle_talc >= n ? 'settled' : 'refused');
+        return true;
+      },
+    };
+  }
+
+  it('writes the save before the give, so talc crushed a moment ago is in the ledger', async () => {
+    const w = world();
+    w.pack.barnacle_talc = 3; // crushed while the project window was open; no save write yet
+    assert.equal(await giveAfterSave({ persist: w.persist, send: () => w.send(3) }), true);
+    assert.deepEqual(w.sent, ['settled']);
+  });
+
+  it('a give given up while the save was written is never sent', async () => {
+    const w = world();
+    w.pack.barnacle_talc = 3;
+    assert.equal(await giveAfterSave({ persist: w.persist, send: () => w.send(3), still: () => false }), false);
+    assert.deepEqual(w.sent, []);
+  });
+
+  it('a failed save write still sends: the ledger may hold the stack from before', async () => {
+    const w = world();
+    w.ledger.barnacle_talc = 3;
+    assert.equal(await giveAfterSave({ persist: async () => { throw new Error('409'); }, send: () => w.send(3) }), true);
+    assert.deepEqual(w.sent, ['settled']);
+  });
+
+  it('the board sends project_give and project_claim only after the save (features/street-jobs-feature.js)', () => {
+    assert.match(feature, /giveAfterSave\(\{ persist: \(\) => persist\(engine\), send: \(\) => s\.client\.send\('project_give', payload\)/);
+    assert.match(feature, /giveAfterSave\(\{ persist: \(\) => persist\(engine\), send: \(\) => s\.client\.send\('project_claim'/);
+    assert.doesNotMatch(feature, /if \(!s\.client\.send\('project_(give|claim)'/);
   });
 });
 

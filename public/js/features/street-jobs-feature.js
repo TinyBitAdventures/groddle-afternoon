@@ -105,6 +105,7 @@ import {
   HALL_TEXT,
   MP_TEXT,
   applyWorld,
+  giveAfterSave,
   hallClock,
   isSharedJob,
   mergeHalls,
@@ -119,7 +120,7 @@ import {
   rowFromServer,
   sharedSlice,
   topLine,
-} from '../street-jobs-mp.js?v=59f9e769';
+} from '../street-jobs-mp.js?v=48a719ab';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 import { createMinnAccount } from '../minn-account.js?v=9544b0a0';
 import { normalizeGroups } from '../groups.js?v=4c4c8d76';
@@ -1712,10 +1713,18 @@ function mpGive(engine, jobId, what) {
   const payload = { job: wireOf(jobId), req: req.id, option: mpChoice[jobId] || '' };
   if (money) payload.currants = n;
   else payload.n = n;
-  if (!s.client.send('project_give', payload)) return engine.toast(MP_TEXT.offline), false;
-  s.giving = { job: jobId, req: req.id, at: Date.now() };
+  // #105: the save lands first, so the ledger has what was made with the window open.
+  const giving = { job: jobId, req: req.id, at: Date.now() };
+  s.giving = giving;
   renderPanel(engine);
   publish(engine);
+  giveAfterSave({ persist: () => persist(engine), send: () => s.client.send('project_give', payload), still: () => s.giving === giving }).then((sent) => {
+    if (sent || s.giving !== giving) return;
+    s.giving = null;
+    engine.toast(MP_TEXT.offline);
+    renderPanel(engine);
+    publish(engine);
+  });
   return true;
 }
 
@@ -1725,10 +1734,18 @@ function mpClaim(engine, jobId, group) {
   if (!s) return engine.toast(MP_TEXT.offline), false;
   if (s.claiming) return engine.toast(MP_TEXT.counting), false;
   if (!n0(group)) return engine.toast(HALL_TEXT.noGroup), false;
-  if (!s.client.send('project_claim', { job: jobId, group: n0(group) })) return engine.toast(MP_TEXT.offline), false;
-  s.claiming = { job: jobId, at: Date.now() };
+  // The claim's currants come out of the ledger too (#105): the save lands first.
+  const claiming = { job: jobId, at: Date.now() };
+  s.claiming = claiming;
   renderPanel(engine);
   publish(engine);
+  giveAfterSave({ persist: () => persist(engine), send: () => s.client.send('project_claim', { job: jobId, group: n0(group) }), still: () => s.claiming === claiming }).then((sent) => {
+    if (sent || s.claiming !== claiming) return;
+    s.claiming = null;
+    engine.toast(MP_TEXT.offline);
+    renderPanel(engine);
+    publish(engine);
+  });
   return true;
 }
 

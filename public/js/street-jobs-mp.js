@@ -27,6 +27,27 @@ export const MP_TEXT = Object.freeze({
   notWinner: 'The top contributors also earned the performance rewards.',
 });
 
+/**
+ * A contribution after the save has landed (#105). The site weighs a give
+ * against the character's ledger, which learns the pack from save writes
+ * (LedgerProject.php refuses what it lacks, and projects.go answers
+ * "That item doesn't exist."). Something made with the window open, like
+ * Barnacle Talc crushed a moment ago, is not in the ledger until the next
+ * write, so the save is written first and the give sent after it, as
+ * trades, auctions and drops already do. `still()` is false when the give
+ * was given up meanwhile; a failed write still sends (the ledger may hold
+ * the stack from earlier). Resolves to what send() answered, or false.
+ */
+export async function giveAfterSave({ persist, send, still = () => true }) {
+  try {
+    await persist();
+  } catch {
+    // The give goes on: the server and the ledger have the last word.
+  }
+  if (!still()) return false;
+  return Boolean(send());
+}
+
 const whole = (v) => Math.max(0, Math.floor(Number(v) || 0));
 const clean = (value) => String(value || '').replace(/[^a-zA-Z0-9_-]/g, '').slice(0, 64);
 
