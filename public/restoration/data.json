@@ -2726,13 +2726,78 @@
   ]
  },
  "release": {
-  "game": "0.18.0",
-  "deployed": "2026-11-04"
+  "game": "0.19.0",
+  "deployed": "2026-11-05"
  },
  "git": {
-  "commits": 1305,
+  "commits": 1320,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-05",
+    "kind": "fix",
+    "text": "A stored bag that can't fit back in the pack stays in its cabinet slot unchanged"
+   },
+   {
+    "date": "2026-11-05",
+    "kind": "fix",
+    "text": "When De-Embiggenify's time runs out, De-Embiggenify II stays in the quest log to try again"
+   },
+   {
+    "date": "2026-11-05",
+    "kind": "fix",
+    "text": "You can walk back out from beside the long table's right leg in De-Embiggenify"
+   },
+   {
+    "date": "2026-11-05",
+    "kind": "fix",
+    "text": "A bag put in a house cabinet keeps everything in it, and comes back out the same"
+   },
+   {
+    "date": "2026-11-05",
+    "kind": "fix",
+    "text": "Escape or a click outside closes the Play Cube's \"Which memory?\" list, and \"Never mind\" stays in view"
+   },
+   {
+    "date": "2026-11-05",
+    "kind": "fix",
+    "text": "Street projects take items made while the project window is open"
+   },
+   {
+    "date": "2026-11-05",
+    "kind": "fix",
+    "text": "A long route on the Map is one short line, with all its stops in a box that scrolls"
+   },
+   {
+    "date": "2026-11-05",
+    "kind": "fix",
+    "text": "The Make panel shows every element a Grinder crush gives, with its count"
+   },
+   {
+    "date": "2026-11-05",
+    "kind": "fix",
+    "text": "The Batterfly's page no longer says it gives Butterfly Milk, nor Hell's Bartender a Drink Ticket"
+   },
+   {
+    "date": "2026-11-05",
+    "kind": "improve",
+    "text": "Item pages name each source once under Where to find it, with how you get it"
+   },
+   {
+    "date": "2026-11-05",
+    "kind": "improve",
+    "text": "The Encyclopedia menu shows its sections in three headed columns"
+   },
+   {
+    "date": "2026-11-05",
+    "kind": "new",
+    "text": "Item pages say where to find each item: the stores that sell it and what gives it, with how many streets have one"
+   },
+   {
+    "date": "2026-11-05",
+    "kind": "new",
+    "text": "The encyclopedia has a page for every street and every store, linked from each region's page"
+   },
    {
     "date": "2026-11-05",
     "kind": "improve",
@@ -2787,71 +2852,6 @@
     "date": "2026-11-05",
     "kind": "new",
     "text": "The Encyclopedia has Recipes by tool: what goes in and comes out, the skill, energy, time and iMG"
-   },
-   {
-    "date": "2026-11-05",
-    "kind": "new",
-    "text": "The Encyclopedia has every Imagination upgrade: cost, what it needs and opens, the card text and what it does in the remake"
-   },
-   {
-    "date": "2026-11-05",
-    "kind": "new",
-    "text": "The Encyclopedia has the Giants: one page per Giant with their shrines, the skills they favor, their Emblem and Icon"
-   },
-   {
-    "date": "2026-11-04",
-    "kind": "improve",
-    "text": "Compare shows Rook attacks and the races as Partly for Groddle Afternoon, since solo still plays lighter"
-   },
-   {
-    "date": "2026-11-04",
-    "kind": "fix",
-    "text": "Your yard animals each wander on their own, and stop when you are at one"
-   },
-   {
-    "date": "2026-11-04",
-    "kind": "improve",
-    "text": "\"N replies\" under a line in the Social drawer is a button of its own, with room before the next line"
-   },
-   {
-    "date": "2026-11-04",
-    "kind": "new",
-    "text": "Going from any page to /chat/ stretches the centred header out into the chat app's header, and back"
-   },
-   {
-    "date": "2026-11-04",
-    "kind": "new",
-    "text": "Threads on chat lines in the Social drawer, an online count, and Appear offline in Account"
-   },
-   {
-    "date": "2026-11-04",
-    "kind": "fix",
-    "text": "The Butler's IMs always come in the order it sent them: a visitor's arrival before what they said"
-   },
-   {
-    "date": "2026-11-04",
-    "kind": "fix",
-    "text": "A Cubimal's name, a Draught's Giant, a Still's Hooch and a pumpkin's phrases go with it to another player"
-   },
-   {
-    "date": "2026-11-04",
-    "kind": "fix",
-    "text": "Each Rook Balm keeps its own pours, online too; a new tube is full"
-   },
-   {
-    "date": "2026-11-04",
-    "kind": "new",
-    "text": "Lines said on the website show \"(web)\" in the game, and Earlier messages brings back kept chat"
-   },
-   {
-    "date": "2026-11-04",
-    "kind": "new",
-    "text": "Replies and quotes on the Community boards show in Activity while you play online"
-   },
-   {
-    "date": "2026-11-04",
-    "kind": "improve",
-    "text": "Reports leave out the browser's harmless ResizeObserver notice and carry only real page errors"
    }
   ]
  },
