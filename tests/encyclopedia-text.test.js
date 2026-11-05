@@ -89,7 +89,7 @@ describe('encyclopedia text', () => {
   it('reads the reported pages with commas and full stops', () => {
     const page = (rel) => readAsText(readFileSync(join(dir, rel), 'utf8'));
     const wine = page('items/wine_of_the_dead/index.html');
-    for (const s of ['Day of the Undead Butlers, a reward', 'Beelzebooze, involves it', "Hell's Bartender, gives it", 'Previous: ', 'Next: ']) assert.ok(wine.includes(s), s);
+    for (const s of ['Day of the Undead Butlers, a reward', 'Beelzebooze, involves it', "Hell's Bartender, trade a Drink Ticket", 'Previous: ', 'Next: ']) assert.ok(wine.includes(s), s);
     assert.ok(page('quests/hell_quest/index.html').includes('in a Hell Hole, finish it first'));
     const home = page('index.html');
     assert.match(home, /Items [\d,]+\. Every item, how to get it/);

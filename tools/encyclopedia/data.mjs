@@ -32,7 +32,7 @@ import { addSounds } from './sounds.mjs';
 import { MORE_SECTIONS, addMoreSections } from './sections.mjs';
 import { addStreets, streetsSection } from './streets.mjs';
 import { addStores, storesSection } from './stores.mjs';
-import { addWhereToFind } from './where-to-find.mjs';
+import { addWhereToFind, GSJS_GIVER_HOW } from './where-to-find.mjs';
 
 const root = join(import.meta.dirname, '..', '..');
 export const PUB = join(root, 'public');
@@ -341,7 +341,8 @@ export async function loadEncyclopedia({ inventory = readInventoryAll() } = {}) 
     } else if (e.section === 'animals' || e.section === 'people') {
       const c = e.creature;
       if (c) {
-        for (const id of c.makes) if (id !== e.id) ref(e, keyOf(id), 'gives');
+        // Not every item a creature file names is one it gives (where-to-find.mjs GSJS_HOW: null).
+        for (const id of c.makes) if (id !== e.id && GSJS_GIVER_HOW[`${e.id}>${id}`] !== null) ref(e, keyOf(id), 'gives');
         for (const id of c.skills) ref(e, `skills:${id}`, 'skill');
         for (const id of textLinks(c.desc)) if (id !== e.id) ref(e, keyOf(id), 'mentions');
       }
