@@ -4,7 +4,6 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=28b6b0a6';
 import { createFeatureHost } from './js/feature-host.js?v=020c9329';
-import { giantDisplayName } from './js/giant-names.js?v=0e295891';
 import { FEATURES, questFlagsFeature } from './js/features/index.js?v=db589098';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
@@ -838,6 +837,7 @@ import {
   emblemRelationNote,
   formatSpeedUpTime,
 } from './js/shrines.js?v=95d74174';
+import { giantDisplayName } from './js/giant-names.js?v=0e295891';
 import { shrinePowderOptions, shrinePowderAchievementCounters } from './js/powders.js?v=3c38f8b7';
 import {
   GAMESHOW_TICKET_ID,

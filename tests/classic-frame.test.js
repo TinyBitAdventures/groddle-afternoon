@@ -38,7 +38,7 @@ describe('Classic frame: CSS and JS agree', () => {
     assert.match(game, /const MODERN_UI = true;/);
     const drawer = read('public/js/ui/social-drawer.js');
     assert.match(drawer, /present: \(next\) => setOpen\(next\),/);
-    assert.match(drawer, /restore: \(\) => setOpen\(choice \?\? defaultOpen\(width\(\)\)\),/);
+    assert.match(drawer, /restore: \(\) => setOpen\(startsOpen\(width\(\), height\(\), choice\)\),/);
     assert.match(drawer, /r\.left >= rr\.right - 1\) return \{ left: 0, right: 0 \}/, 'no inset beside the world');
   });
 });

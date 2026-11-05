@@ -58,7 +58,7 @@ describe('the pack menu draws a feature verb\'s second level (game.js renderPack
   });
 
   it('the level is a Back row and the verbs, each run as a feature verb by its own id', () => {
-    assert.match(pop, /const level = eatPrompt \? 'eat' : dropPrompt \? 'drop' : subVerb \? 'sub' : '';/);
+    assert.match(pop, /const level = eatPrompt \? 'eat' : dropPrompt \? 'drop' : subVerb \? 'sub' : countPrompt \? 'count' : '';/);
     assert.match(pop, /\[\{ attrs: 'data-pack-sub-cancel', cls: 'vm-back', label: 'Back', back: true,[\s\S]*?\.\.\.subVerb\.sub\.map\(\(v\) => featureVerbRow\(\{ \.\.\.v, featureId: subVerb\.featureId \}\)\)\]/);
     assert.match(pop, /attrs: `data-feature-pack-verb="\$\{escapeHtml\(verb\.id\)\}" data-feature-id="\$\{escapeHtml\(verb\.featureId\)\}"`/);
     assert.match(pop, /typeof verb\.current === 'boolean' \? \{ current: verb\.current \} : \{\}/);
@@ -69,8 +69,8 @@ describe('the pack menu draws a feature verb\'s second level (game.js renderPack
   it('every way the menu opens starts on the first level; Esc on the level goes back', () => {
     assert.match(fnSource('closePackPopover'), /packSubLevel = '';/);
     assert.match(fnSource('openPackStackMenu'), /packSubLevel = '';/);
-    assert.match(fnSource('openPackBagOptions'), /packSubLevel = '';\n\s+renderPackPopover\(s\.classTsid, slot\);/);
-    assert.match(game, /if \(isPackPopoverOpen\(\)\) \{\n\s+\/\/ A second level[^\n]*\n\s+const back = packSubLevel \? document\.querySelector\('#pack-popover \[data-pack-sub-cancel\]'\) : null;\n\s+if \(back\) back\.click\(\);\n\s+else closePackPopover\(\);/);
+    assert.match(fnSource('openPackBagOptions'), /packSubLevel = '';\n\s+packCountVerb = '';\n\s+renderPackPopover\(s\.classTsid, slot\);/);
+    assert.match(game, /if \(isPackPopoverOpen\(\)\) \{\n\s+\/\/ A second level[^\n]*\n\s+const back = packSubLevel\n\s+\? document\.querySelector\('#pack-popover \[data-pack-sub-cancel\]'\)\n\s+: packCountVerb \? document\.querySelector\('#pack-popover \[data-pack-count-cancel\]'\) : null;\n\s+if \(back\) back\.click\(\);\n\s+else closePackPopover\(\);/);
   });
 
   it('cites the original and names the level a remake choice', () => {

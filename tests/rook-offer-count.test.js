@@ -126,7 +126,7 @@ describe('ticket 70: how many of an offering', () => {
     assert.match(feature, /countStepMarkup\(\{ value: n, max: o\.count, verb: 'Give', attrs: OFFER_COUNT_ATTRS \}\)/);
     assert.match(feature, /const n = offerDefaultCount\(o\.count\);/);
     assert.match(src('style.css'), /\.count-pop :is\(\.feed-picker-qty-go, \.qty-row \.btn-glitch-primary, \[data-v-go\], \[data-rook-count-give\]\) \{/);
-    assert.match(src('css/classic.css'), /\.count-pop :is\(\[data-pack-drop-confirm\], \[data-pack-eat-confirm\], \.feed-picker-qty-go, \[data-v-go\], \[data-rook-count-give\]\) \{/);
+    assert.match(src('css/classic.css'), /\.count-pop :is\(\[data-pack-drop-confirm\], \[data-pack-eat-confirm\], \[data-pack-count-confirm\], \.feed-picker-qty-go, \[data-v-go\], \[data-rook-count-give\]\) \{/);
   });
 
   it('solo: 1, All and How many each strike with their count, and the chooser shows the damage', async () => {

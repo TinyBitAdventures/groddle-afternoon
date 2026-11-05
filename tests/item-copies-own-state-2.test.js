@@ -188,7 +188,7 @@ describe('js/tools.js: uses, charges, bits and words per copy', () => {
     assert.match(host, /feature\.runPackVerb\(classTsid, verbId, engine, opts\)/);
     const game = readFileSync(join(root, 'public/game.js'), 'utf8');
     assert.match(game, /features\.runPackVerb\(classTsid, button\.dataset\.featurePackVerb, engine, button\.dataset\.featureId, picked\)/);
-    assert.match(game, /features\.packVerbs\(classTsid, engine, verbCopy\)/);
+    assert.match(game, /features\.packVerbs\(classTsid, engine, \{ \.\.\.verbCopy, stackCount \}\)/);
   });
 });
 
