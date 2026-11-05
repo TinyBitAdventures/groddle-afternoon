@@ -1,12 +1,14 @@
 /**
  * Item page quality (lane enc-items, Austin 2026-11-05): each recipe's skills, energy and time (tools/catalog/costs.mjs), what a vendor pays beside
- * the price and the stack size in the header.
+ * the price, the larger picture at the top (tools/catalog/hero.mjs) and the
+ * stack size in the header.
  * Run: node --test tests/catalog-item-pages.test.js
  */
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
+import { HERO_BOX, MAX_BYTES, MAX_UPSCALE, imageSize, loadHero } from '../tools/catalog/hero.mjs';
 import { NOT_SELLABLE, NOT_SELLABLE_FLAGS, loadCosts, secondsText } from '../tools/catalog/costs.mjs';
 
 const spike = join(import.meta.dirname, '..');
@@ -105,7 +107,27 @@ describe('selling', () => {
   });
 });
 
-describe('the header', () => {
+describe('the picture and the header', () => {
+  it('draws the largest art the build has, no larger than the frame', async () => {
+    const heroFor = await loadHero(spike);
+    for (const item of data.items) {
+      const m = /<div class="cat-hero-frame"><img class="cat-hero-icon cat-from-(icon|icon1x|standing)" src="\.\.\/\.\.\/\.\.\/([^"?]+)\?v=[0-9a-f]{8}" alt="" width="(\d+)" height="(\d+)"/.exec(page(item.id));
+      if (!item.icon && !m) continue;
+      assert.ok(m, item.id);
+      const file = join(pub, m[2]);
+      assert.ok(existsSync(file), `${item.id}: ${m[2]}`);
+      assert.ok(Math.max(Number(m[3]), Number(m[4])) <= HERO_BOX, item.id);
+      if (m[1] === 'standing') {
+        assert.ok(readFileSync(file).length <= MAX_BYTES, item.id);
+        const size = imageSize(file);
+        assert.ok(Number(m[3]) <= Math.ceil(size.w * MAX_UPSCALE), `${item.id}: grown at most ${MAX_UPSCALE} times`);
+      }
+    }
+    assert.equal(heroFor('furniture_chair', { w: 37, h: 48, hi: { w: 111, h: 144 } }).from, 'standing');
+    assert.equal(heroFor('apple', { w: 38, h: 44, hi: { w: 114, h: 132 } }).from, 'icon');
+    assert.match(page('furniture_bed'), /src="\.\.\/\.\.\/\.\.\/assets\/sprites\/furniture\/furniture_bed@3x\.webp\?v=/);
+  });
+
   it('shows the stack size in the header, and the price', () => {
     assert.match(page('apple'), /<span class="ency-chip cat-stack"><span>stacks to <b>100<\/b>/);
     const header = (id) => page(id).slice(0, page(id).indexOf('</header>'));

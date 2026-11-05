@@ -43,6 +43,7 @@ import { loadEncyclopedia } from '../encyclopedia/data.mjs';
 import { inRemake, makeParts, sep } from '../encyclopedia/parts.mjs';
 import { neverReleased, neverReleasedNote, neverReleasedTag } from '../encyclopedia/never-released.mjs';
 import { loadCosts } from './costs.mjs';
+import { loadHero } from './hero.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = join(here, '..', '..');
@@ -618,6 +619,8 @@ export async function buildCatalog({ inventory = readInventory(), evidence = rea
   const remake = await readRemake(names);
   // Recipe skills, energy and time, and vendors' sell prices (tools/catalog/costs.mjs).
   const costs = await loadCosts(root);
+  // The picture at the top of each page (tools/catalog/hero.mjs).
+  const heroFor = await loadHero(root);
   const quests = content('quests.json');
   const iconFiles = new Set(readdirSync(ICONS));
   const musicblocks = JSON.parse(readFileSync(join(pub, 'musicblocks', 'data.json'), 'utf8'));
@@ -673,6 +676,7 @@ export async function buildCatalog({ inventory = readInventory(), evidence = rea
   // Each store's keeper's picture for the Sold by combobox (the encyclopedia's People entry).
   const vendorIcons = Object.fromEntries(data.vendors.map((v) => [v.key, ency.entries.get(ency.stores.get(v.key))?.icon?.src]).filter(([, src]) => src));
   files[`${OUT}/index.html`] = indexPage(data, vendorIcons);
+  for (const e of entries) e.hero = heroFor(e.it.id, e.icon);
   entries.forEach((e, i) => {
     files[`${OUT}/${e.it.id}/index.html`] = itemPage(e, {
       prev: entries[i - 1], next: entries[i + 1], remake, inCatalog, names, musicCards, quests, total: entries.length, index: i, ency, costs,
@@ -957,8 +961,9 @@ function itemPage(e, ctx) {
   const nr = neverReleased(`item:${it.id}`);
   const isMusic = it.id.startsWith('musicblock_') || it.tags.includes('musicblock');
   const musicHref = `${p}musicblocks/${ctx.musicCards.has(it.id) ? `#${esc(it.id)}` : ''}`;
-  const icon = e.icon
-    ? `<img class="cat-hero-icon" src="${p}assets/sprites/icons/${esc(it.id)}${e.icon.hi ? '@3x' : ''}.png" alt="" width="${e.icon.hi ? e.icon.hi.w : e.icon.w * 3}" height="${e.icon.hi ? e.icon.hi.h : e.icon.h * 3}"${e.icon.hi ? '' : ' style="image-rendering: auto"'} />`
+  // The largest CC0 art the build has for it (tools/catalog/hero.mjs); the heading beside it names it.
+  const icon = e.hero
+    ? `<img class="cat-hero-icon cat-from-${e.hero.from}" src="${p}${esc(e.hero.src)}" alt="" width="${e.hero.w}" height="${e.hero.h}" fetchpriority="high" />`
     : '<span class="cat-hero-icon cat-ph" aria-hidden="true"></span>';
   const desc = gsjsHtml(it.desc, linkItem);
   const extras = it.extras.map((x) => gsjsHtml(x, linkItem).join(' ')).filter(Boolean);
