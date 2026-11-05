@@ -3,8 +3,9 @@
  * (tools/encyclopedia/streets.mjs, stores.mjs, where-to-find.mjs; Austin 2026-11-05):
  * a page for every street of the remake that belongs to a region, linked from that
  * region's page; each page's vendor, shrine, roads, closures and reachability as the game
- * itself works them out; one page per store with its stock, prices and streets; and the
- * size of the whole section kept in check.
+ * itself works them out; one page per store with its stock, prices and streets; item pages
+ * naming the stores that sell them and what gives them, with street counts that agree with
+ * the other pages; and the size of the whole section kept in check.
  */
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
@@ -170,5 +171,32 @@ describe('encyclopedia stores', () => {
     }
     // A store a vendor of its own keeps carries Tiny Speck's words for the vendor.
     assert.match(pageOf('stores:meals'), /Monsieur de Nomdenoms/);
+  });
+});
+
+describe('item pages: Where to find it', () => {
+  it('names the stores that sell an item, with the price and the streets that have one', { skip }, () => {
+    const html = read('encyclopedia/items/garlic/index.html');
+    const n = d.storeStreets('produce');
+    assert.ok(n > 100);
+    assert.match(html, /<h3>Where to find it<\/h3>/);
+    assert.match(text(html), new RegExp(`Produce Vendor , 4 currants , on ${n} streets`));
+    assert.ok(html.includes('href="../../../encyclopedia/stores/produce/"'));
+  });
+
+  it('names what gives a resource, linked, with the streets that have one', { skip }, () => {
+    const cherry = read('encyclopedia/items/cherry/index.html');
+    assert.ok(cherry.includes('href="../../../encyclopedia/items/trant_fruit/"'));
+    assert.match(text(cherry), new RegExp(`Fruit Tree , on ${d.streetsHaving('trant_fruit')} streets`));
+    const meat = read('encyclopedia/items/meat/index.html');
+    assert.match(text(meat), new RegExp(`Where to find it .*Piggy , on ${d.streetsHaving('npc_piggy')} streets`));
+    const paper = text(read('encyclopedia/items/paper/index.html'));
+    assert.match(paper, /Dust Trap , on \d+ streets/);
+    assert.match(paper, /Paper Tree , on \d+ streets/);
+  });
+
+  it('is a part of its own, registered on the item page in one line', () => {
+    const src = readFileSync(join(spike, 'tools/catalog/build.mjs'), 'utf8');
+    assert.equal((src.match(/whereToFind\(/g) || []).length, 1);
   });
 });

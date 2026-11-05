@@ -40,6 +40,7 @@ import { keyOf as moduleKeyOf } from '../module-keys/build.mjs';
 import { literalFrom, readItemTags } from '../inventory/gsjs-data.mjs';
 import { supplyConversions } from '../job-obtainable.mjs';
 import { loadEncyclopedia } from '../encyclopedia/data.mjs';
+import { whereToFind } from '../encyclopedia/where-to-find.mjs';
 import { inRemake, makeParts, sep } from '../encyclopedia/parts.mjs';
 import { neverReleased, neverReleasedNote, neverReleasedTag } from '../encyclopedia/never-released.mjs';
 import { loadCosts } from './costs.mjs';
@@ -1015,6 +1016,7 @@ ${usesHtml.length ? `          <ul class="cat-list">
   // Music and sounds (tools/encyclopedia/sounds.mjs): the sounds Tiny Speck's game played from this item.
   const soundTiles = fromAll((b) => b.from.startsWith('sounds:')).map((b) => P.tile(b.from));
   const encyBody = [
+    whereToFind(it.id, P, ency),
     questTiles.length ? `<h3>Quests</h3>\n        ${P.tiles(questTiles)}` : '',
     whoTiles.length ? `<h3>Creatures and people that give it</h3>\n        ${P.tiles(whoTiles)}` : '',
     placeChips.length ? `<h3>Where it is found</h3>\n        <p class="ency-lead-small">Regions on the map, with how many there are in each, from the streets’ own files.</p>\n        ${P.chips(placeChips)}` : '',

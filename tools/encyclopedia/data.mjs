@@ -32,6 +32,7 @@ import { addSounds } from './sounds.mjs';
 import { MORE_SECTIONS, addMoreSections } from './sections.mjs';
 import { addStreets, streetsSection } from './streets.mjs';
 import { addStores, storesSection } from './stores.mjs';
+import { addWhereToFind } from './where-to-find.mjs';
 
 const root = join(import.meta.dirname, '..', '..');
 export const PUB = join(root, 'public');
@@ -417,9 +418,10 @@ export async function loadEncyclopedia({ inventory = readInventoryAll() } = {}) 
   for (const s of sounds.stubs) stubs.set(s.key, s);
   addMoreSections({ add, entries, items, keyOf, nameOf, picture, itemIcon, recipes, skills, ecology });
   const out = { entries, items, recipes, keyOf, skills, stores, stubs, stubKey, nameOf, sounds };
-  /* Streets and Stores (streets.mjs, stores.mjs). */
+  /* Streets, Stores and the item pages' Where to find it (streets.mjs, stores.mjs, where-to-find.mjs). */
   await addStreets(out, { inventory, picture, slug });
   await addStores(out, { itemIcon, portrait });
+  await addWhereToFind(out);
   out.back = backOf();
   return out;
 }
