@@ -24,6 +24,16 @@ Words about the remake are ours: plain, factual, no em dashes, never the
 | Places | `/encyclopedia/places/` | `/encyclopedia/places/<hub slug>/`, streets as `#<street tsid>` | `inc_data_maps_prod.js` hub, slug of its name |
 | Achievements | `/encyclopedia/achievements/` | `/encyclopedia/achievements/<id>/` | GSJS `achievements/<id>.js` |
 | Music and sounds | `/encyclopedia/sounds/`, the list `/encyclopedia/sounds/still-missing/` | `/encyclopedia/sounds/<key in lower case>/` | `assets/content/sound-keys.json` keys, street music keys and music set keys of `ambient-music.json` |
+| Imagination upgrades | `/encyclopedia/imagination/` | `/encyclopedia/imagination/<card id>/` | `js/imagination-data.js` card id |
+| Recipes (by tool) | `/encyclopedia/recipes/` | `/encyclopedia/recipes/<tool class>/`, recipes as `#r<recipe id>` | `recipes.json` `tool` |
+| Buffs | `/encyclopedia/buffs/` | `/encyclopedia/buffs/<buff id>/` | `buffs.json` class |
+| Feats and street projects | `/encyclopedia/feats/` | `/encyclopedia/feats/<feat id or project class>/` | `js/solo-feats.js` ids, `street-jobs.json` classes |
+| Giants | `/encyclopedia/giants/` | `/encyclopedia/giants/<giant id>/` (`ti` is Tii) | GSJS `config_base.js` `giants` |
+
+The sections added on 2026-11-05 (Imagination upgrades to Giants) each live in
+their own module, listed in `tools/encyclopedia/sections.mjs`, which says what a
+module exports; data.mjs and build.mjs register the list. The old `/giants/`
+address answers a 301 to the Giants section (the site repo's `src/MovedPages.php`).
 
 The catalog moved from `/items/` into the encyclopedia on 2026-11-02 (Austin:
 "for consistency" with the other sections). The old addresses keep working:
