@@ -76,6 +76,40 @@ describe('site colour theme', () => {
     }
   });
 
+  it('every page with the header opts in to the page-to-page View Transition (site/site-nav.css, Austin 2026-11-04)', () => {
+    // The opt-in lives in the one stylesheet every header page loads, so a new page gets it with the header.
+    for (const { file, html } of pages) {
+      const head = html.slice(0, html.indexOf('</head>'));
+      const prefix = '../'.repeat(file.split('/').length - 1);
+      assert.ok(head.includes(`<link rel="stylesheet" href="${prefix}site/site-nav.css" />`), `${file}: no site-nav.css in <head>`);
+    }
+    const css = readFileSync(join(pub, 'site', 'site-nav.css'), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
+    // Reduced motion: no transition at all (the opt-in sits inside no-preference); unsupported browsers ignore it.
+    assert.match(css, /@media \(prefers-reduced-motion: no-preference\) \{\s*@view-transition \{ navigation: auto; \}\s*\}/);
+    assert.equal((css.match(/@view-transition/g) || []).length, 1, 'opted in once, only under no-preference');
+    const names = Object.fromEntries([...css.matchAll(/^([^{}\n]+) \{ view-transition-name: ([a-z-]+); \}$/gm)].map(([, sel, name]) => [sel.trim(), name]));
+    assert.deepEqual(names, { '.site-nav': 'site-nav', '.site-nav .wordmark img': 'site-nav-mark', '.site-nav .wordmark span': 'site-nav-name', '.site-nav-links': 'site-nav-links', '.site-nav-theme': 'site-nav-theme' });
+    const groups = css.match(/((?:::view-transition-group\([a-z-]+\),?\s*)+)\{ animation-duration: (\d+)ms;/);
+    assert.ok(groups, 'the named parts have their own duration');
+    for (const name of Object.values(names)) assert.ok(groups[1].includes(`::view-transition-group(${name})`), name);
+    const ms = Number(groups[2]);
+    assert.ok(ms >= 250 && ms <= 300, `short and calm: ${ms} ms`);
+  });
+
+  it('the Minn pages carry the same opt-in: every header the theme draws goes out with site-nav.css', { skip: skipWithoutSite }, () => {
+    const ext = readFileSync(sitePath('src', 'Extension.php'), 'utf8');
+    assert.match(ext, /private const STYLESHEETS = \[[^\]]*'\/site\/site-nav\.css'/);
+    assert.match(ext, /\$minn->head\(static fn \(\): string => self::head\(\)\);/, 'content pages (Notes, Minn pages) through the head seam');
+    const dir = sitePath('src');
+    for (const f of readdirSync(dir)) {
+      const php = readFileSync(join(dir, f), 'utf8');
+      if (f === 'SiteNav.php' || !php.includes('SiteNav::nav(')) continue;
+      assert.ok(php.includes('Extension::head()'), `${f} draws the header without Extension::head (site-nav.css)`);
+    }
+    // The chat app's header names its bell too, so it comes in after the theme button has slid past.
+    assert.match(readFileSync(sitePath('community', 'community.css'), 'utf8'), /\.site-nav-bell \{[^}]*view-transition-name: site-nav-bell;/);
+  });
+
   it('the Minn theme draws the same button and loads the script', { skip: skipWithoutSite }, () => {
     assert.ok(readFileSync(sitePath('src', 'SiteNav.php'), 'utf8').includes('<button class="site-nav-theme" type="button" aria-label="Colour theme"></button>'));
     assert.ok(readFileSync(sitePath('src', 'Extension.php'), 'utf8').includes('<script src="/site/theme.js"></script>'));

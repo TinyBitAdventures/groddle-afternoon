@@ -176,7 +176,7 @@ describe('the header menu in the built pages (tools/site-nav/apply.mjs)', () => 
     assert.match(once, /<div class="site-nav-links">\n {8}<a href="\/items\/">Items<\/a>\n {8}<a href="\/players\/">Players<\/a>\n {8}<div class="site-nav-sub">[^\n]*<\/div><\/div>\n {8}<a class="site-nav-play" href="\/play\/online\/">Play<\/a>\n {6}<\/div>\n {6}<button class="site-nav-theme"/);
   });
 
-  it('draws the same markup as the theme (php: SiteNav::parse and nav)', { skip: (skipWithoutSite || (!existsSync(join(engine, 'src/Minn/Autoloader.php')) && 'Minn Engine not found (set MINN_ENGINE_DIR)')) }, () => {
+  it('draws the same markup as the theme, and the chat app\'s layout of it (php: SiteNav::parse and nav)', { skip: (skipWithoutSite || (!existsSync(join(engine, 'src/Minn/Autoloader.php')) && 'Minn Engine not found (set MINN_ENGINE_DIR)')) }, () => {
     const paths = ['/', '/items/', '/players/', '/project/', '/restoration/history/', '/compare/', '/changelog/a-note/', '/code/', '/codex/', '/tj/', '/tj/cartoons/x/', '/deepest/', '/empty/', '/play/online/'];
     for (const file of ['header-menu.html', 'submenus.html']) {
       let out;
@@ -192,6 +192,18 @@ describe('the header menu in the built pages (tools/site-nav/apply.mjs)', () => 
       for (const path of paths) {
         const php = out.nav[path].match(/<div class="site-nav-links">\n([\s\S]*?)\n\s*<\/div>/)[1].split('\n').map((l) => l.trim());
         assert.deepEqual(php, renderLinks(links, path, '').split('\n'), `${file} ${path}`);
+        // The chat app's header (/chat/, Austin 2026-11-04): the same links from the same menu, laid out its own way.
+        for (const [kind, html] of [['app', out.app[path]], ['appOut', out.appOut[path]]]) {
+          assert.match(html, /^<nav class="site-nav site-nav-app" aria-label="Site">\n {2}<div class="site-nav-row">\n/, `${kind} ${path}: its own class, no centred wrap`);
+          const app = html.match(/<div class="site-nav-links" id="site-nav-links">\n([\s\S]*?)\n\s*<\/div>/)[1].split('\n').map((l) => l.trim());
+          assert.deepEqual(app, php, `${kind} ${file} ${path}: the menu's links, no hard-coded ones`);
+          assert.ok(html.indexOf('<button class="site-nav-menu"') < html.indexOf('<div class="site-nav-links"'), 'the phone menu button opens the links after it');
+          assert.match(html, /<button class="site-nav-menu" type="button" aria-expanded="false" aria-controls="site-nav-links" aria-label="Menu" hidden><\/button>/);
+          assert.match(html, /<button class="site-nav-theme" type="button" aria-label="Colour theme"><\/button>\n {2}<\/div>\n<\/nav>$/, 'the theme button closes the row, after the links');
+          assert.ok(html.indexOf('site-nav-theme') > html.indexOf('site-nav-links'));
+        }
+        assert.match(out.app[path], /<div class="site-nav-bell" data-notif><button class="site-nav-bell-btn" [^>]*aria-controls="site-nav-notif" data-notif-open>.*<span data-notif-count>3<\/span>/, 'a signed-in reader\'s bell and its count');
+        assert.ok(!out.appOut[path].includes('site-nav-bell'), 'no bell signed out');
       }
     }
   });

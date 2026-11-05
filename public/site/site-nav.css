@@ -184,3 +184,24 @@ html { scroll-padding-top: calc(var(--site-nav-h) + 12px); }
 }
 
 @media (prefers-reduced-motion: reduce) { .site-nav-play, .site-nav-theme, .site-nav-toggle::before { transition: none; } }
+
+/* Going from page to page (Austin 2026-11-04): a cross-document View Transition. Every page with the
+   header loads this file, the built pages and the Minn ones alike, so every one opts in. The header,
+   its mark and name, its links and the theme button carry names, so on the way to /chat/ (whose header is
+   the chat app's: .site-nav-app, groddle-afternoon-site src/SiteNav.php) the centred header stretches
+   out into it, and back when leaving; the rest of the page cross-fades. Short and calm; with reduced
+   motion there is none at all, and a browser without them simply changes page. */
+@media (prefers-reduced-motion: no-preference) {
+  @view-transition { navigation: auto; }
+}
+.site-nav { view-transition-name: site-nav; }
+.site-nav .wordmark img { view-transition-name: site-nav-mark; }
+.site-nav .wordmark span { view-transition-name: site-nav-name; }
+.site-nav-links { view-transition-name: site-nav-links; }
+.site-nav-theme { view-transition-name: site-nav-theme; }
+::view-transition-group(site-nav),
+::view-transition-group(site-nav-mark),
+::view-transition-group(site-nav-name),
+::view-transition-group(site-nav-links),
+::view-transition-group(site-nav-theme) { animation-duration: 280ms; animation-timing-function: cubic-bezier(0.2, 0, 0, 1); }
+::view-transition-old(root), ::view-transition-new(root) { animation-duration: 200ms; }

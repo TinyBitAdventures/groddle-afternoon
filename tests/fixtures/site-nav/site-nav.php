@@ -4,7 +4,8 @@
  * src/SiteNav.php against the engine's classes and prints, per menu file,
  * the parsed links and the header on each page path as JSON, so
  * tests/site-nav-menu.test.js can hold tools/site-nav/apply.mjs to the same
- * bytes.
+ * bytes; "app" is the chat app's layout of the same header (/chat/: with a
+ * bell of 3 for a signed-in reader, "appOut" without one).
  *
  *   php tests/fixtures/site-nav/site-nav.php <engine public/minn> <groddle-afternoon-site> <menu.html> <path>...
  */
@@ -23,7 +24,11 @@ use Groddle\Minn\SiteNav;
 
 $links = SiteNav::parse((string) file_get_contents($menu));
 $nav = [];
+$app = [];
+$appOut = [];
 foreach ($paths as $path) {
     $nav[$path] = SiteNav::nav($links, $path);
+    $app[$path] = SiteNav::nav($links, $path, [], ['bell' => 3]);
+    $appOut[$path] = SiteNav::nav($links, $path, [], ['bell' => null]);
 }
-echo json_encode(['links' => $links, 'nav' => $nav], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) . "\n";
+echo json_encode(['links' => $links, 'nav' => $nav, 'app' => $app, 'appOut' => $appOut], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) . "\n";
