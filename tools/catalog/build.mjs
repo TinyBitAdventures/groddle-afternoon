@@ -42,6 +42,7 @@ import { supplyConversions } from '../job-obtainable.mjs';
 import { loadEncyclopedia } from '../encyclopedia/data.mjs';
 import { inRemake, makeParts, sep } from '../encyclopedia/parts.mjs';
 import { neverReleased, neverReleasedNote, neverReleasedTag } from '../encyclopedia/never-released.mjs';
+import { loadCosts } from './costs.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = join(here, '..', '..');
@@ -615,6 +616,8 @@ export async function buildCatalog({ inventory = readInventory(), evidence = rea
   const inCatalog = new Set(listed.map((i) => i.id));
   const names = new Map([...all.values()].map((i) => [i.id, { name: i.name, plural: i.plural }]));
   const remake = await readRemake(names);
+  // Recipe skills, energy and time, and vendors' sell prices (tools/catalog/costs.mjs).
+  const costs = await loadCosts(root);
   const quests = content('quests.json');
   const iconFiles = new Set(readdirSync(ICONS));
   const musicblocks = JSON.parse(readFileSync(join(pub, 'musicblocks', 'data.json'), 'utf8'));
@@ -672,7 +675,7 @@ export async function buildCatalog({ inventory = readInventory(), evidence = rea
   files[`${OUT}/index.html`] = indexPage(data, vendorIcons);
   entries.forEach((e, i) => {
     files[`${OUT}/${e.it.id}/index.html`] = itemPage(e, {
-      prev: entries[i - 1], next: entries[i + 1], remake, inCatalog, names, musicCards, quests, total: entries.length, index: i, ency,
+      prev: entries[i - 1], next: entries[i + 1], remake, inCatalog, names, musicCards, quests, total: entries.length, index: i, ency, costs,
     });
   });
   // Each page's icons and art carry their content keys (tools/data-versions/build.mjs keyAssetUrls).
@@ -814,7 +817,7 @@ function itemPage(e, ctx) {
   const linkItem = (id) => (inCatalog.has(id) ? `../${esc(id)}/` : null);
   const qty = (id, n) => (n === 1 || n === '1' ? `${article(nameOf(id))} ${link(id)}` : `${esc(n)} ${link(id, pluralOf(id))}`);
   const tool = (id) => (id ? `${article(nameOf(id))} ${link(id)}` : '');
-  const { ency } = ctx;
+  const { ency, costs } = ctx;
   const info = (key) => (key.startsWith('item:') ? (inCatalog.has(key.slice(5)) ? ency.items.get(key.slice(5)) : null) : ency.entries.get(key) || null);
   const P = makeParts(p, info, (key) => (key.startsWith('item:') ? names.get(key.slice(5))?.name : ency.nameOf(key)));
 
@@ -866,8 +869,20 @@ function itemPage(e, ctx) {
   }).filter((li, i, all) => li && all.indexOf(li) === i);
   const uniq = (list) => [...new Set(list)];
   const sold = e.ways.filter((w) => w.kind === 'sold');
-  const vendorCards = uniq(sold.map((w) => P.vendorCard(ency.stores.get(w.vendor) || `vendor:${w.vendor}`, { label: w.label, price: w.price })));
-  const recipeRows = uniq(e.ways.filter((w) => w.recipe).map((w) => P.recipeRow(w.recipe, { id: `recipe-${w.recipe.key}` })));
+  // Only what goes in a pack is sold: street objects stay where they are.
+  const sells = inRemake(e.status) && it.takeable ? costs.sellPrice(it.id) : null;
+  const vendorCards = uniq(sold.map((w) => P.vendorCard(ency.stores.get(w.vendor) || `vendor:${w.vendor}`, { label: w.label, price: w.price, sell: sells ? costs.sellAt(it.id, w.vendor) : 0 })));
+  // Each recipe with every skill it needs, its energy and its time (tools/catalog/costs.mjs).
+  const skillWord = (id) => esc(ency.entries.get(`skills:${id}`)?.name || remake.skillName(id));
+  const costChips = (c) => [
+    P.chip(c.energy ? `${fmt(c.energy)} energy each` : 'no energy'),
+    P.chip(esc(c.time)),
+    ...(c.better ? [P.chip(`quicker with ${skillWord(c.better)}`)] : []),
+  ];
+  const recipeRows = uniq(e.ways.filter((w) => w.recipe).map((w) => {
+    const c = costs.recipeCosts(w.recipe);
+    return P.recipeRow(w.recipe, { id: `recipe-${w.recipe.key}`, skills: c.skills, chips: costChips(c) });
+  }));
 
   // What it is used for in the remake.
   const uses = [];
@@ -877,10 +892,20 @@ function itemPage(e, ctx) {
     return out && inCatalog.has(out) ? P.tile(`item:${out}`, { name: r.name, anchor: `recipe-${r.key}`, sub: subText }) : P.tile(`recipe:${r.key}`, { name: r.name, sub: subText });
   };
   const seenUse = new Set();
+  // The tile's line: the tool, the skills, the energy and the time, as the recipe row on the result's page has them.
+  const costLine = (r, withTool) => {
+    const c = costs.recipeCosts(r);
+    return [
+      ...(withTool ? [r.tool ? esc(`with ${nameOf(r.tool)}`) : 'by hand'] : []),
+      ...c.skills.map(skillWord),
+      c.energy ? `${fmt(c.energy)} energy` : 'no energy',
+      esc(c.time.replace(/ seconds?\b/, ' s')),
+    ].join(', ');
+  };
   const usedIn = (remake.usedIn.get(it.id) || []).filter((r) => !seenUse.has(r.key) && seenUse.add(r.key))
-    .map((r) => recipeTile(r, r.tool ? esc(`with ${nameOf(r.tool)}`) : 'by hand'));
+    .map((r) => recipeTile(r, costLine(r, true)));
   const seenTool = new Set();
-  const makes = (remake.toolFor.get(it.id) || []).filter((r) => !seenTool.has(r.key) && seenTool.add(r.key)).map((r) => recipeTile(r, ''));
+  const makes = (remake.toolFor.get(it.id) || []).filter((r) => !seenTool.has(r.key) && seenTool.add(r.key)).map((r) => recipeTile(r, costLine(r, false)));
   const useTiles = [
     usedIn.length ? `<h3>An ingredient in ${usedIn.length === 1 ? 'one recipe' : `${usedIn.length} recipes`}</h3>\n          ${P.tiles(usedIn)}` : '',
     makes.length ? `<h3>The tool for ${makes.length === 1 ? 'one recipe' : `${makes.length} recipes`}</h3>\n          ${P.tiles(makes)}` : '',
@@ -954,7 +979,9 @@ ${usesHtml.length ? `          <ul class="cat-list">
   function statChips() {
     const list = [];
     if (it.baseCost) list.push(P.currants(it.baseCost, 'ency-chip'));
-    if (it.stackmax > 1) list.push(P.chip(`stacks to ${fmt(it.stackmax)}`));
+    // What a vendor pays for one in the remake, beside the price (tools/catalog/costs.mjs).
+    if (sells) list.push(P.chip(`sells for <b>${fmt(sells.usual)}</b>`, { cls: 'cat-sell' }));
+    if (it.stackmax > 1) list.push(P.chip(`stacks to <b>${fmt(it.stackmax)}</b>`, { cls: 'cat-stack' }));
     if (use?.energy) list.push(P.chip(`${fmt(use.energy)} energy`));
     if (use?.mood) list.push(P.chip(`${fmt(use.mood)} mood`));
     return P.chips(list, 'cat-stats');
@@ -1007,6 +1034,7 @@ ${extras.length ? `          <ul class="cat-list cat-extras">\n${extras.map((x) 
         <dl class="cat-facts">
           <dt>Category</dt><dd>${esc(e.category)}</dd>
           <dt>Base price</dt><dd>${it.baseCost ? `${fmt(it.baseCost)} currants` : 'None'}</dd>
+          ${sells ? `<dt>Sells for</dt><dd>${fmt(sells.usual)} ${sells.usual === 1 ? 'currant' : 'currants'}${sells.at.length ? ` (${andList(sells.at.map((a) => `${fmt(a.price)} at the ${esc(a.label)}`))})` : ''}</dd>` : ''}
           ${it.stackmax ? `<dt>Stacks to</dt><dd>${fmt(it.stackmax)}</dd>` : ''}
           ${it.tags.length ? `<dt>Tags</dt><dd><ul class="note-tags">${it.tags.map((t) => `<li>${esc(t)}</li>`).join('')}</ul></dd>` : ''}
         </dl>

@@ -89,29 +89,40 @@ export function makeParts(p, info, nameOf = () => null) {
   /** A row of chips, read as a list: "75 iMG, 10 favor with Pot, Recipe: Tasty Pasta". */
   const chipRow = (list) => list.map((c, i) => (i < list.length - 1 ? sepChip(c) : c)).join(' ');
   const chips = (list, cls = '') => (list.length ? `<p class="ency-chips${cls ? ` ${cls}` : ''}">${chipRow(list)}</p>` : '');
-  /** A recipe as ingredients, an arrow and the result, with the tool and skill as chips. */
-  const recipeRow = (r, { id = '', note = '' } = {}) => {
+  /** A skill as a chip, linking its page when it has one. */
+  const skillChip = (id) => {
+    const s = info(`skills:${id}`);
+    return s ? chip(`needs ${esc(s.name)}`, { pic: s.icon, link: href(`skills:${id}`) }) : chip(`needs ${esc(nameOf(`skills:${id}`) || id)}`);
+  };
+  /**
+   * A recipe as ingredients, an arrow and the result, with the tool and skill as chips.
+   * opts.skills: every skill it needs (else the recipe's own skill, when it has a page);
+   * opts.chips: more chips after them (the item pages' energy and time).
+   */
+  const recipeRow = (r, { id = '', note = '', skills = null, chips: more = [] } = {}) => {
     const ins = (r.inputs || []).map((i) => tile(`item:${i.classTsid}`, { n: i.qty }));
     const outs = (r.outputs || []).map((o) => tile(`item:${o.classTsid}`, { n: o.qty }));
     const extras = [];
     if (r.tool) extras.push(chip(`with ${article(info(`item:${r.tool}`)?.name || r.tool)} ${esc(info(`item:${r.tool}`)?.name || r.tool)}`, { pic: info(`item:${r.tool}`)?.icon, link: info(`item:${r.tool}`) ? href(`item:${r.tool}`) : null }));
     else extras.push(chip('by hand'));
-    if (r.skill && info(`skills:${r.skill}`)) extras.push(chip(`needs ${esc(info(`skills:${r.skill}`).name)}`, { pic: info(`skills:${r.skill}`).icon, link: href(`skills:${r.skill}`) }));
+    if (skills) extras.push(...skills.map(skillChip));
+    else if (r.skill && info(`skills:${r.skill}`)) extras.push(skillChip(r.skill));
     if (note) extras.push(chip(note));
+    extras.push(...more);
     return `<div class="ency-recipe"${id ? ` id="${esc(id)}"` : ''}>
             ${r.name ? `<p class="ency-recipe-name">${esc(r.name)}</p>` : ''}<div class="ency-recipe-row"><ul class="ency-tiles ency-ins">${ins.join('<li class="ency-plus" aria-hidden="true">+</li>')}</ul> <span class="ency-arrow" aria-label="makes">→</span> <ul class="ency-tiles ency-outs">${outs.join('')}</ul></div>
             ${chips(extras)}
           </div>`;
   };
-  /** A store card: the keeper's picture, the store's name and the price in currants. */
+  /** A store card: the keeper's picture, the store's name, the price in currants and (opts.sell) what the store pays for one. */
   const currants = (n, cls = 'ency-price') => `<span class="${cls}">${img(info('item:pile_of_currants')?.icon || null, 'ency-chip-ic', 18)}<span>${esc(fmt(n))} currants</span></span>`;
-  const vendorCard = (key, { price, label } = {}) => {
+  const vendorCard = (key, { price, label, sell = 0 } = {}) => {
     const it = info(key);
-    const body = `${img(it?.icon, 'ency-vendor-ic', 52)}<span class="ency-vendor-text"><span class="ency-vendor-name">${esc(label || it?.name || key)}${price ? sep() : ''}</span>${price ? ` ${currants(price)}` : ''}</span>`;
+    const body = `${img(it?.icon, 'ency-vendor-ic', 52)}<span class="ency-vendor-text"><span class="ency-vendor-name">${esc(label || it?.name || key)}${price ? sep() : ''}</span>${price ? ` ${currants(price)}` : ''}${sell ? `${sep()} <span class="ency-sell">sell for ${esc(fmt(sell))}</span>` : ''}</span>`;
     return it ? `<li><a class="ency-vendor" href="${href(key)}">${body}</a></li>` : `<li><span class="ency-vendor">${body}</span></li>`;
   };
   const vendors = (list) => (list.length ? `<ul class="ency-vendors">${list.join('')}</ul>` : '');
-  return { href, img, tile, tiles, chip, chips, chipRow, recipeRow, vendorCard, vendors, currants };
+  return { href, img, tile, tiles, chip, chips, chipRow, recipeRow, skillChip, vendorCard, vendors, currants };
 }
 
 /**

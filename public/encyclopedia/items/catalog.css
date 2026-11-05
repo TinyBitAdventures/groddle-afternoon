@@ -74,6 +74,9 @@
 }
 .cat-hero-icon { max-width: 144px; max-height: 144px; width: auto; height: auto; object-fit: contain; }
 .cat-hero-icon.cat-ph { width: 96px; height: 96px; }
+/* The header's figures: price, what a vendor pays, how many stack. */
+.cat-stats .ency-chip b { margin-left: 0; }
+.cat-stats .cat-stack { background: color-mix(in srgb, var(--moss) 14%, var(--surface)); }
 .cat-plural { margin: 0 0 10px; color: var(--muted); }
 .cat-status { margin: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
 .cat-register { font-family: var(--font-mono); font-size: 13px; color: var(--muted); }
@@ -232,6 +235,7 @@ a.ency-vendor:hover { border-color: var(--moss); }
 .ency-vendor-text { display: grid; gap: 2px; }
 .ency-vendor-name { font-weight: 800; }
 .ency-price { display: inline-flex; align-items: center; gap: 5px; font-weight: 700; }
+.ency-sell { font-size: 14px; color: var(--muted); }
 
 /* Quest steps and talk. */
 .ency-steps { margin: 0 0 18px; padding-left: 26px; display: grid; gap: 14px; max-width: 60em; }
