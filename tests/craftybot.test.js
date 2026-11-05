@@ -402,7 +402,7 @@ describe('delivery and wiring', () => {
 
 describe('craftybot feature: the ingredient source and the job menu', async () => {
   // The feature imports these with their browser cache tags; load the same module instances.
-  const { craftybotFeature } = await import('../public/js/features/craftybot-feature.js?v=f53a12ef');
+  const { craftybotFeature } = await import('../public/js/features/craftybot-feature.js?v=2a2c4196');
   const { homesFeature } = await import('../public/js/features/homes-feature.js?v=43ffde4d');
   const cbMod = await import('../public/js/craftybot.js?v=41eacd5d');
   const making = await import('../public/js/making.js?v=82ce9d08');
@@ -538,5 +538,64 @@ describe('the quantity box follows the count as it is typed', () => {
     assert.match(parts, /lastPanelKey = panelKey\(engine\);/);
     // The panel's own refresh still never rebuilds under a focused box.
     assert.match(fn('renderPanel'), /if \(!force && panel\.contains\(document\.activeElement\) && document\.activeElement\?\.tagName === 'INPUT'\) return;/);
+  });
+});
+
+// G538 (Austin 2026-11-05): the bot vanished now and then while idle. Each sheet loads the first
+// time its clip plays (the first fidget, collapse, sleep, peek), and a sprite given frames of a
+// sheet still loading draws nothing until it arrives. The original client had the whole SWF at
+// once, so the bot keeps its frame until the next sheet is in.
+describe('G538: the bot never draws a sheet that is still loading', async () => {
+  const { showClipWhenLoaded } = await import('../public/js/features/craftybot-feature.js?v=2a2c4196');
+  const fakeIo = () => {
+    const loaded = new Set();
+    const waiting = [];
+    return {
+      loaded,
+      load(tex) { loaded.add(tex); for (const [t, fn] of waiting.splice(0)) if (loaded.has(t)) fn(); else waiting.push([t, fn]); },
+      isLoaded: (tex) => loaded.has(tex),
+      onLoaded: (tex, fn) => (loaded.has(tex) ? fn() : waiting.push([tex, fn])),
+    };
+  };
+  const show = (v, clip) => () => { v.pendingClip = null; v.clip = clip; v.shown.push(clip); };
+
+  it('holds the current frame until the next sheet loads, then shows it', () => {
+    const io = fakeIo();
+    const v = { clip: 'sleepMode', pendingClip: null, shown: [] };
+    const peek = ['peek-0'];
+    assert.equal(showClipWhenLoaded(v, 'peek', peek, show(v, 'peek'), io), false);
+    assert.equal(v.clip, 'sleepMode', 'still drawing the sleeping bot');
+    assert.equal(v.pendingClip, 'peek');
+    io.load('peek-0');
+    assert.deepEqual(v.shown, ['peek']);
+    assert.equal(v.clip, 'peek');
+  });
+
+  it('shows at once when the sheet is in, or when nothing is drawn yet', () => {
+    const io = fakeIo();
+    io.load('idle0-0');
+    const v = { clip: 'walk', pendingClip: null, shown: [] };
+    assert.equal(showClipWhenLoaded(v, 'idle0', ['idle0-0'], show(v, 'idle0'), io), true);
+    const fresh = { clip: null, pendingClip: null, shown: [] };
+    assert.equal(showClipWhenLoaded(fresh, 'sleepMode', ['sleep-0'], show(fresh, 'sleepMode'), io), true);
+  });
+
+  it('a later clip wins over one still waiting for its sheet', () => {
+    const io = fakeIo();
+    io.load('sleep-0');
+    const v = { clip: 'idle0', pendingClip: null, shown: [] };
+    showClipWhenLoaded(v, 'collapse', ['collapse-0'], show(v, 'collapse'), io);
+    showClipWhenLoaded(v, 'sleepMode', ['sleep-0'], show(v, 'sleepMode'), io);
+    io.load('collapse-0');
+    assert.deepEqual(v.shown, ['sleepMode'], 'the late collapse sheet does not replace the sleeping bot');
+  });
+
+  it('every clip change goes through it, and a fidget never cancels a waiting clip', () => {
+    const src = readFileSync(join(PUBLIC, 'js/features/craftybot-feature.js'), 'utf8');
+    const setClip = src.slice(src.indexOf('\nfunction setClip('), src.indexOf('\n}\n', src.indexOf('\nfunction setClip(')));
+    assert.match(setClip, /showClipWhenLoaded\(v, clip, frames, show\)/);
+    assert.doesNotMatch(setClip, /v\.anim\.textures = clipFrames/, 'no direct swap to a sheet that may be loading');
+    assert.equal((src.match(/\.textures = /g) || []).length, 1, 'only show() swaps the frames');
+    assert.match(src, /onComplete: \(\) => \{ if \(!v\.pendingClip\) setClip\(engine, 'idle0', true\); \}/);
   });
 });

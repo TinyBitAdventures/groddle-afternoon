@@ -624,17 +624,50 @@ function botSubtitle() {
   return `${v.jobs_count}/${v.jobs_max} queued · fuel ${v.fuel_count}/${v.fuel_max}`;
 }
 
-function setClip(engine, clip, restart = true) {
+/**
+ * Show a clip's sheet on the bot. G538 (Austin 2026-11-05: the bot vanished now and then while
+ * idle): each sheet loads the first time its clip plays, and a sprite given frames of a sheet
+ * still loading draws nothing, so the bot was gone until it came (the first fidget, collapse,
+ * sleep and peek; seconds on a slow connection). The original client loaded the whole
+ * npc_crafty_bot.swf at once, so a state change never left it blank: the bot now keeps its
+ * current frame until the next sheet has loaded, then plays it from where its state began.
+ * `opts.onComplete` runs when a one-shot clip ends; `opts.place(v)` picks the frame to start on.
+ */
+function setClip(engine, clip, restart = true, opts = {}) {
   const v = view?.bot;
   if (!v || v.anim.destroyed) return;
-  if (v.clip === clip && !restart) return;
-  const def = CLIPS[clip];
-  v.anim.textures = clipFrames(engine, clip);
-  v.anim.loop = def.loop;
-  v.anim.onComplete = null;
-  v.clip = clip;
-  if (def.frames > 1) v.anim.gotoAndPlay(0);
-  else v.anim.gotoAndStop(0);
+  if (v.clip === clip && !restart && !v.pendingClip) return;
+  const frames = clipFrames(engine, clip);
+  const show = () => {
+    if (v.anim.destroyed) return;
+    const def = CLIPS[clip];
+    v.pendingClip = null;
+    v.anim.textures = frames;
+    v.anim.loop = def.loop;
+    v.anim.onComplete = opts.onComplete || null;
+    v.clip = clip;
+    if (def.frames > 1) v.anim.gotoAndPlay(0);
+    else v.anim.gotoAndStop(0);
+    opts.place?.(v);
+  };
+  showClipWhenLoaded(v, clip, frames, show);
+}
+
+/**
+ * G538: show a clip now when nothing is drawn yet or its sheet is in; otherwise keep the frame on
+ * screen and show it once the sheet loads, unless another clip was asked for meanwhile. Returns
+ * whether it showed at once. `io` swaps the loading checks in tests.
+ */
+export function showClipWhenLoaded(v, clip, frames, show, io = { isLoaded, onLoaded }) {
+  if (!v.clip || io.isLoaded(frames[0])) {
+    show();
+    return true;
+  }
+  v.pendingClip = clip;
+  io.onLoaded(frames[0], () => {
+    if (v.pendingClip === clip) show();
+  });
+  return false;
 }
 
 /** Map the rules' animation state onto a sheet, starting where the state began. */
@@ -645,21 +678,26 @@ function syncAnim(engine, t) {
   if (v.animKey !== key) {
     v.animKey = key;
     const clip = ANIM_CLIP[bot.anim] || (CLIPS[bot.anim] ? bot.anim : 'idle0');
-    setClip(engine, clip, true);
-    if (bot.anim === 'craft') {
-      // Hold the open cube while it works.
-      v.anim.gotoAndStop(CLIPS.craftStart.frames - 1);
-    } else if (!CLIPS[clip].loop && CLIPS[clip].frames > 1) {
-      // Catch up a non-looping clip that started a while ago (offline or tab hidden).
-      const into = Math.floor(((t - bot.animAt) / 1000) * FPS);
-      if (into >= CLIPS[clip].frames - 1) v.anim.gotoAndStop(CLIPS[clip].frames - 1);
-      else if (into > 0) v.anim.gotoAndPlay(into);
-    }
+    const anim = bot.anim;
+    const animAt = bot.animAt;
+    setClip(engine, clip, true, {
+      place: (sv) => {
+        if (anim === 'craft') {
+          // Hold the open cube while it works.
+          sv.anim.gotoAndStop(CLIPS.craftStart.frames - 1);
+        } else if (!CLIPS[clip].loop && CLIPS[clip].frames > 1) {
+          // Catch up a non-looping clip that started a while ago (offline, tab hidden, or its sheet still loading).
+          const into = Math.floor(((now(engine) - animAt) / 1000) * FPS);
+          if (into >= CLIPS[clip].frames - 1) sv.anim.gotoAndStop(CLIPS[clip].frames - 1);
+          else if (into > 0) sv.anim.gotoAndPlay(into);
+        }
+      },
+    });
   }
   // An idle bot fidgets now and then (idle1 / idle2), then stands again.
-  if (bot.anim === 'idle0' && bot.craftState === 'idle' && v.clip === 'idle0' && Math.random() < 0.0015) {
-    setClip(engine, Math.random() < 0.5 ? 'idle1' : 'idle2', true);
-    v.anim.onComplete = () => setClip(engine, 'idle0', true);
+  if (bot.anim === 'idle0' && bot.craftState === 'idle' && v.clip === 'idle0' && !v.pendingClip && Math.random() < 0.0015) {
+    // A state's clip waiting on its sheet wins over the stand after the fidget.
+    setClip(engine, Math.random() < 0.5 ? 'idle1' : 'idle2', true, { onComplete: () => { if (!v.pendingClip) setClip(engine, 'idle0', true); } });
   }
   v.container.x = Math.round(bot.move ? moveX(bot, t) : bot.x);
   v.container.y = groundYAt(engine, v.container.x) + 2;
