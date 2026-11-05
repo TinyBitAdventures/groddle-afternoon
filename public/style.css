@@ -9929,13 +9929,16 @@ html[data-street-cards] .notify-notices { visibility: hidden; }
 .thread-reply:hover { border-color: var(--border-strong); color: var(--accent); }
 .thread-reply:focus-visible { opacity: 1; outline: 2px solid var(--focus); outline-offset: 1px; }
 @media (hover: none) { .thread-reply { opacity: 0.7; } }
+/* A button of its own, with room before the next line, so it never reads as part of it (Austin 2026-11-04). */
 .thread-open {
   display: flex;
   align-items: center;
+  gap: var(--sp-2);
   width: fit-content;
-  min-height: 22px;
-  margin-top: var(--sp-2);
-  padding: 0 var(--sp-4);
+  min-height: 24px;
+  margin-top: var(--sp-3);
+  margin-bottom: var(--sp-4);
+  padding: 0 var(--sp-5) 0 var(--sp-4);
   border: 1px solid var(--border);
   border-radius: var(--radius-pill);
   background: var(--surface-bright);
@@ -9945,6 +9948,15 @@ html[data-street-cards] .notify-notices { visibility: hidden; }
   font-weight: var(--fw-bold);
   line-height: var(--lh-none);
   cursor: pointer;
+}
+.thread-open::before {
+  content: '';
+  flex: none;
+  width: 1.1em;
+  height: 1.1em;
+  background: currentColor;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='black' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 4.5h10v6.5H8l-3 2.5V11H3z'/%3E%3Cpath d='M15 8h2v6.5h-1.5V17l-3-2.5H10'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='black' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 4.5h10v6.5H8l-3 2.5V11H3z'/%3E%3Cpath d='M15 8h2v6.5h-1.5V17l-3-2.5H10'/%3E%3C/svg%3E") center / contain no-repeat;
 }
 .thread-open[hidden] { display: none; }
 .thread-open:hover { border-color: var(--accent); background: var(--accent-soft); }

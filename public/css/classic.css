@@ -1620,9 +1620,11 @@
 :root[data-ui="classic"] .thread-reply:hover { border-color: var(--c-classic-input-hi-border); background: var(--c-classic-input-hi); color: var(--c-classic-link); }
 :root[data-ui="classic"] .thread-reply:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--c-classic-focus); }
 :root[data-ui="classic"] .thread-open {
+  gap: calc(3 * var(--cu));
   min-height: calc(18 * var(--cu));
-  margin-top: calc(2 * var(--cu));
-  padding: 0 calc(5 * var(--cu));
+  margin-top: calc(3 * var(--cu));
+  margin-bottom: calc(6 * var(--cu));
+  padding: 0 calc(6 * var(--cu)) 0 calc(4 * var(--cu));
   border: 1px solid var(--c-classic-input-border);
   border-radius: 3px;
   background: var(--c-classic-input);
