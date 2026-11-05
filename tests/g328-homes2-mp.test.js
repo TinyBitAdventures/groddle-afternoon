@@ -33,8 +33,8 @@ import {
 } from '../public/js/neighbours-mp.js?v=a8d5544e';
 import { createButlerState, nextHandover, normalizeButlerState, packagesAndMessagesForOwner } from '../public/js/butler.js?v=86316578';
 import { createGarden, tickGarden } from '../public/js/garden.js?v=9c151062';
-import { butlerApi } from '../public/js/features/butler-feature.js?v=46892148';
-import { neighboursMpFeature } from '../public/js/features/neighbours-mp-feature.js?v=bbd6e95a';
+import { butlerApi } from '../public/js/features/butler-feature.js?v=f672bbc6';
+import { neighboursMpFeature } from '../public/js/features/neighbours-mp-feature.js?v=74a0a027';
 import { createMinnAccount } from '../public/js/minn-account.js?v=9544b0a0';
 import { HAS_SERVER, HAS_SITE, SITE_DIR, serverPath, sitePath } from '../tools/repos.mjs';
 

@@ -118,7 +118,7 @@ import {
   tutorialPhysics,
   SKIP_TUTORIAL_CARDS,
   vogPages,
-} from '../newxp.js?v=ceff0028';
+} from '../newxp.js?v=249fdf4c';
 import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=d82f3b00';
 import { QUOIN_SHEET, QUOIN_TYPES, qrazyRewardForLevel } from '../quoins.js?v=dfe1ff0a';
 import { soundForQuoin } from '../sound-moments.js?v=2f8597cd';
@@ -131,7 +131,7 @@ import * as kit from '../quest-rooms/kit.js?v=4d8ab82d';
 import { frameTexture, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js?v=3149d699';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 import { displayTopOf, itemstackOverlayPoint, playPoofIn, playSheetOverlay, poofInAlpha } from '../overlay-art.js?v=11b6dd7f';
-import { HOME_MACHINE } from '../home-ticket.js?v=68215405';
+import { HOME_MACHINE } from '../home-ticket.js?v=601d0004';
 import { animalAnchorX, createAnimalState } from '../animals.js?v=bf8fe138';
 import {
   AK_ANIMALS,

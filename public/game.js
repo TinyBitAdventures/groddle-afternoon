@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=b49a6da6';
 import { createFeatureHost } from './js/feature-host.js?v=020c9329';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=4e534c56';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=ca4d8484';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -418,7 +418,7 @@ import {
 } from './js/skills.js?v=4542bdf9';
 import { skillTitle, skillTreeCounts, spendEmblemForSkill, studyPillName } from './js/skill-tree.js?v=53795620';
 import { CARD_ART_LAYERS } from './js/imagination-data.js?v=4a85e7fe';
-import { renderSkillTreePanel, focusSkillInPanel } from './js/skills-panel.js?v=4d486440';
+import { renderSkillTreePanel, focusSkillInPanel } from './js/skills-panel.js?v=52f7c25f';
 import {
   createBuffState,
   applyBuff,
@@ -496,7 +496,7 @@ import {
   imagineHome,
   isHomePlaceTsid,
 } from './js/homes.js?v=631ab6b8';
-import { HOME_MACHINE, offerHomeTicket, renderTicketMachine } from './js/home-ticket.js?v=68215405';
+import { HOME_MACHINE, offerHomeTicket, renderTicketMachine } from './js/home-ticket.js?v=601d0004';
 import {
   MAIL_COMPANIONS,
   archiveMail,
@@ -928,7 +928,7 @@ import { installHiresIcons } from './js/icon-hires.js?v=5b68aeaa';
 import { installHiresDecos } from './js/deco-hires.js?v=cb905e17';
 import { loadAudioLevels, loadMutedPreference, saveAudioLevel, saveMutedPreference } from './js/audio-pref.js?v=6fe817bc';
 import { createAudioBuses, fadeGain } from './js/audio-buses.js?v=af167b54';
-import { installTopBar, renderTopBar } from './js/ui/topbar.js?v=00387e52';
+import { installTopBar, renderTopBar } from './js/ui/topbar.js?v=68704b2d';
 import { focusBack, installFocusReturn, lastInput } from './js/ui/focus-return.js?v=da190597';
 import { installContextGuard } from './js/ui/context-guard.js?v=0f71ac17';
 import { QUOIN_FRAME_BOB, advanceQuoinClock, quoinBobBetweenFrames } from './js/quoin-motion.js?v=ea0bd408';
@@ -942,13 +942,14 @@ import { mountSocialDrawer } from './js/ui/social-drawer.js?v=debf9446';
 import { bindChatLinks } from './js/chat-links.js?v=b717fac7';
 import { bindDragScroll } from './js/ui/drag-scroll.js?v=9a527ac8';
 import { SIDE_SHEET_IDS, bindTabs, inSideSheet, mountPanelShell, sheetKeyToWorld } from './js/ui/panel-shell.js?v=e2abdf9e';
-import { createQuestSheet, questStep } from './js/ui/quest-sheet.js?v=3bf54502';
+import { createQuestSheet, questStep } from './js/ui/quest-sheet.js?v=cbd12125';
 import { createQuestTracker } from './js/ui/quest-tracker.js?v=8f823ac2';
 import { bindContextTrigger, createContextMenu, isContextMenuKey as isMenuKey, MORE_KEYS_LABEL } from './js/ui/context-menu.js?v=57c5f1fe';
 import { bindCountField, countKeyValue, countStepMarkup, typedCount } from './js/ui/count-chooser.js?v=b8361b21';
 import { bindVerbMenu, fitVerbMenuRows, focusVerbRow, lockVerbMenuSize, makePickTile, makeVerbRow, pickGridCols, placeVerbMenu, plainWords, refuseVerbRow, syncVerbDetail, verbMenuKey, verbRowAttrs, verbRowInner, verbRowKeys } from './js/ui/verb-menu.js?v=6cc4df84';
 import { createPromptSettler, promptId } from './js/prompt-settle.js?v=509ba9cc';
-import { clientKeyAction, createHotkeysSheet, isHotkeySheetRelease, isPlainKey } from './js/client-hotkeys.js?v=c42fbb76';
+import { clientKeyAction, createHotkeysSheet, isHotkeySheetRelease, isPlainKey } from './js/client-hotkeys.js?v=51814cb2';
+import { ENCYCLOPEDIA_MENU_LABEL, createEncyclopedia, isEncyclopediaKey } from './js/encyclopedia-links.js?v=eebc2a5d';
 import { EAT_PICK_TEXT, bestFoodIndex, eatChoices, eatTip } from './js/eat-pick.js?v=8fb763d0';
 import { installHeldKeyGuard, isMacPlatform } from './js/held-keys.js?v=98b96620';
 import { signpostArmRows, worldContextAction } from './js/world-context-menu.js?v=f3f48805';
@@ -1423,9 +1424,9 @@ function installMoreMenu() {
  * The player menu (PlayerInfoUI.as toggleMenu): clicking your name or the
  * level pill drops down PlayerStatsUI (level, iMG 'til the next level, mood,
  * energy, currants) above the PlayerInfoButtons the remake has (Skills,
- * Vanity, Wardrobe). Profile, Groups, Friends, Keys, Encyclopedia, Forums,
- * Auctions, Preferences and Account had nothing behind them without the
- * website and other players, so they are left out.
+ * Vanity, Wardrobe, Encyclopedia: ENCYC 2026-11-05). Profile, Groups, Friends,
+ * Keys, Forums, Auctions, Preferences and Account had nothing behind them
+ * without the website and other players, so they are left out.
  */
 function renderPlayerMenu(menu) {
   const info = levelInfoForXp(pc.xp);
@@ -1454,6 +1455,8 @@ function renderPlayerMenu(menu) {
     ['Skills', () => document.getElementById('skills-btn')?.click()],
     ['Vanity', () => openLookBuilderOn('hair')],
     ['Wardrobe', () => openLookBuilderOn('top')],
+    // ENCYC: PlayerInfoButtons.as 43 (TSFrontController.as openEncyclopediaPage 4395-4400): the home page.
+    [ENCYCLOPEDIA_MENU_LABEL, () => openEncyclopedia(null)],
   ]) {
     const btn = document.createElement('button');
     btn.type = 'button';
@@ -1480,6 +1483,82 @@ function openLookBuilderOn(slot) {
 /** G254: the client's hold-? sheet (js/client-hotkeys.js); the keyring row only in multiplayer. */
 const hotkeysSheet = createHotkeysSheet(document, { keyring: () => Boolean(document.getElementById('keys-btn')), hub: () => modernUi(), reports: () => Boolean(document.getElementById('bug-btn')) });
 
+/**
+ * ENCYC (Austin 2026-11-05, js/encyclopedia-links.js): the Encyclopedia from the game. Its index
+ * (encyclopedia/search.json) loads a few seconds after the game starts; once it is in, the open
+ * item card and sheets draw their "In the Encyclopedia" links.
+ */
+const encyclopedia = createEncyclopedia({
+  onReady: () => {
+    updateHud();
+    if (isSkillsOpen()) renderSkillsPanel();
+  },
+});
+
+/** ENCYC: a world thing as an Encyclopedia subject (a dropped stack is its item; players have no page). */
+function encyclopediaTargetSubject(t) {
+  if (!t) return null;
+  const id = t.classId === 'dropped_item' ? t.state?.classTsid : t.classId;
+  if (!id || /^pc_/.test(String(id))) return null;
+  return { id: String(id), name: String(t.label || ITEM_CATALOG[id]?.label || '') };
+}
+
+/** ENCYC: an item class as a subject, by its pack name. */
+function encyclopediaItemSubject(cls) {
+  return cls ? { id: String(cls), name: String(ITEM_CATALOG[cls]?.label || cls) } : null;
+}
+
+/**
+ * ENCYC: what `i` is about: the item card (the pack's stack menu) or verb menu that is open, then
+ * what the pointer is over (a pack slot or store tile, then something in the world), then a pack
+ * slot with the keyboard's focus, then the street's region; null is the home page.
+ */
+function encyclopediaSubject() {
+  if (isPackPopoverOpen()) {
+    const cls = document.getElementById('pack-popover')?.dataset.packFor;
+    if (cls) return encyclopediaItemSubject(cls);
+  }
+  if (menuTarget) {
+    const subject = encyclopediaTargetSubject(menuTarget);
+    if (subject) return subject;
+  }
+  const hovered = [...document.querySelectorAll('.pack-slot[data-tsid]:hover, [data-vendor-item]:hover')].pop();
+  if (hovered) return encyclopediaItemSubject(hovered.dataset.tsid || hovered.dataset.vendorItem);
+  // The world's hover outline stays after the pointer leaves the canvas: only a pointer on the canvas counts.
+  if (hoverTarget?.sprite && !hoverTarget.sprite.destroyed && app?.canvas?.matches?.(':hover')) {
+    const subject = encyclopediaTargetSubject(hoverTarget);
+    if (subject) return subject;
+  }
+  const focused = document.activeElement?.closest?.('.pack-slot[data-tsid], [data-vendor-item]');
+  if (focused) return encyclopediaItemSubject(focused.dataset.tsid || focused.dataset.vendorItem);
+  const hubName = currentStreet?.hubName || '';
+  return hubName ? { section: 'places', name: hubName, hubId: String(currentStreet?.hubId ?? '') } : null;
+}
+
+/** ENCYC: open the Encyclopedia (on a subject, or its home page) and note where it went for QA. */
+function openEncyclopedia(subject = null) {
+  const went = encyclopedia.open(subject);
+  const note = (url) => setCanvasData('encyclopediaOpened', String(url || ''));
+  if (went && typeof went.then === 'function') went.then(note);
+  else note(went);
+  return went;
+}
+
+/**
+ * ENCYC: the `i` key (TSMainView.as iKeyHandler 870-891, which started Info mode). It is quiet where
+ * the client's was: where the tutorial hides the imagination menu (nx-hide-actions, the client's
+ * location.no_imagination), in decorate or cultivate mode and in the look builder (decorator,
+ * cult and chassis modes); the main keydown has already let typing in a field through.
+ */
+function encyclopediaKey(e) {
+  if (!isEncyclopediaKey(e)) return false;
+  if (document.body.classList.contains('nx-hide-actions') || features.query('homeEditMode', engine) || isAvatarOpen()) return false;
+  e.preventDefault();
+  keys.delete(e.key);
+  if (!e.repeat) openEncyclopedia(encyclopediaSubject());
+  return true;
+}
+
 /** A visible element (not under a hidden ancestor or display: none). */
 function shownElement(node) {
   return Boolean(node && !node.closest('[hidden]') && node.getClientRects().length);
@@ -1495,9 +1574,9 @@ function shownElement(node) {
  * Shift+F and backquote: Inventory Search (shiftFKeyHandler 846-855, 655), the
  * pack's search (js/ui/pack-row.js), not while Gentle Island hides the pack.
  *
- * Comma is Preferences (js/classic/classic-prefs.js, both skins). Left out, with
- * nothing behind them here: I Info-getting Mode (iKeyHandler 870-891). Shift+M shows or
- * hides the street map (G370). F stays the remake's apple.
+ * Comma is Preferences (js/classic/classic-prefs.js, both skins). I is the
+ * Encyclopedia (ENCYC, encyclopediaKey: the client's Info mode, iKeyHandler 870-891,
+ * led there). Shift+M shows or hides the street map (G370). F stays the remake's apple.
  */
 function clientShortcutKey(e) {
   const action = clientKeyAction(e);
@@ -4399,6 +4478,7 @@ function renderPackPopover(classTsid, anchor = null) {
   pop.hidden = false;
   pop.dataset.vmDefault = plainWords(slot.desc || 'A thing from Ur.');
   pop.dataset.vmLevel = level === 'sub' ? `sub:${subVerb.id}` : level;
+  // ENCYC: the card's "In the Encyclopedia" when the item has a page (GetInfoDialog.as 142-163: "See in Encyclopedia").
   const markup = `
     <div class="pack-pop-head vm-head"${isEmotionalBear ? ` data-bear-state="${bearStateName}"` : ''}>
       <div class="pack-pop-icon"><img src="${slot.icon}" alt="" /></div>
@@ -4411,7 +4491,8 @@ function renderPackPopover(classTsid, anchor = null) {
     <div class="pack-pop-actions vm-rows" role="menu" aria-labelledby="pack-popover-title">${rowsMarkup}</div>
     ${eatPrompt}
     ${dropPrompt}
-    <p class="vm-detail pack-pop-desc" aria-live="polite">${escapeHtml(plainWords(slot.desc || 'A thing from Ur.'))}</p>`;
+    <p class="vm-detail pack-pop-desc" aria-live="polite">${escapeHtml(plainWords(slot.desc || 'A thing from Ur.'))}</p>
+    ${encyclopedia.linkMarkup(encyclopediaItemSubject(classTsid), 'pack-pop-ency')}`;
   // updateHud redraws an open popover on every HUD change (buff timers, energy): rebuilding
   // the same markup swaps the buttons under the pointer and their hover blinks. Same content,
   // same buttons and listeners.
@@ -5671,10 +5752,16 @@ function updateHud() {
       }
       // G255: a startable quest's Try button (quest-offers-feature, QuestElementUI.as 224-264).
       if (p.active) for (const el of features.collect('questLogActions', p.def.classTsid, engine)) card.appendChild(el);
+      // ENCYC: the quest's Encyclopedia page under its buttons, when it has one (the open card shows it).
+      appendQuestEncyclopediaLink(card, p.def.classTsid);
       qBox.appendChild(card);
     }
     const firstDone = qBox.querySelector('.q-card.done');
-    for (const el of putOff) qBox.insertBefore(el, firstDone);
+    for (const el of putOff) {
+      // ENCYC: a quest put off with "Not right now" links to its page too.
+      appendQuestEncyclopediaLink(el, el.dataset.questPutOff);
+      qBox.insertBefore(el, firstDone);
+    }
     appendStoryQuestOffers(qBox);
     // The header counts the cards drawn: offers (put off, or a story quest's offer card) on their own.
     const meta = document.getElementById('quest-meta');
@@ -24598,8 +24685,17 @@ function appendStoryQuestOffers(box) {
           : 'Remember again';
     button.addEventListener('click', () => openQuestDialogue(classTsid));
     card.append(title, desc, button);
+    // ENCYC: a story quest's offer links to its page.
+    appendQuestEncyclopediaLink(card, classTsid);
     box.appendChild(card);
   }
+}
+
+/** ENCYC: "In the Encyclopedia" on a quest card, when the quest has a page (js/encyclopedia-links.js). */
+function appendQuestEncyclopediaLink(card, classTsid) {
+  if (!card || !classTsid || card.querySelector(':scope > .ency-link')) return;
+  const ency = encyclopedia.link(document, { section: 'quests', id: classTsid }, 'q-ency');
+  if (ency) card.appendChild(ency);
 }
 
 function renderQuestDialogueBeat() {
@@ -25512,6 +25608,8 @@ function renderSkillsPanel() {
       achievementName: (id) => getAchievementCatalog()[id]?.name || id.replace(/_/g, ' '),
       giantName: (id) => GIANTS[id]?.name || id,
       emblemCount: (giant) => countItem(inv, `emblem_${giant}`),
+      // ENCYC: "In the Encyclopedia" under an open skill that has a page.
+      encyclopediaLink: (id) => encyclopedia.link(document, { section: 'skills', id }, 'skill-ency'),
       // Unlearning (features/unlearning-feature.js): progress + per-skill check.
       unlearning: features.query('skillUnlearning', engine),
     },
@@ -29764,6 +29862,8 @@ async function main() {
       if (!e.repeat) hotkeysSheet.show();
       return;
     }
+    // ENCYC: i opens the Encyclopedia on what you are looking at, over any menu or sheet (encyclopediaKey).
+    if (encyclopediaKey(e)) return;
     if (isQuestDialogueOpen()) return;
     if (isEmotionalBearPickerOpen()) return;
     // Bug report #5: while tending a garden its plots take the arrows, WASD, Enter and E.
@@ -30097,6 +30197,8 @@ async function main() {
     if (isFeatOpen()) closeFeatPanel();
     else openFeatPanel();
   });
+  // ENCYC: Menu > World > Encyclopedia, its home page in the Encyclopedia's tab (both skins: Classic shows the same Menu).
+  document.getElementById('encyclopedia-btn')?.addEventListener('click', () => openEncyclopedia(null));
   document.getElementById('feat-close')?.addEventListener('click', closeFeatPanel);
   document.getElementById('feat-gather')?.addEventListener('click', gatherFeatChain);
   document.getElementById('feat-say')?.addEventListener('click', sayAssignedFeatLine);
@@ -30372,6 +30474,8 @@ async function main() {
     }
     startMusic();
     playSound('CLIENT_LOADED', { volume: 0.5 });
+    // ENCYC: the Encyclopedia's index (encyclopedia/search.json) once the street is up, so I and the links find pages.
+    setTimeout(() => encyclopedia.load(), 3000);
     // Apply saved look after textures are ready
     applyPlayerAppearance();
     // G339: not when the tutorial is about to take the player into the clouds.

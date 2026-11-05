@@ -35,7 +35,7 @@ import { ensureFoxItems } from '../public/js/foxes.js?v=64bf3e87';
 import { STORE_CATALOG } from '../public/js/store-catalog.js?v=74b56af3';
 import { IMAGINATION_UPGRADES } from '../public/js/imagination-data.js?v=4a85e7fe';
 import { remakeStatus } from '../public/js/imagination-remake.js?v=c37ad887';
-import { HOTKEYS_FOOTER, HOTKEYS_TITLE, hotkeySections } from '../public/js/client-hotkeys.js?v=c42fbb76';
+import { HOTKEYS_FOOTER, HOTKEYS_TITLE, hotkeySections } from '../public/js/client-hotkeys.js?v=51814cb2';
 import { SKILL_REMAKE_NOTES } from '../public/js/skill-tree.js?v=53795620';
 
 /**

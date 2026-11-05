@@ -51,6 +51,8 @@ export const MENU_ROWS = Object.freeze({
   // Ticket 81: the Projects panel (features/street-jobs-feature.js).
   'projects-btn': { group: 'world', rank: 2, key: 'P' },
   'snaps-btn': { group: 'world', rank: 3 },
+  // ENCYC (js/encyclopedia-links.js): the Encyclopedia's home page in its own tab; I opens it on what you look at.
+  'encyclopedia-btn': { group: 'world', rank: 4, key: 'I' },
   'buddies-btn': { group: 'social', rank: 0 },
   'groups-btn': { group: 'social', rank: 1 },
   'auctions-btn': { group: 'social', rank: 2 },

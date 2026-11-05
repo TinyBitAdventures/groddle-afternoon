@@ -22,9 +22,9 @@ import {
   misplacedCommand,
   slashPlan,
 } from '../public/js/slash-commands.js?v=98c2238a';
-import { chatCommandsSection, createHotkeysSheet } from '../public/js/client-hotkeys.js?v=c42fbb76';
-import { HINT_DELAY_MS, showLocalLines, slashCommandsFeature } from '../public/js/features/slash-commands-feature.js?v=3cee19ed';
-import { FEATURES } from '../public/js/features/index.js?v=4e534c56';
+import { chatCommandsSection, createHotkeysSheet } from '../public/js/client-hotkeys.js?v=51814cb2';
+import { HINT_DELAY_MS, showLocalLines, slashCommandsFeature } from '../public/js/features/slash-commands-feature.js?v=f6815f3a';
+import { FEATURES } from '../public/js/features/index.js?v=ca4d8484';
 import { createFeatureHost } from '../public/js/feature-host.js?v=020c9329';
 import { CHANNEL_WELCOME, tabCommand } from '../public/js/groups.js?v=4c4c8d76';
 

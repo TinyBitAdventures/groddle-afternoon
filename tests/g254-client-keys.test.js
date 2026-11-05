@@ -9,8 +9,9 @@
  * menu), Shift+L (looks), Shift+K (multiplayer keyring), Shift+D (decorate where
  * you can), Shift+F and backquote (the pack's search, phase 2) and holding ? (the
  * hotkey sheet, view/ui/Hotkeys.as + hotkeys.png) and comma (Preferences,
- * js/classic/classic-prefs.js) and Shift+M (the street map, G370). I has no
- * panel here and stays unbound.
+ * js/classic/classic-prefs.js) and Shift+M (the street map, G370). I opens the
+ * Encyclopedia (ENCYC 2026-11-05, js/encyclopedia-links.js; the client's I was
+ * Info mode, whose item cards linked there).
  */
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
@@ -29,7 +30,7 @@ import {
   hotkeyText,
   isHotkeySheetRelease,
   isPlainKey,
-} from '../public/js/client-hotkeys.js?v=c42fbb76';
+} from '../public/js/client-hotkeys.js?v=51814cb2';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const PUBLIC = join(here, '../public');
@@ -109,7 +110,8 @@ describe('G254: clientKeyAction', () => {
       [key('D', { shiftKey: true }), 'decorate'],
       [key('?', { shiftKey: true, code: 'Slash' }), 'hotkeys'],
       [key('/', { shiftKey: true, code: 'Slash' }), 'hotkeys'],
-      [key(','), 'preferences'], [key('i'), null],
+      [key(','), 'preferences'], [key('i'), 'encyclopedia'], [key('I'), 'encyclopedia'],
+      [key('I', { shiftKey: true }), null], [key('i', { metaKey: true }), null],
       [key('`'), 'pack-search'], [key('F', { shiftKey: true }), 'pack-search'],
       [key('f'), null], [key('~', { shiftKey: true, code: 'Backquote' }), null],
       // G370: Shift+M shows or hides the street map (the client's chat-column map tab).
@@ -165,9 +167,10 @@ describe('G254: the hotkey sheet lists only keys the remake answers', () => {
     // + too (player report on v0.7.0: where + needs Shift, both keys zoom in, world-zoom.js zoomKeyAction).
     assert.ok(solo.includes('Zoom In: = or +') && solo.includes('Zoom Out: -') && solo.includes('Zoom to Original: 0'));
     assert.ok(solo.includes('Street Map: Shift+M'), 'G370: the street map on Shift+M');
-    for (const gone of [/Info-getting/, /\bI\b$/m]) {
-      assert.doesNotMatch(all, gone);
-    }
+    assert.doesNotMatch(all, /Info-getting/);
+    // ENCYC: I is the Encyclopedia's key, in Menus.
+    assert.ok(solo.includes('Encyclopedia: I'));
+    assert.deepEqual(hotkeySections()[0].rows.at(-1), ['Encyclopedia', [['I']], '(Opens in a new tab, on what you are looking at)']);
     assert.doesNotMatch(all, /—/, 'no em-dashes in player copy');
   });
 

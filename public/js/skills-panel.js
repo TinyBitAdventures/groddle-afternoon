@@ -398,6 +398,9 @@ function skillRow(entry, ctx, actions, rerender, active = null) {
     .map(([id, g]) => `${ctx.giantName?.(id) || id}${g?.primary ? ' (primary)' : ''}`);
   if (giants.length) meta.push(giants.join(', '));
   body.appendChild(el('div', 'skill-meta', meta.join(' · ')));
+  // ENCYC: the skill's Encyclopedia page, when it has one (game.js ctx.encyclopediaLink, js/encyclopedia-links.js).
+  const ency = ctx.encyclopediaLink?.(entry.classTsid);
+  if (ency) body.appendChild(ency);
   const btn = actionButton(entry, ctx, actions, active);
   const note = btn && !btn.disabled && (entry.status === 'available' || entry.status === 'paused')
     ? learnButtonText(entry, active).note

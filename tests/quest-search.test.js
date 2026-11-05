@@ -23,7 +23,7 @@ import {
   QUEST_SEARCH_MIN,
   QUEST_SORT_KEY,
   QUEST_SORTS,
-} from '../public/js/ui/quest-sheet.js?v=3bf54502';
+} from '../public/js/ui/quest-sheet.js?v=cbd12125';
 import { makeVerbRow } from '../public/js/ui/verb-menu.js?v=6cc4df84';
 
 const pub = join(import.meta.dirname, '../public');

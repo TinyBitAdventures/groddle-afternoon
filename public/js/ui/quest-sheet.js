@@ -207,6 +207,9 @@ export function questCardMenuRows(card) {
     // What it opens (a dialog, a quest instance) takes the focus.
     rows.push({ id: `act${n}`, label, tip: btn.title || label, disabled: btn.disabled === true || btn.getAttribute('aria-disabled') === 'true', reason: btn.title || '', focusBack: false, el: btn });
   }
+  // ENCYC: the card's "In the Encyclopedia" link (game.js, js/encyclopedia-links.js), last.
+  const ency = card?.querySelector?.('.ency-link');
+  if (ency) rows.push({ id: 'encyclopedia', label: String(ency.textContent || '').trim(), tip: ency.title || '', focusBack: false, el: ency });
   return rows;
 }
 
@@ -306,6 +309,9 @@ export function createQuestSheet({ document: doc = globalThis.document, questInf
       body.insertBefore(box, firstButton || null);
     }
     for (const extra of extraActions(card.dataset.quest || '', card)) body.appendChild(extra);
+    // ENCYC: the Encyclopedia link (game.js draws it last on the card) goes under the buttons and the pin.
+    const ency = body.querySelector(':scope > .ency-link');
+    if (ency) body.appendChild(ency);
 
     card.replaceChildren(head);
     if (step) {

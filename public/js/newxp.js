@@ -893,13 +893,14 @@ export const ISLAND_LINES = Object.freeze({
 });
 
 /**
- * Which upgradeConfirmed lines describe something the remake has. Zoom and
- * the Encyclopedia were never rebuilt, so those cards are granted silently
- * rather than teaching a key that does nothing.
+ * Which upgradeConfirmed lines the island says after the card. Encyclopeddling
+ * teaches the i key now that i opens the Encyclopedia (ENCYC 2026-11-05,
+ * js/encyclopedia-links.js); Zoomability's card is still granted silently.
  */
 export const ISLAND_CONFIRM = Object.freeze({
   mappery: 'mappery',
   camera_mode: 'camera_mode',
+  encyclopeddling: 'encyclopeddling',
 });
 
 /** Source coordinates (x, y from the street's bounds) to remake street pixels. */

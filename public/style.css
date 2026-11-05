@@ -4991,6 +4991,20 @@ html[data-street-cards] .quest-dialogue { visibility: hidden; }
 }
 .skill-link:hover { color: var(--text-moss); }
 .skill-meta { color: var(--text-subtle); font-size: var(--fs-xs); margin-bottom: var(--sp-1); }
+/* ENCYC (js/encyclopedia-links.js): "In the Encyclopedia" on the pack's item card and the Skills and Quests sheets. */
+.ency-link {
+  display: inline-block;
+  margin: var(--sp-1) 0 var(--sp-3);
+  color: var(--c-green-51);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-bold);
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+.ency-link:is(:hover, :focus-visible) { color: var(--text-moss); }
+.pack-pop-ency { margin: var(--sp-2) 0 var(--sp-1); }
+/* Modern: lined up with the words of the card's footer line (its .vm-detail box). */
+[data-ui="modern"] #pack-popover .pack-pop-ency { padding-inline: calc(2px + var(--sp-4)); }
 /* G205: the switch note above Start/Resume (ImaginationSkillDetailsUI.as 222-232). */
 .skill-switch-note {
   margin-top: var(--sp-3);

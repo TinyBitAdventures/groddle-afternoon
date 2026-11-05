@@ -60,7 +60,7 @@ import {
   training2Layout,
   tutorialPhysics,
   vogPages,
-} from '../public/js/newxp.js?v=ceff0028';
+} from '../public/js/newxp.js?v=249fdf4c';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', 'public');
 const street = (tsid) => JSON.parse(readFileSync(join(ROOT, 'assets/streets', `${tsid}.json`), 'utf8'));
@@ -382,8 +382,8 @@ describe('newxp Gentle Island scripts (newbie_island.js and the street events)',
     assert.equal(reduceToHand([], 4), 4);
     // inc_data_imagination.js costs.
     assert.deepEqual(['mappery', 'camera_mode', 'zoomability', 'encyclopeddling', 'skill_learning'].map((id) => NEWXP_UPGRADES[id].cost), [20, 75, 75, 90, 500]);
-    // Only the confirmations the remake can keep: no zoom, no Encyclopedia.
-    assert.deepEqual(Object.keys(ISLAND_CONFIRM).sort(), ['camera_mode', 'mappery']);
+    // Only the confirmations the remake can keep: no zoom yet; the Encyclopedia's i key since ENCYC (2026-11-05).
+    assert.deepEqual(Object.keys(ISLAND_CONFIRM).sort(), ['camera_mode', 'encyclopeddling', 'mappery']);
   });
 
   it('puts each event quoin on its street, with the street event it fires', () => {

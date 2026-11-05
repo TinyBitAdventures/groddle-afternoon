@@ -40,11 +40,11 @@
   </script>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Groddle Afternoon</title>
-    <link rel="stylesheet" href="style.css?v=16f98cb1" />
+    <link rel="stylesheet" href="style.css?v=bad7aba9" />
   <!-- The UI font, self-hosted (style.css @font-face; OFL in assets/fonts/nunito/): the roman latin file, before first paint. -->
   <link rel="preload" href="assets/fonts/nunito/nunito-roman-latin.woff2" as="font" type="font/woff2" crossorigin />
   <!-- The Classic interface (js/classic/ui-mode.js sets <html data-ui="classic">); every rule is scoped to it. -->
-  <link rel="stylesheet" href="css/classic.css?v=e88902c1" />
+  <link rel="stylesheet" href="css/classic.css?v=5279da5f" />
   <!-- Content keys for data and art URLs (js/data-urls.js): before every other script. -->
   <script src="js/data-versions.js?v=d29d0bf6"></script>
   <script src="js/data-urls.js?v=523668ca"></script>
@@ -130,6 +130,7 @@
             <div class="menu-group" data-menu-group="world" role="group" aria-label="World"><div class="menu-group-label" aria-hidden="true">World</div>
               <button id="home-btn" type="button" class="chrome-btn home-chrome-btn" title="Home">Home</button>
               <button id="feat-btn" type="button" class="chrome-btn feat-chrome-btn" title="Current Feat (H)">Feat</button>
+              <button id="encyclopedia-btn" type="button" class="chrome-btn" title="Encyclopedia (I), opens in a new tab">Encyclopedia</button>
             </div>
             <div class="menu-group" data-menu-group="social" role="group" aria-label="Social" hidden><div class="menu-group-label" aria-hidden="true">Social</div></div>
             <div class="menu-group" data-menu-group="settings" role="group" aria-label="Settings" hidden><div class="menu-group-label" aria-hidden="true">Settings</div></div>
@@ -974,6 +975,6 @@
   </div>
   <!-- Password managers skip the game's own boxes (chat, searches, names); the account forms keep autofill. -->
   <script type="module" src="js/no-autofill.js?v=6a1a4382"></script>
-  <script type="module" src="game.js?v=459a9f6a"></script>
+  <script type="module" src="game.js?v=ef5935d2"></script>
 </body>
 </html>

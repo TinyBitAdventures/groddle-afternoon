@@ -33,7 +33,9 @@ export const CLIENT_KEY_TABLE = Object.freeze([
   // G370: the client's Shift+M showed the chat column's map tab; here it shows or hides the street map.
   { key: 'Shift+M', handler: 'shiftMKeyHandler', action: 'street-map' },
   { key: 'Shift+/', handler: 'shiftSlashKeyHandler', action: 'hotkeys' },
-  { key: 'I', handler: 'iKeyHandler', action: null, why: 'no info mode' },
+  // ENCYC (2026-11-05): the client's I started Info mode, whose item cards linked to the Encyclopedia;
+  // here I opens the Encyclopedia on that page (js/encyclopedia-links.js).
+  { key: 'I', handler: 'iKeyHandler', action: 'encyclopedia' },
   { key: 'Z', handler: 'zKeyHandler', action: 'player-menu' },
   { key: ',', handler: 'commaKeyHandler', action: 'preferences' },
 ]);
@@ -42,7 +44,7 @@ export const CLIENT_KEY_TABLE = Object.freeze([
  * The remake's answer to a keydown, or null. Ctrl, Alt and Cmd combinations are
  * the browser's (Cmd+, Cmd+Z), never the game's.
  * @param {{ key: string, code?: string, shiftKey?: boolean, ctrlKey?: boolean, altKey?: boolean, metaKey?: boolean }} e
- * @returns {'map'|'player-menu'|'looks'|'keyring'|'decorate'|'hotkeys'|'pack-search'|'preferences'|'street-map'|null}
+ * @returns {'map'|'player-menu'|'looks'|'keyring'|'decorate'|'hotkeys'|'pack-search'|'preferences'|'street-map'|'encyclopedia'|null}
  */
 export function clientKeyAction(e) {
   if (!e || e.metaKey || e.ctrlKey || e.altKey) return null;
@@ -55,6 +57,7 @@ export function clientKeyAction(e) {
   if (!e.shiftKey) {
     if (k === 'm') return 'map';
     if (k === 'z') return 'player-menu';
+    if (k === 'i') return 'encyclopedia';
     return null;
   }
   if (k === 'l') return 'looks';
@@ -99,6 +102,8 @@ export function hotkeySections({ keyring = false, hub = false, reports = false }
         ['Buffs', [['Y']]],
         // Ticket 81: the remake's Projects panel (the client had no P).
         ['Projects', [['P']]],
+        // ENCYC: the client's I was Info mode; here it opens the Encyclopedia (js/encyclopedia-links.js).
+        ['Encyclopedia', [['I']], '(Opens in a new tab, on what you are looking at)'],
       ],
     },
     {
