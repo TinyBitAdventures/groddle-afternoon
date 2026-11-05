@@ -32,6 +32,7 @@ const STATE_FILES = {
   'crowns-file': 'realtime-crowns.json', // G334 lane RACES3: crowns.go's owed rewards
   'mayhem-file': 'realtime-mayhem.json', // G397 lane MAYHEM: mayhem.go's owed rewards
   'party-file': 'realtime-party.json', // G335 lane PARTYSAVE: parties, Party Spaces and the spends owed back
+  'play-time-file': 'realtime-play-time.json', // play time (playtime.go): seconds the site's user meta has not taken yet
 };
 
 describe('the server keeps its lasting state in files', { skip: skipWithoutServer }, () => {
