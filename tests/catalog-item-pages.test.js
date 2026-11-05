@@ -1,5 +1,7 @@
 /**
- * Item page quality (lane enc-items, Austin 2026-11-05): each recipe's skills, energy and time (tools/catalog/costs.mjs), what a vendor pays beside
+ * Item page quality (lane enc-items, Austin 2026-11-05): "What it is for" on
+ * every item in the remake (tools/catalog/uses.mjs, uses.json), each recipe's
+ * skills, energy and time (tools/catalog/costs.mjs), what a vendor pays beside
  * the price, the larger picture at the top (tools/catalog/hero.mjs) and the
  * stack size in the header.
  * Run: node --test tests/catalog-item-pages.test.js
@@ -10,6 +12,7 @@ import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { HERO_BOX, MAX_BYTES, MAX_UPSCALE, imageSize, loadHero } from '../tools/catalog/hero.mjs';
 import { NOT_SELLABLE, NOT_SELLABLE_FLAGS, loadCosts, secondsText } from '../tools/catalog/costs.mjs';
+import { loadUses, readCurated } from '../tools/catalog/uses.mjs';
 
 const spike = join(import.meta.dirname, '..');
 const pub = join(spike, 'public');
@@ -21,6 +24,64 @@ const recipes = JSON.parse(readFileSync(join(pub, 'assets/content/recipes.json')
 const costs = await loadCosts(spike);
 const making = await import('../public/js/making.js?v=621cd991');
 const vendor = await import('../public/js/vendor.js?v=c74e9e04');
+const pack = await import('../public/js/pack-slots.js?v=c91d0ca3');
+const storage = await import('../public/js/home-storage.js?v=a260d686');
+const unescape = (s) => s.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"');
+/** The "What it is for" list of a page, as plain lines. */
+const forLines = (html) => {
+  const at = html.indexOf('<h3 class="cat-for">');
+  if (at < 0) return null;
+  const end = html.indexOf('</section>', at);
+  return [...html.slice(at, end).matchAll(/<li(?: class="cat-none")?>([\s\S]*?)<\/li>/g)].map((m) => unescape(m[1].replace(/<[^>]+>/g, '')));
+};
+
+describe('What it is for', () => {
+  it('has a section on every item in the remake', () => {
+    const empty = inRemake.filter((i) => !page(i.id).includes('<h3 class="cat-for">What it is for</h3>'));
+    assert.deepEqual(empty.map((i) => i.id), []);
+  });
+
+  it('says plainly when the remake has no use for it, on few pages, never as a guess', () => {
+    const none = inRemake.filter((i) => page(i.id).includes('class="cat-none"'));
+    const curatedNone = new Set(Object.entries(readCurated()).filter(([, v]) => v.none).map(([k]) => k));
+    // Every "no use" line is one a person checked (uses.json none), not the builder's default.
+    assert.deepEqual(none.map((i) => i.id).filter((id) => !curatedNone.has(id)), []);
+    assert.ok(none.length <= 40, `${none.length} items with no use`);
+    assert.match(page('artifact_wooden_apple'), /A keepsake: the finished artifact has no use of its own/);
+  });
+
+  it('cites a remake file and line for every hand-written use, and the lines exist', () => {
+    const curated = readCurated();
+    for (const [id, v] of Object.entries(curated)) {
+      assert.ok(v.lines?.length || v.none, `${id}: lines or none`);
+      assert.ok(!JSON.stringify(v).includes('—'), `${id}: no em-dash`);
+      assert.ok(!/\bGlitch\b/.test([...(v.lines || []), v.none || ''].join(' ')), `${id}: no trademark`);
+      if (!v.lines?.length) continue;
+      assert.ok(v.evidence?.length, `${id}: evidence`);
+      for (const ev of v.evidence) {
+        const m = /^(public\/[\w./-]+?\.(?:js|json)):(\d+)/.exec(ev);
+        if (!m) continue;
+        const file = join(spike, m[1]);
+        assert.ok(existsSync(file), `${id}: ${m[1]}`);
+        assert.ok(readFileSync(file, 'utf8').split('\n').length >= Number(m[2]), `${id}: ${m[1]}:${m[2]} is past the end`);
+      }
+      for (const line of v.lines) assert.ok(forLines(page(id)).includes(line), `${id}: "${line}" on its page`);
+    }
+  });
+
+  it('takes bag and cabinet sizes, keys and Musicblock pay from the game itself', async () => {
+    const lines = await loadUses(spike);
+    assert.equal(lines('bag_bigger').lines[0], `It holds ${pack.BAG_DEFS.bag_bigger.capacity} stacks of almost anything in one pack slot; not another bag, furniture or Elements.`);
+    assert.match(lines('bag_toolbox_red').lines[0], new RegExp(`holds ${pack.BAG_DEFS.bag_toolbox_red.capacity} tools`));
+    assert.match(lines('bag_furniture_cabinet').lines.join(' '), new RegExp(`its ${storage.cabinetDef('bag_furniture_cabinet').capacity} slots`));
+    // A key opens the doors whose key_id is its number (js/doors.js checkDoorEntry), and a trip uses one up.
+    const key1 = lines('door_key_1').lines;
+    assert.match(key1[0], /^Opens the locked doors from Doonboggle Trail \(Gentle Island\) to Ethereal Endeavour/);
+    assert.equal(key1[1], 'Each trip through a locked door uses up one key.');
+    assert.match(page('musicblock_sb_secret_01'), /The first time you hear this tune it pays 1,000 iMG\./);
+    assert.match(page('furniture_chair'), /Set it on the floor of your house, or of a Tower floor, in Decorate mode\./);
+  });
+});
 
 describe('recipes: skills, energy and time', () => {
   it('puts every skill, the energy and the time on each recipe row', () => {

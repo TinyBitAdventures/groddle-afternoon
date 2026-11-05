@@ -44,6 +44,7 @@ import { inRemake, makeParts, sep } from '../encyclopedia/parts.mjs';
 import { neverReleased, neverReleasedNote, neverReleasedTag } from '../encyclopedia/never-released.mjs';
 import { loadCosts } from './costs.mjs';
 import { loadHero } from './hero.mjs';
+import { loadUses } from './uses.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = join(here, '..', '..');
@@ -621,6 +622,8 @@ export async function buildCatalog({ inventory = readInventory(), evidence = rea
   const costs = await loadCosts(root);
   // The picture at the top of each page (tools/catalog/hero.mjs).
   const heroFor = await loadHero(root);
+  // "What it is for" beyond recipes and food (tools/catalog/uses.mjs, uses.json).
+  const usesFor = await loadUses(root);
   const quests = content('quests.json');
   const iconFiles = new Set(readdirSync(ICONS));
   const musicblocks = JSON.parse(readFileSync(join(pub, 'musicblocks', 'data.json'), 'utf8'));
@@ -679,7 +682,7 @@ export async function buildCatalog({ inventory = readInventory(), evidence = rea
   for (const e of entries) e.hero = heroFor(e.it.id, e.icon);
   entries.forEach((e, i) => {
     files[`${OUT}/${e.it.id}/index.html`] = itemPage(e, {
-      prev: entries[i - 1], next: entries[i + 1], remake, inCatalog, names, musicCards, quests, total: entries.length, index: i, ency, costs,
+      prev: entries[i - 1], next: entries[i + 1], remake, inCatalog, names, musicCards, quests, total: entries.length, index: i, ency, costs, usesFor,
     });
   });
   // Each page's icons and art carry their content keys (tools/data-versions/build.mjs keyAssetUrls).
@@ -942,6 +945,13 @@ function itemPage(e, ctx) {
   }
   const buffItem = remake.buffItems[it.id];
   if (buffItem) uses.push(`<li>${esc(buffItem.verb)} it: ${esc(buffItem.effectHint)}.</li>`);
+  // What the remake does with it beyond recipes and food (tools/catalog/uses.mjs), or, when nothing, says so.
+  const more = ctx.usesFor(it.id);
+  for (const line of more?.lines || []) uses.push(`<li>${esc(line)}</li>`);
+  if (!uses.length && !useTiles && e.status === 'source') {
+    const keep = more?.none || (it.takeable ? 'Nothing in the remake uses it yet: you keep it as a collectible.' : 'It is part of the street: there is nothing to do with it yet.');
+    uses.push(`<li class="cat-none">${esc(keep)}${sells ? ` A vendor will buy it for ${fmt(sells.usual)} ${sells.usual === 1 ? 'currant' : 'currants'}.` : ''}</li>`);
+  }
   const usesHtml = uniq(uses);
 
   // Buffs (GSJS catalog_buffs.js names and descriptions, via buffs.json).
