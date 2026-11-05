@@ -27,6 +27,7 @@ import {
   MR_HAIRBALL_GREETING,
   MR_HAIRBALL_REQUEST,
   SMALL_WORTHLESS_ID,
+  applyEestiWallFix,
   beginDeEmbiggenifySearch,
   completeDeEmbiggenify,
   createDeEmbiggenifyState,
@@ -35,9 +36,10 @@ import {
   eestiStreetPoint,
   expireDeEmbiggenify,
   findSmallWorthless,
-} from '../public/js/de-embiggenify.js?v=7ff7ffba';
+} from '../public/js/de-embiggenify.js?v=37c4724f';
 import { jumpApex, NORMAL_BUFF } from '../public/js/avatar-step.js?v=d48908a5';
 import { SOURCE_PHYSICS, triggerHit } from '../public/js/puzzle-triggers.js?v=b341f855';
+import { barriersScreen, blockBarrierCrossing } from '../public/js/street-model.js?v=505d8990';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const LOCATIONS = path.join(root, '../streets/mnt/stos/location_data');
@@ -280,4 +282,29 @@ test('the way up to the cake is the street\'s own and the remake jump reaches ev
   // The client reached it through its 15 px collision circles; the remake apex clears it by 15.
   assert.ok(-apex - rise >= 15, `apex ${-apex} vs the ${rise} px step`);
   assert.ok(-apex < 160, 'no higher than the client reach needs');
+});
+
+test('#109: off the tabletop\'s right end you can always walk back past the table\'s right leg', () => {
+  const street = JSON.parse(JSON.stringify(eestiStreet));
+  const leg = street.barriers.find((w) => w.id === 'wall_1267251214163');
+  // Tiny Speck's leg: solid both ways, 20 px over the floor, under a tabletop that runs past it.
+  assert.deepEqual([leg.x, leg.y, leg.h, leg.pc_perm], [1881, -352, 300, null]);
+  const floor = street.platforms.find((pl) => pl.id === '_pl1257983553359');
+  const top = street.platforms.find((pl) => pl.id === '_pl1257983927390');
+  assert.deepEqual([floor.x1, floor.x2, floor.y1], [1041, 1999, -32]);
+  assert.ok(top.x2 > leg.x && top.y1 < leg.y, 'the tabletop runs on past the leg, above it');
+  // Feet on the floor right of the leg (the report's spot, source 1976, -32), body as tall as the shrunken avatar's.
+  const feet = eestiStreetPoint({ x: 1976, y: -32 }).y;
+  const at = (x) => eestiStreetPoint({ x, y: 0 }).x;
+  const walk = (s, from, to) => blockBarrierCrossing(barriersScreen(s), at(from), at(to), feet, 40);
+  assert.equal(walk(street, 1890, 1870), at(1881) + 1, 'before: the leg holds you in the pocket');
+  assert.equal(applyEestiWallFix(street), 1);
+  assert.equal(walk(street, 1890, 1870), at(1870), 'after: you walk back left under the table');
+  assert.equal(walk(street, 1870, 1890), at(1881) - 1, 'the leg still ends the floor under the table from the left');
+  assert.equal(applyEestiWallFix(street), 0, 'once');
+  // The instance applies it as the room is set up; the street file keeps Tiny Speck's wall.
+  assert.equal(eestiStreet.barriers.find((w) => w.id === 'wall_1267251214163').pc_perm, null);
+  const game = fs.readFileSync(path.join(root, 'public/game.js'), 'utf8');
+  const setup = game.slice(game.indexOf('async function setupDeEmbiggenifyInstance('), game.indexOf('async function startDeEmbiggenify('));
+  assert.match(setup, /applyEestiWallFix\(currentStreet\);/);
 });

@@ -264,6 +264,7 @@ import {
   MR_HAIRBALL_GREETING,
   MR_HAIRBALL_REQUEST,
   SMALL_WORTHLESS_ID,
+  applyEestiWallFix,
   beginDeEmbiggenifySearch,
   completeDeEmbiggenify,
   createDeEmbiggenifyState,
@@ -272,7 +273,7 @@ import {
   eestiStreetPoint,
   expireDeEmbiggenify,
   findSmallWorthless,
-} from './js/de-embiggenify.js?v=7ff7ffba';
+} from './js/de-embiggenify.js?v=37c4724f';
 import {
   EMOTIONAL_BEAR_ACTIONS,
   EMOTIONAL_BEAR_COMPANIONS,
@@ -20160,6 +20161,8 @@ async function setupDeEmbiggenifyInstance() {
   for (let i = streetPlatforms.length - 1; i >= 0; i -= 1) {
     if (streetPlatforms[i].pcPerm === 0) streetPlatforms.splice(i, 1);
   }
+  // #109: the long table's right leg lets you walk back out of the pocket past it.
+  applyEestiWallFix(currentStreet);
   spawnMrHairball();
   spawnSmallWorthless();
   if (player) {

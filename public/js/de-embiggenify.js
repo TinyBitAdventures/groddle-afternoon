@@ -81,6 +81,32 @@ export const EESTI_LANDMARKS = Object.freeze([
 ]);
 export const EESTI_ROOM_ROUTE = Object.freeze(EESTI_LANDMARKS.map((row) => row.id));
 
+/**
+ * #109: the long table's right leg (wall_1267251214163, x 1881, y -352..-52, pc_perm null: solid
+ * both ways) stands 20 px over the floor (_pl1257983553359, y -32), and the tabletop
+ * (_pl1257983927390) runs on to x 1971, past it. Walking off the tabletop's right end drops you
+ * on the floor right of the leg, x 1881..1999, with no way back: the leg blocks the walk left
+ * and the tabletop is far out of a jump's reach. The source left that pocket to its "Are you
+ * stuck?" exit prompt (players/inc_instances.js instances_show_exit_prompt). The remake makes
+ * the leg solid only to an avatar walking right (pc_perm -1, Wall.as pc_solid_from_left), so
+ * the floor under the table still ends at the leg and anyone in the pocket walks back out.
+ * Tiny Speck's platforms and walls are otherwise unchanged.
+ */
+export const EESTI_ONE_WAY_WALLS = Object.freeze([Object.freeze({ id: 'wall_1267251214163', pc_perm: -1 })]);
+
+/** #109: applies EESTI_ONE_WAY_WALLS to the loaded street; returns how many walls changed. */
+export function applyEestiWallFix(street) {
+  let n = 0;
+  for (const fix of EESTI_ONE_WAY_WALLS) {
+    const wall = (street?.barriers || []).find((w) => w?.id === fix.id);
+    if (wall && wall.pc_perm !== fix.pc_perm) {
+      wall.pc_perm = fix.pc_perm;
+      n += 1;
+    }
+  }
+  return n;
+}
+
 /** Source x, y to the imported street's screen space. */
 export function eestiStreetPoint(point) {
   return {
@@ -201,3 +227,4 @@ export function deEmbiggenifyObjective(state) {
   if (state.status === 'complete') return 'De-Embiggenification complete';
   return 'The catalogue page closed';
 }
+
