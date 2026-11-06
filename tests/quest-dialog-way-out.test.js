@@ -24,9 +24,9 @@ import { join } from 'node:path';
 
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=10b118dd';
 import { createQuestState } from '../public/js/quests.js?v=c8d9d0a4';
-import { markOffered, waitingOffers } from '../public/js/quest-offers.js?v=8599dbf9';
-import { questOffersFeature, EMERGENCY_SNOOZE_MS } from '../public/js/features/quest-offers-feature.js?v=c6f19dc4';
-import { hellTicketsFeature } from '../public/js/features/hell-tickets-feature.js?v=25411a32';
+import { markOffered, waitingOffers } from '../public/js/quest-offers.js?v=f98056af';
+import { questOffersFeature, EMERGENCY_SNOOZE_MS } from '../public/js/features/quest-offers-feature.js?v=6e4d600e';
+import { hellTicketsFeature } from '../public/js/features/hell-tickets-feature.js?v=ca037d15';
 import { hellFeature } from '../public/js/features/hell-feature.js?v=13196575';
 import { HELL_LOCATION, createHellState, croak } from '../public/js/hell.js?v=aca145ba';
 

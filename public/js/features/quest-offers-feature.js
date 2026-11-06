@@ -85,6 +85,7 @@
 
 import {
   acceptOffer,
+  paradiseVisitCredits,
   setQuestHeldCheck,
   ensureQuestOfferState,
   listDeclinedOffers,
@@ -108,7 +109,7 @@ import {
   COLD_COMFORT_LEAVE_TEXT,
   HOME_TREE_GROWN_TEXT,
   SEED_TO_SCYTHE,
-} from '../quest-offers.js?v=8599dbf9';
+} from '../quest-offers.js?v=f98056af';
 import { parseQuestConversation } from '../quests.js?v=c8d9d0a4';
 import { questRequirementText, renderQuestText, withQuestMarkup } from '../quest-text.js?v=7f5d761c';
 import { addItem, removeItem, countItem } from '../inventory.js?v=d82f3b00';
@@ -730,6 +731,8 @@ export const questOffersFeature = {
       lastBroken = breaks.broken;
       for (const event of breaks.events) this.onEvent(event, 1, engine);
       checkYardTrees(engine);
+      // Report #126: courses already visited count when the quest is held, so on load and on accept alike.
+      for (const event of paradiseVisitCredits(qs, engine.paradiseVisits?.())) this.onEvent(event, 1, engine);
       const sync = syncItemRequirements(qs, engine.inv, questContext(engine, now));
       if (sync.advanced?.length) engine.updateHud();
       finish(sync.completable, engine);

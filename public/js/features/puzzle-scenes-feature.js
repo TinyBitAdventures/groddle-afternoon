@@ -696,6 +696,8 @@ export const puzzleScenesFeature = {
     removeItem(engine.inv, TICKET, 1);
     engine.refreshPack();
     if (!startScene(engine, 'beam_me_down')) addItem(engine.inv, TICKET, 1);
+    // Report #126: paradise_ticket.js verbs.activate counts through item.js notifyVerb, as game.js does for the flight courses.
+    else engine.achievement?.(`${TICKET}:activate`, 1);
     return true;
   },
 
@@ -724,7 +726,7 @@ export const puzzleScenesFeature = {
           removeItem(engine.inv, TICKET, 1);
           engine.refreshPack();
         }
-        startScene(engine, id);
+        if (startScene(engine, id) && needsTicket) engine.achievement?.(`${TICKET}:activate`, 1);
       });
       row.appendChild(b);
     }

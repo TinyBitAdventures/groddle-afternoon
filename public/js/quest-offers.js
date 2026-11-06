@@ -1502,6 +1502,27 @@ function makeMatches(req, event) {
 }
 
 /**
+ * The ticket events to credit for courses a player had already been to when they hold a quest that
+ * wants them (paradiseState.visits, kept by js/paradise-flight.js activateParadiseTicket; report #126:
+ * the activation used to count for nothing, so players went and it never showed). A small kindness
+ * beyond the original, which only counted a ticket activated during the quest (fly_paradise.js 25-44,
+ * though its offer does say "If you've been there before, then it's always better a second or third
+ * or fourth time!"). Each comes once: a flag already set asks for nothing.
+ * @returns {string[]} events such as 'paradise_ticket_cloud_rings:activate'
+ */
+export function paradiseVisitCredits(questState, visits = {}) {
+  const out = new Set();
+  const catalog = getQuestCatalog();
+  for (const [id, quest] of Object.entries(questState?.active || {})) {
+    for (const req of catalog[id]?.requirements || []) {
+      const course = /^VERB:paradise_ticket_([a-z0-9_]+):activate$/.exec(String(req.name))?.[1];
+      if (course && Number(visits?.[course]) > 0 && !(Number(quest.progress?.[req.name]) > 0)) out.add(`paradise_ticket_${course}:activate`);
+    }
+  }
+  return [...out];
+}
+
+/**
  * Single entry point for gameplay events. Advances every active quest
  * requirement the event maps to (counter, flag, make, work) and returns the
  * quests that just became completable. With ctx.inv, item requirements are

@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=ff28da24';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=127e0a3c';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=748c98ae';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=d9509cbe';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -36,7 +36,7 @@ import {
 // Quest copy is Flash htmlText: <b>/<i>/<br> drawn as formatting, the rest dropped, never innerHTML.
 import { questRequirementText, renderQuestText, withQuestMarkup } from './js/quest-text.js?v=7f5d761c';
 // G267: the world-verb quest counters skip offer-system quests; old saves drop the boot Moloko quest.
-import { dropBootStarterQuests, questMoveNote, routesCounter, worldVerbQuestEvents, gardenPlotEvents, makingUnitQuestEvents, shrineDonationQuestEvents } from './js/quest-offers.js?v=8599dbf9';
+import { dropBootStarterQuests, questMoveNote, routesCounter, worldVerbQuestEvents, gardenPlotEvents, makingUnitQuestEvents, shrineDonationQuestEvents } from './js/quest-offers.js?v=f98056af';
 import {
   PHANTOM_QUEST_ID,
   REMEMBER_QUEST_ID,
@@ -486,7 +486,7 @@ import {
   parsePlayerSave,
   serializePlayerSave,
   restorePlayerSave,
-} from './js/player-save.js?v=da3ba6c8';
+} from './js/player-save.js?v=58e4ef62';
 import {
   HOME_INTERIOR_TSID,
   HOME_STREET_TSID,
@@ -11598,6 +11598,8 @@ const engine = {
   get toolState() {
     return toolState;
   },
+  /** Courses ever activated, by course id (js/paradise-flight.js; quest-offers-feature credits them, report #126). */
+  paradiseVisits: () => paradiseState.visits,
   get learnedSkills() {
     return skillState.learned || [];
   },
@@ -21387,6 +21389,10 @@ function confirmParadiseTicketActivation(courseId) {
       if (!removeItem(inv, course.ticketId, 1)) return;
       // Spending iMG never lowers lifetime XP (or the level it earned).
       pc.imagination = Math.max(0, pc.imagination - activated.cost);
+      // Report #126: paradise_ticket.js verbs.activate ends in a successful verb, which item.js notifyVerb
+      // counts as VERB:<ticket>:activate (fly_paradise.js 25-44). Here, not in startParadiseFlight: the QA
+      // ?paradise= entry starts a course without a ticket and counts for nothing.
+      emitGameEvent(`${course.ticketId}:activate`);
       savePlayerState();
       updateHud();
       await startParadiseFlight(courseId);
