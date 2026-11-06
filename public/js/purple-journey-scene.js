@@ -19,7 +19,7 @@
  * screen y 939 (geo y -61, the arrival point).
  */
 
-import { deco, gradient, sceneRoot } from './quest-rooms/kit.js?v=4d8ab82d';
+import { deco, gradient, sceneRoot } from './quest-rooms/kit.js?v=d98b987e';
 
 export const VOYAGE_W = 3200;
 export const VOYAGE_H = 1000;

@@ -10,7 +10,7 @@
  */
 
 import { frameTexture, isLoaded, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js?v=3149d699';
-import { quoinTouches } from '../quoins.js?v=dfe1ff0a';
+import { quoinTouches } from '../quoins.js?v=f154a79e';
 
 export const DECO_DIR = 'assets/decos/groddle/';
 export const ICON_DIR = 'assets/sprites/icons/';

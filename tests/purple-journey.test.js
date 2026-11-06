@@ -29,8 +29,8 @@ import {
   scionFact,
   scionWords,
 } from '../public/js/purple-journey.js?v=5e078ed8';
-import { VOYAGE_FLOOR, VOYAGE_OFFSET } from '../public/js/purple-journey-scene.js?v=7e3a5b5d';
-import { purpleJourneyFeature } from '../public/js/features/purple-journey-feature.js?v=c2b8ab4c';
+import { VOYAGE_FLOOR, VOYAGE_OFFSET } from '../public/js/purple-journey-scene.js?v=16609bf4';
+import { purpleJourneyFeature } from '../public/js/features/purple-journey-feature.js?v=2c37d454';
 import { createAchievementState, applyAchievementProgress } from '../public/js/achievements.js?v=f8ccfd34';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=10b118dd';
 

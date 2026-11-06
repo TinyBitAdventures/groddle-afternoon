@@ -34,7 +34,7 @@
  *     data-companion-quoins; data-last-sound for the sound check.
  */
 
-import { QUOIN_TYPES, creditQuoinStat, quoinClassAmount } from '../quoins.js?v=dfe1ff0a';
+import { QUOIN_TYPES, creditQuoinStat, quoinClassAmount } from '../quoins.js?v=f154a79e';
 import {
   COMPANION_QUOIN_RULES,
   QUOIN_SHARD_FX,

@@ -13,8 +13,9 @@ import {
   planStreetQuoins,
   qrazyRewardForLevel,
   quoinDailyLimitFor,
+  quoinLimitPrompt,
   resetQuoinDay,
-} from '../public/js/quoins.js?v=dfe1ff0a';
+} from '../public/js/quoins.js?v=f154a79e';
 
 const publicRoot = join(import.meta.dirname, '..', 'public');
 
@@ -167,7 +168,7 @@ describe('ticket 94: quest rooms keep the daily quoin limit as a street does', (
   });
 
   it('at the limit a room quoin stays where it is and nothing is taken', async () => {
-    const { takeQuoins } = await import('../public/js/quest-rooms/puzzle-kit.js?v=78ce0250');
+    const { takeQuoins } = await import('../public/js/quest-rooms/puzzle-kit.js?v=7410b322');
     const q = { id: 'q0', type: 'xp', x: 100, y: 500, taken: false, spr: { visible: true, destroyed: false, scale: { y: 1 } } };
     let refuse = true;
     const ctx = { player: { x: 100, y: 540 }, bodyScale: () => 1, collectQuoin: () => (refuse ? { ok: false, reason: 'daily_limit', dailyLimit: 100 } : { ok: true }) };
@@ -189,6 +190,52 @@ describe('ticket 94: quest rooms keep the daily quoin limit as a street does', (
       const src = read(`js/${f}`);
       assert.doesNotMatch(src, /'Daily quoin limit'/, f);
       assert.match(src, /Wowza! You've reached today's \$\{[a-zA-Z.]+\}-quoin limit\./, f);
+    }
+  });
+});
+
+describe('report 132: the quoin limit is a prompt, once', () => {
+  it('uses the source prompt: its words, a 10 second timeout and one OK (inc_stats.js 687-693)', () => {
+    assert.deepEqual(quoinLimitPrompt(), {
+      text: "Wowza! You've reached your limit on quoins for this game day.",
+      iconButtons: false,
+      timeout: 10,
+      choices: [{ value: 'ok', label: 'OK' }],
+    });
+  });
+
+  it('fires on the quoin that reaches the limit, and never for a Qurazy quoin past it', () => {
+    const state = createQuoinState({ collectedToday: 98, dailyLimit: 100 });
+    const pc = { imagination: 0, xp: 0, level: 5 };
+    assert.equal(collectQuoin(state, 'xp', pc).hitLimit, false);
+    assert.equal(collectQuoin(state, 'xp', pc).hitLimit, true);
+    assert.equal(collectQuoin(state, 'xp', pc).reason, 'daily_limit');
+    assert.equal(collectQuoin(state, 'qurazy', pc).hitLimit, false);
+    assert.equal(state.collectedToday, 100);
+  });
+
+  it('a limit raised after reaching it fires again at the new top, as the source compares value to top', () => {
+    const state = createQuoinState({ collectedToday: 100, dailyLimit: 100 });
+    state.dailyLimit = 110;
+    const pc = { imagination: 0, xp: 0, level: 5 };
+    state.collectedToday = 109;
+    assert.equal(collectQuoin(state, 'xp', pc).hitLimit, true);
+  });
+
+  it('leaves the day streak rule alone', () => {
+    const state = createQuoinState({ collectedToday: 100, dailyLimit: 100, limitStreak: 2 });
+    assert.equal(resetQuoinDay(state, []).limitStreak, 3);
+    const game = readFileSync(new URL('../public/game.js', import.meta.url), 'utf8');
+    assert.match(game, /collectedToday\) \|\| 0\) >= 100\) \{\s*announceAchievementUpdates\(applyAchievementProgress\(achieveState, 'coin_count:days_maxed', 1, pc\)\);/);
+  });
+
+  it('every collector with its own quoins hands the limit on; no award window is left', () => {
+    const game = readFileSync(new URL('../public/game.js', import.meta.url), 'utf8');
+    assert.doesNotMatch(game, /Quoin Limit Reached/);
+    assert.match(game, /function announceQuoinLimit\(dailyLimit\) \{\s*if \(paradiseRun\) return;\s*engine\.prompt\(quoinLimitPrompt\(\)\);/);
+    for (const f of ['puzzles', 'purple-journey', 'quest-instances']) {
+      const src = readFileSync(new URL(`../public/js/features/${f}-feature.js`, import.meta.url), 'utf8');
+      assert.match(src, /\.hitLimit\) engine\.announceQuoinLimit\?\.\(/);
     }
   });
 });

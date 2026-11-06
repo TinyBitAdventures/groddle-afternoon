@@ -153,6 +153,16 @@ export function planStreetQuoins(streetTsid, count = 8) {
   );
 }
 
+/** The prompt when the day's limit is reached (inc_stats.js stats_add_quoins_today 687-693). */
+export function quoinLimitPrompt() {
+  return {
+    text: "Wowza! You've reached your limit on quoins for this game day.",
+    iconButtons: false,
+    timeout: 10,
+    choices: [{ value: 'ok', label: 'OK' }],
+  };
+}
+
 export function resetQuoinDay(state, upgrades = []) {
   const normalized = normalizeQuoinState(state);
   const hitLimit = normalized.collectedToday >= normalized.dailyLimit;
@@ -337,7 +347,8 @@ export function collectQuoin(state, typeId, pc, opts = {}) {
     multiplier,
     dailyCount: state.collectedToday,
     dailyLimit: state.dailyLimit,
-    hitLimit: originalType !== 'qurazy' && state.collectedToday >= state.dailyLimit,
+    // inc_stats.js 686: the quoin that makes the count equal the limit; only that one.
+    hitLimit: originalType !== 'qurazy' && state.collectedToday === state.dailyLimit,
     giantId,
     quoinClass: classAmount !== null ? className : null,
     acceleration: resolvedType === 'time' ? acceleration : null,

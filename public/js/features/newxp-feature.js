@@ -124,14 +124,14 @@ import {
   vogPages,
 } from '../newxp.js?v=8fa18f24';
 import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=d82f3b00';
-import { QUOIN_SHEET, QUOIN_TYPES, qrazyRewardForLevel } from '../quoins.js?v=dfe1ff0a';
+import { QUOIN_SHEET, QUOIN_TYPES, qrazyRewardForLevel } from '../quoins.js?v=f154a79e';
 import { soundForQuoin } from '../sound-moments.js?v=2f8597cd';
 import { IMAGINATION_UPGRADES } from '../imagination.js?v=0cab36eb';
 import { assignQuest, completeQuest } from '../quests.js?v=c8d9d0a4';
 import { acceptOffer, enqueueQuestOffer, questAwardPayload, turnInQuest } from '../quest-offers.js?v=114a9551';
 import { getQuestCatalog } from '../content-catalogs.js?v=10b118dd';
 import { locationEventsApi } from './location-events-feature.js?v=0966e395';
-import * as kit from '../quest-rooms/kit.js?v=4d8ab82d';
+import * as kit from '../quest-rooms/kit.js?v=d98b987e';
 import { frameTexture, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js?v=3149d699';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 import { displayTopOf, itemstackOverlayPoint, playPoofIn, playSheetOverlay, poofInAlpha } from '../overlay-art.js?v=11b6dd7f';

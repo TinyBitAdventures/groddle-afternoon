@@ -11,7 +11,7 @@
  */
 
 import { textureFromUrl } from '../textures.js?v=3149d699';
-import { touchesQuoin } from './kit.js?v=4d8ab82d';
+import { touchesQuoin } from './kit.js?v=d98b987e';
 
 export const JUMP_RISE = 100;
 export const JUMP_GAP = 150;

@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=8af10970';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=127e0a3c';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=a6614d8c';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=a9dc08ca';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -123,7 +123,7 @@ import {
 } from './js/legalize-it.js?v=d569fd0e';
 import { HALL, HALL_LAYOUT, HALL_QUESTIONS } from './js/bureaucratic-hall.js?v=a0bc6317';
 import { STATION_X, stationArrival, stationScreen, surfaceStation } from './js/subway.js?v=44d1a09f';
-import { ALLEY, SHADY, drawAlley, inEnteredBox } from './js/quest-rooms/back-alley-set.js?v=5faee32f';
+import { ALLEY, SHADY, drawAlley, inEnteredBox } from './js/quest-rooms/back-alley-set.js?v=3a8a00af';
 import {
   WINTER_HAVEN_STREET_ID,
   WINTER_MOTE_REWARDS,
@@ -362,7 +362,7 @@ import {
   slipTerrainY,
   starlitMoonPlainAlpha,
   starlitRevealAlpha,
-} from './js/paradise-flight.js?v=b9ebc32f';
+} from './js/paradise-flight.js?v=1b79cad2';
 import { resolveParadiseCourseAlias } from './js/paradise-courses.js?v=1a5d0aa7';
 import {
   buildParadiseCourseArt,
@@ -486,7 +486,7 @@ import {
   parsePlayerSave,
   serializePlayerSave,
   restorePlayerSave,
-} from './js/player-save.js?v=896f98e5';
+} from './js/player-save.js?v=92b73990';
 import {
   HOME_INTERIOR_TSID,
   HOME_STREET_TSID,
@@ -883,6 +883,7 @@ import {
   planStreetQuoins,
   quoinTouches,
   collectQuoin,
+  quoinLimitPrompt,
   resetQuoinDay,
   streetQuoinClass,
   quoinRespawnMs,
@@ -891,7 +892,7 @@ import {
   quoinClassType,
   resetStreetQuoinsForNewDay,
   creditQuoinStat,
-} from './js/quoins.js?v=dfe1ff0a';
+} from './js/quoins.js?v=f154a79e';
 import {
   buildHubMapView,
   mapClickTravel,
@@ -12121,6 +12122,8 @@ const engine = {
   /** G299: a game_splash_screen (js/game-splash.js show opts); hideGameSplash() takes it down. */
   gameSplash: (opts) => gameSplashUi().show(opts),
   hideGameSplash: () => gameSplash?.hide(),
+  /** The quoin that reached the day's limit, from a feature's own quoins (announceQuoinLimit). */
+  announceQuoinLimit: (dailyLimit) => announceQuoinLimit(dailyLimit),
   /** prompts_remove (inc_prompts.js 97-108): take a stacked prompt away unanswered. */
   removePrompt: (uid) => promptStackUi().remove(uid),
   /** The prompts in the stack (QA and features): { shown: [{ uid, text }], queued }. */
@@ -13657,18 +13660,19 @@ function grabWorldQuoin(q, shared = null) {
     const shrine = interactables.find((target) => target.classId?.startsWith('npc_shrine_'));
     if (shrine) refreshShrineTarget(shrine);
   }
-  if (result.hitLimit) {
-    // G374 stats_add_quoins_today (inc_stats.js 686-699): the 150 cap has its own rainbow; Paradise none.
-    if (!paradiseRun) playerRainbow(result.dailyLimit === 150 ? 'rainbow_150coinstoday' : 'rainbow_100coinstoday');
-    enqueueAward({
-      kind: 'achievement',
-      title: 'Quoin Limit Reached!',
-      body: `You gathered all ${result.dailyLimit} quoins available this game day.`,
-      subtitle: 'Numismatical!',
-    });
-  }
+  if (result.hitLimit) announceQuoinLimit(result.dailyLimit);
   updateHud();
   return true;
+}
+
+/**
+ * G374 stats_add_quoins_today (inc_stats.js 686-699), the quoin that reaches the day's limit: the
+ * source's prompt, not a window (report 132), and the rainbow, the 150 cap's own; in Paradise neither.
+ */
+function announceQuoinLimit(dailyLimit) {
+  if (paradiseRun) return;
+  engine.prompt(quoinLimitPrompt());
+  playerRainbow(dailyLimit === 150 ? 'rainbow_150coinstoday' : 'rainbow_100coinstoday');
 }
 
 function quoinResultCopy(result) {
@@ -17785,16 +17789,8 @@ function collectWinterWalkMote(entry) {
   const quoin = collectQuoin(quoinState, 'xp', pc, { amount: result.amount });
   const amount = quoin.ok ? quoin.actual : 0;
   winterWalkState.imgEarned += amount - result.amount;
-  if (quoin.hitLimit) {
-    // inc_stats.js stats_add_quoins_today 686-699, as a street quoin does (grabWorldQuoin).
-    playerRainbow(quoin.dailyLimit === 150 ? 'rainbow_150coinstoday' : 'rainbow_100coinstoday');
-    enqueueAward({
-      kind: 'achievement',
-      title: 'Quoin Limit Reached!',
-      body: `You gathered all ${quoin.dailyLimit} quoins available this game day.`,
-      subtitle: 'Numismatical!',
-    });
-  }
+  // inc_stats.js stats_add_quoins_today 686-699, as a street quoin does (grabWorldQuoin).
+  if (quoin.hitLimit) announceQuoinLimit(quoin.dailyLimit);
   const { x, y } = entry.sprite;
   if (entry.sprite.parent) entry.sprite.parent.removeChild(entry.sprite);
   if (!entry.sprite.destroyed) entry.sprite.destroy({ children: true });

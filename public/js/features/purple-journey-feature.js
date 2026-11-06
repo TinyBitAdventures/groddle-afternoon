@@ -35,7 +35,7 @@
 
 import { addItem, countItem, ITEM_CATALOG, removeItem } from '../inventory.js?v=d82f3b00';
 import { shiftMetabolic } from '../metabolics.js?v=8504134e';
-import { collectQuoin, QUOIN_SHEET, QUOIN_TYPES, quoinTouches } from '../quoins.js?v=dfe1ff0a';
+import { collectQuoin, QUOIN_SHEET, QUOIN_TYPES, quoinTouches } from '../quoins.js?v=f154a79e';
 import { frameTexture, sourceFromUrl } from '../textures.js?v=3149d699';
 import { playPoofIn } from '../overlay-art.js?v=11b6dd7f';
 import { STREET_INDEX } from '../street-loader.js?v=33d2b8bc';
@@ -60,7 +60,7 @@ import {
   purpleTimeline,
   scionWords,
 } from '../purple-journey.js?v=5e078ed8';
-import { VOYAGE_FLOOR, VOYAGE_H, VOYAGE_OFFSET, VOYAGE_W, buildVoyageScene } from '../purple-journey-scene.js?v=7e3a5b5d';
+import { VOYAGE_FLOOR, VOYAGE_H, VOYAGE_OFFSET, VOYAGE_W, buildVoyageScene } from '../purple-journey-scene.js?v=16609bf4';
 import { homesFeature } from './homes-feature.js?v=48877ccb';
 
 export const PURPLE_FEATURE_ID = 'purple-journey';
@@ -465,6 +465,7 @@ function tickQuoins(engine) {
         }
         continue;
       }
+      if (res.hitLimit) engine.announceQuoinLimit?.(res.dailyLimit);
       quoins = quoins.filter((x) => x !== q);
       q.sprite.parent?.removeChild(q.sprite);
       q.sprite.destroy();

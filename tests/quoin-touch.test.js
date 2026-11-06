@@ -6,7 +6,7 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { QUOIN_TOUCH, quoinTouches } from '../public/js/quoins.js?v=dfe1ff0a';
+import { QUOIN_TOUCH, quoinTouches } from '../public/js/quoins.js?v=f154a79e';
 import { serverPath, skipWithoutServer } from '../tools/repos.mjs';
 import { GRAVITY, JUMP_SPEED, WALK_MAX } from '../public/js/avatar-step.js?v=d48908a5';
 

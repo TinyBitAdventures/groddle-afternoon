@@ -42,7 +42,7 @@
  */
 
 import { locationEventsApi } from './location-events-feature.js?v=0966e395';
-import { collectQuoin, QUOIN_SHEET, QUOIN_TYPES } from '../quoins.js?v=dfe1ff0a';
+import { collectQuoin, QUOIN_SHEET, QUOIN_TYPES } from '../quoins.js?v=f154a79e';
 import {
   PUZZLE_DATA_URL,
   SOURCE_PHYSICS,
@@ -191,6 +191,7 @@ function takeQuoins(engine) {
       limitNotice(engine, result.dailyLimit);
       continue;
     }
+    if (result.hitLimit) engine.announceQuoinLimit?.(result.dailyLimit);
     run.taken.add(q.id);
     const view = run.quoinViews.get(q.id);
     if (view?.spr && !view.spr.destroyed) view.spr.visible = false;

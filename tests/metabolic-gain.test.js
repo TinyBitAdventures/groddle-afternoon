@@ -9,7 +9,7 @@ import { fileURLToPath } from 'node:url';
 
 import { metabolicGain, setMetabolicGainGate } from '../public/js/metabolics.js?v=8504134e';
 import { applyRewards, createQuestState } from '../public/js/quests.js?v=c8d9d0a4';
-import { collectQuoin, createQuoinState, creditQuoinStat } from '../public/js/quoins.js?v=dfe1ff0a';
+import { collectQuoin, createQuoinState, creditQuoinStat } from '../public/js/quoins.js?v=f154a79e';
 import { HELL_TEXT, metabolicGate, normalizeHellState } from '../public/js/hell.js?v=aca145ba';
 import { questOffersFeature } from '../public/js/features/quest-offers-feature.js?v=ed3cb5da';
 
