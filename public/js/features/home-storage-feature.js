@@ -48,9 +48,9 @@ import { textureFromUrl } from '../textures.js?v=3149d699';
 import { stackMaxOf, isBagClass } from '../pack-slots.js?v=c91d0ca3';
 import { ELEMENT_CLASSES, NO_BAG_CLASSES, NO_SLOT_CLASSES } from '../pack-slots-data.js?v=800f664c';
 import { TOOL_CONDITION_CATALOG, copyTagKind, copyTags, receiveToolCopy, setCopyTag, takeToolCopy } from '../tools.js?v=6684b484';
-import { readVisitScene } from '../neighbours-mp.js?v=4a7dd8d6';
+import { readVisitScene } from '../neighbours-mp.js?v=3f8f866c';
 import { saveStore } from '../save-store.js?v=8839ba7b';
-import { homesFeature } from './homes-feature.js?v=e1fc4a79';
+import { homesFeature } from './homes-feature.js?v=343c5786';
 import {
   SDB_PRICE_MAX,
   STORAGE_TEXT as T,

@@ -455,6 +455,19 @@ export function createMinnAccount({ baseUri, fetch: fetchFn = globalThis.fetch?.
       return buddyCall('Taking the package', `butler/${encodeURIComponent(String(id))}/take`, { method: 'POST' });
     },
 
+    // Ticket 112: the Butler's gift stock and visits on the site (src/ButlerGifts.php).
+    async butlerStock() {
+      return buddyCall('Asking your Butler', 'butler/stock');
+    },
+
+    async butlerGive({ op, c, n, keep }) {
+      return buddyCall('Giving the Butler a gift', 'butler/stock', { method: 'POST', body: { op: String(op), c: String(c), n: Math.floor(Number(n) || 0), keep: keep === true } });
+    },
+
+    async butlerAdopt() {
+      return buddyCall('Asking your Butler', 'butler/stock/adopt', { method: 'POST' });
+    },
+
     async tend(owner, acts) {
       return buddyCall('Tending', `homes/${Number(owner)}/tend`, { method: 'POST', body: { acts } });
     },

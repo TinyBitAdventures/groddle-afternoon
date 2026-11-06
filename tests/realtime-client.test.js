@@ -32,9 +32,9 @@ import {
   sampleTrack,
   socketUrl,
 } from '../public/js/realtime-client.js?v=e2dde578';
-import { createMinnAccount } from '../public/js/minn-account.js?v=9544b0a0';
-import { emoteCommand, lookOf, poseOf, realtimeFeature, sharedStreet, statusText } from '../public/js/features/realtime-feature.js?v=1f7d384b';
-import { FEATURES } from '../public/js/features/index.js?v=a893c82e';
+import { createMinnAccount } from '../public/js/minn-account.js?v=7bc19312';
+import { emoteCommand, lookOf, poseOf, realtimeFeature, sharedStreet, statusText } from '../public/js/features/realtime-feature.js?v=3aca01c7';
+import { FEATURES } from '../public/js/features/index.js?v=434c2aeb';
 
 const root = join(import.meta.dirname, '..');
 const read = (rel) => readFileSync(join(root, rel), 'utf8');

@@ -20,11 +20,11 @@
  * [data-friend=<id>], #pc-report-text, #pc-photo, #pc-reply-text.
  */
 
-import { createMinnAccount } from '../minn-account.js?v=9544b0a0';
+import { createMinnAccount } from '../minn-account.js?v=7bc19312';
 import { mountAccountForms, resetLinkFrom, verifyLinkFrom } from '../account-forms.js?v=dc451560';
-import { gateFor, quietSession, suspendedNow } from '../online-boot.js?v=06e4a421';
-import { REPORT_MAX, REPORT_TEXT, STATUS_WORDS, createReportsApi, pictureRefused, pictureSrc, refusalWords, reportFromHash, ticketLine, unreadCount, whenWords } from '../reports.js?v=46a8e328';
-import { DEVICE_KEY, PHONE_TEXT as T, POLL_MS, createPresenceApi, fitPhoto, friendsView, fullGameHref, itemNamesFrom, itemWords, mailRows, mailboxFromSave, mergePlayerMail, phoneContext, unreadLetters } from './companion-data.js?v=a4ba6b09';
+import { gateFor, quietSession, suspendedNow } from '../online-boot.js?v=be077df3';
+import { REPORT_MAX, REPORT_TEXT, STATUS_WORDS, createReportsApi, pictureRefused, pictureSrc, refusalWords, reportFromHash, ticketLine, unreadCount, whenWords } from '../reports.js?v=9baf7f5d';
+import { DEVICE_KEY, PHONE_TEXT as T, POLL_MS, createPresenceApi, fitPhoto, friendsView, fullGameHref, itemNamesFrom, itemWords, mailRows, mailboxFromSave, mergePlayerMail, phoneContext, unreadLetters } from './companion-data.js?v=3fddd1dd';
 
 const doc = globalThis.document;
 

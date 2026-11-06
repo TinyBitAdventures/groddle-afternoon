@@ -16,7 +16,9 @@
  * leave_package / leave_message; the site's src/ButlerParcels.php, the
  * server's homes_help.go), key-holders tending the owner's gardens
  * (items/garden_new.js tend; src/HomeTending.php), and the counters the
- * neighbour quests and the hosting badges read.
+ * neighbour quests and the hosting badges read. Ticket 112: the gift the
+ * owner leaves with the Butler for visitors and who came (bag_butler.js
+ * giveGift, onPlayerEnter; the site's src/ButlerGifts.php keeps both).
  *
  * Solo never loads any of this: solo's neighbours are js/neighbours.js.
  */
@@ -290,6 +292,10 @@ export const VISITOR_BUTLER_TEXT = Object.freeze({
   send: 'Leave message',
   skip: 'No message',
   // Ours: the owner hears at once (the source's Butler IMed an owner away from home).
+  // giveGift's line (bag_butler.js accept_gift 1682-1683, butler_strings giftItem).
+  giftItem: (item, owner) => `Here is your ${item} from ${owner}. I hope you enjoy it!`,
+  // Ours: the save's gift from before waits until the site can take it in (ticket 112).
+  giftWaiting: "I'm still holding your last gift for visitors. Ask me again in a little while.",
   parcelArrived: (name, item, message) => (item && message ? `${name} left you a package and a message with your Butler.` : item ? `${name} left you a package with your Butler.` : `${name} left you a message with your Butler.`),
 });
 
@@ -334,6 +340,74 @@ export function mergeParcels(state, parcels) {
     if (p.item) state.packages.push({ id: p.id, from, fromName: p.from.name, classTsid: p.item.c, count: p.item.n, time: p.at });
     if (p.text) state.messages.push({ id: p.item ? `${p.id}:m` : p.id, from, fromName: p.from.name, text: p.text, time: p.at, withPackage: p.item ? p.id : null });
     added += 1;
+  }
+  return added;
+}
+
+// —— Ticket 112: the owner's gift for visitors and the visit log, kept by the site ——
+
+/** A give's id (the site's ButlerGifts::giftId): bgift- and 16 hex. */
+export function butlerGiftOp(rand = Math.random) {
+  let hex = '';
+  for (let i = 0; i < 16; i++) hex += Math.floor(rand() * 16).toString(16);
+  return `bgift-${hex}`;
+}
+
+/** The realtime server's id for a visit (homes_help.go visited: bvisit- and 16 hex), the gift's credit. */
+export function isButlerVisitOp(id) {
+  return /^bvisit-[0-9a-f]{16}$/.test(String(id || ''));
+}
+
+function siteStack(value) {
+  const c = String(value?.c || '');
+  const n = Math.floor(Number(value?.n) || 0);
+  return /^[a-z0-9_]{1,64}$/.test(c) && n > 0 ? { c, n: Math.min(9999, n) } : null;
+}
+
+/** groddle/v1/butler/stock, checked: { gift: { c, n } | null, legacy, visits: [{ id, name, at }] }. */
+export function normalizeButlerStock(answer) {
+  const visits = [];
+  for (const v of Array.isArray(answer?.visits) ? answer.visits : []) {
+    const id = positiveId(v?.id);
+    const at = Math.floor(Number(v?.at) || 0);
+    if (id && at > 0) visits.push({ id, name: String(v?.name || 'Someone').slice(0, 40), at });
+  }
+  return { gift: siteStack(answer?.gift), legacy: answer?.legacy === true, visits: visits.slice(0, 200) };
+}
+
+/** The site's answer to a give (POST groddle/v1/butler/stock), checked; null when it is no answer. */
+export function normalizeGiftAnswer(answer) {
+  const status = String(answer?.status || '');
+  if (status === 'refused') return { ok: false, why: String(answer?.why || ''), text: String(answer?.text || '') };
+  if (status !== 'given' && status !== 'done') return null;
+  const op = String(answer?.op || '');
+  if (!/^bgift-[0-9a-f]{16}$/.test(op)) return null;
+  return { ok: true, op, gave: siteStack(answer?.gave), got: siteStack(answer?.got), gift: siteStack(answer?.gift) };
+}
+
+/**
+ * The site's stock and visits into the owner's Butler (js/butler.js shape):
+ * the gift it holds is the site's (the save keeps a copy to show), unless
+ * `keepGift` (a gift from before the stock lived on the site, not taken in
+ * yet); each visit is a timestamp under `p<id>` with the visitor's name,
+ * as onPlayerEnter kept them, each once. Returns how many visits came in.
+ */
+export function applyButlerStock(state, stock, { keepGift = false } = {}) {
+  if (!state || !stock) return 0;
+  if (!keepGift) state.gift = stock.gift ? { classTsid: stock.gift.c, count: stock.gift.n } : null;
+  if (!state.visitors || typeof state.visitors !== 'object') state.visitors = {};
+  if (!state.visitorNames || typeof state.visitorNames !== 'object') state.visitorNames = {};
+  let added = 0;
+  for (const v of [...stock.visits].reverse()) {
+    const key = `p${v.id}`;
+    const list = state.visitors[key] || (state.visitors[key] = []);
+    if (!list.includes(v.at)) {
+      list.push(v.at);
+      list.sort((a, b) => a - b);
+      if (list.length > 50) list.splice(0, list.length - 50);
+      added += 1;
+    }
+    state.visitorNames[key] = v.name;
   }
   return added;
 }

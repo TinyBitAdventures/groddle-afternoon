@@ -13,7 +13,7 @@ import { fileURLToPath } from 'node:url';
 import { READ_MAX_MS, READ_MIN_MS, READ_PER_WORD_MS, holdMs, readMs, wordCount } from '../public/js/read-time.js?v=60ae7efc';
 import { NOTICE_KEEP_MS, createNotifier } from '../public/js/notify.js?v=37c6b748';
 import { MEDITATION_TEXT } from '../public/js/meditation.js?v=380b2f3f';
-import { BUTLER_STRINGS, ownerGreeting } from '../public/js/butler.js?v=86316578';
+import { BUTLER_STRINGS, ownerGreeting } from '../public/js/butler.js?v=2bafa110';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (p) => readFileSync(join(ROOT, p), 'utf8');

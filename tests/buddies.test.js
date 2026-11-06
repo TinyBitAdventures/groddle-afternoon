@@ -29,9 +29,9 @@ import {
   freshReverse,
   normalizeList,
 } from '../public/js/buddies.js?v=df41a3bb';
-import { createMinnAccount } from '../public/js/minn-account.js?v=9544b0a0';
-import { buddiesFeature } from '../public/js/features/buddies-feature.js?v=05cbd107';
-import { FEATURES } from '../public/js/features/index.js?v=a893c82e';
+import { createMinnAccount } from '../public/js/minn-account.js?v=7bc19312';
+import { buddiesFeature } from '../public/js/features/buddies-feature.js?v=909520f4';
+import { FEATURES } from '../public/js/features/index.js?v=434c2aeb';
 import { serverPath, sitePath, skipWithoutServer, skipWithoutSite } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');

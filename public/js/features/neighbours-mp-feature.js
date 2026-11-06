@@ -47,6 +47,17 @@
  *   butler_parcel); the Butler hands them over as it does a neighbour's
  *   (butler-feature handOver), the site moving a package into the owner's
  *   ledger first (butlerApi.setParcelHook).
+ * - Ticket 112: the gift the owner leaves with the Butler for visitors is
+ *   kept by the site (src/ButlerGifts.php), not the save, so a visitor gets
+ *   one while the owner is away: the realtime server (homes_help.go) asks
+ *   the site when a visitor comes onto the home street, which notes the
+ *   visit and credits the visitor one of the gift, once per visitor per
+ *   class (bag_butler.js giveGift); the visitor is told (butler_gift) and
+ *   the owner, online, too (butler_visit). The owner's game reads the stock
+ *   and the visits into its Butler (applyButlerStock) for the give verb and
+ *   "who visited?", gives through the site (butlerApi.setGiftHook), and
+ *   brings a gift its save held from before into the site's stock once
+ *   (butler/stock/adopt).
  * - Key-holders tend the owner's gardens (garden_new.js tend: the owner or
  *   a key-holder): their garden verbs run on their copy of the plots, and
  *   each water, plant, clear or harvest goes to the site
@@ -78,21 +89,23 @@
  *
  * QA: canvas data neighboursVisit (owner:room), neighboursKeys (given/received
  * counts), neighboursLast, neighboursButler (the visitor Butler: name@x),
- * neighboursParcels (merged into my Butler), neighboursTended (acts applied
+ * neighboursParcels (merged into my Butler), neighboursButlerStock (ticket
+ * 112: my Butler's gift on the site, class:count, and the visits it noted),
+ * neighboursButlerGifts (gifts a Butler gave me this session), neighboursTended (acts applied
  * to my gardens / acts the site took from me); window.groddleNeighbours in
  * multiplayer.
  */
 
-import { createMinnAccount } from '../minn-account.js?v=9544b0a0';
+import { createMinnAccount } from '../minn-account.js?v=7bc19312';
 import { runStreetTransition } from '../screen-fx.js?v=428f4022';
 import { STREET_INDEX } from '../street-loader.js?v=33d2b8bc';
-import { ITEM_CATALOG, countItem, listPackItemSlots, removeItem } from '../inventory.js?v=d82f3b00';
+import { ITEM_CATALOG, addItem, countItem, listPackItemSlots, removeItem } from '../inventory.js?v=d82f3b00';
 import { cultivationDef, homeStreetLayout } from '../home-cultivation.js?v=ff17225a';
 import { tickGarden } from '../garden.js?v=97737c93';
 import { BUTLER_RIG_SCALE, ButlerPainter, butlerRigNow, loadButlerRig } from '../butler-rig.js?v=e81817d9';
-import { butlerPostRx, normalizeButlerParts } from '../butler.js?v=86316578';
-import { butlerApi } from './butler-feature.js?v=09429901';
-import { homesFeature, visitorHomeScene, visitorHomeState } from './homes-feature.js?v=e1fc4a79';
+import { butlerPostRx, normalizeButlerParts } from '../butler.js?v=2bafa110';
+import { butlerApi } from './butler-feature.js?v=5876fd01';
+import { homesFeature, visitorHomeScene, visitorHomeState } from './homes-feature.js?v=343c5786';
 import {
   BUTLER_MESSAGE_MAX,
   KEY_VERB,
@@ -102,7 +115,9 @@ import {
   VISITOR_BUTLER_TEXT as BT,
   VISITOR_BUTLER_VERBS as BV,
   VISIT_VERB,
+  applyButlerStock,
   applyTendAct,
+  butlerGiftOp,
   doorVerbs,
   givenLine,
   holdsKeyFrom,
@@ -110,6 +125,7 @@ import {
   homeStreetName,
   hostedCounters,
   houseName,
+  isButlerVisitOp,
   isSiteParcel,
   keyCandidates,
   mergeParcels,
@@ -117,6 +133,8 @@ import {
   normalizeKeys,
   normalizeNeighboursSlice,
   normalizeParcels,
+  normalizeButlerStock,
+  normalizeGiftAnswer,
   normalizeTendActs,
   noteGift,
   outText,
@@ -130,7 +148,7 @@ import {
   tendedText,
   TENDED_KEEP,
   visitSceneTsid,
-} from '../neighbours-mp.js?v=4a7dd8d6';
+} from '../neighbours-mp.js?v=3f8f866c';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
 import { elevatorStops, towerLabel } from '../home-tower.js?v=4daa0b96';
 
@@ -805,6 +823,82 @@ function createSession(engine, client) {
   });
 
 
+  // —— Ticket 112: my Butler's gift for visitors and who came, kept by the site ——
+  let stockReady = null;
+  /** A gift my save held from before that the site could not take in yet (adopt refused: budget). */
+  let legacyWaiting = false;
+  let stockLast = '';
+  let giftsGot = 0;
+
+  function publishStock(st) {
+    const g = st?.gift;
+    stockLast = `${g ? `${g.classTsid}:${g.count}` : ''}/${Object.keys(st?.visitors || {}).length}`;
+    engine.setData?.('neighboursButlerStock', stockLast);
+  }
+
+  async function loadStockNow() {
+    const st = butlerApi.mpState?.(engine);
+    if (!st?.owned) return 0;
+    let stock;
+    try {
+      stock = normalizeButlerStock(await account.butlerStock());
+    } catch (err) {
+      console.warn('[neighbours]', err?.message || err);
+      return 0;
+    }
+    legacyWaiting = false;
+    if (stock.legacy && st.gift) {
+      // The gift a save's Butler held before the site kept it: taken in once, so nothing is lost.
+      let a = null;
+      try {
+        a = await account.butlerAdopt();
+      } catch (err) {
+        a = err?.data || null;
+      }
+      if (a?.status === 'adopted' || a?.status === 'done') {
+        stock = normalizeButlerStock({ ...stock, gift: a.gift, legacy: false });
+      } else if (a?.why === 'type') {
+        // Not something the ledger carries: back to the pack, as the source's old gift came back.
+        addItem(engine.inv, st.gift.classTsid, st.gift.count);
+        engine.refreshPack?.();
+        stock = normalizeButlerStock({ ...stock, gift: null, legacy: false });
+      } else {
+        legacyWaiting = true;
+      }
+    }
+    const added = applyButlerStock(st, stock, { keepGift: legacyWaiting });
+    engine.save?.();
+    butlerApi.stockArrived?.(engine);
+    publishStock(st);
+    return added;
+  }
+
+  function loadStock() {
+    stockReady = loadStockNow().finally(() => { stockReady = null; });
+    return stockReady;
+  }
+
+  butlerApi.setGiftHook?.({
+    /** onLeaveVisitorGift through the site: the stack leaves my ledger into the Butler's stock (once per give). */
+    async give(eng, { c, n, keep }) {
+      if (stockReady) await stockReady.catch(() => {});
+      // Ours: a gift from before that the site could not take in yet stays until it can, so nothing is lost.
+      if (legacyWaiting) return { ok: false, text: BT.giftWaiting };
+      let a;
+      try {
+        a = normalizeGiftAnswer(await account.butlerGive({ op: butlerGiftOp(), c, n, keep }));
+      } catch (err) {
+        a = normalizeGiftAnswer(err?.data);
+        if (!a) return { ok: false, text: err?.message || T.failed };
+      }
+      if (!a) return { ok: false, text: T.failed };
+      if (!a.ok) return { ok: false, text: a.text };
+      const applied = eng.query?.('ledgerReceipt', a.op, eng) !== false;
+      publishStock({ gift: a.gift ? { classTsid: a.gift.c, count: a.gift.n } : null, visitors: butlerApi.mpState?.(eng)?.visitors });
+      return { ok: true, applied, got: a.got, gift: a.gift };
+    },
+  });
+
   /**
    * GATESIGN: where the visit's way out leads (goBack: the spot you came from, else the arrival
    * street), with its name and hub, for the Back to Ur arm's tip and the Imagination menu's
@@ -1135,6 +1229,42 @@ function createSession(engine, client) {
     }
     engine.save?.();
   });
+  // Ticket 112: the owner's Butler gave me (a visitor) one of their gift; once per credit.
+  client.on('msg:butler_gift', (msg) => {
+    const op = String(msg.op || '');
+    const c = String(msg.item?.c || '');
+    const n = Math.max(0, Math.min(9999, Math.floor(Number(msg.item?.n) || 0)));
+    if (!isButlerVisitOp(op) || !/^[a-z0-9_]{1,64}$/.test(c) || !n) return;
+    if (engine.query?.('ledgerReceipt', op, engine) === false) return;
+    addItem(engine.inv, c, n);
+    engine.refreshPack?.();
+    engine.save?.();
+    giftsGot += n;
+    engine.setData?.('neighboursButlerGifts', String(giftsGot));
+    const owner = Number(msg.owner) || 0;
+    const here = () => Boolean(vb && !vb.box.destroyed && visit?.owner === owner && visit.room === 'street');
+    engine.floatText?.(engine.player?.x ?? 0, (engine.player?.y ?? engine.groundY ?? 0) - 90, `+${itemLabel(c, n)}`, 0xf2c879);
+    if (visit?.owner !== owner) {
+      engine.pushActivity?.(`+${itemLabel(c, n)}`);
+      return;
+    }
+    const text = BT.giftItem(itemLabel(c, 1), visit.name);
+    // greetPlayer gave the gift with the greeting: the line comes after it, from the Butler when it stands here.
+    const started = Date.now();
+    let waited = false;
+    const sayIt = () => {
+      if (here() && !vb.greeted && Date.now() - started < 4000) {
+        waited = true;
+        setTimeout(sayIt, 400);
+      } else if (here()) setTimeout(() => (here() ? butlerSay(text, 5000) : notice(text, 4200)), waited ? 5200 : 1200);
+      else notice(text, 4200);
+    };
+    sayIt();
+  });
+  // Ticket 112: someone came onto my home street; the Butler's stock and visit list are current.
+  client.on('msg:butler_visit', () => {
+    loadStock();
+  });
   client.on('msg:butler_parcel', (msg) => {
     notice(BT.parcelArrived(String(msg.from?.name || 'Someone'), msg.item === true, msg.message === true), 4200);
     loadParcels();
@@ -1191,6 +1321,7 @@ function createSession(engine, client) {
   loadKeys();
   loadVisitors();
   loadParcels();
+  loadStock();
   loadTending();
 
   return {
@@ -1316,6 +1447,9 @@ function createSession(engine, client) {
       return true;
     },
     loadParcels,
+    loadStock,
+    /** QA, ticket 112: my Butler's gift on the site and the visits noted (class:count/visitors). */
+    get stock() { return stockLast; },
     loadTending,
     /** QA: stand beside the visited Butler ('butler'), your own ('ownbutler'), or the first garden bed ('garden'), then E opens its menu. */
     standNear(what = 'butler') {

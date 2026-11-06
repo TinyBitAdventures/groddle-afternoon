@@ -69,7 +69,7 @@
 
 import { ITEM_CATALOG, addItem, countItem, ensureItem, itemIcon, listPackItemSlots, removeItem } from '../inventory.js?v=d82f3b00';
 import { homeStreetLayout, towerItem } from '../home-cultivation.js?v=ff17225a';
-import { homesFeature } from './homes-feature.js?v=e1fc4a79';
+import { homesFeature } from './homes-feature.js?v=343c5786';
 import { towerApi } from './home-tower-feature.js?v=c854a072';
 import { levelInfoForXp } from '../progression.js?v=33462eaa';
 import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=3149d699';
@@ -112,6 +112,7 @@ import {
   createButlerState,
   giftOffer,
   giveGiftTo,
+  newestVisit,
   hintDue,
   idleChatter,
   nearLevel,
@@ -134,7 +135,7 @@ import {
   takeVisitorDelivery,
   teachButler,
   visitorsReport,
-} from '../butler.js?v=86316578';
+} from '../butler.js?v=2bafa110';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
 import { holdMs } from '../read-time.js?v=60ae7efc';
 
@@ -1370,7 +1371,8 @@ function handOver(engine) {
 function whoVisited(engine) {
   const report = visitorsReport(st);
   if (!report.count) return line(engine, 'visitors', 'There have been no visitors since the last time you asked.', 'Thanks!');
-  st.lastWhoVisited = now();
+  // Ticket 112: in multiplayer the visits come from the site (its clock), so asked means just past the newest.
+  st.lastWhoVisited = engine.mode === 'multiplayer' ? newestVisit(st) + 1 : now();
   engine.save?.();
   if (report.many) {
     line(engine, 'visitors', BUTLER_STRINGS.visitorsMany, 'Thanks!', () => line(engine, 'visitors:list', report.output, 'Thanks!'));
@@ -1642,6 +1644,8 @@ function giveMenu(engine) {
         onChoice: (answer) => {
           if (answer !== 'yes') return line(engine, 'give:no', BUTLER_STRINGS.visitorGiftNo, 'Bye');
           if (countItem(engine.inv, chosen) < n) return closeDialog(engine);
+          // Ticket 112: in multiplayer the Butler's stock is the site's, so a visitor gets it while you are away.
+          if (engine.mode === 'multiplayer' && giftHook) return giveThroughSite(engine, chosen, n, offer.returns === null);
           removeItem(engine.inv, chosen, n);
           const out = setGift(st, { classTsid: chosen, count: n, stackMax: stackMax(chosen) });
           if (out.returned) addItem(engine.inv, out.returned.classTsid, out.returned.count);
@@ -1653,6 +1657,32 @@ function giveMenu(engine) {
       });
     },
   });
+}
+
+/**
+ * Ticket 112 (multiplayer): the site takes the stack into the Butler's stock and
+ * sends back an old gift of another class (onLeaveVisitorGift, onReturnOldGift);
+ * the pack changes once the site says so, once per give (the trade slice's receipt).
+ */
+function giveThroughSite(engine, cls, n, keep) {
+  closeDialog(engine);
+  giftHook.give(engine, { c: cls, n, keep }).then((a) => {
+    if (!a?.ok) {
+      say(engine, a?.text || BUTLER_STRINGS.visitorGiftNo, 3000);
+      return;
+    }
+    if (a.applied) {
+      removeItem(engine.inv, cls, Math.min(n, countItem(engine.inv, cls)));
+      if (a.got) addItem(engine.inv, a.got.c, a.got.n);
+    }
+    st.gift = a.gift ? { classTsid: a.gift.c, count: a.gift.n } : null;
+    st.gifts = {};
+    engine.refreshPack?.();
+    engine.save?.();
+    publish(engine, true);
+    const text = st.gift && st.gift.count > 1 ? BUTLER_STRINGS.visitorGiftAcceptPlural : BUTLER_STRINGS.visitorGiftAccept;
+    setTimeout(() => say(engine, text, 3000), 1200);
+  }, () => say(engine, BUTLER_STRINGS.visitorGiftNo, 3000));
 }
 
 function giftable(cls) {
@@ -1679,7 +1709,8 @@ function receiveVisitor(engine, letter) {
   const out = takeVisitorDelivery(st, { from: id, fromName: letter.sender, attachment: letter.attachment, text: letter.text, now: Number(letter.deliveryAt) || now() });
   if (!out.ok) return false;
   recordVisitor(st, { id, name: letter.sender, now: Number(letter.deliveryAt) || now() });
-  giveGiftTo(st, id);
+  // Ticket 112: in multiplayer the gift is the site's stock, for real visitors only.
+  if (engine.mode !== 'multiplayer') giveGiftTo(st, id);
   engine.pushActivity?.(`${butlerName(st)}: ${butlerText('visitorNotifyOwnerHere', { pc: letter.sender })}`);
   lastMsg = `visitor:${id}`;
   engine.save?.();
@@ -1700,6 +1731,9 @@ function neighbourIdFor(name) {
 let parcelHook = null;
 /** G367 (multiplayer): { list(engine) -> verbs, run(engine, id) } the Butler IM feature adds. */
 let mpVerbs = null;
+/** Ticket 112 (multiplayer): { give(engine, { c, n, keep }) -> Promise<{ ok, applied, got, gift, text }> } for the gift for visitors. */
+let giftHook = null;
+
 
 export const butlerApi = {
   owned: () => st.owned === true,
@@ -1711,6 +1745,15 @@ export const butlerApi = {
   /** neighbours-mp-feature: the site takes a parcel before the Butler hands it over. */
   setParcelHook(hook) {
     parcelHook = hook && typeof hook.owns === 'function' && typeof hook.take === 'function' ? hook : null;
+  },
+  /** Ticket 112, neighbours-mp-feature: the site keeps the gift for visitors. */
+  setGiftHook(hook) {
+    giftHook = hook && typeof hook.give === 'function' ? hook : null;
+  },
+  /** Ticket 112: the site's stock and visits were put into the state (applyButlerStock); redraw. */
+  stockArrived(engine) {
+    if (engine?.mode !== 'multiplayer' || !st.owned) return;
+    publish(engine, true);
   },
   /** After parcels arrive: the Butler (if it stands here) says what it holds, and the counts redraw. */
   parcelsArrived(engine) {

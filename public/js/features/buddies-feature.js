@@ -48,7 +48,7 @@
  * buddiesLast (the last notice); window.groddleBuddies.
  */
 
-import { createMinnAccount } from '../minn-account.js?v=9544b0a0';
+import { createMinnAccount } from '../minn-account.js?v=7bc19312';
 import { bindContextTrigger } from '../ui/context-menu.js?v=57c5f1fe';
 import { STREET_INDEX } from '../street-loader.js?v=33d2b8bc';
 import {

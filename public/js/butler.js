@@ -890,6 +890,18 @@ export function visitorsReport(state) {
   return { count, output, many: count > 5 };
 }
 
+/**
+ * The newest visit noted (0 with none). Multiplayer marks "who visited?" as
+ * asked just past it: the visits are the site's clock, not this computer's.
+ */
+export function newestVisit(state) {
+  let newest = 0;
+  for (const times of Object.values(state?.visitors || {})) {
+    for (const t of Array.isArray(times) ? times : []) if (t > newest) newest = t;
+  }
+  return newest;
+}
+
 // ---------------------------------------------------------------------------
 // Naming, teaching, clicks, chatter
 // ---------------------------------------------------------------------------

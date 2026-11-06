@@ -78,11 +78,11 @@ import { receiveToolCopy, takeToolCopy } from '../tools.js?v=6684b484';
 import { RECIPE_CATALOG } from '../making.js?v=82ce9d08';
 import { getSkillCatalog } from '../content-catalogs.js?v=10b118dd';
 import { createBackYardState, homeStreetLayout, normalizeCultivationState } from '../home-cultivation.js?v=ff17225a';
-import { readVisitScene } from '../neighbours-mp.js?v=4a7dd8d6';
+import { readVisitScene } from '../neighbours-mp.js?v=3f8f866c';
 import { saveStore } from '../save-store.js?v=8839ba7b';
 import { textureFromUrl } from '../textures.js?v=3149d699';
 import { createSheetLoader } from '../sprite-sheets.js?v=db7c442f';
-import { STREET_GROUND_Y, homesFeature } from './homes-feature.js?v=e1fc4a79';
+import { STREET_GROUND_Y, homesFeature } from './homes-feature.js?v=343c5786';
 
 export { HOME_MACHINES_ID };
 

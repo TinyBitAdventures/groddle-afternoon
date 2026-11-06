@@ -47,7 +47,7 @@ import {
 } from '../player-im.js?v=23463a96';
 import { EARLIER_TEXT } from '../groups.js?v=4c4c8d76';
 import { imKey } from '../chat-reactions.js?v=d65d555b';
-import { createMinnAccount } from '../minn-account.js?v=9544b0a0';
+import { createMinnAccount } from '../minn-account.js?v=7bc19312';
 
 export const PLAYER_IM_FEATURE_ID = 'player-im';
 

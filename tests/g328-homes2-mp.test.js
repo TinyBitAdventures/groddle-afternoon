@@ -17,10 +17,15 @@ import { join } from 'node:path';
 import {
   NEIGHBOUR_COUNTERS,
   VISITOR_BUTLER_TEXT,
+  applyButlerStock,
   applyTendAct,
+  butlerGiftOp,
   hostedCounters,
+  isButlerVisitOp,
   isSiteParcel,
   mergeParcels,
+  normalizeButlerStock,
+  normalizeGiftAnswer,
   normalizeHomeView,
   normalizeNeighboursSlice,
   normalizeParcels,
@@ -30,12 +35,12 @@ import {
   tendAct,
   tendCounters,
   tendedText,
-} from '../public/js/neighbours-mp.js?v=4a7dd8d6';
-import { createButlerState, nextHandover, normalizeButlerState, packagesAndMessagesForOwner } from '../public/js/butler.js?v=86316578';
+} from '../public/js/neighbours-mp.js?v=3f8f866c';
+import { createButlerState, giveGiftTo, newestVisit, nextHandover, normalizeButlerState, packagesAndMessagesForOwner, recordVisitor, setGift, visitorsReport } from '../public/js/butler.js?v=2bafa110';
 import { createGarden, tickGarden } from '../public/js/garden.js?v=97737c93';
-import { butlerApi } from '../public/js/features/butler-feature.js?v=09429901';
-import { neighboursMpFeature } from '../public/js/features/neighbours-mp-feature.js?v=15b50b98';
-import { createMinnAccount } from '../public/js/minn-account.js?v=9544b0a0';
+import { butlerApi } from '../public/js/features/butler-feature.js?v=5876fd01';
+import { neighboursMpFeature } from '../public/js/features/neighbours-mp-feature.js?v=752b7b46';
+import { createMinnAccount } from '../public/js/minn-account.js?v=7bc19312';
 import { HAS_SERVER, HAS_SITE, SITE_DIR, serverPath, sitePath } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');
@@ -44,7 +49,7 @@ const hasPhp = spawnSync('php', ['-v']).status === 0;
 const skipSite = !HAS_SITE ? 'no groddle-afternoon-site checkout' : !hasPhp ? 'no php' : false;
 
 function php(body) {
-  const code = `foreach (['Economy', 'LedgerMath', 'WordFilter', 'ButlerParcels', 'HomeTending'] as $c) require ${JSON.stringify(SITE_DIR)} . "/src/$c.php"; use Groddle\\Minn\\ButlerParcels; use Groddle\\Minn\\HomeTending; ${body}`;
+  const code = `foreach (['Economy', 'LedgerMath', 'WordFilter', 'ButlerParcels', 'ButlerGifts', 'HomeTending'] as $c) require ${JSON.stringify(SITE_DIR)} . "/src/$c.php"; use Groddle\\Minn\\ButlerParcels; use Groddle\\Minn\\ButlerGifts; use Groddle\\Minn\\HomeTending; ${body}`;
   return JSON.parse(execFileSync('php', ['-r', code]).toString());
 }
 
@@ -174,9 +179,16 @@ describe('key-holders tending the owner\'s gardens', () => {
 describe('the site\'s Butler and tending rules', { skip: skipSite }, () => {
   it('is wired: routes, tables, the seeds the game wrote', () => {
     const ext = readFileSync(sitePath('src/Extension.php'), 'utf8');
-    assert.match(ext, /new ButlerParcels\(\$minn\), new HomeTending\(\$minn\)/);
+    assert.match(ext, /new ButlerParcels\(\$minn\), new ButlerGifts\(\$minn\), new HomeTending\(\$minn\)/);
     const minn = JSON.parse(readFileSync(sitePath('minn.json'), 'utf8'));
     assert.ok(minn.tables.groddle_butler_parcels && minn.tables.groddle_home_tending);
+    // Ticket 112: the Butler's gift for visitors, who had one, and the visits, all keyed for the QA cleanup.
+    assert.ok(minn.tables.groddle_butler_gift.includes('PRIMARY KEY  (owner_id)'));
+    assert.ok(minn.tables.groddle_butler_gifted.includes('PRIMARY KEY  (owner_id,visitor_id)'));
+    assert.ok(minn.tables.groddle_butler_visits.some((l) => l.startsWith('visitor_id ')));
+    const gifts = readFileSync(sitePath('src/ButlerGifts.php'), 'utf8');
+    assert.match(gifts, /ServiceCall::verify/);
+    assert.match(gifts, /'\/groddle\/v1\/ledger\/butler\/visit'/);
     const butler = readFileSync(sitePath('src/ButlerParcels.php'), 'utf8');
     assert.match(butler, /ServiceCall::verify/);
     assert.match(butler, /'\/groddle\/v1\/ledger\/butler'/);
@@ -231,12 +243,131 @@ describe('the server takes the Butler\'s parcels and passes tending on', { skip:
     if (!go) return;
     for (const kind of ['butler_leave', 'home_tend_tell']) assert.match(go, new RegExp(`r\\.Handle\\("${kind}"`));
     const feature = read('public/js/features/neighbours-mp-feature.js');
-    for (const kind of ['butler_left', 'butler_parcel', 'home_tended', 'home_hosted']) {
+    for (const kind of ['butler_left', 'butler_parcel', 'butler_gift', 'butler_visit', 'home_tended', 'home_hosted']) {
       assert.match(go, new RegExp(`"t": "${kind}"`));
       assert.match(feature, new RegExp(`'msg:${kind}'`));
     }
     assert.match(feature, /client\.send\('butler_leave'/);
     assert.match(feature, /client\.send\('home_tend_tell'/);
+  });
+});
+
+describe('ticket 112: the owner\'s gift for visitors and who visited, kept by the site', () => {
+  const V1 = 'bvisit-00000000000000b1';
+  it('reads the site\'s stock and visits into the Butler once, newest first in, oldest first kept', () => {
+    assert.equal(isButlerVisitOp(V1), true);
+    assert.equal(isButlerVisitOp('butler-00000000000000b1'), false);
+    assert.match(butlerGiftOp(() => 0.5), /^bgift-8{16}$/);
+    const stock = normalizeButlerStock({ gift: { c: 'chicken_egg', n: 9 }, legacy: false, visits: [
+      { id: 11, name: 'Cy', at: 3000 }, { id: 9, name: 'Dr Flavius', at: 2000 }, { id: 9, name: 'Dr Flavius', at: 1000 }, { id: 0, name: 'x', at: 5 }, { id: 4, at: 0 },
+    ] });
+    assert.deepEqual(stock.gift, { c: 'chicken_egg', n: 9 });
+    assert.equal(stock.visits.length, 3);
+    const st = normalizeButlerState({ owned: true, gift: { classTsid: 'chicken_egg', count: 10 } });
+    assert.equal(applyButlerStock(st, stock), 3);
+    assert.equal(applyButlerStock(st, stock), 0, 'twice is once');
+    assert.deepEqual(st.gift, { classTsid: 'chicken_egg', count: 9 }, 'the gift shown is the site\'s');
+    assert.deepEqual(st.visitors.p9, [1000, 2000]);
+    const again = normalizeButlerState(JSON.parse(JSON.stringify(st)));
+    const report = visitorsReport(again);
+    assert.equal(report.count, 2);
+    assert.equal(report.output, 'Since the last time you asked me, the following people have visited your street: Dr Flavius and Cy.');
+    // Asked: just past the newest visit (the site's clock), so the next visit shows and these do not.
+    again.lastWhoVisited = newestVisit(again) + 1;
+    assert.equal(visitorsReport(again).count, 0);
+    applyButlerStock(again, normalizeButlerStock({ gift: null, visits: [{ id: 9, name: 'Dr Flavius', at: 4000 }] }));
+    assert.equal(again.gift, null, 'the stock ran out');
+    assert.equal(visitorsReport(again).output, 'Since the last time you asked me, the following people have visited your street: Dr Flavius.');
+    // A gift kept in the save from before stays until the site takes it in.
+    const old = normalizeButlerState({ owned: true, gift: { classTsid: 'chicken_egg', count: 10 } });
+    applyButlerStock(old, normalizeButlerStock({ gift: null, legacy: true, visits: [] }), { keepGift: true });
+    assert.deepEqual(old.gift, { classTsid: 'chicken_egg', count: 10 });
+  });
+
+  it('names at most 20 visitors and says when there were more than 5 (getVisitors, verbs.visitors)', () => {
+    const st = normalizeButlerState({ owned: true });
+    const visits = Array.from({ length: 22 }, (_, i) => ({ id: i + 1, name: `V${i + 1}`, at: 1000 + i })).reverse(); // the site sends newest first
+    applyButlerStock(st, normalizeButlerStock({ visits }));
+    const report = visitorsReport(st);
+    assert.equal(report.count, 22);
+    assert.equal(report.many, true);
+    assert.match(report.output, /V20\. I think there were more, but that's all I can remember\.$/);
+    assert.doesNotMatch(report.output, /V21/);
+  });
+
+  it('checks the site\'s answer to a give', () => {
+    assert.deepEqual(normalizeGiftAnswer({ status: 'given', op: 'bgift-0123456789abcdef', gave: { c: 'apple', n: 3 }, got: { c: 'chicken_egg', n: 2 }, gift: { c: 'apple', n: 3 } }),
+      { ok: true, op: 'bgift-0123456789abcdef', gave: { c: 'apple', n: 3 }, got: { c: 'chicken_egg', n: 2 }, gift: { c: 'apple', n: 3 } });
+    assert.deepEqual(normalizeGiftAnswer({ status: 'refused', why: 'short', text: "You don't have that any more." }), { ok: false, why: 'short', text: "You don't have that any more." });
+    assert.equal(normalizeGiftAnswer({ status: 'given', op: 'nope' }), null);
+    assert.equal(normalizeGiftAnswer(null), null);
+    assert.equal(VISITOR_BUTLER_TEXT.giftItem('Chicken Egg', 'Friendly'), 'Here is your Chicken Egg from Friendly. I hope you enjoy it!');
+    assert.doesNotMatch(VISITOR_BUTLER_TEXT.giftWaiting, /\u2014/);
+  });
+
+  it('keeps solo\'s gift rules in the save: once per visitor per class, gone when it runs out', () => {
+    const st = normalizeButlerState({ owned: true });
+    setGift(st, { classTsid: 'apple', count: 2 });
+    assert.deepEqual(giveGiftTo(st, 'dorrit'), { classTsid: 'apple', count: 1 });
+    assert.equal(giveGiftTo(st, 'dorrit'), null, 'once per visitor');
+    recordVisitor(st, { id: 'dorrit', name: 'Dorrit', now: 10 });
+    assert.deepEqual(giveGiftTo(st, 'hadwin'), { classTsid: 'apple', count: 1 });
+    assert.equal(st.gift, null);
+    setGift(st, { classTsid: 'apple', count: 1 });
+    assert.deepEqual(giveGiftTo(st, 'dorrit'), { classTsid: 'apple', count: 1 }, 'a new gift reaches everyone again');
+  });
+
+  it('gives through the site in multiplayer only, and solo neighbours keep the save\'s gift', () => {
+    const src = read('public/js/features/butler-feature.js');
+    assert.match(src, /engine\.mode === 'multiplayer' && giftHook\) return giveThroughSite/);
+    assert.match(src, /if \(engine\.mode !== 'multiplayer'\) giveGiftTo\(st, id\);/);
+    assert.match(src, /st\.lastWhoVisited = engine\.mode === 'multiplayer' \? newestVisit\(st\) \+ 1 : now\(\);/);
+    const feature = read('public/js/features/neighbours-mp-feature.js');
+    assert.match(feature, /butlerApi\.setGiftHook\?\.\(/);
+    assert.match(feature, /ledgerReceipt', op, engine\) === false\) return;/, 'a gift comes into the pack once');
+    assert.match(feature, /account\.butlerAdopt\(\)/);
+  });
+
+  it('calls the site\'s stock routes', async () => {
+    const calls = [];
+    const account = createMinnAccount({ baseUri: 'https://groddle.localhost/', nonce: 'abcdef0123', fetch: async (url, init = {}) => {
+      calls.push(`${init.method || 'GET'} ${String(url).replace('https://groddle.localhost/wp-json/groddle/v1/', '')} ${init.body || ''}`.trim());
+      return { status: 200, ok: true, headers: { get: () => null }, json: async () => ({}) };
+    } });
+    await account.butlerStock();
+    await account.butlerGive({ op: 'bgift-0123456789abcdef', c: 'apple', n: 3, keep: true });
+    await account.butlerAdopt();
+    assert.deepEqual(calls, ['GET butler/stock', 'POST butler/stock {"op":"bgift-0123456789abcdef","c":"apple","n":3,"keep":true}', 'POST butler/stock/adopt']);
+  });
+
+  it('hands out and merges by the source\'s rules on the site', { skip: skipSite }, () => {
+    const out = php(`
+      $egg = ['c' => 'chicken_egg', 'n' => 2];
+      $first = ButlerGifts::handOut($egg, null);
+      $again = ButlerGifts::handOut($first['after'], 'chicken_egg');
+      $last = ButlerGifts::handOut($first['after'], 'apple');
+      $none = ButlerGifts::handOut(null, null);
+      $merge = ButlerGifts::leave($egg, 'chicken_egg', 3, true);
+      $swap = ButlerGifts::leave($egg, 'apple', 4, true);
+      $over = ButlerGifts::leave(['c' => 'apple', 'n' => 9998], 'apple', 2, true);
+      $fresh = ButlerGifts::leave(null, 'apple', 1, true);
+      $legacy = ButlerGifts::legacyGift(json_decode('{"systems":{"features":{"butler":{"owned":true,"gift":{"classTsid":"chicken_egg","count":10}}}}}'));
+      $noLegacy = ButlerGifts::legacyGift(json_decode('{"systems":{"features":{"butler":{"owned":true,"gift":null}}}}'));
+      echo json_encode([$first, $again, $last, $none, $merge, $swap, $over, $fresh, $legacy, $noLegacy, ButlerGifts::visitId('bvisit-0123456789abcdef'), ButlerGifts::giftId('bvisit-0123456789abcdef')]);`);
+    assert.deepEqual(out, [
+      { give: 'chicken_egg', after: { c: 'chicken_egg', n: 1 }, clear: false },
+      { give: null, after: { c: 'chicken_egg', n: 1 }, clear: false },
+      { give: 'chicken_egg', after: null, clear: true },
+      { give: null, after: null, clear: false },
+      { after: { c: 'chicken_egg', n: 5 }, back: null, clear: false },
+      { after: { c: 'apple', n: 4 }, back: { c: 'chicken_egg', n: 2 }, clear: true },
+      { after: { c: 'apple', n: 2 }, back: { c: 'apple', n: 9998 }, clear: true },
+      { after: { c: 'apple', n: 1 }, back: null, clear: true },
+      { c: 'chicken_egg', n: 10 },
+      null,
+      true,
+      false,
+    ]);
   });
 });
 

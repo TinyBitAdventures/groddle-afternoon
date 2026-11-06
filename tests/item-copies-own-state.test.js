@@ -36,7 +36,7 @@ import {
 import { ITEM_CATALOG, addItem, createInventory, ensureItem, isToolItem, removeItem } from '../public/js/inventory.js?v=d82f3b00';
 import { createPlayerSave, restorePlayerSave } from '../public/js/player-save.js?v=29ef66db';
 import { layoutPack, unitPlaces } from '../public/js/pack-slots.js?v=c91d0ca3';
-import { bagsFeature } from '../public/js/features/bags-feature.js?v=b8387357';
+import { bagsFeature } from '../public/js/features/bags-feature.js?v=9824d140';
 import { VENDOR_PROFILES, vendorBuy, vendorSell } from '../public/js/vendor.js?v=65e22e0e';
 import { createResourceNode, harvestResourceNode, ensureResourceItems } from '../public/js/resource-nodes.js?v=c14bd6d8';
 import {
