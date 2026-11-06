@@ -146,7 +146,7 @@ describe('encyclopedia', () => {
       const html = read(rel);
       const p = '../'.repeat(rel.split('/').length - 1);
       assert.ok(html.includes('<nav class="site-nav"'), rel);
-      assert.ok(html.includes(`<script src="${p}site/theme.js"></script>`), rel);
+      assert.ok(new RegExp(`<script src="${p}site/theme\\.js\\?v=[0-9a-f]{8}"></script>`).test(html), rel);
       assert.ok(html.includes(`<link rel="stylesheet" href="${p}encyclopedia/items/catalog.css`), rel);
       assert.match(html, /<a href="[./]*encyclopedia\/items\/" aria-current="page">Items<\/a>/, rel);
     }

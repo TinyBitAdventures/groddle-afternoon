@@ -133,7 +133,7 @@ describe('item catalog', () => {
       const p = page === index ? '../../' : '../../../';
       // The header's mark carries its content key, as every image on the page does (keyAssetUrls).
       assert.ok(page.html.includes(keyAssetUrls(siteNav(p, 'items'), page.file, committedMap())), page.file);
-      assert.ok(page.html.includes(`<link rel="stylesheet" href="${p}site/site-nav.css" />`), page.file);
+      assert.ok(new RegExp(`<link rel="stylesheet" href="${p}site/site-nav\\.css\\?v=[0-9a-f]{8}" />`).test(page.html), page.file);
       assert.ok(page.html.indexOf('<nav class="site-nav"') < page.html.indexOf('<header'), page.file);
     }
   });

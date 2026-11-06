@@ -156,7 +156,7 @@ describe('play/phone/ (the companion page)', () => {
   it('loads its module, the site theme switch and its own stylesheet, nothing of the game', () => {
     assert.ok(entry);
     assert.match(html, /<base href="\.\.\/\.\.\/" \/>/);
-    assert.match(html, /<script src="site\/theme\.js"><\/script>/);
+    assert.match(html, /<script src="site\/theme\.js\?v=[0-9a-f]{8}"><\/script>/);
     assert.match(html, /<button class="site-nav-theme" type="button" aria-label="Colour theme"><\/button>/);
     assert.doesNotMatch(html.replace(/<!--[\s\S]*?-->/g, ''), /pixi|game\.js|href="style\.css|classic\.css|data-versions\.js|phone-gate/);
     assert.match(html, /<a href="credits\/">Credits<\/a> · <a href="privacy-policy\/">Privacy<\/a>/);

@@ -22,6 +22,12 @@
  *   carries `?v=` gets the key (the whole query becomes `?v=<key>`; style.css and game.js no longer
  *   collect a parameter per lane). `<script type="module" src>` is always keyed. js/data-versions.js
  *   is left to tools/data-versions/build.mjs, which keys it the same way.
+ * - The three files every page with the site header loads (SHARED_LINKS: restoration.css, site-nav.css,
+ *   theme.js) are always keyed too, ?v= or not, in all 4,800 pages: a browser kept old copies of them.
+ *   Their key is the first 8 hex of the file's sha256, the one the site's head gives the same URLs
+ *   (groddle-afternoon-site src/AssetKeys.php), so Minn pages and built pages share one cached copy.
+ *   A change to one of the three rewrites a line in every one of those pages. The builders that write
+ *   pages (catalog, encyclopedia, changelog) take the URL from sharedLink().
  * - Strings in builders that name a module URL take it from here: moduleUrl('js/online-boot.js')
  *   (tools/play-online ONLINE_BOOT_SRC, tools/data-versions HOOK_SRC).
  *
@@ -36,7 +42,7 @@
  */
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { existsSync, readFileSync, realpathSync, writeFileSync } from 'node:fs';
+import { existsSync, readFileSync, realpathSync, statSync, writeFileSync } from 'node:fs';
 import { dirname, join, relative, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import * as acorn from 'acorn';
@@ -45,6 +51,10 @@ export const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 
 /** Owned by tools/data-versions/build.mjs (its key is the map's own hash). */
 const OWNED_ELSEWHERE = new Set(['js/data-versions.js']);
+/** Always keyed, in every page, by their text alone (see the header). None of them imports anything. */
+export const SHARED_LINKS = Object.freeze(['restoration/restoration.css', 'site/site-nav.css', 'site/theme.js']);
+const SHARED = new Set(SHARED_LINKS);
+const SHARED_NAME = /(?:^|\/)(?:restoration\.css|site-nav\.css|theme\.js)$/;
 const CODE = /\.m?js$/;
 const KEYED = /\.(?:m?js|css)$/;
 const hash = (text) => createHash('sha256').update(text).digest('hex');
@@ -201,7 +211,7 @@ export function computeKeys(graph, roots) {
     const outside = [...new Set(sorted.flatMap((m) => graph.node(m).deps).filter((d) => !inside.has(d)))].sort();
     for (const d of outside) h.update(`D ${d} ${keys.get(d)}\0`);
     const group = h.digest('hex');
-    for (const m of sorted) keys.set(m, sorted.length === 1 ? group.slice(0, 8) : short(`${group} ${m}`));
+    for (const m of sorted) keys.set(m, SHARED.has(m) ? short(graph.node(m).text) : sorted.length === 1 ? group.slice(0, 8) : short(`${group} ${m}`));
   };
   // Iterative Tarjan (the graph is deep: game.js reaches most of public/js).
   for (const root of roots) {
@@ -250,6 +260,23 @@ export function moduleUrl(rel, root = ROOT) {
 /* Rewriting                                                            */
 /* ------------------------------------------------------------------ */
 
+const sharedKeys = new Map();
+
+/**
+ * One of SHARED_LINKS with its key, for a builder writing a page: sharedLink('site/theme.js') ->
+ * 'site/theme.js?v=1a2b3c4d'. Read once per file version: a catalog build asks for it per page.
+ */
+export function sharedLink(rel, root = ROOT) {
+  if (!SHARED.has(rel)) throw new Error(`${rel} is not one of the shared links`);
+  const file = join(root, 'public', rel);
+  const stamp = statSync(file).mtimeMs;
+  const seen = sharedKeys.get(file);
+  if (seen?.stamp === stamp) return seen.url;
+  const url = `${rel}?v=${short(readFileSync(file, 'utf8'))}`;
+  sharedKeys.set(file, { stamp, url });
+  return url;
+}
+
 /** `text` with each spec in `specs` (start/end/value/quote/target) given its key. */
 function rewriteSpecs(text, specs, keys) {
   let out = '';
@@ -281,10 +308,11 @@ function rewritePage(graph, rel, html, keys, need) {
       const value = raw.replace(/&amp;/g, '&');
       const { path, query } = splitQuery(value);
       const isSrc = /^\s*src/i.test(pre);
-      if (!/(?:^|[?&])v=/.test(query.slice(1)) && !(isModuleScript && isSrc)) return all;
+      const named = /(?:^|[?&])v=/.test(query.slice(1)) || (isModuleScript && isSrc);
+      if (!named && !SHARED_NAME.test(path)) return all;
       if (/^[a-z][a-z0-9+.-]*:|^\/\/|^\//i.test(path)) return all;
       const t = graph.target(base, path.startsWith('.') ? path : `./${path}`);
-      if (!t || OWNED_ELSEWHERE.has(t)) return all;
+      if (!t || OWNED_ELSEWHERE.has(t) || (!named && !SHARED.has(t))) return all;
       need.add(t);
       if (!keys) return all;
       return `${pre}${q}${path}?v=${keys.get(t)}${q}`;

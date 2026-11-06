@@ -2732,9 +2732,34 @@
   "deployed": "2026-11-06"
  },
  "git": {
-  "commits": 1347,
+  "commits": 1352,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-06",
+    "kind": "fix",
+    "text": "Built pages pick up the site's new styles and theme script after an update instead of an old cached copy"
+   },
+   {
+    "date": "2026-11-06",
+    "kind": "improve",
+    "text": "The phone companion loads about 16 KB less: the account calls only the game makes stay out of it"
+   },
+   {
+    "date": "2026-11-06",
+    "kind": "fix",
+    "text": "/stuck is easier to find: a one-time hint on a floor you can't jump off, and / then stuck runs it"
+   },
+   {
+    "date": "2026-11-06",
+    "kind": "fix",
+    "text": "Level 3 West's pit has a way out: each end of its floor lifts you back up to that end's signpost island"
+   },
+   {
+    "date": "2026-11-06",
+    "kind": "improve",
+    "text": "Groddle Meadow's map has a calmer new painting, with fewer and smaller trees and more open grass"
+   },
    {
     "date": "2026-11-06",
     "kind": "improve",
@@ -2829,34 +2854,9 @@
     "date": "2026-11-05",
     "kind": "improve",
     "text": "Groddle Meadow's map has a new painting, repainted from Tiny Speck's thumbnail of the lost original"
-   },
-   {
-    "date": "2026-11-05",
-    "kind": "fix",
-    "text": "The Crafty Bot no longer vanishes for a moment when it changes what it is doing"
-   },
-   {
-    "date": "2026-11-05",
-    "kind": "fix",
-    "text": "Water all waters empty and picked plots too, so the bed shows wet"
-   },
-   {
-    "date": "2026-11-05",
-    "kind": "fix",
-    "text": "A stored bag that can't fit back in the pack stays in its cabinet slot unchanged"
-   },
-   {
-    "date": "2026-11-05",
-    "kind": "fix",
-    "text": "When De-Embiggenify's time runs out, De-Embiggenify II stays in the quest log to try again"
-   },
-   {
-    "date": "2026-11-05",
-    "kind": "fix",
-    "text": "You can walk back out from beside the long table's right leg in De-Embiggenify"
    }
   ]
  },
- "tests": 693,
+ "tests": 694,
  "generatedAt": "2026-11-06"
 }

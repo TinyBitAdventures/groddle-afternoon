@@ -19,6 +19,7 @@ import { dirname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { plain } from './html.mjs';
 import { committedMap, keyAssetUrls } from '../data-versions/build.mjs';
+import { sharedLink } from '../module-keys/build.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = join(here, '..', '..');
@@ -77,10 +78,10 @@ const page = ({ p, title, description, noindex, body }) => `<!doctype html>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="description" content="${esc(description)}" />
 ${noindex ? '  <meta name="robots" content="noindex" />\n' : ''}  <title>${esc(title)}</title>
-  <link rel="stylesheet" href="${p}restoration/restoration.css" />
+  <link rel="stylesheet" href="${p}${sharedLink('restoration/restoration.css', root)}" />
   <link rel="stylesheet" href="${p}changelog/changelog.css" />
-  <link rel="stylesheet" href="${p}site/site-nav.css" />
-  <script src="${p}site/theme.js"></script>
+  <link rel="stylesheet" href="${p}${sharedLink('site/site-nav.css', root)}" />
+  <script src="${p}${sharedLink('site/theme.js', root)}"></script>
   <link rel="icon" href="${p}favicon.svg?v=arch" type="image/svg+xml" />
   <link rel="icon" href="${p}favicon.ico?v=arch" sizes="32x32" />
   <link rel="apple-touch-icon" href="${p}apple-touch-icon.png?v=arch" />

@@ -203,7 +203,7 @@ describe('notes: the site header', () => {
     assert.match(home, /Compare<\/a>\n\s*<a href="encyclopedia\/items\/">Items<\/a>\n\s*<a href="changelog\/">Notes<\/a>\n\s*<a class="site-nav-play"/);
     for (const p of pages) {
       const html = read(p.file);
-      assert.match(html, new RegExp(`<link rel="stylesheet" href="${p.prefix}site/site-nav\\.css" />`), p.file);
+      assert.match(html, new RegExp(`<link rel="stylesheet" href="${p.prefix}site/site-nav\\.css\\?v=[0-9a-f]{8}" />`), p.file);
       const nav = navOf(html);
       assert.equal(normal(nav, p.prefix), home, p.file);
       if (p.current) assert.match(nav, new RegExp(`href="${p.prefix.replace(/\./g, '\\.')}${p.current}/" aria-current="page"`), p.file);

@@ -10,7 +10,8 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
-import { keyOf, moduleUrl, plan, resolveKeyConflicts } from '../tools/module-keys/build.mjs';
+import { createHash } from 'node:crypto';
+import { SHARED_LINKS, keyOf, moduleUrl, plan, resolveKeyConflicts, sharedLink } from '../tools/module-keys/build.mjs';
 import { BUILT_ROOMS, roomModulePath } from '../public/js/quest-rooms/catalog.js?v=9ebeb502';
 import { ONLINE_BOOT_SRC } from '../tools/play-online/build.mjs';
 import { HOOK_SRC } from '../tools/data-versions/build.mjs';
@@ -161,5 +162,83 @@ describe('module keys --resolve (rebases)', () => {
     assert.equal(r.left, 1);
     assert.ok(r.text.includes("import { b } from './b.js?v=22222222';\nimport { c } from './c.js?v=33333333';\nconst x = 1;\n<<<<<<< HEAD\n"));
     assert.equal(resolveKeyConflicts("<<<<<<< a\nx?v=12345678\n||||||| base\nx?v=00000000\n=======\nx?v=87654321\n>>>>>>> b\n").text, 'x?v=12345678\n', 'diff3 style too');
+  });
+});
+
+// The links every page with the site header carries (a browser kept stale copies when they had no key).
+describe('module keys: the shared links', () => {
+  const sha = (text) => createHash('sha256').update(text).digest('hex').slice(0, 8);
+
+  it('in the tree: every page carries each with one key, the first 8 hex of its sha256 (the site head\'s key)', () => {
+    assert.deepEqual([...SHARED_LINKS], ['restoration/restoration.css', 'site/site-nav.css', 'site/theme.js']);
+    for (const rel of SHARED_LINKS) {
+      assert.equal(keyOf(rel, root), sha(readFileSync(join(root, 'public', rel))), rel);
+      assert.equal(sharedLink(rel, root), `${rel}?v=${keyOf(rel, root)}`);
+    }
+    assert.match(read('public/encyclopedia/items/apple/index.html'), new RegExp(`\\.\\./restoration/restoration\\.css\\?v=${keyOf('restoration/restoration.css', root)}"`));
+    assert.throws(() => sharedLink('style.css', root), /not one of the shared links/);
+  });
+
+  it('in the tree: no page links one bare', () => {
+    const pages = execFileSync('git', ['ls-files', 'public'], { cwd: root, encoding: 'utf8', maxBuffer: 1 << 28 }).split('\n').filter((f) => /\.html$/.test(f) && !f.startsWith('public/vendor/'));
+    const bare = pages.filter((f) => /(?:href|src)="[^"]*(?:restoration\.css|site-nav\.css|theme\.js)"/.test(read(f)));
+    assert.deepEqual(bare, []);
+  });
+
+  it('the builders that write pages take the URL from sharedLink', () => {
+    for (const f of ['tools/catalog/build.mjs', 'tools/encyclopedia/build.mjs', 'tools/changelog/build.mjs']) {
+      for (const rel of SHARED_LINKS) assert.ok(read(f).includes(`sharedLink('${rel}', root)`), `${f}: ${rel}`);
+    }
+  });
+
+  const tmp = mkdtempSync(join(tmpdir(), 'module-keys-shared-'));
+  after(() => rmSync(tmp, { recursive: true, force: true }));
+  const put = (rel, text) => {
+    mkdirSync(dirname(join(tmp, rel)), { recursive: true });
+    writeFileSync(join(tmp, rel), text);
+  };
+  const apply = () => {
+    const { stale } = plan(tmp);
+    for (const s of stale) writeFileSync(join(tmp, s.file), s.text);
+    return stale.map((s) => s.file).sort();
+  };
+  execFileSync('git', ['init', '-q'], { cwd: tmp });
+  put('public/site/site-nav.css', '.nav{}\n');
+  put('public/site/theme.js', 'void 0;\n');
+  put('public/restoration/restoration.css', 'a{}\n');
+  put('public/other/theme.js', 'void 1;\n');
+  put('public/other.css', 'b{}\n');
+  const page = '<link rel="stylesheet" href="../../restoration/restoration.css" />\n<link rel="stylesheet" href="../../site/site-nav.css" />\n<script src="../../site/theme.js"></script>\n<link rel="stylesheet" href="../../other.css" />\n<script src="../../other/theme.js"></script>\n<script src="/site/theme.js"></script>\n<a href="../../site/">site</a>\n';
+  put('public/a/b/index.html', page);
+  put('public/restoration/index.html', '<link rel="stylesheet" href="restoration.css" />\n');
+  put('public/play/index.html', '<base href="../" />\n<script src="site/theme.js"></script>\n');
+
+  it('keys them, ?v= or not, leaves every other bare link, an absolute one and a same-named other file', () => {
+    assert.deepEqual(apply(), ['public/a/b/index.html', 'public/play/index.html', 'public/restoration/index.html']);
+    const html = readFileSync(join(tmp, 'public/a/b/index.html'), 'utf8');
+    assert.ok(html.includes(`restoration/restoration.css?v=${sha('a{}\n')}"`));
+    assert.ok(html.includes(`site/site-nav.css?v=${sha('.nav{}\n')}"`));
+    assert.ok(html.includes(`<script src="../../site/theme.js?v=${sha('void 0;\n')}"></script>`));
+    assert.ok(html.includes('href="../../other.css"'), 'not a shared link');
+    assert.ok(html.includes('src="../../other/theme.js"'), 'a different file of the same name');
+    assert.ok(html.includes('<script src="/site/theme.js"></script>'), 'absolute');
+    assert.ok(readFileSync(join(tmp, 'public/restoration/index.html'), 'utf8').includes(`restoration.css?v=${sha('a{}\n')}`), 'by its own folder');
+    assert.ok(readFileSync(join(tmp, 'public/play/index.html'), 'utf8').includes(`site/theme.js?v=${sha('void 0;\n')}`), 'by the page\'s <base>');
+  });
+
+  it('is idempotent, and a change re-keys exactly the pages that link the file', () => {
+    assert.deepEqual(apply(), []);
+    put('public/site/theme.js', 'void 2;\n');
+    assert.deepEqual(apply(), ['public/a/b/index.html', 'public/play/index.html']);
+    assert.ok(readFileSync(join(tmp, 'public/a/b/index.html'), 'utf8').includes(`site/theme.js?v=${sha('void 2;\n')}`));
+    assert.equal(sharedLink('site/theme.js', tmp), `site/theme.js?v=${sha('void 2;\n')}`);
+    assert.deepEqual(plan(tmp).stale, [], '--check is clean again');
+  });
+
+  it('--resolve settles a conflict on one of the links', () => {
+    const conflict = '<<<<<<< HEAD\n  <script src="../site/theme.js?v=11111111"></script>\n=======\n  <script src="../site/theme.js?v=22222222"></script>\n>>>>>>> lane\n';
+    const r = resolveKeyConflicts(conflict);
+    assert.equal(r.settled, 1);
+    assert.equal(r.left, 0);
   });
 });

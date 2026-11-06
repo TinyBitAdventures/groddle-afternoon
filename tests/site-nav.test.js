@@ -27,7 +27,7 @@ describe('shared site header', () => {
   it('appears on the home page, the restoration report and the compare page', () => {
     for (const p of navs) {
       assert.ok(p.nav, p.file);
-      assert.match(p.html, new RegExp(`<link rel="stylesheet" href="${p.prefix}site/site-nav\\.css" />`), p.file);
+      assert.match(p.html, new RegExp(`<link rel="stylesheet" href="${p.prefix}site/site-nav\\.css\\?v=[0-9a-f]{8}" />`), p.file);
       assert.ok(p.html.indexOf('<nav class="site-nav"') < p.html.indexOf('<header') || !p.html.includes('<header class="masthead"'), p.file);
     }
   });
@@ -70,7 +70,7 @@ describe('site colour theme', () => {
     for (const { file, html } of pages) {
       const head = html.slice(0, html.indexOf('</head>'));
       const prefix = '../'.repeat(file.split('/').length - 1);
-      assert.ok(head.includes(`<script src="${prefix}site/theme.js"></script>`), `${file}: no theme script in <head>`);
+      assert.ok(new RegExp(`<script src="${prefix}site/theme\\.js\\?v=[0-9a-f]{8}"></script>`).test(head), `${file}: no keyed theme script in <head>`);
       // Outside site-nav-links, which tools/site-nav/apply.mjs rewrites from the Minn menu.
       assert.match(html, /<\/div>\n\s*<button class="site-nav-theme" type="button" aria-label="Colour theme"><\/button>\n\s*<\/div>\n\s*<\/nav>/, file);
     }
@@ -81,7 +81,7 @@ describe('site colour theme', () => {
     for (const { file, html } of pages) {
       const head = html.slice(0, html.indexOf('</head>'));
       const prefix = '../'.repeat(file.split('/').length - 1);
-      assert.ok(head.includes(`<link rel="stylesheet" href="${prefix}site/site-nav.css" />`), `${file}: no site-nav.css in <head>`);
+      assert.ok(new RegExp(`<link rel="stylesheet" href="${prefix}site/site-nav\\.css\\?v=[0-9a-f]{8}" />`).test(head), `${file}: no keyed site-nav.css in <head>`);
     }
     const css = readFileSync(join(pub, 'site', 'site-nav.css'), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
     // Reduced motion: no transition at all (the opt-in sits inside no-preference); unsupported browsers ignore it.

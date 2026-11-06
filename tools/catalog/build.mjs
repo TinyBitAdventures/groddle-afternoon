@@ -36,7 +36,7 @@ import { fileURLToPath } from 'node:url';
 import { DatabaseSync } from 'node:sqlite';
 import { siteNav } from '../changelog/build.mjs';
 import { committedMap, keyAssetUrls, mapTags } from '../data-versions/build.mjs';
-import { keyOf as moduleKeyOf } from '../module-keys/build.mjs';
+import { keyOf as moduleKeyOf, sharedLink } from '../module-keys/build.mjs';
 import { literalFrom, readItemTags } from '../inventory/gsjs-data.mjs';
 import { supplyConversions } from '../job-obtainable.mjs';
 import { loadEncyclopedia } from '../encyclopedia/data.mjs';
@@ -741,10 +741,10 @@ const shell = ({ p, title, description, body, script }) => `<!doctype html>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="description" content="${esc(description)}" />
   <title>${esc(title)}</title>
-  <link rel="stylesheet" href="${p}restoration/restoration.css" />
+  <link rel="stylesheet" href="${p}${sharedLink('restoration/restoration.css', root)}" />
   <link rel="stylesheet" href="${p}changelog/changelog.css" />
-  <link rel="stylesheet" href="${p}site/site-nav.css" />
-${script ? mapTags(p) : ''}  <script src="${p}site/theme.js"></script>
+  <link rel="stylesheet" href="${p}${sharedLink('site/site-nav.css', root)}" />
+${script ? mapTags(p) : ''}  <script src="${p}${sharedLink('site/theme.js', root)}"></script>
   <link rel="stylesheet" href="${p}encyclopedia/items/catalog.css" />
   <link rel="icon" href="${p}favicon.svg?v=arch" type="image/svg+xml" />
   <link rel="icon" href="${p}favicon.ico?v=arch" sizes="32x32" />
