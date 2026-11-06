@@ -20,12 +20,12 @@ import {
   rulesVerbId,
   surfaceNear,
   verbTooltip,
-} from '../public/js/features/resource-nodes-feature.js?v=d00b988a';
+} from '../public/js/features/resource-nodes-feature.js?v=058ff73c';
 import {
   RESOURCE_NODE_CATALOG,
   RESOURCE_NODE_CLASS_IDS,
   createResourceNode,
-} from '../public/js/resource-nodes.js?v=c14bd6d8';
+} from '../public/js/resource-nodes.js?v=a57377a1';
 import { createFeatureHost, normalizeFeatureSlices } from '../public/js/feature-host.js?v=127e0a3c';
 import { populationForStreet, planStreetPlacements } from '../public/js/street-ecology.js?v=e2bdb20c';
 import { STORE_CATALOG } from '../public/js/store-catalog.js?v=74b56af3';

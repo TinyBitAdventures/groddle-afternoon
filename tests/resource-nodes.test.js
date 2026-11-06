@@ -30,7 +30,10 @@ import {
   resourceSpritePaths,
   resourceItemIds,
   sheetFrameRect,
-} from '../public/js/resource-nodes.js?v=c14bd6d8';
+  RESOURCE_DROP_TABLES,
+  DUST_TRAP_RARE_KEY_CHANCE,
+  DUST_TRAP_DROP_ITEM_DEFS
+} from '../public/js/resource-nodes.js?v=a57377a1';
 import { ITEM_CATALOG } from '../public/js/inventory.js?v=d82f3b00';
 import {
   TOOL_CONDITION_CATALOG,
@@ -575,11 +578,33 @@ describe('Dust Trap', () => {
 
     // Ready for 1000 s -> reset 2000 s; roll 0.5 -> drop table; randInt(0,100) of 0.99 -> 100 -> extremely hallowed powder.
     const later = node.readySince + 1000 * 1000;
-    const drop = harvestResourceNode(node, inv, {}, ctxBase({ now: later, rng: seq(0.5, 0.999) }));
+    const drop = harvestResourceNode(node, inv, {}, ctxBase({ now: later, rng: seq(0.5, 0.999, 0.5) }));
     assert.deepEqual(drop.outputs, [{ classTsid: 'extremely_hallowed_shrine_powder', qty: 1 }]);
     assert.equal(drop.resetMs, 2000 * 1000);
-    const paper = harvestResourceNode(createResourceNode('dust_trap'), inv, {}, ctxBase({ rng: seq(0.5, 0) }));
+    const paper = harvestResourceNode(createResourceNode('dust_trap'), inv, {}, ctxBase({ rng: seq(0.5, 0, 0.5) }));
     assert.deepEqual(paper.outputs, [{ classTsid: 'paper', qty: 2 }]);
+  });
+
+  it('Door Keys 7-10 and 12 (ours): a separate roll on top of the drop, rarer for higher keys; the source table is untouched', () => {
+    assert.equal(DUST_TRAP_RARE_KEY_CHANCE, 1 / 40);
+    // A roll under the chance adds a key after the table's own drop.
+    const got = (roll) => harvestResourceNode(createResourceNode('dust_trap'), {}, {}, ctxBase({ rng: seq(0.5, 0, 0.01, roll) })).outputs;
+    assert.deepEqual(got(0), [{ classTsid: 'paper', qty: 2 }, { classTsid: 'door_key_7', qty: 1 }]);
+    assert.deepEqual(got(0.999), [{ classTsid: 'paper', qty: 2 }, { classTsid: 'door_key_12', qty: 1 }]);
+    // No key from a roll at the chance, nor on a remnant (no table at all).
+    assert.deepEqual(harvestResourceNode(createResourceNode('dust_trap'), {}, {}, ctxBase({ rng: seq(0.5, 0, 1 / 40) })).outputs, [{ classTsid: 'paper', qty: 2 }]);
+    assert.deepEqual(harvestResourceNode(createResourceNode('dust_trap'), {}, {}, ctxBase({ rng: seq(0.1, 0, 0) })).outputs, []);
+    // Rarer for higher keys, and every one rarer than a source key's 2 values in 101.
+    const rows = RESOURCE_DROP_TABLES.dust_trap_rare_keys;
+    assert.deepEqual(rows.map(([, r]) => r[0].classTsid), ['door_key_7', 'door_key_8', 'door_key_9', 'door_key_10', 'door_key_12']);
+    assert.equal(rows.at(-1)[0], 100);
+    const widths = rows.map(([t], i) => t - (i ? rows[i - 1][0] : -1));
+    for (let i = 1; i < widths.length; i += 1) assert.ok(widths[i] < widths[i - 1], `key ${i} rarer than the one before`);
+    assert.ok(widths[0] / 40 < 2, 'Key 7 is rarer than Keys 1-6');
+    // The source table: Keys 1-6 at thresholds 85 to 95, two values each, and no key above 6.
+    const keys = RESOURCE_DROP_TABLES.dust_trap.filter(([, r]) => /^door_key_/.test(r[0].classTsid));
+    assert.deepEqual(keys.map(([t, r]) => [t, r[0].classTsid]), [[85, 'door_key_6'], [87, 'door_key_1'], [89, 'door_key_2'], [91, 'door_key_4'], [93, 'door_key_3'], [95, 'door_key_5']]);
+    assert.ok(DUST_TRAP_DROP_ITEM_DEFS.door_key_12.label === 'Green-Orange Hexagon Key');
   });
 });
 

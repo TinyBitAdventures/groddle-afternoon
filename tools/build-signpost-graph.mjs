@@ -32,12 +32,11 @@ const graph = {};
 // same-street doors are not edges. Locked doors are kept with their key, so a
 // route takes them only when there is no other way (js/map-routes.js).
 // A door whose key nothing gives is no way at all (Austin, 2026-11-03: a route to Hazy Gate 3
-// went through Level 2 West's Yellow-Teal Square Key door into Oppidan Avenue). Keys 7-12 had
-// no source in Glitch (items/door_key_7..12.js are in no drop table, store or quest reward;
-// keys 1-6 drop from Dust Traps, catalog_drop_tables.js dust_trap), and tools/job-obtainable.mjs
-// is the remake's own list of what a player can get, so such a door is left out of `doors`
-// and listed under `sealed` ("from>to": key id) instead: routes, the Map's rooms and the quest
-// hold's reachability (js/quest-reach.js) never count it.
+// went through Level 2 West's Yellow-Teal Square Key door into Oppidan Avenue, when Keys 7-10 and
+// 12 had no source). tools/job-obtainable.mjs is the remake's own list of what a player can get, so
+// such a door is left out of `doors` and listed under `sealed` ("from>to": key id) instead: routes,
+// the Map's rooms and the quest hold's reachability (js/quest-reach.js) never count it. None today:
+// Dust Traps drop those keys too (js/resource-nodes.js dust_trap_rare_keys, our design).
 const { items: obtainable } = await obtainableItems();
 const keyGiven = (keyId) => obtainable.has(`door_key_${keyId}`);
 const doors = {};

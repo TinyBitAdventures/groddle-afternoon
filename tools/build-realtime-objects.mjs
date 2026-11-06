@@ -74,12 +74,12 @@ import {
 } from '../public/js/street-ecology.js?v=e2bdb20c';
 import { ROCK_CATALOG } from '../public/js/mining.js?v=4d825b67';
 import { MEGA_ROCK_CHANCE, MEGA_ROCK_CHUNKS } from '../public/js/imagination-effects.js?v=70169933';
-import { RESOURCE_NODE_CATALOG, RESOURCE_SKILL_PACKAGES } from '../public/js/resource-nodes.js?v=c14bd6d8';
+import { RESOURCE_NODE_CATALOG, RESOURCE_SKILL_PACKAGES } from '../public/js/resource-nodes.js?v=a57377a1';
 import { ARBOROLOGY_HARVEST, TRANT_META } from '../public/js/trants.js?v=9c2e8c0f';
 import { TRANT_CARE_PACKAGES } from '../public/js/trant-care.js?v=67ea957b';
 import { ANIMAL_KINSHIP_PACKAGES } from '../public/js/animal-kinship.js?v=5f36cc4b';
 import { locationIsDepressing } from '../public/js/animal-mood.js?v=a49495fc';
-import { resourcePlacementGroups, resourceSpawnPlan } from '../public/js/features/resource-nodes-feature.js?v=d00b988a';
+import { resourcePlacementGroups, resourceSpawnPlan } from '../public/js/features/resource-nodes-feature.js?v=058ff73c';
 import { soilCountsForStreet, soilPlacementGroups } from '../public/js/features/patches-feature.js?v=15d9209c';
 import { kittyPlacementGroups } from '../public/js/features/heli-kitties-feature.js?v=e66f1ad2';
 import { BATTERFLY_GROUP, batterflyPlacementGroups } from '../public/js/features/animal-husbandry-feature.js?v=d585f3d1';
@@ -87,7 +87,7 @@ import { hasRaceDispenser } from '../public/js/races.js?v=ab22a079';
 import { setWildlifeCatalog, wildlifeFor } from '../public/js/wildlife.js?v=670c3a7f';
 import { boardSpotRow, furnitureFor, furniturePlacementGroups } from '../public/js/street-furniture.js?v=d5716ef6';
 import { INCUBATION } from '../public/js/animal-husbandry.js?v=41da06a5';
-import { SHARED_NODE_CLASSES, freshTreePlan } from '../public/js/street-objects.js?v=fd668aaa';
+import { SHARED_NODE_CLASSES, freshTreePlan } from '../public/js/street-objects.js?v=9b3d0d1e';
 import { isZoneTsid } from '../public/js/zone-streets.js?v=b40010d5';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');

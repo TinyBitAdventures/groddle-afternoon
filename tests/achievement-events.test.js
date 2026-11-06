@@ -22,9 +22,9 @@ import {
   resetAchievementCounter,
   purchaseAchievementUpdates,
 } from '../public/js/achievements.js?v=f8ccfd34';
-import { createResourceNode, harvestResourceNode } from '../public/js/resource-nodes.js?v=c14bd6d8';
+import { createResourceNode, harvestResourceNode } from '../public/js/resource-nodes.js?v=a57377a1';
 import { createPlot, growTree, tickPlot } from '../public/js/patches.js?v=bed4aff3';
-import { slothsChewing } from '../public/js/features/resource-nodes-feature.js?v=d00b988a';
+import { slothsChewing } from '../public/js/features/resource-nodes-feature.js?v=058ff73c';
 import { supplyFeature } from '../public/js/features/supply-feature.js?v=9a7e5dc5';
 import { bindToolInventory, createToolConditionState } from '../public/js/tools.js?v=6684b484';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=10b118dd';

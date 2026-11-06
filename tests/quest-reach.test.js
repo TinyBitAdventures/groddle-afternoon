@@ -23,11 +23,11 @@ import { createQuestState } from '../public/js/quests.js?v=c8d9d0a4';
 import { acceptOffer, pendingQuestOffers, setQuestHeldCheck } from '../public/js/quest-offers.js?v=8599dbf9';
 import { SUBWAY_STREETS, closedStreets, initializeStreetJobs, normalizeStreetJobState } from '../public/js/street-jobs.js?v=02a81cb3';
 import { applyWorld } from '../public/js/street-jobs-mp.js?v=c920dbb9';
-import { routeGraph } from '../public/js/map-routes.js?v=e0ac88c0';
+import { routeGraph } from '../public/js/map-routes.js?v=c7e7dc80';
 import { TELEPORTERS } from '../public/js/hidden-floors.js?v=d49b76df';
 import { WINTRY_PORTAL_TELEPORTERS } from '../public/js/wintry-portal.js?v=1437deda';
-import { closuresInTheWay, holdNote, placeIndex, questHold, questPlaceNeeds, reachableStreets } from '../public/js/quest-reach.js?v=9a001ac1';
-import { streetJobsFeature } from '../public/js/features/street-jobs-feature.js?v=66065d7c';
+import { closuresInTheWay, holdNote, placeIndex, questHold, questPlaceNeeds, reachableStreets } from '../public/js/quest-reach.js?v=cd4e9753';
+import { streetJobsFeature } from '../public/js/features/street-jobs-feature.js?v=d7ba1e26';
 
 const root = join(import.meta.dirname, '..');
 const PUB = join(root, 'public');
@@ -75,29 +75,26 @@ before(async () => {
 });
 
 describe('which quests wait for a road on a fresh world', () => {
-  it('a fresh world reaches 239 streets: no door whose key nothing gives (Level 2 West into Oppidan Avenue)', () => {
+  it('a fresh world reaches 241 streets: every door counts now that Dust Traps give every key (Level 2 West into Oppidan Avenue)', () => {
     const w = world(freshJobs());
-    assert.equal(w.reach.size, 239);
+    assert.equal(w.reach.size, 241);
     const level2 = 'GHH1011JSO11ORS';
     const oppidan = 'GDOHDJ84BST2UI2';
-    assert.equal(json('assets/content/signpost-graph.json').sealed[`${level2}>${oppidan}`], 7, 'the Yellow-Teal Square Key');
-    assert.equal(graph[level2].includes(oppidan), false);
-    assert.equal(w.reach.has(oppidan), false);
+    assert.deepEqual(json('assets/content/signpost-graph.json').sealed, {});
+    assert.equal(json('assets/content/signpost-graph.json').doorKeys[`${level2}>${oppidan}`], 7, 'the Yellow-Teal Square Key');
+    assert.equal(graph[level2].includes(oppidan), true);
+    assert.equal(w.reach.has(oppidan), true);
     assert.deepEqual([...w.reach].filter((t) => index.streets[t].hubId === '95').map((t) => index.streets[t].label).sort(), ['Hazy Gate 3', 'Languid Line S'], 'Xalanga, by Hazy Gate 3');
   });
 
-  it('names the six whose streets no open road reaches; two open once their projects are built', () => {
+  it('names the five whose streets no open road reaches; each opens once its projects are built', () => {
     const state = freshJobs();
     const held = Object.keys(getQuestCatalog()).filter((id) => holdIn(state, id)).sort();
-    assert.deepEqual(held, ['explore_the_seams', PURPLE, 'sparkly_of_interest_1', 'sparkly_of_interest_2', 'sparkly_of_interest_3', 'sparkly_of_interest_4']);
-    // Neva Neva and Ajaya Bliss are behind Door Key 9 doors (Nawiwa Wend, Subarna Spells): no project opens them.
-    for (const id of ['sparkly_of_interest_1', 'sparkly_of_interest_2', 'sparkly_of_interest_3', 'sparkly_of_interest_4']) {
-      assert.deepEqual(chainJobs(state, id), [], `${id}: no road to build`);
-      const all = freshJobs();
-      applyWorld(all, catalog, { built: Object.fromEntries(Object.keys(catalog.jobs).filter((j) => catalog.jobs[j].kind === 'street').map((j) => [j, { at: 5 }])) });
-      assert.ok(holdIn(all, id), `${id}: held with every project built`);
-    }
-    for (const id of [PURPLE]) {
+    assert.deepEqual(held, [PURPLE, 'sparkly_of_interest_1', 'sparkly_of_interest_2', 'sparkly_of_interest_3', 'sparkly_of_interest_4']);
+    // Explore The Seams waited for Oppidan Avenue, which Level 2 West's Key 7 door reaches now.
+    assert.equal(holdIn(state, 'explore_the_seams'), null);
+    // Neva Neva and Ajaya Bliss are behind Door Key 9 doors (Nawiwa Wend, Subarna Spells), on streets still to be built.
+    for (const id of [PURPLE, 'sparkly_of_interest_1', 'sparkly_of_interest_2', 'sparkly_of_interest_3', 'sparkly_of_interest_4']) {
       const jobs = chainJobs(state, id);
       assert.ok(jobs.length > 0 && jobs.every(Boolean), id);
       const built = freshJobs();
@@ -118,11 +115,12 @@ describe('which quests wait for a road on a fresh world', () => {
       const t = Object.keys(index.streets).find((k) => index.streets[k].label === label);
       assert.ok(w.reach.has(t) && !w.shut.has(t), `${label} is open and reached`);
     }
-    // Without the three roads it is held again: they are the way.
+    // Without the three roads only Level 2 West's Key 7 door is left; with that door gone too it is held.
     const none = freshJobs();
     const shutAlso = new Set([...closedStreets(none, catalog, opts), ...['201', '206', '240'].map((id) => catalog.jobs[id].street)]);
-    const reach = reachableStreets({ graph, free, shut: shutAlso, starts: [HOME] });
-    assert.ok(questHold(getQuestCatalog()[XALANGA], reach, idx), 'held without them');
+    assert.equal(questHold(getQuestCatalog()[XALANGA], reachableStreets({ graph, free, shut: shutAlso, starts: [HOME] }), idx), null, 'the door still gets there');
+    const noDoor = { ...graph, GHH1011JSO11ORS: graph.GHH1011JSO11ORS.filter((t) => t !== 'GDOHDJ84BST2UI2') };
+    assert.ok(questHold(getQuestCatalog()[XALANGA], reachableStreets({ graph: noDoor, free, shut: shutAlso, starts: [HOME] }), idx), 'held without them');
   });
 
   it('a quest that can happen anywhere, or on a street you reach, never waits', () => {
@@ -135,7 +133,7 @@ describe('which quests wait for a road on a fresh world', () => {
   it('each chain starts at a board you can stand at now, never one behind a closure', () => {
     const state = freshJobs();
     const w = world(state);
-    for (const id of [PURPLE]) {
+    for (const id of [PURPLE, 'sparkly_of_interest_1', 'sparkly_of_interest_2', 'sparkly_of_interest_3', 'sparkly_of_interest_4']) {
       const hold = holdIn(state, id);
       const chain = closuresInTheWay({ graph, free, shut: w.shut, starts: w.starts, targets: hold.streets, boards });
       assert.ok(w.reach.has(chain[0].board), `${id}: the first board is reachable now`);
@@ -213,7 +211,7 @@ describe('the game asks the street projects (no stored flag)', () => {
       assert.equal(streetJobsFeature.questHold(PURPLE, engine), hold, 'cached while the roads stand');
       assert.equal(streetJobsFeature.questHold(XALANGA, engine), null, 'Xalanga is reachable');
       assert.equal(streetJobsFeature.questHold('croppery_harvest_and_sell_at_auction', engine), null);
-      assert.equal(streetJobsFeature.questHold(NEVA, engine).note, 'On hold: waiting for the road to Neva Neva to be built.', 'no project to start: a Door Key 9 door');
+      assert.match(streetJobsFeature.questHold(NEVA, engine).note, /^On hold: waiting for the road to Neva Neva to be built\. Start with .+, at the project board on .+\.$/, 'its Door Key 9 door stands on a street still to be built');
       // The save keeps no hold: the slice is the street projects' own.
       assert.equal(JSON.stringify(streetJobsFeature.save()).includes('hold'), false);
       // A road opens (a saved world where the chain stands): the hold goes, on load.

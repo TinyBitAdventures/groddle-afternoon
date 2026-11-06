@@ -214,7 +214,26 @@ export const RESOURCE_DROP_TABLES = Object.freeze({
     [99, [{ classTsid: 'fairly_hallowed_shrine_powder', qty: 1 }]],
     [100, [{ classTsid: 'extremely_hallowed_shrine_powder', qty: 1 }]],
   ],
+  // OUR DESIGN, not Tiny Speck's (Austin, 2026-11-06): Door Keys 7-10 and 12 were in no drop table,
+  // store or reward, so ten doors stayed shut. Rolled apart from `dust_trap` above (see
+  // DUST_TRAP_RARE_KEY_CHANCE), rarer for higher keys. 101 values, as every table here.
+  dust_trap_rare_keys: [
+    [40, [{ classTsid: 'door_key_7', qty: 1 }]],
+    [65, [{ classTsid: 'door_key_8', qty: 1 }]],
+    [82, [{ classTsid: 'door_key_9', qty: 1 }]],
+    [93, [{ classTsid: 'door_key_10', qty: 1 }]],
+    [100, [{ classTsid: 'door_key_12', qty: 1 }]],
+  ],
 });
+
+/**
+ * OUR DESIGN, not Tiny Speck's: after a Dust Trap's own drop, a separate 1 in 40 roll gives one of
+ * Door Keys 7, 8, 9, 10 or 12 as well. A separate roll because `dust_trap` above is the source table
+ * (catalog_drop_tables.js) and fills all of its 101 values: nothing in it moves, Keys 1-6 stay at 2 in
+ * 101 of a table roll each. Of a table roll that makes Key 7 about 1.0% (half a Key 1-6), Key 8 0.6%,
+ * Key 9 0.4%, Key 10 0.3%, Key 12 0.2%; a trap reaches its table 65% of the time.
+ */
+export const DUST_TRAP_RARE_KEY_CHANCE = 1 / 40;
 
 /** dust_trap.js doDrop: organelle rolls (Baqala timer seconds) before the drop table. */
 /**
@@ -293,6 +312,11 @@ export const DUST_TRAP_DROP_ITEM_DEFS = Object.freeze({
   door_key_4: itemDef('Teal-Red Hexagon Key', 'Teal-Red Hexagon Key', 50, 10, 'Hexagonally shaped keys have more fun.'),
   door_key_5: itemDef('Red-Green Triangle Key', 'Red-Green Triangle Key', 50, 10, "There's nothing a red-green triangle key loves more than a good door-opening."),
   door_key_6: itemDef('Purple-Orange Circle Key', 'Purple-Orange Circle Key', 50, 10, 'Purple, orange and circular, this key has everything you could want in a key.'),
+  door_key_7: itemDef('Yellow-Teal Square Key', 'Yellow-Teal Square Key', 50, 10, 'Yellow, teal and square are good qualities in a key with door-opening aspirations.'),
+  door_key_8: itemDef('Blue-White Hexagon Key', 'Blue-White Hexagon Key', 50, 10, "It's been said that hexagonal keys have more fun. Usually this is the case, except when said key is blue and white. These are serious keys for serious door openings."),
+  door_key_9: itemDef('Teal-White Triangle Key', 'Teal-White Triangle Key', 50, 10, "Some say teal and white keys are nothing but trouble. They've never tried one of the triangular variety."),
+  door_key_10: itemDef('Blue-Yellow Circle Key', 'Blue-Yellow Circle Key', 50, 10, "POW! Right in the keyhole! That's what this blue and yellow circular key would say if it could speak. Which it can't."),
+  door_key_12: itemDef('Green-Orange Hexagon Key', 'Green-Orange Hexagon Key', 50, 10, "This key's greenness and orangeosity is matched only by its hexagonaliciousness."),
   gem_moonstone: itemDef('Luminous Moonstone', 'Luminous Moonstones', 1000, 3, 'A moonstone of eerie luminosity.'),
   focusing_orb: itemDef('Focusing Orb', 'Focusing Orbs', 1200, 1, 'An iridescent focusing orb. It calms your swirly thoughts.'),
   gem_diamond: itemDef('Walloping Big Diamond', 'Walloping Big Diamonds', 2000, 3, "Yep, that's a walloping big diamond."),
@@ -810,6 +834,7 @@ export const RESOURCE_NODE_CATALOG = Object.freeze({
         yields: Object.freeze([
           { what: 'baqala_time', chance: 0.35, note: 'organelle: 13% +10 s, 10% +20 s, 7% +40 s, 5% +60 s of Baqala time' },
           { dropTable: 'dust_trap', chance: 0.65, note: 'paper 2-50, gems, foods, herb seeds, door keys, focusing orb, shrine powders' },
+          { dropTable: 'dust_trap_rare_keys', chance: 0.65 / 40, note: 'ours: Door Keys 7-10 and 12, on top of the drop above' },
         ]),
       }),
     ]),
@@ -1498,6 +1523,7 @@ export function harvestResourceNode(node, inv, pc, ctx = {}) {
         achievementCounters.push({ counter: 'dust_trap:organelle', amount: 1 });
       } else {
         outputs.push(...rollDropTable('dust_trap', rng));
+        if (rng() < DUST_TRAP_RARE_KEY_CHANCE) outputs.push(...rollDropTable('dust_trap_rare_keys', rng));
       }
       const readyFor = node.readySince ? Math.max(0, (now - node.readySince) / 1000) : 0;
       let reset = node.readySince ? 2 * readyFor : def.reset.minMs / 1000;

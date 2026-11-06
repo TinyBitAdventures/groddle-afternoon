@@ -45,7 +45,7 @@ import {
   keyDropDue,
   normalizeDoorState,
   visibleDoors,
-} from '../doors.js?v=eb9510b1';
+} from '../doors.js?v=c5083537';
 import { isLoaded, onLoaded, textureFromUrl } from '../textures.js?v=3149d699';
 import { doorLockArt } from '../door-lock-art.js?v=e656851c';
 import { doorSaleArt } from '../door-sign-art.js?v=69daffff';

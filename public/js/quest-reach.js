@@ -7,9 +7,9 @@
  * dump), so its quests never asked for a street behind a barricade; here some do:
  * "To Xalanga, And Beyond" wants a teleport point in Xalanga: Hazy Gate 3 is built from the start
  * (tools/street-jobs-built-from-start.json), but Yellow Yawning, its way in, still waits on
- * Tlemcen, Heckes and Viscid Pud (the shorter way through Level 2 West's door needs a key nothing
- * gives, so the ways here never count it: signpost-graph `sealed`). Neva Neva and Ajaya Bliss
- * ("Well, I Neva!", "A Blissful Trip") are behind Door Key 9 doors. Glitch gated such offers by where you could go
+ * Tlemcen, Heckes and Viscid Pud (or Level 2 West's Key 7 door; a door whose key nothing gives is
+ * no way here: signpost-graph `sealed`). Neva Neva and Ajaya Bliss ("Well, I Neva!", "A Blissful
+ * Trip") are behind Door Key 9 doors on streets still to be built. Glitch gated such offers by where you could go
  * (quests/*.js canOffer, e.g. the region and location checks); the remake holds them:
  *  - an offer whose requirement needs such a street waits until one of its streets
  *    can be reached (quest-offers.js eligibleTrigger, ctx.questHeld);

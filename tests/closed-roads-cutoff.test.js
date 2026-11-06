@@ -12,7 +12,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import { SUBWAY_STREETS, closedStreets, initializeStreetJobs, noteArrival, normalizeStreetJobState, openWayHome, roadClosure } from '../public/js/street-jobs.js?v=02a81cb3';
-import { routeGraph } from '../public/js/map-routes.js?v=e0ac88c0';
+import { routeGraph } from '../public/js/map-routes.js?v=c7e7dc80';
 import { TELEPORTERS } from '../public/js/hidden-floors.js?v=d49b76df';
 import { WINTRY_PORTAL_TELEPORTERS, WINTRY_PLACE_TSID } from '../public/js/wintry-portal.js?v=1437deda';
 

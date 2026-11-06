@@ -1,11 +1,10 @@
 /**
  * Every hop of a Map route is one a player can take (Austin, 2026-11-03: "this path is impossible").
  * The route from Thicket to Hazy Gate 3 went Level 2 West -> Oppidan Avenue through a door that
- * needs the Yellow-Teal Square Key (key_id 7). Door Keys 7-12 had no source in Glitch
- * (items/door_key_7..12.js are in no drop table, store or reward; Dust Traps drop 1-6,
- * catalog_drop_tables.js dust_trap) and have none in the remake (tools/job-obtainable.mjs), so
- * tools/build-signpost-graph.mjs leaves such doors out (`sealed`) and routes, the Map's rooms and the
- * quest hold's reachability all go without them. Here every way the route graph holds is checked
+ * needs the Yellow-Teal Square Key (key_id 7), which nothing gave then. tools/build-signpost-graph.mjs
+ * leaves a door whose key nothing gives out (`sealed`, tools/job-obtainable.mjs): none since Dust
+ * Traps drop Keys 7-10 and 12 (our design, js/resource-nodes.js), and a route takes a locked door only
+ * when nothing else gets there, the subway included. Here every way the route graph holds is checked
  * against the street files: a visible signpost board the post draws, or a visible door with one
  * destination that opens without a key or with a key a player can get.
  */
@@ -14,7 +13,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { SIGN_ARMS, doorToward, findRoute, isRide, planRoute, createRouteState, routeGraph, signpostToward, subwayRides } from '../public/js/map-routes.js?v=e0ac88c0';
+import { SIGN_ARMS, doorToward, findRoute, isRide, planRoute, createRouteState, routeGraph, signpostToward, subwayRides } from '../public/js/map-routes.js?v=c7e7dc80';
 import { SUBWAY_STREETS, closedStreets, initializeStreetJobs, normalizeStreetJobState } from '../public/js/street-jobs.js?v=02a81cb3';
 import { stationByTsid } from '../public/js/subway.js?v=44d1a09f';
 import { reachRoutes, reachStreet } from '../public/js/builder/reach-graph.js?v=b8634e9a';
@@ -92,17 +91,27 @@ describe('every way in the route graph is one a player can take', () => {
     assert.deepEqual(bad, []);
   });
 
-  it('a door no key opens is not a way: Level 2 West into Oppidan Avenue (Yellow-Teal Square Key)', () => {
-    assert.equal(GRAPH_JSON.sealed[`${LEVEL_2_WEST}>${OPPIDAN}`], 7);
-    assert.equal(graph[LEVEL_2_WEST].includes(OPPIDAN), false);
-    assert.equal(hop(LEVEL_2_WEST, OPPIDAN).ok, false);
-    for (const [edge, key] of Object.entries(GRAPH_JSON.sealed)) {
-      assert.equal(have.has(`door_key_${key}`), false, `${edge}: key ${key} has no source`);
-      const [a, b] = edge.split('>');
-      assert.equal(GRAPH_JSON.doors[a]?.includes(b) || false, false, edge);
-    }
+  it('every locked door has a key a player can get, so none is sealed: Level 2 West into Oppidan Avenue (Yellow-Teal Square Key)', () => {
+    assert.deepEqual(GRAPH_JSON.sealed, {});
+    assert.equal(GRAPH_JSON.doorKeys[`${LEVEL_2_WEST}>${OPPIDAN}`], 7);
+    assert.ok(graph[LEVEL_2_WEST].includes(OPPIDAN));
+    assert.equal(hop(LEVEL_2_WEST, OPPIDAN).ok, true);
     for (const [edge, key] of Object.entries(GRAPH_JSON.doorKeys)) assert.ok(have.has(`door_key_${key}`), `${edge}: key ${key} can be had`);
-    assert.deepEqual([...new Set(Object.values(GRAPH_JSON.sealed))].sort((x, y) => x - y), [7, 8, 9, 10, 12]);
+    assert.deepEqual([...new Set(Object.values(GRAPH_JSON.doorKeys))].sort((x, y) => x - y), [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12]);
+  });
+
+  it('a locked door only when nothing else gets there, the subway included', () => {
+    const g = { a: ['b', 'c'], b: ['d'], c: [], d: [] };
+    const rides = { a: ['c'], c: ['a', 'd'], d: ['c'] };
+    const keyed = new Set(['b>d']);
+    // No ride offered and no other road: the door.
+    assert.deepEqual(findRoute(g, 'a', 'd', { locked: keyed }), ['a', 'b', 'd']);
+    // A ride gets there with no key: the ride, though the door is fewer hops.
+    assert.deepEqual(findRoute({ a: ['b'], b: ['d'], c: [], d: [] }, 'a', 'd', { locked: keyed, rides }), ['a', 'c', 'd']);
+    // A road beats the ride, as before.
+    assert.deepEqual(findRoute({ a: ['d', 'b'], b: ['d'], c: [], d: [] }, 'a', 'd', { locked: keyed, rides }), ['a', 'd']);
+    // The ride and the door both: the door is still there when nothing else is.
+    assert.deepEqual(findRoute({ a: ['b'], b: ['e'], e: ['f'], c: [], d: [], f: [] }, 'a', 'f', { locked: new Set(['b>e']), rides }), ['a', 'b', 'e', 'f']);
   });
 });
 
@@ -112,7 +121,7 @@ describe("Austin's route: Thicket to Hazy Gate 3 (Set a destination on the Map)"
 
   it('a fresh world rides the subway to Onto Parada and walks the roads opened from the start', () => {
     assert.deepEqual(route().map(label), ['Thicket', "Pasha's Place", 'Groddle Forest Junction', 'Onto Parada', 'Konemaen Jaunt', 'Simo Steer', 'Kala Close', 'Shinso Ello', 'Ramyeon Kon', 'Teobocci Shasha', 'Glutton Greens', 'Shim Shiri', 'Yellow Yawning', 'Hazy Gate 3']);
-    assert.equal(findRoute(graph, THICKET, HAZY_GATE_3, { blocked: shut(), locked }), null, 'no road alone gets there');
+    assert.ok(findRoute(graph, THICKET, HAZY_GATE_3, { blocked: shut(), locked }).includes(OPPIDAN), 'without the subway only Level 2 West\'s locked door gets there');
     const res = planRoute(createRouteState(), graph, { from: THICKET, to: HAZY_GATE_3, blocked: shut(), locked, rides: RIDES });
     assert.equal(res.ok, true);
     assert.ok(!route().includes(OPPIDAN), 'not through Oppidan Avenue');

@@ -51,9 +51,10 @@
  * and a door second (TSFrontController.startLocationPath 1791-1799,
  * loc_path_door; Location.getDoorThatLinksToLocTsid), and so do
  * signpostToward() / doorToward() here. A locked door is taken only when no
- * other way exists, and a door whose key nothing gives (Door Keys 7-12, the
- * signpost-graph's `sealed` list) is no way at all: a route to Hazy Gate 3 once
- * went through Level 2 West's Yellow-Teal Square Key door (Austin, 2026-11-03). Unlike player.js, resurrecting forgets the stored route
+ * other way exists, the subway included (a route to Hazy Gate 3 once went
+ * through Level 2 West's Yellow-Teal Square Key door: Austin, 2026-11-03), and a
+ * door whose key nothing gives (the signpost-graph's `sealed` list, empty since
+ * Dust Traps drop Door Keys 7-10 and 12) is no way at all. Unlike player.js, resurrecting forgets the stored route
  * once it is restored (the source kept previous_map_path for ever and could
  * restore a stale one after a later croak).
  */
@@ -221,9 +222,12 @@ export function findRoute(graph, from, to, { blocked = null, locked = null, ride
   for (const t of blocked || []) for (const a of tsidAliases(t)) closed.add(a);
   const keyed = locked && locked.size ? locked : null;
   const ways = { oneWay: oneWay && Object.keys(oneWay).length ? oneWay : null, startCut: startCut ? new Set(startCut) : null };
-  const walk = (extra) => bfs(graph, start, targets, closed, keyed, extra, ways) || (keyed ? bfs(graph, start, targets, closed, null, extra, ways) : null);
-  // The subway only when no road gets there (Austin, 2026-11-03: the way to Xalanga rides to Onto Parada).
-  return walk(null) || (rides ? walk(rides) : null);
+  const noKey = (extra) => bfs(graph, start, targets, closed, keyed, extra, ways);
+  const anyDoor = (extra) => (keyed ? bfs(graph, start, targets, closed, null, extra, ways) : null);
+  // The subway only when no road gets there (Austin, 2026-11-03: the way to Xalanga rides to Onto
+  // Parada), and a locked door only when neither does: the subway needs no key, and the rare keys
+  // would otherwise send a fresh player's road to Xalanga through Level 2 West's Key 7 door again.
+  return noKey(null) || (rides ? noKey(rides) : null) || anyDoor(null) || (rides ? anyDoor(rides) : null);
 }
 
 /**

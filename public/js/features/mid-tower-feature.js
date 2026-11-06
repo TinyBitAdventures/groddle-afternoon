@@ -44,7 +44,7 @@
  * hallWallTint (hex, once the wall tiles are tinted).
  */
 
-import { insideBottomRect } from '../doors.js?v=eb9510b1';
+import { insideBottomRect } from '../doors.js?v=c5083537';
 import { assignQuest } from '../quests.js?v=c8d9d0a4';
 import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=3149d699';
 import { pixiSpeed } from '../sprite-sheets.js?v=db7c442f';

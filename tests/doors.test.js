@@ -27,7 +27,7 @@ import {
   keyDropDue,
   normalizeDoorState,
   visibleDoors,
-} from '../public/js/doors.js?v=eb9510b1';
+} from '../public/js/doors.js?v=c5083537';
 import {
   barriersScreen,
   blockBarrierCrossing,

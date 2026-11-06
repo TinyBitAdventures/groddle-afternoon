@@ -29,9 +29,9 @@ import {
   routeStopsLine,
   ROUTE_STOPS_SHOWN,
   signpostToward,
-} from '../public/js/map-routes.js?v=e0ac88c0';
-import { mapRoutesFeature } from '../public/js/features/map-routes-feature.js?v=b1569512';
-import { hellTicketsFeature } from '../public/js/features/hell-tickets-feature.js?v=d13c2b58';
+} from '../public/js/map-routes.js?v=c7e7dc80';
+import { mapRoutesFeature } from '../public/js/features/map-routes-feature.js?v=09516fab';
+import { hellTicketsFeature } from '../public/js/features/hell-tickets-feature.js?v=25411a32';
 import { hellFeature } from '../public/js/features/hell-feature.js?v=13196575';
 import { createFeatureHost } from '../public/js/feature-host.js?v=127e0a3c';
 import { applyStreetIndex } from '../public/js/street-loader.js?v=33d2b8bc';
@@ -39,10 +39,10 @@ import { loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/c
 import { createQuestState } from '../public/js/quests.js?v=c8d9d0a4';
 import { HELL_QUESTS, createHellState, croak } from '../public/js/hell.js?v=aca145ba';
 import { SUBWAY_STREETS } from '../public/js/quest-rooms/back-alley.js?v=657b2221';
-import { doorRooms, doorToward, routeGraph } from '../public/js/map-routes.js?v=e0ac88c0';
+import { doorRooms, doorToward, routeGraph } from '../public/js/map-routes.js?v=c7e7dc80';
 import { afterStreetCard, runStreetTransition, streetCardUp } from '../public/js/screen-fx.js?v=428f4022';
 import { EMITTED_EVENTS } from '../public/js/quest-offers.js?v=8599dbf9';
-import { smugglingFeature } from '../public/js/features/smuggling-feature.js?v=cfd2ddbd';
+import { smugglingFeature } from '../public/js/features/smuggling-feature.js?v=51a087a4';
 import { addItem } from '../public/js/inventory.js?v=d82f3b00';
 import { resurrect } from '../public/js/hell.js?v=aca145ba';
 
@@ -499,10 +499,10 @@ describe('G192 doors in the route graph', () => {
     assert.ok(built.graph[PANKA].includes(HELL_BAR));
     assert.ok(!GRAPH_JSON.streets[PANKA].includes(HELL_BAR), 'the signpost list stays signposts only (smuggling routes)');
     assert.ok(built.locked.has(`${THORNFAD}>${VICARS}`));
-    // Visible doors with one fixed destination on another street, and nothing else: not a door
-    // whose key nothing gives (Door Keys 7-12, `sealed`), unless another door to that room opens.
+    // Visible doors with one fixed destination on another street, and nothing else; no door's key
+    // lacks a source (`sealed`, empty since Dust Traps drop Door Keys 7-10 and 12).
+    assert.deepEqual(GRAPH_JSON.sealed, {});
     const expected = {};
-    const sealed = {};
     let skipped = 0;
     for (const [key, meta] of Object.entries(INDEX.streets)) {
       for (const d of JSON.parse(read(join(PUBLIC, meta.file))).doors || []) {
@@ -511,12 +511,8 @@ describe('G192 doors in the route graph', () => {
           skipped += 1;
           continue;
         }
-        if (Number(d.key_id) >= 7) (sealed[key] ||= new Set()).add(to);
-        else (expected[key] ||= new Set()).add(to);
+        (expected[key] ||= new Set()).add(to);
       }
-    }
-    for (const [key, list] of Object.entries(sealed)) {
-      for (const to of list) if (!expected[key]?.has(to)) assert.ok(GRAPH_JSON.sealed[`${key}>${to}`] >= 7, `${key}>${to} is sealed`);
     }
     assert.deepEqual(Object.fromEntries(Object.entries(GRAPH_JSON.doors).map(([k, v]) => [k, [...v].sort()])), Object.fromEntries(Object.entries(expected).map(([k, v]) => [k, [...v].sort()])));
     assert.ok(skipped >= 30, `hidden, random and same-street doors: ${skipped}`);

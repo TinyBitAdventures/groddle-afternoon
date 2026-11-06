@@ -98,7 +98,7 @@ import {
   upgradeOption,
 } from '../street-jobs.js?v=02a81cb3';
 import { gainMetabolic, loseEnergy } from '../metabolics.js?v=8504134e';
-import { closuresInTheWay, holdNote, placeIndex, questHold, reachableStreets } from '../quest-reach.js?v=9a001ac1';
+import { closuresInTheWay, holdNote, placeIndex, questHold, reachableStreets } from '../quest-reach.js?v=cd4e9753';
 import { getQuestCatalog as questCatalog } from '../content-catalogs.js?v=10b118dd';
 import { saveStore } from '../save-store.js?v=8839ba7b';
 import {
@@ -127,7 +127,7 @@ import { normalizeGroups } from '../groups.js?v=4c4c8d76';
 import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=3149d699';
 import { JOB_WORK_OVERLAY, jobWorkFloatPoint, jobWorkSoundKey, jobWorkToolScale, jobWorkToolSheet } from '../job-work-fx.js?v=33f097ad';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
-import { SIGN_ARMS, routeGraph } from '../map-routes.js?v=e0ac88c0';
+import { SIGN_ARMS, routeGraph } from '../map-routes.js?v=c7e7dc80';
 import { TELEPORTERS } from '../hidden-floors.js?v=d49b76df';
 import { WINTRY_PORTAL_TELEPORTERS } from '../wintry-portal.js?v=1437deda';
 import { PROJECTS_TEXT, contributedJobs, mineTotal, projectList } from '../projects-tracker.js?v=c508f396';
