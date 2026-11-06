@@ -302,7 +302,9 @@ export function reachFindings(key, street, arrivals, { want = () => true, reach 
       pt(a.x, a.y), { from: a.from, wall: wall?.id, ceiling: ceiling?.id }, 'Move the arrival clear of the wall or ceiling.');
     }
   });
-  const r = reach || reachStreet(street, arrivals, buff ? { buff } : {});
+  // G555: a ladder a jump lifts you to is a way out, as in the game (Up jumps and takes it). The shipped
+  // placement data stays built without it (build-unreached-floors.mjs): that's street ecology's, not this report's.
+  const r = reach || reachStreet(street, arrivals, { jumpGrab: true, ...(buff ? { buff } : {}) });
   const real = arrivals.filter((a) => !a.fallback);
   const fromWords = (t) => {
     const i = t.reachedFrom.findIndex((x) => !x);

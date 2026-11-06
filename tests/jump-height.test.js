@@ -23,7 +23,7 @@ import { NEWXP_DEFAULT_PHYSICS, NEWXP_UPGRADES, reachFor } from '../public/js/ne
 import { NO_UPGRADE_PHYSICS_STREETS, ignoresUpgradePhysics, remakeMovementMultipliers } from '../public/js/imagination.js?v=0cab36eb';
 import { rawTripleJumpMultiplier, scaledTripleJumpMultiplier, TRIPLE_JUMP_UPGRADES } from '../public/js/movement.js?v=b30f84eb';
 import { reachStreet } from '../public/js/builder/reach-graph.js?v=b8634e9a';
-import { plainApex, LEDGE_RISE } from '../public/js/builder/validate.js?v=3791129e';
+import { plainApex, LEDGE_RISE } from '../public/js/builder/validate.js?v=0798d751';
 import { SOURCE_PHYSICS } from '../public/js/puzzle-triggers.js?v=b341f855';
 import { CANOPY_PHYSICS } from '../public/js/hidden-floors.js?v=d49b76df';
 

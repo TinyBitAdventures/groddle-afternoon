@@ -737,7 +737,7 @@ async function boot() {
   }
   function loadValidateMod() {
     if (S.validateModLoading) return;
-    S.validateModLoading = import('./validate.js?v=3791129e').then((m) => { S.validateMod = m; S.geoDrawn = ''; }).catch(() => { S.validateModLoading = null; });
+    S.validateModLoading = import('./validate.js?v=0798d751').then((m) => { S.validateMod = m; S.geoDrawn = ''; }).catch(() => { S.validateModLoading = null; });
   }
 
   /** The reach to draw: the validator's for a draft street, else the one worked out here. */
@@ -2447,7 +2447,7 @@ async function boot() {
       const key = reachKey();
       await new Promise((r) => setTimeout(r, 0));
       const t0 = performance.now();
-      const data = m.reachStreet(s, arrivals);
+      const data = m.reachStreet(s, arrivals, { jumpGrab: true });
       S.reachLocal = { key, data, ms: Math.round(performance.now() - t0) };
       S.geoDrawn = '';
     } catch (err) {
@@ -2482,7 +2482,7 @@ async function boot() {
     // `new URL(...)` written here would not be keyed by tools/module-keys).
     if (!V.workerUrl) {
       if (!V.loading) {
-        V.loading = import('./validate-worker.js?v=c85f2074').then((m) => { V.workerUrl = m.WORKER_URL; V.dataPaths = m.VALIDATOR_DATA; runValidate(); }).catch(() => { V.state = 'off'; ensureLocalReach(); });
+        V.loading = import('./validate-worker.js?v=d6ce0ca9').then((m) => { V.workerUrl = m.WORKER_URL; V.dataPaths = m.VALIDATOR_DATA; runValidate(); }).catch(() => { V.state = 'off'; ensureLocalReach(); });
       }
       return null;
     }

@@ -16,6 +16,7 @@ import { STUCK_HINT_DWELL_MS, onTrapFloor, slashCommandsFeature, trapLinesOn } f
 import { STREET_TRAPS } from '../public/js/street-traps-data.js?v=1ac4d01b';
 import { TRAP_JUMPS, renderTraps, trapLinesOf } from '../tools/ecology/build-street-traps.mjs';
 import { reachStreet, streetBuff } from '../public/js/builder/reach-graph.js?v=b8634e9a';
+import { validateShippedStreet } from '../public/js/builder/validate.js?v=0798d751';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const LEVEL_3_WEST = 'GLI107JLRU11EM2';
@@ -67,6 +68,19 @@ describe('/stuck hint: the floors it knows', () => {
     const arrivals = [{ x: 300, y: 1099, from: 'west' }, { x: 4700, y: 1047, from: 'east' }];
     assert.deepEqual(reachStreet(s, arrivals, { jumpGrab: true, buff }).traps, []);
     assert.ok(reachStreet(s, arrivals, { buff }).traps.length > 0, 'off by default: the placement data is built without it');
+  });
+
+  it('G555: the level builder reports no trap on Piene Question, and still reports Level 3 West\'s; the placement data stays without the jump', () => {
+    const pieneArrivals = [{ x: 300, y: 1099, from: 'west' }, { x: 4700, y: 1047, from: 'east' }];
+    const traps = (tsid, arr) => validateShippedStreet(street(tsid), arr, { rules: ['PHY-005'] }).findings.map((f) => f.at);
+    assert.deepEqual(traps(PIENE, pieneArrivals), []);
+    const editor = readFileSync(join(root, 'public/js/builder/editor.js'), 'utf8');
+    assert.match(editor, /m\.reachStreet\(s, arrivals, \{ jumpGrab: true \}\)/, 'the reach map the editor draws agrees');
+    assert.doesNotMatch(readFileSync(join(root, 'tools/ecology/build-unreached-floors.mjs'), 'utf8'), /jumpGrab/, 'street ecology is built without it');
+    // Level 3 West, from Level 2 West's and The Drop's signposts (tests/cave-pit.test.js).
+    const westArrivals = ['GHH1011JSO11ORS', 'GHH12E1QP611OPA'].flatMap((tsid) => street(tsid).signposts.flatMap((post) => post.connects || [])
+      .filter((c) => c.tsid?.slice(1) === LEVEL_3_WEST.slice(1)).map((c) => ({ ...c.arrive, from: tsid })));
+    assert.ok(traps(LEVEL_3_WEST, westArrivals).length > 0);
   });
 
   it('builds a line per floor at the highest jump it traps at', () => {
