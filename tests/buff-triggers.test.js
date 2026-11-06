@@ -357,8 +357,7 @@ describe('package overrides', () => {
 
   it('game.js holds the price for the Grinder and the Smelter only', () => {
     const src = readFileSync(join(root, 'game.js'), 'utf8');
-    assert.match(src, /room: grinderPackRoom, batchEnergyCost: unitEnergy/);
-    assert.match(src, /recipe\.tool === 'smelter' \? \{ \.\.\.opts, batchEnergyCost: unitEnergy \}/);
+    assert.match(src, /isGrinderRecipe\(recipe\) \|\| recipe\.tool === 'smelter' \? \{ \.\.\.packOpts, batchEnergyCost: unitEnergy \} : packOpts/);
   });
 
   it('Smelt It, Dealt It: free ingots, over the Green Smelt cards too (smelter.js:446-478)', () => {

@@ -2732,9 +2732,39 @@
   "deployed": "2026-11-06"
  },
  "git": {
-  "commits": 1370,
+  "commits": 1376,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-06",
+    "kind": "fix",
+    "text": "The Make panel still hands the Grinder its pack check beside the held batch price"
+   },
+   {
+    "date": "2026-11-06",
+    "kind": "fix",
+    "text": "Each Teleportation Script keeps its own street, wherever it goes"
+   },
+   {
+    "date": "2026-11-06",
+    "kind": "fix",
+    "text": "A batch started under a Flaming Humbaba keeps its price when the buff runs out"
+   },
+   {
+    "date": "2026-11-06",
+    "kind": "fix",
+    "text": "A side window no longer covers your running buffs"
+   },
+   {
+    "date": "2026-11-06",
+    "kind": "fix",
+    "text": "Up up and away! counts the tickets you activate, and courses you already went to"
+   },
+   {
+    "date": "2026-11-06",
+    "kind": "improve",
+    "text": "On a phone the site's header has the mark, Play, the theme button and a Menu that opens every link, and pages fit and tap better"
+   },
    {
     "date": "2026-11-06",
     "kind": "improve",
@@ -2824,39 +2854,9 @@
     "date": "2026-11-06",
     "kind": "fix",
     "text": "Restarting the tutorial's Training Level Two no longer hands out its food and drink again"
-   },
-   {
-    "date": "2026-11-06",
-    "kind": "improve",
-    "text": "The Make panel says why a recipe can't be made, and its title shows the tool of the current tab"
-   },
-   {
-    "date": "2026-11-06",
-    "kind": "fix",
-    "text": "A garden plot that refuses your worn tool no longer plays its word first, and says how much condition the tool needs"
-   },
-   {
-    "date": "2026-11-06",
-    "kind": "fix",
-    "text": "The online smoke check waits for a late Local line instead of failing on it"
-   },
-   {
-    "date": "2026-11-06",
-    "kind": "fix",
-    "text": "Spice Plants and other rooted scenery stand on the ground beside a pipe, not on its rim or behind its end"
-   },
-   {
-    "date": "2026-11-06",
-    "kind": "fix",
-    "text": "The tutorial's Dustbunny no longer holds a player who is too full to eat or drink"
-   },
-   {
-    "date": "2026-11-06",
-    "kind": "fix",
-    "text": "Garden beds on home streets and back yards sit on the land instead of over the background"
    }
   ]
  },
- "tests": 700,
+ "tests": 701,
  "generatedAt": "2026-11-06"
 }

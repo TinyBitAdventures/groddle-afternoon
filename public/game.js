@@ -26554,9 +26554,8 @@ function runMakeCraft(key, qty) {
   // The Grinder keeps only what the pack can carry; the rest is destroyed, never the magic rock's (grand_ol_grinder.js 613-619).
   // A buff's free units are priced when the batch starts and hold to its end, whatever the buff does meanwhile
   // (ore_grinder.js 450-473 and 592, smelter.js 446-478 and 576: the run keeps its own details).
-  const sessionOpts = isGrinderRecipe(recipe)
-    ? { ...opts, room: grinderPackRoom, batchEnergyCost: unitEnergy }
-    : recipe.tool === 'smelter' ? { ...opts, batchEnergyCost: unitEnergy } : opts;
+  const packOpts = isGrinderRecipe(recipe) ? { ...opts, room: grinderPackRoom } : opts;
+  const sessionOpts = isGrinderRecipe(recipe) || recipe.tool === 'smelter' ? { ...packOpts, batchEnergyCost: unitEnergy } : packOpts;
   activeCraftSession = { timer, key, recipe, qty: n, made: 0, opts: sessionOpts };
   document.getElementById('make-list')?.setAttribute('hidden', '');
   document.getElementById('make-detail')?.setAttribute('hidden', '');
