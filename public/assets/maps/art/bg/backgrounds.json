@@ -71,10 +71,11 @@
       "thumbMatches": true,
       "x1": "assets/maps/art/bg/ix.webp",
       "x2": "assets/maps/art/bg/ix@2x.webp",
-      "x1Bytes": 12176,
-      "x1Sha256": "d68e30c9dc93db221cf2a0dbe9ea5f242db5190d63158ff32dfe888f20d14ecd",
-      "x2Bytes": 25702,
-      "x2Sha256": "ed5504c46fb2b529f91d7d34017f74716e08cdc488427d316af5a3a91ab9deb6"
+      "repainted": "tools/provenance/repainted-maps.json",
+      "x1Bytes": 25580,
+      "x1Sha256": "bb973998350578062231d15987801203a78b05ed09e6c2d0faeba9a91a3c9386",
+      "x2Bytes": 89922,
+      "x2Sha256": "35253bea08465e05a03f574edc598231c0c6b78b07cab0b4d8eb5317582a8e90"
     },
     "51": {
       "hubName": "Uralia",

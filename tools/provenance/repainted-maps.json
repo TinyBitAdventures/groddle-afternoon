@@ -2,6 +2,87 @@
   "format": "groddle-repainted-maps/1",
   "policy": "Region map paintings repainted for Groddle Afternoon (register G522): Tiny Speck’s 760 x 460 map paintings are lost, so a region listed here gets a new painting made from its own CC0 world-map thumbnail, dedicated CC0 1.0 with its provenance (tools/builder/licence-policy.json, \"ai-generated\"). tools/map-backgrounds/build.mjs keeps these files as they are and enlarges the thumbnail for every other region; tests/map-backgrounds.test.js checks both. To add a region: put its two WebP files in public/assets/maps/art/bg/ under the region’s usual names and add one entry here.",
   "regions": {
+    "27": {
+      "hubName": "Ix",
+      "x1": {
+        "file": "assets/maps/art/bg/ix.webp",
+        "w": 760,
+        "h": 460,
+        "bytes": 25580,
+        "sha256": "bb973998350578062231d15987801203a78b05ed09e6c2d0faeba9a91a3c9386"
+      },
+      "x2": {
+        "file": "assets/maps/art/bg/ix@2x.webp",
+        "w": 1520,
+        "h": 920,
+        "bytes": 89922,
+        "sha256": "35253bea08465e05a03f574edc598231c0c6b78b07cab0b4d8eb5317582a8e90"
+      },
+      "licence": "ai-generated",
+      "author": "Austin Ginder (directed and chose it)",
+      "tool": "GPT Image 2.6 Sunburst in T3 Chat canvas (t3.chat/canvas)",
+      "model": "GPT Image 2.6 Sunburst",
+      "made": "2026-11-06",
+      "chosen": {
+        "by": "Austin Ginder",
+        "on": "2026-11-06",
+        "of": "1 generation, toned down; Austin 2026-11-06: keep going, four per reset, landing each batch"
+      },
+      "prompt": "Paint ONE image: the background painting for an in-game region map of \"Ix\", a region in a whimsical 2D browser game. Size 1520 x 920 pixels (landscape, exactly this ratio; if only fixed ratios are offered, use 16:10). This is the painted landscape that sits UNDER the game's map interface. The game draws its own street lines, names, buttons and markers on top later, so the painting must contain none of them.\n\nVIEW AND FEEL\nSeen from directly above, like a painted map: not from a side or three-quarter angle. Trees read as small round canopies or small pointed tops with a soft shadow; no trunks showing. Hills, cliffs and slopes read by their light and shadow. Like a hand-painted miniature diorama, quiet and gentle: muted natural colours, soft shadows, a fine even texture over the ground (like felt or fine brush strokes), and only a little scattered detail. Fewer and smaller features is better than more: most of the land is calm open ground, so thin street lines and small labels drawn on top stay easy to read. Storybook, never grim, never photographic, never neon.\n\nWHAT TO PAINT\nOne island of two joined lobes: a golden grassy lobe on the left and a dusty rose-brown lobe on the right. Its shape must follow attachment 02 closely (same outline, same position, same proportions), because the game's streets are fixed to those positions (attachment 03).\n- The sea and margins: pale parchment white with faint grey wavy hatching suggesting calm water, all round the island, widest along the top, the bottom and the right side. A small bay of sea cuts up into the bottom edge where the two lobes meet.\n- The coast edge: a raised, sunlit rim of cream and sandy-ochre earth with a soft shadow below it, like the cut edge of a diorama tile, all round the shore.\n- The left lobe: soft mustard-yellow and ochre grass. Along its top-left and top edge, three or four rounded hummocks rise in low stepped terraces, lit on their upper-left sides.\n- Lower centre of the left lobe: one tall pale blue-grey standing stone, smooth and weathered, with a soft shadow to the lower right. This is the region's landmark; keep it modest in size.\n- The right lobe: dusty rose and terracotta-brown ground, slightly lower than the yellow lobe, with gentle ridges and folds running down toward the bottom right.\n- Across the top of the right lobe and once near its middle: a few small bare grey-brown dead trees, seen from above as thin twiggy crowns.\n- Scattered over both lobes: a few small slate-blue and brown stones, sparse.\n- Light: soft warm daylight from the upper left; gentle shadows falling to the lower right.\n\nSTYLE\nMatch attachment 05: Tiny Speck's own painted plants and scenery for this region (soft painterly shapes, gentle shading, no hard black outlines), but much smaller and simpler, as seen on a map from high above.\n\nDO NOT INCLUDE\nNo text, letters, numbers or labels of any kind. No roads, paths, lines, grids or street markings. No circles, buttons, pins, arrows, icons, stars or \"you are here\" markers. No compass, legend, scale bar, border, frame, title or vignette. No people or characters. No UI of any kind.\n\nATTACHMENTS\n01  the original 150 x 91 thumbnail of this region's painting (Tiny Speck, public domain). The colours and the layout to follow.\n02  that thumbnail enlarged to 1520 x 920 with no extra detail. Follow its shapes closely: coastlines, cliffs, water, forest and open ground in the same places and proportions; repaint everything with real detail.\n03  where the game will draw the streets (dark lines) and region exits (yellow circles), at the same 1520 x 920 scale. For placement only: do NOT paint these lines or circles.\n04  a screenshot of how the game shows this map today: a blurry enlargement of the thumbnail with the game's interface drawn on top (street lines, street names, green GO buttons, panel and buttons). It is here only so you can see what the painting is for. Do NOT copy any of the interface; paint only the landscape underneath it.\n05  Tiny Speck's own painted trees, plants and scenery from this region's streets (public domain). The style and palette to match, drawn smaller and simpler.\n\nReturn the single painted landscape image only.\n",
+      "promptNote": "The prompt exactly as given to the model: research/zone-art/tools/prompt-template.txt with this region’s WHAT TO PAINT, written from the 2012 footage frame.",
+      "inputs": [
+        {
+          "n": 1,
+          "file": "01-thumbnail-150x91.jpg",
+          "sha256": "d0b9776e2735bcdc4ba75e6495166c6eb6928007a8e58b5529a08747c3432cfe",
+          "what": "the region’s own 150 x 91 thumbnail of the lost painting",
+          "source": "Tiny Speck, CC0: glitch-overlays/world_map.fla LIBRARY/z_hub_maps_small/sm_ix.jpg (byte for byte public/assets/maps/art/thumbs/sm_ix.jpg)"
+        },
+        {
+          "n": 2,
+          "file": "02-thumbnail-enlarged-1520x920.png",
+          "sha256": "8f5a238da4ea438cde3c4e0414b4e35803d9cf3c31e821c6a0ad77413ba8094d",
+          "what": "input 1 enlarged to 1520 x 920 (Lanczos), nothing added: the coastline and colour guide",
+          "source": "made from input 1, CC0"
+        },
+        {
+          "n": 3,
+          "file": "03-street-layout-1520x920.png",
+          "sha256": "4a73ef707e2182b15193dc3222ec1983d2b5cc93773fc5e658f3e4d4623789fc",
+          "what": "where the map draws the 7 visible streets (dark lines) and 3 exits (yellow circles), at 2x",
+          "source": "drawn from Tiny Speck’s CC0 map data (public/assets/maps/hubs/hub-27.json, from GSJS inc_data_maps_prod.js)"
+        },
+        {
+          "n": 4,
+          "file": "04-our-map-window-with-ui.png",
+          "sha256": "710cc33455edfe94e22692aea57a528768bea7f7c20554a8b9a531d9025f0f23",
+          "what": "the remake’s own map window at 2x (its UI over the enlarged thumbnail), so the model saw what the painting is for; the prompt says to copy none of the UI",
+          "source": "our own render (Groddle Afternoon UI and the CC0 thumbnail)"
+        },
+        {
+          "n": 5,
+          "file": "05-style-cc0-decos.png",
+          "sha256": "e0776f9cad78d486622cb5dfc52c7c62486114417f1929c63b4832439a39f912",
+          "what": "a sheet of 18 decos Tiny Speck painted this region’s streets with (the most used trees, plants and scenery): the style and palette",
+          "source": "Tiny Speck decos, CC0"
+        }
+      ],
+      "references": [
+        "A player’s capture of the original Ix map window (Glitch Strategy wiki): reference only, never given to the model and never in the repo",
+        "A frame of the original painting from the 2012 video \"tour: The Map of Ur\" (YouTube bXxXB6GUoMU at 4.3 s): reference only, never given to the model and never in the repo; the prompt describes its composition in words"
+      ],
+      "source": {
+        "generated": "2048 x 1152 (16:9, High 2K; no 16:10 option), centre-cropped to 1520 x 920: drop/ix-1.png",
+        "dropSha256": "2186591bb3ce683f998d58233f79a7d691d2bc02196bd01322dd7e508b8d1868",
+        "toning": "magick ix-1.png -modulate 100,62,98 -fill #8a8a5a -colorize 8% master.png (calmer, toward the original’s muted olive)",
+        "masterSha256": "a74ddc0fa12fe197e5b806dc832e6299d94260aff89470741475549a4f60223e",
+        "encode": {
+          "x1": "magick master.png -filter Lanczos -resize 760x460! -quality 82 -define webp:method=6 ix.webp",
+          "x2": "magick master.png -quality 82 -define webp:method=6 ix@2x.webp"
+        },
+        "pack": "research/zone-art/map-ix (outside git): pack.md, prompt.txt, attach/, drop/, review/"
+      }
+    },
     "56": {
       "hubName": "Groddle Forest",
       "x1": {
