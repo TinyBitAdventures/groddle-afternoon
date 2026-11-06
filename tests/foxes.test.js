@@ -39,7 +39,7 @@ import {
   preserveEcologyEntry,
 } from '../public/js/features/foxes-feature.js?v=3bd5713b';
 import { wildlifeFor } from '../public/js/wildlife.js?v=670c3a7f';
-import { createFeatureHost } from '../public/js/feature-host.js?v=020c9329';
+import { createFeatureHost } from '../public/js/feature-host.js?v=127e0a3c';
 import { foxesFeature } from '../public/js/features/foxes-feature.js?v=3bd5713b';
 
 const ecology = JSON.parse(readFileSync(new URL('../public/assets/content/street-ecology.json', import.meta.url)));

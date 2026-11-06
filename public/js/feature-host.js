@@ -45,10 +45,48 @@
  */
 
 /**
+ * The page's error event for an error the game caught and survived: the console shows it
+ * (reportError logs it as uncaught) and the report form's error list hears it
+ * (bug-report-feature's window 'error' listener, which names `where` from err.groddleWhere).
+ */
+export function reportPageError(where, err) {
+  try {
+    if (err && typeof err === 'object') err.groddleWhere = where;
+  } catch { /* a frozen error keeps its own words */ }
+  console.error(`[groddle] ${where} threw; the game goes on.`);
+  if (typeof globalThis.reportError === 'function') globalThis.reportError(err);
+  else console.error(err);
+}
+
+/**
+ * Report 116: one throw in a per-frame call used to stop the game loop for good (Pixi's ticker
+ * asks for the next frame only after its listeners return), freezing the view while the page
+ * around it went on. A guard reports each error once per place and message (`where`, e.g. a
+ * feature id and hook) and lets the frame go on; a call that throws every frame is reported
+ * once, not 60 times a second. At most `limit` different errors are reported.
+ */
+export function createErrorOnce({ report = reportPageError, limit = 40 } = {}) {
+  const seen = new Set();
+  const once = (where, err) => {
+    const key = `${where}|${err?.message ?? err}`;
+    if (seen.has(key) || seen.size >= limit) return false;
+    seen.add(key);
+    try {
+      report(where, err);
+    } catch { /* the reporter itself never stops the loop */ }
+    return true;
+  };
+  once.seen = seen;
+  return once;
+}
+
+/**
  * @param {object[]} features
+ * @param {{ onError?: (where: string, err: unknown) => void }} [opts] who hears a feature's
+ *   per-frame throw (default reportPageError)
  * @returns {object}
  */
-export function createFeatureHost(features = []) {
+export function createFeatureHost(features = [], { onError } = {}) {
   const list = [];
   const byId = new Map();
   for (const feature of features) {
@@ -63,6 +101,18 @@ export function createFeatureHost(features = []) {
   const each = (hook, ...args) => {
     for (const feature of list) {
       if (typeof feature[hook] === 'function') feature[hook](...args);
+    }
+  };
+  // Every-frame hooks: one feature's throw is reported once (with its id) and the rest still run.
+  const failed = createErrorOnce(onError ? { report: onError } : {});
+  const eachGuarded = (hook, ...args) => {
+    for (const feature of list) {
+      if (typeof feature[hook] !== 'function') continue;
+      try {
+        feature[hook](...args);
+      } catch (err) {
+        failed(`${feature.id}.${hook}`, err);
+      }
     }
   };
   const first = (hook, ...args) => {
@@ -96,7 +146,11 @@ export function createFeatureHost(features = []) {
       each('onStreetClear', engine);
     },
     tick(dtMs, now, engine) {
-      each('onTick', dtMs, now, engine);
+      eachGuarded('onTick', dtMs, now, engine);
+    },
+    /** QA: the per-frame errors caught so far (`<feature>.<hook>|<message>`). */
+    caught() {
+      return [...failed.seen];
     },
     newDay(now, engine) {
       each('onNewDay', now, engine);

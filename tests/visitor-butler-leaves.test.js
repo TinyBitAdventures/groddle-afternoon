@@ -10,6 +10,10 @@
  * the next frame only after its listeners return, so the view froze for good while the DOM
  * top bar moved on.
  *
+ * The safety net: the feature host runs each feature's onTick in its own guard, and game.js runs
+ * the frame's work in one, so a throw is reported once (console and the report form's error
+ * list, with the feature's id) and the loop goes on.
+ *
  * This runs the real visit (neighbours-mp-feature's visitHome and the owner's street from
  * homes-feature) against a fake Pixi, leaves by each way out, and walks to the old Butler's x.
  * Run: node --test tests/visitor-butler-leaves.test.js
@@ -20,6 +24,8 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import { neighboursMpFeature } from '../public/js/features/neighbours-mp-feature.js?v=c4685cad';
+import { createErrorOnce, createFeatureHost, reportPageError } from '../public/js/feature-host.js?v=127e0a3c';
+import { pageErrorLine, rememberError } from '../public/js/features/bug-report-feature.js?v=a1fec543';
 
 const root = join(import.meta.dirname, '..');
 const read = (rel) => readFileSync(join(root, rel), 'utf8');
@@ -236,5 +242,72 @@ describe('the visited Butler stays on its street (report 116)', () => {
     assert.match(tick, /if \(!vb \|\| vb\.box\.destroyed \|\| !visit\) return;/);
     const greet = src.slice(src.indexOf('  function greeting()'), src.indexOf('  function tickButler('));
     assert.match(greet, /visit\?\.key/);
+  });
+});
+
+describe('one throw no longer stops the game loop (report 116)', () => {
+  it('the feature host runs every feature\'s onTick in its own guard and reports a throw once, with its id', () => {
+    const heard = [];
+    let ticks = 0;
+    const host = createFeatureHost([
+      { id: 'broken', onTick() { throw new TypeError("Cannot read properties of null (reading 'key')"); } },
+      { id: 'after', onTick() { ticks += 1; } },
+    ], { onError: (where, err) => heard.push([where, err.message]) });
+    for (let i = 0; i < 90; i += 1) assert.doesNotThrow(() => host.tick(16, i, {}));
+    assert.equal(ticks, 90, 'the features after it still tick');
+    assert.deepEqual(heard, [['broken.onTick', "Cannot read properties of null (reading 'key')"]], 'once, not every frame');
+    assert.deepEqual(host.caught(), ["broken.onTick|Cannot read properties of null (reading 'key')"]);
+  });
+
+  it('a new error from the same place is reported too; a run of different ones stops at the limit', () => {
+    const heard = [];
+    const once = createErrorOnce({ report: (where) => heard.push(where), limit: 3 });
+    assert.equal(once('a.onTick', new Error('one')), true);
+    assert.equal(once('a.onTick', new Error('one')), false);
+    assert.equal(once('a.onTick', new Error('two')), true);
+    assert.equal(once('b.onTick', new Error('one')), true);
+    assert.equal(once('c.onTick', new Error('one')), false, 'past the limit');
+    assert.deepEqual(heard, ['a.onTick', 'a.onTick', 'b.onTick']);
+    // A reporter that throws never reaches the loop.
+    assert.equal(createErrorOnce({ report: () => { throw new Error('x'); } })('d', new Error('y')), true);
+  });
+
+  it('other hooks still throw (a street change or a save must not half happen in silence)', () => {
+    const host = createFeatureHost([{ id: 'broken', onStreetEnter() { throw new Error('boom'); } }], { onError: () => {} });
+    assert.throws(() => host.streetEnter({}, {}), /boom/);
+  });
+
+  it('the caught error still reaches the report form\'s error list, named by where it was caught', () => {
+    const saved = { reportError: globalThis.reportError, error: console.error };
+    const fired = [];
+    globalThis.reportError = (err) => fired.push(err);
+    console.error = () => {};
+    try {
+      const err = new TypeError("Cannot read properties of null (reading 'key')");
+      err.stack = 'greeting@https://groddleafternoon.com/js/features/neighbours-mp-feature.js:589:18\ntickButler@https://groddleafternoon.com/js/features/neighbours-mp-feature.js:606:25\nonTick@x';
+      reportPageError('neighbours-mp.onTick', err);
+      assert.deepEqual(fired, [err], 'reportError fires the window error event (the console shows it too)');
+      const list = rememberError([], pageErrorLine({ error: err, message: err.message }));
+      assert.deepEqual(list, ['neighbours-mp.onTick: greeting@https://groddleafternoon.com/js/features/neighbours-mp-feature.js:589:18 tickButler@https://groddleafternoon.com/js/features/neighbours-mp-feature.js:606:25']);
+      // An uncaught error reads as before.
+      assert.equal(pageErrorLine({ error: { stack: 'a\nb\nc' } }), 'a b');
+      assert.equal(pageErrorLine({ message: 'Script error.' }), 'Script error.');
+    } finally {
+      if (saved.reportError === undefined) delete globalThis.reportError;
+      else globalThis.reportError = saved.reportError;
+      console.error = saved.error;
+    }
+    assert.match(read('public/js/features/bug-report-feature.js'), /window\.addEventListener\('error', \(e\) => rememberError\(pageErrors, pageErrorLine\(e\)\)\);/);
+  });
+
+  it('game.js runs the frame inside one guard and keeps the ticker going', () => {
+    const game = read('public/game.js');
+    assert.match(game, /import \{ createErrorOnce, createFeatureHost \} from '\.\/js\/feature-host\.js/);
+    assert.match(game, /const frameFailed = createErrorOnce\(\);\n\s*const gameFrame = \(ticker\) => \{\n\s*syncStreetFront\(\);/);
+    assert.match(game, /app\.ticker\.add\(\(ticker\) => \{\n\s*try \{\n\s*gameFrame\(ticker\);\n\s*\} catch \(err\) \{\n\s*frameFailed\('game loop', err\);\n\s*\}\n\s*\}\);/);
+    // The features tick inside the frame, each in the host's own guard.
+    const frame = game.slice(game.indexOf('const gameFrame = (ticker) => {'), game.indexOf("frameFailed('game loop', err);"));
+    assert.ok(frame.includes('features.tick((1000 / 60) * dt, Date.now(), engine);'));
+    assert.match(read('public/js/feature-host.js'), /tick\(dtMs, now, engine\) \{\n\s*eachGuarded\('onTick', dtMs, now, engine\);/);
   });
 });

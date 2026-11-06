@@ -3,8 +3,8 @@
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=93df4d7b';
-import { createFeatureHost } from './js/feature-host.js?v=020c9329';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=f5f63011';
+import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=127e0a3c';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=f2fe532f';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -486,7 +486,7 @@ import {
   parsePlayerSave,
   serializePlayerSave,
   restorePlayerSave,
-} from './js/player-save.js?v=30ecb8d0';
+} from './js/player-save.js?v=29ef66db';
 import {
   HOME_INTERIOR_TSID,
   HOME_STREET_TSID,
@@ -31304,7 +31304,13 @@ async function main() {
     bgLayer?.updateParallax?.(-world.x, -world.y, VIEW_W, LOCATION_VIEW_H, VIEW_H, parallaxSnap());
     bgLayer?.cullDecos?.(-world.x, -world.y, VIEW_W, VIEW_H);
   };
-  app.ticker.add((ticker) => {
+  // Report 116: the frame's work runs inside one guard. A throw used to stop the loop for good
+  // (Pixi's ticker asks for the next frame only after its listeners return): the view froze on
+  // the last street while the page around it went on. Now the error is reported once (the console
+  // and the report form's error list, feature-host reportPageError) and the next frame comes.
+  // Each feature's onTick has its own guard in the feature host, so one feature never stops the rest.
+  const frameFailed = createErrorOnce();
+  const gameFrame = (ticker) => {
     syncStreetFront();
     orderPromptLayer();
     tickAtmosphere();
@@ -31474,6 +31480,13 @@ async function main() {
     } else {
       prompt.visible = false;
       showSignpostKeys(null);
+    }
+  };
+  app.ticker.add((ticker) => {
+    try {
+      gameFrame(ticker);
+    } catch (err) {
+      frameFailed('game loop', err);
     }
   });
 

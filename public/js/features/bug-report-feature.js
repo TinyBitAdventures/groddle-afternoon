@@ -107,6 +107,17 @@ export function rememberError(list, text) {
   return list;
 }
 
+/**
+ * One line for the report form from a window 'error' event: the stack's first two lines (or the
+ * message), led by where the game caught it when it did (feature-host reportPageError: report 116,
+ * a feature's per-frame throw is caught and the game goes on, so its id is the useful part).
+ */
+export function pageErrorLine(e) {
+  const where = typeof e?.error?.groddleWhere === 'string' && e.error.groddleWhere ? `${e.error.groddleWhere}: ` : '';
+  const line = e?.error?.stack?.split('\n').slice(0, 2).join(' ') || e?.message || '';
+  return line ? where + line : '';
+}
+
 /** The build the page runs: game.js's content key (tools/module-keys; the online page names it on #online-boot). */
 export function buildKey(doc = globalThis.document) {
   const src = doc?.getElementById?.('online-boot')?.dataset?.game
@@ -624,7 +635,7 @@ let listening = false;
 function listen() {
   if (listening || typeof window === 'undefined') return;
   listening = true;
-  window.addEventListener('error', (e) => rememberError(pageErrors, e?.error?.stack?.split('\n').slice(0, 2).join(' ') || e?.message));
+  window.addEventListener('error', (e) => rememberError(pageErrors, pageErrorLine(e)));
   window.addEventListener('unhandledrejection', (e) => rememberError(pageErrors, `Unhandled: ${e?.reason?.message || e?.reason}`));
 }
 

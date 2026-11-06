@@ -172,7 +172,7 @@ describe('game wiring', () => {
   });
   it('follows every scene swap: on street entry and every frame', () => {
     assert.match(game, /world\.addChildAt\(bgLayer, 0\);\n\s*syncStreetFront\(\);/);
-    assert.match(game, /app\.ticker\.add\(\(ticker\) => \{\n\s*syncStreetFront\(\);/);
+    assert.match(game, /const gameFrame = \(ticker\) => \{\n\s*syncStreetFront\(\);/);
     assert.match(game, /syncStreetFront\(\);\n\s*bgLayer\?\.updateParallax\?\./);
   });
 });

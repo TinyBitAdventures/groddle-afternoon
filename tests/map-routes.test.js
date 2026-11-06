@@ -33,7 +33,7 @@ import {
 import { mapRoutesFeature } from '../public/js/features/map-routes-feature.js?v=b1569512';
 import { hellTicketsFeature } from '../public/js/features/hell-tickets-feature.js?v=d13c2b58';
 import { hellFeature } from '../public/js/features/hell-feature.js?v=13196575';
-import { createFeatureHost } from '../public/js/feature-host.js?v=020c9329';
+import { createFeatureHost } from '../public/js/feature-host.js?v=127e0a3c';
 import { applyStreetIndex } from '../public/js/street-loader.js?v=33d2b8bc';
 import { loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js?v=10b118dd';
 import { createQuestState } from '../public/js/quests.js?v=c8d9d0a4';
