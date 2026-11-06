@@ -30,13 +30,13 @@ Repainted region maps (G522, 2026-11-05)
 
   Groddle Meadow (hub 58): art/bg/groddlemeadow.webp (760x460) and groddlemeadow@2x.webp (1520x920)
     Licence      AI-generated, dedicated CC0 1.0 (tools/builder/licence-policy.json)
-    Model        GPT Image 2.6 Sunburst, in T3 Chat canvas, 2026-11-05; 3 generations at
-                 2048x1152, each centre-cropped to 1520x920
-    Chosen       by Austin Ginder, 2026-11-05: the third generation, toned down with
+    Model        GPT Image 2.6 Sunburst, in T3 Chat canvas, 2026-11-06; 1 generation at
+                 2048x1152, centre-cropped to 1520x920. It replaces the first painting of
+                 2026-11-05, which was too high fidelity
+    Chosen       by Austin Ginder, 2026-11-06: toned down with
                  magick in.png -modulate 100,62,98 -fill '#8a8a5a' -colorize 8% master.png
                  to match the original's muted olive palette, then WebP q82
-    Prompt       in full in the provenance file. The generations used an earlier revision of it,
-                 before the "seen from directly above" and "muted olive" edits
+    Prompt       in full in the provenance file, with the extra paragraph the redo used
     Inputs       1. the region's 150x91 thumbnail (Tiny Speck, CC0, world_map.fla sm_groddlemeadow)
                  2. that thumbnail enlarged to 1520x920, nothing added (made from 1)
                  3. the street layout drawn from hubs/hub-58.json at 2x (Tiny Speck's CC0 map data)
