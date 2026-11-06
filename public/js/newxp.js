@@ -97,6 +97,15 @@ export const FIRST_SKILLS = Object.freeze([
   { id: 'ezcooking_1', quest: 'ezcooking_1', choice: 'skill_ezcooking', name: 'EZ Cooking', art: 'ezcooking', street: null, finishBox: null, practice: 'Ah, EZ Cooking. Let\'s get started!', reply: 'Aiight' },
   { id: 'light_green_thumb_1', quest: 'lightgreenthumb_1', choice: 'skill_lightgreenthumb', name: 'Light Green Thumb', art: 'lightgreenthumb', street: 'GUVCT29PSU53G9V', finishBox: 'quest:flag:finish_lightgreenthumb', practice: 'Light Green Thumb? Let’s practice!', reply: 'Aiight' },
 ]);
+/**
+ * The practice tool waiting on each skill's street (skillquest_ak.js reset 99-100, location_targets 24;
+ * the can's spot is the remake's), and the event that hides its sign when it is taken (items_added:
+ * skillquest_ak.js 105-107, skillquest_lgt_v2.js 144-147).
+ */
+export const PRACTICE_TOOLS = Object.freeze({
+  animalkinship_1: Object.freeze({ id: 'butterfly_lotion', classTsid: 'butterfly_lotion', count: 1, x: 1823, y: 810, off: 'lotion_off' }),
+  light_green_thumb_1: Object.freeze({ id: 'watering_can', classTsid: 'watering_can', count: 1, x: 650, y: 900, off: 'wateringcan_off' }),
+});
 // source: quests/*_1.js onStarted teleportToLocationDelayed(..., 123, -958); street bounds t -1000.
 export const PRACTICE_ARRIVAL = Object.freeze({ x: 123, y: 42 });
 
@@ -382,6 +391,16 @@ export function training2ItemsToPlace(rows, taken, held) {
   const place = rows.filter((r) => !taken.includes(r.id));
   return { place: place.length || carried ? place : rows.slice(0, 1), carried };
 }
+/**
+ * What a restart of the practice street puts down. The original resumed a reload at its step and
+ * ran reset(), which makes the lotion, only on a fresh entry (skillquest_ak.js playerEnterCallback
+ * 32-38, reset 99-100; skillquest_lgt_v2.js 17-23), so the same rule as the training tables: taken
+ * and still in the pack, it stays there; taken and gone, it comes back, because the practice needs it.
+ * @returns {{ place: object[], carried: string|null }}
+ */
+export function practiceToolToPlace(skillId, taken, held) {
+  return training2ItemsToPlace([PRACTICE_TOOLS[skillId] || PRACTICE_TOOLS.light_green_thumb_1], taken, held);
+}
 // food_eaten: metabolics_set_energy(80); playerEnter sets energy/mood 99.
 export const TRAINING2_ENERGY_AFTER_EAT = 80;
 export const TRAINING2_ENTER_METABOLICS = 99;
@@ -579,7 +598,7 @@ export function normalizeNewxpSave(seed = {}) {
     exit: s.exit && typeof s.exit === 'object' && typeof s.exit.tsid === 'string' ? { tsid: s.exit.tsid, x: Number(s.exit.x) || 0 } : null,
     flags: Array.isArray(s.flags) ? [...new Set(s.flags.filter((f) => ISLAND_FLAGS.includes(f)))] : [],
     musicblock: ISLAND_MUSICBLOCKS.includes(s.musicblock) ? s.musicblock : '',
-    trainingTaken: Array.isArray(s.trainingTaken) ? [...new Set(s.trainingTaken.filter((id) => [...TRAINING2_FOOD, ...TRAINING2_DRINKS].some((r) => r.id === id)))] : [],
+    trainingTaken: Array.isArray(s.trainingTaken) ? [...new Set(s.trainingTaken.filter((id) => [...TRAINING2_FOOD, ...TRAINING2_DRINKS, ...Object.values(PRACTICE_TOOLS)].some((r) => r.id === id)))] : [],
     leftAt: Number.isFinite(s.leftAt) ? s.leftAt : 0,
     startedAt: Number.isFinite(s.startedAt) ? s.startedAt : 0,
     doneAt: Number.isFinite(s.doneAt) ? s.doneAt : 0,

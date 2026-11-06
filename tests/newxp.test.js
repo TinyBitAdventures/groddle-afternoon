@@ -58,11 +58,13 @@ import {
   talkPages,
   training1Layout,
   training2ItemsToPlace,
+  practiceToolToPlace,
+  PRACTICE_TOOLS,
   training2Layout,
   training2MeterFull,
   tutorialPhysics,
   vogPages,
-} from '../public/js/newxp.js?v=accb5752';
+} from '../public/js/newxp.js?v=8fa18f24';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', 'public');
 const street = (tsid) => JSON.parse(readFileSync(join(ROOT, 'assets/streets', `${tsid}.json`), 'utf8'));
@@ -161,6 +163,67 @@ describe('newxp source data', () => {
     assert.equal(pages[1].button, 'OK');
     assert.equal(talkPages(LINES.rockTicket, { name: 'Pip' }).length, 4);
     assert.deepEqual(vogPages(LINES.currants).length, 2);
+  });
+});
+
+describe('restarting the skill stage does not hand its practice tool out again', () => {
+  const feature = readFileSync(join(ROOT, 'js/features/newxp-feature.js'), 'utf8');
+  const skills = Object.keys(PRACTICE_TOOLS);
+
+  it('every first skill with a practice street has its tool', () => {
+    assert.deepEqual(FIRST_SKILLS.filter((s) => s.street).map((s) => s.id).sort(), [...skills].sort());
+  });
+
+  it('a first visit places the tool', () => {
+    for (const id of skills) {
+      const r = practiceToolToPlace(id, [], () => 0);
+      assert.deepEqual(r.place, [PRACTICE_TOOLS[id]]);
+      assert.equal(r.carried, null);
+    }
+  });
+
+  it('taken and still in the pack: a reload places none and says it is carried', () => {
+    for (const id of skills) {
+      const tool = PRACTICE_TOOLS[id];
+      const r = practiceToolToPlace(id, [tool.id], (c) => (c === tool.classTsid ? 1 : 0));
+      assert.deepEqual(r.place, []);
+      assert.equal(r.carried, tool.classTsid);
+    }
+  });
+
+  it('taken and gone (dropped, or the lotion used up): it comes back, so the practice can be done', () => {
+    for (const id of skills) assert.deepEqual(practiceToolToPlace(id, [PRACTICE_TOOLS[id].id], () => 0).place, [PRACTICE_TOOLS[id]]);
+  });
+
+  it('reloading again and again never adds up', () => {
+    for (const id of skills) {
+      const inv = {};
+      const taken = [];
+      for (let reload = 0; reload < 6; reload++) {
+        for (const row of practiceToolToPlace(id, taken, (c) => inv[c] || 0).place) {
+          inv[row.classTsid] = (inv[row.classTsid] || 0) + row.count;
+          taken.push(row.id);
+        }
+      }
+      assert.deepEqual(inv, { [PRACTICE_TOOLS[id].classTsid]: 1 });
+    }
+  });
+
+  it('the save keeps a taken tool and a new tutorial forgets it', () => {
+    for (const { id } of Object.values(PRACTICE_TOOLS)) {
+      assert.deepEqual(normalizeNewxpSave({ trainingTaken: [id] }).trainingTaken, [id]);
+      assert.deepEqual(startNewxp({ trainingTaken: [id] }, 'skill', 1).trainingTaken, [id]);
+      assert.deepEqual(startNewxp({ trainingTaken: [id] }, 'clouds', 1).trainingTaken, []);
+    }
+  });
+
+  it('the stage uses the rule, records a pick up, and keeps a carried tool\'s sign down', () => {
+    const body = feature.slice(feature.indexOf('async function runSkill('), feature.indexOf('skillquest_ak: the practice animals'));
+    assert.match(body, /practiceToolToPlace\(skill\.id, save\.trainingTaken/);
+    assert.match(body, /save\.trainingTaken\.push\(row\.id\)/);
+    assert.match(body, /engine\.save\(\)/);
+    assert.match(body, /toolCarried/);
+    assert.match(feature, /ev !== 'lotion' \|\| !ak\.toolCarried/);
   });
 });
 

@@ -81,6 +81,8 @@ import {
   LINES,
   NEWXP_UPGRADES,
   PRACTICE_ARRIVAL,
+  PRACTICE_TOOLS,
+  practiceToolToPlace,
   QUOIN_BENEFITS,
   SCENE_STAGES,
   SCENE_TSIDS,
@@ -120,7 +122,7 @@ import {
   tutorialPhysics,
   SKIP_TUTORIAL_CARDS,
   vogPages,
-} from '../newxp.js?v=accb5752';
+} from '../newxp.js?v=8fa18f24';
 import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=d82f3b00';
 import { QUOIN_SHEET, QUOIN_TYPES, qrazyRewardForLevel } from '../quoins.js?v=dfe1ff0a';
 import { soundForQuoin } from '../sound-moments.js?v=2f8597cd';
@@ -133,7 +135,7 @@ import * as kit from '../quest-rooms/kit.js?v=4d8ab82d';
 import { frameTexture, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js?v=3149d699';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 import { displayTopOf, itemstackOverlayPoint, playPoofIn, playSheetOverlay, poofInAlpha } from '../overlay-art.js?v=11b6dd7f';
-import { HOME_MACHINE } from '../home-ticket.js?v=24c1e294';
+import { HOME_MACHINE } from '../home-ticket.js?v=ee7ea52a';
 import { animalAnchorX, createAnimalState } from '../animals.js?v=05dafc43';
 import {
   AK_ANIMALS,
@@ -2068,11 +2070,20 @@ async function runSkill(t) {
     for (const ev of ['wall_off', 'sign1', 'sign2', 'sign3', 'sign4', 'lotion', 'wateringcan_on', 'bottom1', 'bottom2', 'bottom3']) fireSafe(ev);
   }
   // The practice tool waiting on the street (createItemStack in reset()).
-  const tool = skill.id === 'animalkinship_1'
-    ? { id: 'butterfly_lotion', classTsid: 'butterfly_lotion', x: 1823, y: 810, off: 'lotion_off' }
-    : { id: 'watering_can', classTsid: 'watering_can', x: 650, y: 900, off: 'wateringcan_off' };
   const groundAt = (x, y) => groundBelow(engine, x, y);
-  addPickup(engine, tool.id, tool.classTsid, 1, tool.x, groundAt(tool.x, tool.y), () => fireSafe(tool.off));
+  const { place: toolRows, carried: toolCarried } = practiceToolToPlace(skill.id, save.trainingTaken, (cls) => countItem(engine.inv, cls));
+  for (const tool of toolRows) {
+    addPickup(engine, tool.id, tool.classTsid, tool.count, tool.x, groundAt(tool.x, tool.y), (row) => {
+      if (!save.trainingTaken.includes(row.id)) save.trainingTaken.push(row.id);
+      engine.save();
+      fireSafe(tool.off);
+    });
+  }
+  // A tool already in the pack has nothing to point at: its sign stays down.
+  if (toolCarried) {
+    if (ak) run.data.ak.toolCarried = true;
+    else fireSafe(PRACTICE_TOOLS[skill.id].off);
+  }
   if (ak) akSideTable(engine);
   // flamingo_talk1: the flamingo pops in to say hello.
   const fl = makeNpc(engine, 'flamingo', 370, groundAt(370, 880), { register: true });
@@ -2140,7 +2151,7 @@ function akTick(engine, fireSafe) {
     for (const ev of box.events) {
       const classId = akAnimalForEvent(ev);
       if (classId) akSpawn(engine, classId);
-      else fireSafe(ev);
+      else if (ev !== 'lotion' || !ak.toolCarried) fireSafe(ev);
     }
   }
   syncSigns(engine);
