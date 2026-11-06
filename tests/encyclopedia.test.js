@@ -11,7 +11,8 @@ import { spawnSync } from 'node:child_process';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { INVENTORY_DB } from '../tools/catalog/build.mjs';
-import { BUILT_SECTIONS, loadEncyclopedia, readInventoryAll } from '../tools/encyclopedia/data.mjs';
+import { BUILT_SECTIONS, loadEncyclopedia, portrait, readInventoryAll } from '../tools/encyclopedia/data.mjs';
+import { CREATURE_STILLS, STILLS_DIR } from '../tools/encyclopedia/creature-stills.mjs';
 import { pathOf } from '../tools/encyclopedia/parts.mjs';
 import { servedByMinn } from './minn-served.js';
 
@@ -175,5 +176,42 @@ describe('encyclopedia', () => {
   it('is current (node tools/encyclopedia/build.mjs --check)', { skip: skipWithoutInventory }, () => {
     const run = spawnSync(process.execPath, [join(spike, 'tools/encyclopedia/build.mjs'), '--check'], { encoding: 'utf8' });
     assert.equal(run.status, 0, run.stderr || run.stdout);
+  });
+});
+
+describe('report 133: animals and creatures show their own art', () => {
+  const NAMED = ['npc_piggy', 'npc_chicken', 'npc_crab', 'npc_firefly', 'npc_sloth', 'npc_flamingo', 'npc_swoonerfly', 'npc_dustbunny', 'npc_juju_bandit', 'npc_squid'];
+
+  it('each one the report names has a still of its own, not its Cubimal or nothing', () => {
+    for (const id of NAMED) {
+      const p = portrait(id);
+      assert.ok(p, `${id} has a picture`);
+      assert.equal(p.src, `${STILLS_DIR}/${id}.png`, id);
+      assert.equal(p.caption, '', `${id} has no Cubimal caption`);
+      assert.ok(CREATURE_STILLS[id], id);
+    }
+  });
+
+  it('every still is on disk and small, from Tiny Speck art only (the tool header says so)', () => {
+    const tool = readFileSync(resolve(import.meta.dirname, '../tools/encyclopedia/creature-stills.mjs'), 'utf8');
+    assert.match(tool, /Tiny Speck's CC0 art/);
+    for (const [id, row] of Object.entries(CREATURE_STILLS)) {
+      const file = resolve(import.meta.dirname, '../public', STILLS_DIR, `${id}.png`);
+      assert.ok(existsSync(file), id);
+      assert.ok(row.sheet || row.swf, id);
+      assert.ok(readFileSync(file).length < 40_000, `${id} stays small`);
+    }
+    const run = spawnSync(process.execPath, ['tools/encyclopedia/creature-stills.mjs', '--check'], { cwd: resolve(import.meta.dirname, '..'), encoding: 'utf8' });
+    assert.equal(run.status, 0, run.stderr);
+  });
+
+  it('no animal or creature page is left with an empty box or a stand-in Cubimal', { skip: skipWithoutInventory }, async () => {
+    const { entries } = await loadEncyclopedia();
+    const animals = [...entries.values()].filter((e) => e.section === 'animals');
+    assert.ok(animals.length > 20);
+    for (const e of animals) {
+      assert.ok(e.icon, `${e.id} has a picture`);
+      assert.doesNotMatch(e.icon.caption || '', /Cubimal/, e.id);
+    }
   });
 });
