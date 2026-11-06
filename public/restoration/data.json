@@ -169,7 +169,7 @@
    "group": "world",
    "name": "Hub maps and travel",
    "status": "source",
-   "blurb": "Every region’s map with its streets. Travel by signpost; from the map, set a destination for a guided path, or with Teleportation IV teleport to a street you have visited. Tiny Speck’s map paintings are lost, so each region’s map shows their small thumbnail of it, enlarged; Groddle Forest’s and Groddle Meadow’s are repainted for the remake from their thumbnails.",
+   "blurb": "Every region’s map with its streets. Travel by signpost; from the map, set a destination for a guided path, or with Teleportation IV teleport to a street you have visited. Tiny Speck’s map paintings are lost, so each region’s map shows their small thumbnail of it, enlarged; Groddle Forest’s, Groddle Meadow’s, Alakol’s, Andra’s, Aranna’s and Balzare’s are repainted for the remake from their thumbnails.",
    "multiplayer": null,
    "spot": null,
    "evidence": [
@@ -2732,9 +2732,14 @@
   "deployed": "2026-11-06"
  },
  "git": {
-  "commits": 1337,
+  "commits": 1340,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-06",
+    "kind": "fix",
+    "text": "The tutorial's Dustbunny no longer holds a player who is too full to eat or drink"
+   },
    {
     "date": "2026-11-06",
     "kind": "fix",
@@ -2849,11 +2854,6 @@
     "date": "2026-11-05",
     "kind": "fix",
     "text": "The Batterfly's page no longer says it gives Butterfly Milk, nor Hell's Bartender a Drink Ticket"
-   },
-   {
-    "date": "2026-11-05",
-    "kind": "improve",
-    "text": "Item pages name each source once under Where to find it, with how you get it"
    }
   ]
  },

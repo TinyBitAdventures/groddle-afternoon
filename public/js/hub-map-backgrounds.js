@@ -17,11 +17,11 @@ export const HUB_MAP_BACKGROUNDS = Object.freeze({
   '71': Object.freeze({ x1: 'assets/maps/art/bg/jethimadh.webp', x2: 'assets/maps/art/bg/jethimadh@2x.webp' }), // Jethimadh
   '72': Object.freeze({ x1: 'assets/maps/art/bg/chakraphool.webp', x2: 'assets/maps/art/bg/chakraphool@2x.webp' }), // Chakra Phool
   '75': Object.freeze({ x1: 'assets/maps/art/bg/bortola.webp', x2: 'assets/maps/art/bg/bortola@2x.webp' }), // Bortola
-  '76': Object.freeze({ x1: 'assets/maps/art/bg/alakol.webp', x2: 'assets/maps/art/bg/alakol@2x.webp' }), // Alakol
+  '76': Object.freeze({ x1: 'assets/maps/art/bg/alakol.webp', x2: 'assets/maps/art/bg/alakol@2x.webp', repainted: true }), // Alakol
   '85': Object.freeze({ x1: 'assets/maps/art/bg/kajuu.webp', x2: 'assets/maps/art/bg/kajuu@2x.webp' }), // Kajuu
   '86': Object.freeze({ x1: 'assets/maps/art/bg/baqala.webp', x2: 'assets/maps/art/bg/baqala@2x.webp' }), // Baqala
   '88': Object.freeze({ x1: 'assets/maps/art/bg/karnata.webp', x2: 'assets/maps/art/bg/karnata@2x.webp' }), // Karnata
-  '89': Object.freeze({ x1: 'assets/maps/art/bg/andra.webp', x2: 'assets/maps/art/bg/andra@2x.webp' }), // Andra
+  '89': Object.freeze({ x1: 'assets/maps/art/bg/andra.webp', x2: 'assets/maps/art/bg/andra@2x.webp', repainted: true }), // Andra
   '90': Object.freeze({ x1: 'assets/maps/art/bg/choru.webp', x2: 'assets/maps/art/bg/choru@2x.webp' }), // Choru
   '91': Object.freeze({ x1: 'assets/maps/art/bg/zhambu.webp', x2: 'assets/maps/art/bg/zhambu@2x.webp' }), // Zhambu
   '92': Object.freeze({ x1: 'assets/maps/art/bg/tamila.webp', x2: 'assets/maps/art/bg/tamila@2x.webp' }), // Tamila
@@ -31,7 +31,7 @@ export const HUB_MAP_BACKGROUNDS = Object.freeze({
   '98': Object.freeze({ x1: 'assets/maps/art/bg/besara.webp', x2: 'assets/maps/art/bg/besara@2x.webp' }), // Besara
   '99': Object.freeze({ x1: 'assets/maps/art/bg/kalavana.webp', x2: 'assets/maps/art/bg/kalavana@2x.webp' }), // Kalavana
   '100': Object.freeze({ x1: 'assets/maps/art/bg/vantalu.webp', x2: 'assets/maps/art/bg/vantalu@2x.webp' }), // Vantalu
-  '101': Object.freeze({ x1: 'assets/maps/art/bg/aranna.webp', x2: 'assets/maps/art/bg/aranna@2x.webp' }), // Aranna
+  '101': Object.freeze({ x1: 'assets/maps/art/bg/aranna.webp', x2: 'assets/maps/art/bg/aranna@2x.webp', repainted: true }), // Aranna
   '102': Object.freeze({ x1: 'assets/maps/art/bg/ormonos.webp', x2: 'assets/maps/art/bg/ormonos@2x.webp' }), // Ormonos
   '105': Object.freeze({ x1: 'assets/maps/art/bg/lida.webp', x2: 'assets/maps/art/bg/lida@2x.webp' }), // Lida
   '106': Object.freeze({ x1: 'assets/maps/art/bg/pollokoo.webp', x2: 'assets/maps/art/bg/pollokoo@2x.webp' }), // Pollokoo
@@ -47,7 +47,7 @@ export const HUB_MAP_BACKGROUNDS = Object.freeze({
   '121': Object.freeze({ x1: 'assets/maps/art/bg/sura.webp', x2: 'assets/maps/art/bg/sura@2x.webp' }), // Sura
   '123': Object.freeze({ x1: 'assets/maps/art/bg/fenneq.webp', x2: 'assets/maps/art/bg/fenneq@2x.webp' }), // Fenneq
   '126': Object.freeze({ x1: 'assets/maps/art/bg/roobrik.webp', x2: 'assets/maps/art/bg/roobrik@2x.webp' }), // Roobrik
-  '128': Object.freeze({ x1: 'assets/maps/art/bg/balzare.webp', x2: 'assets/maps/art/bg/balzare@2x.webp' }), // Balzare
+  '128': Object.freeze({ x1: 'assets/maps/art/bg/balzare.webp', x2: 'assets/maps/art/bg/balzare@2x.webp', repainted: true }), // Balzare
   '131': Object.freeze({ x1: 'assets/maps/art/bg/haoma.webp', x2: 'assets/maps/art/bg/haoma@2x.webp' }), // Haoma
   '133': Object.freeze({ x1: 'assets/maps/art/bg/kloro.webp', x2: 'assets/maps/art/bg/kloro@2x.webp' }), // Kloro
   '136': Object.freeze({ x1: 'assets/maps/art/bg/jal.webp', x2: 'assets/maps/art/bg/jal@2x.webp' }), // Jal

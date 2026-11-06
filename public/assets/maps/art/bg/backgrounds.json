@@ -208,10 +208,11 @@
       "thumbMatches": true,
       "x1": "assets/maps/art/bg/alakol.webp",
       "x2": "assets/maps/art/bg/alakol@2x.webp",
-      "x1Bytes": 14420,
-      "x1Sha256": "74ea8788e496ff9ecb9fbb33c97625e37c58f60509847c8f21dea3518edd59a9",
-      "x2Bytes": 31328,
-      "x2Sha256": "09da6902c9d5ffab09c7af9bb5decfaa91ae2d94ccd2f35607c85591db9d5a49"
+      "repainted": "tools/provenance/repainted-maps.json",
+      "x1Bytes": 38366,
+      "x1Sha256": "0d657ba1e25d1dff7ae44f720e2a82224424643177e6bd218fcff4223ebd2d9a",
+      "x2Bytes": 118906,
+      "x2Sha256": "36818ea9609fdbaefda60db8212e2bd97a5afdd4fc7b7fd2d0b6882efb585329"
     },
     "85": {
       "hubName": "Kajuu",
@@ -268,10 +269,11 @@
       "thumbMatches": true,
       "x1": "assets/maps/art/bg/andra.webp",
       "x2": "assets/maps/art/bg/andra@2x.webp",
-      "x1Bytes": 11486,
-      "x1Sha256": "a1af02de91ea5a20bc8ac4bf11afe89036b72dd7d382134c9f13b9516f89d2dc",
-      "x2Bytes": 25064,
-      "x2Sha256": "fddf753257c12d6c5fa2e6bf5636f78d240d55332198c9a27418865e8b435975"
+      "repainted": "tools/provenance/repainted-maps.json",
+      "x1Bytes": 31532,
+      "x1Sha256": "15eaf604f7871ae18ba22b030a950d9925052426d64ec346f1cb2a006b0fdb8d",
+      "x2Bytes": 102540,
+      "x2Sha256": "61a1d4904c7d7b53b1a2d7b4c6e73cd4727b4f0062cb3797dece14b9f2ee144f"
     },
     "90": {
       "hubName": "Choru",
@@ -418,10 +420,11 @@
       "thumbMatches": true,
       "x1": "assets/maps/art/bg/aranna.webp",
       "x2": "assets/maps/art/bg/aranna@2x.webp",
-      "x1Bytes": 13528,
-      "x1Sha256": "229502d0b62906f1cdab94702629f54f4194a0a60da84c6f2d1661ff2bd993e3",
-      "x2Bytes": 30120,
-      "x2Sha256": "818576437196617048832d5a6bea395c0dd2a15a1e73d4368ddf54f49d379ca0"
+      "repainted": "tools/provenance/repainted-maps.json",
+      "x1Bytes": 29940,
+      "x1Sha256": "b463281478088d4680968045d9094fe24ed23aeab9fe9cbf321de4275c71585a",
+      "x2Bytes": 92404,
+      "x2Sha256": "97f21b1cd152e5054b063a21de0e98b573bcd23c301c7b5e158f571fd8d312ec"
     },
     "102": {
       "hubName": "Ormonos",
@@ -658,10 +661,11 @@
       "thumbMatches": true,
       "x1": "assets/maps/art/bg/balzare.webp",
       "x2": "assets/maps/art/bg/balzare@2x.webp",
-      "x1Bytes": 9210,
-      "x1Sha256": "4aa90ae0e2b9336c2114b61a0640b010595d90b22cecf60bdcb285822655ef2e",
-      "x2Bytes": 19600,
-      "x2Sha256": "ca07c53052bc3755afc7853a00136c5d70d8b7b5ec1b9ba916034b1dd88dc347"
+      "repainted": "tools/provenance/repainted-maps.json",
+      "x1Bytes": 27248,
+      "x1Sha256": "56aebfe4001c3d24f4f0c824cf6b9199be918909820e179230564e5c8237e1a9",
+      "x2Bytes": 74134,
+      "x2Sha256": "99cc5fbdc9a76fa2a4f97f2d84d152b05ef259cfe5d8fc9fb4c3fae81f5b0e9b"
     },
     "131": {
       "hubName": "Haoma",
