@@ -112,6 +112,7 @@ body.compare { background-color: var(--bg); overflow-x: hidden; }
 .card-more { margin-top: 10px; font-size: 14px; }
 .card-more summary { cursor: pointer; font-weight: 700; color: var(--muted); padding: 4px 0; }
 .card-more summary:hover { color: var(--fg); }
+@media (max-width: 640px) { .card-more summary { padding: 10px 0; } }
 .card-more[open] summary { margin-bottom: 6px; }
 .card-more .facts { border-top: 0; padding-top: 0; }
 /* Ours spans the whole row: the numbers three across, its facts beside them. */

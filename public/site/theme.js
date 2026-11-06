@@ -11,7 +11,8 @@
    It also opens the header's submenus (.site-nav-sub: a link, its .site-nav-toggle
    and the .site-nav-panel of its links, drawn from the Minn menu): hover with a
    mouse, the toggle with anything; Escape closes back to the toggle, and so do a
-   click outside and Tab out. Without this script the link is a plain link. */
+   click outside and Tab out. Without this script the link is a plain link.
+   On a phone it also folds the links into a Menu button (site-nav.css, data-site-menu). */
 (() => {
   const KEY = 'groddle-theme';
   const OLD_KEY = 'groddle-compare-theme'; // the compare page's own toggle, before this
@@ -291,6 +292,58 @@
   });
   window.addEventListener('resize', () => { for (const sub of subs) place(sub); });
 
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', wireAll);
+  else wireAll();
+})();
+
+// Phones: the bar holds the mark, Play, the theme button and a Menu button; the links open under it
+// (site-nav.css). Set before anything paints, so the strip of links never flashes. Built here rather
+// than in the markup, so a page without this script keeps its plain links.
+(() => {
+  const root = document.documentElement;
+  root.setAttribute('data-site-menu', '');
+  const narrow = window.matchMedia ? window.matchMedia('(max-width: 640px)') : null;
+
+  function wire(nav, index) {
+    const links = nav.querySelector('.site-nav-links');
+    const theme = nav.querySelector('.site-nav-theme');
+    if (!links || !theme || nav.dataset.menuWired) return;
+    nav.dataset.menuWired = '1';
+    if (!links.id) links.id = `site-nav-links-${index}`;
+    const play = links.querySelector(':scope > .site-nav-play');
+    if (play) {
+      const inBar = play.cloneNode(true);
+      inBar.classList.add('site-nav-bar-play');
+      theme.before(inBar);
+    }
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'site-nav-menu-btn';
+    button.setAttribute('aria-label', 'Menu');
+    button.setAttribute('aria-expanded', 'false');
+    button.setAttribute('aria-controls', links.id);
+    if (links.querySelector('.site-nav-badge')) button.dataset.news = '1';
+    theme.after(button);
+
+    function setOpen(open, focusButton) {
+      links.classList.toggle('is-open', open);
+      button.setAttribute('aria-expanded', open ? 'true' : 'false');
+      if (focusButton) button.focus();
+    }
+    button.addEventListener('click', () => setOpen(!links.classList.contains('is-open'), false));
+    links.addEventListener('click', (e) => { if (e.target.closest('a')) setOpen(false, false); });
+    document.addEventListener('pointerdown', (e) => {
+      if (links.classList.contains('is-open') && !links.contains(e.target) && !button.contains(e.target)) setOpen(false, false);
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && links.classList.contains('is-open') && !links.querySelector('.site-nav-panel:not([hidden])')) setOpen(false, true);
+    });
+    narrow?.addEventListener?.('change', (e) => { if (!e.matches) setOpen(false, false); });
+  }
+
+  function wireAll() {
+    document.querySelectorAll('.site-nav:not(.site-nav-app)').forEach(wire);
+  }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', wireAll);
   else wireAll();
 })();

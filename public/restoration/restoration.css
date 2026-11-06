@@ -334,7 +334,7 @@ h3 { font-size: 22px; margin: 0 0 10px; }
 }
 .chip[aria-pressed="true"] { background: var(--fg); color: var(--surface); border-color: var(--fg); }
 .chip .count { font-weight: 600; opacity: 0.7; }
-.groups { display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 18px; }
+.groups { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(330px, 100%), 1fr)); gap: 18px; }
 .group { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 18px 18px 8px; }
 .group h3 { margin: 0 0 2px; }
 .group-blurb { margin: 0 0 8px; color: var(--muted); font-size: 14px; }

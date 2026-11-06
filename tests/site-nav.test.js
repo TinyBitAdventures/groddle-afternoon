@@ -144,7 +144,11 @@ describe('site colour theme', () => {
   it('hangs the submenu panel from the header row, so the links\' sideways scroll never clips it', () => {
     const css = readFileSync(join(pub, 'site', 'site-nav.css'), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
     assert.match(css, /\.site-nav-row \{ position: relative; \}/);
+    // The phone menu (data-site-menu) is the one exception: the links are the panel there, and a submenu
+    // sits inside them, unpositioned, so there is nothing for them to clip.
+    assert.match(css, /:root\[data-site-menu\] \.site-nav:not\(\.site-nav-app\) \.site-nav-panel \{\n\s*position: static;/);
     for (const [, selector, body] of css.matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
+      if (selector.includes('[data-site-menu]')) continue;
       if (/\.site-nav-(links|sub)\b(?![-\w])/.test(selector.split(',').map((x) => x.trim().split(/\s+/).at(-1)).join(' '))) {
         assert.doesNotMatch(body, /position:/, `${selector.trim()} must stay unpositioned`);
       }
