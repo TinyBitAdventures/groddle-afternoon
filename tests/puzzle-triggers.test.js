@@ -1,6 +1,6 @@
 import { test, describe } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { NORMAL_BUFF, WALK_MAX, flatJump } from '../public/js/avatar-step.js?v=d48908a5';
@@ -300,5 +300,41 @@ describe('lost puzzle levels (scenes)', async () => {
       done: { constellation: 2 },
       returnTo: { tsid: 'GX', x: 3, y: 0 },
     });
+  });
+});
+
+describe('report 136: Blooian\'s discs show the path that is open', () => {
+  const street = JSON.parse(readFileSync(join(import.meta.dirname, '../public/assets/streets/GHVP8TCLT40336S.json'), 'utf8'));
+  const decos = new Map(street.layers.flatMap((l) => l.decos || []).filter((d) => d.id).map((d) => [d.id, d]));
+  const plats = new Map(street.platforms.map((p) => [p.id, p]));
+
+  /** The event's shown disc art and the long sloped floor it switches on. */
+  function state(event) {
+    const actions = street.events[event];
+    const art = actions.filter((a) => a.type === 'deco_show').map((a) => decos.get(a.deco)).find((d) => d?.sprite === 'circle_cutout_02_arbito1');
+    const floor = actions.filter((a) => a.type === 'plat' && a.pc_perm === -1).map((a) => plats.get(a.plat))
+      .sort((a, b) => Math.abs(b.y2 - b.y1) - Math.abs(a.y2 - a.y1))[0];
+    return { art, risesRight: floor.y2 < floor.y1 };
+  }
+
+  test('the art rises to the right unflipped (circle_cutout_02), so a floor that rises shows unflipped', () => {
+    for (const event of ['depn_swch_2_v_2', 'depn_swch_2_v_3', 'depn_swch_4_v_2', 'depn_swch_4_v_3']) {
+      const { art, risesRight } = state(event);
+      assert.ok(art, event);
+      assert.equal(Boolean(art.flip), !risesRight, event);
+    }
+  });
+
+  test('each twin gets its XML id by z as well as sprite and spot', () => {
+    assert.match(readFileSync(join(import.meta.dirname, '../build-street-events.mjs'), 'utf8'), /d\.x === src\.x && d\.y === src\.y && d\.z === src\.z && !d\.id/);
+    const xmlPath = join(import.meta.dirname, '../../streets/mnt/stos/location_data/GHVP8TCLT40336S.xml');
+    if (!existsSync(xmlPath)) return;
+    const xml = readFileSync(xmlPath, 'utf8');
+    for (const [id, deco] of decos) {
+      if (!id.startsWith('circle_cutout')) continue;
+      const body = new RegExp(`<object id="${id}">([\\s\\S]*?)</object>`).exec(xml)[1];
+      assert.equal(Number(/<int id="z">(-?\d+)/.exec(body)[1]), deco.z, id);
+      assert.equal(/<bool id="h_flip">true/.test(body), Boolean(deco.flip), id);
+    }
   });
 });

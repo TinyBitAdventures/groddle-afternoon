@@ -93,7 +93,7 @@ function soundUrl(name) {
   return null;
 }
 
-/** XML decos by id: { layer, sprite, x, y }. */
+/** XML decos by id: { layer, sprite, x, y, z }. */
 function xmlDecos(gXml) {
   const out = new Map();
   const layers = objectBodyById(gXml, 'layers');
@@ -102,7 +102,7 @@ function xmlDecos(gXml) {
     const decos = childObjects(layer.body).find((c) => c.id === 'decos');
     for (const deco of decos ? childObjects(decos.body) : []) {
       const s = directScalars(deco.body);
-      out.set(deco.id, { layer: layer.id, sprite: s.sprite_class, x: s.x, y: s.y });
+      out.set(deco.id, { layer: layer.id, sprite: s.sprite_class, x: s.x, y: s.y, z: s.z });
     }
   }
   return out;
@@ -198,10 +198,13 @@ for (const [tsid, { file, street }] of streets) {
     const wanted = eventDecoIds(built.events);
     if (wanted.size && gXml) {
       const byId = xmlDecos(gXml);
+      // Report 136: twins can share a sprite and a spot (Blooian's discs, one flipped): only z tells
+      // them apart, so an id goes on the deco with its own z, and an id from an older run comes off.
+      for (const layer of street.layers || []) for (const d of layer.decos || []) if (wanted.has(d.id)) delete d.id;
       for (const id of wanted) {
         const src = byId.get(id);
         const layer = src && (street.layers || []).find((l) => l.id === src.layer);
-        const deco = layer?.decos?.find((d) => d.sprite === src.sprite && d.x === src.x && d.y === src.y && (!d.id || d.id === id));
+        const deco = layer?.decos?.find((d) => d.sprite === src.sprite && d.x === src.x && d.y === src.y && d.z === src.z && !d.id);
         if (deco) {
           deco.id = id;
           totals.decoIdsTagged += 1;
