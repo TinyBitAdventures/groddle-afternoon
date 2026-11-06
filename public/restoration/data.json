@@ -2732,9 +2732,39 @@
   "deployed": "2026-11-06"
  },
  "git": {
-  "commits": 1340,
+  "commits": 1347,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-06",
+    "kind": "improve",
+    "text": "Alakol, Andra, Aranna and Balzare have new map paintings, repainted from Tiny Speck's thumbnails of the lost originals"
+   },
+   {
+    "date": "2026-11-06",
+    "kind": "fix",
+    "text": "Restarting the tutorial's Training Level Two no longer hands out its food and drink again"
+   },
+   {
+    "date": "2026-11-06",
+    "kind": "improve",
+    "text": "The Make panel says why a recipe can't be made, and its title shows the tool of the current tab"
+   },
+   {
+    "date": "2026-11-06",
+    "kind": "fix",
+    "text": "A garden plot that refuses your worn tool no longer plays its word first, and says how much condition the tool needs"
+   },
+   {
+    "date": "2026-11-06",
+    "kind": "fix",
+    "text": "The online smoke check waits for a late Local line instead of failing on it"
+   },
+   {
+    "date": "2026-11-06",
+    "kind": "fix",
+    "text": "Spice Plants and other rooted scenery stand on the ground beside a pipe, not on its rim or behind its end"
+   },
    {
     "date": "2026-11-06",
     "kind": "fix",
@@ -2824,36 +2854,6 @@
     "date": "2026-11-05",
     "kind": "fix",
     "text": "You can walk back out from beside the long table's right leg in De-Embiggenify"
-   },
-   {
-    "date": "2026-11-05",
-    "kind": "fix",
-    "text": "A bag put in a house cabinet keeps everything in it, and comes back out the same"
-   },
-   {
-    "date": "2026-11-05",
-    "kind": "fix",
-    "text": "Escape or a click outside closes the Play Cube's \"Which memory?\" list, and \"Never mind\" stays in view"
-   },
-   {
-    "date": "2026-11-05",
-    "kind": "fix",
-    "text": "Street projects take items made while the project window is open"
-   },
-   {
-    "date": "2026-11-05",
-    "kind": "fix",
-    "text": "A long route on the Map is one short line, with all its stops in a box that scrolls"
-   },
-   {
-    "date": "2026-11-05",
-    "kind": "fix",
-    "text": "The Make panel shows every element a Grinder crush gives, with its count"
-   },
-   {
-    "date": "2026-11-05",
-    "kind": "fix",
-    "text": "The Batterfly's page no longer says it gives Butterfly Milk, nor Hell's Bartender a Drink Ticket"
    }
   ]
  },

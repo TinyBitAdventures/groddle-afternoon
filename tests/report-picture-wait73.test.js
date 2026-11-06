@@ -14,6 +14,12 @@ import { capturePicture, captureFrame, standardStyleNames, viewRows } from '../p
 const root = join(import.meta.dirname, '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+/** Wait for what a step needs, not for a set time: a loaded machine runs 80 ms timers late (G535). */
+const waitFor = async (ok, ms = 5000) => {
+  const end = Date.now() + ms;
+  while (!ok() && Date.now() < end) await wait(10);
+  assert.ok(ok(), 'timed out waiting for the form');
+};
 const JPEG = (tag) => `data:image/jpeg;base64,${Buffer.from(`jpeg ${tag} ${'x'.repeat(30)}`).toString('base64')}`;
 
 // —— A small DOM with bubbling, enough for the sheet and the lightbox ——
@@ -102,10 +108,10 @@ const shownSrc = (preview) => preview.children[0]?.getAttribute('src') || '';
 describe('ticket 73: the report form never waits on the picture with the UI', () => {
   it('opens with only the world picture drawn, shown at once beside the drawing hint', async () => {
     const { world, capture } = pictures();
-    const m = mount(capture, { uiIdle: 80 });
+    const m = mount(capture, { uiIdle: 60000 });
     m.sheet.open('new');
     assert.deepEqual(m.asked, [], 'nothing is drawn as the form opens');
-    await wait(100);
+    await waitFor(() => m.preview.dataset.which === 'world');
     assert.deepEqual(m.asked.map((a) => a.ui), [false], 'the world picture only');
     assert.equal(m.preview.hidden, false, 'the world picture shows while the one with the UI is to come');
     assert.equal(m.preview.dataset.which, 'world');
@@ -172,7 +178,7 @@ describe('ticket 73: the report form never waits on the picture with the UI', ()
     const { world, capture } = pictures();
     const m = mount(capture, { uiIdle: 40 });
     m.sheet.open('new');
-    await wait(80);
+    await waitFor(() => m.preview.dataset.which === 'world');
     const uiBox = byId(m.host, 'reports-picture-ui');
     uiBox.checked = false;
     fire(uiBox, 'change');
