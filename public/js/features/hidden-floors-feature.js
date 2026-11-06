@@ -14,7 +14,9 @@
  *   of the pit floor puts you back up on that side's floor, on the same
  *   street (no loading, no travel gate: the dead walk Naraka). Northwest
  *   Passage's wintry portal (js/wintry-portal.js; Austin 2026-11-01): a jump
- *   into the snowy oval takes you to Wintry Place, its secret entrance.
+ *   into the snowy oval takes you to Wintry Place, its secret entrance. Level 3
+ *   West's pit (js/cave-pit.js, G527): our own stand-in for its lost teleporter,
+ *   each end of the pit floor back up to that end's signpost island.
  * - The painted "EXIT" on both floors: the forgotten floor's archived
  *   sign_txt and, on the lost floor, the word read off the footage.
  * - Goorsh Gam's canopy and Ilmenskie's cave mouth: there the avatar walks
@@ -31,7 +33,8 @@
  *   mushroom cap: run right and triple jump), streetdemo=GUV1CSSE49J2P2C (the missing floor).
  *   &hiddenfloordemo=<teleporter id> drops the avatar into that box on the
  *   street that has it (goorsh_to_lost, lost_to_goorsh, odena_to_forgotten,
- *   forgotten_to_odena, ilmenskie_to_missing, missing_to_ilmenskie). Canvas
+ *   forgotten_to_odena, ilmenskie_to_missing, missing_to_ilmenskie,
+ *   level3west_pit_left, level3west_pit_right). Canvas
  *   data: hiddenFloorBoxes, hiddenFloorSign, hiddenFloorLast,
  *   hiddenFloorTeleports, hiddenFloorFeet (feet height over the street's
  *   lowest box bottom, for jump QA), hiddenFloorCanopy (client physics on),
@@ -57,6 +60,7 @@ import {
 } from '../hidden-floors.js?v=d49b76df';
 import { narakaTeleportersOn } from '../hell.js?v=aca145ba';
 import { wintryPortalTeleportersOn } from '../wintry-portal.js?v=1437deda';
+import { cavePitTeleportersOn } from '../cave-pit.js?v=81e62950';
 
 export const HIDDEN_FLOORS_FEATURE_ID = 'hidden-floors';
 const CHECK_MS = 60;
@@ -193,7 +197,7 @@ export const hiddenFloorsFeature = {
       publish(engine, enteredAt, true);
       return;
     }
-    boxes = [...teleportersOn(street.tsid), ...narakaTeleportersOn(street.tsid), ...wintryPortalTeleportersOn(street.tsid)];
+    boxes = [...teleportersOn(street.tsid), ...narakaTeleportersOn(street.tsid), ...wintryPortalTeleportersOn(street.tsid), ...cavePitTeleportersOn(street.tsid)];
     zone = clientPhysicsZone(street);
     if (isIlmenskieTsid(street.tsid)) ceilings = ceilingsScreen(street);
     const row = exitSignOn(street.tsid);
