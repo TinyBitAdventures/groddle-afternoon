@@ -19,9 +19,9 @@ let arrived = null;
 let checkAt = 0;
 let demoDone = false;
 
-// Registered up front: a reload's pack shows the trophy before any new grant runs.
+// Registered up front: a reload's pack shows the trophy before any new grant runs. base_cost 0: no vendor buys one.
 for (const { trophy, label, desc } of Object.values(COLLECTION_TROPHIES)) {
-  ensureItem(trophy, { label, desc, baseCost: 0, stackMax: 1, sellable: false, donatable: false, tags: ['trophy', 'no_trade'] });
+  ensureItem(trophy, { label, desc, baseCost: 0, stackMax: 1, donatable: false, tags: ['trophy', 'no_trade'] });
 }
 
 function classesOf(ids, catalog, unlocked) {

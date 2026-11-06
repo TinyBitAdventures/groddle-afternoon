@@ -12,7 +12,8 @@ import { loadContentCatalogsFromDir, getAchievementCatalog } from '../public/js/
 import { applyAchievementProgress, createAchievementState, getAchievementProgress, resetAchievementCounter, unlockAchievement } from '../public/js/achievements.js?v=f8ccfd34';
 import { COLLECTION_TROPHIES, COUNTED_ON_ARRIVAL, HELD_AT_ONCE, collectionClasses, heldChanges, planCollectionTrophies } from '../public/js/collection-trophies.js?v=69205984';
 import { ITEM_CATALOG } from '../public/js/inventory.js?v=d82f3b00';
-import { collectionTrophiesFeature as feature } from '../public/js/features/collection-trophies-feature.js?v=dc2b3e84';
+import { vendorSellValue } from '../public/js/vendor.js?v=29f6c214';
+import { collectionTrophiesFeature as feature } from '../public/js/features/collection-trophies-feature.js?v=de9e7c8d';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const GS = join(here, '../../glitch-GameServerJS');
@@ -160,6 +161,7 @@ describe('collection trophies (G530)', () => {
       assert.equal(row.label, words('name_single'));
       assert.equal(row.desc, words('description'));
       assert.equal(ITEM_CATALOG[row.trophy].label, row.label);
+      assert.equal(vendorSellValue(row.trophy, 1).total, 0, `${row.trophy}: base_cost 0, no vendor buys it`);
     }
     const ach = readFileSync(join(GS, 'players/inc_achievements.js'), 'utf8');
     assert.match(ach, /if \(achievement\.collection_type == 2\) this\.items_destroy/);

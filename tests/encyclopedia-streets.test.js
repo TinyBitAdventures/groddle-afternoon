@@ -111,11 +111,13 @@ describe('encyclopedia streets', () => {
     assert.equal(way.has('C'), false);
   });
 
-  it('shows the roads: signposts, doors, one-way drops and doors no key opens', { skip }, () => {
+  it('shows the roads: signposts, doors with their keys and one-way drops; every door\'s key has a source now', { skip }, () => {
     const drop = text(pageOf('streets:the-other-drop'));
     assert.match(drop, /Coming in from Arjun Plunge , you cannot climb back to the signpost to Eastern Approach : that way only goes down\./);
     const bliss = text(pageOf('streets:ajaya-bliss'));
-    assert.match(bliss, /The door into here from .+ needs Door Key \d+, and nothing in the game gives one\./);
+    assert.doesNotMatch(bliss, /nothing in the game gives one/, 'Dust Traps drop Key 9');
+    assert.match(text(pageOf('streets:subarna-spells')), /Doors Ajaya Bliss key 9 /);
+    assert.match(text(pageOf('streets:subarna-spells')), /A door with a key number needs that Door Key\./);
     for (const e of streets().slice(0, 300)) {
       const html = pageOf(e.key);
       for (const t of e.street.signposts) {
