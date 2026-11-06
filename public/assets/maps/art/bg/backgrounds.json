@@ -484,10 +484,11 @@
       "thumbMatches": true,
       "x1": "assets/maps/art/bg/callopee.webp",
       "x2": "assets/maps/art/bg/callopee@2x.webp",
-      "x1Bytes": 16836,
-      "x1Sha256": "29b0d7d1a233ddef518e88aea42cff7235a07258d8ea702d5173757075c7630f",
-      "x2Bytes": 32872,
-      "x2Sha256": "1f74bbf277aa4f271a00f6cee1b20b2ee3bcae48356c2e91a72e150797dd59c8"
+      "repainted": "tools/provenance/repainted-maps.json",
+      "x1Bytes": 35766,
+      "x1Sha256": "57e72ea32d311200582d85a331942f7178b57f482fd3139a33e582781c58c59b",
+      "x2Bytes": 106382,
+      "x2Sha256": "a238560044c94b57c7608de48342e71bd06d8cc9d0a3465f4480b634598026a3"
     },
     "109": {
       "hubName": "Rasana",

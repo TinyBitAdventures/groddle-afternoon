@@ -35,7 +35,7 @@ export const HUB_MAP_BACKGROUNDS = Object.freeze({
   '102': Object.freeze({ x1: 'assets/maps/art/bg/ormonos.webp', x2: 'assets/maps/art/bg/ormonos@2x.webp' }), // Ormonos
   '105': Object.freeze({ x1: 'assets/maps/art/bg/lida.webp', x2: 'assets/maps/art/bg/lida@2x.webp' }), // Lida
   '106': Object.freeze({ x1: 'assets/maps/art/bg/pollokoo.webp', x2: 'assets/maps/art/bg/pollokoo@2x.webp' }), // Pollokoo
-  '107': Object.freeze({ x1: 'assets/maps/art/bg/callopee.webp', x2: 'assets/maps/art/bg/callopee@2x.webp' }), // Callopee
+  '107': Object.freeze({ x1: 'assets/maps/art/bg/callopee.webp', x2: 'assets/maps/art/bg/callopee@2x.webp', repainted: true }), // Callopee
   '109': Object.freeze({ x1: 'assets/maps/art/bg/rasana.webp', x2: 'assets/maps/art/bg/rasana@2x.webp' }), // Rasana
   '110': Object.freeze({ x1: 'assets/maps/art/bg/massadoe.webp', x2: 'assets/maps/art/bg/massadoe@2x.webp' }), // Massadoe
   '112': Object.freeze({ x1: 'assets/maps/art/bg/brillah.webp', x2: 'assets/maps/art/bg/brillah@2x.webp', repainted: true }), // Brillah
