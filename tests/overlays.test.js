@@ -601,8 +601,8 @@ describe('wiring', () => {
   const game = read('game.js');
   it('game.js: quoin limit, super harvest, wheel and donation rainbows; musicblock notes; the phantom; the solo Hog Haul countdown', () => {
     assert.match(game, /import \{[^}]*showRainbow[^}]*\} from '\.\/js\/overlays\.js\?v=[0-9a-f]{8}'/);
-    assert.match(game, /playerRainbow\(result\.dailyLimit === 150 \? 'rainbow_150coinstoday' : 'rainbow_100coinstoday'\)/);
-    assert.match(game, /if \(!paradiseRun\) playerRainbow/);
+    assert.match(game, /playerRainbow\(dailyLimit === 150 \? 'rainbow_150coinstoday' : 'rainbow_100coinstoday'\)/);
+    assert.match(game, /function announceQuoinLimit\(dailyLimit\) \{\s*if \(paradiseRun\) return;/);
     assert.match(game, /playerRainbow\('rainbow_superharvest'/);
     assert.match(game, /playerRainbow\('rainbow_spindoctor'\)/);
     assert.match(game, /if \(result\.bonus\) playerRainbow\('rainbow_superdonation'\)/);

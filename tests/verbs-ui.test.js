@@ -134,8 +134,8 @@ describe('ticket 87: a tall menu stays on the screen', () => {
     assert.match(pack, /fitVerbMenuRows\(pop, pop\.querySelector\('\.pack-pop-actions'\), floor - 9 - ceiling\);/);
     assert.match(pack, /const ceiling = rootTop \+ \(Number\.isFinite\(hudH\) \? hudH : 44\) \+ 8;/);
     const world = fn('placeMenuAtTarget');
-    assert.match(world, /fitVerbMenuRows\(card, card\.querySelector\('\.verb-menu-list'\), roomFloor - 4 - roomTop\);/);
-    assert.ok(world.indexOf('fitVerbMenuRows(') < world.indexOf('size: { w: card.offsetWidth, h: card.offsetHeight }'), 'capped before it is measured');
+    assert.match(world, /fitVerbMenuRows\(card, card\.querySelector\('\.verb-menu-list, \.feed-picker-grid'\), roomFloor - 4 - roomTop\);/);
+    assert.ok(world.indexOf('fitVerbMenuRows(') < world.indexOf('const size = { w: card.offsetWidth, h: card.offsetHeight }'), 'capped before it is measured');
     const vm = read('js/ui/verb-menu.js');
     assert.match(vm, /if \(row\.closest\?\.\('\.vm-scroll'\)\) row\.scrollIntoView\?\.\(\{ block: 'nearest' \}\);/, 'the keys bring a scrolled row into sight');
   });

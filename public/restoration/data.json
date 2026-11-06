@@ -2732,9 +2732,64 @@
   "deployed": "2026-11-06"
  },
  "git": {
-  "commits": 1376,
+  "commits": 1388,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-06",
+    "kind": "new",
+    "text": "Search and filter your upgrades by kind"
+   },
+   {
+    "date": "2026-11-06",
+    "kind": "improve",
+    "text": "An empty Make list says how many recipes you know and has a button to show them"
+   },
+   {
+    "date": "2026-11-06",
+    "kind": "fix",
+    "text": "Blooian's discs show the path that is really open"
+   },
+   {
+    "date": "2026-11-06",
+    "kind": "fix",
+    "text": "No band under the Paradise clouds, and the shut way home looks shut and says why"
+   },
+   {
+    "date": "2026-11-06",
+    "kind": "fix",
+    "text": "The Encyclopedia shows each animal and creature's own picture, not a Cubimal or an empty box"
+   },
+   {
+    "date": "2026-11-06",
+    "kind": "fix",
+    "text": "The nicest day in the neighborhood counts neighbours from when you accept it"
+   },
+   {
+    "date": "2026-11-06",
+    "kind": "fix",
+    "text": "A pinned timed quest says when its time ran out"
+   },
+   {
+    "date": "2026-11-06",
+    "kind": "fix",
+    "text": "Reaching the quoin limit shows the original prompt instead of an award window"
+   },
+   {
+    "date": "2026-11-06",
+    "kind": "fix",
+    "text": "The report window opens on top of an award screen"
+   },
+   {
+    "date": "2026-11-06",
+    "kind": "fix",
+    "text": "A long Feed menu stays on the screen, scrolling inside itself"
+   },
+   {
+    "date": "2026-11-06",
+    "kind": "improve",
+    "text": "Cauda, Chakra Phool, Choru, Drifa and Fenneq have new map paintings, repainted from Tiny Speck's thumbnails of the lost originals"
+   },
    {
     "date": "2026-11-06",
     "kind": "fix",
@@ -2799,61 +2854,6 @@
     "date": "2026-11-06",
     "kind": "fix",
     "text": "A recipe opened from far down the Make list opens at its top, with Back in view, and Back returns to your place"
-   },
-   {
-    "date": "2026-11-06",
-    "kind": "fix",
-    "text": "The level builder no longer reports Piene Question as a trap: a ladder a jump lifts you to is a way out"
-   },
-   {
-    "date": "2026-11-06",
-    "kind": "fix",
-    "text": "The changelog's and encyclopedia's pages pick up new styles after an update instead of an old cached copy"
-   },
-   {
-    "date": "2026-11-06",
-    "kind": "fix",
-    "text": "A Pick with 1 condition left mines at Mining III and IV, where a swing only costs 1"
-   },
-   {
-    "date": "2026-11-06",
-    "kind": "fix",
-    "text": "Restarting the tutorial's practice street no longer hands out another Watering Can or Butterfly Lotion"
-   },
-   {
-    "date": "2026-11-06",
-    "kind": "fix",
-    "text": "Built pages pick up the site's new styles and theme script after an update instead of an old cached copy"
-   },
-   {
-    "date": "2026-11-06",
-    "kind": "improve",
-    "text": "The phone companion loads about 16 KB less: the account calls only the game makes stay out of it"
-   },
-   {
-    "date": "2026-11-06",
-    "kind": "fix",
-    "text": "/stuck is easier to find: a one-time hint on a floor you can't jump off, and / then stuck runs it"
-   },
-   {
-    "date": "2026-11-06",
-    "kind": "fix",
-    "text": "Level 3 West's pit has a way out: each end of its floor lifts you back up to that end's signpost island"
-   },
-   {
-    "date": "2026-11-06",
-    "kind": "improve",
-    "text": "Groddle Meadow's map has a calmer new painting, with fewer and smaller trees and more open grass"
-   },
-   {
-    "date": "2026-11-06",
-    "kind": "improve",
-    "text": "Alakol, Andra, Aranna and Balzare have new map paintings, repainted from Tiny Speck's thumbnails of the lost originals"
-   },
-   {
-    "date": "2026-11-06",
-    "kind": "fix",
-    "text": "Restarting the tutorial's Training Level Two no longer hands out its food and drink again"
    }
   ]
  },
