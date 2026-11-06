@@ -10,7 +10,7 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { RECIPE_CATALOG, TOOL_CATALOG, canCraft, ensureMakingItems, listMakingTools, loadRecipeCatalogFromFile, makePanelIcon, recipeBlockedLine } from '../public/js/making.js?v=76cc5708';
+import { RECIPE_CATALOG, TOOL_CATALOG, canCraft, ensureMakingItems, listMakingTools, loadRecipeCatalogFromFile, makePanelIcon, recipeBlockedLine } from '../public/js/making.js?v=ed3a6e30';
 import { createInventory } from '../public/js/inventory.js?v=d82f3b00';
 import { createToolConditionState, setToolRemaining } from '../public/js/tools.js?v=6684b484';
 

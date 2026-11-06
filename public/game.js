@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=ff28da24';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=127e0a3c';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=d9509cbe';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=2462241a';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -577,7 +577,7 @@ import {
   recipeTaskLimit,
   recipeToolInUse,
   pluralizeItem,
-} from './js/making.js?v=76cc5708';
+} from './js/making.js?v=ed3a6e30';
 import { outputIconsHtml, outputsPhrase, recipeOutputRows } from './js/ui/recipe-outputs.js?v=73e19baf';
 import { MAKE_TOOL_SHEETS } from './js/make-tool-sheets.js?v=6f758e09';
 import { LOW_FUEL_LINE, craftSessionElapsedMs, isLowFuel, isMachineArt, machineArtHtml, packMakeState, playMachineHandOver, setMachineArtFrame } from './js/machine-art.js?v=ac629e13';
@@ -26521,7 +26521,8 @@ function runMakeCraft(key, qty) {
   // The grinder's and smelter's verbs price free units from a running buff first (buff-triggers).
   features.event(`making_batch:${recipe.tool}`, n, engine);
   // inc_making.js refuses the whole batch when its energy >= the player's.
-  const batchEnergy = makingSkillAdjustments(recipe, opts.learned, opts.upgrades).energyCost * n;
+  const unitEnergy = makingSkillAdjustments(recipe, opts.learned, opts.upgrades).energyCost;
+  const batchEnergy = unitEnergy * n;
   if (check.ok && batchEnergy && pc.energy <= batchEnergy) {
     toast("You don't have enough energy.");
     renderMakePanel();
@@ -26549,7 +26550,11 @@ function runMakeCraft(key, qty) {
     durations: craftUnitDurations(recipe, n, opts.learned, opts.upgrades),
   });
   // The Grinder keeps only what the pack can carry; the rest is destroyed, never the magic rock's (grand_ol_grinder.js 613-619).
-  const sessionOpts = isGrinderRecipe(recipe) ? { ...opts, room: grinderPackRoom } : opts;
+  // A buff's free units are priced when the batch starts and hold to its end, whatever the buff does meanwhile
+  // (ore_grinder.js 450-473 and 592, smelter.js 446-478 and 576: the run keeps its own details).
+  const sessionOpts = isGrinderRecipe(recipe)
+    ? { ...opts, room: grinderPackRoom, batchEnergyCost: unitEnergy }
+    : recipe.tool === 'smelter' ? { ...opts, batchEnergyCost: unitEnergy } : opts;
   activeCraftSession = { timer, key, recipe, qty: n, made: 0, opts: sessionOpts };
   document.getElementById('make-list')?.setAttribute('hidden', '');
   document.getElementById('make-detail')?.setAttribute('hidden', '');

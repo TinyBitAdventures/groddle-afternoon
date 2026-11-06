@@ -23,12 +23,12 @@ import {
   smallEnlightenmentSeconds,
   smeltItDealtItFreeSmelts,
 } from '../public/js/buff-triggers.js?v=a3093922';
-import { MIRRORED_BUFFS, buffTriggersFeature } from '../public/js/features/buff-triggers-feature.js?v=8a479723';
+import { MIRRORED_BUFFS, buffTriggersFeature } from '../public/js/features/buff-triggers-feature.js?v=204172ec';
 import { meditationFeature } from '../public/js/features/meditation-feature.js?v=407bb75b';
 import { teleportationFeature } from '../public/js/features/teleportation-feature.js?v=7d175a00';
 import { rookAttackFeature } from '../public/js/features/rook-attack-feature.js?v=37ebb5fd';
 import { rubeFeature } from '../public/js/features/rube-feature.js?v=0c2a3c93';
-import { smugglingFeature } from '../public/js/features/smuggling-feature.js?v=3960f1ac';
+import { smugglingFeature } from '../public/js/features/smuggling-feature.js?v=6187f6c5';
 import { normalizeHusbandryPack } from '../public/js/animal-husbandry.js?v=41da06a5';
 import {
   activateBuffItem,
@@ -42,7 +42,7 @@ import {
 import { getSkillPackageOverride, skillPackageDetails } from '../public/js/skill-packages.js?v=bfb87281';
 import { miningProfile } from '../public/js/mining.js?v=4d825b67';
 import { resolveAnimalKinshipPackage } from '../public/js/animal-kinship.js?v=5f36cc4b';
-import { makingSkillAdjustments } from '../public/js/making.js?v=76cc5708';
+import { RECIPE_CATALOG, buildCraftBatchResult, craftRecipe, ensureMakingItems, makingSkillAdjustments } from '../public/js/making.js?v=ed3a6e30';
 import { sessionPackage } from '../public/js/meditation.js?v=380b2f3f';
 import { accelerateActiveStudy, createSkillState, startSkillStudy } from '../public/js/skills.js?v=4542bdf9';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=10b118dd';
@@ -324,6 +324,41 @@ describe('package overrides', () => {
     engine.advance(1_001);
     engine.sync();
     assert.equal(makingSkillAdjustments(crush, ['refining_1']).energyCost, cost);
+  });
+
+  it('a batch keeps the price it started at when the buff runs out mid-batch (ore_grinder.js 450-473, 592; report 125)', () => {
+    const engine = makeEngine({ learnedSkills: ['refining_1'] });
+    const recipes = JSON.parse(readFileSync(join(root, 'assets/content/recipes.json'), 'utf8'));
+    const crush = (recipes.recipes || recipes).crush_beryl;
+    ensureMakingItems();
+    RECIPE_CATALOG.crush_beryl = crush;
+    const full = makingSkillAdjustments(crush, ['refining_1']).energyCost;
+    buffTriggersFeature.onEvent('flaming_humbaba:drink', 1, engine);
+    engine.advance(27_000);
+    // 3 s left: 10 + 10 free of a 30-crush batch, priced now.
+    buffTriggersFeature.onEvent('making_batch:ore_grinder', 30, engine);
+    const priced = makingSkillAdjustments(crush, ['refining_1']).energyCost;
+    assert.equal(priced, freeBatchEnergyCost(30, 20, full));
+    engine.advance(3_001);
+    engine.sync();
+    // The buff is gone and the override with it (catalog_buffs.js on_remove): the running batch must not care.
+    assert.equal(makingSkillAdjustments(crush, ['refining_1']).energyCost, full);
+    const run = (opts) => {
+      const inv = { beryl: 40, ore_grinder: 1 };
+      const pc = { energy: 400, mood: 50, imagination: 0, xp: 0, imaginationUpgrades: [] };
+      for (let i = 1; i <= 10; i += 1) assert.equal(craftRecipe(inv, pc, 'crush_beryl', { learned: ['refining_1'], upgrades: [], unitIndex: i, batchQty: 30, ...opts }).ok, true);
+      return 400 - pc.energy;
+    };
+    assert.equal(run({}), full * 10, 'without the batch price, full cost (what a batch outlasting the buff paid)');
+    assert.ok(Math.abs(run({ batchEnergyCost: priced }) - priced * 10) < 1e-9);
+    const summary = buildCraftBatchResult({ beryl: 10 }, { energy: 100 }, 'crush_beryl', 30, 30, { learned: ['refining_1'], batchEnergyCost: priced });
+    assert.ok(Math.abs(summary.energy + priced * 30) < 1e-9, 'the result says what was charged');
+  });
+
+  it('game.js holds the price for the Grinder and the Smelter only', () => {
+    const src = readFileSync(join(root, 'game.js'), 'utf8');
+    assert.match(src, /room: grinderPackRoom, batchEnergyCost: unitEnergy/);
+    assert.match(src, /recipe\.tool === 'smelter' \? \{ \.\.\.opts, batchEnergyCost: unitEnergy \}/);
   });
 
   it('Smelt It, Dealt It: free ingots, over the Green Smelt cards too (smelter.js:446-478)', () => {

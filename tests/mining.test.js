@@ -39,7 +39,7 @@ import {
   craftRecipe,
   ensureMakingItems,
   TOOL_CATALOG,
-} from '../public/js/making.js?v=76cc5708';
+} from '../public/js/making.js?v=ed3a6e30';
 import { DEFAULT_VENDOR, vendorBuy } from '../public/js/vendor.js?v=29f6c214';
 import { createToolConditionState, getToolCondition } from '../public/js/tools.js?v=6684b484';
 

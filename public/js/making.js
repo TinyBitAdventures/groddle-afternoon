@@ -1077,7 +1077,10 @@ export function craftRecipe(inv, pc, recipeKey, opts = {}) {
 
   const upgrades = Array.isArray(opts.upgrades) ? opts.upgrades : pc?.imaginationUpgrades || [];
   const adjust = makingSkillAdjustments(recipe, opts.learned, upgrades);
-  const cost = adjust.energyCost;
+  // A Grinder or Smelter batch keeps the price it started at (opts.batchEnergyCost, game.js runMakeCraft):
+  // runSkillPackage holds `details` for the run and onCrushComplete charges from them (ore_grinder.js
+  // 450-473, 592; smelter.js 576), so a Flaming Humbaba running out mid-batch changes nothing.
+  const cost = opts.batchEnergyCost ?? adjust.energyCost;
   // getHitPointModifier: the *_tool_wear cards halve that cooking tool's wear.
   // The Grand Ol' Grinder makes the Grinder's recipes and takes their wear.
   const wornTool = opts.stationTool === recipe.tool
@@ -1399,7 +1402,7 @@ export function buildCraftBatchResult(inv, pc, recipeKey, made, qtyRequested = m
   const count = Math.max(0, Math.floor(Number(made) || 0));
   if (!recipe || count < 1) return null;
 
-  const energy = -recipeEnergyCost(recipe, opts.learned) * count;
+  const energy = -(opts.batchEnergyCost ?? recipeEnergyCost(recipe, opts.learned)) * count;
   const extras = batchExtras?.recipeKey === recipeKey ? batchExtras : null;
   // What landed after the mood bonus (craftRecipe sums it per unit).
   const xp = Number.isFinite(extras?.xp) ? extras.xp : (recipe.xpReward || 0) * count;
