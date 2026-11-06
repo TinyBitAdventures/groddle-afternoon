@@ -24,7 +24,8 @@ import { fileURLToPath } from 'node:url';
 import { remoteAvatarZ } from '../public/js/features/realtime-feature.js?v=c9c3d2f8';
 import { FRONT_FURNITURE_SLOTS, furnitureDrawsInFront } from '../public/js/home-decor.js?v=c1240252';
 import { FURNITURE_CATALOG } from '../public/js/homes-catalog.js?v=7aa9beb0';
-import { SCREEN_SELECTOR, WINDOW_SELECTOR, stackZ } from '../public/js/window-stack.js?v=be3b7274';
+import { typingElsewhere } from '../public/js/screen-fx.js?v=155d18cf';
+import { SCREEN_SELECTOR, WINDOW_SELECTOR, isTopWindow, stackZ } from '../public/js/window-stack.js?v=a7104f02';
 import { BAND_Z, bandClass, itemBand, itemZ, knownItemClass } from '../public/js/item-bands.js?v=e98b10bc';
 import { BACKGROUND_CLASSES, FOREGROUND_CLASSES, FOREMOST_CLASSES, NORMAL_CLASSES } from '../public/js/item-bands-data.js?v=0ac4551c';
 import { buildItemBands, render as renderItemBands } from '../tools/build-item-bands.mjs';
@@ -349,5 +350,33 @@ describe('item bands from the source (ITEMBANDS)', () => {
       assert.match(src, /import \{ itemZ \} from '\.\.?\/(js\/)?item-bands\.js\?v=[0-9a-f]{8}';/, f);
       for (const m of src.matchAll(/itemZ\('([a-z0-9_]+)'/g)) assert.ok(knownItemClass(m[1]), `${f}: ${m[1]}`);
     }
+  });
+});
+
+describe('report 132: the report window opens over a screen', () => {
+  const matching = (selector) => ({ matches: (s) => s === selector });
+
+  it('the report window and the start card go over the screens; other windows do not', () => {
+    assert.equal(isTopWindow(matching('#bug-report-panel')), true);
+    assert.equal(isTopWindow(matching('#overlay')), true);
+    assert.equal(isTopWindow(matching('.award-screen')), false);
+    assert.equal(isTopWindow(matching('.map-panel')), false);
+    // Report (512) opened over an award (96): above it, and the award keeps its own value.
+    assert.deepEqual(stackZ([{ base: 96, screen: true }, { base: 512, top: true }]), [96, 512]);
+    // The award raised over the quest card (510) still sits under the report.
+    const [card, award, report] = stackZ([{ base: 510 }, { base: 96, screen: true }, { base: 512, top: true }]);
+    assert.ok(report > award && award > card);
+  });
+
+  it('the screen leaves its keys to the open report window, and to text fields elsewhere', () => {
+    const el = { contains: () => false };
+    const notTyping = { target: { closest: () => null } };
+    const shut = { getElementById: () => ({ hidden: true }) };
+    const open = { getElementById: () => ({ hidden: false }) };
+    const none = { getElementById: () => null };
+    assert.equal(typingElsewhere(notTyping, el, none), false);
+    assert.equal(typingElsewhere(notTyping, el, shut), false);
+    assert.equal(typingElsewhere(notTyping, el, open), true);
+    assert.equal(typingElsewhere({ target: { closest: () => ({}) } }, el, none), true);
   });
 });

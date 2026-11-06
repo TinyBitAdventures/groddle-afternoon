@@ -39,7 +39,7 @@ import {
 import { createButlerState, giveGiftTo, newestVisit, nextHandover, normalizeButlerState, packagesAndMessagesForOwner, recordVisitor, setGift, visitorsReport } from '../public/js/butler.js?v=2bafa110';
 import { createGarden, tickGarden } from '../public/js/garden.js?v=74dd94d0';
 import { butlerApi } from '../public/js/features/butler-feature.js?v=9832bb19';
-import { neighboursMpFeature } from '../public/js/features/neighbours-mp-feature.js?v=96c0c80b';
+import { neighboursMpFeature } from '../public/js/features/neighbours-mp-feature.js?v=a4170e36';
 import { createMinnAccount } from '../public/js/minn-account.js?v=b29fae30';
 import { HAS_SERVER, HAS_SITE, SITE_DIR, serverPath, sitePath } from '../tools/repos.mjs';
 

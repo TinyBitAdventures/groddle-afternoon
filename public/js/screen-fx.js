@@ -1004,10 +1004,15 @@ export function startFamiliarDrop(fam, { status = '', body = '', name = '' } = {
 /** Keys whose browser default (scrolling the page) a screen with the keyboard stops. */
 const SCREEN_NAV_KEYS = new Set([' ', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'PageUp', 'PageDown', 'Home', 'End']);
 
-/** A text field outside the screen (the online chat box) keeps its own keys. */
-function typingElsewhere(event, el) {
+/**
+ * A text field outside the screen (the online chat box) keeps its own keys, and so does the report
+ * window open over the screen (report 132): Enter and Escape there are not the screen's OK.
+ */
+export function typingElsewhere(event, el, doc = globalThis.document) {
   const t = event?.target;
-  return Boolean(t?.closest?.('input, textarea, select, [contenteditable="true"]') && !el?.contains?.(t));
+  if (t?.closest?.('input, textarea, select, [contenteditable="true"]') && !el?.contains?.(t)) return true;
+  const sheet = doc?.getElementById?.('bug-report-panel');
+  return Boolean(sheet && !sheet.hidden);
 }
 
 /**

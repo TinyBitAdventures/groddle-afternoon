@@ -41,6 +41,15 @@ export const SCREEN_SELECTOR = '.award-screen, .new-day-screen, .giant-screen';
  * had none); game.js holds the screens, the familiar's panel and prompts until the player starts.
  */
 export const START_CARD_SELECTOR = '#overlay';
+/**
+ * Report 132: the report window opens over whatever the player wants to report, screens included
+ * (its copy of the bug icon is on top of them). The remake's own window: the client had no such one.
+ */
+export const REPORT_WINDOW_SELECTOR = '#bug-report-panel';
+/** Over the screens: the start card and the report window. */
+export function isTopWindow(el) {
+  return Boolean(el?.matches?.(START_CARD_SELECTOR) || el?.matches?.(REPORT_WINDOW_SELECTOR));
+}
 /** Not windows: the docked prompt stack, the player menu, the pack's item card, the hotkey sheet. */
 export const NOT_WINDOW_SELECTOR = '.prompt-stack, #player-menu, #pack-popover, .hotkeys-shade, .boot-loader';
 
@@ -116,7 +125,7 @@ export function createWindowStack({ doc = globalThis.document, onChange = null }
     const rows = open.map((el) => ({
       base: baseZ(el),
       screen: el.matches(SCREEN_SELECTOR) || Boolean(el.querySelector(SCREEN_SELECTOR)),
-      top: el.matches(START_CARD_SELECTOR),
+      top: isTopWindow(el),
     }));
     const zs = stackZ(rows);
     open.forEach((el, i) => {

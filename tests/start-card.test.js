@@ -9,8 +9,8 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { START_CARD_SELECTOR, SCREEN_SELECTOR, WINDOW_SELECTOR, stackZ } from '../public/js/window-stack.js?v=be3b7274';
-import { createPromptStack } from '../public/js/prompt-stack.js?v=44dacd10';
+import { START_CARD_SELECTOR, SCREEN_SELECTOR, WINDOW_SELECTOR, stackZ } from '../public/js/window-stack.js?v=a7104f02';
+import { createPromptStack } from '../public/js/prompt-stack.js?v=1282ed29';
 import {
   _resetFamiliarDialog,
   familiarDialogFeature,
@@ -201,7 +201,7 @@ describe('the window stack keeps the start card on top', () => {
     assert.match(resolveTokens(read('play/online/index.html')), /#overlay:not\(\.hidden\) \{ z-index: 80;/);
     const ws = read('js/window-stack.js');
     assert.match(ws, /querySelectorAll\(`\$\{WINDOW_SELECTOR\}, \$\{SCREEN_SELECTOR\}, \$\{START_CARD_SELECTOR\}`\)/);
-    assert.match(ws, /top: el\.matches\(START_CARD_SELECTOR\),/);
+    assert.match(ws, /top: isTopWindow\(el\),/);
   });
 });
 
