@@ -11779,8 +11779,23 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
 [data-ui="modern"] #projects-list .pj-needs { margin: var(--space-2) 0 0; font-size: var(--fs-s); }
 [data-ui="modern"] #projects-list .pj-needs summary { cursor: pointer; font-weight: var(--fw-heavy); }
 [data-ui="modern"] #projects-list .pj-needs summary:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; border-radius: var(--radius-xs); }
-[data-ui="modern"] #projects-list .pj-needs ul { margin: var(--space-1) 0 0; padding-left: var(--space-4); }
-[data-ui="modern"] #projects-list .pj-needs li.is-later { color: var(--text-muted); }
+[data-ui="modern"] #projects-list .pj-needs ul { display: flex; flex-direction: column; gap: var(--space-1); margin: var(--space-2) 0 0; padding: 0; list-style: none; }
+/* Ticket 81: each need is its picture with what is left on it, the task, and whether you can do it now. */
+[data-ui="modern"] #projects-list .pj-need { display: flex; align-items: center; gap: var(--space-2); padding: var(--space-1) var(--space-2) var(--space-1) var(--space-1); border-radius: var(--radius-s); background: var(--surface-sunken); }
+[data-ui="modern"] #projects-list .pj-need.is-later { background: transparent; color: var(--text-muted); }
+[data-ui="modern"] #projects-list .pj-need-pic { position: relative; flex: none; width: 32px; height: 32px; }
+[data-ui="modern"] #projects-list .pj-need-pic img { display: block; width: 32px; height: 32px; object-fit: contain; }
+[data-ui="modern"] #projects-list .pj-need.is-later .pj-need-pic img { opacity: 0.55; }
+[data-ui="modern"] #projects-list .pj-need-n { position: absolute; right: -4px; bottom: -3px; min-width: 16px; padding: 0 3px; border-radius: var(--radius-pill); background: var(--text); color: var(--text-inverse); font-size: var(--fs-2xs); font-weight: var(--fw-heavy); line-height: 15px; text-align: center; }
+[data-ui="modern"] #projects-list .pj-need-words { display: flex; flex-direction: column; min-width: 0; }
+[data-ui="modern"] #projects-list .pj-need-text { color: var(--text); font-weight: var(--fw-bold); }
+[data-ui="modern"] #projects-list .pj-need.is-later .pj-need-text { color: var(--text-muted); }
+[data-ui="modern"] #projects-list .pj-need-notes { display: flex; flex-wrap: wrap; gap: 0 var(--space-2); font-size: var(--fs-xs); }
+[data-ui="modern"] #projects-list .pj-need-notes .pj-later { color: var(--text-muted); }
+[data-ui="modern"] #projects-list .pj-need-can { font-weight: var(--fw-bold); }
+[data-ui="modern"] #projects-list .pj-need.is-yes .pj-need-can { color: var(--good); }
+[data-ui="modern"] #projects-list .pj-need.is-some .pj-need-can { color: var(--warn); }
+[data-ui="modern"] #projects-list .pj-need.is-no .pj-need-can { color: var(--danger); }
 [data-ui="modern"] #projects-list .pj-acts { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-top: var(--space-2); }
 [data-ui="modern"] #projects-list .pj-acts .content-action-btn {
   display: inline-flex;

@@ -16,7 +16,7 @@
  * and only the player's own share is read from it (`mine`). Words come from `labels`.
  */
 
-import { jobDef, jobDivisor, jobStatus, phaseBaseCost, phaseClass, phaseName, phaseRequirements } from './street-jobs.js?v=eca98f2d';
+import { jobDef, jobDivisor, jobStatus, phaseBaseCost, phaseClass, phaseName, phaseRequirements, workGear } from './street-jobs.js?v=02a81cb3';
 
 /** The projects the panel follows: a street's build or upgrade, and online a group hall. Homes' restorations stay their home's. */
 export const TRACKED_KINDS = Object.freeze(['street', 'upgrade', 'hall']);
@@ -37,7 +37,11 @@ export const PROJECTS_TEXT = Object.freeze({
   teleport: 'Teleport',
   showMap: 'Show on Map',
   newMark: 'New',
-  later: 'after the earlier steps',
+  later: 'Opens after the earlier steps',
+  // Ticket 81 (Friendly, 2026-11-06): each need says whether you can do it now.
+  ready: 'You can do this',
+  readySome: 'you can do now',
+  haveNone: 'You have none',
   solo: `Solo amounts: 1/50 of the original totals.`,
   online: 'Shared amounts: 1/50 of the original totals.',
 });
@@ -108,19 +112,64 @@ export function projectPlace(catalog, jobId, { done = false, closed = [] } = {})
   return boards.find((t) => !shut.has(gTsid(t))) || boards[0] || gTsid(job.street) || '';
 }
 
-/** "12 more Planks", "400 more currants", "6 more units of work: chop with a Hatchet (Woodworking I)". */
+/** The picture for a currants need (the board's own, features/street-jobs-feature.js). */
+export const CURRANTS_ICON = 'assets/sprites/street-jobs/pile_of_currants.png';
+
+const article = (word) => (/^[aeiou]/i.test(word) ? 'an' : 'a');
+const upper = (s) => (s ? s[0].toUpperCase() + s.slice(1) : s);
+
+/**
+ * Ticket 81 (Friendly, 2026-11-06: "7 more units of work: clear with a Pick (Mining IV)" was a hard
+ * read): the task first, what is left at the end. "Clear with a Pick (Mining IV) · 7 units",
+ * "Contribute Planks · 12 more", "Contribute currants · 400 more".
+ */
 export function needLine(r, labels = {}) {
   const left = Math.max(0, whole(r.need) - whole(r.got));
+  const n = left.toLocaleString('en-US');
   const item = labels.item || ((cls) => String(cls || '').replace(/_/g, ' '));
-  if (r.type === 'currants') return `${left.toLocaleString('en-US')} more currant${left === 1 ? '' : 's'}`;
+  if (r.type === 'currants') return `Contribute currants · ${n} more`;
   if (r.type === 'work') {
     const tool = item(r.classIds?.[0] || r.classId, 1);
     const skill = r.skill && labels.skill ? ` (${labels.skill(r.skill)})` : '';
-    const a = /^[aeiou]/i.test(tool) ? 'an' : 'a';
-    const verb = r.verb ? `${r.verb} with ${a} ${tool}` : `with ${a} ${tool}`;
-    return `${left.toLocaleString('en-US')} more unit${left === 1 ? '' : 's'} of work: ${verb}${skill}`;
+    const task = r.verb ? `${upper(r.verb)} with ${article(tool)} ${tool}` : `Work with ${article(tool)} ${tool}`;
+    return `${task}${skill} · ${n} unit${left === 1 ? '' : 's'}`;
   }
-  return `${left.toLocaleString('en-US')} more ${item(r.classId, left)}`;
+  return `Contribute ${item(r.classId, left)} · ${n} more`;
+}
+
+/**
+ * Whether you can do a need now, by the board's own rules: work takes a tool in your pack that
+ * still works and the skill (js/street-jobs.js workGear, workCheck's rule); items and currants
+ * take what you carry (the board's Add and Give put in the lesser of what you have and what is
+ * left). Energy is left out, as the board's Hire a hand leaves it out: it comes back.
+ * can: 'yes' (all of it), 'some' (items or currants: some of it), 'no', or '' without a ctx.
+ * @param {object} r a phaseRequirements row
+ * @param {{ inv?: Record<string, number>, learned?: string[], toolOk?: Function, currants?: number, have?: (cls: string) => number }|null} ctx
+ */
+export function needCan(r, ctx, labels = {}) {
+  if (!ctx) return { can: '', mark: '' };
+  const left = Math.max(0, whole(r.need) - whole(r.got));
+  const item = labels.item || ((cls) => String(cls || '').replace(/_/g, ' '));
+  if (r.type === 'work') {
+    const gear = workGear(r, ctx);
+    const missing = [];
+    if (!gear.tool) {
+      const tool = item(gear.tools[0], 1);
+      missing.push(gear.held.length ? `a working ${tool}` : `${article(tool)} ${tool}`);
+    }
+    if (gear.missingSkill) missing.push(labels.skill ? labels.skill(r.skill) : String(r.skill));
+    return missing.length ? { can: 'no', mark: `You need ${missing.join(' and ')}` } : { can: 'yes', mark: PROJECTS_TEXT.ready };
+  }
+  const have = r.type === 'currants' ? whole(ctx.currants) : whole(ctx.have ? ctx.have(r.classId) : ctx.inv?.[r.classId]);
+  if (!have) return { can: 'no', mark: PROJECTS_TEXT.haveNone };
+  return { can: have >= left ? 'yes' : 'some', mark: `You have ${have.toLocaleString('en-US')}` };
+}
+
+/** One need as the panel draws it: its words, its picture and count, and whether you can do it now. */
+export function needEntry(r, labels = {}, ctx = null) {
+  const left = Math.max(0, whole(r.need) - whole(r.got));
+  const icon = r.type === 'currants' ? CURRANTS_ICON : labels.icon ? labels.icon(r.type === 'work' ? r.classIds?.[0] || r.classId : r.classId) : '';
+  return { id: r.id, type: r.type, classId: r.classId, open: Boolean(r.open), left, text: needLine(r, labels), icon, ...needCan(r, ctx, labels) };
 }
 
 /**
@@ -129,7 +178,8 @@ export function needLine(r, labels = {}) {
  * @param {object} catalog street-jobs.json
  * @param {string} jobId
  * @param {object|null} row the project's row, or null when not known yet (online, before the list)
- * @param {{ now?: number, opts?: object, seenAt?: number, closed?: string[], labels?: object, known?: boolean }} o
+ * @param {{ now?: number, opts?: object, seenAt?: number, closed?: string[], labels?: object, known?: boolean, ctx?: object }} o
+ *   labels: { item(cls, n), skill(id), icon(cls) }; ctx: what you carry and know (needCan), or none
  */
 export function projectEntry(state, catalog, jobId, row, o = {}) {
   const job = jobDef(catalog, jobId);
@@ -176,7 +226,7 @@ export function projectEntry(state, catalog, jobId, row, o = {}) {
     phaseName: pc ? phaseName(job, pc.phase, pc.def) : '',
     progress: finished ? 1 : need ? got / need : 0,
     shares,
-    needs: reqs.filter((r) => !r.done).map((r) => ({ id: r.id, type: r.type, classId: r.classId, open: Boolean(r.open), left: Math.max(0, whole(r.need) - whole(r.got)), text: needLine(r, labels) })),
+    needs: reqs.filter((r) => !r.done).map((r) => needEntry(r, labels, o.ctx || null)),
     doneAt,
     isNew: finished && doneAt > 0 && doneAt > whole(o.seenAt),
   };

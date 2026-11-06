@@ -13,10 +13,11 @@
  *
  * Everything is set as text, never HTML. QA hooks: #projects-panel, #projects-list
  * [data-projects-list], cards [data-project=<job id>] with data-status and data-new,
- * [data-pj-act="route|teleport|map"], [data-pj-needs], #projects-meta, #projects-close.
+ * [data-pj-act="route|teleport|map"], [data-pj-needs] with rows [data-need=<requirement id>] and
+ * [data-can=yes|some|no] (ticket 81: whether you can do it now), #projects-meta, #projects-close.
  */
 
-import { PROJECTS_TEXT as T, shareLine, statusLine } from '../projects-tracker.js?v=f46bfff9';
+import { PROJECTS_TEXT as T, shareLine, statusLine } from '../projects-tracker.js?v=c508f396';
 
 export const PROJECTS_PANEL_ID = 'projects-panel';
 const ICON = 'assets/sprites/street-jobs/sign_stake.png';
@@ -66,6 +67,46 @@ export function buildProjectsPanel(doc, root) {
   return panel;
 }
 
+/** The marks beside "You can do this" and the rest; the words say it too (never colour alone). */
+const CAN_MARK = Object.freeze({ yes: '✓', some: '◐', no: '✕' });
+
+/** "Still needed (5)", and "Still needed (5) · 2 you can do now" once the panel knows your pack. */
+export function needsSummary(needs) {
+  const now = needs.filter((n) => n.open && (n.can === 'yes' || n.can === 'some')).length;
+  const known = needs.some((n) => n.can);
+  return `${T.needs} (${needs.length})${known && now ? ` · ${now} ${T.readySome}` : ''}`;
+}
+
+/**
+ * One need (ticket 81, Friendly 2026-11-06): the tool's or item's picture with what is left on it,
+ * the task first and the count at the end, then whether you can do it now (a step after the
+ * earlier ones says so, and still says what you would need for it).
+ */
+export function needRow(doc, n) {
+  const can = n.can || '';
+  const li = el(doc, 'li', { class: `pj-need${can ? ` is-${can}` : ''}${n.open ? '' : ' is-later'}`, dataset: { need: n.id, ...(can ? { can } : {}) } });
+  const pic = el(doc, 'span', { class: 'pj-need-pic', 'aria-hidden': 'true' });
+  if (n.icon) {
+    const img = el(doc, 'img', { src: n.icon, alt: '', width: 28, height: 28, loading: 'lazy' });
+    img.onerror = () => { img.style.visibility = 'hidden'; };
+    pic.append(img);
+  }
+  pic.append(el(doc, 'b', { class: 'pj-need-n' }, n.left.toLocaleString('en-US')));
+  const words = el(doc, 'span', { class: 'pj-need-words' });
+  words.append(el(doc, 'span', { class: 'pj-need-text' }, n.text));
+  const notes = el(doc, 'span', { class: 'pj-need-notes' });
+  if (!n.open) notes.append(el(doc, 'span', { class: 'pj-later' }, T.later));
+  // A later step you could already do needs no word; one you could not says what to get ready.
+  if (can && (n.open || can === 'no')) {
+    const mark = el(doc, 'span', { class: 'pj-need-can' });
+    mark.append(el(doc, 'span', { class: 'pj-need-mark', 'aria-hidden': 'true' }, CAN_MARK[can]), doc.createTextNode(` ${n.mark}`));
+    notes.append(mark);
+  }
+  if (notes.children.length) words.append(notes);
+  li.append(pic, words);
+  return li;
+}
+
 /**
  * One project's card.
  * @param {Document} doc
@@ -103,13 +144,9 @@ export function projectCard(doc, e, o = {}) {
         if (needs.open) o.openNeeds.add(e.jobId);
         else o.openNeeds.delete(e.jobId);
       });
-      needs.append(el(doc, 'summary', {}, `${T.needs} (${e.needs.length})`));
-      const ul = el(doc, 'ul');
-      for (const n of e.needs) {
-        const li = el(doc, 'li', { class: n.open ? '' : 'is-later', dataset: { need: n.id } }, n.text);
-        if (!n.open) li.append(el(doc, 'span', { class: 'pj-later' }, ` (${T.later})`));
-        ul.append(li);
-      }
+      needs.append(el(doc, 'summary', {}, needsSummary(e.needs)));
+      const ul = el(doc, 'ul', { class: 'pj-need-list' });
+      for (const n of e.needs) ul.append(needRow(doc, n));
       needs.append(ul);
       card.append(needs);
     } else if (e.status === 'active' || e.status === 'open') card.append(el(doc, 'p', { class: 'pj-note' }, T.nothingLeft));

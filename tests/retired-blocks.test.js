@@ -15,7 +15,7 @@ import { createInventory, countItem } from '../public/js/inventory.js?v=d82f3b00
 import { createToolConditionState, getToolCondition } from '../public/js/tools.js?v=6684b484';
 import { RECIPE_CATALOG, craftRecipe, loadRecipeCatalogFromFile } from '../public/js/making.js?v=82ce9d08';
 import { BUREAUCRACY_ITEMS, CARD_BADGE, buyDocument, clerkOffers } from '../public/js/bureaucracy.js?v=14ebcfda';
-import { phaseRequirements, normalizeStreetJobState, contributeItems } from '../public/js/street-jobs.js?v=eca98f2d';
+import { phaseRequirements, normalizeStreetJobState, contributeItems } from '../public/js/street-jobs.js?v=02a81cb3';
 import { loadRetiredItems, retireRequirement } from '../tools/retired-items.mjs';
 import { obtainableItems } from '../tools/job-obtainable.mjs';
 

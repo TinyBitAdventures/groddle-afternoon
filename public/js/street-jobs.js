@@ -473,6 +473,20 @@ export function contributeCurrants(state, catalog, jobId, amount, pc, now = Date
 }
 
 /**
+ * What a work requirement asks of you, held or not: the tools it takes, the ones in your pack, the
+ * first of those that still works (ctx.toolOk), and whether its skill is missing. workCheck's own
+ * rule, also read by the Projects panel (ticket 81) for a step that is not open yet.
+ * ctx: { inv, learned: string[], toolOk(classTsid, wear) -> bool }
+ */
+export function workGear(req, ctx = {}) {
+  const tools = req.classIds?.length ? req.classIds : [req.classId];
+  const held = tools.filter((tool) => whole(ctx.inv?.[tool]) > 0);
+  const tool = held.find((t) => (ctx.toolOk ? ctx.toolOk(t, req.wear) : true)) || null;
+  const missingSkill = req.skill && !(ctx.learned || []).includes(req.skill);
+  return { tools, held, tool, missingSkill };
+}
+
+/**
  * Can the player do one unit of this work requirement themselves?
  * ctx: { inv, learned: string[], energy, toolOk(classTsid, wear) -> bool }
  */
@@ -482,10 +496,7 @@ export function workCheck(state, catalog, jobId, rid, ctx = {}, now = Date.now()
   const req = phaseRequirements(state, catalog, jobId).find((r) => r.id === rid && r.type === 'work');
   if (!req) return { ok: false, msg: 'There is no such work.' };
   if (!req.open) return { ok: false, req, msg: req.done ? "There's no more work left to do." : 'Finish the earlier steps first.' };
-  const tools = req.classIds?.length ? req.classIds : [req.classId];
-  const held = tools.filter((tool) => whole(ctx.inv?.[tool]) > 0);
-  const tool = held.find((t) => (ctx.toolOk ? ctx.toolOk(t, req.wear) : true)) || null;
-  const missingSkill = req.skill && !(ctx.learned || []).includes(req.skill);
+  const { tools, held, tool, missingSkill } = workGear(req, ctx);
   const canHire = !tool || missingSkill;
   if (!held.length) return { ok: false, req, canHire, msg: `You need a ${tools[0].replace(/_/g, ' ')}.` };
   if (!tool) return { ok: false, req, canHire, msg: "You don't have the necessary working tool." };

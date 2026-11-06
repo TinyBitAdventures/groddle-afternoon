@@ -43,7 +43,7 @@
  * 'restore', job type 5) and finishes the restore in its `onDone` hook.
  */
 
-import { ITEM_CATALOG, addItem, countItem, ensureItem, itemIcon, removeItem } from '../inventory.js?v=d82f3b00';
+import { ITEM_CATALOG, addItem, countItem, ensureItem, itemIcon, packStamp, removeItem } from '../inventory.js?v=d82f3b00';
 import { canUseTool, useToolCondition } from '../tools.js?v=6684b484';
 import { ecologyForStreet } from '../street-ecology.js?v=d41e5e97';
 import { worldToScreen } from '../street-model.js?v=505d8990';
@@ -96,7 +96,7 @@ import {
   cancelJob,
   jobDivisor,
   upgradeOption,
-} from '../street-jobs.js?v=eca98f2d';
+} from '../street-jobs.js?v=02a81cb3';
 import { gainMetabolic, loseEnergy } from '../metabolics.js?v=8504134e';
 import { closuresInTheWay, holdNote, placeIndex, questHold, reachableStreets } from '../quest-reach.js?v=9a001ac1';
 import { getQuestCatalog as questCatalog } from '../content-catalogs.js?v=10b118dd';
@@ -120,7 +120,7 @@ import {
   rowFromServer,
   sharedSlice,
   topLine,
-} from '../street-jobs-mp.js?v=48a719ab';
+} from '../street-jobs-mp.js?v=c920dbb9';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 import { createMinnAccount } from '../minn-account.js?v=9544b0a0';
 import { normalizeGroups } from '../groups.js?v=4c4c8d76';
@@ -130,8 +130,8 @@ import { itemZ } from '../item-bands.js?v=e98b10bc';
 import { SIGN_ARMS, routeGraph } from '../map-routes.js?v=e0ac88c0';
 import { TELEPORTERS } from '../hidden-floors.js?v=d49b76df';
 import { WINTRY_PORTAL_TELEPORTERS } from '../wintry-portal.js?v=1437deda';
-import { PROJECTS_TEXT, contributedJobs, mineTotal, projectList } from '../projects-tracker.js?v=f46bfff9';
-import { PROJECTS_PANEL_ID, buildProjectsPanel, renderProjects } from '../ui/projects-sheet.js?v=18387022';
+import { PROJECTS_TEXT, contributedJobs, mineTotal, projectList } from '../projects-tracker.js?v=c508f396';
+import { PROJECTS_PANEL_ID, buildProjectsPanel, renderProjects } from '../ui/projects-sheet.js?v=0a47858c';
 import { SIDE_SHEET_IDS } from '../ui/panel-shell.js?v=e2abdf9e';
 
 export const STREET_JOBS_FEATURE_ID = 'street-jobs';
@@ -2007,7 +2007,7 @@ function publish(engine) {
  * Menu button, and a New mark in the panel until it closes (state.trackerSeen); nothing else is said.
  */
 const mineRows = new Map();
-const pj = { panel: null, btn: null, dot: null, open: false, sessionSeen: 0, sig: '', badge: -1, asked: 0, answered: false, openNeeds: new Set(), last: '' };
+const pj = { panel: null, btn: null, dot: null, open: false, sessionSeen: 0, sig: '', badge: -1, asked: 0, answered: false, openNeeds: new Set(), last: '', pack: '', packAt: 0 };
 
 /** The rows the panel reads: the save's in solo; online the server's list, then this page's live board rows. */
 function trackerRows() {
@@ -2029,6 +2029,13 @@ const streetMeta = (tsid) => {
   return { tsid: g, label: meta?.label || g, hubId: String(meta?.hubId || ''), hubName: meta?.hubName || '' };
 };
 
+/** What the Projects panel reads from you for its can-do marks (js/projects-tracker.js needCan). */
+function projectsCtx(engine) {
+  if (!engine?.inv) return null;
+  const ctx = workCtx(engine);
+  return { inv: ctx.inv, learned: ctx.learned || [], toolOk: ctx.toolOk, currants: engine.pc?.currants || 0, have: (cls) => countItem(engine.inv, cls) };
+}
+
 function trackerList(engine, seenAt) {
   if (!catalog) return { active: [], done: [], fresh: 0 };
   const rows = trackerRows();
@@ -2040,7 +2047,9 @@ function trackerList(engine, seenAt) {
     opts: opts(),
     seenAt,
     closed: closedStreets(state, catalog, opts()),
-    labels: { item: (cls, n) => itemLabel(cls, n), skill: skillLabel },
+    labels: { item: (cls, n) => itemLabel(cls, n), skill: skillLabel, icon: itemIcon },
+    // Ticket 81: each need says whether you can do it now (the board's rules: workCheck's tool and skill, what you carry).
+    ctx: projectsCtx(engine),
   });
   for (const e of [...list.active, ...list.done]) {
     if (known[e.jobId]?.partial) e.known = false;
@@ -2225,7 +2234,7 @@ function renderProjectsPanel(engine) {
   // Redraw only when something shown changed: a redraw would take the focus off a button.
   const sig = JSON.stringify([
     meta,
-    ...[...list.active, ...list.done].map((e) => [e.jobId, e.status, e.phase, Math.round(e.progress * 1000), e.known, e.isNew, e.doneAt ? agoMinute(e.doneAt) : 0, e.needs.map((n) => `${n.id}:${n.left}:${n.open}`).join(','), e.shares.map((s) => Math.round(s.share * 100)).join(','), JSON.stringify(teleport(e)), e.place]),
+    ...[...list.active, ...list.done].map((e) => [e.jobId, e.status, e.phase, Math.round(e.progress * 1000), e.known, e.isNew, e.doneAt ? agoMinute(e.doneAt) : 0, e.needs.map((n) => `${n.id}:${n.left}:${n.open}:${n.can}:${n.mark}`).join(','), e.shares.map((s) => Math.round(s.share * 100)).join(','), JSON.stringify(teleport(e)), e.place]),
   ]);
   if (sig !== pj.sig) {
     pj.sig = sig;
@@ -2235,6 +2244,20 @@ function renderProjectsPanel(engine) {
   engine.setData?.('projectsCount', `${list.active.length}/${list.done.length}`);
   engine.setData?.('projectsNewShown', String(list.fresh));
   engine.setData?.('projectsSource', mpMode ? (pj.answered ? 'server' : 'local') : 'solo');
+}
+
+/**
+ * Ticket 81: the open panel follows your pack and skills (its can-do marks), as the board follows
+ * "you have N" (inventory.js packStamp). Checked once a second; the panel redraws only when what it
+ * shows changed (renderProjectsPanel's signature).
+ */
+function tickProjectsPack(engine, now) {
+  if (!pj.open || now - (pj.packAt || 0) < 1000) return;
+  pj.packAt = now;
+  const stamp = `${packStamp(engine.inv, { currants: engine.pc?.currants }, engine.toolState)}|${(engine.learnedSkills || []).length}`;
+  if (stamp === pj.pack) return;
+  pj.pack = stamp;
+  renderProjectsPanel(engine);
 }
 
 /** Minutes since a time, for the redraw check ("5 min ago" moves on). */
@@ -2382,6 +2405,7 @@ export const streetJobsFeature = {
       if (b.barricadeTag && !b.destroyed) b.barricadeTag.visible = Number.isFinite(px) && Math.abs(px - b.x) < 160;
     }
     tickWork(engine, now);
+    tickProjectsPack(engine, now);
     tickReload(engine);
     autoplayStep(engine, now);
     if (board && now - (board.platedAt || 0) > 5000) {

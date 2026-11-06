@@ -10,22 +10,25 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { normalizeStreetJobState, contributeCurrants, contributeItems, settlePhase, phaseBaseCost, phaseRequirements } from '../public/js/street-jobs.js?v=eca98f2d';
-import { rowFromServer } from '../public/js/street-jobs-mp.js?v=48a719ab';
+import { normalizeStreetJobState, contributeCurrants, contributeItems, settlePhase, phaseBaseCost, phaseRequirements, workCheck, workGear } from '../public/js/street-jobs.js?v=02a81cb3';
+import { rowFromServer } from '../public/js/street-jobs-mp.js?v=c920dbb9';
 import {
   PROJECTS_TEXT,
   agoWords,
   boardStreets,
   contributedJobs,
   mineTotal,
+  CURRANTS_ICON,
+  needCan,
+  needEntry,
   needLine,
   projectEntry,
   projectList,
   projectPlace,
   shareLine,
   statusLine,
-} from '../public/js/projects-tracker.js?v=f46bfff9';
-import { buildProjectsPanel, projectCard, renderProjects } from '../public/js/ui/projects-sheet.js?v=18387022';
+} from '../public/js/projects-tracker.js?v=c508f396';
+import { buildProjectsPanel, needRow, needsSummary, projectCard, renderProjects } from '../public/js/ui/projects-sheet.js?v=0a47858c';
 import { MENU_ROWS } from '../public/js/ui/topbar.js?v=68704b2d';
 import { SIDE_SHEET_IDS } from '../public/js/ui/panel-shell.js?v=e2abdf9e';
 import { hotkeySections, hotkeyText } from '../public/js/client-hotkeys.js?v=51814cb2';
@@ -88,12 +91,12 @@ describe('Projects panel data (js/projects-tracker.js)', () => {
     // Every requirement not yet in, the later group marked.
     assert.ok(e.needs.length >= 5);
     const first = e.needs.find((n) => n.id === 'r915');
-    assert.equal(first.text, `${first.left.toLocaleString('en-US')} more currants`);
+    assert.equal(first.text, `Contribute currants · ${first.left.toLocaleString('en-US')} more`);
     assert.equal(first.open, true);
     // r922 is bucket 1's group 2: it opens once the three currant rows are in.
     const later = e.needs.find((n) => n.id === 'r922');
     assert.equal(later.open, false);
-    assert.match(later.text, /^\d+ more units of work: .+ with a quill/);
+    assert.match(later.text, /^[A-Z].* with a quill.* · \d+ units?$/);
     assert.equal(e.needs.find((n) => n.id === 'r919').open, true, 'bucket 2 runs beside bucket 1');
   });
 
@@ -145,10 +148,11 @@ describe('Projects panel data (js/projects-tracker.js)', () => {
     assert.ok(boardStreets(catalog).get(VIA).includes('GA5157TDPC42IGK'));
     assert.equal(projectPlace(catalog, VIA), 'GA5157TDPC42IGK');
     assert.equal(projectPlace(catalog, VIA, { done: true }), catalog.jobs[VIA].street);
-    assert.equal(needLine({ type: 'item', classId: 'plank', need: 10, got: 9 }, { item: (c, n) => (n === 1 ? 'Plank' : 'Planks') }), '1 more Plank');
-    assert.equal(needLine({ type: 'currants', need: 1500, got: 0 }), '1,500 more currants');
-    assert.equal(needLine({ type: 'work', classId: 'awesome_pot', verb: 'bang on', need: 2, got: 0 }, { item: () => 'Awesome Pot' }), '2 more units of work: bang on with an Awesome Pot');
-    assert.equal(needLine({ type: 'work', classId: 'hatchet', verb: 'chop', skill: 'woodworking_1', need: 3, got: 1 }, { item: () => 'Hatchet', skill: () => 'Woodworking I' }), '2 more units of work: chop with a Hatchet (Woodworking I)');
+    assert.equal(needLine({ type: 'item', classId: 'plank', need: 10, got: 9 }, { item: (c, n) => (n === 1 ? 'Plank' : 'Planks') }), 'Contribute Plank · 1 more');
+    assert.equal(needLine({ type: 'item', classId: 'plank', need: 20, got: 4 }, { item: (c, n) => (n === 1 ? 'Plank' : 'Planks') }), 'Contribute Planks · 16 more');
+    assert.equal(needLine({ type: 'currants', need: 1500, got: 0 }), 'Contribute currants · 1,500 more');
+    assert.equal(needLine({ type: 'work', classId: 'awesome_pot', verb: 'bang on', need: 2, got: 0 }, { item: () => 'Awesome Pot' }), 'Bang on with an Awesome Pot · 2 units');
+    assert.equal(needLine({ type: 'work', classId: 'hatchet', verb: 'chop', skill: 'woodworking_1', need: 3, got: 2 }, { item: () => 'Hatchet', skill: () => 'Woodworking I' }), 'Chop with a Hatchet (Woodworking I) · 1 unit');
     assert.equal(agoWords(NOW - 3 * 3600_000, NOW), '3 h ago');
     assert.equal(agoWords(NOW - 86_400_000, NOW), 'yesterday');
     assert.equal(agoWords(0, NOW), '');
@@ -365,6 +369,142 @@ describe('Projects panel wiring', () => {
     // The seen time persists in the board's slice.
     assert.equal(normalizeStreetJobState({ trackerSeen: 5 }).trackerSeen, 5);
     assert.equal(normalizeStreetJobState({}).trackerSeen, null);
+  });
+});
+
+describe('ticket 81 (Friendly, 2026-11-06): each need reads task first, with its picture and whether you can do it', () => {
+  const PALSA = '165'; // Build Palsa Mosch (Shimla Mirch): Friendly's five work rows
+  const ROMAN = ['', 'I', 'II', 'III', 'IV', 'V'];
+  const NAMES = { mining: 'Mining', light_green_thumb: 'Light Green Thumb', soil_appreciation: 'Soil Appreciation', refining: 'Refining' };
+  const ITEMS = { pick: 'Pick', shovel: 'Shovel', hoe: 'Hoe', scraper: 'Scraper', watering_can: 'Watering Can', ore_grinder: 'Grinder', peat: 'Peat', plank: ['Plank', 'Planks'] };
+  const labels = {
+    item: (c, n = 1) => { const x = ITEMS[c]; return Array.isArray(x) ? x[n === 1 ? 0 : 1] : x || c; },
+    skill: (id) => { const m = /^(.*)_(\d+)$/.exec(id); return `${NAMES[m[1]]} ${ROMAN[Number(m[2])]}`; },
+    icon: (c) => `assets/sprites/icons/${c}.png`,
+  };
+  /** Palsa Mosch with its first items in, so bucket 1's work is open and bucket 2's waits on its items. */
+  function palsa() {
+    const state = normalizeStreetJobState({ initialized: true });
+    const inv = { dullite: 99, earth: 99, plank: 99 };
+    for (const [c, n] of Object.entries({ dullite: 12, earth: 15, plank: 10 })) assert.equal(contributeItems(state, catalog, PALSA, c, n, inv, NOW - 5000).ok, true);
+    return state;
+  }
+
+  it('the lines Friendly quoted now start with the task and end with the count', () => {
+    const state = palsa();
+    const e = projectEntry(state, catalog, PALSA, state.jobs[PALSA], { now: NOW, labels });
+    const work = e.needs.filter((n) => n.type === 'work').map((n) => n.text);
+    for (const line of [
+      'Clear with a Pick (Mining IV) · 7 units',
+      'Level with a Hoe (Soil Appreciation V) · 11 units',
+      'Scrape with a Scraper (Mining III) · 8 units',
+      'Soak with a Watering Can (Soil Appreciation IV) · 9 units',
+      'Crush with a Grinder (Refining II) · 10 units',
+    ]) assert.ok(work.includes(line), `${line} in ${work.join(' | ')}`);
+    assert.ok(e.needs.some((n) => n.text === 'Contribute Peat · 9 more'), e.needs.map((n) => n.text).join(' | '));
+    // Each need has its picture and what is left (the count on the picture), and no mark without a pack to read.
+    const pick = e.needs.find((n) => n.text.startsWith('Clear'));
+    assert.equal(pick.icon, 'assets/sprites/icons/pick.png');
+    assert.equal(pick.left, 7);
+    assert.equal(pick.can, '');
+    assert.equal(e.needs.find((n) => n.type === 'item').icon.startsWith('assets/sprites/icons/'), true);
+  });
+
+  it('work: the tool in your pack that still works and the skill, as workCheck rules', () => {
+    const state = palsa();
+    const req = phaseRequirements(state, catalog, PALSA).find((r) => r.verb === 'clear');
+    const ready = { inv: { pick: 1 }, learned: ['mining_4'], toolOk: () => true };
+    assert.deepEqual(needCan(req, ready, labels), { can: 'yes', mark: PROJECTS_TEXT.ready });
+    assert.deepEqual(needCan(req, { inv: {}, learned: ['mining_4'] }, labels), { can: 'no', mark: 'You need a Pick' });
+    assert.deepEqual(needCan(req, { inv: { pick: 1 }, learned: [] }, labels), { can: 'no', mark: 'You need Mining IV' });
+    assert.deepEqual(needCan(req, { inv: {}, learned: [] }, labels), { can: 'no', mark: 'You need a Pick and Mining IV' });
+    assert.deepEqual(needCan(req, { inv: { pick: 1 }, learned: ['mining_4'], toolOk: () => false }, labels), { can: 'no', mark: 'You need a working Pick' });
+    assert.deepEqual(needCan({ type: 'work', classId: 'ore_grinder', need: 1, got: 0 }, { inv: {} }, labels), { can: 'no', mark: 'You need a Grinder' });
+    // The same answer as the board's Work button for an open step (energy aside, as Hire a hand leaves it out).
+    for (const [ctx, ok] of [[ready, true], [{ inv: {}, learned: ['mining_4'] }, false], [{ inv: { pick: 1 }, learned: [] }, false], [{ ...ready, toolOk: () => false }, false]]) {
+      assert.equal(workCheck(state, catalog, PALSA, req.id, { ...ctx, energy: Infinity }, NOW).ok, ok);
+      assert.equal(needCan(req, ctx, labels).can === 'yes', ok);
+    }
+    // workCheck reads the same gear (its messages are unchanged).
+    assert.deepEqual(workGear(req, { inv: { pick: 2 }, learned: [] }), { tools: ['pick'], held: ['pick'], tool: 'pick', missingSkill: true });
+    assert.equal(workCheck(state, catalog, PALSA, req.id, { inv: {}, learned: [] }, NOW).msg, 'You need a pick.');
+    assert.equal(workCheck(state, catalog, PALSA, req.id, { inv: { pick: 1 }, learned: [] }, NOW).msg, 'You need the skill this work asks for.');
+  });
+
+  it('items and currants: what you carry against what is left', () => {
+    const r = { type: 'item', classId: 'plank', need: 20, got: 4 };
+    assert.deepEqual(needCan(r, { inv: { plank: 16 } }, labels), { can: 'yes', mark: 'You have 16' });
+    assert.deepEqual(needCan(r, { inv: { plank: 3 } }, labels), { can: 'some', mark: 'You have 3' });
+    assert.deepEqual(needCan(r, { inv: {} }, labels), { can: 'no', mark: PROJECTS_TEXT.haveNone });
+    assert.deepEqual(needCan(r, { inv: {}, have: (c) => (c === 'plank' ? 40 : 0) }, labels), { can: 'yes', mark: 'You have 40' });
+    const cur = { type: 'currants', need: 1500, got: 0 };
+    assert.deepEqual(needCan(cur, { currants: 2000 }, labels), { can: 'yes', mark: 'You have 2,000' });
+    assert.deepEqual(needCan(cur, { currants: 10 }, labels), { can: 'some', mark: 'You have 10' });
+    assert.equal(needEntry(cur, labels, { currants: 0 }).icon, CURRANTS_ICON);
+    assert.equal(needCan(cur, null, labels).can, '');
+  });
+
+  it('projectEntry and projectList carry the marks when given your pack', () => {
+    const state = palsa();
+    const ctx = { inv: { pick: 1, hoe: 1, peat: 3 }, learned: ['mining_4', 'mining_3'], toolOk: () => true };
+    const e = projectList(state, catalog, state.jobs, { now: NOW, labels, ctx }).active.find((x) => x.jobId === PALSA);
+    const by = (start) => e.needs.find((n) => n.text.startsWith(start));
+    assert.deepEqual([by('Clear').can, by('Clear').open], ['yes', true]);
+    assert.deepEqual([by('Level').can, by('Level').mark], ['no', 'You need Soil Appreciation V']);
+    assert.deepEqual([by('Dig').can, by('Dig').mark], ['no', 'You need a Shovel and Light Green Thumb III']);
+    assert.deepEqual([by('Scrape').can, by('Scrape').open], ['no', false], 'a later step still says what it would need');
+    assert.deepEqual([by('Contribute Peat').can, by('Contribute Peat').mark], ['some', 'You have 3']);
+  });
+
+  it('the panel draws each need: picture and count, the words, and the mark in words and a sign', () => {
+    const doc = fakeDoc();
+    const row = (n) => needRow(doc, { id: 'r1', type: 'work', open: true, left: 7, icon: 'assets/sprites/icons/pick.png', text: 'Clear with a Pick (Mining IV) · 7 units', can: 'yes', mark: PROJECTS_TEXT.ready, ...n });
+    const yes = row({});
+    assert.equal(yes.dataset.need, 'r1');
+    assert.equal(yes.dataset.can, 'yes');
+    assert.match(yes.className, /\bpj-need\b.*\bis-yes\b/);
+    const pic = yes.all((n) => /pj-need-pic/.test(n.className))[0];
+    assert.equal(pic.getAttribute('aria-hidden'), 'true');
+    assert.equal(pic.all((n) => n.tagName === 'IMG')[0].getAttribute('src'), 'assets/sprites/icons/pick.png');
+    assert.equal(pic.all((n) => /pj-need-n/.test(n.className))[0].textContent, '7');
+    assert.equal(yes.all((n) => /pj-need-text/.test(n.className))[0].textContent, 'Clear with a Pick (Mining IV) · 7 units');
+    assert.match(yes.all((n) => /pj-need-can/.test(n.className))[0].textContent, /^✓ You can do this$/);
+    assert.match(row({ can: 'no', mark: 'You need Mining IV' }).textContent, /✕ You need Mining IV/);
+    assert.match(row({ can: 'some', mark: 'You have 3' }).textContent, /◐ You have 3/);
+    // A later step: says it opens later; it names what you lack, and says nothing more when you have it.
+    const laterNo = row({ open: false, can: 'no', mark: 'You need a Scraper' });
+    assert.match(laterNo.className, /is-later/);
+    assert.match(laterNo.textContent, /Opens after the earlier steps.*You need a Scraper/);
+    const laterYes = row({ open: false });
+    assert.match(laterYes.textContent, /Opens after the earlier steps/);
+    assert.doesNotMatch(laterYes.textContent, /You can do this/);
+    // No pack read (no ctx): no mark at all.
+    const bare = row({ can: '', mark: '' });
+    assert.equal(bare.dataset.can, undefined);
+    assert.equal(bare.all((n) => /pj-need-can/.test(n.className)).length, 0);
+    assert.equal(needsSummary([{ open: true, can: 'yes' }, { open: true, can: 'some' }, { open: true, can: 'no' }, { open: false, can: 'yes' }]), 'Still needed (4) · 2 you can do now');
+    assert.equal(needsSummary([{ open: true, can: 'no' }]), 'Still needed (1)');
+    assert.equal(needsSummary([{ open: true, can: '' }]), 'Still needed (1)');
+    for (const k of ['ready', 'readySome', 'haveNone', 'later']) assert.doesNotMatch(PROJECTS_TEXT[k], /—|Glitch/, k);
+  });
+
+  it('the game hands the panel your pack, skills and the item pictures, and follows the pack while it is open', () => {
+    const feature = read('public/js/features/street-jobs-feature.js');
+    const style = read('public/style.css');
+    const classic = read('public/css/classic.css');
+    assert.match(feature, /labels: \{ item: \(cls, n\) => itemLabel\(cls, n\), skill: skillLabel, icon: itemIcon \},\n\s+\/\/ Ticket 81[^\n]*\n\s+ctx: projectsCtx\(engine\),/);
+    assert.match(feature, /function projectsCtx\(engine\) \{[\s\S]{0,300}workCtx\(engine\)[\s\S]{0,300}have: \(cls\) => countItem\(engine\.inv, cls\)/);
+    assert.match(feature, /\$\{n\.id\}:\$\{n\.left\}:\$\{n\.open\}:\$\{n\.can\}:\$\{n\.mark\}/, 'a change of mark redraws the panel');
+    assert.match(feature, /tickWork\(engine, now\);\n\s+tickProjectsPack\(engine, now\);/);
+    assert.match(feature, /function tickProjectsPack\(engine, now\) \{[\s\S]{0,400}packStamp\(engine\.inv/);
+    for (const k of ['pj-need', 'pj-need-pic', 'pj-need-n', 'pj-need-text', 'pj-need-can']) {
+      assert.match(style, new RegExp(`\\[data-ui="modern"\\] #projects-list \\.${k}\\b`), `Modern ${k}`);
+      assert.match(classic, new RegExp(`:root\\[data-ui="classic"\\] #game-root #projects-list \\.${k}\\b`), `Classic ${k}`);
+    }
+    for (const can of ['yes', 'some', 'no']) {
+      assert.match(style, new RegExp(`\\.pj-need\\.is-${can} \\.pj-need-can \\{ color: var\\(--`));
+      assert.match(classic, new RegExp(`\\.pj-need\\.is-${can} \\.pj-need-can \\{ color: var\\(--c-classic-`));
+    }
   });
 });
 

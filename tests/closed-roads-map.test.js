@@ -9,7 +9,7 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { closedRoadText, closedStreets, initializeStreetJobs, normalizeStreetJobState, roadClosure } from '../public/js/street-jobs.js?v=eca98f2d';
+import { closedRoadText, closedStreets, initializeStreetJobs, normalizeStreetJobState, roadClosure } from '../public/js/street-jobs.js?v=02a81cb3';
 import { findRoute } from '../public/js/map-routes.js?v=e0ac88c0';
 
 const root = join(import.meta.dirname, '..');

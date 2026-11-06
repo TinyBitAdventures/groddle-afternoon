@@ -2040,8 +2040,22 @@
 :root[data-ui="classic"] #game-root #projects-list .pj-bar > i { display: block; height: 100%; background: var(--c-classic-wear); }
 :root[data-ui="classic"] #game-root #projects-list .pj-needs { margin: calc(6 * var(--cu)) 0 0; }
 :root[data-ui="classic"] #game-root #projects-list .pj-needs summary { color: var(--c-classic-link); font-weight: 700; cursor: pointer; }
-:root[data-ui="classic"] #game-root #projects-list .pj-needs ul { margin: calc(4 * var(--cu)) 0 0; padding-left: calc(18 * var(--cu)); }
-:root[data-ui="classic"] #game-root #projects-list .pj-needs li.is-later { color: var(--c-classic-offline); }
+:root[data-ui="classic"] #game-root #projects-list .pj-needs ul { margin: calc(4 * var(--cu)) 0 0; padding: 0; list-style: none; }
+/* Ticket 81: a need as the Quest Log draws a requirement: its icon with the count on it, the words, then whether you can do it now. */
+:root[data-ui="classic"] #game-root #projects-list .pj-need { display: flex; align-items: center; gap: calc(8 * var(--cu)); padding: calc(3 * var(--cu)) 0; }
+:root[data-ui="classic"] #game-root #projects-list .pj-need.is-later { color: var(--c-classic-offline); }
+:root[data-ui="classic"] #game-root #projects-list .pj-need-pic { position: relative; flex: none; width: calc(30 * var(--cu)); height: calc(30 * var(--cu)); }
+:root[data-ui="classic"] #game-root #projects-list .pj-need-pic img { display: block; width: 100%; height: 100%; object-fit: contain; }
+:root[data-ui="classic"] #game-root #projects-list .pj-need.is-later .pj-need-pic img { opacity: 0.5; }
+:root[data-ui="classic"] #game-root #projects-list .pj-need-n { position: absolute; right: calc(-3 * var(--cu)); bottom: calc(-2 * var(--cu)); min-width: calc(14 * var(--cu)); padding: 0 calc(3 * var(--cu)); border-radius: calc(7 * var(--cu)); background: var(--c-classic-title); color: var(--c-classic-panel); font: 800 calc(var(--fs-classic-count) * var(--cu-n, 1))/calc(14 * var(--cu)) var(--font-classic-title); text-align: center; }
+:root[data-ui="classic"] #game-root #projects-list .pj-need-words { display: flex; flex-direction: column; min-width: 0; }
+:root[data-ui="classic"] #game-root #projects-list .pj-need-text { color: var(--c-classic-title); font-weight: 700; }
+:root[data-ui="classic"] #game-root #projects-list .pj-need.is-later .pj-need-text { color: var(--c-classic-offline); }
+:root[data-ui="classic"] #game-root #projects-list .pj-need-notes { display: flex; flex-wrap: wrap; gap: 0 calc(8 * var(--cu)); font-size: calc(var(--fs-classic-body) * var(--cu-n, 1)); }
+:root[data-ui="classic"] #game-root #projects-list .pj-need-can { font-weight: 700; }
+:root[data-ui="classic"] #game-root #projects-list .pj-need.is-yes .pj-need-can { color: var(--c-classic-wear); }
+:root[data-ui="classic"] #game-root #projects-list .pj-need.is-some .pj-need-can { color: var(--c-classic-text); }
+:root[data-ui="classic"] #game-root #projects-list .pj-need.is-no .pj-need-can { color: var(--c-classic-unread); }
 :root[data-ui="classic"] #game-root #projects-list .pj-acts { display: flex; flex-wrap: wrap; gap: calc(8 * var(--cu)); margin-top: calc(8 * var(--cu)); }
 :root[data-ui="classic"] #game-root #projects-list .pj-acts .content-action-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 :root[data-ui="classic"] #game-root #projects-list .pj-empty { margin: 0; padding: calc(10 * var(--cu)) 0; color: var(--c-classic-offline); }
