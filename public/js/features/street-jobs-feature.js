@@ -933,7 +933,14 @@ function startWork(engine, jobId, rid, maxUnits = Infinity) {
   return true;
 }
 
-function stopWork(engine, reason) {
+/**
+ * Stop the work. `left` is what the requirement still needs after the last unit when the caller
+ * knows it (the server's project_worked, applyWorkUnit's answer); else the board's copy is read.
+ * Report 111: online the server answers project_worked before its row (projects.go 993 then 996),
+ * so the copy had not counted the last unit yet and the bubble said "2 of the 3" for a need of 2.
+ * Glitch counted the unit before it spoke (items/include/jobs.js 453).
+ */
+function stopWork(engine, reason, left = null) {
   if (!work) return;
   const w = work;
   work = null;
@@ -942,8 +949,9 @@ function stopWork(engine, reason) {
   const req = phaseRequirements(state, catalog, w.jobId).find((r) => r.id === w.rid);
   if (reason) engine.prompt({ kicker: 'Street Project', title: 'Work stopped', text: reason });
   const sayTo = external.get(w.jobId)?.target?.() || board?.target;
-  if (req && sayTo && w.units) {
-    const remaining = req.need - req.got;
+  const known = Number.isFinite(left);
+  if ((req || known) && sayTo && w.units) {
+    const remaining = known ? Math.max(0, left) : Math.max(0, req.need - req.got);
     engine.say(
       sayTo,
       `Thanks! You contributed ${w.units} units of the ${w.units + remaining} we need right now. It took ${(w.units * WORK_UNIT_MS) / 1000} seconds and used ${w.energy} energy.`,
@@ -986,12 +994,12 @@ function tickWork(engine, now) {
   drawPlate(engine);
   if (res.newPhase) for (const badge of contributionBadgesReached(res.distinctPhases)) engine.grantAchievement(badge);
   if (res.phaseReady) {
-    stopWork(engine, '');
+    stopWork(engine, '', res.left);
     finishPhase(engine, jobId);
     return;
   }
   if (res.left <= 0 || work.units >= work.maxUnits) {
-    stopWork(engine, '');
+    stopWork(engine, '', res.left);
     return;
   }
   if (panel && !panel.hidden) renderPanel(engine);
@@ -1789,7 +1797,7 @@ function mpWorked(engine, msg) {
   engine.updateHud();
   drawPlate(engine);
   if (n0(msg.left) <= 0 || work.units >= work.maxUnits) {
-    stopWork(engine, '');
+    stopWork(engine, '', n0(msg.left));
     return;
   }
   if (panel && !panel.hidden) renderPanel(engine);

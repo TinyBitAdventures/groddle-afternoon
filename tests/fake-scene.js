@@ -2,7 +2,7 @@
  * A fake Pixi and page for running a scene's real drawing code in Node (the visited home street,
  * its Butler and signpost): display objects keep children, parent, destroyed and x/y; any other
  * call or read is a no-op that returns itself (never a thenable, 0 as a number). Canvases hand
- * back the same no-op context. Used by visitor-butler-leaves and home-signpost-after-visit.
+ * back the same no-op context. Used by visitor-butler-leaves, home-signpost-after-visit and street-project-work-bubble.
  */
 export const noop = () => chain;
 export const chain = new Proxy(function chainFn() {}, {
@@ -80,10 +80,26 @@ export class FakeEl {
   }
   setAttribute(k, v) { this.attrs[k] = String(v); if (k === 'hidden') this.hidden = true; }
   append(...kids) { this.children.push(...kids); }
+  appendChild(kid) { this.children.push(kid); return kid; }
+  prepend(...kids) { this.children.unshift(...kids); }
+  removeAttribute(k) { delete this.attrs[k]; }
+  getAttribute(k) { return this.attrs[k] ?? null; }
+  closest() { return null; }
+  contains() { return false; }
   insertBefore(kid) { this.children.push(kid); }
   replaceChildren(...kids) { this.children = kids; }
   addEventListener(type, fn) { (this.listeners[type] ||= []).push(fn); }
-  querySelector() { return null; }
+  /** A selector on an element made from innerHTML (a panel's slots): one element per selector, made on first ask. */
+  querySelector(sel) {
+    this.slots ||= new Map();
+    if (!this.slots.has(sel)) this.slots.set(sel, new FakeEl('div'));
+    return this.slots.get(sel);
+  }
   querySelectorAll() { return []; }
   getContext() { return chain; }
+  remove() {}
+  focus() {}
+  /** This element and every element under it. */
+  all() { return [this, ...[...this.children, ...(this.slots?.values() || [])].flatMap((c) => (c instanceof FakeEl ? c.all() : []))]; }
+  fire(type, e = {}) { for (const fn of this.listeners[type] || []) fn({ preventDefault() {}, stopPropagation() {}, target: this, ...e }); }
 }
