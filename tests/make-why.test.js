@@ -10,7 +10,7 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { RECIPE_CATALOG, TOOL_CATALOG, canCraft, ensureMakingItems, listMakingTools, loadRecipeCatalogFromFile, makePanelIcon, recipeBlockedLine } from '../public/js/making.js?v=25c81118';
+import { RECIPE_CATALOG, TOOL_CATALOG, canCraft, ensureMakingItems, listMakingTools, loadRecipeCatalogFromFile, makeEmptyLine, makePanelIcon, recipeBlockedLine } from '../public/js/making.js?v=6da3230e';
 import { createInventory } from '../public/js/inventory.js?v=d82f3b00';
 import { createToolConditionState, setToolRemaining } from '../public/js/tools.js?v=689d6594';
 
@@ -136,5 +136,27 @@ describe('G554: a recipe opened from far down the list opens at its top', () => 
     const page = readFileSync(join(root, 'public/play/index.html'), 'utf8');
     assert.match(game, /const makeScroller = \(\) => document\.querySelector\('#make-panel \.ui-sheet-body'\);/);
     assert.match(page, /class="[^"]*\bui-sheet-body\b[^"]*"[^>]*>\s*<div id="make-list"/);
+  });
+});
+
+describe('report 129: Make says why "Can make now" is empty', () => {
+  const skill = (id, need) => ({ id, name: id, tool: 'frying_pan', inputs: [{ classTsid: 'cherry', qty: need }] });
+
+  it('counts the recipes the player knows and names the ingredients', () => {
+    const recipes = [skill('a', 2), skill('b', 3)];
+    assert.equal(makeEmptyLine({}, recipes, { requireSkill: false }), "You know 2 recipes here but don't have the ingredients.");
+    assert.equal(makeEmptyLine({}, recipes.slice(0, 1), { requireSkill: false }), "You know 1 recipe here but don't have the ingredients.");
+  });
+
+  it('does not blame the ingredients when they are there (a tool or energy stops it)', () => {
+    assert.equal(makeEmptyLine({ cherry: 9 }, [skill('a', 2)], { requireSkill: false }), "You know 1 recipe here but can't make any right now.");
+  });
+
+  it('has a button that turns the filter off', () => {
+    const game = readFileSync(new URL('../public/game.js', import.meta.url), 'utf8');
+    assert.match(game, /makeEmptyLine\(inv, everyRecipe, opts\)/);
+    assert.match(game, /data-make-show-all>Show them<\/button>/);
+    assert.match(game, /\[data-make-show-all\]'\)\?\.addEventListener\('click', \(\) => \{\s*makeCanMakeOnly = false;/);
+    assert.match(game, /let makeCanMakeOnly = true;/);
   });
 });

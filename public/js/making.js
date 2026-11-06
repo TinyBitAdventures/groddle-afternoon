@@ -1575,6 +1575,19 @@ export function craftRecipeBatch(inv, pc, recipeKey, qty = 1, opts = {}) {
  * @param {string} recipeKey
  * @param {{ learned?: string[], requireSkill?: boolean, requireTool?: boolean }} [opts]
  */
+/**
+ * Report 129: what the Make panel says when "Can make now" leaves nothing to show. Known recipes are
+ * those whose skills, quests and badges are met (the tool, its wear and the player's energy aside):
+ * how many, and whether it is the ingredients that stop them.
+ */
+export function makeEmptyLine(inv, recipes, opts = {}) {
+  const checks = recipes.map((r) => canCraft(inv, r, { ...opts, requireTool: false }));
+  const known = checks.filter((c) => c.ok || c.reason === 'ingredients').length;
+  if (!known) return "You don't know any of these recipes yet.";
+  const count = `You know ${known} ${known === 1 ? 'recipe' : 'recipes'} here`;
+  return checks.some((c) => c.ok) ? `${count} but can't make any right now.` : `${count} but don't have the ingredients.`;
+}
+
 export function canCraftAgain(inv, pc, recipeKey, opts = {}) {
   const recipe = RECIPE_CATALOG[recipeKey];
   if (!recipe) return false;

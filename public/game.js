@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=8af10970';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=127e0a3c';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=eb5b7cd8';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=061805c8';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -568,6 +568,7 @@ import {
   GRINDER_DROP_RISE,
   canCraftAgain,
   canCraft,
+  makeEmptyLine,
   ensureMakingItems,
   loadRecipeCatalog,
   RECIPE_CATALOG,
@@ -579,7 +580,7 @@ import {
   recipeTaskLimit,
   recipeToolInUse,
   pluralizeItem,
-} from './js/making.js?v=25c81118';
+} from './js/making.js?v=6da3230e';
 import { outputIconsHtml, outputsPhrase, recipeOutputRows } from './js/ui/recipe-outputs.js?v=73e19baf';
 import { MAKE_TOOL_SHEETS } from './js/make-tool-sheets.js?v=6f758e09';
 import { LOW_FUEL_LINE, craftSessionElapsedMs, isLowFuel, isMachineArt, machineArtHtml, packMakeState, playMachineHandOver, setMachineArtFrame } from './js/machine-art.js?v=ac629e13';
@@ -26848,6 +26849,7 @@ function renderMakePanel() {
   const canMakeEl = document.getElementById('make-canmake');
   if (canMakeEl && canMakeEl.checked !== makeCanMakeOnly) canMakeEl.checked = makeCanMakeOnly;
   const allRecipes = recipes.length;
+  const everyRecipe = makeCanMakeOnly ? recipes.slice() : recipes;
   if (makeCanMakeOnly) {
     for (let i = recipes.length - 1; i >= 0; i--) {
       const r = recipes[i];
@@ -26949,9 +26951,15 @@ function renderMakePanel() {
   list.hidden = false;
   list.innerHTML = '';
   if (!recipes.length) {
+    // Report 129: why, and a button that turns the filter off.
     list.innerHTML = makeCanMakeOnly && allRecipes
-      ? '<div class="make-empty">Nothing you can make with this right now. Turn off Can make now to see every recipe.</div>'
+      ? `<div class="make-empty"><p>${escapeHtml(makeEmptyLine(inv, everyRecipe, opts))}</p><button type="button" class="make-show-all" data-make-show-all>Show them</button></div>`
       : '<div class="make-empty">No recipes for this tool yet.</div>';
+    list.querySelector('[data-make-show-all]')?.addEventListener('click', () => {
+      makeCanMakeOnly = false;
+      renderMakePanel();
+      document.getElementById('make-canmake')?.focus({ preventScroll: true });
+    });
     return;
   }
 

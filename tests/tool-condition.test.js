@@ -25,7 +25,7 @@ import {
   mineRock,
   MINING_COSTS,
 } from '../public/js/mining.js?v=4532ff9b';
-import { craftRecipe } from '../public/js/making.js?v=25c81118';
+import { craftRecipe } from '../public/js/making.js?v=6da3230e';
 import { createPlayerSave, normalizePlayerSave } from '../public/js/player-save.js?v=3895831c';
 
 const here = path.dirname(fileURLToPath(import.meta.url));

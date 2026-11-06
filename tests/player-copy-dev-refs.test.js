@@ -24,7 +24,7 @@ import { join } from 'node:path';
 import { DENY, denied, gameModules, pageText, pagesUnder, pub, rel, scanModule, stripTags } from './player-copy-dev-refs.js';
 import { ITEM_CATALOG } from '../public/js/inventory.js?v=d82f3b00';
 import { ensureVendorItems, VENDOR_PROFILES } from '../public/js/vendor.js?v=70577b0b';
-import { ensureMakingItems } from '../public/js/making.js?v=25c81118';
+import { ensureMakingItems } from '../public/js/making.js?v=6da3230e';
 import { ensureMiningItems } from '../public/js/mining.js?v=4532ff9b';
 import { ensureGardenItems } from '../public/js/garden.js?v=74dd94d0';
 import { ensureMusicblockItems } from '../public/js/musicblocks.js?v=f5adbf0c';

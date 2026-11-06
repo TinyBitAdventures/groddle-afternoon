@@ -5846,6 +5846,19 @@ body.buff-purple-pulse::after {
   opacity: 0.7;
   font-size: var(--fs-base);
 }
+.make-empty:has(.make-show-all) { opacity: 1; }
+.make-empty p { margin: 0 0 var(--sp-5); }
+.make-show-all {
+  padding: var(--sp-3) var(--sp-7);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  background: var(--surface-card);
+  color: inherit;
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+}
+.make-show-all:hover { background: var(--surface-parchment); }
 .vendor-desc { font-size: var(--fs-md); opacity: 0.8; margin: var(--sp-3) 0 var(--sp-4); }
 .vendor-panel { --vendor-accent: var(--c-orange-68); }
 .vendor-panel[data-vendor="gardening"] { --vendor-accent: var(--c-lime-64); }

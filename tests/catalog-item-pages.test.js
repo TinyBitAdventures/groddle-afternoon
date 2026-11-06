@@ -22,7 +22,7 @@ const page = (id) => readFileSync(join(items, id, 'index.html'), 'utf8');
 const inRemake = data.items.filter((i) => i.status === 'source');
 const recipes = JSON.parse(readFileSync(join(pub, 'assets/content/recipes.json'), 'utf8'));
 const costs = await loadCosts(spike);
-const making = await import('../public/js/making.js?v=25c81118');
+const making = await import('../public/js/making.js?v=6da3230e');
 const vendor = await import('../public/js/vendor.js?v=70577b0b');
 const pack = await import('../public/js/pack-slots.js?v=c91d0ca3');
 const storage = await import('../public/js/home-storage.js?v=121f1897');
