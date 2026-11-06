@@ -714,7 +714,10 @@ function createSession(engine, client) {
     const w = where();
     if (target.classId === CLASS_SIGNPOST) {
       const arms = drawn.signpost?.neighbors || [];
-      const out = arms.map((n) => ({ id: `sign_go_${n.position}`, label: T.goVerb(n.name), tooltip: homeStreetName(n.name), enabled: n.id !== visit?.owner, reason: '' }));
+      // The arm to the home you stand on is locked. Report 114: ask where(), not the visit alone,
+      // which outlives the trip home (left() runs on a street clear, before the home's tsid is set).
+      const here = w === 'visit' ? visit.owner : 0;
+      const out = arms.map((n) => ({ id: `sign_go_${n.position}`, label: T.goVerb(n.name), tooltip: homeStreetName(n.name), enabled: n.id !== here, reason: '' }));
       if (w === 'street') out.push({ id: 'sign_edit', label: T.editVerb, tooltip: T.editTip, enabled: true, reason: '' });
       return out;
     }
