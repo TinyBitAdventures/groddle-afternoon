@@ -23,7 +23,9 @@
  * Layer fields: f (parallax: 0 sky, 1 world), items, or band ({ y, h, color,
  * alpha }: a full-width strip such as water or mist), tint, alpha.
  * Look fields: sky [top, bottom] or [top, middle, bottom], field, fieldDark,
- * soil (deco or null), soilColor, stars, layers, near, nearTint, trim.
+ * soil (deco or null), soilColor, stars, layers, near, nearTint, trim, and
+ * depth: how far the field reaches back from the walk line (default
+ * homes-feature FIELD_DEPTH, 130; the backdrop rises with it, #117).
  *
  * build.mjs records which header each composition follows. `missing` marks a
  * style whose own art is not in any CC0 set, so it is not offered.

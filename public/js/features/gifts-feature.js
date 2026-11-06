@@ -38,7 +38,7 @@ import { TOOL_CONDITION_CATALOG, leavingCopyTag, leavingToolWear, receiveToolCop
 import { unitRankAt } from '../pack-slots.js?v=c91d0ca3';
 import { createMinnAccount } from '../minn-account.js?v=7bc19312';
 // The same key as features/index.js: one module instance holds the carried notes.
-import { giveCarriedNote, takeCarriedNote, writtenCarriedNotes } from './street-furniture-feature.js?v=b0d7924e';
+import { giveCarriedNote, takeCarriedNote, writtenCarriedNotes } from './street-furniture-feature.js?v=3c5026ff';
 import {
   BOX_SLOTS,
   GIFT_BOX,

@@ -3,25 +3,31 @@ import { describe, it } from 'node:test';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import {
+  BACK_YARD_GROUND_Y,
+  FIELD_DEPTH,
   STREET_GROUND_Y,
   STREET_WORLD_H,
   cultivationNodes,
   furnitureStoreProfile,
   homesFeature,
   interiorLook,
+  landscapeGeometry,
   liftOldStreetRows,
   nodeKeyMap,
   rekeyNodes,
   rockClassFor,
   rockItems,
   soilKeyMap,
-} from '../public/js/features/homes-feature.js?v=343c5786';
+} from '../public/js/features/homes-feature.js?v=e0f31906';
 import { WALLPAPER_MAPS } from '../public/js/home-wallpaper-art.js?v=9f8473e6';
 import { HOME_TEXTURE_CONFIGS } from '../public/js/homes-catalog.js?v=7aa9beb0';
 import { canPlantBean } from '../public/js/patches.js?v=056bb6ae';
 import { TOWER_PART_CHOICES, TOWER_STYLES, composeTower, towerBounds } from '../public/js/home-tower.js?v=4daa0b96';
 import { MIN_GROUND_CLEARANCE, cameraTargetY, cameraWorldHeightForGround, yCamOffsetAnchor } from '../public/js/movement.js?v=b30f84eb';
 import { INTERIOR } from '../public/js/home-decor.js?v=5551be2e';
+import { EXTERIOR_STYLES, INTERIOR_STYLES, streetLook, yardLook } from '../public/js/home-styles.js?v=f591561f';
+import { gardenLayout, gardenStyle } from '../public/js/garden-view.js?v=05651e76';
+import { listCultivationClasses } from '../public/js/home-cultivation.js?v=ff17225a';
 
 const root = join(import.meta.dirname, '..', 'public');
 
@@ -237,5 +243,58 @@ describe('furniture making and buying', () => {
   it('stocks the Construction Tool and Bulb where catalog_stores.js sells them', () => {
     assert.match(stores, /"classTsid": "construction_tool",\s+"label": "Construction Tool",\s+"cost": 560/);
     assert.match(stores, /"classTsid": "bulb",\s+"label": "Bulb",\s+"cost": 56/);
+  });
+});
+
+describe('#117: garden beds stand on the field, not over the backdrop', () => {
+  const feature = readFileSync(join(import.meta.dirname, '../public/js/features/homes-feature.js'), 'utf8');
+  const gardens = listCultivationClasses().filter((def) => def.kind === 'garden');
+  /** A home garden's bed top in world y: spawnCultivations stands it on groundY + 2, and
+   * game.js spawnGarden puts the box's bottom there (top = y - box.y1, the bed from box.y0). */
+  const bedTop = (def, groundY) => {
+    const layout = gardenLayout({ cols: def.cols, rows: def.rows, style: gardenStyle({ gardenType: def.gardenType, rows: def.rows, home: true }) });
+    return Math.round(groundY + 2 - layout.box.y1) + layout.box.y0;
+  };
+  const places = [
+    ...EXTERIOR_STYLES.filter((row) => row.built).map((row) => ({ key: `street ${row.key}`, look: streetLook(row.key), groundY: STREET_GROUND_Y })),
+    ...INTERIOR_STYLES.filter((row) => row.built).map((row) => ({ key: `yard ${row.key}`, look: yardLook(row.key), groundY: BACK_YARD_GROUND_Y })),
+  ];
+
+  it('checks all six garden sizes on 36 streets and 34 back yards', () => {
+    assert.equal(gardens.length, 6);
+    assert.equal(places.length, 70);
+  });
+
+  it('every bed, the large herb garden included, lies inside the field with room behind it', () => {
+    for (const { key, look, groundY } of places) {
+      const { fieldTop, depth } = landscapeGeometry(look, groundY);
+      assert.ok(depth >= FIELD_DEPTH, key);
+      for (const def of gardens) {
+        const top = bedTop(def, groundY);
+        assert.ok(top - fieldTop >= 40, `${key} ${def.protoClass}: bed top ${top}, field top ${fieldTop}`);
+      }
+    }
+    // The large herb bed reaches 68 px above the walk line; the old 34 px field left it over the backdrop.
+    const large = gardens.find((def) => def.protoClass === 'proto_herb_garden_large');
+    assert.ok(STREET_GROUND_Y - bedTop(large, STREET_GROUND_Y) > 60);
+  });
+
+  it('the backdrop rises with the field, so what stood on its back edge still does', () => {
+    for (const { key, look, groundY } of places) {
+      const { fieldTop, rise } = landscapeGeometry(look, groundY);
+      const lift = groundY - 620;
+      assert.equal(586 + lift - rise, fieldTop, key);
+    }
+    assert.equal(landscapeGeometry({}, STREET_GROUND_Y).fieldTop, STREET_GROUND_Y - FIELD_DEPTH);
+    assert.equal(landscapeGeometry({ depth: 190 }, STREET_GROUND_Y).fieldTop, STREET_GROUND_Y - 190);
+  });
+
+  it('drawLandscape draws the field from that edge and raises layers but not pieces hanging from the top', () => {
+    assert.match(feature, /const \{ fieldTop, rise \} = landscapeGeometry\(style, groundY\);/);
+    assert.match(feature, /field\.rect\(-50, fieldTop, width \+ 100, groundY - fieldTop \+ 40\)/);
+    assert.match(feature, /item\.y \+ lift - \(item\.hang \|\| item\.flipY \? 0 : rise\)/);
+    assert.match(feature, /const by = layer\.band\.y \+ lift - rise;/);
+    // The test's bed geometry is the one the yard uses.
+    assert.match(feature, /engine\.spawnGarden\(\{\n\s+x: cultivationWorldX\(item, st\),\n\s+y: groundY \+ 2,/);
   });
 });

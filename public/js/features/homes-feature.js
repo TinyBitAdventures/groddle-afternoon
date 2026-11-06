@@ -1642,13 +1642,54 @@ function gradientTexture(PIXI, ...colors) {
   return PIXI.Texture.from(canvas);
 }
 
+/** The recipes' field: its back edge at y 586 on the old 620 px street (tools/home-styles/recipes.mjs). */
+const RECIPE_FIELD_TOP = 586;
+const RECIPE_FIELD_DEPTH = OLD_STREET_GROUND_Y - RECIPE_FIELD_TOP;
+/**
+ * How far the walkable field reaches back from the walk line, for a look
+ * without its own `depth` (#117). Every home street is a clone of a `*_high`
+ * template whose ground runs back to the tree line, and cultivations stand on
+ * the walk line in front of it (inc_cultivation.js cultivation_purchase puts
+ * the item at the x, y picked on the street's ground; GardenView.place stands
+ * the bed on that y). Measured on the archived home-street renders
+ * (research/wayback/raw/home-images/homestreets, a 1,000 px street at
+ * height/1000): the Groddle meadows and forests show about 110 to 150 px of
+ * field, the Uralia streets about 190. A large garden's bed reaches 68 px
+ * above the walk line (js/garden-view.js polherb_3 at 0.7), so the field must
+ * reach well past that or the bed's back row lies over the backdrop. The
+ * remake's camera shows less above the ground than the 2012 client's 600 px
+ * view, so a 190 px Uralia field pushed its trees off the top of the screen:
+ * every look keeps this depth unless its recipe sets its own.
+ */
+export const FIELD_DEPTH = 130;
+
+/** The field's depth for a look: its own `depth`, else FIELD_DEPTH. */
+export function fieldDepth(look) {
+  const depth = Number(look?.depth);
+  return Number.isFinite(depth) && depth > RECIPE_FIELD_DEPTH ? depth : FIELD_DEPTH;
+}
+
+/**
+ * Where a look's field starts (its back edge) over a walk line, and how far
+ * the backdrop rises with it: everything the recipe stood at the old field's
+ * back edge stands at the new one, so trees and hills keep their footing.
+ * Pieces drawn down from the top (`hang`, and the `flipY` stalactites of
+ * Canyon Cavern) stay where they hang.
+ */
+export function landscapeGeometry(look, groundY) {
+  const depth = fieldDepth(look);
+  return { depth, fieldTop: groundY - depth, rise: depth - RECIPE_FIELD_DEPTH };
+}
+
 /**
  * A style's landscape (js/home-styles.js looks): the sky, parallax layers, the
  * walkable field with its soil, and grass and plants along it. Item y values
- * are on the old 620 px street, moved down by `lift`. Returns the parallax
- * update for bgLayer.updateParallax.
+ * are on the old 620 px street, moved down by `lift` and up by the deeper
+ * field's rise (landscapeGeometry). Returns the parallax update for
+ * bgLayer.updateParallax.
  */
 function drawLandscape(engine, root, style, seed, { width, groundY, lift, skipNear = () => false }) {
+  const { fieldTop, rise } = landscapeGeometry(style, groundY);
   const { PIXI } = engine;
   const sky = new PIXI.Sprite(gradientTexture(PIXI, ...style.sky));
   sky.zIndex = -100;
@@ -1684,8 +1725,9 @@ function drawLandscape(engine, root, style, seed, { width, groundY, lift, skipNe
     const span = spanFor(layer.f);
     if (layer.band) {
       const band = new PIXI.Graphics();
-      band.rect(-200, layer.band.y + lift, span + 200, layer.band.h).fill({ color: layer.band.color, alpha: layer.band.alpha ?? 1 });
-      band.homeLayoutFills = [[-200, layer.band.y + lift, span + 200, layer.band.h, layer.band.color, layer.band.alpha ?? 1]];
+      const by = layer.band.y + lift - rise;
+      band.rect(-200, by, span + 200, layer.band.h).fill({ color: layer.band.color, alpha: layer.band.alpha ?? 1 });
+      band.homeLayoutFills = [[-200, by, span + 200, layer.band.h, layer.band.color, layer.band.alpha ?? 1]];
       lc.addChild(band);
     }
     for (const item of layer.items || []) {
@@ -1694,7 +1736,7 @@ function drawLandscape(engine, root, style, seed, { width, groundY, lift, skipNe
         const jx = item.jitter ? (hash01(`${seed}:${li}:${item.s}:${i}`) - 0.5) * item.jitter * 2 : 0;
         const row = pickAlt(item, `${seed}:${li}:${item.s}:${i}:alt`);
         if (row.tint == null && layer.tint != null) row.tint = layer.tint;
-        lc.addChild(decoSprite(PIXI, row, x + jx, item.y + lift, hash01(`${item.s}:${i}:flip`) > 0.5));
+        lc.addChild(decoSprite(PIXI, row, x + jx, item.y + lift - (item.hang || item.flipY ? 0 : rise), hash01(`${item.s}:${i}:flip`) > 0.5));
         i += 1;
       }
     }
@@ -1707,9 +1749,9 @@ function drawLandscape(engine, root, style, seed, { width, groundY, lift, skipNe
   // The walkable field and the soil cross-section below it.
   const field = new PIXI.Graphics();
   field.zIndex = -40;
-  field.rect(-50, 586 + lift, width + 100, OLD_STREET_GROUND_Y - 586 + 40).fill(style.field);
+  field.rect(-50, fieldTop, width + 100, groundY - fieldTop + 40).fill(style.field);
   field.rect(-50, groundY + 10, width + 100, 30).fill({ color: style.fieldDark, alpha: 0.5 });
-  field.homeLayoutFills = [[-50, 586 + lift, width + 100, OLD_STREET_GROUND_Y - 586 + 40, style.field, 1], [-50, groundY + 10, width + 100, 30, style.fieldDark, 0.5]];
+  field.homeLayoutFills = [[-50, fieldTop, width + 100, groundY - fieldTop + 40, style.field, 1], [-50, groundY + 10, width + 100, 30, style.fieldDark, 0.5]];
   root.addChild(field);
   const soilFill = new PIXI.Graphics();
   soilFill.zIndex = -39.5;
@@ -3219,13 +3261,15 @@ function stylePreviewEl(look) {
   box.style.background = `linear-gradient(${look.sky.map(hexColor).join(',')})`;
   const H = 64; // tile picture height in CSS px
   const k = H / 470; // about the street's height above the ground
-  const fieldPct = 18;
+  // The field as deep as the street draws it (landscapeGeometry), the decos standing at its back edge.
+  const { depth, rise } = landscapeGeometry(look, OLD_STREET_GROUND_Y);
+  const fieldPct = Math.round((depth * k * 100) / H);
   const layers = look.layers;
   layers.forEach((layer, li) => {
     if (layer.band) {
       box.append(el('span', {
         class: 'hs-band',
-        style: `bottom:${fieldPct + Math.max(0, (586 - layer.band.y - layer.band.h) * k / H * 100)}%;height:${Math.max(1, layer.band.h * k)}px;background:${hexColor(layer.band.color)};opacity:${layer.band.alpha ?? 1}`,
+        style: `bottom:${fieldPct + Math.max(0, (RECIPE_FIELD_TOP - layer.band.y - layer.band.h) * k / H * 100)}%;height:${Math.max(1, layer.band.h * k)}px;background:${hexColor(layer.band.color)};opacity:${layer.band.alpha ?? 1}`,
       }));
       return;
     }
@@ -3234,7 +3278,7 @@ function stylePreviewEl(look) {
     const tint = item.tint ?? layer.tint;
     const lum = tint == null ? 1 : (((tint >> 16) & 255) * 0.3 + ((tint >> 8) & 255) * 0.59 + (tint & 255) * 0.11) / 255;
     const h = Math.min(H * 1.2, item.h * item.scale * k);
-    const bottom = Math.max(0, (620 - item.y) * k);
+    const bottom = Math.max(0, (OLD_STREET_GROUND_Y - item.y + rise) * k);
     [0.22, 0.72].forEach((at, n) => {
       if (layers.length > 3 && li === 0 && n === 1) return;
       box.append(el('img', {
