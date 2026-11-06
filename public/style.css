@@ -6547,11 +6547,14 @@ body.buff-purple-pulse::after {
 .map-canvas[data-zoomed] { cursor: grab; }
 .map-canvas[data-map-dragging],
 .map-canvas[data-map-dragging] * { cursor: grabbing !important; }
-.hub-map-svg :is(.map-go-ring, .map-go-text, .map-you, .map-icon > *) {
+.hub-map-svg :is(.map-go-ring, .map-you, .map-icon > *) {
   transform-box: fill-box;
   transform-origin: center;
   transform: scale(var(--map-mark-k, 1));
 }
+/* Ticket 81 (Safari): a GO's word grows with its font size, anchored on its ring's centre (.map-go-text),
+   not by a fill-box scale: WebKit's box for SVG text is not the drawn word, so the scale's centre moved
+   off the ring and the word slid about as the map zoomed and panned. */
 .hub-map-svg .map-route-line { stroke-width: calc(8px * var(--map-line-k, 1)); }
 .hub-map-svg .map-route-under { stroke-width: calc(13px * var(--map-line-k, 1)); }
 .hub-map-svg .map-route-ants { stroke-width: calc(2px * var(--map-line-k, 1)); }
@@ -6682,7 +6685,7 @@ body.buff-purple-pulse::after {
 .map-hub-go:hover .map-go-ring { fill: var(--c-green-66); }
 .map-go-text {
   font-family: var(--font-ui);
-  font-size: var(--fs-xs);
+  font-size: calc(var(--fs-xs) * var(--map-mark-k, 1));
   font-weight: 800;
   fill: var(--text-inverse);
   pointer-events: none;

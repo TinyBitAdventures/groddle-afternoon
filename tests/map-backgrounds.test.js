@@ -16,7 +16,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { readThumbs, regionThumbs, repaints } from '../tools/map-backgrounds/build.mjs';
 import { HUB_MAP_BACKGROUNDS } from '../public/js/hub-map-backgrounds.js?v=4b87d823';
-import { buildHubMapView, PUBLIC_HUBS, renderHubMapSvg } from '../public/js/map-graph.js?v=197a67b3';
+import { buildHubMapView, PUBLIC_HUBS, renderHubMapSvg } from '../public/js/map-graph.js?v=e3224fa5';
 import { hubMapArtNote } from '../public/js/panel-copy.js?v=1d8de080';
 import { CHECKLIST } from '../tools/restoration/checklist.mjs';
 import { MAP_ART_NOTE } from '../tools/encyclopedia/streets.mjs';

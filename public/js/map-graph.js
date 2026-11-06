@@ -814,7 +814,8 @@ export function renderHubMapSvg(view) {
     parts.push(
       `<g class="map-hub-go" data-hub="${escapeXml(h.hubId)}" data-label="${escapeXml(h.label)}">` +
         `<circle class="map-go-ring" cx="${h.x}" cy="${h.y}" r="22"/>` +
-        `<text class="map-go-text" x="${h.x}" y="${h.y + 1}" text-anchor="middle" dominant-baseline="middle">GO</text>` +
+        // The word's nudge down is in em, so it counter-scales with the word (ticket 81: style.css .map-go-text).
+        `<text class="map-go-text" x="${h.x}" y="${h.y}" dy="0.09em" text-anchor="middle" dominant-baseline="middle">GO</text>` +
         `<text class="map-go-sub" x="${+goSignX(h, w).toFixed(1)}" y="${goLabelY(h, mapH)}" text-anchor="middle">${escapeXml(h.label)}</text>` +
         `</g>`
     );

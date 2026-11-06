@@ -202,7 +202,13 @@ describe('MAPZOOM: the wiring', () => {
     assert.match(style, /\.map-canvas \{ touch-action: none; user-select: none;/);
     assert.match(style, /\.map-seg\.travelable \{\n  stroke: var\(--c-yellow-91\);\n  stroke-width: calc\(7px \* var\(--map-line-k, 1\)\);/);
     assert.match(style, /\.map-label\.loaded \{\n[^}]*font-size: calc\(var\(--fs-xs\) \* var\(--map-text-k, 1\)\);/);
-    assert.match(style, /\.hub-map-svg :is\(\.map-go-ring, \.map-go-text, \.map-you, \.map-icon > \*\) \{\n  transform-box: fill-box;\n  transform-origin: center;\n  transform: scale\(var\(--map-mark-k, 1\)\);/);
+    assert.match(style, /\.hub-map-svg :is\(\.map-go-ring, \.map-you, \.map-icon > \*\) \{\n  transform-box: fill-box;\n  transform-origin: center;\n  transform: scale\(var\(--map-mark-k, 1\)\);/);
+    // Ticket 81 (Safari): GO's word counter-scales by its font size about its anchor, never by a fill-box transform.
+    const goText = style.match(/\n\.map-go-text \{[^}]*\}/)[0];
+    assert.match(goText, /font-size: calc\(var\(--fs-xs\) \* var\(--map-mark-k, 1\)\);/);
+    assert.doesNotMatch(goText, /transform/);
+    assert.ok(![...style.matchAll(/^[^{}\n]*\.map-go-text[^{}\n]*\{[^}]*transform/gm)].length, 'no rule scales the word');
+    assert.doesNotMatch(classic, /\.map-go-text[^{]*\{[^}]*(?:transform|font-size)/, 'Classic keeps the same word');
     assert.match(style, /\.hub-map-svg \.map-route-line \{ stroke-width: calc\(8px \* var\(--map-line-k, 1\)\); \}/);
     assert.match(style, /\.map-zoom-ctl \{\n  position: absolute;\n  right: var\(--sp-3\);\n  bottom: var\(--sp-3\);/);
     assert.match(classic, /#map-panel \.map-zoom-ctl > button \{ width: calc\(24 \* var\(--cu\)\);/);
@@ -325,6 +331,68 @@ describe('MAPZOOM: wheel, drag, click and buttons on a real hub (Chrome)', { ski
       if (Math.abs(Number(ink) - 2.5 / 3) > 1e-3) bad.push(`${skin}: text scale ${ink}`);
       await tab.click('#map-canvas .map-zoom-ctl [data-zoom="fit"]');
       if (!(await until(() => document.querySelector('#map-canvas svg').getAttribute('viewBox') === '0 0 760 460'))) bad.push(`${skin}: Fit gave ${await vb()}`);
+      await ctx.close();
+    }
+    assert.deepEqual(bad, []);
+  });
+
+  // Ticket 81 (Friendly, Safari): "while zooming/panning the GO text on the buttons moves around". The word
+  // is measured here in Chrome (Safari is not run on this machine): its middle on its ring's, and its
+  // size with the ring's, at fit and zoomed in, both skins.
+  it('GO stays on its ring at every zoom (both skins)', { timeout: 120_000 }, async () => {
+    const base = `http://127.0.0.1:${server.address().port}`;
+    const bad = [];
+    for (const skin of ['modern', 'classic']) {
+      const ctx = await chrome.browser.newContext({ viewport: { width: 1000, height: 700 } });
+      const tab = await ctx.newPage();
+      await tab.goto(`${base}/style.css`);
+      await tab.setContent(`<!doctype html><html data-ui="${skin}"><head><link rel="stylesheet" href="/style.css">${skin === 'classic' ? '<link rel="stylesheet" href="/css/classic.css">' : ''}
+<style>#game-root{position:relative;width:1000px;height:700px}#map-canvas{position:relative;width:912px;height:552px}</style></head>
+<body><div id="game-root"><div id="map-panel"><div class="map-card map-hub"><div id="map-canvas" class="map-canvas"></div></div></div></div></body></html>`, { waitUntil: 'load' });
+      const rows = await tab.evaluate(async () => {
+        const { buildHubMapView, renderHubMapSvg } = await import('/js/map-graph.js');
+        const { createMapZoom } = await import('/js/map-zoom.js');
+        const hub = await (await fetch('/assets/maps/hub-56-groddle-forest.json')).json();
+        const streets = (await (await fetch('/assets/streets/index.json')).json()).streets;
+        const canvas = document.getElementById('map-canvas');
+        canvas.innerHTML = renderHubMapSvg(buildHubMapView({ ...hub, hubId: '56' }, '', streets));
+        await document.fonts.ready;
+        const z = createMapZoom(canvas);
+        const svg = canvas.querySelector('svg');
+        z.attach(svg, '56');
+        const ring0 = svg.querySelector('g.map-hub-go circle.map-go-ring');
+        const at = { x: Number(ring0.getAttribute('cx')), y: Number(ring0.getAttribute('cy')) };
+        const out = [];
+        for (const zoom of [1, 1.5, 2, 3]) {
+          if (zoom > 1) z.focus(at.x, at.y, zoom, { animate: false });
+          await new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done)));
+          for (const g of svg.querySelectorAll('g.map-hub-go')) {
+            const ring = g.querySelector('.map-go-ring').getBoundingClientRect();
+            const word = g.querySelector('.map-go-text').getBoundingClientRect();
+            if (!ring.width || !word.width) continue;
+            out.push({
+              zoom: Math.round(z.view().zoom * 100) / 100,
+              hub: g.dataset.hub,
+              // The word's middle from the ring's, in ring sizes.
+              dx: ((word.left + word.width / 2) - (ring.left + ring.width / 2)) / ring.height,
+              dy: ((word.top + word.height / 2) - (ring.top + ring.height / 2)) / ring.height,
+              size: word.height / ring.height,
+              ring: ring.width,
+            });
+          }
+        }
+        return out;
+      });
+      const zooms = [...new Set(rows.map((r) => r.zoom))];
+      if (zooms.length < 4) bad.push(`${skin}: zoomed to ${zooms.join(', ')}`);
+      const spread = (key) => Math.max(...rows.map((r) => r[key])) - Math.min(...rows.map((r) => r[key]));
+      for (const r of rows) {
+        // On the ring's middle (its box takes in the line height and the small nudge down), at every zoom.
+        if (Math.abs(r.dx) > 0.03 || Math.abs(r.dy) > 0.06) bad.push(`${skin} ${r.zoom}x hub ${r.hub}: GO off by ${r.dx.toFixed(3)}, ${r.dy.toFixed(3)} of the ring`);
+      }
+      // It never moves against its ring as the map zooms, and grows and shrinks with it.
+      if (spread('dx') > 0.01 || spread('dy') > 0.01) bad.push(`${skin}: GO moved against its ring by ${spread('dx').toFixed(3)}, ${spread('dy').toFixed(3)}`);
+      if (spread('size') > 0.03) bad.push(`${skin}: GO's size against its ring ran ${Math.min(...rows.map((r) => r.size)).toFixed(3)} to ${Math.max(...rows.map((r) => r.size)).toFixed(3)}`);
       await ctx.close();
     }
     assert.deepEqual(bad, []);
