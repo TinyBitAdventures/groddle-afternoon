@@ -689,7 +689,8 @@ export function smashButton(classTsid, { hasPouch = false } = {}) {
 /**
  * The handler 64-114: each element goes into the pouch up to what it can
  * hold (createItemFromSource with destroy_remainder); the rest is reported
- * destroyed. `room` = { element_green, element_blue, element_shiny }.
+ * destroyed. `room` is how many fit: room(cls, n), asked green, blue, shiny in
+ * the handler's order, or { element_green, element_blue, element_shiny }.
  */
 export function smashTrophy(classTsid, room = {}) {
   const def = trophySmash(classTsid);
@@ -699,11 +700,12 @@ export function smashTrophy(classTsid, room = {}) {
     ['element_blue', def.blue, 'Blue Elements'],
     ['element_shiny', def.shiny, 'Shiny Elements'],
   ];
+  const roomOf = typeof room === 'function' ? room : (cls, n) => room[cls] ?? n;
   const give = {};
   let line = `You smashed ${def.name}. `;
   const produced = [];
   for (const [cls, n, label] of rows) {
-    const fits = Math.max(0, Math.min(n, Math.floor(num(room[cls] ?? n))));
+    const fits = Math.max(0, Math.min(n, Math.floor(num(roomOf(cls, n)))));
     const destroyed = n - fits;
     if (destroyed) line += `${destroyed} ${label} were created, but destroyed, because you couldn't carry them. `;
     if (fits) {

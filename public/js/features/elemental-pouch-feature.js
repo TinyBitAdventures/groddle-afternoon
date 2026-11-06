@@ -45,7 +45,7 @@ import {
   pouchPickupCheck,
   shakeCheck,
   shakePouch,
-} from '../elemental-pouch.js?v=7ae2ad99';
+} from '../elemental-pouch.js?v=ceefa97a';
 
 export const POUCH_FEATURE_ID = 'elemental-pouch';
 const POUCH_QUEST = 'elementhandling_buy_elemental_pouch';
@@ -91,8 +91,13 @@ function migrateName(engine) {
   engine.save?.();
 }
 
+/** What the pouch being shaken holds per class: the one whose menu is open, else the first (undefined with no bags feature). */
+function heldBy(engine) {
+  return engine.query?.('packBagCounts', POUCH_CLASS, engine)?.counts;
+}
+
 function shakeState(engine) {
-  const check = shakeCheck(state, engine.inv, upgrades(engine), dayKey());
+  const check = shakeCheck(state, engine.inv, upgrades(engine), dayKey(), heldBy(engine));
   if (!check) return 'hidden';
   return check.ok ? 'enabled' : `disabled:${check.msg}`;
 }
@@ -124,7 +129,7 @@ function say(engine, msg, ok = true) {
 /* ------------------------------------------------------------ verbs */
 
 function runShake(engine) {
-  const out = shakePouch(state, engine.inv, upgrades(engine), dayKey(), { rng: rngFor(engine) });
+  const out = shakePouch(state, engine.inv, upgrades(engine), dayKey(), { rng: rngFor(engine), held: heldBy(engine) });
   if (out.hidden) return false;
   if (!out.ok) {
     say(engine, out.msg, false);
@@ -237,7 +242,7 @@ export const pouchFeature = {
     if (classTsid !== POUCH_CLASS) return [];
     const rows = [];
     // sort_on: shake 50 (rename 67 is the bags feature's).
-    const check = shakeCheck(state, engine.inv, upgrades(engine), dayKey());
+    const check = shakeCheck(state, engine.inv, upgrades(engine), dayKey(), heldBy(engine));
     if (check) {
       rows.push({ id: 'shake', label: 'Shake', enabled: check.ok, reason: check.msg, tooltip: SHAKE_COPY.tooltip, primary: true });
     }

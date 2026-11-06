@@ -963,6 +963,21 @@ export const bagsFeature = {
     return key ? bagsFeature.packBagInfo(key, engine) : null;
   },
 
+  /**
+   * What one bag of a class holds ({ key, counts: { cls: n } }): the bag whose menu is open, else
+   * the first of its class; null with none. A verb on a bag that reads its own contents (doShake's
+   * this.countItemClass, bag_elemental_pouch.js 669-690) asks here.
+   */
+  packBagCounts(cls, engine) {
+    if (!engine?.inv) return null;
+    const layout = layoutPack(engine.inv, slice.prefs, opts());
+    const key = bagKeyFor(layout, String(cls || ''));
+    if (!key) return null;
+    const counts = {};
+    for (const s of layout.bags[key].slots) if (s.kind === 'stack') counts[s.cls] = (counts[s.cls] || 0) + s.count;
+    return { key, counts };
+  },
+
   /** Rename the first bag of a class (the Elemental Pouch's one-name saves, its QA). renameBag's result, or null with none. */
   packRenameFirst(cls, value, engine) {
     const first = bagsFeature.packFirstBag(cls, engine);

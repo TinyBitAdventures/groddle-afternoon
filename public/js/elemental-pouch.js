@@ -24,10 +24,10 @@
  *  - Rename (bag_generic verbs.rename 538-585, onInputBoxResponse 723-729) is
  *    every bag's: js/bag-names.js, features/bags-feature.js.
  *
- * Remake adaptation: the pack has no bag slots, so the pouch is a pack item
- * and the four element stacks in the pack are its contents. Shake reads and
- * adds to those stacks, and the 5000 per element limit is the pouch being
- * full. A save's `name` is from when one name covered every pouch; the
+ * Remake adaptation: a pouch's contents are its slots in the pack layout. Shake
+ * is about one pouch, as doShake is (this.countItemClass): the feature passes
+ * what the menu's pouch holds as `held`, and 5000 per element is that pouch
+ * being full, not the whole pack. A save's `name` is from when one name covered every pouch; the
  * feature gives it to the first pouch (each pouch has its own name now).
  * Sort/Magic Sort/Stack Up are bag interface verbs behind the `interface`
  * cards (imagination-remake.js) and stay out.
@@ -122,11 +122,12 @@ export function shookToday(state, dayKey) {
  * @param {Record<string, number>} inv
  * @param {string[]} upgrades
  * @param {string} dayKey
+ * @param {Record<string, number>} [held] what the shaken pouch holds (countContents is that bag's); default the whole inv
  */
-export function shakeCheck(state, inv, upgrades, dayKey) {
+export function shakeCheck(state, inv, upgrades, dayKey, held = inv) {
   if (!shakeDeltas(upgrades)) return null;
   if (shookToday(state, dayKey)) return { ok: false, msg: SHAKE_COPY.already };
-  if (!pouchContents(inv)) return { ok: false, msg: SHAKE_COPY.empty };
+  if (!pouchContents(held)) return { ok: false, msg: SHAKE_COPY.empty };
   return { ok: true, msg: '' };
 }
 
@@ -137,16 +138,18 @@ export function chooseOne(choices, rng = Math.random) {
 }
 
 /**
- * doShake (669-690) for one element: bonus = round(count * delta), added up to
- * what the pouch slot still holds. Returns how many were made.
+ * doShake (669-690) for one element: bonus = round(count * delta) of what this
+ * pouch holds, added up to what this pouch's slot still holds (the rest is thrown
+ * away). Another pouch's stack plays no part. Returns how many were made.
+ * @param {Record<string, number>} [held] what the shaken pouch holds; default the whole inv
  */
-export function shakeElement(inv, classTsid, delta) {
+export function shakeElement(inv, classTsid, delta, held = inv) {
   if (!delta) return 0;
-  const count = countOf(inv, classTsid);
+  const count = countOf(held, classTsid);
   const bonus = Math.round(count * delta);
   const room = Math.max(0, ELEMENT_STACKMAX - count);
   const added = Math.min(bonus, room);
-  if (added > 0) inv[classTsid] = count + added;
+  if (added > 0) inv[classTsid] = countOf(inv, classTsid) + added;
   return added;
 }
 
@@ -162,10 +165,11 @@ export function elementChangeText(changes) {
 
 /**
  * Run the Shake verb. Mutates inv and state; returns { ok, msg, made, deltas }.
- * @param {{ rng?: () => number }} [opts]
+ * @param {{ rng?: () => number, held?: Record<string, number> }} [opts] held: what the shaken pouch holds
  */
 export function shakePouch(state, inv, upgrades, dayKey, opts = {}) {
-  const check = shakeCheck(state, inv, upgrades, dayKey);
+  const held = opts.held || inv;
+  const check = shakeCheck(state, inv, upgrades, dayKey, held);
   if (!check) return { ok: false, hidden: true, msg: '', made: {}, deltas: {} };
   if (!check.ok) return { ok: false, msg: check.msg, made: {}, deltas: {} };
   const table = shakeDeltas(upgrades);
@@ -176,7 +180,7 @@ export function shakePouch(state, inv, upgrades, dayKey, opts = {}) {
   for (const el of POUCH_ELEMENTS) {
     const delta = chooseOne(table, rng);
     deltas[el.classTsid] = delta;
-    const n = shakeElement(inv, el.classTsid, delta);
+    const n = shakeElement(inv, el.classTsid, delta, held);
     made[el.classTsid] = n;
     if (n === 1) changes.push({ name: el.single, count: 1 });
     if (n > 1) changes.push({ name: el.plural, count: n });

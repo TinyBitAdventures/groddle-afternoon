@@ -50,8 +50,8 @@ import {
   trophySmash,
   verbMessage,
   vvSniffButton,
-} from '../public/js/item-verbs-more.js?v=ad7b8d03';
-import { itemVerbsMoreFeature, runMoreVerb, eatLicoriceNow } from '../public/js/features/item-verbs-more-feature.js?v=d3473fbd';
+} from '../public/js/item-verbs-more.js?v=c2f9dc31';
+import { itemVerbsMoreFeature, runMoreVerb, eatLicoriceNow } from '../public/js/features/item-verbs-more-feature.js?v=b5d5b0d7';
 import {
   LETTER_WEIGHTS,
   POTIONS,

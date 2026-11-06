@@ -230,7 +230,7 @@ describe('Giant names players read (report #102)', () => {
 
   it('the favor, dice, grave and emblem lines say Tii', async () => {
     const { capitalizeGiant } = await import('../public/js/secret-spots.js?v=59a37384');
-    const { dieOutcome } = await import('../public/js/item-verbs-more.js?v=ad7b8d03');
+    const { dieOutcome } = await import('../public/js/item-verbs-more.js?v=c2f9dc31');
     const { graveRecognitionText } = await import('../public/js/hell.js?v=aca145ba');
     const { emblemVerbCheck } = await import('../public/js/giant-icons.js?v=0d6b4965');
     assert.equal(capitalizeGiant('ti'), 'Tii');

@@ -42,7 +42,7 @@ import { addItem, countItem, removeItem } from '../inventory.js?v=d82f3b00';
 import { getGameDayKey } from '../game-day.js?v=edb00566';
 import { levelInfoForXp, XP_FOR_LEVEL } from '../progression.js?v=33462eaa';
 import { itemVerbAchievementCounters } from '../item-verbs.js?v=1e20fa7d';
-import { ELEMENT_STACKMAX, hasPouch, POUCH_CLASS } from '../elemental-pouch.js?v=7ae2ad99';
+import { hasPouch, POUCH_CLASS } from '../elemental-pouch.js?v=ceefa97a';
 import { GENTLE_ISLAND_TSIDS, isNewxpSceneTsid } from '../newxp.js?v=8fa18f24';
 import { SKILLQUEST_AK_TSID } from '../skillquest-ak.js?v=281b956d';
 import { getToolCondition, migrateClassValue, setToolRemaining, TOOL_CONDITION_CATALOG, toolCopies, useToolCondition } from '../tools.js?v=689d6594';
@@ -114,7 +114,7 @@ import {
   trophySmash,
   vvSniffButton,
   JUJU_POWDER,
-} from '../item-verbs-more.js?v=ad7b8d03';
+} from '../item-verbs-more.js?v=c2f9dc31';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
 
 export const ITEM_VERBS_MORE_FEATURE_ID = 'item-verbs-more';
@@ -263,6 +263,21 @@ function finish(engine, classTsid, verbId, out, { count = 1 } = {}) {
   return out;
 }
 
+/**
+ * trophy_piece.js 68-78: each element in turn goes where the pack has room (every pouch, not one
+ * pouch's cap against the whole pack: bag_elemental_pouch.js canContain 651-659), with the piece
+ * still held; what went before takes its slot from what comes after, hence the trial pack.
+ */
+function smashRoom(engine) {
+  const trial = { ...engine.inv };
+  return (cls, n) => {
+    const room = engine.query?.('packRoom', cls, n, { inv: trial });
+    const fits = room === null || room === undefined ? n : Math.max(0, Math.min(n, Math.floor(Number(room) || 0)));
+    trial[cls] = (Number(trial[cls]) || 0) + fits;
+    return fits;
+  };
+}
+
 function newxpOrSkillQuest(engine) {
   const tsid = String(engine.streetTsid || '');
   // location.is_newxp (the intro scenes and Gentle Island) or is_skillquest (A L'il Animal Kinship).
@@ -386,9 +401,7 @@ export function runMoreVerb(engine, classTsid, verbId, opts = {}) {
         return finish(engine, classTsid, verbId, disperseElements(pc, classTsid, count), { count });
       }
       if (trophySmash(classTsid)) {
-        const room = {};
-        for (const cls of ['element_green', 'element_blue', 'element_shiny']) room[cls] = Math.max(0, ELEMENT_STACKMAX - countItem(engine.inv, cls));
-        const out = smashTrophy(classTsid, room);
+        const out = smashTrophy(classTsid, smashRoom(engine));
         // trophy_piece.js 114: the handler sends its own line (no buildVerbMessage).
         return finish(engine, classTsid, verbId, out);
       }

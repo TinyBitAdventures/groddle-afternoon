@@ -24,9 +24,11 @@ import {
   shakeDeltas,
   shakeElement,
   shakePouch,
-} from '../public/js/elemental-pouch.js?v=7ae2ad99';
-import { pouchFeature } from '../public/js/features/elemental-pouch-feature.js?v=936df3ec';
-import { FEATURES } from '../public/js/features/index.js?v=419baf70';
+} from '../public/js/elemental-pouch.js?v=ceefa97a';
+import { bagsFeature } from '../public/js/features/bags-feature.js?v=c40581b7';
+import { runMoreVerb } from '../public/js/features/item-verbs-more-feature.js?v=b5d5b0d7';
+import { pouchFeature } from '../public/js/features/elemental-pouch-feature.js?v=1eeace34';
+import { FEATURES } from '../public/js/features/index.js?v=86d3433e';
 import { ITEM_CATALOG, countItem, createInventory } from '../public/js/inventory.js?v=d82f3b00';
 import { STORE_CATALOG } from '../public/js/store-catalog.js?v=74b56af3';
 import { VENDOR_PROFILES, vendorBuy } from '../public/js/vendor.js?v=70577b0b';
@@ -270,5 +272,119 @@ describe('cards and skill notes', () => {
   it('marks Element Handling live with a note about the pouch', () => {
     assert.equal(SKILL_REMAKE_NOTES['Element Handling'].status, 'live');
     assert.match(SKILL_REMAKE_NOTES['Element Handling'].note, /Elemental Pouch/);
+  });
+});
+
+// Report 99: a full pouch beside one with room. The rules are the pack's (js/pack-slots.js), read per pouch.
+describe('two pouches: room is each pouch\'s, not one cap against the whole pack', () => {
+  const PIECE = 'trophy_street_creator_wood_piece3'; // 300 green, 450 blue, 550 shiny
+  const said = (engine) => engine.lines.join(' ');
+  let engine;
+  const rig = (inv) => {
+    pouchFeature._reset();
+    bagsFeature.restore(undefined);
+    engine = {
+      inv: { ...inv },
+      pc: { imaginationUpgrades: [...CARD1] },
+      learnedSkills: ['elementhandling_1'],
+      lines: [],
+      setData: () => {},
+      param: () => null,
+      pushActivity: (line) => engine.lines.push(line),
+      toast: () => {},
+      refreshPack: () => {},
+      updateHud: () => {},
+      playSound: () => {},
+      achievement: () => {},
+      featsIncrement: () => {},
+      save: () => {},
+      query: (hook, ...args) => (typeof bagsFeature[hook] === 'function' ? bagsFeature[hook](...args) : null),
+    };
+    bagsFeature.init(engine);
+    return engine;
+  };
+  // A pack layout's prefs that put the stacks where the test says (b1 and b2 are the pouches).
+  const place = (b1, b2) => {
+    const stacks = (counts) => Object.keys(counts);
+    const n = (counts) => Object.values(counts);
+    bagsFeature.restore({
+      v: 1,
+      migrated: true,
+      prefs: {
+        place: { pack: ['@b1', '@b2'], b1: stacks(b1), b2: stacks(b2) },
+        n: { b1: n(b1), b2: n(b2) },
+        bags: { b1: { cls: POUCH_CLASS }, b2: { cls: POUCH_CLASS } },
+      },
+    }, engine);
+  };
+  /** Other things, one class per slot, until the pack has `free` slots left. */
+  const fillPack = (free) => {
+    const classes = ['apple', 'cherry', 'grain', 'meat', 'milk_butterfly', 'bun', 'cheese', 'plum', 'lemon', 'corn', 'carrot', 'tomato', 'onion', 'salmon', 'potato', 'rice'];
+    let i = 0;
+    while (bagsFeature.packLayout(engine).free > free) engine.inv[classes[i++]] = 1;
+  };
+
+  it('Smash: green full in one pouch goes to the other, nothing destroyed', () => {
+    rig({ [POUCH_CLASS]: 2, element_green: 5000, [PIECE]: 1 });
+    assert.equal(bagsFeature.packRoom('element_green', 300, engine), 300);
+    assert.ok(runMoreVerb(engine, PIECE, 'smash'));
+    assert.equal(said(engine), 'You smashed A Piece of Street Creator Wood Trophy. You received 300 Green Elements, 450 Blue Elements and 550 Shiny Elements.');
+    assert.deepEqual([engine.inv.element_green, engine.inv.element_blue, engine.inv.element_shiny, engine.inv[PIECE] || 0], [5300, 450, 550, 0]);
+    const layout = bagsFeature.packLayout(engine);
+    assert.equal(layout.rockStacks, 0);
+    assert.deepEqual(Object.values(layout.bags).map((b) => b.slots.find((s) => s.cls === 'element_green')?.count).sort((a, b) => a - b), [300, 5000]);
+  });
+
+  it('Smash: one full pouch and a free pack slot, the elements take the slot (the pack\'s own rule, as the Grinder\'s)', () => {
+    rig({ [POUCH_CLASS]: 1, element_green: 5000, [PIECE]: 1 });
+    runMoreVerb(engine, PIECE, 'smash');
+    assert.doesNotMatch(said(engine), /destroyed/);
+    assert.equal(engine.inv.element_green, 5300);
+    assert.equal(bagsFeature.packLayout(engine).pack.slots.find((s) => s.cls === 'element_green')?.count, 300);
+  });
+
+  it('Smash: one free slot is taken once, by the first element that needs it', () => {
+    rig({ [POUCH_CLASS]: 1, element_green: 5000, element_blue: 5000, element_shiny: 5000, element_red: 5000, [PIECE]: 1 });
+    fillPack(1);
+    runMoreVerb(engine, PIECE, 'smash');
+    assert.equal(said(engine), "You smashed A Piece of Street Creator Wood Trophy. 450 Blue Elements were created, but destroyed, because you couldn't carry them. 550 Shiny Elements were created, but destroyed, because you couldn't carry them. You received 300 Green Elements.");
+    assert.deepEqual([engine.inv.element_green, engine.inv.element_blue, engine.inv.element_shiny], [5300, 5000, 5000]);
+    assert.equal(bagsFeature.packLayout(engine).rockStacks, 0);
+  });
+
+  it('Smash: no room anywhere, all of it is created, but destroyed, and the piece is spent', () => {
+    rig({ [POUCH_CLASS]: 1, element_green: 5000, element_blue: 5000, element_shiny: 5000, element_red: 5000, [PIECE]: 1 });
+    fillPack(0);
+    runMoreVerb(engine, PIECE, 'smash');
+    assert.equal(said(engine), "You smashed A Piece of Street Creator Wood Trophy. 300 Green Elements were created, but destroyed, because you couldn't carry them. 450 Blue Elements were created, but destroyed, because you couldn't carry them. 550 Shiny Elements were created, but destroyed, because you couldn't carry them.");
+    assert.deepEqual([engine.inv.element_green, engine.inv.element_blue, engine.inv.element_shiny, engine.inv[PIECE] || 0], [5000, 5000, 5000, 0]);
+    assert.equal(bagsFeature.packLayout(engine).rockStacks, 0);
+  });
+
+  it('Shake: each pouch reads its own stacks (doShake this.countItemClass 678; canContain 651-659)', () => {
+    rig({ [POUCH_CLASS]: 2, element_green: 6000 });
+    place({ element_green: 5000 }, { element_green: 1000 });
+    // The pack holds 6000, over one pouch's 5000: the old sum called this too full.
+    bagsFeature.packBagMenu('b2');
+    assert.deepEqual(bagsFeature.packBagCounts(POUCH_CLASS, engine), { key: 'b2', counts: { element_green: 1000 } });
+    assert.equal(pouchFeature.runPackVerb(POUCH_CLASS, 'shake', engine), true);
+    assert.match(said(engine), /^You shook your pouch and created an additional (40|50|60) Green Elements\.$/);
+    const layout = bagsFeature.packLayout(engine);
+    assert.equal(layout.bags.b1.slots[0].count, 5000);
+    assert.ok(layout.bags.b2.slots[0].count > 1000);
+  });
+
+  it('Shake: the full pouch is too full and the day is not used, as a full pouch always was; the empty one has nothing to shake', () => {
+    rig({ [POUCH_CLASS]: 2, element_green: 5000 });
+    place({ element_green: 5000 }, {});
+    bagsFeature.packBagMenu('b1');
+    assert.equal(pouchFeature.packVerbs(POUCH_CLASS, engine)[0].enabled, true);
+    pouchFeature.runPackVerb(POUCH_CLASS, 'shake', engine);
+    assert.equal(said(engine), SHAKE_COPY.full);
+    assert.equal(engine.inv.element_green, 5000);
+    bagsFeature.packBagMenu('b2');
+    const verb = pouchFeature.packVerbs(POUCH_CLASS, engine)[0];
+    assert.equal(verb.enabled, false);
+    assert.equal(verb.reason, SHAKE_COPY.empty);
   });
 });
