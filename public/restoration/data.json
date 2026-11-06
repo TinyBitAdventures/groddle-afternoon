@@ -169,7 +169,7 @@
    "group": "world",
    "name": "Hub maps and travel",
    "status": "source",
-   "blurb": "Every region’s map with its streets. Travel by signpost; from the map, set a destination for a guided path, or with Teleportation IV teleport to a street you have visited. Tiny Speck’s map paintings are lost, so each region’s map shows their small thumbnail of it, enlarged; Groddle Forest’s, Groddle Meadow’s, Alakol’s, Andra’s, Aranna’s and Balzare’s are repainted for the remake from their thumbnails.",
+   "blurb": "Every region’s map with its streets. Travel by signpost; from the map, set a destination for a guided path, or with Teleportation IV teleport to a street you have visited. Tiny Speck’s map paintings are lost, so each region’s map shows their small thumbnail of it, enlarged; Groddle Forest’s, Groddle Meadow’s, Bortola’s, Alakol’s, Baqala’s, Andra’s, Besara’s, Aranna’s, Brillah’s and Balzare’s are repainted for the remake from their thumbnails.",
    "multiplayer": null,
    "spot": null,
    "evidence": [
@@ -2732,9 +2732,39 @@
   "deployed": "2026-11-06"
  },
  "git": {
-  "commits": 1352,
+  "commits": 1363,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-06",
+    "kind": "improve",
+    "text": "Baqala, Besara, Bortola and Brillah have new map paintings, repainted from Tiny Speck's thumbnails of the lost originals"
+   },
+   {
+    "date": "2026-11-06",
+    "kind": "fix",
+    "text": "A recipe opened from far down the Make list opens at its top, with Back in view, and Back returns to your place"
+   },
+   {
+    "date": "2026-11-06",
+    "kind": "fix",
+    "text": "The level builder no longer reports Piene Question as a trap: a ladder a jump lifts you to is a way out"
+   },
+   {
+    "date": "2026-11-06",
+    "kind": "fix",
+    "text": "The changelog's and encyclopedia's pages pick up new styles after an update instead of an old cached copy"
+   },
+   {
+    "date": "2026-11-06",
+    "kind": "fix",
+    "text": "A Pick with 1 condition left mines at Mining III and IV, where a swing only costs 1"
+   },
+   {
+    "date": "2026-11-06",
+    "kind": "fix",
+    "text": "Restarting the tutorial's practice street no longer hands out another Watering Can or Butterfly Lotion"
+   },
    {
     "date": "2026-11-06",
     "kind": "fix",
@@ -2824,36 +2854,6 @@
     "date": "2026-11-05",
     "kind": "fix",
     "text": "One feature's error no longer stops the game; it is reported and play goes on"
-   },
-   {
-    "date": "2026-11-05",
-    "kind": "fix",
-    "text": "Leaving a friend's home street no longer freezes the view"
-   },
-   {
-    "date": "2026-11-05",
-    "kind": "improve",
-    "text": "Your Reports list has tabs by status with counts and a red count of new replies, and lists unread and answered reports first"
-   },
-   {
-    "date": "2026-11-05",
-    "kind": "improve",
-    "text": "The Projects panel's needs read task first, with the tool or item picture, what is left and whether you can do it now"
-   },
-   {
-    "date": "2026-11-05",
-    "kind": "improve",
-    "text": "Groddle Forest's map has a new painting, repainted from Tiny Speck's thumbnail of the lost original"
-   },
-   {
-    "date": "2026-11-05",
-    "kind": "improve",
-    "text": "Vendor and shrine icons on the region map stand out on any painting"
-   },
-   {
-    "date": "2026-11-05",
-    "kind": "improve",
-    "text": "Groddle Meadow's map has a new painting, repainted from Tiny Speck's thumbnail of the lost original"
    }
   ]
  },

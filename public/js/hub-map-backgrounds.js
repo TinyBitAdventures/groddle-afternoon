@@ -16,10 +16,10 @@ export const HUB_MAP_BACKGROUNDS = Object.freeze({
   '64': Object.freeze({ x1: 'assets/maps/art/bg/groddleheights.webp', x2: 'assets/maps/art/bg/groddleheights@2x.webp' }), // Groddle Heights
   '71': Object.freeze({ x1: 'assets/maps/art/bg/jethimadh.webp', x2: 'assets/maps/art/bg/jethimadh@2x.webp' }), // Jethimadh
   '72': Object.freeze({ x1: 'assets/maps/art/bg/chakraphool.webp', x2: 'assets/maps/art/bg/chakraphool@2x.webp' }), // Chakra Phool
-  '75': Object.freeze({ x1: 'assets/maps/art/bg/bortola.webp', x2: 'assets/maps/art/bg/bortola@2x.webp' }), // Bortola
+  '75': Object.freeze({ x1: 'assets/maps/art/bg/bortola.webp', x2: 'assets/maps/art/bg/bortola@2x.webp', repainted: true }), // Bortola
   '76': Object.freeze({ x1: 'assets/maps/art/bg/alakol.webp', x2: 'assets/maps/art/bg/alakol@2x.webp', repainted: true }), // Alakol
   '85': Object.freeze({ x1: 'assets/maps/art/bg/kajuu.webp', x2: 'assets/maps/art/bg/kajuu@2x.webp' }), // Kajuu
-  '86': Object.freeze({ x1: 'assets/maps/art/bg/baqala.webp', x2: 'assets/maps/art/bg/baqala@2x.webp' }), // Baqala
+  '86': Object.freeze({ x1: 'assets/maps/art/bg/baqala.webp', x2: 'assets/maps/art/bg/baqala@2x.webp', repainted: true }), // Baqala
   '88': Object.freeze({ x1: 'assets/maps/art/bg/karnata.webp', x2: 'assets/maps/art/bg/karnata@2x.webp' }), // Karnata
   '89': Object.freeze({ x1: 'assets/maps/art/bg/andra.webp', x2: 'assets/maps/art/bg/andra@2x.webp', repainted: true }), // Andra
   '90': Object.freeze({ x1: 'assets/maps/art/bg/choru.webp', x2: 'assets/maps/art/bg/choru@2x.webp' }), // Choru
@@ -28,7 +28,7 @@ export const HUB_MAP_BACKGROUNDS = Object.freeze({
   '93': Object.freeze({ x1: 'assets/maps/art/bg/salatu.webp', x2: 'assets/maps/art/bg/salatu@2x.webp' }), // Salatu
   '95': Object.freeze({ x1: 'assets/maps/art/bg/xalanga.webp', x2: 'assets/maps/art/bg/xalanga@2x.webp' }), // Xalanga
   '97': Object.freeze({ x1: 'assets/maps/art/bg/muufo.webp', x2: 'assets/maps/art/bg/muufo@2x.webp' }), // Muufo
-  '98': Object.freeze({ x1: 'assets/maps/art/bg/besara.webp', x2: 'assets/maps/art/bg/besara@2x.webp' }), // Besara
+  '98': Object.freeze({ x1: 'assets/maps/art/bg/besara.webp', x2: 'assets/maps/art/bg/besara@2x.webp', repainted: true }), // Besara
   '99': Object.freeze({ x1: 'assets/maps/art/bg/kalavana.webp', x2: 'assets/maps/art/bg/kalavana@2x.webp' }), // Kalavana
   '100': Object.freeze({ x1: 'assets/maps/art/bg/vantalu.webp', x2: 'assets/maps/art/bg/vantalu@2x.webp' }), // Vantalu
   '101': Object.freeze({ x1: 'assets/maps/art/bg/aranna.webp', x2: 'assets/maps/art/bg/aranna@2x.webp', repainted: true }), // Aranna
@@ -38,7 +38,7 @@ export const HUB_MAP_BACKGROUNDS = Object.freeze({
   '107': Object.freeze({ x1: 'assets/maps/art/bg/callopee.webp', x2: 'assets/maps/art/bg/callopee@2x.webp' }), // Callopee
   '109': Object.freeze({ x1: 'assets/maps/art/bg/rasana.webp', x2: 'assets/maps/art/bg/rasana@2x.webp' }), // Rasana
   '110': Object.freeze({ x1: 'assets/maps/art/bg/massadoe.webp', x2: 'assets/maps/art/bg/massadoe@2x.webp' }), // Massadoe
-  '112': Object.freeze({ x1: 'assets/maps/art/bg/brillah.webp', x2: 'assets/maps/art/bg/brillah@2x.webp' }), // Brillah
+  '112': Object.freeze({ x1: 'assets/maps/art/bg/brillah.webp', x2: 'assets/maps/art/bg/brillah@2x.webp', repainted: true }), // Brillah
   '113': Object.freeze({ x1: 'assets/maps/art/bg/tahli.webp', x2: 'assets/maps/art/bg/tahli@2x.webp' }), // Tahli
   '114': Object.freeze({ x1: 'assets/maps/art/bg/firozi.webp', x2: 'assets/maps/art/bg/firozi@2x.webp' }), // Firozi
   '116': Object.freeze({ x1: 'assets/maps/art/bg/haraiva.webp', x2: 'assets/maps/art/bg/haraiva@2x.webp' }), // Haraiva

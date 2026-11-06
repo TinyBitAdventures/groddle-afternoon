@@ -193,10 +193,11 @@
       "thumbMatches": true,
       "x1": "assets/maps/art/bg/bortola.webp",
       "x2": "assets/maps/art/bg/bortola@2x.webp",
-      "x1Bytes": 13050,
-      "x1Sha256": "2e372714a8e849769656aaecbeb8950ed9eb51857ebb56b02c82f0c691f41f92",
-      "x2Bytes": 27162,
-      "x2Sha256": "9a3f72b89f9ac191742bf03dd1586bef68ad563db2905ec9987915eb22cbfa79"
+      "repainted": "tools/provenance/repainted-maps.json",
+      "x1Bytes": 34558,
+      "x1Sha256": "fc83a29bd9a5c5f9bad4eac71292ce80243816ffe9ac1de0fcc4ab7c2e94fede",
+      "x2Bytes": 123614,
+      "x2Sha256": "8c0d08e2d4194fa0e4fd8c3367e6f484e152f9cc26c424da19b239cdbdaac396"
     },
     "76": {
       "hubName": "Alakol",
@@ -239,10 +240,11 @@
       "thumbMatches": true,
       "x1": "assets/maps/art/bg/baqala.webp",
       "x2": "assets/maps/art/bg/baqala@2x.webp",
-      "x1Bytes": 10018,
-      "x1Sha256": "bbc0c693213f18fac1e48fd8df87eb8518ee8c3cc57c912821af01fc9c035346",
-      "x2Bytes": 20814,
-      "x2Sha256": "39c5ccf2499e46cff39bea666d25f5eff43c5366cb60f542f1726c2425df50e1"
+      "repainted": "tools/provenance/repainted-maps.json",
+      "x1Bytes": 18372,
+      "x1Sha256": "8c6571c85d0d0babc6785d35379ccd332b23c051e75a2516e9f413608edaa37e",
+      "x2Bytes": 71976,
+      "x2Sha256": "9a30b75241c2fa362a13556ea78a93e009c060f076acfa1ee43b696364a7b898"
     },
     "88": {
       "hubName": "Karnata",
@@ -375,10 +377,11 @@
       "thumbMatches": true,
       "x1": "assets/maps/art/bg/besara.webp",
       "x2": "assets/maps/art/bg/besara@2x.webp",
-      "x1Bytes": 14782,
-      "x1Sha256": "fb7952781434ecdadb1e71dae22daf08205940010f022950a10bd8ffae6bb09d",
-      "x2Bytes": 30650,
-      "x2Sha256": "1396beb1cbd39a3fbf90f5113866b4fd632d57f6666b0b307963de1ada6aab9c"
+      "repainted": "tools/provenance/repainted-maps.json",
+      "x1Bytes": 44134,
+      "x1Sha256": "6942be9e021e7882049462a14eb0d74cafed55a42cbe6dc54f8aca22d12a2115",
+      "x2Bytes": 117914,
+      "x2Sha256": "0ae1bf8f13726e826b701c707d13bfcf0595a6e3569aa7da36f6fdb3b2c9843e"
     },
     "99": {
       "hubName": "Kalavana",
@@ -526,10 +529,11 @@
       "thumbMatches": true,
       "x1": "assets/maps/art/bg/brillah.webp",
       "x2": "assets/maps/art/bg/brillah@2x.webp",
-      "x1Bytes": 9702,
-      "x1Sha256": "5288d92a99e030a94ef99815c524042da17fb7ec04efd50457daf40faae9ac3d",
-      "x2Bytes": 20182,
-      "x2Sha256": "c5a53ced1bf68f0cf09b3e01f7f70d10b4f958e98cfe9db0fabcad6b5eb3dd0f"
+      "repainted": "tools/provenance/repainted-maps.json",
+      "x1Bytes": 39866,
+      "x1Sha256": "f0ab85727c0cad3c02ea5fb5b2d02ab8a50b2cd166a7175928f5727ac42b0e31",
+      "x2Bytes": 132952,
+      "x2Sha256": "93eecca92c61080e6cebcdfce2a7ba8e1e8b37cb9af6d57497fca814a5c5e63e"
     },
     "113": {
       "hubName": "Tahli",
