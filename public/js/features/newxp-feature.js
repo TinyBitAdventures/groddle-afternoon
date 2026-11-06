@@ -87,6 +87,7 @@ import {
   STAGES,
   TRAINING2_DRINKS,
   TRAINING2_ENERGY_AFTER_EAT,
+  training2ItemsToPlace,
   training2MeterFull,
   TRAINING2_ENTER_METABOLICS,
   TRAINING2_FOOD,
@@ -119,7 +120,7 @@ import {
   tutorialPhysics,
   SKIP_TUTORIAL_CARDS,
   vogPages,
-} from '../newxp.js?v=0dd5052a';
+} from '../newxp.js?v=accb5752';
 import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=d82f3b00';
 import { QUOIN_SHEET, QUOIN_TYPES, qrazyRewardForLevel } from '../quoins.js?v=dfe1ff0a';
 import { soundForQuoin } from '../sound-moments.js?v=2f8597cd';
@@ -132,7 +133,7 @@ import * as kit from '../quest-rooms/kit.js?v=4d8ab82d';
 import { frameTexture, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js?v=3149d699';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 import { displayTopOf, itemstackOverlayPoint, playPoofIn, playSheetOverlay, poofInAlpha } from '../overlay-art.js?v=11b6dd7f';
-import { HOME_MACHINE } from '../home-ticket.js?v=9661827b';
+import { HOME_MACHINE } from '../home-ticket.js?v=24c1e294';
 import { animalAnchorX, createAnimalState } from '../animals.js?v=05dafc43';
 import {
   AK_ANIMALS,
@@ -1679,6 +1680,20 @@ function clickPackUse(engine, classTsid) {
   return Boolean(slot);
 }
 
+/** Puts this restart's food or drink on the table; returns a stack already in the pack, as a first pick. */
+function placeTraining2Items(engine, L, rows, onPick) {
+  const { place, carried } = training2ItemsToPlace(rows, save.trainingTaken, (cls) => countItem(engine.inv, cls));
+  for (const r of place) {
+    const spot = L.items[r.id];
+    addPickup(engine, r.id, r.classTsid, r.count, spot.x, spot.y, (row) => {
+      if (!save.trainingTaken.includes(row.id)) save.trainingTaken.push(row.id);
+      engine.save();
+      onPick(row);
+    });
+  }
+  return carried ? { classTsid: carried } : null;
+}
+
 async function runTraining2(t) {
   const engine = engineRef;
   // hideUIOnLoad: pack until the first pickup, energy until food, mood until a drink.
@@ -1719,11 +1734,8 @@ async function runTraining2(t) {
   db.moveTo(L.dustbunny.table1b, L.floorY, 250, 'walkRight');
   let firstPick = null;
   run.data.eaten = false;
-  for (const f of TRAINING2_FOOD) {
-    const spot = L.items[f.id];
-    addPickup(engine, f.id, f.classTsid, f.count, spot.x, spot.y, (row) => { firstPick ||= row; });
-  }
-  await until(t, () => firstPick, { help: () => pickUp(engine, run.pickups.find((r) => r.id === 'food_2')) });
+  firstPick = placeTraining2Items(engine, L, TRAINING2_FOOD, (row) => { firstPick ||= row; });
+  await until(t, () => firstPick, { help: () => pickUp(engine, run.pickups.find((r) => TRAINING2_FOOD.some((f) => f.id === r.id))) });
   clearInstruction();
   // first_inv_overlay, then the pack appears.
   await overlay(t, LINES.firstInventory);
@@ -1772,10 +1784,7 @@ async function runTraining2(t) {
   db.moveTo(L.dustbunny.table2b, L.floorY, 250, 'walkRight');
   let drinkPick = null;
   run.data.drank = false;
-  for (const d of TRAINING2_DRINKS) {
-    const spot = L.items[d.id];
-    addPickup(engine, d.id, d.classTsid, d.count, spot.x, spot.y, (row) => { drinkPick ||= row; });
-  }
+  drinkPick = placeTraining2Items(engine, L, TRAINING2_DRINKS, (row) => { drinkPick ||= row; });
   instruction(LINES.interactInstructions);
   // leave_drink before drinking: back you go.
   await until(t, () => {
@@ -1784,7 +1793,7 @@ async function runTraining2(t) {
       say(db, LINES.t2DrinkFirst, 3000);
     }
     return drinkPick;
-  }, { help: () => pickUp(engine, run.pickups.find((r) => r.id === 'drink_1')) });
+  }, { help: () => pickUp(engine, run.pickups.find((r) => TRAINING2_DRINKS.some((d) => d.id === r.id))) });
   clearInstruction();
   await overlay(t, { title: LINES.firstDrink, button: 'OK' });
   setStep('drink_wait_drink');

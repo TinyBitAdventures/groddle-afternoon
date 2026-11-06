@@ -10,8 +10,8 @@ import { describe, it, before, beforeEach } from 'node:test';
 import assert from 'node:assert/strict';
 import { join } from 'node:path';
 
-import { GENTLE_ISLAND, LEAVE_FLAG_DELAY_MS, leaveFlagStreet, normalizeNewxpSave } from '../public/js/newxp.js?v=0dd5052a';
-import { __newxpTest } from '../public/js/features/newxp-feature.js?v=85e487d9';
+import { GENTLE_ISLAND, LEAVE_FLAG_DELAY_MS, leaveFlagStreet, normalizeNewxpSave } from '../public/js/newxp.js?v=accb5752';
+import { __newxpTest } from '../public/js/features/newxp-feature.js?v=a1040b7c';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=10b118dd';
 import { acceptOffer } from '../public/js/quest-offers.js?v=8599dbf9';
 import { createQuestState } from '../public/js/quests.js?v=c8d9d0a4';

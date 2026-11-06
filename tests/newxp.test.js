@@ -57,11 +57,12 @@ import {
   tutorialPillSpot,
   talkPages,
   training1Layout,
+  training2ItemsToPlace,
   training2Layout,
   training2MeterFull,
   tutorialPhysics,
   vogPages,
-} from '../public/js/newxp.js?v=0dd5052a';
+} from '../public/js/newxp.js?v=accb5752';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', 'public');
 const street = (tsid) => JSON.parse(readFileSync(join(ROOT, 'assets/streets', `${tsid}.json`), 'utf8'));
@@ -160,6 +161,72 @@ describe('newxp source data', () => {
     assert.equal(pages[1].button, 'OK');
     assert.equal(talkPages(LINES.rockTicket, { name: 'Pip' }).length, 4);
     assert.deepEqual(vogPages(LINES.currants).length, 2);
+  });
+});
+
+describe('restarting training2 does not hand its food and drink out again', () => {
+  const feature = readFileSync(join(ROOT, 'js/features/newxp-feature.js'), 'utf8');
+  const ids = (rows) => rows.map((r) => r.id);
+
+  it('a first run places everything', () => {
+    assert.deepEqual(ids(training2ItemsToPlace(TRAINING2_FOOD, [], () => 0).place), ['food_2', 'food_3']);
+    assert.deepEqual(ids(training2ItemsToPlace(TRAINING2_DRINKS, [], () => 0).place), ['drink_1', 'drink_2', 'drink_3']);
+  });
+
+  it('a taken stack stays taken: picked Flummery, a reload does not give another', () => {
+    const r = training2ItemsToPlace(TRAINING2_FOOD, ['food_3'], (c) => (c === 'flummery' ? 1 : 0));
+    assert.deepEqual(ids(r.place), ['food_2']);
+    assert.equal(r.carried, 'flummery');
+  });
+
+  it('reloading again and again never adds up', () => {
+    const inv = {};
+    const taken = [];
+    for (let reload = 0; reload < 6; reload++) {
+      for (const row of training2ItemsToPlace(TRAINING2_FOOD, taken, (c) => inv[c] || 0).place) {
+        inv[row.classTsid] = (inv[row.classTsid] || 0) + row.count;
+        if (!taken.includes(row.id)) taken.push(row.id);
+      }
+    }
+    assert.deepEqual(inv, { common_crudites: 1, flummery: 1 });
+  });
+
+  it('there is always something to eat or drink, for every taken and held state', () => {
+    for (const rows of [TRAINING2_FOOD, TRAINING2_DRINKS]) {
+      for (let mask = 0; mask < 2 ** rows.length; mask++) {
+        const taken = rows.filter((_, i) => mask & (1 << i)).map((r) => r.id);
+        for (const held of [0, 1]) {
+          const r = training2ItemsToPlace(rows, taken, () => held);
+          assert.ok(r.place.length > 0 || r.carried, `${taken} held ${held}`);
+          if (r.carried) assert.ok(held > 0);
+        }
+      }
+    }
+    // Everything taken and eaten: one stack back, the smallest of the set that comes first.
+    assert.deepEqual(ids(training2ItemsToPlace(TRAINING2_FOOD, ['food_2', 'food_3'], () => 0).place), ['food_2']);
+    assert.deepEqual(ids(training2ItemsToPlace(TRAINING2_DRINKS, ['drink_1', 'drink_2', 'drink_3'], () => 0).place), ['drink_1']);
+  });
+
+  it('the save keeps what was taken, only real ids, and a new tutorial forgets it', () => {
+    assert.deepEqual(normalizeNewxpSave({ trainingTaken: ['food_3', 'food_3', 'nope', 7] }).trainingTaken, ['food_3']);
+    assert.deepEqual(normalizeNewxpSave({}).trainingTaken, []);
+    assert.deepEqual(startNewxp({ trainingTaken: ['food_3'] }, 'training2', 1).trainingTaken, ['food_3']);
+    assert.deepEqual(startNewxp({ trainingTaken: ['food_3'] }, 'clouds', 1).trainingTaken, []);
+  });
+
+  it('both tables go through it and the first pick can come from the pack', () => {
+    assert.match(feature, /firstPick = placeTraining2Items\(engine, L, TRAINING2_FOOD,/);
+    assert.match(feature, /drinkPick = placeTraining2Items\(engine, L, TRAINING2_DRINKS,/);
+    assert.ok(feature.indexOf('firstPick = placeTraining2Items') < feature.indexOf('await until(t, () => firstPick'));
+    assert.ok(feature.indexOf('drinkPick = placeTraining2Items') < feature.indexOf("setStep('drink_wait_drink')"));
+    assert.doesNotMatch(feature, /for \(const f of TRAINING2_FOOD\)/);
+  });
+
+  it('the source: a reload resumes at its step and only reset() creates the stacks', () => {
+    if (!existsSync(join(GS, 'locations/newxp_training2.js'))) return;
+    const t2 = readFileSync(join(GS, 'locations/newxp_training2.js'), 'utf8');
+    assert.match(t2, /if \(this\.current_step\)\{[\s\S]{0,120}from_reload:true/);
+    assert.match(t2, /function reset\(pc\)\{[\s\S]*this\.createItemStack\(this\.special_items\.food_3/);
   });
 });
 

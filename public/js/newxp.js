@@ -367,6 +367,21 @@ export const TRAINING2_DRINKS = Object.freeze([
   { id: 'drink_2', classTsid: 'fruity_juice', count: 3 },
   { id: 'drink_3', classTsid: 'spicy_grog', count: 3 },
 ]);
+/**
+ * What a restart of Training Level Two puts on the tables. The original resumed a reload at its
+ * step (newxp_training2.js playerEnterCallback 88-90, from_reload) and created the stacks only in
+ * reset() (265-274) on a fresh entry, so a reload never gave them again; the remake restarts the
+ * stage, so it remembers which stacks were taken. A taken stack still in the pack carries on to the
+ * eat or drink step; with nothing left to take or eat, the first stack comes back, so the step can
+ * always be done.
+ * @returns {{ place: object[], carried: string|null }} rows to place, and a taken class still held
+ */
+export function training2ItemsToPlace(rows, taken, held) {
+  const had = rows.filter((r) => taken.includes(r.id));
+  const carried = had.find((r) => held(r.classTsid) > 0)?.classTsid || null;
+  const place = rows.filter((r) => !taken.includes(r.id));
+  return { place: place.length || carried ? place : rows.slice(0, 1), carried };
+}
 // food_eaten: metabolics_set_energy(80); playerEnter sets energy/mood 99.
 export const TRAINING2_ENERGY_AFTER_EAT = 80;
 export const TRAINING2_ENTER_METABOLICS = 99;
@@ -564,6 +579,7 @@ export function normalizeNewxpSave(seed = {}) {
     exit: s.exit && typeof s.exit === 'object' && typeof s.exit.tsid === 'string' ? { tsid: s.exit.tsid, x: Number(s.exit.x) || 0 } : null,
     flags: Array.isArray(s.flags) ? [...new Set(s.flags.filter((f) => ISLAND_FLAGS.includes(f)))] : [],
     musicblock: ISLAND_MUSICBLOCKS.includes(s.musicblock) ? s.musicblock : '',
+    trainingTaken: Array.isArray(s.trainingTaken) ? [...new Set(s.trainingTaken.filter((id) => [...TRAINING2_FOOD, ...TRAINING2_DRINKS].some((r) => r.id === id)))] : [],
     leftAt: Number.isFinite(s.leftAt) ? s.leftAt : 0,
     startedAt: Number.isFinite(s.startedAt) ? s.startedAt : 0,
     doneAt: Number.isFinite(s.doneAt) ? s.doneAt : 0,
@@ -579,6 +595,7 @@ export function startNewxp(save, stage = 'clouds', now = Date.now()) {
     next.upgrades = [];
     next.flags = [];
     next.musicblock = '';
+    next.trainingTaken = [];
     next.island = 'arrive';
     next.exit = null;
     next.leftAt = 0;
