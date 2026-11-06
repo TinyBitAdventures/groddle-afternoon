@@ -41,7 +41,7 @@ import {
 } from '../public/js/tools.js?v=6684b484';
 import { crushOre } from '../public/js/mining.js?v=83421428';
 import { MAKE_TOOL_SHEETS } from '../public/js/make-tool-sheets.js?v=6f758e09';
-import { clearPlot, createGarden, getPlot, hasHoe, hasWateringCan, plantPlot, waterPlot } from '../public/js/garden.js?v=97737c93';
+import { clearPlot, createGarden, getPlot, hasHoe, hasWateringCan, plantPlot, waterPlot } from '../public/js/garden.js?v=14c83df8';
 import { performTrantCare, quoteTrantCare } from '../public/js/trant-care.js?v=67ea957b';
 import { createTrantState, setTrantTables } from '../public/js/trants.js?v=9c2e8c0f';
 import { createPlot, performPlotVerb, plotVerbs } from '../public/js/patches.js?v=056bb6ae';

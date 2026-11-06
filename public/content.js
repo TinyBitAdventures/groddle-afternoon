@@ -30,7 +30,7 @@ import {
   plotStatusLabel,
   gardenNeedsWater,
   GARDEN_NO_DRY_PLOTS_LINE,
-} from './js/garden.js?v=97737c93';
+} from './js/garden.js?v=14c83df8';
 import { firstWorkingTool, HOE_TOOLS, WATERING_CAN_TOOLS } from './js/tools.js?v=6684b484';
 import {
   ROCK_CATALOG,
@@ -832,8 +832,10 @@ export function getVerbsFor(target, ctx) {
   // Ticket 63: a garden with only a broken can or hoe refuses at once with its talkback
   // (include/garden.js 125-130, 217-228: no working one, sendResponse('broken_watering_can')
   // before any skill package runs), so the verb takes no time and plays no animation.
-  const brokenOnly = (tools) => {
-    const found = firstWorkingTool(ctx.tools || null, inv, tools);
+  // Report 121: the check takes the action's real wear, so a worn tool Aggressive Hoeing asks too much of
+  // refuses at once as well (inc_skill_packages.js 169, runSkillPackage's first check, before any overlay).
+  const brokenOnly = (tools, wear = 1) => {
+    const found = firstWorkingTool(ctx.tools || null, inv, tools, wear);
     return found.owned && !found.tool;
   };
   if (classId === 'garden_new' || classId === 'garden') {
@@ -842,10 +844,11 @@ export function getVerbsFor(target, ctx) {
     // greyed with onPour's line (potion_garden_water.js canPour/onPour), so it never plays
     // the can or costs energy for nothing.
     const dry = gardenNeedsWater(s.garden || s);
+    const waterAllCost = gardenActionProfile((s.garden || s).gardenType, 'water', ctx.skills?.learned || ctx.learned || []).energy;
     add('water_all', 'water all', {
       sort: 10,
       energy: 2,
-      ...(brokenOnly(WATERING_CAN_TOOLS) ? { durationMs: 0 } : {}),
+      ...(brokenOnly(WATERING_CAN_TOOLS) || (pc.energy || 0) <= waterAllCost ? { durationMs: 0 } : {}),
       enabled: canWater && dry,
       reason: !canWater ? 'Need a Watering Can' : dry ? '' : GARDEN_NO_DRY_PLOTS_LINE,
       tooltip: canWater
@@ -863,10 +866,16 @@ export function getVerbsFor(target, ctx) {
     const st = plot?.state || 'clean';
     const gardenLearned = ctx.skills?.learned || ctx.learned || [];
     const gardenCost = (action) => gardenActionProfile(gType, action, gardenLearned).energy;
+    const gardenUpgrades = ctx.imaginationUpgrades || pc.imaginationUpgrades || [];
+    // Report 121: an action the plot will refuse takes no time, so no word bar or tool runs for a
+    // refusal: a tool that can't take its wear, or energy not above its cost (include/garden.js 263-266).
+    const refusedAtOnce = (action, tools = null) => (tools && brokenOnly(tools, gardenActionProfile(gType, action, gardenLearned, gardenUpgrades).toolWear))
+      || (pc.energy || 0) <= gardenCost(action);
     if (st === 'clean') {
       add('plant', 'plant', {
         sort: 10,
         energy: gardenCost('plant'),
+        ...(refusedAtOnce('plant') ? { durationMs: 0 } : {}),
         enabled: seeds.length > 0,
         reason: seeds.length ? '' : gType === 'herb' ? 'Need herb seeds' : 'Need crop seeds',
         tooltip: seeds.length
@@ -880,7 +889,7 @@ export function getVerbsFor(target, ctx) {
       add('water', 'water', {
         sort: st === 'clean' ? 20 : 10,
         energy: gardenCost('water'),
-        ...(brokenOnly(WATERING_CAN_TOOLS) ? { durationMs: 0 } : {}),
+        ...(refusedAtOnce('water', WATERING_CAN_TOOLS) ? { durationMs: 0 } : {}),
         enabled: hasWateringCan(inv),
         reason: hasWateringCan(inv) ? '' : 'Need a Watering Can',
         tooltip: st === 'clean' ? 'Water this plot' : 'Water so this plot can grow',
@@ -891,6 +900,7 @@ export function getVerbsFor(target, ctx) {
       add('harvest', 'harvest', {
         sort: 10,
         energy: harvestProfile.energy,
+        ...(refusedAtOnce('harvest') ? { durationMs: 0 } : {}),
         tooltip: harvestProfile.halfHarvest
           ? `Pick the crop (half yield without ${gType === 'herb' ? 'Herbalism' : 'Croppery'})`
           : 'Pick the crop',
@@ -900,7 +910,7 @@ export function getVerbsFor(target, ctx) {
       add('clear', 'clear', {
         sort: 10,
         energy: gardenCost('clear'),
-        ...(brokenOnly(HOE_TOOLS) ? { durationMs: 0 } : {}),
+        ...(refusedAtOnce('clear', HOE_TOOLS) ? { durationMs: 0 } : {}),
         enabled: hasHoe(inv),
         reason: hasHoe(inv) ? '' : 'Need a Hoe',
         tooltip: 'Hoe the dirt so you can plant again',
@@ -1585,7 +1595,7 @@ export function runVerb(target, verbId, ctx) {
     } else {
       return { ok: false, msgs: [`Cannot ${verbId} this plot.`], effects };
     }
-    if (!r.ok) return { ok: false, msgs: r.msgs || ['Cannot do that.'], effects, speech: r.speech || null };
+    if (!r.ok) return { ok: false, msgs: r.msgs || ['Cannot do that.'], effects, speech: r.speech || null, toastWithSpeech: Boolean(r.toastWithSpeech) };
     if (r.effects) {
       effects.energy += r.effects.energy || 0;
       effects.mood += r.effects.mood || 0;

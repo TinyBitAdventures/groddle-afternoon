@@ -2,9 +2,9 @@
  * Groddle Afternoon — original street geometry + layered decos
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
-import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=e74fbfeb';
+import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=628c01d0';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=127e0a3c';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=22ad04b7';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=e6d90cde';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -603,7 +603,7 @@ import {
   cropIcon,
   hasWateringCan,
   hasHoe,
-} from './js/garden.js?v=97737c93';
+} from './js/garden.js?v=14c83df8';
 import { GARDEN_SCALE, PLOT_H as GARDEN_PLOT_H, PLOT_W as GARDEN_PLOT_W, gardenFrame, gardenLayout, gardenStyle, plotPieces } from './js/garden-view.js?v=05651e76';
 import {
   ROCK_CATALOG,
@@ -807,7 +807,7 @@ import {
   createVendorSellQuote,
   vendorSellUnitPrice,
   vendorBuyUnitPrice,
-} from './js/vendor.js?v=65e22e0e';
+} from './js/vendor.js?v=2637c146';
 import {
   animalAnchorX,
   createAnimalState,
@@ -8976,7 +8976,8 @@ function executeVerb(target, verbId) {
   const feedLine = result.effects?.activityLine || result.msgs?.[0];
   if (feedLine) {
     const toastLine = result.msgs?.[0] || feedLine;
-    const showLine = !spoke && toastLine !== reactionText;
+    // Report 121: a worn tool's plain reason shows beside the plot's talkback.
+    const showLine = (!spoke || result.toastWithSpeech) && toastLine !== reactionText;
     if (result.ok && verbChangedSomething(result.effects) && target.sprite && !target.sprite.destroyed) {
       if (showLine) floatText(target.sprite.x, target.sprite.y - 50, toastLine, 0xfff4d6, { life: 110 });
       logGain(feedLine);
@@ -31194,7 +31195,7 @@ async function main() {
   }
   // Garden talkback QA (js/garden-talk-qa.js): ?gardentalkdemo=herb|crop.
   if (new URLSearchParams(location.search).has('gardentalkdemo')) {
-    import('./js/garden-talk-qa.js?v=28581bfc').then((m) => m.runGardenTalkDemo({ engine, executeVerb, params: new URLSearchParams(location.search) }));
+    import('./js/garden-talk-qa.js?v=12a81ea6').then((m) => m.runGardenTalkDemo({ engine, executeVerb, params: new URLSearchParams(location.search) }));
   }
   // MEMQA (ticket 21, Safari's memory reload in Naraka): ?memqa=1 lets a probe walk streets through the
   // real street trip (tools/qa/street-memory.mjs). Solo pages only: online pages drop their params.

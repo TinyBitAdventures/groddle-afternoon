@@ -736,6 +736,26 @@ export function gardenActionProfile(gardenType, action, learned, upgrades = []) 
   };
 }
 
+/**
+ * A tool that can't take this action's wear (inc_skill_packages.js 169: isWorking(wear x multiplier),
+ * error_tool_broken) answers with the plot's own talkback (include/garden.js 218, 311). A tool that
+ * is worn but not broken gets a plain line too (the remake's, report 121): Aggressive Hoeing can ask for
+ * more condition than a hoe has left, and the talkback alone reads as if the hoe were broken.
+ */
+function gardenToolRefusal(toolId, toolCheck, opts) {
+  const speech = gardenTalkback(HOE_TOOLS.includes(toolId) ? 'broken_hoe' : 'broken_watering_can', { rng: opts.talkRng, failed: true });
+  const { condition, wear } = toolCheck;
+  if (condition?.broken !== false) return { ok: false, reason: 'broken_tool', msgs: [toolCheck.msg], toolCheck, speech };
+  return {
+    ok: false,
+    reason: 'broken_tool',
+    msgs: [`This ${condition.label} needs ${wear} condition for that and only has ${condition.remaining}. Repair it with a Tinkertool.`],
+    toolCheck,
+    speech,
+    toastWithSpeech: true,
+  };
+}
+
 function rollSucceeds(profile, opts) {
   if (opts.maxLuck) return true;
   const rate = Number(profile.successRate);
@@ -1039,7 +1059,8 @@ export function seedFitsGarden(seed, gardenType) {
 
 function spendEnergy(pc, cost) {
   if ((pc.energy || 0) <= cost) {
-    return { ok: false, reason: 'energy', msgs: [`Need ${cost} energy (have ${Math.floor(pc.energy || 0)}).`] };
+    // include/garden.js 138, 264, 348, 463: the source's line for every plot action.
+    return { ok: false, reason: 'energy', msgs: ["You're too tired to do that."] };
   }
   // G289: metabolics_lose_energy, nothing lost while dead (inc_metabolics.js 108-122).
   loseEnergy(pc, cost);
@@ -1176,10 +1197,7 @@ export function waterPlot(garden, key, pc, opts = {}) {
   const toolId = can ? can.tool || can.fallback : null;
   if (requireTool && toolId && opts.toolState) {
     const toolCheck = canUseTool(opts.toolState, toolId, profile.toolWear);
-    if (!toolCheck.ok) {
-      const speech = gardenTalkback(HOE_TOOLS.includes(toolId) ? 'broken_hoe' : 'broken_watering_can', { rng: opts.talkRng, failed: true });
-      return { ok: false, reason: 'broken_tool', msgs: [toolCheck.msg], toolCheck, speech };
-    }
+    if (!toolCheck.ok) return gardenToolRefusal(toolId, toolCheck, opts);
   }
   const cost = profile.energy;
   const er = spendEnergy(pc, cost);
@@ -1338,10 +1356,7 @@ export function clearPlot(garden, key, pc, opts = {}) {
   const toolId = hoe ? hoe.tool || hoe.fallback : null;
   if (requireTool && toolId && opts.toolState) {
     const toolCheck = canUseTool(opts.toolState, toolId, profile.toolWear);
-    if (!toolCheck.ok) {
-      const speech = gardenTalkback(HOE_TOOLS.includes(toolId) ? 'broken_hoe' : 'broken_watering_can', { rng: opts.talkRng, failed: true });
-      return { ok: false, reason: 'broken_tool', msgs: [toolCheck.msg], toolCheck, speech };
-    }
+    if (!toolCheck.ok) return gardenToolRefusal(toolId, toolCheck, opts);
   }
   const cost = profile.energy;
   const er = spendEnergy(pc, cost);
