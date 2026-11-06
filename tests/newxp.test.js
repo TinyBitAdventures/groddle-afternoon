@@ -58,9 +58,10 @@ import {
   talkPages,
   training1Layout,
   training2Layout,
+  training2MeterFull,
   tutorialPhysics,
   vogPages,
-} from '../public/js/newxp.js?v=249fdf4c';
+} from '../public/js/newxp.js?v=0dd5052a';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', 'public');
 const street = (tsid) => JSON.parse(readFileSync(join(ROOT, 'assets/streets', `${tsid}.json`), 'utf8'));
@@ -159,6 +160,44 @@ describe('newxp source data', () => {
     assert.equal(pages[1].button, 'OK');
     assert.equal(talkPages(LINES.rockTicket, { name: 'Pip' }).length, 4);
     assert.deepEqual(vogPages(LINES.currants).length, 2);
+  });
+});
+
+describe('training2 never holds a player who cannot eat or drink (reports 122-124)', () => {
+  const feature = readFileSync(join(ROOT, 'js/features/newxp-feature.js'), 'utf8');
+
+  it('a full meter counts as full, under it does not', () => {
+    assert.equal(training2MeterFull(100, 100), true);
+    assert.equal(training2MeterFull(120, 120), true);
+    assert.equal(training2MeterFull(99, 100), false);
+    assert.equal(training2MeterFull(100, undefined), true);
+    assert.equal(training2MeterFull(undefined, 100), false);
+  });
+
+  it('entering sets both meters to 99 (playerEntered 96-99), so a full save has room again', () => {
+    assert.match(feature, /pc\.energy = TRAINING2_ENTER_METABOLICS;/);
+    assert.match(feature, /pc\.mood = TRAINING2_ENTER_METABOLICS;/);
+    assert.doesNotMatch(feature, /Math\.max\(pc\.(energy|mood) \|\| 0, TRAINING2_ENTER_METABOLICS\)/);
+  });
+
+  it('the eat and drink waits end on a full meter (food_wait_eat 506, drink_wait_drink 582)', () => {
+    assert.match(feature, /run\.data\.eaten \|\| training2MeterFull\(pc\.energy, pc\.energyMax\)/);
+    assert.match(feature, /run\.data\.drank \|\| training2MeterFull\(pc\.mood, pc\.energyMax\)/);
+  });
+
+  it('eating or drinking while the first overlay is up still counts: the flags reset before the pickups', () => {
+    const eat = feature.indexOf("setStep('food_wait_eat')");
+    const drink = feature.indexOf("setStep('drink_wait_drink')");
+    assert.ok(feature.indexOf('run.data.eaten = false') < eat);
+    assert.ok(feature.indexOf('run.data.drank = false') < drink);
+  });
+
+  it('the source has the same two checks', () => {
+    if (!existsSync(join(GS, 'locations/newxp_training2.js'))) return;
+    const t2 = readFileSync(join(GS, 'locations/newxp_training2.js'), 'utf8');
+    assert.match(t2, /metabolics_get_energy\(\) >= 100/);
+    assert.match(t2, /metabolics_get_mood\(\) >= 100/);
+    assert.match(t2, /metabolics_set_energy\(99, true, true\)/);
   });
 });
 

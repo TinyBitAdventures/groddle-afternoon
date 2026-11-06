@@ -370,6 +370,10 @@ export const TRAINING2_DRINKS = Object.freeze([
 // food_eaten: metabolics_set_energy(80); playerEnter sets energy/mood 99.
 export const TRAINING2_ENERGY_AFTER_EAT = 80;
 export const TRAINING2_ENTER_METABOLICS = 99;
+/** food_wait_eat / drink_wait_drink: a full meter can't take the food or drink, so the wait ends. */
+export function training2MeterFull(value, max) {
+  return (Number(value) || 0) >= (Number(max) || 100);
+}
 // newbie_island.js revealCurrants2: stats_add_currants(978).
 export const ISLAND_CURRANTS = 978;
 // The cheap bag vendor's prices are lost; the rock says "about 500 currants each".
