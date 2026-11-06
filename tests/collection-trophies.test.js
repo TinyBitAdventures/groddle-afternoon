@@ -1,7 +1,7 @@
 /**
- * Collections counted from the pack (G533): the original checks a collection badge whenever an item
- * arrives, against what you hold at that moment (players/inc_items.js 593-597,
- * inc_achievements.js 520-544).
+ * Collections counted from the pack (G533) and their trophies (G530): the original checks a collection
+ * badge whenever an item arrives, against what you hold at that moment (players/inc_items.js 593-597,
+ * inc_achievements.js 520-544), and each badge's onComplete makes its one trophy.
  */
 import { before, beforeEach, describe, it } from 'node:test';
 import assert from 'node:assert/strict';
@@ -10,8 +10,9 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { loadContentCatalogsFromDir, getAchievementCatalog } from '../public/js/content-catalogs.js?v=10b118dd';
 import { applyAchievementProgress, createAchievementState, getAchievementProgress, resetAchievementCounter, unlockAchievement } from '../public/js/achievements.js?v=f8ccfd34';
-import { HELD_AT_ONCE, collectionClasses, heldChanges } from '../public/js/collection-trophies.js?v=069a6848';
-import { collectionTrophiesFeature as feature } from '../public/js/features/collection-trophies-feature.js?v=355c2b70';
+import { COLLECTION_TROPHIES, COUNTED_ON_ARRIVAL, HELD_AT_ONCE, collectionClasses, heldChanges, planCollectionTrophies } from '../public/js/collection-trophies.js?v=69205984';
+import { ITEM_CATALOG } from '../public/js/inventory.js?v=d82f3b00';
+import { collectionTrophiesFeature as feature } from '../public/js/features/collection-trophies-feature.js?v=dc2b3e84';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const GS = join(here, '../../glitch-GameServerJS');
@@ -58,6 +59,8 @@ beforeEach(() => {
   clock += 10_000;
   feature.restore?.();
 });
+const owned = (cls, inv) => inv[cls] || 0;
+const packFor = (badge, n = 1) => Object.fromEntries(collectionClasses(getAchievementCatalog()[badge]).map((c) => [c, n]));
 
 describe('Gem Collector (G533)', () => {
   it('the source asks for the five gems held, as the catalog does', { skip: !existsSync(GS) }, () => {
@@ -137,5 +140,124 @@ describe('Gem Collector (G533)', () => {
     const next = heldChanges(first.held, ['a', 'b'], (c) => inv[c]);
     assert.deepEqual([next.gained, next.lost], [['b'], ['a']]);
     assert.deepEqual(heldChanges(next.held, ['a', 'b'], (c) => inv[c]).gained, []);
+  });
+});
+
+describe('collection trophies (G530)', () => {
+  const MUSIC = ['collection_musicblocks_bb', 'collection_musicblocks_db', 'collection_musicblocks_dg', 'collection_musicblocks_dr', 'collection_musicblocks_xs'];
+
+  it('every badge names its trophy and collection_type 1 keeps the items, as the source', { skip: !existsSync(GS) }, () => {
+    assert.equal(Object.keys(COLLECTION_TROPHIES).length, 13);
+    for (const [badge, row] of Object.entries(COLLECTION_TROPHIES)) {
+      const src = readFileSync(join(GS, `achievements/${badge}.js`), 'utf8');
+      assert.match(src, /^var collection_type\t= 1;/m, badge);
+      assert.ok(src.includes(`pc.createItemFromFamiliar("${row.trophy}", 1);`), `${badge} ${row.trophy}`);
+      assert.deepEqual(getAchievementCatalog()[badge].rewards.items[0].class_id, row.trophy);
+      const item = readFileSync(join(GS, `items/${row.trophy}.js`), 'utf8');
+      // trophy_emblems.js 22 leaves collection_id blank: its badge's onComplete still names it.
+      if (badge !== 'collection_all_emblems') assert.ok(item.includes(`"collection_id"\t: "${badge}"`), `${row.trophy} points back at ${badge}`);
+      const words = (name) => JSON.parse(item.match(new RegExp(`^var ${name} = (".*");$`, 'm'))[1]);
+      assert.equal(row.label, words('name_single'));
+      assert.equal(row.desc, words('description'));
+      assert.equal(ITEM_CATALOG[row.trophy].label, row.label);
+    }
+    const ach = readFileSync(join(GS, 'players/inc_achievements.js'), 'utf8');
+    assert.match(ach, /if \(achievement\.collection_type == 2\) this\.items_destroy/);
+  });
+
+  it('every badge is counted one way or the other, and only these', () => {
+    const counted = [...HELD_AT_ONCE, ...COUNTED_ON_ARRIVAL, ...MUSIC].sort();
+    assert.deepEqual(counted, Object.keys(COLLECTION_TROPHIES).sort());
+    for (const id of Object.keys(COLLECTION_TROPHIES)) assert.ok(collectionClasses(getAchievementCatalog()[id]).length >= 4, id);
+    assert.equal(COLLECTION_TROPHIES.collection_egg_hunter, undefined, 'js/seasons.js gives that one');
+    assert.equal(COLLECTION_TROPHIES.collection_street_creator_rock, undefined, 'js/street-jobs.js gives those');
+  });
+
+  for (const badge of HELD_AT_ONCE) {
+    it(`${badge}: holding it all earns the badge and one trophy, keeping the items`, () => {
+      const inv = packFor(badge);
+      const before = { ...inv };
+      const engine = makeEngine(inv);
+      tick(engine, 3);
+      assert.deepEqual(engine.announced, [badge]);
+      assert.equal(owned(COLLECTION_TROPHIES[badge].trophy, inv), 1);
+      for (const [cls, n] of Object.entries(before)) assert.equal(inv[cls], n, `${cls} stays`);
+      assert.deepEqual(engine.activity, [`You got the ${COLLECTION_TROPHIES[badge].label}!`]);
+    });
+  }
+
+  it('a badge earned before trophies existed gets its trophy on load, without its rewards again', () => {
+    for (const badge of [...MUSIC, 'collection_cubimals']) {
+      const achieve = createAchievementState();
+      unlockAchievement(achieve, badge, null);
+      feature.restore?.();
+      const inv = {};
+      const engine = makeEngine(inv, achieve);
+      tick(engine, 2);
+      assert.equal(owned(COLLECTION_TROPHIES[badge].trophy, inv), 1, badge);
+      assert.deepEqual(engine.announced, [], 'no second badge');
+      assert.equal(engine.pc.xp, 0, 'no second reward');
+      assert.equal(engine.saves, 1);
+    }
+  });
+
+  it('never a second: not with one in the pack, not once it has left, not after a reload', () => {
+    const achieve = createAchievementState();
+    unlockAchievement(achieve, 'collection_gems', null);
+    const inv = { trophy_gem: 1 };
+    const engine = makeEngine(inv, achieve);
+    tick(engine, 2);
+    assert.equal(inv.trophy_gem, 1, 'one held stays one');
+    assert.deepEqual(engine.activity, []);
+    inv.trophy_gem = 0;
+    tick(engine, 2);
+    assert.equal(inv.trophy_gem, 0, 'dropped or stored, none comes back');
+    const slice = JSON.parse(JSON.stringify(feature.save()));
+    assert.deepEqual(slice.given, ['collection_gems']);
+    feature.restore(slice);
+    tick(engine, 2);
+    assert.equal(inv.trophy_gem, 0);
+  });
+
+  it('one trophy per badge when two collections finish together', () => {
+    const inv = { ...packFor('collection_gems'), ...packFor('collection_bubbles'), trophy_gas: 0 };
+    const engine = makeEngine(inv);
+    tick(engine, 2);
+    assert.deepEqual(engine.announced.sort(), ['collection_bubbles', 'collection_gems']);
+    assert.equal(inv.trophy_gem, 1);
+    assert.equal(inv.trophy_bubble, 1);
+    assert.equal(inv.trophy_gas, 0);
+  });
+
+  it('a Cubimal that came by trade counts, and a figure set free stays counted, as before', () => {
+    const inv = packFor('collection_cubimals');
+    const last = Object.keys(inv).pop();
+    delete inv[last];
+    const engine = makeEngine(inv);
+    tick(engine);
+    assert.deepEqual(engine.announced, []);
+    const first = Object.keys(inv)[0];
+    inv[first] = 0;
+    tick(engine);
+    inv[last] = 1;
+    tick(engine);
+    assert.deepEqual(engine.announced, ['collection_cubimals']);
+    assert.equal(inv.trophy_cubimal, 1);
+  });
+
+  it('a Musicblock series earned through its own counters gets the trophy', () => {
+    const inv = packFor('collection_musicblocks_dg');
+    const engine = makeEngine(inv);
+    for (const cls of Object.keys(inv)) engine.achievement(`in_inventory:${cls}`, 1);
+    assert.deepEqual(engine.announced, ['collection_musicblocks_dg']);
+    tick(engine, 2);
+    assert.equal(inv.trophy_music_d_green, 1);
+  });
+
+  it('planCollectionTrophies is pure and quiet with nothing owed', () => {
+    assert.deepEqual(planCollectionTrophies([], [], () => 0), []);
+    assert.deepEqual(planCollectionTrophies(['collection_gems'], ['collection_gems'], () => 0), []);
+    assert.deepEqual(planCollectionTrophies([], ['collection_gems'], () => 0), [{ badge: 'collection_gems', trophy: 'trophy_gem', give: true }]);
+    assert.deepEqual(planCollectionTrophies([], ['collection_gems'], () => 1), [{ badge: 'collection_gems', trophy: 'trophy_gem', give: false }]);
   });
 });
