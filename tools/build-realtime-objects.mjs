@@ -53,6 +53,7 @@
  *
  * Run from the game repo root:
  *   node tools/build-realtime-objects.mjs
+ *   node tools/build-realtime-objects.mjs --check  (fail when stale, writes nothing)
  * Writes data/objects.json in the realtime server repo (go:embed in its objects.go;
  * found by tools/repos.mjs: GRODDLE_SERVER_DIR, else ../groddle-afternoon-server).
  */
@@ -322,8 +323,18 @@ async function main() {
     rules: ruleTables(trantTables),
     streets,
   };
+  const text = `${JSON.stringify(out)}\n`;
+  if (process.argv.includes('--check')) {
+    const now = await readFile(outPath, 'utf8').catch(() => '');
+    if (now !== text) {
+      console.error(`${outPath} is stale: run node tools/build-realtime-objects.mjs`);
+      process.exit(1);
+    }
+    console.log(`${outPath} is current (${Object.keys(streets).length} streets)`);
+    return;
+  }
   await mkdir(dirname(outPath), { recursive: true });
-  await writeFile(outPath, `${JSON.stringify(out)}\n`);
+  await writeFile(outPath, text);
   console.log(`${Object.keys(streets).length} streets, ${totals.rocks} rocks, ${totals.trees} trees, ${totals.nodes} nodes, ${totals.pigs} pigs, ${totals.chickens} chickens, ${totals.butterflies} butterflies, ${totals.batterflies} batterflies -> ${outPath}`);
 }
 

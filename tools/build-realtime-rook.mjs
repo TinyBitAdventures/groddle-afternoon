@@ -25,6 +25,7 @@
  *
  * Run from the game repo root:
  *   node tools/build-realtime-rook.mjs
+ *   node tools/build-realtime-rook.mjs --check  (fail when stale, writes nothing)
  * Writes data/rook.json in the realtime server repo (go:embed in its rook.go;
  * found by tools/repos.mjs: GRODDLE_SERVER_DIR, else ../groddle-afternoon-server). Rerun after
  * street, placement or catalog changes, as for build-realtime-objects.mjs.
@@ -134,8 +135,18 @@ async function main() {
     values,
     refused,
   };
+  const text = `${JSON.stringify(out)}\n`;
+  if (process.argv.includes('--check')) {
+    const now = await readFile(outPath, 'utf8').catch(() => '');
+    if (now !== text) {
+      console.error(`${outPath} is stale: run node tools/build-realtime-rook.mjs`);
+      process.exit(1);
+    }
+    console.log(`${outPath} is current (${Object.keys(streets).length} streets)`);
+    return;
+  }
   await mkdir(dirname(outPath), { recursive: true });
-  await writeFile(outPath, `${JSON.stringify(out)}\n`);
+  await writeFile(outPath, text);
   const hubs = new Set(Object.values(streets).map((s) => s[0]));
   console.log(`${Object.keys(streets).length} rookable streets in ${hubs.size} hubs, ${Object.keys(values).length} offer values, ${refused.length} refused -> ${outPath}`);
 }
