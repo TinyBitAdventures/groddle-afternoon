@@ -13,6 +13,12 @@
  * profiles, buddies, the ledger tables, signups, ...), their mail_sends rows (by email hash),
  * their posts and postmeta, usermeta, the users, and the sign-ups held for their addresses.
  *
+ * The kept chat history is keyed the same way and found the same way: groddle_chat_lines.author_id,
+ * groddle_im_lines.a_id, b_id and from_id (CHAT_HISTORY_COLUMNS, pinned by tests/online-smoke.test.js).
+ * A sweep also clears chat rows whose user row is already gone (a QA player removed by hand, or
+ * a line that landed after the last pass), which no address can find: orphanChatCleanup(). Those
+ * statements and counts never name the text column, so no IM text is read or printed.
+ *
  * Guards: a user is only ever removed when its id is above the run's starting MAX(ID), its
  * email matches the run's exact throwaway pattern, and it is not a protected id (1, the site's
  * administrator, and 54, the review account). cleanupStatements() refuses to build SQL for a
@@ -25,6 +31,14 @@ export const PROTECTED_IDS = Object.freeze([1, 54]);
 
 /** Columns that key a wp_groddle_* row to a user. */
 export const ID_COLUMN_REGEXP = '(user_id|^a_id|^b_id|from_id|to_id|owner_id|holder_id|visitor_id|dropper_id|taker_id|buyer_id|seller_id|buddy_id|ignored_id|neighbor_id|claimer_id|actor_id|poster_id|author_id|reporter_id)$';
+
+/** The kept chat history's user keys (site src/ChatHistory.php). Each must match ID_COLUMN_REGEXP. */
+export const CHAT_HISTORY_COLUMNS = Object.freeze([
+  ['wp_groddle_chat_lines', 'author_id'],
+  ['wp_groddle_im_lines', 'a_id'],
+  ['wp_groddle_im_lines', 'b_id'],
+  ['wp_groddle_im_lines', 'from_id'],
+]);
 
 /** The domain each mode's throwaways use (local: Mailpit shows them; live: never delivered). */
 export const DOMAINS = { local: 'groddle.localhost', live: 'example.com' };
@@ -129,6 +143,45 @@ export function leftoverQueries({ ids, emails, cols, like }) {
     if (emails.length) out.push(['mailSends', `SELECT COUNT(*) FROM wp_groddle_mail_sends WHERE email_hash IN (${emails.map((e) => sqlString(emailHash(e))).join(',')})`]);
   }
   return out;
+}
+
+const orphanWhere = (column) => `u.ID IS NULL AND x.${column} NOT IN (${[0, ...PROTECTED_IDS].join(',')})`;
+
+/** Counts of chat rows whose user is gone: [[name, sql], ...]. 0, 1 and 54 are never orphans here. */
+export function orphanChatQueries() {
+  return CHAT_HISTORY_COLUMNS.map(([t, c]) => [`orphan ${t}.${c}`, `SELECT COUNT(*) FROM ${t} x LEFT JOIN wp_users u ON u.ID = x.${c} WHERE ${orphanWhere(c)}`]);
+}
+
+/** The DELETEs for those rows. */
+export function orphanChatStatements() {
+  return CHAT_HISTORY_COLUMNS.map(([t, c]) => `DELETE x FROM ${t} x LEFT JOIN wp_users u ON u.ID = x.${c} WHERE ${orphanWhere(c)};`);
+}
+
+const orphanCounts = (q) => {
+  const counts = { total: 0 };
+  const queries = orphanChatQueries();
+  const answer = q(queries.map(([name, sql]) => `SELECT ${sqlString(name)}, (${sql});`).join('\n')).split('\n').filter(Boolean);
+  for (const line of answer) {
+    const i = line.lastIndexOf('\t');
+    const count = Number(line.slice(i + 1)) || 0;
+    if (count) counts[line.slice(0, i)] = count;
+    counts.total += count;
+  }
+  return counts;
+};
+
+/**
+ * A sweep's second half. A row with no user can't be matched to a throwaway address, so on the
+ * local site (QA players only) they all go. On production a real player's removed account would
+ * look the same, and its partner's private lines with it, so `remove` is false by default and this
+ * only counts; the live sweep takes it from a flag of its own (--orphans).
+ * Returns { found, left, removed }: found and left are counts by column, with a total.
+ */
+export function orphanChatCleanup(q, { remove = false } = {}) {
+  const found = orphanCounts(q);
+  if (!remove || !found.total) return { found, left: found, removed: false };
+  q(orphanChatStatements().join('\n'));
+  return { found, left: orphanCounts(q), removed: true };
 }
 
 /**

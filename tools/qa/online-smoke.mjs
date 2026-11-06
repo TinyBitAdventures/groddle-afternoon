@@ -5,7 +5,10 @@
  *   node tools/qa/online-smoke.mjs --local                 https://groddle.localhost
  *   node tools/qa/online-smoke.mjs --live                  prints what it would make, exits 2
  *   node tools/qa/online-smoke.mjs --live --yes            https://groddleafternoon.com
- *   node tools/qa/online-smoke.mjs --local --sweep         only remove leftovers of earlier runs
+ *   node tools/qa/online-smoke.mjs --local --sweep         only remove leftovers of earlier runs, and
+ *                                                          chat rows whose user is gone
+ *   node tools/qa/online-smoke.mjs --live --yes --sweep [--orphans]   the same on production; chat rows
+ *                                                          whose user is gone are only counted without --orphans
  *     --out=<dir>       summary.json and the shots (default <tmp>/groddle-online-smoke/<mode>-<stamp>)
  *     --settle=<s>      wait before each cleanup pass, for the realtime server's last credits (default 20)
  *     --timeout=<s>     stop the checks after this long and clean up (default 900)
@@ -48,7 +51,7 @@ import { existsSync, mkdirSync, readFileSync, readdirSync, statSync, writeFileSy
 import { homedir, tmpdir } from 'node:os';
 import { extname, join, resolve } from 'node:path';
 import { openBrowser } from './browser.mjs';
-import { emailHash, runCleanup, throwawayPattern } from './smoke-cleanup.mjs';
+import { emailHash, orphanChatCleanup, runCleanup, throwawayPattern } from './smoke-cleanup.mjs';
 import { waitForLine } from './wait-for-line.mjs';
 
 // —— options ——
@@ -57,7 +60,7 @@ const flag = (name) => argv.includes(`--${name}`);
 const value = (name, fallback) => { const a = argv.find((x) => x.startsWith(`--${name}=`)); return a ? a.slice(name.length + 3) : fallback; };
 const MODE = flag('live') ? 'live' : flag('local') ? 'local' : null;
 if (!MODE || (flag('live') && flag('local'))) {
-  console.error('usage: node tools/qa/online-smoke.mjs --local | --live [--yes] [--sweep] [--out=<dir>] [--settle=<s>] [--timeout=<s>] [--headed]');
+  console.error('usage: node tools/qa/online-smoke.mjs --local | --live [--yes] [--sweep [--orphans]] [--out=<dir>] [--settle=<s>] [--timeout=<s>] [--headed]');
   process.exit(2);
 }
 const LIVE = MODE === 'live';
@@ -110,8 +113,10 @@ if (flag('sweep')) {
   if (LIVE && !flag('yes')) { console.error('--live --sweep deletes zz-smoke-*@example.com users on production; add --yes'); process.exit(2); }
   const any = throwawayPattern(MODE, null);
   const r = runCleanup(q, { like: any.like, re: any.re, minId: 1 });
-  console.log(JSON.stringify({ mode: MODE, sweep: true, removed: r.ids, emails: r.emails, skipped: r.skipped, left: r.left }, null, 2));
-  process.exit(r.left.total === 0 ? 0 : 1);
+  const removeOrphans = !LIVE || flag('orphans');
+  const orphans = orphanChatCleanup(q, { remove: removeOrphans });
+  console.log(JSON.stringify({ mode: MODE, sweep: true, removed: r.ids, emails: r.emails, skipped: r.skipped, left: r.left, orphanChatRows: orphans }, null, 2));
+  process.exit(r.left.total === 0 && (!removeOrphans || orphans.left.total === 0) ? 0 : 1);
 }
 
 // —— --live without --yes: say what it will do ——

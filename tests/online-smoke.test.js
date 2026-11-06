@@ -7,7 +7,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { spawnSync } from 'node:child_process';
 
-import { cleanupStatements, emailHash, leftoverQueries, parseColumns, pickThrowaways, PROTECTED_IDS, runCleanup, throwawayPattern } from '../tools/qa/smoke-cleanup.mjs';
+import { CHAT_HISTORY_COLUMNS, COLUMNS_SQL, ID_COLUMN_REGEXP, cleanupStatements, emailHash, leftoverQueries, orphanChatCleanup, orphanChatQueries, orphanChatStatements, parseColumns, pickThrowaways, PROTECTED_IDS, runCleanup, throwawayPattern } from '../tools/qa/smoke-cleanup.mjs';
 import { LINE_WAIT_MS, waitForLine } from '../tools/qa/wait-for-line.mjs';
 
 const ROOT = new URL('..', import.meta.url).pathname;
@@ -190,4 +190,74 @@ test('G536: the Local check waits for a late line and fails only one that never 
   assert.match(part, /waitForLine\(\(\) => lines\(B, 'local'\), \/Hello from A\//);
   assert.match(part, /waitForLine\(\(\) => lines\(A, 'local'\), \/B here\//);
   assert.doesNotMatch(part, /wait\(1200\)/);
+});
+
+test('G524: the kept chat history is found by the column scan, removed and counted', () => {
+  const re = new RegExp(ID_COLUMN_REGEXP);
+  for (const [, c] of CHAT_HISTORY_COLUMNS) assert.ok(re.test(c), c);
+  assert.ok(COLUMNS_SQL.includes(ID_COLUMN_REGEXP));
+  // Neither table's other columns are keys: lid, line_id and parent_id are not users.
+  for (const c of ['lid', 'line_id', 'parent_lid', 'parent_id', 'text', 'reactions', 'name', 'room']) assert.equal(re.test(c), false, c);
+  for (const mode of ['local', 'live']) {
+    const p = throwawayPattern(mode, '123456');
+    const sql = cleanupStatements({ ids: [61, 62], emails: [p.email('a')], cols: CHAT_HISTORY_COLUMNS, like: p.like, minId: 54 });
+    const left = leftoverQueries({ ids: [61, 62], emails: [p.email('a')], cols: CHAT_HISTORY_COLUMNS, like: p.like }).map(([name]) => name);
+    for (const [t, c] of CHAT_HISTORY_COLUMNS) {
+      assert.ok(sql.includes(`DELETE FROM ${t} WHERE ${c} IN (61,62);`), `${mode} ${t}.${c}`);
+      assert.ok(left.includes(`${t}.${c}`), `${mode} ${t}.${c}`);
+    }
+  }
+});
+
+test('G524: rows whose user is gone are counted without reading text, and never 0, 1 or 54', () => {
+  const sql = [...orphanChatQueries().map(([, s]) => s), ...orphanChatStatements()];
+  assert.equal(sql.length, CHAT_HISTORY_COLUMNS.length * 2);
+  for (const s of sql) {
+    assert.doesNotMatch(s, /\btext\b|\breactions\b/i);
+    assert.match(s, /LEFT JOIN wp_users u ON u\.ID = x\.(author_id|a_id|b_id|from_id) WHERE u\.ID IS NULL AND x\.\1 NOT IN \(0,1,54\)/);
+  }
+});
+
+function fakeOrphanDb(start) {
+  const rows = { ...start };
+  const seen = [];
+  const q = (sql) => {
+    seen.push(sql);
+    if (sql.startsWith('DELETE')) {
+      for (const k of Object.keys(rows)) rows[k] = 0;
+      return '';
+    }
+    return sql.split('\n').map((line) => {
+      const name = line.match(/^SELECT '([^']+)'/)[1];
+      return `${name}\t${rows[name] || 0}`;
+    }).join('\n');
+  };
+  return { q, seen };
+}
+
+test('G524: a sweep clears orphan chat rows only when asked (local yes, live needs --orphans)', () => {
+  const key = 'orphan wp_groddle_im_lines.from_id';
+  const counted = fakeOrphanDb({ [key]: 24 });
+  const held = orphanChatCleanup(counted.q);
+  assert.equal(held.removed, false);
+  assert.equal(held.found[key], 24);
+  assert.equal(held.found.total, 24);
+  assert.equal(counted.seen.some((s) => s.startsWith('DELETE')), false, 'only counted');
+
+  const cleared = fakeOrphanDb({ [key]: 24, 'orphan wp_groddle_chat_lines.author_id': 2 });
+  const done = orphanChatCleanup(cleared.q, { remove: true });
+  assert.equal(done.removed, true);
+  assert.equal(done.found.total, 26);
+  assert.deepEqual(done.left, { total: 0 });
+
+  const none = fakeOrphanDb({});
+  const quiet = orphanChatCleanup(none.q, { remove: true });
+  assert.equal(quiet.removed, false);
+  assert.equal(none.seen.some((s) => s.startsWith('DELETE')), false);
+});
+
+test('G524: the sweep passes --orphans through, and only local removes without it', () => {
+  const src = readFileSync(join(import.meta.dirname, '../tools/qa/online-smoke.mjs'), 'utf8');
+  assert.match(src, /const removeOrphans = !LIVE \|\| flag\('orphans'\);/);
+  assert.match(src, /orphanChatCleanup\(q, \{ remove: removeOrphans \}\)/);
 });

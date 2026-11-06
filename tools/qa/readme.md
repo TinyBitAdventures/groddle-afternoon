@@ -56,6 +56,8 @@ from `/console/` (local only); the Original zoom; no page errors.
   never users 1 or 54.
 - It prints a JSON summary and writes `summary.json` and the shots to `--out` (default a temp
   folder). It exits 0 only when every check passes and the cleanup reads zero.
-- `--sweep` removes leftovers of earlier runs (any `zz-smoke-*` address) and nothing else.
+- `--sweep` removes leftovers of earlier runs (any `zz-smoke-*` address), the kept chat lines and IMs
+  included. Local, it also clears chat rows whose user is gone (a QA player removed by hand). Live, it
+  only counts those: a real player's removed account looks the same, so deleting them takes `--orphans`.
 - `--game=<checkout>/public --ws=ws://127.0.0.1:<port>/ws` (local) runs it against a lane's game files
   and its own test realtime server: the page's socket is piped to that server instead of the shared 8793.
