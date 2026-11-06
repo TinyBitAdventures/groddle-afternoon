@@ -70,6 +70,12 @@ export const REPORT_TEXT = Object.freeze({
   filterPlaceholder: 'Search your reports',
   filterNone: 'None of your reports match that. The search looks at each report\'s first line.',
   filterMeta: (shown, n) => `${shown} of ${n} reports`,
+  // Ticket 115: the list's status tabs.
+  tabsLabel: 'Your reports by status',
+  tabAll: 'All',
+  tabNone: 'None of your reports have this status right now.',
+  tabUnread: (n) => (n === 1 ? '1 new reply' : `${n} new replies`),
+  tabCount: (n) => (n === 1 ? '1 report' : `${n} reports`),
   picture: 'Attach a picture of the game',
   pictureHint: 'It shows the street as you see it, with other players, their names and speech bubbles. Not your chat or these windows.',
   pictureNone: 'The game view could not be drawn, so no picture goes with this one.',
@@ -127,6 +133,52 @@ export function pictureSrc(picture) {
 
 /** The status chip's words. */
 export const STATUS_WORDS = Object.freeze({ open: 'Open', answered: 'Answered', working: 'Working on it', closed: 'Closed' });
+
+/**
+ * Ticket 115 (Friendly, 2026-11-06): the list's tabs, All and then each status the site keeps
+ * (src/TicketStore.php STATUSES), named as the chips name them.
+ */
+export const REPORT_TABS = Object.freeze(['all', 'open', 'answered', 'working', 'closed']);
+
+/** A tab's name: All, or the status chip's words. */
+export function tabLabel(tab) {
+  return tab === 'all' ? REPORT_TEXT.tabAll : STATUS_WORDS[tab] || String(tab);
+}
+
+/** Whether a report shows under a tab. */
+export function inTab(t, tab) {
+  return tab === 'all' || t?.status === tab;
+}
+
+/** Per tab, how many reports it holds and how many of them have a reply you have not read. */
+export function tabCounts(tickets) {
+  const out = Object.fromEntries(REPORT_TABS.map((tab) => [tab, { count: 0, unread: 0 }]));
+  for (const t of Array.isArray(tickets) ? tickets : []) {
+    for (const tab of REPORT_TABS) {
+      if (!inTab(t, tab)) continue;
+      out[tab].count += 1;
+      if (t.unread === true) out[tab].unread += 1;
+    }
+  }
+  return out;
+}
+
+/** The player's order after unread: a report answered first, then open, working on it, closed. */
+export const STATUS_ORDER = Object.freeze(['answered', 'open', 'working', 'closed']);
+
+/**
+ * Ticket 115: the list's order, the site's own (src/TicketStore.php listFor, the administrators'
+ * listAll turned to the player's side): a reply you have not read first, then by STATUS_ORDER, the
+ * newest news first in each (ties keep the order the site sent). A new array; never sorted in place.
+ */
+export function sortReports(tickets) {
+  const rank = (t) => {
+    const i = STATUS_ORDER.indexOf(t?.status);
+    return i < 0 ? STATUS_ORDER.length : i;
+  };
+  const when = (t) => Date.parse(String(t?.updatedAt || t?.lastMessageAt || '')) || 0;
+  return (Array.isArray(tickets) ? tickets : []).slice().sort((a, b) => (b.unread === true) - (a.unread === true) || rank(a) - rank(b) || when(b) - when(a));
+}
 
 /** Whether a thread's first message can still be edited: the site says so, and it is yours. */
 export function canEditFirst(thread) {

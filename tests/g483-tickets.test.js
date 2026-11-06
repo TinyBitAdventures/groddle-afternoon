@@ -16,9 +16,9 @@ import { homedir } from 'node:os';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { SITE_DIR, sitePath, skipWithoutSite } from '../tools/repos.mjs';
-import { REPORT_MAX, REPORT_PICTURE, REPORT_TEXT, STATUS_WORDS, UNREAD_POLL_MS, base64Size, canEditFirst, createReportsApi, pictureRefused, pictureSize, pictureSrc, refusalWords, reportFromHash, ticketLine, unreadCount, whenWords } from '../public/js/reports.js?v=ec8320ce';
-import { mountReportsSheet } from '../public/js/ui/reports-sheet.js?v=c4096306';
-import { BUG_TEXT, badgeFor, bugReportFeature, capturePicture } from '../public/js/features/bug-report-feature.js?v=77831c01';
+import { REPORT_MAX, REPORT_PICTURE, REPORT_TEXT, STATUS_WORDS, UNREAD_POLL_MS, base64Size, canEditFirst, createReportsApi, pictureRefused, pictureSize, pictureSrc, refusalWords, reportFromHash, ticketLine, unreadCount, whenWords } from '../public/js/reports.js?v=46a8e328';
+import { mountReportsSheet } from '../public/js/ui/reports-sheet.js?v=933695ee';
+import { BUG_TEXT, badgeFor, bugReportFeature, capturePicture } from '../public/js/features/bug-report-feature.js?v=ca501f83';
 
 const root = join(import.meta.dirname, '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');
@@ -538,7 +538,8 @@ describe('the site (groddle-afternoon-site)', { skip: skipWithoutSite }, () => {
     }
     const store = src('src/TicketStore.php');
     assert.match(store, /WHERE id = \? AND player_user_id = \?', \[\$ticket, \$player\]/);
-    assert.match(store, /WHERE player_user_id = \? ORDER BY updated_at DESC/);
+    // Ticket 115: unread first, then answered, open, working, closed, the newest news first in each.
+    assert.match(store, /WHERE player_user_id = \? ORDER BY player_unread DESC, FIELD\(status, 'answered', 'open', 'working', 'closed'\), updated_at DESC, id DESC LIMIT/);
     assert.match(php, /throw new RestError\('groddle_ticket_missing', 'That report is not one of yours\.', 404\)/);
     // The old route files a ticket too, so games built before the sheet keep working.
     assert.match(src('src/BugReports.php'), /#\[Route\(Method::Post, '\/groddle\/v1\/feedback', policy: new Policy\(Access::SignedIn\)\)\]\s*public function send\(Request \$request\): Response\s*\{\s*return \(new Tickets\(\$this->minn\)\)->create\(\$request\);/);

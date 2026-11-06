@@ -47,10 +47,18 @@
  * [data-reports-picture-preview] (a link with the picture's img, data-which=world|ui), [data-reports-thread-picture]; ticket 49:
  * [data-reports-edit] (Edit), #reports-edit-text [data-reports-edit-text],
  * [data-reports-edit-save], [data-reports-edit-cancel], [data-edited] on a changed message; ticket 58:
- * #reports-filter [data-reports-filter] (the search box, shown from REPORT_FILTER_MIN reports), [data-reports-no-match].
+ * #reports-filter [data-reports-filter] (the search box, shown from REPORT_FILTER_MIN reports), [data-reports-no-match];
+ * ticket 115: [data-reports-tabs] (role tablist) with tabs #reports-tab-<all|open|answered|working|closed>
+ * [data-reports-tab=<tab>] carrying data-count and data-unread, #reports-tabpanel [data-reports-tabpanel],
+ * [data-reports-tab-empty].
+ *
+ * Ticket 115 (Friendly, 2026-11-06): the list has tabs, All and each status with how many it holds,
+ * and a red count on a tab holding a reply you have not read. A real tablist: one tab in the Tab
+ * order, the arrow keys, Home and End move between them (and show them). The list itself is in the
+ * site's order (js/reports.js sortReports): unread first, then answered, open, working, closed.
  */
 
-import { REPORT_FILTER_MIN, REPORT_MAX, REPORT_TEXT as T, STATUS_WORDS, canEditFirst, matchesReport, pictureRefused, pictureSrc, refusalWords, ticketLine, unreadCount, whenWords } from '../reports.js?v=ec8320ce';
+import { REPORT_FILTER_MIN, REPORT_MAX, REPORT_TABS, REPORT_TEXT as T, STATUS_WORDS, canEditFirst, inTab, matchesReport, pictureRefused, pictureSrc, refusalWords, sortReports, tabCounts, tabLabel, ticketLine, unreadCount, whenWords } from '../reports.js?v=46a8e328';
 import { focusBack } from './focus-return.js?v=da190597';
 import { lightboxLink } from './picture-lightbox.js?v=0d2814c8';
 
@@ -89,6 +97,8 @@ export function mountReportsSheet({ doc = globalThis.document, host, api, contex
   let state = 'closed';
   let view = 'list';
   let tickets = [];
+  // Ticket 115: the tab the list shows (js/reports.js REPORT_TABS).
+  let tab = 'all';
   let unread = 0;
   let ticket = null;
   let messages = [];
@@ -133,7 +143,19 @@ export function mountReportsSheet({ doc = globalThis.document, host, api, contex
   // Ticket 58: a search box over your reports once there are a few (their subjects, client side).
   const filter = e('input', { type: 'search', id: 'reports-filter', class: 'reports-text reports-filter', placeholder: T.filterPlaceholder, 'aria-label': T.filterLabel, autocomplete: 'off', spellcheck: 'false', hidden: true, 'data-reports-filter': '' });
   const noMatch = e('p', { class: 'reports-empty', 'data-reports-no-match': '', hidden: true }, T.filterNone);
-  listView.append(filter, list, empty, noMatch);
+  // Ticket 115: the status tabs over the list (filled by drawTabs), and the list as their panel.
+  const tabs = e('div', { class: 'reports-tabs', role: 'tablist', 'aria-label': T.tabsLabel, hidden: true, 'data-reports-tabs': '' });
+  const tabBtns = new Map();
+  for (const id of REPORT_TABS) {
+    const b = e('button', { type: 'button', id: `reports-tab-${id}`, class: 'reports-tab', role: 'tab', 'aria-controls': 'reports-tabpanel', 'aria-selected': id === tab ? 'true' : 'false', tabindex: id === tab ? '0' : '-1', 'data-reports-tab': id });
+    b.addEventListener('click', () => pickTab(id));
+    tabBtns.set(id, b);
+    tabs.append(b);
+  }
+  const tabEmpty = e('p', { class: 'reports-empty', 'data-reports-tab-empty': '', hidden: true }, T.tabNone);
+  const tabPanel = e('div', { id: 'reports-tabpanel', class: 'reports-tabpanel', role: 'tabpanel', 'aria-labelledby': `reports-tab-${tab}`, 'data-reports-tabpanel': '' });
+  tabPanel.append(filter, list, empty, noMatch, tabEmpty);
+  listView.append(tabs, tabPanel);
   // A thread.
   const threadView = e('section', { class: 'reports-view reports-thread-view', 'data-reports-thread-view': '', hidden: true });
   const threadHead = e('div', { class: 'reports-thread-head' });
@@ -215,16 +237,53 @@ export function mountReportsSheet({ doc = globalThis.document, host, api, contex
     node.dataset.status = s;
   }
 
+  /** The reports the list shows: the tab's, matching the search, in the site's order. */
+  function shownTickets() {
+    const q = filter.hidden ? '' : filter.value.trim();
+    return sortReports(tickets).filter((t) => inTab(t, tab) && matchesReport(t, q));
+  }
+
   function listMeta() {
     const q = filter.hidden ? '' : filter.value.trim();
-    return q ? T.filterMeta(tickets.filter((t) => matchesReport(t, q)).length, tickets.length) : T.meta(tickets.length);
+    return q || tab !== 'all' ? T.filterMeta(shownTickets().length, tickets.length) : T.meta(tickets.length);
+  }
+
+  /** Ticket 115: each tab's name, how many it holds and, in red, how many have a reply you have not read. */
+  function drawTabs() {
+    const counts = tabCounts(tickets);
+    tabs.hidden = tickets.length === 0;
+    for (const [id, b] of tabBtns) {
+      const { count, unread: fresh } = counts[id];
+      const on = id === tab;
+      b.setAttribute('aria-selected', on ? 'true' : 'false');
+      b.setAttribute('tabindex', on ? '0' : '-1');
+      b.classList.toggle('is-on', on);
+      b.dataset.count = String(count);
+      b.dataset.unread = String(fresh);
+      b.setAttribute('aria-label', [tabLabel(id), T.tabCount(count), fresh ? T.tabUnread(fresh) : ''].filter(Boolean).join(', '));
+      const parts = [e('span', { class: 'reports-tab-name' }, tabLabel(id)), e('span', { class: 'reports-tab-count', 'aria-hidden': 'true' }, String(count))];
+      if (fresh) parts.push(e('span', { class: 'reports-tab-dot', title: T.tabUnread(fresh), 'aria-hidden': 'true' }, String(fresh)));
+      b.replaceChildren(...parts);
+    }
+    tabPanel.setAttribute('aria-labelledby', `reports-tab-${tab}`);
+  }
+
+  /** Show a tab's reports; from the keys, the focus goes with it. */
+  function pickTab(id, focus = false) {
+    if (!REPORT_TABS.includes(id)) return;
+    tab = id;
+    drawList();
+    if (view === 'list') say(listMeta());
+    if (focus) tabBtns.get(id)?.focus?.();
   }
 
   function drawList() {
     filter.hidden = tickets.length < REPORT_FILTER_MIN && !filter.value;
     const q = filter.hidden ? '' : filter.value.trim();
-    const shown = tickets.filter((t) => matchesReport(t, q));
+    const shown = shownTickets();
     noMatch.hidden = !(q && tickets.length && !shown.length);
+    tabEmpty.hidden = !(!q && tickets.length && !shown.length);
+    drawTabs();
     list.replaceChildren(...shown.map((t) => {
       const li = e('li', { class: 'reports-row', 'data-ticket': t.id, 'data-unread': t.unread ? '1' : null });
       const btn = e('button', { type: 'button', class: 'reports-row-btn', 'aria-label': `${t.subject}, ${STATUS_WORDS[t.status] || t.status}${t.unread ? `, ${T.unreadDot}` : ''}` });
@@ -556,7 +615,7 @@ export function mountReportsSheet({ doc = globalThis.document, host, api, contex
     // Opened straight on Write to us, the list was never fetched.
     if (!tickets.length) refresh();
     const row = ticket ? list.querySelector(`[data-ticket="${ticket.id}"] button`) : null;
-    (row || title).focus({ preventScroll: true });
+    (row || (tabs.hidden ? null : tabBtns.get(tab)) || title).focus({ preventScroll: true });
   }
 
   async function send() {
@@ -595,6 +654,8 @@ export function mountReportsSheet({ doc = globalThis.document, host, api, contex
       state = 'open';
       sendBtn.disabled = false;
       if (r?.ticket) tickets.unshift(r.ticket);
+      // The new report shows in the list whichever tab was open (ticket 115).
+      if (r?.ticket && !inTab(r.ticket, tab)) tab = 'all';
       drawList();
       show('list');
       say(sentWords);
@@ -731,6 +792,15 @@ export function mountReportsSheet({ doc = globalThis.document, host, api, contex
     });
   }
   panel.addEventListener('pointerdown', (ev) => { if (ev.target === panel) close(); });
+  // Ticket 115: the tabs' keys (a tablist's: Left and Right go round, Home and End to the ends).
+  tabs.addEventListener('keydown', (ev) => {
+    const i = REPORT_TABS.indexOf(tab);
+    const n = REPORT_TABS.length;
+    const next = { ArrowRight: (i + 1) % n, ArrowLeft: (i + n - 1) % n, Home: 0, End: n - 1 }[ev.key];
+    if (next === undefined) return;
+    ev.preventDefault();
+    pickTab(REPORT_TABS[next], true);
+  });
   // Each key starts the wait for the picture with the UI again (ticket 73).
   text.addEventListener('input', () => { if (status.classList.contains('is-error')) say(''); idleUi(); });
   reply.addEventListener('input', () => { if (status.classList.contains('is-error')) say(''); });

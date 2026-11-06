@@ -2481,6 +2481,13 @@
   font: 800 calc(var(--fs-classic-row-title) * var(--cu-n, 1))/var(--lh-tight) var(--font-classic-title);
 }
 :root[data-ui="classic"] #bug-report-panel :is(.reports-line, .reports-when, .reports-closed-note, .reports-msg-who time, .reports-label) { color: var(--c-classic-offline); font-size: calc(var(--fs-classic-body) * var(--cu-n, 1)); }
+/* Ticket 115: the status tabs, as the 2012 windows' tab row (the Quest Log's and the Encyclopedia's). */
+:root[data-ui="classic"] #bug-report-panel .reports-tabs { display: flex; flex-wrap: wrap; gap: calc(4 * var(--cu)); margin: 0 0 calc(6 * var(--cu)); padding: 0 0 calc(4 * var(--cu)); border-bottom: 1px solid var(--c-classic-rule); }
+:root[data-ui="classic"] #bug-report-panel .reports-tab { display: inline-flex; align-items: center; gap: calc(4 * var(--cu)); margin: 0; padding: calc(2 * var(--cu)) calc(8 * var(--cu)); border: 1px solid var(--c-classic-rule); border-radius: var(--radius-xs); background: var(--c-classic-panel); color: var(--c-classic-link); font: 800 calc(var(--fs-classic-body) * var(--cu-n, 1))/var(--lh-normal) var(--font-classic-title); cursor: pointer; }
+:root[data-ui="classic"] #bug-report-panel .reports-tab[aria-selected="true"] { border-color: var(--c-classic-title); background: var(--c-classic-title); color: var(--c-classic-panel); }
+:root[data-ui="classic"] #bug-report-panel .reports-tab:focus-visible { outline: 2px solid var(--c-classic-link); outline-offset: 1px; }
+:root[data-ui="classic"] #bug-report-panel .reports-tab-count { color: inherit; font-weight: 700; opacity: 0.75; }
+:root[data-ui="classic"] #bug-report-panel .reports-tab-dot { min-width: calc(14 * var(--cu)); padding: 0 calc(3 * var(--cu)); border-radius: calc(7 * var(--cu)); background: var(--c-classic-unread); color: var(--c-classic-panel); font: 800 calc(var(--fs-classic-count) * var(--cu-n, 1))/calc(14 * var(--cu)) var(--font-classic-title); text-align: center; }
 :root[data-ui="classic"] #bug-report-panel .reports-dot { flex: none; width: calc(9 * var(--cu)); height: calc(9 * var(--cu)); border-radius: 50%; background: var(--c-classic-unread); }
 :root[data-ui="classic"] #bug-report-panel .reports-chip {
   flex: none;

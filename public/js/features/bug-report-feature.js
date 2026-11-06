@@ -60,8 +60,8 @@
  * window.groddleBugReport.open('list'|'new'), .openTicket(id), .refresh() in multiplayer.
  */
 
-import { createReportsApi, REPORT_PICTURE, REPORT_TEXT, UNREAD_POLL_MS, base64Size, pictureSize, reportFromHash } from '../reports.js?v=ec8320ce';
-import { mountReportsSheet } from '../ui/reports-sheet.js?v=c4096306';
+import { createReportsApi, REPORT_PICTURE, REPORT_TEXT, UNREAD_POLL_MS, base64Size, pictureSize, reportFromHash } from '../reports.js?v=46a8e328';
+import { mountReportsSheet } from '../ui/reports-sheet.js?v=933695ee';
 
 export const BUG_REPORT_FEATURE_ID = 'bug-report';
 
@@ -409,6 +409,15 @@ const STYLE = `
 [data-ui="modern"] #bug-report-panel .reports-body::-webkit-scrollbar-track { background: var(--surface-sunken); border-radius: var(--radius-pill); }
 [data-ui="modern"] #bug-report-panel .reports-body::-webkit-scrollbar-thumb { background: var(--border-strong); border: 2px solid var(--surface-sunken); border-radius: var(--radius-pill); }
 [data-ui="modern"] #bug-report-panel .reports-view { display: flex; flex-direction: column; gap: var(--space-2); min-height: 0; flex: 1 1 auto; }
+/* Ticket 115: the status tabs over the list, each with its count and a red count of new replies. */
+[data-ui="modern"] #bug-report-panel .reports-tabs { flex: none; display: flex; flex-wrap: wrap; gap: var(--space-1); padding: 0 0 var(--space-1); border-bottom: 1px solid var(--border); }
+[data-ui="modern"] #bug-report-panel .reports-tab { display: inline-flex; align-items: center; gap: var(--space-1); min-height: 28px; margin: 0; padding: 0 var(--space-2); border: 1px solid transparent; border-radius: var(--radius-pill); background: transparent; color: var(--text-muted); font: var(--fw-bold) var(--fs-s)/var(--lh-tight) var(--font-ui); cursor: pointer; }
+[data-ui="modern"] #bug-report-panel .reports-tab:hover { background: var(--surface-hover); color: var(--text); }
+[data-ui="modern"] #bug-report-panel .reports-tab[aria-selected="true"] { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); }
+[data-ui="modern"] #bug-report-panel .reports-tab-count { min-width: 16px; padding: 0 var(--space-1); border-radius: var(--radius-pill); background: var(--surface-sunken); color: var(--text-muted); font-size: var(--fs-xs); font-weight: var(--fw-heavy); text-align: center; }
+[data-ui="modern"] #bug-report-panel .reports-tab[data-count="0"] .reports-tab-count { opacity: 0.6; }
+[data-ui="modern"] #bug-report-panel .reports-tab-dot { min-width: 16px; height: 16px; padding: 0 4px; box-sizing: border-box; border-radius: var(--radius-pill); background: var(--danger); color: var(--text-inverse); font-size: var(--fs-2xs); font-weight: var(--fw-heavy); line-height: 16px; text-align: center; }
+[data-ui="modern"] #bug-report-panel .reports-tabpanel { display: flex; flex-direction: column; gap: var(--space-2); min-height: 0; }
 [data-ui="modern"] #bug-report-panel .reports-list { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-1); }
 [data-ui="modern"] #bug-report-panel .reports-row-btn { display: grid; gap: 2px; width: 100%; margin: 0; padding: var(--space-2) var(--space-3); border: 1px solid var(--border); border-radius: var(--radius-m); background: var(--surface-raised); color: var(--text); font: inherit; text-align: left; cursor: pointer; }
 [data-ui="modern"] #bug-report-panel .reports-row-btn:hover { background: var(--surface-hover); }
