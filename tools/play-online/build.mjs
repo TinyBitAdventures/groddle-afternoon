@@ -24,7 +24,7 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const SOURCE = join(root, 'public/play/index.html');
 const TARGET = join(root, 'public/play/online/index.html');
 
-/** js/online-boot.js with its content key (tools/module-keys/build.mjs: it changes with that file or js/minn-account.js). */
+/** js/online-boot.js with its content key (tools/module-keys/build.mjs: it changes with that file or js/minn-account-core.js). */
 export const ONLINE_BOOT_SRC = moduleUrl('js/online-boot.js', root);
 
 const MODE_ENTRY = `  <!--

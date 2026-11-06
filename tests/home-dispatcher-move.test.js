@@ -26,7 +26,7 @@ import {
   signpostX,
   streetFixtures,
 } from '../public/js/home-street-fixtures.js?v=badcb725';
-import { homesFeature } from '../public/js/features/homes-feature.js?v=48204a66';
+import { homesFeature } from '../public/js/features/homes-feature.js?v=bdd9c846';
 
 const root = join(import.meta.dirname, '..', 'public', 'js');
 const read = (rel) => readFileSync(join(root, rel), 'utf8');

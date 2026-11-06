@@ -122,7 +122,7 @@ import {
   topLine,
 } from '../street-jobs-mp.js?v=c920dbb9';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
-import { createMinnAccount } from '../minn-account.js?v=7bc19312';
+import { createMinnAccount } from '../minn-account.js?v=b29fae30';
 import { normalizeGroups } from '../groups.js?v=4c4c8d76';
 import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=3149d699';
 import { JOB_WORK_OVERLAY, jobWorkFloatPoint, jobWorkSoundKey, jobWorkToolScale, jobWorkToolSheet } from '../job-work-fx.js?v=33f097ad';

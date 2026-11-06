@@ -385,7 +385,8 @@ function field(id, label, attrs, help = '') {
  * Draws the forms into host.
  * @param {HTMLElement} host
  * @param {{ account: object, start?: 'signin' | 'signup', reset?: { key: string, login: string } | null, verify?: { token: string } | null, onSignedIn?: (r: { player: object, how: string }) => void }} opts
- *   account: createMinnAccount() from js/minn-account.js
+ *   account: createMinnAccount() from js/minn-account.js, or createMinnAccountCore() from
+ *     js/minn-account-core.js (the forms' calls are all in the core)
  */
 export function mountAccountForms(host, { account, start = 'signin', reset = null, verify = null, onSignedIn = () => {} } = {}) {
   if (!document.getElementById(STYLE_ID)) {

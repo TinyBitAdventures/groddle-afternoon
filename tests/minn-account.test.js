@@ -15,12 +15,12 @@ import { execFileSync } from 'node:child_process';
 import { join } from 'node:path';
 import { homedir } from 'node:os';
 
-import { createMinnAccount, minnUrls } from '../public/js/minn-account.js?v=7bc19312';
-import { GATE_COPY, SAVE_ALERT_COPY, bootDataFrom, deliverHandoff, gateFor, saveAlertFor } from '../public/js/online-boot.js?v=be077df3';
+import { createMinnAccount, minnUrls } from '../public/js/minn-account.js?v=b29fae30';
+import { GATE_COPY, SAVE_ALERT_COPY, bootDataFrom, deliverHandoff, gateFor, saveAlertFor } from '../public/js/online-boot.js?v=7ffb8870';
 import { SAVE_STOPPED } from '../public/js/save-store.js?v=8839ba7b';
-import { FORM_COPY, SETTINGS_COPY, resetLinkFrom } from '../public/js/account-forms.js?v=dc451560';
-import { restoreNeedsAsking, sizeLabel, slotForNewBackup, accountBackupFeature } from '../public/js/features/account-backup-feature.js?v=0479a06e';
-import { FEATURES } from '../public/js/features/index.js?v=ca1e18a4';
+import { FORM_COPY, SETTINGS_COPY, resetLinkFrom } from '../public/js/account-forms.js?v=318b6815';
+import { restoreNeedsAsking, sizeLabel, slotForNewBackup, accountBackupFeature } from '../public/js/features/account-backup-feature.js?v=d780c98a';
+import { FEATURES } from '../public/js/features/index.js?v=dd8c584f';
 import { multiplayerEntryUrl } from '../public/js/game-mode.js?v=1ecf2899';
 import { SAVE_ENTRY_NAMES, createMultiplayerSaveStore } from '../public/js/save-store.js?v=8839ba7b';
 import { HAS_SITE, SITE_DIR, serverPath, skipWithoutServer, skipWithoutSite } from '../tools/repos.mjs';
@@ -285,6 +285,7 @@ describe('online-boot', () => {
     const src = read('public/js/online-boot.js');
     assert.doesNotMatch(src, /from '[^']*save-store\.js/);
     assert.doesNotMatch(read('public/js/minn-account.js'), /from '[^']*save-store\.js/);
+    assert.doesNotMatch(read('public/js/minn-account-core.js'), /from '[^']*save-store\.js/);
     assert.match(src, /window\.GRODDLE_MP_BOOT = bootDataFrom/);
     assert.ok(src.indexOf('window.GRODDLE_MP_BOOT =') < src.indexOf("game.type = 'module'"), 'the save is in place before game.js is added');
   });
@@ -487,5 +488,39 @@ describe('Groddle extension: accounts (groddle-afternoon-site)', { skip: skipWit
       tooLarge: 'groddle_save_too_large:413',
       time: '2026-10-25T18:00:00Z',
     });
+  });
+});
+
+// The phone companion loads js/minn-account-core.js alone (its 240 KB budget); the game's
+// createMinnAccount is that plus every call only the game makes.
+describe('createMinnAccount: the core and the game\'s calls', () => {
+  const opts = { baseUri: 'https://groddle.localhost/', nonce: 'abcdef0123' };
+  const answer = (nonce) => ({ status: 200, ok: true, headers: { get: () => nonce }, json: async () => ({}), text: async () => '' });
+
+  it('one account with every call: the core\'s and the game\'s', async () => {
+    const { createMinnAccountCore, minnUrls: coreUrls } = await import('../public/js/minn-account-core.js?v=e15cf456');
+    const core = createMinnAccountCore(opts);
+    const full = createMinnAccount(opts);
+    for (const name of Object.keys(core)) assert.ok(name in full, name);
+    for (const name of ['realtimeTicket', 'addBuddy', 'groups', 'profile', 'home', 'radiance', 'auctions', 'sendMail', 'snaps', 'listBackups', 'reportBug']) {
+      assert.equal(typeof full[name], 'function', name);
+      assert.equal(core[name], undefined, `${name} stays out of the phone`);
+    }
+    assert.equal(Object.keys(full).length, 79, 'no call lost in the move');
+    assert.equal(minnUrls, coreUrls, 'one minnUrls, whichever file it is imported from');
+  });
+
+  it('the nonce stays live on the full account: a game call\'s answer updates what the core reads', async () => {
+    const seen = [];
+    const fetch = async (url, init) => {
+      seen.push(init.headers['X-WP-Nonce']);
+      return answer(seen.length === 1 ? 'fedcba9876' : null);
+    };
+    const a = createMinnAccount({ ...opts, fetch });
+    assert.equal(a.nonce, 'abcdef0123');
+    await a.groups();
+    assert.equal(a.nonce, 'fedcba9876', 'a getter, not a copied value');
+    await a.buddies();
+    assert.deepEqual(seen, ['abcdef0123', 'fedcba9876'], 'game and core calls share one nonce');
   });
 });

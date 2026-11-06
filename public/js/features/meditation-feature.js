@@ -78,7 +78,7 @@ import { sourceFromUrl } from '../textures.js?v=3149d699';
 import { denseSprite } from '../sprite-dense.js?v=178a711b';
 import { rainbowSound, showRainbow } from '../overlays.js?v=210ad5ee';
 import { moodScaledXp } from '../mood-xp.js?v=958e7680';
-import { createMinnAccount } from '../minn-account.js?v=7bc19312';
+import { createMinnAccount } from '../minn-account.js?v=b29fae30';
 import { getSkillPackageOverride } from '../skill-packages.js?v=bfb87281';
 import {
   RADIANCE_TEXT,

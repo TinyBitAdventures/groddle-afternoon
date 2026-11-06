@@ -3,7 +3,7 @@
  * administrators (groddle-afternoon-site src/Tickets.php, TicketStore.php).
  * The pure rules the Reports sheet (js/ui/reports-sheet.js) draws from, and
  * its calls to groddle/v1/tickets, signed in, with the session's REST nonce
- * (a stale one is fetched again once, as js/minn-account.js does).
+ * (a stale one is fetched again once, as js/minn-account-core.js does).
  *
  * A ticket: { id, status: open|answered|working|closed, subject, createdAt, updatedAt,
  * lastMessageAt, lastAuthor: player|admin, unread }; a message: { id, author:
@@ -25,7 +25,7 @@
  * and the administrators (src/TicketPictures.php).
  */
 
-import { minnUrls } from './minn-account.js?v=7bc19312';
+import { minnUrls } from './minn-account-core.js?v=e15cf456';
 
 /** The sheet's words. The form welcomes feedback, suggestions and bugs alike (the original's BootError.as 280-290 asked only for bugs). */
 export const REPORT_TEXT = Object.freeze({

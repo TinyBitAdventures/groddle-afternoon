@@ -20,8 +20,8 @@ import { execFileSync } from 'node:child_process';
 import { join } from 'node:path';
 import { homedir } from 'node:os';
 
-import { createMinnAccount } from '../public/js/minn-account.js?v=7bc19312';
-import { FORM_COPY, fillCopy, signUpOutcome, verifyLinkFrom, verifyOutcome, resetLinkFrom } from '../public/js/account-forms.js?v=dc451560';
+import { createMinnAccount } from '../public/js/minn-account.js?v=b29fae30';
+import { FORM_COPY, fillCopy, signUpOutcome, verifyLinkFrom, verifyOutcome, resetLinkFrom } from '../public/js/account-forms.js?v=318b6815';
 import { HAS_SITE, SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');

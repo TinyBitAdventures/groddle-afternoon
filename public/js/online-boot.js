@@ -17,8 +17,8 @@
  * play/index.html by tools/play-online/build.mjs.
  */
 
-import { createMinnAccount } from './minn-account.js?v=7bc19312';
-import { mountAccountForms, resetLinkFrom, verifyLinkFrom } from './account-forms.js?v=dc451560';
+import { createMinnAccountCore } from './minn-account-core.js?v=e15cf456';
+import { mountAccountForms, resetLinkFrom, verifyLinkFrom } from './account-forms.js?v=318b6815';
 import { claimCharacter, newWriterId, takeHandoff } from './save-claim.js?v=30cf5250';
 
 const PILL_TEXT = {
@@ -399,7 +399,7 @@ function mountSaveAlert() {
 async function boot() {
   const gate = document.getElementById('online-gate');
   const script = document.getElementById('online-boot');
-  const account = createMinnAccount({ baseUri: document.baseURI });
+  const account = createMinnAccountCore({ baseUri: document.baseURI });
   // Signed in from the gate's forms: the same steps again, now with a session, straight into the game.
   // A sign-up link is spent once used: it leaves the address bar before the gate looks at it again.
   const onSignedIn = () => {

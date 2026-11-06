@@ -1,259 +1,23 @@
 /**
- * The player's account on the Groddle site (Minn, groddle-afternoon-site): signing
- * up, in and out by email, who is signed in, the multiplayer save, and the
- * solo backups, over the groddle/v1 REST routes (groddle-afternoon-site/src/
- * PlayerAccount.php, Player.php, MultiplayerSave.php, SoloBackups.php).
- *
- * Minn speaks WordPress's sign-in contract: the sign-in cookie counts on a
- * REST call only with its wp_rest nonce, which a signed-in page asks for at
- * wp-admin/admin-ajax.php?action=rest-nonce (a signed-out page gets "0"
- * with 400). Every answer hands back a fresh nonce in X-WP-Nonce, kept here.
- * On a plain static server (local QA) none of this exists and session()
- * says { minn: false }.
- *
- * This module never imports js/save-store.js: /play/online/ uses it to
- * fetch the save BEFORE the store (and game.js) loads.
+ * The player's account on the Groddle site: every call the game makes. js/minn-account-core.js has
+ * the sign-in, the save and what the phone companion reads; the calls below are the game's alone
+ * and start from it, so the phone (tests/phone-companion.test.js, 240 KB) never loads them.
+ * createMinnAccount() answers one object with both.
  */
+import { accountParts, minnUrls } from './minn-account-core.js?v=e15cf456';
 
-/** Where the account lives, from the page's base URI (the site root: play pages set <base>). */
-export function minnUrls(baseUri) {
-  const at = (path) => new URL(path, baseUri).href;
-  return {
-    nonce: at('wp-admin/admin-ajax.php?action=rest-nonce'),
-    api: at('wp-json/groddle/v1/'),
-    /** The multiplayer entry, where a signed-out player signs in (its gate holds the forms). */
-    online: at('play/online/'),
-  };
-}
-
-const NONCE = /^[0-9a-f]{10}$/;
+export { minnUrls };
 
 /**
  * @param {{ baseUri: string, fetch?: typeof fetch, nonce?: string }} opts
  *   nonce: a REST nonce already in hand (the multiplayer boot data), so the
  *   first call needs no admin-ajax round trip.
  */
-export function createMinnAccount({ baseUri, fetch: fetchFn = globalThis.fetch?.bind(globalThis), nonce: givenNonce = '' } = {}) {
-  const urls = minnUrls(baseUri);
-  let nonce = NONCE.test(String(givenNonce)) ? String(givenNonce) : '';
+export function createMinnAccount(opts = {}) {
+  const { account, call, failed, buddyCall, refreshNonce } = accountParts(opts);
 
-  async function call(path, { method = 'GET', body, keepalive = false } = {}) {
-    const headers = {};
-    if (nonce) headers['X-WP-Nonce'] = nonce;
-    if (body !== undefined) headers['Content-Type'] = 'application/json';
-    const res = await fetchFn(urls.api + path, {
-      method,
-      credentials: 'same-origin',
-      cache: 'no-store',
-      keepalive,
-      headers,
-      body: body === undefined ? undefined : JSON.stringify(body),
-    });
-    const fresh = res.headers?.get?.('X-WP-Nonce');
-    if (fresh) nonce = fresh;
-    let data = null;
-    try { data = await res.json(); } catch { /* not JSON: no Minn here */ }
-    return { status: res.status, ok: res.ok, data };
-  }
-
-  /** A fresh nonce from admin-ajax (a stale one answers 403 rest_cookie_invalid_nonce). */
-  async function refreshNonce() {
-    try {
-      const res = await fetchFn(urls.nonce, { credentials: 'same-origin', cache: 'no-store' });
-      const text = String(await res.text()).trim();
-      if (res.ok && NONCE.test(text)) {
-        nonce = text;
-        return true;
-      }
-    } catch { /* offline: the caller's answer stands */ }
-    return false;
-  }
-
-  /**
-   * A call to a route anyone may use (sign-up, sign-in): a nonce that went
-   * stale with a session that ended is refused even here, so the call is
-   * made again with a fresh one, or none.
-   */
-  async function post(path, body, method = 'POST') {
-    let r;
-    try {
-      r = await call(path, { method, body });
-      if (r.status === 403 && r.data?.code === 'rest_cookie_invalid_nonce') {
-        if (!(await refreshNonce())) nonce = '';
-        r = await call(path, { method, body });
-      }
-    } catch {
-      return { status: 0, ok: false, data: { code: 'offline', message: 'The Groddle site is not answering. Try again in a moment.' } };
-    }
-    return r;
-  }
-
-  const refusal = (r) => ({
-    ok: false,
-    code: r.data?.code || `http_${r.status}`,
-    message: r.data?.message || 'That didn\'t work. Try again in a moment.',
-    fields: r.data?.fields && typeof r.data.fields === 'object' ? r.data.fields : {},
-  });
-
-  /** A sign-up or sign-in answer; the new session's nonce is fetched before anything else is asked. */
-  async function signedIn(r) {
-    if (!r.ok || r.data?.signedIn !== true) return refusal(r);
-    nonce = '';
-    await refreshNonce();
-    return { ok: true, player: r.data.player };
-  }
-
-  const failed = (what, r) => Object.assign(new Error(`${what} failed (${r.status}${r.data?.code ? ` ${r.data.code}` : ''})`), { status: r.status, code: r.data?.code || '', data: r.data });
-
-  /** A signed-in call that refreshes a stale nonce once (as realtimeTicket does) and throws on a refusal. */
-  async function buddyCall(what, path, init = {}) {
-    let r;
-    for (let attempt = 0; attempt < 2; attempt++) {
-      try {
-        r = await call(path, init);
-      } catch {
-        throw Object.assign(new Error('The Groddle site is not answering'), { status: 0, code: 'offline', message: 'The Groddle site is not answering. Try again in a moment.' });
-      }
-      if (r.status === 403 && r.data?.code === 'rest_cookie_invalid_nonce' && attempt === 0 && (await refreshNonce())) continue;
-      break;
-    }
-    if (!r.ok) {
-      const err = failed(what, r);
-      if (typeof r.data?.message === 'string') err.message = r.data.message;
-      throw err;
-    }
-    return r.data;
-  }
-
-  return {
-    urls,
-    get nonce() { return nonce; },
-
-    /**
-     * Who is playing: { minn, signedIn, player, backups }. minn is false when
-     * the site has no Groddle account routes (a static server), or when it
-     * cannot be reached ({ minn: false, offline: true }).
-     */
-    async session() {
-      let res;
-      try {
-        res = await fetchFn(urls.nonce, { credentials: 'same-origin', cache: 'no-store' });
-      } catch {
-        return { minn: false, offline: true, signedIn: false, player: null };
-      }
-      const text = String(await res.text()).trim();
-      nonce = res.ok && NONCE.test(text) ? text : '';
-      if (!nonce && !(res.status === 400 && text === '0')) return { minn: false, signedIn: false, player: null };
-      let me;
-      try {
-        me = await call('me');
-      } catch {
-        return { minn: false, offline: true, signedIn: false, player: null };
-      }
-      if (!me.ok || typeof me.data?.signedIn !== 'boolean') return { minn: false, signedIn: false, player: null };
-      return { minn: true, signedIn: me.data.signedIn, player: me.data.player || null, backups: me.data.backups || null, account: me.data.account || null };
-    },
-
-    /**
-     * A new player (email, password, the character's name). The site holds
-     * the sign-up until the emailed link is opened: { ok: true, pending:
-     * true, email, name, nameHeld } (nameHeld: another sign-up waiting on its
-     * link asked for the name too). A local QA address is made at once and
-     * signed straight in: { ok: true, player }. A refusal is { ok: false,
-     * code, message, fields } keyed by form field (email, password, name).
-     */
-    async signUp({ email, password, name, website = '' }) {
-      const r = await post('players', { email, password, name, website });
-      if (r.status === 202 && r.data?.pending === true) {
-        return { ok: true, pending: true, email: String(r.data.email || email), name: String(r.data.name || name), nameHeld: r.data.nameHeld === true };
-      }
-      return signedIn(r);
-    },
-
-    /**
-     * Opens a held sign-up's link (its token from /play/online/#verify=):
-     * the account is made and signed in, { ok: true, player }. A name
-     * someone got first is refused with code name_taken and fields.name;
-     * send the token again with another name. Other refusals: signup_used,
-     * signup_expired, signup_unknown, email_exists.
-     */
-    async verifySignUp({ token, name = '' }) {
-      return signedIn(await post('players/verify', name ? { token, name } : { token }));
-    },
-
-    /**
-     * Mails a held sign-up a new link, by its token ({ ok, email }) or by
-     * email ({ ok }: the same whether or not one is waiting). Refusals:
-     * signup_wait (a minute between emails), signup_spent, signup_used,
-     * signup_unknown.
-     */
-    async resendSignUp({ token = '', email = '' } = {}) {
-      const r = await post('players/resend', token ? { token } : { email });
-      return r.ok ? { ok: true, ...(r.data?.email ? { email: String(r.data.email) } : {}) } : refusal(r);
-    },
-
-    /** Signs in by email; remember keeps the session for two weeks. Same answers as signUp. */
-    async signIn({ email, password, remember = false }) {
-      return signedIn(await post('session', { email, password, remember }));
-    },
-
-    /** Signs out (ends the session on the site). */
-    async signOut() {
-      const r = await post('session', undefined, 'DELETE');
-      nonce = '';
-      return { ok: r.ok };
-    },
-
-    /**
-     * A new password for the signed-in player, the current one first. The
-     * site signs this browser in again (other devices are signed out), so a
-     * fresh nonce follows. Same answers as signIn.
-     */
-    async changePassword({ current, password }) {
-      return signedIn(await post('account/password', { current, password }, 'PUT'));
-    },
-
-    /** A new sign-in email, the current password first: { ok, email } or a refusal. */
-    async changeEmail({ current, email }) {
-      const r = await post('account/email', { current, email }, 'PUT');
-      return r.ok ? { ok: true, email: String(r.data?.email || email) } : refusal(r);
-    },
-
-    /** Mails a password reset link. { ok, message }: the same answer whether or not the address has an account. */
-    async requestPasswordReset(email) {
-      const r = await post('password-reset', { email });
-      return r.ok ? { ok: true } : refusal(r);
-    },
-
-    /** A new password from a reset link (its key and login), then signed straight in. Same answers as signUp. */
-    async confirmPasswordReset({ login, key, password }) {
-      return signedIn(await post('password-reset/confirm', { login, key, password }));
-    },
-
-    /**
-     * The multiplayer save: { version, updatedAt, data } (data null before the first write).
-     * writer: the game page's id, which claims the save for that page (the window that
-     * loads last is the one that saves, MultiplayerSave.php); peek: read only, no claim and
-     * no catching up on trades (the phone companion, which never writes the save).
-     */
-    async multiplayerSave({ writer = '', peek = false } = {}) {
-      const query = peek ? '?peek=1' : writer ? `?writer=${encodeURIComponent(writer)}` : '';
-      const r = await call(`save${query}`);
-      if (!r.ok) throw failed('Loading the multiplayer save', r);
-      return r.data;
-    },
-
-    /**
-     * Delivers the last write of the page before in this tab (js/save-claim.js takeHandoff), as
-     * that page sent it: { status, data }. A refusal is an answer, not an error.
-     */
-    async deliverHandoff(body) {
-      let parsed;
-      try { parsed = JSON.parse(body); } catch { return { status: 0, data: null }; }
-      const r = await call('save', { method: 'PUT', body: parsed });
-      return { status: r.status, data: r.data };
-    },
-
+  // Assigned onto the account, not spread: its nonce is a live getter.
+  return Object.assign(account, {
     /** The solo backups: { slots, maxBytes, backups: [{ slot, madeAt, gameDay, size }] }. */
     async listBackups() {
       const r = await call('backups');
@@ -305,9 +69,7 @@ export function createMinnAccount({ baseUri, fetch: fetchFn = globalThis.fetch?.
      * the proof for buddy_tell. A refusal throws with .status, .code and the
      * site's .message.
      */
-    async buddies() {
-      return buddyCall('Loading buddies', 'buddies');
-    },
+    // buddies() is in js/minn-account-core.js: the phone reads it.
 
     async addBuddy(id) {
       return buddyCall('Adding a buddy', 'buddies', { method: 'POST', body: { id: Number(id) } });
@@ -538,16 +300,6 @@ export function createMinnAccount({ baseUri, fetch: fetchFn = globalThis.fetch?.
       return buddyCall('Loading the replies', `chat/ims/${Math.floor(Number(withId)) || 0}/threads/${Math.max(0, Math.floor(Number(lineId)) || 0)}`);
     },
 
-    /** "Appear offline" (groddle-afternoon-site, user meta groddle_appear_offline): { off }. */
-    async presence() {
-      return buddyCall('Checking how you show', 'account/presence');
-    },
-
-    /** Switches "Appear offline": { off, live } (live: the realtime server took it at once). */
-    async setPresence(off) {
-      return buddyCall('Changing how you show', 'account/presence', { method: 'PUT', body: { off: Boolean(off) } });
-    },
-
     /**
      * The Community boards' notices the game's Activity has not shown (groddle-afternoon-site
      * src/Community.php, POST community/notices/game): { notices: [{ id, kind, count, from, thread, url, at, text }] };
@@ -614,9 +366,7 @@ export function createMinnAccount({ baseUri, fetch: fetchFn = globalThis.fetch?.
      * collectMail(id) { status: collected | done, receipt, letter }.
      * A refusal throws with the site's { status: refused, why, text } as err.data.
      */
-    async playerMail() {
-      return buddyCall('Checking your mail', 'mail');
-    },
+    // playerMail() is in js/minn-account-core.js: the phone reads it.
 
     async sendMail(letter) {
       return buddyCall('Sending your letter', 'mail', { method: 'POST', body: letter });
@@ -664,5 +414,5 @@ export function createMinnAccount({ baseUri, fetch: fetchFn = globalThis.fetch?.
       const q = exclude ? `?exclude=${encodeURIComponent(String(exclude))}` : '';
       return buddyCall('Finding a snap', `snaps/random${q}`);
     },
-  };
+  });
 }

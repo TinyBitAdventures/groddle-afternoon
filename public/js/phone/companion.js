@@ -20,11 +20,11 @@
  * [data-friend=<id>], #pc-report-text, #pc-photo, #pc-reply-text.
  */
 
-import { createMinnAccount } from '../minn-account.js?v=7bc19312';
-import { mountAccountForms, resetLinkFrom, verifyLinkFrom } from '../account-forms.js?v=dc451560';
-import { gateFor, quietSession, suspendedNow } from '../online-boot.js?v=be077df3';
-import { REPORT_MAX, REPORT_TEXT, STATUS_WORDS, createReportsApi, pictureRefused, pictureSrc, refusalWords, reportFromHash, ticketLine, unreadCount, whenWords } from '../reports.js?v=9baf7f5d';
-import { DEVICE_KEY, PHONE_TEXT as T, POLL_MS, createPresenceApi, fitPhoto, friendsView, fullGameHref, itemNamesFrom, itemWords, mailRows, mailboxFromSave, mergePlayerMail, phoneContext, unreadLetters } from './companion-data.js?v=3fddd1dd';
+import { createMinnAccountCore } from '../minn-account-core.js?v=e15cf456';
+import { mountAccountForms, resetLinkFrom, verifyLinkFrom } from '../account-forms.js?v=318b6815';
+import { gateFor, quietSession, suspendedNow } from '../online-boot.js?v=7ffb8870';
+import { REPORT_MAX, REPORT_TEXT, STATUS_WORDS, createReportsApi, pictureRefused, pictureSrc, refusalWords, reportFromHash, ticketLine, unreadCount, whenWords } from '../reports.js?v=782a6e42';
+import { DEVICE_KEY, PHONE_TEXT as T, POLL_MS, createPresenceApi, fitPhoto, friendsView, fullGameHref, itemNamesFrom, itemWords, mailRows, mailboxFromSave, mergePlayerMail, phoneContext, unreadLetters } from './companion-data.js?v=fe13d2e8';
 
 const doc = globalThis.document;
 
@@ -93,7 +93,7 @@ function start() {
   home = el('section', { class: 'pc-home', hidden: true });
   app.append(gate, home);
   mountNote(app);
-  account = createMinnAccount({ baseUri: doc.baseURI });
+  account = createMinnAccountCore({ baseUri: doc.baseURI });
   reports = createReportsApi({ baseUri: doc.baseURI });
   presence = createPresenceApi({ account });
   boot();

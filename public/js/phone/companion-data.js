@@ -8,7 +8,7 @@
  *   thread, create with an optional picture, reply, close). On a phone the
  *   picture is a photo the player picks, made into a JPEG the size the site
  *   keeps (REPORT_PICTURE; src/ReportPicture.php checks it again).
- * - Mail: the multiplayer save (groddle/v1/save through js/minn-account.js),
+ * - Mail: the multiplayer save (groddle/v1/save through js/minn-account-core.js),
  *   read only: the letters are the save's mailbox (js/player-save.js systems.
  *   mailbox, js/mailbox.js rules), plus the letters from other players the
  *   site holds that the save has not taken in yet (groddle/v1/mail, G478:
@@ -20,7 +20,7 @@
  *   player's game on another device.
  */
 
-import { REPORT_PICTURE, base64Size, pictureSize } from '../reports.js?v=9baf7f5d';
+import { REPORT_PICTURE, base64Size, pictureSize } from '../reports.js?v=782a6e42';
 import { listMailboxMessages, mailSender, normalizeMailboxState } from '../mailbox.js?v=1d97704f';
 import { addedYouOnly, normalizeList } from '../buddies.js?v=df41a3bb';
 import { letterRow } from '../player-mail.js?v=37933726';

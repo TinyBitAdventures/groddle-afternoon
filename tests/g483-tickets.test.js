@@ -16,9 +16,9 @@ import { homedir } from 'node:os';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { SITE_DIR, sitePath, skipWithoutSite } from '../tools/repos.mjs';
-import { REPORT_MAX, REPORT_PICTURE, REPORT_TEXT, STATUS_WORDS, UNREAD_POLL_MS, base64Size, canEditFirst, createReportsApi, pictureRefused, pictureSize, pictureSrc, refusalWords, reportFromHash, ticketLine, unreadCount, whenWords } from '../public/js/reports.js?v=9baf7f5d';
-import { mountReportsSheet } from '../public/js/ui/reports-sheet.js?v=c847c05a';
-import { BUG_TEXT, badgeFor, bugReportFeature, capturePicture } from '../public/js/features/bug-report-feature.js?v=23935bd3';
+import { REPORT_MAX, REPORT_PICTURE, REPORT_TEXT, STATUS_WORDS, UNREAD_POLL_MS, base64Size, canEditFirst, createReportsApi, pictureRefused, pictureSize, pictureSrc, refusalWords, reportFromHash, ticketLine, unreadCount, whenWords } from '../public/js/reports.js?v=782a6e42';
+import { mountReportsSheet } from '../public/js/ui/reports-sheet.js?v=ee8a262f';
+import { BUG_TEXT, badgeFor, bugReportFeature, capturePicture } from '../public/js/features/bug-report-feature.js?v=be28caeb';
 
 const root = join(import.meta.dirname, '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');

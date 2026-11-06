@@ -9,7 +9,7 @@
  * were logged); window.groddleCommunity.
  */
 
-import { createMinnAccount } from '../minn-account.js?v=7bc19312';
+import { createMinnAccount } from '../minn-account.js?v=b29fae30';
 import { NOTICE_FIRST_MS, NOTICE_POLL_MS, communityNoticeHtml, communityNoticesFrom } from '../community-notices.js?v=f676c372';
 
 export const COMMUNITY_MP_FEATURE_ID = 'community-mp';

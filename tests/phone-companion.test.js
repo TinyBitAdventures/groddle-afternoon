@@ -17,8 +17,8 @@ import { existsSync, readFileSync, statSync } from 'node:fs';
 import { dirname, join, relative, resolve } from 'node:path';
 import vm from 'node:vm';
 import { sitePath, skipWithoutSite } from '../tools/repos.mjs';
-import { createMinnAccount } from '../public/js/minn-account.js?v=7bc19312';
-import { REPORT_PICTURE } from '../public/js/reports.js?v=9baf7f5d';
+import { createMinnAccount } from '../public/js/minn-account.js?v=b29fae30';
+import { REPORT_PICTURE } from '../public/js/reports.js?v=782a6e42';
 import {
   DEVICE_KEY,
   PHONE_TEXT,
@@ -35,7 +35,7 @@ import {
   snippetOf,
   unreadLetters,
   whereWords,
-} from '../public/js/phone/companion-data.js?v=3fddd1dd';
+} from '../public/js/phone/companion-data.js?v=fe13d2e8';
 
 const pub = join(import.meta.dirname, '..', 'public');
 const read = (p) => readFileSync(join(pub, p), 'utf8');
@@ -168,6 +168,20 @@ describe('play/phone/ (the companion page)', () => {
       assert.doesNotMatch(f, /^(game\.js|vendor\/|js\/features\/|js\/ui\/|js\/save-store\.js|js\/game-mode\.js|js\/player-save\.js)/, f);
     }
     for (const f of graph) assert.doesNotMatch(readFileSync(join(pub, f), 'utf8').replace(/\/\*[\s\S]*?\*\/|\/\/[^\n]*/g, ''), /\bPIXI\./, `${f} draws nothing with Pixi`);
+  });
+
+  it('loads the account\'s core only, and every call its pages make is in the core', async () => {
+    assert.ok(graph.includes('js/minn-account-core.js'), graph.join(' '));
+    assert.ok(!graph.includes('js/minn-account.js'), 'the game-only calls stay out of the phone');
+    const { createMinnAccountCore } = await import('../public/js/minn-account-core.js?v=e15cf456');
+    const core = createMinnAccountCore({ baseUri: 'https://groddle.localhost/', fetch: async () => ({}) });
+    const used = new Set();
+    for (const f of ['js/phone/companion.js', 'js/account-forms.js', 'js/online-boot.js', 'js/phone/companion-data.js']) {
+      const src = readFileSync(join(pub, f), 'utf8').replace(/\/\*[\s\S]*?\*\/|\/\/[^\n]*/g, '');
+      for (const m of src.matchAll(/\baccount\.([a-zA-Z]+)/g)) used.add(m[1]);
+    }
+    assert.ok(used.size > 10, [...used].join(' '));
+    for (const name of used) assert.ok(name in core, `account.${name} is not in js/minn-account-core.js`);
   });
 
   it('stays small: everything it loads before a panel opens is under 240 KB', () => {
