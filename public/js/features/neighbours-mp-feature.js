@@ -136,6 +136,8 @@ import {
   normalizeButlerStock,
   normalizeGiftAnswer,
   normalizeTendActs,
+  GIFT_QUEST,
+  giftedThisQuest,
   noteGift,
   outText,
   plotsSnapshot,
@@ -148,7 +150,7 @@ import {
   tendedText,
   TENDED_KEEP,
   visitSceneTsid,
-} from '../neighbours-mp.js?v=3f8f866c';
+} from '../neighbours-mp.js?v=13a573b0';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
 import { elevatorStops, towerLabel } from '../home-tower.js?v=4daa0b96';
 
@@ -223,6 +225,12 @@ function createSession(engine, client) {
   const knocks = new Map();
   /** Slice 2: the slice saved with the game (tending applied, owners gifted). */
   const slice = normalizeNeighboursSlice(savedSlice);
+  /** The held gift quest's count (report 128), null when it is not held. */
+  const giftsCounted = () => {
+    const quest = engine.questState?.active?.[GIFT_QUEST];
+    return quest ? Number(quest.progress?.[NEIGHBOUR_COUNTERS.gifts]) || 0 : null;
+  };
+  slice.gifted = giftedThisQuest(slice.gifted, giftsCounted());
   /** The owner's Butler on a visited street: { box, sprite, painter, source, target, t, greeted, busy }. */
   let vb = null;
   /** Acts on the owner's gardens waiting to go to the site; the site's answers counted. */
@@ -1216,9 +1224,11 @@ function createSession(engine, client) {
       const receipt = engine.query?.('ledgerReceipt', String(msg.op || ''), engine);
       if (receipt !== false && countItem(engine.inv, item.c) > 0) removeItem(engine.inv, item.c, Math.min(item.n, countItem(engine.inv, item.c)));
       engine.refreshPack?.();
-      const gift = noteGift(slice.gifted, visit.owner);
-      slice.gifted = gift.gifted;
-      if (gift.counted && receipt !== false) count(NEIGHBOUR_COUNTERS.gifts, 1);
+      // Report 128: each neighbour counts once from when the quest starts.
+      const held = giftsCounted();
+      const gift = noteGift(giftedThisQuest(slice.gifted, held), visit.owner);
+      slice.gifted = held === null ? [] : gift.gifted;
+      if (held !== null && gift.counted && receipt !== false) count(NEIGHBOUR_COUNTERS.gifts, 1);
       // G172: bag_butler.js:3802-3805, +2 to The Good Neighbor for the first package left with this
       // Butler. The shared Feat (feats-mp.js MP_ACTS visiting_stones) counts each neighbour's
       // HOME_<id> once a run, so every run of the Feat can count it again.

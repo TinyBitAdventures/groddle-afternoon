@@ -537,6 +537,21 @@ export function noteGift(gifted, ownerId) {
   return { gifted: [...list, id].slice(-64), counted: true };
 }
 
+/**
+ * Report 128: the quest whose gift counter noteGift feeds, and the owners that count for it now. A
+ * neighbour counts once from when the quest starts, so only the owners it has counted stay on the
+ * list: they are the newest `counted` (each one counted adds one). `counted` is the held quest's
+ * progress, null when it is not held. A save whose list predates the quest (it kept owners for
+ * life, so a neighbour given to before accepting never counted) comes right the same way.
+ */
+export const GIFT_QUEST = 'neighbor_gifts';
+
+export function giftedThisQuest(gifted, counted) {
+  const list = Array.isArray(gifted) ? gifted.filter((x) => positiveId(x)) : [];
+  const n = Math.max(0, Math.floor(Number(counted) || 0));
+  return n ? list.slice(-n) : [];
+}
+
 /** locations/home.js:59-64: the badge counters a hosted party earns the owner. */
 export function hostedCounters(msg) {
   const out = [];

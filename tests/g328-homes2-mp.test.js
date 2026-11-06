@@ -30,16 +30,20 @@ import {
   normalizeNeighboursSlice,
   normalizeParcels,
   normalizeTendActs,
+  giftedThisQuest,
+  GIFT_QUEST,
   noteGift,
   plotsSnapshot,
   tendAct,
   tendCounters,
   tendedText,
-} from '../public/js/neighbours-mp.js?v=3f8f866c';
+} from '../public/js/neighbours-mp.js?v=13a573b0';
 import { createButlerState, giveGiftTo, newestVisit, nextHandover, normalizeButlerState, packagesAndMessagesForOwner, recordVisitor, setGift, visitorsReport } from '../public/js/butler.js?v=2bafa110';
 import { createGarden, tickGarden } from '../public/js/garden.js?v=74dd94d0';
 import { butlerApi } from '../public/js/features/butler-feature.js?v=9832bb19';
-import { neighboursMpFeature } from '../public/js/features/neighbours-mp-feature.js?v=a4170e36';
+import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=10b118dd';
+import { acceptOffer, routeQuestEvent } from '../public/js/quest-offers.js?v=114a9551';
+import { neighboursMpFeature } from '../public/js/features/neighbours-mp-feature.js?v=023b677b';
 import { createMinnAccount } from '../public/js/minn-account.js?v=b29fae30';
 import { HAS_SERVER, HAS_SITE, SITE_DIR, serverPath, sitePath } from '../tools/repos.mjs';
 
@@ -376,5 +380,63 @@ describe('a fresh Butler state is unchanged by slice 2', () => {
     const st = createButlerState();
     assert.equal(st.packages.length, 0);
     assert.equal(nextHandover(st).kind, 'none');
+  });
+});
+
+describe('report 128: each neighbour counts once from when the quest starts', () => {
+  it('owners given to before the quest was accepted count once it is held', () => {
+    // Before accepting: gifts to 500, 1 and 504; the old save kept them for life. Accepted, 0/5.
+    let list = giftedThisQuest([500, 1, 504], 0);
+    assert.deepEqual(list, []);
+    let g = noteGift(list, 1);
+    assert.equal(g.counted, true);
+    g = noteGift(giftedThisQuest(g.gifted, 1), 500);
+    assert.equal(g.counted, true);
+    assert.deepEqual(g.gifted, [1, 500]);
+  });
+
+  it('a second gift to the same neighbour during the quest does not count', () => {
+    const g = noteGift(giftedThisQuest([1, 500], 2), 1);
+    assert.equal(g.counted, false);
+    assert.deepEqual(g.gifted, [1, 500]);
+  });
+
+  it('a held quest with progress keeps only the owners it counted: the newest ones', () => {
+    // [9, 8] given before accepting, [7, 6] counted after.
+    assert.deepEqual(giftedThisQuest([9, 8, 7, 6], 2), [7, 6]);
+    assert.equal(noteGift(giftedThisQuest([9, 8, 7, 6], 2), 9).counted, true);
+    assert.equal(noteGift(giftedThisQuest([9, 8, 7, 6], 2), 7).counted, false);
+    // A correct list is left alone, on every load.
+    assert.deepEqual(giftedThisQuest([7, 6], 2), [7, 6]);
+  });
+
+  it('not holding the quest keeps nothing and counts nothing', () => {
+    assert.deepEqual(giftedThisQuest([1, 2], null), []);
+    const src = read('public/js/features/neighbours-mp-feature.js');
+    assert.match(src, /active\?\.\[GIFT_QUEST\]/);
+    assert.match(src, /slice\.gifted = giftedThisQuest\(slice\.gifted, giftsCounted\(\)\);/);
+    assert.match(src, /if \(held !== null && gift\.counted && receipt !== false\) count\(NEIGHBOUR_COUNTERS\.gifts, 1\);/);
+    assert.equal(GIFT_QUEST, 'neighbor_gifts');
+  });
+
+  it('a counted gift moves the held quest: gifts to 1 and 500 after accepting read 2/5', async () => {
+    await loadContentCatalogsFromDir(join(root, 'public/assets/content'));
+    const qs = { active: {}, completed: [] };
+    assert.equal(acceptOffer(qs, GIFT_QUEST, { inv: {}, now: 1 }).ok, true);
+    const held = () => qs.active[GIFT_QUEST].progress.give_bag_butler;
+    let list = giftedThisQuest([500, 1, 504], held());
+    for (const owner of [1, 500, 1]) {
+      const g = noteGift(giftedThisQuest(list, held()), owner);
+      list = g.gifted;
+      if (g.counted) routeQuestEvent(qs, NEIGHBOUR_COUNTERS.gifts, 1, {});
+    }
+    assert.equal(held(), 2);
+    assert.deepEqual(list, [1, 500]);
+  });
+
+  it('the feature is multiplayer only: solo restores no slice', () => {
+    neighboursMpFeature.restore({ gifted: [1] }, { mode: 'solo' });
+    assert.equal(neighboursMpFeature.save(), undefined);
+    assert.match(read('public/js/features/neighbours-mp-feature.js'), /savedSlice = engine\?\.mode === 'multiplayer' \? normalizeNeighboursSlice\(slice\) : null;/);
   });
 });
