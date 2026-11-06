@@ -27,7 +27,7 @@ import { routeGraph } from '../public/js/map-routes.js?v=e0ac88c0';
 import { TELEPORTERS } from '../public/js/hidden-floors.js?v=d49b76df';
 import { WINTRY_PORTAL_TELEPORTERS } from '../public/js/wintry-portal.js?v=1437deda';
 import { closuresInTheWay, holdNote, placeIndex, questHold, questPlaceNeeds, reachableStreets } from '../public/js/quest-reach.js?v=9a001ac1';
-import { streetJobsFeature } from '../public/js/features/street-jobs-feature.js?v=e25ef344';
+import { streetJobsFeature } from '../public/js/features/street-jobs-feature.js?v=b0c1c361';
 
 const root = join(import.meta.dirname, '..');
 const PUB = join(root, 'public');

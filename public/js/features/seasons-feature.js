@@ -73,7 +73,7 @@ function takePumpkin(engine, cls, copy) {
 }
 import { landingY, nearestSurfaceY } from '../walk-surface.js?v=c982983e';
 import { isStandable } from '../street-model.js?v=505d8990';
-import { isBatterflyHabitat } from '../animal-husbandry.js?v=c78ee940';
+import { isBatterflyHabitat } from '../animal-husbandry.js?v=41da06a5';
 import { emblemCostFor } from '../shrines.js?v=95d74174';
 import { rollDropTable } from '../drop-tables.js?v=16e12632';
 import { openNoteView, noteViewOpen } from '../note-view.js?v=a5e518d1';

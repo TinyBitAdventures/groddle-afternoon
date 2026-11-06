@@ -33,13 +33,15 @@ import {
   blockingFixture,
   buildPlatformCandidates,
   ecologyForStreet,
+  footAtWalkway,
   frontDecoCovers,
+  frontDecoWalkways,
   hiddenBehindFront,
   planStreetPlacements,
   populationForStreet,
   setStreetEcologyCatalog,
   streetReservedSpots,
-} from '../public/js/street-ecology.js?v=d41e5e97';
+} from '../public/js/street-ecology.js?v=e2bdb20c';
 import { placementRequests } from '../tools/build-realtime-objects.mjs';
 import { serverPath, skipWithoutServer } from '../tools/repos.mjs';
 import { applyStreetIndex, loadStreetDataFromFs, setZoneStreetsShown } from '../public/js/street-loader.js?v=33d2b8bc';
@@ -285,5 +287,61 @@ describe('ticket 89: nothing is planted behind a deco drawn in front of the stre
     }
     // Census of the server's data (2026-11-04): before, 229 trees, rocks and Piggies mostly behind a front deco; after, none.
     assert.deepEqual(hidden, []);
+  });
+});
+
+describe('ticket 118: rooted scenery keeps off a front deco players walk along', () => {
+  const FLIPSIDE = 'GM410QQ0CHARO';
+  const streets = Object.keys(index.streets).filter((tsid) => !/^GZ/.test(tsid)).sort();
+  const line = (id, x1, y1, x2, y2) => ({ id, x1, y1, x2, y2, pcPerm: -1, itemPerm: -1 });
+  const pipe = { key: 'front:m:0', front: true, x: 600, y: 972, block: { l: 400, r: 800, t: 807, b: 972 } };
+  const ground = line('ground', 0, 950, 2000, 950);
+
+  it('finds a deco whose top is a floor, not one the floor runs on past or that has no floor behind it', () => {
+    assert.deepEqual(frontDecoWalkways([ground, line('top', 410, 815, 790, 815)], [pipe]), [pipe]);
+    // The floor goes on past the deco: a shelf of its own.
+    assert.deepEqual(frontDecoWalkways([ground, line('shelf', 300, 815, 790, 815)], [pipe]), []);
+    // A floor well below the deco's top: nothing to walk along on top of it.
+    assert.deepEqual(frontDecoWalkways([ground, line('low', 410, 880, 790, 880)], [pipe]), []);
+    // The only floor there: nothing lower for the deco to stand on.
+    assert.deepEqual(frontDecoWalkways([line('top', 410, 815, 790, 815)], [pipe]), []);
+    assert.deepEqual(frontDecoWalkways([ground, line('top', 410, 815, 790, 815)], []), []);
+  });
+
+  it('Flipside: the pipe is one, and no tree stands on it or with its foot behind it', () => {
+    const data = street(FLIPSIDE);
+    const { plan, reserved } = layoutOf(data);
+    const walkways = frontDecoWalkways(platformsScreen(data), reserved.filter((r) => r.front));
+    // middleplus cl2_swissPipe_02_front (457 x 165 at 1417, 1972), floors along it 1198 to 1616.
+    assert.ok(walkways.some((w) => w.block.l === 1417 - 228.5 && w.block.t === 1972 - 165), JSON.stringify(walkways));
+    assert.equal(plan.groups.trees.length, 7);
+    for (const p of plan.groups.trees) {
+      assert.equal(footAtWalkway(p, PLACEMENT_FOOTPRINTS.trees, walkways), false, `${Math.round(p.x)},${Math.round(p.y)}`);
+      assert.equal(p.y, 1950); // Every Spice Plant on the street's real floor.
+    }
+  });
+
+  it('the avatar still walks the pipe, and a tree takes such a spot when nothing else is left', () => {
+    const data = street(FLIPSIDE);
+    assert.ok(platformsScreen(data).some((l) => isStandable(l) && l.x1 === 1198 && l.y1 === 1813), 'the pipe top stays a floor');
+    const plan = planStreetPlacements([line('top', 410, 815, 790, 815), line('under', 410, 950, 790, 950)], [{ key: 'trees', count: 2, clearance: 100 }], { worldW: 2000, reserved: [pipe] });
+    assert.equal(plan.groups.trees.length, 2);
+  });
+
+  it('no planned tree, rock, garden, vendor or shrine on any shared street is at one', async () => {
+    const offenders = [];
+    let withWalkway = 0;
+    for (const tsid of streets) {
+      let data;
+      try { data = await loaded(tsid); } catch { continue; }
+      const { plan, reserved } = layoutOf(data);
+      const walkways = frontDecoWalkways(platformsScreen(data), reserved.filter((r) => r.front));
+      if (!walkways.length) continue;
+      withWalkway += 1;
+      for (const key of SCENERY) for (const p of plan.groups[key] || []) if (footAtWalkway(p, PLACEMENT_FOOTPRINTS[key], walkways)) offenders.push(`${tsid} ${key} ${Math.round(p.x)},${Math.round(p.y)}`);
+    }
+    // Census of the server's data (2026-11-06): 16 streets have one; before, 4 things stood at one (Flipside's plant, 3 others).
+    assert.ok(withWalkway >= 10, String(withWalkway));
+    assert.deepEqual(offenders, []);
   });
 });

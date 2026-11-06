@@ -43,7 +43,7 @@ import {
   ecologyForStreet,
   populationForStreet,
   RESOURCE_NODE_CLASSES,
-} from '../public/js/street-ecology.js?v=d41e5e97';
+} from '../public/js/street-ecology.js?v=e2bdb20c';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const publicRoot = join(__dirname, '../public');

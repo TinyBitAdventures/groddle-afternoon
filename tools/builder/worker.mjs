@@ -37,7 +37,7 @@ import { configDir } from './sign.mjs';
 import { pathToFileURL } from 'node:url';
 import { readMaster, masterFile, workerSecret, verifyWorker, WORKER_HEADER } from './sign.mjs';
 import { loadValidatorContext } from './validator-context.mjs';
-import { validateZone } from '../../public/js/builder/validate.js?v=9ca7077a';
+import { validateZone } from '../../public/js/builder/validate.js?v=b73899ff';
 import { createRenderer, renderInput } from './render.mjs';
 import { catalog, searchDecos, styleProfile } from './catalog.mjs';
 import { builderGuide } from './guide.mjs';

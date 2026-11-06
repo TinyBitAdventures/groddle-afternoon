@@ -3,7 +3,7 @@
  * placement on recovered locations-xml platforms.
  */
 
-import { avatarHeadReach, groundBeneath, isItemSolid, isStandable, worldToScreen } from './street-model.js?v=505d8990';
+import { avatarHeadReach, groundBeneath, isItemSolid, isStandable, platformYAt, worldToScreen } from './street-model.js?v=505d8990';
 import { behindFloor } from './reach.js?v=4187d746';
 
 export const STREET_ECOLOGY_URL = 'assets/content/street-ecology.json?v=official-ecology-6';
@@ -645,6 +645,43 @@ export function hiddenBehindFront(spot, key, fronts) {
   return false;
 }
 
+/** How near a floor's ends sit to a front deco's top for the floor to be that top (px up or down). */
+export const FRONT_TOP_BAND = 30;
+
+/**
+ * Ticket 118: the front decos (frontDecoCovers) with a floor laid along their top and the street's
+ * real floor running behind them (Flipside's Swiss-cheese pipe: its two lines run 1198 to 1616 at
+ * 1813 to 1829, the deco 1188 to 1645 from 1807 to 1972, the floor behind at 1950). The avatar
+ * walks along such a line, as in the original, but rooted scenery has no ground to the eye on it:
+ * its foot rests on the deco's rim with the street showing behind. Nor beside it: behind the end
+ * of the pipe the deco still cuts the trunk off. A deco counts when a line's whole floor run lies
+ * across it, both the line's ends are within FRONT_TOP_BAND of its top and an item floor runs
+ * lower down within its box. A cliff or shelf that goes on past the deco is a floor of its own.
+ */
+export function frontDecoWalkways(platforms, fronts) {
+  if (!fronts?.length || !Array.isArray(platforms)) return [];
+  const lines = platforms.filter((p) => isStandable(p) && isItemSolid(p));
+  const spans = floorRunSpans(lines);
+  return fronts.filter(({ block: b }) => lines.some((line) => {
+    const lo = Math.min(line.x1, line.x2);
+    const hi = Math.max(line.x1, line.x2);
+    const run = (spans.get(line) || []).find((span) => lo >= span[0] && hi <= span[1]);
+    if (!run || run[0] < b.l || run[1] > b.r) return false;
+    if (Math.abs(line.y1 - b.t) > FRONT_TOP_BAND || Math.abs(line.y2 - b.t) > FRONT_TOP_BAND) return false;
+    const low = Math.max(line.y1, line.y2);
+    return lines.some((under) => {
+      const y = under === line ? null : platformYAt(under, (lo + hi) / 2, 0.01);
+      return y != null && y > low && y <= b.b + FRONT_TOP_BAND;
+    });
+  }));
+}
+
+/** PURE: whether the foot (`footprint` px wide) of a thing at `spot` is on or behind one of them. */
+export function footAtWalkway(spot, footprint, walkways) {
+  return (walkways || []).some(({ block: b }) => spot.x + footprint / 2 > b.l && spot.x - footprint / 2 < b.r
+    && spot.y >= b.t - FRONT_TOP_BAND && spot.y <= b.b);
+}
+
 /** The first fixture a thing at `spot` would cover: big scenery by its box, the rest by the doorways. */
 export function blockingFixture(spot, fixtures, { footprint = 0, height = 0 } = {}) {
   for (const fixture of fixtures || []) {
@@ -855,6 +892,7 @@ export function planStreetPlacements(
   const candidates = buildPlatformCandidates(platforms, { worldW, seed, unreached });
   // Front decos (frontDecoCovers) keep nothing clear; they only rank the spots they hide.
   const fronts = (reserved || []).filter((p) => p?.front && p.block);
+  const walkways = frontDecoWalkways(platforms, fronts);
   const occupied = (reserved || []).filter((p) => !p?.front && Number.isFinite(p?.x) && Number.isFinite(p?.y))
     .map((point, index) => ({ ...point, key: point.key || `reserved:${index}`, clearance: whole(point.clearance, 120, 600) }));
   const fixtures = occupied.filter((point) => point.block);
@@ -931,6 +969,8 @@ export function planStreetPlacements(
           if (!hiddenCache.has(k)) hiddenCache.set(k, hiddenBehindFloor(platforms, candidate, request.key) || hiddenBehindFront(candidate, request.key, fronts));
           hidden = hiddenCache.get(k) ? 32 : 0;
         }
+        // Ticket 118: rooted scenery on or behind a front deco that players walk along, last too.
+        if (!hidden && height > 0 && footAtWalkway(candidate, footprint, walkways)) hidden = 32;
         const tier = (footprint > 0
           ? walker ? (perch ? 8 : 0) + (scenery === 2 ? 4 : 0) + (nearest < 1 ? 2 : 0) + (scenery === 1 ? 1 : 0) : (perch ? 1 : 0) + (nearest < 1 ? 2 : 0)
           : 0) + (covers.has(candidate.id) ? (walker ? 16 : 4) : 0) + hidden;

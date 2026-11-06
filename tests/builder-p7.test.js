@@ -14,7 +14,7 @@ import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { reachStreet, reachRoutes, runUpSpeed, jumpArc, streetWorld, LANDING_TRIES, AIR_JUMP_TRIES, LANDING_SHARE, REACH_LIMITS } from '../public/js/builder/reach-graph.js?v=7a0078a2';
-import { validateShippedStreet } from '../public/js/builder/validate.js?v=9ca7077a';
+import { validateShippedStreet } from '../public/js/builder/validate.js?v=b73899ff';
 import { NORMAL_BUFF, WALK_MAX } from '../public/js/avatar-step.js?v=d48908a5';
 import { run, connectOps, floorAt, newArtFilterNote } from '../tools/builder/cli.mjs';
 import { createWorker, staleFiles } from '../tools/builder/worker.mjs';
