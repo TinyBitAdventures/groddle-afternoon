@@ -157,7 +157,7 @@ import {
   swatchFilters,
   trayFilters,
 } from '../ui/home-builder.js?v=90f759e8';
-import { RECIPE_CATALOG } from '../making.js?v=82ce9d08';
+import { RECIPE_CATALOG } from '../making.js?v=76cc5708';
 import {
   createBackYardState,
   fixtureObstacles,

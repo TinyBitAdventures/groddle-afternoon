@@ -1979,6 +1979,7 @@
 :root[data-ui="classic"] #game-root #make-panel .make-tool-chip.active { background: var(--c-classic-panel); border-color: var(--c-classic-link); color: var(--c-classic-title); }
 :root[data-ui="classic"] #game-root #make-panel .make-tool-chip.unowned { opacity: 0.45; }
 :root[data-ui="classic"] #game-root #make-panel .make-question { font: 800 calc(var(--fs-classic-row-title) * var(--cu-n, 1))/var(--lh-tight) var(--font-classic-title); color: var(--c-classic-title); padding-top: calc(10 * var(--cu)); }
+:root[data-ui="classic"] #game-root #make-panel .make-detail-body .make-why { font: 800 calc(var(--fs-classic-row-title) * var(--cu-n, 1))/var(--lh-tight) var(--font-classic-title); color: var(--text-danger); } /* making_details_title: "You're missing an ingredient!" */
 :root[data-ui="classic"] #game-root #make-panel .make-tile { background: var(--c-classic-panel); box-shadow: 0 0 0 1px var(--c-classic-slot-ring); border: 0; border-radius: 5px; color: var(--c-classic-title); }
 :root[data-ui="classic"] #game-root #make-panel .make-tile .tile-label { font: 800 calc(var(--fs-classic-body) * var(--cu-n, 1))/var(--lh-tight) var(--font-classic-title); }
 :root[data-ui="classic"] #game-root #make-panel .make-tile .tile-req { font-size: calc(var(--fs-classic-count) * var(--cu-n, 1)); color: var(--c-classic-offline); }

@@ -35,7 +35,7 @@ import {
 } from '../public/js/home-floors.js?v=e053a5c0';
 import { createHomeDecorState, placeFurniture } from '../public/js/home-decor.js?v=5551be2e';
 import { FURNITURE_CATALOG, FURNITURE_STORE } from '../public/js/homes-catalog.js?v=7aa9beb0';
-import { furnitureStoreProfile } from '../public/js/features/homes-feature.js?v=9a88f70e';
+import { furnitureStoreProfile } from '../public/js/features/homes-feature.js?v=84e63b1c';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const GSJS = join(homedir(), 'Documents/glitch-audit/glitch-GameServerJS');
@@ -197,7 +197,7 @@ describe('expanding a house with floors (homes_get_expand_costs, homes_extend)',
 
 describe('homes-feature keeps the floors', () => {
   it('saves and restores floors, links and the floor you are on; each upper floor keeps its own stacks', async () => {
-    const { homesFeature } = await import('../public/js/features/homes-feature.js?v=9a88f70e');
+    const { homesFeature } = await import('../public/js/features/homes-feature.js?v=84e63b1c');
     const engine = { param: () => null, setData() {} };
     const { ground, door } = houseWithDoor(600);
     const fs = createFloorsState();

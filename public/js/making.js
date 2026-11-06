@@ -17,7 +17,7 @@ import {
   ensureItem,
   registerItemUse,
 } from './inventory.js?v=d82f3b00';
-import { GRINDER_TOOLS, canUseTool, firstWorkingTool, useToolCondition } from './tools.js?v=6684b484';
+import { GRINDER_TOOLS, TOOL_CONDITION_CATALOG, brokenToolIcon, canUseTool, firstWorkingTool, useToolCondition } from './tools.js?v=6684b484';
 import { getSkillPackageOverride, highestSkillLevel, skillPackageDetails } from './skill-packages.js?v=bfb87281';
 import {
   adjustedTaskLimit,
@@ -878,6 +878,60 @@ export function setSeasonalRecipeCheck(fn) {
   seasonalRecipeCheck = typeof fn === 'function' ? fn : () => true;
 }
 
+/**
+ * Why a recipe can't be made, in the client's words (report 119), or '' when it can.
+ * MakingDetailsUI.as 170-178 (missing ingredients), 229 (energy), 247 (broken tool), 254 (fuel);
+ * MakingComponentUI.as 255 (skill), 263 (unknown recipe), 275-278 (no tool); inc_making.js 384 (not
+ * enough wear), 1715 (achievement). `check` is canCraft's answer.
+ * @param {Recipe} recipe
+ * @param {ReturnType<typeof canCraft>} check
+ * @param {{ inv?: object, energyOk?: boolean, skillName?: (id: string) => string, achievementName?: (id: string) => string }} [ctx]
+ */
+export function recipeBlockedLine(recipe, check, ctx = {}) {
+  if (!check) return '';
+  if (check.ok) return ctx.energyOk === false ? 'You need more energy!' : '';
+  switch (check.reason) {
+    case 'season':
+      return check.msg || '';
+    case 'tool':
+      return `You need ${/^[aeiou]/i.test(check.need) ? 'an' : 'a'} ${check.need} to make this`;
+    case 'broken_tool':
+      if (TOOL_CONDITION_CATALOG[check.tool]?.fuel) return 'You need more fuel to make this';
+      return check.worn ? "That tool doesn't have enough wear left." : `You need a working ${check.need} to make this`;
+    case 'skill':
+      return `You need ${ctx.skillName?.(check.skill) || check.skill} to make this`;
+    case 'quest':
+      return "You don't know how to make this";
+    case 'achievement':
+      return `You need to get the ${ctx.achievementName?.(check.achievement) || check.achievement} achievement.`;
+    case 'ingredients': {
+      const inputs = recipe?.inputs || [];
+      const missing = inputs.filter((i) => countItem(ctx.inv, i.classTsid) < i.qty).length;
+      if (missing > 1 && missing === inputs.length) return "You're missing all of the ingredients!";
+      return `You're missing ${missing > 1 ? `${missing} ingredients` : 'an ingredient'}!`;
+    }
+    default:
+      return 'You can\'t make that right now.';
+  }
+}
+
+/**
+ * The tool in the Make panel's title (MakingDialog.as setTitle 299, 305: the tool's iconic, its
+ * broken_iconic when no copy works). `tool` empty is the panel's own icon. A tab for a tool the
+ * player has no copy of (the original opened from a tool, so it never had one) shows it whole.
+ * @returns {{ tool: string, src: string, broken: boolean }}
+ */
+export function makePanelIcon(tool, inv, toolState = null, atStation = false) {
+  const id = tool && TOOL_CATALOG[tool] ? tool : 'tinkertool';
+  const found = atStation ? { owned: false } : firstWorkingTool(toolState, inv, toolOptions(id));
+  const brokenSrc = found.owned && !found.tool ? brokenToolIcon(found.fallback) : null;
+  return {
+    tool: id,
+    src: brokenSrc || ITEM_CATALOG[id]?.icon || `assets/sprites/icons/${id}.png`,
+    broken: Boolean(brokenSrc),
+  };
+}
+
 export function canCraft(inv, recipe, opts = {}) {
   if (!recipe) return { ok: false, reason: 'unknown' };
   const season = SEASONAL_RECIPES[String(recipe.id ?? '')];
@@ -904,6 +958,7 @@ export function canCraft(inv, recipe, opts = {}) {
         tool: toolId,
         need: TOOL_CATALOG[toolId]?.label || toolId,
         msg: condition.msg,
+        worn: condition.condition?.broken === false,
       };
     }
   }

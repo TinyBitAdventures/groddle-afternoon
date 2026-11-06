@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=628c01d0';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=127e0a3c';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=e6d90cde';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=e2ddca6c';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -556,6 +556,8 @@ import {
   craftUnitDurations,
   recipeEnergyCost,
   makingSkillAdjustments,
+  makePanelIcon,
+  recipeBlockedLine,
   createCraftSession,
   advanceCraftSession,
   cancelCraftSession,
@@ -575,7 +577,7 @@ import {
   recipeTaskLimit,
   recipeToolInUse,
   pluralizeItem,
-} from './js/making.js?v=82ce9d08';
+} from './js/making.js?v=76cc5708';
 import { outputIconsHtml, outputsPhrase, recipeOutputRows } from './js/ui/recipe-outputs.js?v=73e19baf';
 import { MAKE_TOOL_SHEETS } from './js/make-tool-sheets.js?v=6f758e09';
 import { LOW_FUEL_LINE, craftSessionElapsedMs, isLowFuel, isMachineArt, machineArtHtml, packMakeState, playMachineHandOver, setMachineArtFrame } from './js/machine-art.js?v=ac629e13';
@@ -26516,7 +26518,7 @@ function runMakeCraft(key, qty) {
     return;
   }
   if (!check.ok) {
-    toast(check.reason === 'ingredients' ? 'You need more ingredients.' : check.msg || 'Cannot make that right now.');
+    toast(makeBlockedLine(recipe, check));
     renderMakePanel();
     return;
   }
@@ -26650,6 +26652,28 @@ function showMakeResult(result, key) {
   });
 }
 
+/** Report 119: why this recipe can't be made, for the recipe view, its tile and the Make button. */
+function makeBlockedLine(recipe, check) {
+  return recipeBlockedLine(recipe, check, {
+    inv,
+    energyOk: pc.energy > recipeEnergyCost(recipe, skillState.learned, pc.imaginationUpgrades),
+    skillName: (id) => skillTitle(getSkillCatalog()[id]) || getSkillCatalog()[id]?.name || id,
+    achievementName: (id) => getAchievementCatalog()[id]?.name || id.replace(/_/g, ' '),
+  });
+}
+
+/** Report 119: the title's icon is the current tab's tool, or the recipe's (MakingDialog.as setTitle 299, 305). */
+function syncMakePanelIcon() {
+  const img = document.querySelector('#make-panel .ui-sheet-icon');
+  if (!img) return;
+  const selected = makeSelected ? RECIPE_CATALOG[makeSelected]?.tool : null;
+  const tool = selected || (makeSearchQuery.trim() ? '' : makeToolFilter);
+  const icon = makePanelIcon(tool, inv, makeStation?.toolState || toolState, Boolean(makeStation) && makeStation.tool === tool);
+  if (img.getAttribute('src') !== icon.src) img.setAttribute('src', icon.src);
+  img.dataset.tool = icon.tool;
+  img.dataset.broken = icon.broken ? '1' : '0';
+}
+
 function renderMakePanel() {
   const list = document.getElementById('make-list');
   const detail = document.getElementById('make-detail');
@@ -26671,6 +26695,8 @@ function renderMakePanel() {
     const firstOwned = listMakingTools().find((t) => hasTool(inv, t.classTsid));
     if (firstOwned) makeToolFilter = firstOwned.classTsid;
   }
+
+  syncMakePanelIcon();
 
   if (toolsEl) {
     // Rebuilt on every pick: keep where the strip was scrolled, so the picked tool glides into
@@ -26775,8 +26801,9 @@ function renderMakePanel() {
       const outId = outRows[0]?.classTsid;
       const makesLine = recipeMakesLine(recipe);
       const check = canCraft(inv, recipe, opts);
+      const blockedLine = makeBlockedLine(recipe, check);
       const maxMake = (() => {
-        if (!check.ok && check.reason === 'ingredients') return 0;
+        if (!check.ok) return 0;
         let m = recipeTaskLimit(recipe, pc.imaginationUpgrades);
         for (const inp of recipe.inputs || []) {
           m = Math.min(m, Math.floor(countItem(inv, inp.classTsid) / inp.qty));
@@ -26802,7 +26829,8 @@ function renderMakePanel() {
         <div class="make-detail-body">
           <h3>${recipe.name}</h3>
           ${makesLine ? `<p class="make-outs-line" data-make-outs>${escapeHtml(makesLine)}</p>` : ''}
-          <p>You can make up to ${maxMake}. Uses ${recipeEnergyCost(recipe, skillState.learned, pc.imaginationUpgrades)} energy each.</p>
+          ${blockedLine ? `<p class="make-why" data-make-why>${escapeHtml(blockedLine)}</p>` : ''}
+          <p>${blockedLine ? '' : `You can make up to ${maxMake}. `}Uses ${recipeEnergyCost(recipe, skillState.learned, pc.imaginationUpgrades)} energy each.</p>
           ${makingSkillAdjustments(recipe, skillState.learned).note ? `<p class="make-skill-note">${makingSkillAdjustments(recipe, skillState.learned).note}</p>` : ''}
           ${inputsHtml}
           <div class="qty-row">
@@ -26810,7 +26838,7 @@ function renderMakePanel() {
             <input type="number" min="1" max="${Math.max(1, maxMake)}" value="${makeQty}" data-mq-val />
             <button type="button" data-mq="+">+</button>
             <button type="button" class="btn-max" data-mq="max">Max</button>
-            <button type="button" class="btn-glitch-primary" data-make-go ${maxMake < 1 ? 'disabled' : ''}>${recipe.tool === 'fruit_changing_machine' ? 'Transmogrify' : 'Make'}</button>
+            <button type="button" class="btn-glitch-primary" data-make-go ${maxMake < 1 ? `disabled title="${escapeHtml(blockedLine)}"` : ''}>${recipe.tool === 'fruit_changing_machine' ? 'Transmogrify' : 'Make'}</button>
           </div>
         </div>`;
       // restructure to match grid CSS (back spans full)
@@ -26853,6 +26881,7 @@ function renderMakePanel() {
     const check = canCraft(inv, recipe, opts);
     const energyOk = pc.energy > recipeEnergyCost(recipe, skillState.learned, pc.imaginationUpgrades);
     const canMake = check.ok && energyOk;
+    const blockedLine = canMake ? '' : makeBlockedLine(recipe, check);
     const outRows = recipeOutputRows(recipe);
     const outId = outRows[0]?.classTsid;
     const tile = document.createElement('button');
@@ -26870,10 +26899,11 @@ function renderMakePanel() {
       <span class="tile-label">${recipe.name}</span>
       <span class="tile-req">${inputs}</span>`;
     const makes = recipeMakesLine(recipe);
-    if (makes) tile.title = makes;
+    const tileTip = [blockedLine, makes].filter(Boolean).join(' ');
+    if (tileTip) tile.title = tileTip;
     tile.setAttribute(
       'aria-label',
-      `${recipe.name}. ${makes ? `${makes} ` : ''}${inputs}. ${recipeEnergyCost(recipe, skillState.learned, pc.imaginationUpgrades)} energy.${canMake ? '' : ' Not enough resources.'}`
+      `${recipe.name}. ${makes ? `${makes} ` : ''}${inputs}. ${recipeEnergyCost(recipe, skillState.learned, pc.imaginationUpgrades)} energy.${blockedLine ? ` ${blockedLine}` : ''}`
     );
     tile.addEventListener('click', () => {
       makeSelected = key;

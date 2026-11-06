@@ -5765,6 +5765,10 @@ body.buff-purple-pulse::after {
   font-size: var(--fs-md);
   color: var(--c-grey-45);
 }
+.make-detail-body .make-why {
+  font-weight: 700;
+  color: var(--text-danger);
+}
 .qty-row {
   display: flex;
   align-items: center;
