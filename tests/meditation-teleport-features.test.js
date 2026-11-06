@@ -8,9 +8,9 @@ import assert from 'node:assert/strict';
 
 import { createFeatureHost } from '../public/js/feature-host.js?v=127e0a3c';
 import { createInventory, countItem } from '../public/js/inventory.js?v=d82f3b00';
-import { createToolConditionState } from '../public/js/tools.js?v=6684b484';
+import { bindToolInventory, createToolConditionState } from '../public/js/tools.js?v=689d6594';
 import { meditationFeature } from '../public/js/features/meditation-feature.js?v=407bb75b';
-import { teleportationFeature } from '../public/js/features/teleportation-feature.js?v=7d175a00';
+import { teleportationFeature } from '../public/js/features/teleportation-feature.js?v=ee0d6d00';
 
 function fakeEngine(overrides = {}) {
   const toasts = [];
@@ -107,15 +107,16 @@ describe('teleportation feature', () => {
   });
 
   it('asks the host travel gate before a script jump (Hell / Pooped)', () => {
-    teleportationFeature.restore({
-      scripts: [{ id: 'tps1', destination: { tsid: 'GOTHER', x: 1, y: 2, label: 'Elsewhere' } }],
-    });
     const engine = fakeEngine({
       learned: ['teleportation_1'],
       travelGate: () => ({ ok: false, msg: 'You are too Pooped to teleport. Eat something first!' }),
     });
     engine.inv = createInventory({ teleportation_script: 1 });
-    assert.equal(teleportationFeature.runPackVerb('teleportation_script', 'use:tps1', engine), true);
+    bindToolInventory(engine.toolState, engine.inv);
+    teleportationFeature.restore({
+      scripts: [{ id: 'tps1', destination: { tsid: 'GOTHER', x: 1, y: 2, label: 'Elsewhere' } }],
+    }, engine);
+    assert.equal(teleportationFeature.runPackVerb('teleportation_script', 'use', engine, { copy: 0 }), true);
     assert.deepEqual(engine.toasts, ['You are too Pooped to teleport. Eat something first!']);
     assert.equal(countItem(engine.inv, 'teleportation_script'), 1);
     assert.equal(engine.pc.energy, 80);

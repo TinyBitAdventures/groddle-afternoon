@@ -23,7 +23,7 @@
  * name ...) ride with a one-copy stack as "t", as its wear rides as "r".
  */
 
-import { cleanCopyTag } from './tools.js?v=6684b484';
+import { cleanCopyTag } from './tools.js?v=689d6594';
 
 /** Where the site and server ids come from (drops.go dropOpRe). */
 export const DROP_OP = /^drop-[0-9a-f]{16}$/;

@@ -1,6 +1,7 @@
 /**
  * A copy's own words on the way between players (2026-11-04): a Cubimal's name, a Draught of Giant
- * Amicability's Giant, a Still's hopper and Hooch, a lit pumpkin's phrases. js/tools.js keeps them
+ * Amicability's Giant, a Still's hopper and Hooch, a lit pumpkin's phrases, a Teleportation Script's
+ * destination. js/tools.js keeps them
  * beside each copy (row.tags, classes with `tag` naming the kind); online they ride with the copy as
  * "t" wherever its wear rides as "r" (gifts, trades, auctions, mail, shared ground drops).
  *
@@ -17,6 +18,10 @@
  *  - giant: one of the Giants a Draught can favour (potion_favor.js config.giants).
  *  - still: { hopper, hooch, workingSince } whole numbers, hopper at most `hopper` (the Hoocher
  *    cards' ceiling), hooch at most `hooch` (still.js max), workingSince a time no later than now.
+ *  - script: a Teleportation Script's { tsid, x, y, label, hubId, hubName, imbued }
+ *    (teleportation_script.js 298-319 destination, is_imbued): tsid and hubId letters, digits, _ and
+ *    -, at most `id`; x and y whole numbers within `coord` (null when not known); label and hubName as
+ *    one phrase of `len`; imbued true or false. No tsid is no words.
  * Anything else, or an empty result, is no words (null): the copy arrives with none, as before.
  */
 import { SYMBOLS, filterText } from './word-filter.js?v=9a7a7ebb';
@@ -26,6 +31,7 @@ export const COPY_TAG_RULES = Object.freeze({
   phrases: Object.freeze({ max: 3, len: 150 }),
   giant: Object.freeze({ giants: Object.freeze(['alph', 'cosma', 'friendly', 'grendaline', 'humbaba', 'lem', 'mab', 'pot', 'spriggan', 'ti', 'zille']) }),
   still: Object.freeze({ hopper: 600, hooch: 50 }),
+  script: Object.freeze({ id: 32, len: 80, coord: 1000000 }),
 });
 
 /** Spaces off both ends (only the ASCII space: tabs and line breaks are spaces by then; other languages trim alike). */
@@ -80,6 +86,33 @@ function cleanStill(value, rules, now) {
   return { hopper, hooch, workingSince };
 }
 
+const SCRIPT_ID = /^[A-Za-z0-9_-]+$/;
+
+/** A JSON number as a whole number within max, toward zero (anything else, a numeric string too, is null). */
+function coord(v, max) {
+  if (typeof v !== 'number' || !Number.isFinite(v)) return null;
+  return Math.max(-max, Math.min(max, Math.trunc(v))) + 0;
+}
+
+function scriptId(v, max) {
+  return typeof v === 'string' && v.length <= max && SCRIPT_ID.test(v) ? v : '';
+}
+
+function cleanScript(value, rules) {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
+  const tsid = scriptId(value.tsid, rules.id);
+  if (!tsid) return null;
+  return {
+    tsid,
+    x: coord(value.x, rules.coord),
+    y: coord(value.y, rules.coord),
+    label: cleanPhrase(value.label, rules.len),
+    hubId: scriptId(value.hubId, rules.id),
+    hubName: cleanPhrase(value.hubName, rules.len),
+    imbued: value.imbued === true,
+  };
+}
+
 /** A copy's words of `kind`, as they may travel (null: none). `now` in ms. */
 export function cleanCopyTagOf(kind, value, { now = Date.now(), rules = COPY_TAG_RULES } = {}) {
   if (value == null) return null;
@@ -88,6 +121,7 @@ export function cleanCopyTagOf(kind, value, { now = Date.now(), rules = COPY_TAG
     case 'phrases': return cleanPhrases(value, rules.phrases);
     case 'giant': return typeof value === 'string' && rules.giant.giants.includes(value) ? value : null;
     case 'still': return cleanStill(value, rules.still, now);
+    case 'script': return cleanScript(value, rules.script);
     default: return null;
   }
 }

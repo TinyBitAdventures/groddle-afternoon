@@ -53,7 +53,7 @@
  */
 
 import { ITEM_CATALOG, addItem, countItem } from '../inventory.js?v=d82f3b00';
-import { setToolRemaining, toolCopies } from '../tools.js?v=6684b484';
+import { setToolRemaining, toolCopies } from '../tools.js?v=689d6594';
 import { isItemFloor, platformYAt } from '../street-model.js?v=505d8990';
 import { hiresSpriteUrl } from '../sprite-hires.js?v=3f97bf07';
 import { rollResourceNodeDrop } from './drops-feature.js?v=43984e8f';
@@ -85,9 +85,9 @@ import {
   starterResourceTools,
   swimmingSalmonCount,
   tickResourceNode,
-} from '../resource-nodes.js?v=a57377a1';
+} from '../resource-nodes.js?v=b2381f15';
 import { frameTexture as sheetFrameTexture, loadTexture, textureFromUrl } from '../textures.js?v=3149d699';
-import { acceptOffer, markOffered, npcQuestOffers, putOffOffer, questStatus } from '../quest-offers.js?v=f98056af';
+import { acceptOffer, markOffered, npcQuestOffers, putOffOffer, questStatus } from '../quest-offers.js?v=114a9551';
 import { vpSequence } from '../quest-rooms/vp-overlay.js?v=b231d65a';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
 

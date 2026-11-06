@@ -10,7 +10,7 @@ import {
   createTeleportState,
   mapTeleport,
   teleportEnergyCost,
-} from '../public/js/teleportation.js?v=48e4e8de';
+} from '../public/js/teleportation.js?v=5a5c8e6f';
 
 const T4 = ['teleportation_1', 'teleportation_2', 'teleportation_3', 'teleportation_4'];
 const target = { tsid: 'LA9TARGET', label: 'Somewhere', hubId: '27' };

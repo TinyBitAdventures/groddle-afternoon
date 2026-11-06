@@ -51,7 +51,7 @@ import {
   HOME_TEXTURE_CONFIGS,
 } from './homes-catalog.js?v=7aa9beb0';
 import { cleanHistory, cleanUpgradeId, upgradeArt, upgradeRow } from './furniture-upgrades.js?v=a3788c0d';
-import { SDB_COUNT_MAX, SDB_PRICE_MAX, isCabinetClass, normalizeContents, storagePickupLock } from './home-storage.js?v=6c449b4e';
+import { SDB_COUNT_MAX, SDB_PRICE_MAX, isCabinetClass, normalizeContents, storagePickupLock } from './home-storage.js?v=121f1897';
 import { stackMaxOf } from './pack-slots.js?v=c91d0ca3';
 
 export const SEGMENT_W = 150;

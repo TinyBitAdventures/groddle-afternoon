@@ -12,7 +12,7 @@ import { loadContentCatalogsFromDir, getAchievementCatalog } from '../public/js/
 import { applyAchievementProgress, createAchievementState, getAchievementProgress, resetAchievementCounter, unlockAchievement } from '../public/js/achievements.js?v=f8ccfd34';
 import { COLLECTION_TROPHIES, COUNTED_ON_ARRIVAL, HELD_AT_ONCE, collectionClasses, heldChanges, planCollectionTrophies } from '../public/js/collection-trophies.js?v=69205984';
 import { ITEM_CATALOG } from '../public/js/inventory.js?v=d82f3b00';
-import { vendorSellValue } from '../public/js/vendor.js?v=29f6c214';
+import { vendorSellValue } from '../public/js/vendor.js?v=70577b0b';
 import { collectionTrophiesFeature as feature } from '../public/js/features/collection-trophies-feature.js?v=de9e7c8d';
 
 const here = dirname(fileURLToPath(import.meta.url));

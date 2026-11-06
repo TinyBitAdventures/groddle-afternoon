@@ -128,7 +128,7 @@ import { QUOIN_SHEET, QUOIN_TYPES, qrazyRewardForLevel } from '../quoins.js?v=df
 import { soundForQuoin } from '../sound-moments.js?v=2f8597cd';
 import { IMAGINATION_UPGRADES } from '../imagination.js?v=0cab36eb';
 import { assignQuest, completeQuest } from '../quests.js?v=c8d9d0a4';
-import { acceptOffer, enqueueQuestOffer, questAwardPayload, turnInQuest } from '../quest-offers.js?v=f98056af';
+import { acceptOffer, enqueueQuestOffer, questAwardPayload, turnInQuest } from '../quest-offers.js?v=114a9551';
 import { getQuestCatalog } from '../content-catalogs.js?v=10b118dd';
 import { locationEventsApi } from './location-events-feature.js?v=0966e395';
 import * as kit from '../quest-rooms/kit.js?v=4d8ab82d';
@@ -136,7 +136,7 @@ import { frameTexture, onLoaded, sourceFromUrl, textureFromUrl } from '../textur
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 import { displayTopOf, itemstackOverlayPoint, playPoofIn, playSheetOverlay, poofInAlpha } from '../overlay-art.js?v=11b6dd7f';
 import { HOME_MACHINE } from '../home-ticket.js?v=ee7ea52a';
-import { animalAnchorX, createAnimalState } from '../animals.js?v=05dafc43';
+import { animalAnchorX, createAnimalState } from '../animals.js?v=fea7e3e0';
 import {
   AK_ANIMALS,
   AK_BUBBLE,

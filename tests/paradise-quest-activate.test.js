@@ -12,7 +12,7 @@ import { fileURLToPath } from 'node:url';
 
 import { loadContentCatalogsFromDir, resetContentCatalogs, getQuestCatalog } from '../public/js/content-catalogs.js?v=10b118dd';
 import { createQuestState } from '../public/js/quests.js?v=c8d9d0a4';
-import { acceptOffer, ensureQuestOfferState, paradiseVisitCredits, requirementRoute, routeQuestEvent } from '../public/js/quest-offers.js?v=f98056af';
+import { acceptOffer, ensureQuestOfferState, paradiseVisitCredits, requirementRoute, routeQuestEvent } from '../public/js/quest-offers.js?v=114a9551';
 import { PARADISE_COURSES, activateParadiseTicket, createParadiseState, normalizeParadiseState } from '../public/js/paradise-flight.js?v=b9ebc32f';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');

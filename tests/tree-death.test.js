@@ -38,17 +38,17 @@ import {
   quotePoisonVerb,
   treeDeathOutcome,
   useBottle,
-} from '../public/js/tree-poison.js?v=83953de2';
-import { createPlot, killPlotTree, performPlotVerb, growTree } from '../public/js/patches.js?v=bed4aff3';
+} from '../public/js/tree-poison.js?v=4d84ee07';
+import { createPlot, killPlotTree, performPlotVerb, growTree } from '../public/js/patches.js?v=ddd16221';
 import { createFeatureHost } from '../public/js/feature-host.js?v=127e0a3c';
-import { FEATURES } from '../public/js/features/index.js?v=2462241a';
-import { adoptedPlan } from '../public/js/features/patches-feature.js?v=15d9209c';
-import { patchesFeature } from '../public/js/features/patches-feature.js?v=15d9209c';
+import { FEATURES } from '../public/js/features/index.js?v=d3522080';
+import { adoptedPlan } from '../public/js/features/patches-feature.js?v=0f7d0430';
+import { patchesFeature } from '../public/js/features/patches-feature.js?v=0f7d0430';
 import {
   decorateTreeVerbs,
   streetTreeIndex,
   treeDeathFeature,
-} from '../public/js/features/tree-death-feature.js?v=f3f42cf7';
+} from '../public/js/features/tree-death-feature.js?v=3d06498b';
 import { skillRemakeNote } from '../public/js/skill-tree.js?v=53795620';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=10b118dd';
 

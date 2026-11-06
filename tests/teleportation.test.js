@@ -19,7 +19,6 @@ import {
   listTargets,
   maxMapTeleports,
   maxTargets,
-  reconcileScripts,
   rollTeleportDay,
   scriptLabel,
   setTarget,
@@ -27,7 +26,7 @@ import {
   teleportEnergyCost,
   teleportToPoint,
   useScript,
-} from '../public/js/teleportation.js?v=48e4e8de';
+} from '../public/js/teleportation.js?v=5a5c8e6f';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..', 'public');
 const T1 = ['meditativearts_1', 'teleportation_1'];
@@ -130,33 +129,21 @@ describe('teleportation scripts', () => {
     assert.equal(out.message, TELEPORT_TEXT.scriptCreated);
   });
 
-  it('uses Teleportation I energy, consumes the script and starts the cooldown', () => {
+  it('uses Teleportation I energy and starts the cooldown; the caller takes the copy', () => {
     const made = createScript({}, MEADOW, { learned: T4, quillWorking: true, paper: 1 });
-    const out = useScript(made.state, made.script.id, { learned: T1, energy: 50, now: 100, currentTsid: 'X' });
+    const out = useScript(made.state, made.script, { learned: T1, energy: 50, now: 100, currentTsid: 'X' });
     assert.equal(out.ok, true);
     assert.equal(out.energyCost, 33);
-    assert.equal(out.state.scripts.length, 0);
+    assert.equal(out.target.tsid, MEADOW.tsid);
     assert.equal(out.state.cooldownUntil, 5100);
-    assert.equal(useScript(made.state, made.script.id, { learned: [] }).error, TELEPORT_TEXT.scriptSkill);
+    assert.equal(useScript(made.state, made.script, { learned: [] }).error, TELEPORT_TEXT.scriptSkill);
   });
 
   it('refunds 100 iMG when the destination has vanished', () => {
     const made = createScript({}, MEADOW, { learned: T4, quillWorking: true, paper: 1 });
-    const out = useScript(made.state, made.script.id, { learned: T1, energy: 50, exists: () => false });
+    const out = useScript(made.state, made.script, { learned: T1, energy: 50, exists: () => false });
     assert.equal(out.vanished, true);
     assert.equal(out.refundImg, 100);
-    assert.equal(out.state.scripts.length, 0);
-  });
-
-  it('keeps script destinations through a drop and pick up', () => {
-    let s = createScript({}, MEADOW, { learned: T4, quillWorking: true, paper: 2 }).state;
-    s = createScript(s, XALANGA, { learned: T4, quillWorking: true, paper: 1 }).state;
-    const dropped = reconcileScripts(s, 1);
-    assert.equal(dropped.state.scripts.length, 1);
-    assert.equal(dropped.state.looseScripts.length, 1);
-    const back = reconcileScripts(dropped.state, 2);
-    assert.deepEqual(back.state.scripts.map((r) => r.destination.tsid), [MEADOW.tsid, XALANGA.tsid]);
-    assert.equal(reconcileScripts(createTeleportState(), 1).unknown, 1);
   });
 });
 

@@ -43,7 +43,8 @@
  */
 
 import { ITEM_CATALOG, addItem, countItem, itemIcon, listPackSlots, removeItem } from '../inventory.js?v=d82f3b00';
-import { TOOL_CONDITION_CATALOG, leavingCopyTag, leavingToolWear, receiveToolCopy } from '../tools.js?v=6684b484';
+import { scriptFromTag, scriptLabel } from '../teleportation.js?v=5a5c8e6f';
+import { TOOL_CONDITION_CATALOG, copyTagKind, leavingCopyTag, leavingToolWear, receiveToolCopy } from '../tools.js?v=689d6594';
 import { createMinnAccount } from '../minn-account.js?v=b29fae30';
 import { saveStore } from '../save-store.js?v=8839ba7b';
 import {
@@ -70,7 +71,7 @@ import {
   splitEnded,
   suggestedPrice,
   unitPrice,
-} from '../auctions.js?v=7b5dd39b';
+} from '../auctions.js?v=3e5df595';
 
 export const AUCTIONS_FEATURE_ID = 'auctions';
 const TABLE_URL = 'assets/content/trade-items.json';
@@ -488,14 +489,16 @@ function createSession(engine) {
     img.addEventListener('error', () => { img.style.visibility = 'hidden'; }, { once: true });
     ic.append(img, el('b', {}, String(a.n)));
     const what = el('div', { class: 'auc-what' });
-    what.append(el('strong', {}, label(a.c, a.n)));
+    // A Teleportation Script goes by its street, here as everywhere (teleportation_script.js getLabel 254-260).
+    const script = copyTagKind(a.c) === 'script' ? scriptFromTag(a.t) : null;
+    what.append(el('strong', {}, script ? scriptLabel(script) : label(a.c, a.n)));
     const meta = el('div', { class: 'auc-meta' });
     meta.append('Seller: ');
     const who = el('button', { type: 'button', 'data-auction-seller': String(a.seller.id) }, a.seller.name);
     who.addEventListener('click', () => { Object.assign(filters, { seller: { ...a.seller, mine: a.mine }, q: '', c: '', cat: '', page: 1 }); show('browse'); });
     meta.append(who, ` · ${ago(a.at)}`);
     if (a.status === 'active') meta.append(` · Ends in ${endsIn(a.ends)}`);
-    if (a.r != null && TOOL_CONDITION_CATALOG[a.c]) meta.append(` · ${a.r} uses left`);
+    if (a.r != null && TOOL_CONDITION_CATALOG[a.c] && !TOOL_CONDITION_CATALOG[a.c].noMeter) meta.append(` · ${a.r} uses left`);
     what.append(meta);
     const price = el('div', { class: 'auc-price' });
     price.append(el('strong', {}, `${a.n} for ${money(a.cost)}`));

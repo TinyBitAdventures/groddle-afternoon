@@ -11228,6 +11228,8 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+/* A name that says where it goes must read to its end (a Teleportation Script's street). */
+[data-ui="modern"] #pack-popover .pack-pop-title h3.pack-pop-wrap { white-space: normal; overflow: visible; text-overflow: clip; }
 [data-ui="modern"] #pack-popover .pack-pop-title h3 b { font-weight: var(--fw-bold); color: var(--text-muted); font-size: var(--fs-s); }
 [data-ui="modern"] #verb-menu .verb-menu-sub,
 [data-ui="modern"] #pack-popover .pack-pop-kind {

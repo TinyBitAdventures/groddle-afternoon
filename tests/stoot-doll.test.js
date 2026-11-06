@@ -25,7 +25,7 @@ import {
   dropInventoryStack,
   listDroppedStacks,
   pickupDroppedStack,
-} from '../public/js/world-items.js?v=78125f8f';
+} from '../public/js/world-items.js?v=5e25a498';
 import {
   createShrineState,
   listShrineDonationOptions,
@@ -35,7 +35,7 @@ import {
   createVendorSellQuote,
   listSellOffers,
   vendorSell,
-} from '../public/js/vendor.js?v=29f6c214';
+} from '../public/js/vendor.js?v=70577b0b';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 

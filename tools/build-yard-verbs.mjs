@@ -45,11 +45,11 @@ import { requireSite, sitePath } from './repos.mjs';
 export const OUT = sitePath('data', 'yard-verbs.json');
 
 export async function yardVerbsJson() {
-  const { YARD_POOL, YARD_AK_ITEMS } = await import('../public/js/yard-verbs-mp.js?v=767f4bfc');
-  const { ANIMAL_KINSHIP_PACKAGES } = await import('../public/js/animal-kinship.js?v=5f36cc4b');
+  const { YARD_POOL, YARD_AK_ITEMS } = await import('../public/js/yard-verbs-mp.js?v=5c4d68b8');
+  const { ANIMAL_KINSHIP_PACKAGES } = await import('../public/js/animal-kinship.js?v=448ca44a');
   const { ARBOROLOGY_HARVEST, TRANT_META } = await import('../public/js/trants.js?v=9c2e8c0f');
-  const { SEASONED_BEANS, SEEDLING_GROW_UPGRADES, SOIL_SKILL_PACKAGES, SOIL_TIMERS } = await import('../public/js/patches.js?v=bed4aff3');
-  const { WOOD_TREE_HARVEST } = await import('../public/js/woodcutting.js?v=d71073bd');
+  const { SEASONED_BEANS, SEEDLING_GROW_UPGRADES, SOIL_SKILL_PACKAGES, SOIL_TIMERS } = await import('../public/js/patches.js?v=ddd16221');
+  const { WOOD_TREE_HARVEST } = await import('../public/js/woodcutting.js?v=bd6376a1');
   const { ENCHANTED_WOOD_TREE } = await import('../public/js/enchanted-forests.js?v=d986bff5');
   const beans = Object.keys(SEASONED_BEANS).sort().map((id) => `${JSON.stringify(id)}:${JSON.stringify(SEASONED_BEANS[id].trantClass)}`);
   const grow = Object.keys(SEEDLING_GROW_UPGRADES).map((id) => `${JSON.stringify(id)}:{"minMs":${SEEDLING_GROW_UPGRADES[id].minMinutes * 60000},"level":${SEEDLING_GROW_UPGRADES[id].growLevel}}`);
@@ -57,9 +57,9 @@ export async function yardVerbsJson() {
   const arbor = Object.values(ARBOROLOGY_HARVEST).map((r) => `{"skill":${JSON.stringify(r.skillId)},"l":${r.intervalLimit},"b":${r.bonusAmount}}`);
   const dig = Object.entries(SOIL_SKILL_PACKAGES.dig_patch).map(([id, r]) => `{"skill":${JSON.stringify(id === 'no_skill' ? null : id)},"b":${r.bonus_amount}}`);
   const fruit = Object.keys(TRANT_META).sort().map((id) => `${JSON.stringify(id)}:${JSON.stringify(TRANT_META[id].fruitClass)}`);
-  const { STOCK_POOL, STOCK_NODE_CLASSES, STOCK_NODE_VERBS, STOCK_NODE_YIELD, ROCK_RESPAWN_MS } = await import('../public/js/yard-stock-mp.js?v=a1c9c5f2');
-  const { ROCK_CATALOG } = await import('../public/js/mining.js?v=4d825b67');
-  const { RESOURCE_NODE_CATALOG } = await import('../public/js/resource-nodes.js?v=a57377a1');
+  const { STOCK_POOL, STOCK_NODE_CLASSES, STOCK_NODE_VERBS, STOCK_NODE_YIELD, ROCK_RESPAWN_MS } = await import('../public/js/yard-stock-mp.js?v=0cf2c29d');
+  const { ROCK_CATALOG } = await import('../public/js/mining.js?v=4532ff9b');
+  const { RESOURCE_NODE_CATALOG } = await import('../public/js/resource-nodes.js?v=b2381f15');
   const { CULTIVATION_CLASSES } = await import('../public/js/homes-catalog.js?v=7aa9beb0');
   const { LIFESPAN_STEP, MAX_LIFE_STEPS } = await import('../public/js/home-cultivation.js?v=ff17225a');
   const allPool = { ...YARD_POOL, ...STOCK_POOL };
@@ -77,7 +77,7 @@ export async function yardVerbsJson() {
     return `${JSON.stringify(id)}:{"verb":${JSON.stringify(STOCK_NODE_VERBS[id])},"min":${st.min},"max":${st.max},"initial":${st.initial},"ready":${st.harvestableAt},"after":${st.afterHarvest ?? 'null'},"consume":${st.consume ?? 1},"regrow":[${regrow.join(',')}],"yield":${JSON.stringify(STOCK_NODE_YIELD[id])},"daily":${lim}}`;
   });
   const { FIREFLY_HIVE } = await import('../public/js/home-cultivation.js?v=ff17225a');
-  const { FIREFLY_JAR_FULL } = await import('../public/js/yard-stock-mp.js?v=a1c9c5f2');
+  const { FIREFLY_JAR_FULL } = await import('../public/js/yard-stock-mp.js?v=0cf2c29d');
   const cult = Object.keys(CULTIVATION_CLASSES).sort().filter((id) => ['rock', 'node', 'hive'].includes(CULTIVATION_CLASSES[id].kind)).map((id) => {
     const d = CULTIVATION_CLASSES[id];
     const ns = (d.nodes || []).map((n) => [String(n.classTsid).startsWith('peat_') ? 'peat_1' : n.classTsid, n.dx, n.dy]);

@@ -28,16 +28,16 @@ import {
   setCopyTag,
   setToolRemaining,
   toolCopies,
-} from '../public/js/tools.js?v=6684b484';
-import { COPY_TAG_RULES, cleanCopyTagOf } from '../public/js/copy-tags.js?v=e8f6c072';
-import { goodsWithHeldTags, normalizeGoods, normalizeSlice, sameGoods, settleDone } from '../public/js/trade.js?v=35447a40';
-import { giftEffects, normalizeGift, normalizeGiftsSlice, wrapBox } from '../public/js/gifts.js?v=28303c16';
-import { dropEffect, normalizeGroundStack, normalizeItem } from '../public/js/drops-mp.js?v=c88ed13d';
-import { normalizeListing } from '../public/js/auctions.js?v=7b5dd39b';
-import { cabinetMove, cabinetPut, cabinetTake, normalizeContents } from '../public/js/home-storage.js?v=6c449b4e';
+} from '../public/js/tools.js?v=689d6594';
+import { COPY_TAG_RULES, cleanCopyTagOf } from '../public/js/copy-tags.js?v=bd75b92e';
+import { goodsWithHeldTags, normalizeGoods, normalizeSlice, sameGoods, settleDone } from '../public/js/trade.js?v=c9224530';
+import { giftEffects, normalizeGift, normalizeGiftsSlice, wrapBox } from '../public/js/gifts.js?v=9a54c9c3';
+import { dropEffect, normalizeGroundStack, normalizeItem } from '../public/js/drops-mp.js?v=137333d1';
+import { normalizeListing } from '../public/js/auctions.js?v=3e5df595';
+import { cabinetMove, cabinetPut, cabinetTake, normalizeContents } from '../public/js/home-storage.js?v=121f1897';
 import { CUBIMAL_NAMING } from '../public/js/cubimals.js?v=8950bf83';
 import { FAVOR_GIANTS } from '../public/js/potions.js?v=c21bad59';
-import { HOPPER_CEILING, STILL } from '../public/js/machines.js?v=acfeb40f';
+import { HOPPER_CEILING, STILL } from '../public/js/machines.js?v=7359ceff';
 import { teachPhrase } from '../public/js/seasons.js?v=1978c3f3';
 import { addItem, countItem, createInventory } from '../public/js/inventory.js?v=d82f3b00';
 
@@ -234,7 +234,7 @@ const vectors = JSON.parse(readFileSync(join(root, 'tests/fixtures/copy-tag-vect
 describe('a copy\'s words: what may travel (js/copy-tags.js)', () => {
   it('every class that keeps words names its kind; the rules are the game\'s own numbers', () => {
     for (const [cls, def] of Object.entries(TOOL_CONDITION_CATALOG)) {
-      if (def.tags) assert.ok(['name', 'phrases', 'giant', 'still'].includes(copyTagKind(cls)), cls);
+      if (def.tags) assert.ok(['name', 'phrases', 'giant', 'still', 'script'].includes(copyTagKind(cls)), cls);
       else assert.equal(copyTagKind(cls), '', cls);
     }
     assert.equal(copyTagKind('npc_cubimal_rook'), 'name');

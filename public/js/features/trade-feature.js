@@ -41,7 +41,8 @@
  */
 
 import { ITEM_CATALOG, addItem, countItem, itemIcon, listPackSlots, removeItem } from '../inventory.js?v=d82f3b00';
-import { TOOL_CONDITION_CATALOG, copyTagKind, copyTags, leavingToolWear, receiveToolCopies, receiveToolCopy, setCopyTag, setToolRemaining, toolCopies } from '../tools.js?v=6684b484';
+import { TOOL_CONDITION_CATALOG, copyTagKind, copyTags, leavingToolWear, moveToolCopy, receiveToolCopies, receiveToolCopy, setCopyTag, setToolRemaining, toolCopies } from '../tools.js?v=689d6594';
+import { scriptFromTag, scriptLabel } from '../teleportation.js?v=5a5c8e6f';
 import { saveStore } from '../save-store.js?v=8839ba7b';
 import { playOverlay } from '../overlays.js?v=210ad5ee';
 import {
@@ -68,7 +69,7 @@ import {
   tradeCommand,
   untradeableReason,
   goodsWithHeldTags,
-} from '../trade.js?v=35447a40';
+} from '../trade.js?v=c9224530';
 
 export const TRADE_FEATURE_ID = 'trade';
 export const TRADE_VERB = 'trade_start';
@@ -289,7 +290,11 @@ function createSession(engine, client) {
     const img = el('img', { src: iconFor(it.c), alt: '' });
     img.addEventListener('error', () => { img.style.visibility = 'hidden'; }, { once: true });
     // A named Cubimal shows its own name (PackItemstackView.as: the user_name as the label).
-    const named = copyTagKind(it.c) === 'name' && typeof it.t === 'string' && it.t ? `${it.t} (${itemLabel(it.c, it.n)})` : itemLabel(it.c, it.n);
+    const kind = copyTagKind(it.c);
+    const script = kind === 'script' ? scriptFromTag(it.t) : null;
+    const named = script
+      ? scriptLabel(script)
+      : kind === 'name' && typeof it.t === 'string' && it.t ? `${it.t} (${itemLabel(it.c, it.n)})` : itemLabel(it.c, it.n);
     slot.append(img, el('span', { class: 'trade-n' }, it.n.toLocaleString('en-US')), el('span', { class: 'trade-name', title: named }, named));
     if (editable) {
       const tools = el('div', { class: 'trade-tools' });
@@ -297,9 +302,15 @@ function createSession(engine, client) {
       const plus = el('button', { type: 'button', 'aria-label': `One more ${itemLabel(it.c)}`, 'data-trade-plus': String(index) }, '+');
       const out = el('button', { type: 'button', 'aria-label': `Take the ${itemLabel(it.c, it.n)} out`, 'data-trade-remove': String(index) }, '×');
       plus.disabled = it.n >= slotMax(it.c, table) || available(it.c) <= 0;
-      minus.addEventListener('click', () => editDraft(setSlot(open.draft, index, it.n - 1, table)));
+      minus.addEventListener('click', () => {
+        if (it.n <= 1) scriptSlotLeaves(index);
+        editDraft(setSlot(open.draft, index, it.n - 1, table));
+      });
       plus.addEventListener('click', () => editDraft(setSlot(open.draft, index, it.n + 1, table)));
-      out.addEventListener('click', () => editDraft(setSlot(open.draft, index, 0, table)));
+      out.addEventListener('click', () => {
+        scriptSlotLeaves(index);
+        editDraft(setSlot(open.draft, index, 0, table));
+      });
       tools.append(minus, plus, out);
       slot.append(tools);
     }
@@ -344,6 +355,20 @@ function createSession(engine, client) {
       const left = available(row.classTsid);
       if (left <= 0) continue;
       const reason = table ? untradeableReason(row.classTsid, table) : '';
+      // Each Teleportation Script goes by its street, and you offer the one you choose.
+      if (copyTagKind(row.classTsid) === 'script' && engine.toolState) {
+        for (const tag of freeScripts(row.classTsid)) {
+          const script = scriptFromTag(tag);
+          const name = script ? scriptLabel(script) : itemLabel(row.classTsid, 1);
+          const b = el('button', { type: 'button', 'aria-disabled': String(Boolean(reason) || !editable), title: reason || `${TRADE_TEXT.add} ${name}`, 'data-trade-pack-item': row.classTsid });
+          const img = el('img', { src: iconFor(row.classTsid), alt: '' });
+          img.addEventListener('error', () => { img.style.visibility = 'hidden'; }, { once: true });
+          b.append(img, document.createTextNode(name));
+          b.addEventListener('click', () => addFromPack(row.classTsid, tag));
+          buttons.push(b);
+        }
+        continue;
+      }
       const b = el('button', {
         type: 'button',
         draggable: editable && !reason ? 'true' : 'false',
@@ -385,7 +410,7 @@ function createSession(engine, client) {
       title.textContent = TRADE_TEXT.title(name);
       sub.textContent = TRADE_TEXT.subtitle(name);
       const editable = !open.mine.accepted;
-      sideNode(mineCol, TRADE_TEXT.mineHead, editable ? open.draft : open.mine.goods, { editable, locked: open.mine.accepted, lockLabel: 'Locked' });
+      sideNode(mineCol, TRADE_TEXT.mineHead, editable ? draftShown() : open.mine.goods, { editable, locked: open.mine.accepted, lockLabel: 'Locked' });
       sideNode(theirsCol, TRADE_TEXT.theirsHead(name), open.theirs.goods, { editable: false, locked: open.theirs.accepted, lockLabel: 'Locked' });
     }
     renderPack();
@@ -436,6 +461,65 @@ function createSession(engine, client) {
     tags.forEach((t, k) => setCopyTag(engine.toolState, c, n - tags.length + k, t ?? null));
   }
 
+  const tagKey = (t) => JSON.stringify(t ?? null);
+  const heldTagsOf = (c) => (open && saved.hold?.trade === open.id ? saved.hold.tags?.[c] || [] : []);
+
+  /** The words of a kept-apart class's slots the hold doesn't have yet (chosen, not yet sent). */
+  function chosenTags(c, goods = open.draft) {
+    const held = heldTagsOf(c).map(tagKey);
+    const out = [];
+    for (const it of goods.items) {
+      if (it.c !== c) continue;
+      const at = held.indexOf(tagKey(it.t));
+      if (at >= 0) held.splice(at, 1);
+      else out.push(it.t ?? null);
+    }
+    return out;
+  }
+
+  /** The scripts of this class still free to offer: in the pack and not chosen for a slot. */
+  function freeScripts(c) {
+    const chosen = chosenTags(c).map(tagKey);
+    return copyTags(engine.toolState, c).filter((t) => {
+      const at = chosen.indexOf(tagKey(t));
+      if (at < 0) return true;
+      chosen.splice(at, 1);
+      return false;
+    });
+  }
+
+  /** The scripts chosen move last in the pack, so the copies that go into the hold (the last ones) are those. */
+  function chosenScriptsLast(c, goods) {
+    if (copyTagKind(c) !== 'script' || !engine.toolState) return;
+    for (const t of chosenTags(c, goods)) {
+      const all = copyTags(engine.toolState, c);
+      const at = all.findIndex((x) => tagKey(x) === tagKey(t));
+      if (at >= 0) moveToolCopy(engine.toolState, c, at, all.length - 1);
+    }
+  }
+
+  /** A slot's script about to leave the offer: last in the hold, since the hold gives back its last ones. */
+  function scriptSlotLeaves(index) {
+    const it = open?.draft.items[index];
+    if (!it || copyTagKind(it.c) !== 'script') return;
+    const held = saved.hold?.trade === open.id ? saved.hold.tags?.[it.c] : null;
+    const j = open.draft.items.slice(0, index).filter((x) => x.c === it.c).length;
+    if (Array.isArray(held) && j < held.length) held.push(...held.splice(j, 1));
+  }
+
+  /** The draft as it stands: a slot already held shows the script the hold has for it, the truth of the offer. */
+  function draftShown() {
+    const held = {};
+    const items = open.draft.items.map((it) => {
+      if (copyTagKind(it.c) !== 'script') return it;
+      const j = held[it.c] || 0;
+      held[it.c] = j + 1;
+      const list = heldTagsOf(it.c);
+      return j < list.length ? { ...it, t: list[j] } : it;
+    });
+    return { ...open.draft, items };
+  }
+
   /** Move from the pack into the hold so it covers goods. False when the pack cannot. */
   function growHold(goods) {
     const want = holdFor([{ items: Object.entries(heldCounts().items).map(([c, n]) => ({ c, n })), currants: heldCounts().currants }, goods]);
@@ -450,6 +534,7 @@ function createSession(engine, client) {
     for (const [c, n] of Object.entries(want.items)) {
       const more = n - (have.items[c] || 0);
       if (more > 0) {
+        chosenScriptsLast(c, goods);
         const out = toolPointsOut(c, more);
         const words = toolTagsOut(c, more);
         removeItem(engine.inv, c, more);
@@ -546,7 +631,7 @@ function createSession(engine, client) {
     }, SEND_DEBOUNCE_MS);
   }
 
-  function addFromPack(c) {
+  function addFromPack(c, tag = undefined) {
     if (!open || open.sealed || open.mine.accepted) return;
     if (!table) {
       loadTable();
@@ -569,6 +654,8 @@ function createSession(engine, client) {
       line(why, 'error');
       return;
     }
+    // A chosen script's words ride on its slot until the hold has it (chosenTags).
+    if (tag != null) goods.items[goods.items.length - 1].t = tag;
     editDraft(goods);
   }
 

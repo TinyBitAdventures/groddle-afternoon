@@ -70,7 +70,7 @@ import { CUBIMAL_PACKAGE_IDS, CUBIMAL_SERIES } from '../public/js/cubimals.js?v=
 import { ARTIFACT_MAP, ARTIFACT_NECKLACES } from '../public/js/artifacts.js?v=fc419ecf';
 import { XP_FOR_LEVEL, currantRewardForLevel } from '../public/js/progression.js?v=33462eaa';
 import { IMAGINATION_UPGRADES } from '../public/js/imagination-data.js?v=4a85e7fe';
-import { SPINDLE_TOOLS } from '../public/js/making.js?v=ed3a6e30';
+import { SPINDLE_TOOLS } from '../public/js/making.js?v=25c81118';
 import { creditedMultiplayerQuests } from '../public/js/quests-mp.js?v=2beb658a';
 import { FURNITURE_STARTER_KIT } from '../public/js/homes-catalog.js?v=7aa9beb0';
 

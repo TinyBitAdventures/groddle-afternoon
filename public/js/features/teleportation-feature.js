@@ -5,9 +5,11 @@
  * - A Teleportation card in the Map panel (host mapCards hook) lists the
  *   player's 1-3 points, with Set here and Teleport buttons, the energy cost
  *   and the cooldown.
- * - Teleportation Scripts in the pack: Read, and one Teleport button per
- *   script destination (host packVerbs hook). Paper gains Create
- *   Teleportation Script at Teleportation IV with Penpersonship and a Quill.
+ * - Teleportation Scripts in the pack: each is its own copy with its own
+ *   destination (js/tools.js row.tags, kind "script"), one to a slot and named
+ *   for its street; Read and Teleport act on the one picked (host packVerbs
+ *   hook). Paper gains Create Teleportation Script at Teleportation IV with
+ *   Penpersonship and a Quill.
  * - Every jump asks the host travelGate first, so the Hell feature's rules
  *   hold: the dead only move within Naraka, nobody teleports into Naraka, and
  *   Pooped blocks teleporting. Transient quest rooms keep their own exits.
@@ -28,12 +30,12 @@
  * script, travels away and reads it home.
  * &teleportfx=hold freezes the departure shimmer for a screenshot.
  * Canvas data: teleportRank, teleportPoints, teleportCooldown, teleportPhase,
- * teleportLast, teleportScripts, teleportEnergyCost.
+ * teleportLast, teleportScripts (each copy's street, - for one with none), teleportEnergyCost.
  */
 
 import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=d82f3b00';
 import { getGameDayKey } from '../game-day.js?v=edb00566';
-import { canUseTool, useToolCondition } from '../tools.js?v=6684b484';
+import { canUseTool, copyForVerb, copyTag, copyTags, setCopyTag, takeToolCopy, useToolCondition } from '../tools.js?v=689d6594';
 import {
   PAPER_CLASS,
   QUILL_CLASS,
@@ -41,6 +43,7 @@ import {
   SCRIPT_CLASS,
   SCRIPT_ITEM,
   TELEPORT_HIT_ANIMATION_MS,
+  adoptScripts,
   canCreateScript,
   canMapTeleport,
   createScript,
@@ -48,16 +51,16 @@ import {
   mapTeleport,
   maxTargets,
   normalizeTeleportState,
-  reconcileScripts,
   rollTeleportDay,
+  scriptFromTag,
   scriptLabel,
-  scriptTitle,
+  scriptTag,
   setTarget,
   teleportEnergyCost,
   teleportRank,
   teleportToPoint,
   useScript,
-} from '../teleportation.js?v=48e4e8de';
+} from '../teleportation.js?v=5a5c8e6f';
 import { loseEnergy } from '../metabolics.js?v=8504134e';
 
 export const TELEPORT_FEATURE_ID = 'teleportation';
@@ -121,6 +124,40 @@ function jumpCtx(engine) {
   };
 }
 
+/** Every script's own words, in pack order (none held: no row is made for them). */
+function heldTags(engine) {
+  return engine.toolState && countItem(engine.inv, SCRIPT_CLASS) > 0 ? copyTags(engine.toolState, SCRIPT_CLASS) : [];
+}
+
+/** The script a verb is about: the one picked in the pack, else the first. -1 when none is held. */
+function scriptCopy(engine, copy = null) {
+  return engine.toolState ? copyForVerb(engine.toolState, SCRIPT_CLASS, copy) : -1;
+}
+
+function scriptAt(engine, at) {
+  return at >= 0 ? scriptFromTag(copyTag(engine.toolState, SCRIPT_CLASS, at)) : null;
+}
+
+/** A script just made or given: the new copy (the last) takes its words. */
+function addScript(engine, script) {
+  addItem(engine.inv, SCRIPT_CLASS, 1);
+  setCopyTag(engine.toolState, SCRIPT_CLASS, countItem(engine.inv, SCRIPT_CLASS) - 1, scriptTag(script));
+}
+
+/**
+ * Destinations from before each script kept its own (js/teleportation.js adoptScripts): a script
+ * with none takes one, on load and whenever one comes back up from where an older save left it.
+ */
+function settleScripts(engine) {
+  if (!engine?.toolState || (!state.scripts.length && !state.looseScripts.length)) return;
+  const held = heldTags(engine);
+  const out = adoptScripts(state, held);
+  state = out.state;
+  out.tags.forEach((tag, i) => {
+    if (tag !== held[i]) setCopyTag(engine.toolState, SCRIPT_CLASS, i, tag);
+  });
+}
+
 function publish(engine) {
   engine.setData('teleportRank', String(teleportRank(learned(engine))));
   engine.setData(
@@ -129,7 +166,7 @@ function publish(engine) {
   );
   engine.setData('teleportCooldown', String(Math.max(0, Math.ceil((state.cooldownUntil - Date.now()) / 1000))));
   engine.setData('teleportPhase', pending ? 'warp' : arrival ? 'arriving' : 'idle');
-  engine.setData('teleportScripts', state.scripts.map((s) => s.destination.tsid).join(','));
+  engine.setData('teleportScripts', heldTags(engine).map((t) => t?.tsid || '-').join(','));
   engine.setData('teleportEnergyCost', String(teleportEnergyCost(learned(engine), TANK) ?? 0));
   if (engine.param('teleportdemo')) engine.setData('teleportDemo', demo.stage);
 }
@@ -252,16 +289,17 @@ function setPoint(engine, id) {
   return true;
 }
 
-function readScripts(engine) {
-  const lines = state.scripts.map((script) => `• ${script.title || scriptLabel(script)}`);
-  const unknown = Math.max(0, countItem(engine.inv, SCRIPT_CLASS) - state.scripts.length);
-  if (unknown) lines.push(`• ${unknown} with ink too smudged to read`);
+/** teleportation_script.js readScript: the one picked. */
+function readScript(engine, copy = null) {
+  const script = scriptAt(engine, scriptCopy(engine, copy));
   engine.prompt({
     kicker: 'Teleportation Script',
-    title: 'Where does it go?',
-    text: lines.length
-      ? `${lines.join('\n')}\n\nOne way, one use each. Without Teleportation I you can't read the incantation aloud.`
-      : 'A blank Teleportation Script.',
+    title: script ? script.title : 'Where does it go?',
+    text: !script
+      ? 'The ink on this one is too smudged to read.'
+      : script.imbued
+        ? 'One way, one use. Someone already paid for this ride: no energy, and no skill needed.'
+        : "One way, one use. Without Teleportation I you can't read the incantation aloud.",
   });
 }
 
@@ -279,7 +317,7 @@ function writeScript(engine) {
   const wear = useToolCondition(engine.toolState, QUILL_CLASS, out.costs.quillWear);
   loseEnergy(engine.pc, out.costs.energy); // G289 loss gate
   state = out.state;
-  addItem(engine.inv, SCRIPT_CLASS, 1);
+  addScript(engine, out.script);
   for (const event of out.events) engine.achievement(event.counter, event.amount);
   engine.pushActivity(`${out.script.title}. ${out.message} -1 energy`);
   if (wear?.msg) engine.pushActivity(wear.msg);
@@ -291,12 +329,16 @@ function writeScript(engine) {
   return true;
 }
 
-function readAloud(engine, scriptId) {
-  const script = state.scripts.find((row) => row.id === scriptId);
+function readAloud(engine, copy = null) {
+  const at = scriptCopy(engine, copy);
+  const script = scriptAt(engine, at);
   const pre = preflight(engine, script?.destination);
   if (!pre.ok) return engine.toast(pre.msg), false;
-  const out = useScript(state, scriptId, jumpCtx(engine));
+  const out = useScript(state, script, jumpCtx(engine));
   if (!out.ok) return engine.toast(out.error), false;
+  // This one leaves from its own slot, and its destination with it (the others keep theirs).
+  engine.query?.('packTakeUnit', SCRIPT_CLASS, at, 1, engine);
+  takeToolCopy(engine.toolState, SCRIPT_CLASS, { copy: at });
   removeItem(engine.inv, SCRIPT_CLASS, 1);
   if (out.vanished) {
     state = out.state;
@@ -513,7 +555,7 @@ function demoStep(engine, now) {
     demo = auto ? { stage: 'go', at: now + 1800 } : { stage: 'done', at: 0 };
   } else if (demo.stage === 'go') {
     demo = { stage: 'done', at: 0 };
-    if (mode === 'script') readAloud(engine, state.scripts[0]?.id);
+    if (mode === 'script') readAloud(engine, 0);
     else teleportPoint(engine, 1);
   }
 }
@@ -531,7 +573,7 @@ function demoOnEnter(engine) {
       engine.grantSkill('penmanship_1');
       if (countItem(engine.inv, QUILL_CLASS) < 1) addItem(engine.inv, QUILL_CLASS, 1);
       if (countItem(engine.inv, PAPER_CLASS) < 3) addItem(engine.inv, PAPER_CLASS, 3);
-      if (engine.param('teleportautoplay') === '1' && !state.scripts.length) writeScript(engine);
+      if (engine.param('teleportautoplay') === '1' && !countItem(engine.inv, SCRIPT_CLASS)) writeScript(engine);
       engine.closeMap();
     } else if (engine.streetTsid !== DEMO_AWAY_STREET) {
       setPoint(engine, 1);
@@ -565,8 +607,9 @@ export const teleportationFeature = {
     return state;
   },
 
-  restore(slice) {
+  restore(slice, engine) {
     state = normalizeTeleportState(slice || {});
+    settleScripts(engine || engineRef);
   },
 
   onNewDay() {
@@ -606,8 +649,7 @@ export const teleportationFeature = {
     if (!engine.started) return;
     if (now - lastReconcile > 400) {
       lastReconcile = now;
-      const out = reconcileScripts(state, countItem(engine.inv, SCRIPT_CLASS));
-      if (out.changed) state = out.state;
+      settleScripts(engine);
       publish(engine);
     }
     if (pending) {
@@ -638,20 +680,32 @@ export const teleportationFeature = {
   /**
    * Ticket 81 (the Projects panel's Teleport): a Teleportation Script in the pack that goes to
    * `tsid` (an imbued one from a finished project, or one you wrote), read as its pack verb reads it.
-   * 'check' -> null when you hold none, else { ok, error, scriptId, imbued, energyCost }; 'go' reads it.
+   * 'check' -> null when you hold none, else { ok, error, copy, imbued, energyCost }; 'go' reads it.
    */
   teleportScriptTo(action, tsid, engine) {
     const want = String(tsid || '').replace(/^L/, 'G');
-    const script = want ? state.scripts.find((row) => String(row.destination?.tsid || '').replace(/^L/, 'G') === want) : null;
-    if (!script || !countItem(engine.inv, SCRIPT_CLASS)) return null;
-    if (action === 'go') return readAloud(engine, script.id);
+    const at = want ? heldTags(engine).findIndex((t) => String(t?.tsid || '').replace(/^L/, 'G') === want) : -1;
+    if (at < 0) return null;
+    if (action === 'go') return readAloud(engine, at);
     if (action !== 'check') return null;
+    const script = scriptAt(engine, at);
     const pre = preflight(engine, script.destination);
-    if (!pre.ok) return { ok: false, error: pre.msg, scriptId: script.id, imbued: script.imbued };
+    if (!pre.ok) return { ok: false, error: pre.msg, copy: at, imbued: script.imbued };
     const ctx = jumpCtx(engine);
-    const check = useScript(state, script.id, ctx);
+    const check = useScript(state, script, ctx);
     const energyCost = script.imbued ? 0 : teleportEnergyCost(ctx.learned, TANK) || 0;
-    return { ok: check.ok, error: check.ok ? '' : check.error, scriptId: script.id, imbued: script.imbued, energyCost };
+    return { ok: check.ok, error: check.ok ? '' : check.error, copy: at, imbued: script.imbued, energyCost };
+  },
+
+  /**
+   * teleportation_script.js getLabel 254-260: a script goes by where it goes, in the pack from its copy
+   * and on the ground from its stack's first (`tag`). One with no destination keeps the plain name.
+   */
+  itemDisplayName(classTsid, copy = null, engine = null, tag = undefined) {
+    if (classTsid !== SCRIPT_CLASS) return null;
+    const eng = engine || engineRef;
+    const script = tag !== undefined ? scriptFromTag(tag) : eng?.toolState ? scriptAt(eng, scriptCopy(eng, copy)) : null;
+    return script ? { label: scriptLabel(script), kind: script.imbued ? 'Free one-way trip' : 'One-way trip', one: true, wrap: true } : null;
   },
 
   mapCards(engine) {
@@ -686,16 +740,17 @@ export const teleportationFeature = {
     return true;
   },
 
-  packVerbs(classTsid, engine) {
+  packVerbs(classTsid, engine, opts = {}) {
     if (classTsid === SCRIPT_CLASS) {
       const ctx = jumpCtx(engine);
       const verbs = [{ id: 'read', label: 'Read', enabled: true, tooltip: 'Where does it go?' }];
-      for (const script of state.scripts.slice(0, 6)) {
-        const check = useScript(state, script.id, ctx);
+      const script = scriptAt(engine, scriptCopy(engine, opts.copy));
+      if (script) {
+        const check = useScript(state, script, ctx);
         const reason = engine.transientInstance() ? NO_EXIT : check.ok ? '' : check.error;
         const cost = script.imbued ? 0 : teleportEnergyCost(ctx.learned, TANK) || 0;
         verbs.push({
-          id: `use:${script.id}`,
+          id: 'use',
           label: `Teleport to ${script.destination.label || script.destination.tsid}${cost ? ` · ${cost} energy` : ''}`,
           enabled: !reason,
           reason,
@@ -724,10 +779,10 @@ export const teleportationFeature = {
     return null;
   },
 
-  runPackVerb(classTsid, verbId, engine) {
+  runPackVerb(classTsid, verbId, engine, opts = {}) {
     if (classTsid === SCRIPT_CLASS) {
-      if (verbId === 'read') readScripts(engine);
-      else if (verbId.startsWith('use:')) readAloud(engine, verbId.slice(4));
+      if (verbId === 'read') readScript(engine, opts.copy);
+      else if (verbId === 'use') readAloud(engine, opts.copy);
       else return false;
       return true;
     }
@@ -745,20 +800,11 @@ export const teleportationFeature = {
    */
   grantScript(engine, destination) {
     if (!destination?.tsid) return null;
-    const s = normalizeTeleportState(state);
-    const script = {
-      id: `tps${s.nextScriptId}`,
-      destination,
-      imbued: true,
-      title: scriptTitle(destination),
-      createdAt: Date.now(),
-    };
-    s.nextScriptId += 1;
-    s.scripts.push(script);
-    state = normalizeTeleportState(s);
-    addItem(engine.inv, SCRIPT_CLASS, 1);
+    const script = { destination, imbued: true };
+    if (!scriptTag(script)) return null;
+    addScript(engine, script);
     publish(engine);
-    return script;
+    return scriptFromTag(scriptTag(script));
   },
 
   /** QA / tests. */

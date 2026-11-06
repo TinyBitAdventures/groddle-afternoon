@@ -28,10 +28,10 @@ import { requireSite, sitePath } from './repos.mjs';
 export const OUT = sitePath('data', 'home-machines.json');
 
 export async function homeMachinesJson() {
-  const hm = await import('../public/js/home-machines.js?v=eefc7b1d');
-  const { MACHINE_SKILLS } = await import('../public/js/machine-rooms.js?v=bcd6a405');
-  const { FRESH_FUEL, MACHINE_IDS } = await import('../public/js/machines.js?v=acfeb40f');
-  const decor = await import('../public/js/home-decor.js?v=5551be2e');
+  const hm = await import('../public/js/home-machines.js?v=d91fb59b');
+  const { MACHINE_SKILLS } = await import('../public/js/machine-rooms.js?v=58f9c192');
+  const { FRESH_FUEL, MACHINE_IDS } = await import('../public/js/machines.js?v=7359ceff');
+  const decor = await import('../public/js/home-decor.js?v=c1240252');
   const { HOME_LIMITS } = await import('../public/js/homes-catalog.js?v=7aa9beb0');
   const tower = decor.interiorBounds({ layout: 'tower' });
   const rooms = { segmentW: decor.SEGMENT_W, minSegments: HOME_LIMITS.MIN_WALL_SEGMENTS, startSegments: HOME_LIMITS.START_WALL_SEGMENTS, maxSegments: HOME_LIMITS.MAX_WALL_SEGMENTS, endCap: decor.INTERIOR.endCapW, towerLeft: tower.left, towerRight: tower.right };

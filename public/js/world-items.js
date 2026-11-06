@@ -70,7 +70,7 @@ function pointsFor(points, count) {
 export const BAG_CONTENTS_MAX = 16;
 
 /**
- * What a dropped bag holds ([{ classTsid, count, points? }]), or null: in the
+ * What a dropped bag holds ([{ classTsid, count, points?, tags? }]), or null: in the
  * source a bag goes down with its contents inside it (items/include/takeable.js
  * takeable_drop 157-213 moves the bag itemstack and all it holds).
  */
@@ -82,7 +82,8 @@ export function cleanContents(value) {
     const count = cleanCount(row?.count);
     if (!classTsid || count < 1) continue;
     const points = cleanPoints(row?.points, count);
-    out.push({ classTsid, count, ...(points ? { points } : {}) });
+    const tags = cleanTags(row?.tags, count);
+    out.push({ classTsid, count, ...(points ? { points } : {}), ...(tags ? { tags } : {}) });
   }
   return out.length ? out : null;
 }
@@ -269,7 +270,7 @@ export function placeDroppedBag(state, streetTsid, classTsid, contents, position
   const street = cleanStreetTsid(streetTsid);
   const item = cleanClassTsid(classTsid);
   if (!street || !item) return { ok: false, reason: 'invalid_target' };
-  const held = cleanContents((contents || []).map((c) => ({ classTsid: c.classTsid ?? c.cls, count: c.count, points: c.points })));
+  const held = cleanContents((contents || []).map((c) => ({ classTsid: c.classTsid ?? c.cls, count: c.count, points: c.points, tags: c.tags })));
   const rows = state.streets[street] || (state.streets[street] = []);
   const stack = {
     id: `world-item-${state.nextId++}`,

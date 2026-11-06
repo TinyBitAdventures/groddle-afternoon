@@ -2,9 +2,9 @@
  * Groddle Afternoon — original street geometry + layered decos
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
-import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=ff28da24';
+import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=8af10970';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=127e0a3c';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=2462241a';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=d3522080';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -36,7 +36,7 @@ import {
 // Quest copy is Flash htmlText: <b>/<i>/<br> drawn as formatting, the rest dropped, never innerHTML.
 import { questRequirementText, renderQuestText, withQuestMarkup } from './js/quest-text.js?v=7f5d761c';
 // G267: the world-verb quest counters skip offer-system quests; old saves drop the boot Moloko quest.
-import { dropBootStarterQuests, questMoveNote, routesCounter, worldVerbQuestEvents, gardenPlotEvents, makingUnitQuestEvents, shrineDonationQuestEvents } from './js/quest-offers.js?v=f98056af';
+import { dropBootStarterQuests, questMoveNote, routesCounter, worldVerbQuestEvents, gardenPlotEvents, makingUnitQuestEvents, shrineDonationQuestEvents } from './js/quest-offers.js?v=114a9551';
 import {
   PHANTOM_QUEST_ID,
   REMEMBER_QUEST_ID,
@@ -220,7 +220,7 @@ import {
   rookEggStateForProgress,
   rookWoodsObjective,
   rookWoodsRemainingMs,
-} from './js/rook-woods.js?v=083f7364';
+} from './js/rook-woods.js?v=bf749a71';
 import {
   ROOK_HALL_QUEST_ID,
   ROOK_HALL_START_QUEST_ID,
@@ -468,8 +468,8 @@ import {
 } from './js/inventory.js?v=d82f3b00';
 import { PACK_COPY, isBagClass, unitRankAt } from './js/pack-slots.js?v=c91d0ca3';
 import { createPackRow, mountPackClearance, packBandRange, packCountText, packSearchEntries, packSlotTip } from './js/ui/pack-row.js?v=65c0f180';
-import { listAnimalFeedOptions } from './js/animals.js?v=05dafc43';
-import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=05dafc43';
+import { listAnimalFeedOptions } from './js/animals.js?v=fea7e3e0';
+import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=fea7e3e0';
 import {
   createDroppedItemState,
   parseDroppedItemState,
@@ -480,13 +480,13 @@ import {
   pickupDroppedStack,
   placeDroppedBag,
   takeDroppedRecord,
-} from './js/world-items.js?v=78125f8f';
+} from './js/world-items.js?v=5e25a498';
 import {
   createPlayerSave,
   parsePlayerSave,
   serializePlayerSave,
   restorePlayerSave,
-} from './js/player-save.js?v=58e4ef62';
+} from './js/player-save.js?v=896f98e5';
 import {
   HOME_INTERIOR_TSID,
   HOME_STREET_TSID,
@@ -530,6 +530,7 @@ import {
   tinkertoolRefusal,
   toolWornBaseCost,
   mostWornToolCopy,
+  keepsOwnStack,
   takeToolCopy,
   moveToolCopy,
   setToolRemaining,
@@ -543,7 +544,7 @@ import {
   setCopyTag,
   migrateClassValue,
   brokenToolIcon,
-} from './js/tools.js?v=6684b484';
+} from './js/tools.js?v=689d6594';
 import {
   listRecipes,
   listRecipesForTool,
@@ -577,7 +578,7 @@ import {
   recipeTaskLimit,
   recipeToolInUse,
   pluralizeItem,
-} from './js/making.js?v=ed3a6e30';
+} from './js/making.js?v=25c81118';
 import { outputIconsHtml, outputsPhrase, recipeOutputRows } from './js/ui/recipe-outputs.js?v=73e19baf';
 import { MAKE_TOOL_SHEETS } from './js/make-tool-sheets.js?v=6f758e09';
 import { LOW_FUEL_LINE, craftSessionElapsedMs, isLowFuel, isMachineArt, machineArtHtml, packMakeState, playMachineHandOver, setMachineArtFrame } from './js/machine-art.js?v=ac629e13';
@@ -605,7 +606,7 @@ import {
   cropIcon,
   hasWateringCan,
   hasHoe,
-} from './js/garden.js?v=86e003ff';
+} from './js/garden.js?v=74dd94d0';
 import { GARDEN_SCALE, PLOT_H as GARDEN_PLOT_H, PLOT_W as GARDEN_PLOT_W, gardenFrame, gardenLayout, gardenStyle, plotPieces } from './js/garden-view.js?v=05651e76';
 import {
   ROCK_CATALOG,
@@ -619,7 +620,7 @@ import {
   STARTER_MINING_SKILLS,
   findWorkingPick,
   miningToolWear,
-} from './js/mining.js?v=4d825b67';
+} from './js/mining.js?v=4532ff9b';
 import {
   loadStreetData,
   STREET_INDEX,
@@ -810,20 +811,20 @@ import {
   createVendorSellQuote,
   vendorSellUnitPrice,
   vendorBuyUnitPrice,
-} from './js/vendor.js?v=29f6c214';
+} from './js/vendor.js?v=70577b0b';
 import {
   animalAnchorX,
   createAnimalState,
   resetAnimalDay,
   animalStatusLabel,
-} from './js/animals.js?v=05dafc43';
+} from './js/animals.js?v=fea7e3e0';
 import {
   ensureWoodTreeState,
   pickWoodTool,
   resetWoodTreeDay,
   woodToolLabel,
   woodTreeStatusLabel,
-} from './js/woodcutting.js?v=d71073bd';
+} from './js/woodcutting.js?v=bd6376a1';
 import {
   GIANTS,
   createShrineState,
@@ -847,7 +848,7 @@ import {
   formatSpeedUpTime,
 } from './js/shrines.js?v=95d74174';
 import { giantDisplayName } from './js/giant-names.js?v=0e295891';
-import { shrinePowderOptions, shrinePowderAchievementCounters } from './js/powders.js?v=3c38f8b7';
+import { shrinePowderOptions, shrinePowderAchievementCounters } from './js/powders.js?v=ba1b2753';
 import {
   GAMESHOW_TICKET_ID,
   applySpinningWheelReward,
@@ -4544,7 +4545,7 @@ function renderPackPopover(classTsid, anchor = null) {
     <div class="pack-pop-head vm-head"${isEmotionalBear ? ` data-bear-state="${bearStateName}"` : ''}>
       <div class="pack-pop-icon"><img src="${slot.icon}" alt="" /></div>
       <div class="pack-pop-title">
-        <h3 id="pack-popover-title">${escapeHtml(named?.label || slot.label)} <b>×${named?.one ? 1 : stackCount}</b></h3>
+        <h3 id="pack-popover-title"${named?.wrap ? ' class="pack-pop-wrap"' : ''}>${escapeHtml(named?.label || slot.label)}${named?.wrap ? '' : ` <b>×${named?.one ? 1 : stackCount}</b>`}</h3>
         <span class="pack-pop-kind">${named ? escapeHtml(named.kind) : kind}${kindNote ? ` · ${kindNote}` : ''}</span>
       </div>
       <button type="button" class="pack-pop-close" data-pack-close aria-label="Close item actions">×</button>
@@ -12229,7 +12230,7 @@ const engine = {
     if (blocked) return { ok: false, reason: 'blocked', msg: blocked };
     const n = normalizeStackQuantity(count, inv[classTsid] || 0);
     if (!n) return { ok: false, reason: 'missing', msg: 'That stack is no longer in your pack.' };
-    const result = dropInventoryStack(droppedItemState, inv, droppedStacksTsid(), classTsid, n, { x, y }, { now: Date.now(), mergeRadius: 12, points: leavingToolPoints(classTsid, n) });
+    const result = dropInventoryStack(droppedItemState, inv, droppedStacksTsid(), classTsid, n, { x, y }, { now: Date.now(), mergeRadius: 12, ...(keepsOwnStack(classTsid) ? { merge: false } : {}), points: leavingToolPoints(classTsid, n) });
     if (!result.ok) return result;
     closePackPopover();
     saveDroppedItems();
@@ -13295,7 +13296,8 @@ function dropPackItem(classTsid, requested = 1) {
     classTsid,
     count,
     { x, y },
-    { now: Date.now(), points: leavingToolPoints(classTsid, count), tags: leavingToolTags(classTsid, count) }
+    // A script is one to a stack on the ground too (js/tools.js ownStack): stackmax 1 never piled up.
+    { now: Date.now(), points: leavingToolPoints(classTsid, count), tags: leavingToolTags(classTsid, count), ...(keepsOwnStack(classTsid) ? { merge: false } : {}) }
   );
   closePackPopover();
   if (!result.ok) {
@@ -31251,7 +31253,7 @@ async function main() {
   }
   // Garden talkback QA (js/garden-talk-qa.js): ?gardentalkdemo=herb|crop.
   if (new URLSearchParams(location.search).has('gardentalkdemo')) {
-    import('./js/garden-talk-qa.js?v=142ff869').then((m) => m.runGardenTalkDemo({ engine, executeVerb, params: new URLSearchParams(location.search) }));
+    import('./js/garden-talk-qa.js?v=124843c4').then((m) => m.runGardenTalkDemo({ engine, executeVerb, params: new URLSearchParams(location.search) }));
   }
   // MEMQA (ticket 21, Safari's memory reload in Naraka): ?memqa=1 lets a probe walk streets through the
   // real street trip (tools/qa/street-memory.mjs). Solo pages only: online pages drop their params.

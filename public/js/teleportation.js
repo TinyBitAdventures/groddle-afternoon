@@ -13,10 +13,17 @@
  *   can_teleport(skip_skill); energy cost then a cooldown; one-way, consumed;
  *   a vanished destination refunds 100 iMG.
  *
+ * Each script keeps its own destination, as its own copy (js/tools.js row.tags, kind "script",
+ * js/copy-tags.js): teleportation_script.js has stackmax 1 and instance props, and setTarget 298-319
+ * puts destination and is_imbued on the one item. The destinations of older saves wait in
+ * state.scripts and state.looseScripts until a copy with none takes one (adoptScripts).
+ *
  * Death, Naraka and Pooped gates belong to the Hell feature: the feature
  * module asks the host travelGate before any teleport, so these rules never
  * duplicate them.
  */
+
+import { cleanCopyTagOf } from './copy-tags.js?v=bd75b92e';
 
 export const TELEPORT_SKILLS = Object.freeze([
   'teleportation_1',
@@ -124,7 +131,7 @@ export function maxMapTeleports(learned = []) {
 
 function cleanLocation(loc) {
   if (!loc || typeof loc !== 'object' || typeof loc.tsid !== 'string' || !loc.tsid) return null;
-  const n = (v) => (Number.isFinite(Number(v)) ? Number(v) : undefined);
+  const n = (v) => (v != null && v !== '' && Number.isFinite(Number(v)) ? Number(v) : undefined);
   const out = { tsid: loc.tsid };
   if (n(loc.x) !== undefined) out.x = n(loc.x);
   if (n(loc.y) !== undefined) out.y = n(loc.y);
@@ -134,17 +141,27 @@ function cleanLocation(loc) {
   return out;
 }
 
+/** A row of an older save's list: what it needs is its destination, whatever else it has lost. */
 function cleanScript(row) {
   if (!row || typeof row !== 'object') return null;
   const destination = cleanLocation(row.destination);
-  if (!destination || typeof row.id !== 'string' || !row.id) return null;
-  return {
-    id: row.id,
-    destination,
-    imbued: row.imbued === true,
-    title: typeof row.title === 'string' ? row.title.slice(0, 150) : '',
-    createdAt: Number.isFinite(Number(row.createdAt)) ? Number(row.createdAt) : 0,
-  };
+  if (!destination) return null;
+  return { destination, imbued: row.imbued === true };
+}
+
+/** An older save's list, cleaned: its rows in their order, each row once (by the id it had). */
+function cleanRows(list) {
+  const seen = new Set();
+  const out = [];
+  for (const raw of Array.isArray(list) ? list : []) {
+    const row = cleanScript(raw);
+    if (!row) continue;
+    const id = typeof raw.id === 'string' ? raw.id : '';
+    if (id && seen.has(id)) continue;
+    if (id) seen.add(id);
+    out.push(id ? { ...row, id } : row);
+  }
+  return out;
 }
 
 export function createTeleportState(seed = {}) {
@@ -159,20 +176,19 @@ export function normalizeTeleportState(seed = {}) {
     const clean = cleanLocation(loc);
     if (Number.isInteger(slot) && slot >= 1 && slot <= 3 && clean) targets[slot] = clean;
   }
-  const scripts = (Array.isArray(s.scripts) ? s.scripts : []).map(cleanScript).filter(Boolean);
-  const looseScripts = (Array.isArray(s.looseScripts) ? s.looseScripts : []).map(cleanScript).filter(Boolean);
+  const scripts = cleanRows(s.scripts);
+  const looseScripts = cleanRows(s.looseScripts);
   const totals = s.totals && typeof s.totals === 'object' ? s.totals : {};
   const count = (v) => (Number.isFinite(Number(v)) && Number(v) > 0 ? Math.floor(Number(v)) : 0);
   return {
-    version: 1,
+    version: 2,
     targets,
     cooldownUntil: Number(s.cooldownUntil) > 0 ? Number(s.cooldownUntil) : 0,
     dayKey: typeof s.dayKey === 'string' ? s.dayKey : '',
     mapTeleportsToday: count(s.mapTeleportsToday),
     totals: { plain: count(totals.plain), script: count(totals.script), set: count(totals.set), map: count(totals.map) },
     scripts,
-    looseScripts: looseScripts.slice(-20),
-    nextScriptId: Math.max(1, count(s.nextScriptId)),
+    looseScripts,
   };
 }
 
@@ -355,9 +371,10 @@ export function scriptTitle(destination) {
 
 /** getLabel: "Teleportation Script to <street>, <hub>". */
 export function scriptLabel(script) {
-  if (!script?.destination) return 'Teleportation Script';
+  const name = script?.imbued ? 'Imbued Teleportation Script' : 'Teleportation Script'; // teleportation_script_imbued.js name_single
+  if (!script?.destination) return name;
   const d = script.destination;
-  return `Teleportation Script to ${d.label || d.tsid}${d.hubName ? `, ${d.hubName}` : ''}`;
+  return `${name} to ${d.label || d.tsid}${d.hubName ? `, ${d.hubName}` : ''}`;
 }
 
 /**
@@ -376,27 +393,17 @@ export function canCreateScript(state, ctx = {}) {
 
 /**
  * Write one script to the current location. Costs (applied by the caller):
- * 1 Paper, 1 Quill wear, 1 energy.
+ * 1 Paper, 1 Quill wear, 1 energy. The caller adds the copy, with `script.tag` as its words.
  */
 export function createScript(state, location, ctx = {}) {
   const gate = canCreateScript(state, ctx);
   if (!gate.ok) return gate;
-  const destination = cleanLocation(location);
-  if (!destination) return { ok: false, error: TELEPORT_TEXT.cantSave };
-  const s = normalizeTeleportState(state);
-  const script = {
-    id: `tps${s.nextScriptId}`,
-    destination,
-    imbued: false,
-    title: scriptTitle(destination),
-    createdAt: ctx.now ?? Date.now(),
-  };
-  s.nextScriptId += 1;
-  s.scripts.push(script);
+  const tag = scriptTag({ destination: cleanLocation(location), imbued: false });
+  if (!tag) return { ok: false, error: TELEPORT_TEXT.cantSave };
   return {
     ok: true,
-    state: s,
-    script,
+    state: normalizeTeleportState(state),
+    script: scriptFromTag(tag),
     costs: { paper: 1, quillWear: 1, energy: 1 },
     message: TELEPORT_TEXT.scriptCreated,
     events: [{ counter: 'making_recipe:teleportation_script', amount: 1 }],
@@ -404,19 +411,17 @@ export function createScript(state, location, ctx = {}) {
 }
 
 /**
- * items/teleportation_script.js use(). Returns the energy to charge and the
- * destination; the caller removes one script from the pack on success.
+ * items/teleportation_script.js use(). `script` is the one being read (scriptFromTag of its copy).
+ * Returns the energy to charge and the destination; the caller takes that copy out of the pack on
+ * success, and its destination goes with it.
  * @param {{ learned?: string[], now?: number, energy?: number, tank?: number,
  *   currentTsid?: string, fromHubId?: string, exists?: Function, teleporting?: boolean }} ctx
  */
-export function useScript(state, scriptId, ctx = {}) {
+export function useScript(state, script, ctx = {}) {
   const s = normalizeTeleportState(state);
-  const index = s.scripts.findIndex((row) => row.id === scriptId);
-  if (index < 0) return { ok: false, error: TELEPORT_TEXT.noDestination };
-  const script = s.scripts[index];
+  if (!script?.destination?.tsid) return { ok: false, error: TELEPORT_TEXT.noDestination };
   if (!script.imbued && !has(ctx.learned, 'teleportation_1')) return { ok: false, error: TELEPORT_TEXT.scriptSkill };
   if (ctx.exists && !ctx.exists(script.destination.tsid)) {
-    s.scripts.splice(index, 1);
     return { ok: true, state: s, vanished: true, refundImg: 100, message: TELEPORT_TEXT.scriptGone, consumed: script };
   }
   const gate = canTeleport(s, script.destination, { ...ctx, skipSkill: true });
@@ -426,7 +431,6 @@ export function useScript(state, scriptId, ctx = {}) {
     energyCost = teleportEnergyCost(ctx.learned, ctx.tank || DEFAULT_TANK) || 0;
     if ((ctx.energy ?? 0) <= energyCost) return { ok: false, error: TELEPORT_TEXT.energy };
   }
-  s.scripts.splice(index, 1);
   if (energyCost) s.cooldownUntil = (ctx.now ?? Date.now()) + TELEPORT_COOLDOWN_SECONDS * 1000;
   s.totals.script += 1;
   return {
@@ -439,24 +443,61 @@ export function useScript(state, scriptId, ctx = {}) {
   };
 }
 
+/** A script's own words (js/copy-tags.js kind "script") from { destination, imbued }, or null. */
+export function scriptTag(script) {
+  const d = script?.destination;
+  if (!d) return null;
+  return cleanCopyTagOf('script', {
+    tsid: d.tsid,
+    x: d.x ?? null,
+    y: d.y ?? null,
+    label: d.label || '',
+    hubId: d.hubId || '',
+    hubName: d.hubName || '',
+    imbued: script.imbued === true,
+  });
+}
+
+/** What a copy's words say: { destination, imbued, title }, or null for a copy with none. */
+export function scriptFromTag(tag) {
+  if (!tag || typeof tag !== 'object' || !tag.tsid) return null;
+  const destination = cleanLocation(tag);
+  return { destination, imbued: tag.imbued === true, title: scriptTitle(destination) };
+}
+
 /**
- * Keep the per-script destinations in step with the pack count. Stacks that
- * leave the pack (dropped on a street) park in a loose pool and come back,
- * destination intact, when picked up again.
+ * Older saves kept the destinations in one list beside a count, so which went with which was never
+ * known (and the list's order says nothing): each copy with no words takes the next destination
+ * there is, what is held first, then what was set down. Destinations left over wait for a script
+ * that comes back up (from the ground, a cabinet, a bag), and are kept for it.
+ * @param {(object|null)[]} tags every copy's words, in pack order
+ * @returns {{ state: object, tags: (object|null)[], adopted: number, unknown: number }} `unknown`:
+ *   copies with no destination anywhere (a count the save never knew a destination for)
  */
-export function reconcileScripts(state, packCount) {
+export function adoptScripts(state, tags = []) {
   const s = normalizeTeleportState(state);
-  const want = Math.max(0, Math.floor(Number(packCount) || 0));
-  let changed = false;
-  while (s.scripts.length > want) {
-    s.looseScripts.push(s.scripts.pop());
-    changed = true;
+  const ids = new Set();
+  const pool = [...s.scripts, ...s.looseScripts].filter((row) => {
+    if (!row.id) return true;
+    if (ids.has(row.id)) return false;
+    ids.add(row.id);
+    return true;
+  });
+  const out = [];
+  let adopted = 0;
+  let unknown = 0;
+  for (const tag of tags) {
+    if (tag != null) {
+      out.push(tag);
+      continue;
+    }
+    let next = null;
+    while (!next && pool.length) next = scriptTag(pool.shift());
+    if (next) adopted += 1;
+    else unknown += 1;
+    out.push(next);
   }
-  while (s.scripts.length < want && s.looseScripts.length) {
-    s.scripts.push(s.looseScripts.pop());
-    changed = true;
-  }
-  s.looseScripts = s.looseScripts.slice(-20);
-  // Any remaining shortfall is a script from elsewhere with no ink to read.
-  return { state: s, changed, unknown: Math.max(0, want - s.scripts.length) };
+  s.scripts = [];
+  s.looseScripts = pool;
+  return { state: s, tags: out, adopted, unknown };
 }

@@ -34,11 +34,12 @@
  */
 
 import { ITEM_CATALOG, addItem, countItem, ensureItem, itemIcon, listPackSlots, removeItem } from '../inventory.js?v=d82f3b00';
-import { TOOL_CONDITION_CATALOG, leavingCopyTag, leavingToolWear, receiveToolCopy, takeToolCopy } from '../tools.js?v=6684b484';
+import { TOOL_CONDITION_CATALOG, copyTag, copyTagKind, copyTags, leavingCopyTag, leavingToolWear, receiveToolCopy, takeToolCopy } from '../tools.js?v=689d6594';
+import { scriptFromTag, scriptLabel } from '../teleportation.js?v=5a5c8e6f';
 import { unitRankAt } from '../pack-slots.js?v=c91d0ca3';
 import { createMinnAccount } from '../minn-account.js?v=b29fae30';
 // The same key as features/index.js: one module instance holds the carried notes.
-import { giveCarriedNote, takeCarriedNote, writtenCarriedNotes } from './street-furniture-feature.js?v=942acc89';
+import { giveCarriedNote, takeCarriedNote, writtenCarriedNotes } from './street-furniture-feature.js?v=00d2d245';
 import {
   BOX_SLOTS,
   GIFT_BOX,
@@ -58,7 +59,7 @@ import {
   unwrapGrowl,
   unwrapPack,
   wrapBox,
-} from '../gifts.js?v=28303c16';
+} from '../gifts.js?v=9a54c9c3';
 
 export const GIFTS_FEATURE_ID = 'gifts';
 export const GIFT_VERB = 'gift_give';
@@ -252,7 +253,18 @@ function createSession(engine, client) {
       const reason = table ? giveReason(c, table, ITEM_CATALOG[c]?.tags) : '';
       // Opened from one stack's menu, the give is that stack's: no more than it holds (main.js doVerb 3243-3246).
       const own = give?.from?.cls === c ? give.from.count : Infinity;
-      out.push({ kind: 'stack', c, n: 1, max: Math.min(have, stackMax(c, table), own), label: itemLabel(c, have), have, reason });
+      // Each Teleportation Script goes by its street and is given by itself: you choose which.
+      if (copyTagKind(c) === 'script' && engine.toolState && give?.from?.cls !== c) {
+        copyTags(engine.toolState, c).forEach((tag, copy) => {
+          const script = scriptFromTag(tag);
+          out.push({ kind: 'stack', c, n: 1, max: 1, copy, label: script ? scriptLabel(script) : itemLabel(c, 1), have: 1, reason });
+        });
+        continue;
+      }
+      // Opened from that script's own menu: it goes by its street too.
+      const from = copyTagKind(c) === 'script' && give?.from?.cls === c && engine.toolState ? engine.query?.('packLayout', engine) : null;
+      const fromScript = from ? scriptFromTag(copyTag(engine.toolState, c, unitRankAt(from, c, give.from.container, give.from.index))) : null;
+      out.push({ kind: 'stack', c, n: 1, max: Math.min(have, stackMax(c, table), own), label: fromScript ? scriptLabel(fromScript) : itemLabel(c, have), have: fromScript ? 1 : have, reason });
     }
     slice.boxes.forEach((b) => {
       if (busyBoxes.has(b.id)) return;
@@ -262,7 +274,7 @@ function createSession(engine, client) {
   }
 
   function sameThing(a, b) {
-    return a && b && a.kind === b.kind && a.c === b.c && (a.noteId || '') === (b.noteId || '') && (a.boxId || '') === (b.boxId || '');
+    return a && b && a.kind === b.kind && a.c === b.c && (a.noteId || '') === (b.noteId || '') && (a.boxId || '') === (b.boxId || '') && (a.copy ?? -1) === (b.copy ?? -1);
   }
 
   function render() {
@@ -368,7 +380,7 @@ function createSession(engine, client) {
       // wear (2026-11-04), else the given ones carry the most worn of theirs.
       if (TOOL_CONDITION_CATALOG[p.c] && engine.toolState) {
         const layout = p.kind === 'stack' && give.from?.cls === p.c && item.n === 1 ? engine.query?.('packLayout', engine) : null;
-        const rank = layout ? unitRankAt(layout, p.c, give.from.container, give.from.index) : -1;
+        const rank = Number.isInteger(p.copy) ? p.copy : layout ? unitRankAt(layout, p.c, give.from.container, give.from.index) : -1;
         if (rank >= 0) giveCopy = { c: p.c, copy: rank };
         item.r = rank >= 0 ? takeToolCopy(engine.toolState, p.c, { copy: rank, take: false }) : leavingToolWear(engine.toolState, p.c, item.n);
         // Its own words go with it (a Cubimal's name, a Draught's Giant, a Still's Hooch, a pumpkin's phrases).
@@ -380,6 +392,7 @@ function createSession(engine, client) {
     if (!client.send('gift_give', frame)) return say("You're offline.", 'error');
     // The give leaves the pack when the server settles it: from the stack it was opened on.
     if (p.kind === 'stack' && give.from?.cls === p.c) engine.query?.('packTakeFrom', p.c, frame.item.n, engine, { place: give.from, wait: 60000 });
+    else if (p.kind === 'stack' && Number.isInteger(p.copy)) engine.query?.('packTakeUnit', p.c, p.copy, 1, engine, { wait: 60000 });
     sending.set(ref, { kind: p.kind, noteId: p.noteId || null, boxId: p.boxId || null, to, at: Date.now(), ...(giveCopy ? { tool: giveCopy } : {}) });
     give.waiting = true;
     say('Giving…');

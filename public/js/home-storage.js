@@ -167,7 +167,7 @@ export function cabinetDef(cls) {
 /** The most stacks a stored bag keeps (the biggest bag holds far fewer). */
 export const BAG_HELD_MAX = 64;
 
-/** One stack a stored bag holds: { classTsid, count, points? } or null. */
+/** One stack a stored bag holds: { classTsid, count, points?, tags? } or null. */
 function cleanHeld(raw) {
   if (!raw || typeof raw !== 'object') return null;
   const classTsid = cleanKey(raw.classTsid ?? raw.cls);
@@ -177,6 +177,10 @@ function cleanHeld(raw) {
   if (Array.isArray(raw.points)) {
     const pts = raw.points.slice(0, count).map((p) => (p == null ? null : Math.max(0, Math.floor(Number(p) || 0))));
     if (pts.some((p) => p != null)) out.points = pts;
+  }
+  if (Array.isArray(raw.tags)) {
+    const tags = raw.tags.slice(0, count).map(slotTag);
+    if (tags.some((t) => t != null)) out.tags = tags;
   }
   return out;
 }

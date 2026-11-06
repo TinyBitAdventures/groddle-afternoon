@@ -7,7 +7,7 @@
 
 import { repairGivesMood } from './imagination-effects.js?v=70169933';
 import { energyMax, loseEnergy, metabolicGain, moodMax } from './metabolics.js?v=8504134e';
-import { cleanCopyTagOf } from './copy-tags.js?v=e8f6c072';
+import { cleanCopyTagOf } from './copy-tags.js?v=bd75b92e';
 
 export const TOOL_CONDITION_CATALOG = Object.freeze({
   butterfly_lotion: {
@@ -145,6 +145,9 @@ function taggedClasses() {
     ...[1, 2, 3, 4, 5].map((n) => [`pumpkin_lit_${n}`, tagged('Lit Pumpkin', `pumpkin_lit_${n}.js phrases`, 'phrases')]),
     // still.js 30-31 instanceProps hooch and hopper_amount per Still.
     ['still', tagged('Still', 'still.js hooch, hopper_amount', 'still')],
+    // teleportation_script.js 15-19 stackmax 1, has_instance_props; destination and is_imbued per script
+    // (setTarget 298-319, getLabel 254-260), which never share a stack, on the ground either (ownStack).
+    ['teleportation_script', { ...tagged('Teleportation Script', 'teleportation_script.js destination, is_imbued', 'script'), ownStack: true }],
     // emotional_bear.js 620-641: this.upgrades per bear. Bit 1 Lips (kiss), bit 2 Moon.
     ['emotional_bear', { label: 'Emotional Bear', capacity: 3, baseCost: 0, repairable: false, contents: true, empty: 0, bits: ['kiss', 'moon'], noMeter: true, source: 'emotional_bear.js upgrades' }],
   ]);
@@ -598,6 +601,11 @@ export function receiveToolCopy(state, classTsid, remaining, n = 1, tag = null) 
 /** The kind of words a class's copies keep and carry ('' for none): name, phrases, giant, still. */
 export function copyTagKind(classTsid) {
   return TOOL_CONDITION_CATALOG[classTsid]?.tag || '';
+}
+
+/** A class whose copies never lie in one pile, each its own on the ground as in the pack (stackmax 1 with words of its own). */
+export function keepsOwnStack(classTsid) {
+  return Boolean(TOOL_CONDITION_CATALOG[classTsid]?.ownStack);
 }
 
 /** A copy's words as they may travel (js/copy-tags.js rules), or null. */

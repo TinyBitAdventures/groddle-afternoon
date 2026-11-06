@@ -124,7 +124,7 @@ import {
   unitPlaces,
   unitRankAt,
 } from '../pack-slots.js?v=c91d0ca3';
-import { TOOL_CONDITION_CATALOG, moveToolCopy, pickToolCopies, placeToolCopies } from '../tools.js?v=6684b484';
+import { TOOL_CONDITION_CATALOG, moveToolCopy, pickToolCopies, placeToolCopies } from '../tools.js?v=689d6594';
 import { createMinnAccount } from '../minn-account.js?v=b29fae30';
 import { BAG_NAME_MAX, BAG_RENAME_COPY, bagLabel, canRenameBag, cleanBagName, renamedTo } from '../bag-names.js?v=22391c55';
 import { openNamePrompt } from '../ui/name-prompt.js?v=142b551a';
@@ -833,7 +833,7 @@ export const bagsFeature = {
   /**
    * A drop of a bag with things in it (game.js dropPackBag): the bag the player chose
    * leaves the pack with all it holds, as in the source (pack-slots.js takeBag).
-   * Returns { ok, cls, contents: [{ cls, count, points? }], name? }; the inventory and the
+   * Returns { ok, cls, contents: [{ cls, count, points?, tags? }], name? }; the inventory and the
    * arrangement have changed (tools' wear goes with them in `points`, the bag's name in `name`).
    * An empty bag goes this way too when it has a name, so the name goes down with it.
    */
@@ -861,6 +861,9 @@ export const bagsFeature = {
         let at = 0;
         for (const [c, n] of per) {
           c.points = points.slice(at, at + n);
+          // A copy's own words go with it (a script's destination, a Cubimal's name).
+          const words = points.tags?.slice(at, at + n);
+          if (words?.some((t) => t != null)) c.tags = words;
           at += n;
         }
       }
@@ -894,7 +897,7 @@ export const bagsFeature = {
   packGiveBag(cls, contents, engine, name = '') {
     if (!engine?.inv) return { ok: false, reason: 'missing' };
     const o = opts();
-    const list = (contents || []).map((c) => ({ cls: c.classTsid || c.cls, count: c.count, points: c.points }));
+    const list = (contents || []).map((c) => ({ cls: c.classTsid || c.cls, count: c.count, points: c.points, tags: c.tags }));
     const res = giveBag(engine.inv, slice.prefs, String(cls || ''), list, o, cleanBagName(name));
     if (!res.ok) return res;
     addItem(engine.inv, String(cls), 1);
@@ -910,6 +913,7 @@ export const bagsFeature = {
         const places = unitPlaces(layout, tcls);
         const ranks = [];
         const points = [];
+        const words = [];
         // The contents went in in order, so the bag's j-th slot is the j-th content (a swallowed stack comes last).
         list.forEach((c, j) => {
           if (c.cls !== tcls) return;
@@ -918,10 +922,11 @@ export const bagsFeature = {
             if (pl.container !== res.key || pl.index !== j) return;
             ranks.push(r);
             points.push(Array.isArray(c.points) ? (c.points[k] ?? null) : null);
+            words.push(Array.isArray(c.tags) ? (c.tags[k] ?? null) : null);
             k += 1;
           });
         });
-        if (ranks.length) placeToolCopies(engine.toolState, tcls, ranks, points);
+        if (ranks.length) placeToolCopies(engine.toolState, tcls, ranks, points, words);
       }
       // Its tools are already in their places: the next look must not place them again (placeArrivals).
       if (lastLayout) lastLayout = layout;

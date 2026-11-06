@@ -39,8 +39,8 @@ import {
   setSdbPrice,
   storageHasContents,
   storagePickupLock,
-} from '../public/js/home-storage.js?v=6c449b4e';
-import { createHomeDecorState, normalizeHomeDecorState, pickUpFurniture } from '../public/js/home-decor.js?v=5551be2e';
+} from '../public/js/home-storage.js?v=121f1897';
+import { createHomeDecorState, normalizeHomeDecorState, pickUpFurniture } from '../public/js/home-decor.js?v=c1240252';
 import { takeFromHouse } from '../public/js/ledger-house.js?v=b34f5c89';
 import { SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
 

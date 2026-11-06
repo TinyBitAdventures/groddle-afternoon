@@ -25,7 +25,7 @@ import {
   starterMiningTools,
   miningVendorOffers,
   STARTER_MINING_SKILLS,
-} from '../public/js/mining.js?v=4d825b67';
+} from '../public/js/mining.js?v=4532ff9b';
 import {
   createInventory,
   countItem,
@@ -39,9 +39,9 @@ import {
   craftRecipe,
   ensureMakingItems,
   TOOL_CATALOG,
-} from '../public/js/making.js?v=ed3a6e30';
-import { DEFAULT_VENDOR, vendorBuy } from '../public/js/vendor.js?v=29f6c214';
-import { createToolConditionState, getToolCondition } from '../public/js/tools.js?v=6684b484';
+} from '../public/js/making.js?v=25c81118';
+import { DEFAULT_VENDOR, vendorBuy } from '../public/js/vendor.js?v=70577b0b';
+import { createToolConditionState, getToolCondition } from '../public/js/tools.js?v=689d6594';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const SPIKE = join(__dirname, '../public');

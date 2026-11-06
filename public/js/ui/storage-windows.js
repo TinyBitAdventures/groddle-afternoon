@@ -188,7 +188,7 @@ function noteLine(parent) {
  *   put({ cls, count, copy, slot })            a pack stack dropped on a slot
  *   take(slot, n)                              a slot's stack (n of it) to the pack
  *   move(from, to)                             a stack dragged to another slot
- *   item(cls) -> { label, plural, icon, wear(points) }
+ *   item(cls, slot) -> { label, plural, icon, wear(points) } (slot: the stack it is for, when there is one: a script goes by its street)
  */
 export function openCabinetWindow(opts) {
   const { title, sub = '', art = '', cols, rowsDisplay, item, accepts, put, take, move, onClose } = opts;
@@ -229,14 +229,15 @@ export function openCabinetWindow(opts) {
     grid.replaceChildren();
     slots.forEach((s, i) => {
       const b = el('button', { type: 'button', class: `hst-slot${s ? ' is-full' : ''}${picked === i ? ' is-picked' : ''}`, role: 'gridcell', 'data-hst-slot': String(i),
-        'aria-label': s ? `${item(s.classTsid).label} × ${s.count}` : `Empty slot ${i + 1}`, draggable: s ? 'true' : 'false' });
+        'aria-label': s ? `${item(s.classTsid, s).label} × ${s.count}` : `Empty slot ${i + 1}`, draggable: s ? 'true' : 'false' });
       // RIGHTCLICK: a full slot's right-click is the game's (its Take out row), never the browser's.
       if (s) {
         b.dataset.ctx = 'storage';
         b.setAttribute('aria-keyshortcuts', 'Shift+F10');
       }
       if (s) {
-        const meta = item(s.classTsid);
+        const meta = item(s.classTsid, s);
+        b.title = meta.label;
         b.append(el('img', { src: meta.icon, alt: '' }));
         if (s.count > 1) b.append(el('b', {}, String(s.count)));
         const wear = meta.wear?.(s.points);

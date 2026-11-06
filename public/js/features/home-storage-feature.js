@@ -42,15 +42,16 @@
  */
 
 import { ITEM_CATALOG, addItem, countItem, ensureItem, itemIcon, removeItem } from '../inventory.js?v=d82f3b00';
-import { displayRefusal, furnitureDef, furnitureSize, isFurniture } from '../home-decor.js?v=5551be2e';
+import { displayRefusal, furnitureDef, furnitureSize, isFurniture } from '../home-decor.js?v=c1240252';
 import { pieceLabel } from '../furniture-upgrades.js?v=a3788c0d';
 import { textureFromUrl } from '../textures.js?v=3149d699';
 import { stackMaxOf, isBagClass } from '../pack-slots.js?v=c91d0ca3';
 import { ELEMENT_CLASSES, NO_BAG_CLASSES, NO_SLOT_CLASSES } from '../pack-slots-data.js?v=800f664c';
-import { TOOL_CONDITION_CATALOG, copyTagKind, copyTags, receiveToolCopy, setCopyTag, takeToolCopy } from '../tools.js?v=6684b484';
+import { TOOL_CONDITION_CATALOG, copyTagKind, copyTags, receiveToolCopy, setCopyTag, takeToolCopy } from '../tools.js?v=689d6594';
+import { scriptFromTag, scriptLabel } from '../teleportation.js?v=5a5c8e6f';
 import { readVisitScene } from '../neighbours-mp.js?v=3f8f866c';
 import { saveStore } from '../save-store.js?v=8839ba7b';
-import { homesFeature } from './homes-feature.js?v=00c02578';
+import { homesFeature } from './homes-feature.js?v=48877ccb';
 import {
   SDB_PRICE_MAX,
   STORAGE_TEXT as T,
@@ -77,7 +78,7 @@ import {
   sdbVerbs,
   setSdbPrice,
   slotsUsed,
-} from '../home-storage.js?v=6c449b4e';
+} from '../home-storage.js?v=121f1897';
 import {
   closeStorageWindow,
   openCabinetWindow,
@@ -86,7 +87,7 @@ import {
   openPriceDialog,
   openStoreDialog,
   storageWindowKind,
-} from '../ui/storage-windows.js?v=c07d5e6e';
+} from '../ui/storage-windows.js?v=24fa1813';
 
 export const HOME_STORAGE_ID = 'home-storage';
 export const CLASS_STORAGE = 'home_storage';
@@ -441,9 +442,11 @@ function accepts(cls) {
   return null;
 }
 
-function itemView(cls) {
+function itemView(cls, slot = null) {
   const cap = TOOL_CONDITION_CATALOG[cls]?.capacity;
-  return { label: labelOf(cls), plural: pluralOf(cls), icon: iconOf(cls), wear: cap ? (points) => (Array.isArray(points) && points.length ? Math.max(0, Math.min(1, Number(points[0]) / cap)) : null) : null };
+  // A Teleportation Script in a slot goes by its street (teleportation_script.js getLabel 254-260).
+  const script = copyTagKind(cls) === 'script' ? scriptFromTag(slot?.tags?.[0]) : null;
+  return { label: script ? scriptLabel(script) : labelOf(cls), plural: pluralOf(cls), icon: iconOf(cls), wear: cap ? (points) => (Array.isArray(points) && points.length ? Math.max(0, Math.min(1, Number(points[0]) / cap)) : null) : null };
 }
 
 function openCabinet(engine, uid, { owner = 0 } = {}) {
@@ -522,7 +525,7 @@ function cabinetPutBag(engine, row, cls, bag, slot) {
     win.handle.note(T.failed, true);
     return 0;
   }
-  const contents = (res.contents || []).map((c) => ({ classTsid: c.cls, count: c.count, ...(Array.isArray(c.points) ? { points: c.points } : {}) }));
+  const contents = (res.contents || []).map((c) => ({ classTsid: c.cls, count: c.count, ...(Array.isArray(c.points) ? { points: c.points } : {}), ...(Array.isArray(c.tags) ? { tags: c.tags } : {}) }));
   cabinetPut(row.contents, cls, 1, { slot: at, contents, name: res.name || '' });
   engine.refreshPack?.();
   engine.playSound?.('ITEM_DROP', { volume: 0.45 });
@@ -612,7 +615,7 @@ function cabinetTakeToPack(engine, slot, n) {
   const cls = s.classTsid;
   // #108: a bag comes back whole, with what it held and its name, where it fits (bags-feature packGiveBag).
   if (isBagClass(cls) && engine.query?.('packBagRoom', cls, [], engine) != null) {
-    const contents = (s.contents || []).map((c) => ({ cls: c.classTsid, count: c.count, ...(c.points ? { points: c.points } : {}) }));
+    const contents = (s.contents || []).map((c) => ({ cls: c.classTsid, count: c.count, ...(c.points ? { points: c.points } : {}), ...(c.tags ? { tags: c.tags } : {}) }));
     if (!engine.query('packBagRoom', cls, contents, engine)) {
       win.handle.note(T.noRoom, true);
       return 0;
