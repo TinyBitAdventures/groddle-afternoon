@@ -163,27 +163,36 @@ describe('the feature: watcher, overlay, arrival, badges', () => {
     assert.equal(ITEM_CATALOG.artifact_wooden_apple.donatable, false);
   });
 
-  it('assembles 1 s after the last piece arrives, locks for 5 s and delivers 5 s later', () => {
+  it('assembles 1 s after the last piece arrives, locks for 5 s and delivers 5 s later', (t) => {
+    // G534: the feature stamps its waits with Date.now, so the clock is the test's own; this ran on the
+    // real one and read 5001 ms after a moment it had taken before the stamp (failed under load).
+    t.mock.timers.enable({ apis: ['Date'], now: 1_000_000 });
     const pieces = ARTIFACT_MAP.chicken_brick.pieces;
     const inv = Object.fromEntries(pieces.slice(0, 4).map((p) => [p, 1]));
     const { engine, log } = makeEngine(inv);
     artifactsFeature.init(engine);
-    const t0 = 1_000_000;
-    artifactsFeature.onTick(16, t0, engine); // first look: snapshot only
+    const tick = (ms = 0) => {
+      t.mock.timers.tick(ms);
+      artifactsFeature.onTick(16, Date.now(), engine);
+    };
+    tick(); // first look: snapshot only
     inv[pieces[4]] = 1;
-    artifactsFeature.onTick(16, t0 + 300, engine);
+    tick(300); // the pack is looked at a few times a second
     assert.equal(artifactsFeature._state().pending.size, 1);
+    tick(999);
     assert.equal(inv[pieces[0]], 1, 'nothing used during the 1 s wait');
-    // Real clock for the overlay/arrival; drive with Date.now-based ticks.
-    const now = Date.now();
-    artifactsFeature._state().pending.get('artifact_chicken_brick').at = now - 1;
-    artifactsFeature.onTick(16, now, engine);
+    assert.equal(artifactsFeature._state().pending.size, 1);
+    assert.equal(artifactsFeature._state().overlay, null);
+    tick(1);
     assert.deepEqual(pieces.map((p) => inv[p]), [0, 0, 0, 0, 0]);
     assert.equal(artifactsFeature._state().overlay.text, "You've combined all the artifact pieces to make a Chicken-Shaped Brick!");
     assert.deepEqual(artifactsFeature.physics(), { speed: 0, jump: 0 });
     assert.deepEqual(log.counters, [['artifacts_made:artifact_chicken_brick', 1]]);
     assert.equal(inv.artifact_chicken_brick, undefined, 'arrives later');
-    artifactsFeature.onTick(16, now + 5001, engine);
+    tick(4999);
+    assert.equal(inv.artifact_chicken_brick, undefined, 'still 1 ms short');
+    assert.deepEqual(artifactsFeature.physics(), { speed: 0, jump: 0 });
+    tick(1);
     assert.equal(inv.artifact_chicken_brick, 1);
     assert.equal(artifactsFeature._state().overlay, null);
     assert.equal(artifactsFeature.physics(), null);
