@@ -2,12 +2,13 @@
 // or 54, and the --live guard.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { spawnSync } from 'node:child_process';
 
 import { cleanupStatements, emailHash, leftoverQueries, parseColumns, pickThrowaways, PROTECTED_IDS, runCleanup, throwawayPattern } from '../tools/qa/smoke-cleanup.mjs';
+import { LINE_WAIT_MS, waitForLine } from '../tools/qa/wait-for-line.mjs';
 
 const ROOT = new URL('..', import.meta.url).pathname;
 const tmp = () => mkdtempSync(join(tmpdir(), 'groddle-smoke-'));
@@ -166,4 +167,27 @@ test('online-smoke: --live without --yes only prints its plan', () => {
   } finally {
     rmSync(home, { recursive: true, force: true });
   }
+});
+
+test('G536: the Local check waits for a late line and fails only one that never comes', async () => {
+  // A clock the pause moves on, so the 4.25 s the v0.19.0 gate saw takes no real time.
+  const fake = () => { let t = 0; return { now: () => t, pause: async (ms) => { t += ms; } }; };
+  const clock = fake();
+  const late = await waitForLine(() => (clock.now() >= 4250 ? [{ text: 'Hello from A 1' }] : []), /Hello from A/, clock);
+  assert.equal(late.found, true);
+  assert.ok(late.ms >= 4250 && late.ms < 4750, String(late.ms));
+  assert.equal(late.lines.length, 1);
+  const never = fake();
+  const gone = await waitForLine(() => [{ text: 'someone else' }], /Hello from A/, never);
+  assert.equal(gone.found, false);
+  assert.ok(gone.ms >= LINE_WAIT_MS);
+  // A page that cannot answer yet (null) is an empty list, not a failure.
+  const noted = fake();
+  assert.equal((await waitForLine(() => null, /x/, { ...noted, timeoutMs: 500 })).found, false);
+  // The fixed 1.2 s wait that read an empty list is gone from the check.
+  const src = readFileSync(join(ROOT, 'tools/qa/online-smoke.mjs'), 'utf8');
+  const part = src.slice(src.indexOf('// 2. Local chat both ways.'), src.indexOf('// 3. Party:'));
+  assert.match(part, /waitForLine\(\(\) => lines\(B, 'local'\), \/Hello from A\//);
+  assert.match(part, /waitForLine\(\(\) => lines\(A, 'local'\), \/B here\//);
+  assert.doesNotMatch(part, /wait\(1200\)/);
 });

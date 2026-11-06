@@ -40,7 +40,7 @@ releases the lock.
     node tools/qa/online-smoke.mjs --live          # prints what it will make, then stops
     node tools/qa/online-smoke.mjs --live --yes    # production
 
-Two throwaway players meet on one street and check: both get in; Local chat both ways; a party
+Two throwaway players meet on one street and check: both get in; Local chat both ways (each waits up to 15 s for the line and records how long it took: a busy server can hold one for seconds, G536); a party
 invite, the Party chat in the Chats list and leaving; the save cloud's tooltip; a Reports round trip with a reply
 from `/console/` (local only); the Original zoom; no page errors.
 

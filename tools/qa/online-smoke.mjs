@@ -49,6 +49,7 @@ import { homedir, tmpdir } from 'node:os';
 import { extname, join, resolve } from 'node:path';
 import { openBrowser } from './browser.mjs';
 import { emailHash, runCleanup, throwawayPattern } from './smoke-cleanup.mjs';
+import { waitForLine } from './wait-for-line.mjs';
 
 // —— options ——
 const argv = process.argv.slice(2);
@@ -474,18 +475,19 @@ async function checks() {
     if ((await drawer(B)).open === 'open') { await B.p.click('[data-social-collapse]').catch(() => {}); await wait(500); }
     if ((await drawer(A)).open !== 'open') { await A.p.evaluate(() => window.groddleSocial?.open?.()); await wait(400); }
     await say(A, `Hello from A ${STAMP}`);
-    await wait(1200);
+    // G536: a busy server can take seconds to pass a line on, so wait for it and say how long it took.
+    const bHeard = await waitForLine(() => lines(B, 'local'), /Hello from A/);
     const bRail = await drawer(B);
     await B.p.click('[data-social-rail-tab="local"]').catch(() => {});
     await wait(700);
     const bLocal = await lines(B, 'local');
     const bShot = await shot(B.p, 'b-2-local');
     await say(B, `Hi A, B here ${STAMP}`);
-    await wait(1200);
-    const aLocal = await lines(A, 'local');
+    const aHeard = await waitForLine(() => lines(A, 'local'), /B here/);
+    const aLocal = aHeard.lines;
     const aShot = await shot(A.p, 'a-2-local');
-    const heard = (ls, re) => Boolean(ls?.some((l) => re.test(l.text)));
-    check('2-local-chat', heard(bLocal, /Hello from A/) && heard(aLocal, /B here/), { bRail: { open: bRail.open, badge: bRail.railLocalBadge }, bLocal: bLocal?.slice(-2), aLocal: aLocal?.slice(-2), shots: [bShot, aShot] });
+    if (bHeard.ms > 2000 || aHeard.ms > 2000) note('a slow Local line', { toB: bHeard.ms, toA: aHeard.ms });
+    check('2-local-chat', bHeard.found && aHeard.found, { waitedMs: { toB: bHeard.ms, toA: aHeard.ms }, bRail: { open: bRail.open, badge: bRail.railLocalBadge }, bLocal: bLocal?.slice(-2), aLocal: aLocal?.slice(-2), shots: [bShot, aShot] });
 
     // 3. Party: invite from the player menu, the Party chat in Chats, /p, leave.
     alive();
