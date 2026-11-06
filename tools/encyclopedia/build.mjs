@@ -104,10 +104,10 @@ const shell = ({ p, title, description, body, script, css }) => `<!doctype html>
   <meta name="description" content="${esc(description)}" />
   <title>${esc(title)}</title>
   <link rel="stylesheet" href="${p}${sharedLink('restoration/restoration.css', root)}" />
-  <link rel="stylesheet" href="${p}changelog/changelog.css" />
+  <link rel="stylesheet" href="${p}${sharedLink('changelog/changelog.css', root)}" />
   <link rel="stylesheet" href="${p}${sharedLink('site/site-nav.css', root)}" />
 ${script ? mapTags(p) : ''}  <script src="${p}${sharedLink('site/theme.js', root)}"></script>
-  <link rel="stylesheet" href="${p}encyclopedia/items/catalog.css" />
+  <link rel="stylesheet" href="${p}${sharedLink('encyclopedia/items/catalog.css', root)}" />
 ${css ? `  <link rel="stylesheet" href="${p}${css}" />\n` : ''}  <link rel="icon" href="${p}favicon.svg?v=arch" type="image/svg+xml" />
   <link rel="icon" href="${p}favicon.ico?v=arch" sizes="32x32" />
   <link rel="apple-touch-icon" href="${p}apple-touch-icon.png?v=arch" />

@@ -22,11 +22,12 @@
  *   carries `?v=` gets the key (the whole query becomes `?v=<key>`; style.css and game.js no longer
  *   collect a parameter per lane). `<script type="module" src>` is always keyed. js/data-versions.js
  *   is left to tools/data-versions/build.mjs, which keys it the same way.
- * - The three files every page with the site header loads (SHARED_LINKS: restoration.css, site-nav.css,
- *   theme.js) are always keyed too, ?v= or not, in all 4,800 pages: a browser kept old copies of them.
+ * - The files the pages with the site header load (SHARED_LINKS: restoration.css, site-nav.css, theme.js,
+ *   changelog.css, and the encyclopedia's catalog.css) are always keyed too, ?v= or not, in all 4,800
+ *   pages: a browser kept old copies of them.
  *   Their key is the first 8 hex of the file's sha256, the one the site's head gives the same URLs
  *   (groddle-afternoon-site src/AssetKeys.php), so Minn pages and built pages share one cached copy.
- *   A change to one of the three rewrites a line in every one of those pages. The builders that write
+ *   A change to one of them rewrites a line in every page linking it. The builders that write
  *   pages (catalog, encyclopedia, changelog) take the URL from sharedLink().
  * - Strings in builders that name a module URL take it from here: moduleUrl('js/online-boot.js')
  *   (tools/play-online ONLINE_BOOT_SRC, tools/data-versions HOOK_SRC).
@@ -52,9 +53,9 @@ export const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 /** Owned by tools/data-versions/build.mjs (its key is the map's own hash). */
 const OWNED_ELSEWHERE = new Set(['js/data-versions.js']);
 /** Always keyed, in every page, by their text alone (see the header). None of them imports anything. */
-export const SHARED_LINKS = Object.freeze(['restoration/restoration.css', 'site/site-nav.css', 'site/theme.js']);
+export const SHARED_LINKS = Object.freeze(['restoration/restoration.css', 'site/site-nav.css', 'site/theme.js', 'changelog/changelog.css', 'encyclopedia/items/catalog.css']);
 const SHARED = new Set(SHARED_LINKS);
-const SHARED_NAME = /(?:^|\/)(?:restoration\.css|site-nav\.css|theme\.js)$/;
+const SHARED_NAME = /(?:^|\/)(?:restoration\.css|site-nav\.css|theme\.js|changelog\.css|catalog\.css)$/;
 const CODE = /\.m?js$/;
 const KEYED = /\.(?:m?js|css)$/;
 const hash = (text) => createHash('sha256').update(text).digest('hex');

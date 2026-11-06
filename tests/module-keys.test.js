@@ -170,7 +170,7 @@ describe('module keys: the shared links', () => {
   const sha = (text) => createHash('sha256').update(text).digest('hex').slice(0, 8);
 
   it('in the tree: every page carries each with one key, the first 8 hex of its sha256 (the site head\'s key)', () => {
-    assert.deepEqual([...SHARED_LINKS], ['restoration/restoration.css', 'site/site-nav.css', 'site/theme.js']);
+    assert.deepEqual([...SHARED_LINKS], ['restoration/restoration.css', 'site/site-nav.css', 'site/theme.js', 'changelog/changelog.css', 'encyclopedia/items/catalog.css']);
     for (const rel of SHARED_LINKS) {
       assert.equal(keyOf(rel, root), sha(readFileSync(join(root, 'public', rel))), rel);
       assert.equal(sharedLink(rel, root), `${rel}?v=${keyOf(rel, root)}`);
@@ -181,13 +181,17 @@ describe('module keys: the shared links', () => {
 
   it('in the tree: no page links one bare', () => {
     const pages = execFileSync('git', ['ls-files', 'public'], { cwd: root, encoding: 'utf8', maxBuffer: 1 << 28 }).split('\n').filter((f) => /\.html$/.test(f) && !f.startsWith('public/vendor/'));
-    const bare = pages.filter((f) => /(?:href|src)="[^"]*(?:restoration\.css|site-nav\.css|theme\.js)"/.test(read(f)));
+    const bare = pages.filter((f) => /(?:href|src)="[^"]*(?:restoration\.css|site-nav\.css|theme\.js|changelog\.css|catalog\.css)"/.test(read(f)));
     assert.deepEqual(bare, []);
   });
 
   it('the builders that write pages take the URL from sharedLink', () => {
     for (const f of ['tools/catalog/build.mjs', 'tools/encyclopedia/build.mjs', 'tools/changelog/build.mjs']) {
-      for (const rel of SHARED_LINKS) assert.ok(read(f).includes(`sharedLink('${rel}', root)`), `${f}: ${rel}`);
+      // The changelog's own pages don't load the encyclopedia's catalog.css.
+      for (const rel of SHARED_LINKS.filter((r) => !(f.includes('changelog') && r.endsWith('catalog.css')))) {
+        assert.ok(read(f).includes(`sharedLink('${rel}', root)`), `${f}: ${rel}`);
+      }
+      assert.doesNotMatch(read(f), /href="\$\{p\}(?:changelog\/changelog|encyclopedia\/items\/catalog)\.css/, f);
     }
   });
 
@@ -206,6 +210,10 @@ describe('module keys: the shared links', () => {
   put('public/site/site-nav.css', '.nav{}\n');
   put('public/site/theme.js', 'void 0;\n');
   put('public/restoration/restoration.css', 'a{}\n');
+  put('public/changelog/changelog.css', 'c{}\n');
+  put('public/encyclopedia/items/catalog.css', 'd{}\n');
+  put('public/other/catalog.css', 'e{}\n');
+  put('public/lists/index.html', '<link rel="stylesheet" href="../changelog/changelog.css" />\n<link rel="stylesheet" href="../encyclopedia/items/catalog.css" />\n<link rel="stylesheet" href="../other/catalog.css" />\n');
   put('public/other/theme.js', 'void 1;\n');
   put('public/other.css', 'b{}\n');
   const page = '<link rel="stylesheet" href="../../restoration/restoration.css" />\n<link rel="stylesheet" href="../../site/site-nav.css" />\n<script src="../../site/theme.js"></script>\n<link rel="stylesheet" href="../../other.css" />\n<script src="../../other/theme.js"></script>\n<script src="/site/theme.js"></script>\n<a href="../../site/">site</a>\n';
@@ -214,7 +222,11 @@ describe('module keys: the shared links', () => {
   put('public/play/index.html', '<base href="../" />\n<script src="site/theme.js"></script>\n');
 
   it('keys them, ?v= or not, leaves every other bare link, an absolute one and a same-named other file', () => {
-    assert.deepEqual(apply(), ['public/a/b/index.html', 'public/play/index.html', 'public/restoration/index.html']);
+    assert.deepEqual(apply(), ['public/a/b/index.html', 'public/lists/index.html', 'public/play/index.html', 'public/restoration/index.html']);
+    const lists = readFileSync(join(tmp, 'public/lists/index.html'), 'utf8');
+    assert.ok(lists.includes(`changelog/changelog.css?v=${sha('c{}\n')}"`));
+    assert.ok(lists.includes(`encyclopedia/items/catalog.css?v=${sha('d{}\n')}"`));
+    assert.ok(lists.includes('href="../other/catalog.css"'), 'a different file of the same name');
     const html = readFileSync(join(tmp, 'public/a/b/index.html'), 'utf8');
     assert.ok(html.includes(`restoration/restoration.css?v=${sha('a{}\n')}"`));
     assert.ok(html.includes(`site/site-nav.css?v=${sha('.nav{}\n')}"`));

@@ -79,7 +79,7 @@ const page = ({ p, title, description, noindex, body }) => `<!doctype html>
   <meta name="description" content="${esc(description)}" />
 ${noindex ? '  <meta name="robots" content="noindex" />\n' : ''}  <title>${esc(title)}</title>
   <link rel="stylesheet" href="${p}${sharedLink('restoration/restoration.css', root)}" />
-  <link rel="stylesheet" href="${p}changelog/changelog.css" />
+  <link rel="stylesheet" href="${p}${sharedLink('changelog/changelog.css', root)}" />
   <link rel="stylesheet" href="${p}${sharedLink('site/site-nav.css', root)}" />
   <script src="${p}${sharedLink('site/theme.js', root)}"></script>
   <link rel="icon" href="${p}favicon.svg?v=arch" type="image/svg+xml" />
