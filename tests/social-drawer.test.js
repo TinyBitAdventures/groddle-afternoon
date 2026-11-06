@@ -491,6 +491,10 @@ describe('report #100: the open drawer and the top bar on phone screens (Chrome)
         document.getElementById('study-chip').textContent = 'Skills · 4 available';
         d.open();
         await new Promise((res) => requestAnimationFrame(() => requestAnimationFrame(res)));
+        // G552: the drawer grows from the 44 px rail for 180 ms, with the arrow pushed out of it and off the
+        // screen at the start. Two frames in is usually far enough along, so wait for the open drawer itself.
+        const drawerMoving = document.getElementById('local-chat-dock').getAnimations();
+        await Promise.all(drawerMoving.map((a) => a.finished));
         const x = document.querySelector('[data-social-collapse]');
         const b = x.getBoundingClientRect();
         const cx = b.left + b.width / 2;
