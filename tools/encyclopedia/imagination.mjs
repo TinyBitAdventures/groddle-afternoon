@@ -16,8 +16,8 @@
  */
 import {
   BRAIN_CAPACITY_AMOUNTS, BRAIN_CAPACITY_LIMIT, DEALT_SECRET_CARDS, ENERGY_TANK_AMOUNTS, IMAGINATION_UPGRADES,
-  JUMP_CARDS, QUOIN_MULTIPLIER_AMOUNTS, QUOIN_MULTIPLIER_LIMIT, SHUFFLE_CARD_COST, STARTER_UPGRADES,
-} from '../../public/js/imagination.js?v=0cab36eb';
+  JUMP_CARDS, QUOIN_MULTIPLIER_AMOUNTS, QUOIN_MULTIPLIER_LIMIT, SHUFFLE_CARD_COST, STARTER_UPGRADES, upgradeKind,
+} from '../../public/js/imagination.js?v=6adb7b9a';
 import { isOfferedInRemake, isOfferedOnline, remakeStatus } from '../../public/js/imagination-remake.js?v=c37ad887';
 import { andList, esc, fmt } from './parts.mjs';
 
@@ -27,12 +27,8 @@ const CARD = { w: 230, h: 310 };
 /** The remake's card status (imagination-remake.js) as an encyclopedia status (parts.mjs STATUS). */
 const STATUS_OF = { live: 'source', starter: 'source', partial: 'partial', online: 'multiplayer', later: 'missing', multiplayer: 'missing', interface: 'missing', none: 'unbuilt_original' };
 
-/** Our grouping, by the card's suit. */
-const GROUP_OF = {
-  avatar: 'Moving and jumping', skill: 'Skills, making and gathering', clock: 'Learning faster',
-  reward: 'Rewards and prices', upgrade: 'Stats and handy extras', keepable: 'Keepable cards',
-};
-const groupOf = (u) => GROUP_OF[u.config.suit] || (u.config.pattern === 'skill' ? GROUP_OF.skill : GROUP_OF.upgrade);
+/** Our grouping, by the card's suit (imagination.js: the Your upgrades filter uses it too). */
+const groupOf = upgradeKind;
 
 /** A card's name without the amount the deal fills in ("Energy Tank +{amount}"). */
 export const cardName = (u) => u.name.replace(/^Add \{amount\} To/, 'Add To').replace(/ (?:by |\+)?\{amount\}/, '').trim();

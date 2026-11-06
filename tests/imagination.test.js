@@ -24,14 +24,18 @@ import {
   learnTimeReductions,
   normalizeImaginationState,
   optionTier,
+  filterOwnedUpgrades,
+  ownedKinds,
   ownedUpgradeList,
+  upgradeKind,
+  UPGRADE_KINDS,
   purchaseCard,
   remakeMovementMultipliers,
   reshuffleCardCost,
   reshuffleHand,
   resurrectionCardCost,
   upgradeStatus,
-} from '../public/js/imagination.js?v=0cab36eb';
+} from '../public/js/imagination.js?v=6adb7b9a';
 import { resolveTokens } from './css-tokens.js';
 import { parseColour } from '../tools/tokens/colour.mjs';
 
@@ -334,5 +338,44 @@ describe('unaffordable card price and title (ticket 75)', () => {
     assert.ok(lum(parseColour(plain.color)) > 0.8, plain.color);
     assert.ok(lum(parseColour(plain.background)) < 0.05, plain.background);
     assert.ok(lum(parseColour(parts.title.color)) < 0.05);
+  });
+});
+
+describe('report 135: search and a kind filter on Your upgrades', () => {
+  const rows = [
+    { id: 'a', name: 'Walk Speed I', desc: 'Walk a bit faster', kind: 'Moving and jumping' },
+    { id: 'b', name: 'Energy Tank +60', desc: 'More to spend', kind: 'Stats and handy extras' },
+    { id: 'c', name: 'Twinsies', desc: 'More energy from food', kind: 'Rewards and prices' },
+  ];
+
+  it('searches name and text, any case, every word', () => {
+    assert.deepEqual(filterOwnedUpgrades(rows, { query: 'ENERGY' }).map((r) => r.id), ['b', 'c']);
+    assert.deepEqual(filterOwnedUpgrades(rows, { query: 'walk faster' }).map((r) => r.id), ['a']);
+    assert.deepEqual(filterOwnedUpgrades(rows, { query: '  ' }).map((r) => r.id), ['a', 'b', 'c']);
+    assert.deepEqual(filterOwnedUpgrades(rows, { query: 'zzz' }), []);
+  });
+
+  it('filters by kind, with the search', () => {
+    assert.deepEqual(filterOwnedUpgrades(rows, { kind: 'Rewards and prices' }).map((r) => r.id), ['c']);
+    assert.deepEqual(filterOwnedUpgrades(rows, { query: 'energy', kind: 'Stats and handy extras' }).map((r) => r.id), ['b']);
+    assert.deepEqual(ownedKinds(rows).map((k) => k.kind), ['Moving and jumping', 'Rewards and prices', 'Stats and handy extras']);
+  });
+
+  it('is the Encyclopedia\'s one grouping', () => {
+    assert.equal(upgradeKind({ config: { suit: 'clock' } }), UPGRADE_KINDS.clock);
+    assert.equal(upgradeKind({ config: { pattern: 'skill' } }), UPGRADE_KINDS.skill);
+    assert.equal(upgradeKind({ config: {} }), UPGRADE_KINDS.upgrade);
+    const tool = readFileSync(join(publicRoot, '../tools/encyclopedia/imagination.mjs'), 'utf8');
+    assert.match(tool, /const groupOf = upgradeKind;/);
+    assert.doesNotMatch(tool, /GROUP_OF/);
+  });
+
+  it('the search box keeps its keys: X is a letter, Esc still closes, an open kind list takes its own Esc', () => {
+    const src = readFileSync(join(publicRoot, 'js/features/imagination-feature.js'), 'utf8');
+    assert.match(src, /closest\?\.\('\.img-owned-bar'\) && \(e\.key !== 'Escape' \|\| e\.target\.getAttribute\('aria-expanded'\) === 'true'\)\) return;/);
+    assert.match(src, /e\.key === 'Escape' \|\| \(!typing && \(e\.key === 'x' \|\| e\.key === 'X'\)\)/);
+    assert.match(src, /'No upgrades match that\.'/);
+    const game = readFileSync(join(publicRoot, 'game.js'), 'utf8');
+    assert.match(game, /e\.target\?\.matches\?\.\('input, textarea, select, \[contenteditable="true"\]'\)/);
   });
 });

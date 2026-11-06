@@ -46,12 +46,14 @@ import {
   IMAGINATION_SAVE_VERSION,
   learnTimeReductions,
   normalizeImaginationState,
+  filterOwnedUpgrades,
+  ownedKinds,
   ownedUpgradeList,
   purchaseCard,
   remakeMovementMultipliers,
   ignoresUpgradePhysics,
   reshuffleHand,
-} from '../imagination.js?v=0cab36eb';
+} from '../imagination.js?v=6adb7b9a';
 import { brainCapacityRescale, skillTimeFactor } from '../imagination-effects.js?v=70169933';
 import { betterLearningDiscount } from '../better-learning.js?v=044ff9ff';
 import { rescaleStudiesForLearningModifier } from '../skills.js?v=4542bdf9';
@@ -88,6 +90,9 @@ let engineRef = null;
 let panel = null;
 let view = 'hand';
 let flipped = -1;
+/** Report 135: Your upgrades' search and kind, while the window is open. */
+let ownedQuery = '';
+let ownedKind = '';
 let busyAnim = false;
 let lastResult = '';
 let autoplayDone = false;
@@ -351,6 +356,10 @@ const PANEL_CSS = `
 .img-foot button:disabled{opacity:.45;cursor:not-allowed}
 .img-foot img{width:16px;height:17px}
 .img-foot small{display:block;width:100%;text-align:center;font-size:var(--fs-sm);color:var(--c-violet-83)}
+.img-owned-bar{position:relative;display:flex;flex-wrap:wrap;gap:var(--sp-3);margin:var(--sp-4) 0 0}
+.img-owned-bar :is(input,select){box-sizing:border-box;min-height:34px;padding:0 var(--sp-5);border:1px solid var(--border);border-radius:var(--radius-pill);background:var(--surface-card);color:var(--text);font:inherit;font-size:var(--fs-md)}
+.img-owned-search{flex:1 1 180px;min-width:0}
+.img-owned-kind{flex:0 1 auto;min-width:0;max-width:100%}
 .img-empty{position:relative;text-align:center;padding:var(--sp-20) var(--sp-5);color:var(--c-violet-88)}
 .img-owned{position:relative;display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:var(--sp-6);padding:var(--sp-6) 0 var(--sp-2)}
 .img-mini{position:relative;text-align:center;font-size:var(--fs-sm);line-height:var(--lh-tight);color:var(--c-mauve-93)}
@@ -539,9 +548,13 @@ function onKeyDown(e) {
     }
     return;
   }
+  // Report 135: Your upgrades' search box and kind list keep their keys (game.js and the features
+  // leave a text field's keys alone). Esc still closes the window, unless it is closing the kind list.
+  if (e.target?.closest?.('.img-owned-bar') && (e.key !== 'Escape' || e.target.getAttribute('aria-expanded') === 'true')) return;
   // The shop is modal: keep keys away from the avatar while it is open.
   e.stopImmediatePropagation();
-  if (e.key === 'Escape' || e.key === 'x' || e.key === 'X') {
+  // Report 135: an X typed in the search box is a letter; Esc closes the window from there too.
+  if (e.key === 'Escape' || (!typing && (e.key === 'x' || e.key === 'X'))) {
     e.preventDefault();
     if (panel.querySelector('.img-celebrate')) {
       panel.querySelector('.img-celebrate').remove();
@@ -579,6 +592,8 @@ function openPanel(opts = {}) {
 function closePanel() {
   if (!panel) return;
   panel.hidden = true;
+  ownedQuery = '';
+  ownedKind = '';
   panel.querySelector('.img-celebrate')?.remove();
   busyAnim = false;
   flipped = -1;
@@ -597,6 +612,10 @@ function render(dealing = false) {
     if (tab.dataset.imgTab === 'owned') tab.textContent = `Your upgrades (${ownedList.length})`;
   }
   const body = panel.querySelector('[data-img-body]');
+  // Report 135: a redraw (the balance moved) keeps the caret in the search box.
+  const inBar = document.activeElement?.closest?.('.img-owned-bar') ? document.activeElement : null;
+  const barControl = inBar?.dataset.imgOwned;
+  const caret = inBar?.selectionStart ?? null;
   body.replaceChildren();
   // The footer: Re-deal with the hand, the count of cards with Your upgrades; Esc in both.
   const footBar = panel.querySelector('[data-img-foot]') || body;
@@ -609,6 +628,11 @@ function render(dealing = false) {
   };
   if (view === 'owned') {
     renderOwned(body, ownedList);
+    if (barControl) {
+      const back = body.querySelector(`[data-img-owned="${barControl}"]`);
+      back?.focus({ preventScroll: true });
+      if (caret != null) back?.setSelectionRange?.(caret, caret);
+    }
     if (footBar !== body) footBar.append(el('p', { class: 'panel-meta img-foot-note mp-modern-only' }, `${ownedList.length} ${ownedList.length === 1 ? 'upgrade' : 'upgrades'} so far`));
     escHint();
     return;
@@ -647,6 +671,39 @@ function renderOwned(body, list) {
     body.append(el('div', { class: 'img-empty' }, 'No upgrades yet.'));
     return;
   }
+  // Report 135: search and a filter by kind (imagination.js, the Encyclopedia's grouping). Only the
+  // list below redraws as you type, so the box keeps its caret.
+  const bar = el('div', { class: 'img-owned-bar' });
+  const search = el('input', { type: 'text', class: 'img-owned-search', placeholder: 'Search your upgrades', 'aria-label': 'Search your upgrades', autocomplete: 'off', spellcheck: 'false', dataset: { imgOwned: 'search' } });
+  search.value = ownedQuery;
+  const kinds = el('select', { class: 'img-owned-kind', 'aria-label': 'Kind', dataset: { imgOwned: 'kind' } });
+  kinds.append(el('option', { value: '' }, 'All kinds'));
+  for (const { kind, count } of ownedKinds(list)) kinds.append(el('option', { value: kind }, `${kind} (${count})`));
+  kinds.value = ownedKind;
+  if (kinds.value !== ownedKind) ownedKind = kinds.value;
+  bar.append(search, kinds);
+  const shown = el('div', { dataset: { imgOwnedList: '1' } });
+  const draw = () => {
+    // The window keeps its height as the list shrinks, so the box does not move under the caret.
+    if (shown.isConnected && !shown.style.minHeight) shown.style.minHeight = `${Math.min(shown.offsetHeight, body.clientHeight - bar.offsetHeight - 16)}px`;
+    shown.replaceChildren(ownedCards(filterOwnedUpgrades(list, { query: ownedQuery, kind: ownedKind })));
+    body.scrollTop = 0;
+  };
+  search.addEventListener('input', () => {
+    ownedQuery = search.value;
+    draw();
+  });
+  kinds.addEventListener('change', () => {
+    ownedKind = kinds.value;
+    draw();
+  });
+  draw();
+  body.append(bar, shown);
+}
+
+/** The cards of Your upgrades, or a plain line when the search and kind leave none. */
+function ownedCards(list) {
+  if (!list.length) return el('div', { class: 'img-empty img-owned-none' }, 'No upgrades match that.');
   const grid = el('div', { class: 'img-owned' });
   for (const row of list) {
     const status = remakeStatus(row.id);
@@ -662,7 +719,7 @@ function renderOwned(body, list) {
     if (tag) mini.append(el('span', { class: 'img-tag' }, tag));
     grid.append(mini);
   }
-  body.append(grid);
+  return grid;
 }
 
 function celebrate(slot, result, notes) {

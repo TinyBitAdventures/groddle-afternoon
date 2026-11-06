@@ -26,11 +26,11 @@ import {
   shakePouch,
 } from '../public/js/elemental-pouch.js?v=7ae2ad99';
 import { pouchFeature } from '../public/js/features/elemental-pouch-feature.js?v=936df3ec';
-import { FEATURES } from '../public/js/features/index.js?v=061805c8';
+import { FEATURES } from '../public/js/features/index.js?v=419baf70';
 import { ITEM_CATALOG, countItem, createInventory } from '../public/js/inventory.js?v=d82f3b00';
 import { STORE_CATALOG } from '../public/js/store-catalog.js?v=74b56af3';
 import { VENDOR_PROFILES, vendorBuy } from '../public/js/vendor.js?v=70577b0b';
-import { IMAGINATION_UPGRADES } from '../public/js/imagination.js?v=0cab36eb';
+import { IMAGINATION_UPGRADES } from '../public/js/imagination.js?v=6adb7b9a';
 import { isOfferedInRemake, remakeStatus } from '../public/js/imagination-remake.js?v=c37ad887';
 import { SKILL_REMAKE_NOTES } from '../public/js/skill-tree.js?v=53795620';
 import { loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js?v=10b118dd';

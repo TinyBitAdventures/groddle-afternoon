@@ -20,7 +20,7 @@ import { questInstancesFeature } from '../public/js/features/quest-instances-fea
 import { buffPhysics } from '../public/js/buffs.js?v=036fee53';
 import { physicsMultipliers } from '../public/js/location-events.js?v=05663361';
 import { NEWXP_DEFAULT_PHYSICS, NEWXP_UPGRADES, reachFor } from '../public/js/newxp.js?v=8fa18f24';
-import { NO_UPGRADE_PHYSICS_STREETS, ignoresUpgradePhysics, remakeMovementMultipliers } from '../public/js/imagination.js?v=0cab36eb';
+import { NO_UPGRADE_PHYSICS_STREETS, ignoresUpgradePhysics, remakeMovementMultipliers } from '../public/js/imagination.js?v=6adb7b9a';
 import { rawTripleJumpMultiplier, scaledTripleJumpMultiplier, TRIPLE_JUMP_UPGRADES } from '../public/js/movement.js?v=b30f84eb';
 import { reachStreet } from '../public/js/builder/reach-graph.js?v=b8634e9a';
 import { plainApex, LEDGE_RISE } from '../public/js/builder/validate.js?v=0798d751';

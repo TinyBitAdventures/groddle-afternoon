@@ -18,7 +18,7 @@ import {
 } from '../public/js/better-learning.js?v=044ff9ff';
 import { canLearnSkill, createSkillState, grantSkill, startSkillStudy, tickSkillStudy } from '../public/js/skills.js?v=4542bdf9';
 import { skillTimeFactor } from '../public/js/imagination-effects.js?v=70169933';
-import { learnTimeReductions } from '../public/js/imagination.js?v=0cab36eb';
+import { learnTimeReductions } from '../public/js/imagination.js?v=6adb7b9a';
 import { emblemUnlockSkillFor, skillRemakeNote, skillTitle, skillTreeEntry, spendEmblemForSkill } from '../public/js/skill-tree.js?v=53795620';
 import { acceptOffer, pendingQuestOffers } from '../public/js/quest-offers.js?v=114a9551';
 import { createQuestState } from '../public/js/quests.js?v=c8d9d0a4';

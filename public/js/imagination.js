@@ -551,6 +551,35 @@ export function learnTimeReductions(owned) {
   return out;
 }
 
+/**
+ * Report 135: a card's kind, by its suit: the Encyclopedia's Kind (tools/encyclopedia/imagination.mjs)
+ * and the filter on Your upgrades, one grouping.
+ */
+export const UPGRADE_KINDS = Object.freeze({
+  avatar: 'Moving and jumping', skill: 'Skills, making and gathering', clock: 'Learning faster',
+  reward: 'Rewards and prices', upgrade: 'Stats and handy extras', keepable: 'Keepable cards',
+});
+export function upgradeKind(u) {
+  return UPGRADE_KINDS[u?.config?.suit] || (u?.config?.pattern === 'skill' ? UPGRADE_KINDS.skill : UPGRADE_KINDS.upgrade);
+}
+
+/** Report 135: the rows matching the search (every word in the name or text; any case) and the kind ('' for any). */
+export function filterOwnedUpgrades(list, { query = '', kind = '' } = {}) {
+  const words = String(query).toLowerCase().split(/\s+/).filter(Boolean);
+  return list.filter((row) => {
+    if (kind && row.kind !== kind) return false;
+    const text = `${row.name} ${row.desc || ''}`.toLowerCase();
+    return words.every((w) => text.includes(w));
+  });
+}
+
+/** Report 135: the kinds these rows have with their counts, in the Encyclopedia's order. */
+export function ownedKinds(list) {
+  return Object.values(UPGRADE_KINDS)
+    .map((kind) => ({ kind, count: list.filter((row) => row.kind === kind).length }))
+    .filter((row) => row.count > 0);
+}
+
 /** Owned list with display text, newest purchase first. */
 export function ownedUpgradeList(state, owned) {
   return [...asSet(owned)]
@@ -565,7 +594,7 @@ export function ownedUpgradeList(state, owned) {
           .reduce((sum, h) => sum + finite(h.amount), 0);
         name = u.name.replace(/\{amount\}/g, id === 'quoin_multiplier' ? total.toFixed(2) : String(total));
       }
-      return { id, name, desc: u.desc, config: u.config, count, when: state.purchasedAt[id] || 0, starter: STARTER_UPGRADES.includes(id) };
+      return { id, name, desc: u.desc, config: u.config, kind: upgradeKind(u), count, when: state.purchasedAt[id] || 0, starter: STARTER_UPGRADES.includes(id) };
     })
     .sort((a, b) => b.when - a.when || a.name.localeCompare(b.name));
 }
