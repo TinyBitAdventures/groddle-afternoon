@@ -10,7 +10,7 @@
 export const HUB_MAP_BACKGROUNDS = Object.freeze({
   '27': Object.freeze({ x1: 'assets/maps/art/bg/ix.webp', x2: 'assets/maps/art/bg/ix@2x.webp' }), // Ix
   '51': Object.freeze({ x1: 'assets/maps/art/bg/uralia.webp', x2: 'assets/maps/art/bg/uralia@2x.webp' }), // Uralia
-  '56': Object.freeze({ x1: 'assets/maps/art/bg/groddleforest.webp', x2: 'assets/maps/art/bg/groddleforest@2x.webp' }), // Groddle Forest
+  '56': Object.freeze({ x1: 'assets/maps/art/bg/groddleforest.webp', x2: 'assets/maps/art/bg/groddleforest@2x.webp', repainted: true }), // Groddle Forest
   '58': Object.freeze({ x1: 'assets/maps/art/bg/groddlemeadow.webp', x2: 'assets/maps/art/bg/groddlemeadow@2x.webp', repainted: true }), // Groddle Meadow
   '63': Object.freeze({ x1: 'assets/maps/art/bg/shimlamirch.webp', x2: 'assets/maps/art/bg/shimlamirch@2x.webp' }), // Shimla Mirch
   '64': Object.freeze({ x1: 'assets/maps/art/bg/groddleheights.webp', x2: 'assets/maps/art/bg/groddleheights@2x.webp' }), // Groddle Heights
