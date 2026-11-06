@@ -178,10 +178,11 @@
       "thumbMatches": true,
       "x1": "assets/maps/art/bg/chakraphool.webp",
       "x2": "assets/maps/art/bg/chakraphool@2x.webp",
-      "x1Bytes": 10880,
-      "x1Sha256": "89fdd905dca507bf9a2f0ca8a86846af1a0f8117ea50aa853ee55340412bb9a9",
-      "x2Bytes": 22792,
-      "x2Sha256": "5d7aa3d186d0c5d68f6061a307feed55587deba324223213762a48e3dc77eb7e"
+      "repainted": "tools/provenance/repainted-maps.json",
+      "x1Bytes": 25798,
+      "x1Sha256": "135ad174082c8677ce2f027f00aaf404fcd12cffedaa7202ccfb1677f13a0cb6",
+      "x2Bytes": 80946,
+      "x2Sha256": "b3b5d0d4540696d0e765efc2de395ed8c46bfbe72e13e0c9f2350c6e069c1f2e"
     },
     "75": {
       "hubName": "Bortola",
@@ -287,10 +288,11 @@
       "thumbMatches": true,
       "x1": "assets/maps/art/bg/choru.webp",
       "x2": "assets/maps/art/bg/choru@2x.webp",
-      "x1Bytes": 10258,
-      "x1Sha256": "dceba2d9d639f6982d8084a947bfed55a5921506e0aaafd14788b51b1a300a32",
-      "x2Bytes": 20874,
-      "x2Sha256": "1c924598cc23349809981abe84c2bcc90c1cebeb718fd40c8ec822fe2485fe6c"
+      "repainted": "tools/provenance/repainted-maps.json",
+      "x1Bytes": 19484,
+      "x1Sha256": "0c5247badf409192f793d0540b77b99147b950c92ebbc5f6d05523db3b0115ac",
+      "x2Bytes": 65098,
+      "x2Sha256": "00b69f0da3f85f972298dd9eeae98a928a81b8e0704ddecd5363e4973770d2f7"
     },
     "91": {
       "hubName": "Zhambu",
@@ -606,10 +608,11 @@
       "thumbMatches": true,
       "x1": "assets/maps/art/bg/cauda.webp",
       "x2": "assets/maps/art/bg/cauda@2x.webp",
-      "x1Bytes": 9862,
-      "x1Sha256": "996a2892e285f41aac55a59e55bc71edccc48288ed66e119b221298929aa81c6",
-      "x2Bytes": 20172,
-      "x2Sha256": "c5286f9ac898bcb7cf675302d973f5ed68a5f1735e25395d98bea3d5a3fedb8f"
+      "repainted": "tools/provenance/repainted-maps.json",
+      "x1Bytes": 23178,
+      "x1Sha256": "c2dacf5dc09946b0c76ec4f6a6c364fe201629ae3f5f8fec40d905cc802c055b",
+      "x2Bytes": 86266,
+      "x2Sha256": "4a9689a1009e6bdac32a71f8f37a6f3d6b3992bc1d7bd48a7d78a89ec5ca2c69"
     },
     "121": {
       "hubName": "Sura",
@@ -636,10 +639,11 @@
       "thumbMatches": true,
       "x1": "assets/maps/art/bg/fenneq.webp",
       "x2": "assets/maps/art/bg/fenneq@2x.webp",
-      "x1Bytes": 9510,
-      "x1Sha256": "17a0dc1c2e02a014ea0bde61cff44fe64dd1c26d19ea4096e3924c1f1ad9f241",
-      "x2Bytes": 19572,
-      "x2Sha256": "07168ca54ce335d266118cb0e50dd33598ee70c2c37a9428d27143615665e7d5"
+      "repainted": "tools/provenance/repainted-maps.json",
+      "x1Bytes": 36486,
+      "x1Sha256": "725397aca6155836121501e43ef8f99e61210faad90143744d1a451406e4049f",
+      "x2Bytes": 130026,
+      "x2Sha256": "661229dbab500d303bb00f8f34c98fe2180c77a510a0da92d108e678cb321314"
     },
     "126": {
       "hubName": "Roobrik",
@@ -757,10 +761,11 @@
       "thumbMatches": true,
       "x1": "assets/maps/art/bg/drifa.webp",
       "x2": "assets/maps/art/bg/drifa@2x.webp",
-      "x1Bytes": 4144,
-      "x1Sha256": "02758844f4814e34522131544b99c2a56fd519166cb5e073ef7b5f1b2d84904c",
-      "x2Bytes": 9184,
-      "x2Sha256": "9c7ffebaa65ed782aa1ffe08cbef30410f49a0b53d7b5567f5f510df4f7bd97d"
+      "repainted": "tools/provenance/repainted-maps.json",
+      "x1Bytes": 24382,
+      "x1Sha256": "1225c97426d79a50b1398e529df01914ab21d6638d7349eeeca23fb36f66a04f",
+      "x2Bytes": 67158,
+      "x2Sha256": "9ad94491b58661da38ea72a6abf5563dff4ebc4c266bf203b60f1cdccd6a8bcd"
     },
     "143": {
       "hubName": "Vortex of Random",
