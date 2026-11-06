@@ -309,11 +309,14 @@ export function resolveSoilPackage(packageId, skills = []) {
   return { ...pkg.no_skill, id: 'no_skill' };
 }
 
-/** Tend package with the hoeing upgrade override applied (xp bonus + wear multiplier). */
-export function resolveTendPackage(skills = [], upgrades = []) {
+/**
+ * Tend package with the hoeing upgrade override applied (xp bonus + wear multiplier), unless the
+ * player switched Aggressive Hoeing off (patch.js, patch_dark.js 412 read pc.aggressive_off).
+ */
+export function resolveTendPackage(skills = [], upgrades = [], { aggressiveOff = false } = {}) {
   const pkg = resolveSoilPackage('soil_appreciation', skills);
   let wearMultiplier = 1;
-  if (list(upgrades).includes(HOEING_UPGRADE)) {
+  if (!aggressiveOff && list(upgrades).includes(HOEING_UPGRADE)) {
     const learned = list(skills);
     const row = HOEING_UPGRADE_TABLE.find((r) => r.skill === null || learned.includes(r.skill));
     pkg.xp_bonus = row.xp;
@@ -866,7 +869,7 @@ export function plotVerbs(plot, ctx = {}) {
   const messy = plot.stage === 'dirty';
   const dug = plot.stage === 'dug';
 
-  const tend = resolveTendPackage(skills, upgrades);
+  const tend = resolveTendPackage(skills, upgrades, { aggressiveOff: pc.aggressiveOff === true });
   const tendWear = tend.tool_wear * tend.wearMultiplier;
   const hoe = findWorkingTool(HOES, inv, toolState, tendWear);
   const tendRow = verbRow('tend', 'Tend', {
@@ -976,7 +979,7 @@ export function performPlotVerb(plot, verbId, ctx = {}) {
   if (!quote.enabled) return fail(verbId, quote.reason, { reason: 'gated' });
 
   if (verb === 'tend') {
-    const pkg = resolveTendPackage(skills, upgrades);
+    const pkg = resolveTendPackage(skills, upgrades, { aggressiveOff: pc.aggressiveOff === true });
     const wear = pkg.tool_wear * pkg.wearMultiplier;
     const { tool } = findWorkingTool(HOES, inv, toolState, wear);
     // inc_skill_packages.js: a failed success roll returns before any cost

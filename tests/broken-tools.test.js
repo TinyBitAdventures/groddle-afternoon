@@ -11,10 +11,10 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { getVerbsFor, runVerb } from '../public/content.js?v=d4fcc4a9';
+import { getVerbsFor, runVerb } from '../public/content.js?v=ff28da24';
 import { createInventory } from '../public/js/inventory.js?v=d82f3b00';
 import { createMineRock, findWorkingPick, miningToolWear } from '../public/js/mining.js?v=4d825b67';
-import { clearPlot, createGarden, gardenActionProfile, getPlot, waterPlot } from '../public/js/garden.js?v=14c83df8';
+import { clearPlot, createGarden, gardenActionProfile, getPlot, waterPlot } from '../public/js/garden.js?v=86e003ff';
 import { BROKEN_TOOL_ICONS, TOOL_CONDITION_CATALOG, brokenToolIcon, createToolConditionState, setToolRemaining } from '../public/js/tools.js?v=6684b484';
 import { HIRES_ICONS } from '../public/js/icon-hires.js?v=5b68aeaa';
 

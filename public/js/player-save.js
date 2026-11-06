@@ -117,6 +117,8 @@ export function normalizePlayerSnapshot(seed = {}, fallback = PLAYER_DEFAULTS) {
     // A solo game begun as a new player ("Start with the tutorial", game.js startAsNewPlayer):
     // its reloads never hand it the demo kit's migrations (Tinkering I, the starter skills).
     ...(source.startedFresh === true ? { startedFresh: true } : {}),
+    // The Hoe's Aggressive Hoeing switch (hoe.js 70-126, pc.aggressive_off); on unless turned off.
+    ...(source.aggressiveOff === true ? { aggressiveOff: true } : {}),
   };
 }
 

@@ -20,9 +20,9 @@ import { KITTY_PET, createKitty, petKitty } from '../public/js/heli-kitties.js?v
 import { createMusicblockState, playMusicblock } from '../public/js/musicblocks.js?v=f5adbf0c';
 import { runTransform } from '../public/js/item-transforms.js?v=f4f49729';
 import { applyTreePoison, performAntidotePour } from '../public/js/tree-poison.js?v=83953de2';
-import { createPlot, performPlotVerb } from '../public/js/patches.js?v=056bb6ae';
+import { createPlot, performPlotVerb } from '../public/js/patches.js?v=bed4aff3';
 import { doChore, neighbourById, normalizeNeighbourState } from '../public/js/neighbours.js?v=862857f9';
-import { runVerb } from '../public/content.js?v=d4fcc4a9';
+import { runVerb } from '../public/content.js?v=ff28da24';
 import { applySetFree } from '../public/js/animal-set-free.js?v=3b194fca';
 import { RESOURCE_SKILL_PACKAGES, createResourceNode, harvestResourceNode } from '../public/js/resource-nodes.js?v=c14bd6d8';
 import { room as topOfTree } from '../public/js/quest-rooms/top-of-tree.js?v=5668c299';

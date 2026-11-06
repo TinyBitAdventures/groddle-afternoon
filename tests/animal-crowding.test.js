@@ -31,7 +31,7 @@ import { SAD_PIGGY_LINES, ensurePiggyMood } from '../public/js/animal-mood.js?v=
 import { createAnimalState } from '../public/js/animals.js?v=05dafc43';
 import { GAME_DAY_MS, getGameDayStartMs } from '../public/js/game-day.js?v=edb00566';
 import { advanceYard, capturePiggy, createMachine, normalizeHusbandryPack } from '../public/js/animal-husbandry.js?v=41da06a5';
-import { getVerbsFor } from '../public/content.js?v=d4fcc4a9';
+import { getVerbsFor } from '../public/content.js?v=ff28da24';
 import { animalCrowdChanged, animalMoodFeature, crowdLimit } from '../public/js/features/animal-mood-feature.js?v=d3a6b177';
 
 const GSJS = join(homedir(), 'Documents/glitch-audit/glitch-GameServerJS');

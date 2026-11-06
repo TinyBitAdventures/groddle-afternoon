@@ -678,6 +678,40 @@ export const GARDEN_HOEING_TABLE = Object.freeze([
 ]);
 
 /**
+ * The two Hoe verbs of the same card (hoe.js 70-126, high_class_hoe.js 48-126): in the pack, one at
+ * a time, and only with the card. pc.aggressive_off there is pc.aggressiveOff here, read by
+ * include/garden.js 244 and patch.js / patch_dark.js 412.
+ */
+export const AGGRESSIVE_HOEING_VERBS = Object.freeze({
+  off: Object.freeze({
+    id: 'aggressive_hoeing_off',
+    label: 'Aggressive hoeing off',
+    tooltip: 'Wear hoe down slower but lose the iMG bonus',
+    line: 'You are now hoeing gently, wearing it down less but losing the iMG bonus.',
+  }),
+  on: Object.freeze({
+    id: 'aggressive_hoeing_on',
+    label: 'Aggressive hoeing on',
+    tooltip: 'Wear hoe down faster and gain more iMG',
+    line: 'You are now wearing the hoe down faster and gaining a bigger iMG bonus. Hoe, hoe, hoe!',
+  }),
+});
+
+/** The verb the pack card offers: none without the card, else the one that flips the setting. */
+export function aggressiveHoeingVerb(pc) {
+  if (!Array.isArray(pc?.imaginationUpgrades) || !pc.imaginationUpgrades.includes(GARDEN_HOEING_UPGRADE)) return null;
+  return pc.aggressiveOff ? AGGRESSIVE_HOEING_VERBS.on : AGGRESSIVE_HOEING_VERBS.off;
+}
+
+/** Runs one of the verbs. Returns its line, or null when the card or the setting doesn't offer it. */
+export function runAggressiveHoeingVerb(pc, verbId) {
+  const verb = aggressiveHoeingVerb(pc);
+  if (!verb || verb.id !== verbId) return null;
+  pc.aggressiveOff = verb === AGGRESSIVE_HOEING_VERBS.off;
+  return verb.line;
+}
+
+/**
  * Costs and rewards for one garden action. With a `learned` array this is the
  * exact source package row (no_skill or Croppery/Herbalism 1–3): energy,
  * mood, xp, tool wear, success rate, super-harvest multiplier/chance, and the
@@ -687,8 +721,9 @@ export const GARDEN_HOEING_TABLE = Object.freeze([
  * @param {'plant'|'water'|'harvest'|'clear'} action
  * @param {string[]} [learned]
  * @param {string[]} [upgrades]
+ * @param {{ aggressiveOff?: boolean }} [setting] the player's Aggressive Hoeing switch (pc.aggressiveOff)
  */
-export function gardenActionProfile(gardenType, action, learned, upgrades = []) {
+export function gardenActionProfile(gardenType, action, learned, upgrades = [], { aggressiveOff = false } = {}) {
   const type = gardenType === 'herb' ? 'herb' : 'default';
   if (!Array.isArray(learned)) {
     return {
@@ -712,8 +747,8 @@ export function gardenActionProfile(gardenType, action, learned, upgrades = []) 
   let xp = Number(details.xp_bonus) || 0;
   let toolWear = Number(details.tool_wear) || 1;
   // include/garden.js clear: Aggressive Hoeing overrides xp_bonus and
-  // multiplies Hoe wear by the player's Croppery rank (herb gardens too).
-  if (action === 'clear' && Array.isArray(upgrades) && upgrades.includes(GARDEN_HOEING_UPGRADE)) {
+  // multiplies Hoe wear by the player's Croppery rank (herb gardens too), unless switched off (garden.js 244).
+  if (action === 'clear' && !aggressiveOff && Array.isArray(upgrades) && upgrades.includes(GARDEN_HOEING_UPGRADE)) {
     const row = GARDEN_HOEING_TABLE.find((r) => r.skill === null || learned.includes(r.skill));
     xp = row.xp;
     toolWear *= row.wear;
@@ -1350,7 +1385,7 @@ export function clearPlot(garden, key, pc, opts = {}) {
       speech: gardenTalkback('broken_hoe', { rng: opts.talkRng, failed: true }),
     };
   }
-  const profile = gardenActionProfile(garden.gardenType, 'clear', opts.learned, opts.upgrades);
+  const profile = gardenActionProfile(garden.gardenType, 'clear', opts.learned, opts.upgrades, { aggressiveOff: pc?.aggressiveOff === true });
   // include/garden.js:233-238: a working High-Class Hoe first, then a Hoe.
   const hoe = opts.inv ? firstWorkingTool(opts.toolState, opts.inv, HOE_TOOLS, profile.toolWear) : null;
   const toolId = hoe ? hoe.tool || hoe.fallback : null;

@@ -53,7 +53,7 @@
  * yardApplied (acts applied to my home), yardSent (acts the site took).
  */
 
-import { performPlotVerb, plotArtPath, plotLabel, plotStatusLabel, plotVerbs } from '../patches.js?v=056bb6ae';
+import { performPlotVerb, plotArtPath, plotLabel, plotStatusLabel, plotVerbs } from '../patches.js?v=bed4aff3';
 import { trantStatusLabel } from '../trants.js?v=9c2e8c0f';
 import { woodTreeStatusLabel } from '../woodcutting.js?v=d71073bd';
 import { animalAnchorX, animalStatusLabel } from '../animals.js?v=05dafc43';
@@ -61,8 +61,8 @@ import { frameTexture, onLoaded, sourceFromUrl, textureFromUrl } from '../textur
 import { homeStreetLayout, normalizeCultivationState } from '../home-cultivation.js?v=ff17225a';
 import { readVisitScene } from '../neighbours-mp.js?v=3f8f866c';
 import { saveStore } from '../save-store.js?v=8839ba7b';
-import { STREET_GROUND_Y, homesFeature, wearHomeCultivation } from './homes-feature.js?v=37213227';
-import { patchesFeature, treeFrameUrl } from './patches-feature.js?v=938504cf';
+import { STREET_GROUND_Y, homesFeature, wearHomeCultivation } from './homes-feature.js?v=bc94ec33';
+import { patchesFeature, treeFrameUrl } from './patches-feature.js?v=15d9209c';
 import {
   YARD_STREET,
   YARD_TEXT as T,
@@ -78,7 +78,7 @@ import {
   treeSnapshot,
   visitorAnimalState,
   visitorTreeState,
-} from '../yard-verbs-mp.js?v=3a4e7637';
+} from '../yard-verbs-mp.js?v=e6fcb682';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
 import { followYardPath, stickForClass } from '../yard-wander.js?v=1117543e';
 import { countItem, removeItem } from '../inventory.js?v=d82f3b00';

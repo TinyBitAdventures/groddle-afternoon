@@ -62,7 +62,7 @@ import {
   soilSpawnClasses,
   soilSpritePaths,
   tickPlot,
-} from '../patches.js?v=056bb6ae';
+} from '../patches.js?v=bed4aff3';
 import { frameTexture, isLoaded, onFailed, onLoaded, textureFromUrl } from '../textures.js?v=3149d699';
 import { HOE_TOOLS, firstWorkingTool } from '../tools.js?v=6684b484';
 import { slugsFromEffects } from '../speech-slugs.js?v=130338f9';
@@ -532,7 +532,7 @@ function stopToolFx() {
 function toolSheetKey(engine, verb) {
   const key = VERB_TOOL[verb];
   if (key !== 'hoe') return key;
-  const pkg = resolveTendPackage(engine.learnedSkills || [], engine.pc?.imaginationUpgrades || []);
+  const pkg = resolveTendPackage(engine.learnedSkills || [], engine.pc?.imaginationUpgrades || [], { aggressiveOff: engine.pc?.aggressiveOff === true });
   const { tool } = firstWorkingTool(engine.toolState, engine.inv, HOE_TOOLS, pkg.tool_wear * pkg.wearMultiplier);
   return tool === 'high_class_hoe' ? 'high_class_hoe' : 'hoe';
 }

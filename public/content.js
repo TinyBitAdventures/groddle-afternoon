@@ -30,7 +30,7 @@ import {
   plotStatusLabel,
   gardenNeedsWater,
   GARDEN_NO_DRY_PLOTS_LINE,
-} from './js/garden.js?v=14c83df8';
+} from './js/garden.js?v=86e003ff';
 import { firstWorkingTool, HOE_TOOLS, WATERING_CAN_TOOLS } from './js/tools.js?v=6684b484';
 import {
   ROCK_CATALOG,
@@ -870,7 +870,7 @@ export function getVerbsFor(target, ctx) {
     const gardenUpgrades = ctx.imaginationUpgrades || pc.imaginationUpgrades || [];
     // Report 121: an action the plot will refuse takes no time, so no word bar or tool runs for a
     // refusal: a tool that can't take its wear, or energy not above its cost (include/garden.js 263-266).
-    const refusedAtOnce = (action, tools = null) => (tools && brokenOnly(tools, gardenActionProfile(gType, action, gardenLearned, gardenUpgrades).toolWear))
+    const refusedAtOnce = (action, tools = null) => (tools && brokenOnly(tools, gardenActionProfile(gType, action, gardenLearned, gardenUpgrades, { aggressiveOff: pc.aggressiveOff === true }).toolWear))
       || (pc.energy || 0) <= gardenCost(action);
     if (st === 'clean') {
       add('plant', 'plant', {
