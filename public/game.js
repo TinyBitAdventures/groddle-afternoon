@@ -2210,6 +2210,7 @@ const achievementBrowser = {
 };
 /** @type {number} */
 let makeQty = 1;
+let makeListScroll = 0;
 /** @type {null|{ timer: object, key: string, recipe: object, qty: number, made: number, opts: object }} */
 let activeCraftSession = null;
 /** @type {null|{ classTsid:string, timer:number, finishesAt:number }} */
@@ -26677,6 +26678,13 @@ function syncMakePanelIcon() {
   img.dataset.broken = icon.broken ? '1' : '0';
 }
 
+/** The part of the Make window that scrolls: the list and a recipe share it (.ui-sheet-body in both skins). */
+const makeScroller = () => document.querySelector('#make-panel .ui-sheet-body');
+function setMakeScroll(top) {
+  const body = makeScroller();
+  if (body) body.scrollTop = top;
+}
+
 function renderMakePanel() {
   const list = document.getElementById('make-list');
   const detail = document.getElementById('make-detail');
@@ -26849,6 +26857,7 @@ function renderMakePanel() {
       detail.querySelector('[data-make-back]')?.addEventListener('click', () => {
         makeSelected = null;
         renderMakePanel();
+        setMakeScroll(makeListScroll);
       });
       const applyQty = (n) => {
         makeQty = Math.max(1, Math.min(maxMake || 1, n));
@@ -26909,9 +26918,12 @@ function renderMakePanel() {
       `${recipe.name}. ${makes ? `${makes} ` : ''}${inputs}. ${recipeEnergyCost(recipe, skillState.learned, pc.imaginationUpgrades)} energy.${blockedLine ? ` ${blockedLine}` : ''}`
     );
     tile.addEventListener('click', () => {
+      // G554: the recipe opens at its top, with Back in view, and Back returns to this place in the list.
+      makeListScroll = makeScroller()?.scrollTop || 0;
       makeSelected = key;
       makeQty = 1;
       renderMakePanel();
+      setMakeScroll(0);
     });
     list.appendChild(tile);
   }

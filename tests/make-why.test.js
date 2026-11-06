@@ -117,3 +117,24 @@ describe('report 119: the Make title shows the tab\'s tool', () => {
     assert.ok(game.indexOf('syncMakePanelIcon();') > game.indexOf('function renderMakePanel()'));
   });
 });
+
+describe('G554: a recipe opened from far down the list opens at its top', () => {
+  const body = game.slice(game.indexOf('function renderMakePanel()'), game.indexOf('function openMakePanel('));
+  it('the tile keeps the list\'s place, then scrolls the recipe to its top, with Back in view', () => {
+    const tile = body.slice(body.indexOf("tile.addEventListener('click'"));
+    assert.ok(tile.indexOf('makeListScroll = makeScroller()?.scrollTop') < tile.indexOf('renderMakePanel()'), 'read before the list goes');
+    assert.ok(tile.indexOf('setMakeScroll(0)') > tile.indexOf('renderMakePanel()'), 'set after the recipe is in');
+  });
+  it('Back returns to that place, after the list is back', () => {
+    const back = body.slice(body.indexOf("detail.querySelector('[data-make-back]')"), body.indexOf('const applyQty'));
+    assert.ok(back.indexOf('setMakeScroll(makeListScroll)') > back.indexOf('renderMakePanel()'));
+  });
+  it('a recipe redrawn while open keeps its scroll: only the tile resets it', () => {
+    assert.equal(body.split('setMakeScroll(0)').length - 1, 1);
+  });
+  it('both skins scroll the same element', () => {
+    const page = readFileSync(join(root, 'public/play/index.html'), 'utf8');
+    assert.match(game, /const makeScroller = \(\) => document\.querySelector\('#make-panel \.ui-sheet-body'\);/);
+    assert.match(page, /class="[^"]*\bui-sheet-body\b[^"]*"[^>]*>\s*<div id="make-list"/);
+  });
+});
