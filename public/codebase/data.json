@@ -1,30 +1,30 @@
 {
  "measured": "the tags tools/deploy/live.json names",
- "deployed": "2026-11-05",
+ "deployed": "2026-11-06",
  "repos": [
   {
    "id": "game",
    "name": "groddle-afternoon",
    "url": "https://github.com/TinyBitAdventures/groddle-afternoon",
-   "ref": "v0.19.0",
-   "commit": "19836079",
+   "ref": "v0.19.1",
+   "commit": "131074ad",
    "licence": "MIT",
    "history": {
-    "commits": 1320,
+    "commits": 1322,
     "first": "2026-10-19",
-    "latest": "2026-11-05"
+    "latest": "2026-11-06"
    },
    "code": {
     "files": 4232,
-    "lines": 836761,
-    "bytes": 50670917
+    "lines": 836808,
+    "bytes": 50673451
    },
    "languages": [
     {
      "id": "javascript",
      "label": "JavaScript",
      "files": 1538,
-     "lines": 521448
+     "lines": 521495
     },
     {
      "id": "html",
@@ -70,21 +70,21 @@
      "label": "Game core",
      "path": "public/game.js, public/content.js, public/js/",
      "files": 420,
-     "lines": 182370
+     "lines": 182374
     },
     {
      "id": "tests",
      "label": "Tests",
      "path": "tests/",
      "files": 711,
-     "lines": 157961
+     "lines": 158000
     },
     {
      "id": "features",
      "label": "Feature modules",
      "path": "public/js/features/",
      "files": 134,
-     "lines": 104901
+     "lines": 104905
     },
     {
      "id": "tools",
@@ -116,7 +116,7 @@
     },
     {
      "path": "public/js/features/newxp-feature.js",
-     "lines": 3918
+     "lines": 3922
     },
     {
      "path": "public/js/features/rook-attack-feature.js",
@@ -134,7 +134,7 @@
      "id": "data",
      "label": "Data (JSON)",
      "files": 3129,
-     "bytes": 208891815
+     "bytes": 208904558
     },
     {
      "id": "generated",
@@ -166,7 +166,7 @@
    "totalFiles": 29768,
    "tests": {
     "files": 686,
-    "cases": 8832,
+    "cases": 8837,
     "runner": "node --test"
    }
   },
