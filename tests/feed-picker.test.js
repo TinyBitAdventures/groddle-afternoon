@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 
 import { getVerbsFor, runVerb } from '../public/content.js?v=8af10970';
 import { createAnimalState, listAnimalFeedOptions } from '../public/js/animals.js?v=fea7e3e0';
-import { makePickTile, pickGridCols, pickGridStep } from '../public/js/ui/verb-menu.js?v=6cc4df84';
+import { centerVerbMenu, makePickTile, menuRowsCap, pickGridCols, pickGridStep, placeVerbMenu } from '../public/js/ui/verb-menu.js?v=7716e570';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const publicDir = join(here, '../public');
@@ -138,5 +138,37 @@ describe('original-style target-item feed picker', () => {
     assert.match(css, /\[data-ui="modern"\] #verb-menu \.vm-row\.vm-pick \{/);
     assert.match(classic, /:root\[data-ui="classic"\] #verb-menu \.vm-picks \{[\s\S]*?repeat\(var\(--vm-pick-cols, 4\), calc\(50 \* var\(--cu\)\)\)/);
     assert.match(classic, /:root\[data-ui="classic"\] #verb-menu \.verb-choice\.vm-pick \{/);
+  });
+});
+
+describe('ticket 134: a long Feed what? stays on the screen', () => {
+  const room = { w: 1440, h: 675, top: 52, floor: 611, left: 8, right: 8 };
+
+  it('a thing with nothing on screen centres its menu in the free room', () => {
+    assert.deepEqual(centerVerbMenu({ size: { w: 300, h: 300 }, room }), { x: 570, y: 180, below: true, tail: null });
+  });
+
+  it('a menu taller than the room starts under the top band, never above it', () => {
+    assert.equal(centerVerbMenu({ size: { w: 300, h: 900 }, room }).y, 52);
+    assert.equal(placeVerbMenu({ anchor: { left: 100, top: 300, right: 140, bottom: 340 }, size: { w: 300, h: 900 }, room }).y, 52);
+  });
+
+  it('narrow phones keep it inside the side gutters', () => {
+    const phone = { w: 320, h: 844, top: 52, floor: 780, left: 8, right: 8 };
+    assert.equal(centerVerbMenu({ size: { w: 300, h: 400 }, room: phone }).x, 10);
+    assert.equal(centerVerbMenu({ size: { w: 400, h: 400 }, room: phone }).x, 8);
+  });
+
+  it('the grid gives up the height the card has too much of', () => {
+    assert.equal(menuRowsCap({ card: 435, rows: 330, room: 300 }), 195);
+    assert.equal(menuRowsCap({ card: 230, rows: 112, room: 300 }), null);
+  });
+
+  it('the placement never keeps the last place: no anchor centres, and the grid is the rows box', () => {
+    const game = readFileSync(join(publicDir, 'game.js'), 'utf8');
+    const place = game.slice(game.indexOf('function placeMenuAtTarget('), game.indexOf('function targetPageRect('));
+    assert.doesNotMatch(place, /if \(!anchor\) return;/);
+    assert.match(place, /centerVerbMenu\(\{ size, room \}\)/);
+    assert.match(place, /querySelector\('\.verb-menu-list, \.feed-picker-grid'\)/);
   });
 });

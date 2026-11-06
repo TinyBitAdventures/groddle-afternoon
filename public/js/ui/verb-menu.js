@@ -415,6 +415,27 @@ export function placeVerbMenu({ anchor, size, room, avoid = null, gap = 12 }) {
   return { x: Math.round(x), y: Math.round(y), below, tail: tail == null ? null : Math.round(tail) };
 }
 
+/**
+ * PURE (ticket 134): where a menu goes when its thing has nothing on screen to hang from (a Piglet in
+ * the pack): the middle of the free room, under the top band, tail-less.
+ * @param {{ size: {w:number, h:number}, room: {w:number, h:number, top?:number, floor?:number, left?:number, right?:number} }} o
+ * @returns {{ x: number, y: number, below: boolean, tail: null }}
+ */
+export function centerVerbMenu({ size, room }) {
+  const w = Math.max(0, size.w);
+  const h = Math.max(0, size.h);
+  const minX = Math.max(0, room.left ?? 8);
+  const maxX = Math.max(minX, room.w - (room.right ?? 8) - w);
+  const top = room.top ?? 52;
+  const floor = Math.min(room.h, room.floor ?? room.h);
+  return {
+    x: Math.round(Math.min(maxX, Math.max(minX, (room.w - w) / 2))),
+    y: Math.round(Math.max(top, top + (floor - 4 - top - h) / 2)),
+    below: true,
+    tail: null,
+  };
+}
+
 /** The least a capped rows box keeps (about three rows), so a menu never shrinks to nothing. */
 export const MIN_ROWS_BOX = 96;
 

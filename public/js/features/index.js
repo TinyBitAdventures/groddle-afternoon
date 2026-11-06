@@ -37,7 +37,7 @@ import { partySpacesFeature } from './party-spaces-feature.js?v=a287ae6a';
 import { seasonsFeature } from './seasons-feature.js?v=1580958a';
 import { cameraModeFeature } from './camera-mode-feature.js?v=ad1ae5ea';
 import { newxpFeature } from './newxp-feature.js?v=a1ff6910';
-import { streetMinimapFeature } from './street-minimap-feature.js?v=92e83f75';
+import { streetMinimapFeature } from './street-minimap-feature.js?v=a79051b1';
 
 export { questFlagsFeature };
 
@@ -138,7 +138,7 @@ import { partyFeature } from './party-feature.js?v=3a7cf4c6'; FEATURES.push(part
 import { sharedQuoinsFeature } from './shared-quoins-feature.js?v=0c3fa98a'; FEATURES.push(sharedQuoinsFeature);
 import { tradeFeature } from './trade-feature.js?v=d582b274'; FEATURES.push(tradeFeature);
 import { ledgerFeature } from './ledger-feature.js?v=66d50ed1'; FEATURES.push(ledgerFeature);
-import { buddiesFeature } from './buddies-feature.js?v=ecc06cf9'; FEATURES.push(buddiesFeature);
+import { buddiesFeature } from './buddies-feature.js?v=40edf322'; FEATURES.push(buddiesFeature);
 import { profilesFeature } from './profiles-feature.js?v=dc8b0852'; FEATURES.push(profilesFeature);
 import { neighboursMpFeature } from './neighbours-mp-feature.js?v=96c0c80b'; FEATURES.push(neighboursMpFeature);
 import { questsMpFeature } from './quests-mp-feature.js?v=823123ab'; FEATURES.push(questsMpFeature);
@@ -158,7 +158,7 @@ import { swoonerfliesFeature } from './swoonerflies-feature.js?v=5a901dfc'; FEAT
 import { homePoolMpFeature } from './home-pool-mp-feature.js?v=575920f2'; FEATURES.push(homePoolMpFeature);
 import { yardVerbsMpFeature } from './yard-verbs-mp-feature.js?v=3f2c937a'; FEATURES.push(yardVerbsMpFeature);
 import { homeMachinesFeature } from './home-machines-feature.js?v=f5f6b4d7'; FEATURES.push(homeMachinesFeature);
-import { homeStorageFeature } from './home-storage-feature.js?v=ffbedbb9'; FEATURES.push(homeStorageFeature);
+import { homeStorageFeature } from './home-storage-feature.js?v=fd135fb0'; FEATURES.push(homeStorageFeature);
 import { questVerbsFeature } from './quest-verbs-feature.js?v=52517603'; FEATURES.push(questVerbsFeature);
 import { itemVerbsMoreFeature } from './item-verbs-more-feature.js?v=d3473fbd'; FEATURES.push(itemVerbsMoreFeature);
 import { yourLooksFeature } from './your-looks-feature.js?v=38cfe4e8'; FEATURES.push(yourLooksFeature);

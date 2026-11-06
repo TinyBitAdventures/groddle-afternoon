@@ -5,7 +5,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { lockVerbMenuSize } from '../public/js/ui/verb-menu.js?v=6cc4df84';
+import { lockVerbMenuSize } from '../public/js/ui/verb-menu.js?v=7716e570';
 
 const root = join(import.meta.dirname, '..');
 const game = readFileSync(join(root, 'public/game.js'), 'utf8');
