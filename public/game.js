@@ -351,6 +351,7 @@ import {
   finishParadiseRun,
   paradiseObjective,
   paradiseRemainingMs,
+  paradiseExitClosedLine,
   paradiseRunProgress,
   paradiseTicketCost,
   paradiseObjectiveComplete,
@@ -362,7 +363,7 @@ import {
   slipTerrainY,
   starlitMoonPlainAlpha,
   starlitRevealAlpha,
-} from './js/paradise-flight.js?v=1b79cad2';
+} from './js/paradise-flight.js?v=abcd78b9';
 import { resolveParadiseCourseAlias } from './js/paradise-courses.js?v=1a5d0aa7';
 import {
   buildParadiseCourseArt,
@@ -486,7 +487,7 @@ import {
   parsePlayerSave,
   serializePlayerSave,
   restorePlayerSave,
-} from './js/player-save.js?v=92b73990';
+} from './js/player-save.js?v=3895831c';
 import {
   HOME_INTERIOR_TSID,
   HOME_STREET_TSID,
@@ -20465,6 +20466,11 @@ function addParadiseCloud(root, x, y, width, height, alpha = 0.9, tint = 0xfffff
   return cloud;
 }
 
+/** How far the sky runs on under a course: more than any window's view past the course's bottom. */
+const PARADISE_SKY_BELOW = 1200;
+/** Courses whose art ends in a floor run on in the floor's colour (js/paradise-course-runtime.js), not the sky's. */
+const PARADISE_FLOOR_BELOW = Object.freeze({ abysmal_thrill: 0x1d2522, arbor_hollow: 0x24331c, sky_plunge: 0xffffff });
+
 function paintParadiseSky(root, course) {
   const palettes = {
     cloud_rings: [0x789ed0, 0xe3a1a5, 0xf2d3aa, 0x889aba],
@@ -20487,6 +20493,9 @@ function paintParadiseSky(root, course) {
       (mix((from >> 8) & 0xff, (to >> 8) & 0xff) << 8) |
       mix(from & 0xff, to & 0xff);
     sky.rect(0, (course.height / bands) * index, course.width, course.height / bands + 2).fill(color);
+    // Report 131: the camera sits up to its pack allowance and the pack's strip below the course (the
+    // street view's skirt has no twin here), and the empty canvas showed there as a band.
+    if (index === bands - 1) sky.rect(0, course.height, course.width, PARADISE_SKY_BELOW).fill(PARADISE_FLOOR_BELOW[course.id] ?? color);
   }
   sky.zIndex = -100;
   root.addChild(sky);
@@ -21000,10 +21009,42 @@ function spawnParadiseExit(course) {
   label.anchor.set(0.5);
   label.position.set(0, -140);
   root.addChild(label);
-  root.alpha = 0.36;
+  // Report 131: shut until the course's goal is met: planks nailed across it and the word, not only faded.
+  arrow.visible = false;
+  const shut = paradiseExitShutSign();
+  root.addChild(shut);
+  root.alpha = 0.82;
   entityLayer.addChild(root);
-  paradiseExit = { sprite: root, active: false };
+  paradiseExit = { sprite: root, active: false, shut, arrow, lineAt: 0 };
   return paradiseExit;
+}
+
+/** The closed way home's boards (over the arch, in its own px) and its SHUT sign. */
+function paradiseExitShutSign() {
+  const root = new PIXI.Container();
+  const planks = new PIXI.Graphics();
+  for (const [from, to] of [[[-46, -108], [46, -22]], [[46, -108], [-46, -22]]]) {
+    const dx = to[0] - from[0];
+    const dy = to[1] - from[1];
+    const len = Math.hypot(dx, dy);
+    const nx = (-dy / len) * 8;
+    const ny = (dx / len) * 8;
+    planks.poly([from[0] + nx, from[1] + ny, to[0] + nx, to[1] + ny, to[0] - nx, to[1] - ny, from[0] - nx, from[1] - ny])
+      .fill(0x8a5a33).stroke({ width: 2, color: 0x4b2d17 });
+  }
+  planks.circle(0, -65, 5).fill(0x4b2d17);
+  root.addChild(planks);
+  const sign = new PIXI.Text({ text: 'SHUT', style: {
+    fontFamily: 'Trebuchet MS, sans-serif',
+    fontSize: 15,
+    fontWeight: '900',
+    fill: 0xffffff,
+    stroke: { color: 0x8c1f1f, width: 5 },
+  } });
+  sign.anchor.set(0.5);
+  sign.position.set(0, -122);
+  root.addChild(sign);
+  return root;
 }
 
 function announceParadiseFlight(course) {
@@ -21457,6 +21498,8 @@ function passParadiseRingEntry(entry) {
 function unlockParadiseExit() {
   if (!paradiseExit || paradiseExit.active) return;
   paradiseExit.active = true;
+  paradiseExit.shut.visible = false;
+  paradiseExit.arrow.visible = true;
   paradiseExit.sprite.alpha = 1;
   paradiseExit.sprite.scale.set(1.05);
   playSfx('quest', { volume: 0.62, rate: 1.08 });
@@ -21832,6 +21875,17 @@ function updateParadiseFlight(dt) {
   ) {
     completeParadiseAtExit();
     return;
+  }
+  // Report 131: touching it while it is shut says why, and how many are left.
+  if (
+    paradiseExit && !paradiseExit.active && now >= paradiseExit.lineAt &&
+    Math.hypot(paradiseExit.sprite.x - player.x, paradiseExit.sprite.y - player.y) < 74
+  ) {
+    const line = paradiseExitClosedLine(paradiseRun);
+    if (line) {
+      paradiseExit.lineAt = now + 5000;
+      toast(line, 3600);
+    }
   }
 
   if (autoplayActive && now >= paradiseAutoNextAt) {

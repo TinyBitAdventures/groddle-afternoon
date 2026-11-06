@@ -25,7 +25,9 @@ import {
   createParadiseState,
   eatParadiseTicket,
   finishParadiseRun,
+  paradiseExitClosedLine,
   paradiseObjective,
+  paradiseObjectiveComplete,
   paradiseRemainingMs,
   paradiseRunProgress,
   paradiseTicketCost,
@@ -35,7 +37,7 @@ import {
   slipTerrainY,
   starlitMoonPlainAlpha,
   starlitRevealAlpha,
-} from '../public/js/paradise-flight.js?v=1b79cad2';
+} from '../public/js/paradise-flight.js?v=abcd78b9';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const publicDir = path.join(here, '..', 'public');
@@ -319,4 +321,27 @@ test('the pack popover offers Eat beside Activate and asks Hell before activatin
   assert.match(game, /Ticket to Paradise cards per day\./);
   // Both the quote and the confirmed activation pass the Hell state.
   assert.equal((game.match(/dead: playerIsDead\(\)/g) || []).length >= 3, true);
+});
+
+test('report 131: the shut way home names how many are left', () => {
+  const rings = createParadiseRun('cloud_rings', { now: 1000 });
+  assert.equal(paradiseExitClosedLine(rings), 'The way home is shut until you fly through all 5 rings: 5 more to go.');
+  rings.rings.push(0, 1, 2, 3);
+  assert.equal(paradiseExitClosedLine(rings), 'The way home is shut until you fly through all 5 rings: 1 more to go.');
+  rings.rings.push(4);
+  assert.equal(paradiseObjectiveComplete(rings), true);
+  assert.equal(paradiseExitClosedLine(rings), '');
+  assert.match(paradiseExitClosedLine(createParadiseRun('radial_heights', { now: 1000 })), /collect all 53 stars: 53 more to go\.$/);
+  assert.match(paradiseExitClosedLine(createParadiseRun('starlit_night', { now: 1000 })), /collect all 22 quoins: 22 more to go\.$/);
+});
+
+test('report 131: the sky runs on below every course and the closed exit shows its boards', () => {
+  const game = fs.readFileSync(path.join(path.dirname(fileURLToPath(import.meta.url)), '../public/game.js'), 'utf8');
+  const paint = game.slice(game.indexOf('function paintParadiseSky('), game.indexOf('const stars = new PIXI.Graphics();', game.indexOf('function paintParadiseSky(')));
+  assert.match(paint, /sky\.rect\(0, course\.height, course\.width, PARADISE_SKY_BELOW\)/);
+  const below = Number(/const PARADISE_SKY_BELOW = (\d+);/.exec(game)[1]);
+  // The camera shows at most the pack allowance plus the pack strip past the course: 132 + 132 px at most.
+  assert.ok(below >= 600, 'more than any window shows');
+  assert.match(game, /paradiseExit\.shut\.visible = false;/);
+  assert.match(game, /paradiseExitClosedLine\(paradiseRun\)/);
 });

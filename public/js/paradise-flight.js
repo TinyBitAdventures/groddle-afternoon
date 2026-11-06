@@ -583,6 +583,22 @@ export function paradiseObjective(run) {
   return `${course.objective} · ${progress.collected}/${progress.total}`;
 }
 
+/**
+ * Report 131: what the shut way home says when you touch it, naming how many are left; '' when the
+ * goal is met (or there is no run). The rule itself stays paradiseObjectiveComplete's.
+ */
+export function paradiseExitClosedLine(run) {
+  const course = PARADISE_COURSES[run?.courseId];
+  if (!course) return '';
+  const progress = paradiseRunProgress(run);
+  if (progress.complete) return '';
+  if (course.ringCount) {
+    return `The way home is shut until you fly through all ${progress.ringTotal} rings: ${progress.ringTotal - progress.rings} more to go.`;
+  }
+  const things = PARADISE_STAR_COURSES.includes(course.id) ? 'stars' : 'quoins';
+  return `The way home is shut until you collect all ${progress.total} ${things}: ${progress.total - progress.collected} more to go.`;
+}
+
 export function finishParadiseRun(run, now = Date.now()) {
   const course = PARADISE_COURSES[run?.courseId];
   if (!run || !course) return { ok: false, reason: 'missing', run };
