@@ -36,12 +36,13 @@ import {
   ROCK_CATALOG,
   MINING_COSTS,
   miningProfile,
+  miningToolWear,
   mineRock,
   tickMineRock,
   findWorkingPick,
   rockStatusLabel,
   ensureMiningItems,
-} from './js/mining.js?v=83421428';
+} from './js/mining.js?v=4d825b67';
 import {
   ANIMAL_CLASS_IDS,
   ensureAnimalState,
@@ -931,13 +932,17 @@ export function getVerbsFor(target, ctx) {
     // Ticket 63: a broken pick is no pick. The rock's mine verb counts only a working one
     // (rock_beryl_1.js verbs.mine conditions 193-214: it.is_pick && it.isWorking(), else
     // disabled "You'll need a pick first."), so the swing never starts.
-    const pick = findWorkingPick(inv, ctx.tools || null);
     const learned = ctx.learned || ctx.skills?.learned || [];
     const hasSkill =
       learned.includes('mining_1') ||
       learned.includes('mining_2') ||
       learned.includes('mining_3') ||
       learned.includes('mining_4');
+    // G553: the check takes this rank's real wear, 1 at Mining III and IV. A pick that works but can't
+    // take the swing keeps the verb and refuses at once (isWorking() is 1 point in the verb's conditions,
+    // the wear refusal comes from runSkillPackage: inc_skill_packages.js 169, include/mining.js 236-237).
+    const pick = findWorkingPick(inv, ctx.tools || null, miningToolWear(hasSkill ? learned : undefined));
+    const worn = !pick && Boolean(findWorkingPick(inv, ctx.tools || null, 1));
     const depleted = !!(rock.depleted || rock.chunksRemaining <= 0);
     const mineUpgrades = ctx.imaginationUpgrades || pc.imaginationUpgrades || [];
     const swing = (hasSkill && miningProfile(learned, pick || 'pick', mineUpgrades))
@@ -945,17 +950,19 @@ export function getVerbsFor(target, ctx) {
     add('mine', 'mine', {
       sort: 10,
       energy: swing?.energy ?? MINING_COSTS.energy,
-      durationMs: swing?.durationMs,
-      enabled: !depleted && !!pick && hasSkill,
+      durationMs: worn ? 0 : swing?.durationMs,
+      enabled: !depleted && (!!pick || worn) && hasSkill,
       reason: depleted
         ? rockStatusLabel(rock) || 'Depleted'
-        : !pick
+        : !pick && !worn
           ? "You'll need a pick first."
           : !hasSkill
             ? 'Need Mining I'
             : '',
       tooltip: depleted
         ? 'This rock is mined out'
+        : worn
+          ? 'Your pick does not have enough uses left.'
         : pick
           ? `Swing your ${pick.replace(/_/g, ' ')} (${rock.chunksRemaining ?? '?'} chunks left)`
           : 'Requires a Pick in your pack',

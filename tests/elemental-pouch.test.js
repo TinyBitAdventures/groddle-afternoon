@@ -25,11 +25,11 @@ import {
   shakeElement,
   shakePouch,
 } from '../public/js/elemental-pouch.js?v=7ae2ad99';
-import { pouchFeature } from '../public/js/features/elemental-pouch-feature.js?v=0a1980cd';
-import { FEATURES } from '../public/js/features/index.js?v=c9d37746';
+import { pouchFeature } from '../public/js/features/elemental-pouch-feature.js?v=aab884ea';
+import { FEATURES } from '../public/js/features/index.js?v=ea8da203';
 import { ITEM_CATALOG, countItem, createInventory } from '../public/js/inventory.js?v=d82f3b00';
 import { STORE_CATALOG } from '../public/js/store-catalog.js?v=74b56af3';
-import { VENDOR_PROFILES, vendorBuy } from '../public/js/vendor.js?v=2637c146';
+import { VENDOR_PROFILES, vendorBuy } from '../public/js/vendor.js?v=c09df4c6';
 import { IMAGINATION_UPGRADES } from '../public/js/imagination.js?v=0cab36eb';
 import { isOfferedInRemake, remakeStatus } from '../public/js/imagination-remake.js?v=c37ad887';
 import { SKILL_REMAKE_NOTES } from '../public/js/skill-tree.js?v=53795620';

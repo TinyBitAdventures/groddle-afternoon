@@ -25,7 +25,7 @@ import {
   starterMiningTools,
   miningVendorOffers,
   STARTER_MINING_SKILLS,
-} from '../public/js/mining.js?v=83421428';
+} from '../public/js/mining.js?v=4d825b67';
 import {
   createInventory,
   countItem,
@@ -40,7 +40,7 @@ import {
   ensureMakingItems,
   TOOL_CATALOG,
 } from '../public/js/making.js?v=76cc5708';
-import { DEFAULT_VENDOR, vendorBuy } from '../public/js/vendor.js?v=2637c146';
+import { DEFAULT_VENDOR, vendorBuy } from '../public/js/vendor.js?v=c09df4c6';
 import { createToolConditionState, getToolCondition } from '../public/js/tools.js?v=6684b484';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -342,7 +342,7 @@ describe('pick swing', () => {
   it('swings the working pick while the mine verb runs', () => {
     const game = readFileSync(join(pub, 'game.js'), 'utf8');
     assert.match(game, /ROCK_CATALOG\[target\.classId\] && baseVerb === 'mine'\) playPickAnimation/);
-    assert.match(game, /findWorkingPick\(inv, toolState\)/);
+    assert.match(game, /findWorkingPick\(inv, toolState, miningToolWear\(skillState\.learned\)\)/);
     assert.match(game, /pick-tool@3x\.webp/);
     assert.match(game, /fancy-pick-tool@3x\.webp/);
   });

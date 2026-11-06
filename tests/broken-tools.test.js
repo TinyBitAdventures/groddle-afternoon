@@ -11,9 +11,9 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { getVerbsFor, runVerb } from '../public/content.js?v=628c01d0';
+import { getVerbsFor, runVerb } from '../public/content.js?v=d4fcc4a9';
 import { createInventory } from '../public/js/inventory.js?v=d82f3b00';
-import { createMineRock } from '../public/js/mining.js?v=83421428';
+import { createMineRock, findWorkingPick, miningToolWear } from '../public/js/mining.js?v=4d825b67';
 import { clearPlot, createGarden, gardenActionProfile, getPlot, waterPlot } from '../public/js/garden.js?v=14c83df8';
 import { BROKEN_TOOL_ICONS, TOOL_CONDITION_CATALOG, brokenToolIcon, createToolConditionState, setToolRemaining } from '../public/js/tools.js?v=6684b484';
 import { HIRES_ICONS } from '../public/js/icon-hires.js?v=5b68aeaa';
@@ -174,5 +174,66 @@ describe('report 121: an action the plot will refuse never plays', () => {
   it('the game shows the worn tool\'s line beside the talkback', () => {
     const game = readFileSync(join(root, 'public/game.js'), 'utf8');
     assert.match(game, /const showLine = \(!spoke \|\| result\.toastWithSpeech\) && toastLine !== reactionText;/);
+  });
+});
+
+describe('G553: the rock menu uses the real wear of a swing', () => {
+  const ranks = { mining_1: 2, mining_2: 2, mining_3: 1, mining_4: 1 };
+  const rockTarget = () => ({ classId: 'rock_beryl_1', state: { rock: createMineRock('rock_beryl_1') } });
+  const worn = (cls, left) => {
+    const tools = createToolConditionState();
+    setToolRemaining(tools, cls, left);
+    return tools;
+  };
+  const mineVerb = (inv, tools, known) => getVerbsFor(rockTarget(), { pc, inv, tools, learned: known, skills: { learned: known } }).find((v) => v.id === 'mine');
+  const swingOf = (inv, tools, known) => runVerb(rockTarget(), 'mine', { pc: { energy: 500, mood: 100 }, inv, tools, learned: known, skills: { learned: known }, rng: () => 0.5 });
+
+  for (const [rank, wear] of Object.entries(ranks)) {
+    it(`${rank} wears ${wear}: a Pick at condition ${wear} swings, and it costs ${wear}`, () => {
+      assert.equal(miningToolWear([rank]), wear);
+      const inv = createInventory({ pick: 1 });
+      const tools = worn('pick', wear);
+      const on = mineVerb(inv, tools, [rank]);
+      assert.equal(on.enabled, true);
+      assert.ok(on.durationMs > 0, 'a real swing');
+      const done = swingOf(inv, tools, [rank]);
+      assert.equal(done.ok, true);
+    });
+  }
+
+  it('Mining III and IV: a Pick at condition 1 is not refused (the reported case)', () => {
+    for (const rank of ['mining_3', 'mining_4']) {
+      const inv = createInventory({ pick: 1 });
+      assert.equal(mineVerb(inv, worn('pick', 1), [rank]).reason, '');
+      assert.equal(findWorkingPick(inv, worn('pick', 1), miningToolWear([rank])), 'pick');
+    }
+  });
+
+  it('Mining I and II: a Pick at condition 1 refuses at once with the source\'s line, no swing to watch', () => {
+    for (const rank of ['mining_1', 'mining_2']) {
+      const inv = createInventory({ pick: 1 });
+      const tools = worn('pick', 1);
+      const v = mineVerb(inv, tools, [rank]);
+      assert.equal(v.enabled, true);
+      assert.equal(v.durationMs, 0);
+      const r = swingOf(inv, tools, [rank]);
+      assert.equal(r.ok, false);
+      assert.deepEqual(r.msgs, ['Your pick does not have enough uses left.']);
+    }
+  });
+
+  it('a Fancy Pick too worn beside a Pick that can take it: the Pick swings', () => {
+    const tools = worn('fancy_pick', 1);
+    const inv = createInventory({ pick: 1, fancy_pick: 1 });
+    assert.equal(findWorkingPick(inv, tools, miningToolWear(['mining_1'])), 'pick');
+    assert.ok(mineVerb(inv, tools, ['mining_1']).durationMs > 0);
+  });
+
+  it('a broken Pick is still no pick at every rank', () => {
+    for (const rank of Object.keys(ranks)) {
+      const v = mineVerb(createInventory({ pick: 1 }), worn('pick', 0), [rank]);
+      assert.equal(v.enabled, false);
+      assert.equal(v.reason, "You'll need a pick first.");
+    }
   });
 });

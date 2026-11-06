@@ -46,7 +46,7 @@
  *     data-help-mine-companion (the last companion swing: name:chunks).
  */
 
-import { ROCK_CATALOG, findWorkingPick, miningProfile } from '../mining.js?v=83421428';
+import { ROCK_CATALOG, findWorkingPick, miningProfile, miningToolWear } from '../mining.js?v=4d825b67';
 import { addItem } from '../inventory.js?v=d82f3b00';
 import { MEGA_ROCK_CHUNKS, megaRockChance } from '../imagination-effects.js?v=70169933';
 import { crowdScaleX } from '../avatar-anims.js?v=fb921bf4';
@@ -115,7 +115,7 @@ function publishQuest(engine) {
 /** The player could help: knows Mining and carries a working pick (content.js mine verb gate). */
 function playerCanMine(engine) {
   const learned = engine.learnedSkills || [];
-  return learned.some((id) => /^mining_[1-4]$/.test(id)) && Boolean(findWorkingPick(engine.inv || {}, engine.toolState));
+  return learned.some((id) => /^mining_[1-4]$/.test(id)) && Boolean(findWorkingPick(engine.inv || {}, engine.toolState, miningToolWear(learned)));
 }
 
 function swingMs() {

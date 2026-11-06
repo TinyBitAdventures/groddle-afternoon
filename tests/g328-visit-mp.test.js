@@ -24,11 +24,11 @@ import {
   normalizeStockView,
   visitorNode,
   visitorRock,
-} from '../public/js/yard-stock-mp.js?v=54a03422';
-import { normalizeYardActs } from '../public/js/yard-verbs-mp.js?v=3d59cc93';
-import { nodeKeyMap, rockItems } from '../public/js/features/homes-feature.js?v=c21d1645';
+} from '../public/js/yard-stock-mp.js?v=8d02d94d';
+import { normalizeYardActs } from '../public/js/yard-verbs-mp.js?v=3a4e7637';
+import { nodeKeyMap, rockItems } from '../public/js/features/homes-feature.js?v=37213227';
 import { homeStreetFor, readVisitScene, sharedHomeStreet, visitSceneTsid } from '../public/js/neighbours-mp.js?v=3f8f866c';
-import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=c443df04';
+import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=6ca5c328';
 import { HAS_SERVER, HAS_SITE, SITE_DIR, serverPath } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');

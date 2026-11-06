@@ -123,8 +123,8 @@ import {
   treeId,
   treeReady,
   treeSkill,
-} from '../street-objects.js?v=7c989455';
-import { ROCK_CATALOG } from '../mining.js?v=83421428';
+} from '../street-objects.js?v=fd668aaa';
+import { ROCK_CATALOG } from '../mining.js?v=4d825b67';
 import { TRANT_META, trantStatusLabel } from '../trants.js?v=9c2e8c0f';
 import { quoteWoodTreeHarvest } from '../woodcutting.js?v=d71073bd';
 import { animalStatusLabel, pickerMaxCount } from '../animals.js?v=05dafc43';

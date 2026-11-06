@@ -32,7 +32,7 @@
  * keeps a dig crew (diggers) as a rock keeps miners.
  */
 
-import { ROCK_CATALOG, findWorkingPick, miningProfile } from './mining.js?v=83421428';
+import { ROCK_CATALOG, findWorkingPick, miningProfile, miningToolWear } from './mining.js?v=4d825b67';
 import { MINING_EXPERT_UPGRADES } from './imagination-effects.js?v=70169933';
 import { TRANT_META, canHarvestTrant, fruitCapacityAt, resolveArborologyPackage } from './trants.js?v=9c2e8c0f';
 import { highestLightGreenThumbRank, quoteTrantCare } from './trant-care.js?v=67ea957b';
@@ -181,11 +181,7 @@ export function digSkill(learned = [], upgrades = []) {
  */
 export function rockReady(rock, { inv, pc, learned = [], toolState = null } = {}) {
   if (!rock) return false;
-  const wear = Math.min(
-    miningProfile(learned, 'fancy_pick')?.toolWear ?? 2,
-    miningProfile(learned, 'pick')?.toolWear ?? 2,
-  );
-  const pick = findWorkingPick(inv || {}, toolState, wear);
+  const pick = findWorkingPick(inv || {}, toolState, miningToolWear(learned));
   if (!pick) return false;
   const profile = miningProfile(learned, pick);
   if (!profile) return false;

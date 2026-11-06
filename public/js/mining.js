@@ -209,6 +209,15 @@ export function miningProfile(learned, pick = 'pick', upgrades = []) {
 }
 
 /**
+ * Condition one swing asks of a pick at this Mining rank: tool_wear 2 at Mining I and II, 1 at III and
+ * IV, the same for both picks (catalog_skill_packages.js mining, mining_fancypick).
+ * @param {string[]|undefined} learned
+ */
+export function miningToolWear(learned) {
+  return miningProfile(learned)?.toolWear ?? MINING_COSTS.toolWear;
+}
+
+/**
  * Exact `refining` package row (Refining I or II) for the Grinder.
  * Refined Speed I/II (refining_time_1/2) shorten it through the overlay.
  * @param {string[]|undefined} learned
@@ -305,12 +314,12 @@ export function mineRock(rock, inv, pc, opts = {}) {
   }
   const skilled = Array.isArray(opts.learned) ? opts.learned : undefined;
   const upgrades = Array.isArray(opts.upgrades) ? opts.upgrades : pc?.imaginationUpgrades || [];
-  const wearCheck = Math.min(
-    miningProfile(skilled, 'fancy_pick')?.toolWear ?? MINING_COSTS.toolWear,
-    miningProfile(skilled, 'pick')?.toolWear ?? MINING_COSTS.toolWear,
-  );
-  const pick = findWorkingPick(inv, opts.toolState, wearCheck);
+  const pick = findWorkingPick(inv, opts.toolState, miningToolWear(skilled));
   if (!pick) {
+    // include/mining.js 236-237: a pick that works but can't take this swing's wear.
+    if (findWorkingPick(inv, opts.toolState, 1)) {
+      return { ok: false, reason: 'broken_tool', msgs: ['Your pick does not have enough uses left.'] };
+    }
     const ownsPick = countItem(inv, 'fancy_pick') >= 1 || countItem(inv, 'pick') >= 1;
     return {
       ok: false,

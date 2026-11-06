@@ -2,9 +2,9 @@
  * Groddle Afternoon — original street geometry + layered decos
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
-import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=628c01d0';
+import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=d4fcc4a9';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=127e0a3c';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=c9d37746';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=ea8da203';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -618,7 +618,8 @@ import {
   starterMiningTools,
   STARTER_MINING_SKILLS,
   findWorkingPick,
-} from './js/mining.js?v=83421428';
+  miningToolWear,
+} from './js/mining.js?v=4d825b67';
 import {
   loadStreetData,
   STREET_INDEX,
@@ -809,7 +810,7 @@ import {
   createVendorSellQuote,
   vendorSellUnitPrice,
   vendorBuyUnitPrice,
-} from './js/vendor.js?v=2637c146';
+} from './js/vendor.js?v=c09df4c6';
 import {
   animalAnchorX,
   createAnimalState,
@@ -8566,7 +8567,7 @@ const pickToolFrames = new Map();
 
 /** The pick swings beside the avatar for the whole timed mine verb (the source overlay loops). */
 async function playPickAnimation(target, durationMs = 0) {
-  const pick = findWorkingPick(inv, toolState) || 'pick';
+  const pick = findWorkingPick(inv, toolState, miningToolWear(skillState.learned)) || 'pick';
   if (!pickToolFrames.has(pick)) {
     const tex = await loadTexture(PICK_TOOL_SHEETS[pick]).catch(() => null);
     if (!tex) return null;

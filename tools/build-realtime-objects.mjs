@@ -71,7 +71,7 @@ import {
   setStreetEcologyCatalog,
   streetReservedSpots,
 } from '../public/js/street-ecology.js?v=e2bdb20c';
-import { ROCK_CATALOG } from '../public/js/mining.js?v=83421428';
+import { ROCK_CATALOG } from '../public/js/mining.js?v=4d825b67';
 import { MEGA_ROCK_CHANCE, MEGA_ROCK_CHUNKS } from '../public/js/imagination-effects.js?v=70169933';
 import { RESOURCE_NODE_CATALOG, RESOURCE_SKILL_PACKAGES } from '../public/js/resource-nodes.js?v=c14bd6d8';
 import { ARBOROLOGY_HARVEST, TRANT_META } from '../public/js/trants.js?v=9c2e8c0f';
@@ -86,7 +86,7 @@ import { hasRaceDispenser } from '../public/js/races.js?v=ab22a079';
 import { setWildlifeCatalog, wildlifeFor } from '../public/js/wildlife.js?v=670c3a7f';
 import { boardSpotRow, furnitureFor, furniturePlacementGroups } from '../public/js/street-furniture.js?v=d5716ef6';
 import { INCUBATION } from '../public/js/animal-husbandry.js?v=41da06a5';
-import { SHARED_NODE_CLASSES, freshTreePlan } from '../public/js/street-objects.js?v=7c989455';
+import { SHARED_NODE_CLASSES, freshTreePlan } from '../public/js/street-objects.js?v=fd668aaa';
 import { isZoneTsid } from '../public/js/zone-streets.js?v=b40010d5';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
