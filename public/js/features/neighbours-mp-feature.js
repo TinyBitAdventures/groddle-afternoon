@@ -341,7 +341,7 @@ function createSession(engine, client) {
       visit.room = room;
       visit.floor = room === 'tower' ? built.floor : 0;
       engine.enterScene(scene);
-      vb = null;
+      dropButler();
       const spots = built.populate(engine);
       registerTargets(room, spots);
       // HOMES3 (features/home-street-mp-feature.js): the signpost, Note Poles, furniture for sale and restorations here.
@@ -586,11 +586,26 @@ function createSession(engine, client) {
   function greeting() {
     const me3 = client.me?.name || engine.pc?.name || 'friend';
     // greetPlayer: a friend of the owner hears friendGreeting (a key-holder is one), anyone else strangerGreeting.
-    return (visit.key ? BT.friendGreeting(me3) : BT.strangerGreeting(me3, visit.name)) + BT.visitorOwnerHome;
+    return (visit?.key ? BT.friendGreeting(me3) : BT.strangerGreeting(me3, visit?.name || '')) + BT.visitorOwnerHome;
+  }
+
+  /**
+   * Report 116: the owner's Butler goes with its street. clearWorldEntities only takes sprites
+   * off the stage, so a Butler kept here went on ticking on the next street and greeted from a
+   * visit that had ended (greeting read visit.key with no visit), which stopped the game loop.
+   */
+  function dropButler() {
+    const b = vb;
+    vb = null;
+    if (!b) return;
+    if (b.box && !b.box.destroyed) b.box.destroy({ children: true, texture: true, textureSource: true });
+    b.painter = null;
+    b.target = null;
+    publish();
   }
 
   function tickButler(dtMs) {
-    if (!vb || vb.box.destroyed) return;
+    if (!vb || vb.box.destroyed || !visit) return;
     vb.t += (dtMs * 30) / 1000;
     if (vb.painter) {
       const frames = vb.painter.frames('idle0') || 1;
@@ -817,6 +832,7 @@ function createSession(engine, client) {
     const back = visit?.returnTo;
     visit = null;
     knocking = 0;
+    dropButler();
     publish();
     if (back?.tsid) await engine.enter(back.tsid, { spawnX: back.x, spawnY: back.y, quiet: true, bypassFeatureGates: true });
     else await engine.enter(STREET_INDEX.default, { bypassFeatureGates: true });
@@ -1245,6 +1261,11 @@ function createSession(engine, client) {
         knocking = 0;
         publish();
       }
+      if (!visit) dropButler();
+    },
+    /** The street's entities are going (feature host onStreetClear): its Butler with them. */
+    streetClear() {
+      dropButler();
     },
     verbsFor(target) {
       if (!visit) return [];
@@ -1382,6 +1403,10 @@ export const neighboursMpFeature = {
 
   onStreetEnter() {
     session?.left();
+  },
+
+  onStreetClear() {
+    session?.streetClear();
   },
 
   /** realtime-feature: the street shared on someone's home (or yours), HOME_<id> or HOUSE_<id>. */
