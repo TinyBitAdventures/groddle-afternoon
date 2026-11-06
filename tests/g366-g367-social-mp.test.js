@@ -178,7 +178,11 @@ describe('G367 the Butler IM: the feature', () => {
   });
 
   it('IMs, commands and the Butler on the street, end to end against a fake server', async (t) => {
-    t.mock.timers.enable({ apis: ['setTimeout'] });
+    // G525: the test's own clock for both, and the longest delay every time. The delays are random, 500 to
+    // 1000 ms, and a second IM comes 1 ms after the first: a 1000 ms roll (1 in 501) put it at 1001, past the
+    // tick(1000) this used to take on the real clock, and one Jeeves line was missing.
+    t.mock.timers.enable({ apis: ['setTimeout', 'Date'], now: 1_000_000 });
+    t.mock.method(Math, 'random', () => 0.999);
     const { butlerApi } = await import('../public/js/features/butler-feature.js?v=66b6845e');
     t.mock.method(butlerApi, 'owned', () => true);
     t.mock.method(butlerApi, 'label', () => 'Jeeves');
@@ -193,8 +197,12 @@ describe('G367 the Butler IM: the feature', () => {
     client.emit('msg:butler_im', { t: 'butler_im', kind: 'visitor', from: { id: 9, name: 'Bo' } });
     client.emit('msg:butler_im', { t: 'butler_im', kind: 'speech', from: { id: 9, name: 'Bo' }, text: 'anyone home?' });
     client.emit('msg:butler_im', { t: 'butler_im', kind: 'speech', from: { id: 66, name: 'Blocked' }, text: 'x' });
-    t.mock.timers.tick(1000);
-    const lines = () => tabs.get(BUTLER_TAB).lines.map((l) => `${l.mine ? '>' : ''}${l.name}: ${l.text}`);
+    const lines = () => (tabs.get(BUTLER_TAB)?.lines || []).map((l) => `${l.mine ? '>' : ''}${l.name}: ${l.text}`);
+    t.mock.timers.tick(999);
+    assert.deepEqual(lines(), [], 'not before the delay');
+    t.mock.timers.tick(1);
+    assert.deepEqual(lines(), ["Jeeves: Bo is on your Home Street. You can type 'help' for hints about what I can do!"], 'the first at the 1 s it rolled');
+    t.mock.timers.tick(1);
     assert.deepEqual(lines(), ["Jeeves: Bo is on your Home Street. You can type 'help' for hints about what I can do!", "Jeeves: Bo said 'anyone home?'"]);
     assert.equal(tabs.get(BUTLER_TAB).opts.prefix, '/butler ', 'a line typed in its chat is an IM to it');
 
