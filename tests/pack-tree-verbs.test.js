@@ -27,7 +27,7 @@ import { packTreeVerbsFeature, runPackTreeVerb } from '../public/js/features/pac
 import { getVerbsFor } from '../public/content.js?v=93df4d7b';
 import { plotVerbs } from '../public/js/patches.js?v=056bb6ae';
 import { createToolConditionState, setToolRemaining } from '../public/js/tools.js?v=6684b484';
-import { FEATURES } from '../public/js/features/index.js?v=5bd56494';
+import { FEATURES } from '../public/js/features/index.js?v=b195161a';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const gsjs = join(root, '..', 'glitch-GameServerJS');

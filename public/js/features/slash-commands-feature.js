@@ -47,7 +47,7 @@
  */
 
 import { BUTLER_STRINGS } from '../butler.js?v=2bafa110';
-import { butlerApi } from './butler-feature.js?v=f75edae6';
+import { butlerApi } from './butler-feature.js?v=787dd159';
 import { hellFeature } from './hell-feature.js?v=13196575';
 import { towerApi } from './home-tower-feature.js?v=c854a072';
 import { COMMAND_HELP_INTRO, STUCK_COOLDOWN_MS, STUCK_TEXT, commandHelpLines, commandHint, isCommandHelp, misplacedCommand, slashPlan, unknownLine } from '../slash-commands.js?v=98c2238a';

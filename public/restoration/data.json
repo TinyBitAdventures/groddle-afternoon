@@ -2728,13 +2728,68 @@
   ]
  },
  "release": {
-  "game": "0.19.0",
-  "deployed": "2026-11-05"
+  "game": "0.19.1",
+  "deployed": "2026-11-06"
  },
  "git": {
-  "commits": 1324,
+  "commits": 1337,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-06",
+    "kind": "fix",
+    "text": "Garden beds on home streets and back yards sit on the land instead of over the background"
+   },
+   {
+    "date": "2026-11-05",
+    "kind": "fix",
+    "text": "The Butler gives each visitor one of your gift, even while you are away, and \"who visited?\" names them"
+   },
+   {
+    "date": "2026-11-05",
+    "kind": "fix",
+    "text": "GO on the Map's region buttons stays in its circle while you zoom and pan"
+   },
+   {
+    "date": "2026-11-05",
+    "kind": "fix",
+    "text": "A street project's thank-you bubble counts the unit you just did (\"2 of the 2\", not \"2 of the 3\")"
+   },
+   {
+    "date": "2026-11-05",
+    "kind": "fix",
+    "text": "Your signpost's arm to a friend no longer stays locked after you come home from their street"
+   },
+   {
+    "date": "2026-11-05",
+    "kind": "fix",
+    "text": "One feature's error no longer stops the game; it is reported and play goes on"
+   },
+   {
+    "date": "2026-11-05",
+    "kind": "fix",
+    "text": "Leaving a friend's home street no longer freezes the view"
+   },
+   {
+    "date": "2026-11-05",
+    "kind": "improve",
+    "text": "Your Reports list has tabs by status with counts and a red count of new replies, and lists unread and answered reports first"
+   },
+   {
+    "date": "2026-11-05",
+    "kind": "improve",
+    "text": "The Projects panel's needs read task first, with the tool or item picture, what is left and whether you can do it now"
+   },
+   {
+    "date": "2026-11-05",
+    "kind": "improve",
+    "text": "Groddle Forest's map has a new painting, repainted from Tiny Speck's thumbnail of the lost original"
+   },
+   {
+    "date": "2026-11-05",
+    "kind": "improve",
+    "text": "Vendor and shrine icons on the region map stand out on any painting"
+   },
    {
     "date": "2026-11-05",
     "kind": "improve",
@@ -2799,64 +2854,9 @@
     "date": "2026-11-05",
     "kind": "improve",
     "text": "Item pages name each source once under Where to find it, with how you get it"
-   },
-   {
-    "date": "2026-11-05",
-    "kind": "improve",
-    "text": "The Encyclopedia menu shows its sections in three headed columns"
-   },
-   {
-    "date": "2026-11-05",
-    "kind": "new",
-    "text": "Item pages say where to find each item: the stores that sell it and what gives it, with how many streets have one"
-   },
-   {
-    "date": "2026-11-05",
-    "kind": "new",
-    "text": "The encyclopedia has a page for every street and every store, linked from each region's page"
-   },
-   {
-    "date": "2026-11-05",
-    "kind": "improve",
-    "text": "The Encyclopedia's Recipes section is now Tools and recipes, counting 30 tools and the 327 recipes they make"
-   },
-   {
-    "date": "2026-11-05",
-    "kind": "fix",
-    "text": "On a phone the Social drawer starts closed, its close arrow takes the tap, and Report a problem stays on screen"
-   },
-   {
-    "date": "2026-11-05",
-    "kind": "improve",
-    "text": "Shake, Compress, Age, Unbundle and Shuck ask how many of the stack, with a number to type"
-   },
-   {
-    "date": "2026-11-05",
-    "kind": "fix",
-    "text": "Tii's name is spelled Tii on the loading card and in favor, dice and emblem lines"
-   },
-   {
-    "date": "2026-11-05",
-    "kind": "improve",
-    "text": "Every item page in the remake says what the item is for"
-   },
-   {
-    "date": "2026-11-05",
-    "kind": "improve",
-    "text": "A larger picture at the top of each item page"
-   },
-   {
-    "date": "2026-11-05",
-    "kind": "improve",
-    "text": "Item pages show each recipe's skills, energy and time, what vendors pay, and the stack size in the header"
-   },
-   {
-    "date": "2026-11-05",
-    "kind": "new",
-    "text": "I opens the Encyclopedia on what you are looking at, with links from the Menu, item cards, Skills and Quests"
    }
   ]
  },
  "tests": 691,
- "generatedAt": "2026-11-05"
+ "generatedAt": "2026-11-06"
 }

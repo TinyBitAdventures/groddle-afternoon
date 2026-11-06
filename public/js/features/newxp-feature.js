@@ -87,6 +87,7 @@ import {
   STAGES,
   TRAINING2_DRINKS,
   TRAINING2_ENERGY_AFTER_EAT,
+  training2MeterFull,
   TRAINING2_ENTER_METABOLICS,
   TRAINING2_FOOD,
   UPGRADE_HANDS,
@@ -118,7 +119,7 @@ import {
   tutorialPhysics,
   SKIP_TUTORIAL_CARDS,
   vogPages,
-} from '../newxp.js?v=249fdf4c';
+} from '../newxp.js?v=0dd5052a';
 import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=d82f3b00';
 import { QUOIN_SHEET, QUOIN_TYPES, qrazyRewardForLevel } from '../quoins.js?v=dfe1ff0a';
 import { soundForQuoin } from '../sound-moments.js?v=2f8597cd';
@@ -131,7 +132,7 @@ import * as kit from '../quest-rooms/kit.js?v=4d8ab82d';
 import { frameTexture, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js?v=3149d699';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 import { displayTopOf, itemstackOverlayPoint, playPoofIn, playSheetOverlay, poofInAlpha } from '../overlay-art.js?v=11b6dd7f';
-import { HOME_MACHINE } from '../home-ticket.js?v=601d0004';
+import { HOME_MACHINE } from '../home-ticket.js?v=9661827b';
 import { animalAnchorX, createAnimalState } from '../animals.js?v=71f981cb';
 import {
   AK_ANIMALS,
@@ -1685,8 +1686,9 @@ async function runTraining2(t) {
   const L = buildTraining2(engine);
   fadeIn();
   const pc = engine.pc;
-  pc.energy = Math.max(pc.energy || 0, TRAINING2_ENTER_METABOLICS);
-  pc.mood = Math.max(pc.mood || 0, TRAINING2_ENTER_METABOLICS);
+  // playerEntered 96-99: both meters are set to 99, not raised to it, so there is always room to eat and drink.
+  pc.energy = TRAINING2_ENTER_METABOLICS;
+  pc.mood = TRAINING2_ENTER_METABOLICS;
   engine.updateHud();
   const db = makeNpc(engine, 'dustbunny', L.dustbunny.initial, L.floorY, { register: true, classId: 'newxp_dustbunny', subtitle: 'An aficionado of EGGs' });
   run.npcs.push(db);
@@ -1716,6 +1718,7 @@ async function runTraining2(t) {
   instruction(LINES.interactInstructions);
   db.moveTo(L.dustbunny.table1b, L.floorY, 250, 'walkRight');
   let firstPick = null;
+  run.data.eaten = false;
   for (const f of TRAINING2_FOOD) {
     const spot = L.items[f.id];
     addPickup(engine, f.id, f.classTsid, f.count, spot.x, spot.y, (row) => { firstPick ||= row; });
@@ -1727,7 +1730,6 @@ async function runTraining2(t) {
   hud({ meta: true, energy: true, mood: true, pack: false, actions: true, chat: true });
   // food_wait_eat: the slot callout and the nagging.
   setStep('food_wait_eat');
-  run.data.eaten = false;
   // "Eat This" / "Drink This": glitch-client graphics/callout_eat.png and callout_drink.png; the rest is remake copy.
   instruction(`Eat This: click the ${ITEM_LABEL(firstPick.classTsid)} in your pack, then Eat`);
   let nag = 0;
@@ -1738,7 +1740,8 @@ async function runTraining2(t) {
       nag += 1;
       nagAt = Date.now() + 6000;
     }
-    return run.data.eaten;
+    // newxp_training2.js 506-507: full energy skips the wait (a new game day refills the meters here).
+    return run.data.eaten || training2MeterFull(pc.energy, pc.energyMax);
   }, { help: () => { if (!clickPackUse(engine, firstPick.classTsid)) run.data.eaten = true; setTimeout(() => { run.data.eaten = true; }, 900); } });
   clearInstruction();
   // food_eaten: energy to 80, the overlay, then the energy meter appears.
@@ -1768,6 +1771,7 @@ async function runTraining2(t) {
   await talk(t, db, LINES.t2Drinks, { buttons: ['ok'] });
   db.moveTo(L.dustbunny.table2b, L.floorY, 250, 'walkRight');
   let drinkPick = null;
+  run.data.drank = false;
   for (const d of TRAINING2_DRINKS) {
     const spot = L.items[d.id];
     addPickup(engine, d.id, d.classTsid, d.count, spot.x, spot.y, (row) => { drinkPick ||= row; });
@@ -1784,7 +1788,6 @@ async function runTraining2(t) {
   clearInstruction();
   await overlay(t, { title: LINES.firstDrink, button: 'OK' });
   setStep('drink_wait_drink');
-  run.data.drank = false;
   instruction(`Drink This: click the ${ITEM_LABEL(drinkPick.classTsid)} in your pack, then Drink`);
   setTimeout(() => { if (run?.stage === 'training2' && !run.data.drank) say(db, LINES.t2DrinkIt, 3000); }, 2000);
   await until(t, () => {
@@ -1792,7 +1795,8 @@ async function runTraining2(t) {
       place(1928, L.floorY);
       say(db, LINES.t2DrinkFirst, 3000);
     }
-    return run.data.drank;
+    // newxp_training2.js 582-583: full mood skips the wait too.
+    return run.data.drank || training2MeterFull(pc.mood, pc.energyMax);
   }, { help: () => { if (!clickPackUse(engine, drinkPick.classTsid)) run.data.drank = true; setTimeout(() => { run.data.drank = true; }, 900); } });
   clearInstruction();
   // drink_drank: the mood meter appears with its callout.
