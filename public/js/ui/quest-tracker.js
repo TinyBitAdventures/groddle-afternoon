@@ -74,7 +74,8 @@ export function createQuestTracker({ el, onOpen = () => {}, onCollapse = () => {
   });
 
   /**
-   * @param {{ classTsid: string, title: string, step: string, count: string, percent: number }[]} rows
+   * @param {{ classTsid: string, title: string, step: string, count: string, percent: number, failed?: boolean, short?: string }[]} rows
+   *   `failed` (report 127, quest-sheet failedQuestPin): its try ended; the step says so, with no count or bar.
    * @param {boolean} collapsed
    */
   function render(rows, collapsed) {
@@ -94,13 +95,14 @@ export function createQuestTracker({ el, onOpen = () => {}, onCollapse = () => {
     }
     if (!shown.length) return;
     const head = collapsed
-      ? `${shown[0].title} ${shown[0].count}${shown.length > 1 ? ' +1' : ''}`
+      ? `${shown[0].failed ? `${shown[0].title}: ${shown[0].short}` : `${shown[0].title} ${shown[0].count}`}${shown.length > 1 ? ' +1' : ''}`
       : 'Pinned quests';
     if (title && title.textContent !== head) title.textContent = head;
-    const markup = shown.map((r) => `<button type="button" class="tq" aria-haspopup="menu" data-pin="${escapeText(r.classTsid)}" aria-keyshortcuts="Shift+F10" aria-label="${escapeText(`${r.title}, ${r.step} ${r.count}. Open in Quests. ${MORE_KEYS_LABEL}`)}">`
+    const markup = shown.map((r) => `<button type="button" class="tq${r.failed ? ' is-failed' : ''}" aria-haspopup="menu" data-pin="${escapeText(r.classTsid)}" aria-keyshortcuts="Shift+F10" aria-label="${escapeText(`${r.title}, ${r.step} ${r.count}. Open in Quests. ${MORE_KEYS_LABEL}`)}">`
       + `<span class="tq-row"><span class="tq-title">${escapeText(r.title)}</span><span class="tq-n">${escapeText(r.count)}</span></span>`
       + `<span class="tq-step">${escapeText(r.step)}</span>`
-      + `<span class="tq-bar" aria-hidden="true"><i style="width:${Math.max(0, Math.min(100, Math.round(r.percent)))}%"></i></span></button>`).join('');
+      + (r.failed ? '' : `<span class="tq-bar" aria-hidden="true"><i style="width:${Math.max(0, Math.min(100, Math.round(r.percent)))}%"></i></span>`)
+      + '</button>').join('');
     if (markup !== drawn && list) {
       const hadFocus = list.contains(el.ownerDocument?.activeElement) ? el.ownerDocument.activeElement.dataset.pin : '';
       list.innerHTML = markup;

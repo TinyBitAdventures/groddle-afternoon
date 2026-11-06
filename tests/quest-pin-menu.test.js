@@ -12,7 +12,8 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { FakeEl, matches } from './social-fake-dom.js';
-import { createQuestTracker } from '../public/js/ui/quest-tracker.js?v=65707d90';
+import { failedQuestPin } from '../public/js/ui/quest-sheet.js?v=569538d6';
+import { createQuestTracker } from '../public/js/ui/quest-tracker.js?v=db39f8a6';
 import { isPinMenuKey, placePinMenu, LONG_PRESS_MS, PIN_MENU_ROWS } from '../public/js/ui/quest-pin-menu.js?v=361dad0c';
 import { questPinsFeature } from '../public/js/features/quest-pins-feature.js?v=e59012f1';
 
@@ -279,5 +280,39 @@ describe('the game wiring', () => {
     assert.match(css, /\n\.quest-pin-menu \{ display: none; \}/);
     assert.match(css, /\[data-ui="modern"\] #game-root #quest-pin-menu:not\(\[hidden\]\) \{/);
     assert.doesNotMatch(read('css/classic.css'), /quest-pins|quest-pin-menu/);
+  });
+});
+
+describe('report 127: a pinned quest whose try has ended', () => {
+  it('says time ran out on a timed quest, and a plain ended line on a room quest', () => {
+    assert.deepEqual(failedQuestPin({ timer: { durationSec: 300 } }), {
+      step: 'Time ran out: try again', short: 'time ran out', count: '', percent: 0, failed: true,
+    });
+    assert.equal(failedQuestPin({}).step, 'This try ended: try again');
+  });
+
+  it('draws the words with no count or bar, stays pinned, and still opens the log on a click', () => {
+    const row = { classTsid: 'happy_endings', title: 'Happy Endings For All!', ...failedQuestPin({ timer: { durationSec: 300 } }) };
+    let html = '';
+    Object.defineProperty(s.list, 'innerHTML', { set(v) { html = v; }, get() { return html; } });
+    s.tracker.render([row], false);
+    assert.match(html, /class="tq is-failed"/);
+    assert.match(html, /Time ran out: try again/);
+    assert.doesNotMatch(html, /tq-bar/);
+    assert.equal(s.calls.data.questPins, 'happy_endings:');
+    assert.deepEqual(questPinsFeature.pins().includes('happy_endings'), true);
+    s.row('happy_endings').click();
+    assert.deepEqual(s.calls.open, ['happy_endings']);
+  });
+
+  it('says so on the folded tracker too', () => {
+    const row = { classTsid: 'happy_endings', title: 'Happy Endings For All!', ...failedQuestPin({ timer: { durationSec: 300 } }) };
+    s.tracker.render([row], true);
+    assert.equal(s.root.querySelector('[data-pins-title]').textContent, 'Happy Endings For All!: time ran out');
+  });
+
+  it('the game reads offers.failed for the row', () => {
+    const game = read('game.js');
+    assert.match(game, /questState\.offers\?\.failed\?\.\[classTsid\] \? failedQuestPin\(p\.def\) : questStep\(p\.requirements\)/);
   });
 });

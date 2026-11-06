@@ -12056,6 +12056,7 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
 [data-ui="modern"] #quest-pins .tq-title { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 [data-ui="modern"] #quest-pins .tq-n { flex: none; font-variant-numeric: tabular-nums; }
 [data-ui="modern"] #quest-pins .tq-step { display: block; margin-top: 2px; font-size: var(--fs-s); color: var(--text-muted); }
+[data-ui="modern"] #quest-pins .tq.is-failed .tq-step { color: var(--warn); font-weight: var(--fw-bold); }
 [data-ui="modern"] #quest-pins .tq-bar { display: block; height: 6px; margin-top: 6px; border-radius: 3px; background: var(--track); overflow: hidden; }
 [data-ui="modern"] #quest-pins .tq-bar i { display: block; height: 100%; background: var(--good); transition: width var(--motion-med) var(--ease-out); }
 /* The buff strip steps down under the tracker, which stands beside an open sheet too (above). */

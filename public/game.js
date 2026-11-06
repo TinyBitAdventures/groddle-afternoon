@@ -954,8 +954,8 @@ import { mountSocialDrawer } from './js/ui/social-drawer.js?v=dff40570';
 import { bindChatLinks } from './js/chat-links.js?v=b717fac7';
 import { bindDragScroll } from './js/ui/drag-scroll.js?v=9a527ac8';
 import { SIDE_SHEET_IDS, bindTabs, inSideSheet, mountPanelShell, sheetKeyToWorld } from './js/ui/panel-shell.js?v=e2abdf9e';
-import { createQuestSheet, questStep } from './js/ui/quest-sheet.js?v=8dd5267c';
-import { createQuestTracker } from './js/ui/quest-tracker.js?v=65707d90';
+import { createQuestSheet, failedQuestPin, questStep } from './js/ui/quest-sheet.js?v=569538d6';
+import { createQuestTracker } from './js/ui/quest-tracker.js?v=db39f8a6';
 import { bindContextTrigger, createContextMenu, isContextMenuKey as isMenuKey, MORE_KEYS_LABEL } from './js/ui/context-menu.js?v=79326483';
 import { bindCountField, countKeyValue, countStepMarkup, typedCount } from './js/ui/count-chooser.js?v=b8361b21';
 import { bindVerbMenu, centerVerbMenu, fitVerbMenuRows, focusVerbRow, lockVerbMenuSize, makePickTile, makeVerbRow, pickGridCols, placeVerbMenu, plainWords, refuseVerbRow, syncVerbDetail, verbMenuKey, verbRowAttrs, verbRowInner, verbRowKeys } from './js/ui/verb-menu.js?v=7716e570';
@@ -5657,7 +5657,9 @@ function renderPinnedQuests() {
     const p = getQuestProgress(questState, classTsid);
     // On hold: the pin stays, but it puts nothing on screen until the road opens.
     if (!p?.active || questHoldOf(classTsid)) return null;
-    return { classTsid, title: p.def.title || classTsid, ...questStep(p.requirements) };
+    // Report 127: its try ended; "Try again" is on its card in the log, which the row opens.
+    const line = questState.offers?.failed?.[classTsid] ? failedQuestPin(p.def) : questStep(p.requirements);
+    return { classTsid, title: p.def.title || classTsid, ...line };
   }).filter(Boolean);
   questTracker.render(rows, pins.collapsed());
   const el = document.getElementById('quest-pins');

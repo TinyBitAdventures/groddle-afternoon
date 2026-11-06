@@ -173,6 +173,23 @@ export function questStep(requirements = []) {
 }
 
 /**
+ * A pinned quest whose try has ended (report 127, offers.failed): what its row says in place of a
+ * step and a count. The quest stays pinned and "Try again" is on its card in the log, which the row
+ * opens. Timed quests ran out of time; a room quest can also fail by leaving the room.
+ * @param {{ timer?: { durationSec?: number } }|null} def the quest
+ */
+export function failedQuestPin(def) {
+  const timed = Boolean(def?.timer?.durationSec);
+  return {
+    step: timed ? 'Time ran out: try again' : 'This try ended: try again',
+    short: timed ? 'time ran out' : 'try again',
+    count: '',
+    percent: 0,
+    failed: true,
+  };
+}
+
+/**
  * A drawn card's menu rows (RIGHTCLICK), each pressing one of the card's own controls (`el`):
  * Pin to screen or Unpin (its Pin button: disabled with its reason when two are pinned), Open or
  * Close (its head), then its buttons in the order it shows them.
