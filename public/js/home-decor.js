@@ -44,6 +44,7 @@
  * - Glitch furniture never rotated; it faces left or right (`facing_right`).
  */
 
+import { TROPHY_DECOR, isTrophyDecor } from './home-trophies.js?v=21c2add6';
 import {
   FURNITURE_CATALOG,
   FURNITURE_STARTER_KIT,
@@ -99,12 +100,13 @@ const TEXTURE_CONFIG_KEY = { wall: 'walls', floor: 'floors', ceiling: 'ceilings'
 const MAX_PLACED = 160;
 const MAX_STORAGE_STACK = 999;
 
+/** A placeable class's row: furniture, or a trophy (js/home-trophies.js). */
 export function furnitureDef(classTsid) {
-  return FURNITURE_CATALOG[classTsid] || null;
+  return FURNITURE_CATALOG[classTsid] || (isTrophyDecor(classTsid) ? TROPHY_DECOR[classTsid] : null);
 }
 
 export function isFurniture(classTsid) {
-  return Boolean(FURNITURE_CATALOG[classTsid]);
+  return Boolean(furnitureDef(classTsid));
 }
 
 /** Display scale: only ever shrinks an oversized recovered frame (none since the Fireplace draws one cell of its sheet, SEATSELECT). */
@@ -431,7 +433,7 @@ export function grantStarterKit(state) {
  */
 export function listPlaceable(state, inv = {}) {
   const out = [];
-  for (const def of Object.values(FURNITURE_CATALOG)) {
+  for (const def of [...Object.values(FURNITURE_CATALOG), ...Object.values(TROPHY_DECOR)]) {
     const styles = storedStyles(state, def.classTsid);
     const stored = Math.max(0, (state.storage[def.classTsid] || 0) - styles.length);
     const packed = Math.max(0, Math.floor(finite(inv?.[def.classTsid], 0)));

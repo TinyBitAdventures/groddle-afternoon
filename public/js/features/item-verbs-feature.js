@@ -45,7 +45,7 @@ import {
   itemVerbsFor,
   runItemVerb,
 } from '../item-verbs.js?v=1e20fa7d';
-import { homesFeature } from './homes-feature.js?v=0731798e';
+import { homesFeature } from './homes-feature.js?v=1c03ac42';
 import { CROWNS_STREET } from '../game-of-crowns.js?v=e32f35f5';
 import { HOG_HAUL_STREET_ID } from '../hog-haul.js?v=50d2e072';
 import { isRaceSceneTsid } from '../races.js?v=ab22a079';
@@ -78,9 +78,9 @@ export function isTrophyClass(classTsid) {
   return /^trophy_/.test(String(classTsid || '')) && !/_piece\d+$/.test(classTsid);
 }
 
-/** Trophies standing on your home street and in your house (dropped stacks). */
-export function homeTrophyCount(droppedState) {
-  let n = 0;
+/** Trophies standing on your home street and in your house: dropped stacks, and `placed` set down through Decorate. */
+export function homeTrophyCount(droppedState, placed = 0) {
+  let n = Math.max(0, Math.floor(Number(placed) || 0));
   for (const tsid of HOME_STREETS) {
     for (const row of listDroppedStacks(droppedState, tsid)) {
       if (isTrophyClass(row.classTsid)) n += Math.max(0, Math.floor(Number(row.count) || 0));
@@ -154,7 +154,7 @@ function checkHome(engine, now) {
   if (!home?.inHome || !home.owned) return;
   if (now - homeCheckAt < 2000) return;
   homeCheckAt = now;
-  if (homeTrophyCount(engine.droppedItems) >= TROPHIES_FOR_BRAGGING && !(engine.unlockedAchievements || []).includes('humble_bragger')) {
+  if (homeTrophyCount(engine.droppedItems, engine.query?.('homeTrophiesPlaced')) >= TROPHIES_FOR_BRAGGING && !(engine.unlockedAchievements || []).includes('humble_bragger')) {
     engine.achievement('trophy:placed_eleven', 1);
   }
   if (home.room !== 'street') return;

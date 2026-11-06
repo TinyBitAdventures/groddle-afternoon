@@ -45,7 +45,8 @@ function countHeld(engine, catalog) {
 }
 
 function settleTrophies(engine) {
-  const plans = planCollectionTrophies(given, engine.unlockedAchievements, (cls) => countItem(engine.inv, cls));
+  // A trophy standing in the house or back in furniture storage has left the pack: it still counts as had.
+  const plans = planCollectionTrophies(given, engine.unlockedAchievements, (cls) => countItem(engine.inv, cls) + (Number(engine.query?.('homeFurnitureHeld', cls)) || 0));
   for (const plan of plans) {
     given.push(plan.badge);
     if (!plan.give) continue;

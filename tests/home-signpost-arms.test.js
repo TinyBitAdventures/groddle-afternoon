@@ -21,8 +21,8 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { SIGN_FIRST_ARM_Y, SIGN_SCALE, addSignBoard, setSignpostHover, setSignpostKeys, signpostBoardAt } from '../public/js/street-render.js?v=9349c0e5';
-import { SIGN_PROMPT_LIFT } from '../public/js/features/homes-feature.js?v=0731798e';
-import { FRIENDS_HIT_H } from '../public/js/features/home-street-mp-feature.js?v=841e59af';
+import { SIGN_PROMPT_LIFT } from '../public/js/features/homes-feature.js?v=1c03ac42';
+import { FRIENDS_HIT_H } from '../public/js/features/home-street-mp-feature.js?v=21b56f07';
 
 const root = join(import.meta.dirname, '..');
 const read = (p) => readFileSync(join(root, 'public', p), 'utf8');

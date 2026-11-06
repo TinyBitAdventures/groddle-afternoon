@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=8af10970';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=127e0a3c';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=86d3433e';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=0fe4002c';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -467,6 +467,7 @@ import {
   removeItem,
   isToolItem,
 } from './js/inventory.js?v=d82f3b00';
+import { TROPHY_FIND_TEXT, trophyOfBadge } from './js/home-trophies.js?v=21c2add6';
 import { PACK_COPY, isBagClass, unitRankAt } from './js/pack-slots.js?v=c91d0ca3';
 import { createPackRow, mountPackClearance, packBandRange, packCountText, packSearchEntries, packSlotTip } from './js/ui/pack-row.js?v=65c0f180';
 import { listAnimalFeedOptions } from './js/animals.js?v=fea7e3e0';
@@ -25750,6 +25751,13 @@ function renderAchievePanel() {
       label.className = 'badge-category';
       label.textContent = achievementCategoryLabel(row.def.category);
       body.appendChild(label);
+    }
+    if (row.unlocked && !row.redacted && trophyOfBadge(tsid)) {
+      const find = document.createElement('div');
+      find.className = 'badge-category';
+      find.dataset.badgeTrophy = trophyOfBadge(tsid);
+      find.textContent = TROPHY_FIND_TEXT;
+      body.appendChild(find);
     }
     if (art?.generated) {
       const note = document.createElement('div');

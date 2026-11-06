@@ -29,8 +29,8 @@ import {
   towerPlace,
   settleSolo,
   soloRow,
-} from '../public/js/home-machines.js?v=d91fb59b';
-import { homeMachinesFeature } from '../public/js/features/home-machines-feature.js?v=454a91c0';
+} from '../public/js/home-machines.js?v=fb66b5c2';
+import { homeMachinesFeature } from '../public/js/features/home-machines-feature.js?v=f3e7a239';
 import { RECIPE_CATALOG, setRecipeCatalog } from '../public/js/making.js?v=6da3230e';
 import { HAS_SERVER, HAS_SITE, SITE_DIR, serverPath } from '../tools/repos.mjs';
 

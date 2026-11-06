@@ -40,7 +40,7 @@ import {
   TROPHY_PIECES,
   planStreetTrophies,
 } from '../public/js/street-jobs.js?v=02a81cb3';
-import { streetJobsFeature } from '../public/js/features/street-jobs-feature.js?v=033391fa';
+import { streetJobsFeature } from '../public/js/features/street-jobs-feature.js?v=6e6838db';
 import { createAchievementState, applyAchievementProgress } from '../public/js/achievements.js?v=f8ccfd34';
 import { applyRewards } from '../public/js/quests.js?v=c8d9d0a4';
 import { loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js?v=10b118dd';
@@ -446,6 +446,17 @@ describe('report 97: the Street Creator Trophies', () => {
       assert.ok(achieve.unlocked.includes('collection_street_creator_earth'));
       assert.equal(countItem(engine.inv, 'trophy_street_creator_earth'), 1);
       assert.equal(countItem(engine.inv, 'trophy_street_creator_earth_piece5'), 0);
+      // Report 99, a guard: the badge and the trophy but no record of giving it, the trophy standing
+      // at home or in the pack: recorded, no second, and the pieces stay.
+      achieve.unlocked.push('collection_street_creator_wood', 'collection_street_creator_dirt');
+      engine.query = (hook, cls) => (hook === 'homeFurnitureHeld' && cls === 'trophy_street_creator_wood' ? 1 : 0);
+      addItem(engine.inv, 'trophy_street_creator_wood_piece1', 1);
+      addItem(engine.inv, 'trophy_street_creator_dirt', 1);
+      streetJobsFeature.onTick(16, 20_000, engine);
+      assert.equal(countItem(engine.inv, 'trophy_street_creator_wood'), 0);
+      assert.equal(countItem(engine.inv, 'trophy_street_creator_wood_piece1'), 1);
+      assert.equal(countItem(engine.inv, 'trophy_street_creator_dirt'), 1);
+      assert.ok(['wood', 'dirt'].every((f) => streetJobsFeature.save().trophiesGranted.includes(f)));
     } finally {
       globalThis.fetch = realFetch;
     }

@@ -13,7 +13,7 @@ import { applyAchievementProgress, createAchievementState, getAchievementProgres
 import { COLLECTION_TROPHIES, COUNTED_ON_ARRIVAL, HELD_AT_ONCE, collectionClasses, heldChanges, planCollectionTrophies } from '../public/js/collection-trophies.js?v=69205984';
 import { ITEM_CATALOG } from '../public/js/inventory.js?v=d82f3b00';
 import { vendorSellValue } from '../public/js/vendor.js?v=70577b0b';
-import { collectionTrophiesFeature as feature } from '../public/js/features/collection-trophies-feature.js?v=de9e7c8d';
+import { collectionTrophiesFeature as feature } from '../public/js/features/collection-trophies-feature.js?v=c357c3ad';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const GS = join(here, '../../glitch-GameServerJS');

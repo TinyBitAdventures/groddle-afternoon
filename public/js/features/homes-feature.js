@@ -136,7 +136,8 @@ import {
   textureConfig,
   unexpandInterior,
   UNEXPAND_TEXT,
-} from '../home-decor.js?v=c1240252';
+} from '../home-decor.js?v=5dd8f892';
+import { isTrophyDecor, placedTrophies } from '../home-trophies.js?v=21c2add6';
 import { applyBonusUpgrade, applyUpgrade, bonusUpgradeLine, currantsText, hasUpgrades, pieceLabel, rollBonusUpgrade, upgradeVerb, UPGRADE_TEXT } from '../furniture-upgrades.js?v=a3788c0d';
 import { DOCK_GAP, DOCK_W, chooseUpgrade, closeUpgradePicker, openUpgradePicker, placeUpgradePicker, saveUpgrade, upgradePickerOpen, upgradePickerState } from '../furniture-upgrade-picker.js?v=3a637ec8';
 import {
@@ -194,7 +195,7 @@ import { MOVABLE_FIXTURES, MOVABLE_FIXTURE_IDS, fixtureFits, fixtureText, savedF
 import { displayTopOf, itemstackOverlayPoint, overlayAlpha, overlayLifeMs, playPoofIn, trackOverlay } from '../overlay-art.js?v=11b6dd7f';
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=db7c442f';
 import { fadeInNewNear } from '../poof-fade.js?v=54ef2431';
-import { projectApi } from './street-jobs-feature.js?v=033391fa';
+import { projectApi } from './street-jobs-feature.js?v=6e6838db';
 import { TOWER_CHASSIS, TOWER_CONFIG, TOWER_DOOR_DX, TOWER_GEO, TOWER_PROTO, normalizeTowerState } from '../home-tower.js?v=4daa0b96';
 import { drawTowerElevator, drawTowerExit, towerApi, visitorTowerView } from './home-tower-feature.js?v=e46f9b45';
 import { pieceUrl, roomPieces, surfaceAt, swatchPiece, wallTargetAt } from '../home-wallpaper.js?v=f1969400';
@@ -267,7 +268,7 @@ import {
   quoteHouseExpansion,
   quoteHouseUnexpand,
   unexpandHouseFloors,
-} from '../home-floors.js?v=d196638f';
+} from '../home-floors.js?v=9d5bffeb';
 
 export const HOMES_FEATURE_ID = 'homes';
 const HOME_STREET_TSID = 'RH_HOME_EXT';
@@ -3602,7 +3603,8 @@ function furnitureTray(engine) {
         label: row.label,
         count: row.total,
         on,
-        title: `${row.label} (${where}). Drag it into the room, or click it and then click the room.`,
+        // A trophy has no pack slot to look for (js/home-trophies.js), so it does not say "in pack".
+        title: `${row.label}${isTrophyDecor(row.classTsid) ? '' : ` (${where})`}. Drag it into the room, or click it and then click the room.`,
         ariaLabel: `${row.label}, ${row.total}`,
         describedBy: 'homes-keys-help',
         attrs: { 'data-furniture': row.classTsid, 'data-furniture-style': row.style ?? false },
@@ -4460,7 +4462,8 @@ function placeAtPointer(engine, at) {
       }
       if (result.ok) {
         selected = { kind: 'furniture', id: result.item.id };
-        engine.pushActivity(`You placed a ${pieceLabel(result.item, furnitureDef(placing.classTsid).label)}.`);
+        const placedName = pieceLabel(result.item, furnitureDef(placing.classTsid).label);
+        engine.pushActivity(`You placed ${/^[aeiou]/i.test(placedName) ? 'an' : 'a'} ${placedName}.`);
         if (result.from === 'pack') engine.refreshPack();
       }
     }
@@ -7135,6 +7138,24 @@ export const homesFeature = {
    * G335 (multiplayer): what a ledger correction could not take from the pack comes out of the
    * house, as the site took it out of the stored save (js/ledger-house.js); answers what it took.
    */
+  /**
+   * Trophies standing in the house, on every floor, for the Humble Bragger (locations/home.js 46-50
+   * and trophy_base verbs.drop 94-98 count the home's interior and exterior, not the Tower).
+   */
+  homeTrophiesPlaced() {
+    return placedTrophies([houseDecor, ...(floors.upper || [])]);
+  },
+
+  /** How many of a class the home holds, in furniture storage and standing anywhere in it. */
+  homeFurnitureHeld(classTsid) {
+    const cls = String(classTsid || '');
+    let n = Math.max(0, Math.floor(Number(houseDecor.storage?.[cls]) || 0));
+    for (const room of [houseDecor, ...(floors.upper || []), ...towerDecor]) {
+      for (const row of Array.isArray(room?.placed) ? room.placed : []) if (row?.classTsid === cls) n += 1;
+    }
+    return n;
+  },
+
   ledgerTakeBack(want, engine) {
     // Ticket 51: a cabinet taken away leaves what was in it in the pack, as the site's remove does.
     const spill = {};

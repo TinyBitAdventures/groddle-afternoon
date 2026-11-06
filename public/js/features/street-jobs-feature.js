@@ -628,6 +628,9 @@ function grantFinishedTrophies(engine) {
   const plans = planStreetTrophies(state, engine.unlockedAchievements, (cls) => countItem(engine.inv, cls));
   for (const plan of plans) {
     state.trophiesGranted.push(plan.family);
+    // Guard (report 99): one trophy a class. A save holding it, in the pack or at home, with no record of
+    // giving it is only recorded: it keeps its pieces and gets no second.
+    if (countItem(engine.inv, plan.trophy) + (Number(engine.query?.('homeFurnitureHeld', plan.trophy)) || 0) > 0) continue;
     for (const cls of plan.take) removeItem(engine.inv, cls, 1);
     grantItems(engine, [{ classTsid: plan.trophy, count: 1 }]);
     const name = itemLabel(plan.trophy);

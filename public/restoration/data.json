@@ -2732,9 +2732,24 @@
   "deployed": "2026-11-06"
  },
  "git": {
-  "commits": 1388,
+  "commits": 1391,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-06",
+    "kind": "new",
+    "text": "Trophies can be found in the Furniture tab and displayed in your house"
+   },
+   {
+    "date": "2026-11-06",
+    "kind": "fix",
+    "text": "Smash and Shake count each Elemental Pouch on its own, so a full pouch no longer blocks the one beside it"
+   },
+   {
+    "date": "2026-11-06",
+    "kind": "improve",
+    "text": "Firozi, Folivoria, Groddle Heights, Haoma and Haraiva have new map paintings, repainted from Tiny Speck's thumbnails of the lost originals"
+   },
    {
     "date": "2026-11-06",
     "kind": "new",
@@ -2839,24 +2854,9 @@
     "date": "2026-11-06",
     "kind": "fix",
     "text": "The Hoe has Aggressive Hoeing on and off, as in the original"
-   },
-   {
-    "date": "2026-11-06",
-    "kind": "improve",
-    "text": "Callopee has a new map painting, repainted from Tiny Speck's thumbnail of the lost original"
-   },
-   {
-    "date": "2026-11-06",
-    "kind": "improve",
-    "text": "Baqala, Besara, Bortola and Brillah have new map paintings, repainted from Tiny Speck's thumbnails of the lost originals"
-   },
-   {
-    "date": "2026-11-06",
-    "kind": "fix",
-    "text": "A recipe opened from far down the Make list opens at its top, with Back in view, and Back returns to your place"
    }
   ]
  },
- "tests": 701,
+ "tests": 702,
  "generatedAt": "2026-11-06"
 }

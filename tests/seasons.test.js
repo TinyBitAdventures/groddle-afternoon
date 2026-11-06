@@ -290,8 +290,8 @@ describe('Egg Hunt and Pi Day', () => {
   });
 
   it('counts each egg into the collection however it arrives, then gives the trophy for them (seasons-feature)', async () => {
-    const { seasonsFeature } = await import('../public/js/features/seasons-feature.js?v=b8deb040');
-    const { createInventory, addItem, countItem } = await import('../public/js/inventory.js?v=d82f3b00');
+    const { seasonsFeature } = await import('../public/js/features/seasons-feature.js?v=a24deb33');
+    const { createInventory, addItem, countItem, removeItem } = await import('../public/js/inventory.js?v=d82f3b00');
     const unlocked = [];
     const counted = {};
     const inv = createInventory();
@@ -328,6 +328,16 @@ describe('Egg Hunt and Pi Day', () => {
     tick();
     assert.equal(countItem(inv, 'trophy_egghunt'), 1, 'once');
     seasonsFeature._reset();
+    // Report 99, a guard: the badge and the trophy at home, no record of giving it: recorded, no second, the eggs stay.
+    seasonsFeature.restore({}, null);
+    engine.query = (hook, cls) => (hook === 'homeFurnitureHeld' && cls === 'trophy_egghunt' ? 1 : 0);
+    removeItem(inv, 'trophy_egghunt', 1);
+    const eggs = EGG_CLASSES.map((cls) => countItem(inv, cls));
+    tick();
+    assert.equal(countItem(inv, 'trophy_egghunt'), 0);
+    assert.deepEqual(EGG_CLASSES.map((cls) => countItem(inv, cls)), eggs);
+    assert.equal(seasonsFeature.save().trophyGiven, true);
+    seasonsFeature._reset();
   });
 
   it('estimates the first six digits for sure, then fades out (pi.js estimateDigit)', () => {
@@ -350,7 +360,7 @@ describe('supply paths', () => {
 
 describe('a ?season= preview leaves the save alone (G342)', () => {
   it('a carved pumpkin survives previewing another season, and the save still remembers Zilloween', async () => {
-    const { seasonsFeature } = await import('../public/js/features/seasons-feature.js?v=b8deb040');
+    const { seasonsFeature } = await import('../public/js/features/seasons-feature.js?v=a24deb33');
     const { createInventory, addItem, countItem } = await import('../public/js/inventory.js?v=d82f3b00');
     const inv = createInventory();
     addItem(inv, 'pumpkin_carved_1', 2);

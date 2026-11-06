@@ -1125,7 +1125,11 @@ function tickEggs(engine, now = Date.now()) {
   eggsOwned = new Set(owned);
   for (const cls of fresh) engine.achievement?.(`in_inventory:${cls}`, 1);
   const plan = planEggTrophy(state, engine.unlockedAchievements, (cls) => countItem(engine.inv, cls));
-  if (plan) {
+  if (plan && countItem(engine.inv, plan.trophy) + (Number(engine.query?.('homeFurnitureHeld', plan.trophy)) || 0) > 0) {
+    // Guard (report 99): one trophy a class. Held in the pack or at home with no record of giving it: recorded, no second.
+    state.trophyGiven = true;
+    engine.save?.();
+  } else if (plan) {
     state.trophyGiven = true;
     for (const cls of plan.take) removeItem(engine.inv, cls, 1);
     addItem(engine.inv, plan.trophy, 1);
