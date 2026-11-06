@@ -65,8 +65,8 @@ describe('the pinned quests card stays in view beside an open side sheet', () =>
     const beside = rules.find((r) => !r.media && /left:\s*max\(var\(--hud-inset\),\s*var\(--inset-l/.test(r.body));
     assert.ok(beside, 'with a sheet open the card sits at left: max(--hud-inset, --inset-l)');
     assert.match(css, /#game-root #quest-pins:not\(\[hidden\]\) \{[^}]*transition:[^}]*left var\(--motion-med\)/, 'it glides across with the sheet');
-    // The buff strip still steps down under the card only with no sheet open (a sheet covers its spot).
-    assert.match(css, /#game-root:not\(\[data-sheet\]\) #quest-pins:not\(\[hidden\]\) ~ #buff-strip/);
+    // The buff strip steps down under the card, sheet or no sheet (report #125: it stands beside the sheet too).
+    assert.match(css, /#game-root #quest-pins:not\(\[hidden\]\) ~ #buff-strip \{ top: calc\(var\(--hud-h\) \+ 6px \+ var\(--quest-pins-h, 0px\)/);
   });
 
   it('the panel shell keeps every side sheet docked left and measures --inset-l from it', () => {

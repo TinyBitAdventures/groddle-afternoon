@@ -12056,12 +12056,46 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
 [data-ui="modern"] #quest-pins .tq-step { display: block; margin-top: 2px; font-size: var(--fs-s); color: var(--text-muted); }
 [data-ui="modern"] #quest-pins .tq-bar { display: block; height: 6px; margin-top: 6px; border-radius: 3px; background: var(--track); overflow: hidden; }
 [data-ui="modern"] #quest-pins .tq-bar i { display: block; height: 100%; background: var(--good); transition: width var(--motion-med) var(--ease-out); }
-/* The buff strip steps down under the tracker. */
-[data-ui="modern"] #game-root:not([data-sheet]) #quest-pins:not([hidden]) ~ #buff-strip { top: calc(var(--hud-h) + 6px + var(--quest-pins-h, 0px) + var(--space-2)); }
+/* The buff strip steps down under the tracker, which stands beside an open sheet too (above). */
+[data-ui="modern"] #game-root #quest-pins:not([hidden]) ~ #buff-strip { top: calc(var(--hud-h) + 6px + var(--quest-pins-h, 0px) + var(--space-2)); }
+/* Report #125: an open side sheet (Make, a grinder's window, Quests ...) covered the strip, so a running
+   buff could not be watched. It stands beside the sheet as the tracker does, and wraps in the width left. */
+[data-ui="modern"] #game-root #buff-strip { transition: opacity 0.2s ease, left var(--motion-med) var(--ease-out); }
+[data-ui="modern"] #game-root[data-sheet] #buff-strip {
+  left: max(var(--hud-inset), var(--inset-l, 0px));
+  max-width: calc(100% - max(var(--hud-inset), var(--inset-l, 0px)) - var(--inset-r, 0px) - var(--hud-inset));
+  flex-wrap: wrap;
+}
 @media (max-width: 760px) {
   [data-ui="modern"] #game-root #quest-pins:not([hidden]) { top: calc(2 * var(--hud-h) + var(--space-4)); }
   [data-ui="modern"] #game-root[data-sheet] #quest-pins { opacity: 0; visibility: hidden; transform: translateX(-8px); pointer-events: none; }
   [data-ui="modern"] #game-root:not([data-sheet]) #quest-pins:not([hidden]) ~ #buff-strip { top: calc(2 * var(--hud-h) + var(--space-4) + var(--quest-pins-h, 0px) + var(--space-2)); }
+  /* The tracker hides beside a sheet at this width (above), so the strip has no one to step under. */
+  [data-ui="modern"] #game-root[data-sheet] #quest-pins:not([hidden]) ~ #buff-strip { top: calc(2 * var(--hud-h) + var(--space-4)); }
+}
+/* A phone: a 320 px sheet leaves one narrow column. The chips stack there, icon over time, under the
+   Social rail; on a phone too narrow for even that they stay over the sheet's edge, in sight. */
+@media (max-width: 560px) {
+  [data-ui="modern"] #game-root[data-sheet] #buff-strip,
+  [data-ui="modern"] #game-root[data-sheet] #quest-pins:not([hidden]) ~ #buff-strip {
+    z-index: calc(var(--z-panel) + 1);
+    top: calc(2 * var(--hud-h) + var(--space-4) + 56px);
+    left: min(var(--inset-l, 0px), calc(100% - 50px));
+    width: 46px;
+    max-width: none;
+    flex-direction: column;
+    flex-wrap: nowrap;
+  }
+  [data-ui="modern"] #game-root[data-sheet] #buff-strip .buff-chip {
+    flex-direction: column;
+    justify-content: center;
+    gap: 1px;
+    min-width: 0;
+    width: 46px;
+    height: 50px;
+    padding: 2px;
+    border-radius: 14px;
+  }
 }
 /* PINMENU (js/ui/quest-pin-menu.js): a pinned row's menu (right-click, Shift+F10, a long press):
    Unpin and Open in Quests in the verb menu's card and rows, beside the tracker or at the pointer.
