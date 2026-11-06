@@ -112,7 +112,8 @@ describe('site colour theme', () => {
 
   it('the Minn theme draws the same button and loads the script', { skip: skipWithoutSite }, () => {
     assert.ok(readFileSync(sitePath('src', 'SiteNav.php'), 'utf8').includes('<button class="site-nav-theme" type="button" aria-label="Colour theme"></button>'));
-    assert.ok(readFileSync(sitePath('src', 'Extension.php'), 'utf8').includes('<script src="/site/theme.js"></script>'));
+    // Keyed by its content (report 95, tests/site-stylesheet-keys.test.js).
+    assert.ok(readFileSync(sitePath('src', 'Extension.php'), 'utf8').includes(`'<script src="' . self::keyed('/site/theme.js') . '"></script>'`));
   });
 
   it('keeps one site-wide choice (light, dark, system) and reads the old compare-page setting', () => {
