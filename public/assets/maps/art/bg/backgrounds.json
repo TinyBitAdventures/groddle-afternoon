@@ -148,10 +148,11 @@
       "thumbMatches": true,
       "x1": "assets/maps/art/bg/groddleheights.webp",
       "x2": "assets/maps/art/bg/groddleheights@2x.webp",
-      "x1Bytes": 11262,
-      "x1Sha256": "959a0d01c433f501f8387b2a637d290c10bbbea6ac00f6c2c58bb7bfddac7b2f",
-      "x2Bytes": 23442,
-      "x2Sha256": "5f70aa2dd75c1fe5d70187fb304ea06f794b610a4150bd56b1ea3d36225249d1"
+      "repainted": "tools/provenance/repainted-maps.json",
+      "x1Bytes": 25944,
+      "x1Sha256": "b4002bc80e983774cfb4eb945b764af8991bca3a6de05fdb4ddb53c7bf6a5ded",
+      "x2Bytes": 83588,
+      "x2Sha256": "c2be8d9dd2630f6900f608bc5d77a13a241a1cd1f5290248b6f3654abe94fa1f"
     },
     "71": {
       "hubName": "Jethimadh",
@@ -563,10 +564,11 @@
       "thumbMatches": true,
       "x1": "assets/maps/art/bg/firozi.webp",
       "x2": "assets/maps/art/bg/firozi@2x.webp",
-      "x1Bytes": 11008,
-      "x1Sha256": "b8ed895d6e8710e5304b575cca3f5b134a6b7bda67a0fe547739791751c4df96",
-      "x2Bytes": 22732,
-      "x2Sha256": "c0eb55e8634395ccc85fd1802e23b83820d59b0e88836daf2c6c84fb64e1f3cb"
+      "repainted": "tools/provenance/repainted-maps.json",
+      "x1Bytes": 35992,
+      "x1Sha256": "e4fc1741e71e6a7bc7dcae10b0dd3fd24b5ea5aa28c6c5bab8eac2e66303fd3f",
+      "x2Bytes": 130116,
+      "x2Sha256": "581ed28a3470e61c16bf2310dbadd304499503f9b0f58610266c5626552281ec"
     },
     "116": {
       "hubName": "Haraiva",
@@ -578,10 +580,11 @@
       "thumbMatches": true,
       "x1": "assets/maps/art/bg/haraiva.webp",
       "x2": "assets/maps/art/bg/haraiva@2x.webp",
-      "x1Bytes": 10258,
-      "x1Sha256": "c64cb5fc8a69ac9fbdf6e8ab69eb5acf8f4e0ef3eb25cfceea1b9957fc1d7379",
-      "x2Bytes": 20898,
-      "x2Sha256": "7a585fd33f1610a01232f86ff182e956a5d79a636e45c98a561c47971a69acea"
+      "repainted": "tools/provenance/repainted-maps.json",
+      "x1Bytes": 35402,
+      "x1Sha256": "8d782c34e74e43d0a398d05381a511aa7d4c72c921942b10f1137797e5178e1c",
+      "x2Bytes": 103874,
+      "x2Sha256": "8bf003eba34e2066f4db95247e2a758ba6334664c52869fa4de3fcefd3560ddc"
     },
     "119": {
       "hubName": "Folivoria",
@@ -593,10 +596,11 @@
       "thumbMatches": true,
       "x1": "assets/maps/art/bg/folivoria.webp",
       "x2": "assets/maps/art/bg/folivoria@2x.webp",
-      "x1Bytes": 12538,
-      "x1Sha256": "51f919d1034a05679f6e668c43283bbbcb37de08d91fb69bec1c497ea3ea307f",
-      "x2Bytes": 25606,
-      "x2Sha256": "54f2828a0497fb84e7ac832fcec01b8ec98758d579e6699fd011a2e92a0e168f"
+      "repainted": "tools/provenance/repainted-maps.json",
+      "x1Bytes": 30986,
+      "x1Sha256": "676c862c5f969d0061e415a7b86c91b840b09b7544adbab70b734a64b295a36d",
+      "x2Bytes": 105194,
+      "x2Sha256": "731f832737dc4a04a649704d785658f4938d67d171d85689810397acf68bd594"
     },
     "120": {
       "hubName": "Cauda",
@@ -686,10 +690,11 @@
       "thumbMatches": true,
       "x1": "assets/maps/art/bg/haoma.webp",
       "x2": "assets/maps/art/bg/haoma@2x.webp",
-      "x1Bytes": 18004,
-      "x1Sha256": "a25a095f59fe943705d4646833dad2aec9df11dc1c5e4617e0b84e8f2d929d90",
-      "x2Bytes": 39472,
-      "x2Sha256": "f6eac9b9f8bc422e971a78add91a0af0f64f5348d3b52320cce0341a667ee396"
+      "repainted": "tools/provenance/repainted-maps.json",
+      "x1Bytes": 59832,
+      "x1Sha256": "5f5d1c06923104bf44e1adf1aad9d843ae724b44535377f79aae6f27a085bc8d",
+      "x2Bytes": 167820,
+      "x2Sha256": "291aa1c076dbcc98f4d92cf6d2bfe65ea5eb9cb1ad7ebe0042b85f8832b02aa5"
     },
     "133": {
       "hubName": "Kloro",

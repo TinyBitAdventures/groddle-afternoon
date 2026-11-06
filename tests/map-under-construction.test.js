@@ -9,7 +9,7 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { renderHubMapSvg } from '../public/js/map-graph.js?v=040bbe07';
+import { renderHubMapSvg } from '../public/js/map-graph.js?v=f181bdc8';
 
 const root = join(import.meta.dirname, '..');
 const street = (tsid, name, extra = {}) => ({ tsid, name, label: name, loaded: true, loadedTsid: tsid, x1: 100, y1: 100, x2: 300, y2: 120, mx: 200, my: 110, ...extra });
