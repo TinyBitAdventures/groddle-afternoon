@@ -29,6 +29,10 @@
  *   reason in a race, a timed quest room or a Paradise course (Leave), dead in
  *   Hell (the grapes), or busy. Online it is a move on the same street like any
  *   step: the realtime server shares it as it shares every move (hub.go "move").
+ *   G528: the first time you stand 12 s on a floor a plain jump can't leave
+ *   (js/street-traps-data.js, by your jump), a one-time hint names /stuck. The /
+ *   key opens the box without its slash, so a line that is only a command's name
+ *   typed in a box it opened runs that command (js/slash-commands.js bareCommand).
  * - /tp: the administrators' teleport (js/admin-teleport.js, v0.2.2), multiplayer
  *   only; the site's admin/teleport route decides who may, and anyone else sees
  *   the ordinary Unknown command line. Solo says /tp is not available.
@@ -50,7 +54,8 @@ import { BUTLER_STRINGS } from '../butler.js?v=2bafa110';
 import { butlerApi } from './butler-feature.js?v=2c403c36';
 import { hellFeature } from './hell-feature.js?v=13196575';
 import { towerApi } from './home-tower-feature.js?v=c854a072';
-import { COMMAND_HELP_INTRO, STUCK_COOLDOWN_MS, STUCK_TEXT, commandHelpLines, commandHint, isCommandHelp, misplacedCommand, slashPlan, unknownLine } from '../slash-commands.js?v=98c2238a';
+import { platformYAt, platformsScreen } from '../street-model.js?v=505d8990';
+import { COMMAND_HELP_INTRO, STUCK_COOLDOWN_MS, STUCK_TEXT, bareCommand, commandHelpLines, commandHint, isCommandHelp, misplacedCommand, slashPlan, unknownLine } from '../slash-commands.js?v=02bedb12';
 import { parseTp, runTeleportCommand, TP_TEXT } from '../admin-teleport.js?v=fa56e8df';
 import { minnUrls } from '../minn-account.js?v=7bc19312';
 import { saveStore } from '../save-store.js?v=8839ba7b';
@@ -61,6 +66,16 @@ export const SLASH_COMMANDS_FEATURE_ID = 'slash-commands';
 let used = { house: false, tower: false };
 /** When /stuck last moved you (ms since epoch), for its 5 minute cooldown. */
 let stuckAt = 0;
+/** G528: seconds on a trap floor before /stuck's one hint, and how often the feet are checked. */
+export const STUCK_HINT_DWELL_MS = 12000;
+const TRAP_CHECK_MS = 500;
+/** The hint has been shown (once a character, saved). */
+let stuckHinted = false;
+/** This street's trap floors, screen space, each with `trapJump` (js/street-traps-data.js). */
+let trapLines = [];
+let trapStreet = null;
+let trapMs = 0;
+let trapCheckAt = 0;
 /** Tests replace the clock. */
 let now = () => Date.now();
 let last = '';
@@ -117,6 +132,54 @@ export function showLocalLines(engine, lines, where = engine.social?.showing) {
   if (engine.notify?.log) engine.notify.log(lines.join(' '), { kind: 'help', html });
   else for (const l of lines) engine.pushActivity?.(l);
   return 'activity';
+}
+
+/** PURE: a street's trap floors, screen space, each with the highest jump it traps at. */
+export function trapLinesOn(street, traps) {
+  const row = street?.tsid && traps && (traps[street.tsid] || traps[`G${String(street.tsid).slice(1)}`]);
+  if (!row || !Array.isArray(street.platforms)) return [];
+  return platformsScreen(street).filter((p) => row[p.id] != null).map((p) => ({ ...p, trapJump: row[p.id] }));
+}
+
+/** PURE: standing on a floor that traps this jump. */
+export function onTrapFloor(lines, player, jump = 1) {
+  if (!player?.onGround) return false;
+  return lines.some((p) => {
+    if (jump > p.trapJump + 1e-6) return false;
+    const y = platformYAt(p, player.x);
+    return y != null && Math.abs(y - player.y) <= 8;
+  });
+}
+
+/**
+ * The trap floors' list, loaded the first time it's asked for (70 KB, no use once the hint has
+ * shown). A failed load costs only the hint.
+ */
+let trapData = null;
+function loadTraps() {
+  trapData ||= import('../street-traps-data.js?v=1ac4d01b').then((m) => m.STREET_TRAPS).catch(() => null);
+  return trapData;
+}
+
+/** One hint, once a character, after a while on a floor you can't jump off and only when /stuck would move you. */
+function stuckHintTick(engine) {
+  const t = now();
+  const gap = trapCheckAt ? Math.min(TRAP_CHECK_MS * 4, t - trapCheckAt) : 0;
+  if (trapCheckAt && gap < TRAP_CHECK_MS) return;
+  trapCheckAt = t;
+  if (!engine.started || engine.busy?.()) return;
+  if (!onTrapFloor(trapLines, engine.player, engine.movementBuff?.()?.jump ?? 1)) return;
+  trapMs += gap;
+  if (trapMs < STUCK_HINT_DWELL_MS) return;
+  if (slashPlan('/stuck', slashContext(engine))?.stuck !== 'arrival') return;
+  stuckHinted = true;
+  trapLines = [];
+  lastLine = STUCK_TEXT.hint;
+  engine.pushActivity?.(STUCK_TEXT.hint);
+  engine.toast?.(STUCK_TEXT.hint, 8000);
+  last = '/stuck:hint';
+  publish(engine);
+  engine.save?.();
 }
 
 /** /stuck's move: the street's arrival, or the door at home. */
@@ -254,12 +317,40 @@ export function runSlashCommand(engine, text) {
  */
 let engineRef = null;
 let hintBound = false;
+/** G528: the chat box was opened by the / key and nothing has been typed elsewhere since (bareCommand). */
+let slashOpened = false;
+const CHAT_INPUT = 'local-chat-input';
+
+/** The / key, outside any field: after the drawer's own handler has run, did it open the box? */
+function onSlashKey(e) {
+  if (e?.key !== '/' || e.ctrlKey || e.metaKey || e.altKey) return;
+  if (e.target?.matches?.('input, textarea, select, [contenteditable="true"]')) return;
+  setTimeout(() => {
+    const box = globalThis.document?.getElementById(CHAT_INPUT);
+    slashOpened = Boolean(box) && globalThis.document.activeElement === box && !box.value.trim();
+  }, 0);
+}
+
+function onChatBlur(e) {
+  if (e?.target?.id === CHAT_INPUT) slashOpened = false;
+}
 /** The hint waits this long, so it lands after your own line (a channel's comes back from the server). */
 export const HINT_DELAY_MS = 500;
 function onChatSubmit(e) {
   const engine = engineRef;
   if (!engine?.started || e?.target?.id !== 'local-chat-form') return;
-  const cmd = misplacedCommand(globalThis.document?.getElementById('local-chat-input')?.value);
+  const box = globalThis.document?.getElementById(CHAT_INPUT);
+  if (slashOpened) {
+    slashOpened = false;
+    const bare = bareCommand(box?.value);
+    if (bare) {
+      box.value = bare;
+      last = `slash-key:${bare}`;
+      publish(engine);
+      return;
+    }
+  }
+  const cmd = misplacedCommand(box?.value);
   if (!cmd) return;
   const where = engine.social?.showing;
   setTimeout(() => {
@@ -277,12 +368,40 @@ export const slashCommandsFeature = {
     engineRef = engine;
     if (!hintBound && typeof document !== 'undefined') {
       document.addEventListener('submit', onChatSubmit, true);
+      document.addEventListener('keydown', onSlashKey, true);
+      document.addEventListener('focusout', onChatBlur, true);
       hintBound = true;
     }
   },
 
   /** Tests: the hint's submit handler. */
   _onChatSubmit: (e) => onChatSubmit(e),
+
+  /** Tests: the / key's handlers. */
+  _onSlashKey: (e) => onSlashKey(e),
+  _onChatBlur: (e) => onChatBlur(e),
+
+  onStreetEnter(street) {
+    trapLines = [];
+    trapMs = 0;
+    trapCheckAt = 0;
+    if (stuckHinted || !street?.tsid) return undefined;
+    trapStreet = street;
+    return loadTraps().then((traps) => {
+      if (trapStreet === street && !stuckHinted) trapLines = trapLinesOn(street, traps);
+    });
+  },
+
+  onStreetClear() {
+    trapStreet = null;
+    trapLines = [];
+    trapMs = 0;
+    trapCheckAt = 0;
+  },
+
+  onTick(_dtMs, _now, engine) {
+    if (trapLines.length && !stuckHinted) stuckHintTick(engine);
+  },
 
   /** game.js local chat: main.js doChatCommand, the commands a player can use. */
   chatCommand(text, engine) {
@@ -299,13 +418,14 @@ export const slashCommandsFeature = {
   },
 
   save() {
-    return { version: 1, usedHouse: used.house, usedTower: used.tower, ...(stuckAt ? { stuckAt } : {}) };
+    return { version: 1, usedHouse: used.house, usedTower: used.tower, ...(stuckAt ? { stuckAt } : {}), ...(stuckHinted ? { stuckHinted: true } : {}) };
   },
 
   restore(slice) {
     used = { house: slice?.usedHouse === true, tower: slice?.usedTower === true };
     const at = Math.floor(Number(slice?.stuckAt));
     stuckAt = Number.isFinite(at) && at > 0 ? Math.min(at, now()) : 0;
+    stuckHinted = slice?.stuckHinted === true;
   },
 
   /** butler_hints.js:382, :392: has the player used /house or /tower yet. */
@@ -325,11 +445,16 @@ export const slashCommandsFeature = {
 
   /** Tests. */
   _state() {
-    return { used: { ...used }, last, lastLine, stuckAt };
+    return { used: { ...used }, last, lastLine, stuckAt, stuckHinted, trapMs };
   },
   _reset() {
     used = { house: false, tower: false };
     stuckAt = 0;
+    stuckHinted = false;
+    slashOpened = false;
+    trapLines = [];
+    trapMs = 0;
+    trapCheckAt = 0;
     last = '';
     lastLine = '';
   },

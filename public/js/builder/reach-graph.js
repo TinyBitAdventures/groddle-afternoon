@@ -586,13 +586,20 @@ export function buildReachGraph(street, opts = {}) {
     const L = g.node(wall.x, wall.yBot, -1, 'l');
     ladders.push({ id: wall.id, node: L, wall });
     // Grab it: Up or Down within 28 px across, between 28 px over its top and 64 px under its foot.
+    // opts.jumpGrab (tools/ecology/build-street-traps.mjs, G528): further under its foot, Up jumps
+    // (the same key) and takes the ladder from the air once the feet are in that 64 px. Piene
+    // Question's two ladders stand 82 px over their floor, built for the client's reach (its query
+    // is the avatar's whole body, AvatarPhysicsHandler.as areaQuery 490-520). Off by default: the
+    // shipped placement data (build-unreached-floors.mjs) is built without it.
     for (const p of world.gcol(wall.x)) {
       const i = p.index;
       const ln = lineNodes[i];
       if (!ln) continue;
       for (let k = 0; k < ln.count; k += 1) {
         const n = ln.first + k;
-        if (Math.abs(g.x[n] - wall.x) < 28 && g.y[n] >= wall.yTop - 28 && g.y[n] <= wall.yBot + 64) g.edge(n, L, Infinity, opts.keepSpecs ? { kind: 'mount', ladder: wall.id, x: wall.x } : null);
+        if (Math.abs(g.x[n] - wall.x) >= 28 || g.y[n] < wall.yTop - 28) continue;
+        const grabY = wall.yBot + 64;
+        if (g.y[n] <= grabY || (opts.jumpGrab && jumpArc(world, { x: g.x[n], y: g.y[n] }).minY <= grabY)) g.edge(n, L, Infinity, opts.keepSpecs ? { kind: 'mount', ladder: wall.id, x: wall.x } : null);
       }
     }
     const deck = ladderTopDeck(world.col(wall.x), wall.x, wall.yTop + 4, wall.yBot);

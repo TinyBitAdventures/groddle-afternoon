@@ -13,7 +13,7 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { reachStreet, streetBuff } from '../public/js/builder/reach-graph.js?v=7a0078a2';
+import { reachStreet, streetBuff } from '../public/js/builder/reach-graph.js?v=b8634e9a';
 import { CAVE_PIT_TELEPORTERS, LEVEL_3_WEST_TELEPORTER, LEVEL_3_WEST_TSID, cavePitTeleportersOn } from '../public/js/cave-pit.js?v=81e62950';
 import { inTeleporter } from '../public/js/hidden-floors.js?v=d49b76df';
 import { hiddenFloorsFeature } from '../public/js/features/hidden-floors-feature.js?v=37f51085';

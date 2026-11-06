@@ -17,7 +17,7 @@ import { join } from 'node:path';
 import { SIGN_ARMS, doorToward, findRoute, isRide, planRoute, createRouteState, routeGraph, signpostToward, subwayRides } from '../public/js/map-routes.js?v=e0ac88c0';
 import { SUBWAY_STREETS, closedStreets, initializeStreetJobs, normalizeStreetJobState } from '../public/js/street-jobs.js?v=02a81cb3';
 import { stationByTsid } from '../public/js/subway.js?v=44d1a09f';
-import { reachRoutes, reachStreet } from '../public/js/builder/reach-graph.js?v=7a0078a2';
+import { reachRoutes, reachStreet } from '../public/js/builder/reach-graph.js?v=b8634e9a';
 import { applyWorld } from '../public/js/street-jobs-mp.js?v=c920dbb9';
 import { SIGN_MAX_ARMS } from '../public/js/street-render.js?v=9349c0e5';
 import { obtainableItems } from '../tools/job-obtainable.mjs';

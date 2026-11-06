@@ -72,6 +72,8 @@ export const STUCK_TEXT = Object.freeze({
   doneHome: "You're back at the door.",
   leave: "/stuck doesn't work here. Use Leave to get out.",
   dead: "You are dead. Squish Hellish Grapes to get out of Naraka.",
+  /** G528: once, on a floor a plain jump doesn't get off. */
+  hint: "Can't get back up? Type /stuck in chat to go back to where you arrived on this street.",
   /** The cooldown's time left, in whole minutes (seconds under one). */
   wait: (ms) => {
     const s = Math.max(1, Math.ceil(ms / 1000));
@@ -152,6 +154,18 @@ export function misplacedCommand(text) {
   if (!t || t.startsWith('/') || t.includes('://')) return '';
   const m = /(\/[a-z]+)[.!?]*$/.exec(t);
   return m && COMMAND_HELP.some(([cmd]) => cmd === m[1]) ? m[1] : '';
+}
+
+/**
+ * G528: a line typed into a box the / key opened. The key opens the box without its slash here
+ * (js/ui/social-drawer.js), so "/stuck" comes out as the word "stuck" and goes to the street. A
+ * line that is only a listed command's name is that command, in its slash form; anything else
+ * stays chat, so / keeps working as the chat key. The client left the slash in the box instead
+ * (RightSideView.as 130-132), which would turn every chat line typed after / into a command.
+ */
+export function bareCommand(text) {
+  const t = `/${String(text || '').trim().toLowerCase()}`;
+  return t === '/help' || COMMAND_HELP.some(([cmd]) => cmd === t) ? t : '';
 }
 
 /** main.js:1844: words = txt.split(" "). */

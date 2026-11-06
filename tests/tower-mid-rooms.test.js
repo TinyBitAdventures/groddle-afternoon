@@ -34,7 +34,7 @@ import {
 import { greet, greeterAction, midTowerFeature } from '../public/js/features/mid-tower-feature.js?v=1715bfc7';
 import { towerRoomsFeature } from '../public/js/features/tower-rooms-feature.js?v=7b886c5d';
 import { populationForStreet } from '../public/js/street-ecology.js?v=e2bdb20c';
-import { reachStreet } from '../public/js/builder/reach-graph.js?v=7a0078a2';
+import { reachStreet } from '../public/js/builder/reach-graph.js?v=b8634e9a';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const streets = join(spike, 'public/assets/streets');

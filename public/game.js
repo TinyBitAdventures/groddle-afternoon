@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=628c01d0';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=127e0a3c';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=fd7e14d2';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=ca1e18a4';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -957,7 +957,7 @@ import { bindContextTrigger, createContextMenu, isContextMenuKey as isMenuKey, M
 import { bindCountField, countKeyValue, countStepMarkup, typedCount } from './js/ui/count-chooser.js?v=b8361b21';
 import { bindVerbMenu, fitVerbMenuRows, focusVerbRow, lockVerbMenuSize, makePickTile, makeVerbRow, pickGridCols, placeVerbMenu, plainWords, refuseVerbRow, syncVerbDetail, verbMenuKey, verbRowAttrs, verbRowInner, verbRowKeys } from './js/ui/verb-menu.js?v=6cc4df84';
 import { createPromptSettler, promptId } from './js/prompt-settle.js?v=509ba9cc';
-import { clientKeyAction, createHotkeysSheet, isHotkeySheetRelease, isPlainKey } from './js/client-hotkeys.js?v=51814cb2';
+import { clientKeyAction, createHotkeysSheet, isHotkeySheetRelease, isPlainKey } from './js/client-hotkeys.js?v=1d3b39fe';
 import { ENCYCLOPEDIA_MENU_LABEL, createEncyclopedia, isEncyclopediaKey } from './js/encyclopedia-links.js?v=eebc2a5d';
 import { EAT_PICK_TEXT, bestFoodIndex, eatChoices, eatTip } from './js/eat-pick.js?v=8fb763d0';
 import { installHeldKeyGuard, isMacPlatform } from './js/held-keys.js?v=98b96620';
@@ -11818,6 +11818,8 @@ const engine = {
   imaginationHubOpen: () => Boolean(imaginationHub?.isOpen()),
   /** A verb in progress or the verb menu open (both interrupt meditation). */
   acting: () => Boolean(currentAction || menuTarget),
+  /** The movement multipliers in force now (buffs, cards, the street): /stuck's hint asks what jump you have. */
+  movementBuff: () => combinedPhysics(),
   /** A verb in progress on this target, or its verb menu open (npc.js onInteractionStarting: the NPC waits for you). */
   actingOn: (target) => Boolean(target) && (currentAction?.target === target || menuTarget === target),
   /** What the player is at now: the target of the verb in progress, else of the open verb menu. */

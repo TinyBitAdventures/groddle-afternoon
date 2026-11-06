@@ -28,7 +28,7 @@
  *   profiles     assets/content/style-profiles.json, for the STY rules (P5's js/builder/style-rules.js)
  */
 import { compileSchema } from './schema-check.js?v=cc9d1af4';
-import { reachStreet, REACH_LIMITS, TIGHT_MARGIN, LANDING_TRIES, AIR_JUMP_TRIES, LANDING_SHARE, streetBuff } from './reach-graph.js?v=7a0078a2';
+import { reachStreet, REACH_LIMITS, TIGHT_MARGIN, LANDING_TRIES, AIR_JUMP_TRIES, LANDING_SHARE, streetBuff } from './reach-graph.js?v=b8634e9a';
 import { platformsScreen, barriersScreen, isStandable, isSolidFromBelow, isItemFloor, assertStreetGeometry, avatarHeadReach, platformYAt, worldToScreen, streetWidth, streetHeight } from '../street-model.js?v=505d8990';
 import { planStreetPlacements, populationForStreet, streetReservedSpots } from '../street-ecology.js?v=e2bdb20c';
 import { jumpApex } from '../avatar-step.js?v=d48908a5';
