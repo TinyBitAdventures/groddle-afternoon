@@ -8,7 +8,7 @@
  */
 import { afterEach, describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { STUCK_TEXT, bareCommand, slashPlan } from '../public/js/slash-commands.js?v=02bedb12';
@@ -21,8 +21,11 @@ import { validateShippedStreet } from '../public/js/builder/validate.js?v=3201ce
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const LEVEL_3_WEST = 'GLI107JLRU11EM2';
 const PIENE = 'GHVL2NDFT732BK3';
+const HERB_GARDENS = 'GA97L62229522GS';
+const SIMO_STEER = 'GIF113PVOQU1UE5';
 const street = (tsid) => JSON.parse(readFileSync(join(root, 'public/assets/streets', `${tsid}.json`), 'utf8'));
 const AWAY = { owned: true, inHome: false, room: 'street' };
+const xmlDir = join(root, '../streets/mnt/stos/location_data');
 
 function fakeEngine(over = {}) {
   const log = [];
@@ -110,6 +113,60 @@ describe('/stuck hint: the floors it knows', () => {
     const src = readFileSync(join(root, 'public/js/features/slash-commands-feature.js'), 'utf8');
     assert.doesNotMatch(src, /^import [^;]*street-traps-data/m);
     assert.match(src, /import\('\.\.\/street-traps-data\.js/);
+  });
+
+  // Jethimadh (2026-11-07, a player stuck "in these dino bowels", then saved on Simo Steer): the
+  // hub's geometry is Tiny Speck's to the line (2,321 platforms, every ladder, wall and door as in
+  // glitch-locations), and the reach graph finds one trap in it, Herb Gardens' west floor.
+  it('Jethimadh: Herb Gardens\' west floor traps a new character, and no other street in the hub traps anyone', () => {
+    const index = JSON.parse(readFileSync(join(root, 'public/assets/streets/index.json'), 'utf8')).streets;
+    const hub = Object.keys(index).filter((t) => index[t].hubName === 'Jethimadh');
+    assert.equal(hub.length, 33);
+    assert.deepEqual(hub.filter((t) => STREET_TRAPS[t]), [HERB_GARDENS]);
+    const row = STREET_TRAPS[HERB_GARDENS];
+    assert.equal(Object.keys(row).length, 13, 'the floor from the west end to the wall under the walkway');
+    assert.ok(Object.values(row).every((j) => j === 0.7105), 'High Jumper I gets back up');
+    const lines = trapLinesOn(street(HERB_GARDENS), STREET_TRAPS);
+    const under = lines.find((p) => p.id === 'plat_1302676320142');
+    const y = (under.y1 + under.y2) / 2;
+    assert.equal(onTrapFloor(lines, { x: (under.x1 + under.x2) / 2, y, onGround: true }, 0.7105), true);
+    assert.equal(onTrapFloor(lines, { x: (under.x1 + under.x2) / 2, y, onGround: true }, 0.907), false);
+  });
+
+  it('Jethimadh: the generator gets Herb Gardens from its two arrivals, and finds nothing on Simo Steer from its five', () => {
+    const into = (tsid, from) => from.flatMap((t) => street(t).signposts.flatMap((post) => post.connects || [])
+      .filter((c) => c.tsid?.slice(1) === tsid.slice(1) && !c.hidden).map((c) => ({ ...c.arrive, from: t })));
+    const herb = into(HERB_GARDENS, ['GIF102S56SV16TJ', 'GIF15S7VPRV1DIP']);
+    assert.equal(herb.length, 2);
+    assert.deepEqual(trapLinesOf(street(HERB_GARDENS), herb), STREET_TRAPS[HERB_GARDENS]);
+    const simo = into(SIMO_STEER, ['GIF126GSMBU1V2Q', 'GIF1AUQNSDU1UFL', 'GIF1GTHPO9V14NG', 'GIFGR4QG5IV1QPI', 'GIFMOLVTLHV1RAR']);
+    assert.equal(simo.length, 5);
+    assert.equal(trapLinesOf(street(SIMO_STEER), simo), null);
+  });
+
+  it('Jethimadh: the trap is Tiny Speck\'s own (no ladder, door, wall or teleporter dropped), so it stays and the hint covers it', { skip: !existsSync(xmlDir) && 'locations dump not beside this worktree' }, () => {
+    const s = street(HERB_GARDENS);
+    const geo = readFileSync(join(xmlDir, `${HERB_GARDENS}.xml`), 'utf8');
+    assert.match(geo, /<object id="ladders">\s*<\/object>/);
+    assert.match(geo, /<object id="doors">\s*<\/object>/);
+    assert.equal(s.ladders, undefined);
+    assert.equal(s.doors, undefined);
+    // Every platform as the source has it: ends and the avatar's permeability.
+    for (const p of s.platforms) {
+      const at = geo.indexOf(`<object id="${p.id}">`);
+      assert.ok(at > 0, p.id);
+      const seg = geo.slice(at, geo.indexOf('<object id="plat_', at + 10) > 0 ? geo.indexOf('<object id="plat_', at + 10) : at + 2000);
+      const end = (k) => { const b = seg.match(new RegExp(`id="${k}">([\\s\\S]*?)</object>`))[1]; return [Number(b.match(/id="x">(-?\d+)/)[1]), Number(b.match(/id="y">(-?\d+)/)[1])]; };
+      const [a, b] = [end('start'), end('end')].sort((m, n) => m[0] - n[0]);
+      assert.deepEqual([p.x1, p.y1, p.x2, p.y2], [...a, ...b], p.id);
+    }
+    assert.equal(s.platforms.length, (geo.match(/<object id="plat_\d+">/g) || []).length);
+    // The three walls, with their x and permeability (wall_1315545660524, pc_perm 0, is open).
+    const walls = geo.match(/<object id="wall_\d+">/g) || [];
+    assert.equal(walls.length, 3);
+    assert.deepEqual(s.barriers.map((w) => [w.id, w.x, w.pc_perm]), [['wall_1302676320139', -266, null], ['wall_1308962454338', 2282, null], ['wall_1315545660524', -1668, 0]]);
+    const items = readFileSync(join(xmlDir, `L${HERB_GARDENS.slice(1)}.xml`), 'utf8');
+    assert.doesNotMatch(items, /Teleporter|Portal|Physics Changer/);
   });
 
   it('asks about feet on the floor and the jump you have now', () => {
