@@ -167,6 +167,8 @@ const SLOTH_TREE_HIDE_MS = 500;
  */
 const ART = 'assets/sprites/newxp/';
 const CARD_ART = 'assets/imagination/cards/';
+/** A first skill's picture: its overlay from glitch-overlays, one frame at 2x (tools/overlays). */
+export const skillPictureUrl = (skill) => `assets/sprites/overlays/newxpchooseskill_${skill.art}_overlay@2x.webp`;
 const HOME_STREET_TSID = 'RH_HOME_EXT';
 const DEFAULT_START = 'GLI2V0UN7RD1T2J'; // Hechey Track (index default)
 
@@ -284,6 +286,9 @@ body:has(.nx-card:not([hidden])) .nx-instr{visibility:hidden}
 .nx-up .nx-up-name{position:absolute;left:4px;right:4px;bottom:4px;padding:7px var(--sp-3);background:color-mix(in srgb, var(--c-black) 30%, transparent);color:var(--text-inverse);font:800 var(--fs-sm) var(--font-round);border-radius:0 0 var(--radius-xs) var(--radius-xs)}
 .nx-up .nx-up-cost{position:absolute;top:7px;right:9px;color:var(--text-inverse);font:800 var(--fs-base) var(--font-round);text-shadow:0 -1px 1.5px color-mix(in srgb, var(--c-black) 55%, transparent)}
 .nx-up.dim{opacity:.38;cursor:default}
+.nx-skill{border:0;padding:0;background:none;cursor:pointer;align-self:flex-end}
+.nx-skill img{display:block}
+.nx-skill:hover img,.nx-skill:focus-visible img{filter:brightness(1.1)}
 .nx-got{max-width:360px;background:var(--surface-bright);color:var(--c-navy-36);border-radius:var(--radius-xl);padding:var(--sp-8) var(--sp-9);box-shadow:var(--shadow-3)}
 .nx-got h3{margin:0 0 var(--sp-3);font-size:var(--fs-2xl)}
 .nx-got p{margin:0 0 var(--sp-6);font-weight:600}
@@ -643,13 +648,14 @@ async function islandUpgradeHand(t, cards) {
   return gotCard(t, pick);
 }
 
-/** magic_rock.js showSkillChooser: three first skills. */
+/** magic_rock.js showSkillChooser (1174-1272): three first skills, Tiny Speck's pictures (G393), which carry their names. */
 async function skillChooser(t) {
   ensureUi();
   rooted = true;
-  const html = FIRST_SKILLS.map((s) => `<button type="button" class="nx-up" data-nx-skill="${s.id}">
-      <img src="${CARD_ART}bg_green.svg" alt=""><img src="${CARD_ART}pattern_skill.svg" alt=""><img src="${CARD_ART}suit_skill.svg" alt="">
-      <img src="${CARD_ART}art_skill_${s.art}.svg" alt=""><span class="nx-up-name">${s.name}</span></button>`).join('');
+  const html = FIRST_SKILLS.map((s) => {
+    const url = skillPictureUrl(s);
+    return `<button type="button" class="nx-skill" data-nx-skill="${s.id}" aria-label="${s.name}"><img src="${url}" srcset="${url} 2x" alt=""></button>`;
+  }).join('');
   ui.card.innerHTML = `<h2>Choose a skill</h2><div class="nx-hand">${html}</div><div>The Magic Rock can give you one skill instantly.</div>`;
   ui.card.hidden = false;
   engineRef.setData('newxpCard', 'skills');
