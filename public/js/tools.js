@@ -5,6 +5,7 @@
  * Tools whose GSJS points_capacity is 0 remain intentionally wear-free.
  */
 
+import { GAME_MODE } from './game-mode.js?v=1ecf2899';
 import { repairGivesMood } from './imagination-effects.js?v=70169933';
 import { energyMax, loseEnergy, metabolicGain, moodMax } from './metabolics.js?v=8504134e';
 import { cleanCopyTagOf } from './copy-tags.js?v=bd75b92e';
@@ -113,6 +114,9 @@ function chargeClasses() {
     potion('potion_rocky_regeneration_solution', 'Rocky Regeneration Solution', 3),
     // potion_rook_balm.js 25 points_capacity 5, 36 points_remaining 5: five pours a tube (rook-attack-feature).
     potion('potion_rook_balm', 'Rook Balm', 5),
+    // random_kindness.js points_capacity 20, can_repair 0: online its Bestow uses a point of it (G432). Solo has no
+    // Bestow and keeps it as it always was, with no meter (GAME_MODE, js/game-mode.js).
+    ...(GAME_MODE === 'multiplayer' ? [['random_kindness', charge('Random Kindness', 20, 'random_kindness.js points_capacity; features/player-verbs-mp-feature.js')]] : []),
     // js/tree-poison.js POTION_USES (potion_tree_poison.js 36, potion_tree_poison_antidote.js 36).
     potion('potion_tree_poison', 'Tree Poison', 5),
     potion('potion_tree_poison_antidote', 'Tree Poison Antidote', 5),

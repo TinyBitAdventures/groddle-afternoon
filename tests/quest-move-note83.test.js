@@ -17,8 +17,8 @@ import { fileURLToPath } from 'node:url';
 import vm from 'node:vm';
 
 import { getQuestCatalog, loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js?v=10b118dd';
-import { QUEST_MOVES_NOTE, questMoveNote, questOfferCard } from '../public/js/quest-offers.js?v=fe9c4298';
-import { QUEST_ROOMS } from '../public/js/quest-rooms/catalog.js?v=9ebeb502';
+import { QUEST_MOVES_NOTE, questMoveNote, questOfferCard } from '../public/js/quest-offers.js?v=5dc6e428';
+import { QUEST_ROOMS } from '../public/js/quest-rooms/catalog.js?v=f9091020';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const PUBLIC = join(ROOT, 'public');

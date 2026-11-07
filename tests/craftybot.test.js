@@ -402,10 +402,10 @@ describe('delivery and wiring', () => {
 
 describe('craftybot feature: the ingredient source and the job menu', async () => {
   // The feature imports these with their browser cache tags; load the same module instances.
-  const { craftybotFeature } = await import('../public/js/features/craftybot-feature.js?v=c8cac67a');
-  const { homesFeature } = await import('../public/js/features/homes-feature.js?v=8b3afefb');
+  const { craftybotFeature } = await import('../public/js/features/craftybot-feature.js?v=e149f3e2');
+  const { homesFeature } = await import('../public/js/features/homes-feature.js?v=a31171ac');
   const cbMod = await import('../public/js/craftybot.js?v=41eacd5d');
-  const making = await import('../public/js/making.js?v=be67495b');
+  const making = await import('../public/js/making.js?v=c9dc233e');
 
   function fakeEngine(extra = {}) {
     return {
@@ -546,7 +546,7 @@ describe('the quantity box follows the count as it is typed', () => {
 // sheet still loading draws nothing until it arrives. The original client had the whole SWF at
 // once, so the bot keeps its frame until the next sheet is in.
 describe('G538: the bot never draws a sheet that is still loading', async () => {
-  const { showClipWhenLoaded } = await import('../public/js/features/craftybot-feature.js?v=c8cac67a');
+  const { showClipWhenLoaded } = await import('../public/js/features/craftybot-feature.js?v=e149f3e2');
   const fakeIo = () => {
     const loaded = new Set();
     const waiting = [];

@@ -15,6 +15,7 @@
  * - Pack verbs that ask whom (requires_target_pc): the Watering Can's Soak
  *   (watering_can.js 273-332) and a Musicblock's Play for (musicblock_*.js
  *   94-252).
+ * - Random Kindness's Bestow (random_kindness.js 274-328): a pack verb that asks whom.
  * - Charades (potion_charades.js 511-552, main.js 1766-1793).
  * - Epic Blowout's "under the influence" (locations/home.js:207).
  *
@@ -30,6 +31,7 @@ export const BEAR = 'emotional_bear';
 export const PLANK = 'plank';
 export const WATERING_CAN = 'watering_can';
 export const CHARADES_POTION = 'potion_charades';
+export const RANDOM_KINDNESS = 'random_kindness';
 export const CHARADES_BUFF = 'charades';
 export const GARLIC_BREATH = 'buff_garlic_breath';
 
@@ -46,6 +48,7 @@ export const PLAYER_VERBS = Object.freeze({
   moon: Object.freeze({ id: 'moon', label: 'Moon', tooltip: 'Moon this player', item: BEAR, upgrade: 'moon', emote: true, sort: 54, energy: 10, need: 10, selfMood: 0, targetMood: 10, overlay: Object.freeze({ anim: 'moon', ms: 6000 }), sound: '', counter: 'players_mooned', source: 'emotional_bear.js:317-385' }),
   splank: Object.freeze({ id: 'splank', label: 'Splank', tooltip: 'Smack someone', item: PLANK, emote: true, sort: 50, energy: 10, need: -1, selfMood: 0, targetMood: 0, overlay: Object.freeze({ anim: 'splank', ms: 10000 }), sound: 'SPLANK', counter: 'players_splanked', source: 'plank.js:30-89' }),
   soak: Object.freeze({ id: 'soak', label: 'Soak', tooltip: 'Soak others with water', item: WATERING_CAN, emote: false, sort: 57, energy: 5, need: -1, selfMood: 5, targetMood: -3, targetEnergy: 5, overlay: null, sound: '', counter: '', source: 'watering_can.js:273-332' }),
+  bestow: Object.freeze({ id: 'bestow', label: 'Bestow', tooltip: "Bestow kindness on another player. It's kind!", item: RANDOM_KINDNESS, emote: false, sort: 56, energy: 0, need: -1, selfMood: 0, targetMood: 0, overlay: null, sound: '', counter: '', source: 'random_kindness.js:274-328' }),
   play_for: Object.freeze({ id: 'play_for', label: 'Play for', tooltip: 'Let someone else listen', item: 'musicblock', emote: false, sort: 53, energy: 2, need: -1, selfMood: 0, targetMood: 2, overlay: null, sound: '', counter: 'musicblocks_played', source: 'musicblock_*.js:94-252' }),
 });
 
@@ -80,6 +83,9 @@ export const VERB_TEXT = Object.freeze({
   gotSplank: (name) => `${name} splanked you!`, // plank.js:77
   gotSoak: (name) => `${name} dumps water all over you. You are soaked!`, // watering_can.js:313
   heard: (block, lines) => `You heard ${block}. ${lines.join(' ')}`, // musicblock 249
+  // random_kindness.js: buildVerbMessage (items/item.js) with self_msgs 302, 309; the target's 301, 308.
+  bestowed: (name, stat, n) => `You bestowed ${name} with a Random Kindness.${stat ? ` They gain ${n} ${stat}.` : ''}`,
+  gotKindness: (name, stat, n) => `${name} bestowed Random Kindness on you. +${n} ${stat}`,
 });
 
 export const CHARADES_TEXT = Object.freeze({
@@ -164,6 +170,8 @@ export function doerSide(verbId, { name = 'them', garlic = false, blockLabel = '
     case 'soak': return { energy: 5, mood: 5, text: VERB_TEXT.soaked(name) };
     // musicblock 228: -2 energy for the player.
     case 'play_for': return { energy: 2, mood: 0, text: VERB_TEXT.playedFor(blockLabel || 'a musicblock', name) };
+    // No cost; the line waits for what landed (verb_landed), the point comes off with the ledger's word.
+    case 'bestow': return { energy: 0, mood: 0, text: '' };
     default: return null;
   }
 }
@@ -190,6 +198,12 @@ export function targetSide(verbId, { from = 'Somebody', garlic = false } = {}) {
     case 'play_for': return { mood: 2, energy: 0, xp: 0, text: '', sound: '', overlay: null };
     default: return null;
   }
+}
+
+/** random_kindness.js 298-311: up to 50 mood if the target's mood is below their energy, otherwise up to 50 energy. */
+export const KINDNESS_AMOUNT = 50;
+export function kindnessStat(pc) {
+  return (Number(pc?.mood) || 0) < (Number(pc?.energy) || 0) ? 'mood' : 'energy';
 }
 
 /**

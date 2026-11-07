@@ -52,7 +52,7 @@ import {
 // G448: an overlay holds its decoded frames only while it plays (holdVectorTexture).
 export { VECTOR_LINGER_MS, VECTOR_MAX_SIDE, VECTOR_OVER_SHEET, holdVectorArt, overlayDensity, vectorArtStats, vectorDensity, vectorFrameSvgs };
 
-export const MORE_MANIFEST_URL = `${OVERLAY_BASE}overlays-more.json?v=g448-2`;
+export const MORE_MANIFEST_URL = `${OVERLAY_BASE}overlays-more.json?v=g432-1`;
 
 /** show_rainbow (players/player.js 3014-3029): pc_overlay, 400 x 400 at the avatar, delta 0, 4 s. */
 export const RAINBOW = Object.freeze({ wh: 400, durationMs: 4000 });
@@ -72,6 +72,7 @@ export const OVERLAY_USES = Object.freeze({
   // G376.
   rainbow_spindoctor: { type: 'pc', ...RAINBOW, dx: 0, dy: 0, loop: false, sound: 'RAINBOW_SPINDOCTOR', src: 'items/npc_spinning_wheel.js 263, 270' },
   rainbow_superdonation: { type: 'pc', ...RAINBOW, dx: 0, dy: 0, loop: false, src: 'items/include/shrines.js 460-461' },
+  rainbow_randomkindness: { type: 'pc', ...RAINBOW, dx: 0, dy: 0, loop: false, sound: 'RAINBOW_RANDOMKINDNESS', src: 'items/random_kindness.js 314, players/player.js 3047-3048' },
   // G373 items/catalog_buffs.js 412-419 (show_rainbow) and items/fox_bait.js 127-138.
   charades_gameover: { type: 'pc', ...RAINBOW, dx: 0, dy: 0, loop: false, src: 'items/catalog_buffs.js 419' },
   fox_bait_ignite: { type: 'pc', wh: 150, durationMs: 4000, dx: 60, dy: -80, faceDx: true, loop: false, locking: true, src: 'items/fox_bait.js 127-138' },

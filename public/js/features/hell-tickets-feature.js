@@ -39,8 +39,8 @@
  */
 
 import { addItem, countItem, removeItem } from '../inventory.js?v=d82f3b00';
-import { OVERLAY_USES, playWindowOverlay } from '../overlays.js?v=e5f37a8d';
-import { acceptOffer, ensureQuestOfferState, markOffered } from '../quest-offers.js?v=fe9c4298';
+import { OVERLAY_USES, playWindowOverlay } from '../overlays.js?v=642adbd0';
+import { acceptOffer, ensureQuestOfferState, markOffered } from '../quest-offers.js?v=5dc6e428';
 import { getQuestCatalog } from '../content-catalogs.js?v=10b118dd';
 import { parseQuestConversation } from '../quests.js?v=c8d9d0a4';
 import { HELL_LOCATION, HELL_QUESTS, isInHell, isInHellOne } from '../hell.js?v=aca145ba';

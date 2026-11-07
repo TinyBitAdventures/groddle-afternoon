@@ -8,9 +8,9 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { closestTarget } from '../public/js/powders.js?v=908929b1';
-import { OVERLAY_USES } from '../public/js/overlays.js?v=e5f37a8d';
-import { powdersFeature } from '../public/js/features/powders-feature.js?v=a1b3bfae';
+import { closestTarget } from '../public/js/powders.js?v=c0a14c95';
+import { OVERLAY_USES } from '../public/js/overlays.js?v=642adbd0';
+import { powdersFeature } from '../public/js/features/powders-feature.js?v=fbc30481';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=10b118dd';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');

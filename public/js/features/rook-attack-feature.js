@@ -109,7 +109,7 @@ import { shrinePrimeBonus } from '../imagination-effects.js?v=70169933';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 import { gainMetabolic, loseEnergy, loseMood } from '../metabolics.js?v=8504134e';
 import { displayTopOf, easeOutBack, itemstackOverlayPoint, playSheetOverlay } from '../overlay-art.js?v=11b6dd7f';
-import { OVERLAY_USES, playOverlay } from '../overlays.js?v=e5f37a8d';
+import { OVERLAY_USES, playOverlay } from '../overlays.js?v=642adbd0';
 import {
   MP_ROOK,
   MP_ROOK_TEXT,
@@ -125,8 +125,8 @@ import {
   syncObjs,
 } from '../rook-mp.js?v=decf0604';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
-import { copyChargesLeft, copyFromLedger, keepsCopies, spendCopyCharge, verbCopy } from '../copy-charges.js?v=157a665b';
-import { migrateClassValue } from '../tools.js?v=689d6594';
+import { copyChargesLeft, copyFromLedger, keepsCopies, spendCopyCharge, verbCopy } from '../copy-charges.js?v=f94ac7c8';
+import { migrateClassValue } from '../tools.js?v=f701b241';
 import { feedZone, placeRookBadge, unionBox } from '../rook-badge-place.js?v=2bb00dfd';
 
 export const ROOK_FEATURE_ID = 'rook-attack';

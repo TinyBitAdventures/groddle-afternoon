@@ -33,14 +33,14 @@ import {
   RESOURCE_DROP_TABLES,
   DUST_TRAP_RARE_KEY_CHANCE,
   DUST_TRAP_DROP_ITEM_DEFS
-} from '../public/js/resource-nodes.js?v=76736039';
+} from '../public/js/resource-nodes.js?v=1c268516';
 import { ITEM_CATALOG } from '../public/js/inventory.js?v=d82f3b00';
 import {
   TOOL_CONDITION_CATALOG,
   createToolConditionState,
   getToolCondition,
   setToolRemaining,
-} from '../public/js/tools.js?v=689d6594';
+} from '../public/js/tools.js?v=f701b241';
 import {
   setStreetEcologyCatalog,
   ecologyForStreet,

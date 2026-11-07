@@ -34,7 +34,7 @@ import {
 } from '../public/js/groups.js?v=4c4c8d76';
 import { createMinnAccount } from '../public/js/minn-account.js?v=b29fae30';
 import { groupsFeature } from '../public/js/features/groups-feature.js?v=49d04974';
-import { FEATURES } from '../public/js/features/index.js?v=5d7b9a72';
+import { FEATURES } from '../public/js/features/index.js?v=54736765';
 import { serverPath, sitePath, skipWithoutServer, skipWithoutSite } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');

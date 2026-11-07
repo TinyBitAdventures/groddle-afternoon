@@ -109,7 +109,7 @@ import {
   COLD_COMFORT_LEAVE_TEXT,
   HOME_TREE_GROWN_TEXT,
   SEED_TO_SCYTHE,
-} from '../quest-offers.js?v=fe9c4298';
+} from '../quest-offers.js?v=5dc6e428';
 import { parseQuestConversation } from '../quests.js?v=c8d9d0a4';
 import { questRequirementText, renderQuestText, withQuestMarkup } from '../quest-text.js?v=7f5d761c';
 import { addItem, removeItem, countItem } from '../inventory.js?v=d82f3b00';

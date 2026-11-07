@@ -45,12 +45,12 @@ import {
   itemVerbsFor,
   runItemVerb,
 } from '../item-verbs.js?v=1e20fa7d';
-import { homesFeature } from './homes-feature.js?v=8b3afefb';
+import { homesFeature } from './homes-feature.js?v=a31171ac';
 import { CROWNS_STREET } from '../game-of-crowns.js?v=e32f35f5';
 import { HOG_HAUL_STREET_ID } from '../hog-haul.js?v=50d2e072';
 import { isRaceSceneTsid } from '../races.js?v=ab22a079';
 import { WINTER_HAVEN_STREET_ID, WINTER_WALK_STREET_ID } from '../winter-walk.js?v=9961c35f';
-import { ROOK_WOODS_STREET_ID } from '../rook-woods.js?v=bf749a71';
+import { ROOK_WOODS_STREET_ID } from '../rook-woods.js?v=237b391c';
 import { questSceneTsid } from '../quest-instance.js?v=f0df88c3';
 
 export const ITEM_VERBS_FEATURE_ID = 'item-verbs';

@@ -74,7 +74,7 @@ const G448_ART = ['overlay_sneezing_powder', 'focusing_orb_laser_beam', 'shrine_
 const SHARP1_MORE = ['trading', 'fox_bait_ignite', 'dice_overlay', 'twelve_sided_die', 'petrified_rock_open_overlay', 'right_arrow', 'crown_game_indicator_you', 'crown_game_indicator_someone_else', 'game_of_crowns_throbber'];
 const SHARP1_ART = ['poisoned', 'rooked', 'amorous_philtre_heart', 'play_glitch'];
 
-const overlays = () => import('../public/js/overlays.js?v=e5f37a8d');
+const overlays = () => import('../public/js/overlays.js?v=642adbd0');
 const flush = async (n = 3) => {
   for (let i = 0; i < n; i += 1) {
     await new Promise((r) => setTimeout(r, 0));
@@ -105,8 +105,8 @@ describe('tools/overlays/build.mjs', () => {
       if (m.scale !== 1) assert.match(m.file, new RegExp(`@${m.scale}x\\.webp$`), key);
       total += buf.length;
     }
-    // 14.2 MB as built (the six rainbows are 1.25-1.35 MB each at 30 fps, as overlay-art's are).
-    assert.ok(total < 15_000_000, `${total} bytes in all`);
+    // 15.8 MB as built (the seven rainbows are 1.25-1.5 MB each at 30 fps, as overlay-art's are; each loads when first shown).
+    assert.ok(total < 16_500_000, `${total} bytes in all`);
   });
 
   it('is not one of the overlay-art keys (two manifests, no overlap)', () => {
@@ -122,7 +122,7 @@ describe('OVERLAY_USES against GSJS', { skip: !hasGsjs && 'glitch-GameServerJS i
     assert.match(b, /var duration = 4000;/);
     assert.match(b, /width: 400,\s*height: 400/);
     assert.deepEqual({ ...RAINBOW }, { wh: 400, durationMs: 4000 });
-    for (const key of ['rainbow_100coinstoday', 'rainbow_150coinstoday', 'rainbow_maxrelax', 'rainbow_superharvest', 'rainbow_spindoctor', 'rainbow_superdonation', 'charades_gameover']) {
+    for (const key of ['rainbow_100coinstoday', 'rainbow_150coinstoday', 'rainbow_maxrelax', 'rainbow_superharvest', 'rainbow_spindoctor', 'rainbow_superdonation', 'rainbow_randomkindness', 'charades_gameover']) {
       assert.equal(OVERLAY_USES[key].wh, 400, key);
       assert.equal(OVERLAY_USES[key].durationMs, 4000, key);
       assert.ok(manifest[key], key);
@@ -133,6 +133,7 @@ describe('OVERLAY_USES against GSJS', { skip: !hasGsjs && 'glitch-GameServerJS i
     assert.match(src('items/npc_spinning_wheel.js'), /if \(currants >= 500\) targetPC\.show_rainbow\('rainbow_spindoctor'\)/);
     assert.match(src('items/include/shrines.js'), /if \(is_chance\(0\.01\) \|\| pc\.buffs_has\("max_luck"\)\)\{\s*pc\.show_rainbow\('rainbow_superdonation'\)/);
     assert.match(src('items/catalog_buffs.js'), /pc\.show_rainbow\('charades_gameover'\)/);
+    assert.match(src('items/random_kindness.js'), /target\.show_rainbow\('rainbow_randomkindness'\)/);
     // The sounds the switch pairs (3038-3065).
     assert.match(b + src('players/player.js'), /case 'rainbow_maxrelax':\s*this\.announce_sound\('RAINBOW_MAXRELAX'/);
     assert.equal(OVERLAY_USES.rainbow_150coinstoday.sound, undefined);
@@ -361,7 +362,7 @@ describe('G441: the super harvest arc drawn from its SVG frames on dense screens
   });
 
   it('G446: the other rainbows keep SVG frames too, each under 1 MB, and their callers pass the resolution', () => {
-    for (const key of ['rainbow_100coinstoday', 'rainbow_150coinstoday', 'rainbow_maxrelax', 'rainbow_spindoctor', 'rainbow_superdonation', 'charades_gameover']) {
+    for (const key of ['rainbow_100coinstoday', 'rainbow_150coinstoday', 'rainbow_maxrelax', 'rainbow_spindoctor', 'rainbow_superdonation', 'rainbow_randomkindness', 'charades_gameover']) {
       const m = manifest[key];
       assert.equal(m.vector.file, `${key}.frames.json`, key);
       assert.equal(m.vector.order.length, m.frames, key);

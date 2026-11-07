@@ -258,7 +258,7 @@ export const ROOM_ITEMS = Object.freeze({
     donatable: false,
     tags: ['no_rube', 'no_donate', 'no_auction', 'no_mail', 'no_trade'],
   },
-  // items/random_kindness.js: Gwendolyn's Task III's reward; its bestow verb needs another player.
+  // items/random_kindness.js: Gwendolyn's Task III's reward; its bestow verb is multiplayer's (features/player-verbs-mp-feature.js).
   random_kindness: {
     label: 'Random Kindness',
     namePlural: 'Random Kindnesses',

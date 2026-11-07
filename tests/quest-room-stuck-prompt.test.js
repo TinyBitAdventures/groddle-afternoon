@@ -31,7 +31,7 @@ import {
   stepQuestInstance,
   stuckPromptDue,
 } from '../public/js/quest-instance.js?v=f0df88c3';
-import { BUILT_ROOMS, QUEST_ROOMS, roomModulePath } from '../public/js/quest-rooms/catalog.js?v=9ebeb502';
+import { BUILT_ROOMS, QUEST_ROOMS, roomModulePath } from '../public/js/quest-rooms/catalog.js?v=f9091020';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const GSJS = join(root, '../glitch-GameServerJS');

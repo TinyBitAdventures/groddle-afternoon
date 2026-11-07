@@ -33,8 +33,8 @@
 import { slugsFromEffects } from '../speech-slugs.js?v=130338f9';
 import { worldToScreen } from '../street-model.js?v=505d8990';
 import { frameTexture, textureFromUrl } from '../textures.js?v=3149d699';
-import { ensureWoodTreeState, resetWoodTreeDay, woodTreeStatusLabel } from '../woodcutting.js?v=bd6376a1';
-import { noteWoodTreeCare } from '../patches.js?v=ddd16221';
+import { ensureWoodTreeState, resetWoodTreeDay, woodTreeStatusLabel } from '../woodcutting.js?v=c199dd64';
+import { noteWoodTreeCare } from '../patches.js?v=8af384ac';
 import {
   ENCHANTED_FORESTS,
   ENCHANTED_WOOD_TREE,

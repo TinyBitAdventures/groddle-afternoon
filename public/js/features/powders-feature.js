@@ -100,15 +100,15 @@ import {
   sniffNoNo,
   sprinkleHallowed,
   usePowderCharge,
-} from '../powders.js?v=908929b1';
+} from '../powders.js?v=c0a14c95';
 import { itemVerbAchievementCounters } from '../item-verbs.js?v=1e20fa7d';
-import { copyChargesLeft, copyFromLedger, keepsCopies, spendCopyCharge, verbCopy } from '../copy-charges.js?v=157a665b';
-import { migrateClassValue } from '../tools.js?v=689d6594';
-import { DEAD_TRANT_CLASSES } from '../patches.js?v=ddd16221';
+import { copyChargesLeft, copyFromLedger, keepsCopies, spendCopyCharge, verbCopy } from '../copy-charges.js?v=f94ac7c8';
+import { migrateClassValue } from '../tools.js?v=f701b241';
+import { DEAD_TRANT_CLASSES } from '../patches.js?v=8af384ac';
 import { hellFeature } from './hell-feature.js?v=13196575';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 import { displayTopOf, playSheetOverlay } from '../overlay-art.js?v=11b6dd7f';
-import { OVERLAY_USES, playOverlay, playWindowOverlay, windowOverlayFit } from '../overlays.js?v=e5f37a8d';
+import { OVERLAY_USES, playOverlay, playWindowOverlay, windowOverlayFit } from '../overlays.js?v=642adbd0';
 import {
   POWDER_MP,
   POWDER_MP_TEXT,

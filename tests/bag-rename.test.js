@@ -29,8 +29,8 @@ import {
 import { BAG_DEFS, PACK_CAPACITY, giveBag, layoutPack, moveStack, normalizePrefs, renameBag, takeBag } from '../public/js/pack-slots.js?v=a94b816c';
 import { ITEM_CATALOG, isToolItem } from '../public/js/inventory.js?v=d82f3b00';
 import { createDroppedItemState, dropInventoryStack, parseDroppedItemState, placeDroppedBag, serializeDroppedItemState } from '../public/js/world-items.js?v=2f0f2022';
-import { bagsFeature } from '../public/js/features/bags-feature.js?v=6aec8098';
-import { pouchFeature } from '../public/js/features/elemental-pouch-feature.js?v=9ef6ffae';
+import { bagsFeature } from '../public/js/features/bags-feature.js?v=3fbac957';
+import { pouchFeature } from '../public/js/features/elemental-pouch-feature.js?v=3e1a4c6e';
 import { POUCH_CLASS } from '../public/js/elemental-pouch.js?v=ceefa97a';
 import { HAS_SITE, SITE_DIR } from '../tools/repos.mjs';
 

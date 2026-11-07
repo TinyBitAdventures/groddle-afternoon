@@ -44,7 +44,7 @@ test.describe('integration playtest regressions', () => {
 
   test('the Magic Rock waits out rook attacks, Naraka and meditation', async () => {
     const { createFeatureHost } = await import('../public/js/feature-host.js?v=127e0a3c');
-    const { rookAttackFeature } = await import('../public/js/features/rook-attack-feature.js?v=fab98cea');
+    const { rookAttackFeature } = await import('../public/js/features/rook-attack-feature.js?v=6ea12759');
     const { hellFeature } = await import('../public/js/features/hell-feature.js?v=13196575');
     const { createRookAttack } = await import('../public/js/rook-attack.js?v=4a0fb648');
     const host = createFeatureHost([rookAttackFeature, hellFeature]);
@@ -69,7 +69,7 @@ test.describe('integration playtest regressions', () => {
   });
 
   test('vendor receipts say "1 currant"', async () => {
-    const { vendorSell } = await import('../public/js/vendor.js?v=a395dc99');
+    const { vendorSell } = await import('../public/js/vendor.js?v=84dc136c');
     const { createInventory } = await import('../public/js/inventory.js?v=d82f3b00');
     const inv = createInventory();
     inv.grain = 1;

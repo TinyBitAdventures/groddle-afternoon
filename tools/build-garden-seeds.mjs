@@ -21,7 +21,7 @@ import { requireSite, sitePath } from './repos.mjs';
 export const OUT = sitePath('data', 'garden-seeds.json');
 
 export async function gardenSeedsJson() {
-  const { SEED_CATALOG, GARDEN_WATER_MS } = await import('../public/js/garden.js?v=2536c8cd');
+  const { SEED_CATALOG, GARDEN_WATER_MS } = await import('../public/js/garden.js?v=78aa3457');
   const seeds = Object.keys(SEED_CATALOG).sort().map((id) => {
     const s = SEED_CATALOG[id];
     return `${JSON.stringify(id)}:{"t":${JSON.stringify(s.gardenType === 'herb' ? 'herb' : 'default')},"g1":${s.grow1Ms},"g2":${s.grow2Ms}}`;

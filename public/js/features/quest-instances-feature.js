@@ -87,7 +87,7 @@ import {
   stuckPromptDue,
   wayBackFrom,
 } from '../quest-instance.js?v=f0df88c3';
-import { FAMILIAR_GATES, QUEST_ROOMS, REMINISCE_ITEMS, ROOM_ITEMS, isBuiltRoom, questGiver, roomModulePath } from '../quest-rooms/catalog.js?v=9ebeb502';
+import { FAMILIAR_GATES, QUEST_ROOMS, REMINISCE_ITEMS, ROOM_ITEMS, isBuiltRoom, questGiver, roomModulePath } from '../quest-rooms/catalog.js?v=f9091020';
 import * as kit from '../quest-rooms/kit.js?v=d98b987e';
 import { locationEventsApi } from './location-events-feature.js?v=0966e395';
 import {
@@ -97,7 +97,7 @@ import {
   questAwardPayload,
   questMoveNote,
   turnInQuest,
-} from '../quest-offers.js?v=fe9c4298';
+} from '../quest-offers.js?v=5dc6e428';
 import { parseQuestConversation } from '../quests.js?v=c8d9d0a4';
 import { getQuestCatalog } from '../content-catalogs.js?v=10b118dd';
 import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=d82f3b00';
@@ -169,13 +169,13 @@ const ROOM_MODULES = {
   an_autumn_day: () => import('../quest-rooms/an-autumn-day.js?v=37340a72'),
   being_watched: () => import('../quest-rooms/being-watched.js?v=94119dc6'),
   back_alley: () => import('../quest-rooms/back-alley.js?v=d9c26a3f'),
-  clubhouse: () => import('../quest-rooms/clubhouse.js?v=984d5507'),
+  clubhouse: () => import('../quest-rooms/clubhouse.js?v=9a5d9da1'),
   light_perspective: () => import('../quest-rooms/light-perspective.js?v=c775f709'),
   tile_puzzle: () => import('../quest-rooms/tile-puzzle.js?v=67b3c2cc'),
   operation_grow: () => import('../quest-rooms/operation-grow.js?v=49392092'),
-  gwendolyn: () => import('../quest-rooms/gwendolyn.js?v=bd387421'),
+  gwendolyn: () => import('../quest-rooms/gwendolyn.js?v=9c359d93'),
   mental_block: () => import('../quest-rooms/mental-block.js?v=f7fc4c48'),
-  penalty: () => import('../quest-rooms/penalty.js?v=ea72b5ef'),
+  penalty: () => import('../quest-rooms/penalty.js?v=1f688134'),
   esquibeth: () => import('../quest-rooms/esquibeth.js?v=ed42ce79'),
   firefly_whistle: () => import('../quest-rooms/firefly-whistle.js?v=9e94f646'),
 };

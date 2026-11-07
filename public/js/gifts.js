@@ -25,7 +25,7 @@
  * each box as one bag_gift_box and what is inside (LedgerMath::holdings).
  */
 
-import { cleanCopyTag } from './tools.js?v=689d6594';
+import { cleanCopyTag } from './tools.js?v=f701b241';
 
 export const GIFT_BOX = 'bag_gift_box';
 export const GIFT_WRAPPED = 'bag_gift_box_wrapped';

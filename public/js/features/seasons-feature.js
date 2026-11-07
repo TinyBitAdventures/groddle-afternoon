@@ -33,10 +33,10 @@
 
 import { addItem, countItem, ensureItem, removeItem, registerItemUse, ITEM_CATALOG } from '../inventory.js?v=d82f3b00';
 import { dametimeParts, getGameDayKey } from '../game-day.js?v=edb00566';
-import { setSeasonalSeedCheck as setGardenSeasonGate } from '../garden.js?v=2536c8cd';
-import { setSeasonalSeedCheck as setMasterGardenSeasonGate } from '../garden.js?v=2536c8cd';
-import { setSeasonalRecipeCheck } from '../making.js?v=be67495b';
-import { getToolCondition, copyForVerb, copyTag, migrateClassTag, setCopyTag, takeToolCopy } from '../tools.js?v=689d6594';
+import { setSeasonalSeedCheck as setGardenSeasonGate } from '../garden.js?v=78aa3457';
+import { setSeasonalSeedCheck as setMasterGardenSeasonGate } from '../garden.js?v=78aa3457';
+import { setSeasonalRecipeCheck } from '../making.js?v=c9dc233e';
+import { getToolCondition, copyForVerb, copyTag, migrateClassTag, setCopyTag, takeToolCopy } from '../tools.js?v=f701b241';
 
 /*
  * Each lit pumpkin's phrases are its own (pumpkin_lit_*.js this.phrases, 380-391, at most 3), kept
@@ -78,7 +78,7 @@ import { emblemCostFor } from '../shrines.js?v=95d74174';
 import { rollDropTable } from '../drop-tables.js?v=16e12632';
 import { openNoteView, noteViewOpen } from '../note-view.js?v=a5e518d1';
 import { payDrop } from './drops-feature.js?v=43984e8f';
-import { fireflyJarCounts, setFireflyJar } from './resource-nodes-feature.js?v=18e9b4d3';
+import { fireflyJarCounts, setFireflyJar } from './resource-nodes-feature.js?v=84c8f982';
 import { SEASON_DATA } from '../seasons-data.js?v=b5174bc9';
 import {
   CANDY_CLASSES,
@@ -134,7 +134,7 @@ import {
   yetiQuote,
 } from '../seasons.js?v=1978c3f3';
 import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=3149d699';
-import { playOverlay } from '../overlays.js?v=e5f37a8d';
+import { playOverlay } from '../overlays.js?v=642adbd0';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
 import { MAIL_POST_SENDER } from '../mailbox.js?v=1d97704f';
 import { filterText } from '../word-filter.js?v=9a7a7ebb';

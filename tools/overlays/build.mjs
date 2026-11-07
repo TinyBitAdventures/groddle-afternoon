@@ -64,14 +64,14 @@ const rainbow = (k) => ({ fla: fla(k), scale: 1.25, step: 1, webp: 0.8, vector: 
 export const OVERLAYS = Object.freeze({
   // G383 inc_trading.js 188-205: the 70 px bubble over a trading player.
   trading: small('trading', { vector: true }),
-  // G374-G376, G373 show_rainbow (players/player.js 3014-3029): 400 x 400 over the 330 x 200 stage
-  // (rainbow_randomkindness waits on the Random Kindness bestow verb; not built).
+  // G374-G376, G373, G432 show_rainbow (players/player.js 3014-3029): 400 x 400 over the 330 x 200 stage.
   rainbow_100coinstoday: rainbow('rainbow_100coinstoday'),
   rainbow_150coinstoday: rainbow('rainbow_150coinstoday'),
   rainbow_maxrelax: rainbow('rainbow_maxrelax'),
   rainbow_superharvest: rainbow('rainbow_superharvest'),
   rainbow_spindoctor: rainbow('rainbow_spindoctor'),
   rainbow_superdonation: rainbow('rainbow_superdonation'),
+  rainbow_randomkindness: rainbow('rainbow_randomkindness'),
   charades_gameover: rainbow('charades_gameover'),
   // G394: 350 px over the 362 x 199 stage; the one main frame holds the 106-frame 321go clip (stop()).
   '321_countdown': { fla: fla('321_countdown'), scale: 1.5, step: 1, webp: 0.85, vector: true },
