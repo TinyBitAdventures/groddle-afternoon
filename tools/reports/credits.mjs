@@ -34,7 +34,7 @@
  *
  * The rubric (the site's ReportCredits::KINDS): safety_fix 5 (a fix that keeps
  * saves, accounts or security safe), bug_fixed 3, improvement_shipped 2,
- * partial_or_clue 1, none 0 (working as Glitch intended, a duplicate,
+ * partial_or_clue 1, none 0 (working as Glitch intended, the same player's repeat,
  * withdrawn, nothing changed; the reason says so kindly). A report with several
  * changes scores its best one plus 1 for each other (extras), at most 8.
  * The proposals file:

@@ -12,7 +12,7 @@ The Contribute page thanks the testers whose bug reports led to a change: a boar
 | `bug_fixed` | 3 | A real bug, fixed |
 | `improvement_shipped` | 2 | A suggestion or idea that shipped |
 | `partial_or_clue` | 1 | Partly addressed, or a clue that led to a fix found elsewhere |
-| `none` | 0 | Working as Glitch intended, a duplicate, withdrawn by the player, or nothing changed. Say why kindly |
+| `none` | 0 | Working as Glitch intended, a repeat of the same player's own report, withdrawn by the player, or nothing changed. Say why kindly. A different player's report of the same bug scores the same as the first (Austin 2026-11-06) |
 
 A report with several changes in it (follow-ups in the same thread count) scores its best change, plus 1 for each other change, up to 8. Count a change once, on the report where it was first raised. When in doubt, choose the lower kind. The reason is one plain line of at most 200 characters, in player words, with no em-dashes, emails or IPs. Refs are the commits that made the change (`game <sha>`, `site <sha>`, `server <sha>`) and the release it shipped in (`game v0.16.0`).
 
