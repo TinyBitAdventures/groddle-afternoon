@@ -95,7 +95,14 @@ describe('the sources: no move inside /chat/ reloads (site repo community/)', { 
     const bell = src('community/notifications.js');
     assert.match(bell, /if \(nav\) \{\n\s*closePanel\(\);\n\s*nav\.go\(item\.url\);/);
     const pages = src('src/CommunityPages.php');
-    assert.match(pages, /public const ASSET_KEY = 'community-7';/);
+    assert.match(pages, /public const ASSET_KEY = 'community-8';/);
+    // A bare path keeps a browser's copy for a year: returning players got a new chat-app.js beside an old chat-pure.js, and /chat/ stuck on Connecting.
+    for (const file of ['chat-app.js', 'chat-menus.js', 'chat-nav.js', 'notifications.js', 'community.js']) {
+      assert.doesNotMatch(src(`community/${file}`), /(?:^|\n)import [^\n]*from '\.\//, `${file}: a static import of a sibling carries no key`);
+    }
+    for (const file of ['chat-app.js', 'chat-menus.js', 'chat-nav.js', 'notifications.js']) {
+      assert.match(src(`community/${file}`), /await import\(`\.\/chat-pure\.js\$\{new URL\(import\.meta\.url\)\.search\}`\)/, `${file} asks for chat-pure.js with its own key`);
+    }
     assert.match(pages, /\$first = isset\(\$open\[\$asked\]\) \? \$asked : array_key_first\(\$open\);/, '/chat/?c=help draws Live Help without JavaScript');
     for (const r of ["'/chat/'", "'/chat/{board:[a-z-]+}/'", "'/chat/{board:[a-z-]+}/new/'", "'/chat/{board:[a-z-]+}/{thread:\\d+(?:-[a-z0-9-]+)?}/'"]) assert.ok(pages.includes(`#[Route(Method::Get, ${r}, policy: new Policy(Access::Public))]`), r);
   });
