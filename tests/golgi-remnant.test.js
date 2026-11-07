@@ -11,7 +11,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { homedir } from 'node:os';
-import { DUST_TRAP_ORGANELLES, ORGANELLE_OVERLAY, createResourceNode, harvestResourceNode } from '../public/js/resource-nodes.js?v=3685170a';
+import { DUST_TRAP_ORGANELLES, ORGANELLE_OVERLAY, createResourceNode, harvestResourceNode } from '../public/js/resource-nodes.js?v=76736039';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=10b118dd';
 import { createQuestState } from '../public/js/quests.js?v=c8d9d0a4';
 import { acceptOffer, isEventEmitted, routeQuestEvent } from '../public/js/quest-offers.js?v=114a9551';
@@ -28,8 +28,6 @@ describe('golgi apparatus: the Dust Trap remnant', () => {
     assert.deepEqual([golgi.upTo, golgi.seconds], [0.30, 40]);
     assert.equal(ORGANELLE_OVERLAY.durationMs, 3000);
     assert.equal(ORGANELLE_OVERLAY.deltaY, -153);
-    const art = ORGANELLE_OVERLAY.art.golgi_apparatus;
-    assert.ok(existsSync(join(root, 'public', art.url)), art.url);
     const file = join(GSJS, 'items/dust_trap.js');
     if (!existsSync(file)) return;
     const src = readFileSync(file, 'utf8');

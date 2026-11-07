@@ -25,7 +25,7 @@
  */
 
 import { crowdScaleX } from '../avatar-anims.js?v=fb921bf4';
-import { OVERLAY_USES, playCountdownArt, playWindowOverlay } from '../overlays.js?v=210ad5ee';
+import { OVERLAY_USES, playCountdownArt, playWindowOverlay } from '../overlays.js?v=ea22d918';
 import {
   CROWNS_ID,
   CROWNS_LADDERS,
@@ -59,7 +59,7 @@ import {
   tickCrowns,
 } from '../game-of-crowns.js?v=e32f35f5';
 import { RACE_RIVALS } from '../races.js?v=ab22a079';
-import { mayhemHoldsArena } from './mayhem-feature.js?v=37998880';
+import { mayhemHoldsArena } from './mayhem-feature.js?v=407f69d9';
 import { wallsScreen } from '../street-model.js?v=505d8990';
 import { addItem, countItem, removeItem } from '../inventory.js?v=d82f3b00';
 import { textureFromUrl } from '../textures.js?v=3149d699';

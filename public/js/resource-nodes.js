@@ -237,18 +237,24 @@ export const DUST_TRAP_RARE_KEY_CHANCE = 1 / 40;
 
 /** dust_trap.js doDrop: organelle rolls (Baqala timer seconds) before the drop table. */
 /**
- * dust_trap.js organelleOverlay (214-235): the remnant's overlay
- * (inc_data_overlays.js 67-70) over the trap for 3 s, bottom at 153 px above
- * it, "+Ns", then off to the buffs. Only the golgi apparatus has CC0 raster
- * art (its item, items/golgi_apparatus.js, OGA golgi_apparatus__x1_1); the
- * other three overlays survive only as vector .fla sources (glitch-overlays)
- * and keep the "+Ns" alone.
+ * dust_trap.js organelleOverlay (214-233): the remnant's overlay (inc_data_overlays.js 67-70, its
+ * sheet in overlays-more.json, js/overlays.js OVERLAY_USES) stands over the trap with its bottom
+ * 153 px above it and "+Ns" under it. After the 3 s less two 0.2 s fades it flies to the buffs for
+ * 1 s, shrinking to 0.2 (AbstractAnnouncementOverlay.as 582-600), and bursts there.
  */
 export const ORGANELLE_OVERLAY = Object.freeze({
   durationMs: 3000,
   deltaY: -153,
-  art: Object.freeze({ golgi_apparatus: Object.freeze({ url: 'assets/sprites/icons/golgi_apparatus@3x.png', w: 86, h: 80 }) }),
+  holdMs: 2600,
+  flyMs: 1000,
+  finalScale: 0.2,
 });
+
+/** Where a remnant is `ms` into its overlay: at `from`, then on its way to `to` (world px). */
+export function organelleFlight(ms, from, to, o = ORGANELLE_OVERLAY) {
+  const k = Math.min(1, Math.max(0, (ms - o.holdMs) / o.flyMs));
+  return { x: from.x + (to.x - from.x) * k, y: from.y + (to.y - from.y) * k, scale: 1 + (o.finalScale - 1) * k };
+}
 
 export const DUST_TRAP_ORGANELLES = Object.freeze([
   { upTo: 0.13, id: 'vacuoles', label: 'a vacuole', seconds: 10 },

@@ -63,6 +63,7 @@ import { rollSlothBonusSnails } from '../imagination-effects.js?v=70169933';
 import {
   DUST_TRAP_DROP_ITEM_DEFS,
   ORGANELLE_OVERLAY,
+  organelleFlight,
   RESOURCE_ITEM_DEFS,
   RESOURCE_NODE_CATALOG,
   SALMON_RELEASE,
@@ -85,9 +86,11 @@ import {
   starterResourceTools,
   swimmingSalmonCount,
   tickResourceNode,
-} from '../resource-nodes.js?v=3685170a';
+} from '../resource-nodes.js?v=76736039';
 import { frameTexture as sheetFrameTexture, loadTexture, textureFromUrl } from '../textures.js?v=3149d699';
 import { acceptOffer, markOffered, npcQuestOffers, putOffOffer, questStatus } from '../quest-offers.js?v=114a9551';
+import { OVERLAY_USES, playOverlay } from '../overlays.js?v=ea22d918';
+import { OVERLAY_FADE } from '../overlay-art.js?v=11b6dd7f';
 import { vpSequence } from '../quest-rooms/vp-overlay.js?v=b231d65a';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
 
@@ -1475,7 +1478,7 @@ function triggerTrap(engine, entity) {
   });
   if (result.ok && result.baqalaSeconds) {
     engine.floatText(entity.x, entity.y - 120, `+${result.baqalaSeconds}s`, 0xbfe6ff);
-    organelleOverlay(engine, entity, result.organelle);
+    organelleOverlay(engine, entity, result.organelle, result.baqalaSeconds);
     // dust_trap.js 54-72 give_baqala_time: the Ancestral Lands clock and its buff (juju-bandits feature, G39).
     engine.query?.('giveBaqalaTime', result.baqalaSeconds, engine);
   }
@@ -1483,42 +1486,48 @@ function triggerTrap(engine, entity) {
 }
 
 /**
- * dust_trap.js organelleOverlay: the remnant shows over the trap (place_at_bottom,
- * delta_y -153) for its 3 s, then flies off to the buffs (animate_to_buffs).
+ * dust_trap.js organelleOverlay (214-233, G372): the remnant's own picture over the trap, then off
+ * to the buffs, where and_burst shows the seconds (AbstractAnnouncementOverlay.as 582-608).
  */
-function organelleOverlay(engine, entity, organelle) {
-  const art = ORGANELLE_OVERLAY.art[organelle];
-  if (!art || !engine.PIXI || !engine.fxLayer) return;
-  const spr = new engine.PIXI.Sprite(textureFromUrl(art.url));
-  spr.anchor.set(0.5, 1);
-  const from = { x: entity.x, y: entity.y + ORGANELLE_OVERLAY.deltaY };
-  spr.position.set(from.x, from.y);
-  spr.width = art.w;
-  spr.height = art.h;
-  const base = { x: spr.scale.x, y: spr.scale.y };
-  engine.setData?.('dustTrapOverlay', organelle);
-  const hold = ORGANELLE_OVERLAY.durationMs - 600;
-  addEffect(engine, spr, (t) => {
-    // The texture may land after the first frame: keep the source box.
-    if (spr.texture?.width > 1 && Math.abs(spr.width - art.w) > 1) {
-      spr.width = art.w;
-      spr.height = art.h;
-      base.x = spr.scale.x;
-      base.y = spr.scale.y;
-    }
-    const pop = Math.min(1, t / 200);
-    if (t <= hold) {
-      spr.scale.set(base.x * pop, base.y * pop);
-      return true;
-    }
-    const k = Math.min(1, (t - hold) / 600);
+function organelleOverlay(engine, entity, organelle, seconds) {
+  const use = OVERLAY_USES[organelle];
+  if (!use || !engine.PIXI || !engine.fxLayer) return null;
+  const from = { x: entity.x + use.dx, y: entity.y + use.dy };
+  // The buff strip's corner, read every frame: the camera moves while it flies.
+  const to = () => {
     const cam = engine.camera || { x: from.x, y: from.y - 300 };
-    spr.x = from.x + (cam.x + 70 - from.x) * k;
-    spr.y = from.y + (cam.y + 70 - from.y) * k;
-    spr.scale.set(base.x * (1 - 0.6 * k), base.y * (1 - 0.6 * k));
-    spr.alpha = 1 - k * 0.8;
-    return k < 1;
+    return { x: cam.x + 40, y: cam.y + 70 };
+  };
+  const { holdMs, flyMs } = ORGANELLE_OVERLAY;
+  const flight = (ms) => organelleFlight(ms, from, to());
+  const clock = () => globalThis.performance?.now?.() ?? Date.now();
+  const startedAt = clock();
+  engine.setData?.('dustTrapOverlay', organelle);
+  const handle = playOverlay(engine.PIXI, organelle, {
+    layer: engine.fxLayer,
+    // overlayLifeMs: a duration of hold + fly - 0.2 s ends as the flight lands.
+    durationMs: holdMs + flyMs - OVERLAY_FADE.inMs,
+    wh: use.wh,
+    loop: use.loop,
+    zIndex: 9000,
+    at: () => flight(clock() - startedAt),
+    onFrame: () => {
+      const spr = handle.sprite;
+      const { scale } = flight(clock() - startedAt);
+      if (!spr || scale >= 1) return;
+      // Shrinks on the point it stands on (center_bottom).
+      spr.x += (spr.width * (1 - scale)) / 2;
+      spr.y += spr.height * (1 - scale);
+      spr.width *= scale;
+      spr.height *= scale;
+    },
   });
+  handle.done.then((finished) => {
+    if (!finished) return;
+    const at = to();
+    engine.floatText(at.x, at.y, `+${seconds} ${seconds === 1 ? 'second' : 'seconds'}`, 0xbfe6ff);
+  });
+  return handle;
 }
 
 /**

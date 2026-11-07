@@ -107,7 +107,7 @@ import { DEAD_TRANT_CLASSES } from '../patches.js?v=ddd16221';
 import { hellFeature } from './hell-feature.js?v=13196575';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 import { displayTopOf, playSheetOverlay } from '../overlay-art.js?v=11b6dd7f';
-import { OVERLAY_USES, playOverlay } from '../overlays.js?v=210ad5ee';
+import { OVERLAY_USES, playOverlay } from '../overlays.js?v=ea22d918';
 import {
   POWDER_MP,
   POWDER_MP_TEXT,

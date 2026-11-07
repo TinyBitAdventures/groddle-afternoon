@@ -24,7 +24,7 @@ import { createPlot, performPlotVerb } from '../public/js/patches.js?v=ddd16221'
 import { doChore, neighbourById, normalizeNeighbourState } from '../public/js/neighbours.js?v=862857f9';
 import { runVerb } from '../public/content.js?v=4589e83f';
 import { applySetFree } from '../public/js/animal-set-free.js?v=3b194fca';
-import { RESOURCE_SKILL_PACKAGES, createResourceNode, harvestResourceNode } from '../public/js/resource-nodes.js?v=3685170a';
+import { RESOURCE_SKILL_PACKAGES, createResourceNode, harvestResourceNode } from '../public/js/resource-nodes.js?v=76736039';
 import { room as topOfTree } from '../public/js/quest-rooms/top-of-tree.js?v=5668c299';
 import { room as esquibeth } from '../public/js/quest-rooms/esquibeth.js?v=ed42ce79';
 

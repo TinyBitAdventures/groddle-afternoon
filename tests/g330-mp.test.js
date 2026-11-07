@@ -34,7 +34,7 @@ import {
   trCostTankMultiplier,
   trSkillMultiplier,
 } from '../public/js/radiance-mp.js?v=dd99d51f';
-import { meditationFeature } from '../public/js/features/meditation-feature.js?v=407bb75b';
+import { meditationFeature } from '../public/js/features/meditation-feature.js?v=b84b5a66';
 import { createInventory } from '../public/js/inventory.js?v=d82f3b00';
 import { createToolConditionState } from '../public/js/tools.js?v=689d6594';
 import { HAS_SERVER, HAS_SITE, serverPath, sitePath } from '../tools/repos.mjs';

@@ -88,6 +88,11 @@ export const OVERLAY_USES = Object.freeze({
   musicblock_notes: { type: 'pc', wh: 180, durationMs: 0, dx: 140, dy: -100, loop: true, src: 'items/musicblock_b_brown_01.js 139-151' },
   // G379 items/petrified_rock_small.js 174-199: pc_overlay, 2 s, locking, delta_y -115 (1:1).
   petrified_rock_open_overlay: { type: 'pc', wh: 0, durationMs: 2000, dx: 0, dy: -115, loop: false, locking: true, src: 'items/petrified_rock_small.js 174-186' },
+  // G372 items/dust_trap.js 214-233 organelleOverlay: on the trap, 1:1 ('100%' is no pixel size), bottom 153 px above it.
+  vacuoles: { type: 'itemstack', wh: 0, durationMs: 3000, dx: 0, dy: -153, loop: true, src: 'items/dust_trap.js 214-233' },
+  endoplasmic_reticulum: { type: 'itemstack', wh: 0, durationMs: 3000, dx: 0, dy: -153, loop: true, src: 'items/dust_trap.js 214-233' },
+  golgi_apparatus: { type: 'itemstack', wh: 0, durationMs: 3000, dx: 0, dy: -153, loop: true, src: 'items/dust_trap.js 214-233' },
+  super_old_mitochondrial_dna: { type: 'itemstack', wh: 0, durationMs: 3000, dx: 0, dy: -153, loop: true, src: 'items/dust_trap.js 214-233' },
   // G380 items/fertilidust.js 283-294 and items/fertilidust_lite.js 279-290: on the tree, 300 px, 2 s late.
   target_effect_powder_extreme: { type: 'itemstack', wh: 300, durationMs: 5400, dx: 25, dy: 200, delayMs: 2000, loop: false, src: 'items/fertilidust.js 283-294' },
   target_effect_powder_mild: { type: 'itemstack', wh: 300, durationMs: 4300, dx: 75, dy: 200, delayMs: 2000, loop: false, src: 'items/fertilidust_lite.js 279-290' },
