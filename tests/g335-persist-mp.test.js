@@ -33,6 +33,7 @@ const STATE_FILES = {
   'mayhem-file': 'realtime-mayhem.json', // G397 lane MAYHEM: mayhem.go's owed rewards
   'party-file': 'realtime-party.json', // G335 lane PARTYSAVE: parties, Party Spaces and the spends owed back
   'play-time-file': 'realtime-play-time.json', // play time (playtime.go): seconds the site's user meta has not taken yet
+  'gardens-file': 'realtime-gardens.json', // G368: the shared public gardens' plots and the picks not yet saved
 };
 
 describe('the server keeps its lasting state in files', { skip: skipWithoutServer }, () => {

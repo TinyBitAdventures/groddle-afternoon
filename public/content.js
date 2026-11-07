@@ -1607,6 +1607,8 @@ export function runVerb(target, verbId, ctx) {
       toolState: ctx.tools,
       learned: ctx.skills?.learned || ctx.learned || [],
       upgrades: ctx.imaginationUpgrades || pc.imaginationUpgrades || [],
+      // G368: a shared public garden's verb runs with the page's own draws (features/shared-gardens-feature.js).
+      ...(ctx.sharedGarden ? { rng: ctx.rng } : {}),
     };
     let r = null;
     if (verbId === 'plant') r = plantPlot(garden, key, inv, pc, preferSeed, opts);
@@ -1670,6 +1672,7 @@ export function runVerb(target, verbId, ctx) {
       toolState: ctx.tools,
       learned: ctx.skills?.learned || ctx.learned || [],
       upgrades: ctx.imaginationUpgrades || pc.imaginationUpgrades || [],
+      ...(ctx.sharedGarden ? { rng: ctx.rng } : {}),
     });
     if (!r.ok) return { ok: false, msgs: r.msgs || ['Could not water.'], effects };
     effects.energy += r.effects?.energy || 0;

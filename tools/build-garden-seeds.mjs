@@ -8,6 +8,9 @@
  * hours x 8 s), and the watering's 12 hours (include/garden.js timings.water,
  * GARDEN_WATER_MS), so the site ticks an owner's stored plots as the game
  * does (tickGarden) before it lets a visitor water, plant, clear or harvest.
+ * Each seed also names its crop and produces_count (c, n), and "shared" lists
+ * js/shared-gardens.js SHARED_GARDEN_STREETS, for the one-time payout of a
+ * player's own plots on the public gardens (register G368, src/GardenSettle.php).
  *
  *   node tools/build-garden-seeds.mjs           writes the site repo's data/garden-seeds.json
  *   node tools/build-garden-seeds.mjs --check   exits 1 when it is stale
@@ -22,12 +25,13 @@ export const OUT = sitePath('data', 'garden-seeds.json');
 
 export async function gardenSeedsJson() {
   const { SEED_CATALOG, GARDEN_WATER_MS } = await import('../public/js/garden.js?v=78aa3457');
+  const { SHARED_GARDEN_STREETS } = await import('../public/js/shared-gardens.js?v=47984e60');
   const seeds = Object.keys(SEED_CATALOG).sort().map((id) => {
     const s = SEED_CATALOG[id];
-    return `${JSON.stringify(id)}:{"t":${JSON.stringify(s.gardenType === 'herb' ? 'herb' : 'default')},"g1":${s.grow1Ms},"g2":${s.grow2Ms}}`;
+    return `${JSON.stringify(id)}:{"t":${JSON.stringify(s.gardenType === 'herb' ? 'herb' : 'default')},"g1":${s.grow1Ms},"g2":${s.grow2Ms},"c":${JSON.stringify(s.cropId)},"n":${s.produces}}`;
   });
-  const doc = 'Written by groddle-afternoon game tools/build-garden-seeds.mjs from js/garden.js SEED_CATALOG: t the garden type, g1/g2 the stage times in ms; waterMs how long a watering lasts.';
-  return `{"_doc":${JSON.stringify(doc)},"waterMs":${GARDEN_WATER_MS},"seeds":{\n${seeds.join(',\n')}}}\n`;
+  const doc = 'Written by groddle-afternoon game tools/build-garden-seeds.mjs from js/garden.js SEED_CATALOG: t the garden type, g1/g2 the stage times in ms, c the crop, n produces_count; waterMs how long a watering lasts; shared the public gardens shared online (js/shared-gardens.js).';
+  return `{"_doc":${JSON.stringify(doc)},"waterMs":${GARDEN_WATER_MS},"shared":${JSON.stringify([...SHARED_GARDEN_STREETS])},"seeds":{\n${seeds.join(',\n')}}}\n`;
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {

@@ -2,9 +2,9 @@
  * Groddle Afternoon — original street geometry + layered decos
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
-import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=4901531f';
+import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=dff66431';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=127e0a3c';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=f9bffb3f';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=9671b419';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -8752,7 +8752,9 @@ function beginVerbAction(target, verb) {
   // Player report 33: the reach the realtime server checks when a shared verb lands is checked
   // before the swing too (features/street-objects-feature.js verbOutOfReach), so it never plays
   // and then fails.
-  const tooFar = features.query('verbOutOfReach', target, verb.id, engine);
+  // G368: another player's crop in its planter's 60 seconds is refused before the bar, with the
+  // original's feed line and its failure sound (GardenView.as 481-486; features/shared-gardens-feature.js).
+  const tooFar = features.query('verbOutOfReach', target, verb.id, engine) || features.query('verbRefusedNow', target, verb.id, engine);
   if (tooFar) {
     toast(tooFar, 2600);
     pushActivity(tooFar);
@@ -8964,6 +8966,8 @@ function executeVerb(target, verbId) {
   // realtime server's go-ahead may carry its roll (a tree's tending success,
   // used as the first random draw) and a rock swing's chunks.
   const sharedGrant = features.query('sharedVerbGrant', target, verbId, engine);
+  // G368: a shared garden's verb brings the page's own draws, in order (features/shared-gardens-feature.js).
+  const sharedRolls = Array.isArray(sharedGrant?.rolls) ? sharedGrant.rolls.filter(Number.isFinite).map((r) => clamp(r, 0, 0.999999)) : [];
   let sharedRoll = Number.isFinite(sharedGrant?.roll) ? clamp(sharedGrant.roll, 0, 0.999999) : null;
   const result = runVerb(target, verbId, {
     pc,
@@ -8977,7 +8981,9 @@ function executeVerb(target, verbId) {
     shrines: shrineState,
     streetTsid: currentStreetTsid,
     sharedChunks: sharedGrant?.chunks,
+    sharedGarden: Boolean(sharedGrant?.garden),
     rng: () => {
+      if (sharedRolls.length) return sharedRolls.shift();
       if (sharedRoll != null) {
         const roll = sharedRoll;
         sharedRoll = null;
@@ -28343,10 +28349,13 @@ function spawnGarden(opts = {}) {
   const cols = opts.cols || (gardenType === 'herb' ? 3 : 4);
   const rows = opts.rows || 2;
   const streetState = streetWorldState();
+  // G368: a public garden shared online is the realtime server's (features/shared-gardens-feature.js),
+  // held by that feature and never kept in the save; null everywhere else (solo, homes, other streets).
+  const sharedGarden = !opts.detached && !opts.garden ? features.query('sharedGardenFor', gardenType, { cols, rows }, engine) : null;
   // Detached gardens (home cultivations) keep their plots with their owner.
-  const garden = opts.garden || (opts.detached ? null : streetState.gardens[gardenType]) ||
+  const garden = opts.garden || sharedGarden || (opts.detached ? null : streetState.gardens[gardenType]) ||
     createGarden({ cols, rows, gardenType });
-  if (!opts.detached) streetState.gardens[gardenType] = garden;
+  if (!opts.detached && !sharedGarden) streetState.gardens[gardenType] = garden;
   // Growth continues while the player is away or the browser is closed.
   tickGarden(garden, Date.now());
   const pts = samplePlatformPoints(3);

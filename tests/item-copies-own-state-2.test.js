@@ -43,7 +43,7 @@ import { usePotion as useGardenPotion, potionUsesLeft as gardenUsesLeft } from '
 import { potionsFeature, usePotionNow } from '../public/js/features/potions-feature.js?v=44c15256';
 import { powdersFeature } from '../public/js/features/powders-feature.js?v=fbc30481';
 import { treeDeathFeature } from '../public/js/features/tree-death-feature.js?v=da52335c';
-import { masterGardenFeature } from '../public/js/features/master-garden-feature.js?v=a4f66967';
+import { masterGardenFeature } from '../public/js/features/master-garden-feature.js?v=b2534bb3';
 import { itemVerbsMoreFeature } from '../public/js/features/item-verbs-more-feature.js?v=de9963b2';
 import { supplyFeature } from '../public/js/features/supply-feature.js?v=e5a255b4';
 import { cubimalRaceFeature } from '../public/js/features/cubimal-race-feature.js?v=8ff3d175';

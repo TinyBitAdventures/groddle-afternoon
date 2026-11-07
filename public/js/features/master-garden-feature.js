@@ -153,6 +153,9 @@ function startPour(engine, potionClass, seedId = null, copy = null) {
   const potion = GARDEN_POTIONS[potionClass];
   const target = nearestGarden(engine);
   const garden = target?.state?.garden;
+  // G368: a shared public garden's plots are the realtime server's; its potions come in a later slice.
+  const sharedNo = engine.query?.('sharedGardenPotion', target, engine);
+  if (sharedNo) return say(engine, sharedNo, false), true;
   const check = canPour(potionClass, garden, ctxFor(engine, seedId));
   if (!check.ok) return say(engine, check.msg, false), true;
   engine.playSound?.('POTION_GENERIC', { volume: 0.6 });
@@ -337,6 +340,8 @@ export const masterGardenFeature = {
     const target = nearestGarden(engine);
     const garden = target?.state?.garden;
     const uses = `${potionUsesLeft(bottlesFor(engine, opts?.copy ?? null), classTsid, engine.inv)} pours left in this bottle`;
+    const sharedNo = engine.query?.('sharedGardenPotion', target, engine);
+    if (sharedNo) return [{ id: 'pour', label: 'Pour', enabled: false, reason: sharedNo, tooltip: potion.tooltip }];
     if (potion.action === 'plant') {
       const seeds = garden ? listPlantableSeeds(engine.inv, garden.gardenType) : [];
       if (!seeds.length) {
