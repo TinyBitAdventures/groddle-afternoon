@@ -8,7 +8,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { MAX_ROWS, bindChatInput, fitHeight, historyKey, oneLine, sendKey } from '../public/js/ui/chat-input.js?v=3cb4ce2e';
+import { MAX_ROWS, bindChatInput, fitHeight, historyKey, oneLine, sendKey, strayRepeat } from '../public/js/ui/chat-input.js?v=0405e07a';
 import { FakeEl } from './social-fake-dom.js';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -102,6 +102,26 @@ describe('the chat box: wired', () => {
     const sel = f.dispatch('keydown', { key: 'ArrowDown' });
     assert.equal(sel.defaultPrevented, false);
     assert.deepEqual(asked, ['ArrowUp']);
+  });
+
+  it('G563: a walking key held from before the box opened repeats into it typing nothing', () => {
+    // Walk with D, press / to talk: the D keeps auto-repeating into the box ("d/home" went out as chat).
+    const { f, form } = field();
+    bindChatInput(f, { form, win: {} });
+    const repeats = [1, 2, 3].map(() => f.dispatch('keydown', { key: 'd', code: 'KeyD', repeat: true }));
+    assert.ok(repeats.every((e) => e.defaultPrevented), 'the held D types nothing');
+    f.dispatch('keyup', { key: 'd', code: 'KeyD' });
+    // Pressed in the box, a key types and repeats as usual (holding a letter, Shift or not).
+    const fresh = f.dispatch('keydown', { key: 'd', code: 'KeyD' });
+    assert.equal(fresh.defaultPrevented, false);
+    assert.equal(f.dispatch('keydown', { key: 'D', code: 'KeyD', repeat: true, shiftKey: true }).defaultPrevented, false);
+    f.dispatch('keyup', { key: 'd', code: 'KeyD' });
+    // Leaving the box forgets what went down in it.
+    f.dispatch('keydown', { key: 'a', code: 'KeyA' });
+    f.dispatch('blur');
+    assert.equal(f.dispatch('keydown', { key: 'a', code: 'KeyA', repeat: true }).defaultPrevented, true);
+    assert.equal(strayRepeat({ key: 'x', repeat: false }, new Set()), false);
+    assert.equal(strayRepeat({ key: 'x', code: 'KeyX', repeat: true, isComposing: true }, new Set()), false, 'an input method keeps its keys');
   });
 
   it('both skins\' boxes are text areas of the old length, Enter sends, nothing resizes them by hand', () => {

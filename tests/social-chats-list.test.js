@@ -21,9 +21,9 @@ import {
   mountSocialDrawer,
   sectionOf,
   tabRow,
-} from '../public/js/ui/social-drawer.js?v=dff40570';
+} from '../public/js/ui/social-drawer.js?v=8d5ee247';
 import { createNotifier } from '../public/js/notify.js?v=37c6b748';
-import { paneLayout } from '../public/js/classic/classic-panes.js?v=ec21a6f9';
+import { paneLayout } from '../public/js/classic/classic-panes.js?v=a47d1a3e';
 import { memoryStore, page } from './social-fake-dom.js';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');

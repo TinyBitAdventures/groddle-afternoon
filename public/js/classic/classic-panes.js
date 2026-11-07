@@ -26,7 +26,7 @@
  */
 import { uiState, onUiModeChange, readUiCache, writeUiCache } from './ui-mode.js?v=587c014a';
 import { classicArtUrl } from './classic-art.js?v=5745e669';
-import { bindChatInput } from '../ui/chat-input.js?v=3cb4ce2e';
+import { bindChatInput } from '../ui/chat-input.js?v=0405e07a';
 import { pressLeavesKeys, reconcileChildren } from '../ui/keyed-nodes.js?v=9ab4de5c';
 
 /** The tabs that are the bottom pane, not a pane above it. */

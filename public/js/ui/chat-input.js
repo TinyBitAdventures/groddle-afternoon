@@ -10,8 +10,13 @@
  * only to you would look like two messages. Up and Down still walk back through what you said while
  * the caret is on the box's first (Up) or last (Down) line; elsewhere they move the caret.
  *
- * bindChatInput(field, { form }) wires one; the pure parts (oneLine, fitHeight, historyKey) are tested
- * in tests/chat-input.test.js.
+ * G563 (a guard): a key already held when the box takes the keyboard keeps auto-repeating into it, so
+ * walking with D or A and pressing / to talk typed "dddd" before the first word ("d/home" went out as
+ * a chat line). Repeats of a key that went down before the box had the keyboard type nothing; a key
+ * pressed in the box repeats as usual (strayRepeat). Arrow keys type nothing either way.
+ *
+ * bindChatInput(field, { form }) wires one; the pure parts (oneLine, fitHeight, historyKey, strayRepeat)
+ * are tested in tests/chat-input.test.js.
  */
 
 export const MAX_ROWS = 5;
@@ -50,6 +55,18 @@ export function historyKey(key, { start = 0, end = 0, length = 0, rows = 1, care
 /** PURE: Enter (without Shift, Alt, Ctrl or Cmd, not while an input method is composing) sends. */
 export function sendKey(e) {
   return Boolean(e && e.key === 'Enter' && !e.isComposing && e.keyCode !== 229 && !e.shiftKey && !e.altKey && !e.ctrlKey && !e.metaKey);
+}
+
+/** The physical key of a keyboard event (Shift changes the letter, not the key). */
+export const keyOf = (e) => String(e?.code || e?.key || '').toLowerCase();
+
+/**
+ * PURE (G563): an auto-repeat of a key that was not pressed while this box had the keyboard: a
+ * walking key held from before, whose repeats must not type. `pressedHere` holds keyOf() of the
+ * keys that went down in the box.
+ */
+export function strayRepeat(e, pressedHere) {
+  return Boolean(e?.repeat && !e.isComposing && !pressedHere?.has(keyOf(e)));
 }
 
 function px(v) {
@@ -151,7 +168,14 @@ export function bindChatInput(field, { form = field?.form || null, onHistory = n
     }
     fit();
   });
+  // G563: the keys that went down while the box had the keyboard (strayRepeat).
+  const pressedHere = new Set();
   field.addEventListener('keydown', (e) => {
+    if (strayRepeat(e, pressedHere)) {
+      e.preventDefault();
+      return;
+    }
+    if (!e.repeat) pressedHere.add(keyOf(e));
     if (e.key === 'Enter') {
       // No new lines: Enter sends, Shift+Enter (and the rest) adds nothing.
       if (e.isComposing || e.keyCode === 229) return;
@@ -173,6 +197,8 @@ export function bindChatInput(field, { form = field?.form || null, onHistory = n
       if (ok && onHistory(e.key)) e.preventDefault();
     }
   });
+  field.addEventListener('keyup', (e) => pressedHere.delete(keyOf(e)));
+  field.addEventListener('blur', () => pressedHere.clear());
   // Shown again (a tab with the box, the other skin): fit it when it takes the keyboard.
   field.addEventListener('focus', () => fit());
   // The box's width changes (the drawer opens, the window resizes): fit the lines again.
