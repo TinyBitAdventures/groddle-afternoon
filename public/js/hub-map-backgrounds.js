@@ -23,10 +23,10 @@ export const HUB_MAP_BACKGROUNDS = Object.freeze({
   '88': Object.freeze({ x1: 'assets/maps/art/bg/karnata.webp', x2: 'assets/maps/art/bg/karnata@2x.webp', repainted: true }), // Karnata
   '89': Object.freeze({ x1: 'assets/maps/art/bg/andra.webp', x2: 'assets/maps/art/bg/andra@2x.webp', repainted: true }), // Andra
   '90': Object.freeze({ x1: 'assets/maps/art/bg/choru.webp', x2: 'assets/maps/art/bg/choru@2x.webp', repainted: true }), // Choru
-  '91': Object.freeze({ x1: 'assets/maps/art/bg/zhambu.webp', x2: 'assets/maps/art/bg/zhambu@2x.webp' }), // Zhambu
+  '91': Object.freeze({ x1: 'assets/maps/art/bg/zhambu.webp', x2: 'assets/maps/art/bg/zhambu@2x.webp', repainted: true }), // Zhambu
   '92': Object.freeze({ x1: 'assets/maps/art/bg/tamila.webp', x2: 'assets/maps/art/bg/tamila@2x.webp', repainted: true }), // Tamila
   '93': Object.freeze({ x1: 'assets/maps/art/bg/salatu.webp', x2: 'assets/maps/art/bg/salatu@2x.webp', repainted: true }), // Salatu
-  '95': Object.freeze({ x1: 'assets/maps/art/bg/xalanga.webp', x2: 'assets/maps/art/bg/xalanga@2x.webp' }), // Xalanga
+  '95': Object.freeze({ x1: 'assets/maps/art/bg/xalanga.webp', x2: 'assets/maps/art/bg/xalanga@2x.webp', repainted: true }), // Xalanga
   '97': Object.freeze({ x1: 'assets/maps/art/bg/muufo.webp', x2: 'assets/maps/art/bg/muufo@2x.webp', repainted: true }), // Muufo
   '98': Object.freeze({ x1: 'assets/maps/art/bg/besara.webp', x2: 'assets/maps/art/bg/besara@2x.webp', repainted: true }), // Besara
   '99': Object.freeze({ x1: 'assets/maps/art/bg/kalavana.webp', x2: 'assets/maps/art/bg/kalavana@2x.webp', repainted: true }), // Kalavana

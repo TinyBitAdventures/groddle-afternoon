@@ -311,10 +311,11 @@
       "thumbMatches": true,
       "x1": "assets/maps/art/bg/zhambu.webp",
       "x2": "assets/maps/art/bg/zhambu@2x.webp",
-      "x1Bytes": 10564,
-      "x1Sha256": "4f4dcbc39acbf0fdd06e552d0b6f72753710760d9677abecced084ccf279ae30",
-      "x2Bytes": 21660,
-      "x2Sha256": "043558c53a3b9780f32ecd037d78ab41aa880a493a0de0e4ea2b157d52efe58b"
+      "repainted": "tools/provenance/repainted-maps.json",
+      "x1Bytes": 27792,
+      "x1Sha256": "306d9ca865bb2fcdc70457dc25b7aa303be70d75affa2c34f78795f5a1d31641",
+      "x2Bytes": 95784,
+      "x2Sha256": "e92206bf1a1922e322b0ad0af51e063720f5e4c3d59934ddd4e55949d944bdaa"
     },
     "92": {
       "hubName": "Tamila",
@@ -327,10 +328,10 @@
       "x1": "assets/maps/art/bg/tamila.webp",
       "x2": "assets/maps/art/bg/tamila@2x.webp",
       "repainted": "tools/provenance/repainted-maps.json",
-      "x1Bytes": 37946,
-      "x1Sha256": "da66be874df5eedf5e08d2027d089a5f80977ac4455ebc848e868f249c5dc7d8",
-      "x2Bytes": 99194,
-      "x2Sha256": "37309e4a4bda594d6c95068c5de2f79060e3dabc5ee13485d759c50547e0eb67"
+      "x1Bytes": 35326,
+      "x1Sha256": "8844ad6cee8a419711aeea3b340009a0e83058759754ceb3d19a83de2700310a",
+      "x2Bytes": 127928,
+      "x2Sha256": "9ccf35344a9361430866445032dd3e618d4c3678bb888361020c997a454b4f3e"
     },
     "93": {
       "hubName": "Salatu",
@@ -358,10 +359,11 @@
       "thumbMatches": true,
       "x1": "assets/maps/art/bg/xalanga.webp",
       "x2": "assets/maps/art/bg/xalanga@2x.webp",
-      "x1Bytes": 9706,
-      "x1Sha256": "0afe67ff6fc9a4928ea22b959a9f8533706f8b8bba43e6cff9153da812f33b73",
-      "x2Bytes": 20100,
-      "x2Sha256": "14e6a93f8d3843f85b204cc62f9b65ef74f3f234ee6f42cd99240abf7ad1c4aa"
+      "repainted": "tools/provenance/repainted-maps.json",
+      "x1Bytes": 23310,
+      "x1Sha256": "ac536cb64e93b01833b2a6fe7fd898f3d77e6c4beefe8532ac509e2c4a5d0f2c",
+      "x2Bytes": 82428,
+      "x2Sha256": "e5da3171509d2947ee9d335db6516c8a653a7098b232680e0619ab73192ed6ca"
     },
     "97": {
       "hubName": "Muufo",
