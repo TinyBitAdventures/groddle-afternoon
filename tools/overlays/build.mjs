@@ -108,6 +108,8 @@ export const OVERLAYS = Object.freeze({
   phantom_glitch: { fla: fla('phantom_glitch'), scale: 1.25, step: 1, webp: 0.85, vector: true },
   // G390: charge, ready, off.
   avatar_power_up: { fla: fla('avatar_power_up'), scale: 1.5, step: 1, webp: 0.85, states: { symbol: 'avatarPowerUp', labels: ['charge', 'ready', 'off'] }, vector: true },
+  // G379 sparkle_powder.js 330-337: a window_overlay at 150% over the 1000 x 700 stage.
+  overlay_sparkle_powder: { fla: fla('overlay_sparkle_powder'), scale: 0.5, step: 1, webp: 0.8, vector: true },
   // G392 (SHARP batch 2, 2026-11-02: its 2x sheet would be magnified 1.26 on a Retina window).
   tower_sign_scaffolding_overlay: small('tower_sign_scaffolding_overlay', { vector: true }),
   // G393: the new player's skill cards (one frame each; art only, the flow is Austin's call). The

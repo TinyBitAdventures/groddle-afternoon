@@ -23,12 +23,12 @@ import {
   smallEnlightenmentSeconds,
   smeltItDealtItFreeSmelts,
 } from '../public/js/buff-triggers.js?v=a3093922';
-import { MIRRORED_BUFFS, buffTriggersFeature } from '../public/js/features/buff-triggers-feature.js?v=815282ed';
-import { meditationFeature } from '../public/js/features/meditation-feature.js?v=a24d6807';
+import { MIRRORED_BUFFS, buffTriggersFeature } from '../public/js/features/buff-triggers-feature.js?v=f5ddd2ed';
+import { meditationFeature } from '../public/js/features/meditation-feature.js?v=76b0c9e3';
 import { teleportationFeature } from '../public/js/features/teleportation-feature.js?v=ee0d6d00';
-import { rookAttackFeature } from '../public/js/features/rook-attack-feature.js?v=d1c3c6ce';
+import { rookAttackFeature } from '../public/js/features/rook-attack-feature.js?v=fab98cea';
 import { rubeFeature } from '../public/js/features/rube-feature.js?v=0c2a3c93';
-import { smugglingFeature } from '../public/js/features/smuggling-feature.js?v=83c64fbe';
+import { smugglingFeature } from '../public/js/features/smuggling-feature.js?v=3d893907';
 import { normalizeHusbandryPack } from '../public/js/animal-husbandry.js?v=35b23ef4';
 import {
   activateBuffItem,

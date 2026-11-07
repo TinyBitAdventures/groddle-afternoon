@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=4589e83f';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=127e0a3c';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=5f39a06b';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=e31f0057';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -20,7 +20,7 @@ import {
 } from './js/action-timing.js?v=2513e592';
 import { createWordProgressView, wordAnchor, heldActionDelta, MAX_PUSH_DOWN } from './js/word-progress.js?v=bffa60ac';
 // G374/G375/G378: Tiny Speck's quoin-limit and super-harvest rainbows and the musicblock notes.
-import { OVERLAY_USES, playCountdownArt, playOverlay, rainbowSound, showRainbow } from './js/overlays.js?v=6ab8ee10';
+import { OVERLAY_USES, playCountdownArt, playOverlay, rainbowSound, showRainbow } from './js/overlays.js?v=e5f37a8d';
 import {
   createQuestState,
   assignQuest,

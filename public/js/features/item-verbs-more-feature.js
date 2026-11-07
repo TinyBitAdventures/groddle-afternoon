@@ -39,7 +39,7 @@
  */
 
 import { displayTopOf } from '../overlay-art.js?v=11b6dd7f';
-import { OVERLAY_USES, playOverlay } from '../overlays.js?v=6ab8ee10';
+import { OVERLAY_USES, playOverlay } from '../overlays.js?v=e5f37a8d';
 import { addItem, countItem, removeItem } from '../inventory.js?v=d82f3b00';
 import { getGameDayKey } from '../game-day.js?v=edb00566';
 import { levelInfoForXp, XP_FOR_LEVEL } from '../progression.js?v=33462eaa';
@@ -53,7 +53,7 @@ import { HERDKEEPING, hogtieEscapeDelayMs, husbandryPack } from '../animal-husba
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=db7c442f';
 import { sourceFromUrl, frameTexture } from '../textures.js?v=3149d699';
 import { landingY, walkSurfaceY } from '../walk-surface.js?v=c982983e';
-import { overlayOrStandIn } from '../overlay-stand-in.js?v=a415f4bc';
+import { overlayOrStandIn } from '../overlay-stand-in.js?v=5e714163';
 import {
   BUNDLE_OF_JOY,
   BUTTERFLY_NET,

@@ -103,6 +103,9 @@ export const OVERLAY_USES = Object.freeze({
   powder_extremely_hallowed: { key: 'target_effect_powder_extreme', type: 'itemstack', wh: 300, durationMs: 5400, dx: 25, dy: 200, delayMs: 2000, loop: false, src: 'items/extremely_hallowed_shrine_powder.js 286-297' },
   powder_fairly_hallowed: { key: 'target_effect_powder_mild', type: 'itemstack', wh: 300, durationMs: 4300, dx: 75, dy: 200, delayMs: 2000, loop: false, src: 'items/fairly_hallowed_shrine_powder.js 286-297' },
   powder_juju_shoo_shoo: { key: 'target_effect_powder_mild', type: 'itemstack', wh: 0, durationMs: 3000, dx: 0, dy: 20, delayMs: 0, loop: false, src: 'items/juju_shoo_shoo_powder.js 281-288' },
+  // G379 items/sparkle_powder.js 330-337: window_overlay, size 150% of the window's shorter side
+  // (InWindowAnnouncementOverlay.as 116-119, 152), centred, for everyone on the street, 3 s late.
+  overlay_sparkle_powder: { type: 'window', size: 1.5, durationMs: 6000, delayMs: 3000, loop: true, src: 'items/sparkle_powder.js 330-337' },
   // G382 items/include/shrines.js 795-817 (click_to_donate on the shrine's top) and 907-924.
   click_to_donate: { type: 'itemstack', wh: 0, durationMs: 0, dx: 0, dy: 0, loop: true, src: 'items/include/shrines.js 795-817' },
   shrine_power_up: { type: 'itemstack', wh: 0, durationMs: 10000, dx: -40, dy: 10, delayMs: 1000, state: 'charge', src: 'items/include/shrines.js 907-924' },
@@ -285,6 +288,11 @@ export function locationRect(doc = globalThis.document, viewW = 960, locH = 0.72
   // The view follows the window (g458): game.js writes its width on the canvas.
   const vw = Number(canvas.dataset?.viewWidth) || viewW;
   return { left: c.left - r.left - root.clientLeft, top: c.top - r.top - root.clientTop, width: c.width, height: bottom - c.top, scale: c.width / vw };
+}
+
+/** A window_overlay's rect and art size over a window of w x h px (size: 1.5 is "150%"). */
+export function windowOverlayFit(w, h, size = 1) {
+  return { rect: { left: 0, top: 0, width: w, height: h, scale: 1 }, wh: Math.min(w, h) * size };
 }
 
 const sheetImages = new Map();

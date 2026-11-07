@@ -49,8 +49,8 @@
  * Sneezing buff (sneezes the server times, 0-8 s in and at 13 s, seen by
  * everyone, and at 21 s the last one and a Bean at their feet) or +20 mood,
  * each with the source's line; Sneeze-O-Rama at 5 others, Sparkle Buddy at 7
- * (the server's powders counters). The 150% window sparkle overlay is not
- * built (overlay_sparkle_powder.fla is not in the overlay sheets yet).
+ * (the server's powders counters). Everyone on the street sees the 150%
+ * window sparkle 3 s later (sparkleWindow, sparkle_powder.js 330-337).
  * The jar is the site's ledger's to confirm (G335 slice 5): once the street
  * has room, the server uses one charge through ledger/use before anyone
  * catches it, its go-ahead carries the ledger's word (the jar here holds what
@@ -108,7 +108,7 @@ import { DEAD_TRANT_CLASSES } from '../patches.js?v=ddd16221';
 import { hellFeature } from './hell-feature.js?v=13196575';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 import { displayTopOf, playSheetOverlay } from '../overlay-art.js?v=11b6dd7f';
-import { OVERLAY_USES, playOverlay } from '../overlays.js?v=6ab8ee10';
+import { OVERLAY_USES, playOverlay, playWindowOverlay, windowOverlayFit } from '../overlays.js?v=e5f37a8d';
 import {
   POWDER_MP,
   POWDER_MP_TEXT,
@@ -361,6 +361,7 @@ const RUNNERS = {
     // sparkle_powder.js 289: metabolics_add_mood(10), nothing while dead (inc_metabolics.js 79-86).
     if (metabolicGain('mood').ok) pc.mood = Math.min(moodMax(pc), (Number(pc.mood) || 0) + 10);
     say(engine, POWDER_TEXT.sparkle);
+    sparkleWindow(engine);
     finishUse(engine, classTsid);
     engine.updateHud?.();
     return 'sprinkle';
@@ -526,6 +527,18 @@ function remoteAt(id) {
   return r && !r.destroyed ? { x: r.x, y: r.y } : null;
 }
 
+/** G379 sparkle_powder.js 330-337: the sparkle over the whole window, 6 s, 3 s after the sprinkle. */
+function sparkleWindow(engine) {
+  const use = OVERLAY_USES.overlay_sparkle_powder;
+  later(use.delayMs, () => {
+    const root = globalThis.document?.getElementById?.('game-root');
+    if (!root) return;
+    const { rect, wh } = windowOverlayFit(root.clientWidth, root.clientHeight, use.size);
+    playWindowOverlay('overlay_sparkle_powder', { rect, wh, durationMs: use.durationMs, loop: use.loop });
+    engine.setData?.('powderSparkle', 'overlay_sparkle_powder');
+  });
+}
+
 /** The sneeze over a player (pc_overlay overlay_sneezing_powder, 300 x 300, 110 px up). */
 function sneezeOverlay(engine, at) {
   let spot = at();
@@ -613,6 +626,7 @@ function onCaught(engine, m) {
       granted = Math.round(pc.mood - before);
     }
     say(engine, powderCaughtLine(cls, name, granted));
+    sparkleWindow(engine);
     engine.updateHud?.();
     engine.save?.();
   } else return;

@@ -75,7 +75,7 @@ function sheets() {
 }
 
 test('the Rook, its halo and every hi sign keep their frames, cells and timings', async () => {
-  const { ROOK_SHEETS, ROOKED_HALO } = await import('../public/js/features/rook-attack-feature.js?v=d1c3c6ce');
+  const { ROOK_SHEETS, ROOKED_HALO } = await import('../public/js/features/rook-attack-feature.js?v=fab98cea');
   const { HI_ART, HI_ART_CELLS, HI_VARIANTS, hiArtSheet } = await import('../public/js/hi-signs.js?v=b90c7d7e');
   const rows = new Map(sheets().map((s) => [s.path, s]));
   assert.equal(rows.size, 2 + 3 * HI_VARIANTS.length);
@@ -156,7 +156,7 @@ test('each has a 3x render of its vector SWF, matched to the 1x frame for frame,
 test('the 3x covers the Rook, its halo and the hi signs where they are drawn; the swoop is the one draw it cannot', async () => {
   const { HIRES_SPRITES, SPLIT_SPRITES } = await import('../public/js/sprite-hires.js?v=3f97bf07');
   const { moduleConsts } = await import('./sheet-sources.js');
-  const { ROOK_SHEETS, ROOKED_HALO } = await import('../public/js/features/rook-attack-feature.js?v=d1c3c6ce');
+  const { ROOK_SHEETS, ROOKED_HALO } = await import('../public/js/features/rook-attack-feature.js?v=fab98cea');
   const stage = await stageScale();
   const density = (path) => (HIRES_SPRITES.has(path) || SPLIT_SPRITES.has(path) ? 3 : 1);
   const home = moduleConsts('js/features/rook-attack-feature.js').get('ROOK_HOME');
@@ -184,7 +184,7 @@ test('the 3x covers the Rook, its halo and the hi signs where they are drawn; th
 
 test('the overlays that were sheets keep SVG frames, drawn at the screen\'s density where they show', async () => {
   const { VECTOR_MAX_SIDE, VECTOR_OVER_SHEET, overlayDensity, vectorDensity } = await import('../public/js/overlay-art.js?v=11b6dd7f');
-  const { OVERLAY_USES } = await import('../public/js/overlays.js?v=6ab8ee10');
+  const { OVERLAY_USES } = await import('../public/js/overlays.js?v=e5f37a8d');
   const stage = await stageScale();
   const dir = join(pub, 'assets/sprites/overlays');
   for (const [file, keys] of Object.entries(VECTOR_OVERLAYS)) {
