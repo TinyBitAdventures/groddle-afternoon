@@ -52,6 +52,13 @@
  * onPlayerCollision runs lonelinessVisit first (street_spirit.js 541-545).
  * The loneliness feature answers engine.query('spiritCry') and
  * engine.query('spiritLonelyHere').
+ *
+ * Reminisce (G562, js/spirit-reminisce.js): every spirit's menu has the
+ * source's reminisce verb while it has a memory repeat to offer (A Summer's
+ * Day, Winter Walk, An Autumn Day; street_spirit.js 207-245), and that verb
+ * is the only way back into them. One offer opens its card; more ask which
+ * first. Canvas: spiritReminisce (the offers when the menu was drawn),
+ * spiritReminisceLast.
  */
 
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=db7c442f';
@@ -93,7 +100,10 @@ import {
   resumeTarget,
   setCurrentState,
 } from '../conversations.js?v=7cbdfea4';
-import { questStatus } from '../quest-offers.js?v=f0fe957c';
+import { acceptOffer, npcQuestOffers, questStatus } from '../quest-offers.js?v=f0fe957c';
+import { getQuestCatalog } from '../content-catalogs.js?v=10b118dd';
+import { questRoomConverse } from './quest-instances-feature.js?v=a315c1b2';
+import { SPIRIT_REMINISCE_TEXT, isStreetSpiritClass, spiritReminisceOffers, withReminisceVerb } from '../spirit-reminisce.js?v=91c51601';
 import { questDoneAt } from '../quests.js?v=c8d9d0a4';
 
 export const STREET_SPIRITS_FEATURE_ID = 'street-spirits';
@@ -460,8 +470,103 @@ function autoplay(engine) {
   }, Math.max(0, Number(engine.param('spiritwait')) || 2500));
 }
 
+/* ------------------------------------------------------------------ */
+/* G562: reminisce                                                      */
+/* ------------------------------------------------------------------ */
+
+const AUTUMN_REPEAT = 'an_autumn_day_part2';
+
+function reminisceCtx(engine) {
+  return {
+    level: engine.pc?.level,
+    xp: engine.pc?.xp,
+    inv: engine.inv,
+    pc: engine.pc,
+    now: Date.now(),
+    // an_autumn_day_part2.js canOffer 73-87, answered by features/quest-instances-feature.js.
+    customPrereq: (id, prereq) => engine.questCustomPrereq?.(id, prereq) === true,
+  };
+}
+
+/** The Autumn repeat's offer card from this spirit, or null (the offer engine: its npc trigger and canOffer). */
+function autumnCard(engine, target) {
+  return npcQuestOffers(engine.questState, target.classId, engine.pc, reminisceCtx(engine)).offered.find((c) => c.classTsid === AUTUMN_REPEAT) || null;
+}
+
+/** The repeats this spirit can offer now (Summer and Winter: game.js's own checks; Autumn: the offer engine). */
+function reminisceOffers(engine, target) {
+  const qs = engine.questState;
+  if (!qs || !isStreetSpiritClass(target?.classId)) return [];
+  return spiritReminisceOffers({
+    done: (id) => (qs.completed || []).includes(id),
+    canOffer: (id) => (id === AUTUMN_REPEAT ? Boolean(autumnCard(engine, target)) : engine.canOfferStoryQuest?.(id) === true),
+  });
+}
+
+function offerRepeat(engine, target, id) {
+  const kicker = target?.label || 'Street Spirit';
+  engine.setData('spiritReminisceLast', `offer:${id}`);
+  if (id !== AUTUMN_REPEAT) {
+    engine.openStoryQuestOffer?.(id, { kicker, acceptLabel: SPIRIT_REMINISCE_TEXT.accept, declineLabel: SPIRIT_REMINISCE_TEXT.decline });
+    return;
+  }
+  const card = autumnCard(engine, target);
+  if (!card) return;
+  engine.offerQuestDialogue({
+    title: card.title,
+    kicker,
+    beats: card.beats,
+    acceptLabel: SPIRIT_REMINISCE_TEXT.accept,
+    declineLabel: SPIRIT_REMINISCE_TEXT.decline,
+    note: card.moveNote,
+    onAccept: () => {
+      // quest-instances-feature starts the room for an accepted, managed quest (maybeStartAccepted).
+      const result = acceptOffer(engine.questState, id, reminisceCtx(engine));
+      engine.setData('spiritReminisceLast', result.ok ? `accepted:${id}` : `accept-failed:${id}`);
+      if (result.ok) engine.pushActivity(`New quest: ${card.title}`);
+      engine.save();
+      engine.updateHud?.();
+    },
+    // npc_conversation.js: a declined NPC offer is simply asked again next time.
+    onDecline: () => engine.setData('spiritReminisceLast', `declined:${id}`),
+  });
+}
+
+/** reminisce -> offerQuests (npc_quests.js 190-350): one offer opens its card, more ask which. */
+function openReminisce(engine, target) {
+  const offers = reminisceOffers(engine, target);
+  if (!offers.length) return false;
+  if (offers.length === 1) {
+    offerRepeat(engine, target, offers[0]);
+    return true;
+  }
+  const label = target?.label || 'Street Spirit';
+  engine.setData('spiritReminisceLast', 'choose');
+  questRoomConverse(engine, {
+    kicker: label,
+    text: SPIRIT_REMINISCE_TEXT.choose,
+    choices: [
+      ...offers.map((id) => ({ label: getQuestCatalog()?.[id]?.title || id, value: id })),
+      { label: SPIRIT_REMINISCE_TEXT.cancel, value: '', cancel: true },
+    ],
+  }).then((id) => {
+    // Asked again: an hour may have run out or a run started while the question was up.
+    if (id && reminisceOffers(engine, target).includes(id)) setTimeout(() => offerRepeat(engine, target, id), 0);
+    else engine.setData('spiritReminisceLast', 'cancel');
+  });
+  return true;
+}
+
 export const streetSpiritsFeature = {
   id: STREET_SPIRITS_FEATURE_ID,
+
+  /** G562: the reminisce verb, first in a spirit's menu while it has a repeat to offer (else not shown). */
+  decorateVerbs(target, verbs, engine) {
+    if (!isStreetSpiritClass(target?.classId)) return null;
+    const offers = reminisceOffers(engine, target);
+    engine.setData('spiritReminisce', offers.join(','));
+    return withReminisceVerb(verbs, offers);
+  },
 
   init(engine) {
     loader = createSheetLoader(engine.PIXI);
@@ -544,6 +649,10 @@ export const streetSpiritsFeature = {
    * play the talk clip and leave the verb to content.js's single lines (null).
    */
   runVerbOverride(target, verbId, engine) {
+    if (verbId === 'reminisce' && isStreetSpiritClass(target?.classId)) {
+      openReminisce(engine, target);
+      return true;
+    }
     if (verbId !== 'talk_to') return null;
     if (spirit && target === spirit.target) startTalk(engine, Date.now());
     if (target && target === talkTarget && !active && startConversation(engine, target, Date.now())) return true;

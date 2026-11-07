@@ -20,7 +20,7 @@ import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 
 import { CHECKLIST, GROUPS, STATUS } from './restoration/checklist.mjs';
-import { QUEST_ROOMS, BUILT_ROOMS } from '../public/js/quest-rooms/catalog.js?v=f9091020';
+import { QUEST_ROOMS, BUILT_ROOMS } from '../public/js/quest-rooms/catalog.js?v=d77d3d17';
 import { skillAuditTable } from '../public/js/skill-tree.js?v=53795620';
 import { HUB_MAP_STREETS } from '../public/js/hub-maps-data.js?v=ffe222f1';
 import { IMAGINATION_UPGRADES } from '../public/js/imagination-data.js?v=4a85e7fe';

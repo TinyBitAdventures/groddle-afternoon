@@ -309,13 +309,28 @@
   "hasCanOffer": true,
   "offerTriggers": [
    {
-    "type": "quest",
-    "quest": "an_autumn_day",
-    "override": true
+    "type": "npc",
+    "npc": "street_spirit"
+   },
+   {
+    "type": "npc",
+    "npc": "street_spirit_firebog"
+   },
+   {
+    "type": "npc",
+    "npc": "street_spirit_groddle"
+   },
+   {
+    "type": "npc",
+    "npc": "street_spirit_ix"
+   },
+   {
+    "type": "npc",
+    "npc": "street_spirit_zutto"
    }
   ],
   "instanceRoom": "an_autumn_day",
-  "offerNote": "street spirit giver; canOffer: an hour after part 1 and after the last repeat",
+  "offerNote": "street spirit reminisce; canOffer: an hour after part 1 and after the last repeat (an_autumn_day_part2.js 73-87)",
   "solo": true
  },
  "animal_friend": {

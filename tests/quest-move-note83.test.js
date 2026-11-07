@@ -18,7 +18,7 @@ import vm from 'node:vm';
 
 import { getQuestCatalog, loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js?v=10b118dd';
 import { QUEST_MOVES_NOTE, questMoveNote, questOfferCard } from '../public/js/quest-offers.js?v=f0fe957c';
-import { QUEST_ROOMS } from '../public/js/quest-rooms/catalog.js?v=f9091020';
+import { QUEST_ROOMS } from '../public/js/quest-rooms/catalog.js?v=d77d3d17';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const PUBLIC = join(ROOT, 'public');
@@ -87,7 +87,9 @@ describe('#83 quests that move you on accept', () => {
     const game = read('public/game.js');
     assert.match(game, /offerQuestDialogue\(\{[^}]*note = ''/);
     assert.match(game, /note\.textContent = index >= beats\.length - 1 \? questDialogueState\.note \|\| '' : '';/);
-    assert.match(game, /kicker: 'Magic Rock',\n\s*note: questMoveNote\(def\),/);
+    // G562: the story offer names its giver (the Magic Rock unless a Street Spirit's reminisce opens it).
+    assert.match(game, /function openQuestDialogue\(classTsid, \{ kicker = 'Magic Rock'/);
+    assert.match(game, /kicker,\n\s*note: questMoveNote\(def\),/);
     assert.match(read('public/css/classic.css'), /\.quest-dialogue-note/);
   });
 });

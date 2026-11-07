@@ -32,7 +32,7 @@ import {
   QUEST_ROOMS,
   builtInstanceQuests,
   roomModulePath,
-} from '../public/js/quest-rooms/catalog.js?v=f9091020';
+} from '../public/js/quest-rooms/catalog.js?v=d77d3d17';
 import { loadContentCatalogsFromDir, getQuestCatalog } from '../public/js/content-catalogs.js?v=10b118dd';
 import * as kit from '../public/js/quest-rooms/kit.js?v=d98b987e';
 
@@ -269,7 +269,7 @@ describe('The Wrizzards and The Rube (rube_yard)', () => {
   });
 
   it('registers the Play Cube for the pack catalog', async () => {
-    const { ROOM_ITEMS } = await import('../public/js/quest-rooms/catalog.js?v=f9091020');
+    const { ROOM_ITEMS } = await import('../public/js/quest-rooms/catalog.js?v=d77d3d17');
     assert.equal(ROOM_ITEMS.play_cube.label, 'Play Cube');
     assert.equal(ROOM_ITEMS.play_cube.stackMax, 1);
     assert.equal(ROOM_ITEMS.play_cube.sellable, false);
@@ -346,7 +346,7 @@ describe('Le Misérable (le_miserable)', () => {
 
 describe('G99: the retry prompt names whoever offered the quest', () => {
   it('questGiver: NPC and pack-item givers, the Magic Rock for familiar offers', async () => {
-    const { questGiver, FAMILIAR_GATES, GIVER_LABELS } = await import('../public/js/quest-rooms/catalog.js?v=f9091020');
+    const { questGiver, FAMILIAR_GATES, GIVER_LABELS } = await import('../public/js/quest-rooms/catalog.js?v=d77d3d17');
     const quests = JSON.parse(readFileSync(new URL('../public/assets/content/quests.json', import.meta.url), 'utf8'));
     const def = (id) => (Array.isArray(quests) ? quests : quests.quests || Object.values(quests)).find((q) => (q.classTsid || q.id) === id);
     assert.deepEqual(questGiver(def('join_club')), { npc: 'bag_butler', label: 'Butler' });
@@ -397,7 +397,7 @@ describe('G311: a failed room quest is Try again in the quest log', () => {
   };
 
   it('a run lost to a reload marks a startable quest failed, not a retry prompt', async () => {
-    const { questInstancesFeature } = await import('../public/js/features/quest-instances-feature.js?v=cb65c5e3');
+    const { questInstancesFeature } = await import('../public/js/features/quest-instances-feature.js?v=a315c1b2');
     const { ensureQuestOfferState } = await import('../public/js/quest-offers.js?v=f0fe957c');
     assert.equal(getQuestCatalog().mental_block?.needsStart, true);
     assert.notEqual(getQuestCatalog().help_juju_bandits?.needsStart, true, 'no onStarted in GSJS');
@@ -461,7 +461,7 @@ describe('G313: failed room quests the source removes', () => {
   });
 
   it('a reload removes a source-removed quest and its offers, and keeps the prompt for the three', async () => {
-    const { questInstancesFeature } = await import('../public/js/features/quest-instances-feature.js?v=cb65c5e3');
+    const { questInstancesFeature } = await import('../public/js/features/quest-instances-feature.js?v=a315c1b2');
     const { questStatus } = await import('../public/js/quest-offers.js?v=f0fe957c');
     const t = Date.now() - 60_000;
     questInstancesFeature.restore({ memory: {}, retry: { tower_quest: t, le_miserable_part_2: t, smuggle_the_smuggler_part2: t } });
@@ -489,7 +489,7 @@ describe('G313: failed room quests the source removes', () => {
   });
 
   it('has no map card', async () => {
-    const { questInstancesFeature } = await import('../public/js/features/quest-instances-feature.js?v=cb65c5e3');
+    const { questInstancesFeature } = await import('../public/js/features/quest-instances-feature.js?v=a315c1b2');
     assert.equal(questInstancesFeature.mapCards, undefined);
     const src = readFileSync(join(root, 'public/js/features/quest-instances-feature.js'), 'utf8');
     assert.doesNotMatch(src, /Unfinished quest places/);
@@ -510,7 +510,7 @@ describe('#107: a choice dialog can be dismissed', () => {
   const src = readFileSync(join(root, 'public/js/features/quest-instances-feature.js'), 'utf8');
 
   it('Escape and a click outside make the cancel choice (ChoicesDialog.as _escKeyHandler: cancel_value first)', async () => {
-    const { cancelChoice } = await import('../public/js/features/quest-instances-feature.js?v=cb65c5e3');
+    const { cancelChoice } = await import('../public/js/features/quest-instances-feature.js?v=a315c1b2');
     const memories = [{ label: 'Four Letter Words', value: 'letter_block_2' }, { label: 'Hog Haul', value: 'hogtie_piggies' }, { label: 'Never mind', value: '', cancel: true }];
     assert.equal(cancelChoice(memories), '');
     assert.equal(cancelChoice([{ label: 'Stay', value: 'stay', cancel: true }, { label: 'Leave', value: 'leave' }]), 'stay');

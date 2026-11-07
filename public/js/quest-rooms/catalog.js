@@ -118,10 +118,11 @@ export const OFFER_OVERRIDES = Object.freeze({
     offerTriggers: [{ type: 'quest', quest: 'blue_and_white_part1' }],
     why: 'street spirit giver; offered once A Summer’s Day is done',
   },
+  // G562: the repeat keeps its source giver, a Street Spirit's reminisce verb (street_spirit.js
+  // 218-240; features/street-spirits-feature.js), and is never a Magic Rock offer.
   an_autumn_day_part2: {
-    offerTriggers: [{ type: 'quest', quest: 'an_autumn_day' }],
     prerequisites: [{ condition: 'custom_code', value: 'hour_after:an_autumn_day', not: 0 }],
-    why: 'street spirit giver; canOffer: an hour after part 1 and after the last repeat',
+    why: 'street spirit reminisce; canOffer: an hour after part 1 and after the last repeat (an_autumn_day_part2.js 73-87)',
   },
   // Source: firefly_whistle done 10+ days earlier (le_miserable.js 17-23). Austin 2026-10-24: one day.
   le_miserable: {

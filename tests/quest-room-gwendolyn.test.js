@@ -11,7 +11,7 @@ import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import * as kit from '../public/js/quest-rooms/kit.js?v=d98b987e';
-import { QUEST_ROOMS, roomModulePath } from '../public/js/quest-rooms/catalog.js?v=f9091020';
+import { QUEST_ROOMS, roomModulePath } from '../public/js/quest-rooms/catalog.js?v=d77d3d17';
 import { loadContentCatalogsFromDir, getQuestCatalog } from '../public/js/content-catalogs.js?v=10b118dd';
 import { acceptOffer, ensureQuestOfferState, questStatus, turnInQuest } from '../public/js/quest-offers.js?v=f0fe957c';
 import { gwendolynOffers } from '../public/js/gwendolyn-room-23.js?v=46e417b9';

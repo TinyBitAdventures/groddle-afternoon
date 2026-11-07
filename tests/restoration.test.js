@@ -17,7 +17,7 @@ import { SHOTS } from '../tools/restoration/shots.mjs';
 import { buildRestorationData, comparable, commitKind, dayActivity, historyLog, releaseInfo, soundStats } from '../tools/build-restoration.mjs';
 import * as heat from '../public/restoration/history/heatmap.js?v=bb1775c2';
 import { execFileSync } from 'node:child_process';
-import { QUEST_ROOMS } from '../public/js/quest-rooms/catalog.js?v=f9091020';
+import { QUEST_ROOMS } from '../public/js/quest-rooms/catalog.js?v=d77d3d17';
 import { ROOM_NOTES } from '../tools/restoration/rooms.mjs';
 import { DESIGNER_LEVELS, TEXT_LEVELS } from '../tools/restoration/designer-levels.mjs';
 

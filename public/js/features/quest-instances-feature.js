@@ -87,7 +87,7 @@ import {
   stuckPromptDue,
   wayBackFrom,
 } from '../quest-instance.js?v=f0df88c3';
-import { FAMILIAR_GATES, QUEST_ROOMS, REMINISCE_ITEMS, ROOM_ITEMS, isBuiltRoom, questGiver, roomModulePath } from '../quest-rooms/catalog.js?v=f9091020';
+import { FAMILIAR_GATES, QUEST_ROOMS, REMINISCE_ITEMS, ROOM_ITEMS, isBuiltRoom, questGiver, roomModulePath } from '../quest-rooms/catalog.js?v=d77d3d17';
 import * as kit from '../quest-rooms/kit.js?v=d98b987e';
 import { locationEventsApi } from './location-events-feature.js?v=0966e395';
 import {

@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=4901531f';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=127e0a3c';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=8b75ad38';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=5258a113';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -36,6 +36,7 @@ import {
 // Quest copy is Flash htmlText: <b>/<i>/<br> drawn as formatting, the rest dropped, never innerHTML.
 import { questRequirementText, renderQuestText, withQuestMarkup } from './js/quest-text.js?v=7f5d761c';
 // G267: the world-verb quest counters skip offer-system quests; old saves drop the boot Moloko quest.
+import { dropSpiritRepeatOffers, SPIRIT_REPEAT_QUESTS } from './js/spirit-reminisce.js?v=91c51601';
 import { dropBootStarterQuests, questMoveNote, routesCounter, worldVerbQuestEvents, gardenPlotEvents, makingUnitQuestEvents, shrineDonationQuestEvents } from './js/quest-offers.js?v=f0fe957c';
 import {
   PHANTOM_QUEST_ID,
@@ -11879,6 +11880,9 @@ const engine = {
   // cannot be started later has one choice); the X and Escape still close it where they would.
   // G255: acceptBlocked (a reason) disables the accept, as no_starting_quests does accept_and_start (ConversationManager.as 582-585).
   // #83: note (quest-offers questMoveNote) is a line under the last page: accepting moves you.
+  /** G562: a story quest's own offer check, and its offer card from an NPC (features/street-spirits-feature.js reminisce). */
+  canOfferStoryQuest: (classTsid) => canOfferStoryQuest(classTsid),
+  openStoryQuestOffer: (classTsid, opts = {}) => openQuestDialogue(classTsid, opts),
   offerQuestDialogue({ title, kicker, beats, acceptLabel, declineLabel, onAccept, onDecline, urgent = false, inLog = false, declinable = true, acceptBlocked = '', note = '' }) {
     openScriptedQuestDialogue({
       title,
@@ -24944,6 +24948,8 @@ function canOfferStoryQuest(classTsid) {
 
 function appendStoryQuestOffers(box) {
   for (const classTsid of STORY_QUEST_IDS) {
+    // G562: the repeats are a Street Spirit's reminisce, never in the log (hide_questlog 1; street_spirit.js 218-240).
+    if (SPIRIT_REPEAT_QUESTS.includes(classTsid)) continue;
     if (!canOfferStoryQuest(classTsid)) continue;
     const def = getQuestCatalog()[classTsid];
     if (!def) continue;
@@ -25043,7 +25049,7 @@ function renderQuestDialogueBeat() {
           ? questDialogueState.primaryLabel
           : beat.response || (finalBeat ? 'All right' : 'Continue')
         : finalBeat
-          ? STORY_ACCEPT_LABELS[def.classTsid] || 'Accept quest'
+          ? questDialogueState.acceptLabel || STORY_ACCEPT_LABELS[def.classTsid] || 'Accept quest'
           : beat.response || 'Continue';
     next.dataset.accept = mode === 'offer' && finalBeat ? '1' : '0';
     const blocked = finalBeat ? questDialogueState.primaryBlocked || '' : '';
@@ -25055,7 +25061,7 @@ function renderQuestDialogueBeat() {
     cancel.textContent =
       mode === 'script'
         ? questDialogueState.cancelLabel || 'Close'
-        : 'Maybe later';
+        : questDialogueState.declineLabel || 'Maybe later';
   }
   // G211: Magic Rock offers take QuestConversationUI's look; G225: its other
   // lines the FamiliarDialog CONVERSATION panel (js/familiar.js).
@@ -25091,9 +25097,10 @@ function questLogCardSpot(modal) {
   return { x: p.left - base.left + 10, y: l.top - base.top + 10 };
 }
 
-function openQuestDialogue(classTsid) {
+/** A story quest's offer card. G562: a Street Spirit's reminisce names itself and the source's buttons. */
+function openQuestDialogue(classTsid, { kicker = 'Magic Rock', acceptLabel = '', declineLabel = '' } = {}) {
   const def = getQuestCatalog()[classTsid];
-  if (!def || !canOfferStoryQuest(classTsid)) return;
+  if (!def || !canOfferStoryQuest(classTsid)) return false;
   closeQuestPanel();
   closePackPopover();
   questDialogueState = {
@@ -25101,10 +25108,13 @@ function openQuestDialogue(classTsid) {
     def,
     beats: withQuestMarkup(parseQuestConversation(def.offer), def.offer),
     index: 0,
-    kicker: 'Magic Rock',
+    kicker,
     note: questMoveNote(def),
+    acceptLabel,
+    declineLabel,
   };
   renderQuestDialogueBeat();
+  return true;
 }
 
 /** The open prompt's timeout (G198, js/prompt-timeout.js): { state, handle }. */
@@ -29162,6 +29172,8 @@ async function main() {
     dropBootStarterQuests(questState);
     // A Winter Walk still in the log was lost with the page: the source counts that as leaving it.
     failInterruptedWinterWalk(questState, Date.now());
+    // G562: a repeat the Magic Rock left waiting in Offered goes; only a Street Spirit offers it now.
+    dropSpiritRepeatOffers(questState);
     const mainQuests = ['animalkinship_pet_piggies'];
     state.questDone = mainQuests.every((id) => questState.completed.includes(id));
     handleSkillCompletions(tickSkillStudy(skillState, Date.now()).completed, { offline: true });
