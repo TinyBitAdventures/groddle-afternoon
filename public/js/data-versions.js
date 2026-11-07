@@ -2964,6 +2964,7 @@
       "assets/sprites/icons/rube_potato@3x.png": "9ff2d4ee",
       "assets/sprites/icons/smelter_broken.png": "3f2c984f",
       "assets/sprites/icons/smelter_broken@3x.png": "7a1611b2",
+      "assets/sprites/juju_boss/shaking-fists.webp": "35645b8e",
       "assets/sprites/made/fire-dragon/npc_fire_dragon_walk@3x.webp": "bf930506",
       "assets/sprites/mail-npc/frog_blue_box_dancerPose@3x.webp": "fd8eee74",
       "assets/sprites/mail-npc/frog_blue_box_dancerPoseIn@3x.webp": "09c41c31",

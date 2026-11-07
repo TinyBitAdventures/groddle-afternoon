@@ -2732,9 +2732,29 @@
   "deployed": "2026-11-06"
  },
  "git": {
-  "commits": 1416,
+  "commits": 1420,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-07",
+    "kind": "improve",
+    "text": "When the servers are in trouble the Juju Boss says so, as in 2012"
+   },
+   {
+    "date": "2026-11-07",
+    "kind": "new",
+    "text": "Bewitched Backwoods is a back yard you can choose, drawn with Mythical Oak's look"
+   },
+   {
+    "date": "2026-11-07",
+    "kind": "improve",
+    "text": "Rerunning the street events builder changes only what really changed"
+   },
+   {
+    "date": "2026-11-07",
+    "kind": "improve",
+    "text": "Sixteen recipes are learned from their quests again, and anyone who already made one keeps it"
+   },
    {
     "date": "2026-11-07",
     "kind": "new",
@@ -2834,26 +2854,6 @@
     "date": "2026-11-06",
     "kind": "fix",
     "text": "Pick up in Decoration Mode asks how many on a stack of more than one"
-   },
-   {
-    "date": "2026-11-06",
-    "kind": "fix",
-    "text": "Pick up on a stack on the ground asks how many instead of taking it all"
-   },
-   {
-    "date": "2026-11-06",
-    "kind": "improve",
-    "text": "Jal has a new map painting, repainted from Tiny Speck's thumbnail of the lost original"
-   },
-   {
-    "date": "2026-11-06",
-    "kind": "improve",
-    "text": "Ix has a new map painting, repainted from Tiny Speck's thumbnail of the lost original"
-   },
-   {
-    "date": "2026-11-06",
-    "kind": "new",
-    "text": "Trophies can be found in the Furniture tab and displayed in your house"
    }
   ]
  },

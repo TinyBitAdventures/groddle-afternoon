@@ -143,9 +143,14 @@ export const GATE_COPY = {
     title: 'Multiplayer needs the Groddle site',
     body: ['This copy of the game has no accounts behind it, so it can only play solo.'],
   },
+  // Tiny Speck's own server-trouble page (the Juju Boss's one public job): Wayback glitch.com capture of
+  // 2012-08-13, research/wayback/raw/glitchcom-locations-live/pages-census/GIFNU7T73U722U5-20120813184746.html 144-148.
   offline: {
-    title: 'The Groddle site is not answering',
-    body: ['Multiplayer saves live on the site, so it has to be reachable to play. Try again in a moment.'],
+    title: 'Oh no!',
+    body: [
+      'Oh dear, we seem to be having trouble talking to the game servers. Perhaps the bad joojoos have run amok.',
+      "There's a good chance that the problem you're experiencing is intermittent. Wait a few seconds and then try again.",
+    ],
   },
   // The administrators' console banned this account (groddle-afternoon-site src/AdminConsole.php).
   suspended: {
@@ -153,10 +158,16 @@ export const GATE_COPY = {
     body: ['This account is suspended.', 'It cannot play with others. Solo play in this browser still works.'],
   },
   'load-failed': {
-    title: 'Your character did not load',
-    body: ['The site answered, but your multiplayer save could not be read. Try again in a moment.'],
+    title: 'Oh no!',
+    body: [
+      'Your character did not load: the site answered, but your multiplayer save could not be read. Perhaps the bad joojoos have run amok.',
+      'Try again in a moment.',
+    ],
   },
 };
+
+/** The gates that mean the servers are in trouble: the Juju Boss stands on them (assets/sprites/juju_boss, CC0). */
+export const JUJU_BOSS_GATES = Object.freeze(['offline', 'load-failed']);
 
 /**
  * Who is playing, as account.session() answers, without the console's 400 on a signed-out visit
@@ -172,6 +183,8 @@ export async function quietSession(account, { fetch: fetchFn = globalThis.fetch?
   let beat = null;
   try {
     const res = await fetchFn(new URL('wp-admin/admin-ajax.php?action=heartbeat', baseUri).href, { method: 'POST', credentials: 'same-origin', cache: 'no-store' });
+    // The host serves these pages itself, so when PHP is down this answers 5xx: trouble, not "no accounts here".
+    if (res.status >= 500) return offline;
     beat = res.ok ? await res.json().catch(() => null) : null;
   } catch {
     return offline;
@@ -181,6 +194,7 @@ export async function quietSession(account, { fetch: fetchFn = globalThis.fetch?
   let me;
   try {
     const res = await fetchFn(`${account.urls.api}me`, { credentials: 'same-origin', cache: 'no-store' });
+    if (res.status >= 500) return offline;
     me = { ok: res.ok, data: await res.json().catch(() => null) };
   } catch {
     return offline;
@@ -246,6 +260,7 @@ function showGate(gate, state, { account, onSignedIn, onSignedOut = onSignedIn, 
   card.replaceChildren(...(keep ? [keep] : []));
   const name = session?.player?.name || '';
   card.append(el('h2', {}, state === 'choose' && name ? `${copy.title}, ${name}` : copy.title));
+  if (JUJU_BOSS_GATES.includes(state)) card.prepend(el('div', { class: 'online-boss', role: 'img', 'aria-label': 'The Juju Boss, shaking both fists' }));
   for (const line of copy.body) card.append(el('p', {}, line));
   if (state === 'choose') {
     const play = el('button', { type: 'button', class: 'online-play', 'data-online-continue': '' }, name ? `Play as ${name}` : 'Play');

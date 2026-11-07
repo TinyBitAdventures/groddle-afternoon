@@ -17,7 +17,7 @@ import assert from 'node:assert/strict';
 import { resolveTokens } from './css-tokens.js';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { quietSession } from '../public/js/online-boot.js?v=7ffb8870';
+import { quietSession } from '../public/js/online-boot.js?v=092f50f0';
 import { createMinnAccount } from '../public/js/minn-account.js?v=b29fae30';
 import { buildOnlinePage, ONLINE_BOOT_SRC } from '../tools/play-online/build.mjs';
 
@@ -73,6 +73,17 @@ describe('G322: /play/online/ signed out asks no rest-nonce', () => {
     assert.equal(s.player.name, 'Tess');
     assert.deepEqual(f.calls.map((c) => c.url.replace(BASE, '')), [BEAT, NONCE, ME]);
     assert.equal(f.calls[2].headers['X-WP-Nonce'], 'abcdef0123');
+  });
+
+  it('a site answering 5xx is in trouble, not "no accounts here": the host serves this page without PHP', async () => {
+    for (const status of [500, 502, 503, 522]) {
+      const down = routedFetch({ [BEAT]: { status, body: '<html>down</html>' } });
+      assert.deepEqual(await quiet(down), { minn: false, offline: true, signedIn: false, player: null }, String(status));
+    }
+    const meDown = routedFetch({ [BEAT]: BEAT_OUT, [ME]: { status: 503, body: 'down' } });
+    assert.equal((await quiet(meDown)).offline, true);
+    const noPhp = routedFetch({ [BEAT]: { status: 404, body: 'not found' } });
+    assert.deepEqual(await quiet(noPhp), { minn: false, signedIn: false, player: null }, 'a 404 is a copy with no site');
   });
 
   it('a static server (no admin-ajax) is no Minn; an unreachable site is offline', async () => {

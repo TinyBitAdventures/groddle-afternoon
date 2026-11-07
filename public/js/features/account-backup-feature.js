@@ -34,7 +34,7 @@ import { mountAccountForms, mountAccountSettings, mountPresenceSetting } from '.
 import { createBrowserSaveStore, freezeSoloSaves, restoreSoloSave, saveStore, savedAtOf, soloSaveSnapshot } from '../save-store.js?v=8839ba7b';
 import { formatGameDayLabel } from '../game-day.js?v=edb00566';
 import { multiplayerEntryUrl } from '../game-mode.js?v=1ecf2899';
-import { quietSession } from '../online-boot.js?v=7ffb8870';
+import { quietSession } from '../online-boot.js?v=092f50f0';
 
 /** Which slot a new backup goes to: the first empty one, else the oldest (which then needs a yes). */
 export function slotForNewBackup(backups, slots) {

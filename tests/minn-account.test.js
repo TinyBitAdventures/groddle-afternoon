@@ -16,11 +16,11 @@ import { join } from 'node:path';
 import { homedir } from 'node:os';
 
 import { createMinnAccount, minnUrls } from '../public/js/minn-account.js?v=b29fae30';
-import { GATE_COPY, SAVE_ALERT_COPY, bootDataFrom, deliverHandoff, gateFor, saveAlertFor } from '../public/js/online-boot.js?v=7ffb8870';
+import { GATE_COPY, JUJU_BOSS_GATES, SAVE_ALERT_COPY, bootDataFrom, deliverHandoff, gateFor, saveAlertFor } from '../public/js/online-boot.js?v=092f50f0';
 import { SAVE_STOPPED } from '../public/js/save-store.js?v=8839ba7b';
 import { FORM_COPY, SETTINGS_COPY, resetLinkFrom } from '../public/js/account-forms.js?v=318b6815';
-import { restoreNeedsAsking, sizeLabel, slotForNewBackup, accountBackupFeature } from '../public/js/features/account-backup-feature.js?v=d780c98a';
-import { FEATURES } from '../public/js/features/index.js?v=b55d1410';
+import { restoreNeedsAsking, sizeLabel, slotForNewBackup, accountBackupFeature } from '../public/js/features/account-backup-feature.js?v=48101765';
+import { FEATURES } from '../public/js/features/index.js?v=78976235';
 import { multiplayerEntryUrl } from '../public/js/game-mode.js?v=1ecf2899';
 import { SAVE_ENTRY_NAMES, createMultiplayerSaveStore } from '../public/js/save-store.js?v=8839ba7b';
 import { HAS_SITE, SITE_DIR, serverPath, skipWithoutServer, skipWithoutSite } from '../tools/repos.mjs';
@@ -288,6 +288,22 @@ describe('online-boot', () => {
     assert.doesNotMatch(read('public/js/minn-account-core.js'), /from '[^']*save-store\.js/);
     assert.match(src, /window\.GRODDLE_MP_BOOT = bootDataFrom/);
     assert.ok(src.indexOf('window.GRODDLE_MP_BOOT =') < src.indexOf("game.type = 'module'"), 'the save is in place before game.js is added');
+  });
+
+  it('the server-trouble cards are Tiny Speck\'s, with the Juju Boss on them', () => {
+    assert.equal(GATE_COPY.offline.title, 'Oh no!');
+    assert.match(GATE_COPY.offline.body[0], /Perhaps the bad joojoos have run amok\.$/);
+    assert.equal(GATE_COPY['load-failed'].title, 'Oh no!');
+    assert.deepEqual([...JUJU_BOSS_GATES], ['offline', 'load-failed']);
+    const page = read('public/play/online/index.html');
+    assert.match(page, /\.online-boss \{[^}]*shaking-fists\.webp/);
+    assert.match(page, /prefers-reduced-motion: reduce\) \{ \.online-boss/);
+    // 24 cells of 104 x 114, the width its keyframes walk.
+    const webp = readFileSync(join(root, 'public/assets/sprites/juju_boss/shaking-fists.webp'));
+    assert.equal(webp.toString('latin1', 0, 4), 'RIFF');
+    assert.match(page, /background-position: -2496px 0/);
+    const src = read('public/js/online-boot.js');
+    assert.match(src, /JUJU_BOSS_GATES\.includes\(state\)\) card\.prepend/);
   });
 
   it('gate copy is plain, with no em-dashes', () => {

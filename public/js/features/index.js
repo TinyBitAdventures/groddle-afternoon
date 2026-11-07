@@ -181,4 +181,4 @@ import { collectionTrophiesFeature } from './collection-trophies-feature.js?v=c3
 import { recipeMemoryFeature } from './recipe-memory-feature.js?v=de1b3a44'; FEATURES.push(recipeMemoryFeature);
 import { streetObjectsFeature } from './street-objects-feature.js?v=62a5ecf1'; FEATURES.push(streetObjectsFeature);
 import { realtimeFeature } from './realtime-feature.js?v=c9c3d2f8'; FEATURES.push(realtimeFeature);
-import { accountBackupFeature } from './account-backup-feature.js?v=d780c98a'; FEATURES.push(accountBackupFeature);
+import { accountBackupFeature } from './account-backup-feature.js?v=48101765'; FEATURES.push(accountBackupFeature);

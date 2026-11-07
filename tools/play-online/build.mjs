@@ -59,6 +59,11 @@ const ONLINE_STYLE = `  <style>
     .online-gate[hidden] { display: none; }
     .online-gate .card { line-height: var(--lh-normal); text-align: left; max-width: 26rem; }
     .online-gate .card img { display: block; width: 44px; height: 44px; margin: 0 auto var(--sp-4); }
+    /* The Juju Boss on a server-trouble card: 24 frames of npc_juju_boss shaking_fists (frames 27-50, Tiny Speck CC0). */
+    .online-gate[data-online="offline"] .card > img, .online-gate[data-online="load-failed"] .card > img { display: none; }
+    .online-boss { width: 104px; height: 114px; margin: 0 auto var(--sp-4); background: url("assets/sprites/juju_boss/shaking-fists.webp") 0 0 no-repeat; animation: online-boss-shake 1s steps(24) infinite; }
+    @keyframes online-boss-shake { to { background-position: -2496px 0; } }
+    @media (prefers-reduced-motion: reduce) { .online-boss { animation: none; } }
     .online-gate .online-play {
       display: block; width: 100%; margin-top: var(--sp-7); text-align: center; text-decoration: none; border: 0; cursor: pointer;
       border-radius: var(--radius-lg); padding: 0.7rem var(--sp-8); font: inherit; font-size: var(--fs-lg); font-weight: 700; color: var(--text);
