@@ -45,7 +45,7 @@ import {
 } from '../public/js/conversations.js?v=7cbdfea4';
 import { assignQuest, completeQuest, questDoneAt } from '../public/js/quests.js?v=c8d9d0a4';
 import { loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js?v=10b118dd';
-import { normalizeQuestSnapshot } from '../public/js/player-save.js?v=575e43e1';
+import { normalizeQuestSnapshot } from '../public/js/player-save.js?v=45c0cbb1';
 import { SPIRIT_CONVERSATIONS, TALK_CLASSES, TALK_ORDER, UNBUILT_GATES, canOffer as spiritCanOffer, offerNext } from '../public/js/street-spirit-talks.js?v=5321850f';
 import { GIANT_ICON_DATA } from '../public/js/giant-icons-data.js?v=5026b09c';
 import { buildConversations } from '../tools/build-conversations.mjs';
@@ -386,7 +386,7 @@ test.describe('the Street Spirits’ saved ledger moves onto the record', () => 
   });
 
   test('the spirit feature hands over an old slice once and saves a marker', async () => {
-    const { streetSpiritsFeature } = await import('../public/js/features/street-spirits-feature.js?v=e50d4419');
+    const { streetSpiritsFeature } = await import('../public/js/features/street-spirits-feature.js?v=b7e79d8e');
     resetConversationRecord();
     streetSpiritsFeature.restore(OLD);
     assert.equal(hasCompleted(conversationRecord(), 'when_down_was_up_1'), true);
@@ -395,7 +395,7 @@ test.describe('the Street Spirits’ saved ledger moves onto the record', () => 
     streetSpiritsFeature.restore({ moved: 'conversations' });
     assert.deepEqual(conversationRecord().completed, {});
     // The spirits read the same record the conversations feature saves.
-    const { conversationsFeature } = await import('../public/js/features/conversations-feature.js?v=1fa17b85');
+    const { conversationsFeature } = await import('../public/js/features/conversations-feature.js?v=f442742f');
     resetConversationRecord();
     conversationsFeature.restore(OLD);
     assert.equal(streetSpiritsFeature._talks().talks, conversationRecord());
@@ -442,7 +442,7 @@ test.describe('the conversations feature in a stub world', () => {
   }
 
   test('a rock walked into offers, gets a Talk to, and tells its conversation step by step', async () => {
-    const { conversationsFeature: f, CONVO_TALK_VERB } = await import('../public/js/features/conversations-feature.js?v=1fa17b85');
+    const { conversationsFeature: f, CONVO_TALK_VERB } = await import('../public/js/features/conversations-feature.js?v=f442742f');
     resetConversationRecord();
     const w = stubWorld({ classId: 'rock_beryl_1', label: 'Beryl Rock', state: { rock: { chunksRemaining: 10 } }, params: { convo: 'dev' } });
     w.feature = f;
@@ -483,7 +483,7 @@ test.describe('the conversations feature in a stub world', () => {
   });
 
   test('a Fruit Tree’s Surfeit of Cherries 3 hands over 250 Cherries on its third answer; Talk to stays the tree’s own otherwise', async () => {
-    const { conversationsFeature: f } = await import('../public/js/features/conversations-feature.js?v=1fa17b85');
+    const { conversationsFeature: f } = await import('../public/js/features/conversations-feature.js?v=f442742f');
     const rec = resetConversationRecord();
     for (const id of prerequisitesOf('surfeit_of_cherries_3')) completeConversation(rec, CONVERSATIONS[id].tellers[0], id, CONVERSATIONS[id].chain, 1);
     rec.chainsInProgress = { surfeit_of_cherries: 1 };
@@ -648,7 +648,7 @@ test.describe('G202: Icons and resume in the conversations feature', () => {
   const at = (ms) => { clock += ms; return clock; };
 
   test('a placed Icon offers on collision by the shared rules, gets a Talk to, and pays 111 iMG on the last answer', async () => {
-    const { conversationsFeature: f, CONVO_TALK_VERB } = await import('../public/js/features/conversations-feature.js?v=1fa17b85');
+    const { conversationsFeature: f, CONVO_TALK_VERB } = await import('../public/js/features/conversations-feature.js?v=f442742f');
     resetConversationRecord();
     const w = world({ classId: 'icon_pot', label: 'Icon of Pot', iconId: 'i1', params: { convo: 'dev' } });
     w.feature = f;
@@ -701,7 +701,7 @@ test.describe('G202: Icons and resume in the conversations feature', () => {
   });
 
   test('a conversation cut off by a reload opens again at its line by its teller, without the reward again; out of range it waits', async () => {
-    const { conversationsFeature: f } = await import('../public/js/features/conversations-feature.js?v=1fa17b85');
+    const { conversationsFeature: f } = await import('../public/js/features/conversations-feature.js?v=f442742f');
     const rec = resetConversationRecord();
     for (const id of prerequisitesOf('surfeit_of_cherries_3')) completeConversation(rec, CONVERSATIONS[id].tellers[0], id, CONVERSATIONS[id].chain, 1);
     rec.chainsInProgress = { surfeit_of_cherries: 1 };
@@ -766,7 +766,7 @@ test.describe('G202: Icons and resume in the conversations feature', () => {
   });
 
   test('closing keeps the state; Talk to again starts from the first line', async () => {
-    const { conversationsFeature: f } = await import('../public/js/features/conversations-feature.js?v=1fa17b85');
+    const { conversationsFeature: f } = await import('../public/js/features/conversations-feature.js?v=f442742f');
     const rec = resetConversationRecord();
     recordOffer(rec, 'rock_beryl_1', 'common_complaints_of_beryl_1', clock);
     const realNow = Date.now;

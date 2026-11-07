@@ -30,7 +30,11 @@ import {
   plotStatusLabel,
   gardenNeedsWater,
   GARDEN_NO_DRY_PLOTS_LINE,
-} from './js/garden.js?v=74dd94d0';
+  GARDEN_FERTILIZER,
+  GARDEN_FERTILIZE_MS,
+  fertilizeCheck,
+  fertilizePlot,
+} from './js/garden.js?v=2536c8cd';
 import { firstWorkingTool, HOE_TOOLS, WATERING_CAN_TOOLS } from './js/tools.js?v=689d6594';
 import {
   ROCK_CATALOG,
@@ -83,7 +87,7 @@ import { BUTTER_UP, SING_TO, butterUpVerbState, butterUpChicken, singToVerbState
 import { levelInfoForXp } from './js/progression.js?v=33462eaa';
 import { getGameDayKey } from './js/game-day.js?v=edb00566';
 import { isElementClass } from './js/pack-slots.js?v=a94b816c';
-import { ITEM_CATALOG } from './js/inventory.js?v=d82f3b00';
+import { ITEM_CATALOG, countItem } from './js/inventory.js?v=d82f3b00';
 import { slugsFromEffects } from './js/speech-slugs.js?v=130338f9';
 import { animalResponseKey, failureResponseKey, trantCareResponseKey, rockResponseKey, verbResponse } from './js/verb-responses.js?v=3ceb8a8c';
 
@@ -921,6 +925,15 @@ export function getVerbsFor(target, ctx) {
         tooltip: 'Hoe the dirt so you can plant again',
       });
     }
+    // GardenView.as onPlotClick 521-528, GardenPlotDetails.as 170-175: with Guano, a watered plot offers it.
+    if (countItem(inv, GARDEN_FERTILIZER) > 0 && fertilizeCheck(plot).ok) {
+      add('fertilize', 'fertilize', {
+        sort: 20,
+        energy: 0,
+        durationMs: GARDEN_FERTILIZE_MS,
+        tooltip: 'Speed up the growing',
+      });
+    }
     if ((st === 'seeds' || st === 'shoots') && plot?.wet) {
       add('talk_to', 'check', {
         sort: 40,
@@ -1600,6 +1613,7 @@ export function runVerb(target, verbId, ctx) {
     else if (verbId === 'water') r = waterPlot(garden, key, pc, opts);
     else if (verbId === 'harvest') r = harvestPlot(garden, key, inv, pc, opts);
     else if (verbId === 'clear') r = clearPlot(garden, key, pc, opts);
+    else if (verbId === 'fertilize') r = fertilizePlot(garden, key, inv, opts);
     else if (verbId === 'talk_to') {
       msgs.push(plotStatusLabel(s.plot) || 'A garden plot.');
       return { ok: true, msgs, effects };

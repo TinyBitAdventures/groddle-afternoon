@@ -1321,6 +1321,8 @@ export function gardenPlotEvents(plot, label = 'street') {
   const out = [];
   if (verb === 'water') out.push({ event: `garden_plots_watered:${tag}`, amount: 1 });
   if (verb === 'clear') out.push({ event: `garden_plots_hoed:${tag}`, amount: 1 });
+  // include/garden.js 641: achievements_increment('garden_plots_fertilized', achievement_key).
+  if (verb === 'fertilize') out.push({ event: `garden_plots_fertilized:${tag}`, amount: 1 });
   if (verb === 'plant' && plot.seedId) {
     out.push({ event: `${herb ? 'garden_herb_plots_planted' : 'garden_plots_planted'}:${tag}`, amount: 1 });
     if (herb) {

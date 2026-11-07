@@ -8,13 +8,13 @@ import assert from 'node:assert/strict';
 import { readFileSync, existsSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { AGGRESSIVE_HOEING_VERBS, aggressiveHoeingVerb, clearPlot, createGarden, gardenActionProfile, getPlot, runAggressiveHoeingVerb } from '../public/js/garden.js?v=74dd94d0';
+import { AGGRESSIVE_HOEING_VERBS, aggressiveHoeingVerb, clearPlot, createGarden, gardenActionProfile, getPlot, runAggressiveHoeingVerb } from '../public/js/garden.js?v=2536c8cd';
 import { plotVerbs, resolveTendPackage } from '../public/js/patches.js?v=ddd16221';
 import { createToolConditionState, setToolRemaining, getToolCondition } from '../public/js/tools.js?v=689d6594';
 import { createInventory } from '../public/js/inventory.js?v=d82f3b00';
-import { getVerbsFor, runVerb } from '../public/content.js?v=8ceaca2e';
-import { normalizePlayerSnapshot } from '../public/js/player-save.js?v=575e43e1';
-import { aggressiveHoeingFeature as feature } from '../public/js/features/aggressive-hoeing-feature.js?v=bf0f3b0d';
+import { getVerbsFor, runVerb } from '../public/content.js?v=45e24b72';
+import { normalizePlayerSnapshot } from '../public/js/player-save.js?v=45c0cbb1';
+import { aggressiveHoeingFeature as feature } from '../public/js/features/aggressive-hoeing-feature.js?v=09696d80';
 
 const GS = join(dirname(fileURLToPath(import.meta.url)), '../../glitch-GameServerJS');
 const CARD = 'hoeing_more_img_more_wear';

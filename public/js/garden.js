@@ -337,6 +337,7 @@ export const GARDEN_SKILL_PACKAGES = Object.freeze({
     water: 'croppery_water',
     harvest: 'croppery_harvest',
     clear: 'croppery_clear',
+    fertilize: 'croppery_fertilize',
   }),
   herb: Object.freeze({
     skill: 'herbalism_1',
@@ -344,6 +345,7 @@ export const GARDEN_SKILL_PACKAGES = Object.freeze({
     water: 'herbalism_water',
     harvest: 'herbalism_harvest',
     clear: 'herbalism_clear',
+    fertilize: 'herbalism_fertilize',
   }),
 });
 
@@ -1161,6 +1163,8 @@ export function plantPlot(garden, key, inv, pc, seedId, opts = {}) {
   const now = opts.now ?? Date.now();
   plot.state = 'seeds';
   plot.seed = seed.seedId;
+  // Guard: a plot picked by hand after a Dung-Kicker pour kept the mark in older saves.
+  plot.fertilized = false;
   startStage(plot, now);
   // Growth Spurt / Speedy Herbs cards: crop or herb plots grow 10/20% faster
   // (include/garden.js plot grow_modifier, set at planting).
@@ -1337,6 +1341,9 @@ export function harvestPlot(garden, key, inv, pc, opts = {}) {
   const now = opts.now ?? Date.now();
   plot.state = 'dirty';
   plot.seed = null;
+  // include/garden.js 553: picking ends the fertilizer with the crop.
+  plot.fertilized = false;
+  plot.guanoAt = null;
   startStage(plot, now);
   return {
     ok: true,
@@ -1452,6 +1459,97 @@ export function tendPlot(garden, key, inv, pc, opts = {}) {
   if (action === 'harvest') return harvestPlot(garden, key, inv, pc, toolOpts);
   if (action === 'clear') return clearPlot(garden, key, pc, toolOpts);
   return { ok: false, reason: 'unknown', msgs: ['Unknown garden action.'] };
+}
+
+/** GardenManager.as 36-37: what fertilizes, and how watered a plot must be first. */
+export const GARDEN_FERTILIZER = 'guano';
+export const GARDEN_FERTILIZE_PERC = 0.8;
+
+/** croppery_fertilize / herbalism_fertilize: a 2 second action (catalog_skill_packages.js). */
+export const GARDEN_FERTILIZE_MS = 2000;
+
+/** include/garden.js 648, 664, 675; GardenPlotView.as 154-165 (the tip while a Guano is dragged). */
+export const FERTILIZE_TEXT = Object.freeze({
+  done: 'You fertilized a plot.',
+  noGuano: "Oops. You don't have any guano!",
+  nothing: 'Oops. There is nothing there to fertilize.',
+  tipOk: 'Fertilize this plot',
+  tipFull: "This plot doesn't need more fertilizer",
+  tipDry: 'You need to water it first!',
+  tipMore: 'You need to water it more first!',
+  tipNo: "You can't fertilize this!",
+});
+
+/** water_time / max_water_time: how much of the watering's 12 hours is left, 0 on a dry plot. */
+export function plotWaterFraction(plot, now = Date.now()) {
+  if (!plot?.wet) return 0;
+  const wetAt = typeof plot.wetAt === 'number' ? plot.wetAt : now;
+  return Math.max(0, Math.min(1, 1 - (now - wetAt) / GARDEN_WATER_MS));
+}
+
+/**
+ * GardenPlotView.as 152-168 and 217-222: whether a plot takes Guano now, and the tip that says so.
+ * Fertilized first, then seeds or shoots, then at least 80% watered.
+ * @returns {{ ok: boolean, tip: string }}
+ */
+export function fertilizeCheck(plot, now = Date.now()) {
+  if (plot?.fertilized) return { ok: false, tip: FERTILIZE_TEXT.tipFull };
+  if (plot?.state !== 'seeds' && plot?.state !== 'shoots') return { ok: false, tip: FERTILIZE_TEXT.tipNo };
+  const left = plotWaterFraction(plot, now);
+  if (left < GARDEN_FERTILIZE_PERC) return { ok: false, tip: left > 0 ? FERTILIZE_TEXT.tipMore : FERTILIZE_TEXT.tipDry };
+  return { ok: true, tip: FERTILIZE_TEXT.tipOk };
+}
+
+/**
+ * include/garden.js 625-639 on one plot: seeds go straight to shoots (not marked fertilized, so
+ * the shoots can take Guano of their own); shoots keep a tenth of what is left of their second
+ * grow and are marked fertilized. Dung-Kicker Drops does the same (master_garden.js).
+ */
+export function applyFertilizer(plot, seed, now = Date.now()) {
+  if (plot.state === 'seeds') {
+    plot.state = 'shoots';
+    startStage(plot, now);
+  } else if (plot.state === 'shoots') {
+    const need = seed.grow2Ms * (plot.growModifier || 1);
+    const left = Math.max(0, need - stageElapsedMs(plot, now));
+    plot.stageStartedAt = now - (need - 0.1 * left);
+    plot.growthMs = 0;
+    plot.fertilized = true;
+  }
+}
+
+/**
+ * Guano on one plot by hand: include/garden.js 609-669, with the client's checks
+ * (GardenPlotView.as handleDrop, GardenView.as onPlotClick). One Guano, no energy, no mood, no iMG
+ * (the packages have none), no talkback (talkback_key = null).
+ * guanoAt marks the hand's act: a seeds plot going to shoots looks like growth otherwise
+ * (js/neighbours-mp.js tendAct).
+ */
+export function fertilizePlot(garden, key, inv, opts = {}) {
+  const plot = getPlot(garden, key);
+  if (!plot) return { ok: false, reason: 'plot', msgs: ['No such plot.'] };
+  const seed = plot.seed ? SEED_CATALOG[plot.seed] : null;
+  if (!seed || plot.fertilized || (plot.state !== 'seeds' && plot.state !== 'shoots')) {
+    return { ok: false, reason: 'state', msgs: [FERTILIZE_TEXT.nothing] };
+  }
+  const now = opts.now ?? Date.now();
+  const check = fertilizeCheck(plot, now);
+  if (!check.ok) return { ok: false, reason: 'water', msgs: [check.tip] };
+  if (countItem(inv, GARDEN_FERTILIZER) < 1 || !removeItem(inv, GARDEN_FERTILIZER, 1)) {
+    return { ok: false, reason: 'guano', msgs: [FERTILIZE_TEXT.noGuano] };
+  }
+  applyFertilizer(plot, seed, now);
+  plot.guanoAt = now;
+  return {
+    ok: true,
+    reason: 'fertilized',
+    plotKey: key,
+    seedId: plot.seed,
+    profile: gardenActionProfile(garden.gardenType, 'fertilize', opts.learned, opts.upgrades),
+    msgs: [FERTILIZE_TEXT.done],
+    speech: null,
+    effects: { energy: 0, mood: 0, xp: 0 },
+  };
 }
 
 /**

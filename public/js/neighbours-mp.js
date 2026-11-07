@@ -23,6 +23,8 @@
  * Solo never loads any of this: solo's neighbours are js/neighbours.js.
  */
 
+import { SEED_CATALOG, applyFertilizer } from './garden.js?v=2536c8cd';
+
 /** The realtime server's street for a player's home street (homes.go). */
 export const HOME_STREET_PREFIX = 'HOME_';
 /** The realtime server's street for a player's house. */
@@ -420,6 +422,9 @@ export function applyButlerStock(state, stock, { keepGift = false } = {}) {
  */
 export function tendAct(before, after) {
   if (!before || !after) return null;
+  // G403: Guano's own mark, as seeds going to shoots is otherwise only growth (js/garden.js fertilizePlot).
+  // The act is 'guano': the site's table keeps an act in eight letters (minn.json groddle_home_tending).
+  if (after.guanoAt && after.guanoAt !== before.guanoAt) return { act: 'guano', seed: '' };
   if (before.state === 'clean' && after.state === 'seeds' && after.seed) return { act: 'plant', seed: String(after.seed) };
   if (before.state === 'dirty' && after.state === 'clean') return { act: 'clear', seed: '' };
   if (before.state === 'crop' && after.state === 'dirty') return { act: 'harvest', seed: '' };
@@ -432,7 +437,7 @@ export function tendAct(before, after) {
 export function plotsSnapshot(garden) {
   const out = {};
   for (const [key, plot] of Object.entries(garden?.plots || {})) {
-    out[key] = { state: plot?.state || 'clean', seed: plot?.seed || null, wet: plot?.wet === true };
+    out[key] = { state: plot?.state || 'clean', seed: plot?.seed || null, wet: plot?.wet === true, ...(plot?.guanoAt ? { guanoAt: plot.guanoAt } : {}) };
   }
   return out;
 }
@@ -454,9 +459,21 @@ export function applyTendAct(garden, act, tick = null) {
     plot.wetAt = at;
     return true;
   }
+  if (act.act === 'guano') {
+    const seed = SEED_CATALOG[plot.seed];
+    if (!seed) return false;
+    applyFertilizer(plot, seed, at);
+    plot.guanoAt = at;
+    return true;
+  }
   if (!['plant', 'clear', 'harvest'].includes(act.act)) return false;
   plot.state = act.act === 'plant' ? 'seeds' : act.act === 'clear' ? 'clean' : 'dirty';
   plot.seed = act.act === 'plant' ? String(act.seed || '') || null : null;
+  // include/garden.js 553: picking ends the fertilizer with the crop.
+  if (act.act !== 'clear' && (plot.fertilized || plot.guanoAt)) {
+    plot.fertilized = false;
+    plot.guanoAt = null;
+  }
   plot.stageStartedAt = at;
   plot.growthMs = 0;
   if (act.act === 'plant') plot.growModifier = 1;
@@ -474,7 +491,7 @@ export function normalizeTendActs(list) {
     act: String(a?.act || a?.a || ''),
     seed: String(a?.seed || a?.s || ''),
     at: Math.floor(Number(a?.at) || 0),
-  })).filter((a) => a.garden && /^\d{1,2}-\d{1,2}$/.test(a.plot) && ['water', 'plant', 'clear', 'harvest'].includes(a.act));
+  })).filter((a) => a.garden && /^\d{1,2}-\d{1,2}$/.test(a.plot) && ['water', 'plant', 'clear', 'harvest', 'guano'].includes(a.act));
 }
 
 /** What the owner reads when a friend tended their gardens (ours). */
@@ -484,7 +501,8 @@ export function tendedText(name, acts) {
     : kinds.has('plant') && kinds.size === 1 ? 'planted seeds in your garden'
       : kinds.has('harvest') && kinds.size === 1 ? 'harvested your garden'
         : kinds.has('clear') && kinds.size === 1 ? 'cleared a plot in your garden'
-          : 'tended your garden';
+          : kinds.has('guano') && kinds.size === 1 ? 'fertilized your garden'
+            : 'tended your garden';
   return `${name} ${what}.`;
 }
 

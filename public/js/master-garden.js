@@ -31,7 +31,7 @@
  * growModifier }. Growth uses SEED_CATALOG grow1Ms / grow2Ms.
  */
 
-import { SEED_CATALOG, stageElapsedMs, wetPlot } from './garden.js?v=74dd94d0';
+import { SEED_CATALOG, applyFertilizer, wetPlot } from './garden.js?v=2536c8cd';
 import { gardenGrowModifier } from './imagination-effects.js?v=70169933';
 import { skillPackageDetails } from './skill-packages.js?v=bfb87281';
 import { metabolicGain, moodMax, loseEnergy } from './metabolics.js?v=8504134e';
@@ -272,18 +272,7 @@ export function potionTendGarden(garden, action, inv, pc, ctx = {}) {
       const seed = SEED_CATALOG[plot.seed];
       if (!seed) continue;
       if (!pay()) break;
-      if (plot.state === 'seeds') {
-        // stateChanged(grow1): straight to shoots.
-        plot.state = 'shoots';
-        plot.stageStartedAt = now;
-        plot.growthMs = 0;
-      } else if (plot.state === 'shoots') {
-        const need = seed.grow2Ms * (plot.growModifier || 1);
-        const left = Math.max(0, need - stageElapsedMs(plot, now));
-        plot.stageStartedAt = now - (need - 0.1 * left);
-        plot.growthMs = 0;
-        plot.fertilized = true;
-      }
+      applyFertilizer(plot, seed, now);
       count += 1;
     }
   }

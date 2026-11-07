@@ -20,6 +20,7 @@ export const ACTION_DURATION_MS = Object.freeze({
   water_all: 1450,
   plant: 1100,
   clear: 1050,
+  fertilize: 2000,
   mine: 1800,
 });
 
@@ -37,6 +38,7 @@ const ACTION_GERUNDS = Object.freeze({
   water_all: 'Watering',
   plant: 'Planting',
   clear: 'Clearing',
+  fertilize: 'Fertilizing',
   mine: 'Mining',
 });
 
