@@ -119,6 +119,7 @@ import { fireDragonFeature } from './fire-dragon-feature.js?v=490c23d8'; FEATURE
 import { hellBarFeature } from './hell-bar-feature.js?v=b5c16464'; FEATURES.push(hellBarFeature);
 import { machineRoomsFeature } from './machine-rooms-feature.js?v=5c56c08f'; FEATURES.push(machineRoomsFeature);
 import { gardenGuanoFeature } from './garden-guano-feature.js?v=b46fc7cd'; FEATURES.push(gardenGuanoFeature);
+import { gardenNoticesFeature } from './garden-notices-feature.js?v=b040657c'; FEATURES.push(gardenNoticesFeature);
 import { soloFeatsFeature } from './solo-feats-feature.js?v=f9b131f0'; FEATURES.push(soloFeatsFeature);
 import { slashCommandsFeature } from './slash-commands-feature.js?v=7d9926dd'; FEATURES.push(slashCommandsFeature);
 import { hellTicketsFeature } from './hell-tickets-feature.js?v=8ea948b7'; FEATURES.push(hellTicketsFeature);
