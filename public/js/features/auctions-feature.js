@@ -45,7 +45,7 @@
 import { ITEM_CATALOG, addItem, countItem, itemIcon, listPackSlots, removeItem } from '../inventory.js?v=d82f3b00';
 import { scriptFromTag, scriptLabel } from '../teleportation.js?v=5a5c8e6f';
 import { TOOL_CONDITION_CATALOG, copyTagKind, leavingCopyTag, leavingToolWear, receiveToolCopy } from '../tools.js?v=f701b241';
-import { createMinnAccount } from '../minn-account.js?v=b29fae30';
+import { createMinnAccount } from '../minn-account.js?v=ba6a13c5';
 import { saveStore } from '../save-store.js?v=8839ba7b';
 import {
   AUCTION_TEXT as T,

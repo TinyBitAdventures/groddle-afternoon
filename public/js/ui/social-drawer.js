@@ -72,6 +72,13 @@
  * goes back to the conversation. Replies never show in the conversation's own log.
  * features/chat-threads-feature.js connects the sender (threads.connect) and hands the replies over.
  *
+ * MODERATION (js/chat-delete.js; register G567, Austin 2026-11-07): once a feature connects a moderator
+ * (features/groups-feature.js, for an administrator only), a line it says yes to (Global Chat, Live Help
+ * and the Trade Channel, their threads' replies too) has a small Delete line button after its reply
+ * button, shown as that one is. It opens the game's menu (context-menu.js) to confirm: "Delete this line
+ * for everyone?", Delete for everyone or Cancel, Cancel focused. Delete for everyone hands the line to the
+ * moderator; the line leaves when the realtime server says it was deleted (chat_deleted).
+ *
  * QA: canvas data socialThread (chat|key of the thread open, or ''), socialThreadReplies (how many it
  * shows), socialOpen (open|rail), socialTab (the tab selected: activity, local, global,
  * buddies or chats), socialChat (the conversation open in Chats, or ''), socialTabs (the row),
@@ -88,6 +95,7 @@ import { createNodeCache, pressLeavesKeys, reconcileChildren, uniqueKeys } from 
 import { createReactionUI } from './reaction-strip.js?v=5118c23b';
 import { sameWords } from '../chat-reactions.js?v=d65d555b';
 import { THREAD_TEXT, mergeReplies, normalSummary, summaryText } from '../chat-threads.js?v=42954351';
+import { DELETE_CONFIRM_FOCUS, DELETE_TEXT, deleteConfirmRows } from '../chat-delete.js?v=ce1da244';
 
 export const SOCIAL_STORE_KEY = 'groddle-social-drawer';
 /** The drawer opens by default at this window width and up (the mock's 1440 rule). */
@@ -171,6 +179,7 @@ const ICONS = {
   channel: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M2.5 3.5h10v7h-5l-3 2.5v-2.5h-2z"/><path d="M14.5 7.5h3v7h-1.5v2.5l-3-2.5h-4v-2"/></svg>',
   chats: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M2.5 4h11M2.5 8h11M2.5 12h7"/></svg>',
   thread: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M3 4.5h10v6.5H8l-3 2.5V11H3z"/><path d="M15 8h2v6.5h-1.5V17l-3-2.5H10"/></svg>',
+  trash: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 6h12M8 6V4.5h4V6M5.5 6l.8 10h7.4l.8-10M8.5 9v4.5M11.5 9v4.5"/></svg>',
   back: '<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="m7.5 3-3 3 3 3"/></svg>',
   buddies: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true" focusable="false"><circle cx="9" cy="7" r="3"/><path d="M3.5 16.5c.6-3 2.8-4.7 5.5-4.7 1.2 0 2.3.3 3.2 1M15 11.5v5M12.5 14h5"/></svg>',
   send: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M3.5 10 16.5 4l-4 12-2.5-5z"/></svg>',
@@ -443,10 +452,80 @@ export function mountSocialDrawer({
     if (!set.size) threadRows.delete(tk);
     return n;
   }
-  /** A drawn row of a line: its reaction button and chips (once), as they are now; in a conversation with threads, its thread controls. */
-  const decorateRow = (node, line, chatId = '') => {
+  // MODERATION: the moderator once a feature connects one (an administrator's game only); row -> its Delete line button.
+  let moderator = null;
+  const deleteParts = new WeakMap();
+  const deletable = (chatId, line) => Boolean(online && moderator && chatId && line?.rk && !line.note && !line.sep && moderator.can?.(chatId, line));
+  /** A line's Delete line button (after its reply button), or none when the moderator says no. */
+  function decorateDelete(row, line, chatId) {
+    let p = deleteParts.get(row);
+    if (!deletable(chatId, line)) {
+      if (p) {
+        p.btn.remove();
+        deleteParts.delete(row);
+        row.classList.toggle('can-delete', false);
+      }
+      return;
+    }
+    if (!p || p.rk !== String(line.rk)) {
+      p?.btn.remove();
+      const btn = el('button', { type: 'button', class: 'line-delete', 'data-line-delete': String(line.rk), 'aria-haspopup': 'menu', 'aria-label': DELETE_TEXT.buttonLabel(line.mine ? '' : line.name), title: DELETE_TEXT.button });
+      btn.innerHTML = ICONS.trash;
+      // As the reply button: a click never takes the keyboard from the world.
+      btn.addEventListener('pointerdown', (e) => {
+        if (e.button === 0) e.preventDefault?.();
+      });
+      btn.addEventListener('click', (e) => {
+        const keys = e.detail === 0;
+        confirmDelete(row, btn, { keys, at: keys ? null : { x: e.clientX, y: e.clientY } });
+      });
+      p = { rk: String(line.rk), btn };
+      deleteParts.set(row, p);
+      row.classList.add('can-delete');
+    }
+    p.chatId = chatId;
+    p.line = line;
+    // After the reply button (else the reaction button), before the chips and the replies' count.
+    const after = row.querySelector?.('[data-thread-reply]') || row.querySelector?.('[data-react-add]');
+    if (after) {
+      if (after.nextSibling !== p.btn) row.insertBefore(p.btn, after.nextSibling ?? null);
+    } else if (p.btn.parentElement !== row) row.append(p.btn);
+  }
+  /** Delete line's confirm step: the game's menu by the button, Cancel focused; Delete for everyone asks the moderator. */
+  function confirmDelete(row, btn, { keys = false, at = null } = {}) {
+    const p = deleteParts.get(row);
+    const m = contextMenu?.();
+    if (!p || !m || !moderator) return false;
+    const { chatId, line } = p;
+    const owner = `delete:${chatId}#${p.rk}`;
+    const opened = m.open({
+      title: DELETE_TEXT.title,
+      rows: deleteConfirmRows(),
+      at,
+      anchor: btn,
+      keys,
+      opener: btn,
+      findOpener: () => (btn.isConnected ? btn : null),
+      owner,
+      focusIndex: DELETE_CONFIRM_FOCUS,
+      onPick: (id) => {
+        if (id !== 'confirm' || !moderator) return;
+        setData('socialDelete', owner);
+        Promise.resolve(moderator.remove?.(chatId, line)).catch((e) => console.warn('social', e));
+      },
+    });
+    if (opened) drawerMenu = owner;
+    return opened;
+  }
+  /**
+   * A drawn row of a line: its reaction button and chips (once), as they are now; in a conversation with
+   * threads, its thread controls; where the moderator says so, its Delete line button (`modChat`: the
+   * conversation it is in, also for a thread's line and replies, which take no thread controls).
+   */
+  const decorateRow = (node, line, chatId = '', modChat = chatId) => {
     if (reactUI && line?.rk && !line.note && !line.sep) reactUI.decorate(node, line);
     if (chatId) decorateThread(node, line, chatId);
+    if (modChat || deleteParts.has(node)) decorateDelete(node, line, modChat);
     return node;
   };
 
@@ -999,11 +1078,11 @@ export function mountSocialDrawer({
         n.classList.add('is-thread-parent');
         return n;
       });
-      nodes.push(decorateRow(node, parent));
+      nodes.push(decorateRow(node, parent, '', t.id));
     }
     const count = st.replies.length;
     nodes.push(cache.get(`count|${count}|${st.loading}`, () => el('div', { class: 'social-time social-thread-count', 'data-social-thread-count': String(count) }, count ? THREAD_TEXT.count(count) : st.loading ? THREAD_TEXT.loading : THREAD_TEXT.empty)));
-    for (const r of st.replies) nodes.push(decorateRow(cache.get(`reply|${lineKey(t.id, r)}|${r.rk}`, () => lineNode(r)), r));
+    for (const r of st.replies) nodes.push(decorateRow(cache.get(`reply|${lineKey(t.id, r)}|${r.rk}`, () => lineNode(r)), r, '', t.id));
     if (st.note) nodes.push(cache.get(`note|${st.note}`, () => lineNode({ note: true, text: st.note })));
     cache.sweep();
     return nodes;
@@ -1093,7 +1172,7 @@ export function mountSocialDrawer({
       const v = node.getAttribute?.(a);
       if (v !== null && v !== undefined) return `[${a}="${esc(v)}"]`;
     }
-    for (const a of ['data-thread-open', 'data-thread-reply']) {
+    for (const a of ['data-thread-open', 'data-thread-reply', 'data-line-delete']) {
       const v = node.getAttribute?.(a);
       if (v !== null && v !== undefined) return `[${a}="${esc(v)}"]`;
     }
@@ -1793,6 +1872,21 @@ export function mountSocialDrawer({
       render();
       return true;
     },
+    /**
+     * MODERATION: online only (null solo). connect({ can(chat, line) -> bool, remove(chat, line) }) (null
+     * takes the buttons away): `can` says which lines get Delete line, `remove` runs once it is confirmed.
+     */
+    moderation: online ? {
+      connect(m) {
+        moderator = m && typeof m.can === 'function' && typeof m.remove === 'function' ? m : null;
+        render();
+      },
+      get connected() {
+        return Boolean(moderator);
+      },
+      /** Opens a drawn row's confirm menu (QA and the keys); false without its button. */
+      confirm: (row, opts) => confirmDelete(row, deleteParts.get(row)?.btn, opts),
+    } : null,
     /** REACTIONS: online only (null solo). */
     reactions: reactUI ? {
       /** The sender: { send(rk, key, on) -> bool, me() -> your player id }; null turns reactions off. */

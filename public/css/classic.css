@@ -1619,6 +1619,20 @@
 :root[data-ui="classic"] .thread-reply svg { width: calc(14 * var(--cu)); height: calc(14 * var(--cu)); }
 :root[data-ui="classic"] .thread-reply:hover { border-color: var(--c-classic-input-hi-border); background: var(--c-classic-input-hi); color: var(--c-classic-link); }
 :root[data-ui="classic"] .thread-reply:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--c-classic-focus); }
+/* Delete line (G567, an administrator's channel lines): dressed as the reply button beside it. */
+:root[data-ui="classic"] .line-delete {
+  width: calc(22 * var(--cu));
+  height: calc(16 * var(--cu));
+  margin-left: calc(4 * var(--cu));
+  border: 1px solid var(--c-classic-input-border);
+  border-radius: 3px;
+  background: var(--c-classic-panel);
+  color: var(--c-classic-tab-off);
+  vertical-align: calc(-3 * var(--cu));
+}
+:root[data-ui="classic"] .line-delete svg { width: calc(14 * var(--cu)); height: calc(14 * var(--cu)); }
+:root[data-ui="classic"] .line-delete:hover { border-color: var(--c-classic-input-hi-border); background: var(--c-classic-input-hi); color: var(--danger); }
+:root[data-ui="classic"] .line-delete:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--c-classic-focus); }
 :root[data-ui="classic"] .thread-open {
   gap: calc(3 * var(--cu));
   min-height: calc(18 * var(--cu));

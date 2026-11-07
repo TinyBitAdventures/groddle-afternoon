@@ -124,7 +124,7 @@ import {
   unitRankAt,
 } from '../pack-slots.js?v=a94b816c';
 import { TOOL_CONDITION_CATALOG, moveToolCopy, pickToolCopies, placeToolCopies } from '../tools.js?v=f701b241';
-import { createMinnAccount } from '../minn-account.js?v=b29fae30';
+import { createMinnAccount } from '../minn-account.js?v=ba6a13c5';
 import { BAG_NAME_MAX, BAG_RENAME_COPY, bagLabel, canRenameBag, cleanBagName, renamedTo } from '../bag-names.js?v=22391c55';
 import { openNamePrompt } from '../ui/name-prompt.js?v=142b551a';
 

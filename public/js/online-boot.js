@@ -17,7 +17,7 @@
  * play/index.html by tools/play-online/build.mjs.
  */
 
-import { createMinnAccountCore } from './minn-account-core.js?v=e15cf456';
+import { createMinnAccountCore } from './minn-account-core.js?v=d5005a5b';
 import { mountAccountForms, resetLinkFrom, verifyLinkFrom } from './account-forms.js?v=318b6815';
 import { claimCharacter, newWriterId, takeHandoff } from './save-claim.js?v=30cf5250';
 
@@ -242,6 +242,8 @@ export function bootDataFrom({ account, session, save, writer = '' }) {
     entries: data?.entries && typeof data.entries === 'object' ? { ...data.entries } : {},
     player: session.player,
     writer,
+    // G567: an administrator's game draws Delete line on channel lines (groups-feature); the site's route checks again.
+    ...(session.admin === true ? { admin: true } : {}),
   };
 }
 

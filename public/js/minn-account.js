@@ -4,7 +4,7 @@
  * and start from it, so the phone (tests/phone-companion.test.js, 240 KB) never loads them.
  * createMinnAccount() answers one object with both.
  */
-import { accountParts, minnUrls } from './minn-account-core.js?v=e15cf456';
+import { accountParts, minnUrls } from './minn-account-core.js?v=d5005a5b';
 
 export { minnUrls };
 
@@ -293,6 +293,15 @@ export function createMinnAccount(opts = {}) {
      */
     async chatThread(key, lid) {
       return buddyCall('Loading the replies', `chat/channels/${encodeURIComponent(key)}/threads/${Math.max(0, Math.floor(Number(lid)) || 0)}`);
+    },
+
+    /**
+     * An administrator deletes a channel line (or a thread reply) for everyone (G567; the site's
+     * ChatHistory::deleteLine, manage_options only, checked there): key global, help or trade;
+     * { status: 'deleted', lid, parent, live }. Anyone else is refused (403) and it throws.
+     */
+    async deleteChannelLine(key, lid) {
+      return buddyCall('Deleting the line', `chat/channels/${encodeURIComponent(key)}/lines/${Math.max(0, Math.floor(Number(lid)) || 0)}`, { method: 'DELETE' });
     },
 
     /** An IM line's thread (the two players only): { lines: [{ id, from, text, at, r, parent }] oldest first, blocked }. */

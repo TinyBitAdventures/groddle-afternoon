@@ -163,6 +163,17 @@ describe('groddle/v1 on the live site', { skip: !LIVE && 'set GRODDLE_LIVE=1 to 
     assert.equal(bad.json.code, 'rest_cookie_invalid_nonce');
   });
 
+  it('G567: a player is no administrator, and a forged delete of a channel line is refused (403)', () => {
+    const me = call(a.jar, 'GET', '/wp-json/groddle/v1/me', { nonce: a.nonce });
+    assert.notEqual(me.json.admin, true, 'me never says admin for a player');
+    for (const key of ['global', 'help', 'trade']) {
+      const r = call(a.jar, 'DELETE', `/wp-json/groddle/v1/chat/channels/${key}/lines/1`, { nonce: a.nonce });
+      assert.equal(r.status, 403, key);
+      assert.equal(r.json.code, 'rest_forbidden', key);
+    }
+    assert.equal(call(join(dir, 'anon.jar'), 'DELETE', '/wp-json/groddle/v1/chat/channels/global/lines/1').status, 401, 'signed out');
+  });
+
   it('the multiplayer save: empty at first, written over the version it was made from, 409 for a stale copy', () => {
     assert.deepEqual(call(a.jar, 'GET', '/wp-json/groddle/v1/save', { nonce: a.nonce }).json, { version: 0, updatedAt: null, data: null });
     const first = call(a.jar, 'PUT', '/wp-json/groddle/v1/save', { nonce: a.nonce, body: { version: 0, data: multi() } });

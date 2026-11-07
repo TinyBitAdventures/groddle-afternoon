@@ -30,7 +30,7 @@ import {
   untradeableReason,
 } from '../public/js/trade.js?v=beecc06c';
 import { tradeFeature } from '../public/js/features/trade-feature.js?v=626cda18';
-import { FEATURES } from '../public/js/features/index.js?v=2a0ae7c7';
+import { FEATURES } from '../public/js/features/index.js?v=a6fdfb4b';
 import { serverPath, skipWithoutServer } from '../tools/repos.mjs';
 import { GSJS } from '../tools/build-realtime-trade.mjs';
 

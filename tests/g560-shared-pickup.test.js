@@ -26,7 +26,7 @@ import { homedir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { isTakeOp, normalizeGroundStack, normalizeMine, pickupAsk, stackLeft } from '../public/js/drops-mp.js?v=b8307be8';
-import { dropsMpFeature } from '../public/js/features/drops-mp-feature.js?v=54fb35f2';
+import { dropsMpFeature } from '../public/js/features/drops-mp-feature.js?v=2c49fb82';
 import { pickupCountToAsk } from '../public/js/world-items.js?v=6378e71c';
 import { HAS_SERVER, SITE_DIR, serverPath, skipWithoutSite } from '../tools/repos.mjs';
 

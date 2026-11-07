@@ -22,9 +22,9 @@ import {
   normalState,
   refusalText,
 } from '../public/js/player-im.js?v=23463a96';
-import { playerImFeature } from '../public/js/features/player-im-feature.js?v=16659128';
-import { FEATURES } from '../public/js/features/index.js?v=2a0ae7c7';
-import { mountSocialDrawer } from '../public/js/ui/social-drawer.js?v=8d5ee247';
+import { playerImFeature } from '../public/js/features/player-im-feature.js?v=598fa948';
+import { FEATURES } from '../public/js/features/index.js?v=a6fdfb4b';
+import { mountSocialDrawer } from '../public/js/ui/social-drawer.js?v=02b62e88';
 import { createNotifier } from '../public/js/notify.js?v=37c6b748';
 import { memoryStore, page } from './social-fake-dom.js';
 import { serverPath, sitePath, skipWithoutSite } from '../tools/repos.mjs';

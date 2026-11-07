@@ -25,7 +25,7 @@
  * and the administrators (src/TicketPictures.php).
  */
 
-import { minnUrls } from './minn-account-core.js?v=e15cf456';
+import { minnUrls } from './minn-account-core.js?v=d5005a5b';
 
 /** The sheet's words. The form welcomes feedback, suggestions and bugs alike (the original's BootError.as 280-290 asked only for bugs). */
 export const REPORT_TEXT = Object.freeze({

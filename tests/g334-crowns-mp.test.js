@@ -33,7 +33,7 @@ import {
   CROWNS_TEXT,
   CROWNS_TICKET,
 } from '../public/js/game-of-crowns.js?v=e32f35f5';
-import { sharedStreet } from '../public/js/features/realtime-feature.js?v=8f92f5fb';
+import { sharedStreet } from '../public/js/features/realtime-feature.js?v=784d54a4';
 import { HAS_SERVER, HAS_SITE, serverPath, sitePath, skipWithoutServer, skipWithoutSite } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');

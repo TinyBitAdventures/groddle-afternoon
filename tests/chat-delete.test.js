@@ -20,7 +20,7 @@ import { readFileSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
 import { HAS_SITE, serverPath, sitePath, skipWithoutServer, skipWithoutSite } from '../tools/repos.mjs';
 import { dropLid } from '../public/js/groups.js?v=07640c71';
-import { deletedSummary } from '../public/js/features/chat-threads-feature.js?v=822b67e3';
+import { deletedSummary } from '../public/js/features/chat-threads-feature.js?v=405f5614';
 
 const src = (f) => readFileSync(sitePath(f), 'utf8');
 const game = (f) => readFileSync(new URL(`../public/js/${f}`, import.meta.url), 'utf8');
@@ -143,7 +143,7 @@ describe('the console\'s chat log marks a deleted line (console/console.js, src/
     assert.match(mod.logWords({ kind: 'chat_delete', delivery: 'down', player: { id: 7, name: 'Ada' }, detail: { where: 'Global Chat', reply: true, text: 'x' } }), /^deleted Ada's thread reply in Global Chat: “x” \(realtime server not answering/);
     const ac = src('src/AdminConsole.php');
     assert.match(ac, /'deleted' => \$this->chatDeleted\(\$l\['deleted'\] \?\? null, \$names\),/);
-    assert.match(src('src/AdminConsolePage.php'), /ASSET_KEY = 'community-2'/);
+    assert.match(src('src/AdminConsolePage.php'), /ASSET_KEY = 'community-3'/);
   });
 });
 

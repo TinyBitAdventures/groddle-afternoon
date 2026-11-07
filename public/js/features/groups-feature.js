@@ -39,13 +39,21 @@
  *   groddle-afternoon-server chatdelete.go chat_deleted) goes from its chat at
  *   once; a deleted thread reply is chat-threads-feature's. The remake's own:
  *   Glitch's channels had no deletion.
+ * - An administrator (the boot data's admin, from the site's groddle/v1/me;
+ *   register G567) gets Delete line on Global Chat, Live Help and Trade
+ *   Channel lines and their thread replies in the drawer (js/chat-delete.js,
+ *   the drawer's moderation): confirmed, it asks the site
+ *   (account.deleteChannelLine), whose route checks manage_options again, and
+ *   the server's chat_deleted takes the line away for everyone. Nobody else's
+ *   game connects it, so no player sees the button.
  *
  * QA: canvas data groupsCount, groupsTab, groupsOpen (chats open),
- * groupsUnread (chat:n,...), groupsLastSaid (chat|name|text), groupsPanel, groupsDeleted (chat:lid);
+ * groupsUnread (chat:n,...), groupsLastSaid (chat|name|text), groupsPanel, groupsDeleted (chat:lid),
+ * groupsDeleteAsked (chat:lid:ok|refused, an administrator's Delete line answered);
  * window.groddleGroups.
  */
 
-import { createMinnAccount } from '../minn-account.js?v=b29fae30';
+import { createMinnAccount } from '../minn-account.js?v=ba6a13c5';
 import { saveStore } from '../save-store.js?v=8839ba7b';
 import {
   CHANNELS,
@@ -79,6 +87,7 @@ import {
 } from '../groups.js?v=07640c71';
 import { appendLinkedText } from '../chat-links.js?v=b717fac7';
 import { lineKey as reactKey } from '../chat-reactions.js?v=d65d555b';
+import { DELETE_TEXT, deletableChannel, lineLidOf, mayDelete } from '../chat-delete.js?v=ce1da244';
 
 export const GROUPS_FEATURE_ID = 'groups';
 
@@ -226,6 +235,35 @@ function createSession(engine, client) {
       heads.set(channel, h);
     }
     return h;
+  }
+  // G567: an administrator's drawer has Delete line on channel lines (the site's route checks manage_options again).
+  if (boot.admin === true && social?.moderation) {
+    social.moderation.connect({
+      can: (chatId, line) => mayDelete({ admin: true, chatId, line }),
+      async remove(chatId, line) {
+        const key = deletableChannel(chatId);
+        const lid = lineLidOf(line?.rk);
+        if (!key || !lid) return false;
+        try {
+          await account.deleteChannelLine(key, lid);
+        } catch (err) {
+          engine.setData?.('groupsDeleteAsked', `${chatId}:${lid}:refused`);
+          engine.toast?.(err?.message || DELETE_TEXT.failed, 3600);
+          return false;
+        }
+        engine.setData?.('groupsDeleteAsked', `${chatId}:${lid}:ok`);
+        engine.toast?.(DELETE_TEXT.deleted, 2400);
+        // The server's chat_deleted takes it away for everyone; this game drops it now too (the site may have found the server down).
+        const chat = chats.get(chatId);
+        const kept = chat && !line.reply ? dropLid(chat.lines, lid) : null;
+        if (kept && kept !== chat.lines) {
+          chat.lines = kept;
+          if (chatId === tab) renderBox();
+          social.setLines(chatId, chat.lines.map(drawerLine));
+        }
+        return true;
+      },
+    });
   }
   /** Brings in the lines before the oldest one shown, from the site's kept history. */
   async function earlier(channel, button) {

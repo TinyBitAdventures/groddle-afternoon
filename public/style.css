@@ -10083,6 +10083,32 @@ html[data-street-cards] .notify-notices { visibility: hidden; }
 .social-msg.is-thread-parent { padding-bottom: var(--sp-3); border-bottom: 1px solid var(--border); }
 .thread-reply, .thread-open { -webkit-user-select: none; user-select: none; }
 @media (prefers-reduced-motion: reduce) { .thread-reply { transition: none; } }
+/* MODERATION (js/chat-delete.js, the drawer; register G567): an administrator's channel lines have a small
+   Delete line button after the reply button, shown as that one is; it turns the danger colour on hover. */
+.line-delete {
+  display: inline-grid;
+  place-items: center;
+  box-sizing: border-box;
+  width: 1.8em;
+  height: 1.3em;
+  margin-left: var(--sp-2);
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  background: var(--surface-bright);
+  color: var(--text-muted);
+  vertical-align: -0.25em;
+  opacity: 0;
+  cursor: pointer;
+  transition: opacity 0.12s ease;
+}
+.line-delete svg { width: 1.05em; height: 1.05em; }
+.line-delete { -webkit-user-select: none; user-select: none; }
+.social-msg.can-delete:hover > .line-delete, .social-msg.can-delete:focus-within > .line-delete, .line-delete[aria-expanded="true"] { opacity: 1; }
+.line-delete:hover { border-color: var(--danger); color: var(--danger); }
+.line-delete:focus-visible { opacity: 1; outline: 2px solid var(--focus); outline-offset: 1px; }
+@media (hover: none) { .line-delete { opacity: 0.7; } }
+@media (prefers-reduced-motion: reduce) { .line-delete { transition: none; } }
 .social-act {
   display: grid;
   gap: var(--sp-1);

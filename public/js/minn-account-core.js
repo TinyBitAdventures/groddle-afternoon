@@ -138,7 +138,7 @@ export function accountParts({ baseUri, fetch: fetchFn = globalThis.fetch?.bind(
     get nonce() { return nonce; },
 
     /**
-     * Who is playing: { minn, signedIn, player, backups }. minn is false when
+     * Who is playing: { minn, signedIn, player, backups, account, admin? }. minn is false when
      * the site has no Groddle account routes (a static server), or when it
      * cannot be reached ({ minn: false, offline: true }).
      */
@@ -159,7 +159,8 @@ export function accountParts({ baseUri, fetch: fetchFn = globalThis.fetch?.bind(
         return { minn: false, offline: true, signedIn: false, player: null };
       }
       if (!me.ok || typeof me.data?.signedIn !== 'boolean') return { minn: false, signedIn: false, player: null };
-      return { minn: true, signedIn: me.data.signedIn, player: me.data.player || null, backups: me.data.backups || null, account: me.data.account || null };
+      // admin (G567): the account is an administrator (only then present); a hint for the chat's Delete line, the site checks again.
+      return { minn: true, signedIn: me.data.signedIn, player: me.data.player || null, backups: me.data.backups || null, account: me.data.account || null, ...(me.data.admin === true ? { admin: true } : {}) };
     },
 
     /**

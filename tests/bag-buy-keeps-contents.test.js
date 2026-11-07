@@ -33,7 +33,7 @@ import { ITEM_CATALOG, addItem, isToolItem } from '../public/js/inventory.js?v=d
 import { BAG_DEFS, PACK_CAPACITY, PACK_COPY, arrangeIntoBags, bagAccepts, layoutPack, moveStack, roomFor } from '../public/js/pack-slots.js?v=a94b816c';
 import { TOOL_CLASSES } from '../public/js/pack-slots-data.js?v=800f664c';
 import { vendorBuy } from '../public/js/vendor.js?v=18b51628';
-import { applyStarter, bagsFeature } from '../public/js/features/bags-feature.js?v=3fbac957';
+import { applyStarter, bagsFeature } from '../public/js/features/bags-feature.js?v=e3195f4b';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const GSJS = join(ROOT, '..', 'glitch-GameServerJS');
