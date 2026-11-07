@@ -16,8 +16,8 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { readThumbs, regionThumbs, repaints } from '../tools/map-backgrounds/build.mjs';
 import { HUB_MAP_BACKGROUNDS } from '../public/js/hub-map-backgrounds.js?v=2b2d6468';
-import { buildHubMapView, PUBLIC_HUBS, renderHubMapSvg } from '../public/js/map-graph.js?v=7608c586';
-import { hubMapArtNote } from '../public/js/panel-copy.js?v=1d8de080';
+import { buildHubMapView, isPlaceholderMap, PLACEHOLDER_MAP_COLOURS, PUBLIC_HUBS, renderHubMapSvg } from '../public/js/map-graph.js?v=eec0c3d8';
+import { hubMapArtNote } from '../public/js/panel-copy.js?v=3243b9b2';
 import { CHECKLIST } from '../tools/restoration/checklist.mjs';
 import { MAP_ART_NOTE } from '../tools/encyclopedia/streets.mjs';
 
@@ -191,7 +191,7 @@ describe('region map backgrounds (tools/map-backgrounds/build.mjs)', () => {
   });
 
   it('regions without one keep the drawn terrain', () => {
-    for (const id of ['28', '77']) {
+    for (const id of ['77']) {
       const view = buildHubMapView(hub(id), '', STREETS);
       assert.equal(view.bgSoft, '');
       const svg = renderHubMapSvg(view);
@@ -206,5 +206,37 @@ describe('region map backgrounds (tools/map-backgrounds/build.mjs)', () => {
     const painted = buildHubMapView({ ...hub(97), bgLocal: 'assets/maps/art/muufo_bg.jpg' }, '', STREETS);
     assert.equal(painted.bgSoft, '');
     assert.match(renderHubMapSvg(painted), /<image class="map-bg" href="assets\/maps\/art\/muufo_bg\.jpg"/);
+  });
+
+  it('G569: hubs whose source map was the lost placeholder draw its grey until we paint them', () => {
+    assert.deepEqual({ ...PLACEHOLDER_MAP_COLOURS }, { top: '#8a9297', bottom: '#606669' });
+    const ids = Object.keys(INDEX.hubs).filter((id) => isPlaceholderMap(hub(id).bg));
+    assert.equal(ids.length, 40, 'the 40 hubs that shared map_fake_island_45490.jpg');
+    for (const id of ids) {
+      const data = hub(id);
+      // The grey is the one the hub data records for that map.
+      assert.equal(data.top_color, PLACEHOLDER_MAP_COLOURS.top, id);
+      assert.equal(data.btm_color, PLACEHOLDER_MAP_COLOURS.bottom, id);
+      const view = buildHubMapView(data, '', STREETS);
+      const painted = Boolean(view.bgLocal || view.bgSoft);
+      assert.equal(view.bgPlaceholder, !painted, `${id} ${data.hubName}`);
+      if (painted) continue;
+      const svg = renderHubMapSvg(view);
+      assert.match(svg, /<rect class="map-terrain map-terrain-placeholder" [^>]*fill="url\(#hubPlaceholder\)"/, id);
+      assert.match(svg, /<stop offset="0%" stop-color="#8a9297"\/><stop offset="100%" stop-color="#606669"\/>/, id);
+      assert.doesNotMatch(svg, /map-hill|map-thumb|map-bg/, `${id}: no made-up hills or corner thumbnail`);
+      assert.equal(hubMapArtNote(view), 'placeholder grey');
+    }
+    for (const name of ['Underground Puzzles', 'Abbasid', 'Old Groddle Forest', 'Party Locations', 'Homes', 'NewXP']) {
+      assert.ok(ids.some((id) => hub(id).hubName === name), name);
+    }
+    // A painting of ours wins over the grey: a recovered one, or a region painting.
+    const withArt = buildHubMapView({ ...hub(26), bgLocal: 'assets/maps/art/abbasid_bg.jpg' }, '', STREETS);
+    assert.equal(withArt.bgPlaceholder, false);
+    assert.doesNotMatch(renderHubMapSvg(withArt), /hubPlaceholder/);
+    assert.equal(buildHubMapView(hub(97), '', STREETS).bgPlaceholder, false, 'a painted region');
+    // A real map that was lost (Jethimadh Tower: Base) is not the placeholder.
+    assert.equal(isPlaceholderMap(hub(77).bg), false);
+    assert.equal(buildHubMapView(hub(77), '', STREETS).bgPlaceholder, false);
   });
 });

@@ -91,6 +91,17 @@ export function pickMapSpot(candidates, hubHasMap, streetOnHub, fallback = '56')
 }
 
 /**
+ * G569: the original's shared placeholder hub map (map_fake_island_45490.jpg, lost) was a vertical
+ * grey gradient; these are its colours, top and bottom, as every hub that used it records them.
+ */
+export const PLACEHOLDER_MAP_COLOURS = Object.freeze({ top: '#8a9297', bottom: '#606669' });
+
+/** Whether a hub's source map was the shared placeholder (hub data `bg`, G569). */
+export function isPlaceholderMap(bg) {
+  return /\/map_fake_island_\d+\.jpg$/.test(String(bg || ''));
+}
+
+/**
  * Build a hub map view from original GSJS hub JSON + loaded street index.
  *
  * @param {object} hubData  hub-N.json shape
@@ -183,6 +194,10 @@ export function buildHubMapView(hubData, currentTsid, streetIndex = {}) {
   const bgSoftHi = soft ? soft.x2 : '';
   // G522: the region's painting was repainted for the remake from its thumbnail (tools/provenance/repainted-maps.json).
   const bgRepainted = Boolean(soft?.repainted);
+  // G569: 40 hubs (Underground Puzzles, Abbasid, Old Groddle Forest, the POLs, Party Locations,
+  // Homes, NewXP...) shared one placeholder map, map_fake_island_45490.jpg, never archived; only its
+  // grey survives (their hub data's top_color / btm_color). Until we paint one, it draws that grey.
+  const bgPlaceholder = !bgLocal && !soft && isPlaceholderMap(hubData.bg);
 
   return {
     hubId: String(hubData.hubId || ''),
@@ -197,6 +212,7 @@ export function buildHubMapView(hubData, currentTsid, streetIndex = {}) {
     bgSoft,
     bgSoftHi,
     bgRepainted,
+    bgPlaceholder,
     color: hubData.color || '#5f721d',
     currentTsid: currentResolved,
     streets,
@@ -711,6 +727,14 @@ export function renderHubMapSvg(view) {
     parts.push(
       `<image class="map-bg map-bg-soft" href="${escapeXml(keyedArt(view.bgSoft))}"${view.bgSoftHi && view.bgSoftHi !== view.bgSoft ? ` data-hi="${escapeXml(keyedArt(view.bgSoftHi))}"` : ''} x="0" y="0" width="${w}" height="${h}" preserveAspectRatio="none"/>`
     );
+  } else if (view.bgPlaceholder) {
+    // G569: the original's placeholder map, drawn from its surviving grey (no made-up hills).
+    parts.push(
+      `<linearGradient id="hubPlaceholder" x1="0" y1="0" x2="0" y2="1">` +
+        `<stop offset="0%" stop-color="${PLACEHOLDER_MAP_COLOURS.top}"/>` +
+        `<stop offset="100%" stop-color="${PLACEHOLDER_MAP_COLOURS.bottom}"/></linearGradient>`
+    );
+    parts.push(`<rect class="map-terrain map-terrain-placeholder" width="${w}" height="${h}" fill="url(#hubPlaceholder)"/>`);
   } else {
     parts.push(`<rect class="map-terrain" width="${w}" height="${h}" fill="url(#hubTerrain)"/>`);
     parts.push(

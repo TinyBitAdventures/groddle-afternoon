@@ -23,6 +23,8 @@ export function hubMapArtNote(view) {
   // Upscaled from the region's world-map thumbnail (G471, tools/map-backgrounds/build.mjs), or
   // repainted from it for the remake (G522, tools/provenance/repainted-maps.json).
   if (view?.bgSoft) return view.bgRepainted ? 'repainted painting' : 'thumbnail painting';
+  // G569: the original's shared placeholder map, drawn in its surviving grey.
+  if (view?.bgPlaceholder) return 'placeholder grey';
   return 'geometry only';
 }
 
