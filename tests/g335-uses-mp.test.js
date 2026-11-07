@@ -139,7 +139,14 @@ describe('jars and bottles on shared trees are the ledger\'s (LedgerUse)', { ski
       potion_rook_balm: [5, 'rook-attack', 'balmPoints', true],
       // G432 (tests/g432-random-kindness.test.js).
       random_kindness: [20, 'player-verbs-mp', 'kindness'],
+      // G368 slice 2: the Master Gardener potions on shared beds (tests/shared-gardens.test.js).
+      potion_garden_water: [5, 'master-garden', 'uses'],
+      potion_garden_plant: [5, 'master-garden', 'uses'],
+      potion_garden_harvest: [5, 'master-garden', 'uses'],
+      potion_garden_clear: [5, 'master-garden', 'uses'],
+      potion_garden_fertilize: [5, 'master-garden', 'uses'],
     });
+    assert.equal(php('savedLeft', [save({}, { 'master-garden': { uses: { potion_garden_harvest: 3 } } }), 'potion_garden_harvest']), 3, 'an older save keeps a bottle\'s pours in master-garden\'s slice');
     assert.equal(php('savedLeft', [save({}, { powders: { charges: { fertilidust: 3 } } }), 'fertilidust']), 3);
     assert.equal(php('savedLeft', [save({}, { 'tree-death': { uses: { potion_tree_poison: 2 } } }), 'potion_tree_poison']), 2);
     assert.equal(php('savedLeft', [save({}, { powders: { charges: { fertilidust: 5 } } }), 'fertilidust']), null, 'a full one is not named');

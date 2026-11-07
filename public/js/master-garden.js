@@ -292,6 +292,35 @@ export function potionTendGarden(garden, action, inv, pc, ctx = {}) {
   return { ok: true, action, count, energy, mood, xp, items, superHarvest, superCrops, msg: growl(base, { energy, mood, xp }), drop, tired };
 }
 
+/**
+ * How many plots potionTendGarden would work, without working them: its own tests per plot in the
+ * garden's order, the seeds a Seed-Dibber has, and the energy each plot's package costs (it stops when
+ * the player is too tired). A pour on a shared public bed tells the realtime server this number
+ * (groddle-afternoon-server gardens_potions.go "n"), so the server works the same plots.
+ */
+export function potionPlotCount(garden, action, inv, pc, ctx = {}) {
+  const type = garden?.gardenType === 'herb' ? 'herb' : 'default';
+  const details = mgDetails(type, action, ctx.learned, ctx.upgrades);
+  if (!details) return 0;
+  const cost = Number(details.energy_cost) || 0;
+  let energy = Number(pc?.energy) || 0;
+  let seeds = Number(inv?.[ctx.seedId]) || 0;
+  let n = 0;
+  for (const [, plot] of plotsOf(garden)) {
+    if (action === 'plant') {
+      if (seeds <= 0 || SEED_CATALOG[ctx.seedId]?.gardenType !== type) break;
+      if (plot.state !== 'clean') continue;
+    } else if (action === 'hoe' && plot.state !== 'dirty') continue;
+    else if (action === 'pick' && (plot.state !== 'crop' || !SEED_CATALOG[plot.seed])) continue;
+    else if (action === 'fertilize' && (!plot.seed || plot.fertilized || plot.state === 'crop' || !SEED_CATALOG[plot.seed])) continue;
+    if (cost > 0 && energy <= cost) break;
+    energy -= cost;
+    n += 1;
+    if (action === 'plant') seeds -= 1;
+  }
+  return n;
+}
+
 const GARDEN_POTIONS_BY_ACTION = Object.fromEntries(Object.values(GARDEN_POTIONS).map((p) => [p.action, p]));
 
 /* ------------------------------------------------------------ bottles */

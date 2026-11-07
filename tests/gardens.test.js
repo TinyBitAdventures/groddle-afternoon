@@ -46,7 +46,7 @@ import {
 } from '../public/js/garden.js?v=78aa3457';
 import { getVerbsFor, runVerb } from '../public/content.js?v=dff66431';
 import { plotPieces } from '../public/js/garden-view.js?v=05651e76';
-import { plotsFor } from '../public/js/master-garden.js?v=7448df59';
+import { plotsFor } from '../public/js/master-garden.js?v=484b0d85';
 import {
   createInventory,
   countItem,

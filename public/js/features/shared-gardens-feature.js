@@ -33,6 +33,14 @@
  *   own beds on those ten streets are dropped (the site paid them out once by
  *   mail, groddle-afternoon-site GardenPayout.php), so a stale copy never
  *   brings them back.
+ * - Master Gardener potions (slice 2): master-garden-feature's pour asks the server
+ *   (sharedPotionPour) with how many plots the player's energy covers; the server takes the
+ *   bottle's charge and a Seed-Dibber's seeds through the ledger and works the bed for everyone
+ *   (gardens_potions.go; a Manyharvest ignores the planter's 60 seconds, as the original); its
+ *   go-ahead lands the pour here (masterGardenPourGranted) and a Manyharvest's crops are granted
+ *   and acknowledged as a pick's.
+ * - Others' tools: garden_ev's "tool" draws that player's can, hoe or Guano in a bubble over their
+ *   head for the act's time, as the original's pc_overlay to the street did.
  * - The server without this module (bad_frame), a "none" answer, or no live
  *   realtime: the bed goes back to the save's own plots and every verb is
  *   local, as before G368. Solo never comes here (engine.mode).
@@ -56,7 +64,9 @@ import {
   seedFitsGarden,
 } from '../garden.js?v=78aa3457';
 import { HOE_TOOLS, WATERING_CAN_TOOLS, canUseTool, firstWorkingTool } from '../tools.js?v=f701b241';
-import { addItem, countItem, ITEM_CATALOG } from '../inventory.js?v=d82f3b00';
+import { addItem, countItem, ITEM_CATALOG, itemIcon } from '../inventory.js?v=d82f3b00';
+import { JOB_WORK_OVERLAY, jobWorkToolScale, jobWorkToolSheet } from '../job-work-fx.js?v=33f097ad';
+import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=3149d699';
 import { gardenGrowModifier } from '../imagination-effects.js?v=70169933';
 import { saveStore } from '../save-store.js?v=8839ba7b';
 import {
@@ -74,13 +84,18 @@ export const SHARED_GARDENS_FEATURE_ID = 'shared-gardens';
 const REQUEST_TIMEOUT_MS = 8000;
 const SYNC_RETRY_MS = 3000;
 const APPLIED_KEEP = 100;
+/**
+ * A fresh pick's save waits this long: the server's take receipt goes to the site through its credit
+ * outbox (credits.go, batched every 250 ms), and a save write that shows the crop before the receipt
+ * is there pays for it from the earning budget, which an earner who spent theirs would see clamped.
+ */
+const GRANT_SAVE_DELAY_MS = 2500;
 const LOCAL_STATES = new Set(['off', 'signed-out', 'replaced', 'stopped']);
 const BLOCKED_SAVES = new Set(['conflict', 'elsewhere', 'signed-out', 'error', 'offline']);
 const COPY = Object.freeze({
   connecting: 'The street is still connecting. Try again in a moment.',
   timeout: 'The garden did not answer. Try again.',
   busy: 'Hold on, still asking the garden.',
-  potion: 'Garden potions do not work on the shared public gardens yet.',
 });
 const VERBS = new Set(['plant', 'water', 'harvest', 'clear', 'fertilize']);
 /** The crops a grant may carry: every seed's crop (js/garden.js SEED_CATALOG), with its label. */
@@ -98,6 +113,8 @@ let applied = [];
 const applying = new Set();
 let stripped = false;
 let multiplayer = false;
+/** Another player's tool over their head (garden_ev "tool"): player id -> { root, until }. */
+const overlays = new Map();
 
 function freshCopy() {
   return { street: '', snap: false, none: false, offset: 0, lock: 60000, plots: new Map(), beds: new Map() };
@@ -290,7 +307,82 @@ function bind(engine) {
   c.on('msg:garden_ok', (msg) => answered(engine, msg, true));
   c.on('msg:garden_no', (msg) => answered(engine, msg, false));
   c.on('msg:garden_grant', (msg) => applyLateGrant(engine, msg));
+  // Someone else tended: their can, hoe or Guano over their head (include/garden.js 708-722, master_garden.js 868-881).
+  c.on('msg:garden_ev', (msg) => {
+    if (!msg?.tool || msg.street !== engine.streetTsid || Number(msg.by) === me()) return;
+    showToolOver(engine, Number(msg.by), String(msg.tool), Number(msg.ms) || 2000);
+  });
   return c;
+}
+
+/** Where another player stands now (realtime-feature's drawn players), or null. */
+function remoteAt(engine, id) {
+  const row = (engine.query?.('minimapPlayers') || []).find((p) => Number(p.id) === id);
+  return row && Number.isFinite(row.x) && Number.isFinite(row.y) ? row : null;
+}
+
+/**
+ * The original's pc_overlay to the others on the street (apiSendAnnouncementX): a 40 by 40 bubble at
+ * delta_y -110 over the tender, the tool in its tool_animation where the remake has the sheet, its
+ * icon otherwise (js/job-work-fx.js, as a street project's work shows the worker's tool).
+ */
+function showToolOver(engine, id, tool, ms) {
+  const { PIXI } = engine;
+  const at = remoteAt(engine, id);
+  if (!PIXI || !at || !(engine.fxLayer || engine.entityLayer)) return;
+  dropOverlay(id);
+  const root = new PIXI.Container();
+  root.zIndex = 40;
+  root.label = 'garden-tool-over';
+  const { width: w, height: h } = JOB_WORK_OVERLAY;
+  const r = Math.round(Math.max(w, h) / 2 + 9);
+  const bubble = new PIXI.Graphics();
+  bubble.circle(0, 0, r).fill({ color: 0xffffff, alpha: 0.94 }).stroke({ color: 0x8c7a5b, width: 1.5, alpha: 0.7 });
+  bubble.poly([-6, r - 2, 6, r - 2, 0, r + 9]).fill({ color: 0xffffff, alpha: 0.94 });
+  root.addChild(bubble);
+  const sheet = jobWorkToolSheet(tool);
+  let art;
+  if (sheet) {
+    const base = sourceFromUrl(sheet.url);
+    const frames = [];
+    for (let i = 0; i < sheet.frames; i += 1) frames.push(frameTexture(base, new PIXI.Rectangle((i % sheet.cols) * sheet.fw, Math.floor(i / sheet.cols) * sheet.fh, sheet.fw, sheet.fh)));
+    art = new PIXI.AnimatedSprite(frames);
+    art.animationSpeed = sheet.fps / 60;
+    art.loop = true;
+    art.scale.set(jobWorkToolScale(sheet));
+    art.play();
+  } else {
+    art = new PIXI.Sprite(textureFromUrl(itemIcon(tool)));
+    art.width = w;
+    art.height = h;
+  }
+  art.anchor.set(0.5);
+  root.addChild(art);
+  root.x = at.x;
+  root.y = at.y + JOB_WORK_OVERLAY.deltaY;
+  (engine.fxLayer || engine.entityLayer).addChild(root);
+  overlays.set(id, { root, until: Date.now() + Math.max(500, Math.min(6000, ms)) });
+  engine.setData?.('sharedGardensToolOver', `${id}:${tool}:${sheet ? 'animation' : 'icon'}`);
+}
+
+function dropOverlay(id) {
+  const o = overlays.get(id);
+  if (o?.root && !o.root.destroyed) o.root.destroy({ children: true });
+  overlays.delete(id);
+}
+
+/** Each frame: the bubbles follow their players, and go when their time is up or the player left. */
+function tickOverlays(engine) {
+  const now = Date.now();
+  for (const [id, o] of overlays) {
+    const at = remoteAt(engine, id);
+    if (!at || now >= o.until || o.root.destroyed) {
+      dropOverlay(id);
+      continue;
+    }
+    o.root.x = at.x;
+    o.root.y = at.y + JOB_WORK_OVERLAY.deltaY;
+  }
 }
 
 async function persist(engine) {
@@ -326,6 +418,12 @@ function toolWorks(engine, tools, wear) {
   return canUseTool(engine.toolState, id, wear).ok;
 }
 
+/** The can or hoe js/garden.js will use (a working Irrigator 9000 or High-Class Hoe first), for the others' overlay. */
+function toolUsed(engine, tools, wear) {
+  const found = firstWorkingTool(engine.toolState || null, engine.inv, tools, wear);
+  return found ? found.tool || found.fallback || tools[tools.length - 1] : tools[tools.length - 1];
+}
+
 /**
  * What the verb would need from the server, or null when js/garden.js will refuse it here first
  * (no seed, no tool, too tired, the plot not ready): then it runs here alone and changes no plot.
@@ -354,7 +452,7 @@ function planVerb(engine, target, verbId) {
       if (rollPasses(roll, profile.successRate)) ids.push(plotId(gType, key));
     }
     if (!ids.length) return { local: true, rolls };
-    return { send: { bed: gType, ids }, rolls };
+    return { send: { bed: gType, ids, tool: toolUsed(engine, WATERING_CAN_TOOLS, profile.toolWear) }, rolls };
   }
   const plot = target.state?.plot;
   const key = target.state?.plotKey;
@@ -371,7 +469,7 @@ function planVerb(engine, target, verbId) {
     const profile = gardenActionProfile(gType, 'water', learned(engine), upgrades(engine));
     if (plot.wet || !hasWateringCan(inv) || !toolWorks(engine, WATERING_CAN_TOOLS, profile.toolWear) || energy <= profile.energy) return null;
     const roll = Math.random();
-    return rollPasses(roll, profile.successRate) ? { send: { id }, rolls: [roll] } : { local: true, rolls: [roll] };
+    return rollPasses(roll, profile.successRate) ? { send: { id, tool: toolUsed(engine, WATERING_CAN_TOOLS, profile.toolWear) }, rolls: [roll] } : { local: true, rolls: [roll] };
   }
   if (verbId === 'harvest') {
     const profile = gardenActionProfile(gType, 'harvest', learned(engine), upgrades(engine));
@@ -384,7 +482,7 @@ function planVerb(engine, target, verbId) {
   if (verbId === 'clear') {
     const profile = gardenActionProfile(gType, 'clear', learned(engine), upgrades(engine), { aggressiveOff: pc.aggressiveOff === true });
     if (plot.state !== 'dirty' || !hasHoe(inv) || !toolWorks(engine, HOE_TOOLS, profile.toolWear) || energy <= profile.energy) return null;
-    return { send: { id }, rolls: [] };
+    return { send: { id, tool: toolUsed(engine, HOE_TOOLS, profile.toolWear) }, rolls: [] };
   }
   if (verbId === 'fertilize') {
     if (!fertilizeCheck(plot).ok || countItem(inv, GARDEN_FERTILIZER) < 1) return null;
@@ -485,6 +583,10 @@ function answered(engine, msg, ok) {
   }
   // The local rules run on the plots as the server had them, with the page's own draws.
   if (msg.before) takePlots(engine, msg.before, now);
+  if (p.verbId === 'potion') {
+    landPour(engine, p, msg, now);
+    return;
+  }
   const use = msg.use && typeof msg.use === 'object' ? msg.use : null;
   if (use?.spent && use.n && use.op) engine.query?.('ledgerReceipt', String(use.op), engine);
   const g = msg.grant && typeof msg.grant === 'object' ? msg.grant : null;
@@ -494,6 +596,18 @@ function answered(engine, msg, ok) {
   if (msg.plots) takePlots(engine, msg.plots, now);
   redraw(engine);
   if (g) finishGrant(engine, g, before);
+}
+
+/** A Master Gardener pour the server worked: the pour here, its seeds' op once, the server's plots, the crops' grants. */
+function landPour(engine, p, msg, now) {
+  const seeds = msg.seeds && typeof msg.seeds === 'object' ? msg.seeds : null;
+  if (seeds?.spent && seeds.n && seeds.op) engine.query?.('ledgerReceipt', String(seeds.op), engine);
+  const grants = Array.isArray(msg.grants) ? msg.grants.filter((g) => g && typeof g === 'object') : [];
+  const before = Object.fromEntries(grants.map((g) => [g.c, countItem(engine.inv, g.c)]));
+  engine.query?.('masterGardenPourGranted', p.pour, { use: msg.use && typeof msg.use === 'object' ? msg.use : null }, engine);
+  if (msg.plots) takePlots(engine, msg.plots, now);
+  redraw(engine);
+  for (const g of grants) finishGrant(engine, g, before[g.c] || 0);
 }
 
 /** A pick's grant: the pick added the crop (else the base crop goes in here), the save is written, then acknowledged. */
@@ -506,6 +620,7 @@ async function finishGrant(engine, g, before) {
     engine.refreshPack?.();
   }
   applied = [...applied, id].slice(-APPLIED_KEEP);
+  await new Promise((done) => setTimeout(done, GRANT_SAVE_DELAY_MS));
   if (await persist(engine)) client?.send('garden_ack', { id });
 }
 
@@ -596,6 +711,7 @@ export const sharedGardensFeature = {
     pending.clear();
     grant = null;
     copy.beds = new Map();
+    for (const id of [...overlays.keys()]) dropOverlay(id);
   },
 
   onTick(dtMs, now, engine) {
@@ -622,6 +738,7 @@ export const sharedGardensFeature = {
       pending.delete(req);
       engine.toast?.(COPY.timeout, 2400);
     }
+    if (overlays.size) tickOverlays(engine);
   },
 
   /** game.js executeVerb: a shared plot's verb asks the server before it lands. */
@@ -641,10 +758,46 @@ export const sharedGardensFeature = {
     return lockedFor(target.state.plot, me()) ? LOCK_LINE : null;
   },
 
-  /** Master Gardener potions wait for slice 2 on shared beds (the plan's temporary refusal). */
-  sharedGardenPotion(target, engine) {
+  /**
+   * G368 slice 2: a Master Gardener pour on a shared bed (master-garden-feature finishPour, after its
+   * 2.5 s pour): the realtime server takes the bottle's charge and a Seed-Dibber's seeds through the
+   * ledger and works the bed (gardens_potions.go); its go-ahead lands the pour here through
+   * masterGardenPourGranted. pour: { potionClass, seedId, target, copy, n, k, mod }. True when asked.
+   */
+  sharedPotionPour(pour, engine) {
+    const target = pour?.target;
     if (engine?.mode !== 'multiplayer' || !target?.state?.garden?.shared) return null;
-    return COPY.potion;
+    const c = bind(engine);
+    if (!c || LOCAL_STATES.has(c.state)) return null;
+    if (!shared(engine)) {
+      engine.toast?.(COPY.connecting, 2400);
+      return true;
+    }
+    const bed = target.state.garden.gardenType === 'herb' ? 'herb' : 'default';
+    const id = `bed:${bed}`;
+    for (const p of pending.values()) {
+      if (p.id === id) {
+        engine.toast?.(COPY.busy, 1600);
+        return true;
+      }
+    }
+    reqSeq += 1;
+    const req = reqSeq;
+    const msg = { req, bed, c: pour.potionClass, n: Math.max(1, Math.floor(Number(pour.n) || 1)) };
+    if (Number.isInteger(pour.k) && pour.k >= 0) msg.k = pour.k;
+    if (pour.seedId) msg.seed = pour.seedId;
+    if (Number.isFinite(pour.mod)) msg.mod = pour.mod;
+    pending.set(req, { id, target, verbId: 'potion', pour, at: Date.now() });
+    // The ledger learns of a bottle or seeds bought a moment ago from the save write (the plan's catch 1).
+    persist(engine).finally(() => {
+      if (!pending.has(req)) return;
+      pending.get(req).at = Date.now();
+      if (!c.send('garden_potion', msg)) {
+        pending.delete(req);
+        engine.toast?.(COPY.connecting, 2400);
+      }
+    });
+    return true;
   },
 
   save() {

@@ -2732,9 +2732,19 @@
   "deployed": "2026-11-07"
  },
  "git": {
-  "commits": 1436,
+  "commits": 1438,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-07",
+    "kind": "new",
+    "text": "Master Gardener potions work on the shared public gardens, and others see your can or hoe over your head"
+   },
+   {
+    "date": "2026-11-07",
+    "kind": "improve",
+    "text": "Vantalu and the Vortex of Random have new map paintings, repainted from Tiny Speck's thumbnails of the lost originals"
+   },
    {
     "date": "2026-11-07",
     "kind": "improve",
@@ -2844,16 +2854,6 @@
     "date": "2026-11-07",
     "kind": "fix",
     "text": "Setting a Garden Gnome down plays the game's item drop sound"
-   },
-   {
-    "date": "2026-11-07",
-    "kind": "fix",
-    "text": "The first-skill pictures draw at their own size on no button face"
-   },
-   {
-    "date": "2026-11-07",
-    "kind": "fix",
-    "text": "Flipping a Garden Gnome names it in the activity line"
    }
   ]
  },

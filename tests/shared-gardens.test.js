@@ -12,8 +12,11 @@ import { describe, it } from 'node:test';
 
 import { SEED_CATALOG, createGarden, harvestPlot, plantPlot, tickGarden, waterAllPlots, waterPlot } from '../public/js/garden.js?v=78aa3457';
 import { GARDEN_LOCK_MS, LOCK_LINE, SHARED_GARDEN_STREETS, applyPlot, isSharedGardenStreet, localPlot, lockedFor, parsePlotId, plotId, rollPasses } from '../public/js/shared-gardens.js?v=47984e60';
-import { sharedGardensFeature } from '../public/js/features/shared-gardens-feature.js?v=77f1c507';
-import { FEATURES } from '../public/js/features/index.js?v=b662f2ae';
+import { sharedGardensFeature } from '../public/js/features/shared-gardens-feature.js?v=50746a5c';
+import { FEATURES } from '../public/js/features/index.js?v=d5b61eaf';
+import { mgDetails, potionPlotCount } from '../public/js/master-garden.js?v=484b0d85';
+// A fresh pick's save waits for the server's receipt (GRANT_SAVE_DELAY_MS): the tests wait it out.
+const settle = () => new Promise((res) => setTimeout(res, 2700));
 import { HAS_SITE, SITE_DIR, serverPath, sitePath, skipWithoutServer } from '../tools/repos.mjs';
 
 const read = (p) => readFileSync(new URL(`../${p}`, import.meta.url), 'utf8');
@@ -88,6 +91,10 @@ describe('the server\'s data and growth agree with the game', { skip: skipWithou
 });
 
 describe('the feature', () => {
+  it('a fresh pick waits for the server\'s receipt before it saves (the take credit is batched)', () => {
+    assert.match(read('public/js/features/shared-gardens-feature.js'), /const GRANT_SAVE_DELAY_MS = 2500;[\s\S]*setTimeout\(done, GRANT_SAVE_DELAY_MS\)/);
+  });
+
   it('sits before street-objects and its hooks are in game.js and content.js', () => {
     const ids = FEATURES.map((f) => f.id);
     assert.ok(ids.includes('shared-gardens'));
@@ -149,7 +156,7 @@ describe('the feature', () => {
     const pick = r.sent.at(-1);
     assert.equal(pick.verb, 'harvest');
     r.client.emit('msg:garden_ok', { req: pick.req, id: 'default:3-1', verb: 'harvest', now: Date.now(), before: { 'default:3-1': { state: 'crop', seed: 'seed_spinach' } }, plots: { 'default:3-1': { state: 'dirty' } }, grant: { id: 'gg-ab-1', c: 'spinach', n: 6 } });
-    await new Promise((res) => setTimeout(res, 0));
+    await settle();
     assert.ok(r.engine.inv.spinach >= 6);
     assert.deepEqual(r.sent.at(-1), { t: 'garden_ack', id: 'gg-ab-1' });
     assert.deepEqual(sharedGardensFeature.save(), { applied: ['gg-ab-1'] });
@@ -217,6 +224,82 @@ describe('the feature', () => {
   });
 });
 
+describe('Master Gardener potions on a shared bed (slice 2)', () => {
+  it('potionPlotCount is potionTendGarden\'s plots: its tests, the seeds, the energy', () => {
+    const g = createGarden({ cols: 4, rows: 2 });
+    g.plots['1-1'].state = 'dirty';
+    g.plots['3-1'].state = 'dirty';
+    g.plots['2-2'] = { ...g.plots['2-2'], state: 'crop', seed: 'seed_spinach' };
+    const ctx = { learned: ['mastergardener_1', 'croppery_1'], upgrades: [] };
+    const pc = { energy: 1000 };
+    assert.equal(potionPlotCount(g, 'hoe', {}, pc, ctx), 2);
+    assert.equal(potionPlotCount(g, 'water', {}, pc, ctx), 8);
+    assert.equal(potionPlotCount(g, 'pick', {}, pc, ctx), 1);
+    assert.equal(potionPlotCount(g, 'plant', { seed_spinach: 3 }, pc, { ...ctx, seedId: 'seed_spinach' }), 3, 'three seeds for five clean plots');
+    assert.equal(potionPlotCount(g, 'plant', { herb_seed_rubeweed: 3 }, pc, { ...ctx, seedId: 'herb_seed_rubeweed' }), 0, 'an herb seed in a crop bed');
+    const cost = Number(mgDetails('default', 'water', ctx.learned, []).energy_cost) || 0;
+    if (cost > 0) assert.equal(potionPlotCount(g, 'water', {}, { energy: cost * 3 + 1 }, ctx), 3, 'it stops when too tired');
+    assert.equal(potionPlotCount(g, 'water', {}, pc, { learned: [], upgrades: [] }) >= 0, true);
+  });
+
+  it('the pour asks the server with the plots, the bottle, the seed; its go-ahead lands the pour and the grants', async (t) => {
+    t.mock.method(Math, 'random', () => 0.01);
+    const r = rig({});
+    r.client.emit('msg:gardens', { t: 'gardens', street: COMMUNITY, snap: true, now: Date.now(), plots: {} });
+    const granted = [];
+    const q = r.engine.query.bind(r.engine);
+    r.engine.query = (hook, ...args) => {
+      if (hook === 'masterGardenPourGranted') {
+        granted.push(args[1]);
+        const g = args[0].target.state.garden;
+        for (const k of ['1-1', '2-1']) Object.assign(g.plots[k], { state: 'dirty', seed: null });
+        r.engine.inv.spinach = (r.engine.inv.spinach || 0) + 24;
+        return true;
+      }
+      return q(hook, ...args);
+    };
+    const pour = { potionClass: 'potion_garden_harvest', seedId: null, target: r.bedT, copy: null, n: 2, k: 0 };
+    assert.equal(sharedGardensFeature.sharedPotionPour(pour, r.engine), true);
+    await new Promise((res) => setTimeout(res, 0));
+    const ask = r.sent.at(-1);
+    assert.deepEqual({ t: ask.t, bed: ask.bed, c: ask.c, n: ask.n, k: ask.k }, { t: 'garden_potion', bed: 'default', c: 'potion_garden_harvest', n: 2, k: 0 });
+    r.client.emit('msg:garden_ok', { req: ask.req, verb: 'potion', bed: 'default', c: 'potion_garden_harvest', count: 2, now: Date.now(),
+      before: { 'default:1-1': { state: 'crop', seed: 'seed_spinach' }, 'default:2-1': { state: 'crop', seed: 'seed_spinach' } },
+      plots: { 'default:1-1': { state: 'dirty' }, 'default:2-1': { state: 'dirty' } },
+      use: { op: 'use-00000000000000b1', c: 'potion_garden_harvest', left: 4, spent: false },
+      grants: [{ id: 'gg-cd-1', c: 'spinach', n: 24 }] });
+    await settle();
+    assert.deepEqual(granted, [{ use: { op: 'use-00000000000000b1', c: 'potion_garden_harvest', left: 4, spent: false } }]);
+    assert.equal(r.bed.plots['1-1'].state, 'dirty');
+    assert.deepEqual(r.sent.at(-1), { t: 'garden_ack', id: 'gg-cd-1' });
+    assert.equal(r.engine.inv.spinach, 24, 'the pour gave the crop; nothing added twice');
+    // A Seed-Dibber: the seeds' op is applied once.
+    sharedGardensFeature.sharedPotionPour({ potionClass: 'potion_garden_plant', seedId: 'seed_spinach', target: r.bedT, n: 2, mod: 1 }, r.engine);
+    await new Promise((res) => setTimeout(res, 0));
+    const plant = r.sent.at(-1);
+    assert.equal(plant.seed, 'seed_spinach');
+    r.client.emit('msg:garden_ok', { req: plant.req, verb: 'potion', bed: 'default', now: Date.now(), before: {}, plots: {}, use: { op: 'use-00000000000000b2', left: 3, spent: false }, seeds: { op: 'use-00000000000000b3', c: 'seed_spinach', n: 2, spent: true } });
+    assert.ok(r.receipts.includes('use-00000000000000b3'));
+  });
+
+  it('master-garden-feature asks for a shared bed, and the temporary refusal is gone', () => {
+    const mg = read('public/js/features/master-garden-feature.js');
+    assert.match(mg, /if \(garden\?\.shared && engine\.mode === 'multiplayer'\)/);
+    assert.match(mg, /engine\.query\?\.\('sharedPotionPour'/);
+    assert.ok(!/sharedGardenPotion/.test(mg + read('public/js/features/shared-gardens-feature.js')));
+  });
+
+  it('another player\'s can or hoe goes over their head; the page\'s own acts name the tool', () => {
+    const f = read('public/js/features/shared-gardens-feature.js');
+    assert.match(f, /c\.on\('msg:garden_ev'/);
+    assert.match(f, /JOB_WORK_OVERLAY\.deltaY/);
+    const r = rig({});
+    r.client.emit('msg:gardens', { t: 'gardens', street: COMMUNITY, snap: true, now: Date.now(), plots: { 'default:1-1': { state: 'dirty' } } });
+    sharedGardensFeature.runVerbOverride(r.plot('1-1'), 'clear', r.engine);
+    assert.equal(r.sent.at(-1).tool, 'hoe');
+  });
+});
+
 describe('the one-time payout by mail (site GardenPayout.php)', { skip: !HAS_SITE ? 'no site checkout' : spawnSync('php', ['-v']).status !== 0 ? 'no php' : false }, () => {
   const php = (body) => JSON.parse(execFileSync('php', ['-r', `foreach (['LedgerMath', 'Economy', 'LedgerMail', 'GardenPayout'] as $c) require ${JSON.stringify(SITE_DIR)} . "/src/$c.php"; use Groddle\\Minn\\GardenPayout as P; ${body}`]).toString());
   const seeds = JSON.parse(readFileSync(sitePath('data', 'garden-seeds.json'), 'utf8'));
@@ -226,7 +309,7 @@ describe('the one-time payout by mail (site GardenPayout.php)', { skip: !HAS_SIT
     assert.deepEqual(seeds.seeds.seed_spinach, { t: 'default', g1: 4000, g2: 4000, c: 'spinach', n: 12 });
   });
 
-  it('pays a crop for seeds, shoots and crops at the player\'s count, on the ten streets only', () => {
+  it('pays the full crop for seeds, shoots and crops, on the ten streets only', () => {
     const state = {
       world: { streets: {
         [COMMUNITY]: { gardens: {
@@ -239,10 +322,9 @@ describe('the one-time payout by mail (site GardenPayout.php)', { skip: !HAS_SIT
     const arg = JSON.stringify(JSON.stringify(state));
     const shared = JSON.stringify(JSON.stringify(seeds.shared));
     const seedArg = JSON.stringify(JSON.stringify(seeds.seeds));
-    const half = php(`echo json_encode(P::owed(json_decode(${arg}), json_decode(${shared}, true), json_decode(${seedArg}, true), []));`);
-    assert.deepEqual(half, { [COMMUNITY]: { rubeweed: Math.round(SEED_CATALOG.herb_seed_rubeweed.produces / 2), spinach: 12 } }, 'two spinach plots halved, the bad key and the herb seed in a crop bed skipped');
-    const full = php(`echo json_encode(P::owed(json_decode(${arg}), json_decode(${shared}, true), json_decode(${seedArg}, true), ['croppery_1', 'herbalism_1']));`);
-    assert.equal(full[COMMUNITY].spinach, 24);
+    const owed = php(`echo json_encode(P::owed(json_decode(${arg}), json_decode(${shared}, true), json_decode(${seedArg}, true)));`);
+    // The full produces_count whatever the skills (Austin 2026-11-07): no halving in the payout.
+    assert.deepEqual(owed, { [COMMUNITY]: { rubeweed: SEED_CATALOG.herb_seed_rubeweed.produces, spinach: 24 } }, 'two spinach plots at 12, the bad key and the herb seed in a crop bed skipped');
     const streets = php(`echo json_encode(P::streetsWithGardens(json_decode(${arg}), json_decode(${shared}, true)));`);
     assert.deepEqual(streets, [COMMUNITY]);
   });

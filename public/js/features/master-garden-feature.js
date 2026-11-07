@@ -12,6 +12,12 @@
  * drop tables (18/36/67%). The cauldron already makes all five potions
  * (recipes 308-313).
  *
+ * Multiplayer, a shared public bed (G368 slice 2): the pour asks the realtime server first
+ * (shared-gardens-feature sharedPotionPour, with potionPlotCount's plots), which uses the bottle's
+ * charge and a Seed-Dibber's seeds through the site's ledger and works the bed for everyone; its
+ * go-ahead runs the pour here (masterGardenPourGranted, applyPour) with the ledger's word on the
+ * bottle. Everywhere else (solo, a home, the tutorial's bed) the pour is local as before.
+ *
  * QA: ?autostart=1&fresh=1&resetgame=1&questoffer=off&mastergardendemo=1
  *     (=herb for an herb bed) teaches Master Gardener, puts every potion
  *     and seeds in the pack, and makes every plot of the nearest bed dirty.
@@ -32,13 +38,16 @@ import {
   canPour,
   createPotionState,
   plotsFor,
+  potionPlotCount,
   potionTendGarden,
   potionUsesLeft,
   usePotion,
-} from '../master-garden.js?v=7448df59';
+} from '../master-garden.js?v=484b0d85';
 import { rollDropTable } from '../drop-tables.js?v=16e12632';
 import { payDrop } from './drops-feature.js?v=43984e8f';
 import { textureFromUrl } from '../textures.js?v=3149d699';
+import { copyFromLedger, keepsCopies, verbCopy } from '../copy-charges.js?v=f94ac7c8';
+import { gardenGrowModifier } from '../imagination-effects.js?v=70169933';
 
 export const MASTER_GARDEN_FEATURE_ID = 'master-garden';
 
@@ -153,9 +162,6 @@ function startPour(engine, potionClass, seedId = null, copy = null) {
   const potion = GARDEN_POTIONS[potionClass];
   const target = nearestGarden(engine);
   const garden = target?.state?.garden;
-  // G368: a shared public garden's plots are the realtime server's; its potions come in a later slice.
-  const sharedNo = engine.query?.('sharedGardenPotion', target, engine);
-  if (sharedNo) return say(engine, sharedNo, false), true;
   const check = canPour(potionClass, garden, ctxFor(engine, seedId));
   if (!check.ok) return say(engine, check.msg, false), true;
   engine.playSound?.('POTION_GENERIC', { volume: 0.6 });
@@ -166,10 +172,35 @@ function startPour(engine, potionClass, seedId = null, copy = null) {
 }
 
 function finishPour(engine) {
-  const { potionClass, seedId, target, fx, copy } = pouring;
+  const pour = pouring;
   pouring = null;
-  if (fx && !fx.root.destroyed) fx.root.destroy({ children: true });
+  if (pour.fx && !pour.fx.root.destroyed) pour.fx.root.destroy({ children: true });
   engine.setData?.('mgPouring', 'none');
+  const garden = pour.target?.state?.garden;
+  if (garden?.shared && engine.mode === 'multiplayer') {
+    // G368 slice 2: a shared public bed is the realtime server's. It takes the bottle's charge (and a
+    // Seed-Dibber's seeds) through the ledger and works the bed for everyone; its go-ahead runs the
+    // pour here (masterGardenPourGranted) on the plots as the server had them.
+    const potion = GARDEN_POTIONS[pour.potionClass];
+    const ctx = ctxFor(engine, pour.seedId);
+    const n = potionPlotCount(garden, potion.action, engine.inv, engine.pc, ctx);
+    if (!n) {
+      engine.playSound?.('CLICK_FAILURE', { volume: 0.5 });
+      return say(engine, `You tried to pour a ${potion.label}. ${engine.pc?.energy > 0 ? "You're too tired to do that." : potion.noTarget}`, false);
+    }
+    const k = keepsCopies(engine, pour.potionClass) ? verbCopy(engine, pour.potionClass, pour.copy) : null;
+    const mod = potion.action === 'plant' ? 1 - gardenGrowModifier(garden.gardenType === 'herb' ? 'herb' : 'default', upgrades(engine)) : undefined;
+    if (engine.query?.('sharedPotionPour', { ...pour, fx: null, n, k, mod }, engine) === true) return;
+  }
+  applyPour(engine, pour);
+}
+
+/**
+ * The pour lands: potionTendGarden on the bed, the bottle's charge, the sounds, lines, counters and the
+ * Master Gardener drop. `use` is the site ledger's word on the charge for a shared bed (the bottle then
+ * holds what it says is left, an emptied one applied once through ledgerReceipt).
+ */
+function applyPour(engine, { potionClass, seedId, target, copy }, { use = null } = {}) {
   const potion = GARDEN_POTIONS[potionClass];
   const garden = target?.state?.garden;
   if (!garden) return say(engine, 'Oops, there aren\'t any gardens here.', false);
@@ -180,7 +211,13 @@ function finishPour(engine) {
     engine.playSound?.('CLICK_FAILURE', { volume: 0.5 });
     return say(engine, `You tried to pour a ${potion.label}. ${res.msg}`, false);
   }
-  const used = usePotion(bottlesFor(engine, copy), potionClass, engine.inv);
+  if (use && keepsCopies(engine, potionClass)) {
+    if (use.spent && engine.query?.('ledgerReceipt', String(use.op || ''), engine) === false) {
+      // Already applied once (a load caught the ledger up): that bottle is gone.
+      use = { ...use, applied: true };
+    } else copyFromLedger(engine, potionClass, copy, use);
+  } else if (use?.spent && use.op) engine.query?.('ledgerReceipt', String(use.op), engine);
+  const used = use?.applied ? { emptied: true } : usePotion(bottlesFor(engine, copy), potionClass, engine.inv);
   // onPourComplete: "You poured a Soak-All Solution." then the garden growl.
   engine.pushActivity?.(`You poured a ${potion.label}.`);
   if (used.emptied) engine.pushActivity?.(`Your ${potion.label} is all used up.`);
@@ -340,8 +377,6 @@ export const masterGardenFeature = {
     const target = nearestGarden(engine);
     const garden = target?.state?.garden;
     const uses = `${potionUsesLeft(bottlesFor(engine, opts?.copy ?? null), classTsid, engine.inv)} pours left in this bottle`;
-    const sharedNo = engine.query?.('sharedGardenPotion', target, engine);
-    if (sharedNo) return [{ id: 'pour', label: 'Pour', enabled: false, reason: sharedNo, tooltip: potion.tooltip }];
     if (potion.action === 'plant') {
       const seeds = garden ? listPlantableSeeds(engine.inv, garden.gardenType) : [];
       if (!seeds.length) {
@@ -363,6 +398,17 @@ export const masterGardenFeature = {
     }
     const check = canPour(classTsid, garden, ctxFor(engine, null));
     return [{ id: 'pour', label: 'Pour', enabled: check.ok, reason: check.msg || '', tooltip: `${potion.tooltip} · ${uses}`, primary: check.ok }];
+  },
+
+  /**
+   * G368 slice 2: the realtime server worked a shared bed for this pour (shared-gardens-feature, on its
+   * go-ahead, with the plots set as the server had them): the pour lands here, with the ledger's word
+   * on the bottle's charge.
+   */
+  masterGardenPourGranted(pour, granted, engine) {
+    if (!pour || !GARDEN_POTIONS[pour.potionClass]) return null;
+    applyPour(engine, pour, { use: granted?.use || null });
+    return true;
   },
 
   runPackVerb(classTsid, verbId, engine, opts = {}) {
