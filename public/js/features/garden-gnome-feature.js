@@ -1,0 +1,423 @@
+/**
+ * The Garden Gnome (G435; see js/feature-host.js). Rules and copy: js/garden-gnome.js.
+ *
+ * Bought in the pack it has one verb, Place, which works in your own home. Set down it has Teach,
+ * Flip and Pick up, and a bump makes it turn and hop and say one of its phrases.
+ *
+ * Art: its one still picture (assets/sprites/world/npc_garden_gnome/1@3x.webp). The source's states
+ * (idle0, idleBlink, hopStart, hopLoop, hopEnd, talk, look, lookSettle) run in js/garden-gnome.js on
+ * time; with one picture the hop is the picture rising and landing and the rest show nothing.
+ *
+ * Saved in this feature's slice in your own save: { placed, packed }. packed holds what a picked-up
+ * gnome knows, for the next one set down. Phrases are your own text and stay in your save: a visitor
+ * to your home does not see your gnome, so "Cheater..." (onConversation 521) has nobody to answer.
+ *
+ * QA: ?autostart=1&fresh=1&resetgame=1&questoffer=off&homedemo=home&gnomedemo=1 puts one in the pack.
+ * window.groddleGnome: state(), place(), bump(id), verbs(id), run(id, verb), menu(id), answer(value),
+ * teach(value). Canvas: gnomes (id@x:state:dir:phrases per gnome here, ';'), gnomePlace, gnomeLast.
+ */
+import { addItem, countItem, removeItem } from '../inventory.js?v=d82f3b00';
+import { readVisitScene } from '../neighbours-mp.js?v=13a573b0';
+import { worldArtFor } from '../world-art.js?v=df476660';
+import { textureFromUrl } from '../textures.js?v=3149d699';
+import { filterText } from '../word-filter.js?v=9a7a7ebb';
+import { verbMessage } from '../item-verbs-more.js?v=c2f9dc31';
+import { HOME_INTERIOR_TSID, HOME_STREET_TSID } from '../homes.js?v=631ab6b8';
+import { homesFeature } from './homes-feature.js?v=d73d6a05';
+import {
+  GNOME_CLASS,
+  GNOME_PHRASE_MAX,
+  GNOME_TEXT as T,
+  GNOME_TIMES,
+  bumpGnome,
+  createGnomeRuntime,
+  forgetPhrase,
+  gnomePlaceFor,
+  gnomeScaleX,
+  hopLift,
+  inGnomeBox,
+  learnPhrase,
+  normalizeGnome,
+  normalizeGnomeSlice,
+  placeState,
+  resetDirection,
+  teachMenu,
+  tickGnome,
+} from '../garden-gnome.js?v=89994642';
+
+export const GARDEN_GNOME_ID = 'garden-gnome';
+const NAME = 'Garden Gnome';
+
+let slice = normalizeGnomeSlice();
+let engineRef = null;
+const drawn = new Map();
+let drawnPlace = null;
+let lastPollAt = 0;
+let lastAction = '';
+let modal = null;
+let demoDone = false;
+
+function placeHere(engine) {
+  const tsid = engine.streetTsid;
+  if (tsid !== HOME_STREET_TSID && tsid !== HOME_INTERIOR_TSID) return null;
+  const scene = homesFeature._state?.()?.scene || null;
+  if (scene?.room === 'street' && tsid !== HOME_STREET_TSID) return null;
+  if (scene?.room === 'interior' && tsid !== HOME_INTERIOR_TSID) return null;
+  const visiting = engine.mode === 'multiplayer' && Boolean(readVisitScene(tsid));
+  return gnomePlaceFor(scene, { inHome: engine.homeContext?.()?.inHome === true, visiting });
+}
+
+function publish(engine) {
+  engine.setData?.('gnomes', [...drawn.values()].map((e) => `${e.g.id}@${e.g.x}:${e.rt.state}:${e.rt.dir}:${e.g.phrases.length}`).join(';'));
+  engine.setData?.('gnomePlace', drawnPlace || '');
+  engine.setData?.('gnomeLast', lastAction);
+}
+
+function closeModal() {
+  modal?.remove();
+  modal = null;
+}
+
+function clearDrawn(engine) {
+  closeModal();
+  for (const e of drawn.values()) {
+    engine.unregister?.(e.target);
+    if (!e.holder.destroyed) e.holder.destroy({ children: true });
+  }
+  drawn.clear();
+}
+
+function drawOne(engine, g) {
+  const { PIXI } = engine;
+  if (!PIXI || !engine.entityLayer) return;
+  const art = worldArtFor(GNOME_CLASS, 1);
+  const holder = new PIXI.Container();
+  const still = new PIXI.Sprite(textureFromUrl(art.url));
+  still.anchor.set(0.5, 1);
+  still.width = art.w;
+  still.height = art.h;
+  // The texture may land after this frame: keep the picture's own size.
+  still.texture?.source?.once?.('loaded', () => {
+    if (still.destroyed) return;
+    still.width = art.w;
+    still.height = art.h;
+  });
+  holder.addChild(still);
+  holder.x = g.x;
+  holder.y = g.y;
+  holder.zIndex = 14;
+  engine.entityLayer.addChild(holder);
+  const rt = createGnomeRuntime(g);
+  holder.scale.x = gnomeScaleX(rt.dir);
+  const target = engine.register?.({
+    classId: GNOME_CLASS,
+    featureId: GARDEN_GNOME_ID,
+    label: NAME,
+    sprite: holder,
+    gnomeId: g.id,
+  });
+  drawn.set(g.id, { g, rt, holder, target });
+}
+
+function redraw(engine, place) {
+  clearDrawn(engine);
+  drawnPlace = place;
+  if (place) for (const g of slice.placed) if (g.place === place) drawOne(engine, g);
+  publish(engine);
+}
+
+function say(engine, e, text, ms) {
+  if (e.target) engine.say?.(e.target, filterText(text), ms);
+}
+
+function act(engine, action) {
+  lastAction = action;
+  publish(engine);
+}
+
+/** The pack's copies and what they know: a gnome sold or given away takes the oldest with it. */
+function trimPacked(engine) {
+  const have = countItem(engine.inv, GNOME_CLASS);
+  while (slice.packed.length > have) slice.packed.shift();
+}
+
+function placeFromPack(engine) {
+  const place = placeHere(engine);
+  if (!place || countItem(engine.inv, GNOME_CLASS) < 1 || !engine.player) return false;
+  trimPacked(engine);
+  if (!removeItem(engine.inv, GNOME_CLASS, 1)) return false;
+  const kept = normalizeGnome(slice.packed.pop() || {});
+  const g = {
+    ...kept,
+    id: `g${Date.now().toString(36)}${Math.floor(Math.random() * 1296).toString(36)}`,
+    place,
+    x: Math.round(engine.player.x),
+    y: Math.round(engine.player.y),
+  };
+  slice.placed.push(g);
+  if (place === drawnPlace) drawOne(engine, g);
+  engine.playSound?.('DROP', { volume: 0.5 });
+  engine.refreshPack?.();
+  engine.save?.();
+  act(engine, `placed:${g.id}`);
+  return true;
+}
+
+function pickUp(engine, e) {
+  const room = engine.query?.('packRoom', GNOME_CLASS, 1, engine);
+  if (room !== null && room !== undefined && Number(room) < 1) {
+    engine.playSound?.('PACK_FULL', { volume: 0.6 });
+    engine.pushActivity?.(T.bagFull);
+    engine.toast?.(T.bagFull, 2600);
+    act(engine, 'pickup:full');
+    return true;
+  }
+  slice.placed = slice.placed.filter((g) => g.id !== e.g.id);
+  slice.packed.push(normalizeGnome(e.g));
+  engine.unregister?.(e.target);
+  if (!e.holder.destroyed) e.holder.destroy({ children: true });
+  drawn.delete(e.g.id);
+  addItem(engine.inv, GNOME_CLASS, 1);
+  engine.refreshPack?.();
+  engine.save?.();
+  act(engine, `pickup:${e.g.id}`);
+  return true;
+}
+
+/** A small card in the verb menu's style, for the teach conversation and its input box. */
+function card(engine, title, build) {
+  closeModal();
+  if (typeof document === 'undefined') return null;
+  const host = document.getElementById('verb-menu')?.parentElement || document.body;
+  const wrap = document.createElement('div');
+  wrap.className = 'verb-menu gnome-modal';
+  wrap.setAttribute('role', 'dialog');
+  wrap.setAttribute('aria-modal', 'true');
+  wrap.innerHTML = `<div class="verb-menu-card">
+      <div class="verb-menu-head"><div class="verb-menu-title"></div><button type="button" class="verb-menu-x" aria-label="Cancel">×</button></div>
+      <div class="gnome-modal-body" style="padding:0.2rem 0.85rem 0.85rem;display:grid;gap:0.55rem"></div>
+    </div>`;
+  wrap.querySelector('.verb-menu-title').textContent = title;
+  wrap.querySelector('.verb-menu-x').addEventListener('click', closeModal);
+  wrap.addEventListener('keydown', (ev) => {
+    if (ev.key === 'Escape') {
+      ev.preventDefault();
+      ev.stopPropagation();
+      closeModal();
+    }
+    ev.stopPropagation();
+  });
+  build(wrap.querySelector('.gnome-modal-body'));
+  host.appendChild(wrap);
+  modal = wrap;
+  (wrap.querySelector('input') || wrap.querySelector('button.verb-choice'))?.focus?.();
+  return wrap;
+}
+
+function answerMenu(engine, e, value) {
+  closeModal();
+  if (value === 'teach') return openTeachInput(engine, e);
+  const m = /^forget-(\d+)$/.exec(String(value));
+  if (m && forgetPhrase(e.g, Number(m[1]))) {
+    say(engine, e, T.forgot, 2500);
+    engine.save?.();
+    act(engine, `forgot:${e.g.id}`);
+  }
+  return true;
+}
+
+function openTeachMenu(engine, e) {
+  const menu = teachMenu(e.g.phrases);
+  card(engine, NAME, (body) => {
+    const line = document.createElement('p');
+    line.style.margin = '0';
+    line.textContent = menu.text;
+    body.appendChild(line);
+    for (const choice of menu.choices) {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'verb-choice';
+      b.dataset.gnomeChoice = choice.value;
+      b.textContent = filterText(choice.label);
+      b.addEventListener('click', () => answerMenu(engine, e, choice.value));
+      body.appendChild(b);
+    }
+  });
+  act(engine, `teach:${e.g.id}`);
+  return true;
+}
+
+function teachPhrase(engine, e, value) {
+  closeModal();
+  const phrase = learnPhrase(e.g, value);
+  if (!phrase) return false;
+  say(engine, e, T.boom(phrase), GNOME_TIMES.boomMs);
+  engine.save?.();
+  act(engine, `learned:${e.g.id}:${e.g.phrases.length}`);
+  return true;
+}
+
+function openTeachInput(engine, e) {
+  card(engine, T.inputTitle, (body) => {
+    const form = document.createElement('form');
+    form.style.display = 'grid';
+    form.style.gap = '0.55rem';
+    const label = document.createElement('label');
+    label.textContent = T.inputLabel;
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.maxLength = GNOME_PHRASE_MAX;
+    input.autocomplete = 'off';
+    input.style.cssText = 'font:inherit;padding:0.45rem 0.6rem;border:1px solid #d9ccb3;border-radius:8px;background:#fff';
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex;gap:0.5rem;justify-content:flex-end';
+    const cancel = document.createElement('button');
+    cancel.type = 'button';
+    cancel.className = 'verb-choice';
+    cancel.style.width = 'auto';
+    cancel.textContent = 'Cancel';
+    cancel.addEventListener('click', closeModal);
+    const ok = document.createElement('button');
+    ok.type = 'submit';
+    ok.className = 'verb-choice';
+    ok.style.width = 'auto';
+    ok.textContent = 'OK';
+    row.append(cancel, ok);
+    form.append(label, input, row);
+    form.addEventListener('submit', (ev) => {
+      ev.preventDefault();
+      teachPhrase(engine, e, input.value);
+    });
+    body.appendChild(form);
+  });
+  return true;
+}
+
+function setupDemo(engine) {
+  if (demoDone || engine.param?.('gnomedemo') !== '1') return;
+  demoDone = true;
+  addItem(engine.inv, GNOME_CLASS, Math.max(1, Number(engine.param?.('gnomecount')) || 1));
+  engine.refreshPack?.();
+  if (typeof window !== 'undefined') {
+    const entry = (id) => drawn.get(id);
+    window.groddleGnome = {
+      state: () => ({ place: placeHere(engine), slice, drawn: [...drawn.values()].map((e) => ({ ...e.g, state: e.rt.state, dir: e.rt.dir })) }),
+      place: () => placeFromPack(engine),
+      bump: (id) => { const e = entry(id); return e ? bump(engine, e, engine.player?.x ?? 0) : null; },
+      verbs: (id) => gardenGnomeFeature.verbsFor(entry(id)?.target),
+      run: (id, verb) => gardenGnomeFeature.runVerb(entry(id)?.target, verb, engine),
+      answer: (id, value) => answerMenu(engine, entry(id), value),
+      teach: (id, value) => teachPhrase(engine, entry(id), value),
+    };
+  }
+}
+
+function bump(engine, e, playerX) {
+  const res = bumpGnome(e.g, e.rt, { x: e.g.x, playerX, now: Date.now() });
+  if (res) act(engine, `bump:${res}:${e.g.id}`);
+  return res;
+}
+
+export const gardenGnomeFeature = {
+  id: GARDEN_GNOME_ID,
+
+  onTick(dtMs, now, engine) {
+    if (!engine.started) return;
+    engineRef = engine;
+    setupDemo(engine);
+    const t = Date.now();
+    if (t - lastPollAt >= 250) {
+      lastPollAt = t;
+      trimPacked(engine);
+      const place = placeHere(engine);
+      if (place !== drawnPlace) redraw(engine, place);
+    }
+    const p = engine.player;
+    let changed = false;
+    for (const e of drawn.values()) {
+      if (p) {
+        const inside = inGnomeBox(e.g, p.x, p.y);
+        if (inside && !e.rt.inside) bump(engine, e, p.x);
+        e.rt.inside = inside;
+      }
+      const before = e.rt.state;
+      const out = tickGnome(e.g, e.rt, t);
+      if (out?.say) say(engine, e, out.say, out.ms);
+      if (before !== e.rt.state) changed = true;
+      e.holder.scale.x = gnomeScaleX(e.rt.dir);
+      e.holder.y = e.g.y - hopLift(e.rt, t);
+    }
+    if (changed) publish(engine);
+  },
+
+  onStreetClear(engine) {
+    clearDrawn(engine || engineRef || {});
+    drawnPlace = null;
+  },
+
+  verbsFor(target) {
+    if (!drawn.has(target?.gnomeId)) return null;
+    return [
+      { id: 'teach', label: 'Teach', enabled: true, tooltip: T.teachTip },
+      { id: 'flip', label: 'Flip', enabled: true, tooltip: T.flipTip },
+      { id: 'pickup', label: 'Pick up', enabled: true, tooltip: T.pickupTip },
+    ];
+  },
+
+  runVerb(target, verbId, engine) {
+    const e = drawn.get(target?.gnomeId);
+    if (!e) return false;
+    if (verbId === 'teach') return openTeachMenu(engine, e);
+    if (verbId === 'pickup') return pickUp(engine, e);
+    if (verbId === 'flip') {
+      e.g.facingLeft = !e.g.facingLeft;
+      resetDirection(e.g, e.rt, Date.now());
+      engine.pushActivity?.(verbMessage(GNOME_CLASS, { verb: 'flip', past: 'flipped' }));
+      engine.save?.();
+      act(engine, `flip:${e.g.id}`);
+      return true;
+    }
+    return false;
+  },
+
+  packVerbs(classTsid, engine) {
+    if (classTsid !== GNOME_CLASS) return null;
+    const state = placeState(placeHere(engine));
+    return [{ id: 'gnome_place', label: 'Place', tooltip: T.placeTip, enabled: state.enabled, reason: state.reason, primary: true }];
+  },
+
+  runPackVerb(classTsid, verbId, engine) {
+    if (classTsid !== GNOME_CLASS || verbId !== 'gnome_place') return false;
+    return placeFromPack(engine);
+  },
+
+  /** verbs.drop 320-341: "Replaced by place". */
+  packDropBlockReason(classTsid) {
+    return classTsid === GNOME_CLASS ? T.useInstead : null;
+  },
+
+  save() {
+    const out = {};
+    if (slice.placed.length) out.placed = slice.placed.map((g) => ({ ...g }));
+    if (slice.packed.length) out.packed = slice.packed.map((g) => ({ ...g }));
+    return Object.keys(out).length ? out : undefined;
+  },
+
+  restore(seed) {
+    slice = normalizeGnomeSlice(seed || {});
+    drawnPlace = null;
+    if (engineRef) redraw(engineRef, placeHere(engineRef));
+  },
+
+  /** Tests. */
+  _reset() {
+    slice = normalizeGnomeSlice();
+    engineRef = null;
+    drawn.clear();
+    drawnPlace = null;
+    lastPollAt = 0;
+    lastAction = '';
+    modal = null;
+    demoDone = false;
+  },
+};
