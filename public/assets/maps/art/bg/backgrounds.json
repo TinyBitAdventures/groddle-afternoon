@@ -562,10 +562,11 @@
       "thumbMatches": true,
       "x1": "assets/maps/art/bg/tahli.webp",
       "x2": "assets/maps/art/bg/tahli@2x.webp",
-      "x1Bytes": 14078,
-      "x1Sha256": "33b64c23ac3136e00990d6fa96f786e086be542c09560b20bfb6bf4b3c8bbfe4",
-      "x2Bytes": 30586,
-      "x2Sha256": "250772b1d16a26158db47e521b9ca623265eece557c81231fa61d5682da9d4df"
+      "repainted": "tools/provenance/repainted-maps.json",
+      "x1Bytes": 44598,
+      "x1Sha256": "555fb03b12d6c406c44ab5731c00915ad5a58bdc4c91bca9c457a38cfe549fb8",
+      "x2Bytes": 134932,
+      "x2Sha256": "7b7a2a3023bf9307c7e6458879cc5cfa20dd9f503993a65dcc0976528dfbf98b"
     },
     "114": {
       "hubName": "Firozi",

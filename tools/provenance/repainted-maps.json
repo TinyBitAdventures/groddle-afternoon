@@ -2098,6 +2098,86 @@
         "pack": "research/zone-art/map-brillah (outside git): pack.md, prompt.txt, attach/, drop/, review/"
       }
     },
+    "113": {
+      "hubName": "Tahli",
+      "x1": {
+        "file": "assets/maps/art/bg/tahli.webp",
+        "w": 760,
+        "h": 460,
+        "bytes": 44598,
+        "sha256": "555fb03b12d6c406c44ab5731c00915ad5a58bdc4c91bca9c457a38cfe549fb8"
+      },
+      "x2": {
+        "file": "assets/maps/art/bg/tahli@2x.webp",
+        "w": 1520,
+        "h": 920,
+        "bytes": 134932,
+        "sha256": "7b7a2a3023bf9307c7e6458879cc5cfa20dd9f503993a65dcc0976528dfbf98b"
+      },
+      "licence": "ai-generated",
+      "author": "Austin Ginder (directed and chose it)",
+      "tool": "GPT Image 2.6 Sunburst in T3 Chat canvas (t3.chat/canvas)",
+      "model": "GPT Image 2.6 Sunburst",
+      "made": "2026-11-06",
+      "chosen": {
+        "by": "Austin Ginder",
+        "on": "2026-11-06",
+        "of": "1 generation, toned down; Austin 2026-11-06: keep going, four per reset, landing each batch"
+      },
+      "prompt": "Paint ONE image: the background painting for an in-game region map of \"Tahli\", a region in a whimsical 2D browser game. Size 1520 x 920 pixels (landscape, exactly this ratio; if only fixed ratios are offered, use 16:10). This is the painted landscape that sits UNDER the game's map interface. The game draws its own street lines, names, buttons and markers on top later, so the painting must contain none of them.\n\nVIEW AND FEEL\nSeen from directly above, like a painted map: not from a side or three-quarter angle. Trees read as small round canopies or small pointed tops with a soft shadow; no trunks showing. Hills, cliffs and slopes read by their light and shadow. Like a hand-painted miniature diorama, quiet and gentle: muted natural colours, soft shadows, a fine even texture over the ground (like felt or fine brush strokes), and only a little scattered detail. Fewer and smaller features is better than more: most of the land is calm open ground, so thin street lines and small labels drawn on top stay easy to read. Storybook, never grim, never photographic, never neon.\n\nWHAT TO PAINT\nOne area of pale stony flats below a golden plateau. Its shape must follow attachment 02 closely (same outline, same position, same proportions), because the game's streets are fixed to those positions (attachment 03).\n- No sea: the land fills the picture to every edge.\n- The left half and the bottom: pale grey-cream limestone flats, smooth and lightly speckled, with small white boulders, a few small conifers and little flat-topped trees.\n- The top-right half: a raised plateau of dry golden-ochre grassland with small flat-topped trees scattered thinly over it.\n- Between them: a broad band of stepped brown rock terraces, three or four ledges high, running diagonally from the top edge (left of centre) down to the right edge (below the middle), with a few dark holes in the upper ledges.\n- Right of centre, at the foot of the terraces: a small pool of soft blue water spilling down a notch in the rock, beside a dark cave mouth.\n- The left third: a sunken zig-zag trench in the flats (a short top run, a long diagonal down to the left, a long bottom run), with a smaller trench above it and a low cracked ridge running from the lower-left edge toward the centre.\n- Scattered across the lower half: a few dark oval pits and small hollows in the rock.\n- Light: soft daylight from the upper left; the terrace faces and trenches in shadow.\n\nSTYLE\nMatch attachment 05: Tiny Speck's own painted plants and scenery for this region (soft painterly shapes, gentle shading, no hard black outlines), but much smaller and simpler, as seen on a map from high above.\n\nDO NOT INCLUDE\nNo text, letters, numbers or labels of any kind. No roads, paths, lines, grids or street markings. No circles, buttons, pins, arrows, icons, stars or \"you are here\" markers. No compass, legend, scale bar, border, frame, title or vignette. No people or characters. No UI of any kind.\n\nATTACHMENTS\n01  the original 150 x 91 thumbnail of this region's painting (Tiny Speck, public domain). The colours and the layout to follow.\n02  that thumbnail enlarged to 1520 x 920 with no extra detail. Follow its shapes closely: coastlines, cliffs, water, forest and open ground in the same places and proportions; repaint everything with real detail.\n03  where the game will draw the streets (dark lines) and region exits (yellow circles), at the same 1520 x 920 scale. For placement only: do NOT paint these lines or circles.\n04  a screenshot of how the game shows this map today: a blurry enlargement of the thumbnail with the game's interface drawn on top (street lines, street names, green GO buttons, panel and buttons). It is here only so you can see what the painting is for. Do NOT copy any of the interface; paint only the landscape underneath it.\n05  Tiny Speck's own painted trees, plants and scenery from this region's streets (public domain). The style and palette to match, drawn smaller and simpler.\n\nReturn the single painted landscape image only.\n",
+      "promptNote": "The prompt exactly as given to the model: research/zone-art/tools/prompt-template.txt with this region’s WHAT TO PAINT, written from the 2012 footage frame.",
+      "inputs": [
+        {
+          "n": 1,
+          "file": "01-thumbnail-150x91.jpg",
+          "sha256": "d1900aee6e26720aa2b5b6ddeb1b11dde4ed95f9d6e9eb9bd4f2a0e28aa7d41d",
+          "what": "the region’s own 150 x 91 thumbnail of the lost painting",
+          "source": "Tiny Speck, CC0: glitch-overlays/world_map.fla LIBRARY/z_hub_maps_small/sm_tahli.jpg (byte for byte public/assets/maps/art/thumbs/sm_tahli.jpg)"
+        },
+        {
+          "n": 2,
+          "file": "02-thumbnail-enlarged-1520x920.png",
+          "sha256": "51645804cb6e6da1cb0fb6c3495f402a890241d9b684f78b603fe92ceb74ec3e",
+          "what": "input 1 enlarged to 1520 x 920 (Lanczos), nothing added: the coastline and colour guide",
+          "source": "made from input 1, CC0"
+        },
+        {
+          "n": 3,
+          "file": "03-street-layout-1520x920.png",
+          "sha256": "4cdc736c571f96b6a5af593f91de383fa993510766bc493889679d74a6d04729",
+          "what": "where the map draws the 28 visible streets (dark lines) and 3 exits (yellow circles), at 2x",
+          "source": "drawn from Tiny Speck’s CC0 map data (public/assets/maps/hubs/hub-113.json, from GSJS inc_data_maps_prod.js)"
+        },
+        {
+          "n": 4,
+          "file": "04-our-map-window-with-ui.png",
+          "sha256": "3c40a77c600c5afcd9e419a5e85b1e9b2fcd8ae4cf8f2126a0cfe811dd7a3862",
+          "what": "the remake’s own map window at 2x (its UI over the enlarged thumbnail), so the model saw what the painting is for; the prompt says to copy none of the UI",
+          "source": "our own render (Groddle Afternoon UI and the CC0 thumbnail)"
+        },
+        {
+          "n": 5,
+          "file": "05-style-cc0-decos.png",
+          "sha256": "330228b3d6ad14b8917ca15b4506748eb80273af6844fea30b1425c01a5faea9",
+          "what": "a sheet of 18 decos Tiny Speck painted this region’s streets with (the most used trees, plants and scenery): the style and palette",
+          "source": "Tiny Speck decos, CC0"
+        }
+      ],
+      "references": [
+        "A frame of the original painting from the 2012 video \"tour: The Map of Ur\" (YouTube bXxXB6GUoMU at 452.2 s): reference only, never given to the model and never in the repo; the prompt describes its composition in words"
+      ],
+      "source": {
+        "generated": "2048 x 1152 (16:9, High 2K; no 16:10 option), centre-cropped to 1520 x 920: drop/tahli-1.png",
+        "dropSha256": "536defc2abca0dfdbbc9b20ff9371a0b70f7eac949decc6f79612556276c4521",
+        "toning": "magick tahli-1.png -modulate 100,80,98 -fill #8a8a5a -colorize 4% master.png (lighter than the other regions, because the standard toning took the yellow out of this desert)",
+        "masterSha256": "a17d24fff77a626550e61969b24f6c7b0a47f12c4c06c9f324ec3db094c9bcbd",
+        "encode": {
+          "x1": "magick master.png -filter Lanczos -resize 760x460! -quality 82 -define webp:method=6 tahli.webp",
+          "x2": "magick master.png -quality 82 -define webp:method=6 tahli@2x.webp"
+        },
+        "pack": "research/zone-art/map-tahli (outside git): pack.md, prompt.txt, attach/, drop/, review/"
+      }
+    },
     "114": {
       "hubName": "Firozi",
       "x1": {

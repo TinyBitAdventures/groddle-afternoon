@@ -39,7 +39,7 @@ export const HUB_MAP_BACKGROUNDS = Object.freeze({
   '109': Object.freeze({ x1: 'assets/maps/art/bg/rasana.webp', x2: 'assets/maps/art/bg/rasana@2x.webp', repainted: true }), // Rasana
   '110': Object.freeze({ x1: 'assets/maps/art/bg/massadoe.webp', x2: 'assets/maps/art/bg/massadoe@2x.webp', repainted: true }), // Massadoe
   '112': Object.freeze({ x1: 'assets/maps/art/bg/brillah.webp', x2: 'assets/maps/art/bg/brillah@2x.webp', repainted: true }), // Brillah
-  '113': Object.freeze({ x1: 'assets/maps/art/bg/tahli.webp', x2: 'assets/maps/art/bg/tahli@2x.webp' }), // Tahli
+  '113': Object.freeze({ x1: 'assets/maps/art/bg/tahli.webp', x2: 'assets/maps/art/bg/tahli@2x.webp', repainted: true }), // Tahli
   '114': Object.freeze({ x1: 'assets/maps/art/bg/firozi.webp', x2: 'assets/maps/art/bg/firozi@2x.webp', repainted: true }), // Firozi
   '116': Object.freeze({ x1: 'assets/maps/art/bg/haraiva.webp', x2: 'assets/maps/art/bg/haraiva@2x.webp', repainted: true }), // Haraiva
   '119': Object.freeze({ x1: 'assets/maps/art/bg/folivoria.webp', x2: 'assets/maps/art/bg/folivoria@2x.webp', repainted: true }), // Folivoria
