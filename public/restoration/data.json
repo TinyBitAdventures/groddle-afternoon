@@ -2728,13 +2728,18 @@
   ]
  },
  "release": {
-  "game": "0.21.0",
+  "game": "0.22.0",
   "deployed": "2026-11-07"
  },
  "git": {
-  "commits": 1438,
+  "commits": 1439,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-07",
+    "kind": "improve",
+    "text": "Xalanga and Zhambu have new map paintings, and Tamila's is redone, so every region map is repainted"
+   },
    {
     "date": "2026-11-07",
     "kind": "new",
@@ -2849,11 +2854,6 @@
     "date": "2026-11-07",
     "kind": "new",
     "text": "Guano goes on one garden plot by hand: drag it there, or pick Fertilize from the plot's menu"
-   },
-   {
-    "date": "2026-11-07",
-    "kind": "fix",
-    "text": "Setting a Garden Gnome down plays the game's item drop sound"
    }
   ]
  },
