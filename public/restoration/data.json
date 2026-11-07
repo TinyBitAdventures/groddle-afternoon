@@ -2732,9 +2732,29 @@
   "deployed": "2026-11-06"
  },
  "git": {
-  "commits": 1427,
+  "commits": 1431,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-07",
+    "kind": "improve",
+    "text": "The Garden Gnome blinks, hops, talks and looks with its own 140 frames"
+   },
+   {
+    "date": "2026-11-07",
+    "kind": "fix",
+    "text": "A walking key held while opening chat no longer types into the box"
+   },
+   {
+    "date": "2026-11-07",
+    "kind": "fix",
+    "text": "Memory repeats come back only through a Street Spirit's reminisce"
+   },
+   {
+    "date": "2026-11-07",
+    "kind": "improve",
+    "text": "Tahli has a new map painting, repainted from Tiny Speck's thumbnail of the lost original"
+   },
    {
     "date": "2026-11-07",
     "kind": "improve",
@@ -2834,26 +2854,6 @@
     "date": "2026-11-07",
     "kind": "new",
     "text": "A Garden Gnome can be set down at home, taught three phrases, and says one when bumped"
-   },
-   {
-    "date": "2026-11-07",
-    "kind": "improve",
-    "text": "The new player's first skill choice shows Tiny Speck's three skill pictures"
-   },
-   {
-    "date": "2026-11-07",
-    "kind": "improve",
-    "text": "Sparkle Powder fills the whole window with Tiny Speck's sparkle"
-   },
-   {
-    "date": "2026-11-07",
-    "kind": "improve",
-    "text": "The fecundity and hallowed powders and Juju Shoo-Shoo show their powder burst"
-   },
-   {
-    "date": "2026-11-07",
-    "kind": "improve",
-    "text": "A named Tower hangs its name on Tiny Speck's scaffolding sign, not a drawn plaque"
    }
   ]
  },

@@ -55,7 +55,7 @@
 import { ITEM_CATALOG, addItem, countItem } from '../inventory.js?v=d82f3b00';
 import { setToolRemaining, toolCopies } from '../tools.js?v=f701b241';
 import { isItemFloor, platformYAt } from '../street-model.js?v=505d8990';
-import { hiresSpriteUrl } from '../sprite-hires.js?v=3f97bf07';
+import { hiresSpriteUrl } from '../sprite-hires.js?v=f98be5eb';
 import { rollResourceNodeDrop } from './drops-feature.js?v=43984e8f';
 import { slugsFromEffects } from '../speech-slugs.js?v=130338f9';
 import { resourceNodeResponseKey, verbResponse } from '../verb-responses.js?v=3ceb8a8c';

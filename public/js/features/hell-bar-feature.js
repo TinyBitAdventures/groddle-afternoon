@@ -30,7 +30,7 @@
 
 import { addItem, countItem, removeItem } from '../inventory.js?v=d82f3b00';
 import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=3149d699';
-import { pixiSpeed } from '../sprite-sheets.js?v=db7c442f';
+import { pixiSpeed } from '../sprite-sheets.js?v=d77b0b8b';
 import { ensureHellItems, HELL_BARTENDER, HELL_SPRITES } from '../hell.js?v=aca145ba';
 import { questFlagsFeature } from './quest-flags-feature.js?v=17c6ef48';
 import {

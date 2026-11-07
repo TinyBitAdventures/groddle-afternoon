@@ -2517,6 +2517,8 @@
       "assets/sprites/furniture/upgrades/furniture_walllamp/601@3x.webp": "16320141",
       "assets/sprites/furniture/upgrades/furniture_walllamp/635@3x.webp": "5f9d12e2",
       "assets/sprites/furniture/upgrades/furniture_walllamp/672@3x.webp": "513b5585",
+      "assets/sprites/garden-gnome/npc_garden_gnome.webp": "6ba06be4",
+      "assets/sprites/garden-gnome/npc_garden_gnome@3x.webp": "b3970ac2",
       "assets/sprites/garden/garden_bed_apartment_2_2.png": "42064417",
       "assets/sprites/garden/garden_bed_apartment_2_2@3x.webp": "5265184a",
       "assets/sprites/garden/garden_bed_polcrop_2_2.png": "7c926463",

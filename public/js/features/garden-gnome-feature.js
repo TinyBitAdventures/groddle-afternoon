@@ -4,9 +4,10 @@
  * Bought in the pack it has one verb, Place, which works in your own home. Set down it has Teach,
  * Flip and Pick up, and a bump makes it turn and hop and say one of its phrases.
  *
- * Art: its one still picture (assets/sprites/world/npc_garden_gnome/1@3x.webp). The source's states
- * (idle0, idleBlink, hopStart, hopLoop, hopEnd, talk, look, lookSettle) run in js/garden-gnome.js on
- * time; with one picture the hop is the picture rising and landing and the rest show nothing.
+ * Art: the 140 frames of npc_garden_gnome.swf (CC0; js/garden-gnome-art.js, tools/gnome-art, 3x via
+ * tools/vector-sprites/garden-gnome.json). The source's states (idle0, idleBlink, hopStart, hopLoop,
+ * talk, look, lookSettle) run in js/garden-gnome.js on time and each plays its own label at 24 fps,
+ * with hopEnd played out as a hop lands (gnomeVisual). Canvas gnomeArt: label:cell per gnome.
  *
  * Saved in this feature's slice in your own save: { placed, packed }. packed holds what a picked-up
  * gnome knows, for the next one set down. Phrases are your own text and stay in your save: a visitor
@@ -18,11 +19,11 @@
  */
 import { addItem, countItem, removeItem } from '../inventory.js?v=d82f3b00';
 import { readVisitScene } from '../neighbours-mp.js?v=026a6b55';
-import { worldArtFor } from '../world-art.js?v=df476660';
-import { textureFromUrl } from '../textures.js?v=3149d699';
+import { frameTexture, sourceFromUrl } from '../textures.js?v=3149d699';
+import { GNOME_ART, GNOME_ART_DIR } from '../garden-gnome-art.js?v=994b7c76';
 import { filterText } from '../word-filter.js?v=9a7a7ebb';
 import { HOME_INTERIOR_TSID, HOME_STREET_TSID } from '../homes.js?v=631ab6b8';
-import { homesFeature } from './homes-feature.js?v=ea401102';
+import { homesFeature } from './homes-feature.js?v=40afb7e7';
 import {
   GNOME_CLASS,
   GNOME_PHRASE_MAX,
@@ -32,8 +33,9 @@ import {
   createGnomeRuntime,
   forgetPhrase,
   gnomePlaceFor,
+  gnomeCell,
   gnomeScaleX,
-  hopLift,
+  gnomeVisual,
   inGnomeBox,
   learnPhrase,
   normalizeGnome,
@@ -42,7 +44,7 @@ import {
   resetDirection,
   teachMenu,
   tickGnome,
-} from '../garden-gnome.js?v=89994642';
+} from '../garden-gnome.js?v=fd02c15b';
 
 export const GARDEN_GNOME_ID = 'garden-gnome';
 const NAME = 'Garden Gnome';
@@ -66,7 +68,23 @@ function placeHere(engine) {
   return gnomePlaceFor(scene, { inHome: engine.homeContext?.()?.inHome === true, visiting });
 }
 
+/** One texture per sheet cell, cut once (1x units; js/textures.js swaps the 3x file in on first draw). */
+let cellTextures = null;
+function gnomeTextures(PIXI) {
+  if (cellTextures) return cellTextures;
+  const base = sourceFromUrl(`${GNOME_ART_DIR}${GNOME_ART.file}`);
+  const { w, h } = GNOME_ART.cell;
+  cellTextures = Array.from({ length: GNOME_ART.cells }, (_, k) =>
+    frameTexture(base, new PIXI.Rectangle((k % GNOME_ART.cols) * w, Math.floor(k / GNOME_ART.cols) * h, w, h)));
+  return cellTextures;
+}
+
+function publishArt(engine) {
+  engine.setData?.('gnomeArt', [...drawn.values()].map((e) => `${e.vis?.label || ''}:${e.cell}`).join(';'));
+}
+
 function publish(engine) {
+  publishArt(engine);
   engine.setData?.('gnomes', [...drawn.values()].map((e) => `${e.g.id}@${e.g.x}:${e.rt.state}:${e.rt.dir}:${e.g.phrases.length}`).join(';'));
   engine.setData?.('gnomePlace', drawnPlace || '');
   engine.setData?.('gnomeLast', lastAction);
@@ -89,19 +107,12 @@ function clearDrawn(engine) {
 function drawOne(engine, g) {
   const { PIXI } = engine;
   if (!PIXI || !engine.entityLayer) return;
-  const art = worldArtFor(GNOME_CLASS, 1);
+  const textures = gnomeTextures(PIXI);
   const holder = new PIXI.Container();
-  const still = new PIXI.Sprite(textureFromUrl(art.url));
-  still.anchor.set(0.5, 1);
-  still.width = art.w;
-  still.height = art.h;
-  // The texture may land after this frame: keep the picture's own size.
-  still.texture?.source?.once?.('loaded', () => {
-    if (still.destroyed) return;
-    still.width = art.w;
-    still.height = art.h;
-  });
-  holder.addChild(still);
+  // The canvas's bottom is the ground under its feet (getAssetInfo 794-796: bottom-centre).
+  const body = new PIXI.Sprite(textures[GNOME_ART.frames[0]]);
+  body.anchor.set(GNOME_ART.anchor.x, GNOME_ART.anchor.y);
+  holder.addChild(body);
   holder.x = g.x;
   holder.y = g.y;
   holder.zIndex = 14;
@@ -115,7 +126,7 @@ function drawOne(engine, g) {
     sprite: holder,
     gnomeId: g.id,
   });
-  drawn.set(g.id, { g, rt, holder, target });
+  drawn.set(g.id, { g, rt, holder, target, body, vis: gnomeVisual(null, rt.state, Date.now(), GNOME_ART), cell: GNOME_ART.frames[0] });
 }
 
 function redraw(engine, place) {
@@ -333,6 +344,7 @@ export const gardenGnomeFeature = {
     }
     const p = engine.player;
     let changed = false;
+    let artChanged = false;
     for (const e of drawn.values()) {
       if (p) {
         const inside = inGnomeBox(e.g, p.x, p.y);
@@ -344,9 +356,17 @@ export const gardenGnomeFeature = {
       if (out?.say) say(engine, e, out.say, out.ms);
       if (before !== e.rt.state) changed = true;
       e.holder.scale.x = gnomeScaleX(e.rt.dir);
-      e.holder.y = e.g.y - hopLift(e.rt, t);
+      const label = e.vis.label;
+      e.vis = gnomeVisual(e.vis, e.rt.state, t, GNOME_ART);
+      const cell = gnomeCell(GNOME_ART, e.vis.label, t - e.vis.at);
+      if (cell !== e.cell && !e.body.destroyed) {
+        e.cell = cell;
+        e.body.texture = cellTextures[cell];
+      }
+      if (label !== e.vis.label) artChanged = true;
     }
     if (changed) publish(engine);
+    else if (artChanged) publishArt(engine);
   },
 
   onStreetClear(engine) {

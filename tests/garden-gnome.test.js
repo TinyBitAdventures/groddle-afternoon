@@ -16,8 +16,11 @@ import {
   cleanPhrases,
   createGnomeRuntime,
   forgetPhrase,
+  gnomeCell,
+  gnomeFrameIndex,
   gnomePlaceFor,
   gnomeScaleX,
+  gnomeVisual,
   inGnomeBox,
   learnPhrase,
   normalizeGnomeSlice,
@@ -26,9 +29,10 @@ import {
   resetDirection,
   teachMenu,
   tickGnome,
-} from '../public/js/garden-gnome.js?v=89994642';
-import { gardenGnomeFeature as feature } from '../public/js/features/garden-gnome-feature.js?v=3c8645fa';
+} from '../public/js/garden-gnome.js?v=fd02c15b';
+import { gardenGnomeFeature as feature } from '../public/js/features/garden-gnome-feature.js?v=eb65de34';
 import { worldArtFor } from '../public/js/world-art.js?v=df476660';
+import { GNOME_ART, GNOME_ART_DIR } from '../public/js/garden-gnome-art.js?v=994b7c76';
 import { HOME_STREET_TSID } from '../public/js/homes.js?v=631ab6b8';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -223,5 +227,75 @@ describe('the feature', () => {
   it('player-facing copy has no em-dash', () => {
     const copy = Object.values(T).filter((v) => typeof v === 'string').join(' ');
     assert.doesNotMatch(copy, /—/);
+  });
+});
+
+describe('the 140 frames (npc_garden_gnome.swf sprite 31)', () => {
+  const a = GNOME_ART;
+  it('ships every frame and the source\'s labels at 24 fps', () => {
+    assert.equal(a.frames.length, 140);
+    assert.equal(a.fps, 24);
+    assert.deepEqual(a.labels, {
+      idle0: [0, 1], idleBlink: [1, 7], bounce: [8, 28], hopStart: [36, 6], hopLoop: [42, 12],
+      hopEnd: [54, 7], talk: [61, 48], look: [109, 15], lookSettle: [124, 16],
+    });
+    assert.equal(a.cells, 80, 'held drawings are kept once');
+    assert.equal(new Set(a.frames).size, a.cells);
+    assert.ok(a.frames.every((c) => c >= 0 && c < a.cells));
+    assert.equal(a.swfFrames.length, a.cells);
+    a.swfFrames.forEach((n, k) => assert.equal(a.frames[n - 1], k, `cell ${k} is frame ${n}`));
+    assert.deepEqual(a.cell, { w: 83, h: 152 });
+    for (const f of [a.file, a.file.replace(/\.webp$/, '@3x.webp')]) assert.ok(existsSync(join(root, 'public', GNOME_ART_DIR, f)), f);
+    // The 3x render is the same sprite, cell for cell (tools/vector-sprites/garden-gnome.json).
+    const m = JSON.parse(readFileSync(join(root, 'tools/vector-sprites/garden-gnome.json'), 'utf8'));
+    assert.deepEqual(m.jobs[0].sheets[0].frameList, a.swfFrames);
+  });
+
+  it('plays each state\'s own label: blink, hop, talk and look as the source names them', () => {
+    // Every label the server sets has frames (setAndBroadcastState in npc_garden_gnome.js).
+    for (const s of ['idle0', 'idleBlink', 'hopStart', 'hopLoop', 'hopEnd', 'talk', 'look', 'lookSettle']) assert.ok(a.labels[s], s);
+    assert.equal(gnomeFrameIndex(a, 'idle0', 5000), 0);
+    assert.equal(gnomeFrameIndex(a, 'idleBlink', 0), 1);
+    assert.equal(gnomeFrameIndex(a, 'idleBlink', 900), 7, 'a blink plays once and holds');
+    assert.equal(gnomeFrameIndex(a, 'hopLoop', 500), 42, 'the hop loops (12 frames, 0.5 s)');
+    assert.equal(gnomeFrameIndex(a, 'talk', 2000 + 1000 / 24), 62, 'talk loops');
+    assert.equal(gnomeFrameIndex(a, 'look', 1400), 123, 'look turns and holds');
+    assert.equal(gnomeCell(a, 'lookSettle', 1100), a.frames[139]);
+    // A blink, a landing, a talk and a settle all end on the idle drawing.
+    for (const i of [7, 60, 108, 139]) assert.equal(a.frames[i], a.frames[0], `frame ${i + 1}`);
+  });
+
+  it('lands a hop with hopEnd before talking or standing still (hop_onExit 427-429)', () => {
+    const ms = (7 * 1000) / 24;
+    let v = gnomeVisual(null, 'idle0', 0, a);
+    v = gnomeVisual(v, 'hopStart', 10, a);
+    assert.equal(v.label, 'hopStart');
+    v = gnomeVisual(v, 'hopLoop', 110, a);
+    assert.equal(v.label, 'hopLoop');
+    v = gnomeVisual(v, 'talk', 910, a);
+    assert.equal(v.label, 'hopEnd');
+    v = gnomeVisual(v, 'talk', 910 + ms - 1, a);
+    assert.equal(v.label, 'hopEnd');
+    v = gnomeVisual(v, 'talk', 910 + ms, a);
+    assert.deepEqual([v.label, v.at], ['talk', 910 + ms]);
+    v = gnomeVisual(v, 'look', 4000, a);
+    assert.equal(v.label, 'look', 'only a hop has a landing');
+    const g = { facingLeft: true, phrases: [] };
+    const rt = createGnomeRuntime(g);
+    bumpGnome(g, rt, { playerX: 900, x: 1000, now: 0 });
+    let w = gnomeVisual(null, rt.state, 0, a);
+    const seen = [];
+    for (let t = 0; t <= 2000; t += 25) {
+      tickGnome(g, rt, t);
+      w = gnomeVisual(w, rt.state, t, a);
+      if (seen.at(-1) !== w.label) seen.push(w.label);
+    }
+    assert.deepEqual(seen, ['hopStart', 'hopLoop', 'hopEnd', 'idle0'], 'no phrases: hop, land, stand');
+  });
+
+  it('draws the frames, not the still picture', () => {
+    const src = readFileSync(join(root, 'public/js/features/garden-gnome-feature.js'), 'utf8');
+    assert.match(src, /gnomeVisual\(e\.vis, e\.rt\.state, t, GNOME_ART\)/);
+    assert.doesNotMatch(src, /hopLift|worldArtFor/);
   });
 });

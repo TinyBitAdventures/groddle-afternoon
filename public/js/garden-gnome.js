@@ -9,6 +9,10 @@
  * - A bump: one player's first in 60 s turns it towards them and hops; a later one has a 25% chance
  *   of a blink (idle0_onMsg 452-484). After a hop it says a random phrase if it knows any, for
  *   1.5 s + 30 ms a character, looks 1.5 s, settles 1.2 s (431-444, 503-518, 595-619).
+ * - Frames: npc_garden_gnome.swf's own labels at 24 fps (js/garden-gnome-art.js, tools/gnome-art):
+ *   each state shows its label (gnomeCell); hopLoop and talk repeat, the others play once and
+ *   hold. hop_onExit (427-429) broadcasts hopEnd as the hop gives way to talk or idle0, so the
+ *   landing plays out once before the next label (gnomeVisual).
  */
 
 export const GNOME_CLASS = 'npc_garden_gnome';
@@ -223,11 +227,32 @@ export function tickGnome(gnome, rt, now, rng = Math.random) {
   }
 }
 
-/** How far up it is in its hop, with the one still picture (px, 0 on the ground). */
-export function hopLift(rt, now, height = 14) {
-  if (rt.state !== 'hopLoop') return 0;
-  const t = 1 - Math.max(0, rt.until - now) / GNOME_TIMES.hopLoopMs;
-  return Math.max(0, Math.sin(Math.min(1, t) * Math.PI)) * height;
+/** The SWF frame (0-based) a label shows `elapsedMs` after it began: looping labels repeat, the rest hold their last frame. */
+export function gnomeFrameIndex(art, label, elapsedMs) {
+  const [first, count] = art.labels[label] || art.labels.idle0;
+  const step = Math.max(0, Math.floor((Math.max(0, elapsedMs) * art.fps) / 1000));
+  return first + (art.loops.includes(label) ? step % count : Math.min(count - 1, step));
+}
+
+/** The sheet cell for that frame (the sheet holds each different drawing once). */
+export const gnomeCell = (art, label, elapsedMs) => art.frames[gnomeFrameIndex(art, label, elapsedMs)];
+
+/**
+ * What the gnome shows: { label, state, at }. It follows the runtime state, except that when a
+ * hop's loop ends hopEnd plays through once first (hop_onExit 427-429), then the state it gave way to.
+ */
+export function gnomeVisual(vis, state, now, art) {
+  if (!vis) return { label: state, state, at: now };
+  if (vis.label === 'hopEnd') {
+    if (now - vis.at < (art.labels.hopEnd[1] * 1000) / art.fps) {
+      vis.state = state;
+      return vis;
+    }
+    return { label: state, state, at: now };
+  }
+  if (state === vis.state) return vis;
+  if (vis.state === 'hopLoop') return { label: 'hopEnd', state, at: now };
+  return { label: state, state, at: now };
 }
 
 /** Whether a player at (px, py) stands in its 400 x 150 hit box. */
