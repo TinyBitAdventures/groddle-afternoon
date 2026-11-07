@@ -997,35 +997,54 @@ export function getPlot(garden, key) {
 }
 
 /**
- * Advance growth timers for wet planted plots.
+ * Bring every plot to now, continuously (G561): each stage ends when its time is up, not
+ * when a tick notices, so a plot watered hours ago (a closed browser, an away owner) goes
+ * through every stage its watering covered, seeds to shoots to a crop, and a dry plot stops
+ * where the watering ran out with that stage's growth banked. The original's events did
+ * this on the server (include/garden.js pushEvent/stateChanged: grow1, grow2 and dry each
+ * fire at their own time), and the site grows an owner's stored plots the same way
+ * (groddle-afternoon-site src/HomeTending.php tickPlot), as does the realtime server for
+ * the shared public gardens (gardens.go advance).
  * @param {ReturnType<typeof createGarden>} garden
  * @param {number} [now]
- * @returns {string[]} plot keys that changed stage
+ * @returns {string[]} plot keys that changed stage or dried
  */
 export function tickGarden(garden, now = Date.now()) {
   if (!garden?.plots) return [];
   const changed = [];
   for (const [key, plot] of Object.entries(garden.plots)) {
-    if (!plot.wet) continue;
+    if (tickPlot(plot, now)) changed.push(key);
+  }
+  return changed;
+}
+
+/** tickGarden for one plot; true when it changed. At most seeds to shoots, shoots to crop, then dry. */
+function tickPlot(plot, now) {
+  let changed = false;
+  for (let step = 0; step < 3 && plot?.wet; step++) {
     if (typeof plot.wetAt !== 'number') plot.wetAt = now;
     const dryAt = plot.wetAt + GARDEN_WATER_MS;
     const at = Math.min(now, dryAt);
     const seed = SEED_CATALOG[plot.seed];
     if (seed && (plot.state === 'seeds' || plot.state === 'shoots')) {
-      const need =
-        plot.state === 'seeds'
-          ? seed.grow1Ms * (plot.growModifier || 1)
-          : seed.grow2Ms * (plot.growModifier || 1);
-      if (stageElapsedMs(plot, at) >= need) {
+      const mod = Number(plot.growModifier) > 0 ? Number(plot.growModifier) : 1;
+      const need = Math.ceil((plot.state === 'seeds' ? seed.grow1Ms : seed.grow2Ms) * mod);
+      const started = typeof plot.stageStartedAt === 'number' ? plot.stageStartedAt : at;
+      const banked = Math.max(0, Number(plot.growthMs) || 0);
+      const doneAt = started + Math.max(0, need - banked);
+      if (doneAt <= at) {
+        // The next stage starts when this one ended, so the time past it carries on.
         plot.state = plot.state === 'seeds' ? 'shoots' : 'crop';
-        startStage(plot, at);
-        changed.push(key);
+        startStage(plot, doneAt);
+        changed = true;
+        continue;
       }
     }
     if (now >= dryAt) {
       dryPlot(plot, dryAt);
-      if (!changed.includes(key)) changed.push(key);
+      changed = true;
     }
+    break;
   }
   return changed;
 }

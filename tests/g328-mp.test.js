@@ -33,11 +33,11 @@ import {
   receivedLine,
   sharedHomeStreet,
   visitSceneTsid,
-} from '../public/js/neighbours-mp.js?v=026a6b55';
+} from '../public/js/neighbours-mp.js?v=40f4c953';
 import { createMinnAccount } from '../public/js/minn-account.js?v=b29fae30';
 import { homesFeature, visitorHomeScene, visitorHomeState } from '../public/js/features/homes-feature.js?v=548bcb72';
-import { neighboursMpApi, neighboursMpFeature } from '../public/js/features/neighbours-mp-feature.js?v=ac8c3f22';
-import { FEATURES } from '../public/js/features/index.js?v=40bbe957';
+import { neighboursMpApi, neighboursMpFeature } from '../public/js/features/neighbours-mp-feature.js?v=6bf4734d';
+import { FEATURES } from '../public/js/features/index.js?v=9a45ac17';
 import { serverPath, sitePath, skipWithoutServer, skipWithoutSite } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');

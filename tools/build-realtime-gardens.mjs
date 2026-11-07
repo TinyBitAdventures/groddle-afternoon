@@ -30,9 +30,9 @@ import { requireServer, serverPath } from './repos.mjs';
 import { STREET_INDEX, applyStreetIndex, loadStreetDataFromFs, setZoneStreetsShown } from '../public/js/street-loader.js?v=33d2b8bc';
 import { platformsScreen, streetWidth } from '../public/js/street-model.js?v=505d8990';
 import { ecologyForStreet, planStreetPlacements, populationForStreet, setStreetEcologyCatalog, streetReservedSpots } from '../public/js/street-ecology.js?v=3c1d4c06';
-import { GARDEN_FERTILIZE_PERC, GARDEN_WATER_MS, SEED_CATALOG } from '../public/js/garden.js?v=78aa3457';
+import { GARDEN_FERTILIZE_PERC, GARDEN_WATER_MS, SEED_CATALOG } from '../public/js/garden.js?v=890d72ea';
 import { GARDEN_LOCK_MS, SHARED_GARDEN_STREETS } from '../public/js/shared-gardens.js?v=47984e60';
-import { GARDEN_POTIONS, POTION_USES } from '../public/js/master-garden.js?v=484b0d85';
+import { GARDEN_POTIONS, POTION_USES } from '../public/js/master-garden.js?v=ee7655a1';
 import { placementRequests } from './build-realtime-objects.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');

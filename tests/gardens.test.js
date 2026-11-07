@@ -4,6 +4,7 @@
  */
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
+import { execFileSync, spawnSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -43,10 +44,10 @@ import {
   plotNeedsWater,
   gardenNeedsWater,
   GARDEN_NO_DRY_PLOTS_LINE,
-} from '../public/js/garden.js?v=78aa3457';
-import { getVerbsFor, runVerb } from '../public/content.js?v=dff66431';
+} from '../public/js/garden.js?v=890d72ea';
+import { getVerbsFor, runVerb } from '../public/content.js?v=075ded81';
 import { plotPieces } from '../public/js/garden-view.js?v=05651e76';
-import { plotsFor } from '../public/js/master-garden.js?v=484b0d85';
+import { plotsFor } from '../public/js/master-garden.js?v=ee7655a1';
 import {
   createInventory,
   countItem,
@@ -54,7 +55,8 @@ import {
   listPackToolSlots,
   isToolItem,
 } from '../public/js/inventory.js?v=d82f3b00';
-import { DEFAULT_VENDOR, vendorBuy } from '../public/js/vendor.js?v=84dc136c';
+import { DEFAULT_VENDOR, vendorBuy } from '../public/js/vendor.js?v=18b51628';
+import { HAS_SITE, SITE_DIR } from '../tools/repos.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -552,5 +554,94 @@ describe('G537: Water all waters every dry plot, an empty one too', () => {
     assert.equal(plotsFor(garden, 'water').length, 2);
     for (const key of listPlotKeys(garden)) getPlot(garden, key).wet = true;
     assert.equal(plotsFor(garden, 'water').length, 0);
+  });
+});
+
+// G561: a plot comes back as far as the time away carried it, as the site grows it.
+describe('the tick catches up across every stage the time covers (G561)', () => {
+  const T0 = 1_700_000_000_000;
+  const H = GARDEN_WATER_MS / 12;
+  const DRY = T0 + GARDEN_WATER_MS;
+  const wetPlot = (seed, state, o = {}) => ({ state, seed, wet: true, wetAt: T0, stageStartedAt: T0, growthMs: 0, growModifier: 1, ...o });
+  const tickOne = (plot, now) => {
+    const garden = { plots: { '1-1': structuredClone(plot) } };
+    const changed = tickGarden(garden, now);
+    return { plot: garden.plots['1-1'], changed };
+  };
+
+  // Every seed, planted into fresh water at T0, looked at once at each boundary and at 13 hours;
+  // plus the dry and banked cases. The same rows go through the site's HomeTending::tickPlot.
+  const cases = [];
+  for (const [id, s] of Object.entries(SEED_CATALOG)) {
+    for (const dt of [0, s.grow1Ms - 1, s.grow1Ms, s.grow1Ms + s.grow2Ms - 1, s.grow1Ms + s.grow2Ms, GARDEN_WATER_MS - 1, GARDEN_WATER_MS, 13 * H, 40 * H]) {
+      cases.push({ name: `${id} +${dt}`, plot: wetPlot(id, 'seeds'), now: T0 + dt });
+    }
+    cases.push({ name: `${id} Growth Spurt 13h`, plot: wetPlot(id, 'seeds', { growModifier: 0.9 }), now: T0 + 13 * H });
+    cases.push({ name: `${id} Speedy 0.8 one stage`, plot: wetPlot(id, 'seeds', { growModifier: 0.8 }), now: T0 + Math.ceil(s.grow1Ms * 0.8) });
+    cases.push({ name: `${id} planted just before it dried`, plot: wetPlot(id, 'seeds', { stageStartedAt: DRY - Math.floor(s.grow1Ms / 2) }), now: T0 + 13 * H });
+    cases.push({ name: `${id} shoots when it dried`, plot: wetPlot(id, 'seeds', { stageStartedAt: DRY - s.grow1Ms - Math.floor(s.grow2Ms / 2) }), now: T0 + 13 * H });
+    cases.push({ name: `${id} banked shoots rewatered`, plot: wetPlot(id, 'shoots', { growthMs: s.grow2Ms - 1000 }), now: T0 + 999 });
+    cases.push({ name: `${id} banked shoots rewatered, done`, plot: wetPlot(id, 'shoots', { growthMs: s.grow2Ms - 1000 }), now: T0 + 13 * H });
+    cases.push({ name: `${id} dry with banked growth`, plot: { ...wetPlot(id, 'seeds', { growthMs: 1000 }), wet: false, wetAt: null }, now: T0 + 13 * H });
+  }
+  cases.push({ name: 'crop dries', plot: wetPlot('seed_spinach', 'crop'), now: T0 + 13 * H });
+  cases.push({ name: 'clean dries', plot: wetPlot(null, 'clean'), now: T0 + 13 * H });
+  cases.push({ name: 'dirty stays wet', plot: wetPlot(null, 'dirty'), now: T0 + H });
+
+  it('a plot watered and planted 13 hours ago is a crop, dry, its stages ended at their own times', () => {
+    const s = SEED_CATALOG.seed_spinach;
+    const { plot, changed } = tickOne(wetPlot('seed_spinach', 'seeds'), T0 + 13 * H);
+    assert.deepEqual(changed, ['1-1']);
+    assert.equal(plot.state, 'crop');
+    assert.equal(plot.wet, false);
+    assert.equal(plot.wetAt, null);
+    assert.equal(plot.stageStartedAt, DRY);
+    assert.equal(plot.growthMs, 0);
+    // Watered 13 hours ago but planted later: the crop came 8 s after planting, not 13 hours.
+    const late = tickOne(wetPlot('seed_spinach', 'seeds', { stageStartedAt: T0 + H }), T0 + H + s.grow1Ms + s.grow2Ms);
+    assert.equal(late.plot.state, 'crop');
+    assert.equal(late.plot.wet, true);
+    assert.equal(late.plot.stageStartedAt, T0 + H + s.grow1Ms + s.grow2Ms);
+  });
+
+  it('a short gap still moves one stage, and the next stage starts when the last one ended', () => {
+    const s = SEED_CATALOG.seed_potato;
+    assert.equal(tickOne(wetPlot('seed_potato', 'seeds'), T0 + s.grow1Ms - 1).plot.state, 'seeds');
+    const { plot } = tickOne(wetPlot('seed_potato', 'seeds'), T0 + s.grow1Ms + 250);
+    assert.equal(plot.state, 'shoots');
+    assert.equal(plot.stageStartedAt, T0 + s.grow1Ms);
+    assert.equal(plot.wet, true);
+    // Frame by frame and in one look land on the same plot.
+    const garden = { plots: { '1-1': wetPlot('seed_potato', 'seeds') } };
+    for (let t = T0; t <= T0 + s.grow1Ms + s.grow2Ms + 5000; t += 333) tickGarden(garden, t);
+    assert.deepEqual(garden.plots['1-1'], tickOne(wetPlot('seed_potato', 'seeds'), T0 + s.grow1Ms + s.grow2Ms + 5000 - ((s.grow1Ms + s.grow2Ms + 5000) % 333)).plot);
+  });
+
+  it('a plot that dries stops where the watering ran out, with that stage\'s growth banked', () => {
+    const s = SEED_CATALOG.seed_spinach;
+    const seeds = tickOne(wetPlot('seed_spinach', 'seeds', { stageStartedAt: DRY - 2000 }), T0 + 13 * H).plot;
+    assert.deepEqual([seeds.state, seeds.wet, seeds.growthMs, seeds.stageStartedAt], ['seeds', false, 2000, DRY]);
+    const shoots = tickOne(wetPlot('seed_spinach', 'seeds', { stageStartedAt: DRY - s.grow1Ms - 1500 }), T0 + 13 * H).plot;
+    assert.deepEqual([shoots.state, shoots.wet, shoots.growthMs], ['shoots', false, 1500]);
+    // A dry plot never moves, however long it waits; watered again, it takes only what was left.
+    const dry = { ...seeds };
+    assert.deepEqual(tickOne(dry, T0 + 100 * H).changed, []);
+    const rewet = { ...seeds, wet: true, wetAt: T0 + 20 * H, stageStartedAt: T0 + 20 * H };
+    assert.equal(tickOne(rewet, T0 + 20 * H + s.grow1Ms - 2001).plot.state, 'seeds');
+    assert.equal(tickOne(rewet, T0 + 20 * H + s.grow1Ms - 2000).plot.state, 'shoots');
+  });
+
+  const hasPhp = spawnSync('php', ['-v']).status === 0;
+  it('lands on the same plot as the site\'s tick (src/HomeTending.php tickPlot)', { skip: !HAS_SITE ? 'no groddle-afternoon-site checkout' : !hasPhp ? 'no php' : false }, () => {
+    const code = `require ${JSON.stringify(SITE_DIR)} . '/src/HomeTending.php'; $seeds = Groddle\\Minn\\HomeTending::seeds(); $out = [];
+      foreach (json_decode($argv[1]) as $c) { $p = $c->plot; Groddle\\Minn\\HomeTending::tickPlot($p, (int) $c->now, $seeds); $out[] = $p; }
+      echo json_encode($out);`;
+    const site = JSON.parse(execFileSync('php', ['-r', code, '--', JSON.stringify(cases)], { encoding: 'utf8' }));
+    assert.equal(site.length, cases.length);
+    const pick = (p) => ({ state: p.state, wet: p.wet, wetAt: p.wetAt ?? null, stageStartedAt: p.stageStartedAt, growthMs: p.growthMs });
+    cases.forEach((c, i) => assert.deepEqual(pick(tickOne(c.plot, c.now).plot), pick(site[i]), c.name));
+    // The fixture reaches every stage both ways.
+    const states = new Set(site.map((p) => `${p.state}/${p.wet}`));
+    for (const s of ['seeds/true', 'shoots/true', 'crop/true', 'seeds/false', 'shoots/false', 'crop/false']) assert.ok(states.has(s), s);
   });
 });
