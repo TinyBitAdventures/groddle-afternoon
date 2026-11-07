@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=075ded81';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=127e0a3c';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=ca5df5d0';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=2a0ae7c7';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -487,7 +487,7 @@ import {
   pickupDroppedStack,
   placeDroppedBag,
   takeDroppedRecord,
-} from './js/world-items.js?v=2f0f2022';
+} from './js/world-items.js?v=6378e71c';
 import {
   createPlayerSave,
   parsePlayerSave,
@@ -13533,7 +13533,8 @@ function pickupDroppedWorldItem(target, requested = Infinity) {
     if (app?.canvas) app.canvas.dataset.packLast = PACK_COPY.pickupFull;
     return false;
   }
-  const shared = features.query('sharedPickup', target, engine);
+  // A shared stack (drops-mp-feature): only what was asked and fits goes; the rest stays for everyone.
+  const shared = features.query('sharedPickup', target, engine, room != null && room < wantCount ? room : wantCount);
   if (shared != null) return shared;
   const id = target?.state?.id || target?.worldItemId;
   const x = target?.sprite?.x ?? player?.x ?? 0;

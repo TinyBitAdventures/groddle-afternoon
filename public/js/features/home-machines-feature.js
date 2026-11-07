@@ -82,7 +82,7 @@ import { readVisitScene } from '../neighbours-mp.js?v=40f4c953';
 import { saveStore } from '../save-store.js?v=8839ba7b';
 import { textureFromUrl } from '../textures.js?v=3149d699';
 import { createSheetLoader } from '../sprite-sheets.js?v=d77b0b8b';
-import { STREET_GROUND_Y, homesFeature } from './homes-feature.js?v=9794941c';
+import { STREET_GROUND_Y, homesFeature } from './homes-feature.js?v=a63770ff';
 
 export { HOME_MACHINES_ID };
 

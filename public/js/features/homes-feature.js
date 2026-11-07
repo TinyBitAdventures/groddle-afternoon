@@ -100,7 +100,7 @@
  */
 
 import { countItem, ensureItem, ITEM_CATALOG, removeItem } from '../inventory.js?v=d82f3b00';
-import { pickupCountTitle } from '../world-items.js?v=2f0f2022';
+import { pickupCountTitle } from '../world-items.js?v=6378e71c';
 import { createCountChooser } from '../ui/count-chooser.js?v=5bc894c8';
 import { isBagClass } from '../pack-slots.js?v=a94b816c';
 import { createCombobox } from '../combobox.js?v=d43209e8';

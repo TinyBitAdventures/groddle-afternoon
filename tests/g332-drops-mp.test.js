@@ -22,9 +22,9 @@ import {
   normalizeGroundStack,
   normalizeMine,
   shareReason,
-} from '../public/js/drops-mp.js?v=c428065f';
-import { dropsMpFeature } from '../public/js/features/drops-mp-feature.js?v=86f4a798';
-import { giftsFeature } from '../public/js/features/gifts-feature.js?v=021a3c55';
+} from '../public/js/drops-mp.js?v=b8307be8';
+import { dropsMpFeature } from '../public/js/features/drops-mp-feature.js?v=54fb35f2';
+import { giftsFeature } from '../public/js/features/gifts-feature.js?v=cf7f298c';
 import { HAS_SERVER, HAS_SITE, SITE_DIR, serverPath, sitePath } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');
@@ -106,7 +106,7 @@ describe('solo is untouched', () => {
     assert.ok(index.indexOf('drops-mp-feature.js') < index.indexOf('street-objects-feature.js'));
     const game = readFileSync(join(root, 'public/game.js'), 'utf8');
     assert.match(game, /features\.query\('sharedDrop', \{ classTsid, count, x, y, copy: dropCopy \}, engine\)/);
-    assert.match(game, /features\.query\('sharedPickup', target, engine\)/);
+    assert.match(game, /features\.query\('sharedPickup', target, engine, room != null && room < wantCount \? room : wantCount\)/);
     assert.match(game, /features\.query\('sharedDroppedStacks', droppedStacksTsid\(\), engine\)/);
     assert.match(game, /features\.query\('packDragStart', s\.classTsid, event, engine\)/);
     assert.doesNotMatch(game, /from '[^']*drops-mp/, 'game.js imports nothing of it');

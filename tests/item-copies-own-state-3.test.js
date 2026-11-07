@@ -32,7 +32,7 @@ import {
 import { COPY_TAG_RULES, cleanCopyTagOf } from '../public/js/copy-tags.js?v=bd75b92e';
 import { goodsWithHeldTags, normalizeGoods, normalizeSlice, sameGoods, settleDone } from '../public/js/trade.js?v=beecc06c';
 import { giftEffects, normalizeGift, normalizeGiftsSlice, wrapBox } from '../public/js/gifts.js?v=4a01ff13';
-import { dropEffect, normalizeGroundStack, normalizeItem } from '../public/js/drops-mp.js?v=c428065f';
+import { dropEffect, normalizeGroundStack, normalizeItem } from '../public/js/drops-mp.js?v=b8307be8';
 import { normalizeListing } from '../public/js/auctions.js?v=7a3ffda6';
 import { cabinetMove, cabinetPut, cabinetTake, normalizeContents } from '../public/js/home-storage.js?v=121f1897';
 import { CUBIMAL_NAMING } from '../public/js/cubimals.js?v=8950bf83';

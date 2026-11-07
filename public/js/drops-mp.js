@@ -102,11 +102,27 @@ export function normalizeGroundStack(raw, street = '') {
   return out;
 }
 
-/** A stack after a street Piggy ate one (drops.go ground_eaten): n left, or null when none is. */
-export function eatenStack(stack, n) {
+/**
+ * A stack after some of it went (a street Piggy ate one, drops.go ground_eaten; someone picked up a
+ * part, ground_left): n left, or null when none is.
+ */
+export function stackLeft(stack, n) {
   const left = Math.floor(finite(n));
   if (!stack || left < 1) return null;
   return { ...stack, count: left, subtitle: `${DROP_TEXT.by(stack.by?.name || 'Someone')} · ${left} in this pile` };
+}
+
+/** A stack after a street Piggy ate one (drops.go ground_eaten). */
+export const eatenStack = stackLeft;
+
+/**
+ * The count a Pick up of a shared stack sends (drops.go ground_pickup n): what was chosen and fits,
+ * at least one; null asks for the whole stack (no count, or all of it).
+ */
+export function pickupAsk(stackCount, count) {
+  const have = Math.max(1, Math.floor(finite(stackCount, 1)));
+  const want = Math.floor(finite(count, have));
+  return want >= 1 && want < have ? want : null;
 }
 
 /** The animalKey of the street Piggy a server id names ("pig:2"; js/street-objects.js streetPigIndex), or ''. */
@@ -149,11 +165,20 @@ export function dropEffect(side, item, label = (c) => c) {
   return { pack: { [it.c]: it.n }, tool, line: DROP_TEXT.picked(it.n, name), sound: 'ITEM_PICKUP' };
 }
 
+/**
+ * A take's op: the stack's id and -t for the whole of it, -t<from> for a part (the site's
+ * LedgerDrop takePart: from is the count it was taken from, so each part has its own).
+ */
+export function isTakeOp(op, id) {
+  const o = String(op || '');
+  return DROP_OP.test(String(id || '')) && o.startsWith(`${id}-t`) && /^(?:[1-9][0-9]{0,3})?$/.test(o.slice(String(id).length + 2));
+}
+
 /** A row of GET groddle/v1/drops as an op the save applies: { op, side, item } or null. */
 export function normalizeMine(row) {
   const op = String(row?.op || '');
   const id = String(row?.id || '');
-  if (!DROP_OP.test(id) || (op !== id && op !== `${id}-t`)) return null;
+  if (!DROP_OP.test(id) || (op !== id && !isTakeOp(op, id))) return null;
   const item = normalizeItem(row?.item);
   if (!item) return null;
   const side = op === id ? 'dropped' : row?.why === 'return' ? 'back' : 'took';

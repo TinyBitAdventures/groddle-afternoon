@@ -266,12 +266,12 @@ export function pickupDroppedStack(state, inv, streetTsid, stackId, requested = 
  * The count a stack's Pick up asks about, or 0 when it is one press. InteractionMenuController.as
  * 976-985: a verb on more than one, with neither is_single nor is_all, asks; items/*.js verbs.pickup
  * (defined by takeable) sets neither, so any stack on the ground asks, up to the whole stack (905-910).
- * Ours: a bag with contents or a name comes back whole (pickupDroppedBag), and a stack shared with
- * the street goes whole to the first to ask (drops.go ground_pickup takes no count).
+ * Ours: a bag with contents or a name comes back whole (pickupDroppedBag). A stack shared with the
+ * street asks too (G560): drops.go ground_pickup takes the count and the rest stays for everyone.
  */
 export function pickupCountToAsk(stack) {
   const count = cleanCount(stack?.count);
-  if (count < 2 || stack.contents?.length || stack.name || stack.shared) return 0;
+  if (count < 2 || stack.contents?.length || stack.name) return 0;
   return count;
 }
 

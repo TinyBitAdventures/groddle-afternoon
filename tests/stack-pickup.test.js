@@ -14,8 +14,8 @@ import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { ITEM_PLURALS } from '../public/js/item-plurals-data.js?v=62e96051';
-import { normalizeGroundStack } from '../public/js/drops-mp.js?v=c428065f';
-import { createDroppedItemState, dropInventoryStack, pickupCountTitle, pickupCountToAsk, pickupDroppedStack } from '../public/js/world-items.js?v=2f0f2022';
+import { normalizeGroundStack } from '../public/js/drops-mp.js?v=b8307be8';
+import { createDroppedItemState, dropInventoryStack, pickupCountTitle, pickupCountToAsk, pickupDroppedStack } from '../public/js/world-items.js?v=6378e71c';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');
@@ -44,13 +44,13 @@ describe('which stacks ask', () => {
     assert.equal(pickupCountToAsk({ classTsid: 'bag_bigger', count: 2, name: 'Lunch' }), 0);
   });
 
-  it('a stack shared with the street goes whole to the first to ask (drops.go ground_pickup takes no count)', () => {
+  it('a stack shared with the street asks too (G560: drops.go ground_pickup takes the count)', () => {
     const stack = normalizeGroundStack({ id: 'drop-0123456789abcdef', c: 'apple', n: 5, x: 0, y: 0 }, 'LA1');
     assert.equal(stack.shared, true);
-    assert.equal(pickupCountToAsk(stack), 0);
-    // The stack as the menu sees it carries the mark, and sharedPickup is still asked whole.
+    assert.equal(pickupCountToAsk(stack), 5);
+    // The stack as the menu sees it carries the mark, and sharedPickup is asked the count (tests/g560-shared-pickup.test.js).
     assert.match(game, /\.\.\.\(stack\.shared \? \{ shared: true \} : \{\}\),\s+\},\s+worldItemId: stack\.id,/);
-    assert.match(game, /features\.query\('sharedPickup', target, engine\)/);
+    assert.match(game, /features\.query\('sharedPickup', target, engine, room != null && room < wantCount \? room : wantCount\)/);
   });
 });
 

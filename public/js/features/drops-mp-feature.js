@@ -17,7 +17,9 @@
  * changes: true when the drop went to the server), sharedPickup
  * (pickupDroppedWorldItem: true when it is a shared stack) and
  * sharedDroppedStacks (refreshDroppedWorldItems: the shared stacks to draw
- * beside the player's own). Nothing leaves or enters the pack until the
+ * beside the player's own). Pick up how many (G560): the count chosen, cut
+ * to what fits the pack, goes with the pickup; the rest stays on the ground
+ * and everyone on the street sees its new count (ground_left). Nothing leaves or enters the pack until the
  * server says the site moved it (ground_dropped, ground_taken, ground_back);
  * each applies once through the trade slice's applied list (ledgerReceipt),
  * and on every connect the site's list brings any answer that was missed.
@@ -43,7 +45,7 @@ import { ITEM_CATALOG, addItem, countItem, removeItem } from '../inventory.js?v=
 import { TOOL_CONDITION_CATALOG, leavingCopyTag, leavingToolWear, receiveToolCopy, takeToolCopy } from '../tools.js?v=f701b241';
 import { createMinnAccount } from '../minn-account.js?v=b29fae30';
 import { saveStore } from '../save-store.js?v=8839ba7b';
-import { DROP_OP, DROP_TEXT, dropEffect, eatenStack, groundFrom, isPublicStreet, normalizeGroundStack, normalizeMine, pigAnimalKey, shareReason } from '../drops-mp.js?v=c428065f';
+import { DROP_OP, DROP_TEXT, dropEffect, eatenStack, groundFrom, isPublicStreet, normalizeGroundStack, normalizeMine, pickupAsk, pigAnimalKey, shareReason, stackLeft } from '../drops-mp.js?v=b8307be8';
 
 export const DROPS_MP_FEATURE_ID = 'drops-mp';
 const TABLE_URL = 'assets/content/trade-items.json';
@@ -198,6 +200,17 @@ function createSession(engine, client) {
     if (stacks.delete(String(msg.id || ''))) redraw();
   });
 
+  // Some of a stack was picked up (or its count corrected): the rest stays, with its new count.
+  client.on('msg:ground_left', (msg) => {
+    const id = String(msg.id || '');
+    const s = stacks.get(id);
+    if (!s || !street || String(msg.street || '') !== street) return;
+    const left = stackLeft(s, msg.n);
+    if (left) stacks.set(id, left);
+    else stacks.delete(id);
+    redraw();
+  });
+
   // A street Piggy ate one (drops.go eat): the stack shrinks, the Piggy walks over and chews.
   client.on('msg:ground_eaten', (msg) => {
     const id = String(msg.id || '');
@@ -321,8 +334,11 @@ function createSession(engine, client) {
     return true;
   }
 
-  /** pickupDroppedWorldItem: true when the target is a shared stack (the pack changes on the answer). */
-  function pickup(target) {
+  /**
+   * pickupDroppedWorldItem: true when the target is a shared stack (the pack changes on the answer).
+   * count: how many (chosen, and cut to what fits the pack); the whole stack sends no count.
+   */
+  function pickup(target, count = Infinity) {
     const id = String(target?.state?.id || target?.worldItemId || '');
     if (!DROP_OP.test(id)) return null;
     if (!stacks.has(id)) {
@@ -335,8 +351,9 @@ function createSession(engine, client) {
       return false;
     }
     if (picking && Date.now() - picking.at < WAIT_MS) return true;
-    picking = { id, at: Date.now() };
-    client.send('ground_pickup', { id });
+    const n = pickupAsk(stacks.get(id).count, count);
+    picking = { id, n, at: Date.now() };
+    client.send('ground_pickup', n == null ? { id } : { id, n });
     publish();
     return true;
   }
@@ -414,10 +431,10 @@ export const dropsMpFeature = {
     return ensure(engine)?.drop(drop) ?? null;
   },
 
-  /** game.js pickupDroppedWorldItem: a shared stack goes to the first to ask. */
-  sharedPickup(target, engine) {
+  /** game.js pickupDroppedWorldItem: a shared stack, or the part of it asked for (count), goes to the first to ask. */
+  sharedPickup(target, engine, count) {
     if (!multiplayer || !session || engine?.mode !== 'multiplayer') return null;
-    return session.pickup(target);
+    return session.pickup(target, count);
   },
 
   /** game.js pack drop prompt: the drop verb's own words when the stack goes to everyone (shared stacks never merge). */
