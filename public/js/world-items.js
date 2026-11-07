@@ -6,8 +6,9 @@
  * This module keeps that loop deterministic and persistence-friendly without
  * coupling it to Pixi or DOM state.
  */
-import { addItem, removeItem } from './inventory.js?v=d82f3b00';
+import { addItem, ITEM_CATALOG, removeItem } from './inventory.js?v=d82f3b00';
 import { canRenameBag, cleanBagName } from './bag-names.js?v=22391c55';
+import { ITEM_PLURALS } from './item-plurals-data.js?v=62e96051';
 
 export const WORLD_ITEM_STATE_VERSION = 1;
 export const DEFAULT_MERGE_RADIUS = 56;
@@ -259,6 +260,25 @@ export function pickupDroppedStack(state, inv, streetTsid, stackId, requested = 
     ...(points.some((r) => r != null) ? { points } : {}),
     ...(tags.some((t) => t != null) ? { tags } : {}),
   };
+}
+
+/**
+ * The count a stack's Pick up asks about, or 0 when it is one press. InteractionMenuController.as
+ * 976-985: a verb on more than one, with neither is_single nor is_all, asks; items/*.js verbs.pickup
+ * (defined by takeable) sets neither, so any stack on the ground asks, up to the whole stack (905-910).
+ * Ours: a bag with contents or a name comes back whole (pickupDroppedBag), and a stack shared with
+ * the street goes whole to the first to ask (drops.go ground_pickup takes no count).
+ */
+export function pickupCountToAsk(stack) {
+  const count = cleanCount(stack?.count);
+  if (count < 2 || stack.contents?.length || stack.name || stack.shared) return 0;
+  return count;
+}
+
+/** InteractionMenuController.as 988: the verb's label, each word capitalized, "how many", the item's plural. */
+export function pickupCountTitle(classTsid) {
+  const meta = ITEM_CATALOG[classTsid];
+  return `Pick Up how many ${meta?.namePlural || ITEM_PLURALS[classTsid] || meta?.label || classTsid}?`;
 }
 
 /**

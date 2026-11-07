@@ -20,7 +20,7 @@
 
 import { ITEM_CATALOG, addItem, countItem, removeItem } from '../inventory.js?v=d82f3b00';
 import { getGameDayKey } from '../game-day.js?v=edb00566';
-import { listDroppedStacks } from '../world-items.js?v=5e25a498';
+import { listDroppedStacks } from '../world-items.js?v=2f0f2022';
 import { XP_FOR_LEVEL } from '../progression.js?v=33462eaa';
 import {
   SNO_CONES,

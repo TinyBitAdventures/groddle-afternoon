@@ -22,7 +22,7 @@
  * original's dark blocker colour (CabinetDialog blocker 0x213036).
  */
 
-import { bindCountField, countKeyValue, countStepMarkup } from './count-chooser.js?v=b8361b21';
+import { bindCountField, countKeyValue, countStepMarkup } from './count-chooser.js?v=5bc894c8';
 import { bindContextTrigger } from './context-menu.js?v=79326483';
 
 const CSS = `

@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=8af10970';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=127e0a3c';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=0fe4002c';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=dce25a33';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -479,10 +479,12 @@ import {
   listDroppedStacks,
   normalizeStackQuantity,
   dropInventoryStack,
+  pickupCountTitle,
+  pickupCountToAsk,
   pickupDroppedStack,
   placeDroppedBag,
   takeDroppedRecord,
-} from './js/world-items.js?v=5e25a498';
+} from './js/world-items.js?v=2f0f2022';
 import {
   createPlayerSave,
   parsePlayerSave,
@@ -960,7 +962,7 @@ import { SIDE_SHEET_IDS, bindTabs, inSideSheet, mountPanelShell, sheetKeyToWorld
 import { createQuestSheet, failedQuestPin, questStep } from './js/ui/quest-sheet.js?v=569538d6';
 import { createQuestTracker } from './js/ui/quest-tracker.js?v=db39f8a6';
 import { bindContextTrigger, createContextMenu, isContextMenuKey as isMenuKey, MORE_KEYS_LABEL } from './js/ui/context-menu.js?v=79326483';
-import { bindCountField, countKeyValue, countStepMarkup, typedCount } from './js/ui/count-chooser.js?v=b8361b21';
+import { bindCountField, countKeyValue, countStepMarkup, createCountChooser, typedCount } from './js/ui/count-chooser.js?v=5bc894c8';
 import { bindVerbMenu, centerVerbMenu, fitVerbMenuRows, focusVerbRow, lockVerbMenuSize, makePickTile, makeVerbRow, pickGridCols, placeVerbMenu, plainWords, refuseVerbRow, syncVerbDetail, verbMenuKey, verbRowAttrs, verbRowInner, verbRowKeys } from './js/ui/verb-menu.js?v=7716e570';
 import { createPromptSettler, promptId } from './js/prompt-settle.js?v=509ba9cc';
 import { clientKeyAction, createHotkeysSheet, isHotkeySheetRelease, isPlainKey } from './js/client-hotkeys.js?v=1d3b39fe';
@@ -7880,6 +7882,7 @@ function renderVerbMenu(target, verbs, level = null) {
     if (iconUrl && icon.getAttribute('src') !== iconUrl) icon.src = iconUrl;
   }
   menu.dataset.vmLevel = level ? level.verbId : '';
+  setCanvasData('stackPickCount', '');
   delete menu.dataset.vmPicks;
   menu.style.removeProperty('--vm-pick-cols');
   menu.dataset.vmDefault = '';
@@ -7906,6 +7909,15 @@ function renderVerbMenu(target, verbs, level = null) {
       const at = [...list.querySelectorAll('.vm-row')].findIndex((r) => r.dataset.verb === level.verb?.id);
       focusVerbRow(menu, at < 0 ? null : at);
     });
+    // Pick up how many? (openPickupCount): the count, no pictures.
+    if (level.chooser) {
+      const li = document.createElement('li');
+      li.setAttribute('role', 'none');
+      li.className = 'vm-count-li';
+      li.appendChild(level.chooser.panel);
+      list.appendChild(li);
+      return;
+    }
     // The choices as pictures (InteractionMenu.as 425-436, buildTargetItemCUIs 474-610: 50 px
     // buttons, no names, one row up to 7, then a grid), the name and count in the footer line.
     const li = document.createElement('li');
@@ -7958,17 +7970,19 @@ function renderVerbMenu(target, verbs, level = null) {
   const keys = verbRowKeys(verbs);
   verbs.forEach((v, i) => {
     const picks = v.id === 'feed' || Boolean(v.picker);
+    const askMax = v.id === 'pickup' ? pickupCountAsked(target) : 0;
     add({
       key: keys[i],
       label: v.label,
       cost: v.energy,
-      next: picks,
+      next: picks || askMax > 0,
       disabled: !v.enabled,
       tip: v.tooltip || '',
       reason: v.reason || '',
       verb: v.id,
     }, v.enabled ? (e) => {
       if (picks) openVerbPickLevel(target, v, e.currentTarget);
+      else if (askMax) openPickupCount(target, v, askMax);
       else {
         closeVerbMenu();
         requestVerb(target, v);
@@ -8143,6 +8157,7 @@ function closeVerbMenu() {
   menu.hidden = true;
   delete menu.dataset.vmLevel;
   menuTarget = null;
+  setCanvasData('stackPickCount', '');
   if (app?.canvas?.dataset.contextMenu?.startsWith('world:')) app.canvas.dataset.contextMenu = '';
 }
 
@@ -8920,8 +8935,10 @@ function executeVerb(target, verbId) {
       handleStootDollTarget(target, verbId, { context: 'ground' });
       return;
     }
-    if (verbId === 'pickup') {
-      pickupDroppedWorldItem(target);
+    // "pickup:3": the count chosen in the menu (openPickupCount).
+    const [pickVerb, pickCount] = String(verbId || '').split(':');
+    if (pickVerb === 'pickup') {
+      pickupDroppedWorldItem(target, pickCount ? Number(pickCount) : Infinity);
       return;
     }
     // items/bag_bigger.js verbs.rename ok_states in_location: a bag of one's own on the ground (features/bags-feature.js).
@@ -12255,9 +12272,13 @@ const engine = {
     return result;
   },
   /** A dropped stack drawn here back into the pack, as its Pick up verb does (homes-feature: Decoration Mode). */
-  pickUpDroppedStack(id) {
+  pickUpDroppedStack(id, count = Infinity) {
     const target = interactables.find((t) => t.classId === 'dropped_item' && t.worldItemId === id);
-    return target ? pickupDroppedWorldItem(target) : false;
+    return target ? pickupDroppedWorldItem(target, count) : false;
+  },
+  /** How many that stack's Pick up asks about, or 0 for one press (pickupCountAsked). */
+  pickUpCountAsked(id) {
+    return pickupCountAsked(interactables.find((t) => t.classId === 'dropped_item' && t.worldItemId === id));
   },
   /** Every street's dropped stacks (js/world-items.js state), for features that fetch from the ground. */
   get droppedItems() {
@@ -13168,6 +13189,7 @@ function spawnDroppedItemStack(stack) {
       label: named?.label || item.label || stack.classTsid,
       ...(stack.contents?.length ? { contents: stack.contents.map((c) => ({ ...c })) } : {}),
       ...(stack.name ? { name: stack.name } : {}),
+      ...(stack.shared ? { shared: true } : {}),
     },
     worldItemId: stack.id,
   });
@@ -13430,11 +13452,53 @@ function pickupDroppedBag(target) {
   return true;
 }
 
-function pickupDroppedWorldItem(target) {
+/**
+ * The count a dropped stack's Pick up asks about (world-items.js pickupCountToAsk), or 0 for one press.
+ * A full pack never asks: the verb's conditions turned it off (takeable.js:50), here it refuses at once.
+ */
+function pickupCountAsked(target) {
+  if (target?.classId !== 'dropped_item') return 0;
+  const max = pickupCountToAsk(target.state);
+  return max && features.query('packRoom', target.state.classTsid, max, engine) !== 0 ? max : 0;
+}
+
+/**
+ * Pick up how many? (InteractionMenuController.as 976-985): a level of the same menu, as the
+ * original's count step was. All comes first and has the focus (getCountChoices 1757-1761 with
+ * default_to_one off, InteractionMenu.as getDefaultChoiceIndex 1206-1215), so it starts on the whole stack.
+ */
+function openPickupCount(target, verb, max) {
+  const menu = document.getElementById('verb-menu');
+  const id = target.state.id;
+  const say = (n) => setCanvasData('stackPickCount', `${id}:${n}:${max}`);
+  const chooser = createCountChooser(document, {
+    title: pickupCountTitle(target.state.classTsid),
+    max,
+    verb: 'Pick up',
+    hook: 'stack-count',
+    change: say,
+    confirm: (n) => {
+      closeVerbMenu();
+      requestVerb(target, verb, { run: () => beginVerbAction(target, { ...verb, id: `${verb.id}:${n}` }) });
+    },
+    cancel: () => menu.querySelector('[data-vm-back]')?.click(),
+  });
+  renderVerbMenu(target, null, { verbId: verb.id, verb, options: [], title: target.subtitle || '', chooser });
+  syncVerbDetail(menu);
+  placeWorldVerbMenu(target);
+  say(max);
+  // Deferred as openVerbMenu's focus is, so the Enter that picked the row does not also press OK.
+  requestAnimationFrame(() => {
+    if (menuTarget === target && !menu.hidden) chooser.focus();
+  });
+}
+
+function pickupDroppedWorldItem(target, requested = Infinity) {
   if (target?.state?.contents?.length || target?.state?.name) return pickupDroppedBag(target);
   // G152 (takeable.js:76-79, 84-93): a full pack refuses the stack; a part that fits is taken, the rest stays down.
   const wantClass = target?.state?.classTsid;
-  const wantCount = Math.max(1, Math.floor(Number(target?.state?.count) || 1));
+  const stackCount = Math.max(1, Math.floor(Number(target?.state?.count) || 1));
+  const wantCount = Math.min(stackCount, Math.max(1, Math.floor(Number(requested)) || stackCount));
   const room = wantClass ? features.query('packRoom', wantClass, wantCount, engine) : null;
   if (room === 0) {
     playSound('PACK_FULL', { volume: 0.6 });
@@ -13448,12 +13512,13 @@ function pickupDroppedWorldItem(target) {
   const id = target?.state?.id || target?.worldItemId;
   const x = target?.sprite?.x ?? player?.x ?? 0;
   const y = target?.sprite?.y ?? player?.y ?? 0;
-  const result = pickupDroppedStack(droppedItemState, inv, droppedStacksTsid(), id, room != null && room < wantCount ? room : Infinity);
+  const result = pickupDroppedStack(droppedItemState, inv, droppedStacksTsid(), id, room != null && room < wantCount ? room : requested);
   if (!result.ok) {
     toast('That stack has already been picked up.');
     refreshDroppedWorldItems();
     return false;
   }
+  setCanvasData('stackPickLast', `${id}:${result.count}:${result.remaining}`);
   arrivingToolPoints(result.classTsid, result.count, result.points, result.tags);
   saveDroppedItems();
   const label = ITEM_CATALOG[result.classTsid]?.label || result.classTsid.replace(/_/g, ' ');

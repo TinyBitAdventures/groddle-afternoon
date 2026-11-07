@@ -45,7 +45,7 @@
 import { ITEM_CATALOG, addItem, countItem, ensureItem, itemIcon, removeItem } from '../inventory.js?v=d82f3b00';
 import { canUseTool, getToolCondition, setToolRemaining } from '../tools.js?v=689d6594';
 import { MAKING_TOOL_SKILLS, listRecipes, recipeKnown, TOOL_CATALOG } from '../making.js?v=6da3230e';
-import { listDroppedStacks } from '../world-items.js?v=5e25a498';
+import { listDroppedStacks } from '../world-items.js?v=2f0f2022';
 import { BACK_YARD_GROUND_Y, homesFeature } from './homes-feature.js?v=1c03ac42';
 import { cabinetTake, isCabinetClass } from '../home-storage.js?v=121f1897';
 import {
@@ -87,7 +87,7 @@ import { frameTexture, isLoaded, onLoaded, sourceFromUrl, textureFromUrl } from 
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 import { displayTopOf, itemstackOverlayPoint, playSheetOverlay } from '../overlay-art.js?v=11b6dd7f';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
-import { countFromField, typedCount } from '../ui/count-chooser.js?v=b8361b21';
+import { countFromField, typedCount } from '../ui/count-chooser.js?v=5bc894c8';
 
 export const CRAFTYBOT_FEATURE_ID = 'craftybot';
 const HOME_STREET_TSID = 'RH_HOME_EXT';

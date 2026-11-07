@@ -37,7 +37,7 @@ import {
 } from '../public/js/tools.js?v=689d6594';
 import { addItem, countItem, createInventory, removeItem } from '../public/js/inventory.js?v=d82f3b00';
 import { copyFromLedger, spendCopyCharge } from '../public/js/copy-charges.js?v=157a665b';
-import { createDroppedItemState, dropInventoryStack, pickupDroppedStack } from '../public/js/world-items.js?v=5e25a498';
+import { createDroppedItemState, dropInventoryStack, pickupDroppedStack } from '../public/js/world-items.js?v=2f0f2022';
 import { useBottle, bottleUsesLeft } from '../public/js/tree-poison.js?v=4d84ee07';
 import { usePotion as useGardenPotion, potionUsesLeft as gardenUsesLeft } from '../public/js/master-garden.js?v=722a7265';
 import { potionsFeature, usePotionNow } from '../public/js/features/potions-feature.js?v=b0bfb0df';

@@ -2274,7 +2274,8 @@
    a big minor button like Make's. Keyed on the chooser's own classes and the sites' data hooks. */
 :root[data-ui="classic"] [data-pack-eat-panel],
 :root[data-ui="classic"] [data-pack-drop-panel],
-:root[data-ui="classic"] [data-pack-count-panel] {
+:root[data-ui="classic"] [data-pack-count-panel],
+:root[data-ui="classic"] [data-stack-count-panel] {
   margin-top: calc(8 * var(--cu));
   padding: calc(8 * var(--cu)) 0 0;
   border: 0;
@@ -2286,7 +2287,7 @@
 :root[data-ui="classic"] .count-pop :is(.count-pop-title, .pack-eat-title, .feed-picker-qty-label) { margin: 0 0 calc(6 * var(--cu)); color: var(--c-classic-title); font: 800 calc(var(--fs-classic-row-title) * var(--cu-n, 1))/var(--lh-snug) var(--font-classic-title); }
 :root[data-ui="classic"] .count-pop :is(.count-pop-note, .count-pop-of, .pack-eat-note) { color: var(--c-classic-offline); font-size: calc(var(--fs-classic-body) * var(--cu-n, 1)); }
 :root[data-ui="classic"] .count-pop :is(.count-pop-step, .feed-picker-qty-row, .qty-row) { display: flex; align-items: center; gap: calc(5 * var(--cu)); flex-wrap: nowrap; }
-:root[data-ui="classic"] .count-pop :is(.count-pop-dec, .count-pop-inc, .count-pop-max, [data-pack-eat-choice], .feed-picker-qty-step, .feed-picker-qty-max, .feed-picker-qty-back, [data-vq], [data-pack-drop-confirm], [data-pack-eat-confirm], [data-pack-count-confirm], .feed-picker-qty-go, [data-v-go], [data-rook-count-give]) {
+:root[data-ui="classic"] .count-pop :is(.count-pop-dec, .count-pop-inc, .count-pop-max, [data-pack-eat-choice], .feed-picker-qty-step, .feed-picker-qty-max, .feed-picker-qty-back, [data-vq], [data-pack-drop-confirm], [data-pack-eat-confirm], [data-pack-count-confirm], .feed-picker-qty-go, [data-v-go], [data-rook-count-give], .count-pop-go, .count-pop-back) {
   min-height: calc(29 * var(--cu));
   min-width: calc(29 * var(--cu));
   padding: 0 calc(8 * var(--cu));
@@ -2297,7 +2298,7 @@
   color: var(--c-classic-btn-minor-label);
   font: 800 calc(var(--fs-classic-button) * var(--cu-n, 1))/1 var(--font-classic-title);
 }
-:root[data-ui="classic"] .count-pop :is([data-pack-drop-confirm], [data-pack-eat-confirm], [data-pack-count-confirm], .feed-picker-qty-go, [data-v-go], [data-rook-count-give]) { min-height: calc(34 * var(--cu)); min-width: calc(84 * var(--cu)); font-size: calc(var(--fs-classic-row) * var(--cu-n, 1)); }
+:root[data-ui="classic"] .count-pop :is([data-pack-drop-confirm], [data-pack-eat-confirm], [data-pack-count-confirm], .feed-picker-qty-go, [data-v-go], [data-rook-count-give], .count-pop-go) { min-height: calc(34 * var(--cu)); min-width: calc(84 * var(--cu)); font-size: calc(var(--fs-classic-row) * var(--cu-n, 1)); }
 :root[data-ui="classic"] .count-pop :is([data-pack-eat-choice].is-selected, .count-pop-max[aria-pressed="true"], .feed-picker-qty-max[aria-pressed="true"]) { border-color: var(--c-classic-qty-ring); box-shadow: 0 0 0 1px var(--c-classic-qty-ring); color: var(--c-classic-qty-text); }
 :root[data-ui="classic"] .count-pop button:disabled { opacity: 0.45; cursor: default; }
 :root[data-ui="classic"] .count-pop .count-pop-note.is-blocked { color: var(--c-classic-disabled); }

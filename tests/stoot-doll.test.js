@@ -25,7 +25,7 @@ import {
   dropInventoryStack,
   listDroppedStacks,
   pickupDroppedStack,
-} from '../public/js/world-items.js?v=5e25a498';
+} from '../public/js/world-items.js?v=2f0f2022';
 import {
   createShrineState,
   listShrineDonationOptions,

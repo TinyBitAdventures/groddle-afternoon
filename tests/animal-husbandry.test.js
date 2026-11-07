@@ -49,7 +49,7 @@ import {
 import { pickerMaxCount, pickerOptionsFor, pickerTakesCount, listAnimalFeedOptions, createAnimalState } from '../public/js/animals.js?v=fea7e3e0';
 import { getVerbsFor, runVerb } from '../public/content.js?v=8af10970';
 import { setStreetEcologyCatalog } from '../public/js/street-ecology.js?v=e2bdb20c';
-import { batterflyPlacementGroups, normalizeHusbandrySlot } from '../public/js/features/animal-husbandry-feature.js?v=0240a615';
+import { batterflyPlacementGroups, normalizeHusbandrySlot } from '../public/js/features/animal-husbandry-feature.js?v=667eaed4';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const publicDir = join(here, '../public');
