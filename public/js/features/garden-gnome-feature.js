@@ -22,7 +22,7 @@ import { worldArtFor } from '../world-art.js?v=df476660';
 import { textureFromUrl } from '../textures.js?v=3149d699';
 import { filterText } from '../word-filter.js?v=9a7a7ebb';
 import { HOME_INTERIOR_TSID, HOME_STREET_TSID } from '../homes.js?v=631ab6b8';
-import { homesFeature } from './homes-feature.js?v=8259cce6';
+import { homesFeature } from './homes-feature.js?v=3ca7f7da';
 import {
   GNOME_CLASS,
   GNOME_PHRASE_MAX,

@@ -393,10 +393,18 @@ export function itemUse(row) {
   return null;
 }
 
-// learnt 3 recipes stay out of the client catalog (main.js) but a quest can
-// still teach one with making_try_learn_recipe: id -> teaching quest.
+// A quest can teach a recipe with making_try_learn_recipe (players/inc_making.js 1456-1477): learnt 3
+// recipes stay out of the client catalog otherwise (main.js), and learnt 2 ones with no skills have
+// nothing else that teaches them. id -> teaching quest. js/recipe-memory.js lists the sixteen.
 const QUEST_TAUGHT = {
   305: 'batterfly_bounty', // quests/batterfly_bounty.js onComplete; Batterfly Bounty Booster makes it
+  98: 'ezcooking_make_level1_recipes', 101: 'ezcooking_make_level1_recipes', // 55-56
+  19: 'cheffery_make_level1_recipes', 20: 'cheffery_make_level1_recipes', 5: 'cheffery_make_level1_recipes', // 55-57
+  56: 'blending_make_level1_recipes', // 55
+  66: 'cocktailcrafting_make_level1_recipes', // 49
+  25: 'grilling_make_level1_recipes', // 49
+  167: 'intermediateadmixing_make_powder', 164: 'intermediateadmixing_make_powder', 171: 'intermediateadmixing_make_powder', // 43-45
+  162: 'intermediateadmixing_make_more_powders', 163: 'intermediateadmixing_make_more_powders', 166: 'intermediateadmixing_make_more_powders', 168: 'intermediateadmixing_make_more_powders', 169: 'intermediateadmixing_make_more_powders', // 49-53
 };
 
 function skipReason(id, r) {

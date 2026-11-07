@@ -787,7 +787,7 @@ export function listMakingTools() {
 export function searchRecipes(query, opts = {}) {
   const q = String(query || '').trim().toLowerCase();
   const pool = (opts.tool && opts.tool !== 'all' ? listRecipesForTool(opts.tool) : listRecipes())
-    .filter((r) => recipeKnown(r, opts.completedQuests));
+    .filter((r) => recipeKnown(r, opts.completedQuests, opts.keptRecipes));
   if (!q) return pool;
   return pool.filter((r) => {
     if (String(r.name || '').toLowerCase().includes(q)) return true;
@@ -803,9 +803,13 @@ export function listRecipesProducing(classTsid) {
   return listRecipes().filter((r) => (r.outputs || []).some((o) => o.classTsid === classTsid));
 }
 
-/** A quest-taught recipe stays out of the catalog until its quest is done. */
-export function recipeKnown(recipe, completedQuests = null) {
-  return !recipe?.taughtBy || !Array.isArray(completedQuests) || completedQuests.includes(recipe.taughtBy);
+/**
+ * A quest-taught recipe stays out of the catalog until its quest is done, unless the save kept it
+ * from before the gate (`keptRecipes`: recipe ids, js/recipe-memory.js).
+ */
+export function recipeKnown(recipe, completedQuests = null, keptRecipes = null) {
+  if (!recipe?.taughtBy || !Array.isArray(completedQuests) || completedQuests.includes(recipe.taughtBy)) return true;
+  return Array.isArray(keptRecipes) && keptRecipes.includes(String(recipe.id));
 }
 
 export function listRecipes() {
@@ -994,9 +998,9 @@ export function canCraft(inv, recipe, opts = {}) {
   if (grindsElements(recipe) && Array.isArray(opts.learned) && opts.requireTool !== false && countItem(inv, 'bag_elemental_pouch') < 1) {
     return { ok: false, reason: 'pouch', msg: NEED_POUCH_LINE };
   }
-  // Quest-taught recipes (learnt 3, making_try_learn_recipe from a quest's
-  // onComplete) apply only when the caller passes the completed quest ids.
-  if (recipe.taughtBy && Array.isArray(opts.completedQuests) && !opts.completedQuests.includes(recipe.taughtBy)) {
+  // Quest-taught recipes (making_try_learn_recipe from a quest's onComplete)
+  // apply only when the caller passes the completed quest ids.
+  if (!recipeKnown(recipe, opts.completedQuests, opts.keptRecipes)) {
     return { ok: false, reason: 'quest', quest: recipe.taughtBy };
   }
   // Achievement-gated recipes (learnt 2) apply only when the caller passes

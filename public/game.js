@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=45e24b72';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=127e0a3c';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=346a52f9';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=26ea90d8';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -553,6 +553,7 @@ import {
   listRecipes,
   listRecipesForTool,
   listMakingTools,
+  recipeKnown,
   searchRecipes,
   craftRecipe,
   craftRecipeBatch,
@@ -583,7 +584,7 @@ import {
   recipeTaskLimit,
   recipeToolInUse,
   pluralizeItem,
-} from './js/making.js?v=704da2eb';
+} from './js/making.js?v=be67495b';
 import { outputIconsHtml, outputsPhrase, recipeOutputRows } from './js/ui/recipe-outputs.js?v=73e19baf';
 import { MAKE_TOOL_SHEETS } from './js/make-tool-sheets.js?v=6f758e09';
 import { LOW_FUEL_LINE, craftSessionElapsedMs, isLowFuel, isMachineArt, machineArtHtml, packMakeState, playMachineHandOver, setMachineArtFrame } from './js/machine-art.js?v=ac629e13';
@@ -4264,10 +4265,12 @@ function renderPackPopover(classTsid, anchor = null) {
     ? { attrs: 'data-show-emotional-bear', cls: 'pack-bear-upgrade', label: 'Show Emotional Bear', next: true, tip: 'Attach it from the Emotional Bear' }
     : null;
   const musicblockDef = getMusicblock(classTsid);
+  // G437: a recipe not yet learned from its quest isn't counted or opened from here.
+  const recipeKnownNow = (recipe) => recipeKnown(recipe, questState.completed || [], features.query('keptRecipes'));
   const relatedRecipes = listRecipes().filter((recipe) =>
-    (recipe.inputs || []).some((input) => input.classTsid === classTsid)
+    (recipe.inputs || []).some((input) => input.classTsid === classTsid) && recipeKnownNow(recipe)
   );
-  const toolRecipes = slot.isTool ? listRecipesForTool(classTsid) : [];
+  const toolRecipes = slot.isTool ? listRecipesForTool(classTsid).filter(recipeKnownNow) : [];
   const recipeTarget = slot.isTool ? toolRecipes[0] : relatedRecipes[0];
   const kind = musicblockDef
     ? 'Musicblock'
@@ -26345,6 +26348,7 @@ function craftOpts() {
     learned: skillState.learned || [],
     achievements: achieveState.unlocked || [],
     completedQuests: questState.completed || [],
+    keptRecipes: features.query('keptRecipes'),
     requireSkill: true,
     requireTool: true,
     toolState: makeStation?.toolState || toolState,
@@ -26905,6 +26909,7 @@ function renderMakePanel() {
   const recipes = searchRecipes(makeSearchQuery, {
     tool: makeSearchQuery.trim() ? 'all' : makeToolFilter,
     completedQuests: questState.completed || [],
+    keptRecipes: features.query('keptRecipes'),
   });
   const opts = craftOpts();
   recipes.sort((a, b) => {
@@ -29127,6 +29132,8 @@ async function main() {
     try { saveStore.remove(DROPPED_ITEMS_STORAGE_KEY); } catch { /* storage unavailable */ }
   }
   droppedItemState = loadDroppedItems();
+  // As stored: js/recipe-memory.js must see achievement data that isn't there, which loading fills in.
+  const storedPlayerSave = saveStore.get(PLAYER_STATE_STORAGE_KEY);
   const savedPlayerState = loadPlayerState();
   bootHadPlayerSave = Boolean(savedPlayerState);
   if (savedPlayerState) {
@@ -29161,6 +29168,7 @@ async function main() {
     // eleven-skills check (player.js 217) runs on this first boot too.
     handleSkillCompletions([]);
   }
+  features.get('recipe-memory')?.stampOnce(savedPlayerState ? storedPlayerSave : null, engine);
   const homeDemo = String(bootParams.get('homedemo') || '').toLowerCase();
   if (homeDemo) {
     pc.currants = Math.max(pc.currants, 1_250);

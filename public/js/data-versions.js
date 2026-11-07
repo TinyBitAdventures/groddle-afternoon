@@ -298,6 +298,7 @@
       "assets/content/one-way-roads.json": "1724d02b",
       "assets/content/puzzle-triggers.json": "54e6c673",
       "assets/content/quests.json": "54e536b2",
+      "assets/content/recipes.json": "38d5a64e",
       "assets/content/signpost-graph.json": "4c4bcd97",
       "assets/content/sound-keys.json": "cdd3dbd9",
       "assets/content/street-ecology.json": "f4e5c99b",

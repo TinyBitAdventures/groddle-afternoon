@@ -22,7 +22,7 @@ import { REMAKE_STATUS_RULES, isOfferedInRemake, remakeStatus } from '../public/
 import { applyRewards } from '../public/js/quests.js?v=c8d9d0a4';
 import { createInventory, countItem, ensureItem } from '../public/js/inventory.js?v=d82f3b00';
 import { createMineRock, miningProfile, mineRock, smeltMetalRocks } from '../public/js/mining.js?v=4532ff9b';
-import { craftRecipe, makingSkillAdjustments } from '../public/js/making.js?v=704da2eb';
+import { craftRecipe, makingSkillAdjustments } from '../public/js/making.js?v=be67495b';
 import { createToolConditionState, getToolCondition, repairToolCondition, setToolRemaining } from '../public/js/tools.js?v=689d6594';
 import { quoteWoodTreeHarvest } from '../public/js/woodcutting.js?v=bd6376a1';
 import { resolveAnimalKinshipPackage } from '../public/js/animal-kinship.js?v=448ca44a';

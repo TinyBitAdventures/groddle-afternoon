@@ -27,7 +27,7 @@ import {
   teachMenu,
   tickGnome,
 } from '../public/js/garden-gnome.js?v=89994642';
-import { gardenGnomeFeature as feature } from '../public/js/features/garden-gnome-feature.js?v=3e3dbaa2';
+import { gardenGnomeFeature as feature } from '../public/js/features/garden-gnome-feature.js?v=f0826324';
 import { worldArtFor } from '../public/js/world-art.js?v=df476660';
 import { HOME_STREET_TSID } from '../public/js/homes.js?v=631ab6b8';
 

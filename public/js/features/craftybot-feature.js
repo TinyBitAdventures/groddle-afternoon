@@ -44,9 +44,9 @@
 
 import { ITEM_CATALOG, addItem, countItem, ensureItem, itemIcon, removeItem } from '../inventory.js?v=d82f3b00';
 import { canUseTool, getToolCondition, setToolRemaining } from '../tools.js?v=689d6594';
-import { MAKING_TOOL_SKILLS, listRecipes, recipeKnown, TOOL_CATALOG } from '../making.js?v=704da2eb';
+import { MAKING_TOOL_SKILLS, listRecipes, recipeKnown, TOOL_CATALOG } from '../making.js?v=be67495b';
 import { listDroppedStacks } from '../world-items.js?v=2f0f2022';
-import { BACK_YARD_GROUND_Y, homesFeature } from './homes-feature.js?v=8259cce6';
+import { BACK_YARD_GROUND_Y, homesFeature } from './homes-feature.js?v=3ca7f7da';
 import { cabinetTake, isCabinetClass } from '../home-storage.js?v=121f1897';
 import {
   CRAFTYBOT,
@@ -1147,7 +1147,7 @@ function menuRecipes(engine) {
     if (!out || !craftybotSpec(out)?.ingredients) return false;
     if (out.startsWith('furniture_') || out.startsWith('bag_furniture_')) return false;
     if (r.fuel || (r.inputs || []).some((i) => i.classTsid === 'fuel_cell')) return false;
-    if (!recipeKnown(r, done)) return false;
+    if (!recipeKnown(r, done, engine.query?.('keptRecipes'))) return false;
     // can_make: the recipe is learnt (its skills known); transmogrification is known to everyone.
     const transmog = MAKING_TOOL_SKILLS[r.tool]?.makingType === 'transmogrification';
     const skills = [...new Set([...(r.skill ? [r.skill] : []), ...(r.skills || [])])];

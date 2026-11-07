@@ -184,7 +184,8 @@
     "toolWear": 1,
     "taskLimit": 40,
     "learnt": 2,
-    "source": "catalog_recipes.js recipes[\"5\"]"
+    "source": "catalog_recipes.js recipes[\"5\"]",
+    "taughtBy": "cheffery_make_level1_recipes"
   },
   "spicy_quesadilla": {
     "id": "6",
@@ -708,7 +709,8 @@
     "toolWear": 1,
     "taskLimit": 40,
     "learnt": 2,
-    "source": "catalog_recipes.js recipes[\"19\"]"
+    "source": "catalog_recipes.js recipes[\"19\"]",
+    "taughtBy": "cheffery_make_level1_recipes"
   },
   "gammas_pancakes": {
     "id": "20",
@@ -739,7 +741,8 @@
     "toolWear": 1,
     "taskLimit": 40,
     "learnt": 2,
-    "source": "catalog_recipes.js recipes[\"20\"]"
+    "source": "catalog_recipes.js recipes[\"20\"]",
+    "taughtBy": "cheffery_make_level1_recipes"
   },
   "grilled_cheese": {
     "id": "21",
@@ -910,7 +913,8 @@
     "toolWear": 1,
     "taskLimit": 40,
     "learnt": 2,
-    "source": "catalog_recipes.js recipes[\"25\"]"
+    "source": "catalog_recipes.js recipes[\"25\"]",
+    "taughtBy": "grilling_make_level1_recipes"
   },
   "super_veggie_kebabs": {
     "id": "26",
@@ -2079,7 +2083,8 @@
     "toolWear": 1,
     "taskLimit": 40,
     "learnt": 2,
-    "source": "catalog_recipes.js recipes[\"56\"]"
+    "source": "catalog_recipes.js recipes[\"56\"]",
+    "taughtBy": "blending_make_level1_recipes"
   },
   "exotic_juice": {
     "id": "57",
@@ -2499,7 +2504,8 @@
     "toolWear": 1,
     "taskLimit": 40,
     "learnt": 2,
-    "source": "catalog_recipes.js recipes[\"66\"]"
+    "source": "catalog_recipes.js recipes[\"66\"]",
+    "taughtBy": "cocktailcrafting_make_level1_recipes"
   },
   "cloudberry_daiquiri": {
     "id": "67",
@@ -3725,7 +3731,8 @@
     "toolWear": 1,
     "taskLimit": 40,
     "learnt": 2,
-    "source": "catalog_recipes.js recipes[\"98\"]"
+    "source": "catalog_recipes.js recipes[\"98\"]",
+    "taughtBy": "ezcooking_make_level1_recipes"
   },
   "lazy_salad": {
     "id": "99",
@@ -3830,7 +3837,8 @@
     "toolWear": 1,
     "taskLimit": 40,
     "learnt": 2,
-    "source": "catalog_recipes.js recipes[\"101\"]"
+    "source": "catalog_recipes.js recipes[\"101\"]",
+    "taughtBy": "ezcooking_make_level1_recipes"
   },
   "cold_taco": {
     "id": "102",
@@ -5649,7 +5657,8 @@
     "toolWear": 1,
     "taskLimit": 1,
     "learnt": 2,
-    "source": "catalog_recipes.js recipes[\"162\"]"
+    "source": "catalog_recipes.js recipes[\"162\"]",
+    "taughtBy": "intermediateadmixing_make_more_powders"
   },
   "extremely_hallowed_shrine_powder": {
     "id": "163",
@@ -5684,7 +5693,8 @@
     "toolWear": 1,
     "taskLimit": 1,
     "learnt": 2,
-    "source": "catalog_recipes.js recipes[\"163\"]"
+    "source": "catalog_recipes.js recipes[\"163\"]",
+    "taughtBy": "intermediateadmixing_make_more_powders"
   },
   "powder_of_mild_fecundity": {
     "id": "164",
@@ -5715,7 +5725,8 @@
     "toolWear": 1,
     "taskLimit": 1,
     "learnt": 2,
-    "source": "catalog_recipes.js recipes[\"164\"]"
+    "source": "catalog_recipes.js recipes[\"164\"]",
+    "taughtBy": "intermediateadmixing_make_powder"
   },
   "fertilidust_lite": {
     "id": "165",
@@ -5783,7 +5794,8 @@
     "toolWear": 1,
     "taskLimit": 1,
     "learnt": 2,
-    "source": "catalog_recipes.js recipes[\"166\"]"
+    "source": "catalog_recipes.js recipes[\"166\"]",
+    "taughtBy": "intermediateadmixing_make_more_powders"
   },
   "fairly_hallowed_shrine_powder": {
     "id": "167",
@@ -5818,7 +5830,8 @@
     "toolWear": 1,
     "taskLimit": 1,
     "learnt": 2,
-    "source": "catalog_recipes.js recipes[\"167\"]"
+    "source": "catalog_recipes.js recipes[\"167\"]",
+    "taughtBy": "intermediateadmixing_make_powder"
   },
   "no_no_powder": {
     "id": "168",
@@ -5849,7 +5862,8 @@
     "toolWear": 1,
     "taskLimit": 1,
     "learnt": 2,
-    "source": "catalog_recipes.js recipes[\"168\"]"
+    "source": "catalog_recipes.js recipes[\"168\"]",
+    "taughtBy": "intermediateadmixing_make_more_powders"
   },
   "sparkle_powder": {
     "id": "169",
@@ -5880,7 +5894,8 @@
     "toolWear": 1,
     "taskLimit": 1,
     "learnt": 2,
-    "source": "catalog_recipes.js recipes[\"169\"]"
+    "source": "catalog_recipes.js recipes[\"169\"]",
+    "taughtBy": "intermediateadmixing_make_more_powders"
   },
   "sneezing_powder": {
     "id": "171",
@@ -5911,7 +5926,8 @@
     "toolWear": 1,
     "taskLimit": 1,
     "learnt": 2,
-    "source": "catalog_recipes.js recipes[\"171\"]"
+    "source": "catalog_recipes.js recipes[\"171\"]",
+    "taughtBy": "intermediateadmixing_make_powder"
   },
   "change_strawberry": {
     "id": "172",
