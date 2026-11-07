@@ -95,7 +95,7 @@ describe('the feature', () => {
     const game = read('public/game.js');
     assert.match(game, /features\.query\('sharedGardenFor', gardenType, \{ cols, rows \}, engine\)/);
     assert.match(game, /if \(!opts\.detached && !sharedGarden\) streetState\.gardens\[gardenType\] = garden;/);
-    assert.match(game, /features\.query\('verbRefusedNow', target, verb\.id, engine\)/);
+    assert.match(game, /const refusedNow = features\.query\('verbRefusedNow', target, verb\.id, engine\);\s*if \(refusedNow\) \{\s*toast\(refusedNow, 2600\);\s*pushActivity\(refusedNow\);\s*playSound\('CLICK_FAILURE'/);
     assert.match(game, /sharedGarden: Boolean\(sharedGrant\?\.garden\)/);
     const content = read('public/content.js');
     assert.equal((content.match(/\.\.\.\(ctx\.sharedGarden \? \{ rng: ctx\.rng \} : \{\}\)/g) || []).length, 2);

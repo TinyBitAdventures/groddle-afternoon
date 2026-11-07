@@ -8752,14 +8752,22 @@ function beginVerbAction(target, verb) {
   // Player report 33: the reach the realtime server checks when a shared verb lands is checked
   // before the swing too (features/street-objects-feature.js verbOutOfReach), so it never plays
   // and then fails.
-  // G368: another player's crop in its planter's 60 seconds is refused before the bar, with the
-  // original's feed line and its failure sound (GardenView.as 481-486; features/shared-gardens-feature.js).
-  const tooFar = features.query('verbOutOfReach', target, verb.id, engine) || features.query('verbRefusedNow', target, verb.id, engine);
+  const tooFar = features.query('verbOutOfReach', target, verb.id, engine);
   if (tooFar) {
     toast(tooFar, 2600);
     pushActivity(tooFar);
     playSound('CLICK_FAILURE', { volume: 0.45 });
     if (app?.canvas) app.canvas.dataset.verbOutOfReach = `${target.classId || ''}:${verb.id}`;
+    return true;
+  }
+  // G368: another player's crop in its planter's 60 seconds is refused before the bar, with the
+  // original's feed line and its failure sound (GardenView.as 481-486; features/shared-gardens-feature.js).
+  const refusedNow = features.query('verbRefusedNow', target, verb.id, engine);
+  if (refusedNow) {
+    toast(refusedNow, 2600);
+    pushActivity(refusedNow);
+    playSound('CLICK_FAILURE', { volume: 0.45 });
+    if (app?.canvas) app.canvas.dataset.verbRefusedNow = `${target.classId || ''}:${verb.id}`;
     return true;
   }
   const durationMs = Number.isFinite(verb.durationMs)

@@ -2732,9 +2732,19 @@
   "deployed": "2026-11-07"
  },
  "git": {
-  "commits": 1431,
+  "commits": 1434,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-07",
+    "kind": "fix",
+    "text": "The planter's 60 seconds refuses beside the reach check, which stays as pinned"
+   },
+   {
+    "date": "2026-11-07",
+    "kind": "new",
+    "text": "The ten public gardens are shared online: everyone on the street sees and tends the same plots"
+   },
    {
     "date": "2026-11-07",
     "kind": "improve",
@@ -2844,19 +2854,9 @@
     "date": "2026-11-07",
     "kind": "improve",
     "text": "The Encyclopedia's People each show their own picture, not a Cubimal or an empty box"
-   },
-   {
-    "date": "2026-11-07",
-    "kind": "fix",
-    "text": "Touching a quoin at the day's limit says nothing, as in the original"
-   },
-   {
-    "date": "2026-11-07",
-    "kind": "new",
-    "text": "A Garden Gnome can be set down at home, taught three phrases, and says one when bumped"
    }
   ]
  },
- "tests": 720,
+ "tests": 721,
  "generatedAt": "2026-11-07"
 }
