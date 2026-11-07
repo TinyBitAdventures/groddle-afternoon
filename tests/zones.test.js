@@ -26,7 +26,7 @@ import { publishZone, unacknowledged } from '../tools/builder/publish.mjs';
 import { loadValidatorContext } from '../tools/builder/validator-context.mjs';
 import { validateZone } from '../public/js/builder/validate.js?v=3201ce6e';
 import { isZoneTsid, withoutZoneConnects, withoutZoneRows } from '../public/js/zone-streets.js?v=b40010d5';
-import { listHubsFromIndex } from '../public/js/map-graph.js?v=6d46febe';
+import { listHubsFromIndex } from '../public/js/map-graph.js?v=1afa91c5';
 import { HUB_MAP_STREETS } from '../public/js/hub-maps-data.js?v=ffe222f1';
 import { applyStreetIndex, clearStreetIndex, clearStreetCache, loadStreetDataFromFs, setZoneStreetsShown, STREET_INDEX } from '../public/js/street-loader.js?v=33d2b8bc';
 import { run } from '../tools/builder/cli.mjs';

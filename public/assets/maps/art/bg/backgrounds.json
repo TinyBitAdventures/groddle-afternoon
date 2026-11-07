@@ -421,10 +421,11 @@
       "thumbMatches": true,
       "x1": "assets/maps/art/bg/vantalu.webp",
       "x2": "assets/maps/art/bg/vantalu@2x.webp",
-      "x1Bytes": 13562,
-      "x1Sha256": "e62fbfd48328e7ec6896273cdf6bbf5f07b5cc951772e7a2745b584f84000427",
-      "x2Bytes": 29364,
-      "x2Sha256": "2b469115c69323ad97678117ea5d3852b114fa77c09682e8e539df457e832309"
+      "repainted": "tools/provenance/repainted-maps.json",
+      "x1Bytes": 36650,
+      "x1Sha256": "6aa1e2af592d359ec58946b489b423ce96286f659f3f4bdfceeffddb166d9b7e",
+      "x2Bytes": 107900,
+      "x2Sha256": "ad8106733dff822e53e83374de9791353c0b816d7c4f353a472c624ceb74c2bb"
     },
     "101": {
       "hubName": "Aranna",
@@ -804,10 +805,11 @@
       "thumbMatches": true,
       "x1": "assets/maps/art/bg/vortex.webp",
       "x2": "assets/maps/art/bg/vortex@2x.webp",
-      "x1Bytes": 13756,
-      "x1Sha256": "673f86b4b6460cde44451d0d00ea98855a52943b539e9be886a6d72b4878f991",
-      "x2Bytes": 30226,
-      "x2Sha256": "98d3766d3bcdabf1e5300ff9ff7089927c4fc55d03a61647e3c9c8ca6fe5b634"
+      "repainted": "tools/provenance/repainted-maps.json",
+      "x1Bytes": 26746,
+      "x1Sha256": "935b99f1ea0fb09af8f77cce9b1546b628628b5bf09762ff55bdd8ce0bc7c738",
+      "x2Bytes": 69714,
+      "x2Sha256": "12ef58cc02bc809b889425b35805ba4e474fe6e3a185eb53694e183de7ffddac"
     }
   }
 }

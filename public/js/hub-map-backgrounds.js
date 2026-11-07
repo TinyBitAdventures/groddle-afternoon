@@ -30,7 +30,7 @@ export const HUB_MAP_BACKGROUNDS = Object.freeze({
   '97': Object.freeze({ x1: 'assets/maps/art/bg/muufo.webp', x2: 'assets/maps/art/bg/muufo@2x.webp', repainted: true }), // Muufo
   '98': Object.freeze({ x1: 'assets/maps/art/bg/besara.webp', x2: 'assets/maps/art/bg/besara@2x.webp', repainted: true }), // Besara
   '99': Object.freeze({ x1: 'assets/maps/art/bg/kalavana.webp', x2: 'assets/maps/art/bg/kalavana@2x.webp', repainted: true }), // Kalavana
-  '100': Object.freeze({ x1: 'assets/maps/art/bg/vantalu.webp', x2: 'assets/maps/art/bg/vantalu@2x.webp' }), // Vantalu
+  '100': Object.freeze({ x1: 'assets/maps/art/bg/vantalu.webp', x2: 'assets/maps/art/bg/vantalu@2x.webp', repainted: true }), // Vantalu
   '101': Object.freeze({ x1: 'assets/maps/art/bg/aranna.webp', x2: 'assets/maps/art/bg/aranna@2x.webp', repainted: true }), // Aranna
   '102': Object.freeze({ x1: 'assets/maps/art/bg/ormonos.webp', x2: 'assets/maps/art/bg/ormonos@2x.webp', repainted: true }), // Ormonos
   '105': Object.freeze({ x1: 'assets/maps/art/bg/lida.webp', x2: 'assets/maps/art/bg/lida@2x.webp', repainted: true }), // Lida
@@ -54,5 +54,5 @@ export const HUB_MAP_BACKGROUNDS = Object.freeze({
   '137': Object.freeze({ x1: 'assets/maps/art/bg/nottis.webp', x2: 'assets/maps/art/bg/nottis@2x.webp', repainted: true }), // Nottis
   '140': Object.freeze({ x1: 'assets/maps/art/bg/samudra.webp', x2: 'assets/maps/art/bg/samudra@2x.webp', repainted: true }), // Samudra
   '141': Object.freeze({ x1: 'assets/maps/art/bg/drifa.webp', x2: 'assets/maps/art/bg/drifa@2x.webp', repainted: true }), // Drifa
-  '143': Object.freeze({ x1: 'assets/maps/art/bg/vortex.webp', x2: 'assets/maps/art/bg/vortex@2x.webp' }), // Vortex of Random
+  '143': Object.freeze({ x1: 'assets/maps/art/bg/vortex.webp', x2: 'assets/maps/art/bg/vortex@2x.webp', repainted: true }), // Vortex of Random
 });
