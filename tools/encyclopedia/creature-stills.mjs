@@ -8,7 +8,7 @@
  * Writes public/assets/sprites/encyclopedia/<id>.png and, where the source has it, <id>@3x.png; the
  * transparent margin is trimmed. tools/encyclopedia/data.mjs STILLS points at them.
  *
- *   node tools/encyclopedia/creature-stills.mjs          write them
+ *   node tools/encyclopedia/creature-stills.mjs [id...]  write them (all, or those ids)
  *   node tools/encyclopedia/creature-stills.mjs --check  exit 1 if one is missing
  *
  * The SWF rows need ../glitch-items and tools/ffdec beside the repo (or FFDEC=<jar>); a sheet row needs only the repo.
@@ -41,6 +41,29 @@ export const CREATURE_STILLS = Object.freeze({
   npc_swoonerfly: { swf: 'inhabitants/swoonerfly/npc_swoonerfly.swf' },
   npc_blimp: { swf: 'misc/npc/npc_blimp/npc_blimp.swf' },
   npc_catch_me_ghost: { swf: 'inhabitants/ghost/npc_catch_me_ghost.swf' },
+  // The People section: each person's own SWF, not their Cubimal, and no empty boxes.
+  npc_yoga_frog: { swf: 'inhabitants/yoga_frog/npc_yoga_frog.swf' },
+  npc_myopic_frog: { swf: 'inhabitants/myopic_frog/npc_myopic_frog.swf' },
+  npc_gwendolyn: { swf: 'inhabitants/gwendolyn/npc_gwendolyn.swf' },
+  npc_widget: { swf: 'inhabitants/widget_bot/npc_widget.swf' },
+  npc_piggy_explorer: { swf: 'inhabitants/ilmenskie_jones/npc_piggy_explorer.swf' },
+  npc_juju_grandma: { swf: 'inhabitants/juju_grandma/npc_juju_grandma.swf' },
+  npc_maintenance_bot: { swf: 'inhabitants/maintenance_bot/npc_maintenance_bot.swf' },
+  npc_bureaucrat: { swf: 'inhabitants/bureaucrat/npc_bureaucrat.swf' },
+  npc_fox_ranger: { swf: 'inhabitants/fox_ranger/npc_fox_ranger.swf' },
+  npc_gardening_vendor: { swf: 'inhabitants/gardening_vendor/npc_gardening_vendor.swf' },
+  npc_jabba2: { swf: 'inhabitants/helga/npc_jabba2.swf' },
+  npc_cooking_vendor: { swf: 'inhabitants/meal_vendor/npc_cooking_vendor.swf' },
+  npc_sno_cone_vending_machine: { swf: 'inhabitants/sno_cone_vending_machine/npc_sno_cone_vending_machine.swf' },
+  npc_tool_vendor: { swf: 'inhabitants/tool_vendor/npc_tool_vendor.swf' },
+  npc_jabba1: { swf: 'inhabitants/uncle_friendly/npc_jabba1.swf' },
+  npc_esquibeth_playback: { swf: 'misc/npc/npc_esquibeth_playback/npc_esquibeth_playback.swf', sprite: 45, frame: 30 },
+  npc_forehorseman: { swf: 'inhabitants/forehorseman/npc_forehorseman.swf' },
+  npc_letterblock: { swf: 'quest_items/letterblock/npc_letterblock.swf' },
+  npc_mail_dispatcher: { swf: 'misc/npc/npc_mail_dispatcher/npc_mail_dispatcher.swf' },
+  npc_mailbox: { swf: 'misc/npc/npc_mailbox/npc_mailbox.swf' },
+  npc_rare_item_vendor: { swf: 'inhabitants/rare_item_vendor/npc_rare_item_vendor.swf' },
+  npc_spinning_wheel: { swf: 'misc/npc/npc_spinning_wheel/npc_spinning_wheel.swf', sprite: 290, frame: 40 },
 });
 
 const stillPath = (id, hi) => join(ROOT, 'public', STILLS_DIR, `${id}${hi ? '@3x' : ''}.png`);
@@ -56,9 +79,16 @@ function writeCell(file, { cols, rows, frame }, out) {
   execFileSync('magick', [file, '-crop', crop, '+repage', '-trim', '+repage', '-strip', `PNG32:${out}`]);
 }
 
-function writeSwf(swf, zoom, out) {
+function writeSwf(swf, zoom, out, sprite = null, frame = 1) {
   const dir = mkdtempSync(join(tmpdir(), 'creature-still-'));
   try {
+    if (sprite) {
+      // The main timeline shows nothing at rest (Esquibeth, the Spinning Wheel): a frame of their own symbol, past its appear.
+      execFileSync(JAVA, ['-jar', FFDEC, '-zoom', String(zoom), '-ignorebackground', '-selectid', String(sprite), '-format', 'sprite:png', '-export', 'sprite', dir, join(ITEMS, swf)], { stdio: 'ignore' });
+      const sub = readdirSync(dir).find((f) => f.startsWith(`DefineSprite_${sprite}`));
+      execFileSync('magick', [join(dir, sub, `${frame}.png`), '-trim', '+repage', '-strip', `PNG32:${out}`]);
+      return;
+    }
     execFileSync(JAVA, ['-jar', FFDEC, '-zoom', String(zoom), '-ignorebackground', '-select', '1', '-format', 'frame:png', '-export', 'frame', dir, join(ITEMS, swf)], { stdio: 'ignore' });
     const png = readdirSync(dir).find((f) => f.endsWith('.png'));
     execFileSync('magick', [join(dir, png), '-trim', '+repage', '-strip', `PNG32:${out}`]);
@@ -70,8 +100,8 @@ function writeSwf(swf, zoom, out) {
 function write(id, row) {
   mkdirSync(join(ROOT, 'public', STILLS_DIR), { recursive: true });
   if (row.swf) {
-    writeSwf(row.swf, 1, stillPath(id));
-    writeSwf(row.swf, 3, stillPath(id, true));
+    writeSwf(row.swf, 1, stillPath(id), row.sprite, row.frame);
+    writeSwf(row.swf, 3, stillPath(id, true), row.sprite, row.frame);
     return;
   }
   writeCell(join(SPRITES, row.sheet), row, stillPath(id));
@@ -87,6 +117,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
       process.exit(1);
     }
   } else {
-    for (const [id, row] of Object.entries(CREATURE_STILLS)) write(id, row);
+    const only = process.argv.slice(2);
+    for (const [id, row] of Object.entries(CREATURE_STILLS)) if (!only.length || only.includes(id)) write(id, row);
   }
 }

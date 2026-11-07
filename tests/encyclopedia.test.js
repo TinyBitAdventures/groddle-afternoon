@@ -205,6 +205,18 @@ describe('report 133: animals and creatures show their own art', () => {
     assert.equal(run.status, 0, run.stderr);
   });
 
+  it('every person in People has their own picture, not a Cubimal or an empty box', { skip: skipWithoutInventory }, async () => {
+    const { entries } = await loadEncyclopedia();
+    const people = [...entries.values()].filter((e) => e.section === 'people');
+    assert.ok(people.length > 40);
+    for (const e of people) {
+      assert.ok(e.icon, `${e.id} has a picture`);
+      assert.doesNotMatch(e.icon.src, /npc_cubimal_/, `${e.id} is not its Cubimal`);
+      assert.doesNotMatch(e.icon.caption || '', /Cubimal/, e.id);
+    }
+    for (const id of ['npc_quest_widget', 'npc_quest_giver_widget']) assert.equal(portrait(id).src, `${STILLS_DIR}/npc_widget.png`, id);
+  });
+
   it('no animal or creature page is left with an empty box or a stand-in Cubimal', { skip: skipWithoutInventory }, async () => {
     const { entries } = await loadEncyclopedia();
     const animals = [...entries.values()].filter((e) => e.section === 'animals');

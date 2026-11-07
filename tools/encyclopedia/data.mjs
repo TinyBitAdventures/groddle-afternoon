@@ -102,22 +102,17 @@ export const itemIcon = (id) => picture(`assets/sprites/icons/${id}.png`);
 
 /**
  * Creatures and people with no pack icon of their own: a still of Tiny Speck's from their own art
- * (report 133; creature-stills.mjs makes most of them), their Cubimal only where no art of theirs exists.
+ * (report 133; creature-stills.mjs makes most of them). No one is shown as their Cubimal now.
  */
 const STILLS = {
   npc_butterfly: 'assets/sprites/butterfly_rest_single.png',
   npc_salmon: 'assets/sprites/icons/salmon.png',
   npc_cubimal_factorydefect_chick: 'assets/sprites/cubimals/npc_cubimal_factorydefect_chick_1.webp',
   npc_newxp_dustbunny: `${STILLS_DIR}/npc_dustbunny.png`,
+  // Greeterbot Sentry G-42 is one Widget art (npc_widget.swf; the quest copies have no SWF).
+  npc_quest_widget: `${STILLS_DIR}/npc_widget.png`,
+  npc_quest_giver_widget: `${STILLS_DIR}/npc_widget.png`,
   ...Object.fromEntries(Object.keys(CREATURE_STILLS).map((id) => [id, `${STILLS_DIR}/${id}.png`])),
-};
-const CUBIMAL_OF = {
-  npc_juju_grandma: 'juju', npc_gwendolyn: 'gwendolyn',
-  npc_jabba1: 'unclefriendly', npc_jabba2: 'helga', npc_maintenance_bot: 'maintenancebot', npc_widget: 'greeterbot',
-  npc_quest_widget: 'greeterbot', npc_quest_giver_widget: 'greeterbot', npc_myopic_frog: 'frog', npc_yoga_frog: 'frog',
-  npc_piggy_explorer: 'ilmenskiejones', npc_fox_ranger: 'foxranger', npc_gardening_vendor: 'gardeningtoolsvendor',
-  npc_cooking_vendor: 'mealvendor', npc_tool_vendor: 'toolvendor', npc_sno_cone_vending_machine: 'snoconevendor',
-  npc_bureaucrat: 'bureaucrat', npc_garden_gnome: 'gnome',
 };
 export function portrait(id) {
   const own = itemIcon(id);
@@ -125,7 +120,6 @@ export function portrait(id) {
   if (STILLS[id]) { const p = picture(STILLS[id]); if (p) return p; }
   const shrine = /^npc_shrine_(?:(?:firebog|ix|uralia)_)?([a-z]+)$/.exec(id);
   if (shrine && GIANTS[shrine[1]]) return picture(giantIcon(shrine[1]), 'The Giant’s icon');
-  if (CUBIMAL_OF[id]) return picture(`assets/sprites/icons/npc_cubimal_${CUBIMAL_OF[id]}.png`, 'Shown as its Cubimal');
   return null;
 }
 
