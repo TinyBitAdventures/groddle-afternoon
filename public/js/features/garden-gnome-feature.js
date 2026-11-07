@@ -21,7 +21,6 @@ import { readVisitScene } from '../neighbours-mp.js?v=13a573b0';
 import { worldArtFor } from '../world-art.js?v=df476660';
 import { textureFromUrl } from '../textures.js?v=3149d699';
 import { filterText } from '../word-filter.js?v=9a7a7ebb';
-import { verbMessage } from '../item-verbs-more.js?v=c2f9dc31';
 import { HOME_INTERIOR_TSID, HOME_STREET_TSID } from '../homes.js?v=631ab6b8';
 import { homesFeature } from './homes-feature.js?v=b56f3531';
 import {
@@ -372,7 +371,7 @@ export const gardenGnomeFeature = {
     if (verbId === 'flip') {
       e.g.facingLeft = !e.g.facingLeft;
       resetDirection(e.g, e.rt, Date.now());
-      engine.pushActivity?.(verbMessage(GNOME_CLASS, { verb: 'flip', past: 'flipped' }));
+      engine.pushActivity?.(`You flipped a ${NAME}.`); // buildVerbMessage(1, 'flip', 'flipped', ...)
       engine.save?.();
       act(engine, `flip:${e.g.id}`);
       return true;

@@ -27,7 +27,7 @@ import {
   teachMenu,
   tickGnome,
 } from '../public/js/garden-gnome.js?v=89994642';
-import { gardenGnomeFeature as feature } from '../public/js/features/garden-gnome-feature.js?v=504ce686';
+import { gardenGnomeFeature as feature } from '../public/js/features/garden-gnome-feature.js?v=2908d00a';
 import { worldArtFor } from '../public/js/world-art.js?v=df476660';
 import { HOME_STREET_TSID } from '../public/js/homes.js?v=631ab6b8';
 
@@ -212,6 +212,12 @@ describe('the feature', () => {
     assert.equal(feature.packDropBlockReason('apple'), null);
     assert.equal(feature.runPackVerb(GNOME_CLASS, 'gnome_place', { ...engine, inv: { [GNOME_CLASS]: 1 } }), false);
     assert.ok(HOME_STREET_TSID);
+  });
+
+  it('a flip names the gnome in its line', () => {
+    const f = readFileSync(join(root, 'public/js/features/garden-gnome-feature.js'), 'utf8');
+    assert.match(f, /`You flipped a \$\{NAME\}\.`/);
+    assert.match(f, /const NAME = 'Garden Gnome';/);
   });
 
   it('player-facing copy has no em-dash', () => {
