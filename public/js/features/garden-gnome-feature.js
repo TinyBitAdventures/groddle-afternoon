@@ -155,7 +155,7 @@ function placeFromPack(engine) {
   };
   slice.placed.push(g);
   if (place === drawnPlace) drawOne(engine, g);
-  engine.playSound?.('DROP', { volume: 0.5 });
+  engine.playSound?.('ITEM_DROP', { volume: 0.6 });
   engine.refreshPack?.();
   engine.save?.();
   act(engine, `placed:${g.id}`);
