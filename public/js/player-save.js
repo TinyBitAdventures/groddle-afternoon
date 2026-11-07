@@ -119,6 +119,8 @@ export function normalizePlayerSnapshot(seed = {}, fallback = PLAYER_DEFAULTS) {
     ...(source.startedFresh === true ? { startedFresh: true } : {}),
     // The Hoe's Aggressive Hoeing switch (hoe.js 70-126, pc.aggressive_off); on unless turned off.
     ...(source.aggressiveOff === true ? { aggressiveOff: true } : {}),
+    // The Scraper's Party Scraping switch (scraper.js 70-128, pc.party_scraping); off unless turned on.
+    ...(source.partyScraping === true ? { partyScraping: true } : {}),
   };
 }
 

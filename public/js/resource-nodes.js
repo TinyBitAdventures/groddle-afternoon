@@ -934,10 +934,48 @@ function verbDef(def, verbId) {
 }
 
 /**
+ * Party Scraping on and off: the Scraper and Super Scraper carry the two verbs on the pack card, one
+ * at a time, and only with the Party Scraping card (scraper.js 70-128). pc.party_scraping there is
+ * pc.partyScraping here. On, a barnacle or ice scrape passes no_img_upgrades (mortar_barnacle.js 345,
+ * ice_knob.js 373), so it takes the full time and the barnacle card's drop chance is off too.
+ */
+export const PARTY_SCRAPING_UPGRADE = 'barnacle_scraping_speed_1';
+export const SCRAPER_TOOLS = Object.freeze(['scraper', 'super_scraper']);
+export const PARTY_SCRAPING_PACKAGES = Object.freeze(['scraping', 'ice_scraping']);
+export const PARTY_SCRAPING_VERBS = Object.freeze({
+  off: Object.freeze({
+    id: 'party_scraping_off',
+    label: 'Party scraping off',
+    tooltip: 'Scrape faster',
+    line: 'You are now scraping faster again. It feels good.',
+  }),
+  on: Object.freeze({
+    id: 'party_scraping_on',
+    label: 'Party scraping on',
+    tooltip: 'Slow down so other players can join you',
+    line: "You've slowed down your scraping speed.",
+  }),
+});
+
+/** The verb the pack card offers: none without the card, else the one that flips the setting. */
+export function partyScrapingVerb(pc) {
+  if (!asList(pc?.imaginationUpgrades).includes(PARTY_SCRAPING_UPGRADE)) return null;
+  return pc.partyScraping ? PARTY_SCRAPING_VERBS.off : PARTY_SCRAPING_VERBS.on;
+}
+
+/** Runs one of the verbs. Returns its line, or null when the card or the setting doesn't offer it. */
+export function runPartyScrapingVerb(pc, verbId) {
+  const verb = partyScrapingVerb(pc);
+  if (!verb || verb.id !== verbId) return null;
+  pc.partyScraping = verb === PARTY_SCRAPING_VERBS.on;
+  return verb.line;
+}
+
+/**
  * GSJS getSkillPackageDetails: pick the highest-rank skill the player has
  * (or no_skill), then apply img upgrades in rank order.
  */
-export function resolveResourceSkillPackage(name, skills = [], upgrades = []) {
+export function resolveResourceSkillPackage(name, skills = [], upgrades = [], { noImgUpgrades = false } = {}) {
   const pkg = RESOURCE_SKILL_PACKAGES[name];
   if (!pkg) return null;
   const learned = new Set(asList(skills));
@@ -954,7 +992,8 @@ export function resolveResourceSkillPackage(name, skills = [], upgrades = []) {
   const out = { ...details, skill, package: name };
   const imgRank = {};
   let durationMultiplier = 0;
-  for (const [id, img] of Object.entries(pkg.img_upgrades || {})) {
+  // no_img_upgrades skips every card on the package (inc_skill_packages.js 611).
+  for (const [id, img] of Object.entries(noImgUpgrades ? {} : pkg.img_upgrades || {})) {
     if (!owned.has(id)) continue;
     const parts = String(img.rank).split('.');
     const cat = parts[1] !== undefined ? Number(parts[0]) : 0;
@@ -1193,7 +1232,9 @@ function gateVerb(node, inv, pc, ctx = {}) {
     return fail('achievement', 'You need the Firefly Whisperer achievement.', { achievement: verb.achievement });
   }
 
-  const pkg = verb.skillPackage ? resolveResourceSkillPackage(verb.skillPackage, skills, ctx.upgrades) : null;
+  const pkg = verb.skillPackage ? resolveResourceSkillPackage(verb.skillPackage, skills, ctx.upgrades, {
+    noImgUpgrades: pc?.partyScraping === true && PARTY_SCRAPING_PACKAGES.includes(verb.skillPackage),
+  }) : null;
   const wear = pkg?.tool_wear ?? verb.toolWear ?? 0;
   let costs = {
     energy: pkg ? (pkg.energy_cost || 0) : verb.energy,
