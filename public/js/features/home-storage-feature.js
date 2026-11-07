@@ -51,7 +51,7 @@ import { TOOL_CONDITION_CATALOG, copyTagKind, copyTags, receiveToolCopy, setCopy
 import { scriptFromTag, scriptLabel } from '../teleportation.js?v=5a5c8e6f';
 import { readVisitScene } from '../neighbours-mp.js?v=1e79a009';
 import { saveStore } from '../save-store.js?v=8839ba7b';
-import { homesFeature } from './homes-feature.js?v=605d63fc';
+import { homesFeature } from './homes-feature.js?v=8259cce6';
 import {
   SDB_PRICE_MAX,
   STORAGE_TEXT as T,
@@ -1063,8 +1063,11 @@ function verbsFor(target, engine) {
   if (target?.state?.owner) {
     const row = ownRow(uid);
     if (!row) return [];
-    if (isCabinetClass(row.classTsid)) return cabinetVerbs({ canOpen: true, forSale: forSale(engine, row) });
-    if (isSdbClass(row.classTsid)) return sdbOwnerVerbs(engine, row);
+    // G369: its style from its own menu, as any furniture's verbs.upgrade is (home-feature pieceStyleVerb).
+    const style = homesFeature.pieceStyleVerb?.(uid, engine);
+    const extra = style ? [style] : [];
+    if (isCabinetClass(row.classTsid)) return [...cabinetVerbs({ canOpen: true, forSale: forSale(engine, row) }), ...extra];
+    if (isSdbClass(row.classTsid)) return [...sdbOwnerVerbs(engine, row), ...extra];
     return [];
   }
   const row = (visit?.pieces || []).map((p) => p.item).find((p) => Number(p?.id) === uid);
@@ -1085,6 +1088,7 @@ function runVerb(target, verbId, engine) {
     if (verb.reason) notice(engine, verb.reason, 2600);
     return true;
   }
+  if (own && (verbId === 'upgrade' || verbId === 'change_style')) return homesFeature.openPieceStyle(uid, engine), true;
   if (verbId === 'cabinet_open') return openCabinet(engine, uid, { owner: own ? 0 : visit?.owner || 0 }), true;
   if (verbId === 'sdb_purchase') {
     const row = (visit?.pieces || []).map((p) => p.item).find((p) => Number(p?.id) === uid);

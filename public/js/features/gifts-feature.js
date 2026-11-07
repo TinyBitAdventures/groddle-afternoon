@@ -39,7 +39,7 @@ import { scriptFromTag, scriptLabel } from '../teleportation.js?v=5a5c8e6f';
 import { unitRankAt } from '../pack-slots.js?v=a94b816c';
 import { createMinnAccount } from '../minn-account.js?v=b29fae30';
 // The same key as features/index.js: one module instance holds the carried notes.
-import { giveCarriedNote, takeCarriedNote, writtenCarriedNotes } from './street-furniture-feature.js?v=329e66c8';
+import { giveCarriedNote, takeCarriedNote, writtenCarriedNotes } from './street-furniture-feature.js?v=506e6e54';
 import {
   BOX_SLOTS,
   GIFT_BOX,

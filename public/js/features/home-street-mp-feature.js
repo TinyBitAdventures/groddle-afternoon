@@ -53,10 +53,10 @@ import { textureFromUrl } from '../textures.js?v=3149d699';
 import { addSignBoard, signArmWidth, signLabel } from '../street-render.js?v=9349c0e5';
 import { openNotePicker, openNoteView } from '../note-view.js?v=a5e518d1';
 import { homeStreetName, possessive, readVisitScene } from '../neighbours-mp.js?v=1e79a009';
-import { BACK_YARD_GROUND_Y, SIGN_PROMPT_LIFT, STREET_GROUND_Y, homesFeature, visitorHomeState } from './homes-feature.js?v=605d63fc';
+import { BACK_YARD_GROUND_Y, SIGN_PROMPT_LIFT, STREET_GROUND_Y, homesFeature, visitorHomeState } from './homes-feature.js?v=8259cce6';
 import { projectApi } from './street-jobs-feature.js?v=867d894e';
 import { saveStore } from '../save-store.js?v=8839ba7b';
-import { giveCarriedNote, takeCarriedNote, writtenCarriedNotes } from './street-furniture-feature.js?v=329e66c8';
+import { giveCarriedNote, takeCarriedNote, writtenCarriedNotes } from './street-furniture-feature.js?v=506e6e54';
 import {
   GOOD_NEIGHBOUR_AT,
   GOOD_NEIGHBOUR_COUNTER,
@@ -729,7 +729,10 @@ function createSession(engine, client) {
     if (target.classId === CLASS_SALE) {
       const e = drawn.sales.get(target.state?.uid);
       if (!e) return [];
-      return saleVerbs({ owner: w === 'house', listing: e.listing, full: storageHasContents(e.row) });
+      // G369: the piece's own menu has its style too, for its owner (home-feature pieceStyleVerb).
+      const style = w === 'house' ? homesFeature.pieceStyleVerb?.(e.uid, engine) : null;
+      const verbs = saleVerbs({ owner: w === 'house', listing: e.listing, full: storageHasContents(e.row) });
+      return style ? [...verbs, style] : verbs;
     }
     if (target.classId === CLASS_PILE) return [{ id: 'pile_collect', label: T.collectVerb, tooltip: T.collectTip, enabled: true, reason: '', primary: true }];
     if (target.classId === CLASS_PROTO) return [{ id: 'restore', label: T.restoreVerb, tooltip: T.restoreTip, enabled: true, reason: '', primary: true }];
@@ -744,6 +747,12 @@ function createSession(engine, client) {
     }
     if (verbId === 'sign_edit') return openSignpost(), true;
     if (target.classId === CLASS_POLE) return runPole(target, verbId), true;
+    if (target.classId === CLASS_SALE && (verbId === 'upgrade' || verbId === 'change_style')) {
+      const style = homesFeature.pieceStyleVerb?.(target.state?.uid, engine);
+      if (style?.enabled) homesFeature.openPieceStyle(target.state?.uid, engine);
+      else if (style?.reason) engine.toast?.(style.reason, 2600);
+      return true;
+    }
     if (target.classId === CLASS_SALE) return runSale(target, verbId), true;
     if (target.classId === CLASS_PILE) return collectPile(target.state?.op), true;
     if (target.classId === CLASS_PROTO) return projectApi.open(engine, target.state?.wire), true;

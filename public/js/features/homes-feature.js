@@ -77,6 +77,15 @@
  * remove: drop tip "Pour Wine of the Dead on <item>"). QA:
  * &homedemo=cultivate&wotddemo=3 (&wotdtarget=patch stands you by the yard's
  * Patch; &wotdtree=trant_bean first grows a Bean Tree on it).
+ * Your furniture outside Decorate (register G369): HandOfDecorator.as locDragStartHandler 551-558
+ * starts a piece's drag whenever the location is yours (can_decorate, WorldModel.as 59), and the
+ * upgrade and change style verbs (items/furniture_*.js verbs.upgrade, disable_proximity) open
+ * startFurnitureUpgrade 456-513 with no decorator mode. A press on a piece only becomes a drag past
+ * DRAG_DIST (a finger held still first, as the pack's stacks: player report 37), so a click still
+ * does what it did, and the same doors' and sale checks apply. A right-click (a long press on a
+ * phone) opens the piece's style, or adds it to the piece's own menu. Decorate stays for placing
+ * new things and for putting a piece away. Canvas: homeDrag, homeDropLast, homeHover, contextMenu
+ * home-piece:<id>.
  * Canvas data: homeDecorPlaced, homeDecorStorage, homeDecorWall/Walls/Floor/Ceiling, homeStamping,
  * homeDecorSegments, homeMode, homeCultivations, homeYard, homeAutoplay,
  * homeProtos, homeRestore, homeLifespan, homePour (confirm|pouring|depleted|canceled:<id>),
@@ -141,6 +150,7 @@ import {
 } from '../home-decor.js?v=6735c85f';
 import { isTrophyDecor, placedTrophies } from '../home-trophies.js?v=21c2add6';
 import { applyBonusUpgrade, applyUpgrade, bonusUpgradeLine, currantsText, hasUpgrades, pieceLabel, rollBonusUpgrade, upgradeVerb, UPGRADE_TEXT } from '../furniture-upgrades.js?v=a3788c0d';
+import { LONG_PRESS_MS, LONG_PRESS_SLOP, ECHO_MS, createContextMenu } from '../ui/context-menu.js?v=79326483';
 import { DOCK_GAP, DOCK_W, chooseUpgrade, closeUpgradePicker, openUpgradePicker, placeUpgradePicker, saveUpgrade, upgradePickerOpen, upgradePickerState } from '../furniture-upgrade-picker.js?v=3a637ec8';
 import {
   BUILDER_TEXT,
@@ -3784,10 +3794,11 @@ function pieceClientRect(engine, id) {
  * Ticket 52: FurnUpgradeDialog.as 388-409 centres the camera on the piece (in decorate mode,
  * camera_control_pt) so the piece and the column beside it are both in view: the decorate
  * camera slides until the piece, the gap and the column sit centred in the room's free width.
- * Outside Decoration Mode the camera follows the avatar, and the column takes whichever side fits.
+ * Outside Decoration Mode the same (401-408, setCameraCenter on the piece): interiorCameraLook
+ * holds it there while the picker is open.
  */
 function frameUpgradePiece(engine, id) {
-  if (mode !== 'decorate' || scene?.room !== 'interior') return false;
+  if (scene?.room !== 'interior') return false;
   const piece = pieceClientRect(engine, id);
   const area = upgradeArea();
   const item = placedItem(decor, id);
@@ -4684,7 +4695,7 @@ function cancelCarry(engine) {
   carryBy = 'pointer';
   destroyGhost();
   ui?.builder?.tray?.classList.remove('is-drop-target');
-  if (mode === 'decorate' && wasMove) renderFurniture(engine);
+  if ((mode === 'decorate' || !mode) && wasMove) renderFurniture(engine);
   renderBar(engine);
   publish(engine);
 }
@@ -4759,7 +4770,76 @@ function endDrag(engine, e, { cancelled = false, overTray = false } = {}) {
   if (was.over !== 'room') return cancelCarry(engine);
   const res = placeAtPointer(engine, placing.kind === 'furniture' ? toRoom(pointer) : pointer);
   engine.setData('homeDropLast', res?.ok ? 'placed' : `refused:${res?.reason || ''}`);
+  // Outside Decorate nothing stays selected: there is no bar to act on it.
+  if (was.loose) {
+    selected = null;
+    renderFurniture(engine);
+  }
   return res;
+}
+
+// --- your furniture outside Decorate (register G369, HandOfDecorator.as locDragStartHandler 551-558)
+
+/** A finger holds this long before a piece lifts, so a slide or a tap never moves it (game.js setupPackDrops). */
+const LOOSE_HOLD_MS = 350;
+const LOOSE_HINT = 'Drag your furniture to move it. Right-click it to change its style.';
+let looseHintShown = false;
+let pieceMenu = null;
+let pieceMenuEcho = 0;
+
+/** The room is yours and nothing else has the pointer: Decorate's rules for a press, without Decorate. */
+function looseRoom(engine) {
+  if (mode || !scene || scene.room !== 'interior' || scene.construction) return false;
+  const ctx = engine.homeContext?.();
+  return Boolean(ctx?.inHome && ctx.owned && !placing && !upgradePickerOpen() && !engine.busy?.({ ignoreHome: true }));
+}
+
+/** Whether a click target here is this piece itself: a Door's way up, a cabinet or a box. */
+function targetIsPiece(target, item) {
+  const st = target?.state;
+  return Boolean(st) && (st.doorId === item.id || Number(st.uid) === Number(item.id));
+}
+
+/** The piece a press or a hover here is on, unless something in front of it takes the click. */
+function looseItemAt(engine, p) {
+  if (stackAt(engine, p)) return null;
+  const item = furnitureAt(toRoom(p));
+  if (!item) return null;
+  const front = engine.interactableAt?.(p.x, p.y);
+  return !front || targetIsPiece(front, item) ? item : null;
+}
+
+/** The piece's verb for its style, or null: upgrade or change style, off while it is for sale (furniture_*.js 264, 334). */
+function pieceStyleRow(engine, item) {
+  const verb = upgradeVerb(item);
+  if (!verb) return null;
+  const sale = houseFloorHere() === 0 ? engine.query?.('furnitureSaleLock', decor, item.id, engine) : null;
+  const locked = typeof sale === 'string' && sale;
+  return { id: verb.id, label: verb.label, tip: verb.tooltip, disabled: Boolean(locked), reason: locked ? UPGRADE_TEXT.forSale : '' };
+}
+
+/** The little menu on a piece with no menu of its own. False when it has no style to open. */
+function openPieceMenu(engine, item, at) {
+  const row = pieceStyleRow(engine, item);
+  if (!row || typeof document === 'undefined') return false;
+  pieceMenu ||= createContextMenu({ doc: document, host: document.getElementById('game-root'), id: 'home-piece-menu', className: 'world-ctx-menu', setData: (k, v) => engine.setData(k, v) });
+  pieceMenuEcho = Date.now() + ECHO_MS;
+  return pieceMenu.open({
+    title: pieceLabel(item, furnitureDef(item.classTsid).label),
+    rows: [row],
+    at,
+    owner: `home-piece:${item.id}`,
+    onPick: () => openUpgradeFor(engine, item.id),
+  });
+}
+
+/** The world's right-click on a piece; true when it was this feature's. */
+function loosePieceContext(engine, e) {
+  if (!looseRoom(engine)) return false;
+  const p = worldPoint(engine, e);
+  const item = looseItemAt(engine, p);
+  if (!item || engine.interactableAt?.(p.x, p.y)) return false;
+  return openPieceMenu(engine, item, { x: e.clientX, y: e.clientY });
 }
 
 /** The world x span of the room on show (the house's frame, or a Tower floor). */
@@ -5453,6 +5533,17 @@ function bindPointer(engine) {
   const isCanvas = (e) => e.target?.tagName === 'CANVAS';
   let press = null; // a placed piece pressed, before it is a drag
   root.addEventListener('pointermove', (e) => {
+    if (!mode && scene && e.pointerType === 'mouse' && isCanvas(e) && !press) {
+      // HandOfDecorator updateHighlightedLISView: a piece you could lift glows under the cursor.
+      const item = looseRoom(engine) ? looseItemAt(engine, worldPoint(engine, e)) : null;
+      setHover(engine, item?.id ?? null);
+      if (e.target.style) e.target.style.cursor = item ? 'grab' : '';
+      if (item && !looseHintShown) {
+        looseHintShown = true;
+        engine.toast(LOOSE_HINT, 4200);
+      }
+      return;
+    }
     if (!mode || !scene || !isCanvas(e) || drag || press?.dragging) return;
     const p = worldPoint(engine, e);
     pointer = { ...p, inside: true };
@@ -5479,7 +5570,7 @@ function bindPointer(engine) {
     if (mode === 'decorate') setHover(engine, stackAt(engine, p) ? null : furnitureAt(toRoom(p))?.id ?? null);
   }, true);
   root.addEventListener('pointerleave', () => {
-    if (mode === 'decorate') setHover(engine, null);
+    if (mode === 'decorate' || !mode) setHover(engine, null);
   }, true);
   root.addEventListener('wheel', (e) => {
     if (!isCanvas(e) || !panDecorCamera(engine, e.deltaX, e.deltaY, e.shiftKey)) return;
@@ -5489,7 +5580,20 @@ function bindPointer(engine) {
   const onPressMove = (e) => {
     if (!press || e.pointerId !== press.pointerId) return;
     if (!press.dragging) {
-      if (Math.hypot(e.clientX - press.x, e.clientY - press.y) < DRAG_DIST) return;
+      const moved = Math.hypot(e.clientX - press.x, e.clientY - press.y);
+      if (press.loose && press.touch && !press.held) {
+        // A finger that moves before it has held is a slide, not a lift.
+        if (moved > LONG_PRESS_SLOP) endLoosePress();
+        return;
+      }
+      if (moved < DRAG_DIST) return;
+      // The press opened this piece's own menu (a cabinet, a Door): the drag takes over.
+      if (press.loose) {
+        if (mode || placing || upgradePickerOpen() || engine.questDialogueOpen?.()) return endLoosePress();
+        clearTimeout(press.timer);
+        clearTimeout(press.menuTimer);
+        if (targetIsPiece(engine.interactionTarget?.(), { id: press.id })) engine.closeVerbMenu?.();
+      }
       // HandOfDecorator locDragStart: a placed piece pressed and moved is carried.
       press.dragging = true;
       if (press.kind === 'stack') {
@@ -5505,15 +5609,24 @@ function bindPointer(engine) {
         press = null;
         return;
       }
-      drag = { source: 'room', id: press.id, over: 'room' };
+      drag = { source: 'room', id: press.id, over: 'room', ...(press.loose ? { loose: true } : {}) };
       carryBy = 'pointer';
       setHover(engine, null);
     }
     if (drag?.source === 'stack') moveStackDrag(engine, e);
     else moveDrag(engine, e);
   };
+  const endLoosePress = () => {
+    if (press) {
+      clearTimeout(press.timer);
+      clearTimeout(press.menuTimer);
+    }
+    press = null;
+  };
   const onPressUp = (e) => {
     if (!press || e.pointerId !== press.pointerId) return;
+    clearTimeout(press.timer);
+    clearTimeout(press.menuTimer);
     window.removeEventListener('pointermove', onPressMove, true);
     window.removeEventListener('pointerup', onPressUp, true);
     window.removeEventListener('pointercancel', onPressUp, true);
@@ -5530,12 +5643,41 @@ function bindPointer(engine) {
   // selects the piece and shows its actions (the press below takes any button; only the main one
   // drags), so the browser's menu never opens over them (the world's menu neither: game.js
   // worldRightClick stands down while an edit mode is on). QA: canvas data contextMenu home:<kind>.
+  // G369: outside Decorate, the echo of a long press that already opened the menu, a lift in progress, or a piece's style.
+  root.addEventListener('contextmenu', (e) => {
+    if (mode || !scene || !isCanvas(e)) return;
+    if (Date.now() < pieceMenuEcho || drag?.loose || loosePieceContext(engine, e)) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+  }, true);
   root.addEventListener('contextmenu', (e) => {
     if (!mode || !scene || !isCanvas(e)) return;
     e.preventDefault();
     engine.setData('contextMenu', selected ? `home:${selected.kind}:${selected.id}` : '');
   });
   root.addEventListener('pointerdown', (e) => {
+    if (!mode && scene && isCanvas(e) && e.button === 0 && !(e.pointerType === 'mouse' && e.ctrlKey) && looseRoom(engine)) {
+      // G369: nothing stops here, so the click still goes on to game.js as ever.
+      const p = worldPoint(engine, e);
+      const item = looseItemAt(engine, p);
+      if (!item) return;
+      pointer = { ...p, inside: true };
+      press = { id: item.id, x: e.clientX, y: e.clientY, pointerId: e.pointerId, dragging: false, loose: true, touch: e.pointerType !== 'mouse' };
+      if (press.touch) {
+        const mine = press;
+        mine.timer = setTimeout(() => { mine.held = true; }, LOOSE_HOLD_MS);
+        // A long press with no menu of its own opens the style (iOS Safari sends no contextmenu).
+        mine.menuTimer = setTimeout(() => {
+          if (press !== mine || mine.dragging || engine.interactableAt?.(p.x, p.y) || Date.now() < pieceMenuEcho) return;
+          if (openPieceMenu(engine, item, { x: mine.x, y: mine.y })) endLoosePress();
+        }, LONG_PRESS_MS);
+      }
+      window.addEventListener('pointermove', onPressMove, true);
+      window.addEventListener('pointerup', onPressUp, true);
+      window.addEventListener('pointercancel', onPressUp, true);
+      return;
+    }
     if (!mode || !scene || !isCanvas(e)) return;
     e.stopPropagation();
     e.preventDefault();
@@ -5603,7 +5745,24 @@ function bindPointer(engine) {
   }, true);
   const typing = (t) => t?.matches?.('input, textarea, select, [contenteditable="true"]');
   window.addEventListener('keydown', (e) => {
-    if (!mode) return;
+    if (!mode) {
+      if (e.key === 'Escape' && drag?.loose) {
+        e.stopImmediatePropagation();
+        cancelCarry(engine);
+        lastClient = null;
+        engine.setData('homeDrag', '');
+      } else if (upgradePickerOpen() && !typing(e.target)) {
+        // FurnUpgradeDialog has the keys while it is up: Escape is its Cancel, and the avatar stands still.
+        if (e.key === 'Escape') {
+          e.stopImmediatePropagation();
+          closeUpgradePicker(true);
+          publish(engine);
+        } else if (panKey(e.key) || e.key === ' ' || e.key === 'e' || e.key === 'E' || (e.key === 'Enter' && !e.target?.closest?.('button'))) {
+          e.stopImmediatePropagation();
+        }
+      }
+      return;
+    }
     if (e.key === 'Escape') {
       if (typing(e.target) && e.target.tagName !== 'SELECT') return;
       // The Pack tab's pack: a stack's menu or an open bag takes Escape first (game.js closes it, as
@@ -5832,8 +5991,23 @@ function interiorCameraLook(engine, dtMs) {
   let kind = 'walk';
   if (!decorating) {
     decorPan = null;
-    decorCamX = null;
     heldPan.clear();
+    // G369: a drag scrolls at the view's edge (HandOfDecorator onEnterFrame, maybeScrollVPByDragging) and
+    // the style picker holds the camera on its piece (FurnUpgradeDialog.as 401-408); else it follows you.
+    if (drag?.loose) tickDecorPan(engine, { lo: look.walk, hi: look.walk, floor: look.walk, ceiling: look.walk }, dtMs);
+    else if (!upgradePickerOpen()) decorCamX = null;
+    decorPan = null;
+    if (decorCamX != null) {
+      const span = roomSpan();
+      decorCamX = clampRoomX(decorCamX, { left: span.left, right: span.right, view: engine.camera?.w || 960 });
+      wantX = Math.round(decorCamX - (engine.player?.x ?? 0));
+      kind = 'carry';
+    }
+    // The room slid under a still pointer (a walk, the edge): what you carry stays under it.
+    if (drag?.loose && lastClient) {
+      pointer = { ...worldPoint(engine, { clientX: lastClient.x, clientY: lastClient.y }), inside: true };
+      updateGhost(engine);
+    }
   } else {
     const ins = decorInsets(engine);
     const range = decorLook({ playerY, anchor, view, top: ins.top, bottom: ins.bottom, ceilingTop: INTERIOR.ceilingTop, floorFront: INTERIOR.floorFront });
@@ -6128,6 +6302,22 @@ function demoSetup(engine) {
     scene.background?.redraw?.();
     renderFurniture(engine);
     setMode(engine, 'decorate');
+    // QA (G369): the placed pieces, a piece's middle in client px, and setting one down to try.
+    globalThis.groddleHomePieces = {
+      list: () => decor.placed.map((row) => ({ id: row.id, classTsid: row.classTsid, x: row.x, y: row.y, upgradeId: row.upgradeId || '' })),
+      point: (id) => {
+        const b = furnitureBounds(placedItem(decor, id));
+        return clientPoint(engine, roomX0() + b.x + b.w / 2, b.y + b.h / 2);
+      },
+      place: (classTsid, x) => {
+        decor.storage[classTsid] = (decor.storage[classTsid] || 0) + 1;
+        const res = placeFurniture(decor, engine.inv, classTsid, { x, y: INTERIOR.floorY }, { from: 'storage' });
+        setTimeout(() => engine.refreshHomeScene?.(), 0);
+        return res.item?.id ?? null;
+      },
+      mode: () => mode,
+      selected: () => selected,
+    };
     if (engine.param('homeautoplay') === '1') runDecorateAutoplay(engine);
     else if (engine.param('furnupautoplay')) runFurnUpAutoplay(engine, String(engine.param('furnupautoplay')));
   } else if (demo === 'cultivate' && scene.room === 'street') {
@@ -7077,6 +7267,12 @@ export const homesFeature = {
   onStreetClear(engine) {
     closeUpgradePicker(true);
     releaseCameraLook(engine);
+    if (drag?.loose) {
+      // G369: you can walk out through a door with a piece in hand; it stays where it was.
+      drag = null;
+      placing = null;
+      lastClient = null;
+    }
     destroyGhost();
     scene = null;
     rockTarget = null;
@@ -7105,6 +7301,18 @@ export const homesFeature = {
       selected = null;
       renderBar(engine);
     }
+  },
+
+  /** G369: a piece with a menu of its own (a cabinet, a box) offers its style there; the row as a verb. */
+  pieceStyleVerb(id, engine) {
+    const item = scene?.room === 'interior' && !mode ? placedItem(decor, id) : null;
+    const row = item ? pieceStyleRow(engine, item) : null;
+    return row ? { id: row.id, label: row.label, sort: 56, tooltip: row.tip, enabled: !row.disabled, reason: row.reason, energy: 0, durationMs: 0 } : null;
+  },
+
+  /** Opens that style picker. */
+  openPieceStyle(id, engine) {
+    return openUpgradeFor(engine, id);
   },
 
   /** game.js pack dragstart: Wine of the Dead onto a cultivated item (patch.js / trant / proto remove drop target). */

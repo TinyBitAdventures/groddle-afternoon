@@ -2732,9 +2732,24 @@
   "deployed": "2026-11-06"
  },
  "git": {
-  "commits": 1413,
+  "commits": 1416,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-07",
+    "kind": "new",
+    "text": "Your furniture moves and changes style without Decorate"
+   },
+   {
+    "date": "2026-11-07",
+    "kind": "new",
+    "text": "A home garden tells its owner when a plot goes dry or a crop is ready"
+   },
+   {
+    "date": "2026-11-07",
+    "kind": "new",
+    "text": "Guano goes on one garden plot by hand: drag it there, or pick Fertilize from the plot's menu"
+   },
    {
     "date": "2026-11-07",
     "kind": "fix",
@@ -2839,24 +2854,9 @@
     "date": "2026-11-06",
     "kind": "new",
     "text": "Trophies can be found in the Furniture tab and displayed in your house"
-   },
-   {
-    "date": "2026-11-06",
-    "kind": "fix",
-    "text": "Smash and Shake count each Elemental Pouch on its own, so a full pouch no longer blocks the one beside it"
-   },
-   {
-    "date": "2026-11-06",
-    "kind": "improve",
-    "text": "Firozi, Folivoria, Groddle Heights, Haoma and Haraiva have new map paintings, repainted from Tiny Speck's thumbnails of the lost originals"
-   },
-   {
-    "date": "2026-11-06",
-    "kind": "new",
-    "text": "Search and filter your upgrades by kind"
    }
   ]
  },
- "tests": 713,
+ "tests": 714,
  "generatedAt": "2026-11-07"
 }

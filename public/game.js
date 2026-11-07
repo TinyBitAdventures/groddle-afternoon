@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=45e24b72';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=127e0a3c';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=17639b1e';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=346a52f9';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -11761,6 +11761,9 @@ const engine = {
     return m.startsWith('player:') ? Boolean(playerCtxMenu?.isOpenFor(m)) : Boolean(worldCtxMenu?.isOpenFor(`minimap-sign:${m}`));
   },
   beginVerb: (target, verb) => beginVerbAction(target, verb),
+  /** What a click at this world point would open, and closing the verb menu (homes-feature: a press that turns into a drag). */
+  interactableAt: (x, y) => pickInteractableAt(x, y),
+  closeVerbMenu: () => closeVerbMenu(),
   /** The menu's way into a verb: walks into reach first (a drop on a thing, features/garden-guano-feature.js). */
   requestVerb: (target, verb) => requestVerb(target, verb),
   /**
