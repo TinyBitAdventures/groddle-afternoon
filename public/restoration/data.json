@@ -169,7 +169,7 @@
    "group": "world",
    "name": "Hub maps and travel",
    "status": "source",
-   "blurb": "Every region’s map with its streets. Travel by signpost; from the map, set a destination for a guided path, or with Teleportation IV teleport to a street you have visited. Tiny Speck’s map paintings are lost, so each region’s map shows their small thumbnail of it, enlarged; Ix’s, Groddle Forest’s, Groddle Meadow’s, Groddle Heights’s, Jethimadh’s, Chakra Phool’s, Bortola’s, Alakol’s, Kajuu’s, Baqala’s, Karnata’s, Andra’s, Choru’s, Muufo’s, Besara’s, Kalavana’s, Aranna’s, Ormonos’s, Lida’s, Callopee’s, Massadoe’s, Brillah’s, Firozi’s, Haraiva’s, Folivoria’s, Cauda’s, Fenneq’s, Balzare’s, Haoma’s, Kloro’s, Jal’s, Nottis’s and Drifa’s are repainted for the remake from their thumbnails.",
+   "blurb": "Every region’s map with its streets. Travel by signpost; from the map, set a destination for a guided path, or with Teleportation IV teleport to a street you have visited. Tiny Speck’s map paintings are lost, so each region’s map shows their small thumbnail of it, enlarged; Ix’s, Groddle Forest’s, Groddle Meadow’s, Shimla Mirch’s, Groddle Heights’s, Jethimadh’s, Chakra Phool’s, Bortola’s, Alakol’s, Kajuu’s, Baqala’s, Karnata’s, Andra’s, Choru’s, Salatu’s, Muufo’s, Besara’s, Kalavana’s, Aranna’s, Ormonos’s, Lida’s, Pollokoo’s, Callopee’s, Rasana’s, Massadoe’s, Brillah’s, Firozi’s, Haraiva’s, Folivoria’s, Cauda’s, Fenneq’s, Roobrik’s, Balzare’s, Haoma’s, Kloro’s, Jal’s, Nottis’s, Samudra’s and Drifa’s are repainted for the remake from their thumbnails.",
    "multiplayer": null,
    "spot": null,
    "evidence": [
@@ -2732,7 +2732,7 @@
   "deployed": "2026-11-06"
  },
  "git": {
-  "commits": 1424,
+  "commits": 1425,
   "since": "2026-10-19",
   "recent": [
    {

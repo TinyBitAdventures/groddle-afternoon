@@ -134,10 +134,11 @@
       "thumbMatches": true,
       "x1": "assets/maps/art/bg/shimlamirch.webp",
       "x2": "assets/maps/art/bg/shimlamirch@2x.webp",
-      "x1Bytes": 10532,
-      "x1Sha256": "170168eb69e01b96936b206ceefa025b4ec27bcf76aa951aa51b946603758e0a",
-      "x2Bytes": 22990,
-      "x2Sha256": "a20d0323252f3e970a177b5bb9f32ffebcfde49c25b42d982a8c13cae75a6b5b"
+      "repainted": "tools/provenance/repainted-maps.json",
+      "x1Bytes": 20462,
+      "x1Sha256": "e74bf6aeb61e804d102cdccafbd71161bd53fe9516af8f1857d8d9af79de5e35",
+      "x2Bytes": 78748,
+      "x2Sha256": "6e633c60fce436187189394d4397bd23df2e7dc942cd68f6d0fd983cddf803fe"
     },
     "64": {
       "hubName": "Groddle Heights",
@@ -339,10 +340,11 @@
       "thumbMatches": true,
       "x1": "assets/maps/art/bg/salatu.webp",
       "x2": "assets/maps/art/bg/salatu@2x.webp",
-      "x1Bytes": 14592,
-      "x1Sha256": "37037d66c8dfb06c4f4371d3642dba5f441597bc42fcb4fec6b8bb80809c71ea",
-      "x2Bytes": 31872,
-      "x2Sha256": "cf5aca5b759e635285cef24759a130b7915d0a2fdf8d3f911495cfbb63c444e2"
+      "repainted": "tools/provenance/repainted-maps.json",
+      "x1Bytes": 31010,
+      "x1Sha256": "b8059a3f0a0aa05a1180febdcdf0bae1fce7e7be0cac412b1fd14c100def6270",
+      "x2Bytes": 97346,
+      "x2Sha256": "7abd2725dcebb8b5222011c678a6cabbd9464ade93b91e91eb51252514aac8f1"
     },
     "95": {
       "hubName": "Xalanga",
@@ -480,10 +482,11 @@
       "thumbMatches": true,
       "x1": "assets/maps/art/bg/pollokoo.webp",
       "x2": "assets/maps/art/bg/pollokoo@2x.webp",
-      "x1Bytes": 17870,
-      "x1Sha256": "0d7ee692647f2551b3b5b35b1a5cb5fcb9cef778b748748bc343c5c91d1242c8",
-      "x2Bytes": 33452,
-      "x2Sha256": "5b0022579d0b0972b87aeed2af555476d92615ac44d1a0a6e6d89da8ed6bff93"
+      "repainted": "tools/provenance/repainted-maps.json",
+      "x1Bytes": 35412,
+      "x1Sha256": "149187b027181962b8361950ff59605d59b7873a8f75570e75b8063b0c6fa856",
+      "x2Bytes": 108102,
+      "x2Sha256": "85afaa3e22b83e622e55dceafbb9aefb576609da136028ec2cd180920981786b"
     },
     "107": {
       "hubName": "Callopee",
@@ -511,10 +514,11 @@
       "thumbMatches": true,
       "x1": "assets/maps/art/bg/rasana.webp",
       "x2": "assets/maps/art/bg/rasana@2x.webp",
-      "x1Bytes": 13916,
-      "x1Sha256": "3a4f57a8f0b6aaf817b3393a97ba286cf53e1289f73a7c9b6162786e8d558611",
-      "x2Bytes": 30764,
-      "x2Sha256": "7b69f7f1c1f79b683f42e6385c91612d1de37b5f5ccf5de9fff4377462255f23"
+      "repainted": "tools/provenance/repainted-maps.json",
+      "x1Bytes": 33546,
+      "x1Sha256": "9fca5211bbb65a3e4c9e7547839dbc606c55f2829db84b0f258574107cfe4b68",
+      "x2Bytes": 108356,
+      "x2Sha256": "bcc047fb3f68af73d5e8e8c9d6d1ac4bb90dab1492f1956b1f320bd8dfa77d09"
     },
     "110": {
       "hubName": "Massadoe",
@@ -668,10 +672,11 @@
       "thumbMatches": true,
       "x1": "assets/maps/art/bg/roobrik.webp",
       "x2": "assets/maps/art/bg/roobrik@2x.webp",
-      "x1Bytes": 13174,
-      "x1Sha256": "fb493436ede8c4bf5617d1926d7590d979d7329fff170d329eb901d31e4a6685",
-      "x2Bytes": 27408,
-      "x2Sha256": "c0fefea7d6765b3f7a5c4ecee172106c7a667068f3bf216f257e5ef81a56d027"
+      "repainted": "tools/provenance/repainted-maps.json",
+      "x1Bytes": 52998,
+      "x1Sha256": "87ab309fee34100bfa2dee74ce1155b624ea918bad2f16f66d394a3c9aeded0e",
+      "x2Bytes": 153494,
+      "x2Sha256": "506a9e8b72154aadd090b4b67a4f23eeecc1404322101ebe5d10d139a77020e4"
     },
     "128": {
       "hubName": "Balzare",
@@ -763,10 +768,11 @@
       "thumbMatches": true,
       "x1": "assets/maps/art/bg/samudra.webp",
       "x2": "assets/maps/art/bg/samudra@2x.webp",
-      "x1Bytes": 7162,
-      "x1Sha256": "0654a4fb08686050cfdf8bdcda7fb7f4a8682b27c5af012036864c338fb80990",
-      "x2Bytes": 15032,
-      "x2Sha256": "192e5c78b5275c847c27d618f59810cacfe829bbeff30dd9fa3807bb6ad1c59b"
+      "repainted": "tools/provenance/repainted-maps.json",
+      "x1Bytes": 17994,
+      "x1Sha256": "8fe2c3025dfeafea5538c9d483103c5c6e048b3fbef3e9be64ce7cbf3450efda",
+      "x2Bytes": 51272,
+      "x2Sha256": "94cda3214ad49f4b8c345eba97694a864bbec84b12a08d0c83102278cf4173b3"
     },
     "141": {
       "hubName": "Drifa",

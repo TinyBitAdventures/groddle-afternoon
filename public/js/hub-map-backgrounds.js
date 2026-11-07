@@ -12,7 +12,7 @@ export const HUB_MAP_BACKGROUNDS = Object.freeze({
   '51': Object.freeze({ x1: 'assets/maps/art/bg/uralia.webp', x2: 'assets/maps/art/bg/uralia@2x.webp' }), // Uralia
   '56': Object.freeze({ x1: 'assets/maps/art/bg/groddleforest.webp', x2: 'assets/maps/art/bg/groddleforest@2x.webp', repainted: true }), // Groddle Forest
   '58': Object.freeze({ x1: 'assets/maps/art/bg/groddlemeadow.webp', x2: 'assets/maps/art/bg/groddlemeadow@2x.webp', repainted: true }), // Groddle Meadow
-  '63': Object.freeze({ x1: 'assets/maps/art/bg/shimlamirch.webp', x2: 'assets/maps/art/bg/shimlamirch@2x.webp' }), // Shimla Mirch
+  '63': Object.freeze({ x1: 'assets/maps/art/bg/shimlamirch.webp', x2: 'assets/maps/art/bg/shimlamirch@2x.webp', repainted: true }), // Shimla Mirch
   '64': Object.freeze({ x1: 'assets/maps/art/bg/groddleheights.webp', x2: 'assets/maps/art/bg/groddleheights@2x.webp', repainted: true }), // Groddle Heights
   '71': Object.freeze({ x1: 'assets/maps/art/bg/jethimadh.webp', x2: 'assets/maps/art/bg/jethimadh@2x.webp', repainted: true }), // Jethimadh
   '72': Object.freeze({ x1: 'assets/maps/art/bg/chakraphool.webp', x2: 'assets/maps/art/bg/chakraphool@2x.webp', repainted: true }), // Chakra Phool
@@ -25,7 +25,7 @@ export const HUB_MAP_BACKGROUNDS = Object.freeze({
   '90': Object.freeze({ x1: 'assets/maps/art/bg/choru.webp', x2: 'assets/maps/art/bg/choru@2x.webp', repainted: true }), // Choru
   '91': Object.freeze({ x1: 'assets/maps/art/bg/zhambu.webp', x2: 'assets/maps/art/bg/zhambu@2x.webp' }), // Zhambu
   '92': Object.freeze({ x1: 'assets/maps/art/bg/tamila.webp', x2: 'assets/maps/art/bg/tamila@2x.webp' }), // Tamila
-  '93': Object.freeze({ x1: 'assets/maps/art/bg/salatu.webp', x2: 'assets/maps/art/bg/salatu@2x.webp' }), // Salatu
+  '93': Object.freeze({ x1: 'assets/maps/art/bg/salatu.webp', x2: 'assets/maps/art/bg/salatu@2x.webp', repainted: true }), // Salatu
   '95': Object.freeze({ x1: 'assets/maps/art/bg/xalanga.webp', x2: 'assets/maps/art/bg/xalanga@2x.webp' }), // Xalanga
   '97': Object.freeze({ x1: 'assets/maps/art/bg/muufo.webp', x2: 'assets/maps/art/bg/muufo@2x.webp', repainted: true }), // Muufo
   '98': Object.freeze({ x1: 'assets/maps/art/bg/besara.webp', x2: 'assets/maps/art/bg/besara@2x.webp', repainted: true }), // Besara
@@ -34,9 +34,9 @@ export const HUB_MAP_BACKGROUNDS = Object.freeze({
   '101': Object.freeze({ x1: 'assets/maps/art/bg/aranna.webp', x2: 'assets/maps/art/bg/aranna@2x.webp', repainted: true }), // Aranna
   '102': Object.freeze({ x1: 'assets/maps/art/bg/ormonos.webp', x2: 'assets/maps/art/bg/ormonos@2x.webp', repainted: true }), // Ormonos
   '105': Object.freeze({ x1: 'assets/maps/art/bg/lida.webp', x2: 'assets/maps/art/bg/lida@2x.webp', repainted: true }), // Lida
-  '106': Object.freeze({ x1: 'assets/maps/art/bg/pollokoo.webp', x2: 'assets/maps/art/bg/pollokoo@2x.webp' }), // Pollokoo
+  '106': Object.freeze({ x1: 'assets/maps/art/bg/pollokoo.webp', x2: 'assets/maps/art/bg/pollokoo@2x.webp', repainted: true }), // Pollokoo
   '107': Object.freeze({ x1: 'assets/maps/art/bg/callopee.webp', x2: 'assets/maps/art/bg/callopee@2x.webp', repainted: true }), // Callopee
-  '109': Object.freeze({ x1: 'assets/maps/art/bg/rasana.webp', x2: 'assets/maps/art/bg/rasana@2x.webp' }), // Rasana
+  '109': Object.freeze({ x1: 'assets/maps/art/bg/rasana.webp', x2: 'assets/maps/art/bg/rasana@2x.webp', repainted: true }), // Rasana
   '110': Object.freeze({ x1: 'assets/maps/art/bg/massadoe.webp', x2: 'assets/maps/art/bg/massadoe@2x.webp', repainted: true }), // Massadoe
   '112': Object.freeze({ x1: 'assets/maps/art/bg/brillah.webp', x2: 'assets/maps/art/bg/brillah@2x.webp', repainted: true }), // Brillah
   '113': Object.freeze({ x1: 'assets/maps/art/bg/tahli.webp', x2: 'assets/maps/art/bg/tahli@2x.webp' }), // Tahli
@@ -46,13 +46,13 @@ export const HUB_MAP_BACKGROUNDS = Object.freeze({
   '120': Object.freeze({ x1: 'assets/maps/art/bg/cauda.webp', x2: 'assets/maps/art/bg/cauda@2x.webp', repainted: true }), // Cauda
   '121': Object.freeze({ x1: 'assets/maps/art/bg/sura.webp', x2: 'assets/maps/art/bg/sura@2x.webp' }), // Sura
   '123': Object.freeze({ x1: 'assets/maps/art/bg/fenneq.webp', x2: 'assets/maps/art/bg/fenneq@2x.webp', repainted: true }), // Fenneq
-  '126': Object.freeze({ x1: 'assets/maps/art/bg/roobrik.webp', x2: 'assets/maps/art/bg/roobrik@2x.webp' }), // Roobrik
+  '126': Object.freeze({ x1: 'assets/maps/art/bg/roobrik.webp', x2: 'assets/maps/art/bg/roobrik@2x.webp', repainted: true }), // Roobrik
   '128': Object.freeze({ x1: 'assets/maps/art/bg/balzare.webp', x2: 'assets/maps/art/bg/balzare@2x.webp', repainted: true }), // Balzare
   '131': Object.freeze({ x1: 'assets/maps/art/bg/haoma.webp', x2: 'assets/maps/art/bg/haoma@2x.webp', repainted: true }), // Haoma
   '133': Object.freeze({ x1: 'assets/maps/art/bg/kloro.webp', x2: 'assets/maps/art/bg/kloro@2x.webp', repainted: true }), // Kloro
   '136': Object.freeze({ x1: 'assets/maps/art/bg/jal.webp', x2: 'assets/maps/art/bg/jal@2x.webp', repainted: true }), // Jal
   '137': Object.freeze({ x1: 'assets/maps/art/bg/nottis.webp', x2: 'assets/maps/art/bg/nottis@2x.webp', repainted: true }), // Nottis
-  '140': Object.freeze({ x1: 'assets/maps/art/bg/samudra.webp', x2: 'assets/maps/art/bg/samudra@2x.webp' }), // Samudra
+  '140': Object.freeze({ x1: 'assets/maps/art/bg/samudra.webp', x2: 'assets/maps/art/bg/samudra@2x.webp', repainted: true }), // Samudra
   '141': Object.freeze({ x1: 'assets/maps/art/bg/drifa.webp', x2: 'assets/maps/art/bg/drifa@2x.webp', repainted: true }), // Drifa
   '143': Object.freeze({ x1: 'assets/maps/art/bg/vortex.webp', x2: 'assets/maps/art/bg/vortex@2x.webp' }), // Vortex of Random
 });

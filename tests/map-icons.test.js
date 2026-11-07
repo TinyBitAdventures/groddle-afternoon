@@ -28,7 +28,7 @@ import {
   renderHubMapSvg,
   SUBWAY_ICON_NUDGE,
   youBox,
-} from '../public/js/map-graph.js?v=d5b7ecb8';
+} from '../public/js/map-graph.js?v=a469eee6';
 import { mapIconStep, mapIconTipPlace } from '../public/js/ui/map-icon-tips.js?v=6b3eb3f9';
 import { selectVendorProfile } from '../public/js/vendor.js?v=84dc136c';
 import { CLASSIC_ART } from '../public/js/classic/classic-art.js?v=5745e669';
