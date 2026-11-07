@@ -165,10 +165,11 @@
       "thumbMatches": true,
       "x1": "assets/maps/art/bg/jethimadh.webp",
       "x2": "assets/maps/art/bg/jethimadh@2x.webp",
-      "x1Bytes": 10918,
-      "x1Sha256": "322e63e51c164ba82ecd2eef375feb181a28a9783f9dde929a1478e29ce51514",
-      "x2Bytes": 22152,
-      "x2Sha256": "f95df97843a8cc9ec34e679221d52bf6f815ad0a70e0e5ad5c43b98bdd1f0a74"
+      "repainted": "tools/provenance/repainted-maps.json",
+      "x1Bytes": 25832,
+      "x1Sha256": "25fc71277da57015b79a0a7b9f0a4cb9636cc7b0fa391c24e0ba8c62281d851f",
+      "x2Bytes": 97412,
+      "x2Sha256": "f2f583c78f031273c97294fa57c11866885a44c236b496dbfcddbf1b163ab46b"
     },
     "72": {
       "hubName": "Chakra Phool",
@@ -228,10 +229,11 @@
       "thumbMatches": true,
       "x1": "assets/maps/art/bg/kajuu.webp",
       "x2": "assets/maps/art/bg/kajuu@2x.webp",
-      "x1Bytes": 14306,
-      "x1Sha256": "bcec4d58150c38f9c68d943c83f97c84c372a63734f81b914f0a901a12d90ef6",
-      "x2Bytes": 30748,
-      "x2Sha256": "d33023c350e7e9c7adb4453dfe0337522f2f22cdac80b528905b96879bea5d1a"
+      "repainted": "tools/provenance/repainted-maps.json",
+      "x1Bytes": 39662,
+      "x1Sha256": "01aa55c05836353a56f53303b809343b365df8730d0f679d9878dd568a7a37e9",
+      "x2Bytes": 128368,
+      "x2Sha256": "a58429a3efded0d99e3c17e6302163c35506234f9d09661b918b4361c9e78ee6"
     },
     "86": {
       "hubName": "Baqala",
@@ -259,10 +261,11 @@
       "thumbMatches": true,
       "x1": "assets/maps/art/bg/karnata.webp",
       "x2": "assets/maps/art/bg/karnata@2x.webp",
-      "x1Bytes": 8982,
-      "x1Sha256": "945aeaccefc335b81558f9d0e863879abfc494b38dbb0d4260510391e77376aa",
-      "x2Bytes": 18370,
-      "x2Sha256": "a3af806d4d7dc7460492c1dc939eab3135ab14ca4089a58710bdda7afa0981cc"
+      "repainted": "tools/provenance/repainted-maps.json",
+      "x1Bytes": 26364,
+      "x1Sha256": "f3120e1d1e9317e0a5d260f0d7cfa7706383bdd4a3926a6400d267bc85bef5f4",
+      "x2Bytes": 89306,
+      "x2Sha256": "953e1f96f8db2329159d9a90858c3b6a91c3d1f19b3c24b58fdbb243267aa52a"
     },
     "89": {
       "hubName": "Andra",
@@ -366,10 +369,11 @@
       "thumbMatches": true,
       "x1": "assets/maps/art/bg/muufo.webp",
       "x2": "assets/maps/art/bg/muufo@2x.webp",
-      "x1Bytes": 10774,
-      "x1Sha256": "78ba26d628bd22bc2f9bc051fa8785f5cabf03946e26f91eead3f900d76a0964",
-      "x2Bytes": 22418,
-      "x2Sha256": "1fa86d48d3ff17a8e2cfadb06c9ae7c89058cc9a08e02a88aae3dcb480a276d2"
+      "repainted": "tools/provenance/repainted-maps.json",
+      "x1Bytes": 26272,
+      "x1Sha256": "88534f6aae16a90c16226564bd50301e8b00b0a6ccbbc0431a61dbff8025c40e",
+      "x2Bytes": 86142,
+      "x2Sha256": "c60239168e727e1211ada06ecf84cf5d77bdefdfb355d469bc583ff92aa54cd2"
     },
     "98": {
       "hubName": "Besara",
@@ -397,10 +401,11 @@
       "thumbMatches": true,
       "x1": "assets/maps/art/bg/kalavana.webp",
       "x2": "assets/maps/art/bg/kalavana@2x.webp",
-      "x1Bytes": 12012,
-      "x1Sha256": "a6c65c92a2db7084256b987b81526177cedda387f07dc5f346559e7aba0d1900",
-      "x2Bytes": 24974,
-      "x2Sha256": "6d0ea260944012d0be9e4c763cb7e819d47bc309c062e37354b34be0a205949c"
+      "repainted": "tools/provenance/repainted-maps.json",
+      "x1Bytes": 29780,
+      "x1Sha256": "eb8b21b05d2cf4753b2eab558208cb2b7bb8b356e6c479acff7af06f9007a3ed",
+      "x2Bytes": 109148,
+      "x2Sha256": "49f0cf53909bbb665358ca687dbe6ba7a322793be907879fe238115dceb63d9f"
     },
     "100": {
       "hubName": "Vantalu",
@@ -443,10 +448,11 @@
       "thumbMatches": true,
       "x1": "assets/maps/art/bg/ormonos.webp",
       "x2": "assets/maps/art/bg/ormonos@2x.webp",
-      "x1Bytes": 13918,
-      "x1Sha256": "96495e4c1d7e1582d41ce8d5ae2f6cfc1fe38f7b97aae0043d0f3ec0cea6e601",
-      "x2Bytes": 25024,
-      "x2Sha256": "6985355060fa3e58f7ba9da7263bd95a1ccfcb3e6cd0883f9c683cd986a209c2"
+      "repainted": "tools/provenance/repainted-maps.json",
+      "x1Bytes": 36676,
+      "x1Sha256": "dcba8b78ed86e6a11bcad86e25fb4a5dd4136e5b12949dd8942de21753c470f4",
+      "x2Bytes": 114222,
+      "x2Sha256": "2ef671c16917c928eaaf6402d05ae13505d5fe27972dfcc75fa22556dbc475dd"
     },
     "105": {
       "hubName": "Lida",
@@ -458,10 +464,11 @@
       "thumbMatches": true,
       "x1": "assets/maps/art/bg/lida.webp",
       "x2": "assets/maps/art/bg/lida@2x.webp",
-      "x1Bytes": 10090,
-      "x1Sha256": "8b09067c7f9c52cf1d80c2e898c043ac80907b72f53a9e77ec8a52ab44c67016",
-      "x2Bytes": 20410,
-      "x2Sha256": "22f69370e2967cc9bf1f004edb31f232a5076d8f7c82342fcc8757e2d41fe4b2"
+      "repainted": "tools/provenance/repainted-maps.json",
+      "x1Bytes": 37596,
+      "x1Sha256": "8bed196789e4fc2b0dc7281453351c58feb97a46f6f7896a5ec6ebe50d1242e6",
+      "x2Bytes": 119964,
+      "x2Sha256": "addf222af98b7745a635ac2bb6e25156ed474053eea1111708ee90231285ec7d"
     },
     "106": {
       "hubName": "Pollokoo",
@@ -519,10 +526,11 @@
       "thumbMatches": true,
       "x1": "assets/maps/art/bg/massadoe.webp",
       "x2": "assets/maps/art/bg/massadoe@2x.webp",
-      "x1Bytes": 13160,
-      "x1Sha256": "dab7f4432813a36ba0a90d21b617f728b0fe8adb0190146c1b748615d7a13aa5",
-      "x2Bytes": 27484,
-      "x2Sha256": "f94649b12f4fc05fa1d9ddfc9988dba5a20794c138d47da3728ecd1446659d54"
+      "repainted": "tools/provenance/repainted-maps.json",
+      "x1Bytes": 32544,
+      "x1Sha256": "148803357527651bd7656c248d60e7af14d782a004d8c408c4ec880d18cc4a49",
+      "x2Bytes": 93204,
+      "x2Sha256": "6ee9999030f6c3ff8bfad2cb0b468fd06daf045d2a9d5c52aa575eca70bfd28e"
     },
     "112": {
       "hubName": "Brillah",
@@ -707,10 +715,11 @@
       "thumbMatches": true,
       "x1": "assets/maps/art/bg/kloro.webp",
       "x2": "assets/maps/art/bg/kloro@2x.webp",
-      "x1Bytes": 15930,
-      "x1Sha256": "9c9d19d35814353e58b64166316d9e27f6ac49c37fab27ec302d3b76b734d6e3",
-      "x2Bytes": 31918,
-      "x2Sha256": "51ac5f9ce9e2e0906aeed8251aa3b944bf4852bf2545888e4acc927e7a1b0229"
+      "repainted": "tools/provenance/repainted-maps.json",
+      "x1Bytes": 45728,
+      "x1Sha256": "7b1de0bb46164974a19fb5148a3b3f4320fa2fcb458c51b02b6b3b057c3d876e",
+      "x2Bytes": 120922,
+      "x2Sha256": "66abfccff6b73c6ba3165ddbea002b210ee0c449797a2d8a4a080a027b117831"
     },
     "136": {
       "hubName": "Jal",
@@ -738,10 +747,11 @@
       "thumbMatches": true,
       "x1": "assets/maps/art/bg/nottis.webp",
       "x2": "assets/maps/art/bg/nottis@2x.webp",
-      "x1Bytes": 13090,
-      "x1Sha256": "3382e70ffe52f9a87eced9aa6a96fedf26a9d7759cee882b7e78433697c558b3",
-      "x2Bytes": 28750,
-      "x2Sha256": "5ff0884e1d031e54e6d9c23256a0cc840c4cb82cd46bd98b108bcb5c6bf55c45"
+      "repainted": "tools/provenance/repainted-maps.json",
+      "x1Bytes": 33428,
+      "x1Sha256": "779035a6183ea884bcccade69fb053fa771332ce7ab7816b79bdeee67ff156f8",
+      "x2Bytes": 91780,
+      "x2Sha256": "1f5ea3f9c528ce2c3e31cf6cdebe961ca065c5cd4b4bfb6e09899c7945a2e695"
     },
     "140": {
       "hubName": "Samudra",

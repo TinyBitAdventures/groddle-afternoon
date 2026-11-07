@@ -15,8 +15,8 @@ import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { readThumbs, regionThumbs, repaints } from '../tools/map-backgrounds/build.mjs';
-import { HUB_MAP_BACKGROUNDS } from '../public/js/hub-map-backgrounds.js?v=3d9ac6ce';
-import { buildHubMapView, PUBLIC_HUBS, renderHubMapSvg } from '../public/js/map-graph.js?v=6319325d';
+import { HUB_MAP_BACKGROUNDS } from '../public/js/hub-map-backgrounds.js?v=56379064';
+import { buildHubMapView, PUBLIC_HUBS, renderHubMapSvg } from '../public/js/map-graph.js?v=d5b7ecb8';
 import { hubMapArtNote } from '../public/js/panel-copy.js?v=1d8de080';
 import { CHECKLIST } from '../tools/restoration/checklist.mjs';
 import { MAP_ART_NOTE } from '../tools/encyclopedia/streets.mjs';
@@ -160,7 +160,10 @@ describe('region map backgrounds (tools/map-backgrounds/build.mjs)', () => {
       const dim = buildHubMapView(hub(id), '', STREETS).streets.filter((s) => !s.loaded && !s.hidden);
       assert.deepEqual(dim.map((s) => s.name), [], `${id} ${INDEX.hubs[id].hubName}`);
     }
-    assert.equal(hubMapArtNote(view), 'thumbnail painting');
+    assert.equal(hubMapArtNote(view), 'repainted painting');
+    // A region still on its blown-up thumbnail, while any is left (G522).
+    const soft = Object.keys(HUB_MAP_BACKGROUNDS).map((id) => buildHubMapView(hub(id), '', STREETS)).find((v) => v.bgSoft && !v.bgRepainted);
+    if (soft) assert.equal(hubMapArtNote(soft), 'thumbnail painting');
   });
 
   it('Retina screens get the 2x file', () => {
