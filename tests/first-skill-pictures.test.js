@@ -8,7 +8,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { FIRST_SKILLS } from '../public/js/newxp.js?v=8fa18f24';
-import { skillPictureUrl } from '../public/js/features/newxp-feature.js?v=a66405c9';
+import { skillPictureUrl } from '../public/js/features/newxp-feature.js?v=e8a60c62';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const GS = join(root, '../glitch-GameServerJS');
@@ -39,7 +39,8 @@ describe('first skill pictures', () => {
     const at = feature.indexOf('async function skillChooser(t)');
     const fn = feature.slice(at, feature.indexOf('ui.card.hidden = true;', at));
     assert.match(fn, /class="nx-skill" data-nx-skill="\$\{s\.id\}" aria-label="\$\{s\.name\}"/);
-    assert.match(fn, /srcset="\$\{url\} 2x"/);
+    assert.match(fn, /<img srcset="\$\{url\} 2x" alt="">/, 'no src: a src would count as 1x and draw it double on any 1x screen');
+    assert.match(feature, /\.nx-card \.nx-skill\{width:150px;[^}]*background:none!important/, 'magic_rock.js x -150, 0, 150, on no button face');
     assert.match(fn, /querySelectorAll\('\[data-nx-skill\]'\)/);
     assert.doesNotMatch(fn, /art_skill_|bg_green|suit_skill|pattern_skill/);
     assert.match(fn, /<h2>Choose a skill<\/h2>/, 'the rest of the card stays');

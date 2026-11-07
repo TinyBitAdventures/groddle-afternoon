@@ -286,7 +286,8 @@ body:has(.nx-card:not([hidden])) .nx-instr{visibility:hidden}
 .nx-up .nx-up-name{position:absolute;left:4px;right:4px;bottom:4px;padding:7px var(--sp-3);background:color-mix(in srgb, var(--c-black) 30%, transparent);color:var(--text-inverse);font:800 var(--fs-sm) var(--font-round);border-radius:0 0 var(--radius-xs) var(--radius-xs)}
 .nx-up .nx-up-cost{position:absolute;top:7px;right:9px;color:var(--text-inverse);font:800 var(--fs-base) var(--font-round);text-shadow:0 -1px 1.5px color-mix(in srgb, var(--c-black) 55%, transparent)}
 .nx-up.dim{opacity:.38;cursor:default}
-.nx-skill{border:0;padding:0;background:none;cursor:pointer;align-self:flex-end}
+.nx-skills{gap:0;align-items:flex-end}
+.nx-card .nx-skill{width:150px;display:flex;justify-content:center;min-width:0;min-height:0;border:0;padding:0;background:none!important;box-shadow:none!important;cursor:pointer}
 .nx-skill img{display:block}
 .nx-skill:hover img,.nx-skill:focus-visible img{filter:brightness(1.1)}
 .nx-got{max-width:360px;background:var(--surface-bright);color:var(--c-navy-36);border-radius:var(--radius-xl);padding:var(--sp-8) var(--sp-9);box-shadow:var(--shadow-3)}
@@ -654,9 +655,9 @@ async function skillChooser(t) {
   rooted = true;
   const html = FIRST_SKILLS.map((s) => {
     const url = skillPictureUrl(s);
-    return `<button type="button" class="nx-skill" data-nx-skill="${s.id}" aria-label="${s.name}"><img src="${url}" srcset="${url} 2x" alt=""></button>`;
+    return `<button type="button" class="nx-skill" data-nx-skill="${s.id}" aria-label="${s.name}"><img srcset="${url} 2x" alt=""></button>`;
   }).join('');
-  ui.card.innerHTML = `<h2>Choose a skill</h2><div class="nx-hand">${html}</div><div>The Magic Rock can give you one skill instantly.</div>`;
+  ui.card.innerHTML = `<h2>Choose a skill</h2><div class="nx-hand nx-skills">${html}</div><div>The Magic Rock can give you one skill instantly.</div>`;
   ui.card.hidden = false;
   engineRef.setData('newxpCard', 'skills');
   const pick = await new Promise((resolve) => {
