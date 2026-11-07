@@ -2728,13 +2728,18 @@
   ]
  },
  "release": {
-  "game": "0.19.2",
+  "game": "0.20.0",
   "deployed": "2026-11-06"
  },
  "git": {
-  "commits": 1391,
+  "commits": 1392,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-06",
+    "kind": "improve",
+    "text": "Ix has a new map painting, repainted from Tiny Speck's thumbnail of the lost original"
+   },
    {
     "date": "2026-11-06",
     "kind": "new",
@@ -2849,11 +2854,6 @@
     "date": "2026-11-06",
     "kind": "fix",
     "text": "The Gem Collector badge can be earned: holding all five gems counts"
-   },
-   {
-    "date": "2026-11-06",
-    "kind": "fix",
-    "text": "The Hoe has Aggressive Hoeing on and off, as in the original"
    }
   ]
  },
