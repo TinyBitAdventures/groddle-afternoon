@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=45e24b72';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=127e0a3c';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=78976235';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=5d7b9a72';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -25582,6 +25582,8 @@ function handleFeatResult(result, participant) {
 function sayLocalChat(message, participant = 'Ur', { quietActivity = false } = {}) {
   const typed = String(message || '').trim().slice(0, 180);
   if (!typed) return { ok: false, reason: 'empty' };
+  // main.js doLocalChat 1708-1710: under the cone of silence the line goes nowhere, not even a bubble of your own (G480).
+  if (participant === 'Ur' && features.query('localChatRefused', engine)) return { ok: false, reason: 'suspended' };
   // The word filter (the remake's own addition, js/word-filter.js): the line is shown with a bad word as a grawlix.
   const text = filterText(typed);
   const result = submitIncantation(featState, text, participant, Date.now());

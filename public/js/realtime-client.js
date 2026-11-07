@@ -307,7 +307,8 @@ export function createRealtimeClient({
     switch (msg.t) {
       case 'hello':
         // off: the account's "Appear offline" (groddle-afternoon-server presence.go), as the ticket said.
-        me = { id: Number(msg.you?.id), name: String(msg.you?.name || ''), off: msg.off === true };
+        // cone: the chat cone of silence (hub.go, G480), as the ticket or the player's groups list said.
+        me = { id: Number(msg.you?.id), name: String(msg.you?.name || ''), off: msg.off === true, cone: msg.cone === true };
         attempt = 0;
         ticketRetries = 0;
         setState('online');

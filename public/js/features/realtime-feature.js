@@ -57,7 +57,7 @@
  */
 
 import { createMinnAccount } from '../minn-account.js?v=b29fae30';
-import { EMOTES, createRealtimeClient, createTrack, pushSample, sampleTrack } from '../realtime-client.js?v=e2dde578';
+import { EMOTES, createRealtimeClient, createTrack, pushSample, sampleTrack } from '../realtime-client.js?v=a3d40316';
 import { ANIM_FPS, EMOTION_MS, animForState, crowdScaleX } from '../avatar-anims.js?v=fb921bf4';
 import { movedLine } from '../admin-teleport.js?v=fa56e8df';
 import { ADMIN_TEXT, applyAdminGive, applyAdminRefill, showAdminMessage, showBooted } from '../admin-console-mp.js?v=7c028ca0';
@@ -88,6 +88,9 @@ export function typingCounts(text, localTab = true) {
   const t = String(text || '').trim();
   return Boolean(t) && !t.startsWith('/') && localTab !== false;
 }
+
+/** main.js doLocalChat 1709, the same words the channels answer (groddle-afternoon-server channels.go). */
+export const LOCAL_SUSPENDED = "Sorry, you're currently suspended from this chat.";
 
 /** The "…" drawn over a player who is typing (the SWF is lost): a bubble with three dots. */
 export function typingMark(PIXI) {
@@ -461,6 +464,22 @@ function createSession(engine) {
     if (swapped) holdPacks();
   }
 
+  // —— The cone of silence in Local chat (G480, main.js doLocalChat 1708-1710, doLocalChatStart 1679) ——
+  let coneNow = false;
+  const coned = () => coneNow === true;
+  function setCone(on) {
+    coneNow = on === true;
+    engine.setData?.('realtimeCone', coneNow ? '1' : '0');
+  }
+  /** pc.sendActivity: the line went nowhere, and only its speaker is told. */
+  function suspendedNote(message) {
+    const line = message || LOCAL_SUSPENDED;
+    addLog({ note: true, text: line });
+    engine.pushActivity?.(line);
+  }
+  client.on('hello', (who) => setCone(who?.cone === true));
+  client.on('msg:cone', (msg) => setCone(msg?.on === true));
+
   // —— The typing mark (G366) ——
   let typingChanged = false;
   /** This line already told the street; when the last mark went. */
@@ -478,7 +497,7 @@ function createSession(engine) {
       typedLine = false;
       return;
     }
-    if (typedLine || teleporting || !typingCounts(text, localTabInFront())) return;
+    if (coned() || typedLine || teleporting || !typingCounts(text, localTabInFront())) return;
     const t = Date.now();
     if (t - typedAt < TYPING_EVERY_MS) return;
     if (!client.typing()) return;
@@ -560,6 +579,9 @@ function createSession(engine) {
     if (code === 'slow_down') {
       engine.toast?.(message || 'Slow down a little.', 2400);
       addLog({ note: true, text: message || 'Slow down a little.' });
+    } else if (code === 'suspended') {
+      setCone(true);
+      suspendedNote(message);
     } else console.warn('[realtime]', code, message);
   });
 
@@ -660,6 +682,12 @@ function createSession(engine) {
       addLog({ name: client.me?.name || boot.player?.name || 'You', text });
       addLog({ note: true, text: 'Only you heard that.' });
     },
+    /** game.js sayLocalChat, before a line shows anywhere: true when the cone of silence refuses it. */
+    refuseLine() {
+      if (!coned()) return false;
+      suspendedNote();
+      return true;
+    },
     chatName() {
       return client.me?.name || boot.player?.name || null;
     },
@@ -687,6 +715,11 @@ export const realtimeFeature = {
     if (!session || !engine.started) return;
     if (session.client.state === 'idle') session.start();
     session.tick(performance.now());
+  },
+
+  /** game.js sayLocalChat: the cone of silence holds this line back (G480). */
+  localChatRefused() {
+    return session?.refuseLine() ? true : null;
   },
 
   /** game.js sayLocalChat, for each line the player says. */

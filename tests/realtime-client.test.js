@@ -31,10 +31,10 @@ import {
   pushSample,
   sampleTrack,
   socketUrl,
-} from '../public/js/realtime-client.js?v=e2dde578';
+} from '../public/js/realtime-client.js?v=a3d40316';
 import { createMinnAccount } from '../public/js/minn-account.js?v=b29fae30';
-import { emoteCommand, lookOf, poseOf, realtimeFeature, sharedStreet, statusText } from '../public/js/features/realtime-feature.js?v=c9c3d2f8';
-import { FEATURES } from '../public/js/features/index.js?v=78976235';
+import { emoteCommand, lookOf, poseOf, realtimeFeature, sharedStreet, statusText } from '../public/js/features/realtime-feature.js?v=8f92f5fb';
+import { FEATURES } from '../public/js/features/index.js?v=5d7b9a72';
 
 const root = join(import.meta.dirname, '..');
 const read = (rel) => readFileSync(join(root, rel), 'utf8');
@@ -195,7 +195,7 @@ describe('realtime-client: connecting', () => {
     ws.receive({ t: 'hello', you: { id: 7, name: 'Ada' } });
     assert.equal(ctx.client.state, 'online');
     // off: "Appear offline" as the ticket said (presence-mp-feature reads it).
-    assert.deepEqual(ctx.client.me, { id: 7, name: 'Ada', off: false });
+    assert.deepEqual(ctx.client.me, { id: 7, name: 'Ada', off: false, cone: false });
     assert.equal(ctx.client.here, 0, 'not on a street yet');
   });
 

@@ -180,5 +180,5 @@ import { gardenGnomeFeature } from './garden-gnome-feature.js?v=c8f90cd8'; FEATU
 import { collectionTrophiesFeature } from './collection-trophies-feature.js?v=c357c3ad'; FEATURES.push(collectionTrophiesFeature);
 import { recipeMemoryFeature } from './recipe-memory-feature.js?v=de1b3a44'; FEATURES.push(recipeMemoryFeature);
 import { streetObjectsFeature } from './street-objects-feature.js?v=62a5ecf1'; FEATURES.push(streetObjectsFeature);
-import { realtimeFeature } from './realtime-feature.js?v=c9c3d2f8'; FEATURES.push(realtimeFeature);
+import { realtimeFeature } from './realtime-feature.js?v=8f92f5fb'; FEATURES.push(realtimeFeature);
 import { accountBackupFeature } from './account-backup-feature.js?v=48101765'; FEATURES.push(accountBackupFeature);
