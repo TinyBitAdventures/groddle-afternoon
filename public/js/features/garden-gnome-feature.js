@@ -23,7 +23,7 @@ import { textureFromUrl } from '../textures.js?v=3149d699';
 import { filterText } from '../word-filter.js?v=9a7a7ebb';
 import { verbMessage } from '../item-verbs-more.js?v=c2f9dc31';
 import { HOME_INTERIOR_TSID, HOME_STREET_TSID } from '../homes.js?v=631ab6b8';
-import { homesFeature } from './homes-feature.js?v=d73d6a05';
+import { homesFeature } from './homes-feature.js?v=b56f3531';
 import {
   GNOME_CLASS,
   GNOME_PHRASE_MAX,

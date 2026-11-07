@@ -22,9 +22,9 @@ const page = (id) => readFileSync(join(items, id, 'index.html'), 'utf8');
 const inRemake = data.items.filter((i) => i.status === 'source');
 const recipes = JSON.parse(readFileSync(join(pub, 'assets/content/recipes.json'), 'utf8'));
 const costs = await loadCosts(spike);
-const making = await import('../public/js/making.js?v=6da3230e');
+const making = await import('../public/js/making.js?v=704da2eb');
 const vendor = await import('../public/js/vendor.js?v=70577b0b');
-const pack = await import('../public/js/pack-slots.js?v=c91d0ca3');
+const pack = await import('../public/js/pack-slots.js?v=a94b816c');
 const storage = await import('../public/js/home-storage.js?v=121f1897');
 const unescape = (s) => s.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"');
 /** The "What it is for" list of a page, as plain lines. */

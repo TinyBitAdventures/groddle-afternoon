@@ -18,13 +18,13 @@ import {
   rockClassFor,
   rockItems,
   soilKeyMap,
-} from '../public/js/features/homes-feature.js?v=d73d6a05';
+} from '../public/js/features/homes-feature.js?v=b56f3531';
 import { WALLPAPER_MAPS } from '../public/js/home-wallpaper-art.js?v=9f8473e6';
 import { HOME_TEXTURE_CONFIGS } from '../public/js/homes-catalog.js?v=7aa9beb0';
 import { canPlantBean } from '../public/js/patches.js?v=ddd16221';
 import { TOWER_PART_CHOICES, TOWER_STYLES, composeTower, towerBounds } from '../public/js/home-tower.js?v=087df38f';
 import { MIN_GROUND_CLEARANCE, cameraTargetY, cameraWorldHeightForGround, yCamOffsetAnchor } from '../public/js/movement.js?v=b30f84eb';
-import { INTERIOR } from '../public/js/home-decor.js?v=5dd8f892';
+import { INTERIOR } from '../public/js/home-decor.js?v=6735c85f';
 import { EXTERIOR_STYLES, INTERIOR_STYLES, streetLook, yardLook } from '../public/js/home-styles.js?v=f591561f';
 import { gardenLayout, gardenStyle } from '../public/js/garden-view.js?v=05651e76';
 import { listCultivationClasses } from '../public/js/home-cultivation.js?v=c650eed1';

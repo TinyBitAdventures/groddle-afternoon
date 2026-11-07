@@ -12,7 +12,7 @@
  *    skill each tool needs, and which tools are transmogrifiers).
  * Each recipe has an anchor (#r<id>) for links from item pages.
  */
-import { MAKING_TOOL_SKILLS, TOOL_CATALOG, TRANSMOG_FAIL_CHANCE } from '../../public/js/making.js?v=6da3230e';
+import { MAKING_TOOL_SKILLS, TOOL_CATALOG, TRANSMOG_FAIL_CHANCE } from '../../public/js/making.js?v=704da2eb';
 import { esc, fmt } from './parts.mjs';
 
 /** Our grouping of the tools. */

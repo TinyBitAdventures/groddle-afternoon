@@ -2,9 +2,9 @@
  * Groddle Afternoon — original street geometry + layered decos
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
-import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=4589e83f';
+import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=8ceaca2e';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=127e0a3c';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=5a49bedd';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=d93764fc';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -468,7 +468,7 @@ import {
   isToolItem,
 } from './js/inventory.js?v=d82f3b00';
 import { TROPHY_FIND_TEXT, trophyOfBadge } from './js/home-trophies.js?v=21c2add6';
-import { PACK_COPY, isBagClass, unitRankAt } from './js/pack-slots.js?v=c91d0ca3';
+import { PACK_COPY, isBagClass, isElementClass, unitRankAt } from './js/pack-slots.js?v=a94b816c';
 import { createPackRow, mountPackClearance, packBandRange, packCountText, packSearchEntries, packSlotTip } from './js/ui/pack-row.js?v=65c0f180';
 import { listAnimalFeedOptions } from './js/animals.js?v=2cf490ef';
 import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=2cf490ef';
@@ -583,7 +583,7 @@ import {
   recipeTaskLimit,
   recipeToolInUse,
   pluralizeItem,
-} from './js/making.js?v=6da3230e';
+} from './js/making.js?v=704da2eb';
 import { outputIconsHtml, outputsPhrase, recipeOutputRows } from './js/ui/recipe-outputs.js?v=73e19baf';
 import { MAKE_TOOL_SHEETS } from './js/make-tool-sheets.js?v=6f758e09';
 import { LOW_FUEL_LINE, craftSessionElapsedMs, isLowFuel, isMachineArt, machineArtHtml, packMakeState, playMachineHandOver, setMachineArtFrame } from './js/machine-art.js?v=ac629e13';
@@ -13495,6 +13495,7 @@ function openPickupCount(target, verb, max) {
 
 function pickupDroppedWorldItem(target, requested = Infinity) {
   if (target?.state?.contents?.length || target?.state?.name) return pickupDroppedBag(target);
+  if (isElementClass(target?.state?.classTsid)) return false; // element_red.js 147-149, canPickup {ok: 0}
   // G152 (takeable.js:76-79, 84-93): a full pack refuses the stack; a part that fits is taken, the rest stays down.
   const wantClass = target?.state?.classTsid;
   const stackCount = Math.max(1, Math.floor(Number(target?.state?.count) || 1));

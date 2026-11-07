@@ -231,8 +231,27 @@ export function takesNoSlot(cls) {
   return NO_SLOT_CLASSES.has(cls);
 }
 
-/** The pack itself: anything with a slot (departure: elements may sit here when no pouch has room). */
+/** element_base: an element (element_red.js and its three siblings). */
+export function isElementClass(cls) {
+  return ELEMENT_CLASSES.has(String(cls || ''));
+}
+
+/**
+ * The pack itself takes anything with a slot but elements (bag.js canContain 434-441, bag_generic
+ * and every other bag 589: only a pouch holds them, bag_elemental_pouch.js 651-659). Units no pouch
+ * can take are the magic rock's (where a reward goes, createItemFromFamiliar); the sources that
+ * destroy what doesn't fit ask roomFor first (Austin's ruling, 2026-11-07).
+ */
 export function packAccepts(cls) {
+  return !takesNoSlot(cls) && !ELEMENT_CLASSES.has(cls);
+}
+
+/**
+ * A stack a save already holds in a pack slot stays there. The remake let elements overflow into a
+ * free slot until 2026-11-07: such a stack keeps its count, takes no more, gives first in slot order,
+ * and can be dragged into a pouch or dispersed. A new pouch swallows one (layoutPack phase 2a).
+ */
+export function packKeeps(cls) {
   return !takesNoSlot(cls);
 }
 
@@ -429,7 +448,7 @@ export function layoutPack(inv, prefs = null, opts = {}) {
     if (entry.startsWith('@')) {
       const inst = byKey.get(entry.slice(1));
       if (inst && !inst.placed) putBag(inst);
-    } else if (packAccepts(entry)) {
+    } else if (packKeeps(entry)) {
       keepStack(pack, entry, saved.n.pack?.[i] || 0, 'pack', i);
     }
   });
@@ -461,7 +480,7 @@ export function layoutPack(inv, prefs = null, opts = {}) {
     if (total >= sum) {
       let more = total - sum;
       const rank = (h) => routeRank(h.container, cls);
-      const topUp = [...list].sort((a, b) => rank(a) - rank(b));
+      const topUp = list.filter((h) => h.container !== pack || packAccepts(cls)).sort((a, b) => rank(a) - rank(b));
       for (const h of topUp) {
         if (more <= 0) break;
         const add = Math.min(more, Math.max(0, max - h.slot.count));
@@ -683,6 +702,8 @@ export function moveStack(inv, prefs, from, to, opts = {}) {
     if (destKey !== 'pack') return { ok: false, reason: PACK_COPY.bagInBag, prefs: layout.prefs };
   } else if (destKey !== 'pack') {
     if (!bagAccepts(BAG_DEFS[dest.cls], slot.cls, opts)) return { ok: false, reason: PACK_COPY.wontHold(dest.label), prefs: layout.prefs };
+  } else if (src !== layout.pack && !packAccepts(slot.cls)) {
+    return { ok: false, reason: PACK_COPY.wontHold('Your pack'), prefs: layout.prefs };
   }
   const next = JSON.parse(JSON.stringify(layout.prefs));
   const srcKey = src === layout.pack ? 'pack' : from.container;
@@ -1187,6 +1208,8 @@ export function stackUp(inv, prefs, opts = {}) {
   for (const [cls, list] of refs) {
     if (list.length < 2) continue;
     const max = stackMaxOf(cls, opts.catalog);
+    // A stack the pack still holds from a save empties into the pouches first, never the reverse.
+    if (!packAccepts(cls)) list.sort((a, b) => Number(a.key === 'pack') - Number(b.key === 'pack'));
     let total = list.reduce((a, r) => a + (next.n[r.key][r.index] || 0), 0);
     for (const r of list) {
       const take = Math.min(max, total);

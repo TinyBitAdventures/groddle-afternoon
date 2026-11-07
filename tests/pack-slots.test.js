@@ -20,9 +20,9 @@ import {
   roomFor,
   splitStacks,
   stackMaxOf,
-} from '../public/js/pack-slots.js?v=c91d0ca3';
+} from '../public/js/pack-slots.js?v=a94b816c';
 import { STACKMAX } from '../public/js/pack-slots-data.js?v=800f664c';
-import { bagsFeature, rockChanges } from '../public/js/features/bags-feature.js?v=c40581b7';
+import { bagsFeature, rockChanges } from '../public/js/features/bags-feature.js?v=6aec8098';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const GSJS = join(ROOT, '..', 'glitch-GameServerJS');
@@ -143,7 +143,8 @@ describe('bags', () => {
     const out = layoutPack({ bag_elemental_pouch: 1, element_red: 6000, element_blue: 10 });
     const pouch = Object.values(out.bags)[0];
     assert.deepEqual(pouch.slots.map((s) => `${s.cls}:${s.count}`), ['element_red:5000', 'element_blue:10']);
-    assert.deepEqual(out.pack.slots.filter((s) => s.kind === 'stack').map((s) => `${s.cls}:${s.count}`), ['element_red:1000']);
+    assert.deepEqual(out.pack.slots.filter((s) => s.kind === 'stack'), [], 'the pack holds no new element');
+    assert.equal(out.rock.element_red, 1000);
   });
 
   it('a bag that leaves the pack leaves its contents in it', () => {

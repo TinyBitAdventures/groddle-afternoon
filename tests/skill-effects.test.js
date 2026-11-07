@@ -44,7 +44,7 @@ import {
   craftRecipeBatch,
   craftUnitDurations,
   MACHINE_EXTRA_WAIT_MS,
-} from '../public/js/making.js?v=6da3230e';
+} from '../public/js/making.js?v=704da2eb';
 import { createInventory, countItem } from '../public/js/inventory.js?v=d82f3b00';
 import { createToolConditionState, getToolCondition } from '../public/js/tools.js?v=689d6594';
 
@@ -296,7 +296,7 @@ describe('making skill rules (players/inc_making.js)', () => {
 
   it('the Make panel Smelter and Grinder wear like their packages', () => {
     const tools = createToolConditionState();
-    const inv = createInventory({ smelter: 1, metal_rock: 10, ore_grinder: 1, dullite: 9 });
+    const inv = createInventory({ smelter: 1, metal_rock: 10, ore_grinder: 1, bag_elemental_pouch: 1, dullite: 9 });
     const pc = fresh({ energy: 500 });
     const smelt = getToolCondition(tools, 'smelter').remaining;
     assert.equal(craftRecipeBatch(inv, pc, 'plain_metal', 2, { learned: ['smelting_1'], toolState: tools }).made, 2);

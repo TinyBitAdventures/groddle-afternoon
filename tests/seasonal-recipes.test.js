@@ -1,6 +1,6 @@
 import { test, after } from 'node:test';
 import assert from 'node:assert/strict';
-import { canCraft, setSeasonalRecipeCheck, SEASONAL_RECIPES } from '../public/js/making.js?v=6da3230e';
+import { canCraft, setSeasonalRecipeCheck, SEASONAL_RECIPES } from '../public/js/making.js?v=704da2eb';
 
 after(() => setSeasonalRecipeCheck(null));
 

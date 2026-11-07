@@ -49,8 +49,7 @@
  *
  * Departures (see js/pack-slots.js): every overflow is held by the magic rock
  * (the source put things made from a source on the ground); rock-held stacks
- * are out of the pack but recipes and quests still count them; elements may
- * use pack slots; a bag that leaves the pack some other way (sold, given,
+ * are out of the pack but recipes and quests still count them; a bag that leaves the pack some other way (sold, given,
  * traded) leaves its contents behind, but a dropped bag takes them with it and
  * brings them back when it is picked up, as the source's did (packTakeBag,
  * packGiveBag; player report 2026-11-01); a
@@ -123,7 +122,7 @@ import {
   unitOrder,
   unitPlaces,
   unitRankAt,
-} from '../pack-slots.js?v=c91d0ca3';
+} from '../pack-slots.js?v=a94b816c';
 import { TOOL_CONDITION_CATALOG, moveToolCopy, pickToolCopies, placeToolCopies } from '../tools.js?v=689d6594';
 import { createMinnAccount } from '../minn-account.js?v=b29fae30';
 import { BAG_NAME_MAX, BAG_RENAME_COPY, bagLabel, canRenameBag, cleanBagName, renamedTo } from '../bag-names.js?v=22391c55';

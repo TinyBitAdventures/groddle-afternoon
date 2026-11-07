@@ -373,6 +373,14 @@ export function batchWearUnits(recipe, count) {
   return grinder && !barnacle ? Math.round(n / 3) || 1 : n;
 }
 
+/** ore_grinder.js 336, grand_ol_grinder.js: the refusal without a pouch. */
+export const NEED_POUCH_LINE = 'You need an Elemental Pouch to use this.';
+
+/** A Grinder recipe that makes elements (every one but barnacles). */
+export function grindsElements(recipe) {
+  return isGrinderRecipe(recipe) && (recipe.outputs || []).some((o) => /^element_/.test(String(o.classTsid)));
+}
+
 /** A Grinder or Grand Ol' Grinder recipe (ore_grinder.js / grand_ol_grinder.js onCrushComplete). */
 export function isGrinderRecipe(recipe) {
   return recipe?.tool === 'ore_grinder' || recipe?.tool === 'grand_ol_grinder';
@@ -892,6 +900,7 @@ export function recipeBlockedLine(recipe, check, ctx = {}) {
   if (check.ok) return ctx.energyOk === false ? 'You need more energy!' : '';
   switch (check.reason) {
     case 'season':
+    case 'pouch':
       return check.msg || '';
     case 'tool':
       return `You need ${/^[aeiou]/i.test(check.need) ? 'an' : 'a'} ${check.need} to make this`;
@@ -981,6 +990,10 @@ export function canCraft(inv, recipe, opts = {}) {
   if (toolSkill && Array.isArray(opts.learned) && opts.requireSkill !== false && !opts.learned.includes(toolSkill)) {
     return { ok: false, reason: 'skill', skill: toolSkill };
   }
+  // ore_grinder.js 301, 335-336: grinding rock takes a pouch to carry what it makes; barnacles don't.
+  if (grindsElements(recipe) && Array.isArray(opts.learned) && opts.requireTool !== false && countItem(inv, 'bag_elemental_pouch') < 1) {
+    return { ok: false, reason: 'pouch', msg: NEED_POUCH_LINE };
+  }
   // Quest-taught recipes (learnt 3, making_try_learn_recipe from a quest's
   // onComplete) apply only when the caller passes the completed quest ids.
   if (recipe.taughtBy && Array.isArray(opts.completedQuests) && !opts.completedQuests.includes(recipe.taughtBy)) {
@@ -1043,6 +1056,7 @@ export function craftRecipe(inv, pc, recipeKey, opts = {}) {
         msgs: [`You need the skill ${check.skill} first.`],
       };
     }
+    if (check.reason === 'pouch') return { ok: false, reason: 'pouch', msgs: [check.msg] };
     if (check.reason === 'broken_tool') {
       return {
         ok: false,

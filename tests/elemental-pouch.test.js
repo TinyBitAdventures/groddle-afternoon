@@ -25,10 +25,10 @@ import {
   shakeElement,
   shakePouch,
 } from '../public/js/elemental-pouch.js?v=ceefa97a';
-import { bagsFeature } from '../public/js/features/bags-feature.js?v=c40581b7';
+import { bagsFeature } from '../public/js/features/bags-feature.js?v=6aec8098';
 import { runMoreVerb } from '../public/js/features/item-verbs-more-feature.js?v=30705bb7';
 import { pouchFeature } from '../public/js/features/elemental-pouch-feature.js?v=1eeace34';
-import { FEATURES } from '../public/js/features/index.js?v=5a49bedd';
+import { FEATURES } from '../public/js/features/index.js?v=d93764fc';
 import { ITEM_CATALOG, countItem, createInventory } from '../public/js/inventory.js?v=d82f3b00';
 import { STORE_CATALOG } from '../public/js/store-catalog.js?v=74b56af3';
 import { VENDOR_PROFILES, vendorBuy } from '../public/js/vendor.js?v=70577b0b';
@@ -335,21 +335,12 @@ describe('two pouches: room is each pouch\'s, not one cap against the whole pack
     assert.deepEqual(Object.values(layout.bags).map((b) => b.slots.find((s) => s.cls === 'element_green')?.count).sort((a, b) => a - b), [300, 5000]);
   });
 
-  it('Smash: one full pouch and a free pack slot, the elements take the slot (the pack\'s own rule, as the Grinder\'s)', () => {
+  it('Smash: one full pouch and a free pack slot, the slot takes none: the element is destroyed (the ruling of 2026-11-07)', () => {
     rig({ [POUCH_CLASS]: 1, element_green: 5000, [PIECE]: 1 });
     runMoreVerb(engine, PIECE, 'smash');
-    assert.doesNotMatch(said(engine), /destroyed/);
-    assert.equal(engine.inv.element_green, 5300);
-    assert.equal(bagsFeature.packLayout(engine).pack.slots.find((s) => s.cls === 'element_green')?.count, 300);
-  });
-
-  it('Smash: one free slot is taken once, by the first element that needs it', () => {
-    rig({ [POUCH_CLASS]: 1, element_green: 5000, element_blue: 5000, element_shiny: 5000, element_red: 5000, [PIECE]: 1 });
-    fillPack(1);
-    runMoreVerb(engine, PIECE, 'smash');
-    assert.equal(said(engine), "You smashed A Piece of Street Creator Wood Trophy. 450 Blue Elements were created, but destroyed, because you couldn't carry them. 550 Shiny Elements were created, but destroyed, because you couldn't carry them. You received 300 Green Elements.");
-    assert.deepEqual([engine.inv.element_green, engine.inv.element_blue, engine.inv.element_shiny], [5300, 5000, 5000]);
-    assert.equal(bagsFeature.packLayout(engine).rockStacks, 0);
+    assert.match(said(engine), /^You smashed A Piece of Street Creator Wood Trophy\. 300 Green Elements were created, but destroyed, because you couldn't carry them\./);
+    assert.equal(engine.inv.element_green, 5000);
+    assert.equal(bagsFeature.packLayout(engine).pack.slots.find((s) => s.cls === 'element_green'), undefined);
   });
 
   it('Smash: no room anywhere, all of it is created, but destroyed, and the piece is spent', () => {

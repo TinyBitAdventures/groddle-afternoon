@@ -40,7 +40,7 @@ import {
 } from '../public/js/machine-art.js?v=ac629e13';
 import { MACHINE_IDS } from '../public/js/machines.js?v=7359ceff';
 import { MACHINE_EXTRA_WAIT_MS, machineTank, tankFuel } from '../public/js/machine-rooms.js?v=58f9c192';
-import { craftRecipe, ensureMakingItems, loadRecipeCatalogFromFile } from '../public/js/making.js?v=6da3230e';
+import { craftRecipe, ensureMakingItems, loadRecipeCatalogFromFile } from '../public/js/making.js?v=704da2eb';
 import { platformsScreen } from '../public/js/street-model.js?v=505d8990';
 import { machineRoomsFeature } from '../public/js/features/machine-rooms-feature.js?v=5c56c08f';
 import { machineArtFeature } from '../public/js/features/machine-art-feature.js?v=993bc630';

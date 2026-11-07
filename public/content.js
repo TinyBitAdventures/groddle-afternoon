@@ -82,6 +82,7 @@ import { SET_FREE, setFreeVerbState } from './js/animal-set-free.js?v=3b194fca';
 import { BUTTER_UP, SING_TO, butterUpVerbState, butterUpChicken, singToVerbState, singToButterfly } from './js/animal-flattery.js?v=63001f58';
 import { levelInfoForXp } from './js/progression.js?v=33462eaa';
 import { getGameDayKey } from './js/game-day.js?v=edb00566';
+import { isElementClass } from './js/pack-slots.js?v=a94b816c';
 import { ITEM_CATALOG } from './js/inventory.js?v=d82f3b00';
 import { slugsFromEffects } from './js/speech-slugs.js?v=130338f9';
 import { animalResponseKey, failureResponseKey, trantCareResponseKey, rockResponseKey, verbResponse } from './js/verb-responses.js?v=3ceb8a8c';
@@ -768,10 +769,13 @@ export function getVerbsFor(target, ctx) {
   if (classId === 'dropped_item') {
     const count = Math.max(1, Math.floor(Number(s.count) || 1));
     const itemLabel = s.label || target.label || 'item';
-    add('pickup', 'pick up', {
-      sort: 10,
-      tooltip: `Put ${count > 1 ? `${count} × ` : ''}${itemLabel} in your pack`,
-    });
+    // element_base canPickup returns {ok: 0} (element_red.js 147-149): elements on the ground stay there.
+    if (!isElementClass(s.classTsid)) {
+      add('pickup', 'pick up', {
+        sort: 10,
+        tooltip: `Put ${count > 1 ? `${count} × ` : ''}${itemLabel} in your pack`,
+      });
+    }
     if (s.classTsid === 'stoot_barfield_pullstring_doll') {
       add('pull_string', 'pull string', {
         sort: 20,

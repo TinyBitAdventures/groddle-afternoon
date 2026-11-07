@@ -27,7 +27,7 @@ import {
   loadRecipeCatalogFromFile,
   recipeToolFor,
   recipeToolInUse,
-} from '../public/js/making.js?v=6da3230e';
+} from '../public/js/making.js?v=704da2eb';
 import { ITEM_CATALOG, countItem, createInventory, isToolItem } from '../public/js/inventory.js?v=d82f3b00';
 import {
   GRINDER_TOOLS,
@@ -153,7 +153,7 @@ describe("Grand Ol' Grinder crushes like a Grinder", () => {
   });
 
   it('crush recipes wear the Grand Ol’ Grinder when it is the one in the pack', () => {
-    const inv = createInventory({ grand_ol_grinder: 1, dullite: 3 });
+    const inv = createInventory({ grand_ol_grinder: 1, bag_elemental_pouch: 1, dullite: 3 });
     const toolState = createToolConditionState();
     const pc = { energy: 100, imagination: 0, xp: 0 };
     const r = craftRecipe(inv, pc, 'crush_dullite', { learned: ['refining_1'], toolState });
@@ -165,7 +165,7 @@ describe("Grand Ol' Grinder crushes like a Grinder", () => {
   });
 
   it('a broken Grinder hands the work to the Grand Ol’ Grinder', () => {
-    const inv = createInventory({ ore_grinder: 1, grand_ol_grinder: 1, dullite: 2 });
+    const inv = createInventory({ ore_grinder: 1, grand_ol_grinder: 1, bag_elemental_pouch: 1, dullite: 2 });
     const toolState = createToolConditionState();
     const pc = { energy: 100, imagination: 0, xp: 0 };
     const first = craftRecipe(inv, pc, 'crush_dullite', { learned: ['refining_1'], toolState });
@@ -382,7 +382,7 @@ describe('Grinder overflow and its line (grand_ol_grinder.js onCrushComplete)', 
   };
 
   it('keeps what fits and destroys the rest, with Glitch\'s line', () => {
-    const inv = createInventory({ ore_grinder: 1, dullite: 3, element_red: 4990 });
+    const inv = createInventory({ ore_grinder: 1, bag_elemental_pouch: 1, dullite: 3, element_red: 4990 });
     // The pouch has room for 10 more Red Elements and plenty of Green.
     const room = (cls, n) => (cls === 'element_red' ? Math.min(n, 5000 - countItem(inv, cls)) : n);
     const { units, result } = crushBatch(inv, 'crush_dullite', 3, room);
@@ -427,7 +427,7 @@ describe('Grinder overflow and its line (grand_ol_grinder.js onCrushComplete)', 
   });
 
   it('without a pack check (other callers) everything lands as before', () => {
-    const inv = createInventory({ ore_grinder: 1, dullite: 1 });
+    const inv = createInventory({ ore_grinder: 1, bag_elemental_pouch: 1, dullite: 1 });
     const { units } = crushBatch(inv, 'crush_dullite', 1, undefined);
     assert.deepEqual(units[0].destroyed, {});
     assert.equal(countItem(inv, 'element_red'), 5);
