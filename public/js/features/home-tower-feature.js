@@ -48,6 +48,7 @@
  *   towerWork, towerAutoplay, towerSecrets, towerRock, towerVisited, towerTopY (street).
  */
 
+import { playOverlay } from '../overlays.js?v=ea22d918';
 import { ITEM_CATALOG, countItem, ensureItem, itemIcon } from '../inventory.js?v=d82f3b00';
 import { canUseTool, useToolCondition } from '../tools.js?v=689d6594';
 import { acceptOffer, npcQuestOffers } from '../quest-offers.js?v=114a9551';
@@ -68,7 +69,10 @@ import {
   TOWER_PROTO,
   TOWER_SECRETS_GROUP,
   TOWER_SECRET_CURRANTS,
-  TOWER_SIGN,
+  TOWER_SIGN_KEY,
+  TOWER_SIGN_TEXT_DY,
+  TOWER_SIGN_TEXT_WIDTH,
+  towerSignPoint,
   TOWER_STYLES,
   activeProject,
   applyWorkUnit,
@@ -108,7 +112,7 @@ import {
   towerSecretText,
   towerSpotsFor,
   workCheck,
-} from '../home-tower.js?v=4daa0b96';
+} from '../home-tower.js?v=087df38f';
 import { textureFromUrl } from '../textures.js?v=3149d699';
 import { denseSprite } from '../sprite-dense.js?v=178a711b';
 import { pieceUrl } from '../home-wallpaper.js?v=f1969400';
@@ -244,23 +248,31 @@ function chassisContainer(PIXI, style, extra, config, facingRight = true) {
   return box;
 }
 
-function nameSign(PIXI, name) {
-  // getExtraConfig sign_sd: the user name, upper case, on the scaffolding sign.
+function nameSign(PIXI, name, style, facingRight) {
+  // getExtraConfig (422-443): Tiny Speck's scaffolding, h_flipped with the chassis, and the user
+  // name in upper case 30 px above it. The words read normally on a flipped sign, with their
+  // shadows on the other side (HandleSpecialConfigsCmd.as 437-443).
+  const at = towerSignPoint(style, facingRight);
   const sign = new PIXI.Container();
+  sign.x = at.x;
+  sign.y = at.y;
+  const scaffold = new PIXI.Container();
+  scaffold.scale.x = at.flipped ? -1 : 1;
+  playOverlay(PIXI, TOWER_SIGN_KEY, { layer: scaffold, at: () => ({ x: 0, y: 0 }), wh: 0, durationMs: 0, loop: false, zIndex: 0 });
   const text = new PIXI.Text({ text: name.toUpperCase(), style: {
     fontFamily: 'Trebuchet MS, sans-serif',
     fontSize: 15,
     fontWeight: '700',
     fill: 0xfff4d6,
-    stroke: { color: 0x3b2a1f, width: 3 },
+    align: 'center',
+    wordWrap: true,
+    wordWrapWidth: TOWER_SIGN_TEXT_WIDTH,
+    dropShadow: { color: 0x7c756e, alpha: 1, blur: 0.5, distance: 2, angle: at.flipped ? 0 : Math.PI },
+    stroke: { color: 0x000000, width: 1 },
   } });
   text.anchor.set(0.5);
-  const w = Math.max(90, text.width + 26);
-  const g = new PIXI.Graphics();
-  g.rect(-w / 2 + 10, 0, 6, 40).rect(w / 2 - 16, 0, 6, 40).fill(0x5b3d2b);
-  g.roundRect(-w / 2, -16, w, 30, 6).fill(0x8d6444);
-  g.roundRect(-w / 2 + 3, -13, w - 6, 24, 5).fill(0x6e4a32);
-  sign.addChild(g, text);
+  text.y = TOWER_SIGN_TEXT_DY;
+  sign.addChild(scaffold, text);
   return sign;
 }
 
@@ -282,9 +294,7 @@ function drawExterior(engine, box) {
   engine.setData('towerSpan', `${Math.round(box.x + bounds.l)},${Math.round(box.x + bounds.r)}`);
   if (tower.name) {
     // sign_sd h_flipped with the chassis: mirrored to -delta_x, its text still reads normally.
-    const sign = nameSign(PIXI, tower.name);
-    sign.x = towerFacingX(TOWER_SIGN.dx, tower.facingRight);
-    sign.y = TOWER_SIGN.dy;
+    const sign = nameSign(PIXI, tower.name, tower.style, tower.facingRight);
     box.addChild(sign);
     engine.setData('towerSignX', Math.round(box.x + sign.x));
   } else {
@@ -308,10 +318,7 @@ export function visitorTowerView(engine, towerState, { x, groundY, built }) {
   if (built && towerState?.built) {
     box.addChild(chassisContainer(PIXI, towerState.style, extraFloors(towerState), towerState.config, towerState.facingRight));
     if (towerState.name) {
-      const sign = nameSign(PIXI, towerState.name);
-      sign.x = towerFacingX(TOWER_SIGN.dx, towerState.facingRight);
-      sign.y = TOWER_SIGN.dy;
-      box.addChild(sign);
+      box.addChild(nameSign(PIXI, towerState.name, towerState.style, towerState.facingRight));
     }
   } else {
     box.addChild(protoSprite(PIXI, protoArtState(0)));

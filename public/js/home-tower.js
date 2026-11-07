@@ -435,7 +435,31 @@ export function towerBounds(ops) {
  * sit mirrored at -delta_x but their text still reads left to right
  * (InLocationAnnouncementOverlay scaleX -1 inside the flipped view).
  */
-export const TOWER_SIGN = Object.freeze({ dx: 8, dy: -150 });
+/**
+ * G392: where the scaffolding stands (its bottom centre), from the chassis' own origin. Five chassis
+ * FLAs carry a sign_pt, which wins over getExtraConfig's delta (furniture_tower_chassis.js 419-420,
+ * HandleSpecialConfigsCmd.as 387-389, 422-427); here it is sign_pt less maincontainer_mc, the origin
+ * TOWER_ART is drawn from. The mushroom chassis has none, so it keeps delta 8, -120 from the stage's
+ * bottom centre (stage 408 x 820.35, maincontainer_mc 236.85, 807.05). The name sits 30 px above
+ * (getExtraConfig sign_sd, HandleSpecialConfigsCmd.as 431-433).
+ */
+export const TOWER_SIGN_KEY = 'tower_sign_scaffolding_overlay';
+export const TOWER_SIGN_POINTS = Object.freeze({
+  base: Object.freeze({ dx: 23, dy: -107 }),
+  tree: Object.freeze({ dx: 30.55, dy: -104.5 }),
+  quarry: Object.freeze({ dx: 21, dy: -85.5 }),
+  mushroom: Object.freeze({ dx: -24.85, dy: -106.7 }),
+  spaceship: Object.freeze({ dx: 24.15, dy: -92.9 }),
+  adobe: Object.freeze({ dx: 5.9, dy: -92.6 }),
+});
+export const TOWER_SIGN_TEXT_DY = -30;
+export const TOWER_SIGN_TEXT_WIDTH = 250;
+
+/** The sign's point for a style and facing: x flips with the chassis, the words still read normally. */
+export function towerSignPoint(style, facingRight = true) {
+  const { dx, dy } = TOWER_SIGN_POINTS[style] || TOWER_SIGN_POINTS.base;
+  return { x: towerFacingX(dx, facingRight), y: dy, flipped: facingRight === false };
+}
 /** The street spot the avatar steps out to beside the door (FancyDoor mirrors door_x about the foot). */
 export const TOWER_DOOR_DX = 40;
 

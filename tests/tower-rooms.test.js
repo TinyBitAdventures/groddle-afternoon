@@ -21,7 +21,7 @@ import {
   towerRoomStreet,
   turned,
 } from '../public/js/tower-rooms.js?v=f238eaa9';
-import { inTowerSpot, towerSpotsFor } from '../public/js/home-tower.js?v=4daa0b96';
+import { inTowerSpot, towerSpotsFor } from '../public/js/home-tower.js?v=087df38f';
 import { restockGarden, towerRoomsFeature } from '../public/js/features/tower-rooms-feature.js?v=ac0a49ae';
 import {
   ALL_TOWER_ROOMS,

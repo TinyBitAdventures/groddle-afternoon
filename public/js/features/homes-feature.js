@@ -191,15 +191,15 @@ import {
   quoteYardExpansion,
   removeCultivation,
   towerItem,
-} from '../home-cultivation.js?v=ff17225a';
+} from '../home-cultivation.js?v=c650eed1';
 import { PROTO_DEPLETED_ART } from '../home-proto-art.js?v=9309e9f3';
 import { MOVABLE_FIXTURES, MOVABLE_FIXTURE_IDS, fixtureFits, fixtureText, savedFixtureRx, signpostX } from '../home-street-fixtures.js?v=badcb725';
 import { displayTopOf, itemstackOverlayPoint, overlayAlpha, overlayLifeMs, playPoofIn, trackOverlay } from '../overlay-art.js?v=11b6dd7f';
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=db7c442f';
 import { fadeInNewNear } from '../poof-fade.js?v=54ef2431';
 import { projectApi } from './street-jobs-feature.js?v=03adbad6';
-import { TOWER_CHASSIS, TOWER_CONFIG, TOWER_DOOR_DX, TOWER_GEO, TOWER_PROTO, normalizeTowerState } from '../home-tower.js?v=4daa0b96';
-import { drawTowerElevator, drawTowerExit, towerApi, visitorTowerView } from './home-tower-feature.js?v=e46f9b45';
+import { TOWER_CHASSIS, TOWER_CONFIG, TOWER_DOOR_DX, TOWER_GEO, TOWER_PROTO, normalizeTowerState } from '../home-tower.js?v=087df38f';
+import { drawTowerElevator, drawTowerExit, towerApi, visitorTowerView } from './home-tower-feature.js?v=14a42d43';
 import { pieceUrl, roomPieces, surfaceAt, swatchPiece, wallTargetAt } from '../home-wallpaper.js?v=f1969400';
 import { wantsHiresDecos } from '../deco-hires.js?v=cb905e17';
 import { resourceNodesFeature } from './resource-nodes-feature.js?v=ae8016ec';

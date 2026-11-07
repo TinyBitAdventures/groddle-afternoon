@@ -17,7 +17,7 @@ import { describe, it } from 'node:test';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { HOME_LIMITS } from '../public/js/homes-catalog.js?v=7aa9beb0';
-import { createCultivationState, homeStreetLayout } from '../public/js/home-cultivation.js?v=ff17225a';
+import { createCultivationState, homeStreetLayout } from '../public/js/home-cultivation.js?v=c650eed1';
 import { EXTERIOR_STYLES, streetLook } from '../public/js/home-styles.js?v=f591561f';
 import { NEIGHBOURS, neighbourLayout } from '../public/js/neighbours.js?v=862857f9';
 import { SCENE_STYLES, propPlan } from '../public/js/features/neighbour-scene.js?v=074126e5';
@@ -31,7 +31,7 @@ import {
   streetNearSkip,
   streetTrimSpots,
   towerDoorway,
-} from '../public/js/features/homes-feature.js?v=7e590ce8';
+} from '../public/js/features/homes-feature.js?v=716547ac';
 
 const read = (rel) => readFileSync(join(import.meta.dirname, '..', 'public', 'js', rel), 'utf8');
 const maxLeft = HOME_LIMITS.MAX_FRONTYARD_LEFT_SEGMENTS - HOME_LIMITS.START_FRONTYARD_LEFT_SEGMENTS;

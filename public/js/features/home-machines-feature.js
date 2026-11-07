@@ -77,12 +77,12 @@ import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inv
 import { receiveToolCopy, takeToolCopy } from '../tools.js?v=689d6594';
 import { RECIPE_CATALOG } from '../making.js?v=6da3230e';
 import { getSkillCatalog } from '../content-catalogs.js?v=10b118dd';
-import { createBackYardState, homeStreetLayout, normalizeCultivationState } from '../home-cultivation.js?v=ff17225a';
+import { createBackYardState, homeStreetLayout, normalizeCultivationState } from '../home-cultivation.js?v=c650eed1';
 import { readVisitScene } from '../neighbours-mp.js?v=13a573b0';
 import { saveStore } from '../save-store.js?v=8839ba7b';
 import { textureFromUrl } from '../textures.js?v=3149d699';
 import { createSheetLoader } from '../sprite-sheets.js?v=db7c442f';
-import { STREET_GROUND_Y, homesFeature } from './homes-feature.js?v=7e590ce8';
+import { STREET_GROUND_Y, homesFeature } from './homes-feature.js?v=716547ac';
 
 export { HOME_MACHINES_ID };
 

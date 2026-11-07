@@ -20,7 +20,8 @@ import {
   TOWER_STYLES,
   ELEVATOR_MARK,
   TOWER_DOOR_DX,
-  TOWER_SIGN,
+  TOWER_SIGN_POINTS,
+  towerSignPoint,
   applyWorkUnit,
   flipTower,
   parseTowerFacing,
@@ -60,7 +61,7 @@ import {
   towerSecretText,
   towerSpotsFor,
   workCheck,
-} from '../public/js/home-tower.js?v=4daa0b96';
+} from '../public/js/home-tower.js?v=087df38f';
 import {
   countCultivations,
   createCultivationState,
@@ -69,7 +70,7 @@ import {
   cultivationCost,
   removeCultivation,
   towerItem,
-} from '../public/js/home-cultivation.js?v=ff17225a';
+} from '../public/js/home-cultivation.js?v=c650eed1';
 
 const root = join(import.meta.dirname, '..', 'public');
 const GS = join(import.meta.dirname, '..', '..', 'glitch-GameServerJS');
@@ -480,12 +481,11 @@ describe('Flip (facing_right)', () => {
   });
 
   it('mirrors the sign and the step-out spot, not the sign text', () => {
-    assert.deepEqual({ ...TOWER_SIGN }, { dx: 8, dy: -150 });
-    assert.equal(towerFacingX(TOWER_SIGN.dx, true), 8);
-    assert.equal(towerFacingX(TOWER_SIGN.dx, false), -8);
+    assert.equal(towerSignPoint('adobe', true).x, TOWER_SIGN_POINTS.adobe.dx);
+    assert.equal(towerSignPoint('adobe', false).x, -TOWER_SIGN_POINTS.adobe.dx);
     assert.equal(towerFacingX(TOWER_DOOR_DX, false), -TOWER_DOOR_DX);
     // the sign is a sibling of the chassis container, so only its x changes
-    assert.match(featureSrc, /sign\.x = towerFacingX\(TOWER_SIGN\.dx, tower\.facingRight\)/);
+    assert.match(featureSrc, /sign\.x = at\.x;/);
     assert.match(featureSrc, /arrivalX = Number\.isFinite\(x\) \? x \+ towerFacingX\(TOWER_DOOR_DX, tower\.facingRight\)/);
   });
 
