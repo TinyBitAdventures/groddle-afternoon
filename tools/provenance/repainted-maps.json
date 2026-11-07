@@ -83,6 +83,87 @@
         "pack": "research/zone-art/map-ix (outside git): pack.md, prompt.txt, attach/, drop/, review/"
       }
     },
+    "51": {
+      "hubName": "Uralia",
+      "x1": {
+        "file": "assets/maps/art/bg/uralia.webp",
+        "w": 760,
+        "h": 460,
+        "bytes": 29148,
+        "sha256": "1c9993753b61bc579298e0798c9a2297019f2073e325fa0d7033a353d32c0530"
+      },
+      "x2": {
+        "file": "assets/maps/art/bg/uralia@2x.webp",
+        "w": 1520,
+        "h": 920,
+        "bytes": 90252,
+        "sha256": "73afd4d527b4a508af9b261d893355888b89710be14cff61cf2b27883b12dd18"
+      },
+      "licence": "ai-generated",
+      "author": "Austin Ginder (directed and chose it)",
+      "tool": "GPT Image 2.6 Sunburst in T3 Chat canvas (t3.chat/canvas)",
+      "model": "GPT Image 2.6 Sunburst",
+      "made": "2026-11-06",
+      "chosen": {
+        "by": "Austin Ginder",
+        "on": "2026-11-06",
+        "of": "1 generation, toned down; Austin 2026-11-06: keep going, four per reset, landing each batch"
+      },
+      "prompt": "Paint ONE image: the background painting for an in-game region map of \"Uralia\", a region in a whimsical 2D browser game. Size 1520 x 920 pixels (landscape, exactly this ratio; if only fixed ratios are offered, use 16:10). This is the painted landscape that sits UNDER the game's map interface. The game draws its own street lines, names, buttons and markers on top later, so the painting must contain none of them.\n\nVIEW AND FEEL\nSeen from directly above, like a painted map: not from a side or three-quarter angle. Trees read as small round canopies or small pointed tops with a soft shadow; no trunks showing. Hills, cliffs and slopes read by their light and shadow. Like a hand-painted miniature diorama, quiet and gentle: muted natural colours, soft shadows, a fine even texture over the ground (like felt or fine brush strokes), and only a little scattered detail. Fewer and smaller features is better than more: most of the land is calm open ground, so thin street lines and small labels drawn on top stay easy to read. Storybook, never grim, never photographic, never neon.\n\nWHAT TO PAINT\nOne island of cool teal-green land. Its shape must follow attachment 02 closely (same outline, same position, same proportions), because the game's streets are fixed to those positions (attachment 03).\n- The sea and margins: pale parchment white with faint grey wavy hatching suggesting calm water, all round the island, widest across the top, down the left side and in the bottom-left corner.\n- The coast edge: a raised rim with a dark plum-purple cliff face showing below the teal ground, then a thin sandy-cream line and a soft shadow on the water, like the cut edge of a diorama tile.\n- The ground: smooth, slightly mottled teal and blue-green, soft and moss-like, with gentle hollows.\n- Across the centre and the left half: scattered flat pale lilac-grey stepping stones and low flat rocks, and a few tiny mauve and purple toadstools between them.\n- Right of centre: one dense patch of darker teal-green tall grass or reeds, soft and tufted.\n- The lower right: the land slopes down in a few soft ridges toward the coast.\n- Light: soft cool daylight from the upper left; gentle shadows falling to the lower right.\n\nSTYLE\nMatch attachment 05: Tiny Speck's own painted plants and scenery for this region (soft painterly shapes, gentle shading, no hard black outlines), but much smaller and simpler, as seen on a map from high above.\n\nDO NOT INCLUDE\nNo text, letters, numbers or labels of any kind. No roads, paths, lines, grids or street markings. No circles, buttons, pins, arrows, icons, stars or \"you are here\" markers. No compass, legend, scale bar, border, frame, title or vignette. No people or characters. No UI of any kind.\n\nATTACHMENTS\n01  the original 150 x 91 thumbnail of this region's painting (Tiny Speck, public domain). The colours and the layout to follow.\n02  that thumbnail enlarged to 1520 x 920 with no extra detail. Follow its shapes closely: coastlines, cliffs, water, forest and open ground in the same places and proportions; repaint everything with real detail.\n03  where the game will draw the streets (dark lines) and region exits (yellow circles), at the same 1520 x 920 scale. For placement only: do NOT paint these lines or circles.\n04  a screenshot of how the game shows this map today: a blurry enlargement of the thumbnail with the game's interface drawn on top (street lines, street names, green GO buttons, panel and buttons). It is here only so you can see what the painting is for. Do NOT copy any of the interface; paint only the landscape underneath it.\n05  Tiny Speck's own painted trees, plants and scenery from this region's streets (public domain). The style and palette to match, drawn smaller and simpler.\n\nReturn the single painted landscape image only.\n",
+      "promptNote": "The prompt exactly as given to the model: research/zone-art/tools/prompt-template.txt with this region’s WHAT TO PAINT, written from the 2012 footage frame.",
+      "inputs": [
+        {
+          "n": 1,
+          "file": "01-thumbnail-150x91.jpg",
+          "sha256": "4d4ddccb5d659d2b945f7d70dbf6eb1b2818e3dc461faa54647468502582ce2d",
+          "what": "the region’s own 150 x 91 thumbnail of the lost painting",
+          "source": "Tiny Speck, CC0: glitch-overlays/world_map.fla LIBRARY/z_hub_maps_small/sm_uralia.jpg (byte for byte public/assets/maps/art/thumbs/sm_uralia.jpg)"
+        },
+        {
+          "n": 2,
+          "file": "02-thumbnail-enlarged-1520x920.png",
+          "sha256": "3a3e5e75bed1ead3b9a37def66504a8425ac9ae812d0c0e465850a853073b698",
+          "what": "input 1 enlarged to 1520 x 920 (Lanczos), nothing added: the coastline and colour guide",
+          "source": "made from input 1, CC0"
+        },
+        {
+          "n": 3,
+          "file": "03-street-layout-1520x920.png",
+          "sha256": "41e25dea90f694f204436c5c46ef019637a07d2dff709973766152bcc6c3bb76",
+          "what": "where the map draws the 4 visible streets (dark lines) and 4 exits (yellow circles), at 2x",
+          "source": "drawn from Tiny Speck’s CC0 map data (public/assets/maps/hubs/hub-51.json, from GSJS inc_data_maps_prod.js)"
+        },
+        {
+          "n": 4,
+          "file": "04-our-map-window-with-ui.png",
+          "sha256": "b1cb0a34f08b3be3d5e2092c7aa85c3d4357d324200bbc12eaf4bd5cf03f263d",
+          "what": "the remake’s own map window at 2x (its UI over the enlarged thumbnail), so the model saw what the painting is for; the prompt says to copy none of the UI",
+          "source": "our own render (Groddle Afternoon UI and the CC0 thumbnail)"
+        },
+        {
+          "n": 5,
+          "file": "05-style-cc0-decos.png",
+          "sha256": "70e87249024c4adddfd6531afa91029b59b3b281cda746bcaf072bd6a2b2aa00",
+          "what": "a sheet of 18 decos Tiny Speck painted this region’s streets with (the most used trees, plants and scenery): the style and palette",
+          "source": "Tiny Speck decos, CC0"
+        }
+      ],
+      "references": [
+        "A player’s capture of the original Uralia map window (Glitch Strategy wiki): reference only, never given to the model and never in the repo",
+        "A frame of the original painting from the 2012 video \"tour: The Map of Ur\" (YouTube bXxXB6GUoMU at 31.5 s): reference only, never given to the model and never in the repo; the prompt describes its composition in words"
+      ],
+      "source": {
+        "generated": "2048 x 1152 (16:9, High 2K; no 16:10 option), centre-cropped to 1520 x 920: drop/uralia-1.png",
+        "dropSha256": "f760cfb3f4a0a857b0519eab98fe4faa328c9526e9062cfe71a33e2dbcfa382f",
+        "toning": "magick uralia-1.png -modulate 100,88,98 master.png (light, with no olive wash: the standard toning turned this water grey-green, away from the original teal)",
+        "masterSha256": "435c05a4d8f644cad6ca1e5373c7d0a721246590f9ceedc9983dd6d28495c82d",
+        "encode": {
+          "x1": "magick master.png -filter Lanczos -resize 760x460! -quality 82 -define webp:method=6 uralia.webp",
+          "x2": "magick master.png -quality 82 -define webp:method=6 uralia@2x.webp"
+        },
+        "pack": "research/zone-art/map-uralia (outside git): pack.md, prompt.txt, attach/, drop/, review/"
+      }
+    },
     "56": {
       "hubName": "Groddle Forest",
       "x1": {
@@ -1132,6 +1213,87 @@
           "x2": "magick master.png -quality 82 -define webp:method=6 choru@2x.webp"
         },
         "pack": "research/zone-art/map-choru (outside git): pack.md, prompt.txt, attach/, drop/, review/"
+      }
+    },
+    "92": {
+      "hubName": "Tamila",
+      "x1": {
+        "file": "assets/maps/art/bg/tamila.webp",
+        "w": 760,
+        "h": 460,
+        "bytes": 37946,
+        "sha256": "da66be874df5eedf5e08d2027d089a5f80977ac4455ebc848e868f249c5dc7d8"
+      },
+      "x2": {
+        "file": "assets/maps/art/bg/tamila@2x.webp",
+        "w": 1520,
+        "h": 920,
+        "bytes": 99194,
+        "sha256": "37309e4a4bda594d6c95068c5de2f79060e3dabc5ee13485d759c50547e0eb67"
+      },
+      "licence": "ai-generated",
+      "author": "Austin Ginder (directed and chose it)",
+      "tool": "GPT Image 2.6 Flare in T3 Chat canvas (t3.chat/canvas)",
+      "model": "GPT Image 2.6 Flare",
+      "made": "2026-11-06",
+      "chosen": {
+        "by": "Austin Ginder",
+        "on": "2026-11-06",
+        "of": "1 generation, toned down; Austin 2026-11-06: keep going, four per reset, landing each batch"
+      },
+      "prompt": "Paint ONE image: the background painting for an in-game region map of \"Tamila\", a region in a whimsical 2D browser game. Size 1520 x 920 pixels (landscape, exactly this ratio; if only fixed ratios are offered, use 16:10). This is the painted landscape that sits UNDER the game's map interface. The game draws its own street lines, names, buttons and markers on top later, so the painting must contain none of them.\n\nVIEW AND FEEL\nSeen from directly above, like a painted map: not from a side or three-quarter angle. Trees read as small round canopies or small pointed tops with a soft shadow; no trunks showing. Hills, cliffs and slopes read by their light and shadow. Like a hand-painted miniature diorama, quiet and gentle: muted natural colours, soft shadows, a fine even texture over the ground (like felt or fine brush strokes), and only a little scattered detail. Fewer and smaller features is better than more: most of the land is calm open ground, so thin street lines and small labels drawn on top stay easy to read. Storybook, never grim, never photographic, never neon.\n\nWHAT TO PAINT\nOne meeting of a sandy plateau and a tall-grass lowland, filling the whole picture edge to edge (no sea). Its shapes must follow attachment 02 closely (same positions, same proportions), because the game's streets are fixed to those positions (attachment 03).\n- The left side (about two fifths): a raised plateau of pale straw-yellow sandy ground, with small olive shrubs, a few small pointed conifers and grey rocks thinly scattered, more rocks near the bottom-left corner.\n- The plateau's edge: a thin brown earthen bank with a soft shadow, curving from the top centre down to the bottom-left corner.\n- The centre and right: a lowland of tall grass and reeds in muted moss green and olive, seen from above as soft raised blocks of dense grass separated by paler, lower grassy lanes.\n- The top-right corner: a rough outcrop of pale grey-tan rock with soft shadowed folds, coming down the right edge to about the middle.\n- Light: soft warm daylight from the upper left; gentle shadows falling to the lower right.\n\nSTYLE\nMatch attachment 05: Tiny Speck's own painted plants and scenery for this region (soft painterly shapes, gentle shading, no hard black outlines), but much smaller and simpler, as seen on a map from high above.\n\nDO NOT INCLUDE\nNo text, letters, numbers or labels of any kind. No roads, paths, lines, grids or street markings. No circles, buttons, pins, arrows, icons, stars or \"you are here\" markers. No compass, legend, scale bar, border, frame, title or vignette. No people or characters. No UI of any kind.\n\nATTACHMENTS\n01  the original 150 x 91 thumbnail of this region's painting (Tiny Speck, public domain). The colours and the layout to follow.\n02  that thumbnail enlarged to 1520 x 920 with no extra detail. Follow its shapes closely: coastlines, cliffs, water, forest and open ground in the same places and proportions; repaint everything with real detail.\n03  where the game will draw the streets (dark lines) and region exits (yellow circles), at the same 1520 x 920 scale. For placement only: do NOT paint these lines or circles.\n04  a screenshot of how the game shows this map today: a blurry enlargement of the thumbnail with the game's interface drawn on top (street lines, street names, green GO buttons, panel and buttons). It is here only so you can see what the painting is for. Do NOT copy any of the interface; paint only the landscape underneath it.\n05  Tiny Speck's own painted trees, plants and scenery from this region's streets (public domain). The style and palette to match, drawn smaller and simpler.\n\nReturn the single painted landscape image only.\n",
+      "promptNote": "The prompt exactly as given to the model: research/zone-art/tools/prompt-template.txt with this region’s WHAT TO PAINT, written from the 2012 footage frame.",
+      "inputs": [
+        {
+          "n": 1,
+          "file": "01-thumbnail-150x91.jpg",
+          "sha256": "25b5f2baa52d017929a5f4d8d3dab12213c56fa2ebe8bd775446c08f8278f6d2",
+          "what": "the region’s own 150 x 91 thumbnail of the lost painting",
+          "source": "Tiny Speck, CC0: glitch-overlays/world_map.fla LIBRARY/z_hub_maps_small/sm_tamila.jpg (byte for byte public/assets/maps/art/thumbs/sm_tamila.jpg)"
+        },
+        {
+          "n": 2,
+          "file": "02-thumbnail-enlarged-1520x920.png",
+          "sha256": "2d3aebfe909494732df3ca73519b8a4ccee4a232f8c8686f0f943bbb8a87914c",
+          "what": "input 1 enlarged to 1520 x 920 (Lanczos), nothing added: the coastline and colour guide",
+          "source": "made from input 1, CC0"
+        },
+        {
+          "n": 3,
+          "file": "03-street-layout-1520x920.png",
+          "sha256": "7358b52f9a5b2bd6de2f643df5bd5d7448ec28849e57e13457ba8089b30dd63b",
+          "what": "where the map draws the 31 visible streets (dark lines) and 5 exits (yellow circles), at 2x",
+          "source": "drawn from Tiny Speck’s CC0 map data (public/assets/maps/hubs/hub-92.json, from GSJS inc_data_maps_prod.js)"
+        },
+        {
+          "n": 4,
+          "file": "04-our-map-window-with-ui.png",
+          "sha256": "f3820a5afbc39f3e26f23888cd97ae30061a8fb7e654f702231c16677f6346dc",
+          "what": "the remake’s own map window at 2x (its UI over the enlarged thumbnail), so the model saw what the painting is for; the prompt says to copy none of the UI",
+          "source": "our own render (Groddle Afternoon UI and the CC0 thumbnail)"
+        },
+        {
+          "n": 5,
+          "file": "05-style-cc0-decos.png",
+          "sha256": "b10e9d03a753fd1fd0a148bdaf06c515237f8cfd8f0da4e4771456aaabb82288",
+          "what": "a sheet of 18 decos Tiny Speck painted this region’s streets with (the most used trees, plants and scenery): the style and palette",
+          "source": "Tiny Speck decos, CC0"
+        }
+      ],
+      "references": [
+        "A player’s capture of the original Tamila map window (Glitch Strategy wiki): reference only, never given to the model and never in the repo",
+        "A frame of the original painting from the 2012 video \"tour: The Map of Ur\" (YouTube bXxXB6GUoMU at 294.5 s): reference only, never given to the model and never in the repo; the prompt describes its composition in words"
+      ],
+      "source": {
+        "generated": "2048 x 1152 (16:9, High 2K; no 16:10 option), centre-cropped to 1520 x 920: drop/tamila-1.png",
+        "dropSha256": "77984fb24533af6e4658598b88e8cb13fff925153fee5bf2138c832378244ef7",
+        "toning": "magick tamila-1.png -modulate 100,62,98 -fill #8a8a5a -colorize 8% master.png (calmer, toward the original’s muted olive)",
+        "masterSha256": "68a012618b978312da543a80cb8f37ce1b32e61c2f9cc2bf7a638028acbf4ebe",
+        "encode": {
+          "x1": "magick master.png -filter Lanczos -resize 760x460! -quality 82 -define webp:method=6 tamila.webp",
+          "x2": "magick master.png -quality 82 -define webp:method=6 tamila@2x.webp"
+        },
+        "pack": "research/zone-art/map-tamila (outside git): pack.md, prompt.txt, attach/, drop/, review/"
       }
     },
     "93": {

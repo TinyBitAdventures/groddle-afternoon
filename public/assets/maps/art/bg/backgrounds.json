@@ -87,10 +87,11 @@
       "thumbMatches": true,
       "x1": "assets/maps/art/bg/uralia.webp",
       "x2": "assets/maps/art/bg/uralia@2x.webp",
-      "x1Bytes": 11022,
-      "x1Sha256": "953ee853c0f94979c9b35754b991617b4e1f668e06b9409c4006dc15f8a65aaa",
-      "x2Bytes": 23250,
-      "x2Sha256": "f483efa8630a904034281c1f904041b461f2d31171dd0f4ed5b8e4fd65ac4a56"
+      "repainted": "tools/provenance/repainted-maps.json",
+      "x1Bytes": 29148,
+      "x1Sha256": "1c9993753b61bc579298e0798c9a2297019f2073e325fa0d7033a353d32c0530",
+      "x2Bytes": 90252,
+      "x2Sha256": "73afd4d527b4a508af9b261d893355888b89710be14cff61cf2b27883b12dd18"
     },
     "56": {
       "hubName": "Groddle Forest",
@@ -325,10 +326,11 @@
       "thumbMatches": true,
       "x1": "assets/maps/art/bg/tamila.webp",
       "x2": "assets/maps/art/bg/tamila@2x.webp",
-      "x1Bytes": 12736,
-      "x1Sha256": "fc91ad6494603a281905c60e73c479c64c2298a34db4b116346e52583e235017",
-      "x2Bytes": 26632,
-      "x2Sha256": "aa9594d1c88154a326300ed40078f18c174430c8334c770bac6531f211a5f090"
+      "repainted": "tools/provenance/repainted-maps.json",
+      "x1Bytes": 37946,
+      "x1Sha256": "da66be874df5eedf5e08d2027d089a5f80977ac4455ebc848e868f249c5dc7d8",
+      "x2Bytes": 99194,
+      "x2Sha256": "37309e4a4bda594d6c95068c5de2f79060e3dabc5ee13485d759c50547e0eb67"
     },
     "93": {
       "hubName": "Salatu",
