@@ -381,7 +381,7 @@ describe('the site routes (groddle-afternoon-site AdminConsole, AdminConsolePage
   it('the theme serves the console\'s script and styles, keyed', () => {
     assert.ok(existsSync(sitePath('console/console.js')));
     assert.ok(existsSync(sitePath('console/console.css')));
-    assert.match(readFileSync(sitePath('src/AdminConsolePage.php'), 'utf8'), /ASSET_KEY = 'community-1'/);
+    assert.match(readFileSync(sitePath('src/AdminConsolePage.php'), 'utf8'), /ASSET_KEY = 'community-2'/);
     const css = readFileSync(sitePath('console/console.css'), 'utf8');
     for (const token of ['--surface', '--border', '--fg', '--muted', '--track', '--row-line']) assert.match(css, new RegExp(`var\\(${token}\\)`), token);
   });
@@ -499,7 +499,8 @@ describe('the chat log (Austin 2026-10-31: chat written down for spam and abuse 
     assert.match(readFileSync(serverPath('hub.go'), 'utf8'), /h\.logChatLocked\("local", cl\.street, cl, text, "slow_down", nil\)/);
     const chans = readFileSync(serverPath('channels.go'), 'utf8');
     assert.match(chans, /logChatLocked\("channel", room, cl, text, "silenced", nil\)/);
-    assert.match(chans, /logChatLocked\("channel", room, cl, text, "", nil\)/);
+    // A delivered channel line is logged with its lid (Austin 2026-11-07: a deletion finds it, chatdelete.go).
+    assert.match(chans, /logChatLineLocked\("channel", room, id, cl\.Name\(\), text, "", nil, line\.Lid\)/);
     assert.match(readFileSync(serverPath('party.go'), 'utf8'), /logChatLocked\("party", p\.chatlogID\(cl\.ID\(\), m\.h\.Now\(\)\), cl, text, "", to\)/);
     assert.match(readFileSync(serverPath('deploy/groddle-realtime.service'), 'utf8'), /-chatlog-dir \/var\/lib\/groddle-realtime\/chatlog/);
     for (const t of ['TestChatlogCallIsOnlyTheSitesSignedPost', 'TestChatlogAFullQueueDropsLinesAndNeverHoldsUpChat', 'TestChatlogPrunesOldDaysAtStartAndOnANewDay']) assert.match(readFileSync(serverPath('chatlog_test.go'), 'utf8'), new RegExp(`func ${t}\\(`), t);

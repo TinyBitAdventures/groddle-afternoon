@@ -28,8 +28,8 @@ import {
   sameWords,
 } from '../public/js/boards-mp.js?v=36c35534';
 import { BOARD_PINS, NOTE_LIMITS, REMAKE_NOTE_BYLINE, REMAKE_NOTE_MARKER, isRemakeNote, noteContent, normalizeNote, noteWriteVerb } from '../public/js/street-furniture.js?v=d5716ef6';
-import { boardsMpFeature, createBoardsSession } from '../public/js/features/boards-mp-feature.js?v=ba5ba15d';
-import { carriedNoteList, giveCarriedNote, streetFurnitureFeature } from '../public/js/features/street-furniture-feature.js?v=807e5cd0';
+import { boardsMpFeature, createBoardsSession } from '../public/js/features/boards-mp-feature.js?v=8689ae18';
+import { carriedNoteList, giveCarriedNote, streetFurnitureFeature } from '../public/js/features/street-furniture-feature.js?v=d59e2a7a';
 import { boardsData } from '../tools/build-realtime-boards.mjs';
 import { HAS_SITE, SITE_DIR, serverPath, sitePath, skipWithoutServer, skipWithoutSite } from '../tools/repos.mjs';
 
@@ -431,7 +431,7 @@ describe('the console page\'s Boards tab (console/console.js)', { skip: skipWith
     const page = readFileSync(sitePath('src/AdminConsolePage.php'), 'utf8');
     assert.match(page, /data-console-tab="boards">Boards <span/);
     for (const hook of ['data-console-tabpanel="boards"', 'data-console-board-filter', 'data-console-boards hidden>', 'data-console-boards-empty', 'data-console-boards-count', 'data-console-boards-reported']) assert.ok(page.includes(hook), hook);
-    assert.match(page, /ASSET_KEY = 'community-1'/);
+    assert.match(page, /ASSET_KEY = 'community-2'/);
     const src = readFileSync(sitePath('console/console.js'), 'utf8');
     const rm = src.slice(src.indexOf('function removeBoardNote('), src.indexOf("$('[data-console-board-filter]')"));
     assert.ok(rm.indexOf('dialog(COPY.boardRemoveConfirm(') >= 0 && rm.indexOf('dialog(COPY.boardRemoveConfirm(') < rm.indexOf("api.call('admin/board_remove'"), 'the call only from the confirm');

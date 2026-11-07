@@ -195,6 +195,16 @@ export function shownName(line) {
   return line?.web ? `${line.name} ${WEB_TAG}` : String(line?.name || '');
 }
 
+/**
+ * PURE: a chat's lines without the one an administrator deleted (groddle-afternoon-server
+ * chatdelete.go chat_delete, by its lid); the same array when it was not there.
+ */
+export function dropLid(lines, lid) {
+  const n = Math.floor(Number(lid)) || 0;
+  if (!n || !lines.some((l) => l.lid === n)) return lines;
+  return lines.filter((l) => l.lid !== n);
+}
+
 /** Appends to a tab's lines, keeping the last CHAT_LINES. */
 export function pushLine(lines, line, max = CHAT_LINES) {
   lines.push(line);

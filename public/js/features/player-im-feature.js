@@ -45,7 +45,7 @@ import {
   normalState,
   refusalText,
 } from '../player-im.js?v=23463a96';
-import { EARLIER_TEXT } from '../groups.js?v=4c4c8d76';
+import { EARLIER_TEXT } from '../groups.js?v=07640c71';
 import { imKey } from '../chat-reactions.js?v=d65d555b';
 import { createMinnAccount } from '../minn-account.js?v=b29fae30';
 

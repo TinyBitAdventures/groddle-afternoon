@@ -35,9 +35,13 @@
  * - Blocking: a blocked player's lines are dropped here, as the original's
  *   client dropped an ignored player's (RightSideManager.as:218-223),
  *   through buddies-feature's realtimeHidden.
+ * - A channel line an administrator deleted (the website's Delete line;
+ *   groddle-afternoon-server chatdelete.go chat_deleted) goes from its chat at
+ *   once; a deleted thread reply is chat-threads-feature's. The remake's own:
+ *   Glitch's channels had no deletion.
  *
  * QA: canvas data groupsCount, groupsTab, groupsOpen (chats open),
- * groupsUnread (chat:n,...), groupsLastSaid (chat|name|text), groupsPanel;
+ * groupsUnread (chat:n,...), groupsLastSaid (chat|name|text), groupsPanel, groupsDeleted (chat:lid);
  * window.groddleGroups.
  */
 
@@ -52,6 +56,7 @@ import {
   WATCH_REFRESH_MS,
   chatLabel,
   chatLine,
+  dropLid,
   groupChannel,
   groupIdOf,
   groupNameProblem,
@@ -71,7 +76,7 @@ import {
   shownName,
   tabOrder,
   writeMemory,
-} from '../groups.js?v=4c4c8d76';
+} from '../groups.js?v=07640c71';
 import { appendLinkedText } from '../chat-links.js?v=b717fac7';
 import { lineKey as reactKey } from '../chat-reactions.js?v=d65d555b';
 
@@ -864,6 +869,18 @@ function createSession(engine, client) {
     if (ch === tab) renderBox();
     renderTabs();
     social?.push(ch, drawerLine(line));
+  });
+  client.on('msg:chat_deleted', (msg) => {
+    const ch = String(msg.channel || '');
+    const chat = chats.get(ch);
+    // A reply is its thread's (chat-threads-feature), never a line of the chat.
+    if (!chat || Number(msg.parent) > 0) return;
+    const kept = dropLid(chat.lines, msg.lid);
+    if (kept === chat.lines) return;
+    chat.lines = kept;
+    engine.setData?.('groupsDeleted', `${ch}:${Math.floor(Number(msg.lid))}`);
+    if (ch === tab) renderBox();
+    social?.setLines(ch, chat.lines.map(drawerLine));
   });
   client.on('msg:channel_note', (msg) => addNote(String(msg.channel || ''), String(msg.text || '')));
   client.on('msg:party', (msg) => {

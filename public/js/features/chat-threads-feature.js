@@ -15,13 +15,15 @@
  * - a reply's reactions are a line's (chat-reactions-feature: reacted by its lid; here a thread's
  *   replies bring their own).
  * - Blocks: a reply by a player you block is never shown (buddies-feature realtimeHidden).
+ * - A reply an administrator deleted (chat_deleted with "parent", groddle-afternoon-server
+ *   chatdelete.go) leaves its thread and the count goes down; a thread open on a deleted line closes.
  *
  * Multiplayer only: in solo this feature does nothing (the drawer has no threads).
  *
  * QA: canvas data threadLast (the last thing that happened); window.groddleThreads.
  */
 import { THREAD_TEXT, replyFrame, siteKey, threadTarget } from '../chat-threads.js?v=42954351';
-import { chatLine, shownName } from '../groups.js?v=4c4c8d76';
+import { chatLine, shownName } from '../groups.js?v=07640c71';
 import { drawerLine, normalLine } from '../player-im.js?v=23463a96';
 import { imKey, lineKey, normalReactions } from '../chat-reactions.js?v=d65d555b';
 import { createMinnAccount } from '../minn-account.js?v=b29fae30';
@@ -35,6 +37,15 @@ export function replyLine(raw, { me = 0, hidden = () => false } = {}) {
   const l = chatLine(raw);
   if (!l || (l.id !== me && hidden(l.id))) return null;
   return { name: shownName(l), text: l.text, mine: l.id === me, at: l.at || Date.now(), playerId: l.id, rk: lineKey(l.lid) };
+}
+
+/**
+ * PURE: a thread's count after one of its replies was deleted: the server's n and last when it sent
+ * them (chatdelete.go), else one fewer than the thread had.
+ */
+export function deletedSummary(had, m) {
+  if (m && m.n !== undefined) return { n: Math.max(0, Math.floor(Number(m.n)) || 0), last: m.last || null };
+  return { n: Math.max(0, (Number(had?.n) || 0) - 1), last: had?.last || null };
 }
 
 function createSession(engine, client) {
@@ -141,6 +152,20 @@ function createSession(engine, client) {
   });
   client.on('msg:channel_joined', (m) => {
     for (const l of Array.isArray(m?.history) ? m.history : []) if (l?.th) th.summary(lineKey(l.lid), l.th);
+  });
+  client.on('msg:chat_deleted', (m) => {
+    const lid = Math.floor(Number(m?.lid)) || 0;
+    const parent = Math.floor(Number(m?.parent)) || 0;
+    if (!lid) return;
+    if (parent) {
+      const tk = lineKey(parent);
+      const st = th.get(tk);
+      if (st) {
+        th.setReplies(tk, st.replies.filter((r) => r.rk !== lineKey(lid)), { loaded: st.loaded });
+        th.summary(tk, deletedSummary(st, m));
+      }
+    } else if (th.current?.tk === lineKey(lid)) th.close();
+    note(`deleted:${lineKey(lid)}`);
   });
   client.on('error', ({ code, message }) => {
     if (code !== 'thread') return;
