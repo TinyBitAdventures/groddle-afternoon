@@ -8,6 +8,10 @@
  * - items/catalog_stores.js (store 17)
  */
 
+import { applyQuestProgress } from './quests.js?v=c8d9d0a4';
+import { unlockAchievement } from './achievements.js?v=f8ccfd34';
+import { countItem, removeItem } from './inventory.js?v=d82f3b00';
+
 export const LEGALIZE_QUEST_ID = 'card_carrying_qualification';
 export const LEGALIZE_BACK_ALLEY_TSID = 'LIF177DTS6T1KFG';
 export const LEGALIZE_GRANGE_TSID = 'LLI32G3NUTD100I';
@@ -264,15 +268,91 @@ export function purchaseQualification(state, currants, now = Date.now()) {
   };
 }
 
-export function activateQualification(state, hasCard = true, now = Date.now()) {
-  if (!state) return { ok: false, reason: 'missing_state', state };
-  if (state.activated) return { ok: false, reason: 'already_activated', state };
-  if (!state.cardOwned || !hasCard) return { ok: false, reason: 'card_missing', state };
-  state.cardOwned = false;
-  state.activated = true;
-  state.stage = 'complete';
-  state.completedAt = Math.max(0, Number(now) || Date.now());
+/** items/card_carrying_qualification.js 106-108: the activate verb's disabled reason. */
+export const LEGALIZE_ALREADY_HAVE = 'You already have this.';
+
+/**
+ * The pack's Activate (items/card_carrying_qualification.js 95-110): ok_states
+ * in_pack, enabled for anyone without the card_carrying_qualification badge.
+ * No quest is needed and it does not matter where the card came from (any
+ * Bureaucratic Hall, another player, an auction).
+ */
+export function qualificationVerb({ hasBadge = false } = {}) {
+  return hasBadge
+    ? { usable: false, reason: LEGALIZE_ALREADY_HAVE }
+    : { usable: true, reason: '' };
+}
+
+/**
+ * Activating a card from the pack (items/card_carrying_qualification.js
+ * 129-141: grant the badge, delete one card, set ccq_completed). `state` is
+ * the Legalize It application when there is one (null otherwise); it is
+ * marked activated and complete so the route is never offered again.
+ */
+export function activateQualification(state, hasCard = true, now = Date.now(), { hasBadge = false } = {}) {
+  if (hasBadge) return { ok: false, reason: 'already_activated', state };
+  if (!hasCard) return { ok: false, reason: 'card_missing', state };
+  if (state) {
+    state.cardOwned = false;
+    state.activated = true;
+    state.stage = 'complete';
+    state.completedAt = Math.max(0, Number(now) || Date.now());
+  }
   return { ok: true, reason: 'activated', reward: LEGALIZE_REWARD, state };
+}
+
+const hasCardBadge = (achieveState) => (achieveState?.unlocked || []).includes(LEGALIZE_CARD_ID);
+const legalizeUpdate = (updates) => updates.find((u) => u.classTsid === LEGALIZE_QUEST_ID && u.completed) || null;
+
+/**
+ * The pack's Activate on a Card-Carrying Qualification, wherever the card
+ * came from (items/card_carrying_qualification.js 129-141): the badge, one
+ * card used up (any others stay in the pack: they are tradeable), and
+ * ccq_completed. With Legalize It active, the card counts as got too (a card
+ * from a regular hall never set that step), so the quest completes.
+ * Returns { ok, reason, msg, badge, updates, questCompleted, state }.
+ */
+export function activateCardFromPack({ questState, inv, achieveState, pc = null, now = Date.now() } = {}) {
+  const questActive = Boolean(questState?.active?.[LEGALIZE_QUEST_ID]);
+  const legalize = questActive ? ensureLegalizeState(questState) : questState?.story?.legalize || null;
+  const result = activateQualification(legalize, countItem(inv, LEGALIZE_CARD_ID) > 0, now, {
+    hasBadge: hasCardBadge(achieveState),
+  });
+  if (!result.ok) {
+    return {
+      ...result,
+      msg: result.reason === 'already_activated' ? LEGALIZE_ALREADY_HAVE : 'The qualification is missing.',
+      updates: [],
+      questCompleted: false,
+    };
+  }
+  removeItem(inv, LEGALIZE_CARD_ID, 1);
+  const badge = unlockAchievement(achieveState, LEGALIZE_CARD_ID, pc);
+  if (questActive) applyQuestProgress(questState, 'acquired_card_carrying_qualification', 1, pc);
+  const updates = applyQuestProgress(questState, 'ccq_completed', 1, pc);
+  return { ...result, msg: '', badge, updates, questCompleted: Boolean(legalizeUpdate(updates)) };
+}
+
+/**
+ * Taking Legalize It (quests/card_carrying_qualification.js onAccepted
+ * 65-74): a card already in the pack counts as got, and the badge already
+ * earned completes the quest at once, with no trip to the Back Alley.
+ * Returns { completed, updates } (the completion updates to announce).
+ */
+export function legalizeOnAccepted({ questState, inv, achieveState, pc = null, now = Date.now() } = {}) {
+  if (!questState?.active?.[LEGALIZE_QUEST_ID]) return { completed: false, updates: [] };
+  const hasBadge = hasCardBadge(achieveState);
+  const updates = [];
+  if (hasBadge || countItem(inv, LEGALIZE_CARD_ID) > 0) {
+    updates.push(...applyQuestProgress(questState, 'acquired_card_carrying_qualification', 1, pc));
+  }
+  if (hasBadge) {
+    const state = ensureLegalizeState(questState);
+    Object.assign(state, { cardOwned: false, activated: true, stage: 'complete', completedAt: Math.max(0, Number(now) || Date.now()) });
+    updates.push(...applyQuestProgress(questState, 'ccq_completed', 1, pc));
+  }
+  const done = updates.filter((u) => u.completed);
+  return { completed: Boolean(legalizeUpdate(done)), updates: done };
 }
 
 export function legalizeObjective(state) {

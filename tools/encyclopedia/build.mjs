@@ -319,7 +319,10 @@ function questPage(e, P, { linkFor, backOf, uniqBy, info, d }) {
   if (q.instanceRoom || q.instanced) where.push('This quest takes you to a place of its own: take it, and the game sends you there.');
   const back2 = uniqBy(q.endNpcs.map(keyOrStub).filter(Boolean), (x) => x);
   if (back2.length) { where.push(`Hand it in to ${andList(back2.map(name))}.`); back2.forEach((k) => whereTiles.push(P.tile(k, { sub: 'hand it in' }))); }
-  else if (q.familiarTurnin) where.push('Hand it in to your Magic Rock, wherever you are.');
+  // familiar_turnin (inc_quests.js quests_familiar_turnin): the Magic Rock takes what the steps hand in;
+  // a quest with nothing to hand in (Legalize It's card is activated from the pack) just ends where you are.
+  else if (q.familiarTurnin && q.requirements.some((r) => r.type === 'item' && r.remove)) where.push('Hand it in to your Magic Rock, wherever you are.');
+  else if (q.familiarTurnin) where.push('Nothing to hand in: when the last step is done, your Magic Rock comes to you with the end of the quest, wherever you are.');
 
   // Rewards.
   const rw = q.rewards || {};

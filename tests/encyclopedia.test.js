@@ -67,7 +67,15 @@ describe('encyclopedia', () => {
     assert.match(html, /<ol class="ency-steps"><li><p class="ency-step-title">Collect Meat<\/p>/);
     assert.match(html, /href="\.\.\/\.\.\/\.\.\/encyclopedia\/items\/meat\/"><span class="ency-tile-pic">[\s\S]*?<span class="ency-n">×13<\/span>/);
     assert.match(html, /within 4 h: a countdown runs/);
-    assert.match(html, /Hand it in to your Magic Rock/);
+    // A counter quest hands nothing in: the Magic Rock brings the end of the quest (familiar_turnin).
+    assert.match(html, /Nothing to hand in: when the last step is done, your Magic Rock comes to you/);
+    assert.doesNotMatch(html, /Hand it in to your Magic Rock/);
+    // Legalize It: the card is activated from the pack, never handed to the rock.
+    const legalize = read('encyclopedia/quests/card_carrying_qualification/index.html');
+    assert.match(legalize, /Nothing to hand in/);
+    assert.doesNotMatch(legalize, /Hand it in/);
+    // A quest whose steps take items (remove) is still handed in to the rock.
+    assert.match(read('encyclopedia/quests/mining_mine_rocks/index.html'), /Hand it in to your Magic Rock, wherever you are\./);
     assert.match(html, /175 iMG[\s\S]*120 currants[\s\S]*15 favor with Humbaba/);
     // Tiny Speck's own words, with their item links pointing at our pages.
     assert.match(html, /<a href="\.\.\/\.\.\/\.\.\/encyclopedia\/animals\/npc_piggy\/">Piggies<\/a> are smarter than dogs you know\./);

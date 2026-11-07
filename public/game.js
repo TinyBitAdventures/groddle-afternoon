@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=075ded81';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=127e0a3c';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=c33c1a4c';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=ca5df5d0';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -106,7 +106,7 @@ import {
   LEGALIZE_GRANGE_TSID,
   LEGALIZE_HALL_TSID,
   LEGALIZE_QUEST_ID,
-  activateQualification,
+  activateCardFromPack,
   answerLegalizeQuestion,
   beginLegalizeApplication,
   callLegalizeApplicant,
@@ -118,10 +118,12 @@ import {
   enterBureaucraticHall,
   exitToGregariousGrange,
   legalizeObjective,
+  legalizeOnAccepted,
   purchaseQualification,
+  qualificationVerb,
   requestLegalizeQualification,
   travelToGregarious,
-} from './js/legalize-it.js?v=d569fd0e';
+} from './js/legalize-it.js?v=22140819';
 import { HALL, HALL_LAYOUT, HALL_QUESTIONS } from './js/bureaucratic-hall.js?v=a0bc6317';
 import { STATION_X, stationArrival, stationScreen, surfaceStation } from './js/subway.js?v=44d1a09f';
 import { ALLEY, SHADY, drawAlley, inEnteredBox } from './js/quest-rooms/back-alley-set.js?v=3a8a00af';
@@ -3898,16 +3900,13 @@ function getPackUseInfo(classTsid) {
     };
   }
   if (classTsid === LEGALIZE_CARD_ID) {
-    const legalize = ensureLegalizeState(questState);
-    const active = Boolean(questState.active?.[LEGALIZE_QUEST_ID]);
-    const reason = legalize.activated
-      ? 'You already activated this qualification.'
-      : !active
-        ? 'There is no active application to attach this qualification to.'
-        : '';
+    // items/card_carrying_qualification.js 95-110: anyone without the badge, with or without Legalize It.
+    const { usable, reason } = qualificationVerb({ hasBadge: achieveState.unlocked.includes(LEGALIZE_CARD_ID) });
     return {
-      usable: !reason,
+      usable,
       verb: 'Activate',
+      singleAction: true, // is_single 1
+      showDisabled: true, // shown greyed with "You already have this." once the badge is held
       effects: {},
       message: 'Qualify yourself to carry cards.',
       reason,
@@ -4422,7 +4421,7 @@ function renderPackPopover(classTsid, anchor = null) {
     const gateOk = !(useInfo.food && !useInfo.food.gate.ok);
     rows.push({ attrs: 'data-pack-use', cls: 'pack-pop-primary', label: `${useInfo.verb}${useInfo.singleAction ? '' : ' one'}`, gain: useInfo.effects?.energy < 0 ? '' : useGain, cost: useInfo.effects?.energy < 0 ? -useInfo.effects.energy : 0, disabled: !gateOk, reason: useInfo.food?.gate?.reason || '', tip: useTip });
   }
-  if ((useInfo.paradise || useInfo.buff) && !useInfo.usable) {
+  if ((useInfo.paradise || useInfo.buff || useInfo.showDisabled) && !useInfo.usable) {
     rows.push({ attrs: 'data-pack-use data-pack-use-block', cls: 'pack-pop-primary', label: useInfo.verb, disabled: true, reason: useInfo.reason, tip: buffWords });
   }
   if (useInfo.paradise) rows.push({ attrs: 'data-pack-eat-ticket', cls: 'pack-bear-action', label: 'Eat one', tip: PARADISE_TICKET_EAT.tooltip });
@@ -16791,19 +16790,21 @@ function handleLegalizeTarget(target, verbId) {
   }
 }
 
+/**
+ * The pack's Activate (js/legalize-it.js activateCardFromPack): a card from
+ * any hall, player or auction, with or without Legalize It. Inside the quest's
+ * two instanced places the completion takes you back where you came from;
+ * anywhere else the application just ends where you stand.
+ */
 function activateLegalizeCard() {
-  const legalize = ensureLegalizeState(questState);
-  const result = activateQualification(
-    legalize,
-    countItem(inv, LEGALIZE_CARD_ID) > 0,
-    Date.now()
-  );
+  const inInstance = legalizeIsInstanced();
+  const result = activateCardFromPack({ questState, inv, achieveState, pc, now: Date.now() });
   if (!result.ok) {
-    toast(result.reason === 'already_activated' ? 'Already activated.' : 'The qualification is missing.');
+    toast(result.msg);
     return false;
   }
-  removeItem(inv, LEGALIZE_CARD_ID, 1);
-  const badge = unlockAchievement(achieveState, LEGALIZE_CARD_ID, pc);
+  const badge = result.badge;
+  if (result.questCompleted && !inInstance) endLegalizeRunInPlace();
   if (badge.ok) {
     announceAchievementUpdates([
       {
@@ -16814,10 +16815,9 @@ function activateLegalizeCard() {
       },
     ]);
   }
-  const updates = applyQuestProgress(questState, 'ccq_completed', 1, pc);
   announceQuestCompletions(
-    updates.map((update) =>
-      (update.classTsid || update.def?.classTsid) === LEGALIZE_QUEST_ID
+    result.updates.map((update) =>
+      inInstance && (update.classTsid || update.def?.classTsid) === LEGALIZE_QUEST_ID
         ? { ...update, onDismiss: () => leaveLegalizeIt({ abandon: false }) }
         : update
     )
@@ -16831,6 +16831,14 @@ function activateLegalizeCard() {
   return true;
 }
 
+/** The application finished away from The Back Alley and the quest's hall: no trip back, the run just ends (its map route goes with the quest). */
+function endLegalizeRunInPlace() {
+  legalizeRun = null;
+  legalizeSourceLocation = null;
+  if (app?.canvas) app.canvas.dataset.legalizeStatus = 'completed';
+  renderLegalizeHud();
+}
+
 async function startLegalizeIt(opts = {}) {
   if (legalizeStartPromise) return legalizeStartPromise;
   if (legalizeOnRoute()) return legalizeRun;
@@ -16838,6 +16846,15 @@ async function startLegalizeIt(opts = {}) {
     if (!questState.active?.[LEGALIZE_QUEST_ID]) {
       const assigned = assignQuest(questState, LEGALIZE_QUEST_ID, { ignorePrereq: true });
       if (!assigned.ok) return null;
+    }
+    // quests/card_carrying_qualification.js onAccepted 65-74: the badge already earned completes it here.
+    const accepted = legalizeOnAccepted({ questState, inv, achieveState, pc, now: Date.now() });
+    if (accepted.completed) {
+      endLegalizeRunInPlace();
+      announceQuestCompletions(accepted.updates);
+      updateHud();
+      savePlayerState();
+      return null;
     }
     legalizeSourceLocation = opts.sourceLocation || instanceSourceHere({
       tsid: currentStreetTsid,

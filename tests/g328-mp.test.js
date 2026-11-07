@@ -37,7 +37,7 @@ import {
 import { createMinnAccount } from '../public/js/minn-account.js?v=b29fae30';
 import { homesFeature, visitorHomeScene, visitorHomeState } from '../public/js/features/homes-feature.js?v=9794941c';
 import { neighboursMpApi, neighboursMpFeature } from '../public/js/features/neighbours-mp-feature.js?v=70bb87ae';
-import { FEATURES } from '../public/js/features/index.js?v=c33c1a4c';
+import { FEATURES } from '../public/js/features/index.js?v=ca5df5d0';
 import { serverPath, sitePath, skipWithoutServer, skipWithoutSite } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');

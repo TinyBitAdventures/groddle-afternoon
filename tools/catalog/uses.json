@@ -369,12 +369,12 @@
  },
  "card_carrying_qualification": {
   "lines": [
-   "Activate it during Legalize It to earn the Card-Carrying Qualification badge, which you need to learn Bureaucratic Arts and to complete Your Papers.",
+   "Activate it from your pack to earn the Card-Carrying Qualification badge, which you need to learn Bureaucratic Arts and to complete Your Papers. Activating uses up one card, and it also finishes Legalize It if you are on that quest.",
    "Street projects named Clusterfudge also ask for Card-Carrying Qualifications."
   ],
   "evidence": [
-   "public/game.js:3791-3805 getPackUseInfo Activate (only with Legalize It active, once)",
-   "public/game.js:16437-16470 activateLegalizeCard: unlockAchievement card_carrying_qualification, ccq_completed",
+   "public/game.js:3902-3913 getPackUseInfo Activate (anyone without the badge, any quest state)",
+   "public/js/legalize-it.js:315-334 activateCardFromPack: one card used up, unlockAchievement card_carrying_qualification, ccq_completed",
    "public/assets/content/skills.json bureaucraticarts_1 reqAchievements [card_carrying_qualification]",
    "public/js/bureaucracy.js:85-91 completePapersCheck needs the badge",
    "public/assets/content/street-jobs.json classes.job_street_ph4_02c r553 card_carrying_qualification (Anrasan Glance, Kolan Presence, Tharon Spelunk)"

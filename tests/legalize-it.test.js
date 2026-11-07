@@ -28,7 +28,7 @@ import {
   purchaseQualification,
   requestLegalizeQualification,
   travelToGregarious,
-} from '../public/js/legalize-it.js?v=d569fd0e';
+} from '../public/js/legalize-it.js?v=22140819';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -119,7 +119,8 @@ test('purchase costs 50 currants and activation is a separate pack action', () =
   assert.equal(activated.ok, true);
   assert.equal(state.stage, 'complete');
   assert.deepEqual(activated.reward, LEGALIZE_REWARD);
-  assert.equal(activateQualification(state, true).reason, 'already_activated');
+  // The badge, not the application, disables it again (items/card_carrying_qualification.js 106-108).
+  assert.equal(activateQualification(state, true, 3000, { hasBadge: true }).reason, 'already_activated');
 });
 
 test('client integration ships recovered clean quest art and a playable route', () => {
