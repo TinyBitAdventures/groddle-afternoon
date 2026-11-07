@@ -50,7 +50,7 @@ export const HUB_MAP_BACKGROUNDS = Object.freeze({
   '128': Object.freeze({ x1: 'assets/maps/art/bg/balzare.webp', x2: 'assets/maps/art/bg/balzare@2x.webp', repainted: true }), // Balzare
   '131': Object.freeze({ x1: 'assets/maps/art/bg/haoma.webp', x2: 'assets/maps/art/bg/haoma@2x.webp', repainted: true }), // Haoma
   '133': Object.freeze({ x1: 'assets/maps/art/bg/kloro.webp', x2: 'assets/maps/art/bg/kloro@2x.webp' }), // Kloro
-  '136': Object.freeze({ x1: 'assets/maps/art/bg/jal.webp', x2: 'assets/maps/art/bg/jal@2x.webp' }), // Jal
+  '136': Object.freeze({ x1: 'assets/maps/art/bg/jal.webp', x2: 'assets/maps/art/bg/jal@2x.webp', repainted: true }), // Jal
   '137': Object.freeze({ x1: 'assets/maps/art/bg/nottis.webp', x2: 'assets/maps/art/bg/nottis@2x.webp' }), // Nottis
   '140': Object.freeze({ x1: 'assets/maps/art/bg/samudra.webp', x2: 'assets/maps/art/bg/samudra@2x.webp' }), // Samudra
   '141': Object.freeze({ x1: 'assets/maps/art/bg/drifa.webp', x2: 'assets/maps/art/bg/drifa@2x.webp', repainted: true }), // Drifa

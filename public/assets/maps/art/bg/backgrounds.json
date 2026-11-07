@@ -722,10 +722,11 @@
       "thumbMatches": true,
       "x1": "assets/maps/art/bg/jal.webp",
       "x2": "assets/maps/art/bg/jal@2x.webp",
-      "x1Bytes": 10222,
-      "x1Sha256": "200cf04fcf5c88906d63ce9774c84666a8f658cedbd843304325dc2dd647c52c",
-      "x2Bytes": 20866,
-      "x2Sha256": "9bfadb5329decac74da6f5816c0bd565ed40a764bd5b3303db456586ae918ea1"
+      "repainted": "tools/provenance/repainted-maps.json",
+      "x1Bytes": 23302,
+      "x1Sha256": "de1cea86171ed00119772032c8c905a1d3b0c765859c3259173196cb6f8c2d93",
+      "x2Bytes": 72874,
+      "x2Sha256": "171414d15f7e1cc03550c70ee0108d79f30d2f960421973e8e34595550dab65f"
     },
     "137": {
       "hubName": "Nottis",
