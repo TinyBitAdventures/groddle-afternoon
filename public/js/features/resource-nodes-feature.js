@@ -8,7 +8,7 @@
  * Dust Traps (walk into them).
  *
  * Placement: one shared-planner group per node class from the street
- * population's capped `resourceNodeClasses`, so every node stands on a real
+ * population's `resourceNodeClasses`, so every node stands on a real
  * platform. Node state persists per street in engine.streetSlot('resource-nodes')
  * keyed `<classTsid>:<index>`; the Firefly Jar and the one-time starter kit
  * flag live in this feature's save slice.
@@ -149,7 +149,7 @@ function resolveClassId(classTsid) {
   return getResourceNodeDef(classTsid)?.classTsid || null;
 }
 
-/** Planner requests: one group per node class, counts from the capped spawn list. */
+/** Planner requests: one group per node class, counts from the spawn list. */
 export function resourcePlacementGroups(population) {
   const counts = new Map();
   for (const raw of Array.isArray(population?.resourceNodeClasses) ? population.resourceNodeClasses : []) {

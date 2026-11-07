@@ -38,15 +38,15 @@ import {
   takeObjs,
   treeReady,
   treeSkill,
-} from '../public/js/street-objects.js?v=ae522db3';
-import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=2d09057c';
-import { FEATURES } from '../public/js/features/index.js?v=6887398d';
+} from '../public/js/street-objects.js?v=8427c744';
+import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=8cdea3bb';
+import { FEATURES } from '../public/js/features/index.js?v=cfa83ac4';
 import { createMineRock, mineRock } from '../public/js/mining.js?v=4532ff9b';
 import { createResourceNode } from '../public/js/resource-nodes.js?v=b2381f15';
 import { createTrantState, fruitCapacityAt, setTrantTables } from '../public/js/trants.js?v=9c2e8c0f';
 import { placementRequests, ruleTables, streetObjectLayout } from '../tools/build-realtime-objects.mjs';
 import { STREET_INDEX, applyStreetIndex, loadStreetDataFromFs } from '../public/js/street-loader.js?v=33d2b8bc';
-import { setStreetEcologyCatalog } from '../public/js/street-ecology.js?v=e2bdb20c';
+import { setStreetEcologyCatalog } from '../public/js/street-ecology.js?v=3c1d4c06';
 import { serverPath, skipWithoutServer } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');
@@ -489,6 +489,25 @@ describe('street objects: the server\'s layout', () => {
     const firstWithGroups = FEATURES.find((f) => typeof f.placementGroups === 'function');
     assert.equal(firstWithGroups.id, 'resource-nodes');
     assert.ok(features.indexOf('resource-nodes') < 5);
+  });
+
+  it('seats what the location files name for the server too (G399)', { skip: skipWithoutServer }, () => {
+    const data = JSON.parse(readFileSync(serverPath('data/objects.json'), 'utf8'));
+    const eco = JSON.parse(read('public/assets/content/street-ecology.json'));
+    const count = (rows, cls) => (rows || []).filter((r) => r[1] === cls).length;
+    const row = (tsid) => eco.streets[tsid] || eco.streets[`L${tsid.slice(1)}`];
+    assert.equal(count(data.streets.GHFA15VS0UC3ITS.nodes, 'ice_knob'), row('GHFA15VS0UC3ITS').counts.ice_knob);
+    assert.equal(count(data.streets.GTJ12E6VSFQ1V4E.nodes, 'jellisac'), row('GTJ12E6VSFQ1V4E').counts.jellisac);
+    assert.equal(count(data.streets.GA9154LI9R22R7A.rocks, 'rock_sparkly_1'), row('GA9154LI9R22R7A').counts.rock_sparkly_1);
+    // Two streets have too few spots for theirs (the planner runs out, not a cap): they never had them.
+    const short = [];
+    for (const [tsid, street] of Object.entries(data.streets)) {
+      const counts = row(tsid)?.counts || {};
+      for (const cls of ['mortar_barnacle', 'ice_knob', 'jellisac', 'dirt_pile', 'peat_1']) {
+        if (count(street.nodes, cls) < (counts[cls] || 0)) short.push(tsid);
+      }
+    }
+    assert.deepEqual([...new Set(short)].sort(), ['GA94KO5CFQA2V4Q', 'GDOVCSE5H2R2L24']);
   });
 
   it('matches the data file the server embeds', { skip: skipWithoutServer }, async () => {

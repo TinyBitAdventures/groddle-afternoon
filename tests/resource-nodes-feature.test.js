@@ -20,14 +20,14 @@ import {
   rulesVerbId,
   surfaceNear,
   verbTooltip,
-} from '../public/js/features/resource-nodes-feature.js?v=d62d798a';
+} from '../public/js/features/resource-nodes-feature.js?v=0fa3f784';
 import {
   RESOURCE_NODE_CATALOG,
   RESOURCE_NODE_CLASS_IDS,
   createResourceNode,
 } from '../public/js/resource-nodes.js?v=b2381f15';
 import { createFeatureHost, normalizeFeatureSlices } from '../public/js/feature-host.js?v=127e0a3c';
-import { populationForStreet, planStreetPlacements } from '../public/js/street-ecology.js?v=e2bdb20c';
+import { populationForStreet, planStreetPlacements } from '../public/js/street-ecology.js?v=3c1d4c06';
 import { STORE_CATALOG } from '../public/js/store-catalog.js?v=74b56af3';
 
 const population = (classes) => ({ resourceNodeClasses: classes });
@@ -118,6 +118,20 @@ describe('resource node street slots', () => {
     assert.equal(second[0].node.units, 1);
     assert.equal(second[0].node.regrowAt, 99_000);
     assert.equal(saved.nodes['mortar_barnacle:0'], second[0].node);
+  });
+
+  it('keeps a saved street\'s nodes when a street gains more than the old cap of 6 (G399)', () => {
+    const six = Array.from({ length: 6 }, (_, i) => ({ key: `ice_knob:${i}`, classTsid: 'ice_knob', x: i, y: 0 }));
+    const twenty = Array.from({ length: 20 }, (_, i) => ({ key: `ice_knob:${i}`, classTsid: 'ice_knob', x: 900 - i, y: 0 }));
+    const slot = {};
+    const before = prepareStreetResourceNodes(slot, six, { tsid: 'GTEST', now: 1000 });
+    before[2].node.units = 1;
+    const saved = JSON.parse(JSON.stringify(slot));
+    const after = prepareStreetResourceNodes(saved, twenty, { tsid: 'GTEST', now: 2000 });
+    assert.equal(after.length, 20);
+    assert.equal(Object.keys(saved.nodes).length, 20);
+    assert.equal(after[2].node.units, 1, 'what was taken from the third stays taken');
+    assert.ok(after[12].node.units > 1, 'the new ones start fresh');
   });
 
   it('replaces corrupt or mismatched saved rows and keeps the variant stable', () => {

@@ -21,7 +21,7 @@ import {
   setStreetEcologyCatalog,
   streetReservedSpots,
   unreachedFloorsFor,
-} from '../public/js/street-ecology.js?v=e2bdb20c';
+} from '../public/js/street-ecology.js?v=3c1d4c06';
 import { placementRequests, streetEcology } from '../tools/build-realtime-quoins.mjs';
 import { unreachedFloorsOf } from '../tools/ecology/build-unreached-floors.mjs';
 import { shippedArrivals } from '../tools/builder/calibrate.mjs';

@@ -102,8 +102,9 @@ const ROCK_CLASSES = Object.freeze([
 
 /**
  * Harvestable world resource nodes (see js/resource-nodes.js), in source
- * frequency order, with per-street render caps. `resourceCounts` on a
- * population stays exact; `resourceNodeClasses` is the capped spawn list.
+ * frequency order. `resourceCounts` on a population is the location file's
+ * count; `resourceNodeClasses` is the spawn list, the same count (G399) apart
+ * from the two capped animals below.
  */
 export const RESOURCE_NODE_CLASSES = Object.freeze([
   'npc_firefly',
@@ -118,17 +119,14 @@ export const RESOURCE_NODE_CLASSES = Object.freeze([
   'paper_tree',
 ]);
 
+/**
+ * Only the wandering animals have a render cap: each is a sprite that moves
+ * every frame, and the files name up to 49 Fireflies and 54 Salmon on one
+ * street. Every node that stands still spawns as the location file says.
+ */
 export const RESOURCE_NODE_CAPS = Object.freeze({
   npc_firefly: 12,
   npc_salmon: 8,
-  mortar_barnacle: 6,
-  dust_trap: 4,
-  ice_knob: 6,
-  jellisac: 6,
-  dirt_pile: 3,
-  peat_1: 3,
-  npc_sloth: 4, // 16 source streets hold 3-4 (Gomed Essoni, Tamar Garna, Heera Amond); Circle Crunch needs 3
-  paper_tree: 1,
 });
 
 function resourceCountsFrom(counts) {
@@ -143,7 +141,7 @@ function resourceCountsFrom(counts) {
 function expandResourceClasses(counts) {
   const out = [];
   for (const classTsid of RESOURCE_NODE_CLASSES) {
-    const n = Math.min(whole(counts?.[classTsid]), RESOURCE_NODE_CAPS[classTsid] || 4);
+    const n = Math.min(whole(counts?.[classTsid]), RESOURCE_NODE_CAPS[classTsid] ?? Infinity);
     for (let i = 0; i < n; i += 1) out.push(classTsid);
   }
   return out;
@@ -241,10 +239,10 @@ export function ecologyForStreet(tsid, source = catalog) {
   return null;
 }
 
-function expandClasses(counts, classes, totalCap) {
+function expandClasses(counts, classes, totalCap = Infinity, classCap = totalCap === Infinity ? Infinity : 8) {
   const out = [];
   for (const classTsid of classes) {
-    const perClass = Math.min(whole(counts?.[classTsid]), 8);
+    const perClass = Math.min(whole(counts?.[classTsid]), classCap);
     for (let i = 0; i < perClass && out.length < totalCap; i += 1) out.push(classTsid);
   }
   return out;
@@ -359,7 +357,7 @@ export function populationForStreet(tsid, entry, { starter = false } = {}) {
       chickens: Math.min(whole(counts.npc_chicken), STREET_ANIMAL_CAPS.chickens),
       ...butterflySplit(counts.npc_butterfly),
       treeClasses: expandClasses(counts, TREE_CLASSES, 8),
-      rockClasses: expandClasses(counts, ROCK_CLASSES, 10),
+      rockClasses: expandClasses(counts, ROCK_CLASSES),
       gardens: Math.min(whole(counts.garden), 2),
       vendor: whole(counts.street_spirit) > 0,
       shrine: !!entry.giantId,
@@ -383,7 +381,7 @@ export function populationForStreet(tsid, entry, { starter = false } = {}) {
   let { butterflies, flyingButterflies } = butterflySplit(counts.npc_butterfly);
 
   let treeClasses = expandClasses(counts, TREE_CLASSES, 8);
-  let rockClasses = expandClasses(counts, ROCK_CLASSES, 10);
+  let rockClasses = expandClasses(counts, ROCK_CLASSES);
   let gardens = Math.min(whole(counts.garden), 2);
   let vendor = whole(counts.street_spirit) > 0;
   let shrine = !!entry?.giantId;

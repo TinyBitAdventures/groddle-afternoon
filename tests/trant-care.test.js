@@ -23,7 +23,7 @@ import {
   getToolCondition,
   setToolRemaining,
 } from '../public/js/tools.js?v=689d6594';
-import { getVerbsFor, runVerb } from '../public/content.js?v=8af10970';
+import { getVerbsFor, runVerb } from '../public/content.js?v=4589e83f';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const publicDir = path.join(root, 'public');

@@ -46,7 +46,7 @@ import {
   ecologyForStreet,
   populationForStreet,
   RESOURCE_NODE_CLASSES,
-} from '../public/js/street-ecology.js?v=e2bdb20c';
+} from '../public/js/street-ecology.js?v=3c1d4c06';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const publicRoot = join(__dirname, '../public');
@@ -700,7 +700,7 @@ describe('street ecology resource counts', () => {
     const pop = populationForStreet('GLI57G8I2HI1CSO', row);
     assert.deepEqual(pop.resourceCounts, { npc_firefly: 36, mortar_barnacle: 3, jellisac: 9, peat_1: 1 });
     assert.equal(pop.resourceNodeClasses.filter((id) => id === 'npc_firefly').length, 12, 'render cap');
-    assert.equal(pop.resourceNodeClasses.filter((id) => id === 'jellisac').length, 6, 'render cap');
+    assert.equal(pop.resourceNodeClasses.filter((id) => id === 'jellisac').length, 9, 'as the location file says (G399)');
     assert.equal(pop.resourceNodeClasses.filter((id) => id === 'mortar_barnacle').length, 3);
     for (const id of pop.resourceNodeClasses) createResourceNode(id);
   });
@@ -717,5 +717,49 @@ describe('street ecology resource counts', () => {
     const empty = populationForStreet('GIFPV9EMLT72DP4', ecologyForStreet('GIFPV9EMLT72DP4'));
     assert.deepEqual(empty.resourceNodeClasses, []);
     assert.deepEqual(populationForStreet('nowhere', null).resourceNodeClasses, []);
+  });
+
+  // G399: the spawn list used to keep at most 6 barnacles, nubbins and Jellisacs, 3 piles and bogs, and
+  // 10 rocks a street, dropping placements the location XML has. Only the two wandering animals stay capped.
+  const STANDING_NODES = ['mortar_barnacle', 'ice_knob', 'jellisac', 'dirt_pile', 'peat_1', 'dust_trap', 'npc_sloth', 'paper_tree'];
+  const ROCKS = ['rock_metal_1', 'rock_dullite_1', 'rock_beryl_1', 'rock_sparkly_1'];
+
+  it('spawns every standing node and rock the location files name, on every street', () => {
+    const totals = {};
+    let extras = 0;
+    for (const tsid of Object.keys(catalog.streets)) {
+      const row = ecologyForStreet(tsid);
+      const pop = populationForStreet(tsid, row);
+      const counts = row?.counts || {};
+      for (const cls of STANDING_NODES) {
+        const n = pop.resourceNodeClasses.filter((id) => id === cls).length;
+        assert.equal(n, counts[cls] || 0, `${tsid} ${cls}`);
+        totals[cls] = (totals[cls] || 0) + n;
+      }
+      for (const cls of ROCKS) assert.equal(pop.rockClasses.filter((id) => id === cls).length, counts[cls] || 0, `${tsid} ${cls}`);
+      if (pop.rockClasses.length > 10) extras += pop.rockClasses.length - 10;
+    }
+    assert.ok(totals.ice_knob >= 310, `${totals.ice_knob} Ice Nubbins`);
+    assert.ok(extras >= 30, 'streets with more than ten rocks keep them');
+  });
+
+  it('keeps the counts the location XML really has', { skip: !existsSync(join(publicRoot, '../../streets/mnt/stos/location_data')) }, () => {
+    const xml = (tsid) => readFileSync(join(publicRoot, `../../streets/mnt/stos/location_data/${tsid}.xml`), 'utf8');
+    const labels = (text, label) => text.split(`label="${label}"`).length - 1;
+    const classes = (tsid) => {
+      const pop = populationForStreet(tsid, ecologyForStreet(tsid));
+      return { nodes: pop.resourceNodeClasses, rocks: pop.rockClasses };
+    };
+    const count = (list, cls) => list.filter((id) => id === cls).length;
+    assert.equal(count(classes('GHFA15VS0UC3ITS').nodes, 'ice_knob'), labels(xml('LHFA15VS0UC3ITS'), 'Ice Nubbin'));
+    assert.equal(labels(xml('LHFA15VS0UC3ITS'), 'Ice Nubbin'), 20);
+    assert.equal(count(classes('GTJ12E6VSFQ1V4E').nodes, 'jellisac'), labels(xml('LTJ12E6VSFQ1V4E'), 'Jellisac Growth'));
+    assert.equal(count(classes('GA9154LI9R22R7A').rocks, 'rock_sparkly_1'), labels(xml('LA9154LI9R22R7A'), 'Sparkly Rock'));
+  });
+
+  it('still caps the wandering animals: each moves every frame', () => {
+    const pop = populationForStreet('GUVCLS8RV5D3VGT', ecologyForStreet('GUVCLS8RV5D3VGT'));
+    assert.equal(pop.resourceCounts.npc_salmon, 54);
+    assert.equal(pop.resourceNodeClasses.filter((id) => id === 'npc_salmon').length, 8);
   });
 });
