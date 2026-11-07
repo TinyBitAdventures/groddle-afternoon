@@ -33,7 +33,7 @@ import { newStreet, newStreetOps, newHub, nextHubId, mapWithStreet, mapWithoutSt
 import { arriveFor, newConnect, POST_W, POST_H, LADDER_W } from '../../public/js/builder/geometry-handles.js?v=daefecb1';
 import { arrivalOps, settlePostOps, followPostOps } from '../../public/js/builder/posts.js?v=82926ee0';
 import { platformsScreen, isStandable } from '../../public/js/street-model.js?v=505d8990';
-import { DECO_TWINS } from '../../public/js/street-render.js?v=9349c0e5';
+import { DECO_TWINS } from '../../public/js/street-render.js?v=9eded3c1';
 import { groundOps, floatingLines, FLOAT_REACH } from '../../public/js/builder/ground.js?v=8beea23c';
 import { EFFECT_KINDS, EFFECT_DEFAULTS, EFFECT_LIMITS, RUMBLE_DEFAULTS, effectsCost, normaliseEmitter, rumbleShare } from '../../public/js/street-effects.js?v=03f7fe4d';
 

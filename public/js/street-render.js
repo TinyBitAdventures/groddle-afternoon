@@ -1435,6 +1435,60 @@ export function skirtFadeStops() {
   };
 }
 
+/**
+ * PURE: the fade over the street's own art below the edge (the middleground's solid copy and the
+ * front layers), from where it starts (at 0) to SKIRT_FADE_DEPTH (at 1). Hechey Track's dirt
+ * (middleplus) hangs 90 to 210 px below the edge and stopped there in straight lines over the
+ * skirt, which is already near its fade colour that deep: a darker box with hard edges
+ * (Austin 2026-11-07). None at the edge, so art that crosses it carries on unbroken, then as
+ * dark as the skirt's own fade from about halfway down, so where the art ends no edge shows.
+ */
+export function skirtArtFadeStops() {
+  return [{ at: 0, alpha: 0 }, { at: 0.12, alpha: 0.3 }, { at: 0.3, alpha: 0.7 }, { at: 0.55, alpha: 0.92 }, { at: 1, alpha: 1 }];
+}
+
+/**
+ * The fade (skirtArtFadeStops, then the plain colour) as a texture `w` x `h` with only the
+ * opacity of `art` (the art below the edge, `w` x `h`, `start` rows above the fade's start): laid
+ * over that art, it darkens the art and nothing beside it (an avatar behind a front layer, the
+ * skirt between the art).
+ */
+function edgeFadeTexture(PIXI, renderer, art, w, h, start, colour, ramp, res) {
+  // Pixi's sprite mask keeps its red channel (MaskFilter: masky.r), not its opacity: the art goes
+  // white first, at its own opacity.
+  const white = PIXI.RenderTexture.create({ width: w, height: h, resolution: res });
+  const blank = new PIXI.Container();
+  const shape = new PIXI.Sprite(art);
+  shape.width = w;
+  shape.height = h;
+  const whiten = new PIXI.ColorMatrixFilter();
+  whiten.matrix = [0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0];
+  whiten.resolution = res;
+  shape.filters = [whiten];
+  blank.addChild(shape);
+  renderer.render({ container: blank, target: white, clear: true });
+  blank.destroy({ children: true });
+  whiten.destroy();
+  const out = PIXI.RenderTexture.create({ width: w, height: h, resolution: res });
+  const holder = new PIXI.Container();
+  const tint = new PIXI.Container();
+  const fade = new PIXI.Sprite(ramp);
+  fade.x = 0;
+  fade.y = start;
+  fade.width = w;
+  fade.height = SKIRT_FADE_DEPTH;
+  tint.addChild(fade);
+  const solidTop = start + SKIRT_FADE_DEPTH;
+  if (solidTop < h) tint.addChild(new PIXI.Graphics().rect(0, solidTop, w, h - solidTop).fill(colour));
+  const mask = new PIXI.Sprite(white);
+  tint.mask = mask;
+  holder.addChild(tint, mask);
+  renderer.render({ container: holder, target: out, clear: true });
+  holder.destroy({ children: true });
+  white.destroy(true);
+  return out;
+}
+
 /** Opacity under which a pixel of the middleground's art below the edge is dropped, and over which it is kept whole. */
 export const SKIRT_SOLID_ALPHA = [0.8, 0.88];
 
@@ -1544,15 +1598,18 @@ const SKIRT_BYTES = 24 * 1024 * 1024;
  * into skirtFadeColour, then that colour runs on to the skirt's foot. The strip sits over the
  * middleground with the middleground's solid art below bounds.b copied back on top (its
  * see-through art there is covered), and the front layers' art below bounds.b (The Great Hole to
- * Ix's dirt and trunks) still draws over it.
+ * Ix's dirt and trunks) still draws over it. That art, the copy and the front layers', darkens
+ * into the same colour as it goes down (skirtArtFadeStops, from `floorBelow` under the edge: the
+ * deepest walkable ground there, if any), so where it ends it meets the skirt without an edge.
  */
-function buildGroundSkirt(PIXI, renderer, root, grounds, W, sourceH, depthPx, gradientBottom, fallback) {
+function buildGroundSkirt(PIXI, renderer, root, grounds, W, sourceH, depthPx, gradientBottom, fallback, fronts = [], floorBelow = 0) {
   const depth = Math.ceil(depthPx);
   const main = grounds.find((lc) => lc.label === 'middleground') || grounds[0];
   if (!main || depth <= 0 || W <= 0) return;
   const band = skirtBandHeight(depth, sourceH);
+  const fadeStart = Math.max(0, Math.ceil(Number(floorBelow) || 0));
   const build = () => {
-    if (root.destroyed || grounds.some((lc) => lc.destroyed)) return;
+    if (root.destroyed || grounds.some((lc) => lc.destroyed) || fronts.some((lc) => lc.destroyed)) return;
     const t0 = performance.now();
     const strip = new PIXI.Container();
     // Over the middleground and under the avatars: the middleground's own art below bounds.b
@@ -1594,9 +1651,9 @@ function buildGroundSkirt(PIXI, renderer, root, grounds, W, sourceH, depthPx, gr
         if (tile.y < y1 && tile.y + tile.h > y1 - Math.max(band, 24)) bakeBlurTile(tile, root.blurStats);
       }
     }
-    // Decos culled for the camera still belong in the band.
+    // Decos culled for the camera still belong in the band (and in the front layers' fades).
     const culled = [];
-    for (const lc of grounds) for (const child of lc.children) if (child.culled) culled.push(child);
+    for (const lc of new Set([...grounds, ...fronts])) for (const child of lc.children) if (child.culled) culled.push(child);
     for (const child of culled) child.culled = false;
     let r = 0;
     let g = 0;
@@ -1668,7 +1725,7 @@ function buildGroundSkirt(PIXI, renderer, root, grounds, W, sourceH, depthPx, gr
       small.destroy(true);
     }
     solidFilter?.destroy();
-    for (const child of culled) child.culled = true;
+    const chunkCount = mirrors.length ? textures.length - solids.length : 0;
     for (const h of [...homes].sort((p, q) => p.index - q.index)) {
       h.lc.x = h.x;
       h.lc.y = h.y;
@@ -1700,6 +1757,71 @@ function buildGroundSkirt(PIXI, renderer, root, grounds, W, sourceH, depthPx, gr
     strip.addChild(fade, shade, deep);
     for (const spr of solids) strip.addChild(spr);
     textures.push(fade.texture, shade.texture);
+    // The art below the edge darkens into the colour as it goes down (skirtArtFadeStops).
+    const artRamp = rampTexture(PIXI, colour, skirtArtFadeStops());
+    textures.push(artRamp);
+    let fadeBytes = 0;
+    // A cover is a smooth darkening whose edge follows the art to a world px: one texel per px.
+    const coverRes = Math.min(1, res);
+    for (const spr of solids) {
+      const w = spr.texture.width;
+      const h = spr.texture.height;
+      const over = edgeFadeTexture(PIXI, renderer, spr.texture, w, h, SOLID_OVERLAP + fadeStart, colour, artRamp, coverRes);
+      textures.push(over);
+      fadeBytes += w * h * coverRes * coverRes * 4;
+      const cover = new PIXI.Sprite(over);
+      cover.x = spr.x;
+      cover.y = spr.y;
+      strip.addChild(cover);
+    }
+    // Each front layer's art below its bottom (in its own coordinates, where its bottom meets the
+    // street's whenever the camera is low enough to show below the edge), rendered alone, gets a
+    // cover of the fade in its shape, drawn just above it and moved with it (updateParallax).
+    const faded = [];
+    for (const lc of fronts) {
+      const refY = lc.parallaxLayer ? lc.parallaxLayer.h : sourceH;
+      const lw = Math.ceil(lc.parallaxLayer ? lc.parallaxLayer.w : W);
+      const deepest = Math.min(depth, Math.ceil(lc.getLocalBounds().maxY - refY));
+      if (deepest <= fadeStart + 2 || lw <= 0 || !lc.parent) continue;
+      const blurred = lc.blurLayer;
+      if (blurred && root.blurStats) {
+        for (const tile of blurred.tiles) if (tile.y < refY + deepest && tile.y + tile.h > refY) bakeBlurTile(tile, root.blurStats);
+      }
+      let lres = 1;
+      while (lres > 0.5 && lw * deepest * lres * lres * 4 > SKIRT_BYTES) lres /= 1.25;
+      const lchunk = Math.max(256, Math.min(4096, Math.floor(maxTex / lres)));
+      const home = { parent: lc.parent, index: lc.parent.getChildIndex(lc), x: lc.x, y: lc.y };
+      const alone = new PIXI.Container();
+      alone.addChild(lc);
+      lc.x = 0;
+      lc.y = 0;
+      const cover = new PIXI.Container();
+      cover.label = `edge-fade-${lc.label}`;
+      cover.zIndex = lc.zIndex + 5;
+      for (let x0 = 0; x0 < lw; x0 += lchunk) {
+        const w = Math.min(lchunk, lw - x0);
+        const art = PIXI.RenderTexture.create({ width: w, height: deepest, resolution: lres });
+        renderer.render({ container: alone, target: art, transform: new PIXI.Matrix(1, 0, 0, 1, -x0, -refY), clear: true });
+        const over = edgeFadeTexture(PIXI, renderer, art, w, deepest, fadeStart, colour, artRamp, lres);
+        art.destroy(true);
+        textures.push(over);
+        fadeBytes += w * deepest * lres * lres * 4;
+        const spr = new PIXI.Sprite(over);
+        spr.x = x0;
+        spr.y = refY;
+        cover.addChild(spr);
+      }
+      lc.x = home.x;
+      lc.y = home.y;
+      home.parent.addChildAt(lc, Math.min(home.index, home.parent.children.length));
+      alone.destroy();
+      cover.x = lc.x;
+      cover.y = lc.y;
+      home.parent.addChild(cover);
+      lc.edgeFade = cover;
+      faded.push(lc.label);
+    }
+    for (const child of culled) child.culled = true;
     root.addChild(strip);
     root.once('destroyed', () => {
       for (const t of textures) t.destroy(true);
@@ -1710,16 +1832,21 @@ function buildGroundSkirt(PIXI, renderer, root, grounds, W, sourceH, depthPx, gr
       colour,
       average,
       layers: grounds.map((lc) => lc.label),
-      chunks: mirrors.length ? textures.length - 2 - solids.length : 0,
+      chunks: chunkCount,
       copies: mirrors.length,
       below,
       resolution: Math.round(res * 100) / 100,
       bytes: Math.round(W * (band + below) * res * res * 4),
+      // The art fade (skirtArtFadeStops): where it starts below the edge, the front layers it
+      // covers, and its textures' bytes (the middleground copy's included).
+      fadeStart,
+      faded,
+      fadeBytes: Math.round(fadeBytes),
       ms: Math.round(performance.now() - t0),
     };
   };
   const sprites = [];
-  for (const lc of grounds) {
+  for (const lc of new Set([...grounds, ...fronts])) {
     lc.children.forEach(function walk(child) {
       if (child instanceof PIXI.Sprite) sprites.push(child);
       (child.children || []).forEach(walk);
@@ -2076,7 +2203,10 @@ export function buildStreetView(street, PIXI, opts = {}) {
     // Ticket 39: black (000000) is a colour, not a missing one (Panka Surazu's skirt drew meadow green).
     const parsed = parseInt(String(street.gradient?.bottom || '').replace(/^#/, ''), 16);
     const fallback = Number.isFinite(parsed) ? parsed : 0x6b8f3c;
-    buildGroundSkirt(PIXI, opts.renderer, root, grounds, W, sourceH, skirtDepth, Number.isFinite(parsed) ? parsed : null, fallback);
+    // The front layers' art below the edge fades into the skirt, from under the deepest walkable
+    // ground (four streets walk up to 50 px below their edge: Camsteeple Strat).
+    const fronts = layerContainers.filter((lc) => lc.inFront);
+    buildGroundSkirt(PIXI, opts.renderer, root, grounds, W, sourceH, skirtDepth, Number.isFinite(parsed) ? parsed : null, fallback, fronts, deepestPlatformY - sourceH);
   }
   root.decoDrawn = drawn;
   /** Decos that play, for QA (canvas data-anim-decos): placed, strips in, playing, stopped off screen. */
@@ -2208,6 +2338,11 @@ export function buildStreetView(street, PIXI, opts = {}) {
       if (lc.x !== x || lc.y !== y) lastCull = null;
       lc.x = x;
       lc.y = y;
+      // Its art fade (buildGroundSkirt) goes with it.
+      if (lc.edgeFade) {
+        lc.edgeFade.x = x;
+        lc.edgeFade.y = y;
+      }
       // Where it lands on screen this frame: the next frame's settle never steps back past it.
       lc.screenX = x - camX;
       lc.screenY = y - camY;

@@ -13,7 +13,7 @@ import { describe, it } from 'node:test';
 import { SEED_CATALOG, createGarden, harvestPlot, plantPlot, tickGarden, waterAllPlots, waterPlot } from '../public/js/garden.js?v=78aa3457';
 import { GARDEN_LOCK_MS, LOCK_LINE, SHARED_GARDEN_STREETS, applyPlot, isSharedGardenStreet, localPlot, lockedFor, parsePlotId, plotId, rollPasses } from '../public/js/shared-gardens.js?v=47984e60';
 import { sharedGardensFeature } from '../public/js/features/shared-gardens-feature.js?v=77f1c507';
-import { FEATURES } from '../public/js/features/index.js?v=9671b419';
+import { FEATURES } from '../public/js/features/index.js?v=b662f2ae';
 import { HAS_SITE, SITE_DIR, serverPath, sitePath, skipWithoutServer } from '../tools/repos.mjs';
 
 const read = (p) => readFileSync(new URL(`../${p}`, import.meta.url), 'utf8');

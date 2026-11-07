@@ -447,6 +447,8 @@ export function snapshotStreetView(PIXI, renderer, view, { width, height } = {},
         keepTransform(lc);
         lc.position.set(0, 0);
         lc.scale.set(layer.w > 0 ? W / layer.w : 1, layer.h > 0 ? H / layer.h : 1);
+        // Its art fade under the street's edge (street-render buildGroundSkirt) stays out of the map.
+        if (lc.edgeFade) set(lc.edgeFade, 'visible', false);
       }
       for (const lc of view.layerContainers || []) {
         for (const child of lc.children || []) if (child.culled) set(child, 'culled', false);

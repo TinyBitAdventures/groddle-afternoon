@@ -12,6 +12,7 @@ import {
   glitchLayerMatrix,
   parallaxLayerOffset,
   shadeColour,
+  skirtArtFadeStops,
   skirtBandHeight,
   skirtFadeColour,
   skirtFadeStops,
@@ -20,8 +21,9 @@ import {
   skirtSolidAlpha,
   skirtTiles,
   SKIRT_BAND,
+  SKIRT_FADE_DEPTH,
   SKIRT_SLIDE_MAX,
-} from '../public/js/street-render.js?v=9349c0e5';
+} from '../public/js/street-render.js?v=9eded3c1';
 import { streetHeight, streetWidth } from '../public/js/street-model.js?v=505d8990';
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -287,5 +289,74 @@ describe('ground skirt (the strip under a street in the Modern UI)', () => {
     assert.ok(shade[0].alpha > 0 && shade[0].alpha <= 0.35, 'a slight darken at the mirror line');
     assert.equal(shade[shade.length - 1].alpha, 0);
     assert.ok(shade[shade.length - 1].at <= 0.15, 'only near the seam');
+  });
+
+  it('darkens the art below the edge into the skirt, so where it ends no edge shows (Hechey Track, Austin 2026-11-07)', () => {
+    // Opacity of a ramp at `at` (0..1), as the canvas gradient draws it.
+    const at = (stops, t) => {
+      if (t <= stops[0].at) return stops[0].alpha;
+      for (let i = 1; i < stops.length; i++) {
+        if (t <= stops[i].at) {
+          const k = (t - stops[i - 1].at) / (stops[i].at - stops[i - 1].at);
+          return stops[i - 1].alpha + k * (stops[i].alpha - stops[i - 1].alpha);
+        }
+      }
+      return stops[stops.length - 1].alpha;
+    };
+    const art = skirtArtFadeStops();
+    const { fade } = skirtFadeStops();
+    assert.equal(art[0].at, 0);
+    assert.equal(art[0].alpha, 0, 'art that crosses the edge carries on unbroken');
+    assert.equal(art[art.length - 1].at, 1);
+    assert.equal(art[art.length - 1].alpha, 1, 'gone into the colour at the foot of the fade');
+    for (let i = 1; i < art.length; i++) {
+      assert.ok(art[i].at > art[i - 1].at && art[i].alpha > art[i - 1].alpha, 'rises');
+      assert.ok(art[i].alpha - art[i - 1].alpha <= 0.4, 'no step');
+    }
+    for (let t = 0; t <= 1; t += 0.01) assert.ok(at(art, t) <= at(fade, t) + 1e-9, `never darker than the skirt beside it (${t.toFixed(2)})`);
+    for (let t = 0.55; t <= 1; t += 0.01) assert.ok(Math.abs(at(art, t) - at(fade, t)) < 1e-9, `as dark as the skirt from halfway down (${t.toFixed(2)})`);
+
+    // Hechey Track's middleplus dirt (a front layer, fixed to the ground) hangs below the edge and
+    // ends inside the skirt's depth at Austin's window (172 px): the darker box with hard edges.
+    const hechey = street('GLI2V0UN7RD1T2J');
+    const H = streetHeight(hechey);
+    const mz = hechey.layers.find((l) => l.id === 'middleground').z;
+    const plus = hechey.layers.find((l) => l.id === 'middleplus');
+    assert.ok(plus.z > mz, 'drawn in front of the avatars, over the skirt');
+    assert.deepEqual(skirtGroundOffset(plus, streetWidth(hechey), H), { x: 0, y: 0 });
+    // The deep dirt (ug_exface3) starts 450 px in from the west end; there only the cross section
+    // (its bottom ~100 px below the edge) covers the skirt, and the skirt shows under it.
+    const face = plus.decos.filter((d) => d.sprite === 'ug_exface3').map((d) => d.x - d.w / 2).sort((a, b) => a - b)[0];
+    assert.ok(face > 300 && face < 600, `the deep dirt starts ${face} px in`);
+    const cross = plus.decos.filter((d) => d.y - H > 40 && d.y - H < 172 && d.x - d.w / 2 < face);
+    assert.ok(cross.length >= 1, 'a cross section over the gap, ending on screen');
+    for (const d of cross) {
+      const t = (d.y - H) / SKIRT_FADE_DEPTH;
+      assert.ok(t >= 0.55 || at(fade, t) - at(art, t) <= 0.05, `${d.y - H} px below: art ${at(art, t).toFixed(2)} vs skirt ${at(fade, t).toFixed(2)}`);
+    }
+    // Under it, down the deep dirt's straight side, both are as dark (from halfway down, above).
+    assert.ok(Math.max(...cross.map((d) => d.y - H)) >= SKIRT_FADE_DEPTH * 0.55);
+
+    // Wiring: every front layer is offered; the fade starts under the deepest walkable ground; the
+    // cover keeps only the art's opacity (a mask), so an avatar behind a front layer is untouched;
+    // it rides with its layer; the middleground's solid copy gets the same cover.
+    const src = readFileSync(join(here, '../public/js/street-render.js'), 'utf8');
+    assert.match(src, /const fronts = layerContainers\.filter\(\(lc\) => lc\.inFront\);/);
+    assert.match(src, /buildGroundSkirt\(PIXI, opts\.renderer, root, grounds, W, sourceH, skirtDepth, [^\n]*fronts, deepestPlatformY - sourceH\);/);
+    const helper = src.slice(src.indexOf('function edgeFadeTexture('), src.indexOf('let solidPrograms'));
+    assert.match(helper, /tint\.mask = mask;/);
+    // Pixi's sprite mask keeps the mask's red channel: the art goes white at its own opacity first
+    // (the first try kept a third of the fade on Hechey's red-brown dirt).
+    assert.match(helper, /whiten\.matrix = \[0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0\];/);
+    assert.match(helper, /const mask = new PIXI\.Sprite\(white\);/);
+    assert.match(src, /lc\.edgeFade\.x = x;\s*lc\.edgeFade\.y = y;/);
+    const body = src.slice(src.indexOf('function buildGroundSkirt('), src.indexOf('function addLadderTiles('));
+    assert.match(body, /edgeFadeTexture\(PIXI, renderer, spr\.texture, w, h, SOLID_OVERLAP \+ fadeStart, colour, artRamp, coverRes\)/);
+    assert.match(body, /cover\.zIndex = lc\.zIndex \+ 5;/);
+    assert.ok(body.indexOf('for (const child of culled) child.culled = true;') > body.indexOf('for (const lc of fronts)'), 'culled decos are in the front layers\' covers too');
+    // The street map snapshots the street down to its edge with each layer stretched to fit: the
+    // covers stay out of it.
+    const map = readFileSync(join(here, '../public/js/ui/street-minimap.js'), 'utf8');
+    assert.match(map, /if \(lc\.edgeFade\) set\(lc\.edgeFade, 'visible', false\);/);
   });
 });
