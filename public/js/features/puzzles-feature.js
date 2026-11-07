@@ -173,22 +173,13 @@ function spawnQuoins(engine, def) {
   }
 }
 
-let limitNoticeAt = 0;
-function limitNotice(engine, limit) {
-  if (Date.now() - limitNoticeAt <= 5000) return;
-  limitNoticeAt = Date.now();
-  engine.toast?.(`Wowza! You've reached today's ${limit}-quoin limit.`);
-}
-
 function takeQuoins(engine) {
   const p = engine.player;
   for (const q of quoinsInReach(run.def.quoins, run.taken, p.x, p.y, 34, locationEventsApi.flag)) {
     const opts = q.amount ? { amount: q.amount } : {};
     const result = collectQuoin(engine.quoinState, q.type, engine.pc, opts);
     if (result.reason === 'daily_limit') {
-      // Ticket 94: as on a street (items/quoin.js 159 keeps the limit here), the quoin stays and the
-      // limit's line shows at most every 5 s (game.js grabWorldQuoin).
-      limitNotice(engine, result.dailyLimit);
+      // Ticket 94: as on a street (items/quoin.js 159 keeps the limit here), the quoin stays, silently.
       continue;
     }
     if (result.hitLimit) engine.announceQuoinLimit?.(result.dailyLimit);

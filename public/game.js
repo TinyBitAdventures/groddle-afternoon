@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=4589e83f';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=127e0a3c';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=7f3e540e';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=5a49bedd';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -13663,13 +13663,8 @@ function grabWorldQuoin(q, shared = null) {
     favorCap: (id) => emblemCostFor(shrineState, id),
     accelerateStudy: (seconds) => accelerateActiveStudy(skillState, seconds, Date.now()),
   });
-  if (!result.ok) {
-    if (!q._limitNoticeAt || Date.now() - q._limitNoticeAt > 5000) {
-      q._limitNoticeAt = Date.now();
-      toast(`Wowza! You've reached today's ${result.dailyLimit}-quoin limit.`);
-    }
-    return false;
-  }
+  // At the limit a quoin says nothing (quoin.js 159); the prompt came when the limit was reached.
+  if (!result.ok) return false;
   // Multiplayer street quoins: the server keeps who took them and brings them back.
   if (Number.isInteger(q.naturalQuoinIndex) && !shared) {
     collectNaturalIndex('quoin', q.naturalQuoinIndex);
@@ -17840,13 +17835,7 @@ async function startWinterWalk(opts = {}) {
 function collectWinterWalkMote(entry) {
   if (!entry?.sprite || entry.collected || !winterWalkState) return false;
   // The motes are iMG quoins in a place that keeps the daily quoin limit (items/quoin.js 159, 236-237).
-  if (quoinState.collectedToday >= quoinState.dailyLimit) {
-    if (!entry._limitNoticeAt || Date.now() - entry._limitNoticeAt > 5000) {
-      entry._limitNoticeAt = Date.now();
-      toast(`Wowza! You've reached today's ${quoinState.dailyLimit}-quoin limit.`);
-    }
-    return false;
-  }
+  if (quoinState.collectedToday >= quoinState.dailyLimit) return false;
   const result = collectWinterMote(
     winterWalkState,
     entry.stage,

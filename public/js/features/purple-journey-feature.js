@@ -458,13 +458,8 @@ function tickQuoins(engine) {
       // quoin.js onPlayerCollision: the daily limit holds here (not a game or Paradise). Ticket 94: at
       // the limit the quoin stays, as on a street, and the line shows at most every 5 s (game.js grabWorldQuoin).
       const res = collectQuoin(engine.quoinState, q.type, engine.pc, { amount: q.amount });
-      if (res.reason === 'daily_limit') {
-        if (Date.now() - (q.limitAt || 0) > 5000) {
-          q.limitAt = Date.now();
-          engine.toast?.(`Wowza! You've reached today's ${res.dailyLimit}-quoin limit.`);
-        }
-        continue;
-      }
+      // At the limit a quoin says nothing (quoin.js 159).
+      if (res.reason === 'daily_limit') continue;
       if (res.hitLimit) engine.announceQuoinLimit?.(res.dailyLimit);
       quoins = quoins.filter((x) => x !== q);
       q.sprite.parent?.removeChild(q.sprite);

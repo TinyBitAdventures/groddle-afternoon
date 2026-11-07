@@ -189,8 +189,22 @@ describe('ticket 94: quest rooms keep the daily quoin limit as a street does', (
     for (const f of ['features/quest-instances-feature.js', 'features/puzzles-feature.js', 'features/purple-journey-feature.js']) {
       const src = read(`js/${f}`);
       assert.doesNotMatch(src, /'Daily quoin limit'/, f);
-      assert.match(src, /Wowza! You've reached today's \$\{[a-zA-Z.]+\}-quoin limit\./, f);
+      assert.match(src, /reason === 'daily_limit'/, f);
     }
+  });
+});
+
+describe('touching a quoin at the limit says nothing', () => {
+  it('the source returns silently (quoin.js 159), and only the prompt is left', () => {
+    const gs = join(publicRoot, '../../glitch-GameServerJS/items/quoin.js');
+    if (existsSync(gs)) {
+      const line = readFileSync(gs, 'utf8').split('\n')[158];
+      assert.match(line, /pc\.stats\.quoins_today\.value >= pc\.stats\.quoins_today\.top\) return;$/);
+    }
+    for (const f of ['game.js', 'js/features/quest-instances-feature.js', 'js/features/puzzles-feature.js', 'js/features/purple-journey-feature.js']) {
+      assert.doesNotMatch(readFileSync(join(publicRoot, f), 'utf8'), /Wowza/, f);
+    }
+    assert.match(quoinLimitPrompt().text, /^Wowza! You've reached your limit on quoins for this game day\.$/);
   });
 });
 

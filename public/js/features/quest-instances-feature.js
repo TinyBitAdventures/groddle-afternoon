@@ -866,13 +866,8 @@ function makeContext(engine) {
       } else if (result.reason === 'daily_limit') {
         // Ticket 94: a quest room keeps the limit as a street does (items/quoin.js 159: only games,
         // races, rainbow_run, Paradise, ignore_quoin_limit places and Qurazy quoins skip it), and
-        // as on a street the quoin stays where it is (the rooms take it only when this is ok) and
-        // the limit's line shows at most every 5 s (game.js grabWorldQuoin).
-        const now = Date.now();
-        if (now - (c.data._quoinLimitAt || 0) > 5000) {
-          c.data._quoinLimitAt = now;
-          engine.toast(`Wowza! You've reached today's ${result.dailyLimit}-quoin limit.`);
-        }
+        // as on a street the quoin stays where it is (the rooms take it only when this is ok),
+        // silently (the same line returns with no message).
         return result;
       }
       engine.updateHud();
