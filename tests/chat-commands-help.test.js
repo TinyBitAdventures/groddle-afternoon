@@ -23,8 +23,8 @@ import {
   slashPlan,
 } from '../public/js/slash-commands.js?v=02bedb12';
 import { chatCommandsSection, createHotkeysSheet } from '../public/js/client-hotkeys.js?v=1d3b39fe';
-import { HINT_DELAY_MS, showLocalLines, slashCommandsFeature } from '../public/js/features/slash-commands-feature.js?v=167e8e6d';
-import { FEATURES } from '../public/js/features/index.js?v=86d488ab';
+import { HINT_DELAY_MS, showLocalLines, slashCommandsFeature } from '../public/js/features/slash-commands-feature.js?v=f330c55d';
+import { FEATURES } from '../public/js/features/index.js?v=b4df516e';
 import { createFeatureHost } from '../public/js/feature-host.js?v=127e0a3c';
 import { CHANNEL_WELCOME, tabCommand } from '../public/js/groups.js?v=07640c71';
 

@@ -99,6 +99,8 @@ import {
   questOfferCard,
   routeQuestEvent,
   syncItemRequirements,
+  readyOfferedQuests,
+  readyOfferText,
   tickQuestTimers,
   toolBreakEvents,
   turnInQuest,
@@ -109,7 +111,7 @@ import {
   COLD_COMFORT_LEAVE_TEXT,
   HOME_TREE_GROWN_TEXT,
   SEED_TO_SCYTHE,
-} from '../quest-offers.js?v=f0fe957c';
+} from '../quest-offers.js?v=486b09c9';
 import { PEAT_TEXT, retireSoloPeatQuest } from '../peat-quest.js?v=c7baea41';
 import { parseQuestConversation } from '../quests.js?v=c8d9d0a4';
 import { questRequirementText, renderQuestText, withQuestMarkup } from '../quest-text.js?v=7f5d761c';
@@ -523,6 +525,26 @@ export function showWaitingOffer(engine, { openPanel = false } = {}) {
   return true;
 }
 
+/**
+ * G571: once a session, when the pack holds everything an offered quest wants (the moment the
+ * last rock comes in, or on load), say to accept it first; again only after it stops being ready.
+ * Canvas questReadyOffer: the last quest nudged.
+ */
+const nudgedReady = new Set();
+function nudgeReadyOffers(engine, now) {
+  const ready = readyOfferedQuests(engine.questState, engine.inv, questContext(engine, now));
+  const ids = new Set(ready.map((r) => r.classTsid));
+  for (const id of [...nudgedReady]) if (!ids.has(id)) nudgedReady.delete(id);
+  for (const row of ready) {
+    if (nudgedReady.has(row.classTsid)) continue;
+    nudgedReady.add(row.classTsid);
+    const text = readyOfferText(row);
+    engine.toast?.(text, 6000);
+    engine.pushActivity(text);
+    engine.setData('questReadyOffer', row.classTsid);
+  }
+}
+
 /** QuestsDialog.as updateCountToast 241-252: the toast's words for `n` new quests. */
 export function questCountToast(n) {
   const count = Math.max(0, Math.floor(Number(n) || 0));
@@ -771,6 +793,7 @@ export const questOffersFeature = {
       const sync = syncItemRequirements(qs, engine.inv, questContext(engine, now));
       if (sync.advanced?.length) engine.updateHud();
       finish(sync.completable, engine);
+      nudgeReadyOffers(engine, now);
     }
     if (quiet) return;
     const cardUp = engine.streetCardUp?.() === true;

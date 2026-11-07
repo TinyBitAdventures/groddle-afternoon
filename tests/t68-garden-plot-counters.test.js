@@ -13,7 +13,7 @@ import { fileURLToPath } from 'node:url';
 
 import { loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js?v=10b118dd';
 import { createQuestState } from '../public/js/quests.js?v=c8d9d0a4';
-import { acceptOffer, routeQuestEvent, gardenPlotEvents } from '../public/js/quest-offers.js?v=f0fe957c';
+import { acceptOffer, routeQuestEvent, gardenPlotEvents } from '../public/js/quest-offers.js?v=486b09c9';
 import { createGarden, listPlotKeys } from '../public/js/garden.js?v=890d72ea';
 import { runVerb } from '../public/content.js?v=075ded81';
 

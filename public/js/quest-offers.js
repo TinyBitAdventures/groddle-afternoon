@@ -56,6 +56,7 @@
  *   eventCounters(event) / requirementRoute(req) / isEventEmitted(event) / questRoutingReport(catalog)
  *   questEventsForVerb(classTsid, verbId, achievementEvents)
  *   turnInQuest(questState, id, pc, ctx)
+ *   readyOfferedQuests(questState, inv, ctx) / readyOfferText(row)  G571: items in hand, quest not accepted
  *   tickQuestTimers(questState, now) / restartTimedQuest(questState, id, now)
  *
  * ctx (all optional): { level, xp, skills, achievements, inv, buffs, hub,
@@ -1646,6 +1647,42 @@ export function syncItemRequirements(questState, inv, ctx = {}) {
   }
   const completable = ctx.silent ? [] : collectCompletable(questState, rows, before);
   return { advanced, completable };
+}
+
+/**
+ * G571: offered quests the pack already has everything for, not yet accepted: waiting (the
+ * Magic Rock's "You have N new quests") or put off (the log's Offered tab). Accepting one turns
+ * it in, but until then nothing happens and nothing said why (Dullite, Beryl and Sparkly, the
+ * Mining I quest the Magic Rock takes rocks for). The original did not say either: GSJS
+ * quests_changed_item (inc_quests.js 107-116) only counts accepted quests. Only quests whose
+ * every requirement is an item (or currants) and that hand in without an NPC.
+ * @returns {{ classTsid: string, def: object, putOff: boolean }[]}
+ */
+export function readyOfferedQuests(questState, inv, ctx = {}) {
+  const rows = [
+    // An emergency offer pops on the street and asks there, so only ordinary ones.
+    ...waitingOffers(questState).filter((r) => !r.emergency).map((r) => ({ classTsid: r.classTsid, def: r.def, putOff: false })),
+    ...listDeclinedOffers(questState).map((r) => ({ classTsid: r.classTsid, def: r.def, putOff: true })),
+  ];
+  const seen = new Set();
+  return rows.filter(({ classTsid, def }) => {
+    if (seen.has(classTsid) || questState.active?.[classTsid]) return false;
+    seen.add(classTsid);
+    const reqs = def?.requirements || [];
+    if (!reqs.some((r) => r.type === 'item') || turnInKind(def) === 'npc') return false;
+    return reqs.every((r) => {
+      if (r.type === 'item') return countIn(inv, r.classId, ctx) >= (Number(r.num) || 1);
+      if (r.type === 'currants') return Math.max(0, Number(ctx.pc?.currants) || 0) >= (Number(r.num) || 0);
+      return false;
+    });
+  });
+}
+
+/** G571: the nudge for a ready offered quest (ours). */
+export function readyOfferText({ def, putOff = false } = {}) {
+  const where = putOff ? 'in the Offered tab of your quest log (Q)' : 'from your quest log (Q)';
+  const then = def?.familiarTurnin ? ' Your Magic Rock takes them once you do.' : '';
+  return `You have everything for “${def?.title || 'a quest'}”, but you haven't accepted that quest yet. Accept it ${where}.${then}`;
 }
 
 /* ------------------------------------------------------------------ */

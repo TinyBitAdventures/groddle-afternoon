@@ -30,7 +30,7 @@
 
 import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=d82f3b00';
 import { getGameDayKey } from '../game-day.js?v=edb00566';
-import { acceptOffer, ensureQuestOfferState } from '../quest-offers.js?v=f0fe957c';
+import { acceptOffer, ensureQuestOfferState } from '../quest-offers.js?v=486b09c9';
 import { VENDOR_PROFILES } from '../vendor.js?v=18b51628';
 import {
   ELEMENT_STACKMAX,
