@@ -38,7 +38,7 @@ import { TRANT_META, canHarvestTrant, fruitCapacityAt, resolveArborologyPackage 
 import { highestLightGreenThumbRank, quoteTrantCare } from './trant-care.js?v=098500ac';
 import { RESOURCE_NODE_ALIASES, RESOURCE_NODE_CATALOG, resolveResourceSkillPackage } from './resource-nodes.js?v=1c268516';
 import { highestAnimalKinshipRank } from './animal-kinship.js?v=05cd67ec';
-import { applyCreatureState, clockOffset, pathFrom } from './street-creatures.js?v=cc92779f';
+import { applyCreatureState, clockOffset, pathFrom } from './street-creatures.js?v=746e64a0';
 
 /** The resource-node classes whose stock is shared (the "N uses left, then regrows" nodes). */
 export const SHARED_NODE_CLASSES = Object.freeze(['mortar_barnacle', 'ice_knob', 'jellisac', 'dirt_pile', 'peat_1', 'paper_tree']);
@@ -380,7 +380,7 @@ export function createStreetCopy() {
   // creatures: the server shares this street's animals (js/street-creatures.js), animals: which ids;
   // offset: the server's clock minus ours, from the least delayed of the recent objs frames' "now"
   // (clock: those frames, js/street-creatures.js clockOffset).
-  return { street: '', snap: false, none: false, objs: new Map(), version: 0, creatures: false, animals: new Set(), spots: {}, offset: 0, clock: [] };
+  return { street: '', snap: false, none: false, objs: new Map(), version: 0, creatures: false, pigPaths: false, animals: new Set(), spots: {}, offset: 0, clock: [] };
 }
 
 /** Take one objs message; returns the ids it changed, or null when it is for another street. */
@@ -394,6 +394,8 @@ export function takeObjs(copy, msg, now = Date.now()) {
     copy.objs.clear();
     copy.version += 1;
     copy.creatures = msg.creatures === true;
+    // G334: this server keeps street Piggies' paths (objects_pigs.go); an older one leaves them to each page.
+    copy.pigPaths = msg.pigpaths === true;
     copy.animals = new Set(Array.isArray(msg.animals) ? msg.animals.filter((id) => typeof id === 'string') : []);
     // A Batterfly's place, the same for everyone ({"batterfly:0":[x,y]}).
     copy.spots = msg.spots && typeof msg.spots === 'object' ? msg.spots : {};
@@ -452,6 +454,10 @@ export function reconcile(obj, copy, now = Date.now()) {
     // The server lists every Piggy of a street it has; one it does not list keeps the local rules.
     if (!s) return false;
     applyPigState(obj.state, s, now);
+    if (copy.pigPaths && obj.target) {
+      const row = copy.objs.get(obj.id);
+      obj.target.sharedPath = pathFrom(s, row?.at ?? now, row?.off ?? copy.offset, row?.srv);
+    }
   } else if (obj.kind === 'chicken' || obj.kind === 'butterfly' || obj.kind === 'batterfly') {
     // An animal the server does not list is fresh: on its path from the start, nobody's egg.
     applyCreatureState(obj.classId, obj.state, s, { me: obj.me, now });

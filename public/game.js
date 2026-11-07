@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=4901531f';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=127e0a3c';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=1f9f520b';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=8b75ad38';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -926,7 +926,7 @@ import {
   ANIMAL_PATROL,
   nearestPlacementGap,
 } from './js/street-ecology.js?v=3c1d4c06';
-import { chickenPauseRoll, easeToward, flightFloorAt, flightFloorFor, flyerLift } from './js/street-creatures.js?v=cc92779f';
+import { chickenPauseRoll, easeToward, flightFloorAt, flightFloorFor, flyerLift } from './js/street-creatures.js?v=746e64a0';
 import { createSoundBoard, DEFAULT_SFX_VOLUME, watchButtonClicks, watchPanelSounds } from './js/sound-board.js?v=87380a25';
 import {
   actionLoopFor,
@@ -14588,7 +14588,17 @@ function physics(dt) {
 
   // patrol NPCs
   for (const p of piggies) {
-    if (menuTarget?.sprite === p || currentAction?.target?.sprite === p) continue;
+    if (menuTarget?.sprite === p || currentAction?.target?.sprite === p) {
+      // Online, a player at it stops it where it is for everyone (street-objects-feature waitAtCreature).
+      p._pathStand?.();
+      continue;
+    }
+    // Multiplayer: a street Piggy the server shares walks its shared path (G334, street-objects-feature),
+    // unless something here holds it (a walk to food, a sulk, the Rook: their own creeping vx).
+    if (p._path?.(dt)) {
+      followWalkFloor(p, dt);
+      continue;
+    }
     p.x += p.vx * dt;
     if (p.x > p.baseX + p.range) { p.x = p.baseX + p.range; p.vx *= -1; }
     if (p.x < p.baseX - p.range) { p.x = p.baseX - p.range; p.vx *= -1; }

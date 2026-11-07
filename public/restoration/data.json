@@ -2732,9 +2732,29 @@
   "deployed": "2026-11-06"
  },
  "git": {
-  "commits": 1420,
+  "commits": 1424,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-07",
+    "kind": "improve",
+    "text": "Street Piggies walk in the same place on every player's screen"
+   },
+   {
+    "date": "2026-11-07",
+    "kind": "new",
+    "text": "Peter out Peat works online, with a full bog and friends, and solo no longer offers it"
+   },
+   {
+    "date": "2026-11-07",
+    "kind": "new",
+    "text": "Bestow Random Kindness on another player, and they see its rainbow"
+   },
+   {
+    "date": "2026-11-07",
+    "kind": "improve",
+    "text": "A player under the cone of silence is silent in Local chat too"
+   },
    {
     "date": "2026-11-07",
     "kind": "improve",
@@ -2834,29 +2854,9 @@
     "date": "2026-11-07",
     "kind": "improve",
     "text": "The Scraper has Party Scraping on and off, as in the original"
-   },
-   {
-    "date": "2026-11-07",
-    "kind": "improve",
-    "text": "Jethimadh, Kajuu, Kalavana, Karnata, Kloro, Lida, Massadoe, Muufo, Nottis and Ormonos have new map paintings, repainted from Tiny Speck's thumbnails of the lost originals"
-   },
-   {
-    "date": "2026-11-06",
-    "kind": "improve",
-    "text": "Streets hold every Ice Nubbin, Mortar Barnacle, Jellisac, Dirt Pile, Peat Bog and rock their files name"
-   },
-   {
-    "date": "2026-11-06",
-    "kind": "fix",
-    "text": "The plural table for Pick up lifts no item's credit gate"
-   },
-   {
-    "date": "2026-11-06",
-    "kind": "fix",
-    "text": "Pick up in Decoration Mode asks how many on a stack of more than one"
    }
   ]
  },
- "tests": 718,
+ "tests": 719,
  "generatedAt": "2026-11-07"
 }

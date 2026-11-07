@@ -170,6 +170,9 @@ const TREE_STOP_PX = TREE_FOOTPRINT / 2 + PIG_BODY / 2;
 const STOP_GAP_PX = PIG_BODY + 8;
 /** The patrol pace, px a second (game.js spawnPiggies: 0.45 px a frame). */
 const PATROL_PX_S = 0.45 * 60;
+/** A Piggy back from food: its shared path has it again within this, and it catches up at this pace (G334). */
+const PATH_CLOSE_PX = 6;
+const PATH_CATCH_PX_S = PATROL_PX_S * 1.6;
 /** A patrol this short (a hold's 2 px) is a Piggy standing still. */
 const HELD_RANGE_PX = 10;
 
@@ -354,7 +357,8 @@ function release(engine, r) {
     const speed = Math.abs(r.saved?.vx) > 0.01 ? Math.abs(r.saved.vx) : 0.45;
     r.saved = null;
     r.stopX = null;
-    if (home && Math.abs(spr.x - home.x) > home.range) {
+    const gap = spr._path && spr._pathPoint ? Math.abs(spr.x - spr._pathPoint().x) : 0;
+    if (gap > PATH_CLOSE_PX || (home && !spr._path && Math.abs(spr.x - home.x) > home.range)) {
       // Back to its own walk, at its walking pace: it does not live at the food.
       r.saved = { range: home.range, vx: speed };
       r.mode = 'home';
@@ -373,6 +377,23 @@ function release(engine, r) {
 function stepHome(engine, r, dtMs) {
   const spr = r.target.sprite;
   const home = r.home;
+  if (spr._path && spr._pathPoint) {
+    // G334: back to where its shared path has got to (every page walks it there), a little over its
+    // walking pace, so it catches up: then the path has it again.
+    const dx = spr._pathPoint().x - spr.x;
+    const speed = Math.abs(r.saved?.vx) > 0.01 ? Math.abs(r.saved.vx) : 0.45;
+    if (Math.abs(dx) <= PATH_CLOSE_PX) {
+      r.mode = 'idle';
+      r.saved = null;
+      spr.baseX = home ? home.x : spr.x;
+      spr.range = home ? home.range : ANIMAL_PATROL.piggies;
+      spr.vx = (dx >= 0 ? 1 : -1) * speed;
+      return;
+    }
+    setX(r, spr.x + Math.sign(dx) * Math.min(Math.abs(dx), (PATH_CATCH_PX_S * dtMs) / 1000));
+    face(r, dx > 0 ? 1 : -1);
+    return;
+  }
   const edge = spr.x < home.x ? home.x - home.range : home.x + home.range;
   const dx = edge - spr.x;
   const dir = dx > 0 ? 1 : -1;
@@ -617,7 +638,8 @@ function canSeek(engine, r) {
 function startSeek(engine, r, food) {
   if (!food || !reachable(r.target.sprite, food.x, food.y)) return false;
   // setMovingTo('food'): rooting stops (wait_rooting 0) and the walk to food plays its walk.
-  if (r.mode === 'root') walkAgain(engine, r);
+  if (r.mode === 'root' || (r.pathPose && r.pathPose !== 'walk')) walkAgain(engine, r);
+  r.pathPose = '';
   r.rootKind = '';
   r.nextRootAt = 0;
   hold(engine, r);
@@ -1470,7 +1492,7 @@ export const animalMoodFeature = {
       } else if (r.mode === 'root') {
         // A player at it or a sulk keeps it standing; then it walks on (startMoving, stopSniffing).
         if (time >= r.rootUntil && !waiting && !crowdHeld) endRoot(engine, r);
-      } else if (r.mode === 'idle' && !isExtra(target) && !crowdHeld && !waiting && Number(target.sprite.range) >= HELD_RANGE_PX
+      } else if (r.mode === 'idle' && !target.sprite._path && !isExtra(target) && !crowdHeld && !waiting && Number(target.sprite.range) >= HELD_RANGE_PX
         && rootingMode(engine) !== 'off' && !isRooked(target, engine) && !isCrowdSad(target.state, time)) {
         // startMoving 1229-1245: the next rooting, randInt(3, 10) s into the walk.
         if (!r.nextRootAt) r.nextRootAt = time + (rootingMode(engine) ? 1000 : piggyRootDelayMs());
@@ -1545,6 +1567,7 @@ export const animalMoodFeature = {
     const r = recordFor(target);
     if (ev === 'happy') say(engine, target, PIGGY_LINES.happy, 3000);
     else if (ev === 'croak') r.nextCroakAt = Math.min(r.nextCroakAt || Infinity, now() + 1500);
+    else if (ev === 'fed' && r.mode === 'idle' && !isRooked(target, engine)) playClip(engine, r, PIGGY_MOOD_SHEETS.chew); // someone else's feed (G334)
     else if (ev === 'ate' && isRooked(target, engine)) {
       // A rooked Piggy stays put (include/rook.js fullStop), whatever the server's tick decided.
     } else if (ev === 'ate' && on?.sprite && r.mode !== 'sad') {
@@ -1560,6 +1583,33 @@ export const animalMoodFeature = {
     lastEvent = `shared:${ev}`;
     target.subtitle = animalStatusLabel('npc_piggy', target.state);
     publish(engine, true);
+    return true;
+  },
+
+  /**
+   * G334: a street Piggy on its shared path (street-objects-feature) stops, looks and sniffs where
+   * the path says, at the same moment on every page: the clips onRooting plays here on its own
+   * clock (startRoot), and standing while a player is at it.
+   */
+  piggyPathPose(target, pose, engine) {
+    const r = recordFor(target);
+    if (r.mode !== 'idle') return true;
+    if (r.pathPose === pose) {
+      // Walking on a clip that has stopped (back from the Rook, a verb's clip): the walk frames again.
+      if (pose === 'walk' && target.sprite?.playing === false) walkAgain(engine, r);
+      return true;
+    }
+    const was = r.pathPose;
+    r.pathPose = pose;
+    if (pose === 'look') {
+      if (!playClip(engine, r, PIGGY_MOOD_SHEETS.lookScreen, { restore: false })) standStill(engine, r);
+    } else if (pose === 'sniff') {
+      if (!playClip(engine, r, PIGGY_MOOD_SHEETS.chew, { restore: false })) standStill(engine, r);
+    } else if (pose === 'stand') {
+      standStill(engine, r);
+    } else if (was) {
+      walkAgain(engine, r);
+    }
     return true;
   },
 

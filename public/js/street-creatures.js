@@ -40,6 +40,11 @@
  * chicken:<i>, butterfly:<i> (the resting ones, then the flyers), batterfly:<i> (husbandryKey).
  * Released and raised animals (husbandryAnimal) and the yard's stay each player's own.
  *
+ * Street Piggies walk a shared path the same way (G334, Austin 2026-11-07): to and fro round their
+ * spot with the original's rooting stops, rolled from a seed every page shares (piggyWalkAt,
+ * features/street-objects-feature.js). Their ids are pig:<i> (js/street-objects.js), and a Piggy's
+ * moods and food walks stay in features/animal-mood-feature.js, which holds it off its path meanwhile.
+ *
  * What is shared besides the path: a Chicken's egg and who owns it (incubatingEgg, with incubBy
  * when it is someone else's, so only the owner's game hatches it), how many times anyone squeezed,
  * massaged or milked it today (sharedSqueezes, sharedMassages, sharedMilks, for the label), and a
@@ -56,6 +61,8 @@ export const CREATURE_KINDS = Object.freeze(['chicken', 'butterfly', 'batterfly'
 /** The remake's solo paths (game.js, at 60 frames a second), now on the shared clock. */
 export const CREATURE_PATHS = Object.freeze({
   chicken: Object.freeze({ speed: 30, range: 100 }),
+  // game.js spawnPiggies: 0.45 px a frame, ANIMAL_PATROL.piggies 90 px each way.
+  pig: Object.freeze({ speed: 27, range: 90 }),
   rest: Object.freeze({ bob: 2.4, amp: 2 }),
   fly: Object.freeze({ speed: 39, bob: 3.6, amp: 14, margin: 40 }),
   batterfly: Object.freeze({ dx: 170 }),
@@ -257,6 +264,78 @@ export function chickenPlan({ baseX = 0, range = CREATURE_PATHS.chicken.range, s
  */
 export function chickenWalkAt(home, t, seed = 1) {
   const plan = chickenPlan(home, seed);
+  const baseX = home?.baseX ?? 0;
+  if (!(plan.ms > 0)) return { ...loopAt(baseX, plan.r, 0), pose: 'walk' };
+  const tc = mod(Number(t) || 0, plan.ms);
+  let seg = plan.segs[0];
+  for (const g of plan.segs) {
+    if (g.at > tc) break;
+    seg = g;
+  }
+  if (seg.pose !== 'walk') return { ...loopAt(baseX, plan.r, seg.s), pose: seg.pose };
+  return { ...loopAt(baseX, plan.r, mod(seg.s + plan.v * (tc - seg.at), 4 * plan.r)), pose: 'walk' };
+}
+
+/**
+ * A street Piggy's rooting (npc_piggy.js startMoving 1226-1245, onRooting 1131-1160, stopSniffing
+ * 1267-1271; animal-mood-feature PIGGY_ROOTING, its solo twin): randInt(3, 10) s into each walk it
+ * stops; three times in ten it looks at the screen for 5 s and walks on the same way, else it sniffs
+ * for 3 s and turns round. One about to stop by a tree's trunk walks on until it is clear of it (lane
+ * PIGSTUCK: never stands in a tree).
+ */
+export const PIGGY_ROOT = Object.freeze({ walkS: Object.freeze([3, 10]), lookChance: 0.3, lookMs: 5000, sniffMs: 3000, trunkWaitMs: 400, trunkTries: 25 });
+
+/** The rootings in one round of a shared Piggy's walk (piggyPlan). */
+export const PIGGY_PLAN_ROOTS = 12;
+
+/**
+ * A shared Piggy's walk with its rooting, as one round that repeats (as chickenPlan): every page
+ * with the same home and seed gets the same round. home.trunks: the x of each tree on the street
+ * that it should not stop at, home.trunkPx how near counts. Returns { ms, r, v, segs }; a seg's pose
+ * is 'walk', 'look' or 'sniff'.
+ */
+export function piggyPlan({ baseX = 0, range = CREATURE_PATHS.pig.range, speed = CREATURE_PATHS.pig.speed, dir = 1, trunks = [], trunkPx = 0 } = {}, seed = 1) {
+  const r = Math.max(1, range);
+  const key = `pig|${baseX}|${r}|${speed}|${dir < 0 ? -1 : 1}|${seed}|${trunkPx}|${trunks.join(',')}`;
+  const hit = planCache.get(key);
+  if (hit) return hit;
+  const v = speed / 1000;
+  const loop = 4 * r;
+  const rng = seededRandom(seed);
+  const start = dir < 0 ? 2 * r : 0;
+  const segs = [];
+  const { walkS, lookChance, lookMs, sniffMs, trunkWaitMs, trunkTries } = PIGGY_ROOT;
+  const byTrunk = (s) => {
+    const x = loopAt(baseX, r, s).x;
+    return trunks.some((t) => Math.abs(t - x) < trunkPx);
+  };
+  let at = 0;
+  let s = start;
+  for (let k = 0; k < PIGGY_PLAN_ROOTS; k += 1) {
+    let walk = (walkS[0] + Math.floor(rng() * (walkS[1] - walkS[0] + 1))) * 1000;
+    for (let i = 0; i < trunkTries && byTrunk(mod(s + v * walk, loop)); i += 1) walk += trunkWaitMs;
+    const look = rng() < lookChance;
+    segs.push({ at, ms: walk, s, pose: 'walk' });
+    at += walk;
+    s = mod(s + v * walk, loop);
+    const hold = look ? lookMs : sniffMs;
+    segs.push({ at, ms: hold, s, pose: look ? 'look' : 'sniff' });
+    at += hold;
+    if (!look) s = loopTurn(r, s);
+  }
+  // On to where the round began, the way it set off.
+  const back = mod(start - s, loop) / v;
+  segs.push({ at, ms: back, s, pose: 'walk' });
+  at += back;
+  const plan = Object.freeze({ ms: at, r, v, segs });
+  if (planCache.size > 256) planCache.clear();
+  planCache.set(key, plan);
+  return plan;
+}
+
+/** A shared Piggy at path time t (ms): x, heading and pose ('walk', 'look', 'sniff') on its round. */
+export function piggyWalkAt(home, t, seed = 1) {
+  const plan = piggyPlan(home, seed);
   const baseX = home?.baseX ?? 0;
   if (!(plan.ms > 0)) return { ...loopAt(baseX, plan.r, 0), pose: 'walk' };
   const tc = mod(Number(t) || 0, plan.ms);
@@ -487,7 +566,7 @@ export function easeToward(current, target, dt = 1) {
  * The most a path moves in a frame (px at 60 fps), per kind: a Chicken walks 0.5 px a frame, a
  * flyer drifts 0.65 px and bobs under 0.9 px; a little over, for a slow frame's rounding.
  */
-export const PATH_STEP = Object.freeze({ chicken: 0.8, fly: 1.2 });
+export const PATH_STEP = Object.freeze({ chicken: 0.8, pig: 0.8, fly: 1.2 });
 
 /**
  * A sprite on its path: where the path moved no more than its walking pace this frame, the sprite

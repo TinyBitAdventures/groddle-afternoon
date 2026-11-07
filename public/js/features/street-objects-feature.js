@@ -123,20 +123,22 @@ import {
   treeId,
   treeReady,
   treeSkill,
-} from '../street-objects.js?v=6c3e757c';
+} from '../street-objects.js?v=355069d7';
 import { ROCK_CATALOG } from '../mining.js?v=29fe2127';
 import { TRANT_META, trantStatusLabel } from '../trants.js?v=9c2e8c0f';
 import { quoteWoodTreeHarvest } from '../woodcutting.js?v=c199dd64';
 import { animalStatusLabel, pickerMaxCount } from '../animals.js?v=d5af4f3c';
 import { highestAnimalKinshipRank, quoteAnimalKinship } from '../animal-kinship.js?v=05cd67ec';
-import { animalPatrolRange } from '../street-ecology.js?v=3c1d4c06';
+import { animalPatrolRange, ANIMAL_BODY, TREE_FOOTPRINT } from '../street-ecology.js?v=3c1d4c06';
 import { INCUBATION, PIGGY_FEED, itemBaseCost, resetIncubation } from '../animal-husbandry.js?v=35b23ef4';
 import {
   applyCreatureState,
   batterflyAt,
   batterflyPerks,
+  CREATURE_PATHS,
   chickenSeed,
   chickenWalkAt,
+  piggyWalkAt,
   creatureOf,
   easeToward,
   flightFloorFor,
@@ -149,7 +151,7 @@ import {
   restAt,
   serverPathClock,
   sharedCreatureLabel,
-} from '../street-creatures.js?v=cc92779f';
+} from '../street-creatures.js?v=746e64a0';
 
 export const STREET_OBJECTS_FEATURE_ID = 'street-objects';
 const RECONCILE_MS = 250;
@@ -180,6 +182,7 @@ function clearPaths() {
     if (spr && spr._path) delete spr._path;
     if (spr) delete spr._pathPoint;
     if (spr) delete spr._pathHold;
+    if (spr) delete spr._pathStand;
   }
   pathed = new Set();
 }
@@ -263,6 +266,16 @@ function bind(engine) {
       creatureEvent(engine, obj, msg);
       return;
     }
+    // Someone else's pet, nibble or feed: this player sees it happen (G334; its hold comes as objs).
+    if (obj.kind === 'pig' && (msg.ev === 'pet' || msg.ev === 'nibble' || msg.ev === 'feed') && Number(msg.by) !== Number(client?.me?.id)) {
+      if (obj.target?.sprite && !obj.target.sprite.destroyed) {
+        if (msg.ev === 'feed') engine.query?.('sharedAnimalEvent', obj.target, { ev: 'fed' }, engine);
+        else engine.playVerbAnimation?.(obj.target, msg.ev, 1500);
+      }
+      lastAnswer = `${obj.id}:${msg.ev}:seen`;
+      publish(engine);
+      return;
+    }
     const on = msg.on ? localObjects(engine).find((row) => row.id === msg.on) : null;
     engine.query?.('sharedAnimalEvent', obj.target, { ev: String(msg.ev || ''), on: on?.target || null }, engine);
   });
@@ -334,6 +347,41 @@ function setPath(engine, obj) {
       spr.walkPose?.(held && p.pose === 'walk' ? 'stand' : p.pose);
       return true;
     };
+  } else if (obj.kind === 'pig') {
+    // G334: its spot and walk from the street's plan (game.js enterStreet, street-ecology.js
+    // animalPatrolRange), the same for everyone; its rooting on the path (js/street-creatures.js
+    // piggyWalkAt). A Piggy held here its own way (a walk to food, a sulk, the Rook: animal-mood-feature
+    // hold, a creeping vx) leaves the path, and comes back to it when let go.
+    if (!copy.pigPaths) return;
+    const spot = engine.placement?.('piggies')?.[obj.index];
+    const trunks = (engine.placement?.('trees') || []).map((p) => p?.x).filter(Number.isFinite);
+    const home = {
+      baseX: Number.isFinite(spot?.x) ? spot.x : spr.baseX,
+      range: spot ? animalPatrolRange('piggies', spot.room) : (spr.range || CREATURE_PATHS.pig.range),
+      speed: CREATURE_PATHS.pig.speed,
+      dir: obj.index % 2 ? -1 : 1,
+      trunks,
+      trunkPx: TREE_FOOTPRINT / 2 + ANIMAL_BODY.piggies / 2,
+    };
+    if (!Number.isFinite(home.baseX)) return;
+    const seed = chickenSeed(obj.index, home.baseX);
+    pointAt = () => piggyWalkAt(home, pathTime(t.sharedPath, Date.now(), copy.offset), seed);
+    step = (dt) => {
+      if (Math.abs(spr.vx || 0) < 0.01) return false;
+      const p = pointAt();
+      spr.x = followPath(spr.x, p.x, dt, PATH_STEP.pig);
+      spr.vx = p.dir * Math.abs(spr.vx || 0.45);
+      const bs = spr.baseScale ?? Math.abs(spr.scale.y);
+      spr.scale.x = p.dir * bs;
+      spr.scale.y = Math.abs(bs);
+      // Walking or rooting; held for someone at it, it stands (npc_animal onWaitStart 2048-2054).
+      const held = Number(t.sharedPath?.holdEnd) > Date.now() + (Number(copy.offset) || 0);
+      engine.query?.('piggyPathPose', t, held && p.pose === 'walk' ? 'stand' : p.pose, engine);
+      return true;
+    };
+    spr._pathStand = () => engine.query?.('piggyPathPose', t, 'stand', engine);
+    // On its path from the first frame, not sliding there from its spot (a reload, a street change).
+    if (Math.abs(spr.vx || 0) >= 0.01) spr.x = pointAt().x;
   } else if (obj.kind === 'butterfly' && t.airborne) {
     const rest = engine.placement?.('butterflies')?.length || 0;
     const j = obj.index - rest;
@@ -412,8 +460,10 @@ let waitSent = { id: '', at: 0, stop: 0 };
 function waitAtCreature(engine, c, wall) {
   if (c.state !== 'online' || !copy.creatures) return;
   const t = engine.interactionTarget?.();
-  const a = t ? creatureOf(t) : null;
-  if (!a || a.kind === 'batterfly' || !copy.animals.has(a.id) || !t.sprite?._path) {
+  // A street Piggy (G334): the same, when the server keeps its path.
+  const pig = t && copy.pigPaths ? streetPigIndex(t, engine.streetTsid) : -1;
+  const a = t ? (pig >= 0 ? { id: pigId(pig), kind: 'pig' } : creatureOf(t)) : null;
+  if (!a || a.kind === 'batterfly' || (a.kind !== 'pig' && !copy.animals.has(a.id)) || !t.sprite?._path) {
     waitSent = { id: '', at: 0, stop: 0 };
     return;
   }
@@ -448,7 +498,7 @@ function showCreatures(engine, all) {
   creaturesShownAt = wall;
   const rows = [];
   for (const obj of all) {
-    if (obj.kind !== 'chicken' && obj.kind !== 'butterfly' && obj.kind !== 'batterfly') continue;
+    if (obj.kind !== 'chicken' && obj.kind !== 'butterfly' && obj.kind !== 'batterfly' && !(obj.kind === 'pig' && copy.pigPaths)) continue;
     const spr = obj.target?.sprite;
     if (!spr) continue;
     // Where it is on the street, and (#) on the canvas, for QA scripts that click it.
@@ -476,6 +526,7 @@ function redraw(engine, obj, before = null) {
     if (obj.target) engine.refreshTreeVisual?.(obj.target);
   } else if (obj.kind === 'pig') {
     if (obj.target) obj.target.subtitle = animalStatusLabel('npc_piggy', obj.state);
+    setPath(engine, obj);
   } else if (obj.kind === 'chicken' || obj.kind === 'butterfly') {
     if (obj.target) obj.target.subtitle = sharedCreatureLabel(obj.classId, obj.state) || animalStatusLabel(obj.classId, obj.state);
     setPath(engine, obj);
@@ -664,8 +715,10 @@ function applyKnown(obj, s) {
   if (obj.kind === 'rock') applyRockState(obj.rock, s, now);
   else if (obj.kind === 'node') applyNodeState(obj.node, s, now);
   else if (obj.kind === 'wood') applyWoodState(obj.state, s, now);
-  else if (obj.kind === 'pig') applyPigState(obj.state, s, now);
-  else if (obj.kind === 'chicken' || obj.kind === 'butterfly' || obj.kind === 'batterfly') {
+  else if (obj.kind === 'pig') {
+    applyPigState(obj.state, s, now);
+    if (copy.pigPaths && obj.target) obj.target.sharedPath = pathFrom(s, now, copy.offset);
+  } else if (obj.kind === 'chicken' || obj.kind === 'butterfly' || obj.kind === 'batterfly') {
     applyCreatureState(obj.classId, obj.state, s, { me: client?.me?.id || 0, now });
     if (obj.target) obj.target.sharedPath = pathFrom(s, now, copy.offset);
   } else applyTreeState(obj.state, s, now);
@@ -790,7 +843,7 @@ export const streetObjectsFeature = {
         const out = { at: Date.now(), off: copy.offset, animals: {} };
         for (const obj of localObjects(engine)) {
           const spr = obj.target?.sprite;
-          if (!spr || (obj.kind !== 'chicken' && obj.kind !== 'butterfly' && obj.kind !== 'batterfly')) continue;
+          if (!spr || (obj.kind !== 'chicken' && obj.kind !== 'butterfly' && obj.kind !== 'batterfly' && !(obj.kind === 'pig' && copy.pigPaths))) continue;
           const g = typeof spr.getGlobalPosition === 'function' ? spr.getGlobalPosition() : null;
           const p = typeof spr._pathPoint === 'function' ? spr._pathPoint() : null;
           out.animals[obj.id] = { x: Math.round(spr.x), y: Math.round(spr.y), path: obj.target.sharedPath || null, px: p && Number.isFinite(p.x) ? Math.round(p.x) : null, py: p && Number.isFinite(p.y) ? Math.round(p.y) : Math.round(spr.y), gx: g ? Math.round(g.x) : null, gy: g ? Math.round(g.y) : null, label: obj.target.label };

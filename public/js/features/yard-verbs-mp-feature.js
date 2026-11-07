@@ -78,14 +78,14 @@ import {
   treeSnapshot,
   visitorAnimalState,
   visitorTreeState,
-} from '../yard-verbs-mp.js?v=5bdf0a65';
+} from '../yard-verbs-mp.js?v=1261f6c8';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
-import { followYardPath, stickForClass } from '../yard-wander.js?v=5a8b39e8';
+import { followYardPath, stickForClass } from '../yard-wander.js?v=5343ee46';
 import { countItem, removeItem } from '../inventory.js?v=d82f3b00';
 import { ROCK_CATALOG, rockStatusLabel, tickMineRock } from '../mining.js?v=29fe2127';
 import { getResourceNodeDef, regrowDelayMs } from '../resource-nodes.js?v=1c268516';
 import { getGameDayKey } from '../game-day.js?v=edb00566';
-import { rockReady } from '../street-objects.js?v=6c3e757c';
+import { rockReady } from '../street-objects.js?v=355069d7';
 import { resourceNodesFeature } from './resource-nodes-feature.js?v=bab30021';
 import {
   ROCK_RESPAWN_MS,

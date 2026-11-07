@@ -21,7 +21,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { createAnimalState } from '../public/js/animals.js?v=d5af4f3c';
-import { PIGGY_ROOTING, animalMoodFeature, piggyRootDelayMs } from '../public/js/features/animal-mood-feature.js?v=a8f56550';
+import { PIGGY_ROOTING, animalMoodFeature, piggyRootDelayMs } from '../public/js/features/animal-mood-feature.js?v=20eb7bc4';
 import { platformsScreen, streetWidth } from '../public/js/street-model.js?v=505d8990';
 import {
   ANIMAL_BODY,
@@ -36,7 +36,7 @@ import {
   streetReservedSpots,
   walkInScenery,
 } from '../public/js/street-ecology.js?v=3c1d4c06';
-import { walkerAt } from '../public/js/street-creatures.js?v=cc92779f';
+import { walkerAt } from '../public/js/street-creatures.js?v=746e64a0';
 import { placementRequests } from '../tools/build-realtime-objects.mjs';
 import { applyStreetIndex, loadStreetDataFromFs, setZoneStreetsShown } from '../public/js/street-loader.js?v=33d2b8bc';
 
@@ -301,7 +301,7 @@ describe('Piggies root as they walk (Austin 2026-11-01; npc_piggy.js onRooting 1
 
   it('a Piggy you stand at roots no more until you leave it; a rooked or sulking one never roots', () => {
     const src = readFileSync(join(root, 'public/js/features/animal-mood-feature.js'), 'utf8');
-    assert.match(src, /r\.mode === 'idle' && !isExtra\(target\) && !crowdHeld && !waiting && Number\(target\.sprite\.range\) >= HELD_RANGE_PX\n\s*&& rootingMode\(engine\) !== 'off' && !isRooked\(target, engine\) && !isCrowdSad\(target\.state, time\)/);
+    assert.match(src, /r\.mode === 'idle' && !target\.sprite\._path && !isExtra\(target\) && !crowdHeld && !waiting && Number\(target\.sprite\.range\) >= HELD_RANGE_PX\n\s*&& rootingMode\(engine\) !== 'off' && !isRooked\(target, engine\) && !isCrowdSad\(target\.state, time\)/);
     assert.match(src, /if \(time >= r\.rootUntil && !waiting && !crowdHeld\) endRoot\(engine, r\);/);
     assert.match(src, /\(r\.mode === 'seek' \|\| r\.mode === 'eat' \|\| r\.mode === 'root'\) && isRooked\(target, engine\)/);
     assert.match(src, /lookScreen: Object\.freeze\(\{ path: 'assets\/sprites\/npc_piggy__x1_look_screen_png_1354829434\.png', fw: 88, fh: 62, cols: 10, frames: 48 \}\)/);
