@@ -129,6 +129,7 @@ describe('the street', () => {
   it('both skins draw it', () => {
     assert.match(read('public/style.css'), /\[data-ui="modern"\] \.count-pop \.count-pop-go \{/);
     assert.match(read('public/css/classic.css'), /\.count-pop-go, \.count-pop-back\) \{/);
+    assert.match(read('public/css/classic.css'), /\.count-pop \.count-pop-go \{/);
     assert.match(read('public/css/classic.css'), /\[data-stack-count-panel\]/);
   });
 });
@@ -164,5 +165,11 @@ describe('Decoration Mode', () => {
 
   it('tests can read it', () => {
     assert.match(pop, /engine\.setData\('homeStackCount', `\$\{id\}:\$\{n\}:\$\{max\}`\)/);
+  });
+});
+
+describe('the plural table grants nothing', () => {
+  it('the economy builder reads it as a catalog, so a class named there does not lift its credit gate', () => {
+    assert.match(read('tools/build-economy.mjs'), /'public\/js\/item-plurals-data\.js',\s+\]\);/);
   });
 });

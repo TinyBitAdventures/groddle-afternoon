@@ -2298,7 +2298,8 @@
   color: var(--c-classic-btn-minor-label);
   font: 800 calc(var(--fs-classic-button) * var(--cu-n, 1))/1 var(--font-classic-title);
 }
-:root[data-ui="classic"] .count-pop :is([data-pack-drop-confirm], [data-pack-eat-confirm], [data-pack-count-confirm], .feed-picker-qty-go, [data-v-go], [data-rook-count-give], .count-pop-go) { min-height: calc(34 * var(--cu)); min-width: calc(84 * var(--cu)); font-size: calc(var(--fs-classic-row) * var(--cu-n, 1)); }
+:root[data-ui="classic"] .count-pop :is([data-pack-drop-confirm], [data-pack-eat-confirm], [data-pack-count-confirm], .feed-picker-qty-go, [data-v-go], [data-rook-count-give]) { min-height: calc(34 * var(--cu)); min-width: calc(84 * var(--cu)); font-size: calc(var(--fs-classic-row) * var(--cu-n, 1)); }
+:root[data-ui="classic"] .count-pop .count-pop-go { min-height: calc(34 * var(--cu)); min-width: calc(84 * var(--cu)); font-size: calc(var(--fs-classic-row) * var(--cu-n, 1)); }
 :root[data-ui="classic"] .count-pop :is([data-pack-eat-choice].is-selected, .count-pop-max[aria-pressed="true"], .feed-picker-qty-max[aria-pressed="true"]) { border-color: var(--c-classic-qty-ring); box-shadow: 0 0 0 1px var(--c-classic-qty-ring); color: var(--c-classic-qty-text); }
 :root[data-ui="classic"] .count-pop button:disabled { opacity: 0.45; cursor: default; }
 :root[data-ui="classic"] .count-pop .count-pop-note.is-blocked { color: var(--c-classic-disabled); }

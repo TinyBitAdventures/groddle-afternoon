@@ -104,6 +104,8 @@ const CATALOGS = new Set([
   'public/js/data-versions.js',
   // The art a put-down stack shows, for every droppable class (tools/world-art/render.py): art, not a grant.
   'public/js/world-art-list.js',
+  // What the Pick up chooser calls each class (js/world-items.js pickupCountTitle): words, not a grant.
+  'public/js/item-plurals-data.js',
 ]);
 
 export function unitValue(classTsid) {
