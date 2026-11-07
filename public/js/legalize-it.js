@@ -314,18 +314,21 @@ const legalizeUpdate = (updates) => updates.find((u) => u.classTsid === LEGALIZE
  */
 export function activateCardFromPack({ questState, inv, achieveState, pc = null, now = Date.now() } = {}) {
   const questActive = Boolean(questState?.active?.[LEGALIZE_QUEST_ID]);
-  const legalize = questActive ? ensureLegalizeState(questState) : questState?.story?.legalize || null;
-  const result = activateQualification(legalize, countItem(inv, LEGALIZE_CARD_ID) > 0, now, {
-    hasBadge: hasCardBadge(achieveState),
-  });
-  if (!result.ok) {
+  const hasCard = countItem(inv, LEGALIZE_CARD_ID) > 0;
+  const hasBadge = hasCardBadge(achieveState);
+  // A refused activation leaves the quest's story alone: an application made up here had no way back.
+  const refused = activateQualification(null, hasCard, now, { hasBadge });
+  if (!refused.ok) {
     return {
-      ...result,
-      msg: result.reason === 'already_activated' ? LEGALIZE_ALREADY_HAVE : 'The qualification is missing.',
+      ...refused,
+      state: questState?.story?.legalize || null,
+      msg: refused.reason === 'already_activated' ? LEGALIZE_ALREADY_HAVE : 'The qualification is missing.',
       updates: [],
       questCompleted: false,
     };
   }
+  const legalize = questActive ? ensureLegalizeState(questState) : questState?.story?.legalize || null;
+  const result = activateQualification(legalize, hasCard, now, { hasBadge });
   removeItem(inv, LEGALIZE_CARD_ID, 1);
   const badge = unlockAchievement(achieveState, LEGALIZE_CARD_ID, pc);
   if (questActive) applyQuestProgress(questState, 'acquired_card_carrying_qualification', 1, pc);
@@ -353,6 +356,54 @@ export function legalizeOnAccepted({ questState, inv, achieveState, pc = null, n
   }
   const done = updates.filter((u) => u.completed);
   return { completed: Boolean(legalizeUpdate(done)), updates: done };
+}
+
+/** The two places only the quest opens (instances, never streets): The Back Alley and its Bureaucratic Hall. */
+export const LEGALIZE_INSTANCE_TSIDS = Object.freeze([LEGALIZE_BACK_ALLEY_TSID, LEGALIZE_HALL_TSID]);
+
+/**
+ * Where leaving the quest's places takes you: instances_exit returns you to
+ * the place the instance was entered from (players/inc_instances.js;
+ * npc_bureaucrat.js 762 and 795, pc.instances_get_exit('back_alley')), which
+ * is the application's sourceLocation. With none recorded, `fallback` (the
+ * game passes Gregarious Grange Subway Station, in front of A Red Button,
+ * the door into The Back Alley: subway_gate.js 158).
+ */
+export function legalizeWayBack(state, fallback = null) {
+  const src = state?.sourceLocation;
+  const spot = src?.tsid ? src : fallback?.tsid ? fallback : null;
+  return spot ? { tsid: String(spot.tsid), x: Number(spot.x) || 0, y: Number(spot.y) || 0 } : null;
+}
+
+/** An application with no way back gets `fallback`, so every way out has somewhere to go. */
+export function ensureLegalizeWayBack(state, fallback = null) {
+  if (!state) return null;
+  if (!state.sourceLocation?.tsid) state.sourceLocation = legalizeWayBack(null, fallback);
+  return state.sourceLocation;
+}
+
+/**
+ * A saved location inside The Back Alley or the quest's hall: neither is a
+ * street a reload can open, so the reload resumes at the way back (an older
+ * build could save one when the application had no way back). null for any
+ * other place.
+ */
+export function legalizeReloadLocation(saved, questState, fallback = null) {
+  if (!LEGALIZE_INSTANCE_TSIDS.includes(String(saved?.tsid || ''))) return null;
+  return legalizeWayBack(questState?.story?.legalize, fallback);
+}
+
+/**
+ * Leave (abandon) the application: the quest and its route go, the pack
+ * stays as it is. The quest hands out nothing (quests/card_carrying_
+ * qualification.js: no items in its rewards or steps); a Card-Carrying
+ * Qualification in the pack was bought (store 17, 50 currants) and is kept.
+ */
+export function abandonLegalize(questState) {
+  if (!questState) return false;
+  if (questState.active) delete questState.active[LEGALIZE_QUEST_ID];
+  if (questState.story) delete questState.story.legalize;
+  return true;
 }
 
 export function legalizeObjective(state) {

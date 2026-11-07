@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=075ded81';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=127e0a3c';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=a6fdfb4b';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=f54652d4';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -105,7 +105,9 @@ import {
   LEGALIZE_CLERKS,
   LEGALIZE_GRANGE_TSID,
   LEGALIZE_HALL_TSID,
+  LEGALIZE_INSTANCE_TSIDS,
   LEGALIZE_QUEST_ID,
+  abandonLegalize,
   activateCardFromPack,
   answerLegalizeQuestion,
   beginLegalizeApplication,
@@ -114,16 +116,19 @@ import {
   createLegalizeState,
   departForBackAlley,
   ensureLegalizeState,
+  ensureLegalizeWayBack,
   enterBackAlleyStation,
   enterBureaucraticHall,
   exitToGregariousGrange,
   legalizeObjective,
   legalizeOnAccepted,
+  legalizeReloadLocation,
+  legalizeWayBack,
   purchaseQualification,
   qualificationVerb,
   requestLegalizeQualification,
   travelToGregarious,
-} from './js/legalize-it.js?v=22140819';
+} from './js/legalize-it.js?v=bebf2574';
 import { HALL, HALL_LAYOUT, HALL_QUESTIONS } from './js/bureaucratic-hall.js?v=a0bc6317';
 import { STATION_X, stationArrival, stationScreen, surfaceStation } from './js/subway.js?v=44d1a09f';
 import { ALLEY, SHADY, drawAlley, inEnteredBox } from './js/quest-rooms/back-alley-set.js?v=3a8a00af';
@@ -11454,6 +11459,8 @@ const features = createFeatureHost(FEATURES);
  */
 function instanceWayBack() {
   if (legalizeRun && legalizeSourceLocation?.tsid) return legalizeSourceLocation;
+  // Never save a place inside the quest's instances: a reload there resumes at their way out.
+  if (LEGALIZE_INSTANCE_TSIDS.includes(currentStreetTsid)) return legalizeWayOut();
   if (rookMuseumState && rookMuseumSourceLocation?.tsid) return rookMuseumSourceLocation;
   if (summersDayRun && summersDaySourceLocation?.tsid) return summersDaySourceLocation;
   if (deEmbiggenifyState && deEmbiggenifySourceLocation?.tsid) return deEmbiggenifySourceLocation;
@@ -16223,6 +16230,12 @@ const LEGALIZE_STATION_ARRIVAL = stationArrival(-575);
 const LEGALIZE_GATE_SPOT = stationScreen(STATION_X.gate - 70);
 /** Up the stairs: in front of the street's subway entrance (the stairs door's connect arrive). */
 const LEGALIZE_GRANGE_ARRIVAL = Object.freeze({ x: 3430, y: 910 });
+/**
+ * The way out when an application has none recorded: Gregarious Grange
+ * Subway Station in front of A Red Button, the door into The Back Alley
+ * (subway_gate.js 158), where instances_exit returns whoever came in by it.
+ */
+const LEGALIZE_EXIT_FALLBACK = Object.freeze({ tsid: LEGALIZE_STATION_STREET, x: LEGALIZE_GATE_SPOT.x, y: LEGALIZE_GATE_SPOT.y });
 /** npc_bureaucrat.js 784: the halls the Bureaucrat marks on your map (prod), as streets. */
 const LEGALIZE_HALL_STREETS = Object.freeze(['GLI32G3NUTD100I', 'GA91JUQT2G82GUL', 'GA5I10NJDL52TKD']);
 
@@ -16236,8 +16249,17 @@ function legalizeRouteState() {
   if (legalizeRun) return legalizeRun;
   if (!questState.active?.[LEGALIZE_QUEST_ID] || !questState.story?.legalize) return null;
   legalizeRun = ensureLegalizeState(questState);
-  legalizeSourceLocation = legalizeRun.sourceLocation || null;
+  // An application with no way back (an older build made one from the pack) leads out by the station.
+  legalizeSourceLocation = ensureLegalizeWayBack(legalizeRun, LEGALIZE_EXIT_FALLBACK);
   return legalizeRun;
+}
+
+/** Where leaving The Back Alley or the quest's hall takes you, never null (js/legalize-it.js legalizeWayBack). */
+function legalizeWayOut() {
+  return legalizeWayBack(
+    { sourceLocation: legalizeSourceLocation || legalizeRun?.sourceLocation || null },
+    LEGALIZE_EXIT_FALLBACK
+  );
 }
 
 /** On one of the route's places (the station, the street, the alley, the hall). */
@@ -16447,7 +16469,8 @@ function installLegalizeScene(layer, { tsid, label, hubName, spawnX, spawnY = nu
     nameEl.textContent = hubName ? `${label} · ${hubName}` : label;
     nameEl.dataset.tsid = tsid;
   }
-  savePlayerLocation(legalizeSourceLocation);
+  // A reload resumes at the way out, never inside (a null here threw and left the alley empty).
+  savePlayerLocation(legalizeWayOut());
 }
 
 function makeLegalizeBureaucrat(index, x, y, scale = 0.86) {
@@ -16699,7 +16722,9 @@ function finishLegalizePurchase() {
 /** The Shady Bureaucrat's proposition (npc_bureaucrat.js propositionPlayer, no back_alley_business). */
 function legalizeBriefing(target) {
   if (legalizeRun.stage !== 'back_alley') {
+    // npc_bureaucrat.js 762-797: the proposition's OK (or cancel) always ends in instances_exit('back_alley').
     toast('The Bureaucratic Hall on Gregarious Grange is marked on your route.');
+    legalizeExitAlley();
     return;
   }
   if (isQuestDialogueOpen()) return;
@@ -16749,6 +16774,18 @@ async function legalizeLeaveAlley() {
     'You leave The Back Alley for Gregarious Grange Subway Station.',
     'Exit the station to reach the Bureaucratic Hall.'
   );
+}
+
+/**
+ * instances_exit('back_alley') whatever the stage: after the briefing, on to
+ * the station as the route goes; a finished application goes back where it
+ * came from; anything else to the station in front of A Red Button.
+ */
+async function legalizeExitAlley() {
+  if (currentStreetTsid !== LEGALIZE_BACK_ALLEY_TSID || legalizeTransitionBusy) return;
+  if (legalizeRun?.stage === 'back_alley_briefed') return legalizeLeaveAlley();
+  if (!legalizeRun || legalizeRun.stage === 'complete') return leaveLegalizeIt({ abandon: false });
+  await legalizeRunStep(spawnLegalizeGregariousStation, 'You leave The Back Alley for Gregarious Grange Subway Station.', '');
 }
 
 function handleLegalizeTarget(target, verbId) {
@@ -16862,6 +16899,8 @@ async function startLegalizeIt(opts = {}) {
       x: player?.x ?? WORLD_W * 0.5,
       y: player?.y ?? GROUND_Y,
     });
+    // Started from inside the alley or the hall: their way back can't be themselves.
+    if (LEGALIZE_INSTANCE_TSIDS.includes(legalizeSourceLocation?.tsid)) legalizeSourceLocation = { ...LEGALIZE_EXIT_FALLBACK };
     legalizeRun = ensureLegalizeState(questState, legalizeSourceLocation);
     legalizeRun.sourceLocation ||= createLegalizeState(legalizeSourceLocation).sourceLocation;
     legalizeSourceLocation = legalizeRun.sourceLocation || legalizeSourceLocation;
@@ -16904,14 +16943,14 @@ async function startLegalizeIt(opts = {}) {
 }
 
 async function leaveLegalizeIt({ abandon = false } = {}) {
-  if (!legalizeRun || legalizeTransitionBusy) return false;
-  const destination = legalizeSourceLocation || legalizeRun.sourceLocation;
-  if (!destination?.tsid) return false;
+  if (legalizeTransitionBusy) return false;
+  if (!legalizeRun && !LEGALIZE_INSTANCE_TSIDS.includes(currentStreetTsid)) return false;
+  // The way back, else the station in front of A Red Button: Leave always has somewhere to go.
+  const destination = legalizeWayOut();
   legalizeTransitionBusy = true;
-  if (abandon && legalizeRun.stage !== 'complete') {
-    delete questState.active[LEGALIZE_QUEST_ID];
-    delete questState.story?.legalize;
-    removeItem(inv, LEGALIZE_CARD_ID, countItem(inv, LEGALIZE_CARD_ID));
+  if (abandon && legalizeRun && legalizeRun.stage !== 'complete') {
+    // The quest and its route go; the cards in the pack were bought, so they stay (js/legalize-it.js abandonLegalize).
+    abandonLegalize(questState);
     pushActivity('You left the bureaucracy for another time.');
   }
   closeQuestDialogue({ force: true });
@@ -29412,7 +29451,9 @@ async function main() {
       : Math.max(1, Math.floor(TOOL_CONDITION_CATALOG[toolDemo].capacity * 0.12));
     setToolRemaining(toolState, toolDemo, requested);
   }
-  const featureStart = features.query('reloadLocation', loadPlayerLocation(), engine);
+  // The Back Alley and the quest's hall are instances, not streets: a save inside resumes at their way out.
+  const featureStart = legalizeReloadLocation(loadPlayerLocation(), questState, LEGALIZE_EXIT_FALLBACK) ||
+    features.query('reloadLocation', loadPlayerLocation(), engine);
   const savedLoc = featureStart
     ? resolveSavedLocation(featureStart)
     : bootParams.has('fresh') ? null : resolveSavedLocation(loadPlayerLocation());
