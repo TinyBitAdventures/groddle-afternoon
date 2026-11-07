@@ -106,3 +106,35 @@ export function newPlayerInventory(...keySets) {
   }
   return out;
 }
+
+/**
+ * The boot's one-time pack grants for solo saves from before an item
+ * existed (game.js): a Hatchet (the Wood Tree loop) and one ticket for each
+ * starter Paradise course, in that order. Only an absent entry is filled, so
+ * a deliberate zero (used, dropped, sold) stays zero.
+ *
+ * Solo only (G565). Every multiplayer save postdates these items, and a new
+ * multiplayer player's pack holds each at a deliberate zero; but a
+ * multiplayer save without the entries (a QA seed, a save a tool wrote) was
+ * handed a Hatchet and four Paradise tickets the site's ledger never granted
+ * (1,000 each in data/economy.json): kept against the ledger's budget or
+ * corrected away. The original's new player gets none of them:
+ * players/player.js onCreate (1188-1243) creates no items outside its
+ * skip_newux testing path, and Paradise tickets come from imagination
+ * "keepable" cards (inc_data_imagination.js 7171ff).
+ * @param {Record<string, number>} inv the pack
+ * @param {string} mode GAME_MODE ('solo' | 'multiplayer', js/game-mode.js)
+ * @param {string[]} starterTicketIds the starter Paradise tickets
+ * @returns {string[]} the class ids granted
+ */
+export function grantSoloStarterItems(inv, mode, starterTicketIds = []) {
+  if (mode === 'multiplayer' || !inv || typeof inv !== 'object') return [];
+  const granted = [];
+  for (const id of ['hatchet', ...starterTicketIds]) {
+    if (typeof id === 'string' && id && inv[id] === undefined) {
+      inv[id] = 1;
+      granted.push(id);
+    }
+  }
+  return granted;
+}

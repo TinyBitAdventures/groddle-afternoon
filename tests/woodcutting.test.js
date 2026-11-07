@@ -157,7 +157,10 @@ test.describe('Wood Tree client integration', () => {
     assert.match(game, /bootParams\.has\('hatchetremaining'\)/);
     assert.match(game, /resetWoodTreeDay\(tree\.state\)/);
     assert.match(game, /woodTreeChanged/);
-    assert.match(game, /if \(inv\.hatchet === undefined\) inv\.hatchet = 1/);
+    // Solo saves from before the Wood Tree loop get one Hatchet (never multiplayer, G565).
+    assert.match(game, /grantSoloStarterItems\(inv, GAME_MODE, /);
+    const newPlayer = fs.readFileSync(path.join(root, 'public/js/new-player.js'), 'utf8');
+    assert.match(newPlayer, /for \(const id of \['hatchet', \.\.\.starterTicketIds\]\)/);
     assert.match(html, /game\.js\?v=[0-9a-f]{8}/);
     assert.match(game, /muted: loadMutedPreference\(\)/);
   });

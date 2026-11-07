@@ -16,7 +16,7 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { newPlayerInventory, newPlayerStats } from '../public/js/new-player.js?v=553c5481';
+import { newPlayerInventory, newPlayerStats } from '../public/js/new-player.js?v=d9fa4f61';
 import { createInventory } from '../public/js/inventory.js?v=d82f3b00';
 import { PARADISE_TICKET_IDS } from '../public/js/paradise-flight.js?v=abcd78b9';
 import { createPlayerSave, parsePlayerSave, restorePlayerSave, serializePlayerSave, normalizePlayerSnapshot } from '../public/js/player-save.js?v=3f743187';

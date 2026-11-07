@@ -214,7 +214,8 @@ export function normalizeResourceFeatureSlice(slice) {
 
 /**
  * One-time pack migration: grant the Scraper, Shovel and Firefly Jar to new
- * players and saves made before this feature. Only an absent entry is filled,
+ * solo players and solo saves made before this feature (never multiplayer:
+ * the feature marks the kit handled there, G565). Only an absent entry is filled,
  * so a deliberate zero (sold or dropped) is preserved, and the flag stops the
  * grant from repeating once the tool has left the pack entirely.
  * @returns {string[]} granted class ids
@@ -1587,7 +1588,8 @@ export const resourceNodesFeature = {
     const params = [...new URLSearchParams(globalThis.location?.search || '').keys()];
     fireflyOffer.allowed = engine.param('fireflyoffer') === '1' || !params.some((key) => /demo$|autoplay$/.test(key));
     // A new multiplayer player (js/new-player.js) starts with an empty pack: no kit, now or later.
-    if (engine.newPlayer) kit.starterKit = true;
+    // No multiplayer save gets it either (G565): every one postdates the kit, and the ledger never granted it.
+    if (engine.newPlayer || engine.mode === 'multiplayer') kit.starterKit = true;
     else migrateResourceStarterKit(engine.inv, kit);
     publish(engine);
   },
@@ -1603,7 +1605,7 @@ export const resourceNodesFeature = {
     if (!normalized.jarCopies && normalized.jar.flies > 0 && engine?.toolState && countItem(engine.inv, JAR) > 0) {
       setFireflyJar(engine, 0, normalized.jar.flies);
     }
-    kit.starterKit = normalized.starterKit;
+    kit.starterKit = normalized.starterKit || engine?.mode === 'multiplayer';
     bonusSnailsAt = normalized.bonusSnailsAt || 0;
     if (engine) migrateResourceStarterKit(engine.inv, kit);
   },

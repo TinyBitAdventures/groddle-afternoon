@@ -10,18 +10,19 @@ import { join } from 'node:path';
 import {
   NEW_PLAYER_SOURCE,
   NEW_PLAYER_STATS,
+  grantSoloStarterItems,
   isNewMultiplayerPlayer,
   newPlayerInventory,
   newPlayerStats,
-} from '../public/js/new-player.js?v=553c5481';
+} from '../public/js/new-player.js?v=d9fa4f61';
 import { createBrowserSaveStore, createMultiplayerSaveStore, createSaveStore } from '../public/js/save-store.js?v=8839ba7b';
 import { createInventory } from '../public/js/inventory.js?v=d82f3b00';
-import { normalizePlayerSnapshot } from '../public/js/player-save.js?v=3f743187';
+import { normalizePlayerSnapshot, parsePlayerSave, restorePlayerSave } from '../public/js/player-save.js?v=3f743187';
 import { createQuoinState } from '../public/js/quoins.js?v=f154a79e';
 import { createShrineState } from '../public/js/shrines.js?v=95d74174';
-import { PARADISE_TICKET_IDS } from '../public/js/paradise-flight.js?v=abcd78b9';
+import { PARADISE_COURSES, PARADISE_TICKET_IDS } from '../public/js/paradise-flight.js?v=abcd78b9';
 import { imaginationFeature, STARTER_UPGRADES } from '../public/js/features/imagination-feature.js?v=0589acce';
-import { RESOURCE_FEATURE_ID, resourceNodesFeature } from '../public/js/features/resource-nodes-feature.js?v=af4c5520';
+import { RESOURCE_FEATURE_ID, resourceNodesFeature } from '../public/js/features/resource-nodes-feature.js?v=adb71cf1';
 
 const here = import.meta.dirname;
 const pub = join(here, '..', 'public');
@@ -153,6 +154,69 @@ describe('features with a starter kit', () => {
   it('the tutorial hands each bought card to the imagination shop', () => {
     const src = read('js/features/newxp-feature.js');
     assert.match(src, /save\.upgrades\.push\(buy\);\n.*\n\s*engineRef\.query\?\.\('grantTutorialUpgrade', buy, engineRef\);/);
+  });
+});
+
+describe('G565: a multiplayer save gains nothing on load', () => {
+  // game.js's filter: the starter Paradise tickets (the nine reconstructed courses are the shop's).
+  const starterTickets = Object.values(PARADISE_COURSES).filter((c) => c.starterTicket !== false).map((c) => c.ticketId);
+  const UNEARNED = /^(paradise_ticket_|race_ticket)|^(hatchet|scraper|shovel|firefly_jar)$/;
+
+  /** What the boot does to a loaded save's pack: restore it, then the one-time grants. */
+  function bootPack(mode, playerStateJson, { newPlayer = false } = {}) {
+    const inv = createInventory(newPlayer ? newPlayerInventory(createInventory(), PARADISE_TICKET_IDS) : {});
+    const pc = newPlayer ? newPlayerStats() : {};
+    const saved = playerStateJson ? parsePlayerSave(playerStateJson, { inventory: inv, player: pc }) : null;
+    if (saved) restorePlayerSave(saved, inv, pc, {});
+    const engine = { mode, newPlayer, inv, param: () => null, setData() {} };
+    resourceNodesFeature.restore({ starterKit: false });
+    resourceNodesFeature.init(engine);
+    if (saved) resourceNodesFeature.restore(saved.systems?.features?.[RESOURCE_FEATURE_ID] || {}, engine);
+    grantSoloStarterItems(inv, mode, starterTickets);
+    return inv;
+  }
+  const held = (inv) => Object.fromEntries(Object.entries(inv).filter(([, n]) => n > 0));
+
+  it('the four starter Paradise tickets are the ones the boot used to hand out', () => {
+    assert.deepEqual(starterTickets, ['paradise_ticket_cloud_rings', 'paradise_ticket_radial_heights', 'paradise_ticket_starlit_night', 'paradise_ticket_slip_n_slide']);
+  });
+
+  it('a fresh online save without the starter entries loads with no tickets and no unearned items', () => {
+    // The QA scripts' seed (tools/qa/online-smoke.mjs seedSave): a player state whose pack lacks the keys.
+    for (const inventory of [{}, { guano: 10 }]) {
+      const seed = JSON.stringify({ savedAt: 5, inventory, player: { currants: 0, level: 2, xp: 150 }, systems: { quests: { active: {}, completed: {} } } });
+      const inv = bootPack('multiplayer', seed);
+      assert.deepEqual(held(inv), inventory, JSON.stringify(inv));
+      assert.deepEqual(Object.keys(inv).filter((c) => UNEARNED.test(c) && inv[c] > 0), []);
+    }
+  });
+
+  it('a real new player loads with none, and still none after a reload of what it saved', () => {
+    const first = bootPack('multiplayer', null, { newPlayer: true });
+    assert.deepEqual(held(first), {});
+    for (const id of ['hatchet', ...starterTickets]) assert.equal(first[id], 0, `${id}: a deliberate zero in the first save`);
+    const features = { [RESOURCE_FEATURE_ID]: resourceNodesFeature.save() };
+    const reload = bootPack('multiplayer', JSON.stringify({ savedAt: 6, inventory: first, player: { level: 1 }, systems: { features } }));
+    assert.deepEqual(held(reload), {});
+  });
+
+  it('a ticket earned online stays as it is; solo keeps its one-time grants', () => {
+    const earned = bootPack('multiplayer', JSON.stringify({ savedAt: 5, inventory: { paradise_ticket_cloud_rings: 2 }, player: {}, systems: {} }));
+    assert.deepEqual(held(earned), { paradise_ticket_cloud_rings: 2 });
+    const solo = {};
+    assert.deepEqual(grantSoloStarterItems(solo, 'solo', starterTickets), ['hatchet', ...starterTickets]);
+    assert.deepEqual(grantSoloStarterItems(solo, 'solo', starterTickets), [], 'once');
+    const zeros = { hatchet: 0, paradise_ticket_cloud_rings: 0 };
+    assert.deepEqual(grantSoloStarterItems(zeros, 'solo', starterTickets), starterTickets.slice(1), 'a deliberate zero stays zero');
+    assert.equal(zeros.hatchet, 0);
+    const old = bootPack('solo', JSON.stringify({ savedAt: 5, inventory: { apple: 1 }, player: {}, systems: {} }));
+    assert.deepEqual(held(old), { apple: 1, hatchet: 1, scraper: 1, shovel: 1, firefly_jar: 1, ...Object.fromEntries(starterTickets.map((t) => [t, 1])) });
+  });
+
+  it('game.js grants them only through the solo-only helper', () => {
+    const game = read('game.js');
+    assert.match(game, /grantSoloStarterItems\(inv, GAME_MODE, PARADISE_TICKET_IDS\.filter\(\(id\) => paradiseCourseForTicket\(id\)\?\.starterTicket !== false\)\);/);
+    assert.doesNotMatch(game, /inv\.hatchet === undefined|inv\[ticketId\] === undefined/);
   });
 });
 

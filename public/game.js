@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=075ded81';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=127e0a3c';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=9a45ac17';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=c33c1a4c';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -984,7 +984,7 @@ import { hidesChatBubble } from './js/hi-signs.js?v=b90c7d7e';
 // Multiplayer phase 1: the mode flag and the save interface every save read/write goes through.
 import { GAME_MODE, isSolo } from './js/game-mode.js?v=1ecf2899';
 import { saveStore } from './js/save-store.js?v=8839ba7b';
-import { isNewMultiplayerPlayer, newPlayerInventory, newPlayerStats } from './js/new-player.js?v=553c5481';
+import { grantSoloStarterItems, isNewMultiplayerPlayer, newPlayerInventory, newPlayerStats } from './js/new-player.js?v=d9fa4f61';
 import { SPEECH_HOLD_MARGIN, clearSpeechOfBox, deepestSpeechTip, giveArtHeight, holdSpeechSide, hudColumnBox, placeSpeechTail, placeSpeechTip, slideOffAvatars, speechBubbleOutline, speechOffsetFor, speechTipOnSide } from './js/speech-placement.js?v=d12cdd6a';
 import { shrineDonationResponseKey, verbResponse } from './js/verb-responses.js?v=3ceb8a8c';
 import { itemZ } from './js/item-bands.js?v=e98b10bc';
@@ -29219,16 +29219,11 @@ async function main() {
     if (homeState.owned) seedMailbox(mailboxState, Date.now());
   }
   const resumeHomeAtBoot = homeState.owned && homeState.inHome;
-  // One-time inventory migration for saves created before the Wood Tree loop.
-  // A deliberate zero remains zero, so dropped Hatchets do not respawn.
-  if (inv.hatchet === undefined) inv.hatchet = 1;
-  // This slice introduces one source ticket for each supplied Paradise video.
-  // Preserve deliberate zeroes after a ticket has been activated or dropped.
-  for (const ticketId of PARADISE_TICKET_IDS) {
-    // The nine reconstructed courses are dealt by the imagination shop.
-    if (paradiseCourseForTicket(ticketId)?.starterTicket === false) continue;
-    if (inv[ticketId] === undefined) inv[ticketId] = 1;
-  }
+  // One-time pack grants for solo saves from before the Wood Tree loop (a Hatchet) and the
+  // Paradise slice (one ticket per supplied video; the nine reconstructed courses are dealt by
+  // the imagination shop). A deliberate zero stays zero. Never in multiplayer (G565): the
+  // ledger never granted them (js/new-player.js grantSoloStarterItems).
+  grantSoloStarterItems(inv, GAME_MODE, PARADISE_TICKET_IDS.filter((id) => paradiseCourseForTicket(id)?.starterTicket !== false));
   // Pack-economy QA: &paradiseticket=<course>|all puts one ticket in the pack.
   if (bootParams.has('paradiseticket')) {
     const wanted = String(bootParams.get('paradiseticket') || '').toLowerCase();
