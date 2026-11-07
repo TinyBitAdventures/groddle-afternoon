@@ -91,6 +91,8 @@
  */
 
 import { countItem, ensureItem, ITEM_CATALOG, removeItem } from '../inventory.js?v=d82f3b00';
+import { pickupCountTitle } from '../world-items.js?v=2f0f2022';
+import { createCountChooser } from '../ui/count-chooser.js?v=5bc894c8';
 import { isBagClass } from '../pack-slots.js?v=c91d0ca3';
 import { createCombobox } from '../combobox.js?v=d43209e8';
 import {
@@ -5145,6 +5147,7 @@ function drawStackSelection(engine) {
 }
 
 function selectStack(engine, id) {
+  closeStackCount(engine);
   selected = id ? { kind: 'stack', id } : null;
   drawStackSelection(engine);
   renderFurniture(engine);
@@ -5162,6 +5165,7 @@ function overPack(clientX, clientY) {
 function moveStack(engine, id, p) {
   const row = stackRow(engine, id);
   if (!row) return { ok: false, reason: 'gone' };
+  closeStackCount(engine);
   const target = stackSurfaceAt(decor, p.x, p.y);
   row.x = target.x + roomX0();
   row.y = target.y;
@@ -5176,11 +5180,16 @@ function moveStack(engine, id, p) {
   return { ok: true, target };
 }
 
-/** Back in the pack, by the item's own Pick up (game.js pickupDroppedWorldItem: a full pack refuses). */
-function pickUpStack(engine, id) {
-  const ok = Boolean(engine.pickUpDroppedStack?.(id));
+/**
+ * Back in the pack, by the item's own Pick up (game.js pickupDroppedWorldItem: a full pack refuses, and
+ * what doesn't fit stays down). The last argument is how many were chosen; a stack dragged onto the pack goes whole.
+ * What is left stays selected, to take more of it.
+ */
+function pickUpStack(engine, id, count = Infinity) {
+  closeStackCount(engine);
+  const ok = Boolean(engine.pickUpDroppedStack?.(id, count));
   engine.setData('homeStackLast', ok ? `picked:${id}` : `refused:${id}`);
-  if (ok || !stackRow(engine, id)) selected = null;
+  if (!stackRow(engine, id)) selected = null;
   drawStackSelection(engine);
   renderBar(engine);
   publish(engine);
@@ -5216,17 +5225,66 @@ function stackIntoBox(engine, id, hit) {
   return res;
 }
 
+/**
+ * The How many open on the selected stack's Pick up: { id, count, chooser }. The original had no such
+ * button, its chooser came with the verb (InteractionMenuController.as 976-985): this asks as that does,
+ * starting on the whole stack (game.js openPickupCount). Dragging onto the pack still takes it all.
+ */
+let stackCount = null;
+
+function closeStackCount(engine) {
+  if (!stackCount) return;
+  stackCount = null;
+  engine.setData('homeStackCount', '');
+}
+
+/** Pick up pressed: how many, when it is more than one and the pack has room for any; else at once. */
+function askStackCount(engine, row) {
+  const max = engine.pickUpCountAsked?.(row.id) || 0;
+  if (!max) return pickUpStack(engine, row.id);
+  const id = row.id;
+  const backToActions = () => {
+    closeStackCount(engine);
+    syncFloating(engine, true);
+    ui?.builder?.pop?.querySelector('[data-home-stack="pickup"]')?.focus({ preventScroll: true });
+    publish(engine);
+  };
+  const say = (n) => engine.setData('homeStackCount', `${id}:${n}:${max}`);
+  const chooser = createCountChooser(document, {
+    title: pickupCountTitle(row.classTsid),
+    max,
+    verb: 'Pick up',
+    hook: 'stack-count',
+    back: 'Back',
+    change: say,
+    confirm: (n) => {
+      pickUpStack(engine, id, n);
+      ui?.builder?.pop?.querySelector('[data-home-stack="pickup"]')?.focus({ preventScroll: true });
+    },
+    cancel: backToActions,
+  });
+  stackCount = { id, count: row.count, chooser };
+  say(max);
+  syncFloating(engine, true);
+  chooser.focus();
+  return null;
+}
+
 function stackPop(engine) {
   if (selected?.kind !== 'stack' || placing) return null;
   const row = stackRow(engine, selected.id);
   if (!row) return null;
+  if (stackCount?.id === row.id && stackCount.count === row.count) {
+    return { key: `sc:${row.id}:${row.count}`, title: itemName(row), actions: [], extra: [stackCount.chooser.panel] };
+  }
+  closeStackCount(engine);
   return {
     key: `s:${row.id}:${row.count}:${row.x}:${row.y}`,
     title: itemName(row),
     sub: BUILDER_TEXT.stackHint,
     actions: [
       { label: 'Move', attrs: { 'data-home-stack': 'move' }, onClick: () => { stackCarry = { id: row.id }; syncFloating(engine, true); } },
-      { label: 'Pick up', attrs: { 'data-home-stack': 'pickup' }, onClick: () => pickUpStack(engine, row.id) },
+      { label: 'Pick up', attrs: { 'data-home-stack': 'pickup' }, onClick: () => askStackCount(engine, row) },
     ],
     extra: [],
   };
@@ -5352,10 +5410,12 @@ function syncFloating(engine, force = false) {
   reserveBannerZone(engine, force);
   if (!mode || !scene) {
     popModel = null;
+    closeStackCount(engine);
     b.setPop(null);
     b.setPlace(null);
     return;
   }
+  if (selected?.kind !== 'stack' || selected.id !== stackCount?.id) closeStackCount(engine);
   if (force) popModel = mode === 'decorate' ? (selected?.kind === 'stack' ? stackPop(engine) : furniturePop(engine)) : selected?.kind === 'fixture' ? fixturePop(engine) : cultivationPop(engine);
   // Ticket 52: the style column stands in for the piece's actions while it is open.
   if (popModel && !drag && !placing && !stackCarry && !upgradePickerOpen()) b.setPop(popModel, popAnchor(engine));
@@ -5554,6 +5614,11 @@ function bindPointer(engine) {
       // 102-111 submits escape_value; HouseExpandDialog.as 202-209 sets it false). The bar stays open.
       if (engine.questDialogueOpen?.()) return;
       e.stopImmediatePropagation();
+      // How many's Esc is its Back, wherever the focus went.
+      if (stackCount) {
+        ui?.builder?.pop?.querySelector('[data-stack-count-back]')?.click();
+        return;
+      }
       // The style picker's Escape is its Cancel (FurnUpgradeDialog.as); it used to fall through
       // to deselecting the piece and left the picker open (ticket 52's QA).
       if (upgradePickerOpen()) {
@@ -5589,6 +5654,8 @@ function bindPointer(engine) {
       return;
     }
     if (typing(e.target) || e.ctrlKey || e.metaKey || e.altKey || engine.questDialogueOpen?.()) return;
+    // How many's buttons keep the keys (js/ui/count-chooser.js): the arrows step its count, not the camera.
+    if (e.target?.closest?.('.count-pop')) return;
     const dir = panKey(e.key);
     if (mode === 'cultivate') {
       // CultManager: what you carry rides at your feet while you walk.
@@ -5624,7 +5691,8 @@ function bindPointer(engine) {
       } else if (selected && !placing) {
         // Enter reaches the selected piece's actions.
         e.preventDefault();
-        ui?.builder?.pop?.querySelector('button:not([disabled])')?.focus();
+        if (stackCount) stackCount.chooser.focus();
+        else ui?.builder?.pop?.querySelector('button:not([disabled])')?.focus();
       }
     }
   }, true);

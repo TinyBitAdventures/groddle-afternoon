@@ -132,3 +132,37 @@ describe('the street', () => {
     assert.match(read('public/css/classic.css'), /\[data-stack-count-panel\]/);
   });
 });
+
+describe('Decoration Mode', () => {
+  const homes = read('public/js/features/homes-feature.js');
+  const pop = homes.slice(homes.indexOf('let stackCount = null;'), homes.indexOf('/** A stack dragged (or carried after Move)'));
+
+  it('Pick up asks through the shared chooser on more than one; one press on one or on a full pack', () => {
+    assert.match(pop, /'data-home-stack': 'pickup' \}, onClick: \(\) => askStackCount\(engine, row\)/);
+    assert.match(pop, /const max = engine\.pickUpCountAsked\?\.\(row\.id\) \|\| 0;\s+if \(!max\) return pickUpStack\(engine, row\.id\);/);
+    assert.match(pop, /createCountChooser\(document, \{/);
+    assert.match(pop, /title: pickupCountTitle\(row\.classTsid\)/);
+    assert.match(game, /pickUpCountAsked\(id\) \{\s+return pickupCountAsked\(/);
+  });
+
+  it('dragging onto the pack and onto a Storage Display Box still takes the whole stack', () => {
+    assert.match(homes, /if \(overPack\(e\.clientX, e\.clientY\)\) return pickUpStack\(engine, was\.id\);/);
+    const box = homes.slice(homes.indexOf('function stackIntoBox('), homes.indexOf('let stackCount = null;'));
+    assert.match(box, /if \(!engine\.pickUpDroppedStack\?\.\(id\)\) \{/);
+  });
+
+  it('what is left stays selected, and the count reaches the engine', () => {
+    const fn = homes.slice(homes.indexOf('function pickUpStack('), homes.indexOf('function stackIntoBox('));
+    assert.match(fn, /engine\.pickUpDroppedStack\?\.\(id, count\)/);
+    assert.match(fn, /if \(!stackRow\(engine, id\)\) selected = null;/);
+  });
+
+  it('the keys: Esc goes back, not out of the mode, and the arrows on its buttons leave the camera alone', () => {
+    assert.match(homes, /if \(stackCount\) \{\s+ui\?\.builder\?\.pop\?\.querySelector\('\[data-stack-count-back\]'\)\?\.click\(\);\s+return;/);
+    assert.match(homes, /if \(e\.target\?\.closest\?\.\('\.count-pop'\)\) return;\s+const dir = panKey\(e\.key\);/);
+  });
+
+  it('tests can read it', () => {
+    assert.match(pop, /engine\.setData\('homeStackCount', `\$\{id\}:\$\{n\}:\$\{max\}`\)/);
+  });
+});
