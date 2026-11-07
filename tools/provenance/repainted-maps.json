@@ -2418,6 +2418,86 @@
         "pack": "research/zone-art/map-cauda (outside git): pack.md, prompt.txt, attach/, drop/, review/"
       }
     },
+    "121": {
+      "hubName": "Sura",
+      "x1": {
+        "file": "assets/maps/art/bg/sura.webp",
+        "w": 760,
+        "h": 460,
+        "bytes": 35090,
+        "sha256": "7e0f5b9a7a8b4e35385ddf1c551fd6e0400bebea12418aacffe67126f6504157"
+      },
+      "x2": {
+        "file": "assets/maps/art/bg/sura@2x.webp",
+        "w": 1520,
+        "h": 920,
+        "bytes": 108420,
+        "sha256": "c684cca1b87421ceb94fc1f35d4814742060a873c5e1d4003c77dd1033f8885a"
+      },
+      "licence": "ai-generated",
+      "author": "Austin Ginder (directed and chose it)",
+      "tool": "GPT Image 2.6 Sunburst in T3 Chat canvas (t3.chat/canvas)",
+      "model": "GPT Image 2.6 Sunburst",
+      "made": "2026-11-06",
+      "chosen": {
+        "by": "Austin Ginder",
+        "on": "2026-11-06",
+        "of": "1 generation, toned down; Austin 2026-11-06: keep going, four per reset, landing each batch"
+      },
+      "prompt": "Paint ONE image: the background painting for an in-game region map of \"Sura\", a region in a whimsical 2D browser game. Size 1520 x 920 pixels (landscape, exactly this ratio; if only fixed ratios are offered, use 16:10). This is the painted landscape that sits UNDER the game's map interface. The game draws its own street lines, names, buttons and markers on top later, so the painting must contain none of them.\n\nVIEW AND FEEL\nSeen from directly above, like a painted map: not from a side or three-quarter angle. Trees read as small round canopies or small pointed tops with a soft shadow; no trunks showing. Hills, cliffs and slopes read by their light and shadow. Like a hand-painted miniature diorama, quiet and gentle: muted natural colours, soft shadows, a fine even texture over the ground (like felt or fine brush strokes), and only a little scattered detail. Fewer and smaller features is better than more: most of the land is calm open ground, so thin street lines and small labels drawn on top stay easy to read. Storybook, never grim, never photographic, never neon.\n\nWHAT TO PAINT\nOne area of thick bushland seen from above. Its shape must follow attachment 02 closely (same outline, same position, same proportions), because the game's streets are fixed to those positions (attachment 03).\n- No sea: the land fills the picture to every edge.\n- Ground: dense, soft masses of olive-green scrub, like a thick carpet of small bushes, covering most of the picture.\n- Running through the scrub: a branching network of narrow open valleys of short, paler yellow-green grass, the main one running from the left edge across to the right with side valleys spreading up and down from it like branches, roughly where the streets run.\n- The scrub masses between the valleys are rounded and raised, with darker shadowed edges where they meet the valleys.\n- The top-right corner: a ledge of pale grey rock at the edge.\n- A few small grey stones and low stumps in the valleys, sparse.\n- Light: soft daylight from the upper left; the scrub masses cast soft shadows into the valleys.\n\nSTYLE\nMatch attachment 05: Tiny Speck's own painted plants and scenery for this region (soft painterly shapes, gentle shading, no hard black outlines), but much smaller and simpler, as seen on a map from high above.\n\nDO NOT INCLUDE\nNo text, letters, numbers or labels of any kind. No roads, paths, lines, grids or street markings. No circles, buttons, pins, arrows, icons, stars or \"you are here\" markers. No compass, legend, scale bar, border, frame, title or vignette. No people or characters. No UI of any kind.\n\nATTACHMENTS\n01  the original 150 x 91 thumbnail of this region's painting (Tiny Speck, public domain). The colours and the layout to follow.\n02  that thumbnail enlarged to 1520 x 920 with no extra detail. Follow its shapes closely: coastlines, cliffs, water, forest and open ground in the same places and proportions; repaint everything with real detail.\n03  where the game will draw the streets (dark lines) and region exits (yellow circles), at the same 1520 x 920 scale. For placement only: do NOT paint these lines or circles.\n04  a screenshot of how the game shows this map today: a blurry enlargement of the thumbnail with the game's interface drawn on top (street lines, street names, green GO buttons, panel and buttons). It is here only so you can see what the painting is for. Do NOT copy any of the interface; paint only the landscape underneath it.\n05  Tiny Speck's own painted trees, plants and scenery from this region's streets (public domain). The style and palette to match, drawn smaller and simpler.\n\nReturn the single painted landscape image only.\n",
+      "promptNote": "The prompt exactly as given to the model: research/zone-art/tools/prompt-template.txt with this region’s WHAT TO PAINT, written from the 2012 footage frame.",
+      "inputs": [
+        {
+          "n": 1,
+          "file": "01-thumbnail-150x91.jpg",
+          "sha256": "4a224cdac8c69d3d1ad3d9e83893f145b3a3f7adfeb0c245f24b34afd22fc062",
+          "what": "the region’s own 150 x 91 thumbnail of the lost painting",
+          "source": "Tiny Speck, CC0: glitch-overlays/world_map.fla LIBRARY/z_hub_maps_small/sm_sura.jpg (byte for byte public/assets/maps/art/thumbs/sm_sura.jpg)"
+        },
+        {
+          "n": 2,
+          "file": "02-thumbnail-enlarged-1520x920.png",
+          "sha256": "f08ac70993142b2967187bb5085d801f048fca3ef90489d7440fb83282e52dd0",
+          "what": "input 1 enlarged to 1520 x 920 (Lanczos), nothing added: the coastline and colour guide",
+          "source": "made from input 1, CC0"
+        },
+        {
+          "n": 3,
+          "file": "03-street-layout-1520x920.png",
+          "sha256": "a94c3f50133c17aa2bf55b48e542e0ac210cffe0bae0c46f11e0a4fce169bfd0",
+          "what": "where the map draws the 20 visible streets (dark lines) and 3 exits (yellow circles), at 2x",
+          "source": "drawn from Tiny Speck’s CC0 map data (public/assets/maps/hubs/hub-121.json, from GSJS inc_data_maps_prod.js)"
+        },
+        {
+          "n": 4,
+          "file": "04-our-map-window-with-ui.png",
+          "sha256": "f1f0757c8a67294dffb46786a6b28a8168650c5b11359840040b6579dd0c5084",
+          "what": "the remake’s own map window at 2x (its UI over the enlarged thumbnail), so the model saw what the painting is for; the prompt says to copy none of the UI",
+          "source": "our own render (Groddle Afternoon UI and the CC0 thumbnail)"
+        },
+        {
+          "n": 5,
+          "file": "05-style-cc0-decos.png",
+          "sha256": "6cbec311b3bd1c823925a1afe1788f103812f65cd88eb34891d944f4618aea8d",
+          "what": "a sheet of 18 decos Tiny Speck painted this region’s streets with (the most used trees, plants and scenery): the style and palette",
+          "source": "Tiny Speck decos, CC0"
+        }
+      ],
+      "references": [
+        "A frame of the original painting from the 2012 video \"tour: The Map of Ur\" (YouTube bXxXB6GUoMU at 141.9 s): reference only, never given to the model and never in the repo; the prompt describes its composition in words"
+      ],
+      "source": {
+        "generated": "2048 x 1152 (16:9, High 2K; no 16:10 option), centre-cropped to 1520 x 920: drop/sura-1.png",
+        "dropSha256": "b95418f8582094a6d1235531918707f30a4a5691954a57f26c9e0be4d40e95e7",
+        "toning": "magick sura-1.png -modulate 100,62,98 -fill #8a8a5a -colorize 8% master.png (calmer, toward the original’s muted olive)",
+        "masterSha256": "83743040d73c519ad404eeba231022530981b47192f44c404f3ca11a9f2f84af",
+        "encode": {
+          "x1": "magick master.png -filter Lanczos -resize 760x460! -quality 82 -define webp:method=6 sura.webp",
+          "x2": "magick master.png -quality 82 -define webp:method=6 sura@2x.webp"
+        },
+        "pack": "research/zone-art/map-sura (outside git): pack.md, prompt.txt, attach/, drop/, review/"
+      }
+    },
     "123": {
       "hubName": "Fenneq",
       "x1": {

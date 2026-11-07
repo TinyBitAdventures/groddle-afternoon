@@ -44,7 +44,7 @@ export const HUB_MAP_BACKGROUNDS = Object.freeze({
   '116': Object.freeze({ x1: 'assets/maps/art/bg/haraiva.webp', x2: 'assets/maps/art/bg/haraiva@2x.webp', repainted: true }), // Haraiva
   '119': Object.freeze({ x1: 'assets/maps/art/bg/folivoria.webp', x2: 'assets/maps/art/bg/folivoria@2x.webp', repainted: true }), // Folivoria
   '120': Object.freeze({ x1: 'assets/maps/art/bg/cauda.webp', x2: 'assets/maps/art/bg/cauda@2x.webp', repainted: true }), // Cauda
-  '121': Object.freeze({ x1: 'assets/maps/art/bg/sura.webp', x2: 'assets/maps/art/bg/sura@2x.webp' }), // Sura
+  '121': Object.freeze({ x1: 'assets/maps/art/bg/sura.webp', x2: 'assets/maps/art/bg/sura@2x.webp', repainted: true }), // Sura
   '123': Object.freeze({ x1: 'assets/maps/art/bg/fenneq.webp', x2: 'assets/maps/art/bg/fenneq@2x.webp', repainted: true }), // Fenneq
   '126': Object.freeze({ x1: 'assets/maps/art/bg/roobrik.webp', x2: 'assets/maps/art/bg/roobrik@2x.webp', repainted: true }), // Roobrik
   '128': Object.freeze({ x1: 'assets/maps/art/bg/balzare.webp', x2: 'assets/maps/art/bg/balzare@2x.webp', repainted: true }), // Balzare

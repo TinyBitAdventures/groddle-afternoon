@@ -641,10 +641,11 @@
       "thumbMatches": true,
       "x1": "assets/maps/art/bg/sura.webp",
       "x2": "assets/maps/art/bg/sura@2x.webp",
-      "x1Bytes": 13444,
-      "x1Sha256": "f77e89839409c9d5769dc049909b401891017800963a1ad37d913ed4852d5511",
-      "x2Bytes": 28964,
-      "x2Sha256": "81748a9f107953dbbac63d433ec8490690cf8b7fe08d7eea34e05de75bccccee"
+      "repainted": "tools/provenance/repainted-maps.json",
+      "x1Bytes": 35090,
+      "x1Sha256": "7e0f5b9a7a8b4e35385ddf1c551fd6e0400bebea12418aacffe67126f6504157",
+      "x2Bytes": 108420,
+      "x2Sha256": "c684cca1b87421ceb94fc1f35d4814742060a873c5e1d4003c77dd1033f8885a"
     },
     "123": {
       "hubName": "Fenneq",
