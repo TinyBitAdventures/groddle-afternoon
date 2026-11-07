@@ -104,10 +104,10 @@
       "x1": "assets/maps/art/bg/groddleforest.webp",
       "x2": "assets/maps/art/bg/groddleforest@2x.webp",
       "repainted": "tools/provenance/repainted-maps.json",
-      "x1Bytes": 40876,
-      "x1Sha256": "d722d2077864a55f10085c6ec84c74b972d65aad31dd6180839dd1775e54b1b2",
-      "x2Bytes": 123838,
-      "x2Sha256": "7240f25b339b294475246829cc67fcfb25370b2cc0adbe1011240531465eedde"
+      "x1Bytes": 53528,
+      "x1Sha256": "296e950b60e926dc17498476d136a165aa6233f8719b0ad802564bb6b0d6a500",
+      "x2Bytes": 163296,
+      "x2Sha256": "405377b93db02e6e9e36c96c5ecfc5d4892b73dc2d9afdff4aaf5bd027ca1324"
     },
     "58": {
       "hubName": "Groddle Meadow",
@@ -120,10 +120,10 @@
       "x1": "assets/maps/art/bg/groddlemeadow.webp",
       "x2": "assets/maps/art/bg/groddlemeadow@2x.webp",
       "repainted": "tools/provenance/repainted-maps.json",
-      "x1Bytes": 33492,
-      "x1Sha256": "4e8624369c444080656e27f25689b551b8a4833910680d5476d1aef988c41da0",
-      "x2Bytes": 119986,
-      "x2Sha256": "fa9e290a06cc2ae7112f3ddac36f2af150edb1a5e5b881557e5410427dd6c637"
+      "x1Bytes": 43070,
+      "x1Sha256": "82c60c310845f3a98d41205b5bc9cee38eaeef2fc219d9d6c4302ba2874da3b7",
+      "x2Bytes": 159456,
+      "x2Sha256": "4808cae82f780c6705d7d675f6d7dcd3c2e833c31e53b1fb69b7ef6178623b7a"
     },
     "63": {
       "hubName": "Shimla Mirch",
@@ -216,10 +216,10 @@
       "x1": "assets/maps/art/bg/alakol.webp",
       "x2": "assets/maps/art/bg/alakol@2x.webp",
       "repainted": "tools/provenance/repainted-maps.json",
-      "x1Bytes": 38366,
-      "x1Sha256": "0d657ba1e25d1dff7ae44f720e2a82224424643177e6bd218fcff4223ebd2d9a",
-      "x2Bytes": 118906,
-      "x2Sha256": "36818ea9609fdbaefda60db8212e2bd97a5afdd4fc7b7fd2d0b6882efb585329"
+      "x1Bytes": 43596,
+      "x1Sha256": "a0cad877631ab079b6638f35193c020fccf44ec9ebe14399e000b15a5c93082e",
+      "x2Bytes": 164072,
+      "x2Sha256": "dd6e7073b0ff6bfbc8c6f6706168186226e1466a776fc34449aa3388c7670b4e"
     },
     "85": {
       "hubName": "Kajuu",
