@@ -187,6 +187,11 @@ export function fecundityScatter(kind, animals = []) {
   return { ok: true, count, drops, message, achievementCounters, sound: kind === 'startling' ? 'EFFECT_EXTREME' : 'EFFECT_MILD' };
 }
 
+/** findCloseStack: the target nearest to x (by its sprite). */
+export function closestTarget(targets, x = 0) {
+  return (targets || []).reduce((best, t) => (!best || Math.abs(t.sprite.x - x) < Math.abs(best.sprite.x - x) ? t : best), null);
+}
+
 // ---------------------------------------------------------------------------
 // Fertilidust
 // ---------------------------------------------------------------------------

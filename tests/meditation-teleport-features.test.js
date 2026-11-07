@@ -9,7 +9,7 @@ import assert from 'node:assert/strict';
 import { createFeatureHost } from '../public/js/feature-host.js?v=127e0a3c';
 import { createInventory, countItem } from '../public/js/inventory.js?v=d82f3b00';
 import { bindToolInventory, createToolConditionState } from '../public/js/tools.js?v=689d6594';
-import { meditationFeature } from '../public/js/features/meditation-feature.js?v=b84b5a66';
+import { meditationFeature } from '../public/js/features/meditation-feature.js?v=a24d6807';
 import { teleportationFeature } from '../public/js/features/teleportation-feature.js?v=ee0d6d00';
 
 function fakeEngine(overrides = {}) {

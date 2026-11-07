@@ -38,6 +38,8 @@
  *   packVerbNet, packVerbDefect.
  */
 
+import { displayTopOf } from '../overlay-art.js?v=11b6dd7f';
+import { OVERLAY_USES, playOverlay } from '../overlays.js?v=6ab8ee10';
 import { addItem, countItem, removeItem } from '../inventory.js?v=d82f3b00';
 import { getGameDayKey } from '../game-day.js?v=edb00566';
 import { levelInfoForXp, XP_FOR_LEVEL } from '../progression.js?v=33462eaa';
@@ -51,7 +53,7 @@ import { HERDKEEPING, hogtieEscapeDelayMs, husbandryPack } from '../animal-husba
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=db7c442f';
 import { sourceFromUrl, frameTexture } from '../textures.js?v=3149d699';
 import { landingY, walkSurfaceY } from '../walk-surface.js?v=c982983e';
-import { overlayOrStandIn } from '../overlay-stand-in.js?v=b3120e67';
+import { overlayOrStandIn } from '../overlay-stand-in.js?v=a415f4bc';
 import {
   BUNDLE_OF_JOY,
   BUTTERFLY_NET,
@@ -524,6 +526,28 @@ function tickTwelve(engine, t) {
 
 /* ---- Juju Shoo-Shoo Powder ------------------------------------------ */
 
+/**
+ * G380 juju_shoo_shoo_powder.js 279-288: the mild powder burst on every boss on the street, 1:1 for
+ * 3 s. Its gang's overlay (289-297) is keyed by the loop index (j.tsid), so no gang member shows one.
+ */
+function jujuBurst(engine) {
+  const use = OVERLAY_USES.powder_juju_shoo_shoo;
+  if (!engine.PIXI) return;
+  for (const t of engine.interactables || []) {
+    const spr = t?.classId === 'npc_juju_boss' ? t.sprite : null;
+    if (!spr || spr.destroyed) continue;
+    playOverlay(engine.PIXI, use.key, {
+      layer: engine.fxLayer || engine.entityLayer,
+      at: () => ({ x: spr.x + use.dx, y: displayTopOf(spr) + use.dy }),
+      alive: () => !spr.destroyed,
+      wh: use.wh,
+      durationMs: use.durationMs,
+      loop: use.loop,
+    });
+    engine.setData?.('jujuPowderBurst', use.key);
+  }
+}
+
 function blowPowder(engine) {
   // pc.location.item_exists('npc_juju_boss'): the remake's streets have no Juju boss (only Dust Trap bandits).
   const bossHere = (engine.interactables || []).some((t) => t?.classId === 'npc_juju_boss');
@@ -531,6 +555,7 @@ function blowPowder(engine) {
   if (out.ok) {
     engine.playSound?.(JUJU_POWDER.sound, { volume: 0.6 });
     engine.query?.('jujuPowderBlow', engine);
+    jujuBurst(engine);
     if (keepsCopies(engine, 'juju_shoo_shoo_powder')) {
       // That jar's charge (the one picked, else the one in use); emptied, that jar is gone.
       spendCopyCharge(engine, 'juju_shoo_shoo_powder', picked);

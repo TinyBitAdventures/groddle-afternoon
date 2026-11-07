@@ -87,6 +87,7 @@ import { metabolicGain, moodMax, loseEnergy, loseMood } from '../metabolics.js?v
 import {
   POWDERS,
   POWDER_TEXT,
+  closestTarget,
   dragonChased,
   fecundityScatter,
   FECUNDITY_DELAY_MS,
@@ -99,7 +100,7 @@ import {
   sniffNoNo,
   sprinkleHallowed,
   usePowderCharge,
-} from '../powders.js?v=ba1b2753';
+} from '../powders.js?v=908929b1';
 import { itemVerbAchievementCounters } from '../item-verbs.js?v=1e20fa7d';
 import { copyChargesLeft, copyFromLedger, keepsCopies, spendCopyCharge, verbCopy } from '../copy-charges.js?v=157a665b';
 import { migrateClassValue } from '../tools.js?v=689d6594';
@@ -107,7 +108,7 @@ import { DEAD_TRANT_CLASSES } from '../patches.js?v=ddd16221';
 import { hellFeature } from './hell-feature.js?v=13196575';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 import { displayTopOf, playSheetOverlay } from '../overlay-art.js?v=11b6dd7f';
-import { OVERLAY_USES, playOverlay } from '../overlays.js?v=ea22d918';
+import { OVERLAY_USES, playOverlay } from '../overlays.js?v=6ab8ee10';
 import {
   POWDER_MP,
   POWDER_MP_TEXT,
@@ -224,14 +225,15 @@ function notify(engine, classTsid, verb) {
  * delta 25 / 200 from the stack's top, 5.4 s after 2 s; fertilidust_lite.js 279-290:
  * target_effect_powder_mild, delta 75 / 200, 4.3 s).
  */
-function powderBurst(engine, key, targets) {
-  const use = OVERLAY_USES[key];
+function powderBurst(engine, key, targets, useKey = key) {
+  const use = OVERLAY_USES[useKey];
   for (const t of targets) {
     const spr = t?.sprite;
     if (!spr || spr.destroyed) continue;
     playOverlay(engine.PIXI, key, {
       layer: engine.fxLayer || engine.entityLayer,
       at: () => ({ x: spr.x + use.dx, y: displayTopOf(spr) + use.dy }),
+      alive: () => !spr.destroyed,
       wh: use.wh,
       durationMs: use.durationMs,
       delayMs: use.delayMs,
@@ -366,9 +368,12 @@ const RUNNERS = {
 
   fecundity(engine, classTsid) {
     const kind = POWDERS[classTsid].fecundity;
-    const animals = streetTargets(engine, (t) => /^npc_(?:piggy|butterfly|chicken)$/.test(t.classId))
-      .map((t) => ({ classId: t.classId, x: t.sprite.x, y: t.sprite.y }));
+    const targets = streetTargets(engine, (t) => /^npc_(?:piggy|butterfly|chicken)$/.test(t.classId));
+    const animals = targets.map((t) => ({ classId: t.classId, x: t.sprite.x, y: t.sprite.y }));
     const out = fecundityScatter(kind, animals);
+    // G380: the burst on each animal that scatters, following it (powder_of_*_fecundity.js 311-357).
+    const useKey = `powder_${kind}_fecundity`;
+    powderBurst(engine, OVERLAY_USES[useKey].key, targets.slice(0, out.count), useKey);
     for (const drop of out.drops) {
       later(FECUNDITY_DELAY_MS[kind], () => engine.dropWorldStack?.(drop.classTsid, drop.count, drop.x, drop.y - 1));
     }
@@ -427,9 +432,14 @@ const RUNNERS = {
     say(engine, out.message, out.ok);
     if (!out.ok) return 'already';
     engine.applyBuff(out.buffId);
-    // The effect sound plays only with a shrine on the street (findCloseStack isShrine).
-    if (streetTargets(engine, (t) => /^npc_shrine/.test(String(t.classId))).length) {
+    // The effect sound and burst play only with a shrine on the street, on the closest one
+    // (findCloseStack isShrine, 10000 px, *_hallowed_shrine_powder.js 283-297).
+    const shrines = streetTargets(engine, (t) => /^npc_shrine/.test(String(t.classId)));
+    if (shrines.length) {
       later(2000, () => engine.playSound?.(out.sound, { volume: 0.6 }));
+      const closest = closestTarget(shrines, Number(engine.player?.x) || 0);
+      const useKey = classTsid === 'extremely_hallowed_shrine_powder' ? 'powder_extremely_hallowed' : 'powder_fairly_hallowed';
+      powderBurst(engine, OVERLAY_USES[useKey].key, [closest], useKey);
     }
     finishUse(engine, classTsid);
     return out.buffId;

@@ -72,7 +72,7 @@ const G448_ART = ['overlay_sneezing_powder', 'focusing_orb_laser_beam', 'shrine_
 const SHARP1_MORE = ['trading', 'fox_bait_ignite', 'dice_overlay', 'twelve_sided_die', 'petrified_rock_open_overlay', 'right_arrow', 'crown_game_indicator_you', 'crown_game_indicator_someone_else', 'game_of_crowns_throbber'];
 const SHARP1_ART = ['poisoned', 'rooked', 'amorous_philtre_heart', 'play_glitch'];
 
-const overlays = () => import('../public/js/overlays.js?v=ea22d918');
+const overlays = () => import('../public/js/overlays.js?v=6ab8ee10');
 const flush = async (n = 3) => {
   for (let i = 0; i < n; i += 1) {
     await new Promise((r) => setTimeout(r, 0));

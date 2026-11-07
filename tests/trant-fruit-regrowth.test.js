@@ -24,7 +24,7 @@ import {
   fruitProductionAt,
   setTrantTables,
 } from '../public/js/trants.js?v=9c2e8c0f';
-import { fertilizeTree } from '../public/js/powders.js?v=ba1b2753';
+import { fertilizeTree } from '../public/js/powders.js?v=908929b1';
 import { createPlot, growTree, resetPlotDay, reviveDeadTree } from '../public/js/patches.js?v=ddd16221';
 import { createToolConditionState } from '../public/js/tools.js?v=689d6594';
 

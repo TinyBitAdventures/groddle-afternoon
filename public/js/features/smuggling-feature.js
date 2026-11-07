@@ -45,7 +45,7 @@ import { STREET_INDEX, resolveIndexTsid } from '../street-loader.js?v=33d2b8bc';
 import { isStandable, worldToScreen } from '../street-model.js?v=505d8990';
 import { landingY, walkSurfaceY } from '../walk-surface.js?v=c982983e';
 import { hellFeature } from './hell-feature.js?v=13196575';
-import { questRoomConverse } from './quest-instances-feature.js?v=272bc590';
+import { questRoomConverse } from './quest-instances-feature.js?v=824694e8';
 import {
   CONTRABAND,
   CONTRABAND_ITEM,

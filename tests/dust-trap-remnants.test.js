@@ -9,7 +9,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { DUST_TRAP_ORGANELLES, ORGANELLE_OVERLAY, organelleFlight } from '../public/js/resource-nodes.js?v=76736039';
-import { OVERLAY_USES } from '../public/js/overlays.js?v=ea22d918';
+import { OVERLAY_USES } from '../public/js/overlays.js?v=6ab8ee10';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const GS = join(root, '../glitch-GameServerJS');

@@ -96,6 +96,13 @@ export const OVERLAY_USES = Object.freeze({
   // G380 items/fertilidust.js 283-294 and items/fertilidust_lite.js 279-290: on the tree, 300 px, 2 s late.
   target_effect_powder_extreme: { type: 'itemstack', wh: 300, durationMs: 5400, dx: 25, dy: 200, delayMs: 2000, loop: false, src: 'items/fertilidust.js 283-294' },
   target_effect_powder_mild: { type: 'itemstack', wh: 300, durationMs: 4300, dx: 75, dy: 200, delayMs: 2000, loop: false, src: 'items/fertilidust_lite.js 279-290' },
+  // G380, the same two sheets on other targets, with those powders' own numbers. 'follow: true' on the
+  // animals: at() reads the sprite every frame. Juju: pc.announce_itemstack_overlay, 1:1, no delay.
+  powder_startling_fecundity: { key: 'target_effect_powder_extreme', type: 'itemstack', wh: 300, durationMs: 5400, dx: 75, dy: 0, delayMs: 2000, loop: false, src: 'items/powder_of_startling_fecundity.js 311-340' },
+  powder_mild_fecundity: { key: 'target_effect_powder_mild', type: 'itemstack', wh: 300, durationMs: 4300, dx: 75, dy: 0, delayMs: 2000, loop: false, src: 'items/powder_of_mild_fecundity.js 311-340' },
+  powder_extremely_hallowed: { key: 'target_effect_powder_extreme', type: 'itemstack', wh: 300, durationMs: 5400, dx: 25, dy: 200, delayMs: 2000, loop: false, src: 'items/extremely_hallowed_shrine_powder.js 286-297' },
+  powder_fairly_hallowed: { key: 'target_effect_powder_mild', type: 'itemstack', wh: 300, durationMs: 4300, dx: 75, dy: 200, delayMs: 2000, loop: false, src: 'items/fairly_hallowed_shrine_powder.js 286-297' },
+  powder_juju_shoo_shoo: { key: 'target_effect_powder_mild', type: 'itemstack', wh: 0, durationMs: 3000, dx: 0, dy: 20, delayMs: 0, loop: false, src: 'items/juju_shoo_shoo_powder.js 281-288' },
   // G382 items/include/shrines.js 795-817 (click_to_donate on the shrine's top) and 907-924.
   click_to_donate: { type: 'itemstack', wh: 0, durationMs: 0, dx: 0, dy: 0, loop: true, src: 'items/include/shrines.js 795-817' },
   shrine_power_up: { type: 'itemstack', wh: 0, durationMs: 10000, dx: -40, dy: 10, delayMs: 1000, state: 'charge', src: 'items/include/shrines.js 907-924' },

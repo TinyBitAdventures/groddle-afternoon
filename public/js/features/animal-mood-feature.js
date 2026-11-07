@@ -105,7 +105,7 @@ import { TRANT_META, trantStatusLabel } from '../trants.js?v=9c2e8c0f';
 import { animalStatusLabel } from '../animals.js?v=2cf490ef';
 import { quoteAnimalKinship } from '../animal-kinship.js?v=448ca44a';
 import { captureVerbState, isFoodItem, itemLabel } from '../animal-husbandry.js?v=35b23ef4';
-import { ROOK_SHEETS, rookAttackFeature } from './rook-attack-feature.js?v=b85c43f3';
+import { ROOK_SHEETS, rookAttackFeature } from './rook-attack-feature.js?v=d1c3c6ce';
 import { ANIMAL_BODY, ANIMAL_PATROL, TREE_FOOTPRINT } from '../street-ecology.js?v=3c1d4c06';
 import {
   CHECK_ON_REMOVE,
