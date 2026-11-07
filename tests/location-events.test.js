@@ -1,6 +1,7 @@
 import { test, describe } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync, readdirSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync } from 'node:fs';
+import { spawnSync } from 'node:child_process';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
@@ -21,6 +22,7 @@ import {
   runLocationEvent,
   streetOwner,
 } from '../public/js/location-events.js?v=05663361';
+import { inOriginalOrder } from '../tools/stable-json.mjs';
 import { createFeatureHost } from '../public/js/feature-host.js?v=127e0a3c';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -210,5 +212,28 @@ describe('walkable fallback', () => {
     const amber = street('GHVDKQ2O6S23LVJ');
     // Amberlyza's arrival reset turns 100 platforms off and only 17 back on.
     assert.equal(recoverableToggles(amber.events).platOn.size, 17);
+  });
+});
+
+describe('build-street-events reruns', () => {
+  test('a key keeps its place, a new one goes last, a gone one goes', () => {
+    const was = { a: 1, physics: {}, events: { e: [{ type: 'play_sound', name: 'X', loops: 1 }] }, gradient: 2, old: 3 };
+    const now = { a: 1, gradient: 2, physics: {}, events: { e: [{ name: 'X', type: 'play_sound', loops: 1, url: 'u' }] }, fresh: 4 };
+    const out = inOriginalOrder(now, was);
+    assert.deepEqual(Object.keys(out), ['a', 'physics', 'events', 'gradient', 'fresh']);
+    assert.deepEqual(Object.keys(out.events.e[0]), ['type', 'name', 'loops', 'url']);
+    assert.deepEqual(out, now);
+  });
+
+  test('--check finds nothing to change: the files are what a rerun writes', { skip: !existsSync(join(root, '../streets/mnt/stos/location_data')) }, () => {
+    const run = spawnSync(process.execPath, ['build-street-events.mjs', '--check'], { cwd: root, encoding: 'utf8', timeout: 170000 });
+    assert.equal(run.status, 0, run.stderr);
+    assert.match(run.stdout, /street events are current/);
+  });
+
+  test('--check writes nothing', () => {
+    const src = readFileSync(join(root, 'build-street-events.mjs'), 'utf8');
+    assert.match(src, /if \(!CHECK\) await writeFile/);
+    assert.equal(src.split('writeFile(').length - 1, 1, 'one write, behind the check');
   });
 });

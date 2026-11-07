@@ -21,13 +21,18 @@
  * and build-street-navigation.mjs).
  *
  * Run from spike root:
- *   node build-street-events.mjs
+ *   node build-street-events.mjs          write the files
+ *   node build-street-events.mjs --check  exit 1 if a street is stale, write nothing
+ *
+ * Every key keeps its place in the file (a rerun used to move each street's physics and events
+ * past its gradient, and a deco's id to its end, rewriting about 80 streets for nothing).
  */
 
 import { readFile, writeFile, readdir, access } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { arrivalInTarget, streetAliases } from './public/js/location-navigation.js';
+import { inOriginalOrder } from './tools/stable-json.mjs';
 import {
   buildStreetEvents,
   childObjects,
@@ -41,6 +46,7 @@ import {
   streetOwner,
 } from './public/js/location-events.js';
 
+const CHECK = process.argv.includes('--check');
 const root = dirname(fileURLToPath(import.meta.url));
 const streetsDir = join(root, 'public/assets/streets');
 const audioDir = join(root, 'public/assets/audio');
@@ -135,7 +141,10 @@ const totals = {
 };
 const missingSounds = new Map();
 
+const stale = [];
+
 for (const [tsid, { file, street }] of streets) {
+  const original = JSON.parse(JSON.stringify(street));
   const gXml = await readXml(`G${tsid.slice(1)}`);
   const lXml = await readXml(`L${tsid.slice(1)}`);
   delete street.physics;
@@ -219,9 +228,20 @@ for (const [tsid, { file, street }] of streets) {
     totals.boxStreets += 1;
     totals.boxes += built.eventBoxes.length;
   }
-  await writeFile(join(streetsDir, file), `${JSON.stringify(street)}\n`);
+  const text = `${JSON.stringify(inOriginalOrder(street, original))}\n`;
+  if (text === `${JSON.stringify(original)}\n`) continue;
+  stale.push(file);
+  if (!CHECK) await writeFile(join(streetsDir, file), text);
 }
 
+if (CHECK) {
+  if (stale.length) {
+    console.error(`${stale.length} streets are stale: run node build-street-events.mjs\n${stale.join(' ')}`);
+    process.exit(1);
+  }
+  console.log('street events are current');
+  process.exit(0);
+}
 console.log(JSON.stringify(totals, null, 1));
 if (missingSounds.size) {
   console.log('sounds without a recovered file:', [...missingSounds.keys()].sort().join(' '));
