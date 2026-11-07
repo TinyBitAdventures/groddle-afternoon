@@ -93,7 +93,7 @@ import {
   resumeTarget,
   setCurrentState,
 } from '../conversations.js?v=7cbdfea4';
-import { questStatus } from '../quest-offers.js?v=5dc6e428';
+import { questStatus } from '../quest-offers.js?v=f0fe957c';
 import { questDoneAt } from '../quests.js?v=c8d9d0a4';
 
 export const STREET_SPIRITS_FEATURE_ID = 'street-spirits';

@@ -53,7 +53,7 @@ import {
   tickQuestTimers,
   restartTimedQuest,
   questTimerStatus,
-} from '../public/js/quest-offers.js?v=5dc6e428';
+} from '../public/js/quest-offers.js?v=f0fe957c';
 import { XP_FOR_LEVEL } from '../public/js/progression.js?v=33462eaa';
 
 const CONTENT = join(dirname(fileURLToPath(import.meta.url)), '../public/assets/content');
@@ -117,8 +117,9 @@ describe('classifyQuests', () => {
     // help_mine: the local companions work rocks you can help (G207, features/help-mine-feature.js).
     const featureQuests = ['smuggling_basic', 'build_a_tower', 'meditativearts_meditation_station', 'soilappreciation_1', 'help_mine'].length;
     // Judged out after the 129 were counted: Manor Mystery, never offered and never finishable in the
-    // source (lane juju; build-quests.mjs EXCLUDE, tests/juju-judged.test.js).
-    const judgedOut = ['manor_mystery'].length;
+    // source (lane juju; build-quests.mjs EXCLUDE, tests/juju-judged.test.js). Peter out Peat takes other
+    // players (G451, Austin 2026-11-07; tests/g451-peter-out-peat.test.js).
+    const judgedOut = ['manor_mystery', 'bogspecialization_harvest_full_peat_bog_in_time_period'].length;
     assert.equal(c.solo.length, 129 + built + featureQuests - judgedOut);
     assert.equal(c.custom.length, 22); // + 5 Gentle Island tutorial quests (newxp-feature.js)
     assert.equal(c.excluded.length, 294 - built - featureQuests + judgedOut);

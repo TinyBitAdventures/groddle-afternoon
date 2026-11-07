@@ -10,7 +10,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { loadContentCatalogsFromDir, resetContentCatalogs, getQuestCatalog } from '../public/js/content-catalogs.js?v=10b118dd';
 import { createQuestState } from '../public/js/quests.js?v=c8d9d0a4';
-import { classifyQuests, eventCounters, isEventEmitted, questRoutingReport, requirementRoute } from '../public/js/quest-offers.js?v=5dc6e428';
+import { classifyQuests, eventCounters, isEventEmitted, questRoutingReport, requirementRoute } from '../public/js/quest-offers.js?v=f0fe957c';
 import { HELL_LOCATION, HELL_QUESTS, createHellState, croak } from '../public/js/hell.js?v=aca145ba';
 import { PANKA_TSID, HELL_BAR_TSID } from '../public/js/hell-bar.js?v=c1fa4328';
 import {
@@ -27,12 +27,12 @@ import {
   recognitionBranch,
   ticketDue,
 } from '../public/js/hell-tickets.js?v=df435754';
-import { hellTicketsFeature } from '../public/js/features/hell-tickets-feature.js?v=27c983be';
+import { hellTicketsFeature } from '../public/js/features/hell-tickets-feature.js?v=4499e378';
 import { hellFeature } from '../public/js/features/hell-feature.js?v=13196575';
 import { hellBarFeature } from '../public/js/features/hell-bar-feature.js?v=b5c16464';
-import { questOffersFeature } from '../public/js/features/quest-offers-feature.js?v=ade8d1ed';
+import { questOffersFeature } from '../public/js/features/quest-offers-feature.js?v=9406a75d';
 import { questFlagsFeature } from '../public/js/features/quest-flags-feature.js?v=17c6ef48';
-import { FEATURES } from '../public/js/features/index.js?v=54736765';
+import { FEATURES } from '../public/js/features/index.js?v=1f9f520b';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const CONTENT = join(spike, 'public/assets/content');

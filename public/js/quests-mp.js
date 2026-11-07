@@ -49,6 +49,11 @@
  *    following 3 s after the teleport. The server counts the followers
  *    (follow.go follow_teleported) and features/follow-mp-feature.js sets
  *    the flag; offered once following another player works (needs: follow).
+ *  - bogspecialization_harvest_full_peat_bog_in_time_period (Peter out Peat):
+ *    Bog Specialization I's quest (inc_data_skills.js:494, 3960). peat_bog_fully_harvested
+ *    is the quest's testBog 87-92, decided by the server when its 9 seconds end
+ *    (objects_peat.go) and set by features/peat-quest-mp-feature.js. Solo no longer
+ *    offers it (G451, Austin 2026-11-07).
  *  - soilappreciation_help_digging (It Takes Two): Soil Appreciation II's
  *    quest (inc_data_skills.js:3158, 3891). helped_dig is dirt_pile.js
  *    onDigComplete 481-483: a dig that had helpers (others who started
@@ -170,6 +175,8 @@ export const MULTIPLAYER_QUESTS = Object.freeze({
   // G334 follow: Teleportation III's quest; the flag is the server's count at teleport_complete (follow.go).
   teleportation_teleport_with_followers: Object.freeze({ offer: 'source', needs: Object.freeze(['follow']), source: 'inc_data_skills.js:3417, 3965' }),
   meditative_arts_with_friends: Object.freeze({ offer: 'source', source: 'quests/meditative_arts_with_friends.js prerequisites, prereq_quests' }),
+  // G451: Bog Specialization I's quest; started by a full bog and judged at 9 s by the server (objects_peat.go, js/peat-quest.js).
+  bogspecialization_harvest_full_peat_bog_in_time_period: Object.freeze({ offer: 'source', source: 'inc_data_skills.js:494, 3960' }),
   // G329 help digging: the server's Dirt Pile dig crews (objects.go digHelp); helped_dig from its answer.
   soilappreciation_help_digging: Object.freeze({ offer: 'source', source: 'inc_data_skills.js:3158, 3891' }),
   good_neighbor: Object.freeze({ offer: 'ours', offerTriggers: ours(MP_FACTS.tendNeighbour) }),

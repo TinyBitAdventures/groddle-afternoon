@@ -1893,7 +1893,8 @@
     "skill": "bogspecialization_1"
    }
   ],
-  "solo": true
+  "solo": false,
+  "soloReason": "needs_other_players"
  },
  "botany_make_tree_beans": {
   "classTsid": "botany_make_tree_beans",

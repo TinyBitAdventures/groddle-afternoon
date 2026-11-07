@@ -71,7 +71,7 @@ import { VENDOR_NPCS, VENDOR_NPC_CLASSES } from './vendor-npcs.js?v=616c0568';
 import { getQuestCatalog } from './content-catalogs.js?v=10b118dd';
 import { levelInfoForXp } from './progression.js?v=33462eaa';
 import { brokenToolCopies } from './tools.js?v=f701b241';
-import { offerableMultiplayerQuest } from './quests-mp.js?v=2beb658a';
+import { offerableMultiplayerQuest } from './quests-mp.js?v=1fc5ff58';
 import {
   assignQuest,
   completeQuest,
@@ -1727,7 +1727,8 @@ export function tickQuestTimers(questState, now = Date.now()) {
       delete offers.timers[id];
       continue;
     }
-    if (now < timer.endsAt) continue;
+    // graceUntil: a timer whose end is the server's to judge waits for its word (js/peat-quest.js).
+    if (now < Math.max(timer.endsAt, Number(timer.graceUntil) || 0)) continue;
     const def = getQuestCatalog()[id];
     if (def && requirementsComplete(questState, def)) continue;
     for (const key of Object.keys(quest.progress)) quest.progress[key] = 0;

@@ -71,7 +71,7 @@ import { ARTIFACT_MAP, ARTIFACT_NECKLACES } from '../public/js/artifacts.js?v=fc
 import { XP_FOR_LEVEL, currantRewardForLevel } from '../public/js/progression.js?v=33462eaa';
 import { IMAGINATION_UPGRADES } from '../public/js/imagination-data.js?v=4a85e7fe';
 import { SPINDLE_TOOLS } from '../public/js/making.js?v=c9dc233e';
-import { creditedMultiplayerQuests } from '../public/js/quests-mp.js?v=2beb658a';
+import { creditedMultiplayerQuests } from '../public/js/quests-mp.js?v=1fc5ff58';
 import { FURNITURE_STARTER_KIT } from '../public/js/homes-catalog.js?v=7aa9beb0';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');

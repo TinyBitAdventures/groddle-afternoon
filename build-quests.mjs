@@ -337,6 +337,8 @@ const EXCLUDE = {
   water_neighbor_garden: 'needs_other_players', herbalism_plant_seeds_in_someones_garden: 'needs_other_players',
   transcendentalradiation_radiate_to_five_people: 'needs_other_players', teleportation_teleport_with_followers: 'needs_other_players',
   teleportation_make_and_hand_out_tp_scripts: 'needs_other_players', distilling_make_and_distribute_hooch: 'needs_other_players',
+  // G451, Austin 2026-11-07: emptying a bog takes other players (peat_1.js 142-160); online only, js/quests-mp.js.
+  bogspecialization_harvest_full_peat_bog_in_time_period: 'needs_other_players',
   croppery_harvest_and_sell_at_auction: 'needs_other_players', soilappreciation_help_digging: 'needs_other_players',
   play_musicblocks: 'needs_other_players', watering_time: 'needs_other_players',
   // bespoke instanced locations the remake has not built

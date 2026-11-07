@@ -109,7 +109,8 @@ import {
   COLD_COMFORT_LEAVE_TEXT,
   HOME_TREE_GROWN_TEXT,
   SEED_TO_SCYTHE,
-} from '../quest-offers.js?v=5dc6e428';
+} from '../quest-offers.js?v=f0fe957c';
+import { PEAT_TEXT, retireSoloPeatQuest } from '../peat-quest.js?v=c7baea41';
 import { parseQuestConversation } from '../quests.js?v=c8d9d0a4';
 import { questRequirementText, renderQuestText, withQuestMarkup } from '../quest-text.js?v=7f5d761c';
 import { addItem, removeItem, countItem } from '../inventory.js?v=d82f3b00';
@@ -282,7 +283,7 @@ function emergencySnoozed(engine, now = Date.now()) {
 }
 
 /** Accept an offer (the card's accept, or a put-off quest's Try it): in the log and started. */
-function acceptCard(engine, classTsid, def) {
+function acceptCard(engine, classTsid, def, { gated = false } = {}) {
   // main.js doQuestConversationChoice 6040-6046 / doQuestBegin: starting while dead fails
   // ("You are dead!"); the quest stays in the log, accepted, not started (G255).
   const dead = def.needsStart ? deadStartError(engine) : '';
@@ -294,6 +295,22 @@ function acceptCard(engine, classTsid, def) {
     engine.updateHud?.();
     syncWaiting(engine);
     return { ok: false, reason: 'dead' };
+  }
+  // A quest's onStarted may refuse (Peter out Peat, G451: features/peat-quest-mp-feature.js): it stays in the log, not started.
+  if (def.needsStart && !gated) {
+    const asked = engine.query?.('questStartGate', classTsid, {
+      go: () => acceptCard(engine, classTsid, def, { gated: true }),
+      refuse: (message) => {
+        putOffOffer(engine.questState, classTsid, Date.now());
+        engine.setData('questOfferResult', 'start_refused');
+        engine.toast?.(message, 5000);
+        engine.pushActivity(message);
+        engine.save();
+        engine.updateHud?.();
+        syncWaiting(engine);
+      },
+    }, engine);
+    if (asked) return { ok: false, reason: 'start_gate' };
   }
   const result = acceptOffer(engine.questState, classTsid, questContext(engine));
   engine.setData('questOfferResult', result.ok ? 'accepted' : result.reason || 'failed');
@@ -390,7 +407,7 @@ export function questLogActions(engine, classTsid) {
 }
 
 /** "Try again" on a failed timed quest (quest_begin -> restartQuest -> onRestart). */
-export function retryTimedQuest(engine, classTsid, now = Date.now()) {
+export function retryTimedQuest(engine, classTsid, now = Date.now(), { gated = false } = {}) {
   const qs = engine.questState;
   const def = getQuestCatalog()[classTsid];
   if (!def || !ensureQuestOfferState(qs).failed?.[classTsid]) return { ok: false, reason: 'not_failed' };
@@ -401,6 +418,18 @@ export function retryTimedQuest(engine, classTsid, now = Date.now()) {
     engine.setData('questOfferResult', 'dead');
     engine.toast?.(dead, 5000);
     return { ok: false, reason: 'dead' };
+  }
+  // Try again is onRestart, then onStarted: the same check (G451).
+  if (!gated) {
+    const asked = engine.query?.('questStartGate', classTsid, {
+      go: () => retryTimedQuest(engine, classTsid, Date.now(), { gated: true }),
+      refuse: (message) => {
+        engine.setData('questOfferResult', 'start_refused');
+        engine.toast?.(message, 5000);
+        engine.pushActivity(message);
+      },
+    }, engine);
+    if (asked) return { ok: false, reason: 'start_gate' };
   }
   const result = restartTimedQuest(qs, classTsid, now);
   engine.setData('questOfferResult', result.ok ? 'restarted' : result.reason || 'failed');
@@ -713,6 +742,12 @@ export const questOffersFeature = {
       nextSyncAt = now + SYNC_MS;
       syncWaiting(engine);
       const qs = engine.questState;
+      // G451: solo no longer offers Peter out Peat; a save that held it lets it go, once, with a line.
+      if (engine.mode !== 'multiplayer' && retireSoloPeatQuest(qs)) {
+        engine.pushActivity(PEAT_TEXT.retired);
+        engine.save();
+        engine.updateHud?.();
+      }
       const failed = tickQuestTimers(qs, now);
       for (const id of failed) {
         const title = getQuestCatalog()[id]?.title || 'A timed quest';

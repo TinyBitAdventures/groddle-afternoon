@@ -24,11 +24,11 @@ import {
 } from '../public/js/achievements.js?v=f8ccfd34';
 import { createResourceNode, harvestResourceNode } from '../public/js/resource-nodes.js?v=1c268516';
 import { createPlot, growTree, tickPlot } from '../public/js/patches.js?v=8af384ac';
-import { slothsChewing } from '../public/js/features/resource-nodes-feature.js?v=84c8f982';
+import { slothsChewing } from '../public/js/features/resource-nodes-feature.js?v=bab30021';
 import { supplyFeature } from '../public/js/features/supply-feature.js?v=e5a255b4';
 import { bindToolInventory, createToolConditionState } from '../public/js/tools.js?v=f701b241';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=10b118dd';
-import { normalizeAchievementSnapshot } from '../public/js/player-save.js?v=31ea1d53';
+import { normalizeAchievementSnapshot } from '../public/js/player-save.js?v=3f743187';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const publicRoot = join(here, '../public');
