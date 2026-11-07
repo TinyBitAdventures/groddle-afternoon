@@ -19,8 +19,8 @@ import { join } from 'node:path';
 import { HOME_LIMITS } from '../public/js/homes-catalog.js?v=7aa9beb0';
 import { createCultivationState, homeStreetLayout } from '../public/js/home-cultivation.js?v=c650eed1';
 import { EXTERIOR_STYLES, streetLook } from '../public/js/home-styles.js?v=1a7a2798';
-import { NEIGHBOURS, neighbourLayout } from '../public/js/neighbours.js?v=862857f9';
-import { SCENE_STYLES, propPlan } from '../public/js/features/neighbour-scene.js?v=074126e5';
+import { NEIGHBOURS, neighbourLayout } from '../public/js/neighbours.js?v=161fc2e5';
+import { SCENE_STYLES, propPlan } from '../public/js/features/neighbour-scene.js?v=ac55dcf1';
 import {
   DOORWAY_GAP,
   HOUSE_STYLE_KEYS,

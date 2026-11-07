@@ -39,9 +39,9 @@ import {
   splitEnded,
   suggestedPrice,
   unitPrice,
-} from '../public/js/auctions.js?v=7a3ffda6';
-import { auctionsFeature } from '../public/js/features/auctions-feature.js?v=f13367b2';
-import { normalizeMailboxState } from '../public/js/mailbox.js?v=1d97704f';
+} from '../public/js/auctions.js?v=9684e995';
+import { auctionsFeature } from '../public/js/features/auctions-feature.js?v=e30169a6';
+import { normalizeMailboxState } from '../public/js/mailbox.js?v=a3e833ba';
 import { MULTIPLAYER_QUESTS, MULTIPLAYER_QUESTS_LEFT_OUT, offerableMultiplayerQuest } from '../public/js/quests-mp.js?v=1fc5ff58';
 import { auctionJson } from '../tools/build-auctions.mjs';
 import { HAS_SITE, SITE_DIR, sitePath } from '../tools/repos.mjs';
@@ -111,7 +111,7 @@ describe('the source\'s words', () => {
     assert.equal(mailText('expired'), 'Your expired auction, courtesy of the Auction Fulfillment and Logistics Corporation.');
     assert.match(arrivedWhileOutText('purchased'), /^Your purchased auctions arrived while you were out\./);
     const row = deliveryMail({ id: ID, kind: 'purchased', item: { c: 'potato', n: 50 }, at: 5000 });
-    assert.deepEqual(row, { id: `auction-${ID}`, sender: AUCTION_SENDER, text: mailText('purchased'), sentAt: 5000, deliveryAt: 5000, attachment: { classTsid: 'potato', count: 50 }, ledger: `auc-${ID}-d`, auction: 'purchased' });
+    assert.deepEqual(row, { id: `auction-${ID}`, sender: AUCTION_SENDER, subject: 'Your auction purchase', text: mailText('purchased'), sentAt: 5000, deliveryAt: 5000, attachment: { classTsid: 'potato', count: 50 }, ledger: `auc-${ID}-d`, auction: 'purchased' });
     // Ticket 74: the red frog says what it brought (auction_action).
     assert.equal(deliveryMail({ id: ID, kind: 'expired', item: { c: 'potato', n: 1 }, at: 1 }).auction, 'expired');
     assert.equal(deliveryMail({ id: ID, kind: 'cancelled', item: { c: 'potato', n: 1 }, at: 1 }).auction, 'cancelled');

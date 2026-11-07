@@ -61,7 +61,7 @@
  *   that comes back from the Post waits the same way.
  */
 
-import { MAIL_POST_SENDER } from './mailbox.js?v=1d97704f';
+import { MAIL_POST_SENDER } from './mailbox.js?v=a3e833ba';
 
 export const PLAYER_MAIL_RULES = Object.freeze({
   textMax: 300,
@@ -92,6 +92,7 @@ export const PLAYER_MAIL_TEXT = Object.freeze({
   sentParcel: 'Your parcel is on its way. It arrives in about 7 minutes.',
   offline: 'The post office is not answering. Try again in a moment.',
   returnedFrom: MAIL_POST_SENDER,
+  returnedSubject: 'Your letter came back', // G570 (ours)
   toPlaceholder: 'A buddy\'s name',
   // HOMES2 (ours): things in a letter are collected at a mailbox.
   parcelFrom: (name) => `${name} sent you a parcel. Collect it at any mailbox.`,
@@ -209,6 +210,9 @@ export function letterRow(letter) {
   const row = {
     id: returned ? RETURN_ROW(letter.id) : LETTER_ROW(letter.id),
     sender: returned ? PLAYER_MAIL_TEXT.returnedFrom : String(letter.from?.name || 'Someone').slice(0, 80),
+    // G570: the Post's note on a letter that came back, or the subject the site gives a letter
+    // from nobody (LedgerMail::subject: the gardens payout's crops); a player's letter has none.
+    ...(returned ? { subject: PLAYER_MAIL_TEXT.returnedSubject } : letter.subject ? { subject: String(letter.subject).slice(0, 80) } : {}),
     text: returned ? String(letter.returned || `Your letter to ${letter.to?.name || 'them'} came back.`) + (letter.text ? `\n\n"${letter.text}"` : '') : String(letter.text || ''),
     sentAt: n0(letter.sent) || at,
     deliveryAt: at,

@@ -71,7 +71,7 @@ import {
   splitEnded,
   suggestedPrice,
   unitPrice,
-} from '../auctions.js?v=7a3ffda6';
+} from '../auctions.js?v=9684e995';
 
 export const AUCTIONS_FEATURE_ID = 'auctions';
 const TABLE_URL = 'assets/content/trade-items.json';
@@ -280,6 +280,7 @@ function createSession(engine) {
         else if (have.deleted) have.deleted = false;
         if (!have.ledger) have.ledger = row.ledger;
         if (!have.auction) have.auction = row.auction;
+        if (!have.subject) have.subject = row.subject; // G570: saved before subjects
         // The site says when it arrives.
         if (row.deliveryAt && have.deliveryAt !== row.deliveryAt && !d.collected) have.deliveryAt = row.deliveryAt;
         // A row saved before the frog carried auctions, still on its way: the frog brings it.

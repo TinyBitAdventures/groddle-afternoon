@@ -269,6 +269,7 @@ export function doChore(state, neighbour, pc, ctx = {}) {
     state.thanked[neighbour.id] = true;
     letter = {
       sender: neighbour.name,
+      subject: 'Thank you',
       text: neighbour.thanks.text,
       attachment: { ...neighbour.thanks.attachment },
       deliveryAt: whole(ctx.now) + LETTER_DELAY_MS,
@@ -291,6 +292,7 @@ export function postNoteReply(state, neighbour, note, ctx = {}) {
   const quoted = title.length > 44 ? `${title.slice(0, 43)}…` : title;
   return {
     sender: neighbour.name,
+    subject: 'Your note',
     text: `I found your note, “${quoted}”, in my mailbox when I got home. It made my whole day. Come by again soon!`,
     deliveryAt: whole(ctx.now) + LETTER_DELAY_MS,
   };
@@ -311,6 +313,7 @@ export function visitorLetter(state, ctx = {}) {
   return {
     neighbourId: neighbour.id,
     sender: neighbour.name,
+    subject: 'I stopped by',
     text: neighbour.visitor,
     attachment: { ...neighbour.visitorGift },
     deliveryAt: whole(ctx.now),

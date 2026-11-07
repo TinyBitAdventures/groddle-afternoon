@@ -21,7 +21,7 @@ import { createMusicblockState, playMusicblock } from '../public/js/musicblocks.
 import { runTransform } from '../public/js/item-transforms.js?v=f4f49729';
 import { applyTreePoison, performAntidotePour } from '../public/js/tree-poison.js?v=3f890e1e';
 import { createPlot, performPlotVerb } from '../public/js/patches.js?v=8af384ac';
-import { doChore, neighbourById, normalizeNeighbourState } from '../public/js/neighbours.js?v=862857f9';
+import { doChore, neighbourById, normalizeNeighbourState } from '../public/js/neighbours.js?v=161fc2e5';
 import { runVerb } from '../public/content.js?v=075ded81';
 import { applySetFree } from '../public/js/animal-set-free.js?v=3b194fca';
 import { RESOURCE_SKILL_PACKAGES, createResourceNode, harvestResourceNode } from '../public/js/resource-nodes.js?v=1c268516';

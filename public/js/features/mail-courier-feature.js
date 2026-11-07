@@ -84,11 +84,11 @@
 
 import { ITEM_CATALOG, itemIcon } from '../inventory.js?v=d82f3b00';
 import { frameTexture, sourceFromUrl } from '../textures.js?v=3149d699';
-import { questRoomConverse } from './quest-instances-feature.js?v=01870615';
+import { questRoomConverse } from './quest-instances-feature.js?v=70214cef';
 import { hellFeature } from './hell-feature.js?v=13196575';
 import { DISPATCHER_ART, FROG_ART, MAIL_NPC_ART_DIR } from '../mail-npc-art.js?v=031c4e2e';
 import { DISPATCHER_GAP, DISPATCHER_HALF, SIGNPOST } from '../home-street-fixtures.js?v=badcb725';
-import { MAIL_POST_SENDER } from '../mailbox.js?v=1d97704f';
+import { MAIL_POST_SENDER } from '../mailbox.js?v=a3e833ba';
 import {
   AUCTION_PAGE,
   COURIER,
@@ -112,8 +112,8 @@ import {
   sendAuctionsToMailbox,
   sendCarriedToMailbox,
   sendDueToMailbox,
-} from '../mail-courier.js?v=e872c17e';
-import { AUCTION_SENDER, mailText } from '../auctions.js?v=7a3ffda6';
+} from '../mail-courier.js?v=68125101';
+import { AUCTION_SENDER, mailSubject, mailText } from '../auctions.js?v=9684e995';
 import { formatStack } from '../gifts.js?v=4a01ff13';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
 
@@ -986,7 +986,7 @@ function demoSetup(engine) {
   if (demo === 'courier') {
     // mail_send_special_item 1543-1585 with its default words; inc_imagination.js 1574 sends 5 Awesome Stew.
     const cls = ITEM_CATALOG.awesome_stew ? 'awesome_stew' : 'apple';
-    engine.deliverMail?.({ sender: MAIL_POST_SENDER, text: "Here's a special delivery just for you!", deliveryAt: now(), attachment: { classTsid: cls, count: 5 } });
+    engine.deliverMail?.({ sender: MAIL_POST_SENDER, subject: 'A special delivery', text: "Here's a special delivery just for you!", deliveryAt: now(), attachment: { classTsid: cls, count: 5 } });
     booted = true;
     last = 'demo:courier';
   }
@@ -999,6 +999,7 @@ function demoSetup(engine) {
       const kind = i === 0 ? 'purchased' : kinds[i % kinds.length];
       engine.deliverMail?.({
         sender: AUCTION_SENDER,
+        subject: mailSubject(kind),
         text: mailText(kind),
         deliveryAt: now(),
         attachment: { classTsid: classes[i % classes.length] || 'apple', count: i === 0 ? 3 : 1 + (i % 4) },

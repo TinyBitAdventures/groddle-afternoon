@@ -118,15 +118,15 @@ import {
   postNoteVerb,
   recordVisit,
   visitorLetter,
-} from '../neighbours.js?v=862857f9';
-import { buildNeighbourBackground, neighbourLoadingColors, neighbourPlatforms } from './neighbour-scene.js?v=074126e5';
+} from '../neighbours.js?v=161fc2e5';
+import { buildNeighbourBackground, neighbourLoadingColors, neighbourPlatforms } from './neighbour-scene.js?v=ac55dcf1';
 import { closeNoteView, noteViewOpen, openBoardView, openNotePicker, openNoteView, openReportView } from '../note-view.js?v=a5e518d1';
 import { BOARD_MP_TEXT, boardByline } from '../boards-mp.js?v=36c35534';
 import { textureFromUrl } from '../textures.js?v=3149d699';
-import { butlerApi } from './butler-feature.js?v=5ef2567b';
-import { neighboursMpApi } from './neighbours-mp-feature.js?v=ba39fe89';
+import { butlerApi } from './butler-feature.js?v=ba16bc12';
+import { neighboursMpApi } from './neighbours-mp-feature.js?v=c5c3729a';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
-import { MAIL_POST_SENDER } from '../mailbox.js?v=1d97704f';
+import { MAIL_POST_SENDER } from '../mailbox.js?v=a3e833ba';
 
 export const FURNITURE_FEATURE_ID = 'street-furniture';
 const PLAYER_ID = 'player';
@@ -139,11 +139,13 @@ const DEFAULT_RETURN_TSID = 'GLI2V0UN7RD1T2J';
 /** The first time a street mailbox opens, the post office explains itself. */
 export const STREET_MAIL_WELCOME = Object.freeze({
   sender: MAIL_POST_SENDER,
+  subject: 'Mail on every street',
   text: 'Every mailbox in Ur opens the same mail: yours. Write to a friend from any street, and collect your deliveries wherever you happen to be.',
 });
 /** HOMES2: online, what other players send waits for a mailbox (js/player-mail.js). */
 export const STREET_MAIL_WELCOME_ONLINE = Object.freeze({
   sender: MAIL_POST_SENDER,
+  subject: 'Mail on every street',
   text: 'Every mailbox in Ur opens the same mail: yours. Read and write letters anywhere, and when someone sends you things, open any mailbox like this one to collect them.',
 });
 

@@ -21,9 +21,9 @@
  */
 
 import { REPORT_PICTURE, base64Size, pictureSize } from '../reports.js?v=61088e97';
-import { listMailboxMessages, mailSender, normalizeMailboxState } from '../mailbox.js?v=1d97704f';
+import { listMailboxMessages, mailSender, normalizeMailboxState } from '../mailbox.js?v=a3e833ba';
 import { addedYouOnly, normalizeList } from '../buddies.js?v=df41a3bb';
-import { letterRow } from '../player-mail.js?v=37933726';
+import { letterRow } from '../player-mail.js?v=af6a8b00';
 
 /** localStorage: "full" opens the game on this device anyway; "companion" always opens this page (play/index.html #phone-gate). */
 export const DEVICE_KEY = 'groddle-play-device';

@@ -54,7 +54,7 @@ import {
   normalizePlayerMailSlice,
   playerMailCost,
   sentRow,
-} from '../player-mail.js?v=37933726';
+} from '../player-mail.js?v=af6a8b00';
 
 export const PLAYER_MAIL_FEATURE_ID = 'player-mail';
 const SYNC_EVERY_MS = 5 * 60_000;
@@ -148,6 +148,8 @@ function createSession(engine) {
       if (have) {
         // HOMES2: a parcel a save still had waiting for the Frog waits in the mailbox now.
         if (have.playerMail && have.express && !have.inMailbox) have.express = false;
+        // G570: a letter the save took in before subjects (the gardens payout) gets the site's.
+        if (row.subject && !have.subject) have.subject = row.subject;
         if (letter.collected && row.ledger) {
           have.attachmentsClaimed = true;
           if (have.express) have.inMailbox = true;

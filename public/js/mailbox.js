@@ -37,6 +37,25 @@ export function mailSender(value) {
   return OLD_POST_SENDERS.has(name) ? MAIL_POST_SENDER : name || MAIL_POST_SENDER;
 }
 
+/**
+ * G570: a letter's title in the reader. The game's own letters carry a subject (ours: the
+ * original's mail had none, MailReadUI.as shows From, Received and the words); a letter without
+ * one (a player's, or one saved before subjects) keeps the old title. A reply adds "Re: ".
+ */
+export const MAIL_SUBJECT_LIMIT = 80;
+export function mailTitle(message) {
+  const subject = String(message?.subject || '').trim();
+  const base = subject || (message?.outgoing ? 'Sent message' : 'Delivered message');
+  return `${message?.replyTo ? 'Re: ' : ''}${base}`;
+}
+
+/** G570: the subjects of the game's own letters (ours; plain and short). */
+export const MAIL_SUBJECTS = Object.freeze({
+  welcome: 'Your new mailbox',
+  ampWelcome: 'Welcome home',
+  companionReply: 'Your letter',
+});
+
 function finiteInt(value, fallback = 0, max = 999_999) {
   const number = Math.floor(Number(value));
   return Number.isFinite(number) ? Math.max(0, Math.min(max, number)) : fallback;
@@ -76,6 +95,8 @@ function normalizeMessage(seed = {}, index = 0) {
   return {
     id: cleanId(seed?.id || seed?.message_id) || `mail-${index + 1}`,
     sender: mailSender(seed?.sender?.label || seed?.sender),
+    // G570: a letter the game writes has a subject; a player's (and an old saved letter) has none.
+    ...(cleanText(seed?.subject, MAIL_SUBJECT_LIMIT) ? { subject: cleanText(seed.subject, MAIL_SUBJECT_LIMIT) } : {}),
     recipient: cleanParty(seed?.recipient, 'You'),
     text: cleanText(seed?.text),
     sentAt,
@@ -195,6 +216,7 @@ export function seedMailbox(state, now = Date.now()) {
   if (state.messages.length) return state;
   deliverMail(state, {
     sender: MAIL_POST_SENDER,
+    subject: MAIL_SUBJECTS.welcome,
     text: 'Your mailbox is ready. Messages may carry one item stack and a little bundle of currants. Open a message to collect either.',
     sentAt: now - 120_000,
     deliveryAt: now - 120_000,
@@ -202,6 +224,7 @@ export function seedMailbox(state, now = Date.now()) {
   });
   deliverMail(state, {
     sender: 'Amp',
+    subject: MAIL_SUBJECTS.ampWelcome,
     text: 'Home already? Lovely. Send me a note when the kettle has decided what it wants to be.',
     sentAt: now - 60_000,
     deliveryAt: now - 60_000,
@@ -273,6 +296,7 @@ export function sendMail(
 
   const reply = deliverMail(state, {
     sender: to,
+    subject: MAIL_SUBJECTS.companionReply,
     text: companionReply(to, body),
     sentAt: finiteTimestamp(now),
     deliveryAt: finiteTimestamp(now + Math.max(0, Number(replyDelayMs) || 0)),

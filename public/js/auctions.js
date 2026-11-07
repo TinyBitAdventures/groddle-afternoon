@@ -187,6 +187,11 @@ export function mailText(kind) {
   return `Your ${thing}, courtesy of the Auction Fulfillment and Logistics Corporation.`;
 }
 
+/** G570: a delivery's subject in the mailbox (ours: the original's letters had none). */
+export function mailSubject(kind) {
+  return kind === 'cancelled' ? 'Your cancelled auction' : kind === 'expired' ? 'Your expired auction' : 'Your auction purchase';
+}
+
 /** inc_mail.js:800-806: deliveries that came while you were away. */
 export function arrivedWhileOutText(kind) {
   if (kind === 'cancelled') return 'Your cancelled auctions arrived while you were out. All items have been placed in your mailbox for convenient pickup.';
@@ -296,6 +301,7 @@ export function deliveryMail(d) {
   return {
     id: `auction-${id}`,
     sender: AUCTION_SENDER,
+    subject: mailSubject(d.kind),
     text: mailText(d.kind),
     sentAt: n0(d.at),
     deliveryAt: n0(d.at),

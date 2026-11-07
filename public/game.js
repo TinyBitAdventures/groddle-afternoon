@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=075ded81';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=127e0a3c';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=f54652d4';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=86d488ab';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -498,7 +498,7 @@ import {
   parsePlayerSave,
   serializePlayerSave,
   restorePlayerSave,
-} from './js/player-save.js?v=3f743187';
+} from './js/player-save.js?v=586d1891';
 import {
   HOME_INTERIOR_TSID,
   HOME_STREET_TSID,
@@ -519,6 +519,7 @@ import {
   createMailboxState,
   deleteMail,
   deliverMail,
+  mailTitle,
   listMailboxMessages,
   mailCost,
   readMail,
@@ -527,7 +528,7 @@ import {
   seedMailbox,
   sendMail,
   unreadMailCount,
-} from './js/mailbox.js?v=1d97704f';
+} from './js/mailbox.js?v=a3e833ba';
 import {
   TOOL_CONDITION_CATALOG,
   createToolConditionState,
@@ -22745,7 +22746,7 @@ function renderMailboxReader(message) {
   const notHere = canReceive && message.ledger && !mailboxAt;
   reader.innerHTML = `
     <p class="mail-message-from">${message.outgoing ? 'To' : 'From'} ${escapeHtml(message.outgoing ? message.recipient : message.sender)}</p>
-    <h3 class="mail-message-title">${message.replyTo ? 'Re: ' : ''}${message.outgoing ? 'Sent message' : 'Delivered message'}</h3>
+    <h3 class="mail-message-title">${escapeHtml(mailTitle(message))}</h3>
     <time class="mail-message-time">${new Date(message.deliveryAt).toLocaleString()}</time>
     ${message.quote ? `<blockquote class="mail-quote" data-mail-quote>${message.quote.from ? `<cite>${escapeHtml(message.quote.from)} wrote</cite>` : ''}${escapeHtml(message.quote.text)}</blockquote>` : ''}
     <div class="mail-message-body">${escapeHtml(message.text)}</div>
