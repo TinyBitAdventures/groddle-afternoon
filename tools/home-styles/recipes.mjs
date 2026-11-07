@@ -877,7 +877,8 @@ export const PURCHASE_YARD_STYLE = {
  * Vatn Road, Nightfall Surprise / Eventide Essence, Ruddy Skies / Sunset Strip,
  * Grasslands Graze / Llano Lane, Anemone Alley / Coral Caves
  * (research/web-hunt-2026-10-24/REVIEW.md finding 2). A string is the street style whose look the yard
- * uses; `missing` keeps a yard out of the choices.
+ * uses; `missing` keeps a yard out of the choices; `lookOf` with `borrowed` says plainly on the
+ * style's data what stands in for its art.
  */
 export const YARD_LOOKS = {
   aranna_int_1_hor_high: 'aranna_ext_1_high',
@@ -916,5 +917,11 @@ export const YARD_LOOKS = {
   _moon__high: '_moon_high',
   _rook__high: '_rook_high',
   _ruin__high: '_ruin_high',
-  _triney__high: { missing: 'No street style shares its template family (triney), and its own template was never archived.' },
+  // The pair's key hid it: Mythical Oak's exterior row is meadows_int_default__high, the same key as
+  // interior Plush Pasture (inc_data_homes_prod.js 552, 873). Templates POL_ext_triney_2_high and
+  // POL_int_triney_2_HOR_high (inc_data_maps_prod.js 19197, 19225); a player's note of the pair (general/19703).
+  _triney__high: {
+    lookOf: 'meadows_int_default__high',
+    borrowed: "Uses Mythical Oak's look. The yard's own template was never archived, so this is its street pair's composition, not the yard as it stood.",
+  },
 };

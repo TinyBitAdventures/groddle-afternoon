@@ -81,7 +81,7 @@ export const INTERIOR_STYLES = Object.freeze([
   {"key":"_moon__high","label":"Silent Orbit","subscriber":true,"visible":true,"template":"LHV4B1RP7JS2K01","added":"2012-04-09","built":true,"lookOf":"_moon_high"},
   {"key":"_rook__high","label":"Dark Vista","subscriber":true,"visible":true,"template":"LHVFLNOFOJS28O2","added":"2012-04-09","built":true,"lookOf":"_rook_high"},
   {"key":"_ruin__high","label":"Reminiscent Reflection","subscriber":true,"visible":true,"template":"LHV4CJEQ7JS2G64","added":"2012-04-09","built":true,"lookOf":"_ruin_high"},
-  {"key":"_triney__high","label":"Bewitched Backwoods","subscriber":true,"visible":true,"template":"LHV4DK1R7JS2P08","added":"2012-04-09","built":false,"reason":"No street style shares its template family (triney), and its own template was never archived."},
+  {"key":"_triney__high","label":"Bewitched Backwoods","subscriber":true,"visible":true,"template":"LHV4DK1R7JS2P08","added":"2012-04-09","built":true,"lookOf":"meadows_int_default__high","borrowed":"Uses Mythical Oak's look. The yard's own template was never archived, so this is its street pair's composition, not the yard as it stood."},
 ]);
 
 /** The street style each purchase look (js/homes.js HOME_STYLES) starts on. */

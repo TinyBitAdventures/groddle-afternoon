@@ -18,6 +18,11 @@ import {
   START_YARD_STYLE,
   YARD_STYLE_BY_KEY,
   yardStyleFor,
+  yardStyleChoices,
+  yardLook,
+  switchYardStyle,
+  streetLook,
+  STREET_STYLE_BY_KEY,
   START_STREET_STYLE,
   STYLE_TEXT,
   changeForLabel,
@@ -27,7 +32,7 @@ import {
   styleChoices,
   styleSwitchCost,
   switchStreetStyle,
-} from '../public/js/home-styles.js?v=f591561f';
+} from '../public/js/home-styles.js?v=1a7a2798';
 import { HOME_STYLES } from '../public/js/homes.js?v=631ab6b8';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -198,12 +203,40 @@ describe('composed styles (tools/home-styles/build.mjs)', () => {
     assert.equal(choices.filter((row) => row.isCurrent).length, 1);
   });
 
-  it('draws 34 of the 37 back yards with the look of their street pair (G135)', () => {
+  it('draws 35 of the 37 back yards with the look of their street pair (G135)', () => {
     const built = INTERIOR_STYLES.filter((row) => row.built);
-    assert.equal(built.length, 34);
+    assert.equal(built.length, 35);
     for (const row of built) assert.equal(EXTERIOR_STYLES.find((ext) => ext.key === row.lookOf)?.built, true, row.key);
-    assert.deepEqual(INTERIOR_STYLES.filter((row) => !row.built).map((row) => row.label), ['Anemone Alley', 'More Door', 'Bewitched Backwoods']);
+    assert.deepEqual(INTERIOR_STYLES.filter((row) => !row.built).map((row) => row.label), ['Anemone Alley', 'More Door']);
     for (const row of INTERIOR_STYLES.filter((r) => !r.built)) assert.ok(row.reason);
+  });
+
+  it('offers Bewitched Backwoods with Mythical Oak\'s look, and says it is borrowed', () => {
+    const row = YARD_STYLE_BY_KEY._triney__high;
+    assert.equal(row.label, 'Bewitched Backwoods');
+    assert.equal(row.built, true);
+    assert.equal(row.lookOf, 'meadows_int_default__high');
+    assert.equal(STREET_STYLE_BY_KEY[row.lookOf].label, 'Mythical Oak');
+    assert.match(row.borrowed, /Mythical Oak's look/);
+    assert.doesNotMatch(row.borrowed, /—/);
+    assert.deepEqual(yardLook('_triney__high'), streetLook('meadows_int_default__high'));
+    // Only this one says so; Plush Pasture, which shares the key's spelling, still draws Heartfelt Heath.
+    assert.deepEqual(INTERIOR_STYLES.filter((r) => r.borrowed).map((r) => r.key), ['_triney__high']);
+    assert.equal(YARD_STYLE_BY_KEY.meadows_int_default__high.lookOf, 'meadow_ext_default_high');
+    assert.equal(YARD_STYLE_BY_KEY.meadows_int_default__high.label, 'Plush Pasture');
+    // The price and the way it is bought are every style's: house_style_switch_cost, level x 10 and at least 40 iMG (players/inc_houses.js 1603-1667).
+    const { choices, cost } = yardStyleChoices('basic', 30);
+    assert.equal(cost, 300);
+    assert.ok(choices.some((c) => c.key === '_triney__high'));
+    const before = choices.filter((c) => c.key !== '_triney__high').map((c) => c.key);
+    assert.equal(before.length, 34);
+    assert.deepEqual(before, INTERIOR_STYLES.filter((r) => r.built && r.key !== '_triney__high').map((r) => r.key), 'the others keep their order');
+    const state = { yardStyle: 'basic' };
+    const pc = { imagination: 500, level: 30 };
+    assert.equal(switchYardStyle(state, pc, '_triney__high', { atHome: true }).ok, true);
+    assert.equal(state.yardStyle, '_triney__high');
+    assert.equal(pc.imagination, 200);
+    assert.equal(yardStyleFor('_triney__high'), '_triney__high', 'a saved choice stands');
   });
 
   it('draws only shipped CC0 decos', () => {

@@ -122,12 +122,13 @@ export function buildData() {
   const intRows = interior.map((row) => {
     const pair = YARD_LOOKS[row.key];
     if (pair == null) throw new Error(`no back-yard look for interior style ${row.key}`);
-    if (typeof pair !== 'string') return { ...row, built: false, reason: pair.missing };
-    const ext = extRows.find((r) => r.key === pair);
-    if (!ext) throw new Error(`back-yard look ${row.key}: ${pair} is not a GSJS exterior style`);
+    if (typeof pair !== 'string' && pair.missing) return { ...row, built: false, reason: pair.missing };
+    const lookOf = typeof pair === 'string' ? pair : pair.lookOf;
+    const ext = extRows.find((r) => r.key === lookOf);
+    if (!ext) throw new Error(`back-yard look ${row.key}: ${lookOf} is not a GSJS exterior style`);
     if (!ext.built) return { ...row, built: false, reason: `Drawn like the ${ext.label} street, which is not built: ${ext.reason}` };
     // The look is the street style's (js/home-styles.js yardLook), kept once in EXTERIOR_STYLES.
-    return { ...row, built: true, lookOf: pair };
+    return { ...row, built: true, lookOf, ...(pair.borrowed ? { borrowed: pair.borrowed } : {}) };
   });
   for (const key of Object.keys(YARD_LOOKS)) {
     if (!interior.some((row) => row.key === key)) throw new Error(`back-yard look ${key} is not a GSJS interior style`);
