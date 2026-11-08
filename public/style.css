@@ -10764,6 +10764,8 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
   [data-ui="modern"] .street-nameplate,
   [data-ui="modern"] .street-nameplate.is-placed { top: calc(var(--hud-h) + var(--space-2)); left: 50%; transform: translateX(-50%); max-width: calc(100% - 2 * var(--hud-inset)); }
   [data-ui="modern"] #buff-strip { top: calc(2 * var(--hud-h) + var(--space-4)); }
+  /* The street map steps down under the nameplate too, or it covers the street's name. */
+  [data-ui="modern"] .street-minimap { top: calc(2 * var(--hud-h) + var(--space-4)); }
 }
 /* Report #100: a phone held upright is narrower than the two pills. The actions pill gives way (the
    study chip shortens with an ellipsis) and Report a problem and Menu come first in it, so both stay
@@ -10835,6 +10837,15 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
 #study-chip .study-chip-time { flex: none; }
 /* Phone width: the bar is tight, so the name gives way first (the time always shows). */
 @media (max-width: 560px) { #study-chip .study-chip-name { max-width: 64px; } }
+/* A narrow window (topbar.js fitTopActions): the study pill keeps only its number or time, then
+   Map, Make and Quests leave the bar for the Menu's World group. */
+#study-chip .study-chip-short { display: none; }
+[data-ui="modern"] .top-bar[data-overflow~="chip"] #study-chip :is(.study-chip-name, .study-chip-time) { display: none; }
+[data-ui="modern"] .top-bar[data-overflow~="chip"] #study-chip .study-chip-short { display: inline; }
+[data-ui="modern"] .top-bar[data-overflow~="chip"] #study-chip { min-width: 0; }
+[data-ui="modern"] .top-bar[data-overflow~="map"] #map-btn,
+[data-ui="modern"] .top-bar[data-overflow~="make"] #make-btn,
+[data-ui="modern"] .top-bar[data-overflow~="quest"] #quest-btn { display: none; }
 #study-chip .study-chip-card { display: none; }
 @media (hover: hover) { #study-chip:hover .study-chip-card { display: flex; } }
 #study-chip:focus-visible .study-chip-card { display: flex; }

@@ -7,17 +7,19 @@ import { join } from 'node:path';
 import {
   MENU_GROUPS,
   MENU_ROWS,
+  TOP_OVERFLOW_STEPS,
   favorChip,
   levelRing,
   lowEnergyText,
   mailText,
   menuRowFor,
   nameplateLeft,
+  pickTopOverflow,
   ringDash,
   vitalRing,
   volumeLevel,
   soundChannelToggle,
-} from '../public/js/ui/topbar.js?v=57cc6690';
+} from '../public/js/ui/topbar.js?v=40baf379';
 
 const pub = join(import.meta.dirname, '..', 'public');
 const read = (f) => readFileSync(join(pub, f), 'utf8');
@@ -161,5 +163,41 @@ describe('top bar markup and wiring', () => {
     assert.match(topbar, /if \(\(e\.key === 'Enter' \|\| e\.key === ' '\) && e\.target\.closest\?\.\('button, \[role="button"\], input'\)\) e\.stopPropagation\(\);/);
     assert.doesNotMatch(topbar.replace(/\/\*[\s\S]*?\*\/|\/\/[^\n]*/g, ''), /—/);
     assert.doesNotMatch(header.replace(/<!--[\s\S]*?-->/g, ''), /—/);
+  });
+});
+
+describe('a narrow window: the actions pill gives way instead of running off the edge', () => {
+  const css = read('style.css');
+  it('takes the fewest steps, in order: the study pill shortens, then Map, Make and Quests go to the Menu', () => {
+    assert.deepEqual([...TOP_OVERFLOW_STEPS], ['chip', 'map', 'make', 'quest']);
+    // 390 px: the pill holds 170; the bar's parts measured there (Menu, pill, Quests, Make, Map, Sound).
+    const widths = { base: 36 + 36 + 36 + 12, chip: 100, chipShort: 30, map: 36, make: 36, quest: 36 };
+    const need = (steps) => widths.base + (steps.includes('chip') ? widths.chipShort : widths.chip)
+      + ['map', 'make'].filter((k) => !steps.includes(k)).reduce((n, k) => n + widths[k], 0);
+    assert.deepEqual(pickTopOverflow((steps) => need(steps) <= 170), ['chip', 'map', 'make']);
+    assert.deepEqual(pickTopOverflow((steps) => need(steps) <= 400), []);
+    assert.deepEqual(pickTopOverflow((steps) => need(steps) <= 200), ['chip', 'map']);
+    assert.deepEqual(pickTopOverflow(() => false), ['chip', 'map', 'make', 'quest']);
+  });
+  it('the moved buttons get Menu rows with their keys, and the bar hides them in Modern only', () => {
+    for (const [id, key] of [['menu-quest-btn', 'Q'], ['menu-make-btn', 'N'], ['menu-map-btn', 'M']]) {
+      assert.equal(MENU_ROWS[id].group, 'world');
+      assert.equal(MENU_ROWS[id].key, key);
+    }
+    assert.match(css, /\[data-ui="modern"\] \.top-bar\[data-overflow~="map"\] #map-btn,/);
+    assert.match(css, /\[data-ui="modern"\] \.top-bar\[data-overflow~="chip"\] #study-chip \.study-chip-short \{ display: inline; \}/);
+    assert.match(css, /#study-chip \.study-chip-short \{ display: none; \}/);
+    // Classic lays its own bar out: the fit clears itself there.
+    assert.match(topbar, /if \(doc\.documentElement\.dataset\.ui !== 'modern'\) return apply\(\[\]\);/);
+    assert.match(topbar, /installTopOverflow\(doc\);/);
+  });
+  it('the study pill carries its short form: the count when idle, the time when learning', () => {
+    assert.match(game, /function paintStudyChip\(chip, classTsid, name, remaining, short = remaining\)/);
+    assert.match(game, /paintStudyChip\(chip, '', 'Skills', `\$\{n\} available`, String\(n\)\);/);
+    assert.match(game, /<span class="study-chip-short"><\/span>/);
+  });
+  it('the street map steps under the nameplate in a narrow window', () => {
+    const narrow = css.slice(css.indexOf('@media (max-width: 760px) {\n  [data-ui="modern"] .top-bar .hud-cur.currants'));
+    assert.match(narrow.slice(0, 1200), /\[data-ui="modern"\] \.street-minimap \{ top: calc\(2 \* var\(--hud-h\) \+ var\(--space-4\)\); \}/);
   });
 });

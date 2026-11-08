@@ -960,7 +960,7 @@ import { installHiresIcons } from './js/icon-hires.js?v=165dbd6e';
 import { installHiresDecos } from './js/deco-hires.js?v=aeb0c9bd';
 import { loadAudioLevels, loadMutedPreference, saveAudioLevel, saveMutedPreference } from './js/audio-pref.js?v=6fe817bc';
 import { createAudioBuses, fadeGain } from './js/audio-buses.js?v=af167b54';
-import { installTopBar, renderTopBar } from './js/ui/topbar.js?v=57cc6690';
+import { installTopBar, renderTopBar } from './js/ui/topbar.js?v=40baf379';
 import { focusBack, installFocusReturn, lastInput } from './js/ui/focus-return.js?v=da190597';
 import { installContextGuard } from './js/ui/context-guard.js?v=0f71ac17';
 import { QUOIN_FRAME_BOB, advanceQuoinClock, quoinBobBetweenFrames } from './js/quoin-motion.js?v=ea0bd408';
@@ -26304,7 +26304,7 @@ function paintIdleSkillChip(chip, n) {
     chip.hidden = true;
     return;
   }
-  paintStudyChip(chip, '', 'Skills', `${n} available`);
+  paintStudyChip(chip, '', 'Skills', `${n} available`, String(n));
   chip.dataset.sub = `${n} ${n === 1 ? 'skill' : 'skills'} you can learn now`;
   delete chip.dataset.tipIcon;
   chip.querySelector('.study-chip-card small').textContent = chip.dataset.sub;
@@ -26315,13 +26315,13 @@ function paintIdleSkillChip(chip, n) {
  * The bar's study pill (Austin 2026-11-01): the skill's name, cut short when long, and the
  * time left; hovered or focused, a card under it shows the skill's icon and its whole name.
  */
-function paintStudyChip(chip, classTsid, name, remaining) {
+function paintStudyChip(chip, classTsid, name, remaining, short = remaining) {
   let label = chip.querySelector('.study-chip-label');
   if (!label) {
     chip.textContent = '';
     label = document.createElement('span');
     label.className = 'study-chip-label';
-    label.innerHTML = '<span class="study-chip-name"></span><span class="study-chip-time"></span>';
+    label.innerHTML = '<span class="study-chip-name"></span><span class="study-chip-time"></span><span class="study-chip-short"></span>';
     const card = document.createElement('span');
     card.className = 'study-chip-card';
     card.setAttribute('aria-hidden', 'true');
@@ -26331,7 +26331,9 @@ function paintStudyChip(chip, classTsid, name, remaining) {
   const card = chip.querySelector('.study-chip-card');
   label.firstChild.textContent = studyPillName(name);
   // A no-break space: a plain one collapses at the start of the inline time ("Skills· 16 available").
-  label.lastChild.textContent = ` · ${remaining}`;
+  label.children[1].textContent = ` · ${remaining}`;
+  // A narrow bar (topbar.js fitTopActions) shows only this: the time left, or how many are ready.
+  label.children[2].textContent = short;
   if (chip.dataset.skill !== classTsid) {
     chip.dataset.skill = classTsid;
     const icon = card.querySelector('.study-chip-icon');

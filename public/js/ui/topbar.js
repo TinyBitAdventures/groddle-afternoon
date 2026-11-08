@@ -46,6 +46,10 @@ export const MENU_ROWS = Object.freeze({
   'achieve-btn': { group: 'me', rank: 3, key: 'B' },
   'buffs-btn': { group: 'me', rank: 4, key: 'Y' },
   'avatar-btn': { group: 'me', rank: 5, key: 'L' },
+  // A narrow window (fitTopActions): the bar's Quests, Make and Map, when they no longer fit on it.
+  'menu-quest-btn': { group: 'world', rank: -3, key: 'Q' },
+  'menu-make-btn': { group: 'world', rank: -2, key: 'N' },
+  'menu-map-btn': { group: 'world', rank: -1, key: 'M' },
   'home-btn': { group: 'world', rank: 0 },
   'feat-btn': { group: 'world', rank: 1, key: 'H' },
   // Ticket 81: the Projects panel (features/street-jobs-feature.js).
@@ -565,6 +569,102 @@ function trackPillWidths(doc) {
   sync();
 }
 
+/**
+ * A narrow window (390 px, Modern): the actions pill ran off the right edge, the Make hammer and
+ * the study pill's "16 available" cut off. What does not fit gives way in this order: the study
+ * pill shows only its number or time (`chip`), then Map, Make and Quests move from the bar into
+ * the Menu's World group (Map also opens from the street name and the street map). Report a
+ * problem, Sound and the Menu itself always stay on the bar.
+ */
+export const TOP_OVERFLOW_STEPS = Object.freeze(['chip', 'map', 'make', 'quest']);
+const OVERFLOW_BUTTONS = Object.freeze({ quest: 'quest-btn', make: 'make-btn', map: 'map-btn' });
+const OVERFLOW_ROWS = Object.freeze({ quest: ['menu-quest-btn', 'Quests'], make: ['menu-make-btn', 'Make'], map: ['menu-map-btn', 'Map'] });
+
+/**
+ * PURE: the fewest steps of TOP_OVERFLOW_STEPS, taken in order, for which `fits(steps)` is
+ * true (all of them when nothing fits).
+ */
+export function pickTopOverflow(fits, steps = TOP_OVERFLOW_STEPS) {
+  for (let n = 0; n <= steps.length; n += 1) {
+    const taken = steps.slice(0, n);
+    if (fits(taken)) return taken;
+  }
+  return [...steps];
+}
+
+/** Whether the actions pill fits: no content past its box, its box inside the window. */
+function actionsFit(doc, pill) {
+  const win = doc.defaultView;
+  const right = (win?.innerWidth || doc.documentElement.clientWidth) - 4;
+  return pill.scrollWidth <= pill.clientWidth + 1 && pill.getBoundingClientRect().right <= right;
+}
+
+function fitTopActions(doc) {
+  const bar = doc.querySelector('header.top-bar');
+  const pill = doc.querySelector('.top-bar .top-actions');
+  const world = doc.querySelector('#more-list [data-menu-group="world"]');
+  if (!bar || !pill) return;
+  for (const [step, [id, label]] of Object.entries(OVERFLOW_ROWS)) {
+    if (doc.getElementById(id) || !world) continue;
+    const row = doc.createElement('button');
+    row.type = 'button';
+    row.id = id;
+    row.className = 'chrome-btn menu-overflow-row';
+    row.textContent = label;
+    row.hidden = true;
+    row.addEventListener('click', () => {
+      doc.getElementById('more-btn')?.click();
+      doc.getElementById(OVERFLOW_BUTTONS[step])?.click();
+    });
+    world.append(row);
+  }
+  const apply = (steps) => {
+    const value = steps.join(' ');
+    if ((bar.dataset.overflow || '') !== value) {
+      if (value) bar.dataset.overflow = value;
+      else delete bar.dataset.overflow;
+    }
+    for (const [step, [id]] of Object.entries(OVERFLOW_ROWS)) {
+      const row = doc.getElementById(id);
+      if (row && row.hidden !== !steps.includes(step)) row.hidden = !steps.includes(step);
+    }
+  };
+  // Classic lays its own bar out (classic.css): nothing moves there.
+  if (doc.documentElement.dataset.ui !== 'modern') return apply([]);
+  apply(pickTopOverflow((steps) => {
+    apply(steps);
+    return actionsFit(doc, pill);
+  }));
+}
+
+function installTopOverflow(doc) {
+  const bar = doc.querySelector('header.top-bar');
+  const pill = doc.querySelector('.top-bar .top-actions');
+  if (!bar || !pill) return;
+  let queued = false;
+  let lastChip = '';
+  const fit = () => {
+    if (queued) return;
+    queued = true;
+    requestAnimationFrame(() => {
+      queued = false;
+      fitTopActions(doc);
+    });
+  };
+  fit();
+  doc.defaultView?.addEventListener('resize', fit);
+  if (typeof ResizeObserver === 'function') new ResizeObserver(fit).observe(bar);
+  // The study pill's words change as a skill counts down; a new length can need a new fit.
+  const chip = doc.getElementById('study-chip');
+  if (chip && typeof MutationObserver === 'function') {
+    new MutationObserver(() => {
+      const text = `${chip.hidden}:${chip.textContent.length}`;
+      if (text !== lastChip) { lastChip = text; fit(); }
+    }).observe(chip, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ['hidden'] });
+  }
+  new MutationObserver(fit).observe(doc.documentElement, { attributes: true, attributeFilter: ['data-ui'] });
+}
+
 /** Effects and Music sliders and Mute (the game's #mute-btn, moved into the Sound popover). */
 function installSound(doc, audio) {
   const btn = doc.getElementById('sound-btn');
@@ -823,6 +923,7 @@ export function installTopBar(doc, opts = {}) {
   shapeStreetName(doc);
   installLocationLink(doc);
   trackPillWidths(doc);
+  installTopOverflow(doc);
   doc.getElementById('low-energy-btn')?.addEventListener('click', (e) => {
     e.stopPropagation();
     doc.querySelector('.top-bar .meta-pill.energy')?.click();
