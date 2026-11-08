@@ -36,6 +36,15 @@
  * `tree:<street tree index>`, with its spot in slot.adopted. From then on it
  * is an ordinary plot: clear, tend, plant, pet, grow. `adoptPlot` and
  * `killTree` are the hooks; trees grown here die through `killPlotTree`.
+ *
+ * Shared street Patches (G564, multiplayer, dark until a release turns it on):
+ * on a street the realtime server shares, the plots come from
+ * features/shared-patches-feature.js (engine.query('sharedPatchPlots')), never
+ * from the save. The server grows them (no tickPlot here), its changes come
+ * back through `sharedPlotsChanged`, and a soil verb asks the server first
+ * (runSharedVerb runs it here on the server's go-ahead, with the page's own
+ * draws). Targets carry `sharedPatch` (the plot key). Solo, homes and any
+ * street the server doesn't share keep the save's own plots, as before.
  */
 
 import { ensureItem } from '../inventory.js?v=b7609342';
@@ -66,6 +75,7 @@ import {
 import { frameTexture, isLoaded, onFailed, onLoaded, textureFromUrl } from '../textures.js?v=3149d699';
 import { HOE_TOOLS, firstWorkingTool } from '../tools.js?v=d8aa3536';
 import { slugsFromEffects } from '../speech-slugs.js?v=130338f9';
+import { plotSignature, replayRng } from '../shared-patches.js?v=1ceb8941';
 
 export const PATCHES_FEATURE_ID = 'patches';
 export const SOIL_GROUP_PREFIX = 'soil:';
@@ -220,6 +230,12 @@ let autoplayTimers = [];
 let toolFx = null;
 /** When the last Dametime midnight passed (saved), so unloaded streets catch up. */
 let lastNewDayAt = 0;
+/** G564: this street's planned soil plots (no plots), so a shared/saved swap can lay them out again. */
+let lastPlan = [];
+let lastSoilCounts = null;
+/** G564: a street's first views are still loading; a shared swap asked meanwhile waits for them. */
+let spawning = false;
+let resyncWanted = false;
 const effects = [];
 const baseTextures = new Map();
 const frameTextures = new Map();
@@ -347,6 +363,7 @@ function treeSubtitle(tree) {
 
 async function buildView(engine, entity, myGeneration, { grow = false } = {}) {
   const { PIXI } = engine;
+  entity.sig = plotSignature(entity.plot);
   const tex = await texturesForPlot(engine, entity.plot);
   if (myGeneration !== generation || !entities.includes(entity)) return;
   dropView(engine, entity);
@@ -372,6 +389,7 @@ async function buildView(engine, entity, myGeneration, { grow = false } = {}) {
       sprite,
       state: plot.tree.state,
       grownFromBean: true,
+      ...(entity.shared ? { sharedPatch: entity.key } : {}),
     });
     if (grow) growFx(engine, sprite, s);
     return;
@@ -398,6 +416,7 @@ async function buildView(engine, entity, myGeneration, { grow = false } = {}) {
     subtitle: plotStatusLabel(plot, Date.now()),
     sprite,
     patchKey: entity.key,
+    ...(entity.shared ? { sharedPatch: entity.key } : {}),
   });
 }
 
@@ -604,9 +623,9 @@ function itemLabel(classTsid, qty) {
   return `${qty} ${qty === 1 ? def.label : def.namePlural}`;
 }
 
-function performVerb(engine, entity, verbId) {
+function performVerb(engine, entity, verbId, over = null) {
   stopToolFx();
-  const ctx = ctxFor(engine, entity);
+  const ctx = over ? { ...ctxFor(engine, entity), ...over } : ctxFor(engine, entity);
   const before = entity.plot.stage;
   const result = performPlotVerb(entity.plot, verbId, ctx);
   lastVerb = `${verbId}:${result.ok ? 'ok' : result.reason || 'failed'}`;
@@ -766,7 +785,13 @@ async function spawnStreet(engine, items, myGeneration) {
   }));
   entities = [...spawned, ...adoptedMeanwhile];
   demoEntity = entities.find((e) => e.demo) || null;
-  await Promise.all(spawned.map((entity) => buildView(engine, entity, myGeneration)));
+  spawning = false;
+  const views = spawned.map((entity) => buildView(engine, entity, myGeneration));
+  if (resyncWanted) {
+    resyncWanted = false;
+    resyncPlots(engine);
+  }
+  await Promise.all(views);
   if (myGeneration !== generation) return;
   publish(engine);
   scheduleAutoplay(engine);
@@ -776,6 +801,86 @@ function ensureSoilItems() {
   for (const [classTsid, def] of Object.entries(SOIL_ITEM_DEFS)) {
     ensureItem(classTsid, def);
   }
+}
+
+/**
+ * G564: the shared plots for this street (features/shared-patches-feature.js), or null when the
+ * plots are the save's own (solo, a home's Patches, a street the server doesn't share, no live
+ * realtime). handle: { plot(key, classTsid), extras() } (extras: the tree:<i> plots, with spots).
+ */
+function sharedHandle(engine) {
+  if (lastSoilCounts || engine?.mode !== 'multiplayer') return null;
+  return engine.query?.('sharedPatchPlots', engine.streetTsid, engine) || null;
+}
+
+/** This street's plots with their positions: the shared ones, or the save's own (with the demo and catch-up). */
+function streetItems(engine) {
+  const shared = sharedHandle(engine);
+  if (shared) {
+    const items = lastPlan.map((item) => ({ ...item, plot: shared.plot(item.key, item.classTsid), shared: true }));
+    for (const extra of shared.extras() || []) {
+      if (!items.some((item) => item.key === extra.key)) items.push({ ...extra, adopted: true, shared: true });
+    }
+    return items.filter((item) => item.plot);
+  }
+  const slot = engine.streetSlot(PATCHES_FEATURE_ID);
+  const now = Date.now();
+  let planned = [...lastPlan, ...adoptedPlan(slot, (index) => engine.placement('trees')?.[index])];
+  planned = setupDemo(engine, slot, planned);
+  const items = prepareStreetPlots(slot, planned, { tsid: engine.streetTsid, hubId: hubIdOf(engine), now });
+  // Catch up on time spent away (seedlings, regrowth, tree maturity).
+  for (const item of items) {
+    resetPlotDayIfStale(item.plot, lastNewDayAt, Math.random, now);
+    if (tickPlot(item.plot, now).events.includes('maxed')) engine.achievement('wood_tree:maxed', 1);
+  }
+  return items;
+}
+
+/**
+ * G564: lay this street's plots out again from wherever they come from now (the server's
+ * snapshot or change, or the save's own after a fall back), redrawing only what changed.
+ */
+function resyncPlots(engine) {
+  if (!engine?.entityLayer) return;
+  if (spawning) {
+    resyncWanted = true;
+    return;
+  }
+  const items = streetItems(engine);
+  plannedItems = items;
+  const myGeneration = generation;
+  const keep = new Set(items.map((item) => item.key));
+  for (const old of entities.filter((e) => !keep.has(e.key) && !e.demo)) dropView(engine, old);
+  entities = entities.filter((e) => keep.has(e.key) || e.demo);
+  let dirty = false;
+  items.forEach((item, index) => {
+    let entity = entities.find((e) => e.key === item.key);
+    if (!entity) {
+      entity = { ...item, direction: index % 2 ? -1 : 1, sprite: null, target: null };
+      entities.push(entity);
+      buildView(engine, entity, myGeneration);
+      dirty = true;
+      return;
+    }
+    const was = String(entity.sig || '').split('|')[0];
+    const swapped = entity.plot !== item.plot || entity.shared !== Boolean(item.shared);
+    entity.plot = item.plot;
+    entity.shared = Boolean(item.shared);
+    if (Number.isFinite(item.x)) entity.x = item.x;
+    if (Number.isFinite(item.y)) entity.y = item.y;
+    if (swapped || plotSignature(entity.plot) !== entity.sig) {
+      const grew = was === 'seedling' && entity.plot.stage === 'tree';
+      if (!swapped && grew) engine.pushActivity?.(`A Seedling grew into a ${GROWN_TREE_LABELS[entity.plot.tree.classId]}!`);
+      if (!swapped && was === 'seedling' && entity.plot.stage === 'dirty') engine.pushActivity?.('A Seedling went too long without petting and withered back into a Patch.');
+      buildView(engine, entity, myGeneration, { grow: grew && !swapped });
+      dirty = true;
+    } else if (entity.plot.stage === 'tree') {
+      refreshTreeView(engine, entity);
+    } else if (entity.target) {
+      entity.target.subtitle = plotStatusLabel(entity.plot, Date.now());
+    }
+  });
+  if (dirty) publish(engine);
 }
 
 // ---------------------------------------------------------------------------
@@ -797,28 +902,20 @@ export const patchesFeature = {
   onStreetEnter(street, engine) {
     generation += 1;
     const myGeneration = generation;
-    const slot = engine.streetSlot(PATCHES_FEATURE_ID);
     // Home streets pass their cultivated Patches (js/features/homes-feature.js).
-    const counts = street?.soilCounts || soilCountsForStreet(street?.tsid || engine.streetTsid);
-    const now = Date.now();
-    let planned = [
-      ...soilSpawnPlan(counts, (key) => engine.placement(key)),
-      ...adoptedPlan(slot, (index) => engine.placement('trees')?.[index]),
-    ];
-    planned = setupDemo(engine, slot, planned);
-    const items = prepareStreetPlots(slot, planned, { tsid: engine.streetTsid, hubId: hubIdOf(engine), now });
+    lastSoilCounts = street?.soilCounts || null;
+    const counts = lastSoilCounts || soilCountsForStreet(street?.tsid || engine.streetTsid);
+    lastPlan = soilSpawnPlan(counts, (key) => engine.placement(key));
+    const items = streetItems(engine);
     plannedItems = items;
-    // Catch up on time spent away (seedlings, regrowth, tree maturity).
-    for (const item of items) {
-      resetPlotDayIfStale(item.plot, lastNewDayAt, Math.random, now);
-      if (tickPlot(item.plot, now).events.includes('maxed')) engine.achievement('wood_tree:maxed', 1);
-    }
     if (!items.length) {
       entities = [];
       demoEntity = null;
       publish(engine);
       return;
     }
+    spawning = true;
+    resyncWanted = false;
     spawnStreet(engine, items, myGeneration);
   },
 
@@ -830,6 +927,10 @@ export const patchesFeature = {
     effects.length = 0;
     entities = [];
     plannedItems = [];
+    lastPlan = [];
+    lastSoilCounts = null;
+    spawning = false;
+    resyncWanted = false;
     demoEntity = null;
   },
 
@@ -870,6 +971,12 @@ export const patchesFeature = {
     lastTickAt = now;
     let dirty = false;
     for (const entity of entities) {
+      // G564: the server grows a shared plot; its changes come through sharedPlotsChanged.
+      if (entity.shared) {
+        if (entity.plot.stage === 'tree') refreshTreeView(engine, entity);
+        else if (entity.target) entity.target.subtitle = plotStatusLabel(entity.plot, now);
+        continue;
+      }
       const before = entity.plot.stage;
       const { changed, events } = tickPlot(entity.plot, now);
       if (events.includes('maxed')) engine.achievement('wood_tree:maxed', 1);
@@ -896,6 +1003,7 @@ export const patchesFeature = {
     // Trees on other streets catch up from lastNewDayAt when next entered.
     lastNewDayAt = now;
     for (const entity of entities) {
+      if (entity.shared) continue;
       if (resetPlotDay(entity.plot, Math.random, now)) refreshTreeView(engine, entity);
     }
   },
@@ -969,6 +1077,8 @@ export const patchesFeature = {
       engine.toast('Find a suitable patch to plant it in!', 2400);
       return true;
     }
+    // G564: a shared Patch asks the server first, as its verb menu's Plant does.
+    if (near.shared && near.target && engine.query?.('sharedPatchVerb', near.target, `plant:${classTsid}`, engine) === true) return true;
     performVerb(engine, near, `plant:${classTsid}`);
     return true;
   },
@@ -988,19 +1098,25 @@ export const patchesFeature = {
    * when the street is loaded.
    */
   adoptPlot(engine, { key, soilClass, x, y }) {
-    const slot = engine.streetSlot(PATCHES_FEATURE_ID);
-    slot.plots ||= {};
-    slot.adopted ||= {};
     const now = Date.now();
-    const plot = createPlot(soilClass, { now, hubId: hubIdOf(engine), seed: `${engine.streetTsid}:${key}` });
-    slot.plots[key] = plot;
-    slot.adopted[key] = { x: Math.round(x), y: Math.round(y) };
+    // G564: on a shared street the server makes the dead tree's plot for everyone; the page holds
+    // the shared copy (filled when the server's change lands), never a save copy.
+    const shared = sharedHandle(engine)?.adopt?.(key, soilClass, x, y) || null;
+    let plot = shared;
+    if (!plot) {
+      const slot = engine.streetSlot(PATCHES_FEATURE_ID);
+      slot.plots ||= {};
+      slot.adopted ||= {};
+      plot = createPlot(soilClass, { now, hubId: hubIdOf(engine), seed: `${engine.streetTsid}:${key}` });
+      slot.plots[key] = plot;
+      slot.adopted[key] = { x: Math.round(x), y: Math.round(y) };
+    }
     const old = entities.find((e) => e.key === key);
     if (old) {
       dropView(engine, old);
       entities = entities.filter((e) => e !== old);
     }
-    const entity = { key, classTsid: plot.classTsid, x, y, plot, adopted: true, direction: entities.length % 2 ? -1 : 1, sprite: null, target: null };
+    const entity = { key, classTsid: plot.classTsid, x, y, plot, adopted: true, shared: Boolean(shared), direction: entities.length % 2 ? -1 : 1, sprite: null, target: null };
     entities.push(entity);
     buildView(engine, entity, generation, {}).then(() => {
       if (entity.sprite && !entity.sprite.destroyed) deathPuff(engine, entity.sprite.x, entity.sprite.y);
@@ -1025,6 +1141,29 @@ export const patchesFeature = {
     publish(engine);
     engine.save();
     return { ...out, x, y, key: entity.key };
+  },
+
+  /** G564 (shared-patches-feature): the shared plots changed or fell back to the save's: redraw. */
+  sharedPlotsChanged(engine) {
+    resyncPlots(engine);
+  },
+
+  /** G564: a shared soil verb's quote here (the page's own tool, energy and stage checks), or null. */
+  quoteSharedVerb(engine, key, verbId) {
+    const entity = entities.find((e) => e.key === key && e.shared);
+    if (!entity) return null;
+    const quotes = plotVerbs(entity.plot, ctxFor(engine, entity));
+    const base = String(verbId).split(':')[0];
+    return quotes.find((row) => row.id === verbId) || (base === 'plant' ? quotes.find((row) => row.id === 'plant') : null) || null;
+  },
+
+  /** G564: run a shared soil verb here on the server's go-ahead, with the page's own draws. */
+  runSharedVerb(engine, key, verbId, { rolls = [], owner } = {}) {
+    const entity = entities.find((e) => e.key === key);
+    if (!entity) return null;
+    const over = { rng: replayRng(rolls) };
+    if (owner !== undefined) over.owner = owner;
+    return performVerb(engine, entity, verbId, over);
   },
 
   /** QA: the plot entity for a key on the loaded street. */

@@ -879,7 +879,8 @@ describe('every save read and write goes through the store', () => {
   // js/phone/companion.js is the phone page, not the game: it keeps this device's choice to open the full game anyway (groddle-play-device);
   // js/builder/editor.js is the level builder in the console, not the game: it keeps its panels, cameras and clipboard on this device.
   // js/ui/quest-sheet.js keeps the Quests sheet's sort (ticket 77, groddle.questSort), a device preference.
-  const ALLOWED = new Set(['js/ui/quest-sheet.js', 'js/save-store.js', 'js/practice-mode.js', 'js/audio-pref.js', 'js/online-boot.js', 'js/features/groups-feature.js', 'js/ui/social-drawer.js', 'js/classic/ui-mode.js', 'js/world-zoom.js', 'js/night-tint.js', 'js/ui/street-minimap.js', 'js/builder/editor.js', 'js/phone/companion.js', 'js/save-claim.js']);
+  // js/shared-patches.js reads one QA flag (groddle.qa.sharedPatches, G564) that turns the dark shared Patches on in this browser, never a save.
+  const ALLOWED = new Set(['js/shared-patches.js', 'js/ui/quest-sheet.js', 'js/save-store.js', 'js/practice-mode.js', 'js/audio-pref.js', 'js/online-boot.js', 'js/features/groups-feature.js', 'js/ui/social-drawer.js', 'js/classic/ui-mode.js', 'js/world-zoom.js', 'js/night-tint.js', 'js/ui/street-minimap.js', 'js/builder/editor.js', 'js/phone/companion.js', 'js/save-claim.js']);
 
   it('game.js and js/ make no direct localStorage or sessionStorage calls', () => {
     const offenders = [];
