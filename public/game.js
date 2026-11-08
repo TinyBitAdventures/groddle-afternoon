@@ -746,6 +746,7 @@ import {
   refillFruit,
   maturityLabel,
   trantStatusLabel,
+  trantFootAnchorY,
 } from './js/trants.js?v=9c2e8c0f';
 import {
   runStreetTransition,
@@ -831,6 +832,7 @@ import {
 } from './js/vendor.js?v=307aca18';
 import {
   animalAnchorX,
+  animalAnchorY,
   createAnimalState,
   resetAnimalDay,
   animalStatusLabel,
@@ -6874,10 +6876,19 @@ function textureForTrant(classTsid, maturity) {
     // Reject leftover multi-plant sheets (very wide or sparse tall grids)
     if (tex.width > tex.height * 2.2) continue;
     if (tex.height < 60) continue;
+    trantFootOf.set(tex, trantFootAnchorY(classTsid, m));
     return tex;
   }
   if (textures.treeFruit?.frames?.[0]) return textures.treeFruit.frames[0];
   return null;
+}
+
+/** G583: each trant frame's anchor y (js/trants.js trantFootAnchorY), set as textureForTrant picks it. */
+const trantFootOf = new WeakMap();
+
+/** G583: the anchor y that stands a tree's trunk on its y (the cell's bottom for art without a measured foot). */
+function treeAnchorY(tex) {
+  return trantFootOf.get(tex) ?? 1;
 }
 
 /** Six official Wood Tree maturity frames, from stump to mighty trunk. */
@@ -12152,6 +12163,7 @@ const engine = {
     const tex = textureForTrant(target.classId, target.state.maturity);
     if (tex) {
       target.sprite.texture = tex;
+      target.sprite.anchor.y = treeAnchorY(tex);
       const s = trantDisplayScale(tex, { targetH: 210, maxScale: 1 });
       target.sprite.scale.set((target.sprite._woodDirection || 1) * s, s);
     }
@@ -12801,6 +12813,8 @@ function spawnChickens(xs) {
     });
     // Anchored under the bird, so it turns on the spot (js/animals.js ANIMAL_ANCHOR_X, lane CHICKWALK).
     spr.anchor.x = animalAnchorX('npc_chicken');
+    // G583: and on its feet, not on the cell's empty rows under them (ANIMAL_ANCHOR_Y).
+    spr.anchor.y = animalAnchorY('npc_chicken');
     spr.baseScale = ENTITY_SCALE.chicken;
     spr.x = x;
     spr.y = GROUND_Y + 2;
@@ -13024,7 +13038,8 @@ function spawnTrees(spots) {
     // Linear filtering without a mip chain (Pixi 8 sources have none by default).
     if (tex.source) tex.source.scaleMode = 'linear';
     const spr = new PIXI.Sprite(tex);
-    spr.anchor.set(0.5, 1);
+    // G583: the trunk's foot on the platform line, not the frame's empty rows under it.
+    spr.anchor.set(0.5, treeAnchorY(tex));
     spr.roundPixels = true;
     // Never upscale x1 OGA rasters. Cap height so tall egg/fruit plants fit in view
     // (~VIEW_H * 0.42) without clipping against the camera top.
@@ -30108,7 +30123,10 @@ async function main() {
         harvestTarget.label = TRANT_META[requested].label;
         harvestTarget.state = createTrantState(requested, { maturity: 10, health: 9 });
         const replacement = textureForTrant(requested, harvestTarget.state.maturity);
-        if (replacement) harvestTarget.sprite.texture = replacement;
+        if (replacement) {
+          harvestTarget.sprite.texture = replacement;
+          harvestTarget.sprite.anchor.y = treeAnchorY(replacement);
+        }
         const treeIndex = trees.indexOf(harvestTarget.sprite);
         if (treeIndex >= 0) {
           streetWorldState().trees[treeIndex] = {
@@ -30131,6 +30149,7 @@ async function main() {
       const replacement = textureForTrant(requested, maturity);
       if (replacement) {
         harvestTarget.sprite.texture = replacement;
+        harvestTarget.sprite.anchor.y = treeAnchorY(replacement);
         const scale = trantDisplayScale(replacement, { targetH: 210, maxScale: 1 });
         harvestTarget.sprite.scale.set(
           (harvestTarget.sprite._woodDirection || 1) * scale,

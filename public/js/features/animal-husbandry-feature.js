@@ -59,7 +59,7 @@ import { nearestSurfaceY } from '../walk-surface.js?v=106bfdc5';
 import { displayTopOf, itemstackOverlayPoint, playSheetOverlay } from '../overlay-art.js?v=11b6dd7f';
 import { SET_FREE, applySetFree, canSetFree, setFreeGoneLine, setFreePrompt } from '../animal-set-free.js?v=3b194fca';
 import { getGameDayKey } from '../game-day.js?v=edb00566';
-import { animalAnchorX, createAnimalState, resetAnimalDay, animalStatusLabel, listAnimalFeedOptions } from '../animals.js?v=08496a95';
+import { animalAnchorX, animalAnchorY, createAnimalState, resetAnimalDay, animalStatusLabel, listAnimalFeedOptions } from '../animals.js?v=08496a95';
 import {
   BABY_ANIMALS,
   BATTERFLY,
@@ -442,7 +442,7 @@ function buildExtraAnimal(engine, row) {
   const spr = new PIXI.AnimatedSprite(frames.length ? frames : [PIXI.Texture.EMPTY]);
   const scale = row.classId === 'npc_piggy' ? 0.97 : row.classId === 'npc_chicken' ? 0.7 : 0.7;
   // Under the animal, so it turns on the spot (js/animals.js ANIMAL_ANCHOR_X).
-  spr.anchor.set(animalAnchorX(row.classId), row.classId === 'npc_butterfly' ? 0.5 : 1);
+  spr.anchor.set(animalAnchorX(row.classId), row.classId === 'npc_butterfly' ? 0.5 : animalAnchorY(row.classId));
   spr.baseScale = scale;
   spr.scale.set(scale);
   spr.animationSpeed = row.classId === 'npc_butterfly' ? 0.25 : 0.13;

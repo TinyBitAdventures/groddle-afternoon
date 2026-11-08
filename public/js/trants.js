@@ -443,3 +443,35 @@ export function trantStatusLabel(state, meta = TRANT_META[state?.classTsid] || {
   const base = `${maturityLabel(state?.maturity)} · ${Math.max(0, Number(state?.fruitCount) || 0)} ${meta.fruitLabel || 'fruit'}`;
   return care ? `${base} · ${care}` : base;
 }
+
+/**
+ * G583: where a tree's trunk meets the ground in its frame. Every shipped trant frame
+ * (assets/sprites/trants/frames/<class>_m<stage>, one OGA cell each: build-trant-frames.sh) keeps
+ * the cell's transparent rows under the trunk's soft shadow, 3 to 36 px of them, more on the young
+ * stages. The original client drew an item with its art's registration point (the trunk's foot) at
+ * the item's y; a sprite anchored on the cell's bottom edge stood that many px above the platform
+ * line, so the Bubble Tree on Guillermo Gamera Way's upper ledge (m7: 11 px) floated over the drawn
+ * ledge, and a young Spice Tree (m1: 36 px) on any street floated by about 30 px.
+ * Values: [cell height, transparent rows under the lowest row with alpha > 50%] at 1x, measured
+ * from the shipped WebP frames (fixc lane, 2026-11-08). tests/trant-foot.test.js re-measures them.
+ */
+export const TRANT_FRAME_FOOT = Object.freeze({
+  trant_fruit: Object.freeze({ h: 249, pad: Object.freeze({ 1: 7, 3: 7, 5: 3, 7: 10, 10: 6 }) }),
+  trant_egg: Object.freeze({ h: 278, pad: Object.freeze({ 1: 15, 3: 15, 5: 12, 7: 14, 10: 7 }) }),
+  trant_bean: Object.freeze({ h: 270, pad: Object.freeze({ 1: 14, 3: 13, 5: 12, 7: 8, 10: 4 }) }),
+  trant_bubble: Object.freeze({ h: 277, pad: Object.freeze({ 1: 9, 3: 9, 5: 10, 7: 11, 10: 7 }) }),
+  trant_gas: Object.freeze({ h: 258, pad: Object.freeze({ 1: 17, 3: 16, 5: 15, 7: 10, 10: 5 }) }),
+  trant_spice: Object.freeze({ h: 250, pad: Object.freeze({ 1: 36, 3: 26, 5: 20, 7: 21, 10: 6 }) }),
+});
+
+/**
+ * PURE (G583): the anchor y (0..1) that puts a trant frame's trunk foot on the sprite's y: its
+ * lowest solid row, so the soft shadow under it spreads round the platform line as it did. 1 (the
+ * cell's bottom) for a class or stage without a measured frame.
+ */
+export function trantFootAnchorY(classId, stage) {
+  const row = TRANT_FRAME_FOOT[classId];
+  const pad = Number(row?.pad?.[stage]);
+  if (!row || !Number.isFinite(pad) || pad <= 0) return 1;
+  return 1 - pad / row.h;
+}

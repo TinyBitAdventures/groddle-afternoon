@@ -50,7 +50,7 @@
 import { ensureItem } from '../inventory.js?v=b7609342';
 import { isItemFloor, platformYAt } from '../street-model.js?v=b6cb6a4e';
 import { getStreetEcologyCatalog, streetEcologyAliases } from '../street-ecology.js?v=78a1d522';
-import { trantStatusLabel } from '../trants.js?v=9c2e8c0f';
+import { trantFootAnchorY, trantStatusLabel } from '../trants.js?v=9c2e8c0f';
 import { woodTreeStatusLabel } from '../woodcutting.js?v=4fd0342b';
 import {
   GROWN_TREE_LABELS,
@@ -374,7 +374,8 @@ async function buildView(engine, entity, myGeneration, { grow = false } = {}) {
   sprite.roundPixels = true;
   if (plot.stage === 'tree') {
     const isWood = plot.tree.classId === 'wood_tree';
-    sprite.anchor.set(0.5, 1);
+    // G583: the trunk's foot on the soil line (js/trants.js trantFootAnchorY), as street trees.
+    sprite.anchor.set(0.5, isWood ? 1 : trantFootAnchorY(plot.tree.classId, trantFrameStage(plot.tree.state?.maturity)));
     const s = treeScale(tex, isWood);
     sprite._woodDirection = entity.direction;
     sprite.scale.set(entity.direction * s, s);

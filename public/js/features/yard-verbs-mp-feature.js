@@ -56,7 +56,7 @@
 import { performPlotVerb, plotArtPath, plotLabel, plotStatusLabel, plotVerbs } from '../patches.js?v=aa83d5ad';
 import { trantStatusLabel } from '../trants.js?v=9c2e8c0f';
 import { woodTreeStatusLabel } from '../woodcutting.js?v=4fd0342b';
-import { animalAnchorX, animalStatusLabel } from '../animals.js?v=08496a95';
+import { animalAnchorX, animalAnchorY, animalStatusLabel } from '../animals.js?v=08496a95';
 import { frameTexture, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js?v=3149d699';
 import { homeStreetLayout, normalizeCultivationState } from '../home-cultivation.js?v=42ae453c';
 import { readVisitScene } from '../neighbours-mp.js?v=cfabb4f7';
@@ -242,7 +242,7 @@ function createSession(engine, client) {
     const spr = new PIXI.AnimatedSprite(frames.length ? frames : [PIXI.Texture.EMPTY]);
     const scale = classId === 'npc_piggy' ? 0.97 : 0.7;
     // Under the animal, so it turns on the spot (js/animals.js ANIMAL_ANCHOR_X).
-    spr.anchor.set(animalAnchorX(classId), classId === 'npc_butterfly' ? 0.5 : 1);
+    spr.anchor.set(animalAnchorX(classId), classId === 'npc_butterfly' ? 0.5 : animalAnchorY(classId));
     spr.baseScale = scale;
     spr.scale.set(scale);
     spr.animationSpeed = classId === 'npc_butterfly' ? 0.25 : 0.13;

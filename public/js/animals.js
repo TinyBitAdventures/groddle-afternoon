@@ -44,6 +44,21 @@ export function animalAnchorX(classId) {
   return ANIMAL_ANCHOR_X[classId] ?? 0.5;
 }
 
+/**
+ * G583: where each walking animal's feet are in its sheet's cell (the anchor y, 0..1). The original
+ * drew an NPC with its art's registration point (its feet) at the item's y, the platform line. Tiny
+ * Speck's Chicken cells (148 x 110, every state) keep 13 empty rows under the bird's feet (walk and
+ * the idle1 stand: lowest solid row 96; pecking_once 97), so anchored on the cell's bottom it stood
+ * 13 px x its 0.70 scale above the line (Guillermo Gamera Way's arch landing, 2026-11-08). The
+ * Piggy's walk keeps 1 to 3 rows (the +2 every walker is set down by covers it), so the rest keep 1.
+ */
+export const ANIMAL_ANCHOR_Y = Object.freeze({ npc_chicken: 97 / 110 });
+
+/** The anchor y a walking animal's sprite takes on the ground (ANIMAL_ANCHOR_Y; 1 for the rest). */
+export function animalAnchorY(classId) {
+  return ANIMAL_ANCHOR_Y[classId] ?? 1;
+}
+
 const FEED_CATALOG = Object.freeze({
   npc_piggy: Object.freeze({
     apple: { label: 'Apple', nutrition: 2 },
