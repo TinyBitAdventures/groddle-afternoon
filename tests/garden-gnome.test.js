@@ -30,7 +30,7 @@ import {
   teachMenu,
   tickGnome,
 } from '../public/js/garden-gnome.js?v=fd02c15b';
-import { gardenGnomeFeature as feature } from '../public/js/features/garden-gnome-feature.js?v=cd99ed9e';
+import { gardenGnomeFeature as feature } from '../public/js/features/garden-gnome-feature.js?v=2257e24e';
 import { worldArtFor } from '../public/js/world-art.js?v=df476660';
 import { GNOME_ART, GNOME_ART_DIR } from '../public/js/garden-gnome-art.js?v=994b7c76';
 import { HOME_STREET_TSID } from '../public/js/homes.js?v=631ab6b8';

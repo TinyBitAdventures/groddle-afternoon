@@ -11,20 +11,20 @@ import {
   resolveTrantCarePackage,
   quoteTrantCare,
   performTrantCare,
-} from '../public/js/trant-care.js?v=ac146026';
+} from '../public/js/trant-care.js?v=1f183f4b';
 import {
   createTrantState,
   livingTrantPlanForStreet,
   LIVING_TRANT_CLASS_IDS,
   setTrantTables,
   trantStatusLabel,
-} from '../public/js/trants.js?v=9c2e8c0f';
+} from '../public/js/trants.js?v=1b3c8ae3';
 import {
   createToolConditionState,
   getToolCondition,
   setToolRemaining,
 } from '../public/js/tools.js?v=d8aa3536';
-import { getVerbsFor, runVerb } from '../public/content.js?v=b87f037d';
+import { getVerbsFor, runVerb } from '../public/content.js?v=3e243822';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const publicDir = path.join(root, 'public');

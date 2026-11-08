@@ -38,7 +38,7 @@ import { GAME_DAY_MS, GAME_EPOCH_MS, GAME_YEAR_MS, MONTH_LENGTHS, MONTH_NAMES } 
 import { SEASONAL_SEEDS } from '../../public/js/garden.js?v=e1c3415c';
 import { SEASONAL_RECIPES } from '../../public/js/making.js?v=f4f214c2';
 import { SKILL_PACKAGES } from '../../public/js/skill-packages-data.js?v=cb4e9ab3';
-import { TRANT_META } from '../../public/js/trants.js?v=9c2e8c0f';
+import { TRANT_META } from '../../public/js/trants.js?v=1b3c8ae3';
 import { playHref } from './play-links.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..', '..');

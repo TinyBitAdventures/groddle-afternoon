@@ -23,7 +23,7 @@ import {
   SKIRT_BAND,
   SKIRT_FADE_DEPTH,
   SKIRT_SLIDE_MAX,
-} from '../public/js/street-render.js?v=40f4b798';
+} from '../public/js/street-render.js?v=bcbf72a5';
 import { streetHeight, streetWidth } from '../public/js/street-model.js?v=b6cb6a4e';
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -342,7 +342,7 @@ describe('ground skirt (the strip under a street in the Modern UI)', () => {
     // it rides with its layer; the middleground's solid copy gets the same cover.
     const src = readFileSync(join(here, '../public/js/street-render.js'), 'utf8');
     assert.match(src, /const fronts = layerContainers\.filter\(\(lc\) => lc\.inFront\);/);
-    assert.match(src, /buildGroundSkirt\(PIXI, opts\.renderer, root, grounds, W, sourceH, skirtDepth, [^\n]*fronts, deepestPlatformY - sourceH\);/);
+    assert.match(src, /buildGroundSkirt\(PIXI, opts\.renderer, root, grounds, W, sourceH, skirtDepth, [^\n]*fronts, deepestPlatformY - sourceH(?:, [^\n]*skirtRight[^\n]*)?\);/);
     const helper = src.slice(src.indexOf('function edgeFadeTexture('), src.indexOf('let solidPrograms'));
     assert.match(helper, /tint\.mask = mask;/);
     // Pixi's sprite mask keeps the mask's red channel: the art goes white at its own opacity first

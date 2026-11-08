@@ -34,8 +34,8 @@
 
 import { ROCK_CATALOG, findWorkingPick, miningProfile, miningToolWear } from './mining.js?v=fc28670f';
 import { MINING_EXPERT_UPGRADES } from './imagination-effects.js?v=70169933';
-import { TRANT_META, canHarvestTrant, fruitCapacityAt, resolveArborologyPackage } from './trants.js?v=9c2e8c0f';
-import { highestLightGreenThumbRank, quoteTrantCare } from './trant-care.js?v=ac146026';
+import { TRANT_META, canHarvestTrant, fruitCapacityAt, resolveArborologyPackage } from './trants.js?v=1b3c8ae3';
+import { highestLightGreenThumbRank, quoteTrantCare } from './trant-care.js?v=1f183f4b';
 import { RESOURCE_NODE_ALIASES, RESOURCE_NODE_CATALOG, resolveResourceSkillPackage } from './resource-nodes.js?v=b11d96b2';
 import { highestAnimalKinshipRank } from './animal-kinship.js?v=b857b068';
 import { applyCreatureState, clockOffset, pathFrom } from './street-creatures.js?v=3c07d608';

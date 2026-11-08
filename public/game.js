@@ -2,9 +2,9 @@
  * Groddle Afternoon — original street geometry + layered decos
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
-import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=b87f037d';
+import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=3e243822';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=127e0a3c';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=710b051c';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=60cac31c';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -479,8 +479,8 @@ import { TROPHY_FIND_TEXT, trophyOfBadge } from './js/home-trophies.js?v=21c2add
 import { PACK_COPY, isBagClass, isElementClass, unitRankAt } from './js/pack-slots.js?v=6cf9f397';
 import { hasPouch } from './js/elemental-pouch.js?v=ceefa97a';
 import { createPackRow, mountPackClearance, packBandRange, packCountText, packSearchEntries, packSlotTip } from './js/ui/pack-row.js?v=65c0f180';
-import { listAnimalFeedOptions } from './js/animals.js?v=08496a95';
-import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=08496a95';
+import { listAnimalFeedOptions } from './js/animals.js?v=18e6b180';
+import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=18e6b180';
 import {
   createDroppedItemState,
   parseDroppedItemState,
@@ -644,7 +644,7 @@ import {
   ensureStreetIndex,
   resolveIndexTsid,
 } from './js/street-loader.js?v=18b181ad';
-import { showDraftBanner, startDraftPlay } from './js/builder/draft-play.js?v=b3adf35e';
+import { showDraftBanner, startDraftPlay } from './js/builder/draft-play.js?v=8e6b0914';
 import {
   ladderTopDeck,
   groundBeneath,
@@ -673,7 +673,7 @@ import {
   setSignpostHover,
   setSignpostKeys,
   signpostBoardAt,
-} from './js/street-render.js?v=40f4b798';
+} from './js/street-render.js?v=bcbf72a5';
 import {
   GAME_DAY_MS,
   shouldFireNewDay,
@@ -747,7 +747,7 @@ import {
   maturityLabel,
   trantStatusLabel,
   trantFootAnchorY,
-} from './js/trants.js?v=9c2e8c0f';
+} from './js/trants.js?v=1b3c8ae3';
 import {
   runStreetTransition,
   showAwardScreen,
@@ -836,7 +836,7 @@ import {
   createAnimalState,
   resetAnimalDay,
   animalStatusLabel,
-} from './js/animals.js?v=08496a95';
+} from './js/animals.js?v=18e6b180';
 import {
   ensureWoodTreeState,
   pickWoodTool,
@@ -867,7 +867,7 @@ import {
   formatSpeedUpTime,
 } from './js/shrines.js?v=1a945fe7';
 import { giantDisplayName } from './js/giant-names.js?v=0e295891';
-import { shrinePowderOptions, shrinePowderAchievementCounters } from './js/powders.js?v=39081ab5';
+import { shrinePowderOptions, shrinePowderAchievementCounters } from './js/powders.js?v=6f458d42';
 import {
   GAMESHOW_TICKET_ID,
   applySpinningWheelReward,

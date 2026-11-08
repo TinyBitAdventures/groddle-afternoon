@@ -53,16 +53,16 @@
  * yardApplied (acts applied to my home), yardSent (acts the site took).
  */
 
-import { performPlotVerb, plotArtPath, plotLabel, plotStatusLabel, plotVerbs } from '../patches.js?v=aa83d5ad';
-import { trantStatusLabel } from '../trants.js?v=9c2e8c0f';
+import { performPlotVerb, plotArtPath, plotLabel, plotStatusLabel, plotVerbs } from '../patches.js?v=5b86e3f1';
+import { trantStatusLabel } from '../trants.js?v=1b3c8ae3';
 import { woodTreeStatusLabel } from '../woodcutting.js?v=4fd0342b';
-import { animalAnchorX, animalAnchorY, animalStatusLabel } from '../animals.js?v=08496a95';
+import { animalAnchorX, animalAnchorY, animalStatusLabel } from '../animals.js?v=18e6b180';
 import { frameTexture, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js?v=3149d699';
 import { homeStreetLayout, normalizeCultivationState } from '../home-cultivation.js?v=42ae453c';
 import { readVisitScene } from '../neighbours-mp.js?v=cfabb4f7';
 import { saveStore } from '../save-store.js?v=8839ba7b';
-import { STREET_GROUND_Y, homesFeature, wearHomeCultivation } from './homes-feature.js?v=d020f3d1';
-import { patchesFeature, treeFrameUrl } from './patches-feature.js?v=766de05b';
+import { STREET_GROUND_Y, homesFeature, wearHomeCultivation } from './homes-feature.js?v=454501f7';
+import { patchesFeature, treeFrameUrl } from './patches-feature.js?v=d41b1e17';
 import {
   YARD_STREET,
   YARD_TEXT as T,
@@ -78,14 +78,14 @@ import {
   treeSnapshot,
   visitorAnimalState,
   visitorTreeState,
-} from '../yard-verbs-mp.js?v=0ec000e7';
+} from '../yard-verbs-mp.js?v=740fbaed';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
 import { followYardPath, stickForClass } from '../yard-wander.js?v=75cc92d0';
 import { countItem, removeItem } from '../inventory.js?v=b7609342';
 import { ROCK_CATALOG, rockStatusLabel, tickMineRock } from '../mining.js?v=fc28670f';
 import { getResourceNodeDef, regrowDelayMs } from '../resource-nodes.js?v=b11d96b2';
 import { getGameDayKey } from '../game-day.js?v=edb00566';
-import { rockReady } from '../street-objects.js?v=c72e3d5c';
+import { rockReady } from '../street-objects.js?v=38310175';
 import { resourceNodesFeature } from './resource-nodes-feature.js?v=5d084390';
 import {
   ROCK_RESPAWN_MS,

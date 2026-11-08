@@ -17,7 +17,7 @@
  */
 import { validateZone } from './validate.js?v=f811c3ff';
 import { compileSchema } from './schema-check.js?v=cc9d1af4';
-import { DECO_TWINS } from '../street-render.js?v=40f4b798';
+import { DECO_TWINS } from '../street-render.js?v=bcbf72a5';
 import { ANIM_DECOS } from '../deco-anim-list.js?v=ecfee655';
 import { SHARP_DECOS } from '../deco-sharp-list.js?v=3806f689';
 import { setStreetEcologyCatalog } from '../street-ecology.js?v=78a1d522';

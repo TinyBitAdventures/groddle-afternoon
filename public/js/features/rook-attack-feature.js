@@ -64,7 +64,7 @@ import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=b764884b';
 import { landingY, nearestSurfaceY } from '../walk-surface.js?v=106bfdc5';
 import { donationValueFor } from '../shrines.js?v=1a945fe7';
 import { giantDisplayName } from '../giant-names.js?v=0e295891';
-import { TRANT_META, trantStatusLabel } from '../trants.js?v=9c2e8c0f';
+import { TRANT_META, trantStatusLabel } from '../trants.js?v=1b3c8ae3';
 import {
   FOREHORSEMAN_LINES,
   ROOK_COLORS,

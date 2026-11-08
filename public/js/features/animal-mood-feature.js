@@ -101,11 +101,11 @@ import { nearestSurfaceY } from '../walk-surface.js?v=106bfdc5';
 import { displayTopOf, itemstackOverlayPoint, playSheetOverlay } from '../overlay-art.js?v=11b6dd7f';
 import { isInHell } from '../hell.js?v=ca971c34';
 import { HOG_HAUL_STREET_ID } from '../hog-haul.js?v=50d2e072';
-import { TRANT_META, trantStatusLabel } from '../trants.js?v=9c2e8c0f';
-import { animalStatusLabel } from '../animals.js?v=08496a95';
+import { TRANT_META, trantStatusLabel } from '../trants.js?v=1b3c8ae3';
+import { animalStatusLabel } from '../animals.js?v=18e6b180';
 import { quoteAnimalKinship } from '../animal-kinship.js?v=b857b068';
 import { captureVerbState, isFoodItem, itemLabel } from '../animal-husbandry.js?v=75afc5c5';
-import { ROOK_SHEETS, rookAttackFeature } from './rook-attack-feature.js?v=a2e3453f';
+import { ROOK_SHEETS, rookAttackFeature } from './rook-attack-feature.js?v=a9a5cef1';
 import { ANIMAL_BODY, ANIMAL_PATROL, TREE_FOOTPRINT } from '../street-ecology.js?v=78a1d522';
 import {
   CHECK_ON_REMOVE,

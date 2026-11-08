@@ -34,7 +34,7 @@ import { slugsFromEffects } from '../speech-slugs.js?v=130338f9';
 import { worldToScreen } from '../street-model.js?v=b6cb6a4e';
 import { frameTexture, textureFromUrl } from '../textures.js?v=3149d699';
 import { ensureWoodTreeState, resetWoodTreeDay, woodTreeStatusLabel } from '../woodcutting.js?v=4fd0342b';
-import { noteWoodTreeCare } from '../patches.js?v=aa83d5ad';
+import { noteWoodTreeCare } from '../patches.js?v=5b86e3f1';
 import {
   ENCHANTED_FORESTS,
   ENCHANTED_WOOD_TREE,
