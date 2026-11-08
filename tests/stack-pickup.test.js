@@ -113,7 +113,7 @@ describe('the street', () => {
   });
 
   it('the partial-fit rule holds for a chosen count (takeable.js 76-93)', () => {
-    assert.match(fn, /const room = wantClass \? features\.query\('packRoom', wantClass, wantCount, engine\) : null;\s+if \(room === 0\) \{/);
+    assert.match(fn, /const room = wantClass \? features\.query\('packRoom', wantClass, wantCount, engine\) : null;\s+if \(room === 0(?: \|\| \(element && room == null\))?\) \{/);
     assert.match(fn, /room != null && room < wantCount \? room : requested\)/);
     assert.match(fn, /const wantCount = Math\.min\(stackCount, Math\.max\(1, Math\.floor\(Number\(requested\)\) \|\| stackCount\)\);/);
   });
