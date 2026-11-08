@@ -430,12 +430,32 @@ function normalizeStack(row) {
   return classTsid && count > 0 ? { classTsid, count } : null;
 }
 
+/**
+ * G332: a wrapped Gift Box a real visitor left (bag_butler.js:1013) keeps the
+ * one to three stacks inside it until the owner takes it (multiplayer only).
+ */
+export function normalizeParcelBox(raw) {
+  if (!Array.isArray(raw) || raw.length < 1 || raw.length > 3) return null;
+  const out = [];
+  for (const it of raw) {
+    const c = String(it?.c || '');
+    const n = Math.floor(Number(it?.n) || 0);
+    if (!/^[a-z0-9_]{1,64}$/.test(c) || n < 1 || n > 9999 || out.some((x) => x.c === c)) return null;
+    const row = { c, n };
+    const r = Number(it?.r);
+    if (it?.r != null && Number.isInteger(r) && r >= 0 && r <= 1_000_000) row.r = r;
+    out.push(row);
+  }
+  return out;
+}
+
 export function normalizeButlerState(seed = {}) {
   const s = seed && typeof seed === 'object' ? seed : {};
   const packages = (Array.isArray(s.packages) ? s.packages : []).map((p) => {
     const stack = normalizeStack(p);
     if (!stack || !cleanId(p.from)) return null;
-    return { id: cleanId(p.id) || '', from: cleanId(p.from), fromName: cleanLine(p.fromName || p.from, 80), ...stack, time: whole(p.time) };
+    const box = normalizeParcelBox(p.box);
+    return { id: cleanId(p.id) || '', from: cleanId(p.from), fromName: cleanLine(p.fromName || p.from, 80), ...stack, ...(box ? { box } : {}), time: whole(p.time) };
   }).filter(Boolean).slice(0, BUTLER.PACKAGE_LIMIT);
   const messages = (Array.isArray(s.messages) ? s.messages : []).map((m) => {
     const text = cleanLine(m?.text, BUTLER.MESSAGE_MAX);
@@ -784,7 +804,7 @@ export function nextHandover(state, { now = Date.now(), itemName = (cls, n) => `
   } else {
     text += butlerText('packageNoMessage', { param: ago(pkg.time, now) });
   }
-  return { kind: 'package', text, from: pkg.fromName, give: { classTsid: pkg.classTsid, count: pkg.count }, id: pkg.id };
+  return { kind: 'package', text, from: pkg.fromName, give: { classTsid: pkg.classTsid, count: pkg.count, ...(pkg.box ? { box: pkg.box, fromId: pkg.from } : {}) }, id: pkg.id };
 }
 
 /**

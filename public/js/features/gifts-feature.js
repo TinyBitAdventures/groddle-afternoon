@@ -40,8 +40,9 @@ import { unitRankAt } from '../pack-slots.js?v=6cf9f397';
 import { createMinnAccount } from '../minn-account.js?v=8f2741cd';
 import { createItemPicker } from '../ui/item-picker.js?v=b4c84ac6';
 // The same key as features/index.js: one module instance holds the carried notes.
-import { giveCarriedNote, takeCarriedNote, writtenCarriedNotes } from './street-furniture-feature.js?v=b3519a82';
+import { giveCarriedNote, takeCarriedNote, writtenCarriedNotes } from './street-furniture-feature.js?v=8e333bf7';
 import {
+  BOX_KEEP,
   BOX_SLOTS,
   GIFT_BOX,
   GIFT_NOTE,
@@ -889,6 +890,39 @@ export const giftsFeature = {
     if (verbId === 'gift_unwrap') return session.unwrapOne();
     if (verbId === 'gift_recycle') return session.recycle();
     return false;
+  },
+
+  /**
+   * G332, bag_butler.js:1013: leave_package takes a wrapped Gift Box though it
+   * is no_trade. neighbours-mp-feature lists the boxes for a friend's Butler
+   * (giftBoxList), takes one out when the site has it (giftBoxOut), and the
+   * owner's Butler hands one over with what is inside (giftBoxIn).
+   */
+  giftBoxList(engine) {
+    if (!multiplayer || engine?.mode !== 'multiplayer') return null;
+    return slice.boxes.map((b) => ({ id: b.id, items: b.items.map((it) => ({ ...it })), from: b.from ? { ...b.from } : null }));
+  },
+
+  giftBoxOut(ref, items, engine) {
+    if (!multiplayer || engine?.mode !== 'multiplayer') return null;
+    const i = findBox(slice.boxes, ref, items);
+    if (i < 0) return false;
+    slice.boxes.splice(i, 1);
+    if (countItem(engine.inv, GIFT_WRAPPED) > 0) removeItem(engine.inv, GIFT_WRAPPED, 1);
+    engine.refreshPack?.();
+    return true;
+  },
+
+  giftBoxIn(box, engine) {
+    if (!multiplayer || engine?.mode !== 'multiplayer') return null;
+    const clean = normalizeGiftsSlice({ boxes: [box] }).boxes[0];
+    if (!clean || !clean.items.length) return false;
+    ensureGiftItems();
+    slice.boxes.push(clean);
+    if (slice.boxes.length > BOX_KEEP) slice.boxes.splice(0, slice.boxes.length - BOX_KEEP);
+    addItem(engine.inv, GIFT_WRAPPED, 1);
+    engine.refreshPack?.();
+    return true;
   },
 
   /** A wrapped Gift Box keeps its contents with it: give it or unwrap it, never drop it. */

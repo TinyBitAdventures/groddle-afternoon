@@ -29,7 +29,7 @@
 import { PROFILE_PAGE_VERB } from '../profiles.js?v=86423d98';
 import { IM_VERB_ID } from '../player-im.js?v=23463a96';
 import { BUDDY_VERBS } from '../buddies.js?v=df41a3bb';
-import { VISIT_VERB } from '../neighbours-mp.js?v=c79fdf01';
+import { VISIT_VERB } from '../neighbours-mp.js?v=d2a75460';
 import { FOLLOW_STOP_VERB } from '../follow-mp.js?v=53768d0d';
 
 /** The feature that draws other players and owns their targets (features/party-feature.js PARTY_FEATURE_ID). */

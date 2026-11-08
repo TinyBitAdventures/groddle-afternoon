@@ -7,11 +7,11 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { FROM_LIST_VERBS, PLAYER_TARGET_FEATURE, listPlayerTarget, opensPlayerMenu, playerMenuRows } from '../public/js/ui/player-menu.js?v=a403d5b0';
+import { FROM_LIST_VERBS, PLAYER_TARGET_FEATURE, listPlayerTarget, opensPlayerMenu, playerMenuRows } from '../public/js/ui/player-menu.js?v=107fd27a';
 import { PROFILE_PAGE_VERB } from '../public/js/profiles.js?v=86423d98';
 import { IM_VERB_ID } from '../public/js/player-im.js?v=23463a96';
 import { BUDDY_VERBS } from '../public/js/buddies.js?v=df41a3bb';
-import { VISIT_VERB } from '../public/js/neighbours-mp.js?v=c79fdf01';
+import { VISIT_VERB } from '../public/js/neighbours-mp.js?v=d2a75460';
 import { PARTY_FEATURE_ID } from '../public/js/features/party-feature.js?v=4d88a80e';
 
 const game = readFileSync(new URL('../public/game.js', import.meta.url), 'utf8');

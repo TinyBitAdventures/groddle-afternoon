@@ -24,6 +24,7 @@
  */
 
 import { SEED_CATALOG, applyFertilizer } from './garden.js?v=7bf205c7';
+import { normalizeParcelBox } from './butler.js?v=2c95c064';
 
 /** The realtime server's street for a player's home street (homes.go). */
 export const HOME_STREET_PREFIX = 'HOME_';
@@ -318,7 +319,13 @@ export function normalizeParcels(answer) {
     if (!isSiteParcel(id) || !from) continue;
     const c = String(p?.item?.c || '');
     const n = Math.floor(Number(p?.item?.n) || 0);
-    const item = /^[a-z0-9_]{1,64}$/.test(c) && n > 0 ? { c, n: Math.min(9999, n) } : null;
+    let item = /^[a-z0-9_]{1,64}$/.test(c) && n > 0 ? { c, n: Math.min(9999, n) } : null;
+    // G332: a wrapped Gift Box carries what is inside (ButlerParcels::itemOf).
+    if (item && c === 'bag_gift_box_wrapped' && p?.item?.box != null) {
+      const box = normalizeParcelBox(p.item.box);
+      item = box ? { c, n: 1, box } : null;
+      if (!item) continue;
+    }
     const text = String(p?.text || '').slice(0, BUTLER_MESSAGE_MAX);
     if (!item && !text) continue;
     out.push({ id, from: { id: from, name: String(p?.from?.name || 'Someone').slice(0, 40) }, item, text, at: Math.max(0, Math.floor(Number(p?.at) || 0)) });
@@ -339,7 +346,7 @@ export function mergeParcels(state, parcels) {
   for (const p of parcels) {
     if (held.has(p.id) || held.has(`${p.id}:m`)) continue;
     const from = `p${p.from.id}`;
-    if (p.item) state.packages.push({ id: p.id, from, fromName: p.from.name, classTsid: p.item.c, count: p.item.n, time: p.at });
+    if (p.item) state.packages.push({ id: p.id, from, fromName: p.from.name, classTsid: p.item.c, count: p.item.n, ...(p.item.box ? { box: p.item.box } : {}), time: p.at });
     if (p.text) state.messages.push({ id: p.item ? `${p.id}:m` : p.id, from, fromName: p.from.name, text: p.text, time: p.at, withPackage: p.item ? p.id : null });
     added += 1;
   }

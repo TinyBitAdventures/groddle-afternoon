@@ -103,8 +103,8 @@ import { ITEM_CATALOG, addItem, countItem, listPackItemSlots, removeItem } from 
 import { cultivationDef, homeStreetLayout } from '../home-cultivation.js?v=42ae453c';
 import { tickGarden } from '../garden.js?v=7bf205c7';
 import { BUTLER_RIG_SCALE, ButlerPainter, butlerRigNow, loadButlerRig } from '../butler-rig.js?v=e81817d9';
-import { butlerPostRx, normalizeButlerParts } from '../butler.js?v=826eb5f6';
-import { butlerApi } from './butler-feature.js?v=07ec9557';
+import { butlerPostRx, normalizeButlerParts } from '../butler.js?v=2c95c064';
+import { butlerApi } from './butler-feature.js?v=aa110a11';
 import { homesFeature, visitorHomeScene, visitorHomeState } from './homes-feature.js?v=186411c6';
 import {
   BUTLER_MESSAGE_MAX,
@@ -150,7 +150,7 @@ import {
   tendedText,
   TENDED_KEEP,
   visitSceneTsid,
-} from '../neighbours-mp.js?v=c79fdf01';
+} from '../neighbours-mp.js?v=d2a75460';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
 import { elevatorStops, towerLabel } from '../home-tower.js?v=087df38f';
 
@@ -163,6 +163,8 @@ const CLASS_FRONT = 'mp_home_front_door';
 const CLASS_TOWER = 'mp_home_tower';
 const CLASS_LIFT = 'mp_home_tower_elevator';
 const CLASS_TOWER_EXIT = 'mp_home_tower_exit';
+/** gifts-feature's wrapped Gift Box (js/gifts.js GIFT_WRAPPED). */
+const GIFT_WRAPPED_CLASS = 'bag_gift_box_wrapped';
 
 const STYLE = `
 .keys-shade { position: fixed; inset: 0; z-index: var(--z-screen); display: grid; place-items: center; padding: var(--sp-8); background: color-mix(in srgb, var(--c-sage-23) 45%, transparent); }
@@ -718,7 +720,13 @@ function createSession(engine, client) {
       if (!cls || tags.includes('no_trade') || tags.includes('quest-item') || tags.includes('no_drop') || /^(bag_|furniture_|trophy_)/.test(cls)) continue;
       if (!seen.has(cls)) seen.set(cls, countItem(engine.inv, cls));
     }
-    return [...seen].filter(([, n]) => n > 0).map(([c, n]) => ({ c, n }));
+    const out = [...seen].filter(([, n]) => n > 0).map(([c, n]) => ({ c, n }));
+    // G332, bag_butler.js:1013 and 1059: a wrapped Gift Box goes though it is no_trade; each box is its own choice.
+    for (const b of engine.query?.('giftBoxList', engine) || []) {
+      if (countItem(engine.inv, GIFT_WRAPPED_CLASS) < 1) break;
+      out.push({ c: GIFT_WRAPPED_CLASS, n: 1, box: b });
+    }
+    return out;
   }
 
   function leavePackage() {
@@ -732,10 +740,11 @@ function createSession(engine, client) {
       const grid = el('div', { class: 'butler-stacks', 'data-butler-stacks': '' });
       const count = el('input', { type: 'number', min: '1', max: String(pick.n), value: '1', 'data-butler-count': '', 'aria-label': BT.howMany });
       for (const st of stacks) {
-        const b = el('button', { type: 'button', 'data-butler-stack': st.c, 'aria-pressed': String(st === pick), title: itemLabel(st.c, st.n) });
+        const words = st.box ? boxLabel(st.box) : `${itemLabel(st.c, 1)} ×${st.n}`;
+        const b = el('button', { type: 'button', 'data-butler-stack': st.c, ...(st.box ? { 'data-butler-gift-box': st.box.id } : {}), 'aria-pressed': String(st === pick), title: st.box ? words : itemLabel(st.c, st.n) });
         const icon = ITEM_CATALOG[st.c]?.icon;
         if (icon) b.append(el('img', { src: icon, alt: '' }));
-        b.append(document.createTextNode(`${itemLabel(st.c, 1)} ×${st.n}`));
+        b.append(document.createTextNode(words));
         b.addEventListener('click', () => {
           pick = st;
           count.max = String(st.n);
@@ -751,7 +760,7 @@ function createSession(engine, client) {
       ok.addEventListener('click', () => {
         const n = Math.max(1, Math.min(pick.n, Math.floor(Number(count.value) || 1)));
         closeBox(false);
-        confirmPackage(pick.c, n);
+        confirmPackage(pick.c, n, pick.box || null);
       });
       actions.append(label, ok);
       panel.append(grid, actions);
@@ -759,7 +768,12 @@ function createSession(engine, client) {
   }
 
   /** leave_package's conversation (bag_butler.js 1100-1114), then the message (onLeavePackage 3830-3840). */
-  function confirmPackage(c, n) {
+  /** A wrapped box in the pick list: whose it was and what is inside (the owner finds out when it is unwrapped). */
+  function boxLabel(box) {
+    return box.from?.name ? `${itemLabel(GIFT_WRAPPED_CLASS, 1)} from ${box.from.name}` : itemLabel(GIFT_WRAPPED_CLASS, 1);
+  }
+
+  function confirmPackage(c, n, box = null) {
     if (!visit) return;
     vb && (vb.busy = true);
     const words = itemLabel(c, n);
@@ -771,7 +785,8 @@ function createSession(engine, client) {
         return butlerSay(BT.packageNo);
       }
       butlerSay(BT.packageSuccess(visit.name));
-      messageBox(BT.packageSuccess(visit.name), (msg) => send({ item: { c, n }, text: msg }), { optional: true });
+      const item = box ? { c, n: 1, box: box.items, ref: box.id } : { c, n };
+      messageBox(BT.packageSuccess(visit.name), (msg) => send({ item, text: msg }), { optional: true });
     };
     if (!engine.prompt) return go(true);
     engine.prompt({ text, choices: [{ label: BT.yes, value: true }, { label: BT.keep, value: false }], onChoice: (v) => go(v === true) });
@@ -1222,7 +1237,11 @@ function createSession(engine, client) {
     if (item?.c) {
       // Once per parcel (LedgerSpend's way: the trade slice remembers the op).
       const receipt = engine.query?.('ledgerReceipt', String(msg.op || ''), engine);
-      if (receipt !== false && countItem(engine.inv, item.c) > 0) removeItem(engine.inv, item.c, Math.min(item.n, countItem(engine.inv, item.c)));
+      const box = Array.isArray(msg.item.box) ? msg.item.box : null;
+      if (receipt !== false && box) {
+        // G332: the wrapped box leaves with what is inside (the site took the box and the stacks from the ledger).
+        if (engine.query?.('giftBoxOut', String(msg.item.ref || ''), box, engine) !== true && countItem(engine.inv, item.c) > 0) removeItem(engine.inv, item.c, 1);
+      } else if (receipt !== false && countItem(engine.inv, item.c) > 0) removeItem(engine.inv, item.c, Math.min(item.n, countItem(engine.inv, item.c)));
       engine.refreshPack?.();
       // Report 128: each neighbour counts once from when the quest starts.
       const held = giftsCounted();

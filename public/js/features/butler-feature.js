@@ -135,7 +135,7 @@ import {
   takeVisitorDelivery,
   teachButler,
   visitorsReport,
-} from '../butler.js?v=826eb5f6';
+} from '../butler.js?v=2c95c064';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
 import { holdMs } from '../read-time.js?v=60ae7efc';
 import { createItemPicker } from '../ui/item-picker.js?v=b4c84ac6';
@@ -1337,8 +1337,16 @@ function handOver(engine) {
     if (!give) return;
     const g = give;
     give = null;
-    ensureItem(g.classTsid, NEIGHBOUR_ITEMS[g.classTsid] || {});
-    addItem(engine.inv, g.classTsid, g.count);
+    // G332: a wrapped Gift Box a visitor left comes with what is inside (gifts-feature giftBoxIn), its id
+    // the site's credit, as a load that missed it would add it (ButlerParcels::catchUp).
+    const fromId = Number(String(g.fromId || '').replace(/^p/, '')) || 0;
+    const boxed = g.box && parcel
+      ? engine.query?.('giftBoxIn', { id: `${parcel}-in`, items: g.box, at: Date.now(), ...(fromId ? { from: { id: fromId, name: out.from || 'Someone' } } : {}) }, engine) === true
+      : false;
+    if (!boxed) {
+      ensureItem(g.classTsid, NEIGHBOUR_ITEMS[g.classTsid] || {});
+      addItem(engine.inv, g.classTsid, g.count);
+    }
     engine.refreshPack?.();
     if (float) engine.floatText?.(engine.player?.x ?? rt.x, (engine.player?.y ?? engine.groundY) - 90, `+${itemName(g.classTsid, g.count)}`, 0xf2c879);
     engine.save?.();
