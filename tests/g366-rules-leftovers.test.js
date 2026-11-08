@@ -29,7 +29,7 @@ import { createQuestState } from '../public/js/quests.js?v=c8d9d0a4';
 import { acceptOffer, routeQuestEvent } from '../public/js/quest-offers.js?v=e31115ea';
 import { applyBuff, createBuffState } from '../public/js/buffs.js?v=036fee53';
 import { BUFF_ICONS, QUEST_TIMER_BUFFS } from '../public/js/buff-triggers.js?v=a3093922';
-import { EMERGENCY_RETRY_MS } from '../public/js/features/quest-offers-feature.js?v=57dafa96';
+import { EMERGENCY_RETRY_MS } from '../public/js/features/quest-offers-feature.js?v=12efabd5';
 import { QUOIN_CLASSES, quoinClassAmount, quoinRespawnMs } from '../public/js/quoins.js?v=299cc3f4';
 import { COIN_BACK_MS, COIN_CLASS, COIN_TYPE, room as rainbowRoom } from '../public/js/quest-rooms/rainbow-run.js?v=12beb417';
 

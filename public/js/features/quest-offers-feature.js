@@ -321,6 +321,10 @@ function acceptCard(engine, classTsid, def, { gated = false } = {}) {
   if (!result.ok) dropOffer(engine.questState, classTsid);
   if (result.ok) {
     engine.pushActivity(`New quest: ${def.title}`);
+    // #142: the same popup and sound as a quest taken in a conversation (game.js acceptQuestDialogue,
+    // playSfx('alert') = QUEST_ADDED), for the Magic Rock's card and the Offered tab's Try it alike.
+    engine.toast?.(`New quest: ${def.title}`, 3600);
+    engine.playSound?.('QUEST_ADDED', { volume: 0.65 });
     engine.refreshPack();
     // A rebuilt quest room turns its own quest in: a room quest with no
     // requirements (Le Misérable, Gwendolyn's Task) must not complete on accept.

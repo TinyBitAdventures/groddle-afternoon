@@ -551,11 +551,33 @@ function skillName(s, all) {
   return `${s.name}${siblings && ROMAN[s.level] ? ` ${ROMAN[s.level]}` : ''}`;
 }
 
+/**
+ * #143: does taking the quest send you somewhere in this game? build-quests.mjs's `instanced` only says
+ * the quest file names a location (Notice the Unnoticeable names its haunting streets and goes nowhere).
+ * The move comes from onStarted/onAccepted (movesOnStart, movesOnAccept, e639758785), and only where the
+ * remake carries it: a rebuilt room or a quest run by its own module (quest-offers.js questMoveNote).
+ * QUEST_MOVES_HERE holds the remake's own cases, each checked against the code named.
+ */
+export const QUEST_MOVES_HERE = Object.freeze({
+  // Accepting It's Educational opens the Museum of the Rook (game.js startRookMuseum); GSJS moved you
+  // with part two's onAccepted (rook_hall.js 280-285), which here begins inside the museum already.
+  rook_hall_start: true,
+  rook_hall: false,
+  // EZ Cooking's lesson has no street of its own (js/newxp.js SKILLS: street null).
+  ezcooking_1: false,
+});
+
+export function questTakesYouAway(q) {
+  const own = QUEST_MOVES_HERE[q?.classTsid];
+  if (typeof own === 'boolean') return own;
+  return Boolean((q?.movesOnStart || q?.movesOnAccept) && (q?.instanceRoom || q?.custom));
+}
+
 /** Our own grouping for quests: by the skill or system they belong to. */
 function questGroup(id, q) {
   const skill = q.offerTriggers.find((t) => t.type === 'skill')?.skill;
   if (skill) return 'Skill quests';
-  if (q.instanceRoom || q.instanced) return 'Quests with their own place';
+  if (q.instanceRoom || questTakesYouAway(q)) return 'Quests with their own place';
   if (/race|run|climb|dash|hogtied|crown/.test(id) && q.isMultiplayer) return 'Races and games';
   if (q.isMultiplayer) return 'Games with other players';
   return 'Other quests';

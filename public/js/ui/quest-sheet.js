@@ -116,21 +116,27 @@ export function questProgress(requirements = []) {
 }
 
 /**
- * One tab's cards in a sort's order. `rows`: [{ n, title, progress }] in the order game.js drew
- * them (newest first). Ties keep that order.
+ * One tab's cards in a sort's order. `rows`: [{ n, title, progress, pinned? }] in the order game.js
+ * drew them (newest first). Ties keep that order. Pinned quests come first whatever the sort (#142),
+ * each group in the sort's order.
  */
 export function orderQuestCards(rows, sort) {
   const list = [...rows].sort((a, b) => a.n - b.n);
+  let sorted;
   switch (questSortId(sort)) {
     case 'oldest':
-      return list.reverse();
+      sorted = list.reverse();
+      break;
     case 'name':
-      return list.sort((a, b) => String(a.title).localeCompare(String(b.title), 'en', { sensitivity: 'base', numeric: true }) || a.n - b.n);
+      sorted = list.sort((a, b) => String(a.title).localeCompare(String(b.title), 'en', { sensitivity: 'base', numeric: true }) || a.n - b.n);
+      break;
     case 'progress':
-      return list.sort((a, b) => (Number(b.progress) || 0) - (Number(a.progress) || 0) || a.n - b.n);
+      sorted = list.sort((a, b) => (Number(b.progress) || 0) - (Number(a.progress) || 0) || a.n - b.n);
+      break;
     default:
-      return list;
+      sorted = list;
   }
+  return [...sorted.filter((r) => r.pinned), ...sorted.filter((r) => !r.pinned)];
 }
 
 /** A tab's label: "Active 40", or "Active 3 of 40" while a search is on. */
@@ -238,7 +244,7 @@ export function questCardMenuRows(card) {
  *   storage: where the sort choice is kept (default: this device's localStorage, a device preference
  *   like the street map's); onChange: the search or sort changed (draw again).
  */
-export function createQuestSheet({ document: doc = globalThis.document, questInfo = () => null, renderText = (el, s) => { el.textContent = s; }, setData = () => {}, onToggle = () => {}, extraActions = () => [], contextMenu = null, storage = deviceStorage(), onChange = () => {} } = {}) {
+export function createQuestSheet({ document: doc = globalThis.document, questInfo = () => null, renderText = (el, s) => { el.textContent = s; }, setData = () => {}, onToggle = () => {}, extraActions = () => [], isPinned = () => false, contextMenu = null, storage = deviceStorage(), onChange = () => {} } = {}) {
   let tab = 'active';
   /** Ticket 77: the search box's words, the sort in use, and the row that holds them (mountTools). */
   let query = '';
@@ -393,6 +399,7 @@ export function createQuestSheet({ document: doc = globalThis.document, questInf
         title: (n.querySelector(':scope > .q-title')?.textContent || '').replace(/\s*✓$/, ''),
         words: cardWords(n),
         progress: cardProgress(n, which),
+        pinned: Boolean(n.dataset.quest && isPinned(n.dataset.quest)),
       });
     }
     const total = counts.active + counts.offered + counts.done;

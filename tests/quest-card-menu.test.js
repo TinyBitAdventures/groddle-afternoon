@@ -10,7 +10,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { FakeEl, matches } from './social-fake-dom.js';
-import { createQuestSheet, questCardMenuRows } from '../public/js/ui/quest-sheet.js?v=569538d6';
+import { createQuestSheet, questCardMenuRows } from '../public/js/ui/quest-sheet.js?v=1dffc3a6';
 
 class El extends FakeEl {
   get className() { return this.attrs.class || ''; }

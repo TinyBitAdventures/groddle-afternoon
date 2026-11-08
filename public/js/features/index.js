@@ -7,7 +7,7 @@
 import { questFlagsFeature } from './quest-flags-feature.js?v=17c6ef48';
 import { hellFeature } from './hell-feature.js?v=93f1c8dd';
 import { resourceNodesFeature } from './resource-nodes-feature.js?v=faaf2b60';
-import { questOffersFeature } from './quest-offers-feature.js?v=57dafa96';
+import { questOffersFeature } from './quest-offers-feature.js?v=12efabd5';
 import { meditationFeature } from './meditation-feature.js?v=50bf1ac0';
 import { teleportationFeature } from './teleportation-feature.js?v=23270f4f';
 import { racesFeature } from './races-feature.js?v=3297f7bf';

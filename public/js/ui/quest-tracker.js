@@ -15,6 +15,7 @@
  */
 
 import { escapeText } from './verb-menu.js?v=7716e570';
+import { questTextPlain, questTextSegments } from '../quest-text.js?v=7f5d761c';
 import { createQuestPinMenu } from './quest-pin-menu.js?v=361dad0c';
 import { bindContextTrigger, MORE_KEYS_LABEL } from './context-menu.js?v=79326483';
 
@@ -23,6 +24,20 @@ import { bindContextTrigger, MORE_KEYS_LABEL } from './context-menu.js?v=7932648
  *   onUnpin?: (classTsid: string) => void, setData?: (k: string, v: string) => void,
  *   reducedMotion?: () => boolean, now?: () => number }} opts
  */
+/**
+ * A step's quest markup as the row shows it (#147): <b> and <i> as the Quests sheet draws them
+ * (js/quest-text.js renderQuestText), links as their words, a break as a space; everything escaped.
+ */
+export function questStepHtml(raw) {
+  return questTextSegments(raw).map((seg) => {
+    if (seg.br) return ' ';
+    let html = escapeText(seg.text);
+    if (seg.italic) html = `<i>${html}</i>`;
+    if (seg.bold) html = `<b>${html}</b>`;
+    return html;
+  }).join('');
+}
+
 export function createQuestTracker({ el, onOpen = () => {}, onCollapse = () => {}, onUnpin = () => {}, setData = () => {}, reducedMotion = () => false, now = () => Date.now() } = {}) {
   const list = el?.querySelector('[data-pins-list]');
   const title = el?.querySelector('[data-pins-title]');
@@ -98,9 +113,9 @@ export function createQuestTracker({ el, onOpen = () => {}, onCollapse = () => {
       ? `${shown[0].failed ? `${shown[0].title}: ${shown[0].short}` : `${shown[0].title} ${shown[0].count}`}${shown.length > 1 ? ' +1' : ''}`
       : 'Pinned quests';
     if (title && title.textContent !== head) title.textContent = head;
-    const markup = shown.map((r) => `<button type="button" class="tq${r.failed ? ' is-failed' : ''}" aria-haspopup="menu" data-pin="${escapeText(r.classTsid)}" aria-keyshortcuts="Shift+F10" aria-label="${escapeText(`${r.title}, ${r.step} ${r.count}. Open in Quests. ${MORE_KEYS_LABEL}`)}">`
+    const markup = shown.map((r) => `<button type="button" class="tq${r.failed ? ' is-failed' : ''}" aria-haspopup="menu" data-pin="${escapeText(r.classTsid)}" aria-keyshortcuts="Shift+F10" aria-label="${escapeText(`${r.title}, ${questTextPlain(r.step)} ${r.count}. Open in Quests. ${MORE_KEYS_LABEL}`)}">`
       + `<span class="tq-row"><span class="tq-title">${escapeText(r.title)}</span><span class="tq-n">${escapeText(r.count)}</span></span>`
-      + `<span class="tq-step">${escapeText(r.step)}</span>`
+      + `<span class="tq-step">${questStepHtml(r.step)}</span>`
       + (r.failed ? '' : `<span class="tq-bar" aria-hidden="true"><i style="width:${Math.max(0, Math.min(100, Math.round(r.percent)))}%"></i></span>`)
       + '</button>').join('');
     if (markup !== drawn && list) {

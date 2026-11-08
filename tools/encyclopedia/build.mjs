@@ -24,7 +24,7 @@ import { siteNav } from '../changelog/build.mjs';
 import { committedMap, keyAssetUrls, mapTags } from '../data-versions/build.mjs';
 import { keyOf as moduleKeyOf, sharedLink } from '../module-keys/build.mjs';
 import { EMAIL } from '../contribute/to-minn.mjs';
-import { GIANTS, PUB, SECTIONS, giantIcon, loadEncyclopedia, picture } from './data.mjs';
+import { GIANTS, PUB, SECTIONS, giantIcon, loadEncyclopedia, picture, questTakesYouAway } from './data.mjs';
 import { SOUND_GROUPS } from './sounds.mjs';
 import { MORE_PAGES } from './sections.mjs';
 import { neverReleased, neverReleasedNote, neverReleasedTag } from './never-released.mjs';
@@ -316,7 +316,10 @@ function questPage(e, P, { linkFor, backOf, uniqBy, info, d }) {
   // Where to go.
   const where = [];
   const whereTiles = [];
-  if (q.instanceRoom || q.instanced) where.push('This quest takes you to a place of its own: take it, and the game sends you there.');
+  // #143: only a quest that really moves you says so (data.mjs questTakesYouAway); a later part played
+  // in the room an earlier part opened (Le Miserable, Smuggle the Smuggler) says where it goes on.
+  if (questTakesYouAway(q)) where.push('This quest takes you to a place of its own: take it, and the game sends you there.');
+  else if (q.instanceRoom) where.push('This quest goes on in the place the quest before it took you to.');
   const back2 = uniqBy(q.endNpcs.map(keyOrStub).filter(Boolean), (x) => x);
   if (back2.length) { where.push(`Hand it in to ${andList(back2.map(name))}.`); back2.forEach((k) => whereTiles.push(P.tile(k, { sub: 'hand it in' }))); }
   // familiar_turnin (inc_quests.js quests_familiar_turnin): the Magic Rock takes what the steps hand in;

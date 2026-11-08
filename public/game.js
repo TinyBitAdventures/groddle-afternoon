@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=b87f037d';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=127e0a3c';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=fce015bd';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=73e60865';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -971,8 +971,8 @@ import { mountSocialDrawer } from './js/ui/social-drawer.js?v=2bb4e831';
 import { bindChatLinks } from './js/chat-links.js?v=b717fac7';
 import { bindDragScroll } from './js/ui/drag-scroll.js?v=9a527ac8';
 import { SIDE_SHEET_IDS, bindTabs, inSideSheet, mountPanelShell, sheetKeyToWorld } from './js/ui/panel-shell.js?v=e2abdf9e';
-import { createQuestSheet, failedQuestPin, questStep } from './js/ui/quest-sheet.js?v=569538d6';
-import { createQuestTracker } from './js/ui/quest-tracker.js?v=db39f8a6';
+import { createQuestSheet, failedQuestPin, questStep } from './js/ui/quest-sheet.js?v=1dffc3a6';
+import { createQuestTracker } from './js/ui/quest-tracker.js?v=445303df';
 import { bindContextTrigger, createContextMenu, isContextMenuKey as isMenuKey, MORE_KEYS_LABEL } from './js/ui/context-menu.js?v=79326483';
 import { bindCountField, countKeyValue, countStepMarkup, createCountChooser, typedCount } from './js/ui/count-chooser.js?v=5bc894c8';
 import { bindVerbMenu, centerVerbMenu, fitVerbMenuRows, focusVerbRow, lockVerbMenuSize, makePickTile, makeVerbRow, pickGridCols, placeVerbMenu, plainWords, refuseVerbRow, syncVerbDetail, verbMenuKey, verbRowAttrs, verbRowInner, verbRowKeys } from './js/ui/verb-menu.js?v=7716e570';
@@ -5625,6 +5625,8 @@ const questSheet = createQuestSheet({
   onToggle: () => { questLogDrawn = document.getElementById('quest')?.innerHTML ?? questLogDrawn; },
   // VERBS: an active quest's card pins it to the tracker (two at most).
   extraActions: (classTsid) => (classTsid ? [questPinButton(classTsid)] : []),
+  // #142: pinned quests head the list whatever the sort (js/ui/quest-sheet.js orderQuestCards).
+  isPinned: (classTsid) => Boolean(questPins()?.isPinned(classTsid)),
   // RIGHTCLICK (audit item 7): a card's menu (Pin or Unpin, Open, its buttons), as the tracker's rows have.
   contextMenu: createContextMenu({ doc: document, host: document.getElementById('game-root'), id: 'quest-card-menu', className: 'quest-card-menu', setData: (key, value) => { if (app?.canvas) app.canvas.dataset[key] = value; } }),
   // Ticket 77: the search box and the sort picker (the sort a device preference, kept by the sheet) draw it again.
