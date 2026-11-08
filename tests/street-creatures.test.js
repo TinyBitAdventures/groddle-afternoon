@@ -38,7 +38,7 @@ import {
 } from '../public/js/street-creatures.js?v=3c07d608';
 import { createStreetCopy, idKind, reconcile, takeObjs } from '../public/js/street-objects.js?v=c72e3d5c';
 import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=c86d6b40';
-import { FEATURES } from '../public/js/features/index.js?v=083e26a8';
+import { FEATURES } from '../public/js/features/index.js?v=710b051c';
 import { GAME_EPOCH_MS } from '../public/js/game-day.js?v=edb00566';
 import { creatureRequests, setCreatureEcology, streetObjectLayout } from '../tools/build-realtime-objects.mjs';
 import { STREET_INDEX, applyStreetIndex, loadStreetDataFromFs } from '../public/js/street-loader.js?v=18b181ad';

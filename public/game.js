@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=b87f037d';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=127e0a3c';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=083e26a8';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=710b051c';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -7745,9 +7745,9 @@ function recentFloatText(text, ms) {
  * avatar already floated for the same amount gives way to the caller's own float. With
  * prefers-reduced-motion it fades where it is. `opts.life` (frames) keeps longer words up.
  */
-/** A floated gain's icon: pack icons are about 40 px, drawn at half beside 15 px words. */
-const FLOAT_ICON_SCALE = 0.5;
-const FLOAT_ICON_W = 22;
+/** A floated gain's icon: pack icons are about 40 px, drawn at 0.7 (about 28 px) beside 15 px words. */
+const FLOAT_ICON_SCALE = 0.7;
+const FLOAT_ICON_W = 30;
 
 function floatText(x, y, text, color = 0xfff4d6, opts = {}) {
   const words = wholeStatAmounts(text);

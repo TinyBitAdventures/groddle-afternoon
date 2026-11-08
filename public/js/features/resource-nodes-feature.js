@@ -1264,15 +1264,18 @@ function applyResult(engine, entity, result) {
     publish(engine);
     return;
   }
-  const anchorX = entity.view?.sprite?.x ?? entity.x;
-  const anchorY = (entity.view?.sprite?.y ?? entity.y) - 60;
+  // Gains float over the player, as a Dust Trap's finds do (drops-feature payDrop): over the node
+  // they sat under its talkback bubble. The node itself is the fallback when there is no player.
+  const p = engine.player;
+  const anchorX = p ? p.x : entity.view?.sprite?.x ?? entity.x;
+  const anchorY = p ? (p.y || 0) - 130 : (entity.view?.sprite?.y ?? entity.y) - 60;
   for (const line of result.msgs || []) engine.pushActivity(line);
   let lift = 0;
   const merged = new Map();
   for (const out of result.outputs || []) merged.set(out.classTsid, (merged.get(out.classTsid) || 0) + out.qty);
   for (const [classTsid, qty] of merged) {
     floatGain(engine, anchorX, anchorY - lift, classTsid, qty);
-    lift += 22;
+    lift += 28;
   }
   for (const counter of result.achievementCounters || []) engine.achievement(counter.counter, counter.amount);
   // Skill-package rare drops (scraping, jellisac, peat, paper tree): features/drops-feature.js.
