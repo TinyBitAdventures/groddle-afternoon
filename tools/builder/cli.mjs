@@ -30,8 +30,8 @@ import { builderGuide } from './guide.mjs';
 import { applyOps, applyOp, nextDecoId, nextGeometryId, findGeometry, findDeco, GEOMETRY, OpError, OP_NAMES } from '../../public/js/builder/ops.js?v=27c7796f';
 import { forkStreet, forkOps, newTsid, libraryAsset, linkEdit, editsOn } from '../../public/js/builder/zone.js?v=332c559e';
 import { newStreet, newStreetOps, newHub, nextHubId, mapWithStreet, mapWithoutStreet, TEMPLATES, DEFAULT_MAP_COLOURS } from '../../public/js/builder/templates.js?v=f5eaea9c';
-import { arriveFor, newConnect, POST_W, POST_H, LADDER_W } from '../../public/js/builder/geometry-handles.js?v=394f083e';
-import { arrivalOps, settlePostOps, followPostOps } from '../../public/js/builder/posts.js?v=7725af4f';
+import { arriveFor, newConnect, POST_W, POST_H, LADDER_W } from '../../public/js/builder/geometry-handles.js?v=051128f3';
+import { arrivalOps, settlePostOps, followPostOps } from '../../public/js/builder/posts.js?v=719921fa';
 import { platformsScreen, isStandable } from '../../public/js/street-model.js?v=b6cb6a4e';
 import { DECO_TWINS } from '../../public/js/street-render.js?v=a46dcea6';
 import { groundOps, floatingLines, FLOAT_REACH } from '../../public/js/builder/ground.js?v=9218684b';
@@ -1165,7 +1165,7 @@ export async function run(argv, { env = process.env, fetchImpl = globalThis.fetc
       let report;
       let rev;
       if (local()) {
-        const { validateZone } = await import('../../public/js/builder/validate.js?v=4358f5a7');
+        const { validateZone } = await import('../../public/js/builder/validate.js?v=a8c69996');
         const { loadValidatorContext } = await import('./validator-context.mjs');
         const zone = readJson(resolve(flags.file));
         rev = zone.rev;

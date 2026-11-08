@@ -16,7 +16,7 @@
  */
 import { isStandable, platformsScreen, isBuriedSignpost } from '../street-model.js?v=b6cb6a4e';
 import { applyOps } from './ops.js?v=27c7796f';
-import { arriveFor } from './geometry-handles.js?v=394f083e';
+import { arriveFor } from './geometry-handles.js?v=051128f3';
 
 /** How far (px) a post's foot may be from its floor before it is off it: over it, and sunk into it. */
 export const POST_FLOOR = Object.freeze({ reach: 80, built: Object.freeze({ over: 4, under: 4 }), forked: Object.freeze({ over: 48, under: 8 }) });

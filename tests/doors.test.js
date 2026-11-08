@@ -13,7 +13,8 @@ import {
   extractLocationNavigation,
   buildStreetNavigation,
   arrivalInTarget,
-} from '../public/js/location-navigation.js?v=4be109b9';
+  EDGE_SLACK,
+} from '../public/js/location-navigation.js?v=90fca5cc';
 import {
   DOOR_KEYS,
   DOOR_TEXT,
@@ -207,6 +208,25 @@ describe('location navigation extraction', () => {
   it('keeps a raw arrival when no platform is near and rejects points off the street', () => {
     assert.deepEqual(arrivalInTarget(OTHER, 0, -400), { x: 500, y: 200, snapped: false });
     assert.equal(arrivalInTarget(OTHER, 4000, -100), null);
+  });
+
+  it('#150: a source arrival above the top lands on the first floor under it', () => {
+    const drop = street('GHH12E1QP611OPA');
+    // Level 3 West's connect says x -200, y -2053; The Drop's top is -2000 and its top ledge under -200 is about -1435.
+    const at = arrivalInTarget(drop, -200, -2053);
+    assert.equal(at.x, 800);
+    assert.ok(at.y > 500 && at.y < 620, `near the top ledge, got ${at.y}`);
+    assert.equal(at.snapped, true);
+    assert.equal(arrivalInTarget({ bounds: { l: 0, r: 100, t: 0, b: 100 }, platforms: [] }, 50, -100), null, 'no floor under it: still off the street');
+  });
+
+  it('#150: a source arrival a few px past a side edge lands at that edge', () => {
+    const harrisa = street('GA957DNLVGN2F0S');
+    const dasha = street('GA9EJ02SANM2BT7');
+    const conn = harrisa.signposts.flatMap((sp) => sp.connects).find((c) => c.label === 'Dasha Mula');
+    assert.ok(conn.arrive, 'Harrisa Hara to Dasha Mula has an arrival now (source x 3010 on a 3000 edge)');
+    assert.equal(conn.arrive.x, dasha.bounds.r - dasha.bounds.l);
+    assert.equal(arrivalInTarget(dasha, dasha.bounds.r + EDGE_SLACK + 1, -100), null, 'farther off is still off the street');
   });
 });
 

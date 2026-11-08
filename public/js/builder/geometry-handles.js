@@ -19,7 +19,7 @@
 import { isStandable, platformsScreen } from '../street-model.js?v=b6cb6a4e';
 import { decoBox, handlePoints, resizeBy } from './handles.js?v=243c4a14';
 import { floorUnder } from './zone.js?v=332c559e';
-import { arrivalInTarget, streetAliases } from '../location-navigation.js?v=4be109b9';
+import { arrivalInTarget, streetAliases } from '../location-navigation.js?v=90fca5cc';
 import { EFFECT_DEFAULTS } from '../street-effects.js?v=f35d7e32';
 
 export const GEO_KINDS = Object.freeze(['platform', 'barrier', 'ladder', 'signpost', 'emitter']);

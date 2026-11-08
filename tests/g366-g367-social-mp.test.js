@@ -15,7 +15,7 @@ import { TYPING_EVERY_MS, TYPING_MS, typingCounts, typingDotAlpha } from '../pub
 import { BUTLER_IM_TEXT, BUTLER_IM_VERBS, HELP_AGAIN_MS, commandHelp, imDelayMs, imLine, imText, normalizeImPrefs, parseButlerIm } from '../public/js/butler-im.js?v=44783638';
 import { butlerImFeature, BUTLER_TAB } from '../public/js/features/butler-im-feature.js?v=e7974835';
 import { slashCommandsFeature } from '../public/js/features/slash-commands-feature.js?v=2a8c9f5b';
-import { FEATURES } from '../public/js/features/index.js?v=1e971a5c';
+import { FEATURES } from '../public/js/features/index.js?v=59a49568';
 
 const root = join(import.meta.dirname, '..');
 const read = (rel) => readFileSync(join(root, rel), 'utf8');

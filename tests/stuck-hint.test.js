@@ -16,7 +16,7 @@ import { STUCK_HINT_DWELL_MS, onTrapFloor, slashCommandsFeature, trapLinesOn } f
 import { STREET_TRAPS } from '../public/js/street-traps-data.js?v=b2911c49';
 import { TRAP_JUMPS, renderTraps, trapLinesOf } from '../tools/ecology/build-street-traps.mjs';
 import { reachStreet, streetBuff } from '../public/js/builder/reach-graph.js?v=f1b86aeb';
-import { validateShippedStreet } from '../public/js/builder/validate.js?v=4358f5a7';
+import { validateShippedStreet } from '../public/js/builder/validate.js?v=a8c69996';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const LEVEL_3_WEST = 'GLI107JLRU11EM2';

@@ -44,7 +44,7 @@ import {
   normalizeMayhemRoom,
   normalizeMayhemState,
 } from '../math-mayhem.js?v=7fe952aa';
-import { platformYNear } from '../location-navigation.js?v=4be109b9';
+import { platformYNear } from '../location-navigation.js?v=90fca5cc';
 import { hasRaceDispenser } from '../races.js?v=ab22a079';
 import { OVERLAY_USES, locationRect, playCountdownArt, playWindowOverlay } from '../overlays.js?v=ed371926';
 import { textureFromUrl } from '../textures.js?v=3149d699';

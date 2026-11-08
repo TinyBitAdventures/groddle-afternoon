@@ -2733,9 +2733,14 @@
   "deployed": "2026-11-08"
  },
  "git": {
-  "commits": 1496,
+  "commits": 1497,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-08",
+    "kind": "new",
+    "text": "Bewitched Backwoods draws its own misty yard, and Night Lights, Easy Ash and Perfus Preference match their streets"
+   },
    {
     "date": "2026-11-08",
     "kind": "improve",
@@ -2850,11 +2855,6 @@
     "date": "2026-11-08",
     "kind": "improve",
     "text": "Items from Dust Traps and other resource nodes float up with their icon"
-   },
-   {
-    "date": "2026-11-08",
-    "kind": "fix",
-    "text": "Pinned quests show bold words, the encyclopedia only says a quest moves you when it does, and quests from the Offered tab pop up"
    }
   ]
  },

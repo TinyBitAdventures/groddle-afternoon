@@ -198,6 +198,22 @@ export function platformYNear(platforms, x, y, reach = 80) {
   return best ? best.y : null;
 }
 
+/** How far past a side edge a source arrival may sit and still land at that edge (px). */
+export const EDGE_SLACK = 40;
+
+/** The highest floor at x at or below y (the first one a falling avatar lands on), or null. */
+export function platformYBelow(platforms, x, y) {
+  let best = null;
+  for (const p of platforms || []) {
+    const minX = Math.min(p.x1, p.x2);
+    const maxX = Math.max(p.x1, p.x2);
+    if (x < minX - 2 || x > maxX + 2) continue;
+    const py = maxX === minX ? (p.y1 + p.y2) / 2 : p.y1 + ((x - p.x1) / (p.x2 - p.x1)) * (p.y2 - p.y1);
+    if (py >= y && (best == null || py < best)) best = py;
+  }
+  return best;
+}
+
 /**
  * Arrival point in the target street's screen space, set on its nearest
  * platform when one is within reach (the source x/y is a feet position).
@@ -208,7 +224,17 @@ export function platformYNear(platforms, x, y, reach = 80) {
 export function arrivalInTarget(target, wx, wy) {
   if (!target?.bounds) return null;
   const { l, r, t, b } = target.bounds;
-  if (wx < l || wx > r || wy < t - 40 || wy > b + 200) return null;
+  // #150 (2026-11-08): five source connects arrive 6-10 px past a street's side edge (Harrisa Hara to
+  // Dasha Mula: x 3010 on a 3000 edge); they land at that edge. Farther off is still off the street.
+  if (wx < l - EDGE_SLACK || wx > r + EDGE_SLACK || wy > b + 200) return null;
+  wx = Math.min(r, Math.max(l, wx));
+  if (wy < t - 40) {
+    // #149/#150 (2026-11-08): a few source connects arrive above the street's top (Level 3 West to The
+    // Drop: y -2053 over a -2000 top). The avatar falls onto the first floor under that x, as it would
+    // in the client; without a floor there the point is still off the street.
+    const floor = platformYBelow(target.platforms, wx, t);
+    return floor == null ? null : { x: Math.round(wx - l), y: Math.round(floor - t), snapped: true };
+  }
   const ground = platformYNear(target.platforms, wx, wy);
   return {
     x: Math.round(wx - l),

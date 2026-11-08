@@ -10,7 +10,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { assertStreetGeometry, platformYAt } from '../public/js/street-model.js?v=b6cb6a4e';
-import { arrivalInTarget } from '../public/js/location-navigation.js?v=4be109b9';
+import { arrivalInTarget } from '../public/js/location-navigation.js?v=90fca5cc';
 import { populationForStreet } from '../public/js/street-ecology.js?v=78a1d522';
 import { checkDoorEntry, doorAt, doorDestination } from '../public/js/doors.js?v=c5083537';
 import { eventCounters, SEAM_STREETS } from '../public/js/quest-offers.js?v=a304c912';
@@ -53,7 +53,7 @@ import {
   rebuiltRoomEcology,
 } from '../public/js/rebuilt-rooms.js?v=8c2eaf24';
 import { rebuiltRoomsFeature } from '../public/js/features/rebuilt-rooms-feature.js?v=8baf41e0';
-import { FEATURES } from '../public/js/features/index.js?v=1e971a5c';
+import { FEATURES } from '../public/js/features/index.js?v=59a49568';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const pub = join(spike, 'public');

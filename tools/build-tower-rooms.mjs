@@ -15,7 +15,7 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { arrivalInTarget, streetAliases } from '../public/js/location-navigation.js?v=4be109b9';
+import { arrivalInTarget, streetAliases } from '../public/js/location-navigation.js?v=90fca5cc';
 import { TOWER_ROOM_DOOR_LINKS } from '../public/js/tower-rooms.js?v=f238eaa9';
 import { ALL_TOWER_ROOMS, CHALLENGE_ROOM_DOOR_LINKS, anyTowerRoomIndexEntry, anyTowerRoomStreet } from '../public/js/tower-challenge-rooms.js?v=7502a893';
 import { MID_TOWER_DOOR_LINKS, MID_TOWER_ROOMS, midTowerIndexEntry, midTowerRoomStreet } from '../public/js/tower-mid-rooms.js?v=678fdc50';

@@ -10,7 +10,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { assertStreetGeometry } from '../public/js/street-model.js?v=b6cb6a4e';
-import { arrivalInTarget } from '../public/js/location-navigation.js?v=4be109b9';
+import { arrivalInTarget } from '../public/js/location-navigation.js?v=90fca5cc';
 import { inEventBox, runLocationEvent, createEventRuntime } from '../public/js/location-events.js?v=05663361';
 import {
   CEBARKUL_DOOR,
@@ -36,7 +36,7 @@ import {
   touchesStar,
 } from '../public/js/symphonious-maximus.js?v=345ad437';
 import { symphoniousMaximusFeature, isSymphonious } from '../public/js/features/symphonious-maximus-feature.js?v=59145efa';
-import { FEATURES } from '../public/js/features/index.js?v=1e971a5c';
+import { FEATURES } from '../public/js/features/index.js?v=59a49568';
 import { parallaxLayerOffset } from '../public/js/street-render.js?v=a46dcea6';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');

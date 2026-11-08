@@ -35,7 +35,7 @@ import { jumpApex } from '../avatar-step.js?v=e8e9581f';
 import { STY_RULES, styleFindings } from './style-rules.js?v=abf9bfae';
 import { EFFECT_LIMITS, effectsCost, normaliseEmitter, rumbleShare, emitterAnchor } from '../street-effects.js?v=f35d7e32';
 import { LICENCE_POLICY, provenanceProblems } from './new-art.js?v=29f0b13e';
-import { postOffFloor, offFloorWords } from './posts.js?v=7725af4f';
+import { postOffFloor, offFloorWords } from './posts.js?v=719921fa';
 import { floatingLines, FLOAT_REACH, FLOAT_OPEN } from './ground.js?v=9218684b';
 
 export const RULES = Object.freeze({

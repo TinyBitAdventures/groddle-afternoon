@@ -12,7 +12,7 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { arrivalInTarget } from '../public/js/location-navigation.js?v=4be109b9';
+import { arrivalInTarget } from '../public/js/location-navigation.js?v=90fca5cc';
 import {
   MOSSYSTEP_ARRIVE,
   MOSSYSTEP_TSID,
