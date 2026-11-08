@@ -13337,6 +13337,15 @@
       "decos": 107,
       "reconstructed": true,
       "internalLabel": "Abandoned Gregarious Towers, floor 3"
+    },
+    "GCRDGMREPJ02ORK": {
+      "label": "Louise Pasture Villa",
+      "file": "assets/streets/GCRDGMREPJ02ORK.json",
+      "hubId": "58",
+      "hubName": "Groddle Meadow",
+      "platforms": 12,
+      "decos": 6,
+      "reconstructed": true
     }
   }
 }

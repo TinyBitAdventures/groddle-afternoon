@@ -1896,7 +1896,7 @@
  },
  "location:LIFLFPPBUUT11SP": {
   "status": "lost",
-  "reason": "no geometry survives anywhere: Interrogation (category instance-template-no-geometry: quest/instance room with no geometry anywhere); listed in the round 2 hunt brief (research/coverage/hunt-outline-2026-10-27-round2.md) and comes back if a source turns up",
+  "reason": "no geometry survives anywhere: Interrogation (category instance-template-no-geometry: quest/instance room with no geometry anywhere); listed in the round 2 hunt brief (research/coverage/hunt-outline-2026-10-27-round2.md) and comes back if a source turns up. G352 (2026-11-08): a staff room in hub 67 (the dev and template hub, inc_data_maps_prod.js:17992) that no door, signpost, quest or item leads into; its empty-street render (720 x 864) shows one hanging bulb (hanging_lightbulb), the seated-figure-and-clock sign (bureaucratic_hall_waitingroom_1) and a red theatre chair (glitch-items furniture_bench_theater_chair_red.swf, CC0, not rendered yet) between dark speckled panels (no CC0 piece found); not built while players have no way in",
   "register": "G351",
   "lost": "nosource"
  },
@@ -1925,10 +1925,9 @@
   "lost": "nosource"
  },
  "location:LCRDGMREPJ02ORK": {
-  "status": "lost",
-  "reason": "no geometry survives anywhere: Louise Pasture Villa (category live-region-other: other name in a live region: needs a judgement); listed in the round 2 hunt brief (research/coverage/hunt-outline-2026-10-27-round2.md) and comes back if a source turns up",
-  "register": "G351",
-  "lost": "nosource"
+  "status": "reimagined",
+  "reason": "Louise Pasture Villa: rebuilt from its render (G371). No location XML (inc_data_maps_prod.js:16263 only); its 2011-04-29 render (Wayback street image, 720 x 308, reference only) is the apartment lobby template's hall, so the street is Gregarious Towers' geometry dressed as the render shows it with CC0 bldg_int_apt decos (apartment_lobby, the Discover iX poster, lift doors, the EXIT door; public/js/louise-pasture-villa.js, tools/build-rebuilt-rooms.mjs). Out by the EXIT door to Louise Pasture (Louise Pasture's sources list it); in by a door and apartment sign added on Louise Pasture (remake choice, as the tower streets enter their lobby)",
+  "register": "G371"
  },
  "location:LHV13KC42L82G08": {
   "status": "lost",

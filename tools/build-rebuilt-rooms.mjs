@@ -7,6 +7,9 @@
  * door_1343415170600 (Door Key 1) and Rookthills Lay's locked door_1 (Door Key 2).
  * Also Winter Walk and Winter Haven (public/js/winter-walk-streets.js), the
  * two streets the timed Winter Walk route runs on (no doors lead in).
+ * Also Louise Pasture Villa (public/js/louise-pasture-villa.js, G371): its
+ * EXIT door out to Louise Pasture, and the door and apartment sign that lead
+ * in, added to Louise Pasture.
  * Each door's own connect x/y is kept and snapped to the rebuilt floor. Safe to
  * re-run; run it again after a street re-import or a build-street-navigation.mjs
  * pass.
@@ -56,6 +59,19 @@ import {
   winterWalkIndexEntry,
   winterWalkStreet,
 } from '../public/js/winter-walk-streets.js?v=8607edd3';
+import {
+  LOUISE_PASTURE_DOOR,
+  LOUISE_PASTURE_ENTRY,
+  LOUISE_PASTURE_SIGN_ID,
+  LOUISE_PASTURE_TSID,
+  LOUISE_VILLA_ARRIVE,
+  LOUISE_VILLA_EXIT_DOOR,
+  LOUISE_VILLA_TEMPLATE_TSID,
+  LOUISE_VILLA_TSID,
+  louisePastureEntry,
+  louiseVillaIndexEntry,
+  louiseVillaStreet,
+} from '../public/js/louise-pasture-villa.js?v=9d267f7e';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const streetsDir = join(root, 'public/assets/streets');
@@ -164,6 +180,32 @@ function indexRow(tsid, row) {
   const haven = winterHavenStreet();
   put(`${WINTER_HAVEN_TSID}.json`, `${JSON.stringify(haven)}\n`);
   indexRow(WINTER_HAVEN_TSID, winterHavenIndexEntry(haven));
+}
+
+// Louise Pasture Villa: out by its EXIT door to Louise Pasture, in by the door and sign added there.
+{
+  const pasture = read(`${LOUISE_PASTURE_TSID}.json`);
+  const E = LOUISE_PASTURE_ENTRY;
+  const foot = arrivalInTarget(pasture, E.x, -130);
+  if (!foot?.snapped) throw new Error("no floor on Louise Pasture's flat stretch");
+  const ground = foot.y + pasture.bounds.t;
+  const template = read(`${LOUISE_VILLA_TEMPLATE_TSID}.json`);
+  const draft = louiseVillaStreet(template);
+  const villaArrive = arrivalInTarget(draft, LOUISE_VILLA_ARRIVE.x, LOUISE_VILLA_ARRIVE.y);
+  if (!villaArrive?.snapped) throw new Error('no floor at the villa arrival');
+  const mg = pasture.layers.find((l) => l.name === 'middleground');
+  const z = 1 + Math.max(...mg.decos.filter((d) => d.id !== LOUISE_PASTURE_SIGN_ID).map((d) => d.z));
+  const { door, sign } = louisePastureEntry(pasture, ground, { villaArrive: { x: villaArrive.x, y: villaArrive.y }, z });
+  pasture.doors = [...(pasture.doors || []).filter((d) => d.id !== LOUISE_PASTURE_DOOR), door];
+  mg.decos = [...mg.decos.filter((d) => d.id !== LOUISE_PASTURE_SIGN_ID), sign];
+  pasture.stats.doorCount = pasture.doors.length;
+  pasture.stats.decoCount = pasture.layers.reduce((n, l) => n + l.decos.length, 0);
+  const room = louiseVillaStreet(template, { pastureXY: { x: E.x, y: ground }, pastureArrive: { x: foot.x, y: foot.y } });
+  if (!room.doors.some((d) => d.id === LOUISE_VILLA_EXIT_DOOR)) throw new Error('the villa lost its EXIT door');
+  if (room.tsid !== LOUISE_VILLA_TSID) throw new Error('villa tsid');
+  put(`${LOUISE_VILLA_TSID}.json`, `${JSON.stringify(room)}\n`);
+  put(`${LOUISE_PASTURE_TSID}.json`, `${JSON.stringify(pasture)}\n`);
+  indexRow(LOUISE_VILLA_TSID, louiseVillaIndexEntry(room));
 }
 
 if (indexChanged) put('index.json', `${JSON.stringify(index, null, 2)}\n`);

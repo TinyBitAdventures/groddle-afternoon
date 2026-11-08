@@ -27,7 +27,7 @@ import { routeGraph } from '../public/js/map-routes.js?v=c7e7dc80';
 import { TELEPORTERS } from '../public/js/hidden-floors.js?v=eb220641';
 import { WINTRY_PORTAL_TELEPORTERS } from '../public/js/wintry-portal.js?v=1437deda';
 import { closuresInTheWay, holdNote, placeIndex, questHold, questPlaceNeeds, reachableStreets } from '../public/js/quest-reach.js?v=4509d009';
-import { streetJobsFeature } from '../public/js/features/street-jobs-feature.js?v=91ac6d02';
+import { streetJobsFeature } from '../public/js/features/street-jobs-feature.js?v=60bb777f';
 
 const root = join(import.meta.dirname, '..');
 const PUB = join(root, 'public');
@@ -75,9 +75,10 @@ before(async () => {
 });
 
 describe('which quests wait for a road on a fresh world', () => {
-  it('a fresh world reaches 241 streets: every door counts now that Dust Traps give every key (Level 2 West into Oppidan Avenue)', () => {
+  it('a fresh world reaches 242 streets: every door counts now that Dust Traps give every key (Level 2 West into Oppidan Avenue), and Louise Pasture\'s door to its villa (G371)', () => {
     const w = world(freshJobs());
-    assert.equal(w.reach.size, 241);
+    assert.equal(w.reach.size, 242);
+    assert.equal(w.reach.has('GCRDGMREPJ02ORK'), true, 'Louise Pasture Villa, by its door on Louise Pasture');
     const level2 = 'GHH1011JSO11ORS';
     const oppidan = 'GDOHDJ84BST2UI2';
     assert.deepEqual(json('assets/content/signpost-graph.json').sealed, {});

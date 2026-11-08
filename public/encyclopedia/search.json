@@ -4745,6 +4745,7 @@
 {"s":"streets","id":"gregarious-towers-floor-1","n":"Gregarious Towers, floor 1","g":"Groddle Meadow","st":"rebuilt","ic":"assets/maps/art/thumbs/sm_groddlemeadow.jpg","h":"encyclopedia/streets/gregarious-towers-floor-1/"},
 {"s":"streets","id":"gregarious-towers-floor-2","n":"Gregarious Towers, floor 2","g":"Groddle Meadow","st":"rebuilt","ic":"assets/maps/art/thumbs/sm_groddlemeadow.jpg","h":"encyclopedia/streets/gregarious-towers-floor-2/"},
 {"s":"streets","id":"gregarious-towers-floor-3","n":"Gregarious Towers, floor 3","g":"Groddle Meadow","st":"rebuilt","ic":"assets/maps/art/thumbs/sm_groddlemeadow.jpg","h":"encyclopedia/streets/gregarious-towers-floor-3/"},
+{"s":"streets","id":"louise-pasture-villa","n":"Louise Pasture Villa","g":"Groddle Meadow","st":"lost","ic":"assets/maps/art/thumbs/sm_groddlemeadow.jpg","h":"encyclopedia/streets/louise-pasture-villa/"},
 {"s":"stores","id":"produce","n":"Produce Vendor","g":"Kept by Street Spirits","st":"source","ic":"assets/sprites/icons/street_spirit.webp","h":"encyclopedia/stores/produce/"},
 {"s":"stores","id":"hardware","n":"Hardware Vendor","g":"Kept by Street Spirits","st":"source","ic":"assets/sprites/icons/street_spirit.webp","h":"encyclopedia/stores/hardware/"},
 {"s":"stores","id":"sno_cone","n":"Sno Cone Vendor","g":"Kept by a vendor of their own","st":"source","ic":"assets/sprites/encyclopedia/npc_sno_cone_vending_machine.webp","h":"encyclopedia/stores/sno_cone/"},

@@ -40,7 +40,7 @@
  */
 
 import { onLoaded } from '../textures.js?v=3149d699';
-import { sceneAnim } from '../deco-anim.js?v=8c4c784b';
+import { sceneAnim } from '../deco-anim.js?v=270f39af';
 
 export const QUEST = 'stale_but_necessary';
 /**

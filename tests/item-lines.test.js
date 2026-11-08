@@ -109,11 +109,11 @@ describe('street data (build-street-layers.mjs item_perm)', () => {
 
   it('the rebuilt streets: the ones copied from an archived street carry it, the 49 drawn by hand have none', () => {
     const rebuilt = allStreets().filter((s) => /^reconstruction/.test(s.source || ''));
-    assert.equal(rebuilt.length, 53); // + the 15 abandoned-tower floors (G144)
+    assert.equal(rebuilt.length, 54); // + the 15 abandoned-tower floors (G144), Louise Pasture Villa (G371)
     // tools/build-enchanted-forests.mjs slices the parent street; tools/build-forest-machine-room.mjs
-    // copies the Meadow room's template.
-    const copied = rebuilt.filter((s) => /Enchanted Forest hollows|Forest Community Machine Room/.test(s.source));
-    assert.equal(copied.length, 4);
+    // copies the Meadow room's template; Louise Pasture Villa (G371) the apartment lobby template's.
+    const copied = rebuilt.filter((s) => /Enchanted Forest hollows|Forest Community Machine Room|apartment lobby template/.test(s.source));
+    assert.equal(copied.length, 5);
     assert.ok(copied.every((s) => s.platforms.every((p) => 'item_perm' in p)));
     assert.ok(rebuilt.filter((s) => !copied.includes(s)).every((s) => s.platforms.every((p) => !('item_perm' in p))));
   });
@@ -237,7 +237,7 @@ describe('the other lines the rule changes', () => {
     assert.ok(checked > 1900, `${checked}`);
   });
 
-  it("2,253 lines on 285 streets hold no items; the two rules disagree on 70 lines on 32 streets", () => {
+  it("2,254 lines on 286 streets hold no items; the two rules disagree on 70 lines on 32 streets", () => {
     let soft = 0;
     let softStreets = 0;
     let disagree = 0;
@@ -254,8 +254,8 @@ describe('the other lines the rule changes', () => {
       soft += n;
       if (n) softStreets += 1;
     }
-    assert.equal(soft, 2253); // R5: Room 23 gets a roof over its new upper floor
-    assert.equal(softStreets, 285);
+    assert.equal(soft, 2254); // R5: Room 23 gets a roof over its new upper floor; G371: Louise Pasture Villa's ceiling (Gregarious Towers')
+    assert.equal(softStreets, 286);
     assert.equal(disagree, 70);
     assert.equal(disagreeStreets.size, 32);
   });

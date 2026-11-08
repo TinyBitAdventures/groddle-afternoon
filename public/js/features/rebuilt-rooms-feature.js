@@ -16,15 +16,18 @@
  * QA: ?autostart=1&questoffer=off&doordemo=GA9R6BM705F3L3N&doorautoplay=1 (Snowed In),
  *   doordemo=GA94GCF7H3D30IM&doorkey=1&doorautoplay=1 (Ethereal Endeavour),
  *   doordemo=GCR169OSLQL13JR&doorkey=2&doorautoplay=1 (Martleby Hare),
- *   doordemo=GA9R4OR505F3PSL&doorautoplay=1 (Growing Stuff).
+ *   doordemo=GA9R4OR505F3PSL&doorautoplay=1 (Growing Stuff),
+ *   doordemo=GLIFIG7BP8G1MU9&doorautoplay=1 (Louise Pasture Villa, G371: js/louise-pasture-villa.js,
+ *   an empty hall indoors like the others).
  */
 
 import { isRebuiltRoomTsid, rebuiltRoomEcology } from '../rebuilt-rooms.js?v=8c2eaf24';
+import { isLouiseVillaTsid, louiseVillaEcology } from '../louise-pasture-villa.js?v=9d267f7e';
 import { WINTER_WALK_BOUNDS, WINTER_WALK_CAPTION, WINTER_WALK_TSID, winterStreetEcology } from '../winter-walk-streets.js?v=8607edd3';
 
 export const REBUILT_ROOMS_FEATURE_ID = 'rebuilt-rooms';
 
-const isRoom = (tsid) => isRebuiltRoomTsid(tsid);
+const isRoom = (tsid) => isRebuiltRoomTsid(tsid) || isLouiseVillaTsid(tsid);
 
 let caption = null;
 
@@ -71,7 +74,7 @@ export const rebuiltRoomsFeature = {
 
   ecologyOverride(street) {
     // Winter Walk and Winter Haven (js/winter-walk-streets.js) are empty too: the route clears them.
-    return rebuiltRoomEcology(street?.tsid) || winterStreetEcology(street?.tsid);
+    return rebuiltRoomEcology(street?.tsid) || louiseVillaEcology(street?.tsid) || winterStreetEcology(street?.tsid);
   },
 
   onStreetEnter(street, engine) {

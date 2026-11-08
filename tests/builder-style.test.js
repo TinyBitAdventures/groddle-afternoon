@@ -184,7 +184,7 @@ describe('the style rules (js/builder/style-rules.js)', () => {
     assert.equal(sty001(a)[0].fingerprint, sty001(structuredClone(a))[0].fingerprint);
   });
 
-  it('calibration: over the 1,475 shipped streets STY-001 is rare and STY-005 never fires', () => {
+  it('calibration: over the 1,476 shipped streets STY-001 is rare and STY-005 never fires', () => {
     const counts = {};
     for (const f of readdirSync(join(root, 'public/assets/streets')).filter((n) => /^[GL][A-Z0-9]+\.json$/.test(n) && !/^[GL]Z[A-Z0-9]{13}\.json$/.test(n))) {
       const street = json(`public/assets/streets/${f}`);
