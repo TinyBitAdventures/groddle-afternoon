@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=108ab200';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=127e0a3c';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=b8c4427d';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=31d926b7';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -251,7 +251,7 @@ import {
   rookMuseumOverlayPoint,
   rookMuseumPaintingAlphas,
   visitRookMuseumExhibit,
-} from './js/rook-museum.js?v=c774b613';
+} from './js/rook-museum.js?v=fbe961bb';
 import {
   DE_EMBIGGENIFY_PART2_QUEST_ID,
   DE_EMBIGGENIFY_QUEST_ID,
@@ -499,7 +499,7 @@ import {
   parsePlayerSave,
   serializePlayerSave,
   restorePlayerSave,
-} from './js/player-save.js?v=9c00cbd7';
+} from './js/player-save.js?v=dd3f89c1';
 import {
   HOME_INTERIOR_TSID,
   HOME_STREET_TSID,
@@ -865,7 +865,7 @@ import {
   favorRelationNote,
   emblemRelationNote,
   formatSpeedUpTime,
-} from './js/shrines.js?v=3170dbdb';
+} from './js/shrines.js?v=164b1234';
 import { shrineSheet, shrineVariantFor } from './js/shrine-variants.js?v=7f11c97d';
 import { giantDisplayName } from './js/giant-names.js?v=0e295891';
 import { shrinePowderOptions, shrinePowderAchievementCounters } from './js/powders.js?v=fa5d1e41';
@@ -878,7 +878,7 @@ import {
   spinMeResponse,
   spinningWheelPhase,
   startSpinningWheel,
-} from './js/spinning-wheel.js?v=ddae3d4d';
+} from './js/spinning-wheel.js?v=6f786bdd';
 import {
   CUBIMAL_PACKAGE_IDS,
   cubimalCollectionProgress,
@@ -16689,7 +16689,8 @@ function spawnLegalizeBackAlley() {
     label: 'Shady Bureaucrat',
     subtitle:
       legalizeRun.stage === 'back_alley'
-        ? 'Pssst. I know a route through the red tape.'
+        ? // G318: his own opener in the back alley (npc_bureaucrat.js 897), not ours.
+          "Psssst. Here'sss the deal."
         : 'The closest Hall is marked on your route.',
     sprite: shady,
     state: { legalizeState: legalizeRun },
@@ -20415,9 +20416,10 @@ function handleDeEmbiggenifyTarget(target, verbId) {
     openScriptedQuestDialogue({
       title: 'De-Embiggenify II',
       kicker: 'Mr. Hairball',
+      // G318: part two's own words, the appendage line and the hint (de_embiggenify_part2.js 3), and its OK!.
       beats: [{
-        text: "Still looking? It's behind the cake. I'd get it myself, but: appendages.",
-        response: 'Back to the cake.',
+        text: "I'd get it myself, but I'm kind of lacking in the appendage department, if you know what I mean. (And here's a hint: have a look behind the cake!)",
+        response: 'OK!',
       }],
       onComplete: () => setMrHairballAnimation('idle'),
     });
@@ -25061,23 +25063,6 @@ const STORY_QUEST_IDS = [
   PHANTOM_QUEST_ID,
   REMEMBER_QUEST_ID,
 ];
-const STORY_ACCEPT_LABELS = {
-  [GREEDY_STREET_SPIRIT_QUEST_ID]: 'Read me the story.',
-  [GREEDY_STREET_SPIRIT_REPEAT_ID]: 'Let’s reminisce.',
-  [LEGALIZE_QUEST_ID]: 'Sounds complicated.',
-  [ILMENSKIE_QUEST_ID]: 'I’ll find him.',
-  [DE_EMBIGGENIFY_QUEST_ID]: 'Shrink me down.',
-  [WINTER_WALK_QUEST_ID]: 'Take me there.',
-  [WINTER_WALK_REPEAT_QUEST_ID]: 'Back into the snow!',
-  [SUMMERS_DAY_QUEST_ID]: 'Take me to the memory.',
-  [SUMMERS_DAY_REPEAT_QUEST_ID]: 'Let’s reminisce.',
-  [FOUR_LETTER_QUEST_ID]: 'Shrink me down!',
-  [ROOK_QUEST_ID]: "Send me into the Rooks' Woods.",
-  [ROOK_HALL_START_QUEST_ID]: 'Take me to the museum.',
-  [HOG_HAUL_QUEST_ID]: 'Let the Hog Haul begin!',
-  [PHANTOM_QUEST_ID]: "Never mind. It's ghost hunting time!",
-  [REMEMBER_QUEST_ID]: 'Where did I put that thing?',
-};
 
 function canOfferStoryQuest(classTsid) {
   if (questState.active?.[classTsid]) return false;
@@ -25248,7 +25233,8 @@ function renderQuestDialogueBeat() {
           ? questDialogueState.primaryLabel
           : beat.response || (finalBeat ? 'All right' : 'Continue')
         : finalBeat
-          ? questDialogueState.acceptLabel || STORY_ACCEPT_LABELS[def.classTsid] || 'Accept quest'
+          ? // G318: the quest's own button_accept (quests.json acceptLabel), else quest.js's default (quests/quest.js 14).
+            questDialogueState.acceptLabel || def?.acceptLabel || "Ok, I'll do it!"
           : beat.response || 'Continue';
     next.dataset.accept = mode === 'offer' && finalBeat ? '1' : '0';
     const blocked = finalBeat ? questDialogueState.primaryBlocked || '' : '';
@@ -25260,7 +25246,7 @@ function renderQuestDialogueBeat() {
     cancel.textContent =
       mode === 'script'
         ? questDialogueState.cancelLabel || 'Close'
-        : questDialogueState.declineLabel || 'Maybe later';
+        : questDialogueState.declineLabel || def?.declineLabel || 'Not right now';
   }
   // G211: Magic Rock offers take QuestConversationUI's look; G225: its other
   // lines the FamiliarDialog CONVERSATION panel (js/familiar.js).

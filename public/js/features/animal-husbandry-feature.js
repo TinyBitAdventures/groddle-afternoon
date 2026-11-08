@@ -110,7 +110,7 @@ import { batterflyBaseY, batterflyResponseFor, flightFloorFor } from '../street-
 import { loseEnergy, shiftMetabolic } from '../metabolics.js?v=8504134e';
 import { textureFromUrl } from '../textures.js?v=3149d699';
 import { PIGGY_DEATH_DROPS, PIGGY_DEATH_PUFF, SAD_BABY, forcedRoll, isSadIn } from '../animal-mood.js?v=a49495fc';
-import { animalCrowdChanged, animalCrowdSad, animalPlaceIsDepressing, crowdLimit, smokePuff as sharedSmokePuff } from './animal-mood-feature.js?v=8d28e28b';
+import { animalCrowdChanged, animalCrowdSad, animalPlaceIsDepressing, crowdLimit, smokePuff as sharedSmokePuff } from './animal-mood-feature.js?v=3855bf49';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
 import { followYardPath, freeYardSpot } from '../yard-wander.js?v=69f553ec';
@@ -829,7 +829,8 @@ function advanceYardNow(engine) {
       // The drops land where the butterfly was (yard ground piles would need
       // a pickup; put them straight into the yard's milker owner's pack).
       for (const [id, n] of Object.entries(ev.drops)) engine.inv[id] = (engine.inv[id] || 0) + n;
-      engine.pushActivity('A Butterfly in your yard has ascended to a higher plane.');
+      // G318: the source's line for a butterfly's last milking (npc_butterfly.js 1310).
+      engine.pushActivity('The butterfly ascends to a higher plane.');
       const gone = extras.find((e) => e.row === ev.animal);
       if (gone) {
         extras = extras.filter((e) => e !== gone);

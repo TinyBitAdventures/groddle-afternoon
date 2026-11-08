@@ -122,7 +122,8 @@ export const SPINNING_WHEEL_RESPONSES = Object.freeze({
   tier4: Object.freeze([
     "Wheeeeeeeee! Who's a super-special Glitch then?!",
     'Oooooh! We have a WINNER, laydeez and gentlegiants!',
-    'Oh my! I believe you have hit the jackpot!',
+    // npc_spinning_wheel.js 507, verbatim.
+    "Oh my! I believe you've hit the jackpot!",
     'BULLSEYE!',
     "Didn't you do WELL?! Spin again! Tell your friends!",
   ]),

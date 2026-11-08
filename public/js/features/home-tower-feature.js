@@ -1125,10 +1125,12 @@ function talkToRock(engine) {
     });
     return true;
   }
+  // G318: the Magic Rock's own words. Nothing to offer: the familiar's empty line (players/inc_familiar.js
+  // 219, 227); the tower quest's steps: its requirement (build_a_tower.js 40) and its offer's last line (3).
   const text = !questActive(engine)
-    ? 'Keep it up, lil\' Glitch. I\'ll let you know when I think of something.'
+    ? "That's odd, I coulda sworn I had something for you..."
     : bridge?.towerItem?.()
-      ? 'Gather the requirements and finish the project. Bigger, bigger!'
+      ? 'Finish the Tower Project'
       : 'Go to your home street and Cultivate a Tower to get started.';
   engine.say?.(streetRock(), text, 4200);
   return true;

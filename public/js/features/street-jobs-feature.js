@@ -49,7 +49,7 @@ import { ecologyForStreet } from '../street-ecology.js?v=08076876';
 import { worldToScreen } from '../street-model.js?v=b6cb6a4e';
 import { signArmWidth } from '../street-render.js?v=418a3d31';
 import { getSkillCatalog } from '../content-catalogs.js?v=10b118dd';
-import { GIANTS } from '../shrines.js?v=3170dbdb';
+import { GIANTS } from '../shrines.js?v=164b1234';
 import { giantDisplayName } from '../giant-names.js?v=0e295891';
 import { teleportationFeature } from './teleportation-feature.js?v=627cf405';
 import {

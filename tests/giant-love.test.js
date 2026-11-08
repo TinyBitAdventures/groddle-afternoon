@@ -19,8 +19,8 @@ import {
   loveYouGiant,
   loveYouLine,
 } from '../public/js/giant-love.js?v=aa9ea315';
-import { GIANTS } from '../public/js/shrines.js?v=3170dbdb';
-import { sayLoveLine } from '../public/js/features/shrine-hint-feature.js?v=dadc4af0';
+import { GIANTS } from '../public/js/shrines.js?v=164b1234';
+import { sayLoveLine } from '../public/js/features/shrine-hint-feature.js?v=8f93a258';
 
 const ROOT = join(import.meta.dirname, '..');
 const AUDIT = join(ROOT, '..');

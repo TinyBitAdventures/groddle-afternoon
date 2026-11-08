@@ -31,7 +31,7 @@ import {
   streetNearSkip,
   streetTrimSpots,
   towerDoorway,
-} from '../public/js/features/homes-feature.js?v=4559f53d';
+} from '../public/js/features/homes-feature.js?v=41ce1a30';
 
 const read = (rel) => readFileSync(join(import.meta.dirname, '..', 'public', 'js', rel), 'utf8');
 const maxLeft = HOME_LIMITS.MAX_FRONTYARD_LEFT_SEGMENTS - HOME_LIMITS.START_FRONTYARD_LEFT_SEGMENTS;

@@ -31,7 +31,7 @@ import {
 import { SOUND_ALIASES, SOUND_FILES } from '../public/js/sound-keys.js?v=6aedc206';
 import { DROP_TABLES } from '../public/js/drop-tables-data.js?v=c51a6400';
 import { SOIL_DROP_TABLES } from '../public/js/patches.js?v=796732fb';
-import { SPINNING_WHEEL_DROP_TABLE } from '../public/js/spinning-wheel.js?v=ddae3d4d';
+import { SPINNING_WHEEL_DROP_TABLE } from '../public/js/spinning-wheel.js?v=6f786bdd';
 import {
   ITEM_CATALOG,
   countItem,
