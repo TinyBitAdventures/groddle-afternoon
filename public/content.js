@@ -86,7 +86,8 @@ import { SET_FREE, setFreeVerbState } from './js/animal-set-free.js?v=3b194fca';
 import { BUTTER_UP, SING_TO, butterUpVerbState, butterUpChicken, singToVerbState, singToButterfly } from './js/animal-flattery.js?v=63001f58';
 import { levelInfoForXp } from './js/progression.js?v=33462eaa';
 import { getGameDayKey } from './js/game-day.js?v=edb00566';
-import { isElementClass } from './js/pack-slots.js?v=a94b816c';
+import { PACK_COPY, isElementClass } from './js/pack-slots.js?v=6cf9f397';
+import { hasPouch } from './js/elemental-pouch.js?v=ceefa97a';
 import { ITEM_CATALOG, countItem } from './js/inventory.js?v=b7609342';
 import { slugsFromEffects } from './js/speech-slugs.js?v=130338f9';
 import { animalResponseKey, failureResponseKey, trantCareResponseKey, rockResponseKey, verbResponse } from './js/verb-responses.js?v=3ceb8a8c';
@@ -773,8 +774,18 @@ export function getVerbsFor(target, ctx) {
   if (classId === 'dropped_item') {
     const count = Math.max(1, Math.floor(Number(s.count) || 1));
     const itemLabel = s.label || target.label || 'item';
-    // element_base canPickup returns {ok: 0} (element_red.js 147-149): elements on the ground stay there.
-    if (!isElementClass(s.classTsid)) {
+    // element_base canPickup returns {ok: 0} (element_red.js 147-149): the source never let an element
+    // reach the ground. Stacks v0.20.0-v0.23.0 let down (#139) go back, straight into a pouch only
+    // (bag_elemental_pouch.js 651-659; game.js pickupDroppedWorldItem refuses a full one).
+    if (isElementClass(s.classTsid)) {
+      const pouch = hasPouch(inv || {});
+      add('pickup', 'pick up', {
+        sort: 10,
+        enabled: pouch,
+        reason: pouch ? '' : PACK_COPY.elementNoPouch,
+        tooltip: PACK_COPY.elementPickupTip(count, itemLabel),
+      });
+    } else {
       add('pickup', 'pick up', {
         sort: 10,
         tooltip: `Put ${count > 1 ? `${count} × ` : ''}${itemLabel} in your pack`,

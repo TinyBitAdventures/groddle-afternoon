@@ -194,6 +194,12 @@ export const PACK_COPY = Object.freeze({
   bagInBag: "A bag can't go in a bag.",
   wontHold: (label) => `${label} can't hold that.`,
   noRoom: (label) => `There's no room in ${label}.`,
+  // Elements on the ground (#139). The source hid Drop and Pick up (element_red.js 143-149, canDrop and
+  // canPickup {ok: 0}); a stack left down by v0.20.0-v0.23.0 goes straight into a pouch. Our own words.
+  elementNoDrop: "Elements can't be put down. Disperse them instead.",
+  elementNoPouch: 'You need an Elemental Pouch to pick up elements.',
+  elementPouchFull: 'Your Elemental Pouch has no room for these.',
+  elementPickupTip: (count, label) => `Put ${count > 1 ? `${count} × ` : ''}${label} in your Elemental Pouch`,
 });
 
 export function isBagClass(cls) {

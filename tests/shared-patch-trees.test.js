@@ -31,12 +31,12 @@ import {
 import { sharedPatchesFeature } from '../public/js/features/shared-patches-feature.js?v=1c1d05f0';
 import { patchesFeature } from '../public/js/features/patches-feature.js?v=9ae1d3a5';
 import { treeDeathFeature, decorateTreeVerbs } from '../public/js/features/tree-death-feature.js?v=747f0035';
-import { potionsFeature } from '../public/js/features/potions-feature.js?v=a448f974';
+import { potionsFeature } from '../public/js/features/potions-feature.js?v=eb2b3b19';
 import { powdersFeature, runPowder } from '../public/js/features/powders-feature.js?v=83f0ed34';
 import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=c86d6b40';
 import { rookKeyFor } from '../public/js/rook-attack.js?v=0382c223';
 import { rookedFromServer, syncKeys } from '../public/js/rook-mp.js?v=0b724b8c';
-import { runVerb } from '../public/content.js?v=0eb17d5e';
+import { runVerb } from '../public/content.js?v=b87f037d';
 import { isPoisoned, POISON_DURATION_MS, TREE_ANTIDOTE, TREE_POISON } from '../public/js/tree-poison.js?v=80469175';
 import { getStreetEcologyCatalog, setStreetEcologyCatalog } from '../public/js/street-ecology.js?v=78a1d522';
 

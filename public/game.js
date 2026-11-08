@@ -2,9 +2,9 @@
  * Groddle Afternoon — original street geometry + layered decos
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
-import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=0eb17d5e';
+import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=b87f037d';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=127e0a3c';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=e1b64299';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=fce015bd';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -476,7 +476,8 @@ import {
   isToolItem,
 } from './js/inventory.js?v=b7609342';
 import { TROPHY_FIND_TEXT, trophyOfBadge } from './js/home-trophies.js?v=21c2add6';
-import { PACK_COPY, isBagClass, isElementClass, unitRankAt } from './js/pack-slots.js?v=a94b816c';
+import { PACK_COPY, isBagClass, isElementClass, unitRankAt } from './js/pack-slots.js?v=6cf9f397';
+import { hasPouch } from './js/elemental-pouch.js?v=ceefa97a';
 import { createPackRow, mountPackClearance, packBandRange, packCountText, packSearchEntries, packSlotTip } from './js/ui/pack-row.js?v=65c0f180';
 import { listAnimalFeedOptions } from './js/animals.js?v=08496a95';
 import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=08496a95';
@@ -4547,7 +4548,8 @@ function renderPackPopover(classTsid, anchor = null) {
     : '';
   if (recipeTarget) rows.push({ attrs: 'data-pack-make', label: makeLabel, tip: recipeNote ? `${recipeNote} · opens Make` : 'Opens Make' });
   const dropBlock = packDropBlockReason(classTsid);
-  rows.push({
+  // takeable_drop_conditions {state: null}: an element's menu has no Drop row at all (element_red.js 143-145).
+  if (!isElementClass(classTsid)) rows.push({
     attrs: 'data-pack-drop',
     label: 'Drop',
     next: stackCount > 1,
@@ -7994,7 +7996,7 @@ function renderVerbMenu(target, verbs, level = null) {
     return;
   }
   if (!verbs.length) {
-    menu.dataset.vmDefault = 'Nothing to do here.';
+    // The row says it; the footer stays empty, so the line shows once (#139 report, 2026-11-08).
     const li = document.createElement('li');
     li.className = 'verb-choice-tip vm-empty';
     li.textContent = 'Nothing to do here.';
@@ -12328,6 +12330,18 @@ const engine = {
     updateHud();
     return result;
   },
+  /**
+   * The player's own dropped stack here taken off the ground whole, to nowhere (an element's Disperse on
+   * the ground, element_red.js 93-141, apiDelete). Returns { ok, classTsid, count }; shared stacks are not here.
+   */
+  takeDroppedStack(id) {
+    if (!currentStreetTsid) return { ok: false, reason: 'not_started' };
+    const result = pickupDroppedStack(droppedItemState, {}, droppedStacksTsid(), id, Infinity);
+    if (!result.ok) return result;
+    saveDroppedItems();
+    refreshDroppedWorldItems();
+    return result;
+  },
   /** A dropped stack drawn here back into the pack, as its Pick up verb does (homes-feature: Decoration Mode). */
   pickUpDroppedStack(id, count = Infinity) {
     const target = interactables.find((t) => t.classId === 'dropped_item' && t.worldItemId === id);
@@ -13297,10 +13311,14 @@ function refreshDroppedWorldItems() {
  * stay in the pack. The remake marks them with the `quest-item` or `no_drop`
  * tag.
  */
-function packDropBlockReason(classTsid) {
+function packDropBlockReason(classTsid, { inBag = false } = {}) {
   // A feature's own drop conditions (game_box.js verbs.drop while it plays).
   const featureReason = features.query('packDropBlockReason', classTsid, engine);
   if (featureReason) return featureReason;
+  // element_base canDrop {ok: 0} (element_red.js 143-145; takeable.js 110-116 hides the verb): an element
+  // never goes down on its own, by Drop, a drag or Decoration Mode (#139). A pouch goes down whole with
+  // its elements (takeable.js 122-130 checks only soulbound contents).
+  if (!inBag && isElementClass(classTsid)) return PACK_COPY.elementNoDrop;
   const tags = ITEM_CATALOG[classTsid]?.tags || [];
   if (tags.includes('quest-item')) return "This item is needed for a quest and can't be dropped.";
   if (tags.includes('no_drop')) return "This item can't be dropped.";
@@ -13440,7 +13458,7 @@ function dropPackBag(classTsid, key) {
     dropPackItem(classTsid, 1);
     return;
   }
-  if (box.slots.some((s) => packDropBlockReason(s.cls))) {
+  if (box.slots.some((s) => packDropBlockReason(s.cls, { inBag: true }))) {
     toast("This contains items locked to you and can't be dropped.");
     return;
   }
@@ -13550,19 +13568,30 @@ function openPickupCount(target, verb, max) {
   });
 }
 
+/** A pick up the pack (or the pouch) can't take: the sound and the line (takeable.js:76-79). */
+function refusePickup(line) {
+  playSound('PACK_FULL', { volume: 0.6 });
+  toast(line);
+  pushActivity(line);
+  if (app?.canvas) app.canvas.dataset.packLast = line;
+}
+
 function pickupDroppedWorldItem(target, requested = Infinity) {
   if (target?.state?.contents?.length || target?.state?.name) return pickupDroppedBag(target);
-  if (isElementClass(target?.state?.classTsid)) return false; // element_red.js 147-149, canPickup {ok: 0}
   // G152 (takeable.js:76-79, 84-93): a full pack refuses the stack; a part that fits is taken, the rest stays down.
   const wantClass = target?.state?.classTsid;
+  // #139: an element stack left on the ground (v0.20.0-v0.23.0) goes straight into a pouch; packRoom
+  // counts pouches only for elements (js/pack-slots.js packAccepts), so a pack slot never takes it.
+  const element = isElementClass(wantClass);
+  if (element && !hasPouch(inv)) {
+    refusePickup(PACK_COPY.elementNoPouch);
+    return false;
+  }
   const stackCount = Math.max(1, Math.floor(Number(target?.state?.count) || 1));
   const wantCount = Math.min(stackCount, Math.max(1, Math.floor(Number(requested)) || stackCount));
   const room = wantClass ? features.query('packRoom', wantClass, wantCount, engine) : null;
-  if (room === 0) {
-    playSound('PACK_FULL', { volume: 0.6 });
-    toast(PACK_COPY.pickupFull);
-    pushActivity(PACK_COPY.pickupFull);
-    if (app?.canvas) app.canvas.dataset.packLast = PACK_COPY.pickupFull;
+  if (room === 0 || (element && room == null)) {
+    refusePickup(element ? PACK_COPY.elementPouchFull : PACK_COPY.pickupFull);
     return false;
   }
   // A shared stack (drops-mp-feature): only what was asked and fits goes; the rest stays for everyone.
@@ -13581,7 +13610,7 @@ function pickupDroppedWorldItem(target, requested = Infinity) {
   arrivingToolPoints(result.classTsid, result.count, result.points, result.tags);
   saveDroppedItems();
   const label = ITEM_CATALOG[result.classTsid]?.label || result.classTsid.replace(/_/g, ' ');
-  const line = `You picked up ${result.count}× ${label}.`;
+  const line = `You picked up ${result.count}× ${label}${element ? ' into your Elemental Pouch' : ''}.`;
   toast(line);
   pushActivity(line);
   floatText(x, y - 55, `+${result.count} ${label}`, 0x7dcea0);

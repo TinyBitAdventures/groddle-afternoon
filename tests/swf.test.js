@@ -25,7 +25,7 @@ import {
   wrangleMessage,
 } from '../public/js/swf.js?v=6dd72036';
 import { swfFeature } from '../public/js/features/swf-feature.js?v=c039ff5b';
-import { FEATURES } from '../public/js/features/index.js?v=e1b64299';
+import { FEATURES } from '../public/js/features/index.js?v=fce015bd';
 import { ITEM_CATALOG } from '../public/js/inventory.js?v=b7609342';
 import { DROP_ITEMS, DROP_TABLES } from '../public/js/drop-tables-data.js?v=c51a6400';
 
@@ -279,7 +279,7 @@ describe('Wiring and art', () => {
   it('is registered once, and game.js asks features before a pack drop', () => {
     assert.equal(FEATURES.filter((f) => f.id === 'swf').length, 1);
     const game = readFileSync(join(root, 'public/game.js'), 'utf8');
-    assert.match(game, /function packDropBlockReason\(classTsid\) \{\n[^\n]*\n\s*const featureReason = features\.query\('packDropBlockReason', classTsid, engine\);/);
+    assert.match(game, /function packDropBlockReason\(classTsid(?:, \{ inBag = false \} = \{\})?\) \{\n[^\n]*\n\s*const featureReason = features\.query\('packDropBlockReason', classTsid, engine\);/);
   });
 
   it('barnacle scraping still rolls the three SWFs', () => {

@@ -411,6 +411,38 @@ export function runMoreVerb(engine, classTsid, verbId, opts = {}) {
   }
 }
 
+/* ---- #139 Elements on the ground: Disperse (element_red.js 93-141, ok_states in_location) ---- */
+
+/** A stack of elements on the ground that is the player's own (a shared stack is the street's: pick it up first). */
+function groundElements(target) {
+  const s = target?.state;
+  return target?.classId === 'dropped_item' && s && !s.shared && !s.contents?.length && ELEMENT_CLASSES.includes(s.classTsid) ? s : null;
+}
+
+/** The ground menu's Disperse row, after Pick up (sort_on 53, as the pack's). */
+export function groundDisperseVerb() {
+  const b = disperseButton();
+  return { id: 'disperse', label: 'disperse', sort: 53, tooltip: b.tooltip, enabled: true, reason: '' };
+}
+
+/** Disperse a stack on the ground: it goes whole, stats_add_xp(count / 20) as from the pack. */
+export function disperseGroundElements(engine, target) {
+  const s = groundElements(target);
+  if (!s) return null;
+  const taken = engine.takeDroppedStack?.(s.id);
+  if (!taken?.ok) {
+    engine.toast?.('That stack has already been picked up.', 2600);
+    return null;
+  }
+  const out = disperseElements(engine.pc, taken.classTsid, taken.count);
+  say(engine, out.message, true);
+  counters(engine, taken.classTsid, 'disperse', taken.count);
+  engine.playSound?.('ITEM_DROP', { volume: 0.4 });
+  last = `${taken.classTsid}:disperse:ground`;
+  refresh(engine);
+  return out;
+}
+
 /** licorice.js verbs.eat (the default verb). */
 export function eatLicoriceNow(engine) {
   if (countItem(engine.inv, 'licorice') < 1) return null;
@@ -935,6 +967,18 @@ export const itemVerbsMoreFeature = {
   verbStarted(target) {
     if (attracted && target === attracted.target) endAttraction();
     return null;
+  },
+
+  /** #139: Disperse on an element stack lying on the ground (element_red.js 93-141, ok_states in_location). */
+  decorateVerbs(target, verbs) {
+    if (!groundElements(target) || verbs.some((v) => v.id === 'disperse')) return null;
+    return [...verbs, groundDisperseVerb()];
+  },
+
+  runVerbOverride(target, verbId, engine) {
+    if (verbId !== 'disperse' || !groundElements(target)) return null;
+    disperseGroundElements(engine, target);
+    return true;
   },
 
   packVerbs(classTsid, engine, opts = {}) {

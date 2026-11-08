@@ -8,10 +8,10 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { layoutPack, moveStack, packAccepts, packKeeps, roomFor, stackUp, isElementClass } from '../public/js/pack-slots.js?v=a94b816c';
+import { layoutPack, moveStack, packAccepts, packKeeps, roomFor, stackUp, isElementClass } from '../public/js/pack-slots.js?v=6cf9f397';
 import { smashTrophy } from '../public/js/item-verbs-more.js?v=c2f9dc31';
 import { canCraft, grindsElements, grinderResultLine, NEED_POUCH_LINE, recipeBlockedLine, isGrinderRecipe } from '../public/js/making.js?v=f4f214c2';
-import { getVerbsFor } from '../public/content.js?v=0eb17d5e';
+import { getVerbsFor } from '../public/content.js?v=b87f037d';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=10b118dd';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -204,11 +204,16 @@ describe('every source', () => {
     assert.match(f, /engine\.query\?\.\('packRoom', cls, n, \{ inv: trial \}\)/);
   });
 
-  it('an element on the ground has no pick up', () => {
+  it('an element left on the ground (#139) picks up only into a pouch', () => {
     const target = (classTsid) => ({ classId: 'dropped_item', state: { classTsid, count: 3 }, label: 'x' });
-    const ids = (t) => getVerbsFor(t, { pc: {}, inv: {} }).map((v) => v.id);
-    assert.ok(ids(target('apple')).includes('pickup'));
-    assert.ok(!ids(target(RED)).includes('pickup'));
-    assert.match(readFileSync(join(root, 'public/game.js'), 'utf8'), /if \(isElementClass\(target\?\.state\?\.classTsid\)\) return false;/);
+    const pick = (t, inv) => getVerbsFor(t, { pc: {}, inv }).find((v) => v.id === 'pickup');
+    assert.equal(pick(target('apple'), {}).enabled, true);
+    assert.equal(pick(target(RED), {}).enabled, false);
+    assert.equal(pick(target(RED), {}).reason, 'You need an Elemental Pouch to pick up elements.');
+    assert.equal(pick(target(RED), { [POUCH]: 1 }).enabled, true);
+    assert.match(pick(target(RED), { [POUCH]: 1 }).tooltip, /in your Elemental Pouch$/);
+    const game = readFileSync(join(root, 'public/game.js'), 'utf8');
+    assert.match(game, /if \(element && !hasPouch\(inv\)\) \{\s*refusePickup\(PACK_COPY\.elementNoPouch\);/);
+    assert.match(game, /refusePickup\(element \? PACK_COPY\.elementPouchFull : PACK_COPY\.pickupFull\);/);
   });
 });

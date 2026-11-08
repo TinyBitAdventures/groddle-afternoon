@@ -27,7 +27,7 @@ import { WORD_FILTER } from '../public/js/word-filter-list.js?v=20da9845';
 import { VECTORS, wordFilterOutputs } from '../tools/build-word-filter.mjs';
 import { HAS_SERVER, HAS_SITE, SITE_DIR, serverPath, sitePath } from '../tools/repos.mjs';
 import { bagLabel } from '../public/js/bag-names.js?v=22391c55';
-import { BAG_DEFS, PACK_CAPACITY, layoutPack, normalizePrefs, renameBag } from '../public/js/pack-slots.js?v=a94b816c';
+import { BAG_DEFS, PACK_CAPACITY, layoutPack, normalizePrefs, renameBag } from '../public/js/pack-slots.js?v=6cf9f397';
 import { ITEM_CATALOG, isToolItem } from '../public/js/inventory.js?v=b7609342';
 import { nameAnimal, namedAnimalLabel } from '../public/js/animal-husbandry.js?v=75afc5c5';
 import { kittyLabel, nameKitty } from '../public/js/heli-kitties.js?v=8fbe314a';
