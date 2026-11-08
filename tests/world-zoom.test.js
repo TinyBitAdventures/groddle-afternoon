@@ -19,10 +19,10 @@ import {
   loadZoom,
   saveZoom,
   createWorldZoom,
-} from '../public/js/world-zoom.js?v=b262a6c7';
-import { stageFor, ORIGINAL_VIEW_W, ORIGINAL_VIEW_H, LOCATION_VIEW_W, VIEW_FLOOR_H, MIN_PACK_HEIGHT } from '../public/js/location-view.js?v=5a0d5c0b';
-import { classicLayout, classicScale, classicZoomScale, chromeWidth, railFor } from '../public/js/classic/classic-layout.js?v=299eef68';
-import { classicZoomVar } from '../public/js/classic/classic-zoom.js?v=1ef4b9a5';
+} from '../public/js/world-zoom.js?v=1d0c0cfb';
+import { stageFor, ORIGINAL_VIEW_W, ORIGINAL_VIEW_H, LOCATION_VIEW_W, VIEW_FLOOR_H, MIN_PACK_HEIGHT } from '../public/js/location-view.js?v=f1f922b4';
+import { classicLayout, classicScale, classicZoomScale, chromeWidth, railFor } from '../public/js/classic/classic-layout.js?v=6c6d5ef4';
+import { classicZoomVar } from '../public/js/classic/classic-zoom.js?v=3e4e5747';
 import { hotkeySections, clientKeyAction } from '../public/js/client-hotkeys.js?v=31d1891d';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -210,7 +210,7 @@ test('the controls: Menu Settings and the Sound popover (topbar), Preferences, a
   const prefs = read('js/classic/classic-prefs.js');
   assert.match(prefs, /id: 'prefs-zoom'/);
   const game = read('game.js');
-  assert.match(game, /zoom: worldZoom\(\),\n\s*\}\);/);
+  assert.match(game, /return stageFor\(\{ \.\.\.stageArgs\(\), zoom: worldZoom\(\) \}\);/);
   assert.match(game, /onZoomChange\(\(\) => applyWorldZoom\(\)\);/);
   assert.match(game, /syncLocationViewHeight\(\{ keepFraming: true \}\)/);
   // game.js loads Classic's zoom before main() adds its resize listener.

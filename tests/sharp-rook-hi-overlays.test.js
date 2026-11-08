@@ -40,7 +40,7 @@ const VECTOR_OVERLAYS = Object.freeze({
 
 /** CSS px per world px at Original zoom on a 2560 x 1440 monitor (the audit's 2.52). */
 async function stageScale() {
-  const { stageFor } = await import('../public/js/location-view.js?v=5a0d5c0b');
+  const { stageFor } = await import('../public/js/location-view.js?v=f1f922b4');
   const stage = stageFor({ width: 2560, height: 1360, sceneWidth: 4000, sceneHeight: 1000, zoom: 1 }).scale;
   assert.ok(stage > 2 && stage < 3, `stage ${stage}`);
   return stage;

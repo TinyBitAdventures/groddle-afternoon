@@ -27,7 +27,7 @@
  * come with the game's init), so under Classic it takes X first. It never takes X while typing, while
  * the loading or start card is up, or while the upgrade cards are open (X closes those, as before).
  */
-import { uiState, onUiModeChange, readUiCache, writeUiCache } from './ui-mode.js?v=587c014a';
+import { uiState, onUiModeChange, readUiCache, writeUiCache } from './ui-mode.js?v=11da9030';
 import { classicArtUrl } from './classic-art.js?v=5f713e7d';
 import { focusBack } from '../ui/focus-return.js?v=da190597';
 

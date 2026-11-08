@@ -24,7 +24,7 @@
  *   (RightSideView.as 1166). The choice is kept on this device; it is closed by default.
  * Everything here shows only under Classic (inline display, so Modern is untouched).
  */
-import { uiState, onUiModeChange, readUiCache, writeUiCache } from './ui-mode.js?v=587c014a';
+import { uiState, onUiModeChange, readUiCache, writeUiCache } from './ui-mode.js?v=11da9030';
 import { classicArtUrl } from './classic-art.js?v=5f713e7d';
 import { bindChatInput } from '../ui/chat-input.js?v=2ccd05ab';
 import { pressLeavesKeys, reconcileChildren } from '../ui/keyed-nodes.js?v=9ab4de5c';

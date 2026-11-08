@@ -78,9 +78,20 @@ export const ZOOM_KEYS_HINT = 'Keys: - out, = in, 0 Original';
  * PURE: the brief notice a zoom key shows, or '' for none. Only `0` says anything:
  * it jumps all the way, so it says where it went and the way back out.
  */
-export function zoomKeyToast(action) {
+export function zoomKeyToast(action, fixed = false) {
+  if (fixed && action) return `Zoom: ${ZOOM_FIXED_NOTE.charAt(0).toLowerCase()}${ZOOM_FIXED_NOTE.slice(1)}`;
   return action === 'reset' ? 'Zoom: Original (press - to zoom out)' : '';
 }
+
+/**
+ * FIXED (#149, 2026-11-08): on a street whose narrowest layer is about as wide as the Original
+ * view (the Heights climbs: Clamber Crag's sky is 1000 px), the view never grows wider than that
+ * layer (TSMainView.as 514, lm.max_vp_w = Math.min(lm.max_vp_w, layer.w); location-view.js
+ * sceneViewWidthCap), so Wide and Original draw the same picture. The game marks such a street
+ * fixed (Modern only: Classic's zoom also scales its frame), and then the keys leave the level
+ * alone and say why, and the sliders show this note instead of the keys.
+ */
+export const ZOOM_FIXED_NOTE = 'This street looks the same at every zoom.';
 
 /** PURE: the level after a zoom key. */
 export function nextZoom(z, action) {
@@ -117,9 +128,26 @@ export function saveZoom(z, storage) {
 export function createWorldZoom({ win = globalThis, storage } = {}) {
   const store = storage !== undefined ? storage : (() => { try { return win?.localStorage; } catch { return null; } })();
   let level = loadZoom(store);
+  let fixed = false;
   const listeners = new Set();
+  const fixedListeners = new Set();
   return {
     get: () => level,
+    /** FIXED: true while this street draws the same at every level (set by the game per street and window). */
+    fixed: () => fixed,
+    setFixed(f) {
+      const v = Boolean(f);
+      if (v === fixed) return fixed;
+      fixed = v;
+      for (const fn of [...fixedListeners]) {
+        try { fn(v); } catch (err) { console.error(err); }
+      }
+      return fixed;
+    },
+    onFixedChange(fn) {
+      fixedListeners.add(fn);
+      return () => fixedListeners.delete(fn);
+    },
     set(z) {
       const v = clampZoom(z);
       if (v === level) return level;
@@ -135,6 +163,8 @@ export function createWorldZoom({ win = globalThis, storage } = {}) {
       return level;
     },
     step(action) {
+      // FIXED: a key changes nothing on this street, so the level (this device's choice for every street) stays.
+      if (fixed) return level;
       return this.set(nextZoom(level, action));
     },
     onChange(fn) {
@@ -150,3 +180,6 @@ export const worldZoom = () => zoom.get();
 export const setWorldZoom = (z) => zoom.set(z);
 export const stepWorldZoom = (action) => zoom.step(action);
 export const onZoomChange = (fn) => zoom.onChange(fn);
+export const zoomFixed = () => zoom.fixed();
+export const setZoomFixed = (f) => zoom.setFixed(f);
+export const onZoomFixedChange = (fn) => zoom.onFixedChange(fn);

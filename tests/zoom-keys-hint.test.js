@@ -16,8 +16,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { ZOOM_KEYS_HINT, createWorldZoom, nextZoom, zoomKeyAction, zoomKeyToast } from '../public/js/world-zoom.js?v=b262a6c7';
-import { zoomSlider } from '../public/js/ui/topbar.js?v=918c8bab';
+import { ZOOM_KEYS_HINT, createWorldZoom, nextZoom, zoomKeyAction, zoomKeyToast } from '../public/js/world-zoom.js?v=1d0c0cfb';
+import { zoomSlider } from '../public/js/ui/topbar.js?v=57cc6690';
 import { hotkeySections, hotkeyText } from '../public/js/client-hotkeys.js?v=31d1891d';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -76,7 +76,7 @@ describe('0 says where it went and the way back out', () => {
 
   it('game.js shows it once per press (not on a held key)', () => {
     const game = read('game.js');
-    assert.match(game, /const said = e\.repeat \? '' : zoomKeyToast\(zoomKey\);\n\s*if \(said\) toast\(said, 3000\);/);
+    assert.match(game, /const said = e\.repeat \? '' : zoomKeyToast\(zoomKey, fixed\);\n\s*if \(said\) toast\(said, 3000\);/);
   });
 
   it('and - does take you back out from Original', () => {

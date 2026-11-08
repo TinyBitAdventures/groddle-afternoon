@@ -10661,6 +10661,9 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
 /* The zoom keys under the slider (world-zoom.js ZOOM_KEYS_HINT). */
 [data-ui="modern"] .hud-zoom-keys { grid-column: 1 / -1; margin: var(--sp-2) 0 0; color: var(--text-muted); font-size: var(--fs-xs); }
 [data-ui="modern"] .hud-zoom input:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+/* #149: a street that looks the same at every zoom: the slider rests, the line under it says why. */
+[data-ui="modern"] .hud-zoom[data-zoom-fixed] input { opacity: 0.45; cursor: not-allowed; }
+[data-ui="modern"] .hud-zoom[data-zoom-fixed] .hud-zoom-ends, [data-ui="modern"] .hud-zoom[data-zoom-fixed] output { color: var(--text-muted); }
 
 /* —— NIGHT TINT and STREET MAP —— the switches under Zoom in the Menu's Settings group (js/night-tint.js,
    js/ui/street-minimap.js, js/ui/topbar.js): one look for both. */

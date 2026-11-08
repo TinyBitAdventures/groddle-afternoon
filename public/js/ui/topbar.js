@@ -18,7 +18,7 @@
  */
 import { vitalLevel, vitalTitle } from '../vitals.js?v=ca7471dd';
 import { loadAudioRestore, saveAudioRestore } from '../audio-pref.js?v=6fe817bc';
-import { ZOOM_KEYS_HINT, clampZoom, zoomLabel, zoomValueText } from '../world-zoom.js?v=b262a6c7';
+import { ZOOM_FIXED_NOTE, ZOOM_KEYS_HINT, clampZoom, zoomLabel, zoomValueText } from '../world-zoom.js?v=1d0c0cfb';
 import { NIGHT_TINT_HINT, NIGHT_TINT_LABEL } from '../night-tint.js?v=1dfc9c89';
 import { STREET_MAP_HINT, STREET_MAP_LABEL } from './street-minimap.js?v=fa31d398';
 import { focusBack } from './focus-return.js?v=da190597';
@@ -620,7 +620,8 @@ function installSound(doc, audio) {
 
 /**
  * ZOOM: one Zoom slider (Wide 0 to Original 100, js/world-zoom.js) with its live label
- * and the keys under it (ZOOM_KEYS_HINT).
+ * and the keys under it (ZOOM_KEYS_HINT). On a street that looks the same at every zoom
+ * (`zoom.fixed()`, #149) the slider is disabled and the line under it says so (ZOOM_FIXED_NOTE).
  * `where` names it for QA (data-zoom-control). Returns the row and a draw().
  */
 export function zoomSlider(doc, zoom, { id, where, className = 'hud-slider hud-zoom' }) {
@@ -647,9 +648,14 @@ export function zoomSlider(doc, zoom, { id, where, className = 'hud-slider hud-z
   row.append(label, input, out, ends, keys);
   const draw = () => {
     const z = clampZoom(zoom?.get?.());
+    const fixed = Boolean(zoom?.fixed?.());
     if (doc.activeElement !== input) input.value = String(Math.round(z * 100));
     setText(out, zoomLabel(z));
     input.setAttribute('aria-valuetext', zoomValueText(z));
+    input.disabled = fixed;
+    if (fixed) row.dataset.zoomFixed = '';
+    else delete row.dataset.zoomFixed;
+    setText(keys, fixed ? ZOOM_FIXED_NOTE : ZOOM_KEYS_HINT);
   };
   input.addEventListener('input', () => {
     zoom?.set?.(clampZoom(Number(input.value) / 100));
@@ -660,6 +666,7 @@ export function zoomSlider(doc, zoom, { id, where, className = 'hud-slider hud-z
     if (['ArrowLeft', 'ArrowRight', 'Home', 'End', 'PageUp', 'PageDown'].includes(e.key)) e.stopPropagation();
   });
   zoom?.onChange?.(draw);
+  zoom?.onFixedChange?.(draw);
   draw();
   return { row, input, draw };
 }

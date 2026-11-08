@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=3e243822';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=127e0a3c';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=a26b11fe';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=79c4544a';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -731,7 +731,7 @@ import { easeCameraAxis } from './js/camera-feel.js?v=e668afc5';
 import { renderResolution, RESOLUTION_STEP } from './js/render-density.js?v=ae0941e5';
 // g458: low energy and mood turn amber and red, and a click offers something from the pack.
 import { vitalMenuEmpty, vitalMenuHeading, vitalSnacks } from './js/vitals.js?v=ca7471dd';
-import { DEFAULT_VP_H, LOCATION_VIEW_W, VIEW_CEIL_H, stageFor, sceneViewCap, sceneViewWidthCap } from './js/location-view.js?v=5a0d5c0b';
+import { DEFAULT_VP_H, LOCATION_VIEW_W, VIEW_CEIL_H, stageFor, sceneViewCap, sceneViewWidthCap, zoomMovesStage } from './js/location-view.js?v=f1f922b4';
 import {
   levelInfoForXp,
   reconcilePlayerProgression,
@@ -759,12 +759,12 @@ import {
 } from './js/screen-fx.js?v=b4ec277f';
 import { momentMoreText } from './js/ui/moment-card.js?v=68e10b61';
 // HUB: the hub is the Modern skin's; Classic owns X in its skin (js/classic/classic-hub.js).
-import { MODERN, onUiModeChange, uiState } from './js/classic/ui-mode.js?v=587c014a';
+import { MODERN, onUiModeChange, uiState } from './js/classic/ui-mode.js?v=11da9030';
 // ZOOM: the world zoom (a device preference) and Classic's frame scale under it; both load before main().
-import { worldZoom, setWorldZoom, stepWorldZoom, onZoomChange, zoomKeyAction, zoomKeyToast } from './js/world-zoom.js?v=b262a6c7';
+import { worldZoom, setWorldZoom, stepWorldZoom, onZoomChange, zoomKeyAction, zoomKeyToast, zoomFixed, setZoomFixed, onZoomFixedChange } from './js/world-zoom.js?v=1d0c0cfb';
 import { nightTint, nightTintOn, onNightTintChange, worldTintOpacity } from './js/night-tint.js?v=1dfc9c89';
 import { streetMapSetting, toggleStreetMap } from './js/ui/street-minimap.js?v=fa31d398';
-import './js/classic/classic-zoom.js?v=1ef4b9a5';
+import './js/classic/classic-zoom.js?v=3e4e5747';
 import { mountImaginationHub } from './js/ui/imagination-hub.js?v=51fa371f';
 import { newDayBubble, shuffleNewDayMessages, waitForScreenGates } from './js/screen-queue.js?v=cf0132c0';
 import { applyFamiliarLook, familiarCardHeading, familiarLook, skillArtFor, skillLearnedActivity } from './js/familiar.js?v=5fd83250';
@@ -959,7 +959,7 @@ import { installHiresIcons } from './js/icon-hires.js?v=165dbd6e';
 import { installHiresDecos } from './js/deco-hires.js?v=cb905e17';
 import { loadAudioLevels, loadMutedPreference, saveAudioLevel, saveMutedPreference } from './js/audio-pref.js?v=6fe817bc';
 import { createAudioBuses, fadeGain } from './js/audio-buses.js?v=af167b54';
-import { installTopBar, renderTopBar } from './js/ui/topbar.js?v=918c8bab';
+import { installTopBar, renderTopBar } from './js/ui/topbar.js?v=57cc6690';
 import { focusBack, installFocusReturn, lastInput } from './js/ui/focus-return.js?v=da190597';
 import { installContextGuard } from './js/ui/context-guard.js?v=0f71ac17';
 import { QUOIN_FRAME_BOB, advanceQuoinClock, quoinBobBetweenFrames } from './js/quoin-motion.js?v=ea0bd408';
@@ -1004,7 +1004,7 @@ import { SLUG_ANIMATION, SLUG_LAYOUT, SLUG_STYLES, SLUG_TARGETS, drawSlugIcon, f
 import { filterText } from './js/word-filter.js?v=9a7a7ebb'; // the remake's own word filter
 import { arrangeMapCards, fitMapExtras } from './js/map-extras.js?v=9f38c312'; // the Map's Shortcuts
 // The interface skin (js/classic/ui-mode.js) sets <html data-ui> as it loads: before main(), so before the boot cover lifts.
-import { installInterfaceSettings } from './js/classic/classic-prefs.js?v=64f4e576';
+import { installInterfaceSettings } from './js/classic/classic-prefs.js?v=0c28fc31';
 
 /** @type {object|null} assets/maps/index.json */
 let mapIndexCache = null;
@@ -1834,23 +1834,36 @@ if (PINNED_VIEW_H > 0) document.documentElement.classList.add('stage-pinned');
  * #game-root leaves under the top bar, the current scene's own width and
  * height (TSMainView's smallest layer), and `viewh` for the pinned layout.
  */
-function measureStage() {
+function stageArgs() {
   const root = document.getElementById('game-root');
   const sceneHeight = sceneViewCap(bgLayer);
-  if (!root) return stageFor({ sceneHeight });
+  if (!root) return { sceneHeight };
   if (PINNED_VIEW_H > 0) {
     const host = app?.canvas?.isConnected ? app.canvas : root;
-    return stageFor({ width: host.getBoundingClientRect().width || root.clientWidth, height: 1, pinnedHeight: PINNED_VIEW_H, sceneHeight });
+    return { width: host.getBoundingClientRect().width || root.clientWidth, height: 1, pinnedHeight: PINNED_VIEW_H, sceneHeight };
   }
-  return stageFor({
+  return {
     width: root.clientWidth,
     height: root.clientHeight,
     packReserve: PACK_VIEW_RESERVE,
     sceneWidth: sceneViewWidthCap(bgLayer, WORLD_W),
     sceneHeight,
-    // ZOOM (js/world-zoom.js): Wide (0) to Original (1), this device's choice.
-    zoom: worldZoom(),
-  });
+  };
+}
+
+function measureStage() {
+  // ZOOM (js/world-zoom.js): Wide (0) to Original (1), this device's choice.
+  return stageFor({ ...stageArgs(), zoom: worldZoom() });
+}
+
+/**
+ * ZOOM FIXED (#149): this street draws the same at every zoom in this window (a narrow
+ * layer caps the view, js/location-view.js zoomMovesStage). Modern only: Classic's zoom also
+ * scales its frame, so the picture always changes there; the pinned QA page ignores zoom.
+ */
+function streetZoomFixed() {
+  if (PINNED_VIEW_H > 0 || !modernUi() || !bgLayer) return false;
+  return !zoomMovesStage(stageArgs());
 }
 
 /**
@@ -1863,6 +1876,7 @@ function syncLocationViewHeight({ keepFraming = false } = {}) {
   viewSceneLayer = bgLayer;
   const before = { viewW: VIEW_W, camX: camTarget };
   const stage = measureStage();
+  setZoomFixed(streetZoomFixed());
   const root = document.getElementById('game-root');
   if (root && !stage.pinned) {
     // Only a view held under the window's height (a portrait phone) leaves a band above the canvas.
@@ -30647,8 +30661,10 @@ async function main() {
     if (zoomKey) {
       e.preventDefault();
       keys.delete(e.key);
+      // #149: on a street that looks the same at every zoom the level stays and the toast says why.
+      const fixed = zoomFixed();
       stepWorldZoom(zoomKey);
-      const said = e.repeat ? '' : zoomKeyToast(zoomKey);
+      const said = e.repeat ? '' : zoomKeyToast(zoomKey, fixed);
       if (said) toast(said, 3000);
       return;
     }
@@ -31658,7 +31674,7 @@ async function main() {
   installFocusReturn(document);
   installTopBar(document, {
     audio: { levels: () => ({ ...audioLevels }), setLevel: setAudioLevel },
-    zoom: { get: worldZoom, set: setWorldZoom, onChange: onZoomChange },
+    zoom: { get: worldZoom, set: setWorldZoom, onChange: onZoomChange, fixed: zoomFixed, onFixedChange: onZoomFixedChange },
     nightTint,
     streetMap: streetMapSetting,
     onImagination: () => (modernUi() && imaginationHub ? imaginationHub.toggle() : document.getElementById('img-btn')?.click()),

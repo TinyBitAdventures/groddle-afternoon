@@ -150,6 +150,19 @@ export function sceneViewWidthCap(layer, worldWidth) {
 }
 
 /**
+ * PURE (#149): whether the zoom changes this stage at all: false when Wide (0) and Original (1)
+ * come out at the same scale, as on a street whose narrowest layer is no wider than the Original
+ * view (sceneViewWidthCap; the original capped its viewport the same way, TSMainView.as 514).
+ * Takes stageFor's arguments without `zoom`.
+ */
+export function zoomMovesStage(args = {}) {
+  if (finite(args.pinnedHeight) > 0) return false;
+  const wide = stageFor({ ...args, zoom: 0 }).scale;
+  const close = stageFor({ ...args, zoom: 1 }).scale;
+  return Math.abs(close - wide) > Math.max(close, wide) * 0.005;
+}
+
+/**
  * The stage for a window (g458, Austin's UI audit): how many CSS px one world
  * px takes (scale) and the view that buys, in world px.
  *
