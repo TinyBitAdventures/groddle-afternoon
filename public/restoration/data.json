@@ -2732,9 +2732,29 @@
   "deployed": "2026-11-08"
  },
  "git": {
-  "commits": 1482,
+  "commits": 1486,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-08",
+    "kind": "improve",
+    "text": "The start card's title is no longer covered on a phone, and every sign-in check skips the console's 400 when signed out"
+   },
+   {
+    "date": "2026-11-08",
+    "kind": "fix",
+    "text": "Fewer floors are wrongly marked out of reach, so quoins, rocks and animals can be placed on more of them"
+   },
+   {
+    "date": "2026-11-08",
+    "kind": "fix",
+    "text": "The Rube points the way when you talk to him in his yard during The Wrizzards and The Rube"
+   },
+   {
+    "date": "2026-11-08",
+    "kind": "fix",
+    "text": "Zoom says so on streets that look the same at every zoom"
+   },
    {
     "date": "2026-11-08",
     "kind": "new",
@@ -2834,26 +2854,6 @@
     "date": "2026-11-07",
     "kind": "fix",
     "text": "/stuck in Wintry Place takes you to the way out on the floor, and its hint only counts the slot you can't jump out of"
-   },
-   {
-    "date": "2026-11-07",
-    "kind": "improve",
-    "text": "A deploy can keep files that left the game for one release"
-   },
-   {
-    "date": "2026-11-07",
-    "kind": "fix",
-    "text": "A chat command with a walking key's letter in front (\"d/home\", \"a/leave\") runs instead of going out as chat"
-   },
-   {
-    "date": "2026-11-07",
-    "kind": "improve",
-    "text": "Game pictures load as lossless WebP, 48.8 MB smaller with identical pixels"
-   },
-   {
-    "date": "2026-11-07",
-    "kind": "improve",
-    "text": "Groddle Meadow, Groddle Forest and Alakol have redone map paintings, closer to the originals' olive felt"
    }
   ]
  },

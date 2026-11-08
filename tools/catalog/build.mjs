@@ -584,6 +584,7 @@ function evidenceWay(evidence, quests, takeable) {
   if (/^drop:egg_plant_pet/.test(ob)) return 'Petting an Egg Plant can drop one, any time of year.';
   if (/^drop:/.test(ob)) return 'A drop you can get as you play.';
   if (/^collection:/.test(ob)) return 'A reward for finishing a collection.';
+  if (/collection-trophies-feature\.js/.test(ob)) return 'A reward for finishing a collection.';
   if (/^season/.test(ob)) return 'Only while its holiday is on in the remake.';
   if (/^starter/.test(ob)) return 'Every new player starts with one.';
   if (/^reward of badge/.test(ob)) return 'A reward for finishing a collection.';

@@ -1986,5 +1986,10 @@
  },
  "item:petrified_rock_small": {
   "reason": "how: The reward for finishing a Feat, which opens again a game week later for another (js/features/solo-feats-feature.js:225-227, REWARD_ITEM in js/solo-feats.js:69)"
+ },
+ "quest:bogspecialization_harvest_full_peat_bog_in_time_period": {
+  "mp": "game 34f7f6856b, server fa3c6f5",
+  "mpReason": "peat-quest.js + objects_peat.go: the server judges the shared bog; takes four players (two with the upgrade), so solo no longer offers it (Austin 2026-11-07)",
+  "register": "G451"
  }
 }

@@ -1011,7 +1011,7 @@
 {"s":"quests","id":"block_party","n":"Block Party","g":"Skill quests","st":"source","ic":"assets/ui/quest-book.webp","h":"encyclopedia/quests/block_party/"},
 {"s":"quests","id":"blue_and_white_part1","n":"A Summer's Day","g":"Quests with their own place","st":"source","ic":"assets/ui/quest-book.webp","h":"encyclopedia/quests/blue_and_white_part1/"},
 {"s":"quests","id":"blue_and_white_part2","n":"A Summer's Day","g":"Quests with their own place","st":"source","ic":"assets/ui/quest-book.webp","h":"encyclopedia/quests/blue_and_white_part2/"},
-{"s":"quests","id":"bogspecialization_harvest_full_peat_bog_in_time_period","n":"Peter out Peat","g":"Skill quests","st":"source","ic":"assets/ui/quest-book.webp","h":"encyclopedia/quests/bogspecialization_harvest_full_peat_bog_in_time_period/"},
+{"s":"quests","id":"bogspecialization_harvest_full_peat_bog_in_time_period","n":"Peter out Peat","g":"Skill quests","st":"multiplayer","ic":"assets/ui/quest-book.webp","h":"encyclopedia/quests/bogspecialization_harvest_full_peat_bog_in_time_period/"},
 {"s":"quests","id":"botany_make_tree_beans","n":"Advanced Bean Fancification","g":"Skill quests","st":"source","ic":"assets/ui/quest-book.webp","h":"encyclopedia/quests/botany_make_tree_beans/"},
 {"s":"quests","id":"brain_freezer","n":"Brain Freezer","g":"Other quests","st":"source","ic":"assets/ui/quest-book.webp","h":"encyclopedia/quests/brain_freezer/"},
 {"s":"quests","id":"btc_room_3","n":"An Old Fashioned B&E","g":"Quests with their own place","st":"rebuilt","ic":"assets/ui/quest-book.webp","h":"encyclopedia/quests/btc_room_3/"},
