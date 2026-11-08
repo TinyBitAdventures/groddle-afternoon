@@ -371,6 +371,9 @@ function signKeyCap(PIXI, n) {
   text.anchor.set(0.5, 0.5);
   text.y = 0.5;
   cap.addChild(box, text);
+  // Drawn once into a 3x texture: a thin vector outline re-rasterized at a fractional spot every
+  // frame the camera moves made the box edge shimmer; a baked texture glides smoothly between pixels.
+  if (typeof cap.cacheAsTexture === 'function') cap.cacheAsTexture({ resolution: SIGN_TEXT_RESOLUTION, antialias: true });
   return cap;
 }
 
