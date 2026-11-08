@@ -20,6 +20,7 @@ import {
   syncObjs,
 } from '../public/js/rook-mp.js?v=0b724b8c';
 import { rookClockS, canStrike, canStun, rookPresent } from '../public/js/rook-attack.js?v=0382c223';
+import { orbGlowIds } from '../public/js/features/rook-attack-feature.js?v=7ec58dcf';
 import { HAS_SERVER, serverPath, skipWithoutServer } from '../tools/repos.mjs';
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -211,5 +212,25 @@ describe('rook-mp: wiring', () => {
       .filter(([id]) => !(data.values[id] >= 10))
       .map(([id]) => id);
     assert.deepEqual(missing, [], 'worth 1 damage or more in the source, unpriced on the server');
+  });
+});
+
+describe('G390: the power-up glow at every orb player\'s feet online', () => {
+  it('lights the initiator and each joiner until their orb fires (inc_rook.js 346, 432-451, 617)', () => {
+    const glows = orbGlowIds([
+      { by: 7, joiners: [8, 9], fireAt: 15000 },
+      { by: 11, joiners: [], fireAt: 20000 },
+    ]);
+    assert.deepEqual([...glows.entries()], [[7, 15000], [8, 15000], [9, 15000], [11, 20000]]);
+    assert.equal(orbGlowIds([]).size, 0);
+  });
+
+  it('draws avatar_power_up from the shared state, so a late arrival sees them (sendGlowMsgToNewPlayer 416-429)', () => {
+    const src = fs.readFileSync(path.join(root, 'public/js/features/rook-attack-feature.js'), 'utf8');
+    const sync = src.slice(src.indexOf('function mpSyncGlows'), src.indexOf('function mpDropGlow('));
+    assert.match(sync, /playOverlay\(engine\.PIXI, 'avatar_power_up'/);
+    assert.match(src, /mpSyncGlows\(engine, orbs, t\);/);
+    // Dropped when the street, the attack or the Rook goes.
+    assert.equal((src.match(/mpDropGlows\(\);/g) || []).length, 3);
   });
 });

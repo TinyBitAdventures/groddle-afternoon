@@ -2219,6 +2219,7 @@ function mpPosOf(engine, id) {
 
 function mpLeaveStreet(engine) {
   for (const by of [...mp.arts.keys()]) mpDropArt(by);
+  mpDropGlows();
   if (mp.attack) stopMusic();
   mp.attack = null;
   mp.slot.rooked = {};
@@ -2289,6 +2290,7 @@ function mpOnRook(engine, msg) {
   if (!a && before) {
     stopMusic();
     for (const by of [...mp.arts.keys()]) mpDropArt(by);
+    mpDropGlows();
   }
   mpSyncPrimed(engine);
   syncRookedVisuals(engine, rookableTargets(engine));
@@ -2438,6 +2440,7 @@ function mpDefeatFx(engine) {
   youDidItRainbow(engine);
   engine.playSound('RAINBOW_YOUDIDIT', { volume: 0.7 });
   for (const by of [...mp.arts.keys()]) mpDropArt(by);
+  mpDropGlows();
   lastAction = 'defeated';
 }
 
@@ -2659,6 +2662,66 @@ function mpDrawOrbs(engine) {
     art.root.y = pos.y - ORB_ART.orbAbove;
     art.count.text = String(o.joiners.length);
   }
+  mpSyncGlows(engine, orbs, t);
+}
+
+/**
+ * G390: avatar_power_up at the feet of an orb's initiator and of every player
+ * who joined it, for the rest of its 15 s window (inc_rook.js sendGlowMsg
+ * 432-451, called on the starter at 346 and each joiner at 617). Everyone on
+ * the street sees it, and a player who arrives mid-orb sees the glows already
+ * lit (sendGlowMsgToNewPlayer 416-429 from onPlayerEnterRooked 643): the
+ * shared attack state carries each orb's joiners, so every game draws them.
+ */
+export function orbGlowIds(orbs) {
+  const out = new Map();
+  for (const o of orbs || []) {
+    for (const id of [o.by, ...(o.joiners || [])]) {
+      if (id == null || out.has(id)) continue;
+      out.set(id, Number(o.fireAt) || 0);
+    }
+  }
+  return out;
+}
+
+function mpSyncGlows(engine, orbs, t) {
+  if (!mp.glows) mp.glows = new Map();
+  const want = orbGlowIds(orbs);
+  for (const id of [...mp.glows.keys()]) if (!want.has(id)) mpDropGlow(id);
+  for (const [id, fireAt] of want) {
+    if (mp.glows.has(id)) continue;
+    let last = mpPosOf(engine, id);
+    if (!last) continue;
+    const handle = playOverlay(engine.PIXI, 'avatar_power_up', {
+      layer: frontLayer(engine),
+      at: () => {
+        const p = mpPosOf(engine, id);
+        if (p) last = p;
+        return { x: last.x, y: last.y };
+      },
+      // duration: (start_time - time() + 15) * 1000, the orb's own window left (+1 s, as the solo glow).
+      durationMs: Math.max(1000, fireAt - t) + 1000,
+      state: OVERLAY_USES.avatar_power_up.state,
+      zIndex: 38,
+    });
+    mp.glows.set(id, handle);
+  }
+  const shown = [...mp.glows.keys()].sort((a, b) => a - b).join(',');
+  if (shown !== mp.glowsShown) {
+    mp.glowsShown = shown;
+    engine.setData?.('rookGlows', shown);
+  }
+}
+
+function mpDropGlow(id) {
+  const g = mp?.glows?.get(id);
+  if (!g) return;
+  mp.glows.delete(id);
+  g.stop?.();
+}
+
+function mpDropGlows() {
+  for (const id of [...(mp?.glows?.keys() || [])]) mpDropGlow(id);
 }
 
 function mpDropArt(by) {
