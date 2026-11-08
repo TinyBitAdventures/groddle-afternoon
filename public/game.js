@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=1d0c533d';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=127e0a3c';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=4560f9eb';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=5a3f7f15';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -429,9 +429,9 @@ import {
   canLearnSkill,
   listLearnedSkills,
 } from './js/skills.js?v=4542bdf9';
-import { skillTitle, skillTreeCounts, spendEmblemForSkill, studyPillName } from './js/skill-tree.js?v=53795620';
+import { skillTitle, skillTreeCounts, spendEmblemForSkill, studyPillName } from './js/skill-tree.js?v=faa54b90';
 import { CARD_ART_LAYERS } from './js/imagination-data.js?v=4a85e7fe';
-import { renderSkillTreePanel, focusSkillInPanel } from './js/skills-panel.js?v=52f7c25f';
+import { renderSkillTreePanel, focusSkillInPanel } from './js/skills-panel.js?v=cef381ab';
 import {
   createBuffState,
   applyBuff,
@@ -499,7 +499,7 @@ import {
   parsePlayerSave,
   serializePlayerSave,
   restorePlayerSave,
-} from './js/player-save.js?v=db065254';
+} from './js/player-save.js?v=9c00cbd7';
 import {
   HOME_INTERIOR_TSID,
   HOME_STREET_TSID,
@@ -865,7 +865,7 @@ import {
   favorRelationNote,
   emblemRelationNote,
   formatSpeedUpTime,
-} from './js/shrines.js?v=1a945fe7';
+} from './js/shrines.js?v=3170dbdb';
 import { giantDisplayName } from './js/giant-names.js?v=0e295891';
 import { shrinePowderOptions, shrinePowderAchievementCounters } from './js/powders.js?v=fa5d1e41';
 import {
@@ -26125,6 +26125,8 @@ function renderSkillsPanel() {
       encyclopediaLink: (id) => encyclopedia.link(document, { section: 'skills', id }, 'skill-ency'),
       // Unlearning (features/unlearning-feature.js): progress + per-skill check.
       unlearning: features.query('skillUnlearning', engine),
+      // G330: a multiplayer game shows the notes of skills that need other players as working.
+      online: engine.mode === 'multiplayer',
     },
     actions: {
       start: (id) => runSkillStudyAction(id, 'start'),

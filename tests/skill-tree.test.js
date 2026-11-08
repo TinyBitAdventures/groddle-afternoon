@@ -22,7 +22,7 @@ import {
   emblemUnlockFor,
   spendEmblemForSkill,
   skillTitle,
-} from '../public/js/skill-tree.js?v=53795620';
+} from '../public/js/skill-tree.js?v=faa54b90';
 
 const root = join(import.meta.dirname, '..', 'public');
 
@@ -106,5 +106,24 @@ describe('Skills panel wiring', () => {
     for (const selector of ['.skill-tree-toolbar', '.skill-tree-chip.is-active', '.skill-pip.is-learned', '.skill-remake.is-later']) {
       assert.ok(css.includes(selector), selector);
     }
+  });
+});
+
+describe('G330: skills that need other players read as working online', () => {
+  it('shows Transcendental Radiation as live in a multiplayer game, and needing players in solo', () => {
+    const state = createSkillState();
+    for (const id of ['transcendental_radiation_1', 'transcendental_radiation_2', 'transcendental_radiation_3']) {
+      const solo = skillTreeEntry(state, id, {});
+      assert.equal(solo.remake.status, 'multiplayer');
+      assert.equal(solo.remake.label, 'Needs other players');
+      const online = skillTreeEntry(state, id, { online: true });
+      assert.equal(online.remake.status, 'live');
+      assert.equal(online.remake.label, 'Works here');
+      assert.match(online.remake.note, /Sharing the Oneness/);
+    }
+    // The audit table (and the restoration page) keeps the solo view.
+    assert.equal(skillAuditTable().find((r) => r.classTsid === 'transcendental_radiation_1').status, 'multiplayer');
+    // A family without an online note reads the same either way.
+    assert.deepEqual(skillTreeEntry(state, 'mining_1', { online: true }).remake, skillTreeEntry(state, 'mining_1', {}).remake);
   });
 });

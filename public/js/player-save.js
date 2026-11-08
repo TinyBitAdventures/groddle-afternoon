@@ -1,5 +1,5 @@
 /** Persistent player systems + per-street world snapshot. */
-import { normalizeShrineState } from './shrines.js?v=1a945fe7';
+import { normalizeShrineState } from './shrines.js?v=3170dbdb';
 import { normalizeQuoinState } from './quoins.js?v=299cc3f4';
 import { normalizeToolConditionState, syncToolCopies } from './tools.js?v=eff5ef6f';
 import { normalizeSkillState } from './skills.js?v=4542bdf9';

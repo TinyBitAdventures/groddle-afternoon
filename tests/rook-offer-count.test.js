@@ -15,7 +15,7 @@ import { readFileSync } from 'node:fs';
 import { FakeEl, FakeText } from './social-fake-dom.js';
 import { offerDefaultCount, strikeDamageFor } from '../public/js/rook-attack.js?v=0382c223';
 import { strikeDamage as mpStrikeDamage } from '../public/js/rook-mp.js?v=0b724b8c';
-import { donationValueFor } from '../public/js/shrines.js?v=1a945fe7';
+import { donationValueFor } from '../public/js/shrines.js?v=3170dbdb';
 
 const src = (p) => readFileSync(new URL(`../public/${p}`, import.meta.url), 'utf8');
 

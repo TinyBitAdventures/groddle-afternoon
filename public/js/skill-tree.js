@@ -274,6 +274,11 @@ export const SKILL_REMAKE_NOTES = Object.freeze({
   'Transcendental Radiation': {
     status: 'multiplayer',
     note: 'Radiates mood to other players nearby, so it does nothing on a solo street.',
+    // G330: what the panel says in a multiplayer game, where it works (radiance.go, radiance-mp.js).
+    online: {
+      status: 'live',
+      note: 'With a Focusing Orb, radiates mood and energy to the players near you for a while. Each rank reaches further, lasts longer and gives more. Rank II needs the quest Sharing the Oneness (radiate to five players at once); rank III needs the Transcendental Radius II upgrade.',
+    },
   },
   'Martial Imagination': {
     status: 'partial',
@@ -352,16 +357,21 @@ export function skillCategoryName(def) {
   return SKILL_CATEGORIES[def?.categoryId] || 'Other';
 }
 
-/** Honest remake note for one skill: { status, label, note }. */
-export function skillRemakeNote(classTsid) {
+/**
+ * Honest remake note for one skill: { status, label, note }. `online` (a
+ * multiplayer game) uses a family's `online` note where it has one: a skill
+ * that needs other players works there (G330).
+ */
+export function skillRemakeNote(classTsid, { online = false } = {}) {
   const def = catalog()[classTsid];
   const family = def ? SKILL_REMAKE_NOTES[def.name] : null;
   const rank = family?.ranks?.[classTsid] || {};
-  const status = rank.status || family?.status || 'later';
+  const there = online && family?.online ? family.online : null;
+  const status = there?.status || rank.status || family?.status || 'later';
   return {
     status,
     label: REMAKE_STATUS[status] || REMAKE_STATUS.later,
-    note: rank.note || family?.note || 'What this skill unlocks is not here yet.',
+    note: there?.note || rank.note || family?.note || 'What this skill unlocks is not here yet.',
   };
 }
 
@@ -510,7 +520,7 @@ export function skillTreeEntry(state, classTsid, ctx = {}, now = Date.now()) {
     prerequisites: prerequisiteRows(state, classTsid, ctx),
     chain: prerequisiteChain(classTsid),
     unlocks: unlocksAfter(classTsid),
-    remake: skillRemakeNote(classTsid),
+    remake: skillRemakeNote(classTsid, { online: ctx.online === true }),
     emblem: emblemUnlockFor(classTsid),
   };
 }

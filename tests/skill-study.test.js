@@ -21,7 +21,7 @@ import {
   tickSkillStudy,
 } from '../public/js/skills.js?v=4542bdf9';
 import { brainCapacityRescale } from '../public/js/imagination-effects.js?v=70169933';
-import { studyPillName } from '../public/js/skill-tree.js?v=53795620';
+import { studyPillName } from '../public/js/skill-tree.js?v=faa54b90';
 
 const root = join(import.meta.dirname, '..', 'public');
 

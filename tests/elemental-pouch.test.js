@@ -28,13 +28,13 @@ import {
 import { bagsFeature } from '../public/js/features/bags-feature.js?v=1a8252c1';
 import { runMoreVerb } from '../public/js/features/item-verbs-more-feature.js?v=51e76da6';
 import { pouchFeature } from '../public/js/features/elemental-pouch-feature.js?v=52e45e2a';
-import { FEATURES } from '../public/js/features/index.js?v=4560f9eb';
+import { FEATURES } from '../public/js/features/index.js?v=5a3f7f15';
 import { ITEM_CATALOG, countItem, createInventory } from '../public/js/inventory.js?v=b7609342';
 import { STORE_CATALOG } from '../public/js/store-catalog.js?v=74b56af3';
 import { VENDOR_PROFILES, vendorBuy } from '../public/js/vendor.js?v=afdebbe1';
 import { IMAGINATION_UPGRADES } from '../public/js/imagination.js?v=6adb7b9a';
 import { isOfferedInRemake, remakeStatus } from '../public/js/imagination-remake.js?v=c37ad887';
-import { SKILL_REMAKE_NOTES } from '../public/js/skill-tree.js?v=53795620';
+import { SKILL_REMAKE_NOTES } from '../public/js/skill-tree.js?v=faa54b90';
 import { loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js?v=10b118dd';
 import { createQuestState } from '../public/js/quests.js?v=c8d9d0a4';
 import { acceptOffer, pendingQuestOffers, syncItemRequirements, turnInQuest } from '../public/js/quest-offers.js?v=a304c912';

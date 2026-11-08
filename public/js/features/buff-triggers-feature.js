@@ -60,9 +60,9 @@ import { itemVerbAchievementCounters } from '../item-verbs.js?v=1e20fa7d';
 // The same module instances js/features/index.js registers (tests/buff-triggers.test.js checks the tags).
 import { meditationFeature } from './meditation-feature.js?v=46025cfa';
 import { teleportationFeature } from './teleportation-feature.js?v=627cf405';
-import { rookAttackFeature } from './rook-attack-feature.js?v=7ec58dcf';
+import { rookAttackFeature } from './rook-attack-feature.js?v=a52f9952';
 import { rubeFeature } from './rube-feature.js?v=e131eebe';
-import { smugglingFeature } from './smuggling-feature.js?v=648ba0db';
+import { smugglingFeature } from './smuggling-feature.js?v=9ea2212a';
 import { hellFeature } from './hell-feature.js?v=93f1c8dd';
 import { isPooped } from '../hell.js?v=ca971c34';
 
