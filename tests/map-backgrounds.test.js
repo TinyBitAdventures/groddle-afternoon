@@ -239,4 +239,57 @@ describe('region map backgrounds (tools/map-backgrounds/build.mjs)', () => {
     assert.equal(isPlaceholderMap(hub(77).bg), false);
     assert.equal(buildHubMapView(hub(77), '', STREETS).bgPlaceholder, false);
   });
+
+  /**
+   * G569 follow-up (Austin 2026-11-07: "Check the source first, then grey them if they used the
+   * placeholder"). The six unpainted hubs left after G569 each had a painting of their own in the
+   * original, so none goes grey: they keep the drawn terrain until a painting turns up. What the
+   * original did, per hub (GSJS inc_data_maps_prod.js maps_get_hubs_<id>; client HubMapDialog.as;
+   * street flags from the archived G*.xml; the 2012 encyclopedia copies are in
+   * research/wayback/raw/c1-img/maps_encyclopedia, reference only, never shipped):
+   */
+  const OWN_LOST_MAPS = Object.freeze({
+    // map_bg_purgatory_69074.jpg + an fg. A dark red cavern with a spiral path (encyclopedia
+    // naraka_124737.jpg). The client showed it only to the dead: "You can only see the map of
+    // Naraka when you're dead." (HubMapDialog.as 475-484, Hub.HELL_TSID '40').
+    40: { name: 'Naraka', file: 'map_bg_purgatory_69074.jpg' },
+    // + an fg. Blue-grey rock with the tunnels cut through it (encyclopedia ilmenskie_caverns_77122.jpg).
+    50: { name: 'Ilmenskie Caverns', file: 'map_bg_ilmenskie_caverns_43684.jpg' },
+    // + an fg. Grey rock, tunnels and caverns (encyclopedia ilmenskie_deeps_77122.jpg).
+    78: { name: 'Ilmenskie Deeps', file: 'map_bg_ilmenskie_deep_48415.jpg' },
+    // No copy or footage. Distant End's street sets no_hubmap (map not available there).
+    66: { name: 'The Seams', file: 'map_bg_seamstreet_56971.jpg' },
+    // + an fg. No thumbnail, copy or footage (research/zone-art/map-jethimadh-tower-base/pack.md).
+    77: { name: 'Jethimadh Tower: Base', file: 'map_bg_jethimadh_tower_base_45753.jpg' },
+    // No copy or footage. The tutorial hid the map until the Mappery card (newbie_island.js 250, 298).
+    129: { name: 'Gentle Island', file: 'gentle_island_bg_1343348721.jpg' },
+    // An isometric patchwork of coloured tiles (encyclopedia moshi_moshi_oshilatis_123487.jpg), but all
+    // seven streets set no_hubmap, so the map window never opened there ("The map is not available
+    // in this location", HubMapDialog.as 468-471).
+    142: { name: 'Moshi Moshi Oshilatis', file: 'moshi_moshi_oshilatis_bg_1352509438.jpg' },
+  });
+
+  it('G569: the unpainted hubs with a lost map of their own stay drawn, not placeholder grey', () => {
+    const gsjsPath = join(root, '../glitch-GameServerJS/inc_data_maps_prod.js');
+    const gsjs = existsSync(gsjsPath) ? readFileSync(gsjsPath, 'utf8') : '';
+    for (const [id, { name, file }] of Object.entries(OWN_LOST_MAPS)) {
+      const data = hub(id);
+      assert.equal(data.hubName, name, id);
+      assert.ok(data.bg.endsWith(`/${file}`), `${name}: its own map ${file}, not ${data.bg}`);
+      assert.equal(isPlaceholderMap(data.bg), false, name);
+      assert.notEqual(data.top_color, PLACEHOLDER_MAP_COLOURS.top, `${name} records its own colours`);
+      if (gsjs) {
+        const block = gsjs.match(new RegExp(`function maps_get_hubs_${id}\\(\\)\\{[\\s\\S]*?\\n\\t\\}`))?.[0] || '';
+        assert.ok(block.includes(file), `${name}: GSJS names ${file}`);
+        assert.ok(!block.includes('map_fake_island'), `${name}: GSJS is not the placeholder`);
+      }
+      const view = buildHubMapView(data, '', STREETS);
+      assert.equal(view.bgPlaceholder, false, name);
+      if (view.bgLocal || view.bgSoft) continue; // a painting of ours, once one exists, wins
+      const svg = renderHubMapSvg(view);
+      assert.match(svg, /<rect class="map-terrain" [^>]*fill="url\(#hubTerrain\)"/, name);
+      assert.doesNotMatch(svg, /hubPlaceholder/, name);
+      assert.equal(hubMapArtNote(view), 'geometry only', name);
+    }
+  });
 });
