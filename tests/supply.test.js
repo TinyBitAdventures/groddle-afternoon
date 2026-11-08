@@ -23,13 +23,13 @@ import {
   advanceStill,
   collectHooch,
 } from '../public/js/machines.js?v=663980c9';
-import { runTransform, listTransformVerbs, transformCountMax, transformEdges, transformVerbCount } from '../public/js/item-transforms.js?v=28c06c6c';
+import { runTransform, listTransformVerbs, transformCountMax, transformEdges, transformVerbCount } from '../public/js/item-transforms.js?v=b743bdca';
 import { RECIPE_CATALOG, craftRecipe, loadRecipeCatalogFromFile } from '../public/js/making.js?v=f4f214c2';
 import { VENDOR_PROFILES } from '../public/js/vendor.js?v=307aca18';
 import { SEED_CATALOG } from '../public/js/garden.js?v=e1c3415c';
 import { obtainableItems } from '../tools/job-obtainable.mjs';
 import { supplyReport } from '../tools/supply-report.mjs';
-import { supplyFeature } from '../public/js/features/supply-feature.js?v=850f2c1f';
+import { supplyFeature } from '../public/js/features/supply-feature.js?v=19ce56d1';
 
 const SPIKE = join(dirname(fileURLToPath(import.meta.url)), '..', 'public');
 const ENGINEER = ['engineering_1'];
@@ -190,7 +190,7 @@ describe('pack transforms', () => {
     assert.ok(ids.includes('poke:1') && !ids.includes('poke:all'), ids.join());
     assert.ok(ids.includes('age:count'), 'age still asks how many of the stack');
     const poke = runTransform('cheese_very_stinky', 'poke', 1, inv, pc);
-    assert.equal(poke.msg, "You poked a Very Stinky Cheese. After sticking an investigatory pinkie in the soft, gooey cheese, you encounter a hard object. You pull it out. It's a small shiny object with no intrinsic value! -10 Energy");
+    assert.equal(poke.msg, "You poked a Very Stinky Cheese. After sticking an investigatory pinkie in the soft, gooey cheese, you encounter a hard object. You pull it out. It's a small shiny object with no intrinsic value! The cheese you poked is Stinky Cheese now. -10 Energy");
     const shake = runTransform('milk_butterfly', 'shake', 'all', inv, pc);
     assert.equal(shake.msg, 'You shook 3 Butterfly Milks. You shake the butterfly milk vigorously. Butterfly butter! -6 Energy +3 Butterfly Butter');
     // The pack verb reports the verb (notifyVerb) and the quest's counter is the class the source counts.

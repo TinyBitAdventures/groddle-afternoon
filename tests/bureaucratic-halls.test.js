@@ -17,7 +17,7 @@ import {
   bureaucraticHallsFeature,
   hallSceneTsid,
 } from '../public/js/features/bureaucratic-halls-feature.js?v=89a989ad';
-import { supplyFeature } from '../public/js/features/supply-feature.js?v=850f2c1f';
+import { supplyFeature } from '../public/js/features/supply-feature.js?v=19ce56d1';
 import { LEGALIZE_HALL_TSID } from '../public/js/legalize-it.js?v=ffce7efe';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');

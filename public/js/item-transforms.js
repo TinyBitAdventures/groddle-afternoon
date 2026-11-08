@@ -73,6 +73,9 @@ export const ITEM_TRANSFORMS = Object.freeze({
       out: 'small_worthless',
       energy: 10,
       becomes: 'cheese_stinky',
+      // #140: replaceWith('cheese_stinky', pc) (cheese_very_stinky.js 333) said nothing; our own line,
+      // so the Stinky Cheese that turns up in the pack doesn't read as a copy.
+      becameLine: 'The cheese you poked is Stinky Cheese now.',
       tooltip: 'Investigate with a pinkie.',
       line: "After sticking an investigatory pinkie in the soft, gooey cheese, you encounter a hard object. You pull it out. It's a small shiny object with no intrinsic value!",
       source: 'cheese_very_stinky.js poke',
@@ -251,7 +254,7 @@ function verbLine(t, n, line, check) {
   const effects = [`-${check.energy} Energy`];
   if (check.mood) effects.push(`-${check.mood} Mood`);
   if (t.gives) effects.push(`+${n} ${t.gives}`);
-  return `You ${t.past} ${n > 1 ? `${n} ${plural}` : `${article} ${single}`}. ${line} ${effects.join(' ')}`;
+  return `You ${t.past} ${n > 1 ? `${n} ${plural}` : `${article} ${single}`}. ${line}${t.becameLine ? ` ${t.becameLine}` : ''} ${effects.join(' ')}`;
 }
 
 function shuck(classTsid, n, inv, pc, learned, rng) {

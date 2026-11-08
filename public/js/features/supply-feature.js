@@ -52,7 +52,7 @@ import {
   stillEtaSeconds,
   stillRoom,
 } from '../machines.js?v=663980c9';
-import { HERB_SEEDS, ITEM_TRANSFORMS, listTransformVerbs, runTransform, transformVerbCount } from '../item-transforms.js?v=28c06c6c';
+import { HERB_SEEDS, ITEM_TRANSFORMS, listTransformVerbs, runTransform, transformVerbCount } from '../item-transforms.js?v=b743bdca';
 import {
   BUREAUCRACY_ITEMS,
   HALL_STREETS,
