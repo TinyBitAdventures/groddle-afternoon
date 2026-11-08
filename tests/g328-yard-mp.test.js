@@ -27,7 +27,7 @@ import {
   visitorTreeState,
 } from '../public/js/yard-verbs-mp.js?v=0533dbd8';
 import { FIREFLY_JAR_FULL, STOCK_NODE_VERBS, applyStockAct, homeNodes } from '../public/js/yard-stock-mp.js?v=a502e667';
-import { yardVerbsMpFeature } from '../public/js/features/yard-verbs-mp-feature.js?v=3c2f93c2';
+import { yardVerbsMpFeature } from '../public/js/features/yard-verbs-mp-feature.js?v=2aa87b0c';
 import { HAS_SERVER, HAS_SITE, SITE_DIR, serverPath, sitePath } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');

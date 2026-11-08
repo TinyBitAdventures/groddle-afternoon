@@ -132,7 +132,7 @@ describe('original-style target-item feed picker', () => {
     assert.match(game, /function feedPickerQtyBack\(\) \{[\s\S]*?closeFeedPicker\('back'\);[\s\S]*?backToVerbPickLevel\(target, verb, food\)/);
     assert.match(game, /function backToVerbPickLevel\(target, verb, food\) \{[\s\S]*?openVerbPickLevel\(target, verb, null, food\)/);
     // engine.openPicker (a pack baby's Feed, the husbandry demos) still opens the panel's own grid.
-    assert.match(game, /openPicker: \(target, verb\) => openFeedPicker\(target, verb\),/);
+    assert.match(game, /openPicker: \(target, verb, pick = ''\) => openFeedPicker\(target, verb, pick\),/);
     // Both skins draw the tiles.
     assert.match(css, /\[data-ui="modern"\] #verb-menu \.vm-picks \{[\s\S]*?grid-template-columns: repeat\(var\(--vm-pick-cols, 4\), 50px\)/);
     assert.match(css, /\[data-ui="modern"\] #verb-menu \.vm-row\.vm-pick \{/);

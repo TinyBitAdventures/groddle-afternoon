@@ -3029,3 +3029,15 @@
    Arial bold 11, label_c 0x005c73, label_hover_c 0xd79035). */
 :root[data-ui="classic"] .ency-link { color: var(--c-classic-link); font-family: var(--font-arial); font-size: var(--fs-xs); font-weight: var(--fw-bold); }
 :root[data-ui="classic"] .ency-link:is(:hover, :focus-visible) { color: var(--c-classic-contact-hover); }
+
+/* == WORLDDROP == a pack stack's drop tip over a thing (features/world-drop-feature.js), in the client's
+   pale yellow tip (TipDisplayManager), as the pack's own tip. */
+:root[data-ui="classic"] .world-drop-tip {
+  border: 1px solid color-mix(in srgb, var(--c-classic-ink) 37%, transparent);
+  border-radius: 3px;
+  background: var(--c-classic-tip);
+  box-shadow: 0 1px 2px color-mix(in srgb, var(--c-classic-ink) 15%, transparent);
+  color: var(--c-classic-text);
+  font: var(--fs-classic-body)/var(--lh-tight) var(--font-classic-body);
+}
+:root[data-ui="classic"] .world-drop-tip.is-no { color: var(--c-classic-debuff); }

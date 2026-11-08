@@ -383,7 +383,7 @@ describe('Animal husbandry wiring', () => {
     const game = readFileSync(join(publicDir, 'game.js'), 'utf8');
     assert.match(game, /animal_max_reward:\$\{target\.classId\}/);
     assert.match(game, /skill_package_drop:\$\{target\.classId\}/);
-    assert.match(game, /openPicker: \(target, verb\) => openFeedPicker\(target, verb\)/);
+    assert.match(game, /openPicker: \(target, verb, pick = ''\) => openFeedPicker\(target, verb, pick\)/);
     const recipes = JSON.parse(readFileSync(join(publicDir, 'assets/content/recipes.json'), 'utf8'));
     const outputs = Object.values(recipes.recipes || recipes).flatMap((r) => (r.outputs || []).map((o) => o.classTsid));
     for (const id of ['meat_collector', 'butterfly_milker', 'piggy_feeder']) assert.ok(outputs.includes(id), id);

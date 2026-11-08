@@ -10837,6 +10837,16 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
 #study-chip .study-chip-time { flex: none; }
 /* Phone width: the bar is tight, so the name gives way first (the time always shows). */
 @media (max-width: 560px) { #study-chip .study-chip-name { max-width: 64px; } }
+/* A pack stack dragged over a thing that takes it (features/world-drop-feature.js, register G588): the
+   verb's drop tip by the pointer, red with the reason when the verb can't run now. */
+.world-drop-tip {
+  position: fixed; z-index: calc(var(--z-dialog) + 6); pointer-events: none; transform: translate(14px, 10px);
+  padding: var(--sp-1) var(--sp-3); border-radius: var(--radius-sm); background: var(--surface-card); color: var(--text);
+  box-shadow: var(--shadow-2); font: 700 var(--fs-sm)/var(--lh-snug) var(--font-system); white-space: nowrap;
+}
+.world-drop-tip[hidden] { display: none; }
+.world-drop-tip.is-left { transform: translate(calc(-100% - 14px), 10px); }
+.world-drop-tip.is-no { color: var(--c-red-53d); }
 /* A narrow window (topbar.js fitTopActions): the study pill keeps only its number or time, then
    Map, Make and Quests leave the bar for the Menu's World group. */
 #study-chip .study-chip-short { display: none; }

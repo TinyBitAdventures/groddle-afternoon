@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=108ab200';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=127e0a3c';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=bab081dc';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=b8c4427d';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -513,7 +513,7 @@ import {
   imagineHome,
   isHomePlaceTsid,
 } from './js/homes.js?v=631ab6b8';
-import { HOME_MACHINE, offerHomeTicket, renderTicketMachine } from './js/home-ticket.js?v=7512f173';
+import { HOME_MACHINE, offerHomeTicket, renderTicketMachine } from './js/home-ticket.js?v=69769c2f';
 import {
   MAIL_COMPANIONS,
   archiveMail,
@@ -11880,7 +11880,7 @@ const engine = {
   interactableAt: (x, y) => pickInteractableAt(x, y),
   closeVerbMenu: () => closeVerbMenu(),
   /** The menu's way into a verb: walks into reach first (a drop on a thing, features/garden-guano-feature.js). */
-  requestVerb: (target, verb) => requestVerb(target, verb),
+  requestVerb: (target, verb, opts) => requestVerb(target, verb, opts),
   /**
    * Multiplayer street objects: run a verb's effect now (the realtime server's
    * go-ahead for a swing that already played; animated skips the start animation).
@@ -12145,7 +12145,12 @@ const engine = {
   register,
   unregister: unregisterTarget,
   /** The target-item chooser (Feed what? / how many) for a feature target or pack pseudo-target. */
-  openPicker: (target, verb) => openFeedPicker(target, verb),
+  /** The target-item picker; `pick` chooses that stack at once (a food dragged onto it, features/world-drop-feature.js). */
+  openPicker: (target, verb, pick = '') => openFeedPicker(target, verb, pick),
+  /** A shrine's donation window with that pack stack chosen (a stack dragged onto it, features/world-drop-feature.js). */
+  openShrineDonate: (target, classTsid) => openShrinePanel(target, { item: classTsid }),
+  /** Light a thing as the pointer does (null: none), for a stack dragged over it (features/world-drop-feature.js). */
+  setHoverTarget: (target) => (target ? setHoverTarget(target) : clearHoverGlow()),
   toast,
   pushActivity,
   updateHud,
@@ -27411,7 +27416,7 @@ function closeShrinePanel() {
   shrineQty = 1;
 }
 
-function openShrinePanel(target) {
+function openShrinePanel(target, { item = '' } = {}) {
   closeFeatPanel();
   const giant = GIANTS[target?.state?.giantId];
   if (!giant) return;
@@ -27427,7 +27432,8 @@ function openShrinePanel(target) {
   closeGardenPanel();
   closeAvatarPanel();
   activeShrineTarget = target;
-  shrineSelected = null;
+  // renderShrinePanel falls back to the first donatable stack when this one isn't.
+  shrineSelected = item && (inv[item] || 0) > 0 ? item : null;
   shrineQty = 1;
   shrineFavorSpent = false;
   const panel = document.getElementById('shrine-panel');

@@ -124,7 +124,7 @@ import {
   vogPages,
   tutorialNameDefault,
   TUTORIAL_NAME_MAX,
-} from '../newxp.js?v=b7a1699b';
+} from '../newxp.js?v=85922204';
 import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=b7609342';
 import { QUOIN_SHEET, QUOIN_TYPES, qrazyRewardForLevel } from '../quoins.js?v=299cc3f4';
 import { soundForQuoin } from '../sound-moments.js?v=2f8597cd';
@@ -137,7 +137,7 @@ import * as kit from '../quest-rooms/kit.js?v=25fc6d59';
 import { frameTexture, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js?v=3149d699';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 import { displayTopOf, itemstackOverlayPoint, playPoofIn, playSheetOverlay, poofInAlpha } from '../overlay-art.js?v=11b6dd7f';
-import { HOME_MACHINE } from '../home-ticket.js?v=7512f173';
+import { HOME_MACHINE } from '../home-ticket.js?v=69769c2f';
 import { animalAnchorX, animalAnchorY, createAnimalState } from '../animals.js?v=2f790e9b';
 import {
   AK_ANIMALS,

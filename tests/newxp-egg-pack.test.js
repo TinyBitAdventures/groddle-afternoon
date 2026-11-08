@@ -1,23 +1,24 @@
 /**
  * The tutorial's Egg (Austin 2026-11-08): while the Dustbunny waits, the Egg's own pack menu gives
  * it, as the original's drag onto the Dustbunny did (npc_newxp_dustbunny.js 190-195, drop_tip
- * "Give Egg to Dust Bunny"). The hint names the pack instead of the drag the remake lacks.
+ * "Give Egg to Dust Bunny"). Since the drag itself came (G588, features/world-drop-feature.js) the hint
+ * is the source's own line again.
  */
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
-import { LINES } from '../public/js/newxp.js?v=b7a1699b';
-import { newxpFeature, EGG_GIVE_REACH } from '../public/js/features/newxp-feature.js?v=cd723acc';
+import { LINES } from '../public/js/newxp.js?v=85922204';
+import { newxpFeature, EGG_GIVE_REACH } from '../public/js/features/newxp-feature.js?v=11d6b866';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const src = readFileSync(join(root, 'public/js/features/newxp-feature.js'), 'utf8');
 
-test('the pack verb uses the original drop tip, and the hint no longer asks for a drag', () => {
+test('the pack verb uses the original drop tip, and the hint is the original line', () => {
   assert.equal(LINES.t2GiveEggPack, 'Give Egg to Dust Bunny');
-  assert.doesNotMatch(LINES.t2GiveHint, /Drag/);
-  assert.match(LINES.t2GiveHint, /Give Egg to Dust Bunny/);
+  // npc_newxp_dustbunny.js 204.
+  assert.equal(LINES.t2GiveHint, 'Drag an EGG onto the Dustbunny. Or, click on the Dustbunny to give it an EGG.');
   assert.doesNotMatch(`${LINES.t2GiveHint} ${LINES.t2GiveEggFar}`, /—|Glitch/);
   assert.ok(EGG_GIVE_REACH > 0);
 });

@@ -282,9 +282,8 @@ export const LINES = Object.freeze({
   t2Egg3: 'Mmmm. EGGs! Love \'em!',
   t2HaveEgg: 'You got an EGG! Please gimme it!!!',
   t2NoEgg: 'Heyyyyyyy. You were going to<br>get me an EGG. Fair\'s fair!<br>Go get one!',
-  // npc_newxp_dustbunny.js 204 says "Drag an EGG onto the Dustbunny. Or, click on the Dustbunny ...":
-  // the remake has no dragging onto the world, so the first half names the pack's Give instead (ours).
-  t2GiveHint: 'Click on the Dustbunny to give it an Egg. Or, click the Egg in your pack and choose Give Egg to Dust Bunny.',
+  // npc_newxp_dustbunny.js 204, verbatim: the Egg drags onto the Dustbunny (features/world-drop-feature.js).
+  t2GiveHint: 'Drag an EGG onto the Dustbunny. Or, click on the Dustbunny to give it an EGG.',
   // drop_tip of verbs.give_egg (npc_newxp_dustbunny.js 192), the pack verb's label here.
   t2GiveEggPack: 'Give Egg to Dust Bunny',
   t2GiveEggFar: 'Get a little closer to the Dustbunny.',
