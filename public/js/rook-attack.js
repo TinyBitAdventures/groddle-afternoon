@@ -241,9 +241,10 @@ export const ROOK_LOOSE_KEY_BASE = 100;
  * so the realtime server never hears of them (rook-mp syncKeys takes digits only).
  * A tree grown in a shared street Patch (G564: target.sharedPatch, the plot key the
  * realtime server keeps it by, the same on every page) is keyed by its plot,
- * `trant_bean:p<plot key>`, never by scan order. Slice 1: no Patch tree is rookable on
- * the server yet (patches.go rookTree is a stub), and syncKeys never sends a p key, so
- * the Rook passes shared Patch trees by for everyone. Solo Patch trees keep their keys.
+ * `trant_bean:p<plot key>`, never by scan order. The server learns the street's Patch
+ * trees from its own patches module at each wing beat and strips them there (slice 2,
+ * patches_trees.go), so syncKeys never sends a p key; its rooked things may name one, and
+ * a revive sends it back. Solo Patch trees keep their keys.
  * '' when the target carries neither (the feature then keys it from ROOK_LOOSE_KEY_BASE).
  */
 export function rookKeyFor(target) {

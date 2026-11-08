@@ -20,7 +20,7 @@
  * with no solo crowd multiplier, and each player gives one revive dose.
  */
 
-import { ROOK_SOURCE, ROOK_TEXT, isRookableClass, strikeDamageFor } from './rook-attack.js?v=c6c14534';
+import { ROOK_SOURCE, ROOK_TEXT, isRookableClass, strikeDamageFor } from './rook-attack.js?v=0382c223';
 
 /** The server's limits (groddle-afternoon-server/rook.go). */
 export const MP_ROOK = Object.freeze({
@@ -47,6 +47,12 @@ export const MP_ROOK_TEXT = Object.freeze({
 });
 
 const KEY_RE = /^([a-z_]{1,24}):(\d{1,3})$/;
+/**
+ * G564 slice 2: a tree grown in a shared street Patch, keyed by its plot (js/rook-attack.js
+ * rookKeyFor, the server's rook.go rookPatchKeyRe). The server learns these from its own patches
+ * module, so syncKeys never sends one; the rooked things it reports may name them.
+ */
+const PATCH_KEY_RE = /^(trant_[a-z]{1,8}|wood_tree):p((?:patch|patch_dark|trant_[a-z]{1,8}_dead):\d{1,2}|tree:\d{1,2})$/;
 const num = (v, d = 0) => (Number.isFinite(Number(v)) ? Number(v) : d);
 const PHASES = new Set(['herald', 'build_up', 'angry', 'stunned', 'dead', 'departed']);
 
@@ -131,7 +137,7 @@ export function rookedFromServer(raw) {
   const out = {};
   if (!raw || typeof raw !== 'object') return out;
   for (const [key, row] of Object.entries(raw)) {
-    const m = KEY_RE.exec(key);
+    const m = KEY_RE.exec(key) || PATCH_KEY_RE.exec(key);
     const classId = String(row?.class || m?.[1] || '');
     if (!m || !isRookableClass(classId)) continue;
     const by = (Array.isArray(row?.by) ? row.by : []).map((id) => num(id, 0)).filter(Boolean);

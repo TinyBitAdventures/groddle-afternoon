@@ -49,10 +49,10 @@ import {
 } from '../public/js/home-styles.js?v=1a7a2798';
 import { WALLPAPER_MAPS, WALLPAPER_PIECES } from '../public/js/home-wallpaper-art.js?v=9f8473e6';
 import { roomPieces } from '../public/js/home-wallpaper.js?v=f1969400';
-import { BACK_YARD_GROUND_Y, clampRowsX, homesFeature, shiftHusbandryRows, shiftInteriorRows, towerDropTsid } from '../public/js/features/homes-feature.js?v=c81cd023';
+import { BACK_YARD_GROUND_Y, clampRowsX, homesFeature, shiftHusbandryRows, shiftInteriorRows, towerDropTsid } from '../public/js/features/homes-feature.js?v=1a3e2169';
 import { getGameDayKey } from '../public/js/game-day.js?v=edb00566';
 import { towerApi } from '../public/js/features/home-tower-feature.js?v=ebbc41b4';
-import { shiftBotX } from '../public/js/features/craftybot-feature.js?v=0721ecb0';
+import { shiftBotX } from '../public/js/features/craftybot-feature.js?v=21ee3998';
 import { normalizeDroppedItemState } from '../public/js/world-items.js?v=0bbfdab9';
 import { applyAchievementProgress, createAchievementState } from '../public/js/achievements.js?v=f8ccfd34';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=10b118dd';

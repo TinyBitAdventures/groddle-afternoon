@@ -69,12 +69,16 @@
  * server grows the trees for everyone as the dust lands; the local rules run
  * on this page's copy at the same moment.
  *
- * Shared street Patches (G564 lane 3, slice 1; dark until a release turns it
- * on): Fertilidust on a tree grown in a Patch the realtime server shares
- * (target.sharedPatch) is slice 2 (the server answers "later"). Fertilidust
- * passes those trees and their dead trees by, and says the plain temporary
- * line (js/shared-patches.js LATER_LINE) when they are all it would reach;
- * Fertilidust Lite whose closest tree is one says it and uses nothing.
+ * Shared street Patches (G564 slice 2; dark until a release turns it on):
+ * the trees grown in Patches the realtime server shares (target.sharedPatch)
+ * and their dead trees are the server's too. They count for the jar as the
+ * street's own (its lines, the 25 iMG per dead trant brought back, Fertilivert),
+ * the jar asks the server (sharedFertilize, obj_dust, even on a street with no
+ * shared street trees), and the server revives the dead ones as the jar is used
+ * and grows the living ones as the dust lands, for everyone (patches_trees.go):
+ * this page never grows or revives them on its own copy. Fertilidust Lite whose
+ * closest tree is one names it by its plot key. Without the server's go-ahead
+ * (connecting) the jar is not used.
  *
  * Solo: the sneezing and sparkle effects on other players are multiplayer's
  * (Sneeze-O-Rama and Sparkle Buddy stay out of reach). Nothing to build for
@@ -112,7 +116,7 @@ import { itemVerbAchievementCounters } from '../item-verbs.js?v=1e20fa7d';
 import { copyChargesLeft, copyFromLedger, keepsCopies, spendCopyCharge, verbCopy } from '../copy-charges.js?v=737fd334';
 import { migrateClassValue } from '../tools.js?v=d8aa3536';
 import { DEAD_TRANT_CLASSES } from '../patches.js?v=aa83d5ad';
-import { LATER_LINE } from '../shared-patches.js?v=3dd27063';
+import { COPY as SHARED_PATCH_COPY } from '../shared-patches.js?v=0f12269f';
 import { hellFeature } from './hell-feature.js?v=93f1c8dd';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 import { displayTopOf, playSheetOverlay } from '../overlay-art.js?v=11b6dd7f';
@@ -196,7 +200,7 @@ function streetTargets(engine, test) {
   return (engine.interactables || []).filter((t) => t?.sprite && !t.sprite.destroyed && test(t));
 }
 
-/** G564: shared street Patches' trees and dead trees are slice 2 for Fertilidust (the server's "later"). */
+/** G564: a tree or dead tree in a shared street Patch: the server grows and revives it, never this page. */
 function inSharedPatch(t) {
   return Boolean(t?.sharedPatch);
 }
@@ -210,9 +214,9 @@ function deadTreeTargets(engine, { shared = false } = {}) {
   return streetTargets(engine, (t) => t.featureId === 'patches' && DEAD_TRANT_CLASSES.includes(t.classId) && t.patchKey && (shared || !inSharedPatch(t)));
 }
 
-/** How many trees and dead trees in shared Patches a Fertilidust passes by. */
-function sharedPatchTrees(engine) {
-  return treeTargets(engine, { shared: true }).filter(inSharedPatch).length + deadTreeTargets(engine, { shared: true }).filter(inSharedPatch).length;
+/** This page's own trees (not in a shared Patch): the ones the local rules grow or revive. */
+function ownTrees(targets) {
+  return targets.filter((t) => !inSharedPatch(t));
 }
 
 /**
@@ -405,21 +409,21 @@ const RUNNERS = {
   },
 
   fertilidust(engine, classTsid) {
-    const trees = treeTargets(engine);
-    const deadTargets = deadTreeTargets(engine);
+    // G564: trees and dead trees in shared Patches count as the street's own (the server grows them).
+    const trees = treeTargets(engine, { shared: true });
+    const deadTargets = deadTreeTargets(engine, { shared: true });
     const paper = streetTargets(engine, (t) => t.classId === 'paper_tree').length;
     const out = fertilidustOutcome({ trants: trees.length, dead: deadTargets.length, paper });
-    // G564: only shared Patch trees in reach: the plain line, and the jar keeps its charge.
-    const passed = sharedPatchTrees(engine);
-    if (!out.ok && passed) {
-      say(engine, LATER_LINE, false);
-      return 'shared-patch';
+    const sharedHere = trees.length + deadTargets.length - ownTrees(trees).length - ownTrees(deadTargets).length;
+    if (out.ok && askDust(engine, classTsid, [...trees, ...deadTargets.filter(inSharedPatch)], false)) return 'asked';
+    if (out.ok && sharedHere && granted?.classTsid !== classTsid) {
+      // Shared Patch trees in reach but no go-ahead to be had (connecting): the jar is not used.
+      say(engine, SHARED_PATCH_COPY.connecting, false);
+      return 'shared-patch-wait';
     }
-    if (out.ok && askDust(engine, classTsid, trees, false)) return 'asked';
-    if (out.ok && passed) engine.pushActivity?.(LATER_LINE);
     for (const msg of out.msgs) say(engine, msg, out.ok);
     if (!out.ok) return 'no-trees';
-    const dead = reviveDeadTrees(engine, deadTargets);
+    const dead = reviveDeadTrees(engine, ownTrees(deadTargets)) + (deadTargets.length - ownTrees(deadTargets).length);
     if (out.xp) {
       // 25 iMG for every dead trant brought back (fertilidust.js 371,
       // stats_add_xp(n, false): the mood bonus applies).
@@ -427,7 +431,8 @@ const RUNNERS = {
       if (engine.player) engine.floatText?.(engine.player.x, engine.player.y - 90, `+${xp} iMG`, 0xb388ff);
       engine.updateHud?.();
     }
-    if (trees.length) later(3000, () => fertilize(engine, trees));
+    const own = ownTrees(trees);
+    if (own.length) later(3000, () => fertilize(engine, own));
     powderBurst(engine, 'target_effect_powder_extreme', trees);
     if (out.sound) later(2000, () => engine.playSound?.(out.sound, { volume: 0.6 }));
     for (const row of out.achievementCounters) engine.achievement(row.counter, row.amount);
@@ -443,15 +448,16 @@ const RUNNERS = {
       ...streetTargets(engine, (t) => t.classId === 'paper_tree'),
     ].map((t) => ({ classId: t.classId, x: t.sprite.x, target: t }));
     const out = fertilidustLiteTarget(trees, nearestPlayerX(engine));
-    // G564: the closest tree grows in a shared Patch: the plain line, and the jar keeps its charge.
-    if (out.ok && inSharedPatch(out.tree?.target)) {
-      say(engine, LATER_LINE, false);
-      return 'shared-patch';
-    }
     if (out.ok && askDust(engine, classTsid, [out.tree.target], true)) return 'asked';
+    // G564: the closest tree grows in a shared Patch, but no go-ahead to be had (connecting): the jar is not used.
+    const shared = out.ok && inSharedPatch(out.tree?.target);
+    if (shared && granted?.classTsid !== classTsid) {
+      say(engine, SHARED_PATCH_COPY.connecting, false);
+      return 'shared-patch-wait';
+    }
     say(engine, out.message, out.ok);
     if (!out.ok) return 'no-tree';
-    later(3000, () => fertilize(engine, [out.tree.target]));
+    if (!shared) later(3000, () => fertilize(engine, [out.tree.target]));
     powderBurst(engine, 'target_effect_powder_mild', [out.tree.target]);
     later(2000, () => engine.playSound?.(out.sound, { volume: 0.6 }));
     finishUse(engine, classTsid);

@@ -14,7 +14,7 @@ import { execFileSync, spawnSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
-import { powdersFeature } from '../public/js/features/powders-feature.js?v=a3e52514';
+import { powdersFeature } from '../public/js/features/powders-feature.js?v=83f0ed34';
 
 const hasPhp = spawnSync('php', ['-v']).status === 0;
 const skip = skipWithoutSite || !hasPhp;
@@ -145,6 +145,8 @@ describe('jars and bottles on shared trees are the ledger\'s (LedgerUse)', { ski
       potion_garden_harvest: [5, 'master-garden', 'uses'],
       potion_garden_clear: [5, 'master-garden', 'uses'],
       potion_garden_fertilize: [5, 'master-garden', 'uses'],
+      // G564 slice 2: Trantsformation Fluid on a tree in a shared street Patch (tests/shared-patch-trees.test.js).
+      potion_trantsformation_fluid: [3, 'potions', 'uses'],
     });
     assert.equal(php('savedLeft', [save({}, { 'master-garden': { uses: { potion_garden_harvest: 3 } } }), 'potion_garden_harvest']), 3, 'an older save keeps a bottle\'s pours in master-garden\'s slice');
     assert.equal(php('savedLeft', [save({}, { powders: { charges: { fertilidust: 3 } } }), 'fertilidust']), 3);

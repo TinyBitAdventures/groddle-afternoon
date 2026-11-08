@@ -27,9 +27,16 @@
  *   grants) and for Tree Poison and its Antidote (the clock, anyone's cure, the
  *   death, everyone's). Its poison lands in the tree state as tree-death-feature
  *   reads it (poisonEndsAt), so the warning, the cries and the cure show for
- *   everyone. The Rook, Fertilidust and Trantsformation Fluid are slice 2: the
- *   server answers "later", so the page refuses them on a shared Patch tree
- *   with LATER_LINE and asks nothing.
+ *   everyone.
+ * - Slice 2 (G564): the Rook, Fertilidust and Trantsformation Fluid reach a
+ *   shared Patch tree through the server too. The Rook learns the street's
+ *   Patch trees from the server's patches module and strips them there (the
+ *   page keys them `<class>:p<plot key>`, js/rook-attack.js rookKeyFor, and
+ *   never sends them in rook_sync); Fertilidust is the one jar route online,
+ *   obj_dust (features/street-objects-feature.js sharedFertilize: the full jar
+ *   revives the shared dead trants and grows the shared trees for everyone, Lite
+ *   names one by its plot key); Trantsformation Fluid is patch_act "trantsform"
+ *   (TRANTSFORM_VERB), the server choosing the new tree.
  */
 
 import { DEAD_TRANT_CLASSES, GROWN_TREE_LABELS, SEASONED_BEANS, SOIL_CLASSES, resolveSoilPackage, resolveTendPackage, seedlingTimings } from './patches.js?v=aa83d5ad';
@@ -271,13 +278,10 @@ export function dugByOther(plot, me) {
 export const TREE_VERBS = Object.freeze(['pet', 'water', 'harvest']);
 
 /** tree-death-feature's pours as the wire names them. */
-export const POUR_WIRE = Object.freeze({ 'treepoison:poison': 'poison', 'treepoison:antidote': 'antidote' });
+export const POUR_WIRE = Object.freeze({ 'treepoison:poison': 'poison', 'treepoison:antidote': 'antidote', 'potion:trantsform': 'trantsform' });
 
-/**
- * Ours, temporary (plan section 13, slice 2): the Rook, Fertilidust and Trantsformation Fluid on a
- * tree in a shared Patch. The server's "later" line, so both sides say the same.
- */
-export const LATER_LINE = 'Not on shared Patches yet.';
+/** potions-feature's Trantsformation Fluid pour, as shared-patches-feature asks it (POUR_WIRE). */
+export const TRANTSFORM_VERB = 'potion:trantsform';
 
 /** A tree target grown in a shared Patch (patches-feature marks it sharedPatch): its plot key, or ''. */
 export function sharedTreeKey(target) {
@@ -380,6 +384,7 @@ export const REFUSAL_LINES = Object.freeze({
   no_answer: 'The patch could not check your pack just now. Nothing was taken. Try again.',
   enough: "That's enough, thnx.",
   small: 'This tree is too small to harvest.',
+  weak: 'This tree is too weak to be trantsformed',
   empty: "There's nothing to pick, cowboy.",
   daily_limit: 'You can only harvest from this tree once per game day.',
   not_wanted: 'This tree was already looked after today.',
@@ -389,7 +394,7 @@ export const REFUSAL_LINES = Object.freeze({
   nothing: "There's nothing here to clear.",
   not_tree: "That isn't a tree.",
   no_tool: "You'll need a working tool for that.",
-  later: 'Not on shared Patches yet.',
+  rooked: "It's rooked. Revive it first.",
 });
 
 /** patch.js 175-178 and 235-240: the "planted" code reads by verb. */

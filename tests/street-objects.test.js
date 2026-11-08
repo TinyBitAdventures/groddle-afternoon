@@ -39,8 +39,8 @@ import {
   treeReady,
   treeSkill,
 } from '../public/js/street-objects.js?v=c72e3d5c';
-import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=5792a415';
-import { FEATURES } from '../public/js/features/index.js?v=81a685e4';
+import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=c86d6b40';
+import { FEATURES } from '../public/js/features/index.js?v=33306002';
 import { createMineRock, mineRock } from '../public/js/mining.js?v=fc28670f';
 import { createResourceNode } from '../public/js/resource-nodes.js?v=b11d96b2';
 import { createTrantState, fruitCapacityAt, setTrantTables } from '../public/js/trants.js?v=9c2e8c0f';
@@ -371,7 +371,8 @@ describe('street objects: the feature', () => {
     const src = read('public/js/features/powders-feature.js');
     // The jar used goes with the ask (its place in pack order), so the ledger uses that jar's charge.
     assert.match(src, /return engine\.query\?\.\('sharedFertilize', targets, lite, engine, classTsid, copy\) === true;/);
-    assert.match(src, /if \(out\.ok && askDust\(engine, classTsid, trees, false\)\) return 'asked';/);
+    // G564 slice 2: the street's trees, and the dead trees in shared Patches (the server revives those).
+    assert.match(src, /if \(out\.ok && askDust\(engine, classTsid, \[\.\.\.trees, \.\.\.deadTargets\.filter\(inSharedPatch\)\], false\)\) return 'asked';/);
     assert.match(src, /if \(out\.ok && askDust\(engine, classTsid, \[out\.tree\.target\], true\)\) return 'asked';/);
     assert.doesNotMatch(src.slice(src.indexOf('function fertilize(')), /^[^\n]*sharedFertilize/m, 'fertilize no longer tells the server');
   });

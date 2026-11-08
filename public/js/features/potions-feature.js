@@ -33,8 +33,12 @@
  *   only on your home street) becomes a different random tree at health 4,
  *   maturity max(4, maturity - 3). A street tree's spot goes to the patches
  *   feature, as for a tree that died (tree-death-feature `replaced`). A tree
- *   grown in a shared street Patch (G564, target.sharedPatch) is slice 2: the
- *   pour is refused with js/shared-patches.js LATER_LINE.
+ *   grown in a shared street Patch (G564 slice 2, target.sharedPatch) is the
+ *   realtime server's: the pour asks it (shared-patches-feature
+ *   sharedPatchTrantsform, patch_act "trantsform"), the server's ledger uses the
+ *   bottle and the server picks the new tree for everyone (patches_trees.go);
+ *   its go-ahead (trantsformGranted) spends the bottle here, shows the poof and
+ *   says the line. No go-ahead, nothing is used.
  * - Charades Potion shows its solo refusal (it needs other players).
  * - Draught of Wisdom (potion_xp, G430): from level 20, once a game day,
  *   500 iMG with no mood bonus ("+500 xp").
@@ -70,7 +74,7 @@ import { metabolicGain, moodMax } from '../metabolics.js?v=8504134e';
 import { quoinDailyLimitFor } from '../quoins.js?v=299cc3f4';
 import { emblemCostFor } from '../shrines.js?v=1a945fe7';
 import { GROWN_TREE_LABELS, trantsformPlotTree } from '../patches.js?v=aa83d5ad';
-import { LATER_LINE } from '../shared-patches.js?v=3dd27063';
+import { COPY as SHARED_PATCH_COPY } from '../shared-patches.js?v=0f12269f';
 import { isPoisoned } from '../tree-poison.js?v=80469175';
 import { furnitureSize } from '../home-decor.js?v=f9b0e3dc';
 import { textureFromUrl, sourceFromUrl, frameTexture } from '../textures.js?v=3149d699';
@@ -131,12 +135,12 @@ import {
   usePotion,
 } from '../potions.js?v=c21bad59';
 import { itemVerbAchievementCounters } from '../item-verbs.js?v=1e20fa7d';
-import { patchesFeature } from './patches-feature.js?v=802e2f21';
-import { homesFeature } from './homes-feature.js?v=c81cd023';
-import { streetTreeIndex } from './tree-death-feature.js?v=57f5e70f';
-import { questRoomConverse } from './quest-instances-feature.js?v=4ea65912';
+import { patchesFeature } from './patches-feature.js?v=9ae1d3a5';
+import { homesFeature } from './homes-feature.js?v=1a3e2169';
+import { streetTreeIndex } from './tree-death-feature.js?v=747f0035';
+import { questRoomConverse } from './quest-instances-feature.js?v=76702d05';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
-import { copyChargesLeft, keepsCopies, spendCopyCharge, verbCopy } from '../copy-charges.js?v=737fd334';
+import { copyChargesLeft, copyFromLedger, keepsCopies, spendCopyCharge, verbCopy } from '../copy-charges.js?v=737fd334';
 import { copyTag, migrateClassTag, migrateClassValue, setCopyTag, toolCopies } from '../tools.js?v=d8aa3536';
 
 export const POTIONS_FEATURE_ID = 'potions';
@@ -173,6 +177,7 @@ let rugTargets = [];
 let heart = null; // playSheetOverlay handle
 let heartRetryAt = 0;
 let adopting = []; // street trees handed to patches, waiting for their plot's first draw
+let sharedAsk = null; // G564: a Trantsformation Fluid pour the realtime server was asked about: { copy, x, y, treeH, oldLabel }
 let sauces = []; // alphabet_sauce puddles: { id, tsid, x, y, word, expiresAt }
 let letter = null; // pc.letter: 'A'..'Z', 'heart' or '1' (has_letter)
 let letterView = null; // overlayOrStandIn handle over the avatar
@@ -350,8 +355,6 @@ function checkFor(classTsid, engine) {
     }
     case 'potion_trantsformation_fluid': {
       const target = closestTree(engine);
-      // G564 slice 2: a tree grown in a shared street Patch is the server's, which answers "later".
-      if (target?.sharedPatch) return { ok: false, error: LATER_LINE, target };
       return { ...trantsformCheck(target), target };
     }
     case 'potion_xp':
@@ -451,6 +454,12 @@ function complete(engine) {
   // A copy that is no longer there (sold or given during the 2.5 s) falls back to the one in use.
   const at = copy != null && copy < countItem(engine.inv, classTsid) ? copy : null;
   const result = withCopy(at, () => EFFECTS[classTsid]?.(engine, { target, extra })) || { ok: false };
+  // G564: asked the realtime server (a shared Patch tree): its go-ahead spends the bottle and speaks.
+  if (result.asked) {
+    last = `${classTsid}:asked`;
+    publish(engine);
+    return;
+  }
   const def = POTIONS[classTsid];
   if (result.ok && !result.noUse && keepsCopies(engine, classTsid)) {
     spendCopyCharge(engine, classTsid, at);
@@ -625,7 +634,13 @@ const EFFECTS = {
     const y = target.sprite.y;
     const treeH = Math.min(260, Math.max(60, Number(target.sprite.height) || 0));
     const oldLabel = GROWN_TREE_LABELS[target.classId] || target.label;
-    if (target.sharedPatch) return { ok: false, msg: LATER_LINE };
+    if (target.sharedPatch) {
+      // G564 slice 2: the realtime server's tree; its go-ahead lands in trantsformGranted.
+      const copy = keepsCopies(engine, 'potion_trantsformation_fluid') ? verbCopy(engine, 'potion_trantsformation_fluid', picked) : null;
+      if (engine.query?.('sharedPatchTrantsform', target, engine, copy) !== true) return { ok: false, msg: SHARED_PATCH_COPY.connecting };
+      sharedAsk = { copy: copy != null && copy >= 0 ? copy : null, x, y, treeH, oldLabel };
+      return { ok: true, asked: true };
+    }
     if (target.grownFromBean) {
       const plots = engine.streetSlot('patches')?.plots || {};
       const plot = Object.values(plots).find((row) => row?.tree?.state === target.state);
@@ -1273,6 +1288,51 @@ export const potionsFeature = {
     return munchRug(engine);
   },
 
+  /**
+   * G564 slice 2: the realtime server's go-ahead for a Trantsformation Fluid pour on a shared Patch
+   * tree (shared-patches-feature, on patch_ok "trantsform" with "from", "to" and the ledger's "use"):
+   * the bottle the ledger used is spent here (once: its emptying through ledgerReceipt), the poof,
+   * the line ("The Spice Plant is now a Fruit Tree.") and the counters. The new tree is the server's
+   * plot, already drawn. `target` is the tree as it stands now (or null).
+   */
+  trantsformGranted(target, msg, engine) {
+    const classTsid = 'potion_trantsformation_fluid';
+    const ask = sharedAsk;
+    sharedAsk = null;
+    if (!engine || !msg || countItem(engine.inv, classTsid) < 1) return null;
+    const def = POTIONS[classTsid];
+    const use = msg.use && typeof msg.use === 'object' ? msg.use : null;
+    const copy = ask?.copy ?? null;
+    if (use?.spent) engine.query?.('ledgerReceipt', String(use.op || ''), engine);
+    if (keepsCopies(engine, classTsid)) {
+      if (use) copyFromLedger(engine, classTsid, copy, use);
+      spendCopyCharge(engine, classTsid, copy != null && copy < countItem(engine.inv, classTsid) ? copy : null);
+    } else {
+      if (use) uses[classTsid] = use.spent ? 1 : Math.min(def.capacity - 1, Math.max(0, Math.floor(Number(use.left) || 0))) + 1;
+      const used = usePotion(classTsid, uses[classTsid]);
+      if (used.emptied) {
+        removeItem(engine.inv, classTsid, 1);
+        delete uses[classTsid];
+      } else {
+        uses[classTsid] = used.uses;
+      }
+    }
+    engine.achievement(`potions_used:${classTsid}`, 1);
+    for (const row of itemVerbAchievementCounters(classTsid, def.verb)) engine.achievement(row.counter, row.amount);
+    const sprite = target?.sprite && !target.sprite.destroyed ? target.sprite : null;
+    const x = sprite ? sprite.x : ask?.x;
+    const y = sprite ? sprite.y : ask?.y;
+    if (Number.isFinite(x) && Number.isFinite(y)) poof(engine, x, y, ask?.treeH || 120);
+    const from = GROWN_TREE_LABELS[String(msg.from || '')] || ask?.oldLabel || 'tree';
+    const to = GROWN_TREE_LABELS[String(msg.to || '')] || 'tree';
+    say(engine, potionMessage(classTsid, [trantsformMessage(from, to)], false), true);
+    last = `${classTsid}:${msg.from}>${msg.to}`;
+    engine.refreshPack?.();
+    engine.save?.();
+    publish(engine);
+    return true;
+  },
+
   save() {
     // version 2: each bottle's uses and Giant are saved with the pack's tools (js/tools.js); uses and
     // favorGiant stay only for an engine with no tool state.
@@ -1329,6 +1389,7 @@ export const potionsFeature = {
     baseScale = null;
     pending = null;
     adopting = [];
+    sharedAsk = null;
     sauces = [];
     letter = null;
     stopLetter();

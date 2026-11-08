@@ -2,10 +2,11 @@
  * G564 lane 3 (slice 1): a tree grown in a shared street Patch answers to the
  * realtime server (patches.go) for pet, water and harvest
  * (features/shared-patches-feature.js), and for Tree Poison and its Antidote
- * (features/tree-death-feature.js through sharedPatchTreeVerb). The Rook,
- * Fertilidust and Trantsformation Fluid are slice 2 (the server answers
- * "later"): the page refuses them on a shared Patch tree with the plain line
- * and asks nothing.
+ * (features/tree-death-feature.js through sharedPatchTreeVerb). Slice 2: the
+ * Rook (the server strips Patch trees itself; the page reads their p keys),
+ * Fertilidust (street-objects-feature sharedFertilize, obj_dust) and
+ * Trantsformation Fluid (patch_act "trantsform", potions-feature) reach them
+ * through the server too.
  *
  * Every `grownFromBean` branch keeps its solo behaviour (a tree in your own
  * Patch, at home or on a street the server doesn't share carries no
@@ -16,7 +17,6 @@ import { readFileSync } from 'node:fs';
 import { after, before, describe, it } from 'node:test';
 
 import {
-  LATER_LINE,
   POUR_WIRE,
   REFUSAL_LINES,
   SHARED_PATCHES_QA_KEY,
@@ -26,15 +26,16 @@ import {
   sharedTreeKey,
   sharedTreeReady,
   sharedTreeSkill,
-} from '../public/js/shared-patches.js?v=3dd27063';
-import { sharedPatchesFeature } from '../public/js/features/shared-patches-feature.js?v=2ef556db';
-import { patchesFeature } from '../public/js/features/patches-feature.js?v=802e2f21';
-import { treeDeathFeature, decorateTreeVerbs } from '../public/js/features/tree-death-feature.js?v=57f5e70f';
-import { potionsFeature } from '../public/js/features/potions-feature.js?v=f46b507a';
-import { powdersFeature, runPowder } from '../public/js/features/powders-feature.js?v=a3e52514';
-import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=5792a415';
-import { rookKeyFor } from '../public/js/rook-attack.js?v=c6c14534';
-import { syncKeys } from '../public/js/rook-mp.js?v=9ef8b96b';
+  TRANTSFORM_VERB,
+} from '../public/js/shared-patches.js?v=0f12269f';
+import { sharedPatchesFeature } from '../public/js/features/shared-patches-feature.js?v=1c1d05f0';
+import { patchesFeature } from '../public/js/features/patches-feature.js?v=9ae1d3a5';
+import { treeDeathFeature, decorateTreeVerbs } from '../public/js/features/tree-death-feature.js?v=747f0035';
+import { potionsFeature } from '../public/js/features/potions-feature.js?v=80f1cef9';
+import { powdersFeature, runPowder } from '../public/js/features/powders-feature.js?v=83f0ed34';
+import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=c86d6b40';
+import { rookKeyFor } from '../public/js/rook-attack.js?v=0382c223';
+import { rookedFromServer, syncKeys } from '../public/js/rook-mp.js?v=0b724b8c';
 import { runVerb } from '../public/content.js?v=0eb17d5e';
 import { isPoisoned, POISON_DURATION_MS, TREE_ANTIDOTE, TREE_POISON } from '../public/js/tree-poison.js?v=80469175';
 import { getStreetEcologyCatalog, setStreetEcologyCatalog } from '../public/js/street-ecology.js?v=78a1d522';
@@ -58,12 +59,14 @@ describe('a tree in a shared Patch: the page\'s rules', () => {
     assert.equal(sharedTreeKey(tree({ sharedPatch: 'patch:0', featureId: 'patches' })), '', 'soil plots are lane 2\'s');
     assert.equal(sharedTreeKey(tree({ sharedPatch: 'demo:tree' })), '', 'demo plots are never shared');
     assert.deepEqual(TREE_VERBS, ['pet', 'water', 'harvest']);
-    assert.deepEqual(POUR_WIRE, { 'treepoison:poison': 'poison', 'treepoison:antidote': 'antidote' });
+    assert.deepEqual(POUR_WIRE, { 'treepoison:poison': 'poison', 'treepoison:antidote': 'antidote', [TRANTSFORM_VERB]: 'trantsform' });
   });
 
-  it('the later line is the server\'s, in plain words', () => {
-    assert.equal(LATER_LINE, REFUSAL_LINES.later);
-    assert.doesNotMatch(LATER_LINE, /[—–]/);
+  it('slice 2: no "later" any more; the rooked and weak refusals read in plain words', () => {
+    assert.equal(REFUSAL_LINES.later, undefined);
+    assert.equal(REFUSAL_LINES.rooked, "It's rooked. Revive it first.");
+    assert.equal(REFUSAL_LINES.weak, 'This tree is too weak to be trantsformed');
+    for (const line of Object.values(REFUSAL_LINES)) assert.doesNotMatch(line, /[—–]/);
   });
 
   it('the server\'s poison clock lands in the tree state as tree-death-feature reads it, and anyone\'s cure clears it', () => {
@@ -119,11 +122,21 @@ describe('a tree in a shared Patch: the page\'s rules', () => {
     assert.deepEqual(p, { petted: false });
   });
 
-  it('the Rook keys a shared Patch tree by its plot, never sends it, and leaves solo Patch trees\' keys alone', () => {
+  it('the Rook keys a shared Patch tree by its plot, never sends it, reads the server\'s rooked Patch trees, and leaves solo Patch trees\' keys alone', () => {
     assert.equal(rookKeyFor(tree({ sharedPatch: 'patch:0' })), 'trant_spice:ppatch:0');
     assert.equal(rookKeyFor(tree({ sharedPatch: 'trant_spice_dead:0', classId: 'trant_bean' })), 'trant_bean:ptrant_spice_dead:0');
+    assert.equal(rookKeyFor(tree({ sharedPatch: 'tree:3', classId: 'wood_tree', state: { maturity: 4 } })), 'wood_tree:ptree:3');
     assert.equal(rookKeyFor(tree()), '', 'solo: the feature keys it from 100 as before');
-    assert.deepEqual(syncKeys([{ key: 'trant_spice:ppatch:0' }, { key: 'trant_spice:3' }]), ['trant_spice:3'], 'slice 1: the server never hears of a Patch tree');
+    assert.deepEqual(syncKeys([{ key: 'trant_spice:ppatch:0' }, { key: 'trant_spice:3' }]), ['trant_spice:3'], 'the server learns Patch trees from its own patches module');
+    const rooked = rookedFromServer({
+      'trant_spice:ppatch:0': { class: 'trant_spice', doses: 1, by: [9] },
+      'wood_tree:ptree:3': { class: 'wood_tree' },
+      'trant_spice:3': { class: 'trant_spice' },
+      'trant_spice:pnot_a_plot': { class: 'trant_spice' },
+      'npc_piggy:pfoo:1': { class: 'npc_piggy' },
+    });
+    assert.deepEqual(Object.keys(rooked).sort(), ['trant_spice:3', 'trant_spice:ppatch:0', 'wood_tree:ptree:3']);
+    assert.deepEqual(rooked['trant_spice:ppatch:0'].by, [9]);
   });
 });
 
@@ -244,6 +257,10 @@ function rig({ mode = 'multiplayer', learned = [] } = {}) {
       if (hook === 'sharedPatchTreeVerb') return sharedPatchesFeature.sharedPatchTreeVerb(...args);
       if (hook === 'sharedPatchTree') return sharedPatchesFeature.sharedPatchTree(...args);
       if (hook === 'sharedVerbGrant') return sharedPatchesFeature.sharedVerbGrant(...args);
+      if (hook === 'sharedPatchTrantsform') return sharedPatchesFeature.sharedPatchTrantsform(...args);
+      if (hook === 'trantsformGranted') return potionsFeature.trantsformGranted(...args);
+      if (hook === 'sharedFertilize') return streetObjectsFeature.sharedFertilize(...args);
+      if (hook === 'powderUseGranted') return powdersFeature.powderUseGranted(...args);
       // street-objects never answers for a Patch tree (it has no treeIndex).
       if (hook === 'sharedObjectVerb' || hook === 'sharedTree') return null;
       return null;
@@ -277,6 +294,9 @@ async function boot(r, { flag = true } = {}) {
   globalThis.window = { localStorage: { getItem: (k) => store.get(k) ?? null } };
   sharedPatchesFeature._reset();
   treeDeathFeature._reset();
+  streetObjectsFeature._reset();
+  powdersFeature._reset();
+  potionsFeature._reset();
   sharedPatchesFeature.restore(undefined, r.engine);
   sharedPatchesFeature.init(r.engine);
   treeDeathFeature.init(r.engine);
@@ -465,23 +485,79 @@ describe('a tree in a shared Patch on the page', () => {
     assert.equal(isPoisoned(target('patch:0').state), false, 'cured for everyone');
   });
 
-  it('Fertilidust passes shared Patch trees by with the plain line and keeps its charge; Lite on one refuses', async () => {
+  it('Fertilidust on a street with shared Patch trees asks the server (obj_dust) even with no shared street trees; the go-ahead uses the jar but grows and revives nothing here', async () => {
     const r = await shared({ 'patch:0': spiceTree() });
-    const before = r.engine.inv.fertilidust;
-    powdersFeature.restore?.(undefined, r.engine);
-    assert.equal(runPowder(r.engine, 'fertilidust'), 'fertilidust:shared-patch');
-    assert.equal(r.log.toasts.at(-1), LATER_LINE);
-    assert.equal(r.engine.inv.fertilidust, before);
-    assert.equal(runPowder(r.engine, 'fertilidust_lite'), 'fertilidust_lite:shared-patch');
-    assert.equal(r.log.toasts.at(-1), LATER_LINE);
-    assert.equal(acts(r).length, 0, 'nothing asked');
+    assert.equal(r.interactables.filter((t) => t.sharedPatch && (t.grownFromBean || /_dead$/.test(t.classId))).length, 2, 'the Spice Plant and the Dead Spice Plant');
+    assert.equal(runPowder(r.engine, 'fertilidust'), 'fertilidust:asked');
+    const asked = r.sent.filter((m) => m.t === 'obj_dust').at(-1);
+    assert.ok(asked && asked.id === undefined, 'the full jar names no tree');
+    assert.equal(acts(r).length, 0, 'not a patch_act');
+    assert.equal(r.engine.inv.fertilidust, 1, 'nothing used until the go-ahead');
+    // The server's go-ahead (the dead Spice Plant came back for everyone as the jar was used).
+    r.client.emit('msg:obj_dust_used', { t: 'obj_dust_used', req: asked.req, c: 'fertilidust', revived: ['trant_spice_dead:0'] });
+    await tick();
+    assert.match(powdersFeature._state().last, /^fertilidust:trees:1:revived:1:granted$/, 'counted as the street\'s own: one tree grown, one revived (its 25 iMG)');
+    assert.ok(r.log.activity.some((line) => /Fertilidust|airborne/i.test(line)), 'its line');
+    assert.equal(target('patch:0').state.maturity, 5, 'the page never grows a shared Patch tree itself');
+    assert.equal(r.world[OLD_MAIN].features.patches.plots['trant_spice_dead:0']?.fertilidustAt, undefined, 'nor revives a shared dead one');
+    // The server's word lands as patches, for everyone.
+    change(r, { 'patch:0': spiceTree({ maturity: 6, health: 10, fruit: 12 }), 'trant_spice_dead:0': { class: 'trant_spice_dead', kind: 'patch', stage: 'tree', since: now(), tree: { class: 'trant_spice', maturity: 4, health: 5, fruit: 0, cap: 10 } } });
+    await tick();
+    assert.equal(target('patch:0').state.maturity, 6);
+    assert.equal(target('trant_spice_dead:0').classId, 'trant_spice');
   });
 
-  it('Trantsformation Fluid on a shared Patch tree is refused with the plain line', async () => {
-    const r = await shared({ 'patch:0': spiceTree({ maturity: 6 }) });
+  it('Fertilidust Lite on a shared Patch tree names it by its plot key; still connecting, nothing is used', async () => {
+    const r = await shared({ 'patch:0': spiceTree() });
+    assert.equal(runPowder(r.engine, 'fertilidust_lite'), 'fertilidust_lite:asked');
+    const asked = r.sent.filter((m) => m.t === 'obj_dust').at(-1);
+    assert.equal(asked.id, 'patch:0');
+    r.client.emit('msg:obj_dust_used', { t: 'obj_dust_used', req: asked.req, c: 'fertilidust_lite' });
+    await tick();
+    assert.match(powdersFeature._state().last, /^fertilidust_lite:tree:trant_spice:granted$/);
+    assert.equal(target('patch:0').state.maturity, 5, 'grown by the server, not here');
+    // Connecting: the jar is not used and nothing is asked.
+    r.client.state = 'connecting';
+    r.sent.length = 0;
+    const before = powdersFeature._state().charges;
+    assert.equal(runPowder(r.engine, 'fertilidust_lite'), 'fertilidust_lite:shared-patch-wait');
+    assert.equal(r.sent.length, 0);
+    assert.deepEqual(powdersFeature._state().charges, before);
+    r.client.state = 'online';
+  });
+
+  it('Trantsformation Fluid on a shared Patch tree asks the server (patch_act trantsform); its go-ahead spends the bottle, the new tree is the server\'s', async () => {
+    const r = await shared({ 'patch:0': spiceTree({ maturity: 7, health: 8 }) });
     const rows = potionsFeature.packVerbs('potion_trantsformation_fluid', r.engine);
-    assert.equal(rows[0].enabled, false);
-    assert.equal(rows[0].reason, LATER_LINE);
+    assert.equal(rows[0].enabled, true, 'no refusal on a shared Patch tree any more');
+    potionsFeature.runPackVerb('potion_trantsformation_fluid', 'pour', r.engine);
+    potionsFeature._complete(r.engine);
+    const asked = lastAct(r);
+    assert.deepEqual({ verb: asked.verb, id: asked.id }, { verb: 'trantsform', id: 'patch:0' });
+    assert.equal(potionsFeature._state().last, 'potion_trantsformation_fluid:asked');
+    assert.equal(r.engine.inv.potion_trantsformation_fluid, 1, 'nothing used yet');
+    assert.equal(target('patch:0').classId, 'trant_spice', 'nothing changed here yet');
+    const use = { op: 'use-00000000000000c1', c: 'potion_trantsformation_fluid', left: 0, spent: true };
+    r.client.emit('msg:patch_ok', { t: 'patch_ok', req: asked.req, id: 'patch:0', verb: 'trantsform', now: now(), from: 'trant_spice', to: 'trant_fruit', use, before: spiceTree({ maturity: 7, health: 8 }), plot: { class: 'patch', kind: 'patch', stage: 'tree', since: now(), tree: { class: 'trant_fruit', maturity: 4, health: 4, fruit: 0, cap: 8 } } });
+    await tick();
+    assert.equal(target('patch:0').classId, 'trant_fruit', 'the server\'s new tree');
+    assert.equal(target('patch:0').state.maturity, 4);
+    assert.deepEqual(r.receipts, ['use-00000000000000c1'], 'the emptied bottle, once, through the ledger');
+    assert.equal(r.engine.inv.potion_trantsformation_fluid || 0, 0, 'the ledger\'s last pour empties it here too');
+    assert.ok(r.log.toasts.some((line) => /The Spice Plant is now a Fruit Tree\./.test(line)), r.log.toasts.join(' | '));
+    assert.ok(r.log.achievements.includes('potions_used:potion_trantsformation_fluid:1'));
+  });
+
+  it('a refused trantsform (rooked, too weak) shows the server\'s line and uses nothing', async () => {
+    const r = await shared({ 'patch:0': spiceTree({ maturity: 7, health: 8 }) });
+    potionsFeature.runPackVerb('potion_trantsformation_fluid', 'pour', r.engine);
+    potionsFeature._complete(r.engine);
+    const asked = lastAct(r);
+    r.client.emit('msg:patch_no', { t: 'patch_no', req: asked.req, id: 'patch:0', verb: 'trantsform', code: 'rooked', message: "It's rooked. Revive it first.", now: now(), plot: spiceTree({ maturity: 7, health: 8 }) });
+    await tick();
+    assert.equal(r.log.toasts.at(-1), "It's rooked. Revive it first.");
+    assert.equal(r.engine.inv.potion_trantsformation_fluid, 1);
+    assert.equal(target('patch:0').classId, 'trant_spice');
   });
 
   it('dark or solo: the same tree is the page\'s own, every hook answers null', async () => {
@@ -533,10 +609,11 @@ describe('every grownFromBean branch keeps its solo path and takes the shared on
     assert.match(s, /const hook = target\.grownFromBean \? 'sharedPatchTreeVerb' : 'sharedObjectVerb';/);
   });
 
-  it('potions-feature: a solo Patch tree trantsforms in its plot; a shared one is refused (line 623)', () => {
+  it('potions-feature: a solo Patch tree trantsforms in its plot; a shared one asks the server', () => {
     const s = src('js/features/potions-feature.js');
-    assert.match(s, /if \(target\.sharedPatch\) return \{ ok: false, msg: LATER_LINE \};\n    if \(target\.grownFromBean\) \{\n      const plots = engine\.streetSlot\('patches'\)\?\.plots \|\| \{\};/);
-    assert.match(s, /if \(target\?\.sharedPatch\) return \{ ok: false, error: LATER_LINE, target \};/);
+    assert.match(s, /      return \{ ok: true, asked: true \};\n    \}\n    if \(target\.grownFromBean\) \{\n      const plots = engine\.streetSlot\('patches'\)\?\.plots \|\| \{\};\n      const plot = Object\.values\(plots\)\.find\(\(row\) => row\?\.tree\?\.state === target\.state\);\n      if \(!plot\) return \{ ok: false \};\n      trantsformPlotTree\(plot, out, now\(\)\);/);
+    assert.doesNotMatch(s, /LATER_LINE/);
+    assert.match(s, /case 'potion_trantsformation_fluid': \{\n      const target = closestTree\(engine\);\n      return \{ \.\.\.trantsformCheck\(target\), target \};/, 'canPour as before, shared or not');
   });
 
   it('game.js refreshTreeVisual: Patch trees redraw themselves, shared or not (lines 12086-12088, unchanged)', () => {
@@ -545,9 +622,25 @@ describe('every grownFromBean branch keeps its solo path and takes the shared on
     assert.match(s, /if \(!meta \|\| !target\.sprite \|\| !target\.state \|\| target\.grownFromBean\) return;/);
   });
 
-  it('powders-feature: solo Patch trees still take Fertilidust; only sharedPatch ones are passed by', () => {
+  it('powders-feature: solo Patch trees still take Fertilidust here; only sharedPatch ones are left to the server', () => {
     const s = src('js/features/powders-feature.js');
     assert.match(s, /function inSharedPatch\(t\) \{\n  return Boolean\(t\?\.sharedPatch\);\n\}/);
-    assert.match(s, /&& \(shared \|\| !inSharedPatch\(t\)\)/);
+    assert.match(s, /function ownTrees\(targets\) \{\n  return targets\.filter\(\(t\) => !inSharedPatch\(t\)\);\n\}/);
+    assert.match(s, /const dead = reviveDeadTrees\(engine, ownTrees\(deadTargets\)\)/);
+    assert.match(s, /if \(own\.length\) later\(3000, \(\) => fertilize\(engine, own\)\);/);
+    assert.match(s, /if \(!shared\) later\(3000, \(\) => fertilize\(engine, \[out\.tree\.target\]\)\);/);
+    assert.doesNotMatch(s, /LATER_LINE/);
+  });
+
+  it('rook-attack-feature: a wing beat strips this page\'s copy of a tree, but never a shared Patch tree\'s (the server\'s "patches" carry it)', () => {
+    const s = src('js/features/rook-attack-feature.js');
+    assert.match(s, /hits\.has\(e\.key\) && TRANT_META\[e\.classId\] && e\.target\.state && !e\.target\.sharedPatch\) rookTrantState/);
+    assert.match(s, /if \(entry && TRANT_META\[entry\.classId\] && entry\.target\.state\) rookTrantState\(entry\.target\.state\);/, 'solo: unchanged');
+  });
+
+  it('street-objects-feature: Fertilidust asks for shared Patch trees, never for solo ones', () => {
+    const solo = { classId: 'trant_spice', grownFromBean: true, state: { maturity: 5 }, sprite: {} };
+    assert.equal(streetObjectsFeature.sharedFertilize([solo], false, { mode: 'multiplayer', query: () => null }), null);
+    assert.equal(streetObjectsFeature.sharedFertilize([{ ...solo, sharedPatch: 'patch:0' }], false, { mode: 'solo', query: () => null }), null);
   });
 });

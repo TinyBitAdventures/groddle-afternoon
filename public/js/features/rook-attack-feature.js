@@ -104,7 +104,7 @@ import {
   strikeBeamFor,
   strikeDamageFor,
   useBalmPoint,
-} from '../rook-attack.js?v=c6c14534';
+} from '../rook-attack.js?v=0382c223';
 import { shrinePrimeBonus } from '../imagination-effects.js?v=70169933';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 import { gainMetabolic, loseEnergy, loseMood } from '../metabolics.js?v=8504134e';
@@ -123,7 +123,7 @@ import {
   strikeDamage as mpStrikeDamage,
   syncKeys,
   syncObjs,
-} from '../rook-mp.js?v=9ef8b96b';
+} from '../rook-mp.js?v=0b724b8c';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
 import { copyChargesLeft, copyFromLedger, keepsCopies, spendCopyCharge, verbCopy } from '../copy-charges.js?v=737fd334';
 import { migrateClassValue } from '../tools.js?v=d8aa3536';
@@ -2377,7 +2377,8 @@ function mpWingBeatFx(engine, a, hit) {
   const entries = rookableTargets(engine);
   const hits = new Set(hit);
   // items/include/trants.js onRooked: fruit gone, health -2, on this player's copy of the tree.
-  for (const e of entries) if (hits.has(e.key) && TRANT_META[e.classId] && e.target.state) rookTrantState(e.target.state);
+  // A tree in a shared street Patch (G564) is the server's: its stripped state comes as "patches".
+  for (const e of entries) if (hits.has(e.key) && TRANT_META[e.classId] && e.target.state && !e.target.sharedPatch) rookTrantState(e.target.state);
   syncRookedVisuals(engine, entries);
   const cam = engine.camera;
   const first = entries.find((e) => hits.has(e.key) && e.x > cam.x + 40 && e.x < cam.x + cam.w * 0.75);

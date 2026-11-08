@@ -944,14 +944,21 @@ export const streetObjectsFeature = {
    * jar's charge through the site's ledger, answers obj_dust_used (powderUseGranted runs the verb
    * here) or refuses (the line is shown), and grows the shared street trees as the dust lands
    * (objects.go handleDust: every tree of the street, or with lite the one named); everyone hears
-   * their new state. True when the server was asked, null when the trees are local (solo, a
-   * private place, a tree in your Patch).
+   * their new state. G564 slice 2: trees and dead trees in shared street Patches (target.sharedPatch,
+   * shared-patches-feature's) go the same way, even on a street with no shared street trees: the
+   * full jar revives the dead ones and grows the living ones there (patches_trees.go), Lite names
+   * one by its plot key. True when the server was asked, null when the trees are local (solo, a
+   * private place, a tree in your own Patch).
    */
   sharedFertilize(targets, lite, engine, classTsid = lite ? 'fertilidust_lite' : 'fertilidust', copy = null) {
-    if (!engine || engine.mode !== 'multiplayer' || !shared(engine)) return null;
-    const trees = (targets || []).filter(isStreetTree);
-    if (!trees.length || (lite && trees.length !== 1)) return null;
+    if (!engine || engine.mode !== 'multiplayer') return null;
+    const patchTrees = (targets || []).filter((t) => typeof t?.sharedPatch === 'string' && t.sharedPatch);
+    if (!shared(engine) && !patchTrees.length) return null;
+    const trees = shared(engine) ? (targets || []).filter(isStreetTree) : [];
+    if (!trees.length && !patchTrees.length) return null;
+    if (lite && trees.length + patchTrees.length !== 1) return null;
     const c = bind(engine);
+    if (!c || c.state !== 'online') return null;
     for (const p of pending.values()) {
       if (p.verbId === 'dust') {
         engine.toast?.(COPY.busy, 1600);
@@ -960,7 +967,7 @@ export const streetObjectsFeature = {
     }
     reqSeq += 1;
     const msg = { req: reqSeq };
-    if (lite) msg.id = treeId(trees[0].treeIndex);
+    if (lite) msg.id = trees.length ? treeId(trees[0].treeIndex) : String(patchTrees[0].sharedPatch);
     // The jar used (its place among the class's jars in pack order): the ledger uses that one's charge.
     if (Number.isInteger(copy) && copy >= 0) msg.k = copy;
     if (!c?.send('obj_dust', msg)) return null;

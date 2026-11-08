@@ -55,6 +55,13 @@
  *   the server's (the tree becomes its dead class for everyone; guilt and mood
  *   stay the pourer's page's). Quest counters, iMG, energy and mood come only
  *   from the verb run on a go-ahead.
+ * - Slice 2: Trantsformation Fluid on a shared Patch tree asks here too
+ *   (potions-feature, sharedPatchTrantsform: patch_act "trantsform" with the
+ *   bottle "k"); the server's ledger uses the bottle and the server picks the
+ *   new tree for everyone; its go-ahead lands the new plot and hands
+ *   potions-feature the answer (trantsformGranted: the bottle, the poof, the
+ *   line). Fertilidust is street-objects-feature's obj_dust (sharedFertilize)
+ *   and the Rook rook-attack-feature's (the server strips Patch trees itself).
  *
  * QA: canvas data sharedPatches (street:off|local|waiting|snap|none),
  * sharedPatchesLast (key:verb:ok|code), sharedPatchesView (each plot as this page has it:
@@ -64,7 +71,7 @@
 
 import { addItem, countItem, ITEM_CATALOG } from '../inventory.js?v=b7609342';
 import { saveStore } from '../save-store.js?v=8839ba7b';
-import { patchesFeature } from './patches-feature.js?v=802e2f21';
+import { patchesFeature } from './patches-feature.js?v=9ae1d3a5';
 import {
   COPY,
   GRANT_CLASSES,
@@ -87,7 +94,8 @@ import {
   sharedTreeKey,
   sharedTreeReady,
   sharedTreeSkill,
-} from '../shared-patches.js?v=3dd27063';
+  TRANTSFORM_VERB,
+} from '../shared-patches.js?v=0f12269f';
 
 export const SHARED_PATCHES_FEATURE_ID = 'shared-patches';
 const REQUEST_TIMEOUT_MS = 8000;
@@ -453,7 +461,7 @@ function ask(engine, target, verbId) {
  * when the tree is not a shared one, or the player's own side refuses (the verb runs here alone and
  * refuses as in solo), or this is the go-ahead's own run.
  */
-function askTree(engine, target, verbId, { pour = false } = {}) {
+function askTree(engine, target, verbId, { pour = false, k = null } = {}) {
   const key = sharedTreeKey(target);
   if (!key || engine?.mode !== 'multiplayer' || !enabled) return null;
   if (treeGrant && treeGrant.target === target && treeGrant.verbId === verbId) return null;
@@ -476,6 +484,7 @@ function askTree(engine, target, verbId, { pour = false } = {}) {
   const skill = pour ? '' : sharedTreeSkill(target.classId, wire, learned);
   if (skill) payload.skill = skill;
   if (wire === 'poison' && qaPoisonMs > 0) payload.ms = qaPoisonMs;
+  if (wire === 'trantsform' && Number.isInteger(k) && k >= 0) payload.k = k;
   const { req, send } = sendReq(engine, payload);
   pending.set(req, { req, key, verb: wire, verbId, phase: 'land', tree: true, classId: target.classId, at: Date.now() });
   if (!send()) {
@@ -495,6 +504,14 @@ function treeAnswered(engine, msg, ok, p, key) {
     if (msg.plot) takeOne(key, msg.plot);
     notify(engine);
     refuse(engine, refusalLine(msg.code, msg.message, p.verb));
+    return;
+  }
+  if (p.verb === 'trantsform') {
+    // The new tree is the server's: it lands first, then potions-feature spends the bottle and speaks.
+    if (msg.plot) takeOne(key, msg.plot);
+    notify(engine);
+    const now = patchesFeature.entityByKey?.(key);
+    engine.query?.('trantsformGranted', now?.plot?.stage === 'tree' ? now.target : null, msg, engine);
     return;
   }
   if (msg.before) takeOne(key, msg.before);
@@ -748,6 +765,15 @@ export const sharedPatchesFeature = {
    */
   sharedPatchTreeVerb(target, verbId, engine) {
     return askTree(engine, target, verbId, { pour: true });
+  },
+
+  /**
+   * potions-feature, as a Trantsformation Fluid pour lands on a tree grown in a shared Patch: true
+   * when the server was asked (patch_act "trantsform", k: the bottle) or the ask is held (connecting,
+   * waiting: the line is shown, nothing used), null when the tree is not a shared one.
+   */
+  sharedPatchTrantsform(target, engine, k = null) {
+    return askTree(engine, target, TRANTSFORM_VERB, { pour: true, k });
   },
 
   /** game.js runVerb and tree-death-feature: the server's care roll and the ledger's use of a bottle, for the verb it just allowed. */
