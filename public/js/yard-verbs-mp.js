@@ -44,7 +44,7 @@ import { resetTrantDay } from './trants.js?v=1b3c8ae3';
 import { GROWN_TREE_LABELS, SEASONED_BEANS, SOIL_TIMERS, seedlingTimings } from './patches.js?v=796732fb';
 import { GAME_DAY_MS, GAME_EPOCH_MS } from './game-day.js?v=edb00566';
 import { isNodeId, isRockId } from './yard-stock-mp.js?v=a502e667';
-import { STICK_ANIMAL } from './yard-wander.js?v=99360f64';
+import { STICK_ANIMAL } from './yard-wander.js?v=429743cd';
 
 export const YARD_VERBS_MP_ID = 'yard-verbs-mp';
 /** js/features/homes-feature.js HOME_STREET_TSID: where an owner's save keeps the home street. */

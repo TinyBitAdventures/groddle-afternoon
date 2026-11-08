@@ -14,6 +14,12 @@
  * Each crab's memory (blocks_played and the day-keyed maps) lives in its
  * street's feature slot, so it persists with the world.
  *
+ * Online (slice 2 of research/plans/street-animals-shared.md) a street Crab is in the same place for
+ * everyone: it roams the shared path street-objects-feature gives it (walkShared: the server's spot
+ * and clock, npc_walkable's roam rolled from a seed every page shares), stands for everyone while a
+ * player is at it, listens or reacts (sharedHold, the server's wait), and the street sees a flatter,
+ * hug, insult or pinch. Its memory stays each player's own (Austin 2026-11-08: position only).
+ *
  * The source plays no Musicblock audio for the crab: the tune goes into the
  * crab's headphones (its listen clip), the player hears nothing.
  *
@@ -38,6 +44,7 @@ import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 import { slugsFromEffects } from '../speech-slugs.js?v=130338f9';
 import { getGameDayKey } from '../game-day.js?v=edb00566';
 import { cleanQuestMarkup } from '../quests.js?v=c8d9d0a4';
+import { followPath } from '../street-creatures.js?v=0ef76fff';
 import { walkSurfaceY } from '../walk-surface.js?v=106bfdc5';
 import { isStandable } from '../street-model.js?v=b6cb6a4e';
 import {
@@ -135,6 +142,7 @@ function setClip(crab, state) {
     ? null
     : () => {
         // A one-shot reaction (like_off / dislike_off) settles back to its pose.
+        crab.reactUntil = 0;
         if (crab.sprite.destroyed || holdClips) return;
         setClip(crab, crab.mode === 'walk' ? 'walk' : crab.idleClip);
       };
@@ -192,6 +200,10 @@ function spawn(engine, key, point) {
     subtitle: 'Loves a good tune',
     sprite: spr,
     crab: true,
+    // Online the server shares a street's Crab by its place only (street-objects-feature, sharedPath);
+    // its memory of the tunes it heard stays each player's own (Austin 2026-11-08).
+    crabKey: `crab:${key}`,
+    state: {},
   });
   stopMoving(crab, 1500);
   crabs.push(crab);
@@ -230,6 +242,32 @@ function walk(engine, crab, dtMs) {
     crab.goDir = crab.goDir === 'left' ? 'right' : 'left';
     stopMoving(crab, CRAB_WALK.arriveWaitMs);
   }
+}
+
+/**
+ * Online (slice 2 of research/plans/street-animals-shared.md): a street Crab walks the shared path
+ * street-objects-feature gives it (js/street-creatures.js crabWalkAt: npc_walkable's roam and stands
+ * from the server's spot and clock, rolled from a seed every page shares), so everyone sees it in the
+ * same place. While it listens to someone's tune (busy) this page holds it for everyone
+ * (target.sharedHold: the server's wait), and a menu or a verb holds it too.
+ */
+function walkShared(engine, crab, p, dtMs) {
+  const spr = crab.sprite;
+  crab.target.sharedHold = crab.mode === 'busy' || talk?.crab === crab;
+  if (crab.target.sharedHold) return;
+  const dt = Math.max(1, dtMs / (1000 / 60));
+  spr.x = followPath(spr.x, p.x, dt, 1.4);
+  const feet = spr.y - FEET_PAD * CRAB_SCALE;
+  const y = walkSurfaceY(engine.platforms, spr.x, Number.isFinite(feet) ? feet : p.y0, { up: 24, down: 40 });
+  if (y != null) spr.y = y + FEET_PAD * CRAB_SCALE;
+  const walking = p.pose === 'walk' && !p.held;
+  crab.mode = walking ? 'walk' : 'idle';
+  crab.waitUntil = Infinity;
+  if (!walking && p.pose !== 'walk') crab.idleClip = p.pose;
+  // A verb's reaction clip plays out (its menu wait) before the walk's pose takes over again.
+  if (Date.now() < (crab.reactUntil || 0) || holdClips) return;
+  const clip = walking ? 'walk' : crab.idleClip;
+  if (crab.clip !== clip) setClip(crab, clip);
 }
 
 // —— The call-out (onPlayerCollision / onConversation) ————————————————————
@@ -460,8 +498,13 @@ function runCrabVerb(engine, crab, verb) {
   }
   // onInteractionStarting -> onWaitStart stops it; onWaitEnd walks on after 1.5 s.
   stopMoving(crab, CRAB_WALK.menuWaitMs);
-  if (result.state) setClip(crab, result.state);
+  if (result.state) {
+    setClip(crab, result.state);
+    crab.reactUntil = now() + CRAB_WALK.menuWaitMs;
+  }
   engine.pushActivity({ base: crabVerbMessage(result), effects });
+  // Online the street sees it, and the server holds the Crab for everyone (its menu wait).
+  if (crab.sprite._walkerPath) engine.query?.('sharedWalkerVerb', crab.target, verb, engine);
   // npc_crab.js 227-231 hug, 309-313 flatter, 353-357 pinch, 395-399 insult:
   // animal_love +1, once per crab (one crab per street) per player (G143).
   if (!result.failed) engine.featsIncrement?.('animal_love', 1, { cap: { key: `crab:${engine.streetTsid}:${verb}`, max: 1 } });
@@ -478,7 +521,9 @@ function tickCrabs(engine, dtMs) {
   const p = engine.player;
   for (const crab of crabs) {
     if (crab.sprite.destroyed) continue;
-    if (crab.mode === 'walk') walk(engine, crab, Math.min(dtMs, 100));
+    const shared = crab.sprite._walkerPath?.();
+    if (shared) walkShared(engine, crab, shared, Math.min(dtMs, 100));
+    else if (crab.mode === 'walk') walk(engine, crab, Math.min(dtMs, 100));
     else if (crab.mode === 'idle' && t >= crab.waitUntil) startMoving(engine, crab);
     if (talk || !p || crab.mode === 'busy' || engine.busy()) continue;
     if (!inCrabHitBox({ x: crab.sprite.x, y: crab.sprite.y }, p)) continue;
@@ -679,6 +724,17 @@ export const crabsFeature = {
     const crab = crabs.find((c) => c.target === target);
     if (crab && verbId.startsWith('crab_')) runCrabVerb(engine, crab, verbId.slice(5));
     publish(engine);
+    return true;
+  },
+
+  /** Online: someone else flattered, hugged, insulted or pinched this street Crab: its reaction here too. */
+  walkerVerbSeen(target, verb) {
+    const crab = crabs.find((c) => c.target === target);
+    if (!crab) return null;
+    if (verb === 'flatter' || verb === 'hug') setClip(crab, 'like_off');
+    else if (verb === 'insult' || verb === 'pinch') setClip(crab, 'dislike_off');
+    crab.reactUntil = now() + CRAB_WALK.menuWaitMs;
+    last = `${verb}:seen`;
     return true;
   },
 

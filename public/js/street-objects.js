@@ -38,7 +38,7 @@ import { TRANT_META, canHarvestTrant, fruitCapacityAt, resolveArborologyPackage 
 import { highestLightGreenThumbRank, quoteTrantCare } from './trant-care.js?v=8339adef';
 import { RESOURCE_NODE_ALIASES, RESOURCE_NODE_CATALOG, resolveResourceSkillPackage } from './resource-nodes.js?v=1ecc9789';
 import { highestAnimalKinshipRank } from './animal-kinship.js?v=ae02d8d3';
-import { applyCreatureState, clockOffset, pathFrom } from './street-creatures.js?v=e6741f02';
+import { applyCreatureState, clockOffset, pathFrom } from './street-creatures.js?v=0ef76fff';
 
 /** The resource-node classes whose stock is shared (the "N uses left, then regrows" nodes). */
 export const SHARED_NODE_CLASSES = Object.freeze(['mortar_barnacle', 'ice_knob', 'jellisac', 'dirt_pile', 'peat_1', 'paper_tree']);
@@ -119,7 +119,7 @@ export function streetPigIndex(target, streetTsid) {
 
 /** The kind an id names ('rock' | 'tree' | 'node' | 'pig' | 'chicken' | 'butterfly' | 'batterfly'), or ''. */
 export function idKind(id) {
-  const m = /^(rock|tree|node|pig|chicken|butterfly|batterfly):/.exec(String(id || ''));
+  const m = /^(rock|tree|node|pig|chicken|butterfly|batterfly|kitty|crab):/.exec(String(id || ''));
   return m ? m[1] : '';
 }
 
@@ -465,7 +465,7 @@ export function reconcile(obj, copy, now = Date.now()) {
       const row = copy.objs.get(obj.id);
       obj.target.sharedPath = pathFrom(s, row?.at ?? now, row?.off ?? copy.offset, row?.srv);
     }
-  } else if (obj.kind === 'chicken' || obj.kind === 'butterfly' || obj.kind === 'batterfly') {
+  } else if (obj.kind === 'chicken' || obj.kind === 'butterfly' || obj.kind === 'batterfly' || obj.kind === 'kitty' || obj.kind === 'crab') {
     // An animal the server does not list is fresh: on its path from the start, nobody's egg.
     applyCreatureState(obj.classId, obj.state, s, { me: obj.me, now });
     const row = copy.objs.get(obj.id);

@@ -16,6 +16,13 @@
  * not offered here either. Revive/Apply Balm need Rook attacks, which the
  * remake leaves out.
  *
+ * Online (slice 2 of research/plans/street-animals-shared.md) a street's Heli Kitties are the same
+ * for everyone: each walks the shared path street-objects-feature gives it (stepShared: the
+ * server's spot and clock, the source's pauses rolled from a seed every page shares), a player at
+ * one holds it for everyone, and a pet puts it to sleep for everyone (the server holds it and the
+ * street sees the pet). A bump startles it into a hop where it stands, on that screen only (its
+ * place is everyone's). Names stay in each player's own street slot.
+ *
  * Art: recovered CC0 OGA `npc_kitty_chicken` adult (`3*`) sheets under
  * assets/sprites/kitties/, sliced on their exact 136×115 cells.
  *
@@ -28,6 +35,7 @@
 
 import { slugsFromEffects } from '../speech-slugs.js?v=130338f9';
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=3957a237';
+import { followPath } from '../street-creatures.js?v=0ef76fff';
 import { landingY, nearestSurfaceY, walkSurfaceY } from '../walk-surface.js?v=106bfdc5';
 import { loadWildlifeCatalog, wildlifeCatalog, wildlifeFor } from '../wildlife.js?v=670c3a7f';
 import {
@@ -146,7 +154,10 @@ function buildKitty(engine, kitty) {
     sprite: spr,
     airborne: true,
     kittyKey: kitty.key,
+    // Online the server shares a street's Heli Kitties (street-objects-feature: its path in sharedPath).
+    state: {},
   });
+  entity.appearUntil = Date.now() + KITTY_MOTION.appearMs;
   kitties.push(entity);
   place(entity);
   return entity;
@@ -156,7 +167,7 @@ function place(entity) {
   const { kitty, sprite } = entity;
   if (!sprite || sprite.destroyed) return;
   sprite.x = kitty.x;
-  sprite.y = kitty.y + 2;
+  sprite.y = kitty.y + 2 + (entity.hopY || 0);
   // The art faces right.
   sprite.scale.set(KITTY_SCALE * (kitty.dir === 'left' ? -1 : 1), KITTY_SCALE);
   if (kitty.clip !== entity.clip) setClip(entity, kitty.clip);
@@ -166,7 +177,11 @@ function scare(engine, entity, force = false) {
   const { kitty } = entity;
   if (!force && !rollScare(kitty, engine.learnedSkills)) return false;
   if (kitty.state === 'sleep' || kitty.state === 'sleepStart' || kitty.flying) return false;
-  kickKitty(kitty);
+  if (entity.target.sprite?._walkerPath) {
+    // Online it stays on its shared path: a startled hop where it is, on this screen only (the
+    // source kicked the one kitty into the air for everyone; here its place is everyone's).
+    entity.hopAt = Date.now();
+  } else kickKitty(kitty);
   engine.say(entity.target, KITTY_MOTION.mewBubble, KITTY_MOTION.mewBubbleMs);
   engine.playSound('FLYING_KITTY_MEW', { volume: 0.5 });
   lastAction = 'scared';
@@ -181,6 +196,11 @@ function pet(engine, entity) {
     return;
   }
   setClip(entity, '3sleepStart');
+  // Online it sleeps for everyone: the server holds it on its path and the street sees the pet.
+  if (entity.target.sprite?._walkerPath) {
+    sleepFor(entity);
+    engine.query?.('sharedWalkerVerb', entity.target, 'pet', engine);
+  }
   // npc_kitty_chicken.js 240-279: sendBubble("purrrrrr", 2000, pc, slugs), xp, mood and energy.
   engine.say(entity.target, result.bubble, KITTY_PET.bubbleMs, { slugs: slugsFromEffects({ energy: result.energy, mood: result.mood, xp: result.xp }) });
   engine.playSound('FLYING_KITTY_PURR', { volume: 0.6 });
@@ -195,6 +215,48 @@ function pet(engine, entity) {
   engine.updateHud();
   engine.save();
   publish(engine, true);
+}
+
+/** Online: curled up asleep (3sleepStart, then one sleep cycle) while its shared path holds. */
+function sleepFor(entity) {
+  const at = Date.now();
+  entity.sleepStartUntil = at + KITTY_PET.sleepStartMs;
+  entity.sleepUntil = at + KITTY_PET.totalMs;
+}
+
+/** A hop as onPlayerCollision's kick reads on screen, in place: up and down in 0.8 s, 60 px at the top. */
+const HOP_MS = 800;
+const HOP_PX = 60;
+
+/**
+ * Online (slice 2 of research/plans/street-animals-shared.md): a street Heli Kitty walks the shared
+ * path street-objects-feature gives it (js/street-creatures.js kittyWalkAt from the server's spot and
+ * clock, the source's pauses rolled from a seed every page shares), so everyone sees it in the same
+ * place doing the same thing. Held (a player at it, a pet) it hovers where it is; asleep it sleeps.
+ */
+function stepShared(engine, entity, p, dtMs) {
+  const { kitty } = entity;
+  const at = Date.now();
+  const dt = Math.max(1, dtMs / (1000 / 60));
+  kitty.x = followPath(kitty.x, p.x, dt, 1.4);
+  const y = walkSurfaceY(engine.platforms, kitty.x, Number.isFinite(kitty.y) ? kitty.y : p.y0, { up: 40, down: 70 });
+  if (y != null) kitty.y = y;
+  kitty.dir = p.dir < 0 ? 'left' : 'right';
+  kitty.flying = false;
+  const f = entity.hopAt ? (at - entity.hopAt) / HOP_MS : 1;
+  entity.hopY = f >= 0 && f < 1 ? -Math.sin(Math.PI * f) * HOP_PX : 0;
+  if (f >= 1) entity.hopAt = 0;
+  let clip;
+  if (entity.sleepUntil > at) {
+    kitty.state = at < entity.sleepStartUntil ? 'sleepStart' : 'sleep';
+    clip = at < entity.sleepStartUntil ? '3sleepStart' : '3sleep';
+  } else {
+    kitty.state = p.pose === 'walk' && !p.held ? 'move' : 'pause';
+    if (entity.appearUntil > at) clip = '3appear';
+    else if (entity.hopAt) clip = '3jump';
+    else clip = p.held || p.pose === 'walk' ? '3fly' : p.pose;
+  }
+  kitty.clip = clip;
 }
 
 function applyName(engine, entity, value) {
@@ -373,7 +435,10 @@ export const heliKittiesFeature = {
     if (!kitties.length) return;
     const w = world(engine);
     for (const entity of kitties) {
-      stepKitty(entity.kitty, dtMs, w);
+      // Online a street Heli Kitty is on its shared path (street-objects-feature), else its own walk.
+      const p = entity.target?.sprite?._walkerPath?.();
+      if (p) stepShared(engine, entity, p, dtMs);
+      else stepKitty(entity.kitty, dtMs, w);
       place(entity);
     }
     checkCollisions(engine);
@@ -397,6 +462,17 @@ export const heliKittiesFeature = {
     if (verbId === 'pet') pet(engine, entity);
     else if (verbId === 'name') openNameModal(engine, entity, 'Name Me!');
     else if (verbId === 'rename') openNameModal(engine, entity, 'Rename Me!');
+    return true;
+  },
+
+  /** Online: someone else petted this street Heli Kitty (street-objects-feature): it sleeps here too. */
+  walkerVerbSeen(target, verb) {
+    const entity = kitties.find((e) => e.target === target);
+    if (!entity) return null;
+    if (verb === 'pet') {
+      sleepFor(entity);
+      lastAction = 'pet:seen';
+    }
     return true;
   },
 

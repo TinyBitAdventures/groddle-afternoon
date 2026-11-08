@@ -56,6 +56,9 @@ import { GAME_EPOCH_MS } from './game-day.js?v=edb00566';
 import { INCUBATION } from './animal-husbandry.js?v=75afc5c5';
 import { isStandable } from './street-model.js?v=b6cb6a4e';
 import { ANIMAL_BODY, TREE_FOOTPRINT } from './street-ecology.js?v=78a1d522';
+import { KITTY_MOTION, KITTY_PAUSE_CHOICES } from './heli-kitties.js?v=8fbe314a';
+import { CRAB_WALK } from './crabs.js?v=90964bf8';
+import { walkSurfaceY } from './walk-surface.js?v=106bfdc5';
 import { EAT_PAUSE_MS } from './animal-mood.js?v=a49495fc';
 
 export const CREATURE_KINDS = Object.freeze(['chicken', 'butterfly', 'batterfly']);
@@ -100,6 +103,16 @@ export function creatureId(kind, index) {
 /** The street animal a target is (its id and kind), or null for anything else or your own animal. */
 export function creatureOf(target) {
   if (!target || target.husbandryAnimal || target.packBaby) return null;
+  // A street's Heli Kitties and Crab (slice 2 of research/plans/street-animals-shared.md): their
+  // features' spawn index (heli-kitties-feature kittyKey, crabs-feature crabKey).
+  if (target.classId === 'npc_kitty_chicken' && target.featureId === 'heli-kitties') {
+    const m = /^kitty:(\d{1,2})$/.exec(String(target.kittyKey || ''));
+    return m ? { id: creatureId('kitty', Number(m[1])), kind: 'kitty', index: Number(m[1]) } : null;
+  }
+  if (target.classId === 'npc_crab' && target.featureId === 'crabs') {
+    const m = /^crab:(\d{1,2})$/.exec(String(target.crabKey || ''));
+    return m ? { id: creatureId('crab', Number(m[1])), kind: 'crab', index: Number(m[1]) } : null;
+  }
   if (target.classId === 'npc_batterfly') {
     const m = /^batterfly:(\d{1,2})$/.exec(String(target.husbandryKey || ''));
     return m ? { id: creatureId('batterfly', Number(m[1])), kind: 'batterfly', index: Number(m[1]) } : null;
@@ -412,6 +425,193 @@ export function tripBaseTime(trip, t) {
 /** A street Piggy at path time t: on its trip when it has one, else on its walk (piggyWalkAt). */
 export function piggyAt(home, t, seed = 1, trip = null) {
   return piggyTripAt(trip, t) || { ...piggyWalkAt(home, tripBaseTime(trip, t), seed), phase: '' };
+}
+
+/**
+ * Heli Kitties and Crabs walk the whole run of their floor (slice 2 of
+ * research/plans/street-animals-shared.md). In the original one npc_kitty_chicken or npc_crab item
+ * walked the street for everyone (npc_kitty_chicken.js startMoving, onPathing 1103-1113; npc_crab's
+ * npc_walkable roam) and turned where the floor ended (onStuck). Online every page now walks each on
+ * one path from the server's clock and the spot the server gives (the snapshot's spots), with the
+ * source's pauses rolled from a seed every page shares, so two players see it in the same place.
+ *
+ * walkerSpan is the run of floor it can walk from its spot: the walk surface (js/walk-surface.js,
+ * the same reach the solo walk uses: a Heli Kitty 40 px up and 70 down, a Crab 24 and 40) followed a
+ * few px at a time either way until it ends, and never nearer the street's ends than `edge` (the
+ * source's startMovingLimited geo.l + 100, npc_walkable). The same lines give the same span on every page.
+ */
+export const WALKER_REACH = Object.freeze({
+  kitty: Object.freeze({ up: 40, down: 70, edge: KITTY_MOTION.edgeInset }),
+  crab: Object.freeze({ up: 24, down: 40, edge: CRAB_WALK.edge }),
+});
+
+const spanCache = new WeakMap();
+
+export function walkerSpan(platforms, x, y, { worldW = 0, up = 40, down = 70, edge = 100, step = 2 } = {}) {
+  const lo = Math.min(Number(x), Math.max(0, Number(edge) || 0));
+  const hi = Math.max(Number(x), (Number(worldW) || 0) - (Number(edge) || 0));
+  const key = `${x}|${y}|${worldW}|${up}|${down}|${edge}|${step}`;
+  let row = platforms && typeof platforms === 'object' ? spanCache.get(platforms) : null;
+  if (row?.has(key)) return row.get(key);
+  const y0 = walkSurfaceY(platforms, x, y, { up, down });
+  let span = { l: Number(x), r: Number(x) };
+  if (y0 != null) {
+    const walk = (sign, stop) => {
+      let px = Number(x);
+      let py = y0;
+      for (;;) {
+        const nx = px + sign * step;
+        if (sign < 0 ? nx < stop : nx > stop) return px;
+        const ny = walkSurfaceY(platforms, nx, py, { up, down });
+        if (ny == null) return px;
+        px = nx;
+        py = ny;
+      }
+    };
+    span = { l: walk(-1, lo), r: walk(1, hi) };
+  }
+  if (platforms && typeof platforms === 'object') {
+    if (!row) spanCache.set(platforms, (row = new Map()));
+    if (row.size > 64) row.clear();
+    row.set(key, span);
+  }
+  return span;
+}
+
+/** A place x heading dir on the to-and-fro loop over baseX - r .. baseX + r (loopAt's s). */
+function loopStart(baseX, r, x, dir) {
+  const off = Math.max(-r, Math.min(r, x - baseX));
+  if (dir < 0) return 2 * r - off;
+  return off >= 0 ? off : 4 * r + off;
+}
+
+/** The pauses in one round of a shared Heli Kitty's walk (kittyPlan). */
+export const KITTY_PLAN_PAUSES = 8;
+
+/**
+ * A shared Heli Kitty's walk, as one round that repeats (as chickenPlan): edge to edge over its span
+ * at its walk speed (npc_walkable_onCreate randInt(50, 55)), stopping first after randInt(3, 11) s of
+ * walking and then every randInt(6, 14) s for a pause from kitty_pause_state_choices (a blink, a
+ * happy wiggle, a chew, a hop or a swat at a ball), turning round half the time (stepKitty, its solo
+ * twin). home: { l, r } its span, x0 its spot, dir the way it sets off. Segs' pose is 'walk' or a clip.
+ */
+export function kittyPlan({ l = 0, r = 0, x0 = 0, dir = -1 } = {}, seed = 1) {
+  const key = `kitty|${l}|${r}|${x0}|${dir < 0 ? -1 : 1}|${seed}`;
+  const hit = planCache.get(key);
+  if (hit) return hit;
+  const rng = seededRandom(seed);
+  const randInt = (a, b) => Math.floor(rng() * (b - a + 1)) + a;
+  const speed = randInt(KITTY_MOTION.walkSpeedMin, KITTY_MOTION.walkSpeedMax);
+  const half = Math.max(0.5, (r - l) / 2);
+  const baseX = (l + r) / 2;
+  const loop = 4 * half;
+  const v = speed / 1000;
+  const start = loopStart(baseX, half, x0, dir);
+  let walk = randInt(KITTY_MOTION.firstPauseMinMs, KITTY_MOTION.firstPauseMaxMs);
+  const segs = [];
+  let at = 0;
+  let s = start;
+  for (let k = 0; k < KITTY_PLAN_PAUSES; k += 1) {
+    segs.push({ at, ms: walk, s, pose: 'walk' });
+    at += walk;
+    s = mod(s + v * walk, loop);
+    const choice = KITTY_PAUSE_CHOICES[Math.floor(rng() * KITTY_PAUSE_CHOICES.length) % KITTY_PAUSE_CHOICES.length];
+    const ms = Math.round(choice[0] * 1000);
+    segs.push({ at, ms, s, pose: choice[1] });
+    at += ms;
+    if (rng() < 0.5) s = loopTurn(half, s);
+    walk = randInt(KITTY_MOTION.pauseEveryMinMs, KITTY_MOTION.pauseEveryMaxMs);
+  }
+  const back = mod(start - s, loop) / v;
+  segs.push({ at, ms: back, s, pose: 'walk' });
+  at += back;
+  const plan = Object.freeze({ ms: at, r: half, baseX, v, speed, segs });
+  if (planCache.size > 256) planCache.clear();
+  planCache.set(key, plan);
+  return plan;
+}
+
+/** A shared Heli Kitty at path time t: x, heading and pose ('walk' or its pause's clip). */
+export function kittyWalkAt(home, t, seed = 1) {
+  const plan = kittyPlan(home, seed);
+  if (!(plan.ms > 0)) return { ...loopAt(plan.baseX, plan.r, 0), pose: 'walk' };
+  const tc = mod(Number(t) || 0, plan.ms);
+  let seg = plan.segs[0];
+  for (const g of plan.segs) {
+    if (g.at > tc) break;
+    seg = g;
+  }
+  if (seg.pose !== 'walk') return { ...loopAt(plan.baseX, plan.r, seg.s), pose: seg.pose };
+  return { ...loopAt(plan.baseX, plan.r, mod(seg.s + plan.v * (tc - seg.at), 4 * plan.r)), pose: 'walk' };
+}
+
+/** The roams in one round of a shared Crab's walk (crabPlan). */
+export const CRAB_PLAN_MOVES = 10;
+
+/**
+ * A shared Crab's roam, as one round that repeats: as npc_walkable (crabs-feature, its solo twin) it
+ * stands 1.5 s, then walks 250 or 400 px the way it is going (crabRoamTarget, never past its span),
+ * turns and stands 10 s; where its floor ends it turns and stands 1 s (onStuck). Each stand plays
+ * idle1 or idle2. After CRAB_PLAN_MOVES roams it walks back to its spot, so the next round carries on
+ * from there. home: { l, r } its span and x0 its spot. Segs: { at, ms, x, to, pose } (walk: x to to).
+ */
+export function crabPlan({ l = 0, r = 0, x0 = 0 } = {}, seed = 1) {
+  const key = `crab|${l}|${r}|${x0}|${seed}`;
+  const hit = planCache.get(key);
+  if (hit) return hit;
+  const rng = seededRandom(seed);
+  const speed = CRAB_WALK.speedMin + Math.floor(rng() * (CRAB_WALK.speedMax - CRAB_WALK.speedMin + 1));
+  const v = speed / 1000;
+  const idle = () => (rng() < 0.5 ? 'idle1' : 'idle2');
+  const segs = [];
+  let at = 0;
+  let x = x0;
+  let goDir = -1;
+  const stand = (ms) => {
+    segs.push({ at, ms, x, to: x, pose: idle() });
+    at += ms;
+  };
+  stand(1500);
+  for (let k = 0; k < CRAB_PLAN_MOVES; k += 1) {
+    const list = goDir < 0 ? CRAB_WALK.left : CRAB_WALK.right;
+    let d = list[Math.floor(rng() * list.length) % list.length];
+    if (d < 0 && x + d < l) d = l - x;
+    else if (d > 0 && x + d > r) d = r - x;
+    goDir = -goDir;
+    if (Math.abs(d) < 0.5) {
+      stand(CRAB_WALK.stuckWaitMs);
+      continue;
+    }
+    const ms = Math.abs(d) / v;
+    segs.push({ at, ms, x, to: x + d, pose: 'walk' });
+    at += ms;
+    x += d;
+    stand(CRAB_WALK.arriveWaitMs);
+  }
+  if (Math.abs(x - x0) >= 0.5) {
+    const ms = Math.abs(x0 - x) / v;
+    segs.push({ at, ms, x, to: x0, pose: 'walk' });
+    at += ms;
+  }
+  const plan = Object.freeze({ ms: at, v, speed, segs });
+  if (planCache.size > 256) planCache.clear();
+  planCache.set(key, plan);
+  return plan;
+}
+
+/** A shared Crab at path time t: x, heading and pose ('walk', 'idle1', 'idle2'). */
+export function crabWalkAt(home, t, seed = 1) {
+  const plan = crabPlan(home, seed);
+  if (!(plan.ms > 0)) return { x: home?.x0 ?? 0, dir: -1, pose: 'idle1' };
+  const tc = mod(Number(t) || 0, plan.ms);
+  let seg = plan.segs[0];
+  for (const g of plan.segs) {
+    if (g.at > tc) break;
+    seg = g;
+  }
+  if (seg.pose !== 'walk') return { x: seg.x, dir: -1, pose: seg.pose };
+  const f = seg.ms > 0 ? Math.min(1, (tc - seg.at) / seg.ms) : 1;
+  return { x: seg.x + (seg.to - seg.x) * f, dir: seg.to >= seg.x ? 1 : -1, pose: 'walk' };
 }
 
 /** The seed a street's Chicken rolls its pauses from: its spawn index and spot, the same on every page. */
