@@ -6,6 +6,9 @@
   g.GRODDLE_DATA_VERSIONS = {
     root: s && s.src ? new URL('../', s.src).href : '',
     epoch: '4774a7f0',
-    files: {},
+    files: {
+      "landing/card-explore.webp": "7a2c1124",
+      "landing/full/card-explore.webp": "cbce4e96",
+    },
   };
 })(typeof globalThis !== 'undefined' ? globalThis : this);
