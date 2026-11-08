@@ -26,8 +26,8 @@ import { applyWorld } from '../public/js/street-jobs-mp.js?v=c920dbb9';
 import { routeGraph } from '../public/js/map-routes.js?v=c7e7dc80';
 import { TELEPORTERS } from '../public/js/hidden-floors.js?v=eb220641';
 import { WINTRY_PORTAL_TELEPORTERS } from '../public/js/wintry-portal.js?v=1437deda';
-import { closuresInTheWay, holdNote, placeIndex, questHold, questPlaceNeeds, reachableStreets } from '../public/js/quest-reach.js?v=250cf2eb';
-import { streetJobsFeature } from '../public/js/features/street-jobs-feature.js?v=09d598ac';
+import { closuresInTheWay, holdNote, placeIndex, questHold, questPlaceNeeds, reachableStreets } from '../public/js/quest-reach.js?v=b88ca495';
+import { streetJobsFeature } from '../public/js/features/street-jobs-feature.js?v=056df495';
 
 const root = join(import.meta.dirname, '..');
 const PUB = join(root, 'public');

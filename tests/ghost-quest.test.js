@@ -25,7 +25,7 @@ import {
   phantomAnimationDurationMs,
   grantFadedHeart,
   rememberWithFadedHeart,
-} from '../public/js/ghost-quest.js?v=43feac5c';
+} from '../public/js/ghost-quest.js?v=18559ed6';
 import { createQuestState, parseQuestConversation } from '../public/js/quests.js?v=c8d9d0a4';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -51,10 +51,11 @@ describe('Notice the Unnoticeable authored quest', () => {
       'GA51B2OQAK623EF',
       'GLI2V0UN7RD1T2J',
     ];
-    const selected = choosePhantomHaunts(available);
+    const selected = choosePhantomHaunts(available, { seed: 'one player' });
     assert.equal(selected.length, PHANTOM_HAUNT_COUNT);
     assert.equal(new Set(selected).size, PHANTOM_HAUNT_COUNT);
-    assert.deepEqual(selected.slice(0, 2), ['GCRHITPKONL1T7J', 'GLIF6R3R9GE1GQB']);
+    // Seven official streets are present, so the one non-official street is never borrowed (#145).
+    assert.equal(selected.includes('GLI2V0UN7RD1T2J'), false);
   });
 
   it('records each haunting once and exposes the final encounter after seven', () => {

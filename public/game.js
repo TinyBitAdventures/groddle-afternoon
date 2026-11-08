@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=0eb17d5e';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=127e0a3c';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=33306002';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=5f9f7a1e';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -56,7 +56,7 @@ import {
   noticePhantom,
   grantFadedHeart,
   rememberWithFadedHeart,
-} from './js/ghost-quest.js?v=43feac5c';
+} from './js/ghost-quest.js?v=18559ed6';
 import {
   HOG_HAUL_QUEST_ID,
   HOG_HAUL_STREET_ID,
@@ -498,7 +498,7 @@ import {
   parsePlayerSave,
   serializePlayerSave,
   restorePlayerSave,
-} from './js/player-save.js?v=c7c41d5c';
+} from './js/player-save.js?v=caa1f897';
 import {
   HOME_INTERIOR_TSID,
   HOME_STREET_TSID,
@@ -3299,6 +3299,30 @@ function renderActivityHistory() {
   }
 }
 
+/**
+ * Notice the Unnoticeable's cold spots (#145), with the streets this player can reach now
+ * (street-jobs-feature streetsReachable; null while the roads load): new spots are picked
+ * from those, and an older save's spots are checked once when reach is first known.
+ */
+function ghostQuestStory(opts = {}) {
+  return ensureGhostQuestState(questState, availableStreetTsids(), {
+    ...opts,
+    reachable: features.query('streetsReachable', engine) || null,
+    info: (tsid) => STREET_INDEX.streets[tsid] || null,
+  });
+}
+
+/** An active hunt whose spots were never checked against the roads gets that check (once). */
+function checkPhantomHauntReach() {
+  if (!questState.active?.[PHANTOM_QUEST_ID] || questState.story?.phantom?.reachChecked) return;
+  if (!features.query('streetsReachable', engine)) return;
+  const before = (questState.story?.phantom?.hauntStreets || []).join(',');
+  const story = ghostQuestStory();
+  if (app?.canvas) app.canvas.dataset.ghostHauntSwaps = String(
+    story.hauntStreets.filter((id) => !before.split(',').includes(id)).length
+  );
+}
+
 /** Why an active quest is on hold (street-jobs-feature questHold), or null. */
 function questHoldOf(classTsid) {
   return features.query('questHold', classTsid, engine) || null;
@@ -3308,6 +3332,7 @@ function renderQuestTracker() {
   const box = document.getElementById('quest-tracker-list');
   const count = document.getElementById('quest-tracker-count');
   if (!box) return;
+  checkPhantomHauntReach();
   // A quest on hold is no "what to do next": it leaves the tracker until its road opens.
   const holds = Object.keys(questState.active || {}).filter((id) => questHoldOf(id));
   if (app?.canvas) app.canvas.dataset.questHolds = holds.join(',');
@@ -3870,7 +3895,7 @@ function getPackUseInfo(classTsid) {
     };
   }
   if (classTsid === FADED_HEART_ID) {
-    const story = ensureGhostQuestState(questState, availableStreetTsids());
+    const story = ghostQuestStory();
     const active = Boolean(questState.active?.[REMEMBER_QUEST_ID]);
     const cooldownMs = Math.max(0, story.memoryCooldownUntil - Date.now());
     const rememberedHere = story.rememberedStreets.includes(currentStreetTsid);
@@ -5814,7 +5839,7 @@ function updateHud() {
         card.appendChild(bar);
       }
       if (p.active && p.def.classTsid === PHANTOM_QUEST_ID) {
-        const story = ensureGhostQuestState(questState, availableStreetTsids());
+        const story = ghostQuestStory();
         const remaining = story.hauntStreets.filter((id) => !story.foundStreets.includes(id));
         const hint = document.createElement('div');
         hint.className = 'q-req';
@@ -15156,7 +15181,7 @@ function handlePhantomInteraction(target, verbId) {
     return;
   }
   if (kind === 'final' && verbId === 'talk_to') {
-    const story = ensureGhostQuestState(questState, availableStreetTsids());
+    const story = ghostQuestStory();
     if (story.heartGranted) {
       toast('The Phantom has nothing more to give.');
       return;
@@ -25536,7 +25561,7 @@ function advanceQuestDialogue() {
     return;
   }
   if (def.classTsid === PHANTOM_QUEST_ID || def.classTsid === REMEMBER_QUEST_ID) {
-    ensureGhostQuestState(questState, availableStreetTsids(), {
+    ghostQuestStory({
       reset: def.classTsid === PHANTOM_QUEST_ID,
     });
   }
@@ -29525,7 +29550,7 @@ async function main() {
     if (!questState.active[PHANTOM_QUEST_ID]) {
       assignQuest(questState, PHANTOM_QUEST_ID, { ignorePrereq: true });
     }
-    const story = ensureGhostQuestState(questState, availableStreetTsids(), {
+    const story = ghostQuestStory({
       reset: bootParams.get('ghostreset') === '1',
     });
     const step = clamp(Math.floor(Number(bootParams.get('ghoststep')) || 0), 0, PHANTOM_HAUNT_COUNT);
@@ -29549,7 +29574,7 @@ async function main() {
       assignQuest(questState, REMEMBER_QUEST_ID, { ignorePrereq: true });
     }
     inv[FADED_HEART_ID] = Math.max(1, inv[FADED_HEART_ID] || 0);
-    const story = ensureGhostQuestState(questState, availableStreetTsids());
+    const story = ghostQuestStory();
     const step = clamp(Math.floor(Number(bootParams.get('ghoststep')) || 0), 0, 12);
     story.heartGranted = true;
     story.rememberedStreets = availableStreetTsids()

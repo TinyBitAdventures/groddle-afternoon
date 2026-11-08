@@ -53,9 +53,9 @@ export const PHANTOM_GIVE_HEART_DURATION_MS = phantomAnimationDurationMs(
 );
 
 /**
- * Original production haunting streets from phantom_glitch.js. The location
- * import often exposes the same ids with a G prefix, so selection resolves
- * both forms.
+ * Original production haunting streets, all 50 of phantom_glitch.js's
+ * `locations` (prod_tsid, in source order). The location import often exposes
+ * the same ids with a G prefix, so selection resolves both forms.
  */
 export const OFFICIAL_PHANTOM_HAUNTS = Object.freeze([
   'LCRHITPKONL1T7J',
@@ -63,6 +63,7 @@ export const OFFICIAL_PHANTOM_HAUNTS = Object.freeze([
   'LCR101SU5VL1P09',
   'LCR195Q63RK143M',
   'LCR13NMUQEM1A2R',
+  'LLI23Q4NDHD11EK',
   'LA5DVVGJQQ5237U',
   'LA51B2OQAK623EF',
   'LA912LITC492EU2',
@@ -79,7 +80,11 @@ export const OFFICIAL_PHANTOM_HAUNTS = Object.freeze([
   'LTJ13TRDHKV1970',
   'LTJ2S0EVDSV1HQ0',
   'LIFNG7GD8OU17BO',
+  'LTJ1FR102AV17DP',
+  'LTJ1PV6RLCV1L08',
   'LIFDIDJT0GU1CR8',
+  'LTJ18J9ASDU1UPS',
+  'LTJ10HO3FAV1HDD',
   'LA91JU4QQ712DJN',
   'LA9114MS8B32FB2',
   'LA918AIN63127HB',
@@ -168,22 +173,113 @@ function hash(value) {
   return h >>> 0;
 }
 
-/**
- * Select seven deterministic, real haunting streets present in the imported
- * catalog. Official quest locations are always preferred.
- */
-export function choosePhantomHaunts(availableTsids, seed = 'phantom_glitch') {
-  const available = uniqueIds(availableTsids);
-  const availableSet = new Set(available);
-  const official = [];
+/** mulberry32: a seeded random for tests and QA (the game uses Math.random, as GSJS choose_one). */
+function seededRng(seed) {
+  let a = hash(seed) || 1;
+  return () => {
+    a = (a + 0x6d2b79f5) >>> 0;
+    let t = a;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+function rngFrom(opts) {
+  if (typeof opts.rng === 'function') return opts.rng;
+  if (opts.seed != null) return seededRng(opts.seed);
+  return Math.random;
+}
+
+function pickRandom(list, count, rng) {
+  const pool = [...list];
+  const out = [];
+  while (out.length < count && pool.length) {
+    const i = Math.min(pool.length - 1, Math.floor(rng() * pool.length));
+    out.push(pool.splice(i, 1)[0]);
+  }
+  return out;
+}
+
+/** A street test from a Set/array of reachable tsids (either prefix), or null when unknown. */
+function reachTest(reachable) {
+  if (!reachable) return null;
+  if (typeof reachable === 'function') return (tsid) => aliasCandidates(tsid).some((t) => reachable(t));
+  const set = reachable instanceof Set ? reachable : new Set(uniqueIds(reachable));
+  return (tsid) => aliasCandidates(tsid).some((t) => set.has(t));
+}
+
+/** The official haunting streets present in the imported catalog, in its own tsid form. */
+export function phantomHauntPool(availableTsids) {
+  const availableSet = new Set(uniqueIds(availableTsids));
+  const out = [];
   for (const tsid of OFFICIAL_PHANTOM_HAUNTS) {
     const resolved = aliasCandidates(tsid).find((candidate) => availableSet.has(candidate));
-    if (resolved && !official.includes(resolved)) official.push(resolved);
+    if (resolved && !out.includes(resolved)) out.push(resolved);
   }
-  const fallback = available
-    .filter((tsid) => !official.includes(tsid))
-    .sort((a, b) => hash(`${seed}:${a}`) - hash(`${seed}:${b}`) || a.localeCompare(b));
-  return [...official, ...fallback].slice(0, PHANTOM_HAUNT_COUNT);
+  return out;
+}
+
+/**
+ * Streets that may stand in for an official haunt the player cannot reach (#145 fallback):
+ * reachable streets in a region (hub) that holds an official haunt, never a subway station or a
+ * machine room. `info(tsid)` gives { hubId, label } (assets/streets/index.json).
+ */
+function standInStreets(available, canReach, info, exclude) {
+  if (!canReach || typeof info !== 'function') return [];
+  const officialSet = new Set(phantomHauntPool(available));
+  const hauntHubs = new Set([...officialSet].map((t) => String(info(t)?.hubId || '')).filter(Boolean));
+  return available.filter((t) => {
+    if (officialSet.has(t) || exclude.has(t) || !canReach(t) || t.includes('_')) return false;
+    const row = info(t);
+    if (!row || !hauntHubs.has(String(row.hubId || ''))) return false;
+    return !/subway station|machine room/i.test(String(row.label || ''));
+  });
+}
+
+/**
+ * Seven haunting streets for one player (#145). phantom_glitch.js chooseHauntings
+ * (373-397) takes seven at random from the 50 official streets, a new seven for
+ * every player; the remake used to take the first seven, so everyone hunted the
+ * same streets, most of them behind unbuilt street projects.
+ *
+ * opts.reachable (a Set of tsids, or a test): only streets a player can reach
+ * now are picked (street-jobs-feature `streetsReachable`, the reach the On hold
+ * quests use). The fallback, in order, when fewer reachable official streets are
+ * left than needed (a fresh world reaches 6 of the 50: most stand on streets still
+ * to be built): reachable stand-ins from the haunts' own regions (opts.info, see
+ * standInStreets), then unreachable official streets (they open with their road,
+ * and the quest shows On hold until then: quest-reach.js questStoryNeeds), then
+ * any other street (only a catalog without the official streets, as in unit tests).
+ * opts.exclude: streets already chosen or found. opts.count: how many (7).
+ * opts.rng / opts.seed (or a seed string as the second argument): deterministic picks.
+ */
+export function choosePhantomHaunts(availableTsids, opts = {}) {
+  if (typeof opts === 'string') opts = { seed: opts };
+  const rng = rngFrom(opts);
+  const canReach = reachTest(opts.reachable);
+  const exclude = new Set(uniqueIds(opts.exclude));
+  const count = Math.max(0, Math.floor(opts.count ?? PHANTOM_HAUNT_COUNT));
+  const all = uniqueIds(availableTsids);
+  const available = all.filter((tsid) => !exclude.has(tsid));
+  const official = phantomHauntPool(available);
+  const picked = pickRandom(canReach ? official.filter(canReach) : official, count, rng);
+  if (picked.length < count) {
+    const standIns = standInStreets(all, canReach, opts.info, new Set([...exclude, ...picked]));
+    picked.push(...pickRandom(standIns, count - picked.length, rng));
+  }
+  if (picked.length < count) {
+    picked.push(...pickRandom(official.filter((tsid) => !picked.includes(tsid)), count - picked.length, rng));
+  }
+  if (picked.length < count) {
+    const seed = opts.seed ?? 'phantom_glitch';
+    const others = available
+      .filter((tsid) => !picked.includes(tsid))
+      .sort((a, b) => hash(`${seed}:${a}`) - hash(`${seed}:${b}`) || a.localeCompare(b));
+    const ordered = canReach ? [...others.filter(canReach), ...others.filter((t) => !canReach(t))] : others;
+    picked.push(...ordered.slice(0, count - picked.length));
+  }
+  return picked;
 }
 
 export function createGhostQuestState(seed = {}) {
@@ -197,28 +293,82 @@ export function createGhostQuestState(seed = {}) {
     heartGranted: seed.heartGranted === true,
     rememberedStreets,
     memoryCooldownUntil: Math.max(0, Number(seed.memoryCooldownUntil) || 0),
+    // #145: the spots were chosen (or checked once) knowing which streets the player can reach.
+    reachChecked: seed.reachChecked === true,
   };
 }
 
+/**
+ * The player's spots, chosen when missing. opts.reset starts the hunt again (accepting the
+ * quest). opts.reachable (see choosePhantomHaunts): known reach. A save whose spots were chosen
+ * before reach was known (every save before #145, or a pick made while the roads were still
+ * loading) is checked once, the first time reach is known: spots already found stay, and each
+ * spot still to find that no open road reaches is swapped for a reachable official street not
+ * already chosen, else a reachable stand-in (opts.info); with none left it stays (the quest
+ * shows On hold until its road is built).
+ */
 export function ensureGhostQuestState(questState, availableTsids = [], opts = {}) {
   questState.story ||= {};
   const current = createGhostQuestState(questState.story.phantom);
+  const canReach = reachTest(opts.reachable);
   if (opts.reset === true || current.hauntStreets.length < PHANTOM_HAUNT_COUNT) {
-    current.hauntStreets = choosePhantomHaunts(availableTsids, opts.seed);
     if (opts.reset === true) {
       current.foundStreets = [];
       current.finalReady = false;
       current.heartGranted = false;
       current.rememberedStreets = [];
       current.memoryCooldownUntil = 0;
-    } else {
-      current.foundStreets = current.foundStreets.filter((id) =>
-        current.hauntStreets.includes(id)
-      );
     }
+    const kept = current.foundStreets.slice(0, PHANTOM_HAUNT_COUNT);
+    current.hauntStreets = [
+      ...kept,
+      ...choosePhantomHaunts(availableTsids, {
+        reachable: opts.reachable,
+        info: opts.info,
+        rng: opts.rng,
+        seed: opts.seed,
+        exclude: kept,
+        count: PHANTOM_HAUNT_COUNT - kept.length,
+      }),
+    ];
+    current.foundStreets = kept;
+    current.reachChecked = Boolean(canReach);
+  } else if (canReach && !current.reachChecked) {
+    const blocked = current.hauntStreets.filter(
+      (id) => !current.foundStreets.includes(id) && !canReach(id)
+    );
+    if (blocked.length) {
+      const rng = rngFrom(opts);
+      const all = uniqueIds(availableTsids);
+      const taken = new Set(current.hauntStreets);
+      const pool = phantomHauntPool(all).filter((id) => !taken.has(id) && canReach(id));
+      const swaps = pickRandom(pool, blocked.length, rng);
+      if (swaps.length < blocked.length) {
+        const standIns = standInStreets(all, canReach, opts.info, new Set([...taken, ...swaps]));
+        swaps.push(...pickRandom(standIns, blocked.length - swaps.length, rng));
+      }
+      swaps.forEach((to, i) => {
+        current.hauntStreets[current.hauntStreets.indexOf(blocked[i])] = to;
+      });
+    }
+    current.reachChecked = true;
   }
   questState.story.phantom = current;
   return current;
+}
+
+/**
+ * The cold spots still to find, as a street-bound requirement for quest-reach.js
+ * (questStoryNeeds): every one must be reached, so one no open road reaches puts
+ * the quest On hold. Null when the hunt is over or the spots are all found.
+ */
+export function phantomPlaceNeed(questState) {
+  if (!questState?.active?.[PHANTOM_QUEST_ID]) return null;
+  const story = createGhostQuestState(questState?.story?.phantom);
+  if (story.finalReady || story.heartGranted) return null;
+  const streets = story.hauntStreets.filter((id) => !story.foundStreets.includes(id));
+  if (!streets.length) return null;
+  return { name: 'found_ghost', desc: 'Notice the Phantom on its cold spots', streets, need: streets.length };
 }
 
 export function ghostEncounterAt(questState, streetTsid) {

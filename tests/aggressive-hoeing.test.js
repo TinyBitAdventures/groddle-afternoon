@@ -13,7 +13,7 @@ import { plotVerbs, resolveTendPackage } from '../public/js/patches.js?v=aa83d5a
 import { createToolConditionState, setToolRemaining, getToolCondition } from '../public/js/tools.js?v=d8aa3536';
 import { createInventory } from '../public/js/inventory.js?v=b7609342';
 import { getVerbsFor, runVerb } from '../public/content.js?v=0eb17d5e';
-import { normalizePlayerSnapshot } from '../public/js/player-save.js?v=c7c41d5c';
+import { normalizePlayerSnapshot } from '../public/js/player-save.js?v=caa1f897';
 import { aggressiveHoeingFeature as feature } from '../public/js/features/aggressive-hoeing-feature.js?v=a0e81acf';
 
 const GS = join(dirname(fileURLToPath(import.meta.url)), '../../glitch-GameServerJS');

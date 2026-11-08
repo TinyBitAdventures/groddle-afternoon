@@ -98,7 +98,7 @@ import {
   upgradeOption,
 } from '../street-jobs.js?v=02a81cb3';
 import { gainMetabolic, loseEnergy } from '../metabolics.js?v=8504134e';
-import { closuresInTheWay, holdNote, placeIndex, questHold, reachableStreets } from '../quest-reach.js?v=250cf2eb';
+import { closuresInTheWay, holdNote, placeIndex, questHold, questStoryKey, reachableStreets } from '../quest-reach.js?v=b88ca495';
 import { getQuestCatalog as questCatalog } from '../content-catalogs.js?v=10b118dd';
 import { saveStore } from '../save-store.js?v=8839ba7b';
 import {
@@ -299,9 +299,12 @@ function questHoldFor(classTsid, engine) {
   const r = questReach(engine);
   const def = r && questCatalog()?.[classTsid];
   if (!def) return null;
-  if (r.holds.has(classTsid)) return r.holds.get(classTsid);
+  // #145: Notice the Unnoticeable's per-player cold spots join the hold (quest-reach questStoryNeeds).
+  const storyKey = questStoryKey(classTsid, engine?.questState);
+  const cacheKey = storyKey ? `${classTsid}|${storyKey}` : classTsid;
+  if (r.holds.has(cacheKey)) return r.holds.get(cacheKey);
   let out = null;
-  const hold = questHold(def, r.reach, placeIdx);
+  const hold = questHold(def, r.reach, placeIdx, engine?.questState);
   if (hold) {
     const first = closuresInTheWay({ ...waysReady, shut: r.shut, starts: r.starts, targets: hold.streets, boards: boardsOf() })[0] || null;
     const jobId = first ? Object.keys(catalog.jobs || {}).find((id) => catalog.jobs[id].kind === 'street' && catalog.jobs[id].street === first.street) || '' : '';
@@ -309,7 +312,7 @@ function questHoldFor(classTsid, engine) {
     out = { ...hold, street: first?.street || '', jobId, building: job ? job.label || streetLabel(first.street) : '', board: first?.board ? streetLabel(first.board) : '' };
     out.note = holdNote(out, { building: out.building, board: out.board });
   }
-  r.holds.set(classTsid, out);
+  r.holds.set(cacheKey, out);
   return out;
 }
 
@@ -2468,6 +2471,15 @@ export const streetJobsFeature = {
    */
   questHold(classTsid, engine) {
     return questHoldFor(classTsid, engine);
+  },
+
+  /**
+   * #145: every street the roads as they stand let this player reach (a Set of G tsids, the
+   * reach questHold uses), or null while the ways are still loading. Notice the Unnoticeable
+   * picks its cold spots from these.
+   */
+  streetsReachable(engine) {
+    return questReach(engine)?.reach || null;
   },
 
   streetUnderConstruction(tsid, engine) {

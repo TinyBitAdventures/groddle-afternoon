@@ -23,6 +23,7 @@
  * every route that can advance it happens on named streets.
  */
 import { routesForCounter, WINTRY_PLACE_STREETS } from './quest-offers.js?v=e31115ea';
+import { PHANTOM_QUEST_ID, phantomPlaceNeed } from './ghost-quest.js?v=18559ed6';
 
 const G = (t) => String(t || '').replace(/^L/, 'G');
 const slug = (s) => String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '');
@@ -165,14 +166,41 @@ export function closuresInTheWay({ graph = {}, free = {}, shut = [], starts = []
 }
 
 /**
+ * Street-bound requirements a quest's own story chose for this player (#145): Notice the
+ * Unnoticeable's cold spots (questState.story.phantom, js/ghost-quest.js phantomPlaceNeed), each
+ * of which must be reached. [{ name, desc, streets, need, story: true }], G tsids in the index.
+ */
+export function questStoryNeeds(classTsid, questState, idx) {
+  if (classTsid !== PHANTOM_QUEST_ID || !questState) return [];
+  const need = phantomPlaceNeed(questState);
+  if (!need) return [];
+  const streets = [...new Set(need.streets.map(G))].filter(idx.has);
+  if (!streets.length) return [];
+  return [{ ...need, streets, need: streets.length, story: true }];
+}
+
+/** A cache key for questStoryNeeds (changes when a spot is found or swapped), or ''. */
+export function questStoryKey(classTsid, questState) {
+  if (classTsid !== PHANTOM_QUEST_ID) return '';
+  const need = phantomPlaceNeed(questState);
+  return need ? need.streets.join(',') : '';
+}
+
+/**
  * Why this quest waits, or null: the first street-bound requirement none of whose
  * streets can be reached. { name, desc, streets, place } (place: the hub, or the street,
- * the requirement names).
+ * the requirement names). `questState` adds the streets its story chose for this player
+ * (questStoryNeeds); for those, `streets` and `place` name only the ones out of reach.
  */
-export function questHold(def, reach, idx) {
+export function questHold(def, reach, idx, questState = null) {
   if (!reach) return null;
-  for (const need of questPlaceNeeds(def, idx)) {
+  const needs = [...questPlaceNeeds(def, idx), ...questStoryNeeds(def?.classTsid, questState, idx)];
+  for (const need of needs) {
     if (need.streets.filter((t) => reach.has(t)).length >= (need.need || 1)) continue;
+    if (need.story) {
+      const blocked = need.streets.filter((t) => !reach.has(t));
+      return { ...need, streets: blocked, place: idx.label(blocked[0]) };
+    }
     const hubs = [...new Set(need.streets.map(idx.hubName).filter(Boolean))];
     const place = hubs.length === 1 && need.streets.length > 1 ? hubs[0] : idx.label(need.streets[0]);
     return { ...need, place };
