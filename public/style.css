@@ -2494,13 +2494,13 @@ body.nx-hide-mood.nx-hide-energy .meta-vitals { visibility: hidden; }
   padding: 0;
   border: 0;
   /* cancel.svg redraws the client's 20 x 21 word_dismisser_cancel.png so it stays sharp when the view scales. */
-  background: url("assets/sprites/word-progress/cancel.svg?v=df15aba7") no-repeat 0 0 / 20px 21px;
+  background: url("assets/sprites/word-progress/cancel.svg?v=4774a7f0") no-repeat 0 0 / 20px 21px;
   cursor: pointer;
   pointer-events: auto;
 }
 .word-progress-cancel:hover,
 .word-progress-cancel:focus-visible {
-  background-image: url("assets/sprites/word-progress/cancel_hover.svg?v=df15aba7");
+  background-image: url("assets/sprites/word-progress/cancel_hover.svg?v=4774a7f0");
 }
 .word-progress-cancel:focus-visible { outline: 2px solid var(--c-white); outline-offset: 1px; border-radius: var(--radius-round); }
 .word-progress-cancel[hidden] { display: none; }
@@ -3306,7 +3306,7 @@ button.play-context-head:focus-visible {
   grid-row: 1 / span 2;
   width: 51px;
   height: 46px;
-  background: url('assets/sprites/making/tinkertool-work@3x.webp?v=df15aba7') 0 0 / var(--mp-sheet-w) var(--mp-sheet-h) no-repeat;
+  background: url('assets/sprites/making/tinkertool-work@3x.webp?v=4774a7f0') 0 0 / var(--mp-sheet-w) var(--mp-sheet-h) no-repeat;
   animation:
     make-tool-sheet-x var(--mp-row-dur) steps(var(--mp-cols), end) infinite,
     make-tool-sheet-y calc(var(--mp-row-dur) * var(--mp-rows)) steps(var(--mp-rows), end) infinite;
@@ -9123,7 +9123,7 @@ header.top-bar + .sub { display: none; }
 @media (prefers-reduced-motion: reduce) { .fam-rays svg { animation: none; } }
 .fam-close {
   width: 22px; height: 22px; padding: 0; border: 0; border-radius: var(--radius-xs); cursor: pointer;
-  background: var(--surface-navy) url('assets/ui/familiar/close_x_small_gray.webp?v=f64d7bb6') center / 20px 20px no-repeat;
+  background: var(--surface-navy) url('assets/ui/familiar/close_x_small_gray.webp?v=4774a7f0') center / 20px 20px no-repeat;
   box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--c-grey-84) 25%, transparent);
 }
 .fam-close:hover, .fam-close:focus-visible { box-shadow: inset 0 0 0 1px var(--c-grey-84); }
@@ -9972,7 +9972,7 @@ html[data-street-cards] .notify-notices { visibility: hidden; }
   display: inline-block;
   width: 1.5em;
   height: calc(1.5em * 60 / 74);
-  background: url("assets/sprites/hi-signs/hi_hi_1@3x.webp?v=fe92c120") no-repeat;
+  background: url("assets/sprites/hi-signs/hi_hi_1@3x.webp?v=4774a7f0") no-repeat;
   background-size: calc(1.5em * 444 / 74) calc(1.5em * 348 / 74);
   background-position: calc(1.5em * -197 / 74) calc(1.5em * -171 / 74);
 }
