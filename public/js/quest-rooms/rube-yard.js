@@ -97,6 +97,19 @@ function makeWrizzard(PIXI, kit, spot) {
   return c;
 }
 
+/**
+ * What The Rube says when talked to in his yard. The original's line for this moment is lost
+ * (quests/rube_spy.js:2-4 keeps only the desc, offer and completion text), so while Wrizzards remain he
+ * points the way in our own words; "Help a Rube out, will ya?" stays his greeting on arrival
+ * (the offer's last line). The done line is unchanged.
+ */
+export function rubeTalkLine(found = 0) {
+  const left = WRIZZARDS_NEEDED - Math.max(0, found | 0);
+  if (left <= 0) return 'You got them all?! Thank ya, thank ya!';
+  if (left === WRIZZARDS_NEEDED) return 'They\'re hiding all over the yard! Click them to catch them.';
+  return `${left} more hiding in the yard! Click them when they peek out.`;
+}
+
 export const room = {
   id: 'rube_yard',
   title: 'The Wrizzards and The Rube',
@@ -221,8 +234,7 @@ export const room = {
 
   runVerb(ctx, target, verbId) {
     if (target !== ctx.data.rube || verbId !== 'talk_to') return false;
-    const left = WRIZZARDS_NEEDED - (ctx.data.found?.length || 0);
-    ctx.say(target, left > 0 ? 'Help a Rube out, will ya?' : 'You got them all?! Thank ya, thank ya!', 3600);
+    ctx.say(target, rubeTalkLine(ctx.data.found?.length || 0), 3600);
     return true;
   },
 

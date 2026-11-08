@@ -14,7 +14,7 @@ import { RUBE_YARD_FILES } from '../public/js/rube-yard-art.js?v=0a67d3e6';
 import {
   YARD_ART_DIR, YARD_FLOOR, YARD_FRONT, YARD_PIECES, YARD_W, TIER1, TIER2, LAWN_TOP,
 } from '../public/js/rube-yard-scene.js?v=84b947c2';
-import * as room from '../public/js/quest-rooms/rube-yard.js?v=0e25fc41';
+import * as room from '../public/js/quest-rooms/rube-yard.js?v=b6257e1e';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.join(here, '..');
@@ -65,4 +65,22 @@ test('the yard keeps its gameplay geometry and terraces stay behind the lawn', (
   const near = (name, x) => YARD_PIECES.some(([n, px]) => n === name && Math.abs(px - x) < 40);
   assert.ok(near('bling_birdhouse_1', room.HIDING_SPOTS.find((s) => s.id === 'roof').wx));
   assert.ok(near('bling_treeface_1', room.HIDING_SPOTS.find((s) => s.id === 'tree').wx));
+});
+
+test('talking to The Rube while Wrizzards remain points the way, and the done line stays', () => {
+  const first = room.rubeTalkLine(0);
+  assert.match(first, /hiding all over the yard/);
+  assert.match(first, /Click them/);
+  assert.doesNotMatch(first, /Help a Rube out/);
+  assert.equal(room.rubeTalkLine(7), '3 more hiding in the yard! Click them when they peek out.');
+  assert.equal(room.rubeTalkLine(9), '1 more hiding in the yard! Click them when they peek out.');
+  assert.equal(room.rubeTalkLine(room.WRIZZARDS_NEEDED), 'You got them all?! Thank ya, thank ya!');
+  // Player copy rules: no em-dashes, never the old game's name.
+  for (const n of [0, 5, 9, 10]) assert.doesNotMatch(room.rubeTalkLine(n), /—|Glitch/);
+  // The verb uses it.
+  const said = [];
+  const rube = {};
+  const ctx = { data: { rube, found: [1, 2] }, say: (t, line) => said.push(line) };
+  assert.equal(room.room.runVerb(ctx, rube, 'talk_to'), true);
+  assert.deepEqual(said, ['8 more hiding in the yard! Click them when they peek out.']);
 });
