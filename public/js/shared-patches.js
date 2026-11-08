@@ -9,8 +9,9 @@
  *   release turns it on. QA turns it on for one browser with
  *   localStorage['groddle.qa.sharedPatches'] = '1' (the /play/online/ page
  *   strips query params, so a param can't do it).
- * - Which streets: the server's data/patches.json `pilot` list (slice 1: Old
- *   Main Street, GM4103L52ID23). The page keeps no list of its own: it asks on
+ * - Which streets: the server's data/patches.json `pilot` value (slice 3: null,
+ *   every street with Patches; slice 1 had Old Main Street, GM4103L52ID23). The
+ *   page keeps no list of its own: it asks on
  *   every street with soil and the answer says ("none": keep the save's own).
  *   Homes, tower rooms, party spaces and any private place (a street id with
  *   "_") never ask.
@@ -37,6 +38,10 @@
  *   revives the shared dead trants and grows the shared trees for everyone, Lite
  *   names one by its plot key); Trantsformation Fluid is patch_act "trantsform"
  *   (TRANTSFORM_VERB), the server choosing the new tree.
+ * - Slice 3 (G564): every street at once, and players' own street Patches
+ *   handed over once by the site's payout (one winner per Patch reaches the
+ *   server as its seed file; tools/patches/payout.mjs). A clear another player
+ *   landed first reads CLEARED_FIRST_LINE.
  */
 
 import { DEAD_TRANT_CLASSES, GROWN_TREE_LABELS, SEASONED_BEANS, SOIL_CLASSES, resolveSoilPackage, resolveTendPackage, seedlingTimings } from './patches.js?v=aa83d5ad';
@@ -404,10 +409,17 @@ const PLANTED_BY_VERB = Object.freeze({
   plant: "There's already a seedling here.",
 });
 
+/**
+ * Ours (G564 slice 3): a clear that lands after another player's (the server's first clear wins,
+ * trant_*_dead.js clear 75-110, and answers "nothing") reads as what happened.
+ */
+export const CLEARED_FIRST_LINE = 'Someone else cleared it first.';
+
 /** The line a refusal shows: the server's message, else the code's own line, in plain words. */
 export function refusalLine(code, message = '', verb = '') {
   const base = String(verb || '').split(':')[0];
   const own = String(message || '').trim();
+  if (code === 'nothing' && base === 'clear') return CLEARED_FIRST_LINE;
   if (own) return plainWords(own);
   if (code === 'planted' && PLANTED_BY_VERB[base]) return PLANTED_BY_VERB[base];
   return plainWords(REFUSAL_LINES[code] || 'Not now.');

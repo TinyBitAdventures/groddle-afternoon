@@ -74,7 +74,7 @@ import { metabolicGain, moodMax } from '../metabolics.js?v=8504134e';
 import { quoinDailyLimitFor } from '../quoins.js?v=299cc3f4';
 import { emblemCostFor } from '../shrines.js?v=1a945fe7';
 import { GROWN_TREE_LABELS, trantsformPlotTree } from '../patches.js?v=aa83d5ad';
-import { COPY as SHARED_PATCH_COPY } from '../shared-patches.js?v=0f12269f';
+import { COPY as SHARED_PATCH_COPY } from '../shared-patches.js?v=76a66475';
 import { isPoisoned } from '../tree-poison.js?v=80469175';
 import { furnitureSize } from '../home-decor.js?v=7cee3ace';
 import { textureFromUrl, sourceFromUrl, frameTexture } from '../textures.js?v=3149d699';
@@ -133,12 +133,12 @@ import {
   trantsformMessage,
   trantsformOutcome,
   usePotion,
-} from '../potions.js?v=c21bad59';
+} from '../potions.js?v=4f4c996d';
 import { itemVerbAchievementCounters } from '../item-verbs.js?v=1e20fa7d';
-import { patchesFeature } from './patches-feature.js?v=9ae1d3a5';
-import { homesFeature } from './homes-feature.js?v=492b40e4';
-import { streetTreeIndex } from './tree-death-feature.js?v=747f0035';
-import { questRoomConverse } from './quest-instances-feature.js?v=dd45898c';
+import { patchesFeature } from './patches-feature.js?v=766de05b';
+import { homesFeature } from './homes-feature.js?v=9bbbd085';
+import { streetTreeIndex } from './tree-death-feature.js?v=0e82ba3a';
+import { questRoomConverse } from './quest-instances-feature.js?v=2e82393b';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
 import { copyChargesLeft, copyFromLedger, keepsCopies, spendCopyCharge, verbCopy } from '../copy-charges.js?v=737fd334';
 import { copyTag, migrateClassTag, migrateClassValue, setCopyTag, toolCopies } from '../tools.js?v=d8aa3536';
@@ -1142,7 +1142,7 @@ async function runAutoplay(engine) {
   }
   if (mode === 'potion_animal_youth' || mode === 'potion_trantsformation_fluid') {
     // Stand beside the closest target first.
-    const want = mode === 'potion_animal_youth' ? (t) => Boolean(ANIMAL_BABIES[t.classId]) : (t) => !t.featureId && t.state && isTrantsformable(t, { home: onHomeStreet(engine) }) && (t.state.maturity >= 4) && (t.state.health >= 4);
+    const want = mode === 'potion_animal_youth' ? (t) => Boolean(ANIMAL_BABIES[t.classId]) : (t) => !t.featureId && t.state && isTrantsformable(t, { home: onHomeStreet(engine) }) && trantsformCheck(t).ok;
     const list = live(engine, want).sort((a, b) => Math.abs(a.sprite.x - engine.player.x) - Math.abs(b.sprite.x - engine.player.x));
     if (list[0] && engine.player) {
       engine.player.x = list[0].sprite.x - 60;

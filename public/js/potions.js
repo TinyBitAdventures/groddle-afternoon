@@ -408,12 +408,19 @@ export function isTrantsformable(target, { home = false, poisoned = false } = {}
   return !poisoned;
 }
 
-/** canPour: maturity and health 4 or more (and someone else's tree on their home: not here). */
+/**
+ * canPour: maturity and health 4 or more (and someone else's tree on their home: not here).
+ * A Wood Tree has no health (wood_tree.js keeps none), and the source's
+ * getInstanceProp('health') < 4 is false for a missing prop, so a Wood Tree
+ * passes at maturity 4 or more (potion_trantsformation_fluid.js canPour
+ * 523-524, onPour 544-552; G564: the remake read the missing health as 0 and
+ * refused every Wood Tree).
+ */
 export function trantsformCheck(target) {
   if (!target) return { ok: false, error: POTION_TEXT.noTree };
   const state = target.state || {};
   if ((Number(state.maturity) || 0) < 4) return { ok: false, error: POTION_TEXT.treeSmall };
-  if ((Number(state.health) || 0) < 4) return { ok: false, error: POTION_TEXT.treeWeak };
+  if (target.classId !== 'wood_tree' && (Number(state.health) || 0) < 4) return { ok: false, error: POTION_TEXT.treeWeak };
   return { ok: true };
 }
 

@@ -45,8 +45,8 @@ import {
   trantsformMessage,
   trantsformOutcome,
   usePotion,
-} from '../public/js/potions.js?v=c21bad59';
-import { potionsFeature, usePotionNow, munchRug, shakeFavor } from '../public/js/features/potions-feature.js?v=613b9812';
+} from '../public/js/potions.js?v=4f4c996d';
+import { potionsFeature, usePotionNow, munchRug, shakeFavor } from '../public/js/features/potions-feature.js?v=a616c995';
 import { BUFF_ICONS } from '../public/js/buff-triggers.js?v=a3093922';
 import { createPlot, growTree, tickPlot, trantsformPlotTree, normalizePlot } from '../public/js/patches.js?v=aa83d5ad';
 import { POTION_ART } from '../public/js/potion-art.js?v=27ccc756';
@@ -348,6 +348,10 @@ describe('pour potions', () => {
     assert.equal(trantsformCheck(null).error, 'You must be near a tree to apply this.');
     assert.equal(trantsformCheck({ state: { maturity: 3, health: 9 } }).error, 'This tree is too small to be trantsformed');
     assert.equal(trantsformCheck({ state: { maturity: 9, health: 3 } }).error, 'This tree is too weak to be trantsformed');
+    // A Wood Tree has no health: the source passes it at maturity 4 or more (canPour 523-524).
+    assert.deepEqual(trantsformCheck({ classId: 'wood_tree', state: { maturity: 4, harvestCount: 0 } }), { ok: true });
+    assert.equal(trantsformCheck({ classId: 'wood_tree', state: { maturity: 3 } }).error, 'This tree is too small to be trantsformed');
+    assert.equal(trantsformCheck({ classId: 'trant_bean', state: { maturity: 9 } }).error, 'This tree is too weak to be trantsformed', 'a trant still needs its health');
     assert.equal(isTrantsformable({ classId: 'trant_egg' }), false);
     assert.equal(isTrantsformable({ classId: 'trant_egg' }, { home: true }), true);
     assert.equal(isTrantsformable({ classId: 'trant_gas' }, { poisoned: true }), false);

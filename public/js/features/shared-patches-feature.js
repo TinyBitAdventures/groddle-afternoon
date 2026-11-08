@@ -12,7 +12,8 @@
  * changes for players until a release turns it on.
  *
  * - On a street join the page asks for the street's plots (patch_sync). The
- *   server's pilot list decides: "none" (or a server without the module, its
+ *   server decides (every laid-out street since slice 3, or its data's pilot
+ *   list): "none" (or a server without the module, its
  *   bad_frame) keeps the save's own plots, as before G564. Solo never comes here.
  * - patches-feature lays the street's plots out from this feature
  *   (sharedPatchPlots: the plots held here, never the save) and redraws when
@@ -71,7 +72,7 @@
 
 import { addItem, countItem, ITEM_CATALOG } from '../inventory.js?v=b7609342';
 import { saveStore } from '../save-store.js?v=8839ba7b';
-import { patchesFeature } from './patches-feature.js?v=9ae1d3a5';
+import { patchesFeature } from './patches-feature.js?v=766de05b';
 import {
   COPY,
   GRANT_CLASSES,
@@ -95,7 +96,7 @@ import {
   sharedTreeReady,
   sharedTreeSkill,
   TRANTSFORM_VERB,
-} from '../shared-patches.js?v=0f12269f';
+} from '../shared-patches.js?v=76a66475';
 
 export const SHARED_PATCHES_FEATURE_ID = 'shared-patches';
 const REQUEST_TIMEOUT_MS = 8000;

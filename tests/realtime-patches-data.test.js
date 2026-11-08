@@ -21,8 +21,8 @@ import {
   tickPlot,
 } from '../public/js/patches.js?v=aa83d5ad';
 import { createTrantState } from '../public/js/trants.js?v=9c2e8c0f';
-import { PATCH_PILOT } from '../tools/build-realtime-patches.mjs';
-import { serverPath, skipWithoutServer } from '../tools/repos.mjs';
+import { PATCH_PILOT, SITE_OUT, sharedPatchStreets } from '../tools/build-realtime-patches.mjs';
+import { HAS_SITE, serverPath, skipWithoutServer } from '../tools/repos.mjs';
 
 const OLD_MAIN = 'GM4103L52ID23';
 
@@ -32,10 +32,13 @@ describe('the server\'s Patches data and growth agree with the game', { skip: sk
     assert.equal(out.status, 0, out.stderr || out.stdout);
   });
 
-  it('lays out every placed plot under the page\'s own keys, with Old Main Street the only pilot', () => {
+  it('lays out every placed plot under the page\'s own keys, every street shared (no pilot list)', () => {
     const data = JSON.parse(readFileSync(serverPath('data', 'patches.json'), 'utf8'));
-    assert.deepEqual(data.pilot, [OLD_MAIN]);
-    assert.deepEqual([...PATCH_PILOT], [OLD_MAIN]);
+    // Slice 3 (Austin 2026-11-08: "all 100 streets", "no pilot: every street at once"): one data value.
+    assert.equal(data.pilot, null);
+    assert.equal(PATCH_PILOT, null);
+    assert.equal(sharedPatchStreets(data.streets).length, 100);
+    assert.deepEqual(sharedPatchStreets(data.streets, [OLD_MAIN]), [OLD_MAIN], 'a list narrows it again');
     const plots = Object.values(data.streets).flatMap((s) => s.plots);
     assert.equal(Object.keys(data.streets).length, 100, 'the plan\'s 100 streets');
     assert.equal(plots.length, 188, '175 Patches, 8 Dark Patches, 5 dead trees');
@@ -43,6 +46,17 @@ describe('the server\'s Patches data and growth agree with the game', { skip: sk
     const old = data.streets[OLD_MAIN];
     assert.equal(old.hub, 27);
     assert.deepEqual(old.plots.map((p) => p[0]), ['patch:0', 'patch:1', 'patch:2', 'patch:3', 'trant_spice_dead:0']);
+  });
+
+  it('writes the site\'s payout data for every shared street (data/patch-streets.json)', { skip: HAS_SITE ? false : 'no site checkout' }, () => {
+    const data = JSON.parse(readFileSync(serverPath('data', 'patches.json'), 'utf8'));
+    const site = JSON.parse(readFileSync(SITE_OUT, 'utf8'));
+    assert.deepEqual(Object.keys(site.streets).sort(), Object.keys(data.streets).sort());
+    assert.equal(site.streets[OLD_MAIN].name, 'Old Main Street');
+    assert.deepEqual(site.streets[OLD_MAIN].plots, data.streets[OLD_MAIN].plots.map(([k, c]) => [k, c]));
+    for (const [bean, b] of Object.entries(SEASONED_BEANS)) assert.equal(site.beans[b.trantClass], bean);
+    assert.equal(site.fruit.trant_spice, 'all_spice');
+    assert.deepEqual(site.planks, [25, 30, 40, 50, 60, 80]);
   });
 
   it('carries js/patches.js\'s numbers', () => {

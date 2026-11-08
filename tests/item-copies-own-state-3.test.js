@@ -36,7 +36,7 @@ import { dropEffect, normalizeGroundStack, normalizeItem } from '../public/js/dr
 import { normalizeListing } from '../public/js/auctions.js?v=4fe3e230';
 import { cabinetMove, cabinetPut, cabinetTake, normalizeContents } from '../public/js/home-storage.js?v=121f1897';
 import { CUBIMAL_NAMING } from '../public/js/cubimals.js?v=c48cc6ff';
-import { FAVOR_GIANTS } from '../public/js/potions.js?v=c21bad59';
+import { FAVOR_GIANTS } from '../public/js/potions.js?v=4f4c996d';
 import { HOPPER_CEILING, STILL } from '../public/js/machines.js?v=663980c9';
 import { teachPhrase } from '../public/js/seasons.js?v=1978c3f3';
 import { addItem, countItem, createInventory } from '../public/js/inventory.js?v=b7609342';

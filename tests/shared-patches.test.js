@@ -27,15 +27,16 @@ import {
   plainWords,
   plantGrowLevel,
   refusalLine,
+  CLEARED_FIRST_LINE,
   refusedBeforeBar,
   replayRng,
   sharedPatchesOn,
   soilRolls,
   stripSharedPlots,
-} from '../public/js/shared-patches.js?v=0f12269f';
-import { sharedPatchesFeature } from '../public/js/features/shared-patches-feature.js?v=1c1d05f0';
-import { patchesFeature, soilSpawnPlan } from '../public/js/features/patches-feature.js?v=9ae1d3a5';
-import { FEATURES } from '../public/js/features/index.js?v=9a66cb0a';
+} from '../public/js/shared-patches.js?v=76a66475';
+import { sharedPatchesFeature } from '../public/js/features/shared-patches-feature.js?v=09086469';
+import { patchesFeature, soilSpawnPlan } from '../public/js/features/patches-feature.js?v=766de05b';
+import { FEATURES } from '../public/js/features/index.js?v=b762264d';
 import { getStreetEcologyCatalog, setStreetEcologyCatalog } from '../public/js/street-ecology.js?v=78a1d522';
 import { HAS_SERVER, serverPath } from '../tools/repos.mjs';
 
@@ -149,6 +150,8 @@ describe('a server plot on the page', () => {
     assert.equal(refusalLine('planted', '', 'dig'), 'A seedling is growing - why would you dig it out?');
     assert.equal(refusalLine('planted', '', 'plant:bean_spice'), "There's already a seedling here.");
     assert.equal(refusalLine('enough', ''), "That's enough, thnx.");
+    assert.equal(refusalLine('nothing', "There's nothing here to clear.", 'clear'), CLEARED_FIRST_LINE, 'the first clear won');
+    assert.equal(refusalLine('nothing', ''), "There's nothing here to clear.");
     assert.equal(refusalLine('weeds', 'You should probably tend to the weeds first.'), 'You should probably tend to the weeds first.');
     assert.equal(refusalLine('whatever', ''), 'Not now.');
     assert.equal(plainWords('One \u2014 two \u2013 three'), 'One, two, three');
@@ -217,9 +220,9 @@ describe('the page\'s own rolls replay the same way (js/patches.js performPlotVe
 });
 
 describe('the server\'s layout agrees with the page', { skip: !HAS_SERVER || !existsSync(serverPath('data', 'patches.json')) ? 'no server data/patches.json' : false }, () => {
-  it('the pilot is Old Main Street, and its plot keys are the ones this page plans', () => {
+  it('every street is shared (no pilot list), and Old Main Street\'s plot keys are the ones this page plans', () => {
     const data = JSON.parse(readFileSync(serverPath('data', 'patches.json'), 'utf8'));
-    assert.ok(data.pilot.includes(OLD_MAIN));
+    assert.equal(data.pilot, null, 'slice 3: every street at once (Austin 2026-11-08)');
     const street = data.streets[OLD_MAIN];
     const keys = street.plots.map((p) => p[0]).sort();
     assert.deepEqual(keys, ['patch:0', 'patch:1', 'patch:2', 'patch:3', 'trant_spice_dead:0']);
@@ -668,6 +671,21 @@ describe('the feature', () => {
     assert.equal(stage('trant_spice_dead:0'), 'dirty');
     assert.equal(r.engine.inv.plank, 25);
     assert.ok(r.log.achievements.includes('dead_trants_cleared:trant_spice_dead:1'));
+    restore();
+  });
+
+  it('a clear another player landed first reads "Someone else cleared it first." (Ours, slice 3)', async () => {
+    const r = rig();
+    restore = await boot(r);
+    snapshot(r, {});
+    await tick();
+    assert.equal(sharedPatchesFeature.runVerbOverride(target(r, 'trant_spice_dead:0'), 'clear', r.engine), true);
+    const asked = lastAct(r);
+    r.client.emit('msg:patch_no', { t: 'patch_no', req: asked.req, id: 'trant_spice_dead:0', verb: 'clear', code: 'nothing', message: "There's nothing here to clear.", now: Date.now(), plot: { class: 'trant_spice_dead', kind: 'patch', stage: 'dirty' } });
+    await tick();
+    assert.ok(r.log.activity.includes(CLEARED_FIRST_LINE), r.log.activity.join(' | '));
+    assert.equal(r.engine.inv.plank || 0, 0, 'no Planks for the second clear');
+    assert.equal(stage('trant_spice_dead:0'), 'dirty', 'the plot as it stands');
     restore();
   });
 

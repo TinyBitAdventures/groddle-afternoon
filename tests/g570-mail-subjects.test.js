@@ -93,7 +93,7 @@ describe('G570: subjects on the game\'s own letters', () => {
 
   it('subjects are plain and short (no em-dash, no trademark)', () => {
     const all = [...Object.values(MAIL_SUBJECTS), ...['purchased', 'cancelled', 'expired'].map(mailSubject), PLAYER_MAIL_TEXT.returnedSubject,
-      'A special delivery', 'A gift from the Yeti', 'Mail on every street', 'Thank you', 'Your note', 'I stopped by', 'Your garden crops'];
+      'A special delivery', 'A gift from the Yeti', 'Mail on every street', 'Thank you', 'Your note', 'I stopped by', 'Your garden crops', 'Your Patch tree is shared', 'Your Patch beans'];
     for (const s of all) {
       assert.doesNotMatch(s, /—|Glitch/, s);
       assert.ok(s.length <= 30, s);
@@ -102,7 +102,7 @@ describe('G570: subjects on the game\'s own letters', () => {
 });
 
 describe('G570: the site titles its letters from nobody (src/LedgerMail.php subject)', { skip: !HAS_SITE ? 'no groddle-afternoon-site checkout' : !hasPhp ? 'no php' : false }, () => {
-  const php = (body) => JSON.parse(execFileSync('php', ['-r', `foreach (['Economy', 'LedgerMath', 'WordFilter', 'LedgerGift', 'LedgerMail', 'GardenPayout'] as $c) require ${JSON.stringify(SITE_DIR)} . "/src/$c.php"; use Groddle\\Minn\\LedgerMail as M; use Groddle\\Minn\\GardenPayout as P; ${body}`]).toString());
+  const php = (body) => JSON.parse(execFileSync('php', ['-r', `foreach (['Economy', 'LedgerMath', 'WordFilter', 'LedgerGift', 'LedgerMail', 'GardenPayout', 'PatchPayout'] as $c) require ${JSON.stringify(SITE_DIR)} . "/src/$c.php"; use Groddle\\Minn\\LedgerMail as M; use Groddle\\Minn\\GardenPayout as P; use Groddle\\Minn\\PatchPayout as Q; ${body}`]).toString());
 
   it('the gardens payout\'s crops are "Your garden crops"; a player\'s letter has no subject', () => {
     const out = php(`echo json_encode([
@@ -112,6 +112,13 @@ describe('G570: the site titles its letters from nobody (src/LedgerMail.php subj
       'subject' => P::SUBJECT,
     ]);`);
     assert.deepEqual(out, { payout: 'Your garden crops', other: null, player: null, subject: 'Your garden crops' });
+    // G564: the street Patches payout's two letters.
+    const patches = php(`echo json_encode([
+      'refund' => M::subject(['from_id' => 0, 'text' => Q::REFUND_TEXT]),
+      'win' => M::subject(['from_id' => 0, 'text' => Q::WIN_START . 'Your Fruit Tree on Pental Leave is now a shared Patch tree.']),
+      'player' => M::subject(['from_id' => 7, 'text' => Q::REFUND_TEXT]),
+    ]);`);
+    assert.deepEqual(patches, { refund: 'Your Patch beans', win: 'Your Patch tree is shared', player: null });
     const src = readFileSync(join(SITE_DIR, 'src/LedgerMail.php'), 'utf8');
     assert.match(src, /if \(\(\$subject = self::subject\(\$r\)\) !== null\) \{\n\s+\$letter\['subject'\] = \$subject;/);
   });
