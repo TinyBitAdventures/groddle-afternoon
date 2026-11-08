@@ -17,6 +17,9 @@
 #   slow link), then the copies swap, so players never load a half-written game.
 #
 # Usage: tools/deploy/kinsta.sh [<release json>]   (default: tools/deploy/live.json)
+#   GRODDLE_DEPLOY_KEEP="*.png *.jpg"   protect files matching these rsync patterns from deletion in the
+#   game for this one deploy (old clients still on the page may ask for them); the next deploy without
+#   it removes them.
 set -euo pipefail
 here=$(cd "$(dirname "$0")/../.." && pwd)
 RELEASE=${1:-$here/tools/deploy/live.json}
@@ -96,7 +99,10 @@ rsync -rlc --delete -e "${SSH[*]}" "$work/site/" "$HOST:public/wp-content/themes
 
 echo "3/6 the game (changed files only)"
 "${SSH[@]}" "$HOST" 'rm -rf ~/web/game.next && cp -al ~/web/game ~/web/game.next'
-rsync -rlc --delete --exclude index.php --timeout=120 -e "${SSH[*]}" "$GAME/" "$HOST:web/game.next/"
+keep=(); read -ra keep_pats <<< "${GRODDLE_DEPLOY_KEEP:-}"   # read -a: patterns stay unglobbed
+for pat in "${keep_pats[@]+"${keep_pats[@]}"}"; do keep+=(--filter="protect $pat"); done
+[ ${#keep[@]} -gt 0 ] && echo "keeping files that left the game: ${GRODDLE_DEPLOY_KEEP}"
+rsync -rlc --delete --exclude index.php "${keep[@]+"${keep[@]}"}" --timeout=120 -e "${SSH[*]}" "$GAME/" "$HOST:web/game.next/"
 "${SSH[@]}" "$HOST" 'rm -rf ~/web/game.old && mv ~/web/game ~/web/game.old && mv ~/web/game.next ~/web/game && rm -rf ~/web/game.old'
 
 echo "4/6 links, shims"
