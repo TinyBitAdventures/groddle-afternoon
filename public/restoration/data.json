@@ -2729,13 +2729,18 @@
   ]
  },
  "release": {
-  "game": "0.24.0",
+  "game": "0.25.0",
   "deployed": "2026-11-08"
  },
  "git": {
-  "commits": 1509,
+  "commits": 1510,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-08",
+    "kind": "fix",
+    "text": "Mailboxes, Visiting Stones and notice boards keep clear of tree trunks"
+   },
    {
     "date": "2026-11-08",
     "kind": "fix",
@@ -2850,11 +2855,6 @@
     "date": "2026-11-08",
     "kind": "fix",
     "text": "Fewer floors are wrongly marked out of reach, so quoins, rocks and animals can be placed on more of them"
-   },
-   {
-    "date": "2026-11-08",
-    "kind": "fix",
-    "text": "The Rube points the way when you talk to him in his yard during The Wrizzards and The Rube"
    }
   ]
  },
