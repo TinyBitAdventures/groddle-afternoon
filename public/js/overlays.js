@@ -107,11 +107,27 @@ export const OVERLAY_USES = Object.freeze({
   // G379 items/sparkle_powder.js 330-337: window_overlay, size 150% of the window's shorter side
   // (InWindowAnnouncementOverlay.as 116-119, 152), centred, for everyone on the street, 3 s late.
   overlay_sparkle_powder: { type: 'window', size: 1.5, durationMs: 6000, delayMs: 3000, loop: true, src: 'items/sparkle_powder.js 330-337' },
+  // G378 items/include/shrines.js showSplatterOverlayFinish 840-872: on the shrine, 4.5 s, delta_y 180
+  // (Ix 275, Firebog 255, Uralia 195), 1.5 s after the slather walks you to x - 120; SQUISH_GRAPES.
+  jellisac_splatter_on_shrine: { type: 'itemstack', wh: 0, durationMs: 4500, dx: 0, dy: 180, dyByRegion: { ix: 275, firebog: 255, uralia: 195 }, delayMs: 1500, walkDx: -120, loop: false, sound: 'SQUISH_GRAPES', src: 'items/include/shrines.js 822-872' },
+  // G382 items/include/shrines.js showPrimeOverlay 750-783: on the shrine's top (at_top, delta_y 0), clickable,
+  // "Click to prime this shrine for attack." 30 px over it; a click primes and dismisses it.
+  click_to_prime: { type: 'itemstack', wh: 0, durationMs: 0, dx: 0, dy: 0, loop: true, txt: 'Click to prime this shrine for attack.', txtDy: -30, src: 'items/include/shrines.js 750-783' },
   // G382 items/include/shrines.js 795-817 (click_to_donate on the shrine's top) and 907-924.
   click_to_donate: { type: 'itemstack', wh: 0, durationMs: 0, dx: 0, dy: 0, loop: true, src: 'items/include/shrines.js 795-817' },
   shrine_power_up: { type: 'itemstack', wh: 0, durationMs: 10000, dx: -40, dy: 10, delayMs: 1000, state: 'charge', src: 'items/include/shrines.js 907-924' },
   // G390 locations/inc_rook.js 416-451 sendGlowMsg: at the avatar's feet for the rest of the 15 s orb window.
   avatar_power_up: { type: 'pc', wh: 0, durationMs: 15000, dx: 0, dy: 0, state: 'charge', src: 'locations/inc_rook.js 432-451' },
+  // G387 main.js doCameraModeStarted 6853-6868: a 50 x 50 bubble 110 px over the avatar, to everyone else,
+  // until Camera Mode ends (doCameraModeEnded 6896-6899); hide_in_snaps.
+  eyeballing: { type: 'pc', wh: 50, durationMs: 0, dx: 0, dy: -110, loop: true, others: true, src: 'main.js 6853-6868, 6896-6899' },
+  // G387 items/game_teleporter.js onConversation 211-230: pay 50, 2 s at the avatar, width 300 (the art's
+  // larger side fits it: InLocationAnnouncementOverlay.as 425), delta_y 20.
+  game_teleporter_overlay: { type: 'pc', wh: 300, durationMs: 2000, dx: 0, dy: 20, loop: false, sound: 'PAY_FIFTY_CURRANTS', src: 'items/game_teleporter.js 211-230' },
+  // G398 locations/inc_transit.js transit_start_subway_windows 426-470: location_overlays at x -528, -52
+  // and 441, y -234, 275 x 161 (1:1), at_bottom, while the train moves. Drawn over the static pane
+  // (js/subway.js CAR_WINDOWS, CAR_WINDOW_BOTTOM), whose frame it repeats.
+  subway_window: { type: 'location', wh: 275, durationMs: 0, xs: [-528, -52, 441], y: -234, loop: true, src: 'locations/inc_transit.js 426-470' },
   // G391 quests/hell_hole.js 104-113: a 75 px right_arrow under the hint, no duration.
   right_arrow: { type: 'vp', wh: 75, durationMs: 0, x: 0.5, topY: 0.15, loop: true, src: 'quests/hell_hole.js 100-113' },
   // G396 players/inc_games.js 872-893 and groups/shared_instance_manager.js 247-257.
@@ -124,6 +140,25 @@ export const OVERLAY_USES = Object.freeze({
   button_play_again: { type: 'vp', wh: 150, durationMs: 0, x: 0.37, y: 0.6, loop: false, src: 'players/inc_games.js 1116-1131' },
   button_leave_game: { type: 'vp', wh: 150, durationMs: 0, x: 0.63, y: 0.6, loop: false, src: 'players/inc_games.js 1133-1148' },
 });
+
+/** G387: Tiny Speck's thought bubble (glitch-client overlay_bubble.swf frame 1, CC0) round an overlay with bubble: true. */
+export const OVERLAY_BUBBLE_URL = `${OVERLAY_BASE}overlay_bubble.svg`;
+
+/**
+ * The thought bubble's size and where the art sits in it, for art drawn artW x artH
+ * (InLocationAnnouncementOverlay.as 259-261, 316-342: sized to the larger side + 10, padding
+ * 15 over a 50 px space, 1.3 for the tail; the art centred in the top 70%). The bubble's
+ * bottom centre is the overlay's point; artBottom is how far above it the art's bottom sits.
+ */
+export function overlayBubbleBox(artW, artH) {
+  const size = Math.trunc(Math.max(artW, artH) + 10);
+  const padd = 15;
+  const space = 50;
+  const h = Math.trunc((size + (size / space) * (padd * 2)) * 1.3);
+  const w = Math.trunc(size + (size / space) * (padd * 2));
+  const artY = Math.round(-h + artH + ((h * 0.7) - artH) / 2);
+  return { w, h, artBottom: -artY };
+}
 
 let manifestPromise = null;
 

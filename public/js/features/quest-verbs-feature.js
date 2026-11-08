@@ -6,8 +6,14 @@
  * open and its super_harvest_jellisac counter is already above 0. It removes
  * up to 4 Jellisac clumps (removeItemStackClass('jellisac_clump', 4)), counts
  * jellisacs_slathered (quest event shrine_slathered:grendaline) and says the
- * source's activity line. The splatter overlay (showSplatterOverlay) is not
- * drawn here.
+ * source's activity line. G378: the slather walks you to the shrine's x - 120
+ * facing right, and 1.5 s later Tiny Speck's jellisac_splatter_on_shrine
+ * plays on the shrine for 4.5 s with SQUISH_GRAPES (shrines.js
+ * showSplatterOverlay 822-838, showSplatterOverlayFinish 840-872); its
+ * delta_y is 180, or 275 / 255 / 195 on the Ix, Firebog and Uralia shrines.
+ * QA: a street with a Grendaline shrine plus &shrinedemo=1&slatherdemo=1 opens
+ * the quest with its super harvest counted and 4 Jellisac Clumps in the pack;
+ * &slatherautoplay=1 slathers (&slatherhold=<ms> freezes the splatter there).
  *
  * G447, Give a cubimal to (items/street_spirit.js 132-215, the npc base verb,
  * hasCubimal 880-919): on a character a cubimal looks like, while Mini Me, Mini
@@ -21,7 +27,9 @@
  * (street_spirit_groceries and the rest), so they do not take one yet.
  */
 
-import { removeItem, countItem } from '../inventory.js?v=b7609342';
+import { addItem, removeItem, countItem } from '../inventory.js?v=b7609342';
+import { OVERLAY_USES, playOverlay } from '../overlays.js?v=ed371926';
+import { displayTopOf, itemstackOverlayPoint } from '../overlay-art.js?v=11b6dd7f';
 
 export const QUEST_VERB_PREFIX = 'questverb_';
 export const SLATHER_QUEST = 'jellisachands_donate_jellisacs';
@@ -118,6 +126,45 @@ export function slatherVerb(target, questState) {
   return { id: SLATHER_VERB, label: SLATHER_COPY.label, sort: 56, tooltip: SLATHER_COPY.tooltip, enabled: true, reason: '', energy: 0 };
 }
 
+/** jellisac_splatter_on_shrine.fla's stage is 168.25 x 217: its larger side, drawn 1:1 in the source. */
+export const SPLATTER_STAGE_SIDE = 217;
+
+/** G378 showSplatterOverlayFinish 845-852: the splatter's delta_y on this shrine (its region's, else 180). */
+export function splatterDy(target) {
+  const use = OVERLAY_USES.jellisac_splatter_on_shrine;
+  return use.dyByRegion[target?.state?.region] ?? use.dy;
+}
+
+/**
+ * G378: walk to x - 120 facing right (showSplatterOverlay 826-831), then after
+ * 1.5 s the splatter on the shrine and SQUISH_GRAPES. Returns the overlay's
+ * handle promise (null when the shrine has no sprite).
+ */
+export function showSplatter(engine, target, { holdMs = null } = {}) {
+  const spr = target?.sprite;
+  if (!spr || spr.destroyed) return null;
+  const use = OVERLAY_USES.jellisac_splatter_on_shrine;
+  engine.moveAvatar?.(spr.x + use.walkDx, 'right');
+  const dy = splatterDy(target);
+  // The remake draws shrines at 0.78 of their art (game.js spawnShrine), so the splatter's delta and
+  // size shrink with it, keeping it where the source put it on the shrine's front.
+  const s = Math.abs(spr.scale?.y || 1);
+  const handle = playOverlay(engine.PIXI, 'jellisac_splatter_on_shrine', {
+    layer: engine.fxLayer,
+    at: () => itemstackOverlayPoint(spr.x, displayTopOf(spr), { dx: use.dx * s, dy: dy * s }),
+    wh: SPLATTER_STAGE_SIDE * s,
+    durationMs: use.durationMs,
+    delayMs: use.delayMs,
+    loop: use.loop,
+    holdMs,
+    alive: () => !spr.destroyed,
+  });
+  const sound = setTimeout(() => engine.playSound?.(use.sound), use.delayMs);
+  handle.done.then((ok) => { if (!ok) clearTimeout(sound); });
+  engine.setData?.('questVerbSplatter', `${target.state?.region || 'base'}:${dy}`);
+  return handle;
+}
+
 /** The slather itself: up to 4 clumps go, the counter moves. */
 export function performSlather(inv) {
   const removed = Math.min(SLATHER_CLUMPS, countItem(inv, 'jellisac_clump'));
@@ -125,8 +172,38 @@ export function performSlather(inv) {
   return { ok: true, removed, msg: SLATHER_COPY.done };
 }
 
+let slatherDemoDone = false;
+
+/** QA &slatherdemo=1: the quest open and counted, 4 clumps; &slatherautoplay=1 slathers the street's shrine. */
+function slatherDemo(engine) {
+  if (slatherDemoDone || engine.param?.('slatherdemo') !== '1') return;
+  slatherDemoDone = true;
+  const qs = engine.questState;
+  if (qs) {
+    qs.active ||= {};
+    qs.active[SLATHER_QUEST] = { ...(qs.active[SLATHER_QUEST] || {}), progress: { ...(qs.active[SLATHER_QUEST]?.progress || {}), super_harvest_jellisac: 1 } };
+  }
+  if (countItem(engine.inv, 'jellisac_clump') < SLATHER_CLUMPS) addItem(engine.inv, 'jellisac_clump', SLATHER_CLUMPS);
+  engine.refreshPack?.();
+  if (engine.param?.('slatherautoplay') !== '1') return;
+  setTimeout(() => {
+    const shrine = (engine.interactables || []).find((t) => isGrendalineShrine(t));
+    if (!shrine) return;
+    const hold = engine.param?.('slatherhold');
+    if (hold) {
+      showSplatter(engine, shrine, { holdMs: Number(hold) || 0 });
+      return;
+    }
+    questVerbsFeature.runVerbOverride(shrine, SLATHER_VERB, engine);
+  }, 1500);
+}
+
 export const questVerbsFeature = {
   id: 'quest-verbs',
+
+  onStreetEnter(street, engine) {
+    slatherDemo(engine);
+  },
 
   decorateVerbs(target, verbs, engine) {
     const rows = [slatherVerb(target, engine.questState), giveCubimalVerb(target, engine.questState, engine.inv)].filter(Boolean);
@@ -178,6 +255,7 @@ export const questVerbsFeature = {
     if (verbId !== SLATHER_VERB) return null;
     if (!slatherVerb(target, engine.questState)) return true;
     const res = performSlather(engine.inv);
+    showSplatter(engine, target);
     engine.achievement('shrine_slathered:grendaline', 1);
     engine.pushActivity(res.msg);
     engine.toast(res.msg, 4200);

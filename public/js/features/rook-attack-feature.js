@@ -60,7 +60,7 @@
 import { slugsFromEffects } from '../speech-slugs.js?v=130338f9';
 import { addItem, countItem, ensureItem, removeItem, ITEM_CATALOG } from '../inventory.js?v=b7609342';
 import { bindCountField, countKeyValue, countStepMarkup } from '../ui/count-chooser.js?v=5bc894c8';
-import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=b764884b';
+import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=3957a237';
 import { landingY, nearestSurfaceY } from '../walk-surface.js?v=106bfdc5';
 import { donationValueFor } from '../shrines.js?v=3170dbdb';
 import { giantDisplayName } from '../giant-names.js?v=0e295891';
@@ -109,7 +109,7 @@ import { shrinePrimeBonus } from '../imagination-effects.js?v=70169933';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 import { gainMetabolic, loseEnergy, loseMood } from '../metabolics.js?v=8504134e';
 import { displayTopOf, easeOutBack, itemstackOverlayPoint, playSheetOverlay } from '../overlay-art.js?v=11b6dd7f';
-import { OVERLAY_USES, playOverlay } from '../overlays.js?v=642adbd0';
+import { OVERLAY_USES, playOverlay } from '../overlays.js?v=ed371926';
 import {
   MP_ROOK,
   MP_ROOK_TEXT,
@@ -1959,6 +1959,93 @@ function openOfferPanel(engine, target) {
   requestAnimationFrame(() => wrap.querySelector('button.verb-choice')?.focus());
 }
 
+/**
+ * G382 items/include/shrines.js showPrimeOverlay 750-783: while the Rook is stunned and the
+ * shrine is not primed (inc_rook.js 647-653, shrines.js openRookAttack 736-739, primeComplete 956,
+ * doneAttack 1106-1109), click_to_prime sits on the shrine's top (at_top, delta_y 0). It is
+ * clickable: a click primes the shrine and dismisses it (dismiss_on_click), and hovering shows
+ * "Click to prime this shrine for attack." 30 px over its point (txt_delta_y -30, the tip at the
+ * overlay's own point, AbstractAnnouncementOverlay.as getTip 716-734). Only players with Piety I
+ * see it (750-753); solo has no Piety gate (ROOK_SOLO), and online alone needs none either.
+ */
+let primePrompt = null; // { target, handle, hit, tip }
+
+function primePromptWanted(engine) {
+  const a = here(engine);
+  if (!a || !canStrike(a)) return null;
+  const shrine = shrineTarget(engine);
+  if (!shrine?.sprite || shrine.sprite.destroyed) return null;
+  if (mp) {
+    if (a.primed) return null;
+    if (!mpAlone() && !engine.learnedSkills?.includes(MP_ROOK.primeSkill)) return null;
+  } else if (primed) return null;
+  return shrine;
+}
+
+function hidePrimePrompt() {
+  if (!primePrompt) return;
+  primePrompt.handle?.stop();
+  for (const v of [primePrompt.hit, primePrompt.tip]) if (v && !v.destroyed) v.destroy();
+  primePrompt = null;
+}
+
+function updatePrimePrompt(engine) {
+  const shrine = primePromptWanted(engine);
+  // A stunned Rook takes no stun click (canStun), so while the prompt is up the flying Rook
+  // never sits over it and swallows the click meant for the arrow.
+  if (ui?.rook && !ui.rook.destroyed) ui.rook.eventMode = shrine ? 'none' : 'static';
+  if (!shrine) {
+    hidePrimePrompt();
+    return;
+  }
+  if (primePrompt?.target !== shrine) {
+    hidePrimePrompt();
+    const { PIXI } = engine;
+    const spr = shrine.sprite;
+    const use = OVERLAY_USES.click_to_prime;
+    const point = () => ({ x: spr.x + use.dx, y: displayTopOf(spr) + use.dy });
+    const handle = playOverlay(PIXI, 'click_to_prime', { layer: engine.fxLayer, at: point, durationMs: use.durationMs, loop: use.loop });
+    // The arrow is the click target (the stage, 115 x 138, standing on the shrine's top).
+    const hit = new PIXI.Graphics().rect(-57, -138, 114, 138).fill({ color: 0xffffff, alpha: 0.001 });
+    hit.eventMode = 'static';
+    hit.cursor = 'pointer';
+    hit.zIndex = 100001;
+    hit.label = 'rook:click_to_prime';
+    const tip = new PIXI.Container();
+    const words = new PIXI.Text({ text: use.txt, style: { fontFamily: 'Arial', fontSize: 12, fontWeight: '700', fill: 0x2a2a2a } });
+    words.anchor.set(0.5, 1);
+    const pad = 6;
+    const box = new PIXI.Graphics().roundRect(-words.width / 2 - pad, -words.height - pad * 2, words.width + pad * 2, words.height + pad * 2, 5).fill({ color: 0xfffbe8, alpha: 0.96 }).stroke({ width: 1, color: 0x8c7b4f, alpha: 0.9 });
+    words.y = -pad;
+    tip.addChild(box, words);
+    tip.visible = false;
+    tip.eventMode = 'none';
+    tip.zIndex = 100002;
+    hit.on('pointerover', () => { tip.visible = true; });
+    hit.on('pointerout', () => { tip.visible = false; });
+    // On the press, before game.js's own canvas pointerdown (Pixi's listener was added first): the
+    // click is the prompt's, not a click on the shrine under it (no verb menu opens).
+    hit.on('pointerdown', (ev) => {
+      ev?.stopPropagation?.();
+      ev?.nativeEvent?.stopImmediatePropagation?.();
+      engine.setData('rookPrimePrompt', 'clicked');
+      hidePrimePrompt();
+      prime(engine, shrine);
+    });
+    engine.fxLayer.addChild(hit, tip);
+    primePrompt = { target: shrine, handle, hit, tip, point };
+    engine.setData('rookPrimePrompt', 'shown');
+  }
+  const p = primePrompt.point();
+  primePrompt.hit.x = p.x;
+  primePrompt.hit.y = p.y;
+  primePrompt.tip.x = p.x;
+  primePrompt.tip.y = p.y + OVERLAY_USES.click_to_prime.txtDy;
+  engine.setData('rookPrimePromptAt', `${Math.round(p.x)},${Math.round(p.y)}`);
+  // QA: &rookprimetip=1 holds the hover tip up for screenshots.
+  if (engine.param?.('rookprimetip') === '1') primePrompt.tip.visible = true;
+}
+
 function updatePrimeFx(engine) {
   if (!primed) return;
   if (now() >= primed.until && !primed.mp) {
@@ -3035,6 +3122,7 @@ export const rookAttackFeature = {
     cancelOrb(engine);
     if (mp) mpLeaveStreet(engine);
     endPrime(engine, false);
+    hidePrimePrompt();
     closeOfferPanel();
     for (const row of tracked.values()) if (row.halo && !row.halo.destroyed) row.halo.destroy();
     tracked = new Map();
@@ -3124,6 +3212,7 @@ export const rookAttackFeature = {
     updateOrb(engine, dtMs);
     if (mp) mpDrawOrbs(engine);
     updatePrimeFx(engine);
+    updatePrimePrompt(engine);
     if (t < shakeUntil) {
       const k = (shakeUntil - t) / 1100;
       engine.nudgeCamera?.((Math.random() - 0.5) * 14 * k, (Math.random() - 0.5) * 10 * k);

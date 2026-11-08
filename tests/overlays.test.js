@@ -68,13 +68,15 @@ const G397_VECTOR = ['crown_game_winner_you', 'crown_game_winner_someone_else'];
 const SHARP2_VECTOR = ['tower_sign_scaffolding_overlay'];
 /** G379: Sparkle Powder fills the window (150%), so its frames are SVG on any screen; the half-size sheet is the fallback. */
 const G379_VECTOR = ['overlay_sparkle_powder'];
+// Lane art 2026-11-08 (G387): the eyeballing bubble and the Crown Game Teleporter's overlay.
+const ART_NOV8_VECTOR = ['eyeballing', 'game_teleporter_overlay'];
 /** G448: the overlays.json rows that do. */
 const G448_ART = ['overlay_sneezing_powder', 'focusing_orb_laser_beam', 'shrine_laser_beam_1', 'shrine_laser_beam_2', 'shrine_laser_beam_3', 'smoke_puff', 'proto_puff', 'secret_location_marker', 'icon_giant_love', 'race_winner', 'grabemgood_winner', 'thegreathoghaul_winner', 'game_of_crowns_winner', 'focusing_orb_attack'];
 /** The sharpness audit's first batch (2026-11-02, tests/sharp-rook-hi-overlays.test.js): the rest of the sheets the game shows. */
 const SHARP1_MORE = ['trading', 'fox_bait_ignite', 'dice_overlay', 'twelve_sided_die', 'petrified_rock_open_overlay', 'right_arrow', 'crown_game_indicator_you', 'crown_game_indicator_someone_else', 'game_of_crowns_throbber'];
 const SHARP1_ART = ['poisoned', 'rooked', 'amorous_philtre_heart', 'play_glitch'];
 
-const overlays = () => import('../public/js/overlays.js?v=642adbd0');
+const overlays = () => import('../public/js/overlays.js?v=ed371926');
 const flush = async (n = 3) => {
   for (let i = 0; i < n; i += 1) {
     await new Promise((r) => setTimeout(r, 0));
@@ -105,8 +107,9 @@ describe('tools/overlays/build.mjs', () => {
       if (m.scale !== 1) assert.match(m.file, new RegExp(`@${m.scale}x\\.webp$`), key);
       total += buf.length;
     }
-    // 15.8 MB as built (the seven rainbows are 1.25-1.5 MB each at 30 fps, as overlay-art's are; each loads when first shown).
-    assert.ok(total < 16_500_000, `${total} bytes in all`);
+    // 17.7 MB as built (the seven rainbows are 1.25-1.5 MB each at 30 fps, as overlay-art's are; each loads when first
+    // shown). Lane art 2026-11-08 added 1.8 MB: the slather splatter, click_to_prime, eyeballing, the teleporter, the subway window.
+    assert.ok(total < 18_200_000, `${total} bytes in all`);
   });
 
   it('is not one of the overlay-art keys (two manifests, no overlap)', () => {
@@ -292,7 +295,7 @@ describe('G441: the super harvest arc drawn from its SVG frames on dense screens
     // 0.82 MB as built (about 100 KB gzipped), under the 1.3 MB sheet.
     assert.ok(readFileSync(vfile).length < 1_000_000);
     // G446: every 400 px rainbow (and the charades arc); G448: the other FLA overlays the audit found soft.
-    for (const [key, m] of Object.entries(manifest)) assert.equal(Boolean(m.vector), /^rainbow_|^charades_gameover$/.test(key) || G448_MORE.includes(key) || G397_VECTOR.includes(key) || SHARP1_MORE.includes(key) || SHARP2_VECTOR.includes(key) || G379_VECTOR.includes(key), key);
+    for (const [key, m] of Object.entries(manifest)) assert.equal(Boolean(m.vector), /^rainbow_|^charades_gameover$/.test(key) || G448_MORE.includes(key) || G397_VECTOR.includes(key) || SHARP1_MORE.includes(key) || SHARP2_VECTOR.includes(key) || G379_VECTOR.includes(key) || ART_NOV8_VECTOR.includes(key), key);
   });
 
   it('vectorDensity: the sheet on a 1x screen, the SVG frames from 1.5 device px per stage px, capped', async () => {

@@ -31,10 +31,10 @@ import {
   pushSample,
   sampleTrack,
   socketUrl,
-} from '../public/js/realtime-client.js?v=a3d40316';
+} from '../public/js/realtime-client.js?v=7350df88';
 import { createMinnAccount } from '../public/js/minn-account.js?v=8f2741cd';
-import { emoteCommand, lookOf, poseOf, realtimeFeature, sharedStreet, statusText } from '../public/js/features/realtime-feature.js?v=8a399067';
-import { FEATURES } from '../public/js/features/index.js?v=5fa0ff5c';
+import { emoteCommand, lookOf, poseOf, realtimeFeature, sharedStreet, statusText } from '../public/js/features/realtime-feature.js?v=1ca263fd';
+import { FEATURES } from '../public/js/features/index.js?v=1ce6c699';
 
 const root = join(import.meta.dirname, '..');
 const read = (rel) => readFileSync(join(root, rel), 'utf8');
@@ -346,6 +346,23 @@ describe('realtime-client: moves, chat, emotes', () => {
     const emoted = ctx.events.filter(([k]) => k === 'emoted');
     assert.equal(emoted.length, 1);
     assert.equal(emoted[0][1].e, 'surprise');
+  });
+
+  it('G387: Camera Mode\'s eyeballing rides the emote message as an overlay, never an emotion', async () => {
+    const ctx = setup();
+    const overlays = [];
+    ctx.client.on('overlay', (d) => overlays.push(d.e));
+    ctx.client.join({ street: 'S1' });
+    const ws = await online(ctx);
+    ws.receive({ t: 'street', street: 'S1', players: [{ id: 8, name: 'Bo' }] });
+    assert.equal(ctx.client.emote('eyeballing'), true);
+    assert.deepEqual(ws.sent.at(-1), { t: 'emote', e: 'eyeballing' });
+    const before = ctx.events.filter(([k]) => k === 'emoted').length;
+    ws.receive({ t: 'emoted', id: 8, e: 'eyeballing' });
+    ws.receive({ t: 'emoted', id: 8, e: 'eyeballing_done' });
+    ws.receive({ t: 'emoted', id: 99, e: 'eyeballing' });
+    assert.deepEqual(overlays, ['eyeballing', 'eyeballing_done']);
+    assert.equal(ctx.events.filter(([k]) => k === 'emoted').length, before);
   });
 });
 

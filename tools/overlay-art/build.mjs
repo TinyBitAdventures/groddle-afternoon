@@ -276,6 +276,8 @@ const sha256 = (buf) => createHash('sha256').update(buf).digest('hex');
  */
 export function vectorFrames(cfg, box) {
   const doc = scrub(loadFla(join(audit, cfg.fla), { scene: cfg.scene }), cfg.scrub);
+  // tools/overlays/build.mjs configs may change the loaded FLA first (G387 expandMotionObjects).
+  cfg.prepare?.(join(audit, cfg.fla), doc);
   const plan = framePlan({ kind: 'sheet', ...cfg }, doc);
   const unique = [];
   const seen = new Map();

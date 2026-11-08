@@ -8,7 +8,7 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { HIRES_SPRITES } from '../public/js/sprite-hires.js?v=abaf3d5a';
+import { HIRES_SPRITES } from '../public/js/sprite-hires.js?v=663a7121';
 import { HIRES_ICONS } from '../public/js/icon-hires.js?v=165dbd6e';
 import {
   CANDY_DAILY_MAX,
@@ -290,7 +290,7 @@ describe('Egg Hunt and Pi Day', () => {
   });
 
   it('counts each egg into the collection however it arrives, then gives the trophy for them (seasons-feature)', async () => {
-    const { seasonsFeature } = await import('../public/js/features/seasons-feature.js?v=1dae554c');
+    const { seasonsFeature } = await import('../public/js/features/seasons-feature.js?v=594d3cf5');
     const { createInventory, addItem, countItem, removeItem } = await import('../public/js/inventory.js?v=b7609342');
     const unlocked = [];
     const counted = {};
@@ -360,7 +360,7 @@ describe('supply paths', () => {
 
 describe('a ?season= preview leaves the save alone (G342)', () => {
   it('a carved pumpkin survives previewing another season, and the save still remembers Zilloween', async () => {
-    const { seasonsFeature } = await import('../public/js/features/seasons-feature.js?v=1dae554c');
+    const { seasonsFeature } = await import('../public/js/features/seasons-feature.js?v=594d3cf5');
     const { createInventory, addItem, countItem } = await import('../public/js/inventory.js?v=b7609342');
     const inv = createInventory();
     addItem(inv, 'pumpkin_carved_1', 2);

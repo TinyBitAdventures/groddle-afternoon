@@ -49,6 +49,16 @@ export const CORE_KINDS = Object.freeze(new Set(['auth', 'join', 'move', 'chat',
 export const EMOTES = Object.freeze(['happy', 'surprise', 'angry']);
 
 /**
+ * G387: words that ride the emote message but are no emotion: a state another
+ * player's client draws over your Glitch. 'eyeballing' is Camera Mode's
+ * bubble (main.js doCameraModeStarted 6853-6868, sent to everyone else on
+ * the street), 'eyeballing_done' takes it down (doCameraModeEnded 6896-6899).
+ * They arrive as the client's 'overlay' event, never 'emoted'. Like the
+ * source's announcement, a player who arrives later does not see it.
+ */
+export const OVERLAY_EMOTES = Object.freeze(['eyeballing', 'eyeballing_done']);
+
+/**
  * Avatar sheet states travel as the server's anim words (lower case, digits
  * and _, at most 24). Every state avatar-anims.js avatarAnimState returns is
  * already one except climbPause. liftTriple is the rise of a triple jump
@@ -371,6 +381,10 @@ export function createRealtimeClient({
       case 'emoted': {
         if (awaitingStreet) return;
         const p = players.get(Number(msg.id));
+        if (p && OVERLAY_EMOTES.includes(msg.e)) {
+          emit('overlay', { id: p.id, e: msg.e, player: p });
+          return;
+        }
         if (!p || !EMOTES.includes(msg.e)) return;
         emit('emoted', { id: p.id, e: msg.e, player: p });
         return;
@@ -538,7 +552,7 @@ export function createRealtimeClient({
     },
 
     emote(e) {
-      if (!EMOTES.includes(e) || !want || !street) return false;
+      if ((!EMOTES.includes(e) && !OVERLAY_EMOTES.includes(e)) || !want || !street) return false;
       return send({ t: 'emote', e });
     },
   };

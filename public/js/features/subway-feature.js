@@ -40,6 +40,7 @@
  */
 
 import { countItem } from '../inventory.js?v=b7609342';
+import { OVERLAY_USES, playOverlay } from '../overlays.js?v=ed371926';
 import { doorsFeature } from './doors-feature.js?v=aa806d8c';
 import { frameTexture, textureFromUrl } from '../textures.js?v=3149d699';
 import {
@@ -98,7 +99,7 @@ const DATA_MS = 250;
 let state = { rides: 0, stop: null, direction: 'forwards', inCar: false };
 let views = [];
 let targets = [];
-let windows = []; // { tunnel, lamp, mask }
+let windows = []; // { engine, x, y, handle } (G398: the subway_window overlay while moving)
 let floorLights = [];
 let ride = null;
 let pendingBoard = null;
@@ -558,6 +559,7 @@ function clearViews(engine) {
     if (!v.destroyed) v.destroy({ children: true });
   }
   views = [];
+  for (const w of windows) w.handle?.stop();
   windows = [];
   floorLights = [];
 }
@@ -620,33 +622,8 @@ function drawCar(engine, street) {
   const [, ww, wh] = SUBWAY_ART.subway_window_static;
   for (const cx of CAR_WINDOWS) {
     addSprite(engine, { piece: 'subway_window_static', x: cx, y: CAR_WINDOW_BOTTOM, w: ww, h: wh, z: -62 }, b);
-    // The glass (the overlay's mask, ~243 x 135): the tunnel wall slides past it while the train moves.
-    const gx = cx - b.l - 121;
-    const gy = CAR_WINDOW_BOTTOM - b.t - wh + 13;
-    const box = new PIXI.Container();
-    box.x = gx;
-    box.y = gy;
-    box.zIndex = -61;
-    box.eventMode = 'none';
-    const dark = new PIXI.Graphics().rect(0, 0, 243, 135).fill(0x1e1f1a);
-    const tunnel = new PIXI.TilingSprite({ texture: textureFromUrl(artUrl('wall_1')), width: 243, height: 135 });
-    tunnel.tileScale.set(0.55);
-    tunnel.tint = 0x7a7a6e;
-    tunnel.alpha = 0.85;
-    const lamp = new PIXI.Sprite(textureFromUrl(artUrl('light_1')));
-    lamp.anchor.set(0.5);
-    lamp.width = 150;
-    lamp.height = 50;
-    lamp.y = 24;
-    lamp.alpha = 0.8;
-    const glare = new PIXI.Graphics().roundRect(0, 0, 243, 135, 14).fill({ color: 0xffffff, alpha: 0.07 });
-    const mask = new PIXI.Graphics().roundRect(0, 0, 243, 135, 14).fill(0xffffff);
-    box.addChild(dark, tunnel, lamp, glare, mask);
-    box.mask = mask;
-    box.visible = false;
-    engine.entityLayer.addChild(box);
-    views.push(box);
-    windows.push({ box, tunnel, lamp, phase: Math.random() });
+    // G398: while the train moves, Tiny Speck's subway_window overlay plays over the pane (setMoving).
+    windows.push({ engine, x: cx - b.l, y: CAR_WINDOW_BOTTOM - b.t, handle: null });
   }
   for (const cx of CAR_FLOOR_LIGHTS) {
     const s = addSprite(engine, { piece: 'subway_interior_floor_light', x: cx, y: CAR_FLOOR + 30, w: 605, h: 87, z: -8 }, b);
@@ -656,19 +633,36 @@ function drawCar(engine, street) {
   }
 }
 
+/**
+ * G398 locations/inc_transit.js transit_start_subway_windows 426-470: on departure the car gets
+ * three subway_window location_overlays (275 x 161, 1:1, at_bottom), the tunnel sliding past
+ * behind the glass, until the train stops (transit_stop_subway_windows). The overlay is
+ * subway_window_overlay.fla (CC0; the published 1296275255_7402.swf is not archived): its own
+ * frame drawn over the static pane at the same centre and bottom, under everything in the car.
+ */
 function setMoving(moving) {
-  for (const w of windows) w.box.visible = moving;
+  for (const w of windows) {
+    if (moving && !w.handle) {
+      const use = OVERLAY_USES.subway_window;
+      w.handle = playOverlay(w.engine.PIXI, 'subway_window', {
+        layer: w.engine.entityLayer,
+        at: () => ({ x: w.x, y: w.y }),
+        wh: use.wh,
+        durationMs: use.durationMs,
+        loop: use.loop,
+        zIndex: -61,
+      });
+    } else if (!moving && w.handle) {
+      w.handle.stop();
+      w.handle = null;
+    }
+  }
   for (const s of floorLights) s.visible = moving;
 }
 
 function animateCar(now) {
   if (!ride || ride.phase !== 'moving') return;
   const t = now / 1000;
-  for (const w of windows) {
-    w.tunnel.tilePosition.x = -((t * 900) % 100000);
-    const p = ((t * 1.3 + w.phase) % 1);
-    w.lamp.x = 243 + 120 - p * 600;
-  }
   for (const s of floorLights) {
     const p = (t * 1.6) % 1;
     s.x = s._baseX + 240 - p * 480;
@@ -984,7 +978,8 @@ function publish(engine, now = Date.now(), force = false) {
   engine.setData('subwayNext', ride ? rideNext(ride)?.name || '' : '');
   engine.setData('subwayStops', ride ? ride.stops : '');
   engine.setData('subwayRides', state.rides || 0);
-  engine.setData('subwayWindows', windows.length && windows[0].box.visible ? 'moving' : windows.length ? 'still' : '');
+  engine.setData('subwayWindows', windows.length && windows[0].handle ? 'moving' : windows.length ? 'still' : '');
+  engine.setData('subwayWindowArt', windows[0]?.handle?.art || '');
 }
 
 export const subwayFeature = {

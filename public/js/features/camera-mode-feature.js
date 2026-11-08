@@ -19,10 +19,23 @@
  * `cameraSnapHint` (engine, range) for the line under "Camera Mode". Solo
  * answers neither and stays the looking part only.
  *
+ * G387 (main.js doCameraModeStarted 6853-6868, doCameraModeEnded 6896-6899):
+ * everyone else on the street sees Tiny Speck's eyeballing bubble over a
+ * Glitch in Camera Mode (pc_overlay, 50 x 50, 110 px up, until it ends; never
+ * to the one looking). Online, entering and leaving send the words
+ * 'eyeballing' / 'eyeballing_done' on the emote message (js/realtime-client.js
+ * OVERLAY_EMOTES), and each other client draws or drops the bubble over that
+ * player (realtime-feature remoteAvatar). Solo has nobody else to see it.
+ *
  * QA: ?autostart=1&camerademo=1 opens it (&cameraskill=1 grants Eyeballery,
- * &cameralook=x,y pans). Canvas data: cameraMode, cameraLookX, cameraLookY,
- * cameraRange.
+ * &cameralook=x,y pans; &eyeballdemo=1 also draws the bubble over your own
+ * Glitch, as the others would see it). Canvas data: cameraMode, cameraLookX,
+ * cameraLookY, cameraRange, cameraEyeballing (players drawn with the bubble),
+ * cameraEyeballSent.
  */
+
+import { textureFromUrl } from '../textures.js?v=3149d699';
+import { OVERLAY_BUBBLE_URL, OVERLAY_USES, overlayBubbleBox, playOverlay } from '../overlays.js?v=ed371926';
 
 export const CAMERA_FEATURE_ID = 'camera-mode';
 /** getCameraAbilities: range without Eyeballery, px from the avatar. */
@@ -52,6 +65,101 @@ export function stepLook(look, dirs, dtMs, range) {
 
 const held = new Set();
 let active = false;
+/** G387: eyeballing bubbles drawn over other players (id -> overlay handle), and the client listened to. */
+const eyeballs = new Map();
+let eyeballClient = null;
+let eyeballOff = null;
+let selfEyeball = null;
+
+/**
+ * Draw the eyeballing bubble over a Glitch whose feet `at()` gives (main.js 6855-6866: 50 px,
+ * delta_y -110, bubble: true): Tiny Speck's thought bubble standing on that point, the eyes
+ * centred in its top (overlays.js overlayBubbleBox). Returns the overlay's handle; stop() takes
+ * both down.
+ */
+export function playEyeballing(engine, at, alive = null) {
+  const use = OVERLAY_USES.eyeballing;
+  const { PIXI } = engine;
+  // eyeballing.fla's stage is 50.4 x 27.15, fitted to 50 px (InLocationAnnouncementOverlay.as 425).
+  const k = use.wh / 50.4;
+  const box = overlayBubbleBox(50.4 * k, 27.15 * k);
+  const point = () => { const p = at(); return { x: p.x + use.dx, y: p.y + use.dy }; };
+  let bubble = null;
+  if (PIXI?.Sprite) {
+    bubble = new PIXI.Sprite(textureFromUrl(OVERLAY_BUBBLE_URL, { scale: 4, resolution: 4 }));
+    bubble.anchor.set(0.5, 1);
+    bubble.width = box.w;
+    bubble.height = box.h;
+    bubble.alpha = 0;
+    bubble.eventMode = 'none';
+    bubble.zIndex = 99999;
+    bubble.label = 'overlay:eyeballing-bubble';
+    engine.fxLayer?.addChild(bubble);
+  }
+  const place = () => {
+    if (!bubble || bubble.destroyed) return;
+    const p = point();
+    bubble.x = p.x;
+    bubble.y = p.y;
+  };
+  place();
+  const handle = playOverlay(PIXI, 'eyeballing', {
+    layer: engine.fxLayer,
+    at: () => { const p = point(); return { x: p.x, y: p.y - box.artBottom }; },
+    wh: use.wh,
+    durationMs: use.durationMs,
+    loop: use.loop,
+    alive,
+    onFrame: () => {
+      place();
+      if (bubble && !bubble.destroyed && handle.sprite) bubble.alpha = handle.sprite.alpha;
+    },
+  });
+  handle.done?.then(() => { if (bubble && !bubble.destroyed) bubble.destroy(); });
+  return handle;
+}
+
+function dropEyeball(id) {
+  eyeballs.get(id)?.stop();
+  eyeballs.delete(id);
+}
+
+/** Another player entered or left Camera Mode (the client's 'overlay' event). */
+export function onEyeballing(engine, { id, e }) {
+  if (e === 'eyeballing_done') {
+    dropEyeball(id);
+  } else if (e === 'eyeballing' && !eyeballs.has(id)) {
+    const root = () => engine.query?.('remoteAvatar', id);
+    if (!root()) return;
+    const h = playEyeballing(engine, () => { const r = root(); return r ? { x: r.x, y: r.y } : { x: 0, y: 0 }; }, () => Boolean(root()));
+    eyeballs.set(id, h);
+    h.done?.then(() => { if (eyeballs.get(id) === h) eyeballs.delete(id); });
+  }
+  engine.setData?.('cameraEyeballing', String(eyeballs.size));
+}
+
+/** Listen to the realtime client once it exists (and again if it changes). */
+function watchEyeballing(engine) {
+  const client = engine.mode === 'multiplayer' ? engine.query?.('realtimeClient') : null;
+  if (client === eyeballClient) return;
+  eyeballOff?.();
+  eyeballOff = null;
+  for (const id of [...eyeballs.keys()]) dropEyeball(id);
+  eyeballClient = client;
+  if (client?.on) eyeballOff = client.on('overlay', (msg) => onEyeballing(engine, msg));
+}
+
+/** Tell the street (online) that this player started or stopped looking. */
+function sendEyeballing(engine, on) {
+  const client = engine.mode === 'multiplayer' ? engine.query?.('realtimeClient') : null;
+  const sent = Boolean(client?.emote?.(on ? 'eyeballing' : 'eyeballing_done'));
+  if (sent) engine.setData('cameraEyeballSent', on ? 'eyeballing' : 'eyeballing_done');
+  // QA: &eyeballdemo=1 shows your own bubble, as the others see it.
+  if (engine.param?.('eyeballdemo') === '1') {
+    selfEyeball?.stop();
+    selfEyeball = on ? playEyeballing(engine, () => ({ x: engine.player?.x || 0, y: engine.player?.y || 0 })) : null;
+  }
+}
 let look = { x: 0, y: 0 };
 let listeners = null;
 let overlay = null;
@@ -104,6 +212,7 @@ function setActive(engine, on) {
   }
   const range = cameraRange(engine.learnedSkills);
   showOverlay(on, range, on ? engine.query?.('cameraSnapHint', engine, range) : null);
+  sendEyeballing(engine, on);
   engine.playSound(on ? 'CAMERA_MODE_ON' : 'CAMERA_MODE_OFF', { volume: 0.4 });
   publish(engine);
 }
@@ -193,6 +302,8 @@ export const cameraModeFeature = {
 
   onStreetClear(engine) {
     if (active) setActive(engine, false);
+    // The street's other players go with it (their bubbles are cancelled with the street's overlays too).
+    for (const id of [...eyeballs.keys()]) dropEyeball(id);
   },
 
   physics() {
@@ -205,6 +316,7 @@ export const cameraModeFeature = {
   },
 
   onTick(dtMs, now, engine) {
+    watchEyeballing(engine);
     if (!active) return;
     // Anything that takes over the screen ends Camera Mode.
     if (engine.busy({ ignoreHome: true, ignoreInstance: true }) || engine.acting()) {

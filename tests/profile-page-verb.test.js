@@ -11,7 +11,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { PROFILE_LISTED_LEVEL, PROFILE_PAGE_COPY, PROFILE_PAGE_VERB, profilePagePath, profilePageVerb, profileSlug } from '../public/js/profiles.js?v=86423d98';
-import { lookUpPlayersHere, profilesFeature } from '../public/js/features/profiles-feature.js?v=6d04a647';
+import { lookUpPlayersHere, profilesFeature } from '../public/js/features/profiles-feature.js?v=6005f50b';
 import { SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
 
 const realFetch = globalThis.fetch;

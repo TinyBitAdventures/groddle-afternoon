@@ -358,14 +358,16 @@ export async function collectSheets() {
   rows.push(row('game.js irrigator tool', irr.url, { fw: irr.fw, fh: irr.fh, cols: irr.cols, n: 30 }));
   const pickDef = game.get('PICK_TOOL_DEF');
   for (const [k, url] of Object.entries(game.get('PICK_TOOL_SHEETS'))) rows.push(row(`game.js ${k} tool`, url, { fw: pickDef.fw, fh: pickDef.fh, cols: pickDef.cols, n: game.get('PICK_SWING_FRAMES') }));
-  // ensureShrineTextures: one grid per giant and motion, its count from the sliceSheet call.
-  const shrineCall = game.calls('sliceSheet').find((c) => c.fn === 'ensureShrineTextures');
-  const shrineFn = game.ast.body.find((n) => n.type === 'FunctionDeclaration' && n.id.name === 'ensureShrineTextures');
-  const shrineDef = game.evaluate(shrineFn.body.body.find((n) => n.type === 'VariableDeclaration').declarations[0].init);
-  for (const f of readdirSync(join(pub, 'assets/sprites/shrines')).filter((x) => /^[a-z]+_(open|close)\.webp$/.test(x))) {
-    const [giant, motion] = f.replace('.webp', '').split('_');
-    const n = game.evaluate(shrineCall.node.arguments[2], { motion });
-    rows.push(row(`shrine ${giant} ${motion}`, `assets/sprites/shrines/${f}`, { ...shrineDef, n }));
+  // ensureShrineTextures: one grid per region, giant and motion (js/shrine-variants.js shrineSheet: the plain
+  // shrines' 151 x 188, and the Firebog, Ix and Uralia sheets, lane art 2026-11-08).
+  const { SHRINE_REGIONS, shrineSheet } = await imp('js/shrine-variants.js');
+  for (const region of SHRINE_REGIONS) {
+    const dir = region === 'base' ? '' : `${region}/`;
+    for (const f of readdirSync(join(pub, 'assets/sprites/shrines', dir)).filter((x) => /^[a-z]+_(open|close)\.webp$/.test(x))) {
+      const [giant, motion] = f.replace('.webp', '').split('_');
+      const sh = shrineSheet(region, giant, motion);
+      rows.push(row(`shrine ${region} ${giant} ${motion}`, sh.url, { fw: sh.fw, fh: sh.fh, cols: sh.cols, n: sh.frames }));
+    }
   }
 
   // Module-internal tables, read from the source.

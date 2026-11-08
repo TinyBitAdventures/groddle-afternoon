@@ -29,6 +29,7 @@ import {
   streetReservedSpots,
 } from '../public/js/street-ecology.js?v=78a1d522';
 import { placementRequests } from '../tools/build-realtime-objects.mjs';
+import { SHRINE_SHEETS } from '../public/js/shrine-variants.js?v=7f11c97d';
 import { adoptedPlan } from '../public/js/features/patches-feature.js?v=e5ac130e';
 import { createPlot } from '../public/js/patches.js?v=796732fb';
 import { serverPath, skipWithoutServer } from '../tools/repos.mjs';
@@ -63,7 +64,9 @@ describe('the footprints', () => {
     const game = readFileSync(join(root, 'public/game.js'), 'utf8');
     assert.match(game, /trantDisplayScale\(tex, \{ targetH: 210, maxScale: 1 \}\)/);
     assert.match(game, /const body = new PIXI\.Sprite\(textureFromUrl\('assets\/decos\/groddle\/vendor\.png'\)\);\s*body\.anchor\.set\(0\.5, 1\);\s*body\.scale\.set\(0\.25\);/);
-    assert.match(game, /const def = \{ fw: 151, fh: 188, cols: 6, rows: 4 \};/);
+    // The plain shrine's cell (js/shrine-variants.js, read by game.js ensureShrineTextures).
+    assert.deepEqual({ ...SHRINE_SHEETS.base }, { fw: 151, fh: 188, cols: 6, open: 22, close: 23 });
+    assert.match(game, /const sheet = shrineSheet\(region, giantId, motion\);/);
   });
 });
 

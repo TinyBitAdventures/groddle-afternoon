@@ -90,8 +90,9 @@ export const OVERLAYS = Object.freeze({
     vector: true,
     states: { symbol: 'twelveSidedDie', labels: ['spin', 'roll_alph', 'roll_cosma', 'roll_friendly', 'roll_grendaline', 'roll_humbaba', 'roll_lem', 'roll_mab', 'roll_pot', 'roll_spriggan', 'roll_ti', 'roll_zille', 'roll_rook'] },
   }),
-  // G378 (jellisac_splatter_on_shrine waits on the Jellisac Hands slather verb; not built).
+  // G378: the slather (npc_shrine_grendaline.js 496-529, shrines.js showSplatterOverlayFinish 840-872), 1:1 over the 168 x 217 stage.
   musicblock_notes: small('musicblock_notes', { vector: true }),
+  jellisac_splatter_on_shrine: { fla: fla('jellisac_splatter_on_shrine'), scale: 1.5, step: 1, webp: 0.85 },
   // G379.
   petrified_rock_open_overlay: { fla: fla('petrified_rock_open_overlay'), scale: 1.5, step: 1, webp: 0.85, vector: true },
   // G380: 300 px over the ~200 px stages.
@@ -99,7 +100,8 @@ export const OVERLAYS = Object.freeze({
   target_effect_powder_mild: { fla: fla('target_effect_powder_mild'), scale: 1.5, step: 1, webp: 0.85, vector: true },
   // G381: waiting loops, grab plays into pull.
   glitchmas_cracker: { fla: fla('glitchmas_cracker'), scale: 1, step: 1, webp: 0.85, states: { symbol: 'glitchmasCracker', labels: ['waiting', 'grab'] }, vector: true },
-  // G382 (click_to_prime is left out: it is the clickable prompt to prime, not built).
+  // G382: click_to_prime is the clickable prompt to prime (shrines.js showPrimeOverlay 750-783), the same stage as click_to_donate.
+  click_to_prime: { fla: fla('click_to_prime'), scale: 1.5, step: 1, webp: 0.85 },
   click_to_donate: { fla: fla('click_to_donate'), scale: 1.5, step: 1, webp: 0.85 },
   shrine_power_up: { fla: fla('shrine_power_up'), scale: 1, step: 1, webp: 0.85, states: { symbol: 'shrinePowerUp', labels: ['charge', 'ready', 'off'] }, vector: true },
   // G391: the Hell Hole hint arrow (75 px over the 140 px stage).
@@ -117,6 +119,14 @@ export const OVERLAYS = Object.freeze({
   newxpchooseskill_animalkinship_overlay: small('newxpchooseskill_animalkinship_overlay', { webp: 0.9 }),
   newxpchooseskill_ezcooking_overlay: small('newxpchooseskill_ezcooking_overlay', { webp: 0.9 }),
   newxpchooseskill_lightgreenthumb_overlay: small('newxpchooseskill_lightgreenthumb_overlay', { webp: 0.9 }),
+  // G387: Camera Mode's eyeballing bubble (main.js doCameraModeStarted 6853-6868: 50 x 50 over the 50 x 27 stage)
+  // and the Crown Game Teleporter's pay-50 overlay (game_teleporter.js onConversation 211-230: 300 wide).
+  // The pupils wander on CS4 motion objects in 180-frame clips (eyeball1, eyeball2) under a one-frame main.
+  eyeballing: small('eyeballing', { vector: true, frames: 180, prepare: expandMotionObjects }),
+  game_teleporter_overlay: { fla: fla('game_teleporter_overlay'), scale: 1.25, step: 1, webp: 0.8, vector: true },
+  // G398: the subway car's two windows (inc_transit.js transit_start_subway_windows 426-460: 275 x 161, 1:1).
+  // inc_data_overlays.js 39 names 1296275255_7402.swf (not archived); subway_window_overlay.fla is the CC0 overlay of that name.
+  subway_window: { fla: fla('subway_window_overlay'), scale: 1.5, step: 1, webp: 0.85 },
   // G395: the games' opening logos (one frame), drawn like the winner splashes.
   race_logo: { fla: fla('race_logo'), scale: 1.5, step: 1, webp: 0.9 },
   grabemgood_logo: { fla: fla('grabemgood_logo'), scale: 1.5, step: 1, webp: 0.9 },
@@ -162,6 +172,58 @@ export function curveAt(curve, n) {
     if (n <= f1) return v0 + (v1 - v0) * ((n - f0) / (f1 - f0 || 1));
   }
   return curve[curve.length - 1][1];
+}
+
+/**
+ * G387: CS4 motion objects (isMotionObject frames, motionObjectXML) inside
+ * symbols, which the classic-tween reader holds still: each such frame
+ * becomes one-frame keys with its instance moved by the Motion_X / Motion_Y
+ * curves (Keyframe anchor "x,v", timevalue in TimeScale units per second,
+ * TimeMap strength 0 = linear between keys). Only position is followed:
+ * eyeballing's pupils wander and nothing else moves. Returns the number of
+ * frames expanded (0 when the FLA has none).
+ */
+export function expandMotionObjects(file, doc) {
+  const zip = readZip(file);
+  const fps = doc.doc.frameRate;
+  let expanded = 0;
+  for (const [name, tl] of doc.symbols) {
+    const buf = zip.read(`LIBRARY/${name}.xml`);
+    if (!buf) continue;
+    const xml = buf.toString('utf8');
+    const layersXml = xml.split(/<DOMLayer[\s>]/).slice(1);
+    layersXml.forEach((lx, li) => {
+      const layer = tl.layers[li];
+      if (!layer) return;
+      for (const fm of lx.matchAll(/<DOMFrame ([^>]*isMotionObject="true"[^>]*)>([\s\S]*?)<\/DOMFrame>/g)) {
+        const index = Number(fm[1].match(/index="(\d+)"/)?.[1] || 0);
+        const core = fm[2].match(/<AnimationCore TimeScale="(\d+)"[\s\S]*?<\/AnimationCore>/);
+        if (!core) continue;
+        if (!/<TimeMap strength="0"/.test(core[0])) throw new Error(`${file}: an eased motion object`);
+        const ts = Number(core[1]);
+        const curve = (id) => {
+          const prop = core[0].match(new RegExp(`<Property [^>]*id="${id}"[^>]*>((?:<Keyframe [^>]*\\/>)+)<\\/Property>`));
+          return prop ? [...prop[1].matchAll(/<Keyframe anchor="[^,]*,([^"]+)"[^>]*timevalue="(\d+)"/g)].map((m) => [Number(m[2]) * fps / ts, Number(m[1])]) : null;
+        };
+        const cx = curve('Motion_X');
+        const cy = curve('Motion_Y');
+        if (!cx && !cy) continue;
+        const at = layer.frames.findIndex((f) => f.index === index);
+        const fr = layer.frames[at];
+        if (at < 0 || !fr) continue;
+        const keys = [];
+        for (let k = 0; k < fr.duration; k++) {
+          const dx = cx ? curveAt(cx, k) : 0;
+          const dy = cy ? curveAt(cy, k) : 0;
+          keys.push({ ...fr, index: index + k, duration: 1, tween: null, label: k ? null : fr.label, acts: k ? [] : fr.acts,
+            els: fr.els.map((e) => (e.k === 'inst' ? { ...e, m: [e.m[0], e.m[1], e.m[2], e.m[3], e.m[4] + dx, e.m[5] + dy] } : e)) });
+        }
+        layer.frames.splice(at, 1, ...keys);
+        expanded += 1;
+      }
+    });
+  }
+  return expanded;
 }
 
 /** The loaded FLA with the motion object's own colour alpha lifted to 1 (the curve carries it). */
@@ -248,6 +310,7 @@ async function launch() {
 async function buildOne(page, key, cfg) {
   const file = join(audit, cfg.fla);
   const doc = scrub(loadFla(file), cfg.scrub);
+  if (cfg.prepare && !cfg.prepare(file, doc)) throw new Error(`${key}: prepare changed nothing`);
   const curve = cfg.motionAlpha ? motionAlphaCurve(file, doc.doc.frameRate) : null;
   if (cfg.motionAlpha && !curve) throw new Error(`${key}: no motion object alpha`);
   if (curve) liftMotionAlpha(doc);
@@ -375,7 +438,9 @@ export function checkOverlays() {
     const src = join(audit, cfg.fla);
     if (!existsSync(src)) continue; // glitch-overlays not beside the game: the files alone are checked
     if (sha(readFileSync(src), 'sha1') !== m.fla) { bad.push(`${key}: FLA changed`); continue; }
-    const plan = framePlan({ kind: 'sheet', ...cfg }, scrub(loadFla(src), cfg.scrub));
+    const pdoc = scrub(loadFla(src), cfg.scrub);
+    cfg.prepare?.(src, pdoc);
+    const plan = framePlan({ kind: 'sheet', ...cfg }, pdoc);
     if (plan.picks.length !== m.frames) bad.push(`${key}: frame count ${plan.picks.length}, built ${m.frames}`);
     // The SVG frames are drawn without Chrome, so they can be redrawn and compared.
     if (vbuf && vectorFrames(cfg, m.box).text !== vbuf.toString('utf8')) bad.push(`${key}: ${m.vector.file} is not what the FLA draws`);

@@ -57,7 +57,7 @@
  */
 
 import { createMinnAccount } from '../minn-account.js?v=8f2741cd';
-import { EMOTES, createRealtimeClient, createTrack, pushSample, sampleTrack } from '../realtime-client.js?v=a3d40316';
+import { EMOTES, createRealtimeClient, createTrack, pushSample, sampleTrack } from '../realtime-client.js?v=7350df88';
 import { ANIM_FPS, EMOTION_MS, animForState, crowdScaleX } from '../avatar-anims.js?v=fb921bf4';
 import { movedLine } from '../admin-teleport.js?v=fa56e8df';
 import { ADMIN_TEXT, applyAdminGive, applyAdminRefill, showAdminMessage, showBooted } from '../admin-console-mp.js?v=e3bf1e6d';
@@ -747,6 +747,12 @@ export const realtimeFeature = {
   /** Speech bubbles keep off these players' heads (game.js positionSpeechBubble). */
   speechAvoidTargets() {
     return session ? session.speechTargets() : null;
+  },
+
+  /** G387: another player's Glitch on this street (its Pixi root), for overlays drawn over it; null when not here. */
+  remoteAvatar(id) {
+    const r = session?.remotes.get(Number(id));
+    return r?.root && !r.root.destroyed ? r.root : null;
   },
 
   /** MINIMAP (G370): the other players drawn on this street, for the street map's dots. */
