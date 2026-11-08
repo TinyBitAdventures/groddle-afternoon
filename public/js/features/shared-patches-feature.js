@@ -83,6 +83,7 @@ import {
   mayAskStreet,
   plantGrowLevel,
   refusalLine,
+  CLEARED_FIRST_LINE,
   refusedBeforeBar,
   sharedPatchesOn,
   soilRolls,
@@ -809,11 +810,19 @@ export const sharedPatchesFeature = {
     return undefined;
   },
 
-  /** game.js when a timed verb is cancelled: the lock (or the dig) goes back. */
+  /**
+   * game.js when a timed verb is cancelled: the lock (or the dig) goes back. A clear cut short because
+   * another player's clear landed first (the dead tree gone from under the bar, so game.js cancels it
+   * quietly) reads CLEARED_FIRST_LINE, as a clear the server refused does (Ours, slice 3).
+   */
   verbCancelled(target, verbId, engine) {
     const key = sharedKey(target);
     const base = String(verbId || '').split(':')[0];
     if (key && BAR_VERBS.has(base) && shared(engine)) stopBar(key, base);
+    if (key && base === 'clear' && shared(engine)) {
+      const now = copy.plots.get(key);
+      if (now && now.stage !== 'dead') refuse(engine, CLEARED_FIRST_LINE);
+    }
     return undefined;
   },
 

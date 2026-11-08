@@ -34,9 +34,9 @@ import {
   soilRolls,
   stripSharedPlots,
 } from '../public/js/shared-patches.js?v=76a66475';
-import { sharedPatchesFeature } from '../public/js/features/shared-patches-feature.js?v=09086469';
+import { sharedPatchesFeature } from '../public/js/features/shared-patches-feature.js?v=d6f7aa7e';
 import { patchesFeature, soilSpawnPlan } from '../public/js/features/patches-feature.js?v=766de05b';
-import { FEATURES } from '../public/js/features/index.js?v=b762264d';
+import { FEATURES } from '../public/js/features/index.js?v=083e26a8';
 import { getStreetEcologyCatalog, setStreetEcologyCatalog } from '../public/js/street-ecology.js?v=78a1d522';
 import { HAS_SERVER, serverPath } from '../tools/repos.mjs';
 
@@ -686,6 +686,21 @@ describe('the feature', () => {
     assert.ok(r.log.activity.includes(CLEARED_FIRST_LINE), r.log.activity.join(' | '));
     assert.equal(r.engine.inv.plank || 0, 0, 'no Planks for the second clear');
     assert.equal(stage('trant_spice_dead:0'), 'dirty', 'the plot as it stands');
+    restore();
+  });
+
+  it('a clear cut short because another player\'s clear landed reads the same line; a plain cancel says nothing', async () => {
+    const r = rig();
+    restore = await boot(r);
+    snapshot(r, {});
+    await tick();
+    const t = target(r, 'trant_spice_dead:0');
+    sharedPatchesFeature.verbCancelled(t, 'clear', r.engine);
+    assert.ok(!r.log.activity.includes(CLEARED_FIRST_LINE), 'still dead: an ordinary cancel');
+    r.client.emit('msg:patches', { t: 'patches', street: OLD_MAIN, now: Date.now(), plots: { 'trant_spice_dead:0': { class: 'trant_spice_dead', kind: 'patch', stage: 'dirty' } } });
+    await tick();
+    sharedPatchesFeature.verbCancelled(t, 'clear', r.engine);
+    assert.ok(r.log.activity.includes(CLEARED_FIRST_LINE));
     restore();
   });
 
