@@ -41,6 +41,16 @@
  * charge the ledger did (bottleFromLedger). Guilt, mood and Botany stay yours.
  * Trees grown in your Patches, your home and private places stay local.
  *
+ * Shared street Patches (G564 lane 3, dark until a release turns it on): a
+ * tree grown in a Patch the realtime server shares (target.sharedPatch) is
+ * everyone's too. A pour on it asks the server through shared-patches-feature
+ * (sharedPatchTreeVerb; the server's patches.go pour, the bottle through the
+ * ledger first), and its clock, anyone's cure and the death are the server's:
+ * the poison comes back in the tree's state for everyone (the warning, the
+ * cries for antidote), this page never kills it on its own clock, and when the
+ * server says it died the plot redraws as its dead class (a Wood Tree a Patch,
+ * its 25 Planks the poisoner's grant). Guilt, mood and Botany stay yours.
+ *
  * QA: ?autostart=1&fresh=1&resetgame=1&questoffer=off&treepoisondemo=1
  *   teaches Botany and packs Tree Poison, Antidote, Hatchet, Hoe and beans,
  *   then stands you by the nearest living street trant
@@ -87,7 +97,7 @@ import {
   quotePoisonVerb,
   treeDeathOutcome,
 } from '../tree-poison.js?v=80469175';
-import { patchesFeature } from './patches-feature.js?v=27dc5d0d';
+import { patchesFeature } from './patches-feature.js?v=802e2f21';
 
 export const TREE_DEATH_FEATURE_ID = 'tree-death';
 const VERB_PREFIX = 'treepoison:';
@@ -323,8 +333,15 @@ function applyGuiltChange(engine, change) {
   if (change.apply) engine.applyBuff?.(change.apply.id, { durationSec: change.apply.durationSec, args: change.apply.args });
 }
 
-/** Multiplayer with the realtime client: does the server hold this street tree's life? */
+/** G564: a tree grown in a Patch the realtime server shares (shared-patches-feature says so). */
+function sharedPatchTree(engine, target) {
+  if (engine?.mode !== 'multiplayer' || !target?.grownFromBean || !target.sharedPatch) return false;
+  return isTreeTarget(target) && engine.query?.('sharedPatchTree', target, engine) === true;
+}
+
+/** Multiplayer with the realtime client: does the server hold this street tree's (or shared Patch tree's) life? */
 function sharedTree(engine, target) {
+  if (sharedPatchTree(engine, target)) return true;
   if (engine?.mode !== 'multiplayer' || !engine.query?.('realtimeClient') || target?.grownFromBean) return false;
   return Number.isInteger(target?.treeIndex) && isTreeTarget(target);
 }
@@ -338,7 +355,9 @@ function askServer(engine, kind, target) {
     if (grant.use) bottleFromLedger(engine, kind === 'poison' ? TREE_POISON : TREE_ANTIDOTE, grant.use);
     return null;
   }
-  return engine.query('sharedObjectVerb', target, verbId, engine) === true ? true : null;
+  // G564: a shared Patch tree is shared-patches-feature's to ask (the server's patches.go).
+  const hook = target.grownFromBean ? 'sharedPatchTreeVerb' : 'sharedObjectVerb';
+  return engine.query(hook, target, verbId, engine) === true ? true : null;
 }
 
 /**
@@ -409,6 +428,8 @@ function killTree(engine, target, opts = {}) {
   const x = target.sprite.x;
   const y = target.sprite.y;
   let result = null;
+  // G564: a shared Patch tree dies only by the server's word (its plot redraws as the dead tree).
+  if (sharedPatchTree(engine, target)) return null;
   if (target.grownFromBean) {
     cureTreePoison(target.state);
     result = patchesFeature.killTree(engine, target);

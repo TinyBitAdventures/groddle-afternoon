@@ -75,7 +75,7 @@ import {
 import { frameTexture, isLoaded, onFailed, onLoaded, textureFromUrl } from '../textures.js?v=3149d699';
 import { HOE_TOOLS, firstWorkingTool } from '../tools.js?v=d8aa3536';
 import { slugsFromEffects } from '../speech-slugs.js?v=130338f9';
-import { plotSignature, replayRng } from '../shared-patches.js?v=1ceb8941';
+import { plotSignature, replayRng } from '../shared-patches.js?v=3dd27063';
 
 export const PATCHES_FEATURE_ID = 'patches';
 export const SOIL_GROUP_PREFIX = 'soil:';
@@ -872,7 +872,12 @@ function resyncPlots(engine) {
       const grew = was === 'seedling' && entity.plot.stage === 'tree';
       if (!swapped && grew) engine.pushActivity?.(`A Seedling grew into a ${GROWN_TREE_LABELS[entity.plot.tree.classId]}!`);
       if (!swapped && was === 'seedling' && entity.plot.stage === 'dirty') engine.pushActivity?.('A Seedling went too long without petting and withered back into a Patch.');
-      buildView(engine, entity, myGeneration, { grow: grew && !swapped });
+      // G564 lane 3: a shared Patch tree the server says died (poison) dies here too, with the puff.
+      const died = !swapped && was === 'tree' && entity.plot.stage !== 'tree';
+      const at = died && entity.sprite && !entity.sprite.destroyed ? { x: entity.sprite.x, y: entity.sprite.y } : null;
+      buildView(engine, entity, myGeneration, { grow: grew && !swapped }).then(() => {
+        if (at && myGeneration === generation) deathPuff(engine, at.x, at.y);
+      });
       dirty = true;
     } else if (entity.plot.stage === 'tree') {
       refreshTreeView(engine, entity);

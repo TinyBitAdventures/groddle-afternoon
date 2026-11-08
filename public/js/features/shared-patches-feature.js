@@ -42,8 +42,19 @@
  * - The old personal plots: once the server says it shares a street, this
  *   save's own plots on that street go (the site pays them out once, plan
  *   section 10), so a stale copy never comes back. Other streets keep theirs.
- * - Grown trees here are drawn from the server's numbers; their pet, water,
- *   harvest and poison stay the page's own until lane 3 (G564 slice 1).
+ * - Grown trees here are drawn from the server's numbers and answer to it (lane
+ *   3, slice 1): pet, water and harvest ask first (runVerbOverride; the
+ *   player's own tools, skill and energy refuse here first, as in solo), and
+ *   the go-ahead runs the verb here on the tree as the server had it, with the
+ *   server's care roll (sharedVerbGrant, as street-objects-feature does for
+ *   street trees). A harvest's fruit or Planks are the server's grant: added
+ *   once by id, saved, then acknowledged; this player's harvests today are the
+ *   server's count (plan section 7). Tree Poison and its Antidote ask through
+ *   tree-death-feature (sharedPatchTreeVerb); the ledger's use of the bottle
+ *   comes with the go-ahead, and the clock, anyone's cure and the death are
+ *   the server's (the tree becomes its dead class for everyone; guilt and mood
+ *   stay the pourer's page's). Quest counters, iMG, energy and mood come only
+ *   from the verb run on a go-ahead.
  *
  * QA: canvas data sharedPatches (street:off|local|waiting|snap|none),
  * sharedPatchesLast (key:verb:ok|code), sharedPatchesView (each plot as this page has it:
@@ -53,7 +64,7 @@
 
 import { addItem, countItem, ITEM_CATALOG } from '../inventory.js?v=b7609342';
 import { saveStore } from '../save-store.js?v=8839ba7b';
-import { patchesFeature } from './patches-feature.js?v=27dc5d0d';
+import { patchesFeature } from './patches-feature.js?v=802e2f21';
 import {
   COPY,
   GRANT_CLASSES,
@@ -69,7 +80,14 @@ import {
   soilRolls,
   stripSharedPlots,
   treePlotSpot,
-} from '../shared-patches.js?v=1ceb8941';
+  POUR_WIRE,
+  TREE_VERBS,
+  newDayTree,
+  prepareGrantedTree,
+  sharedTreeKey,
+  sharedTreeReady,
+  sharedTreeSkill,
+} from '../shared-patches.js?v=3dd27063';
 
 export const SHARED_PATCHES_FEATURE_ID = 'shared-patches';
 const REQUEST_TIMEOUT_MS = 8000;
@@ -107,6 +125,10 @@ const applying = new Set();
 const strippedStreets = new Set();
 /** Plots whose tend or dig start the server refused: the landing is not asked again (one line, not two). */
 const startRefused = new Set();
+/** The go-ahead for a tree verb while it runs here: { target, verbId, roll, use } (sharedVerbGrant). */
+let treeGrant = null;
+/** QA only: a shorter poison clock sent with a pour (the server takes it with GRODDLE_PATCHES_DEV=1). */
+let qaPoisonMs = 0;
 
 function freshCopy(street) {
   return { street, snap: false, none: false, offset: 0, timers: null, server: new Map(), plots: new Map(), spots: new Map() };
@@ -424,6 +446,78 @@ function ask(engine, target, verbId) {
   return true;
 }
 
+/**
+ * A tree verb on a tree grown in a shared Patch asks the server first: pet, water and harvest from
+ * the verb menu (runVerbOverride), Tree Poison and its Antidote from tree-death-feature
+ * (sharedPatchTreeVerb, its own checks done). True when asked (or held: connecting, waiting), null
+ * when the tree is not a shared one, or the player's own side refuses (the verb runs here alone and
+ * refuses as in solo), or this is the go-ahead's own run.
+ */
+function askTree(engine, target, verbId, { pour = false } = {}) {
+  const key = sharedTreeKey(target);
+  if (!key || engine?.mode !== 'multiplayer' || !enabled) return null;
+  if (treeGrant && treeGrant.target === target && treeGrant.verbId === verbId) return null;
+  const wire = pour ? POUR_WIRE[verbId] : (TREE_VERBS.includes(verbId) ? verbId : '');
+  if (!wire) return null;
+  if (!live(engine)) return null;
+  if (!shared(engine)) {
+    engine.toast?.(COPY.connecting, 2400);
+    return true;
+  }
+  const learned = engine.learnedSkills || [];
+  if (!pour && !sharedTreeReady(target.state, target.classId, wire, { inv: engine.inv, pc: engine.pc, learned, tools: engine.toolState })) return null;
+  for (const p of pending.values()) {
+    if (p.key === key && p.phase === 'land') {
+      engine.toast?.(COPY.waiting, 1600);
+      return true;
+    }
+  }
+  const payload = { id: key, verb: wire };
+  const skill = pour ? '' : sharedTreeSkill(target.classId, wire, learned);
+  if (skill) payload.skill = skill;
+  if (wire === 'poison' && qaPoisonMs > 0) payload.ms = qaPoisonMs;
+  const { req, send } = sendReq(engine, payload);
+  pending.set(req, { req, key, verb: wire, verbId, phase: 'land', tree: true, classId: target.classId, at: Date.now() });
+  if (!send()) {
+    pending.delete(req);
+    engine.toast?.(COPY.connecting, 2400);
+  }
+  return true;
+}
+
+/**
+ * The server's go-ahead for a tree verb: the verb runs here on the tree as the server had it
+ * ("before"), with its care roll and the ledger's use of a bottle (sharedVerbGrant), then the
+ * server's tree lands; a harvest's grant is added once by id, saved and acknowledged.
+ */
+function treeAnswered(engine, msg, ok, p, key) {
+  if (!ok) {
+    if (msg.plot) takeOne(key, msg.plot);
+    notify(engine);
+    refuse(engine, refusalLine(msg.code, msg.message, p.verb));
+    return;
+  }
+  if (msg.before) takeOne(key, msg.before);
+  // The tree as it stands now (a redraw since the ask makes a new target for the same plot).
+  const entity = patchesFeature.entityByKey?.(key);
+  const target = entity?.plot?.stage === 'tree' ? entity.target : null;
+  const use = msg.use && typeof msg.use === 'object' ? msg.use : null;
+  const g = msg.grant && typeof msg.grant === 'object' ? msg.grant : null;
+  const before = g ? countItem(engine.inv, String(g.c)) : 0;
+  if (target && target.classId === p.classId) {
+    prepareGrantedTree(target.state, target.classId, p.verb, msg);
+    treeGrant = { target, verbId: p.verbId, roll: Number(msg.roll), use };
+    try {
+      engine.executeVerb?.(target, p.verbId, { animated: true });
+    } finally {
+      treeGrant = null;
+    }
+  }
+  if (msg.plot) takeOne(key, msg.plot);
+  notify(engine);
+  if (g) finishGrant(engine, g, before);
+}
+
 /** A shared tend or dig's action bar began: tell the server (the one-tender lock). */
 function startBar(engine, target, verb) {
   const key = sharedKey(target);
@@ -470,6 +564,10 @@ function answered(engine, msg, ok) {
       refuse(engine, refusalLine(msg.code, msg.message, p.verb));
     }
     notify(engine);
+    return;
+  }
+  if (p.tree) {
+    treeAnswered(engine, msg, ok, p, key);
     return;
   }
   if (!ok) {
@@ -577,6 +675,8 @@ export const sharedPatchesFeature = {
         view: () => Object.fromEntries([...copy.plots].map(([k, p]) => [k, { stage: p.stage, kind: p.kind, dead: p.deadClass, seedling: p.seedling, tree: p.tree ? { classId: p.tree.classId, ...p.tree.state } : null, tender: p.tender || 0 }])),
         state: () => ({ street: copy.street, snap: copy.snap, none: copy.none, serverOff, pending: pending.size, applied: applied.length, stripped: [...strippedStreets], timers: copy.timers }),
         dev: (opts = {}) => client?.send('patch_dev', opts),
+        /** QA: a pour's poison clock in ms (a server with GRODDLE_PATCHES_DEV=1 takes 1000 up to 3 minutes); 0 for the real one. */
+        poisonMs: (n) => { qaPoisonMs = Math.max(0, Math.floor(Number(n) || 0)); return qaPoisonMs; },
         count: (c) => countItem(engine.inv, String(c)),
         me: () => me(),
         /** A plot's middle in client px, for a real click. */
@@ -612,6 +712,14 @@ export const sharedPatchesFeature = {
     for (const [req, p] of pending) if (p.phase === 'land') pending.delete(req);
   },
 
+  /** Dametime midnight: this player's harvests of the shared Patch trees start over (the server's count does too). */
+  onNewDay(now, engine) {
+    if (!enabled || engine?.mode !== 'multiplayer') return;
+    for (const plot of copy.plots.values()) {
+      if (plot.stage === 'tree' && plot.tree?.state) newDayTree(plot.tree.state, plot.tree.classId);
+    }
+  },
+
   onTick(dtMs, now, engine) {
     if (!enabled || engine.mode !== 'multiplayer' || !engine.started) return;
     const c = bind(engine);
@@ -628,9 +736,31 @@ export const sharedPatchesFeature = {
     }
   },
 
-  /** game.js executeVerb: a shared soil verb asks the server before it lands. */
+  /** game.js executeVerb: a shared soil verb, or a shared Patch tree's pet, water or harvest, asks the server before it lands. */
   runVerbOverride(target, verbId, engine) {
+    if (sharedTreeKey(target)) return askTree(engine, target, verbId);
     return ask(engine, target, verbId);
+  },
+
+  /**
+   * tree-death-feature, as a pour lands on a tree grown in a shared Patch: true when the server was
+   * asked (its go-ahead runs the pour again with the grant), null when the tree is not shared.
+   */
+  sharedPatchTreeVerb(target, verbId, engine) {
+    return askTree(engine, target, verbId, { pour: true });
+  },
+
+  /** game.js runVerb and tree-death-feature: the server's care roll and the ledger's use of a bottle, for the verb it just allowed. */
+  sharedVerbGrant(target, verbId) {
+    if (!treeGrant || treeGrant.target !== target || treeGrant.verbId !== verbId) return null;
+    const out = { roll: Number.isFinite(treeGrant.roll) ? treeGrant.roll : undefined };
+    if (treeGrant.use) out.use = treeGrant.use;
+    return out;
+  },
+
+  /** Whether this tree grown in a Patch is the server's now (tree-death-feature leaves its clock and death to it). */
+  sharedPatchTree(target, engine) {
+    return sharedTreeKey(target) && enabled && engine?.mode === 'multiplayer' ? true : null;
   },
 
   /** patches-feature runPackVerb: Plant from the pack on a shared Patch. */
@@ -695,5 +825,7 @@ export const sharedPatchesFeature = {
     applying.clear();
     strippedStreets.clear();
     startRefused.clear();
+    treeGrant = null;
+    qaPoisonMs = 0;
   },
 };

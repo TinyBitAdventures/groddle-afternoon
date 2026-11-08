@@ -58,7 +58,7 @@ import {
 } from '../public/js/patches.js?v=aa83d5ad';
 import { ARBOROLOGY_HARVEST } from '../public/js/trants.js?v=9c2e8c0f';
 import { TRANT_CARE_PACKAGES } from '../public/js/trant-care.js?v=ac146026';
-import { soilCountsForStreet, soilSpawnPlan } from '../public/js/features/patches-feature.js?v=27dc5d0d';
+import { soilCountsForStreet, soilSpawnPlan } from '../public/js/features/patches-feature.js?v=802e2f21';
 import { isZoneTsid } from '../public/js/zone-streets.js?v=b40010d5';
 import { creatureRequests, setCreatureEcology } from './build-realtime-objects.mjs';
 

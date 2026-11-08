@@ -21,11 +21,23 @@
  *   drops (tend drops, dig Loam); the server decides the plot (the lock, the
  *   plant, the pettings, growth) and the base yields (Earth, Planks) as ledger
  *   receipts.
+ * - A tree grown in a shared Patch (G564 lane 3, slice 1) answers to the server
+ *   for pet, water and harvest (the tending flags, the care roll, the fruit on
+ *   it, each player's harvests a game day: fruit and Planks come back as
+ *   grants) and for Tree Poison and its Antidote (the clock, anyone's cure, the
+ *   death, everyone's). Its poison lands in the tree state as tree-death-feature
+ *   reads it (poisonEndsAt), so the warning, the cries and the cure show for
+ *   everyone. The Rook, Fertilidust and Trantsformation Fluid are slice 2: the
+ *   server answers "later", so the page refuses them on a shared Patch tree
+ *   with LATER_LINE and asks nothing.
  */
 
 import { DEAD_TRANT_CLASSES, GROWN_TREE_LABELS, SEASONED_BEANS, SOIL_CLASSES, resolveSoilPackage, resolveTendPackage, seedlingTimings } from './patches.js?v=aa83d5ad';
 import { TRANT_META, fruitCapacityAt } from './trants.js?v=9c2e8c0f';
-import { ensureWoodTreeState } from './woodcutting.js?v=4fd0342b';
+import { ensureWoodTreeState, quoteWoodTreeHarvest } from './woodcutting.js?v=4fd0342b';
+import { POISON_DURATION_MS } from './tree-poison.js?v=80469175';
+import { treeReady, treeSkill } from './street-objects.js?v=c72e3d5c';
+import { highestLightGreenThumbRank, quoteTrantCare } from './trant-care.js?v=ac146026';
 
 /** The release switch. false = dark: shared Patches stay off for everyone (the QA flag below aside). */
 export const SHARED_PATCHES_ON = false;
@@ -95,7 +107,8 @@ function whole(value, fallback = 0, min = 0, max = Number.MAX_SAFE_INTEGER) {
  * identity, so the game's own verbs and labels read the server's numbers). harvestsToday is this
  * player's own and the server sends it only on a harvest answer, so the page's count is kept.
  */
-function fillTreeState(state, t, classId) {
+function fillTreeState(state, t, classId, now = Date.now()) {
+  fillPoison(state, t, now);
   if (classId === 'wood_tree') {
     state.maturity = whole(t.maturity, 1, 0, 6);
     state.harvestCount = whole(t.count, 0, 0, 1);
@@ -112,6 +125,28 @@ function fillTreeState(state, t, classId) {
   state.petted = t.petted === true;
   state.watered = t.watered === true;
   return state;
+}
+
+/**
+ * The server's poison clock (tree.poison: ms left) in the tree state as js/tree-poison.js keeps it
+ * (poisonedAt, poisonEndsAt, poisonBubble), so tree-death-feature shows the overlay, the cries and
+ * the antidote verb, and hides harvest, pet and water, for everyone on the street. A clock already
+ * held within 2 s of the server's keeps its own start and its bubbles (the pourer's page set it).
+ * No poison: cured (anyone's antidote).
+ */
+function fillPoison(state, t, now) {
+  const left = ms(t?.poison);
+  if (!left) {
+    delete state.poisonedAt;
+    delete state.poisonEndsAt;
+    delete state.poisonBubble;
+    return;
+  }
+  const end = now + left;
+  if (Number(state.poisonEndsAt) > 0 && Math.abs(Number(state.poisonEndsAt) - end) <= 2000) return;
+  state.poisonEndsAt = end;
+  state.poisonedAt = Math.min(now, end - POISON_DURATION_MS);
+  if (!Number.isFinite(state.poisonBubble)) state.poisonBubble = -1;
 }
 
 /**
@@ -174,7 +209,7 @@ export function localPatchPlot(key, s, offset = 0, now = Date.now(), prev = null
       plot.stage = 'dirty';
     } else {
       const keep = prev?.stage === 'tree' && prev.tree?.classId === classId && prev.tree.state && typeof prev.tree.state === 'object';
-      const state = fillTreeState(keep ? prev.tree.state : {}, t, classId);
+      const state = fillTreeState(keep ? prev.tree.state : {}, t, classId, now);
       plot.tree = {
         classId,
         state,
@@ -226,6 +261,78 @@ export function tendedByOther(plot, me, now = Date.now()) {
 /** Whether someone other than this player is digging the plot now. */
 export function dugByOther(plot, me) {
   return Array.isArray(plot?.diggers) && plot.diggers.some((d) => Number(d) !== Number(me));
+}
+
+// ---------------------------------------------------------------------------
+// Trees in shared Patches (lane 3, slice 1)
+// ---------------------------------------------------------------------------
+
+/** The tree verbs a shared Patch tree asks the server about (wire patch_act verb). */
+export const TREE_VERBS = Object.freeze(['pet', 'water', 'harvest']);
+
+/** tree-death-feature's pours as the wire names them. */
+export const POUR_WIRE = Object.freeze({ 'treepoison:poison': 'poison', 'treepoison:antidote': 'antidote' });
+
+/**
+ * Ours, temporary (plan section 13, slice 2): the Rook, Fertilidust and Trantsformation Fluid on a
+ * tree in a shared Patch. The server's "later" line, so both sides say the same.
+ */
+export const LATER_LINE = 'Not on shared Patches yet.';
+
+/** A tree target grown in a shared Patch (patches-feature marks it sharedPatch): its plot key, or ''. */
+export function sharedTreeKey(target) {
+  if (!target || target.featureId || !target.grownFromBean || !target.sharedPatch || !target.state) return '';
+  return isSharedKey(target.sharedPatch) ? String(target.sharedPatch) : '';
+}
+
+/**
+ * The player's own side of a tree verb on a shared Patch tree (tools, skill, energy, size), as in
+ * solo: false and the verb runs here alone and refuses as solo does, never asking. What the server
+ * decides is left out of the check: the tree's tending flags, the fruit on it (it may hold more than
+ * this copy shows) and this player's harvests today (the server keeps them, plan section 7).
+ */
+export function sharedTreeReady(state, classId, verb, { inv = {}, pc = {}, learned = [], tools = null } = {}) {
+  if (!state || !TREE_VERBS.includes(verb)) return false;
+  if (classId === 'wood_tree') {
+    if (verb === 'harvest') return quoteWoodTreeHarvest({ ...state, harvestedToday: false }, inv, pc, tools).ok === true;
+    return quoteTrantCare({ ...state, petted: false, watered: false }, 'wood_tree', verb, { pc, inv, tools, learned }).ok === true;
+  }
+  if (!TRANT_META[classId]) return false;
+  return treeReady({ ...state, harvestsToday: 0 }, classId, verb, { inv, pc, learned, tools });
+}
+
+/** The skill row the server reads a tree verb's rate or limit from (wire "skill"); '' for none. */
+export function sharedTreeSkill(classId, verb, learned = []) {
+  if (classId === 'wood_tree') {
+    if (verb === 'harvest') return '';
+    const rank = highestLightGreenThumbRank(learned);
+    return rank === 'no_skill' ? '' : rank;
+  }
+  const skill = treeSkill(verb, learned);
+  return skill && skill !== 'no_skill' ? skill : '';
+}
+
+/**
+ * Before a granted tree verb runs here on the server's "before": the player's own daily count is
+ * the server's (a harvest answer's "harvests" is after this one), so the local rules count it once.
+ */
+export function prepareGrantedTree(state, classId, verb, answer = {}) {
+  if (!state || verb !== 'harvest') return state;
+  if (classId === 'wood_tree') state.harvestedToday = false;
+  else state.harvestsToday = Math.max(0, whole(answer.harvests, 1) - 1);
+  return state;
+}
+
+/**
+ * Dametime midnight on the page: this player's own harvest count on a shared Patch tree starts over
+ * (the server turns its own per-player count at the same game day, patches.go advance), so the verb
+ * menu offers Harvest again. The tending flags are the server's: its day turn sends them.
+ */
+export function newDayTree(state, classId) {
+  if (!state) return state;
+  if (classId === 'wood_tree') state.harvestedToday = false;
+  else state.harvestsToday = 0;
+  return state;
 }
 
 /** patch.js 171-174, 373-381. */

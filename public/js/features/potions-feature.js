@@ -32,7 +32,9 @@
  * - Trantsformation Fluid: the closest grown tree within 200 px (an Egg Plant
  *   only on your home street) becomes a different random tree at health 4,
  *   maturity max(4, maturity - 3). A street tree's spot goes to the patches
- *   feature, as for a tree that died (tree-death-feature `replaced`).
+ *   feature, as for a tree that died (tree-death-feature `replaced`). A tree
+ *   grown in a shared street Patch (G564, target.sharedPatch) is slice 2: the
+ *   pour is refused with js/shared-patches.js LATER_LINE.
  * - Charades Potion shows its solo refusal (it needs other players).
  * - Draught of Wisdom (potion_xp, G430): from level 20, once a game day,
  *   500 iMG with no mood bonus ("+500 xp").
@@ -68,6 +70,7 @@ import { metabolicGain, moodMax } from '../metabolics.js?v=8504134e';
 import { quoinDailyLimitFor } from '../quoins.js?v=299cc3f4';
 import { emblemCostFor } from '../shrines.js?v=1a945fe7';
 import { GROWN_TREE_LABELS, trantsformPlotTree } from '../patches.js?v=aa83d5ad';
+import { LATER_LINE } from '../shared-patches.js?v=3dd27063';
 import { isPoisoned } from '../tree-poison.js?v=80469175';
 import { furnitureSize } from '../home-decor.js?v=f9b0e3dc';
 import { textureFromUrl, sourceFromUrl, frameTexture } from '../textures.js?v=3149d699';
@@ -128,10 +131,10 @@ import {
   usePotion,
 } from '../potions.js?v=c21bad59';
 import { itemVerbAchievementCounters } from '../item-verbs.js?v=1e20fa7d';
-import { patchesFeature } from './patches-feature.js?v=27dc5d0d';
-import { homesFeature } from './homes-feature.js?v=cd767724';
-import { streetTreeIndex } from './tree-death-feature.js?v=3c1715a1';
-import { questRoomConverse } from './quest-instances-feature.js?v=ada7c046';
+import { patchesFeature } from './patches-feature.js?v=802e2f21';
+import { homesFeature } from './homes-feature.js?v=c81cd023';
+import { streetTreeIndex } from './tree-death-feature.js?v=57f5e70f';
+import { questRoomConverse } from './quest-instances-feature.js?v=4ea65912';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
 import { copyChargesLeft, keepsCopies, spendCopyCharge, verbCopy } from '../copy-charges.js?v=737fd334';
 import { copyTag, migrateClassTag, migrateClassValue, setCopyTag, toolCopies } from '../tools.js?v=d8aa3536';
@@ -347,6 +350,8 @@ function checkFor(classTsid, engine) {
     }
     case 'potion_trantsformation_fluid': {
       const target = closestTree(engine);
+      // G564 slice 2: a tree grown in a shared street Patch is the server's, which answers "later".
+      if (target?.sharedPatch) return { ok: false, error: LATER_LINE, target };
       return { ...trantsformCheck(target), target };
     }
     case 'potion_xp':
@@ -620,6 +625,7 @@ const EFFECTS = {
     const y = target.sprite.y;
     const treeH = Math.min(260, Math.max(60, Number(target.sprite.height) || 0));
     const oldLabel = GROWN_TREE_LABELS[target.classId] || target.label;
+    if (target.sharedPatch) return { ok: false, msg: LATER_LINE };
     if (target.grownFromBean) {
       const plots = engine.streetSlot('patches')?.plots || {};
       const plot = Object.values(plots).find((row) => row?.tree?.state === target.state);
