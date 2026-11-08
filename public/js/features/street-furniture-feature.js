@@ -74,6 +74,7 @@ import {
   createMailboxView,
   editNote,
   clearOfDoors,
+  treeObstacles,
   fixedFurniturePoints,
   furniturePlacementGroups,
   furnitureFor,
@@ -99,7 +100,7 @@ import {
   streetNoteSeeds,
   takePinnedNote,
   writePaperNote,
-} from '../street-furniture.js?v=026c21ef';
+} from '../street-furniture.js?v=05b28557';
 import {
   CHORES,
   NEIGHBOURS,
@@ -121,7 +122,7 @@ import {
 } from '../neighbours.js?v=161fc2e5';
 import { buildNeighbourBackground, neighbourLoadingColors, neighbourPlatforms } from './neighbour-scene.js?v=ac55dcf1';
 import { closeNoteView, noteViewOpen, openBoardView, openNotePicker, openNoteView, openReportView } from '../note-view.js?v=eca7de52';
-import { BOARD_MP_TEXT, boardByline } from '../boards-mp.js?v=209fc735';
+import { BOARD_MP_TEXT, boardByline } from '../boards-mp.js?v=04beb5a6';
 import { textureFromUrl } from '../textures.js?v=3149d699';
 import { butlerApi } from './butler-feature.js?v=2e39f792';
 import { neighboursMpApi } from './neighbours-mp-feature.js?v=79b8fe9b';
@@ -1304,8 +1305,8 @@ function spawnStreet(engine, row) {
   currentRow = row;
   const groups = FURNITURE_GROUPS;
   const at = (classTsid) => fixedFurniturePoints(row, classTsid) || engine.placement(groups[classTsid].key) || [];
-  // Planned spots step off the street's doors (fixed spots were put where they are on purpose).
-  const doors = engine.street?.doors || [];
+  // Planned spots step off the street's doors and trees (fixed spots were put where they are on purpose).
+  const doors = [...(engine.street?.doors || []), ...treeObstacles(engine.placement('trees'))];
   const worldW = Number(engine.worldW) || Infinity;
   const clear = (classTsid, half) => fixedFurniturePoints(row, classTsid)
     ? at(classTsid)

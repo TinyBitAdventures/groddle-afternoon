@@ -194,6 +194,20 @@ export function fixedFurniturePoints(row, classTsid) {
 export const DOOR_CLEARANCE = 24;
 
 /**
+ * Austin 2026-11-08 (Tii Street GLI23TBNDHD19F2: the mailbox planned 75 px from a Spice Plant's
+ * trunk, standing in it): a tree is an obstacle as wide as its trunk and lower canopy for planned
+ * furniture, stepped off the way a door is (clearOfDoors). Fixed source spots are left alone.
+ */
+export const TREE_OBSTACLE_W = 200;
+
+/** Tree planner points as door-like obstacles for clearOfDoors. */
+export function treeObstacles(points = []) {
+  return (points || [])
+    .filter((p) => Number.isFinite(p?.x) && Number.isFinite(p?.y))
+    .map((p) => ({ x: p.x, y: p.y, w: TREE_OBSTACLE_W }));
+}
+
+/**
  * A planned spot moved off any door on its floor. The archive keeps how many
  * Mailboxes, Visiting Stones and Notice Boards a street had, not where (the
  * planner picks), and the planner only keeps clear of signposts, so Gregarious

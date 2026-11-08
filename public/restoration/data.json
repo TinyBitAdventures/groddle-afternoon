@@ -2733,9 +2733,14 @@
   "deployed": "2026-11-08"
  },
  "git": {
-  "commits": 1508,
+  "commits": 1509,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-08",
+    "kind": "fix",
+    "text": "Greeterbot says \"A magic rock told me to talk to you.\""
+   },
    {
     "date": "2026-11-08",
     "kind": "new",
@@ -2850,14 +2855,9 @@
     "date": "2026-11-08",
     "kind": "fix",
     "text": "The Rube points the way when you talk to him in his yard during The Wrizzards and The Rube"
-   },
-   {
-    "date": "2026-11-08",
-    "kind": "fix",
-    "text": "Zoom says so on streets that look the same at every zoom"
    }
   ]
  },
- "tests": 752,
+ "tests": 753,
  "generatedAt": "2026-11-08"
 }

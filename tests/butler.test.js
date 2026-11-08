@@ -68,7 +68,7 @@ import {
   teachButler,
   visitorsReport,
 } from '../public/js/butler.js?v=2c95c064';
-import { canOptIn, stoneVog, STONE_TEXT } from '../public/js/street-furniture.js?v=026c21ef';
+import { canOptIn, stoneVog, STONE_TEXT } from '../public/js/street-furniture.js?v=05b28557';
 import { NEIGHBOURS, neighbourById, normalizeNeighbourState, visitorLetter } from '../public/js/neighbours.js?v=161fc2e5';
 import { butlerApi, butlerFeature } from '../public/js/features/butler-feature.js?v=2e39f792';
 // The URL clubhouse.js imports, so these share its Butler.
