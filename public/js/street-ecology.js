@@ -596,6 +596,12 @@ export function streetReservedSpots(street) {
 
 /** The smallest deco on a layer in front of the player that can hide a tree, rock or Piggy (px). */
 export const FRONT_DECO_MIN = Object.freeze({ w: 120, h: 90 });
+/**
+ * The smallest front deco that still counts as part of a fill: cave rock is laid as many tiles,
+ * some turned (Megna Burrow's middleplus, cave_gr_tiling_piece 178 x 184, cave_gr_tile_horiz_sm
+ * 184 x 89 at r 50 and 90), none of which hides a thing alone but which together hide it whole.
+ */
+export const FRONT_FILL_MIN = Object.freeze({ w: 40, h: 40 });
 /** How much of a thing's box a front deco has to cover for the thing to count as behind it. */
 export const FRONT_HIDE_SHARE = 0.6;
 /** Front decos that are see-through (shadows, light and haze overlays): they hide nothing. */
@@ -608,39 +614,123 @@ export const FRONT_SEE_THROUGH = /shadow|overlay|trans|glow|light|haze|fog|mist|
  * away; planStreetPlacements only takes a spot whose tree, rock or Piggy (REACH_BOXES) they would
  * mostly hide last, as it does a spot behind a floor. The original set those by hand where they
  * showed (Flipside's Spice Plant sat inside the Swiss-cheese pipe's front half). Only layers as
- * wide as the street: a parallax layer moves against the street as the camera does.
+ * wide and as tall as the street: a parallax layer moves against the street as the camera does.
+ * Smaller or turned tiles (FRONT_FILL_MIN, any `r`) come too, marked `fill` with their turn (`r`,
+ * degrees clockwise about the bottom centre, as street-render.js sets spr.angle on a 0.5, 1
+ * anchor) and their own size: they only hide things together (hiddenBehindFront), and a fill
+ * tile is never a walkway (frontDecoWalkways).
  */
 export function frontDecoCovers(street) {
   const out = [];
   const width = street?.bounds ? street.bounds.r - street.bounds.l : 0;
+  const height = street?.bounds ? street.bounds.b - street.bounds.t : 0;
   for (const layer of street?.layers || []) {
     if (!(Number(layer?.z) > 0) || !width || Number(layer.w) !== width) continue;
+    // A layer as wide as the street but shorter still moves up and down against it
+    // (parallaxLayerOffset): Sylvan Grove's middleplus is 850 tall on a 1000 px street.
+    if (Number.isFinite(Number(layer.h)) && Number(layer.h) > 0 && height && Number(layer.h) !== height) continue;
     (layer.decos || []).forEach((d, i) => {
       const w = Number(d?.w) || 0;
       const h = Number(d?.h) || 0;
-      if (w < FRONT_DECO_MIN.w || h < FRONT_DECO_MIN.h || !Number.isFinite(d.x) || !Number.isFinite(d.y) || Number(d.r)) return;
+      if (!Number.isFinite(d?.x) || !Number.isFinite(d?.y) || d.hidden) return;
       if (FRONT_SEE_THROUGH.test(String(d.sprite || ''))) return;
-      out.push({ x: d.x, y: d.y, key: `front:${layer.name || layer.id}:${i}`, front: true, block: { l: d.x - w / 2, r: d.x + w / 2, t: d.y - h, b: d.y } });
+      const r = Number(d.r) || 0;
+      const key = `front:${layer.name || layer.id}:${i}`;
+      if (w >= FRONT_DECO_MIN.w && h >= FRONT_DECO_MIN.h && !r) {
+        out.push({ x: d.x, y: d.y, key, front: true, block: { l: d.x - w / 2, r: d.x + w / 2, t: d.y - h, b: d.y } });
+        return;
+      }
+      if (w < FRONT_FILL_MIN.w || h < FRONT_FILL_MIN.h) return;
+      out.push({ x: d.x, y: d.y, key, front: true, fill: true, r, w, h, block: turnedBox(d.x, d.y, w, h, r) });
     });
   }
   return out;
 }
 
-/** PURE: whether a thing of `key` at `spot` is mostly behind one front deco (frontDecoCovers). */
+/** The screen box round a deco w x h turned `r` degrees about its bottom centre (x, y). */
+function turnedBox(x, y, w, h, r) {
+  const a = (r * Math.PI) / 180;
+  const cos = Math.cos(a);
+  const sin = Math.sin(a);
+  const xs = [];
+  const ys = [];
+  for (const [cx, cy] of [[-w / 2, 0], [w / 2, 0], [-w / 2, -h], [w / 2, -h]]) {
+    xs.push(x + cx * cos - cy * sin);
+    ys.push(y + cx * sin + cy * cos);
+  }
+  return { l: Math.min(...xs), r: Math.max(...xs), t: Math.min(...ys), b: Math.max(...ys) };
+}
+
+/** PURE: whether the point (px, py) is inside front deco `f` (its turn included). */
+function insideFront(f, px, py) {
+  const b = f.block;
+  if (px < b.l || px > b.r || py < b.t || py > b.b) return false;
+  if (!f.fill || !f.r) return true;
+  const a = (-f.r * Math.PI) / 180;
+  const dx = px - f.x;
+  const dy = py - f.y;
+  const lx = dx * Math.cos(a) - dy * Math.sin(a);
+  const ly = dx * Math.sin(a) + dy * Math.cos(a);
+  return lx >= -f.w / 2 && lx <= f.w / 2 && ly >= -f.h && ly <= 0;
+}
+
+/** Sample grid for the share of a box that front decos cover together (columns x rows). */
+const FRONT_SAMPLES = Object.freeze([8, 6]);
+
+/**
+ * PURE: the share (0..1) of a w x h box standing on `spot` that the front decos cover between
+ * them, from a FRONT_SAMPLES grid of points at the cells' centres.
+ */
+export function frontCoverShare(spot, w, h, fronts) {
+  if (!fronts?.length) return 0;
+  const l = spot.x - w / 2;
+  const t = spot.y - h;
+  const near = fronts.filter(({ block: b }) => b.r > l && b.l < l + w && b.b > t && b.t < spot.y);
+  if (!near.length) return 0;
+  const [cols, rows] = FRONT_SAMPLES;
+  let hit = 0;
+  for (let i = 0; i < cols; i += 1) {
+    const px = l + ((i + 0.5) * w) / cols;
+    for (let j = 0; j < rows; j += 1) {
+      const py = t + ((j + 0.5) * h) / rows;
+      if (near.some((f) => insideFront(f, px, py))) hit += 1;
+    }
+  }
+  return hit / (cols * rows);
+}
+
+/**
+ * The boxes the front check uses for things players walk up to that are not REACH_BOXES (the
+ * reach check is about floors): a shrine (one 151 x 188 cell at spawnShrine's 0.78) and the
+ * vendor (PLACEMENT_HEIGHTS). Megna Burrow (GA912TJ0KF328Q3) planned its shrine on the slope
+ * that runs up through the cave's rock, behind the middleplus fill, so it and a player at it
+ * could not be seen.
+ */
+export const FRONT_BOXES = Object.freeze({ shrine: [118, 147], vendor: [105, 127] });
+
+/**
+ * PURE: whether a thing of `key` at `spot` is mostly behind the front decos (frontDecoCovers):
+ * one big deco over FRONT_HIDE_SHARE of its box, or (for things that stand still) the decos
+ * together over that share. A walking animal (ANIMAL_PATROL) keeps the one-deco rule: it walks out
+ * from behind a fill, and the planner would otherwise put it inside a rock rather than behind one
+ * (GIFBSQJTGME2KRH, tests/piggies-walk-on.test.js).
+ */
 export function hiddenBehindFront(spot, key, fronts) {
-  const size = REACH_BOXES[key];
+  const size = REACH_BOXES[key] || FRONT_BOXES[key];
   if (!size || !fronts?.length) return false;
   const [w, h] = size;
   const l = spot.x - w / 2;
   const r = spot.x + w / 2;
   const t = spot.y - h;
   for (const f of fronts) {
+    if (f.fill) continue;
     const b = f.block;
     const ox = Math.min(r, b.r) - Math.max(l, b.l);
     const oy = Math.min(spot.y, b.b) - Math.max(t, b.t);
     if (ox > 0 && oy > 0 && ox * oy >= FRONT_HIDE_SHARE * w * h) return true;
   }
-  return false;
+  if (ANIMAL_PATROL[key]) return false;
+  return frontCoverShare(spot, w, h, fronts) >= FRONT_HIDE_SHARE;
 }
 
 /** How near a floor's ends sit to a front deco's top for the floor to be that top (px up or down). */
@@ -660,7 +750,7 @@ export function frontDecoWalkways(platforms, fronts) {
   if (!fronts?.length || !Array.isArray(platforms)) return [];
   const lines = platforms.filter((p) => isStandable(p) && isItemSolid(p));
   const spans = floorRunSpans(lines);
-  return fronts.filter(({ block: b }) => lines.some((line) => {
+  return fronts.filter(({ block: b, fill }) => !fill && lines.some((line) => {
     const lo = Math.min(line.x1, line.x2);
     const hi = Math.max(line.x1, line.x2);
     const run = (spans.get(line) || []).find((span) => lo >= span[0] && hi <= span[1]);
@@ -962,9 +1052,9 @@ export function planStreetPlacements(
         const scenery = walker ? walkInScenery(candidate, request.key, occupied) : 0;
         // Ticket 64 follow-up: a tree, rock or Piggy behind a floor from beside it only when no other spot is left.
         let hidden = 0;
-        if (REACH_BOXES[request.key]) {
+        if (REACH_BOXES[request.key] || FRONT_BOXES[request.key]) {
           const k = `${request.key}:${candidate.id}`;
-          if (!hiddenCache.has(k)) hiddenCache.set(k, hiddenBehindFloor(platforms, candidate, request.key) || hiddenBehindFront(candidate, request.key, fronts));
+          if (!hiddenCache.has(k)) hiddenCache.set(k, (REACH_BOXES[request.key] && hiddenBehindFloor(platforms, candidate, request.key)) || hiddenBehindFront(candidate, request.key, fronts));
           hidden = hiddenCache.get(k) ? 32 : 0;
         }
         // Ticket 118: rooted scenery on or behind a front deco that players walk along, last too.

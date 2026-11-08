@@ -49,7 +49,7 @@
 
 import { ensureItem } from '../inventory.js?v=b7609342';
 import { isItemFloor, platformYAt } from '../street-model.js?v=b6cb6a4e';
-import { getStreetEcologyCatalog, streetEcologyAliases } from '../street-ecology.js?v=78a1d522';
+import { getStreetEcologyCatalog, streetEcologyAliases } from '../street-ecology.js?v=08076876';
 import { trantFootAnchorY, trantStatusLabel } from '../trants.js?v=1b3c8ae3';
 import { woodTreeStatusLabel } from '../woodcutting.js?v=73472b8c';
 import {
@@ -75,7 +75,7 @@ import {
 import { frameTexture, isLoaded, onFailed, onLoaded, textureFromUrl } from '../textures.js?v=3149d699';
 import { HOE_TOOLS, firstWorkingTool } from '../tools.js?v=eff5ef6f';
 import { slugsFromEffects } from '../speech-slugs.js?v=130338f9';
-import { plotSignature, replayRng } from '../shared-patches.js?v=da9da69d';
+import { plotSignature, replayRng } from '../shared-patches.js?v=0d71edb4';
 
 export const PATCHES_FEATURE_ID = 'patches';
 export const SOIL_GROUP_PREFIX = 'soil:';

@@ -37,14 +37,14 @@
  * an animal or tree carries the visitor's uses today, never the owner's.
  */
 
-import { createAnimalState } from './animals.js?v=fd2e3b93';
+import { createAnimalState } from './animals.js?v=2f790e9b';
 import { petPiggy } from './animal-mood.js?v=a49495fc';
 import { trantFruitCycle } from './trant-care.js?v=8339adef';
 import { resetTrantDay } from './trants.js?v=1b3c8ae3';
 import { GROWN_TREE_LABELS, SEASONED_BEANS, SOIL_TIMERS, seedlingTimings } from './patches.js?v=796732fb';
 import { GAME_DAY_MS, GAME_EPOCH_MS } from './game-day.js?v=edb00566';
 import { isNodeId, isRockId } from './yard-stock-mp.js?v=a502e667';
-import { STICK_ANIMAL } from './yard-wander.js?v=429743cd';
+import { STICK_ANIMAL } from './yard-wander.js?v=69f553ec';
 
 export const YARD_VERBS_MP_ID = 'yard-verbs-mp';
 /** js/features/homes-feature.js HOME_STREET_TSID: where an owner's save keeps the home street. */

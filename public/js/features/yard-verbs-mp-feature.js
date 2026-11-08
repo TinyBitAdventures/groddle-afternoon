@@ -56,13 +56,13 @@
 import { performPlotVerb, plotArtPath, plotLabel, plotStatusLabel, plotVerbs } from '../patches.js?v=796732fb';
 import { trantStatusLabel } from '../trants.js?v=1b3c8ae3';
 import { woodTreeStatusLabel } from '../woodcutting.js?v=73472b8c';
-import { animalAnchorX, animalAnchorY, animalStatusLabel } from '../animals.js?v=fd2e3b93';
+import { animalAnchorX, animalAnchorY, animalStatusLabel } from '../animals.js?v=2f790e9b';
 import { frameTexture, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js?v=3149d699';
 import { homeStreetLayout, normalizeCultivationState } from '../home-cultivation.js?v=42ae453c';
 import { readVisitScene } from '../neighbours-mp.js?v=d2a75460';
 import { saveStore } from '../save-store.js?v=8839ba7b';
-import { STREET_GROUND_Y, homesFeature, wearHomeCultivation } from './homes-feature.js?v=6ee17c50';
-import { patchesFeature, treeFrameUrl } from './patches-feature.js?v=fad91e52';
+import { STREET_GROUND_Y, homesFeature, wearHomeCultivation } from './homes-feature.js?v=7132ef0d';
+import { patchesFeature, treeFrameUrl } from './patches-feature.js?v=91433cb0';
 import {
   YARD_STREET,
   YARD_TEXT as T,
@@ -78,14 +78,14 @@ import {
   treeSnapshot,
   visitorAnimalState,
   visitorTreeState,
-} from '../yard-verbs-mp.js?v=591960c3';
+} from '../yard-verbs-mp.js?v=0533dbd8';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
-import { followYardPath, stickForClass } from '../yard-wander.js?v=429743cd';
+import { followYardPath, stickForClass } from '../yard-wander.js?v=69f553ec';
 import { countItem, removeItem } from '../inventory.js?v=b7609342';
 import { ROCK_CATALOG, rockStatusLabel, tickMineRock } from '../mining.js?v=f132ad75';
 import { getResourceNodeDef, regrowDelayMs } from '../resource-nodes.js?v=1ecc9789';
 import { getGameDayKey } from '../game-day.js?v=edb00566';
-import { rockReady } from '../street-objects.js?v=08e15893';
+import { rockReady } from '../street-objects.js?v=41e61b77';
 import { resourceNodesFeature } from './resource-nodes-feature.js?v=6f009751';
 import {
   ROCK_RESPAWN_MS,

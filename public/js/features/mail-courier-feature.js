@@ -84,7 +84,7 @@
 
 import { ITEM_CATALOG, itemIcon } from '../inventory.js?v=b7609342';
 import { frameTexture, sourceFromUrl } from '../textures.js?v=3149d699';
-import { questRoomConverse } from './quest-instances-feature.js?v=8c8ec617';
+import { questRoomConverse } from './quest-instances-feature.js?v=5751ef70';
 import { hellFeature } from './hell-feature.js?v=93f1c8dd';
 import { DISPATCHER_ART, FROG_ART, MAIL_NPC_ART_DIR } from '../mail-npc-art.js?v=1ed97a5d';
 import { DISPATCHER_GAP, DISPATCHER_HALF, SIGNPOST } from '../home-street-fixtures.js?v=badcb725';

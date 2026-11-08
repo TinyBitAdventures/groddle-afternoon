@@ -30,7 +30,7 @@ import {
   countItem,
   ITEM_CATALOG,
 } from '../public/js/inventory.js?v=b7609342';
-import { getVerbsFor, runVerb } from '../public/content.js?v=1d0c533d';
+import { getVerbsFor, runVerb } from '../public/content.js?v=108ab200';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=10b118dd';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));

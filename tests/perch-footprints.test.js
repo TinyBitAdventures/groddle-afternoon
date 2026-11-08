@@ -27,10 +27,10 @@ import {
   populationForStreet,
   setStreetEcologyCatalog,
   streetReservedSpots,
-} from '../public/js/street-ecology.js?v=78a1d522';
+} from '../public/js/street-ecology.js?v=08076876';
 import { placementRequests } from '../tools/build-realtime-objects.mjs';
 import { SHRINE_SHEETS } from '../public/js/shrine-variants.js?v=7f11c97d';
-import { adoptedPlan } from '../public/js/features/patches-feature.js?v=fad91e52';
+import { adoptedPlan } from '../public/js/features/patches-feature.js?v=91433cb0';
 import { createPlot } from '../public/js/patches.js?v=796732fb';
 import { serverPath, skipWithoutServer } from '../tools/repos.mjs';
 
@@ -198,8 +198,9 @@ describe('the archived streets', () => {
     assert.ok(placed > 5000, String(placed));
     // Perches only where a street's floors are full: 6 trees, 17 shrines, 167 rocks on 2026-10-31;
     // with doors, ladder feet and signposts kept clear (lane DOORCLEAR) 4 trees, 26 shrines, 192 rocks, 3 vendors;
-    // with every rock the files name (G399, 51 more, up to 16 a street) 15 more of the rocks perch: 212 rocks, 4 vendors.
-    assert.ok(perched <= 250, JSON.stringify(perchedBy));
+    // with every rock the files name (G399, 51 more, up to 16 a street) 15 more of the rocks perch: 212 rocks, 4 vendors;
+    // with shrines and vendors kept out from behind front decos (2026-11-08) 216 rocks, 26 shrines, 5 vendors, 4 trees.
+    assert.ok(perched <= 255, JSON.stringify(perchedBy));
     // A walking animal never perches while a floor has room: none do (38 Piggies, 658 Chickens before).
     assert.equal((perchedBy.piggies || 0) + (perchedBy.chickens || 0), 0, JSON.stringify(perchedBy));
   });

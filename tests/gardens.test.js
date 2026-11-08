@@ -45,7 +45,7 @@ import {
   gardenNeedsWater,
   GARDEN_NO_DRY_PLOTS_LINE,
 } from '../public/js/garden.js?v=7bf205c7';
-import { getVerbsFor, runVerb } from '../public/content.js?v=1d0c533d';
+import { getVerbsFor, runVerb } from '../public/content.js?v=108ab200';
 import { plotPieces } from '../public/js/garden-view.js?v=3683a26f';
 import { plotsFor } from '../public/js/master-garden.js?v=0fa84ce4';
 import {

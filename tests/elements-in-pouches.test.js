@@ -11,7 +11,7 @@ import { fileURLToPath } from 'node:url';
 import { layoutPack, moveStack, packAccepts, packKeeps, roomFor, stackUp, isElementClass } from '../public/js/pack-slots.js?v=6cf9f397';
 import { smashTrophy } from '../public/js/item-verbs-more.js?v=f495e9e8';
 import { canCraft, grindsElements, grinderResultLine, NEED_POUCH_LINE, recipeBlockedLine, isGrinderRecipe } from '../public/js/making.js?v=b0053dac';
-import { getVerbsFor } from '../public/content.js?v=1d0c533d';
+import { getVerbsFor } from '../public/content.js?v=108ab200';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=10b118dd';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');

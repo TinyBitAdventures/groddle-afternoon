@@ -34,7 +34,7 @@ import {
   populationForStreet,
   setStreetEcologyCatalog,
   streetReservedSpots,
-} from '../public/js/street-ecology.js?v=78a1d522';
+} from '../public/js/street-ecology.js?v=08076876';
 import {
   MYSTERY_QUOIN_KINDS,
   QUOIN_CLASSES,

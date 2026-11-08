@@ -30,7 +30,7 @@
 import { compileSchema } from './schema-check.js?v=cc9d1af4';
 import { reachStreet, REACH_LIMITS, TIGHT_MARGIN, LANDING_TRIES, AIR_JUMP_TRIES, LANDING_SHARE, streetBuff } from './reach-graph.js?v=f1b86aeb';
 import { platformsScreen, barriersScreen, isStandable, isSolidFromBelow, isItemFloor, assertStreetGeometry, avatarHeadReach, platformYAt, worldToScreen, streetWidth, streetHeight } from '../street-model.js?v=b6cb6a4e';
-import { planStreetPlacements, populationForStreet, streetReservedSpots } from '../street-ecology.js?v=78a1d522';
+import { planStreetPlacements, populationForStreet, streetReservedSpots } from '../street-ecology.js?v=08076876';
 import { jumpApex } from '../avatar-step.js?v=e8e9581f';
 import { STY_RULES, styleFindings } from './style-rules.js?v=abf9bfae';
 import { EFFECT_LIMITS, effectsCost, normaliseEmitter, rumbleShare, emitterAnchor } from '../street-effects.js?v=f35d7e32';

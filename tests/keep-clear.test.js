@@ -34,6 +34,7 @@ import {
   buildPlatformCandidates,
   ecologyForStreet,
   footAtWalkway,
+  frontCoverShare,
   frontDecoCovers,
   frontDecoWalkways,
   hiddenBehindFront,
@@ -41,7 +42,7 @@ import {
   populationForStreet,
   setStreetEcologyCatalog,
   streetReservedSpots,
-} from '../public/js/street-ecology.js?v=78a1d522';
+} from '../public/js/street-ecology.js?v=08076876';
 import { placementRequests } from '../tools/build-realtime-objects.mjs';
 import { serverPath, skipWithoutServer } from '../tools/repos.mjs';
 import { applyStreetIndex, loadStreetDataFromFs, setZoneStreetsShown } from '../public/js/street-loader.js?v=18b181ad';
@@ -343,5 +344,58 @@ describe('ticket 118: rooted scenery keeps off a front deco players walk along',
     // Census of the server's data (2026-11-06): 16 streets have one; before, 4 things stood at one (Flipside's plant, 3 others).
     assert.ok(withWalkway >= 10, String(withWalkway));
     assert.deepEqual(offenders, []);
+  });
+});
+
+describe('a shrine or vendor is never planned behind the rock a cave draws in front', () => {
+  const MEGNA = 'GA912TJ0KF328Q3';
+  const tile = (x, y, w, h, r = 0) => ({ sprite: 'cave_gr_tiling_piece', x, y, w, h, r });
+  const cave = (decos) => ({ bounds: { l: -1000, r: 1000, t: -1000, b: 0 }, layers: [{ name: 'Middleplus', z: 1, w: 2000, decos }] });
+
+  it('counts small and turned tiles together, as a fill, never as a walkway', () => {
+    // Four 100 x 80 tiles, none over 60% of a shrine's 118 x 147 box alone, together all of it.
+    const fronts = frontDecoCovers(cave([tile(950, 1000, 100, 80), tile(1050, 1000, 100, 80), tile(950, 920, 100, 80), tile(1050, 920, 100, 80)]));
+    assert.equal(fronts.length, 4);
+    assert.ok(fronts.every((f) => f.fill));
+    assert.equal(frontCoverShare({ x: 1000, y: 1000 }, 118, 147, fronts), 1);
+    assert.equal(hiddenBehindFront({ x: 1000, y: 1000 }, 'shrine', fronts), true);
+    assert.equal(hiddenBehindFront({ x: 1300, y: 1000 }, 'shrine', fronts), false);
+    assert.deepEqual(frontDecoWalkways([{ id: 'a', x1: 900, y1: 840, x2: 1100, y2: 840, pcPerm: -1, itemPerm: -1 }], fronts), []);
+    // A tile turned 90 degrees about its bottom centre stands to the side of it, w and h swapped.
+    const [turned] = frontDecoCovers(cave([tile(1000, 1000, 184, 89, 90)]));
+    assert.deepEqual(Object.fromEntries(Object.entries(turned.block).map(([k, v]) => [k, Math.round(v)])), { l: 1000, r: 1089, t: 908, b: 1092 });
+    assert.ok(frontCoverShare({ x: 1045, y: 1090 }, 60, 160, [turned]) > 0.9);
+    assert.equal(frontCoverShare({ x: 955, y: 1090 }, 60, 160, [turned]), 0);
+    // A layer as wide as the street but shorter moves with the camera (Sylvan Grove's middleplus, 850 on 1000).
+    assert.deepEqual(frontDecoCovers({ ...cave([tile(1000, 1000, 300, 300)]), layers: [{ name: 'middleplus', z: 1, w: 2000, h: 850, decos: [tile(1000, 1000, 300, 300)] }] }), []);
+    // Tiles too small to matter, see-through overlays and hidden decos hide nothing.
+    assert.deepEqual(frontDecoCovers(cave([tile(1000, 1000, 24, 25), { sprite: 'cave_light_overlay', x: 1000, y: 1000, w: 400, h: 400 }, { ...tile(1000, 1000, 300, 300), hidden: true }])), []);
+  });
+
+  it('Megna Burrow puts its shrine where it shows, off the slope through the rock', async () => {
+    const data = await loaded(MEGNA);
+    const { plan, reserved, pop } = layoutOf(data);
+    assert.equal(pop.shrine, true);
+    const fronts = reserved.filter((r) => r.front);
+    const [shrine] = plan.groups.shrine;
+    // Before: on plat_1307035601041 at screen 3362, 857, the slope up through the middleplus rock, 100% covered.
+    assert.equal(frontCoverShare({ x: 3362, y: 857 }, 118, 147, fronts), 1);
+    assert.ok(frontCoverShare(shrine, 118, 147, fronts) < 0.6, `${Math.round(shrine.x)},${Math.round(shrine.y)}`);
+    for (const key of ['vendor', 'trees', 'rocks']) for (const p of plan.groups[key] || []) assert.equal(hiddenBehindFront(p, key, fronts), false, `${key} ${Math.round(p.x)},${Math.round(p.y)}`);
+  });
+
+  it('every street keeps its shrine and vendor out from behind the front decos', async () => {
+    const hidden = [];
+    for (const tsid of Object.keys(index.streets).filter((t) => !/^GZ/.test(t)).sort()) {
+      let data;
+      try { data = await loaded(tsid); } catch { continue; }
+      const { plan, reserved } = layoutOf(data);
+      const fronts = reserved.filter((r) => r.front);
+      if (!fronts.length) continue;
+      for (const key of ['shrine', 'vendor']) for (const p of plan.groups[key] || []) if (hiddenBehindFront(p, key, fronts)) hidden.push(`${tsid} ${key}`);
+    }
+    // Census (2026-11-08): before, 146 shrines and vendors mostly behind front decos (Megna Burrow's
+    // shrine and vendor, Gimbap Bop's shrine behind a tree trunk); after, none.
+    assert.deepEqual(hidden, []);
   });
 });
