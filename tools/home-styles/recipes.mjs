@@ -773,12 +773,18 @@ export const RECIPES = {
         { f: 0.02, items: [item('moon_asset_plain.svg', 0.26, 230, 2400, 0, 900, { noFlip: true, w: 322, h: 322 })] },
         { f: 0.4, items: [item('earthdot_grp_2', 0.9, 586, 900, 260, 300, { tint: 0x6a6a66 })] },
       ],
+      // G223 polish against header-1338327146 (reference only): grey dust and one crater, the
+      // radioactive sign, and a single drum lying on its side out on the plain, not a row of
+      // drums planted by the door. earthdot_grp_3 is orange-brown art, so tinting it grey made
+      // brown stains; the grey earthdot_grp_4 and _grp_2 spots stand in for the dust and crater.
       near: [
-        { s: 'earthdot_grp_3', scale: 0.7, every: 700, jitter: 200, tint: 0x7a7974, below: 30 },
-        { s: 'radioactive_sign_1', scale: 0.32, every: 1700, jitter: 300, offset: 1200 },
-        { s: 'cattle_skull', scale: 0.24, every: 1900, jitter: 300, offset: 300, tint: 0xe0e0e0 },
+        { s: 'earthdot_grp_4', scale: 0.8, every: 700, jitter: 200, tint: 0x9a9994, alpha: 0.5, below: 30 },
+        { s: 'earthdot_grp_2', scale: 1, every: 1500, jitter: 300, offset: 700, tint: 0x6e6d69, below: 22 },
+        { s: 'radioactive_sign_1', scale: 0.32, every: 1700, jitter: 300, offset: 1200, tint: 0xffffff },
+        { s: 'ra_drum_1', scale: 0.28, every: 2300, jitter: 300, offset: 300, tint: 0xffffff },
       ],
-      trim: ['ra_drum_3', 'ra_drum_1', 'ra_drum_2'],
+      nearTint: 0xc4c3be,
+      trim: ['rock_rubble_01c_al1', 'gravel_2', 'rock_rubble_01f_al1'],
     },
   },
   _crimson_forest_high: {
@@ -867,9 +873,17 @@ export const PURCHASE_YARD_STYLE = {
  * the groddle frame (home_groddle.swf, frame groddle): the house is the same in
  * every one, only the yard landscape left of it changes. No interior template's
  * geometry or main image was archived, so each yard is drawn with the CC0
- * composition of the street style from the same template family: the keys pair
- * up by region and number (forest_2__high / forest_2_high, firebog_int_3_hor_high
- * / firebog_3_high, ...), the default yard pairs with the default street
+ * composition of the street style from the same template family. The pairs come
+ * from the template streets' names in inc_data_maps_prod.js (each interior row's
+ * template is named <family>_int_<n>_HOR_high, its street's <family>_ext_<n>_high;
+ * tests/home-styles.test.js reads them), not from the style keys, which lie three
+ * times: Night Lights is keyed firebog_int_1b_hor_high but its template
+ * LHVMN2RPE9U24OJ is uralia_int_2a_HOR_high (Midnight Glow's yard, as a player's
+ * "Midnight Glow - (Night Lights)" in forum general/20994 page 2 says too), and
+ * the keys of Easy Ash (firebog_int_4__high, template firebog_int_4_HOR_high) and
+ * Perfus Preference (firebog_int_4_hor_high, template firebog_int_4a_HOR_high) are
+ * swapped, so Easy Ash pairs with Vidya Vent, the street the Firebog tutorial
+ * choice sets with it (magic_rock.js 594-597). The default yard pairs with the default street
  * (config_base.js START_INT_TEMPLATE meadows_int_default__high / START_EXT_TEMPLATE
  * meadow_ext_default_high), and the September 2012 batch added five yards and
  * five streets together (Engadget 2012-09-14 "5 interior and 5 exterior"; their
@@ -877,19 +891,20 @@ export const PURCHASE_YARD_STYLE = {
  * Vatn Road, Nightfall Surprise / Eventide Essence, Ruddy Skies / Sunset Strip,
  * Grasslands Graze / Llano Lane, Anemone Alley / Coral Caves
  * (research/web-hunt-2026-10-24/REVIEW.md finding 2). A string is the street style whose look the yard
- * uses; `missing` keeps a yard out of the choices; `lookOf` with `borrowed` says plainly on the
+ * uses; `missing` keeps a yard out of the choices; `{ lookOf, look, ref }` is a yard drawn from a
+ * surviving picture of the yard itself (`ref`, reference only); `lookOf` with `borrowed` says plainly on the
  * style's data what stands in for its art.
  */
 export const YARD_LOOKS = {
   aranna_int_1_hor_high: 'aranna_ext_1_high',
   basic: 'basic',
   firebog_1_hor_high: 'firebog_1_high',
-  firebog_int_1b_hor_high: 'firebog_1b_high',
+  firebog_int_1b_hor_high: 'uralia_2a_high',
   firebog_int_1b__high: 'firebog_1b_high',
   firebog_int_2__high: 'firebog_2_high',
   firebog_int_3_hor_high: 'firebog_3_high',
-  firebog_int_4_hor_high: 'firebog_4_high',
-  firebog_int_4__high: 'firebog_4a_high',
+  firebog_int_4_hor_high: 'firebog_4a_high',
+  firebog_int_4__high: 'firebog_4_high',
   forest_1_hor_high: 'forest_1_high',
   forest_2__high: 'forest_2_high',
   forest_3__high: 'forest_3_high',
@@ -920,8 +935,37 @@ export const YARD_LOOKS = {
   // The pair's key hid it: Mythical Oak's exterior row is meadows_int_default__high, the same key as
   // interior Plush Pasture (inc_data_homes_prod.js 552, 873). Templates POL_ext_triney_2_high and
   // POL_int_triney_2_HOR_high (inc_data_maps_prod.js 19197, 19225); a player's note of the pair (general/19703).
+  // The yard itself survives in players' snaps (reference only, never shipped): a dusk-purple sky,
+  // big dark oaks with their canopy over the top, dark curling mushroom trees and a teal light shaft
+  // behind, ground mist, glowing blue mushrooms round the trunks, a fallen log, and fiddleheads and
+  // dark red flowers in front. Composed from CC0 decos (groddle1, maytang, corey3 bundles).
   _triney__high: {
     lookOf: 'meadows_int_default__high',
-    borrowed: "Uses Mythical Oak's look. The yard's own template was never archived, so this is its street pair's composition, not the yard as it stood.",
+    ref: 'snap 12871 "Bewitched Backwoods backyard style" (2012-05-21, 3000x1516) and snap 12944 (2012-05-14)',
+    look: {
+      sky: [0x261c2a, 0x3a2b40, 0x4e3b54],
+      field: 0x2c3a24,
+      fieldDark: 0x223019,
+      soil: 'crosssection_short_3',
+      soilColor: 0x5a3a26,
+      layers: [
+        { f: 0.05, items: [item('tree_group_bg_4_maytang', 0.62, 562, 380, 140, 0, { tint: 0x46384f })] },
+        { f: 0.08, items: [item('newxp_haze_oval_1', 1.2, 560, 760, 200, 0, { tint: 0x9a88a8, alpha: 0.45 })] },
+        { f: 0.12, items: [item(['mushroom_light_tree_maytang', 'mushroom_light_tree_2_maytang'], 0.5, 572, 1100, 260, 520, { tint: 0x35283f })] },
+        { f: 0.16, items: [item('light_shafts_blue', 0.36, 548, 1500, 300, 900, { alpha: 0.55 })] },
+        { f: 0.22, items: [item(OAKS.slice(0, 2), 0.62, 578, 420, 140, 100, { tint: 0x4a5a44 })] },
+        { f: 0.3, items: [item('newxp_haze_oval_1', 1, 590, 640, 200, 300, { tint: 0xb0a4bc, alpha: 0.35 })] },
+        { f: 0.5, items: [item(OAKS.slice(0, 2), 0.95, 598, 820, 200, 300, { tint: 0xb4c8a4 }), item('tree_dead_2', 0.5, 596, 1700, 300, 1100, { tint: 0x7a7070 })] },
+        { f: 0.75, items: [item(['corey3_shroom_aqua1', 'corey3_shroom_aqua2', 'mushroom_aqua_1'], 0.42, 603, 560, 220, 200), item('purple_mushroom_1', 0.4, 603, 900, 260, 640)] },
+        { f: 0.9, items: [item('tree_plane_foliage_01a_g1', 0.8, 10, 1100, 300, 300, { hang: true, tint: 0x24341f })] },
+      ],
+      near: [
+        { s: 'groddle_grass_2', scale: 0.5, every: 280, jitter: 120, tint: 0x6a7a68 },
+        { s: 'plant_fern_1', scale: 0.5, every: 420, jitter: 160, offset: 120 },
+        { s: 'bling_branchrosebrush_red_1', scale: 0.4, every: 700, jitter: 220, offset: 300, tint: 0x8a3a44 },
+        { s: 'plant_fern_3', scale: 0.6, every: 520, jitter: 200, offset: 60 },
+      ],
+      trim: ['plant_fern_1', 'bling_mushroom_bunch_ground_1', 'plant_giant_fern_1'],
+    },
   },
 };

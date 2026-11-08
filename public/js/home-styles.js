@@ -35,7 +35,7 @@
  * confirm says "yard".
  */
 
-import { EXTERIOR_STYLES, INTERIOR_STYLES, PURCHASE_STREET_STYLE, PURCHASE_YARD_STYLE } from './home-styles-data.js?v=97a00148';
+import { EXTERIOR_STYLES, INTERIOR_STYLES, PURCHASE_STREET_STYLE, PURCHASE_YARD_STYLE } from './home-styles-data.js?v=007017e9';
 
 export { EXTERIOR_STYLES, INTERIOR_STYLES, PURCHASE_STREET_STYLE, PURCHASE_YARD_STYLE };
 
@@ -141,10 +141,10 @@ export function yardStyleFor(saved, purchaseStyle = null) {
   return YARD_STYLE_BY_KEY[start]?.built ? start : START_YARD_STYLE;
 }
 
-/** The yard's look: the street style it pairs with (its `lookOf`). */
+/** The yard's look: its own composition when a picture of the yard survives (`look`), else the street style it pairs with (its `lookOf`). */
 export function yardLook(key) {
   const row = YARD_STYLE_BY_KEY[key]?.built ? YARD_STYLE_BY_KEY[key] : YARD_STYLE_BY_KEY[START_YARD_STYLE];
-  return streetLook(row.lookOf);
+  return row.look || streetLook(row.lookOf);
 }
 
 /** houses_style_choices inside the house: every yard style whose look is built. */
@@ -156,7 +156,7 @@ export function yardStyleChoices(current, level) {
       key: row.key,
       label: row.label,
       isCurrent: row.key === current,
-      look: streetLook(row.lookOf),
+      look: yardLook(row.key),
     })),
     missing: INTERIOR_STYLES.filter((row) => !row.built).map((row) => ({ key: row.key, label: row.label, reason: row.reason })),
   };

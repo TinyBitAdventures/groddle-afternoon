@@ -14,7 +14,7 @@ import {
 import { isOfferedInRemake, remakeStatus } from '../public/js/imagination-remake.js?v=c37ad887';
 import { IMAGINATION_UPGRADES } from '../public/js/imagination.js?v=6adb7b9a';
 // The feature imports these with their browser cache tags; load the same module instances.
-import { moodDecayContext, moodDecayFeature, runMoodDecayMinute } from '../public/js/features/mood-decay-feature.js?v=9ab9a2a9';
+import { moodDecayContext, moodDecayFeature, runMoodDecayMinute } from '../public/js/features/mood-decay-feature.js?v=7fbd44d0';
 import { __newxpTest } from '../public/js/features/newxp-feature.js?v=2c2bcada';
 import { GENTLE_ISLAND_TSIDS } from '../public/js/newxp.js?v=b7a1699b';
 

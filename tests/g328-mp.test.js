@@ -35,9 +35,10 @@ import {
   visitSceneTsid,
 } from '../public/js/neighbours-mp.js?v=d2a75460';
 import { createMinnAccount } from '../public/js/minn-account.js?v=8f2741cd';
-import { homesFeature, visitorHomeScene, visitorHomeState } from '../public/js/features/homes-feature.js?v=bdc0c835';
-import { neighboursMpApi, neighboursMpFeature } from '../public/js/features/neighbours-mp-feature.js?v=b27c7b7d';
-import { FEATURES } from '../public/js/features/index.js?v=1ce6c699';
+import { homesFeature, visitorHomeScene, visitorHomeState } from '../public/js/features/homes-feature.js?v=4ca0070e';
+import { neighboursMpApi, neighboursMpFeature } from '../public/js/features/neighbours-mp-feature.js?v=b5693c76';
+import { FEATURES } from '../public/js/features/index.js?v=1e971a5c';
+import { YARD_STYLE_BY_KEY, streetLook, yardLook, yardStyleFor } from '../public/js/home-styles.js?v=eeba82ee';
 import { serverPath, sitePath, skipWithoutServer, skipWithoutSite } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');
@@ -120,6 +121,21 @@ describe('homes feature, for a visitor', () => {
     assert.ok(Array.isArray(v.cult.items));
     assert.ok(Array.isArray(v.decor.placed));
     assert.equal(visitorHomeState({}).style, 'meadow');
+  });
+
+  it('shows a visitor the owner\'s street and yard styles, whatever the visitor chose (G223)', () => {
+    const v = visitorHomeState({ ...VIEW, homes: { ...VIEW.homes, streetStyle: '_moon_high', yardStyle: '_triney__high' } });
+    assert.equal(v.streetStyle, '_moon_high');
+    assert.equal(v.yardStyle, '_triney__high');
+    assert.equal(yardLook(v.yardStyle), YARD_STYLE_BY_KEY._triney__high.look, 'Bewitched Backwoods\' own look');
+    // An owner who never restyled saves none: the visit shim hands homeContext the OWNER's purchase look,
+    // so a Firebog owner's yard is Easy Ash, drawn as Vidya Vent (its template pair), for every visitor.
+    const plain = visitorHomeState(VIEW);
+    assert.equal(plain.yardStyle, null);
+    assert.equal(yardStyleFor(plain.yardStyle, plain.style), 'firebog_int_4__high');
+    assert.deepEqual(yardLook(yardStyleFor(plain.yardStyle, plain.style)), streetLook('firebog_4_high'));
+    const src = read('public/js/features/homes-feature.js');
+    assert.match(src, /homeContext: \{ value: \(\) => \(\{ inHome: false, room, owned: true, style: v\.style/, 'the shim names the owner\'s purchase look');
   });
 
   it('never leaves the owner\'s home in place of yours, even when building fails', () => {

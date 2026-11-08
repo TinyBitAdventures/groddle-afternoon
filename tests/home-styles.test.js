@@ -32,8 +32,9 @@ import {
   styleChoices,
   styleSwitchCost,
   switchStreetStyle,
-} from '../public/js/home-styles.js?v=1a7a2798';
+} from '../public/js/home-styles.js?v=eeba82ee';
 import { HOME_STYLES } from '../public/js/homes.js?v=631ab6b8';
+import { templateNames, templatePair } from '../tools/home-styles/build.mjs';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const GS = join(spike, '../glitch-GameServerJS');
@@ -211,26 +212,28 @@ describe('composed styles (tools/home-styles/build.mjs)', () => {
     for (const row of INTERIOR_STYLES.filter((r) => !r.built)) assert.ok(row.reason);
   });
 
-  it('offers Bewitched Backwoods with Mythical Oak\'s look, and says it is borrowed', () => {
+  it('offers Bewitched Backwoods, paired with Mythical Oak and drawn from its own yard snaps (G223)', () => {
     const row = YARD_STYLE_BY_KEY._triney__high;
     assert.equal(row.label, 'Bewitched Backwoods');
     assert.equal(row.built, true);
     assert.equal(row.lookOf, 'meadows_int_default__high');
     assert.equal(STREET_STYLE_BY_KEY[row.lookOf].label, 'Mythical Oak');
-    assert.match(row.borrowed, /Mythical Oak's look/);
-    assert.doesNotMatch(row.borrowed, /—/);
-    assert.deepEqual(yardLook('_triney__high'), streetLook('meadows_int_default__high'));
-    // Only this one says so; Plush Pasture, which shares the key's spelling, still draws Heartfelt Heath.
-    assert.deepEqual(INTERIOR_STYLES.filter((r) => r.borrowed).map((r) => r.key), ['_triney__high']);
+    assert.equal(row.borrowed, undefined, 'its pair is the template family\'s, like every other yard');
+    assert.match(row.ref, /snap 12871/);
+    assert.deepEqual(yardLook('_triney__high'), row.look, 'its own composition');
+    assert.notDeepEqual(yardLook('_triney__high'), streetLook('meadows_int_default__high'));
+    const names = new Set(row.look.layers.flatMap((l) => (l.items || []).flatMap((it) => [it.s, ...(it.alts || []).map((a) => a.s)])));
+    for (const want of ['tree_deciduous1', 'light_shafts_blue', 'tree_dead_2', 'corey3_shroom_aqua1', 'tree_plane_foliage_01a_g1']) assert.ok(names.has(want), want);
+    assert.ok(row.look.near.some((it) => it.s === 'plant_fern_1'), 'fiddleheads in front');
+    // Only this yard has a picture of its own; Plush Pasture, which shares the key's spelling, still draws Heartfelt Heath.
+    assert.deepEqual(INTERIOR_STYLES.filter((r) => r.look).map((r) => r.key), ['_triney__high']);
+    assert.equal(INTERIOR_STYLES.filter((r) => r.borrowed).length, 0);
     assert.equal(YARD_STYLE_BY_KEY.meadows_int_default__high.lookOf, 'meadow_ext_default_high');
     assert.equal(YARD_STYLE_BY_KEY.meadows_int_default__high.label, 'Plush Pasture');
     // The price and the way it is bought are every style's: house_style_switch_cost, level x 10 and at least 40 iMG (players/inc_houses.js 1603-1667).
     const { choices, cost } = yardStyleChoices('basic', 30);
     assert.equal(cost, 300);
-    assert.ok(choices.some((c) => c.key === '_triney__high'));
-    const before = choices.filter((c) => c.key !== '_triney__high').map((c) => c.key);
-    assert.equal(before.length, 34);
-    assert.deepEqual(before, INTERIOR_STYLES.filter((r) => r.built && r.key !== '_triney__high').map((r) => r.key), 'the others keep their order');
+    assert.deepEqual(choices.find((c) => c.key === '_triney__high').look, row.look, 'the picker shows the yard\'s own look');
     const state = { yardStyle: 'basic' };
     const pc = { imagination: 500, level: 30 };
     assert.equal(switchYardStyle(state, pc, '_triney__high', { atHome: true }).ok, true);
@@ -239,10 +242,44 @@ describe('composed styles (tools/home-styles/build.mjs)', () => {
     assert.equal(yardStyleFor('_triney__high'), '_triney__high', 'a saved choice stands');
   });
 
+  it('pairs every yard with its street by the template streets\' names, not the style keys (G223)', () => {
+    const names = templateNames(join(GS, 'inc_data_maps_prod.js'));
+    const exterior = EXTERIOR_STYLES;
+    for (const row of INTERIOR_STYLES) {
+      const pair = templatePair(row.template, exterior, names);
+      if (row.key === 'pol_int_mordor_high') {
+        assert.equal(pair, null, 'More Door: POL_int_mordor_high has no street');
+        continue;
+      }
+      assert.ok(pair, row.key);
+      if (row.built) assert.equal(row.lookOf, pair.key, `${row.label} (${names[row.template]})`);
+      else assert.equal(pair.key, 'pol_ext_coral_high', row.key);
+    }
+    // The three the keys got wrong: inc_data_maps_prod.js names LHVMN2RPE9U24OJ uralia_int_2a_HOR_high,
+    // LHVMRH2SE9U2SEM firebog_int_4_HOR_high and LHVMS6CSE9U2NKR firebog_int_4a_HOR_high.
+    const label = (key) => STREET_STYLE_BY_KEY[YARD_STYLE_BY_KEY[key].lookOf].label;
+    assert.equal(label('firebog_int_1b_hor_high'), 'Midnight Glow', 'Night Lights (a player: "Midnight Glow - (Night Lights)")');
+    assert.equal(label('firebog_int_4__high'), 'Vidya Vent', 'Easy Ash');
+    assert.equal(label('firebog_int_4_hor_high'), 'Crinum Quag', 'Perfus Preference');
+    assert.equal(label('firebog_int_1b__high'), "Raima's Roost", 'Glaring Muddle keeps its pair');
+    // The Firebog tutorial home now has a matching street and yard (magic_rock.js 594-597).
+    assert.equal(YARD_STYLE_BY_KEY[PURCHASE_YARD_STYLE.firebog].lookOf, PURCHASE_STREET_STYLE.firebog);
+  });
+
+  it('draws Toxic Moon as its header does: one drum on its side, grey dust, no drums by the door (G223)', () => {
+    const look = streetLook('_moon_high');
+    assert.ok(!look.trim.some((it) => /^ra_drum/.test(it.s)), 'no drums in the border by the house');
+    const drums = look.near.filter((it) => /^ra_drum/.test(it.s));
+    assert.deepEqual(drums.map((it) => it.s), ['ra_drum_1'], 'one drum, lying down');
+    assert.ok(drums[0].every >= 2000, 'out on the plain, now and then');
+    assert.ok(!look.near.some((it) => it.s === 'earthdot_grp_3'), 'no orange-brown stains');
+  });
+
   it('draws only shipped CC0 decos', () => {
     const decos = join(spike, 'public/assets/decos/groddle');
     const names = new Set();
-    for (const row of EXTERIOR_STYLES.filter((r) => r.built)) {
+    // Every street look, and every yard drawn from a picture of its own (G223).
+    for (const row of [...EXTERIOR_STYLES, ...INTERIOR_STYLES].filter((r) => r.built && r.look)) {
       const { look } = row;
       for (const layer of look.layers) for (const item of layer.items || []) for (const alt of item.alts || [item]) names.add(alt.s);
       for (const item of look.near) for (const alt of item.alts || [item]) names.add(alt.s);

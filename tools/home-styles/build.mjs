@@ -16,6 +16,7 @@ import { PURCHASE_STREET_STYLE, PURCHASE_YARD_STYLE, RECIPES, YARD_LOOKS } from 
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '../..');
 const GSJS = join(spike, '../glitch-GameServerJS/inc_data_homes_prod.js');
+const GSJS_MAPS = join(spike, '../glitch-GameServerJS/inc_data_maps_prod.js');
 const SRC_DECOS = join(spike, 'assets-src/decos/groddle');
 const PUB_DECOS = join(spike, 'public/assets/decos/groddle');
 const OUT = join(spike, 'public/js/home-styles-data.js');
@@ -65,6 +66,33 @@ export function loadGsjsStyles(path = GSJS) {
     interior: Object.entries(data.homes_interior_configs).map(row),
     exterior: Object.entries(data.homes_exterior_configs).map(row),
   };
+}
+
+/**
+ * The template streets' own names (inc_data_maps_prod.js, mote 15 Homes: "LHV..." : "<name>").
+ * An interior template is named <family>_int_<n>_HOR_high and its street's <family>_ext_<n>_high
+ * (POL_int_crimson_HOR_high pairs with POL_ext_crimson_forest_high); the two Groddle templates
+ * are "Groddle Int HoR" and "Groddle Ext Yard 01" (both rows keyed basic).
+ */
+export function templateNames(path = GSJS_MAPS) {
+  const src = readFileSync(path, 'utf8');
+  const names = {};
+  for (const m of src.matchAll(/"(LHV[0-9A-Z]{12})"\s*:\s*"([^"]*)"/g)) names[m[1]] = m[2];
+  return names;
+}
+
+/** The exterior style whose template is the named pair of an interior template, or null. */
+export function templatePair(intTemplate, exterior, names = templateNames()) {
+  const name = names[intTemplate];
+  if (!name) return null;
+  const extName = (row) => names[row.template] || '';
+  if (name === 'Groddle Int HoR') return exterior.find((row) => extName(row) === 'Groddle Ext Yard 01') || null;
+  const want = name.replace(/_int_/i, '_ext_').replace(/_HOR(?=_|$)/i, '').toLowerCase();
+  const exact = exterior.find((row) => extName(row).toLowerCase() === want);
+  if (exact) return exact;
+  const stem = want.replace(/_high$/, '_');
+  const near = exterior.filter((row) => extName(row).toLowerCase().startsWith(stem));
+  return near.length === 1 ? near[0] : null;
 }
 
 function pngSize(name) {
@@ -119,15 +147,25 @@ export function buildData() {
   for (const key of Object.keys(RECIPES)) {
     if (!exterior.some((row) => row.key === key)) throw new Error(`recipe ${key} is not a GSJS exterior style`);
   }
+  const names = templateNames();
   const intRows = interior.map((row) => {
     const pair = YARD_LOOKS[row.key];
+    const named = templatePair(row.template, exterior, names);
+    const said = typeof pair === 'string' ? pair : pair?.lookOf;
+    // The style keys mislead (Night Lights is keyed firebog_int_1b_hor_high); the template's name decides.
+    if (said && named && said !== named.key) throw new Error(`back-yard look ${row.key}: its template ${names[row.template]} pairs with ${named.key}, not ${said}`);
     if (pair == null) throw new Error(`no back-yard look for interior style ${row.key}`);
     if (typeof pair !== 'string' && pair.missing) return { ...row, built: false, reason: pair.missing };
     const lookOf = typeof pair === 'string' ? pair : pair.lookOf;
     const ext = extRows.find((r) => r.key === lookOf);
     if (!ext) throw new Error(`back-yard look ${row.key}: ${lookOf} is not a GSJS exterior style`);
     if (!ext.built) return { ...row, built: false, reason: `Drawn like the ${ext.label} street, which is not built: ${ext.reason}` };
-    // The look is the street style's (js/home-styles.js yardLook), kept once in EXTERIOR_STYLES.
+    // A yard with a picture of its own (`look`, `ref`) is composed from it; the rest draw their
+    // street style's look (js/home-styles.js yardLook), kept once in EXTERIOR_STYLES.
+    if (typeof pair !== 'string' && pair.look) {
+      if (!pair.ref) throw new Error(`back-yard look ${row.key}: a look of its own needs the picture it follows (ref)`);
+      return { ...row, built: true, lookOf, ref: pair.ref, look: resolveLook(pair.look) };
+    }
     return { ...row, built: true, lookOf, ...(pair.borrowed ? { borrowed: pair.borrowed } : {}) };
   });
   for (const key of Object.keys(YARD_LOOKS)) {
@@ -148,7 +186,7 @@ function render(data) {
     ...data.exterior.map((row) => `  ${json(row)},`),
     ']);',
     '',
-    '/** homes_interior_configs (inc_data_homes_prod.js 1-816), source order. `lookOf`: the street style whose look the yard uses. */',
+    '/** homes_interior_configs (inc_data_homes_prod.js 1-816), source order. `lookOf`: the street style the yard pairs with; a yard with its own `look` follows the picture `ref`. */',
     'export const INTERIOR_STYLES = Object.freeze([',
     ...data.interior.map((row) => `  ${json(row)},`),
     ']);',
