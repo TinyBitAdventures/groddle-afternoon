@@ -30,6 +30,11 @@
  *   charadesQuaff (the secret word box); the server keeps the word, watches
  *   the street's chat and says who won (charades_won pays the guesser 50 iMG
  *   and 250 currants, which the server also credits in the site's ledger).
+ * - Garlic Breath (garlic.js 125-156, G429): buff-triggers-feature asks
+ *   garlicBreath when a Garlic starts the breath; the server tells every
+ *   other player on the street (garlic_smell), whose game takes up to 20 mood
+ *   (1 a clove) and says "Something smells funky.". The eater's line adds the
+ *   source's "Everyone around you: -N Mood.".
  * - Epic Blowout: whether one of the four party buffs is on goes to the
  *   server (verbs_influence); its party_blowout counts attended_party:blowout.
  * - Quests (js/quests-mp.js): playerVerbsReady says the verbs are live;
@@ -63,6 +68,7 @@ import {
   VERB_TEXT,
   WATERING_CAN,
   doerCounters,
+  garlicMood,
   doerSide,
   emoteMenu,
   energyRefusal,
@@ -72,7 +78,7 @@ import {
   normalizeVerbsSlice,
   targetSide,
   underTheInfluence,
-} from '../player-verbs-mp.js?v=9d9653eb';
+} from '../player-verbs-mp.js?v=c82b7e0f';
 
 export const PLAYER_VERBS_FEATURE_ID = 'player-verbs-mp';
 const PACK_SOAK = 'pverb_soak';
@@ -511,6 +517,31 @@ function createSession(engine, client) {
   client.on('msg:charades_on', onOn);
   client.on('msg:charades_over', onOver);
   client.on('msg:charades_won', onWon);
+  // —— Garlic Breath (G429) ——
+
+  function breatheGarlic(count) {
+    if (client.state !== 'online') return false;
+    const n = Math.max(1, Math.floor(Number(count) || 1));
+    client.send('garlic_breath', { count: n });
+    // buildVerbMessage's they_effects (garlic.js 151-155): after the eat line itself.
+    queueMicrotask(() => engine.pushActivity?.(VERB_TEXT.garlicEveryone(n)));
+    note(`garlic:breath:${n}`);
+    return true;
+  }
+
+  function onGarlic(m) {
+    const from = { id: Number(m?.from?.id) || 0, name: cleanName(m?.from?.name) };
+    const count = Math.max(1, Math.floor(Number(m?.count) || 1));
+    const player = pc();
+    // garlic.js:139 metabolics_lose_mood(mood_amount): what it really took.
+    const lost = player ? Math.round(loseMood(player, garlicMood(m?.mood ?? count))) : 0;
+    engine.pushActivity?.(VERB_TEXT.smelledGarlic(from.name, count, lost));
+    note(`garlic:smelled:${from.id}:${lost}`);
+    engine.updateHud?.();
+    engine.save?.();
+  }
+
+  client.on('msg:garlic_smell', onGarlic);
   client.on('msg:party_blowout', () => {
     // home.js:216: achievements_increment('attended_party', 'blowout').
     engine.achievement?.('attended_party:blowout', 1);
@@ -538,6 +569,7 @@ function createSession(engine, client) {
     askWord,
     submitWord,
     charadesCheck,
+    breatheGarlic,
     tick(now) {
       tickInfluence(now);
       if (mine && mine.ends && Date.now() > mine.ends + 5000) mine = null; // the server's end was lost
@@ -633,6 +665,12 @@ export const playerVerbsMpFeature = {
     if (!s) return null;
     s.askWord();
     return { ok: true, noUse: true, tag: 'charades_ask' };
+  },
+
+  /** buff-triggers-feature: a Garlic started the breath (garlic.js 128-150). */
+  garlicBreath(count, engine) {
+    if (engine?.mode !== 'multiplayer') return null;
+    return ensure(engine)?.breatheGarlic(count) || null;
   },
 
   /** quests-mp-feature: the verbs on another player are live. */

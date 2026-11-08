@@ -23,7 +23,7 @@ import {
   smallEnlightenmentSeconds,
   smeltItDealtItFreeSmelts,
 } from '../public/js/buff-triggers.js?v=a3093922';
-import { MIRRORED_BUFFS, buffTriggersFeature } from '../public/js/features/buff-triggers-feature.js?v=6c3b1bff';
+import { MIRRORED_BUFFS, buffTriggersFeature } from '../public/js/features/buff-triggers-feature.js?v=2a22c15e';
 import { meditationFeature } from '../public/js/features/meditation-feature.js?v=46025cfa';
 import { teleportationFeature } from '../public/js/features/teleportation-feature.js?v=627cf405';
 import { rookAttackFeature } from '../public/js/features/rook-attack-feature.js?v=8c68aba8';
@@ -217,6 +217,14 @@ describe('drinks and foods apply their buff (catalog_buffs.js numbers)', () => {
     // +5 iMG under 50% mood: x0.75 rounds to 4 (G148).
     assert.equal(engine.pc.imagination, 4);
     assert.ok(engine.log.activity.includes('You no longer have the taste of garlic in your mouth.'));
+  });
+
+  it('Garlic Breath reaches the street only when a Garlic starts it (garlic.js 126-150, G429)', () => {
+    const asked = [];
+    const engine = makeEngine({ query: (hook, ...args) => { if (hook === 'garlicBreath') asked.push(args[0]); return null; } });
+    buffTriggersFeature.onEvent('garlic:eat', 3, engine);
+    buffTriggersFeature.onEvent('garlic:eat', 2, engine);
+    assert.deepEqual(asked, [3], 'the second Garlic in the breath touches nobody');
   });
 
   it('Moonwalk: slower and floatier for 11 s, MOONWALK plays', () => {

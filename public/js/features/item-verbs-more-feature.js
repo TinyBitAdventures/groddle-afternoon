@@ -116,7 +116,7 @@ import {
   trophySmash,
   vvSniffButton,
   JUJU_POWDER,
-} from '../item-verbs-more.js?v=c2f9dc31';
+} from '../item-verbs-more.js?v=f495e9e8';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
 
 export const ITEM_VERBS_MORE_FEATURE_ID = 'item-verbs-more';

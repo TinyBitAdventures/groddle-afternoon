@@ -44,7 +44,7 @@ import { potionsFeature, usePotionNow } from '../public/js/features/potions-feat
 import { powdersFeature } from '../public/js/features/powders-feature.js?v=da4542e6';
 import { treeDeathFeature } from '../public/js/features/tree-death-feature.js?v=b350f7e1';
 import { masterGardenFeature } from '../public/js/features/master-garden-feature.js?v=6bef2d7e';
-import { itemVerbsMoreFeature } from '../public/js/features/item-verbs-more-feature.js?v=86cd89ba';
+import { itemVerbsMoreFeature } from '../public/js/features/item-verbs-more-feature.js?v=51e76da6';
 import { supplyFeature } from '../public/js/features/supply-feature.js?v=ab1afede';
 import { cubimalRaceFeature } from '../public/js/features/cubimal-race-feature.js?v=737ac7b8';
 import { seasonsFeature } from '../public/js/features/seasons-feature.js?v=087774b5';

@@ -12,9 +12,10 @@
  * when the verb failed), each flavour message, then the effects on yourself
  * ("+5 Mood -5 Energy +4 iMG", transformEffects 136-187).
  *
- * Effects on other players in the street (bacon.js 109-120, garlic.js
- * 130-156, the dice's location activity) need the realtime server and are
- * left out here; a solo street has nobody else in it.
+ * Effects on other players in the street (bacon.js 109-120, the dice's
+ * location activity) need the realtime server and are left out here; a solo
+ * street has nobody else in it. Garlic's (garlic.js 130-156, G429) goes
+ * through the server online: buff-triggers-feature and player-verbs-mp-feature.
  */
 
 import { grantMoodXp } from './mood-xp.js?v=958e7680';

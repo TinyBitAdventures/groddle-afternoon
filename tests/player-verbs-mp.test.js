@@ -26,8 +26,8 @@ import {
   isVerbRaceStreet,
   targetSide,
   underTheInfluence,
-} from '../public/js/player-verbs-mp.js?v=9d9653eb';
-import { playerVerbsMpFeature } from '../public/js/features/player-verbs-mp-feature.js?v=11be1969';
+} from '../public/js/player-verbs-mp.js?v=c82b7e0f';
+import { playerVerbsMpFeature } from '../public/js/features/player-verbs-mp-feature.js?v=47444281';
 import { loadContentCatalogsFromDir, getQuestCatalog } from '../public/js/content-catalogs.js?v=10b118dd';
 import { createQuestState } from '../public/js/quests.js?v=c8d9d0a4';
 import { pendingQuestOffers, acceptOffer } from '../public/js/quest-offers.js?v=a304c912';
@@ -106,6 +106,7 @@ describe('player verbs: solo is untouched', () => {
     assert.equal(playerVerbsMpFeature.packVerbs('watering_can', engine), null);
     assert.equal(playerVerbsMpFeature.charadesCheck(engine), null);
     assert.equal(playerVerbsMpFeature.charadesQuaff(engine), null);
+    assert.equal(playerVerbsMpFeature.garlicBreath(3, engine), null);
     assert.equal(playerVerbsMpFeature.playerVerbsReady(engine), null);
     assert.equal(globalThis.groddlePlayerVerbs, undefined);
     assert.equal(playerVerbsMpFeature.save(), undefined);
@@ -293,6 +294,24 @@ describe('player verbs: between two players (fake server)', () => {
     assert.equal(engine.pc.currants, before + 250);
     client.msg({ t: 'party_blowout', owner: 7 });
     assert.ok(engine.log.achievements.some(([c]) => c === 'attended_party:blowout'));
+  });
+
+  it('breathes Garlic on the street and smells it from others (garlic.js 125-156, G429)', async () => {
+    client.sent.length = 0;
+    assert.equal(playerVerbsMpFeature.garlicBreath(3, engine), true);
+    assert.deepEqual(client.sent.at(-1), ['garlic_breath', { count: 3 }]);
+    await Promise.resolve();
+    assert.equal(engine.log.activity.at(-1), 'Everyone around you: -3 Mood.');
+    engine.pc.mood = 30;
+    client.msg({ t: 'garlic_smell', from: { id: 2, name: 'Bo' }, count: 3, mood: 3 });
+    assert.equal(engine.pc.mood, 27);
+    assert.equal(engine.log.activity.at(-1), 'Bo ate 3 Garlic. Something smells funky. You -3 Mood.');
+    // At most 20 (131), and only what was there to lose.
+    client.msg({ t: 'garlic_smell', from: { id: 2, name: 'Bo' }, count: 40, mood: 40 });
+    assert.equal(engine.pc.mood, 7);
+    engine.pc.mood = 0;
+    client.msg({ t: 'garlic_smell', from: { id: 2, name: 'Bo' }, count: 1, mood: 1 });
+    assert.equal(engine.log.activity.at(-1), 'Bo ate a Garlic. Something smells funky.');
   });
 
   it('tells the server when a party buff comes on', () => {

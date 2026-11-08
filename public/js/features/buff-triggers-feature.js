@@ -124,7 +124,7 @@ function restart(engine, buff, opts) {
 /* Consumables                                                          */
 /* ------------------------------------------------------------------ */
 
-function onConsume(row, engine) {
+function onConsume(row, engine, amount = 1) {
   last = `${row.event}>${row.buff}`;
   if (row.buff === 'buff_garlic_breath' && engine.hasBuff('buff_garlic_breath')) {
     engine.pushActivity?.(GARLIC_AGAIN);
@@ -150,6 +150,9 @@ function onConsume(row, engine) {
     engine.playSound?.('MOONWALK', { volume: 0.6 });
   } else {
     restart(engine, row.buff);
+    // garlic.js 128-150 (G429): a fresh breath reaches every other player on the
+    // street online (player-verbs-mp-feature garlicBreath); solo has nobody else.
+    if (row.buff === 'buff_garlic_breath') engine.query?.('garlicBreath', amount, engine);
   }
   syncOverrides(engine);
   publish(engine);
@@ -403,7 +406,7 @@ export const buffTriggersFeature = {
     const c = String(counter || '');
     const row = consumeBuffFor(c);
     if (row) {
-      onConsume(row, engine);
+      onConsume(row, engine, amount);
       return;
     }
     if (c.startsWith('making_batch:')) {

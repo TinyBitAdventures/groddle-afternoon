@@ -86,7 +86,18 @@ export const VERB_TEXT = Object.freeze({
   // random_kindness.js: buildVerbMessage (items/item.js) with self_msgs 302, 309; the target's 301, 308.
   bestowed: (name, stat, n) => `You bestowed ${name} with a Random Kindness.${stat ? ` They gain ${n} ${stat}.` : ''}`,
   gotKindness: (name, stat, n) => `${name} bestowed Random Kindness on you. +${n} ${stat}`,
+  // garlic.js (G429): the street's line, buildVerbEveryoneMessage (items/item.js 193-243) with
+  // my_msgs "Something smells funky." (147) and my_effects the mood lost (140-145);
+  // the eater's they_effects, buildSimpleVerbMessage 111-121 ("Everyone around you: -3 Mood.").
+  smelledGarlic: (name, count, lost) => `${name} ate ${count > 1 ? `${count} Garlic` : 'a Garlic'}. Something smells funky.${lost > 0 ? ` You -${lost} Mood.` : ''}`,
+  garlicEveryone: (count) => `Everyone around you: -${count} Mood.`,
 });
+
+/** garlic.js:131 mood_amount = Math.min(1 * msg.count, 20). */
+export const GARLIC_MOOD_MOST = 20;
+export function garlicMood(count) {
+  return Math.max(0, Math.min(Math.floor(Number(count) || 0), GARLIC_MOOD_MOST));
+}
 
 export const CHARADES_TEXT = Object.freeze({
   title: 'Charades!',
