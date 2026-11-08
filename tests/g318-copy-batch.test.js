@@ -14,7 +14,6 @@ const gsjs = (f) => {
 
 const LINES = [
   ['js/spinning-wheel.js', "Oh my! I believe you've hit the jackpot!", 'items/npc_spinning_wheel.js'],
-  ['js/rook-museum.js', 'A magic rock told me talk to you.', 'quests/rook_hall_start.js'],
   ['game.js', "Psssst. Here'sss the deal.", 'items/npc_bureaucrat.js'],
   ['game.js', "I'd get it myself, but I'm kind of lacking in the appendage department, if you know what I mean.", 'quests/de_embiggenify_part2.js'],
   ['game.js', "(And here's a hint: have a look behind the cake!)", 'quests/de_embiggenify_part2.js'],
@@ -56,3 +55,10 @@ describe('G318: the original words where they survive', () => {
     assert.equal(q.phantom_glitch.acceptLabel, "Never mind. It's ghost hunting time!");
   });
 });
+
+describe('Greeterbot', () => it('Greeterbot\'s reply is the source line with its missing "to" put back (Austin 2026-11-08)', (t) => {
+  assert.ok(game('js/rook-museum.js').includes('A magic rock told me to talk to you.'));
+  const source = gsjs('quests/rook_hall_start.js');
+  if (!source) return t.skip('needs glitch-GameServerJS beside the game');
+  assert.ok(source.includes('A magic rock told me talk to you.'), 'the source keeps its typo');
+}));

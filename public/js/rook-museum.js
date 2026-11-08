@@ -88,8 +88,8 @@ const overlayX = (id) => worldX(ROOK_MUSEUM_SOURCE.overlays[id].x);
 export const ROOK_MUSEUM_GREETING = Object.freeze([
   {
     text: 'Welcome, young one, to the ancient and venerable Museum of the Rook. I am Greeterbot Sentry G-42, humble docent of this establishment. How may I be of service?',
-    // rook_hall_start.js 4, verbatim (the source's own words, missing "to" and all).
-    response: 'A magic rock told me talk to you.',
+    // rook_hall_start.js 4, with the source's missing "to" put back (Austin 2026-11-08).
+    response: 'A magic rock told me to talk to you.',
   },
   {
     text: 'Then it is time: time for you to learn of the Rook! Time for you to take up the fight against those dreadful beasts, the fight for imagination - nay, for Ur itself!',

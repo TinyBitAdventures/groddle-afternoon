@@ -2733,9 +2733,59 @@
   "deployed": "2026-11-08"
  },
  "git": {
-  "commits": 1497,
+  "commits": 1508,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-08",
+    "kind": "new",
+    "text": "Coral Caves and its yard Anemone Alley, drawn with their own pieces found in the CC0 location art"
+   },
+   {
+    "date": "2026-11-08",
+    "kind": "new",
+    "text": "Salmon, foxes' runs and Fire Dragons in the same place for everyone online"
+   },
+   {
+    "date": "2026-11-08",
+    "kind": "improve",
+    "text": "NPCs say the original's words where they survive: the shady Bureaucrat, Mr. Hairball, the jackpot wheel, the Magic Rock and story quest buttons"
+   },
+   {
+    "date": "2026-11-08",
+    "kind": "new",
+    "text": "Drag a pack item onto a thing in the world: the Egg onto the Dustbunny, a Watering Can onto a tree, food onto a Piggy"
+   },
+   {
+    "date": "2026-11-08",
+    "kind": "fix",
+    "text": "The top bar fits a narrow window: what does not fit moves into the Menu"
+   },
+   {
+    "date": "2026-11-08",
+    "kind": "fix",
+    "text": "Shrines and vendors no longer stand hidden behind a cave's front rock or a tree trunk"
+   },
+   {
+    "date": "2026-11-08",
+    "kind": "new",
+    "text": "Heli Kitties and Crabs walk in the same place for everyone online"
+   },
+   {
+    "date": "2026-11-08",
+    "kind": "new",
+    "text": "A street Piggy walks to food in the same place for everyone online"
+   },
+   {
+    "date": "2026-11-08",
+    "kind": "new",
+    "text": "Louise Pasture Villa, the apartment hall behind a new door on Louise Pasture"
+   },
+   {
+    "date": "2026-11-08",
+    "kind": "fix",
+    "text": "Six signposts land you where the original did, not at the street's default spot"
+   },
    {
     "date": "2026-11-08",
     "kind": "new",
@@ -2805,56 +2855,6 @@
     "date": "2026-11-08",
     "kind": "fix",
     "text": "Zoom says so on streets that look the same at every zoom"
-   },
-   {
-    "date": "2026-11-08",
-    "kind": "new",
-    "text": "Street Patches are shared online: everyone on a street tends, digs, plants and grows the same Patch trees"
-   },
-   {
-    "date": "2026-11-08",
-    "kind": "fix",
-    "text": "A signpost arm's number key stays steady while the camera moves"
-   },
-   {
-    "date": "2026-11-08",
-    "kind": "fix",
-    "text": "Trees and Chickens stand on the ground instead of floating above it"
-   },
-   {
-    "date": "2026-11-08",
-    "kind": "fix",
-    "text": "A street's end stays clear of the Social drawer, so the last signpost is never cut off under the rail"
-   },
-   {
-    "date": "2026-11-08",
-    "kind": "improve",
-    "text": "The region map's subway, shrine and vendor icons stay sharp at any size, and the shrine and vendor icons read dark instead of pale"
-   },
-   {
-    "date": "2026-11-08",
-    "kind": "improve",
-    "text": "Gains from resource nodes float over you with a larger item picture, clear of the node's talk bubble"
-   },
-   {
-    "date": "2026-11-08",
-    "kind": "improve",
-    "text": "A Patch clear cut short because another player cleared the dead tree first says \"Someone else cleared it first.\" (switched off until a release turns it on)"
-   },
-   {
-    "date": "2026-11-08",
-    "kind": "new",
-    "text": "Every street Patch can be shared online, and players' own Patch trees are handed over once when that happens (switched off until a release turns it on)"
-   },
-   {
-    "date": "2026-11-08",
-    "kind": "improve",
-    "text": "Poking Very Stinky Cheese says the cheese became Stinky Cheese"
-   },
-   {
-    "date": "2026-11-08",
-    "kind": "improve",
-    "text": "Items from Dust Traps and other resource nodes float up with their icon"
    }
   ]
  },
