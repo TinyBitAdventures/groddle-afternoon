@@ -56,7 +56,7 @@ import { ITEM_CATALOG, addItem, countItem } from '../inventory.js?v=b7609342';
 import { setToolRemaining, toolCopies } from '../tools.js?v=d8aa3536';
 import { isItemFloor, platformYAt } from '../street-model.js?v=b6cb6a4e';
 import { hiresSpriteUrl } from '../sprite-hires.js?v=abaf3d5a';
-import { rollResourceNodeDrop } from './drops-feature.js?v=123055bc';
+import { rollResourceNodeDrop } from './drops-feature.js?v=68551bc1';
 import { slugsFromEffects } from '../speech-slugs.js?v=130338f9';
 import { resourceNodeResponseKey, verbResponse } from '../verb-responses.js?v=3ceb8a8c';
 import { rollSlothBonusSnails } from '../imagination-effects.js?v=70169933';
@@ -1249,6 +1249,14 @@ export function talkbackFor(result, drop = null) {
   });
 }
 
+/**
+ * #146: one item a node gave, floated as its icon beside "+N label" (game.js floatText opts.icon). Every
+ * resource node's gains come through here (applyResult): Dust Traps, peat, barnacles, jellisacs, ice...
+ */
+export function floatGain(engine, x, y, classTsid, qty) {
+  return engine.floatText(x, y, `+${itemLabel(classTsid, qty)}`, 0xfff4d6, { icon: classTsid });
+}
+
 function applyResult(engine, entity, result) {
   notePublishResult(result);
   if (!result.ok) {
@@ -1263,8 +1271,8 @@ function applyResult(engine, entity, result) {
   const merged = new Map();
   for (const out of result.outputs || []) merged.set(out.classTsid, (merged.get(out.classTsid) || 0) + out.qty);
   for (const [classTsid, qty] of merged) {
-    engine.floatText(anchorX, anchorY - lift, `+${itemLabel(classTsid, qty)}`, 0xfff4d6);
-    lift += 18;
+    floatGain(engine, anchorX, anchorY - lift, classTsid, qty);
+    lift += 22;
   }
   for (const counter of result.achievementCounters || []) engine.achievement(counter.counter, counter.amount);
   // Skill-package rare drops (scraping, jellisac, peat, paper tree): features/drops-feature.js.

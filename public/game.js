@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=b87f037d';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=127e0a3c';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=73e60865';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=4c644c59';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -7745,6 +7745,10 @@ function recentFloatText(text, ms) {
  * avatar already floated for the same amount gives way to the caller's own float. With
  * prefers-reduced-motion it fades where it is. `opts.life` (frames) keeps longer words up.
  */
+/** A floated gain's icon: pack icons are about 40 px, drawn at half beside 15 px words. */
+const FLOAT_ICON_SCALE = 0.5;
+const FLOAT_ICON_W = 22;
+
 function floatText(x, y, text, color = 0xfff4d6, opts = {}) {
   const words = wholeStatAmounts(text);
   const now = performance.now();
@@ -7765,11 +7769,25 @@ function floatText(x, y, text, color = 0xfff4d6, opts = {}) {
     dropShadow: { blur: 2, color: 0x000000, distance: 1 },
   } });
   t.anchor.set(0.5);
-  t.x = x; t.y = placed; t._life = 0; t._vy = notifyView?.reducedMotion() ? 0 : -0.7;
-  if (Number(opts.life) > 0) t._fade = Number(opts.life);
-  fxLayer.addChild(t);
-  recentFloats.push({ x, y: placed, t: now, key, sprite: t });
-  return t;
+  // #146: `opts.icon` (an item class) puts the item's pack icon beside the words, the pair centred on x
+  // and floating as one (a gain from a Dust Trap or any resource node, features/resource-nodes-feature.js).
+  let float = t;
+  if (opts.icon) {
+    float = new PIXI.Container();
+    const icon = new PIXI.Sprite(textureFromUrl(itemIconUrl(opts.icon)));
+    icon.anchor.set(0.5);
+    icon.scale.set(FLOAT_ICON_SCALE);
+    const shift = (t.width + FLOAT_ICON_W + 4) / 2;
+    icon.x = FLOAT_ICON_W / 2 - shift;
+    t.anchor.set(0, 0.5);
+    t.x = FLOAT_ICON_W + 4 - shift;
+    float.addChild(icon, t);
+  }
+  float.x = x; float.y = placed; float._life = 0; float._vy = notifyView?.reducedMotion() ? 0 : -0.7;
+  if (Number(opts.life) > 0) float._fade = Number(opts.life);
+  fxLayer.addChild(float);
+  recentFloats.push({ x, y: placed, t: now, key, sprite: float });
+  return float;
 }
 
 function burst(x, y, color = 0xffe066, n = 10) {

@@ -112,11 +112,14 @@ export function payDrop(engine, result, { source = '' } = {}) {
   });
   const p = engine.player;
   let lift = 0;
-  for (const line of paid.lines) {
+  paid.lines.forEach((line, i) => {
     engine.pushActivity?.(line);
-    if (p) engine.floatText?.(p.x, (p.y || 0) - 130 - lift, line.replace(/^You got /, '+').replace(/!$/, ''), 0xffe39a);
-    lift += 18;
-  }
+    // #146: an item line (applyDropResult lists the items first, in order) floats with the item's icon,
+    // as a resource node's own gains do (resource-nodes-feature floatGain): a Dust Trap's finds come here.
+    const icon = paid.landed?.items?.[i]?.classTsid;
+    if (p) engine.floatText?.(p.x, (p.y || 0) - 130 - lift, line.replace(/^You got /, '+').replace(/!$/, ''), 0xffe39a, icon ? { icon } : undefined);
+    lift += icon ? 22 : 18;
+  });
   engine.playSound?.('DISCOVER_USEFUL_NEW_ITEM', { volume: 0.5 });
   hits += 1;
   last = `${source ? `${source}:` : ''}${result.table}:${paid.lines.join(' ')}`;
