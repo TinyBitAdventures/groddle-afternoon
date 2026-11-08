@@ -27,12 +27,12 @@ import {
   sharedTreeReady,
   sharedTreeSkill,
   TRANTSFORM_VERB,
-} from '../public/js/shared-patches.js?v=9dd33774';
-import { sharedPatchesFeature } from '../public/js/features/shared-patches-feature.js?v=a9366443';
-import { patchesFeature } from '../public/js/features/patches-feature.js?v=d41b1e17';
-import { treeDeathFeature, decorateTreeVerbs } from '../public/js/features/tree-death-feature.js?v=3e7241bd';
-import { potionsFeature } from '../public/js/features/potions-feature.js?v=ce2b7968';
-import { powdersFeature, runPowder } from '../public/js/features/powders-feature.js?v=d133840f';
+} from '../public/js/shared-patches.js?v=2517d9a4';
+import { sharedPatchesFeature } from '../public/js/features/shared-patches-feature.js?v=8ddf3adf';
+import { patchesFeature } from '../public/js/features/patches-feature.js?v=59b03b45';
+import { treeDeathFeature, decorateTreeVerbs } from '../public/js/features/tree-death-feature.js?v=9824805b';
+import { potionsFeature } from '../public/js/features/potions-feature.js?v=c12b3320';
+import { powdersFeature, runPowder } from '../public/js/features/powders-feature.js?v=10270384';
 import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=56f5244f';
 import { rookKeyFor } from '../public/js/rook-attack.js?v=0382c223';
 import { rookedFromServer, syncKeys } from '../public/js/rook-mp.js?v=0b724b8c';
@@ -290,7 +290,7 @@ function rig({ mode = 'multiplayer', learned = [] } = {}) {
 async function boot(r, { flag = true } = {}) {
   const prevPixi = globalThis.PIXI;
   globalThis.PIXI = PIXI;
-  const store = new Map(flag ? [[SHARED_PATCHES_QA_KEY, '1']] : []);
+  const store = new Map([[SHARED_PATCHES_QA_KEY, flag ? '1' : '0']]);
   globalThis.window = { localStorage: { getItem: (k) => store.get(k) ?? null } };
   sharedPatchesFeature._reset();
   treeDeathFeature._reset();

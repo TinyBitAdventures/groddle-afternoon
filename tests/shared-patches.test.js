@@ -33,10 +33,10 @@ import {
   sharedPatchesOn,
   soilRolls,
   stripSharedPlots,
-} from '../public/js/shared-patches.js?v=9dd33774';
-import { sharedPatchesFeature } from '../public/js/features/shared-patches-feature.js?v=a9366443';
-import { patchesFeature, soilSpawnPlan } from '../public/js/features/patches-feature.js?v=d41b1e17';
-import { FEATURES } from '../public/js/features/index.js?v=c8978caa';
+} from '../public/js/shared-patches.js?v=2517d9a4';
+import { sharedPatchesFeature } from '../public/js/features/shared-patches-feature.js?v=8ddf3adf';
+import { patchesFeature, soilSpawnPlan } from '../public/js/features/patches-feature.js?v=59b03b45';
+import { FEATURES } from '../public/js/features/index.js?v=a26b11fe';
 import { getStreetEcologyCatalog, setStreetEcologyCatalog } from '../public/js/street-ecology.js?v=78a1d522';
 import { HAS_SERVER, serverPath } from '../tools/repos.mjs';
 
@@ -47,14 +47,16 @@ const settle = () => new Promise((res) => setTimeout(res, 2700));
 const tick = () => new Promise((res) => setTimeout(res, 15));
 
 describe('the switch and the streets', () => {
-  it('is dark: off by default, on only by the release switch or the QA flag', () => {
-    assert.equal(SHARED_PATCHES_ON, false, 'nothing changes for players until a release turns it on');
+  it('is on since the release switch flipped (v0.24.0); with the switch off only the QA flag turns it on', () => {
+    assert.equal(SHARED_PATCHES_ON, true, 'game v0.24.0 turned shared street Patches on');
     assert.equal(SHARED_PATCHES_QA_KEY, 'groddle.qa.sharedPatches');
-    assert.equal(sharedPatchesOn(null), false);
-    assert.equal(sharedPatchesOn({ getItem: () => null }), false);
-    assert.equal(sharedPatchesOn({ getItem: (k) => (k === SHARED_PATCHES_QA_KEY ? '1' : null) }), true);
-    assert.equal(sharedPatchesOn({ getItem: () => { throw new Error('blocked'); } }), false, 'blocked storage stays off');
-    assert.equal(sharedPatchesOn(null, true), true, 'the release switch');
+    assert.equal(sharedPatchesOn(null), true, 'the release switch');
+    assert.equal(sharedPatchesOn(null, false), false);
+    assert.equal(sharedPatchesOn({ getItem: () => null }, false), false);
+    assert.equal(sharedPatchesOn({ getItem: (k) => (k === SHARED_PATCHES_QA_KEY ? '1' : null) }, false), true);
+    assert.equal(sharedPatchesOn({ getItem: () => { throw new Error('blocked'); } }, false), false, 'blocked storage stays off');
+    assert.equal(sharedPatchesOn({ getItem: (k) => (k === SHARED_PATCHES_QA_KEY ? '0' : null) }), false, "the QA flag '0' keeps them off with the switch on");
+    assert.equal(sharedPatchesOn({ getItem: () => { throw new Error('blocked'); } }), true, 'blocked storage follows the switch');
   });
 
   it('asks only about public streets: never a home, a room, a party or any private place', () => {
@@ -352,7 +354,7 @@ function rig({ flag = true, street = OLD_MAIN, mode = 'multiplayer', savePlots =
 async function boot(r, { flag = true } = {}) {
   const prevPixi = globalThis.PIXI;
   globalThis.PIXI = PIXI;
-  const store = new Map(flag ? [[SHARED_PATCHES_QA_KEY, '1']] : []);
+  const store = new Map([[SHARED_PATCHES_QA_KEY, flag ? '1' : '0']]);
   globalThis.window = { localStorage: { getItem: (k) => store.get(k) ?? null } };
   sharedPatchesFeature._reset();
   sharedPatchesFeature.restore(undefined, r.engine);

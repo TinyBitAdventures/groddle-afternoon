@@ -51,10 +51,10 @@ import { POISON_DURATION_MS } from './tree-poison.js?v=80469175';
 import { treeReady, treeSkill } from './street-objects.js?v=38310175';
 import { highestLightGreenThumbRank, quoteTrantCare } from './trant-care.js?v=1f183f4b';
 
-/** The release switch. false = dark: shared Patches stay off for everyone (the QA flag below aside). */
-export const SHARED_PATCHES_ON = false;
+/** The release switch: on since game v0.24.0 (G564; false = dark, shared Patches off for everyone but the QA flag below). */
+export const SHARED_PATCHES_ON = true;
 
-/** QA only: '1' in this browser's localStorage turns shared Patches on for it. */
+/** QA only: '1' in this browser's localStorage turns shared Patches on for it, '0' keeps them off (the switched-off path, with the release switch on). */
 export const SHARED_PATCHES_QA_KEY = 'groddle.qa.sharedPatches';
 
 /** This browser's localStorage, or null (a private window or blocked site data): only for the QA flag, never a save. */
@@ -66,14 +66,16 @@ export function qaFlagStorage() {
   }
 }
 
-/** Whether this page uses shared Patches: the release switch, or the QA flag in storage. */
+/** Whether this page uses shared Patches: the QA flag '0' says no, else the release switch, else the QA flag '1'. */
 export function sharedPatchesOn(storage = qaFlagStorage(), on = SHARED_PATCHES_ON) {
-  if (on) return true;
+  let flag = null;
   try {
-    return storage?.getItem?.(SHARED_PATCHES_QA_KEY) === '1';
+    flag = storage?.getItem?.(SHARED_PATCHES_QA_KEY) ?? null;
   } catch {
-    return false;
+    flag = null;
   }
+  if (flag === '0') return false;
+  return Boolean(on) || flag === '1';
 }
 
 /** A street the page may ask about: a public street (not a home, room, party or any "_" place). */

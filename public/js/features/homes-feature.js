@@ -213,7 +213,7 @@ import { drawTowerElevator, drawTowerExit, towerApi, visitorTowerView } from './
 import { pieceUrl, roomPieces, surfaceAt, swatchPiece, wallTargetAt } from '../home-wallpaper.js?v=f1969400';
 import { wantsHiresDecos } from '../deco-hires.js?v=cb905e17';
 import { resourceNodesFeature } from './resource-nodes-feature.js?v=5d084390';
-import { patchesFeature } from './patches-feature.js?v=d41b1e17';
+import { patchesFeature } from './patches-feature.js?v=59b03b45';
 import { GROWN_TREE_LABELS, createPlot, growTree, plotLabel } from '../patches.js?v=5b86e3f1';
 import { WOTD_DEPLETE_MS, WOTD_TEXT, nearestPourTarget, pourButton, pourConditions, pourConfirmText } from '../wine-pour.js?v=6daa23a7';
 import { WOTD_TOOL, pourApproach, pourDropTip } from '../wine-pour-fx.js?v=364e22d2';
