@@ -24,6 +24,8 @@ export function minnUrls(baseUri) {
   const at = (path) => new URL(path, baseUri).href;
   return {
     nonce: at('wp-admin/admin-ajax.php?action=rest-nonce'),
+    /** Answers 200 signed in or out (G322: session() asks it before rest-nonce). */
+    heartbeat: at('wp-admin/admin-ajax.php?action=heartbeat'),
     api: at('wp-json/groddle/v1/'),
     /** The multiplayer entry, where a signed-out player signs in (its gate holds the forms). */
     online: at('play/online/'),
@@ -143,22 +145,56 @@ export function accountParts({ baseUri, fetch: fetchFn = globalThis.fetch?.bind(
      * cannot be reached ({ minn: false, offline: true }).
      */
     async session() {
+      // G322: rest-nonce answers a signed-out page "0" with 400, which the console logs (the
+      // solo Account panel, the phone companion, /play/online/). admin-ajax's heartbeat answers
+      // 200 to anyone: a signed-in cookie with no heartbeat nonce gets wp_ajax_heartbeat's
+      // {"success":false} (its empty _nonce check), a signed-out visit wp_ajax_nopriv_heartbeat's
+      // {"server_time":...}. So only a signed-in page asks rest-nonce; a signed-out one asks
+      // groddle/v1/me alone (open to anyone, no nonce needed). The host serves the play pages
+      // itself, so a 5xx here means PHP is down: offline, not "no accounts here".
+      const offline = { minn: false, offline: true, signedIn: false, player: null };
+      const none = { minn: false, signedIn: false, player: null };
+      let beat = null;
+      try {
+        const res = await fetchFn(urls.heartbeat, { method: 'POST', credentials: 'same-origin', cache: 'no-store' });
+        if (res.status >= 500) return offline;
+        beat = res.ok ? await res.json().catch(() => null) : null;
+      } catch {
+        return offline;
+      }
+      if (!beat || typeof beat !== 'object') return none;
+      if (beat.success !== false) {
+        let me;
+        try {
+          const res = await fetchFn(`${urls.api}me`, { credentials: 'same-origin', cache: 'no-store' });
+          if (res.status >= 500) return offline;
+          me = { ok: res.ok, data: await res.json().catch(() => null) };
+        } catch {
+          return offline;
+        }
+        if (!me.ok || typeof me.data?.signedIn !== 'boolean') return none;
+        if (!me.data.signedIn) {
+          nonce = '';
+          return { minn: true, signedIn: false, player: null, backups: null, account: null };
+        }
+        // A session that began between the two asks: on to rest-nonce for its nonce.
+      }
       let res;
       try {
         res = await fetchFn(urls.nonce, { credentials: 'same-origin', cache: 'no-store' });
       } catch {
-        return { minn: false, offline: true, signedIn: false, player: null };
+        return offline;
       }
       const text = String(await res.text()).trim();
       nonce = res.ok && NONCE.test(text) ? text : '';
-      if (!nonce && !(res.status === 400 && text === '0')) return { minn: false, signedIn: false, player: null };
+      if (!nonce && !(res.status === 400 && text === '0')) return none;
       let me;
       try {
         me = await call('me');
       } catch {
-        return { minn: false, offline: true, signedIn: false, player: null };
+        return offline;
       }
-      if (!me.ok || typeof me.data?.signedIn !== 'boolean') return { minn: false, signedIn: false, player: null };
+      if (!me.ok || typeof me.data?.signedIn !== 'boolean') return none;
       // admin (G567): the account is an administrator (only then present); a hint for the chat's Delete line, the site checks again.
       return { minn: true, signedIn: me.data.signedIn, player: me.data.player || null, backups: me.data.backups || null, account: me.data.account || null, ...(me.data.admin === true ? { admin: true } : {}) };
     },

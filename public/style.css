@@ -1319,6 +1319,10 @@ kbd {
 }
 /* Classic: clear of the pack band at the world's foot (classic.css #game-root::after), which is over the world. */
 [data-ui="classic"] #overlay { padding-bottom: calc(var(--cband-h, calc(132 * var(--cu))) + var(--sp-6)); }
+/* G320: the collapsed Social rail (z-hud, over the card's z-world) sat on the card's top right corner on a
+   phone, over the title. Nothing in it is live before the card closes, so it waits with the card up (Modern
+   only: Classic's chat column sits beside the frame, clear of the card). */
+[data-ui="modern"] body:has(#overlay:not(.hidden)) .local-chat-dock.social-drawer:not(.is-open) { visibility: hidden; }
 .start-card {
   display: grid;
   grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.2fr);

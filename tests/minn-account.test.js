@@ -15,12 +15,12 @@ import { execFileSync } from 'node:child_process';
 import { join } from 'node:path';
 import { homedir } from 'node:os';
 
-import { createMinnAccount, minnUrls } from '../public/js/minn-account.js?v=ba6a13c5';
-import { GATE_COPY, JUJU_BOSS_GATES, SAVE_ALERT_COPY, bootDataFrom, deliverHandoff, gateFor, saveAlertFor } from '../public/js/online-boot.js?v=8149fe3e';
+import { createMinnAccount, minnUrls } from '../public/js/minn-account.js?v=8f2741cd';
+import { GATE_COPY, JUJU_BOSS_GATES, SAVE_ALERT_COPY, bootDataFrom, deliverHandoff, gateFor, saveAlertFor } from '../public/js/online-boot.js?v=19450640';
 import { SAVE_STOPPED } from '../public/js/save-store.js?v=8839ba7b';
 import { FORM_COPY, SETTINGS_COPY, resetLinkFrom } from '../public/js/account-forms.js?v=318b6815';
-import { restoreNeedsAsking, sizeLabel, slotForNewBackup, accountBackupFeature } from '../public/js/features/account-backup-feature.js?v=64af35bf';
-import { FEATURES } from '../public/js/features/index.js?v=0163f9ea';
+import { restoreNeedsAsking, sizeLabel, slotForNewBackup, accountBackupFeature } from '../public/js/features/account-backup-feature.js?v=3efe5c17';
+import { FEATURES } from '../public/js/features/index.js?v=686c774e';
 import { multiplayerEntryUrl } from '../public/js/game-mode.js?v=1ecf2899';
 import { SAVE_ENTRY_NAMES, createMultiplayerSaveStore } from '../public/js/save-store.js?v=8839ba7b';
 import { HAS_SITE, SITE_DIR, serverPath, skipWithoutServer, skipWithoutSite } from '../tools/repos.mjs';
@@ -51,6 +51,10 @@ function routedFetch(routes) {
 
 const BASE = 'https://groddle.localhost/';
 const NONCE_PATH = 'wp-admin/admin-ajax.php?action=rest-nonce';
+const BEAT_PATH = 'wp-admin/admin-ajax.php?action=heartbeat';
+// What Minn's admin-ajax heartbeat answers (G322): signed out wp_ajax_nopriv_heartbeat, signed in the empty-nonce error.
+const BEAT_OUT = { status: 200, body: { 'wp-auth-check': false, server_time: 1793138579 } };
+const BEAT_IN = { status: 200, body: { success: false } };
 
 describe('minn-account', () => {
   it('builds the site URLs from the page base (play pages set <base> to the site root)', () => {
@@ -66,26 +70,44 @@ describe('minn-account', () => {
     const f = routedFetch({});
     const session = await createMinnAccount({ baseUri: BASE, fetch: f.fn }).session();
     assert.deepEqual(session, { minn: false, signedIn: false, player: null });
-    assert.equal(f.calls.length, 1, 'never asks groddle/v1 when the nonce route is missing');
+    assert.equal(f.calls.length, 1, 'never asks groddle/v1 when admin-ajax is missing');
   });
 
   it('a site that cannot be reached says offline', async () => {
-    const session = await createMinnAccount({ baseUri: BASE, fetch: routedFetch({ [NONCE_PATH]: 'network' }).fn }).session();
+    const session = await createMinnAccount({ baseUri: BASE, fetch: routedFetch({ [BEAT_PATH]: 'network' }).fn }).session();
     assert.equal(session.offline, true);
     assert.equal(session.minn, false);
+    const nonceGone = await createMinnAccount({ baseUri: BASE, fetch: routedFetch({ [BEAT_PATH]: BEAT_IN, [NONCE_PATH]: 'network' }).fn }).session();
+    assert.equal(nonceGone.offline, true);
   });
 
-  it('signed out: admin-ajax answers "0" with 400 and me says signedIn false, asked without a nonce', async () => {
-    const f = routedFetch({ [NONCE_PATH]: { status: 400, body: '0' }, 'groddle/v1/me': { status: 200, body: { signedIn: false, player: null } } });
-    const account = createMinnAccount({ baseUri: BASE, fetch: f.fn });
+  it('signed out (G322): the heartbeat, then me without a nonce; rest-nonce and its console 400 are never asked', async () => {
+    const f = routedFetch({ [BEAT_PATH]: BEAT_OUT, [NONCE_PATH]: { status: 400, body: '0' }, 'groddle/v1/me': { status: 200, body: { signedIn: false, player: null } } });
+    const account = createMinnAccount({ baseUri: BASE, fetch: f.fn, nonce: 'abcdef0123' });
     const session = await account.session();
     assert.deepEqual(session, { minn: true, signedIn: false, player: null, backups: null, account: null });
-    assert.equal(f.calls[1].headers['X-WP-Nonce'], undefined);
+    assert.deepEqual(f.calls.map((c) => c.url.replace(BASE, '')), [BEAT_PATH, 'wp-json/groddle/v1/me']);
+    assert.equal(f.calls[0].method, 'POST');
+    assert.equal(f.calls[1].headers, undefined, 'no nonce header');
     assert.equal(f.calls[1].credentials, 'same-origin');
+    assert.equal(account.nonce, '', 'a nonce from an ended session is dropped');
+  });
+
+  it('signed in between the heartbeat and me: on to rest-nonce, then me with it', async () => {
+    const f = routedFetch({
+      [BEAT_PATH]: BEAT_OUT,
+      [NONCE_PATH]: { status: 200, body: 'abcdef0123' },
+      'groddle/v1/me': { status: 200, body: { signedIn: true, player: { id: 3, name: 'Tess' } } },
+    });
+    const session = await createMinnAccount({ baseUri: BASE, fetch: f.fn }).session();
+    assert.equal(session.signedIn, true);
+    assert.deepEqual(f.calls.map((c) => c.url.replace(BASE, '')), [BEAT_PATH, 'wp-json/groddle/v1/me', NONCE_PATH, 'wp-json/groddle/v1/me']);
+    assert.equal(f.calls[3].headers['X-WP-Nonce'], 'abcdef0123');
   });
 
   it('signed in: the nonce rides every call and a fresh one from an answer replaces it', async () => {
     const f = routedFetch({
+      [BEAT_PATH]: BEAT_IN,
       [NONCE_PATH]: { status: 200, body: 'abcdef0123' },
       'groddle/v1/me': { status: 200, body: { signedIn: true, player: { id: 3, name: 'Tess' }, backups: { slots: 3, maxBytes: 4194304 } }, nonce: '0123abcdef' },
       'groddle/v1/save': { status: 200, body: { version: 2, updatedAt: '2026-10-25T18:00:00Z', data: null } },
@@ -94,15 +116,15 @@ describe('minn-account', () => {
     const session = await account.session();
     assert.equal(session.signedIn, true);
     assert.equal(session.player.name, 'Tess');
-    assert.equal(f.calls[1].headers['X-WP-Nonce'], 'abcdef0123');
+    assert.equal(f.calls[2].headers['X-WP-Nonce'], 'abcdef0123');
     assert.equal(account.nonce, '0123abcdef');
     assert.equal((await account.multiplayerSave()).version, 2);
-    assert.equal(f.calls[2].headers['X-WP-Nonce'], '0123abcdef');
+    assert.equal(f.calls[3].headers['X-WP-Nonce'], '0123abcdef');
     // Ticket 21: the game page's read claims the save for that page; the phone only peeks.
     await account.multiplayerSave({ writer: 'aaaa1111bbbb2222' });
-    assert.match(f.calls[3].url, /groddle\/v1\/save\?writer=aaaa1111bbbb2222$/);
+    assert.match(f.calls[4].url, /groddle\/v1\/save\?writer=aaaa1111bbbb2222$/);
     await account.multiplayerSave({ peek: true });
-    assert.match(f.calls[4].url, /groddle\/v1\/save\?peek=1$/);
+    assert.match(f.calls[5].url, /groddle\/v1\/save\?peek=1$/);
   });
 
   it('signs up and in by email: the new session\'s nonce is fetched before the answer comes back', async () => {
@@ -514,7 +536,7 @@ describe('createMinnAccount: the core and the game\'s calls', () => {
   const answer = (nonce) => ({ status: 200, ok: true, headers: { get: () => nonce }, json: async () => ({}), text: async () => '' });
 
   it('one account with every call: the core\'s and the game\'s', async () => {
-    const { createMinnAccountCore, minnUrls: coreUrls } = await import('../public/js/minn-account-core.js?v=d5005a5b');
+    const { createMinnAccountCore, minnUrls: coreUrls } = await import('../public/js/minn-account-core.js?v=c7629a9d');
     const core = createMinnAccountCore(opts);
     const full = createMinnAccount(opts);
     for (const name of Object.keys(core)) assert.ok(name in full, name);

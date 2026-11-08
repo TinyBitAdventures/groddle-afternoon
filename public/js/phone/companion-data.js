@@ -20,7 +20,7 @@
  *   player's game on another device.
  */
 
-import { REPORT_PICTURE, base64Size, pictureSize } from '../reports.js?v=61088e97';
+import { REPORT_PICTURE, base64Size, pictureSize } from '../reports.js?v=df024080';
 import { listMailboxMessages, mailSender, normalizeMailboxState } from '../mailbox.js?v=a3e833ba';
 import { addedYouOnly, normalizeList } from '../buddies.js?v=df41a3bb';
 import { letterRow } from '../player-mail.js?v=af6a8b00';

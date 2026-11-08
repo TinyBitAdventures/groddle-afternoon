@@ -2,7 +2,8 @@
  * G322 and G320, multiplayer polish (lane MPCHECK, 2026-10-27).
  *
  * G322: a signed-out visit to /play/online/ asked admin-ajax rest-nonce first and the console showed
- * its 400 ("0", WordPress's wp_ajax_rest_nonce for nobody). js/online-boot.js quietSession asks
+ * its 400 ("0", WordPress's wp_ajax_rest_nonce for nobody). account.session() (js/minn-account-core.js,
+ * since 2026-11-08; js/online-boot.js quietSession hands over to it) asks
  * admin-ajax's heartbeat first, which answers 200 to anyone (wp_ajax_nopriv_heartbeat signed out,
  * wp_ajax_heartbeat's empty _nonce error signed in), so only a signed-in page asks rest-nonce.
  *
@@ -17,8 +18,8 @@ import assert from 'node:assert/strict';
 import { resolveTokens } from './css-tokens.js';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { quietSession } from '../public/js/online-boot.js?v=8149fe3e';
-import { createMinnAccount } from '../public/js/minn-account.js?v=ba6a13c5';
+import { quietSession } from '../public/js/online-boot.js?v=19450640';
+import { createMinnAccount } from '../public/js/minn-account.js?v=8f2741cd';
 import { buildOnlinePage, ONLINE_BOOT_SRC } from '../tools/play-online/build.mjs';
 
 const root = join(import.meta.dirname, '..');
@@ -148,5 +149,16 @@ describe('G320: the multiplayer start card', () => {
     assert.match(src, /function afterStartCard\(engine, run\) \{\n\s+if \(engine\.started !== false\) return Promise\.resolve\(true\);/);
     assert.match(src, /const run = \+\+bannerRun;\n\s+if \(!\(await afterStartCard\(engine, run\)\) \|\| run !== bannerRun\) return;/);
     assert.match(read('public/js/features/index.js'), /qurazy-feature\.js\?v=[0-9a-f]{8}'/);
+  });
+});
+
+describe('G320: the collapsed Social rail waits with the start card (2026-11-08)', () => {
+  it('Modern hides the rail while the card is up (it sat on the card\'s title at 390 px); Classic and an open drawer are untouched', () => {
+    const css = read('public/style.css');
+    const rule = css.match(/^\[data-ui="modern"\] body:has\(#overlay:not\(\.hidden\)\) \.local-chat-dock\.social-drawer:not\(\.is-open\) \{ visibility: hidden; \}$/m);
+    assert.ok(rule, 'the rule is in style.css, scoped to Modern');
+    assert.doesNotMatch(css, /^\[data-ui="classic"\][^{\n]*#overlay:not\(\.hidden\)[^{\n]*local-chat-dock/m, 'Classic keeps its chat column');
+    // The overlay sits under the HUD (z-world), which is why the rail covered the card.
+    assert.match(css, /\.overlay \{[^}]*z-index: var\(--z-world\);/);
   });
 });

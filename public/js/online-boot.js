@@ -17,7 +17,7 @@
  * play/index.html by tools/play-online/build.mjs.
  */
 
-import { createMinnAccountCore } from './minn-account-core.js?v=d5005a5b';
+import { createMinnAccountCore } from './minn-account-core.js?v=c7629a9d';
 import { mountAccountForms, resetLinkFrom, verifyLinkFrom } from './account-forms.js?v=318b6815';
 import { claimCharacter, newWriterId, takeHandoff } from './save-claim.js?v=30cf5250';
 
@@ -170,39 +170,13 @@ export const GATE_COPY = {
 export const JUJU_BOSS_GATES = Object.freeze(['offline', 'load-failed']);
 
 /**
- * Who is playing, as account.session() answers, without the console's 400 on a signed-out visit
- * (G322). session() asks admin-ajax rest-nonce first, and a signed-out page gets "0" with 400.
- * admin-ajax's heartbeat answers 200 to anyone: with no heartbeat nonce a signed-in cookie gets
- * wp_ajax_heartbeat's {"success":false} (its empty _nonce check), a signed-out visit
- * wp_ajax_nopriv_heartbeat's {"server_time":…}. So only a signed-in page goes on to session();
- * a signed-out one asks groddle/v1/me alone (open to anyone, no nonce needed).
+ * Who is playing, without the console's 400 on a signed-out visit (G322). The heartbeat probe
+ * that asks rest-nonce only of a signed-in page now lives in account.session() itself
+ * (js/minn-account-core.js), so the solo Account panel and the phone companion ask it too; this
+ * stays the gate's one name for it.
  */
-export async function quietSession(account, { fetch: fetchFn = globalThis.fetch?.bind(globalThis), baseUri = globalThis.document?.baseURI } = {}) {
-  const offline = { minn: false, offline: true, signedIn: false, player: null };
-  const none = { minn: false, signedIn: false, player: null };
-  let beat = null;
-  try {
-    const res = await fetchFn(new URL('wp-admin/admin-ajax.php?action=heartbeat', baseUri).href, { method: 'POST', credentials: 'same-origin', cache: 'no-store' });
-    // The host serves these pages itself, so when PHP is down this answers 5xx: trouble, not "no accounts here".
-    if (res.status >= 500) return offline;
-    beat = res.ok ? await res.json().catch(() => null) : null;
-  } catch {
-    return offline;
-  }
-  if (!beat || typeof beat !== 'object') return none;
-  if (beat.success === false) return account.session();
-  let me;
-  try {
-    const res = await fetchFn(`${account.urls.api}me`, { credentials: 'same-origin', cache: 'no-store' });
-    if (res.status >= 500) return offline;
-    me = { ok: res.ok, data: await res.json().catch(() => null) };
-  } catch {
-    return offline;
-  }
-  if (!me.ok || typeof me.data?.signedIn !== 'boolean') return none;
-  // A session that began between the two asks still has no nonce here: session() fetches it.
-  if (me.data.signedIn) return account.session();
-  return { minn: true, signedIn: false, player: null, backups: null, account: null };
+export async function quietSession(account) {
+  return account.session();
 }
 
 /**

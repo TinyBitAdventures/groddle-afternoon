@@ -22,8 +22,8 @@ import {
   normalState,
   refusalText,
 } from '../public/js/player-im.js?v=23463a96';
-import { playerImFeature } from '../public/js/features/player-im-feature.js?v=598fa948';
-import { FEATURES } from '../public/js/features/index.js?v=0163f9ea';
+import { playerImFeature } from '../public/js/features/player-im-feature.js?v=063a9a4c';
+import { FEATURES } from '../public/js/features/index.js?v=686c774e';
 import { mountSocialDrawer } from '../public/js/ui/social-drawer.js?v=2bb4e831';
 import { createNotifier } from '../public/js/notify.js?v=37c6b748';
 import { memoryStore, page } from './social-fake-dom.js';
