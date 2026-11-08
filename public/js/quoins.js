@@ -5,7 +5,7 @@ import { grantMoodXp } from './mood-xp.js?v=958e7680';
 
 export const DEFAULT_DAILY_QUOIN_LIMIT = 100;
 export const QUOIN_SHEET = Object.freeze({
-  url: 'assets/sprites/quoin__x1_1_x1_2_x1_3_x1_4_x1_5_x1_6_x1_7_x1_8_png_1354829599.png',
+  url: 'assets/sprites/quoin__x1_1_x1_2_x1_3_x1_4_x1_5_x1_6_x1_7_x1_8_png_1354829599.webp',
   frameWidth: 40,
   frameHeight: 45,
   columns: 24,

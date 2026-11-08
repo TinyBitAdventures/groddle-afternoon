@@ -42,11 +42,11 @@
  *   craftybotPanel, craftybotLast, craftybotAutoplay.
  */
 
-import { ITEM_CATALOG, addItem, countItem, ensureItem, itemIcon, removeItem } from '../inventory.js?v=d82f3b00';
-import { canUseTool, getToolCondition, setToolRemaining } from '../tools.js?v=f701b241';
-import { MAKING_TOOL_SKILLS, listRecipes, recipeKnown, TOOL_CATALOG } from '../making.js?v=c9dc233e';
-import { listDroppedStacks } from '../world-items.js?v=6378e71c';
-import { BACK_YARD_GROUND_Y, homesFeature } from './homes-feature.js?v=357f8787';
+import { ITEM_CATALOG, addItem, countItem, ensureItem, itemIcon, removeItem } from '../inventory.js?v=b7609342';
+import { canUseTool, getToolCondition, setToolRemaining } from '../tools.js?v=d8aa3536';
+import { MAKING_TOOL_SKILLS, listRecipes, recipeKnown, TOOL_CATALOG } from '../making.js?v=f4f214c2';
+import { listDroppedStacks } from '../world-items.js?v=0bbfdab9';
+import { BACK_YARD_GROUND_Y, homesFeature } from './homes-feature.js?v=5391026a';
 import { cabinetTake, isCabinetClass } from '../home-storage.js?v=121f1897';
 import {
   CRAFTYBOT,
@@ -119,9 +119,9 @@ const CLIPS = {
 /** The SWF's 'craft' label is two frames of the open cube; the OGA set has no sheet for it, so hold craftStart's last frame. */
 const ANIM_CLIP = { craft: 'craftStart', idle0: 'idle0', iconic: 'idle0', iconic_craft: 'craftStart' };
 const FPS = 30;
-const BOX_ART = `${ART}butler_box_craftybot.png`;
+const BOX_ART = `${ART}butler_box_craftybot.webp`;
 /** butler_box.swf root frame 2 ('craftybot') at zoom 3; js/textures.js reads resolution 3 from the name. */
-const BOX_ART_3X = `${ART}butler_box_craftybot@3x.png`;
+const BOX_ART_3X = `${ART}butler_box_craftybot@3x.webp`;
 const OVERLAY_MS = 2500;
 
 let bot = createCraftybotState();

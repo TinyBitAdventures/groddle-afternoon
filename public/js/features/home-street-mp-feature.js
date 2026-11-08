@@ -40,23 +40,23 @@
  * here), hsPiles, hsRestores (shared restoration ids here), hsLast.
  */
 
-import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=d82f3b00';
-import { RECIPE_CATALOG, isRecipeCatalogReady, setRecipeCatalog } from '../making.js?v=c9dc233e';
-import { furnitureDef, furnitureScale, furnitureSize } from '../home-decor.js?v=6735c85f';
+import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=b7609342';
+import { RECIPE_CATALOG, isRecipeCatalogReady, setRecipeCatalog } from '../making.js?v=f4f214c2';
+import { furnitureDef, furnitureScale, furnitureSize } from '../home-decor.js?v=f9b0e3dc';
 import { isStorageClass, storageHasContents } from '../home-storage.js?v=121f1897';
 import { pieceLabel } from '../furniture-upgrades.js?v=a3788c0d';
-import { cultivationDef, homeStreetLayout } from '../home-cultivation.js?v=c650eed1';
+import { cultivationDef, homeStreetLayout } from '../home-cultivation.js?v=42ae453c';
 import { signpostX as fixtureSignpostX } from '../home-street-fixtures.js?v=badcb725';
 import { PROTO_DEPLETED_ART } from '../home-proto-art.js?v=9309e9f3';
 import { NOTE_POLE_CONTAINERS, NOTE_POLE_PARTS, NOTE_POLE_SIGN_Y } from '../note-pole-art.js?v=fbda2f8a';
 import { textureFromUrl } from '../textures.js?v=3149d699';
-import { addSignBoard, signArmWidth, signLabel } from '../street-render.js?v=9eded3c1';
-import { openNotePicker, openNoteView } from '../note-view.js?v=a5e518d1';
-import { homeStreetName, possessive, readVisitScene } from '../neighbours-mp.js?v=40f4c953';
-import { BACK_YARD_GROUND_Y, SIGN_PROMPT_LIFT, STREET_GROUND_Y, homesFeature, visitorHomeState } from './homes-feature.js?v=357f8787';
-import { projectApi } from './street-jobs-feature.js?v=ef527fbb';
+import { addSignBoard, signArmWidth, signLabel } from '../street-render.js?v=81416f4f';
+import { openNotePicker, openNoteView } from '../note-view.js?v=eca7de52';
+import { homeStreetName, possessive, readVisitScene } from '../neighbours-mp.js?v=cfabb4f7';
+import { BACK_YARD_GROUND_Y, SIGN_PROMPT_LIFT, STREET_GROUND_Y, homesFeature, visitorHomeState } from './homes-feature.js?v=5391026a';
+import { projectApi } from './street-jobs-feature.js?v=25e52041';
 import { saveStore } from '../save-store.js?v=8839ba7b';
-import { giveCarriedNote, takeCarriedNote, writtenCarriedNotes } from './street-furniture-feature.js?v=966f14bf';
+import { giveCarriedNote, takeCarriedNote, writtenCarriedNotes } from './street-furniture-feature.js?v=7e6704a4';
 import {
   GOOD_NEIGHBOUR_AT,
   GOOD_NEIGHBOUR_COUNTER,
@@ -88,7 +88,7 @@ import {
   saleVerbs,
   signpostArms,
   signpostCandidates,
-} from '../home-street-mp.js?v=1c337af4';
+} from '../home-street-mp.js?v=0b9774df';
 
 export { HOME_STREET_MP_ID };
 
@@ -98,10 +98,10 @@ const CLASS_SALE = 'mp_furn_sale';
 const CLASS_PILE = 'mp_currant_pile';
 const CLASS_PROTO = 'mp_restore_proto';
 const FLOOR_Y = 620;
-const SIGN_ART = { arm: 'assets/ui/signpost/signpost_arm.png' };
+const SIGN_ART = { arm: 'assets/ui/signpost/signpost_arm.webp' };
 /** The friends' arms' hit box height (world px): under the post's top arm, Back to Ur (its centre 171 px up). */
 export const FRIENDS_HIT_H = 152;
-const PILE_ART = 'assets/sprites/street-jobs/pile_of_currants.png';
+const PILE_ART = 'assets/sprites/street-jobs/pile_of_currants.webp';
 const POLE_ART_DIR = 'assets/sprites/note-pole/';
 const TOKENS_FRESH_MS = 10 * 60 * 1000;
 const BIG_SPENDERS = [[1009, 'big_spender'], [2003, 'el_big_spenderino'], [5003, 'moneybags_magoo']];

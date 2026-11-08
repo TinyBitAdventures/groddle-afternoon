@@ -37,13 +37,13 @@
  * neighbourChore, neighbourLetters, furnitureLast.
  */
 
-import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=d77b0b8b';
+import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=b764884b';
 import { nearestSurfaceY } from '../walk-surface.js?v=c982983e';
 import { loadWildlifeCatalog, wildlifeCatalog } from '../wildlife.js?v=670c3a7f';
-import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=d82f3b00';
-import { canUseTool, useToolCondition } from '../tools.js?v=f701b241';
+import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=b7609342';
+import { canUseTool, useToolCondition } from '../tools.js?v=d8aa3536';
 import { getGameDayKey } from '../game-day.js?v=edb00566';
-import { runStreetTransition } from '../screen-fx.js?v=155d18cf';
+import { runStreetTransition } from '../screen-fx.js?v=b4ec277f';
 import { STREET_VISITS_SLOT, loadingCardDetails, recordStreetEntry, streetLoadingVisit } from '../exploration.js?v=aa0bd00c';
 import {
   BOARD_ART,
@@ -99,7 +99,7 @@ import {
   streetNoteSeeds,
   takePinnedNote,
   writePaperNote,
-} from '../street-furniture.js?v=d5716ef6';
+} from '../street-furniture.js?v=6983f5f5';
 import {
   CHORES,
   NEIGHBOURS,
@@ -120,18 +120,18 @@ import {
   visitorLetter,
 } from '../neighbours.js?v=161fc2e5';
 import { buildNeighbourBackground, neighbourLoadingColors, neighbourPlatforms } from './neighbour-scene.js?v=ac55dcf1';
-import { closeNoteView, noteViewOpen, openBoardView, openNotePicker, openNoteView, openReportView } from '../note-view.js?v=a5e518d1';
-import { BOARD_MP_TEXT, boardByline } from '../boards-mp.js?v=36c35534';
+import { closeNoteView, noteViewOpen, openBoardView, openNotePicker, openNoteView, openReportView } from '../note-view.js?v=eca7de52';
+import { BOARD_MP_TEXT, boardByline } from '../boards-mp.js?v=81ac15d6';
 import { textureFromUrl } from '../textures.js?v=3149d699';
-import { butlerApi } from './butler-feature.js?v=4e988a25';
-import { neighboursMpApi } from './neighbours-mp-feature.js?v=c3ef11ae';
+import { butlerApi } from './butler-feature.js?v=54762b93';
+import { neighboursMpApi } from './neighbours-mp-feature.js?v=7fba429a';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
 import { MAIL_POST_SENDER } from '../mailbox.js?v=a3e833ba';
 
 export const FURNITURE_FEATURE_ID = 'street-furniture';
 const PLAYER_ID = 'player';
 const DIR = 'assets/sprites/street-furniture/';
-const GIFT_ART = Object.freeze({ wrapped: `${DIR}gift-box-wrapped.png`, open: `${DIR}gift-box-open.png` });
+const GIFT_ART = Object.freeze({ wrapped: `${DIR}gift-box-wrapped.webp`, open: `${DIR}gift-box-open.webp` });
 const DECO = 'assets/decos/groddle/';
 /** Hechey Track, the street index default, if a visit somehow lost its way home. */
 const DEFAULT_RETURN_TSID = 'GLI2V0UN7RD1T2J';

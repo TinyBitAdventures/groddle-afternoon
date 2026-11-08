@@ -9,7 +9,7 @@ import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { check, readManifest, trademarkProblems, cleanSvg, stripSvg, artSize, sha1, LOGO_SHA1, ASSETS, OUT_DIR } from '../tools/classic-art/build.mjs';
-import { CLASSIC_ART, classicArtUrl } from '../public/js/classic/classic-art.js?v=5745e669';
+import { CLASSIC_ART, classicArtUrl } from '../public/js/classic/classic-art.js?v=5f713e7d';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const files = readdirSync(OUT_DIR);
@@ -62,7 +62,7 @@ describe('Classic art: what ships', () => {
   it('the module lists every piece with its size', () => {
     assert.equal(CLASSIC_ART.currants_icon.w, 36);
     assert.equal(CLASSIC_ART.currants_icon.h, 36);
-    assert.equal(CLASSIC_ART.imagination_button.url, 'assets/imagination/ui/imagination_button.png', 'reused, not copied');
+    assert.equal(CLASSIC_ART.imagination_button.url, 'assets/imagination/ui/imagination_button.webp', 'reused, not copied');
     assert.equal(CLASSIC_ART.avatar_rain.frames, 10);
     assert.equal(CLASSIC_ART.player_face_rays.frames, 89);
     assert.equal(classicArtUrl('spinner'), 'assets/classic/spinner.svg');

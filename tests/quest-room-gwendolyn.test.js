@@ -10,10 +10,10 @@ import { existsSync, readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import * as kit from '../public/js/quest-rooms/kit.js?v=d98b987e';
+import * as kit from '../public/js/quest-rooms/kit.js?v=25fc6d59';
 import { QUEST_ROOMS, roomModulePath } from '../public/js/quest-rooms/catalog.js?v=d77d3d17';
 import { loadContentCatalogsFromDir, getQuestCatalog } from '../public/js/content-catalogs.js?v=10b118dd';
-import { acceptOffer, ensureQuestOfferState, questStatus, turnInQuest } from '../public/js/quest-offers.js?v=486b09c9';
+import { acceptOffer, ensureQuestOfferState, questStatus, turnInQuest } from '../public/js/quest-offers.js?v=e31115ea';
 import { gwendolynOffers } from '../public/js/gwendolyn-room-23.js?v=46e417b9';
 import {
   CACTUS,
@@ -48,7 +48,7 @@ import {
   room,
   stageForQuest,
   thirdPartFor,
-} from '../public/js/quest-rooms/gwendolyn.js?v=95106936';
+} from '../public/js/quest-rooms/gwendolyn.js?v=24f286a1';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const pub = (p) => join(root, 'public', p);
@@ -198,12 +198,12 @@ describe("Gwendolyn's Task (gwendolyn): source", () => {
         for (const f of files) assert.ok(existsSync(pub(`assets/sprites/quest-rooms/gwendolyn/${f}`)), f);
       }
     }
-    for (const f of ['gwendolyn_icon.png', 'swoonerfly_fall.png', 'swoonerfly_rest.png']) {
+    for (const f of ['gwendolyn_icon.webp', 'swoonerfly_fall.webp', 'swoonerfly_rest.webp']) {
       assert.ok(existsSync(pub(`assets/sprites/quest-rooms/gwendolyn/${f}`)), f);
     }
     for (const d of ['cacti_3', 'trailerhome_1', 'land_l3_mesa_1']) assert.ok(existsSync(pub(`assets/decos/groddle/${d}.webp`)), d);
-    assert.ok(existsSync(pub('assets/sprites/icons/gurly_drink.png')));
-    assert.ok(existsSync(pub('assets/sprites/icons/random_kindness.png')));
+    assert.ok(existsSync(pub('assets/sprites/icons/gurly_drink.webp')));
+    assert.ok(existsSync(pub('assets/sprites/icons/random_kindness.webp')));
   });
 
   it('cuts each sheet on its frame grid (WebP canvas size)', () => {

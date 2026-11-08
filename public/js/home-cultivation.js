@@ -55,7 +55,7 @@
  *   `rockRx`); a fixture steps aside for a cultivation, never the other way round.
  */
 
-import { CULTIVATION_CLASSES, HOME_LIMITS } from './homes-catalog.js?v=7aa9beb0';
+import { CULTIVATION_CLASSES, HOME_LIMITS } from './homes-catalog.js?v=10ac34b6';
 import {
   TOWER_CHASSIS,
   TOWER_IMG_COST,
@@ -76,7 +76,7 @@ import {
   signpostX,
   streetFixtures,
 } from './home-street-fixtures.js?v=badcb725';
-import { gardenHalfWidth } from './garden-view.js?v=05651e76';
+import { gardenHalfWidth } from './garden-view.js?v=3683a26f';
 
 export const YARD_SEGMENT_W = 150;
 /** The house, porch and mailbox stand on a fixed lot between the yards. */

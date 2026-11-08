@@ -37,11 +37,11 @@
  * site runs it through its word filter). The site writes every label itself;
  * nothing the game sends is shown as words except a Tower's filtered name.
  */
-import { HIRES_SPRITES, SPLIT_SPRITES } from './sprite-hires.js?v=f98be5eb';
-import { HIRES_ICONS } from './icon-hires.js?v=5b68aeaa';
-import { CULTIVATION_CLASSES } from './homes-catalog.js?v=7aa9beb0';
+import { HIRES_SPRITES, SPLIT_SPRITES } from './sprite-hires.js?v=abaf3d5a';
+import { HIRES_ICONS } from './icon-hires.js?v=165dbd6e';
+import { CULTIVATION_CLASSES } from './homes-catalog.js?v=10ac34b6';
 import { TOWER_CHASSIS, TOWER_PROTO } from './home-tower.js?v=087df38f';
-import { GROWN_TREE_LABELS } from './patches.js?v=8af384ac';
+import { GROWN_TREE_LABELS } from './patches.js?v=aa83d5ad';
 import { shortHash } from './profiles.js?v=86423d98';
 
 export const HOME_LAYOUT_VERSION = 1;
@@ -136,7 +136,7 @@ function assetPath(url) {
  * or null when it is none of Tiny Speck's art files. The loader's routes are
  * undone (js/textures.js addUrlRoute): a deco asked for as `<name>.png` ships
  * as `<name>.webp` (js/deco-hires.js; `@1.5x` is its twin), a 3x sprite sheet
- * is its HIRES_SPRITES key, a 3x icon its `.png`.
+ * is its HIRES_SPRITES key, a 3x icon its 1x `.webp`.
  */
 export function layoutArtPath(url) {
   let s = assetPath(url);
@@ -145,8 +145,8 @@ export function layoutArtPath(url) {
   if (deco) s = `${deco[1]}.webp`;
   else if (SPRITE_1X.has(s)) s = SPRITE_1X.get(s);
   else {
-    const icon = /^assets\/sprites\/icons\/([a-z0-9_]+)@3x\.png$/.exec(s);
-    if (icon && HIRES_ICONS.has(icon[1])) s = `assets/sprites/icons/${icon[1]}.png`;
+    const icon = /^assets\/sprites\/icons\/([a-z0-9_]+)@3x\.webp$/.exec(s);
+    if (icon && HIRES_ICONS.has(icon[1])) s = `assets/sprites/icons/${icon[1]}.webp`;
   }
   if (s.includes('..') || s.includes('//') || /@\d/.test(s)) return null;
   if (!ART_PATH.test(s) || NOT_TINY_SPECK.test(s)) return null;

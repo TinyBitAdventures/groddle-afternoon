@@ -17,7 +17,7 @@ import {
   ensureQuestOfferState,
   pendingQuestOffers,
   routeQuestEvent,
-} from '../public/js/quest-offers.js?v=486b09c9';
+} from '../public/js/quest-offers.js?v=e31115ea';
 import {
   MP_FACTS,
   MP_RACE_QUESTS,
@@ -30,8 +30,8 @@ import {
   offerableMultiplayerQuest,
   tradeHoochCount,
 } from '../public/js/quests-mp.js?v=1fc5ff58';
-import { questOffersFeature } from '../public/js/features/quest-offers-feature.js?v=f5d8a199';
-import { questsMpFeature } from '../public/js/features/quests-mp-feature.js?v=f62fe6b6';
+import { questOffersFeature } from '../public/js/features/quest-offers-feature.js?v=57dafa96';
+import { questsMpFeature } from '../public/js/features/quests-mp-feature.js?v=44f546e9';
 import { economyCredits } from '../tools/build-economy.mjs';
 import { tradeTable } from '../tools/build-realtime-trade.mjs';
 

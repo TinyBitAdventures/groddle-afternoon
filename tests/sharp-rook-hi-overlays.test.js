@@ -75,14 +75,14 @@ function sheets() {
 }
 
 test('the Rook, its halo and every hi sign keep their frames, cells and timings', async () => {
-  const { ROOK_SHEETS, ROOKED_HALO } = await import('../public/js/features/rook-attack-feature.js?v=c56ce4a4');
+  const { ROOK_SHEETS, ROOKED_HALO } = await import('../public/js/features/rook-attack-feature.js?v=db912705');
   const { HI_ART, HI_ART_CELLS, HI_VARIANTS, hiArtSheet } = await import('../public/js/hi-signs.js?v=b90c7d7e');
   const rows = new Map(sheets().map((s) => [s.path, s]));
   assert.equal(rows.size, 2 + 3 * HI_VARIANTS.length);
   assert.equal(HI_VARIANTS.length, 11);
   // The 1x sheets' grids, as the feature slices them.
   assert.deepEqual({ ...ROOK_SHEETS.hover }, { path: 'assets/sprites/rooks/rook-hover.webp', fw: 496, fh: 300, cols: 6, frames: 36 });
-  assert.deepEqual({ ...ROOK_SHEETS.halo }, { path: 'assets/sprites/rooks/rooked-halo.png', fw: 124, fh: 46, cols: 8, frames: 30 });
+  assert.deepEqual({ ...ROOK_SHEETS.halo }, { path: 'assets/sprites/rooks/rooked-halo.webp', fw: 124, fh: 46, cols: 8, frames: 30 });
   for (const key of ['hover', 'halo']) {
     const s = ROOK_SHEETS[key];
     const m = rows.get(s.path);
@@ -109,7 +109,7 @@ test('the Rook, its halo and every hi sign keep their frames, cells and timings'
 });
 
 test('each has a 3x render of its vector SWF, matched to the 1x frame for frame, loaded on first draw', async () => {
-  const { HIRES_SPRITES, SPLIT_SPRITES, FIRST_DRAW_SPRITES } = await import('../public/js/sprite-hires.js?v=f98be5eb');
+  const { HIRES_SPRITES, SPLIT_SPRITES, FIRST_DRAW_SPRITES } = await import('../public/js/sprite-hires.js?v=abaf3d5a');
   const results = json(join(vs, 'results.json'));
   for (const s of sheets()) {
     const r = results[s.path];
@@ -144,7 +144,7 @@ test('each has a 3x render of its vector SWF, matched to the 1x frame for frame,
   assert.equal(hover.swf, '../glitch-overlays/rook_fly_forward.swf');
   assert.deepEqual(hover.swfFrames, ROOK_FRAMES, 'one distinct SWF frame per cell, in order');
   assert.ok(SPLIT_SPRITES.has('assets/sprites/rooks/rook-hover.webp'), 'the 193 MB hover ships as parts');
-  const halo = results['assets/sprites/rooks/rooked-halo.png'];
+  const halo = results['assets/sprites/rooks/rooked-halo.webp'];
   assert.deepEqual([halo.swf, halo.sprite, ...halo.swfFrames], ['misc/emotional_bear/emotional_bear.swf', 0, 479, 508]);
   // Files exactly 3x their 1x sheet and js/sprite-hires.js current (no FFDec needed).
   for (const name of ['rooks.json', 'hi-signs.json']) {
@@ -154,9 +154,9 @@ test('each has a 3x render of its vector SWF, matched to the 1x frame for frame,
 });
 
 test('the 3x covers the Rook, its halo and the hi signs where they are drawn; the swoop is the one draw it cannot', async () => {
-  const { HIRES_SPRITES, SPLIT_SPRITES } = await import('../public/js/sprite-hires.js?v=f98be5eb');
+  const { HIRES_SPRITES, SPLIT_SPRITES } = await import('../public/js/sprite-hires.js?v=abaf3d5a');
   const { moduleConsts } = await import('./sheet-sources.js');
-  const { ROOK_SHEETS, ROOKED_HALO } = await import('../public/js/features/rook-attack-feature.js?v=c56ce4a4');
+  const { ROOK_SHEETS, ROOKED_HALO } = await import('../public/js/features/rook-attack-feature.js?v=db912705');
   const stage = await stageScale();
   const density = (path) => (HIRES_SPRITES.has(path) || SPLIT_SPRITES.has(path) ? 3 : 1);
   const home = moduleConsts('js/features/rook-attack-feature.js').get('ROOK_HOME');
@@ -227,5 +227,5 @@ test('the overlays that were sheets keep SVG frames, drawn at the screen\'s dens
   // The race winner's rainbow (nothing shows it) and the organelles (small, 2x, and on screen for 3 s) stay sheets.
   assert.ok(!json(join(dir, 'overlays.json')).rainbow_winner.vector);
   for (const key of ['vacuoles', 'endoplasmic_reticulum', 'super_old_mitochondrial_dna', 'golgi_apparatus']) assert.ok(!json(join(dir, 'overlays-more.json'))[key].vector, key);
-  assert.ok(existsSync(join(pub, 'assets/sprites/icons/golgi_apparatus@3x.png')));
+  assert.ok(existsSync(join(pub, 'assets/sprites/icons/golgi_apparatus@3x.webp')));
 });

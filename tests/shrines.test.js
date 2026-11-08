@@ -16,7 +16,7 @@ import {
   normalizeShrineState,
   quoteShrineDonation,
   resetShrineDay,
-} from '../public/js/shrines.js?v=95d74174';
+} from '../public/js/shrines.js?v=1a945fe7';
 import { GIANT_NAMES, giantDisplayName } from '../public/js/giant-names.js?v=0e295891';
 
 const publicRoot = join(import.meta.dirname, '..', 'public');
@@ -135,9 +135,9 @@ describe('official Giant shrine donation economy', () => {
 describe('shrine official art and client wiring', () => {
   it('ships open/close animation sheets and emblem art for every Giant', () => {
     for (const giant of Object.keys(GIANTS)) {
-      assert.ok(existsSync(join(publicRoot, 'assets', 'sprites', 'shrines', `${giant}_open.png`)));
-      assert.ok(existsSync(join(publicRoot, 'assets', 'sprites', 'shrines', `${giant}_close.png`)));
-      assert.ok(existsSync(join(publicRoot, 'assets', 'sprites', 'icons', `emblem_${giant}.png`)));
+      assert.ok(existsSync(join(publicRoot, 'assets', 'sprites', 'shrines', `${giant}_open.webp`)));
+      assert.ok(existsSync(join(publicRoot, 'assets', 'sprites', 'shrines', `${giant}_close.webp`)));
+      assert.ok(existsSync(join(publicRoot, 'assets', 'sprites', 'icons', `emblem_${giant}.webp`)));
     }
   });
 
@@ -154,7 +154,7 @@ describe('shrine official art and client wiring', () => {
   });
 
   it('follows the source donation rules: level cap, capped bonus, favor accounting, emblem iMG', async () => {
-    const { donationXpLimit, EMBLEM_XP } = await import('../public/js/shrines.js?v=95d74174');
+    const { donationXpLimit, EMBLEM_XP } = await import('../public/js/shrines.js?v=1a945fe7');
     const { XP_FOR_LEVEL } = await import('../public/js/progression.js?v=33462eaa');
     // stats_donation_xp_limit: 250 to level 5, 500 to 10, then a share of the level's interval.
     assert.equal(donationXpLimit(0), 250);
@@ -231,7 +231,7 @@ describe('Giant names players read (report #102)', () => {
   it('the favor, dice, grave and emblem lines say Tii', async () => {
     const { capitalizeGiant } = await import('../public/js/secret-spots.js?v=59a37384');
     const { dieOutcome } = await import('../public/js/item-verbs-more.js?v=c2f9dc31');
-    const { graveRecognitionText } = await import('../public/js/hell.js?v=aca145ba');
+    const { graveRecognitionText } = await import('../public/js/hell.js?v=ca971c34');
     const { emblemVerbCheck } = await import('../public/js/giant-icons.js?v=0d6b4965');
     assert.equal(capitalizeGiant('ti'), 'Tii');
     assert.equal(dieOutcome({ mood: 100, energy: 100 }, 'ti').line, 'rolled "Tii"');

@@ -54,7 +54,7 @@ import { fileURLToPath } from 'node:url';
 import { requireServer, serverPath } from './repos.mjs';
 
 import { readItemTags, readItems } from './inventory/gsjs-data.mjs';
-import { TOOL_CONDITION_CATALOG } from '../public/js/tools.js?v=f701b241';
+import { TOOL_CONDITION_CATALOG } from '../public/js/tools.js?v=d8aa3536';
 import { COPY_TAG_RULES } from '../public/js/copy-tags.js?v=bd75b92e';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');

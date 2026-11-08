@@ -139,13 +139,13 @@ test('client integration uses clean recovered room and item art', () => {
   const decoRoot = path.join(root, 'public/assets/decos/groddle');
 
   for (const file of [
-    'npc_dustbunny__x1_idle_stand_png_1354831147.png',
-    'npc_dustbunny__x1_talk_png_1354831143.png',
-    'small_worthless__x1_1_x1_2_png_1354829517.png',
+    'npc_dustbunny__x1_idle_stand_png_1354831147.webp',
+    'npc_dustbunny__x1_talk_png_1354831143.webp',
+    'small_worthless__x1_1_x1_2_png_1354829517.webp',
   ]) {
     assert.equal(fs.existsSync(path.join(spriteRoot, file)), true);
   }
-  assert.equal(fs.existsSync(path.join(root, 'public/assets/sprites/icons/emotional_bear.png')), true);
+  assert.equal(fs.existsSync(path.join(root, 'public/assets/sprites/icons/emotional_bear.webp')), true);
   // Every deco the street places ships as Tiny Speck's own art.
   for (const sprite of new Set(eestiStreet.layers.flatMap((layer) => layer.decos.map((d) => d.sprite)))) {
     assert.equal(fs.existsSync(path.join(decoRoot, `${sprite}.webp`)), true, sprite);

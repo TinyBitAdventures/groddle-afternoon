@@ -55,7 +55,7 @@ import {
   stepRide,
   ticketOffer,
 } from '../public/js/subway.js?v=44d1a09f';
-import { subwayFeature } from '../public/js/features/subway-feature.js?v=ff38d0da';
+import { subwayFeature } from '../public/js/features/subway-feature.js?v=ec0c7eb3';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const pub = join(spike, 'public');
@@ -224,7 +224,7 @@ describe('Ride badges (achievements subwayfarer, ground_hogger, commuter_mug, ch
       assert.equal(cond.num, rides, id);
       const src = readFileSync(join(GSJS, `achievements/${id}.js`), 'utf8');
       assert.ok(src.includes(`value\t: "${rides}"`), id);
-      assert.ok(existsSync(join(pub, `assets/badges/${id}.png`)), id);
+      assert.ok(existsSync(join(pub, `assets/badges/${id}.webp`)), id);
     }
     assert.deepEqual(badgesReached(22), []);
     assert.deepEqual(badgesReached(23), ['subwayfarer']);

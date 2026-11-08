@@ -38,11 +38,11 @@
  * `killTree` are the hooks; trees grown here die through `killPlotTree`.
  */
 
-import { ensureItem } from '../inventory.js?v=d82f3b00';
+import { ensureItem } from '../inventory.js?v=b7609342';
 import { isItemFloor, platformYAt } from '../street-model.js?v=505d8990';
 import { getStreetEcologyCatalog, streetEcologyAliases } from '../street-ecology.js?v=3c1d4c06';
 import { trantStatusLabel } from '../trants.js?v=9c2e8c0f';
-import { woodTreeStatusLabel } from '../woodcutting.js?v=c199dd64';
+import { woodTreeStatusLabel } from '../woodcutting.js?v=4fd0342b';
 import {
   GROWN_TREE_LABELS,
   SEASONED_BEANS,
@@ -62,9 +62,9 @@ import {
   soilSpawnClasses,
   soilSpritePaths,
   tickPlot,
-} from '../patches.js?v=8af384ac';
+} from '../patches.js?v=aa83d5ad';
 import { frameTexture, isLoaded, onFailed, onLoaded, textureFromUrl } from '../textures.js?v=3149d699';
-import { HOE_TOOLS, firstWorkingTool } from '../tools.js?v=f701b241';
+import { HOE_TOOLS, firstWorkingTool } from '../tools.js?v=d8aa3536';
 import { slugsFromEffects } from '../speech-slugs.js?v=130338f9';
 
 export const PATCHES_FEATURE_ID = 'patches';
@@ -74,17 +74,17 @@ const TICK_MS = 500;
 const TRANT_MAT_STAGES = [1, 3, 5, 7, 10];
 const TRANT_FRAME_VERSION = 'all-species-cell-2';
 const WOOD_SHEET = Object.freeze({
-  url: 'assets/sprites/wood_tree_maturity_6_variant_2_x6_1_png_1354833445.png',
+  url: 'assets/sprites/wood_tree_maturity_6_variant_2_x6_1_png_1354833445.webp',
   fw: 88,
   fh: 138,
   count: 6,
 });
 const TOOL_SHEETS = Object.freeze({
-  hoe: Object.freeze({ url: 'assets/sprites/soil/hoe-tool.png', fw: 86, fh: 58, cols: 10, count: 30 }),
+  hoe: Object.freeze({ url: 'assets/sprites/soil/hoe-tool.webp', fw: 86, fh: 58, cols: 10, count: 30 }),
   // high_class_hoe.swf tool_animation (OGA high_class_hoe__x1_tool_animation, CC0): 890x165, 10x3.
-  high_class_hoe: Object.freeze({ url: 'assets/sprites/soil/high-class-hoe-tool.png', fw: 89, fh: 55, cols: 10, count: 30 }),
-  shovel: Object.freeze({ url: 'assets/sprites/soil/shovel-tool.png', fw: 65, fh: 82, cols: 14, count: 53 }),
-  hatchet: Object.freeze({ url: 'assets/sprites/tools/hatchet-tool.png', fw: 110, fh: 64, cols: 8, count: 38 }), // 38 of 40 cells hold art (G276, as game.js 0ca900a7)
+  high_class_hoe: Object.freeze({ url: 'assets/sprites/soil/high-class-hoe-tool.webp', fw: 89, fh: 55, cols: 10, count: 30 }),
+  shovel: Object.freeze({ url: 'assets/sprites/soil/shovel-tool.webp', fw: 65, fh: 82, cols: 14, count: 53 }),
+  hatchet: Object.freeze({ url: 'assets/sprites/tools/hatchet-tool.webp', fw: 110, fh: 64, cols: 8, count: 38 }), // 38 of 40 cells hold art (G276, as game.js 0ca900a7)
 });
 const VERB_TOOL = Object.freeze({ tend: 'hoe', dig: 'shovel', clear: 'hatchet' });
 const PLACEMENT_CLEARANCE = Object.freeze({ patch: 150, patch_dark: 150, patch_seedling: 150 });
@@ -176,7 +176,7 @@ export function trantFrameStage(maturity) {
 }
 
 export function treeFrameUrl(classId, maturity) {
-  return `assets/sprites/trants/frames/${classId}_m${trantFrameStage(maturity)}.png?v=${TRANT_FRAME_VERSION}`;
+  return `assets/sprites/trants/frames/${classId}_m${trantFrameStage(maturity)}.webp?v=${TRANT_FRAME_VERSION}`;
 }
 
 /** The demo pack: tools plus a spread of Seasoned Beans (one that will not grow here). */

@@ -14,7 +14,7 @@ import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { WORLD_ART } from '../public/js/world-art-list.js?v=df42115a';
 import { FALLBACK_MAX, artIdOf, worldArtFor, worldStateFor } from '../public/js/world-art.js?v=df476660';
-import { surfaceHeight, stackSurfaceAt, createHomeDecorState } from '../public/js/home-decor.js?v=6735c85f';
+import { surfaceHeight, stackSurfaceAt, createHomeDecorState } from '../public/js/home-decor.js?v=f9b0e3dc';
 import { FURNITURE_UPGRADES } from '../public/js/furniture-upgrades-data.js?v=ced89b64';
 
 const root = join(import.meta.dirname, '..');
@@ -39,7 +39,7 @@ describe('world art (tools/world-art/render.py)', () => {
 
   it('draws the diamond lying down at its own 23 x 26, not its 41 x 34 pack icon', () => {
     assert.deepEqual(WORLD_ART.gem_diamond, { 1: [23, 26] });
-    const art = worldArtFor('gem_diamond', 1, 'assets/sprites/icons/gem_diamond.png');
+    const art = worldArtFor('gem_diamond', 1, 'assets/sprites/icons/gem_diamond.webp');
     assert.equal(art.url, 'assets/sprites/world/gem_diamond/1@3x.webp');
     assert.deepEqual([art.w, art.h], [23, 26]);
   });
@@ -54,7 +54,7 @@ describe('world art (tools/world-art/render.py)', () => {
   });
 
   it('goes by the icon file, and a class with no SWF keeps its icon at the fallback size', () => {
-    assert.equal(artIdOf('x', 'assets/sprites/icons/plank@3x.png'), 'plank');
+    assert.equal(artIdOf('x', 'assets/sprites/icons/plank@3x.webp'), 'plank');
     assert.equal(artIdOf('plank', ''), 'plank');
     assert.equal(worldArtFor('no_such_thing', 1), null);
     assert.ok(FALLBACK_MAX >= 24 && FALLBACK_MAX <= 48);

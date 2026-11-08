@@ -11,12 +11,12 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { getVerbsFor, runVerb } from '../public/content.js?v=075ded81';
-import { createInventory } from '../public/js/inventory.js?v=d82f3b00';
-import { createMineRock, findWorkingPick, miningToolWear } from '../public/js/mining.js?v=29fe2127';
-import { clearPlot, createGarden, gardenActionProfile, getPlot, waterPlot } from '../public/js/garden.js?v=890d72ea';
-import { BROKEN_TOOL_ICONS, TOOL_CONDITION_CATALOG, brokenToolIcon, createToolConditionState, setToolRemaining } from '../public/js/tools.js?v=f701b241';
-import { HIRES_ICONS } from '../public/js/icon-hires.js?v=5b68aeaa';
+import { getVerbsFor, runVerb } from '../public/content.js?v=ebc8b8b3';
+import { createInventory } from '../public/js/inventory.js?v=b7609342';
+import { createMineRock, findWorkingPick, miningToolWear } from '../public/js/mining.js?v=fc28670f';
+import { clearPlot, createGarden, gardenActionProfile, getPlot, waterPlot } from '../public/js/garden.js?v=e1c3415c';
+import { BROKEN_TOOL_ICONS, TOOL_CONDITION_CATALOG, brokenToolIcon, createToolConditionState, setToolRemaining } from '../public/js/tools.js?v=d8aa3536';
+import { HIRES_ICONS } from '../public/js/icon-hires.js?v=165dbd6e';
 
 const root = join(import.meta.dirname, '..');
 const icons = join(root, 'public/assets/sprites/icons');
@@ -61,14 +61,14 @@ describe('ticket 63: a broken tool is no tool', () => {
   it('every tool with a broken state has its broken pack icon, 1x and 3x, and the pack uses it', () => {
     for (const cls of BROKEN_TOOL_ICONS) {
       assert.ok(TOOL_CONDITION_CATALOG[cls], `${cls} wears`);
-      assert.ok(existsSync(join(icons, `${cls}_broken.png`)), `${cls}_broken.png`);
-      assert.ok(existsSync(join(icons, `${cls}_broken@3x.png`)) && HIRES_ICONS.has(`${cls}_broken`), `${cls}_broken@3x.png`);
+      assert.ok(existsSync(join(icons, `${cls}_broken.webp`)), `${cls}_broken.webp`);
+      assert.ok(existsSync(join(icons, `${cls}_broken@3x.webp`)) && HIRES_ICONS.has(`${cls}_broken`), `${cls}_broken@3x.webp`);
     }
     for (const cls of Object.keys(TOOL_CONDITION_CATALOG)) {
-      if (existsSync(join(icons, `${cls}_broken.png`))) assert.ok(BROKEN_TOOL_ICONS.has(cls), `${cls} has art but is not listed`);
+      if (existsSync(join(icons, `${cls}_broken.webp`))) assert.ok(BROKEN_TOOL_ICONS.has(cls), `${cls} has art but is not listed`);
     }
     for (const cls of ['pick', 'fancy_pick', 'hoe', 'high_class_hoe', 'smelter', 'ore_grinder', 'grand_ol_grinder']) assert.ok(BROKEN_TOOL_ICONS.has(cls), cls);
-    assert.equal(brokenToolIcon('pick'), 'assets/sprites/icons/pick_broken.png');
+    assert.equal(brokenToolIcon('pick'), 'assets/sprites/icons/pick_broken.webp');
     assert.equal(brokenToolIcon('butterfly_lotion'), null);
     assert.match(readFileSync(join(root, 'public/game.js'), 'utf8'), /img\.src = \(toolCondition\?\.broken && brokenToolIcon\(s\.classTsid\)\)\n\s+\|\| \(s\.classTsid === EMOTIONAL_BEAR_ID[^\n]+\n\s+\|\| s\.icon;/);
   });

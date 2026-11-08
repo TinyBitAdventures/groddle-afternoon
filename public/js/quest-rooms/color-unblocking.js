@@ -36,7 +36,7 @@
  *  5. The crab, and the door.
  */
 
-import { COLORS, JUMP_RISE, lastCheckpoint, makeSwitch, pushOutOfSolids, spawnQuoins, takeQuoins } from './puzzle-kit.js?v=7410b322';
+import { COLORS, JUMP_RISE, lastCheckpoint, makeSwitch, pushOutOfSolids, spawnQuoins, takeQuoins } from './puzzle-kit.js?v=378c28e8';
 import { COLOR_UNBLOCKING_FILES } from '../color-unblocking-art.js?v=ea2b7e7f';
 import { textureFromUrl } from '../textures.js?v=3149d699';
 
@@ -220,7 +220,7 @@ export const room = {
   ownLight: true,
   title: 'Color Unblocking',
   kicker: 'Unblock your way to the exit',
-  icon: 'assets/sprites/icons/play_cube.png',
+  icon: 'assets/sprites/icons/play_cube.webp',
   theme: 'warm',
   // G315: hub 135 'Puzzles' (inc_data_maps_prod.js 1197), the template's hub.
   hubName: 'Puzzles',
@@ -296,7 +296,7 @@ export const room = {
     ctx.data.prevX = layout.spawn.x;
     ctx.data.presses = [];
     // The crab (npc_crab idle0 6x5 / talk 7x9 sheets, 131x129).
-    const crab = ctx.kit.animated(ctx.PIXI, `${ART}npc_crab_idle0.png`, 6, 5, { scale: 0.62, speed: 0.3, count: 30 });
+    const crab = ctx.kit.animated(ctx.PIXI, `${ART}npc_crab_idle0.webp`, 6, 5, { scale: 0.62, speed: 0.3, count: 30 });
     crab.x = layout.crab.x;
     crab.y = layout.crab.y + 6;
     crab.scale.x = -0.62;

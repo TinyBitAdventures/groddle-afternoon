@@ -21,8 +21,8 @@
  * sceneId, sceneStatus, sceneProgress, sceneQuoins, sceneReward, sceneDemo.
  */
 
-import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=d82f3b00';
-import { QUOIN_SHEET, QUOIN_TYPES, quoinTouches } from '../quoins.js?v=f154a79e';
+import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=b7609342';
+import { QUOIN_SHEET, QUOIN_TYPES, quoinTouches } from '../quoins.js?v=299cc3f4';
 import {
   BEAM_ME_DOWN,
   CONSTELLATION,
@@ -181,7 +181,7 @@ function buildBeamMeDown(engine) {
     g.fill({ color: 0xfff8d8, alpha: 0.12 });
     root.addChild(g);
     beams.push(g);
-    const ufo = new PIXI.Sprite(textureFromUrl(`${ART}ufo_1.png`));
+    const ufo = new PIXI.Sprite(textureFromUrl(`${ART}ufo_1.webp`));
     ufo.anchor.set(0.5, 0.75);
     ufo.x = s.x;
     ufo.y = s.y + 30;

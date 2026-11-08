@@ -17,10 +17,10 @@
  * [data-can=yes|some|no] (ticket 81: whether you can do it now), #projects-meta, #projects-close.
  */
 
-import { PROJECTS_TEXT as T, shareLine, statusLine } from '../projects-tracker.js?v=c508f396';
+import { PROJECTS_TEXT as T, shareLine, statusLine } from '../projects-tracker.js?v=f34c5236';
 
 export const PROJECTS_PANEL_ID = 'projects-panel';
-const ICON = 'assets/sprites/street-jobs/sign_stake.png';
+const ICON = 'assets/sprites/street-jobs/sign_stake.webp';
 
 function el(doc, tag, attrs = {}, text = '') {
   const node = doc.createElement(tag);

@@ -481,7 +481,7 @@ const lab = {
   id: 'firefly_whistle',
   title: 'Firefly Whistle',
   kicker: 'The Fireflex 3000 Lab',
-  icon: `${ART}firefly_whistle_icon.png`,
+  icon: `${ART}firefly_whistle_icon.webp`,
   theme: 'lab',
   // The offer's "the last days of the Alphite Age".
   hubName: 'The last days of the Alphite Age',

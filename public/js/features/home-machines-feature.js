@@ -69,20 +69,20 @@ import {
   expireSolo,
   tankOf,
   TAKEN_KEEP,
-} from '../home-machines.js?v=de26166b';
-import { CALL_PLAYER_LINES, MACHINE_HITBOX, MACHINE_SKILLS, collectLine, machineJobMs, machineMadeLine, runningSoundKey, takeJobIngredients } from '../machine-rooms.js?v=725fbf92';
-import { MACHINE_ART_SHEETS, LOW_FUEL_BUBBLE_MS, LOW_FUEL_LINE, isLowFuel, machineFrame, machineSheetDef, roomMachineState } from '../machine-art.js?v=f8dc5b4d';
-import { FUEL_CELL, FUEL_PER_CELL, MAX_FUEL } from '../machines.js?v=2f4f8293';
-import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=d82f3b00';
-import { receiveToolCopy, takeToolCopy } from '../tools.js?v=f701b241';
-import { RECIPE_CATALOG } from '../making.js?v=c9dc233e';
+} from '../home-machines.js?v=fff6026c';
+import { CALL_PLAYER_LINES, MACHINE_HITBOX, MACHINE_SKILLS, collectLine, machineJobMs, machineMadeLine, runningSoundKey, takeJobIngredients } from '../machine-rooms.js?v=a201d684';
+import { MACHINE_ART_SHEETS, LOW_FUEL_BUBBLE_MS, LOW_FUEL_LINE, isLowFuel, machineFrame, machineSheetDef, roomMachineState } from '../machine-art.js?v=44af04ef';
+import { FUEL_CELL, FUEL_PER_CELL, MAX_FUEL } from '../machines.js?v=663980c9';
+import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=b7609342';
+import { receiveToolCopy, takeToolCopy } from '../tools.js?v=d8aa3536';
+import { RECIPE_CATALOG } from '../making.js?v=f4f214c2';
 import { getSkillCatalog } from '../content-catalogs.js?v=10b118dd';
-import { createBackYardState, homeStreetLayout, normalizeCultivationState } from '../home-cultivation.js?v=c650eed1';
-import { readVisitScene } from '../neighbours-mp.js?v=40f4c953';
+import { createBackYardState, homeStreetLayout, normalizeCultivationState } from '../home-cultivation.js?v=42ae453c';
+import { readVisitScene } from '../neighbours-mp.js?v=cfabb4f7';
 import { saveStore } from '../save-store.js?v=8839ba7b';
 import { textureFromUrl } from '../textures.js?v=3149d699';
-import { createSheetLoader } from '../sprite-sheets.js?v=d77b0b8b';
-import { STREET_GROUND_Y, homesFeature } from './homes-feature.js?v=357f8787';
+import { createSheetLoader } from '../sprite-sheets.js?v=b764884b';
+import { STREET_GROUND_Y, homesFeature } from './homes-feature.js?v=5391026a';
 
 export { HOME_MACHINES_ID };
 
@@ -266,7 +266,7 @@ function createSession(engine, client) {
   function drawOne(m) {
     const { PIXI } = engine;
     if (!PIXI || !engine.entityLayer || !home) return;
-    const sprite = new PIXI.Sprite(textureFromUrl(`assets/sprites/icons/${m.classTsid}.png`));
+    const sprite = new PIXI.Sprite(textureFromUrl(`assets/sprites/icons/${m.classTsid}.webp`));
     sprite.anchor.set(0.5, 1);
     sprite.x = Math.round(home.x0 + m.rx);
     sprite.y = home.groundY + 2;

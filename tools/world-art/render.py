@@ -13,7 +13,7 @@ SWF's stage bottom centre on the stack's point at the movie's own size
 (LocationItemstackView.as _positionViewDO 853-854, _itemstack.scale 1), so a
 stack rests on the line under it.
 
-For every pack icon (public/assets/sprites/icons/<id>.png) with a SWF of the same
+For every pack icon (public/assets/sprites/icons/<id>.webp) with a SWF of the same
 name in tinyspeck/glitch-items (CC0) whose class can be put down (its GameServerJS
 item file has a drop verb, items/include/takeable.js), each numbered scene's first frame is
 exported by FFDec at zoom 3 (the stage padded on every side, as
@@ -68,7 +68,7 @@ def guard():
 
 
 def icon_ids():
-    return sorted({os.path.basename(p)[:-4] for p in glob.glob(os.path.join(ICONS, '*.png')) if '@' not in os.path.basename(p)})
+    return sorted({os.path.basename(p)[:-5] for p in glob.glob(os.path.join(ICONS, '*.webp')) if '@' not in os.path.basename(p)})
 
 
 # Not an item's art: glitch-items/achievements holds the badges (one SWF per achievement), and 11

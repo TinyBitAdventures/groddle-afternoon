@@ -58,11 +58,11 @@
  */
 
 import { slugsFromEffects } from '../speech-slugs.js?v=130338f9';
-import { addItem, countItem, ensureItem, removeItem, ITEM_CATALOG } from '../inventory.js?v=d82f3b00';
+import { addItem, countItem, ensureItem, removeItem, ITEM_CATALOG } from '../inventory.js?v=b7609342';
 import { bindCountField, countKeyValue, countStepMarkup } from '../ui/count-chooser.js?v=5bc894c8';
-import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=d77b0b8b';
+import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=b764884b';
 import { landingY, nearestSurfaceY } from '../walk-surface.js?v=c982983e';
-import { donationValueFor } from '../shrines.js?v=95d74174';
+import { donationValueFor } from '../shrines.js?v=1a945fe7';
 import { giantDisplayName } from '../giant-names.js?v=0e295891';
 import { TRANT_META, trantStatusLabel } from '../trants.js?v=9c2e8c0f';
 import {
@@ -125,8 +125,8 @@ import {
   syncObjs,
 } from '../rook-mp.js?v=decf0604';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
-import { copyChargesLeft, copyFromLedger, keepsCopies, spendCopyCharge, verbCopy } from '../copy-charges.js?v=f94ac7c8';
-import { migrateClassValue } from '../tools.js?v=f701b241';
+import { copyChargesLeft, copyFromLedger, keepsCopies, spendCopyCharge, verbCopy } from '../copy-charges.js?v=737fd334';
+import { migrateClassValue } from '../tools.js?v=d8aa3536';
 import { feedZone, placeRookBadge, unionBox } from '../rook-badge-place.js?v=2bb00dfd';
 
 export const ROOK_FEATURE_ID = 'rook-attack';
@@ -164,25 +164,25 @@ export const ROOK_SHEETS = Object.freeze({
   fore: sheet('forehorseman-frantic.webp', 191, 202, 8, 47),
   // emotional_bear.swf scene rooked_halo (frames 479-508): 30 frames of 124x46 in an 8 x 4 grid. Read
   // as 124x92 it played two frames stacked, and the last two cells came up half empty each loop.
-  halo: sheet('rooked-halo.png', 124, 46, 8, 30),
-  balm: sheet('rook-balm-tool.png', 88, 106, 10, 67),
-  piggy1: sheet('piggy-rooked1.png', 88, 62, 10, 10),
-  piggy2: sheet('piggy-rooked2.png', 88, 62, 8, 24),
-  chicken1: sheet('chicken-rooked1.png', 148, 110, 1, 1),
-  chicken2: sheet('chicken-rooked2.png', 148, 110, 6, 27),
-  bflyFly: sheet('butterfly-fly-rooked.png', 70, 65, 14, 14),
-  bflyRest: sheet('butterfly-rest-rooked.png', 70, 65, 1, 1),
-  kittySad: sheet('kitty-sad.png', 136, 115, 6, 17),
-  head_idle1: sheet('rook-head-idle1.png', 108, 127, 9, 60),
-  head_angry1: sheet('rook-head-angry1.png', 108, 127, 9, 102),
-  head_angry2: sheet('rook-head-angry2.png', 108, 127, 9, 54),
-  head_angry3: sheet('rook-head-angry3.png', 108, 127, 9, 54),
-  head_stun: sheet('rook-head-stun.png', 108, 127, 8, 24),
-  head_stunned: sheet('rook-head-stunned.png', 108, 127, 8, 30),
-  head_stunnedHit: sheet('rook-head-stunnedHit.png', 108, 127, 8, 30),
-  head_killShot: sheet('rook-head-killShot.png', 108, 127, 8, 30),
-  head_dead: sheet('rook-head-dead.png', 108, 127, 1, 1),
-  head_taunt: sheet('rook-head-taunt.png', 108, 127, 8, 39),
+  halo: sheet('rooked-halo.webp', 124, 46, 8, 30),
+  balm: sheet('rook-balm-tool.webp', 88, 106, 10, 67),
+  piggy1: sheet('piggy-rooked1.webp', 88, 62, 10, 10),
+  piggy2: sheet('piggy-rooked2.webp', 88, 62, 8, 24),
+  chicken1: sheet('chicken-rooked1.webp', 148, 110, 1, 1),
+  chicken2: sheet('chicken-rooked2.webp', 148, 110, 6, 27),
+  bflyFly: sheet('butterfly-fly-rooked.webp', 70, 65, 14, 14),
+  bflyRest: sheet('butterfly-rest-rooked.webp', 70, 65, 1, 1),
+  kittySad: sheet('kitty-sad.webp', 136, 115, 6, 17),
+  head_idle1: sheet('rook-head-idle1.webp', 108, 127, 9, 60),
+  head_angry1: sheet('rook-head-angry1.webp', 108, 127, 9, 102),
+  head_angry2: sheet('rook-head-angry2.webp', 108, 127, 9, 54),
+  head_angry3: sheet('rook-head-angry3.webp', 108, 127, 9, 54),
+  head_stun: sheet('rook-head-stun.webp', 108, 127, 8, 24),
+  head_stunned: sheet('rook-head-stunned.webp', 108, 127, 8, 30),
+  head_stunnedHit: sheet('rook-head-stunnedHit.webp', 108, 127, 8, 30),
+  head_killShot: sheet('rook-head-killShot.webp', 108, 127, 8, 30),
+  head_dead: sheet('rook-head-dead.webp', 108, 127, 1, 1),
+  head_taunt: sheet('rook-head-taunt.webp', 108, 127, 8, 39),
 });
 
 /**

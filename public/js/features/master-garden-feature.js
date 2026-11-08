@@ -27,9 +27,9 @@
  *     mgPlots, mgAutoplay, mgDrop.
  */
 
-import { TOOL_CONDITION_CATALOG, migrateClassValue } from '../tools.js?v=f701b241';
-import { ITEM_CATALOG, countItem, ensureItem } from '../inventory.js?v=d82f3b00';
-import { SEED_CATALOG, listPlantableSeeds } from '../garden.js?v=890d72ea';
+import { TOOL_CONDITION_CATALOG, migrateClassValue } from '../tools.js?v=d8aa3536';
+import { ITEM_CATALOG, countItem, ensureItem } from '../inventory.js?v=b7609342';
+import { SEED_CATALOG, listPlantableSeeds } from '../garden.js?v=e1c3415c';
 import {
   GARDEN_POTIONS,
   MASTER_GARDENER,
@@ -42,11 +42,11 @@ import {
   potionTendGarden,
   potionUsesLeft,
   usePotion,
-} from '../master-garden.js?v=ee7655a1';
+} from '../master-garden.js?v=1e4d279f';
 import { rollDropTable } from '../drop-tables.js?v=16e12632';
-import { payDrop } from './drops-feature.js?v=43984e8f';
+import { payDrop } from './drops-feature.js?v=123055bc';
 import { textureFromUrl } from '../textures.js?v=3149d699';
-import { copyFromLedger, keepsCopies, verbCopy } from '../copy-charges.js?v=f94ac7c8';
+import { copyFromLedger, keepsCopies, verbCopy } from '../copy-charges.js?v=737fd334';
 import { gardenGrowModifier } from '../imagination-effects.js?v=70169933';
 
 export const MASTER_GARDEN_FEATURE_ID = 'master-garden';
@@ -127,7 +127,7 @@ function pourFx(engine, potionClass, target) {
   const p = engine.player;
   if (!PIXI || !p || !engine.fxLayer) return null;
   const root = new PIXI.Container();
-  const bottle = new PIXI.Sprite(textureFromUrl(ITEM_CATALOG[potionClass]?.icon || `assets/sprites/icons/${potionClass}.png`));
+  const bottle = new PIXI.Sprite(textureFromUrl(ITEM_CATALOG[potionClass]?.icon || `assets/sprites/icons/${potionClass}.webp`));
   bottle.anchor.set(0.5);
   bottle.x = p.x;
   bottle.y = (p.y || 0) - 135;

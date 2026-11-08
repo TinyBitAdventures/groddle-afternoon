@@ -34,11 +34,11 @@
  *   (rolled with the shared js/drop-tables.js runDropTable).
  */
 
-import { ITEM_CATALOG, ensureItem, getItemUseInfo } from './inventory.js?v=d82f3b00';
+import { ITEM_CATALOG, ensureItem, getItemUseInfo } from './inventory.js?v=b7609342';
 import { DROP_TABLES, applyDropResult, rollDropTable } from './drop-tables.js?v=16e12632';
 import { loseEnergy, loseMood, metabolicGain, moodMax } from './metabolics.js?v=8504134e';
 import { grantMoodXp } from './mood-xp.js?v=958e7680';
-import { musicblockItemMeta } from './musicblocks.js?v=f5adbf0c';
+import { musicblockItemMeta } from './musicblocks.js?v=db6a213b';
 import { isEnchantedForest } from './enchanted-forests.js?v=d986bff5';
 import { isSymphoniousTsid } from './symphonious-maximus.js?v=345ad437';
 import { isMissingFloorTsid } from './hidden-floors.js?v=d49b76df';
@@ -93,7 +93,7 @@ export function ensureHusbandryItems() {
     ensureItem(id, {
       ...meta,
       label: existing?.label && existing.label !== id ? existing.label : meta.label,
-      icon: existing?.icon || `assets/sprites/icons/${id}.png`,
+      icon: existing?.icon || `assets/sprites/icons/${id}.webp`,
     });
   }
 }

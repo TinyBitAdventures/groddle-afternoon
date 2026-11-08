@@ -27,8 +27,8 @@ import {
   projectPlace,
   shareLine,
   statusLine,
-} from '../public/js/projects-tracker.js?v=c508f396';
-import { buildProjectsPanel, needRow, needsSummary, projectCard, renderProjects } from '../public/js/ui/projects-sheet.js?v=0a47858c';
+} from '../public/js/projects-tracker.js?v=f34c5236';
+import { buildProjectsPanel, needRow, needsSummary, projectCard, renderProjects } from '../public/js/ui/projects-sheet.js?v=69f33fa6';
 import { MENU_ROWS } from '../public/js/ui/topbar.js?v=918c8bab';
 import { SIDE_SHEET_IDS } from '../public/js/ui/panel-shell.js?v=e2abdf9e';
 import { hotkeySections, hotkeyText } from '../public/js/client-hotkeys.js?v=1d3b39fe';
@@ -380,7 +380,7 @@ describe('ticket 81 (Friendly, 2026-11-06): each need reads task first, with its
   const labels = {
     item: (c, n = 1) => { const x = ITEMS[c]; return Array.isArray(x) ? x[n === 1 ? 0 : 1] : x || c; },
     skill: (id) => { const m = /^(.*)_(\d+)$/.exec(id); return `${NAMES[m[1]]} ${ROMAN[Number(m[2])]}`; },
-    icon: (c) => `assets/sprites/icons/${c}.png`,
+    icon: (c) => `assets/sprites/icons/${c}.webp`,
   };
   /** Palsa Mosch with its first items in, so bucket 1's work is open and bucket 2's waits on its items. */
   function palsa() {
@@ -404,7 +404,7 @@ describe('ticket 81 (Friendly, 2026-11-06): each need reads task first, with its
     assert.ok(e.needs.some((n) => n.text === 'Contribute Peat · 9 more'), e.needs.map((n) => n.text).join(' | '));
     // Each need has its picture and what is left (the count on the picture), and no mark without a pack to read.
     const pick = e.needs.find((n) => n.text.startsWith('Clear'));
-    assert.equal(pick.icon, 'assets/sprites/icons/pick.png');
+    assert.equal(pick.icon, 'assets/sprites/icons/pick.webp');
     assert.equal(pick.left, 7);
     assert.equal(pick.can, '');
     assert.equal(e.needs.find((n) => n.type === 'item').icon.startsWith('assets/sprites/icons/'), true);
@@ -458,14 +458,14 @@ describe('ticket 81 (Friendly, 2026-11-06): each need reads task first, with its
 
   it('the panel draws each need: picture and count, the words, and the mark in words and a sign', () => {
     const doc = fakeDoc();
-    const row = (n) => needRow(doc, { id: 'r1', type: 'work', open: true, left: 7, icon: 'assets/sprites/icons/pick.png', text: 'Clear with a Pick (Mining IV) · 7 units', can: 'yes', mark: PROJECTS_TEXT.ready, ...n });
+    const row = (n) => needRow(doc, { id: 'r1', type: 'work', open: true, left: 7, icon: 'assets/sprites/icons/pick.webp', text: 'Clear with a Pick (Mining IV) · 7 units', can: 'yes', mark: PROJECTS_TEXT.ready, ...n });
     const yes = row({});
     assert.equal(yes.dataset.need, 'r1');
     assert.equal(yes.dataset.can, 'yes');
     assert.match(yes.className, /\bpj-need\b.*\bis-yes\b/);
     const pic = yes.all((n) => /pj-need-pic/.test(n.className))[0];
     assert.equal(pic.getAttribute('aria-hidden'), 'true');
-    assert.equal(pic.all((n) => n.tagName === 'IMG')[0].getAttribute('src'), 'assets/sprites/icons/pick.png');
+    assert.equal(pic.all((n) => n.tagName === 'IMG')[0].getAttribute('src'), 'assets/sprites/icons/pick.webp');
     assert.equal(pic.all((n) => /pj-need-n/.test(n.className))[0].textContent, '7');
     assert.equal(yes.all((n) => /pj-need-text/.test(n.className))[0].textContent, 'Clear with a Pick (Mining IV) · 7 units');
     assert.match(yes.all((n) => /pj-need-can/.test(n.className))[0].textContent, /^✓ You can do this$/);

@@ -10,6 +10,7 @@
  * LIF5UU8FO3029OK, LUVNIF7Q9KR2382; Area 42 LHF8DDDBTPF3P4U is an instance).
  */
 import { describe, it } from 'node:test';
+import { imageSize } from '../tools/image-size.mjs';
 import assert from 'node:assert/strict';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
@@ -23,7 +24,7 @@ import {
   SWOONERFLY_STATE,
   swoonerflyPlacementGroups,
   swoonerfliesFor,
-} from '../public/js/swoonerflies.js?v=d23403b6';
+} from '../public/js/swoonerflies.js?v=75b61747';
 import { setWildlifeCatalog } from '../public/js/wildlife.js?v=670c3a7f';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -96,18 +97,18 @@ describe('the archived placements', () => {
   it('reuses the fly-rooked sheet Gwendolyn\'s room plays', () => {
     const room = readFileSync(join(pub, 'js/quest-rooms/gwendolyn.js'), 'utf8');
     assert.match(room, /const SWOON_FRAMES = 14; \/\/ npc_butterfly fly-rooked, 70 x 65/);
-    assert.match(room, /\$\{ART\}swoonerfly_fall\.png/);
-    assert.equal(SWOONERFLY_SHEET.path, 'assets/sprites/quest-rooms/gwendolyn/swoonerfly_fall.png');
+    assert.match(room, /\$\{ART\}swoonerfly_fall\.webp/);
+    assert.equal(SWOONERFLY_SHEET.path, 'assets/sprites/quest-rooms/gwendolyn/swoonerfly_fall.webp');
     assert.ok(existsSync(join(pub, SWOONERFLY_SHEET.path)));
     const png = readFileSync(join(pub, SWOONERFLY_SHEET.path));
-    assert.deepEqual([png.readUInt32BE(16), png.readUInt32BE(20)], [SWOONERFLY_SHEET.fw * SWOONERFLY_SHEET.frames, SWOONERFLY_SHEET.fh]);
+    assert.deepEqual([imageSize(png).w, imageSize(png).h], [SWOONERFLY_SHEET.fw * SWOONERFLY_SHEET.frames, SWOONERFLY_SHEET.fh]);
   });
 });
 
 describe('the feature', () => {
   it('is registered and draws one looping, untargetable sprite per objref', async () => {
     assert.match(readFileSync(join(pub, 'js/features/index.js'), 'utf8'), /import \{ swoonerfliesFeature \} from '\.\/swoonerflies-feature\.js\?v=[0-9a-f]{8}'; FEATURES\.push\(swoonerfliesFeature\);/);
-    const { swoonerfliesFeature } = await import('../public/js/features/swoonerflies-feature.js?v=0a54205d');
+    const { swoonerfliesFeature } = await import('../public/js/features/swoonerflies-feature.js?v=39c49118');
     class AnimatedSprite {
       constructor(textures) {
         this.textures = textures;

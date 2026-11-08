@@ -597,7 +597,7 @@ function openLetter(id) {
     att.append(el('h3', {}, T.mailAttached));
     if (r.item) {
       const line = el('p', { class: 'pc-item' });
-      const icon = el('img', { src: `assets/sprites/icons/${encodeURIComponent(r.item.id)}.png`, alt: '', width: '40', height: '40', loading: 'lazy' });
+      const icon = el('img', { src: `assets/sprites/icons/${encodeURIComponent(r.item.id)}.webp`, alt: '', width: '40', height: '40', loading: 'lazy' });
       icon.addEventListener('error', () => icon.remove());
       line.append(icon, el('span', {}, T.mailItem(r.item.count, itemNames?.get(r.item.id) || itemWords(r.item.id))));
       att.append(line);

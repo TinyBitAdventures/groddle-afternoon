@@ -61,7 +61,7 @@
  */
 
 import { createReportsApi, REPORT_PICTURE, REPORT_TEXT, UNREAD_POLL_MS, base64Size, pictureSize, reportFromHash } from '../reports.js?v=61088e97';
-import { mountReportsSheet } from '../ui/reports-sheet.js?v=837df440';
+import { mountReportsSheet } from '../ui/reports-sheet.js?v=0825709f';
 
 export const BUG_REPORT_FEATURE_ID = 'bug-report';
 
@@ -539,7 +539,7 @@ function createSession(engine, errors) {
   // The header icon, beside the mute button (GameHeaderUI.as: the bug icon sat with help in the header).
   // R opens it too (ticket 62, game.js keydown): the key cap in its tooltip, as the bar's other buttons.
   const btn = el('button', { id: 'bug-btn', type: 'button', class: 'chrome-btn mute-btn bug-btn', title: BUG_TEXT.tip, 'aria-label': `${BUG_TEXT.tip} (${REPORT_KEY})`, 'aria-keyshortcuts': REPORT_KEY, 'data-key': REPORT_KEY, 'aria-haspopup': 'dialog', 'data-bug-report-open': '' });
-  btn.append(el('img', { src: 'assets/ui/bug_icon.png', alt: '', width: '23', height: '20' }));
+  btn.append(el('img', { src: 'assets/ui/bug_icon.webp', alt: '', width: '23', height: '20' }));
   const badge = el('span', { class: 'bug-unread hud-badge', 'aria-hidden': 'true', hidden: true, 'data-reports-badge': '' });
   btn.append(badge);
   // The modern bar keeps it in the right pill, before Sound (Mute lives in Sound's popover there).

@@ -34,9 +34,9 @@
  */
 
 import { createTrantState, fruitCapacityAt, resetTrantDay } from './trants.js?v=9c2e8c0f';
-import { ensureWoodTreeState, resetWoodTreeDay } from './woodcutting.js?v=c199dd64';
-import { canUseTool, useToolCondition } from './tools.js?v=f701b241';
-import { musicblockItemMeta } from './musicblocks.js?v=f5adbf0c';
+import { ensureWoodTreeState, resetWoodTreeDay } from './woodcutting.js?v=4fd0342b';
+import { canUseTool, useToolCondition } from './tools.js?v=d8aa3536';
+import { musicblockItemMeta } from './musicblocks.js?v=db6a213b';
 import { grantMoodXp } from './mood-xp.js?v=958e7680';
 import { metabolicGain, loseEnergy } from './metabolics.js?v=8504134e';
 
@@ -1217,19 +1217,19 @@ export function plotStatusLabel(plot, now = Date.now()) {
 
 /** Sprite file for a plot stage (trees are drawn from the shared trant frames). */
 export function plotArtPath(plot) {
-  if (!plot) return `${SOIL_SPRITE_ROOT}/patch-dirty.png`;
-  if (plot.stage === 'dead') return `${SOIL_SPRITE_ROOT}/${plot.deadClass.replace(/_/g, '-')}.png`;
-  if (plot.stage === 'seedling') return `${SOIL_SPRITE_ROOT}/patch-seedling.png`;
+  if (!plot) return `${SOIL_SPRITE_ROOT}/patch-dirty.webp`;
+  if (plot.stage === 'dead') return `${SOIL_SPRITE_ROOT}/${plot.deadClass.replace(/_/g, '-')}.webp`;
+  if (plot.stage === 'seedling') return `${SOIL_SPRITE_ROOT}/patch-seedling.webp`;
   const prefix = plot.kind === 'patch_dark' ? 'patch-dark' : 'patch';
   const stage = plot.stage === 'clean' || plot.stage === 'dug' ? plot.stage : 'dirty';
-  return `${SOIL_SPRITE_ROOT}/${prefix}-${stage}.png`;
+  return `${SOIL_SPRITE_ROOT}/${prefix}-${stage}.webp`;
 }
 
 export function soilSpritePaths() {
   const out = new Set();
-  for (const kind of ['patch', 'patch-dark']) for (const stage of ['dirty', 'clean', 'dug']) out.add(`${SOIL_SPRITE_ROOT}/${kind}-${stage}.png`);
-  out.add(`${SOIL_SPRITE_ROOT}/patch-seedling.png`);
-  for (const dead of DEAD_TRANT_CLASSES) out.add(`${SOIL_SPRITE_ROOT}/${dead.replace(/_/g, '-')}.png`);
+  for (const kind of ['patch', 'patch-dark']) for (const stage of ['dirty', 'clean', 'dug']) out.add(`${SOIL_SPRITE_ROOT}/${kind}-${stage}.webp`);
+  out.add(`${SOIL_SPRITE_ROOT}/patch-seedling.webp`);
+  for (const dead of DEAD_TRANT_CLASSES) out.add(`${SOIL_SPRITE_ROOT}/${dead.replace(/_/g, '-')}.webp`);
   return [...out];
 }
 

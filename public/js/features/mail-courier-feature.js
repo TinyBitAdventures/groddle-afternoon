@@ -82,11 +82,11 @@
  *   mailParcels, mailCourierLast, mailCourierDelivered, mailCourierAutoplay.
  */
 
-import { ITEM_CATALOG, itemIcon } from '../inventory.js?v=d82f3b00';
+import { ITEM_CATALOG, itemIcon } from '../inventory.js?v=b7609342';
 import { frameTexture, sourceFromUrl } from '../textures.js?v=3149d699';
-import { questRoomConverse } from './quest-instances-feature.js?v=90e5b2fd';
-import { hellFeature } from './hell-feature.js?v=13196575';
-import { DISPATCHER_ART, FROG_ART, MAIL_NPC_ART_DIR } from '../mail-npc-art.js?v=031c4e2e';
+import { questRoomConverse } from './quest-instances-feature.js?v=f6015246';
+import { hellFeature } from './hell-feature.js?v=93f1c8dd';
+import { DISPATCHER_ART, FROG_ART, MAIL_NPC_ART_DIR } from '../mail-npc-art.js?v=1ed97a5d';
 import { DISPATCHER_GAP, DISPATCHER_HALF, SIGNPOST } from '../home-street-fixtures.js?v=badcb725';
 import { MAIL_POST_SENDER } from '../mailbox.js?v=a3e833ba';
 import {
@@ -113,8 +113,8 @@ import {
   sendCarriedToMailbox,
   sendDueToMailbox,
 } from '../mail-courier.js?v=68125101';
-import { AUCTION_SENDER, mailSubject, mailText } from '../auctions.js?v=9684e995';
-import { formatStack } from '../gifts.js?v=4a01ff13';
+import { AUCTION_SENDER, mailSubject, mailText } from '../auctions.js?v=4fe3e230';
+import { formatStack } from '../gifts.js?v=89f09eba';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
 
 export const MAIL_COURIER_FEATURE_ID = 'mail-courier';
@@ -170,7 +170,7 @@ function frogFrames(engine, variant, box, label) {
   const [cols, count] = FROG_ART.sheets[label];
   const { PIXI } = engine;
   const files = FROG_ART.variants?.[variant] || FROG_ART.files;
-  const base = sourceFromUrl(`${MAIL_NPC_ART_DIR}${files[box ? 'box' : 'none']}${label}.png`);
+  const base = sourceFromUrl(`${MAIL_NPC_ART_DIR}${files[box ? 'box' : 'none']}${label}.webp`);
   const list = [];
   for (let i = 0; i < count; i += 1) {
     list.push(frameTexture(base, new PIXI.Rectangle((i % cols) * FROG_ART.cell.w, Math.floor(i / cols) * FROG_ART.cell.h, FROG_ART.cell.w, FROG_ART.cell.h)));

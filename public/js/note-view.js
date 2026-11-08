@@ -33,7 +33,7 @@ const CSS = `
 .note-view textarea { min-height: 9rem; resize: vertical; line-height: var(--lh-loose); }
 .note-view label { display: block; font-size: var(--fs-sm); color: var(--c-gold-59); margin: 0.45rem 0 0.2rem; }
 .note-view .note-count { font-size: var(--fs-sm); color: var(--c-gold-69); text-align: right; }
-.note-view .board-card { background: var(--c-gold-73b) url('assets/sprites/street-furniture/notice-board-m0.png') center / cover; border: 10px solid var(--c-gold-80); border-radius: var(--radius-sm); box-shadow: var(--shadow-4); width: min(600px, 94vw); max-height: min(78vh, 640px); overflow: auto; padding: 0.8rem; }
+.note-view .board-card { background: var(--c-gold-73b) url('assets/sprites/street-furniture/notice-board-m0.webp') center / cover; border: 10px solid var(--c-gold-80); border-radius: var(--radius-sm); box-shadow: var(--shadow-4); width: min(600px, 94vw); max-height: min(78vh, 640px); overflow: auto; padding: 0.8rem; }
 .note-view .board-head { display: flex; justify-content: space-between; align-items: center; gap: var(--sp-4); background: color-mix(in srgb, var(--surface-card) 92%, transparent); border-radius: var(--radius-sm); padding: 0.45rem 0.7rem; margin-bottom: var(--sp-5); }
 .note-view .board-head h2 { margin: 0; font-size: var(--fs-lg); }
 .note-view .board-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: var(--sp-5); }

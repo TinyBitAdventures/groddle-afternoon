@@ -42,7 +42,7 @@
  */
 
 import { locationEventsApi } from './location-events-feature.js?v=0966e395';
-import { collectQuoin, QUOIN_SHEET, QUOIN_TYPES } from '../quoins.js?v=f154a79e';
+import { collectQuoin, QUOIN_SHEET, QUOIN_TYPES } from '../quoins.js?v=299cc3f4';
 import {
   PUZZLE_DATA_URL,
   SOURCE_PHYSICS,
@@ -214,7 +214,7 @@ const ART_BASE = 'assets/sprites/puzzles/';
 function spawnArt(engine, def) {
   const { PIXI } = engine;
   for (const a of def.art || []) {
-    const spr = new PIXI.Sprite(textureFromUrl(`${ART_BASE}${a.sprite}.png`));
+    const spr = new PIXI.Sprite(textureFromUrl(`${ART_BASE}${a.sprite}.webp`));
     spr.anchor.set(0.5, 1);
     spr.x = a.x;
     spr.y = a.y;

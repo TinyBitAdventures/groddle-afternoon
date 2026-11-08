@@ -99,8 +99,8 @@
  *       (=restorehold stops on the proto, =restoreaward on the award)
  */
 
-import { countItem, ensureItem, ITEM_CATALOG, removeItem } from '../inventory.js?v=d82f3b00';
-import { pickupCountTitle } from '../world-items.js?v=6378e71c';
+import { countItem, ensureItem, ITEM_CATALOG, removeItem } from '../inventory.js?v=b7609342';
+import { pickupCountTitle } from '../world-items.js?v=0bbfdab9';
 import { createCountChooser } from '../ui/count-chooser.js?v=5bc894c8';
 import { isBagClass } from '../pack-slots.js?v=a94b816c';
 import { createCombobox } from '../combobox.js?v=d43209e8';
@@ -108,7 +108,7 @@ import {
   CULTIVATION_CLASSES,
   FURNITURE_CATALOG,
   FURNITURE_STORE,
-} from '../homes-catalog.js?v=7aa9beb0';
+} from '../homes-catalog.js?v=10ac34b6';
 import {
   INTERIOR,
   arrangeStarterRoom,
@@ -147,7 +147,7 @@ import {
   textureConfig,
   unexpandInterior,
   UNEXPAND_TEXT,
-} from '../home-decor.js?v=6735c85f';
+} from '../home-decor.js?v=f9b0e3dc';
 import { isTrophyDecor, placedTrophies } from '../home-trophies.js?v=21c2add6';
 import { applyBonusUpgrade, applyUpgrade, bonusUpgradeLine, currantsText, hasUpgrades, pieceLabel, rollBonusUpgrade, upgradeVerb, UPGRADE_TEXT } from '../furniture-upgrades.js?v=a3788c0d';
 import { LONG_PRESS_MS, LONG_PRESS_SLOP, ECHO_MS, createContextMenu } from '../ui/context-menu.js?v=79326483';
@@ -170,7 +170,7 @@ import {
   swatchFilters,
   trayFilters,
 } from '../ui/home-builder.js?v=90f759e8';
-import { RECIPE_CATALOG } from '../making.js?v=c9dc233e';
+import { RECIPE_CATALOG } from '../making.js?v=f4f214c2';
 import {
   createBackYardState,
   fixtureObstacles,
@@ -201,20 +201,20 @@ import {
   quoteYardExpansion,
   removeCultivation,
   towerItem,
-} from '../home-cultivation.js?v=c650eed1';
+} from '../home-cultivation.js?v=42ae453c';
 import { PROTO_DEPLETED_ART } from '../home-proto-art.js?v=9309e9f3';
 import { MOVABLE_FIXTURES, MOVABLE_FIXTURE_IDS, fixtureFits, fixtureText, savedFixtureRx, signpostX } from '../home-street-fixtures.js?v=badcb725';
 import { displayTopOf, itemstackOverlayPoint, overlayAlpha, overlayLifeMs, playPoofIn, trackOverlay } from '../overlay-art.js?v=11b6dd7f';
-import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=d77b0b8b';
+import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=b764884b';
 import { fadeInNewNear } from '../poof-fade.js?v=54ef2431';
-import { projectApi } from './street-jobs-feature.js?v=ef527fbb';
+import { projectApi } from './street-jobs-feature.js?v=25e52041';
 import { TOWER_CHASSIS, TOWER_CONFIG, TOWER_DOOR_DX, TOWER_GEO, TOWER_PROTO, normalizeTowerState } from '../home-tower.js?v=087df38f';
-import { drawTowerElevator, drawTowerExit, towerApi, visitorTowerView } from './home-tower-feature.js?v=2b2cd1df';
+import { drawTowerElevator, drawTowerExit, towerApi, visitorTowerView } from './home-tower-feature.js?v=ebbc41b4';
 import { pieceUrl, roomPieces, surfaceAt, swatchPiece, wallTargetAt } from '../home-wallpaper.js?v=f1969400';
 import { wantsHiresDecos } from '../deco-hires.js?v=cb905e17';
-import { resourceNodesFeature } from './resource-nodes-feature.js?v=11e86f91';
-import { patchesFeature } from './patches-feature.js?v=c0adb8fb';
-import { GROWN_TREE_LABELS, createPlot, growTree, plotLabel } from '../patches.js?v=8af384ac';
+import { resourceNodesFeature } from './resource-nodes-feature.js?v=ed64e23a';
+import { patchesFeature } from './patches-feature.js?v=f3e88dee';
+import { GROWN_TREE_LABELS, createPlot, growTree, plotLabel } from '../patches.js?v=aa83d5ad';
 import { WOTD_DEPLETE_MS, WOTD_TEXT, nearestPourTarget, pourButton, pourConditions, pourConfirmText } from '../wine-pour.js?v=6daa23a7';
 import { WOTD_TOOL, pourApproach, pourDropTip } from '../wine-pour-fx.js?v=364e22d2';
 import { XP_FOR_LEVEL } from '../progression.js?v=33462eaa';
@@ -236,8 +236,8 @@ import {
 } from '../home-styles.js?v=1a7a2798';
 import { frameTexture, isLoaded, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js?v=3149d699';
 import { FALLBACK_MAX as WORLD_ART_FALLBACK_MAX, worldArtFor } from '../world-art.js?v=df476660';
-import { oneArmSignpost } from '../street-render.js?v=9eded3c1';
-import { ROCK_CATALOG } from '../mining.js?v=29fe2127';
+import { oneArmSignpost } from '../street-render.js?v=81416f4f';
+import { ROCK_CATALOG } from '../mining.js?v=fc28670f';
 import {
   HOUSE_SIGN,
   IMG_BUBBLE_MS,
@@ -253,9 +253,9 @@ import {
   readHowto,
   rockVerbs,
   ROCK_VERB_IDS,
-} from '../magic-rock-home.js?v=39921139';
+} from '../magic-rock-home.js?v=c07b2327';
 import { getGameDayKey } from '../game-day.js?v=edb00566';
-import { HOME_TICKET, HOME_TICKET_CLASS } from '../home-ticket.js?v=ee7ea52a';
+import { HOME_TICKET, HOME_TICKET_CLASS } from '../home-ticket.js?v=d5a36577';
 import { MIN_GROUND_CLEARANCE, yCamOffsetAnchor } from '../movement.js?v=b30f84eb';
 import { takeFromHouse } from '../ledger-house.js?v=b34f5c89';
 import { storagePickupLock } from '../home-storage.js?v=121f1897';
@@ -280,7 +280,7 @@ import {
   quoteHouseExpansion,
   quoteHouseUnexpand,
   unexpandHouseFloors,
-} from '../home-floors.js?v=039bb1b0';
+} from '../home-floors.js?v=a3d3e677';
 
 export const HOMES_FEATURE_ID = 'homes';
 const HOME_STREET_TSID = 'RH_HOME_EXT';
@@ -1073,7 +1073,7 @@ const YARD_ROCK = Object.freeze({ dx: -29 });
  * (magic_rock.js `if (this.container.is_newxp) return {state: null}`).
  */
 const STREET_ROCK = Object.freeze({ dx: 221 });
-const ROCK_SHEET = Object.freeze({ file: 'assets/sprites/newxp/rock_read.png', cols: 9, rows: 2, count: 18, cellW: 75, cropY: 262, cropH: 74, footX: 27, footY: 329 });
+const ROCK_SHEET = Object.freeze({ file: 'assets/sprites/newxp/rock_read.webp', cols: 9, rows: 2, count: 18, cellW: 75, cropY: 262, cropH: 74, footX: 27, footY: 329 });
 
 function spawnRock(engine, x, groundY, room) {
   const { PIXI } = engine;
@@ -2103,8 +2103,8 @@ function spawnStreetTargets(engine) {
   const bg = scene?.background;
   const unread = Number(engine.homeContext?.().unread) || 0;
   const mailbox = new PIXI.Sprite(textureFromUrl(unread > 0
-    ? 'assets/sprites/mailbox/npc_mailbox_variant_mailboxRight_x1_has_mail_idle_png_1354832230.png'
-    : 'assets/sprites/mailbox/npc_mailbox_variant_mailboxRight_x1_idle_png_1354832227.png'));
+    ? 'assets/sprites/mailbox/npc_mailbox_variant_mailboxRight_x1_has_mail_idle_png_1354832230.webp'
+    : 'assets/sprites/mailbox/npc_mailbox_variant_mailboxRight_x1_idle_png_1354832227.webp'));
   mailbox.anchor.set(0.5, 1);
   // PORCH: where you moved it, else the house's sign corner.
   mailbox.x = Math.round(fixtureWorldX('mailbox') ?? bg?.houseSignX ?? layout.houseX - 260);
@@ -2207,7 +2207,7 @@ function furnitureView(PIXI, item) {
     }
   }
   if (item.display?.classTsid) {
-    const icon = new PIXI.Sprite(textureFromUrl(ITEM_CATALOG[item.display.classTsid]?.icon || `assets/sprites/icons/${item.display.classTsid}.png`));
+    const icon = new PIXI.Sprite(textureFromUrl(ITEM_CATALOG[item.display.classTsid]?.icon || `assets/sprites/icons/${item.display.classTsid}.webp`));
     icon.anchor.set(0.5);
     icon.width = 34;
     icon.height = 34;
@@ -2412,7 +2412,7 @@ function spawnCultivations(engine, st = activeCult()) {
     const def = cultivationDef(item.protoClass);
     if (!def.art) continue;
     const art = POD_ART[def.art];
-    const spr = new PIXI.Sprite(textureFromUrl(`assets/sprites/cultivation/${def.art}.png`));
+    const spr = new PIXI.Sprite(textureFromUrl(`assets/sprites/cultivation/${def.art}.webp`));
     spr.anchor.set(0.5, 1);
     spr.x = cultivationWorldX(item, st);
     spr.y = groundY + 6;
@@ -3611,7 +3611,7 @@ function furnitureTray(engine) {
       const where = `${row.stored ? `${row.stored} in storage` : ''}${row.stored && row.packed ? ', ' : ''}${row.packed ? `${row.packed} in pack` : ''}`;
       return {
         // G358: an upgraded piece in storage shows its own art.
-        img: row.upgradeId ? pieceArt(row.classTsid, row.upgradeId).path : `assets/sprites/icons/${row.classTsid}.png`,
+        img: row.upgradeId ? pieceArt(row.classTsid, row.upgradeId).path : `assets/sprites/icons/${row.classTsid}.webp`,
         label: row.label,
         count: row.total,
         on,
@@ -4134,7 +4134,7 @@ function cultivationPop(engine) {
 export function cultivationIcon(protoClass) {
   const def = cultivationDef(protoClass);
   if (def?.kind === 'tower') return 'assets/sprites/home-tower/proto_3.webp';
-  return `assets/sprites/icons/${protoClass}.png`;
+  return `assets/sprites/icons/${protoClass}.webp`;
 }
 
 // ---------------------------------------------------------------------------
@@ -5051,7 +5051,7 @@ function drawPackMarker(engine, target, what = packDrag) {
   const g = new PIXI.Container();
   g.zIndex = 95;
   // The stack as it will lie there (js/world-art.js: its count's state at its own size).
-  const iconUrl = ITEM_CATALOG[what.classTsid]?.icon || `assets/sprites/icons/${what.classTsid}.png`;
+  const iconUrl = ITEM_CATALOG[what.classTsid]?.icon || `assets/sprites/icons/${what.classTsid}.webp`;
   const art = worldArtFor(what.classTsid, what.count, iconUrl);
   const icon = new PIXI.Sprite(textureFromUrl(art?.url || iconUrl));
   icon.anchor.set(0.5, 1);
@@ -5182,7 +5182,7 @@ function stackRow(engine, id) {
 
 /** A stack's drawn box in world px (js/world-art.js: its art at its own size, bottom centre on its point). */
 function stackBox(row) {
-  const iconUrl = ITEM_CATALOG[row.classTsid]?.icon || `assets/sprites/icons/${row.classTsid}.png`;
+  const iconUrl = ITEM_CATALOG[row.classTsid]?.icon || `assets/sprites/icons/${row.classTsid}.webp`;
   const art = worldArtFor(row.classTsid, row.count, iconUrl);
   const w = art?.w || WORLD_ART_FALLBACK_MAX;
   const h = art?.h || WORLD_ART_FALLBACK_MAX;
@@ -6617,7 +6617,7 @@ function drawVisitorYard(engine, st, groundY, houseX, opts = {}) {
     }
     if (def.art && POD_ART[def.art]) {
       const art = POD_ART[def.art];
-      const spr = new PIXI.Sprite(textureFromUrl(`assets/sprites/cultivation/${def.art}.png`));
+      const spr = new PIXI.Sprite(textureFromUrl(`assets/sprites/cultivation/${def.art}.webp`));
       spr.anchor.set(0.5, 1);
       spr.x = x;
       spr.y = groundY + 6;
@@ -6745,7 +6745,7 @@ export function visitorHomeScene(engine, view = {}, room = 'street', opts = {}) 
       doorX: background.houseDoorX,
       populate(eng) {
         const { PIXI } = eng;
-        const mailbox = new PIXI.Sprite(textureFromUrl('assets/sprites/mailbox/npc_mailbox_variant_mailboxRight_x1_idle_png_1354832227.png'));
+        const mailbox = new PIXI.Sprite(textureFromUrl('assets/sprites/mailbox/npc_mailbox_variant_mailboxRight_x1_idle_png_1354832227.webp'));
         mailbox.anchor.set(0.5, 1);
         // PORCH: where the owner moved it (their street's cultivation state), else the house's sign corner.
         const usual = Math.round(background.houseSignX ?? layout.houseX - 260);
@@ -6955,7 +6955,7 @@ function registerDoorJob(engine) {
       kindLabel: 'Home Project',
       // players/inc_jobs.js:471 says every type 5 job in a house (not is_public) is "in your yard".
       place: 'in your yard',
-      iconUrl: 'assets/sprites/icons/furniture_door.png',
+      iconUrl: 'assets/sprites/icons/furniture_door.webp',
       note: `When it is done your house has ${floorCount(floors) + 1} floors.`,
       target: () => (engine.interactables || []).find((t) => t.classId === DOOR_CLASS && t.state?.doorId === floors.pending?.id) || null,
       onDone: (eng) => finishFloor(eng, jobId),

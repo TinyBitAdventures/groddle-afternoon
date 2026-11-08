@@ -60,7 +60,7 @@ test('client ships original clean art, map teleportation, rescue verbs, and QA r
   const game = fs.readFileSync(path.join(publicDir, 'game.js'), 'utf8');
   const content = fs.readFileSync(path.join(publicDir, 'content.js'), 'utf8');
   const css = fs.readFileSync(path.join(publicDir, 'style.css'), 'utf8');
-  for (const file of ['jones-walk.png', 'jones-look.png', 'hogtied-jones.png']) {
+  for (const file of ['jones-walk.webp', 'jones-look.webp', 'hogtied-jones.webp']) {
     assert.equal(
       fs.existsSync(path.join(publicDir, 'assets', 'sprites', 'quests', 'ilmenskie', file)),
       true

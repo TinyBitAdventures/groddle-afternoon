@@ -47,10 +47,10 @@ describe('the Project page (tools/project/to-minn.mjs)', () => {
   it('wears a Tiny Speck icon on each card from the game\'s own CC0 icons (the site\'s style.css)', { skip: skipWithoutSite }, () => {
     const css = readFileSync(sitePath('style.css'), 'utf8');
     for (const c of CARDS) {
-      const rule = css.match(new RegExp(`\\.pj-card-${c.id} \\{[^}]*--pj-icon: url\\("/assets/sprites/icons/([a-z0-9_]+)@3x\\.png"\\)`));
+      const rule = css.match(new RegExp(`\\.pj-card-${c.id} \\{[^}]*--pj-icon: url\\("/assets/sprites/icons/([a-z0-9_]+)@3x\\.webp"\\)`));
       assert.ok(rule, `${c.id} has an icon`);
       assert.equal(rule[1], c.icon, c.id);
-      assert.ok(existsSync(join(root, `public/assets/sprites/icons/${c.icon}@3x.png`)), c.icon);
+      assert.ok(existsSync(join(root, `public/assets/sprites/icons/${c.icon}@3x.webp`)), c.icon);
     }
     assert.match(css, /\.pj-card-title a::after \{ content: ""; position: absolute; inset: 0;/, 'the whole card is the link');
   });

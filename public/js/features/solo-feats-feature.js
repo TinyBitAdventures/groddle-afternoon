@@ -85,7 +85,7 @@
  *   server message), mpFeatRewards (ids applied); window.groddleFeats (QA).
  */
 
-import { addItem } from '../inventory.js?v=d82f3b00';
+import { addItem } from '../inventory.js?v=b7609342';
 import { GAME_DAY_MS, getGameDayKey } from '../game-day.js?v=edb00566';
 import {
   CAP_OWNERS,
@@ -118,7 +118,7 @@ import {
 import { saveStore } from '../save-store.js?v=8839ba7b';
 import { gainMetabolic } from '../metabolics.js?v=8504134e';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
-import { GIANTS } from '../shrines.js?v=95d74174';
+import { GIANTS } from '../shrines.js?v=1a945fe7';
 import {
   MP_TEXT,
   endedLine,
@@ -138,7 +138,7 @@ import {
 const POLL_MS = 500;
 /** How often an open panel redraws its "Opens again in" lines. */
 const COUNTDOWN_MS = 30_000;
-const ROCK_ICON = 'assets/sprites/icons/petrified_rock_small@3x.png';
+const ROCK_ICON = 'assets/sprites/icons/petrified_rock_small@3x.webp';
 /** Archived street TSIDs (assets/streets/index.json): homes, neighbours and instances use other ids. */
 const REAL_STREET = /^G[A-Z0-9]{12,14}$/;
 
@@ -537,9 +537,9 @@ function applyDemo(engine) {
 
 const BLOCKED_SAVES = new Set(['conflict', 'elsewhere', 'signed-out', 'error', 'offline']);
 const ROCK_ICONS = Object.freeze({
-  petrified_rock_small: 'assets/sprites/icons/petrified_rock_small@3x.png',
-  petrified_rock_medium: 'assets/sprites/icons/petrified_rock_medium@3x.png',
-  petrified_rock_large: 'assets/sprites/icons/petrified_rock_large@3x.png',
+  petrified_rock_small: 'assets/sprites/icons/petrified_rock_small@3x.webp',
+  petrified_rock_medium: 'assets/sprites/icons/petrified_rock_medium@3x.webp',
+  petrified_rock_large: 'assets/sprites/icons/petrified_rock_large@3x.webp',
 });
 
 /** Writes the save now and waits for it to land (as street-jobs-feature persist): true once saved. */

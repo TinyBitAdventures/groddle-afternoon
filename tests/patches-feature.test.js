@@ -13,9 +13,9 @@ import {
   trantFrameStage,
   treeFrameUrl,
   patchesFeature,
-} from '../public/js/features/patches-feature.js?v=c0adb8fb';
-import { FEATURES } from '../public/js/features/index.js?v=b4df516e';
-import { soilSpritePaths } from '../public/js/patches.js?v=8af384ac';
+} from '../public/js/features/patches-feature.js?v=f3e88dee';
+import { FEATURES } from '../public/js/features/index.js?v=d9128cb3';
+import { soilSpritePaths } from '../public/js/patches.js?v=aa83d5ad';
 
 const ecology = JSON.parse(await readFile(new URL('../public/assets/content/street-ecology.json', import.meta.url), 'utf8'));
 
@@ -91,7 +91,7 @@ describe('patches feature wiring', () => {
     assert.equal(trantFrameStage(2), 1);
     assert.equal(trantFrameStage(4), 3);
     assert.equal(trantFrameStage(9), 10);
-    assert.equal(treeFrameUrl('trant_bean', 6), 'assets/sprites/trants/frames/trant_bean_m5.png?v=all-species-cell-2');
+    assert.equal(treeFrameUrl('trant_bean', 6), 'assets/sprites/trants/frames/trant_bean_m5.webp?v=all-species-cell-2');
   });
 
   it('the demo kit carries tools and beans, including one that will not grow in Groddle', () => {
@@ -106,7 +106,7 @@ describe('patches feature wiring', () => {
 
   it('every soil sprite the feature loads ships in the repo', async () => {
     const { access } = await import('node:fs/promises');
-    for (const path of [...soilSpritePaths(), 'assets/sprites/soil/hoe-tool.png', 'assets/sprites/soil/shovel-tool.png']) {
+    for (const path of [...soilSpritePaths(), 'assets/sprites/soil/hoe-tool.webp', 'assets/sprites/soil/shovel-tool.webp']) {
       await access(new URL(`../public/${path}`, import.meta.url));
     }
   });

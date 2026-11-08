@@ -7,10 +7,10 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 
 import { createFeatureHost } from '../public/js/feature-host.js?v=127e0a3c';
-import { createInventory, countItem } from '../public/js/inventory.js?v=d82f3b00';
-import { bindToolInventory, createToolConditionState } from '../public/js/tools.js?v=f701b241';
-import { meditationFeature } from '../public/js/features/meditation-feature.js?v=fb3d2d4c';
-import { teleportationFeature } from '../public/js/features/teleportation-feature.js?v=8a9ee900';
+import { createInventory, countItem } from '../public/js/inventory.js?v=b7609342';
+import { bindToolInventory, createToolConditionState } from '../public/js/tools.js?v=d8aa3536';
+import { meditationFeature } from '../public/js/features/meditation-feature.js?v=50bf1ac0';
+import { teleportationFeature } from '../public/js/features/teleportation-feature.js?v=23270f4f';
 
 function fakeEngine(overrides = {}) {
   const toasts = [];

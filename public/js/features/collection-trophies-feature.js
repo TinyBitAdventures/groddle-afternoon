@@ -8,7 +8,7 @@
  * QA: ?autostart=1&fresh=1&resetgame=1&questoffer=off&collectiondemo=collection_gems[,<badge>] packs
  *   one of each thing the badge asks for. Canvas: collectionTrophies (the badges settled).
  */
-import { addItem, countItem, ensureItem } from '../inventory.js?v=d82f3b00';
+import { addItem, countItem, ensureItem } from '../inventory.js?v=b7609342';
 import { getAchievementCatalog } from '../content-catalogs.js?v=10b118dd';
 import { COLLECTION_TROPHIES, COUNTED_ON_ARRIVAL, HELD_AT_ONCE, collectionClasses, heldChanges, planCollectionTrophies } from '../collection-trophies.js?v=69205984';
 

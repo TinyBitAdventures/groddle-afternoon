@@ -8,7 +8,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { HELL_TEXT, checkLowEnergyWarning, createHellState } from '../public/js/hell.js?v=aca145ba';
+import { HELL_TEXT, checkLowEnergyWarning, createHellState } from '../public/js/hell.js?v=ca971c34';
 
 const root = join(import.meta.dirname, '..', 'public');
 const read = (p) => readFileSync(join(root, p), 'utf8');
@@ -36,7 +36,7 @@ describe('walking at 0 energy (ticket 45)', () => {
 
 describe('Pooped says why you did not croak again (ticket 44)', () => {
   it('Pooped and Super Pooped carry the You Croaked ending, in the strip and the Buffs panel', async () => {
-    const { POOPED_EXPLAINED, hellBuffDesc } = await import('../public/js/hell.js?v=aca145ba');
+    const { POOPED_EXPLAINED, hellBuffDesc } = await import('../public/js/hell.js?v=ca971c34');
     assert.ok(POOPED_EXPLAINED.startsWith('You can only croak once a day'));
     assert.equal(hellBuffDesc('pooped', 'You are seriously pooped! You need energy to get out of it'),
       `You are seriously pooped! You need energy to get out of it. ${POOPED_EXPLAINED}`);

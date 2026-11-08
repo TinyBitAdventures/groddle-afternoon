@@ -10,7 +10,7 @@ import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { homedir } from 'node:os';
 
-import * as kit from '../public/js/quest-rooms/kit.js?v=d98b987e';
+import * as kit from '../public/js/quest-rooms/kit.js?v=25fc6d59';
 import {
   BARS_X,
   DIG_COUNTER,
@@ -33,7 +33,7 @@ import {
   cellStep,
   hasWorkingTool,
   room,
-} from '../public/js/quest-rooms/penalty.js?v=1f688134';
+} from '../public/js/quest-rooms/penalty.js?v=90d655c9';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const GSJS = join(homedir(), 'Documents/glitch-audit/glitch-GameServerJS');
@@ -76,7 +76,7 @@ describe('Smuggle the Smuggler source', () => {
     for (const m of src.matchAll(/kit\.deco\(PIXI, '([a-z0-9_]+)'/g)) {
       assert.ok(existsSync(join(root, 'public/assets/decos/groddle', `${m[1]}.webp`)), m[1]);
     }
-    for (const f of ['patch-dark-dirty.png', 'patch-dark-dug.png']) assert.ok(existsSync(join(root, 'public/assets/sprites/soil', f)));
+    for (const f of ['patch-dark-dirty.webp', 'patch-dark-dug.webp']) assert.ok(existsSync(join(root, 'public/assets/sprites/soil', f)));
   });
 
   it("draws the Snap's grassy ledge under the floor and the trunk behind the bars, not a drawn fill", () => {

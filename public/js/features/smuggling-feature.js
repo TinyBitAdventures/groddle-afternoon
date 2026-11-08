@@ -36,16 +36,16 @@
  *     smugDeim, smugLast, smugCounts, smugAutoplay.
  */
 
-import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=d82f3b00';
-import { canUseTool } from '../tools.js?v=f701b241';
-import { acceptOffer, ensureQuestOfferState, turnInQuest } from '../quest-offers.js?v=486b09c9';
+import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=b7609342';
+import { canUseTool } from '../tools.js?v=d8aa3536';
+import { acceptOffer, ensureQuestOfferState, turnInQuest } from '../quest-offers.js?v=e31115ea';
 import { parseQuestConversation } from '../quests.js?v=c8d9d0a4';
 import { getQuestCatalog } from '../content-catalogs.js?v=10b118dd';
 import { STREET_INDEX, resolveIndexTsid } from '../street-loader.js?v=33d2b8bc';
 import { isStandable, worldToScreen } from '../street-model.js?v=505d8990';
 import { landingY, walkSurfaceY } from '../walk-surface.js?v=c982983e';
-import { hellFeature } from './hell-feature.js?v=13196575';
-import { questRoomConverse } from './quest-instances-feature.js?v=90e5b2fd';
+import { hellFeature } from './hell-feature.js?v=93f1c8dd';
+import { questRoomConverse } from './quest-instances-feature.js?v=f6015246';
 import {
   CONTRABAND,
   CONTRABAND_ITEM,
@@ -424,7 +424,7 @@ function renderHud(engine) {
     offPath: Boolean(graph) && !arrived && !path,
   });
   hud.style.display = 'grid';
-  hud.innerHTML = `<img src="assets/sprites/icons/contraband.png" alt="" style="width:30px;height:auto" />
+  hud.innerHTML = `<img src="assets/sprites/icons/contraband.webp" alt="" style="width:30px;height:auto" />
     <div><strong style="display:block;font-size:.8rem">${TEXT.buffName}</strong><span style="font-size:.74rem;line-height:1.25;display:block">${text}</span></div>`;
 }
 
@@ -446,7 +446,7 @@ function mapRouteCard(engine) {
   }
   return {
     source: 'smuggling',
-    icon: 'assets/sprites/icons/contraband.png',
+    icon: 'assets/sprites/icons/contraband.webp',
     title: `Contraband destination: ${streetLabel(dest)}${hub.hubName ? ` (${hub.hubName})` : ''}`,
     text: routeText,
     destination: dest,
@@ -886,7 +886,7 @@ function caught(engine) {
   engine.pushActivity?.(TEXT.caught);
   engine.playSound?.('DEIMAGINATOR_TAKES_BOX', { volume: 0.7 });
   // The box lands at its feet and is gone 2 s later (onDropped).
-  const box = new engine.PIXI.Sprite(textureFromUrl('assets/sprites/icons/contraband.png'));
+  const box = new engine.PIXI.Sprite(textureFromUrl('assets/sprites/icons/contraband.webp'));
   box.anchor.set(0.5, 1);
   box.x = deim.x;
   box.y = deim.y;

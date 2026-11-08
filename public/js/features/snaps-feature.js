@@ -38,7 +38,7 @@
  */
 
 import { createMinnAccount } from '../minn-account.js?v=ba6a13c5';
-import { ITEM_CATALOG, countItem, ensureItem, itemIcon } from '../inventory.js?v=d82f3b00';
+import { ITEM_CATALOG, countItem, ensureItem, itemIcon } from '../inventory.js?v=b7609342';
 import { STREET_INDEX, resolveIndexTsid } from '../street-loader.js?v=33d2b8bc';
 import {
   CAMERA_CLASS, CAPTION_MAX, FORGET_RECHARGE_SEC, RECHARGE_BUFF, SNAP_COPY as T, SNAP_MAX_BYTES, SNAP_QUALITY, SNAP_WIDTHS, TRAVEL,
@@ -222,7 +222,7 @@ function drawSnap(engine) {
 /* Filters (js/snap-filters.js)                                          */
 /* ------------------------------------------------------------------ */
 
-const FILTER_THUMB = 'assets/ui/snaps/filter-thumb.png';
+const FILTER_THUMB = 'assets/ui/snaps/filter-thumb.webp';
 /** FilterThumbnailView.as: the thumbnail is filtered at 300 px (FILTER_SCALEUP_DIMENSION), shown at 46. */
 const THUMB_WORK = 300;
 let thumbImage = null;

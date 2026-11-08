@@ -33,13 +33,13 @@
  * giftDrag (none|dragging|over:<id>); window.groddleGifts.
  */
 
-import { ITEM_CATALOG, addItem, countItem, ensureItem, itemIcon, listPackSlots, removeItem } from '../inventory.js?v=d82f3b00';
-import { TOOL_CONDITION_CATALOG, copyTag, copyTagKind, copyTags, leavingCopyTag, leavingToolWear, receiveToolCopy, takeToolCopy } from '../tools.js?v=f701b241';
+import { ITEM_CATALOG, addItem, countItem, ensureItem, itemIcon, listPackSlots, removeItem } from '../inventory.js?v=b7609342';
+import { TOOL_CONDITION_CATALOG, copyTag, copyTagKind, copyTags, leavingCopyTag, leavingToolWear, receiveToolCopy, takeToolCopy } from '../tools.js?v=d8aa3536';
 import { scriptFromTag, scriptLabel } from '../teleportation.js?v=5a5c8e6f';
 import { unitRankAt } from '../pack-slots.js?v=a94b816c';
 import { createMinnAccount } from '../minn-account.js?v=ba6a13c5';
 // The same key as features/index.js: one module instance holds the carried notes.
-import { giveCarriedNote, takeCarriedNote, writtenCarriedNotes } from './street-furniture-feature.js?v=966f14bf';
+import { giveCarriedNote, takeCarriedNote, writtenCarriedNotes } from './street-furniture-feature.js?v=7e6704a4';
 import {
   BOX_SLOTS,
   GIFT_BOX,
@@ -59,7 +59,7 @@ import {
   unwrapGrowl,
   unwrapPack,
   wrapBox,
-} from '../gifts.js?v=4a01ff13';
+} from '../gifts.js?v=89f09eba';
 
 export const GIFTS_FEATURE_ID = 'gifts';
 export const GIFT_VERB = 'gift_give';

@@ -131,7 +131,7 @@ describe('Game of Crowns arena', () => {
     assert.equal(street.label, 'Game of Crowns');
     assert.equal(playLineScreenY(street), 610);
     for (const name of ['crown_game_lock', 'game_crown_unlocked', 'game_crown_locked']) {
-      assert.ok(existsSync(join(root, 'assets/sprites/races/crowns', `${name}.png`)), name);
+      assert.ok(existsSync(join(root, 'assets/sprites/races/crowns', `${name}.webp`)), name);
     }
   });
 

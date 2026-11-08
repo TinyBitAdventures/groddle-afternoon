@@ -7,15 +7,15 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { createInventory, countItem } from '../public/js/inventory.js?v=d82f3b00';
-import { SEED_CATALOG } from '../public/js/garden.js?v=890d72ea';
+import { createInventory, countItem } from '../public/js/inventory.js?v=b7609342';
+import { SEED_CATALOG } from '../public/js/garden.js?v=e1c3415c';
 import {
   VENDOR_PROFILES,
   selectVendorProfile,
   vendorBuy,
   vendorSell,
   vendorSellValue,
-} from '../public/js/vendor.js?v=18b51628';
+} from '../public/js/vendor.js?v=307aca18';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const publicDir = join(here, '../public');
@@ -37,7 +37,7 @@ describe('official street vendor profiles', () => {
     for (const vendor of Object.values(VENDOR_PROFILES)) {
       assert.match(vendor.id, /^street_spirit_/, vendor.label);
       for (const offer of vendor.offers) {
-        assert.equal(existsSync(join(publicDir, `assets/sprites/icons/${offer.classTsid}.png`)), true, offer.classTsid);
+        assert.equal(existsSync(join(publicDir, `assets/sprites/icons/${offer.classTsid}.webp`)), true, offer.classTsid);
       }
     }
   });
@@ -97,7 +97,7 @@ describe('official street vendor profiles', () => {
 
   it('ships recovered official icons and the full vendor character art', () => {
     for (const id of ['coffee', 'broccoli', 'seed_broccoli', 'dice', 'lips', 'moon', 'npc_garden_gnome']) {
-      assert.equal(existsSync(join(publicDir, `assets/sprites/icons/${id}.png`)), true, id);
+      assert.equal(existsSync(join(publicDir, `assets/sprites/icons/${id}.webp`)), true, id);
     }
     assert.equal(existsSync(join(publicDir, 'assets/decos/groddle/vendor.webp')), true);
   });

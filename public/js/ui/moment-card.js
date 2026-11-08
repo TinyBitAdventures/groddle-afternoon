@@ -17,7 +17,7 @@
  * so the card uses a copy with its alpha divided by 0.8 (magick quest-book.png -channel A
  * -fx "min(1,u/0.8)"), the same pixels made solid.
  */
-const QUEST_BOOK_SOLID = 'assets/ui/quest-book-solid.png';
+const QUEST_BOOK_SOLID = 'assets/ui/quest-book-solid.webp';
 
 /**
  * Art for a moment that brings none: the quest book, and for a level the imagination card's
@@ -38,22 +38,22 @@ export function isModernSkin(doc = globalThis.document) {
 
 /** The art the card shows: the payload's own, else the kind's, else null (the glyph). */
 export function momentArt(payload = {}) {
-  if (payload.iconUrl) return /(^|\/)quest-book\.png$/.test(payload.iconUrl) ? QUEST_BOOK_SOLID : payload.iconUrl;
+  if (payload.iconUrl) return /(^|\/)quest-book\.webp$/.test(payload.iconUrl) ? QUEST_BOOK_SOLID : payload.iconUrl;
   return MOMENT_ART[payload.kind] || null;
 }
 
 /** Which art it is, for its size: the quest book is wide (86x58), the rest square. */
 export function momentArtShape(url = '') {
-  return /quest-book(-solid)?\.png/.test(String(url)) ? 'book' : 'square';
+  return /quest-book(-solid)?\.webp/.test(String(url)) ? 'book' : 'square';
 }
 
 /** A reward's icon: iMG, currants and a Giant's favor have one; the rest show words only. */
 export function rewardIcon(text = '', kind = '') {
-  if (kind === 'img') return 'assets/imagination/ui/imagination_button.png';
-  if (kind === 'currants') return 'assets/sprites/icons/pile_of_currants@3x.png';
+  if (kind === 'img') return 'assets/imagination/ui/imagination_button.webp';
+  if (kind === 'currants') return 'assets/sprites/icons/pile_of_currants@3x.webp';
   if (kind === 'favor') {
     const m = String(text).toLowerCase().match(new RegExp(`\\b(${GIANTS.join('|')})\\b`));
-    return m ? `assets/sprites/icons/emblem_${m[1]}@3x.png` : null;
+    return m ? `assets/sprites/icons/emblem_${m[1]}@3x.webp` : null;
   }
   return null;
 }

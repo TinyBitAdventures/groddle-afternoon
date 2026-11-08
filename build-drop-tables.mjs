@@ -71,7 +71,7 @@ for (const id of [...itemIds].sort()) {
     plural: strVar(src, 'name_plural') || `${strVar(src, 'label') || id}s`,
     desc: strVar(src, 'description'),
     baseCost: Number(src.match(/^var base_cost = ([0-9.]+);/m)?.[1] || 0),
-    art: existsSync(join(ICONS, `${id}.png`)),
+    art: existsSync(join(ICONS, `${id}.webp`)),
   };
 }
 

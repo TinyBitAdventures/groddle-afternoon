@@ -216,7 +216,7 @@ export const BROKEN_TOOL_ICONS = Object.freeze(new Set([
 
 /** The broken pack icon of a tool class, or null when it has none. */
 export function brokenToolIcon(classTsid) {
-  return BROKEN_TOOL_ICONS.has(classTsid) ? `assets/sprites/icons/${classTsid}_broken.png` : null;
+  return BROKEN_TOOL_ICONS.has(classTsid) ? `assets/sprites/icons/${classTsid}_broken.webp` : null;
 }
 export const GRINDER_TOOLS = Object.freeze(['ore_grinder', 'grand_ol_grinder']);
 export const WATERING_CAN_TOOLS = Object.freeze(['irrigator_9000', 'watering_can']);

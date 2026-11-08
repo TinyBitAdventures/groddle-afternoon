@@ -13,20 +13,20 @@ import {
   quoteToolRepair,
   repairToolCondition,
   setToolRemaining,
-} from '../public/js/tools.js?v=f701b241';
-import { createInventory } from '../public/js/inventory.js?v=d82f3b00';
+} from '../public/js/tools.js?v=d8aa3536';
+import { createInventory } from '../public/js/inventory.js?v=b7609342';
 import {
   createGarden,
   plantPlot,
   waterPlot,
-} from '../public/js/garden.js?v=890d72ea';
+} from '../public/js/garden.js?v=e1c3415c';
 import {
   createMineRock,
   mineRock,
   MINING_COSTS,
-} from '../public/js/mining.js?v=29fe2127';
-import { craftRecipe } from '../public/js/making.js?v=c9dc233e';
-import { createPlayerSave, normalizePlayerSave } from '../public/js/player-save.js?v=17b5c632';
+} from '../public/js/mining.js?v=fc28670f';
+import { craftRecipe } from '../public/js/making.js?v=f4f214c2';
+import { createPlayerSave, normalizePlayerSave } from '../public/js/player-save.js?v=c7c41d5c';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const publicDir = path.join(here, '..', 'public');
@@ -183,8 +183,8 @@ describe('tool save and client wiring', () => {
 
   test('ships the authentic icon/animation and visible pack repair wiring', () => {
     for (const rel of [
-      'assets/sprites/icons/tinkertool.png',
-      'assets/sprites/icons/tinkertool_broken.png',
+      'assets/sprites/icons/tinkertool.webp',
+      'assets/sprites/icons/tinkertool_broken.webp',
       'assets/sprites/making/tinkertool-work@3x.webp',
     ]) {
       assert.equal(fs.existsSync(path.join(publicDir, rel)), true, rel);

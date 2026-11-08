@@ -3,6 +3,7 @@
  * panel, G219 achievement drop, G220 voice-of-rock overlay).
  */
 import { describe, it } from 'node:test';
+import { imageSize } from '../tools/image-size.mjs';
 import assert from 'node:assert/strict';
 import { resolveTokens } from './css-tokens.js';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
@@ -29,7 +30,7 @@ import {
   skillLearnedModel,
   truncateLabel,
   vogLayout,
-} from '../public/js/familiar.js?v=c7e902af';
+} from '../public/js/familiar.js?v=5fd83250';
 import { CARD_ART_LAYERS } from '../public/js/imagination-data.js?v=4a85e7fe';
 import {
   _resetFamiliarDialog,
@@ -37,7 +38,7 @@ import {
   familiarDialogFeature,
   familiarDialogOpen,
   queueSkillLearned,
-} from '../public/js/features/familiar-dialog-feature.js?v=b043ef2b';
+} from '../public/js/features/familiar-dialog-feature.js?v=017fb596';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const PUBLIC = join(root, 'public');
@@ -45,7 +46,7 @@ const read = (p) => readFileSync(join(PUBLIC, p), 'utf8');
 
 function pngSize(path) {
   const buf = readFileSync(path);
-  return { w: buf.readUInt32BE(16), h: buf.readUInt32BE(20) };
+  return { w: imageSize(buf).w, h: imageSize(buf).h };
 }
 
 describe('pet_rock art (CC0 OGA sheet)', () => {
@@ -60,7 +61,7 @@ describe('pet_rock art (CC0 OGA sheet)', () => {
 
   it('draws the rock from its 3x render of pet_rock.swf, three times the cropped 1x sheet (G402)', () => {
     const sheet = PET_ROCK_SHEETS.idle;
-    assert.equal(sheet.hires, sheet.src.replace(/\.png$/, '@3x.webp'));
+    assert.equal(sheet.hires, sheet.src.replace(/\.(png|webp)$/, '@3x.webp'));
     const b = readFileSync(join(PUBLIC, sheet.hires));
     assert.equal(b.toString('ascii', 12, 16), 'VP8L', 'lossless WebP');
     const bits = b.readUInt32LE(21);
@@ -123,7 +124,7 @@ describe('quest card look (G211) and voice of rock (G220)', () => {
     const card = html.slice(html.indexOf('id="quest-dialogue"'), html.indexOf('id="rook-museum-exhibit"'));
     assert.doesNotMatch(card, /quest-dialogue-orb/);
     assert.match(card, /id="quest-dialogue-head"/);
-    assert.match(card, /assets\/ui\/familiar\/quests_small\.png/);
+    assert.match(card, /assets\/ui\/familiar\/quests_small\.webp/);
     assert.match(card, /id="quest-dialogue-close"/);
     for (const id of ['quest-dialogue-kicker', 'quest-dialogue-title', 'quest-dialogue-copy', 'quest-dialogue-next', 'quest-dialogue-cancel']) {
       assert.match(card, new RegExp(`id="${id}"`));

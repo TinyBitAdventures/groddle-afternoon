@@ -113,7 +113,7 @@ export function projectPlace(catalog, jobId, { done = false, closed = [] } = {})
 }
 
 /** The picture for a currants need (the board's own, features/street-jobs-feature.js). */
-export const CURRANTS_ICON = 'assets/sprites/street-jobs/pile_of_currants.png';
+export const CURRANTS_ICON = 'assets/sprites/street-jobs/pile_of_currants.webp';
 
 const article = (word) => (/^[aeiou]/i.test(word) ? 'an' : 'a');
 const upper = (s) => (s ? s[0].toUpperCase() + s.slice(1) : s);

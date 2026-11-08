@@ -24,7 +24,7 @@
  * Austin 2026-10-25).
  */
 
-import { addItem, countItem, ensureItem, removeItem } from './inventory.js?v=d82f3b00';
+import { addItem, countItem, ensureItem, removeItem } from './inventory.js?v=b7609342';
 import { HOME_STYLES, imagineHome, normalizeHomeState } from './homes.js?v=631ab6b8';
 import { LINES, talkPages } from './newxp.js?v=8fa18f24';
 
@@ -38,14 +38,14 @@ export const HOME_TICKET = Object.freeze({
   useReason: 'Use this from a Ticket Machine',
   stackMax: 1,
   tags: Object.freeze(['no_rube', 'no_trade', 'no_auction']),
-  icon: 'assets/sprites/icons/homestreet_ticket.png',
+  icon: 'assets/sprites/icons/homestreet_ticket.webp',
 });
 
 /** homestreet_ticket_dispenser.js 1, 38, 43-143 (verb name, tooltip; the art is the OGA icon). */
 export const HOME_MACHINE = Object.freeze({
   label: 'Home Street Selection Machine',
   needTicket: 'You need to get a ticket to use this machine',
-  icon: 'assets/sprites/icons/homestreet_ticket_dispenser.png',
+  icon: 'assets/sprites/icons/homestreet_ticket_dispenser.webp',
   styles: Object.freeze(['meadow', 'firebog', 'uralia']),
   verb: (style) => {
     const label = HOME_STYLES[style]?.label || style;

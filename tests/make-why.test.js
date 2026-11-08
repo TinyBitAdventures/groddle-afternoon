@@ -10,9 +10,9 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { RECIPE_CATALOG, TOOL_CATALOG, canCraft, ensureMakingItems, listMakingTools, loadRecipeCatalogFromFile, makeEmptyLine, makePanelIcon, recipeBlockedLine } from '../public/js/making.js?v=c9dc233e';
-import { createInventory } from '../public/js/inventory.js?v=d82f3b00';
-import { createToolConditionState, setToolRemaining } from '../public/js/tools.js?v=f701b241';
+import { RECIPE_CATALOG, TOOL_CATALOG, canCraft, ensureMakingItems, listMakingTools, loadRecipeCatalogFromFile, makeEmptyLine, makePanelIcon, recipeBlockedLine } from '../public/js/making.js?v=f4f214c2';
+import { createInventory } from '../public/js/inventory.js?v=b7609342';
+import { createToolConditionState, setToolRemaining } from '../public/js/tools.js?v=d8aa3536';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const game = readFileSync(join(root, 'public/game.js'), 'utf8');
@@ -95,7 +95,7 @@ describe('report 119: the Make title shows the tab\'s tool', () => {
     const tools = createToolConditionState();
     assert.deepEqual(makePanelIcon('saucepan', inv, tools), { tool: 'saucepan', src: TOOL_CATALOG.saucepan.icon, broken: false });
     setToolRemaining(tools, 'saucepan', 0);
-    assert.deepEqual(makePanelIcon('saucepan', inv, tools), { tool: 'saucepan', src: 'assets/sprites/icons/saucepan_broken.png', broken: true });
+    assert.deepEqual(makePanelIcon('saucepan', inv, tools), { tool: 'saucepan', src: 'assets/sprites/icons/saucepan_broken.webp', broken: true });
     assert.equal(makePanelIcon('saucepan', createInventory({}), tools).broken, false);
     assert.equal(makePanelIcon('saucepan', inv, tools, true).broken, false, 'a machine standing in the world is not the pack\'s copy');
   });

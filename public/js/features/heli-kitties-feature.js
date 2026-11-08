@@ -27,7 +27,7 @@
  */
 
 import { slugsFromEffects } from '../speech-slugs.js?v=130338f9';
-import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=d77b0b8b';
+import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=b764884b';
 import { landingY, nearestSurfaceY, walkSurfaceY } from '../walk-surface.js?v=c982983e';
 import { loadWildlifeCatalog, wildlifeCatalog, wildlifeFor } from '../wildlife.js?v=670c3a7f';
 import {
@@ -55,7 +55,7 @@ const KITTY_SCALE = 0.86;
 const PLAYER_ID = 'player';
 
 const DIR = 'assets/sprites/kitties/';
-const sheet = (name, cols, frames, first = 0) => Object.freeze({ path: `${DIR}kitty-${name}.png`, fw: 136, fh: 115, cols, frames, first });
+const sheet = (name, cols, frames, first = 0) => Object.freeze({ path: `${DIR}kitty-${name}.webp`, fw: 136, fh: 115, cols, frames, first });
 
 /** Exact OGA cells (136×115). The appear clip's first cell is blank by design. */
 export const KITTY_SHEETS = Object.freeze({

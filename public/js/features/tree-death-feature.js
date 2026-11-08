@@ -54,11 +54,11 @@
  * treeGuilt, treeDeaths, treePoisonAutoplay.
  */
 
-import { copyFromLedger, keepsCopies } from '../copy-charges.js?v=f94ac7c8';
-import { migrateClassValue } from '../tools.js?v=f701b241';
-import { ITEM_CATALOG, ensureItem } from '../inventory.js?v=d82f3b00';
+import { copyFromLedger, keepsCopies } from '../copy-charges.js?v=737fd334';
+import { migrateClassValue } from '../tools.js?v=d8aa3536';
+import { ITEM_CATALOG, ensureItem } from '../inventory.js?v=b7609342';
 import { moodMax } from '../metabolics.js?v=8504134e';
-import { plantChoices } from '../patches.js?v=8af384ac';
+import { plantChoices } from '../patches.js?v=aa83d5ad';
 import { textureFromUrl } from '../textures.js?v=3149d699';
 import { displayTopOf, itemstackOverlayPoint, playSheetOverlay } from '../overlay-art.js?v=11b6dd7f';
 import {
@@ -86,8 +86,8 @@ import {
   quoteAntidoteVerb,
   quotePoisonVerb,
   treeDeathOutcome,
-} from '../tree-poison.js?v=3f890e1e';
-import { patchesFeature } from './patches-feature.js?v=c0adb8fb';
+} from '../tree-poison.js?v=80469175';
+import { patchesFeature } from './patches-feature.js?v=f3e88dee';
 
 export const TREE_DEATH_FEATURE_ID = 'tree-death';
 const VERB_PREFIX = 'treepoison:';
@@ -271,7 +271,7 @@ function pourFx(engine, potionClass, target) {
   const root = new PIXI.Container();
   root.zIndex = 9000;
   root.eventMode = 'none';
-  const bottle = new PIXI.Sprite(textureFromUrl(ITEM_CATALOG[potionClass]?.icon || `assets/sprites/icons/${potionClass}.png`));
+  const bottle = new PIXI.Sprite(textureFromUrl(ITEM_CATALOG[potionClass]?.icon || `assets/sprites/icons/${potionClass}.webp`));
   bottle.anchor.set(0.5);
   root.addChild(bottle);
   const drops = new PIXI.Graphics();
@@ -592,7 +592,7 @@ function tickAutoplay(engine, now) {
 
 function ensurePotionItems() {
   for (const [id, meta] of Object.entries(POTION_ITEMS)) {
-    if (!ITEM_CATALOG[id]) ensureItem(id, { ...meta, icon: `assets/sprites/icons/${id}.png` });
+    if (!ITEM_CATALOG[id]) ensureItem(id, { ...meta, icon: `assets/sprites/icons/${id}.webp` });
   }
 }
 

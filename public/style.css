@@ -9123,7 +9123,7 @@ header.top-bar + .sub { display: none; }
 @media (prefers-reduced-motion: reduce) { .fam-rays svg { animation: none; } }
 .fam-close {
   width: 22px; height: 22px; padding: 0; border: 0; border-radius: var(--radius-xs); cursor: pointer;
-  background: var(--surface-navy) url('assets/ui/familiar/close_x_small_gray.png?v=df15aba7') center / 20px 20px no-repeat;
+  background: var(--surface-navy) url('assets/ui/familiar/close_x_small_gray.webp?v=f64d7bb6') center / 20px 20px no-repeat;
   box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--c-grey-84) 25%, transparent);
 }
 .fam-close:hover, .fam-close:focus-visible { box-shadow: inset 0 0 0 1px var(--c-grey-84); }

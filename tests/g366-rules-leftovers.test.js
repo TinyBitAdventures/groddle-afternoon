@@ -24,14 +24,14 @@ import { fileURLToPath } from 'node:url';
 
 import { loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js?v=10b118dd';
 import { worldVerbAchievementCounters } from '../public/js/achievements.js?v=f8ccfd34';
-import { createAnimalState, resetAnimalDay } from '../public/js/animals.js?v=d5af4f3c';
+import { createAnimalState, resetAnimalDay } from '../public/js/animals.js?v=0d9f9b0f';
 import { createQuestState } from '../public/js/quests.js?v=c8d9d0a4';
-import { acceptOffer, routeQuestEvent } from '../public/js/quest-offers.js?v=486b09c9';
+import { acceptOffer, routeQuestEvent } from '../public/js/quest-offers.js?v=e31115ea';
 import { applyBuff, createBuffState } from '../public/js/buffs.js?v=036fee53';
 import { BUFF_ICONS, QUEST_TIMER_BUFFS } from '../public/js/buff-triggers.js?v=a3093922';
-import { EMERGENCY_RETRY_MS } from '../public/js/features/quest-offers-feature.js?v=f5d8a199';
-import { QUOIN_CLASSES, quoinClassAmount, quoinRespawnMs } from '../public/js/quoins.js?v=f154a79e';
-import { COIN_BACK_MS, COIN_CLASS, COIN_TYPE, room as rainbowRoom } from '../public/js/quest-rooms/rainbow-run.js?v=5cfaf3af';
+import { EMERGENCY_RETRY_MS } from '../public/js/features/quest-offers-feature.js?v=57dafa96';
+import { QUOIN_CLASSES, quoinClassAmount, quoinRespawnMs } from '../public/js/quoins.js?v=299cc3f4';
+import { COIN_BACK_MS, COIN_CLASS, COIN_TYPE, room as rainbowRoom } from '../public/js/quest-rooms/rainbow-run.js?v=12beb417';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const PUBLIC = join(ROOT, 'public');
@@ -134,7 +134,7 @@ describe('G277: timer buff icons for NPC classes', () => {
     for (const { buff } of QUEST_TIMER_BUFFS) {
       const icon = BUFF_ICONS[buff] || buffs[buff]?.itemClass;
       if (!icon) continue; // no item_class: the client draws none (BuffUI.as setIcon 156-171)
-      assert.ok(existsSync(join(PUBLIC, 'assets/sprites/icons', `${icon}.png`)), `${buff}: ${icon}`);
+      assert.ok(existsSync(join(PUBLIC, 'assets/sprites/icons', `${icon}.webp`)), `${buff}: ${icon}`);
     }
   });
 });

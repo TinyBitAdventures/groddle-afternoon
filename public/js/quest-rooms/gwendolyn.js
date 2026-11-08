@@ -63,8 +63,8 @@
  * they end with the room.
  */
 
-import { ensureQuestOfferState } from '../quest-offers.js?v=486b09c9';
-import { MEDITATION_MUSIC, ORB_TOOL_SHEET } from '../meditation.js?v=380b2f3f';
+import { ensureQuestOfferState } from '../quest-offers.js?v=e31115ea';
+import { MEDITATION_MUSIC, ORB_TOOL_SHEET } from '../meditation.js?v=f0c00590';
 import { gainMetabolic, loseMood } from '../metabolics.js?v=8504134e';
 import { frameTexture, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js?v=3149d699';
 import { displayTopOf, itemstackOverlayPoint, playSheetOverlay } from '../overlay-art.js?v=11b6dd7f';
@@ -570,7 +570,7 @@ function swoonerfly(ctx, offX, offY) {
   const { PIXI, kit } = ctx;
   const p = ctx.player;
   if (!p) return;
-  const fall = kit.sheetFrames(PIXI, `${ART}swoonerfly_fall.png`, SWOON_FRAMES, 1, SWOON_FRAMES);
+  const fall = kit.sheetFrames(PIXI, `${ART}swoonerfly_fall.webp`, SWOON_FRAMES, 1, SWOON_FRAMES);
   const spr = new PIXI.AnimatedSprite(fall.frames.length ? fall.frames : [PIXI.Texture.EMPTY]);
   spr.anchor.set(0.5, 1);
   spr.animationSpeed = 0.5;
@@ -593,7 +593,7 @@ function stepSwoons(ctx, dtMs, now) {
       if (s.spr.y >= s.destY) {
         s.landed = true;
         s.spr.stop();
-        s.spr.texture = textureFromUrl(`${ART}swoonerfly_rest.png`);
+        s.spr.texture = textureFromUrl(`${ART}swoonerfly_rest.webp`);
         // npc_swoonerfly.js 45-62 land(): itemstack_overlay rooked, delta_y
         // 20 from its top, 3000 ms (Tiny Speck's rooked.fla: little rooks,
         // a skull and a cloud circling, G273).
@@ -1562,7 +1562,7 @@ export const room = {
   title: "Gwendolyn's Task",
   // G318: all four templates sit in hub 79 "Tower Quest" (inc_data_maps_prod.js 441; streets 18019-18022).
   kicker: 'Tower Quest',
-  icon: `${ART}gwendolyn_icon.png`,
+  icon: `${ART}gwendolyn_icon.webp`,
   hubName: 'Tower Quest',
   durationMs: 0, // exit_delay is the "Are you stuck?" prompt, not a clock
   doneLabel: 'Go back',

@@ -1,4 +1,5 @@
 import test from 'node:test';
+import { imageSize } from '../tools/image-size.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -31,8 +32,8 @@ import {
   paradisePickupTouches,
   paradiseTicketCost,
   resolveParadiseReward,
-} from '../public/js/paradise-flight.js?v=abcd78b9';
-import { QURAZY_REWARDS } from '../public/js/quoins.js?v=f154a79e';
+} from '../public/js/paradise-flight.js?v=5d9aec42';
+import { QURAZY_REWARDS } from '../public/js/quoins.js?v=299cc3f4';
 import { remakeStatus } from '../public/js/imagination-remake.js?v=c37ad887';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
@@ -76,10 +77,10 @@ test('all nine missing production templates are registered with source names and
 
 test('official 33x44 ticket icons ship for every new course', () => {
   for (const id of EXTRA_PARADISE_COURSE_IDS) {
-    const file = path.join(publicDir, 'assets', 'sprites', 'icons', `paradise_ticket_${id}.png`);
+    const file = path.join(publicDir, 'assets', 'sprites', 'icons', `paradise_ticket_${id}.webp`);
     const png = fs.readFileSync(file);
-    assert.equal(png.readUInt32BE(16), 33, id);
-    assert.equal(png.readUInt32BE(20), 44, id);
+    assert.equal(imageSize(png).w, 33, id);
+    assert.equal(imageSize(png).h, 44, id);
   }
 });
 

@@ -11,15 +11,18 @@ mkdir -p "${FRAME_DIR}"
 # maturity/fruit state. Each row below selects the last populated, fully
 # fruited source cell. Never alpha-trim or resize the complete atlas.
 while read -r species cell_w cell_h maturity column row; do
-  source="${TRANT_DIR}/trant_${species}_m${maturity}.png"
-  target="${FRAME_DIR}/trant_${species}_m${maturity}.png"
+  source="${TRANT_DIR}/trant_${species}_m${maturity}.webp"
+  target="${FRAME_DIR}/trant_${species}_m${maturity}.webp"
   x=$((column * cell_w))
   y=$((row * cell_h))
 
+  # Shipped as lossless WebP (tools/webp-lossless.mjs): crop to a PNG, then cwebp.
   magick "${source}" \
     -crop "${cell_w}x${cell_h}+${x}+${y}" \
     +repage \
-    "${target}"
+    "PNG32:${target%.webp}.tmp.png"
+  cwebp -quiet -lossless -z 9 -exact -metadata none "${target%.webp}.tmp.png" -o "${target}"
+  rm -f "${target%.webp}.tmp.png"
 done <<'FRAMES'
 fruit 271 249 1 0 3
 fruit 271 249 3 0 3

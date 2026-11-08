@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { imageSize } from '../tools/image-size.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
 import test from 'node:test';
@@ -12,14 +13,14 @@ import {
   quoteWoodTreeHarvest,
   resetWoodTreeDay,
   woodTreeStatusLabel,
-} from '../public/js/woodcutting.js?v=c199dd64';
+} from '../public/js/woodcutting.js?v=4fd0342b';
 import {
   TOOL_CONDITION_CATALOG,
   createToolConditionState,
   getToolCondition,
   setToolRemaining,
-} from '../public/js/tools.js?v=f701b241';
-import { getVerbsFor, runVerb } from '../public/content.js?v=075ded81';
+} from '../public/js/tools.js?v=d8aa3536';
+import { getVerbsFor, runVerb } from '../public/content.js?v=ebc8b8b3';
 import { actionDurationFor } from '../public/js/action-timing.js?v=5db4e91b';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -133,13 +134,13 @@ test.describe('Wood Tree client integration', () => {
   test('ships the authentic icon, broken icon, 8×5 animation, and six maturity frames', () => {
     const png = (relative) => {
       const bytes = fs.readFileSync(path.join(root, 'public', relative));
-      return { width: bytes.readUInt32BE(16), height: bytes.readUInt32BE(20) };
+      return { width: imageSize(bytes).w, height: imageSize(bytes).h };
     };
-    assert.deepEqual(png('assets/sprites/icons/hatchet.png'), { width: 46, height: 42 });
-    assert.deepEqual(png('assets/sprites/icons/hatchet_broken.png'), { width: 44, height: 39 });
-    assert.deepEqual(png('assets/sprites/tools/hatchet-tool.png'), { width: 880, height: 320 });
+    assert.deepEqual(png('assets/sprites/icons/hatchet.webp'), { width: 46, height: 42 });
+    assert.deepEqual(png('assets/sprites/icons/hatchet_broken.webp'), { width: 44, height: 39 });
+    assert.deepEqual(png('assets/sprites/tools/hatchet-tool.webp'), { width: 880, height: 320 });
     assert.deepEqual(
-      png('assets/sprites/wood_tree_maturity_6_variant_2_x6_1_png_1354833445.png'),
+      png('assets/sprites/wood_tree_maturity_6_variant_2_x6_1_png_1354833445.webp'),
       { width: 528, height: 138 }
     );
   });
@@ -150,7 +151,7 @@ test.describe('Wood Tree client integration', () => {
     assert.match(game, /function textureForWoodTree\(maturity\)/);
     assert.match(game, /function refreshWoodTreeVisual\(target\)/);
     assert.match(game, /function playHatchetAnimation\(target\)/);
-    assert.match(game, /hatchet-tool\.png/);
+    assert.match(game, /hatchet-tool\.webp/);
     assert.match(game, /wooddemo/);
     assert.match(game, /woodreset/);
     assert.match(game, /hatchetremaining/);

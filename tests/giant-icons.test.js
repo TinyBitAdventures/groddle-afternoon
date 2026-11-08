@@ -72,8 +72,8 @@ describe('giant icon catalog', () => {
     for (const def of Object.values(GIANT_ICON_DATA)) {
       assert.equal(def.capacity, 20);
       assert.match(def.desc, /Icon of/);
-      assert.ok(existsSync(join(root, 'assets/sprites/icons', `${def.iconClass}.png`)), def.iconClass);
-      assert.ok(existsSync(join(root, 'assets/sprites/giant-icons', `${def.iconClass}.png`)), def.iconClass);
+      assert.ok(existsSync(join(root, 'assets/sprites/icons', `${def.iconClass}.webp`)), def.iconClass);
+      assert.ok(existsSync(join(root, 'assets/sprites/giant-icons', `${def.iconClass}.webp`)), def.iconClass);
       // G214: the conversations live only in conversations-data.js.
       assert.equal('conversations' in def, false, def.iconClass);
       const first = CONVERSATIONS[TELLERS[def.iconClass].list[0]];
@@ -277,7 +277,7 @@ describe('icon conversations (G202: the shared record)', () => {
   });
 
   it('a version 1 save hands its talked list to the record once, in either restore order', async () => {
-    const { giantIconsFeature } = await import('../public/js/features/giant-icons-feature.js?v=920a0d00');
+    const { giantIconsFeature } = await import('../public/js/features/giant-icons-feature.js?v=7f977b91');
     const old = { version: 1, talked: ['icon_humbaba_1', 'icon_alph_1'] };
     const saved = { completed: { npc_chicken: { chickens_cautionary_tales_1: 700 } } };
     const t0 = Date.now();
@@ -316,7 +316,7 @@ describe('imagination cards', () => {
 
 describe('giant icons feature', () => {
   it('offers the source pack verbs and iconizes through the engine', async () => {
-    const { giantIconsFeature } = await import('../public/js/features/giant-icons-feature.js?v=920a0d00');
+    const { giantIconsFeature } = await import('../public/js/features/giant-icons-feature.js?v=7f977b91');
     giantIconsFeature._reset();
     const events = [];
     const granted = [];
@@ -349,7 +349,7 @@ describe('giant icons feature', () => {
   });
 
   it('Caress adds mood up to the real limit and never takes any away; the popup says what landed (ticket 48)', async () => {
-    const { giantIconsFeature } = await import('../public/js/features/giant-icons-feature.js?v=920a0d00');
+    const { giantIconsFeature } = await import('../public/js/features/giant-icons-feature.js?v=7f977b91');
     giantIconsFeature._reset();
     const toasts = [];
     const engine = {

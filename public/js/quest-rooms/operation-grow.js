@@ -32,7 +32,7 @@
  * end beside the painted EXIT (or Leave). js/operation-grow-scene.js builds it.
  */
 
-import { JUMP_GAP, JUMP_RISE } from './puzzle-kit.js?v=7410b322';
+import { JUMP_GAP, JUMP_RISE } from './puzzle-kit.js?v=378c28e8';
 import { textureFromUrl } from '../textures.js?v=3149d699';
 import { buildGrowBackground, makeStalk } from '../operation-grow-scene.js?v=1f3d0ed4';
 
@@ -137,7 +137,7 @@ function drawHint(PIXI, kit) {
     dots.circle(-66 + i * 22, -88, lit ? 7 : 4.5).fill({ color: lit ? 0x8fd9ff : 0x3b2f22, alpha: lit ? 1 : 0.8 });
   }
   c.addChild(dots);
-  const mab = new PIXI.Sprite(textureFromUrl('assets/sprites/icons/icon_mab@3x.png'));
+  const mab = new PIXI.Sprite(textureFromUrl('assets/sprites/icons/icon_mab@3x.webp'));
   mab.anchor.set(0.5, 1);
   mab.scale.set(0.42);
   mab.x = -60;
@@ -163,7 +163,7 @@ export const room = {
   id: 'operation_grow',
   title: 'Operation: Grow',
   kicker: 'Brighten the bog fields',
-  icon: 'assets/sprites/icons/icon_mab@3x.png',
+  icon: 'assets/sprites/icons/icon_mab@3x.webp',
   theme: 'dark',
   hubName: 'The forgotten bog fields',
   durationMs: 0,

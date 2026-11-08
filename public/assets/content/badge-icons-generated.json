@@ -1,11 +1,11 @@
 {
  "highest_of_the_hi_skippers": {
-  "path": "assets/badges/highest_of_the_hi_skippers.png",
+  "path": "assets/badges/highest_of_the_hi_skippers.webp",
   "generated": true,
   "subject": "glyph:sneaker with the Hi-Sign series emblem (all-time evasion record)"
  },
  "impossible_achievement": {
-  "path": "assets/badges/impossible_achievement.png",
+  "path": "assets/badges/impossible_achievement.webp",
   "generated": true,
   "subject": "glyph:padlock (cannot be earned)"
  }

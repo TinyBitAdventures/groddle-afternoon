@@ -22,7 +22,7 @@ import {
   planStreetQuoins,
   rollMysteryKind,
   streetQuoinClass,
-} from '../public/js/quoins.js?v=f154a79e';
+} from '../public/js/quoins.js?v=299cc3f4';
 import { setMetabolicGainGate } from '../public/js/metabolics.js?v=8504134e';
 import { CHECKLIST } from '../tools/restoration/checklist.mjs';
 

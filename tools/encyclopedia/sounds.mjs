@@ -309,7 +309,7 @@ export function addSounds(d, { picture }) {
     const placeKey = refs.find((r) => r.rel === 'region-music' || r.rel === 'street-music')?.to;
     const placeIcon = placeKey ? d.entries.get(placeKey)?.icon : null;
     const musical = ['region', 'street', 'event', 'musicblock'].includes(e.groupKey);
-    const icon = (e.groupKey === 'musicblock' && d.items.get(e.id)?.icon) || thingIcon || placeIcon || (musical ? picture('assets/sprites/icons/musicblock_d_green_01.png', 'Shown as a Musicblock') : null);
+    const icon = (e.groupKey === 'musicblock' && d.items.get(e.id)?.icon) || thingIcon || placeIcon || (musical ? picture('assets/sprites/icons/musicblock_d_green_01.webp', 'Shown as a Musicblock') : null);
     d.entries.set(key, { key, refs: refs.filter((r, i, a) => a.findIndex((x) => x.to === r.to && x.rel === r.rel && x.anchor === r.anchor) === i), icon, register: '', ...e });
   }
   return { groups: SOUND_GROUPS, regions, stubs };

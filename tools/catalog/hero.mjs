@@ -62,8 +62,8 @@ export async function loadHero(root) {
     const options = [];
     if (icon) {
       options.push(icon.hi
-        ? { src: `assets/sprites/icons/${id}@3x.png`, w: icon.hi.w, h: icon.hi.h, from: 'icon' }
-        : { src: `assets/sprites/icons/${id}.png`, w: icon.w * 3, h: icon.h * 3, from: 'icon1x' });
+        ? { src: `assets/sprites/icons/${id}@3x.webp`, w: icon.hi.w, h: icon.hi.h, from: 'icon' }
+        : { src: `assets/sprites/icons/${id}.webp`, w: icon.w * 3, h: icon.h * 3, from: 'icon1x' });
     }
     const art = standing.get(id);
     if (art && statSync(join(pub, art)).size <= MAX_BYTES) {

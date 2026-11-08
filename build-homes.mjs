@@ -17,9 +17,9 @@
  *
  * Writes:
  *   public/js/homes-catalog.js
- *   public/assets/sprites/furniture/<class>.png      world art (exact OGA x1 frames)
- *   public/assets/sprites/icons/<class>.png          pack thumbnails (<= 48 px)
- *   public/assets/sprites/cultivation/<class>.png    pod / hive / mound art
+ *   public/assets/sprites/furniture/<class>.webp     world art (exact OGA x1 frames)
+ *   public/assets/sprites/icons/<class>.webp         pack thumbnails (<= 48 px)
+ *   public/assets/sprites/cultivation/<class>.webp   pod / hive / mound art
  *
  * Run from spike root:
  *   node build-homes.mjs            (art copy needs ImageMagick for thumbnails)
@@ -27,10 +27,12 @@
 
 import vm from 'node:vm';
 import { execFileSync } from 'node:child_process';
-import { copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { loadItem } from './build-recipes.mjs';
+import { encodeLosslessWebp } from './tools/webp-lossless.mjs';
 import { basePlats, surfaceFrom } from './tools/furniture-upgrades/build.mjs';
 
 const root = dirname(fileURLToPath(import.meta.url));
@@ -259,11 +261,11 @@ function buildFurniture() {
       slot: slotFor(placementSet),
       tabletop: TABLETOP.has(classTsid),
       canFlip: String(row.classProps.can_flip ?? '1') !== '0',
-      art: { path: `assets/sprites/furniture/${classTsid}.png`, w, h, ...rest.art },
+      art: { path: `assets/sprites/furniture/${classTsid}.webp`, w, h, ...rest.art },
       ...(LAYOUT[classTsid] || {}),
       ...(rest.platY != null ? { platY: rest.platY } : {}),
       ...(classTsid === 'furniture_door'
-        ? { doorArt: Object.fromEntries(DOOR_ART.map((v) => [v, `assets/sprites/furniture/furniture_door_${v}.png`])) }
+        ? { doorArt: Object.fromEntries(DOOR_ART.map((v) => [v, `assets/sprites/furniture/furniture_door_${v}.webp`])) }
         : {}),
       upgrades: upgrades[classTsid] || 0,
       recipe: recipeByOutput[classTsid] || null,
@@ -405,40 +407,49 @@ function copyArt(furniture) {
   const iconDir = join(PUBLIC, 'assets/sprites/icons');
   mkdirSync(furnDir, { recursive: true });
   mkdirSync(cultDir, { recursive: true });
+  // Everything ships as lossless WebP (tools/webp-lossless.mjs); ImageMagick steps go through a PNG first.
+  const tmp = mkdtempSync(join(tmpdir(), 'homes-art-'));
+  const magickWebp = (args, out) => {
+    const png = join(tmp, 'out.png');
+    execFileSync('magick', [...args, png]);
+    encodeLosslessWebp(png, out);
+  };
   let thumbs = 0;
   for (const classTsid of Object.keys(furniture)) {
     const sheet = SHEET_ART[classTsid];
     let src = ogaFrame(classTsid);
+    const world = join(furnDir, `${classTsid}.webp`);
     if (sheet) {
       // The sheet's first cell (SHEET_ART): the piece and its thumbnail are one frame.
       const { w, h } = artSize(classTsid, src);
-      execFileSync('magick', [src, '-crop', `${w}x${h}+0+0`, '+repage', '-strip', join(furnDir, `${classTsid}.png`)]);
-      src = join(furnDir, `${classTsid}.png`);
-    } else copyFileSync(src, join(furnDir, `${classTsid}.png`));
+      magickWebp([src, '-crop', `${w}x${h}+0+0`, '+repage', '-strip'], world);
+      src = world;
+    } else encodeLosslessWebp(src, world);
     if (classTsid === 'furniture_door') {
-      for (const v of DOOR_ART) copyFileSync(ogaFrameIn(`furniture_door_door_door_${v}`), join(furnDir, `furniture_door_${v}.png`));
+      for (const v of DOOR_ART) encodeLosslessWebp(ogaFrameIn(`furniture_door_door_door_${v}`), join(furnDir, `furniture_door_${v}.webp`));
     }
-    if (KEEP_ICON.has(classTsid) && existsSync(join(iconDir, `${classTsid}.png`))) continue;
+    if (KEEP_ICON.has(classTsid) && existsSync(join(iconDir, `${classTsid}.webp`))) continue;
     try {
-      execFileSync('magick', [src, '-resize', '48x48>', '-strip', join(iconDir, `${classTsid}.png`)]);
+      magickWebp([src, '-resize', '48x48>', '-strip'], join(iconDir, `${classTsid}.webp`));
       thumbs += 1;
     } catch {
-      copyFileSync(src, join(iconDir, `${classTsid}.png`));
+      encodeLosslessWebp(src, join(iconDir, `${classTsid}.webp`));
     }
   }
   for (const cls of ['barnacle_pod', 'firefly_hive', 'jellisac_mound']) {
-    copyFileSync(ogaFrame(cls), join(cultDir, `${cls}.png`));
+    encodeLosslessWebp(ogaFrame(cls), join(cultDir, `${cls}.webp`));
   }
   const iconic = (cls, out = cls) => {
     const src = ogaFrame(cls, /_x1_iconic_png_/);
-    if (src) copyFileSync(src, join(iconDir, `${out}.png`));
+    if (src) encodeLosslessWebp(src, join(iconDir, `${out}.webp`));
   };
   iconic('construction_tool');
   iconic('bulb');
   iconic('wall_segment');
   iconic('grade_aa_earth_block');
   const broken = ogaFrame('construction_tool', /_x1_broken_iconic_png_/);
-  if (broken) copyFileSync(broken, join(iconDir, 'construction_tool_broken.png'));
+  if (broken) encodeLosslessWebp(broken, join(iconDir, 'construction_tool_broken.webp'));
+  rmSync(tmp, { recursive: true, force: true });
   return thumbs;
 }
 

@@ -71,7 +71,7 @@
 import { VENDOR_NPCS, VENDOR_NPC_CLASSES } from './vendor-npcs.js?v=616c0568';
 import { getQuestCatalog } from './content-catalogs.js?v=10b118dd';
 import { levelInfoForXp } from './progression.js?v=33462eaa';
-import { brokenToolCopies } from './tools.js?v=f701b241';
+import { brokenToolCopies } from './tools.js?v=d8aa3536';
 import { offerableMultiplayerQuest } from './quests-mp.js?v=1fc5ff58';
 import {
   assignQuest,

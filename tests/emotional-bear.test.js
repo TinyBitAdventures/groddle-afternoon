@@ -15,7 +15,7 @@ import {
   normalizeEmotionalBearState,
   performEmotionalBearAction,
   upgradeEmotionalBear,
-} from '../public/js/emotional-bear.js?v=1dd276f7';
+} from '../public/js/emotional-bear.js?v=8d027fe0';
 
 const publicRoot = join(import.meta.dirname, '..', 'public');
 
@@ -23,7 +23,7 @@ describe('source-authored Emotional Bear', () => {
   it('starts plain and preserves the four original visual states', () => {
     const plain = createEmotionalBearState();
     assert.equal(emotionalBearIconState(plain), 'plain');
-    assert.equal(emotionalBearIcon(plain), 'assets/sprites/emotional-bear/iconic_plain.png');
+    assert.equal(emotionalBearIcon(plain), 'assets/sprites/emotional-bear/iconic_plain.webp');
     assert.equal(emotionalBearIconState(createEmotionalBearState({ upgrades: ['kiss'] })), 'kiss');
     assert.equal(emotionalBearIconState(createEmotionalBearState({ upgrades: ['moon'] })), 'moon');
     assert.equal(
@@ -175,10 +175,10 @@ describe('source-authored Emotional Bear', () => {
   it('ships clean OGA states, animation atlases, pack controls, and deterministic QA', () => {
     const assetRoot = join(publicRoot, 'assets', 'sprites', 'emotional-bear');
     for (const file of [
-      'iconic_plain.png',
-      'iconic_kiss.png',
-      'iconic_moon.png',
-      'iconic_moon_kiss.png',
+      'iconic_plain.webp',
+      'iconic_kiss.webp',
+      'iconic_moon.webp',
+      'iconic_moon_kiss.webp',
       'hug.webp',
       'high-five.webp',
       'kiss.webp',
@@ -188,7 +188,7 @@ describe('source-authored Emotional Bear', () => {
       assert.equal(existsSync(path), true, file);
       assert.ok(statSync(path).size > 100, file);
     }
-    for (const file of ['lips.png', 'moon.png', 'emotional_bear.png']) {
+    for (const file of ['lips.webp', 'moon.webp', 'emotional_bear.webp']) {
       assert.equal(existsSync(join(publicRoot, 'assets', 'sprites', 'icons', file)), true, file);
     }
     const game = readFileSync(join(publicRoot, 'game.js'), 'utf8');

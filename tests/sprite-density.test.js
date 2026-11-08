@@ -11,8 +11,8 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { FIRST_DRAW_SPRITES, HIRES_SPRITES } from '../public/js/sprite-hires.js?v=f98be5eb';
-import { DENSE_SPRITES, denseFrame, densePath, denseSprite } from '../public/js/sprite-dense.js?v=178a711b';
+import { FIRST_DRAW_SPRITES, HIRES_SPRITES } from '../public/js/sprite-hires.js?v=abaf3d5a';
+import { DENSE_SPRITES, denseFrame, densePath, denseSprite } from '../public/js/sprite-dense.js?v=2a0ce07a';
 import {
   STREET_SPIRIT_ART,
   STREET_SPIRIT_LONELY_ART,
@@ -117,7 +117,7 @@ describe('sharp sprites drawn bigger than their frames', () => {
       }
     }
     // The watering can, hatchet and Class Axe rows of game.js SHEETS are these sheets.
-    for (const [key, path] of [['wateringCanTool', 'assets/sprites/tools/watering-can-tool.png'], ['hatchetTool', 'assets/sprites/tools/hatchet-tool.png'], ['classAxeTool', 'assets/sprites/tools/class-axe-tool.png']]) {
+    for (const [key, path] of [['wateringCanTool', 'assets/sprites/tools/watering-can-tool.webp'], ['hatchetTool', 'assets/sprites/tools/hatchet-tool.webp'], ['classAxeTool', 'assets/sprites/tools/class-axe-tool.webp']]) {
       assert.match(game, new RegExp(`${key}: \\{\\s*url: '${path.replace(/[.]/g, '\\.')}'`), key);
       assert.ok(HIRES_SPRITES.has(path), path);
     }
@@ -129,7 +129,7 @@ describe('sharp sprites drawn bigger than their frames', () => {
     const hit = denseSprite(`./${path}?v=1`, 4.6);
     assert.equal(hit.density, 5);
     assert.equal(densePath(`https://x.test/play/../${path}?v=2`), path);
-    assert.equal(denseSprite('assets/sprites/icons/apple.png', 9), null);
+    assert.equal(denseSprite('assets/sprites/icons/apple.webp', 9), null);
   });
 
   it('denseFrame finds every cell in its part, density x the 1x cell', () => {
@@ -165,7 +165,7 @@ describe('sharp sprites drawn bigger than their frames', () => {
   it('the Focusing Orb draws its 4x cells where meditation holds it at twice their size (the 80x80 overlay)', () => {
     const med = readFileSync(join(pub, 'js/features/meditation-feature.js'), 'utf8');
     assert.match(med, /denseSprite\(ORB_TOOL_SHEET\.url/);
-    const r = dense['assets/sprites/meditation/focusing_orb-tool.png'];
+    const r = dense['assets/sprites/meditation/focusing_orb-tool.webp'];
     assert.equal(r?.status, 'ok', r?.reason);
     assert.equal(r.density, 4);
     assert.equal(r.cells, 31);

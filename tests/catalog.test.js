@@ -119,9 +119,9 @@ describe('item catalog', () => {
     for (const item of data.items) {
       const html = pages.find((p) => p.id === item.id).html;
       if (item.icon) {
-        assert.ok(existsSync(join(pub, 'assets/sprites/icons', `${item.id}.png`)), item.id);
+        assert.ok(existsSync(join(pub, 'assets/sprites/icons', `${item.id}.webp`)), item.id);
         // The picture at the top is the icon, or the larger art the item stands as (tools/catalog/hero.mjs, tests/catalog-item-pages.test.js).
-        assert.match(html, new RegExp(`<div class="cat-hero-frame"><img class="cat-hero-icon cat-from-(?:icon[^"]*" src="\\.\\./\\.\\./\\.\\./assets/sprites/icons/${item.id}${item.icon === 3 ? '@3x' : ''}\\.png|standing" src="\\.\\./\\.\\./\\.\\./assets/sprites/[a-z/-]+/${item.id}@3x\\.webp)\\?v=[0-9a-f]{8}"`), item.id);
+        assert.match(html, new RegExp(`<div class="cat-hero-frame"><img class="cat-hero-icon cat-from-(?:icon[^"]*" src="\\.\\./\\.\\./\\.\\./assets/sprites/icons/${item.id}${item.icon === 3 ? '@3x' : ''}\\.webp|standing" src="\\.\\./\\.\\./\\.\\./assets/sprites/[a-z/-]+/${item.id}@3x\\.webp)\\?v=[0-9a-f]{8}"`), item.id);
       } else {
         assert.match(html, /<span class="cat-hero-icon cat-ph" aria-hidden="true"><\/span>/, item.id);
       }

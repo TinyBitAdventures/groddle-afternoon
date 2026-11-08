@@ -74,9 +74,9 @@ import {
   machineTank,
   roomMachineVerbs,
   secondsToString,
-} from './machine-rooms.js?v=725fbf92';
-import { ASSEMBLY_SKILL, FUEL_PER_CELL, MAX_FUEL, isMachine } from './machines.js?v=2f4f8293';
-import { INTERIOR, interiorBounds } from './home-decor.js?v=6735c85f';
+} from './machine-rooms.js?v=a201d684';
+import { ASSEMBLY_SKILL, FUEL_PER_CELL, MAX_FUEL, isMachine } from './machines.js?v=663980c9';
+import { INTERIOR, interiorBounds } from './home-decor.js?v=f9b0e3dc';
 
 export const HOME_MACHINES_ID = 'home-machines';
 

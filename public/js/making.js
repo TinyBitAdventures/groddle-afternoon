@@ -16,8 +16,8 @@ import {
   itemIcon,
   ensureItem,
   registerItemUse,
-} from './inventory.js?v=d82f3b00';
-import { GRINDER_TOOLS, TOOL_CONDITION_CATALOG, brokenToolIcon, canUseTool, firstWorkingTool, useToolCondition } from './tools.js?v=f701b241';
+} from './inventory.js?v=b7609342';
+import { GRINDER_TOOLS, TOOL_CONDITION_CATALOG, brokenToolIcon, canUseTool, firstWorkingTool, useToolCondition } from './tools.js?v=d8aa3536';
 import { getSkillPackageOverride, highestSkillLevel, skillPackageDetails } from './skill-packages.js?v=bfb87281';
 import {
   adjustedTaskLimit,
@@ -940,7 +940,7 @@ export function makePanelIcon(tool, inv, toolState = null, atStation = false) {
   const brokenSrc = found.owned && !found.tool ? brokenToolIcon(found.fallback) : null;
   return {
     tool: id,
-    src: brokenSrc || ITEM_CATALOG[id]?.icon || `assets/sprites/icons/${id}.png`,
+    src: brokenSrc || ITEM_CATALOG[id]?.icon || `assets/sprites/icons/${id}.webp`,
     broken: Boolean(brokenSrc),
   };
 }

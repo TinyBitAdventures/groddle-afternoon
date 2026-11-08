@@ -21,7 +21,7 @@
  * the crab, runs its conversation and applies these results.
  */
 
-import { MUSICBLOCK_CATALOG } from './musicblocks.js?v=f5adbf0c';
+import { MUSICBLOCK_CATALOG } from './musicblocks.js?v=db6a213b';
 
 export const CRAB_CLASS = 'npc_crab';
 export const CRAB_FEATURE_ID = 'crabs';
@@ -129,7 +129,7 @@ export const CRAB_ITEMS = Object.freeze({
     label: 'Crabato Juice',
     namePlural: 'Crabato Juices',
     desc: 'Mmm... all the goodness of crab juice, plus tomatoes!',
-    icon: 'assets/sprites/icons/crabato_juice.png',
+    icon: 'assets/sprites/icons/crabato_juice.webp',
     baseCost: 50,
     stackMax: 24,
     tags: ['drink'],
@@ -138,7 +138,7 @@ export const CRAB_ITEMS = Object.freeze({
     label: 'CrabPod Headphones',
     namePlural: 'CrabPod Headphones',
     desc: 'These appear to be the kind of headphones only a crab could love. The sound quality is fabulous, but they really pinch your earlobes.',
-    icon: 'assets/sprites/icons/crabphones.png',
+    icon: 'assets/sprites/icons/crabphones.webp',
     baseCost: 0,
     stackMax: 1,
     tags: ['no_rube', 'crabphones', 'no_auction', 'no_trade'],

@@ -40,6 +40,7 @@ import { keyOf as moduleKeyOf, sharedLink } from '../module-keys/build.mjs';
 import { literalFrom, readItemTags } from '../inventory/gsjs-data.mjs';
 import { supplyConversions } from '../job-obtainable.mjs';
 import { loadEncyclopedia } from '../encyclopedia/data.mjs';
+import { imageSize } from '../image-size.mjs';
 import { whereToFind } from '../encyclopedia/where-to-find.mjs';
 import { inRemake, makeParts, sep } from '../encyclopedia/parts.mjs';
 import { neverReleased, neverReleasedNote, neverReleasedTag } from '../encyclopedia/never-released.mjs';
@@ -245,8 +246,8 @@ export function categoryOf(item) {
 /* -- Icons --------------------------------------------- */
 
 function pngSize(path) {
-  const b = readFileSync(path);
-  return b.length > 24 && b.toString('ascii', 12, 16) === 'IHDR' ? { w: b.readUInt32BE(16), h: b.readUInt32BE(20) } : null;
+  const s = imageSize(path);
+  return s ? { w: s.w, h: s.h } : null;
 }
 
 /**
@@ -257,7 +258,7 @@ function pngSize(path) {
  * the SWF's version stamp), is one and the same 40 x 40 picture: the Large
  * Petrified Rock (md5 f9cbda35..., all 38). Those captures are reference only
  * (research/catalog-icons-2026-10-27/raw/wayback-matches.txt); what ships is a
- * byte copy of the CC0 petrified_rock_large.png and @3x.png under each id.
+ * byte copy of the CC0 petrified_rock_large.webp and @3x.webp under each id.
  * id -> the capture's <n>_<ts>.
  */
 export const ROCK_STAND_INS = Object.freeze({
@@ -302,11 +303,11 @@ export const ROCK_STAND_INS = Object.freeze({
 });
 export const ROCK_STAND_IN_ICON = 'petrified_rock_large';
 
-/** The pack icon (assets/sprites/icons/<id>.png, CC0 OGA or tools/icon-hires 3x renders), or null: a placeholder is drawn. */
+/** The pack icon (assets/sprites/icons/<id>.webp, CC0 OGA or tools/icon-hires 3x renders), or null: a placeholder is drawn. */
 function iconOf(id, files) {
-  if (!files.has(`${id}.png`)) return null;
-  const one = pngSize(join(ICONS, `${id}.png`));
-  const hi = files.has(`${id}@3x.png`) ? pngSize(join(ICONS, `${id}@3x.png`)) : null;
+  if (!files.has(`${id}.webp`)) return null;
+  const one = pngSize(join(ICONS, `${id}.webp`));
+  const hi = files.has(`${id}@3x.webp`) ? pngSize(join(ICONS, `${id}@3x.webp`)) : null;
   return one ? { w: one.w, h: one.h, hi: hi ? { w: hi.w, h: hi.h } : null } : null;
 }
 
@@ -786,7 +787,7 @@ function indexPage(data, vendorIcons = {}) {
           <label><span>Category</span>
             <select id="cat">
               <option value="">All categories</option>
-${data.categories.map((name) => { const pic = data.items.find((i) => i.category === name && i.icon); return `              <option value="${esc(name)}"${pic ? ` data-icon="../../assets/sprites/icons/${esc(pic.id)}.png"` : ''}>${esc(name)} (${fmt(data.items.filter((i) => i.category === name).length)})</option>`; }).join('\n')}
+${data.categories.map((name) => { const pic = data.items.find((i) => i.category === name && i.icon); return `              <option value="${esc(name)}"${pic ? ` data-icon="../../assets/sprites/icons/${esc(pic.id)}.webp"` : ''}>${esc(name)} (${fmt(data.items.filter((i) => i.category === name).length)})</option>`; }).join('\n')}
             </select>
           </label>
           <label><span>Sold by</span>

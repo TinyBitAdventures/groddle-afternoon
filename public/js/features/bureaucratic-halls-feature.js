@@ -56,15 +56,15 @@
  *   confirm, done, left), hallStep, hallHelper, hallBuff, hallRefusals, hallClerks.
  */
 
-import { LEGALIZE_CLERKS } from '../legalize-it.js?v=bebf2574';
-import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=d82f3b00';
+import { LEGALIZE_CLERKS } from '../legalize-it.js?v=ffce7efe';
+import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=b7609342';
 import { loseEnergy, loseMood } from '../metabolics.js?v=8504134e';
-import { acceptOffer, ensureQuestOfferState, markOffered, questMoveNote, questStatus } from '../quest-offers.js?v=486b09c9';
+import { acceptOffer, ensureQuestOfferState, markOffered, questMoveNote, questStatus } from '../quest-offers.js?v=e31115ea';
 import { getQuestCatalog } from '../content-catalogs.js?v=10b118dd';
 import { parseQuestConversation } from '../quests.js?v=c8d9d0a4';
 import { CUP_CLASS, CUP_OF_WATER, WATER_COOLER, WATER_COOLER_CLASS, drinkCup, getWater, getWaterState } from '../water-cooler.js?v=1cf1b040';
 import { BUREAUCRAT_CLASS, HALL, HALL_LAYOUT, HALL_TEXT, PLEASE_WAIT_BUFF, TALK_VERB, createHallFlow } from '../bureaucratic-hall.js?v=a0bc6317';
-import { questRoomConverse } from './quest-instances-feature.js?v=90e5b2fd';
+import { questRoomConverse } from './quest-instances-feature.js?v=f6015246';
 import { HALL_MP_TEXT, HALL_POSE_MS, clerkAt, clerkRow, poseChanged } from '../halls-mp.js?v=044b5c5a';
 
 export const HALLS_FEATURE_ID = 'bureaucratic-halls';
@@ -94,7 +94,7 @@ const ROOM = Object.freeze({ width: HALL.width, height: HALL.height, ground: HAL
 const EXIT_X = HALL_LAYOUT.exitX;
 /** Ours: in the desk room, between the desk (x 254-548) and the partition (x 625). */
 export const COOLER_X = 580;
-const COOLER_ART = 'assets/sprites/icons/water_cooler@3x.png';
+const COOLER_ART = 'assets/sprites/icons/water_cooler@3x.webp';
 export const GET_WATER_VERB = WATER_COOLER.verb.id;
 export const DRINK_VERB = 'cup_drink';
 const EXIT_ART = 'assets/decos/groddle/door_asset_bureaucratic_hall_int.png';

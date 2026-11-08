@@ -32,13 +32,14 @@
 import { execFileSync } from 'node:child_process';
 import { existsSync, mkdtempSync, readFileSync, renameSync, rmSync, statSync, unlinkSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { encodeLosslessWebp } from '../webp-lossless.mjs';
 import os from 'node:os';
 import { HERE, FW, FH, COLS, TYPES, allCells, sheetSvg } from './compose.mjs';
 import { crop, downscale, readImage, renderSvg, score, toBytes } from './pixels.mjs';
 
 const ROOT = join(HERE, '../..');
 const PUBLIC = join(ROOT, 'public');
-export const SHEET = 'assets/sprites/quoin__x1_1_x1_2_x1_3_x1_4_x1_5_x1_6_x1_7_x1_8_png_1354829599.png';
+export const SHEET = 'assets/sprites/quoin__x1_1_x1_2_x1_3_x1_4_x1_5_x1_6_x1_7_x1_8_png_1354829599.webp';
 const RESULTS = join(ROOT, 'tools/vector-sprites/results.json');
 
 /** Same bars as tools/vector-sprites (tests/vector-sprites.test.js checks them). */
@@ -127,14 +128,14 @@ async function main() {
   if (DRY) return;
 
   // Write <name>@3x.png or .webp (lossless, whichever is smaller).
-  const stem = join(PUBLIC, SHEET.replace(/\.png$/, ''));
+  const stem = join(PUBLIC, SHEET.replace(/\.(png|webp)$/, ''));
   const tmp = mkdtempSync(join(os.tmpdir(), 'quoin-art-'));
   const tmpPng = join(tmp, 'sheet.png');
   const tmpWebp = join(tmp, 'sheet.webp');
   writeFileSync(tmpPng, three.png);
   execFileSync('magick', [tmpPng, '-strip', '-define', 'png:compression-level=9', tmpPng]);
-  execFileSync('magick', [tmpPng, '-define', 'webp:lossless=true', '-define', 'webp:method=6', '-define', 'webp:exact=true', tmpWebp]);
-  const useWebp = statSync(tmpWebp).size < statSync(tmpPng).size * 0.9;
+  encodeLosslessWebp(tmpPng, tmpWebp);
+  const useWebp = statSync(tmpWebp).size < statSync(tmpPng).size; // lossless WebP whenever smaller (Austin 2026-11-07)
   for (const ext of ['png', 'webp']) if (existsSync(`${stem}@3x.${ext}`)) unlinkSync(`${stem}@3x.${ext}`);
   const file = `${stem}@3x.${useWebp ? 'webp' : 'png'}`;
   renameSync(useWebp ? tmpWebp : tmpPng, file);

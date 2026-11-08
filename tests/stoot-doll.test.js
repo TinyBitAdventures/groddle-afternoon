@@ -1,4 +1,5 @@
 import test from 'node:test';
+import { imageSize } from '../tools/image-size.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -19,29 +20,29 @@ import {
   createInventory,
   ensureItem,
   listPackItemSlots,
-} from '../public/js/inventory.js?v=d82f3b00';
+} from '../public/js/inventory.js?v=b7609342';
 import {
   createDroppedItemState,
   dropInventoryStack,
   listDroppedStacks,
   pickupDroppedStack,
-} from '../public/js/world-items.js?v=6378e71c';
+} from '../public/js/world-items.js?v=0bbfdab9';
 import {
   createShrineState,
   listShrineDonationOptions,
   quoteShrineDonation,
-} from '../public/js/shrines.js?v=95d74174';
+} from '../public/js/shrines.js?v=1a945fe7';
 import {
   createVendorSellQuote,
   listSellOffers,
   vendorSell,
-} from '../public/js/vendor.js?v=18b51628';
+} from '../public/js/vendor.js?v=307aca18';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
 function pngSize(file) {
   const bytes = fs.readFileSync(file);
-  return { width: bytes.readUInt32BE(16), height: bytes.readUInt32BE(20) };
+  return { width: imageSize(bytes).w, height: imageSize(bytes).h };
 }
 
 test.describe('official Stoot pull-string catalog', () => {
@@ -100,7 +101,7 @@ test.describe('pull-string interaction', () => {
 
   test('ships the clean doll art and world verb without recording media', () => {
     assert.deepEqual(
-      pngSize(path.join(root, 'public/assets/sprites/spinning-wheel/stoot-doll.png')),
+      pngSize(path.join(root, 'public/assets/sprites/spinning-wheel/stoot-doll.webp')),
       { width: 59, height: 59 }
     );
     const game = fs.readFileSync(path.join(root, 'public/game.js'), 'utf8');
@@ -143,7 +144,7 @@ test.describe('pull-string interaction', () => {
   test('keeps the rare doll usable in the pack and intact through drop and pickup', () => {
     ensureItem(STOOT_DOLL_ID, {
       label: 'Stoot Barfield Pullstring Doll',
-      icon: 'assets/sprites/spinning-wheel/stoot-doll.png',
+      icon: 'assets/sprites/spinning-wheel/stoot-doll.webp',
       baseCost: 1_333_100,
       stackMax: 1,
       sellable: false,

@@ -31,10 +31,12 @@
  */
 import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
-import { copyFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join, relative } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import { imageSize } from '../image-size.mjs';
+import { encodeLosslessWebp, pngBufferToWebp } from '../webp-lossless.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
 export const SPIKE = join(here, '../..');
@@ -48,15 +50,19 @@ const JAVA = '/opt/homebrew/opt/openjdk@21/bin/java';
 const FFDEC = join(SPIKE, '..', 'tools/ffdec/ffdec.jar');
 const FFDEC_FALLBACK = join(process.env.HOME || '', 'Documents/glitch-audit/tools/ffdec/ffdec.jar');
 
-/** The logo's bytes, refused under any name (sha1 of logo_glitch.png and glitch_logo.swf). */
-export const LOGO_SHA1 = Object.freeze(['7cc11706eb69383565c61c95d4787937cc7bfe86', '72ba15a4dfabcc0ba7208d3d84e8d1b90a721572']);
+/**
+ * The logo's bytes, refused under any name (sha1 of logo_glitch.png, glitch_logo.swf, and
+ * logo_glitch.png as the lossless WebP a copy would ship as).
+ */
+export const LOGO_SHA1 = Object.freeze(['7cc11706eb69383565c61c95d4787937cc7bfe86', '72ba15a4dfabcc0ba7208d3d84e8d1b90a721572', 'bcf03e4964b2026420372ea9e375ca7e50f59a7d']);
 export const TRADEMARK = /glitch/i;
 
 export const sha1 = (buf) => createHash('sha1').update(buf).digest('hex');
 
 /** Width and height of a PNG (IHDR) or an SVG (its width/height attributes). */
 export function artSize(buf, name = '') {
-  if (buf.subarray(1, 4).toString('latin1') === 'PNG') return [buf.readUInt32BE(16), buf.readUInt32BE(20)];
+  const raster = imageSize(buf);
+  if (raster) return [raster.w, raster.h];
   const head = buf.subarray(0, 2048).toString('utf8');
   const svg = /<svg\b[^>]*>/.exec(head);
   if (svg) {
@@ -64,7 +70,7 @@ export function artSize(buf, name = '') {
     const h = /\sheight="([\d.]+)(?:px)?"/.exec(svg[0]);
     if (w && h) return [Number(w[1]), Number(h[1])];
   }
-  throw new Error(`${name}: not a PNG or a sized SVG`);
+  throw new Error(`${name}: not a PNG, a WebP or a sized SVG`);
 }
 
 /** Problems with one piece of art about to ship (empty when it may). */
@@ -164,7 +170,7 @@ export function moduleText(m) {
     if (e.strip) x.strip = true;
     return x;
   };
-  for (const e of m.copy) rows.push({ name: e.name, file: `${URL_DIR}/${e.name}.png`, kind: 'copy', src: e.src, ...meta(e) });
+  for (const e of m.copy) rows.push({ name: e.name, file: `${URL_DIR}/${e.name}.webp`, kind: 'copy', src: e.src, ...meta(e) });
   for (const e of m.reuse) rows.push({ name: e.name, file: e.path, kind: 'reuse', src: e.src });
   for (const e of m.svg) rows.push({ name: e.name, file: `${URL_DIR}/${e.name}.svg`, kind: 'svg', src: e.swf, ...meta(e) });
   rows.sort((a, b) => a.name.localeCompare(b.name));
@@ -197,7 +203,7 @@ export function check() {
   let m;
   try { m = readManifest(); } catch (err) { return [err.message]; }
   const shipped = new Map();
-  for (const e of m.copy) shipped.set(`${e.name}.png`, e);
+  for (const e of m.copy) shipped.set(`${e.name}.webp`, e);
   for (const e of m.svg) shipped.set(`${e.name}.svg`, e);
   const onDisk = existsSync(OUT_DIR) ? readdirSync(OUT_DIR) : [];
   for (const f of onDisk) {
@@ -211,16 +217,18 @@ export function check() {
     if (!existsSync(p)) problems.push(`${e.path}: the remake no longer ships it`);
   }
   if (problems.length) return problems;
-  // Sources, when glitch-client is beside the game: copies and reuses are its bytes.
+  // Sources, when glitch-client is beside the game: copies are its pictures as lossless WebP
+  // (the same pixels; tools/webp-lossless.mjs gives the same bytes for them), reuses are its bytes.
   if (existsSync(ASSETS)) {
     for (const e of m.copy) {
       const src = join(ASSETS, e.src);
       if (!existsSync(src)) problems.push(`${e.src}: no such source`);
-      else if (sha1(readFileSync(src)) !== sha1(readFileSync(join(OUT_DIR, `${e.name}.png`)))) problems.push(`${e.name}.png differs from ${e.src}`);
+      else if (sha1(pngBufferToWebp(readFileSync(src))) !== sha1(readFileSync(join(OUT_DIR, `${e.name}.webp`)))) problems.push(`${e.name}.webp differs from ${e.src}`);
     }
     for (const e of m.reuse) {
       const src = join(ASSETS, e.src);
-      if (existsSync(src) && sha1(readFileSync(src)) !== sha1(readFileSync(join(SPIKE, 'public', e.path)))) problems.push(`${e.path} differs from ${e.src}`);
+      const want = existsSync(src) ? readFileSync(src) : null;
+      if (want && sha1(e.path.endsWith('.webp') ? pngBufferToWebp(want) : want) !== sha1(readFileSync(join(SPIKE, 'public', e.path)))) problems.push(`${e.path} differs from ${e.src}`);
     }
     for (const e of m.svg) if (!existsSync(join(ASSETS, e.swf))) problems.push(`${e.swf}: no such source`);
   }
@@ -239,7 +247,7 @@ export function build({ keep = false } = {}) {
     const src = join(ASSETS, e.src);
     const bad = trademarkProblems(e.name, readFileSync(src));
     if (bad.length) throw new Error(bad.join('\n'));
-    copyFileSync(src, join(OUT_DIR, `${e.name}.png`));
+    encodeLosslessWebp(src, join(OUT_DIR, `${e.name}.webp`));
   }
   const work = mkdtempSync(join(tmpdir(), 'classic-art-'));
   try {

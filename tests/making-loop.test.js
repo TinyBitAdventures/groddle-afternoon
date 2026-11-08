@@ -39,7 +39,7 @@ import {
   starterToolsInventory,
   starterCraftIngredients,
   pluralizeItem,
-} from '../public/js/making.js?v=c9dc233e';
+} from '../public/js/making.js?v=f4f214c2';
 import { outputIconsHtml, outputsPhrase, recipeOutputRows } from '../public/js/ui/recipe-outputs.js?v=73e19baf';
 import {
   createInventory,
@@ -50,13 +50,13 @@ import {
   listPackItemSlots,
   listPackToolSlots,
   listPackRows,
-} from '../public/js/inventory.js?v=d82f3b00';
+} from '../public/js/inventory.js?v=b7609342';
 import {
   buildActivitySegments,
   activitySegmentsToHtml,
   formatSignedDelta,
 } from '../public/js/verb-rewards.js?v=d3ce41d5';
-import { runVerb } from '../public/content.js?v=075ded81';
+import { runVerb } from '../public/content.js?v=ebc8b8b3';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const recipesPath = join(__dirname, '../public/assets/content/recipes.json');
@@ -463,7 +463,7 @@ describe('UI wiring', () => {
 
 describe('quest-taught recipes (learnt 3)', () => {
   it('Batterfly Bounty teaches the Batterfly Bounty Booster Bar', async () => {
-    const { RECIPE_CATALOG, canCraft, searchRecipes, recipeKnown, loadRecipeCatalog } = await import('../public/js/making.js?v=c9dc233e');
+    const { RECIPE_CATALOG, canCraft, searchRecipes, recipeKnown, loadRecipeCatalog } = await import('../public/js/making.js?v=f4f214c2');
     if (typeof loadRecipeCatalog === 'function') await loadRecipeCatalog?.();
     const bar = Object.values(RECIPE_CATALOG).find((r) => r.id === '305');
     assert.ok(bar, 'recipe 305 imported');

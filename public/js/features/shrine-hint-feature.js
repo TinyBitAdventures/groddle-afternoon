@@ -27,11 +27,11 @@
  *   wrong-shrine:<giant>), giantLoveScreen (open | ready | closed),
  *   giantLoveLine, giantLoveSound.
  */
-import { questStatus } from '../quest-offers.js?v=486b09c9';
+import { questStatus } from '../quest-offers.js?v=e31115ea';
 import { GIANT_SCREEN_FADE_MS, giantLoveResponse } from '../giant-love.js?v=aa9ea315';
-import { GIANTS, inEmblemHitbox } from '../shrines.js?v=95d74174';
+import { GIANTS, inEmblemHitbox } from '../shrines.js?v=1a945fe7';
 import { vogPages } from '../newxp.js?v=8fa18f24';
-import { screenInput } from '../screen-fx.js?v=155d18cf';
+import { screenInput } from '../screen-fx.js?v=b4ec277f';
 
 export const SHRINE_HINT_FEATURE_ID = 'shrine-hint';
 export const SHRINES_TO_PASS = 3;
@@ -182,7 +182,7 @@ function showGiantScreen(engine, screen, giantId) {
   const r = engine.app?.canvas?.getBoundingClientRect?.() || document.querySelector('canvas')?.getBoundingClientRect();
   if (r) Object.assign(el.style, { left: `${r.left}px`, top: `${r.top}px`, width: `${r.width}px`, height: `${r.height}px` });
   el.style.background = hexToRgba(screen.bg, screen.alpha);
-  el.querySelector('.gs-art').src = `assets/sprites/icons/emblem_${giantId}@3x.png`;
+  el.querySelector('.gs-art').src = `assets/sprites/icons/emblem_${giantId}@3x.webp`;
   el.querySelector('.gs-name').textContent = screen.title;
   el.querySelector('.gs-tip').textContent = screen.tipBody;
   el.setAttribute('aria-label', `${screen.title} ${screen.tipBody}`);

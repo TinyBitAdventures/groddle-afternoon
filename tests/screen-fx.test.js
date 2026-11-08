@@ -18,7 +18,7 @@ import {
   awardRewardTokens,
   runStreetTransition,
   showAwardScreen,
-} from '../public/js/screen-fx.js?v=155d18cf';
+} from '../public/js/screen-fx.js?v=b4ec277f';
 
 describe('screen-fx timings (LoadingLocationView / BaseScreenView)', () => {
   it('uses the street card windows and the BaseScreenView fades (seconds)', () => {
@@ -148,7 +148,7 @@ describe('badge + loading asset maps (local pack)', () => {
     const { fileURLToPath } = await import('node:url');
     const root = join(dirname(fileURLToPath(import.meta.url)), '../public');
     const game = readFileSync(join(root, 'game.js'), 'utf8');
-    assert.ok(existsSync(join(root, 'assets/ui/quest-book.png')));
+    assert.ok(existsSync(join(root, 'assets/ui/quest-book.webp')));
     assert.match(
       game,
       /const completionPages = parseQuestConversation\(update\.def\.completion\)/
@@ -165,7 +165,7 @@ describe('badge + loading asset maps (local pack)', () => {
 
 describe('award card text', () => {
   it('drops GSJS item links and tags but keeps the words', async () => {
-    const { awardText, normalizeAwardPages } = await import('../public/js/screen-fx.js?v=155d18cf');
+    const { awardText, normalizeAwardPages } = await import('../public/js/screen-fx.js?v=b4ec277f');
     assert.equal(
       awardText('Give 6 <a href="event:item|npc_piggy">Piggies</a> the pleasuring of a lifetime. By petting them, of course.'),
       'Give 6 Piggies the pleasuring of a lifetime. By petting them, of course.',
@@ -176,7 +176,7 @@ describe('award card text', () => {
   });
 });
 
-import { LOAD_STATUS, loadStatusLabel, loadingSplit, cssColor } from '../public/js/screen-fx.js?v=155d18cf';
+import { LOAD_STATUS, loadStatusLabel, loadingSplit, cssColor } from '../public/js/screen-fx.js?v=b4ec277f';
 
 describe('loading card status and hub split (LoadingLocationView.as)', () => {
   it('uses the client status labels with the TimerBar percent', () => {
@@ -224,7 +224,7 @@ import {
   polGradient,
   polNeighbours,
   polVisitLine,
-} from '../public/js/screen-fx.js?v=155d18cf';
+} from '../public/js/screen-fx.js?v=b4ec277f';
 
 describe('home loading card (G249, LoadingLocationPOLView.as)', () => {
   it('names the place as setText does (215-235)', () => {
@@ -268,13 +268,13 @@ describe('home loading card (G249, LoadingLocationPOLView.as)', () => {
     assert.equal(house.textX, 290);
     assert.equal(house.allWidth, 290 + 326);
     assert.deepEqual(house.owner, { x: -20, y: 15 });
-    assert.equal(house.door.src, 'assets/sprites/loading/enter_home_door.png');
+    assert.equal(house.door.src, 'assets/sprites/loading/enter_home_door.webp');
     assert.equal(house.enterY, 50);
     assert.equal(house.featuresPad, 20);
     assert.equal(house.artHeight, 380);
     const tower = polCardLayout('tower');
     assert.deepEqual([tower.door.x, tower.door.y], [-105, -10]);
-    assert.equal(tower.door.src, 'assets/sprites/loading/enter_tower_door.png');
+    assert.equal(tower.door.src, 'assets/sprites/loading/enter_tower_door.webp');
     const street = polCardLayout('exterior');
     assert.equal(street.textX, 135);
     assert.equal(street.door, null);
@@ -290,8 +290,8 @@ describe('home loading card (G249, LoadingLocationPOLView.as)', () => {
     const { join, dirname } = await import('node:path');
     const { fileURLToPath } = await import('node:url');
     const pub = join(dirname(fileURLToPath(import.meta.url)), '..', 'public');
-    assert.ok(existsSync(join(pub, 'assets/sprites/loading/enter_home_door.png')));
-    assert.ok(existsSync(join(pub, 'assets/sprites/loading/enter_tower_door.png')));
+    assert.ok(existsSync(join(pub, 'assets/sprites/loading/enter_home_door.webp')));
+    assert.ok(existsSync(join(pub, 'assets/sprites/loading/enter_tower_door.webp')));
     const game = readFileSync(join(pub, 'game.js'), 'utf8');
     assert.match(game, /pol: \{ type: homeState\.room === 'interior' \? 'interior' : 'exterior' \}/);
     assert.match(game, /pol: \{ type: room === 'interior' \? 'interior' : 'exterior' \}/);
@@ -304,7 +304,7 @@ describe('home loading card (G249, LoadingLocationPOLView.as)', () => {
 
 describe('home loading card on a narrow screen', () => {
   it('scales the holder and the fill to fit with 16 px gutters', async () => {
-    const { polCardScale } = await import('../public/js/screen-fx.js?v=155d18cf');
+    const { polCardScale } = await import('../public/js/screen-fx.js?v=b4ec277f');
     const house = polCardLayout('interior');
     assert.equal(polCardScale(house, 1280), 1);
     assert.equal(polCardScale(house, 390), (390 - 32) / 616);

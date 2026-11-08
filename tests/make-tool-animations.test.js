@@ -17,7 +17,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { inflateSync } from 'node:zlib';
 import { MAKE_TOOL_SHEETS } from '../public/js/make-tool-sheets.js?v=6f758e09';
-import { TOOL_STAND_INS, listMakingTools, loadRecipeCatalogFromFile } from '../public/js/making.js?v=c9dc233e';
+import { TOOL_STAND_INS, listMakingTools, loadRecipeCatalogFromFile } from '../public/js/making.js?v=f4f214c2';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const pub = join(spike, 'public');
@@ -126,7 +126,7 @@ describe('G188 Make panel tool animations', () => {
     for (const f of readdirSync(makingDir)) {
       if (/-work(@\d+x)?\.(webp|png)$/.test(f)) assert.ok(urls.has(f), `${f} is not in the table`);
       // irrigator_9000-tool.png is the watering pour (game.js IRRIGATOR_TOOL_SHEET), not a Make panel sheet.
-      if (f.endsWith('-tool.png')) assert.equal(f, 'irrigator_9000-tool.png', `${f}: unused grid`);
+      if (f.endsWith('-tool.png')) assert.equal(f, 'irrigator_9000-tool.webp', `${f}: unused grid`);
     }
   });
 

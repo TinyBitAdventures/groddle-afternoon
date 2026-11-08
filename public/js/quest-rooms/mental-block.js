@@ -47,7 +47,7 @@
  * blocks, billboards and silhouettes are clean vectors.
  */
 
-import { pushOutOfSolids, spawnQuoins, takeQuoins, BODY_H } from './puzzle-kit.js?v=7410b322';
+import { pushOutOfSolids, spawnQuoins, takeQuoins, BODY_H } from './puzzle-kit.js?v=378c28e8';
 import { textureFromUrl } from '../textures.js?v=3149d699';
 
 const ROOM_ID = 'mental_block';
@@ -621,7 +621,7 @@ export const room = {
   id: ROOM_ID,
   title: 'Mental Block',
   kicker: 'Drop blocks, climb out',
-  icon: 'assets/sprites/icons/play_cube.png',
+  icon: 'assets/sprites/icons/play_cube.webp',
   theme: 'dark',
   // G315: hub 135 'Puzzles' (inc_data_maps_prod.js 1197), the template's hub.
   hubName: 'Puzzles',
@@ -701,8 +701,8 @@ export const room = {
     // QA: ?mbstation=N starts at station N with the ones before it cleared.
     for (let k = 0; k < qaStart(ctx, geo); k++) ctx.data.state[k].cleared = true;
     ctx.data.columnTargets = {};
-    ctx.data.outTex = textureFromUrl(`${ART}wall_button_lockOut.png`);
-    ctx.data.inTex = textureFromUrl(`${ART}wall_button_lockIn.png`);
+    ctx.data.outTex = textureFromUrl(`${ART}wall_button_lockOut.webp`);
+    ctx.data.inTex = textureFromUrl(`${ART}wall_button_lockIn.webp`);
     ctx.data.view = geo.sections.map((s) => makeStationView(ctx, s));
     ctx.data.buttons = [];
     geo.sections.forEach((s) => {
@@ -1293,13 +1293,13 @@ function makeEnd(ctx) {
     // Teleporter_Base (550x1058): the pad's foot at y 1020, the top emitter's
     // rim at y ~30; the emitter hangs under the door ledge.
     const sc = (SHELF_Y + 4 - end.ledgeY) / 990;
-    const base = new PIXI.Sprite(textureFromUrl(`${ART}Teleporter_Base.png`));
+    const base = new PIXI.Sprite(textureFromUrl(`${ART}Teleporter_Base.webp`));
     base.anchor.set(0.5, 1020 / 1058);
     base.scale.set(sc);
     base.x = end.padX;
     base.y = SHELF_Y + 4;
     ctx.add(base, 6);
-    const beam = new PIXI.Sprite(textureFromUrl(`${ART}Teleporter_Beam.png`));
+    const beam = new PIXI.Sprite(textureFromUrl(`${ART}Teleporter_Beam.webp`));
     beam.anchor.set(0.5, 1020 / 1058);
     beam.scale.set(sc);
     beam.x = end.padX;

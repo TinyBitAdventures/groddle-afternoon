@@ -30,7 +30,7 @@ import {
   rookMuseumPaintingAlphas,
   rookMuseumWorldPoint,
   visitRookMuseumExhibit,
-} from '../public/js/rook-museum.js?v=aa41f263';
+} from '../public/js/rook-museum.js?v=c774b613';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -119,17 +119,17 @@ test('client ships clean recovered museum art and full transient integration', (
   }
   assert.equal(
     fs.existsSync(
-      path.join(assetRoot, 'rook_hall_focusing_orb__x1_1_png_1354835872.png')
+      path.join(assetRoot, 'rook_hall_focusing_orb__x1_1_png_1354835872.webp')
     ),
     true
   );
   assert.equal(
-    fs.existsSync(path.join(assetRoot, 'rook_hall_speaker__x1_stop_png_1354835940.png')),
+    fs.existsSync(path.join(assetRoot, 'rook_hall_speaker__x1_stop_png_1354835940.webp')),
     true
   );
   assert.equal(
     fs.existsSync(
-      path.join(assetRoot, 'rook_hall_shrine_holofilm__x1_stop_png_1354835839.png')
+      path.join(assetRoot, 'rook_hall_shrine_holofilm__x1_stop_png_1354835839.webp')
     ),
     true
   );

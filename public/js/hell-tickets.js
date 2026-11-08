@@ -40,7 +40,7 @@
  * Most first visits land in Hell One, where the source offers hell_hole.
  */
 
-import { HELL_QUESTS, normalizeHellState } from './hell.js?v=aca145ba';
+import { HELL_QUESTS, normalizeHellState } from './hell.js?v=ca971c34';
 import { LOCAL_COMPANION_PROFILES } from './local-companions.js?v=188f756c';
 
 export const HELL_TICKETS_VERSION = 1;

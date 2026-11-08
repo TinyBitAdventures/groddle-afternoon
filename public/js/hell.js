@@ -45,7 +45,7 @@
  * }
  */
 
-import { ensureItem } from './inventory.js?v=d82f3b00';
+import { ensureItem } from './inventory.js?v=b7609342';
 import { GAME_DAY_MS, getGameDayKey, getGameDayStartMs } from './game-day.js?v=edb00566';
 import { giantDisplayName } from './giant-names.js?v=0e295891';
 
@@ -377,8 +377,8 @@ export const HELL_ITEMS = Object.freeze({
     verbKey: 'q',
     tooltip: 'Do your purgatory duty',
     tags: Object.freeze(['no_trade', 'no_auction', 'no_rube']),
-    icon: 'assets/sprites/icons/bunch_of_grapes_hell.png',
-    world: 'assets/sprites/hell/bunch_of_grapes_hell-world.png',
+    icon: 'assets/sprites/icons/bunch_of_grapes_hell.webp',
+    world: 'assets/sprites/hell/bunch_of_grapes_hell-world.webp',
   }),
   wine_of_the_dead: Object.freeze({
     classTsid: 'wine_of_the_dead',
@@ -387,8 +387,8 @@ export const HELL_ITEMS = Object.freeze({
     desc: "A forbidding decanter filled with wine of the dead, made from grapes crushed in Purgatory. This Hade-licious drink will revive even the most pooped of hellions... but will kill all who drink it aboveground. Pour it on cultivated items in your home street or yard to unreap what you've sown. Beware its cursed powers!",
     stackMax: 13,
     baseCost: 66,
-    icon: 'assets/sprites/icons/wine_of_the_dead.png',
-    world: 'assets/sprites/hell/wine_of_the_dead-world.png',
+    icon: 'assets/sprites/icons/wine_of_the_dead.webp',
+    world: 'assets/sprites/hell/wine_of_the_dead-world.webp',
   }),
   drink_ticket: Object.freeze({
     classTsid: 'drink_ticket',
@@ -397,8 +397,8 @@ export const HELL_ITEMS = Object.freeze({
     desc: 'Printed in infernal inks on fire-resistant paper, a Diabolical Drink Ticket can be given to Hell\'s Bartender in exchange for the potent Wine of the Dead—a fermented beverage which revitalizes the devitalized. No one knows what the Bartender does with the tickets, but rumour has it that in sufficient numbers they can be redeemed for either an all-expenses-paid vacation to Ix or the apocalypse.',
     stackMax: 5,
     baseCost: 0,
-    icon: 'assets/sprites/icons/drink_ticket.png',
-    world: 'assets/sprites/hell/drink_ticket-world.png',
+    icon: 'assets/sprites/icons/drink_ticket.webp',
+    world: 'assets/sprites/hell/drink_ticket-world.webp',
   }),
 });
 
@@ -433,13 +433,13 @@ export function ensureHellItems() {
 /** Measured sheets (PIL alpha scan, full grids, never trimmed). */
 export const HELL_SPRITES = Object.freeze({
   grapesWorld: Object.freeze({
-    url: 'assets/sprites/hell/bunch_of_grapes_hell-world.png',
+    url: 'assets/sprites/hell/bunch_of_grapes_hell-world.webp',
     width: 280, height: 39, cols: 4, rows: 1, frameW: 70, frameH: 39, frames: 4,
     note: 'Four static bunch variants (states 1-4), not an animation',
   }),
-  grapesIcon: Object.freeze({ url: 'assets/sprites/icons/bunch_of_grapes_hell.png', width: 70, height: 73 }),
+  grapesIcon: Object.freeze({ url: 'assets/sprites/icons/bunch_of_grapes_hell.webp', width: 70, height: 73 }),
   graveside: Object.freeze({
-    urlPattern: 'assets/sprites/hell/graveside/graveside_marker_<giant>.png',
+    urlPattern: 'assets/sprites/hell/graveside/graveside_marker_<giant>.webp',
     width: 270, height: 88, cols: 3, rows: 1, frameW: 90, frameH: 88,
     states: Object.freeze(['none', 'mourn', 'celebrate']),
     giants: Object.freeze(['alph', 'cosma', 'friendly', 'generic', 'grendaline', 'humbaba', 'lem', 'mab', 'pot', 'spriggan', 'tii', 'zille']),
@@ -447,17 +447,17 @@ export const HELL_SPRITES = Object.freeze({
   bartender: Object.freeze({
     frameW: 244,
     frameH: 197,
-    idle1: Object.freeze({ url: 'assets/sprites/hell/hell_bartender-idle1.png', width: 3416, height: 1182, cols: 14, rows: 6, frames: 81 }),
-    idle2: Object.freeze({ url: 'assets/sprites/hell/hell_bartender-idle2.png', width: 3660, height: 1182, cols: 15, rows: 6, frames: 87 }),
-    talkLeft: Object.freeze({ url: 'assets/sprites/hell/hell_bartender-talk-left.png', width: 3904, height: 1379, cols: 16, rows: 7, frames: 110 }),
-    talkRight: Object.freeze({ url: 'assets/sprites/hell/hell_bartender-talk-right.png', width: 3660, height: 1379, cols: 15, rows: 7, frames: 103 }),
-    talkRightOut: Object.freeze({ url: 'assets/sprites/hell/hell_bartender-talk-right-out.png', width: 976, height: 394, cols: 4, rows: 2, frames: 7 }),
+    idle1: Object.freeze({ url: 'assets/sprites/hell/hell_bartender-idle1.webp', width: 3416, height: 1182, cols: 14, rows: 6, frames: 81 }),
+    idle2: Object.freeze({ url: 'assets/sprites/hell/hell_bartender-idle2.webp', width: 3660, height: 1182, cols: 15, rows: 6, frames: 87 }),
+    talkLeft: Object.freeze({ url: 'assets/sprites/hell/hell_bartender-talk-left.webp', width: 3904, height: 1379, cols: 16, rows: 7, frames: 110 }),
+    talkRight: Object.freeze({ url: 'assets/sprites/hell/hell_bartender-talk-right.webp', width: 3660, height: 1379, cols: 15, rows: 7, frames: 103 }),
+    talkRightOut: Object.freeze({ url: 'assets/sprites/hell/hell_bartender-talk-right-out.webp', width: 976, height: 394, cols: 4, rows: 2, frames: 7 }),
   }),
-  wineWorld: Object.freeze({ url: 'assets/sprites/hell/wine_of_the_dead-world.png', width: 168, height: 78, cols: 4, rows: 1, frameW: 42, frameH: 78, frames: 4 }),
-  wineIcon: Object.freeze({ url: 'assets/sprites/icons/wine_of_the_dead.png', width: 15, height: 48 }),
-  drinkTicketIcon: Object.freeze({ url: 'assets/sprites/icons/drink_ticket.png', width: 48, height: 48 }),
-  drinkTicketWorld: Object.freeze({ url: 'assets/sprites/hell/drink_ticket-world.png', width: 48, height: 20 }),
-  hellHoleQuestIcon: Object.freeze({ url: 'assets/sprites/hell/quest_req_icon_hellhole.png', width: 175, height: 187 }),
+  wineWorld: Object.freeze({ url: 'assets/sprites/hell/wine_of_the_dead-world.webp', width: 168, height: 78, cols: 4, rows: 1, frameW: 42, frameH: 78, frames: 4 }),
+  wineIcon: Object.freeze({ url: 'assets/sprites/icons/wine_of_the_dead.webp', width: 15, height: 48 }),
+  drinkTicketIcon: Object.freeze({ url: 'assets/sprites/icons/drink_ticket.webp', width: 48, height: 48 }),
+  drinkTicketWorld: Object.freeze({ url: 'assets/sprites/hell/drink_ticket-world.webp', width: 48, height: 20 }),
+  hellHoleQuestIcon: Object.freeze({ url: 'assets/sprites/hell/quest_req_icon_hellhole.webp', width: 175, height: 187 }),
 });
 
 /* ------------------------------------------------------------------ */

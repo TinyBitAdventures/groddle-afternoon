@@ -29,11 +29,11 @@
  * accepted | declined | quiet), room23Last, room23RepeatPaid, room23ExitIn.
  */
 
-import { acceptOffer, declineOffer, npcQuestOffers } from '../quest-offers.js?v=486b09c9';
+import { acceptOffer, declineOffer, npcQuestOffers } from '../quest-offers.js?v=e31115ea';
 import { XP_FOR_LEVEL } from '../progression.js?v=33462eaa';
 import { textureFromUrl } from '../textures.js?v=3149d699';
-import * as kit from '../quest-rooms/kit.js?v=d98b987e';
-import { GREETERBOT } from '../tower-mid-rooms.js?v=02071191';
+import * as kit from '../quest-rooms/kit.js?v=25fc6d59';
+import { GREETERBOT } from '../tower-mid-rooms.js?v=678fdc50';
 import { ROOM_23_FILES } from '../gwendolyn-room-23-art.js?v=1de55db7';
 import {
   EXIT_PROMPT,

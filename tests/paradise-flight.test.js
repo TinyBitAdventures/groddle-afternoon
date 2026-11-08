@@ -37,7 +37,7 @@ import {
   slipTerrainY,
   starlitMoonPlainAlpha,
   starlitRevealAlpha,
-} from '../public/js/paradise-flight.js?v=abcd78b9';
+} from '../public/js/paradise-flight.js?v=5d9aec42';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const publicDir = path.join(here, '..', 'public');
@@ -242,7 +242,7 @@ test('client ships real ticket art, a flight HUD, and deterministic QA entry', (
       'assets',
       'sprites',
       'icons',
-      `${course.ticketId}.png`
+      `${course.ticketId}.webp`
     )), true);
   }
   assert.match(game, /updateParadiseFlight/);

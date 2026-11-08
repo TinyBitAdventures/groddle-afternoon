@@ -10,7 +10,7 @@
 
 import { applyQuestProgress } from './quests.js?v=c8d9d0a4';
 import { unlockAchievement } from './achievements.js?v=f8ccfd34';
-import { countItem, removeItem } from './inventory.js?v=d82f3b00';
+import { countItem, removeItem } from './inventory.js?v=b7609342';
 
 export const LEGALIZE_QUEST_ID = 'card_carrying_qualification';
 export const LEGALIZE_BACK_ALLEY_TSID = 'LIF177DTS6T1KFG';

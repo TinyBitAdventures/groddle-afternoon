@@ -139,7 +139,7 @@ export function emotionalBearIconState(state) {
 }
 
 export function emotionalBearIcon(state) {
-  return `assets/sprites/emotional-bear/iconic_${emotionalBearIconState(state)}.png`;
+  return `assets/sprites/emotional-bear/iconic_${emotionalBearIconState(state)}.webp`;
 }
 
 export function emotionalBearUpgradeQuote(state, inventory, upgrade) {

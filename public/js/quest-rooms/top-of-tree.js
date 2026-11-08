@@ -161,7 +161,7 @@ export const room = {
   ownLight: true,
   title: 'The High Jumper',
   kicker: 'The Magic Rock’s memory-place',
-  icon: 'assets/sprites/icons/spinach.png',
+  icon: 'assets/sprites/icons/spinach.webp',
   theme: 'memory',
   hubName: 'A memory-place',
   durationMs: 0,

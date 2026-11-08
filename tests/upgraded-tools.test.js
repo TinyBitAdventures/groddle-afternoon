@@ -10,6 +10,7 @@
  * Run: node --test tests/upgraded-tools.test.js
  */
 import { describe, it, before } from 'node:test';
+import { imageSize } from '../tools/image-size.mjs';
 import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
@@ -27,8 +28,8 @@ import {
   loadRecipeCatalogFromFile,
   recipeToolFor,
   recipeToolInUse,
-} from '../public/js/making.js?v=c9dc233e';
-import { ITEM_CATALOG, countItem, createInventory, isToolItem } from '../public/js/inventory.js?v=d82f3b00';
+} from '../public/js/making.js?v=f4f214c2';
+import { ITEM_CATALOG, countItem, createInventory, isToolItem } from '../public/js/inventory.js?v=b7609342';
 import {
   GRINDER_TOOLS,
   HOE_TOOLS,
@@ -38,13 +39,13 @@ import {
   firstWorkingTool,
   getToolCondition,
   setToolRemaining,
-} from '../public/js/tools.js?v=f701b241';
-import { crushOre } from '../public/js/mining.js?v=29fe2127';
+} from '../public/js/tools.js?v=d8aa3536';
+import { crushOre } from '../public/js/mining.js?v=fc28670f';
 import { MAKE_TOOL_SHEETS } from '../public/js/make-tool-sheets.js?v=6f758e09';
-import { clearPlot, createGarden, getPlot, hasHoe, hasWateringCan, plantPlot, waterPlot } from '../public/js/garden.js?v=890d72ea';
-import { performTrantCare, quoteTrantCare } from '../public/js/trant-care.js?v=098500ac';
+import { clearPlot, createGarden, getPlot, hasHoe, hasWateringCan, plantPlot, waterPlot } from '../public/js/garden.js?v=e1c3415c';
+import { performTrantCare, quoteTrantCare } from '../public/js/trant-care.js?v=ac146026';
 import { createTrantState, setTrantTables } from '../public/js/trants.js?v=9c2e8c0f';
-import { createPlot, performPlotVerb, plotVerbs } from '../public/js/patches.js?v=8af384ac';
+import { createPlot, performPlotVerb, plotVerbs } from '../public/js/patches.js?v=aa83d5ad';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const pub = join(here, '../public');
@@ -255,9 +256,9 @@ describe('High-Class Hoe tends like a Hoe, and goes first', () => {
 
   it('patches-feature swings the High-Class Hoe sheet (OGA tool_animation, 890x165)', () => {
     const src = readFileSync(join(pub, 'js/features/patches-feature.js'), 'utf8');
-    assert.match(src, /high_class_hoe: Object\.freeze\(\{ url: 'assets\/sprites\/soil\/high-class-hoe-tool\.png', fw: 89, fh: 55, cols: 10, count: 30 \}\)/);
-    const png = readFileSync(join(pub, 'assets/sprites/soil/high-class-hoe-tool.png'));
-    assert.deepEqual([png.readUInt32BE(16), png.readUInt32BE(20)], [890, 165]);
+    assert.match(src, /high_class_hoe: Object\.freeze\(\{ url: 'assets\/sprites\/soil\/high-class-hoe-tool\.webp', fw: 89, fh: 55, cols: 10, count: 30 \}\)/);
+    const png = readFileSync(join(pub, 'assets/sprites/soil/high-class-hoe-tool.webp'));
+    assert.deepEqual([imageSize(png).w, imageSize(png).h], [890, 165]);
   });
 });
 
@@ -325,13 +326,13 @@ describe('G183: the Irrigator 9000 wears and pours first', () => {
 
   it('game.js pours with the Irrigator sheet (OGA irrigator_9000 tool_animation, 950x228)', () => {
     const game = readFileSync(join(pub, 'game.js'), 'utf8');
-    assert.match(game, /IRRIGATOR_TOOL_SHEET = Object\.freeze\(\{ url: 'assets\/sprites\/making\/irrigator_9000-tool\.png', fw: 95, fh: 76, cols: 10, rows: 3 \}\)/);
+    assert.match(game, /IRRIGATOR_TOOL_SHEET = Object\.freeze\(\{ url: 'assets\/sprites\/making\/irrigator_9000-tool\.webp', fw: 95, fh: 76, cols: 10, rows: 3 \}\)/);
     assert.match(game, /firstWorkingTool\(toolState, inv, WATERING_CAN_TOOLS\)/);
     // Ticket 63: the pack's broken icons come from js/tools.js BROKEN_TOOL_ICONS.
     assert.match(game, /brokenToolIcon\(s\.classTsid\)/);
     assert.match(readFileSync(join(pub, 'js/tools.js'), 'utf8'), /BROKEN_TOOL_ICONS = Object\.freeze\(new Set\(\[[^\]]*'irrigator_9000'/);
-    const png = readFileSync(join(pub, 'assets/sprites/making/irrigator_9000-tool.png'));
-    assert.deepEqual([png.readUInt32BE(16), png.readUInt32BE(20)], [950, 228]);
+    const png = readFileSync(join(pub, 'assets/sprites/making/irrigator_9000-tool.webp'));
+    assert.deepEqual([imageSize(png).w, imageSize(png).h], [950, 228]);
   });
 });
 

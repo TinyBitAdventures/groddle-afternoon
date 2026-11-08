@@ -34,7 +34,7 @@ import {
   roomModulePath,
 } from '../public/js/quest-rooms/catalog.js?v=d77d3d17';
 import { loadContentCatalogsFromDir, getQuestCatalog } from '../public/js/content-catalogs.js?v=10b118dd';
-import * as kit from '../public/js/quest-rooms/kit.js?v=d98b987e';
+import * as kit from '../public/js/quest-rooms/kit.js?v=25fc6d59';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -161,7 +161,7 @@ describe('quest room kit', () => {
 
 describe('Rainbow Run (numismatic_hustle)', () => {
   it('has the source 30-second, 30-coin rules and enough coins on reachable ledges', async () => {
-    const mod = await import('../public/js/quest-rooms/rainbow-run.js?v=5cfaf3af');
+    const mod = await import('../public/js/quest-rooms/rainbow-run.js?v=12beb417');
     assert.equal(mod.RUN_MS, 30_000);
     assert.equal(mod.COINS_NEEDED, 30);
     const coins = mod.rainbowCoins();
@@ -184,7 +184,7 @@ describe('Rainbow Run (numismatic_hustle)', () => {
 
 describe('The High Jumper (top_of_tree)', () => {
   it('asks "Are you stuck?" after the source two minutes, and has branches only Spinach can reach', async () => {
-    const mod = await import('../public/js/quest-rooms/top-of-tree.js?v=5668c299');
+    const mod = await import('../public/js/quest-rooms/top-of-tree.js?v=a8f8abb6');
     assert.equal(mod.EXIT_PROMPT_MS, 120_000);
     assert.equal(mod.room.exitPromptMs, 120_000);
     assert.equal(mod.room.durationMs, 0);
@@ -205,7 +205,7 @@ describe('The High Jumper (top_of_tree)', () => {
 
 describe('Color Unblocking (color_unblocking)', () => {
   it('opens a path with the four solution switches and keeps the orange bridge', async () => {
-    const mod = await import('../public/js/quest-rooms/color-unblocking.js?v=7a46fa0d');
+    const mod = await import('../public/js/quest-rooms/color-unblocking.js?v=f543a952');
     const layout = mod.colorLayout();
     const on = mod.colorsAfter(layout.solution);
     for (const color of ['red', 'blue', 'green', 'purple']) assert.ok(!on.has(color), `${color} cleared`);
@@ -222,7 +222,7 @@ describe('Color Unblocking (color_unblocking)', () => {
 
 describe('Vision Quest (vision_quest)', () => {
   it('uses the archived Institute street and the six source objects', async () => {
-    const mod = await import('../public/js/quest-rooms/vision-quest.js?v=4d3f6bac');
+    const mod = await import('../public/js/quest-rooms/vision-quest.js?v=d7f0ed65');
     assert.equal(mod.STREET, 'GNV1T7PCUM53T25');
     assert.deepEqual(Object.keys(mod.OBJECTS).sort(), ['lemburger', 'npc_crab', 'npc_piggy', 'pumpkin', 'rock_sparkly_1', 'trant_fruit']);
     assert.equal(mod.WRONG_THINGS.length, 7);
@@ -232,7 +232,7 @@ describe('Vision Quest (vision_quest)', () => {
 
 describe("Mr. Block's playroom (kids_room)", () => {
   it('has the 24 source words, the doneSpelling tiers and letter gifts', async () => {
-    const mod = await import('../public/js/quest-rooms/kids-room.js?v=7fd8bac5');
+    const mod = await import('../public/js/quest-rooms/kids-room.js?v=ce37c0c9');
     assert.equal(mod.WORD_UP_WORDS.length, 24);
     assert.equal(mod.SPELL_MS, 180_000);
     // The 5*60 exit delay is the "Are you stuck?" prompt; Word Up's 3:00 is the room's only clock.
@@ -254,7 +254,7 @@ describe("Mr. Block's playroom (kids_room)", () => {
 
 describe('The Wrizzards and The Rube (rube_yard)', () => {
   it('hides ten Wrizzards where the camera and room card leave them visible', async () => {
-    const mod = await import('../public/js/quest-rooms/rube-yard.js?v=f443dc92');
+    const mod = await import('../public/js/quest-rooms/rube-yard.js?v=0e25fc41');
     assert.equal(mod.WRIZZARDS_NEEDED, 10);
     assert.equal(mod.HIDING_SPOTS.length, 10);
     assert.equal(new Set(mod.HIDING_SPOTS.map((s) => s.id)).size, 10);
@@ -273,7 +273,7 @@ describe('The Wrizzards and The Rube (rube_yard)', () => {
     assert.equal(ROOM_ITEMS.play_cube.label, 'Play Cube');
     assert.equal(ROOM_ITEMS.play_cube.stackMax, 1);
     assert.equal(ROOM_ITEMS.play_cube.sellable, false);
-    assert.ok(existsSync(join(root, 'public/assets/sprites/icons/play_cube.png')));
+    assert.ok(existsSync(join(root, 'public/assets/sprites/icons/play_cube.webp')));
   });
 });
 
@@ -283,7 +283,7 @@ describe('Le Misérable (le_miserable)', () => {
   const STEP_BY_TINT = { 16777024: 1, 16750144: 2, 10436052: 3, 3394764: 4 };
 
   async function setup() {
-    const mod = await import('../public/js/quest-rooms/le-miserable.js?v=c15ad933');
+    const mod = await import('../public/js/quest-rooms/le-miserable.js?v=f56a7f23');
     const ev = await import('../public/js/location-events.js?v=05663361');
     const { readFileSync } = await import('node:fs');
     const street = JSON.parse(readFileSync(streetFile, 'utf8'));
@@ -397,8 +397,8 @@ describe('G311: a failed room quest is Try again in the quest log', () => {
   };
 
   it('a run lost to a reload marks a startable quest failed, not a retry prompt', async () => {
-    const { questInstancesFeature } = await import('../public/js/features/quest-instances-feature.js?v=90e5b2fd');
-    const { ensureQuestOfferState } = await import('../public/js/quest-offers.js?v=486b09c9');
+    const { questInstancesFeature } = await import('../public/js/features/quest-instances-feature.js?v=f6015246');
+    const { ensureQuestOfferState } = await import('../public/js/quest-offers.js?v=e31115ea');
     assert.equal(getQuestCatalog().mental_block?.needsStart, true);
     assert.notEqual(getQuestCatalog().help_juju_bandits?.needsStart, true, 'no onStarted in GSJS');
     questInstancesFeature.restore({ questId: 'mental_block', roomId: 'mental_block', memory: {}, retry: { help_juju_bandits: Date.now() - 60_000 } });
@@ -461,8 +461,8 @@ describe('G313: failed room quests the source removes', () => {
   });
 
   it('a reload removes a source-removed quest and its offers, and keeps the prompt for the three', async () => {
-    const { questInstancesFeature } = await import('../public/js/features/quest-instances-feature.js?v=90e5b2fd');
-    const { questStatus } = await import('../public/js/quest-offers.js?v=486b09c9');
+    const { questInstancesFeature } = await import('../public/js/features/quest-instances-feature.js?v=f6015246');
+    const { questStatus } = await import('../public/js/quest-offers.js?v=e31115ea');
     const t = Date.now() - 60_000;
     questInstancesFeature.restore({ memory: {}, retry: { tower_quest: t, le_miserable_part_2: t, smuggle_the_smuggler_part2: t } });
     const active = { tower_quest: { progress: {} }, le_miserable_part_2: { progress: {} }, smuggle_the_smuggler_part2: { progress: {} } };
@@ -489,7 +489,7 @@ describe('G313: failed room quests the source removes', () => {
   });
 
   it('has no map card', async () => {
-    const { questInstancesFeature } = await import('../public/js/features/quest-instances-feature.js?v=90e5b2fd');
+    const { questInstancesFeature } = await import('../public/js/features/quest-instances-feature.js?v=f6015246');
     assert.equal(questInstancesFeature.mapCards, undefined);
     const src = readFileSync(join(root, 'public/js/features/quest-instances-feature.js'), 'utf8');
     assert.doesNotMatch(src, /Unfinished quest places/);
@@ -510,7 +510,7 @@ describe('#107: a choice dialog can be dismissed', () => {
   const src = readFileSync(join(root, 'public/js/features/quest-instances-feature.js'), 'utf8');
 
   it('Escape and a click outside make the cancel choice (ChoicesDialog.as _escKeyHandler: cancel_value first)', async () => {
-    const { cancelChoice } = await import('../public/js/features/quest-instances-feature.js?v=90e5b2fd');
+    const { cancelChoice } = await import('../public/js/features/quest-instances-feature.js?v=f6015246');
     const memories = [{ label: 'Four Letter Words', value: 'letter_block_2' }, { label: 'Hog Haul', value: 'hogtie_piggies' }, { label: 'Never mind', value: '', cancel: true }];
     assert.equal(cancelChoice(memories), '');
     assert.equal(cancelChoice([{ label: 'Stay', value: 'stay', cancel: true }, { label: 'Leave', value: 'leave' }]), 'stay');

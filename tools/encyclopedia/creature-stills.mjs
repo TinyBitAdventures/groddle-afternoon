@@ -5,7 +5,7 @@
  * the game does not draw from a sheet) that creature's SWF in tinyspeck/glitch-items, rendered with
  * ffdec as the puzzle art was (`-format frame:png -export frame`). Nothing else goes in here.
  *
- * Writes public/assets/sprites/encyclopedia/<id>.png and, where the source has it, <id>@3x.png; the
+ * Writes public/assets/sprites/encyclopedia/<id>.webp and, where the source has it, <id>@3x.webp (lossless); the
  * transparent margin is trimmed. tools/encyclopedia/data.mjs STILLS points at them.
  *
  *   node tools/encyclopedia/creature-stills.mjs [id...]  write them (all, or those ids)
@@ -18,6 +18,7 @@ import { existsSync, mkdirSync, mkdtempSync, readdirSync, rmSync } from 'node:fs
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { replacePngWithWebp } from '../webp-lossless.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const SPRITES = join(ROOT, 'public/assets/sprites');
@@ -28,14 +29,14 @@ const ITEMS = join(ROOT, '..', 'glitch-items');
 
 /** One still: `sheet` (under assets/sprites) with its grid (cols x rows) and frame, or `swf` (under glitch-items). */
 export const CREATURE_STILLS = Object.freeze({
-  npc_piggy: { sheet: 'npc_piggy__x1_look_screen_png_1354829434.png', cols: 10, rows: 5, frame: 0 },
-  npc_chicken: { sheet: 'animals/npc_chicken_stand.png', cols: 1, rows: 1, frame: 0 },
+  npc_piggy: { sheet: 'npc_piggy__x1_look_screen_png_1354829434.webp', cols: 10, rows: 5, frame: 0 },
+  npc_chicken: { sheet: 'animals/npc_chicken_stand.webp', cols: 1, rows: 1, frame: 0 },
   npc_crab: { sheet: 'crabs/npc_crab_idle1.webp', cols: 6, rows: 5, frame: 0 },
-  npc_firefly: { sheet: 'resources/firefly-full-path.png', cols: 10, rows: 9, frame: 0 },
-  npc_sloth: { sheet: 'newxp/sloth.png', cols: 1, rows: 1, frame: 0 },
+  npc_firefly: { sheet: 'resources/firefly-full-path.webp', cols: 10, rows: 9, frame: 0 },
+  npc_sloth: { sheet: 'newxp/sloth.webp', cols: 1, rows: 1, frame: 0 },
   // Flamingo Flamingo's one idle frame (two heads, one bird: newxp-feature's modes.idle).
-  npc_flamingo: { sheet: 'newxp/flamingo_idle.png', cols: 1, rows: 1, frame: 0 },
-  npc_dustbunny: { sheet: 'newxp/dustbunny_idle.png', cols: 9, rows: 20, frame: 0 },
+  npc_flamingo: { sheet: 'newxp/flamingo_idle.webp', cols: 1, rows: 1, frame: 0 },
+  npc_dustbunny: { sheet: 'newxp/dustbunny_idle.webp', cols: 9, rows: 20, frame: 0 },
   npc_juju_bandit: { sheet: 'juju_bandit/juju_green_black_idle1.webp', cols: 8, rows: 8, frame: 16 },
   npc_squid: { sheet: 'quest-rooms/gwendolyn/squid_blue_idle.webp', cols: 4, rows: 12, frame: 0 },
   npc_swoonerfly: { swf: 'inhabitants/swoonerfly/npc_swoonerfly.swf' },
@@ -66,7 +67,9 @@ export const CREATURE_STILLS = Object.freeze({
   npc_spinning_wheel: { swf: 'misc/npc/npc_spinning_wheel/npc_spinning_wheel.swf', sprite: 290, frame: 40 },
 });
 
-const stillPath = (id, hi) => join(ROOT, 'public', STILLS_DIR, `${id}${hi ? '@3x' : ''}.png`);
+const stillPath = (id, hi) => join(ROOT, 'public', STILLS_DIR, `${id}${hi ? '@3x' : ''}.webp`);
+/** ImageMagick draws a PNG beside the still, then it ships as lossless WebP (tools/webp-lossless.mjs). */
+const asWebp = (out, draw) => { const png = out.replace(/\.webp$/, '.tmp.png'); draw(png); replacePngWithWebp(png, out); };
 
 const size = (file) => execFileSync('magick', ['identify', '-format', '%w %h\n', file], { encoding: 'utf8' }).split('\n')[0].split(' ').map(Number);
 
@@ -100,13 +103,13 @@ function writeSwf(swf, zoom, out, sprite = null, frame = 1) {
 function write(id, row) {
   mkdirSync(join(ROOT, 'public', STILLS_DIR), { recursive: true });
   if (row.swf) {
-    writeSwf(row.swf, 1, stillPath(id), row.sprite, row.frame);
-    writeSwf(row.swf, 3, stillPath(id, true), row.sprite, row.frame);
+    asWebp(stillPath(id), (png) => writeSwf(row.swf, 1, png, row.sprite, row.frame));
+    asWebp(stillPath(id, true), (png) => writeSwf(row.swf, 3, png, row.sprite, row.frame));
     return;
   }
-  writeCell(join(SPRITES, row.sheet), row, stillPath(id));
+  asWebp(stillPath(id), (png) => writeCell(join(SPRITES, row.sheet), row, png));
   const hi = join(SPRITES, row.sheet.replace(/\.(png|webp)$/, '@3x.webp'));
-  if (existsSync(hi)) writeCell(hi, row, stillPath(id, true));
+  if (existsSync(hi)) asWebp(stillPath(id, true), (png) => writeCell(hi, row, png));
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {

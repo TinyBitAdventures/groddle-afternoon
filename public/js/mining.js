@@ -18,8 +18,8 @@ import {
   ensureItem,
   itemIcon,
   ITEM_CATALOG,
-} from './inventory.js?v=d82f3b00';
-import { GRINDER_TOOLS, canUseTool, firstWorkingTool, useToolCondition } from './tools.js?v=f701b241';
+} from './inventory.js?v=b7609342';
+import { GRINDER_TOOLS, canUseTool, firstWorkingTool, useToolCondition } from './tools.js?v=d8aa3536';
 import { skillPackageDetails } from './skill-packages.js?v=bfb87281';
 import { grantMoodXp } from './mood-xp.js?v=958e7680';
 import { loseEnergy } from './metabolics.js?v=8504134e';
@@ -55,7 +55,7 @@ export const ROCK_CATALOG = {
     chunksMax: 50,
     minChunks: 3,
     maxChunks: 9,
-    worldSheet: 'assets/sprites/mining/rock_metal.png',
+    worldSheet: 'assets/sprites/mining/rock_metal.webp',
     sheetFrames: 5,
     frameWidth: 137,
     frameHeight: 100,
@@ -71,7 +71,7 @@ export const ROCK_CATALOG = {
     chunksMax: 50,
     minChunks: 5,
     maxChunks: 9,
-    worldSheet: 'assets/sprites/mining/rock_dullite.png',
+    worldSheet: 'assets/sprites/mining/rock_dullite.webp',
     sheetFrames: 5,
     frameWidth: 131,
     frameHeight: 114,
@@ -87,7 +87,7 @@ export const ROCK_CATALOG = {
     chunksMax: 50,
     minChunks: 4,
     maxChunks: 8,
-    worldSheet: 'assets/sprites/mining/rock_beryl.png',
+    worldSheet: 'assets/sprites/mining/rock_beryl.webp',
     sheetFrames: 5,
     frameWidth: 134,
     frameHeight: 120,
@@ -103,7 +103,7 @@ export const ROCK_CATALOG = {
     chunksMax: 50,
     minChunks: 3,
     maxChunks: 7,
-    worldSheet: 'assets/sprites/mining/rock_sparkly.png',
+    worldSheet: 'assets/sprites/mining/rock_sparkly.webp',
     sheetFrames: 5,
     frameWidth: 131,
     frameHeight: 127,

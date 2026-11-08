@@ -42,7 +42,7 @@ export const ORB_ITEM = Object.freeze({
 
 /** Overlay art: 640x80 sheet, 16x2 cells of 40x40, 31 populated frames. */
 export const ORB_TOOL_SHEET = Object.freeze({
-  url: 'assets/sprites/meditation/focusing_orb-tool.png',
+  url: 'assets/sprites/meditation/focusing_orb-tool.webp',
   frameW: 40,
   frameH: 40,
   cols: 16,

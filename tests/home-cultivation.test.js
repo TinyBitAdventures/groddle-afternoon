@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
-import { CULTIVATION_CLASSES, HOME_LIMITS } from '../public/js/homes-catalog.js?v=7aa9beb0';
+import { CULTIVATION_CLASSES, HOME_LIMITS } from '../public/js/homes-catalog.js?v=10ac34b6';
 import {
   FIREFLY_HIVE,
   HOUSE_LOT_W,
@@ -23,8 +23,8 @@ import {
   placementCheck,
   quoteYardExpansion,
   removeCultivation,
-} from '../public/js/home-cultivation.js?v=c650eed1';
-import { cultivationIcon } from '../public/js/features/homes-feature.js?v=357f8787';
+} from '../public/js/home-cultivation.js?v=42ae453c';
+import { cultivationIcon } from '../public/js/features/homes-feature.js?v=5391026a';
 
 const root = join(import.meta.dirname, '..', 'public');
 const rich = () => ({ level: 60, imagination: 1_000_000 });
@@ -46,7 +46,7 @@ describe('cultivation catalog', () => {
     assert.equal(CULTIVATION_CLASSES.proto_metal_rock.maxWear, 40);
     assert.equal(CULTIVATION_CLASSES.proto_peat.maxWear, 100);
     for (const cls of ['barnacle_pod', 'firefly_hive', 'jellisac_mound']) {
-      assert.ok(existsSync(join(root, 'assets/sprites/cultivation', `${cls}.png`)), cls);
+      assert.ok(existsSync(join(root, 'assets/sprites/cultivation', `${cls}.webp`)), cls);
     }
   });
 });
@@ -158,8 +158,8 @@ describe('cultivation menu icons (ticket 31)', () => {
       const url = cultivationIcon(def.protoClass);
       assert.ok(existsSync(join(root, url)), `${def.protoClass}: ${url} is missing`);
       assert.doesNotMatch(url, /bean_plain|seed_|herb_seed/, def.protoClass);
-      if (def.kind !== 'tower') assert.equal(url, `assets/sprites/icons/${def.protoClass}.png`);
+      if (def.kind !== 'tower') assert.equal(url, `assets/sprites/icons/${def.protoClass}.webp`);
     }
-    assert.equal(cultivationIcon('proto_patch'), 'assets/sprites/icons/proto_patch.png');
+    assert.equal(cultivationIcon('proto_patch'), 'assets/sprites/icons/proto_patch.webp');
   });
 });

@@ -28,8 +28,8 @@
  *     data-supply-permits).
  */
 
-import { ITEM_CATALOG, addItem, countItem, ensureItem } from '../inventory.js?v=d82f3b00';
-import { getToolCondition, copyForVerb, copyTag, migrateClassTag, setCopyTag } from '../tools.js?v=f701b241';
+import { ITEM_CATALOG, addItem, countItem, ensureItem } from '../inventory.js?v=b7609342';
+import { getToolCondition, copyForVerb, copyTag, migrateClassTag, setCopyTag } from '../tools.js?v=d8aa3536';
 import {
   MACHINE_ASSEMBLIES,
   MACHINE_IDS,
@@ -51,8 +51,8 @@ import {
   refuelMachine,
   stillEtaSeconds,
   stillRoom,
-} from '../machines.js?v=2f4f8293';
-import { HERB_SEEDS, ITEM_TRANSFORMS, listTransformVerbs, runTransform, transformVerbCount } from '../item-transforms.js?v=f4f49729';
+} from '../machines.js?v=663980c9';
+import { HERB_SEEDS, ITEM_TRANSFORMS, listTransformVerbs, runTransform, transformVerbCount } from '../item-transforms.js?v=28c06c6c';
 import {
   BUREAUCRACY_ITEMS,
   HALL_STREETS,
@@ -61,14 +61,14 @@ import {
   clerkOffers,
   completePapers,
   completePapersCheck,
-} from '../bureaucracy.js?v=14ebcfda';
+} from '../bureaucracy.js?v=dc1cb181';
 import { frameTexture, sourceFromUrl } from '../textures.js?v=3149d699';
 import { setMetalMakingMusic } from '../sound-moments.js?v=2f8597cd';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
 
 export const SUPPLY_FEATURE_ID = 'supply';
 export const CLERK_CLASS = 'npc_bureaucrat';
-const CLERK_ART = 'assets/sprites/quests/legalize/npc_bureaucrat_arms_01_glasses_none_hair_01_legs_01_necklace_none_tie_01_torso_01_x1_idle1_png_1354832995.png';
+const CLERK_ART = 'assets/sprites/quests/legalize/npc_bureaucrat_arms_01_glasses_none_hair_01_legs_01_necklace_none_tie_01_torso_01_x1_idle1_png_1354832995.webp';
 const CLERK_FRAME = { w: 97, h: 89 };
 
 /** Items the chains need that no other module registers with source text. */

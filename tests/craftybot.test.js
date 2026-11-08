@@ -391,8 +391,8 @@ describe('delivery and wiring', () => {
     for (const f of ['idle0', 'walk', 'collapse', 'craftStart', 'craftEnd', 'expand', 'sleepMode', 'peek']) {
       assert.ok(existsSync(join(PUBLIC, `assets/sprites/craftybot/craftybot_${f}.webp`)), f);
     }
-    assert.ok(existsSync(join(PUBLIC, 'assets/sprites/craftybot/butler_box_craftybot.png')));
-    assert.ok(existsSync(join(PUBLIC, 'assets/sprites/icons/npc_crafty_bot.png')));
+    assert.ok(existsSync(join(PUBLIC, 'assets/sprites/craftybot/butler_box_craftybot.webp')));
+    assert.ok(existsSync(join(PUBLIC, 'assets/sprites/icons/npc_crafty_bot.webp')));
     const keys = JSON.parse(readFileSync(join(PUBLIC, 'assets/content/sound-keys.json'), 'utf8')).keys;
     for (const k of ['CRAFTYBOT_WALK', 'CRAFTYBOT_COLLAPSE', 'CRAFTYBOT_EXPAND', 'CRAFTYBOT_CRAFT_START', 'CRAFTYBOT_CRAFT_END', 'CRAFTYBOT_KICK', 'CRAFTYBOT_PEEK']) {
       assert.ok(keys[k]?.file, k);
@@ -402,10 +402,10 @@ describe('delivery and wiring', () => {
 
 describe('craftybot feature: the ingredient source and the job menu', async () => {
   // The feature imports these with their browser cache tags; load the same module instances.
-  const { craftybotFeature } = await import('../public/js/features/craftybot-feature.js?v=97383722');
-  const { homesFeature } = await import('../public/js/features/homes-feature.js?v=357f8787');
+  const { craftybotFeature } = await import('../public/js/features/craftybot-feature.js?v=22fe518f');
+  const { homesFeature } = await import('../public/js/features/homes-feature.js?v=5391026a');
   const cbMod = await import('../public/js/craftybot.js?v=41eacd5d');
-  const making = await import('../public/js/making.js?v=c9dc233e');
+  const making = await import('../public/js/making.js?v=f4f214c2');
 
   function fakeEngine(extra = {}) {
     return {
@@ -546,7 +546,7 @@ describe('the quantity box follows the count as it is typed', () => {
 // sheet still loading draws nothing until it arrives. The original client had the whole SWF at
 // once, so the bot keeps its frame until the next sheet is in.
 describe('G538: the bot never draws a sheet that is still loading', async () => {
-  const { showClipWhenLoaded } = await import('../public/js/features/craftybot-feature.js?v=97383722');
+  const { showClipWhenLoaded } = await import('../public/js/features/craftybot-feature.js?v=22fe518f');
   const fakeIo = () => {
     const loaded = new Set();
     const waiting = [];

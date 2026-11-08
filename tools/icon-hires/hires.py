@@ -46,6 +46,8 @@ import json, glob, math, os, re, shutil, subprocess, sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 import swfinfo  # noqa: E402
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
+import webp_lossless  # noqa: E402  (pack icons ship as lossless WebP)
 
 SPIKE = os.path.normpath(os.path.join(HERE, '../..'))
 ICONS = os.path.join(SPIKE, 'public/assets/sprites/icons')
@@ -102,7 +104,7 @@ def seed_size(r, zoom):
 
 def one_x(i, p):
     """The 1x icon a render is checked against and placed on: the shipped file, else the plan's OGA PNG, else None (seed)."""
-    icon = os.path.join(ICONS, f'{i}.png')
+    icon = os.path.join(ICONS, f'{i}.webp')
     if os.path.exists(icon):
         return icon
     return os.path.expanduser(p['oga']) if p.get('oga') else None
@@ -226,17 +228,23 @@ def run(plan_path, work, write, only):
         if d is not None and d > MAX_DIFF:
             rep.update(ok=False, why=f'art differs from the 1x icon (diff {d})'); continue
         out = ICONS if write else os.path.join(work, 'hi')
-        dst = os.path.join(out, f'{i}@3x.png')
+        dst = os.path.join(out, f'{i}@3x.webp')
+        tmp = os.path.join(work, f'{i}.tmp.png')
         subprocess.run(['magick', src, *(['-flop'] if flop else []), '-trim', '+repage', '-filter', 'Lanczos',
                         '-resize', f'{ow * 3}x{oh * 3}!', '-background', 'none', '-gravity', 'NorthWest',
                         '-extent', f'{w * 3}x{h * 3}-{ox * 3}-{oy * 3}',
-                        '-define', 'png:compression-level=9', '-strip', dst], check=True)
-        dst1 = os.path.join(out, f'{i}.png')
+                        '-define', 'png:compression-level=9', '-strip', tmp], check=True)
+        webp_lossless.encode(tmp, dst)
+        dst1 = os.path.join(out, f'{i}.webp')
         if not one:
             subprocess.run(['magick', src, *(['-flop'] if flop else []), '-trim', '+repage', '-filter', 'Lanczos',
-                            '-resize', f'{ow}x{oh}!', '-define', 'png:compression-level=9', '-strip', dst1], check=True)
+                            '-resize', f'{ow}x{oh}!', '-define', 'png:compression-level=9', '-strip', tmp], check=True)
+            webp_lossless.encode(tmp, dst1)
         elif one != dst1:
-            shutil.copyfile(one, dst1)  # the shipped icon (dry run) or the OGA PNG, byte for byte
+            # the shipped icon (dry run), byte for byte, or the OGA PNG's pixels as lossless WebP
+            shutil.copyfile(one, dst1) if one.endswith('.webp') else webp_lossless.encode(one, dst1)
+        if os.path.exists(tmp):
+            os.unlink(tmp)
         rep.update(ok=True, out=dst)
     json.dump(report, open(os.path.join(work, 'report.json'), 'w'), indent=1)
     ok = [i for i, r in report.items() if r.get('ok')]
@@ -247,7 +255,7 @@ def run(plan_path, work, write, only):
 
 def write_list():
     """Rewrite the HIRES_ICONS set in js/icon-hires.js from the @3x files on disk."""
-    ids = sorted(f[:-7] for f in os.listdir(ICONS) if f.endswith('@3x.png') and os.path.exists(os.path.join(ICONS, f[:-7] + '.png')))
+    ids = sorted(f[:-8] for f in os.listdir(ICONS) if f.endswith('@3x.webp') and os.path.exists(os.path.join(ICONS, f[:-8] + '.webp')))
     src = open(HIRES_JS).read()
     line = 'export const HIRES_ICONS = new Set(' + json.dumps(ids, separators=(', ', ': ')) + ');'
     src, n = re.subn(r'^export const HIRES_ICONS = new Set\(.*\);$', lambda _: line, src, count=1, flags=re.M)

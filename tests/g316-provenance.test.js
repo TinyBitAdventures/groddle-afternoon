@@ -149,13 +149,13 @@ describe('loading-card strips are our own renders (G316)', () => {
 
 describe('sprites, decos and garden art (G316)', () => {
   it('every 3x sprite file exists; the butterfly sheets render the CC0 glitch-items SWF', async () => {
-    const { HIRES_SPRITES } = await import('../public/js/sprite-hires.js?v=f98be5eb');
+    const { HIRES_SPRITES } = await import('../public/js/sprite-hires.js?v=abaf3d5a');
     for (const [lo, hi] of HIRES_SPRITES) {
       assert.ok(existsSync(join(pub, lo.split('?')[0])), lo);
       assert.ok(existsSync(join(pub, hi)), hi);
     }
-    for (const lo of ['assets/sprites/npc_butterfly__x1_fly-side_png_1354829525.png', 'assets/sprites/rooks/butterfly-fly-rooked.png',
-      'assets/sprites/quest-rooms/gwendolyn/swoonerfly_fall.png']) {
+    for (const lo of ['assets/sprites/npc_butterfly__x1_fly-side_png_1354829525.webp', 'assets/sprites/rooks/butterfly-fly-rooked.webp',
+      'assets/sprites/quest-rooms/gwendolyn/swoonerfly_fall.webp']) {
       assert.ok(HIRES_SPRITES.has(lo), lo);
       assert.ok(existsSync(join(pub, lo)), `${lo}: the CC0 1x sheet stays`);
     }
@@ -168,7 +168,7 @@ describe('sprites, decos and garden art (G316)', () => {
   it('every manifest deco has its file; renamed twins draw their CC0 SWF render', async () => {
     const names = JSON.parse(readFileSync(join(pub, 'assets/decos/manifest.json'), 'utf8'));
     for (const n of names) assert.ok(existsSync(join(pub, 'assets/decos/groddle', `${n}.webp`)), n);
-    const { DECO_TWINS } = await import('../public/js/street-render.js?v=9eded3c1');
+    const { DECO_TWINS } = await import('../public/js/street-render.js?v=81416f4f');
     for (const [alias, twin] of Object.entries(DECO_TWINS)) {
       assert.ok(!names.includes(alias), alias);
       assert.ok(names.includes(twin), twin);
@@ -178,8 +178,8 @@ describe('sprites, decos and garden art (G316)', () => {
 
   it('the fruit tree and garden art come from CC0 cells or SWFs', () => {
     const game = readFileSync(join(pub, 'game.js'), 'utf8');
-    assert.match(game, /treeFruit: \{ url: 'assets\/sprites\/trants\/frames\/trant_fruit_m7\.png', whole: true \}/);
-    assert.ok(existsSync(join(pub, 'assets/sprites/trants/frames/trant_fruit_m7.png')));
+    assert.match(game, /treeFruit: \{ url: 'assets\/sprites\/trants\/frames\/trant_fruit_m7\.webp', whole: true \}/);
+    assert.ok(existsSync(join(pub, 'assets/sprites/trants/frames/trant_fruit_m7.webp')));
     // 2026-10-31: the gardens are Tiny Speck's garden_new.swf (CC0 glitch-items), rendered by
     // tools/garden-art/build.mjs; the drawn G316 stand-ins (plot_dry/wet/dirty, bed_frame_wood) retired.
     const art = JSON.parse(readFileSync(join(root, 'tools/garden-art/garden.json'), 'utf8'));
@@ -192,7 +192,7 @@ describe('sprites, decos and garden art (G316)', () => {
       assert.equal(sha(file), row.sha256, file);
       assert.equal(sha(row.hires), row.sha256_3, row.hires);
     }
-    const others = new Set(['bean_garden__x1_1_x1_2_x1_3_x1_4_png_1354836553.png', 'bean_garden__x1_iconic_png_1354836553.png', 'garden_new__x1_1_png_1354833270.png']);
+    const others = new Set(['bean_garden__x1_1_x1_2_x1_3_x1_4_png_1354836553.webp', 'bean_garden__x1_iconic_png_1354836553.webp', 'garden_new__x1_1_png_1354833270.webp']);
     const listed = new Set(Object.entries(art.files).flatMap(([f, r]) => [f, r.hires].map((p) => p.split('/').pop())));
     for (const f of readdirSync(join(pub, 'assets/sprites/garden'))) assert.ok(listed.has(f) || others.has(f), f);
     for (const f of ['plot_dry.png', 'plot_wet.png', 'plot_dirty.png', 'bed_frame_wood.png']) {

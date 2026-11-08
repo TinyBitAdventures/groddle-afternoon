@@ -33,11 +33,11 @@ import {
   pickUpFurniture,
   placeFurniture,
   surfaceHeight,
-} from '../public/js/home-decor.js?v=6735c85f';
-import { FURNITURE_CATALOG } from '../public/js/homes-catalog.js?v=7aa9beb0';
+} from '../public/js/home-decor.js?v=f9b0e3dc';
+import { FURNITURE_CATALOG } from '../public/js/homes-catalog.js?v=10ac34b6';
 import { IMAGINATION_UPGRADES, upgradeStatus, DEALT_SECRET_CARDS } from '../public/js/imagination.js?v=6adb7b9a';
 import { isOfferedInRemake, remakeStatus } from '../public/js/imagination-remake.js?v=c37ad887';
-import { visitorHomeState } from '../public/js/features/homes-feature.js?v=357f8787';
+import { visitorHomeState } from '../public/js/features/homes-feature.js?v=5391026a';
 
 const spike = join(import.meta.dirname, '..');
 const pub = join(spike, 'public');
@@ -98,7 +98,7 @@ describe('upgrade data (tools/furniture-upgrades/build.mjs)', () => {
     const path = FURNITURE_UPGRADES.furniture_chair.upgrades['1'].art.path;
     assert.deepEqual(artImgAttrs(path), { src: path, srcset: `${path} 3x` });
     assert.deepEqual(artImgAttrs(path, 2), { src: path, srcset: `${path} 1.5x` });
-    assert.deepEqual(artImgAttrs('assets/sprites/furniture/furniture_chair.png'), { src: 'assets/sprites/furniture/furniture_chair.png' });
+    assert.deepEqual(artImgAttrs('assets/sprites/furniture/furniture_chair.webp'), { src: 'assets/sprites/furniture/furniture_chair.webp' });
     assert.deepEqual(artImgAttrs(''), { src: '' });
   });
 });

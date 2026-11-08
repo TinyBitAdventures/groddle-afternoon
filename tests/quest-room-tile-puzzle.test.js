@@ -9,7 +9,7 @@ import { readFileSync, existsSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import * as mod from '../public/js/quest-rooms/tile-puzzle.js?v=67b3c2cc';
+import * as mod from '../public/js/quest-rooms/tile-puzzle.js?v=a99ad77f';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const GS = join(root, '../glitch-GameServerJS/quests');
@@ -162,7 +162,7 @@ describe('B.T.C Room #3 geometry', () => {
   });
 
   it('ships its button art', () => {
-    for (const f of ['wall_button_lockOut.png', 'wall_button_lockIn.png']) {
+    for (const f of ['wall_button_lockOut.webp', 'wall_button_lockIn.webp']) {
       assert.ok(existsSync(join(root, 'public/assets/sprites/quest-rooms/tile_puzzle', f)), f);
     }
     assert.ok(existsSync(join(root, 'public', mod.room.icon)));

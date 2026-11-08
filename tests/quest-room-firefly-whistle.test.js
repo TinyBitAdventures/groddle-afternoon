@@ -35,13 +35,13 @@ import {
   codeMatches,
   hintFor,
   room,
-} from '../public/js/quest-rooms/firefly-whistle.js?v=9e94f646';
+} from '../public/js/quest-rooms/firefly-whistle.js?v=c90c9864';
 import { DRESSING, ENTRY, FLOOR, FLOOR_Y, LAB, W, entryPath, labPlatforms, seamsToDraw, sx, sy } from '../public/js/quest-rooms/firefly-whistle-scene.js?v=883e9743';
 import { FIREFLY_LAB_FILES } from '../public/js/quest-rooms/firefly-lab-art.js?v=481a55f9';
-import * as kit from '../public/js/quest-rooms/kit.js?v=d98b987e';
+import * as kit from '../public/js/quest-rooms/kit.js?v=25fc6d59';
 import { BUILT_ROOMS, OFFER_OVERRIDES, QUEST_ROOMS, questGiver } from '../public/js/quest-rooms/catalog.js?v=d77d3d17';
-import { REMAKE_QUEST_NPCS } from '../public/js/quest-offers.js?v=486b09c9';
-import { FIREFLY_OFFER_LINES, FIREFLY_WHISTLE_QUEST, fireflyTouches } from '../public/js/features/resource-nodes-feature.js?v=11e86f91';
+import { REMAKE_QUEST_NPCS } from '../public/js/quest-offers.js?v=e31115ea';
+import { FIREFLY_OFFER_LINES, FIREFLY_WHISTLE_QUEST, fireflyTouches } from '../public/js/features/resource-nodes-feature.js?v=ed64e23a';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const GS = join(homedir(), 'Documents/glitch-audit/glitch-GameServerJS');
@@ -231,10 +231,10 @@ describe('Firefly Whistle offer and room wiring', () => {
 
   it('ships its art', () => {
     const dir = join(root, 'public/assets/sprites/quest-rooms/firefly_whistle');
-    for (const f of ['whistle_stand_on.webp', 'whistle_stand_off.webp', 'teleporter_control.webp', 'firefly_whistle@2x.webp', 'firefly_whistle_icon.png']) {
+    for (const f of ['whistle_stand_on.webp', 'whistle_stand_off.webp', 'teleporter_control.webp', 'firefly_whistle@2x.webp', 'firefly_whistle_icon.webp']) {
       assert.ok(existsSync(join(dir, f)), f);
     }
-    assert.ok(room.icon.endsWith('firefly_whistle_icon.png'));
+    assert.ok(room.icon.endsWith('firefly_whistle_icon.webp'));
     for (const d of ['eggbooth', 'security_orb', 'Teleporter_Base', 'Teleporter_Beam']) {
       assert.ok(existsSync(join(root, 'public/assets/decos/groddle', `${d}.webp`)), d);
     }

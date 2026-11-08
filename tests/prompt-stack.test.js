@@ -20,7 +20,7 @@ import {
   promptChoices,
   promptStackHasRoom,
   usesIconButtons,
-} from '../public/js/prompt-stack.js?v=1282ed29';
+} from '../public/js/prompt-stack.js?v=c67c01b5';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const pub = join(here, '../public');
@@ -287,11 +287,11 @@ describe('the stack', () => {
   it('two icon_buttons choices are a check and an X with the labels as tips', () => {
     const t = setup();
     t.stack.add({ text: 'Can Gene come in?', iconButtons: true, choices: [{ label: 'Yes', value: 'yes' }, { label: 'No', value: 'no' }] });
-    assert.equal(t.button(0, 0).children[0].src, 'assets/ui/prompt/prompt_check.png');
-    assert.equal(t.button(0, 1).children[0].src, 'assets/ui/prompt/prompt_x.png');
+    assert.equal(t.button(0, 0).children[0].src, 'assets/ui/prompt/prompt_check.webp');
+    assert.equal(t.button(0, 1).children[0].src, 'assets/ui/prompt/prompt_x.webp');
     assert.equal(t.button(0, 1).title, 'No');
-    assert.ok(existsSync(join(pub, 'assets/ui/prompt/prompt_check.png')));
-    assert.ok(existsSync(join(pub, 'assets/ui/prompt/prompt_x.png')));
+    assert.ok(existsSync(join(pub, 'assets/ui/prompt/prompt_check.webp')));
+    assert.ok(existsSync(join(pub, 'assets/ui/prompt/prompt_x.webp')));
   });
 });
 

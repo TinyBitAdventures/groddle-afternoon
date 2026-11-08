@@ -1,6 +1,7 @@
 /** Street furniture: mailboxes, notes, notice boards, Visiting Stones (js/street-furniture.js). */
 
 import { describe, it } from 'node:test';
+import { imageSize } from '../tools/image-size.mjs';
 import assert from 'node:assert/strict';
 import { readFileSync, existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
@@ -46,10 +47,10 @@ import {
   streetNoteSeeds,
   takePinnedNote,
   writePaperNote,
-} from '../public/js/street-furniture.js?v=d5716ef6';
-import { REMAKE_NOTE_BYLINE, REMAKE_NOTE_MARKER, isRemakeNote, normalizeNote as normalizeNoteRow } from '../public/js/street-furniture.js?v=d5716ef6';
-import { streetFurnitureFeature } from '../public/js/features/street-furniture-feature.js?v=966f14bf';
-import { FEATURES } from '../public/js/features/index.js?v=b4df516e';
+} from '../public/js/street-furniture.js?v=6983f5f5';
+import { REMAKE_NOTE_BYLINE, REMAKE_NOTE_MARKER, isRemakeNote, normalizeNote as normalizeNoteRow } from '../public/js/street-furniture.js?v=6983f5f5';
+import { streetFurnitureFeature } from '../public/js/features/street-furniture-feature.js?v=7e6704a4';
+import { FEATURES } from '../public/js/features/index.js?v=d9128cb3';
 import { createFeatureHost } from '../public/js/feature-host.js?v=127e0a3c';
 import { setWildlifeCatalog } from '../public/js/wildlife.js?v=670c3a7f';
 
@@ -58,7 +59,7 @@ const catalog = JSON.parse(readFileSync(join(root, 'assets/content/street-ecolog
 
 function pngSize(rel) {
   const buf = readFileSync(join(root, rel));
-  return [buf.readUInt32BE(16), buf.readUInt32BE(20)];
+  return [imageSize(buf).w, imageSize(buf).h];
 }
 
 const PEN = { learned: ['penmanship_1'], quillWorking: true, playerId: 'player', nowS: 1000 };

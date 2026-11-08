@@ -100,12 +100,12 @@ test('client ships the clean room, original block art, verbs, HUD, and determini
 
   for (const letter of ['A', 'B', 'E', 'M', 'S', 'T']) {
     assert.equal(
-      fs.existsSync(path.join(publicDir, 'assets', 'sprites', 'quests', 'four-letter', `letter-block-${letter}.png`)),
+      fs.existsSync(path.join(publicDir, 'assets', 'sprites', 'quests', 'four-letter', `letter-block-${letter}.webp`)),
       true
     );
   }
   assert.equal(
-    fs.existsSync(path.join(publicDir, 'assets', 'sprites', 'quests', 'four-letter', 'mr-block.png')),
+    fs.existsSync(path.join(publicDir, 'assets', 'sprites', 'quests', 'four-letter', 'mr-block.webp')),
     true
   );
   assert.match(game, /drawPlayroomBackground/);

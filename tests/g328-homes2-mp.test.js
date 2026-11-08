@@ -37,13 +37,13 @@ import {
   tendAct,
   tendCounters,
   tendedText,
-} from '../public/js/neighbours-mp.js?v=40f4c953';
-import { createButlerState, giveGiftTo, newestVisit, nextHandover, normalizeButlerState, packagesAndMessagesForOwner, recordVisitor, setGift, visitorsReport } from '../public/js/butler.js?v=2bafa110';
-import { createGarden, tickGarden } from '../public/js/garden.js?v=890d72ea';
-import { butlerApi } from '../public/js/features/butler-feature.js?v=4e988a25';
+} from '../public/js/neighbours-mp.js?v=cfabb4f7';
+import { createButlerState, giveGiftTo, newestVisit, nextHandover, normalizeButlerState, packagesAndMessagesForOwner, recordVisitor, setGift, visitorsReport } from '../public/js/butler.js?v=826eb5f6';
+import { createGarden, tickGarden } from '../public/js/garden.js?v=e1c3415c';
+import { butlerApi } from '../public/js/features/butler-feature.js?v=54762b93';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=10b118dd';
-import { acceptOffer, routeQuestEvent } from '../public/js/quest-offers.js?v=486b09c9';
-import { neighboursMpFeature } from '../public/js/features/neighbours-mp-feature.js?v=c3ef11ae';
+import { acceptOffer, routeQuestEvent } from '../public/js/quest-offers.js?v=e31115ea';
+import { neighboursMpFeature } from '../public/js/features/neighbours-mp-feature.js?v=7fba429a';
 import { createMinnAccount } from '../public/js/minn-account.js?v=ba6a13c5';
 import { HAS_SERVER, HAS_SITE, SITE_DIR, serverPath, sitePath } from '../tools/repos.mjs';
 

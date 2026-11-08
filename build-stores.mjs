@@ -97,7 +97,7 @@ for (const [rawId, meta] of Object.entries(KEEP)) {
       skipped.push(`${store.name}: ${entry.class_tsid}`);
       continue;
     }
-    if (!existsSync(join(root, 'public/assets/sprites/icons', `${entry.class_tsid}.png`))) {
+    if (!existsSync(join(root, 'public/assets/sprites/icons', `${entry.class_tsid}.webp`))) {
       skipped.push(`${store.name}: ${entry.class_tsid}`);
       continue;
     }

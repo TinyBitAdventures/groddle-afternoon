@@ -19,7 +19,7 @@
  * { [classTsid]: n }.
  */
 
-import { cleanCopyTag } from './tools.js?v=f701b241';
+import { cleanCopyTag } from './tools.js?v=d8aa3536';
 
 /** TradeDialog.as:50 MAX_TRADE_SLOTS. */
 export const TRADE_SLOTS = 6;

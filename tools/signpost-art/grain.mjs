@@ -115,7 +115,7 @@ function rowBands(img, id, { y0, y1, left, right, s0, s1, block = 3 }) {
 /** The grain groups each SVG gets, by SVG name. */
 export function grainFor(name) {
   if (name === 'post') {
-    const img = readImage(join(PUBLIC, DIR, 'signpost_post.png'));
+    const img = readImage(join(PUBLIC, DIR, 'signpost_post.webp'));
     // The shaft: columns 9 (the half-covered left edge) to 34 (the right outline, kept dark).
     const shaft = columnStrips(img, 'g', { x0: 9, x1: 33, top: 0, bottom: 225, s0: 3, s1: 222 });
     const edge = columnStrips(img, 'e', { x0: 34, x1: 34, top: 0, bottom: 225, s0: 3, s1: 219, block: 8, keepDark: true });
@@ -127,7 +127,7 @@ export function grainFor(name) {
     };
   }
   if (name === 'arm') {
-    const img = readImage(join(PUBLIC, DIR, 'signpost_arm.png'));
+    const img = readImage(join(PUBLIC, DIR, 'signpost_arm.webp'));
     const bands = rowBands(img, 'g', { y0: 0, y1: 28, left: 0, right: 260, s0: 3, s1: 257 });
     return { arm: [...bands.defs, ...bands.rects] };
   }

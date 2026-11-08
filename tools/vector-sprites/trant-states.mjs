@@ -178,7 +178,7 @@ export function trantJobs() {
           sprite: grow.id,
           ...(def.renderer ? { renderer: def.renderer } : {}),
           ...(Object.keys(set).length ? { state: { set } } : {}),
-          sheets: [{ path: `assets/sprites/trants/frames/trant_${species}_m${m}.png`, fw, fh, cols: 1, frames: 1, swfStart: frame, swfCount: 1, mirror: false }],
+          sheets: [{ path: `assets/sprites/trants/frames/trant_${species}_m${m}.webp`, fw, fh, cols: 1, frames: 1, swfStart: frame, swfCount: 1, mirror: false }],
         });
       }
     } finally {

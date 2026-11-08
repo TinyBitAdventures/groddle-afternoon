@@ -362,8 +362,8 @@ export async function collectSheets() {
   const shrineCall = game.calls('sliceSheet').find((c) => c.fn === 'ensureShrineTextures');
   const shrineFn = game.ast.body.find((n) => n.type === 'FunctionDeclaration' && n.id.name === 'ensureShrineTextures');
   const shrineDef = game.evaluate(shrineFn.body.body.find((n) => n.type === 'VariableDeclaration').declarations[0].init);
-  for (const f of readdirSync(join(pub, 'assets/sprites/shrines')).filter((x) => /^[a-z]+_(open|close)\.png$/.test(x))) {
-    const [giant, motion] = f.replace('.png', '').split('_');
+  for (const f of readdirSync(join(pub, 'assets/sprites/shrines')).filter((x) => /^[a-z]+_(open|close)\.webp$/.test(x))) {
+    const [giant, motion] = f.replace('.webp', '').split('_');
     const n = game.evaluate(shrineCall.node.arguments[2], { motion });
     rows.push(row(`shrine ${giant} ${motion}`, `assets/sprites/shrines/${f}`, { ...shrineDef, n }));
   }
@@ -412,11 +412,11 @@ export async function collectSheets() {
 
   const seasons = moduleConsts('js/features/seasons-feature.js');
   for (const [face, [w, h]] of Object.entries(seasons.get('TALK_SIZE'))) {
-    rows.push(row(`seasons pumpkin ${face} talk`, `assets/sprites/seasons/pumpkin_lit_${face}_talk.png`, { fw: w, fh: h, cols: seasons.get('TALK_COLS'), n: seasons.get('TALK_FRAMES') }));
+    rows.push(row(`seasons pumpkin ${face} talk`, `assets/sprites/seasons/pumpkin_lit_${face}_talk.webp`, { fw: w, fh: h, cols: seasons.get('TALK_COLS'), n: seasons.get('TALK_FRAMES') }));
   }
 
   const party = moduleConsts('js/features/party-spaces-feature.js');
-  for (const file of ['teleporter_visible_portal.png', 'teleporter_visible_disappear.png']) {
+  for (const file of ['teleporter_visible_portal.webp', 'teleporter_visible_disappear.webp']) {
     const cols = party.get('PORTAL_COLS');
     rows.push(row(`party ${file}`, `${party.get('ART')}${file}`, { fw: party.get('PORTAL_W'), fh: party.get('PORTAL_H'), cols, n: cols * party.get('PORTAL_ROWS') }));
   }
@@ -436,10 +436,10 @@ export async function collectSheets() {
   const room23 = moduleConsts('js/features/gwendolyn-room-23-feature.js');
   for (const [k, [cols, r, n]] of Object.entries(room23.get('GWEN_SHEETS'))) rows.push(kitRow(`room 23 ${k}`, `${room23.get('GWEN_ART')}${k}.webp`, cols, r, n));
   const camp = moduleConsts('js/quest-rooms/juju-camp.js');
-  for (const [k, [cols, r, n]] of Object.entries(camp.get('GRANDMA_SHEETS'))) rows.push(kitRow(`juju camp grandma ${k}`, `${camp.get('ART')}grandma_${k}.png`, cols, r, n));
+  for (const [k, [cols, r, n]] of Object.entries(camp.get('GRANDMA_SHEETS'))) rows.push(kitRow(`juju camp grandma ${k}`, `${camp.get('ART')}grandma_${k}.webp`, cols, r, n));
   for (const color of ['green', 'red', 'yellow']) {
     for (const [k, [cols, r, n]] of Object.entries(camp.get('KID_SHEETS'))) {
-      const url = `${camp.get('ART')}bandit_${color}_${k}.png`;
+      const url = `${camp.get('ART')}bandit_${color}_${k}.webp`;
       if (existsSync(join(pub, url))) rows.push(kitRow(`juju camp bandit ${color} ${k}`, url, cols, r, n));
     }
   }
@@ -449,7 +449,7 @@ export async function collectSheets() {
   for (const [k, [cols, n]] of Object.entries(pen.get('VENDOR_CLIPS'))) rows.push(kitRow(`penalty vendor ${k}`, `${pen.get('ART')}vendor_${k}.webp`, cols, Math.ceil(n / cols), n));
   const newxp = moduleConsts('js/features/newxp-feature.js');
   for (const [who, s] of Object.entries(newxp.get('SHEETS'))) {
-    for (const [mode, [file, cols, r, n]] of Object.entries(s.modes)) rows.push(kitRow(`newxp ${who} ${mode}`, `${newxp.get('ART')}${file}.png`, cols, r, n));
+    for (const [mode, [file, cols, r, n]] of Object.entries(s.modes)) rows.push(kitRow(`newxp ${who} ${mode}`, `${newxp.get('ART')}${file}.webp`, cols, r, n));
   }
   // Every other kit call whose arguments are literals or module constants.
   for (const c of kitCalls()) {

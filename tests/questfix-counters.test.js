@@ -28,23 +28,23 @@ import {
   PURPLE_JOURNEY_STREETS,
   COLD_COMFORT,
   COLD_COMFORT_LEAVE_TEXT,
-} from '../public/js/quest-offers.js?v=486b09c9';
-import { createResourceNode, harvestResourceNode } from '../public/js/resource-nodes.js?v=1c268516';
-import { createPlot, performPlotVerb } from '../public/js/patches.js?v=8af384ac';
-import { createToolConditionState } from '../public/js/tools.js?v=f701b241';
-import { performEmotionalBearAction, createEmotionalBearState } from '../public/js/emotional-bear.js?v=1dd276f7';
+} from '../public/js/quest-offers.js?v=e31115ea';
+import { createResourceNode, harvestResourceNode } from '../public/js/resource-nodes.js?v=b11d96b2';
+import { createPlot, performPlotVerb } from '../public/js/patches.js?v=aa83d5ad';
+import { createToolConditionState } from '../public/js/tools.js?v=d8aa3536';
+import { performEmotionalBearAction, createEmotionalBearState } from '../public/js/emotional-bear.js?v=8d027fe0';
 import {
   questVerbsFeature,
   slatherVerb,
   SLATHER_VERB,
   SLATHER_COPY,
-} from '../public/js/features/quest-verbs-feature.js?v=52517603';
-import { onOwnYard } from '../public/js/features/quest-offers-feature.js?v=f5d8a199';
+} from '../public/js/features/quest-verbs-feature.js?v=355fee62';
+import { onOwnYard } from '../public/js/features/quest-offers-feature.js?v=57dafa96';
 import {
   giveCubimalVerb,
   GIVE_CUBIMAL_VERB,
   CUBIMAL_GIFT_RESPONSES,
-} from '../public/js/features/quest-verbs-feature.js?v=52517603';
+} from '../public/js/features/quest-verbs-feature.js?v=355fee62';
 import { createFeatureHost } from '../public/js/feature-host.js?v=127e0a3c';
 
 const here = dirname(fileURLToPath(import.meta.url));

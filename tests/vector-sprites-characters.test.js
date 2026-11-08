@@ -18,7 +18,7 @@ import {
   pointAtPart,
   sourceSheet,
   upgradeSource,
-} from '../public/js/sprite-hires.js?v=f98be5eb';
+} from '../public/js/sprite-hires.js?v=abaf3d5a';
 import { packParts } from '../tools/vector-sprites/build.mjs';
 
 /** A js/textures.js stand-in: records the URL routes it is given. */
@@ -213,7 +213,7 @@ describe('first-draw 3x swap', () => {
     installHiresSprites(textures, { dpr: 2, viewWidth: 1280 });
     assert.equal(textures.route(sheet), sheet);
     assert.equal(textures.route(eager), HIRES_SPRITES.get(eager));
-    assert.equal(textures.route('assets/sprites/icons/apple.png'), 'assets/sprites/icons/apple.png');
+    assert.equal(textures.route('assets/sprites/icons/apple.webp'), 'assets/sprites/icons/apple.webp');
   });
 
   it('finds the sheet a TextureSource came from (label, absolute URL, query)', () => {
@@ -221,7 +221,7 @@ describe('first-draw 3x swap', () => {
     assert.equal(sourceSheet({ label: `./${sheet}?v=2` }), sheet);
     assert.equal(sourceSheet({ label: `https://groddle.localhost/${sheet}` }), sheet);
     assert.equal(sourceSheet({ label: HIRES_SPRITES.get(sheet) }), null);
-    assert.equal(sourceSheet({ label: 'assets/sprites/icons/apple.png' }), null);
+    assert.equal(sourceSheet({ label: 'assets/sprites/icons/apple.webp' }), null);
     assert.equal(sourceSheet({}), null);
   });
 
@@ -243,7 +243,7 @@ describe('first-draw 3x swap', () => {
       assert.deepEqual(renderer.texture._initSource(source), { gl: 1 });
       assert.equal(await source.hiresUpgrade, true);
       renderer.texture._initSource(source); // texture GC re-upload: no second fetch
-      renderer.texture._initSource(fakeSource('assets/sprites/icons/apple.png'));
+      renderer.texture._initSource(fakeSource('assets/sprites/icons/apple.webp'));
       assert.deepEqual(fetched, [HIRES_SPRITES.get(sheet)]);
       assert.deepEqual(loaded, [source]);
       assert.equal(inits.length, 3);
@@ -275,7 +275,7 @@ describe('first-draw 3x swap', () => {
         framesOf: (source) => [...(sets.get(source) || [])],
       };
       installHiresSprites(textures, { dpr: 2, viewWidth: 1280 });
-      assert.ok(tracker.match(path) && !tracker.match('assets/sprites/icons/apple.png'));
+      assert.ok(tracker.match(path) && !tracker.match('assets/sprites/icons/apple.webp'));
       assert.equal(hiresSpriteUrl(path), null, 'split sheets are never URL-routed');
       class Source {
         constructor(opts = {}) { Object.assign(this, opts); }

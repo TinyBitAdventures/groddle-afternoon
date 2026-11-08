@@ -45,7 +45,7 @@ describe('party packs (items/party_pack*.js, catalog_stores.js store 19)', () =>
   it('has a full and a taster pack for all eight themes, with icons', () => {
     assert.equal(PARTY_PACK_CLASSES.length, 16);
     for (const classTsid of PARTY_PACK_CLASSES) {
-      assert.ok(existsSync(join(publicDir, 'assets/sprites/icons', `${classTsid}.png`)), classTsid);
+      assert.ok(existsSync(join(publicDir, 'assets/sprites/icons', `${classTsid}.webp`)), classTsid);
     }
   });
 
@@ -136,7 +136,7 @@ describe('party spaces (config_prod.js party_spaces)', () => {
     assert.equal(stackAvailable(shaker, [], now, 2), 0);
     for (const space of Object.values(PARTY_SPACES)) {
       for (const g of partyStackGroups(space.id)) {
-        assert.ok(existsSync(join(publicDir, 'assets/sprites/icons', `${g.classTsid}.png`)), `${space.id}: ${g.classTsid}`);
+        assert.ok(existsSync(join(publicDir, 'assets/sprites/icons', `${g.classTsid}.webp`)), `${space.id}: ${g.classTsid}`);
       }
     }
   });
@@ -239,8 +239,8 @@ describe('party lifecycle (groups/party.js, party_atm.js)', () => {
 });
 
 describe('party spaces feature wiring', async () => {
-  const { partySpacesFeature } = await import('../public/js/features/party-spaces-feature.js?v=a287ae6a');
-  const { FEATURES } = await import('../public/js/features/index.js?v=b4df516e');
+  const { partySpacesFeature } = await import('../public/js/features/party-spaces-feature.js?v=5ab158fe');
+  const { FEATURES } = await import('../public/js/features/index.js?v=d9128cb3');
 
   it('is registered with the feature host', () => {
     assert.ok(FEATURES.some((f) => f.id === partySpacesFeature.id));

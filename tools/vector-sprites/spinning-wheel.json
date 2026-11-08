@@ -5,16 +5,16 @@
  "budget": {"maxSide": 8192, "maxMB": 64},
  "jobs": [
   {"name": "spinning-wheel", "swf": "misc/npc/npc_spinning_wheel/npc_spinning_wheel.swf", "sprite": 290, "sheets": [
-   {"path": "assets/sprites/spinning-wheel/appear.png", "label": "appear", "swfStart": 19, "swfCount": 15, "fw": 172, "fh": 267, "cols": 7, "frames": 14},
-   {"path": "assets/sprites/spinning-wheel/white-spin.png", "label": "white_spin", "fw": 172, "fh": 267, "cols": 7, "frames": 53},
-   {"path": "assets/sprites/spinning-wheel/white-end.png", "label": "white_spin_end", "fw": 172, "fh": 267, "cols": 1, "frames": 8},
-   {"path": "assets/sprites/spinning-wheel/green-spin.png", "label": "green_spin", "fw": 172, "fh": 267, "cols": 7, "frames": 53},
-   {"path": "assets/sprites/spinning-wheel/green-end.png", "label": "green_spin_end", "fw": 172, "fh": 267, "cols": 1, "frames": 8},
-   {"path": "assets/sprites/spinning-wheel/red-spin.png", "label": "red_spin", "fw": 172, "fh": 267, "cols": 7, "frames": 53},
-   {"path": "assets/sprites/spinning-wheel/red-end.png", "label": "red_spin_end", "fw": 172, "fh": 267, "cols": 1, "frames": 8}
+   {"path": "assets/sprites/spinning-wheel/appear.webp", "label": "appear", "swfStart": 19, "swfCount": 15, "fw": 172, "fh": 267, "cols": 7, "frames": 14},
+   {"path": "assets/sprites/spinning-wheel/white-spin.webp", "label": "white_spin", "fw": 172, "fh": 267, "cols": 7, "frames": 53},
+   {"path": "assets/sprites/spinning-wheel/white-end.webp", "label": "white_spin_end", "fw": 172, "fh": 267, "cols": 1, "frames": 8},
+   {"path": "assets/sprites/spinning-wheel/green-spin.webp", "label": "green_spin", "fw": 172, "fh": 267, "cols": 7, "frames": 53},
+   {"path": "assets/sprites/spinning-wheel/green-end.webp", "label": "green_spin_end", "fw": 172, "fh": 267, "cols": 1, "frames": 8},
+   {"path": "assets/sprites/spinning-wheel/red-spin.webp", "label": "red_spin", "fw": 172, "fh": 267, "cols": 7, "frames": 53},
+   {"path": "assets/sprites/spinning-wheel/red-end.webp", "label": "red_spin_end", "fw": 172, "fh": 267, "cols": 1, "frames": 8}
   ]},
   {"name": "spinning-wheel-disappear", "swf": "misc/npc/npc_spinning_wheel/npc_spinning_wheel.swf", "sprite": 290, "sheets": [
-   {"path": "assets/sprites/spinning-wheel/disappear.png", "label": "disappear", "fw": 514, "fh": 450, "cols": 6, "frames": 9}
+   {"path": "assets/sprites/spinning-wheel/disappear.webp", "label": "disappear", "fw": 514, "fh": 450, "cols": 6, "frames": 9}
   ]}
  ]
 }

@@ -11,7 +11,7 @@
    "padStage": 1,
    "sheets": [
     {
-     "path": "assets/sprites/spinning-wheel/stoot-doll.png",
+     "path": "assets/sprites/spinning-wheel/stoot-doll.webp",
      "fw": 59,
      "fh": 59,
      "cols": 1,
@@ -28,7 +28,7 @@
    "padStage": 1,
    "sheets": [
     {
-     "path": "assets/sprites/home-tower/tower_expander.png",
+     "path": "assets/sprites/home-tower/tower_expander.webp",
      "fw": 112,
      "fh": 49,
      "cols": 1,

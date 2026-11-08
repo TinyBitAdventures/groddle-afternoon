@@ -162,7 +162,7 @@ function encyclopediaDashesAreSource(text) {
 
 describe('the lines G215 reworded', () => {
   it('making uses the source result line and a colon before the recipe name', async () => {
-    const { formatCraftProgress, formatCraftResultLine } = await import('../public/js/making.js?v=c9dc233e');
+    const { formatCraftProgress, formatCraftResultLine } = await import('../public/js/making.js?v=f4f214c2');
     assert.equal(formatCraftProgress(2, 5, 'Flour'), 'Making 2 of 5: Flour');
     assert.equal(formatCraftProgress(1, 1), 'Making 1 of 1');
     // players/inc_making.js 896-909.

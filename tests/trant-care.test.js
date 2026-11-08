@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { imageSize } from '../tools/image-size.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
 import test from 'node:test';
@@ -10,7 +11,7 @@ import {
   resolveTrantCarePackage,
   quoteTrantCare,
   performTrantCare,
-} from '../public/js/trant-care.js?v=098500ac';
+} from '../public/js/trant-care.js?v=ac146026';
 import {
   createTrantState,
   livingTrantPlanForStreet,
@@ -22,8 +23,8 @@ import {
   createToolConditionState,
   getToolCondition,
   setToolRemaining,
-} from '../public/js/tools.js?v=f701b241';
-import { getVerbsFor, runVerb } from '../public/content.js?v=075ded81';
+} from '../public/js/tools.js?v=d8aa3536';
+import { getVerbsFor, runVerb } from '../public/content.js?v=ebc8b8b3';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const publicDir = path.join(root, 'public');
@@ -209,17 +210,17 @@ test.describe('living-trant world and client integration', () => {
   test('ships the official 10×3 Watering Can sheet and broken icon', () => {
     const png = (relative) => {
       const bytes = fs.readFileSync(path.join(publicDir, relative));
-      return { width: bytes.readUInt32BE(16), height: bytes.readUInt32BE(20) };
+      return { width: imageSize(bytes).w, height: imageSize(bytes).h };
     };
-    assert.deepEqual(png('assets/sprites/tools/watering-can-tool.png'), { width: 910, height: 234 });
-    assert.deepEqual(png('assets/sprites/icons/watering_can_broken.png'), { width: 64, height: 59 });
+    assert.deepEqual(png('assets/sprites/tools/watering-can-tool.webp'), { width: 910, height: 234 });
+    assert.deepEqual(png('assets/sprites/icons/watering_can_broken.webp'), { width: 64, height: 59 });
   });
 
   test('wires dynamic duration, cancellable animation, QA, condition, and mute default', () => {
     const game = fs.readFileSync(path.join(publicDir, 'game.js'), 'utf8');
     const html = fs.readFileSync(path.join(publicDir, 'play/index.html'), 'utf8');
     assert.match(game, /function playWateringCanAnimation\(target, durationMs = 0\)/);
-    assert.match(game, /watering-can-tool\.png/);
+    assert.match(game, /watering-can-tool\.webp/);
     assert.match(game, /Number\.isFinite\(verb\.durationMs\)/);
     assert.match(game, /clearActionToolFx\('cancelled'\)/);
     assert.match(game, /caredemo/);

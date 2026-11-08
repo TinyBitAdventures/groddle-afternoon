@@ -145,7 +145,7 @@ describe('top bar markup and wiring', () => {
     assert.match(game, /onMail: \(\) => \{ if \(state\.started\) openMailboxPanel\(\); \},/);
     assert.match(game, /onPlayerCard: \(\) => document\.getElementById\('player-menu-btn'\)\?\.click\(\),/);
     assert.match(game, /renderTopBar\(document, \{ unread, parcels \}\);/);
-    assert.match(game, /icon: `assets\/sprites\/giant-icons\/icon_\$\{favorGiant\.id === 'ti' \? 'tii' : favorGiant\.id\}\.png`/);
+    assert.match(game, /icon: `assets\/sprites\/giant-icons\/icon_\$\{favorGiant\.id === 'ti' \? 'tii' : favorGiant\.id\}\.webp`/);
   });
 
   it('every ring number sits centred in its ring; three digits take the smaller size', () => {

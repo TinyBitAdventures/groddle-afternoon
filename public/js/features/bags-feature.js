@@ -92,7 +92,7 @@
  * grant(class, n) to gain something the way a reward does.
  */
 
-import { ITEM_CATALOG, addItem, isToolItem, removeItem } from '../inventory.js?v=d82f3b00';
+import { ITEM_CATALOG, addItem, isToolItem, removeItem } from '../inventory.js?v=b7609342';
 import {
   BAG_DEFS,
   PACK_CAPACITY,
@@ -123,7 +123,7 @@ import {
   unitPlaces,
   unitRankAt,
 } from '../pack-slots.js?v=a94b816c';
-import { TOOL_CONDITION_CATALOG, moveToolCopy, pickToolCopies, placeToolCopies } from '../tools.js?v=f701b241';
+import { TOOL_CONDITION_CATALOG, moveToolCopy, pickToolCopies, placeToolCopies } from '../tools.js?v=d8aa3536';
 import { createMinnAccount } from '../minn-account.js?v=ba6a13c5';
 import { BAG_NAME_MAX, BAG_RENAME_COPY, bagLabel, canRenameBag, cleanBagName, renamedTo } from '../bag-names.js?v=22391c55';
 import { openNamePrompt } from '../ui/name-prompt.js?v=142b551a';

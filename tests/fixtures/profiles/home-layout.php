@@ -41,7 +41,7 @@ $png('assets/decos/groddle/gz_new_thing.webp', 50, 50);
 $png('assets/sprites/rocks/rock_sheet.png', 400, 100);
 $png('assets/sprites/rocks/rock_sheet@3x.webp', 1200, 300);
 $png('assets/sprites/made/fire-dragon/dragon.png', 50, 50);
-$png('assets/ui/signpost/signpost_post.png', 43, 246);
+$png('assets/ui/signpost/signpost_post.webp', 43, 246);
 // A sheet whose 3x ships split into two parts (js/sprite-hires.js SPLIT_SPRITES): 4 x 2 cells of
 // 50 x 80 on the 1x sheet; each part holds 4 cells in 2 columns (100 x 160 in 1x units, 300 x 480 px).
 $png('assets/sprites/mail-npc/fake_left.png', 200, 160);
@@ -64,7 +64,7 @@ file_put_contents("{$root}/encyclopedia/items/data.json", json_encode(['items' =
 
 $good = [
     'v' => 1, 'w' => 960, 'h' => 476,
-    'art' => ['assets/decos/groddle/bush_1.webp', 'assets/sprites/rocks/rock_sheet.png', 'assets/ui/signpost/signpost_post.png'],
+    'art' => ['assets/decos/groddle/bush_1.webp', 'assets/sprites/rocks/rock_sheet.png', 'assets/ui/signpost/signpost_post.webp'],
     'draw' => [
         ['sky' => ['#a6effa', '#eafcfb'], 'x' => 0, 'y' => 0, 'w' => 960, 'h' => 600],
         ['col' => '#5c3b25', 'x' => 0, 'y' => 400, 'w' => 960, 'h' => 76, 'o' => 0.5],
@@ -157,7 +157,7 @@ $out['scriptName'] = HomeLayout::render($named, ['owner' => 'Zz', 'root' => $roo
 // Version 2: the whole street, in layers with their parallax factors.
 $street = [
     'v' => 2, 'w' => 960, 'h' => 476, 'sw' => 2670, 'cx' => 600,
-    'art' => ['assets/decos/groddle/bush_1.webp', 'assets/sprites/rocks/rock_sheet.png', 'assets/ui/signpost/signpost_post.png'],
+    'art' => ['assets/decos/groddle/bush_1.webp', 'assets/sprites/rocks/rock_sheet.png', 'assets/ui/signpost/signpost_post.webp'],
     'layers' => [
         ['f' => 0, 'draw' => [['sky' => ['#a6effa', '#eafcfb'], 'x' => 0, 'y' => 0, 'w' => 960, 'h' => 600]]],
         ['f' => 0.5, 'draw' => [

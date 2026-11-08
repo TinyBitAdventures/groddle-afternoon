@@ -102,14 +102,14 @@
     { "name": "familiar_dialog_teleport", "src": "graphics/familiar_dialog_teleport.png", "use": "the art inside the hub's Teleport cloud (ImgMenuTeleport.as 25-37)" }
   ],
   "reuse": [
-    { "name": "imagination_button", "path": "assets/imagination/ui/imagination_button.png", "src": "graphics/imagination_button.png" },
-    { "name": "imagination_button_hover", "path": "assets/imagination/ui/imagination_button_hover.png", "src": "graphics/imagination_button_hover.png" },
-    { "name": "bug_icon", "path": "assets/ui/bug_icon.png", "src": "graphics/bug_icon.png" },
-    { "name": "quest_book", "path": "assets/ui/quest-book.png", "src": "graphics/quest_book.png" },
-    { "name": "prompt_check", "path": "assets/ui/prompt/prompt_check.png", "src": "graphics/prompt_check.png" },
-    { "name": "prompt_x", "path": "assets/ui/prompt/prompt_x.png", "src": "graphics/prompt_x.png" },
-    { "name": "close_x_small_gray", "path": "assets/ui/familiar/close_x_small_gray.png", "src": "graphics/close_x_small_gray.png" },
-    { "name": "familiar_dialog_quests_small", "path": "assets/ui/familiar/quests_small.png", "src": "graphics/familiar_dialog_quests_small.png" }
+    { "name": "imagination_button", "path": "assets/imagination/ui/imagination_button.webp", "src": "graphics/imagination_button.png" },
+    { "name": "imagination_button_hover", "path": "assets/imagination/ui/imagination_button_hover.webp", "src": "graphics/imagination_button_hover.png" },
+    { "name": "bug_icon", "path": "assets/ui/bug_icon.webp", "src": "graphics/bug_icon.png" },
+    { "name": "quest_book", "path": "assets/ui/quest-book.webp", "src": "graphics/quest_book.png" },
+    { "name": "prompt_check", "path": "assets/ui/prompt/prompt_check.webp", "src": "graphics/prompt_check.png" },
+    { "name": "prompt_x", "path": "assets/ui/prompt/prompt_x.webp", "src": "graphics/prompt_x.png" },
+    { "name": "close_x_small_gray", "path": "assets/ui/familiar/close_x_small_gray.webp", "src": "graphics/close_x_small_gray.png" },
+    { "name": "familiar_dialog_quests_small", "path": "assets/ui/familiar/quests_small.webp", "src": "graphics/familiar_dialog_quests_small.png" }
   ],
   "svg": [
     { "name": "cloud_upgrades", "swf": "swfs/imagination_clouds.swf", "sprite": 3, "use": "hub cloud: Upgrades" },

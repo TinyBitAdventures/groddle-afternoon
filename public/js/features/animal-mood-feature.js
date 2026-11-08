@@ -96,16 +96,16 @@
  *   animalMoodRooting (Piggies rooting now), animalMoodLast (root:look | root:sniff).
  */
 
-import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=d77b0b8b';
+import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=b764884b';
 import { nearestSurfaceY } from '../walk-surface.js?v=c982983e';
 import { displayTopOf, itemstackOverlayPoint, playSheetOverlay } from '../overlay-art.js?v=11b6dd7f';
-import { isInHell } from '../hell.js?v=aca145ba';
+import { isInHell } from '../hell.js?v=ca971c34';
 import { HOG_HAUL_STREET_ID } from '../hog-haul.js?v=50d2e072';
 import { TRANT_META, trantStatusLabel } from '../trants.js?v=9c2e8c0f';
-import { animalStatusLabel } from '../animals.js?v=d5af4f3c';
-import { quoteAnimalKinship } from '../animal-kinship.js?v=05cd67ec';
-import { captureVerbState, isFoodItem, itemLabel } from '../animal-husbandry.js?v=35b23ef4';
-import { ROOK_SHEETS, rookAttackFeature } from './rook-attack-feature.js?v=c56ce4a4';
+import { animalStatusLabel } from '../animals.js?v=0d9f9b0f';
+import { quoteAnimalKinship } from '../animal-kinship.js?v=b857b068';
+import { captureVerbState, isFoodItem, itemLabel } from '../animal-husbandry.js?v=7194f0f1';
+import { ROOK_SHEETS, rookAttackFeature } from './rook-attack-feature.js?v=db912705';
 import { ANIMAL_BODY, ANIMAL_PATROL, TREE_FOOTPRINT } from '../street-ecology.js?v=3c1d4c06';
 import {
   CHECK_ON_REMOVE,
@@ -196,11 +196,11 @@ export function piggyRootDelayMs(rng = Math.random) {
 
 /** OGA npc_piggy sheets (88×62 cells, measured): too_much_nibble 11×6 (65), chew 11×5 (53), look_screen 10×5 (48). */
 export const PIGGY_MOOD_SHEETS = Object.freeze({
-  tooMuchNibble: Object.freeze({ path: 'assets/sprites/npc_piggy__x1_too_much_nibble_png_1354829441.png', fw: 88, fh: 62, cols: 11, frames: 65 }),
-  chew: Object.freeze({ path: 'assets/sprites/npc_piggy__x1_chew_png_1354829433.png', fw: 88, fh: 62, cols: 11, frames: 53 }),
-  rooked2: Object.freeze({ path: 'assets/sprites/rooks/piggy-rooked2.png', fw: 88, fh: 62, cols: 8, frames: 24 }),
+  tooMuchNibble: Object.freeze({ path: 'assets/sprites/npc_piggy__x1_too_much_nibble_png_1354829441.webp', fw: 88, fh: 62, cols: 11, frames: 65 }),
+  chew: Object.freeze({ path: 'assets/sprites/npc_piggy__x1_chew_png_1354829433.webp', fw: 88, fh: 62, cols: 11, frames: 53 }),
+  rooked2: Object.freeze({ path: 'assets/sprites/rooks/piggy-rooked2.webp', fw: 88, fh: 62, cols: 8, frames: 24 }),
   // onRooting's look_screen. Its sniff has no clip in the CC0 exports: the chew clip stands in.
-  lookScreen: Object.freeze({ path: 'assets/sprites/npc_piggy__x1_look_screen_png_1354829434.png', fw: 88, fh: 62, cols: 10, frames: 48 }),
+  lookScreen: Object.freeze({ path: 'assets/sprites/npc_piggy__x1_look_screen_png_1354829434.webp', fw: 88, fh: 62, cols: 10, frames: 48 }),
 });
 
 /**
@@ -209,7 +209,7 @@ export const PIGGY_MOOD_SHEETS = Object.freeze({
  * butterfly fly-rooked sheets.
  */
 export const CROWD_SHEETS = Object.freeze({
-  chickenSit: Object.freeze({ path: 'assets/sprites/animals/npc_chicken_sit.png', fw: 148, fh: 110, cols: 5, frames: 20 }),
+  chickenSit: Object.freeze({ path: 'assets/sprites/animals/npc_chicken_sit.webp', fw: 148, fh: 110, cols: 5, frames: 20 }),
   chickenRooked2: ROOK_SHEETS.chicken2,
   butterflyFlyRooked: ROOK_SHEETS.bflyFly,
 });

@@ -10,8 +10,8 @@
  *     is searched by box-downscaling the render 3:1 and comparing premultiplied
  *     RGBA against the OGA cells; every frame is then scored with it, and its
  *     own best offset must agree.
- *  4. Matching sheets are written next to the 1x file as <name>@3x.png (or
- *     .webp when lossless WebP is clearly smaller), exactly 3x its pixel size,
+ *  4. Matching sheets are written next to the 1x file as <name>@3x.webp (lossless,
+ *     or .png in the rare case WebP is not smaller), exactly 3x its pixel size,
  *     every frame clipped to its cell (or as parts, see "budget"). Rejected
  *     sheets are reported, not written. Frames under 1% of the sheet's median
  *     alpha (a vanishing sparkle) are scored but not gated.
@@ -521,9 +521,9 @@ function buildSheet(job, sheet, labels, frameDir) {
     // Lossless WebP keeps the exact pixels (a "lossy" manifest: lossless alpha, lossy colour).
     execFileSync('cwebp', lossy
       ? ['-quiet', '-q', String(lossy), '-alpha_q', '100', '-m', '6', '-exact', tmpPng, '-o', tmpWebp]
-      : ['-quiet', '-lossless', '-exact', '-z', '9', tmpPng, '-o', tmpWebp]);
-    // Lossless WebP: use it when it saves a fifth.
-    const useWebp = lossy || alwaysWebp || extname(oga) === '.webp' || statSync(tmpWebp).size < statSync(tmpPng).size * 0.8;
+      : ['-quiet', '-lossless', '-exact', '-z', '9', '-metadata', 'none', tmpPng, '-o', tmpWebp]);
+    // Lossless WebP whenever it is smaller (Austin 2026-11-07; it was a fifth smaller before).
+    const useWebp = lossy || alwaysWebp || extname(oga) === '.webp' || statSync(tmpWebp).size < statSync(tmpPng).size;
     const file = `${name}.${useWebp ? 'webp' : 'png'}`;
     if (useWebp) { renameSync(tmpWebp, file); unlinkSync(tmpPng); } else { renameSync(tmpPng, file); unlinkSync(tmpWebp); }
     written.push({ hires: relative(PUBLIC, file), bytes: statSync(file).size, ...(split ? { from: layout.from, count: layout.count, cols: layout.cols, w: W, h: H } : {}) });

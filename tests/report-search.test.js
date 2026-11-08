@@ -3,7 +3,7 @@
 // tabs by status with counts and a red count of new replies, and unread then answered/open first.
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { mountReportsSheet, PICTURE_WAIT_MS } from '../public/js/ui/reports-sheet.js?v=837df440';
+import { mountReportsSheet, PICTURE_WAIT_MS } from '../public/js/ui/reports-sheet.js?v=0825709f';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { REPORT_FILTER_MIN, REPORT_TABS, REPORT_TEXT, STATUS_ORDER, STATUS_WORDS, matchesReport, sortReports, tabCounts, tabLabel } from '../public/js/reports.js?v=61088e97';

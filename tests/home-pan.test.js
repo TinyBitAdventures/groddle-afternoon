@@ -16,10 +16,10 @@ import { join } from 'node:path';
 import { homedir } from 'node:os';
 import { pathToFileURL } from 'node:url';
 
-import { HOME_LAYOUT_LIMITS, HOME_STREET_LIMITS, HOME_STREET_VERSION, buildHomeLayout, homeLayoutJson, homeLayoutKeyOf } from '../public/js/home-layout.js?v=e1b845ad';
-import { walkHomeScene } from '../public/js/home-layout-scene.js?v=aefdc265';
-import { HOME_LIMITS } from '../public/js/homes-catalog.js?v=7aa9beb0';
-import { HOUSE_LOT_W, YARD_SEGMENT_W } from '../public/js/home-cultivation.js?v=c650eed1';
+import { HOME_LAYOUT_LIMITS, HOME_STREET_LIMITS, HOME_STREET_VERSION, buildHomeLayout, homeLayoutJson, homeLayoutKeyOf } from '../public/js/home-layout.js?v=df6020fe';
+import { walkHomeScene } from '../public/js/home-layout-scene.js?v=99cc7def';
+import { HOME_LIMITS } from '../public/js/homes-catalog.js?v=10ac34b6';
+import { HOUSE_LOT_W, YARD_SEGMENT_W } from '../public/js/home-cultivation.js?v=42ae453c';
 import { CAMERA_RANGE } from '../public/js/features/camera-mode-feature.js?v=ad1ae5ea';
 import { SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
 
@@ -228,7 +228,7 @@ describe('the site side, version 2 (groddle-afternoon-site)', { skip: skipWithou
     assert.doesNotMatch(html, /hd-arrow/, 'the arrow buttons are the script\'s: none without JavaScript');
     // Far from the starting frame (the rock at 2300, the view 600..1560): its art waits.
     assert.match(html, /<img data-src="\/assets\/sprites\/rocks\/rock_sheet\.png" data-srcset="[^"]+"/);
-    assert.match(html, /<img class="hd-art" src="\/assets\/ui\/signpost\/signpost_post\.png"/);
+    assert.match(html, /<img class="hd-art" src="\/assets\/ui\/signpost\/signpost_post\.webp"/);
     // Spots left to right in the street's layer, each with its box for the camera.
     assert.deepEqual([...html.matchAll(/data-kind="(\w+)"[^>]*data-b="([\d,-]+)"/g)].map((m) => m[1]), ['door', 'signpost', 'avatar', 'cultivation']);
     assert.doesNotMatch(html, /—/);

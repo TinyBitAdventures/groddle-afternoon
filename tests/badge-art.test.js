@@ -1,4 +1,5 @@
 import { describe, it } from 'node:test';
+import { imageSize } from '../tools/image-size.mjs';
 import assert from 'node:assert/strict';
 import { readFileSync, existsSync } from 'node:fs';
 import { join, dirname } from 'node:path';
@@ -12,8 +13,8 @@ const generated = readJson('assets/content/badge-icons-generated.json');
 
 function pngSize(rel) {
   const png = readFileSync(join(publicRoot, rel));
-  assert.deepEqual([...png.subarray(0, 8)], [137, 80, 78, 71, 13, 10, 26, 10], `${rel} is a PNG`);
-  return [png.readUInt32BE(16), png.readUInt32BE(20)];
+  assert.equal(imageSize(png)?.format, 'webp', `${rel} is a lossless WebP`);
+  return [imageSize(png).w, imageSize(png).h];
 }
 
 describe('badge art coverage', () => {
@@ -48,12 +49,12 @@ describe('badge art coverage', () => {
       assert.ok(catalog[id], `${id} is a catalog row`);
       assert.equal(official[id], undefined, `${id} has official art, so must not be generated`);
       assert.equal(entry.generated, true);
-      assert.equal(entry.path, `assets/badges/${id}.png`);
+      assert.equal(entry.path, `assets/badges/${id}.webp`);
       assert.ok(entry.subject, `${id} records its subject`);
     }
     for (const [id, rel] of Object.entries(official)) {
       assert.ok(catalog[id], `${id} is a catalog row`);
-      assert.equal(rel, `assets/badges/${id}.png`);
+      assert.equal(rel, `assets/badges/${id}.webp`);
     }
   });
 

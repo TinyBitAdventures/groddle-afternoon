@@ -9,7 +9,7 @@
    "padStage": 1,
    "sheets": [
     {
-     "path": "assets/sprites/street-furniture/visiting-stone.png",
+     "path": "assets/sprites/street-furniture/visiting-stone.webp",
      "fw": 101,
      "fh": 155,
      "cols": 1,
@@ -26,7 +26,7 @@
    "padStage": 1,
    "sheets": [
     {
-     "path": "assets/sprites/street-furniture/note-world.png",
+     "path": "assets/sprites/street-furniture/note-world.webp",
      "fw": 45,
      "fh": 14,
      "cols": 1,
@@ -43,7 +43,7 @@
    "padStage": 1,
    "sheets": [
     {
-     "path": "assets/sprites/street-furniture/gift-box-wrapped.png",
+     "path": "assets/sprites/street-furniture/gift-box-wrapped.webp",
      "fw": 52,
      "fh": 49,
      "cols": 1,
@@ -60,7 +60,7 @@
    "padStage": 1,
    "sheets": [
     {
-     "path": "assets/sprites/street-furniture/gift-box-open.png",
+     "path": "assets/sprites/street-furniture/gift-box-open.webp",
      "fw": 56,
      "fh": 49,
      "cols": 1,
@@ -76,7 +76,7 @@
    "sprite": 13,
    "sheets": [
     {
-     "path": "assets/sprites/street-furniture/notice-board-m0.png",
+     "path": "assets/sprites/street-furniture/notice-board-m0.webp",
      "label": "m0",
      "fw": 212,
      "fh": 147,
@@ -84,7 +84,7 @@
      "frames": 1
     },
     {
-     "path": "assets/sprites/street-furniture/notice-board-m1.png",
+     "path": "assets/sprites/street-furniture/notice-board-m1.webp",
      "label": "m1",
      "fw": 212,
      "fh": 147,
@@ -92,7 +92,7 @@
      "frames": 1
     },
     {
-     "path": "assets/sprites/street-furniture/notice-board-m2.png",
+     "path": "assets/sprites/street-furniture/notice-board-m2.webp",
      "label": "m2",
      "fw": 212,
      "fh": 147,
@@ -100,7 +100,7 @@
      "frames": 1
     },
     {
-     "path": "assets/sprites/street-furniture/notice-board-m3.png",
+     "path": "assets/sprites/street-furniture/notice-board-m3.webp",
      "label": "m3",
      "fw": 212,
      "fh": 147,
@@ -108,7 +108,7 @@
      "frames": 1
     },
     {
-     "path": "assets/sprites/street-furniture/notice-board-m4.png",
+     "path": "assets/sprites/street-furniture/notice-board-m4.webp",
      "label": "m4",
      "fw": 212,
      "fh": 147,
@@ -116,7 +116,7 @@
      "frames": 1
     },
     {
-     "path": "assets/sprites/street-furniture/notice-board-m5.png",
+     "path": "assets/sprites/street-furniture/notice-board-m5.webp",
      "label": "m5",
      "fw": 212,
      "fh": 147,
@@ -124,7 +124,7 @@
      "frames": 1
     },
     {
-     "path": "assets/sprites/street-furniture/notice-board-m6.png",
+     "path": "assets/sprites/street-furniture/notice-board-m6.webp",
      "label": "m6",
      "fw": 212,
      "fh": 147,
@@ -132,7 +132,7 @@
      "frames": 1
     },
     {
-     "path": "assets/sprites/street-furniture/notice-board-m7.png",
+     "path": "assets/sprites/street-furniture/notice-board-m7.webp",
      "label": "m7",
      "fw": 212,
      "fh": 147,
@@ -140,7 +140,7 @@
      "frames": 1
     },
     {
-     "path": "assets/sprites/street-furniture/notice-board-m8.png",
+     "path": "assets/sprites/street-furniture/notice-board-m8.webp",
      "label": "m8",
      "fw": 212,
      "fh": 147,
@@ -148,7 +148,7 @@
      "frames": 1
     },
     {
-     "path": "assets/sprites/street-furniture/notice-board-m9.png",
+     "path": "assets/sprites/street-furniture/notice-board-m9.webp",
      "label": "m9",
      "fw": 212,
      "fh": 147,
@@ -156,7 +156,7 @@
      "frames": 1
     },
     {
-     "path": "assets/sprites/street-furniture/notice-board-m10.png",
+     "path": "assets/sprites/street-furniture/notice-board-m10.webp",
      "label": "m10",
      "fw": 212,
      "fh": 147,
@@ -171,7 +171,7 @@
    "sprite": 28,
    "sheets": [
     {
-     "path": "assets/sprites/street-furniture/mailbox-left-idle.png",
+     "path": "assets/sprites/street-furniture/mailbox-left-idle.webp",
      "label": "idle",
      "fw": 97,
      "fh": 146,
@@ -179,7 +179,7 @@
      "frames": 1
     },
     {
-     "path": "assets/sprites/street-furniture/mailbox-left-has-mail-idle.png",
+     "path": "assets/sprites/street-furniture/mailbox-left-has-mail-idle.webp",
      "label": "has_mail_idle",
      "fw": 97,
      "fh": 146,
@@ -187,7 +187,7 @@
      "frames": 1
     },
     {
-     "path": "assets/sprites/street-furniture/mailbox-left-has-mail.png",
+     "path": "assets/sprites/street-furniture/mailbox-left-has-mail.webp",
      "label": "has_mail",
      "fw": 97,
      "fh": 146,
@@ -195,7 +195,7 @@
      "frames": 73
     },
     {
-     "path": "assets/sprites/street-furniture/mailbox-left-interact.png",
+     "path": "assets/sprites/street-furniture/mailbox-left-interact.webp",
      "label": "interact",
      "fw": 97,
      "fh": 146,
@@ -203,7 +203,7 @@
      "frames": 9
     },
     {
-     "path": "assets/sprites/street-furniture/mailbox-left-all-done.png",
+     "path": "assets/sprites/street-furniture/mailbox-left-all-done.webp",
      "label": "all_done",
      "fw": 97,
      "fh": 146,
@@ -219,7 +219,7 @@
    "padStage": 1,
    "sheets": [
     {
-     "path": "assets/sprites/furniture/bag_furniture_sdb.png",
+     "path": "assets/sprites/furniture/bag_furniture_sdb.webp",
      "fw": 67,
      "fh": 70,
      "cols": 1,
@@ -236,7 +236,7 @@
    "padStage": 1,
    "sheets": [
     {
-     "path": "assets/sprites/furniture/furniture_armchair.png",
+     "path": "assets/sprites/furniture/furniture_armchair.webp",
      "fw": 118,
      "fh": 90,
      "cols": 1,
@@ -253,7 +253,7 @@
    "padStage": 1,
    "sheets": [
     {
-     "path": "assets/sprites/furniture/furniture_bed.png",
+     "path": "assets/sprites/furniture/furniture_bed.webp",
      "fw": 284,
      "fh": 112,
      "cols": 1,
@@ -270,7 +270,7 @@
    "padStage": 1,
    "sheets": [
     {
-     "path": "assets/sprites/furniture/furniture_bench.png",
+     "path": "assets/sprites/furniture/furniture_bench.webp",
      "fw": 224,
      "fh": 53,
      "cols": 1,
@@ -287,7 +287,7 @@
    "padStage": 1,
    "sheets": [
     {
-     "path": "assets/sprites/furniture/furniture_bookcase.png",
+     "path": "assets/sprites/furniture/furniture_bookcase.webp",
      "fw": 149,
      "fh": 159,
      "cols": 1,
@@ -304,7 +304,7 @@
    "padStage": 1,
    "sheets": [
     {
-     "path": "assets/sprites/furniture/furniture_cabinet.png",
+     "path": "assets/sprites/furniture/furniture_cabinet.webp",
      "fw": 158,
      "fh": 169,
      "cols": 1,
@@ -321,7 +321,7 @@
    "padStage": 1,
    "sheets": [
     {
-     "path": "assets/sprites/furniture/furniture_ceilingdeco.png",
+     "path": "assets/sprites/furniture/furniture_ceilingdeco.webp",
      "fw": 71,
      "fh": 84,
      "cols": 1,
@@ -338,7 +338,7 @@
    "padStage": 1,
    "sheets": [
     {
-     "path": "assets/sprites/furniture/furniture_ceilinglamp.png",
+     "path": "assets/sprites/furniture/furniture_ceilinglamp.webp",
      "fw": 82,
      "fh": 51,
      "cols": 1,
@@ -355,7 +355,7 @@
    "padStage": 1,
    "sheets": [
     {
-     "path": "assets/sprites/furniture/furniture_chair.png",
+     "path": "assets/sprites/furniture/furniture_chair.webp",
      "fw": 72,
      "fh": 93,
      "cols": 1,
@@ -372,7 +372,7 @@
    "padStage": 1,
    "sheets": [
     {
-     "path": "assets/sprites/furniture/furniture_coffeetable.png",
+     "path": "assets/sprites/furniture/furniture_coffeetable.webp",
      "fw": 258,
      "fh": 62,
      "cols": 1,
@@ -389,7 +389,7 @@
    "padStage": 1,
    "sheets": [
     {
-     "path": "assets/sprites/furniture/furniture_counter.png",
+     "path": "assets/sprites/furniture/furniture_counter.webp",
      "fw": 198,
      "fh": 81,
      "cols": 1,
@@ -406,7 +406,7 @@
    "padStage": 1,
    "sheets": [
     {
-     "path": "assets/sprites/furniture/furniture_desk.png",
+     "path": "assets/sprites/furniture/furniture_desk.webp",
      "fw": 168,
      "fh": 72,
      "cols": 1,
@@ -423,7 +423,7 @@
    "padStage": 1,
    "sheets": [
     {
-     "path": "assets/sprites/furniture/furniture_fireplace.png",
+     "path": "assets/sprites/furniture/furniture_fireplace.webp",
      "fw": 193,
      "fh": 133,
      "cols": 1,
@@ -440,7 +440,7 @@
    "padStage": 1,
    "sheets": [
     {
-     "path": "assets/sprites/furniture/furniture_floorlamp.png",
+     "path": "assets/sprites/furniture/furniture_floorlamp.webp",
      "fw": 50,
      "fh": 176,
      "cols": 1,
@@ -457,7 +457,7 @@
    "padStage": 1,
    "sheets": [
     {
-     "path": "assets/sprites/furniture/furniture_lamp.png",
+     "path": "assets/sprites/furniture/furniture_lamp.webp",
      "fw": 89,
      "fh": 57,
      "cols": 1,
@@ -474,7 +474,7 @@
    "padStage": 1,
    "sheets": [
     {
-     "path": "assets/sprites/furniture/furniture_largebackfloordeco.png",
+     "path": "assets/sprites/furniture/furniture_largebackfloordeco.webp",
      "fw": 118,
      "fh": 166,
      "cols": 1,
@@ -491,7 +491,7 @@
    "padStage": 1,
    "sheets": [
     {
-     "path": "assets/sprites/furniture/furniture_largefrontfloordeco.png",
+     "path": "assets/sprites/furniture/furniture_largefrontfloordeco.webp",
      "fw": 155,
      "fh": 143,
      "cols": 1,
@@ -508,7 +508,7 @@
    "padStage": 1,
    "sheets": [
     {
-     "path": "assets/sprites/furniture/furniture_largetabledeco.png",
+     "path": "assets/sprites/furniture/furniture_largetabledeco.webp",
      "fw": 99,
      "fh": 83,
      "cols": 1,
@@ -525,7 +525,7 @@
    "padStage": 1,
    "sheets": [
     {
-     "path": "assets/sprites/furniture/furniture_largewalldeco.png",
+     "path": "assets/sprites/furniture/furniture_largewalldeco.webp",
      "fw": 88,
      "fh": 134,
      "cols": 1,
@@ -542,7 +542,7 @@
    "padStage": 1,
    "sheets": [
     {
-     "path": "assets/sprites/furniture/furniture_largewindow.png",
+     "path": "assets/sprites/furniture/furniture_largewindow.webp",
      "fw": 93,
      "fh": 117,
      "cols": 1,
@@ -559,7 +559,7 @@
    "padStage": 1,
    "sheets": [
     {
-     "path": "assets/sprites/furniture/furniture_loveseat.png",
+     "path": "assets/sprites/furniture/furniture_loveseat.webp",
      "fw": 180,
      "fh": 99,
      "cols": 1,
@@ -576,7 +576,7 @@
    "padStage": 1,
    "sheets": [
     {
-     "path": "assets/sprites/furniture/furniture_painting.png",
+     "path": "assets/sprites/furniture/furniture_painting.webp",
      "fw": 77,
      "fh": 113,
      "cols": 1,
@@ -593,7 +593,7 @@
    "padStage": 1,
    "sheets": [
     {
-     "path": "assets/sprites/furniture/furniture_roomdeco.png",
+     "path": "assets/sprites/furniture/furniture_roomdeco.webp",
      "fw": 118,
      "fh": 166,
      "cols": 1,
@@ -610,7 +610,7 @@
    "padStage": 1,
    "sheets": [
     {
-     "path": "assets/sprites/furniture/furniture_rug.png",
+     "path": "assets/sprites/furniture/furniture_rug.webp",
      "fw": 211,
      "fh": 65,
      "cols": 1,
@@ -627,7 +627,7 @@
    "padStage": 1,
    "sheets": [
     {
-     "path": "assets/sprites/furniture/furniture_shelf.png",
+     "path": "assets/sprites/furniture/furniture_shelf.webp",
      "fw": 233,
      "fh": 47,
      "cols": 1,
@@ -644,7 +644,7 @@
    "padStage": 1,
    "sheets": [
     {
-     "path": "assets/sprites/furniture/furniture_sidetable.png",
+     "path": "assets/sprites/furniture/furniture_sidetable.webp",
      "fw": 62,
      "fh": 54,
      "cols": 1,
@@ -661,7 +661,7 @@
    "padStage": 1,
    "sheets": [
     {
-     "path": "assets/sprites/furniture/furniture_smallbackfloordeco.png",
+     "path": "assets/sprites/furniture/furniture_smallbackfloordeco.webp",
      "fw": 93,
      "fh": 86,
      "cols": 1,
@@ -678,7 +678,7 @@
    "padStage": 1,
    "sheets": [
     {
-     "path": "assets/sprites/furniture/furniture_smallfrontfloordeco.png",
+     "path": "assets/sprites/furniture/furniture_smallfrontfloordeco.webp",
      "fw": 58,
      "fh": 93,
      "cols": 1,
@@ -695,7 +695,7 @@
    "padStage": 1,
    "sheets": [
     {
-     "path": "assets/sprites/furniture/furniture_smalltabledeco.png",
+     "path": "assets/sprites/furniture/furniture_smalltabledeco.webp",
      "fw": 49,
      "fh": 62,
      "cols": 1,
@@ -712,7 +712,7 @@
    "padStage": 1,
    "sheets": [
     {
-     "path": "assets/sprites/furniture/furniture_smallwalldeco.png",
+     "path": "assets/sprites/furniture/furniture_smallwalldeco.webp",
      "fw": 64,
      "fh": 80,
      "cols": 1,
@@ -729,7 +729,7 @@
    "padStage": 1,
    "sheets": [
     {
-     "path": "assets/sprites/furniture/furniture_smallwindow.png",
+     "path": "assets/sprites/furniture/furniture_smallwindow.webp",
      "fw": 75,
      "fh": 76,
      "cols": 1,
@@ -746,7 +746,7 @@
    "padStage": 1,
    "sheets": [
     {
-     "path": "assets/sprites/furniture/furniture_sofa.png",
+     "path": "assets/sprites/furniture/furniture_sofa.webp",
      "fw": 244,
      "fh": 108,
      "cols": 1,
@@ -763,7 +763,7 @@
    "padStage": 1,
    "sheets": [
     {
-     "path": "assets/sprites/furniture/furniture_stool.png",
+     "path": "assets/sprites/furniture/furniture_stool.webp",
      "fw": 62,
      "fh": 48,
      "cols": 1,
@@ -780,7 +780,7 @@
    "padStage": 1,
    "sheets": [
     {
-     "path": "assets/sprites/furniture/furniture_table.png",
+     "path": "assets/sprites/furniture/furniture_table.webp",
      "fw": 219,
      "fh": 85,
      "cols": 1,
@@ -797,7 +797,7 @@
    "padStage": 1,
    "sheets": [
     {
-     "path": "assets/sprites/furniture/furniture_tabledeco.png",
+     "path": "assets/sprites/furniture/furniture_tabledeco.webp",
      "fw": 49,
      "fh": 62,
      "cols": 1,
@@ -814,7 +814,7 @@
    "padStage": 1,
    "sheets": [
     {
-     "path": "assets/sprites/furniture/furniture_tablelamp.png",
+     "path": "assets/sprites/furniture/furniture_tablelamp.webp",
      "fw": 40,
      "fh": 65,
      "cols": 1,
@@ -831,7 +831,7 @@
    "padStage": 1,
    "sheets": [
     {
-     "path": "assets/sprites/furniture/furniture_walldeco.png",
+     "path": "assets/sprites/furniture/furniture_walldeco.webp",
      "fw": 64,
      "fh": 80,
      "cols": 1,
@@ -848,7 +848,7 @@
    "padStage": 1,
    "sheets": [
     {
-     "path": "assets/sprites/furniture/furniture_walldecor.png",
+     "path": "assets/sprites/furniture/furniture_walldecor.webp",
      "fw": 64,
      "fh": 80,
      "cols": 1,
@@ -865,7 +865,7 @@
    "padStage": 1,
    "sheets": [
     {
-     "path": "assets/sprites/furniture/furniture_walllamp.png",
+     "path": "assets/sprites/furniture/furniture_walllamp.webp",
      "fw": 43,
      "fh": 72,
      "cols": 1,
@@ -882,7 +882,7 @@
    "padStage": 1,
    "sheets": [
     {
-     "path": "assets/sprites/furniture/bag_furniture_cabinet.png",
+     "path": "assets/sprites/furniture/bag_furniture_cabinet.webp",
      "fw": 142,
      "fh": 187,
      "cols": 1,
@@ -899,7 +899,7 @@
    "padStage": 1,
    "sheets": [
     {
-     "path": "assets/sprites/furniture/bag_furniture_largecabinet.png",
+     "path": "assets/sprites/furniture/bag_furniture_largecabinet.webp",
      "fw": 158,
      "fh": 169,
      "cols": 1,
@@ -916,7 +916,7 @@
    "padStage": 1,
    "sheets": [
     {
-     "path": "assets/sprites/furniture/bag_furniture_smallcabinet.png",
+     "path": "assets/sprites/furniture/bag_furniture_smallcabinet.webp",
      "fw": 168,
      "fh": 77,
      "cols": 1,
@@ -933,7 +933,7 @@
    "padStage": 1,
    "sheets": [
     {
-     "path": "assets/sprites/furniture/bag_furniture_wallcabinet.png",
+     "path": "assets/sprites/furniture/bag_furniture_wallcabinet.webp",
      "fw": 88,
      "fh": 129,
      "cols": 1,
@@ -950,7 +950,7 @@
    "padStage": 1,
    "sheets": [
     {
-     "path": "assets/sprites/street-jobs/sign_stake.png",
+     "path": "assets/sprites/street-jobs/sign_stake.webp",
      "fw": 67,
      "fh": 105,
      "cols": 1,
@@ -967,7 +967,7 @@
    "padStage": 1,
    "sheets": [
     {
-     "path": "assets/sprites/parties/party_atm.png",
+     "path": "assets/sprites/parties/party_atm.webp",
      "fw": 122,
      "fh": 138,
      "cols": 1,
@@ -983,7 +983,7 @@
    "sprite": 166,
    "sheets": [
     {
-     "path": "assets/sprites/quests/rook-museum/rook_hall_speaker__x1_stop_png_1354835940.png",
+     "path": "assets/sprites/quests/rook-museum/rook_hall_speaker__x1_stop_png_1354835940.webp",
      "label": "stop",
      "fw": 54,
      "fh": 83,
@@ -999,7 +999,7 @@
    "padStage": 1,
    "sheets": [
     {
-     "path": "assets/sprites/butler/butler_box.png",
+     "path": "assets/sprites/butler/butler_box.webp",
      "fw": 104,
      "fh": 101,
      "cols": 1,
@@ -1016,7 +1016,7 @@
    "padStage": 1,
    "sheets": [
     {
-     "path": "assets/sprites/hell/bunch_of_grapes_hell-world.png",
+     "path": "assets/sprites/hell/bunch_of_grapes_hell-world.webp",
      "fw": 70,
      "fh": 39,
      "cols": 4,
@@ -1032,7 +1032,7 @@
    "sprite": 4,
    "sheets": [
     {
-     "path": "assets/sprites/small-items/funpickle_1.png",
+     "path": "assets/sprites/small-items/funpickle_1.webp",
      "label": "1",
      "fw": 125,
      "fh": 227,
@@ -1048,7 +1048,7 @@
    "padStage": 1,
    "sheets": [
     {
-     "path": "assets/sprites/races/hogtied_piggy__x1_1_png_1354830331.png",
+     "path": "assets/sprites/races/hogtied_piggy__x1_1_png_1354830331.webp",
      "fw": 45,
      "fh": 40,
      "cols": 1,
@@ -1065,7 +1065,7 @@
    "padStage": 1,
    "sheets": [
     {
-     "path": "assets/sprites/races/race_ticket_dispenser.png",
+     "path": "assets/sprites/races/race_ticket_dispenser.webp",
      "fw": 58,
      "fh": 94,
      "cols": 1,
@@ -1082,7 +1082,7 @@
    "padStage": 1,
    "sheets": [
     {
-     "path": "assets/sprites/animals/butterfly_milker.png",
+     "path": "assets/sprites/animals/butterfly_milker.webp",
      "fw": 48,
      "fh": 69,
      "cols": 1,
@@ -1099,7 +1099,7 @@
    "padStage": 1,
    "sheets": [
     {
-     "path": "assets/sprites/animals/plop.png",
+     "path": "assets/sprites/animals/plop.webp",
      "fw": 28,
      "fh": 23,
      "cols": 1,
@@ -1116,7 +1116,7 @@
    "padStage": 1,
    "sheets": [
     {
-     "path": "assets/sprites/street-jobs/pile_of_currants.png",
+     "path": "assets/sprites/street-jobs/pile_of_currants.webp",
      "fw": 34,
      "fh": 40,
      "cols": 1,
@@ -1133,7 +1133,7 @@
    "padStage": 1,
    "sheets": [
     {
-     "path": "assets/sprites/animals/meat_collector.png",
+     "path": "assets/sprites/animals/meat_collector.webp",
      "fw": 69,
      "fh": 54,
      "cols": 1,
@@ -1150,7 +1150,7 @@
    "padStage": 1,
    "sheets": [
     {
-     "path": "assets/sprites/animals/piggy_feeder.png",
+     "path": "assets/sprites/animals/piggy_feeder.webp",
      "fw": 87,
      "fh": 92,
      "cols": 1,
@@ -1167,7 +1167,7 @@
    "padStage": 1,
    "sheets": [
     {
-     "path": "assets/sprites/hell/wine_of_the_dead-world.png",
+     "path": "assets/sprites/hell/wine_of_the_dead-world.webp",
      "fw": 42,
      "fh": 78,
      "cols": 4,
@@ -1184,7 +1184,7 @@
    "padStage": 1,
    "sheets": [
     {
-     "path": "assets/sprites/hell/drink_ticket-world.png",
+     "path": "assets/sprites/hell/drink_ticket-world.webp",
      "fw": 48,
      "fh": 20,
      "cols": 1,
@@ -1201,7 +1201,7 @@
    "padStage": 1,
    "sheets": [
     {
-     "path": "assets/sprites/races/pig_bait__x1_1_x1_2_x1_3_x1_4_png_1354830335.png",
+     "path": "assets/sprites/races/pig_bait__x1_1_x1_2_x1_3_x1_4_png_1354830335.webp",
      "fw": 53,
      "fh": 46,
      "cols": 4,
@@ -1218,7 +1218,7 @@
    "padStage": 1,
    "sheets": [
     {
-     "path": "assets/sprites/cultivation/firefly_hive.png",
+     "path": "assets/sprites/cultivation/firefly_hive.webp",
      "fw": 161,
      "fh": 107,
      "cols": 1,
@@ -1235,7 +1235,7 @@
    "padStage": 1,
    "sheets": [
     {
-     "path": "assets/sprites/puzzles/light_beam.png",
+     "path": "assets/sprites/puzzles/light_beam.webp",
      "fw": 161,
      "fh": 382,
      "cols": 1,
@@ -1252,7 +1252,7 @@
    "padStage": 1,
    "sheets": [
     {
-     "path": "assets/sprites/quests/rook-woods/rook-egg-states.png",
+     "path": "assets/sprites/quests/rook-woods/rook-egg-states.webp",
      "fw": 171,
      "fh": 168,
      "cols": 5,
@@ -1268,7 +1268,7 @@
    "sprite": 32,
    "sheets": [
     {
-     "path": "assets/sprites/hell/graveside/graveside_marker_friendly.png",
+     "path": "assets/sprites/hell/graveside/graveside_marker_friendly.webp",
      "fw": 90,
      "fh": 88,
      "cols": 3,
@@ -1284,7 +1284,7 @@
    "sprite": 41,
    "sheets": [
     {
-     "path": "assets/sprites/hell/graveside/graveside_marker_generic.png",
+     "path": "assets/sprites/hell/graveside/graveside_marker_generic.webp",
      "fw": 90,
      "fh": 88,
      "cols": 3,
@@ -1300,7 +1300,7 @@
    "sprite": 38,
    "sheets": [
     {
-     "path": "assets/sprites/hell/graveside/graveside_marker_alph.png",
+     "path": "assets/sprites/hell/graveside/graveside_marker_alph.webp",
      "fw": 90,
      "fh": 88,
      "cols": 3,
@@ -1316,7 +1316,7 @@
    "sprite": 35,
    "sheets": [
     {
-     "path": "assets/sprites/hell/graveside/graveside_marker_cosma.png",
+     "path": "assets/sprites/hell/graveside/graveside_marker_cosma.webp",
      "fw": 90,
      "fh": 88,
      "cols": 3,
@@ -1332,7 +1332,7 @@
    "sprite": 20,
    "sheets": [
     {
-     "path": "assets/sprites/hell/graveside/graveside_marker_mab.png",
+     "path": "assets/sprites/hell/graveside/graveside_marker_mab.webp",
      "fw": 90,
      "fh": 88,
      "cols": 3,
@@ -1348,7 +1348,7 @@
    "sprite": 26,
    "sheets": [
     {
-     "path": "assets/sprites/hell/graveside/graveside_marker_humbaba.png",
+     "path": "assets/sprites/hell/graveside/graveside_marker_humbaba.webp",
      "fw": 90,
      "fh": 88,
      "cols": 3,
@@ -1364,7 +1364,7 @@
    "sprite": 29,
    "sheets": [
     {
-     "path": "assets/sprites/hell/graveside/graveside_marker_grendaline.png",
+     "path": "assets/sprites/hell/graveside/graveside_marker_grendaline.webp",
      "fw": 90,
      "fh": 88,
      "cols": 3,
@@ -1380,7 +1380,7 @@
    "sprite": 23,
    "sheets": [
     {
-     "path": "assets/sprites/hell/graveside/graveside_marker_lem.png",
+     "path": "assets/sprites/hell/graveside/graveside_marker_lem.webp",
      "fw": 90,
      "fh": 88,
      "cols": 3,
@@ -1396,7 +1396,7 @@
    "sprite": 11,
    "sheets": [
     {
-     "path": "assets/sprites/hell/graveside/graveside_marker_tii.png",
+     "path": "assets/sprites/hell/graveside/graveside_marker_tii.webp",
      "fw": 90,
      "fh": 88,
      "cols": 3,
@@ -1412,7 +1412,7 @@
    "sprite": 17,
    "sheets": [
     {
-     "path": "assets/sprites/hell/graveside/graveside_marker_pot.png",
+     "path": "assets/sprites/hell/graveside/graveside_marker_pot.webp",
      "fw": 90,
      "fh": 88,
      "cols": 3,
@@ -1428,7 +1428,7 @@
    "sprite": 14,
    "sheets": [
     {
-     "path": "assets/sprites/hell/graveside/graveside_marker_spriggan.png",
+     "path": "assets/sprites/hell/graveside/graveside_marker_spriggan.webp",
      "fw": 90,
      "fh": 88,
      "cols": 3,
@@ -1444,7 +1444,7 @@
    "sprite": 8,
    "sheets": [
     {
-     "path": "assets/sprites/hell/graveside/graveside_marker_zille.png",
+     "path": "assets/sprites/hell/graveside/graveside_marker_zille.webp",
      "fw": 90,
      "fh": 88,
      "cols": 3,
@@ -1464,7 +1464,7 @@
    },
    "sheets": [
     {
-     "path": "assets/sprites/furniture/furniture_door.png",
+     "path": "assets/sprites/furniture/furniture_door.webp",
      "fw": 117,
      "fh": 169,
      "cols": 1,
@@ -1484,7 +1484,7 @@
    },
    "sheets": [
     {
-     "path": "assets/sprites/furniture/furniture_door_up_job.png",
+     "path": "assets/sprites/furniture/furniture_door_up_job.webp",
      "fw": 117,
      "fh": 169,
      "cols": 1,
@@ -1501,7 +1501,7 @@
    "padStage": 1,
    "sheets": [
     {
-     "path": "assets/sprites/furniture/furniture_door_up.png",
+     "path": "assets/sprites/furniture/furniture_door_up.webp",
      "fw": 117,
      "fh": 169,
      "cols": 1,
@@ -1521,7 +1521,7 @@
    },
    "sheets": [
     {
-     "path": "assets/sprites/furniture/furniture_door_down.png",
+     "path": "assets/sprites/furniture/furniture_door_down.webp",
      "fw": 117,
      "fh": 169,
      "cols": 1,
@@ -1541,7 +1541,7 @@
    },
    "sheets": [
     {
-     "path": "assets/sprites/furniture/furniture_door_down_job.png",
+     "path": "assets/sprites/furniture/furniture_door_down_job.webp",
      "fw": 117,
      "fh": 169,
      "cols": 1,
@@ -1558,7 +1558,7 @@
    "padStage": 1,
    "sheets": [
     {
-     "path": "assets/sprites/animals/magic_pig_stick_placed.png",
+     "path": "assets/sprites/animals/magic_pig_stick_placed.webp",
      "fw": 119,
      "fh": 185,
      "cols": 1,
@@ -1575,7 +1575,7 @@
    "padStage": 1,
    "sheets": [
     {
-     "path": "assets/sprites/animals/magic_chicken_stick_placed.png",
+     "path": "assets/sprites/animals/magic_chicken_stick_placed.webp",
      "fw": 119,
      "fh": 185,
      "cols": 1,
@@ -1592,7 +1592,7 @@
    "padStage": 1,
    "sheets": [
     {
-     "path": "assets/sprites/animals/magic_butterfly_stick_placed.png",
+     "path": "assets/sprites/animals/magic_butterfly_stick_placed.webp",
      "fw": 119,
      "fh": 184,
      "cols": 1,

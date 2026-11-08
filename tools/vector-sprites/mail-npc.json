@@ -14,7 +14,7 @@
    "zoom": 3.405,
    "sheets": [
     {
-     "path": "assets/sprites/mail-npc/dispatcher_left.png",
+     "path": "assets/sprites/mail-npc/dispatcher_left.webp",
      "label": "idle",
      "fw": 118,
      "fh": 211,
@@ -29,7 +29,7 @@
    "sprite": 81,
    "sheets": [
     {
-     "path": "assets/sprites/mailbox/npc_mailbox_variant_mailboxRight_x1_idle_png_1354832227.png",
+     "path": "assets/sprites/mailbox/npc_mailbox_variant_mailboxRight_x1_idle_png_1354832227.webp",
      "label": "idle",
      "fw": 97,
      "fh": 146,
@@ -37,7 +37,7 @@
      "frames": 1
     },
     {
-     "path": "assets/sprites/mailbox/npc_mailbox_variant_mailboxRight_x1_has_mail_idle_png_1354832230.png",
+     "path": "assets/sprites/mailbox/npc_mailbox_variant_mailboxRight_x1_has_mail_idle_png_1354832230.webp",
      "label": "has_mail_idle",
      "fw": 97,
      "fh": 146,
@@ -53,7 +53,7 @@
    "sprite": 0,
    "sheets": [
     {
-     "path": "assets/sprites/mail-npc/frog_blue_box_idle.png",
+     "path": "assets/sprites/mail-npc/frog_blue_box_idle.webp",
      "swfStart": 2,
      "swfCount": 48,
      "fw": 108,
@@ -63,7 +63,7 @@
      "mirror": false
     },
     {
-     "path": "assets/sprites/mail-npc/frog_blue_box_moveStart.png",
+     "path": "assets/sprites/mail-npc/frog_blue_box_moveStart.webp",
      "swfStart": 50,
      "swfCount": 5,
      "fw": 108,
@@ -73,7 +73,7 @@
      "mirror": false
     },
     {
-     "path": "assets/sprites/mail-npc/frog_blue_box_move.png",
+     "path": "assets/sprites/mail-npc/frog_blue_box_move.webp",
      "swfStart": 55,
      "swfCount": 24,
      "fw": 108,
@@ -83,7 +83,7 @@
      "mirror": false
     },
     {
-     "path": "assets/sprites/mail-npc/frog_blue_box_moveEnd.png",
+     "path": "assets/sprites/mail-npc/frog_blue_box_moveEnd.webp",
      "swfStart": 79,
      "swfCount": 5,
      "fw": 108,
@@ -93,7 +93,7 @@
      "mirror": false
     },
     {
-     "path": "assets/sprites/mail-npc/frog_blue_box_talk.png",
+     "path": "assets/sprites/mail-npc/frog_blue_box_talk.webp",
      "swfStart": 84,
      "swfCount": 62,
      "fw": 108,
@@ -103,7 +103,7 @@
      "mirror": false
     },
     {
-     "path": "assets/sprites/mail-npc/frog_blue_box_treePoseIn.png",
+     "path": "assets/sprites/mail-npc/frog_blue_box_treePoseIn.webp",
      "swfStart": 146,
      "swfCount": 22,
      "fw": 108,
@@ -113,7 +113,7 @@
      "mirror": false
     },
     {
-     "path": "assets/sprites/mail-npc/frog_blue_box_treePose.png",
+     "path": "assets/sprites/mail-npc/frog_blue_box_treePose.webp",
      "swfStart": 168,
      "swfCount": 6,
      "fw": 108,
@@ -123,7 +123,7 @@
      "mirror": false
     },
     {
-     "path": "assets/sprites/mail-npc/frog_blue_box_treePoseOut.png",
+     "path": "assets/sprites/mail-npc/frog_blue_box_treePoseOut.webp",
      "swfStart": 174,
      "swfCount": 19,
      "fw": 108,
@@ -133,7 +133,7 @@
      "mirror": false
     },
     {
-     "path": "assets/sprites/mail-npc/frog_blue_box_dancerPoseIn.png",
+     "path": "assets/sprites/mail-npc/frog_blue_box_dancerPoseIn.webp",
      "swfStart": 193,
      "swfCount": 20,
      "fw": 108,
@@ -143,7 +143,7 @@
      "mirror": false
     },
     {
-     "path": "assets/sprites/mail-npc/frog_blue_box_dancerPose.png",
+     "path": "assets/sprites/mail-npc/frog_blue_box_dancerPose.webp",
      "swfStart": 213,
      "swfCount": 6,
      "fw": 108,
@@ -153,7 +153,7 @@
      "mirror": false
     },
     {
-     "path": "assets/sprites/mail-npc/frog_blue_box_dancerPoseOut.png",
+     "path": "assets/sprites/mail-npc/frog_blue_box_dancerPoseOut.webp",
      "swfStart": 219,
      "swfCount": 8,
      "fw": 108,
@@ -163,7 +163,7 @@
      "mirror": false
     },
     {
-     "path": "assets/sprites/mail-npc/frog_blue_box_warriorPoseIn.png",
+     "path": "assets/sprites/mail-npc/frog_blue_box_warriorPoseIn.webp",
      "swfStart": 227,
      "swfCount": 23,
      "fw": 108,
@@ -173,7 +173,7 @@
      "mirror": false
     },
     {
-     "path": "assets/sprites/mail-npc/frog_blue_box_warriorPose.png",
+     "path": "assets/sprites/mail-npc/frog_blue_box_warriorPose.webp",
      "swfStart": 250,
      "swfCount": 6,
      "fw": 108,
@@ -183,7 +183,7 @@
      "mirror": false
     },
     {
-     "path": "assets/sprites/mail-npc/frog_blue_box_warriorPoseOut.png",
+     "path": "assets/sprites/mail-npc/frog_blue_box_warriorPoseOut.webp",
      "swfStart": 256,
      "swfCount": 11,
      "fw": 108,
@@ -201,7 +201,7 @@
    "sprite": 108,
    "sheets": [
     {
-     "path": "assets/sprites/mail-npc/frog_blue_none_idle.png",
+     "path": "assets/sprites/mail-npc/frog_blue_none_idle.webp",
      "label": "idle",
      "fw": 108,
      "fh": 94,
@@ -210,7 +210,7 @@
      "mirror": false
     },
     {
-     "path": "assets/sprites/mail-npc/frog_blue_none_moveStart.png",
+     "path": "assets/sprites/mail-npc/frog_blue_none_moveStart.webp",
      "label": "moveStart",
      "fw": 108,
      "fh": 94,
@@ -219,7 +219,7 @@
      "mirror": false
     },
     {
-     "path": "assets/sprites/mail-npc/frog_blue_none_move.png",
+     "path": "assets/sprites/mail-npc/frog_blue_none_move.webp",
      "label": "move",
      "fw": 108,
      "fh": 94,
@@ -228,7 +228,7 @@
      "mirror": false
     },
     {
-     "path": "assets/sprites/mail-npc/frog_blue_none_moveEnd.png",
+     "path": "assets/sprites/mail-npc/frog_blue_none_moveEnd.webp",
      "label": "moveEnd",
      "fw": 108,
      "fh": 94,
@@ -237,7 +237,7 @@
      "mirror": false
     },
     {
-     "path": "assets/sprites/mail-npc/frog_blue_none_talk.png",
+     "path": "assets/sprites/mail-npc/frog_blue_none_talk.webp",
      "label": "talk",
      "fw": 108,
      "fh": 94,
@@ -246,7 +246,7 @@
      "mirror": false
     },
     {
-     "path": "assets/sprites/mail-npc/frog_blue_none_treePoseIn.png",
+     "path": "assets/sprites/mail-npc/frog_blue_none_treePoseIn.webp",
      "label": "treePoseIn",
      "fw": 108,
      "fh": 94,
@@ -255,7 +255,7 @@
      "mirror": false
     },
     {
-     "path": "assets/sprites/mail-npc/frog_blue_none_treePose.png",
+     "path": "assets/sprites/mail-npc/frog_blue_none_treePose.webp",
      "label": "treePose",
      "fw": 108,
      "fh": 94,
@@ -264,7 +264,7 @@
      "mirror": false
     },
     {
-     "path": "assets/sprites/mail-npc/frog_blue_none_treePoseOut.png",
+     "path": "assets/sprites/mail-npc/frog_blue_none_treePoseOut.webp",
      "label": "treePoseOut",
      "fw": 108,
      "fh": 94,
@@ -273,7 +273,7 @@
      "mirror": false
     },
     {
-     "path": "assets/sprites/mail-npc/frog_blue_none_dancerPoseIn.png",
+     "path": "assets/sprites/mail-npc/frog_blue_none_dancerPoseIn.webp",
      "label": "dancerPoseIn",
      "fw": 108,
      "fh": 94,
@@ -282,7 +282,7 @@
      "mirror": false
     },
     {
-     "path": "assets/sprites/mail-npc/frog_blue_none_dancerPose.png",
+     "path": "assets/sprites/mail-npc/frog_blue_none_dancerPose.webp",
      "label": "dancerPose",
      "fw": 108,
      "fh": 94,
@@ -291,7 +291,7 @@
      "mirror": false
     },
     {
-     "path": "assets/sprites/mail-npc/frog_blue_none_dancerPoseOut.png",
+     "path": "assets/sprites/mail-npc/frog_blue_none_dancerPoseOut.webp",
      "label": "dancerPoseOut",
      "fw": 108,
      "fh": 94,
@@ -300,7 +300,7 @@
      "mirror": false
     },
     {
-     "path": "assets/sprites/mail-npc/frog_blue_none_warriorPoseIn.png",
+     "path": "assets/sprites/mail-npc/frog_blue_none_warriorPoseIn.webp",
      "label": "warriorPoseIn",
      "fw": 108,
      "fh": 94,
@@ -309,7 +309,7 @@
      "mirror": false
     },
     {
-     "path": "assets/sprites/mail-npc/frog_blue_none_warriorPose.png",
+     "path": "assets/sprites/mail-npc/frog_blue_none_warriorPose.webp",
      "label": "warriorPose",
      "fw": 108,
      "fh": 94,
@@ -318,7 +318,7 @@
      "mirror": false
     },
     {
-     "path": "assets/sprites/mail-npc/frog_blue_none_warriorPoseOut.png",
+     "path": "assets/sprites/mail-npc/frog_blue_none_warriorPoseOut.webp",
      "label": "warriorPoseOut",
      "fw": 108,
      "fh": 94,
@@ -338,7 +338,7 @@
    },
    "sheets": [
     {
-     "path": "assets/sprites/mail-npc/frog_red_box_idle.png",
+     "path": "assets/sprites/mail-npc/frog_red_box_idle.webp",
      "swfStart": 2,
      "swfCount": 48,
      "shift": -1,
@@ -349,7 +349,7 @@
      "mirror": false
     },
     {
-     "path": "assets/sprites/mail-npc/frog_red_box_moveStart.png",
+     "path": "assets/sprites/mail-npc/frog_red_box_moveStart.webp",
      "swfStart": 50,
      "swfCount": 5,
      "shift": -1,
@@ -360,7 +360,7 @@
      "mirror": false
     },
     {
-     "path": "assets/sprites/mail-npc/frog_red_box_move.png",
+     "path": "assets/sprites/mail-npc/frog_red_box_move.webp",
      "swfStart": 55,
      "swfCount": 24,
      "shift": -1,
@@ -371,7 +371,7 @@
      "mirror": false
     },
     {
-     "path": "assets/sprites/mail-npc/frog_red_box_moveEnd.png",
+     "path": "assets/sprites/mail-npc/frog_red_box_moveEnd.webp",
      "swfStart": 79,
      "swfCount": 5,
      "shift": -1,
@@ -382,7 +382,7 @@
      "mirror": false
     },
     {
-     "path": "assets/sprites/mail-npc/frog_red_box_talk.png",
+     "path": "assets/sprites/mail-npc/frog_red_box_talk.webp",
      "swfStart": 84,
      "swfCount": 62,
      "shift": -1,
@@ -393,7 +393,7 @@
      "mirror": false
     },
     {
-     "path": "assets/sprites/mail-npc/frog_red_box_treePoseIn.png",
+     "path": "assets/sprites/mail-npc/frog_red_box_treePoseIn.webp",
      "swfStart": 146,
      "swfCount": 22,
      "shift": -1,
@@ -404,7 +404,7 @@
      "mirror": false
     },
     {
-     "path": "assets/sprites/mail-npc/frog_red_box_treePose.png",
+     "path": "assets/sprites/mail-npc/frog_red_box_treePose.webp",
      "swfStart": 168,
      "swfCount": 6,
      "shift": -1,
@@ -415,7 +415,7 @@
      "mirror": false
     },
     {
-     "path": "assets/sprites/mail-npc/frog_red_box_treePoseOut.png",
+     "path": "assets/sprites/mail-npc/frog_red_box_treePoseOut.webp",
      "swfStart": 174,
      "swfCount": 19,
      "shift": -1,
@@ -426,7 +426,7 @@
      "mirror": false
     },
     {
-     "path": "assets/sprites/mail-npc/frog_red_box_dancerPoseIn.png",
+     "path": "assets/sprites/mail-npc/frog_red_box_dancerPoseIn.webp",
      "swfStart": 193,
      "swfCount": 20,
      "shift": -1,
@@ -437,7 +437,7 @@
      "mirror": false
     },
     {
-     "path": "assets/sprites/mail-npc/frog_red_box_dancerPose.png",
+     "path": "assets/sprites/mail-npc/frog_red_box_dancerPose.webp",
      "swfStart": 213,
      "swfCount": 6,
      "shift": -1,
@@ -448,7 +448,7 @@
      "mirror": false
     },
     {
-     "path": "assets/sprites/mail-npc/frog_red_box_dancerPoseOut.png",
+     "path": "assets/sprites/mail-npc/frog_red_box_dancerPoseOut.webp",
      "swfStart": 219,
      "swfCount": 8,
      "shift": -1,
@@ -459,7 +459,7 @@
      "mirror": false
     },
     {
-     "path": "assets/sprites/mail-npc/frog_red_box_warriorPoseIn.png",
+     "path": "assets/sprites/mail-npc/frog_red_box_warriorPoseIn.webp",
      "swfStart": 227,
      "swfCount": 23,
      "shift": -1,
@@ -470,7 +470,7 @@
      "mirror": false
     },
     {
-     "path": "assets/sprites/mail-npc/frog_red_box_warriorPose.png",
+     "path": "assets/sprites/mail-npc/frog_red_box_warriorPose.webp",
      "swfStart": 250,
      "swfCount": 6,
      "shift": -1,
@@ -481,7 +481,7 @@
      "mirror": false
     },
     {
-     "path": "assets/sprites/mail-npc/frog_red_box_warriorPoseOut.png",
+     "path": "assets/sprites/mail-npc/frog_red_box_warriorPoseOut.webp",
      "swfStart": 256,
      "swfCount": 11,
      "shift": -1,
@@ -500,7 +500,7 @@
    "sprite": 88,
    "sheets": [
     {
-     "path": "assets/sprites/mail-npc/frog_red_none_idle.png",
+     "path": "assets/sprites/mail-npc/frog_red_none_idle.webp",
      "label": "idle",
      "fw": 108,
      "fh": 94,
@@ -509,7 +509,7 @@
      "mirror": false
     },
     {
-     "path": "assets/sprites/mail-npc/frog_red_none_moveStart.png",
+     "path": "assets/sprites/mail-npc/frog_red_none_moveStart.webp",
      "label": "moveStart",
      "fw": 108,
      "fh": 94,
@@ -518,7 +518,7 @@
      "mirror": false
     },
     {
-     "path": "assets/sprites/mail-npc/frog_red_none_move.png",
+     "path": "assets/sprites/mail-npc/frog_red_none_move.webp",
      "label": "move",
      "fw": 108,
      "fh": 94,
@@ -527,7 +527,7 @@
      "mirror": false
     },
     {
-     "path": "assets/sprites/mail-npc/frog_red_none_moveEnd.png",
+     "path": "assets/sprites/mail-npc/frog_red_none_moveEnd.webp",
      "label": "moveEnd",
      "fw": 108,
      "fh": 94,
@@ -536,7 +536,7 @@
      "mirror": false
     },
     {
-     "path": "assets/sprites/mail-npc/frog_red_none_talk.png",
+     "path": "assets/sprites/mail-npc/frog_red_none_talk.webp",
      "label": "talk",
      "fw": 108,
      "fh": 94,
@@ -545,7 +545,7 @@
      "mirror": false
     },
     {
-     "path": "assets/sprites/mail-npc/frog_red_none_treePoseIn.png",
+     "path": "assets/sprites/mail-npc/frog_red_none_treePoseIn.webp",
      "label": "treePoseIn",
      "fw": 108,
      "fh": 94,
@@ -554,7 +554,7 @@
      "mirror": false
     },
     {
-     "path": "assets/sprites/mail-npc/frog_red_none_treePose.png",
+     "path": "assets/sprites/mail-npc/frog_red_none_treePose.webp",
      "label": "treePose",
      "fw": 108,
      "fh": 94,
@@ -563,7 +563,7 @@
      "mirror": false
     },
     {
-     "path": "assets/sprites/mail-npc/frog_red_none_treePoseOut.png",
+     "path": "assets/sprites/mail-npc/frog_red_none_treePoseOut.webp",
      "label": "treePoseOut",
      "fw": 108,
      "fh": 94,
@@ -572,7 +572,7 @@
      "mirror": false
     },
     {
-     "path": "assets/sprites/mail-npc/frog_red_none_dancerPoseIn.png",
+     "path": "assets/sprites/mail-npc/frog_red_none_dancerPoseIn.webp",
      "label": "dancerPoseIn",
      "fw": 108,
      "fh": 94,
@@ -581,7 +581,7 @@
      "mirror": false
     },
     {
-     "path": "assets/sprites/mail-npc/frog_red_none_dancerPose.png",
+     "path": "assets/sprites/mail-npc/frog_red_none_dancerPose.webp",
      "label": "dancerPose",
      "fw": 108,
      "fh": 94,
@@ -590,7 +590,7 @@
      "mirror": false
     },
     {
-     "path": "assets/sprites/mail-npc/frog_red_none_dancerPoseOut.png",
+     "path": "assets/sprites/mail-npc/frog_red_none_dancerPoseOut.webp",
      "label": "dancerPoseOut",
      "fw": 108,
      "fh": 94,
@@ -599,7 +599,7 @@
      "mirror": false
     },
     {
-     "path": "assets/sprites/mail-npc/frog_red_none_warriorPoseIn.png",
+     "path": "assets/sprites/mail-npc/frog_red_none_warriorPoseIn.webp",
      "label": "warriorPoseIn",
      "fw": 108,
      "fh": 94,
@@ -608,7 +608,7 @@
      "mirror": false
     },
     {
-     "path": "assets/sprites/mail-npc/frog_red_none_warriorPose.png",
+     "path": "assets/sprites/mail-npc/frog_red_none_warriorPose.webp",
      "label": "warriorPose",
      "fw": 108,
      "fh": 94,
@@ -617,7 +617,7 @@
      "mirror": false
     },
     {
-     "path": "assets/sprites/mail-npc/frog_red_none_warriorPoseOut.png",
+     "path": "assets/sprites/mail-npc/frog_red_none_warriorPoseOut.webp",
      "label": "warriorPoseOut",
      "fw": 108,
      "fh": 94,

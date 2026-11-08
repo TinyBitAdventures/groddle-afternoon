@@ -25,13 +25,13 @@ import { fileURLToPath } from 'node:url';
 
 import { loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js?v=10b118dd';
 import { createQuestState } from '../public/js/quests.js?v=c8d9d0a4';
-import { acceptOffer, routeQuestEvent } from '../public/js/quest-offers.js?v=486b09c9';
+import { acceptOffer, routeQuestEvent } from '../public/js/quest-offers.js?v=e31115ea';
 import { applyBuff, createBuffState } from '../public/js/buffs.js?v=036fee53';
 import { BUFF_ICONS } from '../public/js/buff-triggers.js?v=a3093922';
 import { FEAT_BY_ID, UNWIRED_FEATS, WIRED_FEATS, featsInEpic } from '../public/js/solo-feats.js?v=40f8c7b5';
 import { MP_ACTS, MP_ORDER, MP_PACE, mpGoals, reportFor } from '../public/js/feats-mp.js?v=a1864075';
 import { featTable } from '../tools/build-realtime-feats.mjs';
-import { endComedian } from '../public/js/features/funpickle-feature.js?v=6817a676';
+import { endComedian } from '../public/js/features/funpickle-feature.js?v=2df16c9e';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const PUBLIC = join(ROOT, 'public');
@@ -86,7 +86,7 @@ describe('G277: potion and waiting-room buffs show their stand-in from the first
     assert.equal(applyBuff(state, 'crazy_coin_collector', null, 1000).buff.sourceItem, 'potion_elixir_of_avarice');
     assert.equal(applyBuff(state, 'feeling_called_love', null, 1000).buff.sourceItem, 'potion_amorous_philtre');
     for (const id of ['please_wait', 'crazy_coin_collector', 'feeling_called_love']) {
-      assert.ok(existsSync(join(PUBLIC, 'assets/sprites/icons', `${BUFF_ICONS[id]}.png`)), id);
+      assert.ok(existsSync(join(PUBLIC, 'assets/sprites/icons', `${BUFF_ICONS[id]}.webp`)), id);
     }
   });
 

@@ -34,12 +34,12 @@ import {
 } from '../public/js/verb-responses.js?v=3ceb8a8c';
 import { VERB_RESPONSE_POOLS } from '../public/js/verb-responses-data.js?v=0b948684';
 import { buildVerbResponses, render } from '../tools/build-verb-responses.mjs';
-import { runVerb } from '../public/content.js?v=075ded81';
-import { createAnimalState } from '../public/js/animals.js?v=d5af4f3c';
-import { createToolConditionState } from '../public/js/tools.js?v=f701b241';
+import { runVerb } from '../public/content.js?v=ebc8b8b3';
+import { createAnimalState } from '../public/js/animals.js?v=0d9f9b0f';
+import { createToolConditionState } from '../public/js/tools.js?v=d8aa3536';
 import { setTrantTables, createTrantState } from '../public/js/trants.js?v=9c2e8c0f';
-import { createMineRock } from '../public/js/mining.js?v=29fe2127';
-import { createInventory } from '../public/js/inventory.js?v=d82f3b00';
+import { createMineRock } from '../public/js/mining.js?v=fc28670f';
+import { createInventory } from '../public/js/inventory.js?v=b7609342';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const CLIENT = join(ROOT, '..', 'glitch-client');

@@ -4,8 +4,8 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { getVerbsFor, runVerb } from '../public/content.js?v=075ded81';
-import { createAnimalState, listAnimalFeedOptions } from '../public/js/animals.js?v=d5af4f3c';
+import { getVerbsFor, runVerb } from '../public/content.js?v=ebc8b8b3';
+import { createAnimalState, listAnimalFeedOptions } from '../public/js/animals.js?v=0d9f9b0f';
 import { centerVerbMenu, makePickTile, menuRowsCap, pickGridCols, pickGridStep, placeVerbMenu } from '../public/js/ui/verb-menu.js?v=7716e570';
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -102,7 +102,7 @@ describe('original-style target-item feed picker', () => {
   it('draws a choice as its picture with the pack count, the name for the tooltip and screen readers', () => {
     const el = () => ({ dataset: {}, attrs: {}, setAttribute(k, v) { this.attrs[k] = String(v); }, getAttribute(k) { return this.attrs[k]; } });
     const doc = { createElement: () => el() };
-    const tile = makePickTile(doc, { key: '2', label: 'Grain', have: 15, icon: 'assets/sprites/icons/grain.png', food: 'grain', verb: 'feed:grain', verbLabel: 'Feed' });
+    const tile = makePickTile(doc, { key: '2', label: 'Grain', have: 15, icon: 'assets/sprites/icons/grain.webp', food: 'grain', verb: 'feed:grain', verbLabel: 'Feed' });
     assert.match(tile.className, /\bvm-row\b/);
     assert.match(tile.className, /\bvm-pick\b/);
     assert.equal(tile.title, 'Grain');
@@ -110,7 +110,7 @@ describe('original-style target-item feed picker', () => {
     assert.equal(tile.dataset.vmTip, 'Grain (you have 15)', 'the client desc line, InteractionMenu.as 1906-1916');
     assert.equal(tile.dataset.food, 'grain');
     assert.equal(tile.dataset.verb, 'feed:grain');
-    assert.match(tile.innerHTML, /<img class="vm-pick-icon" src="assets\/sprites\/icons\/grain\.png" alt=""/);
+    assert.match(tile.innerHTML, /<img class="vm-pick-icon" src="assets\/sprites\/icons\/grain\.webp" alt=""/);
     assert.match(tile.innerHTML, /<span class="count" aria-hidden="true">15<\/span>/);
     assert.doesNotMatch(tile.innerHTML, /Grain/, 'no name drawn on the button (label = \'\')');
     const one = makePickTile(doc, { label: 'Apple', have: 1, icon: 'a.png' });

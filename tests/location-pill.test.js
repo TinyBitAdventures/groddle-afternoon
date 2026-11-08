@@ -53,7 +53,7 @@ describe('ticket 60: the street name opens the Map', () => {
   it('Classic: the whole Current location block, once (the old second handler would close it again)', () => {
     assert.match(classicCss, /:root\[data-ui="classic"\] #game-root \.street-nameplate:not\(\.is-quest\) \{ pointer-events: auto; \}/);
     assert.doesNotMatch(classicTopbar, /plate\?\.addEventListener\('click'/);
-    assert.match(classicCss, /\.street-nameplate:hover \{ background-image: url\("\.\.\/assets\/classic\/map_icon_hover\.png/);
+    assert.match(classicCss, /\.street-nameplate:hover \{ background-image: url\("\.\.\/assets\/classic\/map_icon_hover\.webp/);
   });
 
   it('Classic: the date block opens the hi sign board where the clock has one (multiplayer)', () => {

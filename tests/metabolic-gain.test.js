@@ -9,9 +9,9 @@ import { fileURLToPath } from 'node:url';
 
 import { metabolicGain, setMetabolicGainGate } from '../public/js/metabolics.js?v=8504134e';
 import { applyRewards, createQuestState } from '../public/js/quests.js?v=c8d9d0a4';
-import { collectQuoin, createQuoinState, creditQuoinStat } from '../public/js/quoins.js?v=f154a79e';
-import { HELL_TEXT, metabolicGate, normalizeHellState } from '../public/js/hell.js?v=aca145ba';
-import { questOffersFeature } from '../public/js/features/quest-offers-feature.js?v=f5d8a199';
+import { collectQuoin, createQuoinState, creditQuoinStat } from '../public/js/quoins.js?v=299cc3f4';
+import { HELL_TEXT, metabolicGate, normalizeHellState } from '../public/js/hell.js?v=ca971c34';
+import { questOffersFeature } from '../public/js/features/quest-offers-feature.js?v=57dafa96';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const pub = join(here, '../public');
@@ -157,7 +157,7 @@ describe('prompts, VOGs and the buffs tray', () => {
 
   it('a debuff with no item shows the bang, and a held buff has no End button', () => {
     assert.ok(existsSync(join(pub, 'assets/ui/buff-debuff.svg')));
-    assert.match(game, /return row\?\.def\?\.isDebuff \? 'assets\/ui\/buff-debuff\.svg' : 'assets\/sprites\/icons\/apple\.png';/);
+    assert.match(game, /return row\?\.def\?\.isDebuff \? 'assets\/ui\/buff-debuff\.svg' : 'assets\/sprites\/icons\/apple\.webp';/);
     assert.match(game, /if \(!b\.heldBy\) \{\s*const btn = document\.createElement\('button'\);/);
     const catalog = JSON.parse(read('assets/content/buffs.json'));
     for (const id of ['pooped', 'super_pooped']) {

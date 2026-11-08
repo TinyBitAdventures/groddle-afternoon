@@ -23,13 +23,13 @@ import {
   smallEnlightenmentSeconds,
   smeltItDealtItFreeSmelts,
 } from '../public/js/buff-triggers.js?v=a3093922';
-import { MIRRORED_BUFFS, buffTriggersFeature } from '../public/js/features/buff-triggers-feature.js?v=627ab090';
-import { meditationFeature } from '../public/js/features/meditation-feature.js?v=fb3d2d4c';
-import { teleportationFeature } from '../public/js/features/teleportation-feature.js?v=8a9ee900';
-import { rookAttackFeature } from '../public/js/features/rook-attack-feature.js?v=c56ce4a4';
-import { rubeFeature } from '../public/js/features/rube-feature.js?v=0c2a3c93';
-import { smugglingFeature } from '../public/js/features/smuggling-feature.js?v=556e3bbe';
-import { normalizeHusbandryPack } from '../public/js/animal-husbandry.js?v=35b23ef4';
+import { MIRRORED_BUFFS, buffTriggersFeature } from '../public/js/features/buff-triggers-feature.js?v=cb3595ed';
+import { meditationFeature } from '../public/js/features/meditation-feature.js?v=50bf1ac0';
+import { teleportationFeature } from '../public/js/features/teleportation-feature.js?v=23270f4f';
+import { rookAttackFeature } from '../public/js/features/rook-attack-feature.js?v=db912705';
+import { rubeFeature } from '../public/js/features/rube-feature.js?v=50352247';
+import { smugglingFeature } from '../public/js/features/smuggling-feature.js?v=49c3f782';
+import { normalizeHusbandryPack } from '../public/js/animal-husbandry.js?v=7194f0f1';
 import {
   activateBuffItem,
   applyBuff,
@@ -40,10 +40,10 @@ import {
   tickBuffs,
 } from '../public/js/buffs.js?v=036fee53';
 import { getSkillPackageOverride, skillPackageDetails } from '../public/js/skill-packages.js?v=bfb87281';
-import { miningProfile } from '../public/js/mining.js?v=29fe2127';
-import { resolveAnimalKinshipPackage } from '../public/js/animal-kinship.js?v=05cd67ec';
-import { RECIPE_CATALOG, buildCraftBatchResult, craftRecipe, ensureMakingItems, makingSkillAdjustments } from '../public/js/making.js?v=c9dc233e';
-import { sessionPackage } from '../public/js/meditation.js?v=380b2f3f';
+import { miningProfile } from '../public/js/mining.js?v=fc28670f';
+import { resolveAnimalKinshipPackage } from '../public/js/animal-kinship.js?v=b857b068';
+import { RECIPE_CATALOG, buildCraftBatchResult, craftRecipe, ensureMakingItems, makingSkillAdjustments } from '../public/js/making.js?v=f4f214c2';
+import { sessionPackage } from '../public/js/meditation.js?v=f0c00590';
 import { accelerateActiveStudy, createSkillState, startSkillStudy } from '../public/js/skills.js?v=4542bdf9';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=10b118dd';
 
@@ -571,7 +571,7 @@ describe('wiring', () => {
     for (const id of ids) {
       const icon = BUFF_ICONS[id] || buffs[id].itemClass;
       if (!icon) continue; // item_class null: the tray's generic icon
-      assert.ok(existsSync(join(root, 'assets/sprites/icons', `${icon}.png`)), `${id}: ${icon}`);
+      assert.ok(existsSync(join(root, 'assets/sprites/icons', `${icon}.webp`)), `${id}: ${icon}`);
     }
   });
 

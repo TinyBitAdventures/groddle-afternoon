@@ -3,6 +3,7 @@
  * Run: node --test tests/achievement-events.test.js
  */
 import { before, describe, it } from 'node:test';
+import { imageSize } from '../tools/image-size.mjs';
 import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
@@ -22,13 +23,13 @@ import {
   resetAchievementCounter,
   purchaseAchievementUpdates,
 } from '../public/js/achievements.js?v=f8ccfd34';
-import { createResourceNode, harvestResourceNode } from '../public/js/resource-nodes.js?v=1c268516';
-import { createPlot, growTree, tickPlot } from '../public/js/patches.js?v=8af384ac';
-import { slothsChewing } from '../public/js/features/resource-nodes-feature.js?v=11e86f91';
-import { supplyFeature } from '../public/js/features/supply-feature.js?v=e5a255b4';
-import { bindToolInventory, createToolConditionState } from '../public/js/tools.js?v=f701b241';
+import { createResourceNode, harvestResourceNode } from '../public/js/resource-nodes.js?v=b11d96b2';
+import { createPlot, growTree, tickPlot } from '../public/js/patches.js?v=aa83d5ad';
+import { slothsChewing } from '../public/js/features/resource-nodes-feature.js?v=ed64e23a';
+import { supplyFeature } from '../public/js/features/supply-feature.js?v=850f2c1f';
+import { bindToolInventory, createToolConditionState } from '../public/js/tools.js?v=d8aa3536';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=10b118dd';
-import { normalizeAchievementSnapshot } from '../public/js/player-save.js?v=17b5c632';
+import { normalizeAchievementSnapshot } from '../public/js/player-save.js?v=c7c41d5c';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const publicRoot = join(here, '../public');
@@ -143,8 +144,8 @@ describe('video badge client integration', () => {
       const path = join(publicRoot, relative);
       assert.ok(existsSync(path), `${id} file`);
       const png = readFileSync(path);
-      assert.equal(png.readUInt32BE(16), 180, `${id} width`);
-      assert.equal(png.readUInt32BE(20), 180, `${id} height`);
+      assert.equal(imageSize(png).w, 180, `${id} width`);
+      assert.equal(imageSize(png).h, 180, `${id} height`);
     }
   });
 
@@ -162,9 +163,9 @@ describe('video badge client integration', () => {
       const relative = iconMap[id];
       assert.ok(relative, `${id} mapped`);
       const png = readFileSync(join(publicRoot, relative));
-      assert.deepEqual([...png.subarray(0, 8)], [137, 80, 78, 71, 13, 10, 26, 10], `${id} PNG`);
-      assert.ok([60, 180].includes(png.readUInt32BE(16)), `${id} source width`);
-      assert.equal(png.readUInt32BE(16), png.readUInt32BE(20), `${id} square`);
+      assert.equal(imageSize(png)?.format, 'webp', `${id} lossless WebP`);
+      assert.ok([60, 180].includes(imageSize(png).w), `${id} source width`);
+      assert.equal(imageSize(png).w, imageSize(png).h, `${id} square`);
     }
 
     const game = readFileSync(join(publicRoot, 'game.js'), 'utf8');
@@ -173,7 +174,7 @@ describe('video badge client integration', () => {
     assert.match(game, /neutral-unrecovered/);
     assert.doesNotMatch(
       game.slice(game.indexOf('function renderAchievePanel'), game.indexOf('function openAchievePanel')),
-      /icons\/apple\.png/
+      /icons\/apple\.webp/
     );
     assert.match(style, /\.badge-card \.badge-art-missing/);
   });

@@ -23,25 +23,25 @@ import {
   loadRecipeCatalogFromFile,
   starterToolsInventory,
   STARTER_TOOL_IDS,
-} from '../public/js/making.js?v=c9dc233e';
+} from '../public/js/making.js?v=f4f214c2';
 import {
   ITEM_CATALOG,
   createInventory,
   countItem,
   getItemUseInfo,
   useItem,
-} from '../public/js/inventory.js?v=d82f3b00';
+} from '../public/js/inventory.js?v=b7609342';
 import {
   FOOD_VARIETY_UPGRADE,
   createFoodState,
   isFoodBonusItem,
   quoteFoodVarietyBonus,
-} from '../public/js/food.js?v=e03d5f01';
+} from '../public/js/food.js?v=ed75d614';
 import {
   TOOL_CONDITION_CATALOG,
   createToolConditionState,
   getToolCondition,
-} from '../public/js/tools.js?v=f701b241';
+} from '../public/js/tools.js?v=d8aa3536';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const publicRoot = join(here, '../public');
@@ -195,15 +195,15 @@ describe('GSJS recipe catalog import', () => {
     const ids = new Set([...Object.keys(itemsJson.items), ...Object.keys(TOOL_CATALOG)]);
     const missing = [];
     for (const id of ids) {
-      const iconPath = join(publicRoot, 'assets/sprites/icons', `${id}.png`);
+      const iconPath = join(publicRoot, 'assets/sprites/icons', `${id}.webp`);
       if (!existsSync(iconPath)) missing.push(id);
     }
     assert.deepEqual(missing.sort(), [...MISSING_ICONS].sort());
     for (const id of GSJS_THUMB_ICONS) {
-      assert.ok(existsSync(join(publicRoot, 'assets/sprites/icons', `${id}.png`)), id);
+      assert.ok(existsSync(join(publicRoot, 'assets/sprites/icons', `${id}.webp`)), id);
     }
     for (const id of NEW_TOOLS) {
-      assert.equal(ITEM_CATALOG[id].icon, `assets/sprites/icons/${id}.png`);
+      assert.equal(ITEM_CATALOG[id].icon, `assets/sprites/icons/${id}.webp`);
     }
     for (const id of ['saucepan', 'mike_tyson_grill', 'cocktail_shaker', 'awesome_pot', 'cauldron']) {
       // G188/G191: each tool's tool_animation sheet (tools/build-make-tool-sheets.py, js/make-tool-sheets.js).

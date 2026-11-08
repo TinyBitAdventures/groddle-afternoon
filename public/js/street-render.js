@@ -35,9 +35,9 @@ export const DECO_TWINS = Object.freeze({
 const PLACEHOLDER = 0x5a7a4a;
 /** Original engine art from TSEngineAssets (SignpostView.as). */
 const SIGNPOST = {
-  post: 'assets/ui/signpost/signpost_post.png',
-  arm: 'assets/ui/signpost/signpost_arm.png',
-  shadow: 'assets/ui/signpost/signpost_shadow.png',
+  post: 'assets/ui/signpost/signpost_post.webp',
+  arm: 'assets/ui/signpost/signpost_arm.webp',
+  shadow: 'assets/ui/signpost/signpost_shadow.webp',
   /** Original holder.scale = 0.8 */
   scale: 0.8,
 };

@@ -120,6 +120,6 @@ describe('the online cards are wired', () => {
     assert.match(snaps, /const filters = filterRow\(engine, s, picture, img\);/);
     assert.match(snaps, /const kept = filters \? filters\.picture\(\) : picture;/);
     assert.match(snaps, /image: kept\.b64/);
-    assert.ok(existsSync(join(ROOT, 'public/assets/ui/snaps/filter-thumb.png')));
+    assert.ok(existsSync(join(ROOT, 'public/assets/ui/snaps/filter-thumb.webp')));
   });
 });

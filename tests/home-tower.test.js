@@ -70,7 +70,7 @@ import {
   cultivationCost,
   removeCultivation,
   towerItem,
-} from '../public/js/home-cultivation.js?v=c650eed1';
+} from '../public/js/home-cultivation.js?v=42ae453c';
 
 const root = join(import.meta.dirname, '..', 'public');
 const GS = join(import.meta.dirname, '..', '..', 'glitch-GameServerJS');
@@ -311,7 +311,7 @@ describe('exterior art', () => {
       assert.equal(two.some((op) => op.part === 'deco_side'), false, 'deco_side needs an extra floor');
       assert.ok(towerBounds(nine).h > towerBounds(two).h + 400, id);
     }
-    for (const f of ['proto_1.webp', 'proto_2.webp', 'proto_3.webp', 'tower_expander.png']) {
+    for (const f of ['proto_1.webp', 'proto_2.webp', 'proto_3.webp', 'tower_expander.webp']) {
       assert.ok(existsSync(join(root, TOWER_ART_DIR, f)), f);
     }
     // G316: elevator.png had no traced source and nothing drew it.

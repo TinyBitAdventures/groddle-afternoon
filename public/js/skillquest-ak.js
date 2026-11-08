@@ -91,7 +91,7 @@ export const AK_QUOINS = 3;
 export const AK_SIDE_TABLE = Object.freeze({
   classTsid: 'furniture_sidetable',
   label: 'Side Table',
-  art: 'assets/sprites/icons/furniture_sidetable@3x.png',
+  art: 'assets/sprites/icons/furniture_sidetable@3x.webp',
   artW: 62,
   artH: 54,
   surface: 50,

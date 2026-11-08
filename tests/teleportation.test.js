@@ -46,7 +46,7 @@ describe('rank tables', () => {
 
   it('has recovered icons for the script, imbued script and quill', () => {
     for (const cls of [SCRIPT_CLASS, 'teleportation_script_imbued', 'quill', 'paper']) {
-      assert.ok(existsSync(join(root, `assets/sprites/icons/${cls}.png`)), cls);
+      assert.ok(existsSync(join(root, `assets/sprites/icons/${cls}.webp`)), cls);
     }
   });
 });

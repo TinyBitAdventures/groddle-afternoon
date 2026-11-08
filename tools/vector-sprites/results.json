@@ -1,5 +1,5 @@
 {
- "assets/sprites/npc_piggy__x1_walk_png_1354829432.png": {
+ "assets/sprites/npc_piggy__x1_walk_png_1354829432.webp": {
   "animal": "piggy",
   "swf": "inhabitants/piggy/npc_piggy.swf",
   "sprite": 79,
@@ -53,7 +53,7 @@
    0.9842
   ]
  },
- "assets/sprites/npc_piggy__x1_nibble_png_1354829441.png": {
+ "assets/sprites/npc_piggy__x1_nibble_png_1354829441.webp": {
   "animal": "piggy",
   "swf": "inhabitants/piggy/npc_piggy.swf",
   "sprite": 79,
@@ -143,7 +143,7 @@
    0.9837
   ]
  },
- "assets/sprites/npc_chicken__x1_walk_png_1354830385.png": {
+ "assets/sprites/npc_chicken__x1_walk_png_1354830385.webp": {
   "animal": "chicken",
   "swf": "inhabitants/chicken/npc_chicken.swf",
   "sprite": 183,
@@ -197,7 +197,7 @@
    0.9584
   ]
  },
- "assets/sprites/npc_chicken__x1_pecking_once_png_1354830398.png": {
+ "assets/sprites/npc_chicken__x1_pecking_once_png_1354830398.webp": {
   "animal": "chicken",
   "swf": "inhabitants/chicken/npc_chicken.swf",
   "sprite": 183,
@@ -479,7 +479,7 @@
    0.9801
   ]
  },
- "assets/sprites/foxes/fox-orange-run.png": {
+ "assets/sprites/foxes/fox-orange-run.webp": {
   "animal": "fox-orange",
   "swf": "inhabitants/fox/npc_fox.swf",
   "sprite": 151,
@@ -521,7 +521,7 @@
    0.9587
   ]
  },
- "assets/sprites/foxes/fox-orange-pause.png": {
+ "assets/sprites/foxes/fox-orange-pause.webp": {
   "animal": "fox-orange",
   "swf": "inhabitants/fox/npc_fox.swf",
   "sprite": 151,
@@ -607,7 +607,7 @@
    0.963
   ]
  },
- "assets/sprites/foxes/fox-orange-eatStart.png": {
+ "assets/sprites/foxes/fox-orange-eatStart.webp": {
   "animal": "fox-orange",
   "swf": "inhabitants/fox/npc_fox.swf",
   "sprite": 151,
@@ -647,7 +647,7 @@
    0.9575
   ]
  },
- "assets/sprites/foxes/fox-orange-eat.png": {
+ "assets/sprites/foxes/fox-orange-eat.webp": {
   "animal": "fox-orange",
   "swf": "inhabitants/fox/npc_fox.swf",
   "sprite": 151,
@@ -697,7 +697,7 @@
    0.9598
   ]
  },
- "assets/sprites/foxes/fox-orange-eatEnd.png": {
+ "assets/sprites/foxes/fox-orange-eatEnd.webp": {
   "animal": "fox-orange",
   "swf": "inhabitants/fox/npc_fox.swf",
   "sprite": 151,
@@ -747,7 +747,7 @@
    0.9596
   ]
  },
- "assets/sprites/foxes/fox-orange-brushed.png": {
+ "assets/sprites/foxes/fox-orange-brushed.webp": {
   "animal": "fox-orange",
   "swf": "inhabitants/fox/npc_fox.swf",
   "sprite": 151,
@@ -779,7 +779,7 @@
    0.9587
   ]
  },
- "assets/sprites/foxes/fox-silver-run.png": {
+ "assets/sprites/foxes/fox-silver-run.webp": {
   "animal": "fox-silver",
   "swf": "inhabitants/fox/npc_fox.swf",
   "sprite": 80,
@@ -821,7 +821,7 @@
    0.9531
   ]
  },
- "assets/sprites/foxes/fox-silver-pause.png": {
+ "assets/sprites/foxes/fox-silver-pause.webp": {
   "animal": "fox-silver",
   "swf": "inhabitants/fox/npc_fox.swf",
   "sprite": 80,
@@ -907,7 +907,7 @@
    0.9578
   ]
  },
- "assets/sprites/foxes/fox-silver-eatStart.png": {
+ "assets/sprites/foxes/fox-silver-eatStart.webp": {
   "animal": "fox-silver",
   "swf": "inhabitants/fox/npc_fox.swf",
   "sprite": 80,
@@ -947,7 +947,7 @@
    0.9505
   ]
  },
- "assets/sprites/foxes/fox-silver-eat.png": {
+ "assets/sprites/foxes/fox-silver-eat.webp": {
   "animal": "fox-silver",
   "swf": "inhabitants/fox/npc_fox.swf",
   "sprite": 80,
@@ -997,7 +997,7 @@
    0.9527
   ]
  },
- "assets/sprites/foxes/fox-silver-eatEnd.png": {
+ "assets/sprites/foxes/fox-silver-eatEnd.webp": {
   "animal": "fox-silver",
   "swf": "inhabitants/fox/npc_fox.swf",
   "sprite": 80,
@@ -1047,7 +1047,7 @@
    0.9544
   ]
  },
- "assets/sprites/foxes/fox-silver-brushed.png": {
+ "assets/sprites/foxes/fox-silver-brushed.webp": {
   "animal": "fox-silver",
   "swf": "inhabitants/fox/npc_fox.swf",
   "sprite": 80,
@@ -1079,7 +1079,7 @@
    0.9536
   ]
  },
- "assets/sprites/kitties/kitty-appear.png": {
+ "assets/sprites/kitties/kitty-appear.webp": {
   "animal": "heli-kitty",
   "swf": "inhabitants/heli_kitty/npc_kitty_chicken.swf",
   "sprite": 114,
@@ -1156,7 +1156,7 @@
    0.9636
   ]
  },
- "assets/sprites/kitties/kitty-fly.png": {
+ "assets/sprites/kitties/kitty-fly.webp": {
   "animal": "heli-kitty",
   "swf": "inhabitants/heli_kitty/npc_kitty_chicken.swf",
   "sprite": 114,
@@ -1206,7 +1206,7 @@
    0.9539
   ]
  },
- "assets/sprites/kitties/kitty-sleepStart.png": {
+ "assets/sprites/kitties/kitty-sleepStart.webp": {
   "animal": "heli-kitty",
   "swf": "inhabitants/heli_kitty/npc_kitty_chicken.swf",
   "sprite": 114,
@@ -1262,7 +1262,7 @@
    0.9714
   ]
  },
- "assets/sprites/kitties/kitty-sleep.png": {
+ "assets/sprites/kitties/kitty-sleep.webp": {
   "animal": "heli-kitty",
   "swf": "inhabitants/heli_kitty/npc_kitty_chicken.swf",
   "sprite": 114,
@@ -1349,7 +1349,7 @@
    0.9714
   ]
  },
- "assets/sprites/kitties/kitty-blink.png": {
+ "assets/sprites/kitties/kitty-blink.webp": {
   "animal": "heli-kitty",
   "swf": "inhabitants/heli_kitty/npc_kitty_chicken.swf",
   "sprite": 114,
@@ -1384,7 +1384,7 @@
    0.9641
   ]
  },
- "assets/sprites/kitties/kitty-happy.png": {
+ "assets/sprites/kitties/kitty-happy.webp": {
   "animal": "heli-kitty",
   "swf": "inhabitants/heli_kitty/npc_kitty_chicken.swf",
   "sprite": 114,
@@ -1452,7 +1452,7 @@
    0.9636
   ]
  },
- "assets/sprites/kitties/kitty-chew.png": {
+ "assets/sprites/kitties/kitty-chew.webp": {
   "animal": "heli-kitty",
   "swf": "inhabitants/heli_kitty/npc_kitty_chicken.swf",
   "sprite": 114,
@@ -1497,7 +1497,7 @@
    0.9712
   ]
  },
- "assets/sprites/kitties/kitty-jump.png": {
+ "assets/sprites/kitties/kitty-jump.webp": {
   "animal": "heli-kitty",
   "swf": "inhabitants/heli_kitty/npc_kitty_chicken.swf",
   "sprite": 114,
@@ -1543,7 +1543,7 @@
    0.9671
   ]
  },
- "assets/sprites/kitties/kitty-hitBall.png": {
+ "assets/sprites/kitties/kitty-hitBall.webp": {
   "animal": "heli-kitty",
   "swf": "inhabitants/heli_kitty/npc_kitty_chicken.swf",
   "sprite": 114,
@@ -1582,7 +1582,7 @@
    0.9543
   ]
  },
- "assets/sprites/kitties/kitty-disappear.png": {
+ "assets/sprites/kitties/kitty-disappear.webp": {
   "animal": "heli-kitty",
   "swf": "inhabitants/heli_kitty/npc_kitty_chicken.swf",
   "sprite": 114,
@@ -1639,7 +1639,7 @@
    1
   ]
  },
- "assets/sprites/resources/salmon-swim-right.png": {
+ "assets/sprites/resources/salmon-swim-right.webp": {
   "animal": "salmon",
   "swf": "inhabitants/salmon/npc_salmon.swf",
   "sprite": 16,
@@ -1691,7 +1691,7 @@
    0.9428
   ]
  },
- "assets/sprites/resources/salmon-swim-right-up15.png": {
+ "assets/sprites/resources/salmon-swim-right-up15.webp": {
   "animal": "salmon",
   "swf": "inhabitants/salmon/npc_salmon.swf",
   "sprite": 16,
@@ -1743,7 +1743,7 @@
    0.9344
   ]
  },
- "assets/sprites/resources/salmon-swim-right-up30.png": {
+ "assets/sprites/resources/salmon-swim-right-up30.webp": {
   "animal": "salmon",
   "swf": "inhabitants/salmon/npc_salmon.swf",
   "sprite": 16,
@@ -1795,7 +1795,7 @@
    0.9269
   ]
  },
- "assets/sprites/resources/salmon-swim-right-down15.png": {
+ "assets/sprites/resources/salmon-swim-right-down15.webp": {
   "animal": "salmon",
   "swf": "inhabitants/salmon/npc_salmon.swf",
   "sprite": 16,
@@ -1847,7 +1847,7 @@
    0.9339
   ]
  },
- "assets/sprites/resources/salmon-swim-right-down30.png": {
+ "assets/sprites/resources/salmon-swim-right-down30.webp": {
   "animal": "salmon",
   "swf": "inhabitants/salmon/npc_salmon.swf",
   "sprite": 16,
@@ -1899,7 +1899,7 @@
    0.9368
   ]
  },
- "assets/sprites/resources/salmon-turn-right.png": {
+ "assets/sprites/resources/salmon-turn-right.webp": {
   "animal": "salmon",
   "swf": "inhabitants/salmon/npc_salmon.swf",
   "sprite": 16,
@@ -1940,7 +1940,7 @@
    0.9428
   ]
  },
- "assets/sprites/quests/legalize/npc_bureaucrat_arms_01_glasses_none_hair_01_legs_01_necklace_none_tie_01_torso_01_x1_idle1_png_1354832995.png": {
+ "assets/sprites/quests/legalize/npc_bureaucrat_arms_01_glasses_none_hair_01_legs_01_necklace_none_tie_01_torso_01_x1_idle1_png_1354832995.webp": {
   "animal": "bureaucrat-0",
   "swf": "inhabitants/bureaucrat/npc_bureaucrat.swf",
   "sprite": 121,
@@ -2029,7 +2029,7 @@
    0.9786
   ]
  },
- "assets/sprites/quests/legalize/npc_bureaucrat_arms_01_glasses_none_hair_01_legs_01_necklace_none_tie_01_torso_01_x1_talk_png_1354832993.png": {
+ "assets/sprites/quests/legalize/npc_bureaucrat_arms_01_glasses_none_hair_01_legs_01_necklace_none_tie_01_torso_01_x1_talk_png_1354832993.webp": {
   "animal": "bureaucrat-0",
   "swf": "inhabitants/bureaucrat/npc_bureaucrat.swf",
   "sprite": 121,
@@ -2087,7 +2087,7 @@
    0.9749
   ]
  },
- "assets/sprites/quests/legalize/npc_bureaucrat_arms_02_glasses_none_hair_02_legs_02_necklace_none_tie_02_torso_02_x1_idle1_png_1354833004.png": {
+ "assets/sprites/quests/legalize/npc_bureaucrat_arms_02_glasses_none_hair_02_legs_02_necklace_none_tie_02_torso_02_x1_idle1_png_1354833004.webp": {
   "animal": "bureaucrat-1",
   "swf": "inhabitants/bureaucrat/npc_bureaucrat.swf",
   "sprite": 121,
@@ -2176,7 +2176,7 @@
    0.9766
   ]
  },
- "assets/sprites/quests/legalize/npc_bureaucrat_arms_02_glasses_none_hair_02_legs_02_necklace_none_tie_02_torso_02_x1_talk_png_1354833002.png": {
+ "assets/sprites/quests/legalize/npc_bureaucrat_arms_02_glasses_none_hair_02_legs_02_necklace_none_tie_02_torso_02_x1_talk_png_1354833002.webp": {
   "animal": "bureaucrat-1",
   "swf": "inhabitants/bureaucrat/npc_bureaucrat.swf",
   "sprite": 121,
@@ -2234,7 +2234,7 @@
    0.9756
   ]
  },
- "assets/sprites/quests/legalize/npc_bureaucrat_arms_03_glasses_none_hair_04_legs_03_necklace_01_tie_none_torso_03_x1_idle1_png_1354833012.png": {
+ "assets/sprites/quests/legalize/npc_bureaucrat_arms_03_glasses_none_hair_04_legs_03_necklace_01_tie_none_torso_03_x1_idle1_png_1354833012.webp": {
   "animal": "bureaucrat-2",
   "swf": "inhabitants/bureaucrat/npc_bureaucrat.swf",
   "sprite": 121,
@@ -2323,7 +2323,7 @@
    0.9809
   ]
  },
- "assets/sprites/quests/legalize/npc_bureaucrat_arms_03_glasses_none_hair_04_legs_03_necklace_01_tie_none_torso_03_x1_talk_png_1354833010.png": {
+ "assets/sprites/quests/legalize/npc_bureaucrat_arms_03_glasses_none_hair_04_legs_03_necklace_01_tie_none_torso_03_x1_talk_png_1354833010.webp": {
   "animal": "bureaucrat-2",
   "swf": "inhabitants/bureaucrat/npc_bureaucrat.swf",
   "sprite": 121,
@@ -2381,7 +2381,7 @@
    0.9809
   ]
  },
- "assets/sprites/quests/legalize/npc_bureaucrat_arms_04_glasses_none_hair_05_legs_04_necklace_02_tie_none_torso_04_x1_idle1_png_1354833021.png": {
+ "assets/sprites/quests/legalize/npc_bureaucrat_arms_04_glasses_none_hair_05_legs_04_necklace_02_tie_none_torso_04_x1_idle1_png_1354833021.webp": {
   "animal": "bureaucrat-3",
   "swf": "inhabitants/bureaucrat/npc_bureaucrat.swf",
   "sprite": 121,
@@ -2470,7 +2470,7 @@
    0.9817
   ]
  },
- "assets/sprites/quests/legalize/npc_bureaucrat_arms_04_glasses_none_hair_05_legs_04_necklace_02_tie_none_torso_04_x1_talk_png_1354833019.png": {
+ "assets/sprites/quests/legalize/npc_bureaucrat_arms_04_glasses_none_hair_05_legs_04_necklace_02_tie_none_torso_04_x1_talk_png_1354833019.webp": {
   "animal": "bureaucrat-3",
   "swf": "inhabitants/bureaucrat/npc_bureaucrat.swf",
   "sprite": 121,
@@ -2528,7 +2528,7 @@
    0.9817
   ]
  },
- "assets/sprites/quests/phantom-appear.png": {
+ "assets/sprites/quests/phantom-appear.webp": {
   "animal": "phantom",
   "swf": "quest_items/phantom_glitch/phantom_glitch.swf",
   "sprite": 65,
@@ -2606,7 +2606,7 @@
    0.9251
   ]
  },
- "assets/sprites/quests/phantom-give-heart.png": {
+ "assets/sprites/quests/phantom-give-heart.webp": {
   "animal": "phantom",
   "swf": "quest_items/phantom_glitch/phantom_glitch.swf",
   "sprite": 65,
@@ -2733,7 +2733,7 @@
    0.9542
   ]
  },
- "assets/sprites/quests/four-letter/letter-block-A.png": {
+ "assets/sprites/quests/four-letter/letter-block-A.webp": {
   "animal": "letter-block-A",
   "character": "letter-blocks",
   "swf": "quest_items/letter_block/letter_block.swf",
@@ -2767,7 +2767,7 @@
    0.9909
   ]
  },
- "assets/sprites/quests/four-letter/letter-block-B.png": {
+ "assets/sprites/quests/four-letter/letter-block-B.webp": {
   "animal": "letter-block-B",
   "character": "letter-blocks",
   "swf": "quest_items/letter_block/letter_block.swf",
@@ -2801,7 +2801,7 @@
    0.9916
   ]
  },
- "assets/sprites/quests/four-letter/letter-block-E.png": {
+ "assets/sprites/quests/four-letter/letter-block-E.webp": {
   "animal": "letter-block-E",
   "character": "letter-blocks",
   "swf": "quest_items/letter_block/letter_block.swf",
@@ -2835,7 +2835,7 @@
    0.9905
   ]
  },
- "assets/sprites/quests/four-letter/letter-block-M.png": {
+ "assets/sprites/quests/four-letter/letter-block-M.webp": {
   "animal": "letter-block-M",
   "character": "letter-blocks",
   "swf": "quest_items/letter_block/letter_block.swf",
@@ -2869,7 +2869,7 @@
    0.9912
   ]
  },
- "assets/sprites/quests/four-letter/letter-block-S.png": {
+ "assets/sprites/quests/four-letter/letter-block-S.webp": {
   "animal": "letter-block-S",
   "character": "letter-blocks",
   "swf": "quest_items/letter_block/letter_block.swf",
@@ -2903,7 +2903,7 @@
    0.9911
   ]
  },
- "assets/sprites/quests/four-letter/letter-block-T.png": {
+ "assets/sprites/quests/four-letter/letter-block-T.webp": {
   "animal": "letter-block-T",
   "character": "letter-blocks",
   "swf": "quest_items/letter_block/letter_block.swf",
@@ -2937,7 +2937,7 @@
    0.9913
   ]
  },
- "assets/sprites/quest-rooms/kids_room/mr-block-A.png": {
+ "assets/sprites/quest-rooms/kids_room/mr-block-A.webp": {
   "animal": "mr-block-A",
   "character": "mr-block",
   "swf": "quest_items/letterblock/npc_letterblock.swf",
@@ -2971,7 +2971,7 @@
    0.9944
   ]
  },
- "assets/sprites/quest-rooms/kids_room/mr-block-B.png": {
+ "assets/sprites/quest-rooms/kids_room/mr-block-B.webp": {
   "animal": "mr-block-B",
   "character": "mr-block",
   "swf": "quest_items/letterblock/npc_letterblock.swf",
@@ -3005,7 +3005,7 @@
    0.994
   ]
  },
- "assets/sprites/quests/four-letter/mr-block.png": {
+ "assets/sprites/quests/four-letter/mr-block.webp": {
   "animal": "mr-block-B",
   "character": "mr-block",
   "swf": "quest_items/letterblock/npc_letterblock.swf",
@@ -3039,7 +3039,7 @@
    0.994
   ]
  },
- "assets/sprites/quest-rooms/kids_room/mr-block-E.png": {
+ "assets/sprites/quest-rooms/kids_room/mr-block-E.webp": {
   "animal": "mr-block-E",
   "character": "mr-block",
   "swf": "quest_items/letterblock/npc_letterblock.swf",
@@ -3073,7 +3073,7 @@
    0.9938
   ]
  },
- "assets/sprites/quest-rooms/kids_room/mr-block-M.png": {
+ "assets/sprites/quest-rooms/kids_room/mr-block-M.webp": {
   "animal": "mr-block-M",
   "character": "mr-block",
   "swf": "quest_items/letterblock/npc_letterblock.swf",
@@ -3107,7 +3107,7 @@
    0.9939
   ]
  },
- "assets/sprites/quest-rooms/kids_room/mr-block-S.png": {
+ "assets/sprites/quest-rooms/kids_room/mr-block-S.webp": {
   "animal": "mr-block-S",
   "character": "mr-block",
   "swf": "quest_items/letterblock/npc_letterblock.swf",
@@ -3141,7 +3141,7 @@
    0.9943
   ]
  },
- "assets/sprites/quest-rooms/kids_room/mr-block-T.png": {
+ "assets/sprites/quest-rooms/kids_room/mr-block-T.webp": {
   "animal": "mr-block-T",
   "character": "mr-block",
   "swf": "quest_items/letterblock/npc_letterblock.swf",
@@ -3175,7 +3175,7 @@
    0.9945
   ]
  },
- "assets/sprites/quests/de-embiggenify/npc_dustbunny__x1_idle_stand_png_1354831147.png": {
+ "assets/sprites/quests/de-embiggenify/npc_dustbunny__x1_idle_stand_png_1354831147.webp": {
   "animal": "dustbunny",
   "swf": "inhabitants/dustbunny/npc_dustbunny.swf",
   "sprite": 39,
@@ -3378,7 +3378,7 @@
    0.9415
   ]
  },
- "assets/sprites/quests/de-embiggenify/npc_dustbunny__x1_talk_png_1354831143.png": {
+ "assets/sprites/quests/de-embiggenify/npc_dustbunny__x1_talk_png_1354831143.webp": {
   "animal": "dustbunny",
   "swf": "inhabitants/dustbunny/npc_dustbunny.swf",
   "sprite": 39,
@@ -3459,7 +3459,7 @@
    0.9417
   ]
  },
- "assets/sprites/newxp/dustbunny_idle.png": {
+ "assets/sprites/newxp/dustbunny_idle.webp": {
   "animal": "dustbunny",
   "swf": "inhabitants/dustbunny/npc_dustbunny.swf",
   "sprite": 39,
@@ -3662,7 +3662,7 @@
    0.9415
   ]
  },
- "assets/sprites/newxp/dustbunny_talk.png": {
+ "assets/sprites/newxp/dustbunny_talk.webp": {
   "animal": "dustbunny",
   "swf": "inhabitants/dustbunny/npc_dustbunny.swf",
   "sprite": 39,
@@ -3743,7 +3743,7 @@
    0.9417
   ]
  },
- "assets/sprites/newxp/dustbunny_walk.png": {
+ "assets/sprites/newxp/dustbunny_walk.webp": {
   "animal": "dustbunny",
   "swf": "inhabitants/dustbunny/npc_dustbunny.swf",
   "sprite": 39,
@@ -3782,7 +3782,7 @@
    0.9504
   ]
  },
- "assets/sprites/newxp/dustbunny_walk_right.png": {
+ "assets/sprites/newxp/dustbunny_walk_right.webp": {
   "animal": "dustbunny",
   "swf": "inhabitants/dustbunny/npc_dustbunny.swf",
   "sprite": 39,
@@ -3822,7 +3822,7 @@
    0.9474
   ]
  },
- "assets/sprites/quests/ilmenskie/jones-walk.png": {
+ "assets/sprites/quests/ilmenskie/jones-walk.webp": {
   "animal": "ilmenskie-jones",
   "swf": "inhabitants/ilmenskie_jones/npc_piggy_explorer.swf",
   "sprite": 77,
@@ -3956,7 +3956,7 @@
    0.9812
   ]
  },
- "assets/sprites/rooks/rook-head-idle1.png": {
+ "assets/sprites/rooks/rook-head-idle1.webp": {
   "animal": "rook-head",
   "swf": "misc/rook_head/rook_head.swf",
   "sprite": 107,
@@ -4047,7 +4047,7 @@
    0.9851
   ]
  },
- "assets/sprites/rooks/rook-head-angry1.png": {
+ "assets/sprites/rooks/rook-head-angry1.webp": {
   "animal": "rook-head",
   "swf": "misc/rook_head/rook_head.swf",
   "sprite": 107,
@@ -4180,7 +4180,7 @@
    0.9851
   ]
  },
- "assets/sprites/rooks/rook-head-angry2.png": {
+ "assets/sprites/rooks/rook-head-angry2.webp": {
   "animal": "rook-head",
   "swf": "misc/rook_head/rook_head.swf",
   "sprite": 107,
@@ -4265,7 +4265,7 @@
    0.9826
   ]
  },
- "assets/sprites/rooks/rook-head-angry3.png": {
+ "assets/sprites/rooks/rook-head-angry3.webp": {
   "animal": "rook-head",
   "swf": "misc/rook_head/rook_head.swf",
   "sprite": 107,
@@ -4350,7 +4350,7 @@
    0.9851
   ]
  },
- "assets/sprites/rooks/rook-head-stun.png": {
+ "assets/sprites/rooks/rook-head-stun.webp": {
   "animal": "rook-head",
   "swf": "misc/rook_head/rook_head.swf",
   "sprite": 107,
@@ -4405,7 +4405,7 @@
    0.985
   ]
  },
- "assets/sprites/rooks/rook-head-stunned.png": {
+ "assets/sprites/rooks/rook-head-stunned.webp": {
   "animal": "rook-head",
   "swf": "misc/rook_head/rook_head.swf",
   "sprite": 107,
@@ -4466,7 +4466,7 @@
    0.9742
   ]
  },
- "assets/sprites/rooks/rook-head-stunnedHit.png": {
+ "assets/sprites/rooks/rook-head-stunnedHit.webp": {
   "animal": "rook-head",
   "swf": "misc/rook_head/rook_head.swf",
   "sprite": 107,
@@ -4527,7 +4527,7 @@
    0.9768
   ]
  },
- "assets/sprites/rooks/rook-head-killShot.png": {
+ "assets/sprites/rooks/rook-head-killShot.webp": {
   "animal": "rook-head",
   "swf": "misc/rook_head/rook_head.swf",
   "sprite": 107,
@@ -4588,7 +4588,7 @@
    0.9825
   ]
  },
- "assets/sprites/rooks/rook-head-dead.png": {
+ "assets/sprites/rooks/rook-head-dead.webp": {
   "animal": "rook-head",
   "swf": "misc/rook_head/rook_head.swf",
   "sprite": 107,
@@ -4620,7 +4620,7 @@
    0.9825
   ]
  },
- "assets/sprites/rooks/rook-head-taunt.png": {
+ "assets/sprites/rooks/rook-head-taunt.webp": {
   "animal": "rook-head",
   "swf": "misc/rook_head/rook_head.swf",
   "sprite": 107,
@@ -4690,7 +4690,7 @@
    0.9851
   ]
  },
- "assets/sprites/rooks/piggy-rooked1.png": {
+ "assets/sprites/rooks/piggy-rooked1.webp": {
   "animal": "rooked-piggy",
   "swf": "inhabitants/piggy/npc_piggy.swf",
   "sprite": 79,
@@ -4731,7 +4731,7 @@
    0.9855
   ]
  },
- "assets/sprites/rooks/piggy-rooked2.png": {
+ "assets/sprites/rooks/piggy-rooked2.webp": {
   "animal": "rooked-piggy",
   "swf": "inhabitants/piggy/npc_piggy.swf",
   "sprite": 79,
@@ -4786,7 +4786,7 @@
    0.9866
   ]
  },
- "assets/sprites/rooks/chicken-rooked1.png": {
+ "assets/sprites/rooks/chicken-rooked1.webp": {
   "animal": "rooked-chicken",
   "swf": "inhabitants/chicken/npc_chicken.swf",
   "sprite": 183,
@@ -4818,7 +4818,7 @@
    0.9673
   ]
  },
- "assets/sprites/rooks/chicken-rooked2.png": {
+ "assets/sprites/rooks/chicken-rooked2.webp": {
   "animal": "rooked-chicken",
   "swf": "inhabitants/chicken/npc_chicken.swf",
   "sprite": 183,
@@ -4876,7 +4876,7 @@
    0.9667
   ]
  },
- "assets/sprites/rooks/kitty-sad.png": {
+ "assets/sprites/rooks/kitty-sad.webp": {
   "animal": "sad-kitty",
   "swf": "inhabitants/heli_kitty/npc_kitty_chicken.swf",
   "sprite": 114,
@@ -5966,7 +5966,7 @@
    0.8931
   ]
  },
- "assets/sprites/quest-rooms/juju_camp/grandma_idle.png": {
+ "assets/sprites/quest-rooms/juju_camp/grandma_idle.webp": {
   "animal": "juju-grandma",
   "swf": "inhabitants/juju_grandma/npc_juju_grandma.swf",
   "sprite": 26,
@@ -6069,7 +6069,7 @@
    0.983
   ]
  },
- "assets/sprites/quest-rooms/juju_camp/grandma_talk.png": {
+ "assets/sprites/quest-rooms/juju_camp/grandma_talk.webp": {
   "animal": "juju-grandma",
   "swf": "inhabitants/juju_grandma/npc_juju_grandma.swf",
   "sprite": 26,
@@ -6167,7 +6167,7 @@
    0.9793
   ]
  },
- "assets/sprites/quest-rooms/juju_camp/grandma_angry.png": {
+ "assets/sprites/quest-rooms/juju_camp/grandma_angry.webp": {
   "animal": "juju-grandma",
   "swf": "inhabitants/juju_grandma/npc_juju_grandma.swf",
   "sprite": 26,
@@ -6344,7 +6344,7 @@
    0.9832
   ]
  },
- "assets/sprites/quest-rooms/juju_camp/bandit_red_spawn.png": {
+ "assets/sprites/quest-rooms/juju_camp/bandit_red_spawn.webp": {
   "animal": "juju-red",
   "swf": "inhabitants/juju_bandits/npc_juju_bandit.swf",
   "sprite": 226,
@@ -6399,7 +6399,7 @@
    0.9002
   ]
  },
- "assets/sprites/quest-rooms/juju_camp/bandit_red_walk.png": {
+ "assets/sprites/quest-rooms/juju_camp/bandit_red_walk.webp": {
   "animal": "juju-red",
   "swf": "inhabitants/juju_bandits/npc_juju_bandit.swf",
   "sprite": 226,
@@ -6446,7 +6446,7 @@
    0.9608
   ]
  },
- "assets/sprites/quest-rooms/juju_camp/bandit_red_walk_end.png": {
+ "assets/sprites/quest-rooms/juju_camp/bandit_red_walk_end.webp": {
   "animal": "juju-red",
   "swf": "inhabitants/juju_bandits/npc_juju_bandit.swf",
   "sprite": 226,
@@ -6493,7 +6493,7 @@
    0.9028
   ]
  },
- "assets/sprites/quest-rooms/juju_camp/bandit_red_shrink.png": {
+ "assets/sprites/quest-rooms/juju_camp/bandit_red_shrink.webp": {
   "animal": "juju-red",
   "swf": "inhabitants/juju_bandits/npc_juju_bandit.swf",
   "sprite": 226,
@@ -6546,7 +6546,7 @@
    0.4222
   ]
  },
- "assets/sprites/quest-rooms/juju_camp/bandit_green_spawn.png": {
+ "assets/sprites/quest-rooms/juju_camp/bandit_green_spawn.webp": {
   "animal": "juju-green",
   "swf": "inhabitants/juju_bandits/npc_juju_bandit.swf",
   "sprite": 226,
@@ -6601,7 +6601,7 @@
    0.9006
   ]
  },
- "assets/sprites/quest-rooms/juju_camp/bandit_green_walk.png": {
+ "assets/sprites/quest-rooms/juju_camp/bandit_green_walk.webp": {
   "animal": "juju-green",
   "swf": "inhabitants/juju_bandits/npc_juju_bandit.swf",
   "sprite": 226,
@@ -6648,7 +6648,7 @@
    0.9629
   ]
  },
- "assets/sprites/quest-rooms/juju_camp/bandit_green_walk_end.png": {
+ "assets/sprites/quest-rooms/juju_camp/bandit_green_walk_end.webp": {
   "animal": "juju-green",
   "swf": "inhabitants/juju_bandits/npc_juju_bandit.swf",
   "sprite": 226,
@@ -6695,7 +6695,7 @@
    0.9034
   ]
  },
- "assets/sprites/quest-rooms/juju_camp/bandit_green_shrink.png": {
+ "assets/sprites/quest-rooms/juju_camp/bandit_green_shrink.webp": {
   "animal": "juju-green",
   "swf": "inhabitants/juju_bandits/npc_juju_bandit.swf",
   "sprite": 226,
@@ -6748,7 +6748,7 @@
    0.4222
   ]
  },
- "assets/sprites/quest-rooms/juju_camp/bandit_yellow_spawn.png": {
+ "assets/sprites/quest-rooms/juju_camp/bandit_yellow_spawn.webp": {
   "animal": "juju-yellow",
   "swf": "inhabitants/juju_bandits/npc_juju_bandit.swf",
   "sprite": 226,
@@ -6803,7 +6803,7 @@
    0.8976
   ]
  },
- "assets/sprites/quest-rooms/juju_camp/bandit_yellow_walk.png": {
+ "assets/sprites/quest-rooms/juju_camp/bandit_yellow_walk.webp": {
   "animal": "juju-yellow",
   "swf": "inhabitants/juju_bandits/npc_juju_bandit.swf",
   "sprite": 226,
@@ -6850,7 +6850,7 @@
    0.9618
   ]
  },
- "assets/sprites/quest-rooms/juju_camp/bandit_yellow_walk_end.png": {
+ "assets/sprites/quest-rooms/juju_camp/bandit_yellow_walk_end.webp": {
   "animal": "juju-yellow",
   "swf": "inhabitants/juju_bandits/npc_juju_bandit.swf",
   "sprite": 226,
@@ -6897,7 +6897,7 @@
    0.8996
   ]
  },
- "assets/sprites/quest-rooms/juju_camp/bandit_yellow_shrink.png": {
+ "assets/sprites/quest-rooms/juju_camp/bandit_yellow_shrink.webp": {
   "animal": "juju-yellow",
   "swf": "inhabitants/juju_bandits/npc_juju_bandit.swf",
   "sprite": 226,
@@ -6950,7 +6950,7 @@
    0.4222
   ]
  },
- "assets/sprites/quest-rooms/vision_quest/crab_idle.png": {
+ "assets/sprites/quest-rooms/vision_quest/crab_idle.webp": {
   "animal": "crab",
   "swf": "inhabitants/crab/npc_crab.swf",
   "sprite": 133,
@@ -7011,7 +7011,7 @@
    0.9755
   ]
  },
- "assets/sprites/quest-rooms/color_unblocking/npc_crab_idle0.png": {
+ "assets/sprites/quest-rooms/color_unblocking/npc_crab_idle0.webp": {
   "animal": "crab",
   "swf": "inhabitants/crab/npc_crab.swf",
   "sprite": 133,
@@ -7072,7 +7072,7 @@
    0.9755
   ]
  },
- "assets/sprites/quest-rooms/color_unblocking/npc_crab_talk.png": {
+ "assets/sprites/quest-rooms/color_unblocking/npc_crab_talk.webp": {
   "animal": "crab",
   "swf": "inhabitants/crab/npc_crab.swf",
   "sprite": 133,
@@ -7161,7 +7161,7 @@
    0.9711
   ]
  },
- "assets/sprites/quest-rooms/vision_quest/frog_idle.png": {
+ "assets/sprites/quest-rooms/vision_quest/frog_idle.webp": {
   "animal": "myopic-frog",
   "swf": "inhabitants/myopic_frog/npc_myopic_frog.swf",
   "sprite": 116,
@@ -7240,7 +7240,7 @@
    0.9603
   ]
  },
- "assets/sprites/quest-rooms/vision_quest/frog_talk.png": {
+ "assets/sprites/quest-rooms/vision_quest/frog_talk.webp": {
   "animal": "myopic-frog",
   "swf": "inhabitants/myopic_frog/npc_myopic_frog.swf",
   "sprite": 116,
@@ -7333,7 +7333,7 @@
    0.9562
   ]
  },
- "assets/sprites/quest-rooms/vision_quest/frog_move.png": {
+ "assets/sprites/quest-rooms/vision_quest/frog_move.webp": {
   "animal": "myopic-frog",
   "swf": "inhabitants/myopic_frog/npc_myopic_frog.swf",
   "sprite": 116,
@@ -7388,7 +7388,7 @@
    0.9697
   ]
  },
- "assets/sprites/quest-rooms/le_miserable/bot_idle.png": {
+ "assets/sprites/quest-rooms/le_miserable/bot_idle.webp": {
   "animal": "maintenance-bot",
   "swf": "inhabitants/maintenance_bot/npc_maintenance_bot.swf",
   "sprite": 16,
@@ -7443,7 +7443,7 @@
    0.9762
   ]
  },
- "assets/sprites/quest-rooms/le_miserable/bot_talk.png": {
+ "assets/sprites/quest-rooms/le_miserable/bot_talk.webp": {
   "animal": "maintenance-bot",
   "swf": "inhabitants/maintenance_bot/npc_maintenance_bot.swf",
   "sprite": 16,
@@ -7543,7 +7543,7 @@
    0.9762
   ]
  },
- "assets/sprites/quest-rooms/back_alley/bot_attract.png": {
+ "assets/sprites/quest-rooms/back_alley/bot_attract.webp": {
   "animal": "maintenance-bot",
   "swf": "inhabitants/maintenance_bot/npc_maintenance_bot.swf",
   "sprite": 16,
@@ -7631,7 +7631,7 @@
    0.9762
   ]
  },
- "assets/sprites/quest-rooms/back_alley/bot_move.png": {
+ "assets/sprites/quest-rooms/back_alley/bot_move.webp": {
   "animal": "maintenance-bot",
   "swf": "inhabitants/maintenance_bot/npc_maintenance_bot.swf",
   "sprite": 16,
@@ -7975,7 +7975,7 @@
    0.9859
   ]
  },
- "assets/sprites/foxes/ranger-idle0.png": {
+ "assets/sprites/foxes/ranger-idle0.webp": {
   "animal": "fox-ranger",
   "swf": "inhabitants/fox_ranger/npc_fox_ranger.swf",
   "sprite": 28,
@@ -8007,7 +8007,7 @@
    0.9811
   ]
  },
- "assets/sprites/foxes/ranger-idle1.png": {
+ "assets/sprites/foxes/ranger-idle1.webp": {
   "animal": "fox-ranger",
   "swf": "inhabitants/fox_ranger/npc_fox_ranger.swf",
   "sprite": 28,
@@ -8047,7 +8047,7 @@
    0.9811
   ]
  },
- "assets/sprites/foxes/ranger-idle2.png": {
+ "assets/sprites/foxes/ranger-idle2.webp": {
   "animal": "fox-ranger",
   "swf": "inhabitants/fox_ranger/npc_fox_ranger.swf",
   "sprite": 28,
@@ -8168,7 +8168,7 @@
    0.9811
   ]
  },
- "assets/sprites/foxes/ranger-talk.png": {
+ "assets/sprites/foxes/ranger-talk.webp": {
   "animal": "fox-ranger",
   "swf": "inhabitants/fox_ranger/npc_fox_ranger.swf",
   "sprite": 28,
@@ -8289,7 +8289,7 @@
    0.9811
   ]
  },
- "assets/sprites/foxes/bait-bait1.png": {
+ "assets/sprites/foxes/bait-bait1.webp": {
   "animal": "fox-bait",
   "swf": "misc/fox_bait/fox_bait.swf",
   "sprite": 10,
@@ -8321,7 +8321,7 @@
    0.9811
   ]
  },
- "assets/sprites/foxes/bait-bait2.png": {
+ "assets/sprites/foxes/bait-bait2.webp": {
   "animal": "fox-bait",
   "swf": "misc/fox_bait/fox_bait.swf",
   "sprite": 10,
@@ -8353,7 +8353,7 @@
    0.958
   ]
  },
- "assets/sprites/foxes/bait-bait3.png": {
+ "assets/sprites/foxes/bait-bait3.webp": {
   "animal": "fox-bait",
   "swf": "misc/fox_bait/fox_bait.swf",
   "sprite": 10,
@@ -8385,7 +8385,7 @@
    0.9681
   ]
  },
- "assets/sprites/foxes/bait-stink1.png": {
+ "assets/sprites/foxes/bait-stink1.webp": {
   "animal": "fox-bait",
   "swf": "misc/fox_bait/fox_bait.swf",
   "sprite": 10,
@@ -8458,7 +8458,7 @@
    0.9703
   ]
  },
- "assets/sprites/foxes/bait-stink2.png": {
+ "assets/sprites/foxes/bait-stink2.webp": {
   "animal": "fox-bait",
   "swf": "misc/fox_bait/fox_bait.swf",
   "sprite": 10,
@@ -8532,7 +8532,7 @@
    0.9513
   ]
  },
- "assets/sprites/foxes/bait-stink3.png": {
+ "assets/sprites/foxes/bait-stink3.webp": {
   "animal": "fox-bait",
   "swf": "misc/fox_bait/fox_bait.swf",
   "sprite": 10,
@@ -8605,7 +8605,7 @@
    0.9602
   ]
  },
- "assets/sprites/shrines/alph_open.png": {
+ "assets/sprites/shrines/alph_open.webp": {
   "animal": "shrine-alph",
   "swf": "shrines/npc_shrine_base/npc_shrine_alph/npc_shrine_alph.swf",
   "sprite": 38,
@@ -8658,7 +8658,7 @@
    0.9906
   ]
  },
- "assets/sprites/shrines/alph_close.png": {
+ "assets/sprites/shrines/alph_close.webp": {
   "animal": "shrine-alph",
   "swf": "shrines/npc_shrine_base/npc_shrine_alph/npc_shrine_alph.swf",
   "sprite": 38,
@@ -8712,7 +8712,7 @@
    0.9874
   ]
  },
- "assets/sprites/shrines/cosma_open.png": {
+ "assets/sprites/shrines/cosma_open.webp": {
   "animal": "shrine-cosma",
   "swf": "shrines/npc_shrine_base/npc_shrine_cosma/npc_shrine_cosma.swf",
   "sprite": 38,
@@ -8765,7 +8765,7 @@
    0.9907
   ]
  },
- "assets/sprites/shrines/cosma_close.png": {
+ "assets/sprites/shrines/cosma_close.webp": {
   "animal": "shrine-cosma",
   "swf": "shrines/npc_shrine_base/npc_shrine_cosma/npc_shrine_cosma.swf",
   "sprite": 38,
@@ -8819,7 +8819,7 @@
    0.9874
   ]
  },
- "assets/sprites/shrines/friendly_open.png": {
+ "assets/sprites/shrines/friendly_open.webp": {
   "animal": "shrine-friendly",
   "swf": "shrines/npc_shrine_base/npc_shrine_friendly/npc_shrine_friendly.swf",
   "sprite": 38,
@@ -8872,7 +8872,7 @@
    0.9906
   ]
  },
- "assets/sprites/shrines/friendly_close.png": {
+ "assets/sprites/shrines/friendly_close.webp": {
   "animal": "shrine-friendly",
   "swf": "shrines/npc_shrine_base/npc_shrine_friendly/npc_shrine_friendly.swf",
   "sprite": 38,
@@ -8926,7 +8926,7 @@
    0.9874
   ]
  },
- "assets/sprites/shrines/grendaline_open.png": {
+ "assets/sprites/shrines/grendaline_open.webp": {
   "animal": "shrine-grendaline",
   "swf": "shrines/npc_shrine_base/npc_shrine_grendaline/npc_shrine_grendaline.swf",
   "sprite": 38,
@@ -8979,7 +8979,7 @@
    0.9906
   ]
  },
- "assets/sprites/shrines/grendaline_close.png": {
+ "assets/sprites/shrines/grendaline_close.webp": {
   "animal": "shrine-grendaline",
   "swf": "shrines/npc_shrine_base/npc_shrine_grendaline/npc_shrine_grendaline.swf",
   "sprite": 38,
@@ -9033,7 +9033,7 @@
    0.9874
   ]
  },
- "assets/sprites/shrines/humbaba_open.png": {
+ "assets/sprites/shrines/humbaba_open.webp": {
   "animal": "shrine-humbaba",
   "swf": "shrines/npc_shrine_base/npc_shrine_humbaba/npc_shrine_humbaba.swf",
   "sprite": 38,
@@ -9086,7 +9086,7 @@
    0.9907
   ]
  },
- "assets/sprites/shrines/humbaba_close.png": {
+ "assets/sprites/shrines/humbaba_close.webp": {
   "animal": "shrine-humbaba",
   "swf": "shrines/npc_shrine_base/npc_shrine_humbaba/npc_shrine_humbaba.swf",
   "sprite": 38,
@@ -9140,7 +9140,7 @@
    0.9874
   ]
  },
- "assets/sprites/shrines/lem_open.png": {
+ "assets/sprites/shrines/lem_open.webp": {
   "animal": "shrine-lem",
   "swf": "shrines/npc_shrine_base/npc_shrine_lem/npc_shrine_lem.swf",
   "sprite": 38,
@@ -9193,7 +9193,7 @@
    0.9907
   ]
  },
- "assets/sprites/shrines/lem_close.png": {
+ "assets/sprites/shrines/lem_close.webp": {
   "animal": "shrine-lem",
   "swf": "shrines/npc_shrine_base/npc_shrine_lem/npc_shrine_lem.swf",
   "sprite": 38,
@@ -9247,7 +9247,7 @@
    0.9874
   ]
  },
- "assets/sprites/shrines/mab_open.png": {
+ "assets/sprites/shrines/mab_open.webp": {
   "animal": "shrine-mab",
   "swf": "shrines/npc_shrine_base/npc_shrine_mab/npc_shrine_mab.swf",
   "sprite": 38,
@@ -9300,7 +9300,7 @@
    0.9906
   ]
  },
- "assets/sprites/shrines/mab_close.png": {
+ "assets/sprites/shrines/mab_close.webp": {
   "animal": "shrine-mab",
   "swf": "shrines/npc_shrine_base/npc_shrine_mab/npc_shrine_mab.swf",
   "sprite": 38,
@@ -9354,7 +9354,7 @@
    0.9873
   ]
  },
- "assets/sprites/shrines/pot_open.png": {
+ "assets/sprites/shrines/pot_open.webp": {
   "animal": "shrine-pot",
   "swf": "shrines/npc_shrine_base/npc_shrine_pot/npc_shrine_pot.swf",
   "sprite": 38,
@@ -9407,7 +9407,7 @@
    0.9907
   ]
  },
- "assets/sprites/shrines/pot_close.png": {
+ "assets/sprites/shrines/pot_close.webp": {
   "animal": "shrine-pot",
   "swf": "shrines/npc_shrine_base/npc_shrine_pot/npc_shrine_pot.swf",
   "sprite": 38,
@@ -9461,7 +9461,7 @@
    0.9875
   ]
  },
- "assets/sprites/shrines/spriggan_open.png": {
+ "assets/sprites/shrines/spriggan_open.webp": {
   "animal": "shrine-spriggan",
   "swf": "shrines/npc_shrine_base/npc_shrine_spriggan/npc_shrine_spriggan.swf",
   "sprite": 38,
@@ -9514,7 +9514,7 @@
    0.9906
   ]
  },
- "assets/sprites/shrines/spriggan_close.png": {
+ "assets/sprites/shrines/spriggan_close.webp": {
   "animal": "shrine-spriggan",
   "swf": "shrines/npc_shrine_base/npc_shrine_spriggan/npc_shrine_spriggan.swf",
   "sprite": 38,
@@ -9568,7 +9568,7 @@
    0.9874
   ]
  },
- "assets/sprites/shrines/ti_open.png": {
+ "assets/sprites/shrines/ti_open.webp": {
   "animal": "shrine-ti",
   "swf": "shrines/npc_shrine_base/npc_shrine_ti/npc_shrine_ti.swf",
   "sprite": 38,
@@ -9621,7 +9621,7 @@
    0.9905
   ]
  },
- "assets/sprites/shrines/ti_close.png": {
+ "assets/sprites/shrines/ti_close.webp": {
   "animal": "shrine-ti",
   "swf": "shrines/npc_shrine_base/npc_shrine_ti/npc_shrine_ti.swf",
   "sprite": 38,
@@ -9675,7 +9675,7 @@
    0.9873
   ]
  },
- "assets/sprites/shrines/zille_open.png": {
+ "assets/sprites/shrines/zille_open.webp": {
   "animal": "shrine-zille",
   "swf": "shrines/npc_shrine_base/npc_shrine_zille/npc_shrine_zille.swf",
   "sprite": 38,
@@ -9728,7 +9728,7 @@
    0.9906
   ]
  },
- "assets/sprites/shrines/zille_close.png": {
+ "assets/sprites/shrines/zille_close.webp": {
   "animal": "shrine-zille",
   "swf": "shrines/npc_shrine_base/npc_shrine_zille/npc_shrine_zille.swf",
   "sprite": 38,
@@ -13650,7 +13650,7 @@
    0.9851
   ]
  },
- "assets/sprites/rube/rube_offer_trade.png": {
+ "assets/sprites/rube/rube_offer_trade.webp": {
   "animal": "rube",
   "swf": "inhabitants/rube/npc_rube.swf",
   "sprite": 78,
@@ -14471,7 +14471,7 @@
    0.6547
   ]
  },
- "assets/sprites/newxp/flamingo_idle.png": {
+ "assets/sprites/newxp/flamingo_idle.webp": {
   "animal": "flamingo",
   "swf": "inhabitants/flamingo/npc_flamingo.swf",
   "sprite": 933,
@@ -14503,7 +14503,7 @@
    0.963
   ]
  },
- "assets/sprites/newxp/flamingo_talk_tall.png": {
+ "assets/sprites/newxp/flamingo_talk_tall.webp": {
   "animal": "flamingo",
   "swf": "inhabitants/flamingo/npc_flamingo.swf",
   "sprite": 933,
@@ -14661,7 +14661,7 @@
    0.9557
   ]
  },
- "assets/sprites/newxp/flamingo_talk_short.png": {
+ "assets/sprites/newxp/flamingo_talk_short.webp": {
   "animal": "flamingo",
   "swf": "inhabitants/flamingo/npc_flamingo.swf",
   "sprite": 933,
@@ -14819,7 +14819,7 @@
    0.9618
   ]
  },
- "assets/sprites/newxp/flamingo_flying.png": {
+ "assets/sprites/newxp/flamingo_flying.webp": {
   "animal": "flamingo",
   "swf": "inhabitants/flamingo/npc_flamingo.swf",
   "sprite": 933,
@@ -14862,7 +14862,7 @@
    0.9731
   ]
  },
- "assets/sprites/newxp/flamingo_hover.png": {
+ "assets/sprites/newxp/flamingo_hover.webp": {
   "animal": "flamingo",
   "swf": "inhabitants/flamingo/npc_flamingo.swf",
   "sprite": 933,
@@ -14905,7 +14905,7 @@
    0.9732
   ]
  },
- "assets/sprites/newxp/rock_read.png": {
+ "assets/sprites/newxp/rock_read.webp": {
   "animal": "magic-rock",
   "swf": "inhabitants/magic_rock/magic_rock.swf",
   "sprite": 52,
@@ -14954,7 +14954,7 @@
    0.9811
   ]
  },
- "assets/sprites/newxp/rock_talk.png": {
+ "assets/sprites/newxp/rock_talk.webp": {
   "animal": "magic-rock",
   "swf": "inhabitants/magic_rock/magic_rock.swf",
   "sprite": 52,
@@ -15097,7 +15097,7 @@
    0.2197
   ]
  },
- "assets/sprites/newxp/rock_appear.png": {
+ "assets/sprites/newxp/rock_appear.webp": {
   "animal": "magic-rock",
   "swf": "inhabitants/magic_rock/magic_rock.swf",
   "sprite": 52,
@@ -15167,7 +15167,7 @@
    1
   ]
  },
- "assets/sprites/hell/hell_bartender-idle1.png": {
+ "assets/sprites/hell/hell_bartender-idle1.webp": {
   "animal": "hell-bartender",
   "swf": "inhabitants/hell_bartender/hell_bartender.swf",
   "sprite": 34,
@@ -15308,7 +15308,7 @@
    0.9855
   ]
  },
- "assets/sprites/hell/hell_bartender-idle2.png": {
+ "assets/sprites/hell/hell_bartender-idle2.webp": {
   "animal": "hell-bartender",
   "swf": "inhabitants/hell_bartender/hell_bartender.swf",
   "sprite": 34,
@@ -15455,7 +15455,7 @@
    0.9863
   ]
  },
- "assets/sprites/hell/hell_bartender-talk-left.png": {
+ "assets/sprites/hell/hell_bartender-talk-left.webp": {
   "animal": "hell-bartender",
   "swf": "inhabitants/hell_bartender/hell_bartender.swf",
   "sprite": 34,
@@ -15634,7 +15634,7 @@
    0.9857
   ]
  },
- "assets/sprites/hell/hell_bartender-talk-right.png": {
+ "assets/sprites/hell/hell_bartender-talk-right.webp": {
   "animal": "hell-bartender",
   "swf": "inhabitants/hell_bartender/hell_bartender.swf",
   "sprite": 34,
@@ -15797,7 +15797,7 @@
    0.9863
   ]
  },
- "assets/sprites/hell/hell_bartender-talk-right-out.png": {
+ "assets/sprites/hell/hell_bartender-talk-right-out.webp": {
   "animal": "hell-bartender",
   "swf": "inhabitants/hell_bartender/hell_bartender.swf",
   "sprite": 34,
@@ -16389,7 +16389,7 @@
    0.9758
   ]
  },
- "assets/sprites/quoin__x1_1_x1_2_x1_3_x1_4_x1_5_x1_6_x1_7_x1_8_png_1354829599.png": {
+ "assets/sprites/quoin__x1_1_x1_2_x1_3_x1_4_x1_5_x1_6_x1_7_x1_8_png_1354829599.webp": {
   "animal": "quoin",
   "character": "quoin",
   "source": "tools/quoin-art",
@@ -16632,7 +16632,7 @@
    0.9661
   ]
  },
- "assets/sprites/trants/frames/trant_bean_m1.png": {
+ "assets/sprites/trants/frames/trant_bean_m1.webp": {
   "animal": "trant-bean-m1",
   "swf": "harvestable_resources/bean_tree/trant_bean.swf",
   "sprite": 162,
@@ -16664,7 +16664,7 @@
    0.9646
   ]
  },
- "assets/sprites/trants/frames/trant_bean_m3.png": {
+ "assets/sprites/trants/frames/trant_bean_m3.webp": {
   "animal": "trant-bean-m3",
   "swf": "harvestable_resources/bean_tree/trant_bean.swf",
   "sprite": 136,
@@ -16696,7 +16696,7 @@
    0.9693
   ]
  },
- "assets/sprites/trants/frames/trant_bean_m5.png": {
+ "assets/sprites/trants/frames/trant_bean_m5.webp": {
   "animal": "trant-bean-m5",
   "swf": "harvestable_resources/bean_tree/trant_bean.swf",
   "sprite": 112,
@@ -16728,7 +16728,7 @@
    0.9697
   ]
  },
- "assets/sprites/trants/frames/trant_bean_m7.png": {
+ "assets/sprites/trants/frames/trant_bean_m7.webp": {
   "animal": "trant-bean-m7",
   "swf": "harvestable_resources/bean_tree/trant_bean.swf",
   "sprite": 89,
@@ -16760,7 +16760,7 @@
    0.9761
   ]
  },
- "assets/sprites/trants/frames/trant_bean_m10.png": {
+ "assets/sprites/trants/frames/trant_bean_m10.webp": {
   "animal": "trant-bean-m10",
   "swf": "harvestable_resources/bean_tree/trant_bean.swf",
   "sprite": 29,
@@ -16792,7 +16792,7 @@
    0.9791
   ]
  },
- "assets/sprites/trants/frames/trant_bubble_m1.png": {
+ "assets/sprites/trants/frames/trant_bubble_m1.webp": {
   "animal": "trant-bubble-m1",
   "swf": "harvestable_resources/bubble_tree/trant_bubble.swf",
   "sprite": 42,
@@ -16824,7 +16824,7 @@
    0.9422
   ]
  },
- "assets/sprites/trants/frames/trant_bubble_m3.png": {
+ "assets/sprites/trants/frames/trant_bubble_m3.webp": {
   "animal": "trant-bubble-m3",
   "swf": "harvestable_resources/bubble_tree/trant_bubble.swf",
   "sprite": 58,
@@ -16856,7 +16856,7 @@
    0.9501
   ]
  },
- "assets/sprites/trants/frames/trant_bubble_m5.png": {
+ "assets/sprites/trants/frames/trant_bubble_m5.webp": {
   "animal": "trant-bubble-m5",
   "swf": "harvestable_resources/bubble_tree/trant_bubble.swf",
   "sprite": 142,
@@ -16888,7 +16888,7 @@
    0.935
   ]
  },
- "assets/sprites/trants/frames/trant_bubble_m7.png": {
+ "assets/sprites/trants/frames/trant_bubble_m7.webp": {
   "animal": "trant-bubble-m7",
   "swf": "harvestable_resources/bubble_tree/trant_bubble.swf",
   "sprite": 173,
@@ -16920,7 +16920,7 @@
    0.9364
   ]
  },
- "assets/sprites/trants/frames/trant_bubble_m10.png": {
+ "assets/sprites/trants/frames/trant_bubble_m10.webp": {
   "animal": "trant-bubble-m10",
   "swf": "harvestable_resources/bubble_tree/trant_bubble.swf",
   "sprite": 190,
@@ -16952,7 +16952,7 @@
    0.9385
   ]
  },
- "assets/sprites/trants/frames/trant_egg_m1.png": {
+ "assets/sprites/trants/frames/trant_egg_m1.webp": {
   "animal": "trant-egg-m1",
   "swf": "harvestable_resources/egg_plant/trant_egg.swf",
   "sprite": 84,
@@ -16984,7 +16984,7 @@
    0.9863
   ]
  },
- "assets/sprites/trants/frames/trant_egg_m3.png": {
+ "assets/sprites/trants/frames/trant_egg_m3.webp": {
   "animal": "trant-egg-m3",
   "swf": "harvestable_resources/egg_plant/trant_egg.swf",
   "sprite": 76,
@@ -17016,7 +17016,7 @@
    0.9893
   ]
  },
- "assets/sprites/trants/frames/trant_egg_m5.png": {
+ "assets/sprites/trants/frames/trant_egg_m5.webp": {
   "animal": "trant-egg-m5",
   "swf": "harvestable_resources/egg_plant/trant_egg.swf",
   "sprite": 61,
@@ -17048,7 +17048,7 @@
    0.9781
   ]
  },
- "assets/sprites/trants/frames/trant_egg_m7.png": {
+ "assets/sprites/trants/frames/trant_egg_m7.webp": {
   "animal": "trant-egg-m7",
   "swf": "harvestable_resources/egg_plant/trant_egg.swf",
   "sprite": 47,
@@ -17080,7 +17080,7 @@
    0.9792
   ]
  },
- "assets/sprites/trants/frames/trant_egg_m10.png": {
+ "assets/sprites/trants/frames/trant_egg_m10.webp": {
   "animal": "trant-egg-m10",
   "swf": "harvestable_resources/egg_plant/trant_egg.swf",
   "sprite": 22,
@@ -17112,7 +17112,7 @@
    0.9808
   ]
  },
- "assets/sprites/trants/frames/trant_fruit_m1.png": {
+ "assets/sprites/trants/frames/trant_fruit_m1.webp": {
   "animal": "trant-fruit-m1",
   "swf": "harvestable_resources/fruit_tree/trant_fruit.swf",
   "sprite": 40,
@@ -17144,7 +17144,7 @@
    0.9532
   ]
  },
- "assets/sprites/trants/frames/trant_fruit_m3.png": {
+ "assets/sprites/trants/frames/trant_fruit_m3.webp": {
   "animal": "trant-fruit-m3",
   "swf": "harvestable_resources/fruit_tree/trant_fruit.swf",
   "sprite": 46,
@@ -17176,7 +17176,7 @@
    0.9367
   ]
  },
- "assets/sprites/trants/frames/trant_fruit_m5.png": {
+ "assets/sprites/trants/frames/trant_fruit_m5.webp": {
   "animal": "trant-fruit-m5",
   "swf": "harvestable_resources/fruit_tree/trant_fruit.swf",
   "sprite": 56,
@@ -17208,7 +17208,7 @@
    0.9497
   ]
  },
- "assets/sprites/trants/frames/trant_fruit_m7.png": {
+ "assets/sprites/trants/frames/trant_fruit_m7.webp": {
   "animal": "trant-fruit-m7",
   "swf": "harvestable_resources/fruit_tree/trant_fruit.swf",
   "sprite": 62,
@@ -17240,7 +17240,7 @@
    0.9467
   ]
  },
- "assets/sprites/trants/frames/trant_fruit_m10.png": {
+ "assets/sprites/trants/frames/trant_fruit_m10.webp": {
   "animal": "trant-fruit-m10",
   "swf": "harvestable_resources/fruit_tree/trant_fruit.swf",
   "sprite": 71,
@@ -17272,7 +17272,7 @@
    0.9743
   ]
  },
- "assets/sprites/trants/frames/trant_gas_m1.png": {
+ "assets/sprites/trants/frames/trant_gas_m1.webp": {
   "animal": "trant-gas-m1",
   "swf": "harvestable_resources/gas_plant/trant_gas.swf",
   "sprite": 71,
@@ -17304,7 +17304,7 @@
    0.9754
   ]
  },
- "assets/sprites/trants/frames/trant_gas_m3.png": {
+ "assets/sprites/trants/frames/trant_gas_m3.webp": {
   "animal": "trant-gas-m3",
   "swf": "harvestable_resources/gas_plant/trant_gas.swf",
   "sprite": 165,
@@ -17336,7 +17336,7 @@
    0.9857
   ]
  },
- "assets/sprites/trants/frames/trant_gas_m5.png": {
+ "assets/sprites/trants/frames/trant_gas_m5.webp": {
   "animal": "trant-gas-m5",
   "swf": "harvestable_resources/gas_plant/trant_gas.swf",
   "sprite": 237,
@@ -17368,7 +17368,7 @@
    0.9847
   ]
  },
- "assets/sprites/trants/frames/trant_gas_m7.png": {
+ "assets/sprites/trants/frames/trant_gas_m7.webp": {
   "animal": "trant-gas-m7",
   "swf": "harvestable_resources/gas_plant/trant_gas.swf",
   "sprite": 297,
@@ -17400,7 +17400,7 @@
    0.9817
   ]
  },
- "assets/sprites/trants/frames/trant_gas_m10.png": {
+ "assets/sprites/trants/frames/trant_gas_m10.webp": {
   "animal": "trant-gas-m10",
   "swf": "harvestable_resources/gas_plant/trant_gas.swf",
   "sprite": 377,
@@ -17432,7 +17432,7 @@
    0.9879
   ]
  },
- "assets/sprites/trants/frames/trant_spice_m1.png": {
+ "assets/sprites/trants/frames/trant_spice_m1.webp": {
   "animal": "trant-spice-m1",
   "swf": "harvestable_resources/spice_plant/trant_spice.swf",
   "sprite": 26,
@@ -17464,7 +17464,7 @@
    0.9923
   ]
  },
- "assets/sprites/trants/frames/trant_spice_m3.png": {
+ "assets/sprites/trants/frames/trant_spice_m3.webp": {
   "animal": "trant-spice-m3",
   "swf": "harvestable_resources/spice_plant/trant_spice.swf",
   "sprite": 59,
@@ -17496,7 +17496,7 @@
    0.9936
   ]
  },
- "assets/sprites/trants/frames/trant_spice_m5.png": {
+ "assets/sprites/trants/frames/trant_spice_m5.webp": {
   "animal": "trant-spice-m5",
   "swf": "harvestable_resources/spice_plant/trant_spice.swf",
   "sprite": 102,
@@ -17528,7 +17528,7 @@
    0.9926
   ]
  },
- "assets/sprites/trants/frames/trant_spice_m7.png": {
+ "assets/sprites/trants/frames/trant_spice_m7.webp": {
   "animal": "trant-spice-m7",
   "swf": "harvestable_resources/spice_plant/trant_spice.swf",
   "sprite": 134,
@@ -17560,7 +17560,7 @@
    0.9948
   ]
  },
- "assets/sprites/trants/frames/trant_spice_m10.png": {
+ "assets/sprites/trants/frames/trant_spice_m10.webp": {
   "animal": "trant-spice-m10",
   "swf": "harvestable_resources/spice_plant/trant_spice.swf",
   "sprite": 185,
@@ -17592,7 +17592,7 @@
    0.9957
   ]
  },
- "assets/sprites/soil/trant-bean-dead.png": {
+ "assets/sprites/soil/trant-bean-dead.webp": {
   "animal": "trant-bean-dead",
   "swf": "harvestable_resources/trant_bean_dead/trant_bean_dead.swf",
   "sprite": 0,
@@ -17624,7 +17624,7 @@
    0.9907
   ]
  },
- "assets/sprites/soil/trant-bubble-dead.png": {
+ "assets/sprites/soil/trant-bubble-dead.webp": {
   "animal": "trant-bubble-dead",
   "swf": "harvestable_resources/trant_bubble_dead/trant_bubble_dead.swf",
   "sprite": 0,
@@ -17656,7 +17656,7 @@
    0.9912
   ]
  },
- "assets/sprites/soil/trant-egg-dead.png": {
+ "assets/sprites/soil/trant-egg-dead.webp": {
   "animal": "trant-egg-dead",
   "swf": "harvestable_resources/trant_egg_dead/trant_egg_dead.swf",
   "sprite": 0,
@@ -17688,7 +17688,7 @@
    0.9929
   ]
  },
- "assets/sprites/soil/trant-fruit-dead.png": {
+ "assets/sprites/soil/trant-fruit-dead.webp": {
   "animal": "trant-fruit-dead",
   "swf": "harvestable_resources/trant_fruit_dead/trant_fruit_dead.swf",
   "sprite": 0,
@@ -17720,7 +17720,7 @@
    0.9908
   ]
  },
- "assets/sprites/soil/trant-gas-dead.png": {
+ "assets/sprites/soil/trant-gas-dead.webp": {
   "animal": "trant-gas-dead",
   "swf": "harvestable_resources/trant_gas_dead/trant_gas_dead.swf",
   "sprite": 0,
@@ -17752,7 +17752,7 @@
    0.9887
   ]
  },
- "assets/sprites/soil/trant-spice-dead.png": {
+ "assets/sprites/soil/trant-spice-dead.webp": {
   "animal": "trant-spice-dead",
   "swf": "harvestable_resources/trant_spice_dead/trant_spice_dead.swf",
   "sprite": 0,
@@ -17784,7 +17784,7 @@
    0.9922
   ]
  },
- "assets/sprites/soil/patch-dirty.png": {
+ "assets/sprites/soil/patch-dirty.webp": {
   "animal": "patch-dirty",
   "swf": "harvestable_resources/patch/patch.swf",
   "sprite": 0,
@@ -17816,7 +17816,7 @@
    0.9877
   ]
  },
- "assets/sprites/soil/patch-clean.png": {
+ "assets/sprites/soil/patch-clean.webp": {
   "animal": "patch-clean",
   "swf": "harvestable_resources/patch/patch.swf",
   "sprite": 0,
@@ -17848,7 +17848,7 @@
    0.9904
   ]
  },
- "assets/sprites/soil/patch-dug.png": {
+ "assets/sprites/soil/patch-dug.webp": {
   "animal": "patch-dug",
   "swf": "harvestable_resources/patch/patch.swf",
   "sprite": 0,
@@ -17880,7 +17880,7 @@
    0.9702
   ]
  },
- "assets/sprites/soil/patch-dark-dirty.png": {
+ "assets/sprites/soil/patch-dark-dirty.webp": {
   "animal": "patch-dark-dirty",
   "swf": "harvestable_resources/patch/patch_dark/patch_dark.swf",
   "sprite": 0,
@@ -17912,7 +17912,7 @@
    0.9894
   ]
  },
- "assets/sprites/soil/patch-dark-clean.png": {
+ "assets/sprites/soil/patch-dark-clean.webp": {
   "animal": "patch-dark-clean",
   "swf": "harvestable_resources/patch/patch_dark/patch_dark.swf",
   "sprite": 0,
@@ -17944,7 +17944,7 @@
    0.991
   ]
  },
- "assets/sprites/soil/patch-dark-dug.png": {
+ "assets/sprites/soil/patch-dark-dug.webp": {
   "animal": "patch-dark-dug",
   "swf": "harvestable_resources/patch/patch_dark/patch_dark.swf",
   "sprite": 0,
@@ -17976,7 +17976,7 @@
    0.9607
   ]
  },
- "assets/sprites/soil/patch-seedling.png": {
+ "assets/sprites/soil/patch-seedling.webp": {
   "animal": "patch-seedling",
   "swf": "harvestable_resources/patch_seedling/patch_seedling.swf",
   "sprite": 0,
@@ -18008,7 +18008,7 @@
    0.9859
   ]
  },
- "assets/sprites/cultivation/barnacle_pod.png": {
+ "assets/sprites/cultivation/barnacle_pod.webp": {
   "animal": "barnacle-pod",
   "swf": "harvestable_resources/barnacle_pod/barnacle_pod.swf",
   "sprite": 0,
@@ -18040,7 +18040,7 @@
    0.9935
   ]
  },
- "assets/sprites/cultivation/jellisac_mound.png": {
+ "assets/sprites/cultivation/jellisac_mound.webp": {
   "animal": "jellisac-mound",
   "swf": "harvestable_resources/jellisac_mound/jellisac_mound.swf",
   "sprite": 0,
@@ -18072,7 +18072,7 @@
    0.9958
   ]
  },
- "assets/sprites/resources/paper-tree-pet-false-water-false.png": {
+ "assets/sprites/resources/paper-tree-pet-false-water-false.webp": {
   "animal": "paper-tree-pet-false-water-false",
   "character": "paper-tree",
   "swf": "harvestable_resources/paper_tree/paper_tree.swf",
@@ -18126,7 +18126,7 @@
    0.977
   ]
  },
- "assets/sprites/resources/paper-tree-pet-true-water-false.png": {
+ "assets/sprites/resources/paper-tree-pet-true-water-false.webp": {
   "animal": "paper-tree-pet-true-water-false",
   "character": "paper-tree",
   "swf": "harvestable_resources/paper_tree/paper_tree.swf",
@@ -18180,7 +18180,7 @@
    0.9729
   ]
  },
- "assets/sprites/resources/paper-tree-pet-false-water-true.png": {
+ "assets/sprites/resources/paper-tree-pet-false-water-true.webp": {
   "animal": "paper-tree-pet-false-water-true",
   "character": "paper-tree",
   "swf": "harvestable_resources/paper_tree/paper_tree.swf",
@@ -18234,7 +18234,7 @@
    0.9765
   ]
  },
- "assets/sprites/resources/paper-tree-pet-true-water-true.png": {
+ "assets/sprites/resources/paper-tree-pet-true-water-true.webp": {
   "animal": "paper-tree-pet-true-water-true",
   "character": "paper-tree",
   "swf": "harvestable_resources/paper_tree/paper_tree.swf",
@@ -18288,7 +18288,7 @@
    0.9726
   ]
  },
- "assets/sprites/resources/mortar-barnacle-blister1.png": {
+ "assets/sprites/resources/mortar-barnacle-blister1.webp": {
   "animal": "mortar-barnacle-blister1",
   "character": "mortar-barnacle",
   "swf": "harvestable_resources/mortar_barnacle/mortar_barnacle.swf",
@@ -18326,7 +18326,7 @@
    0.9682
   ]
  },
- "assets/sprites/resources/mortar-barnacle-blister2.png": {
+ "assets/sprites/resources/mortar-barnacle-blister2.webp": {
   "animal": "mortar-barnacle-blister2",
   "character": "mortar-barnacle",
   "swf": "harvestable_resources/mortar_barnacle/mortar_barnacle.swf",
@@ -18364,7 +18364,7 @@
    0.9623
   ]
  },
- "assets/sprites/resources/mortar-barnacle-blister3.png": {
+ "assets/sprites/resources/mortar-barnacle-blister3.webp": {
   "animal": "mortar-barnacle-blister3",
   "character": "mortar-barnacle",
   "swf": "harvestable_resources/mortar_barnacle/mortar_barnacle.swf",
@@ -18402,7 +18402,7 @@
    0.9632
   ]
  },
- "assets/sprites/resources/mortar-barnacle-blister4.png": {
+ "assets/sprites/resources/mortar-barnacle-blister4.webp": {
   "animal": "mortar-barnacle-blister4",
   "character": "mortar-barnacle",
   "swf": "harvestable_resources/mortar_barnacle/mortar_barnacle.swf",
@@ -18440,7 +18440,7 @@
    0.9668
   ]
  },
- "assets/sprites/resources/mortar-barnacle-blister5.png": {
+ "assets/sprites/resources/mortar-barnacle-blister5.webp": {
   "animal": "mortar-barnacle-blister5",
   "character": "mortar-barnacle",
   "swf": "harvestable_resources/mortar_barnacle/mortar_barnacle.swf",
@@ -18478,7 +18478,7 @@
    0.9627
   ]
  },
- "assets/sprites/resources/mortar-barnacle-blister6.png": {
+ "assets/sprites/resources/mortar-barnacle-blister6.webp": {
   "animal": "mortar-barnacle-blister6",
   "character": "mortar-barnacle",
   "swf": "harvestable_resources/mortar_barnacle/mortar_barnacle.swf",
@@ -18516,7 +18516,7 @@
    0.9692
   ]
  },
- "assets/sprites/resources/ice-knob-knob1.png": {
+ "assets/sprites/resources/ice-knob-knob1.webp": {
   "animal": "ice-knob-knob1",
   "character": "ice-knob",
   "swf": "harvestable_resources/ice_knob/ice_knob.swf",
@@ -18555,7 +18555,7 @@
    0.9452
   ]
  },
- "assets/sprites/resources/ice-knob-knob2.png": {
+ "assets/sprites/resources/ice-knob-knob2.webp": {
   "animal": "ice-knob-knob2",
   "character": "ice-knob",
   "swf": "harvestable_resources/ice_knob/ice_knob.swf",
@@ -18594,7 +18594,7 @@
    0.9506
   ]
  },
- "assets/sprites/resources/ice-knob-knob3.png": {
+ "assets/sprites/resources/ice-knob-knob3.webp": {
   "animal": "ice-knob-knob3",
   "character": "ice-knob",
   "swf": "harvestable_resources/ice_knob/ice_knob.swf",
@@ -18633,7 +18633,7 @@
    0.961
   ]
  },
- "assets/sprites/resources/ice-knob-knob4.png": {
+ "assets/sprites/resources/ice-knob-knob4.webp": {
   "animal": "ice-knob-knob4",
   "character": "ice-knob",
   "swf": "harvestable_resources/ice_knob/ice_knob.swf",
@@ -18672,7 +18672,7 @@
    0.9482
   ]
  },
- "assets/sprites/resources/jellisac-jellysack1.png": {
+ "assets/sprites/resources/jellisac-jellysack1.webp": {
   "animal": "jellisac-jellysack1",
   "character": "jellisac",
   "swf": "harvestable_resources/jellisac/jellisac.swf",
@@ -18709,7 +18709,7 @@
    0.9801
   ]
  },
- "assets/sprites/resources/jellisac-jellysack2.png": {
+ "assets/sprites/resources/jellisac-jellysack2.webp": {
   "animal": "jellisac-jellysack2",
   "character": "jellisac",
   "swf": "harvestable_resources/jellisac/jellisac.swf",
@@ -18746,7 +18746,7 @@
    0.985
   ]
  },
- "assets/sprites/resources/jellisac-jellysack3.png": {
+ "assets/sprites/resources/jellisac-jellysack3.webp": {
   "animal": "jellisac-jellysack3",
   "character": "jellisac",
   "swf": "harvestable_resources/jellisac/jellisac.swf",
@@ -18783,7 +18783,7 @@
    0.9831
   ]
  },
- "assets/sprites/resources/jellisac-jellysack4.png": {
+ "assets/sprites/resources/jellisac-jellysack4.webp": {
   "animal": "jellisac-jellysack4",
   "character": "jellisac",
   "swf": "harvestable_resources/jellisac/jellisac.swf",
@@ -18820,7 +18820,7 @@
    0.9835
   ]
  },
- "assets/sprites/resources/dirt-pile-dirt1.png": {
+ "assets/sprites/resources/dirt-pile-dirt1.webp": {
   "animal": "dirt-pile-dirt1",
   "character": "dirt-pile",
   "swf": "harvestable_resources/dirt_pile/dirt_pile.swf",
@@ -18864,7 +18864,7 @@
    0.9669
   ]
  },
- "assets/sprites/resources/dirt-pile-dirt2.png": {
+ "assets/sprites/resources/dirt-pile-dirt2.webp": {
   "animal": "dirt-pile-dirt2",
   "character": "dirt-pile",
   "swf": "harvestable_resources/dirt_pile/dirt_pile.swf",
@@ -18908,7 +18908,7 @@
    0.957
   ]
  },
- "assets/sprites/resources/peat-1.png": {
+ "assets/sprites/resources/peat-1.webp": {
   "animal": "peat-1",
   "character": "peat",
   "swf": "harvestable_resources/peat_base/peat_1/peat_1.swf",
@@ -18945,7 +18945,7 @@
    0.977
   ]
  },
- "assets/sprites/resources/peat-2.png": {
+ "assets/sprites/resources/peat-2.webp": {
   "animal": "peat-2",
   "character": "peat",
   "swf": "harvestable_resources/peat_base/peat_2/peat_2.swf",
@@ -18982,7 +18982,7 @@
    0.9764
   ]
  },
- "assets/sprites/resources/peat-3.png": {
+ "assets/sprites/resources/peat-3.webp": {
   "animal": "peat-3",
   "character": "peat",
   "swf": "harvestable_resources/peat_base/peat_3/peat_3.swf",
@@ -19019,7 +19019,7 @@
    0.9824
   ]
  },
- "assets/sprites/wood_tree_maturity_6_variant_2_x6_1_png_1354833445.png": {
+ "assets/sprites/wood_tree_maturity_6_variant_2_x6_1_png_1354833445.webp": {
   "animal": "wood-tree",
   "swf": "harvestable_resources/wood_tree/wood_tree.swf",
   "sprite": 14,
@@ -19056,7 +19056,7 @@
    0.9648
   ]
  },
- "assets/sprites/mining/rock_metal.png": {
+ "assets/sprites/mining/rock_metal.webp": {
   "animal": "rock-metal",
   "swf": "harvestable_resources/rock_metal/rock_metal_1/rock_metal_1.swf",
   "sprite": 0,
@@ -19092,7 +19092,7 @@
    0.9659
   ]
  },
- "assets/sprites/mining/rock_dullite.png": {
+ "assets/sprites/mining/rock_dullite.webp": {
   "animal": "rock-dullite",
   "swf": "harvestable_resources/rock_dullite/rock_dullite_1/rock_dullite_1.swf",
   "sprite": 0,
@@ -19128,7 +19128,7 @@
    0.9862
   ]
  },
- "assets/sprites/mining/rock_beryl.png": {
+ "assets/sprites/mining/rock_beryl.webp": {
   "animal": "rock-beryl",
   "swf": "harvestable_resources/rock_beryl/rock_beryl_1/rock_beryl_1.swf",
   "sprite": 0,
@@ -19164,7 +19164,7 @@
    0.9826
   ]
  },
- "assets/sprites/mining/rock_sparkly.png": {
+ "assets/sprites/mining/rock_sparkly.webp": {
   "animal": "rock-sparkly",
   "swf": "harvestable_resources/rock_sparkly/rock_sparkly_1/rock_sparkly_1.swf",
   "sprite": 0,
@@ -23953,7 +23953,7 @@
    0.4222
   ]
  },
- "assets/sprites/seasons/pumpkin_lit_1_talk.png": {
+ "assets/sprites/seasons/pumpkin_lit_1_talk.webp": {
   "animal": "pumpkin-lit-1",
   "swf": "carved_pumpkins/pumpkin_lit_1/pumpkin_lit_1.swf",
   "sprite": 6,
@@ -24057,7 +24057,7 @@
    0.982
   ]
  },
- "assets/sprites/seasons/pumpkin_lit_2_talk.png": {
+ "assets/sprites/seasons/pumpkin_lit_2_talk.webp": {
   "animal": "pumpkin-lit-2",
   "swf": "carved_pumpkins/pumpkin_lit_2/pumpkin_lit_2.swf",
   "sprite": 8,
@@ -24161,7 +24161,7 @@
    0.9833
   ]
  },
- "assets/sprites/seasons/pumpkin_lit_3_talk.png": {
+ "assets/sprites/seasons/pumpkin_lit_3_talk.webp": {
   "animal": "pumpkin-lit-3",
   "swf": "carved_pumpkins/pumpkin_lit_3/pumpkin_lit_3.swf",
   "sprite": 9,
@@ -24265,7 +24265,7 @@
    0.9817
   ]
  },
- "assets/sprites/seasons/pumpkin_lit_4_talk.png": {
+ "assets/sprites/seasons/pumpkin_lit_4_talk.webp": {
   "animal": "pumpkin-lit-4",
   "swf": "carved_pumpkins/pumpkin_lit_4/pumpkin_lit_4.swf",
   "sprite": 8,
@@ -24369,7 +24369,7 @@
    0.9825
   ]
  },
- "assets/sprites/seasons/pumpkin_lit_5_talk.png": {
+ "assets/sprites/seasons/pumpkin_lit_5_talk.webp": {
   "animal": "pumpkin-lit-5",
   "swf": "carved_pumpkins/pumpkin_lit_5/pumpkin_lit_5.swf",
   "sprite": 8,
@@ -24473,7 +24473,7 @@
    0.9835
   ]
  },
- "assets/sprites/seasons/egghunt_egg_4_world.png": {
+ "assets/sprites/seasons/egghunt_egg_4_world.webp": {
   "animal": "egghunt-egg-4",
   "swf": "food/egghunt_egg_4/egghunt_egg_4.swf",
   "sprite": 0,
@@ -24504,7 +24504,7 @@
    0.9753
   ]
  },
- "assets/sprites/seasons/glitchmas_cracker_world.png": {
+ "assets/sprites/seasons/glitchmas_cracker_world.webp": {
   "animal": "glitchmas-cracker",
   "swf": "misc/glitchmas_cracker/glitchmas_cracker.swf",
   "sprite": 0,
@@ -29455,7 +29455,7 @@
    0.9859
   ]
  },
- "assets/sprites/mail-npc/dispatcher_left.png": {
+ "assets/sprites/mail-npc/dispatcher_left.webp": {
   "animal": "mail_dispatcher",
   "swf": "misc/npc/npc_mail_dispatcher/npc_mail_dispatcher.swf",
   "sprite": 28,
@@ -29623,7 +29623,7 @@
    0.9771
   ]
  },
- "assets/sprites/pet-rock/pet_rock_idle_fit.png": {
+ "assets/sprites/pet-rock/pet_rock_idle_fit.webp": {
   "animal": "pet_rock",
   "swf": "misc/pet_rock/pet_rock.swf",
   "sprite": 46,
@@ -29846,7 +29846,7 @@
    0.9821
   ]
  },
- "assets/sprites/mailbox/npc_mailbox_variant_mailboxRight_x1_idle_png_1354832227.png": {
+ "assets/sprites/mailbox/npc_mailbox_variant_mailboxRight_x1_idle_png_1354832227.webp": {
   "animal": "mailbox_right",
   "swf": "misc/npc/npc_mailbox/npc_mailbox.swf",
   "sprite": 81,
@@ -29878,7 +29878,7 @@
    0.9825
   ]
  },
- "assets/sprites/mailbox/npc_mailbox_variant_mailboxRight_x1_has_mail_idle_png_1354832230.png": {
+ "assets/sprites/mailbox/npc_mailbox_variant_mailboxRight_x1_has_mail_idle_png_1354832230.webp": {
   "animal": "mailbox_right",
   "swf": "misc/npc/npc_mailbox/npc_mailbox.swf",
   "sprite": 81,
@@ -32923,7 +32923,7 @@
    0.9745
   ]
  },
- "assets/sprites/tools/watering-can-tool.png": {
+ "assets/sprites/tools/watering-can-tool.webp": {
   "animal": "tool-watering-can",
   "swf": "tools/tool_base/watering_can/watering_can.swf",
   "sprite": 0,
@@ -32984,7 +32984,7 @@
    0.9846
   ]
  },
- "assets/sprites/tools/hatchet-tool.png": {
+ "assets/sprites/tools/hatchet-tool.webp": {
   "animal": "tool-hatchet",
   "swf": "tools/tool_base/hatchet/hatchet.swf",
   "sprite": 0,
@@ -33053,7 +33053,7 @@
    0.9841
   ]
  },
- "assets/sprites/tools/class-axe-tool.png": {
+ "assets/sprites/tools/class-axe-tool.webp": {
   "animal": "tool-class-axe",
   "swf": "tools/hatchet/class_axe/class_axe.swf",
   "sprite": 0,
@@ -33122,7 +33122,7 @@
    0.9736
   ]
  },
- "assets/sprites/making/irrigator_9000-tool.png": {
+ "assets/sprites/making/irrigator_9000-tool.webp": {
   "animal": "tool-irrigator",
   "swf": "tools/watering_can/irrigator_9000/irrigator_9000.swf",
   "sprite": 0,
@@ -33183,7 +33183,7 @@
    0.9835
   ]
  },
- "assets/sprites/soil/hoe-tool.png": {
+ "assets/sprites/soil/hoe-tool.webp": {
   "animal": "tool-hoe",
   "swf": "tools/tool_base/hoe/hoe.swf",
   "sprite": 0,
@@ -33244,7 +33244,7 @@
    0.9675
   ]
  },
- "assets/sprites/soil/high-class-hoe-tool.png": {
+ "assets/sprites/soil/high-class-hoe-tool.webp": {
   "animal": "tool-high-class-hoe",
   "swf": "tools/hoe/high_class_hoe/high_class_hoe.swf",
   "sprite": 0,
@@ -33305,7 +33305,7 @@
    0.9598
   ]
  },
- "assets/sprites/soil/shovel-tool.png": {
+ "assets/sprites/soil/shovel-tool.webp": {
   "animal": "tool-shovel",
   "swf": "tools/tool_base/shovel/shovel.swf",
   "sprite": 0,
@@ -34064,7 +34064,7 @@
    0.9771
   ]
  },
- "assets/sprites/parties/teleporter_visible_portal.png": {
+ "assets/sprites/parties/teleporter_visible_portal.webp": {
   "animal": "teleporter-visible",
   "swf": "misc/teleporter_visible/teleporter_ground/teleporter_ground.swf",
   "sprite": 8,
@@ -34109,7 +34109,7 @@
    0.3449
   ]
  },
- "assets/sprites/parties/teleporter_visible_disappear.png": {
+ "assets/sprites/parties/teleporter_visible_disappear.webp": {
   "animal": "teleporter-visible",
   "swf": "misc/teleporter_visible/teleporter_ground/teleporter_ground.swf",
   "sprite": 8,
@@ -34153,7 +34153,7 @@
    1
   ]
  },
- "assets/sprites/street-furniture/visiting-stone.png": {
+ "assets/sprites/street-furniture/visiting-stone.webp": {
   "animal": "visiting-stone",
   "swf": "misc/visiting_stone/visiting_stone.swf",
   "sprite": 0,
@@ -34185,7 +34185,7 @@
    0.9858
   ]
  },
- "assets/sprites/street-furniture/note-world.png": {
+ "assets/sprites/street-furniture/note-world.webp": {
   "animal": "note-world",
   "swf": "misc/note/note.swf",
   "sprite": 0,
@@ -34217,7 +34217,7 @@
    0.9621
   ]
  },
- "assets/sprites/street-furniture/gift-box-wrapped.png": {
+ "assets/sprites/street-furniture/gift-box-wrapped.webp": {
   "animal": "gift-box-wrapped",
   "swf": "misc/bag_gift_box/bag_gift_box_wrapped/bag_gift_box_wrapped.swf",
   "sprite": 0,
@@ -34242,14 +34242,14 @@
   "faintMin": 1,
   "drift": [],
   "status": "ok",
-  "hires": "assets/sprites/street-furniture/gift-box-wrapped@3x.png",
-  "bytes": 10392,
+  "hires": "assets/sprites/street-furniture/gift-box-wrapped@3x.webp",
+  "bytes": 8478,
   "firstDraw": true,
   "frameScores": [
    0.9761
   ]
  },
- "assets/sprites/street-furniture/gift-box-open.png": {
+ "assets/sprites/street-furniture/gift-box-open.webp": {
   "animal": "gift-box-open",
   "swf": "misc/bag_generic/bag_gift_box/bag_gift_box.swf",
   "sprite": 0,
@@ -34281,7 +34281,7 @@
    0.9837
   ]
  },
- "assets/sprites/street-furniture/notice-board-m0.png": {
+ "assets/sprites/street-furniture/notice-board-m0.webp": {
   "animal": "notice-board",
   "swf": "misc/bag_notice_board/bag_notice_board.swf",
   "sprite": 13,
@@ -34313,7 +34313,7 @@
    0.992
   ]
  },
- "assets/sprites/street-furniture/notice-board-m1.png": {
+ "assets/sprites/street-furniture/notice-board-m1.webp": {
   "animal": "notice-board",
   "swf": "misc/bag_notice_board/bag_notice_board.swf",
   "sprite": 13,
@@ -34345,7 +34345,7 @@
    0.9918
   ]
  },
- "assets/sprites/street-furniture/notice-board-m2.png": {
+ "assets/sprites/street-furniture/notice-board-m2.webp": {
   "animal": "notice-board",
   "swf": "misc/bag_notice_board/bag_notice_board.swf",
   "sprite": 13,
@@ -34377,7 +34377,7 @@
    0.9915
   ]
  },
- "assets/sprites/street-furniture/notice-board-m3.png": {
+ "assets/sprites/street-furniture/notice-board-m3.webp": {
   "animal": "notice-board",
   "swf": "misc/bag_notice_board/bag_notice_board.swf",
   "sprite": 13,
@@ -34409,7 +34409,7 @@
    0.9914
   ]
  },
- "assets/sprites/street-furniture/notice-board-m4.png": {
+ "assets/sprites/street-furniture/notice-board-m4.webp": {
   "animal": "notice-board",
   "swf": "misc/bag_notice_board/bag_notice_board.swf",
   "sprite": 13,
@@ -34441,7 +34441,7 @@
    0.9911
   ]
  },
- "assets/sprites/street-furniture/notice-board-m5.png": {
+ "assets/sprites/street-furniture/notice-board-m5.webp": {
   "animal": "notice-board",
   "swf": "misc/bag_notice_board/bag_notice_board.swf",
   "sprite": 13,
@@ -34473,7 +34473,7 @@
    0.9908
   ]
  },
- "assets/sprites/street-furniture/notice-board-m6.png": {
+ "assets/sprites/street-furniture/notice-board-m6.webp": {
   "animal": "notice-board",
   "swf": "misc/bag_notice_board/bag_notice_board.swf",
   "sprite": 13,
@@ -34505,7 +34505,7 @@
    0.9905
   ]
  },
- "assets/sprites/street-furniture/notice-board-m7.png": {
+ "assets/sprites/street-furniture/notice-board-m7.webp": {
   "animal": "notice-board",
   "swf": "misc/bag_notice_board/bag_notice_board.swf",
   "sprite": 13,
@@ -34537,7 +34537,7 @@
    0.9904
   ]
  },
- "assets/sprites/street-furniture/notice-board-m8.png": {
+ "assets/sprites/street-furniture/notice-board-m8.webp": {
   "animal": "notice-board",
   "swf": "misc/bag_notice_board/bag_notice_board.swf",
   "sprite": 13,
@@ -34569,7 +34569,7 @@
    0.9903
   ]
  },
- "assets/sprites/street-furniture/notice-board-m9.png": {
+ "assets/sprites/street-furniture/notice-board-m9.webp": {
   "animal": "notice-board",
   "swf": "misc/bag_notice_board/bag_notice_board.swf",
   "sprite": 13,
@@ -34601,7 +34601,7 @@
    0.9902
   ]
  },
- "assets/sprites/street-furniture/notice-board-m10.png": {
+ "assets/sprites/street-furniture/notice-board-m10.webp": {
   "animal": "notice-board",
   "swf": "misc/bag_notice_board/bag_notice_board.swf",
   "sprite": 13,
@@ -34633,7 +34633,7 @@
    0.9901
   ]
  },
- "assets/sprites/street-furniture/mailbox-left-idle.png": {
+ "assets/sprites/street-furniture/mailbox-left-idle.webp": {
   "animal": "mailbox-left",
   "swf": "misc/npc/npc_mailbox/npc_mailbox.swf",
   "sprite": 28,
@@ -34665,7 +34665,7 @@
    0.9857
   ]
  },
- "assets/sprites/street-furniture/mailbox-left-has-mail-idle.png": {
+ "assets/sprites/street-furniture/mailbox-left-has-mail-idle.webp": {
   "animal": "mailbox-left",
   "swf": "misc/npc/npc_mailbox/npc_mailbox.swf",
   "sprite": 28,
@@ -34697,7 +34697,7 @@
    0.9853
   ]
  },
- "assets/sprites/street-furniture/mailbox-left-has-mail.png": {
+ "assets/sprites/street-furniture/mailbox-left-has-mail.webp": {
   "animal": "mailbox-left",
   "swf": "misc/npc/npc_mailbox/npc_mailbox.swf",
   "sprite": 28,
@@ -34801,7 +34801,7 @@
    0.9813
   ]
  },
- "assets/sprites/street-furniture/mailbox-left-interact.png": {
+ "assets/sprites/street-furniture/mailbox-left-interact.webp": {
   "animal": "mailbox-left",
   "swf": "misc/npc/npc_mailbox/npc_mailbox.swf",
   "sprite": 28,
@@ -34841,7 +34841,7 @@
    0.9843
   ]
  },
- "assets/sprites/street-furniture/mailbox-left-all-done.png": {
+ "assets/sprites/street-furniture/mailbox-left-all-done.webp": {
   "animal": "mailbox-left",
   "swf": "misc/npc/npc_mailbox/npc_mailbox.swf",
   "sprite": 28,
@@ -34894,7 +34894,7 @@
    0.9857
   ]
  },
- "assets/sprites/furniture/bag_furniture_sdb.png": {
+ "assets/sprites/furniture/bag_furniture_sdb.webp": {
   "animal": "bag_furniture_sdb",
   "swf": "furniture/furniture_base/bag_furniture_sdb/bag_furniture_sdb.swf",
   "sprite": 0,
@@ -34926,7 +34926,7 @@
    0.9865
   ]
  },
- "assets/sprites/furniture/furniture_armchair.png": {
+ "assets/sprites/furniture/furniture_armchair.webp": {
   "animal": "furniture_armchair",
   "swf": "furniture/furniture_base/furniture_armchair/furniture_armchair.swf",
   "sprite": 0,
@@ -34958,7 +34958,7 @@
    0.9894
   ]
  },
- "assets/sprites/furniture/furniture_bed.png": {
+ "assets/sprites/furniture/furniture_bed.webp": {
   "animal": "furniture_bed",
   "swf": "furniture/furniture_base/furniture_bed/furniture_bed.swf",
   "sprite": 0,
@@ -34990,7 +34990,7 @@
    0.9724
   ]
  },
- "assets/sprites/furniture/furniture_bench.png": {
+ "assets/sprites/furniture/furniture_bench.webp": {
   "animal": "furniture_bench",
   "swf": "furniture/furniture_base/furniture_bench/furniture_bench.swf",
   "sprite": 0,
@@ -35022,7 +35022,7 @@
    0.9563
   ]
  },
- "assets/sprites/furniture/furniture_bookcase.png": {
+ "assets/sprites/furniture/furniture_bookcase.webp": {
   "animal": "furniture_bookcase",
   "swf": "furniture/furniture_base/furniture_bookcase/furniture_bookcase.swf",
   "sprite": 0,
@@ -35054,7 +35054,7 @@
    0.9847
   ]
  },
- "assets/sprites/furniture/furniture_cabinet.png": {
+ "assets/sprites/furniture/furniture_cabinet.webp": {
   "animal": "furniture_cabinet",
   "swf": "furniture/furniture_base/furniture_cabinet/furniture_cabinet.swf",
   "sprite": 0,
@@ -35086,7 +35086,7 @@
    0.9948
   ]
  },
- "assets/sprites/furniture/furniture_ceilingdeco.png": {
+ "assets/sprites/furniture/furniture_ceilingdeco.webp": {
   "animal": "furniture_ceilingdeco",
   "swf": "furniture/furniture_base/furniture_ceilingdeco/furniture_ceilingdeco.swf",
   "sprite": 0,
@@ -35118,7 +35118,7 @@
    0.9796
   ]
  },
- "assets/sprites/furniture/furniture_ceilinglamp.png": {
+ "assets/sprites/furniture/furniture_ceilinglamp.webp": {
   "animal": "furniture_ceilinglamp",
   "swf": "furniture/furniture_base/furniture_ceilinglamp/furniture_ceilinglamp.swf",
   "sprite": 0,
@@ -35150,7 +35150,7 @@
    0.9807
   ]
  },
- "assets/sprites/furniture/furniture_chair.png": {
+ "assets/sprites/furniture/furniture_chair.webp": {
   "animal": "furniture_chair",
   "swf": "furniture/furniture_base/furniture_chair/furniture_chair.swf",
   "sprite": 0,
@@ -35182,7 +35182,7 @@
    0.9317
   ]
  },
- "assets/sprites/furniture/furniture_coffeetable.png": {
+ "assets/sprites/furniture/furniture_coffeetable.webp": {
   "animal": "furniture_coffeetable",
   "swf": "furniture/furniture_base/furniture_coffeetable/furniture_coffeetable.swf",
   "sprite": 0,
@@ -35214,7 +35214,7 @@
    0.9885
   ]
  },
- "assets/sprites/furniture/furniture_counter.png": {
+ "assets/sprites/furniture/furniture_counter.webp": {
   "animal": "furniture_counter",
   "swf": "furniture/furniture_base/furniture_counter/furniture_counter.swf",
   "sprite": 0,
@@ -35246,7 +35246,7 @@
    0.9565
   ]
  },
- "assets/sprites/furniture/furniture_desk.png": {
+ "assets/sprites/furniture/furniture_desk.webp": {
   "animal": "furniture_desk",
   "swf": "furniture/furniture_base/furniture_desk/furniture_desk.swf",
   "sprite": 0,
@@ -35278,7 +35278,7 @@
    0.9809
   ]
  },
- "assets/sprites/furniture/furniture_floorlamp.png": {
+ "assets/sprites/furniture/furniture_floorlamp.webp": {
   "animal": "furniture_floorlamp",
   "swf": "furniture/furniture_base/furniture_floorlamp/furniture_floorlamp.swf",
   "sprite": 0,
@@ -35310,7 +35310,7 @@
    0.9697
   ]
  },
- "assets/sprites/furniture/furniture_lamp.png": {
+ "assets/sprites/furniture/furniture_lamp.webp": {
   "animal": "furniture_lamp",
   "swf": "furniture/furniture_base/furniture_lamp/furniture_lamp.swf",
   "sprite": 0,
@@ -35342,7 +35342,7 @@
    0.9791
   ]
  },
- "assets/sprites/furniture/furniture_largebackfloordeco.png": {
+ "assets/sprites/furniture/furniture_largebackfloordeco.webp": {
   "animal": "furniture_largebackfloordeco",
   "swf": "furniture/furniture_base/furniture_largebackfloordeco/furniture_largebackfloordeco.swf",
   "sprite": 0,
@@ -35374,7 +35374,7 @@
    0.9561
   ]
  },
- "assets/sprites/furniture/furniture_largefrontfloordeco.png": {
+ "assets/sprites/furniture/furniture_largefrontfloordeco.webp": {
   "animal": "furniture_largefrontfloordeco",
   "swf": "furniture/furniture_base/furniture_largefrontfloordeco/furniture_largefrontfloordeco.swf",
   "sprite": 0,
@@ -35406,7 +35406,7 @@
    0.9487
   ]
  },
- "assets/sprites/furniture/furniture_largetabledeco.png": {
+ "assets/sprites/furniture/furniture_largetabledeco.webp": {
   "animal": "furniture_largetabledeco",
   "swf": "furniture/furniture_base/furniture_largetabledeco/furniture_largetabledeco.swf",
   "sprite": 0,
@@ -35438,7 +35438,7 @@
    0.9614
   ]
  },
- "assets/sprites/furniture/furniture_largewalldeco.png": {
+ "assets/sprites/furniture/furniture_largewalldeco.webp": {
   "animal": "furniture_largewalldeco",
   "swf": "furniture/furniture_base/furniture_largewalldeco/furniture_largewalldeco.swf",
   "sprite": 0,
@@ -35470,7 +35470,7 @@
    0.9681
   ]
  },
- "assets/sprites/furniture/furniture_largewindow.png": {
+ "assets/sprites/furniture/furniture_largewindow.webp": {
   "animal": "furniture_largewindow",
   "swf": "furniture/furniture_base/furniture_largewindow/furniture_largewindow.swf",
   "sprite": 0,
@@ -35502,7 +35502,7 @@
    0.9944
   ]
  },
- "assets/sprites/furniture/furniture_loveseat.png": {
+ "assets/sprites/furniture/furniture_loveseat.webp": {
   "animal": "furniture_loveseat",
   "swf": "furniture/furniture_base/furniture_loveseat/furniture_loveseat.swf",
   "sprite": 0,
@@ -35534,7 +35534,7 @@
    0.9763
   ]
  },
- "assets/sprites/furniture/furniture_painting.png": {
+ "assets/sprites/furniture/furniture_painting.webp": {
   "animal": "furniture_painting",
   "swf": "furniture/furniture_base/furniture_painting/furniture_painting.swf",
   "sprite": 0,
@@ -35566,7 +35566,7 @@
    0.9892
   ]
  },
- "assets/sprites/furniture/furniture_roomdeco.png": {
+ "assets/sprites/furniture/furniture_roomdeco.webp": {
   "animal": "furniture_roomdeco",
   "swf": "furniture/furniture_base/furniture_roomdeco/furniture_roomdeco.swf",
   "sprite": 0,
@@ -35598,7 +35598,7 @@
    0.9562
   ]
  },
- "assets/sprites/furniture/furniture_rug.png": {
+ "assets/sprites/furniture/furniture_rug.webp": {
   "animal": "furniture_rug",
   "swf": "furniture/furniture_base/furniture_rug/furniture_rug.swf",
   "sprite": 0,
@@ -35630,7 +35630,7 @@
    0.9908
   ]
  },
- "assets/sprites/furniture/furniture_shelf.png": {
+ "assets/sprites/furniture/furniture_shelf.webp": {
   "animal": "furniture_shelf",
   "swf": "furniture/furniture_base/furniture_shelf/furniture_shelf.swf",
   "sprite": 0,
@@ -35662,7 +35662,7 @@
    0.9775
   ]
  },
- "assets/sprites/furniture/furniture_sidetable.png": {
+ "assets/sprites/furniture/furniture_sidetable.webp": {
   "animal": "furniture_sidetable",
   "swf": "furniture/furniture_base/furniture_sidetable/furniture_sidetable.swf",
   "sprite": 0,
@@ -35694,7 +35694,7 @@
    0.9698
   ]
  },
- "assets/sprites/furniture/furniture_smallbackfloordeco.png": {
+ "assets/sprites/furniture/furniture_smallbackfloordeco.webp": {
   "animal": "furniture_smallbackfloordeco",
   "swf": "furniture/furniture_base/furniture_smallbackfloordeco/furniture_smallbackfloordeco.swf",
   "sprite": 0,
@@ -35726,7 +35726,7 @@
    0.9549
   ]
  },
- "assets/sprites/furniture/furniture_smallfrontfloordeco.png": {
+ "assets/sprites/furniture/furniture_smallfrontfloordeco.webp": {
   "animal": "furniture_smallfrontfloordeco",
   "swf": "furniture/furniture_base/furniture_smallfrontfloordeco/furniture_smallfrontfloordeco.swf",
   "sprite": 0,
@@ -35758,7 +35758,7 @@
    0.9536
   ]
  },
- "assets/sprites/furniture/furniture_smalltabledeco.png": {
+ "assets/sprites/furniture/furniture_smalltabledeco.webp": {
   "animal": "furniture_smalltabledeco",
   "swf": "furniture/furniture_base/furniture_smalltabledeco/furniture_smalltabledeco.swf",
   "sprite": 0,
@@ -35790,7 +35790,7 @@
    0.9375
   ]
  },
- "assets/sprites/furniture/furniture_smallwalldeco.png": {
+ "assets/sprites/furniture/furniture_smallwalldeco.webp": {
   "animal": "furniture_smallwalldeco",
   "swf": "furniture/furniture_base/furniture_smallwalldeco/furniture_smallwalldeco.swf",
   "sprite": 0,
@@ -35822,7 +35822,7 @@
    0.9777
   ]
  },
- "assets/sprites/furniture/furniture_smallwindow.png": {
+ "assets/sprites/furniture/furniture_smallwindow.webp": {
   "animal": "furniture_smallwindow",
   "swf": "furniture/furniture_base/furniture_smallwindow/furniture_smallwindow.swf",
   "sprite": 0,
@@ -35854,7 +35854,7 @@
    0.99
   ]
  },
- "assets/sprites/furniture/furniture_sofa.png": {
+ "assets/sprites/furniture/furniture_sofa.webp": {
   "animal": "furniture_sofa",
   "swf": "furniture/furniture_base/furniture_sofa/furniture_sofa.swf",
   "sprite": 0,
@@ -35886,7 +35886,7 @@
    0.986
   ]
  },
- "assets/sprites/furniture/furniture_stool.png": {
+ "assets/sprites/furniture/furniture_stool.webp": {
   "animal": "furniture_stool",
   "swf": "furniture/furniture_base/furniture_stool/furniture_stool.swf",
   "sprite": 0,
@@ -35918,7 +35918,7 @@
    0.9724
   ]
  },
- "assets/sprites/furniture/furniture_table.png": {
+ "assets/sprites/furniture/furniture_table.webp": {
   "animal": "furniture_table",
   "swf": "furniture/furniture_base/furniture_table/furniture_table.swf",
   "sprite": 0,
@@ -35950,7 +35950,7 @@
    0.9822
   ]
  },
- "assets/sprites/furniture/furniture_tabledeco.png": {
+ "assets/sprites/furniture/furniture_tabledeco.webp": {
   "animal": "furniture_tabledeco",
   "swf": "furniture/furniture_base/furniture_tabledeco/furniture_tabledeco.swf",
   "sprite": 0,
@@ -35982,7 +35982,7 @@
    0.9441
   ]
  },
- "assets/sprites/furniture/furniture_tablelamp.png": {
+ "assets/sprites/furniture/furniture_tablelamp.webp": {
   "animal": "furniture_tablelamp",
   "swf": "furniture/furniture_base/furniture_tablelamp/furniture_tablelamp.swf",
   "sprite": 0,
@@ -36014,7 +36014,7 @@
    0.9778
   ]
  },
- "assets/sprites/furniture/furniture_walldeco.png": {
+ "assets/sprites/furniture/furniture_walldeco.webp": {
   "animal": "furniture_walldeco",
   "swf": "furniture/furniture_base/furniture_walldeco/furniture_walldeco.swf",
   "sprite": 0,
@@ -36046,7 +36046,7 @@
    0.9777
   ]
  },
- "assets/sprites/furniture/furniture_walldecor.png": {
+ "assets/sprites/furniture/furniture_walldecor.webp": {
   "animal": "furniture_walldecor",
   "swf": "furniture/furniture_base/furniture_walldecor/furniture_walldecor.swf",
   "sprite": 0,
@@ -36078,7 +36078,7 @@
    0.9777
   ]
  },
- "assets/sprites/furniture/furniture_walllamp.png": {
+ "assets/sprites/furniture/furniture_walllamp.webp": {
   "animal": "furniture_walllamp",
   "swf": "furniture/furniture_base/furniture_walllamp/furniture_walllamp.swf",
   "sprite": 0,
@@ -36110,7 +36110,7 @@
    0.9824
   ]
  },
- "assets/sprites/furniture/bag_furniture_cabinet.png": {
+ "assets/sprites/furniture/bag_furniture_cabinet.webp": {
   "animal": "bag_furniture_cabinet",
   "swf": "furniture/bag_furniture_cabinet_base/bag_furniture_cabinet/bag_furniture_cabinet.swf",
   "sprite": 0,
@@ -36142,7 +36142,7 @@
    0.9921
   ]
  },
- "assets/sprites/furniture/bag_furniture_largecabinet.png": {
+ "assets/sprites/furniture/bag_furniture_largecabinet.webp": {
   "animal": "bag_furniture_largecabinet",
   "swf": "furniture/bag_furniture_cabinet_base/bag_furniture_largecabinet/furniture_largecabinet.swf",
   "sprite": 0,
@@ -36174,7 +36174,7 @@
    0.9948
   ]
  },
- "assets/sprites/furniture/bag_furniture_smallcabinet.png": {
+ "assets/sprites/furniture/bag_furniture_smallcabinet.webp": {
   "animal": "bag_furniture_smallcabinet",
   "swf": "furniture/bag_furniture_cabinet_base/bag_furniture_smallcabinet/bag_furniture_smallcabinet.swf",
   "sprite": 0,
@@ -36206,7 +36206,7 @@
    0.9905
   ]
  },
- "assets/sprites/furniture/bag_furniture_wallcabinet.png": {
+ "assets/sprites/furniture/bag_furniture_wallcabinet.webp": {
   "animal": "bag_furniture_wallcabinet",
   "swf": "furniture/bag_furniture_cabinet_base/bag_furniture_wallcabinet/bag_furniture_wallcabinet.swf",
   "sprite": 0,
@@ -36238,7 +36238,7 @@
    0.9874
   ]
  },
- "assets/sprites/street-jobs/sign_stake.png": {
+ "assets/sprites/street-jobs/sign_stake.webp": {
   "animal": "sign-stake",
   "swf": "misc/sign_stake/sign_stake.swf",
   "sprite": 0,
@@ -36270,7 +36270,7 @@
    0.9552
   ]
  },
- "assets/sprites/parties/party_atm.png": {
+ "assets/sprites/parties/party_atm.webp": {
   "animal": "party-atm",
   "swf": "misc/npc/party_atm/party_atm.swf",
   "sprite": 0,
@@ -36302,7 +36302,7 @@
    0.9658
   ]
  },
- "assets/sprites/quests/rook-museum/rook_hall_speaker__x1_stop_png_1354835940.png": {
+ "assets/sprites/quests/rook-museum/rook_hall_speaker__x1_stop_png_1354835940.webp": {
   "animal": "rook-hall-speaker",
   "swf": "quest_items/rook_hall_speaker/rook_hall_speaker.swf",
   "sprite": 166,
@@ -36334,7 +36334,7 @@
    0.9784
   ]
  },
- "assets/sprites/butler/butler_box.png": {
+ "assets/sprites/butler/butler_box.webp": {
   "animal": "butler-box",
   "swf": "misc/butler_box/butler_box.swf",
   "sprite": 0,
@@ -36366,7 +36366,7 @@
    0.9936
   ]
  },
- "assets/sprites/npc_butterfly__x1_fly-side_png_1354829525.png": {
+ "assets/sprites/npc_butterfly__x1_fly-side_png_1354829525.webp": {
   "animal": "butterfly",
   "swf": "misc/npc/npc_butterfly/npc_butterfly.swf",
   "sprite": 8,
@@ -36481,7 +36481,7 @@
    0.9644
   ]
  },
- "assets/sprites/npc_butterfly__x1_rest-angle1_png_1354829530.png": {
+ "assets/sprites/npc_butterfly__x1_rest-angle1_png_1354829530.webp": {
   "animal": "butterfly-rest",
   "swf": "misc/npc/npc_butterfly/npc_butterfly.swf",
   "sprite": 10,
@@ -36518,7 +36518,7 @@
    0.9507
   ]
  },
- "assets/sprites/rooks/butterfly-fly-rooked.png": {
+ "assets/sprites/rooks/butterfly-fly-rooked.webp": {
   "animal": "rooked-butterfly",
   "swf": "misc/npc/npc_butterfly/npc_butterfly.swf",
   "sprite": 9,
@@ -36564,7 +36564,7 @@
    0.94
   ]
  },
- "assets/sprites/rooks/butterfly-rest-rooked.png": {
+ "assets/sprites/rooks/butterfly-rest-rooked.webp": {
   "animal": "rooked-butterfly",
   "swf": "misc/npc/npc_butterfly/npc_butterfly.swf",
   "sprite": 9,
@@ -36597,7 +36597,7 @@
    0.94
   ]
  },
- "assets/sprites/quest-rooms/gwendolyn/swoonerfly_fall.png": {
+ "assets/sprites/quest-rooms/gwendolyn/swoonerfly_fall.webp": {
   "animal": "rooked-butterfly",
   "swf": "misc/npc/npc_butterfly/npc_butterfly.swf",
   "sprite": 9,
@@ -36643,7 +36643,7 @@
    0.94
   ]
  },
- "assets/sprites/quest-rooms/gwendolyn/swoonerfly_rest.png": {
+ "assets/sprites/quest-rooms/gwendolyn/swoonerfly_rest.webp": {
   "animal": "rooked-butterfly",
   "swf": "misc/npc/npc_butterfly/npc_butterfly.swf",
   "sprite": 9,
@@ -36676,7 +36676,7 @@
    0.94
   ]
  },
- "assets/sprites/npc_piggy__x1_chew_png_1354829433.png": {
+ "assets/sprites/npc_piggy__x1_chew_png_1354829433.webp": {
   "animal": "piggy",
   "swf": "inhabitants/piggy/npc_piggy.swf",
   "sprite": 79,
@@ -36760,7 +36760,7 @@
    0.9827
   ]
  },
- "assets/sprites/npc_piggy__x1_too_much_nibble_png_1354829441.png": {
+ "assets/sprites/npc_piggy__x1_too_much_nibble_png_1354829441.webp": {
   "animal": "piggy",
   "swf": "inhabitants/piggy/npc_piggy.swf",
   "sprite": 79,
@@ -36856,7 +36856,7 @@
    0.9858
   ]
  },
- "assets/sprites/animals/npc_chicken_sit.png": {
+ "assets/sprites/animals/npc_chicken_sit.webp": {
   "animal": "chicken",
   "swf": "inhabitants/chicken/npc_chicken.swf",
   "sprite": 183,
@@ -36907,7 +36907,7 @@
    0.9726
   ]
  },
- "assets/sprites/hell/bunch_of_grapes_hell-world.png": {
+ "assets/sprites/hell/bunch_of_grapes_hell-world.webp": {
   "animal": "hell-grapes-world",
   "swf": "misc/bunch_of_grapes_hell/bunch_of_grapes_hell.swf",
   "sprite": 0,
@@ -36942,7 +36942,7 @@
    0.9734
   ]
  },
- "assets/sprites/small-items/funpickle_1.png": {
+ "assets/sprites/small-items/funpickle_1.webp": {
   "animal": "funpickle-still",
   "swf": "misc/special_item_that_only_beta_testers_get/special_item_that_only_beta_testers_get.swf",
   "sprite": 4,
@@ -36974,7 +36974,7 @@
    0.9637
   ]
  },
- "assets/sprites/resources/dust-trap-idle.png": {
+ "assets/sprites/resources/dust-trap-idle.webp": {
   "animal": "dust-trap",
   "swf": "misc/dust_trap/dust_trap.swf",
   "sprite": 93,
@@ -37006,7 +37006,7 @@
    0.967
   ]
  },
- "assets/sprites/resources/dust-trap-smack-down.png": {
+ "assets/sprites/resources/dust-trap-smack-down.webp": {
   "animal": "dust-trap",
   "swf": "misc/dust_trap/dust_trap.swf",
   "sprite": 93,
@@ -37031,8 +37031,8 @@
   "faintMin": 1,
   "drift": [],
   "status": "ok",
-  "hires": "assets/sprites/resources/dust-trap-smack-down@3x.png",
-  "bytes": 1921625,
+  "hires": "assets/sprites/resources/dust-trap-smack-down@3x.webp",
+  "bytes": 1789088,
   "firstDraw": true,
   "frameScores": [
    0.967,
@@ -37082,7 +37082,7 @@
    0.9679
   ]
  },
- "assets/sprites/resources/dust-trap-down.png": {
+ "assets/sprites/resources/dust-trap-down.webp": {
   "animal": "dust-trap",
   "swf": "misc/dust_trap/dust_trap.swf",
   "sprite": 93,
@@ -37114,7 +37114,7 @@
    0.9679
   ]
  },
- "assets/sprites/resources/dust-trap-up.png": {
+ "assets/sprites/resources/dust-trap-up.webp": {
   "animal": "dust-trap",
   "swf": "misc/dust_trap/dust_trap.swf",
   "sprite": 93,
@@ -37161,7 +37161,7 @@
    0.967
   ]
  },
- "assets/sprites/resources/firefly-jar-0-closed.png": {
+ "assets/sprites/resources/firefly-jar-0-closed.webp": {
   "animal": "firefly-jar-0",
   "character": "firefly-jar",
   "swf": "misc/firefly_jar/firefly_jar.swf",
@@ -37209,7 +37209,7 @@
    0.9497
   ]
  },
- "assets/sprites/resources/firefly-jar-0-opening.png": {
+ "assets/sprites/resources/firefly-jar-0-opening.webp": {
   "animal": "firefly-jar-0",
   "character": "firefly-jar",
   "swf": "misc/firefly_jar/firefly_jar.swf",
@@ -37257,7 +37257,7 @@
    0.9392
   ]
  },
- "assets/sprites/resources/firefly-jar-0-open.png": {
+ "assets/sprites/resources/firefly-jar-0-open.webp": {
   "animal": "firefly-jar-0",
   "character": "firefly-jar",
   "swf": "misc/firefly_jar/firefly_jar.swf",
@@ -37305,7 +37305,7 @@
    0.9392
   ]
  },
- "assets/sprites/resources/firefly-jar-0-closing.png": {
+ "assets/sprites/resources/firefly-jar-0-closing.webp": {
   "animal": "firefly-jar-0",
   "character": "firefly-jar",
   "swf": "misc/firefly_jar/firefly_jar.swf",
@@ -37353,7 +37353,7 @@
    0.9497
   ]
  },
- "assets/sprites/resources/firefly-jar-1-closed.png": {
+ "assets/sprites/resources/firefly-jar-1-closed.webp": {
   "animal": "firefly-jar-1",
   "character": "firefly-jar",
   "swf": "misc/firefly_jar/firefly_jar.swf",
@@ -37380,8 +37380,8 @@
   "faintMin": 1,
   "drift": [],
   "status": "ok",
-  "hires": "assets/sprites/resources/firefly-jar-1-closed@3x.png",
-  "bytes": 65997,
+  "hires": "assets/sprites/resources/firefly-jar-1-closed@3x.webp",
+  "bytes": 63598,
   "firstDraw": true,
   "frameScores": [
    0.9486,
@@ -37401,7 +37401,7 @@
    0.9497
   ]
  },
- "assets/sprites/resources/firefly-jar-1-opening.png": {
+ "assets/sprites/resources/firefly-jar-1-opening.webp": {
   "animal": "firefly-jar-1",
   "character": "firefly-jar",
   "swf": "misc/firefly_jar/firefly_jar.swf",
@@ -37428,8 +37428,8 @@
   "faintMin": 1,
   "drift": [],
   "status": "ok",
-  "hires": "assets/sprites/resources/firefly-jar-1-opening@3x.png",
-  "bytes": 128260,
+  "hires": "assets/sprites/resources/firefly-jar-1-opening@3x.webp",
+  "bytes": 104302,
   "firstDraw": true,
   "frameScores": [
    0.9486,
@@ -37449,7 +37449,7 @@
    0.9394
   ]
  },
- "assets/sprites/resources/firefly-jar-1-open.png": {
+ "assets/sprites/resources/firefly-jar-1-open.webp": {
   "animal": "firefly-jar-1",
   "character": "firefly-jar",
   "swf": "misc/firefly_jar/firefly_jar.swf",
@@ -37476,8 +37476,8 @@
   "faintMin": 1,
   "drift": [],
   "status": "ok",
-  "hires": "assets/sprites/resources/firefly-jar-1-open@3x.png",
-  "bytes": 63183,
+  "hires": "assets/sprites/resources/firefly-jar-1-open@3x.webp",
+  "bytes": 62418,
   "firstDraw": true,
   "frameScores": [
    0.9381,
@@ -37497,7 +37497,7 @@
    0.9394
   ]
  },
- "assets/sprites/resources/firefly-jar-1-closing.png": {
+ "assets/sprites/resources/firefly-jar-1-closing.webp": {
   "animal": "firefly-jar-1",
   "character": "firefly-jar",
   "swf": "misc/firefly_jar/firefly_jar.swf",
@@ -37524,8 +37524,8 @@
   "faintMin": 1,
   "drift": [],
   "status": "ok",
-  "hires": "assets/sprites/resources/firefly-jar-1-closing@3x.png",
-  "bytes": 123326,
+  "hires": "assets/sprites/resources/firefly-jar-1-closing@3x.webp",
+  "bytes": 102004,
   "firstDraw": true,
   "frameScores": [
    0.9381,
@@ -37545,7 +37545,7 @@
    0.9497
   ]
  },
- "assets/sprites/resources/firefly-jar-2-closed.png": {
+ "assets/sprites/resources/firefly-jar-2-closed.webp": {
   "animal": "firefly-jar-2",
   "character": "firefly-jar",
   "swf": "misc/firefly_jar/firefly_jar.swf",
@@ -37572,8 +37572,8 @@
   "faintMin": 1,
   "drift": [],
   "status": "ok",
-  "hires": "assets/sprites/resources/firefly-jar-2-closed@3x.png",
-  "bytes": 113503,
+  "hires": "assets/sprites/resources/firefly-jar-2-closed@3x.webp",
+  "bytes": 124482,
   "firstDraw": true,
   "frameScores": [
    0.9564,
@@ -37593,7 +37593,7 @@
    0.9569
   ]
  },
- "assets/sprites/resources/firefly-jar-2-opening.png": {
+ "assets/sprites/resources/firefly-jar-2-opening.webp": {
   "animal": "firefly-jar-2",
   "character": "firefly-jar",
   "swf": "misc/firefly_jar/firefly_jar.swf",
@@ -37620,8 +37620,8 @@
   "faintMin": 1,
   "drift": [],
   "status": "ok",
-  "hires": "assets/sprites/resources/firefly-jar-2-opening@3x.png",
-  "bytes": 175762,
+  "hires": "assets/sprites/resources/firefly-jar-2-opening@3x.webp",
+  "bytes": 165998,
   "firstDraw": true,
   "frameScores": [
    0.9564,
@@ -37641,7 +37641,7 @@
    0.9494
   ]
  },
- "assets/sprites/resources/firefly-jar-2-open.png": {
+ "assets/sprites/resources/firefly-jar-2-open.webp": {
   "animal": "firefly-jar-2",
   "character": "firefly-jar",
   "swf": "misc/firefly_jar/firefly_jar.swf",
@@ -37668,8 +37668,8 @@
   "faintMin": 1,
   "drift": [],
   "status": "ok",
-  "hires": "assets/sprites/resources/firefly-jar-2-open@3x.png",
-  "bytes": 110844,
+  "hires": "assets/sprites/resources/firefly-jar-2-open@3x.webp",
+  "bytes": 123424,
   "firstDraw": true,
   "frameScores": [
    0.9487,
@@ -37689,7 +37689,7 @@
    0.9494
   ]
  },
- "assets/sprites/resources/firefly-jar-2-closing.png": {
+ "assets/sprites/resources/firefly-jar-2-closing.webp": {
   "animal": "firefly-jar-2",
   "character": "firefly-jar",
   "swf": "misc/firefly_jar/firefly_jar.swf",
@@ -37716,8 +37716,8 @@
   "faintMin": 1,
   "drift": [],
   "status": "ok",
-  "hires": "assets/sprites/resources/firefly-jar-2-closing@3x.png",
-  "bytes": 170407,
+  "hires": "assets/sprites/resources/firefly-jar-2-closing@3x.webp",
+  "bytes": 162530,
   "firstDraw": true,
   "frameScores": [
    0.9487,
@@ -37737,7 +37737,7 @@
    0.9569
   ]
  },
- "assets/sprites/resources/firefly-jar-3-closed.png": {
+ "assets/sprites/resources/firefly-jar-3-closed.webp": {
   "animal": "firefly-jar-3",
   "character": "firefly-jar",
   "swf": "misc/firefly_jar/firefly_jar.swf",
@@ -37764,8 +37764,8 @@
   "faintMin": 1,
   "drift": [],
   "status": "ok",
-  "hires": "assets/sprites/resources/firefly-jar-3-closed@3x.png",
-  "bytes": 139620,
+  "hires": "assets/sprites/resources/firefly-jar-3-closed@3x.webp",
+  "bytes": 156150,
   "firstDraw": true,
   "frameScores": [
    0.9564,
@@ -37785,7 +37785,7 @@
    0.9567
   ]
  },
- "assets/sprites/resources/firefly-jar-3-opening.png": {
+ "assets/sprites/resources/firefly-jar-3-opening.webp": {
   "animal": "firefly-jar-3",
   "character": "firefly-jar",
   "swf": "misc/firefly_jar/firefly_jar.swf",
@@ -37812,8 +37812,8 @@
   "faintMin": 1,
   "drift": [],
   "status": "ok",
-  "hires": "assets/sprites/resources/firefly-jar-3-opening@3x.png",
-  "bytes": 201699,
+  "hires": "assets/sprites/resources/firefly-jar-3-opening@3x.webp",
+  "bytes": 195194,
   "firstDraw": true,
   "frameScores": [
    0.9564,
@@ -37833,7 +37833,7 @@
    0.9494
   ]
  },
- "assets/sprites/resources/firefly-jar-3-open.png": {
+ "assets/sprites/resources/firefly-jar-3-open.webp": {
   "animal": "firefly-jar-3",
   "character": "firefly-jar",
   "swf": "misc/firefly_jar/firefly_jar.swf",
@@ -37860,8 +37860,8 @@
   "faintMin": 1,
   "drift": [],
   "status": "ok",
-  "hires": "assets/sprites/resources/firefly-jar-3-open@3x.png",
-  "bytes": 137010,
+  "hires": "assets/sprites/resources/firefly-jar-3-open@3x.webp",
+  "bytes": 146422,
   "firstDraw": true,
   "frameScores": [
    0.9491,
@@ -37881,7 +37881,7 @@
    0.9494
   ]
  },
- "assets/sprites/resources/firefly-jar-3-closing.png": {
+ "assets/sprites/resources/firefly-jar-3-closing.webp": {
   "animal": "firefly-jar-3",
   "character": "firefly-jar",
   "swf": "misc/firefly_jar/firefly_jar.swf",
@@ -37908,8 +37908,8 @@
   "faintMin": 1,
   "drift": [],
   "status": "ok",
-  "hires": "assets/sprites/resources/firefly-jar-3-closing@3x.png",
-  "bytes": 196456,
+  "hires": "assets/sprites/resources/firefly-jar-3-closing@3x.webp",
+  "bytes": 192728,
   "firstDraw": true,
   "frameScores": [
    0.9491,
@@ -37929,7 +37929,7 @@
    0.9567
   ]
  },
- "assets/sprites/resources/firefly-jar-4-closed.png": {
+ "assets/sprites/resources/firefly-jar-4-closed.webp": {
   "animal": "firefly-jar-4",
   "character": "firefly-jar",
   "swf": "misc/firefly_jar/firefly_jar.swf",
@@ -37956,8 +37956,8 @@
   "faintMin": 1,
   "drift": [],
   "status": "ok",
-  "hires": "assets/sprites/resources/firefly-jar-4-closed@3x.png",
-  "bytes": 167722,
+  "hires": "assets/sprites/resources/firefly-jar-4-closed@3x.webp",
+  "bytes": 179502,
   "firstDraw": true,
   "frameScores": [
    0.9573,
@@ -37977,7 +37977,7 @@
    0.9577
   ]
  },
- "assets/sprites/resources/firefly-jar-4-opening.png": {
+ "assets/sprites/resources/firefly-jar-4-opening.webp": {
   "animal": "firefly-jar-4",
   "character": "firefly-jar",
   "swf": "misc/firefly_jar/firefly_jar.swf",
@@ -38004,8 +38004,8 @@
   "faintMin": 1,
   "drift": [],
   "status": "ok",
-  "hires": "assets/sprites/resources/firefly-jar-4-opening@3x.png",
-  "bytes": 229839,
+  "hires": "assets/sprites/resources/firefly-jar-4-opening@3x.webp",
+  "bytes": 218726,
   "firstDraw": true,
   "frameScores": [
    0.9573,
@@ -38025,7 +38025,7 @@
    0.951
   ]
  },
- "assets/sprites/resources/firefly-jar-4-open.png": {
+ "assets/sprites/resources/firefly-jar-4-open.webp": {
   "animal": "firefly-jar-4",
   "character": "firefly-jar",
   "swf": "misc/firefly_jar/firefly_jar.swf",
@@ -38052,8 +38052,8 @@
   "faintMin": 1,
   "drift": [],
   "status": "ok",
-  "hires": "assets/sprites/resources/firefly-jar-4-open@3x.png",
-  "bytes": 164995,
+  "hires": "assets/sprites/resources/firefly-jar-4-open@3x.webp",
+  "bytes": 170412,
   "firstDraw": true,
   "frameScores": [
    0.9505,
@@ -38073,7 +38073,7 @@
    0.951
   ]
  },
- "assets/sprites/resources/firefly-jar-4-closing.png": {
+ "assets/sprites/resources/firefly-jar-4-closing.webp": {
   "animal": "firefly-jar-4",
   "character": "firefly-jar",
   "swf": "misc/firefly_jar/firefly_jar.swf",
@@ -38100,8 +38100,8 @@
   "faintMin": 1,
   "drift": [],
   "status": "ok",
-  "hires": "assets/sprites/resources/firefly-jar-4-closing@3x.png",
-  "bytes": 224316,
+  "hires": "assets/sprites/resources/firefly-jar-4-closing@3x.webp",
+  "bytes": 216604,
   "firstDraw": true,
   "frameScores": [
    0.9505,
@@ -38121,7 +38121,7 @@
    0.9577
   ]
  },
- "assets/sprites/resources/firefly-jar-5-closed.png": {
+ "assets/sprites/resources/firefly-jar-5-closed.webp": {
   "animal": "firefly-jar-5",
   "character": "firefly-jar",
   "swf": "misc/firefly_jar/firefly_jar.swf",
@@ -38148,8 +38148,8 @@
   "faintMin": 1,
   "drift": [],
   "status": "ok",
-  "hires": "assets/sprites/resources/firefly-jar-5-closed@3x.png",
-  "bytes": 196948,
+  "hires": "assets/sprites/resources/firefly-jar-5-closed@3x.webp",
+  "bytes": 208532,
   "firstDraw": true,
   "frameScores": [
    0.9574,
@@ -38169,7 +38169,7 @@
    0.9574
   ]
  },
- "assets/sprites/resources/firefly-jar-5-opening.png": {
+ "assets/sprites/resources/firefly-jar-5-opening.webp": {
   "animal": "firefly-jar-5",
   "character": "firefly-jar",
   "swf": "misc/firefly_jar/firefly_jar.swf",
@@ -38196,8 +38196,8 @@
   "faintMin": 1,
   "drift": [],
   "status": "ok",
-  "hires": "assets/sprites/resources/firefly-jar-5-opening@3x.png",
-  "bytes": 258978,
+  "hires": "assets/sprites/resources/firefly-jar-5-opening@3x.webp",
+  "bytes": 247380,
   "firstDraw": true,
   "frameScores": [
    0.9574,
@@ -38217,7 +38217,7 @@
    0.9508
   ]
  },
- "assets/sprites/resources/firefly-jar-5-open.png": {
+ "assets/sprites/resources/firefly-jar-5-open.webp": {
   "animal": "firefly-jar-5",
   "character": "firefly-jar",
   "swf": "misc/firefly_jar/firefly_jar.swf",
@@ -38244,8 +38244,8 @@
   "faintMin": 1,
   "drift": [],
   "status": "ok",
-  "hires": "assets/sprites/resources/firefly-jar-5-open@3x.png",
-  "bytes": 194274,
+  "hires": "assets/sprites/resources/firefly-jar-5-open@3x.webp",
+  "bytes": 198728,
   "firstDraw": true,
   "frameScores": [
    0.9508,
@@ -38265,7 +38265,7 @@
    0.9508
   ]
  },
- "assets/sprites/resources/firefly-jar-5-closing.png": {
+ "assets/sprites/resources/firefly-jar-5-closing.webp": {
   "animal": "firefly-jar-5",
   "character": "firefly-jar",
   "swf": "misc/firefly_jar/firefly_jar.swf",
@@ -38292,8 +38292,8 @@
   "faintMin": 1,
   "drift": [],
   "status": "ok",
-  "hires": "assets/sprites/resources/firefly-jar-5-closing@3x.png",
-  "bytes": 253613,
+  "hires": "assets/sprites/resources/firefly-jar-5-closing@3x.webp",
+  "bytes": 245558,
   "firstDraw": true,
   "frameScores": [
    0.9508,
@@ -38313,7 +38313,7 @@
    0.9574
   ]
  },
- "assets/sprites/resources/firefly-jar-6-closed.png": {
+ "assets/sprites/resources/firefly-jar-6-closed.webp": {
   "animal": "firefly-jar-6",
   "character": "firefly-jar",
   "swf": "misc/firefly_jar/firefly_jar.swf",
@@ -38340,8 +38340,8 @@
   "faintMin": 1,
   "drift": [],
   "status": "ok",
-  "hires": "assets/sprites/resources/firefly-jar-6-closed@3x.png",
-  "bytes": 238061,
+  "hires": "assets/sprites/resources/firefly-jar-6-closed@3x.webp",
+  "bytes": 239532,
   "firstDraw": true,
   "frameScores": [
    0.9583,
@@ -38361,7 +38361,7 @@
    0.9584
   ]
  },
- "assets/sprites/resources/firefly-jar-6-opening.png": {
+ "assets/sprites/resources/firefly-jar-6-opening.webp": {
   "animal": "firefly-jar-6",
   "character": "firefly-jar",
   "swf": "misc/firefly_jar/firefly_jar.swf",
@@ -38388,8 +38388,8 @@
   "faintMin": 1,
   "drift": [],
   "status": "ok",
-  "hires": "assets/sprites/resources/firefly-jar-6-opening@3x.png",
-  "bytes": 299750,
+  "hires": "assets/sprites/resources/firefly-jar-6-opening@3x.webp",
+  "bytes": 280664,
   "firstDraw": true,
   "frameScores": [
    0.9583,
@@ -38409,7 +38409,7 @@
    0.9524
   ]
  },
- "assets/sprites/resources/firefly-jar-6-open.png": {
+ "assets/sprites/resources/firefly-jar-6-open.webp": {
   "animal": "firefly-jar-6",
   "character": "firefly-jar",
   "swf": "misc/firefly_jar/firefly_jar.swf",
@@ -38436,8 +38436,8 @@
   "faintMin": 1,
   "drift": [],
   "status": "ok",
-  "hires": "assets/sprites/resources/firefly-jar-6-open@3x.png",
-  "bytes": 235342,
+  "hires": "assets/sprites/resources/firefly-jar-6-open@3x.webp",
+  "bytes": 232484,
   "firstDraw": true,
   "frameScores": [
    0.9524,
@@ -38457,7 +38457,7 @@
    0.9524
   ]
  },
- "assets/sprites/resources/firefly-jar-6-closing.png": {
+ "assets/sprites/resources/firefly-jar-6-closing.webp": {
   "animal": "firefly-jar-6",
   "character": "firefly-jar",
   "swf": "misc/firefly_jar/firefly_jar.swf",
@@ -38484,8 +38484,8 @@
   "faintMin": 1,
   "drift": [],
   "status": "ok",
-  "hires": "assets/sprites/resources/firefly-jar-6-closing@3x.png",
-  "bytes": 294037,
+  "hires": "assets/sprites/resources/firefly-jar-6-closing@3x.webp",
+  "bytes": 278692,
   "firstDraw": true,
   "frameScores": [
    0.9524,
@@ -38505,7 +38505,7 @@
    0.9584
   ]
  },
- "assets/sprites/resources/firefly-jar-7-closed.png": {
+ "assets/sprites/resources/firefly-jar-7-closed.webp": {
   "animal": "firefly-jar-7",
   "character": "firefly-jar",
   "swf": "misc/firefly_jar/firefly_jar.swf",
@@ -38532,8 +38532,8 @@
   "faintMin": 1,
   "drift": [],
   "status": "ok",
-  "hires": "assets/sprites/resources/firefly-jar-7-closed@3x.png",
-  "bytes": 265947,
+  "hires": "assets/sprites/resources/firefly-jar-7-closed@3x.webp",
+  "bytes": 263216,
   "firstDraw": true,
   "frameScores": [
    0.9592,
@@ -38553,7 +38553,7 @@
    0.9591
   ]
  },
- "assets/sprites/resources/firefly-jar-7-opening.png": {
+ "assets/sprites/resources/firefly-jar-7-opening.webp": {
   "animal": "firefly-jar-7",
   "character": "firefly-jar",
   "swf": "misc/firefly_jar/firefly_jar.swf",
@@ -38580,8 +38580,8 @@
   "faintMin": 1,
   "drift": [],
   "status": "ok",
-  "hires": "assets/sprites/resources/firefly-jar-7-opening@3x.png",
-  "bytes": 328423,
+  "hires": "assets/sprites/resources/firefly-jar-7-opening@3x.webp",
+  "bytes": 304136,
   "firstDraw": true,
   "frameScores": [
    0.9592,
@@ -38601,7 +38601,7 @@
    0.9532
   ]
  },
- "assets/sprites/resources/firefly-jar-7-open.png": {
+ "assets/sprites/resources/firefly-jar-7-open.webp": {
   "animal": "firefly-jar-7",
   "character": "firefly-jar",
   "swf": "misc/firefly_jar/firefly_jar.swf",
@@ -38628,8 +38628,8 @@
   "faintMin": 1,
   "drift": [],
   "status": "ok",
-  "hires": "assets/sprites/resources/firefly-jar-7-open@3x.png",
-  "bytes": 268138,
+  "hires": "assets/sprites/resources/firefly-jar-7-open@3x.webp",
+  "bytes": 257562,
   "firstDraw": true,
   "frameScores": [
    0.9534,
@@ -38649,7 +38649,7 @@
    0.9532
   ]
  },
- "assets/sprites/resources/firefly-jar-7-closing.png": {
+ "assets/sprites/resources/firefly-jar-7-closing.webp": {
   "animal": "firefly-jar-7",
   "character": "firefly-jar",
   "swf": "misc/firefly_jar/firefly_jar.swf",
@@ -38676,8 +38676,8 @@
   "faintMin": 1,
   "drift": [],
   "status": "ok",
-  "hires": "assets/sprites/resources/firefly-jar-7-closing@3x.png",
-  "bytes": 321128,
+  "hires": "assets/sprites/resources/firefly-jar-7-closing@3x.webp",
+  "bytes": 300068,
   "firstDraw": true,
   "frameScores": [
    0.9534,
@@ -38697,7 +38697,7 @@
    0.9591
   ]
  },
- "assets/sprites/mail-npc/frog_blue_box_idle.png": {
+ "assets/sprites/mail-npc/frog_blue_box_idle.webp": {
   "animal": "frog-blue-box",
   "character": "aflc-frog",
   "swf": "inhabitants/yoga_frog/npc_yoga_frog.swf",
@@ -38777,7 +38777,7 @@
    0.9612
   ]
  },
- "assets/sprites/mail-npc/frog_blue_box_moveStart.png": {
+ "assets/sprites/mail-npc/frog_blue_box_moveStart.webp": {
   "animal": "frog-blue-box",
   "character": "aflc-frog",
   "swf": "inhabitants/yoga_frog/npc_yoga_frog.swf",
@@ -38814,7 +38814,7 @@
    0.9713
   ]
  },
- "assets/sprites/mail-npc/frog_blue_box_move.png": {
+ "assets/sprites/mail-npc/frog_blue_box_move.webp": {
   "animal": "frog-blue-box",
   "character": "aflc-frog",
   "swf": "inhabitants/yoga_frog/npc_yoga_frog.swf",
@@ -38870,7 +38870,7 @@
    0.9684
   ]
  },
- "assets/sprites/mail-npc/frog_blue_box_moveEnd.png": {
+ "assets/sprites/mail-npc/frog_blue_box_moveEnd.webp": {
   "animal": "frog-blue-box",
   "character": "aflc-frog",
   "swf": "inhabitants/yoga_frog/npc_yoga_frog.swf",
@@ -38907,7 +38907,7 @@
    0.9628
   ]
  },
- "assets/sprites/mail-npc/frog_blue_box_talk.png": {
+ "assets/sprites/mail-npc/frog_blue_box_talk.webp": {
   "animal": "frog-blue-box",
   "character": "aflc-frog",
   "swf": "inhabitants/yoga_frog/npc_yoga_frog.swf",
@@ -39001,7 +39001,7 @@
    0.9623
   ]
  },
- "assets/sprites/mail-npc/frog_blue_box_treePoseIn.png": {
+ "assets/sprites/mail-npc/frog_blue_box_treePoseIn.webp": {
   "animal": "frog-blue-box",
   "character": "aflc-frog",
   "swf": "inhabitants/yoga_frog/npc_yoga_frog.swf",
@@ -39055,7 +39055,7 @@
    0.9459
   ]
  },
- "assets/sprites/mail-npc/frog_blue_box_treePose.png": {
+ "assets/sprites/mail-npc/frog_blue_box_treePose.webp": {
   "animal": "frog-blue-box",
   "character": "aflc-frog",
   "swf": "inhabitants/yoga_frog/npc_yoga_frog.swf",
@@ -39093,7 +39093,7 @@
    0.9462
   ]
  },
- "assets/sprites/mail-npc/frog_blue_box_treePoseOut.png": {
+ "assets/sprites/mail-npc/frog_blue_box_treePoseOut.webp": {
   "animal": "frog-blue-box",
   "character": "aflc-frog",
   "swf": "inhabitants/yoga_frog/npc_yoga_frog.swf",
@@ -39144,7 +39144,7 @@
    0.9497
   ]
  },
- "assets/sprites/mail-npc/frog_blue_box_dancerPoseIn.png": {
+ "assets/sprites/mail-npc/frog_blue_box_dancerPoseIn.webp": {
   "animal": "frog-blue-box",
   "character": "aflc-frog",
   "swf": "inhabitants/yoga_frog/npc_yoga_frog.swf",
@@ -39196,7 +39196,7 @@
    0.9335
   ]
  },
- "assets/sprites/mail-npc/frog_blue_box_dancerPose.png": {
+ "assets/sprites/mail-npc/frog_blue_box_dancerPose.webp": {
   "animal": "frog-blue-box",
   "character": "aflc-frog",
   "swf": "inhabitants/yoga_frog/npc_yoga_frog.swf",
@@ -39234,7 +39234,7 @@
    0.9335
   ]
  },
- "assets/sprites/mail-npc/frog_blue_box_dancerPoseOut.png": {
+ "assets/sprites/mail-npc/frog_blue_box_dancerPoseOut.webp": {
   "animal": "frog-blue-box",
   "character": "aflc-frog",
   "swf": "inhabitants/yoga_frog/npc_yoga_frog.swf",
@@ -39274,7 +39274,7 @@
    0.9485
   ]
  },
- "assets/sprites/mail-npc/frog_blue_box_warriorPoseIn.png": {
+ "assets/sprites/mail-npc/frog_blue_box_warriorPoseIn.webp": {
   "animal": "frog-blue-box",
   "character": "aflc-frog",
   "swf": "inhabitants/yoga_frog/npc_yoga_frog.swf",
@@ -39329,7 +39329,7 @@
    0.9213
   ]
  },
- "assets/sprites/mail-npc/frog_blue_box_warriorPose.png": {
+ "assets/sprites/mail-npc/frog_blue_box_warriorPose.webp": {
   "animal": "frog-blue-box",
   "character": "aflc-frog",
   "swf": "inhabitants/yoga_frog/npc_yoga_frog.swf",
@@ -39367,7 +39367,7 @@
    0.9206
   ]
  },
- "assets/sprites/mail-npc/frog_blue_box_warriorPoseOut.png": {
+ "assets/sprites/mail-npc/frog_blue_box_warriorPoseOut.webp": {
   "animal": "frog-blue-box",
   "character": "aflc-frog",
   "swf": "inhabitants/yoga_frog/npc_yoga_frog.swf",
@@ -39410,7 +39410,7 @@
    0.9478
   ]
  },
- "assets/sprites/mail-npc/frog_blue_none_idle.png": {
+ "assets/sprites/mail-npc/frog_blue_none_idle.webp": {
   "animal": "frog-blue-none",
   "character": "aflc-frog",
   "swf": "inhabitants/yoga_frog/npc_yoga_frog.swf",
@@ -39490,7 +39490,7 @@
    0.9133
   ]
  },
- "assets/sprites/mail-npc/frog_blue_none_moveStart.png": {
+ "assets/sprites/mail-npc/frog_blue_none_moveStart.webp": {
   "animal": "frog-blue-none",
   "character": "aflc-frog",
   "swf": "inhabitants/yoga_frog/npc_yoga_frog.swf",
@@ -39527,7 +39527,7 @@
    0.946
   ]
  },
- "assets/sprites/mail-npc/frog_blue_none_move.png": {
+ "assets/sprites/mail-npc/frog_blue_none_move.webp": {
   "animal": "frog-blue-none",
   "character": "aflc-frog",
   "swf": "inhabitants/yoga_frog/npc_yoga_frog.swf",
@@ -39583,7 +39583,7 @@
    0.9455
   ]
  },
- "assets/sprites/mail-npc/frog_blue_none_moveEnd.png": {
+ "assets/sprites/mail-npc/frog_blue_none_moveEnd.webp": {
   "animal": "frog-blue-none",
   "character": "aflc-frog",
   "swf": "inhabitants/yoga_frog/npc_yoga_frog.swf",
@@ -39620,7 +39620,7 @@
    0.9161
   ]
  },
- "assets/sprites/mail-npc/frog_blue_none_talk.png": {
+ "assets/sprites/mail-npc/frog_blue_none_talk.webp": {
   "animal": "frog-blue-none",
   "character": "aflc-frog",
   "swf": "inhabitants/yoga_frog/npc_yoga_frog.swf",
@@ -39714,7 +39714,7 @@
    0.9191
   ]
  },
- "assets/sprites/mail-npc/frog_blue_none_treePoseIn.png": {
+ "assets/sprites/mail-npc/frog_blue_none_treePoseIn.webp": {
   "animal": "frog-blue-none",
   "character": "aflc-frog",
   "swf": "inhabitants/yoga_frog/npc_yoga_frog.swf",
@@ -39768,7 +39768,7 @@
    0.919
   ]
  },
- "assets/sprites/mail-npc/frog_blue_none_treePose.png": {
+ "assets/sprites/mail-npc/frog_blue_none_treePose.webp": {
   "animal": "frog-blue-none",
   "character": "aflc-frog",
   "swf": "inhabitants/yoga_frog/npc_yoga_frog.swf",
@@ -39806,7 +39806,7 @@
    0.9184
   ]
  },
- "assets/sprites/mail-npc/frog_blue_none_treePoseOut.png": {
+ "assets/sprites/mail-npc/frog_blue_none_treePoseOut.webp": {
   "animal": "frog-blue-none",
   "character": "aflc-frog",
   "swf": "inhabitants/yoga_frog/npc_yoga_frog.swf",
@@ -39857,7 +39857,7 @@
    0.9198
   ]
  },
- "assets/sprites/mail-npc/frog_blue_none_dancerPoseIn.png": {
+ "assets/sprites/mail-npc/frog_blue_none_dancerPoseIn.webp": {
   "animal": "frog-blue-none",
   "character": "aflc-frog",
   "swf": "inhabitants/yoga_frog/npc_yoga_frog.swf",
@@ -39909,7 +39909,7 @@
    0.918
   ]
  },
- "assets/sprites/mail-npc/frog_blue_none_dancerPose.png": {
+ "assets/sprites/mail-npc/frog_blue_none_dancerPose.webp": {
   "animal": "frog-blue-none",
   "character": "aflc-frog",
   "swf": "inhabitants/yoga_frog/npc_yoga_frog.swf",
@@ -39947,7 +39947,7 @@
    0.918
   ]
  },
- "assets/sprites/mail-npc/frog_blue_none_dancerPoseOut.png": {
+ "assets/sprites/mail-npc/frog_blue_none_dancerPoseOut.webp": {
   "animal": "frog-blue-none",
   "character": "aflc-frog",
   "swf": "inhabitants/yoga_frog/npc_yoga_frog.swf",
@@ -39987,7 +39987,7 @@
    0.9184
   ]
  },
- "assets/sprites/mail-npc/frog_blue_none_warriorPoseIn.png": {
+ "assets/sprites/mail-npc/frog_blue_none_warriorPoseIn.webp": {
   "animal": "frog-blue-none",
   "character": "aflc-frog",
   "swf": "inhabitants/yoga_frog/npc_yoga_frog.swf",
@@ -40042,7 +40042,7 @@
    0.9154
   ]
  },
- "assets/sprites/mail-npc/frog_blue_none_warriorPose.png": {
+ "assets/sprites/mail-npc/frog_blue_none_warriorPose.webp": {
   "animal": "frog-blue-none",
   "character": "aflc-frog",
   "swf": "inhabitants/yoga_frog/npc_yoga_frog.swf",
@@ -40080,7 +40080,7 @@
    0.9138
   ]
  },
- "assets/sprites/mail-npc/frog_blue_none_warriorPoseOut.png": {
+ "assets/sprites/mail-npc/frog_blue_none_warriorPoseOut.webp": {
   "animal": "frog-blue-none",
   "character": "aflc-frog",
   "swf": "inhabitants/yoga_frog/npc_yoga_frog.swf",
@@ -41538,7 +41538,7 @@
    0.9895
   ]
  },
- "assets/sprites/races/hogtied_piggy__x1_1_png_1354830331.png": {
+ "assets/sprites/races/hogtied_piggy__x1_1_png_1354830331.webp": {
   "animal": "hogtied-piggy",
   "swf": "misc/hogtied_piggy/hogtied_piggy.swf",
   "sprite": 0,
@@ -41570,7 +41570,7 @@
    0.98
   ]
  },
- "assets/sprites/quests/legalize/npc_bureaucrat_arms_01_glasses_none_hair_01_legs_01_necklace_none_tie_01_torso_01_x1_walk1_png_1354832991.png": {
+ "assets/sprites/quests/legalize/npc_bureaucrat_arms_01_glasses_none_hair_01_legs_01_necklace_none_tie_01_torso_01_x1_walk1_png_1354832991.webp": {
   "animal": "bureaucrat-0",
   "swf": "inhabitants/bureaucrat/npc_bureaucrat.swf",
   "sprite": 121,
@@ -41626,7 +41626,7 @@
    0.9781
   ]
  },
- "assets/sprites/quests/legalize/npc_bureaucrat_arms_01_glasses_none_hair_01_legs_01_necklace_none_tie_01_torso_01_x1_walk2_png_1354832992.png": {
+ "assets/sprites/quests/legalize/npc_bureaucrat_arms_01_glasses_none_hair_01_legs_01_necklace_none_tie_01_torso_01_x1_walk2_png_1354832992.webp": {
   "animal": "bureaucrat-0",
   "swf": "inhabitants/bureaucrat/npc_bureaucrat.swf",
   "sprite": 121,
@@ -41670,7 +41670,7 @@
    0.9774
   ]
  },
- "assets/sprites/quests/legalize/npc_bureaucrat_arms_02_glasses_none_hair_02_legs_02_necklace_none_tie_02_torso_02_x1_walk1_png_1354832999.png": {
+ "assets/sprites/quests/legalize/npc_bureaucrat_arms_02_glasses_none_hair_02_legs_02_necklace_none_tie_02_torso_02_x1_walk1_png_1354832999.webp": {
   "animal": "bureaucrat-1",
   "swf": "inhabitants/bureaucrat/npc_bureaucrat.swf",
   "sprite": 121,
@@ -41726,7 +41726,7 @@
    0.9784
   ]
  },
- "assets/sprites/quests/legalize/npc_bureaucrat_arms_02_glasses_none_hair_02_legs_02_necklace_none_tie_02_torso_02_x1_walk2_png_1354833000.png": {
+ "assets/sprites/quests/legalize/npc_bureaucrat_arms_02_glasses_none_hair_02_legs_02_necklace_none_tie_02_torso_02_x1_walk2_png_1354833000.webp": {
   "animal": "bureaucrat-1",
   "swf": "inhabitants/bureaucrat/npc_bureaucrat.swf",
   "sprite": 121,
@@ -41770,7 +41770,7 @@
    0.9774
   ]
  },
- "assets/sprites/quests/legalize/npc_bureaucrat_arms_03_glasses_none_hair_04_legs_03_necklace_01_tie_none_torso_03_x1_walk1_png_1354833008.png": {
+ "assets/sprites/quests/legalize/npc_bureaucrat_arms_03_glasses_none_hair_04_legs_03_necklace_01_tie_none_torso_03_x1_walk1_png_1354833008.webp": {
   "animal": "bureaucrat-2",
   "swf": "inhabitants/bureaucrat/npc_bureaucrat.swf",
   "sprite": 121,
@@ -41826,7 +41826,7 @@
    0.9804
   ]
  },
- "assets/sprites/quests/legalize/npc_bureaucrat_arms_03_glasses_none_hair_04_legs_03_necklace_01_tie_none_torso_03_x1_walk2_png_1354833009.png": {
+ "assets/sprites/quests/legalize/npc_bureaucrat_arms_03_glasses_none_hair_04_legs_03_necklace_01_tie_none_torso_03_x1_walk2_png_1354833009.webp": {
   "animal": "bureaucrat-2",
   "swf": "inhabitants/bureaucrat/npc_bureaucrat.swf",
   "sprite": 121,
@@ -41870,7 +41870,7 @@
    0.98
   ]
  },
- "assets/sprites/quests/legalize/npc_bureaucrat_arms_04_glasses_none_hair_05_legs_04_necklace_02_tie_none_torso_04_x1_walk1_png_1354833017.png": {
+ "assets/sprites/quests/legalize/npc_bureaucrat_arms_04_glasses_none_hair_05_legs_04_necklace_02_tie_none_torso_04_x1_walk1_png_1354833017.webp": {
   "animal": "bureaucrat-3",
   "swf": "inhabitants/bureaucrat/npc_bureaucrat.swf",
   "sprite": 121,
@@ -41926,7 +41926,7 @@
    0.9817
   ]
  },
- "assets/sprites/quests/legalize/npc_bureaucrat_arms_04_glasses_none_hair_05_legs_04_necklace_02_tie_none_torso_04_x1_walk2_png_1354833018.png": {
+ "assets/sprites/quests/legalize/npc_bureaucrat_arms_04_glasses_none_hair_05_legs_04_necklace_02_tie_none_torso_04_x1_walk2_png_1354833018.webp": {
   "animal": "bureaucrat-3",
   "swf": "inhabitants/bureaucrat/npc_bureaucrat.swf",
   "sprite": 121,
@@ -42092,7 +42092,7 @@
    0.9791
   ]
  },
- "assets/sprites/races/race_ticket_dispenser.png": {
+ "assets/sprites/races/race_ticket_dispenser.webp": {
   "animal": "race-ticket-dispenser",
   "swf": "misc/race_ticket_dispenser/race_ticket_dispenser.swf",
   "sprite": 0,
@@ -42124,7 +42124,7 @@
    0.9822
   ]
  },
- "assets/sprites/animals/meat_collector.png": {
+ "assets/sprites/animals/meat_collector.webp": {
   "animal": "meat-collector",
   "swf": "misc/meat_collector/meat_collector.swf",
   "sprite": 0,
@@ -42156,7 +42156,7 @@
    0.9902
   ]
  },
- "assets/sprites/animals/butterfly_milker.png": {
+ "assets/sprites/animals/butterfly_milker.webp": {
   "animal": "butterfly-milker",
   "swf": "misc/butterfly_milker/butterfly_milker.swf",
   "sprite": 0,
@@ -42188,7 +42188,7 @@
    0.9818
   ]
  },
- "assets/sprites/animals/piggy_feeder.png": {
+ "assets/sprites/animals/piggy_feeder.webp": {
   "animal": "piggy-feeder",
   "swf": "misc/piggy_feeder/piggy_feeder.swf",
   "sprite": 0,
@@ -42220,7 +42220,7 @@
    0.9786
   ]
  },
- "assets/sprites/animals/plop.png": {
+ "assets/sprites/animals/plop.webp": {
   "animal": "plop",
   "swf": "misc/plop/plop.swf",
   "sprite": 0,
@@ -42252,7 +42252,7 @@
    0.9842
   ]
  },
- "assets/sprites/street-jobs/pile_of_currants.png": {
+ "assets/sprites/street-jobs/pile_of_currants.webp": {
   "animal": "pile-of-currants",
   "swf": "misc/pile_of_currants/pile_of_currants.swf",
   "sprite": 0,
@@ -42284,7 +42284,7 @@
    0.9883
   ]
  },
- "assets/sprites/hell/wine_of_the_dead-world.png": {
+ "assets/sprites/hell/wine_of_the_dead-world.webp": {
   "animal": "hell-wine-world",
   "swf": "misc/wine_of_the_dead/wine_of_the_dead.swf",
   "sprite": 0,
@@ -42319,7 +42319,7 @@
    0.9844
   ]
  },
- "assets/sprites/hell/drink_ticket-world.png": {
+ "assets/sprites/hell/drink_ticket-world.webp": {
   "animal": "hell-drink-ticket-world",
   "swf": "misc/drink_ticket/drink_ticket.swf",
   "sprite": 0,
@@ -42351,7 +42351,7 @@
    0.9482
   ]
  },
- "assets/sprites/races/pig_bait__x1_1_x1_2_x1_3_x1_4_png_1354830335.png": {
+ "assets/sprites/races/pig_bait__x1_1_x1_2_x1_3_x1_4_png_1354830335.webp": {
   "animal": "pig-bait-world",
   "swf": "misc/pig_bait/pig_bait.swf",
   "sprite": 0,
@@ -42386,7 +42386,7 @@
    0.9845
   ]
  },
- "assets/sprites/cultivation/firefly_hive.png": {
+ "assets/sprites/cultivation/firefly_hive.webp": {
   "animal": "firefly-hive",
   "swf": "misc/spawner/firefly_hive/firefly_hive.swf",
   "sprite": 0,
@@ -42418,7 +42418,7 @@
    0.9911
   ]
  },
- "assets/sprites/puzzles/light_beam.png": {
+ "assets/sprites/puzzles/light_beam.webp": {
   "animal": "light-beam",
   "swf": "misc/light_beam/light_beam.swf",
   "sprite": 0,
@@ -42450,7 +42450,7 @@
    0.9473
   ]
  },
- "assets/sprites/quests/rook-woods/rook-egg-states.png": {
+ "assets/sprites/quests/rook-woods/rook-egg-states.webp": {
   "animal": "rook-egg",
   "swf": "quest_items/rook_egg/rook_egg.swf",
   "sprite": 0,
@@ -42486,7 +42486,7 @@
    0.9818
   ]
  },
- "assets/sprites/hell/graveside/graveside_marker_alph.png": {
+ "assets/sprites/hell/graveside/graveside_marker_alph.webp": {
   "animal": "graveside-alph",
   "swf": "misc/graveside_marker/graveside_marker.swf",
   "sprite": 38,
@@ -42520,7 +42520,7 @@
    0.9696
   ]
  },
- "assets/sprites/hell/graveside/graveside_marker_cosma.png": {
+ "assets/sprites/hell/graveside/graveside_marker_cosma.webp": {
   "animal": "graveside-cosma",
   "swf": "misc/graveside_marker/graveside_marker.swf",
   "sprite": 35,
@@ -42554,7 +42554,7 @@
    0.9698
   ]
  },
- "assets/sprites/hell/graveside/graveside_marker_friendly.png": {
+ "assets/sprites/hell/graveside/graveside_marker_friendly.webp": {
   "animal": "graveside-friendly",
   "swf": "misc/graveside_marker/graveside_marker.swf",
   "sprite": 32,
@@ -42588,7 +42588,7 @@
    0.9696
   ]
  },
- "assets/sprites/hell/graveside/graveside_marker_generic.png": {
+ "assets/sprites/hell/graveside/graveside_marker_generic.webp": {
   "animal": "graveside-generic",
   "swf": "misc/graveside_marker/graveside_marker.swf",
   "sprite": 41,
@@ -42622,7 +42622,7 @@
    0.9696
   ]
  },
- "assets/sprites/hell/graveside/graveside_marker_grendaline.png": {
+ "assets/sprites/hell/graveside/graveside_marker_grendaline.webp": {
   "animal": "graveside-grendaline",
   "swf": "misc/graveside_marker/graveside_marker.swf",
   "sprite": 29,
@@ -42656,7 +42656,7 @@
    0.9694
   ]
  },
- "assets/sprites/hell/graveside/graveside_marker_humbaba.png": {
+ "assets/sprites/hell/graveside/graveside_marker_humbaba.webp": {
   "animal": "graveside-humbaba",
   "swf": "misc/graveside_marker/graveside_marker.swf",
   "sprite": 26,
@@ -42690,7 +42690,7 @@
    0.9696
   ]
  },
- "assets/sprites/hell/graveside/graveside_marker_lem.png": {
+ "assets/sprites/hell/graveside/graveside_marker_lem.webp": {
   "animal": "graveside-lem",
   "swf": "misc/graveside_marker/graveside_marker.swf",
   "sprite": 23,
@@ -42724,7 +42724,7 @@
    0.9696
   ]
  },
- "assets/sprites/hell/graveside/graveside_marker_mab.png": {
+ "assets/sprites/hell/graveside/graveside_marker_mab.webp": {
   "animal": "graveside-mab",
   "swf": "misc/graveside_marker/graveside_marker.swf",
   "sprite": 20,
@@ -42758,7 +42758,7 @@
    0.9695
   ]
  },
- "assets/sprites/hell/graveside/graveside_marker_pot.png": {
+ "assets/sprites/hell/graveside/graveside_marker_pot.webp": {
   "animal": "graveside-pot",
   "swf": "misc/graveside_marker/graveside_marker.swf",
   "sprite": 17,
@@ -42792,7 +42792,7 @@
    0.9696
   ]
  },
- "assets/sprites/hell/graveside/graveside_marker_spriggan.png": {
+ "assets/sprites/hell/graveside/graveside_marker_spriggan.webp": {
   "animal": "graveside-spriggan",
   "swf": "misc/graveside_marker/graveside_marker.swf",
   "sprite": 14,
@@ -42826,7 +42826,7 @@
    0.9695
   ]
  },
- "assets/sprites/hell/graveside/graveside_marker_tii.png": {
+ "assets/sprites/hell/graveside/graveside_marker_tii.webp": {
   "animal": "graveside-tii",
   "swf": "misc/graveside_marker/graveside_marker.swf",
   "sprite": 11,
@@ -42860,7 +42860,7 @@
    0.9695
   ]
  },
- "assets/sprites/hell/graveside/graveside_marker_zille.png": {
+ "assets/sprites/hell/graveside/graveside_marker_zille.webp": {
   "animal": "graveside-zille",
   "swf": "misc/graveside_marker/graveside_marker.swf",
   "sprite": 8,
@@ -42894,7 +42894,7 @@
    0.9696
   ]
  },
- "assets/sprites/garden/garden_bed_apartment_2_2.png": {
+ "assets/sprites/garden/garden_bed_apartment_2_2.webp": {
   "animal": "garden-art",
   "character": "garden-art",
   "source": "tools/garden-art",
@@ -42914,7 +42914,7 @@
    0.9826
   ]
  },
- "assets/sprites/garden/garden_bed_polcrop_2_2.png": {
+ "assets/sprites/garden/garden_bed_polcrop_2_2.webp": {
   "animal": "garden-art",
   "character": "garden-art",
   "source": "tools/garden-art",
@@ -42934,7 +42934,7 @@
    0.9681
   ]
  },
- "assets/sprites/garden/garden_bed_polcrop_2_4.png": {
+ "assets/sprites/garden/garden_bed_polcrop_2_4.webp": {
   "animal": "garden-art",
   "character": "garden-art",
   "source": "tools/garden-art",
@@ -42954,7 +42954,7 @@
    0.9721
   ]
  },
- "assets/sprites/garden/garden_bed_polcrop_3_5.png": {
+ "assets/sprites/garden/garden_bed_polcrop_3_5.webp": {
   "animal": "garden-art",
   "character": "garden-art",
   "source": "tools/garden-art",
@@ -42974,7 +42974,7 @@
    0.9732
   ]
  },
- "assets/sprites/garden/garden_bed_polgroddle_1_3.png": {
+ "assets/sprites/garden/garden_bed_polgroddle_1_3.webp": {
   "animal": "garden-art",
   "character": "garden-art",
   "source": "tools/garden-art",
@@ -42994,7 +42994,7 @@
    0.9563
   ]
  },
- "assets/sprites/garden/garden_bed_polgroddle_2_2.png": {
+ "assets/sprites/garden/garden_bed_polgroddle_2_2.webp": {
   "animal": "garden-art",
   "character": "garden-art",
   "source": "tools/garden-art",
@@ -43014,7 +43014,7 @@
    0.9654
   ]
  },
- "assets/sprites/garden/garden_bed_polherb_2_2.png": {
+ "assets/sprites/garden/garden_bed_polherb_2_2.webp": {
   "animal": "garden-art",
   "character": "garden-art",
   "source": "tools/garden-art",
@@ -43034,7 +43034,7 @@
    0.9505
   ]
  },
- "assets/sprites/garden/garden_bed_polherb_2_4.png": {
+ "assets/sprites/garden/garden_bed_polherb_2_4.webp": {
   "animal": "garden-art",
   "character": "garden-art",
   "source": "tools/garden-art",
@@ -43054,7 +43054,7 @@
    0.9527
   ]
  },
- "assets/sprites/garden/garden_bed_polherb_3_5.png": {
+ "assets/sprites/garden/garden_bed_polherb_3_5.webp": {
   "animal": "garden-art",
   "character": "garden-art",
   "source": "tools/garden-art",
@@ -43074,7 +43074,7 @@
    0.9553
   ]
  },
- "assets/sprites/garden/garden_bed_shimla_1_1.png": {
+ "assets/sprites/garden/garden_bed_shimla_1_1.webp": {
   "animal": "garden-art",
   "character": "garden-art",
   "source": "tools/garden-art",
@@ -43094,7 +43094,7 @@
    0.9698
   ]
  },
- "assets/sprites/garden/garden_bed_shimla_2_1.png": {
+ "assets/sprites/garden/garden_bed_shimla_2_1.webp": {
   "animal": "garden-art",
   "character": "garden-art",
   "source": "tools/garden-art",
@@ -43114,7 +43114,7 @@
    0.9734
   ]
  },
- "assets/sprites/garden/garden_bed_shimla_3_1.png": {
+ "assets/sprites/garden/garden_bed_shimla_3_1.webp": {
   "animal": "garden-art",
   "character": "garden-art",
   "source": "tools/garden-art",
@@ -43134,7 +43134,7 @@
    0.9751
   ]
  },
- "assets/sprites/garden/garden_bed_strip_1_1.png": {
+ "assets/sprites/garden/garden_bed_strip_1_1.webp": {
   "animal": "garden-art",
   "character": "garden-art",
   "source": "tools/garden-art",
@@ -43154,7 +43154,7 @@
    0.9824
   ]
  },
- "assets/sprites/garden/garden_bed_strip_2_1.png": {
+ "assets/sprites/garden/garden_bed_strip_2_1.webp": {
   "animal": "garden-art",
   "character": "garden-art",
   "source": "tools/garden-art",
@@ -43174,7 +43174,7 @@
    0.9832
   ]
  },
- "assets/sprites/garden/garden_bed_strip_3_1.png": {
+ "assets/sprites/garden/garden_bed_strip_3_1.webp": {
   "animal": "garden-art",
   "character": "garden-art",
   "source": "tools/garden-art",
@@ -43194,7 +43194,7 @@
    0.9841
   ]
  },
- "assets/sprites/garden/garden_bed_strip_4_1.png": {
+ "assets/sprites/garden/garden_bed_strip_4_1.webp": {
   "animal": "garden-art",
   "character": "garden-art",
   "source": "tools/garden-art",
@@ -43214,7 +43214,7 @@
    0.9834
   ]
  },
- "assets/sprites/garden/garden_crops.png": {
+ "assets/sprites/garden/garden_crops.webp": {
   "animal": "garden-art",
   "character": "garden-art",
   "source": "tools/garden-art",
@@ -43258,7 +43258,7 @@
    0.9605
   ]
  },
- "assets/sprites/garden/garden_plots.png": {
+ "assets/sprites/garden/garden_plots.webp": {
   "animal": "garden-art",
   "character": "garden-art",
   "source": "tools/garden-art",
@@ -43289,7 +43289,7 @@
    0.9523
   ]
  },
- "assets/sprites/npc_piggy__x1_look_screen_png_1354829434.png": {
+ "assets/sprites/npc_piggy__x1_look_screen_png_1354829434.webp": {
   "animal": "piggy",
   "swf": "inhabitants/piggy/npc_piggy.swf",
   "sprite": 79,
@@ -43368,7 +43368,7 @@
    0.9821
   ]
  },
- "assets/ui/signpost/signpost_post.png": {
+ "assets/ui/signpost/signpost_post.webp": {
   "animal": "signpost",
   "character": "signpost",
   "source": "tools/signpost-art",
@@ -43386,7 +43386,7 @@
    0.9962
   ]
  },
- "assets/ui/signpost/signpost_arm.png": {
+ "assets/ui/signpost/signpost_arm.webp": {
   "animal": "signpost",
   "character": "signpost",
   "source": "tools/signpost-art",
@@ -43404,13 +43404,13 @@
    0.9919
   ]
  },
- "assets/ui/signpost/signpost_shadow.png": {
+ "assets/ui/signpost/signpost_shadow.webp": {
   "animal": "signpost",
   "character": "signpost",
   "source": "tools/signpost-art",
   "status": "ok",
-  "hires": "assets/ui/signpost/signpost_shadow@3x.png",
-  "bytes": 5745,
+  "hires": "assets/ui/signpost/signpost_shadow@3x.webp",
+  "bytes": 4968,
   "cells": 1,
   "fw": 87,
   "fh": 26,
@@ -43422,7 +43422,7 @@
    0.9647
   ]
  },
- "assets/sprites/furniture/furniture_fireplace.png": {
+ "assets/sprites/furniture/furniture_fireplace.webp": {
   "animal": "furniture_fireplace",
   "swf": "furniture/furniture_base/furniture_fireplace/furniture_fireplace.swf",
   "sprite": 0,
@@ -43454,7 +43454,7 @@
    0.9912
   ]
  },
- "assets/sprites/animals/npc_chicken_stand.png": {
+ "assets/sprites/animals/npc_chicken_stand.webp": {
   "animal": "chicken",
   "swf": "inhabitants/chicken/npc_chicken.swf",
   "sprite": 183,
@@ -43485,7 +43485,7 @@
    0.9631
   ]
  },
- "assets/sprites/spinning-wheel/appear.png": {
+ "assets/sprites/spinning-wheel/appear.webp": {
   "animal": "spinning-wheel",
   "swf": "misc/npc/npc_spinning_wheel/npc_spinning_wheel.swf",
   "sprite": 290,
@@ -43530,7 +43530,7 @@
    0.991
   ]
  },
- "assets/sprites/spinning-wheel/white-spin.png": {
+ "assets/sprites/spinning-wheel/white-spin.webp": {
   "animal": "spinning-wheel",
   "swf": "misc/npc/npc_spinning_wheel/npc_spinning_wheel.swf",
   "sprite": 290,
@@ -43634,7 +43634,7 @@
    0.9911
   ]
  },
- "assets/sprites/spinning-wheel/white-end.png": {
+ "assets/sprites/spinning-wheel/white-end.webp": {
   "animal": "spinning-wheel",
   "swf": "misc/npc/npc_spinning_wheel/npc_spinning_wheel.swf",
   "sprite": 290,
@@ -43673,7 +43673,7 @@
    0.991
   ]
  },
- "assets/sprites/spinning-wheel/green-spin.png": {
+ "assets/sprites/spinning-wheel/green-spin.webp": {
   "animal": "spinning-wheel",
   "swf": "misc/npc/npc_spinning_wheel/npc_spinning_wheel.swf",
   "sprite": 290,
@@ -43777,7 +43777,7 @@
    0.9911
   ]
  },
- "assets/sprites/spinning-wheel/green-end.png": {
+ "assets/sprites/spinning-wheel/green-end.webp": {
   "animal": "spinning-wheel",
   "swf": "misc/npc/npc_spinning_wheel/npc_spinning_wheel.swf",
   "sprite": 290,
@@ -43816,7 +43816,7 @@
    0.991
   ]
  },
- "assets/sprites/spinning-wheel/red-spin.png": {
+ "assets/sprites/spinning-wheel/red-spin.webp": {
   "animal": "spinning-wheel",
   "swf": "misc/npc/npc_spinning_wheel/npc_spinning_wheel.swf",
   "sprite": 290,
@@ -43920,7 +43920,7 @@
    0.9911
   ]
  },
- "assets/sprites/spinning-wheel/red-end.png": {
+ "assets/sprites/spinning-wheel/red-end.webp": {
   "animal": "spinning-wheel",
   "swf": "misc/npc/npc_spinning_wheel/npc_spinning_wheel.swf",
   "sprite": 290,
@@ -43959,7 +43959,7 @@
    0.991
   ]
  },
- "assets/sprites/spinning-wheel/disappear.png": {
+ "assets/sprites/spinning-wheel/disappear.webp": {
   "animal": "spinning-wheel-disappear",
   "swf": "misc/npc/npc_spinning_wheel/npc_spinning_wheel.swf",
   "sprite": 290,
@@ -44150,7 +44150,7 @@
    0.9889
   ]
  },
- "assets/sprites/rooks/rooked-halo.png": {
+ "assets/sprites/rooks/rooked-halo.webp": {
   "animal": "rooked-halo",
   "swf": "misc/emotional_bear/emotional_bear.swf",
   "sprite": 0,
@@ -46726,7 +46726,7 @@
   ],
   "drift": []
  },
- "assets/sprites/furniture/furniture_door.png": {
+ "assets/sprites/furniture/furniture_door.webp": {
   "animal": "furniture_door",
   "swf": "furniture/furniture_base/furniture_door/furniture_door.swf",
   "sprite": 0,
@@ -46758,7 +46758,7 @@
    0.9912
   ]
  },
- "assets/sprites/furniture/furniture_door_up_job.png": {
+ "assets/sprites/furniture/furniture_door_up_job.webp": {
   "animal": "furniture_door_up_job",
   "swf": "furniture/furniture_base/furniture_door/furniture_door.swf",
   "sprite": 0,
@@ -46790,7 +46790,7 @@
    0.9912
   ]
  },
- "assets/sprites/furniture/furniture_door_up.png": {
+ "assets/sprites/furniture/furniture_door_up.webp": {
   "animal": "furniture_door_up",
   "swf": "furniture/furniture_base/furniture_door/furniture_door.swf",
   "sprite": 0,
@@ -46822,7 +46822,7 @@
    0.9911
   ]
  },
- "assets/sprites/furniture/furniture_door_down.png": {
+ "assets/sprites/furniture/furniture_door_down.webp": {
   "animal": "furniture_door_down",
   "swf": "furniture/furniture_base/furniture_door/furniture_door.swf",
   "sprite": 0,
@@ -46854,7 +46854,7 @@
    0.9911
   ]
  },
- "assets/sprites/furniture/furniture_door_down_job.png": {
+ "assets/sprites/furniture/furniture_door_down_job.webp": {
   "animal": "furniture_door_down_job",
   "swf": "furniture/furniture_base/furniture_door/furniture_door.swf",
   "sprite": 0,
@@ -46886,7 +46886,7 @@
    0.9911
   ]
  },
- "assets/sprites/animals/magic_pig_stick_placed.png": {
+ "assets/sprites/animals/magic_pig_stick_placed.webp": {
   "animal": "magic_pig_stick_placed",
   "swf": "misc/magic_animal_stick/magic_pig_stick/magic_pig_stick.swf",
   "sprite": 0,
@@ -46918,7 +46918,7 @@
    0.947
   ]
  },
- "assets/sprites/animals/magic_chicken_stick_placed.png": {
+ "assets/sprites/animals/magic_chicken_stick_placed.webp": {
   "animal": "magic_chicken_stick_placed",
   "swf": "misc/magic_animal_stick/magic_chicken_stick/magic_chicken_stick.swf",
   "sprite": 0,
@@ -46950,7 +46950,7 @@
    0.944
   ]
  },
- "assets/sprites/animals/magic_butterfly_stick_placed.png": {
+ "assets/sprites/animals/magic_butterfly_stick_placed.webp": {
   "animal": "magic_butterfly_stick_placed",
   "swf": "misc/magic_animal_stick/magic_butterfly_stick/magic_butterfly_stick.swf",
   "sprite": 0,
@@ -51086,7 +51086,7 @@
   ],
   "drift": []
  },
- "assets/sprites/mail-npc/frog_red_box_idle.png": {
+ "assets/sprites/mail-npc/frog_red_box_idle.webp": {
   "animal": "frog-red-box",
   "character": "aflc-frog-red",
   "swf": "inhabitants/yoga_frog/npc_yoga_frog.swf",
@@ -51166,7 +51166,7 @@
    0.9634
   ]
  },
- "assets/sprites/mail-npc/frog_red_box_moveStart.png": {
+ "assets/sprites/mail-npc/frog_red_box_moveStart.webp": {
   "animal": "frog-red-box",
   "character": "aflc-frog-red",
   "swf": "inhabitants/yoga_frog/npc_yoga_frog.swf",
@@ -51203,7 +51203,7 @@
    0.9473
   ]
  },
- "assets/sprites/mail-npc/frog_red_box_move.png": {
+ "assets/sprites/mail-npc/frog_red_box_move.webp": {
   "animal": "frog-red-box",
   "character": "aflc-frog-red",
   "swf": "inhabitants/yoga_frog/npc_yoga_frog.swf",
@@ -51259,7 +51259,7 @@
    0.9689
   ]
  },
- "assets/sprites/mail-npc/frog_red_box_moveEnd.png": {
+ "assets/sprites/mail-npc/frog_red_box_moveEnd.webp": {
   "animal": "frog-red-box",
   "character": "aflc-frog-red",
   "swf": "inhabitants/yoga_frog/npc_yoga_frog.swf",
@@ -51296,7 +51296,7 @@
    0.9543
   ]
  },
- "assets/sprites/mail-npc/frog_red_box_talk.png": {
+ "assets/sprites/mail-npc/frog_red_box_talk.webp": {
   "animal": "frog-red-box",
   "character": "aflc-frog-red",
   "swf": "inhabitants/yoga_frog/npc_yoga_frog.swf",
@@ -51390,7 +51390,7 @@
    0.9626
   ]
  },
- "assets/sprites/mail-npc/frog_red_box_treePoseIn.png": {
+ "assets/sprites/mail-npc/frog_red_box_treePoseIn.webp": {
   "animal": "frog-red-box",
   "character": "aflc-frog-red",
   "swf": "inhabitants/yoga_frog/npc_yoga_frog.swf",
@@ -51444,7 +51444,7 @@
    0.9467
   ]
  },
- "assets/sprites/mail-npc/frog_red_box_treePose.png": {
+ "assets/sprites/mail-npc/frog_red_box_treePose.webp": {
   "animal": "frog-red-box",
   "character": "aflc-frog-red",
   "swf": "inhabitants/yoga_frog/npc_yoga_frog.swf",
@@ -51482,7 +51482,7 @@
    0.9468
   ]
  },
- "assets/sprites/mail-npc/frog_red_box_treePoseOut.png": {
+ "assets/sprites/mail-npc/frog_red_box_treePoseOut.webp": {
   "animal": "frog-red-box",
   "character": "aflc-frog-red",
   "swf": "inhabitants/yoga_frog/npc_yoga_frog.swf",
@@ -51533,7 +51533,7 @@
    0.9499
   ]
  },
- "assets/sprites/mail-npc/frog_red_box_dancerPoseIn.png": {
+ "assets/sprites/mail-npc/frog_red_box_dancerPoseIn.webp": {
   "animal": "frog-red-box",
   "character": "aflc-frog-red",
   "swf": "inhabitants/yoga_frog/npc_yoga_frog.swf",
@@ -51585,7 +51585,7 @@
    0.934
   ]
  },
- "assets/sprites/mail-npc/frog_red_box_dancerPose.png": {
+ "assets/sprites/mail-npc/frog_red_box_dancerPose.webp": {
   "animal": "frog-red-box",
   "character": "aflc-frog-red",
   "swf": "inhabitants/yoga_frog/npc_yoga_frog.swf",
@@ -51623,7 +51623,7 @@
    0.934
   ]
  },
- "assets/sprites/mail-npc/frog_red_box_dancerPoseOut.png": {
+ "assets/sprites/mail-npc/frog_red_box_dancerPoseOut.webp": {
   "animal": "frog-red-box",
   "character": "aflc-frog-red",
   "swf": "inhabitants/yoga_frog/npc_yoga_frog.swf",
@@ -51663,7 +51663,7 @@
    0.9486
   ]
  },
- "assets/sprites/mail-npc/frog_red_box_warriorPoseIn.png": {
+ "assets/sprites/mail-npc/frog_red_box_warriorPoseIn.webp": {
   "animal": "frog-red-box",
   "character": "aflc-frog-red",
   "swf": "inhabitants/yoga_frog/npc_yoga_frog.swf",
@@ -51718,7 +51718,7 @@
    0.9218
   ]
  },
- "assets/sprites/mail-npc/frog_red_box_warriorPose.png": {
+ "assets/sprites/mail-npc/frog_red_box_warriorPose.webp": {
   "animal": "frog-red-box",
   "character": "aflc-frog-red",
   "swf": "inhabitants/yoga_frog/npc_yoga_frog.swf",
@@ -51756,7 +51756,7 @@
    0.9212
   ]
  },
- "assets/sprites/mail-npc/frog_red_box_warriorPoseOut.png": {
+ "assets/sprites/mail-npc/frog_red_box_warriorPoseOut.webp": {
   "animal": "frog-red-box",
   "character": "aflc-frog-red",
   "swf": "inhabitants/yoga_frog/npc_yoga_frog.swf",
@@ -51799,7 +51799,7 @@
    0.9479
   ]
  },
- "assets/sprites/mail-npc/frog_red_none_idle.png": {
+ "assets/sprites/mail-npc/frog_red_none_idle.webp": {
   "animal": "frog-red-none",
   "character": "aflc-frog-red",
   "swf": "inhabitants/yoga_frog/npc_yoga_frog.swf",
@@ -51879,7 +51879,7 @@
    0.9548
   ]
  },
- "assets/sprites/mail-npc/frog_red_none_moveStart.png": {
+ "assets/sprites/mail-npc/frog_red_none_moveStart.webp": {
   "animal": "frog-red-none",
   "character": "aflc-frog-red",
   "swf": "inhabitants/yoga_frog/npc_yoga_frog.swf",
@@ -51916,7 +51916,7 @@
    0.9632
   ]
  },
- "assets/sprites/mail-npc/frog_red_none_move.png": {
+ "assets/sprites/mail-npc/frog_red_none_move.webp": {
   "animal": "frog-red-none",
   "character": "aflc-frog-red",
   "swf": "inhabitants/yoga_frog/npc_yoga_frog.swf",
@@ -51972,7 +51972,7 @@
    0.9673
   ]
  },
- "assets/sprites/mail-npc/frog_red_none_moveEnd.png": {
+ "assets/sprites/mail-npc/frog_red_none_moveEnd.webp": {
   "animal": "frog-red-none",
   "character": "aflc-frog-red",
   "swf": "inhabitants/yoga_frog/npc_yoga_frog.swf",
@@ -52009,7 +52009,7 @@
    0.9509
   ]
  },
- "assets/sprites/mail-npc/frog_red_none_talk.png": {
+ "assets/sprites/mail-npc/frog_red_none_talk.webp": {
   "animal": "frog-red-none",
   "character": "aflc-frog-red",
   "swf": "inhabitants/yoga_frog/npc_yoga_frog.swf",
@@ -52103,7 +52103,7 @@
    0.9534
   ]
  },
- "assets/sprites/mail-npc/frog_red_none_treePoseIn.png": {
+ "assets/sprites/mail-npc/frog_red_none_treePoseIn.webp": {
   "animal": "frog-red-none",
   "character": "aflc-frog-red",
   "swf": "inhabitants/yoga_frog/npc_yoga_frog.swf",
@@ -52157,7 +52157,7 @@
    0.9527
   ]
  },
- "assets/sprites/mail-npc/frog_red_none_treePose.png": {
+ "assets/sprites/mail-npc/frog_red_none_treePose.webp": {
   "animal": "frog-red-none",
   "character": "aflc-frog-red",
   "swf": "inhabitants/yoga_frog/npc_yoga_frog.swf",
@@ -52195,7 +52195,7 @@
    0.9538
   ]
  },
- "assets/sprites/mail-npc/frog_red_none_treePoseOut.png": {
+ "assets/sprites/mail-npc/frog_red_none_treePoseOut.webp": {
   "animal": "frog-red-none",
   "character": "aflc-frog-red",
   "swf": "inhabitants/yoga_frog/npc_yoga_frog.swf",
@@ -52246,7 +52246,7 @@
    0.9532
   ]
  },
- "assets/sprites/mail-npc/frog_red_none_dancerPoseIn.png": {
+ "assets/sprites/mail-npc/frog_red_none_dancerPoseIn.webp": {
   "animal": "frog-red-none",
   "character": "aflc-frog-red",
   "swf": "inhabitants/yoga_frog/npc_yoga_frog.swf",
@@ -52298,7 +52298,7 @@
    0.948
   ]
  },
- "assets/sprites/mail-npc/frog_red_none_dancerPose.png": {
+ "assets/sprites/mail-npc/frog_red_none_dancerPose.webp": {
   "animal": "frog-red-none",
   "character": "aflc-frog-red",
   "swf": "inhabitants/yoga_frog/npc_yoga_frog.swf",
@@ -52336,7 +52336,7 @@
    0.948
   ]
  },
- "assets/sprites/mail-npc/frog_red_none_dancerPoseOut.png": {
+ "assets/sprites/mail-npc/frog_red_none_dancerPoseOut.webp": {
   "animal": "frog-red-none",
   "character": "aflc-frog-red",
   "swf": "inhabitants/yoga_frog/npc_yoga_frog.swf",
@@ -52376,7 +52376,7 @@
    0.9526
   ]
  },
- "assets/sprites/mail-npc/frog_red_none_warriorPoseIn.png": {
+ "assets/sprites/mail-npc/frog_red_none_warriorPoseIn.webp": {
   "animal": "frog-red-none",
   "character": "aflc-frog-red",
   "swf": "inhabitants/yoga_frog/npc_yoga_frog.swf",
@@ -52431,7 +52431,7 @@
    0.9494
   ]
  },
- "assets/sprites/mail-npc/frog_red_none_warriorPose.png": {
+ "assets/sprites/mail-npc/frog_red_none_warriorPose.webp": {
   "animal": "frog-red-none",
   "character": "aflc-frog-red",
   "swf": "inhabitants/yoga_frog/npc_yoga_frog.swf",
@@ -52469,7 +52469,7 @@
    0.949
   ]
  },
- "assets/sprites/mail-npc/frog_red_none_warriorPoseOut.png": {
+ "assets/sprites/mail-npc/frog_red_none_warriorPoseOut.webp": {
   "animal": "frog-red-none",
   "character": "aflc-frog-red",
   "swf": "inhabitants/yoga_frog/npc_yoga_frog.swf",

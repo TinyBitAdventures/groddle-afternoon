@@ -339,7 +339,7 @@ export function fallbackClip(clip) {
 export function butlerSheetUrl(_lookId, anim) {
   return `assets/sprites/butler/butler_${BUTLER_FALLBACK.look}_${fallbackClip(anim)}.webp`;
 }
-export const BUTLER_BOX_ART = 'assets/sprites/butler/butler_box.png';
+export const BUTLER_BOX_ART = 'assets/sprites/butler/butler_box.webp';
 
 /**
  * Part choices of the OGA combinations (their file names): the three looks,

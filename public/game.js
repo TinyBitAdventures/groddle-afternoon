@@ -2,14 +2,14 @@
  * Groddle Afternoon — original street geometry + layered decos
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
-import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=075ded81';
+import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=ebc8b8b3';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=127e0a3c';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=b4df516e';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=d9128cb3';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
 import { createVogOverlay } from './js/vog-overlay.js?v=c2a9cc07';
-import { createPromptStack } from './js/prompt-stack.js?v=1282ed29';
+import { createPromptStack } from './js/prompt-stack.js?v=c67c01b5';
 import { createWindowStack } from './js/window-stack.js?v=a7104f02';
 import { HOG_HAUL_SPLASH, createGameSplash, splashFor } from './js/game-splash.js?v=5e2c6eb6';
 import {
@@ -18,7 +18,7 @@ import {
   advanceTimedAction,
   cancelTimedAction,
 } from './js/action-timing.js?v=5db4e91b';
-import { createWordProgressView, wordAnchor, heldActionDelta, MAX_PUSH_DOWN } from './js/word-progress.js?v=bffa60ac';
+import { createWordProgressView, wordAnchor, heldActionDelta, MAX_PUSH_DOWN } from './js/word-progress.js?v=98366023';
 // G374/G375/G378: Tiny Speck's quoin-limit and super-harvest rainbows and the musicblock notes.
 import { OVERLAY_USES, playCountdownArt, playOverlay, rainbowSound, showRainbow } from './js/overlays.js?v=642adbd0';
 import {
@@ -36,8 +36,8 @@ import {
 // Quest copy is Flash htmlText: <b>/<i>/<br> drawn as formatting, the rest dropped, never innerHTML.
 import { questRequirementText, renderQuestText, withQuestMarkup } from './js/quest-text.js?v=7f5d761c';
 // G267: the world-verb quest counters skip offer-system quests; old saves drop the boot Moloko quest.
-import { dropSpiritRepeatOffers, SPIRIT_REPEAT_QUESTS } from './js/spirit-reminisce.js?v=149199d4';
-import { dropBootStarterQuests, questMoveNote, routesCounter, worldVerbQuestEvents, gardenPlotEvents, makingUnitQuestEvents, shrineDonationQuestEvents } from './js/quest-offers.js?v=486b09c9';
+import { dropSpiritRepeatOffers, SPIRIT_REPEAT_QUESTS } from './js/spirit-reminisce.js?v=630e3731';
+import { dropBootStarterQuests, questMoveNote, routesCounter, worldVerbQuestEvents, gardenPlotEvents, makingUnitQuestEvents, shrineDonationQuestEvents } from './js/quest-offers.js?v=e31115ea';
 import {
   PHANTOM_QUEST_ID,
   REMEMBER_QUEST_ID,
@@ -128,10 +128,10 @@ import {
   qualificationVerb,
   requestLegalizeQualification,
   travelToGregarious,
-} from './js/legalize-it.js?v=bebf2574';
+} from './js/legalize-it.js?v=ffce7efe';
 import { HALL, HALL_LAYOUT, HALL_QUESTIONS } from './js/bureaucratic-hall.js?v=a0bc6317';
 import { STATION_X, stationArrival, stationScreen, surfaceStation } from './js/subway.js?v=44d1a09f';
-import { ALLEY, SHADY, drawAlley, inEnteredBox } from './js/quest-rooms/back-alley-set.js?v=3a8a00af';
+import { ALLEY, SHADY, drawAlley, inEnteredBox } from './js/quest-rooms/back-alley-set.js?v=d53ba17d';
 import {
   WINTER_HAVEN_STREET_ID,
   WINTER_MOTE_REWARDS,
@@ -228,7 +228,7 @@ import {
   rookEggStateForProgress,
   rookWoodsObjective,
   rookWoodsRemainingMs,
-} from './js/rook-woods.js?v=237b391c';
+} from './js/rook-woods.js?v=0ccc8239';
 import {
   ROOK_HALL_QUEST_ID,
   ROOK_HALL_START_QUEST_ID,
@@ -251,7 +251,7 @@ import {
   rookMuseumOverlayPoint,
   rookMuseumPaintingAlphas,
   visitRookMuseumExhibit,
-} from './js/rook-museum.js?v=aa41f263';
+} from './js/rook-museum.js?v=c774b613';
 import {
   DE_EMBIGGENIFY_PART2_QUEST_ID,
   DE_EMBIGGENIFY_QUEST_ID,
@@ -298,7 +298,7 @@ import {
   listEmotionalBearActions,
   performEmotionalBearAction,
   upgradeEmotionalBear,
-} from './js/emotional-bear.js?v=1dd276f7';
+} from './js/emotional-bear.js?v=8d027fe0';
 import {
   LAST_FEAT_STREET_IDS,
   LAST_FEAT_STREET_LABELS,
@@ -371,7 +371,7 @@ import {
   slipTerrainY,
   starlitMoonPlainAlpha,
   starlitRevealAlpha,
-} from './js/paradise-flight.js?v=abcd78b9';
+} from './js/paradise-flight.js?v=5d9aec42';
 import { resolveParadiseCourseAlias } from './js/paradise-courses.js?v=1a5d0aa7';
 import {
   buildParadiseCourseArt,
@@ -474,12 +474,12 @@ import {
   addItem,
   removeItem,
   isToolItem,
-} from './js/inventory.js?v=d82f3b00';
+} from './js/inventory.js?v=b7609342';
 import { TROPHY_FIND_TEXT, trophyOfBadge } from './js/home-trophies.js?v=21c2add6';
 import { PACK_COPY, isBagClass, isElementClass, unitRankAt } from './js/pack-slots.js?v=a94b816c';
 import { createPackRow, mountPackClearance, packBandRange, packCountText, packSearchEntries, packSlotTip } from './js/ui/pack-row.js?v=65c0f180';
-import { listAnimalFeedOptions } from './js/animals.js?v=d5af4f3c';
-import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=d5af4f3c';
+import { listAnimalFeedOptions } from './js/animals.js?v=0d9f9b0f';
+import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=0d9f9b0f';
 import {
   createDroppedItemState,
   parseDroppedItemState,
@@ -492,13 +492,13 @@ import {
   pickupDroppedStack,
   placeDroppedBag,
   takeDroppedRecord,
-} from './js/world-items.js?v=6378e71c';
+} from './js/world-items.js?v=0bbfdab9';
 import {
   createPlayerSave,
   parsePlayerSave,
   serializePlayerSave,
   restorePlayerSave,
-} from './js/player-save.js?v=17b5c632';
+} from './js/player-save.js?v=c7c41d5c';
 import {
   HOME_INTERIOR_TSID,
   HOME_STREET_TSID,
@@ -512,7 +512,7 @@ import {
   imagineHome,
   isHomePlaceTsid,
 } from './js/homes.js?v=631ab6b8';
-import { HOME_MACHINE, offerHomeTicket, renderTicketMachine } from './js/home-ticket.js?v=ee7ea52a';
+import { HOME_MACHINE, offerHomeTicket, renderTicketMachine } from './js/home-ticket.js?v=d5a36577';
 import {
   MAIL_COMPANIONS,
   archiveMail,
@@ -557,7 +557,7 @@ import {
   setCopyTag,
   migrateClassValue,
   brokenToolIcon,
-} from './js/tools.js?v=f701b241';
+} from './js/tools.js?v=d8aa3536';
 import {
   listRecipes,
   listRecipesForTool,
@@ -593,10 +593,10 @@ import {
   recipeTaskLimit,
   recipeToolInUse,
   pluralizeItem,
-} from './js/making.js?v=c9dc233e';
+} from './js/making.js?v=f4f214c2';
 import { outputIconsHtml, outputsPhrase, recipeOutputRows } from './js/ui/recipe-outputs.js?v=73e19baf';
 import { MAKE_TOOL_SHEETS } from './js/make-tool-sheets.js?v=6f758e09';
-import { LOW_FUEL_LINE, craftSessionElapsedMs, isLowFuel, isMachineArt, machineArtHtml, packMakeState, playMachineHandOver, setMachineArtFrame } from './js/machine-art.js?v=f8dc5b4d';
+import { LOW_FUEL_LINE, craftSessionElapsedMs, isLowFuel, isMachineArt, machineArtHtml, packMakeState, playMachineHandOver, setMachineArtFrame } from './js/machine-art.js?v=44af04ef';
 import {
   createGarden,
   tickGarden,
@@ -621,8 +621,8 @@ import {
   cropIcon,
   hasWateringCan,
   hasHoe,
-} from './js/garden.js?v=890d72ea';
-import { GARDEN_SCALE, PLOT_H as GARDEN_PLOT_H, PLOT_W as GARDEN_PLOT_W, gardenFrame, gardenLayout, gardenStyle, plotPieces } from './js/garden-view.js?v=05651e76';
+} from './js/garden.js?v=e1c3415c';
+import { GARDEN_SCALE, PLOT_H as GARDEN_PLOT_H, PLOT_W as GARDEN_PLOT_W, gardenFrame, gardenLayout, gardenStyle, plotPieces } from './js/garden-view.js?v=3683a26f';
 import {
   ROCK_CATALOG,
   createMineRock,
@@ -635,7 +635,7 @@ import {
   STARTER_MINING_SKILLS,
   findWorkingPick,
   miningToolWear,
-} from './js/mining.js?v=29fe2127';
+} from './js/mining.js?v=fc28670f';
 import {
   loadStreetData,
   STREET_INDEX,
@@ -643,7 +643,7 @@ import {
   ensureStreetIndex,
   resolveIndexTsid,
 } from './js/street-loader.js?v=33d2b8bc';
-import { showDraftBanner, startDraftPlay } from './js/builder/draft-play.js?v=5f124475';
+import { showDraftBanner, startDraftPlay } from './js/builder/draft-play.js?v=bf625cdf';
 import {
   ladderTopDeck,
   groundBeneath,
@@ -671,7 +671,7 @@ import {
   setSignpostHover,
   setSignpostKeys,
   signpostBoardAt,
-} from './js/street-render.js?v=9eded3c1';
+} from './js/street-render.js?v=81416f4f';
 import {
   GAME_DAY_MS,
   shouldFireNewDay,
@@ -695,7 +695,7 @@ import {
   canEatFood,
   recordFoodEat,
   resetFoodDay,
-} from './js/food.js?v=e03d5f01';
+} from './js/food.js?v=ed75d614';
 import {
   consumeTakesCount,
   consumeCountCap,
@@ -705,7 +705,7 @@ import {
   limitCountCap,
   useItemMany,
   recordFoodEatMany,
-} from './js/eat-many.js?v=10974c7c';
+} from './js/eat-many.js?v=69cdb513';
 import {
   TRIPLE_JUMP_UPGRADES,
   createJumpState,
@@ -753,8 +753,8 @@ import {
   streetCardUp,
   STREET_CARD_UP,
   POL_OWNER_SIZE,
-} from './js/screen-fx.js?v=155d18cf';
-import { momentMoreText } from './js/ui/moment-card.js?v=077703c8';
+} from './js/screen-fx.js?v=b4ec277f';
+import { momentMoreText } from './js/ui/moment-card.js?v=68e10b61';
 // HUB: the hub is the Modern skin's; Classic owns X in its skin (js/classic/classic-hub.js).
 import { MODERN, onUiModeChange, uiState } from './js/classic/ui-mode.js?v=587c014a';
 // ZOOM: the world zoom (a device preference) and Classic's frame scale under it; both load before main().
@@ -762,10 +762,10 @@ import { worldZoom, setWorldZoom, stepWorldZoom, onZoomChange, zoomKeyAction, zo
 import { nightTint, nightTintOn, onNightTintChange, worldTintOpacity } from './js/night-tint.js?v=1dfc9c89';
 import { streetMapSetting, toggleStreetMap } from './js/ui/street-minimap.js?v=fa31d398';
 import './js/classic/classic-zoom.js?v=1ef4b9a5';
-import { mountImaginationHub } from './js/ui/imagination-hub.js?v=1d96f241';
+import { mountImaginationHub } from './js/ui/imagination-hub.js?v=51fa371f';
 import { newDayBubble, shuffleNewDayMessages, waitForScreenGates } from './js/screen-queue.js?v=cf0132c0';
-import { applyFamiliarLook, familiarCardHeading, familiarLook, skillArtFor, skillLearnedActivity } from './js/familiar.js?v=c7e902af';
-import { armPromptTimeout, promptTimeoutMs } from './js/prompt-timeout.js?v=d8da8751';
+import { applyFamiliarLook, familiarCardHeading, familiarLook, skillArtFor, skillLearnedActivity } from './js/familiar.js?v=5fd83250';
+import { armPromptTimeout, promptTimeoutMs } from './js/prompt-timeout.js?v=4ed116c4';
 import {
   planTravel,
   listMapDestinations,
@@ -779,7 +779,7 @@ import { holdCloseToFloor } from './js/slope-walk.js?v=9af1e505';
 import { JUMP_SPEED, MAX_TICK_FRAMES, WALK_MAX, avatarGround, coastX, frameSteps, stepAvatar, steerAccel, steerX, streetPhysicsExtras } from './js/avatar-step.js?v=d48908a5';
 import { createUserPath, stepUserPath } from './js/user-path.js?v=8880557f';
 import { FAILED_LINE, inVerbReach, movingLine, verbRange, walkOverEnd, walkOverGoalX } from './js/walk-over.js?v=db80ba07';
-import { hellBuffDesc, isInHell } from './js/hell.js?v=aca145ba';
+import { hellBuffDesc, isInHell } from './js/hell.js?v=ca971c34';
 import { climbBobY, ladderAnimState, ladderSwap } from './js/ladder-anim.js?v=a8b327a0';
 import { VECTOR_AVATAR } from './js/avatar-vector-sheets.js?v=ad801376';
 import { createNpcGlitchKit } from './js/npc-glitch.js?v=894841be';
@@ -815,7 +815,7 @@ import {
   planMusicblockDrop,
   playMusicblock,
   starterMusicblocks,
-} from './js/musicblocks.js?v=f5adbf0c';
+} from './js/musicblocks.js?v=db6a213b';
 import {
   VENDOR_PROFILES,
   selectVendorProfile,
@@ -826,20 +826,20 @@ import {
   createVendorSellQuote,
   vendorSellUnitPrice,
   vendorBuyUnitPrice,
-} from './js/vendor.js?v=18b51628';
+} from './js/vendor.js?v=307aca18';
 import {
   animalAnchorX,
   createAnimalState,
   resetAnimalDay,
   animalStatusLabel,
-} from './js/animals.js?v=d5af4f3c';
+} from './js/animals.js?v=0d9f9b0f';
 import {
   ensureWoodTreeState,
   pickWoodTool,
   resetWoodTreeDay,
   woodToolLabel,
   woodTreeStatusLabel,
-} from './js/woodcutting.js?v=c199dd64';
+} from './js/woodcutting.js?v=4fd0342b';
 import {
   GIANTS,
   createShrineState,
@@ -861,9 +861,9 @@ import {
   favorRelationNote,
   emblemRelationNote,
   formatSpeedUpTime,
-} from './js/shrines.js?v=95d74174';
+} from './js/shrines.js?v=1a945fe7';
 import { giantDisplayName } from './js/giant-names.js?v=0e295891';
-import { shrinePowderOptions, shrinePowderAchievementCounters } from './js/powders.js?v=c0a14c95';
+import { shrinePowderOptions, shrinePowderAchievementCounters } from './js/powders.js?v=39081ab5';
 import {
   GAMESHOW_TICKET_ID,
   applySpinningWheelReward,
@@ -873,7 +873,7 @@ import {
   spinMeResponse,
   spinningWheelPhase,
   startSpinningWheel,
-} from './js/spinning-wheel.js?v=482cd151';
+} from './js/spinning-wheel.js?v=ddae3d4d';
 import {
   CUBIMAL_PACKAGE_IDS,
   cubimalCollectionProgress,
@@ -882,7 +882,7 @@ import {
   ensureCubimalItems,
   openCubimalPackage,
   setCubimalFree,
-} from './js/cubimals.js?v=8950bf83';
+} from './js/cubimals.js?v=c48cc6ff';
 import {
   STOOT_DOLL_BUBBLE_MS,
   STOOT_DOLL_ID,
@@ -907,7 +907,7 @@ import {
   quoinClassType,
   resetStreetQuoinsForNewDay,
   creditQuoinStat,
-} from './js/quoins.js?v=f154a79e';
+} from './js/quoins.js?v=299cc3f4';
 import {
   buildHubMapView,
   mapClickTravel,
@@ -921,7 +921,7 @@ import {
   pickMapSpot,
   MAP_INDEX_URL,
   HUB_56_MAP_URL,
-} from './js/map-graph.js?v=eec0c3d8';
+} from './js/map-graph.js?v=b404f57b';
 import { hubMapArtNote, hubMapSubtitle, questLogSummary } from './js/panel-copy.js?v=3243b9b2';
 import { bindMapIconTips } from './js/ui/map-icon-tips.js?v=6b3eb3f9';
 import { createMapZoom } from './js/map-zoom.js?v=4c2ce0e3';
@@ -935,7 +935,7 @@ import {
   ANIMAL_PATROL,
   nearestPlacementGap,
 } from './js/street-ecology.js?v=3c1d4c06';
-import { chickenPauseRoll, easeToward, flightFloorAt, flightFloorFor, flyerLift } from './js/street-creatures.js?v=746e64a0';
+import { chickenPauseRoll, easeToward, flightFloorAt, flightFloorFor, flyerLift } from './js/street-creatures.js?v=5fe850f9';
 import { createSoundBoard, DEFAULT_SFX_VOLUME, watchButtonClicks, watchPanelSounds } from './js/sound-board.js?v=87380a25';
 import {
   actionLoopFor,
@@ -951,7 +951,7 @@ import {
   soundForVerb,
 } from './js/sound-moments.js?v=2f8597cd';
 import { loseMood, moodMax, setMetabolicGainGate, setMetabolicLossGate } from './js/metabolics.js?v=8504134e';
-import { installHiresIcons } from './js/icon-hires.js?v=5b68aeaa';
+import { installHiresIcons } from './js/icon-hires.js?v=165dbd6e';
 import { installHiresDecos } from './js/deco-hires.js?v=cb905e17';
 import { loadAudioLevels, loadMutedPreference, saveAudioLevel, saveMutedPreference } from './js/audio-pref.js?v=6fe817bc';
 import { createAudioBuses, fadeGain } from './js/audio-buses.js?v=af167b54';
@@ -959,8 +959,8 @@ import { installTopBar, renderTopBar } from './js/ui/topbar.js?v=918c8bab';
 import { focusBack, installFocusReturn, lastInput } from './js/ui/focus-return.js?v=da190597';
 import { installContextGuard } from './js/ui/context-guard.js?v=0f71ac17';
 import { QUOIN_FRAME_BOB, advanceQuoinClock, quoinBobBetweenFrames } from './js/quoin-motion.js?v=ea0bd408';
-import { installHiresFirstDraw, installHiresSprites, upgradeSource } from './js/sprite-hires.js?v=f98be5eb';
-import { denseSprite } from './js/sprite-dense.js?v=178a711b';
+import { installHiresFirstDraw, installHiresSprites, upgradeSource } from './js/sprite-hires.js?v=abaf3d5a';
+import { denseSprite } from './js/sprite-dense.js?v=2a0ce07a';
 import { wholeStatAmounts, wholeEffects } from './js/stat-text.js?v=f96d8fd3';
 import { createNotifier, effectTokens, floatKey, offerCardDrop, stackFloat, tokenText } from './js/notify.js?v=37c6b748';
 import { holdMs } from './js/read-time.js?v=60ae7efc';
@@ -980,7 +980,7 @@ import { ENCYCLOPEDIA_MENU_LABEL, createEncyclopedia, isEncyclopediaKey } from '
 import { EAT_PICK_TEXT, bestFoodIndex, eatChoices, eatTip } from './js/eat-pick.js?v=8fb763d0';
 import { installHeldKeyGuard, isMacPlatform } from './js/held-keys.js?v=98b96620';
 import { signpostArmRows, worldContextAction } from './js/world-context-menu.js?v=f3f48805';
-import { blockedPlayerVerbs, listPlayerTarget, opensPlayerMenu, playerMenuRows } from './js/ui/player-menu.js?v=7ae16be2';
+import { blockedPlayerVerbs, listPlayerTarget, opensPlayerMenu, playerMenuRows } from './js/ui/player-menu.js?v=a2934000';
 import { forgetTexture, frameTexture, isFailed, isLoaded, onFailed, onLoaded, textureFromUrl, whenLoaded } from './js/textures.js?v=3149d699';
 import { FALLBACK_MAX as WORLD_ART_FALLBACK_MAX, worldArtFor } from './js/world-art.js?v=df476660';
 import { sceneAnim, syncAnim } from './js/deco-anim.js?v=8c4c784b';
@@ -1000,7 +1000,7 @@ import { SLUG_ANIMATION, SLUG_LAYOUT, SLUG_STYLES, SLUG_TARGETS, drawSlugIcon, f
 import { filterText } from './js/word-filter.js?v=9a7a7ebb'; // the remake's own word filter
 import { arrangeMapCards, fitMapExtras } from './js/map-extras.js?v=9f38c312'; // the Map's Shortcuts
 // The interface skin (js/classic/ui-mode.js) sets <html data-ui> as it loads: before main(), so before the boot cover lifts.
-import { installInterfaceSettings } from './js/classic/classic-prefs.js?v=168f9993';
+import { installInterfaceSettings } from './js/classic/classic-prefs.js?v=c2f84801';
 
 /** @type {object|null} assets/maps/index.json */
 let mapIndexCache = null;
@@ -1133,105 +1133,105 @@ const WHEEL_TRIM = Object.freeze({ x: 170, y: 181, w: 514, h: 450 });
 
 const SHEETS = {
   piggyWalk: {
-    url: 'assets/sprites/npc_piggy__x1_walk_png_1354829432.png',
+    url: 'assets/sprites/npc_piggy__x1_walk_png_1354829432.webp',
     fw: 88, fh: 62, cols: 8, rows: 3,
   },
   piggyNibble: {
-    url: 'assets/sprites/npc_piggy__x1_nibble_png_1354829441.png',
+    url: 'assets/sprites/npc_piggy__x1_nibble_png_1354829441.webp',
     fw: 88, fh: 62, cols: 10, rows: 6,
   },
   // The pack icon, which has a 3x render (js/icon-hires.js).
-  appleIcon: { url: 'assets/sprites/icons/apple.png', whole: true },
+  appleIcon: { url: 'assets/sprites/icons/apple.webp', whole: true },
   chickenWalk: {
-    url: 'assets/sprites/npc_chicken__x1_walk_png_1354830385.png',
+    url: 'assets/sprites/npc_chicken__x1_walk_png_1354830385.webp',
     fw: 148, fh: 110, cols: 6, rows: 4,
   },
   // Sheets whose last cells are blank play only their real frames (Austin, 2026-10-25: the ticket's
   // Spinning Wheel blinked out each turn). tests/sheet-blank-cells.test.js checks every sheet here.
   chickenPeck: {
-    url: 'assets/sprites/npc_chicken__x1_pecking_once_png_1354830398.png',
+    url: 'assets/sprites/npc_chicken__x1_pecking_once_png_1354830398.webp',
     fw: 148, fh: 110, cols: 6, rows: 6, frameCount: 32,
   },
   // A Chicken standing still (a pause, a player at it): the first frame of the original's idle1, the
   // state npc_chicken.js pause_state_choices picks most (1856-1865), not the walk's mid-step frame
   // (Austin 2026-11-02). One cell of Tiny Speck's OGA sheet; its 3x is rendered from npc_chicken.swf.
   chickenStand: {
-    url: 'assets/sprites/animals/npc_chicken_stand.png',
+    url: 'assets/sprites/animals/npc_chicken_stand.webp',
     fw: 148, fh: 110, cols: 1, rows: 1,
   },
   butterfly: {
-    url: 'assets/sprites/npc_butterfly__x1_fly-side_png_1354829525.png',
+    url: 'assets/sprites/npc_butterfly__x1_fly-side_png_1354829525.webp',
     fw: 70, fh: 65, cols: 14, rows: 6,
   },
   // Official rest sheet (x1) — not the tiny hand-cropped 39×28 single used before.
   butterflyRest: {
-    url: 'assets/sprites/npc_butterfly__x1_rest-angle1_png_1354829530.png',
+    url: 'assets/sprites/npc_butterfly__x1_rest-angle1_png_1354829530.webp',
     fw: 70, fh: 65, cols: 6, rows: 1,
   },
   // The sheets end in empty cells (idle 57 of 60, talk 26 of 27): played, the clerks vanished each loop.
   // walk1 (24 cells) and walk2 (12) are full: greeting and strolling, and helping (npc_bureaucrat.js setAndBroadcastState).
   bureaucrat0Idle: {
-    url: 'assets/sprites/quests/legalize/npc_bureaucrat_arms_01_glasses_none_hair_01_legs_01_necklace_none_tie_01_torso_01_x1_idle1_png_1354832995.png',
+    url: 'assets/sprites/quests/legalize/npc_bureaucrat_arms_01_glasses_none_hair_01_legs_01_necklace_none_tie_01_torso_01_x1_idle1_png_1354832995.webp',
     fw: 97, fh: 89, cols: 10, rows: 6, frameCount: 57,
   },
   bureaucrat0Talk: {
-    url: 'assets/sprites/quests/legalize/npc_bureaucrat_arms_01_glasses_none_hair_01_legs_01_necklace_none_tie_01_torso_01_x1_talk_png_1354832993.png',
+    url: 'assets/sprites/quests/legalize/npc_bureaucrat_arms_01_glasses_none_hair_01_legs_01_necklace_none_tie_01_torso_01_x1_talk_png_1354832993.webp',
     fw: 97, fh: 89, cols: 9, rows: 3, frameCount: 26,
   },
   bureaucrat0Walk1: {
-    url: 'assets/sprites/quests/legalize/npc_bureaucrat_arms_01_glasses_none_hair_01_legs_01_necklace_none_tie_01_torso_01_x1_walk1_png_1354832991.png',
+    url: 'assets/sprites/quests/legalize/npc_bureaucrat_arms_01_glasses_none_hair_01_legs_01_necklace_none_tie_01_torso_01_x1_walk1_png_1354832991.webp',
     fw: 97, fh: 89, cols: 8, rows: 3,
   },
   bureaucrat0Walk2: {
-    url: 'assets/sprites/quests/legalize/npc_bureaucrat_arms_01_glasses_none_hair_01_legs_01_necklace_none_tie_01_torso_01_x1_walk2_png_1354832992.png',
+    url: 'assets/sprites/quests/legalize/npc_bureaucrat_arms_01_glasses_none_hair_01_legs_01_necklace_none_tie_01_torso_01_x1_walk2_png_1354832992.webp',
     fw: 97, fh: 89, cols: 6, rows: 2,
   },
   bureaucrat1Idle: {
-    url: 'assets/sprites/quests/legalize/npc_bureaucrat_arms_02_glasses_none_hair_02_legs_02_necklace_none_tie_02_torso_02_x1_idle1_png_1354833004.png',
+    url: 'assets/sprites/quests/legalize/npc_bureaucrat_arms_02_glasses_none_hair_02_legs_02_necklace_none_tie_02_torso_02_x1_idle1_png_1354833004.webp',
     fw: 97, fh: 91, cols: 10, rows: 6, frameCount: 57,
   },
   bureaucrat1Talk: {
-    url: 'assets/sprites/quests/legalize/npc_bureaucrat_arms_02_glasses_none_hair_02_legs_02_necklace_none_tie_02_torso_02_x1_talk_png_1354833002.png',
+    url: 'assets/sprites/quests/legalize/npc_bureaucrat_arms_02_glasses_none_hair_02_legs_02_necklace_none_tie_02_torso_02_x1_talk_png_1354833002.webp',
     fw: 97, fh: 91, cols: 9, rows: 3, frameCount: 26,
   },
   bureaucrat1Walk1: {
-    url: 'assets/sprites/quests/legalize/npc_bureaucrat_arms_02_glasses_none_hair_02_legs_02_necklace_none_tie_02_torso_02_x1_walk1_png_1354832999.png',
+    url: 'assets/sprites/quests/legalize/npc_bureaucrat_arms_02_glasses_none_hair_02_legs_02_necklace_none_tie_02_torso_02_x1_walk1_png_1354832999.webp',
     fw: 97, fh: 91, cols: 8, rows: 3,
   },
   bureaucrat1Walk2: {
-    url: 'assets/sprites/quests/legalize/npc_bureaucrat_arms_02_glasses_none_hair_02_legs_02_necklace_none_tie_02_torso_02_x1_walk2_png_1354833000.png',
+    url: 'assets/sprites/quests/legalize/npc_bureaucrat_arms_02_glasses_none_hair_02_legs_02_necklace_none_tie_02_torso_02_x1_walk2_png_1354833000.webp',
     fw: 97, fh: 91, cols: 6, rows: 2,
   },
   bureaucrat2Idle: {
-    url: 'assets/sprites/quests/legalize/npc_bureaucrat_arms_03_glasses_none_hair_04_legs_03_necklace_01_tie_none_torso_03_x1_idle1_png_1354833012.png',
+    url: 'assets/sprites/quests/legalize/npc_bureaucrat_arms_03_glasses_none_hair_04_legs_03_necklace_01_tie_none_torso_03_x1_idle1_png_1354833012.webp',
     fw: 97, fh: 96, cols: 10, rows: 6, frameCount: 57,
   },
   bureaucrat2Talk: {
-    url: 'assets/sprites/quests/legalize/npc_bureaucrat_arms_03_glasses_none_hair_04_legs_03_necklace_01_tie_none_torso_03_x1_talk_png_1354833010.png',
+    url: 'assets/sprites/quests/legalize/npc_bureaucrat_arms_03_glasses_none_hair_04_legs_03_necklace_01_tie_none_torso_03_x1_talk_png_1354833010.webp',
     fw: 97, fh: 96, cols: 9, rows: 3, frameCount: 26,
   },
   bureaucrat2Walk1: {
-    url: 'assets/sprites/quests/legalize/npc_bureaucrat_arms_03_glasses_none_hair_04_legs_03_necklace_01_tie_none_torso_03_x1_walk1_png_1354833008.png',
+    url: 'assets/sprites/quests/legalize/npc_bureaucrat_arms_03_glasses_none_hair_04_legs_03_necklace_01_tie_none_torso_03_x1_walk1_png_1354833008.webp',
     fw: 97, fh: 96, cols: 8, rows: 3,
   },
   bureaucrat2Walk2: {
-    url: 'assets/sprites/quests/legalize/npc_bureaucrat_arms_03_glasses_none_hair_04_legs_03_necklace_01_tie_none_torso_03_x1_walk2_png_1354833009.png',
+    url: 'assets/sprites/quests/legalize/npc_bureaucrat_arms_03_glasses_none_hair_04_legs_03_necklace_01_tie_none_torso_03_x1_walk2_png_1354833009.webp',
     fw: 97, fh: 96, cols: 6, rows: 2,
   },
   bureaucrat3Idle: {
-    url: 'assets/sprites/quests/legalize/npc_bureaucrat_arms_04_glasses_none_hair_05_legs_04_necklace_02_tie_none_torso_04_x1_idle1_png_1354833021.png',
+    url: 'assets/sprites/quests/legalize/npc_bureaucrat_arms_04_glasses_none_hair_05_legs_04_necklace_02_tie_none_torso_04_x1_idle1_png_1354833021.webp',
     fw: 97, fh: 101, cols: 10, rows: 6, frameCount: 57,
   },
   bureaucrat3Talk: {
-    url: 'assets/sprites/quests/legalize/npc_bureaucrat_arms_04_glasses_none_hair_05_legs_04_necklace_02_tie_none_torso_04_x1_talk_png_1354833019.png',
+    url: 'assets/sprites/quests/legalize/npc_bureaucrat_arms_04_glasses_none_hair_05_legs_04_necklace_02_tie_none_torso_04_x1_talk_png_1354833019.webp',
     fw: 97, fh: 101, cols: 9, rows: 3, frameCount: 26,
   },
   bureaucrat3Walk1: {
-    url: 'assets/sprites/quests/legalize/npc_bureaucrat_arms_04_glasses_none_hair_05_legs_04_necklace_02_tie_none_torso_04_x1_walk1_png_1354833017.png',
+    url: 'assets/sprites/quests/legalize/npc_bureaucrat_arms_04_glasses_none_hair_05_legs_04_necklace_02_tie_none_torso_04_x1_walk1_png_1354833017.webp',
     fw: 97, fh: 101, cols: 8, rows: 3,
   },
   bureaucrat3Walk2: {
-    url: 'assets/sprites/quests/legalize/npc_bureaucrat_arms_04_glasses_none_hair_05_legs_04_necklace_02_tie_none_torso_04_x1_walk2_png_1354833018.png',
+    url: 'assets/sprites/quests/legalize/npc_bureaucrat_arms_04_glasses_none_hair_05_legs_04_necklace_02_tie_none_torso_04_x1_walk2_png_1354833018.webp',
     fw: 97, fh: 101, cols: 6, rows: 2,
   },
   quoin: {
@@ -1242,131 +1242,131 @@ const SHEETS = {
     rows: QUOIN_SHEET.rows,
   },
   // A CC0 trant_fruit cell (OGA sheet, maturity 7); the old tree_fruit_single.png had no traced source (G316).
-  treeFruit: { url: 'assets/sprites/trants/frames/trant_fruit_m7.png', whole: true },
-  treeWood: { url: 'assets/sprites/tree_wood_single.png', whole: true },
+  treeFruit: { url: 'assets/sprites/trants/frames/trant_fruit_m7.webp', whole: true },
+  treeWood: { url: 'assets/sprites/tree_wood_single.webp', whole: true },
   treeWoodGrowth: {
-    url: 'assets/sprites/wood_tree_maturity_6_variant_2_x6_1_png_1354833445.png',
+    url: 'assets/sprites/wood_tree_maturity_6_variant_2_x6_1_png_1354833445.webp',
     fw: 88, fh: 138, cols: 6, rows: 1,
   },
   mineRockMetal: {
-    url: 'assets/sprites/mining/rock_metal.png?v=exact-rock-cells-1',
+    url: 'assets/sprites/mining/rock_metal.webp?v=exact-rock-cells-1',
     fw: 137, fh: 100, cols: 5, rows: 1,
   },
   mineRockDullite: {
-    url: 'assets/sprites/mining/rock_dullite.png?v=exact-rock-cells-1',
+    url: 'assets/sprites/mining/rock_dullite.webp?v=exact-rock-cells-1',
     fw: 131, fh: 114, cols: 5, rows: 1,
   },
   mineRockBeryl: {
-    url: 'assets/sprites/mining/rock_beryl.png?v=exact-rock-cells-1',
+    url: 'assets/sprites/mining/rock_beryl.webp?v=exact-rock-cells-1',
     fw: 134, fh: 120, cols: 5, rows: 1,
   },
   mineRockSparkly: {
-    url: 'assets/sprites/mining/rock_sparkly.png?v=exact-rock-cells-1',
+    url: 'assets/sprites/mining/rock_sparkly.webp?v=exact-rock-cells-1',
     fw: 131, fh: 127, cols: 5, rows: 1,
   },
   hatchetTool: {
-    url: 'assets/sprites/tools/hatchet-tool.png',
+    url: 'assets/sprites/tools/hatchet-tool.webp',
     fw: 110, fh: 64, cols: 8, rows: 5, frameCount: 38,
   },
   // OGA class_axe__x1_tool_animation (888×325): 38 cells of 111×65.
   classAxeTool: {
-    url: 'assets/sprites/tools/class-axe-tool.png',
+    url: 'assets/sprites/tools/class-axe-tool.webp',
     fw: 111, fh: 65, cols: 8, rows: 5, frameCount: 38,
   },
   wateringCanTool: {
-    url: 'assets/sprites/tools/watering-can-tool.png',
+    url: 'assets/sprites/tools/watering-can-tool.webp',
     fw: 91, fh: 78, cols: 10, rows: 3,
   },
   wheelAppear: {
-    url: 'assets/sprites/spinning-wheel/appear.png',
+    url: 'assets/sprites/spinning-wheel/appear.webp',
     fw: 172, fh: 267, cols: 7, rows: 2, frameCount: 14, trim: WHEEL_TRIM,
   },
   wheelDisappear: {
-    url: 'assets/sprites/spinning-wheel/disappear.png',
+    url: 'assets/sprites/spinning-wheel/disappear.webp',
     fw: 514, fh: 450, cols: 6, rows: 3, frameCount: 18,
   },
   wheelGreenSpin: {
-    url: 'assets/sprites/spinning-wheel/green-spin.png',
+    url: 'assets/sprites/spinning-wheel/green-spin.webp',
     fw: 172, fh: 267, cols: 7, rows: 8, frameCount: 53, trim: WHEEL_TRIM,
   },
   wheelGreenEnd: {
-    url: 'assets/sprites/spinning-wheel/green-end.png',
+    url: 'assets/sprites/spinning-wheel/green-end.webp',
     fw: 172, fh: 267, cols: 1, rows: 8, frameCount: 8, trim: WHEEL_TRIM,
   },
   wheelWhiteSpin: {
-    url: 'assets/sprites/spinning-wheel/white-spin.png',
+    url: 'assets/sprites/spinning-wheel/white-spin.webp',
     fw: 172, fh: 267, cols: 7, rows: 8, frameCount: 53, trim: WHEEL_TRIM,
   },
   wheelWhiteEnd: {
-    url: 'assets/sprites/spinning-wheel/white-end.png',
+    url: 'assets/sprites/spinning-wheel/white-end.webp',
     fw: 172, fh: 267, cols: 1, rows: 8, frameCount: 8, trim: WHEEL_TRIM,
   },
   wheelRedSpin: {
-    url: 'assets/sprites/spinning-wheel/red-spin.png',
+    url: 'assets/sprites/spinning-wheel/red-spin.webp',
     fw: 172, fh: 267, cols: 7, rows: 8, frameCount: 53, trim: WHEEL_TRIM,
   },
   wheelRedEnd: {
-    url: 'assets/sprites/spinning-wheel/red-end.png',
+    url: 'assets/sprites/spinning-wheel/red-end.webp',
     fw: 172, fh: 267, cols: 1, rows: 8, frameCount: 8, trim: WHEEL_TRIM,
   },
   phantomAppear: {
-    url: 'assets/sprites/quests/phantom-appear.png',
+    url: 'assets/sprites/quests/phantom-appear.webp',
     fw: 147, fh: 214, cols: 6, rows: 8, frameCount: PHANTOM_APPEAR_FRAME_COUNT,
   },
   phantomGiveHeart: {
-    url: 'assets/sprites/quests/phantom-give-heart.png',
+    url: 'assets/sprites/quests/phantom-give-heart.webp',
     fw: 147, fh: 214, cols: 6, rows: 13, frameCount: PHANTOM_GIVE_HEART_FRAME_COUNT,
   },
   pigBait: {
-    url: 'assets/sprites/races/pig_bait__x1_1_x1_2_x1_3_x1_4_png_1354830335.png',
+    url: 'assets/sprites/races/pig_bait__x1_1_x1_2_x1_3_x1_4_png_1354830335.webp',
     fw: 53, fh: 46, cols: 4, rows: 1,
   },
   hogtiedPiggy: {
-    url: 'assets/sprites/races/hogtied_piggy__x1_1_png_1354830331.png',
+    url: 'assets/sprites/races/hogtied_piggy__x1_1_png_1354830331.webp',
     whole: true,
   },
   hogHaulTicket: {
-    url: 'assets/sprites/races/race_ticket_hogtie_piggy__x1_iconic_png_1354836452.png',
+    url: 'assets/sprites/races/race_ticket_hogtie_piggy__x1_iconic_png_1354836452.webp',
     whole: true,
   },
   letterBlockA: {
-    url: 'assets/sprites/quests/four-letter/letter-block-A.png',
+    url: 'assets/sprites/quests/four-letter/letter-block-A.webp',
     fw: 139, fh: 197, cols: 2, rows: 1,
   },
   letterBlockB: {
-    url: 'assets/sprites/quests/four-letter/letter-block-B.png',
+    url: 'assets/sprites/quests/four-letter/letter-block-B.webp',
     fw: 139, fh: 197, cols: 2, rows: 1,
   },
   letterBlockE: {
-    url: 'assets/sprites/quests/four-letter/letter-block-E.png',
+    url: 'assets/sprites/quests/four-letter/letter-block-E.webp',
     fw: 139, fh: 197, cols: 2, rows: 1,
   },
   letterBlockM: {
-    url: 'assets/sprites/quests/four-letter/letter-block-M.png',
+    url: 'assets/sprites/quests/four-letter/letter-block-M.webp',
     fw: 139, fh: 197, cols: 2, rows: 1,
   },
   letterBlockS: {
-    url: 'assets/sprites/quests/four-letter/letter-block-S.png',
+    url: 'assets/sprites/quests/four-letter/letter-block-S.webp',
     fw: 139, fh: 197, cols: 2, rows: 1,
   },
   letterBlockT: {
-    url: 'assets/sprites/quests/four-letter/letter-block-T.png',
+    url: 'assets/sprites/quests/four-letter/letter-block-T.webp',
     fw: 139, fh: 197, cols: 2, rows: 1,
   },
   mrBlock: {
-    url: 'assets/sprites/quests/four-letter/mr-block.png',
+    url: 'assets/sprites/quests/four-letter/mr-block.webp',
     fw: 121, fh: 117, cols: 2, rows: 1,
   },
   dustBunnyIdle: {
-    url: 'assets/sprites/quests/de-embiggenify/npc_dustbunny__x1_idle_stand_png_1354831147.png',
+    url: 'assets/sprites/quests/de-embiggenify/npc_dustbunny__x1_idle_stand_png_1354831147.webp',
     fw: 104, fh: 59, cols: 9, rows: 20, frameCount: 172,
   },
   dustBunnyTalk: {
-    url: 'assets/sprites/quests/de-embiggenify/npc_dustbunny__x1_talk_png_1354831143.png',
+    url: 'assets/sprites/quests/de-embiggenify/npc_dustbunny__x1_talk_png_1354831143.webp',
     fw: 104, fh: 59, cols: 9, rows: 6, frameCount: 50,
   },
   jonesWalk: {
-    url: 'assets/sprites/quests/ilmenskie/jones-walk.png',
+    url: 'assets/sprites/quests/ilmenskie/jones-walk.webp',
     fw: 87, fh: 64, cols: 8, rows: 3,
   },
   // The vector Glitch's default look (js/avatar-vector-sheets.js, 3x on first draw).
@@ -2488,7 +2488,7 @@ ensureCubimalItems();
 ensureItem(STOOT_DOLL_ID, {
   label: STOOT_DOLL_LABEL,
   desc: 'Loaded with a goodly amount of "inspirational" phrases.',
-  icon: 'assets/sprites/spinning-wheel/stoot-doll.png',
+  icon: 'assets/sprites/spinning-wheel/stoot-doll.webp',
   baseCost: 1_333_100,
   stackMax: 1,
   sellable: false,
@@ -2501,22 +2501,22 @@ ensureItem(FADED_HEART_ID, {
 ensureItem(HOGTIED_JONES_ID, {
   label: 'Hogtied Ilmenskie Jones',
   desc: 'A famous porkthropologist, temporarily packed for emergency cavern evacuation.',
-  icon: 'assets/sprites/quests/ilmenskie/hogtied-jones.png',
+  icon: 'assets/sprites/quests/ilmenskie/hogtied-jones.webp',
 });
 ensureItem(LEGALIZE_CARD_ID, {
   label: 'Card-Carrying Qualification',
   desc: 'The basic bureaucratic proof that you are qualified to carry cards.',
-  icon: 'assets/sprites/quests/legalize/card_carrying_qualification__x1_iconic_png_1354833115.png',
+  icon: 'assets/sprites/quests/legalize/card_carrying_qualification__x1_iconic_png_1354833115.webp',
 });
 ensureItem('your_papers', {
   label: 'Your Papers',
   desc: 'A full yet incomplete set of papers, waiting to be put in order.',
-  icon: 'assets/sprites/quests/legalize/your_papers__x1_iconic_png_1354833120.png',
+  icon: 'assets/sprites/quests/legalize/your_papers__x1_iconic_png_1354833120.webp',
 });
 ensureItem('ice', {
   label: 'Ice',
   desc: 'A clear, cold piece of Winter Walk, still sparkling after the journey home.',
-  icon: 'assets/sprites/icons/ice.png',
+  icon: 'assets/sprites/icons/ice.webp',
 });
 ensureItem(SMALL_WORTHLESS_ID, {
   label: 'Small shiny object with no intrinsic value',
@@ -2533,14 +2533,14 @@ ensureItem(EMOTIONAL_BEAR_ID, {
 ensureItem('lips', {
   label: 'Lips',
   desc: 'Pre-pursed and super-soft, these Lips can be attached to an Emotional Bear.',
-  icon: 'assets/sprites/icons/lips.png',
+  icon: 'assets/sprites/icons/lips.webp',
   baseCost: 10,
   stackMax: 1,
 });
 ensureItem('moon', {
   label: 'Moon',
   desc: 'One full, craterous Moon, most useful when attached to an Emotional Bear.',
-  icon: 'assets/sprites/icons/moon.png',
+  icon: 'assets/sprites/icons/moon.webp',
   baseCost: 99,
   stackMax: 1,
 });
@@ -5257,7 +5257,7 @@ function packRockChip(rock) {
   const line = PACK_COPY.rockHolding(names.length > 4 ? `${names.slice(0, 3).join(', ')} and ${names.length - 3} more things` : names.join(', ').replace(/, ([^,]*)$/, ' and $1'), entries.length > 1 || entries.some(([, n]) => n > 1));
   chip.title = line;
   chip.setAttribute('aria-label', line);
-  chip.innerHTML = `<img src="assets/sprites/icons/magic_rock.png" alt="" /><span class="count">${entries.length}</span>`;
+  chip.innerHTML = `<img src="assets/sprites/icons/magic_rock.webp" alt="" /><span class="count">${entries.length}</span>`;
   chip.addEventListener('click', () => {
     toast(line, 5000);
     playSound('CLICK_SUCCESS', { volume: 0.4 });
@@ -6019,7 +6019,7 @@ function updateHud() {
       name: favorGiant.name,
       points: shrineState.favor?.[favorGiant.id] || 0,
       target: emblemCostFor(shrineState, favorGiant.id),
-      icon: `assets/sprites/giant-icons/icon_${favorGiant.id === 'ti' ? 'tii' : favorGiant.id}.png`,
+      icon: `assets/sprites/giant-icons/icon_${favorGiant.id === 'ti' ? 'tii' : favorGiant.id}.webp`,
     } : null,
   });
   refreshVitalsMenu();
@@ -6230,7 +6230,7 @@ function openPackedCubimalBox(classTsid) {
     title: result.prize.label,
     body: `Series ${result.package.series} collection: ${result.collection.owned}/${result.collection.total}`,
     subtitle: 'You opened the box!',
-    iconUrl: `assets/sprites/icons/${result.prize.classTsid}.png`,
+    iconUrl: `assets/sprites/icons/${result.prize.classTsid}.webp`,
   });
   updateHud();
   return result;
@@ -6290,7 +6290,7 @@ function setPackedCubimalFree(classTsid, opts = {}) {
     title: 'Cubimal set free',
     body: result.response,
     subtitle: `+${result.reward.toLocaleString()} Imagination`,
-    iconUrl: `assets/sprites/icons/${classTsid}.png`,
+    iconUrl: `assets/sprites/icons/${classTsid}.webp`,
   });
   updateHud();
   return result;
@@ -6799,7 +6799,7 @@ async function loadSheets() {
   for (const classTsid of Object.keys(TRANT_META)) {
     for (const m of TRANT_MAT_STAGES) trantKeys.push(`${classTsid}_m${m}`);
   }
-  const trantUrl = (key) => `assets/sprites/trants/frames/${key}.png?v=${TRANT_FRAME_VERSION}`;
+  const trantUrl = (key) => `assets/sprites/trants/frames/${key}.webp?v=${TRANT_FRAME_VERSION}`;
   // Optional: a missing stage falls back to the raw sheet or treeFruit at spawn.
   const trants = await Promise.all(trantKeys.map((key) => loadTexture(trantUrl(key)).catch(() => null)));
   trantKeys.forEach((key, i) => {
@@ -7803,7 +7803,7 @@ function showMusicblockFx(def) {
     if (child._musicFx) fxLayer.removeChild(child);
   }
 
-  const icon = new PIXI.Sprite(textureFromUrl(ITEM_CATALOG[def.classTsid]?.icon || `assets/sprites/icons/${def.classTsid}.png`));
+  const icon = new PIXI.Sprite(textureFromUrl(ITEM_CATALOG[def.classTsid]?.icon || `assets/sprites/icons/${def.classTsid}.webp`));
   icon.anchor.set(0.5);
   icon.scale.set(1.35);
   icon._musicFx = 'block';
@@ -8239,7 +8239,7 @@ function showFeedPickerQty(food) {
   const input = document.getElementById('feed-picker-qty-input');
   const icon = document.getElementById('feed-picker-qty-icon');
   const label = document.getElementById('feed-picker-qty-label');
-  if (icon) icon.src = ITEM_ICONS[food.classTsid] || `assets/sprites/icons/${food.classTsid}.png`;
+  if (icon) icon.src = ITEM_ICONS[food.classTsid] || `assets/sprites/icons/${food.classTsid}.webp`;
   if (label) label.textContent = `${food.label} · ${food.have} in your pack`;
   if (input) {
     input.max = String(max);
@@ -8386,7 +8386,7 @@ function openFeedPicker(target, verb = null, pick = '') {
     button.title = `${FEED_PICKER_VERB_LABELS[verbId] || 'Feed'} ${food.label} · ${food.have} in your pack`;
 
     const image = document.createElement('img');
-    image.src = ITEM_ICONS[food.classTsid] || `assets/sprites/icons/${food.classTsid}.png`;
+    image.src = ITEM_ICONS[food.classTsid] || `assets/sprites/icons/${food.classTsid}.webp`;
     image.alt = '';
     image.loading = 'lazy';
     const label = document.createElement('span');
@@ -8550,7 +8550,7 @@ function playHatchetAnimation(target) {
 }
 
 // OGA irrigator_9000__x1_tool_animation (950x228, CC0): 30 cells of 95x76, loaded on the first pour.
-const IRRIGATOR_TOOL_SHEET = Object.freeze({ url: 'assets/sprites/making/irrigator_9000-tool.png', fw: 95, fh: 76, cols: 10, rows: 3 });
+const IRRIGATOR_TOOL_SHEET = Object.freeze({ url: 'assets/sprites/making/irrigator_9000-tool.webp', fw: 95, fh: 76, cols: 10, rows: 3 });
 let irrigatorToolFrames = null;
 
 async function playWateringCanAnimation(target, durationMs = 0) {
@@ -9926,7 +9926,7 @@ function spawnSpinningWheel({ now = Date.now() } = {}) {
  * memorial): its 5x render (js/sprite-dense.js, rare_items/stoot_barfield_pullstring_doll.swf, CC0;
  * js/textures.js reads resolution 5 from the name, so the drawn size is unchanged) on dense screens.
  */
-const STOOT_DOLL_ART = 'assets/sprites/spinning-wheel/stoot-doll.png';
+const STOOT_DOLL_ART = 'assets/sprites/spinning-wheel/stoot-doll.webp';
 function stootDollTexture() {
   const dense = denseSprite(STOOT_DOLL_ART, 1.18 * (app?.renderer?.resolution || window.devicePixelRatio || 1));
   return textureFromUrl(dense?.parts.length === 1 ? dense.parts[0][0] : STOOT_DOLL_ART);
@@ -13106,7 +13106,7 @@ function spawnMusicblockDrop(point, exactPlacement = false) {
   // Ticket 78: the block on the street is the same stack a player puts down, so it draws as one
   // (spawnDroppedItemStack): its '1' scene at the SWF's own size (musicblock_*.js adjusted_scale 1,
   // LocationItemstackView.as 853-854), about 37 px, not the pack icon blown up 1.65 times.
-  const icon = ITEM_CATALOG[def.classTsid]?.icon || `assets/sprites/icons/${def.classTsid}.png`;
+  const icon = ITEM_CATALOG[def.classTsid]?.icon || `assets/sprites/icons/${def.classTsid}.webp`;
   const worldArt = worldArtFor(def.classTsid, 1, icon);
   const spr = new PIXI.Sprite(textureFromUrl(worldArt?.url || icon));
   spr.anchor.set(0.5, 1);
@@ -13165,12 +13165,12 @@ function placeDroppedCount(spr, w, h) {
 function spawnDroppedItemStack(stack) {
   const item = ITEM_CATALOG[stack.classTsid] || {
     label: stack.classTsid.replace(/_/g, ' '),
-    icon: `assets/sprites/icons/${stack.classTsid}.png`,
+    icon: `assets/sprites/icons/${stack.classTsid}.webp`,
   };
   // The state the original showed for a put-down stack (its count's scene, not the pack icon),
   // at its own size, resting on its point and lying still (js/world-art.js).
   const worldArt = worldArtFor(stack.classTsid, stack.count, item.icon);
-  const spr = new PIXI.Sprite(textureFromUrl(worldArt?.url || item.icon || `assets/sprites/icons/${stack.classTsid}.png`));
+  const spr = new PIXI.Sprite(textureFromUrl(worldArt?.url || item.icon || `assets/sprites/icons/${stack.classTsid}.webp`));
   spr.label = 'world-item-stack';
   spr.anchor.set(0.5, 1);
   spr.worldArt = worldArt;
@@ -14897,7 +14897,7 @@ function announceQuestCompletions(updates = []) {
       title: update.def.title || 'Quest complete',
       body: cleanQuestMarkup(update.def.completion || update.def.desc),
       subtitle: rewardBits.join(' · ') || 'Quest complete',
-      iconUrl: completionPages.length ? 'assets/ui/quest-book.png' : null,
+      iconUrl: completionPages.length ? 'assets/ui/quest-book.webp' : null,
       steps: completionPages,
       primaryLabel: 'OK',
       onPage: completionPages.length
@@ -15287,8 +15287,8 @@ function renderHogHaulHud() {
   }
   if (cargoIcon) {
     cargoIcon.src = hogHaulState.carryingPig
-      ? 'assets/sprites/races/hogtied_piggy__x1_1_png_1354830331.png'
-      : 'assets/sprites/races/pig_bait__x1_iconic_png_1354830334.png';
+      ? 'assets/sprites/races/hogtied_piggy__x1_1_png_1354830331.webp'
+      : 'assets/sprites/races/pig_bait__x1_iconic_png_1354830334.webp';
   }
   if (cargoLabel) {
     cargoLabel.textContent = hogHaulState.carryingPig
@@ -16205,10 +16205,10 @@ function updateFourLetterQuest() {
 
 const LEGALIZE_ASSET_ROOT = 'assets/sprites/quests/legalize';
 const LEGALIZE_BUREAUCRAT_ART = [
-  'npc_bureaucrat_arms_01_glasses_none_hair_01_legs_01_necklace_none_tie_01_torso_01_x1_iconic_png_1354832989.png',
-  'npc_bureaucrat_arms_02_glasses_none_hair_02_legs_02_necklace_none_tie_02_torso_02_x1_iconic_png_1354832997.png',
-  'npc_bureaucrat_arms_03_glasses_none_hair_04_legs_03_necklace_01_tie_none_torso_03_x1_iconic_png_1354833006.png',
-  'npc_bureaucrat_arms_04_glasses_none_hair_05_legs_04_necklace_02_tie_none_torso_04_x1_iconic_png_1354833015.png',
+  'npc_bureaucrat_arms_01_glasses_none_hair_01_legs_01_necklace_none_tie_01_torso_01_x1_iconic_png_1354832989.webp',
+  'npc_bureaucrat_arms_02_glasses_none_hair_02_legs_02_necklace_none_tie_02_torso_02_x1_iconic_png_1354832997.webp',
+  'npc_bureaucrat_arms_03_glasses_none_hair_04_legs_03_necklace_01_tie_none_torso_03_x1_iconic_png_1354833006.webp',
+  'npc_bureaucrat_arms_04_glasses_none_hair_05_legs_04_necklace_02_tie_none_torso_04_x1_iconic_png_1354833015.webp',
 ];
 
 /**
@@ -17118,7 +17118,7 @@ function greedyButtonSprite(actIndex, x, y) {
   const root = new PIXI.Container();
   root.name = `greedy-story-act-${actIndex + 1}`;
   root.sortableChildren = true;
-  const button = new PIXI.Sprite(textureFromUrl('assets/sprites/quests/greedy-street-spirit/wall_button__x1_out_png_1354839763.png'));
+  const button = new PIXI.Sprite(textureFromUrl('assets/sprites/quests/greedy-street-spirit/wall_button__x1_out_png_1354839763.webp'));
   button.anchor.set(0.5, 1);
   button.width = 126;
   button.height = 18;
@@ -17349,10 +17349,10 @@ function pressGreedyStoryButton(target) {
   applyGreedySceneEvent(result.eventId);
   if (target.sprite?._buttonArt) {
     const art = target.sprite._buttonArt;
-    art.texture = textureFromUrl('assets/sprites/quests/greedy-street-spirit/wall_button__x1_in_png_1354839762.png');
+    art.texture = textureFromUrl('assets/sprites/quests/greedy-street-spirit/wall_button__x1_in_png_1354839762.webp');
     window.setTimeout(() => {
       if (!art.destroyed) {
-        art.texture = textureFromUrl('assets/sprites/quests/greedy-street-spirit/wall_button__x1_out_png_1354839763.png');
+        art.texture = textureFromUrl('assets/sprites/quests/greedy-street-spirit/wall_button__x1_out_png_1354839763.webp');
       }
     }, 240);
   }
@@ -18827,7 +18827,7 @@ function rookWoodsIsInstanced() {
 
 function rookEggTexture(state = ROOK_EGG_INITIAL_STATE) {
   if (!rookEggTextures.length) {
-    const texture = textureFromUrl('assets/sprites/quests/rook-woods/rook-egg-states.png');
+    const texture = textureFromUrl('assets/sprites/quests/rook-woods/rook-egg-states.webp');
     rookEggTextures = Array.from(
       { length: 5 },
       (_, index) =>
@@ -19507,7 +19507,7 @@ function drawRookMuseumBackground() {
 
 function makeRookMuseumSpeaker(exhibit) {
   const sprite = new PIXI.Sprite(
-    textureFromUrl(`${ROOK_MUSEUM_ASSET_ROOT}/rook_hall_speaker__x1_stop_png_1354835940.png`)
+    textureFromUrl(`${ROOK_MUSEUM_ASSET_ROOT}/rook_hall_speaker__x1_stop_png_1354835940.webp`)
   );
   sprite.anchor.set(0.5, 1);
   const hall = ROOK_MUSEUM_HALL;
@@ -19566,13 +19566,13 @@ function spawnRookMuseumExhibits() {
       sprite = makeRookMuseumPainting(exhibit);
     } else if (exhibit.kind === 'orb') {
       sprite = new PIXI.Sprite(
-        textureFromUrl(`${ROOK_MUSEUM_ASSET_ROOT}/rook_hall_focusing_orb__x1_1_png_1354835872.png`)
+        textureFromUrl(`${ROOK_MUSEUM_ASSET_ROOT}/rook_hall_focusing_orb__x1_1_png_1354835872.webp`)
       );
       sprite.anchor.set(0.5, 1);
       sprite.position.set(exhibit.x, floor);
     } else {
       sprite = new PIXI.Sprite(
-        textureFromUrl(`${ROOK_MUSEUM_ASSET_ROOT}/rook_hall_shrine_holofilm__x1_stop_png_1354835839.png`)
+        textureFromUrl(`${ROOK_MUSEUM_ASSET_ROOT}/rook_hall_shrine_holofilm__x1_stop_png_1354835839.webp`)
       );
       sprite.anchor.set(0.5, 1);
       sprite.position.set(exhibit.x, floor + 15);
@@ -19714,13 +19714,13 @@ function renderRookMuseumExhibitPage() {
     if (painting) playRookMuseumPainting(painting, exhibit);
     if (glow) glow.hidden = true;
   } else if (exhibit.kind === 'orb') {
-    art.src = `${ROOK_MUSEUM_ASSET_ROOT}/rook_hall_focusing_orb__x1_1_png_1354835872.png`;
+    art.src = `${ROOK_MUSEUM_ASSET_ROOT}/rook_hall_focusing_orb__x1_1_png_1354835872.webp`;
     art.alt = 'Ancient Focusing Orb';
     visual.style.setProperty('--rook-orb-scale', String(0.68 + rookMuseumPageIndex * 0.07));
     visual.classList.toggle('is-broken', rookMuseumPageIndex === exhibit.pages.length - 1);
     if (glow) glow.hidden = false;
   } else {
-    art.src = `${ROOK_MUSEUM_ASSET_ROOT}/rook_hall_shrine_holofilm__x1_stop_png_1354835839.png`;
+    art.src = `${ROOK_MUSEUM_ASSET_ROOT}/rook_hall_shrine_holofilm__x1_stop_png_1354835839.webp`;
     art.alt = 'Primitive shrine holofilm';
     if (glow) glow.hidden = true;
   }
@@ -20041,7 +20041,7 @@ function deEmbiggenifyMoment(moment) {
 function spawnMrHairball() {
   const idleFrames = textures.dustBunnyIdle?.frames;
   const talkFrames = textures.dustBunnyTalk?.frames;
-  const fallback = textureFromUrl(`${EESTI_ASSET_ROOT}/npc_dustbunny__x1_idle_stand_png_1354831147.png`);
+  const fallback = textureFromUrl(`${EESTI_ASSET_ROOT}/npc_dustbunny__x1_idle_stand_png_1354831147.webp`);
   const sprite = new PIXI.AnimatedSprite(idleFrames?.length ? idleFrames : [fallback]);
   sprite.texturesIdle = idleFrames?.length ? idleFrames : [fallback];
   sprite.texturesTalk = talkFrames?.length ? talkFrames : sprite.texturesIdle;
@@ -20077,7 +20077,7 @@ function setMrHairballAnimation(mode = 'idle') {
 
 function spawnSmallWorthless() {
   const sprite = new PIXI.Sprite(
-    textureFromUrl(`${EESTI_ASSET_ROOT}/small_worthless__x1_1_x1_2_png_1354829517.png`)
+    textureFromUrl(`${EESTI_ASSET_ROOT}/small_worthless__x1_1_x1_2_png_1354829517.webp`)
   );
   sprite.anchor.set(0.5, 1);
   // Inside the archived box on the tabletop; the street's own cake (middleplus, in front of
@@ -21234,7 +21234,7 @@ function renderParadiseFlightHud() {
   const progressEl = hud.querySelector('[data-paradise-progress]');
   const tickets = hud.querySelector('[data-paradise-tickets]');
   const controls = hud.querySelector('[data-paradise-controls]');
-  if (icon) icon.src = `assets/sprites/icons/${course.ticketId}.png`;
+  if (icon) icon.src = `assets/sprites/icons/${course.ticketId}.webp`;
   if (title) title.textContent = course.name;
   if (controls) {
     controls.textContent = course.controls || (course.movement === 'slide'
@@ -22336,8 +22336,8 @@ function updateHomeChrome() {
       ? `${unread} unread message${unread === 1 ? '' : 's'}`
       : 'Your very own mail';
     homeMailboxTarget.sprite.texture = textureFromUrl(unread > 0
-      ? 'assets/sprites/mailbox/npc_mailbox_variant_mailboxRight_x1_has_mail_idle_png_1354832230.png'
-      : 'assets/sprites/mailbox/npc_mailbox_variant_mailboxRight_x1_idle_png_1354832227.png');
+      ? 'assets/sprites/mailbox/npc_mailbox_variant_mailboxRight_x1_has_mail_idle_png_1354832230.webp'
+      : 'assets/sprites/mailbox/npc_mailbox_variant_mailboxRight_x1_idle_png_1354832227.webp');
   }
   if (app?.canvas) {
     app.canvas.dataset.homeOwned = homeState.owned ? '1' : '0';
@@ -22752,7 +22752,7 @@ function renderMailboxReader(message) {
     <div class="mail-message-body">${escapeHtml(message.text)}</div>
     ${attachment ? `
       <div class="mail-attachment">
-        ${message.attachment ? `<img src="${escapeHtml(ITEM_CATALOG[message.attachment.classTsid]?.icon || `assets/sprites/icons/${message.attachment.classTsid}.png`)}" alt="" />` : '<span class="currant-coin">◎</span>'}
+        ${message.attachment ? `<img src="${escapeHtml(ITEM_CATALOG[message.attachment.classTsid]?.icon || `assets/sprites/icons/${message.attachment.classTsid}.webp`)}" alt="" />` : '<span class="currant-coin">◎</span>'}
         <div class="mail-attachment-copy">
           <strong>${escapeHtml(attachment)}</strong>
           <span>${message.attachmentsClaimed ? 'Collected' : notHere ? 'Waiting for you at any mailbox' : 'Waiting in this envelope'}</span>
@@ -22985,8 +22985,8 @@ function spawnHomeSceneTargets(room) {
   if (room === 'street') {
     const unread = unreadMailCount(mailboxState, Date.now());
     const mailbox = new PIXI.Sprite(textureFromUrl(unread > 0
-      ? 'assets/sprites/mailbox/npc_mailbox_variant_mailboxRight_x1_has_mail_idle_png_1354832230.png'
-      : 'assets/sprites/mailbox/npc_mailbox_variant_mailboxRight_x1_idle_png_1354832227.png'));
+      ? 'assets/sprites/mailbox/npc_mailbox_variant_mailboxRight_x1_has_mail_idle_png_1354832230.webp'
+      : 'assets/sprites/mailbox/npc_mailbox_variant_mailboxRight_x1_idle_png_1354832227.webp'));
     mailbox.anchor.set(0.5, 1);
     mailbox.x = 430;
     mailbox.y = GROUND_Y;
@@ -26314,7 +26314,7 @@ function renderBuffsPanel() {
     const card = document.createElement('div');
     card.className = 'q-card buff-source-card';
     card.innerHTML = `<div class="buff-card-head">
-        <img src="assets/sprites/icons/${escapeHtml(item.classTsid)}.png" alt="" />
+        <img src="assets/sprites/icons/${escapeHtml(item.classTsid)}.webp" alt="" />
         <div><div class="q-title">${escapeHtml(ITEM_CATALOG[item.classTsid]?.label || item.classTsid)} ×${item.count}</div>
         <div class="q-req">${escapeHtml(item.effectHint)}</div></div>
       </div>`;
@@ -26341,8 +26341,8 @@ function buffIconUrl(row) {
   // A system that draws its own tray icon (Ancestral Nostalgia: none, as BuffUI.as shows it).
   if (row?.iconUrl) return row.iconUrl;
   const item = row?.sourceItem || row?.def?.itemClass;
-  if (item) return `assets/sprites/icons/${item}.png`;
-  return row?.def?.isDebuff ? 'assets/ui/buff-debuff.svg' : 'assets/sprites/icons/apple.png';
+  if (item) return `assets/sprites/icons/${item}.webp`;
+  return row?.def?.isDebuff ? 'assets/ui/buff-debuff.svg' : 'assets/sprites/icons/apple.webp';
 }
 
 function renderBuffStrip() {
@@ -26452,7 +26452,7 @@ function craftOpts() {
 }
 
 function itemIconUrl(classTsid) {
-  return ITEM_CATALOG[classTsid]?.icon || `assets/sprites/icons/${classTsid}.png`;
+  return ITEM_CATALOG[classTsid]?.icon || `assets/sprites/icons/${classTsid}.webp`;
 }
 
 /** #103: "20 Red Elements" for one output row (making.js pluralizeItem). */
@@ -27780,7 +27780,7 @@ function grantShrineEmblem(target) {
     kind: 'badge',
     title: `Emblem of ${result.giant.name}`,
     body: `Your devotion has earned emblem ${result.count}. The next costs ${emblemCostFor(shrineState, giantId).toLocaleString()} favor.`,
-    iconUrl: `assets/sprites/icons/${result.classTsid}.png`,
+    iconUrl: `assets/sprites/icons/${result.classTsid}.webp`,
   });
   updateHud();
   return true;
@@ -28236,7 +28236,7 @@ async function ensureShrineTextures(giantId) {
   for (const motion of ['open', 'close']) {
     const key = `shrine_${giantId}_${motion}`;
     if (textures[key]) continue;
-    const url = `assets/sprites/shrines/${giantId}_${motion}.png`;
+    const url = `assets/sprites/shrines/${giantId}_${motion}.webp`;
     const tex = await loadTexture(url);
     textures[key] = {
       def: { ...def, url },
@@ -31489,7 +31489,7 @@ async function main() {
   }
   // Garden talkback QA (js/garden-talk-qa.js): ?gardentalkdemo=herb|crop.
   if (new URLSearchParams(location.search).has('gardentalkdemo')) {
-    import('./js/garden-talk-qa.js?v=d34f65d8').then((m) => m.runGardenTalkDemo({ engine, executeVerb, params: new URLSearchParams(location.search) }));
+    import('./js/garden-talk-qa.js?v=49e3a0f3').then((m) => m.runGardenTalkDemo({ engine, executeVerb, params: new URLSearchParams(location.search) }));
   }
   // MEMQA (ticket 21, Safari's memory reload in Naraka): ?memqa=1 lets a probe walk streets through the
   // real street trip (tools/qa/street-memory.mjs). Solo pages only: online pages drop their params.

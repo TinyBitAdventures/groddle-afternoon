@@ -23,7 +23,7 @@ import {
   tabRow,
 } from '../public/js/ui/social-drawer.js?v=02b62e88';
 import { createNotifier } from '../public/js/notify.js?v=37c6b748';
-import { paneLayout } from '../public/js/classic/classic-panes.js?v=a47d1a3e';
+import { paneLayout } from '../public/js/classic/classic-panes.js?v=5a6d6885';
 import { memoryStore, page } from './social-fake-dom.js';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -323,7 +323,7 @@ describe('the Chats list: in the drawer', () => {
     assert.equal(t.drawer.label(t.drawer.showing), 'Trade Channel');
     assert.match(read('public/js/classic/classic-panes.js'), /const tab = d\.showing \?\? d\.tab;/);
     const css = read('public/css/classic.css');
-    assert.match(css, /:root\[data-ui="classic"\] \.social-drawer \.social-chat-row\[data-social-chat="trade"\] \.social-chat-av \{ background-image: url\("\.\.\/assets\/classic\/contact_trade\.png/);
+    assert.match(css, /:root\[data-ui="classic"\] \.social-drawer \.social-chat-row\[data-social-chat="trade"\] \.social-chat-av \{ background-image: url\("\.\.\/assets\/classic\/contact_trade\.webp/);
     assert.match(css, /:root\[data-ui="classic"\] \.social-drawer \.social-conv-who \{ display: none; \}/);
   });
 

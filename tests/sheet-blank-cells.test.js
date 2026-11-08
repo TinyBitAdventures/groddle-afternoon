@@ -59,7 +59,7 @@ const MODULE_ALLOWED = [
   [/^rube spawn_in( rube_spawn_in\.p1@3x\.webp)? cell [0-2]$/, 'The Rube spawns in from nothing (played once)'],
   [/^esquibeth ghost appear cell [01]$/, "Esquibeth's ghost appears from nothing (played once)"],
   [/^spirit \w+ \w+ lonely_in cell 0$/, 'the loneliness portrait fades in from nothing (played once)'],
-  [/^party teleporter_visible_disappear\.png cell 1[234]$/, 'the teleporter is gone at the end of its disappear clip'],
+  [/^party teleporter_visible_disappear\.webp cell 1[234]$/, 'the teleporter is gone at the end of its disappear clip'],
   [/^potion-art\.js POTION_ART\.scion_of_purple_fade cell 31$/, 'the Scion of Purple fades out to nothing'],
   [/^hi \w+ hi( @3x)? cell (5[4-9]|6[0-4])$/, 'hi_overlay.swf hi state (played once, 2 s) ends after its burst'],
   [/^hi \w+ bonus( @3x)? cell 3[3-6]$/, 'the 2x bonus state (played once) ends after its burst'],

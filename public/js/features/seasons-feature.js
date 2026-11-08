@@ -31,12 +31,12 @@
  *     pack), seasonTrophy, seasonPlaced.
  */
 
-import { addItem, countItem, ensureItem, removeItem, registerItemUse, ITEM_CATALOG } from '../inventory.js?v=d82f3b00';
+import { addItem, countItem, ensureItem, removeItem, registerItemUse, ITEM_CATALOG } from '../inventory.js?v=b7609342';
 import { dametimeParts, getGameDayKey } from '../game-day.js?v=edb00566';
-import { setSeasonalSeedCheck as setGardenSeasonGate } from '../garden.js?v=890d72ea';
-import { setSeasonalSeedCheck as setMasterGardenSeasonGate } from '../garden.js?v=890d72ea';
-import { setSeasonalRecipeCheck } from '../making.js?v=c9dc233e';
-import { getToolCondition, copyForVerb, copyTag, migrateClassTag, setCopyTag, takeToolCopy } from '../tools.js?v=f701b241';
+import { setSeasonalSeedCheck as setGardenSeasonGate } from '../garden.js?v=e1c3415c';
+import { setSeasonalSeedCheck as setMasterGardenSeasonGate } from '../garden.js?v=e1c3415c';
+import { setSeasonalRecipeCheck } from '../making.js?v=f4f214c2';
+import { getToolCondition, copyForVerb, copyTag, migrateClassTag, setCopyTag, takeToolCopy } from '../tools.js?v=d8aa3536';
 
 /*
  * Each lit pumpkin's phrases are its own (pumpkin_lit_*.js this.phrases, 380-391, at most 3), kept
@@ -73,12 +73,12 @@ function takePumpkin(engine, cls, copy) {
 }
 import { landingY, nearestSurfaceY } from '../walk-surface.js?v=c982983e';
 import { isStandable } from '../street-model.js?v=505d8990';
-import { isBatterflyHabitat } from '../animal-husbandry.js?v=35b23ef4';
-import { emblemCostFor } from '../shrines.js?v=95d74174';
+import { isBatterflyHabitat } from '../animal-husbandry.js?v=7194f0f1';
+import { emblemCostFor } from '../shrines.js?v=1a945fe7';
 import { rollDropTable } from '../drop-tables.js?v=16e12632';
-import { openNoteView, noteViewOpen } from '../note-view.js?v=a5e518d1';
-import { payDrop } from './drops-feature.js?v=43984e8f';
-import { fireflyJarCounts, setFireflyJar } from './resource-nodes-feature.js?v=11e86f91';
+import { openNoteView, noteViewOpen } from '../note-view.js?v=eca7de52';
+import { payDrop } from './drops-feature.js?v=123055bc';
+import { fireflyJarCounts, setFireflyJar } from './resource-nodes-feature.js?v=ed64e23a';
 import { SEASON_DATA } from '../seasons-data.js?v=b5174bc9';
 import {
   CANDY_CLASSES,
@@ -251,7 +251,7 @@ function talkFrames(engine, face) {
   const key = `talk:${face}`;
   if (textures.has(key)) return textures.get(key);
   const [w, h] = TALK_SIZE[face] || TALK_SIZE[1];
-  const base = sourceFromUrl(`assets/sprites/seasons/pumpkin_lit_${face}_talk.png`);
+  const base = sourceFromUrl(`assets/sprites/seasons/pumpkin_lit_${face}_talk.webp`);
   const frames = [];
   for (let i = 0; i < TALK_FRAMES; i += 1) {
     const x = (i % TALK_COLS) * w;
@@ -401,7 +401,7 @@ function renderChip(engine) {
   const left = daysLeft(id, nowForCalendar(engine));
   chip.dataset.season = id;
   chip.title = `${def.label}${season.via === 'dametime' ? ' (Dametime)' : ''}${left != null ? `: ${left === 0 ? 'last day' : `${left} day${left === 1 ? '' : 's'} left`}` : ''}. Click for what is on.`;
-  chip.innerHTML = `<img src="assets/sprites/icons/${def.icon}.png" alt=""><span>${def.label}</span>`;
+  chip.innerHTML = `<img src="assets/sprites/icons/${def.icon}.webp" alt=""><span>${def.label}</span>`;
 }
 
 function seasonTodo(id) {
@@ -582,7 +582,7 @@ function spawnPlaced(engine, row) {
   const { PIXI } = engine;
   const lit = isLitPumpkin(row.cls);
   const y = groundAt(engine, row.x, row.y);
-  const spr = lit ? new PIXI.AnimatedSprite(talkFrames(engine, faceOf(row.cls))) : new PIXI.Sprite(textureFromUrl(`assets/sprites/icons/${row.cls}.png`));
+  const spr = lit ? new PIXI.AnimatedSprite(talkFrames(engine, faceOf(row.cls))) : new PIXI.Sprite(textureFromUrl(`assets/sprites/icons/${row.cls}.webp`));
   spr.anchor.set(0.5, 1);
   spr.x = row.x;
   spr.y = y + 3;
@@ -680,7 +680,7 @@ function startCarve(engine) {
 
 function showToolOverHead(engine, tool) {
   if (carving?.toolSprite && !carving.toolSprite.destroyed) carving.toolSprite.destroy();
-  const spr = new engine.PIXI.Sprite(textureFromUrl(`assets/sprites/icons/${tool}.png`));
+  const spr = new engine.PIXI.Sprite(textureFromUrl(`assets/sprites/icons/${tool}.webp`));
   spr.anchor.set(0.5);
   spr.zIndex = 40;
   engine.fxLayer?.addChild(spr);

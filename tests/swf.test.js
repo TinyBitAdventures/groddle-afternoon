@@ -24,9 +24,9 @@ import {
   swfVerbs,
   wrangleMessage,
 } from '../public/js/swf.js?v=6dd72036';
-import { swfFeature } from '../public/js/features/swf-feature.js?v=2c4acc19';
-import { FEATURES } from '../public/js/features/index.js?v=b4df516e';
-import { ITEM_CATALOG } from '../public/js/inventory.js?v=d82f3b00';
+import { swfFeature } from '../public/js/features/swf-feature.js?v=c039ff5b';
+import { FEATURES } from '../public/js/features/index.js?v=d9128cb3';
+import { ITEM_CATALOG } from '../public/js/inventory.js?v=b7609342';
 import { DROP_ITEMS, DROP_TABLES } from '../public/js/drop-tables-data.js?v=c51a6400';
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -290,7 +290,7 @@ describe('Wiring and art', () => {
 
   it('every SWF and the Game have CC0 icons (1x and @3x), and the drop data knows it', () => {
     for (const cls of [...SWF_CLASSES, GAME_BOX]) {
-      for (const f of [`${cls}.png`, `${cls}@3x.png`]) assert.ok(existsSync(join(root, 'public/assets/sprites/icons', f)), f);
+      for (const f of [`${cls}.webp`, `${cls}@3x.webp`]) assert.ok(existsSync(join(root, 'public/assets/sprites/icons', f)), f);
       assert.equal(DROP_ITEMS[cls].art, true, cls);
     }
     // swf_1's icon is cut from Tiny Speck's own glitch-items SWF (tools/icon-hires/plan.json).

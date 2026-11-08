@@ -52,8 +52,8 @@ export const FLAGS = Object.freeze({ peek: 'convo_end', leave: 'leave' });
 /** source: cup_of_water.js drink. */
 export const DRINK_TEXT = 'Ewww. That water tastes really … bureaucratic-y.';
 const LEGALIZE = 'assets/sprites/quests/legalize/';
-const B_IDLE = `${LEGALIZE}npc_bureaucrat_arms_03_glasses_none_hair_04_legs_03_necklace_01_tie_none_torso_03_x1_idle1_png_1354833012.png`;
-const B_TALK = `${LEGALIZE}npc_bureaucrat_arms_03_glasses_none_hair_04_legs_03_necklace_01_tie_none_torso_03_x1_talk_png_1354833010.png`;
+const B_IDLE = `${LEGALIZE}npc_bureaucrat_arms_03_glasses_none_hair_04_legs_03_necklace_01_tie_none_torso_03_x1_idle1_png_1354833012.webp`;
+const B_TALK = `${LEGALIZE}npc_bureaucrat_arms_03_glasses_none_hair_04_legs_03_necklace_01_tie_none_torso_03_x1_talk_png_1354833010.webp`;
 
 /**
  * Behind the veil. Remake copy (G318: no source text for this moment): the
@@ -259,7 +259,7 @@ export const room = {
   id: 'being_watched',
   title: 'Being Watched',
   kicker: 'Take a nap',
-  icon: 'assets/sprites/quest-rooms/being_watched/cup_of_water.png',
+  icon: 'assets/sprites/quest-rooms/being_watched/cup_of_water.webp',
   theme: 'dark',
   // G315: template in hub 61 'Simple Level Quests' (inc_data_maps_prod.js 245), a dev label; plain remake wording.
   hubName: 'Quest',

@@ -30,9 +30,9 @@
  * Canvas: crabs, crabLast, crabClip, crabOutcome, crabMemory, crabTalk.
  */
 
-import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=d77b0b8b';
-import { addItem, countItem, ensureItem, registerItemUse, removeItem } from '../inventory.js?v=d82f3b00';
-import { MUSICBLOCK_CATALOG, ensureMusicblockItems } from '../musicblocks.js?v=f5adbf0c';
+import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=b764884b';
+import { addItem, countItem, ensureItem, registerItemUse, removeItem } from '../inventory.js?v=b7609342';
+import { MUSICBLOCK_CATALOG, ensureMusicblockItems } from '../musicblocks.js?v=db6a213b';
 import { energyMax, loseMood, metabolicGain, moodMax, shiftMetabolic } from '../metabolics.js?v=8504134e';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 import { slugsFromEffects } from '../speech-slugs.js?v=130338f9';
@@ -70,7 +70,7 @@ import {
   musicblocksInPack,
   normalizeCrabMemory,
   playToday,
-} from '../crabs.js?v=0ec02c50';
+} from '../crabs.js?v=90964bf8';
 
 const ART = 'assets/sprites/crabs/';
 /** OGA npc_crab sheets: 131x129 cells, 6 columns; populated counts measured. */

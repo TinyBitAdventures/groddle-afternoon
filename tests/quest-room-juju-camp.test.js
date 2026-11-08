@@ -8,8 +8,8 @@ import { readFileSync, existsSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import * as kit from '../public/js/quest-rooms/kit.js?v=d98b987e';
-import * as mod from '../public/js/quest-rooms/juju-camp.js?v=d19a6628';
+import * as kit from '../public/js/quest-rooms/kit.js?v=25fc6d59';
+import * as mod from '../public/js/quest-rooms/juju-camp.js?v=a52765c1';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', 'public');
 const street = (tsid) => JSON.parse(readFileSync(join(ROOT, 'assets', 'streets', `${tsid}.json`), 'utf8'));
@@ -221,11 +221,11 @@ describe('Juju Hideout room', () => {
 
   it('ships its art', () => {
     const art = join(ROOT, 'assets', 'sprites', 'quest-rooms', 'juju_camp');
-    for (const f of ['grandma_idle', 'grandma_talk', 'grandma_angry']) assert.ok(existsSync(join(art, `${f}.png`)), f);
+    for (const f of ['grandma_idle', 'grandma_talk', 'grandma_angry']) assert.ok(existsSync(join(art, `${f}.webp`)), f);
     for (const c of ['red', 'green', 'yellow']) {
-      for (const s of ['spawn', 'walk', 'walk_end', 'shrink']) assert.ok(existsSync(join(art, `bandit_${c}_${s}.png`)), `${c} ${s}`);
+      for (const s of ['spawn', 'walk', 'walk_end', 'shrink']) assert.ok(existsSync(join(art, `bandit_${c}_${s}.webp`)), `${c} ${s}`);
     }
-    for (const cls of Object.keys(mod.ITEMS)) assert.ok(existsSync(join(ROOT, 'assets', 'sprites', 'icons', `${cls}.png`)), cls);
+    for (const cls of Object.keys(mod.ITEMS)) assert.ok(existsSync(join(ROOT, 'assets', 'sprites', 'icons', `${cls}.webp`)), cls);
     for (const d of ['juju_grandma_tent_01a_al1', 'juju_grandma_campfire_01a_al1', 'juju_grandma_papers_01a_al1']) {
       assert.ok(existsSync(join(ROOT, 'assets', 'decos', 'groddle', `${d}.webp`)), d);
     }

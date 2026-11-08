@@ -18,7 +18,7 @@
  *     doorDrinkLast, doorDrinkPour, doorDrinkHere, doorDrinkAutoplay.
  */
 
-import { ITEM_CATALOG, ensureItem } from '../inventory.js?v=d82f3b00';
+import { ITEM_CATALOG, ensureItem } from '../inventory.js?v=b7609342';
 import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=3149d699';
 import {
   CLOSE_AFTER_MS,
@@ -198,7 +198,7 @@ function pourFx(engine) {
   const { PIXI } = engine;
   const p = engine.player;
   if (!PIXI || !p || !engine.fxLayer) return null;
-  const bottle = new PIXI.Sprite(textureFromUrl(ITEM_CATALOG[DOOR_DRINK]?.icon || `assets/sprites/icons/${DOOR_DRINK}.png`));
+  const bottle = new PIXI.Sprite(textureFromUrl(ITEM_CATALOG[DOOR_DRINK]?.icon || `assets/sprites/icons/${DOOR_DRINK}.webp`));
   bottle.anchor.set(0.5);
   bottle.zIndex = 9000;
   engine.fxLayer.addChild(bottle);

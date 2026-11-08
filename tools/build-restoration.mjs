@@ -212,7 +212,7 @@ function recipeStats() {
 }
 
 function iconStats() {
-  const files = readdirSync(join(pub, 'assets/sprites/icons')).filter((f) => f.endsWith('.png'));
+  const files = readdirSync(join(pub, 'assets/sprites/icons')).filter((f) => /\.(png|webp)$/.test(f));
   return { items: files.filter((f) => !f.includes('@3x')).length, sharp: files.filter((f) => f.includes('@3x')).length };
 }
 

@@ -7,9 +7,9 @@
  * DOM-driven (not Pixi) so it covers HUD + canvas inside #game-root.
  */
 
-import { ACHIEVEMENT_DROP, ACHIEVEMENT_ROCK_WH, achievementBubbleText, easeOutBounce, mountPetRock } from './familiar.js?v=c7e902af';
+import { ACHIEVEMENT_DROP, ACHIEVEMENT_ROCK_WH, achievementBubbleText, easeOutBounce, mountPetRock } from './familiar.js?v=5fd83250';
 import { formatLoadingTime, ordinal } from './exploration.js?v=aa0bd00c';
-import { isModernSkin, momentArt, momentArtShape, rewardChips } from './ui/moment-card.js?v=077703c8';
+import { isModernSkin, momentArt, momentArtShape, rewardChips } from './ui/moment-card.js?v=68e10b61';
 
 /**
  * Street-load timings (seconds).
@@ -448,8 +448,8 @@ export const POL_OWNER_SIZE = Object.freeze({ w: 172, h: 248 });
  * (glitch-client TSEngineAssets/src/assets/graphics, Assets.as 245-248).
  */
 const POL_DOORS = Object.freeze({
-  interior: Object.freeze({ src: 'assets/sprites/loading/enter_home_door.png', x: 0, y: 0, w: 294, h: 380 }),
-  tower: Object.freeze({ src: 'assets/sprites/loading/enter_tower_door.png', x: -105, y: -10, w: 409, h: 370 }),
+  interior: Object.freeze({ src: 'assets/sprites/loading/enter_home_door.webp', x: 0, y: 0, w: 294, h: 380 }),
+  tower: Object.freeze({ src: 'assets/sprites/loading/enter_tower_door.webp', x: -105, y: -10, w: 409, h: 370 }),
 });
 
 export function isPolType(type) {
@@ -569,7 +569,7 @@ const CARD_HTML = `
     <p class="st-hub-welcome" data-st-welcoming hidden><span>Welcome to</span><b data-st-welcome-hub></b></p>
   </div>
   <div class="screen-transition-inner st-card">
-    <p class="st-last" data-st-last><span data-st-last-text></span><img class="st-qurazy" data-st-qurazy src="assets/sprites/loading/qurazy_quoin.png" alt="Qurazy Quoin" hidden /></p>
+    <p class="st-last" data-st-last><span data-st-last-text></span><img class="st-qurazy" data-st-qurazy src="assets/sprites/loading/qurazy_quoin.webp" alt="Qurazy Quoin" hidden /></p>
     <div class="st-snap-wrap" data-st-snap-wrap hidden><img class="st-snap" data-st-snap alt="" /></div>
     <div class="st-title">
       <p class="st-entering">Entering</p>
@@ -578,7 +578,7 @@ const CARD_HTML = `
     </div>
     <div class="st-details">
       <div class="st-home" data-st-home hidden></div>
-      <img class="st-upgrade-badge" data-st-upgrade-badge src="assets/sprites/loading/upgrade_badge.png" alt="Upgraded since your last visit" hidden />
+      <img class="st-upgrade-badge" data-st-upgrade-badge src="assets/sprites/loading/upgrade_badge.webp" alt="Upgraded since your last visit" hidden />
       <div class="st-upgrade" data-st-upgrade hidden></div>
     </div>
   </div>

@@ -123,20 +123,20 @@ import {
   SKIP_TUTORIAL_CARDS,
   vogPages,
 } from '../newxp.js?v=8fa18f24';
-import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=d82f3b00';
-import { QUOIN_SHEET, QUOIN_TYPES, qrazyRewardForLevel } from '../quoins.js?v=f154a79e';
+import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=b7609342';
+import { QUOIN_SHEET, QUOIN_TYPES, qrazyRewardForLevel } from '../quoins.js?v=299cc3f4';
 import { soundForQuoin } from '../sound-moments.js?v=2f8597cd';
 import { IMAGINATION_UPGRADES } from '../imagination.js?v=6adb7b9a';
 import { assignQuest, completeQuest } from '../quests.js?v=c8d9d0a4';
-import { acceptOffer, enqueueQuestOffer, questAwardPayload, turnInQuest } from '../quest-offers.js?v=486b09c9';
+import { acceptOffer, enqueueQuestOffer, questAwardPayload, turnInQuest } from '../quest-offers.js?v=e31115ea';
 import { getQuestCatalog } from '../content-catalogs.js?v=10b118dd';
 import { locationEventsApi } from './location-events-feature.js?v=0966e395';
-import * as kit from '../quest-rooms/kit.js?v=d98b987e';
+import * as kit from '../quest-rooms/kit.js?v=25fc6d59';
 import { frameTexture, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js?v=3149d699';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 import { displayTopOf, itemstackOverlayPoint, playPoofIn, playSheetOverlay, poofInAlpha } from '../overlay-art.js?v=11b6dd7f';
-import { HOME_MACHINE } from '../home-ticket.js?v=ee7ea52a';
-import { animalAnchorX, createAnimalState } from '../animals.js?v=d5af4f3c';
+import { HOME_MACHINE } from '../home-ticket.js?v=d5a36577';
+import { animalAnchorX, createAnimalState } from '../animals.js?v=0d9f9b0f';
 import {
   AK_ANIMALS,
   AK_BUBBLE,
@@ -152,7 +152,7 @@ import {
   akSideTablePlacement,
   akVerbReaction,
   createAkState,
-} from '../skillquest-ak.js?v=281b956d';
+} from '../skillquest-ak.js?v=397a9d19';
 import { filterText } from '../word-filter.js?v=9a7a7ebb';
 
 export const NEWXP_FEATURE_ID = 'newxp';
@@ -731,7 +731,7 @@ const SHEETS = {
 const sheetCache = new Map();
 function framesFor(PIXI, file, cols, rows, count) {
   const key = `${file}`;
-  if (!sheetCache.has(key)) sheetCache.set(key, kit.sheetFrames(PIXI, `${ART}${file}.png`, cols, rows, count));
+  if (!sheetCache.has(key)) sheetCache.set(key, kit.sheetFrames(PIXI, `${ART}${file}.webp`, cols, rows, count));
   return sheetCache.get(key);
 }
 
@@ -960,7 +960,7 @@ function takeQuoin(engine, q) {
 function addPickup(engine, id, classTsid, count, x, y, onPick) {
   const { PIXI } = engine;
   const box = new PIXI.Container();
-  const spr = new PIXI.Sprite(textureFromUrl(`assets/sprites/icons/${classTsid}.png`));
+  const spr = new PIXI.Sprite(textureFromUrl(`assets/sprites/icons/${classTsid}.webp`));
   spr.anchor.set(0.5, 1);
   spr.scale.set(0.8);
   box.addChild(spr);
@@ -1105,8 +1105,8 @@ const CHAIN_LOOK_Y = 370;
 
 /** newxp_chain's 58 x 505 x1 sheets (OGA extracted_newxp newxp_chain, CC0): hang loops, pull plays once. */
 const CHAIN_ART = Object.freeze({
-  hang: { url: `${ART}chain_hang.png`, cols: 15, rows: 4, count: 60 },
-  pull: { url: `${ART}chain_pull.png`, cols: 16, rows: 3, count: 45 },
+  hang: { url: `${ART}chain_hang.webp`, cols: 15, rows: 4, count: 60 },
+  pull: { url: `${ART}chain_pull.webp`, cols: 16, rows: 3, count: 45 },
 });
 
 function buildClouds(engine) {
@@ -1495,7 +1495,7 @@ async function runTraining1(t) {
   // door_flamingo: the flamingo heads up to the door; the sloth waits in the tree
   setStep('climb');
   fl.moveTo(L.doorway.x, L.doorway.y, 400, 'fly').then(() => fl.setMode(null));
-  const sloth = new engine.PIXI.Sprite(textureFromUrl(`${ART}sloth.png`));
+  const sloth = new engine.PIXI.Sprite(textureFromUrl(`${ART}sloth.webp`));
   sloth.anchor.set(0.35, 0.1);
   sloth.x = L.sloth.x;
   sloth.y = L.sloth.y;
@@ -1656,7 +1656,7 @@ function buildTraining2(engine) {
     walls[b.id] = w;
   }
   // Egg Plant (trant_egg) on its ledge.
-  const egg = new PIXI.Sprite(textureFromUrl('assets/sprites/trants/frames/trant_egg_m10.png'));
+  const egg = new PIXI.Sprite(textureFromUrl('assets/sprites/trants/frames/trant_egg_m10.webp'));
   egg.anchor.set(0.5, 1);
   egg.x = L.eggPlant.x;
   egg.y = L.eggPlant.y + 8;

@@ -19,8 +19,8 @@ import {
   loveYouGiant,
   loveYouLine,
 } from '../public/js/giant-love.js?v=aa9ea315';
-import { GIANTS } from '../public/js/shrines.js?v=95d74174';
-import { sayLoveLine } from '../public/js/features/shrine-hint-feature.js?v=26715df3';
+import { GIANTS } from '../public/js/shrines.js?v=1a945fe7';
+import { sayLoveLine } from '../public/js/features/shrine-hint-feature.js?v=19b421a8';
 
 const ROOT = join(import.meta.dirname, '..');
 const AUDIT = join(ROOT, '..');
@@ -103,7 +103,7 @@ describe('the shrine (findCloseStack(is_shrine, 200), get_giant)', () => {
       assert.ok(info, g);
       assert.equal(info.label, GIANTS[g].name);
       assert.match(info.bg, /^#[0-9a-f]{6}$/);
-      assert.ok(existsSync(join(ROOT, 'public', 'assets', 'sprites', 'icons', `emblem_${g}@3x.png`)), `emblem art for ${g}`);
+      assert.ok(existsSync(join(ROOT, 'public', 'assets', 'sprites', 'icons', `emblem_${g}@3x.webp`)), `emblem art for ${g}`);
     }
     assert.equal(GIANT_SCREEN_ALPHA, 0.75);
     assert.equal(GIANT_SCREEN_FADE_MS, 800);

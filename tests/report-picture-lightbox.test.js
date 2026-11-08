@@ -8,7 +8,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { LIGHTBOX_FIT, LIGHTBOX_PAN_STEP, LIGHTBOX_TEXT, fitPicture, lightboxFocusTarget, lightboxLink, openLightbox, plainClick, zoomScroll } from '../public/js/ui/picture-lightbox.js?v=0d2814c8';
-import { mountReportsSheet } from '../public/js/ui/reports-sheet.js?v=837df440';
+import { mountReportsSheet } from '../public/js/ui/reports-sheet.js?v=0825709f';
 import { REPORT_TEXT } from '../public/js/reports.js?v=61088e97';
 
 const root = join(import.meta.dirname, '..');

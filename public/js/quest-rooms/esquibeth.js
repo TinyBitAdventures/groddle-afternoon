@@ -905,7 +905,7 @@ function setupGrotto(ctx, stage, scene) {
   const plate = new PIXI.Graphics();
   plate.roundRect(-20, -26, 40, 52, 8).fill({ color: 0x4b3d5c, alpha: 0.95 }).stroke({ width: 2, color: 0x2a2133, alpha: 1 });
   btn.addChild(plate);
-  const sheet = kit.sheetFrames(PIXI, `${ART}button_in.png`, 8, 1, 8);
+  const sheet = kit.sheetFrames(PIXI, `${ART}button_in.webp`, 8, 1, 8);
   const press = new PIXI.AnimatedSprite([PIXI.Texture.EMPTY]);
   press.anchor.set(0.5);
   press.loop = false;
@@ -1387,7 +1387,7 @@ export const room = {
   id: ROOM_ID,
   title: 'The Last Pilgrimage of Esquibeth',
   kicker: 'Retrace her steps',
-  icon: 'assets/sprites/icons/conch.png',
+  icon: 'assets/sprites/icons/conch.webp',
   theme: 'dark',
   hubName: 'The Last Pilgrimage of Esquibeth',
   durationMs: 0,

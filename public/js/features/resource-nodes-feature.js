@@ -52,11 +52,11 @@
  * last release: released:respawned|new:<key>, or failed:<reason>).
  */
 
-import { ITEM_CATALOG, addItem, countItem } from '../inventory.js?v=d82f3b00';
-import { setToolRemaining, toolCopies } from '../tools.js?v=f701b241';
+import { ITEM_CATALOG, addItem, countItem } from '../inventory.js?v=b7609342';
+import { setToolRemaining, toolCopies } from '../tools.js?v=d8aa3536';
 import { isItemFloor, platformYAt } from '../street-model.js?v=505d8990';
-import { hiresSpriteUrl } from '../sprite-hires.js?v=f98be5eb';
-import { rollResourceNodeDrop } from './drops-feature.js?v=43984e8f';
+import { hiresSpriteUrl } from '../sprite-hires.js?v=abaf3d5a';
+import { rollResourceNodeDrop } from './drops-feature.js?v=123055bc';
 import { slugsFromEffects } from '../speech-slugs.js?v=130338f9';
 import { resourceNodeResponseKey, verbResponse } from '../verb-responses.js?v=3ceb8a8c';
 import { rollSlothBonusSnails } from '../imagination-effects.js?v=70169933';
@@ -86,9 +86,9 @@ import {
   starterResourceTools,
   swimmingSalmonCount,
   tickResourceNode,
-} from '../resource-nodes.js?v=1c268516';
+} from '../resource-nodes.js?v=b11d96b2';
 import { frameTexture as sheetFrameTexture, loadTexture, textureFromUrl } from '../textures.js?v=3149d699';
-import { acceptOffer, markOffered, npcQuestOffers, putOffOffer, questStatus } from '../quest-offers.js?v=486b09c9';
+import { acceptOffer, markOffered, npcQuestOffers, putOffOffer, questStatus } from '../quest-offers.js?v=e31115ea';
 import { OVERLAY_USES, playOverlay } from '../overlays.js?v=642adbd0';
 import { OVERLAY_FADE } from '../overlay-art.js?v=11b6dd7f';
 import { vpSequence } from '../quest-rooms/vp-overlay.js?v=b231d65a';
@@ -1051,7 +1051,7 @@ function showJar(engine, flies, state = 'closing') {
 
 function spitSnail(engine, entity) {
   const { PIXI } = engine;
-  const snail = new PIXI.Sprite(textureFromUrl('assets/sprites/icons/snail.png'));
+  const snail = new PIXI.Sprite(textureFromUrl('assets/sprites/icons/snail.webp'));
   snail.anchor.set(0.5);
   snail.scale.set(0.6);
   const from = {

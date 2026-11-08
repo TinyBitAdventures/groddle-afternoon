@@ -62,14 +62,14 @@
  *   &potionlevel=<n> sets your level for the Draught of Wisdom.
  */
 
-import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=d82f3b00';
+import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=b7609342';
 import { getGameDayKey } from '../game-day.js?v=edb00566';
 import { metabolicGain, moodMax } from '../metabolics.js?v=8504134e';
-import { quoinDailyLimitFor } from '../quoins.js?v=f154a79e';
-import { emblemCostFor } from '../shrines.js?v=95d74174';
-import { GROWN_TREE_LABELS, trantsformPlotTree } from '../patches.js?v=8af384ac';
-import { isPoisoned } from '../tree-poison.js?v=3f890e1e';
-import { furnitureSize } from '../home-decor.js?v=6735c85f';
+import { quoinDailyLimitFor } from '../quoins.js?v=299cc3f4';
+import { emblemCostFor } from '../shrines.js?v=1a945fe7';
+import { GROWN_TREE_LABELS, trantsformPlotTree } from '../patches.js?v=aa83d5ad';
+import { isPoisoned } from '../tree-poison.js?v=80469175';
+import { furnitureSize } from '../home-decor.js?v=f9b0e3dc';
 import { textureFromUrl, sourceFromUrl, frameTexture } from '../textures.js?v=3149d699';
 import { POTION_ART } from '../potion-art.js?v=27ccc756';
 import { levelInfoForXp, XP_FOR_LEVEL } from '../progression.js?v=33462eaa';
@@ -128,13 +128,13 @@ import {
   usePotion,
 } from '../potions.js?v=c21bad59';
 import { itemVerbAchievementCounters } from '../item-verbs.js?v=1e20fa7d';
-import { patchesFeature } from './patches-feature.js?v=c0adb8fb';
-import { homesFeature } from './homes-feature.js?v=357f8787';
-import { streetTreeIndex } from './tree-death-feature.js?v=da52335c';
-import { questRoomConverse } from './quest-instances-feature.js?v=90e5b2fd';
+import { patchesFeature } from './patches-feature.js?v=f3e88dee';
+import { homesFeature } from './homes-feature.js?v=5391026a';
+import { streetTreeIndex } from './tree-death-feature.js?v=37a31290';
+import { questRoomConverse } from './quest-instances-feature.js?v=f6015246';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
-import { copyChargesLeft, keepsCopies, spendCopyCharge, verbCopy } from '../copy-charges.js?v=f94ac7c8';
-import { copyTag, migrateClassTag, migrateClassValue, setCopyTag, toolCopies } from '../tools.js?v=f701b241';
+import { copyChargesLeft, keepsCopies, spendCopyCharge, verbCopy } from '../copy-charges.js?v=737fd334';
+import { copyTag, migrateClassTag, migrateClassValue, setCopyTag, toolCopies } from '../tools.js?v=d8aa3536';
 
 export const POTIONS_FEATURE_ID = 'potions';
 const LOVE = 'feeling_called_love';
@@ -386,7 +386,7 @@ function bottleFx(engine, classTsid, target) {
   // The bottle's tool_animation is an itemstack_overlay: over the street's front layers too.
   const layer = engine.fxLayer || engine.entityLayer;
   if (!PIXI?.Sprite || !layer) return null;
-  const spr = new PIXI.Sprite(textureFromUrl(`assets/sprites/icons/${classTsid}.png`));
+  const spr = new PIXI.Sprite(textureFromUrl(`assets/sprites/icons/${classTsid}.webp`));
   spr.anchor.set(0.5, 1);
   spr.zIndex = 900;
   spr.scale.set(0.9);

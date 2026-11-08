@@ -67,17 +67,17 @@ import {
   takeVisitorDelivery,
   teachButler,
   visitorsReport,
-} from '../public/js/butler.js?v=2bafa110';
-import { canOptIn, stoneVog, STONE_TEXT } from '../public/js/street-furniture.js?v=d5716ef6';
+} from '../public/js/butler.js?v=826eb5f6';
+import { canOptIn, stoneVog, STONE_TEXT } from '../public/js/street-furniture.js?v=6983f5f5';
 import { NEIGHBOURS, neighbourById, normalizeNeighbourState, visitorLetter } from '../public/js/neighbours.js?v=161fc2e5';
-import { butlerApi, butlerFeature } from '../public/js/features/butler-feature.js?v=4e988a25';
+import { butlerApi, butlerFeature } from '../public/js/features/butler-feature.js?v=54762b93';
 // The URL clubhouse.js imports, so these share its Butler.
-import { butlerApi as clubButler, butlerFeature as clubButlerFeature } from '../public/js/features/butler-feature.js?v=4e988a25';
-import { PART_1 as JOIN_CLUB, REMINISCE as JOIN_CLUB_REMINISCE, room as clubRoom } from '../public/js/quest-rooms/clubhouse.js?v=7d181e3a';
+import { butlerApi as clubButler, butlerFeature as clubButlerFeature } from '../public/js/features/butler-feature.js?v=54762b93';
+import { PART_1 as JOIN_CLUB, REMINISCE as JOIN_CLUB_REMINISCE, room as clubRoom } from '../public/js/quest-rooms/clubhouse.js?v=c0b141a6';
 import { BUTLER_FEET, ButlerPainter, clipRange, drawList } from '../public/js/butler-rig.js?v=e81817d9';
 import { OFFER_OVERRIDES } from '../public/js/quest-rooms/catalog.js?v=d77d3d17';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=10b118dd';
-import { npcQuestOffers, pendingQuestOffers } from '../public/js/quest-offers.js?v=486b09c9';
+import { npcQuestOffers, pendingQuestOffers } from '../public/js/quest-offers.js?v=e31115ea';
 import { createQuestState } from '../public/js/quests.js?v=c8d9d0a4';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -378,8 +378,8 @@ describe('copy and source numbers', () => {
 
   it('ships only the loading fallback (Look 1 idle0 + walk4), every clip standing in on it, at the measured grid', () => {
     const dir = join(PUBLIC, 'assets/sprites/butler');
-    // butler_box@3x.webp is the box's sharp twin (tools/vector-sprites/stills.json), not a clip.
-    const sheets = readdirSync(dir).filter((f) => f.endsWith('.webp') && !/@\d+x\.webp$/.test(f)).sort();
+    // butler_box.webp (and its sharp @3x twin, tools/vector-sprites/stills.json) is the delivery box, not a clip.
+    const sheets = readdirSync(dir).filter((f) => f.endsWith('.webp') && !/@\d+x\.webp$/.test(f) && !f.startsWith('butler_box')).sort();
     assert.deepEqual(sheets, BUTLER_FALLBACK.clips.map((c) => `butler_${BUTLER_FALLBACK.look}_${c}.webp`).sort());
     assert.deepEqual([fallbackClip('walk3'), fallbackClip('stepBack'), fallbackClip('wave'), fallbackClip('turnBack'), fallbackClip('walk4')], ['walk4', 'walk4', 'idle0', 'idle0', 'walk4']);
     for (const look of BUTLER_LOOKS) {
@@ -403,7 +403,7 @@ describe('copy and source numbers', () => {
       assert.ok(Math.floor(w / look.cell.w) === cols, `${file} cols`);
       assert.ok((h / look.cell.h) * cols >= frames, `${file} rows`);
     }
-    assert.ok(statSync(join(PUBLIC, 'assets/sprites/butler/butler_box.png')).size > 1000);
+    assert.ok(statSync(join(PUBLIC, 'assets/sprites/butler/butler_box.webp')).size > 1000);
   });
 });
 

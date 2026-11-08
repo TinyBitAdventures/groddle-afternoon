@@ -27,17 +27,17 @@ import {
   planMusicblockDrop,
   playMusicblock,
   starterMusicblocks,
-} from '../public/js/musicblocks.js?v=f5adbf0c';
+} from '../public/js/musicblocks.js?v=db6a213b';
 import { SOUND_ALIASES, SOUND_FILES } from '../public/js/sound-keys.js?v=6aedc206';
 import { DROP_TABLES } from '../public/js/drop-tables-data.js?v=c51a6400';
-import { SOIL_DROP_TABLES } from '../public/js/patches.js?v=8af384ac';
-import { SPINNING_WHEEL_DROP_TABLE } from '../public/js/spinning-wheel.js?v=482cd151';
+import { SOIL_DROP_TABLES } from '../public/js/patches.js?v=aa83d5ad';
+import { SPINNING_WHEEL_DROP_TABLE } from '../public/js/spinning-wheel.js?v=ddae3d4d';
 import {
   ITEM_CATALOG,
   countItem,
   createInventory,
-} from '../public/js/inventory.js?v=d82f3b00';
-import { getVerbsFor, runVerb } from '../public/content.js?v=075ded81';
+} from '../public/js/inventory.js?v=b7609342';
+import { getVerbsFor, runVerb } from '../public/content.js?v=ebc8b8b3';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const publicRoot = join(here, '../public');
@@ -124,7 +124,7 @@ describe('official Musicblock catalog', () => {
   it('drop modules register the GSJS item data, not stand-ins', () => {
     const meta = musicblockItemMeta('musicblock_x_shiny_04');
     assert.equal(meta.baseCost, 600);
-    assert.equal(meta.icon, 'assets/sprites/icons/musicblock_x_shiny_04.png');
+    assert.equal(meta.icon, 'assets/sprites/icons/musicblock_x_shiny_04.webp');
     assert.equal(musicblockItemMeta('nope'), null);
   });
 });
@@ -308,7 +308,7 @@ describe('Musicblock game integration', () => {
 
 describe('Musicblock collection badges from any source', () => {
   it('emits in_inventory the first time a block reaches the pack', async () => {
-    const { musicblocksFeature, newlyOwnedMusicblocks } = await import('../public/js/features/musicblocks-feature.js?v=0885e42f');
+    const { musicblocksFeature, newlyOwnedMusicblocks } = await import('../public/js/features/musicblocks-feature.js?v=5aeba913');
     assert.deepEqual(newlyOwnedMusicblocks(new Set(['musicblock_d_blue_01']), {
       musicblock_d_blue_01: 2, musicblock_d_blue_02: 1, apple: 3, musicblock_trumpets: 1,
     }), ['musicblock_d_blue_02']);

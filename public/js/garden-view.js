@@ -24,7 +24,7 @@
  * Remake plot keys are "c-r", c from 1 at the left, r from 1 at the back
  * (js/garden.js createGarden), so the client's row is rows - r.
  */
-import { GARDEN_ART } from './garden-art.js?v=c947ccf4';
+import { GARDEN_ART } from './garden-art.js?v=d90f3721';
 
 /**
  * The size gardens are drawn at: items/garden_new.js adjusted_scale 0.7, and

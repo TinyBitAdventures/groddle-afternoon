@@ -41,7 +41,7 @@
  * radianceStatus, meditationTogether, meditatorsHere.
  */
 
-import { addItem, countItem, ensureItem } from '../inventory.js?v=d82f3b00';
+import { addItem, countItem, ensureItem } from '../inventory.js?v=b7609342';
 import { GAME_DAY_MS, getGameDayKey, getGameDayStartMs } from '../game-day.js?v=edb00566';
 import {
   STATION_COUNTER,
@@ -70,12 +70,12 @@ import {
   rollMeditationDay,
   startLevitation,
   startMeditation,
-} from '../meditation.js?v=380b2f3f';
+} from '../meditation.js?v=f0c00590';
 import { energyMax, metabolicGain, moodMax, loseEnergy, loseMood } from '../metabolics.js?v=8504134e';
 import { levitationCards } from '../imagination-effects.js?v=70169933';
 import { applyPhysicsAdjustments, physicsMultipliers } from '../location-events.js?v=05663361';
 import { sourceFromUrl } from '../textures.js?v=3149d699';
-import { denseSprite } from '../sprite-dense.js?v=178a711b';
+import { denseSprite } from '../sprite-dense.js?v=2a0ce07a';
 import { rainbowSound, showRainbow } from '../overlays.js?v=642adbd0';
 import { moodScaledXp } from '../mood-xp.js?v=958e7680';
 import { createMinnAccount } from '../minn-account.js?v=ba6a13c5';
@@ -97,7 +97,7 @@ import {
   radiationRank,
   radiatorEnd,
   radiatorLine,
-} from '../radiance-mp.js?v=dd99d51f';
+} from '../radiance-mp.js?v=72bfa767';
 
 export const MEDITATION_FEATURE_ID = 'meditation';
 /** metabolics_get_max_energy: the energy tank (100 plus Energy Tank cards). */

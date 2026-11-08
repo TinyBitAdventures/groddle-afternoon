@@ -2320,8 +2320,8 @@
     "icon": {
      "id": "pumpkin_lit_1",
      "name": "Jack-O-Lantern",
-     "icon": "/assets/sprites/icons/pumpkin_lit_1.png",
-     "icon3x": "/assets/sprites/icons/pumpkin_lit_1@3x.png"
+     "icon": "/assets/sprites/icons/pumpkin_lit_1.webp",
+     "icon3x": "/assets/sprites/icons/pumpkin_lit_1@3x.webp"
     },
     "status": "source",
     "window": "October 17 to November 1, and Remember 25-37 on the Dametime calendar",
@@ -2346,32 +2346,32 @@
        {
         "id": "pumpkin_carved_1",
         "name": "Jack the Pumpkin",
-        "icon": "/assets/sprites/icons/pumpkin_carved_1.png",
-        "icon3x": "/assets/sprites/icons/pumpkin_carved_1@3x.png"
+        "icon": "/assets/sprites/icons/pumpkin_carved_1.webp",
+        "icon3x": "/assets/sprites/icons/pumpkin_carved_1@3x.webp"
        },
        {
         "id": "pumpkin_carved_2",
         "name": "Steve the Pumpkin",
-        "icon": "/assets/sprites/icons/pumpkin_carved_2.png",
-        "icon3x": "/assets/sprites/icons/pumpkin_carved_2@3x.png"
+        "icon": "/assets/sprites/icons/pumpkin_carved_2.webp",
+        "icon3x": "/assets/sprites/icons/pumpkin_carved_2@3x.webp"
        },
        {
         "id": "pumpkin_carved_3",
         "name": "Hello Pumpkin!",
-        "icon": "/assets/sprites/icons/pumpkin_carved_3.png",
-        "icon3x": "/assets/sprites/icons/pumpkin_carved_3@3x.png"
+        "icon": "/assets/sprites/icons/pumpkin_carved_3.webp",
+        "icon3x": "/assets/sprites/icons/pumpkin_carved_3@3x.webp"
        },
        {
         "id": "pumpkin_carved_4",
         "name": "Zille the Pumpkin",
-        "icon": "/assets/sprites/icons/pumpkin_carved_4.png",
-        "icon3x": "/assets/sprites/icons/pumpkin_carved_4@3x.png"
+        "icon": "/assets/sprites/icons/pumpkin_carved_4.webp",
+        "icon3x": "/assets/sprites/icons/pumpkin_carved_4@3x.webp"
        },
        {
         "id": "pumpkin_carved_5",
         "name": "Lem the Pumpkin",
-        "icon": "/assets/sprites/icons/pumpkin_carved_5.png",
-        "icon3x": "/assets/sprites/icons/pumpkin_carved_5@3x.png"
+        "icon": "/assets/sprites/icons/pumpkin_carved_5.webp",
+        "icon3x": "/assets/sprites/icons/pumpkin_carved_5@3x.webp"
        }
       ]
      },
@@ -2382,32 +2382,32 @@
        {
         "id": "pumpkin_lit_1",
         "name": "Jack-O-Lantern",
-        "icon": "/assets/sprites/icons/pumpkin_lit_1.png",
-        "icon3x": "/assets/sprites/icons/pumpkin_lit_1@3x.png"
+        "icon": "/assets/sprites/icons/pumpkin_lit_1.webp",
+        "icon3x": "/assets/sprites/icons/pumpkin_lit_1@3x.webp"
        },
        {
         "id": "pumpkin_lit_2",
         "name": "Steve-O-Lantern",
-        "icon": "/assets/sprites/icons/pumpkin_lit_2.png",
-        "icon3x": "/assets/sprites/icons/pumpkin_lit_2@3x.png"
+        "icon": "/assets/sprites/icons/pumpkin_lit_2.webp",
+        "icon3x": "/assets/sprites/icons/pumpkin_lit_2@3x.webp"
        },
        {
         "id": "pumpkin_lit_3",
         "name": "Shiny Hello Pumpkin!",
-        "icon": "/assets/sprites/icons/pumpkin_lit_3.png",
-        "icon3x": "/assets/sprites/icons/pumpkin_lit_3@3x.png"
+        "icon": "/assets/sprites/icons/pumpkin_lit_3.webp",
+        "icon3x": "/assets/sprites/icons/pumpkin_lit_3@3x.webp"
        },
        {
         "id": "pumpkin_lit_4",
         "name": "Zille-O-Lantern",
-        "icon": "/assets/sprites/icons/pumpkin_lit_4.png",
-        "icon3x": "/assets/sprites/icons/pumpkin_lit_4@3x.png"
+        "icon": "/assets/sprites/icons/pumpkin_lit_4.webp",
+        "icon3x": "/assets/sprites/icons/pumpkin_lit_4@3x.webp"
        },
        {
         "id": "pumpkin_lit_5",
         "name": "Lem-O-Lantern",
-        "icon": "/assets/sprites/icons/pumpkin_lit_5.png",
-        "icon3x": "/assets/sprites/icons/pumpkin_lit_5@3x.png"
+        "icon": "/assets/sprites/icons/pumpkin_lit_5.webp",
+        "icon3x": "/assets/sprites/icons/pumpkin_lit_5@3x.webp"
        }
       ]
      },
@@ -2418,20 +2418,20 @@
        {
         "id": "birch_candy",
         "name": "Birch Candy",
-        "icon": "/assets/sprites/icons/birch_candy.png",
-        "icon3x": "/assets/sprites/icons/birch_candy@3x.png"
+        "icon": "/assets/sprites/icons/birch_candy.webp",
+        "icon3x": "/assets/sprites/icons/birch_candy@3x.webp"
        },
        {
         "id": "corn_syrup_squares",
         "name": "Hi-Sucrose Corn Syrup Square",
-        "icon": "/assets/sprites/icons/corn_syrup_squares.png",
-        "icon3x": "/assets/sprites/icons/corn_syrup_squares@3x.png"
+        "icon": "/assets/sprites/icons/corn_syrup_squares.webp",
+        "icon3x": "/assets/sprites/icons/corn_syrup_squares@3x.webp"
        },
        {
         "id": "carobish_treats",
         "name": "Raw Bio-Organic Carob-ish Treat",
-        "icon": "/assets/sprites/icons/carobish_treats.png",
-        "icon3x": "/assets/sprites/icons/carobish_treats@3x.png"
+        "icon": "/assets/sprites/icons/carobish_treats.webp",
+        "icon3x": "/assets/sprites/icons/carobish_treats@3x.webp"
        }
       ]
      },
@@ -2442,8 +2442,8 @@
        {
         "id": "seed_pumpkin",
         "name": "Pumpkin Seed",
-        "icon": "/assets/sprites/icons/seed_pumpkin.png",
-        "icon3x": "/assets/sprites/icons/seed_pumpkin@3x.png"
+        "icon": "/assets/sprites/icons/seed_pumpkin.webp",
+        "icon3x": "/assets/sprites/icons/seed_pumpkin@3x.webp"
        }
       ]
      }
@@ -2453,73 +2453,73 @@
       "id": "lanternerer",
       "name": "Lanternerer",
       "desc": "Lit and Displayed a Pumpkin Lantern",
-      "icon": "/assets/badges/lanternerer.png"
+      "icon": "/assets/badges/lanternerer.webp"
      },
      {
       "id": "mini_tricksy_treater",
       "name": "Mini Tricksy-Treater",
       "desc": "Gave Candy to 5 Lucky Candy-Munchers during Zilloween",
-      "icon": "/assets/badges/mini_tricksy_treater.png"
+      "icon": "/assets/badges/mini_tricksy_treater.webp"
      },
      {
       "id": "pumpkin_carver",
       "name": "Pumpkin Carver",
       "desc": "Carved the full collection of Pumpkins",
-      "icon": "/assets/badges/pumpkin_carver.png"
+      "icon": "/assets/badges/pumpkin_carver.webp"
      },
      {
       "id": "candy_muncher",
       "name": "Candy Muncher",
       "desc": "Munched 17 Candy during Zilloween",
-      "icon": "/assets/badges/candy_muncher.png"
+      "icon": "/assets/badges/candy_muncher.webp"
      },
      {
       "id": "minor_tricksy_treater",
       "name": "Minor Tricksy-Treater",
       "desc": "Gave Candy to 37 Lucky Candy-Eaters during Zilloween",
-      "icon": "/assets/badges/minor_tricksy_treater.png"
+      "icon": "/assets/badges/minor_tricksy_treater.webp"
      },
      {
       "id": "candy_snaffler",
       "name": "Candy Snaffler",
       "desc": "Snaffled 43 Candy during Zilloween",
-      "icon": "/assets/badges/candy_snaffler.png"
+      "icon": "/assets/badges/candy_snaffler.webp"
      },
      {
       "id": "candy_nommer",
       "name": "Candy Nommer",
       "desc": "Nommed 79 Candy during Zilloween",
-      "icon": "/assets/badges/candy_nommer.png"
+      "icon": "/assets/badges/candy_nommer.webp"
      },
      {
       "id": "major_tricksy_treater",
       "name": "Major Tricksy-Treater",
       "desc": "Gave Candy to 103 Lucky Candy-Biters during Zilloween",
-      "icon": "/assets/badges/major_tricksy_treater.png"
+      "icon": "/assets/badges/major_tricksy_treater.webp"
      },
      {
       "id": "candy_caner",
       "name": "Candy Caner",
       "desc": "Caned 137 Candy during Zilloween",
-      "icon": "/assets/badges/candy_caner.png"
+      "icon": "/assets/badges/candy_caner.webp"
      },
      {
       "id": "super_tricksy_treater",
       "name": "Super Tricksy-Treater",
       "desc": "Gave Candy to 257 Lucky Candy-Lovers during Zilloween",
-      "icon": "/assets/badges/super_tricksy_treater.png"
+      "icon": "/assets/badges/super_tricksy_treater.webp"
      },
      {
       "id": "candy_stripper",
       "name": "Candy Stripper",
       "desc": "Devoured 353 Candy during Zilloween",
-      "icon": "/assets/badges/candy_stripper.png"
+      "icon": "/assets/badges/candy_stripper.webp"
      },
      {
       "id": "the_candyglitch",
       "name": "The Candyglitch",
       "desc": "Gave Candy to 499 Lucky Candy-Lickers during Zilloween",
-      "icon": "/assets/badges/the_candyglitch.png"
+      "icon": "/assets/badges/the_candyglitch.webp"
      }
     ],
     "secret": 0,
@@ -2532,8 +2532,8 @@
     "icon": {
      "id": "glitchmas_cracker",
      "name": "Glitchmas Cracker",
-     "icon": "/assets/sprites/icons/glitchmas_cracker.png",
-     "icon3x": "/assets/sprites/icons/glitchmas_cracker@3x.png"
+     "icon": "/assets/sprites/icons/glitchmas_cracker.webp",
+     "icon3x": "/assets/sprites/icons/glitchmas_cracker@3x.webp"
     },
     "status": "source",
     "window": "December 12 to January 3",
@@ -2558,14 +2558,14 @@
        {
         "id": "glitchmas_cracker",
         "name": "Glitchmas Cracker",
-        "icon": "/assets/sprites/icons/glitchmas_cracker.png",
-        "icon3x": "/assets/sprites/icons/glitchmas_cracker@3x.png"
+        "icon": "/assets/sprites/icons/glitchmas_cracker.webp",
+        "icon3x": "/assets/sprites/icons/glitchmas_cracker@3x.webp"
        },
        {
         "id": "glitchmas_card",
         "name": "Glitchmas Card",
-        "icon": "/assets/sprites/icons/glitchmas_card.png",
-        "icon3x": "/assets/sprites/icons/glitchmas_card@3x.png"
+        "icon": "/assets/sprites/icons/glitchmas_card.webp",
+        "icon3x": "/assets/sprites/icons/glitchmas_card@3x.webp"
        }
       ]
      },
@@ -2576,14 +2576,14 @@
        {
         "id": "glitchmas_present",
         "name": "Glitchmas Present",
-        "icon": "/assets/sprites/icons/glitchmas_present.png",
-        "icon3x": "/assets/sprites/icons/glitchmas_present@3x.png"
+        "icon": "/assets/sprites/icons/glitchmas_present.webp",
+        "icon3x": "/assets/sprites/icons/glitchmas_present@3x.webp"
        },
        {
         "id": "collectors_edition_2010_glitchmas_yeti",
         "name": "Collectors' Edition 2010 Glitchmas Yeti",
-        "icon": "/assets/sprites/icons/collectors_edition_2010_glitchmas_yeti.png",
-        "icon3x": "/assets/sprites/icons/collectors_edition_2010_glitchmas_yeti@3x.png"
+        "icon": "/assets/sprites/icons/collectors_edition_2010_glitchmas_yeti.webp",
+        "icon3x": "/assets/sprites/icons/collectors_edition_2010_glitchmas_yeti@3x.webp"
        }
       ]
      },
@@ -2594,8 +2594,8 @@
        {
         "id": "egg_plain",
         "name": "Egg",
-        "icon": "/assets/sprites/icons/egg_plain.png",
-        "icon3x": "/assets/sprites/icons/egg_plain@3x.png"
+        "icon": "/assets/sprites/icons/egg_plain.webp",
+        "icon3x": "/assets/sprites/icons/egg_plain@3x.webp"
        }
       ]
      }
@@ -2611,8 +2611,8 @@
     "icon": {
      "id": "pi",
      "name": "Pi",
-     "icon": "/assets/sprites/icons/pi.png",
-     "icon3x": "/assets/sprites/icons/pi@3x.png"
+     "icon": "/assets/sprites/icons/pi.webp",
+     "icon3x": "/assets/sprites/icons/pi@3x.webp"
     },
     "status": "source",
     "window": "March 14, wherever it is still March 14",
@@ -2632,8 +2632,8 @@
        {
         "id": "pi",
         "name": "Pi",
-        "icon": "/assets/sprites/icons/pi.png",
-        "icon3x": "/assets/sprites/icons/pi@3x.png"
+        "icon": "/assets/sprites/icons/pi.webp",
+        "icon3x": "/assets/sprites/icons/pi@3x.webp"
        }
       ]
      },
@@ -2654,8 +2654,8 @@
     "icon": {
      "id": "egghunt_egg_5",
      "name": "Golden Egg",
-     "icon": "/assets/sprites/icons/egghunt_egg_5.png",
-     "icon3x": "/assets/sprites/icons/egghunt_egg_5@3x.png"
+     "icon": "/assets/sprites/icons/egghunt_egg_5.webp",
+     "icon3x": "/assets/sprites/icons/egghunt_egg_5@3x.webp"
     },
     "status": "source",
     "window": "all year",
@@ -2672,32 +2672,32 @@
        {
         "id": "egghunt_egg_1",
         "name": "Certified Organic Chocolate Egg",
-        "icon": "/assets/sprites/icons/egghunt_egg_1.png",
-        "icon3x": "/assets/sprites/icons/egghunt_egg_1@3x.png"
+        "icon": "/assets/sprites/icons/egghunt_egg_1.webp",
+        "icon3x": "/assets/sprites/icons/egghunt_egg_1@3x.webp"
        },
        {
         "id": "egghunt_egg_2",
         "name": "Bugsbury Creme Egg",
-        "icon": "/assets/sprites/icons/egghunt_egg_2.png",
-        "icon3x": "/assets/sprites/icons/egghunt_egg_2@3x.png"
+        "icon": "/assets/sprites/icons/egghunt_egg_2.webp",
+        "icon3x": "/assets/sprites/icons/egghunt_egg_2@3x.webp"
        },
        {
         "id": "egghunt_egg_3",
         "name": "Pysanka",
-        "icon": "/assets/sprites/icons/egghunt_egg_3.png",
-        "icon3x": "/assets/sprites/icons/egghunt_egg_3@3x.png"
+        "icon": "/assets/sprites/icons/egghunt_egg_3.webp",
+        "icon3x": "/assets/sprites/icons/egghunt_egg_3@3x.webp"
        },
        {
         "id": "egghunt_egg_4",
         "name": "Secular Holiday Egg",
-        "icon": "/assets/sprites/icons/egghunt_egg_4.png",
-        "icon3x": "/assets/sprites/icons/egghunt_egg_4@3x.png"
+        "icon": "/assets/sprites/icons/egghunt_egg_4.webp",
+        "icon3x": "/assets/sprites/icons/egghunt_egg_4@3x.webp"
        },
        {
         "id": "egghunt_egg_5",
         "name": "Golden Egg",
-        "icon": "/assets/sprites/icons/egghunt_egg_5.png",
-        "icon3x": "/assets/sprites/icons/egghunt_egg_5@3x.png"
+        "icon": "/assets/sprites/icons/egghunt_egg_5.webp",
+        "icon3x": "/assets/sprites/icons/egghunt_egg_5@3x.webp"
        }
       ]
      },
@@ -2708,8 +2708,8 @@
        {
         "id": "trophy_egghunt",
         "name": "Egg Hunter Trophy",
-        "icon": "/assets/sprites/icons/trophy_egghunt.png",
-        "icon3x": "/assets/sprites/icons/trophy_egghunt@3x.png"
+        "icon": "/assets/sprites/icons/trophy_egghunt.webp",
+        "icon3x": "/assets/sprites/icons/trophy_egghunt@3x.webp"
        }
       ]
      }
@@ -2719,7 +2719,7 @@
       "id": "collection_egg_hunter",
       "name": "Egg Hunter Trophy",
       "desc": "Collected all 5 Chocolate Eggs",
-      "icon": "/assets/badges/collection_egg_hunter.png"
+      "icon": "/assets/badges/collection_egg_hunter.webp"
      }
     ],
     "secret": 0,
@@ -2732,9 +2732,64 @@
   "deployed": "2026-11-07"
  },
  "git": {
-  "commits": 1439,
+  "commits": 1452,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-07",
+    "kind": "improve",
+    "text": "Groddle Meadow, Groddle Forest and Alakol have redone map paintings, closer to the originals' olive felt"
+   },
+   {
+    "date": "2026-11-07",
+    "kind": "improve",
+    "text": "Holding everything an offered quest wants says to accept it first"
+   },
+   {
+    "date": "2026-11-07",
+    "kind": "improve",
+    "text": "Letters the game sends have real subjects instead of \"Delivered message\""
+   },
+   {
+    "date": "2026-11-07",
+    "kind": "improve",
+    "text": "Hubs that had the original's placeholder map show its grey instead of a made-up tan and green"
+   },
+   {
+    "date": "2026-11-07",
+    "kind": "fix",
+    "text": "Nobody gets stuck in The Back Alley, the Shady Bureaucrat is always there, and leaving Legalize It keeps your cards"
+   },
+   {
+    "date": "2026-11-07",
+    "kind": "new",
+    "text": "Administrators can delete a Global Chat, Live Help or Trade Channel line from inside the game"
+   },
+   {
+    "date": "2026-11-07",
+    "kind": "fix",
+    "text": "Pick up how many on a shared street stack asks, takes only that many and leaves the rest for everyone"
+   },
+   {
+    "date": "2026-11-07",
+    "kind": "fix",
+    "text": "The Card-Carrying Qualification activates from the pack wherever it was bought"
+   },
+   {
+    "date": "2026-11-07",
+    "kind": "fix",
+    "text": "An online character no longer finds free Paradise tickets, a Hatchet or a resource kit in the pack when it loads"
+   },
+   {
+    "date": "2026-11-07",
+    "kind": "fix",
+    "text": "A garden left for hours comes back as far as it grew, a crop instead of dry shoots"
+   },
+   {
+    "date": "2026-11-07",
+    "kind": "new",
+    "text": "A channel line an administrator deletes disappears from the game's chat at once"
+   },
    {
     "date": "2026-11-07",
     "kind": "improve",
@@ -2799,61 +2854,6 @@
     "date": "2026-11-07",
     "kind": "improve",
     "text": "Pollokoo, Rasana, Roobrik, Salatu, Samudra and Shimla Mirch have new map paintings, repainted from Tiny Speck's thumbnails of the lost originals"
-   },
-   {
-    "date": "2026-11-07",
-    "kind": "improve",
-    "text": "Street Piggies walk in the same place on every player's screen"
-   },
-   {
-    "date": "2026-11-07",
-    "kind": "new",
-    "text": "Peter out Peat works online, with a full bog and friends, and solo no longer offers it"
-   },
-   {
-    "date": "2026-11-07",
-    "kind": "new",
-    "text": "Bestow Random Kindness on another player, and they see its rainbow"
-   },
-   {
-    "date": "2026-11-07",
-    "kind": "improve",
-    "text": "A player under the cone of silence is silent in Local chat too"
-   },
-   {
-    "date": "2026-11-07",
-    "kind": "improve",
-    "text": "When the servers are in trouble the Juju Boss says so, as in 2012"
-   },
-   {
-    "date": "2026-11-07",
-    "kind": "new",
-    "text": "Bewitched Backwoods is a back yard you can choose, drawn with Mythical Oak's look"
-   },
-   {
-    "date": "2026-11-07",
-    "kind": "improve",
-    "text": "Rerunning the street events builder changes only what really changed"
-   },
-   {
-    "date": "2026-11-07",
-    "kind": "improve",
-    "text": "Sixteen recipes are learned from their quests again, and anyone who already made one keeps it"
-   },
-   {
-    "date": "2026-11-07",
-    "kind": "new",
-    "text": "Your furniture moves and changes style without Decorate"
-   },
-   {
-    "date": "2026-11-07",
-    "kind": "new",
-    "text": "A home garden tells its owner when a plot goes dry or a crop is ready"
-   },
-   {
-    "date": "2026-11-07",
-    "kind": "new",
-    "text": "Guano goes on one garden plot by hand: drag it there, or pick Fertilize from the plot's menu"
    }
   ]
  },

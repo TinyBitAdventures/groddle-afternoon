@@ -49,7 +49,7 @@
 import { onLoaded, textureFromUrl } from '../textures.js?v=3149d699';
 import { displayTopOf, itemstackOverlayPoint, playSheetOverlay } from '../overlay-art.js?v=11b6dd7f';
 import { STATION_FLOOR, stationArrival, stationByTsid, stationScreen, surfaceStation } from '../subway.js?v=44d1a09f';
-import { ALLEY, ALLEY_ART, ALLEY_SET, SHADY, alleyPlatforms, drawAlley, inEnteredBox } from './back-alley-set.js?v=3a8a00af';
+import { ALLEY, ALLEY_ART, ALLEY_SET, SHADY, alleyPlatforms, drawAlley, inEnteredBox } from './back-alley-set.js?v=d53ba17d';
 
 export { ALLEY, ALLEY_ART, ALLEY_SET, alleyPlatforms };
 
@@ -223,8 +223,8 @@ async function proposition(ctx) {
 
 function enterAlley(ctx) {
   const { PIXI, kit } = ctx;
-  ctx.data.bIdle = kit.sheetFrames(PIXI, `${LEGALIZE}npc_bureaucrat_arms_01_glasses_none_hair_01_legs_01_necklace_none_tie_01_torso_01_x1_idle1_png_1354832995.png`, 10, 6, 57);
-  ctx.data.bTalk = kit.sheetFrames(PIXI, `${LEGALIZE}npc_bureaucrat_arms_01_glasses_none_hair_01_legs_01_necklace_none_tie_01_torso_01_x1_talk_png_1354832993.png`, 9, 3, 26);
+  ctx.data.bIdle = kit.sheetFrames(PIXI, `${LEGALIZE}npc_bureaucrat_arms_01_glasses_none_hair_01_legs_01_necklace_none_tie_01_torso_01_x1_idle1_png_1354832995.webp`, 10, 6, 57);
+  ctx.data.bTalk = kit.sheetFrames(PIXI, `${LEGALIZE}npc_bureaucrat_arms_01_glasses_none_hair_01_legs_01_necklace_none_tie_01_torso_01_x1_talk_png_1354832993.webp`, 9, 3, 26);
   const spr = new PIXI.AnimatedSprite([PIXI.Texture.EMPTY]);
   spr.anchor.set(0.5, 1);
   spr.scale.set(SHADY.scale);
@@ -269,9 +269,9 @@ function spawnBot(wctx, station) {
   if (wctx.param('backalleymade') === '1') wctx.progressQuest(QUEST, 'made_fuel_cell');
   const spot = botSpot();
   const b = { station, collided: false, danced: false, revived: false, talking: false, dancing: false, rollFrom: null, gone: false };
-  b.talk = kit.sheetFrames(PIXI, `${BOT_ART}bot_talk.png`, 12, 6, 69);
-  b.happy = kit.sheetFrames(PIXI, `${ART}bot_attract.png`, 12, 5, 57);
-  b.moveTex = textureFromUrl(`${ART}bot_move.png`);
+  b.talk = kit.sheetFrames(PIXI, `${BOT_ART}bot_talk.webp`, 12, 6, 69);
+  b.happy = kit.sheetFrames(PIXI, `${ART}bot_attract.webp`, 12, 5, 57);
+  b.moveTex = textureFromUrl(`${ART}bot_move.webp`);
   const spr = new PIXI.AnimatedSprite([b.moveTex]);
   spr.anchor.set(0.5, 1);
   spr.x = spot.x;
@@ -425,7 +425,7 @@ export const room = {
   id: ROOM_ID,
   title: 'The Back Alley',
   kicker: 'Strictly off the record',
-  icon: `${ART}bureaucrat_icon.png`,
+  icon: `${ART}bureaucrat_icon.webp`,
   theme: 'dark',
   hubName: 'Instance',
   durationMs: 0,

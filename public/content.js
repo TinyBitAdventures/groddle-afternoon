@@ -15,7 +15,7 @@ import {
 import {
   quoteTrantCare,
   performTrantCare,
-} from './js/trant-care.js?v=098500ac';
+} from './js/trant-care.js?v=ac146026';
 import {
   listPlantableSeeds,
   waterAllPlots,
@@ -34,8 +34,8 @@ import {
   GARDEN_FERTILIZE_MS,
   fertilizeCheck,
   fertilizePlot,
-} from './js/garden.js?v=890d72ea';
-import { firstWorkingTool, HOE_TOOLS, WATERING_CAN_TOOLS } from './js/tools.js?v=f701b241';
+} from './js/garden.js?v=e1c3415c';
+import { firstWorkingTool, HOE_TOOLS, WATERING_CAN_TOOLS } from './js/tools.js?v=d8aa3536';
 import {
   ROCK_CATALOG,
   MINING_COSTS,
@@ -46,31 +46,31 @@ import {
   findWorkingPick,
   rockStatusLabel,
   ensureMiningItems,
-} from './js/mining.js?v=29fe2127';
+} from './js/mining.js?v=fc28670f';
 import {
   ANIMAL_CLASS_IDS,
   ensureAnimalState,
   listAnimalFeedOptions,
   feedAnimal,
-} from './js/animals.js?v=d5af4f3c';
+} from './js/animals.js?v=0d9f9b0f';
 import {
   quoteAnimalKinship,
   performAnimalKinship,
   highestAnimalKinshipRank,
-} from './js/animal-kinship.js?v=05cd67ec';
+} from './js/animal-kinship.js?v=b857b068';
 import {
   MUSICBLOCK_CATALOG,
   collectMusicblock,
   isMusicblock,
-} from './js/musicblocks.js?v=f5adbf0c';
+} from './js/musicblocks.js?v=db6a213b';
 import { nextDialogue, formatSpokenLine } from './js/dialogue.js?v=fcfed1af';
 import {
   ensureWoodTreeState,
   quoteWoodTreeHarvest,
   harvestWoodTree,
   woodTreeStatusLabel,
-} from './js/woodcutting.js?v=c199dd64';
-import { findWorkingRookTool } from './js/rook-woods.js?v=237b391c';
+} from './js/woodcutting.js?v=4fd0342b';
+import { findWorkingRookTool } from './js/rook-woods.js?v=0ccc8239';
 import {
   HERDKEEPING,
   INCUBATION,
@@ -80,14 +80,14 @@ import {
   namingVerbs,
   queuePlops,
   startIncubation,
-} from './js/animal-husbandry.js?v=35b23ef4';
+} from './js/animal-husbandry.js?v=7194f0f1';
 import { loseEnergy, metabolicGain, moodMax } from './js/metabolics.js?v=8504134e';
 import { SET_FREE, setFreeVerbState } from './js/animal-set-free.js?v=3b194fca';
 import { BUTTER_UP, SING_TO, butterUpVerbState, butterUpChicken, singToVerbState, singToButterfly } from './js/animal-flattery.js?v=63001f58';
 import { levelInfoForXp } from './js/progression.js?v=33462eaa';
 import { getGameDayKey } from './js/game-day.js?v=edb00566';
 import { isElementClass } from './js/pack-slots.js?v=a94b816c';
-import { ITEM_CATALOG, countItem } from './js/inventory.js?v=d82f3b00';
+import { ITEM_CATALOG, countItem } from './js/inventory.js?v=b7609342';
 import { slugsFromEffects } from './js/speech-slugs.js?v=130338f9';
 import { animalResponseKey, failureResponseKey, trantCareResponseKey, rockResponseKey, verbResponse } from './js/verb-responses.js?v=3ceb8a8c';
 
@@ -103,22 +103,22 @@ function husbandryCtx(ctx) {
 
 /** OGA iconic pack — assets/sprites/icons/<class_tsid>.png */
 export const ITEM_ICONS = {
-  apple: 'assets/sprites/icons/apple.png',
-  milk_butterfly: 'assets/sprites/icons/milk_butterfly.png',
-  butterfly_lotion: 'assets/sprites/icons/butterfly_lotion.png',
-  grain: 'assets/sprites/icons/grain.png',
-  plank: 'assets/sprites/icons/plank.png',
-  cherry: 'assets/sprites/icons/cherry.png',
-  flour: 'assets/sprites/icons/flour.png',
-  bun: 'assets/sprites/icons/bun.png',
-  sammich: 'assets/sprites/icons/sammich.png',
-  meat: 'assets/sprites/icons/meat.png',
-  pinch_of_salt: 'assets/sprites/icons/pinch_of_salt.png',
-  egg_plain: 'assets/sprites/icons/egg_plain.png',
-  bean_plain: 'assets/sprites/icons/bean_plain.png',
-  plain_bubble: 'assets/sprites/icons/plain_bubble.png',
-  all_spice: 'assets/sprites/icons/all_spice.png',
-  general_vapour: 'assets/sprites/icons/general_vapour.png',
+  apple: 'assets/sprites/icons/apple.webp',
+  milk_butterfly: 'assets/sprites/icons/milk_butterfly.webp',
+  butterfly_lotion: 'assets/sprites/icons/butterfly_lotion.webp',
+  grain: 'assets/sprites/icons/grain.webp',
+  plank: 'assets/sprites/icons/plank.webp',
+  cherry: 'assets/sprites/icons/cherry.webp',
+  flour: 'assets/sprites/icons/flour.webp',
+  bun: 'assets/sprites/icons/bun.webp',
+  sammich: 'assets/sprites/icons/sammich.webp',
+  meat: 'assets/sprites/icons/meat.webp',
+  pinch_of_salt: 'assets/sprites/icons/pinch_of_salt.webp',
+  egg_plain: 'assets/sprites/icons/egg_plain.webp',
+  bean_plain: 'assets/sprites/icons/bean_plain.webp',
+  plain_bubble: 'assets/sprites/icons/plain_bubble.webp',
+  all_spice: 'assets/sprites/icons/all_spice.webp',
+  general_vapour: 'assets/sprites/icons/general_vapour.webp',
 };
 
 export const ITEM_LABELS = {
@@ -148,7 +148,7 @@ export const ITEM_LABELS = {
 };
 
 for (const def of Object.values(MUSICBLOCK_CATALOG)) {
-  ITEM_ICONS[def.classTsid] = `assets/sprites/icons/${def.classTsid}.png`;
+  ITEM_ICONS[def.classTsid] = `assets/sprites/icons/${def.classTsid}.webp`;
   ITEM_LABELS[def.classTsid] = def.label;
 }
 

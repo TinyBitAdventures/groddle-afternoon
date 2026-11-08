@@ -71,8 +71,8 @@ describe('the taster pack opens a 10-minute Winter Wingding', () => {
     assert.equal(space.label, 'Winter Wingding');
     assert.equal(space.streetTsid, 'GDOOS17UPNJ2HT7');
     assert.ok(existsSync(join(pub, `assets/streets/${space.streetTsid}.json`)));
-    assert.ok(existsSync(join(pub, `assets/sprites/icons/${TASTER}.png`)));
-    assert.ok(existsSync(join(pub, `assets/sprites/icons/${TASTER}@3x.png`)));
+    assert.ok(existsSync(join(pub, `assets/sprites/icons/${TASTER}.webp`)));
+    assert.ok(existsSync(join(pub, `assets/sprites/icons/${TASTER}@3x.webp`)));
   });
 
   it('the item inventory finds the cracker drop on its own, with no override (G183 dropTableReach)', () => {

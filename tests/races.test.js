@@ -95,10 +95,10 @@ describe('race catalog and ticket store', () => {
 
   it('ships ticket and dispenser art', () => {
     for (const race of Object.values(RACES)) {
-      assert.ok(existsSync(join(root, 'assets/sprites/races', `${race.ticket}.png`)), race.ticket);
+      assert.ok(existsSync(join(root, 'assets/sprites/races', `${race.ticket}.webp`)), race.ticket);
     }
-    assert.ok(existsSync(join(root, 'assets/sprites/races/race_ticket_dispenser.png')));
-    assert.ok(existsSync(join(root, 'assets/sprites/races/race_ticket.png')));
+    assert.ok(existsSync(join(root, 'assets/sprites/races/race_ticket_dispenser.webp')));
+    assert.ok(existsSync(join(root, 'assets/sprites/races/race_ticket.webp')));
   });
 
   it('rolls the generic ticket onto a race, The Great Hog Haul, or Grab \'Em Good', () => {
@@ -571,7 +571,7 @@ describe("Grab 'Em Good (quoin_grab)", () => {
   });
 
   it('ships the ticket art and only recovered decos', () => {
-    assert.ok(existsSync(join(root, 'assets/sprites/races/race_ticket_grab_em_good.png')));
+    assert.ok(existsSync(join(root, 'assets/sprites/races/race_ticket_grab_em_good.webp')));
     for (const d of course.decor) assert.ok(existsSync(join(root, 'assets/decos/groddle', `${d.name}.webp`)), d.name);
   });
 });

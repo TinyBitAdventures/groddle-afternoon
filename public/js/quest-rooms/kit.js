@@ -10,7 +10,7 @@
  */
 
 import { frameTexture, isLoaded, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js?v=3149d699';
-import { quoinTouches } from '../quoins.js?v=f154a79e';
+import { quoinTouches } from '../quoins.js?v=299cc3f4';
 
 export const DECO_DIR = 'assets/decos/groddle/';
 export const ICON_DIR = 'assets/sprites/icons/';
@@ -84,7 +84,9 @@ export function sceneRoot(PIXI, width, height) {
 
 /** A recovered deco, bottom-centre anchored by default. */
 export function deco(PIXI, name, x, y, opts = {}) {
-  const spr = new PIXI.Sprite(textureFromUrl(`${opts.dir || DECO_DIR}${name}.png`));
+  // Decos are asked for as .png (js/deco-hires.js routes them to their WebP); every other folder ships lossless WebP.
+  const dir = opts.dir || DECO_DIR;
+  const spr = new PIXI.Sprite(textureFromUrl(`${dir}${name}.${dir.includes('assets/decos/') ? 'png' : 'webp'}`));
   spr.anchor.set(opts.ax ?? 0.5, opts.ay ?? 1);
   const s = opts.scale ?? 1;
   spr.scale.set(opts.flip ? -s : s, opts.sy ?? s);

@@ -5,8 +5,8 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { packStamp } from '../public/js/inventory.js?v=d82f3b00';
-import { bindToolInventory, createToolConditionState, getToolCondition, repairToolCondition, setToolRemaining, useToolCondition } from '../public/js/tools.js?v=f701b241';
+import { packStamp } from '../public/js/inventory.js?v=b7609342';
+import { bindToolInventory, createToolConditionState, getToolCondition, repairToolCondition, setToolRemaining, useToolCondition } from '../public/js/tools.js?v=d8aa3536';
 import { createPackRow } from '../public/js/ui/pack-row.js?v=65c0f180';
 import { FakeEl, page } from './social-fake-dom.js';
 
@@ -71,8 +71,8 @@ describe('the open bag follows a repair (Austin 2026-11-01: its wear bar changed
     const packRowSignature = signatureWith(tools);
     const rowOpts = { emptyCount: 14, fillEmpty: true, ghost: true, container: 'bag_bigger_gray' };
     const entries = [
-      { classTsid: 'cherry', count: 4, container: 'bag_bigger_gray', index: 0, icon: 'cherry.png' },
-      { classTsid: 'hoe', count: 1, container: 'bag_bigger_gray', index: 1, icon: 'hoe.png', isTool: true, copy: 0 },
+      { classTsid: 'cherry', count: 4, container: 'bag_bigger_gray', index: 0, icon: 'cherry.webp' },
+      { classTsid: 'hoe', count: 1, container: 'bag_bigger_gray', index: 1, icon: 'hoe.webp', isTool: true, copy: 0 },
     ];
     const { doc } = page();
     const band = new FakeEl('div');

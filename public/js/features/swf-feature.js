@@ -32,7 +32,7 @@
  *   its SVG frames on a dense screen, else its 2x sheet).
  */
 
-import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=d82f3b00';
+import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=b7609342';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=3149d699';
 import {
@@ -392,7 +392,7 @@ function showBadge(engine) {
     if (density > 0) holdPlayVector(PIXI, density);
     return;
   }
-  const url = ITEM_CATALOG[GAME_BOX]?.icon || `assets/sprites/icons/${GAME_BOX}.png`;
+  const url = ITEM_CATALOG[GAME_BOX]?.icon || `assets/sprites/icons/${GAME_BOX}.webp`;
   badge = new PIXI.Sprite(textureFromUrl(url));
   badge.anchor.set(0.5, 0.5);
   // game_box.js getAssetInfo: 37 x 51.

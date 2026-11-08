@@ -22,7 +22,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import vm from 'node:vm';
 import { GSJS } from '../catalog/build.mjs';
-import { EMBLEM_FAVOR_COST, EMBLEM_FAVOR_INCREMENT, FAVOR_STUDY_SECONDS, GIANTS as REMAKE_GIANTS } from '../../public/js/shrines.js?v=95d74174';
+import { EMBLEM_FAVOR_COST, EMBLEM_FAVOR_INCREMENT, FAVOR_STUDY_SECONDS, GIANTS as REMAKE_GIANTS } from '../../public/js/shrines.js?v=1a945fe7';
 import { ICONIZE_COUNT } from '../../public/js/giant-icons.js?v=0d6b4965';
 import { GIANT_ICON_DATA } from '../../public/js/giant-icons-data.js?v=5026b09c';
 import { esc, fmt, tsHtml } from './parts.mjs';
@@ -56,7 +56,7 @@ export function gsjsVar(file, name) {
   return vm.runInNewContext(`(${text.slice(start, end)})`, Object.create(null));
 }
 
-const iconOf = (g) => `assets/sprites/giant-icons/icon_${g === 'ti' ? 'tii' : g}.png`;
+const iconOf = (g) => `assets/sprites/giant-icons/icon_${g === 'ti' ? 'tii' : g}.webp`;
 
 function add({ add: addEntry, entries, items, picture, ecology }) {
   // Street tsid -> the region page that lists it.

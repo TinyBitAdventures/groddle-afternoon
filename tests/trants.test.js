@@ -3,6 +3,7 @@
  * Run: node --test tests/trants.test.js
  */
 import { describe, it, before } from 'node:test';
+import { imageSize } from '../tools/image-size.mjs';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
@@ -23,7 +24,7 @@ import {
   TRANT_META,
   trantHarvestResponse,
 } from '../public/js/trants.js?v=9c2e8c0f';
-import { getVerbsFor, runVerb } from '../public/content.js?v=075ded81';
+import { getVerbsFor, runVerb } from '../public/content.js?v=ebc8b8b3';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '../public');
 
@@ -262,8 +263,8 @@ describe('trant harvest (GSJS-extracted)', () => {
     const png = (relative) => {
       const bytes = readFileSync(join(root, relative));
       return {
-        width: bytes.readUInt32BE(16),
-        height: bytes.readUInt32BE(20),
+        width: imageSize(bytes).w,
+        height: imageSize(bytes).h,
         bytes: bytes.length,
       };
     };
@@ -277,13 +278,13 @@ describe('trant harvest (GSJS-extracted)', () => {
     };
     for (const [classTsid, [width, height]] of Object.entries(cells)) {
       for (const maturity of [1, 3, 5, 7, 10]) {
-        const result = png(`assets/sprites/trants/frames/${classTsid}_m${maturity}.png`);
+        const result = png(`assets/sprites/trants/frames/${classTsid}_m${maturity}.webp`);
         assert.deepEqual(
           { width: result.width, height: result.height },
           { width, height },
           `${classTsid} maturity ${maturity} must be one exact source-sheet cell`
         );
-        assert.ok(result.bytes > 2500, `${classTsid} maturity ${maturity} must not be blank`);
+        assert.ok(result.bytes > 1000, `${classTsid} maturity ${maturity} must not be blank`); // a blank cell is 34 bytes as lossless WebP
       }
     }
     const build = readFileSync(join(root, '../build-trant-frames.sh'), 'utf8');

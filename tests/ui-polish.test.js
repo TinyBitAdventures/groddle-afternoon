@@ -1,4 +1,5 @@
 import test from 'node:test';
+import { imageSize } from '../tools/image-size.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -10,8 +11,8 @@ const publicRoot = path.join(root, 'public');
 function pngSize(file) {
   const bytes = fs.readFileSync(file);
   return {
-    width: bytes.readUInt32BE(16),
-    height: bytes.readUInt32BE(20),
+    width: imageSize(bytes).w,
+    height: imageSize(bytes).h,
   };
 }
 
@@ -20,7 +21,7 @@ test.describe('responsive chrome polish', () => {
     for (const maturity of [1, 3, 5, 7, 10]) {
       const file = path.join(
         publicRoot,
-        `assets/sprites/trants/frames/trant_bubble_m${maturity}.png`
+        `assets/sprites/trants/frames/trant_bubble_m${maturity}.webp`
       );
       assert.deepEqual(pngSize(file), { width: 167, height: 277 });
     }

@@ -40,17 +40,17 @@
 
 import { displayTopOf } from '../overlay-art.js?v=11b6dd7f';
 import { OVERLAY_USES, playOverlay } from '../overlays.js?v=642adbd0';
-import { addItem, countItem, removeItem } from '../inventory.js?v=d82f3b00';
+import { addItem, countItem, removeItem } from '../inventory.js?v=b7609342';
 import { getGameDayKey } from '../game-day.js?v=edb00566';
 import { levelInfoForXp, XP_FOR_LEVEL } from '../progression.js?v=33462eaa';
 import { itemVerbAchievementCounters } from '../item-verbs.js?v=1e20fa7d';
 import { hasPouch, POUCH_CLASS } from '../elemental-pouch.js?v=ceefa97a';
 import { GENTLE_ISLAND_TSIDS, isNewxpSceneTsid } from '../newxp.js?v=8fa18f24';
-import { SKILLQUEST_AK_TSID } from '../skillquest-ak.js?v=281b956d';
-import { getToolCondition, migrateClassValue, setToolRemaining, TOOL_CONDITION_CATALOG, toolCopies, useToolCondition } from '../tools.js?v=f701b241';
-import { copyChargesLeft, keepsCopies, spendCopyCharge, verbCopy } from '../copy-charges.js?v=f94ac7c8';
-import { HERDKEEPING, hogtieEscapeDelayMs, husbandryPack } from '../animal-husbandry.js?v=35b23ef4';
-import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=d77b0b8b';
+import { SKILLQUEST_AK_TSID } from '../skillquest-ak.js?v=397a9d19';
+import { getToolCondition, migrateClassValue, setToolRemaining, TOOL_CONDITION_CATALOG, toolCopies, useToolCondition } from '../tools.js?v=d8aa3536';
+import { copyChargesLeft, keepsCopies, spendCopyCharge, verbCopy } from '../copy-charges.js?v=737fd334';
+import { HERDKEEPING, hogtieEscapeDelayMs, husbandryPack } from '../animal-husbandry.js?v=7194f0f1';
+import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=b764884b';
 import { sourceFromUrl, frameTexture } from '../textures.js?v=3149d699';
 import { landingY, walkSurfaceY } from '../walk-surface.js?v=c982983e';
 import { overlayOrStandIn } from '../overlay-stand-in.js?v=029a664a';
@@ -626,7 +626,7 @@ function tickAttracted(engine) {
 
 /* ---- Dusty Stick and the Bundle of Joy ------------------------------- */
 
-const JOY_SHEET = Object.freeze({ url: 'assets/sprites/newxp/dustbunny_walk_right.png', fw: 104, fh: 59, frames: 9 });
+const JOY_SHEET = Object.freeze({ url: 'assets/sprites/newxp/dustbunny_walk_right.webp', fw: 104, fh: 59, frames: 9 });
 
 function joyFrames(engine) {
   const { PIXI } = engine;

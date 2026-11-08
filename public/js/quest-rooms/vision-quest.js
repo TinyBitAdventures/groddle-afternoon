@@ -74,14 +74,14 @@ function objectSprite(ctx, cls) {
   const { PIXI, kit } = ctx;
   const { x, y } = objectSpot(cls);
   if (cls === 'npc_piggy') {
-    const sheet = kit.animated(PIXI, 'assets/sprites/npc_piggy__x1_walk_png_1354829432.png', 8, 3, { count: 24, speed: 0.12 });
+    const sheet = kit.animated(PIXI, 'assets/sprites/npc_piggy__x1_walk_png_1354829432.webp', 8, 3, { count: 24, speed: 0.12 });
     sheet.x = x;
     sheet.y = y + 2;
     sheet.scale.set(0.9);
     return sheet;
   }
   if (cls === 'npc_crab') {
-    const crab = kit.animated(PIXI, `${ART}crab_idle.png`, 6, 5, { count: 30, speed: 0.2 });
+    const crab = kit.animated(PIXI, `${ART}crab_idle.webp`, 6, 5, { count: 30, speed: 0.2 });
     crab.x = x;
     crab.y = y + 4;
     crab.scale.set(0.55);
@@ -89,7 +89,7 @@ function objectSprite(ctx, cls) {
   }
   if (cls === 'trant_fruit') return kit.deco(PIXI, 'trant_fruit_m7', x, y + 4, { dir: 'assets/sprites/trants/frames/', scale: 0.85 });
   if (cls === 'rock_sparkly_1') {
-    const base = sourceFromUrl('assets/sprites/mining/rock_sparkly.png');
+    const base = sourceFromUrl('assets/sprites/mining/rock_sparkly.webp');
     const tex = frameTexture(base, new PIXI.Rectangle(0, 0, 131, 127));
     const spr = new PIXI.Sprite(tex);
     spr.anchor.set(0.5, 1);
@@ -246,7 +246,7 @@ export const room = {
   id: 'vision_quest',
   title: 'Institute of Ocular Testing',
   kicker: 'Vision test',
-  icon: `${ART}frog_icon.png`,
+  icon: `${ART}frog_icon.webp`,
   theme: 'memory',
   // G315: template in hub 61 'Simple Level Quests' (inc_data_maps_prod.js 245), a dev label; plain remake wording.
   hubName: 'Quest',
@@ -277,14 +277,14 @@ export const room = {
     ctx.add(obj, 12);
     ctx.data.objectX = objectSpot(ctx.data.object).x;
     // The examiner crab (archived on the location) and the frog.
-    const crab = kit.animated(PIXI, `${ART}crab_idle.png`, 6, 5, { count: 30, speed: 0.18 });
+    const crab = kit.animated(PIXI, `${ART}crab_idle.webp`, 6, 5, { count: 30, speed: 0.18 });
     crab.x = sx(1330);
     crab.y = sy(-194);
     crab.scale.set(-0.42, 0.42);
     ctx.add(crab, 14);
-    const frogIdle = kit.sheetFrames(PIXI, `${ART}frog_idle.png`, 16, 3, 48);
-    const frogTalk = kit.sheetFrames(PIXI, `${ART}frog_talk.png`, 16, 4, 62); // OGA npc_myopic_frog talk: 62 cells (G276)
-    const frogMove = kit.sheetFrames(PIXI, `${ART}frog_move.png`, 12, 2, 24);
+    const frogIdle = kit.sheetFrames(PIXI, `${ART}frog_idle.webp`, 16, 3, 48);
+    const frogTalk = kit.sheetFrames(PIXI, `${ART}frog_talk.webp`, 16, 4, 62); // OGA npc_myopic_frog talk: 62 cells (G276)
+    const frogMove = kit.sheetFrames(PIXI, `${ART}frog_move.webp`, 12, 2, 24);
     const frog = new PIXI.AnimatedSprite([PIXI.Texture.EMPTY]);
     frog.anchor.set(0.5, 1);
     frog.animationSpeed = 0.3;

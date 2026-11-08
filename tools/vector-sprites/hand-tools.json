@@ -9,7 +9,7 @@
    "padStage": 1,
    "sheets": [
     {
-     "path": "assets/sprites/tools/watering-can-tool.png",
+     "path": "assets/sprites/tools/watering-can-tool.webp",
      "fw": 91,
      "fh": 78,
      "cols": 10,
@@ -26,7 +26,7 @@
    "padStage": 1,
    "sheets": [
     {
-     "path": "assets/sprites/tools/hatchet-tool.png",
+     "path": "assets/sprites/tools/hatchet-tool.webp",
      "fw": 110,
      "fh": 64,
      "cols": 8,
@@ -43,7 +43,7 @@
    "padStage": 1,
    "sheets": [
     {
-     "path": "assets/sprites/tools/class-axe-tool.png",
+     "path": "assets/sprites/tools/class-axe-tool.webp",
      "fw": 111,
      "fh": 65,
      "cols": 8,
@@ -60,7 +60,7 @@
    "padStage": 1,
    "sheets": [
     {
-     "path": "assets/sprites/making/irrigator_9000-tool.png",
+     "path": "assets/sprites/making/irrigator_9000-tool.webp",
      "fw": 95,
      "fh": 76,
      "cols": 10,
@@ -77,7 +77,7 @@
    "padStage": 1,
    "sheets": [
     {
-     "path": "assets/sprites/soil/hoe-tool.png",
+     "path": "assets/sprites/soil/hoe-tool.webp",
      "fw": 86,
      "fh": 58,
      "cols": 10,
@@ -94,7 +94,7 @@
    "padStage": 1,
    "sheets": [
     {
-     "path": "assets/sprites/soil/high-class-hoe-tool.png",
+     "path": "assets/sprites/soil/high-class-hoe-tool.webp",
      "fw": 89,
      "fh": 55,
      "cols": 10,
@@ -111,7 +111,7 @@
    "padStage": 1,
    "sheets": [
     {
-     "path": "assets/sprites/soil/shovel-tool.png",
+     "path": "assets/sprites/soil/shovel-tool.webp",
      "fw": 65,
      "fh": 82,
      "cols": 14,

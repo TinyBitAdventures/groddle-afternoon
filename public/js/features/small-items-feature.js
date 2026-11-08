@@ -23,11 +23,11 @@
  *     smallItemsBallX.
  */
 
-import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=d82f3b00';
-import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=d77b0b8b';
+import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=b7609342';
+import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=b764884b';
 import { nearestSurfaceY } from '../walk-surface.js?v=c982983e';
-import { openNoteView, openNotePicker } from '../note-view.js?v=a5e518d1';
-import { giveCarriedNote, takeCarriedNote, writtenCarriedNotes } from './street-furniture-feature.js?v=966f14bf';
+import { openNoteView, openNotePicker } from '../note-view.js?v=eca7de52';
+import { giveCarriedNote, takeCarriedNote, writtenCarriedNotes } from './street-furniture-feature.js?v=7e6704a4';
 import {
   BALL,
   BALL_HIT,
@@ -88,9 +88,9 @@ function ensureItems() {
 }
 
 const COOKIE_ICONS = Object.freeze({
-  iconic: 'assets/sprites/icons/fortune_cookie.png',
+  iconic: 'assets/sprites/icons/fortune_cookie.webp',
   // OGA fortune_cookie__x1_withnote_iconic (buildState 'withnote_iconic').
-  withnote: 'assets/sprites/icons/fortune_cookie_withnote.png',
+  withnote: 'assets/sprites/icons/fortune_cookie_withnote.webp',
 });
 
 function sync(engine) {

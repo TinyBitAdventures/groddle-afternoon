@@ -6,6 +6,7 @@ import { chromium } from 'playwright';
 import { readFile } from 'node:fs/promises';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { replacePngWithWebp } from '../webp-lossless.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const icons = join(here, '../../public/assets/sprites/icons');
@@ -17,7 +18,9 @@ for (const id of process.argv.slice(2)) {
   for (const [scale, suffix] of [[1, '']]) {
     await page.setViewportSize({ width: w * scale, height: h * scale });
     await page.setContent(`<style>html,body{margin:0;background:transparent}svg{display:block;width:${w * scale}px;height:${h * scale}px}</style>${svg}`);
-    await page.locator('svg').screenshot({ path: join(icons, `${id}${suffix}.png`), omitBackground: true });
+    const png = join(icons, `${id}${suffix}.png`);
+    await page.locator('svg').screenshot({ path: png, omitBackground: true });
+    replacePngWithWebp(png); // pack icons ship as lossless WebP
   }
   console.log(id);
 }

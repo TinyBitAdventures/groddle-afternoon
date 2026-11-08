@@ -23,7 +23,7 @@
 import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { GIANTS } from '../../public/js/shrines.js?v=95d74174';
+import { GIANTS } from '../../public/js/shrines.js?v=1a945fe7';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const pub = join(root, 'public');
@@ -113,7 +113,7 @@ export function contributeData(source = JSON.parse(readFileSync(SOURCE, 'utf8'))
   }).sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
   const giant = GIANTS[SHRINE_GIANT];
   const art = {
-    sheet: `/assets/sprites/shrines/${SHRINE_GIANT}_open.png`,
+    sheet: `/assets/sprites/shrines/${SHRINE_GIANT}_open.webp`,
     sheet3x: `/assets/sprites/shrines/${SHRINE_GIANT}_open@3x.webp`,
   };
   for (const path of Object.values(art)) if (!existsSync(join(pub, path))) throw new Error(`no shrine art at public${path}`);

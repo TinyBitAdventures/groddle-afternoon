@@ -51,7 +51,7 @@
 
 import { towerRoomIndexEntry } from './tower-rooms.js?v=f238eaa9';
 import { DOOR, anyTowerRoomStreet, barriersFor, collector, flat, ladder, plaque, shell } from './tower-challenge-rooms.js?v=7502a893';
-import { HALL, HALL_TSID, buildHall } from './hall-rejected-concepts.js?v=fb352215';
+import { HALL, HALL_TSID, buildHall } from './hall-rejected-concepts.js?v=30e5a21e';
 
 export const STAIRS_TSID = 'GIFFUV4ATQ72I6D';
 export const MEZZANINE_TSID = 'GIFGJ2246R72LJL';
@@ -66,7 +66,7 @@ export const GREETERBOT = Object.freeze({
   classId: 'npc_quest_giver_widget',
   label: 'Greeterbot Sentry G-42',
   variant: 'widgetWood',
-  art: 'assets/sprites/quests/rook-museum/greeterbot_widgetWood_idle@2x.png',
+  art: 'assets/sprites/quests/rook-museum/greeterbot_widgetWood_idle@2x.webp',
   // npc_quest_giver_widget classProps.no_quest_text (overrides npc_quest_widget's).
   noQuestText: 'I\'m afraid one cannot simply enter the Museum of the Rook on a whim, little Glitch. One must be called to do so.',
   // conversation_run_hall_repeat, offered once rook_hall is done.

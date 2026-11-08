@@ -8,8 +8,8 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { HIRES_SPRITES } from '../public/js/sprite-hires.js?v=f98be5eb';
-import { HIRES_ICONS } from '../public/js/icon-hires.js?v=5b68aeaa';
+import { HIRES_SPRITES } from '../public/js/sprite-hires.js?v=abaf3d5a';
+import { HIRES_ICONS } from '../public/js/icon-hires.js?v=165dbd6e';
 import {
   CANDY_DAILY_MAX,
   CARVED_CLASSES,
@@ -95,9 +95,9 @@ describe('seasonal calendar', () => {
   });
 
   it('has art for every event icon and every holiday item', () => {
-    for (const s of Object.values(SEASONS)) assert.ok(existsSync(join(root, 'assets/sprites/icons', `${s.icon}.png`)), s.icon);
-    for (const id of Object.keys(SEASON_DATA.items)) assert.ok(existsSync(join(root, 'assets/sprites/icons', `${id}.png`)), id);
-    for (const n of [1, 2, 3, 4, 5]) assert.ok(existsSync(join(root, `assets/sprites/seasons/pumpkin_lit_${n}_talk.png`)));
+    for (const s of Object.values(SEASONS)) assert.ok(existsSync(join(root, 'assets/sprites/icons', `${s.icon}.webp`)), s.icon);
+    for (const id of Object.keys(SEASON_DATA.items)) assert.ok(existsSync(join(root, 'assets/sprites/icons', `${id}.webp`)), id);
+    for (const n of [1, 2, 3, 4, 5]) assert.ok(existsSync(join(root, `assets/sprites/seasons/pumpkin_lit_${n}_talk.webp`)));
   });
 
   it('draws every street sprite from a sheet or icon with a 3x render', () => {
@@ -109,14 +109,14 @@ describe('seasonal calendar', () => {
     assert.match(src, /const TALK_COLS = 19;/);
     assert.match(src, /const TALK_FRAMES = 74;/);
     for (const n of [1, 2, 3, 4, 5]) {
-      const path = `assets/sprites/seasons/pumpkin_lit_${n}_talk.png`;
+      const path = `assets/sprites/seasons/pumpkin_lit_${n}_talk.webp`;
       const s = sheets.get(path);
       assert.deepEqual([s.fw, s.fh, s.cols, s.frames, s.label], [...size[n], 19, 74, 'talk'], path);
       assert.match(HIRES_SPRITES.get(path) || '', /@3x\.webp$/, path);
     }
     // G381: the pulled cracker is Tiny Speck's glitchmas_cracker overlay (js/overlays.js), not the item's world sprite.
     assert.match(src, /playOverlay\(engine\.PIXI, 'glitchmas_cracker'/);
-    assert.doesNotMatch(src, /glitchmas_cracker_world\.png/);
+    assert.doesNotMatch(src, /glitchmas_cracker_world\.webp/);
     // No eggs in the grass: the source's eggs drop from Egg Plants.
     assert.doesNotMatch(src, /egghunt_egg_4_world|spawnEgg|eggForStreet|seasonegg/);
     // Placed carved pumpkins draw their pack icon.
@@ -256,7 +256,7 @@ describe('Egg Hunt and Pi Day', () => {
   it('is the source mechanic: Egg Plants pet with lgt_egg_plant_pet, five equally likely eggs, all year', async () => {
     const { SKILL_PACKAGES } = await import('../public/js/skill-packages-data.js?v=cb4e9ab3');
     const { DROP_TABLES } = await import('../public/js/drop-tables-data.js?v=c51a6400');
-    const { packageForEvent } = await import('../public/js/features/drops-feature.js?v=43984e8f');
+    const { packageForEvent } = await import('../public/js/features/drops-feature.js?v=123055bc');
     assert.equal(packageForEvent(`${EGG_HUNT.pet.trant}:pet`, {}), EGG_HUNT.pet.package);
     const pkg = SKILL_PACKAGES[EGG_HUNT.pet.package];
     assert.deepEqual(Object.values(pkg.skills).map((s) => [s.drop_class_id, s.drop_chance]), [[EGG_HUNT.pet.table, 10], [EGG_HUNT.pet.table, 15], [EGG_HUNT.pet.table, 20], [EGG_HUNT.pet.table, 30]]);
@@ -290,8 +290,8 @@ describe('Egg Hunt and Pi Day', () => {
   });
 
   it('counts each egg into the collection however it arrives, then gives the trophy for them (seasons-feature)', async () => {
-    const { seasonsFeature } = await import('../public/js/features/seasons-feature.js?v=ce286038');
-    const { createInventory, addItem, countItem, removeItem } = await import('../public/js/inventory.js?v=d82f3b00');
+    const { seasonsFeature } = await import('../public/js/features/seasons-feature.js?v=9efe579c');
+    const { createInventory, addItem, countItem, removeItem } = await import('../public/js/inventory.js?v=b7609342');
     const unlocked = [];
     const counted = {};
     const inv = createInventory();
@@ -360,8 +360,8 @@ describe('supply paths', () => {
 
 describe('a ?season= preview leaves the save alone (G342)', () => {
   it('a carved pumpkin survives previewing another season, and the save still remembers Zilloween', async () => {
-    const { seasonsFeature } = await import('../public/js/features/seasons-feature.js?v=ce286038');
-    const { createInventory, addItem, countItem } = await import('../public/js/inventory.js?v=d82f3b00');
+    const { seasonsFeature } = await import('../public/js/features/seasons-feature.js?v=9efe579c');
+    const { createInventory, addItem, countItem } = await import('../public/js/inventory.js?v=b7609342');
     const inv = createInventory();
     addItem(inv, 'pumpkin_carved_1', 2);
     let saved = 0;

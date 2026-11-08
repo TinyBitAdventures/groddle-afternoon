@@ -48,7 +48,7 @@
  * EXIT sign; the sign texts already matched.
  */
 
-import { BODY_H, JUMP_GAP, JUMP_RISE, pushOutOfSolids, spawnQuoins, takeQuoins } from './puzzle-kit.js?v=7410b322';
+import { BODY_H, JUMP_GAP, JUMP_RISE, pushOutOfSolids, spawnQuoins, takeQuoins } from './puzzle-kit.js?v=378c28e8';
 
 const W = 7600;
 const H = 1100;
@@ -557,7 +557,7 @@ export const room = {
   id: 'light_perspective',
   title: 'Walk Toward the Light',
   kicker: 'Light up your path to find the way',
-  icon: 'assets/sprites/icons/bulb.png',
+  icon: 'assets/sprites/icons/bulb.webp',
   theme: 'dark',
   // G315: hub 135 'Puzzles' (inc_data_maps_prod.js 1197), the template's hub.
   hubName: 'Puzzles',

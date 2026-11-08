@@ -74,8 +74,8 @@ export const WALL_BUTTON = Object.freeze({
   lockMs: 500, // setState: "in" -> "lockIn" after 500 ms
   distance: 1000, // instance prop distance
   // The art the remake already ships for wall_button (lockOut / lockIn, 36 x 35 in getAssetInfo).
-  artOut: 'assets/sprites/quest-rooms/clubhouse/wall_button_lockOut.png',
-  artIn: 'assets/sprites/quest-rooms/clubhouse/wall_button_lockIn.png',
+  artOut: 'assets/sprites/quest-rooms/clubhouse/wall_button_lockOut.webp',
+  artIn: 'assets/sprites/quest-rooms/clubhouse/wall_button_lockIn.webp',
   w: 36,
   h: 35,
 });

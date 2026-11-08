@@ -3,6 +3,7 @@
  * Run: node --test tests/hell.test.js
  */
 import { before, describe, it } from 'node:test';
+import { imageSize } from '../tools/image-size.mjs';
 import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
@@ -59,8 +60,8 @@ import {
   shouldWarnLowEnergy,
   squishGrape,
   wineDrinkConditions,
-} from '../public/js/hell.js?v=aca145ba';
-import { ITEM_CATALOG } from '../public/js/inventory.js?v=d82f3b00';
+} from '../public/js/hell.js?v=ca971c34';
+import { ITEM_CATALOG } from '../public/js/inventory.js?v=b7609342';
 import { GAME_DAY_MS, getGameDayKey, getGameDayStartMs } from '../public/js/game-day.js?v=edb00566';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=10b118dd';
 import {
@@ -97,7 +98,7 @@ function squishMany(state, n, now = DAY0) {
 
 function pngSize(path) {
   const buf = readFileSync(path);
-  return { width: buf.readUInt32BE(16), height: buf.readUInt32BE(20) };
+  return { width: imageSize(buf).w, height: imageSize(buf).h };
 }
 
 before(async () => {

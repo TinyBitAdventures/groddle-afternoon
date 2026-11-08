@@ -14,7 +14,7 @@ import { RUBE_YARD_FILES } from '../public/js/rube-yard-art.js?v=0a67d3e6';
 import {
   YARD_ART_DIR, YARD_FLOOR, YARD_FRONT, YARD_PIECES, YARD_W, TIER1, TIER2, LAWN_TOP,
 } from '../public/js/rube-yard-scene.js?v=84b947c2';
-import * as room from '../public/js/quest-rooms/rube-yard.js?v=f443dc92';
+import * as room from '../public/js/quest-rooms/rube-yard.js?v=0e25fc41';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.join(here, '..');

@@ -18,11 +18,11 @@ import {
   ensureItem,
   isToolItem,
   removeItem,
-} from './inventory.js?v=d82f3b00';
+} from './inventory.js?v=b7609342';
 import {
   GAMESHOW_TICKET_ID,
   gameshowTicketChance,
-} from './spinning-wheel.js?v=482cd151';
+} from './spinning-wheel.js?v=ddae3d4d';
 import { metabolicGain, moodMax } from './metabolics.js?v=8504134e';
 import { grantMoodXp } from './mood-xp.js?v=958e7680';
 import { getSkillCatalog } from './content-catalogs.js?v=10b118dd';
@@ -374,7 +374,7 @@ export function donateToShrine(state, giantId, inv, pc, classTsid, count = 1, op
     ensureItem(GAMESHOW_TICKET_ID, {
       label: 'Gameshow Ticket',
       desc: "One glittery, razzling, dazzling game show ticket. Ain't nothing you can do but USE it.",
-      icon: 'assets/sprites/icons/gameshow_ticket.png',
+      icon: 'assets/sprites/icons/gameshow_ticket.webp',
       baseCost: 0,
     });
     addItem(inv, GAMESHOW_TICKET_ID, 1);

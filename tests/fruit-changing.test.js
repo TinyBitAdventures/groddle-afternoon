@@ -17,13 +17,13 @@ import {
   loadRecipeCatalogFromFile,
   starterCraftIngredients,
   starterToolsInventory,
-} from '../public/js/making.js?v=c9dc233e';
+} from '../public/js/making.js?v=f4f214c2';
 import {
   ITEM_CATALOG,
   countItem,
   createInventory,
   listPackToolSlots,
-} from '../public/js/inventory.js?v=d82f3b00';
+} from '../public/js/inventory.js?v=b7609342';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const publicRoot = join(here, '../public');
@@ -80,7 +80,7 @@ describe('official Fruit Changing Machine catalog', () => {
   it('ships every iconic fruit plus the original 18×5 animation sheet', () => {
     const ids = ['fruit_changing_machine', ...Object.values(EXPECTED).map((row) => row[4])];
     for (const id of new Set(ids)) {
-      const icon = join(publicRoot, `assets/sprites/icons/${id}.png`);
+      const icon = join(publicRoot, `assets/sprites/icons/${id}.webp`);
       assert.ok(existsSync(icon), `missing ${id} iconic art`);
     }
     // G191: all 90 tool_animation frames (fruit_changing_machine.swf root frames 3-92) rendered at 3x

@@ -246,7 +246,7 @@ from the site's tokens so light and dark both work):
 
 Pictures are only CC0 Tiny Speck art already in the repo
 (`assets/sprites/icons`, `assets/badges`, `sprites/giant-icons`, the hub map
-thumbnails, `ui/quest-book.png`). A creature with no single picture of its own
+thumbnails, `ui/quest-book.webp`). A creature with no single picture of its own
 shows its Cubimal (Tiny Speck's toy likeness), labelled so. Images are lazy,
 with fixed sizes, so pages stay fast; everything is drawn at build time.
 

@@ -43,15 +43,15 @@
  * 'restore', job type 5) and finishes the restore in its `onDone` hook.
  */
 
-import { ITEM_CATALOG, addItem, countItem, ensureItem, itemIcon, packStamp, removeItem } from '../inventory.js?v=d82f3b00';
-import { canUseTool, useToolCondition } from '../tools.js?v=f701b241';
+import { ITEM_CATALOG, addItem, countItem, ensureItem, itemIcon, packStamp, removeItem } from '../inventory.js?v=b7609342';
+import { canUseTool, useToolCondition } from '../tools.js?v=d8aa3536';
 import { ecologyForStreet } from '../street-ecology.js?v=3c1d4c06';
 import { worldToScreen } from '../street-model.js?v=505d8990';
-import { signArmWidth } from '../street-render.js?v=9eded3c1';
+import { signArmWidth } from '../street-render.js?v=81416f4f';
 import { getSkillCatalog } from '../content-catalogs.js?v=10b118dd';
-import { GIANTS } from '../shrines.js?v=95d74174';
+import { GIANTS } from '../shrines.js?v=1a945fe7';
 import { giantDisplayName } from '../giant-names.js?v=0e295891';
-import { teleportationFeature } from './teleportation-feature.js?v=8a9ee900';
+import { teleportationFeature } from './teleportation-feature.js?v=23270f4f';
 import {
   SOLO_DIVISOR,
   WORK_UNIT_MS,
@@ -98,7 +98,7 @@ import {
   upgradeOption,
 } from '../street-jobs.js?v=02a81cb3';
 import { gainMetabolic, loseEnergy } from '../metabolics.js?v=8504134e';
-import { closuresInTheWay, holdNote, placeIndex, questHold, reachableStreets } from '../quest-reach.js?v=6b91ff86';
+import { closuresInTheWay, holdNote, placeIndex, questHold, reachableStreets } from '../quest-reach.js?v=250cf2eb';
 import { getQuestCatalog as questCatalog } from '../content-catalogs.js?v=10b118dd';
 import { saveStore } from '../save-store.js?v=8839ba7b';
 import {
@@ -125,18 +125,18 @@ import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 import { createMinnAccount } from '../minn-account.js?v=ba6a13c5';
 import { normalizeGroups } from '../groups.js?v=07640c71';
 import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=3149d699';
-import { JOB_WORK_OVERLAY, jobWorkFloatPoint, jobWorkSoundKey, jobWorkToolScale, jobWorkToolSheet } from '../job-work-fx.js?v=33f097ad';
+import { JOB_WORK_OVERLAY, jobWorkFloatPoint, jobWorkSoundKey, jobWorkToolScale, jobWorkToolSheet } from '../job-work-fx.js?v=a040a5a7';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
 import { SIGN_ARMS, routeGraph } from '../map-routes.js?v=c7e7dc80';
 import { TELEPORTERS } from '../hidden-floors.js?v=d49b76df';
 import { WINTRY_PORTAL_TELEPORTERS } from '../wintry-portal.js?v=1437deda';
-import { PROJECTS_TEXT, contributedJobs, mineTotal, projectList } from '../projects-tracker.js?v=c508f396';
-import { PROJECTS_PANEL_ID, buildProjectsPanel, renderProjects } from '../ui/projects-sheet.js?v=0a47858c';
+import { PROJECTS_TEXT, contributedJobs, mineTotal, projectList } from '../projects-tracker.js?v=f34c5236';
+import { PROJECTS_PANEL_ID, buildProjectsPanel, renderProjects } from '../ui/projects-sheet.js?v=69f33fa6';
 import { SIDE_SHEET_IDS } from '../ui/panel-shell.js?v=e2abdf9e';
 
 export const STREET_JOBS_FEATURE_ID = 'street-jobs';
 const BOARD_CLASS = 'street_job_board';
-const BOARD_ART = 'assets/sprites/street-jobs/sign_stake.png';
+const BOARD_ART = 'assets/sprites/street-jobs/sign_stake.webp';
 const BARRICADE_ART = 'assets/decos/groddle/door_barricade_wood_1.png';
 const FLORA_ART = Object.freeze({
   flowers: ['bling_branchflowerbrush_red_1', 'bling_branchflowerbrush_white_1', 'bling_branchflowerbrush_purple_2'],
@@ -1191,7 +1191,7 @@ function renderPanel(engine) {
   for (const r of reqs) {
     const li = el('li', { class: `sj-req${r.done ? ' is-done' : ''}${!r.done && !r.open ? ' is-locked' : ''}`, dataset: { sjReq: r.id } });
     const iconCls = r.type === 'currants' ? 'currant' : r.classId;
-    const img = el('img', { src: r.type === 'currants' ? 'assets/sprites/street-jobs/pile_of_currants.png' : itemIcon(iconCls), alt: '' });
+    const img = el('img', { src: r.type === 'currants' ? 'assets/sprites/street-jobs/pile_of_currants.webp' : itemIcon(iconCls), alt: '' });
     img.onerror = () => {
       img.style.visibility = 'hidden';
     };

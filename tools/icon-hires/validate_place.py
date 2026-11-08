@@ -9,7 +9,7 @@ def box(path):
 ok, bad = [], []
 for i in sorted(m):
     src = f'{T}/out/{i}.swf/1.png'
-    orig = f'{ICONS}/{i}.png'
+    orig = f'{ICONS}/{i}.webp'
     if not os.path.exists(src):
         bad.append((i, 'no render')); continue
     o = box(orig); r = box(src)

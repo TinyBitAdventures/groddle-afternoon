@@ -20,9 +20,9 @@
  * base, fill (clipped on the right by the progress) and top.
  *
  * Writes public/assets/sprites/word-progress/:
- *   words.png        1x atlas (zoom 1: 1 SWF px = 1 world px, WordProgressBar SCALE 1)
+ *   words.webp       1x atlas, lossless (zoom 1: 1 SWF px = 1 world px, WordProgressBar SCALE 1)
  *   words@3x.webp    the same atlas drawn at zoom 3
- *   cancel.png, cancel_hover.png   word_dismisser_cancel(_hover).png, copied as-is
+ *   cancel.webp, cancel_hover.webp   word_dismisser_cancel(_hover).png, as lossless WebP (the same pixels)
  * and public/js/word-progress-art.js (atlas cells, the fill box, file sizes and
  * hashes, the SWF's sha1).
  *
@@ -35,10 +35,11 @@
  */
 import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
-import { copyFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import { encodeLosslessWebp, pngBufferToWebp, replacePngWithWebp } from '../webp-lossless.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const spike = join(here, '../..');
@@ -276,10 +277,14 @@ function build(work) {
         args.push(renders[`${layer}@${zoom}:${p.word}`], '-geometry', `+${cx * zoom}+${cy * zoom}`, '-composite');
       }
     }
-    if (zoom === 1) execFileSync('magick', [...args, '-strip', `PNG32:${join(OUT, 'words.png')}`]);
+    if (zoom === 1) {
+      const png = join(OUT, 'words.tmp.png');
+      execFileSync('magick', [...args, '-strip', `PNG32:${png}`]);
+      replacePngWithWebp(png, join(OUT, 'words.webp'));
+    }
     else execFileSync('magick', [...args, '-strip', '-quality', String(WEBP_QUALITY), '-define', 'webp:alpha-quality=100', '-define', 'webp:method=6', join(OUT, 'words@3x.webp')]);
   }
-  for (const [key, src] of Object.entries(CANCEL)) copyFileSync(src, join(OUT, `${key}.png`));
+  for (const [key, src] of Object.entries(CANCEL)) encodeLosslessWebp(src, join(OUT, `${key}.webp`));
   writeModule({ cells, atlasW, atlasH });
   return plans.length;
 }
@@ -294,11 +299,11 @@ function writeModule({ cells, atlasW, atlasH }) {
   const art = {
     source: 'tinyspeck/glitch-client TSEngineAssets/src/assets/swfs/word_progress_bar.swf (CC0)',
     swfSha1: sha(readFileSync(SWF), 'sha1'),
-    atlas: { w: atlasW, h: atlasH, x1: fileRow('words.png'), x3: fileRow('words@3x.webp') },
+    atlas: { w: atlasW, h: atlasH, x1: fileRow('words.webp'), x3: fileRow('words@3x.webp') },
     cancel: {
       source: 'tinyspeck/glitch-client TSEngineAssets/src/assets/graphics/word_dismisser_cancel(_hover).png (CC0)',
-      normal: fileRow('cancel.png'),
-      hover: fileRow('cancel_hover.png'),
+      normal: fileRow('cancel.webp'),
+      hover: fileRow('cancel_hover.webp'),
     },
     words: cells,
   };
@@ -334,7 +339,7 @@ async function check() {
   }
   if (art.atlas.x1.w !== art.atlas.w || art.atlas.x3.w !== art.atlas.w * 3) problems.push('atlas sizes');
   for (const [key, src] of Object.entries(CANCEL)) {
-    if (existsSync(src) && sha(readFileSync(src)) !== art.cancel[key === 'cancel' ? 'normal' : 'hover'].sha256) problems.push(`${key}.png is not the client's`);
+    if (existsSync(src) && sha(pngBufferToWebp(readFileSync(src))) !== art.cancel[key === 'cancel' ? 'normal' : 'hover'].sha256) problems.push(`${key}.webp is not the client's picture`);
   }
   if (Object.keys(art.words).length !== 26) problems.push('26 words');
   if (problems.length) {

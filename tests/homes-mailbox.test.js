@@ -151,10 +151,10 @@ describe('playable home and mailbox integration', () => {
   it('ships clean extracted Mailbox (1) art for idle and has-mail states', () => {
     const root = join(import.meta.dirname, '..', 'public', 'assets', 'sprites', 'mailbox');
     for (const file of [
-      'npc_mailbox_variant_mailboxRight_x1_idle_png_1354832227.png',
-      'npc_mailbox_variant_mailboxRight_x1_has_mail_idle_png_1354832230.png',
-      'npc_mailbox_variant_mailboxRight_x1_interact_png_1354832230.png',
-      'npc_mailbox_variant_mailboxRight_x1_all_done_png_1354832231.png',
+      'npc_mailbox_variant_mailboxRight_x1_idle_png_1354832227.webp',
+      'npc_mailbox_variant_mailboxRight_x1_has_mail_idle_png_1354832230.webp',
+      'npc_mailbox_variant_mailboxRight_x1_interact_png_1354832230.webp',
+      'npc_mailbox_variant_mailboxRight_x1_all_done_png_1354832231.webp',
     ]) {
       assert.ok(readFileSync(join(root, file)).length > 1_000);
     }

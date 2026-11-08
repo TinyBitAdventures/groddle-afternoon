@@ -34,10 +34,10 @@
  * funpicklePowers, funpickleAward, funpickleSneezes, funpickleOverlay.
  */
 
-import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=d82f3b00';
+import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=b7609342';
 import { ITEM_BASE_COSTS } from '../store-catalog.js?v=74b56af3';
 import { shiftMetabolic } from '../metabolics.js?v=8504134e';
-import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=d77b0b8b';
+import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=b764884b';
 import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=3149d699';
 import { landingY, nearestSurfaceY } from '../walk-surface.js?v=c982983e';
 import { STREET_INDEX } from '../street-loader.js?v=33d2b8bc';
@@ -93,7 +93,7 @@ export const FUNPICKLE_FEATURE_ID = 'funpickle';
 const FIND_GROUP = 'funpickleFind';
 const ART = 'assets/sprites/small-items/';
 /** OGA special_item_that_only_beta_testers_get__x1_1: 125 x 227, the item's registration at (48, 214). */
-const STILL = Object.freeze({ path: `${ART}funpickle_1.png`, w: 125, h: 227, ax: 48 / 125, ay: 214 / 227 });
+const STILL = Object.freeze({ path: `${ART}funpickle_1.webp`, w: 125, h: 227, ax: 48 / 125, ay: 214 / 227 });
 /** OGA __x1_bounce2: 32 x 5 cells of 125 x 227, 160 frames (SWF sprite 4 frames 123-282), 30 fps. */
 const BOUNCE_SHEET = Object.freeze({ path: `${ART}funpickle_bounce2.webp`, fw: 125, fh: 227, cols: 32, frames: 160 });
 /** The source's last sneeze line is on the tenth ("Wait, it feels like this is the last one."). */

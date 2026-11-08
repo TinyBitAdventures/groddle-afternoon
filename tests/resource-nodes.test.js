@@ -1,6 +1,7 @@
 /** Harvestable world resource nodes (GSJS-derived, pure module). */
 
 import { describe, it } from 'node:test';
+import { imageSize } from '../tools/image-size.mjs';
 import assert from 'node:assert/strict';
 import { readFileSync, existsSync } from 'node:fs';
 import { join, dirname } from 'node:path';
@@ -33,14 +34,14 @@ import {
   RESOURCE_DROP_TABLES,
   DUST_TRAP_RARE_KEY_CHANCE,
   DUST_TRAP_DROP_ITEM_DEFS
-} from '../public/js/resource-nodes.js?v=1c268516';
-import { ITEM_CATALOG } from '../public/js/inventory.js?v=d82f3b00';
+} from '../public/js/resource-nodes.js?v=b11d96b2';
+import { ITEM_CATALOG } from '../public/js/inventory.js?v=b7609342';
 import {
   TOOL_CONDITION_CATALOG,
   createToolConditionState,
   getToolCondition,
   setToolRemaining,
-} from '../public/js/tools.js?v=f701b241';
+} from '../public/js/tools.js?v=d8aa3536';
 import {
   setStreetEcologyCatalog,
   ecologyForStreet,
@@ -61,8 +62,8 @@ function seq(...values) {
 
 function pngSize(relPath) {
   const buf = readFileSync(join(publicRoot, relPath));
-  assert.deepEqual([...buf.subarray(0, 8)], [137, 80, 78, 71, 13, 10, 26, 10], `${relPath} PNG`);
-  return { w: buf.readUInt32BE(16), h: buf.readUInt32BE(20) };
+  assert.equal(imageSize(buf)?.format, 'webp', `${relPath} WebP`);
+  return { w: imageSize(buf).w, h: imageSize(buf).h };
 }
 
 function snapshot(...objects) {
@@ -137,16 +138,16 @@ describe('resource node catalog', () => {
 
   it('ships an icon for every yield, tool, broken tool and dust-trap drop', () => {
     for (const id of resourceItemIds()) {
-      assert.ok(existsSync(join(publicRoot, `assets/sprites/icons/${id}.png`)), id);
+      assert.ok(existsSync(join(publicRoot, `assets/sprites/icons/${id}.webp`)), id);
     }
     for (const id of ['scraper', 'super_scraper', 'shovel', 'ace_of_spades']) {
-      assert.ok(existsSync(join(publicRoot, `assets/sprites/icons/${id}_broken.png`)), `${id}_broken`);
+      assert.ok(existsSync(join(publicRoot, `assets/sprites/icons/${id}_broken.webp`)), `${id}_broken`);
     }
     for (const def of Object.values(RESOURCE_NODE_CATALOG)) {
       for (const verb of def.verbs) {
         for (const tool of verb.tools) {
           if (tool === 'irrigator_9000') continue;
-          assert.ok(existsSync(join(publicRoot, `assets/sprites/icons/${tool}.png`)), tool);
+          assert.ok(existsSync(join(publicRoot, `assets/sprites/icons/${tool}.webp`)), tool);
         }
       }
     }

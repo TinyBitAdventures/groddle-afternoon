@@ -21,19 +21,19 @@ import {
   normalizeHomeDecorState,
   pickUpFurniture,
   placeFurniture,
-} from '../public/js/home-decor.js?v=6735c85f';
+} from '../public/js/home-decor.js?v=f9b0e3dc';
 import { cabinetRefusal } from '../public/js/home-storage.js?v=121f1897';
-import { canSellClass } from '../public/js/home-street-mp.js?v=1c337af4';
+import { canSellClass } from '../public/js/home-street-mp.js?v=0b9774df';
 import { filterTiles, furniturePane, trayFilters } from '../public/js/ui/home-builder.js?v=90f759e8';
 import { hasUpgrades, upgradeVerb } from '../public/js/furniture-upgrades.js?v=a3788c0d';
 import { NO_SLOT_CLASSES } from '../public/js/pack-slots-data.js?v=800f664c';
 import { layoutPack, takesNoSlot } from '../public/js/pack-slots.js?v=a94b816c';
 import { WORLD_ART } from '../public/js/world-art-list.js?v=df42115a';
-import { homeTrophyCount, isTrophyClass } from '../public/js/features/item-verbs-feature.js?v=15d71a46';
-import { homesFeature } from '../public/js/features/homes-feature.js?v=357f8787';
+import { homeTrophyCount, isTrophyClass } from '../public/js/features/item-verbs-feature.js?v=08d3edea';
+import { homesFeature } from '../public/js/features/homes-feature.js?v=5391026a';
 import { planStreetTrophies } from '../public/js/street-jobs.js?v=02a81cb3';
 import { planEggTrophy } from '../public/js/seasons.js?v=1978c3f3';
-import { collectionTrophiesFeature as collection } from '../public/js/features/collection-trophies-feature.js?v=c357c3ad';
+import { collectionTrophiesFeature as collection } from '../public/js/features/collection-trophies-feature.js?v=bb848f8f';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=10b118dd';
 import { applyAchievementProgress, createAchievementState } from '../public/js/achievements.js?v=f8ccfd34';
 
@@ -61,7 +61,7 @@ describe('the eighteen trophies', () => {
     for (const [cls, def] of Object.entries(TROPHY_DECOR)) {
       assert.deepEqual([def.art.w, def.art.h], WORLD_ART[cls]['1'], cls);
       assert.ok(existsSync(join(here, '../public', def.art.path)), def.art.path);
-      assert.ok(existsSync(join(here, '../public/assets/sprites/icons', `${cls}.png`)), cls);
+      assert.ok(existsSync(join(here, '../public/assets/sprites/icons', `${cls}.webp`)), cls);
       assert.equal(isTrophyClass(cls), true);
     }
     assert.equal(isTrophyDecor('trophy_street_creator_wood_piece1'), false);

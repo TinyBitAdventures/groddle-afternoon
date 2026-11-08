@@ -61,7 +61,7 @@ import {
 import { RACE_RIVALS } from '../races.js?v=ab22a079';
 import { mayhemHoldsArena } from './mayhem-feature.js?v=bf288afa';
 import { wallsScreen } from '../street-model.js?v=505d8990';
-import { addItem, countItem, removeItem } from '../inventory.js?v=d82f3b00';
+import { addItem, countItem, removeItem } from '../inventory.js?v=b7609342';
 import { textureFromUrl } from '../textures.js?v=3149d699';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 import { CROWNS_SPLASH, splashFor } from '../game-splash.js?v=5e2c6eb6';
@@ -146,7 +146,7 @@ function buildChrome(engine) {
   const bar = el('section', { id: 'crowns-hud', class: 'hog-haul-hud crowns-hud', hidden: true, 'aria-live': 'polite' }, `
     <div class="crowns-board" data-crowns-board></div>
     <p class="crowns-tip" data-crowns-tip></p>
-    <div class="crowns-clock" data-crowns-clock hidden><img src="${CROWN_DIR}game_crown_unlocked.png" alt="" /><span data-crowns-clock-text></span></div>`);
+    <div class="crowns-clock" data-crowns-clock hidden><img src="${CROWN_DIR}game_crown_unlocked.webp" alt="" /><span data-crowns-clock-text></span></div>`);
   const ready = el('div', { id: 'crowns-ready', class: 'hog-haul-screen', hidden: true, role: 'dialog', 'aria-modal': 'true', 'aria-labelledby': 'crowns-ready-title' }, `
     <div class="hog-haul-screen-shade"></div>
     <div class="hog-haul-ready-card">
@@ -231,7 +231,7 @@ function setupArena(street, engine) {
     placeActor(actors[r.name]);
   });
   lockSprites = game.locks.map((lock) => {
-    const sprite = new PIXI.Sprite(textureFromUrl(`${CROWN_DIR}crown_game_lock.png`));
+    const sprite = new PIXI.Sprite(textureFromUrl(`${CROWN_DIR}crown_game_lock.webp`));
     sprite.anchor.set(0.5, 1);
     sprite.scale.set(1.2);
     sprite.x = lock.x;
@@ -240,7 +240,7 @@ function setupArena(street, engine) {
     engine.entityLayer.addChild(sprite);
     return sprite;
   });
-  crownSprite = new PIXI.Sprite(textureFromUrl(`${CROWN_DIR}game_crown_unlocked.png`));
+  crownSprite = new PIXI.Sprite(textureFromUrl(`${CROWN_DIR}game_crown_unlocked.webp`));
   crownSprite.anchor.set(0.5, 1);
   crownSprite.scale.set(0.8);
   crownSprite.zIndex = 60;
@@ -498,7 +498,7 @@ function tick(dtMs, now, engine) {
 
   if (crownSprite && holder) {
     const locked = crownsLocked(game, game.itId, now);
-    const tex = `${CROWN_DIR}game_crown_${locked ? 'locked' : 'unlocked'}.png`;
+    const tex = `${CROWN_DIR}game_crown_${locked ? 'locked' : 'unlocked'}.webp`;
     if (crownSprite._tex !== tex) {
       crownSprite.texture = textureFromUrl(tex);
       crownSprite._tex = tex;
@@ -644,7 +644,7 @@ function renderHud(engine, force = false) {
   clock.hidden = !mine || game.status !== 'running';
   if (mine) {
     clock.querySelector('[data-crowns-clock-text]').textContent = `${crownRemainingSeconds(game, 'you')}s to win${game.players.you.below ? '' : ' (below the play line)'}`;
-    clock.querySelector('img').src = `${CROWN_DIR}game_crown_${crownsLocked(game, 'you', now) ? 'locked' : 'unlocked'}.png`;
+    clock.querySelector('img').src = `${CROWN_DIR}game_crown_${crownsLocked(game, 'you', now) ? 'locked' : 'unlocked'}.webp`;
   }
 }
 
@@ -1092,7 +1092,7 @@ function mpSetupArena(street, engine) {
   clearTip();
   actors = {};
   lockSprites = (mp.locks.length ? mp.locks : LOCK_POINTS).map((lock) => {
-    const sprite = new PIXI.Sprite(textureFromUrl(`${CROWN_DIR}crown_game_lock.png`));
+    const sprite = new PIXI.Sprite(textureFromUrl(`${CROWN_DIR}crown_game_lock.webp`));
     sprite.anchor.set(0.5, 1);
     sprite.scale.set(1.2);
     sprite.x = lock.x;
@@ -1101,7 +1101,7 @@ function mpSetupArena(street, engine) {
     engine.entityLayer.addChild(sprite);
     return sprite;
   });
-  crownSprite = new PIXI.Sprite(textureFromUrl(`${CROWN_DIR}game_crown_unlocked.png`));
+  crownSprite = new PIXI.Sprite(textureFromUrl(`${CROWN_DIR}game_crown_unlocked.webp`));
   crownSprite.anchor.set(0.5, 1);
   crownSprite.scale.set(0.8);
   crownSprite.zIndex = 60;
@@ -1174,7 +1174,7 @@ function mpTick(dtMs, now, engine) {
   if (crownSprite && !crownSprite.destroyed) {
     if (holder && mp.status === 'running') {
       const locked = now < st.lockedUntil;
-      const tex = `${CROWN_DIR}game_crown_${locked ? 'locked' : 'unlocked'}.png`;
+      const tex = `${CROWN_DIR}game_crown_${locked ? 'locked' : 'unlocked'}.webp`;
       if (crownSprite._tex !== tex) {
         crownSprite.texture = textureFromUrl(tex);
         crownSprite._tex = tex;
@@ -1214,7 +1214,7 @@ function mpRenderHud(engine, force = false) {
   if (mine) {
     const left = Math.ceil((mp.winMs - crownMsNow(st, mp.myId, now, mp.winMs)) / 1000);
     clock.querySelector('[data-crowns-clock-text]').textContent = `${left}s to win${mp.below ? '' : ' (below the play line)'}`;
-    clock.querySelector('img').src = `${CROWN_DIR}game_crown_${now < st.lockedUntil ? 'locked' : 'unlocked'}.png`;
+    clock.querySelector('img').src = `${CROWN_DIR}game_crown_${now < st.lockedUntil ? 'locked' : 'unlocked'}.webp`;
   }
 }
 

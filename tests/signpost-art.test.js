@@ -7,15 +7,15 @@ import assert from 'node:assert/strict';
 import { readFileSync, readdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { FIRST_DRAW_SPRITES, HIRES_SPRITES } from '../public/js/sprite-hires.js?v=f98be5eb';
+import { FIRST_DRAW_SPRITES, HIRES_SPRITES } from '../public/js/sprite-hires.js?v=abaf3d5a';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const art = join(root, 'tools/signpost-art');
 const results = JSON.parse(readFileSync(join(root, 'tools/vector-sprites/results.json'), 'utf8'));
 const PARTS = {
-  post: 'assets/ui/signpost/signpost_post.png',
-  arm: 'assets/ui/signpost/signpost_arm.png',
-  shadow: 'assets/ui/signpost/signpost_shadow.png',
+  post: 'assets/ui/signpost/signpost_post.webp',
+  arm: 'assets/ui/signpost/signpost_arm.webp',
+  shadow: 'assets/ui/signpost/signpost_shadow.webp',
 };
 
 describe('3x signpost art', () => {

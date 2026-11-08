@@ -38,13 +38,13 @@
  * towerRoomItems, towerRoomGarden, towerRoomLast.
  */
 
-import { addItem, countItem } from '../inventory.js?v=d82f3b00';
+import { addItem, countItem } from '../inventory.js?v=b7609342';
 import { getGameDayKey } from '../game-day.js?v=edb00566';
 import { DOOR_TEXT, doorKeyClass, insideBottomRect } from '../doors.js?v=c5083537';
 import { textureFromUrl } from '../textures.js?v=3149d699';
 import { ROOM_15_TSID } from '../tower-rooms.js?v=f238eaa9';
 import { anyTowerRoomByTsid as baseRoomByTsid } from '../tower-challenge-rooms.js?v=7502a893';
-import { midTowerRoomByTsid } from '../tower-mid-rooms.js?v=02071191';
+import { midTowerRoomByTsid } from '../tower-mid-rooms.js?v=678fdc50';
 
 const anyTowerRoomByTsid = (tsid) => baseRoomByTsid(tsid) || midTowerRoomByTsid(tsid);
 
@@ -169,7 +169,7 @@ function drawArt(engine, room, street) {
 
 function drawKey(engine, box) {
   const { PIXI } = engine;
-  const s = new PIXI.Sprite(textureFromUrl(`assets/sprites/icons/${doorKeyClass(box.key)}.png`));
+  const s = new PIXI.Sprite(textureFromUrl(`assets/sprites/icons/${doorKeyClass(box.key)}.webp`));
   s.anchor.set(0.5, 1);
   s.x = box.x;
   s.y = box.y - 32; // the box bottom sits 30 px under the shelf top
@@ -212,7 +212,7 @@ const itemsWaiting = () => itemRows.filter((r) => !r.picked).length;
 function drawItem(engine, street, item) {
   const { PIXI } = engine;
   const box = new PIXI.Container();
-  const spr = new PIXI.Sprite(textureFromUrl(`assets/sprites/icons/${item.cls}.png`));
+  const spr = new PIXI.Sprite(textureFromUrl(`assets/sprites/icons/${item.cls}.webp`));
   spr.anchor.set(0.5, 1);
   spr.scale.set(0.8);
   box.addChild(spr);

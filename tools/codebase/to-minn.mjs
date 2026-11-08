@@ -25,7 +25,7 @@ const patch = (id, alt, title, inner) => group('section', `band${alt ? ' band-al
 const knot = (item, name, words) => group('div', `cb-knot cb-knot-${item}`, null, [p('', `<strong>${name}</strong> ${words}`)]);
 /** A Tiny Speck badge from the game's own badge art (public/assets/badges). */
 const badge = (file, alt) => block('image', { width: '72px', height: '72px', className: 'cb-badge' },
-  `<figure class="wp-block-image is-resized cb-badge"><img src="/assets/badges/${file}.png" alt="${alt}" width="72" height="72" style="width:72px;height:72px"/></figure>`);
+  `<figure class="wp-block-image is-resized cb-badge"><img src="/assets/badges/${file}.webp" alt="${alt}" width="72" height="72" style="width:72px;height:72px"/></figure>`);
 const list = (cls, items, ordered = false) => block('list', { ...(ordered ? { ordered: true } : {}), ...(cls ? { className: cls } : {}) },
   `<${ordered ? 'ol' : 'ul'} class="wp-block-list${cls ? ` ${cls}` : ''}">${items.map((i) => block('list-item', null, `<li>${i}</li>`)).join('\n')}</${ordered ? 'ol' : 'ul'}>`);
 /** A repo's contributing badge: a small sewn-on patch in its section's tone, with a Tiny Speck icon and its two GitHub doors (the .cb-rbadge styles). */

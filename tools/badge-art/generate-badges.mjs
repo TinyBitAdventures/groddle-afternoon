@@ -14,6 +14,8 @@ import { chromium } from 'playwright';
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { imageDims } from '../image-size.mjs';
+import { replacePngWithWebp } from '../webp-lossless.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = join(here, '../../public');
@@ -165,26 +167,24 @@ function iconMarkup(spec, box) {
     const s = box.w / 100;
     return `<g transform="translate(${box.x - box.w / 2} ${box.y - box.h / 2 + (box.h - box.w) / 2}) scale(${s})" filter="url(#iconShadow)">${g}</g>`;
   }
-  const iconPath = join(root, 'assets/sprites/icons', `${spec.icon}.png`);
+  const iconPath = join(root, 'assets/sprites/icons', `${spec.icon}.webp`);
   const png = readFileSync(iconPath);
-  const w = png.readUInt32BE(16);
-  const h = png.readUInt32BE(20);
+  const [w, h] = imageDims(png);
   const scale = Math.min(box.w / w, box.h / h, spec.maxScale || 2.4);
   const dw = w * scale;
   const dh = h * scale;
-  return `<image href="data:image/png;base64,${png.toString('base64')}" x="${(box.x - dw / 2).toFixed(2)}" y="${(box.y + box.h / 2 - dh).toFixed(2)}" width="${dw.toFixed(2)}" height="${dh.toFixed(2)}" filter="url(#iconShadow)"/>`;
+  return `<image href="data:image/webp;base64,${png.toString('base64')}" x="${(box.x - dw / 2).toFixed(2)}" y="${(box.y + box.h / 2 - dh).toFixed(2)}" width="${dw.toFixed(2)}" height="${dh.toFixed(2)}" filter="url(#iconShadow)"/>`;
 }
 
 /** Giant emblem medallion at the upper left, as on the Hi-Sign badge series. */
 function emblemMarkup(name) {
-  const png = readFileSync(join(root, 'assets/sprites/icons', `${name}.png`));
-  const w = png.readUInt32BE(16);
-  const h = png.readUInt32BE(20);
+  const png = readFileSync(join(root, 'assets/sprites/icons', `${name}.webp`));
+  const [w, h] = imageDims(png);
   const s = Math.min(48 / w, 48 / h);
   return `<g filter="url(#iconShadow)">
     <circle cx="38" cy="38" r="28" fill="#2f2a4a" stroke="#f4f0e6" stroke-width="3.5"/>
     <circle cx="38" cy="38" r="24.5" fill="url(#emblemSky)"/>
-    <image href="data:image/png;base64,${png.toString('base64')}" x="${(38 - (w * s) / 2).toFixed(2)}" y="${(38 - (h * s) / 2).toFixed(2)}" width="${(w * s).toFixed(2)}" height="${(h * s).toFixed(2)}"/>
+    <image href="data:image/webp;base64,${png.toString('base64')}" x="${(38 - (w * s) / 2).toFixed(2)}" y="${(38 - (h * s) / 2).toFixed(2)}" width="${(w * s).toFixed(2)}" height="${(h * s).toFixed(2)}"/>
   </g>`;
 }
 
@@ -207,7 +207,7 @@ export function designFor(id) {
   const def = catalog[id] || { classTsid: id, name: id, category: '' };
   const override = specs.badges?.[id] || {};
   const firstCond = def.conditions?.length === 1 ? def.conditions[0] : null;
-  const autoIcon = firstCond && existsSync(join(root, 'assets/sprites/icons', `${firstCond.name}.png`))
+  const autoIcon = firstCond && existsSync(join(root, 'assets/sprites/icons', `${firstCond.name}.webp`))
     ? firstCond.name
     : specs.categoryIcons?.[def.category] || null;
   const tier = override.tier ?? seriesTier(def);
@@ -303,14 +303,17 @@ export function badgeSvg(d) {
 </svg>`;
 }
 
-async function render(designs, outDir) {
+async function render(designs, outDir, { webp = false } = {}) {
   mkdirSync(outDir, { recursive: true });
   const browser = await chromium.launch();
   const page = await browser.newPage({ viewport: { width: 180, height: 180 }, deviceScaleFactor: 1 });
   for (const d of designs) {
     await page.setContent(`<html><body style="margin:0;background:transparent">${badgeSvg(d)}</body></html>`);
     await page.evaluate(() => document.fonts.ready);
-    await page.locator('svg').screenshot({ path: join(outDir, `${d.id}.png`), omitBackground: true });
+    const png = join(outDir, `${d.id}.png`);
+    await page.locator('svg').screenshot({ path: png, omitBackground: true });
+    // Shipped badges are lossless WebP (tools/webp-lossless.mjs); previews stay PNG.
+    if (webp) replacePngWithWebp(png);
   }
   await browser.close();
 }
@@ -327,11 +330,11 @@ if (previewDir) {
   console.log(`preview: ${designs.length} badges -> ${previewDir}`);
 } else {
   const targets = designs.filter((d) => !official[d.id]);
-  await render(targets, join(root, 'assets/badges'));
+  await render(targets, join(root, 'assets/badges'), { webp: true });
   const manifest = {};
   for (const d of targets) {
     manifest[d.id] = {
-      path: `assets/badges/${d.id}.png`,
+      path: `assets/badges/${d.id}.webp`,
       generated: true,
       subject: d.subject || (d.icon ? `icon:${d.icon}` : `glyph:${d.glyph}`),
     };

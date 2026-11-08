@@ -34,7 +34,7 @@ export const SWOONERFLY_PLACEMENT_KEY = 'swoonerflies';
 
 /** The fly-rooked loop (js/quest-rooms/gwendolyn.js SWOON_FRAMES, animationSpeed 0.5 = 30 fps). */
 export const SWOONERFLY_SHEET = Object.freeze({
-  path: 'assets/sprites/quest-rooms/gwendolyn/swoonerfly_fall.png',
+  path: 'assets/sprites/quest-rooms/gwendolyn/swoonerfly_fall.webp',
   fw: 70,
   fh: 65,
   cols: 14,

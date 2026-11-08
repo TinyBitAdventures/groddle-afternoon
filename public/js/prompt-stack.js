@@ -44,7 +44,7 @@
  * the remake's centre card (game.js engine.prompt with modal: true).
  */
 
-import { armPromptTimeout, promptTimeoutMs } from './prompt-timeout.js?v=d8da8751';
+import { armPromptTimeout, promptTimeoutMs } from './prompt-timeout.js?v=4ed116c4';
 
 export const PROMPT_WIDTH = 300; // PromptView.as 39 overall_w
 export const PROMPT_PAD = 7; // PromptView.as 38 padd
@@ -53,8 +53,8 @@ export const PROMPT_MAX_BUTTON_WIDTHS = 100; // PromptView.as 35
 export const PROMPT_FADE_MS = 100; // PromptView.as 200, 346
 export const PROMPT_REMOVE_MS = 200; // PromptView.as 201-207
 export const PROMPT_RECHECK_MS = 5000; // PromptView.as 61
-export const PROMPT_ICON_CHECK = 'assets/ui/prompt/prompt_check.png';
-export const PROMPT_ICON_X = 'assets/ui/prompt/prompt_x.png';
+export const PROMPT_ICON_CHECK = 'assets/ui/prompt/prompt_check.webp';
+export const PROMPT_ICON_X = 'assets/ui/prompt/prompt_x.webp';
 
 /** prompts_add_simple 37-52: one OK when no choices are sent. */
 export const DEFAULT_PROMPT_CHOICES = Object.freeze([Object.freeze({ label: 'OK', value: 'ok' })]);

@@ -55,7 +55,7 @@ describe('the neighbours', () => {
       for (const copy of [n.doorNote.text, n.thanks.text, n.visitor]) assert.ok(!copy.includes('—'));
       for (const item of [n.thanks.attachment, n.visitorGift, ...(n.gifts || [])]) {
         assert.ok(NEIGHBOUR_ITEMS[item.classTsid], item.classTsid);
-        assert.ok(existsSync(join(root, `assets/sprites/icons/${item.classTsid}.png`)), item.classTsid);
+        assert.ok(existsSync(join(root, `assets/sprites/icons/${item.classTsid}.webp`)), item.classTsid);
       }
     }
     assert.ok(NEIGHBOURS.filter((n) => n.chore === 'gift').every((n) => n.gifts?.length));

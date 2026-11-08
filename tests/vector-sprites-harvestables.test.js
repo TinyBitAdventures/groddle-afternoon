@@ -9,7 +9,7 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { FIRST_DRAW_SPRITES, HIRES_SPRITES, hiresSpriteUrl } from '../public/js/sprite-hires.js?v=f98be5eb';
+import { FIRST_DRAW_SPRITES, HIRES_SPRITES, hiresSpriteUrl } from '../public/js/sprite-hires.js?v=abaf3d5a';
 import { fruitState } from '../tools/vector-sprites/trant-states.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -19,13 +19,13 @@ const sheets = manifest.jobs.flatMap((job) => job.sheets.map((sheet) => ({ job, 
 
 /** Sheets that must stay sharp (the 1x art they replace is in every world). */
 const SHARP = [
-  ...['bean', 'bubble', 'egg', 'fruit', 'gas', 'spice'].flatMap((s) => [1, 3, 5, 7, 10].map((m) => `assets/sprites/trants/frames/trant_${s}_m${m}.png`)),
-  ...['bean', 'bubble', 'egg', 'fruit', 'gas', 'spice'].map((s) => `assets/sprites/soil/trant-${s}-dead.png`),
-  ...['patch', 'patch-dark'].flatMap((k) => ['dirty', 'clean', 'dug'].map((s) => `assets/sprites/soil/${k}-${s}.png`)),
-  'assets/sprites/soil/patch-seedling.png',
-  ...['false-water-false', 'true-water-false', 'false-water-true', 'true-water-true'].map((s) => `assets/sprites/resources/paper-tree-pet-${s}.png`),
-  'assets/sprites/wood_tree_maturity_6_variant_2_x6_1_png_1354833445.png',
-  ...['metal', 'dullite', 'beryl', 'sparkly'].map((r) => `assets/sprites/mining/rock_${r}.png`),
+  ...['bean', 'bubble', 'egg', 'fruit', 'gas', 'spice'].flatMap((s) => [1, 3, 5, 7, 10].map((m) => `assets/sprites/trants/frames/trant_${s}_m${m}.webp`)),
+  ...['bean', 'bubble', 'egg', 'fruit', 'gas', 'spice'].map((s) => `assets/sprites/soil/trant-${s}-dead.webp`),
+  ...['patch', 'patch-dark'].flatMap((k) => ['dirty', 'clean', 'dug'].map((s) => `assets/sprites/soil/${k}-${s}.webp`)),
+  'assets/sprites/soil/patch-seedling.webp',
+  ...['false-water-false', 'true-water-false', 'false-water-true', 'true-water-true'].map((s) => `assets/sprites/resources/paper-tree-pet-${s}.webp`),
+  'assets/sprites/wood_tree_maturity_6_variant_2_x6_1_png_1354833445.webp',
+  ...['metal', 'dullite', 'beryl', 'sparkly'].map((r) => `assets/sprites/mining/rock_${r}.webp`),
 ];
 
 describe('3x harvestables', () => {
@@ -62,9 +62,9 @@ describe('3x harvestables', () => {
 
   it('G448: the ice knobs, the Dust Trap and all 32 Firefly Jar sheets are sharp', () => {
     const paths = [
-      ...[1, 2, 3, 4].map((k) => `assets/sprites/resources/ice-knob-knob${k}.png`),
-      ...['idle', 'smack-down', 'down', 'up'].map((s) => `assets/sprites/resources/dust-trap-${s}.png`),
-      ...Array.from({ length: 8 }, (_, n) => ['closed', 'opening', 'open', 'closing'].map((s) => `assets/sprites/resources/firefly-jar-${n}-${s}.png`)).flat(),
+      ...[1, 2, 3, 4].map((k) => `assets/sprites/resources/ice-knob-knob${k}.webp`),
+      ...['idle', 'smack-down', 'down', 'up'].map((s) => `assets/sprites/resources/dust-trap-${s}.webp`),
+      ...Array.from({ length: 8 }, (_, n) => ['closed', 'opening', 'open', 'closing'].map((s) => `assets/sprites/resources/firefly-jar-${n}-${s}.webp`)).flat(),
     ];
     assert.equal(paths.length, 40);
     for (const path of paths) {

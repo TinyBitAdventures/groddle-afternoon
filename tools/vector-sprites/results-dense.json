@@ -1,5 +1,5 @@
 {
- "assets/sprites/meditation/focusing_orb-tool.png": {
+ "assets/sprites/meditation/focusing_orb-tool.webp": {
   "animal": "tool-focusing-orb",
   "swf": "tools/tool_base/focusing_orb/focusing_orb.swf",
   "sprite": 0,
@@ -2722,7 +2722,7 @@
    0.9619
   ]
  },
- "assets/sprites/spinning-wheel/stoot-doll.png": {
+ "assets/sprites/spinning-wheel/stoot-doll.webp": {
   "animal": "stoot-doll",
   "swf": "rare_items/stoot_barfield_pullstring_doll/stoot_barfield_pullstring_doll.swf",
   "sprite": 0,
@@ -2756,7 +2756,7 @@
    0.9828
   ]
  },
- "assets/sprites/home-tower/tower_expander.png": {
+ "assets/sprites/home-tower/tower_expander.webp": {
   "animal": "tower-expander",
   "swf": "misc/tower_expander/tower_expander.swf",
   "sprite": 0,

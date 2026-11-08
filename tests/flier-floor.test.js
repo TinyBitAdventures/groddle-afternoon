@@ -34,7 +34,7 @@ import {
   floorUnder,
   flyerAt,
   flyerLift,
-} from '../public/js/street-creatures.js?v=746e64a0';
+} from '../public/js/street-creatures.js?v=5fe850f9';
 import { setCreatureEcology, streetObjectLayout } from '../tools/build-realtime-objects.mjs';
 import { STREET_INDEX, applyStreetIndex, loadStreetDataFromFs, setZoneStreetsShown } from '../public/js/street-loader.js?v=33d2b8bc';
 import { setStreetEcologyCatalog } from '../public/js/street-ecology.js?v=3c1d4c06';
@@ -124,7 +124,7 @@ describe('fliers keep above the floor under them', () => {
     const game = read('public/game.js');
     assert.match(game, /const SCALE = 1\.35;/);
     assert.match(game, /butterflyFly: SCALE \* 0\.52,/);
-    assert.match(game, /npc_butterfly__x1_fly-side_png_1354829525\.png',\n\s+fw: 70, fh: 65,/);
+    assert.match(game, /npc_butterfly__x1_fly-side_png_1354829525\.webp',\n\s+fw: 70, fh: 65,/);
     assert.match(game, /b\.anchor\.set\(0\.5, 0\.5\);\n\s+b\.baseScale = ENTITY_SCALE\.butterflyFly;/);
     assert.match(game, /b\.lift = flyerLift\(i\);/);
     const husbandry = read('public/js/features/animal-husbandry-feature.js');

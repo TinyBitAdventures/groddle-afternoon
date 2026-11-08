@@ -4,6 +4,8 @@
  * feature: public/js/features/mail-courier-feature.js; art: public/js/mail-npc-art.js.
  */
 import { describe, it, mock } from 'node:test';
+import { imageSize } from '../tools/image-size.mjs';
+import { pngBufferToWebp } from '../tools/webp-lossless.mjs';
 import assert from 'node:assert/strict';
 import { existsSync, openSync, readFileSync, readSync, readdirSync, closeSync } from 'node:fs';
 import { dirname, join } from 'node:path';
@@ -45,7 +47,7 @@ import {
   receiveMailAttachments,
   seedMailbox,
 } from '../public/js/mailbox.js?v=a3e833ba';
-import { DISPATCHER_ART, FROG_ART, MAIL_NPC_ART_DIR } from '../public/js/mail-npc-art.js?v=031c4e2e';
+import { DISPATCHER_ART, FROG_ART, MAIL_NPC_ART_DIR } from '../public/js/mail-npc-art.js?v=1ed97a5d';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = join(here, '..');
@@ -59,10 +61,10 @@ const plain = (s) => s.replace(/\s*—\s*/g, ' ').replace(/[,:]\s*/g, ' ').repla
 
 function pngSize(file) {
   const fd = openSync(file, 'r');
-  const buf = Buffer.alloc(24);
-  readSync(fd, buf, 0, 24, 0);
+  const buf = Buffer.alloc(32);
+  readSync(fd, buf, 0, 32, 0);
   closeSync(fd);
-  return [buf.readUInt32BE(16), buf.readUInt32BE(20)];
+  return [imageSize(buf).w, imageSize(buf).h];
 }
 
 describe('express mail rules (players/inc_mail.js)', () => {
@@ -321,7 +323,7 @@ describe('mail npc art (tools/mail-npc-art/build.mjs)', () => {
     for (const [label, [cols, count]] of Object.entries(FROG_ART.sheets)) {
       for (const files of Object.values(FROG_ART.variants)) {
         for (const kind of ['box', 'none']) {
-          const [w, h] = pngSize(join(dir, `${files[kind]}${label}.png`));
+          const [w, h] = pngSize(join(dir, `${files[kind]}${label}.webp`));
           assert.equal(w, cols * FROG_ART.cell.w, `${files[kind]} ${label}`);
           assert.ok(h >= Math.ceil(count / cols) * FROG_ART.cell.h, `${files[kind]} ${label}`);
         }
@@ -331,24 +333,24 @@ describe('mail npc art (tools/mail-npc-art/build.mjs)', () => {
     for (const fit of Object.values(FROG_ART.redFit)) assert.ok(fit >= 0.8);
   });
 
-  it('ticket 74: the red frog\'s sheets are Tiny Speck\'s own OGA renders, byte for byte', { skip: !existsSync(OGA_FROG) && 'needs the OpenGameArt archive' }, () => {
+  it('ticket 74: the red frog\'s sheets are Tiny Speck\'s own OGA renders (their pixels, as lossless WebP)', { skip: !existsSync(OGA_FROG) && 'needs the OpenGameArt archive' }, () => {
     for (const label of Object.keys(FROG_ART.sheets)) {
       for (const [box, file] of [['box', FROG_ART.variants.frogRed.box], ['none', FROG_ART.variants.frogRed.none]]) {
         const ogaDir = join(OGA_FROG, `npc_yoga_frog_box_${box}_variant_frogRed`);
         const oga = readdirSync(ogaDir).find((f) => f.includes(`_x1_${label}_png_`));
         assert.ok(oga, `${box} ${label}`);
-        assert.ok(readFileSync(join(ogaDir, oga)).equals(readFileSync(join(pub, MAIL_NPC_ART_DIR, `${file}${label}.png`))), `${file}${label}`);
+        assert.ok(pngBufferToWebp(readFileSync(join(ogaDir, oga))).equals(readFileSync(join(pub, MAIL_NPC_ART_DIR, `${file}${label}.webp`))), `${file}${label}`);
       }
     }
   });
 
   it('G448: the frog\'s 56 sheets (blue and red) have 3x renders from npc_yoga_frog.swf that swap in on first draw', async () => {
-    const { FIRST_DRAW_SPRITES, HIRES_SPRITES, hiresSpriteUrl } = await import('../public/js/sprite-hires.js?v=f98be5eb');
+    const { FIRST_DRAW_SPRITES, HIRES_SPRITES, hiresSpriteUrl } = await import('../public/js/sprite-hires.js?v=abaf3d5a');
     const results = JSON.parse(readFileSync(join(root, 'tools/vector-sprites/results.json'), 'utf8'));
     let n = 0;
     for (const label of Object.keys(FROG_ART.sheets)) {
       for (const [variant, kind] of ['frogBlue', 'frogRed'].flatMap((v) => [[v, 'box'], [v, 'none']])) {
-        const path = `${MAIL_NPC_ART_DIR}${FROG_ART.variants[variant][kind]}${label}.png`.replace(/^.*?(assets\/)/, '$1');
+        const path = `${MAIL_NPC_ART_DIR}${FROG_ART.variants[variant][kind]}${label}.webp`.replace(/^.*?(assets\/)/, '$1');
         const r = results[path];
         assert.equal(r?.status, 'ok', path);
         assert.ok(r.score >= 0.9 && r.minFrame >= 0.8 && r.drift.length === 0, `${path} ${r.score}`);
@@ -371,7 +373,7 @@ describe('mail courier feature', () => {
   it('calls the frog with the source prompt once a letter is due, and waits in an instance', async () => {
     mock.timers.enable({ apis: ['Date'], now: 1_000_000 });
     try {
-      const { mailCourierFeature } = await import('../public/js/features/mail-courier-feature.js?v=e93f7cfb');
+      const { mailCourierFeature } = await import('../public/js/features/mail-courier-feature.js?v=c61573d7');
       const st = createMailboxState();
       const prompts = [];
       let instance = false;

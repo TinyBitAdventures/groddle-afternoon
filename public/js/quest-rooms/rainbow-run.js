@@ -17,7 +17,7 @@
  */
 
 import { FLOOR, H, W, buildRainbowScene, rainbowCoins, rainbowPlatforms } from './rainbow-run-scene.js?v=bdf25b27';
-import { touchesQuoin } from './kit.js?v=d98b987e';
+import { touchesQuoin } from './kit.js?v=25fc6d59';
 
 export { rainbowCoins, rainbowPlatforms };
 export const RUN_MS = 30_000;
@@ -40,7 +40,7 @@ export const room = {
   id: 'rainbow_run',
   title: 'Rainbow Run',
   kicker: 'Coins in 30 seconds',
-  icon: 'assets/sprites/quest-rooms/rainbow_run/coin.png',
+  icon: 'assets/sprites/quest-rooms/rainbow_run/coin.webp',
   theme: 'memory',
   hubName: 'The infamous Rainbow Run',
   durationMs: 0, // exit_delay 0: the 30-second clock ends it
@@ -170,7 +170,7 @@ async function ready(ctx) {
     title: 'Get ready to grab those coins!',
     detail: '(CLICK WHEN READY)',
     button: 'Ready',
-    icon: 'assets/sprites/quest-rooms/rainbow_run/coin.png',
+    icon: 'assets/sprites/quest-rooms/rainbow_run/coin.webp',
   });
   ctx.data.phase = 'countdown';
   await ctx.countdown(['3', '2', '1', 'GO!'], 850);
@@ -191,7 +191,7 @@ async function finish(ctx) {
     await ctx.wait(1200);
   }
   await ctx.card(won
-    ? { kicker: 'Rainbow Run', title: 'Success!', detail: 'You got them coins but good.', button: 'OK', icon: 'assets/sprites/quest-rooms/rainbow_run/coin.png' }
+    ? { kicker: 'Rainbow Run', title: 'Success!', detail: 'You got them coins but good.', button: 'OK', icon: 'assets/sprites/quest-rooms/rainbow_run/coin.webp' }
     : { kicker: 'Rainbow Run', title: 'Failure!', detail: 'How embarrassing.', button: 'OK', loss: true });
   ctx.leave({ transition: ctx.fx() });
 }

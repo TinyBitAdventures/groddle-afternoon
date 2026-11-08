@@ -44,18 +44,18 @@ import {
   plotNeedsWater,
   gardenNeedsWater,
   GARDEN_NO_DRY_PLOTS_LINE,
-} from '../public/js/garden.js?v=890d72ea';
-import { getVerbsFor, runVerb } from '../public/content.js?v=075ded81';
-import { plotPieces } from '../public/js/garden-view.js?v=05651e76';
-import { plotsFor } from '../public/js/master-garden.js?v=ee7655a1';
+} from '../public/js/garden.js?v=e1c3415c';
+import { getVerbsFor, runVerb } from '../public/content.js?v=ebc8b8b3';
+import { plotPieces } from '../public/js/garden-view.js?v=3683a26f';
+import { plotsFor } from '../public/js/master-garden.js?v=1e4d279f';
 import {
   createInventory,
   countItem,
   listPackItemSlots,
   listPackToolSlots,
   isToolItem,
-} from '../public/js/inventory.js?v=d82f3b00';
-import { DEFAULT_VENDOR, vendorBuy } from '../public/js/vendor.js?v=18b51628';
+} from '../public/js/inventory.js?v=b7609342';
+import { DEFAULT_VENDOR, vendorBuy } from '../public/js/vendor.js?v=307aca18';
 import { HAS_SITE, SITE_DIR } from '../tools/repos.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -355,21 +355,21 @@ describe('UI wiring for garden', () => {
     assert.ok(game.includes('_gardenHitW') || game.includes('garden_plot'));
     // World plot, plant and bed art (tools/garden-art from garden_new.swf)
     for (const f of [
-      'garden_plots.png',
-      'garden_crops.png',
-      'garden_bed_strip_2_1.png',
-      'garden_bed_shimla_2_1.png',
-      'garden_new__x1_1_png_1354833270.png',
+      'garden_plots.webp',
+      'garden_crops.webp',
+      'garden_bed_strip_2_1.webp',
+      'garden_bed_shimla_2_1.webp',
+      'garden_new__x1_1_png_1354833270.webp',
     ]) {
       const p = join(__dirname, '../public/assets/sprites/garden', f);
       assert.ok(readFileSync(p).length > 50, f);
     }
     for (const f of [
-      'seed_carrot.png',
-      'watering_can.png',
-      'hoe.png',
-      'herb_seed_rookswort.png',
-      'corn.png',
+      'seed_carrot.webp',
+      'watering_can.webp',
+      'hoe.webp',
+      'herb_seed_rookswort.webp',
+      'corn.webp',
     ]) {
       const p = join(__dirname, '../public/assets/sprites/icons', f);
       assert.ok(readFileSync(p).length > 50, f);

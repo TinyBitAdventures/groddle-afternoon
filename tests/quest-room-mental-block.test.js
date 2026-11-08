@@ -36,7 +36,7 @@ import {
   solidRects,
   solvingPlans,
   staticPlatforms,
-} from '../public/js/quest-rooms/mental-block.js?v=f7fc4c48';
+} from '../public/js/quest-rooms/mental-block.js?v=7194931d';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const GS = join(homedir(), 'Documents/glitch-audit/glitch-GameServerJS');
@@ -71,7 +71,7 @@ describe('Mental Block source', () => {
   });
 
   it('ships its button and teleporter art', () => {
-    for (const f of ['wall_button_lockOut.png', 'wall_button_lockIn.png', 'Teleporter_Base.png', 'Teleporter_Beam.png']) {
+    for (const f of ['wall_button_lockOut.webp', 'wall_button_lockIn.webp', 'Teleporter_Base.webp', 'Teleporter_Beam.webp']) {
       assert.ok(existsSync(join(root, 'public/assets/sprites/quest-rooms/mental_block', f)), f);
     }
     assert.ok(existsSync(join(root, 'public/assets/decos/groddle/door_asset_gray.webp')));

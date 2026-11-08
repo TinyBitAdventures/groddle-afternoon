@@ -17,11 +17,11 @@ import { homedir } from 'node:os';
 import {
   HOME_LAYOUT_ART_ROOTS, HOME_LAYOUT_KINDS, HOME_LAYOUT_LIMITS, HOME_LAYOUT_TEXTS, HOME_LAYOUT_VERSION,
   boxFromCorners, buildHomeLayout, describeHomeThing, hexColour, homeLayoutJson, homeLayoutKeyOf, layoutArtPath, splitFrameToSheet,
-} from '../public/js/home-layout.js?v=e1b845ad';
-import { walkHomeScene } from '../public/js/home-layout-scene.js?v=aefdc265';
+} from '../public/js/home-layout.js?v=df6020fe';
+import { walkHomeScene } from '../public/js/home-layout-scene.js?v=99cc7def';
 import { AVATAR_STILL, homeKeyOf } from '../public/js/profiles.js?v=86423d98';
-import { HIRES_SPRITES, SPLIT_SPRITES } from '../public/js/sprite-hires.js?v=f98be5eb';
-import { HOUSE_STYLE_KEYS } from '../public/js/features/homes-feature.js?v=357f8787';
+import { HIRES_SPRITES, SPLIT_SPRITES } from '../public/js/sprite-hires.js?v=abaf3d5a';
+import { HOUSE_STYLE_KEYS } from '../public/js/features/homes-feature.js?v=5391026a';
 import { SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');
@@ -35,9 +35,9 @@ describe('art paths (layoutArtPath)', () => {
   it('undoes the loader routes to the 1x file the site serves', () => {
     assert.equal(layoutArtPath('https://groddle.localhost/assets/decos/groddle/bush_3@1.5x.webp?v=1'), 'assets/decos/groddle/bush_3.webp');
     assert.equal(layoutArtPath('assets/decos/groddle/bush_3.png'), 'assets/decos/groddle/bush_3.webp', 'a deco asked for as .png ships as .webp');
-    assert.equal(layoutArtPath('assets/sprites/animals/butterfly_milker@3x.webp'), 'assets/sprites/animals/butterfly_milker.png');
-    assert.equal(layoutArtPath('assets/sprites/icons/apple@3x.png'), 'assets/sprites/icons/apple.png');
-    assert.equal(layoutArtPath('../assets/ui/signpost/signpost_post.png'), 'assets/ui/signpost/signpost_post.png');
+    assert.equal(layoutArtPath('assets/sprites/animals/butterfly_milker@3x.webp'), 'assets/sprites/animals/butterfly_milker.webp');
+    assert.equal(layoutArtPath('assets/sprites/icons/apple@3x.webp'), 'assets/sprites/icons/apple.webp');
+    assert.equal(layoutArtPath('../assets/ui/signpost/signpost_post.webp'), 'assets/ui/signpost/signpost_post.webp');
   });
 
   it('refuses anything that is not Tiny Speck art under the roots', () => {
@@ -50,7 +50,7 @@ describe('art paths (layoutArtPath)', () => {
 
   it('puts a split 3x part\'s frame back on its 1x sheet', () => {
     const moved = splitFrameToSheet('assets/sprites/mail-npc/dispatcher_left.p1@3x.webp', { x: 118, y: 0, width: 118, height: 211 });
-    assert.equal(moved.sheet, 'assets/sprites/mail-npc/dispatcher_left.png');
+    assert.equal(moved.sheet, 'assets/sprites/mail-npc/dispatcher_left.webp');
     assert.deepEqual(moved.frame, { x: 118, y: 0, width: 118, height: 211 });
     assert.equal(splitFrameToSheet('assets/sprites/mailbox/x.png', { x: 0, y: 0, width: 1, height: 1 }), null);
   });
@@ -102,7 +102,7 @@ describe('the manifest (buildHomeLayout)', () => {
         { art: 'https://evil.example/x.png', corners: corners(0, 0, 10, 10) },
         { art: 'assets/sprites/rocks/rock_sheet.png', corners: corners(500, 350, 60, 50), frame: { x: 60, y: 0, width: 60, height: 50 }, sheet: { width: 240, height: 50 }, spot: 0 },
         { art: 'assets/sprites/rocks/rock_sheet.png', corners: corners(500, 340, 60, 20), frame: { x: 0, y: 0, width: 240, height: 50 }, sheet: { width: 240, height: 50 }, spot: 0, alpha: 0.5 },
-        { art: 'assets/ui/signpost/signpost_post.png', corners: corners(590, 190, 40, 210), spot: 2 },
+        { art: 'assets/ui/signpost/signpost_post.webp', corners: corners(590, 190, 40, 210), spot: 2 },
         { txt: 'way_out', corners: corners(600, 200, 60, 14), spot: 2 },
         { txt: 'not_a_text', corners: corners(600, 200, 60, 14) },
         { avatar: true, rect: [700, 250, 98, 141], mirrored: true, spot: 3 },
@@ -119,7 +119,7 @@ describe('the manifest (buildHomeLayout)', () => {
       ],
     });
     assert.equal(layout.v, HOME_LAYOUT_VERSION);
-    assert.deepEqual(layout.art, ['assets/decos/groddle/bush_3.webp', 'assets/sprites/rocks/rock_sheet.png', 'assets/ui/signpost/signpost_post.png']);
+    assert.deepEqual(layout.art, ['assets/decos/groddle/bush_3.webp', 'assets/sprites/rocks/rock_sheet.png', 'assets/ui/signpost/signpost_post.webp']);
     assert.deepEqual(layout.draw[0], { sky: ['#a6effa', '#eafcfb'], x: 0, y: 0, w: 960, h: 600 });
     assert.deepEqual(layout.draw[1], { col: '#5c3b25', x: 0, y: 420, w: 960, h: 56 }, 'a band is clipped to the stage');
     assert.deepEqual(layout.draw[2], { a: 0, x: 100, y: 380, w: 80, h: 40 });
@@ -226,8 +226,8 @@ describe('the stage walk (walkHomeScene)', () => {
 
   it('gives art drawn apart from its thing to that thing (a garden\'s bed beside its foot), drawn before or after it', () => {
     const foot = node({ x: 200, y: 400, homeLayout: { k: 'cultivation', i: 'proto_herb_garden_small' }, bounds: { x: -50, y: -10, width: 100, height: 12 } });
-    const bed = node({ x: 200, y: 400, homeLayoutPartOf: foot }, [sprite('assets/sprites/garden/garden_bed_polherb_2_2.png', -50, -40, 100, 40)]);
-    const plot = node({ x: 180, y: 380, homeLayoutPartOf: foot }, [sprite('assets/sprites/garden/garden_plots.png', -10, -20, 20, 20)]);
+    const bed = node({ x: 200, y: 400, homeLayoutPartOf: foot }, [sprite('assets/sprites/garden/garden_bed_polherb_2_2.webp', -50, -40, 100, 40)]);
+    const plot = node({ x: 180, y: 380, homeLayoutPartOf: foot }, [sprite('assets/sprites/garden/garden_plots.webp', -10, -20, 20, 20)]);
     const { draw, spots } = walkHomeScene(node({}, [bed, foot, plot]), io());
     assert.equal(spots.length, 1);
     assert.deepEqual(draw.map((d) => d.spot), [0, 0]);
@@ -349,7 +349,7 @@ describe('the site side (groddle-afternoon-site src/HomeLayout.php)', { skip: sk
     // The site reads every split sheet the game's generated js/sprite-hires.js lists, exactly.
     const real = Object.fromEntries([...SPLIT_SPRITES].map(([sheet, s]) => [sheet, { fw: s.fw, fh: s.fh, cols: s.cols, parts: s.parts }]));
     assert.deepEqual(out.realSplits, real);
-    assert.ok(out.realSplits['assets/sprites/mail-npc/dispatcher_left.png'], 'the mail dispatcher is one');
+    assert.ok(out.realSplits['assets/sprites/mail-npc/dispatcher_left.webp'], 'the mail dispatcher is one');
     // Only the generated shape, paths under assets/.
     assert.deepEqual(Object.keys(out.splitSheets), ['assets/sprites/mail-npc/fake_left.png']);
     // Cell 7 (column 3, row 1) is the second part's fourth cell: column 1, row 1 of its 2-column grid.

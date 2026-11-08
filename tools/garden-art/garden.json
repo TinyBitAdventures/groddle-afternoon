@@ -9,12 +9,12 @@
   "ffdec": "sprite:png, zoom 3 (scored against zoom 1)"
  },
  "files": {
-  "assets/sprites/garden/garden_bed_apartment_2_2.png": {
+  "assets/sprites/garden/garden_bed_apartment_2_2.webp": {
    "hires": "assets/sprites/garden/garden_bed_apartment_2_2@3x.webp",
    "w": 231,
    "h": 59,
    "cells": 1,
-   "sha256": "42064417fe26f167e8a8637b9c66ce7804b57635731fc1c8dec045fa206bd826",
+   "sha256": "ddeac0a4ba73f1eb790d5164714f780ed396d8900870944ed8eacf97a13f4200",
    "sha256_3": "5265184a2b9232fab8da5249fcb3be867d012b0123841ef9625355949be6c205",
    "score": 0.9826,
    "minFrame": 0.9826,
@@ -22,12 +22,12 @@
     0.9826
    ]
   },
-  "assets/sprites/garden/garden_bed_polcrop_2_2.png": {
+  "assets/sprites/garden/garden_bed_polcrop_2_2.webp": {
    "hires": "assets/sprites/garden/garden_bed_polcrop_2_2@3x.webp",
    "w": 296,
    "h": 75,
    "cells": 1,
-   "sha256": "7c9264636280180cb785407383f0c94c6318acc49cad5af41909490f8c24c5b9",
+   "sha256": "50f98c6920efb62ac1d28828f73d674ebc19c80ed36b56c6ab2bba3cf58e73bc",
    "sha256_3": "7fdc670f805a39dd32851161350f105e9a34a9902972c07ea3a23c502e79097f",
    "score": 0.9681,
    "minFrame": 0.9681,
@@ -35,12 +35,12 @@
     0.9681
    ]
   },
-  "assets/sprites/garden/garden_bed_polcrop_2_4.png": {
+  "assets/sprites/garden/garden_bed_polcrop_2_4.webp": {
    "hires": "assets/sprites/garden/garden_bed_polcrop_2_4@3x.webp",
    "w": 458,
    "h": 74,
    "cells": 1,
-   "sha256": "7f3a19e7137fab2d391d4d77888800399ecdf159472b7701536ee2a75f93931f",
+   "sha256": "2e544d72118c910d4e643ef6921b72aaac10b1c69c25cc9fa3e7cadb571c3f14",
    "sha256_3": "d1a806660fa90bbb79d0a5b3b3a6f7a42a22233122e85424764bd88f79be16c7",
    "score": 0.9721,
    "minFrame": 0.9721,
@@ -48,12 +48,12 @@
     0.9721
    ]
   },
-  "assets/sprites/garden/garden_bed_polcrop_3_5.png": {
+  "assets/sprites/garden/garden_bed_polcrop_3_5.webp": {
    "hires": "assets/sprites/garden/garden_bed_polcrop_3_5@3x.webp",
    "w": 587,
    "h": 93,
    "cells": 1,
-   "sha256": "2db01a78189a6e0bf7a6d1cd18e4cfb7c35091446ea1022eb9572ef236a004df",
+   "sha256": "acfd453a892696b0ea51275d3fc0cbe90a622bcaec21c04808cc835f19b64cac",
    "sha256_3": "432c6fefae16a08b4622618da4a92d87f67667aad82315bbb7946104cb3dcd13",
    "score": 0.9732,
    "minFrame": 0.9732,
@@ -61,12 +61,12 @@
     0.9732
    ]
   },
-  "assets/sprites/garden/garden_bed_polgroddle_1_3.png": {
+  "assets/sprites/garden/garden_bed_polgroddle_1_3.webp": {
    "hires": "assets/sprites/garden/garden_bed_polgroddle_1_3@3x.webp",
    "w": 319,
    "h": 56,
    "cells": 1,
-   "sha256": "5a237ea607b5d1632c8baef696785f74687bfa7e2132053618999b899e134e28",
+   "sha256": "6ad5c9df9d680ea570147c92823b9dea59f7fe5fd4e0cb7e076c5511898d97f9",
    "sha256_3": "1d398ccd1629208114633e785764b376d7017975e84ca420b2d688108ad34171",
    "score": 0.9563,
    "minFrame": 0.9563,
@@ -74,12 +74,12 @@
     0.9563
    ]
   },
-  "assets/sprites/garden/garden_bed_polgroddle_2_2.png": {
+  "assets/sprites/garden/garden_bed_polgroddle_2_2.webp": {
    "hires": "assets/sprites/garden/garden_bed_polgroddle_2_2@3x.webp",
    "w": 271,
    "h": 70,
    "cells": 1,
-   "sha256": "fb2f26c7e8559675599bedaa8f57d212b9026a0c2b71f039b795684b6a3ac722",
+   "sha256": "47a4df3ae7d6454d8259656c4e3b36e57c6044b509b233aa33554bc3223d1aa6",
    "sha256_3": "03ce2ac1fd480d9e263374cf366f22a6cbdc6d7056013e8df9c42193695d6ea8",
    "score": 0.9654,
    "minFrame": 0.9654,
@@ -87,12 +87,12 @@
     0.9654
    ]
   },
-  "assets/sprites/garden/garden_bed_polherb_2_2.png": {
+  "assets/sprites/garden/garden_bed_polherb_2_2.webp": {
    "hires": "assets/sprites/garden/garden_bed_polherb_2_2@3x.webp",
    "w": 296,
    "h": 80,
    "cells": 1,
-   "sha256": "1134f1248000ea8e919da17d6a69e00d2a03142be65d633c106c7fba65e944bd",
+   "sha256": "feef66222951d3d54026c769dd8baaa0e32d0e9ea36827f92b871f5745e640c1",
    "sha256_3": "a68d306760dcfc5e241398ea06ee3fca1b56ccf642602eab16fcdd16f964a7b1",
    "score": 0.9505,
    "minFrame": 0.9505,
@@ -100,12 +100,12 @@
     0.9505
    ]
   },
-  "assets/sprites/garden/garden_bed_polherb_2_4.png": {
+  "assets/sprites/garden/garden_bed_polherb_2_4.webp": {
    "hires": "assets/sprites/garden/garden_bed_polherb_2_4@3x.webp",
    "w": 464,
    "h": 82,
    "cells": 1,
-   "sha256": "ec417a6159b238cd90ebb400f9835cc0325cccd8d88308dc815c0e826ecf3012",
+   "sha256": "ffef422f1ef1e6fef1cf248415f1e0597ca6bcec977508b080251a3cac75bee0",
    "sha256_3": "9d8ca6ebc7f1d410114cbb01e3e1507486a8908ab7e6d37561f1477ec29c7bcb",
    "score": 0.9527,
    "minFrame": 0.9527,
@@ -113,12 +113,12 @@
     0.9527
    ]
   },
-  "assets/sprites/garden/garden_bed_polherb_3_5.png": {
+  "assets/sprites/garden/garden_bed_polherb_3_5.webp": {
    "hires": "assets/sprites/garden/garden_bed_polherb_3_5@3x.webp",
    "w": 583,
    "h": 99,
    "cells": 1,
-   "sha256": "4978156c6396fc3c25e49f1e1d72935289fac4849e8e09fe5bc94ec4736556c5",
+   "sha256": "6206af8594e33012d06e40aa9abd559d08c79baaecaef46806a0bde26f7efb7e",
    "sha256_3": "89607ff128c3c9b22b3861504faa89afc31d113931b87bcbcd5443a85a657029",
    "score": 0.9553,
    "minFrame": 0.9553,
@@ -126,12 +126,12 @@
     0.9553
    ]
   },
-  "assets/sprites/garden/garden_bed_shimla_1_1.png": {
+  "assets/sprites/garden/garden_bed_shimla_1_1.webp": {
    "hires": "assets/sprites/garden/garden_bed_shimla_1_1@3x.webp",
    "w": 103,
    "h": 44,
    "cells": 1,
-   "sha256": "6edcbd4d13a50ff94892019ca8620c3359a97b090b93517170b970db4f4e1df0",
+   "sha256": "dca0df74a360cbb69bce6c94e3df1af34ebf571c7587cbfc5aab3cd9d08c4912",
    "sha256_3": "fba2b863ca1f46326d7fb5ea37c7e0108734e4445c0f956204585813bfdb9c9c",
    "score": 0.9698,
    "minFrame": 0.9698,
@@ -139,12 +139,12 @@
     0.9698
    ]
   },
-  "assets/sprites/garden/garden_bed_shimla_2_1.png": {
+  "assets/sprites/garden/garden_bed_shimla_2_1.webp": {
    "hires": "assets/sprites/garden/garden_bed_shimla_2_1@3x.webp",
    "w": 156,
    "h": 63,
    "cells": 1,
-   "sha256": "3caa158941d09311834e0ec17dd89ab337966e9461c7a36634c5a78f0558e8a6",
+   "sha256": "0ec3351ddf4f2a2fec4640202682ad068a3adc2b091bc9bef0955ade01e80f23",
    "sha256_3": "9703ba6c232ab8e31dd994629b06ceabdc91b8ab4ceec2369a58d024f9429a10",
    "score": 0.9734,
    "minFrame": 0.9734,
@@ -152,12 +152,12 @@
     0.9734
    ]
   },
-  "assets/sprites/garden/garden_bed_shimla_3_1.png": {
+  "assets/sprites/garden/garden_bed_shimla_3_1.webp": {
    "hires": "assets/sprites/garden/garden_bed_shimla_3_1@3x.webp",
    "w": 192,
    "h": 81,
    "cells": 1,
-   "sha256": "8f376ad261d60917342eff6422467246ea6dd9502931c9ba8b6c81e7d7416584",
+   "sha256": "84da0efebc2162efee38163b20423c1cad3ddcd357472bac79bfb6569bb68f2a",
    "sha256_3": "aafc35b7b02a49fedbf395d9104af45bf45778bccb6024ac60ac1d2fb3cc2174",
    "score": 0.9751,
    "minFrame": 0.9751,
@@ -165,12 +165,12 @@
     0.9751
    ]
   },
-  "assets/sprites/garden/garden_bed_strip_1_1.png": {
+  "assets/sprites/garden/garden_bed_strip_1_1.webp": {
    "hires": "assets/sprites/garden/garden_bed_strip_1_1@3x.webp",
    "w": 94,
    "h": 31,
    "cells": 1,
-   "sha256": "633b52581056b7a48ad62fbbafe35d88b37eeac03d0aaeceb740a998df2f22b2",
+   "sha256": "c327bb8660745815301f85dcb1a6edf463939959e96194c88526b4f35be6fb7b",
    "sha256_3": "d80f2384d175ec45f4be01a6439224060cb2bef125f3235f7ea3f39e9c16579a",
    "score": 0.9824,
    "minFrame": 0.9824,
@@ -178,12 +178,12 @@
     0.9824
    ]
   },
-  "assets/sprites/garden/garden_bed_strip_2_1.png": {
+  "assets/sprites/garden/garden_bed_strip_2_1.webp": {
    "hires": "assets/sprites/garden/garden_bed_strip_2_1@3x.webp",
    "w": 147,
    "h": 50,
    "cells": 1,
-   "sha256": "e0a0f772a9e8e6b69da6e644c09244a804a6c7275f9e5b4ecadafdd4b4a7652d",
+   "sha256": "02e658f5d5e0d1fbbc88a4b54e1e9ad8977b03107e42d7e469623af80d582973",
    "sha256_3": "a9003eea2b5489fe40a3533d9c05a9e0df6b78a6871f9a85566f6e65928d7d6b",
    "score": 0.9832,
    "minFrame": 0.9832,
@@ -191,12 +191,12 @@
     0.9832
    ]
   },
-  "assets/sprites/garden/garden_bed_strip_3_1.png": {
+  "assets/sprites/garden/garden_bed_strip_3_1.webp": {
    "hires": "assets/sprites/garden/garden_bed_strip_3_1@3x.webp",
    "w": 183,
    "h": 68,
    "cells": 1,
-   "sha256": "2c9edb89d7c0eef882775c8b9f7546af1531a324459baaaaaa27cfcaaf0d2552",
+   "sha256": "bbfe82c4a493f2e2bd8298346a862f6d4c55690067d5b6a248a14bc84f7784f1",
    "sha256_3": "9a6c3028b42a9cce869c9c18b9f76473a5182260336e6fe495fe6cee1ca50def",
    "score": 0.9841,
    "minFrame": 0.9841,
@@ -204,12 +204,12 @@
     0.9841
    ]
   },
-  "assets/sprites/garden/garden_bed_strip_4_1.png": {
+  "assets/sprites/garden/garden_bed_strip_4_1.webp": {
    "hires": "assets/sprites/garden/garden_bed_strip_4_1@3x.webp",
    "w": 230,
    "h": 88,
    "cells": 1,
-   "sha256": "1dd3a7f30864b70659da0550c850d1e40335baea1955ad676db8e05de53a6651",
+   "sha256": "153d5eefae9b4b82287a1d8ad7fb7078a98c6ab20d3658bc78826e971033fd04",
    "sha256_3": "dbce1dde4e1ae14fb631b7558e8fba8b39f72d65fc539c2699978a3b64d9a7c6",
    "score": 0.9834,
    "minFrame": 0.9834,
@@ -217,12 +217,12 @@
     0.9834
    ]
   },
-  "assets/sprites/garden/garden_crops.png": {
+  "assets/sprites/garden/garden_crops.webp": {
    "hires": "assets/sprites/garden/garden_crops@3x.webp",
    "w": 499,
    "h": 271,
    "cells": 25,
-   "sha256": "ee0523805dc7ac93ffa3cacf90162b8d6b6c891ab43017b305a87aff86b341e5",
+   "sha256": "ed61218023faafb9f53396148705218eb2615f7eff513a003a12fb45213ad4d1",
    "sha256_3": "1ec1f8add9677f4dea702af0164c13fffd306aa478b05b4bf46e7832c63779bc",
    "score": 0.9401,
    "minFrame": 0.8921,
@@ -254,12 +254,12 @@
     0.9605
    ]
   },
-  "assets/sprites/garden/garden_plots.png": {
+  "assets/sprites/garden/garden_plots.webp": {
    "hires": "assets/sprites/garden/garden_plots@3x.webp",
    "w": 480,
    "h": 71,
    "cells": 12,
-   "sha256": "0762fa869c0f970768ecf41757bdd3197876812ae2c24a9d509a3280e931fc1e",
+   "sha256": "7232e307cf494581de9bf3ff8c8629611a5c8b530a0f0d8245eaa416cbe36927",
    "sha256_3": "0954fc54343a3ffd7ab68260c1b188362d707009ca1db32dff007db1f908e471",
    "score": 0.928,
    "minFrame": 0.8633,
@@ -281,7 +281,7 @@
  },
  "frames": {
   "apartment_2_2": {
-   "url": "assets/sprites/garden/garden_bed_apartment_2_2.png",
+   "url": "assets/sprites/garden/garden_bed_apartment_2_2.webp",
    "x": 0,
    "y": 0,
    "w": 231,
@@ -294,7 +294,7 @@
    "h0": 58.25
   },
   "polcrop_2_2": {
-   "url": "assets/sprites/garden/garden_bed_polcrop_2_2.png",
+   "url": "assets/sprites/garden/garden_bed_polcrop_2_2.webp",
    "x": 0,
    "y": 0,
    "w": 296,
@@ -307,7 +307,7 @@
    "h0": 74.5
   },
   "polcrop_2_4": {
-   "url": "assets/sprites/garden/garden_bed_polcrop_2_4.png",
+   "url": "assets/sprites/garden/garden_bed_polcrop_2_4.webp",
    "x": 0,
    "y": 0,
    "w": 458,
@@ -320,7 +320,7 @@
    "h0": 73.3
   },
   "polcrop_3_5": {
-   "url": "assets/sprites/garden/garden_bed_polcrop_3_5.png",
+   "url": "assets/sprites/garden/garden_bed_polcrop_3_5.webp",
    "x": 0,
    "y": 0,
    "w": 587,
@@ -333,7 +333,7 @@
    "h0": 92.85
   },
   "polgroddle_1_3": {
-   "url": "assets/sprites/garden/garden_bed_polgroddle_1_3.png",
+   "url": "assets/sprites/garden/garden_bed_polgroddle_1_3.webp",
    "x": 0,
    "y": 0,
    "w": 319,
@@ -346,7 +346,7 @@
    "h0": 55.15
   },
   "polgroddle_2_2": {
-   "url": "assets/sprites/garden/garden_bed_polgroddle_2_2.png",
+   "url": "assets/sprites/garden/garden_bed_polgroddle_2_2.webp",
    "x": 0,
    "y": 0,
    "w": 271,
@@ -359,7 +359,7 @@
    "h0": 69.85
   },
   "polherb_2_2": {
-   "url": "assets/sprites/garden/garden_bed_polherb_2_2.png",
+   "url": "assets/sprites/garden/garden_bed_polherb_2_2.webp",
    "x": 0,
    "y": 0,
    "w": 296,
@@ -372,7 +372,7 @@
    "h0": 78.95
   },
   "polherb_2_4": {
-   "url": "assets/sprites/garden/garden_bed_polherb_2_4.png",
+   "url": "assets/sprites/garden/garden_bed_polherb_2_4.webp",
    "x": 0,
    "y": 0,
    "w": 464,
@@ -385,7 +385,7 @@
    "h0": 80.95
   },
   "polherb_3_5": {
-   "url": "assets/sprites/garden/garden_bed_polherb_3_5.png",
+   "url": "assets/sprites/garden/garden_bed_polherb_3_5.webp",
    "x": 0,
    "y": 0,
    "w": 583,
@@ -398,7 +398,7 @@
    "h0": 97.55
   },
   "shimla_1_1": {
-   "url": "assets/sprites/garden/garden_bed_shimla_1_1.png",
+   "url": "assets/sprites/garden/garden_bed_shimla_1_1.webp",
    "x": 0,
    "y": 0,
    "w": 103,
@@ -411,7 +411,7 @@
    "h0": 42.7
   },
   "shimla_2_1": {
-   "url": "assets/sprites/garden/garden_bed_shimla_2_1.png",
+   "url": "assets/sprites/garden/garden_bed_shimla_2_1.webp",
    "x": 0,
    "y": 0,
    "w": 156,
@@ -424,7 +424,7 @@
    "h0": 62.15
   },
   "shimla_3_1": {
-   "url": "assets/sprites/garden/garden_bed_shimla_3_1.png",
+   "url": "assets/sprites/garden/garden_bed_shimla_3_1.webp",
    "x": 0,
    "y": 0,
    "w": 192,
@@ -437,7 +437,7 @@
    "h0": 80.25
   },
   "strip_1_1": {
-   "url": "assets/sprites/garden/garden_bed_strip_1_1.png",
+   "url": "assets/sprites/garden/garden_bed_strip_1_1.webp",
    "x": 0,
    "y": 0,
    "w": 94,
@@ -450,7 +450,7 @@
    "h0": 30
   },
   "strip_2_1": {
-   "url": "assets/sprites/garden/garden_bed_strip_2_1.png",
+   "url": "assets/sprites/garden/garden_bed_strip_2_1.webp",
    "x": 0,
    "y": 0,
    "w": 147,
@@ -463,7 +463,7 @@
    "h0": 49.1
   },
   "strip_3_1": {
-   "url": "assets/sprites/garden/garden_bed_strip_3_1.png",
+   "url": "assets/sprites/garden/garden_bed_strip_3_1.webp",
    "x": 0,
    "y": 0,
    "w": 183,
@@ -476,7 +476,7 @@
    "h0": 67.35
   },
   "strip_4_1": {
-   "url": "assets/sprites/garden/garden_bed_strip_4_1.png",
+   "url": "assets/sprites/garden/garden_bed_strip_4_1.webp",
    "x": 0,
    "y": 0,
    "w": 230,
@@ -489,7 +489,7 @@
    "h0": 87.8
   },
   "garden_broccoli": {
-   "url": "assets/sprites/garden/garden_crops.png",
+   "url": "assets/sprites/garden/garden_crops.webp",
    "x": 224,
    "y": 0,
    "w": 70,
@@ -502,7 +502,7 @@
    "h0": 74.35
   },
   "garden_cabbage": {
-   "url": "assets/sprites/garden/garden_crops.png",
+   "url": "assets/sprites/garden/garden_crops.webp",
    "x": 256,
    "y": 154,
    "w": 67,
@@ -515,7 +515,7 @@
    "h0": 64.15
   },
   "garden_carrot": {
-   "url": "assets/sprites/garden/garden_crops.png",
+   "url": "assets/sprites/garden/garden_crops.webp",
    "x": 0,
    "y": 154,
    "w": 53,
@@ -528,7 +528,7 @@
    "h0": 67.3
   },
   "garden_corn": {
-   "url": "assets/sprites/garden/garden_crops.png",
+   "url": "assets/sprites/garden/garden_crops.webp",
    "x": 434,
    "y": 0,
    "w": 56,
@@ -541,7 +541,7 @@
    "h0": 73.15
   },
   "garden_cucumber": {
-   "url": "assets/sprites/garden/garden_crops.png",
+   "url": "assets/sprites/garden/garden_crops.webp",
    "x": 295,
    "y": 0,
    "w": 66,
@@ -554,7 +554,7 @@
    "h0": 74.25
   },
   "garden_gandlevery": {
-   "url": "assets/sprites/garden/garden_crops.png",
+   "url": "assets/sprites/garden/garden_crops.webp",
    "x": 0,
    "y": 0,
    "w": 50,
@@ -567,7 +567,7 @@
    "h0": 77.95
   },
   "garden_grain": {
-   "url": "assets/sprites/garden/garden_crops.png",
+   "url": "assets/sprites/garden/garden_crops.webp",
    "x": 380,
    "y": 80,
    "w": 45,
@@ -580,7 +580,7 @@
    "h0": 67.7
   },
   "garden_green_leaf": {
-   "url": "assets/sprites/garden/garden_crops.png",
+   "url": "assets/sprites/garden/garden_crops.webp",
    "x": 181,
    "y": 80,
    "w": 69,
@@ -593,7 +593,7 @@
    "h0": 71.4
   },
   "garden_hairball_flower": {
-   "url": "assets/sprites/garden/garden_crops.png",
+   "url": "assets/sprites/garden/garden_crops.webp",
    "x": 251,
    "y": 80,
    "w": 63,
@@ -606,7 +606,7 @@
    "h0": 71
   },
   "garden_onion": {
-   "url": "assets/sprites/garden/garden_crops.png",
+   "url": "assets/sprites/garden/garden_crops.webp",
    "x": 0,
    "y": 80,
    "w": 57,
@@ -619,7 +619,7 @@
    "h0": 71.6
   },
   "garden_parsnip": {
-   "url": "assets/sprites/garden/garden_crops.png",
+   "url": "assets/sprites/garden/garden_crops.webp",
    "x": 439,
    "y": 154,
    "w": 60,
@@ -632,7 +632,7 @@
    "h0": 57.55
   },
   "garden_potato": {
-   "url": "assets/sprites/garden/garden_crops.png",
+   "url": "assets/sprites/garden/garden_crops.webp",
    "x": 324,
    "y": 154,
    "w": 47,
@@ -645,7 +645,7 @@
    "h0": 61.4
   },
   "garden_pumpkin": {
-   "url": "assets/sprites/garden/garden_crops.png",
+   "url": "assets/sprites/garden/garden_crops.webp",
    "x": 0,
    "y": 223,
    "w": 62,
@@ -658,7 +658,7 @@
    "h0": 48
   },
   "garden_purple_flower": {
-   "url": "assets/sprites/garden/garden_crops.png",
+   "url": "assets/sprites/garden/garden_crops.webp",
    "x": 58,
    "y": 80,
    "w": 63,
@@ -671,7 +671,7 @@
    "h0": 71.9
   },
   "garden_radish": {
-   "url": "assets/sprites/garden/garden_crops.png",
+   "url": "assets/sprites/garden/garden_crops.webp",
    "x": 372,
    "y": 154,
    "w": 66,
@@ -684,7 +684,7 @@
    "h0": 62.4
   },
   "garden_rice": {
-   "url": "assets/sprites/garden/garden_crops.png",
+   "url": "assets/sprites/garden/garden_crops.webp",
    "x": 362,
    "y": 0,
    "w": 71,
@@ -697,7 +697,7 @@
    "h0": 74.2
   },
   "garden_rookswort": {
-   "url": "assets/sprites/garden/garden_crops.png",
+   "url": "assets/sprites/garden/garden_crops.webp",
    "x": 426,
    "y": 80,
    "w": 62,
@@ -710,7 +710,7 @@
    "h0": 68.8
   },
   "garden_rubeweed": {
-   "url": "assets/sprites/garden/garden_crops.png",
+   "url": "assets/sprites/garden/garden_crops.webp",
    "x": 51,
    "y": 0,
    "w": 51,
@@ -723,7 +723,7 @@
    "h0": 78.95
   },
   "garden_silvertongue": {
-   "url": "assets/sprites/garden/garden_crops.png",
+   "url": "assets/sprites/garden/garden_crops.webp",
    "x": 117,
    "y": 154,
    "w": 77,
@@ -736,7 +736,7 @@
    "h0": 64.8
   },
   "garden_spinach": {
-   "url": "assets/sprites/garden/garden_crops.png",
+   "url": "assets/sprites/garden/garden_crops.webp",
    "x": 195,
    "y": 154,
    "w": 60,
@@ -749,7 +749,7 @@
    "h0": 65.65
   },
   "garden_strawberry": {
-   "url": "assets/sprites/garden/garden_crops.png",
+   "url": "assets/sprites/garden/garden_crops.webp",
    "x": 122,
    "y": 80,
    "w": 58,
@@ -762,7 +762,7 @@
    "h0": 71.85
   },
   "garden_tomato": {
-   "url": "assets/sprites/garden/garden_crops.png",
+   "url": "assets/sprites/garden/garden_crops.webp",
    "x": 315,
    "y": 80,
    "w": 64,
@@ -775,7 +775,7 @@
    "h0": 70.65
   },
   "garden_turnip": {
-   "url": "assets/sprites/garden/garden_crops.png",
+   "url": "assets/sprites/garden/garden_crops.webp",
    "x": 54,
    "y": 154,
    "w": 62,
@@ -788,7 +788,7 @@
    "h0": 66.8
   },
   "garden_yellow_crumb_flower": {
-   "url": "assets/sprites/garden/garden_crops.png",
+   "url": "assets/sprites/garden/garden_crops.webp",
    "x": 174,
    "y": 0,
    "w": 49,
@@ -801,7 +801,7 @@
    "h0": 77.1
   },
   "garden_zucchini": {
-   "url": "assets/sprites/garden/garden_crops.png",
+   "url": "assets/sprites/garden/garden_crops.webp",
    "x": 103,
    "y": 0,
    "w": 70,
@@ -814,7 +814,7 @@
    "h0": 78.2
   },
   "depleted": {
-   "url": "assets/sprites/garden/garden_plots.png",
+   "url": "assets/sprites/garden/garden_plots.webp",
    "x": 394,
    "y": 0,
    "w": 86,
@@ -827,7 +827,7 @@
    "h0": 27
   },
   "dry": {
-   "url": "assets/sprites/garden/garden_plots.png",
+   "url": "assets/sprites/garden/garden_plots.webp",
    "x": 0,
    "y": 48,
    "w": 81,
@@ -840,7 +840,7 @@
    "h0": 23
   },
   "harvested_dry": {
-   "url": "assets/sprites/garden/garden_plots.png",
+   "url": "assets/sprites/garden/garden_plots.webp",
    "x": 338,
    "y": 0,
    "w": 55,
@@ -853,7 +853,7 @@
    "h0": 27.05
   },
   "harvested_wet": {
-   "url": "assets/sprites/garden/garden_plots.png",
+   "url": "assets/sprites/garden/garden_plots.webp",
    "x": 241,
    "y": 0,
    "w": 55,
@@ -866,7 +866,7 @@
    "h0": 29.6
   },
   "herb_seedling_dry": {
-   "url": "assets/sprites/garden/garden_plots.png",
+   "url": "assets/sprites/garden/garden_plots.webp",
    "x": 202,
    "y": 0,
    "w": 38,
@@ -879,7 +879,7 @@
    "h0": 32.35
   },
   "herb_seedling_fertilized": {
-   "url": "assets/sprites/garden/garden_plots.png",
+   "url": "assets/sprites/garden/garden_plots.webp",
    "x": 0,
    "y": 0,
    "w": 59,
@@ -892,7 +892,7 @@
    "h0": 45.8
   },
   "herb_seedling_wet": {
-   "url": "assets/sprites/garden/garden_plots.png",
+   "url": "assets/sprites/garden/garden_plots.webp",
    "x": 60,
    "y": 0,
    "w": 35,
@@ -905,7 +905,7 @@
    "h0": 41.5
   },
   "seedling_dry": {
-   "url": "assets/sprites/garden/garden_plots.png",
+   "url": "assets/sprites/garden/garden_plots.webp",
    "x": 297,
    "y": 0,
    "w": 40,
@@ -918,7 +918,7 @@
    "h0": 28.6
   },
   "seedling_fertilized": {
-   "url": "assets/sprites/garden/garden_plots.png",
+   "url": "assets/sprites/garden/garden_plots.webp",
    "x": 96,
    "y": 0,
    "w": 58,
@@ -931,7 +931,7 @@
    "h0": 36.2
   },
   "seedling_wet": {
-   "url": "assets/sprites/garden/garden_plots.png",
+   "url": "assets/sprites/garden/garden_plots.webp",
    "x": 155,
    "y": 0,
    "w": 46,
@@ -944,7 +944,7 @@
    "h0": 33.6
   },
   "seeds": {
-   "url": "assets/sprites/garden/garden_plots.png",
+   "url": "assets/sprites/garden/garden_plots.webp",
    "x": 164,
    "y": 48,
    "w": 46,
@@ -957,7 +957,7 @@
    "h0": 16.75
   },
   "wet": {
-   "url": "assets/sprites/garden/garden_plots.png",
+   "url": "assets/sprites/garden/garden_plots.webp",
    "x": 82,
    "y": 48,
    "w": 81,

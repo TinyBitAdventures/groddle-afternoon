@@ -257,7 +257,7 @@ const GIANT_NAMES = {
   alph: 'Alph', cosma: 'Cosma', friendly: 'Friendly', grendaline: 'Grendaline', humbaba: 'Humbaba', lem: 'Lem',
   mab: 'Mab', pot: 'Pot', spriggan: 'Spriggan', ti: 'Tii', zille: 'Zille',
 };
-const giantIcon = (g) => `assets/sprites/giant-icons/icon_${g === 'ti' ? 'tii' : g}.png`;
+const giantIcon = (g) => `assets/sprites/giant-icons/icon_${g === 'ti' ? 'tii' : g}.webp`;
 
 /** A chip's 20 px picture without its 3x copy: thousands of pages, and the plain icon is already twice the size. */
 const lite = (pic) => (pic ? { ...pic, hi: null } : null);

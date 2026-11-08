@@ -10,8 +10,8 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { FIRST_DRAW_SPRITES, HIRES_SPRITES } from '../public/js/sprite-hires.js?v=f98be5eb';
-import { HELL_SPRITES } from '../public/js/hell.js?v=aca145ba';
+import { FIRST_DRAW_SPRITES, HIRES_SPRITES } from '../public/js/sprite-hires.js?v=abaf3d5a';
+import { HELL_SPRITES } from '../public/js/hell.js?v=ca971c34';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const pub = join(root, 'public');
@@ -21,18 +21,18 @@ const stills = JSON.parse(readFileSync(join(vs, 'stills.json'), 'utf8'));
 
 /** World art the game draws at scale 1 (or more) that was 1x before this sweep. */
 const SWEPT = [
-  'assets/sprites/races/race_ticket_dispenser.png',
-  'assets/sprites/animals/meat_collector.png',
-  'assets/sprites/animals/butterfly_milker.png',
-  'assets/sprites/animals/piggy_feeder.png',
-  'assets/sprites/animals/plop.png',
-  'assets/sprites/street-jobs/pile_of_currants.png',
-  'assets/sprites/cultivation/firefly_hive.png',
-  'assets/sprites/hell/wine_of_the_dead-world.png',
-  'assets/sprites/hell/drink_ticket-world.png',
-  'assets/sprites/races/pig_bait__x1_1_x1_2_x1_3_x1_4_png_1354830335.png',
-  'assets/sprites/puzzles/light_beam.png',
-  'assets/sprites/quests/rook-woods/rook-egg-states.png',
+  'assets/sprites/races/race_ticket_dispenser.webp',
+  'assets/sprites/animals/meat_collector.webp',
+  'assets/sprites/animals/butterfly_milker.webp',
+  'assets/sprites/animals/piggy_feeder.webp',
+  'assets/sprites/animals/plop.webp',
+  'assets/sprites/street-jobs/pile_of_currants.webp',
+  'assets/sprites/cultivation/firefly_hive.webp',
+  'assets/sprites/hell/wine_of_the_dead-world.webp',
+  'assets/sprites/hell/drink_ticket-world.webp',
+  'assets/sprites/races/pig_bait__x1_1_x1_2_x1_3_x1_4_png_1354830335.webp',
+  'assets/sprites/puzzles/light_beam.webp',
+  'assets/sprites/quests/rook-woods/rook-egg-states.webp',
 ];
 
 describe('sharp world stills at Original zoom', () => {
@@ -49,7 +49,7 @@ describe('sharp world stills at Original zoom', () => {
 
   it('the dispenser is the street sprite races-feature draws', () => {
     const src = readFileSync(join(pub, 'js/features/races-feature.js'), 'utf8');
-    assert.match(src, /textureFromUrl\(`\$\{RACE_ICON_DIR\}race_ticket_dispenser\.png`\)/);
+    assert.match(src, /textureFromUrl\(`\$\{RACE_ICON_DIR\}race_ticket_dispenser\.webp`\)/);
     assert.match(src, /const RACE_ICON_DIR = 'assets\/sprites\/races\/'/);
   });
 

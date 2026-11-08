@@ -391,7 +391,7 @@ const noteOpen = () => Boolean(noteMod?.noteViewOpen?.());
 async function openHint(engineLike, h) {
   const clue = clueFor(h);
   if (!clue || typeof document === 'undefined') return;
-  noteMod ||= await import('../note-view.js?v=a5e518d1');
+  noteMod ||= await import('../note-view.js?v=eca7de52');
   noteMod.openNoteView({ kicker: 'Secret Juju Hint', title: clue.title, body: clue.text, reason: TEXT.noteReason });
   engineLike.setData?.('jujuNote', clue.title);
 }
@@ -407,7 +407,7 @@ function grandmaState(ctx, name) {
 
 function spawnKid(ctx) {
   const color = hunt(ctx).color || 'red';
-  const view = npcView(ctx, (s) => `${ART}bandit_${color}_${s}.png`, KID_SHEETS, { ax: 148 / 240, ay: 185 / 254 });
+  const view = npcView(ctx, (s) => `${ART}bandit_${color}_${s}.webp`, KID_SHEETS, { ax: 148 / 240, ay: 185 / 254 });
   view.x = sx(SCENE.kidSpawnX);
   view.y = sy(FLOOR_Y);
   view.scale.x = -1; // dir = 'left'
@@ -701,7 +701,7 @@ export const room = {
   id: ROOM_ID,
   title: 'Juju Hideout',
   kicker: 'Secret Juju Bandit Hideout',
-  icon: 'assets/sprites/icons/juju_paperweight.png',
+  icon: 'assets/sprites/icons/juju_paperweight.webp',
   theme: 'warm',
   hubName: 'Secret Juju Bandit Hideout',
   durationMs: 0,
@@ -745,7 +745,7 @@ export const room = {
       ctx.data.collided = true;
       ctx.solve();
     }
-    const view = npcView(ctx, (s) => `${ART}grandma_${s}.png`, GRANDMA_SHEETS, { ax: 0.38, ay: 1 });
+    const view = npcView(ctx, (s) => `${ART}grandma_${s}.webp`, GRANDMA_SHEETS, { ax: 0.38, ay: 1 });
     view.x = sx(GRANDMA_X);
     view.y = sy(FLOOR_Y) + 4;
     ctx.add(view, 30);

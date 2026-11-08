@@ -13,7 +13,7 @@ import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { homedir } from 'node:os';
 
-import * as kit from '../public/js/quest-rooms/kit.js?v=d98b987e';
+import * as kit from '../public/js/quest-rooms/kit.js?v=25fc6d59';
 import {
   ALLEY,
   ALLEY_ART,
@@ -43,8 +43,8 @@ import {
   nearestStation,
   room,
   stationForDoor,
-} from '../public/js/quest-rooms/back-alley.js?v=d9c26a3f';
-import * as alleySet from '../public/js/quest-rooms/back-alley-set.js?v=3a8a00af';
+} from '../public/js/quest-rooms/back-alley.js?v=edf95276';
+import * as alleySet from '../public/js/quest-rooms/back-alley-set.js?v=d53ba17d';
 import { STATION_FLOOR, STATIONS, stationArrival, stationByTsid, surfaceStation } from '../public/js/subway.js?v=44d1a09f';
 import { BACK_ALLEY_FILES } from '../public/js/quest-rooms/back-alley-art.js?v=08af5d4f';
 import { QUEST_ROOMS } from '../public/js/quest-rooms/catalog.js?v=d77d3d17';
@@ -109,8 +109,8 @@ describe("We're Off to See the Lizard (fuelmaking_refuel_robot) source", () => {
 
   it('ships its art', () => {
     assert.ok(existsSync(join(root, 'public', room.icon)));
-    for (const f of ['bot_move.png', 'bot_attract.png']) assert.ok(existsSync(join(root, 'public/assets/sprites/quest-rooms/back_alley', f)), f);
-    for (const f of ['bot_talk.png']) assert.ok(existsSync(join(root, 'public/assets/sprites/quest-rooms/le_miserable', f)), f);
+    for (const f of ['bot_move.webp', 'bot_attract.webp']) assert.ok(existsSync(join(root, 'public/assets/sprites/quest-rooms/back_alley', f)), f);
+    for (const f of ['bot_talk.webp']) assert.ok(existsSync(join(root, 'public/assets/sprites/quest-rooms/le_miserable', f)), f);
     const set = readFileSync(join(root, 'public/js/quest-rooms/back-alley-set.js'), 'utf8');
     const decos = [...set.matchAll(/'((?:tree|bush|groddle|wallpaper|platform|forest)_[a-z0-9_]+)'/g)].map((m) => m[1]);
     assert.ok(decos.length >= 10, 'the set draws from the Groddle decos');

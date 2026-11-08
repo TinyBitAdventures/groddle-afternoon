@@ -12,11 +12,11 @@ export const WORD_PROGRESS_ART = Object.freeze({
   "w": 791,
   "h": 1106,
   "x1": {
-   "url": "assets/sprites/word-progress/words.png",
+   "url": "assets/sprites/word-progress/words.webp",
    "w": 791,
    "h": 1106,
-   "bytes": 212478,
-   "sha256": "5d74b24d600421f600ca1682949273198c86e6d90872d96ead460a8657e9ab26"
+   "bytes": 78878,
+   "sha256": "01217b576e3de09e4effac650837735da54de350650c652d64ee2b7cf5f5473a"
   },
   "x3": {
    "url": "assets/sprites/word-progress/words@3x.webp",
@@ -29,18 +29,18 @@ export const WORD_PROGRESS_ART = Object.freeze({
  "cancel": {
   "source": "tinyspeck/glitch-client TSEngineAssets/src/assets/graphics/word_dismisser_cancel(_hover).png (CC0)",
   "normal": {
-   "url": "assets/sprites/word-progress/cancel.png",
+   "url": "assets/sprites/word-progress/cancel.webp",
    "w": 20,
    "h": 21,
-   "bytes": 1300,
-   "sha256": "98d8bd93d36bbd9e52cb7d82906d7608bd603eb3335eebad8d30f4a0a1ec1668"
+   "bytes": 872,
+   "sha256": "4570a6422993fb547a1505bea7252697c21056b08886f4b53e2a9ca6e2264921"
   },
   "hover": {
-   "url": "assets/sprites/word-progress/cancel_hover.png",
+   "url": "assets/sprites/word-progress/cancel_hover.webp",
    "w": 20,
    "h": 21,
-   "bytes": 1337,
-   "sha256": "82a892704f6e4419f77f0a7599a1d830e0f55465c1435ef2cabb41f4ae6e0852"
+   "bytes": 944,
+   "sha256": "f20668f3f51660707bc3921525ac43ce0ca8c75443839c6698f1957bddaf82ae"
   }
  },
  "words": {

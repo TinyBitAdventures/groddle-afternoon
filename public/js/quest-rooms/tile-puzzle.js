@@ -32,7 +32,7 @@
  * the cheese icon; the lab itself never survived, so it is drawn as vectors.
  */
 
-import { BODY_H, JUMP_GAP, JUMP_RISE, spawnQuoins, takeQuoins } from './puzzle-kit.js?v=7410b322';
+import { BODY_H, JUMP_GAP, JUMP_RISE, spawnQuoins, takeQuoins } from './puzzle-kit.js?v=378c28e8';
 import { textureFromUrl } from '../textures.js?v=3149d699';
 
 const ART = 'assets/sprites/quest-rooms/tile_puzzle/';
@@ -524,7 +524,7 @@ export const room = {
   id: 'tile_puzzle',
   title: 'B.T.C Room #3',
   kicker: 'Solve the maze',
-  icon: 'assets/sprites/icons/cheese.png',
+  icon: 'assets/sprites/icons/cheese.webp',
   theme: 'lab',
   // G315: B.T.C Room #3's hub, 'Fireflex 3000 Lab' (inc_data_maps_prod.js 1253, 18097-18099).
   hubName: 'Fireflex 3000 Lab',
@@ -587,8 +587,8 @@ export const room = {
       ctx.data.glyphs[t.id] = glyph;
       drawGlyph(glyph, tileOpen(ctx.data.rots, t.id));
       const c = new PIXI.Container();
-      const out = new PIXI.Sprite(textureFromUrl(`${ART}wall_button_lockOut.png`));
-      const pressed = new PIXI.Sprite(textureFromUrl(`${ART}wall_button_lockIn.png`));
+      const out = new PIXI.Sprite(textureFromUrl(`${ART}wall_button_lockOut.webp`));
+      const pressed = new PIXI.Sprite(textureFromUrl(`${ART}wall_button_lockIn.webp`));
       for (const s of [out, pressed]) {
         s.anchor.set(0.5, 0.5);
         s.scale.set(1.2);

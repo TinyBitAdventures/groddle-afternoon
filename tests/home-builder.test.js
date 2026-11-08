@@ -36,8 +36,8 @@ import {
   placeFurniture,
   stackSurfaceAt,
   surfaceHeight,
-} from '../public/js/home-decor.js?v=6735c85f';
-import { FURNITURE_CATALOG } from '../public/js/homes-catalog.js?v=7aa9beb0';
+} from '../public/js/home-decor.js?v=f9b0e3dc';
+import { FURNITURE_CATALOG } from '../public/js/homes-catalog.js?v=10ac34b6';
 
 const root = join(import.meta.dirname, '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');
@@ -555,7 +555,7 @@ describe('two skins, one DOM', () => {
     // The old side sheet is gone.
     assert.doesNotMatch(style, /#game-root \.homes-bar \{\s*left: var\(--hud-inset\)/);
     // Classic uses the 2012 bag's own art for its paging arrows.
-    assert.match(classic, /assets\/classic\/furn_scroll\.png/);
+    assert.match(classic, /assets\/classic\/furn_scroll\.webp/);
   });
 
   it('keeps the tray tabs on one row, and an open bag clear of the tabs', () => {

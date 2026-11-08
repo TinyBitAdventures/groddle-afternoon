@@ -28,10 +28,11 @@
  * OpenGameArt sheets (box+frogRed, none+frogRed), copied as they are.
  *
  * Output:
- *   public/assets/sprites/mail-npc/dispatcher_left.png      the dispatcher sheet (1x)
- *   public/assets/sprites/mail-npc/frog_blue_box_<label>.png  copied OGA sheets
- *   public/assets/sprites/mail-npc/frog_blue_none_<label>.png built here
- *   public/assets/sprites/mail-npc/frog_red_<box|none>_<label>.png  copied OGA sheets
+ *   public/assets/sprites/mail-npc/dispatcher_left.webp      the dispatcher sheet (1x)
+ *   public/assets/sprites/mail-npc/frog_blue_box_<label>.webp  copied OGA sheets
+ *   public/assets/sprites/mail-npc/frog_blue_none_<label>.webp built here
+ *   public/assets/sprites/mail-npc/frog_red_<box|none>_<label>.webp  copied OGA sheets
+ * (every picture lossless WebP: tools/webp-lossless.mjs)
  *   public/js/mail-npc-art.js  (generated: cells, columns, label ranges, origins)
  *
  * Origins follow each item's getAssetInfo position (the client's placement
@@ -41,11 +42,12 @@
  * Usage: node tools/mail-npc-art/build.mjs [--work <dir>] [--check]
  */
 import { execFileSync } from 'node:child_process';
-import { copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import os from 'node:os';
 import { fileURLToPath } from 'node:url';
 import { FFDEC, JAVA, swfSprites } from '../vector-sprites/swf-labels.mjs';
+import { encodeLosslessWebp, replacePngWithWebp } from '../webp-lossless.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const AUDIT = join(os.homedir(), 'Documents/glitch-audit');
@@ -91,6 +93,13 @@ function rgba(png) {
 
 function writePng(img, out) {
   execFileSync('magick', ['-size', `${img.w}x${img.h}`, '-depth', '8', 'RGBA:-', `PNG32:${out}`], { input: img.data, maxBuffer: 1 << 30 });
+}
+
+/** The picture as lossless WebP at `out` (a .webp path), drawn through a PNG. */
+function writeWebp(img, out) {
+  const png = out.replace(/\.webp$/, '.tmp.png');
+  writePng(img, png);
+  replacePngWithWebp(png, out);
 }
 
 function blank(w, h) {
@@ -226,7 +235,7 @@ dFrames.forEach((f, i) => {
   const cy = Math.floor(i / DISPATCHER_COLS) * dCell.h;
   blit(dSheet, f, cx - union.x0 + 1, cy - union.y0 + 1, { x: cx, y: cy, w: dCell.w, h: dCell.h });
 });
-if (!CHECK) writePng(dSheet, join(OUT_DIR, 'dispatcher_left.png'));
+if (!CHECK) writeWebp(dSheet, join(OUT_DIR, 'dispatcher_left.webp'));
 
 // ---------------------------------------------------------------------- frog
 const redLabels = labelsOf(FROG_SWF, FROG_RED.id);
@@ -270,16 +279,16 @@ for (const label of FROG_LABELS) {
   const cols = Math.round(ref.w / FROG_CELL.w);
   frogSheets[label] = [cols, count];
   if (CHECK) continue;
-  copyFileSync(ogaSheet('box', 'frogBlue', label), join(OUT_DIR, `frog_blue_box_${label}.png`));
-  copyFileSync(ogaSheet('box', 'frogRed', label), join(OUT_DIR, `frog_red_box_${label}.png`));
-  copyFileSync(ogaSheet('none', 'frogRed', label), join(OUT_DIR, `frog_red_none_${label}.png`));
+  encodeLosslessWebp(ogaSheet('box', 'frogBlue', label), join(OUT_DIR, `frog_blue_box_${label}.webp`));
+  encodeLosslessWebp(ogaSheet('box', 'frogRed', label), join(OUT_DIR, `frog_red_box_${label}.webp`));
+  encodeLosslessWebp(ogaSheet('none', 'frogRed', label), join(OUT_DIR, `frog_red_none_${label}.webp`));
   const out = blank(ref.w, ref.h);
   for (let i = 0; i < count; i += 1) {
     const cx = (i % cols) * FROG_CELL.w;
     const cy = Math.floor(i / cols) * FROG_CELL.h;
     blit(out, rgba(blueFrame(start + i)), cx + best.dx, cy + best.dy, { x: cx, y: cy, w: FROG_CELL.w, h: FROG_CELL.h });
   }
-  writePng(out, join(OUT_DIR, `frog_blue_none_${label}.png`));
+  writeWebp(out, join(OUT_DIR, `frog_blue_none_${label}.webp`));
 }
 // The iconic frame's box (blue sprite frame 1) is the client's placement box.
 const iconic = drawn(rgba(blueFrame(blueLabels.iconic[0])));
@@ -299,7 +308,7 @@ const js = [
   ' */',
   'export const MAIL_NPC_ART_DIR = \'assets/sprites/mail-npc/\';',
   `export const DISPATCHER_ART = Object.freeze(${JSON.stringify({
-    file: 'dispatcher_left.png',
+    file: 'dispatcher_left.webp',
     cell: dCell,
     cols: DISPATCHER_COLS,
     origin: dOrigin,
@@ -321,7 +330,7 @@ const js = [
 
 if (CHECK) {
   const have = existsSync(OUT_JS) ? readFileSync(OUT_JS, 'utf8') : '';
-  const files = ['dispatcher_left.png', ...FROG_LABELS.flatMap((l) => [`frog_blue_box_${l}.png`, `frog_blue_none_${l}.png`, `frog_red_box_${l}.png`, `frog_red_none_${l}.png`])];
+  const files = ['dispatcher_left.webp', ...FROG_LABELS.flatMap((l) => [`frog_blue_box_${l}.webp`, `frog_blue_none_${l}.webp`, `frog_red_box_${l}.webp`, `frog_red_none_${l}.webp`])];
   const lost = files.filter((f) => !existsSync(join(OUT_DIR, f)));
   if (have !== js || lost.length) {
     console.error(`mail npc art is stale${lost.length ? ` (${lost.length} files missing)` : ''}: run node tools/mail-npc-art/build.mjs`);

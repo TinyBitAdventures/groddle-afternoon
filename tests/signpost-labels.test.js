@@ -11,7 +11,7 @@ import { describe, it } from 'node:test';
 import { existsSync, readFileSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { join } from 'node:path';
-import { SIGN_TEXT_FILL, SIGN_TEXT_FILL_UNBUILT, signLabel } from '../public/js/street-render.js?v=9eded3c1';
+import { SIGN_TEXT_FILL, SIGN_TEXT_FILL_UNBUILT, signLabel } from '../public/js/street-render.js?v=81416f4f';
 
 const root = join(import.meta.dirname, '..');
 const python = '/opt/homebrew/bin/python3.11';
@@ -64,7 +64,7 @@ mean = [round(sum(p[i] for p in px) / len(px)) for i in range(3)]
 light = max(px, key=lambda p: p[0] + p[1] + p[2])[:3]
 print(json.dumps([mean, list(light)]))
 `;
-    const [mean, light] = JSON.parse(execFileSync(python, ['-I', '-c', code, join(root, 'public/assets/ui/signpost/signpost_arm.png')], { encoding: 'utf8' }));
+    const [mean, light] = JSON.parse(execFileSync(python, ['-I', '-c', code, join(root, 'public/assets/ui/signpost/signpost_arm.webp')], { encoding: 'utf8' }));
     for (const fill of [SIGN_TEXT_FILL, SIGN_TEXT_FILL_UNBUILT]) {
       assert.ok(contrast(fill, mean) >= 4.5, `${fill.toString(16)} on the arm's mean ${mean}: ${contrast(fill, mean).toFixed(1)}:1`);
       assert.ok(contrast(fill, light) >= 4.5, `${fill.toString(16)} on the arm's lightest ${light}: ${contrast(fill, light).toFixed(1)}:1`);

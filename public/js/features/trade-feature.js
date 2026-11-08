@@ -40,8 +40,8 @@
  * endRequest, acceptRequest).
  */
 
-import { ITEM_CATALOG, addItem, countItem, itemIcon, listPackSlots, removeItem } from '../inventory.js?v=d82f3b00';
-import { TOOL_CONDITION_CATALOG, copyTagKind, copyTags, leavingToolWear, moveToolCopy, receiveToolCopies, receiveToolCopy, setCopyTag, setToolRemaining, toolCopies } from '../tools.js?v=f701b241';
+import { ITEM_CATALOG, addItem, countItem, itemIcon, listPackSlots, removeItem } from '../inventory.js?v=b7609342';
+import { TOOL_CONDITION_CATALOG, copyTagKind, copyTags, leavingToolWear, moveToolCopy, receiveToolCopies, receiveToolCopy, setCopyTag, setToolRemaining, toolCopies } from '../tools.js?v=d8aa3536';
 import { scriptFromTag, scriptLabel } from '../teleportation.js?v=5a5c8e6f';
 import { saveStore } from '../save-store.js?v=8839ba7b';
 import { playOverlay } from '../overlays.js?v=642adbd0';
@@ -69,7 +69,7 @@ import {
   tradeCommand,
   untradeableReason,
   goodsWithHeldTags,
-} from '../trade.js?v=beecc06c';
+} from '../trade.js?v=6eaf2844';
 
 export const TRADE_FEATURE_ID = 'trade';
 export const TRADE_VERB = 'trade_start';

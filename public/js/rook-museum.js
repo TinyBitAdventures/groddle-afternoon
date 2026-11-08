@@ -312,7 +312,7 @@ export const ROOK_MUSEUM_HALL = Object.freeze({
   greeterStart: Object.freeze(rookMuseumWorldPoint(ROOK_MUSEUM_SOURCE.greeterStart.x, ROOK_MUSEUM_SOURCE.greeterStart.y)),
   greeterEnd: Object.freeze(rookMuseumWorldPoint(ROOK_MUSEUM_SOURCE.greeterEnd.x, ROOK_MUSEUM_SOURCE.greeterEnd.y)),
   // npc_quest_widget variant widgetWood (rook_hall.js onEnterLocation): the Mezzanine Greeterbot's art.
-  greeterArt: 'assets/sprites/quests/rook-museum/greeterbot_widgetWood_idle@2x.png',
+  greeterArt: 'assets/sprites/quests/rook-museum/greeterbot_widgetWood_idle@2x.webp',
   door: Object.freeze({ x: 170, w: 196, h: 214 }),
   plaque: Object.freeze({ x: 170, text: 'Mezzanine' }),
   arrow: Object.freeze({ x: 620, y: 390, w: 140, h: 93, text: 'Exhibits' }),

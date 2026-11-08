@@ -40,15 +40,15 @@
  * window.groddlePlayerVerbs in multiplayer.
  */
 
-import { countItem, removeItem } from '../inventory.js?v=d82f3b00';
+import { countItem, removeItem } from '../inventory.js?v=b7609342';
 import { gainMetabolic, loseEnergy, loseMood } from '../metabolics.js?v=8504134e';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
-import { ensureQuestOfferState } from '../quest-offers.js?v=486b09c9';
-import { getMusicblock, isMusicblock } from '../musicblocks.js?v=f5adbf0c';
+import { ensureQuestOfferState } from '../quest-offers.js?v=e31115ea';
+import { getMusicblock, isMusicblock } from '../musicblocks.js?v=db6a213b';
 import { GAME_DAY_MS } from '../game-day.js?v=edb00566';
 import { playSheetOverlay } from '../overlay-art.js?v=11b6dd7f';
 import { showRainbow, rainbowSound } from '../overlays.js?v=642adbd0';
-import { copyFromLedger, spendCopyCharge } from '../copy-charges.js?v=f94ac7c8';
+import { copyFromLedger, spendCopyCharge } from '../copy-charges.js?v=737fd334';
 import {
   CHARADES_BUFF,
   CHARADES_POTION,
@@ -168,7 +168,7 @@ function createSession(engine, client) {
     const splank = overlay.anim === 'splank';
     fx.classList.toggle('is-splank', splank);
     img.src = '';
-    const src = splank ? 'assets/sprites/icons/plank@3x.png' : `assets/sprites/emotional-bear/${overlay.anim}.webp?play=${Date.now()}`;
+    const src = splank ? 'assets/sprites/icons/plank@3x.webp' : `assets/sprites/emotional-bear/${overlay.anim}.webp?play=${Date.now()}`;
     requestAnimationFrame(() => { img.src = src; });
     fx.querySelector('p').textContent = caption;
     fx.hidden = false;

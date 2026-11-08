@@ -49,9 +49,9 @@
  */
 
 import { playOverlay } from '../overlays.js?v=642adbd0';
-import { ITEM_CATALOG, countItem, ensureItem, itemIcon } from '../inventory.js?v=d82f3b00';
-import { canUseTool, useToolCondition } from '../tools.js?v=f701b241';
-import { acceptOffer, npcQuestOffers } from '../quest-offers.js?v=486b09c9';
+import { ITEM_CATALOG, countItem, ensureItem, itemIcon } from '../inventory.js?v=b7609342';
+import { canUseTool, useToolCondition } from '../tools.js?v=d8aa3536';
+import { acceptOffer, npcQuestOffers } from '../quest-offers.js?v=e31115ea';
 import { getQuestCatalog } from '../content-catalogs.js?v=10b118dd';
 import { XP_FOR_LEVEL } from '../progression.js?v=33462eaa';
 import {
@@ -114,7 +114,7 @@ import {
   workCheck,
 } from '../home-tower.js?v=087df38f';
 import { textureFromUrl } from '../textures.js?v=3149d699';
-import { denseSprite } from '../sprite-dense.js?v=178a711b';
+import { denseSprite } from '../sprite-dense.js?v=2a0ce07a';
 import { pieceUrl } from '../home-wallpaper.js?v=f1969400';
 import { wantsHiresDecos } from '../deco-hires.js?v=cb905e17';
 import { WOTD_TEXT } from '../wine-pour.js?v=6daa23a7';
@@ -423,7 +423,7 @@ function currentFloor() {
  * render (js/sprite-dense.js, tools/vector-sprites/dense-stills.json; js/textures.js reads
  * resolution 5 from the name, so the drawn size is unchanged).
  */
-export const BENCH_ART = 'assets/sprites/home-tower/tower_expander.png';
+export const BENCH_ART = 'assets/sprites/home-tower/tower_expander.webp';
 export const BENCH_SCALE = 1.25;
 function benchTexture(engine) {
   const dpr = engine?.app?.renderer?.resolution || globalThis.devicePixelRatio || 1;

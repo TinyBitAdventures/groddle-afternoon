@@ -31,10 +31,10 @@
  * groddle1.swf decos; their placement is read off the Snap.
  */
 
-import { createPlot, performPlotVerb, plotArtPath, plotVerbs, soilResponse } from '../patches.js?v=8af384ac';
+import { createPlot, performPlotVerb, plotArtPath, plotVerbs, soilResponse } from '../patches.js?v=aa83d5ad';
 import { getQuestCatalog } from '../content-catalogs.js?v=10b118dd';
 import { onLoaded, textureFromUrl } from '../textures.js?v=3149d699';
-import { ensureItem } from '../inventory.js?v=d82f3b00';
+import { ensureItem } from '../inventory.js?v=b7609342';
 
 export const PART_1 = 'smuggle_the_smuggler_part1';
 export const PART_2 = 'smuggle_the_smuggler_part2';
@@ -98,7 +98,7 @@ export const RARE_ITEMS = Object.freeze({
 
 /** The chick's art (OGA npc_cubimal_factorydefect_chick__x1_1) is not one of the 43 series figures in icons/. */
 export const RARE_ICONS = Object.freeze({
-  npc_cubimal_factorydefect_chick: 'assets/sprites/quest-rooms/penalty/npc_cubimal_factorydefect_chick.png',
+  npc_cubimal_factorydefect_chick: 'assets/sprites/quest-rooms/penalty/npc_cubimal_factorydefect_chick.webp',
 });
 
 export function ensureRareItems() {
@@ -299,7 +299,7 @@ export const room = {
   id: 'penalty',
   title: 'Smuggle the Smuggler',
   kicker: 'Wrongfully imprisoned',
-  icon: `${ART}vendor_icon.png`,
+  icon: `${ART}vendor_icon.webp`,
   theme: 'dark',
   // G315: hub 73 'Penalty' (inc_data_maps_prod.js 371, street 'The Penalty Box' 18014).
   hubName: 'Penalty',

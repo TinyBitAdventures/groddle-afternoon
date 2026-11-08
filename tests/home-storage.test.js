@@ -40,7 +40,7 @@ import {
   storageHasContents,
   storagePickupLock,
 } from '../public/js/home-storage.js?v=121f1897';
-import { createHomeDecorState, normalizeHomeDecorState, pickUpFurniture } from '../public/js/home-decor.js?v=6735c85f';
+import { createHomeDecorState, normalizeHomeDecorState, pickUpFurniture } from '../public/js/home-decor.js?v=f9b0e3dc';
 import { takeFromHouse } from '../public/js/ledger-house.js?v=b34f5c89';
 import { SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
 

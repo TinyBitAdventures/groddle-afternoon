@@ -20,9 +20,9 @@
  *     rubeLast, rubeAutoplay, rubeChance.
  */
 
-import { ITEM_CATALOG, ensureItem } from '../inventory.js?v=d82f3b00';
+import { ITEM_CATALOG, ensureItem } from '../inventory.js?v=b7609342';
 import { getGameDayKey } from '../game-day.js?v=edb00566';
-import { hellFeature } from './hell-feature.js?v=13196575';
+import { hellFeature } from './hell-feature.js?v=93f1c8dd';
 import { landingY, walkSurfaceY } from '../walk-surface.js?v=c982983e';
 import {
   RUBE_CLASS,
@@ -57,7 +57,7 @@ const CLIPS = {
   walk: { file: 'rube_walk.webp', cols: 8, frames: 15, fps: 30, loop: true },
   walk_end: { file: 'rube_walk_end.webp', cols: 7, frames: 14, fps: 30, loop: false },
   talk: { file: 'rube_talk.webp', cols: 7, frames: 20, fps: 24, loop: true },
-  offer_trade: { file: 'rube_offer_trade.png', cols: 34, frames: 340, fps: 30, loop: true },
+  offer_trade: { file: 'rube_offer_trade.webp', cols: 34, frames: 340, fps: 30, loop: true },
   offer_accept: { file: 'rube_offer_accept.webp', cols: 9, frames: 70, fps: 30, loop: false },
   offer_reject: { file: 'rube_offer_reject.webp', cols: 9, frames: 130, fps: 30, loop: false },
   fade_out: { file: 'rube_fade_out.webp', cols: 9, frames: 98, fps: 30, loop: false }, // OGA npc_rube fade_out: 98 cells (G276)
@@ -276,7 +276,7 @@ function closeModal() {
 }
 
 function iconFor(id) {
-  return ITEM_CATALOG[id]?.icon || `assets/sprites/icons/${id}.png`;
+  return ITEM_CATALOG[id]?.icon || `assets/sprites/icons/${id}.webp`;
 }
 
 function ensureModal() {
@@ -291,7 +291,7 @@ function ensureModal() {
   el.innerHTML = `
     <div class="quest-dialogue-shade"></div>
     <div class="quest-dialogue-card" style="background:linear-gradient(160deg,#fffdf4,#f3ead2);box-shadow:0 22px 70px rgba(0,0,0,.42),inset 0 0 0 1px #d9c48f">
-      <img src="assets/sprites/icons/npc_rube.png" alt="" style="height:76px;margin:-4px auto 2px;display:block" />
+      <img src="assets/sprites/icons/npc_rube.webp" alt="" style="height:76px;margin:-4px auto 2px;display:block" />
       <p class="mr-kicker">The Rube</p>
       <div data-rube-items style="display:flex;justify-content:center;align-items:center;gap:14px;margin:4px 0 8px"></div>
       <p data-rube-copy class="quest-dialogue-copy" style="min-height:3.2em"></p>

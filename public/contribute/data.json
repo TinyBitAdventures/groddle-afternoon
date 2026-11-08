@@ -33,7 +33,7 @@
   "giant": "pot",
   "name": "Pot",
   "description": "The big-hearted giant who dispenses prosperity and good fortune, provided sloth stays out of the way.",
-  "sheet": "/assets/sprites/shrines/pot_open.png",
+  "sheet": "/assets/sprites/shrines/pot_open.webp",
   "sheet3x": "/assets/sprites/shrines/pot_open@3x.webp"
  }
 }

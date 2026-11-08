@@ -40,7 +40,7 @@ import {
   recordPower,
   shouldPlaceFind,
 } from '../public/js/funpickle.js?v=1fb38c54';
-import { funpickleFeature, endComedian } from '../public/js/features/funpickle-feature.js?v=6817a676';
+import { funpickleFeature, endComedian } from '../public/js/features/funpickle-feature.js?v=2df16c9e';
 import { applyStreetIndex } from '../public/js/street-loader.js?v=33d2b8bc';
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -352,7 +352,7 @@ describe('G209 wiring', () => {
   it('the feature is registered and the art is in place', () => {
     const index = readFileSync(join(spike, 'public/js/features/index.js'), 'utf8');
     assert.match(index, /import \{ funpickleFeature \} from '\.\/funpickle-feature\.js\?v=[^']+'; FEATURES\.push\(funpickleFeature\);/);
-    for (const file of ['assets/sprites/icons/special_item_that_only_beta_testers_get.png', 'assets/sprites/icons/special_item_that_only_beta_testers_get@3x.png', 'assets/sprites/small-items/funpickle_1.png', 'assets/sprites/small-items/funpickle_bounce2.webp']) {
+    for (const file of ['assets/sprites/icons/special_item_that_only_beta_testers_get.webp', 'assets/sprites/icons/special_item_that_only_beta_testers_get@3x.webp', 'assets/sprites/small-items/funpickle_1.webp', 'assets/sprites/small-items/funpickle_bounce2.webp']) {
       assert.ok(existsSync(join(spike, 'public', file)), file);
     }
     const overlays = JSON.parse(readFileSync(join(spike, 'public/assets/sprites/overlays/overlays.json'), 'utf8'));

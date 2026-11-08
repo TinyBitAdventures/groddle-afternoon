@@ -170,8 +170,8 @@ describe('encyclopedia', () => {
 
   it('draws the Category, Sold by and section filters as the themed combobox over their selects', () => {
     const items = read('encyclopedia/items/index.html');
-    assert.match(items, /<select id="cat">[\s\S]*data-icon="\.\.\/\.\.\/assets\/sprites\/icons\/[a-z0-9_]+\.png"/);
-    if (BUILT_SECTIONS.includes('people')) assert.match(items, /<select id="sold">[\s\S]*<option value="produce" data-icon="\.\.\/\.\.\/assets\/sprites\/icons\/street_spirit\.png">Produce Vendor \(\d+\)<\/option>/);
+    assert.match(items, /<select id="cat">[\s\S]*data-icon="\.\.\/\.\.\/assets\/sprites\/icons\/[a-z0-9_]+\.webp"/);
+    if (BUILT_SECTIONS.includes('people')) assert.match(items, /<select id="sold">[\s\S]*<option value="produce" data-icon="\.\.\/\.\.\/assets\/sprites\/icons\/street_spirit\.webp">Produce Vendor \(\d+\)<\/option>/);
     const js = readFileSync(join(dir, 'items', 'catalog.js'), 'utf8');
     assert.match(js, /combobox\(cat\);\n\s*combobox\(sold\);/);
     const cbx = readFileSync(join(dir, 'items', 'combobox.js'), 'utf8');
@@ -194,7 +194,7 @@ describe('report 133: animals and creatures show their own art', () => {
     for (const id of NAMED) {
       const p = portrait(id);
       assert.ok(p, `${id} has a picture`);
-      assert.equal(p.src, `${STILLS_DIR}/${id}.png`, id);
+      assert.equal(p.src, `${STILLS_DIR}/${id}.webp`, id);
       assert.equal(p.caption, '', `${id} has no Cubimal caption`);
       assert.ok(CREATURE_STILLS[id], id);
     }
@@ -204,7 +204,7 @@ describe('report 133: animals and creatures show their own art', () => {
     const tool = readFileSync(resolve(import.meta.dirname, '../tools/encyclopedia/creature-stills.mjs'), 'utf8');
     assert.match(tool, /Tiny Speck's CC0 art/);
     for (const [id, row] of Object.entries(CREATURE_STILLS)) {
-      const file = resolve(import.meta.dirname, '../public', STILLS_DIR, `${id}.png`);
+      const file = resolve(import.meta.dirname, '../public', STILLS_DIR, `${id}.webp`);
       assert.ok(existsSync(file), id);
       assert.ok(row.sheet || row.swf, id);
       assert.ok(readFileSync(file).length < 40_000, `${id} stays small`);
@@ -222,7 +222,7 @@ describe('report 133: animals and creatures show their own art', () => {
       assert.doesNotMatch(e.icon.src, /npc_cubimal_/, `${e.id} is not its Cubimal`);
       assert.doesNotMatch(e.icon.caption || '', /Cubimal/, e.id);
     }
-    for (const id of ['npc_quest_widget', 'npc_quest_giver_widget']) assert.equal(portrait(id).src, `${STILLS_DIR}/npc_widget.png`, id);
+    for (const id of ['npc_quest_widget', 'npc_quest_giver_widget']) assert.equal(portrait(id).src, `${STILLS_DIR}/npc_widget.webp`, id);
   });
 
   it('no animal or creature page is left with an empty box or a stand-in Cubimal', { skip: skipWithoutInventory }, async () => {

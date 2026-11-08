@@ -5,11 +5,12 @@
  * as private Bug reports (minn.json "types": groddle_feedback).
  */
 import { describe, it } from 'node:test';
+import { pngBufferToWebp } from '../tools/webp-lossless.mjs';
 import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { BUG_TEXT, MAX_MESSAGE, benignError, bugReportFeature, buildKey, rememberError, reportContext } from '../public/js/features/bug-report-feature.js?v=d2e5bf08';
+import { BUG_TEXT, MAX_MESSAGE, benignError, bugReportFeature, buildKey, rememberError, reportContext } from '../public/js/features/bug-report-feature.js?v=7c913497';
 import { createMinnAccount } from '../public/js/minn-account.js?v=ba6a13c5';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -26,9 +27,9 @@ describe('Report a bug (G353)', () => {
     assert.equal(BUG_TEXT.tip, 'Feedback, ideas and bugs');
     assert.match(BUG_TEXT.label, /feedback.*suggestion.*bug/);
     assert.ok(bootError.includes(`<p>${BUG_TEXT.send}</p>`));
-    const icon = readFileSync(join(root, 'public/assets/ui/bug_icon.png'));
+    const icon = readFileSync(join(root, 'public/assets/ui/bug_icon.webp'));
     const original = readFileSync(join(root, '../glitch-client/TSEngineAssets/src/assets/graphics/bug_icon.png'));
-    assert.ok(icon.equals(original), 'the icon is the client\'s own bug_icon.png');
+    assert.ok(icon.equals(pngBufferToWebp(original)), 'the icon is the client\'s own bug_icon.png, as lossless WebP');
     for (const line of Object.values(BUG_TEXT)) assert.ok(!line.includes('—'), `no em dash: ${line}`);
   });
 

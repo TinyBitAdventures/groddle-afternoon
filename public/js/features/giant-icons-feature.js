@@ -34,10 +34,10 @@
  *     iconOfferCollisions (walk-ins that offered instead of bestowing).
  */
 
-import { addItem, countItem, ensureItem } from '../inventory.js?v=d82f3b00';
+import { addItem, countItem, ensureItem } from '../inventory.js?v=b7609342';
 import { getGameDayKey } from '../game-day.js?v=edb00566';
 import { XP_FOR_LEVEL } from '../progression.js?v=33462eaa';
-import { emblemCostFor } from '../shrines.js?v=95d74174';
+import { emblemCostFor } from '../shrines.js?v=1a945fe7';
 import { giantDisplayName } from '../giant-names.js?v=0e295891';
 import { landingY } from '../walk-surface.js?v=c982983e';
 import {
@@ -76,7 +76,7 @@ import { TELLERS } from '../conversations-data.js?v=f11b7e02';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
 
 export const ICONS_FEATURE_ID = 'giant-icons';
-const WORLD_ART = (iconClass) => `assets/sprites/giant-icons/${iconClass}.png`;
+const WORLD_ART = (iconClass) => `assets/sprites/giant-icons/${iconClass}.webp`;
 const COLLIDE_W = 150; // apiSetHitBox(300, 250) is centred on the icon
 const COLLIDE_H = 250;
 

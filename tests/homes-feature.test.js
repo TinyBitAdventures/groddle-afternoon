@@ -18,16 +18,16 @@ import {
   rockClassFor,
   rockItems,
   soilKeyMap,
-} from '../public/js/features/homes-feature.js?v=357f8787';
+} from '../public/js/features/homes-feature.js?v=5391026a';
 import { WALLPAPER_MAPS } from '../public/js/home-wallpaper-art.js?v=9f8473e6';
-import { HOME_TEXTURE_CONFIGS } from '../public/js/homes-catalog.js?v=7aa9beb0';
-import { canPlantBean } from '../public/js/patches.js?v=8af384ac';
+import { HOME_TEXTURE_CONFIGS } from '../public/js/homes-catalog.js?v=10ac34b6';
+import { canPlantBean } from '../public/js/patches.js?v=aa83d5ad';
 import { TOWER_PART_CHOICES, TOWER_STYLES, composeTower, towerBounds } from '../public/js/home-tower.js?v=087df38f';
 import { MIN_GROUND_CLEARANCE, cameraTargetY, cameraWorldHeightForGround, yCamOffsetAnchor } from '../public/js/movement.js?v=b30f84eb';
-import { INTERIOR } from '../public/js/home-decor.js?v=6735c85f';
+import { INTERIOR } from '../public/js/home-decor.js?v=f9b0e3dc';
 import { EXTERIOR_STYLES, INTERIOR_STYLES, streetLook, yardLook } from '../public/js/home-styles.js?v=1a7a2798';
-import { gardenLayout, gardenStyle } from '../public/js/garden-view.js?v=05651e76';
-import { listCultivationClasses } from '../public/js/home-cultivation.js?v=c650eed1';
+import { gardenLayout, gardenStyle } from '../public/js/garden-view.js?v=3683a26f';
+import { listCultivationClasses } from '../public/js/home-cultivation.js?v=42ae453c';
 
 const root = join(import.meta.dirname, '..', 'public');
 

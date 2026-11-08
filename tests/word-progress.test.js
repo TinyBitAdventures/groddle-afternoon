@@ -4,6 +4,7 @@
 // AbstractAnnouncementOverlay.as, Announcement.as; glitch-GameServerJS config_base.js 180-209,
 // players/inc_skill_packages.js 205-292 and each item's runSkillPackage call.
 import { describe, it } from 'node:test';
+import { pngBufferToWebp } from '../tools/webp-lossless.mjs';
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
@@ -22,8 +23,8 @@ import {
   wordTimeline,
   isDismissible,
   heldActionDelta,
-} from '../public/js/word-progress.js?v=bffa60ac';
-import { WORD_PROGRESS_ART } from '../public/js/word-progress-art.js?v=bd57f998';
+} from '../public/js/word-progress.js?v=98366023';
+import { WORD_PROGRESS_ART } from '../public/js/word-progress-art.js?v=0952e832';
 import { imageSize } from '../tools/word-progress/build.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -201,7 +202,7 @@ describe('the art', () => {
       assert.deepEqual(imageSize(buf), [row.w, row.h], row.url);
       assert.equal(buf.length, row.bytes, row.url);
     }
-    assert.match(atlas.x1.url, /word-progress\/words\.png$/);
+    assert.match(atlas.x1.url, /word-progress\/words\.webp$/);
     assert.match(atlas.x3.url, /word-progress\/words@3x\.webp$/);
     assert.deepEqual([atlas.x1.w, atlas.x1.h], [atlas.w, atlas.h]);
     assert.deepEqual([atlas.x3.w, atlas.x3.h], [atlas.w * 3, atlas.h * 3]);
@@ -221,10 +222,10 @@ describe('the art', () => {
     execFileSync(process.execPath, [join(root, 'tools/word-progress/build.mjs'), '--check'], { stdio: 'pipe' });
   });
 
-  it('copies the client\'s cancel PNGs as they are', { skip: skipClient }, () => {
+  it('ships the client\'s cancel PNGs as lossless WebP (the same pixels)', { skip: skipClient }, () => {
     const dir = join(CLIENT, 'TSEngineAssets/src/assets/graphics');
-    assert.deepEqual(readFileSync(join(pub, 'assets/sprites/word-progress/cancel.png')), readFileSync(join(dir, 'word_dismisser_cancel.png')));
-    assert.deepEqual(readFileSync(join(pub, 'assets/sprites/word-progress/cancel_hover.png')), readFileSync(join(dir, 'word_dismisser_cancel_hover.png')));
+    assert.deepEqual(readFileSync(join(pub, 'assets/sprites/word-progress/cancel.webp')), pngBufferToWebp(readFileSync(join(dir, 'word_dismisser_cancel.png'))));
+    assert.deepEqual(readFileSync(join(pub, 'assets/sprites/word-progress/cancel_hover.webp')), pngBufferToWebp(readFileSync(join(dir, 'word_dismisser_cancel_hover.png'))));
     // The street draws the SVG redraw of those PNGs, so the button stays sharp when the view scales.
     const css = readFileSync(join(pub, 'style.css'), 'utf8');
     assert.match(css, /\.word-progress-cancel \{[^}]*cancel\.svg/);

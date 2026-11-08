@@ -62,7 +62,7 @@ export const GIANTS = {
   alph: 'Alph', cosma: 'Cosma', friendly: 'Friendly', grendaline: 'Grendaline', humbaba: 'Humbaba', lem: 'Lem',
   mab: 'Mab', pot: 'Pot', spriggan: 'Spriggan', ti: 'Tii', zille: 'Zille',
 };
-export const giantIcon = (g) => `assets/sprites/giant-icons/icon_${g === 'ti' ? 'tii' : g}.png`;
+export const giantIcon = (g) => `assets/sprites/giant-icons/icon_${g === 'ti' ? 'tii' : g}.webp`;
 
 /* -- Pictures -------------------------------------------- */
 
@@ -94,25 +94,25 @@ export function picture(src, caption = '') {
   if (!sizeCache.has(src)) sizeCache.set(src, existsSync(abs) ? imageSize(abs) : null);
   const size = sizeCache.get(src);
   if (!size) return null;
-  const hiSrc = src.replace(/\.png$/, '@3x.png');
+  const hiSrc = src.replace(/\.(png|webp)$/, '@3x.$1');
   const hi = hiSrc !== src && existsSync(join(PUB, hiSrc)) ? hiSrc : null;
   return { src, w: size.w, h: size.h, hi, caption };
 }
-export const itemIcon = (id) => picture(`assets/sprites/icons/${id}.png`);
+export const itemIcon = (id) => picture(`assets/sprites/icons/${id}.webp`);
 
 /**
  * Creatures and people with no pack icon of their own: a still of Tiny Speck's from their own art
  * (report 133; creature-stills.mjs makes most of them). No one is shown as their Cubimal now.
  */
 const STILLS = {
-  npc_butterfly: 'assets/sprites/butterfly_rest_single.png',
-  npc_salmon: 'assets/sprites/icons/salmon.png',
+  npc_butterfly: 'assets/sprites/butterfly_rest_single.webp',
+  npc_salmon: 'assets/sprites/icons/salmon.webp',
   npc_cubimal_factorydefect_chick: 'assets/sprites/cubimals/npc_cubimal_factorydefect_chick_1.webp',
-  npc_newxp_dustbunny: `${STILLS_DIR}/npc_dustbunny.png`,
+  npc_newxp_dustbunny: `${STILLS_DIR}/npc_dustbunny.webp`,
   // Greeterbot Sentry G-42 is one Widget art (npc_widget.swf; the quest copies have no SWF).
-  npc_quest_widget: `${STILLS_DIR}/npc_widget.png`,
-  npc_quest_giver_widget: `${STILLS_DIR}/npc_widget.png`,
-  ...Object.fromEntries(Object.keys(CREATURE_STILLS).map((id) => [id, `${STILLS_DIR}/${id}.png`])),
+  npc_quest_widget: `${STILLS_DIR}/npc_widget.webp`,
+  npc_quest_giver_widget: `${STILLS_DIR}/npc_widget.webp`,
+  ...Object.fromEntries(Object.keys(CREATURE_STILLS).map((id) => [id, `${STILLS_DIR}/${id}.webp`])),
 };
 export function portrait(id) {
   const own = itemIcon(id);
@@ -209,7 +209,7 @@ export async function loadEncyclopedia({ inventory = readInventoryAll() } = {}) 
   for (const [id, r] of live('quest')) {
     const q = quests[id];
     if (!q) continue;
-    add('quests', id, { name: String(q.title).trim(), status: r.status, register: r.register, quest: q, icon: picture('assets/ui/quest-book.png'), group: questGroup(id, q) });
+    add('quests', id, { name: String(q.title).trim(), status: r.status, register: r.register, quest: q, icon: picture('assets/ui/quest-book.webp'), group: questGroup(id, q) });
   }
 
   /* Skills. */
@@ -225,7 +225,7 @@ export async function loadEncyclopedia({ inventory = readInventoryAll() } = {}) 
   for (const [id, r] of live('achievement')) {
     const a = achievements[id];
     if (!a) continue;
-    add('achievements', id, { name: a.name, status: r.status, register: r.register, ach: a, icon: picture(`assets/badges/${id}.png`), group: a.category ? a.category[0].toUpperCase() + a.category.slice(1) : 'Other' });
+    add('achievements', id, { name: a.name, status: r.status, register: r.register, ach: a, icon: picture(`assets/badges/${id}.webp`), group: a.category ? a.category[0].toUpperCase() + a.category.slice(1) : 'Other' });
   }
 
   /* Animals, Cubimals and people (inventory kind npc), plus the item-class people and the stores. */
@@ -478,7 +478,7 @@ export function hasWords(desc, name = '', id = '') {
 
 /** Quest relations that only name who offers a quest or takes it back (rule 5). */
 const NAMING_ONLY = new Set(['giver', 'return-to']);
-const QUEST_BOOK = 'assets/ui/quest-book.png';
+const QUEST_BOOK = 'assets/ui/quest-book.webp';
 const filled = (o) => Object.values(o || {}).some((v) => (v && typeof v === 'object' ? Object.keys(v).length : Boolean(v)));
 
 /** Every class id the remake's systems name (rule 6): recipes, stores, drop tables, harvests and conversions. */

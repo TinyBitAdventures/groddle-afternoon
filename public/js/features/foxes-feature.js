@@ -44,11 +44,11 @@
  */
 
 import { slugsFromEffects } from '../speech-slugs.js?v=130338f9';
-import { addItem, countItem, removeItem } from '../inventory.js?v=d82f3b00';
-import { getToolCondition } from '../tools.js?v=f701b241';
+import { addItem, countItem, removeItem } from '../inventory.js?v=b7609342';
+import { getToolCondition } from '../tools.js?v=d8aa3536';
 import { worldToScreen } from '../street-model.js?v=505d8990';
 import { OVERLAY_USES, playOverlay } from '../overlays.js?v=642adbd0';
-import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=d77b0b8b';
+import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=b764884b';
 import { nearestSurfaceY, walkSurfaceY } from '../walk-surface.js?v=c982983e';
 import { loadWildlifeCatalog, wildlifeCatalog, wildlifeFor } from '../wildlife.js?v=670c3a7f';
 import {
@@ -81,8 +81,8 @@ import {
   rangerGreeting,
   splitConversation,
   stepFox,
-} from '../foxes.js?v=d8065ef5';
-import { FOX_FLURRY_COUNTER, igniteBaitXs, normalizeBaits, normalizeFoxes, preserveOverCapacity, serverId } from '../foxes-mp.js?v=7f988b39';
+} from '../foxes.js?v=fd65f2b8';
+import { FOX_FLURRY_COUNTER, igniteBaitXs, normalizeBaits, normalizeFoxes, preserveOverCapacity, serverId } from '../foxes-mp.js?v=e7b2e938';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
 
 export const FOX_FEATURE_ID = 'foxes';
@@ -96,7 +96,7 @@ const REACH_Y = 220;
 const Z = Object.freeze({ ranger: itemZ(FOX_RANGER_ID, 3), bait: itemZ('fox_bait', 1), fox: itemZ(FOX_ID, 4) });
 
 const DIR = 'assets/sprites/foxes/';
-const sheet = (name, fw, fh, cols, frames, first = 0) => Object.freeze({ path: `${DIR}${name}.png`, fw, fh, cols, frames, first });
+const sheet = (name, fw, fh, cols, frames, first = 0) => Object.freeze({ path: `${DIR}${name}.webp`, fw, fh, cols, frames, first });
 
 /** Exact OGA cells (measured): Fox 153×139, Ranger 62×105, bait 41×144, brush 105×80. */
 export const FOX_SHEETS = Object.freeze({

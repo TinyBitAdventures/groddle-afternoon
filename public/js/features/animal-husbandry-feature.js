@@ -54,12 +54,12 @@
  */
 
 import { slugsFromEffects } from '../speech-slugs.js?v=130338f9';
-import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=d77b0b8b';
+import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=b764884b';
 import { nearestSurfaceY } from '../walk-surface.js?v=c982983e';
 import { displayTopOf, itemstackOverlayPoint, playSheetOverlay } from '../overlay-art.js?v=11b6dd7f';
 import { SET_FREE, applySetFree, canSetFree, setFreeGoneLine, setFreePrompt } from '../animal-set-free.js?v=3b194fca';
 import { getGameDayKey } from '../game-day.js?v=edb00566';
-import { animalAnchorX, createAnimalState, resetAnimalDay, animalStatusLabel, listAnimalFeedOptions } from '../animals.js?v=d5af4f3c';
+import { animalAnchorX, createAnimalState, resetAnimalDay, animalStatusLabel, listAnimalFeedOptions } from '../animals.js?v=0d9f9b0f';
 import {
   BABY_ANIMALS,
   BATTERFLY,
@@ -105,15 +105,15 @@ import {
   resetIncubation,
   stepHogtie,
   stickPlaceState,
-} from '../animal-husbandry.js?v=35b23ef4';
-import { batterflyBaseY, batterflyResponseFor, flightFloorFor } from '../street-creatures.js?v=746e64a0';
+} from '../animal-husbandry.js?v=7194f0f1';
+import { batterflyBaseY, batterflyResponseFor, flightFloorFor } from '../street-creatures.js?v=5fe850f9';
 import { loseEnergy, shiftMetabolic } from '../metabolics.js?v=8504134e';
 import { textureFromUrl } from '../textures.js?v=3149d699';
 import { PIGGY_DEATH_DROPS, PIGGY_DEATH_PUFF, SAD_BABY, forcedRoll, isSadIn } from '../animal-mood.js?v=a49495fc';
-import { animalCrowdChanged, animalCrowdSad, animalPlaceIsDepressing, crowdLimit, smokePuff as sharedSmokePuff } from './animal-mood-feature.js?v=0a63c072';
+import { animalCrowdChanged, animalCrowdSad, animalPlaceIsDepressing, crowdLimit, smokePuff as sharedSmokePuff } from './animal-mood-feature.js?v=15e39cb4';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
-import { followYardPath, freeYardSpot } from '../yard-wander.js?v=5343ee46';
+import { followYardPath, freeYardSpot } from '../yard-wander.js?v=69eef5e3';
 
 export const HUSBANDRY_FEATURE_ID = 'animal-husbandry';
 export const BATTERFLY_GROUP = 'batterfly';
@@ -128,14 +128,14 @@ export const BATTERFLY_SHEETS = Object.freeze({
   chew: Object.freeze({ path: `${DIR}npc_batterfly_chew.webp`, fw: 111, fh: 96, cols: 9, frames: 120 }),
 });
 const ART = Object.freeze({
-  plop: `${DIR}plop.png`,
-  guano: 'assets/sprites/icons/guano.png',
-  magic_pig_stick: `${DIR}magic_pig_stick_placed.png`,
-  magic_chicken_stick: `${DIR}magic_chicken_stick_placed.png`,
-  magic_butterfly_stick: `${DIR}magic_butterfly_stick_placed.png`,
-  meat_collector: `${DIR}meat_collector.png`,
-  butterfly_milker: `${DIR}butterfly_milker.png`,
-  piggy_feeder: `${DIR}piggy_feeder.png`,
+  plop: `${DIR}plop.webp`,
+  guano: 'assets/sprites/icons/guano.webp',
+  magic_pig_stick: `${DIR}magic_pig_stick_placed.webp`,
+  magic_chicken_stick: `${DIR}magic_chicken_stick_placed.webp`,
+  magic_butterfly_stick: `${DIR}magic_butterfly_stick_placed.webp`,
+  meat_collector: `${DIR}meat_collector.webp`,
+  butterfly_milker: `${DIR}butterfly_milker.webp`,
+  piggy_feeder: `${DIR}piggy_feeder.webp`,
 });
 
 // ---------------------------------------------------------------------------

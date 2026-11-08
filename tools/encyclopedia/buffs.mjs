@@ -177,7 +177,7 @@ function add({ add: addEntry, entries, items, itemIcon, picture }) {
     }
     const iconId = BUFF_ICONS[id] || raw.itemClass;
     const firstItem = list.flatMap((c) => c.keys || []).find((k) => k.startsWith('item:'))?.slice(5);
-    const icon = (iconId && itemIcon(iconId)) || (firstItem && itemIcon(firstItem)) || picture('assets/ui/quest-book.png');
+    const icon = (iconId && itemIcon(iconId)) || (firstItem && itemIcon(firstItem)) || picture('assets/ui/quest-book.webp');
     const e = addEntry('buffs', id, {
       name: tidy(raw.name), status, register: '', group: groupOf(id, raw), icon, desc: tidy(raw.desc),
       buff: { ...raw, causes: list, effect: effects.get(id) || null, tick: BUFF_TICK_MESSAGES[id] || '', end: BUFF_END_MESSAGES[id] || '', follows: FOLLOWS[id] || null },

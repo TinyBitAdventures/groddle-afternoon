@@ -11,8 +11,8 @@ import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { homedir } from 'node:os';
 
-import * as kit from '../public/js/quest-rooms/kit.js?v=d98b987e';
-import { JUMP_RISE, JUMP_GAP } from '../public/js/quest-rooms/puzzle-kit.js?v=7410b322';
+import * as kit from '../public/js/quest-rooms/kit.js?v=25fc6d59';
+import { JUMP_RISE, JUMP_GAP } from '../public/js/quest-rooms/puzzle-kit.js?v=378c28e8';
 import {
   DAIS,
   DRINK_TEXT,
@@ -32,7 +32,7 @@ import {
   napPlatforms,
   room,
   watching,
-} from '../public/js/quest-rooms/being-watched.js?v=94119dc6';
+} from '../public/js/quest-rooms/being-watched.js?v=c6bb98c6';
 import { QUEST_ROOMS } from '../public/js/quest-rooms/catalog.js?v=d77d3d17';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');

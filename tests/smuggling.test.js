@@ -104,7 +104,7 @@ describe('smuggling source constants', () => {
     }
     const ann = src('players/inc_announcements.js');
     if (ann) for (const line of EXPLAIN_RESTRICTIONS) assert.ok(ann.includes(line.replace(/'/g, "\\'")), line);
-    assert.ok(existsSync(join(root, 'public/assets/sprites/icons/contraband.png')));
+    assert.ok(existsSync(join(root, 'public/assets/sprites/icons/contraband.webp')));
   });
 
   it('keeps every conversation line and choice from npc_smuggler.js', () => {

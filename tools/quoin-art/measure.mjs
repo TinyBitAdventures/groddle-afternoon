@@ -24,7 +24,7 @@ import { join } from 'node:path';
 import { HERE, FW, FH, COLS, TYPES, propellerDefs, propellerUse } from './compose.mjs';
 import { readImage, crop, renderSvg, score } from './pixels.mjs';
 
-export const SHEET = 'public/assets/sprites/quoin__x1_1_x1_2_x1_3_x1_4_x1_5_x1_6_x1_7_x1_8_png_1354829599.png';
+export const SHEET = 'public/assets/sprites/quoin__x1_1_x1_2_x1_3_x1_4_x1_5_x1_6_x1_7_x1_8_png_1354829599.webp';
 const ROOT = join(HERE, '../..');
 const OUT = join(HERE, 'frames.json');
 

@@ -41,17 +41,17 @@
  * open one), hstLast.
  */
 
-import { ITEM_CATALOG, addItem, countItem, ensureItem, itemIcon, removeItem } from '../inventory.js?v=d82f3b00';
-import { displayRefusal, furnitureDef, furnitureSize, isFurniture } from '../home-decor.js?v=6735c85f';
+import { ITEM_CATALOG, addItem, countItem, ensureItem, itemIcon, removeItem } from '../inventory.js?v=b7609342';
+import { displayRefusal, furnitureDef, furnitureSize, isFurniture } from '../home-decor.js?v=f9b0e3dc';
 import { pieceLabel } from '../furniture-upgrades.js?v=a3788c0d';
 import { textureFromUrl } from '../textures.js?v=3149d699';
 import { stackMaxOf, isBagClass } from '../pack-slots.js?v=a94b816c';
 import { ELEMENT_CLASSES, NO_BAG_CLASSES, NO_SLOT_CLASSES } from '../pack-slots-data.js?v=800f664c';
-import { TOOL_CONDITION_CATALOG, copyTagKind, copyTags, receiveToolCopy, setCopyTag, takeToolCopy } from '../tools.js?v=f701b241';
+import { TOOL_CONDITION_CATALOG, copyTagKind, copyTags, receiveToolCopy, setCopyTag, takeToolCopy } from '../tools.js?v=d8aa3536';
 import { scriptFromTag, scriptLabel } from '../teleportation.js?v=5a5c8e6f';
-import { readVisitScene } from '../neighbours-mp.js?v=40f4c953';
+import { readVisitScene } from '../neighbours-mp.js?v=cfabb4f7';
 import { saveStore } from '../save-store.js?v=8839ba7b';
-import { homesFeature } from './homes-feature.js?v=357f8787';
+import { homesFeature } from './homes-feature.js?v=5391026a';
 import {
   SDB_PRICE_MAX,
   STORAGE_TEXT as T,
@@ -91,7 +91,7 @@ import {
 
 export const HOME_STORAGE_ID = 'home-storage';
 export const CLASS_STORAGE = 'home_storage';
-const PILE_ART = 'assets/sprites/street-jobs/pile_of_currants.png';
+const PILE_ART = 'assets/sprites/street-jobs/pile_of_currants.webp';
 const BIG_SPENDERS = [[1009, 'big_spender'], [2003, 'el_big_spenderino'], [5003, 'moneybags_magoo']];
 const PENDING_KEEP = 24;
 const RESEND_AFTER_MS = 4000;

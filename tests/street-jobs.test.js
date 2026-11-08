@@ -40,11 +40,11 @@ import {
   TROPHY_PIECES,
   planStreetTrophies,
 } from '../public/js/street-jobs.js?v=02a81cb3';
-import { streetJobsFeature } from '../public/js/features/street-jobs-feature.js?v=ef527fbb';
+import { streetJobsFeature } from '../public/js/features/street-jobs-feature.js?v=25e52041';
 import { createAchievementState, applyAchievementProgress } from '../public/js/achievements.js?v=f8ccfd34';
 import { applyRewards } from '../public/js/quests.js?v=c8d9d0a4';
 import { loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js?v=10b118dd';
-import { addItem, countItem } from '../public/js/inventory.js?v=d82f3b00';
+import { addItem, countItem } from '../public/js/inventory.js?v=b7609342';
 import { obtainableItems } from '../tools/job-obtainable.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..', 'public');
@@ -127,10 +127,10 @@ describe('street jobs catalog', () => {
       for (const suffix of ['', '_piece1', '_piece2', '_piece3', '_piece4', '_piece5']) {
         const id = `trophy_street_creator_${family}${suffix}`;
         assert.ok(catalog.items[id]?.label, id);
-        assert.ok(existsSync(join(root, `assets/sprites/icons/${id}.png`)), `${id} icon`);
+        assert.ok(existsSync(join(root, `assets/sprites/icons/${id}.webp`)), `${id} icon`);
       }
     }
-    assert.ok(existsSync(join(root, 'assets/sprites/street-jobs/sign_stake.png')));
+    assert.ok(existsSync(join(root, 'assets/sprites/street-jobs/sign_stake.webp')));
   });
 
   it('offers the next upgrade level only, with the source tree options', () => {

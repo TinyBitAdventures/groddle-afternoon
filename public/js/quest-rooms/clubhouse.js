@@ -56,7 +56,7 @@
  */
 
 import { textureFromUrl } from '../textures.js?v=3149d699';
-import { butlerApi } from '../features/butler-feature.js?v=4e988a25';
+import { butlerApi } from '../features/butler-feature.js?v=54762b93';
 
 // source: questInstanceLocation(..., 5*60) -> instances_schedule_exit_prompt (a prompt, not a clock).
 export const EXIT_PROMPT_MS = 5 * 60 * 1000;
@@ -845,7 +845,7 @@ function enterClub(ctx) {
   ctx.data.door = ctx.add(door, 3);
   setDoor(ctx, Boolean(ctx.data.solved));
   // The Curious Painting over the fireplace.
-  const pic = new ctx.PIXI.Sprite(textureFromUrl(`${ART}club_house_picture.png`));
+  const pic = new ctx.PIXI.Sprite(textureFromUrl(`${ART}club_house_picture.webp`));
   pic.anchor.set(0.5, 1);
   pic.scale.set(0.62);
   pic.x = CLUBHOUSE.fireplaceX;
@@ -865,8 +865,8 @@ function makeButton(ctx, b, y) {
   const plate = new PIXI.Graphics();
   plate.circle(0, 0, 17).fill({ color: 0x3a2716, alpha: 0.5 });
   c.addChild(plate);
-  const out = new PIXI.Sprite(textureFromUrl(`${ART}wall_button_lockOut.png`));
-  const inn = new PIXI.Sprite(textureFromUrl(`${ART}wall_button_lockIn.png`));
+  const out = new PIXI.Sprite(textureFromUrl(`${ART}wall_button_lockOut.webp`));
+  const inn = new PIXI.Sprite(textureFromUrl(`${ART}wall_button_lockIn.webp`));
   for (const s of [out, inn]) {
     s.anchor.set(0.5);
     s.scale.set(0.82);
@@ -1051,7 +1051,7 @@ export const room = {
   id: 'clubhouse',
   title: 'Join the Club',
   kicker: 'The Society of Keen-Eyed Noticers',
-  icon: `${ART}club_house_picture.png`,
+  icon: `${ART}club_house_picture.webp`,
   theme: 'dark',
   hubName: 'Join the Club',
   // The 5 * 60 exit delay is a prompt, not a clock (maybePromptStuck).

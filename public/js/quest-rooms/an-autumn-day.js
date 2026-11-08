@@ -691,13 +691,13 @@ function drawFeelingRoom(ctx, feeling) {
  * rook_fly_forward.swf sprite 17 (rookFlyForward_1) in red.
  */
 function crowSprite(ctx, opts = {}) {
-  const spr = ctx.kit.animated(ctx.PIXI, `${ART}crow.png`, 6, 3, { count: 18, speed: 0.32, ay: 0.55, ...opts });
+  const spr = ctx.kit.animated(ctx.PIXI, `${ART}crow.webp`, 6, 3, { count: 18, speed: 0.32, ay: 0.55, ...opts });
   spr.scale.set(0.42);
   return spr;
 }
 
 function redBirdSprite(ctx) {
-  const spr = ctx.kit.animated(ctx.PIXI, `${ART}bird_red.png`, 6, 6, { count: 36, speed: 0.22, ay: 0.5 });
+  const spr = ctx.kit.animated(ctx.PIXI, `${ART}bird_red.webp`, 6, 6, { count: 36, speed: 0.22, ay: 0.5 });
   spr.scale.set(0.5);
   return spr;
 }
@@ -999,7 +999,7 @@ export const room = {
   /** Keeps its own sunset light, like A Summer's Day: the world-only Dametime tint stays off (G99). */
   ownLight: true,
   kicker: 'A shared memory',
-  icon: `${ART}bird_icon.png`,
+  icon: `${ART}bird_icon.webp`,
   theme: 'warm',
   hubName: HUB_NAME,
   durationMs: 0,

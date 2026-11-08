@@ -7,7 +7,7 @@
    "trophy": {
     "name": "Musicblock DG Collector",
     "desc": "Collected all 5 DG musicblocks",
-    "badge": "/assets/badges/collection_musicblocks_dg.png",
+    "badge": "/assets/badges/collection_musicblocks_dg.webp",
     "imagination": 500,
     "mood": 200,
     "energy": 200,
@@ -19,8 +19,8 @@
      "label": "Musicblock DG-1",
      "desc": "Hoe Magazine gave this musicblock 6.8 out of a possible 7 pointlets.",
      "audio": "/assets/audio/sfx/MUSICBLOCK_D_GREEN_01.mp3",
-     "icon": "/assets/sprites/icons/musicblock_d_green_01.png",
-     "icon3x": "/assets/sprites/icons/musicblock_d_green_01@3x.png",
+     "icon": "/assets/sprites/icons/musicblock_d_green_01.webp",
+     "icon3x": "/assets/sprites/icons/musicblock_d_green_01@3x.webp",
      "cost": 400,
      "firstPlay": 50
     },
@@ -29,8 +29,8 @@
      "label": "Musicblock DG-2",
      "desc": "Dig those crazy pincer-snapping beats.",
      "audio": "/assets/audio/ambient/Musicblock-DG-2_1291896713.mp3",
-     "icon": "/assets/sprites/icons/musicblock_d_green_02.png",
-     "icon3x": "/assets/sprites/icons/musicblock_d_green_02@3x.png",
+     "icon": "/assets/sprites/icons/musicblock_d_green_02.webp",
+     "icon3x": "/assets/sprites/icons/musicblock_d_green_02@3x.webp",
      "cost": 400,
      "firstPlay": 50
     },
@@ -39,8 +39,8 @@
      "label": "Musicblock DG-3",
      "desc": "Some would ban this musicblock. Might not be a bad idea.",
      "audio": "/assets/audio/ambient/Musicblock-DG-3_1291896740.mp3",
-     "icon": "/assets/sprites/icons/musicblock_d_green_03.png",
-     "icon3x": "/assets/sprites/icons/musicblock_d_green_03@3x.png",
+     "icon": "/assets/sprites/icons/musicblock_d_green_03.webp",
+     "icon3x": "/assets/sprites/icons/musicblock_d_green_03@3x.webp",
      "cost": 500,
      "firstPlay": 50
     },
@@ -49,8 +49,8 @@
      "label": "Musicblock DG-4",
      "desc": "This one is like that song from that guy who did that other musicblock.",
      "audio": "/assets/audio/sfx/MUSICBLOCK_D_GREEN_04.mp3",
-     "icon": "/assets/sprites/icons/musicblock_d_green_04.png",
-     "icon3x": "/assets/sprites/icons/musicblock_d_green_04@3x.png",
+     "icon": "/assets/sprites/icons/musicblock_d_green_04.webp",
+     "icon3x": "/assets/sprites/icons/musicblock_d_green_04@3x.webp",
      "cost": 600,
      "firstPlay": 50
     },
@@ -59,8 +59,8 @@
      "label": "Musicblock DG-5",
      "desc": "Rock out with your block out. This is the musicblock anthem that's taking Groddle Forest by storm.",
      "audio": "/assets/audio/sfx/MUSICBLOCK_D_GREEN_05.mp3",
-     "icon": "/assets/sprites/icons/musicblock_d_green_05.png",
-     "icon3x": "/assets/sprites/icons/musicblock_d_green_05@3x.png",
+     "icon": "/assets/sprites/icons/musicblock_d_green_05.webp",
+     "icon3x": "/assets/sprites/icons/musicblock_d_green_05@3x.webp",
      "cost": 700,
      "firstPlay": 50
     }
@@ -73,7 +73,7 @@
    "trophy": {
     "name": "Musicblock DR Collector",
     "desc": "Collected all 5 DR musicblocks",
-    "badge": "/assets/badges/collection_musicblocks_dr.png",
+    "badge": "/assets/badges/collection_musicblocks_dr.webp",
     "imagination": 800,
     "mood": 250,
     "energy": 250,
@@ -85,8 +85,8 @@
      "label": "Musicblock DR-1",
      "desc": "Music to drink a Cloud 11 Smoothie by.",
      "audio": "/assets/audio/ambient/Musicblock-DR-1_1291896467.mp3",
-     "icon": "/assets/sprites/icons/musicblock_d_red_01.png",
-     "icon3x": "/assets/sprites/icons/musicblock_d_red_01@3x.png",
+     "icon": "/assets/sprites/icons/musicblock_d_red_01.webp",
+     "icon3x": "/assets/sprites/icons/musicblock_d_red_01@3x.webp",
      "cost": 400,
      "firstPlay": 50
     },
@@ -95,8 +95,8 @@
      "label": "Musicblock DR-2",
      "desc": "The bestselling theme song from 'A Pig Petter's Diary'.",
      "audio": "/assets/audio/sfx/MUSICBLOCK_D_RED_02.mp3",
-     "icon": "/assets/sprites/icons/musicblock_d_red_02.png",
-     "icon3x": "/assets/sprites/icons/musicblock_d_red_02@3x.png",
+     "icon": "/assets/sprites/icons/musicblock_d_red_02.webp",
+     "icon3x": "/assets/sprites/icons/musicblock_d_red_02@3x.webp",
      "cost": 400,
      "firstPlay": 50
     },
@@ -105,8 +105,8 @@
      "label": "Musicblock DR-3",
      "desc": "Underpants have been known to become airborne at the sound of this musicblock. Watch your back.",
      "audio": "/assets/audio/sfx/MUSICBLOCK_D_RED_03.mp3",
-     "icon": "/assets/sprites/icons/musicblock_d_red_03.png",
-     "icon3x": "/assets/sprites/icons/musicblock_d_red_03@3x.png",
+     "icon": "/assets/sprites/icons/musicblock_d_red_03.webp",
+     "icon3x": "/assets/sprites/icons/musicblock_d_red_03@3x.webp",
      "cost": 500,
      "firstPlay": 50
     },
@@ -115,8 +115,8 @@
      "label": "Musicblock DR-4",
      "desc": "The best ear-wormy racket-pop currants can buy.",
      "audio": "/assets/audio/sfx/MUSICBLOCK_D_RED_04.mp3",
-     "icon": "/assets/sprites/icons/musicblock_d_red_04.png",
-     "icon3x": "/assets/sprites/icons/musicblock_d_red_04@3x.png",
+     "icon": "/assets/sprites/icons/musicblock_d_red_04.webp",
+     "icon3x": "/assets/sprites/icons/musicblock_d_red_04@3x.webp",
      "cost": 600,
      "firstPlay": 50
     },
@@ -125,8 +125,8 @@
      "label": "Musicblock DR-5",
      "desc": "This friendly little tune reaches into your brain and scratches your hypothalamus. Tickly.",
      "audio": "/assets/audio/ambient/Musicblock-DR-5_1291896506.mp3",
-     "icon": "/assets/sprites/icons/musicblock_d_red_05.png",
-     "icon3x": "/assets/sprites/icons/musicblock_d_red_05@3x.png",
+     "icon": "/assets/sprites/icons/musicblock_d_red_05.webp",
+     "icon3x": "/assets/sprites/icons/musicblock_d_red_05@3x.webp",
      "cost": 700,
      "firstPlay": 50
     }
@@ -139,7 +139,7 @@
    "trophy": {
     "name": "Musicblock DB Collector",
     "desc": "Collected all 5 DB musicblocks",
-    "badge": "/assets/badges/collection_musicblocks_db.png",
+    "badge": "/assets/badges/collection_musicblocks_db.webp",
     "imagination": 500,
     "mood": 200,
     "energy": 200,
@@ -151,8 +151,8 @@
      "label": "Musicblock DB-1",
      "desc": "Knees, prepare to be slapped. This musicblock takes no prisoners with its twangy goodness.",
      "audio": "/assets/audio/sfx/MUSICBLOCK_D_BLUE_01.mp3",
-     "icon": "/assets/sprites/icons/musicblock_d_blue_01.png",
-     "icon3x": "/assets/sprites/icons/musicblock_d_blue_01@3x.png",
+     "icon": "/assets/sprites/icons/musicblock_d_blue_01.webp",
+     "icon3x": "/assets/sprites/icons/musicblock_d_blue_01@3x.webp",
      "cost": 400,
      "firstPlay": 50
     },
@@ -161,8 +161,8 @@
      "label": "Musicblock DB-2",
      "desc": "Like the songs that giants hum to themselves when they're feeling blue. Unless they ARE blue, in which case they don't sing this way at all.",
      "audio": "/assets/audio/sfx/MUSICBLOCK_D_BLUE_02.mp3",
-     "icon": "/assets/sprites/icons/musicblock_d_blue_02.png",
-     "icon3x": "/assets/sprites/icons/musicblock_d_blue_02@3x.png",
+     "icon": "/assets/sprites/icons/musicblock_d_blue_02.webp",
+     "icon3x": "/assets/sprites/icons/musicblock_d_blue_02@3x.webp",
      "cost": 400,
      "firstPlay": 50
     },
@@ -171,8 +171,8 @@
      "label": "Musicblock DB-3",
      "desc": "Warning: May cause you to do the chicken boogie.",
      "audio": "/assets/audio/sfx/MUSICBLOCK_D_BLUE_03.mp3",
-     "icon": "/assets/sprites/icons/musicblock_d_blue_03.png",
-     "icon3x": "/assets/sprites/icons/musicblock_d_blue_03@3x.png",
+     "icon": "/assets/sprites/icons/musicblock_d_blue_03.webp",
+     "icon3x": "/assets/sprites/icons/musicblock_d_blue_03@3x.webp",
      "cost": 500,
      "firstPlay": 50
     },
@@ -181,8 +181,8 @@
      "label": "Musicblock DB-4",
      "desc": "Feet everywhere will tap despite themselves when they hear this.",
      "audio": "/assets/audio/sfx/MUSICBLOCK_D_BLUE_04.mp3",
-     "icon": "/assets/sprites/icons/musicblock_d_blue_04.png",
-     "icon3x": "/assets/sprites/icons/musicblock_d_blue_04@3x.png",
+     "icon": "/assets/sprites/icons/musicblock_d_blue_04.webp",
+     "icon3x": "/assets/sprites/icons/musicblock_d_blue_04@3x.webp",
      "cost": 600,
      "firstPlay": 50
     },
@@ -191,8 +191,8 @@
      "label": "Musicblock DB-5",
      "desc": "If you could amplify butterfly song, this is roughly what it would sound like.",
      "audio": "/assets/audio/sfx/MUSICBLOCK_D_BLUE_05.mp3",
-     "icon": "/assets/sprites/icons/musicblock_d_blue_05.png",
-     "icon3x": "/assets/sprites/icons/musicblock_d_blue_05@3x.png",
+     "icon": "/assets/sprites/icons/musicblock_d_blue_05.webp",
+     "icon3x": "/assets/sprites/icons/musicblock_d_blue_05@3x.webp",
      "cost": 700,
      "firstPlay": 50
     }
@@ -205,7 +205,7 @@
    "trophy": {
     "name": "Musicblock BB Collector",
     "desc": "Collected all 5 BB musicblocks",
-    "badge": "/assets/badges/collection_musicblocks_bb.png",
+    "badge": "/assets/badges/collection_musicblocks_bb.webp",
     "imagination": 500,
     "mood": 200,
     "energy": 200,
@@ -217,8 +217,8 @@
      "label": "Musicblock BB-1",
      "desc": "The hit single off the best selling album \"Music For Batterflies\", inspired by the enchanting noises inside a batterfly's gastrointestinal tract.",
      "audio": "/assets/audio/sfx/MUSICBLOCK_B_BROWN_01.mp3",
-     "icon": "/assets/sprites/icons/musicblock_b_brown_01.png",
-     "icon3x": "/assets/sprites/icons/musicblock_b_brown_01@3x.png",
+     "icon": "/assets/sprites/icons/musicblock_b_brown_01.webp",
+     "icon3x": "/assets/sprites/icons/musicblock_b_brown_01@3x.webp",
      "cost": 400,
      "firstPlay": 50
     },
@@ -227,8 +227,8 @@
      "label": "Musicblock BB-2",
      "desc": "Warning: excessive volume may cause eyeball jelly to vibrate (in a good way).",
      "audio": "/assets/audio/sfx/MUSICBLOCK_B_BROWN_02.mp3",
-     "icon": "/assets/sprites/icons/musicblock_b_brown_02.png",
-     "icon3x": "/assets/sprites/icons/musicblock_b_brown_02@3x.png",
+     "icon": "/assets/sprites/icons/musicblock_b_brown_02.webp",
+     "icon3x": "/assets/sprites/icons/musicblock_b_brown_02@3x.webp",
      "cost": 400,
      "firstPlay": 50
     },
@@ -237,8 +237,8 @@
      "label": "Musicblock BB-3",
      "desc": "Lie back, close your eyes, and let the music wash over you, like the a cool sea breeze on a hot Alakol day. Or the tongues of a thousand piggies.",
      "audio": "/assets/audio/sfx/MUSICBLOCK_B_BROWN_03.mp3",
-     "icon": "/assets/sprites/icons/musicblock_b_brown_03.png",
-     "icon3x": "/assets/sprites/icons/musicblock_b_brown_03@3x.png",
+     "icon": "/assets/sprites/icons/musicblock_b_brown_03.webp",
+     "icon3x": "/assets/sprites/icons/musicblock_b_brown_03@3x.webp",
      "cost": 500,
      "firstPlay": 50
     },
@@ -247,8 +247,8 @@
      "label": "Musicblock BB-4",
      "desc": "Voted Head-bumpingest, Toe-tappingest, Ear-wormingest, Air-drummingest Music Block of the Year, every year, for three centuries running.",
      "audio": "/assets/audio/sfx/MUSICBLOCK_B_BROWN_04.mp3",
-     "icon": "/assets/sprites/icons/musicblock_b_brown_04.png",
-     "icon3x": "/assets/sprites/icons/musicblock_b_brown_04@3x.png",
+     "icon": "/assets/sprites/icons/musicblock_b_brown_04.webp",
+     "icon3x": "/assets/sprites/icons/musicblock_b_brown_04@3x.webp",
      "cost": 600,
      "firstPlay": 50
     },
@@ -257,8 +257,8 @@
      "label": "Musicblock BB-5",
      "desc": "Like the noise of Tii's sleeping brain, creating whole new rhythmical logarithms of imagination, but in musical form.",
      "audio": "/assets/audio/sfx/MUSICBLOCK_B_BROWN_05.mp3",
-     "icon": "/assets/sprites/icons/musicblock_b_brown_05.png",
-     "icon3x": "/assets/sprites/icons/musicblock_b_brown_05@3x.png",
+     "icon": "/assets/sprites/icons/musicblock_b_brown_05.webp",
+     "icon3x": "/assets/sprites/icons/musicblock_b_brown_05@3x.webp",
      "cost": 700,
      "firstPlay": 50
     }
@@ -271,7 +271,7 @@
    "trophy": {
     "name": "Musicblock XS Collector",
     "desc": "Collected all 5 XS musicblocks",
-    "badge": "/assets/badges/collection_musicblocks_xs.png",
+    "badge": "/assets/badges/collection_musicblocks_xs.webp",
     "imagination": 800,
     "mood": 250,
     "energy": 250,
@@ -283,8 +283,8 @@
      "label": "Musicblock XS-1",
      "desc": "This is sort of an experimental, free-form, jazzy, fusiony something-or-other. Heavy on the experimental.",
      "audio": "/assets/audio/sfx/MUSICBLOCK_X_SHINY_01.mp3",
-     "icon": "/assets/sprites/icons/musicblock_x_shiny_01.png",
-     "icon3x": "/assets/sprites/icons/musicblock_x_shiny_01@3x.png",
+     "icon": "/assets/sprites/icons/musicblock_x_shiny_01.webp",
+     "icon3x": "/assets/sprites/icons/musicblock_x_shiny_01@3x.webp",
      "cost": 400,
      "firstPlay": 50
     },
@@ -293,8 +293,8 @@
      "label": "Musicblock XS-2",
      "desc": "It's a little-known fact that this snappy little ditty was the inspiration for the phrase 'snappy little ditty'.",
      "audio": "/assets/audio/ambient/Musicblock-XS-2_1292035400.mp3",
-     "icon": "/assets/sprites/icons/musicblock_x_shiny_02.png",
-     "icon3x": "/assets/sprites/icons/musicblock_x_shiny_02@3x.png",
+     "icon": "/assets/sprites/icons/musicblock_x_shiny_02.webp",
+     "icon3x": "/assets/sprites/icons/musicblock_x_shiny_02@3x.webp",
      "cost": 400,
      "firstPlay": 50
     },
@@ -303,8 +303,8 @@
      "label": "Musicblock XS-3",
      "desc": "This rare musicblock is a bootleg from a Lapulapu Cavern rave dance party.",
      "audio": "/assets/audio/ambient/Musicblock-XS-3_1291896779.mp3",
-     "icon": "/assets/sprites/icons/musicblock_x_shiny_03.png",
-     "icon3x": "/assets/sprites/icons/musicblock_x_shiny_03@3x.png",
+     "icon": "/assets/sprites/icons/musicblock_x_shiny_03.webp",
+     "icon3x": "/assets/sprites/icons/musicblock_x_shiny_03@3x.webp",
      "cost": 500,
      "firstPlay": 50
     },
@@ -313,8 +313,8 @@
      "label": "Musicblock XS-4",
      "desc": "Rare recording of classic Glitch-hop before it all went mainstream.",
      "audio": "/assets/audio/sfx/MUSICBLOCK_X_SHINY_04.mp3",
-     "icon": "/assets/sprites/icons/musicblock_x_shiny_04.png",
-     "icon3x": "/assets/sprites/icons/musicblock_x_shiny_04@3x.png",
+     "icon": "/assets/sprites/icons/musicblock_x_shiny_04.webp",
+     "icon3x": "/assets/sprites/icons/musicblock_x_shiny_04@3x.webp",
      "cost": 600,
      "firstPlay": 50
     },
@@ -323,8 +323,8 @@
      "label": "Musicblock XS-5",
      "desc": "If you played a butterfly song backward, this is roughly what it would sound like. You can barely hear the demons.",
      "audio": "/assets/audio/sfx/MUSICBLOCK_X_SHINY_05.mp3",
-     "icon": "/assets/sprites/icons/musicblock_x_shiny_05.png",
-     "icon3x": "/assets/sprites/icons/musicblock_x_shiny_05@3x.png",
+     "icon": "/assets/sprites/icons/musicblock_x_shiny_05.webp",
+     "icon3x": "/assets/sprites/icons/musicblock_x_shiny_05@3x.webp",
      "cost": 700,
      "firstPlay": 50
     }
@@ -341,8 +341,8 @@
      "label": "Musicblock GNG",
      "desc": "Once upon a time, this was the song that sent the world into slumber.",
      "audio": "/assets/audio/sfx/GOODNIGHT_GRODDLE.mp3",
-     "icon": "/assets/sprites/icons/musicblock_goodnight_groddle.png",
-     "icon3x": "/assets/sprites/icons/musicblock_goodnight_groddle@3x.png",
+     "icon": "/assets/sprites/icons/musicblock_goodnight_groddle.webp",
+     "icon3x": "/assets/sprites/icons/musicblock_goodnight_groddle@3x.webp",
      "cost": 5000,
      "firstPlay": 50
     },
@@ -351,8 +351,8 @@
      "label": "Musicblock SB-1",
      "desc": "This is the rare original recording of the song the Giants were humming when they were imagining the world.",
      "audio": "/assets/audio/sfx/MUSICBLOCK_SB_SECRET_01.mp3",
-     "icon": "/assets/sprites/icons/musicblock_sb_secret_01.png",
-     "icon3x": "/assets/sprites/icons/musicblock_sb_secret_01@3x.png",
+     "icon": "/assets/sprites/icons/musicblock_sb_secret_01.webp",
+     "icon3x": "/assets/sprites/icons/musicblock_sb_secret_01@3x.webp",
      "cost": 10000,
      "firstPlay": 1000
     }

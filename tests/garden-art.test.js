@@ -10,12 +10,12 @@ import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { GARDEN_ART } from '../public/js/garden-art.js?v=c947ccf4';
-import { bedPieces, GARDEN_SCALE, gardenHalfWidth, gardenLayout, gardenMetrics, gardenStyle, plotOrigin, plotPieces, PLOT_H, PLOT_W } from '../public/js/garden-view.js?v=05651e76';
-import { createCultivationState, cultivateDemoYard, cultivationDef, dispatcherRx, footprint, groundFixtures, homeStreetLayout, normalizeCultivationState, placementCheck, SIGNPOST_POST_HALF } from '../public/js/home-cultivation.js?v=c650eed1';
+import { GARDEN_ART } from '../public/js/garden-art.js?v=d90f3721';
+import { bedPieces, GARDEN_SCALE, gardenHalfWidth, gardenLayout, gardenMetrics, gardenStyle, plotOrigin, plotPieces, PLOT_H, PLOT_W } from '../public/js/garden-view.js?v=3683a26f';
+import { createCultivationState, cultivateDemoYard, cultivationDef, dispatcherRx, footprint, groundFixtures, homeStreetLayout, normalizeCultivationState, placementCheck, SIGNPOST_POST_HALF } from '../public/js/home-cultivation.js?v=42ae453c';
 import { DISPATCHER_HALF } from '../public/js/home-street-fixtures.js?v=badcb725';
-import { SEED_CATALOG } from '../public/js/garden.js?v=890d72ea';
-import { HIRES_SPRITES, FIRST_DRAW_SPRITES } from '../public/js/sprite-hires.js?v=f98be5eb';
+import { SEED_CATALOG } from '../public/js/garden.js?v=e1c3415c';
+import { HIRES_SPRITES, FIRST_DRAW_SPRITES } from '../public/js/sprite-hires.js?v=abaf3d5a';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const pub = join(root, 'public');

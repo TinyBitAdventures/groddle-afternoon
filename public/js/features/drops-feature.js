@@ -34,8 +34,8 @@
  *     dropTable, dropLast, dropRolls, dropHits, dropAutoplay.
  */
 
-import { addItem, ensureItem, ITEM_CATALOG } from '../inventory.js?v=d82f3b00';
-import { emblemCostFor } from '../shrines.js?v=95d74174';
+import { addItem, ensureItem, ITEM_CATALOG } from '../inventory.js?v=b7609342';
+import { emblemCostFor } from '../shrines.js?v=1a945fe7';
 import {
   DROP_ITEMS,
   DROP_TABLES,
@@ -217,7 +217,7 @@ function closeCard() {
 }
 
 function iconFor(id) {
-  return ITEM_CATALOG[id]?.icon || `assets/sprites/icons/${id}.png`;
+  return ITEM_CATALOG[id]?.icon || `assets/sprites/icons/${id}.webp`;
 }
 
 function entryHtml(e) {

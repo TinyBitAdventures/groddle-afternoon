@@ -42,7 +42,7 @@ export const FAMILIAR_FPS = 30;
  */
 export const PET_ROCK_SHEETS = Object.freeze({
   idle: Object.freeze({
-    src: 'assets/sprites/pet-rock/pet_rock_idle_fit.png',
+    src: 'assets/sprites/pet-rock/pet_rock_idle_fit.webp',
     hires: 'assets/sprites/pet-rock/pet_rock_idle_fit@3x.webp',
     cols: 12,
     frames: 193,

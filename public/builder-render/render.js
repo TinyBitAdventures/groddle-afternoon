@@ -19,7 +19,7 @@
  * with every emitter puffing (2.2 s in); the `effects` overlay marks each emitter (its id, kind and
  * plume height) and names the rumble. The output is at most 4096 px a side (the scale shrinks to fit).
  */
-import { buildStreetView, loadDecoManifest, loadSignpostTextures } from '../js/street-render.js?v=9eded3c1';
+import { buildStreetView, loadDecoManifest, loadSignpostTextures } from '../js/street-render.js?v=81416f4f';
 import { navigableSignposts, streetWidth, streetHeight, worldToScreen } from '../js/street-model.js?v=505d8990';
 import * as textureUrls from '../js/textures.js?v=3149d699';
 import { installPixiFixes } from '../js/pixi-fixes.js?v=173fb649';

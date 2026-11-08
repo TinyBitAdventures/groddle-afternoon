@@ -50,7 +50,7 @@
  * Solo is untouched.
  */
 
-import { addItem, countItem, ensureItem, removeItem, ITEM_CATALOG, itemIcon } from '../inventory.js?v=d82f3b00';
+import { addItem, countItem, ensureItem, removeItem, ITEM_CATALOG, itemIcon } from '../inventory.js?v=b7609342';
 import { teleportEnergyCost } from '../teleportation.js?v=5a5c8e6f';
 import {
   PARTY_GUESTS,
@@ -465,7 +465,7 @@ function spawnTeleporter(engine) {
   const tp = p?.teleporter;
   if (!tp || tp.tsid !== engine.streetTsid || teleporter) return;
   const { PIXI } = engine;
-  portalFrames ||= sheetFrames(PIXI, `${ART}teleporter_visible_portal.png`);
+  portalFrames ||= sheetFrames(PIXI, `${ART}teleporter_visible_portal.webp`);
   const sprite = new PIXI.AnimatedSprite(portalFrames);
   sprite.anchor.set(0.5, 0.94);
   sprite.scale.set(PORTAL_SCALE);
@@ -494,7 +494,7 @@ function despawnTeleporter(engine, { vanish = false } = {}) {
   teleporter = null;
   if (vanish && sprite && !sprite.destroyed) {
     const { PIXI } = engine;
-    disappearFrames ||= sheetFrames(PIXI, `${ART}teleporter_visible_disappear.png`);
+    disappearFrames ||= sheetFrames(PIXI, `${ART}teleporter_visible_disappear.webp`);
     const fx = new PIXI.AnimatedSprite(disappearFrames);
     fx.anchor.set(0.5, 0.94);
     fx.scale.set(PORTAL_SCALE);
@@ -695,7 +695,7 @@ function groundNear(engine, x, y) {
 function spawnAtm(engine, point) {
   const { PIXI } = engine;
   const sprite = new PIXI.Container();
-  const art = new PIXI.Sprite(textureFromUrl(`${ART}party_atm.png`));
+  const art = new PIXI.Sprite(textureFromUrl(`${ART}party_atm.webp`));
   art.anchor.set(0.5, 1);
   art.scale.set(0.9);
   const screen = new PIXI.Text({ text: '', style: { fontFamily: 'Courier New, monospace', fontSize: 13, fontWeight: '700', fill: 0x8dff8d } });
@@ -971,7 +971,7 @@ function openAtm(engine) {
   const options = partyExtendOptions(p);
   showModal(engine, {
     kind: 'atm',
-    art: `${ART}party_atm.png`,
+    art: `${ART}party_atm.webp`,
     kicker: PARTY_TEXT.atmLabel,
     body: `<p style="margin:0 0 4px;font-weight:800">${formatPartyClock(partyRemainingMs(p))} left · you have ${Math.floor(Number(engine.pc.currants) || 0)}c</p>`,
     copy: PARTY_TEXT.atmQuestion,

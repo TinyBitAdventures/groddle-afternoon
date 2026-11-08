@@ -7,7 +7,7 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { HIRES_SPRITES, SPLIT_SPRITES, hiresSpriteUrl, installHiresSprites, upgradeSource } from '../public/js/sprite-hires.js?v=f98be5eb';
+import { HIRES_SPRITES, SPLIT_SPRITES, hiresSpriteUrl, installHiresSprites, upgradeSource } from '../public/js/sprite-hires.js?v=abaf3d5a';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const pub = join(root, 'public');
@@ -31,11 +31,11 @@ function imageSize(file) {
 
 describe('3x vector sprite sheets', () => {
   it('maps listed sheet URLs (query kept) and leaves others alone', () => {
-    const walkUrl = 'assets/sprites/npc_piggy__x1_walk_png_1354829432.png';
+    const walkUrl = 'assets/sprites/npc_piggy__x1_walk_png_1354829432.webp';
     assert.ok(HIRES_SPRITES.has(walkUrl));
     assert.match(hiresSpriteUrl(walkUrl), /@3x\.(png|webp)$/);
     assert.match(hiresSpriteUrl(`./${walkUrl}?v=2`), /@3x\.(png|webp)\?v=2$/);
-    assert.equal(hiresSpriteUrl('assets/sprites/icons/apple.png'), null);
+    assert.equal(hiresSpriteUrl('assets/sprites/icons/apple.webp'), null);
     assert.equal(hiresSpriteUrl(hiresSpriteUrl(walkUrl)), null);
   });
 
@@ -93,14 +93,14 @@ describe('3x vector sprite sheets', () => {
     const textures = { addUrlRoute: (name, fn) => routes.set(name, fn) };
     installHiresSprites(textures, { dpr: 1, viewWidth: 1200 });
     assert.equal(routes.size, 0);
-    assert.equal(hiresSpriteUrl('assets/sprites/npc_piggy__x1_walk_png_1354829432.png'), null);
+    assert.equal(hiresSpriteUrl('assets/sprites/npc_piggy__x1_walk_png_1354829432.webp'), null);
     installHiresSprites(textures, { dpr: 2, viewWidth: 1280 });
     installHiresSprites(textures, { dpr: 2, viewWidth: 1280 });
     assert.equal(routes.size, 1);
     const route = routes.get('hires-sprites');
-    const walkUrl = 'assets/sprites/npc_piggy__x1_walk_png_1354829432.png';
+    const walkUrl = 'assets/sprites/npc_piggy__x1_walk_png_1354829432.webp';
     assert.equal(route(walkUrl), HIRES_SPRITES.get(walkUrl));
-    assert.equal(route('assets/sprites/icons/apple.png'), null);
+    assert.equal(route('assets/sprites/icons/apple.webp'), null);
   });
 
   it('upgrades a loaded 1x TextureSource in place, once, keeping its logical size', async () => {
@@ -119,7 +119,7 @@ describe('3x vector sprite sheets', () => {
         },
         update() { this.updates += 1; },
       };
-      const url = 'assets/sprites/npc_piggy__x1_walk_png_1354829432.png';
+      const url = 'assets/sprites/npc_piggy__x1_walk_png_1354829432.webp';
       const waited = [];
       const whenLoaded = (s) => (waited.push(s), Promise.resolve(s));
       const a = upgradeSource(source, url, whenLoaded);
@@ -133,7 +133,7 @@ describe('3x vector sprite sheets', () => {
       assert.equal(source.resource.width, 2112);
       assert.equal(source.hiresSrc, HIRES_SPRITES.get(url));
       assert.ok(old.closed);
-      assert.equal(await upgradeSource({ resource: old }, 'assets/sprites/icons/apple.png'), false);
+      assert.equal(await upgradeSource({ resource: old }, 'assets/sprites/icons/apple.webp'), false);
     } finally {
       globalThis.fetch = realFetch;
       globalThis.createImageBitmap = realBitmap;

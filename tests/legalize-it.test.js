@@ -28,7 +28,7 @@ import {
   purchaseQualification,
   requestLegalizeQualification,
   travelToGregarious,
-} from '../public/js/legalize-it.js?v=bebf2574';
+} from '../public/js/legalize-it.js?v=ffce7efe';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -131,16 +131,16 @@ test('client integration ships recovered clean quest art and a playable route', 
   const spriteRoot = path.join(root, 'public/assets/sprites/quests/legalize');
 
   for (const file of [
-    'card_carrying_qualification__x1_iconic_png_1354833115.png',
-    'your_papers__x1_iconic_png_1354833120.png',
-    'subway_gate__x1_1_png_1354832987.png',
-    'npc_bureaucrat_arms_01_glasses_none_hair_01_legs_01_necklace_none_tie_01_torso_01_x1_iconic_png_1354832989.png',
-    'npc_bureaucrat_arms_02_glasses_none_hair_02_legs_02_necklace_none_tie_02_torso_02_x1_iconic_png_1354832997.png',
-    'npc_bureaucrat_arms_03_glasses_none_hair_04_legs_03_necklace_01_tie_none_torso_03_x1_iconic_png_1354833006.png',
-    'npc_bureaucrat_arms_01_glasses_none_hair_01_legs_01_necklace_none_tie_01_torso_01_x1_idle1_png_1354832995.png',
-    'npc_bureaucrat_arms_01_glasses_none_hair_01_legs_01_necklace_none_tie_01_torso_01_x1_talk_png_1354832993.png',
-    'npc_bureaucrat_arms_02_glasses_none_hair_02_legs_02_necklace_none_tie_02_torso_02_x1_idle1_png_1354833004.png',
-    'npc_bureaucrat_arms_02_glasses_none_hair_02_legs_02_necklace_none_tie_02_torso_02_x1_talk_png_1354833002.png',
+    'card_carrying_qualification__x1_iconic_png_1354833115.webp',
+    'your_papers__x1_iconic_png_1354833120.webp',
+    'subway_gate__x1_1_png_1354832987.webp',
+    'npc_bureaucrat_arms_01_glasses_none_hair_01_legs_01_necklace_none_tie_01_torso_01_x1_iconic_png_1354832989.webp',
+    'npc_bureaucrat_arms_02_glasses_none_hair_02_legs_02_necklace_none_tie_02_torso_02_x1_iconic_png_1354832997.webp',
+    'npc_bureaucrat_arms_03_glasses_none_hair_04_legs_03_necklace_01_tie_none_torso_03_x1_iconic_png_1354833006.webp',
+    'npc_bureaucrat_arms_01_glasses_none_hair_01_legs_01_necklace_none_tie_01_torso_01_x1_idle1_png_1354832995.webp',
+    'npc_bureaucrat_arms_01_glasses_none_hair_01_legs_01_necklace_none_tie_01_torso_01_x1_talk_png_1354832993.webp',
+    'npc_bureaucrat_arms_02_glasses_none_hair_02_legs_02_necklace_none_tie_02_torso_02_x1_idle1_png_1354833004.webp',
+    'npc_bureaucrat_arms_02_glasses_none_hair_02_legs_02_necklace_none_tie_02_torso_02_x1_talk_png_1354833002.webp',
   ]) {
     assert.equal(fs.existsSync(path.join(spriteRoot, file)), true);
   }

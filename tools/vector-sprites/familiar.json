@@ -3,7 +3,7 @@
  "webp": true,
  "jobs": [
   {"name": "pet_rock", "swf": "misc/pet_rock/pet_rock.swf", "sprite": 46, "sheets": [
-   {"path": "assets/sprites/pet-rock/pet_rock_idle_fit.png", "label": "idle", "fw": 58, "fh": 57, "cols": 12, "frames": 193}
+   {"path": "assets/sprites/pet-rock/pet_rock_idle_fit.webp", "label": "idle", "fw": 58, "fh": 57, "cols": 12, "frames": 193}
   ]}
  ]
 }

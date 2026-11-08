@@ -28,7 +28,7 @@ import {
 } from '../public/js/buffs.js?v=036fee53';
 import { accelerateActiveStudy, createSkillState, getStudyStatus, startSkillStudy } from '../public/js/skills.js?v=4542bdf9';
 import { applyRewards } from '../public/js/quests.js?v=c8d9d0a4';
-import { normalizeBuffSnapshot } from '../public/js/player-save.js?v=17b5c632';
+import { normalizeBuffSnapshot } from '../public/js/player-save.js?v=c7c41d5c';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '../public');
 
@@ -55,7 +55,7 @@ describe('official item buff mappings', () => {
     for (const classTsid of Object.keys(BUFF_ITEM_CATALOG)) {
       const info = getBuffItemInfo(classTsid);
       assert.ok(info.def, classTsid);
-      assert.ok(existsSync(join(root, 'assets/sprites/icons', `${classTsid}.png`)), classTsid);
+      assert.ok(existsSync(join(root, 'assets/sprites/icons', `${classTsid}.webp`)), classTsid);
     }
     assert.equal(getBuffItemInfo('spinach').buffId, 'high_jumper');
     assert.equal(getBuffItemInfo('spinach').durationSeconds, 7);

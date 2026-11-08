@@ -28,18 +28,18 @@ import {
   setCopyTag,
   setToolRemaining,
   toolCopies,
-} from '../public/js/tools.js?v=f701b241';
+} from '../public/js/tools.js?v=d8aa3536';
 import { COPY_TAG_RULES, cleanCopyTagOf } from '../public/js/copy-tags.js?v=bd75b92e';
-import { goodsWithHeldTags, normalizeGoods, normalizeSlice, sameGoods, settleDone } from '../public/js/trade.js?v=beecc06c';
-import { giftEffects, normalizeGift, normalizeGiftsSlice, wrapBox } from '../public/js/gifts.js?v=4a01ff13';
-import { dropEffect, normalizeGroundStack, normalizeItem } from '../public/js/drops-mp.js?v=b8307be8';
-import { normalizeListing } from '../public/js/auctions.js?v=9684e995';
+import { goodsWithHeldTags, normalizeGoods, normalizeSlice, sameGoods, settleDone } from '../public/js/trade.js?v=6eaf2844';
+import { giftEffects, normalizeGift, normalizeGiftsSlice, wrapBox } from '../public/js/gifts.js?v=89f09eba';
+import { dropEffect, normalizeGroundStack, normalizeItem } from '../public/js/drops-mp.js?v=4793cdb5';
+import { normalizeListing } from '../public/js/auctions.js?v=4fe3e230';
 import { cabinetMove, cabinetPut, cabinetTake, normalizeContents } from '../public/js/home-storage.js?v=121f1897';
-import { CUBIMAL_NAMING } from '../public/js/cubimals.js?v=8950bf83';
+import { CUBIMAL_NAMING } from '../public/js/cubimals.js?v=c48cc6ff';
 import { FAVOR_GIANTS } from '../public/js/potions.js?v=c21bad59';
-import { HOPPER_CEILING, STILL } from '../public/js/machines.js?v=2f4f8293';
+import { HOPPER_CEILING, STILL } from '../public/js/machines.js?v=663980c9';
 import { teachPhrase } from '../public/js/seasons.js?v=1978c3f3';
-import { addItem, countItem, createInventory } from '../public/js/inventory.js?v=d82f3b00';
+import { addItem, countItem, createInventory } from '../public/js/inventory.js?v=b7609342';
 
 /** A copy of the feature of its own (its realtime binding is module state). */
 const rookCopy = async (name) => (await import(`../public/js/features/rook-attack-feature.js?fresh=item-state-3-${name}`)).rookAttackFeature;

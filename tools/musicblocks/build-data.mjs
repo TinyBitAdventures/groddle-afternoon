@@ -17,7 +17,7 @@ import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { MUSICBLOCK_CATALOG, MUSICBLOCK_SERIES, MUSICBLOCK_MONTH_MS, MUSICBLOCK_REPLAY_MS, createMusicblockState, playMusicblock } from '../../public/js/musicblocks.js?v=f5adbf0c';
+import { MUSICBLOCK_CATALOG, MUSICBLOCK_SERIES, MUSICBLOCK_MONTH_MS, MUSICBLOCK_REPLAY_MS, createMusicblockState, playMusicblock } from '../../public/js/musicblocks.js?v=db6a213b';
 import { GAME_DAY_MS } from '../../public/js/game-day.js?v=edb00566';
 import { ITEM_BASE_COSTS } from '../../public/js/store-catalog.js?v=74b56af3';
 
@@ -33,7 +33,7 @@ const LOST = [{ id: 'musicblock_trumpets', label: 'Musicblock T-1' }];
 const site = (path) => (path ? `/${path}` : null);
 
 function block(def) {
-  const icon3x = def.icon.replace(/\.png$/, '@3x.png');
+  const icon3x = def.icon.replace(/\.(png|webp)$/, '@3x.$1');
   if (!def.audio || !existsSync(join(pub, def.audio))) throw new Error(`${def.classTsid}: no recording at ${def.audio}`);
   return {
     id: def.classTsid,
@@ -72,7 +72,7 @@ export function musicblockData() {
   const sets = Object.values(MUSICBLOCK_SERIES).map((series) => {
     const trophy = achievements[series.badge];
     if (!trophy) throw new Error(`no achievement ${series.badge}`);
-    const badge = `assets/badges/${series.badge}.png`;
+    const badge = `assets/badges/${series.badge}.webp`;
     return {
       id: series.id,
       colour: series.colour,

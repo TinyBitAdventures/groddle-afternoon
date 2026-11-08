@@ -262,7 +262,7 @@ export const HOUSE_SIGN = Object.freeze({
 /** A sign button's icon: 'street_<art>' plus '' | '_hover' | '_disabled'. */
 export function houseSignArt(art, state = '') {
   const suffix = state === 'hover' || state === 'disabled' ? `_${state}` : '';
-  return art ? `${HOUSE_SIGN_ART_DIR}street_${art}${suffix}.png` : '';
+  return art ? `${HOUSE_SIGN_ART_DIR}street_${art}${suffix}.webp` : '';
 }
 
 /**

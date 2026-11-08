@@ -207,10 +207,10 @@ describe('asset keys written into HTML and CSS (2026-10-29)', () => {
     }
     assert.equal(committedMap(root).epoch, currentEpoch(root).slice(0, 8));
     const play = read('public/play/index.html');
-    assert.match(play, /<img src="assets\/sprites\/feat_badge_small\.png\?v=[0-9a-f]{8}"/, 'the solo shell\'s own <img> tags');
+    assert.match(play, /<img src="assets\/sprites\/feat_badge_small\.webp\?v=[0-9a-f]{8}"/, 'the solo shell\'s own <img> tags');
     assert.match(read('public/play/online/index.html'), /<img src="favicon\.svg\?v=[0-9a-f]{8}"/, 'the sign-in gate');
     assert.match(read('public/style.css'), /url\("assets\/sprites\/word-progress\/cancel\.svg\?v=[0-9a-f]{8}"\)/);
-    assert.match(read('public/restoration/restoration.css'), /url\('\.\.\/assets\/sprites\/mining\/rock_sparkly\.png\?v=[0-9a-f]{8}'\)/);
+    assert.match(read('public/restoration/restoration.css'), /url\('\.\.\/assets\/sprites\/mining\/rock_sparkly\.webp\?v=[0-9a-f]{8}'\)/);
     assert.ok(play.includes(`<script src="${HOOK_SRC}"></script>`), 'the solo shell loads the hook under its current key');
   });
 

@@ -23,8 +23,8 @@ import {
   soilSpawnClasses,
   tickPlot,
   archivedSeedlingTrant,
-} from '../public/js/patches.js?v=8af384ac';
-import { createToolConditionState, getToolCondition } from '../public/js/tools.js?v=f701b241';
+} from '../public/js/patches.js?v=aa83d5ad';
+import { createToolConditionState, getToolCondition } from '../public/js/tools.js?v=d8aa3536';
 
 const seq = (...values) => {
   let i = 0;
@@ -352,8 +352,8 @@ describe('persistence and presentation', () => {
 
   it('caps spawn counts and names the art per stage', () => {
     assert.equal(soilSpawnClasses({ patch: 12, patch_dark: 1, trant_bean_dead: 1 }).length, 10);
-    assert.equal(plotArtPath(createPlot('patch_dark')), 'assets/sprites/soil/patch-dark-dirty.png');
-    assert.equal(plotArtPath(createPlot('trant_gas_dead')), 'assets/sprites/soil/trant-gas-dead.png');
+    assert.equal(plotArtPath(createPlot('patch_dark')), 'assets/sprites/soil/patch-dark-dirty.webp');
+    assert.equal(plotArtPath(createPlot('trant_gas_dead')), 'assets/sprites/soil/trant-gas-dead.webp');
     assert.match(plotStatusLabel(createPlot('patch')), /Weedy/);
   });
 });

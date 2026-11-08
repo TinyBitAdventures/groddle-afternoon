@@ -35,8 +35,8 @@ import {
 } from '../../public/js/seasons.js?v=1978c3f3';
 import { SEASON_DATA } from '../../public/js/seasons-data.js?v=b5174bc9';
 import { GAME_DAY_MS, GAME_EPOCH_MS, GAME_YEAR_MS, MONTH_LENGTHS, MONTH_NAMES } from '../../public/js/game-day.js?v=edb00566';
-import { SEASONAL_SEEDS } from '../../public/js/garden.js?v=890d72ea';
-import { SEASONAL_RECIPES } from '../../public/js/making.js?v=c9dc233e';
+import { SEASONAL_SEEDS } from '../../public/js/garden.js?v=e1c3415c';
+import { SEASONAL_RECIPES } from '../../public/js/making.js?v=f4f214c2';
 import { SKILL_PACKAGES } from '../../public/js/skill-packages-data.js?v=cb4e9ab3';
 import { TRANT_META } from '../../public/js/trants.js?v=9c2e8c0f';
 import { playHref } from './play-links.mjs';
@@ -90,9 +90,9 @@ const site = (path) => (existsSync(join(pub, path)) ? `/${path}` : null);
 
 /** An item as the card shows it: its name and CC0 icon (with the 3x render where there is one). */
 function item(id) {
-  const icon = site(`assets/sprites/icons/${id}.png`);
+  const icon = site(`assets/sprites/icons/${id}.webp`);
   if (!icon) throw new Error(`seasons: no icon for ${id}`);
-  return { id, name: label(id), icon, icon3x: site(`assets/sprites/icons/${id}@3x.png`) };
+  return { id, name: label(id), icon, icon3x: site(`assets/sprites/icons/${id}@3x.webp`) };
 }
 
 const list = (names) => (names.length < 2 ? names.join('') : `${names.slice(0, -1).join(', ')} and ${names.at(-1)}`);
@@ -172,7 +172,7 @@ function badges(id, achievements) {
     return a.category === b.category ? num(a) - num(b) || a.name.localeCompare(b.name) : a.category.localeCompare(b.category);
   });
   return {
-    badges: shown.map((a) => ({ id: a.classTsid, name: a.name, desc: a.desc, icon: site(`assets/badges/${a.classTsid}.png`) })),
+    badges: shown.map((a) => ({ id: a.classTsid, name: a.name, desc: a.desc, icon: site(`assets/badges/${a.classTsid}.webp`) })),
     secret: hits.length - shown.length,
   };
 }

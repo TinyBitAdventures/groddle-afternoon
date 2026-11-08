@@ -30,21 +30,21 @@ import {
   ROUTE_STOPS_SHOWN,
   signpostToward,
 } from '../public/js/map-routes.js?v=c7e7dc80';
-import { mapRoutesFeature } from '../public/js/features/map-routes-feature.js?v=09516fab';
-import { hellTicketsFeature } from '../public/js/features/hell-tickets-feature.js?v=a20cd37c';
-import { hellFeature } from '../public/js/features/hell-feature.js?v=13196575';
+import { mapRoutesFeature } from '../public/js/features/map-routes-feature.js?v=63c4ad0f';
+import { hellTicketsFeature } from '../public/js/features/hell-tickets-feature.js?v=d1cddf95';
+import { hellFeature } from '../public/js/features/hell-feature.js?v=93f1c8dd';
 import { createFeatureHost } from '../public/js/feature-host.js?v=127e0a3c';
 import { applyStreetIndex } from '../public/js/street-loader.js?v=33d2b8bc';
 import { loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js?v=10b118dd';
 import { createQuestState } from '../public/js/quests.js?v=c8d9d0a4';
-import { HELL_QUESTS, createHellState, croak } from '../public/js/hell.js?v=aca145ba';
-import { SUBWAY_STREETS } from '../public/js/quest-rooms/back-alley.js?v=d9c26a3f';
+import { HELL_QUESTS, createHellState, croak } from '../public/js/hell.js?v=ca971c34';
+import { SUBWAY_STREETS } from '../public/js/quest-rooms/back-alley.js?v=edf95276';
 import { doorRooms, doorToward, routeGraph } from '../public/js/map-routes.js?v=c7e7dc80';
-import { afterStreetCard, runStreetTransition, streetCardUp } from '../public/js/screen-fx.js?v=155d18cf';
-import { EMITTED_EVENTS } from '../public/js/quest-offers.js?v=486b09c9';
-import { smugglingFeature } from '../public/js/features/smuggling-feature.js?v=556e3bbe';
-import { addItem } from '../public/js/inventory.js?v=d82f3b00';
-import { resurrect } from '../public/js/hell.js?v=aca145ba';
+import { afterStreetCard, runStreetTransition, streetCardUp } from '../public/js/screen-fx.js?v=b4ec277f';
+import { EMITTED_EVENTS } from '../public/js/quest-offers.js?v=e31115ea';
+import { smugglingFeature } from '../public/js/features/smuggling-feature.js?v=49c3f782';
+import { addItem } from '../public/js/inventory.js?v=b7609342';
+import { resurrect } from '../public/js/hell.js?v=ca971c34';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const PUBLIC = join(spike, 'public');
@@ -938,7 +938,7 @@ describe('G192 the Map keeps the map in view', () => {
     const info = smugglingFeature.mapRouteCard(engine);
     assert.equal(info.source, 'smuggling');
     assert.match(info.title, /^Contraband destination: Briarset Croft/);
-    assert.equal(info.icon, 'assets/sprites/icons/contraband.png');
+    assert.equal(info.icon, 'assets/sprites/icons/contraband.webp');
     smugglingFeature._reset();
     const feature = read(join(PUBLIC, 'js/features/map-routes-feature.js'));
     assert.match(feature, /engine\.query\?\.\('mapRouteCard', engine\)/);

@@ -207,10 +207,10 @@ const js = lines.join('\n');
 const want = new Set(rows.flatMap((r) => [r.path.split('/').pop(), r.hires.split('/').pop()]));
 if (CHECK) {
   const same = existsSync(OUT_JS) && readFileSync(OUT_JS, 'utf8') === js;
-  const { HIRES_SPRITES } = await import('../../public/js/sprite-hires.js?v=f98be5eb');
+  const { HIRES_SPRITES } = await import('../../public/js/sprite-hires.js?v=abaf3d5a');
   const bad = checkPairs(results, SOURCE, rows.map((r) => r.path), PUB, HIRES_SPRITES);
   for (const r of rows) if (results[r.path] && results[r.path].hires !== r.hires) bad.push(`${r.path}: results name ${results[r.path].hires}`);
-  for (const f of readdirSync(OUT_DIR)) if (!want.has(f) && f !== 'tower_expander.png' && !/^tower_expander@\d+x\.webp$/.test(f)) bad.push(`${REL_DIR}/${f}: not built here`);
+  for (const f of readdirSync(OUT_DIR)) if (!want.has(f) && f !== 'tower_expander.webp' && !/^tower_expander@\d+x\.webp$/.test(f)) bad.push(`${REL_DIR}/${f}: not built here`);
   if (!same) bad.push('home-tower-art.js is stale');
   if (bad.length) {
     for (const b of bad) console.error(`stale: ${b}`);
@@ -220,7 +220,7 @@ if (CHECK) {
 } else {
   writeFileSync(OUT_JS, js);
   // The 2x files these pairs replace (and anything else no longer built).
-  for (const f of readdirSync(OUT_DIR)) if (!want.has(f) && f !== 'tower_expander.png' && !/^tower_expander@\d+x\.webp$/.test(f)) unlinkSync(join(OUT_DIR, f));
+  for (const f of readdirSync(OUT_DIR)) if (!want.has(f) && f !== 'tower_expander.webp' && !/^tower_expander@\d+x\.webp$/.test(f)) unlinkSync(join(OUT_DIR, f));
   registerPairs(results, SOURCE, rows, PUB);
   writeFileSync(RESULTS, `${JSON.stringify(results, null, 1)}\n`);
   const { writeModule } = await import('../vector-sprites/build.mjs');

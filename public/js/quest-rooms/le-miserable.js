@@ -152,7 +152,7 @@ function addResetButton(ctx, panel) {
   const plate = new PIXI.Graphics();
   plate.roundRect(-24, -66, 48, 56, 6).fill(0xe9e6df).stroke({ width: 2, color: 0x9a958c, alpha: 1 });
   c.addChild(plate);
-  const sheet = kit.sheetFrames(PIXI, `${ART}reset_button.png`, 7, 1, 7);
+  const sheet = kit.sheetFrames(PIXI, `${ART}reset_button.webp`, 7, 1, 7);
   const btn = new PIXI.AnimatedSprite([PIXI.Texture.EMPTY]);
   btn.anchor.set(0.5, 0.5);
   btn.y = -28;
@@ -228,7 +228,7 @@ export const room = {
   id: 'le_miserable',
   title: 'Le Misérable',
   kicker: 'The Fireflex 3000 Lab',
-  icon: `${ART}bot_icon.png`,
+  icon: `${ART}bot_icon.webp`,
   theme: 'memory',
   hubName: 'The Fireflex 3000 Lab',
   // quests/le_miserable.js onStarted 76 (and le_miserable_reminisce.js 93-96): questInstanceLocation(..., 5*60): the exit delay is the "Are you stuck?" prompt (players/inc_instances.js 317-357), not a clock.
@@ -251,8 +251,8 @@ export const room = {
     ctx.data.machineOn = false;
     ctx.data.quoins = [];
     if (ctx.questId !== REMINISCE) {
-      ctx.data.botIdle = kit.sheetFrames(PIXI, `${ART}bot_idle.png`, 12, 2, 24);
-      ctx.data.botTalk = kit.sheetFrames(PIXI, `${ART}bot_talk.png`, 12, 6, 69);
+      ctx.data.botIdle = kit.sheetFrames(PIXI, `${ART}bot_idle.webp`, 12, 2, 24);
+      ctx.data.botTalk = kit.sheetFrames(PIXI, `${ART}bot_talk.webp`, 12, 6, 69);
       const bot = new PIXI.AnimatedSprite([PIXI.Texture.EMPTY]);
       bot.anchor.set(0.5, 1);
       bot.animationSpeed = 0.3;

@@ -84,16 +84,16 @@ import {
   secondsToString,
   takeJobIngredients,
   tankFuel,
-} from '../machine-rooms.js?v=725fbf92';
-import { refuelMachine, MAX_FUEL } from '../machines.js?v=2f4f8293';
+} from '../machine-rooms.js?v=a201d684';
+import { refuelMachine, MAX_FUEL } from '../machines.js?v=663980c9';
 import { DROP_ITEMS, applyDropResult, isEmptyDrop, rollDropTable } from '../drop-tables.js?v=16e12632';
-import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=d82f3b00';
+import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=b7609342';
 import { energyMax, moodMax } from '../metabolics.js?v=8504134e';
 import { getSkillCatalog } from '../content-catalogs.js?v=10b118dd';
 import { worldToScreen } from '../street-model.js?v=505d8990';
 import { nearestSurfaceY } from '../walk-surface.js?v=c982983e';
 import { textureFromUrl } from '../textures.js?v=3149d699';
-import { createSheetLoader } from '../sprite-sheets.js?v=d77b0b8b';
+import { createSheetLoader } from '../sprite-sheets.js?v=b764884b';
 import {
   LOW_FUEL_BUBBLE_MS,
   LOW_FUEL_LINE,
@@ -103,7 +103,7 @@ import {
   machineFrame,
   machineSheetDef,
   roomMachineState,
-} from '../machine-art.js?v=f8dc5b4d';
+} from '../machine-art.js?v=44af04ef';
 
 export const MACHINE_ROOMS_FEATURE_ID = 'machine-rooms';
 const MUSIC_CARD = 'metalmaking_music';
@@ -212,7 +212,7 @@ function spawnMachines(engine, street, layout) {
     slot.tanks[def.id] = machineTank(slot.tanks[def.id], def.classTsid);
     const p = worldToScreen(street, def.x, -130);
     const y = nearestSurfaceY(engine.platforms, p.x, p.y) ?? p.y;
-    const sprite = new PIXI.Sprite(textureFromUrl(`assets/sprites/icons/${def.classTsid}.png`));
+    const sprite = new PIXI.Sprite(textureFromUrl(`assets/sprites/icons/${def.classTsid}.webp`));
     sprite.anchor.set(0.5, 1);
     sprite.x = p.x;
     sprite.y = y + 4;

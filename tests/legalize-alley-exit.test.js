@@ -20,8 +20,8 @@ import { fileURLToPath } from 'node:url';
 import { loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js?v=10b118dd';
 import { assignQuest, createQuestState } from '../public/js/quests.js?v=c8d9d0a4';
 import { createAchievementState } from '../public/js/achievements.js?v=f8ccfd34';
-import { countItem, createInventory } from '../public/js/inventory.js?v=d82f3b00';
-import { createPlayerSave, restorePlayerSave } from '../public/js/player-save.js?v=17b5c632';
+import { countItem, createInventory } from '../public/js/inventory.js?v=b7609342';
+import { createPlayerSave, restorePlayerSave } from '../public/js/player-save.js?v=c7c41d5c';
 import { STATION_X, stationScreen, surfaceStation } from '../public/js/subway.js?v=44d1a09f';
 import {
   LEGALIZE_BACK_ALLEY_TSID,
@@ -36,7 +36,7 @@ import {
   ensureLegalizeWayBack,
   legalizeReloadLocation,
   legalizeWayBack,
-} from '../public/js/legalize-it.js?v=bebf2574';
+} from '../public/js/legalize-it.js?v=ffce7efe';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const game = fs.readFileSync(path.join(root, 'public/game.js'), 'utf8');

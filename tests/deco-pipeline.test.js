@@ -12,7 +12,7 @@ import { fileURLToPath } from 'node:url';
 import { HIRES_DECOS, HIRES_DECOS_BIG } from '../public/js/deco-hires-list.js?v=2c460d64';
 import { decoUrl, installHiresDecos, wantsHiresDecos } from '../public/js/deco-hires.js?v=cb905e17';
 import { resolutionOfUrl } from '../public/js/textures.js?v=3149d699';
-import { recolourBudgetBytes } from '../public/js/street-render.js?v=9eded3c1';
+import { recolourBudgetBytes } from '../public/js/street-render.js?v=81416f4f';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const decoDir = join(root, 'public/assets/decos/groddle');
@@ -91,7 +91,7 @@ describe('deco WebP pipeline', () => {
     assert.equal(decoUrl(`assets/decos/groddle/${lo}.png`, { hires: true }), `assets/decos/groddle/${lo}.webp`);
     assert.equal(decoUrl(`../assets/decos/groddle/${hi}.png?v=2`, { hires: true }), `../assets/decos/groddle/${hi}@1.5x.webp?v=2`);
     assert.equal(decoUrl('assets/decos/groddle/moon_asset_smile.svg'), null);
-    assert.equal(decoUrl('assets/sprites/icons/apple.png'), null);
+    assert.equal(decoUrl('assets/sprites/icons/apple.webp'), null);
     // Logical size is the 2x pixel size: the 3x file has resolution 1.5, the 2x file 1.
     assert.equal(resolutionOfUrl(`assets/decos/groddle/${hi}@1.5x.webp`), 1.5);
     assert.equal(resolutionOfUrl(`assets/decos/groddle/${hi}.webp`), 1);
@@ -119,7 +119,7 @@ describe('deco WebP pipeline', () => {
     assert.equal(route(`assets/decos/groddle/${hi}.png`), `assets/decos/groddle/${hi}.webp`);
     resolution = 3.3;
     assert.equal(route(`assets/decos/groddle/${hi}.png`), `assets/decos/groddle/${hi}@1.5x.webp`);
-    assert.equal(route('assets/sprites/icons/apple.png'), null);
+    assert.equal(route('assets/sprites/icons/apple.webp'), null);
   });
 
   it('counts recolour bakes at logical size, so 3x decos keep layers baked', () => {

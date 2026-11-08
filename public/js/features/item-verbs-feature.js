@@ -31,9 +31,9 @@
  *   itemVerbLast, itemVerbBuzz, itemVerbDash.
  */
 
-import { addItem, countItem, removeItem } from '../inventory.js?v=d82f3b00';
+import { addItem, countItem, removeItem } from '../inventory.js?v=b7609342';
 import { moodMax } from '../metabolics.js?v=8504134e';
-import { listDroppedStacks } from '../world-items.js?v=6378e71c';
+import { listDroppedStacks } from '../world-items.js?v=0bbfdab9';
 import {
   GARLIC_EAT_COUNTER,
   ITEM_VERBS,
@@ -45,12 +45,12 @@ import {
   itemVerbsFor,
   runItemVerb,
 } from '../item-verbs.js?v=1e20fa7d';
-import { homesFeature } from './homes-feature.js?v=357f8787';
+import { homesFeature } from './homes-feature.js?v=5391026a';
 import { CROWNS_STREET } from '../game-of-crowns.js?v=e32f35f5';
 import { HOG_HAUL_STREET_ID } from '../hog-haul.js?v=50d2e072';
 import { isRaceSceneTsid } from '../races.js?v=ab22a079';
 import { WINTER_HAVEN_STREET_ID, WINTER_WALK_STREET_ID } from '../winter-walk.js?v=9961c35f';
-import { ROOK_WOODS_STREET_ID } from '../rook-woods.js?v=237b391c';
+import { ROOK_WOODS_STREET_ID } from '../rook-woods.js?v=0ccc8239';
 import { questSceneTsid } from '../quest-instance.js?v=f0df88c3';
 
 export const ITEM_VERBS_FEATURE_ID = 'item-verbs';

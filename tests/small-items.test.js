@@ -28,14 +28,14 @@ import {
   planBallHit,
   reconcileFortunes,
 } from '../public/js/small-items.js?v=78d0056a';
-import { smallItemsFeature } from '../public/js/features/small-items-feature.js?v=551c7683';
-import { streetFurnitureFeature } from '../public/js/features/street-furniture-feature.js?v=966f14bf';
-import { FEATURES } from '../public/js/features/index.js?v=b4df516e';
-import { countItem } from '../public/js/inventory.js?v=d82f3b00';
-import { pickWoodTool, quoteWoodTreeHarvest, harvestWoodTree, woodToolLabel } from '../public/js/woodcutting.js?v=c199dd64';
-import { TOOL_CONDITION_CATALOG, createToolConditionState, getToolCondition, setToolRemaining } from '../public/js/tools.js?v=f701b241';
+import { smallItemsFeature } from '../public/js/features/small-items-feature.js?v=a126bf65';
+import { streetFurnitureFeature } from '../public/js/features/street-furniture-feature.js?v=7e6704a4';
+import { FEATURES } from '../public/js/features/index.js?v=d9128cb3';
+import { countItem } from '../public/js/inventory.js?v=b7609342';
+import { pickWoodTool, quoteWoodTreeHarvest, harvestWoodTree, woodToolLabel } from '../public/js/woodcutting.js?v=4fd0342b';
+import { TOOL_CONDITION_CATALOG, createToolConditionState, getToolCondition, setToolRemaining } from '../public/js/tools.js?v=d8aa3536';
 import { HOG_HAUL_GAME_ID, HOG_HAUL_TICKET, RACE_STORE_ITEMS } from '../public/js/races.js?v=ab22a079';
-import { racesFeature } from '../public/js/features/races-feature.js?v=cf2b808e';
+import { racesFeature } from '../public/js/features/races-feature.js?v=f8ab7430';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = join(here, '..');
@@ -136,7 +136,7 @@ describe('Fortune Cookie and Fortune (fortune_cookie.js, fortune.js)', () => {
 
   it('is registered and ships the CC0 icons', () => {
     assert.ok(FEATURES.includes(smallItemsFeature));
-    for (const icon of ['fortune.png', 'fortune_cookie_withnote.png', 'plate_of_beans.png']) {
+    for (const icon of ['fortune.webp', 'fortune_cookie_withnote.webp', 'plate_of_beans.webp']) {
       assert.ok(existsSync(join(root, 'public/assets/sprites/icons', icon)), icon);
     }
   });
@@ -290,11 +290,11 @@ describe('Class Axe (class_axe.js, recipe 301)', () => {
     assert.ok(!skipped.includes('"class_axe"'));
     const items = JSON.parse(readFileSync(join(root, 'public/assets/content/making-items.json'), 'utf8'));
     assert.equal(items.items.class_axe.isTool, true);
-    for (const f of ['icons/class_axe.png', 'icons/class_axe_broken.png', 'tools/class-axe-tool.png']) {
+    for (const f of ['icons/class_axe.webp', 'icons/class_axe_broken.webp', 'tools/class-axe-tool.webp']) {
       assert.ok(existsSync(join(root, 'public/assets/sprites', f)), f);
     }
     const game = readFileSync(join(root, 'public/game.js'), 'utf8');
-    assert.ok(game.includes("url: 'assets/sprites/tools/class-axe-tool.png'"));
+    assert.ok(game.includes("url: 'assets/sprites/tools/class-axe-tool.webp'"));
     // Ticket 63: the pack's broken icons come from js/tools.js BROKEN_TOOL_ICONS (every tool with one).
     assert.ok(game.includes('brokenToolIcon(s.classTsid)'));
     assert.match(readFileSync(join(root, 'public/js/tools.js'), 'utf8'), /BROKEN_TOOL_ICONS = Object\.freeze\(new Set\(\[[^\]]*'class_axe'/);

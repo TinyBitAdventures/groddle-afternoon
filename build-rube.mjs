@@ -60,7 +60,7 @@ for (const id of classes) {
     baseCost,
     doll: tags.includes('doll') || /function canRubeOffer/.test(src),
     special: specials.has(id) || tags.includes('rube_special'),
-    art: existsSync(join(ICONS, `${id}.png`)),
+    art: existsSync(join(ICONS, `${id}.webp`)),
   };
 }
 

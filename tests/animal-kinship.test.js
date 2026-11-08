@@ -15,10 +15,10 @@ import {
   quoteAnimalKinship,
   performAnimalKinship,
   resetAnimalKinshipDay,
-} from '../public/js/animal-kinship.js?v=05cd67ec';
-import { createAnimalState, animalStatusLabel } from '../public/js/animals.js?v=d5af4f3c';
-import { getVerbsFor, runVerb } from '../public/content.js?v=075ded81';
-import { createToolConditionState, getToolCondition, setToolRemaining } from '../public/js/tools.js?v=f701b241';
+} from '../public/js/animal-kinship.js?v=b857b068';
+import { createAnimalState, animalStatusLabel } from '../public/js/animals.js?v=0d9f9b0f';
+import { getVerbsFor, runVerb } from '../public/content.js?v=ebc8b8b3';
+import { createToolConditionState, getToolCondition, setToolRemaining } from '../public/js/tools.js?v=d8aa3536';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const publicDir = join(here, '../public');

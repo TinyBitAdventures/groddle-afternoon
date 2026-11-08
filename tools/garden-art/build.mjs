@@ -24,7 +24,7 @@
  * 4. Every symbol's zoom-3 render, box-downscaled 3:1 on its own pixel grid,
  *    is scored against FFDec's zoom-1 render (the tools/vector-sprites bars:
  *    sheet mean 0.9, worst frame 0.8, no frame preferring a one-pixel shift).
- * 5. Writes public/assets/sprites/garden/<file>.png and <file>@3x.png|webp,
+ * 5. Writes public/assets/sprites/garden/<file>.webp and <file>@3x.webp|png (lossless),
  *    tools/garden-art/garden.json (provenance, every frame, every file's
  *    sha256), the generated public/js/garden-art.js, and registers the 3x
  *    files in tools/vector-sprites/results.json -> public/js/sprite-hires.js
@@ -44,6 +44,7 @@ import { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import os from 'node:os';
 import { symbolBounds } from './swf-bounds.mjs';
+import { encodeLosslessWebp, replacePngWithWebp } from '../webp-lossless.mjs';
 import { downscale, readImage, score, writeImage } from '../quoin-art/pixels.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
@@ -64,16 +65,16 @@ export const FRAME_MIN = 0.8;
 
 /** Other files in assets/sprites/garden that are not this tool's (their own CC0 records). */
 export const OTHER_FILES = Object.freeze([
-  'bean_garden__x1_1_x1_2_x1_3_x1_4_png_1354836553.png',
-  'bean_garden__x1_iconic_png_1354836553.png',
-  'garden_new__x1_1_png_1354833270.png',
+  'bean_garden__x1_1_x1_2_x1_3_x1_4_png_1354836553.webp',
+  'bean_garden__x1_iconic_png_1354836553.webp',
+  'garden_new__x1_1_png_1354833270.webp',
 ]);
 
 /** Which file each symbol goes in. */
 export function fileFor(name) {
-  if (/^garden_/.test(name)) return `${OUT_DIR}/garden_crops.png`;
-  if (/^(strip|shimla|polherb|polcrop|polgroddle|apartment)_\d+_\d+$/.test(name)) return `${OUT_DIR}/garden_bed_${name}.png`;
-  if (/^(dry|wet|depleted|seeds|(herb_)?seedling_(dry|wet|fertilized)|harvested_(dry|wet))$/.test(name)) return `${OUT_DIR}/garden_plots.png`;
+  if (/^garden_/.test(name)) return `${OUT_DIR}/garden_crops.webp`;
+  if (/^(strip|shimla|polherb|polcrop|polgroddle|apartment)_\d+_\d+$/.test(name)) return `${OUT_DIR}/garden_bed_${name}.webp`;
+  if (/^(dry|wet|depleted|seeds|(herb_)?seedling_(dry|wet|fertilized)|harvested_(dry|wet))$/.test(name)) return `${OUT_DIR}/garden_plots.webp`;
   return null;
 }
 
@@ -164,12 +165,19 @@ function writePng(img, file) {
   execFileSync('magick', [file, '-strip', '-define', 'png:compression-level=9', '-define', 'png:exclude-chunks=date,time', file]);
 }
 
-/** <stem>@3x.png or .webp (lossless, when clearly smaller). Returns the public path. */
+/** The 1x file as lossless WebP (tools/webp-lossless.mjs), drawn through a PNG. */
+function writeOne(img, file) {
+  const png = file.replace(/\.webp$/, '.tmp.png');
+  writePng(img, png);
+  replacePngWithWebp(png, file);
+}
+
+/** <stem>@3x.webp, lossless, or .png in the rare case WebP is not smaller (Austin 2026-11-07). Returns the public path. */
 function writeHires(img, stem) {
   const tmp = `${stem}.tmp@3x`;
   writePng(img, `${tmp}.png`);
-  execFileSync('cwebp', ['-quiet', '-lossless', '-exact', '-z', '9', `${tmp}.png`, '-o', `${tmp}.webp`]);
-  const webp = statSync(`${tmp}.webp`).size < statSync(`${tmp}.png`).size * 0.9;
+  encodeLosslessWebp(`${tmp}.png`, `${tmp}.webp`);
+  const webp = statSync(`${tmp}.webp`).size < statSync(`${tmp}.png`).size;
   for (const ext of ['png', 'webp']) if (existsSync(`${stem}@3x.${ext}`)) unlinkSync(`${stem}@3x.${ext}`);
   const file = `${stem}@3x.${webp ? 'webp' : 'png'}`;
   renameSync(`${tmp}.${webp ? 'webp' : 'png'}`, file);
@@ -255,8 +263,8 @@ async function build(args) {
       continue;
     }
     const abs = join(PUBLIC, file);
-    writePng(one, abs);
-    const hires = writeHires(three, abs.replace(/\.png$/, ''));
+    writeOne(one, abs);
+    const hires = writeHires(three, abs.replace(/\.(png|webp)$/, ''));
     data.files[file] = {
       hires, w: size.w, h: size.h, cells: cells.length,
       sha256: sha256(abs), sha256_3: sha256(join(PUBLIC, hires)),

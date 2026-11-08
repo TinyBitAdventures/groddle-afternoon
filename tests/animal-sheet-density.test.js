@@ -5,6 +5,8 @@
 // SWF (tools/vector-sprites/animals.json, js/sprite-hires.js), and that 3x must cover the animal's
 // largest draw scale: its world scale times the stage scale at Original zoom on a 2560 x 1440 monitor.
 import { test } from 'node:test';
+import { imageSize } from '../tools/image-size.mjs';
+import { pngBufferToWebp } from '../tools/webp-lossless.mjs';
 import assert from 'node:assert/strict';
 import { existsSync } from 'node:fs';
 import { join, dirname } from 'node:path';
@@ -56,11 +58,11 @@ test('every animal sheet the game slices is found, the Piggy rooting look among 
   assert.ok(by('butterfly') >= 4, `butterfly sheets ${by('butterfly')}`);
   assert.ok(by('batterfly') >= 2, `batterfly sheets ${by('batterfly')}`);
   assert.ok(by('kitty') >= 11, `kitty sheets ${by('kitty')}`);
-  assert.ok(rows.some((r) => r.path === 'assets/sprites/npc_piggy__x1_look_screen_png_1354829434.png'));
+  assert.ok(rows.some((r) => r.path === 'assets/sprites/npc_piggy__x1_look_screen_png_1354829434.webp'));
 });
 
 test('every animal sheet has a 3x twin from the vector SWF, exactly three times its 1x pixels', async () => {
-  const { HIRES_SPRITES } = await import('../public/js/sprite-hires.js?v=f98be5eb');
+  const { HIRES_SPRITES } = await import('../public/js/sprite-hires.js?v=abaf3d5a');
   const missing = [];
   for (const r of await animalSheets()) {
     if (r.density >= 3) continue;
@@ -71,7 +73,7 @@ test('every animal sheet has a 3x twin from the vector SWF, exactly three times 
 });
 
 test('each animal sheet stores at least as many pixels as its largest draw scale', async () => {
-  const { HIRES_SPRITES } = await import('../public/js/sprite-hires.js?v=f98be5eb');
+  const { HIRES_SPRITES } = await import('../public/js/sprite-hires.js?v=abaf3d5a');
   const { stageFor } = await import('../public/js/location-view.js?v=5a0d5c0b');
   // Original zoom on a 2560 x 1440 monitor (the game area under the top bar), CSS px per world px.
   const stage = stageFor({ width: 2560, height: 1360, sceneWidth: 4000, sceneHeight: 1000, zoom: 1 }).scale;
@@ -93,9 +95,9 @@ test('each animal sheet stores at least as many pixels as its largest draw scale
 // the 2012 client never magnified them). No vector source shipped, so each has a 3x twin rendered
 // from a hand trace of the 1x PNG (tools/signpost-art, G509), loaded wherever the 1x URL is used.
 const SIGN_RASTERS = Object.freeze({
-  'assets/ui/signpost/signpost_post.png': { w: 43, h: 246 },
-  'assets/ui/signpost/signpost_arm.png': { w: 260, h: 30 },
-  'assets/ui/signpost/signpost_shadow.png': { w: 87, h: 26 },
+  'assets/ui/signpost/signpost_post.webp': { w: 43, h: 246 },
+  'assets/ui/signpost/signpost_arm.webp': { w: 260, h: 30 },
+  'assets/ui/signpost/signpost_shadow.webp': { w: 87, h: 26 },
 });
 
 /** Device px per signpost art px: holder 0.8 x the stage at Original zoom x a 2x screen. */
@@ -116,19 +118,19 @@ test('signpost words are rendered at least as finely as a 2x screen draws them a
   }
 });
 
-test('signpost woods keep Tiny Speck\'s own 1x PNGs, byte for byte, for 1x screens', async () => {
+test('signpost woods keep Tiny Speck\'s own 1x pictures (their pixels, as lossless WebP) for 1x screens', async () => {
   const { readFileSync } = await import('node:fs');
   const client = join(root, '../glitch-client/TSEngineAssets/src/assets/graphics');
   for (const [path, size] of Object.entries(SIGN_RASTERS)) {
     const b = readFileSync(join(pub, path));
-    assert.deepEqual({ w: b.readUInt32BE(16), h: b.readUInt32BE(20) }, size, path);
-    if (existsSync(client)) assert.ok(b.equals(readFileSync(join(client, path.split('/').pop()))), `${path} is the client's file`);
+    assert.deepEqual({ w: imageSize(b).w, h: imageSize(b).h }, size, path);
+    if (existsSync(client)) assert.ok(b.equals(pngBufferToWebp(readFileSync(join(client, path.split('/').pop().replace(/\.webp$/, '.png'))))), `${path} is the client's picture`);
   }
 });
 
 test('signpost woods have a sharp 3x copy, finer than a 2x screen draws them at Original zoom', async () => {
   const { readFileSync } = await import('node:fs');
-  const { HIRES_SPRITES, hiresSpriteUrl } = await import('../public/js/sprite-hires.js?v=f98be5eb');
+  const { HIRES_SPRITES, hiresSpriteUrl } = await import('../public/js/sprite-hires.js?v=abaf3d5a');
   const soft = [];
   for (const [path, size] of Object.entries(SIGN_RASTERS)) {
     const twin = HIRES_SPRITES.get(path);
@@ -141,7 +143,7 @@ test('signpost woods have a sharp 3x copy, finer than a 2x screen draws them at 
     const b = readFileSync(join(pub, twin));
     const kind = b.toString('ascii', 12, 16);
     const three = b.readUInt32BE(0) === 0x89504e47
-      ? { w: b.readUInt32BE(16), h: b.readUInt32BE(20) }
+      ? { w: imageSize(b).w, h: imageSize(b).h }
       : kind === 'VP8X'
         ? { w: b.readUIntLE(24, 3) + 1, h: b.readUIntLE(27, 3) + 1 }
         : { w: (b.readUInt32LE(21) & 0x3fff) + 1, h: ((b.readUInt32LE(21) >> 14) & 0x3fff) + 1 };

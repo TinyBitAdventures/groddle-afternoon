@@ -26,9 +26,9 @@
  * imgLast, imgShuffled, imgAutoplay, imgBrain, imgEnergyMax.
  */
 
-import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=d82f3b00';
+import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=b7609342';
 import { getGameDayKey } from '../game-day.js?v=edb00566';
-import { quoinDailyLimitFor } from '../quoins.js?v=f154a79e';
+import { quoinDailyLimitFor } from '../quoins.js?v=299cc3f4';
 import { XP_FOR_LEVEL } from '../progression.js?v=33462eaa';
 import {
   CARD_ART_LAYERS,
@@ -58,7 +58,7 @@ import { brainCapacityRescale, skillTimeFactor } from '../imagination-effects.js
 import { betterLearningDiscount } from '../better-learning.js?v=044ff9ff';
 import { rescaleStudiesForLearningModifier } from '../skills.js?v=4542bdf9';
 import { isOfferedInRemake, isOfferedOnline, remakeStatus } from '../imagination-remake.js?v=c37ad887';
-import { hellFeature } from './hell-feature.js?v=13196575';
+import { hellFeature } from './hell-feature.js?v=93f1c8dd';
 
 const ART = 'assets/imagination/cards/';
 const UI = 'assets/imagination/ui/';
@@ -298,7 +298,7 @@ function afterRedeal(engine, message) {
 const PANEL_CSS = `
 #imagination-panel{background:color-mix(in srgb, var(--c-navy-16) 45%, transparent)}
 .img-card-shell{position:relative;width:min(760px,96vw);max-height:min(86vh,700px,calc(100% - 16px));overflow:auto;border-radius:var(--radius-2xl);
-  background:var(--c-violet-20) url(${UI}imagination_space.png) center/341px 187px repeat;box-shadow:0 18px 50px color-mix(in srgb, var(--c-black) 45%, transparent);
+  background:var(--c-violet-20) url(${UI}imagination_space.webp) center/341px 187px repeat;box-shadow:0 18px 50px color-mix(in srgb, var(--c-black) 45%, transparent);
   color:var(--c-mauve-95);padding:var(--sp-7) var(--sp-9) var(--sp-8);border:1px solid color-mix(in srgb, var(--c-violet-79) 25%, transparent)}
 .img-card-shell::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
   background:radial-gradient(ellipse at 50% 0%,color-mix(in srgb, var(--c-violet-64) 28%, transparent),transparent 60%),radial-gradient(ellipse at 50% 110%,color-mix(in srgb, var(--c-blue-74) 18%, transparent),transparent 55%)}
@@ -461,9 +461,9 @@ function ensurePanel() {
   panel = el('div', { id: 'imagination-panel', class: 'glitch-modal imagination-panel ui-sheet ui-sheet-center', hidden: true });
   panel.innerHTML = `<div class="img-card-shell ui-sheet-card" role="dialog" aria-modal="true" aria-labelledby="img-title">
     <div class="img-head ui-sheet-head">
-      <img class="ui-sheet-icon img-head-icon mp-modern-only" src="${UI}imagination_button.png" alt="" />
+      <img class="ui-sheet-icon img-head-icon mp-modern-only" src="${UI}imagination_button.webp" alt="" />
       <div class="img-head-title"><p class="img-kicker">Imagination</p><h2 id="img-title" class="ui-sheet-title" tabindex="-1">Upgrade</h2></div>
-      <div class="img-balance" title="Spendable imagination"><img src="${UI}imagination_button.png" alt="iMG" /><strong data-img-balance>0</strong></div>
+      <div class="img-balance" title="Spendable imagination"><img src="${UI}imagination_button.webp" alt="iMG" /><strong data-img-balance>0</strong></div>
       <span class="kcap ui-sheet-key mp-modern-only" aria-hidden="true">U</span>
       <button type="button" class="img-x ui-sheet-x" data-img-close aria-label="Close Upgrades (Esc)">×</button>
     </div>
@@ -653,12 +653,12 @@ function render(dealing = false) {
   const foot = el('div', { class: 'img-foot' });
   const free = canFreeReshuffle(state, dayKey());
   const redeal = el('button', { type: 'button', dataset: { imgRedeal: '1' }, disabled: !free });
-  redeal.append(el('img', { src: `${UI}${free ? 'redeal' : 'redeal_no'}.png`, alt: '' }), document.createTextNode('Re-deal cards'));
+  redeal.append(el('img', { src: `${UI}${free ? 'redeal' : 'redeal_no'}.webp`, alt: '' }), document.createTextNode('Re-deal cards'));
   foot.append(redeal);
   const cards = countItem(engine.inv, RESHUFFLE_CARD);
   if (cards > 0) {
     const use = el('button', { type: 'button', dataset: { imgReshuffleCard: '1' } });
-    use.append(el('img', { src: 'assets/sprites/icons/upgrade_card_reshuffle.png', alt: '', style: 'width:14px;height:19px' }), document.createTextNode(`Use a Reshuffle Card (${cards})`));
+    use.append(el('img', { src: 'assets/sprites/icons/upgrade_card_reshuffle.webp', alt: '', style: 'width:14px;height:19px' }), document.createTextNode(`Use a Reshuffle Card (${cards})`));
     foot.append(use);
   }
   foot.append(el('small', {}, free ? 'You can re-deal once a day' : "You've already re-dealt today"));

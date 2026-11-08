@@ -33,9 +33,9 @@
  * teleportLast, teleportScripts (each copy's street, - for one with none), teleportEnergyCost.
  */
 
-import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=d82f3b00';
+import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=b7609342';
 import { getGameDayKey } from '../game-day.js?v=edb00566';
-import { canUseTool, copyForVerb, copyTag, copyTags, setCopyTag, takeToolCopy, useToolCondition } from '../tools.js?v=f701b241';
+import { canUseTool, copyForVerb, copyTag, copyTags, setCopyTag, takeToolCopy, useToolCondition } from '../tools.js?v=d8aa3536';
 import {
   PAPER_CLASS,
   QUILL_CLASS,
@@ -419,7 +419,7 @@ function buildMapCard(engine) {
   card.dataset.teleportCard = '1';
   const head = document.createElement('header');
   const icon = document.createElement('img');
-  icon.src = 'assets/sprites/icons/teleportation_script.png';
+  icon.src = 'assets/sprites/icons/teleportation_script.webp';
   icon.alt = '';
   const text = document.createElement('div');
   const title = document.createElement('strong');

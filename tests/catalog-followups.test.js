@@ -5,6 +5,7 @@
  * Run: node --test tests/catalog-followups.test.js
  */
 import assert from 'node:assert/strict';
+import { imageSize } from '../tools/image-size.mjs';
 import { describe, it } from 'node:test';
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
@@ -18,18 +19,18 @@ const page = (id) => readFileSync(join(items, id, 'index.html'), 'utf8');
 const skipWithoutInventory = existsSync(INVENTORY_DB) ? false : `needs the coverage inventory at ${INVENTORY_DB}`;
 
 function pngSize(file) {
-  const b = readFileSync(file);
-  assert.equal(b.toString('ascii', 12, 16), 'IHDR', file);
-  return { w: b.readUInt32BE(16), h: b.readUInt32BE(20), depth: b[24], type: b[25] };
+  const s = imageSize(readFileSync(file));
+  assert.ok(s, file);
+  return s;
 }
 
 describe('G174 catalog follow-ups', () => {
   it('ships the quoin and moving quoin icons (1x, from the OGA quoin sheet and moving_quoin.swf)', () => {
     const want = { quoin: { w: 26, h: 30 }, moving_quoin: { w: 20, h: 30 } };
     for (const [id, size] of Object.entries(want)) {
-      const s = pngSize(join(pub, 'assets/sprites/icons', `${id}.png`));
+      const s = pngSize(join(pub, 'assets/sprites/icons', `${id}.webp`));
       assert.deepEqual({ w: s.w, h: s.h }, size, id);
-      assert.deepEqual([s.depth, s.type], [8, 6], `${id}: 8-bit RGBA`);
+      assert.equal(s.format, 'webp', `${id}: lossless WebP`);
       assert.equal(data.items.find((i) => i.id === id).icon, 1, id);
     }
   });
@@ -38,11 +39,11 @@ describe('G174 catalog follow-ups', () => {
     const ids = Object.keys(ROCK_STAND_INS);
     assert.equal(ids.length, 38);
     const dir = join(pub, 'assets/sprites/icons');
-    const one = readFileSync(join(dir, `${ROCK_STAND_IN_ICON}.png`));
-    const three = readFileSync(join(dir, `${ROCK_STAND_IN_ICON}@3x.png`));
+    const one = readFileSync(join(dir, `${ROCK_STAND_IN_ICON}.webp`));
+    const three = readFileSync(join(dir, `${ROCK_STAND_IN_ICON}@3x.webp`));
     for (const [id, capture] of Object.entries(ROCK_STAND_INS)) {
-      assert.ok(readFileSync(join(dir, `${id}.png`)).equals(one), id);
-      assert.ok(readFileSync(join(dir, `${id}@3x.png`)).equals(three), id);
+      assert.ok(readFileSync(join(dir, `${id}.webp`)).equals(one), id);
+      assert.ok(readFileSync(join(dir, `${id}@3x.webp`)).equals(three), id);
       // The capture's <ts> is the version stamp of the artifact's own SWF in GSJS.
       const src = readFileSync(join(GSJS, 'items', `${id}.js`), 'utf8');
       assert.match(src, new RegExp(`items\\\\?/2012-12\\\\?/${id}-${capture.split('_')[1]}\\.swf`), id);

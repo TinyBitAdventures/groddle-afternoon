@@ -45,7 +45,7 @@ describe('rube catalog', () => {
     assert.equal(CATALOG.cherry.plural, 'Cherries');
     assert.equal(CATALOG.cubimal_package.special, true);
     for (const [id, row] of Object.entries(CATALOG)) {
-      if (row.art) assert.ok(existsSync(join(root, 'assets/sprites/icons', `${id}.png`)), id);
+      if (row.art) assert.ok(existsSync(join(root, 'assets/sprites/icons', `${id}.webp`)), id);
     }
   });
 });

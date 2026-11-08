@@ -35,6 +35,7 @@ import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
 import os from 'node:os';
 import { readSwf } from './swf.mjs';
+import { writeLosslessWebp } from '../webp-lossless.mjs';
 import { exportMorphShapes, exportShapes, morphShapeAt } from './shapes.mjs';
 import { buildRig, flattenPart, morphOfShapeId, nodeContent, shapeIds } from './rig.mjs';
 import { mergeContainers, readAvatarFla, validateAgainstSwf } from './xfl.mjs';
@@ -90,9 +91,9 @@ function writeBitmaps(bitmaps, ids, prefix) {
   for (const id of ids) {
     const png = bitmaps.get(id);
     if (!png) continue;
-    const file = `textures/${prefix}-${id}.png`;
+    const file = `textures/${prefix}-${id}.webp`;
     mkdirSync(join(OUT, 'textures'), { recursive: true });
-    writeFileSync(join(OUT, file), png);
+    writeLosslessWebp(join(OUT, file), png);
     out[id] = file;
   }
   return out;
@@ -496,11 +497,11 @@ function reimaginedColours(key, e, groups, variantsOf) {
   return { reimagined: true, borrowedColours: e.borrowedColours, variants };
 }
 
-/** An article's bitmap textures (writeBitmaps names them <type>-<name>-<id>.png). */
+/** An article's bitmap textures (writeBitmaps names them <type>-<name>-<id>.webp). */
 function clearTextures(type, name) {
   const dir = join(OUT, 'textures');
   if (!existsSync(dir)) return;
-  const re = new RegExp(`^${type}-${name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}-\\d+\\.png$`);
+  const re = new RegExp(`^${type}-${name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}-\\d+\\.(png|webp)$`);
   for (const f of readdirSync(dir)) if (re.test(f)) rmSync(join(dir, f));
 }
 
@@ -567,8 +568,8 @@ async function withPage(fn) {
 }
 
 /**
- * Write a sheet losslessly: PNG, or WebP when it saves a fifth (the same
- * rule as tools/vector-sprites). Returns the file written; removes the other.
+ * Write a sheet losslessly: lossless WebP when it is smaller than the PNG (Austin 2026-11-07,
+ * the same rule as tools/vector-sprites), else PNG. Returns the file written; removes the other.
  */
 function saveSheet(stem, dataUrl) {
   mkdirSync(dirname(stem), { recursive: true });
@@ -577,7 +578,7 @@ function saveSheet(stem, dataUrl) {
   writeFileSync(png, Buffer.from(dataUrl.split(',')[1], 'base64'));
   execFileSync('magick', [png, '-define', 'png:compression-level=9', '-define', 'png:compression-filter=5', '-strip', `PNG32:${png}`]);
   execFileSync('cwebp', ['-quiet', '-lossless', '-exact', '-z', '9', png, '-o', webp]);
-  if (statSync(webp).size < statSync(png).size * 0.8) { rmSync(png); return webp; }
+  if (statSync(webp).size < statSync(png).size) { rmSync(png); return webp; }
   rmSync(webp);
   return png;
 }

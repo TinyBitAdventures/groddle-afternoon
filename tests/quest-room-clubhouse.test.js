@@ -9,8 +9,8 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import * as kit from '../public/js/quest-rooms/kit.js?v=d98b987e';
-import * as club from '../public/js/quest-rooms/clubhouse.js?v=7d181e3a';
+import * as kit from '../public/js/quest-rooms/kit.js?v=25fc6d59';
+import * as club from '../public/js/quest-rooms/clubhouse.js?v=c0b141a6';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const JUMP_RISE = 100;
@@ -197,7 +197,7 @@ describe('Join the Club (clubhouse)', () => {
 
   it('ships its recovered art', () => {
     for (const f of ['club_house_picture', 'wall_button_lockIn', 'wall_button_lockOut', 'fireplace']) {
-      assert.ok(existsSync(join(root, 'public/assets/sprites/quest-rooms/clubhouse', `${f}.png`)), f);
+      assert.ok(existsSync(join(root, 'public/assets/sprites/quest-rooms/clubhouse', `${f}.webp`)), f);
     }
     const src = readFileSync(join(root, 'public/js/quest-rooms/clubhouse.js'), 'utf8');
     const decos = [...src.matchAll(/(?:deco|at)\(PIXI, '([a-z0-9_]+)'|at\('([a-z0-9_]+)'/g)].map((m) => m[1] || m[2]);

@@ -35,7 +35,7 @@
  * meomi2 feltgrass tile, recoloured from the Snaps): tools/room-art picto_pattern.
  */
 
-import { pushOutOfSolids, spawnQuoins, takeQuoins, JUMP_RISE, JUMP_GAP } from './puzzle-kit.js?v=7410b322';
+import { pushOutOfSolids, spawnQuoins, takeQuoins, JUMP_RISE, JUMP_GAP } from './puzzle-kit.js?v=378c28e8';
 import { textureFromUrl } from '../textures.js?v=3149d699';
 import { PICTO_PATTERN_FILES } from '../picto-pattern-art.js?v=72120af4';
 
@@ -269,7 +269,7 @@ export const room = {
   id: ROOM_ID,
   title: 'Picto-Pattern',
   kicker: 'Add and subtract until you reach 11',
-  icon: 'assets/sprites/icons/cloud_11_smoothie.png',
+  icon: 'assets/sprites/icons/cloud_11_smoothie.webp',
   theme: 'lab',
   hubName: 'Picto Pattern',
   durationMs: 0,
@@ -382,8 +382,8 @@ export const room = {
     ctx.data.prevX = layout.spawn.x;
     ctx.data.phase = 'play';
     ctx.data.buttons = [];
-    const outTex = textureFromUrl(`${ART}wall_button_lockOut.png`);
-    const inTex = textureFromUrl(`${ART}wall_button_lockIn.png`);
+    const outTex = textureFromUrl(`${ART}wall_button_lockOut.webp`);
+    const inTex = textureFromUrl(`${ART}wall_button_lockIn.webp`);
     for (const s of layout.sections) {
       for (const b of s.buttons) ctx.data.buttons.push(makeButton(ctx, { ...b, section: s.i, outTex, inTex }));
       ctx.data.buttons.push(makeButton(ctx, { ...s.reset, section: s.i, reset: true, outTex, inTex }));

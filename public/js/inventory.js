@@ -8,8 +8,8 @@
 /** Canonical icon path for a class_tsid (OGA iconic extract). */
 import { loseEnergy, loseMood, metabolicGain, moodMax } from './metabolics.js?v=8504134e';
 export function itemIcon(classTsid) {
-  if (!classTsid) return 'assets/sprites/icons/apple.png';
-  return `assets/sprites/icons/${classTsid}.png`;
+  if (!classTsid) return 'assets/sprites/icons/apple.webp';
+  return `assets/sprites/icons/${classTsid}.webp`;
 }
 
 /**

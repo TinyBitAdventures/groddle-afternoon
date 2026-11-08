@@ -3,6 +3,7 @@
  * Run: node --test tests/mining.test.js
  */
 import { describe, it } from 'node:test';
+import { imageSize } from '../tools/image-size.mjs';
 import assert from 'node:assert/strict';
 import { readFileSync, existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
@@ -25,13 +26,13 @@ import {
   starterMiningTools,
   miningVendorOffers,
   STARTER_MINING_SKILLS,
-} from '../public/js/mining.js?v=29fe2127';
+} from '../public/js/mining.js?v=fc28670f';
 import {
   createInventory,
   countItem,
   listPackToolSlots,
   isToolItem,
-} from '../public/js/inventory.js?v=d82f3b00';
+} from '../public/js/inventory.js?v=b7609342';
 import {
   loadRecipeCatalogFromFile,
   listRecipesForTool,
@@ -39,9 +40,9 @@ import {
   craftRecipe,
   ensureMakingItems,
   TOOL_CATALOG,
-} from '../public/js/making.js?v=c9dc233e';
-import { DEFAULT_VENDOR, vendorBuy } from '../public/js/vendor.js?v=18b51628';
-import { createToolConditionState, getToolCondition } from '../public/js/tools.js?v=f701b241';
+} from '../public/js/making.js?v=f4f214c2';
+import { DEFAULT_VENDOR, vendorBuy } from '../public/js/vendor.js?v=307aca18';
+import { createToolConditionState, getToolCondition } from '../public/js/tools.js?v=d8aa3536';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const SPIKE = join(__dirname, '../public');
@@ -57,8 +58,8 @@ describe('mining catalog (GSJS rocks)', () => {
       assert.ok(r.minChunks >= 3);
       assert.ok(r.maxChunks >= r.minChunks);
       const bytes = readFileSync(join(SPIKE, r.worldSheet));
-      assert.equal(bytes.readUInt32BE(16), r.frameWidth * r.sheetFrames, `${id} strip width`);
-      assert.equal(bytes.readUInt32BE(20), r.frameHeight, `${id} strip height`);
+      assert.equal(imageSize(bytes).w, r.frameWidth * r.sheetFrames, `${id} strip width`);
+      assert.equal(imageSize(bytes).h, r.frameHeight, `${id} strip height`);
       assert.match(r.textureKey, /^mineRock/);
     }
   });
@@ -86,11 +87,11 @@ describe('mining catalog (GSJS rocks)', () => {
       'copper',
       'element_red',
     ]) {
-      const p = join(SPIKE, `assets/sprites/icons/${id}.png`);
+      const p = join(SPIKE, `assets/sprites/icons/${id}.webp`);
       assert.ok(existsSync(p), p);
     }
     for (const id of ['rock_metal', 'rock_dullite', 'rock_beryl', 'rock_sparkly']) {
-      const p = join(SPIKE, `assets/sprites/mining/${id}.png`);
+      const p = join(SPIKE, `assets/sprites/mining/${id}.webp`);
       assert.ok(existsSync(p), p);
     }
   });

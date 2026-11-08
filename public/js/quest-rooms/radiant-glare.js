@@ -38,7 +38,7 @@
  * LIFFFRAHB4A3JHJ, reference only).
  */
 
-import { BODY_H, JUMP_GAP, JUMP_RISE, spawnQuoins, takeQuoins } from './puzzle-kit.js?v=7410b322';
+import { BODY_H, JUMP_GAP, JUMP_RISE, spawnQuoins, takeQuoins } from './puzzle-kit.js?v=378c28e8';
 
 export const W = 1100;
 export const H = 3400;
@@ -500,7 +500,7 @@ export const room = {
   id: 'radiant_glare',
   title: 'Radiant Glare',
   kicker: 'Hone your skills as you travel toward the radiant glare above',
-  icon: 'assets/sprites/icons/play_cube.png',
+  icon: 'assets/sprites/icons/play_cube.webp',
   theme: 'lab',
   // G315: hub 135 'Puzzles' (inc_data_maps_prod.js 1197), the template's hub.
   hubName: 'Puzzles',

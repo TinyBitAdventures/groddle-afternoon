@@ -69,14 +69,14 @@ const DIR = 'assets/sprites/street-furniture/';
 
 /** Exact OGA cells: every mailbox clip is 97×146. */
 export const MAILBOX_SHEETS = Object.freeze({
-  idle: Object.freeze({ path: `${DIR}mailbox-left-idle.png`, fw: 97, fh: 146, cols: 1, frames: 1 }),
-  has_mail: Object.freeze({ path: `${DIR}mailbox-left-has-mail.png`, fw: 97, fh: 146, cols: 10, frames: 73 }),
-  interact: Object.freeze({ path: `${DIR}mailbox-left-interact.png`, fw: 97, fh: 146, cols: 9, frames: 9 }),
-  all_done: Object.freeze({ path: `${DIR}mailbox-left-all-done.png`, fw: 97, fh: 146, cols: 8, frames: 22 }),
+  idle: Object.freeze({ path: `${DIR}mailbox-left-idle.webp`, fw: 97, fh: 146, cols: 1, frames: 1 }),
+  has_mail: Object.freeze({ path: `${DIR}mailbox-left-has-mail.webp`, fw: 97, fh: 146, cols: 10, frames: 73 }),
+  interact: Object.freeze({ path: `${DIR}mailbox-left-interact.webp`, fw: 97, fh: 146, cols: 9, frames: 9 }),
+  all_done: Object.freeze({ path: `${DIR}mailbox-left-all-done.webp`, fw: 97, fh: 146, cols: 8, frames: 22 }),
 });
-export const STONE_ART = Object.freeze({ path: `${DIR}visiting-stone.png`, w: 101, h: 155 });
-export const NOTE_ART = Object.freeze({ path: `${DIR}note-world.png`, w: 45, h: 14, icon: 'assets/sprites/icons/note.png' });
-export const BOARD_ART = Object.freeze({ w: 212, h: 147, path: (count) => `${DIR}notice-board-m${count}.png` });
+export const STONE_ART = Object.freeze({ path: `${DIR}visiting-stone.webp`, w: 101, h: 155 });
+export const NOTE_ART = Object.freeze({ path: `${DIR}note-world.webp`, w: 45, h: 14, icon: 'assets/sprites/icons/note.webp' });
+export const BOARD_ART = Object.freeze({ w: 212, h: 147, path: (count) => `${DIR}notice-board-m${count}.webp` });
 
 export const MAILBOX_ALL_DONE_MS = 2000;
 export const MAILBOX_HITBOX = 200;

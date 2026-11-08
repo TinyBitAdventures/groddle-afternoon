@@ -18,7 +18,7 @@
  */
 
 import { MAKE_TOOL_SHEETS } from './make-tool-sheets.js?v=6f758e09';
-import { ORB_TOOL_SHEET } from './meditation.js?v=380b2f3f';
+import { ORB_TOOL_SHEET } from './meditation.js?v=f0c00590';
 import { SOUND_ALIASES, SOUND_FILES } from './sound-keys.js?v=6aedc206';
 
 /** items/include/jobs.js startJobWork 293-305. */
@@ -30,13 +30,13 @@ const FPS = 30;
 /** Field tools' tool_animation sheets, as game.js loads them (TEXTURE_DEFS, PICK_TOOL_SHEETS, IRRIGATOR_TOOL_SHEET). */
 const FIELD_TOOL_SHEETS = Object.freeze({
   // OGA hatchet__x1_tool_animation: 38 cells of 110x64 (game.js hatchetTool).
-  hatchet: Object.freeze({ url: 'assets/sprites/tools/hatchet-tool.png', fw: 110, fh: 64, cols: 8, frames: 38 }),
+  hatchet: Object.freeze({ url: 'assets/sprites/tools/hatchet-tool.webp', fw: 110, fh: 64, cols: 8, frames: 38 }),
   // OGA class_axe__x1_tool_animation: 38 cells of 111x65 (game.js classAxeTool).
-  class_axe: Object.freeze({ url: 'assets/sprites/tools/class-axe-tool.png', fw: 111, fh: 65, cols: 8, frames: 38 }),
+  class_axe: Object.freeze({ url: 'assets/sprites/tools/class-axe-tool.webp', fw: 111, fh: 65, cols: 8, frames: 38 }),
   // OGA watering_can__x1_tool_animation: 30 cells of 91x78 (game.js wateringCanTool).
-  watering_can: Object.freeze({ url: 'assets/sprites/tools/watering-can-tool.png', fw: 91, fh: 78, cols: 10, frames: 30 }),
+  watering_can: Object.freeze({ url: 'assets/sprites/tools/watering-can-tool.webp', fw: 91, fh: 78, cols: 10, frames: 30 }),
   // OGA irrigator_9000__x1_tool_animation: 30 cells of 95x76 (game.js IRRIGATOR_TOOL_SHEET).
-  irrigator_9000: Object.freeze({ url: 'assets/sprites/making/irrigator_9000-tool.png', fw: 95, fh: 76, cols: 10, frames: 30 }),
+  irrigator_9000: Object.freeze({ url: 'assets/sprites/making/irrigator_9000-tool.webp', fw: 95, fh: 76, cols: 10, frames: 30 }),
   // pick.swf / fancy_pick.swf tool_animation, root frames 1-33 (game.js PICK_TOOL_DEF).
   pick: Object.freeze({ url: 'assets/sprites/tools/pick-tool@3x.webp', fw: 115, fh: 63, cols: 11, frames: 33 }),
   fancy_pick: Object.freeze({ url: 'assets/sprites/tools/fancy-pick-tool@3x.webp', fw: 115, fh: 63, cols: 11, frames: 33 }),

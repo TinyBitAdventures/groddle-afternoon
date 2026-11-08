@@ -3,10 +3,10 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import * as kit from '../public/js/quest-rooms/kit.js?v=d98b987e';
+import * as kit from '../public/js/quest-rooms/kit.js?v=25fc6d59';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
-const mod = await import('../public/js/quest-rooms/esquibeth.js?v=ed42ce79');
+const mod = await import('../public/js/quest-rooms/esquibeth.js?v=b7056a11');
 
 // Avatar reach (game.js physics): jump 9.6 px/frame against 0.42 gravity peaks near 110 px
 // and carries about 200 px at run speed 4.4; keep margins.
@@ -193,11 +193,11 @@ describe('The Last Pilgrimage of Esquibeth (esquibeth)', () => {
 
   it('ships the recovered art and the room contract', () => {
     const art = join(root, 'public/assets/sprites/quest-rooms/esquibeth');
-    for (const name of ['hollow.webp', 'hollow_grendaline.webp', 'conch_decoy.webp', 'button_in.png', 'ghost_appear.webp', 'ghost_idle.webp', 'ghost_disappear.webp',
-      ...[1, 2, 3, 4, 5].flatMap((n) => [`ghost_note${n}.webp`, `note${n}_1.png`, `note${n}_right.png`, `note${n}_wrong.png`])]) {
+    for (const name of ['hollow.webp', 'hollow_grendaline.webp', 'conch_decoy.webp', 'button_in.webp', 'ghost_appear.webp', 'ghost_idle.webp', 'ghost_disappear.webp',
+      ...[1, 2, 3, 4, 5].flatMap((n) => [`ghost_note${n}.webp`, `note${n}_1.webp`, `note${n}_right.webp`, `note${n}_wrong.webp`])]) {
       assert.ok(existsSync(join(art, name)), name);
     }
-    assert.ok(existsSync(join(root, 'public/assets/sprites/icons/conch.png')));
+    assert.ok(existsSync(join(root, 'public/assets/sprites/icons/conch.webp')));
     assert.equal(mod.room.id, 'esquibeth');
     assert.equal(mod.room.firstStage, 'waterfall_01');
     assert.equal(mod.room.stageLabel('waterfall_03'), 'Waterfall Climb');

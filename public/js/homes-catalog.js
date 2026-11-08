@@ -18,7 +18,7 @@ export const FURNITURE_CATALOG = Object.freeze({
     "tabletop": false,
     "canFlip": true,
     "art": {
-      "path": "assets/sprites/furniture/furniture_chair.png",
+      "path": "assets/sprites/furniture/furniture_chair.webp",
       "w": 72,
       "h": 93,
       "top": 1,
@@ -49,7 +49,7 @@ export const FURNITURE_CATALOG = Object.freeze({
     "tabletop": false,
     "canFlip": true,
     "art": {
-      "path": "assets/sprites/furniture/furniture_armchair.png",
+      "path": "assets/sprites/furniture/furniture_armchair.webp",
       "w": 118,
       "h": 90,
       "top": 1,
@@ -80,7 +80,7 @@ export const FURNITURE_CATALOG = Object.freeze({
     "tabletop": false,
     "canFlip": true,
     "art": {
-      "path": "assets/sprites/furniture/furniture_bench.png",
+      "path": "assets/sprites/furniture/furniture_bench.webp",
       "w": 224,
       "h": 53,
       "top": 6,
@@ -111,7 +111,7 @@ export const FURNITURE_CATALOG = Object.freeze({
     "tabletop": false,
     "canFlip": true,
     "art": {
-      "path": "assets/sprites/furniture/furniture_stool.png",
+      "path": "assets/sprites/furniture/furniture_stool.webp",
       "w": 62,
       "h": 48,
       "top": 0,
@@ -142,7 +142,7 @@ export const FURNITURE_CATALOG = Object.freeze({
     "tabletop": false,
     "canFlip": true,
     "art": {
-      "path": "assets/sprites/furniture/furniture_sofa.png",
+      "path": "assets/sprites/furniture/furniture_sofa.webp",
       "w": 244,
       "h": 108,
       "top": 0,
@@ -173,7 +173,7 @@ export const FURNITURE_CATALOG = Object.freeze({
     "tabletop": false,
     "canFlip": true,
     "art": {
-      "path": "assets/sprites/furniture/furniture_loveseat.png",
+      "path": "assets/sprites/furniture/furniture_loveseat.webp",
       "w": 180,
       "h": 99,
       "top": 0,
@@ -203,7 +203,7 @@ export const FURNITURE_CATALOG = Object.freeze({
     "tabletop": false,
     "canFlip": true,
     "art": {
-      "path": "assets/sprites/furniture/furniture_bed.png",
+      "path": "assets/sprites/furniture/furniture_bed.webp",
       "w": 284,
       "h": 112,
       "top": 9,
@@ -233,7 +233,7 @@ export const FURNITURE_CATALOG = Object.freeze({
     "tabletop": false,
     "canFlip": false,
     "art": {
-      "path": "assets/sprites/furniture/furniture_table.png",
+      "path": "assets/sprites/furniture/furniture_table.webp",
       "w": 219,
       "h": 85,
       "top": 1,
@@ -263,7 +263,7 @@ export const FURNITURE_CATALOG = Object.freeze({
     "tabletop": false,
     "canFlip": true,
     "art": {
-      "path": "assets/sprites/furniture/furniture_coffeetable.png",
+      "path": "assets/sprites/furniture/furniture_coffeetable.webp",
       "w": 258,
       "h": 62,
       "top": 4,
@@ -293,7 +293,7 @@ export const FURNITURE_CATALOG = Object.freeze({
     "tabletop": false,
     "canFlip": true,
     "art": {
-      "path": "assets/sprites/furniture/furniture_sidetable.png",
+      "path": "assets/sprites/furniture/furniture_sidetable.webp",
       "w": 62,
       "h": 54,
       "top": 0,
@@ -323,7 +323,7 @@ export const FURNITURE_CATALOG = Object.freeze({
     "tabletop": false,
     "canFlip": true,
     "art": {
-      "path": "assets/sprites/furniture/furniture_desk.png",
+      "path": "assets/sprites/furniture/furniture_desk.webp",
       "w": 168,
       "h": 72,
       "top": 1,
@@ -353,7 +353,7 @@ export const FURNITURE_CATALOG = Object.freeze({
     "tabletop": false,
     "canFlip": true,
     "art": {
-      "path": "assets/sprites/furniture/furniture_counter.png",
+      "path": "assets/sprites/furniture/furniture_counter.webp",
       "w": 198,
       "h": 81,
       "top": 3,
@@ -382,7 +382,7 @@ export const FURNITURE_CATALOG = Object.freeze({
     "tabletop": false,
     "canFlip": true,
     "art": {
-      "path": "assets/sprites/furniture/furniture_bookcase.png",
+      "path": "assets/sprites/furniture/furniture_bookcase.webp",
       "w": 149,
       "h": 159,
       "top": 1,
@@ -406,7 +406,7 @@ export const FURNITURE_CATALOG = Object.freeze({
     "tabletop": false,
     "canFlip": true,
     "art": {
-      "path": "assets/sprites/furniture/furniture_cabinet.png",
+      "path": "assets/sprites/furniture/furniture_cabinet.webp",
       "w": 158,
       "h": 169,
       "top": 0,
@@ -430,7 +430,7 @@ export const FURNITURE_CATALOG = Object.freeze({
     "tabletop": false,
     "canFlip": true,
     "art": {
-      "path": "assets/sprites/furniture/furniture_fireplace.png",
+      "path": "assets/sprites/furniture/furniture_fireplace.webp",
       "w": 193,
       "h": 133,
       "top": 7,
@@ -459,7 +459,7 @@ export const FURNITURE_CATALOG = Object.freeze({
     "tabletop": false,
     "canFlip": true,
     "art": {
-      "path": "assets/sprites/furniture/bag_furniture_cabinet.png",
+      "path": "assets/sprites/furniture/bag_furniture_cabinet.webp",
       "w": 142,
       "h": 187,
       "top": 0,
@@ -487,7 +487,7 @@ export const FURNITURE_CATALOG = Object.freeze({
     "tabletop": false,
     "canFlip": false,
     "art": {
-      "path": "assets/sprites/furniture/bag_furniture_largecabinet.png",
+      "path": "assets/sprites/furniture/bag_furniture_largecabinet.webp",
       "w": 158,
       "h": 169,
       "top": 0
@@ -511,7 +511,7 @@ export const FURNITURE_CATALOG = Object.freeze({
     "tabletop": false,
     "canFlip": true,
     "art": {
-      "path": "assets/sprites/furniture/bag_furniture_smallcabinet.png",
+      "path": "assets/sprites/furniture/bag_furniture_smallcabinet.webp",
       "w": 168,
       "h": 77,
       "top": 0,
@@ -540,7 +540,7 @@ export const FURNITURE_CATALOG = Object.freeze({
     "tabletop": false,
     "canFlip": true,
     "art": {
-      "path": "assets/sprites/furniture/bag_furniture_wallcabinet.png",
+      "path": "assets/sprites/furniture/bag_furniture_wallcabinet.webp",
       "w": 88,
       "h": 129
     },
@@ -565,7 +565,7 @@ export const FURNITURE_CATALOG = Object.freeze({
     "tabletop": false,
     "canFlip": true,
     "art": {
-      "path": "assets/sprites/furniture/bag_furniture_sdb.png",
+      "path": "assets/sprites/furniture/bag_furniture_sdb.webp",
       "w": 67,
       "h": 70
     },
@@ -592,7 +592,7 @@ export const FURNITURE_CATALOG = Object.freeze({
     "tabletop": false,
     "canFlip": true,
     "art": {
-      "path": "assets/sprites/furniture/furniture_floorlamp.png",
+      "path": "assets/sprites/furniture/furniture_floorlamp.webp",
       "w": 50,
       "h": 176
     },
@@ -619,7 +619,7 @@ export const FURNITURE_CATALOG = Object.freeze({
     "tabletop": true,
     "canFlip": true,
     "art": {
-      "path": "assets/sprites/furniture/furniture_tablelamp.png",
+      "path": "assets/sprites/furniture/furniture_tablelamp.webp",
       "w": 40,
       "h": 65
     },
@@ -644,7 +644,7 @@ export const FURNITURE_CATALOG = Object.freeze({
     "tabletop": false,
     "canFlip": true,
     "art": {
-      "path": "assets/sprites/furniture/furniture_walllamp.png",
+      "path": "assets/sprites/furniture/furniture_walllamp.webp",
       "w": 43,
       "h": 72
     },
@@ -669,7 +669,7 @@ export const FURNITURE_CATALOG = Object.freeze({
     "tabletop": false,
     "canFlip": true,
     "art": {
-      "path": "assets/sprites/furniture/furniture_ceilinglamp.png",
+      "path": "assets/sprites/furniture/furniture_ceilinglamp.webp",
       "w": 82,
       "h": 51
     },
@@ -694,7 +694,7 @@ export const FURNITURE_CATALOG = Object.freeze({
     "tabletop": false,
     "canFlip": true,
     "art": {
-      "path": "assets/sprites/furniture/furniture_lamp.png",
+      "path": "assets/sprites/furniture/furniture_lamp.webp",
       "w": 89,
       "h": 57
     },
@@ -715,7 +715,7 @@ export const FURNITURE_CATALOG = Object.freeze({
     "tabletop": false,
     "canFlip": true,
     "art": {
-      "path": "assets/sprites/furniture/furniture_rug.png",
+      "path": "assets/sprites/furniture/furniture_rug.webp",
       "w": 211,
       "h": 65
     },
@@ -740,7 +740,7 @@ export const FURNITURE_CATALOG = Object.freeze({
     "tabletop": false,
     "canFlip": true,
     "art": {
-      "path": "assets/sprites/furniture/furniture_shelf.png",
+      "path": "assets/sprites/furniture/furniture_shelf.webp",
       "w": 233,
       "h": 47,
       "top": 3,
@@ -769,7 +769,7 @@ export const FURNITURE_CATALOG = Object.freeze({
     "tabletop": false,
     "canFlip": false,
     "art": {
-      "path": "assets/sprites/furniture/furniture_painting.png",
+      "path": "assets/sprites/furniture/furniture_painting.webp",
       "w": 77,
       "h": 113
     },
@@ -790,7 +790,7 @@ export const FURNITURE_CATALOG = Object.freeze({
     "tabletop": false,
     "canFlip": true,
     "art": {
-      "path": "assets/sprites/furniture/furniture_smallwindow.png",
+      "path": "assets/sprites/furniture/furniture_smallwindow.webp",
       "w": 75,
       "h": 76
     },
@@ -811,7 +811,7 @@ export const FURNITURE_CATALOG = Object.freeze({
     "tabletop": false,
     "canFlip": true,
     "art": {
-      "path": "assets/sprites/furniture/furniture_largewindow.png",
+      "path": "assets/sprites/furniture/furniture_largewindow.webp",
       "w": 93,
       "h": 117
     },
@@ -832,7 +832,7 @@ export const FURNITURE_CATALOG = Object.freeze({
     "tabletop": false,
     "canFlip": true,
     "art": {
-      "path": "assets/sprites/furniture/furniture_walldeco.png",
+      "path": "assets/sprites/furniture/furniture_walldeco.webp",
       "w": 64,
       "h": 80
     },
@@ -857,7 +857,7 @@ export const FURNITURE_CATALOG = Object.freeze({
     "tabletop": false,
     "canFlip": true,
     "art": {
-      "path": "assets/sprites/furniture/furniture_walldecor.png",
+      "path": "assets/sprites/furniture/furniture_walldecor.webp",
       "w": 64,
       "h": 80
     },
@@ -878,7 +878,7 @@ export const FURNITURE_CATALOG = Object.freeze({
     "tabletop": false,
     "canFlip": true,
     "art": {
-      "path": "assets/sprites/furniture/furniture_smallwalldeco.png",
+      "path": "assets/sprites/furniture/furniture_smallwalldeco.webp",
       "w": 64,
       "h": 80
     },
@@ -899,7 +899,7 @@ export const FURNITURE_CATALOG = Object.freeze({
     "tabletop": false,
     "canFlip": true,
     "art": {
-      "path": "assets/sprites/furniture/furniture_largewalldeco.png",
+      "path": "assets/sprites/furniture/furniture_largewalldeco.webp",
       "w": 88,
       "h": 134
     },
@@ -920,7 +920,7 @@ export const FURNITURE_CATALOG = Object.freeze({
     "tabletop": false,
     "canFlip": true,
     "art": {
-      "path": "assets/sprites/furniture/furniture_ceilingdeco.png",
+      "path": "assets/sprites/furniture/furniture_ceilingdeco.webp",
       "w": 71,
       "h": 84
     },
@@ -947,7 +947,7 @@ export const FURNITURE_CATALOG = Object.freeze({
     "tabletop": false,
     "canFlip": true,
     "art": {
-      "path": "assets/sprites/furniture/furniture_roomdeco.png",
+      "path": "assets/sprites/furniture/furniture_roomdeco.webp",
       "w": 118,
       "h": 166
     },
@@ -974,7 +974,7 @@ export const FURNITURE_CATALOG = Object.freeze({
     "tabletop": true,
     "canFlip": true,
     "art": {
-      "path": "assets/sprites/furniture/furniture_tabledeco.png",
+      "path": "assets/sprites/furniture/furniture_tabledeco.webp",
       "w": 49,
       "h": 62
     },
@@ -1001,7 +1001,7 @@ export const FURNITURE_CATALOG = Object.freeze({
     "tabletop": true,
     "canFlip": true,
     "art": {
-      "path": "assets/sprites/furniture/furniture_smalltabledeco.png",
+      "path": "assets/sprites/furniture/furniture_smalltabledeco.webp",
       "w": 49,
       "h": 62
     },
@@ -1024,7 +1024,7 @@ export const FURNITURE_CATALOG = Object.freeze({
     "tabletop": true,
     "canFlip": true,
     "art": {
-      "path": "assets/sprites/furniture/furniture_largetabledeco.png",
+      "path": "assets/sprites/furniture/furniture_largetabledeco.webp",
       "w": 99,
       "h": 83
     },
@@ -1047,7 +1047,7 @@ export const FURNITURE_CATALOG = Object.freeze({
     "tabletop": false,
     "canFlip": true,
     "art": {
-      "path": "assets/sprites/furniture/furniture_smallbackfloordeco.png",
+      "path": "assets/sprites/furniture/furniture_smallbackfloordeco.webp",
       "w": 93,
       "h": 86
     },
@@ -1070,7 +1070,7 @@ export const FURNITURE_CATALOG = Object.freeze({
     "tabletop": false,
     "canFlip": true,
     "art": {
-      "path": "assets/sprites/furniture/furniture_largebackfloordeco.png",
+      "path": "assets/sprites/furniture/furniture_largebackfloordeco.webp",
       "w": 118,
       "h": 166
     },
@@ -1093,7 +1093,7 @@ export const FURNITURE_CATALOG = Object.freeze({
     "tabletop": false,
     "canFlip": true,
     "art": {
-      "path": "assets/sprites/furniture/furniture_smallfrontfloordeco.png",
+      "path": "assets/sprites/furniture/furniture_smallfrontfloordeco.webp",
       "w": 58,
       "h": 93
     },
@@ -1116,7 +1116,7 @@ export const FURNITURE_CATALOG = Object.freeze({
     "tabletop": false,
     "canFlip": true,
     "art": {
-      "path": "assets/sprites/furniture/furniture_largefrontfloordeco.png",
+      "path": "assets/sprites/furniture/furniture_largefrontfloordeco.webp",
       "w": 155,
       "h": 143
     },
@@ -1137,15 +1137,15 @@ export const FURNITURE_CATALOG = Object.freeze({
     "tabletop": false,
     "canFlip": false,
     "art": {
-      "path": "assets/sprites/furniture/furniture_door.png",
+      "path": "assets/sprites/furniture/furniture_door.webp",
       "w": 117,
       "h": 169
     },
     "doorArt": {
-      "up": "assets/sprites/furniture/furniture_door_up.png",
-      "up_job": "assets/sprites/furniture/furniture_door_up_job.png",
-      "down": "assets/sprites/furniture/furniture_door_down.png",
-      "down_job": "assets/sprites/furniture/furniture_door_down_job.png"
+      "up": "assets/sprites/furniture/furniture_door_up.webp",
+      "up_job": "assets/sprites/furniture/furniture_door_up_job.webp",
+      "down": "assets/sprites/furniture/furniture_door_down.webp",
+      "down_job": "assets/sprites/furniture/furniture_door_down_job.webp"
     },
     "upgrades": 32,
     "recipe": {

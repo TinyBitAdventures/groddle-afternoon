@@ -41,7 +41,7 @@ function writeUrl() {
 
 function card(item, statusLabel) {
   const icon = item.icon
-    ? `<img class="cat-ic" src="${ICONS}${item.id}.png"${item.icon === 3 ? ` srcset="${ICONS}${item.id}.png 1x, ${ICONS}${item.id}@3x.png 3x"` : ''} alt="" width="52" height="52" loading="lazy" decoding="async" />`
+    ? `<img class="cat-ic" src="${ICONS}${item.id}.webp"${item.icon === 3 ? ` srcset="${ICONS}${item.id}.webp 1x, ${ICONS}${item.id}@3x.webp 3x"` : ''} alt="" width="52" height="52" loading="lazy" decoding="async" />`
     : '<span class="cat-ic cat-ph" aria-hidden="true"></span>';
   // Never released in Glitch (tools/encyclopedia/never-released.mjs): a small tag over the picture.
   const tag = item.nr ? '<span class="ency-unreleased cat-card-tag">Never released<span class="ency-sep">,</span></span> ' : '';

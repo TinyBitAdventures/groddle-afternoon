@@ -84,15 +84,15 @@ import {
   raceLoadingColors,
   renderRaceCourse,
 } from '../race-render.js?v=c7c235a7';
-import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=d82f3b00';
-import { runStreetTransition } from '../screen-fx.js?v=155d18cf';
+import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=b7609342';
+import { runStreetTransition } from '../screen-fx.js?v=b4ec277f';
 import { CROWNS_STREET, CROWNS_TICKET, CROWNS_TITLE } from '../game-of-crowns.js?v=e32f35f5';
 import { HOG_HAUL_STREET_ID } from '../hog-haul.js?v=50d2e072';
 import { QUOIN_GRAB_SPLASH, RACE_SPLASH, splashFor } from '../game-splash.js?v=5e2c6eb6';
-import { crownsMpChallenge, startCrowns } from './crowns-feature.js?v=23979d63';
-import { startHogHaulMp } from './hog-haul-mp-feature.js?v=dd222238';
+import { crownsMpChallenge, startCrowns } from './crowns-feature.js?v=8b1d404a';
+import { startHogHaulMp } from './hog-haul-mp-feature.js?v=dc1d4f96';
 import { textureFromUrl } from '../textures.js?v=3149d699';
-import { QUOIN_SHEET, QUOIN_TYPES } from '../quoins.js?v=f154a79e';
+import { QUOIN_SHEET, QUOIN_TYPES } from '../quoins.js?v=299cc3f4';
 import { gainMetabolic } from '../metabolics.js?v=8504134e';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 import { quoinShardGrabberSound, quoinShardSoundKey } from '../quoin-shards.js?v=9a2e4c37';
@@ -175,7 +175,7 @@ function ensureRaceItems() {
     ensureItem(race.ticket, {
       label: race.ticketLabel,
       desc: race.ticketDesc,
-      icon: `${RACE_ICON_DIR}${race.ticket}.png`,
+      icon: `${RACE_ICON_DIR}${race.ticket}.webp`,
       baseCost: 20,
       stackMax: RACE_TICKET_STACK,
       tags: ['no_trade'],
@@ -186,7 +186,7 @@ function ensureRaceItems() {
   ensureItem(HOG_HAUL_TICKET.classTsid, {
     label: HOG_HAUL_TICKET.label,
     desc: HOG_HAUL_TICKET.desc,
-    icon: `${RACE_ICON_DIR}${HOG_HAUL_TICKET.classTsid}.png`,
+    icon: `${RACE_ICON_DIR}${HOG_HAUL_TICKET.classTsid}.webp`,
     baseCost: 20,
     stackMax: RACE_TICKET_STACK,
     tags: ['no_rube', 'games', 'ticket', 'races', 'toys'],
@@ -195,7 +195,7 @@ function ensureRaceItems() {
   ensureItem(CROWNS_TICKET, {
     label: 'Game of Crowns Ticket',
     desc: 'Challenge another player to Game of Crowns.',
-    icon: `${RACE_ICON_DIR}${CROWNS_TICKET}.png`,
+    icon: `${RACE_ICON_DIR}${CROWNS_TICKET}.webp`,
     baseCost: 20,
     stackMax: RACE_TICKET_STACK,
     tags: ['no_trade'],
@@ -204,7 +204,7 @@ function ensureRaceItems() {
   ensureItem(RACE_GENERIC_TICKET, {
     label: 'Race Ticket',
     desc: 'Challenge another player to a race.',
-    icon: `${RACE_ICON_DIR}race_ticket.png`,
+    icon: `${RACE_ICON_DIR}race_ticket.webp`,
     baseCost: 60,
     stackMax: RACE_TICKET_STACK,
     tags: ['no_trade'],
@@ -343,7 +343,7 @@ function buildChrome(engine) {
     <div class="hog-haul-screen-shade" data-race-store-close></div>
     <div class="race-store-card">
       <button type="button" class="race-store-close" data-race-store-close aria-label="Close">×</button>
-      <header><img src="${RACE_ICON_DIR}race_ticket_dispenser.png" alt="" />
+      <header><img src="${RACE_ICON_DIR}race_ticket_dispenser.webp" alt="" />
         <div><h2 id="race-store-title">Ticket Dispenser</h2><p data-race-store-currants></p></div></header>
       <ul data-race-store-list></ul>
     </div>`);
@@ -390,7 +390,7 @@ function renderStore(engine) {
     const poor = (engine.pc.currants || 0) < row.cost;
     const why = !on ? 'Not in this remake yet' : full ? 'Your pack holds 5' : poor ? 'Not enough currants' : '';
     return `<li class="${on ? '' : 'is-off'}">
-      <img src="${RACE_ICON_DIR}${row.classTsid}.png" alt="" />
+      <img src="${RACE_ICON_DIR}${row.classTsid}.webp" alt="" />
       <span><b>${escapeHtml(row.label)}</b><small>${on ? escapeHtml(raceDesc(raceId)) : 'Not in this remake yet.'}${owned ? ` · ${owned} in pack` : ''}</small></span>
       <span class="race-store-actions">
         ${owned ? `<button type="button" data-race-activate="${row.classTsid}">Activate</button>` : ''}
@@ -1644,7 +1644,7 @@ function mpEnd(engine, msg) {
 /** A game called off (inc_games.js games_end_quoin_grab 1587-1610: the logo and Leave the Game, no reward). */
 function showCalledOff(engine) {
   const race = RACES[run.raceId];
-  hud.ready.querySelector('[data-race-ready-icon]').src = `${RACE_ICON_DIR}${race.ticket}.png`;
+  hud.ready.querySelector('[data-race-ready-icon]').src = `${RACE_ICON_DIR}${race.ticket}.webp`;
   hud.ready.querySelector('[data-race-ready-kicker]').textContent = race.title;
   hud.ready.querySelector('[data-race-ready-desc]').textContent = MP_RACE_TEXT.calledOff(mp?.calledOff || '');
   hud.ready.querySelector('[data-race-ready-btn]').textContent = MP_RACE_TEXT.leaveGame;
@@ -1719,7 +1719,7 @@ function publish(engine) {
 
 function spawnDispenser(engine, point) {
   const { PIXI } = engine;
-  const sprite = new PIXI.Sprite(textureFromUrl(`${RACE_ICON_DIR}race_ticket_dispenser.png`));
+  const sprite = new PIXI.Sprite(textureFromUrl(`${RACE_ICON_DIR}race_ticket_dispenser.webp`));
   sprite.anchor.set(0.5, 1);
   sprite.x = point.x;
   sprite.y = point.y + 2;

@@ -3,6 +3,7 @@
  * Run: node --test tests/feats.test.js
  */
 import assert from 'node:assert/strict';
+import { imageSize } from '../tools/image-size.mjs';
 import { describe, it } from 'node:test';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
@@ -132,15 +133,15 @@ describe('Feat client integration', () => {
     assert.match(html, /id="local-chat-input"/);
     assert.match(css, /\.local-chat-dock/);
     assert.match(css, /--pack-live-height/);
-    const png = readFileSync(join(publicRoot, 'assets/sprites/feat_badge_small.png'));
-    assert.equal(png.readUInt32BE(16), 30);
-    assert.equal(png.readUInt32BE(20), 25);
+    const png = readFileSync(join(publicRoot, 'assets/sprites/feat_badge_small.webp'));
+    assert.equal(imageSize(png).w, 30);
+    assert.equal(imageSize(png).h, 25);
     const badgeMap = JSON.parse(
       readFileSync(join(publicRoot, 'assets/content/badge-icons.json'), 'utf8')
     );
-    assert.equal(badgeMap.feat_first, 'assets/badges/feat_first.png');
+    assert.equal(badgeMap.feat_first, 'assets/badges/feat_first.webp');
     const badge = readFileSync(join(publicRoot, badgeMap.feat_first));
-    assert.equal(badge.readUInt32BE(16), 180);
-    assert.equal(badge.readUInt32BE(20), 180);
+    assert.equal(imageSize(badge).w, 180);
+    assert.equal(imageSize(badge).h, 180);
   });
 });

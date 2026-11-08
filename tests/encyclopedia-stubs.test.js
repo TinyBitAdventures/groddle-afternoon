@@ -54,7 +54,7 @@ describe('blank stubs', () => {
   it('keeps every entry that is in the remake or has art', { skip: skipWithoutInventory }, () => {
     for (const s of d.stubs.values()) {
       assert.ok(!inRemake(s.status), `${s.key} is in the remake`);
-      if (s.section === 'items') assert.ok(!existsSync(join(pub, 'assets/sprites/icons', `${s.id}.png`)), `${s.key} has an icon`);
+      if (s.section === 'items') assert.ok(!existsSync(join(pub, 'assets/sprites/icons', `${s.id}.webp`)), `${s.key} has an icon`);
     }
     assert.ok(d.stubs.size < 40, `${d.stubs.size} stubs: the rule is leaving out too much`);
   });

@@ -46,8 +46,8 @@ import {
   musicblocksInPack,
   normalizeCrabMemory,
   playToday,
-} from '../public/js/crabs.js?v=0ec02c50';
-import { MUSICBLOCK_CATALOG } from '../public/js/musicblocks.js?v=f5adbf0c';
+} from '../public/js/crabs.js?v=90964bf8';
+import { MUSICBLOCK_CATALOG } from '../public/js/musicblocks.js?v=db6a213b';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const PUBLIC = join(ROOT, 'public');
@@ -318,15 +318,15 @@ describe('source copy and data', () => {
     for (const s of ['idle1', 'idle2', 'walk', 'listen', 'like_on', 'like_off', 'dislike_on', 'dislike_off']) {
       assert.ok(existsSync(join(PUBLIC, `assets/sprites/crabs/npc_crab_${s}.webp`)), s);
     }
-    assert.ok(existsSync(join(PUBLIC, 'assets/sprites/icons/crabato_juice.png')));
-    assert.ok(existsSync(join(PUBLIC, 'assets/sprites/icons/crabphones.png')));
+    assert.ok(existsSync(join(PUBLIC, 'assets/sprites/icons/crabato_juice.webp')));
+    assert.ok(existsSync(join(PUBLIC, 'assets/sprites/icons/crabphones.webp')));
     const buffs = JSON.parse(readFileSync(join(PUBLIC, 'assets/content/buffs.json'), 'utf8'));
     const som = buffs.crab_state_of_mind || buffs.buffs?.crab_state_of_mind;
     assert.equal(som.duration, 30);
     const badges = JSON.parse(readFileSync(join(PUBLIC, 'assets/content/achievements.json'), 'utf8'));
     assert.deepEqual(badges.make_a_crab_happy.conditions, []);
     assert.equal(badges.make_a_crab_happy.rewards.xp, 800);
-    assert.ok(existsSync(join(PUBLIC, 'assets/badges/make_a_crab_happy.png')));
+    assert.ok(existsSync(join(PUBLIC, 'assets/badges/make_a_crab_happy.webp')));
     const index = readFileSync(join(PUBLIC, 'js/features/index.js'), 'utf8');
     assert.match(index, /crabs-feature\.js/);
   });

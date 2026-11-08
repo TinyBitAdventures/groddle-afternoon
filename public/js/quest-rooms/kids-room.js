@@ -30,7 +30,7 @@
  */
 
 import { applyRewards } from '../quests.js?v=c8d9d0a4';
-import { ITEM_CATALOG, isToolItem } from '../inventory.js?v=d82f3b00';
+import { ITEM_CATALOG, isToolItem } from '../inventory.js?v=b7609342';
 import { frameTexture, isLoaded, onLoaded, sourceFromUrl } from '../textures.js?v=3149d699';
 import { playPoofIn } from '../overlay-art.js?v=11b6dd7f';
 import { KIDS_ROOM_FLOOR, KIDS_ROOM_H, KIDS_ROOM_W, buildKidsRoomScene } from '../kids-room-scene.js?v=b2803888';
@@ -185,7 +185,7 @@ function drawPlayroom(PIXI) {
 }
 
 function blockTexture(PIXI, letter, frame = 0) {
-  const base = sourceFromUrl(`${BLOCK_ART}${letter}.png`);
+  const base = sourceFromUrl(`${BLOCK_ART}${letter}.webp`);
   const make = () => frameTexture(base, new PIXI.Rectangle(frame * 139, 0, 139, 197));
   return isLoaded(base) ? make() : null;
 }
@@ -193,7 +193,7 @@ function blockTexture(PIXI, letter, frame = 0) {
 function setBlockLetter(ctx, block, letter) {
   const { PIXI } = ctx;
   block.letter = letter;
-  const url = `${BLOCK_ART}${letter}.png`;
+  const url = `${BLOCK_ART}${letter}.webp`;
   const tex = blockTexture(PIXI, letter);
   if (tex) block.sprite.texture = tex;
   else {
@@ -207,7 +207,7 @@ function setBlockLetter(ctx, block, letter) {
 
 function mrBlockSprite(ctx, letter) {
   const { PIXI } = ctx;
-  const base = sourceFromUrl(`${ROOM_ART}mr-block-${letter}.png`);
+  const base = sourceFromUrl(`${ROOM_ART}mr-block-${letter}.webp`);
   const spr = new PIXI.Sprite(PIXI.Texture.EMPTY);
   const apply = () => { spr.texture = frameTexture(base, new PIXI.Rectangle(0, 0, 121, 117)); };
   if (isLoaded(base)) apply();
@@ -406,7 +406,7 @@ function teaParty(ctx) {
 export const room = {
   id: 'kids_room',
   title: "Mr. Block's Playroom",
-  icon: 'assets/sprites/quests/four-letter/quest-icon.png',
+  icon: 'assets/sprites/quests/four-letter/quest-icon.webp',
   theme: 'warm',
   // G315: template in hub 61 'Simple Level Quests' (inc_data_maps_prod.js 245), a dev label; plain remake wording.
   hubName: 'Quest',

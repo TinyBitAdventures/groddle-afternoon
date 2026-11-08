@@ -32,6 +32,7 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, mkdtempSync, readFileSync, renameSync, rmSync, statSync, unlinkSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { encodeLosslessWebp } from '../webp-lossless.mjs';
 import os from 'node:os';
 import { downscale, readImage, renderSvg, score, toBytes } from '../quoin-art/pixels.mjs';
 
@@ -42,9 +43,9 @@ const RESULTS = join(ROOT, 'tools/vector-sprites/results.json');
 
 /** The three signpost PNGs and their traces. */
 export const PARTS = Object.freeze([
-  { id: 'post', png: 'assets/ui/signpost/signpost_post.png', svg: 'svg/post.svg' },
-  { id: 'arm', png: 'assets/ui/signpost/signpost_arm.png', svg: 'svg/arm.svg' },
-  { id: 'shadow', png: 'assets/ui/signpost/signpost_shadow.png', svg: 'svg/shadow.svg' },
+  { id: 'post', png: 'assets/ui/signpost/signpost_post.webp', svg: 'svg/post.svg' },
+  { id: 'arm', png: 'assets/ui/signpost/signpost_arm.webp', svg: 'svg/arm.svg' },
+  { id: 'shadow', png: 'assets/ui/signpost/signpost_shadow.webp', svg: 'svg/shadow.svg' },
 ]);
 
 /** Same bars as tools/vector-sprites (tests/vector-sprites.test.js checks them). */
@@ -124,15 +125,15 @@ async function main() {
   const { writeModule } = await import('../vector-sprites/build.mjs');
   const results = JSON.parse(readFileSync(RESULTS, 'utf8'));
   for (const { part, one, three, score: s } of rows) {
-    // Write <name>@3x.png or .webp (lossless, whichever is clearly smaller).
-    const stem = join(PUBLIC, part.png.replace(/\.png$/, ''));
+    // Write <name>@3x.png or .webp (lossless, whichever is smaller).
+    const stem = join(PUBLIC, part.png.replace(/\.(png|webp)$/, ''));
     const tmp = mkdtempSync(join(os.tmpdir(), 'signpost-art-'));
     const tmpPng = join(tmp, 'part.png');
     const tmpWebp = join(tmp, 'part.webp');
     writeFileSync(tmpPng, three.png);
     execFileSync('magick', [tmpPng, '-strip', '-define', 'png:compression-level=9', tmpPng]);
-    execFileSync('magick', [tmpPng, '-define', 'webp:lossless=true', '-define', 'webp:method=6', '-define', 'webp:exact=true', tmpWebp]);
-    const useWebp = statSync(tmpWebp).size < statSync(tmpPng).size * 0.9;
+    encodeLosslessWebp(tmpPng, tmpWebp);
+    const useWebp = statSync(tmpWebp).size < statSync(tmpPng).size; // lossless WebP whenever smaller (Austin 2026-11-07)
     for (const ext of ['png', 'webp']) if (existsSync(`${stem}@3x.${ext}`)) unlinkSync(`${stem}@3x.${ext}`);
     const file = `${stem}@3x.${useWebp ? 'webp' : 'png'}`;
     renameSync(useWebp ? tmpWebp : tmpPng, file);

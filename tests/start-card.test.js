@@ -10,12 +10,12 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { START_CARD_SELECTOR, SCREEN_SELECTOR, WINDOW_SELECTOR, stackZ } from '../public/js/window-stack.js?v=a7104f02';
-import { createPromptStack } from '../public/js/prompt-stack.js?v=1282ed29';
+import { createPromptStack } from '../public/js/prompt-stack.js?v=c67c01b5';
 import {
   _resetFamiliarDialog,
   familiarDialogFeature,
   familiarDialogOpen,
-} from '../public/js/features/familiar-dialog-feature.js?v=b043ef2b';
+} from '../public/js/features/familiar-dialog-feature.js?v=017fb596';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const pub = join(here, '../public');

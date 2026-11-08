@@ -14,7 +14,7 @@
    },
    "sheets": [
     {
-     "path": "assets/sprites/trants/frames/trant_bean_m1.png",
+     "path": "assets/sprites/trants/frames/trant_bean_m1.webp",
      "fw": 198,
      "fh": 270,
      "cols": 1,
@@ -37,7 +37,7 @@
    },
    "sheets": [
     {
-     "path": "assets/sprites/trants/frames/trant_bean_m3.png",
+     "path": "assets/sprites/trants/frames/trant_bean_m3.webp",
      "fw": 198,
      "fh": 270,
      "cols": 1,
@@ -62,7 +62,7 @@
    },
    "sheets": [
     {
-     "path": "assets/sprites/trants/frames/trant_bean_m5.png",
+     "path": "assets/sprites/trants/frames/trant_bean_m5.webp",
      "fw": 198,
      "fh": 270,
      "cols": 1,
@@ -89,7 +89,7 @@
    },
    "sheets": [
     {
-     "path": "assets/sprites/trants/frames/trant_bean_m7.png",
+     "path": "assets/sprites/trants/frames/trant_bean_m7.webp",
      "fw": 198,
      "fh": 270,
      "cols": 1,
@@ -118,7 +118,7 @@
    },
    "sheets": [
     {
-     "path": "assets/sprites/trants/frames/trant_bean_m10.png",
+     "path": "assets/sprites/trants/frames/trant_bean_m10.webp",
      "fw": 198,
      "fh": 270,
      "cols": 1,
@@ -144,7 +144,7 @@
    },
    "sheets": [
     {
-     "path": "assets/sprites/trants/frames/trant_bubble_m1.png",
+     "path": "assets/sprites/trants/frames/trant_bubble_m1.webp",
      "fw": 167,
      "fh": 277,
      "cols": 1,
@@ -173,7 +173,7 @@
    },
    "sheets": [
     {
-     "path": "assets/sprites/trants/frames/trant_bubble_m3.png",
+     "path": "assets/sprites/trants/frames/trant_bubble_m3.webp",
      "fw": 167,
      "fh": 277,
      "cols": 1,
@@ -205,7 +205,7 @@
    },
    "sheets": [
     {
-     "path": "assets/sprites/trants/frames/trant_bubble_m5.png",
+     "path": "assets/sprites/trants/frames/trant_bubble_m5.webp",
      "fw": 167,
      "fh": 277,
      "cols": 1,
@@ -240,7 +240,7 @@
    },
    "sheets": [
     {
-     "path": "assets/sprites/trants/frames/trant_bubble_m7.png",
+     "path": "assets/sprites/trants/frames/trant_bubble_m7.webp",
      "fw": 167,
      "fh": 277,
      "cols": 1,
@@ -281,7 +281,7 @@
    },
    "sheets": [
     {
-     "path": "assets/sprites/trants/frames/trant_bubble_m10.png",
+     "path": "assets/sprites/trants/frames/trant_bubble_m10.webp",
      "fw": 167,
      "fh": 277,
      "cols": 1,
@@ -298,7 +298,7 @@
    "sprite": 84,
    "sheets": [
     {
-     "path": "assets/sprites/trants/frames/trant_egg_m1.png",
+     "path": "assets/sprites/trants/frames/trant_egg_m1.webp",
      "fw": 296,
      "fh": 278,
      "cols": 1,
@@ -315,7 +315,7 @@
    "sprite": 76,
    "sheets": [
     {
-     "path": "assets/sprites/trants/frames/trant_egg_m3.png",
+     "path": "assets/sprites/trants/frames/trant_egg_m3.webp",
      "fw": 296,
      "fh": 278,
      "cols": 1,
@@ -332,7 +332,7 @@
    "sprite": 61,
    "sheets": [
     {
-     "path": "assets/sprites/trants/frames/trant_egg_m5.png",
+     "path": "assets/sprites/trants/frames/trant_egg_m5.webp",
      "fw": 296,
      "fh": 278,
      "cols": 1,
@@ -349,7 +349,7 @@
    "sprite": 47,
    "sheets": [
     {
-     "path": "assets/sprites/trants/frames/trant_egg_m7.png",
+     "path": "assets/sprites/trants/frames/trant_egg_m7.webp",
      "fw": 296,
      "fh": 278,
      "cols": 1,
@@ -366,7 +366,7 @@
    "sprite": 22,
    "sheets": [
     {
-     "path": "assets/sprites/trants/frames/trant_egg_m10.png",
+     "path": "assets/sprites/trants/frames/trant_egg_m10.webp",
      "fw": 296,
      "fh": 278,
      "cols": 1,
@@ -397,7 +397,7 @@
    },
    "sheets": [
     {
-     "path": "assets/sprites/trants/frames/trant_fruit_m1.png",
+     "path": "assets/sprites/trants/frames/trant_fruit_m1.webp",
      "fw": 271,
      "fh": 249,
      "cols": 1,
@@ -434,7 +434,7 @@
    },
    "sheets": [
     {
-     "path": "assets/sprites/trants/frames/trant_fruit_m3.png",
+     "path": "assets/sprites/trants/frames/trant_fruit_m3.webp",
      "fw": 271,
      "fh": 249,
      "cols": 1,
@@ -479,7 +479,7 @@
    },
    "sheets": [
     {
-     "path": "assets/sprites/trants/frames/trant_fruit_m5.png",
+     "path": "assets/sprites/trants/frames/trant_fruit_m5.webp",
      "fw": 271,
      "fh": 249,
      "cols": 1,
@@ -545,7 +545,7 @@
    },
    "sheets": [
     {
-     "path": "assets/sprites/trants/frames/trant_fruit_m7.png",
+     "path": "assets/sprites/trants/frames/trant_fruit_m7.webp",
      "fw": 271,
      "fh": 249,
      "cols": 1,
@@ -668,7 +668,7 @@
    },
    "sheets": [
     {
-     "path": "assets/sprites/trants/frames/trant_fruit_m10.png",
+     "path": "assets/sprites/trants/frames/trant_fruit_m10.webp",
      "fw": 271,
      "fh": 249,
      "cols": 1,
@@ -685,7 +685,7 @@
    "sprite": 71,
    "sheets": [
     {
-     "path": "assets/sprites/trants/frames/trant_gas_m1.png",
+     "path": "assets/sprites/trants/frames/trant_gas_m1.webp",
      "fw": 276,
      "fh": 258,
      "cols": 1,
@@ -702,7 +702,7 @@
    "sprite": 165,
    "sheets": [
     {
-     "path": "assets/sprites/trants/frames/trant_gas_m3.png",
+     "path": "assets/sprites/trants/frames/trant_gas_m3.webp",
      "fw": 276,
      "fh": 258,
      "cols": 1,
@@ -719,7 +719,7 @@
    "sprite": 237,
    "sheets": [
     {
-     "path": "assets/sprites/trants/frames/trant_gas_m5.png",
+     "path": "assets/sprites/trants/frames/trant_gas_m5.webp",
      "fw": 276,
      "fh": 258,
      "cols": 1,
@@ -736,7 +736,7 @@
    "sprite": 297,
    "sheets": [
     {
-     "path": "assets/sprites/trants/frames/trant_gas_m7.png",
+     "path": "assets/sprites/trants/frames/trant_gas_m7.webp",
      "fw": 276,
      "fh": 258,
      "cols": 1,
@@ -753,7 +753,7 @@
    "sprite": 377,
    "sheets": [
     {
-     "path": "assets/sprites/trants/frames/trant_gas_m10.png",
+     "path": "assets/sprites/trants/frames/trant_gas_m10.webp",
      "fw": 276,
      "fh": 258,
      "cols": 1,
@@ -770,7 +770,7 @@
    "sprite": 26,
    "sheets": [
     {
-     "path": "assets/sprites/trants/frames/trant_spice_m1.png",
+     "path": "assets/sprites/trants/frames/trant_spice_m1.webp",
      "fw": 318,
      "fh": 250,
      "cols": 1,
@@ -787,7 +787,7 @@
    "sprite": 59,
    "sheets": [
     {
-     "path": "assets/sprites/trants/frames/trant_spice_m3.png",
+     "path": "assets/sprites/trants/frames/trant_spice_m3.webp",
      "fw": 318,
      "fh": 250,
      "cols": 1,
@@ -804,7 +804,7 @@
    "sprite": 102,
    "sheets": [
     {
-     "path": "assets/sprites/trants/frames/trant_spice_m5.png",
+     "path": "assets/sprites/trants/frames/trant_spice_m5.webp",
      "fw": 318,
      "fh": 250,
      "cols": 1,
@@ -821,7 +821,7 @@
    "sprite": 134,
    "sheets": [
     {
-     "path": "assets/sprites/trants/frames/trant_spice_m7.png",
+     "path": "assets/sprites/trants/frames/trant_spice_m7.webp",
      "fw": 318,
      "fh": 250,
      "cols": 1,
@@ -838,7 +838,7 @@
    "sprite": 185,
    "sheets": [
     {
-     "path": "assets/sprites/trants/frames/trant_spice_m10.png",
+     "path": "assets/sprites/trants/frames/trant_spice_m10.webp",
      "fw": 318,
      "fh": 250,
      "cols": 1,
@@ -855,7 +855,7 @@
    "sprite": 0,
    "sheets": [
     {
-     "path": "assets/sprites/soil/trant-bean-dead.png",
+     "path": "assets/sprites/soil/trant-bean-dead.webp",
      "fw": 119,
      "fh": 159,
      "cols": 1,
@@ -872,7 +872,7 @@
    "sprite": 0,
    "sheets": [
     {
-     "path": "assets/sprites/soil/trant-bubble-dead.png",
+     "path": "assets/sprites/soil/trant-bubble-dead.webp",
      "fw": 104,
      "fh": 150,
      "cols": 1,
@@ -889,7 +889,7 @@
    "sprite": 0,
    "sheets": [
     {
-     "path": "assets/sprites/soil/trant-egg-dead.png",
+     "path": "assets/sprites/soil/trant-egg-dead.webp",
      "fw": 119,
      "fh": 169,
      "cols": 1,
@@ -906,7 +906,7 @@
    "sprite": 0,
    "sheets": [
     {
-     "path": "assets/sprites/soil/trant-fruit-dead.png",
+     "path": "assets/sprites/soil/trant-fruit-dead.webp",
      "fw": 119,
      "fh": 145,
      "cols": 1,
@@ -923,7 +923,7 @@
    "sprite": 0,
    "sheets": [
     {
-     "path": "assets/sprites/soil/trant-gas-dead.png",
+     "path": "assets/sprites/soil/trant-gas-dead.webp",
      "fw": 120,
      "fh": 114,
      "cols": 1,
@@ -940,7 +940,7 @@
    "sprite": 0,
    "sheets": [
     {
-     "path": "assets/sprites/soil/trant-spice-dead.png",
+     "path": "assets/sprites/soil/trant-spice-dead.webp",
      "fw": 104,
      "fh": 120,
      "cols": 1,
@@ -957,7 +957,7 @@
    "sprite": 0,
    "sheets": [
     {
-     "path": "assets/sprites/soil/patch-dirty.png",
+     "path": "assets/sprites/soil/patch-dirty.webp",
      "fw": 115,
      "fh": 32,
      "cols": 1,
@@ -974,7 +974,7 @@
    "sprite": 0,
    "sheets": [
     {
-     "path": "assets/sprites/soil/patch-clean.png",
+     "path": "assets/sprites/soil/patch-clean.webp",
      "fw": 115,
      "fh": 32,
      "cols": 1,
@@ -991,7 +991,7 @@
    "sprite": 0,
    "sheets": [
     {
-     "path": "assets/sprites/soil/patch-dug.png",
+     "path": "assets/sprites/soil/patch-dug.webp",
      "fw": 115,
      "fh": 32,
      "cols": 1,
@@ -1008,7 +1008,7 @@
    "sprite": 0,
    "sheets": [
     {
-     "path": "assets/sprites/soil/patch-dark-dirty.png",
+     "path": "assets/sprites/soil/patch-dark-dirty.webp",
      "fw": 115,
      "fh": 32,
      "cols": 1,
@@ -1025,7 +1025,7 @@
    "sprite": 0,
    "sheets": [
     {
-     "path": "assets/sprites/soil/patch-dark-clean.png",
+     "path": "assets/sprites/soil/patch-dark-clean.webp",
      "fw": 115,
      "fh": 32,
      "cols": 1,
@@ -1042,7 +1042,7 @@
    "sprite": 0,
    "sheets": [
     {
-     "path": "assets/sprites/soil/patch-dark-dug.png",
+     "path": "assets/sprites/soil/patch-dark-dug.webp",
      "fw": 115,
      "fh": 32,
      "cols": 1,
@@ -1059,7 +1059,7 @@
    "sprite": 0,
    "sheets": [
     {
-     "path": "assets/sprites/soil/patch-seedling.png",
+     "path": "assets/sprites/soil/patch-seedling.webp",
      "fw": 104,
      "fh": 46,
      "cols": 1,
@@ -1076,7 +1076,7 @@
    "sprite": 0,
    "sheets": [
     {
-     "path": "assets/sprites/cultivation/barnacle_pod.png",
+     "path": "assets/sprites/cultivation/barnacle_pod.webp",
      "fw": 162,
      "fh": 177,
      "cols": 1,
@@ -1093,7 +1093,7 @@
    "sprite": 0,
    "sheets": [
     {
-     "path": "assets/sprites/cultivation/jellisac_mound.png",
+     "path": "assets/sprites/cultivation/jellisac_mound.webp",
      "fw": 228,
      "fh": 145,
      "cols": 1,
@@ -1112,7 +1112,7 @@
    "clip": "normal",
    "sheets": [
     {
-     "path": "assets/sprites/resources/paper-tree-pet-false-water-false.png",
+     "path": "assets/sprites/resources/paper-tree-pet-false-water-false.webp",
      "fw": 232,
      "fh": 216,
      "cols": 4,
@@ -1131,7 +1131,7 @@
    "clip": "needs_pet",
    "sheets": [
     {
-     "path": "assets/sprites/resources/paper-tree-pet-true-water-false.png",
+     "path": "assets/sprites/resources/paper-tree-pet-true-water-false.webp",
      "fw": 232,
      "fh": 216,
      "cols": 4,
@@ -1150,7 +1150,7 @@
    "clip": "needs_water",
    "sheets": [
     {
-     "path": "assets/sprites/resources/paper-tree-pet-false-water-true.png",
+     "path": "assets/sprites/resources/paper-tree-pet-false-water-true.webp",
      "fw": 232,
      "fh": 216,
      "cols": 4,
@@ -1169,7 +1169,7 @@
    "clip": "needs_pet_and_water",
    "sheets": [
     {
-     "path": "assets/sprites/resources/paper-tree-pet-true-water-true.png",
+     "path": "assets/sprites/resources/paper-tree-pet-true-water-true.webp",
      "fw": 232,
      "fh": 216,
      "cols": 4,
@@ -1187,7 +1187,7 @@
    "sprite": 36,
    "sheets": [
     {
-     "path": "assets/sprites/resources/mortar-barnacle-blister1.png",
+     "path": "assets/sprites/resources/mortar-barnacle-blister1.webp",
      "fw": 39,
      "fh": 44,
      "cols": 4,
@@ -1209,7 +1209,7 @@
    "sprite": 30,
    "sheets": [
     {
-     "path": "assets/sprites/resources/mortar-barnacle-blister2.png",
+     "path": "assets/sprites/resources/mortar-barnacle-blister2.webp",
      "fw": 35,
      "fh": 40,
      "cols": 4,
@@ -1231,7 +1231,7 @@
    "sprite": 24,
    "sheets": [
     {
-     "path": "assets/sprites/resources/mortar-barnacle-blister3.png",
+     "path": "assets/sprites/resources/mortar-barnacle-blister3.webp",
      "fw": 35,
      "fh": 39,
      "cols": 4,
@@ -1253,7 +1253,7 @@
    "sprite": 18,
    "sheets": [
     {
-     "path": "assets/sprites/resources/mortar-barnacle-blister4.png",
+     "path": "assets/sprites/resources/mortar-barnacle-blister4.webp",
      "fw": 36,
      "fh": 40,
      "cols": 4,
@@ -1275,7 +1275,7 @@
    "sprite": 12,
    "sheets": [
     {
-     "path": "assets/sprites/resources/mortar-barnacle-blister5.png",
+     "path": "assets/sprites/resources/mortar-barnacle-blister5.webp",
      "fw": 32,
      "fh": 39,
      "cols": 4,
@@ -1297,7 +1297,7 @@
    "sprite": 6,
    "sheets": [
     {
-     "path": "assets/sprites/resources/mortar-barnacle-blister6.png",
+     "path": "assets/sprites/resources/mortar-barnacle-blister6.webp",
      "fw": 39,
      "fh": 47,
      "cols": 4,
@@ -1319,7 +1319,7 @@
    "sprite": 922,
    "sheets": [
     {
-     "path": "assets/sprites/resources/ice-knob-knob1.png",
+     "path": "assets/sprites/resources/ice-knob-knob1.webp",
      "fw": 45,
      "fh": 69,
      "cols": 4,
@@ -1343,7 +1343,7 @@
    "sprite": 668,
    "sheets": [
     {
-     "path": "assets/sprites/resources/ice-knob-knob2.png",
+     "path": "assets/sprites/resources/ice-knob-knob2.webp",
      "fw": 54,
      "fh": 68,
      "cols": 4,
@@ -1367,7 +1367,7 @@
    "sprite": 464,
    "sheets": [
     {
-     "path": "assets/sprites/resources/ice-knob-knob3.png",
+     "path": "assets/sprites/resources/ice-knob-knob3.webp",
      "fw": 46,
      "fh": 71,
      "cols": 4,
@@ -1391,7 +1391,7 @@
    "sprite": 253,
    "sheets": [
     {
-     "path": "assets/sprites/resources/ice-knob-knob4.png",
+     "path": "assets/sprites/resources/ice-knob-knob4.webp",
      "fw": 72,
      "fh": 52,
      "cols": 4,
@@ -1414,7 +1414,7 @@
    "sprite": 93,
    "sheets": [
     {
-     "path": "assets/sprites/resources/dust-trap-idle.png",
+     "path": "assets/sprites/resources/dust-trap-idle.webp",
      "label": "idle",
      "fw": 110,
      "fh": 255,
@@ -1423,7 +1423,7 @@
      "mirror": false
     },
     {
-     "path": "assets/sprites/resources/dust-trap-smack-down.png",
+     "path": "assets/sprites/resources/dust-trap-smack-down.webp",
      "label": "smackDown",
      "fw": 110,
      "fh": 255,
@@ -1432,7 +1432,7 @@
      "mirror": false
     },
     {
-     "path": "assets/sprites/resources/dust-trap-down.png",
+     "path": "assets/sprites/resources/dust-trap-down.webp",
      "label": "down",
      "fw": 110,
      "fh": 255,
@@ -1441,7 +1441,7 @@
      "mirror": false
     },
     {
-     "path": "assets/sprites/resources/dust-trap-up.png",
+     "path": "assets/sprites/resources/dust-trap-up.webp",
      "label": "up",
      "fw": 110,
      "fh": 255,
@@ -1467,7 +1467,7 @@
    },
    "sheets": [
     {
-     "path": "assets/sprites/resources/firefly-jar-0-closed.png",
+     "path": "assets/sprites/resources/firefly-jar-0-closed.webp",
      "label": "closed",
      "fw": 54,
      "fh": 87,
@@ -1476,7 +1476,7 @@
      "mirror": false
     },
     {
-     "path": "assets/sprites/resources/firefly-jar-0-opening.png",
+     "path": "assets/sprites/resources/firefly-jar-0-opening.webp",
      "label": "opening",
      "fw": 54,
      "fh": 87,
@@ -1485,7 +1485,7 @@
      "mirror": false
     },
     {
-     "path": "assets/sprites/resources/firefly-jar-0-open.png",
+     "path": "assets/sprites/resources/firefly-jar-0-open.webp",
      "label": "open",
      "fw": 54,
      "fh": 87,
@@ -1494,7 +1494,7 @@
      "mirror": false
     },
     {
-     "path": "assets/sprites/resources/firefly-jar-0-closing.png",
+     "path": "assets/sprites/resources/firefly-jar-0-closing.webp",
      "label": "closing",
      "fw": 54,
      "fh": 87,
@@ -1520,7 +1520,7 @@
    },
    "sheets": [
     {
-     "path": "assets/sprites/resources/firefly-jar-1-closed.png",
+     "path": "assets/sprites/resources/firefly-jar-1-closed.webp",
      "label": "closed",
      "fw": 54,
      "fh": 88,
@@ -1529,7 +1529,7 @@
      "mirror": false
     },
     {
-     "path": "assets/sprites/resources/firefly-jar-1-opening.png",
+     "path": "assets/sprites/resources/firefly-jar-1-opening.webp",
      "label": "opening",
      "fw": 54,
      "fh": 88,
@@ -1538,7 +1538,7 @@
      "mirror": false
     },
     {
-     "path": "assets/sprites/resources/firefly-jar-1-open.png",
+     "path": "assets/sprites/resources/firefly-jar-1-open.webp",
      "label": "open",
      "fw": 54,
      "fh": 88,
@@ -1547,7 +1547,7 @@
      "mirror": false
     },
     {
-     "path": "assets/sprites/resources/firefly-jar-1-closing.png",
+     "path": "assets/sprites/resources/firefly-jar-1-closing.webp",
      "label": "closing",
      "fw": 54,
      "fh": 88,
@@ -1573,7 +1573,7 @@
    },
    "sheets": [
     {
-     "path": "assets/sprites/resources/firefly-jar-2-closed.png",
+     "path": "assets/sprites/resources/firefly-jar-2-closed.webp",
      "label": "closed",
      "fw": 55,
      "fh": 88,
@@ -1582,7 +1582,7 @@
      "mirror": false
     },
     {
-     "path": "assets/sprites/resources/firefly-jar-2-opening.png",
+     "path": "assets/sprites/resources/firefly-jar-2-opening.webp",
      "label": "opening",
      "fw": 55,
      "fh": 88,
@@ -1591,7 +1591,7 @@
      "mirror": false
     },
     {
-     "path": "assets/sprites/resources/firefly-jar-2-open.png",
+     "path": "assets/sprites/resources/firefly-jar-2-open.webp",
      "label": "open",
      "fw": 55,
      "fh": 88,
@@ -1600,7 +1600,7 @@
      "mirror": false
     },
     {
-     "path": "assets/sprites/resources/firefly-jar-2-closing.png",
+     "path": "assets/sprites/resources/firefly-jar-2-closing.webp",
      "label": "closing",
      "fw": 55,
      "fh": 88,
@@ -1626,7 +1626,7 @@
    },
    "sheets": [
     {
-     "path": "assets/sprites/resources/firefly-jar-3-closed.png",
+     "path": "assets/sprites/resources/firefly-jar-3-closed.webp",
      "label": "closed",
      "fw": 55,
      "fh": 88,
@@ -1635,7 +1635,7 @@
      "mirror": false
     },
     {
-     "path": "assets/sprites/resources/firefly-jar-3-opening.png",
+     "path": "assets/sprites/resources/firefly-jar-3-opening.webp",
      "label": "opening",
      "fw": 55,
      "fh": 88,
@@ -1644,7 +1644,7 @@
      "mirror": false
     },
     {
-     "path": "assets/sprites/resources/firefly-jar-3-open.png",
+     "path": "assets/sprites/resources/firefly-jar-3-open.webp",
      "label": "open",
      "fw": 55,
      "fh": 88,
@@ -1653,7 +1653,7 @@
      "mirror": false
     },
     {
-     "path": "assets/sprites/resources/firefly-jar-3-closing.png",
+     "path": "assets/sprites/resources/firefly-jar-3-closing.webp",
      "label": "closing",
      "fw": 55,
      "fh": 88,
@@ -1679,7 +1679,7 @@
    },
    "sheets": [
     {
-     "path": "assets/sprites/resources/firefly-jar-4-closed.png",
+     "path": "assets/sprites/resources/firefly-jar-4-closed.webp",
      "label": "closed",
      "fw": 55,
      "fh": 88,
@@ -1688,7 +1688,7 @@
      "mirror": false
     },
     {
-     "path": "assets/sprites/resources/firefly-jar-4-opening.png",
+     "path": "assets/sprites/resources/firefly-jar-4-opening.webp",
      "label": "opening",
      "fw": 55,
      "fh": 88,
@@ -1697,7 +1697,7 @@
      "mirror": false
     },
     {
-     "path": "assets/sprites/resources/firefly-jar-4-open.png",
+     "path": "assets/sprites/resources/firefly-jar-4-open.webp",
      "label": "open",
      "fw": 55,
      "fh": 88,
@@ -1706,7 +1706,7 @@
      "mirror": false
     },
     {
-     "path": "assets/sprites/resources/firefly-jar-4-closing.png",
+     "path": "assets/sprites/resources/firefly-jar-4-closing.webp",
      "label": "closing",
      "fw": 55,
      "fh": 88,
@@ -1732,7 +1732,7 @@
    },
    "sheets": [
     {
-     "path": "assets/sprites/resources/firefly-jar-5-closed.png",
+     "path": "assets/sprites/resources/firefly-jar-5-closed.webp",
      "label": "closed",
      "fw": 55,
      "fh": 88,
@@ -1741,7 +1741,7 @@
      "mirror": false
     },
     {
-     "path": "assets/sprites/resources/firefly-jar-5-opening.png",
+     "path": "assets/sprites/resources/firefly-jar-5-opening.webp",
      "label": "opening",
      "fw": 55,
      "fh": 88,
@@ -1750,7 +1750,7 @@
      "mirror": false
     },
     {
-     "path": "assets/sprites/resources/firefly-jar-5-open.png",
+     "path": "assets/sprites/resources/firefly-jar-5-open.webp",
      "label": "open",
      "fw": 55,
      "fh": 88,
@@ -1759,7 +1759,7 @@
      "mirror": false
     },
     {
-     "path": "assets/sprites/resources/firefly-jar-5-closing.png",
+     "path": "assets/sprites/resources/firefly-jar-5-closing.webp",
      "label": "closing",
      "fw": 55,
      "fh": 88,
@@ -1785,7 +1785,7 @@
    },
    "sheets": [
     {
-     "path": "assets/sprites/resources/firefly-jar-6-closed.png",
+     "path": "assets/sprites/resources/firefly-jar-6-closed.webp",
      "label": "closed",
      "fw": 55,
      "fh": 88,
@@ -1794,7 +1794,7 @@
      "mirror": false
     },
     {
-     "path": "assets/sprites/resources/firefly-jar-6-opening.png",
+     "path": "assets/sprites/resources/firefly-jar-6-opening.webp",
      "label": "opening",
      "fw": 55,
      "fh": 88,
@@ -1803,7 +1803,7 @@
      "mirror": false
     },
     {
-     "path": "assets/sprites/resources/firefly-jar-6-open.png",
+     "path": "assets/sprites/resources/firefly-jar-6-open.webp",
      "label": "open",
      "fw": 55,
      "fh": 88,
@@ -1812,7 +1812,7 @@
      "mirror": false
     },
     {
-     "path": "assets/sprites/resources/firefly-jar-6-closing.png",
+     "path": "assets/sprites/resources/firefly-jar-6-closing.webp",
      "label": "closing",
      "fw": 55,
      "fh": 88,
@@ -1835,7 +1835,7 @@
    },
    "sheets": [
     {
-     "path": "assets/sprites/resources/firefly-jar-7-closed.png",
+     "path": "assets/sprites/resources/firefly-jar-7-closed.webp",
      "label": "closed",
      "fw": 55,
      "fh": 88,
@@ -1844,7 +1844,7 @@
      "mirror": false
     },
     {
-     "path": "assets/sprites/resources/firefly-jar-7-opening.png",
+     "path": "assets/sprites/resources/firefly-jar-7-opening.webp",
      "label": "opening",
      "fw": 55,
      "fh": 88,
@@ -1853,7 +1853,7 @@
      "mirror": false
     },
     {
-     "path": "assets/sprites/resources/firefly-jar-7-open.png",
+     "path": "assets/sprites/resources/firefly-jar-7-open.webp",
      "label": "open",
      "fw": 55,
      "fh": 88,
@@ -1862,7 +1862,7 @@
      "mirror": false
     },
     {
-     "path": "assets/sprites/resources/firefly-jar-7-closing.png",
+     "path": "assets/sprites/resources/firefly-jar-7-closing.webp",
      "label": "closing",
      "fw": 55,
      "fh": 88,
@@ -1879,7 +1879,7 @@
    "sprite": 1221,
    "sheets": [
     {
-     "path": "assets/sprites/resources/jellisac-jellysack1.png",
+     "path": "assets/sprites/resources/jellisac-jellysack1.webp",
      "fw": 40,
      "fh": 48,
      "cols": 5,
@@ -1897,7 +1897,7 @@
    "sprite": 906,
    "sheets": [
     {
-     "path": "assets/sprites/resources/jellisac-jellysack2.png",
+     "path": "assets/sprites/resources/jellisac-jellysack2.webp",
      "fw": 42,
      "fh": 46,
      "cols": 5,
@@ -1915,7 +1915,7 @@
    "sprite": 606,
    "sheets": [
     {
-     "path": "assets/sprites/resources/jellisac-jellysack3.png",
+     "path": "assets/sprites/resources/jellisac-jellysack3.webp",
      "fw": 44,
      "fh": 39,
      "cols": 5,
@@ -1933,7 +1933,7 @@
    "sprite": 304,
    "sheets": [
     {
-     "path": "assets/sprites/resources/jellisac-jellysack4.png",
+     "path": "assets/sprites/resources/jellisac-jellysack4.webp",
      "fw": 47,
      "fh": 52,
      "cols": 5,
@@ -1951,7 +1951,7 @@
    "sprite": 23,
    "sheets": [
     {
-     "path": "assets/sprites/resources/dirt-pile-dirt1.png",
+     "path": "assets/sprites/resources/dirt-pile-dirt1.webp",
      "fw": 195,
      "fh": 71,
      "cols": 4,
@@ -1971,7 +1971,7 @@
    "sprite": 24,
    "sheets": [
     {
-     "path": "assets/sprites/resources/dirt-pile-dirt2.png",
+     "path": "assets/sprites/resources/dirt-pile-dirt2.webp",
      "fw": 195,
      "fh": 71,
      "cols": 4,
@@ -1991,7 +1991,7 @@
    "sprite": 0,
    "sheets": [
     {
-     "path": "assets/sprites/resources/peat-1.png",
+     "path": "assets/sprites/resources/peat-1.webp",
      "fw": 211,
      "fh": 52,
      "cols": 3,
@@ -2009,7 +2009,7 @@
    "sprite": 0,
    "sheets": [
     {
-     "path": "assets/sprites/resources/peat-2.png",
+     "path": "assets/sprites/resources/peat-2.webp",
      "fw": 166,
      "fh": 46,
      "cols": 5,
@@ -2027,7 +2027,7 @@
    "sprite": 0,
    "sheets": [
     {
-     "path": "assets/sprites/resources/peat-3.png",
+     "path": "assets/sprites/resources/peat-3.webp",
      "fw": 178,
      "fh": 57,
      "cols": 5,
@@ -2045,7 +2045,7 @@
    "clip": "tree2",
    "sheets": [
     {
-     "path": "assets/sprites/wood_tree_maturity_6_variant_2_x6_1_png_1354833445.png",
+     "path": "assets/sprites/wood_tree_maturity_6_variant_2_x6_1_png_1354833445.webp",
      "fw": 88,
      "fh": 138,
      "cols": 6,
@@ -2062,7 +2062,7 @@
    "sprite": 0,
    "sheets": [
     {
-     "path": "assets/sprites/mining/rock_metal.png",
+     "path": "assets/sprites/mining/rock_metal.webp",
      "fw": 137,
      "fh": 100,
      "cols": 5,
@@ -2079,7 +2079,7 @@
    "sprite": 0,
    "sheets": [
     {
-     "path": "assets/sprites/mining/rock_dullite.png",
+     "path": "assets/sprites/mining/rock_dullite.webp",
      "fw": 131,
      "fh": 114,
      "cols": 5,
@@ -2096,7 +2096,7 @@
    "sprite": 0,
    "sheets": [
     {
-     "path": "assets/sprites/mining/rock_beryl.png",
+     "path": "assets/sprites/mining/rock_beryl.webp",
      "fw": 134,
      "fh": 120,
      "cols": 5,
@@ -2113,7 +2113,7 @@
    "sprite": 0,
    "sheets": [
     {
-     "path": "assets/sprites/mining/rock_sparkly.png",
+     "path": "assets/sprites/mining/rock_sparkly.webp",
      "fw": 131,
      "fh": 127,
      "cols": 5,

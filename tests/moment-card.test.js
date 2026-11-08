@@ -18,8 +18,8 @@ import {
   momentMoreText,
   rewardChips,
   rewardIcon,
-} from '../public/js/ui/moment-card.js?v=077703c8';
-import { awardRewardTokens } from '../public/js/screen-fx.js?v=155d18cf';
+} from '../public/js/ui/moment-card.js?v=68e10b61';
+import { awardRewardTokens } from '../public/js/screen-fx.js?v=b4ec277f';
 import { readTokens } from '../tools/tokens/css-sources.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -36,14 +36,14 @@ describe('moment card helpers', () => {
   });
 
   it('gives every moment art: its own, else the quest book or the iMG mark', () => {
-    assert.equal(momentArt({ kind: 'achievement', iconUrl: 'assets/badges/confident_petter.png' }), 'assets/badges/confident_petter.png');
-    assert.equal(momentArt({ kind: 'quest' }), 'assets/ui/quest-book-solid.png');
+    assert.equal(momentArt({ kind: 'achievement', iconUrl: 'assets/badges/confident_petter.webp' }), 'assets/badges/confident_petter.webp');
+    assert.equal(momentArt({ kind: 'quest' }), 'assets/ui/quest-book-solid.webp');
     // A paged quest's own book (game.js iconUrl) is the solid copy too: no rays through the pages.
-    assert.equal(momentArt({ kind: 'quest', iconUrl: 'assets/ui/quest-book.png' }), 'assets/ui/quest-book-solid.png');
+    assert.equal(momentArt({ kind: 'quest', iconUrl: 'assets/ui/quest-book.webp' }), 'assets/ui/quest-book-solid.webp');
     assert.equal(momentArt({ kind: 'level' }), MOMENT_ART.level);
     assert.equal(momentArt({ kind: 'generic' }), null);
-    assert.equal(momentArtShape('assets/ui/quest-book.png'), 'book');
-    assert.equal(momentArtShape('assets/ui/quest-book-solid.png'), 'book');
+    assert.equal(momentArtShape('assets/ui/quest-book.webp'), 'book');
+    assert.equal(momentArtShape('assets/ui/quest-book-solid.webp'), 'book');
     assert.equal(momentArtShape('assets/badges/x.png'), 'square');
     for (const url of Object.values(MOMENT_ART)) assert.ok(existsSync(join(PUBLIC, url)), url);
     // The cropped iMG mark is the card art's own paths with a tighter viewBox.
@@ -56,9 +56,9 @@ describe('moment card helpers', () => {
   it('turns a reward summary into chips, and leaves a cheer as words', () => {
     const chips = rewardChips(awardRewardTokens('+300 iMG · +40 Grendaline favor · +50 currants · +30 energy'));
     assert.deepEqual(chips.map((c) => [c.text, c.kind, c.icon]), [
-      ['+300 iMG', 'img', 'assets/imagination/ui/imagination_button.png'],
-      ['+40 Grendaline favor', 'favor', 'assets/sprites/icons/emblem_grendaline@3x.png'],
-      ['+50 currants', 'currants', 'assets/sprites/icons/pile_of_currants@3x.png'],
+      ['+300 iMG', 'img', 'assets/imagination/ui/imagination_button.webp'],
+      ['+40 Grendaline favor', 'favor', 'assets/sprites/icons/emblem_grendaline@3x.webp'],
+      ['+50 currants', 'currants', 'assets/sprites/icons/pile_of_currants@3x.webp'],
       ['+30 energy', 'energy', null],
     ]);
     for (const c of chips) if (c.icon) assert.ok(existsSync(join(PUBLIC, c.icon)), c.icon);

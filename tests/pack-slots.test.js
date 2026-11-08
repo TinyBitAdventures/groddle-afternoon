@@ -22,7 +22,7 @@ import {
   stackMaxOf,
 } from '../public/js/pack-slots.js?v=a94b816c';
 import { STACKMAX } from '../public/js/pack-slots-data.js?v=800f664c';
-import { bagsFeature, rockChanges } from '../public/js/features/bags-feature.js?v=e3195f4b';
+import { bagsFeature, rockChanges } from '../public/js/features/bags-feature.js?v=67e77f1d';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const GSJS = join(ROOT, '..', 'glitch-GameServerJS');
@@ -264,6 +264,6 @@ describe('wiring', () => {
     assert.match(read('public/js/features/index.js'), /bags-feature\.js\?v=[0-9a-f]{8}'; FEATURES\.push\(bagsFeature\)/);
     const text = read('public/js/store-catalog.js');
     for (const cls of ['bag_generic', 'bag_bigger', 'bag_toolbox_red', 'bag_spicerack']) assert.ok(text.includes(`"classTsid": "${cls}"`), cls);
-    for (const cls of Object.keys(BAG_DEFS)) assert.ok(existsSync(join(ROOT, 'public/assets/sprites/icons', `${cls}.png`)), `${cls} icon`);
+    for (const cls of Object.keys(BAG_DEFS)) assert.ok(existsSync(join(ROOT, 'public/assets/sprites/icons', `${cls}.webp`)), `${cls} icon`);
   });
 });

@@ -30,12 +30,12 @@ import {
   rollCrack,
   stackMaxFor,
 } from '../public/js/artifacts.js?v=fc419ecf';
-import { artifactsFeature, finishCrack } from '../public/js/features/artifacts-feature.js?v=b014162c';
-import { FEATURES } from '../public/js/features/index.js?v=b4df516e';
+import { artifactsFeature, finishCrack } from '../public/js/features/artifacts-feature.js?v=ba6a1a46';
+import { FEATURES } from '../public/js/features/index.js?v=d9128cb3';
 import { DROP_ITEMS, DROP_TABLES, rollDropTable } from '../public/js/drop-tables.js?v=16e12632';
-import { ITEM_CATALOG } from '../public/js/inventory.js?v=d82f3b00';
-import { createToolConditionState, getToolCondition } from '../public/js/tools.js?v=f701b241';
-import { HIRES_ICONS } from '../public/js/icon-hires.js?v=5b68aeaa';
+import { ITEM_CATALOG } from '../public/js/inventory.js?v=b7609342';
+import { createToolConditionState, getToolCondition } from '../public/js/tools.js?v=d8aa3536';
+import { HIRES_ICONS } from '../public/js/icon-hires.js?v=165dbd6e';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const GSJS = join(ROOT, '../glitch-GameServerJS');
@@ -99,7 +99,7 @@ describe('the recipes come from inc_artifacts.js', () => {
     const dropped = new Set(Object.values(DROP_TABLES).flatMap((t) => t.rows.flatMap(([, es]) => es.map((e) => e.item).filter(Boolean))));
     for (const id of [...Object.values(ARTIFACT_MAP).flatMap((a) => a.pieces), ...Object.keys(ARTIFACT_NECKLACES)]) assert.ok(dropped.has(id), id);
     for (const id of ALL_ARTIFACT_CLASSES) {
-      assert.ok(existsSync(join(ROOT, `public/assets/sprites/icons/${id}.png`)), `${id} icon`);
+      assert.ok(existsSync(join(ROOT, `public/assets/sprites/icons/${id}.webp`)), `${id} icon`);
       assert.ok(HIRES_ICONS.has(id), `${id} 3x icon`);
     }
   });

@@ -21,7 +21,7 @@ import {
   normalizeRockFlags,
   readHowto,
   rockVerbs,
-} from '../public/js/magic-rock-home.js?v=39921139';
+} from '../public/js/magic-rock-home.js?v=c07b2327';
 import {
   CULTIVATION_REWARDS_CAP,
   HOUSE_SIGN,
@@ -33,7 +33,7 @@ import {
   imgRewardLine,
   imgRewards,
   rewardsCap,
-} from '../public/js/magic-rock-home.js?v=39921139';
+} from '../public/js/magic-rock-home.js?v=c07b2327';
 import { getGameDayKey } from '../public/js/game-day.js?v=edb00566';
 
 const spike = join(import.meta.dirname, '..');
@@ -156,11 +156,11 @@ describe('source wording', { skip: !existsSync(ROCK_JS) }, () => {
  * shiftCKeyHandler 816-828; HouseManager.as startCultivation 102-118).
  */
 describe('the home street rock (G231)', async () => {
-  const { homesFeature } = await import('../public/js/features/homes-feature.js?v=357f8787');
-  const { towerApi } = await import('../public/js/features/home-tower-feature.js?v=2b2cd1df');
-  const { shiftButlerRuntime } = await import('../public/js/features/butler-feature.js?v=4e988a25');
+  const { homesFeature } = await import('../public/js/features/homes-feature.js?v=5391026a');
+  const { towerApi } = await import('../public/js/features/home-tower-feature.js?v=ebbc41b4');
+  const { shiftButlerRuntime } = await import('../public/js/features/butler-feature.js?v=54762b93');
   const { homeEditing } = await import('../public/js/features/camera-mode-feature.js?v=ad1ae5ea');
-  const { newxpFeature, __newxpTest } = await import('../public/js/features/newxp-feature.js?v=2c718852');
+  const { newxpFeature, __newxpTest } = await import('../public/js/features/newxp-feature.js?v=30b55578');
   const street = { classId: 'magic_rock', state: { room: 'street' } };
   const yard = { classId: 'magic_rock', state: { room: 'yard' } };
   const towerQuest = { active: { build_a_tower: { started: 1 } }, completed: [], offers: {} };
@@ -173,7 +173,7 @@ describe('the home street rock (G231)', async () => {
     assert.match(feature, /homeContext\?\.\(\)\.owned === true/);
     // One rock a street: the Tower module no longer draws its own.
     const tower = readFileSync(join(spike, 'public/js/features/home-tower-feature.js'), 'utf8');
-    assert.doesNotMatch(tower, /function spawnRock\(|rock_read\.png/);
+    assert.doesNotMatch(tower, /function spawnRock\(|rock_read\.webp/);
   });
 
   it('the street rock adds the Tower quest’s talk to after its home verbs; the yard rock never does', () => {
@@ -285,7 +285,7 @@ describe('the home street rock (G231)', async () => {
  * (NCMsgHandler.as 3093-3096). Solo: no visitors, so only the stipend.
  */
 describe('the rock’s daily iMG and the house sign (G232)', async () => {
-  const { homesFeature } = await import('../public/js/features/homes-feature.js?v=357f8787');
+  const { homesFeature } = await import('../public/js/features/homes-feature.js?v=5391026a');
   const street = { classId: 'magic_rock', state: { room: 'street' } };
   const yard = { classId: 'magic_rock', state: { room: 'yard' } };
   const quiet = { active: {}, completed: [], offers: {} };
@@ -385,9 +385,9 @@ describe('the rock’s daily iMG and the house sign (G232)', async () => {
 
   it('G253: the house sign buttons carry the client’s street_* icons (buildButton 146-193)', () => {
     assert.deepEqual(HOUSE_SIGN.buttons.map((b) => b.art), ['expand', 'style', 'cultivate']);
-    assert.equal(houseSignArt('expand'), 'assets/ui/house-sign/street_expand.png');
-    assert.equal(houseSignArt('style', 'hover'), 'assets/ui/house-sign/street_style_hover.png');
-    assert.equal(houseSignArt('cultivate', 'disabled'), 'assets/ui/house-sign/street_cultivate_disabled.png');
+    assert.equal(houseSignArt('expand'), 'assets/ui/house-sign/street_expand.webp');
+    assert.equal(houseSignArt('style', 'hover'), 'assets/ui/house-sign/street_style_hover.webp');
+    assert.equal(houseSignArt('cultivate', 'disabled'), 'assets/ui/house-sign/street_cultivate_disabled.webp');
     for (const b of HOUSE_SIGN.buttons) {
       for (const state of ['', 'hover', 'disabled']) {
         const file = join(spike, 'public', houseSignArt(b.art, state));

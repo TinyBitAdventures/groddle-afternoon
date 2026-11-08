@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { imageSize } from '../tools/image-size.mjs';
 import { describe, it } from 'node:test';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -135,11 +136,11 @@ describe('Phantom Glitch sheets', () => {
   // appear (46) and giveHeart (76) frames; a 7x126 grid cut through heads.
   const pngSize = (file) => {
     const buf = fs.readFileSync(path.join(root, 'public', file));
-    return { w: buf.readUInt32BE(16), h: buf.readUInt32BE(20) };
+    return { w: imageSize(buf).w, h: imageSize(buf).h };
   };
   const sheets = [
-    ['phantomAppear', 'assets/sprites/quests/phantom-appear.png', PHANTOM_APPEAR_FRAME_COUNT, 46],
-    ['phantomGiveHeart', 'assets/sprites/quests/phantom-give-heart.png', PHANTOM_GIVE_HEART_FRAME_COUNT, 76],
+    ['phantomAppear', 'assets/sprites/quests/phantom-appear.webp', PHANTOM_APPEAR_FRAME_COUNT, 46],
+    ['phantomGiveHeart', 'assets/sprites/quests/phantom-give-heart.webp', PHANTOM_GIVE_HEART_FRAME_COUNT, 76],
   ];
 
   it('slices the sheets on the grid the SWF frame counts fill', () => {

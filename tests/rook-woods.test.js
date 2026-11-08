@@ -36,11 +36,11 @@ import {
   rookEggStateForProgress,
   rookWoodsGroundY,
   rookWoodsRemainingMs,
-} from '../public/js/rook-woods.js?v=237b391c';
+} from '../public/js/rook-woods.js?v=0ccc8239';
 import {
   createToolConditionState,
   setToolRemaining,
-} from '../public/js/tools.js?v=f701b241';
+} from '../public/js/tools.js?v=d8aa3536';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -153,7 +153,7 @@ test('client ships recovered Egg art and transient-instance integration', () => 
   const css = fs.readFileSync(path.join(root, 'public/style.css'), 'utf8');
   const egg = path.join(
     root,
-    'public/assets/sprites/quests/rook-woods/rook-egg-states.png'
+    'public/assets/sprites/quests/rook-woods/rook-egg-states.webp'
   );
   assert.equal(fs.existsSync(egg), true);
   assert.match(game, /startRookWoodsQuest/);

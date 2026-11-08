@@ -169,7 +169,7 @@ export function mountImaginationHub(doc, { root, actions = {}, tileState = () =>
       `<button type="button" class="hub-tile" data-hub-tile="${t.id}" style="--hub-i:${i}" aria-keyshortcuts="${t.key}">` +
       `<span class="hub-art" style="background-image:${hubTileBackground(t)}" aria-hidden="true"></span>` +
       `<span class="hub-label"><span class="kcap" aria-hidden="true">${t.key}</span>${t.label}</span></button>`).join('') +
-    '<div class="hub-pill" data-hub-pill><img src="assets/imagination/ui/imagination_button.png" alt="" />' +
+    '<div class="hub-pill" data-hub-pill><img src="assets/imagination/ui/imagination_button.webp" alt="" />' +
     '<span data-hub-img></span><span class="kcap" aria-hidden="true">Esc</span></div>';
   root.appendChild(el);
   const tiles = [...el.querySelectorAll('[data-hub-tile]')];

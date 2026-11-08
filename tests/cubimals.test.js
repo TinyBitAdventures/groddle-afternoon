@@ -3,6 +3,7 @@
  * Run: node --test tests/cubimals.test.js
  */
 import { before, describe, it } from 'node:test';
+import { imageSize } from '../tools/image-size.mjs';
 import assert from 'node:assert/strict';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
@@ -18,14 +19,14 @@ import {
   openCubimalPackage,
   selectCubimal,
   setCubimalFree,
-} from '../public/js/cubimals.js?v=8950bf83';
+} from '../public/js/cubimals.js?v=c48cc6ff';
 import {
   ITEM_CATALOG,
   addItem,
   countItem,
   createInventory,
   listPackItemSlots,
-} from '../public/js/inventory.js?v=d82f3b00';
+} from '../public/js/inventory.js?v=b7609342';
 import {
   applyAchievementProgress,
   createAchievementState,
@@ -38,8 +39,8 @@ const publicRoot = join(here, '../public');
 
 function pngSize(file) {
   const bytes = readFileSync(file);
-  assert.equal(bytes.subarray(1, 4).toString(), 'PNG');
-  return { width: bytes.readUInt32BE(16), height: bytes.readUInt32BE(20) };
+  assert.equal(imageSize(bytes)?.format, 'webp');
+  return { width: imageSize(bytes).w, height: imageSize(bytes).h };
 }
 
 before(async () => {
@@ -99,7 +100,7 @@ describe('official Cubimal package tables', () => {
     const chickSlot = listPackItemSlots(
       createInventory({ npc_cubimal_chick: 1 })
     ).find((slot) => slot.classTsid === 'npc_cubimal_chick');
-    assert.equal(chickSlot.icon, 'assets/sprites/icons/npc_cubimal_chick.png');
+    assert.equal(chickSlot.icon, 'assets/sprites/icons/npc_cubimal_chick.webp');
   });
 });
 
@@ -181,12 +182,12 @@ describe('Cubimal achievements and clean art', () => {
   it('ships one crisp transparent PNG for every official figure', () => {
     const iconDir = join(publicRoot, 'assets/sprites/icons');
     const files = readdirSync(iconDir)
-      .filter((file) => /^npc_cubimal_[^@]+\.png$/.test(file))
+      .filter((file) => /^npc_cubimal_[^@]+\.webp$/.test(file))
       .sort();
     assert.equal(files.length, 43);
     for (const rows of Object.values(CUBIMAL_SERIES)) {
       for (const row of rows) {
-        const file = join(iconDir, `${row.classTsid}.png`);
+        const file = join(iconDir, `${row.classTsid}.webp`);
         assert.equal(existsSync(file), true, row.classTsid);
         const { width, height } = pngSize(file);
         assert.ok(width > 0 && width <= 50, `${row.classTsid} width ${width}`);

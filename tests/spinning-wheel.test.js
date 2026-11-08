@@ -1,4 +1,5 @@
 import test from 'node:test';
+import { imageSize } from '../tools/image-size.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -19,22 +20,22 @@ import {
   spinningWheelPhase,
   startSpinningWheel,
   wheelPrizeTier,
-} from '../public/js/spinning-wheel.js?v=482cd151';
+} from '../public/js/spinning-wheel.js?v=ddae3d4d';
 import {
   ITEM_CATALOG,
   createInventory,
   listPackItemSlots,
-} from '../public/js/inventory.js?v=d82f3b00';
+} from '../public/js/inventory.js?v=b7609342';
 import {
   createShrineState,
   donateToShrine,
-} from '../public/js/shrines.js?v=95d74174';
+} from '../public/js/shrines.js?v=1a945fe7';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
 function pngSize(file) {
   const bytes = fs.readFileSync(file);
-  return { width: bytes.readUInt32BE(16), height: bytes.readUInt32BE(20) };
+  return { width: imageSize(bytes).w, height: imageSize(bytes).h };
 }
 
 test.describe('official Gameshow Ticket prize table', () => {
@@ -148,31 +149,31 @@ test.describe('shrine source and client integration', () => {
     assert.equal(ITEM_CATALOG.musicblock_d_green_04.baseCost, 600);
     const slots = listPackItemSlots(createInventory({ musicblock_x_shiny_01: 1 }));
     assert.equal(slots.find((slot) => slot.classTsid === 'musicblock_x_shiny_01').icon,
-      'assets/sprites/icons/musicblock_x_shiny_01.png');
+      'assets/sprites/icons/musicblock_x_shiny_01.webp');
   });
 
   test('ships complete clean sprite sheets and runtime wiring', () => {
     const spriteDir = path.join(root, 'public/assets/sprites/spinning-wheel');
     // The OGA 514x450 cells cropped to the wheel's 172x267 box (WHEEL_TRIM, see below).
-    assert.deepEqual(pngSize(path.join(spriteDir, 'appear.png')), {
+    assert.deepEqual(pngSize(path.join(spriteDir, 'appear.webp')), {
       width: 7 * 172,
       height: 2 * 267,
     });
-    assert.deepEqual(pngSize(path.join(spriteDir, 'red-spin.png')), {
+    assert.deepEqual(pngSize(path.join(spriteDir, 'red-spin.webp')), {
       width: 7 * 172,
       height: 8 * 267,
     });
-    assert.deepEqual(pngSize(path.join(spriteDir, 'red-end.png')), {
+    assert.deepEqual(pngSize(path.join(spriteDir, 'red-end.webp')), {
       width: 172,
       height: 8 * 267,
     });
     for (const file of [
-      'disappear.png',
-      'green-spin.png',
-      'green-end.png',
-      'white-spin.png',
-      'white-end.png',
-      'stoot-doll.png',
+      'disappear.webp',
+      'green-spin.webp',
+      'green-end.webp',
+      'white-spin.webp',
+      'white-end.webp',
+      'stoot-doll.webp',
     ]) {
       assert.equal(fs.existsSync(path.join(spriteDir, file)), true, file);
     }
@@ -207,7 +208,7 @@ test.describe('sharp Spinning Wheel sheets', () => {
     // The smoke fills the whole cell; cells 9-17 are empty (the wheel is gone) and stay 1x.
     wheelDisappear: { file: 'disappear', label: 'disappear', swfFrames: [276, 284], n: 18, art: 9 },
   });
-  const sheetPath = (file) => `assets/sprites/spinning-wheel/${file}.png`;
+  const sheetPath = (file) => `assets/sprites/spinning-wheel/${file}.webp`;
 
   async function wheelRows() {
     const { gameSheetTable } = await import('./sheet-sources.js');
@@ -279,7 +280,7 @@ print(json.dumps(out))`;
   });
 
   test('every sheet has a 3x render from npc_spinning_wheel.swf, matched to the 1x frame for frame', async () => {
-    const { HIRES_SPRITES, SPLIT_SPRITES, FIRST_DRAW_SPRITES } = await import('../public/js/sprite-hires.js?v=f98be5eb');
+    const { HIRES_SPRITES, SPLIT_SPRITES, FIRST_DRAW_SPRITES } = await import('../public/js/sprite-hires.js?v=abaf3d5a');
     const results = JSON.parse(fs.readFileSync(path.join(root, 'tools/vector-sprites/results.json'), 'utf8'));
     const manifest = JSON.parse(fs.readFileSync(path.join(root, 'tools/vector-sprites/spinning-wheel.json'), 'utf8'));
     assert.deepEqual(

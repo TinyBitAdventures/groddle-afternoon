@@ -104,7 +104,7 @@
   <link rel="icon" href="favicon.ico" sizes="32x32" />
   <link rel="apple-touch-icon" href="apple-touch-icon.png?v=df15aba7" />
   <!-- Content keys for data and art URLs (js/data-urls.js): before every other script. -->
-  <script src="js/data-versions.js?v=4163e8e8"></script>
+  <script src="js/data-versions.js?v=10f60887"></script>
   <script src="js/data-urls.js?v=523668ca"></script>
 </head>
 <body>
@@ -120,7 +120,7 @@
     full <strong>walk1x</strong> (frames 1–24) and <strong>idle0</strong> as real vector timelines.
     Placement matrices for every wardrobe slot extracted from SWF XML.<br /><br />
     <span class="ok">In game:</span> skinned walk sheet
-    <code>assets/sprites/avatar_walk_vector.png</code> (24×196×258).<br /><br />
+    <code>assets/sprites/avatar_walk_vector.webp</code> (24×196×258).<br /><br />
     <strong>Still open:</strong> wardrobe pieces drop into named containers
     (<code>sideShirtContainer_mc</code>, …) at runtime in Flash. We have the slot transforms
     but have not yet injected clothes into the composed avatar SVG. Pattern-fill bitmaps in
@@ -142,7 +142,7 @@
     </div>
     <div class="stage" style="background:#111;color:var(--muted)">
       <div style="font-size:0.8rem;margin-bottom:0.5rem">game sheet (skinned)</div>
-      <img src="assets/sprites/avatar_idle_vector.png?v=df15aba7" alt="idle skinned" height="200" style="image-rendering:pixelated" />
+      <img src="assets/sprites/avatar_idle_vector.webp?v=466e084a" alt="idle skinned" height="200" style="image-rendering:pixelated" />
     </div>
   </div>
 
@@ -188,13 +188,13 @@
     }
 
     const pieces = [
-      'Candy_Cane_Sweater__shirtTorso.png',
-      'Boardwalk_Empire_Overcoat__coatClose.png',
-      'Lederhosen__pantsTop.png',
-      'Buzzcut__sideHair.png',
-      'eyes_01__sideEyeClose.png',
-      'bunny_slippers__shoeClose.png',
-      'Men_DressShoes__shoeClose.png',
+      'Candy_Cane_Sweater__shirtTorso.webp',
+      'Boardwalk_Empire_Overcoat__coatClose.webp',
+      'Lederhosen__pantsTop.webp',
+      'Buzzcut__sideHair.webp',
+      'eyes_01__sideEyeClose.webp',
+      'bunny_slippers__shoeClose.webp',
+      'Men_DressShoes__shoeClose.webp',
     ];
     const grid = document.getElementById('grid');
     for (const name of pieces) {
@@ -203,7 +203,7 @@
       img.src = 'avatar-lab/' + name;
       img.alt = name;
       const cap = document.createElement('figcaption');
-      cap.textContent = name.replace(/\.png$/, '').replace(/__/g, ' · ');
+      cap.textContent = name.replace(/\.(png|webp)$/, '').replace(/__/g, ' · ');
       fig.append(img, cap);
       grid.append(fig);
     }

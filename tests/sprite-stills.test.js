@@ -13,10 +13,10 @@ import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { FIRST_DRAW_SPRITES, HIRES_SPRITES } from '../public/js/sprite-hires.js?v=f98be5eb';
-import { DENSE_SPRITES, denseSprite } from '../public/js/sprite-dense.js?v=178a711b';
-import { MAILBOX_SHEETS, STONE_ART, NOTE_ART, BOARD_ART } from '../public/js/street-furniture.js?v=d5716ef6';
-import { FURNITURE_CATALOG } from '../public/js/homes-catalog.js?v=7aa9beb0';
+import { FIRST_DRAW_SPRITES, HIRES_SPRITES } from '../public/js/sprite-hires.js?v=abaf3d5a';
+import { DENSE_SPRITES, denseSprite } from '../public/js/sprite-dense.js?v=2a0ce07a';
+import { MAILBOX_SHEETS, STONE_ART, NOTE_ART, BOARD_ART } from '../public/js/street-furniture.js?v=6983f5f5';
+import { FURNITURE_CATALOG } from '../public/js/homes-catalog.js?v=10ac34b6';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const pub = join(root, 'public');
@@ -66,7 +66,7 @@ describe('sharp world still items', () => {
   });
 
   it('the Stoot doll draws its 5x render where it is shown at 1.18 and 1.55', () => {
-    const path = 'assets/sprites/spinning-wheel/stoot-doll.png';
+    const path = 'assets/sprites/spinning-wheel/stoot-doll.webp';
     assert.equal(dense[path]?.status, 'ok', dense[path]?.reason);
     assert.equal(DENSE_SPRITES.get(path).density, 5);
     assert.equal(denseSprite(path, 1.18), null);
@@ -74,6 +74,6 @@ describe('sharp world still items', () => {
     const game = readFileSync(join(pub, 'game.js'), 'utf8');
     assert.match(game, /from '\.\/js\/sprite-dense\.js\?v=[0-9a-f]{8}'/);
     assert.equal((game.match(/new PIXI\.Sprite\(stootDollTexture\(\)\)/g) || []).length, 2);
-    assert.doesNotMatch(game, /textureFromUrl\('assets\/sprites\/spinning-wheel\/stoot-doll\.png'\)/);
+    assert.doesNotMatch(game, /textureFromUrl\('assets\/sprites\/spinning-wheel\/stoot-doll\.webp'\)/);
   });
 });

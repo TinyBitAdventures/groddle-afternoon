@@ -41,7 +41,7 @@ import {
   mapFitSize,
   quadBox,
   renderHubMapSvg,
-} from '../public/js/map-graph.js?v=eec0c3d8';
+} from '../public/js/map-graph.js?v=b404f57b';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');

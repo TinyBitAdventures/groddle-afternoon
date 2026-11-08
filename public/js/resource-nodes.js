@@ -76,8 +76,8 @@ import {
   countItem,
   ensureItem,
   ITEM_CATALOG,
-} from './inventory.js?v=d82f3b00';
-import { canUseTool, useToolCondition } from './tools.js?v=f701b241';
+} from './inventory.js?v=b7609342';
+import { canUseTool, useToolCondition } from './tools.js?v=d8aa3536';
 import { getGameDayKey } from './game-day.js?v=edb00566';
 import { grantMoodXp } from './mood-xp.js?v=958e7680';
 import { metabolicGain, moodMax, loseEnergy, loseMood } from './metabolics.js?v=8504134e';
@@ -363,8 +363,8 @@ export const FIREFLY_JAR_SHEETS = Object.freeze(Object.fromEntries(
     Object.freeze(Object.fromEntries(['closed', 'open', 'opening', 'closing'].map((state) => [
       state,
       flies <= 1
-        ? sheet(`firefly-jar-${flies}-${state}.png`, 54, flies === 0 ? 87 : 88, 15, 1, 15, { loop: state === 'closed' || state === 'open' })
-        : sheet(`firefly-jar-${flies}-${state}.png`, 55, 88, 15, 1, 15, { loop: state === 'closed' || state === 'open' }),
+        ? sheet(`firefly-jar-${flies}-${state}.webp`, 54, flies === 0 ? 87 : 88, 15, 1, 15, { loop: state === 'closed' || state === 'open' })
+        : sheet(`firefly-jar-${flies}-${state}.webp`, 55, 88, 15, 1, 15, { loop: state === 'closed' || state === 'open' }),
     ]))),
   ])
 ));
@@ -423,9 +423,9 @@ export const RESOURCE_NODE_CATALOG = Object.freeze({
     art: 'raster',
     sprite: Object.freeze({
       sheets: Object.freeze({
-        fullPath: sheet('firefly-full-path.png', 87, 40, 10, 9, 89, { loop: true }),
-        halfPath: sheet('firefly-half-path.png', 87, 40, 10, 4, 40, { loop: true }),
-        smallPath: sheet('firefly-small-path.png', 87, 40, 10, 2, 20, { loop: true }),
+        fullPath: sheet('firefly-full-path.webp', 87, 40, 10, 9, 89, { loop: true }),
+        halfPath: sheet('firefly-half-path.webp', 87, 40, 10, 4, 40, { loop: true }),
+        smallPath: sheet('firefly-small-path.webp', 87, 40, 10, 2, 20, { loop: true }),
       }),
       defaultSheet: 'fullPath',
       variants: Object.freeze(['fullPath', 'halfPath', 'smallPath']),
@@ -467,12 +467,12 @@ export const RESOURCE_NODE_CATALOG = Object.freeze({
     art: 'raster',
     sprite: Object.freeze({
       sheets: Object.freeze({
-        swimRight: sheet('salmon-swim-right.png', 59, 37, 11, 2, 22, { loop: true }),
-        swimRightUp15: sheet('salmon-swim-right-up15.png', 59, 37, 11, 2, 22, { loop: true }),
-        swimRightUp30: sheet('salmon-swim-right-up30.png', 59, 37, 11, 2, 22, { loop: true }),
-        swimRightDown15: sheet('salmon-swim-right-down15.png', 59, 37, 11, 2, 22, { loop: true }),
-        swimRightDown30: sheet('salmon-swim-right-down30.png', 59, 37, 11, 2, 22, { loop: true }),
-        turnRight: sheet('salmon-turn-right.png', 59, 37, 11, 1, 11, { loop: false }),
+        swimRight: sheet('salmon-swim-right.webp', 59, 37, 11, 2, 22, { loop: true }),
+        swimRightUp15: sheet('salmon-swim-right-up15.webp', 59, 37, 11, 2, 22, { loop: true }),
+        swimRightUp30: sheet('salmon-swim-right-up30.webp', 59, 37, 11, 2, 22, { loop: true }),
+        swimRightDown15: sheet('salmon-swim-right-down15.webp', 59, 37, 11, 2, 22, { loop: true }),
+        swimRightDown30: sheet('salmon-swim-right-down30.webp', 59, 37, 11, 2, 22, { loop: true }),
+        turnRight: sheet('salmon-turn-right.webp', 59, 37, 11, 1, 11, { loop: false }),
       }),
       defaultSheet: 'swimRight',
       frameRule: 'Present: loop swimRight (pick Up15/Up30/Down15/Down30 by heading; mirror x for leftward travel; play turnRight once when reversing). Pocketed: hidden.',
@@ -507,12 +507,12 @@ export const RESOURCE_NODE_CATALOG = Object.freeze({
     art: 'raster',
     sprite: Object.freeze({
       sheets: Object.freeze({
-        blister1: sheet('mortar-barnacle-blister1.png', 39, 44, 4, 1, 4),
-        blister2: sheet('mortar-barnacle-blister2.png', 35, 40, 4, 1, 4),
-        blister3: sheet('mortar-barnacle-blister3.png', 35, 39, 4, 1, 4),
-        blister4: sheet('mortar-barnacle-blister4.png', 36, 40, 4, 1, 4),
-        blister5: sheet('mortar-barnacle-blister5.png', 32, 39, 4, 1, 4),
-        blister6: sheet('mortar-barnacle-blister6.png', 39, 47, 4, 1, 4),
+        blister1: sheet('mortar-barnacle-blister1.webp', 39, 44, 4, 1, 4),
+        blister2: sheet('mortar-barnacle-blister2.webp', 35, 40, 4, 1, 4),
+        blister3: sheet('mortar-barnacle-blister3.webp', 35, 39, 4, 1, 4),
+        blister4: sheet('mortar-barnacle-blister4.webp', 36, 40, 4, 1, 4),
+        blister5: sheet('mortar-barnacle-blister5.webp', 32, 39, 4, 1, 4),
+        blister6: sheet('mortar-barnacle-blister6.webp', 39, 47, 4, 1, 4),
       }),
       defaultSheet: 'blister1',
       variants: Object.freeze(['blister1', 'blister2', 'blister3', 'blister4', 'blister5', 'blister6']),
@@ -554,10 +554,10 @@ export const RESOURCE_NODE_CATALOG = Object.freeze({
     art: 'raster',
     sprite: Object.freeze({
       sheets: Object.freeze({
-        knob1: sheet('ice-knob-knob1.png', 45, 69, 4, 1, 4),
-        knob2: sheet('ice-knob-knob2.png', 54, 68, 4, 1, 4),
-        knob3: sheet('ice-knob-knob3.png', 46, 71, 4, 1, 4),
-        knob4: sheet('ice-knob-knob4.png', 72, 52, 4, 1, 4),
+        knob1: sheet('ice-knob-knob1.webp', 45, 69, 4, 1, 4),
+        knob2: sheet('ice-knob-knob2.webp', 54, 68, 4, 1, 4),
+        knob3: sheet('ice-knob-knob3.webp', 46, 71, 4, 1, 4),
+        knob4: sheet('ice-knob-knob4.webp', 72, 52, 4, 1, 4),
       }),
       defaultSheet: 'knob1',
       variants: Object.freeze(['knob1', 'knob2', 'knob3', 'knob4']),
@@ -598,10 +598,10 @@ export const RESOURCE_NODE_CATALOG = Object.freeze({
     art: 'raster',
     sprite: Object.freeze({
       sheets: Object.freeze({
-        jellySack1: sheet('jellisac-jellysack1.png', 40, 48, 5, 1, 5),
-        jellySack2: sheet('jellisac-jellysack2.png', 42, 46, 5, 1, 5),
-        jellySack3: sheet('jellisac-jellysack3.png', 44, 39, 5, 1, 5),
-        jellySack4: sheet('jellisac-jellysack4.png', 47, 52, 5, 1, 5),
+        jellySack1: sheet('jellisac-jellysack1.webp', 40, 48, 5, 1, 5),
+        jellySack2: sheet('jellisac-jellysack2.webp', 42, 46, 5, 1, 5),
+        jellySack3: sheet('jellisac-jellysack3.webp', 44, 39, 5, 1, 5),
+        jellySack4: sheet('jellisac-jellysack4.webp', 47, 52, 5, 1, 5),
       }),
       defaultSheet: 'jellySack1',
       variants: Object.freeze(['jellySack1', 'jellySack2', 'jellySack3', 'jellySack4']),
@@ -643,8 +643,8 @@ export const RESOURCE_NODE_CATALOG = Object.freeze({
     art: 'raster',
     sprite: Object.freeze({
       sheets: Object.freeze({
-        dirt1: sheet('dirt-pile-dirt1.png', 195, 71, 4, 3, 11),
-        dirt2: sheet('dirt-pile-dirt2.png', 195, 71, 4, 3, 11),
+        dirt1: sheet('dirt-pile-dirt1.webp', 195, 71, 4, 3, 11),
+        dirt2: sheet('dirt-pile-dirt2.webp', 195, 71, 4, 3, 11),
       }),
       defaultSheet: 'dirt1',
       variants: Object.freeze(['dirt1', 'dirt2']),
@@ -684,9 +684,9 @@ export const RESOURCE_NODE_CATALOG = Object.freeze({
     art: 'raster',
     sprite: Object.freeze({
       sheets: Object.freeze({
-        peat1: sheet('peat-1.png', 211, 52, 3, 2, 5),
-        peat2: sheet('peat-2.png', 166, 46, 5, 1, 5),
-        peat3: sheet('peat-3.png', 178, 57, 5, 1, 5),
+        peat1: sheet('peat-1.webp', 211, 52, 3, 2, 5),
+        peat2: sheet('peat-2.webp', 166, 46, 5, 1, 5),
+        peat3: sheet('peat-3.webp', 178, 57, 5, 1, 5),
       }),
       defaultSheet: 'peat1',
       variants: Object.freeze(['peat1', 'peat2', 'peat3']),
@@ -750,10 +750,10 @@ export const RESOURCE_NODE_CATALOG = Object.freeze({
     art: 'raster',
     sprite: Object.freeze({
       sheets: Object.freeze({
-        petFalseWaterFalse: sheet('paper-tree-pet-false-water-false.png', 232, 216, 4, 6, 22),
-        petFalseWaterTrue: sheet('paper-tree-pet-false-water-true.png', 232, 216, 4, 6, 22),
-        petTrueWaterFalse: sheet('paper-tree-pet-true-water-false.png', 232, 216, 4, 6, 22),
-        petTrueWaterTrue: sheet('paper-tree-pet-true-water-true.png', 232, 216, 4, 6, 22),
+        petFalseWaterFalse: sheet('paper-tree-pet-false-water-false.webp', 232, 216, 4, 6, 22),
+        petFalseWaterTrue: sheet('paper-tree-pet-false-water-true.webp', 232, 216, 4, 6, 22),
+        petTrueWaterFalse: sheet('paper-tree-pet-true-water-false.webp', 232, 216, 4, 6, 22),
+        petTrueWaterTrue: sheet('paper-tree-pet-true-water-true.webp', 232, 216, 4, 6, 22),
       }),
       defaultSheet: 'petFalseWaterFalse',
       frameRule: 'sheet by (needs_pet, needs_water) = (!petted, !watered); frame = units (paper_count 0-21)',
@@ -847,10 +847,10 @@ export const RESOURCE_NODE_CATALOG = Object.freeze({
     art: 'raster',
     sprite: Object.freeze({
       sheets: Object.freeze({
-        idle: sheet('dust-trap-idle.png', 110, 255, 1, 1, 1),
-        smackDown: sheet('dust-trap-smack-down.png', 110, 255, 9, 5, 45, { loop: false }),
-        down: sheet('dust-trap-down.png', 110, 255, 1, 1, 1),
-        up: sheet('dust-trap-up.png', 110, 255, 8, 2, 16, { loop: false }),
+        idle: sheet('dust-trap-idle.webp', 110, 255, 1, 1, 1),
+        smackDown: sheet('dust-trap-smack-down.webp', 110, 255, 9, 5, 45, { loop: false }),
+        down: sheet('dust-trap-down.webp', 110, 255, 1, 1, 1),
+        up: sheet('dust-trap-up.webp', 110, 255, 8, 2, 16, { loop: false }),
       }),
       defaultSheet: 'idle',
       frameRule: 'ready: idle; first 2 s after trigger: play smackDown once; then down; last 1 s before ready: play up once',

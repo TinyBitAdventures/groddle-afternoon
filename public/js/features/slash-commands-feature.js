@@ -50,10 +50,10 @@
  *     slashLine (the last line shown).
  */
 
-import { BUTLER_STRINGS } from '../butler.js?v=2bafa110';
-import { butlerApi } from './butler-feature.js?v=4e988a25';
-import { hellFeature } from './hell-feature.js?v=13196575';
-import { towerApi } from './home-tower-feature.js?v=2b2cd1df';
+import { BUTLER_STRINGS } from '../butler.js?v=826eb5f6';
+import { butlerApi } from './butler-feature.js?v=54762b93';
+import { hellFeature } from './hell-feature.js?v=93f1c8dd';
+import { towerApi } from './home-tower-feature.js?v=ebbc41b4';
 import { platformYAt, platformsScreen } from '../street-model.js?v=505d8990';
 import { COMMAND_HELP_INTRO, STUCK_COOLDOWN_MS, STUCK_TEXT, bareCommand, commandHelpLines, commandHint, isCommandHelp, misplacedCommand, slashPlan, unknownLine } from '../slash-commands.js?v=02bedb12';
 import { parseTp, runTeleportCommand, TP_TEXT } from '../admin-teleport.js?v=fa56e8df';

@@ -130,7 +130,7 @@ export async function surfacePieces() {
   for (const [cls, def] of Object.entries(FURNITURE_CATALOG)) {
     if (!def.surface) continue;
     const scale = Math.min(1, Number(def.scale) || 1);
-    const plain = def.art.path.replace(/\.png$/, '@3x.webp');
+    const plain = def.art.path.replace(/\.(png|webp)$/, '@3x.webp');
     out.push({ key: `${cls}/0`, cls, id: '', path: existsSync(join(root, 'public', plain)) ? plain : def.art.path, w: Math.round(def.art.w * scale), h: Math.round(def.art.h * scale), artH: def.art.h, scale, def, platOnly: Boolean(def.platOnly) });
     for (const [id, row] of Object.entries(FURNITURE_UPGRADES[cls]?.upgrades || {})) {
       // A seat's style with no plat holds nothing (platOnly, SEATSELECT): the sweep proves that apart.

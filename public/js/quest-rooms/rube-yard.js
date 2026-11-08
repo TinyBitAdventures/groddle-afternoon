@@ -101,7 +101,7 @@ export const room = {
   id: 'rube_yard',
   title: 'The Wrizzards and The Rube',
   kicker: 'The Rube’s yard',
-  icon: 'assets/sprites/icons/npc_rube.png',
+  icon: 'assets/sprites/icons/npc_rube.webp',
   theme: 'warm',
   hubName: 'The Rube’s yard',
   // quests/rube_spy.js onStarted 80: questInstanceLocation(..., 5*60): the exit delay is the "Are you stuck?" prompt (players/inc_instances.js 317-357), not a clock.
