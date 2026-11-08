@@ -36,8 +36,8 @@ import {
 } from '../public/js/neighbours-mp.js?v=cfabb4f7';
 import { createMinnAccount } from '../public/js/minn-account.js?v=ba6a13c5';
 import { homesFeature, visitorHomeScene, visitorHomeState } from '../public/js/features/homes-feature.js?v=60f1dbf3';
-import { neighboursMpApi, neighboursMpFeature } from '../public/js/features/neighbours-mp-feature.js?v=5cd49d6c';
-import { FEATURES } from '../public/js/features/index.js?v=5f9f7a1e';
+import { neighboursMpApi, neighboursMpFeature } from '../public/js/features/neighbours-mp-feature.js?v=a5ee87ec';
+import { FEATURES } from '../public/js/features/index.js?v=e1b64299';
 import { serverPath, sitePath, skipWithoutServer, skipWithoutSite } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');

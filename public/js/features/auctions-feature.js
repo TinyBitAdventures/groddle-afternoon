@@ -47,6 +47,7 @@ import { scriptFromTag, scriptLabel } from '../teleportation.js?v=5a5c8e6f';
 import { TOOL_CONDITION_CATALOG, copyTagKind, leavingCopyTag, leavingToolWear, receiveToolCopy } from '../tools.js?v=d8aa3536';
 import { createMinnAccount } from '../minn-account.js?v=ba6a13c5';
 import { saveStore } from '../save-store.js?v=8839ba7b';
+import { createItemPicker } from '../ui/item-picker.js?v=b4c84ac6';
 import {
   AUCTION_TEXT as T,
   DEFAULT_RULES,
@@ -123,10 +124,7 @@ const STYLE = `
 .auc-pager { display: flex; gap: var(--sp-4); justify-content: center; align-items: center; margin-top: var(--sp-4); color: var(--text-muted); font-size: var(--fs-sm); }
 .auc-status { min-height: 1.2em; margin: var(--sp-3) 0 0; font-size: var(--fs-sm); color: var(--c-mauve-40); }
 .auc-status.is-error { color: var(--text-danger); }
-.auc-pack { display: flex; flex-wrap: wrap; gap: 0.3rem; max-height: 9.5rem; overflow-y: auto; margin-bottom: var(--sp-4); }
-.auc-pack button { display: inline-flex; align-items: center; gap: var(--sp-2); font: 600 var(--fs-xs)/var(--lh-tight) var(--font-system); border: 0; border-radius: var(--radius-pill); padding: 0.18rem 0.55rem 0.18rem var(--sp-2); cursor: pointer; color: var(--text-heading); background: var(--surface-lilac); box-shadow: inset 0 0 0 1px var(--c-mauve-85); }
-.auc-pack button img { width: 22px; height: 22px; object-fit: contain; }
-.auc-pack button[aria-pressed="true"] { background: var(--c-violet-50); color: var(--text-inverse); box-shadow: none; }
+.auc-body .item-picker { margin-bottom: var(--sp-4); }
 .auc-sell { border-radius: var(--radius-lg); background: var(--surface-card); box-shadow: inset 0 0 0 1px var(--c-cream-93); padding: var(--sp-5) var(--sp-6); }
 .auc-sell h3 { margin: 0 0 var(--sp-2); font: 700 var(--fs-base)/var(--lh-snug) var(--font-ui); color: var(--c-violet-36); }
 .auc-sell p { margin: var(--sp-2) 0; }
@@ -667,25 +665,52 @@ function createSession(engine) {
     }
   }
 
+  /**
+   * #141: the shared item picker (js/ui/item-picker.js): a tile grid with a search, and How many
+   * right under the picked stack; the price and the costs follow it.
+   */
+  let postPicker = null;
+  /** The open sell box's parts, so a count from the picker reaches the price and the readout. */
+  let sellRefs = null;
+  function picker() {
+    postPicker ||= createItemPicker(document, {
+      hook: 'auctions',
+      label: 'Your pack',
+      searchLabel: 'Search your pack',
+      emptyText: T.nothingToSell,
+      countLabel: (it) => `How many ${label(it.c, 2)} do you want to sell?`,
+      countVerb: 'Sell',
+      countHooks: { num: 'data-auctions-count' },
+      onPick: (it) => choose(it.c),
+      onCount: (n) => {
+        if (!pick || !sellRefs) return;
+        pick.n = n;
+        if (!pick.touched) sellRefs.costIn.value = String(suggestedPrice(n, sellRefs.s.v) || '');
+        sellRefs.readout();
+      },
+      onConfirm: () => sellRefs?.costIn.focus(),
+    });
+    return postPicker;
+  }
+
   function renderPost() {
     const nodes = [];
     const stacks = sellables();
+    sellRefs = null;
     if (!stacks.length) {
       nodes.push(el('p', { class: 'auc-none' }, T.nothingToSell), status);
       body.replaceChildren(...nodes);
       return;
     }
     nodes.push(el('p', { class: 'auc-hint' }, 'Choose a stack from your pack.'));
-    const pack = el('div', { class: 'auc-pack', 'data-auctions-pack': '' });
-    for (const s of stacks) {
-      const b = el('button', { type: 'button', 'aria-pressed': String(pick?.c === s.c), 'data-auctions-pick': s.c });
-      const img = el('img', { src: iconFor(s.c), alt: '' });
-      img.addEventListener('error', () => { img.style.visibility = 'hidden'; }, { once: true });
-      b.append(img, el('span', {}, `${label(s.c, s.have)} ×${s.have}`));
-      b.addEventListener('click', () => choose(s.c));
-      pack.append(b);
-    }
-    nodes.push(pack);
+    const pk = picker();
+    pk.update({
+      items: stacks.map((s) => ({ key: s.c, c: s.c, label: label(s.c, s.have), count: s.have, icon: iconFor(s.c), max: s.have, attrs: { 'data-auctions-pick': s.c } })),
+      selected: pick && !pick.forbidden ? pick.c : null,
+      count: pick?.n || 1,
+    });
+    pk.el.setAttribute('data-auctions-pack', '');
+    nodes.push(pk.el);
     if (pick) nodes.push(sellBox(stacks.find((x) => x.c === pick.c)));
     nodes.push(status);
     body.replaceChildren(...nodes);
@@ -693,9 +718,8 @@ function createSession(engine) {
 
   function sellBox(s) {
     const box = el('div', { class: 'auc-sell', 'data-auctions-sell': pick.c });
-    box.append(el('h3', {}, label(pick.c, 1)));
     if (!s || pick.forbidden) {
-      box.append(el('p', {}, T.forbidden));
+      box.append(el('h3', {}, label(pick.c, 1)), el('p', {}, T.forbidden));
       return box;
     }
     const one = label(pick.c, 1);
@@ -703,10 +727,7 @@ function createSession(engine) {
       ? `Lowest current auction price for a single ${one}: ${money(Math.round(lowest.each))}`
       : `Current going rate for a single ${one}: ${money(s.v)}`;
     box.append(el('p', { 'data-auctions-rate': '' }, rate));
-    const countIn = el('input', { type: 'number', min: '1', max: String(s.have), step: '1', value: String(pick.n), 'data-auctions-count': '', inputmode: 'numeric' });
     const costIn = el('input', { type: 'number', min: '1', max: String(rules.costMax), step: '1', value: pick.cost ? String(pick.cost) : '', 'data-auctions-cost': '', inputmode: 'numeric' });
-    const lc = el('label');
-    lc.append(`How many ${label(pick.c, 2)} do you want to sell?`, countIn, el('span', {}, `/ ${s.have}`));
     const lp = el('label');
     lp.append('For what price?', costIn, el('span', {}, 'currants'));
     const each = el('p', { 'data-auctions-each': '' });
@@ -716,7 +737,7 @@ function createSession(engine) {
     costs.append(comm, fee);
     const go = el('button', { type: 'button', class: 'auc-btn', 'data-auctions-post': '' }, 'Post auction');
     const readout = () => {
-      const n = Math.max(0, Math.min(s.have, Math.floor(Number(countIn.value) || 0)));
+      const n = Math.max(0, Math.min(s.have, Math.floor(Number(pick.n) || 0)));
       const cost = Math.max(0, Math.floor(Number(costIn.value) || 0));
       pick.n = n;
       pick.cost = cost;
@@ -725,16 +746,16 @@ function createSession(engine) {
       fee.replaceChildren(el('strong', {}, `Listing fee ${cost ? money(listingFee(cost, rules)) : '–'}`), el('small', {}, T.feeDesc(rules)));
       go.disabled = busy || n < 1 || cost < 1 || cost > rules.costMax;
     };
-    countIn.addEventListener('input', () => {
-      if (!pick.touched) {
-        const n = Math.max(0, Math.min(s.have, Math.floor(Number(countIn.value) || 0)));
-        costIn.value = String(suggestedPrice(n, s.v) || '');
-      }
-      readout();
-    });
     costIn.addEventListener('input', () => { pick.touched = true; readout(); });
+    costIn.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !go.disabled) {
+        e.preventDefault();
+        post(s);
+      }
+    });
     go.addEventListener('click', () => post(s));
-    box.append(lc, lp, each, costs, go);
+    box.append(lp, each, costs, go);
+    sellRefs = { costIn, readout, s };
     readout();
     return box;
   }

@@ -2281,6 +2281,18 @@
 :root[data-ui="classic"] #feed-picker .feed-picker-choice:is(:hover, :focus-visible, .is-selected) { outline: none; box-shadow: 0 0 0 2px var(--c-classic-focus); }
 :root[data-ui="classic"] #feed-picker .verb-menu-x { color: var(--c-classic-close); }
 :root[data-ui="classic"] #feed-picker .verb-menu-hint { display: none; }
+:root[data-ui="classic"] .item-picker { font: calc(var(--fs-classic-row) * var(--cu-n, 1))/var(--lh-normal) var(--font-classic-body); color: var(--c-classic-text); }
+/* #141 the item picker (js/ui/item-picker.js) in the 2012 look: the search box as the client's text
+   field, the tiles as pack slots (the Feed what? picker's), the picked stack on a ruled row. */
+:root[data-ui="classic"] .item-picker-find { height: calc(28 * var(--cu)); border: 1px solid var(--c-classic-input-border); border-radius: var(--radius-xs); background: var(--c-classic-input); color: var(--c-classic-text); font: inherit; }
+:root[data-ui="classic"] .item-picker-find:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--c-classic-focus); }
+:root[data-ui="classic"] .item-picker-tile { border: 0; border-radius: 5px; background: var(--c-classic-panel); box-shadow: 0 0 0 1px var(--c-classic-slot-ring); color: var(--c-classic-title); font: 700 calc(var(--fs-classic-body) * var(--cu-n, 1))/var(--lh-tight) var(--font-classic-body); }
+:root[data-ui="classic"] .item-picker-tile:is(:hover, :focus-visible) { outline: none; box-shadow: 0 0 0 2px var(--c-classic-focus); background: var(--c-classic-panel); }
+:root[data-ui="classic"] .item-picker-tile[aria-pressed="true"] { box-shadow: 0 0 0 2px var(--c-classic-qty-ring); background: var(--c-classic-panel); }
+:root[data-ui="classic"] .item-picker-badge { background: var(--c-classic-panel); box-shadow: 0 0 0 1px var(--c-classic-slot-ring); color: var(--c-classic-title); font: 800 calc(var(--fs-classic-body) * var(--cu-n, 1))/1.35 var(--font-classic-title); }
+:root[data-ui="classic"] .item-picker-none { color: var(--c-classic-offline); }
+:root[data-ui="classic"] .item-picker-chosen { border: 0; border-top: 1px solid var(--c-classic-row-rule); border-radius: 0; background: none; padding: calc(8 * var(--cu)) 0 0; }
+:root[data-ui="classic"] .item-picker-chosen-name { color: var(--c-classic-title); font-family: var(--font-classic-title); }
 /* How many (js/ui/count-chooser.js, .count-pop: Feed, Eat more, Drop, Shake more and the other pack verbs, Buy and Sell, a Rook offering): the client's
    QuantityPickerSpecial row (InteractionMenu.as 612-713). The title keeps the client's own words,
    "Feed how many Cherries?" (InteractionMenuController.as 989). The number in Nunito 13 #495e5e in a

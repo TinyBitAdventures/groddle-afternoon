@@ -38,8 +38,9 @@ import { TOOL_CONDITION_CATALOG, copyTag, copyTagKind, copyTags, leavingCopyTag,
 import { scriptFromTag, scriptLabel } from '../teleportation.js?v=5a5c8e6f';
 import { unitRankAt } from '../pack-slots.js?v=a94b816c';
 import { createMinnAccount } from '../minn-account.js?v=ba6a13c5';
+import { createItemPicker } from '../ui/item-picker.js?v=b4c84ac6';
 // The same key as features/index.js: one module instance holds the carried notes.
-import { giveCarriedNote, takeCarriedNote, writtenCarriedNotes } from './street-furniture-feature.js?v=6f3ed09d';
+import { giveCarriedNote, takeCarriedNote, writtenCarriedNotes } from './street-furniture-feature.js?v=26213578';
 import {
   BOX_SLOTS,
   GIFT_BOX,
@@ -70,7 +71,7 @@ let slice = normalizeGiftsSlice(null);
 let multiplayer = false;
 
 const STYLE = `
-.gift-win { position: fixed; z-index: calc(var(--z-dialog) + 5); left: 50%; top: 10vh; transform: translateX(-50%); width: min(520px, calc(100vw - 32px)); max-height: 82vh; overflow-y: auto;
+.gift-win { position: fixed; z-index: calc(var(--z-dialog) + 5); left: 50%; top: 10vh; transform: translateX(-50%); width: min(520px, calc(100vw - 32px)); max-height: 82vh; overflow-y: auto; box-sizing: border-box;
   border-radius: var(--radius-xl); background: var(--surface-card); color: var(--text); box-shadow: var(--shadow-3), 0 0 0 1px color-mix(in srgb, var(--c-violet-50) 18%, transparent); font: var(--fs-md)/var(--lh-normal) var(--font-system); pointer-events: auto; }
 .gift-win[hidden] { display: none; }
 .gift-head { display: flex; gap: var(--sp-5); align-items: flex-start; padding: 0.8rem var(--sp-7) 0.3rem; }
@@ -88,10 +89,10 @@ const STYLE = `
 .gift-list button[aria-pressed="true"] { background: var(--c-violet-50); color: var(--text-inverse); box-shadow: none; }
 .gift-list button[aria-disabled="true"] { opacity: 0.45; cursor: not-allowed; }
 .gift-none { color: var(--text-subtle); font-size: var(--fs-sm); }
-.gift-count { display: flex; align-items: center; gap: var(--sp-3); padding: var(--sp-4) var(--sp-7) 0; font-size: var(--fs-sm); color: var(--c-sand-42); }
-.gift-count[hidden] { display: none; }
-.gift-count button { font: 700 var(--fs-sm)/var(--lh-none) var(--font-system); border: 0; border-radius: var(--radius-sm); min-width: 1.6rem; height: 1.5rem; cursor: pointer; color: var(--text-heading); background: var(--surface-parchment); }
-.gift-count output { min-width: 4.5rem; text-align: center; font-weight: 700; }
+/* #141: the recipient sits with the amount, just above Give (the picker's How many is right above it). */
+.gift-sec.gift-to { margin-top: var(--sp-3); }
+.gift-sec.gift-to .gift-list { max-height: 5.2rem; }
+@media (max-height: 560px) { .gift-win { top: 4vh; max-height: 92vh; } }
 .gift-slots { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp-3); }
 .gift-slot { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 4.2rem; border-radius: var(--radius-md); background: var(--surface-card); box-shadow: inset 0 0 0 1px var(--c-sand-90); padding: 0.2rem; font-size: var(--fs-xs); text-align: center; }
 .gift-slot img { width: 32px; height: 32px; object-fit: contain; }
@@ -188,34 +189,39 @@ function createSession(engine, client) {
   headText.append(title, sub);
   const head = el('div', { class: 'gift-head' });
   head.append(headText, closeBtn);
-  const whoSec = el('div', { class: 'gift-sec' });
+  const whoSec = el('div', { class: 'gift-sec gift-to' });
   const whoList = el('div', { class: 'gift-list', 'data-gift-who': '' });
   whoSec.append(el('h3', {}, 'To'), whoList);
   const whatSec = el('div', { class: 'gift-sec' });
   const whatHead = el('h3', {}, 'What');
   const slotsBox = el('div', { class: 'gift-slots', 'data-gift-slots': '' });
-  const whatList = el('div', { class: 'gift-list', 'data-gift-what': '' });
-  whatSec.append(whatHead, slotsBox, whatList);
-  const countRow = el('div', { class: 'gift-count', hidden: true });
-  const minus = el('button', { type: 'button', 'aria-label': 'One fewer', 'data-gift-minus': '' }, '−');
-  const countOut = el('output', { 'aria-live': 'polite', 'data-gift-count': '' });
-  const plus = el('button', { type: 'button', 'aria-label': 'One more', 'data-gift-plus': '' }, '+');
-  const allBtn = el('button', { type: 'button', 'data-gift-all': '' }, 'All');
-  countRow.append(el('span', {}, 'How many'), minus, countOut, plus, allBtn);
+  // #141: the shared item picker (js/ui/item-picker.js): tiles with a search, How many right under the
+  // picked stack; Wrap uses the same grid to put stacks in the box.
+  const picker = createItemPicker(document, {
+    hook: 'gift',
+    label: 'Your pack',
+    searchLabel: 'Search your pack',
+    countLabel: () => 'How many?',
+    countVerb: 'Give',
+    countHooks: { dec: 'data-gift-minus', inc: 'data-gift-plus', max: 'data-gift-all', of: 'data-gift-count' },
+    onPick: (it) => (wrap ? wrapPick(it) : givePick(it)),
+    onCount: (n) => setCount(n),
+    onConfirm: () => { if (!wrap && !goBtn.disabled) send(); },
+  });
+  picker.el.setAttribute('data-gift-what', '');
+  whatSec.append(whatHead, slotsBox, picker.el);
   const status = el('p', { class: 'gift-status', 'aria-live': 'polite', 'data-gift-status': '' });
   const foot = el('div', { class: 'gift-foot' });
   const cancelBtn = el('button', { type: 'button', class: 'is-quiet', 'data-gift-cancel': '' }, 'Cancel');
   const goBtn = el('button', { type: 'button', 'data-gift-go': '' }, GIFT_TEXT.verb);
   foot.append(cancelBtn, goBtn);
-  win.append(head, whoSec, whatSec, countRow, status, foot);
+  // #141: What (the grid and How many), then To, then Give: the amount and the recipient stay together by the button.
+  win.append(head, whatSec, whoSec, status, foot);
   document.body.append(win);
 
   closeBtn.addEventListener('click', () => close());
   cancelBtn.addEventListener('click', () => close());
   goBtn.addEventListener('click', () => (wrap ? doWrap() : send()));
-  minus.addEventListener('click', () => setCount((give?.pick?.n || 1) - 1));
-  plus.addEventListener('click', () => setCount((give?.pick?.n || 1) + 1));
-  allBtn.addEventListener('click', () => setCount(Infinity));
 
   function publish() {
     engine.setData?.('giftState', wrap ? 'wrap' : give ? 'open' : sending.size ? 'sending' : 'none');
@@ -299,33 +305,48 @@ function createSession(engine, client) {
     slotsBox.hidden = true;
     whatHead.textContent = 'What';
     const things = givables();
-    whatList.replaceChildren(...(things.length
-      ? things.map((t) => {
-        const b = el('button', { type: 'button', 'aria-pressed': String(sameThing(give.pick, t)), 'aria-disabled': String(Boolean(t.reason)), title: t.reason || t.label, 'data-gift-item': t.c, ...(t.noteId ? { 'data-gift-note': t.noteId } : {}), ...(t.boxId ? { 'data-gift-box': t.boxId } : {}) });
-        b.append(icon(t.c), el('span', {}, t.kind === 'stack' && t.have > 1 ? `${t.label} ×${t.have}` : t.label));
-        b.addEventListener('click', () => {
-          if (t.reason) return say(t.reason, 'error');
-          const keep = sameThing(give.pick, t) ? give.pick.n : 1;
-          give.pick = { ...t, n: Math.min(keep, t.max || 1) };
-          say('');
-          render();
-        });
-        return b;
-      })
-      : [el('span', { class: 'gift-none' }, 'Your pack is empty.')]));
     // A pick that left the pack (eaten, given) goes.
     if (give.pick && !things.some((t) => sameThing(t, give.pick))) give.pick = null;
+    picker.update({
+      items: things.map((t) => ({
+        key: thingKey(t),
+        c: t.c,
+        label: t.label,
+        count: t.kind === 'stack' ? t.have || 1 : 1,
+        icon: iconFor(t.c),
+        max: t.kind === 'stack' ? t.max || 1 : 1,
+        reason: t.reason,
+        attrs: { 'data-gift-item': t.c, 'data-gift-note': t.noteId || null, 'data-gift-box': t.boxId || null },
+      })),
+      selected: give.pick ? thingKey(give.pick) : null,
+      count: give.pick?.n || 1,
+    });
     const p = give.pick;
-    countRow.hidden = !(p && p.kind === 'stack' && (p.max || 1) > 1);
-    if (p) countOut.textContent = `${p.n} of ${p.max || 1}`;
-    goBtn.textContent = p && give.to ? `Give ${p.kind === 'box' ? 'the Gift Box' : p.kind === 'note' ? 'the note' : formatStack(p.c, p.n, table, itemLabel)}` : GIFT_TEXT.verb;
+    const what = p ? (p.kind === 'box' ? 'the Gift Box' : p.kind === 'note' ? 'the note' : formatStack(p.c, p.n, table, itemLabel)) : '';
+    // The button names both: what goes and to whom (#141: never the wrong amount to the wrong player).
+    goBtn.textContent = p && give.to ? `Give ${what} to ${give.to.name}` : !p ? 'Choose something to give' : 'Choose who to give it to';
     goBtn.disabled = !p || !give.to || give.waiting;
+  }
+
+  /** One key per givable thing (a note, a box, a script copy are each their own). */
+  function thingKey(t) {
+    return [t.kind, t.c, t.noteId || '', t.boxId || '', t.copy ?? ''].join('|');
+  }
+
+  function givePick(it) {
+    const t = givables().find((x) => thingKey(x) === it.key);
+    if (!t || !give) return;
+    if (t.reason) return say(t.reason, 'error');
+    const keep = sameThing(give.pick, t) ? give.pick.n : 1;
+    give.pick = { ...t, n: Math.min(keep, t.max || 1) };
+    say('');
+    render();
   }
 
   function setCount(n) {
     const p = give?.pick;
     if (!p || p.kind !== 'stack') return;
-    p.n = Math.max(1, Math.min(p.max || 1, n));
+    p.n = Math.max(1, Math.min(p.max || 1, Math.floor(Number(n)) || 1));
     render();
   }
 
@@ -345,8 +366,16 @@ function createSession(engine, client) {
       if (t && !t.reason) give.pick = { ...t, n: t.kind === 'stack' ? Math.min(t.max || 1, 1) : 1 };
     }
     say('');
+    picker.clearSearch();
     render();
+    focusPicker();
     return true;
+  }
+
+  /** The keyboard starts in the window: at How many for a stack already picked, else the search (not on a phone: no keyboard pops up). */
+  function focusPicker() {
+    if (globalThis.matchMedia?.('(pointer: coarse)')?.matches) return;
+    requestAnimationFrame(() => (give?.pick ? picker.focusCount() : picker.focus()));
   }
 
   function close() {
@@ -517,7 +546,6 @@ function createSession(engine, client) {
     title.textContent = GIFT_TEXT.wrapTip;
     sub.textContent = 'Up to three stacks go inside. The one you give it to opens it.';
     whoSec.hidden = true;
-    countRow.hidden = true;
     slotsBox.hidden = false;
     whatHead.textContent = 'Inside';
     const slots = wrap.picks.map((it, i) => {
@@ -537,31 +565,38 @@ function createSession(engine, client) {
     for (let i = wrap.picks.length; i < BOX_SLOTS; i += 1) slots.push(el('div', { class: 'gift-slot is-empty' }, '+'));
     slotsBox.replaceChildren(...slots);
     const rows = listPackSlots(engine.inv || {}).filter((r) => countItem(engine.inv, r.classTsid) > 0 && r.classTsid !== GIFT_BOX);
-    whatList.replaceChildren(...rows.map((r) => {
-      const c = r.classTsid;
-      const reason = table ? boxReason(c, table, ITEM_CATALOG[c]?.tags) : '';
-      const inBox = wrap.picks.some((p) => p.c === c);
-      const b = el('button', { type: 'button', 'aria-disabled': String(Boolean(reason) || inBox), title: reason || `Put ${itemLabel(c, 2)} in`, 'data-gift-wrap-item': c });
-      b.append(icon(c), el('span', {}, `${itemLabel(c, countItem(engine.inv, c))} ×${countItem(engine.inv, c)}`));
-      b.addEventListener('click', () => {
-        if (reason) return say(reason, 'error');
-        if (inBox) return;
-        if (wrap.picks.length >= BOX_SLOTS) return say(GIFT_TEXT.boxFull, 'error');
-        wrap.picks.push({ c, n: Math.min(countItem(engine.inv, c), stackMax(c, table)) });
-        say('');
-        render();
-      });
-      return b;
-    }));
+    picker.update({
+      items: rows.map((r) => {
+        const c = r.classTsid;
+        const reason = table ? boxReason(c, table, ITEM_CATALOG[c]?.tags) : '';
+        const inBox = wrap.picks.some((p) => p.c === c);
+        const have = countItem(engine.inv, c);
+        return { key: c, c, label: itemLabel(c, have), count: have, icon: iconFor(c), max: 1, reason, disabled: inBox, attrs: { 'data-gift-wrap-item': c } };
+      }),
+      selected: null,
+    });
     goBtn.textContent = GIFT_TEXT.wrap;
     goBtn.disabled = !wrap.picks.length;
+  }
+
+  function wrapPick(it) {
+    if (!wrap) return;
+    const c = it.c;
+    if (it.reason) return say(it.reason, 'error');
+    if (wrap.picks.some((p) => p.c === c)) return;
+    if (wrap.picks.length >= BOX_SLOTS) return say(GIFT_TEXT.boxFull, 'error');
+    wrap.picks.push({ c, n: Math.min(countItem(engine.inv, c), stackMax(c, table)) });
+    say('');
+    render();
   }
 
   function openWrap() {
     give = null;
     wrap = { picks: [] };
     say('');
+    picker.clearSearch();
     render();
+    focusPicker();
     return true;
   }
 

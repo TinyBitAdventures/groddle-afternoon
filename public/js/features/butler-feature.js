@@ -138,6 +138,7 @@ import {
 } from '../butler.js?v=826eb5f6';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
 import { holdMs } from '../read-time.js?v=60ae7efc';
+import { createItemPicker } from '../ui/item-picker.js?v=b4c84ac6';
 
 export const BUTLER_FEATURE_ID = 'butler';
 const HOME_STREET_TSID = 'RH_HOME_EXT';
@@ -538,17 +539,11 @@ const CSS = `
 #butler-dialog .bd-btn.primary { border-color: var(--c-lime-77b); background: var(--surface-moss); font-weight: 700; }
 #butler-dialog .bd-input { font: inherit; width: 100%; box-sizing: border-box; padding: 0.45rem var(--sp-5); border: 1px solid var(--c-sand-86); border-radius: var(--radius-md); background: var(--surface-bright); }
 #butler-dialog .bd-label { display: block; font-size: var(--fs-md); opacity: 0.75; margin: var(--sp-1) 0 0.3rem; }
-#butler-dialog .bd-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(64px, 1fr)); gap: var(--sp-3); max-height: 220px; overflow: auto; margin-top: 0.3rem; }
-#butler-dialog .bd-item { font: inherit; font-size: var(--fs-sm); border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--surface-bright); padding: 0.3rem 0.2rem; display: grid; justify-items: center; gap: var(--sp-1); cursor: pointer; }
-#butler-dialog .bd-item[aria-pressed="true"] { border-color: var(--c-lime-72); background: var(--surface-moss); }
-#butler-dialog .bd-item img { width: 36px; height: 36px; object-fit: contain; }
 #butler-dialog .bd-looks { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.45rem; margin-top: 0.3rem; }
 #butler-dialog .bd-look { font: inherit; font-size: var(--fs-sm); border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--surface-bright); padding: var(--sp-3); cursor: pointer; display: grid; justify-items: center; gap: 0.2rem; }
 #butler-dialog .bd-look[aria-pressed="true"] { border-color: var(--c-lime-72); background: var(--surface-moss); font-weight: 700; }
 #butler-dialog .bd-look img { height: 78px; }
 #butler-dialog .bd-parts { font-size: var(--fs-xs); opacity: 0.75; line-height: var(--lh-snug); text-align: center; }
-#butler-dialog .bd-count { display: flex; gap: var(--sp-4); align-items: center; margin-top: var(--sp-4); }
-#butler-dialog .bd-count input { width: 5rem; }
 #butler-dialog .butler-card.bd-wide { width: min(560px, calc(100vw - 32px)); }
 #butler-dialog .bd-wide .bd-portrait, #butler-dialog .bd-wide .bd-text:empty { display: none; }
 #butler-dialog .bd-wide .bd-main { flex: 1 1 auto; min-width: 0; }
@@ -1585,47 +1580,26 @@ function giveMenu(engine) {
   if (!slots.length) return line(engine, 'give:none', BUTLER_STRINGS.visitorGiftNoPrevious.trim(), 'Oh, ok.');
   let chosen = slots[0].classTsid;
   let count = 1;
+  // #141: the shared item picker (js/ui/item-picker.js), the one Give and the Auction House use: this
+  // grid was its model; it adds a search and the count badge, How many stays right under it.
   const render = (el) => {
-    const grid = document.createElement('div');
-    grid.className = 'bd-grid';
-    const countRow = document.createElement('label');
-    countRow.className = 'bd-count';
-    const input = document.createElement('input');
-    input.type = 'number';
-    input.min = '1';
-    input.className = 'bd-input';
-    input.dataset.butlerCount = '1';
-    const sync = () => {
-      const have = countItem(engine.inv, chosen);
-      input.max = String(have);
-      count = Math.max(1, Math.min(have, Math.floor(Number(input.value) || 1)));
-      input.value = String(count);
-      for (const b of grid.querySelectorAll('[data-butler-item]')) b.setAttribute('aria-pressed', b.dataset.butlerItem === chosen ? 'true' : 'false');
-    };
-    for (const s of slots) {
-      const b = document.createElement('button');
-      b.type = 'button';
-      b.className = 'bd-item';
-      b.dataset.butlerItem = s.classTsid;
-      const img = document.createElement('img');
-      img.src = s.icon || itemIcon(s.classTsid);
-      img.alt = '';
-      const lab = document.createElement('span');
-      lab.textContent = `${s.label} ×${s.count}`;
-      b.append(img, lab);
-      b.addEventListener('click', () => {
-        chosen = s.classTsid;
-        input.value = '1';
-        sync();
-      });
-      grid.appendChild(b);
-    }
-    input.addEventListener('change', sync);
-    input.addEventListener('keydown', (e) => e.stopPropagation());
-    countRow.append(document.createTextNode('How many?'), input);
-    el.append(grid, countRow);
-    input.value = '1';
-    sync();
+    const items = slots.map((s) => ({ key: s.classTsid, c: s.classTsid, label: s.label, count: s.count, icon: s.icon || itemIcon(s.classTsid), max: Math.max(1, countItem(engine.inv, s.classTsid)), attrs: { 'data-butler-item': s.classTsid } }));
+    const picker = createItemPicker(document, {
+      hook: 'butler',
+      label: 'Your pack',
+      countLabel: () => 'How many?',
+      countVerb: 'Give',
+      countHooks: { num: 'data-butler-count' },
+      onPick: (it) => {
+        chosen = it.c;
+        count = 1;
+        picker.update({ selected: chosen, count });
+      },
+      onCount: (n) => { count = n; },
+      onConfirm: () => el.closest?.('#butler-dialog')?.querySelector('.bd-btn.primary')?.click(),
+    });
+    picker.update({ items, selected: chosen, count });
+    el.append(picker.el);
   };
   openDialog(engine, {
     key: 'give',
