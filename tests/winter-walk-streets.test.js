@@ -11,7 +11,7 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { assertStreetGeometry } from '../public/js/street-model.js?v=505d8990';
+import { assertStreetGeometry } from '../public/js/street-model.js?v=b6cb6a4e';
 import { OWNED_STREETS, streetOwner } from '../public/js/location-events.js?v=05663361';
 import { JUMP_GAP } from '../public/js/quest-rooms/puzzle-kit.js?v=378c28e8';
 import { WINTER_HAVEN_STREET_ID, WINTER_WALK_STREET_ID } from '../public/js/winter-walk.js?v=9961c35f';
@@ -38,7 +38,7 @@ import {
   winterStreetEcology,
 } from '../public/js/winter-walk-streets.js?v=8607edd3';
 import { rebuiltRoomsFeature } from '../public/js/features/rebuilt-rooms-feature.js?v=8baf41e0';
-import { reachStreet } from '../public/js/builder/reach-graph.js?v=b8634e9a';
+import { reachStreet } from '../public/js/builder/reach-graph.js?v=50932a7a';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const pub = join(spike, 'public');

@@ -46,10 +46,10 @@
 import { slugsFromEffects } from '../speech-slugs.js?v=130338f9';
 import { addItem, countItem, removeItem } from '../inventory.js?v=b7609342';
 import { getToolCondition } from '../tools.js?v=d8aa3536';
-import { worldToScreen } from '../street-model.js?v=505d8990';
+import { worldToScreen } from '../street-model.js?v=b6cb6a4e';
 import { OVERLAY_USES, playOverlay } from '../overlays.js?v=642adbd0';
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=b764884b';
-import { nearestSurfaceY, walkSurfaceY } from '../walk-surface.js?v=c982983e';
+import { nearestSurfaceY, walkSurfaceY } from '../walk-surface.js?v=106bfdc5';
 import { loadWildlifeCatalog, wildlifeCatalog, wildlifeFor } from '../wildlife.js?v=670c3a7f';
 import {
   FIBER_ID,

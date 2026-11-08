@@ -5,7 +5,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import { OUT_OF_REACH_LINE, STAND_LIFT, behindFloor, floorBetween, reachPoint } from '../public/js/reach.js?v=4187d746';
-import { avatarHeadReach, groundBeneath, platformsScreen } from '../public/js/street-model.js?v=505d8990';
+import { avatarHeadReach, groundBeneath, platformsScreen } from '../public/js/street-model.js?v=b6cb6a4e';
 import { serverPath, skipWithoutServer } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');

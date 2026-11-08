@@ -50,7 +50,7 @@
 
 import { createMinnAccount } from '../minn-account.js?v=ba6a13c5';
 import { bindContextTrigger } from '../ui/context-menu.js?v=79326483';
-import { STREET_INDEX } from '../street-loader.js?v=33d2b8bc';
+import { STREET_INDEX } from '../street-loader.js?v=18b181ad';
 import {
   BUDDY_COUNTER,
   BUDDY_TEXT,

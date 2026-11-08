@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { reachStreet } from '../public/js/builder/reach-graph.js?v=b8634e9a';
+import { reachStreet } from '../public/js/builder/reach-graph.js?v=50932a7a';
 
 import {
   SUMMERS_DAY_ANNEX_BOWL,

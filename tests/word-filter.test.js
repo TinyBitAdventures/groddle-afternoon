@@ -29,12 +29,12 @@ import { HAS_SERVER, HAS_SITE, SITE_DIR, serverPath, sitePath } from '../tools/r
 import { bagLabel } from '../public/js/bag-names.js?v=22391c55';
 import { BAG_DEFS, PACK_CAPACITY, layoutPack, normalizePrefs, renameBag } from '../public/js/pack-slots.js?v=a94b816c';
 import { ITEM_CATALOG, isToolItem } from '../public/js/inventory.js?v=b7609342';
-import { nameAnimal, namedAnimalLabel } from '../public/js/animal-husbandry.js?v=7194f0f1';
+import { nameAnimal, namedAnimalLabel } from '../public/js/animal-husbandry.js?v=75afc5c5';
 import { kittyLabel, nameKitty } from '../public/js/heli-kitties.js?v=8fbe314a';
 import { nameCubimal } from '../public/js/cubimals.js?v=c48cc6ff';
 import { createButlerState, renameButler, teachButler } from '../public/js/butler.js?v=826eb5f6';
 import { cleanTowerName } from '../public/js/home-tower.js?v=087df38f';
-import { PENMANSHIP_SKILL, editNote, writePaperNote } from '../public/js/street-furniture.js?v=6983f5f5';
+import { PENMANSHIP_SKILL, editNote, writePaperNote } from '../public/js/street-furniture.js?v=026c21ef';
 import { MAIL_COMPANIONS, createMailboxState, sendMail } from '../public/js/mailbox.js?v=a3e833ba';
 import { teachPhrase } from '../public/js/seasons.js?v=1978c3f3';
 import { cleanCaption } from '../public/js/snaps.js?v=55d4c257';

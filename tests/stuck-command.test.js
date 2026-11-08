@@ -10,7 +10,7 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { PLAYER_COMMANDS, REMAKE_COMMANDS, SLASH_TEXT, STUCK_COOLDOWN_MS, STUCK_TEXT, slashPlan } from '../public/js/slash-commands.js?v=8533e143';
-import { slashCommandsFeature } from '../public/js/features/slash-commands-feature.js?v=39331e76';
+import { slashCommandsFeature } from '../public/js/features/slash-commands-feature.js?v=c0c04626';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const game = readFileSync(join(root, 'public/game.js'), 'utf8');
@@ -151,8 +151,9 @@ describe('game.js: where you arrived on this street', () => {
   it('stuckReturn moves you on the street you are on, onto the floor, and the camera follows', () => {
     const fn = game.slice(game.indexOf('  stuckReturn() {'), game.indexOf('  async refreshHomeScene('));
     assert.match(fn, /streetArrival\?\.tsid === currentStreetTsid/);
-    // No arrival this visit: the street's own way in nearest you (a signpost or a door), never the planned spawn first.
-    assert.match(fn, /if \(at\.from === 'street'\) \{\s*const ways = \[\.\.\.\(currentStreet\?\.signposts \|\| \[\]\), \.\.\.\(currentStreet\?\.doors \|\| \[\]\)\]/);
+    // No arrival this visit: the street's own way in nearest you that you can leave by (a signpost or a door,
+    // street-model.js stuckWay, tests/wintry-trap.test.js), never the planned spawn first.
+    assert.match(fn, /if \(at\.from === 'street'\) \{\s*const near = stuckWay\(currentStreet, player\.x, features\.query\('closedRoads', engine\) \|\| \[\]\);/);
     assert.match(fn, /player\.onGround = false;/);
     assert.match(fn, /engine\.snapCamera\(\);/);
     // Online the realtime client sends the new spot as any step (hub.go "move" takes any spot on the street).

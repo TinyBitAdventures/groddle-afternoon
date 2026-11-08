@@ -23,14 +23,14 @@ import { GAME_DIR, SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
 import {
   EFFECT_KINDS, EFFECT_DEFAULTS, EFFECT_LIMITS, RUMBLE_SOUND, normaliseEmitter, calmEmitter, emitterPool, effectsCost,
   createRumbleClock, rumbleShare, rumbleEnvelope, createStreetEffects, seededRandom,
-} from '../public/js/street-effects.js?v=03f7fe4d';
-import { zoneEffectsFeature } from '../public/js/features/zone-effects-feature.js?v=eef3178d';
-import { useDraftArt } from '../public/js/builder/draft-play.js?v=bf625cdf';
+} from '../public/js/street-effects.js?v=f35d7e32';
+import { zoneEffectsFeature } from '../public/js/features/zone-effects-feature.js?v=8399f1f5';
+import { useDraftArt } from '../public/js/builder/draft-play.js?v=b3adf35e';
 import { run, effectOps, rumbleOps, effectsReport, placeOps, ladderTiling, LADDER_TILINGS } from '../tools/builder/cli.mjs';
 import * as textures from '../public/js/textures.js?v=3149d699';
 import { installNewArt } from '../public/js/builder/new-art.js?v=29f0b13e';
-import { newStreet } from '../public/js/builder/templates.js?v=04776537';
-import { kindChange, costWords } from '../public/js/builder/editor-effects.js?v=220287cb';
+import { newStreet } from '../public/js/builder/templates.js?v=f5eaea9c';
+import { kindChange, costWords } from '../public/js/builder/editor-effects.js?v=03f8c8a0';
 
 const json = (p) => JSON.parse(readFileSync(join(GAME_DIR, p), 'utf8'));
 const hasPhp = spawnSync('php', ['-v']).status === 0;

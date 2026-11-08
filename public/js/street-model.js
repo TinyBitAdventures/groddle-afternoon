@@ -258,6 +258,36 @@ export function navigableSignposts(signposts, hereTsid = '') {
 }
 
 /**
+ * /stuck's spot when nothing arrived this visit (a load, a return, a resurrection): the street's
+ * own way in nearest `x` (screen space) that you can leave by. A signpost counts when the client
+ * shows it (navigableSignposts) and one of its arms leads to a street whose road is open; a door
+ * when it is shown, unlocked and its street open. `closed` holds the streets still being built
+ * (street-jobs-feature closedRoads, either tsid prefix). With no such way, the nearest shown one.
+ * Wintry Place (Austin 2026-11-07): from the slot right of its ice blocks the nearest post was
+ * signpost_1, on the top ledge, whose only arm leads to Newcot Close, still being built; the way
+ * out is signpost_2 on the floor. Signposts are world space, doors screen space
+ * (build-street-navigation.mjs).
+ * @returns {{ x:number, y:number, open:boolean }|null}
+ */
+export function stuckWay(street, x, closed = []) {
+  if (!street) return null;
+  const shut = new Set((closed || []).map((t) => String(t || '').slice(1)));
+  const isOpen = (tsid) => !shut.has(String(tsid || '').slice(1));
+  const ways = [];
+  for (const post of navigableSignposts(street.signposts || [], street.tsid)) {
+    if (!Number.isFinite(Number(post?.x)) || !Number.isFinite(Number(post?.y))) continue;
+    const at = worldToScreen(street, Number(post.x), Number(post.y));
+    ways.push({ x: at.x, y: at.y, open: (post.connects || []).some((c) => isOpen(c?.tsid)) });
+  }
+  for (const door of street.doors || []) {
+    if (!door || door.hidden || !Number.isFinite(Number(door.x)) || !Number.isFinite(Number(door.y))) continue;
+    ways.push({ x: Number(door.x), y: Number(door.y), open: !door.is_locked && Boolean(door.connect?.tsid) && isOpen(door.connect.tsid) });
+  }
+  const nearest = (list) => list.sort((a, b) => Math.abs(a.x - x) - Math.abs(b.x - x))[0] || null;
+  return nearest(ways.filter((w) => w.open)) || nearest(ways);
+}
+
+/**
  * Platform y at world/screen x via linear interpolation, or null if off segment.
  * @param {{ x1:number,y1:number,x2:number,y2:number }} p  screen-space
  * @param {number} x

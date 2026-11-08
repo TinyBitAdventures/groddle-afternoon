@@ -12,11 +12,11 @@ import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { STUCK_TEXT, bareCommand, slashPlan } from '../public/js/slash-commands.js?v=8533e143';
-import { STUCK_HINT_DWELL_MS, onTrapFloor, slashCommandsFeature, trapLinesOn } from '../public/js/features/slash-commands-feature.js?v=39331e76';
-import { STREET_TRAPS } from '../public/js/street-traps-data.js?v=1ac4d01b';
+import { STUCK_HINT_DWELL_MS, onTrapFloor, slashCommandsFeature, trapLinesOn } from '../public/js/features/slash-commands-feature.js?v=c0c04626';
+import { STREET_TRAPS } from '../public/js/street-traps-data.js?v=b2911c49';
 import { TRAP_JUMPS, renderTraps, trapLinesOf } from '../tools/ecology/build-street-traps.mjs';
-import { reachStreet, streetBuff } from '../public/js/builder/reach-graph.js?v=b8634e9a';
-import { validateShippedStreet } from '../public/js/builder/validate.js?v=3201ce6e';
+import { reachStreet, streetBuff } from '../public/js/builder/reach-graph.js?v=50932a7a';
+import { validateShippedStreet } from '../public/js/builder/validate.js?v=f811c3ff';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const LEVEL_3_WEST = 'GLI107JLRU11EM2';
@@ -97,9 +97,11 @@ describe('/stuck hint: the floors it knows', () => {
     assert.ok(Object.keys(STREET_TRAPS).length > 10);
     for (const [tsid, row] of Object.entries(STREET_TRAPS)) {
       const ids = new Set(street(tsid).platforms.map((p) => p.id));
-      for (const [line, jump] of Object.entries(row)) {
+      for (const [line, entry] of Object.entries(row)) {
         assert.ok(ids.has(line), `${tsid} ${line}`);
-        assert.ok(TRAP_JUMPS.includes(jump), `${tsid} ${line} ${jump}`);
+        // A plain jump, or [jump, x1, x2] runs for a floor that traps along part of it (tests/wintry-trap.test.js).
+        for (const jump of Array.isArray(entry) ? entry.map((r) => r[0]) : [entry]) assert.ok(TRAP_JUMPS.includes(jump), `${tsid} ${line} ${jump}`);
+        if (Array.isArray(entry)) for (const [, a, b] of entry) assert.ok(a < b, `${tsid} ${line} ${a}..${b}`);
       }
     }
   });

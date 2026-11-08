@@ -9,11 +9,11 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { assertStreetGeometry, platformYAt } from '../public/js/street-model.js?v=505d8990';
+import { assertStreetGeometry, platformYAt } from '../public/js/street-model.js?v=b6cb6a4e';
 import { arrivalInTarget } from '../public/js/location-navigation.js?v=4be109b9';
-import { populationForStreet } from '../public/js/street-ecology.js?v=3c1d4c06';
+import { populationForStreet } from '../public/js/street-ecology.js?v=78a1d522';
 import { pickAwayConnection, pickConnection, planSignpostTravel, resolveLoadedTsid } from '../public/js/travel.js?v=7fd6e363';
-import { validateShippedStreet } from '../public/js/builder/validate.js?v=3201ce6e';
+import { validateShippedStreet } from '../public/js/builder/validate.js?v=f811c3ff';
 import {
   HAUKI_FLOOR_1,
   HAUKI_FLOOR_2,
@@ -35,7 +35,7 @@ import {
   towerForLobby,
 } from '../public/js/tower-floors.js?v=3d1ad8b7';
 import { towerFloorsFeature } from '../public/js/features/tower-floors-feature.js?v=fc4c24d8';
-import { FEATURES } from '../public/js/features/index.js?v=bf9dfe13';
+import { FEATURES } from '../public/js/features/index.js?v=ffc77a5a';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const pub = join(spike, 'public');

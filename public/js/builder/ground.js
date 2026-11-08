@@ -13,7 +13,7 @@
  * anchor is bottom-centre. "Art under a line" is any middleground deco box in its column; the
  * pictures' own transparency is not looked at (a box is what the zone knows).
  */
-import { isStandable } from '../street-model.js?v=505d8990';
+import { isStandable } from '../street-model.js?v=b6cb6a4e';
 import { nextDecoId } from './ops.js?v=27c7796f';
 
 /**

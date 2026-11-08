@@ -12,7 +12,7 @@ import { describe, it } from 'node:test';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { platformsScreen, streetWidth } from '../public/js/street-model.js?v=505d8990';
+import { platformsScreen, streetWidth } from '../public/js/street-model.js?v=b6cb6a4e';
 import {
   hiddenBehindFloor,
   inUnreachedRun,
@@ -21,7 +21,7 @@ import {
   setStreetEcologyCatalog,
   streetReservedSpots,
   unreachedFloorsFor,
-} from '../public/js/street-ecology.js?v=3c1d4c06';
+} from '../public/js/street-ecology.js?v=78a1d522';
 import { placementRequests, streetEcology } from '../tools/build-realtime-quoins.mjs';
 import { unreachedFloorsOf } from '../tools/ecology/build-unreached-floors.mjs';
 import { shippedArrivals } from '../tools/builder/calibrate.mjs';

@@ -22,7 +22,7 @@
  * administrators as a report ticket.
  */
 
-import { noteContent } from './street-furniture.js?v=6983f5f5';
+import { noteContent } from './street-furniture.js?v=026c21ef';
 
 /** Where the site and server ids come from (boards.go boardOpRe, boardSeedRe). */
 export const BOARD_NOTE_ID = /^board-([0-9a-f]{16}|seed-[A-Z0-9]{1,32}-[0-9]{1,2})$/;

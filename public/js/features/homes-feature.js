@@ -207,13 +207,13 @@ import { MOVABLE_FIXTURES, MOVABLE_FIXTURE_IDS, fixtureFits, fixtureText, savedF
 import { displayTopOf, itemstackOverlayPoint, overlayAlpha, overlayLifeMs, playPoofIn, trackOverlay } from '../overlay-art.js?v=11b6dd7f';
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=b764884b';
 import { fadeInNewNear } from '../poof-fade.js?v=54ef2431';
-import { projectApi } from './street-jobs-feature.js?v=25e52041';
+import { projectApi } from './street-jobs-feature.js?v=09d598ac';
 import { TOWER_CHASSIS, TOWER_CONFIG, TOWER_DOOR_DX, TOWER_GEO, TOWER_PROTO, normalizeTowerState } from '../home-tower.js?v=087df38f';
 import { drawTowerElevator, drawTowerExit, towerApi, visitorTowerView } from './home-tower-feature.js?v=ebbc41b4';
 import { pieceUrl, roomPieces, surfaceAt, swatchPiece, wallTargetAt } from '../home-wallpaper.js?v=f1969400';
 import { wantsHiresDecos } from '../deco-hires.js?v=cb905e17';
-import { resourceNodesFeature } from './resource-nodes-feature.js?v=ed64e23a';
-import { patchesFeature } from './patches-feature.js?v=f3e88dee';
+import { resourceNodesFeature } from './resource-nodes-feature.js?v=faaf2b60';
+import { patchesFeature } from './patches-feature.js?v=ab2de387';
 import { GROWN_TREE_LABELS, createPlot, growTree, plotLabel } from '../patches.js?v=aa83d5ad';
 import { WOTD_DEPLETE_MS, WOTD_TEXT, nearestPourTarget, pourButton, pourConditions, pourConfirmText } from '../wine-pour.js?v=6daa23a7';
 import { WOTD_TOOL, pourApproach, pourDropTip } from '../wine-pour-fx.js?v=364e22d2';
@@ -236,7 +236,7 @@ import {
 } from '../home-styles.js?v=1a7a2798';
 import { frameTexture, isLoaded, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js?v=3149d699';
 import { FALLBACK_MAX as WORLD_ART_FALLBACK_MAX, worldArtFor } from '../world-art.js?v=df476660';
-import { oneArmSignpost } from '../street-render.js?v=81416f4f';
+import { oneArmSignpost } from '../street-render.js?v=40f4b798';
 import { ROCK_CATALOG } from '../mining.js?v=fc28670f';
 import {
   HOUSE_SIGN,
@@ -255,7 +255,7 @@ import {
   ROCK_VERB_IDS,
 } from '../magic-rock-home.js?v=c07b2327';
 import { getGameDayKey } from '../game-day.js?v=edb00566';
-import { HOME_TICKET, HOME_TICKET_CLASS } from '../home-ticket.js?v=d5a36577';
+import { HOME_TICKET, HOME_TICKET_CLASS } from '../home-ticket.js?v=91125b31';
 import { MIN_GROUND_CLEARANCE, yCamOffsetAnchor } from '../movement.js?v=b30f84eb';
 import { takeFromHouse } from '../ledger-house.js?v=b34f5c89';
 import { storagePickupLock } from '../home-storage.js?v=121f1897';

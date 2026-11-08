@@ -41,11 +41,11 @@ import { grantMoodXp } from './mood-xp.js?v=958e7680';
 import { musicblockItemMeta } from './musicblocks.js?v=db6a213b';
 import { isEnchantedForest } from './enchanted-forests.js?v=d986bff5';
 import { isSymphoniousTsid } from './symphonious-maximus.js?v=345ad437';
-import { isMissingFloorTsid } from './hidden-floors.js?v=d49b76df';
+import { isMissingFloorTsid } from './hidden-floors.js?v=eb220641';
 import { stationByTsid } from './subway.js?v=44d1a09f';
 import { ensurePiggyMood, piggyTwiceDailyTick, satePiggy } from './animal-mood.js?v=a49495fc';
 import { isCrowdSad } from './animal-crowding.js?v=e8d3ce7c';
-import { ecologyForStreet } from './street-ecology.js?v=3c1d4c06';
+import { ecologyForStreet } from './street-ecology.js?v=78a1d522';
 import { filterText } from './word-filter.js?v=9a7a7ebb';
 
 const MINUTE = 60 * 1000;

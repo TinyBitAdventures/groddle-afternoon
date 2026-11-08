@@ -39,9 +39,9 @@ import { ITEM_BASE_COSTS } from '../store-catalog.js?v=74b56af3';
 import { shiftMetabolic } from '../metabolics.js?v=8504134e';
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=b764884b';
 import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=3149d699';
-import { landingY, nearestSurfaceY } from '../walk-surface.js?v=c982983e';
-import { STREET_INDEX } from '../street-loader.js?v=33d2b8bc';
-import { GENTLE_ISLAND_TSIDS, isNewxpSceneTsid } from '../newxp.js?v=8fa18f24';
+import { landingY, nearestSurfaceY } from '../walk-surface.js?v=106bfdc5';
+import { STREET_INDEX } from '../street-loader.js?v=18b181ad';
+import { GENTLE_ISLAND_TSIDS, isNewxpSceneTsid } from '../newxp.js?v=398ca20e';
 import { OVERLAY_BASE, cellRect, loadOverlayManifest, overlayAlpha, overlayFrameAt, standPlacement, trackOverlay } from '../overlay-art.js?v=11b6dd7f';
 import {
   AWARD_ITEM,

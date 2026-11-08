@@ -56,7 +56,7 @@
 import { addItem, countItem, removeItem } from '../inventory.js?v=b7609342';
 import { copyForVerb, copyTag, copyTags, migrateClassTag, setCopyTag, takeToolCopy } from '../tools.js?v=d8aa3536';
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=b764884b';
-import { landingY, walkSurfaceY } from '../walk-surface.js?v=c982983e';
+import { landingY, walkSurfaceY } from '../walk-surface.js?v=106bfdc5';
 import { playPoofIn, poofInAlpha } from '../overlay-art.js?v=11b6dd7f';
 import {
   CUBIMAL_FREE,

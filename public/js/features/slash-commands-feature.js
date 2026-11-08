@@ -53,15 +53,15 @@
  */
 
 import { BUTLER_STRINGS } from '../butler.js?v=826eb5f6';
-import { butlerApi } from './butler-feature.js?v=54762b93';
+import { butlerApi } from './butler-feature.js?v=a3e0527a';
 import { hellFeature } from './hell-feature.js?v=93f1c8dd';
 import { towerApi } from './home-tower-feature.js?v=ebbc41b4';
-import { platformYAt, platformsScreen } from '../street-model.js?v=505d8990';
+import { platformYAt, platformsScreen } from '../street-model.js?v=b6cb6a4e';
 import { COMMAND_HELP_INTRO, STUCK_COOLDOWN_MS, STUCK_TEXT, bareCommand, commandHelpLines, commandHint, isCommandHelp, misplacedCommand, slashPlan, strayLetterCommand, unknownLine } from '../slash-commands.js?v=8533e143';
 import { parseTp, runTeleportCommand, TP_TEXT } from '../admin-teleport.js?v=fa56e8df';
 import { minnUrls } from '../minn-account.js?v=ba6a13c5';
 import { saveStore } from '../save-store.js?v=8839ba7b';
-import { STREET_INDEX } from '../street-loader.js?v=33d2b8bc';
+import { STREET_INDEX } from '../street-loader.js?v=18b181ad';
 
 export const SLASH_COMMANDS_FEATURE_ID = 'slash-commands';
 
@@ -136,18 +136,25 @@ export function showLocalLines(engine, lines, where = engine.social?.showing) {
   return 'activity';
 }
 
-/** PURE: a street's trap floors, screen space, each with the highest jump it traps at. */
+/**
+ * PURE: a street's trap floors, screen space, each with the highest jump it traps at
+ * (`trapJump`), or, for a floor that traps only along part of it, `trapRuns` [jump, x1, x2]
+ * (js/street-traps-data.js; Wintry Place's floor traps only in the slot right of its ice blocks).
+ */
 export function trapLinesOn(street, traps) {
   const row = street?.tsid && traps && (traps[street.tsid] || traps[`G${String(street.tsid).slice(1)}`]);
   if (!row || !Array.isArray(street.platforms)) return [];
-  return platformsScreen(street).filter((p) => row[p.id] != null).map((p) => ({ ...p, trapJump: row[p.id] }));
+  return platformsScreen(street).filter((p) => row[p.id] != null).map((p) => (Array.isArray(row[p.id])
+    ? { ...p, trapJump: Math.max(...row[p.id].map((r) => r[0])), trapRuns: row[p.id] }
+    : { ...p, trapJump: row[p.id] }));
 }
 
-/** PURE: standing on a floor that traps this jump. */
+/** PURE: standing on a floor, or the part of one, that traps this jump. */
 export function onTrapFloor(lines, player, jump = 1) {
   if (!player?.onGround) return false;
   return lines.some((p) => {
     if (jump > p.trapJump + 1e-6) return false;
+    if (p.trapRuns && !p.trapRuns.some(([j, x1, x2]) => jump <= j + 1e-6 && player.x >= x1 && player.x <= x2)) return false;
     const y = platformYAt(p, player.x);
     return y != null && Math.abs(y - player.y) <= 8;
   });
@@ -159,7 +166,7 @@ export function onTrapFloor(lines, player, jump = 1) {
  */
 let trapData = null;
 function loadTraps() {
-  trapData ||= import('../street-traps-data.js?v=1ac4d01b').then((m) => m.STREET_TRAPS).catch(() => null);
+  trapData ||= import('../street-traps-data.js?v=b2911c49').then((m) => m.STREET_TRAPS).catch(() => null);
   return trapData;
 }
 

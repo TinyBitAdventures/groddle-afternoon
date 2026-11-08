@@ -32,8 +32,8 @@
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { flatJump, NORMAL_BUFF, WALK_MAX, JUMP_SPEED, avatarFall } from '../../public/js/avatar-step.js?v=d48908a5';
-import { isStandable, climbWallsWorld } from '../../public/js/street-model.js?v=505d8990';
+import { flatJump, NORMAL_BUFF, WALK_MAX, JUMP_SPEED, avatarFall } from '../../public/js/avatar-step.js?v=e8e9581f';
+import { isStandable, climbWallsWorld } from '../../public/js/street-model.js?v=b6cb6a4e';
 import { physicsMultipliers } from '../../public/js/location-events.js?v=05663361';
 
 const check = process.argv.includes('--check');

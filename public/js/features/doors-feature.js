@@ -29,7 +29,7 @@
 
 import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=b7609342';
 import { getGameDayKey } from '../game-day.js?v=edb00566';
-import { loadDecoManifest } from '../street-render.js?v=81416f4f';
+import { loadDecoManifest } from '../street-render.js?v=40f4b798';
 import {
   DOOR_KEYS,
   DOOR_KEY_BASE_COST,

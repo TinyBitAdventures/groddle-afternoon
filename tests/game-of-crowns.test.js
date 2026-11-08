@@ -33,7 +33,7 @@ import {
   tagCrowns,
   tickCrowns,
 } from '../public/js/game-of-crowns.js?v=e32f35f5';
-import { platformsScreen, wallsScreen } from '../public/js/street-model.js?v=505d8990';
+import { platformsScreen, wallsScreen } from '../public/js/street-model.js?v=b6cb6a4e';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..', 'public');
 const players = [

@@ -23,9 +23,9 @@
  *
  * Pure: no DOM, no Pixi.
  */
-import { platformsScreen, barriersScreen, wallsScreen, isStandable, platformYAt, resolveGround, ladderTopDeck, worldToScreen, streetWidth, streetHeight, navigableSignposts, isBuriedSignpost, blockBarrierCrossing } from '../street-model.js?v=505d8990';
-import { stepAvatar, avatarGround, steerX, NORMAL_BUFF, JUMP_SPEED, WALK_MAX, OFF_LADDER_RATIO } from '../avatar-step.js?v=d48908a5';
-import { ladderTopSignpostLadder } from '../ladder-top-signposts.js?v=40abe6f5';
+import { platformsScreen, barriersScreen, wallsScreen, isStandable, platformYAt, resolveGround, ladderTopDeck, worldToScreen, streetWidth, streetHeight, navigableSignposts, isBuriedSignpost, blockBarrierCrossing } from '../street-model.js?v=b6cb6a4e';
+import { stepAvatar, avatarGround, steerX, NORMAL_BUFF, JUMP_SPEED, WALK_MAX, OFF_LADDER_RATIO } from '../avatar-step.js?v=e8e9581f';
+import { ladderTopSignpostLadder } from '../ladder-top-signposts.js?v=046013b4';
 import { physicsMultipliers } from '../location-events.js?v=05663361';
 
 export const STAND_STEP = 8;
@@ -726,11 +726,22 @@ export function reachStreet(street, arrivals, opts = {}) {
     let run = null;
     let anyReached = false;
     let trapped = 0;
+    // Runs of trapped stand points (screen x, consecutive points joined), so a floor that traps
+    // only along part of it says where (Wintry Place: the slot right of the ice blocks, not the
+    // whole floor under them; tools/ecology/build-street-traps.mjs).
+    const runs = [];
+    let prevTrapped = false;
     for (let k = 0; k < ln.count; k += 1) {
       const n = ln.first + k;
       const r = Boolean(fromAll[n]);
       anyReached ||= r;
-      if (r && exitNodes.length && !toExit[n]) trapped += 1;
+      const isTrapped = r && exitNodes.length && !toExit[n];
+      if (isTrapped) {
+        trapped += 1;
+        if (prevTrapped) runs[runs.length - 1][1] = Math.round(g.x[n]);
+        else runs.push([Math.round(g.x[n]), Math.round(g.x[n])]);
+      }
+      prevTrapped = Boolean(isTrapped);
       if (!run || run.reached !== r) {
         if (run) surfaces.push(run);
         run = { line: p.id, reached: r, x1: g.x[n], y1: g.y[n], x2: g.x[n], y2: g.y[n] };
@@ -741,7 +752,7 @@ export function reachStreet(street, arrivals, opts = {}) {
     }
     if (run) surfaces.push(run);
     if (p.virtual) { /* the world's floor: drawn, never listed */ } else if (!anyReached) unreached.push({ line: p.id, x1: p.x1, y1: p.y1, x2: p.x2, y2: p.y2 });
-    if (trapped && !p.virtual) traps.push({ line: p.id, x: Math.round((Math.max(ln.x0, p.x1) + Math.min(ln.x1, p.x2)) / 2), y: Math.round((p.y1 + p.y2) / 2), points: trapped });
+    if (trapped && !p.virtual) traps.push({ line: p.id, x: Math.round((Math.max(ln.x0, p.x1) + Math.min(ln.x1, p.x2)) / 2), y: Math.round((p.y1 + p.y2) / 2), points: trapped, stands: ln.count, runs });
   });
   // Ladders: a floor at the foot and a deck at the top (unless a post stands at its top).
   const topPosts = new Set(targets.filter((t) => t.ladder != null).map((t) => t.ladder));

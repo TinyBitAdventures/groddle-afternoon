@@ -10,8 +10,8 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { assertStreetGeometry, platformsScreen, platformYAt, worldToScreen } from '../public/js/street-model.js?v=505d8990';
-import { reachStreet } from '../public/js/builder/reach-graph.js?v=b8634e9a';
+import { assertStreetGeometry, platformsScreen, platformYAt, worldToScreen } from '../public/js/street-model.js?v=b6cb6a4e';
+import { reachStreet } from '../public/js/builder/reach-graph.js?v=50932a7a';
 import {
   ENCHANTED_FORESTS,
   ENCHANTED_MUSIC,
@@ -41,9 +41,9 @@ import {
   woodTreeStatusLabel,
 } from '../public/js/woodcutting.js?v=4fd0342b';
 import { noteWoodTreeCare } from '../public/js/patches.js?v=aa83d5ad';
-import { isTreeTarget } from '../public/js/features/tree-death-feature.js?v=37a31290';
-import { enchantedForestFeature, hollowTrees, treeScreenSpots } from '../public/js/features/enchanted-forest-feature.js?v=47f3f409';
-import { FEATURES } from '../public/js/features/index.js?v=bf9dfe13';
+import { isTreeTarget } from '../public/js/features/tree-death-feature.js?v=cac74160';
+import { enchantedForestFeature, hollowTrees, treeScreenSpots } from '../public/js/features/enchanted-forest-feature.js?v=86aec688';
+import { FEATURES } from '../public/js/features/index.js?v=ffc77a5a';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const streets = join(spike, 'public/assets/streets');

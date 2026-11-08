@@ -62,7 +62,7 @@ import { ANIM_FPS, EMOTION_MS, animForState, crowdScaleX } from '../avatar-anims
 import { movedLine } from '../admin-teleport.js?v=fa56e8df';
 import { ADMIN_TEXT, applyAdminGive, applyAdminRefill, showAdminMessage, showBooted } from '../admin-console-mp.js?v=e3bf1e6d';
 import { saveStore } from '../save-store.js?v=8839ba7b';
-import { STREET_INDEX } from '../street-loader.js?v=33d2b8bc';
+import { STREET_INDEX } from '../street-loader.js?v=18b181ad';
 import { appendLinkedText } from '../chat-links.js?v=b717fac7';
 import { lineKey } from '../chat-reactions.js?v=d65d555b';
 

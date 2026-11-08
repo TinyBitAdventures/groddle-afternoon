@@ -23,7 +23,7 @@
 import { ITEM_CATALOG, ensureItem } from '../inventory.js?v=b7609342';
 import { getGameDayKey } from '../game-day.js?v=edb00566';
 import { hellFeature } from './hell-feature.js?v=93f1c8dd';
-import { landingY, walkSurfaceY } from '../walk-surface.js?v=c982983e';
+import { landingY, walkSurfaceY } from '../walk-surface.js?v=106bfdc5';
 import {
   RUBE_CLASS,
   RUBE_FADE_MS,

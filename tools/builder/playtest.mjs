@@ -30,8 +30,8 @@ import { existsSync, mkdirSync, statSync } from 'node:fs';
 import { extname, join, resolve } from 'node:path';
 import { homedir } from 'node:os';
 import { pathToFileURL } from 'node:url';
-import { reachRoutes } from '../../public/js/builder/reach-graph.js?v=b8634e9a';
-import { zoneArrivals } from '../../public/js/builder/validate.js?v=3201ce6e';
+import { reachRoutes } from '../../public/js/builder/reach-graph.js?v=50932a7a';
+import { zoneArrivals } from '../../public/js/builder/validate.js?v=f811c3ff';
 
 const TYPES = { '.js': 'text/javascript', '.mjs': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.webp': 'image/webp', '.png': 'image/png', '.svg': 'image/svg+xml', '.html': 'text/html', '.woff2': 'font/woff2', '.mp3': 'audio/mpeg', '.ogg': 'audio/ogg', '.jpg': 'image/jpeg', '.atlas': 'text/plain', '.xml': 'text/xml' };
 const SITE_ONLY = /^\/(wp-json|wp-admin|wp-login\.php|console|minn-admin|wp-content|minn|builder-art)(\/|$)/;

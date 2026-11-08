@@ -28,15 +28,15 @@
  *   profiles     assets/content/style-profiles.json, for the STY rules (P5's js/builder/style-rules.js)
  */
 import { compileSchema } from './schema-check.js?v=cc9d1af4';
-import { reachStreet, REACH_LIMITS, TIGHT_MARGIN, LANDING_TRIES, AIR_JUMP_TRIES, LANDING_SHARE, streetBuff } from './reach-graph.js?v=b8634e9a';
-import { platformsScreen, barriersScreen, isStandable, isSolidFromBelow, isItemFloor, assertStreetGeometry, avatarHeadReach, platformYAt, worldToScreen, streetWidth, streetHeight } from '../street-model.js?v=505d8990';
-import { planStreetPlacements, populationForStreet, streetReservedSpots } from '../street-ecology.js?v=3c1d4c06';
-import { jumpApex } from '../avatar-step.js?v=d48908a5';
+import { reachStreet, REACH_LIMITS, TIGHT_MARGIN, LANDING_TRIES, AIR_JUMP_TRIES, LANDING_SHARE, streetBuff } from './reach-graph.js?v=50932a7a';
+import { platformsScreen, barriersScreen, isStandable, isSolidFromBelow, isItemFloor, assertStreetGeometry, avatarHeadReach, platformYAt, worldToScreen, streetWidth, streetHeight } from '../street-model.js?v=b6cb6a4e';
+import { planStreetPlacements, populationForStreet, streetReservedSpots } from '../street-ecology.js?v=78a1d522';
+import { jumpApex } from '../avatar-step.js?v=e8e9581f';
 import { STY_RULES, styleFindings } from './style-rules.js?v=abf9bfae';
-import { EFFECT_LIMITS, effectsCost, normaliseEmitter, rumbleShare, emitterAnchor } from '../street-effects.js?v=03f7fe4d';
+import { EFFECT_LIMITS, effectsCost, normaliseEmitter, rumbleShare, emitterAnchor } from '../street-effects.js?v=f35d7e32';
 import { LICENCE_POLICY, provenanceProblems } from './new-art.js?v=29f0b13e';
-import { postOffFloor, offFloorWords } from './posts.js?v=82926ee0';
-import { floatingLines, FLOAT_REACH, FLOAT_OPEN } from './ground.js?v=8beea23c';
+import { postOffFloor, offFloorWords } from './posts.js?v=7725af4f';
+import { floatingLines, FLOAT_REACH, FLOAT_OPEN } from './ground.js?v=9218684b';
 
 export const RULES = Object.freeze({
   'SCH-001': ['fatal', 'Zone does not fit the schema'],

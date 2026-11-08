@@ -55,14 +55,14 @@ import {
   removeSkillPackageOverride,
   skillPackageDetails,
 } from '../skill-packages.js?v=bfb87281';
-import { husbandryPack } from '../animal-husbandry.js?v=7194f0f1';
+import { husbandryPack } from '../animal-husbandry.js?v=75afc5c5';
 import { itemVerbAchievementCounters } from '../item-verbs.js?v=1e20fa7d';
 // The same module instances js/features/index.js registers (tests/buff-triggers.test.js checks the tags).
 import { meditationFeature } from './meditation-feature.js?v=50bf1ac0';
 import { teleportationFeature } from './teleportation-feature.js?v=23270f4f';
-import { rookAttackFeature } from './rook-attack-feature.js?v=db912705';
-import { rubeFeature } from './rube-feature.js?v=50352247';
-import { smugglingFeature } from './smuggling-feature.js?v=49c3f782';
+import { rookAttackFeature } from './rook-attack-feature.js?v=5794de08';
+import { rubeFeature } from './rube-feature.js?v=e131eebe';
+import { smugglingFeature } from './smuggling-feature.js?v=6e063637';
 import { hellFeature } from './hell-feature.js?v=93f1c8dd';
 import { isPooped } from '../hell.js?v=ca971c34';
 

@@ -23,7 +23,7 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { isStandable, platformYAt, platformsScreen, streetWidth, worldToScreen } from '../public/js/street-model.js?v=505d8990';
+import { isStandable, platformYAt, platformsScreen, streetWidth, worldToScreen } from '../public/js/street-model.js?v=b6cb6a4e';
 import {
   ANIMAL_PATROL,
   LADDER_FOOT_PX,
@@ -41,10 +41,10 @@ import {
   populationForStreet,
   setStreetEcologyCatalog,
   streetReservedSpots,
-} from '../public/js/street-ecology.js?v=3c1d4c06';
+} from '../public/js/street-ecology.js?v=78a1d522';
 import { placementRequests } from '../tools/build-realtime-objects.mjs';
 import { serverPath, skipWithoutServer } from '../tools/repos.mjs';
-import { applyStreetIndex, loadStreetDataFromFs, setZoneStreetsShown } from '../public/js/street-loader.js?v=33d2b8bc';
+import { applyStreetIndex, loadStreetDataFromFs, setZoneStreetsShown } from '../public/js/street-loader.js?v=18b181ad';
 
 const root = join(import.meta.dirname, '..');
 const streetsDir = join(root, 'public/assets/streets');

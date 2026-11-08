@@ -21,8 +21,8 @@ import {
 import { VERB_RANGES } from '../public/js/verb-ranges-data.js?v=4d0a4515';
 import { OUT_OF_REACH_LINE } from '../public/js/reach.js?v=4187d746';
 import { createUserPath, stepUserPath } from '../public/js/user-path.js?v=8880557f';
-import { NORMAL_BUFF, avatarGround, stepAvatar, steerX } from '../public/js/avatar-step.js?v=d48908a5';
-import { groundBeneath, platformsScreen, barriersScreen, streetWidth } from '../public/js/street-model.js?v=505d8990';
+import { NORMAL_BUFF, avatarGround, stepAvatar, steerX } from '../public/js/avatar-step.js?v=e8e9581f';
+import { groundBeneath, platformsScreen, barriersScreen, streetWidth } from '../public/js/street-model.js?v=b6cb6a4e';
 
 const root = join(import.meta.dirname, '..');
 const game = readFileSync(join(root, 'public/game.js'), 'utf8');

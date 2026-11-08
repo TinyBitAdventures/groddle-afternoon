@@ -19,7 +19,7 @@ import {
   flashBlurSize,
   pickBlurTilesToFree,
   planBlurTiles,
-} from '../public/js/street-render.js?v=81416f4f';
+} from '../public/js/street-render.js?v=40f4b798';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const src = readFileSync(join(here, '../public/js/street-render.js'), 'utf8');

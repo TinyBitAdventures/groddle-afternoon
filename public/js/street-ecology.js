@@ -3,7 +3,7 @@
  * placement on recovered locations-xml platforms.
  */
 
-import { avatarHeadReach, groundBeneath, isItemSolid, isStandable, platformYAt, worldToScreen } from './street-model.js?v=505d8990';
+import { avatarHeadReach, groundBeneath, isItemSolid, isStandable, platformYAt, worldToScreen } from './street-model.js?v=b6cb6a4e';
 import { behindFloor } from './reach.js?v=4187d746';
 
 export const STREET_ECOLOGY_URL = 'assets/content/street-ecology.json?v=official-ecology-6';

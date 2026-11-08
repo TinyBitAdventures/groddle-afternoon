@@ -7,8 +7,8 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { FIRST_SKILLS } from '../public/js/newxp.js?v=8fa18f24';
-import { skillPictureUrl } from '../public/js/features/newxp-feature.js?v=30b55578';
+import { FIRST_SKILLS } from '../public/js/newxp.js?v=398ca20e';
+import { skillPictureUrl } from '../public/js/features/newxp-feature.js?v=884421ca';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const GS = join(root, '../glitch-GameServerJS');

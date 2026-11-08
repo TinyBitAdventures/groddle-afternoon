@@ -7,11 +7,11 @@
  */
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { GRAVITY, JUMP_SPEED, WALK_MAX } from '../public/js/avatar-step.js?v=d48908a5';
+import { GRAVITY, JUMP_SPEED, WALK_MAX } from '../public/js/avatar-step.js?v=e8e9581f';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { FRAME_DT_CAP, assertStreetGeometry, platformYAt, resolveGround } from '../public/js/street-model.js?v=505d8990';
+import { FRAME_DT_CAP, assertStreetGeometry, platformYAt, resolveGround } from '../public/js/street-model.js?v=b6cb6a4e';
 import { insideBottomRect } from '../public/js/doors.js?v=c5083537';
 import {
   GREETERBOT,
@@ -33,8 +33,8 @@ import {
 } from '../public/js/tower-mid-rooms.js?v=678fdc50';
 import { greet, greeterAction, midTowerFeature } from '../public/js/features/mid-tower-feature.js?v=115f0814';
 import { towerRoomsFeature } from '../public/js/features/tower-rooms-feature.js?v=78ed7778';
-import { populationForStreet } from '../public/js/street-ecology.js?v=3c1d4c06';
-import { reachStreet } from '../public/js/builder/reach-graph.js?v=b8634e9a';
+import { populationForStreet } from '../public/js/street-ecology.js?v=78a1d522';
+import { reachStreet } from '../public/js/builder/reach-graph.js?v=50932a7a';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const streets = join(spike, 'public/assets/streets');

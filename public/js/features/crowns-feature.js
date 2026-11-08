@@ -60,7 +60,7 @@ import {
 } from '../game-of-crowns.js?v=e32f35f5';
 import { RACE_RIVALS } from '../races.js?v=ab22a079';
 import { mayhemHoldsArena } from './mayhem-feature.js?v=bf288afa';
-import { wallsScreen } from '../street-model.js?v=505d8990';
+import { wallsScreen } from '../street-model.js?v=b6cb6a4e';
 import { addItem, countItem, removeItem } from '../inventory.js?v=b7609342';
 import { textureFromUrl } from '../textures.js?v=3149d699';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';

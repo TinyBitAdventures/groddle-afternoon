@@ -2,9 +2,9 @@
  * Groddle Afternoon — original street geometry + layered decos
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
-import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=ebc8b8b3';
+import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=0eb17d5e';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=127e0a3c';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=bf9dfe13';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=ffc77a5a';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -478,8 +478,8 @@ import {
 import { TROPHY_FIND_TEXT, trophyOfBadge } from './js/home-trophies.js?v=21c2add6';
 import { PACK_COPY, isBagClass, isElementClass, unitRankAt } from './js/pack-slots.js?v=a94b816c';
 import { createPackRow, mountPackClearance, packBandRange, packCountText, packSearchEntries, packSlotTip } from './js/ui/pack-row.js?v=65c0f180';
-import { listAnimalFeedOptions } from './js/animals.js?v=0d9f9b0f';
-import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=0d9f9b0f';
+import { listAnimalFeedOptions } from './js/animals.js?v=08496a95';
+import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=08496a95';
 import {
   createDroppedItemState,
   parseDroppedItemState,
@@ -512,7 +512,7 @@ import {
   imagineHome,
   isHomePlaceTsid,
 } from './js/homes.js?v=631ab6b8';
-import { HOME_MACHINE, offerHomeTicket, renderTicketMachine } from './js/home-ticket.js?v=d5a36577';
+import { HOME_MACHINE, offerHomeTicket, renderTicketMachine } from './js/home-ticket.js?v=91125b31';
 import {
   MAIL_COMPANIONS,
   archiveMail,
@@ -642,8 +642,8 @@ import {
   availableStreetTsids,
   ensureStreetIndex,
   resolveIndexTsid,
-} from './js/street-loader.js?v=33d2b8bc';
-import { showDraftBanner, startDraftPlay } from './js/builder/draft-play.js?v=bf625cdf';
+} from './js/street-loader.js?v=18b181ad';
+import { showDraftBanner, startDraftPlay } from './js/builder/draft-play.js?v=b3adf35e';
 import {
   ladderTopDeck,
   groundBeneath,
@@ -659,8 +659,9 @@ import {
   isItemFloor,
   isStandable,
   signpostReachY,
-} from './js/street-model.js?v=505d8990';
-import { climberAtLadderTop, ladderTopSignpostFor, walkUpSignpostStreet } from './js/ladder-top-signposts.js?v=40abe6f5';
+  stuckWay,
+} from './js/street-model.js?v=b6cb6a4e';
+import { climberAtLadderTop, ladderTopSignpostFor, walkUpSignpostStreet } from './js/ladder-top-signposts.js?v=046013b4';
 import {
   buildStreetView,
   glitchLayerMatrix,
@@ -671,7 +672,7 @@ import {
   setSignpostHover,
   setSignpostKeys,
   signpostBoardAt,
-} from './js/street-render.js?v=81416f4f';
+} from './js/street-render.js?v=40f4b798';
 import {
   GAME_DAY_MS,
   shouldFireNewDay,
@@ -774,9 +775,9 @@ import {
 } from './js/travel.js?v=7fd6e363';
 import { facingScaleX, facingFromVelocity } from './js/avatar.js?v=c4da73ea';
 import { AFK_SEQUENCE, AFK_TIMEOUT_MS, ANIMS, ANIM_FPS, EMOTIONS, EMOTION_MS, FALL_LOOP, IDLE_SHEETS, RANDOM_IDLE_MS, RANDOM_IDLE_WAIT_MS, animForState, avatarAnimState, createIdleClock, crowdScaleX, frameRef, idleSheetFor } from './js/avatar-anims.js?v=fb921bf4';
-import { landingY, stackRestY, walkSurfaceY } from './js/walk-surface.js?v=c982983e';
+import { landingY, stackRestY, walkSurfaceY } from './js/walk-surface.js?v=106bfdc5';
 import { holdCloseToFloor } from './js/slope-walk.js?v=9af1e505';
-import { JUMP_SPEED, MAX_TICK_FRAMES, WALK_MAX, avatarGround, coastX, frameSteps, stepAvatar, steerAccel, steerX, streetPhysicsExtras } from './js/avatar-step.js?v=d48908a5';
+import { JUMP_SPEED, MAX_TICK_FRAMES, WALK_MAX, avatarGround, coastX, frameSteps, stepAvatar, steerAccel, steerX, streetPhysicsExtras } from './js/avatar-step.js?v=e8e9581f';
 import { createUserPath, stepUserPath } from './js/user-path.js?v=8880557f';
 import { FAILED_LINE, inVerbReach, movingLine, verbRange, walkOverEnd, walkOverGoalX } from './js/walk-over.js?v=db80ba07';
 import { hellBuffDesc, isInHell } from './js/hell.js?v=ca971c34';
@@ -832,7 +833,7 @@ import {
   createAnimalState,
   resetAnimalDay,
   animalStatusLabel,
-} from './js/animals.js?v=0d9f9b0f';
+} from './js/animals.js?v=08496a95';
 import {
   ensureWoodTreeState,
   pickWoodTool,
@@ -934,8 +935,8 @@ import {
   animalPatrolRange,
   ANIMAL_PATROL,
   nearestPlacementGap,
-} from './js/street-ecology.js?v=3c1d4c06';
-import { chickenPauseRoll, easeToward, flightFloorAt, flightFloorFor, flyerLift } from './js/street-creatures.js?v=5fe850f9';
+} from './js/street-ecology.js?v=78a1d522';
+import { chickenPauseRoll, easeToward, flightFloorAt, flightFloorFor, flyerLift } from './js/street-creatures.js?v=3c07d608';
 import { createSoundBoard, DEFAULT_SFX_VOLUME, watchButtonClicks, watchPanelSounds } from './js/sound-board.js?v=87380a25';
 import {
   actionLoopFor,
@@ -980,7 +981,7 @@ import { ENCYCLOPEDIA_MENU_LABEL, createEncyclopedia, isEncyclopediaKey } from '
 import { EAT_PICK_TEXT, bestFoodIndex, eatChoices, eatTip } from './js/eat-pick.js?v=8fb763d0';
 import { installHeldKeyGuard, isMacPlatform } from './js/held-keys.js?v=98b96620';
 import { signpostArmRows, worldContextAction } from './js/world-context-menu.js?v=f3f48805';
-import { blockedPlayerVerbs, listPlayerTarget, opensPlayerMenu, playerMenuRows } from './js/ui/player-menu.js?v=a2934000';
+import { blockedPlayerVerbs, listPlayerTarget, opensPlayerMenu, playerMenuRows } from './js/ui/player-menu.js?v=f035d73c';
 import { forgetTexture, frameTexture, isFailed, isLoaded, onFailed, onLoaded, textureFromUrl, whenLoaded } from './js/textures.js?v=3149d699';
 import { FALLBACK_MAX as WORLD_ART_FALLBACK_MAX, worldArtFor } from './js/world-art.js?v=df476660';
 import { sceneAnim, syncAnim } from './js/deco-anim.js?v=8c4c784b';
@@ -12243,14 +12244,12 @@ const engine = {
     if (!state.started || !player || !currentStreetTsid) return { ok: false, reason: 'not_started' };
     let at = streetArrival?.tsid === currentStreetTsid ? streetArrival : null;
     if (!at) return { ok: false, reason: 'no_arrival' };
-    // No arrival this visit (a load, a return): the street's own way in nearest you, a signpost or
-    // a door, where an arrival from it stands; the planned spawn only on a street with neither
-    // (it can sit anywhere, Mada Tamaha's pit included).
+    // No arrival this visit (a load, a return): the street's own way in nearest you that you can
+    // leave by, a signpost or a door, where an arrival from it stands (street-model.js stuckWay:
+    // not a road still being built, Wintry Place's Newcot Close arm); the planned spawn only on a
+    // street with neither (it can sit anywhere, Mada Tamaha's pit included).
     if (at.from === 'street') {
-      const ways = [...(currentStreet?.signposts || []), ...(currentStreet?.doors || [])]
-        .filter((w) => Number.isFinite(Number(w?.x)) && Number.isFinite(Number(w?.y)))
-        .map((w) => worldToScreen(currentStreet, Number(w.x), Number(w.y)));
-      const near = ways.sort((a, b) => Math.abs(a.x - player.x) - Math.abs(b.x - player.x))[0];
+      const near = stuckWay(currentStreet, player.x, features.query('closedRoads', engine) || []);
       if (near) at = { ...at, x: clamp(near.x, 40, Math.max(80, WORLD_W - 40)), y: near.y, from: 'street' };
     }
     player.x = at.x;

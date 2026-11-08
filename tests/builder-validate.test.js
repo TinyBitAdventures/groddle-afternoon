@@ -8,10 +8,10 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { validateZone, RULES, hash16, healOps, plainApex, badWords, zoneArrivals } from '../public/js/builder/validate.js?v=3201ce6e';
-import { streetWorld, jumpArc, jumpArcs, reachStreet } from '../public/js/builder/reach-graph.js?v=b8634e9a';
-import { GRAVITY, stepAvatar, avatarGround, steerX, coastX, NORMAL_BUFF } from '../public/js/avatar-step.js?v=d48908a5';
-import { platformsScreen } from '../public/js/street-model.js?v=505d8990';
+import { validateZone, RULES, hash16, healOps, plainApex, badWords, zoneArrivals } from '../public/js/builder/validate.js?v=f811c3ff';
+import { streetWorld, jumpArc, jumpArcs, reachStreet } from '../public/js/builder/reach-graph.js?v=50932a7a';
+import { GRAVITY, stepAvatar, avatarGround, steerX, coastX, NORMAL_BUFF } from '../public/js/avatar-step.js?v=e8e9581f';
+import { platformsScreen } from '../public/js/street-model.js?v=b6cb6a4e';
 import { loadValidatorContext } from '../tools/builder/validator-context.mjs';
 
 const root = join(import.meta.dirname, '..');
@@ -276,7 +276,7 @@ describe('ART-001: art that floats (js/builder/ground.js, lane GROUNDED)', () =>
   const rock = { id: 'd_5', sprite: 'gz_rock', x: 0, y: -40, w: 300, h: 120, z: 0, r: 0 };
 
   it('a low ledge with open space under it floats; the floor past the bottom edge does not; a high one may float', async () => {
-    const { floatingLines, FLOAT_REACH, FLOAT_OPEN } = await import('../public/js/builder/ground.js?v=8beea23c');
+    const { floatingLines, FLOAT_REACH, FLOAT_OPEN } = await import('../public/js/builder/ground.js?v=9218684b');
     assert.equal(FLOAT_REACH, 450);
     assert.equal(FLOAT_OPEN, 24);
     const f = floatingLines(street());

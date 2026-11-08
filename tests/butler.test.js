@@ -68,12 +68,12 @@ import {
   teachButler,
   visitorsReport,
 } from '../public/js/butler.js?v=826eb5f6';
-import { canOptIn, stoneVog, STONE_TEXT } from '../public/js/street-furniture.js?v=6983f5f5';
+import { canOptIn, stoneVog, STONE_TEXT } from '../public/js/street-furniture.js?v=026c21ef';
 import { NEIGHBOURS, neighbourById, normalizeNeighbourState, visitorLetter } from '../public/js/neighbours.js?v=161fc2e5';
-import { butlerApi, butlerFeature } from '../public/js/features/butler-feature.js?v=54762b93';
+import { butlerApi, butlerFeature } from '../public/js/features/butler-feature.js?v=a3e0527a';
 // The URL clubhouse.js imports, so these share its Butler.
-import { butlerApi as clubButler, butlerFeature as clubButlerFeature } from '../public/js/features/butler-feature.js?v=54762b93';
-import { PART_1 as JOIN_CLUB, REMINISCE as JOIN_CLUB_REMINISCE, room as clubRoom } from '../public/js/quest-rooms/clubhouse.js?v=c0b141a6';
+import { butlerApi as clubButler, butlerFeature as clubButlerFeature } from '../public/js/features/butler-feature.js?v=a3e0527a';
+import { PART_1 as JOIN_CLUB, REMINISCE as JOIN_CLUB_REMINISCE, room as clubRoom } from '../public/js/quest-rooms/clubhouse.js?v=dc777841';
 import { BUTLER_FEET, ButlerPainter, clipRange, drawList } from '../public/js/butler-rig.js?v=e81817d9';
 import { OFFER_OVERRIDES } from '../public/js/quest-rooms/catalog.js?v=d77d3d17';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=10b118dd';

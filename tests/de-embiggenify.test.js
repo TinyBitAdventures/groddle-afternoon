@@ -40,9 +40,9 @@ import {
   expireDeEmbiggenify,
   findSmallWorthless,
 } from '../public/js/de-embiggenify.js?v=db347ac1';
-import { jumpApex, NORMAL_BUFF } from '../public/js/avatar-step.js?v=d48908a5';
+import { jumpApex, NORMAL_BUFF } from '../public/js/avatar-step.js?v=e8e9581f';
 import { SOURCE_PHYSICS, triggerHit } from '../public/js/puzzle-triggers.js?v=b341f855';
-import { barriersScreen, blockBarrierCrossing } from '../public/js/street-model.js?v=505d8990';
+import { barriersScreen, blockBarrierCrossing } from '../public/js/street-model.js?v=b6cb6a4e';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const LOCATIONS = path.join(root, '../streets/mnt/stos/location_data');

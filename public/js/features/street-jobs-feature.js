@@ -45,9 +45,9 @@
 
 import { ITEM_CATALOG, addItem, countItem, ensureItem, itemIcon, packStamp, removeItem } from '../inventory.js?v=b7609342';
 import { canUseTool, useToolCondition } from '../tools.js?v=d8aa3536';
-import { ecologyForStreet } from '../street-ecology.js?v=3c1d4c06';
-import { worldToScreen } from '../street-model.js?v=505d8990';
-import { signArmWidth } from '../street-render.js?v=81416f4f';
+import { ecologyForStreet } from '../street-ecology.js?v=78a1d522';
+import { worldToScreen } from '../street-model.js?v=b6cb6a4e';
+import { signArmWidth } from '../street-render.js?v=40f4b798';
 import { getSkillCatalog } from '../content-catalogs.js?v=10b118dd';
 import { GIANTS } from '../shrines.js?v=1a945fe7';
 import { giantDisplayName } from '../giant-names.js?v=0e295891';
@@ -128,7 +128,7 @@ import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=31
 import { JOB_WORK_OVERLAY, jobWorkFloatPoint, jobWorkSoundKey, jobWorkToolScale, jobWorkToolSheet } from '../job-work-fx.js?v=a040a5a7';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
 import { SIGN_ARMS, routeGraph } from '../map-routes.js?v=c7e7dc80';
-import { TELEPORTERS } from '../hidden-floors.js?v=d49b76df';
+import { TELEPORTERS } from '../hidden-floors.js?v=eb220641';
 import { WINTRY_PORTAL_TELEPORTERS } from '../wintry-portal.js?v=1437deda';
 import { PROJECTS_TEXT, contributedJobs, mineTotal, projectList } from '../projects-tracker.js?v=f34c5236';
 import { PROJECTS_PANEL_ID, buildProjectsPanel, renderProjects } from '../ui/projects-sheet.js?v=69f33fa6';

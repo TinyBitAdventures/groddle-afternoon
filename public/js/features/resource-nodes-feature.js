@@ -54,7 +54,7 @@
 
 import { ITEM_CATALOG, addItem, countItem } from '../inventory.js?v=b7609342';
 import { setToolRemaining, toolCopies } from '../tools.js?v=d8aa3536';
-import { isItemFloor, platformYAt } from '../street-model.js?v=505d8990';
+import { isItemFloor, platformYAt } from '../street-model.js?v=b6cb6a4e';
 import { hiresSpriteUrl } from '../sprite-hires.js?v=abaf3d5a';
 import { rollResourceNodeDrop } from './drops-feature.js?v=123055bc';
 import { slugsFromEffects } from '../speech-slugs.js?v=130338f9';

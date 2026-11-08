@@ -30,7 +30,7 @@ import { PROFILE_PAGE_VERB } from '../profiles.js?v=86423d98';
 import { IM_VERB_ID } from '../player-im.js?v=23463a96';
 import { BUDDY_VERBS } from '../buddies.js?v=df41a3bb';
 import { VISIT_VERB } from '../neighbours-mp.js?v=cfabb4f7';
-import { FOLLOW_STOP_VERB } from '../follow-mp.js?v=f0f5232f';
+import { FOLLOW_STOP_VERB } from '../follow-mp.js?v=53768d0d';
 
 /** The feature that draws other players and owns their targets (features/party-feature.js PARTY_FEATURE_ID). */
 export const PLAYER_TARGET_FEATURE = 'party';

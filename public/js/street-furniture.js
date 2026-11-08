@@ -1,4 +1,4 @@
-import { isItemFloor, platformYAt, worldToScreen } from './street-model.js?v=505d8990';
+import { isItemFloor, platformYAt, worldToScreen } from './street-model.js?v=b6cb6a4e';
 import { filterText } from './word-filter.js?v=9a7a7ebb';
 
 /**

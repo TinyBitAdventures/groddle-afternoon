@@ -55,11 +55,11 @@
 
 import { slugsFromEffects } from '../speech-slugs.js?v=130338f9';
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=b764884b';
-import { nearestSurfaceY } from '../walk-surface.js?v=c982983e';
+import { nearestSurfaceY } from '../walk-surface.js?v=106bfdc5';
 import { displayTopOf, itemstackOverlayPoint, playSheetOverlay } from '../overlay-art.js?v=11b6dd7f';
 import { SET_FREE, applySetFree, canSetFree, setFreeGoneLine, setFreePrompt } from '../animal-set-free.js?v=3b194fca';
 import { getGameDayKey } from '../game-day.js?v=edb00566';
-import { animalAnchorX, createAnimalState, resetAnimalDay, animalStatusLabel, listAnimalFeedOptions } from '../animals.js?v=0d9f9b0f';
+import { animalAnchorX, createAnimalState, resetAnimalDay, animalStatusLabel, listAnimalFeedOptions } from '../animals.js?v=08496a95';
 import {
   BABY_ANIMALS,
   BATTERFLY,
@@ -105,15 +105,15 @@ import {
   resetIncubation,
   stepHogtie,
   stickPlaceState,
-} from '../animal-husbandry.js?v=7194f0f1';
-import { batterflyBaseY, batterflyResponseFor, flightFloorFor } from '../street-creatures.js?v=5fe850f9';
+} from '../animal-husbandry.js?v=75afc5c5';
+import { batterflyBaseY, batterflyResponseFor, flightFloorFor } from '../street-creatures.js?v=3c07d608';
 import { loseEnergy, shiftMetabolic } from '../metabolics.js?v=8504134e';
 import { textureFromUrl } from '../textures.js?v=3149d699';
 import { PIGGY_DEATH_DROPS, PIGGY_DEATH_PUFF, SAD_BABY, forcedRoll, isSadIn } from '../animal-mood.js?v=a49495fc';
-import { animalCrowdChanged, animalCrowdSad, animalPlaceIsDepressing, crowdLimit, smokePuff as sharedSmokePuff } from './animal-mood-feature.js?v=15e39cb4';
+import { animalCrowdChanged, animalCrowdSad, animalPlaceIsDepressing, crowdLimit, smokePuff as sharedSmokePuff } from './animal-mood-feature.js?v=5d913e98';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
-import { followYardPath, freeYardSpot } from '../yard-wander.js?v=69eef5e3';
+import { followYardPath, freeYardSpot } from '../yard-wander.js?v=75cc92d0';
 
 export const HUSBANDRY_FEATURE_ID = 'animal-husbandry';
 export const BATTERFLY_GROUP = 'batterfly';

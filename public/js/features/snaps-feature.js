@@ -39,7 +39,7 @@
 
 import { createMinnAccount } from '../minn-account.js?v=ba6a13c5';
 import { ITEM_CATALOG, countItem, ensureItem, itemIcon } from '../inventory.js?v=b7609342';
-import { STREET_INDEX, resolveIndexTsid } from '../street-loader.js?v=33d2b8bc';
+import { STREET_INDEX, resolveIndexTsid } from '../street-loader.js?v=18b181ad';
 import {
   CAMERA_CLASS, CAPTION_MAX, FORGET_RECHARGE_SEC, RECHARGE_BUFF, SNAP_COPY as T, SNAP_MAX_BYTES, SNAP_QUALITY, SNAP_WIDTHS, TRAVEL,
   base64Bytes, canSnap, cleanCaption, isSnapUrl, jpegBase64, snapAuthor, snapPlace, snapStreet, takePictureState, withCamera,

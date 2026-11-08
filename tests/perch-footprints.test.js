@@ -15,7 +15,7 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { platformsScreen, streetWidth } from '../public/js/street-model.js?v=505d8990';
+import { platformsScreen, streetWidth } from '../public/js/street-model.js?v=b6cb6a4e';
 import {
   PERCH_DROP_PX,
   PLACEMENT_FOOTPRINTS,
@@ -27,9 +27,9 @@ import {
   populationForStreet,
   setStreetEcologyCatalog,
   streetReservedSpots,
-} from '../public/js/street-ecology.js?v=3c1d4c06';
+} from '../public/js/street-ecology.js?v=78a1d522';
 import { placementRequests } from '../tools/build-realtime-objects.mjs';
-import { adoptedPlan } from '../public/js/features/patches-feature.js?v=f3e88dee';
+import { adoptedPlan } from '../public/js/features/patches-feature.js?v=ab2de387';
 import { createPlot } from '../public/js/patches.js?v=aa83d5ad';
 import { serverPath, skipWithoutServer } from '../tools/repos.mjs';
 

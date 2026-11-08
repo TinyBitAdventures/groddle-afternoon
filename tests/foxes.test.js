@@ -37,10 +37,10 @@ import {
   inReach,
   isPreserveRow,
   preserveEcologyEntry,
-} from '../public/js/features/foxes-feature.js?v=427d7fa5';
+} from '../public/js/features/foxes-feature.js?v=ba5d597e';
 import { wildlifeFor } from '../public/js/wildlife.js?v=670c3a7f';
 import { createFeatureHost } from '../public/js/feature-host.js?v=127e0a3c';
-import { foxesFeature } from '../public/js/features/foxes-feature.js?v=427d7fa5';
+import { foxesFeature } from '../public/js/features/foxes-feature.js?v=ba5d597e';
 
 const ecology = JSON.parse(readFileSync(new URL('../public/assets/content/street-ecology.json', import.meta.url)));
 

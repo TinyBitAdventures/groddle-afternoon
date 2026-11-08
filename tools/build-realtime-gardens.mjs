@@ -27,9 +27,9 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { requireServer, serverPath } from './repos.mjs';
 
-import { STREET_INDEX, applyStreetIndex, loadStreetDataFromFs, setZoneStreetsShown } from '../public/js/street-loader.js?v=33d2b8bc';
-import { platformsScreen, streetWidth } from '../public/js/street-model.js?v=505d8990';
-import { ecologyForStreet, planStreetPlacements, populationForStreet, setStreetEcologyCatalog, streetReservedSpots } from '../public/js/street-ecology.js?v=3c1d4c06';
+import { STREET_INDEX, applyStreetIndex, loadStreetDataFromFs, setZoneStreetsShown } from '../public/js/street-loader.js?v=18b181ad';
+import { platformsScreen, streetWidth } from '../public/js/street-model.js?v=b6cb6a4e';
+import { ecologyForStreet, planStreetPlacements, populationForStreet, setStreetEcologyCatalog, streetReservedSpots } from '../public/js/street-ecology.js?v=78a1d522';
 import { GARDEN_FERTILIZE_PERC, GARDEN_WATER_MS, SEED_CATALOG } from '../public/js/garden.js?v=e1c3415c';
 import { GARDEN_LOCK_MS, SHARED_GARDEN_STREETS } from '../public/js/shared-gardens.js?v=47984e60';
 import { GARDEN_POTIONS, POTION_USES } from '../public/js/master-garden.js?v=1e4d279f';
