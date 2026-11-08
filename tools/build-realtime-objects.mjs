@@ -66,6 +66,7 @@ import { requireServer, serverPath } from './repos.mjs';
 import { STREET_INDEX, applyStreetIndex, loadStreetDataFromFs, setZoneStreetsShown } from '../public/js/street-loader.js?v=18b181ad';
 import { platformsScreen, streetWidth } from '../public/js/street-model.js?v=b6cb6a4e';
 import {
+  animalPatrolRange,
   ecologyForStreet,
   planStreetPlacements,
   populationForStreet,
@@ -80,14 +81,15 @@ import { TRANT_CARE_PACKAGES } from '../public/js/trant-care.js?v=8339adef';
 import { ANIMAL_KINSHIP_PACKAGES } from '../public/js/animal-kinship.js?v=ae02d8d3';
 import { locationIsDepressing } from '../public/js/animal-mood.js?v=a49495fc';
 import { resourcePlacementGroups, resourceSpawnPlan } from '../public/js/features/resource-nodes-feature.js?v=6f009751';
-import { soilCountsForStreet, soilPlacementGroups } from '../public/js/features/patches-feature.js?v=e5ac130e';
+import { soilCountsForStreet, soilPlacementGroups } from '../public/js/features/patches-feature.js?v=4963fd30';
 import { kittyPlacementGroups } from '../public/js/features/heli-kitties-feature.js?v=aac16478';
-import { BATTERFLY_GROUP, batterflyPlacementGroups } from '../public/js/features/animal-husbandry-feature.js?v=97aa26e9';
+import { BATTERFLY_GROUP, batterflyPlacementGroups } from '../public/js/features/animal-husbandry-feature.js?v=927b19a5';
 import { hasRaceDispenser } from '../public/js/races.js?v=ab22a079';
 import { setWildlifeCatalog, wildlifeFor } from '../public/js/wildlife.js?v=670c3a7f';
 import { boardSpotRow, furnitureFor, furniturePlacementGroups } from '../public/js/street-furniture.js?v=026c21ef';
 import { INCUBATION } from '../public/js/animal-husbandry.js?v=75afc5c5';
-import { SHARED_NODE_CLASSES, freshTreePlan } from '../public/js/street-objects.js?v=684c80b8';
+import { SHARED_NODE_CLASSES, freshTreePlan } from '../public/js/street-objects.js?v=9565073d';
+import { PIGGY_TRIP } from '../public/js/street-creatures.js?v=e6741f02';
 import { isZoneTsid } from '../public/js/zone-streets.js?v=b40010d5';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -161,7 +163,9 @@ function groundY(platforms) {
  *   trees [i, class, x, y, maturity, health] game.js spawnTrees (the trants, and the Wood Tree at
  *                                          maturity 6, health 0: ensureWoodTreeState's fresh tree)
  *   nodes [key, class, x, y]               resource-nodes-feature resourceSpawnPlan (`<class>:<n>`)
- *   pigs  [i, x, y]                        game.js spawnPiggies (index i in placement('piggies'); y + 2)
+ *   pigs  [i, x, y, range]                 game.js spawnPiggies (index i in placement('piggies'); y + 2;
+ *                                          range: its walk each way, animalPatrolRange)
+ *   trunks [x]                             every planned tree's x (a Piggy never roots by a trunk)
  *   sad   true                             locationIsDepressing for the street (its Piggies are sad)
  *   chickens    [i, x, y]                  game.js spawnChickens (index i in placement('chickens'); y + 2)
  *   butterflies [i, x, y, fly]             game.js spawnButterflies: resting i < n (fly 0), then the
@@ -204,7 +208,12 @@ export function streetObjectLayout(data, { starter = false, ecology = ecologyFor
     .filter((row) => SHARED_NODE_CLASSES.includes(row.classTsid))
     .map((row) => [row.key, row.classTsid, r1(row.x), r1(row.y + 2)]);
 
-  const pigs = placement('piggies').map((p, i) => [i, r1(p.x), r1((p.y ?? ground) + 2)]);
+  // Each Piggy's walk (game.js enterStreet: animalPatrolRange at its spot's room), so the server knows
+  // where its shared path has it (groddle-afternoon-server pigpath.go) and every page walks it from
+  // the same numbers (the snapshot's "homes").
+  const pigs = placement('piggies').map((p, i) => [i, r1(p.x), r1((p.y ?? ground) + 2), animalPatrolRange('piggies', p.room)]);
+  // The trunks a Piggy never roots by (features/street-objects-feature.js: every planned tree).
+  const trunks = pigs.length ? placement('trees').map((p) => r1(p.x)).filter(Number.isFinite) : [];
   const meta = STREET_INDEX.streets?.[data.tsid] || {};
   // features/animal-mood-feature.js describeAnimalPlace on an ordinary street (no race, game or instance).
   const sad = pigs.length > 0 && locationIsDepressing({
@@ -228,7 +237,7 @@ export function streetObjectLayout(data, { starter = false, ecology = ecologyFor
     batterflies = (full.groups[BATTERFLY_GROUP] || []).map((p, i) => [i, r1(p.x), r1(p.y ?? ground)]);
   }
 
-  return { rocks, trees, nodes, pigs, sad, chickens, butterflies, batterflies };
+  return { rocks, trees, nodes, pigs, trunks, sad, chickens, butterflies, batterflies };
 }
 
 /** The rule numbers the server applies, from the game's own tables. */
@@ -282,7 +291,9 @@ export function ruleTables(trantTables) {
     ak[key] = ANIMAL_KINSHIP_PACKAGES[key].map((row) => [row.intervalLimit, row.successRate, row.bonusAmount]);
   }
   const incubate = { hatches: { ...INCUBATION.hatches }, ms: INCUBATION.completeMs };
-  return { rocks, mega, nodes, harvest, care, trants, prod, dig, pig, ak, incubate };
+  // A street Piggy's walk to food and home (js/street-creatures.js PIGGY_TRIP, the server's startTrip).
+  const pigtrip = { ...PIGGY_TRIP };
+  return { rocks, mega, nodes, harvest, care, trants, prod, dig, pig, ak, incubate, pigtrip };
 }
 
 async function main() {
@@ -314,12 +325,13 @@ async function main() {
       if (layout[key].length) row[key] = layout[key];
       totals[key] += layout[key].length;
     }
+    if (layout.trunks.length) row.trunks = layout.trunks;
     if (layout.sad) row.sad = true;
     streets[data.tsid] = row;
   }
   const out = {
     about: 'Shared street objects for objects.go in groddle-afternoon-server. Generated by tools/build-realtime-objects.mjs from public/assets/streets, street-ecology.json, trants.json and the game modules; do not edit by hand.',
-    format: 'streets[tsid] = { rocks: [[i, class, x, y]], trees: [[i, class, x, y, maturity, health]], nodes: [[key, class, x, y]], pigs: [[i, x, y]], chickens: [[i, x, y]], butterflies: [[i, x, y, fly]], batterflies: [[i, x, y]], sad?: true }',
+    format: 'streets[tsid] = { rocks: [[i, class, x, y]], trees: [[i, class, x, y, maturity, health]], nodes: [[key, class, x, y]], pigs: [[i, x, y, range]], trunks?: [x], chickens: [[i, x, y]], butterflies: [[i, x, y, fly]], batterflies: [[i, x, y]], sad?: true }',
     rules: ruleTables(trantTables),
     streets,
   };

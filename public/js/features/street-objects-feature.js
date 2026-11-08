@@ -43,8 +43,12 @@
  *   arrives later as well.
  * - Street Piggies (G334): pet, nibble and feed ask the server, whose mood,
  *   hunger and twice-daily clock win (animal-mood-feature leaves their ticks
- *   to it); a Piggy eating a shared tree's fruit where only this player saw
- *   it walk tells the server (sharedPiggyAte); the server's tick events
+ *   to it). Their walks to food are the server's too (sharedPiggyTrips: the
+ *   state's trip, drawn on the shared path): a fruiting tree this player
+ *   works sends the server "food" (sharedPiggyFood), and the server walks
+ *   the hungry ones there for everyone. With an older server, a Piggy eating
+ *   a shared tree's fruit where only this player saw it walk tells the server
+ *   (sharedPiggyAte); the server's tick events
  *   (obj_ev) reach animal-mood-feature's sharedAnimalEvent. Food that sates
  *   a hungry Piggy is the ledger's (G335 slice 5): the feed names it ("c",
  *   "n"), the server has the site take it first, a refusal shows "You don't
@@ -123,7 +127,7 @@ import {
   treeId,
   treeReady,
   treeSkill,
-} from '../street-objects.js?v=684c80b8';
+} from '../street-objects.js?v=9565073d';
 import { ROCK_CATALOG } from '../mining.js?v=f132ad75';
 import { TRANT_META, trantStatusLabel } from '../trants.js?v=1b3c8ae3';
 import { quoteWoodTreeHarvest } from '../woodcutting.js?v=73472b8c';
@@ -138,7 +142,8 @@ import {
   CREATURE_PATHS,
   chickenSeed,
   chickenWalkAt,
-  piggyWalkAt,
+  piggyAt,
+  PIGGY_TRIP,
   creatureOf,
   easeToward,
   flightFloorFor,
@@ -151,7 +156,7 @@ import {
   restAt,
   serverPathClock,
   sharedCreatureLabel,
-} from '../street-creatures.js?v=3c07d608';
+} from '../street-creatures.js?v=e6741f02';
 
 export const STREET_OBJECTS_FEATURE_ID = 'street-objects';
 const RECONCILE_MS = 250;
@@ -350,14 +355,18 @@ function setPath(engine, obj) {
   } else if (obj.kind === 'pig') {
     // G334: its spot and walk from the street's plan (game.js enterStreet, street-ecology.js
     // animalPatrolRange), the same for everyone; its rooting on the path (js/street-creatures.js
-    // piggyWalkAt). A Piggy held here its own way (a walk to food, a sulk, the Rook: animal-mood-feature
+    // piggyWalkAt), and its walks to food and home when the server sends one (piggyAt: the trip). A
+    // Piggy held here its own way (a sulk, the Rook, an older server's walk to food: animal-mood-feature
     // hold, a creeping vx) leaves the path, and comes back to it when let go.
     if (!copy.pigPaths) return;
     const spot = engine.placement?.('piggies')?.[obj.index];
-    const trunks = (engine.placement?.('trees') || []).map((p) => p?.x).filter(Number.isFinite);
+    // The server's numbers for its walk when it gives them (the snapshot's homes and trunks: spot
+    // drift between builds, research/plans/street-animals-shared.md section 5), else this page's plan.
+    const given = Array.isArray(copy.homes?.[obj.id]) ? copy.homes[obj.id].map(Number) : null;
+    const trunks = copy.trunks || (engine.placement?.('trees') || []).map((p) => p?.x).filter(Number.isFinite);
     const home = {
-      baseX: Number.isFinite(spot?.x) ? spot.x : spr.baseX,
-      range: spot ? animalPatrolRange('piggies', spot.room) : (spr.range || CREATURE_PATHS.pig.range),
+      baseX: given && Number.isFinite(given[0]) ? given[0] : Number.isFinite(spot?.x) ? spot.x : spr.baseX,
+      range: given && Number.isFinite(given[1]) ? given[1] : spot ? animalPatrolRange('piggies', spot.room) : (spr.range || CREATURE_PATHS.pig.range),
       speed: CREATURE_PATHS.pig.speed,
       dir: obj.index % 2 ? -1 : 1,
       trunks,
@@ -365,16 +374,19 @@ function setPath(engine, obj) {
     };
     if (!Number.isFinite(home.baseX)) return;
     const seed = chickenSeed(obj.index, home.baseX);
-    pointAt = () => piggyWalkAt(home, pathTime(t.sharedPath, Date.now(), copy.offset), seed);
+    // On its walk to food and home when the server sent one (js/street-creatures.js piggyAt), else on its walk.
+    pointAt = () => piggyAt(home, pathTime(t.sharedPath, Date.now(), copy.offset), seed, t.sharedPath?.trip || null);
+    // A trip walks a little faster than the patrol: the frame's step follows its pace.
+    const tripStep = (PIGGY_TRIP.speed / 60) * 1.25;
     step = (dt) => {
       if (Math.abs(spr.vx || 0) < 0.01) return false;
       const p = pointAt();
-      spr.x = followPath(spr.x, p.x, dt, PATH_STEP.pig);
+      spr.x = followPath(spr.x, p.x, dt, p.phase ? Math.max(PATH_STEP.pig, tripStep) : PATH_STEP.pig);
       spr.vx = p.dir * Math.abs(spr.vx || 0.45);
       const bs = spr.baseScale ?? Math.abs(spr.scale.y);
       spr.scale.x = p.dir * bs;
       spr.scale.y = Math.abs(bs);
-      // Walking or rooting; held for someone at it, it stands (npc_animal onWaitStart 2048-2054).
+      // Walking, rooting or at its food; held for someone at it, it stands (npc_animal onWaitStart 2048-2054).
       const held = Number(t.sharedPath?.holdEnd) > Date.now() + (Number(copy.offset) || 0);
       engine.query?.('piggyPathPose', t, held && p.pose === 'walk' ? 'stand' : p.pose, engine);
       return true;
@@ -924,6 +936,32 @@ export const streetObjectsFeature = {
     if (!engine || engine.mode !== 'multiplayer' || !shared(engine)) return null;
     const i = streetPigIndex(target, engine.streetTsid);
     return i >= 0 && copy.objs.has(pigId(i)) ? true : null;
+  },
+
+  /**
+   * Whether the server walks this street's Piggies to food (slice 1 of
+   * research/plans/street-animals-shared.md: their state's trip, drawn by setPath): then this page
+   * starts no walk of its own, and a Piggy's "ate" is only its chew and "Yum!".
+   */
+  sharedPiggyTrips(target, engine) {
+    if (!shared(engine) || !copy.pigPaths || !copy.pigTrips) return null;
+    if (target && !streetObjectsFeature.sharedPiggy(target, engine)) return null;
+    return true;
+  },
+
+  /**
+   * A fruiting street tree this player harvested, watered or petted (animal-mood-feature onEvent,
+   * onContainerItemStateChanged): the server sends the street's hungry Piggies to it, for everyone.
+   */
+  sharedPiggyFood(trant, engine) {
+    if (!streetObjectsFeature.sharedPiggyTrips(null, engine) || !Number.isInteger(trant?.treeIndex)) return null;
+    const c = client;
+    if (!c || c.state !== 'online') return null;
+    reqSeq += 1;
+    if (!c.send('obj_act', actMessage({ req: reqSeq, id: treeId(trant.treeIndex), verb: 'food' }))) return null;
+    lastAnswer = `${treeId(trant.treeIndex)}:food:sent`;
+    publish(engine);
+    return true;
   },
 
   /** A street Piggy ate a shared tree's fruit (onTarget) where only this player saw it walk there. */

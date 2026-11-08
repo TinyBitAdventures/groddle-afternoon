@@ -55,6 +55,8 @@
 import { GAME_EPOCH_MS } from './game-day.js?v=edb00566';
 import { INCUBATION } from './animal-husbandry.js?v=75afc5c5';
 import { isStandable } from './street-model.js?v=b6cb6a4e';
+import { ANIMAL_BODY, TREE_FOOTPRINT } from './street-ecology.js?v=78a1d522';
+import { EAT_PAUSE_MS } from './animal-mood.js?v=a49495fc';
 
 export const CREATURE_KINDS = Object.freeze(['chicken', 'butterfly', 'batterfly']);
 
@@ -348,6 +350,70 @@ export function piggyWalkAt(home, t, seed = 1) {
   return { ...loopAt(baseX, plan.r, mod(seg.s + plan.v * (tc - seg.at), 4 * plan.r)), pose: 'walk' };
 }
 
+/**
+ * A street Piggy's walk to food and home, the same for everyone online (slice 1 of
+ * research/plans/street-animals-shared.md). In the original the server walked the one npc_piggy
+ * item to the food (npc_animal goForFood: apiFindPath(item.x, item.y, 0, 'onFoodPathing'),
+ * npc_piggy.js 1404, 1428, 1986-2002), it chewed, idled 3 s (onFoodPathing 1482-1533) and walked on,
+ * and every client drew it there. Now the realtime server (groddle-afternoon-server objects_pigs.go
+ * startTrip) decides each walk: when a twice-daily tick, food dropped for everyone or a fruiting tree
+ * a player worked sends a hungry Piggy, the Piggy's state carries a trip: from x0 (where its path had
+ * it) to x1 (beside the tree's foot, or on the stack) in leg ms at the source's middle walk speed
+ * (npc_walk_speed randInt(30, 55), onCreate 1442), eat ms at the food, and back to x0 in leg ms. The
+ * trip runs on the path's clock (c0: the clock when it set off), so a player at it, a landed verb
+ * and the Rook freeze it where it is, for everyone, as they freeze its path; its path stands still
+ * meanwhile and runs on from x0 when it is back. The server eats the food on arrival and says "ate".
+ * PIGGY_TRIP is what both sides use: speed px a second, the pause, and where it stops (beside a
+ * tree's foot: half the footprint and half its body; each Piggy a body and 8 px apart, lane PIGSTUCK).
+ */
+export const PIGGY_TRIP = Object.freeze({
+  speed: 42,
+  eatMs: EAT_PAUSE_MS,
+  treeStop: TREE_FOOTPRINT / 2 + ANIMAL_BODY.piggies / 2,
+  gap: ANIMAL_BODY.piggies + 8,
+  body: ANIMAL_BODY.piggies,
+});
+
+/**
+ * A trip as the server sent it ({ x0, x1, c0, leg, eat }, c0 in server ms), with c0 on the client's
+ * path time (ms since the game's epoch, as pathTime), or null when there is none or it is malformed.
+ */
+export function tripFrom(s) {
+  if (!s || typeof s !== 'object') return null;
+  const x0 = Number(s.x0);
+  const x1 = Number(s.x1);
+  const c0 = Number(s.c0);
+  const leg = Math.max(0, Math.round(Number(s.leg) || 0));
+  const eat = Math.max(0, Math.round(Number(s.eat) || 0));
+  if (![x0, x1, c0].every(Number.isFinite) || c0 <= 0 || leg > 3600000 || eat > 3600000) return null;
+  return { x0, x1, c0: c0 - GAME_EPOCH_MS, leg, eat, ms: 2 * leg + eat };
+}
+
+/**
+ * A Piggy on its trip at path time t (pathTime): { x, dir, pose, phase } while the trip lasts
+ * (phase go, eat, home; pose walk or eat), else null (it is on its path: tripBaseTime).
+ */
+export function piggyTripAt(trip, t) {
+  if (!trip) return null;
+  const e = Number(t) - trip.c0;
+  if (!(e >= 0) || e >= trip.ms) return null;
+  const toward = trip.x1 >= trip.x0 ? 1 : -1;
+  if (e < trip.leg) return { x: trip.x0 + (trip.x1 - trip.x0) * (e / trip.leg), dir: toward, pose: 'walk', phase: 'go' };
+  if (e < trip.leg + trip.eat) return { x: trip.x1, dir: toward, pose: 'eat', phase: 'eat' };
+  return { x: trip.x1 + (trip.x0 - trip.x1) * ((e - trip.leg - trip.eat) / trip.leg), dir: -toward, pose: 'walk', phase: 'home' };
+}
+
+/** The path time its path is at, with a trip: stood still from the trip's start until it is back. */
+export function tripBaseTime(trip, t) {
+  if (!trip || !(Number(t) >= trip.c0)) return Number(t);
+  return Number(t) < trip.c0 + trip.ms ? trip.c0 : Number(t) - trip.ms;
+}
+
+/** A street Piggy at path time t: on its trip when it has one, else on its walk (piggyWalkAt). */
+export function piggyAt(home, t, seed = 1, trip = null) {
+  return piggyTripAt(trip, t) || { ...piggyWalkAt(home, tripBaseTime(trip, t), seed), phase: '' };
+}
+
 /** The seed a street's Chicken rolls its pauses from: its spawn index and spot, the same on every page. */
 export function chickenSeed(index, baseX) {
   return ((Math.imul((Number(index) || 0) + 1, 2654435761) ^ Math.round(Number(baseX) || 0)) >>> 0) || 1;
@@ -591,7 +657,11 @@ export function followPath(current, target, dt = 1, step = PATH_STEP.chicken) {
 export function pathFrom(s, at = Date.now(), offset = 0, serverNow = 0) {
   const hold = Math.max(0, Number(s?.hold) || 0);
   const base = Number(serverNow) > 0 ? Number(serverNow) : at + (Number(offset) || 0);
-  return { lag: Math.max(0, Number(s?.lag) || 0), holdEnd: hold > 0 ? base + hold : 0 };
+  const path = { lag: Math.max(0, Number(s?.lag) || 0), holdEnd: hold > 0 ? base + hold : 0 };
+  // A street Piggy on its way to food (PIGGY_TRIP): the server's trip, on the path's clock.
+  const trip = tripFrom(s?.trip);
+  if (trip) path.trip = trip;
+  return path;
 }
 
 function count(v) {

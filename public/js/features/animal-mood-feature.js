@@ -48,7 +48,12 @@
  * Multiplayer (G334): a street Piggy is everyone's. The realtime server
  * (objects_pigs.go, through street-objects-feature) holds its mood, hunger
  * and twice-daily clock and runs its ticks; this page runs none for it and
- * replays none on arrival. Its tick events come back as sharedAnimalEvent:
+ * replays none on arrival. A server that walks them to food (sharedPiggyTrips,
+ * slice 1 of research/plans/street-animals-shared.md) draws each walk on the
+ * Piggy's shared path for everyone: a fruiting tree you work is sent to it
+ * (sharedPiggyFood) instead of sending the Piggies here, and "ate" is only the
+ * chew and "Yum!" at the food. With an older server the rest of this holds.
+ * Its tick events come back as sharedAnimalEvent:
  * the "Other animals make me happy!" bubble, the croak, and a walk to the
  * tree whose fruit it ate (the server took the fruit), and a walk to a
  * stack dropped for everyone it ate one of (drops-mp-feature, G332). A Piggy that eats
@@ -1547,10 +1552,15 @@ export const animalMoodFeature = {
       .filter((t) => t.classId === m[1])
       .sort((a, b) => Math.abs(a.sprite.x - p.x) - Math.abs(b.sprite.x - p.x))[0];
     if (!trant) return;
+    // Online the server walks its street Piggies to food for everyone (objects_pigs.go pigsToTree):
+    // this tree is sent once, if any of them is hungry, and it starts their walks.
+    if (livePiggies(engine).some((t) => serverPig(engine, t) && Number(t.state?.hunger) > 0)) {
+      engine.query?.('sharedPiggyFood', trant, engine);
+    }
     for (const target of livePiggies(engine)) {
       // Ticket 40: online, the server walks its street Piggies to food (objects_pigs.go, capped at
       // 1600 px) and checks reach from where it keeps them; a walk of our own across the street left
-      // a Piggy beside you refused with "You need to be closer" for minutes. Only the server's ate events move them.
+      // a Piggy beside you refused with "You need to be closer" for minutes. Only the server moves them.
       if (serverPig(engine, target)) continue;
       const r = recordFor(target);
       if (canSeek(engine, r)) startSeek(engine, r, { kind: 'trant', target: trant, x: trant.sprite.x, y: trant.sprite.y });
@@ -1568,7 +1578,12 @@ export const animalMoodFeature = {
     if (ev === 'happy') say(engine, target, PIGGY_LINES.happy, 3000);
     else if (ev === 'croak') r.nextCroakAt = Math.min(r.nextCroakAt || Infinity, now() + 1500);
     else if (ev === 'fed' && r.mode === 'idle' && !isRooked(target, engine)) playClip(engine, r, PIGGY_MOOD_SHEETS.chew); // someone else's feed (G334)
-    else if (ev === 'ate' && isRooked(target, engine)) {
+    else if (ev === 'ate' && engine.query?.('sharedPiggyTrips', target, engine) === true) {
+      // The server walked it to the food on its shared path (its trip) and it just got there:
+      // the chew and the "Yum!" (onFoodPathing 1489-1500), the same moment on every page.
+      if (r.mode === 'idle' && !isRooked(target, engine)) playClip(engine, r, PIGGY_MOOD_SHEETS.chew);
+      say(engine, target, PIGGY_LINES.yum, PIGGY_LINES.yumMs);
+    } else if (ev === 'ate' && isRooked(target, engine)) {
       // A rooked Piggy stays put (include/rook.js fullStop), whatever the server's tick decided.
     } else if (ev === 'ate' && on?.sprite && r.mode !== 'sad') {
       if (!startSeek(engine, r, { kind: 'trant', target: on, x: on.sprite.x, y: on.sprite.y, shared: true })) {
@@ -1597,6 +1612,8 @@ export const animalMoodFeature = {
     if (r.pathPose === pose) {
       // Walking on a clip that has stopped (back from the Rook, a verb's clip): the walk frames again.
       if (pose === 'walk' && target.sprite?.playing === false) walkAgain(engine, r);
+      // At its food, a chew that ended went back to the walk frames: it stands on them.
+      if (pose === 'eat') standStill(engine, r);
       return true;
     }
     const was = r.pathPose;
@@ -1605,7 +1622,8 @@ export const animalMoodFeature = {
       if (!playClip(engine, r, PIGGY_MOOD_SHEETS.lookScreen, { restore: false })) standStill(engine, r);
     } else if (pose === 'sniff') {
       if (!playClip(engine, r, PIGGY_MOOD_SHEETS.chew, { restore: false })) standStill(engine, r);
-    } else if (pose === 'stand') {
+    } else if (pose === 'stand' || pose === 'eat') {
+      // At its food (a server trip's pause) it stands, after any chew the server's "ate" played.
       standStill(engine, r);
     } else if (was) {
       walkAgain(engine, r);

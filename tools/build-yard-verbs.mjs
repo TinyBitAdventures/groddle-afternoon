@@ -45,7 +45,7 @@ import { requireSite, sitePath } from './repos.mjs';
 export const OUT = sitePath('data', 'yard-verbs.json');
 
 export async function yardVerbsJson() {
-  const { YARD_POOL, YARD_AK_ITEMS } = await import('../public/js/yard-verbs-mp.js?v=c00c105a');
+  const { YARD_POOL, YARD_AK_ITEMS } = await import('../public/js/yard-verbs-mp.js?v=cafb7426');
   const { ANIMAL_KINSHIP_PACKAGES } = await import('../public/js/animal-kinship.js?v=ae02d8d3');
   const { ARBOROLOGY_HARVEST, TRANT_META } = await import('../public/js/trants.js?v=1b3c8ae3');
   const { SEASONED_BEANS, SEEDLING_GROW_UPGRADES, SOIL_SKILL_PACKAGES, SOIL_TIMERS } = await import('../public/js/patches.js?v=796732fb');
