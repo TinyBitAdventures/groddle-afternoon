@@ -24,11 +24,13 @@ import {
   mapIconTip,
   MAP_ICON_ART,
   MAP_ICON_GLOW,
+  MAP_ICON_INK,
+  mapIconSymbol,
   quadsOverlap,
   renderHubMapSvg,
   SUBWAY_ICON_NUDGE,
   youBox,
-} from '../public/js/map-graph.js?v=b404f57b';
+} from '../public/js/map-graph.js?v=c161229d';
 import { mapIconStep, mapIconTipPlace } from '../public/js/ui/map-icon-tips.js?v=6b3eb3f9';
 import { selectVendorProfile } from '../public/js/vendor.js?v=307aca18';
 import { CLASSIC_ART } from '../public/js/classic/classic-art.js?v=5f713e7d';
@@ -89,17 +91,19 @@ describe('map icon data (tools/build-map-icons.mjs)', () => {
     }
   });
 
-  it('the art is Tiny Speck\'s, listed in tools/classic-art/manifest.json', () => {
+  it('the art is drawn from Tiny Speck\'s, listed in tools/classic-art/manifest.json, at its size', () => {
     const manifest = JSON.parse(read('tools/classic-art/manifest.json'));
-    for (const name of ['map_icon_shop', 'map_icon_shrine', 'map_icon_subway']) {
+    for (const [kind, name] of [['store', 'map_icon_shop'], ['shrine', 'map_icon_shrine'], ['subway', 'map_icon_subway']]) {
       const row = manifest.copy.find((e) => e.name === name);
       assert.ok(row, name);
       assert.equal(row.src, `graphics/${name}.png`);
       assert.ok(existsSync(join(root, 'public', CLASSIC_ART[name].url)));
+      // The vector keeps the bitmap's box, so placement, hit boxes and the focus ring stay put (G584).
+      assert.deepEqual([MAP_ICON_ART[kind].w, MAP_ICON_ART[kind].h], [CLASSIC_ART[name].w, CLASSIC_ART[name].h], kind);
     }
-    assert.equal(MAP_ICON_ART.store, CLASSIC_ART.map_icon_shop);
     assert.deepEqual([MAP_ICON_ART.store.w, MAP_ICON_ART.store.h], [14, 14]);
     assert.deepEqual([MAP_ICON_ART.subway.w, MAP_ICON_ART.subway.h], [24, 23]);
+    assert.match(read('public/js/map-graph.js'), /drawn from\n \* Tiny Speck's CC0 map icons \(glitch-client TSEngineAssets graphics\/map_icon_shop, _shrine and\n \* _subway\.png/);
   });
 });
 
@@ -215,7 +219,8 @@ describe('map icon placement and render (js/map-graph.js)', () => {
     assert.match(svg, /data-tip="Groceries Vendor"[^>]*data-kind="store"/);
     assert.match(svg, /aria-label="Shrine to Mab, Hechey Track"/);
     assert.match(svg, /data-tip="Subway Station"/);
-    assert.match(svg, new RegExp(`href="${CLASSIC_ART.map_icon_subway.url}"`));
+    assert.match(svg, /<use href="#mapIconSubway" x="-?[\d.]+" y="-?[\d.]+" width="24" height="23"\/>/);
+    assert.match(svg, /<use href="#mapIconShrine"[^>]* width="14" height="14" filter="url\(#mapIconGlow\)"\/>/);
     assert.match(svg, /<filter id="mapIconGlow"/);
     // The icons draw over the streets and labels, under the star.
     assert.ok(svg.indexOf('class="map-icons"') > svg.lastIndexOf('class="map-label'));
@@ -224,6 +229,40 @@ describe('map icon placement and render (js/map-graph.js)', () => {
     const bare = renderHubMapSvg(buildHubMapView({ hubId: '1', hubName: 'Bare', streets: [{ tsid: 'LQ', name: 'Q', x1: 0, y1: 0, x2: 10, y2: 0 }] }, '', STREETS));
     assert.doesNotMatch(bare, /map-icon/);
     assert.match(bare, /role="img"/);
+  });
+
+  it('draw as vectors, sharp at any scale, with the vendor and shrine ink nearly opaque (G584)', () => {
+    const view = buildHubMapView(hub(56), 'GLI2V0UN7RD1T2J', STREETS);
+    const svg = renderHubMapSvg(view);
+    const group = svg.slice(svg.indexOf('<g class="map-icons">'));
+    // No bitmap: each icon uses its kind's <symbol>, written once.
+    assert.doesNotMatch(group.slice(0, group.indexOf('class="map-you"')), /<image/);
+    assert.doesNotMatch(svg, /map_icon_s(hop|hrine|ubway)/);
+    for (const kind of ['store', 'shrine', 'subway']) {
+      const { id, w, h } = MAP_ICON_ART[kind];
+      assert.equal(svg.split(`<symbol id="${id}"`).length, 2, kind);
+      assert.ok(svg.includes(mapIconSymbol(kind)), kind);
+      assert.ok(svg.includes(`<use href="#${id}"`), kind);
+      const sym = mapIconSymbol(kind);
+      assert.match(sym, new RegExp(`viewBox="0 0 ${w} ${h}"`));
+      assert.match(sym, /<path /);
+      assert.doesNotMatch(sym, /<image|href=/);
+      // The clear box keeps the symbol's bounds to the icon's box (the focus ring's scale origin).
+      assert.match(sym, new RegExp(`<rect width="${w}" height="${h}" fill="none"/>`));
+    }
+    // The symbols sit before the icons that use them.
+    assert.ok(svg.indexOf('<symbol id="mapIconSubway"') < svg.indexOf('<use href="#mapIconSubway"'));
+    // Ink: black, nearly opaque (Tiny Speck's was 40%), with a light halo round it.
+    assert.ok(MAP_ICON_INK >= 0.85 && MAP_ICON_INK <= 1);
+    for (const kind of ['store', 'shrine']) assert.ok(MAP_ICON_ART[kind].body.includes(`opacity="${MAP_ICON_INK}"`), kind);
+    assert.ok(MAP_ICON_GLOW.haloOpacity > 0 && MAP_ICON_GLOW.haloOpacity < 1);
+    assert.doesNotMatch(svg, /feFuncA type="linear" slope="1\.75"/);
+    // The subway keeps its blue and red halves, train and cream rim.
+    const sub = MAP_ICON_ART.subway.body;
+    for (const colour of ['#4a7dce', '#bc603a', '#fdf8e3']) assert.ok(sub.includes(colour), colour);
+    // One symbol for each kind the map shows, in a fixed order.
+    const ids = [...svg.matchAll(/<symbol id="(\w+)"/g)].map((m) => m[1]);
+    assert.deepEqual(ids, ['mapIconStore', 'mapIconShrine', 'mapIconSubway']);
   });
 });
 

@@ -5,7 +5,6 @@
  */
 
 import { listMapDestinations, planTravel, resolveLoadedTsid, tsidAliases } from './travel.js?v=7fd6e363';
-import { CLASSIC_ART } from './classic/classic-art.js?v=5f713e7d';
 import { HUB_MAP_BACKGROUNDS } from './hub-map-backgrounds.js?v=2b2d6468';
 
 /** Map catalog + per-hub files. */
@@ -331,14 +330,81 @@ export function youBox(mx, my) {
 }
 
 /**
- * The street icons' art and size (MapHub.as drawStreet; the art is Tiny Speck's CC0
- * TSEngineAssets map_icon_shop / _shrine / _subway, tools/classic-art/manifest.json).
+ * How opaque the vendor and shrine icons' ink is. Tiny Speck drew them black at 40% (the
+ * client's soft thumbnails), which reads pale on the remake's large, detailed paintings (G584).
+ */
+export const MAP_ICON_INK = 0.9;
+
+/**
+ * The street icons (MapHub.as drawStreet), drawn as vectors so they stay sharp at any map scale
+ * (G584: the 14 px and 24 px bitmaps blurred on large and hi-DPI screens). Each is drawn from
+ * Tiny Speck's CC0 map icons (glitch-client TSEngineAssets graphics/map_icon_shop, _shrine and
+ * _subway.png, also in tools/classic-art/manifest.json), traced at 16x in the bitmaps' own pixel
+ * grid, keeping their shapes, colours and sizes: the vendor's coin sign (a C crossed by two
+ * strokes), the shrine with its light band, and the subway's round blue and red badge with a
+ * train and its rails in a cream rim. Each draws in a <symbol> of the bitmap's size (w x h, which
+ * the placement below uses); the clear rect holds the box for the focus ring's scale origin.
  */
 export const MAP_ICON_ART = Object.freeze({
-  store: CLASSIC_ART.map_icon_shop,
-  shrine: CLASSIC_ART.map_icon_shrine,
-  subway: CLASSIC_ART.map_icon_subway,
+  store: Object.freeze({
+    id: 'mapIconStore',
+    w: 14,
+    h: 14,
+    body:
+      `<g fill="#000" stroke="#000" opacity="${MAP_ICON_INK}">` +
+      '<path stroke="none" d="M10.2 1.9L5.2 1.45C2.9 1.45 1.45 3.3 1.45 5.6V8.3C1.45 10.8 3.1 12.25 5.6 12.25H8.4' +
+      'C9.6 12.2 10.5 11.6 10.9 10.6L10.4 9.1C9.8 9.7 9.1 10.1 8 10.1H5.9C4.6 10.1 3.75 9.3 3.75 8V5.9' +
+      'C3.75 4.3 4.6 3.3 6 3.3H8C9.1 3.3 9.8 3.8 10.4 4.4Z"/>' +
+      '<path fill="none" stroke-width="1.05" stroke-linecap="round" d="M10.5 0.4L1.8 11.9M12.6 1.4L3.6 13.4"/>' +
+      '</g>',
+  }),
+  shrine: Object.freeze({
+    id: 'mapIconShrine',
+    w: 14,
+    h: 14,
+    body:
+      '<linearGradient id="mapIconShrineBand" x1="0" y1="3" x2="0" y2="7.1" gradientUnits="userSpaceOnUse">' +
+      '<stop offset="0" stop-color="#5a5a5a"/><stop offset="1" stop-color="#f4f4f4"/></linearGradient>' +
+      `<g opacity="${MAP_ICON_INK}">` +
+      '<path fill="#000" d="M7 1.05C9.6 1.05 11.4 1.45 12.25 2.15C12.85 2.7 12.95 3.4 12.95 4C12.95 4.7 12.8 5.4 12.2 6.05' +
+      'C11.9 6.4 11.8 6.8 11.8 7.3V11.4C11.8 12.4 10.4 13 7 13C3.6 13 2.2 12.4 2.2 11.4V7.3C2.2 6.8 2.1 6.4 1.8 6.05' +
+      'C1.2 5.4 1.05 4.7 1.05 4C1.05 3.4 1.15 2.7 1.75 2.15C2.6 1.45 4.4 1.05 7 1.05Z"/>' +
+      '<path fill="url(#mapIconShrineBand)" d="M3.4 4Q7 2 10.6 4V6.2Q7 7.7 3.4 6.2Z"/>' +
+      '</g>',
+  }),
+  subway: Object.freeze({
+    id: 'mapIconSubway',
+    w: 24,
+    h: 23,
+    body:
+      '<radialGradient id="mapIconSubwayRim" cx="11.55" cy="11.6" r="11.4" gradientUnits="userSpaceOnUse">' +
+      '<stop offset="0.72" stop-color="#fdf8e3" stop-opacity="0.6"/><stop offset="0.86" stop-color="#fdf8e3" stop-opacity="0.32"/>' +
+      '<stop offset="0.95" stop-color="#fdf8e3" stop-opacity="0.13"/><stop offset="1" stop-color="#fdf8e3" stop-opacity="0"/></radialGradient>' +
+      '<clipPath id="mapIconSubwayDisc"><circle cx="11.55" cy="11.6" r="8.75"/></clipPath>' +
+      '<circle cx="11.55" cy="11.6" r="11.4" fill="url(#mapIconSubwayRim)"/>' +
+      '<g clip-path="url(#mapIconSubwayDisc)">' +
+      '<rect width="12" height="23" fill="#4a7dce"/><rect x="12" width="12" height="23" fill="#bc603a"/>' +
+      '<path d="M7.4 5.2Q7.6 3.9 9 3.9H14.4Q15.8 3.9 15.9 5.2Z" opacity="0.2"/>' +
+      '<path d="M7.3 14V6.3Q7.3 5 8.6 5H14.6Q15.9 5 15.9 6.3V14Z" fill="#fdf8e3" opacity="0.5"/>' +
+      '<g fill="#fdf8e3"><rect x="8" y="9.3" width="7.9" height="4.7"/>' +
+      '<path d="M8.1 6.1h0.9v3.3h-0.9zM11.05 6.1h0.9v3.3h-0.9zM14.25 6.1h1.65v3.3h-1.65z" opacity="0.5"/>' +
+      '<rect x="8" y="15" width="7" height="1" opacity="0.85"/><rect x="7" y="16" width="9" height="1" opacity="0.7"/>' +
+      '<rect x="6.5" y="17" width="10" height="0.8" opacity="0.12"/></g>' +
+      '<rect x="9" y="6.7" width="2.05" height="2.7" rx="0.3" fill="#3561c4"/>' +
+      '<rect x="11.95" y="6.7" width="2.3" height="2.7" rx="0.3" fill="#a9421c"/>' +
+      '<circle cx="9.5" cy="11.5" r="0.6" fill="#4a6fae"/><ellipse cx="13.9" cy="11.5" rx="0.8" ry="0.6" fill="#ad7a62"/>' +
+      '</g>',
+  }),
 });
+
+/** The <symbol> for one kind of street icon (renderHubMapSvg writes one per kind its map shows). */
+export function mapIconSymbol(kind) {
+  const art = MAP_ICON_ART[kind];
+  return (
+    `<symbol id="${art.id}" viewBox="0 0 ${art.w} ${art.h}" overflow="visible">` +
+    `<rect width="${art.w}" height="${art.h}" fill="none"/>${art.body}</symbol>`
+  );
+}
 
 /** MapHub.as nudges two subway icons along their street (TSIDs it hardcodes, "jed tower" and "groddle junction"). */
 export const SUBWAY_ICON_NUDGE = Object.freeze({ LIF10HE4JTU1S7P: 20, LLI3272LOTD1B1F: 40 });
@@ -373,7 +439,7 @@ export function mapIconTip(kind, value = '') {
  * the icons.
  * @param {ReturnType<typeof buildHubMapView>['streets']} streets
  * @param {{ labels?: ReturnType<typeof layoutStreetLabels>, hubs?: { x:number, y:number }[] }} [around]
- * @returns {{ kind:string, tsid:string, streetName:string, tip:string, url:string,
+ * @returns {{ kind:string, tsid:string, streetName:string, tip:string, symbol:string,
  *   w:number, h:number, mx:number, my:number, rot:number, lx:number, ly:number, moved:boolean,
  *   quad:number[][], box:{ x0:number, y0:number, x1:number, y1:number } }[]}
  */
@@ -421,7 +487,7 @@ export function layoutStreetIcons(streets, { labels = [], hubs = [] } = {}) {
         tsid: s.loadedTsid || s.tsid,
         streetName: s.label || s.name || s.tsid,
         tip: mapIconTip(kind, value),
-        url: art.url,
+        symbol: art.id,
         w,
         h,
         mx: s.mx,
@@ -679,19 +745,19 @@ export function mapFitSize({ availW, availH, chromeW = 0, chromeH = 0, compactCh
  * The vendor and shrine icons' glow (MapHub.as: StaticFilters.white2px40percent_GlowA, a white
  * 2 px glow at 40%, over Tiny Speck's art, which is black at 40%). That read on the soft
  * thumbnail paintings but turned into pale grey smudges on a detailed one (the Groddle Meadow
- * repaint, G522), so the remake draws the same shape stronger: a cream halo at 75% and the
- * icon's ink at 1.75 times its alpha (black at 70%), in Modern and Classic. The subway icon is
- * full colour and opaque, and keeps the client's no glow.
+ * repaint, G522), so the remake draws the same shape stronger, in Modern and Classic: the ink
+ * nearly opaque (MAP_ICON_INK, G584) and a light cream halo round it, so the dark icons still
+ * read on the darkest parts of a painting. The subway icon is full colour and opaque, with its
+ * own cream rim, and keeps the client's no glow.
  */
-export const MAP_ICON_GLOW = Object.freeze({ halo: '#fffbea', haloOpacity: 0.75, spread: 1.2, ink: 1.75 });
+export const MAP_ICON_GLOW = Object.freeze({ halo: '#fffbea', haloOpacity: 0.7, spread: 1.2 });
 const MAP_ICON_FILTER =
   `<filter id="mapIconGlow" x="-50%" y="-50%" width="200%" height="200%">
       <feGaussianBlur in="SourceAlpha" stdDeviation="${MAP_ICON_GLOW.spread}"/>
       <feComponentTransfer result="spread"><feFuncA type="linear" slope="9"/></feComponentTransfer>
       <feFlood flood-color="${MAP_ICON_GLOW.halo}" flood-opacity="${MAP_ICON_GLOW.haloOpacity}"/>
       <feComposite in2="spread" operator="in" result="glow"/>
-      <feComponentTransfer in="SourceGraphic" result="ink"><feFuncA type="linear" slope="${MAP_ICON_GLOW.ink}"/></feComponentTransfer>
-      <feMerge><feMergeNode in="glow"/><feMergeNode in="ink"/></feMerge>
+      <feMerge><feMergeNode in="glow"/><feMergeNode in="SourceGraphic"/></feMerge>
     </filter>`;
 
 export function renderHubMapSvg(view) {
@@ -800,12 +866,14 @@ export function renderHubMapSvg(view) {
     );
   }
 
-  // MapHub.as drawStreet: each icon turned with its street; the vendor and shrine get the
-  // client's glow, drawn stronger so they read on any painting (MAP_ICON_GLOW), the subway none.
+  // MapHub.as drawStreet: each icon turned with its street, drawn from its vector <symbol>
+  // (MAP_ICON_ART); the vendor and shrine get the client's glow, drawn stronger so they read on
+  // any painting (MAP_ICON_GLOW), the subway none.
   // One tab stop for them all (arrow keys move between them, js/ui/map-icon-tips.js), left to right.
   const ordered = [...icons].sort((a, b) => a.box.x0 - b.box.x0 || a.box.y0 - b.box.y0);
   if (ordered.length) {
-    parts.push(`<g class="map-icons">`);
+    const kinds = Object.keys(MAP_ICON_ART).filter((k) => ordered.some((ic) => ic.kind === k));
+    parts.push(`<defs>${kinds.map(mapIconSymbol).join('')}</defs>`, `<g class="map-icons">`);
     ordered.forEach((ic, i) => {
       const f = (n) => Number(n.toFixed(2));
       parts.push(
@@ -814,7 +882,7 @@ export function renderHubMapSvg(view) {
           `data-kind="${ic.kind}" data-tsid="${escapeXml(ic.tsid)}" ` +
           `transform="translate(${f(ic.mx)} ${f(ic.my)}) rotate(${f(ic.rot)})">` +
           `<rect class="map-icon-ring" x="${ic.lx - 2}" y="${ic.ly - 2}" width="${ic.w + 4}" height="${ic.h + 4}" rx="3"/>` +
-          `<image href="${escapeXml(ic.url)}" x="${ic.lx}" y="${ic.ly}" width="${ic.w}" height="${ic.h}"` +
+          `<use href="#${ic.symbol}" x="${ic.lx}" y="${ic.ly}" width="${ic.w}" height="${ic.h}"` +
           `${ic.kind === 'subway' ? '' : ' filter="url(#mapIconGlow)"'}/>` +
           `</g>`
       );
