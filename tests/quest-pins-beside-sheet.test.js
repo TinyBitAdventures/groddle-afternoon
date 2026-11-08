@@ -22,7 +22,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=10b118dd';
 import { getQuestProgress } from '../public/js/quests.js?v=c8d9d0a4';
-import { acceptOffer, routeQuestEvent } from '../public/js/quest-offers.js?v=e31115ea';
+import { acceptOffer, routeQuestEvent } from '../public/js/quest-offers.js?v=a304c912';
 import { questStep } from '../public/js/ui/quest-sheet.js?v=1dffc3a6';
 
 const PUBLIC = join(dirname(fileURLToPath(import.meta.url)), '../public');

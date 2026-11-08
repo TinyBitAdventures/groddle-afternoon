@@ -8,7 +8,7 @@
 import { GAME_MODE } from './game-mode.js?v=1ecf2899';
 import { repairGivesMood } from './imagination-effects.js?v=70169933';
 import { energyMax, loseEnergy, metabolicGain, moodMax } from './metabolics.js?v=8504134e';
-import { cleanCopyTagOf } from './copy-tags.js?v=bd75b92e';
+import { cleanCopyTagOf } from './copy-tags.js?v=a2d357d4';
 
 export const TOOL_CONDITION_CATALOG = Object.freeze({
   butterfly_lotion: {

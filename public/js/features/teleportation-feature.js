@@ -35,7 +35,7 @@
 
 import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=b7609342';
 import { getGameDayKey } from '../game-day.js?v=edb00566';
-import { canUseTool, copyForVerb, copyTag, copyTags, setCopyTag, takeToolCopy, useToolCondition } from '../tools.js?v=d8aa3536';
+import { canUseTool, copyForVerb, copyTag, copyTags, setCopyTag, takeToolCopy, useToolCondition } from '../tools.js?v=eff5ef6f';
 import {
   PAPER_CLASS,
   QUILL_CLASS,
@@ -60,7 +60,7 @@ import {
   teleportRank,
   teleportToPoint,
   useScript,
-} from '../teleportation.js?v=5a5c8e6f';
+} from '../teleportation.js?v=42d36178';
 import { loseEnergy } from '../metabolics.js?v=8504134e';
 
 export const TELEPORT_FEATURE_ID = 'teleportation';

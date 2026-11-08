@@ -23,8 +23,8 @@ import {
   soilSpawnClasses,
   tickPlot,
   archivedSeedlingTrant,
-} from '../public/js/patches.js?v=5b86e3f1';
-import { createToolConditionState, getToolCondition } from '../public/js/tools.js?v=d8aa3536';
+} from '../public/js/patches.js?v=796732fb';
+import { createToolConditionState, getToolCondition } from '../public/js/tools.js?v=eff5ef6f';
 
 const seq = (...values) => {
   let i = 0;

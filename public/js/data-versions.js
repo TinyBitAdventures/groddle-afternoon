@@ -8,6 +8,7 @@
     epoch: '4774a7f0',
     files: {
       "assets/content/street-ecology.json": "52c389c0",
+      "assets/content/trade-items.json": "f12a69ec",
       "encyclopedia/search.json": "5557d629",
       "landing/card-explore.webp": "7a2c1124",
       "landing/full/card-explore.webp": "cbce4e96",

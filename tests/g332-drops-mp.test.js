@@ -22,9 +22,9 @@ import {
   normalizeGroundStack,
   normalizeMine,
   shareReason,
-} from '../public/js/drops-mp.js?v=4793cdb5';
-import { dropsMpFeature } from '../public/js/features/drops-mp-feature.js?v=eaed1683';
-import { giftsFeature } from '../public/js/features/gifts-feature.js?v=64f3b59d';
+} from '../public/js/drops-mp.js?v=ac5577f0';
+import { dropsMpFeature } from '../public/js/features/drops-mp-feature.js?v=85d71d4f';
+import { giftsFeature } from '../public/js/features/gifts-feature.js?v=c913adb9';
 import { HAS_SERVER, HAS_SITE, SITE_DIR, serverPath, sitePath } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');

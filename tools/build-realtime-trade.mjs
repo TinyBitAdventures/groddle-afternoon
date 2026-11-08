@@ -54,8 +54,8 @@ import { fileURLToPath } from 'node:url';
 import { requireServer, serverPath } from './repos.mjs';
 
 import { readItemTags, readItems } from './inventory/gsjs-data.mjs';
-import { TOOL_CONDITION_CATALOG } from '../public/js/tools.js?v=d8aa3536';
-import { COPY_TAG_RULES } from '../public/js/copy-tags.js?v=bd75b92e';
+import { TOOL_CONDITION_CATALOG } from '../public/js/tools.js?v=eff5ef6f';
+import { COPY_TAG_RULES } from '../public/js/copy-tags.js?v=a2d357d4';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 export const GSJS = join(root, '..', 'glitch-GameServerJS');

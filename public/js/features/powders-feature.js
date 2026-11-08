@@ -111,12 +111,12 @@ import {
   sniffNoNo,
   sprinkleHallowed,
   usePowderCharge,
-} from '../powders.js?v=6f458d42';
+} from '../powders.js?v=fa5d1e41';
 import { itemVerbAchievementCounters } from '../item-verbs.js?v=1e20fa7d';
-import { copyChargesLeft, copyFromLedger, keepsCopies, spendCopyCharge, verbCopy } from '../copy-charges.js?v=737fd334';
-import { migrateClassValue } from '../tools.js?v=d8aa3536';
-import { DEAD_TRANT_CLASSES } from '../patches.js?v=5b86e3f1';
-import { COPY as SHARED_PATCH_COPY } from '../shared-patches.js?v=2517d9a4';
+import { copyChargesLeft, copyFromLedger, keepsCopies, spendCopyCharge, verbCopy } from '../copy-charges.js?v=507e8d22';
+import { migrateClassValue } from '../tools.js?v=eff5ef6f';
+import { DEAD_TRANT_CLASSES } from '../patches.js?v=796732fb';
+import { COPY as SHARED_PATCH_COPY } from '../shared-patches.js?v=358f63cb';
 import { hellFeature } from './hell-feature.js?v=93f1c8dd';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 import { displayTopOf, playSheetOverlay } from '../overlay-art.js?v=11b6dd7f';

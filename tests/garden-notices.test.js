@@ -6,7 +6,7 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { GARDEN_WATER_MS, SEED_CATALOG, createGarden, tickGarden } from '../public/js/garden.js?v=e1c3415c';
+import { GARDEN_WATER_MS, SEED_CATALOG, createGarden, tickGarden } from '../public/js/garden.js?v=7bf205c7';
 import {
   GARDEN_CROP_LINE,
   GARDEN_DRY_LINE,
@@ -16,8 +16,8 @@ import {
   noticeAllowed,
   plotMarks,
 } from '../public/js/garden-notices.js?v=dc26dd82';
-import { gardenNoticesFeature } from '../public/js/features/garden-notices-feature.js?v=3efb1a35';
-import { homesFeature } from '../public/js/features/homes-feature.js?v=683f6dac';
+import { gardenNoticesFeature } from '../public/js/features/garden-notices-feature.js?v=4d1cfd0d';
+import { homesFeature } from '../public/js/features/homes-feature.js?v=3a0ddfb4';
 
 const T0 = 1_000_000;
 

@@ -1247,12 +1247,13 @@
    "name": "Musicblocks, Cubimals and the Stoot doll",
    "status": "source",
    "blurb": "All 27 recovered Musicblock tunes (five series of five, SB-1 and Goodnight Groddle) with their collector trophies, both Cubimal series and the memorial pull-string doll.",
-   "multiplayer": "Play a Musicblock for another player on your street, and Blocks That Rock counts it.",
+   "multiplayer": "Play a Musicblock for another player on your street, and Blocks That Rock counts it. Set a Cubimal down to battle another player's with Panache, Wile or Gumption: they trade insults until one runs out of Ego, and the winner gains experience and levels.",
    "spot": null,
    "evidence": [
     "public/js/musicblocks.js",
     "public/js/cubimals.js",
-    "public/js/stoot-doll.js"
+    "public/js/stoot-doll.js",
+    "public/js/cubimal-battle.js"
    ],
    "shot": "shots/collectibles.webp",
    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&timedemo=day&stootdemo=1&stootquote=38&practice=1"
@@ -2732,9 +2733,14 @@
   "deployed": "2026-11-08"
  },
  "git": {
-  "commits": 1486,
+  "commits": 1487,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-08",
+    "kind": "fix",
+    "text": "The encyclopedia says Peter out Peat is a multiplayer quest"
+   },
    {
     "date": "2026-11-08",
     "kind": "improve",
@@ -2849,14 +2855,9 @@
     "date": "2026-11-07",
     "kind": "improve",
     "text": "Every file's cache key starts fresh for game v0.23.0, so the game's start-up list shrinks from 670 KB to almost nothing"
-   },
-   {
-    "date": "2026-11-07",
-    "kind": "fix",
-    "text": "/stuck in Wintry Place takes you to the way out on the floor, and its hint only counts the slot you can't jump out of"
    }
   ]
  },
- "tests": 740,
+ "tests": 741,
  "generatedAt": "2026-11-08"
 }

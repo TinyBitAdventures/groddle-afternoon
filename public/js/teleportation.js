@@ -23,7 +23,7 @@
  * duplicate them.
  */
 
-import { cleanCopyTagOf } from './copy-tags.js?v=bd75b92e';
+import { cleanCopyTagOf } from './copy-tags.js?v=a2d357d4';
 
 export const TELEPORT_SKILLS = Object.freeze([
   'teleportation_1',

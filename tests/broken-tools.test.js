@@ -11,11 +11,11 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { getVerbsFor, runVerb } from '../public/content.js?v=3e243822';
+import { getVerbsFor, runVerb } from '../public/content.js?v=1d0c533d';
 import { createInventory } from '../public/js/inventory.js?v=b7609342';
-import { createMineRock, findWorkingPick, miningToolWear } from '../public/js/mining.js?v=fc28670f';
-import { clearPlot, createGarden, gardenActionProfile, getPlot, waterPlot } from '../public/js/garden.js?v=e1c3415c';
-import { BROKEN_TOOL_ICONS, TOOL_CONDITION_CATALOG, brokenToolIcon, createToolConditionState, setToolRemaining } from '../public/js/tools.js?v=d8aa3536';
+import { createMineRock, findWorkingPick, miningToolWear } from '../public/js/mining.js?v=f132ad75';
+import { clearPlot, createGarden, gardenActionProfile, getPlot, waterPlot } from '../public/js/garden.js?v=7bf205c7';
+import { BROKEN_TOOL_ICONS, TOOL_CONDITION_CATALOG, brokenToolIcon, createToolConditionState, setToolRemaining } from '../public/js/tools.js?v=eff5ef6f';
 import { HIRES_ICONS } from '../public/js/icon-hires.js?v=165dbd6e';
 
 const root = join(import.meta.dirname, '..');

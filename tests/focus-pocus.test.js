@@ -19,9 +19,9 @@ import { fileURLToPath } from 'node:url';
 
 import { loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js?v=10b118dd';
 import { createQuestState } from '../public/js/quests.js?v=c8d9d0a4';
-import { acceptOffer, routeQuestEvent } from '../public/js/quest-offers.js?v=e31115ea';
+import { acceptOffer, routeQuestEvent } from '../public/js/quest-offers.js?v=a304c912';
 import { createInventory } from '../public/js/inventory.js?v=b7609342';
-import { createToolConditionState } from '../public/js/tools.js?v=d8aa3536';
+import { createToolConditionState } from '../public/js/tools.js?v=eff5ef6f';
 import { setMetabolicGainGate } from '../public/js/metabolics.js?v=8504134e';
 import {
   FOCUS_POCUS_FLAG,

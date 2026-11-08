@@ -32,7 +32,7 @@ import {
   setCopyTag,
   syncToolCopies,
   takeToolCopy,
-} from '../public/js/tools.js?v=d8aa3536';
+} from '../public/js/tools.js?v=eff5ef6f';
 import {
   SCRIPT_CLASS,
   SCRIPT_ITEM,
@@ -44,12 +44,12 @@ import {
   scriptTag,
   scriptTitle,
   useScript,
-} from '../public/js/teleportation.js?v=5a5c8e6f';
-import { teleportationFeature as feature } from '../public/js/features/teleportation-feature.js?v=23270f4f';
+} from '../public/js/teleportation.js?v=42d36178';
+import { teleportationFeature as feature } from '../public/js/features/teleportation-feature.js?v=627cf405';
 import { cleanContents, createDroppedItemState, dropInventoryStack, pickupDroppedStack, placeDroppedBag } from '../public/js/world-items.js?v=0bbfdab9';
 import { cabinetPut, cabinetTake, cleanHeldList, normalizeContents } from '../public/js/home-storage.js?v=121f1897';
-import { normalizeGroundStack, normalizeItem } from '../public/js/drops-mp.js?v=4793cdb5';
-import { goodsWithHeldTags, normalizeGoods } from '../public/js/trade.js?v=6eaf2844';
+import { normalizeGroundStack, normalizeItem } from '../public/js/drops-mp.js?v=ac5577f0';
+import { goodsWithHeldTags, normalizeGoods } from '../public/js/trade.js?v=abb23481';
 
 const root = join(import.meta.dirname, '..');
 const A = { tsid: 'GA5101HF7F429V5', x: 100, y: -68, label: 'Hechey Track', hubId: '58', hubName: 'Groddle Forest' };

@@ -13,7 +13,7 @@ import {
   groupLabelCount,
 } from '../public/js/achievements.js?v=f8ccfd34';
 import { loadContentCatalogsFromDir, getAchievementCatalog } from '../public/js/content-catalogs.js?v=10b118dd';
-import { normalizeAchievementSnapshot } from '../public/js/player-save.js?v=caa1f897';
+import { normalizeAchievementSnapshot } from '../public/js/player-save.js?v=db065254';
 import {
   applyStreetVisit,
   availableHubStreets,

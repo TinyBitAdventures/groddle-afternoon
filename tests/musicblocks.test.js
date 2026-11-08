@@ -30,14 +30,14 @@ import {
 } from '../public/js/musicblocks.js?v=db6a213b';
 import { SOUND_ALIASES, SOUND_FILES } from '../public/js/sound-keys.js?v=6aedc206';
 import { DROP_TABLES } from '../public/js/drop-tables-data.js?v=c51a6400';
-import { SOIL_DROP_TABLES } from '../public/js/patches.js?v=5b86e3f1';
+import { SOIL_DROP_TABLES } from '../public/js/patches.js?v=796732fb';
 import { SPINNING_WHEEL_DROP_TABLE } from '../public/js/spinning-wheel.js?v=ddae3d4d';
 import {
   ITEM_CATALOG,
   countItem,
   createInventory,
 } from '../public/js/inventory.js?v=b7609342';
-import { getVerbsFor, runVerb } from '../public/content.js?v=3e243822';
+import { getVerbsFor, runVerb } from '../public/content.js?v=1d0c533d';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const publicRoot = join(here, '../public');

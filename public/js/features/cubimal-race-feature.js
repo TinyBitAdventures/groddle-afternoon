@@ -27,9 +27,9 @@
  * stack's pick up (js/world-items.js), saved per street.
  *
  * Tottly's Toys (solo Feats, G143): a race of 5 planks or more gives +2
- * (raceEnd, npc_cubimal_*.js:942). Not here: battles (G40, another player's
- * cubimal), with the Tottly's Toys points a battle win gives
- * (npc_cubimal_*.js makeWinner 650, 661), and sloth taunts (no source:
+ * (raceEnd, npc_cubimal_*.js:942). Battles are features/cubimal-battle-feature.js
+ * (G40); a figure's battle level rides in its copy's words beside its name, so
+ * a race, a rename or a reload keeps it. Not here: sloth taunts (no source:
  * npc_sloth has no race hook).
  *
  * Art: the client's CC0 race recordings, assets/sprites/cubimals/*_race.webp
@@ -54,7 +54,7 @@
  */
 
 import { addItem, countItem, removeItem } from '../inventory.js?v=b7609342';
-import { copyForVerb, copyTag, copyTags, migrateClassTag, setCopyTag, takeToolCopy } from '../tools.js?v=d8aa3536';
+import { copyForVerb, copyTag, copyTags, migrateClassTag, setCopyTag, takeToolCopy } from '../tools.js?v=eff5ef6f';
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=b764884b';
 import { landingY, walkSurfaceY } from '../walk-surface.js?v=106bfdc5';
 import { playPoofIn, poofInAlpha } from '../overlay-art.js?v=11b6dd7f';
@@ -78,6 +78,8 @@ import {
   nameCubimal,
   rollCubimalRace,
 } from '../cubimals.js?v=c48cc6ff';
+import { cleanCopyTagOf } from '../copy-tags.js?v=a2d357d4';
+import { cubimalBattleLabel, cubimalBattleStats, cubimalTagName, cubimalTagWith } from '../cubimal-battle.js?v=f443b25c';
 
 export const CUBIMAL_RACE_FEATURE_ID = 'cubimal-race';
 const DEMO_DEFAULT = 'npc_cubimal_chick';
@@ -100,7 +102,15 @@ function nameOf(classTsid, copy = null) {
   if (!tools || !isCubimal(classTsid)) return '';
   const at = copyForVerb(tools, classTsid, copy);
   const t = at >= 0 ? copyTag(tools, classTsid, at) : null;
-  return typeof t === 'string' ? t : '';
+  return cubimalTagName(t);
+}
+
+/** One copy's whole words (its name, and its battle level once it has won: js/cubimal-battle.js). */
+function tagOf(classTsid, copy = null) {
+  const tools = eng?.toolState;
+  if (!tools || !isCubimal(classTsid)) return null;
+  const at = copyForVerb(tools, classTsid, copy);
+  return at >= 0 ? copyTag(tools, classTsid, at) : null;
 }
 
 /** The pure rules' { class: name } view of one copy (js/cubimals.js nameCubimal / cubimalNameVerb). */
@@ -140,7 +150,7 @@ function publish(engine) {
   if (engine.toolState && engine.inv) {
     for (const k of Object.keys(engine.inv)) {
       if (!isCubimal(k)) continue;
-      for (const t of copyTags(engine.toolState, k)) if (typeof t === 'string' && t) named.push(`${k.replace('npc_cubimal_', '')}:${t}`);
+      for (const t of copyTags(engine.toolState, k)) if (cubimalTagName(t)) named.push(`${k.replace('npc_cubimal_', '')}:${cubimalTagName(t)}`);
     }
   }
   engine.setData('cubimalName', named.join(','));
@@ -219,6 +229,7 @@ function startRace(engine, classTsid, copy = null) {
   // The figure picked races, with its own name; it leaves the pack from its own slot.
   const at = engine.toolState ? copyForVerb(engine.toolState, classTsid, copy) : -1;
   const raceName = at >= 0 ? nameOf(classTsid, at) : '';
+  const raceTag = at >= 0 ? tagOf(classTsid, at) : null;
   if (at >= 0) {
     engine.query?.('packTakeUnit', classTsid, at, 1, engine);
     takeToolCopy(engine.toolState, classTsid, { copy: at });
@@ -233,6 +244,7 @@ function startRace(engine, classTsid, copy = null) {
   const racer = {
     classTsid,
     name: raceName,
+    tag: raceTag,
     sprite,
     target: null,
     state: 'windup',
@@ -315,7 +327,8 @@ function returnToPack(engine, racer, { quiet = false } = {}) {
   racer.state = 'returned';
   addItem(engine.inv, racer.classTsid, 1);
   // Back in the pack with its own name (the copy that just arrived is the last).
-  if (racer.name && engine.toolState) setCopyTag(engine.toolState, racer.classTsid, countItem(engine.inv, racer.classTsid) - 1, racer.name);
+  const back = racer.tag ?? (racer.name || null);
+  if (back && engine.toolState) setCopyTag(engine.toolState, racer.classTsid, countItem(engine.inv, racer.classTsid) - 1, back);
   if (racer.target) engine.unregister?.(racer.target);
   else destroySprite(racer.sprite);
   racer.sprite = null;
@@ -367,7 +380,8 @@ function applyName(engine, classTsid, value, copy = null) {
   const at = engine.toolState ? copyForVerb(engine.toolState, classTsid, copy) : -1;
   const res = nameCubimal(namesOf(classTsid, at), classTsid, value);
   if (!res.ok) return false;
-  if (at >= 0) setCopyTag(engine.toolState, classTsid, at, res.name);
+  // The name only: a figure's battle level stays with it (js/cubimal-battle.js).
+  if (at >= 0) setCopyTag(engine.toolState, classTsid, at, cubimalTagWith(copyTag(engine.toolState, classTsid, at), { name: res.name }));
   nameBubble = res.bubble;
   const player = engine.player;
   if (player) engine.say?.({ sprite: player, label: cubimalInfo(classTsid)?.label || '' }, res.bubble, res.bubbleMs);
@@ -773,15 +787,22 @@ export const cubimalRaceFeature = {
    * game.js pack card, pack slot tooltip and dropped-stack label: a named
    * figure goes by its name, the figure type beside it. The server sent
    * getLabel() as the stack label (common.js make_item_simple 546; cubimal
-   * getLabel 580 is user_name, plus a battle level the remake leaves out) and
+   * getLabel 580 is user_name, plus " Lvl." and the battle level, shown here
+   * once a battle has raised it above 1) and
    * the client showed that label in place of the item's (Itemstack.as
    * getLabel 445, PackItemstackView.as 102).
    */
   itemDisplayName(classTsid, copy = null, engine = null, tag = undefined) {
     if (engine) eng = engine;
+    if (!isCubimal(classTsid)) return null;
     // A ground stack names its first figure's own words (`tag`); a pack slot its copy's.
-    const name = !isCubimal(classTsid) ? '' : tag !== undefined ? (typeof tag === 'string' ? tag : '') : nameOf(classTsid, copy);
-    return name ? { label: name, kind: cubimalInfo(classTsid)?.label || 'Cubimal' } : null;
+    const words = tag !== undefined ? tag : tagOf(classTsid, copy);
+    const name = cubimalTagName(words);
+    const kind = cubimalInfo(classTsid)?.label || 'Cubimal';
+    // getLabel's " Lvl.N" once a battle has raised it (level 1, every new figure, reads as before).
+    const { level } = cubimalBattleStats(words);
+    if (level > 1) return { label: cubimalBattleLabel(classTsid, name, level), kind };
+    return name ? { label: name, kind } : null;
   },
 
   /** game.js setPackedCubimalFree: the source conversation instead of window.confirm. */
@@ -794,18 +815,22 @@ export const cubimalRaceFeature = {
     // A figure saying goodbye has not been paid for yet: a reload keeps it.
     for (const f of flights) if (!f.paid) out.push(f.classTsid);
     // Names are each figure's own (js/tools.js row.tags, saved with the pack's tools); a racer's rides with it.
-    return { version: 2, out, outNames: racers.filter((r) => r.state !== 'returned').map((r) => r.name || '') };
+    const live = racers.filter((r) => r.state !== 'returned');
+    return { version: 2, out, outNames: live.map((r) => r.name || ''), outTags: live.map((r) => r.tag ?? null) };
   },
 
   restore(slice, engine) {
     eng = engine || eng;
     // A reload mid-race: the figure goes home to the pack, with its name.
     const outNames = Array.isArray(slice?.outNames) ? slice.outNames : [];
+    const outTags = Array.isArray(slice?.outTags) ? slice.outTags : [];
     (Array.isArray(slice?.out) ? slice.out : []).forEach((classTsid, i) => {
       if (!isCubimal(classTsid) || !engine?.inv) return;
       addItem(engine.inv, classTsid, 1);
       const n = typeof outNames[i] === 'string' ? outNames[i].slice(0, CUBIMAL_NAMING.maxLength) : '';
-      if (n && engine.toolState) setCopyTag(engine.toolState, classTsid, countItem(engine.inv, classTsid) - 1, n);
+      // Its whole words (a battle level too) when the save has them, else the name.
+      const t = outTags[i] != null ? cleanCopyTagOf('name', outTags[i]) : n || null;
+      if (t && engine.toolState) setCopyTag(engine.toolState, classTsid, countItem(engine.inv, classTsid) - 1, t);
     });
     // An older save's one name per class (2026-11-04) is the first figure's; any other is unnamed.
     for (const [k, v] of Object.entries(slice?.names || {})) {

@@ -54,7 +54,7 @@
 
 import { FOREST_MACHINE_ROOM_HELD, FOREST_MACHINE_ROOM_TSID } from './forest-machine-room.js?v=5f7e4589';
 import { MACHINE_ROOMS } from './exploration.js?v=aa0bd00c';
-import { FRESH_FUEL, FUEL_PER_CELL, MAX_FUEL } from './machines.js?v=663980c9';
+import { FRESH_FUEL, FUEL_PER_CELL, MAX_FUEL } from './machines.js?v=6b72e07b';
 
 /** config_prod.js:1332 machine_rooms, as built (G prefix). */
 export const MACHINE_ROOM_TSIDS = Object.freeze([...MACHINE_ROOMS]);

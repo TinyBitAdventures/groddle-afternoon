@@ -36,9 +36,9 @@ import {
   sharedCreatureLabel,
   walkerAt,
 } from '../public/js/street-creatures.js?v=3c07d608';
-import { createStreetCopy, idKind, reconcile, takeObjs } from '../public/js/street-objects.js?v=38310175';
-import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=56f5244f';
-import { FEATURES } from '../public/js/features/index.js?v=686c774e';
+import { createStreetCopy, idKind, reconcile, takeObjs } from '../public/js/street-objects.js?v=684c80b8';
+import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=34d8361c';
+import { FEATURES } from '../public/js/features/index.js?v=4c16a7bc';
 import { GAME_EPOCH_MS } from '../public/js/game-day.js?v=edb00566';
 import { creatureRequests, setCreatureEcology, streetObjectLayout } from '../tools/build-realtime-objects.mjs';
 import { STREET_INDEX, applyStreetIndex, loadStreetDataFromFs } from '../public/js/street-loader.js?v=18b181ad';
@@ -248,7 +248,7 @@ describe('street animals: a Chicken\'s walk, turns and pauses (lane CHICKWALK)',
   });
 
   it('the art turns on the spot: the sprite is anchored under the bird (Chicken sheets are cut 27 px off centre)', async () => {
-    const { ANIMAL_ANCHOR_X, animalAnchorX } = await import('../public/js/animals.js?v=18e6b180');
+    const { ANIMAL_ANCHOR_X, animalAnchorX } = await import('../public/js/animals.js?v=fd2e3b93');
     assert.equal(animalAnchorX('npc_chicken'), 101 / 148);
     assert.equal(animalAnchorX('npc_piggy'), 0.5);
     assert.equal(animalAnchorX('npc_butterfly'), 0.5);

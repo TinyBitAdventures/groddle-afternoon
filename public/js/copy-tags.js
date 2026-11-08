@@ -12,6 +12,10 @@
  *  - name: the characters a Cubimal name keeps (npc_cubimal_chick.js onInputBoxResponse 41 keeps
  *    letters, digits and spaces; the word filter's grawlix symbols are kept too), then at most
  *    `max` of them, then the word filter, trimmed. ASCII only, so every language cuts it alike.
+ *    A figure that has won a battle (G40, js/cubimal-battle.js) keeps { name, level, xp } (its
+ *    instance props level and xp, npc_cubimal_chick.js 30-31): the name as above ('' for none),
+ *    level a whole number from 1 to `levelMax`, xp from 0 to `xpMax`; at level 1 with no xp it is
+ *    just the name again.
  *  - phrases: a list of at most `max` (lit_pumpkin_base teach: three phrases); each one line, no
  *    control characters or angle brackets, at most `len` characters (code points), the word filter,
  *    trimmed; empty ones dropped.
@@ -27,7 +31,7 @@
 import { SYMBOLS, filterText } from './word-filter.js?v=9a7a7ebb';
 
 export const COPY_TAG_RULES = Object.freeze({
-  name: Object.freeze({ max: 32 }),
+  name: Object.freeze({ max: 32, levelMax: 99, xpMax: 1000000000 }),
   phrases: Object.freeze({ max: 3, len: 150 }),
   giant: Object.freeze({ giants: Object.freeze(['alph', 'cosma', 'friendly', 'grendaline', 'humbaba', 'lem', 'mab', 'pot', 'spriggan', 'ti', 'zille']) }),
   still: Object.freeze({ hopper: 600, hooch: 50 }),
@@ -39,12 +43,21 @@ const trimSpaces = (s) => s.replace(/^ +| +$/g, '');
 
 const NAME_KEEP = new Set(`abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ${SYMBOLS}`);
 
-function cleanName(value, rules) {
-  if (typeof value !== 'string') return null;
+function cleanNameText(value, rules) {
+  if (typeof value !== 'string') return '';
   let s = '';
   for (const c of value) if (NAME_KEEP.has(c)) s += c;
-  const out = trimSpaces(filterText(s.slice(0, rules.max)));
-  return out || null;
+  return trimSpaces(filterText(s.slice(0, rules.max)));
+}
+
+function cleanName(value, rules) {
+  if (typeof value === 'string') return cleanNameText(value, rules) || null;
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
+  const name = cleanNameText(value.name, rules);
+  const level = Math.max(1, whole(value.level, rules.levelMax));
+  const xp = whole(value.xp, rules.xpMax);
+  if (level <= 1 && xp <= 0) return name || null;
+  return { name, level, xp };
 }
 
 /** One phrase: one line, no control characters, angle brackets or U+FFFD, `len` code points at most. */

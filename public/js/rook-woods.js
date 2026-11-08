@@ -18,7 +18,7 @@
  * route, the Crusher spots and the nest's spot are ours.
  */
 
-import { canUseTool } from './tools.js?v=d8aa3536';
+import { canUseTool } from './tools.js?v=eff5ef6f';
 import { ROOK_ART } from './rook-art.js?v=3d9cd2ae';
 
 export const ROOK_QUEST_ID = 'rook_egg_smash';

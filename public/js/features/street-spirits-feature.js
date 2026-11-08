@@ -100,10 +100,10 @@ import {
   resumeTarget,
   setCurrentState,
 } from '../conversations.js?v=7cbdfea4';
-import { acceptOffer, npcQuestOffers, questStatus } from '../quest-offers.js?v=e31115ea';
+import { acceptOffer, npcQuestOffers, questStatus } from '../quest-offers.js?v=a304c912';
 import { getQuestCatalog } from '../content-catalogs.js?v=10b118dd';
-import { questRoomConverse } from './quest-instances-feature.js?v=b36264ec';
-import { SPIRIT_REMINISCE_TEXT, isStreetSpiritClass, spiritReminisceOffers, withReminisceVerb } from '../spirit-reminisce.js?v=630e3731';
+import { questRoomConverse } from './quest-instances-feature.js?v=2fb38b89';
+import { SPIRIT_REMINISCE_TEXT, isStreetSpiritClass, spiritReminisceOffers, withReminisceVerb } from '../spirit-reminisce.js?v=c6d5ef8e';
 import { questDoneAt } from '../quests.js?v=c8d9d0a4';
 
 export const STREET_SPIRITS_FEATURE_ID = 'street-spirits';

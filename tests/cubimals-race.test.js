@@ -35,11 +35,11 @@ import {
   setCubimalFree,
 } from '../public/js/cubimals.js?v=c48cc6ff';
 import { addItem, countItem, createInventory } from '../public/js/inventory.js?v=b7609342';
-import { bindToolInventory, copyTags, createToolConditionState } from '../public/js/tools.js?v=d8aa3536';
+import { bindToolInventory, copyTags, createToolConditionState } from '../public/js/tools.js?v=eff5ef6f';
 import { applyAchievementProgress, createAchievementState } from '../public/js/achievements.js?v=f8ccfd34';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=10b118dd';
-import { FEATURES } from '../public/js/features/index.js?v=686c774e';
-import { cubimalRaceFeature, CUBIMAL_RACE_FEATURE_ID } from '../public/js/features/cubimal-race-feature.js?v=de879626';
+import { FEATURES } from '../public/js/features/index.js?v=4c16a7bc';
+import { cubimalRaceFeature, CUBIMAL_RACE_FEATURE_ID } from '../public/js/features/cubimal-race-feature.js?v=737ac7b8';
 import { FIRST_DRAW_SPRITES, HIRES_SPRITES } from '../public/js/sprite-hires.js?v=abaf3d5a';
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -495,7 +495,7 @@ describe('cubimal-race feature', () => {
     assert.ok(log.includes('sound:SPINACHJUMP'));
     assert.deepEqual(calls, [{ responseRoll: 0.7 }]);
     assert.equal(countItem(engine.inv, 'npc_cubimal_chick'), 0);
-    assert.deepEqual(cubimalRaceFeature.save(), { version: 2, out: [], outNames: [] });
+    assert.deepEqual(cubimalRaceFeature.save(), { version: 2, out: [], outNames: [], outTags: [] });
     clock += 1500;
     cubimalRaceFeature.onTick(16, clock, engine);
   });

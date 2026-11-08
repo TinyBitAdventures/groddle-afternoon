@@ -11,9 +11,9 @@
  * 10 minutes (clear).
  */
 
-import { tickGarden } from '../garden.js?v=e1c3415c';
+import { tickGarden } from '../garden.js?v=7bf205c7';
 import { GARDEN_NOTICE_TIMEOUT, gardenNoticeLines, noticeAllowed, plotMarks } from '../garden-notices.js?v=dc26dd82';
-import { homesFeature } from './homes-feature.js?v=683f6dac';
+import { homesFeature } from './homes-feature.js?v=3a0ddfb4';
 
 export const GARDEN_NOTICES_FEATURE_ID = 'garden-notices';
 const LOOK_MS = 1000;
