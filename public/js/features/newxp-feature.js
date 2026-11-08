@@ -1109,6 +1109,16 @@ function stageDeco(PIXI, name, x, y, { ax = 0.5, ay = 0.5, scale = 1, sx = null,
   return spr;
 }
 
+/** How long you stand still on a style tube's ring before it chooses that style (ms). */
+export const STYLE_RING_DWELL_MS = 1000;
+/** Slower than this counts as standing still on the ring (px per ms). */
+export const STYLE_RING_STILL_VX = 0.05;
+/** PURE: the hint as you step onto a tube's ring ("Pick Uralia Style" -> its tip). */
+export function styleRingHint(label) {
+  const name = String(label || '').replace(/^Pick\s+/i, '');
+  return `Stand still here to pick ${name}, or keep walking to see the others.`;
+}
+
 /** Camera look while you wait at the chain: shows the arrow's bottom (world y 667) in a 408 px view. */
 const CHAIN_LOOK_Y = 370;
 
@@ -1949,10 +1959,24 @@ async function runTraining2(t) {
     auto = false;
     engine.setData('newxpAutoplay', 'hold:machine');
   }
+  // Austin 2026-11-08: the rock stands past the three tubes, so walking back from it crossed Uralia's
+  // ring first and chose it. A ring now chooses only once you stand still on it (STYLE_RING_DWELL_MS),
+  // or by the tube's own Pick verb; walking across one says how to pick it.
+  let ring = null;
   await until(t, () => {
     const p = P();
     const c = L.machine.choices.find((m) => Math.abs(p.x - m.x) < 40 && p.y > L.floorY - 20);
-    if (c && countItem(engine.inv, 'homestreet_ticket') > 0 && !run.data.style) run.data.style = c.style;
+    if (!c || countItem(engine.inv, 'homestreet_ticket') < 1 || run.data.style) {
+      ring = null;
+      return run.data.style;
+    }
+    const now = Date.now();
+    if (ring?.style !== c.style) {
+      ring = { style: c.style, since: now };
+      engine.toast(styleRingHint(c.label), 2200);
+    }
+    if (Math.abs(Number(p.vx) || 0) > STYLE_RING_STILL_VX || !p.onGround) ring.since = now;
+    if (now - ring.since >= STYLE_RING_DWELL_MS) run.data.style = c.style;
     return run.data.style;
   }, { help: () => { run.data.style = engine.param('newxpstyle') || 'meadow'; } });
   removeItem(engine.inv, 'homestreet_ticket', 1);
