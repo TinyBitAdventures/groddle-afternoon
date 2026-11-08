@@ -19,6 +19,7 @@
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=3957a237';
 import { shiftMetabolic } from '../metabolics.js?v=8504134e';
 import { getGameDayKey } from '../game-day.js?v=edb00566';
+import { followPath } from '../street-creatures.js?v=fa8f9bcc';
 import { walkSurfaceY } from '../walk-surface.js?v=106bfdc5';
 import {
   FIRE_DRAGON_CLASS,
@@ -128,6 +129,9 @@ function spawn(engine, key, point) {
     label: FIRE_DRAGON_COPY.label,
     subtitle: FIRE_DRAGON_COPY.subtitle,
     sprite: spr,
+    // Online a street's Fire Dragons are shared by place (street-objects-feature, sharedPath);
+    // a demo dragon (demo<n>) never is.
+    ...(/^\d{1,2}$/.test(String(key)) ? { dragonKey: `dragon:${key}`, state: {} } : {}),
   });
   face(dragon, dragon.goDir);
   stand(dragon, 1500 + Math.random() * 2000);
@@ -135,10 +139,44 @@ function spawn(engine, key, point) {
   return dragon;
 }
 
+/**
+ * Online (slice 3 of research/plans/street-animals-shared.md): a street Fire Dragon walks the shared
+ * path street-objects-feature gives it (js/street-creatures.js dragonWalkAt: its roam and rests from
+ * the server's spot and clock, rolled from a seed every page shares), so everyone sees it in the same
+ * place; a player at it or a pet holds it for everyone.
+ */
+function walkShared(engine, dragon, p, dtMs) {
+  const spr = dragon.sprite;
+  const dt = Math.max(1, dtMs / (1000 / 60));
+  spr.x = followPath(spr.x, p.x, dt, 1.6);
+  const feet = spr.y - FIRE_DRAGON_SHEET.feetPad;
+  const y = walkSurfaceY(engine.platforms, spr.x, Number.isFinite(feet) ? feet : p.y0, { up: 24, down: 40 });
+  if (y != null) spr.y = y + FIRE_DRAGON_SHEET.feetPad;
+  const walking = p.pose === 'walk' && !p.held && now() >= (dragon.faceUntil || 0);
+  if (now() >= (dragon.faceUntil || 0)) face(dragon, p.dir < 0 ? 'left' : 'right');
+  if (walking && dragon.mode !== 'walk') {
+    dragon.mode = 'walk';
+    spr.scale.y = 1;
+    spr.play();
+  } else if (!walking) {
+    if (dragon.mode !== 'idle') {
+      dragon.mode = 'idle';
+      spr.gotoAndStop(0);
+    }
+    dragon.breath += dtMs / 700;
+    spr.scale.y = 1 + 0.015 * Math.sin(dragon.breath);
+  }
+}
+
 function tick(engine, dtMs) {
   const t = now();
   for (const d of dragons) {
     if (!d.sprite || d.sprite.destroyed) continue;
+    const shared = d.sprite._walkerPath?.();
+    if (shared) {
+      walkShared(engine, d, shared, dtMs);
+      continue;
+    }
     if (d.mode === 'walk') walk(engine, d, dtMs);
     else {
       // Standing: a slow breath, 1.5% taller at the top.
@@ -161,6 +199,9 @@ function pet(engine, dragon) {
   // Face the player and stand a moment.
   face(dragon, (engine.player?.x ?? dragon.sprite.x) < dragon.sprite.x ? 'left' : 'right');
   stand(dragon, FIRE_DRAGON_WALK.menuWaitMs);
+  dragon.faceUntil = now() + FIRE_DRAGON_WALK.menuWaitMs;
+  // Online the street sees it, and the server holds it for everyone a moment.
+  if (dragon.sprite._walkerPath) engine.query?.('sharedWalkerVerb', dragon.target, 'pet', engine);
   engine.pushActivity({ base: result.message, effects: mood ? { mood } : {} });
   engine.updateHud();
   engine.save();
@@ -235,6 +276,15 @@ export const fireDragonFeature = {
     const d = dragons.find((x) => x.target === target);
     if (d && verbId === 'dragon_pet') pet(engine, d);
     publish(engine);
+    return true;
+  },
+
+  /** Online: someone else petted this street Fire Dragon: it stops a moment here too. */
+  walkerVerbSeen(target, verb) {
+    const dragon = dragons.find((d) => d.target === target);
+    if (!dragon || verb !== 'pet') return null;
+    dragon.faceUntil = now() + FIRE_DRAGON_WALK.menuWaitMs;
+    last = 'pet:seen';
     return true;
   },
 

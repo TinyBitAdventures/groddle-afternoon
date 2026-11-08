@@ -127,7 +127,7 @@ import {
   treeId,
   treeReady,
   treeSkill,
-} from '../street-objects.js?v=41e61b77';
+} from '../street-objects.js?v=afa39058';
 import { ROCK_CATALOG } from '../mining.js?v=f132ad75';
 import { TRANT_META, trantStatusLabel } from '../trants.js?v=1b3c8ae3';
 import { quoteWoodTreeHarvest } from '../woodcutting.js?v=73472b8c';
@@ -158,9 +158,10 @@ import {
   sharedCreatureLabel,
   WALKER_REACH,
   crabWalkAt,
+  dragonWalkAt,
   kittyWalkAt,
   walkerSpan,
-} from '../street-creatures.js?v=6abb5f1d';
+} from '../street-creatures.js?v=fa8f9bcc';
 
 export const STREET_OBJECTS_FEATURE_ID = 'street-objects';
 const RECONCILE_MS = 250;
@@ -272,7 +273,7 @@ function bind(engine) {
     if (!msg || msg.street !== copy.street || copy.street !== engine.streetTsid) return;
     const obj = localObjects(engine).find((row) => row.id === msg.id);
     if (!obj) return;
-    if (obj.kind === 'chicken' || obj.kind === 'butterfly' || obj.kind === 'batterfly' || obj.kind === 'kitty' || obj.kind === 'crab') {
+    if (obj.kind === 'chicken' || obj.kind === 'butterfly' || obj.kind === 'batterfly' || obj.kind === 'kitty' || obj.kind === 'crab' || obj.kind === 'dragon') {
       creatureEvent(engine, obj, msg);
       return;
     }
@@ -449,8 +450,8 @@ function setPath(engine, obj) {
       return true;
     };
   }
-  if (obj.kind === 'kitty' || obj.kind === 'crab') {
-    // A Heli Kitty or a Crab (slice 2): its spot is the server's, its walk the run of floor from
+  if (obj.kind === 'kitty' || obj.kind === 'crab' || obj.kind === 'dragon') {
+    // A Heli Kitty, a Crab (slice 2) or a Fire Dragon (slice 3): its spot is the server's, its walk the run of floor from
     // there (js/street-creatures.js walkerSpan), its pauses rolled from a seed every page shares
     // (kittyWalkAt, crabWalkAt). Its feature draws it from spr._walkerPath() (the place, heading,
     // pose, and whether someone holds it) instead of its own wander.
@@ -460,7 +461,7 @@ function setPath(engine, obj) {
     const span = walkerSpan(engine.platforms, sx, sy, { worldW: Number(engine.worldW) || 0, ...WALKER_REACH[obj.kind] });
     const home = { l: span.l, r: span.r, x0: sx, y0: sy, dir: obj.index % 2 ? 1 : -1 };
     const seed = chickenSeed(obj.index, sx);
-    const walkAt = obj.kind === 'kitty' ? kittyWalkAt : crabWalkAt;
+    const walkAt = obj.kind === 'kitty' ? kittyWalkAt : obj.kind === 'dragon' ? dragonWalkAt : crabWalkAt;
     pointAt = () => ({
       ...walkAt(home, pathTime(t.sharedPath, Date.now(), copy.offset), seed),
       held: Number(t.sharedPath?.holdEnd) > Date.now() + (Number(copy.offset) || 0),
@@ -535,7 +536,7 @@ function creatureEvent(engine, obj, msg) {
   if (ev === 'squeeze' || ev === 'massage' || ev === 'milk') engine.playVerbAnimation?.(t, ev, 1500);
   else if (ev === 'feed' && obj.kind === 'batterfly') engine.query?.('batterflyChew', t, engine);
   // Someone petted a Heli Kitty (it curls up asleep) or flattered, hugged, insulted or pinched a Crab.
-  else if (obj.kind === 'kitty' || obj.kind === 'crab') engine.query?.('walkerVerbSeen', t, ev, engine);
+  else if (obj.kind === 'kitty' || obj.kind === 'crab' || obj.kind === 'dragon') engine.query?.('walkerVerbSeen', t, ev, engine);
   lastAnswer = `${obj.id}:${ev}:seen`;
   publish(engine);
 }
@@ -547,7 +548,7 @@ function showCreatures(engine, all) {
   creaturesShownAt = wall;
   const rows = [];
   for (const obj of all) {
-    if (obj.kind !== 'chicken' && obj.kind !== 'butterfly' && obj.kind !== 'batterfly' && obj.kind !== 'kitty' && obj.kind !== 'crab' && !(obj.kind === 'pig' && copy.pigPaths)) continue;
+    if (obj.kind !== 'chicken' && obj.kind !== 'butterfly' && obj.kind !== 'batterfly' && obj.kind !== 'kitty' && obj.kind !== 'crab' && obj.kind !== 'dragon' && !(obj.kind === 'pig' && copy.pigPaths)) continue;
     const spr = obj.target?.sprite;
     if (!spr) continue;
     // Where it is on the street, and (#) on the canvas, for QA scripts that click it.
@@ -579,7 +580,7 @@ function redraw(engine, obj, before = null) {
   } else if (obj.kind === 'chicken' || obj.kind === 'butterfly') {
     if (obj.target) obj.target.subtitle = sharedCreatureLabel(obj.classId, obj.state) || animalStatusLabel(obj.classId, obj.state);
     setPath(engine, obj);
-  } else if (obj.kind === 'batterfly' || obj.kind === 'kitty' || obj.kind === 'crab') {
+  } else if (obj.kind === 'batterfly' || obj.kind === 'kitty' || obj.kind === 'crab' || obj.kind === 'dragon') {
     setPath(engine, obj);
   } else obj.refresh?.();
   // G334: the server says this street tree died (for everyone): it dies here too.
@@ -1001,6 +1002,12 @@ export const streetObjectsFeature = {
     return true;
   },
 
+  /** The server's clock now (ms) while this street's objects are shared, else null (resource-nodes-feature's Salmon). */
+  sharedClockNow(engine) {
+    if (!shared(engine)) return null;
+    return Date.now() + (Number(copy.offset) || 0);
+  },
+
   /**
    * A verb on a shared Heli Kitty or Crab landed here (heli-kitties-feature's pet, crabs-feature's
    * flatter, hug, insult, pinch): what it gave stays this player's (the local rules ran); the server
@@ -1008,7 +1015,7 @@ export const streetObjectsFeature = {
    */
   sharedWalkerVerb(target, verb, engine) {
     const a = creatureOf(target);
-    if (!a || (a.kind !== 'kitty' && a.kind !== 'crab') || !shared(engine) || !copy.animals.has(a.id)) return null;
+    if (!a || (a.kind !== 'kitty' && a.kind !== 'crab' && a.kind !== 'dragon') || !shared(engine) || !copy.animals.has(a.id)) return null;
     reqSeq += 1;
     if (!client.send('obj_act', actMessage({ req: reqSeq, id: a.id, verb: String(verb || '') }))) return null;
     pending.set(reqSeq, { id: a.id, target, verbId: String(verb || ''), at: Date.now(), silent: true });

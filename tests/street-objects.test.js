@@ -38,9 +38,9 @@ import {
   takeObjs,
   treeReady,
   treeSkill,
-} from '../public/js/street-objects.js?v=41e61b77';
-import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=636d7e3a';
-import { FEATURES } from '../public/js/features/index.js?v=31d926b7';
+} from '../public/js/street-objects.js?v=afa39058';
+import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=b5536d43';
+import { FEATURES } from '../public/js/features/index.js?v=dc27c808';
 import { createMineRock, mineRock } from '../public/js/mining.js?v=f132ad75';
 import { createResourceNode } from '../public/js/resource-nodes.js?v=1ecc9789';
 import { createTrantState, fruitCapacityAt, setTrantTables } from '../public/js/trants.js?v=1b3c8ae3';
@@ -66,7 +66,7 @@ describe('street objects: the pure rules', () => {
   });
 
   it('shares the stock verbs only', () => {
-    assert.deepEqual(SHARED_NODE_CLASSES, ['mortar_barnacle', 'ice_knob', 'jellisac', 'dirt_pile', 'peat_1', 'paper_tree']);
+    assert.deepEqual(SHARED_NODE_CLASSES, ['mortar_barnacle', 'ice_knob', 'jellisac', 'dirt_pile', 'peat_1', 'paper_tree', 'npc_salmon']);
     assert.equal(sharedNodeVerb('peat_2', 'harvest'), true);
     assert.equal(sharedNodeVerb('dirt_pile', 'dig'), true);
     assert.equal(sharedNodeVerb('paper_tree', 'pet'), true);

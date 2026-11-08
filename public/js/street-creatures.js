@@ -58,6 +58,7 @@ import { isStandable } from './street-model.js?v=b6cb6a4e';
 import { ANIMAL_BODY, TREE_FOOTPRINT } from './street-ecology.js?v=08076876';
 import { KITTY_MOTION, KITTY_PAUSE_CHOICES } from './heli-kitties.js?v=8fbe314a';
 import { CRAB_WALK } from './crabs.js?v=90964bf8';
+import { FIRE_DRAGON_WALK } from './fire-dragon.js?v=b7f3d751';
 import { walkSurfaceY } from './walk-surface.js?v=106bfdc5';
 import { EAT_PAUSE_MS } from './animal-mood.js?v=a49495fc';
 
@@ -108,6 +109,10 @@ export function creatureOf(target) {
   if (target.classId === 'npc_kitty_chicken' && target.featureId === 'heli-kitties') {
     const m = /^kitty:(\d{1,2})$/.exec(String(target.kittyKey || ''));
     return m ? { id: creatureId('kitty', Number(m[1])), kind: 'kitty', index: Number(m[1]) } : null;
+  }
+  if (target.classId === 'npc_fire_dragon' && target.featureId === 'fire-dragon') {
+    const m = /^dragon:(\d{1,2})$/.exec(String(target.dragonKey || ''));
+    return m ? { id: creatureId('dragon', Number(m[1])), kind: 'dragon', index: Number(m[1]) } : null;
   }
   if (target.classId === 'npc_crab' && target.featureId === 'crabs') {
     const m = /^crab:(\d{1,2})$/.exec(String(target.crabKey || ''));
@@ -443,6 +448,7 @@ export function piggyAt(home, t, seed = 1, trip = null) {
 export const WALKER_REACH = Object.freeze({
   kitty: Object.freeze({ up: 40, down: 70, edge: KITTY_MOTION.edgeInset }),
   crab: Object.freeze({ up: 24, down: 40, edge: CRAB_WALK.edge }),
+  dragon: Object.freeze({ up: 24, down: 40, edge: FIRE_DRAGON_WALK.edge }),
 });
 
 const spanCache = new WeakMap();
@@ -610,6 +616,102 @@ export function crabWalkAt(home, t, seed = 1) {
     seg = g;
   }
   if (seg.pose !== 'walk') return { x: seg.x, dir: -1, pose: seg.pose };
+  const f = seg.ms > 0 ? Math.min(1, (tc - seg.at) / seg.ms) : 1;
+  return { x: seg.x + (seg.to - seg.x) * f, dir: seg.to >= seg.x ? 1 : -1, pose: 'walk' };
+}
+
+/**
+ * A Pocket Salmon's swim (resource-nodes-feature placeSalmon, its solo twin): to and fro `range` px
+ * either side of its spot at 0.042 px/ms, playing its turn clip at each end (turnRight: 11 frames
+ * at 0.42 a 60 fps frame, about 437 ms), bobbing 7 px. Online (slice 3 of
+ * research/plans/street-animals-shared.md) it is this pure function of the server's clock, so every
+ * page has each Salmon in the same place. start: { offset0, dir0, range, phase } from its key's
+ * hash; t: path time (ms). Returns { offset, dir, turning, bob }.
+ */
+export const SALMON_SWIM = Object.freeze({ speed: 0.042, turnMs: Math.round((11 / 0.42) * (1000 / 60)), bob: 7, bobRate: 1.7 });
+
+export function salmonSwimAt({ offset0 = 0, dir0 = 1, range = 130, phase = 0 } = {}, t = 0) {
+  const { speed: v, turnMs: T } = SALMON_SWIM;
+  const R = Math.max(1, range);
+  const leg = (2 * R) / v;
+  const P = 2 * leg + 2 * T;
+  const o = Math.max(-R, Math.min(R, offset0));
+  const u0 = dir0 > 0 ? (o + R) / v : leg + T + (R - o) / v;
+  const u = mod(u0 + (Number(t) || 0), P);
+  const bob = Math.sin((Number(t) || 0) / 1000 * SALMON_SWIM.bobRate + phase) * SALMON_SWIM.bob;
+  if (u < leg) return { offset: -R + v * u, dir: 1, turning: false, bob };
+  if (u < leg + T) return { offset: R, dir: -1, turning: true, bob };
+  if (u < 2 * leg + T) return { offset: R - v * (u - leg - T), dir: -1, turning: false, bob };
+  return { offset: -R, dir: 1, turning: true, bob };
+}
+
+/** The roams in one round of a shared Fire Dragon's walk (dragonPlan). */
+export const DRAGON_PLAN_MOVES = 10;
+
+/**
+ * A shared Fire Dragon's roam (slice 3 of research/plans/street-animals-shared.md; the made animal's
+ * own walk, js/fire-dragon.js and fire-dragon-feature, its solo twin): it stands 1.5 to 3.5 s, then
+ * walks 220 to 380 px the way it is going at 55 to 65 px/s (never past its span), turns and stands 3
+ * to 8 s; where its floor ends it turns and stands 1 s. Rolled from a seed every page shares, as one
+ * round that comes back to its spot. Segs as crabPlan's, pose 'walk' or 'stand'.
+ */
+export function dragonPlan({ l = 0, r = 0, x0 = 0 } = {}, seed = 1) {
+  const key = `dragon|${l}|${r}|${x0}|${seed}`;
+  const hit = planCache.get(key);
+  if (hit) return hit;
+  const W = FIRE_DRAGON_WALK;
+  const rng = seededRandom(seed);
+  const speed = W.speedMin + Math.floor(rng() * (W.speedMax - W.speedMin + 1));
+  const v = speed / 1000;
+  const segs = [];
+  let at = 0;
+  let x = x0;
+  let goDir = rng() < 0.5 ? -1 : 1;
+  const stand = (ms) => {
+    segs.push({ at, ms, x, to: x, pose: 'stand' });
+    at += ms;
+  };
+  stand(Math.round(1500 + rng() * 2000));
+  for (let k = 0; k < DRAGON_PLAN_MOVES; k += 1) {
+    const range = goDir < 0 ? W.left : W.right;
+    let d = Math.round(range[0] + rng() * (range[1] - range[0]));
+    if (d < 0 && x + d < l) d = Math.min(0, l - x);
+    else if (d > 0 && x + d > r) d = Math.max(0, r - x);
+    goDir = -goDir;
+    if (Math.abs(d) < 0.5) {
+      stand(W.stuckWaitMs);
+      continue;
+    }
+    const ms = Math.abs(d) / v;
+    segs.push({ at, ms, x, to: x + d, pose: 'walk' });
+    at += ms;
+    x += d;
+    stand(Math.round(W.restMin + rng() * (W.restMax - W.restMin)));
+  }
+  if (Math.abs(x - x0) >= 0.5) {
+    const ms = Math.abs(x0 - x) / v;
+    segs.push({ at, ms, x, to: x0, pose: 'walk' });
+    at += ms;
+  }
+  const plan = Object.freeze({ ms: at, v, speed, segs });
+  if (planCache.size > 256) planCache.clear();
+  planCache.set(key, plan);
+  return plan;
+}
+
+/** A shared Fire Dragon at path time t: x, heading and pose ('walk' or 'stand'). */
+export function dragonWalkAt(home, t, seed = 1) {
+  const plan = dragonPlan(home, seed);
+  if (!(plan.ms > 0)) return { x: home?.x0 ?? 0, dir: 1, pose: 'stand' };
+  const tc = mod(Number(t) || 0, plan.ms);
+  let seg = plan.segs[0];
+  let dir = 1;
+  for (const g of plan.segs) {
+    if (g.at > tc) break;
+    seg = g;
+    if (g.pose === 'walk') dir = g.to >= g.x ? 1 : -1;
+  }
+  if (seg.pose !== 'walk') return { x: seg.x, dir, pose: 'stand' };
   const f = seg.ms > 0 ? Math.min(1, (tc - seg.at) / seg.ms) : 1;
   return { x: seg.x + (seg.to - seg.x) * f, dir: seg.to >= seg.x ? 1 : -1, pose: 'walk' };
 }

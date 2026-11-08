@@ -31,8 +31,12 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { requireServer, serverPath } from './repos.mjs';
 
+import { STREET_INDEX, applyStreetIndex, loadStreetDataFromFs, setZoneStreetsShown } from '../public/js/street-loader.js?v=18b181ad';
+import { streetWidth } from '../public/js/street-model.js?v=b6cb6a4e';
+import { entranceScreenX } from '../public/js/features/foxes-feature.js?v=6a0c19d0';
+import { preserveLayout } from '../public/js/foxes.js?v=c75842a8';
 import { FOX_TEXT, FOX_TIMING } from '../public/js/foxes.js?v=c75842a8';
-import { FOX_LEAVE_MS, FOX_PLAYERS_PER_FOX } from '../public/js/foxes-mp.js?v=cc270410';
+import { FOX_LEAVE_MS, FOX_PLAYERS_PER_FOX } from '../public/js/foxes-mp.js?v=db83040d';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const outPath = serverPath('data', 'foxes.json');
@@ -74,9 +78,38 @@ export function foxesData() {
   };
 }
 
+/**
+ * Each preserve as every page lays it out (features/foxes-feature.js setupPreserve, js/foxes.js
+ * preserveLayout): its width, its Fox Stop Markers, the Ranger and the spawner, so the server can run
+ * its foxes where every page draws them (foxes.go foxes_walk.go, slice 3 of
+ * research/plans/street-animals-shared.md). w is the street's width (game.js worldW).
+ */
+export async function foxLayouts() {
+  setZoneStreetsShown(false);
+  const streetsDir = join(root, 'public', 'assets', 'streets');
+  applyStreetIndex(JSON.parse(readFileSync(join(streetsDir, 'index.json'), 'utf8')));
+  const eco = JSON.parse(readFileSync(join(root, 'public', 'assets', 'content', 'street-ecology.json'), 'utf8'));
+  const out = {};
+  for (const tsid of preserveStreets()) {
+    if (!STREET_INDEX.streets?.[tsid]) continue;
+    let street;
+    try {
+      street = await loadStreetDataFromFs(tsid, streetsDir);
+    } catch {
+      continue;
+    }
+    const worldW = streetWidth(street);
+    const entranceX = entranceScreenX(street, worldW);
+    const seed = [...String(tsid)].reduce((h, c) => (h * 31 + c.charCodeAt(0)) >>> 0, 7);
+    const layout = preserveLayout({ worldW, entranceX, markerCount: Number(eco.wildlife?.[tsid]?.fox_stop_marker) || 0, seed });
+    out[tsid] = { w: worldW, markers: layout.markers, ranger: layout.rangerX, spawner: layout.spawnerX };
+  }
+  return out;
+}
+
 async function main() {
   requireServer();
-  const text = `${JSON.stringify(foxesData())}\n`;
+  const text = `${JSON.stringify({ ...foxesData(), layouts: await foxLayouts() })}\n`;
   if (process.argv.includes('--check')) {
     const now = await readFile(outPath, 'utf8').catch(() => '');
     if (now !== text) {

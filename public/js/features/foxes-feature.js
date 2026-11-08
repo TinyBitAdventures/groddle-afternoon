@@ -33,7 +33,11 @@
  * foxRangerTalk; multiplayer foxMp (server foxes:baits) and foxFlurry.
  *
  * Multiplayer (G329, js/foxes-mp.js): the realtime server's foxes.go owns each
- * preserve's foxes and baits, so the players there see the same foxes. An
+ * preserve's foxes and baits, so the players there see the same foxes. Since
+ * slice 3 of research/plans/street-animals-shared.md it runs them too
+ * (foxes_walk.go): each fox_walk leg is drawn here on the server's clock
+ * (onServerLeg), so a fox is in the same place on every page and reaches a
+ * bait at the same moment, when the server eats it. An
  * ignite sends fox_ignite (the server drops the three baits for everyone and
  * spawns the fox, one per three players on the street); a brush still pays the
  * brusher here and sends fox_brush (the server sends the fox away after three
@@ -82,7 +86,8 @@ import {
   splitConversation,
   stepFox,
 } from '../foxes.js?v=c75842a8';
-import { FOX_FLURRY_COUNTER, igniteBaitXs, normalizeBaits, normalizeFoxes, preserveOverCapacity, serverId } from '../foxes-mp.js?v=cc270410';
+import { FOX_FLURRY_COUNTER, foxLegFrom, foxOnLeg, igniteBaitXs, normalizeBaits, normalizeFoxes, preserveOverCapacity, serverId } from '../foxes-mp.js?v=db83040d';
+import { clockOffset } from '../street-creatures.js?v=fa8f9bcc';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
 
 export const FOX_FEATURE_ID = 'foxes';
@@ -511,10 +516,34 @@ function tickBaits(engine, now) {
   }
 }
 
+/**
+ * Multiplayer: a fox the server runs (foxes_walk.go) is drawn on its leg, from the server's clock, so
+ * everyone sees it in the same place; the server eats the baits and sends it off the street.
+ */
+function onServerLeg(engine, entity) {
+  const leg = mp && entity.serverId ? mp.legs.get(entity.serverId) : null;
+  const at = leg ? foxOnLeg(leg, Date.now() + (mp.offset || 0)) : null;
+  if (!at) return false;
+  const fox = entity.fox;
+  const dx = at.x - fox.x;
+  // On its leg; a fresh leg from where this page drew it eases in rather than jumping.
+  fox.x = Math.abs(dx) > 400 ? at.x : fox.x + dx * (Math.abs(dx) > 30 ? 0.35 : 1);
+  if (at.dir) fox.dir = at.dir < 0 ? 'left' : 'right';
+  if (at.state === 'brushed') entity.flashUntil = Math.max(entity.flashUntil, Date.now() + 120);
+  else fox.state = at.state;
+  const y = walkSurfaceY(engine.platforms, fox.x, fox.y, { up: 60, down: 90 });
+  if (y != null) fox.y = y;
+  return true;
+}
+
 function tickFoxes(engine, dtMs, now) {
   if (!foxes.length) return;
   const world = worldFor(engine);
   for (const entity of [...foxes]) {
+    if (onServerLeg(engine, entity)) {
+      placeFox(engine, entity);
+      continue;
+    }
     const events = stepFox(entity.fox, dtMs, world, rng);
     for (const ev of events) {
       if (ev.type === 'eat') {
@@ -557,9 +586,26 @@ function tickFoxes(engine, dtMs, now) {
 function mpSession(engine) {
   const client = engine.query?.('realtimeClient');
   if (!client) return null;
-  mp = { client, foxes: new Map(), baits: new Map(), departed: new Set(), refundAt: 0, nextSync: 0 };
+  mp = { client, foxes: new Map(), baits: new Map(), departed: new Set(), refundAt: 0, nextSync: 0, legs: new Map(), clock: [], offset: 0 };
   const dirty = () => { mp.nextSync = 0; };
+  // The server's clock, from its frames' "now" (the least delayed of the last 30 s, as the street animals').
+  const tick = (msg) => {
+    if (Number(msg?.now) > 0) mp.offset = clockOffset(mp.clock, Number(msg.now), Date.now());
+  };
+  client.on('msg:fox_walk', (msg) => {
+    // Slice 3: the server runs its foxes (foxes_walk.go); every page draws the same leg.
+    tick(msg);
+    const id = serverId(msg.fox);
+    const leg = foxLegFrom(msg);
+    if (id && leg) mp.legs.set(id, leg);
+  });
   client.on('msg:fox_state', (msg) => {
+    tick(msg);
+    mp.legs = new Map();
+    for (const row of Array.isArray(msg.foxes) ? msg.foxes : []) {
+      const leg = foxLegFrom(row?.walk);
+      if (leg && serverId(row.id)) mp.legs.set(serverId(row.id), leg);
+    }
     mp.foxes = new Map(normalizeFoxes(msg.foxes).map((f) => [f.id, { leaving: f.leaving }]));
     mp.baits = new Map(normalizeBaits(msg.baits).map((b) => [b.id, { x: b.x, dropAt: 0 }]));
     mp.departed.clear();

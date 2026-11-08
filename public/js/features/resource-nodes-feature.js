@@ -35,6 +35,11 @@
  * resourceNodeCount, resourceNodeClasses, resourceLastHarvest, fireflyJar,
  * resourceDemo.
  *
+ * Pocket Salmon online (slice 3 of research/plans/street-animals-shared.md):
+ * a street's Salmon are shared nodes (street-objects-feature): one pocketed is
+ * gone for everyone until the server's 10 s respawn, and each swims on the
+ * server's clock (placeSharedSalmon), the same on every page.
+ *
  * Pocket Salmon: Release (G178, items/salmon.js 30-100; rules in
  * js/resource-nodes.js SALMON_RELEASE). A pack button on the Pocket Salmon,
  * shown only in Jal (hub 136) and Samudra (hub 140) while the street has
@@ -93,6 +98,8 @@ import { OVERLAY_USES, playOverlay } from '../overlays.js?v=ed371926';
 import { OVERLAY_FADE } from '../overlay-art.js?v=11b6dd7f';
 import { vpSequence } from '../quest-rooms/vp-overlay.js?v=b231d65a';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
+import { salmonSwimAt } from '../street-creatures.js?v=fa8f9bcc';
+import { GAME_EPOCH_MS } from '../game-day.js?v=edb00566';
 
 export const RESOURCE_FEATURE_ID = 'resource-nodes';
 export const RESOURCE_GROUP_PREFIX = 'resource:';
@@ -805,8 +812,47 @@ function buildSalmonView(engine, entity) {
   placeSalmon(entity, 0);
 }
 
-function placeSalmon(entity, dtMs) {
+/**
+ * Online a street's Salmon swim on the server's clock (js/street-creatures.js salmonSwimAt, from
+ * street-objects-feature's sharedClockNow), so every page has each in the same place; one released
+ * from a pack (release:<n>) is this player's own and swims its own way.
+ */
+function placeSharedSalmon(entity, now) {
   const view = entity.view;
+  const seed = hash(entity.key);
+  const at = salmonSwimAt({ offset0: ((seed % 200) - 100) * 0.8, dir0: seed % 2 ? 1 : -1, range: view.range, phase: view.phase }, now - GAME_EPOCH_MS);
+  if (at.turning && !view.turning) {
+    // turnRight turns a left-facing fish to face right; mirrored, it turns a right-facing one left.
+    view.turning = true;
+    view.fish.scale.x = at.dir;
+    if (view.turn.length) {
+      view.fish.textures = view.turn;
+      view.fish.loop = false;
+      view.fish.animationSpeed = 0.42;
+      view.fish.onComplete = null;
+      view.fish.gotoAndPlay(0);
+    }
+  } else if (!at.turning && (view.turning || view.fish.textures !== view.swim)) {
+    view.turning = false;
+    view.fish.textures = view.swim;
+    view.fish.loop = true;
+    view.fish.animationSpeed = 0.4;
+    view.fish.play();
+  }
+  if (!at.turning) view.fish.scale.x = at.dir;
+  view.dir = at.dir;
+  view.offset = at.offset;
+  view.sprite.x = entity.x + at.offset;
+  view.sprite.y = entity.y - view.depth + at.bob + 22;
+}
+
+function placeSalmon(entity, dtMs, engine = null) {
+  const view = entity.view;
+  const shared = engine && !String(entity.key).startsWith('release:') ? engine.query?.('sharedClockNow', engine) : null;
+  if (Number.isFinite(shared)) {
+    placeSharedSalmon(entity, shared);
+    return;
+  }
   view.t += dtMs / 1000;
   if (!view.turning) {
     view.offset += view.dir * 0.042 * dtMs;
@@ -1345,7 +1391,8 @@ function releaseGate(engine) {
 function salmonBackInWater(engine) {
   const p = engine.player || { x: 0, y: 0 };
   const y = surfaceNear(engine.platforms, p.x, p.y);
-  const back = pickReleasedSalmon(entities, p.x);
+  // Online the street's own Salmon come back on the server's clock: a released one is new, and yours.
+  const back = engine.query?.('sharedClockNow', engine) == null ? pickReleasedSalmon(entities, p.x) : null;
   if (back) {
     respawnReleasedSalmon(back.node);
     // Moved for this visit only: the plan seats it again on the next entry.
@@ -1655,7 +1702,7 @@ export const resourceNodesFeature = {
       const view = entity.view;
       if (!view) continue;
       if (view.kind === 'firefly') placeFirefly(entity, dtMs);
-      else if (view.kind === 'salmon') placeSalmon(entity, dtMs);
+      else if (view.kind === 'salmon') placeSalmon(entity, dtMs, engine);
       else if (view.kind === 'sloth') placeSloth(engine, entity, dtMs, now);
       else if (view.kind === 'trap' && entity.node.depleted) refreshTrap(engine, entity);
     }
@@ -1720,7 +1767,8 @@ export const resourceNodesFeature = {
    * left to the realtime server; refresh() redraws after a state change.
    */
   streetResourceNodes(engine) {
-    return entities.filter((entity) => entity !== demoEntity).map((entity) => ({
+    // A Salmon released from a pack (release:<n>) is the player's own, never the street's.
+    return entities.filter((entity) => entity !== demoEntity && !String(entity.key).startsWith('release:')).map((entity) => ({
       key: entity.key,
       classTsid: entity.classTsid,
       node: entity.node,

@@ -38,10 +38,17 @@ import { TRANT_META, canHarvestTrant, fruitCapacityAt, resolveArborologyPackage 
 import { highestLightGreenThumbRank, quoteTrantCare } from './trant-care.js?v=8339adef';
 import { RESOURCE_NODE_ALIASES, RESOURCE_NODE_CATALOG, resolveResourceSkillPackage } from './resource-nodes.js?v=1ecc9789';
 import { highestAnimalKinshipRank } from './animal-kinship.js?v=ae02d8d3';
-import { applyCreatureState, clockOffset, pathFrom } from './street-creatures.js?v=6abb5f1d';
+import { applyCreatureState, clockOffset, pathFrom } from './street-creatures.js?v=fa8f9bcc';
 
 /** The resource-node classes whose stock is shared (the "N uses left, then regrows" nodes). */
-export const SHARED_NODE_CLASSES = Object.freeze(['mortar_barnacle', 'ice_knob', 'jellisac', 'dirt_pile', 'peat_1', 'paper_tree']);
+/**
+ * Pocket Salmon (npc_salmon) are shared too since slice 3 of research/plans/street-animals-shared.md:
+ * the one npc_salmon item swam for everyone and a pocketed one was gone for everyone until the
+ * spawner put another in the water 10 s later (npc_salmon.js verbs.pocket apiDelete; spawner.js
+ * spawn_interval), so the server keeps whether each is there; where it swims is one path from the
+ * server's clock (js/salmon-swim.js).
+ */
+export const SHARED_NODE_CLASSES = Object.freeze(['mortar_barnacle', 'ice_knob', 'jellisac', 'dirt_pile', 'peat_1', 'paper_tree', 'npc_salmon']);
 
 /** The verbs that change shared state, per kind. Everything else stays local. */
 export const SHARED_VERBS = Object.freeze({
@@ -119,7 +126,7 @@ export function streetPigIndex(target, streetTsid) {
 
 /** The kind an id names ('rock' | 'tree' | 'node' | 'pig' | 'chicken' | 'butterfly' | 'batterfly'), or ''. */
 export function idKind(id) {
-  const m = /^(rock|tree|node|pig|chicken|butterfly|batterfly|kitty|crab):/.exec(String(id || ''));
+  const m = /^(rock|tree|node|pig|chicken|butterfly|batterfly|kitty|crab|dragon):/.exec(String(id || ''));
   return m ? m[1] : '';
 }
 
@@ -244,6 +251,10 @@ export function freshenNode(node) {
   if (!node || !def) return node;
   node.units = def.stock.initial;
   node.regrowAt = 0;
+  if (def.stock.model === 'respawn') {
+    node.depleted = false;
+    node.respawnAt = 0;
+  }
   if (def.classTsid === 'paper_tree') {
     node.petted = false;
     node.watered = false;
@@ -257,6 +268,12 @@ export function applyNodeState(node, s, now = Date.now()) {
   if (!node || !s || !def) return node;
   node.units = Math.max(def.stock.min, Math.min(def.stock.max, Math.floor(Number(s.units) || 0)));
   node.regrowAt = node.units < def.stock.max ? deadline(s.in, now) : 0;
+  if (def.stock.model === 'respawn') {
+    // A pocketed Salmon: gone until the server's respawn.
+    node.depleted = node.units < 1;
+    node.respawnAt = node.depleted ? deadline(s.in, now) || now + (def.respawnMs || 10000) : 0;
+    node.regrowAt = 0;
+  }
   if (def.classTsid === 'paper_tree') {
     node.petted = s.petted === true;
     node.watered = s.watered === true;
@@ -465,7 +482,7 @@ export function reconcile(obj, copy, now = Date.now()) {
       const row = copy.objs.get(obj.id);
       obj.target.sharedPath = pathFrom(s, row?.at ?? now, row?.off ?? copy.offset, row?.srv);
     }
-  } else if (obj.kind === 'chicken' || obj.kind === 'butterfly' || obj.kind === 'batterfly' || obj.kind === 'kitty' || obj.kind === 'crab') {
+  } else if (obj.kind === 'chicken' || obj.kind === 'butterfly' || obj.kind === 'batterfly' || obj.kind === 'kitty' || obj.kind === 'crab' || obj.kind === 'dragon') {
     // An animal the server does not list is fresh: on its path from the start, nobody's egg.
     applyCreatureState(obj.classId, obj.state, s, { me: obj.me, now });
     const row = copy.objs.get(obj.id);

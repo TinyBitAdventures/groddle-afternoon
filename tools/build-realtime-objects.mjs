@@ -80,18 +80,19 @@ import { ARBOROLOGY_HARVEST, TRANT_META } from '../public/js/trants.js?v=1b3c8ae
 import { TRANT_CARE_PACKAGES } from '../public/js/trant-care.js?v=8339adef';
 import { ANIMAL_KINSHIP_PACKAGES } from '../public/js/animal-kinship.js?v=ae02d8d3';
 import { locationIsDepressing } from '../public/js/animal-mood.js?v=a49495fc';
-import { resourcePlacementGroups, resourceSpawnPlan } from '../public/js/features/resource-nodes-feature.js?v=42e6995e';
-import { soilCountsForStreet, soilPlacementGroups } from '../public/js/features/patches-feature.js?v=91433cb0';
-import { KITTY_GROUP, kittyPlacementGroups } from '../public/js/features/heli-kitties-feature.js?v=7a82dd14';
-import { BATTERFLY_GROUP, batterflyPlacementGroups } from '../public/js/features/animal-husbandry-feature.js?v=2a7d55ba';
+import { resourcePlacementGroups, resourceSpawnPlan } from '../public/js/features/resource-nodes-feature.js?v=e5687e7e';
+import { soilCountsForStreet, soilPlacementGroups } from '../public/js/features/patches-feature.js?v=d5f3eae0';
+import { KITTY_GROUP, kittyPlacementGroups } from '../public/js/features/heli-kitties-feature.js?v=203df965';
+import { BATTERFLY_GROUP, batterflyPlacementGroups } from '../public/js/features/animal-husbandry-feature.js?v=cea6b138';
 import { hasRaceDispenser } from '../public/js/races.js?v=ab22a079';
 import { setWildlifeCatalog, wildlifeFor } from '../public/js/wildlife.js?v=670c3a7f';
 import { boardSpotRow, furnitureFor, furniturePlacementGroups } from '../public/js/street-furniture.js?v=026c21ef';
 import { INCUBATION } from '../public/js/animal-husbandry.js?v=4fd2fae5';
-import { SHARED_NODE_CLASSES, freshTreePlan } from '../public/js/street-objects.js?v=41e61b77';
-import { PIGGY_TRIP } from '../public/js/street-creatures.js?v=6abb5f1d';
+import { SHARED_NODE_CLASSES, freshTreePlan } from '../public/js/street-objects.js?v=afa39058';
+import { PIGGY_TRIP } from '../public/js/street-creatures.js?v=fa8f9bcc';
 import { CRAB_PLACEMENT_KEY, CRAB_WALK, crabPlacementGroups } from '../public/js/crabs.js?v=90964bf8';
 import { KITTY_PET } from '../public/js/heli-kitties.js?v=8fbe314a';
+import { FIRE_DRAGON_PLACEMENT_KEY, FIRE_DRAGON_WALK, fireDragonPlacementGroups } from '../public/js/fire-dragon.js?v=b7f3d751';
 import { isZoneTsid } from '../public/js/zone-streets.js?v=b40010d5';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -175,6 +176,7 @@ function groundY(platforms) {
  *   batterflies [i, x, y]                  animal-husbandry-feature spawnStreet (batterfly:<i>)
  *   kitties     [i, x, y]                  heli-kitties-feature (kitty:<i>, the planner's kitty group)
  *   crabs       [i, x, y]                  crabs-feature (crab:<i>, its crabs group after the others)
+ *   dragons     [i, x, y]                  fire-dragon-feature (dragon:<i>, after the Crabs; none yet)
  */
 export function streetObjectLayout(data, { starter = false, ecology = ecologyForStreet(data.tsid) } = {}) {
   const population = populationForStreet(data.tsid, ecology, { starter });
@@ -240,9 +242,13 @@ export function streetObjectLayout(data, { starter = false, ecology = ecologyFor
   let crabs = [];
   const kittyGroups = kittyPlacementGroups(wildlifeFor(ecologyCatalog, data.tsid));
   const crabGroups = crabPlacementGroups(data.tsid);
-  if (batterflyPlacementGroups(data).length || kittyGroups.length || crabGroups.length) {
+  // Fire Dragons (fire-dragon-feature, after the Crabs; slice 3): from the street's population, which
+  // no shared street has yet (the made animal lives in a draft zone, and zones are solo only).
+  const dragonGroups = fireDragonPlacementGroups(population);
+  let dragons = [];
+  if (batterflyPlacementGroups(data).length || kittyGroups.length || crabGroups.length || dragonGroups.length) {
     const requests = creatureRequests(population, data, ecologyCatalog);
-    const full = planStreetPlacements(platforms, [...requests, ...crabGroups], {
+    const full = planStreetPlacements(platforms, [...requests, ...crabGroups, ...dragonGroups], {
       worldW: streetWidth(data),
       seed: data.tsid,
       reserved,
@@ -251,9 +257,10 @@ export function streetObjectLayout(data, { starter = false, ecology = ecologyFor
     kitties = (full.groups[KITTY_GROUP] || []).slice(0, kittyGroups[0]?.count || 0)
       .filter((p) => Number.isFinite(p?.x) && Number.isFinite(p?.y)).map((p, i) => [i, r1(p.x), r1(p.y)]);
     crabs = (full.groups[CRAB_PLACEMENT_KEY] || []).map((p, i) => [i, r1(p.x), r1(p.y ?? ground)]);
+    dragons = (full.groups[FIRE_DRAGON_PLACEMENT_KEY] || []).map((p, i) => [i, r1(p.x), r1(p.y ?? ground)]);
   }
 
-  return { rocks, trees, nodes, pigs, trunks, sad, chickens, butterflies, batterflies, kitties, crabs };
+  return { rocks, trees, nodes, pigs, trunks, sad, chickens, butterflies, batterflies, kitties, crabs, dragons };
 }
 
 /** The rule numbers the server applies, from the game's own tables. */
@@ -276,6 +283,8 @@ export function ruleTables(trantTables) {
     if (def.stock.afterHarvest != null) row.after = def.stock.afterHarvest;
     if (def.stock.consume != null) row.consume = def.stock.consume;
     if (def.regrow) row.regrow = [def.regrow.minMs, def.regrow.maxMs, def.regrow.stepMs];
+    // A Salmon comes back one at a time, respawnMs after it was pocketed (spawner.js spawn_interval).
+    else if (def.stock.model === 'respawn' && def.respawnMs) row.regrow = [def.respawnMs, def.respawnMs, def.respawnMs];
     if (def.tend) row.tend = { refill: def.tend.refill, resetMs: def.tend.resetMs };
     nodes[id] = row;
   }
@@ -310,7 +319,7 @@ export function ruleTables(trantTables) {
   // A street Piggy's walk to food and home (js/street-creatures.js PIGGY_TRIP, the server's startTrip).
   const pigtrip = { ...PIGGY_TRIP };
   // How long a landed verb holds a Heli Kitty (its sleep) or a Crab (its menu wait) for everyone.
-  const holds = { kittyPet: KITTY_PET.totalMs, crabVerb: CRAB_WALK.menuWaitMs };
+  const holds = { kittyPet: KITTY_PET.totalMs, crabVerb: CRAB_WALK.menuWaitMs, dragonPet: FIRE_DRAGON_WALK.menuWaitMs };
   return { rocks, mega, nodes, harvest, care, trants, prod, dig, pig, ak, incubate, pigtrip, holds };
 }
 
@@ -325,7 +334,7 @@ async function main() {
   setCreatureEcology(ecology);
   const trantTables = JSON.parse(await readFile(join(root, 'public/assets/content/trants.json'), 'utf8'));
   const streets = {};
-  const totals = { rocks: 0, trees: 0, nodes: 0, pigs: 0, chickens: 0, butterflies: 0, batterflies: 0, kitties: 0, crabs: 0 };
+  const totals = { rocks: 0, trees: 0, nodes: 0, pigs: 0, chickens: 0, butterflies: 0, batterflies: 0, kitties: 0, crabs: 0, dragons: 0 };
   // A published zone's streets (GZ) are solo only (docs/level-builder/spec.md 15, Q6): never shared.
   for (const tsid of Object.keys(index.streets).filter((t) => !isZoneTsid(t)).sort()) {
     let data;
@@ -336,7 +345,7 @@ async function main() {
       continue;
     }
     const layout = streetObjectLayout(data, { starter: data.tsid === STREET_INDEX.default });
-    const keys = ['rocks', 'trees', 'nodes', 'pigs', 'chickens', 'butterflies', 'batterflies', 'kitties', 'crabs'];
+    const keys = ['rocks', 'trees', 'nodes', 'pigs', 'chickens', 'butterflies', 'batterflies', 'kitties', 'crabs', 'dragons'];
     if (!keys.some((key) => layout[key].length)) continue;
     const row = {};
     for (const key of keys) {
@@ -349,7 +358,7 @@ async function main() {
   }
   const out = {
     about: 'Shared street objects for objects.go in groddle-afternoon-server. Generated by tools/build-realtime-objects.mjs from public/assets/streets, street-ecology.json, trants.json and the game modules; do not edit by hand.',
-    format: 'streets[tsid] = { rocks: [[i, class, x, y]], trees: [[i, class, x, y, maturity, health]], nodes: [[key, class, x, y]], pigs: [[i, x, y, range]], trunks?: [x], chickens: [[i, x, y]], butterflies: [[i, x, y, fly]], batterflies: [[i, x, y]], kitties: [[i, x, y]], crabs: [[i, x, y]], sad?: true }',
+    format: 'streets[tsid] = { rocks: [[i, class, x, y]], trees: [[i, class, x, y, maturity, health]], nodes: [[key, class, x, y]], pigs: [[i, x, y, range]], trunks?: [x], chickens: [[i, x, y]], butterflies: [[i, x, y, fly]], batterflies: [[i, x, y]], kitties: [[i, x, y]], crabs: [[i, x, y]], dragons: [[i, x, y]], sad?: true }',
     rules: ruleTables(trantTables),
     streets,
   };
@@ -365,7 +374,7 @@ async function main() {
   }
   await mkdir(dirname(outPath), { recursive: true });
   await writeFile(outPath, text);
-  console.log(`${Object.keys(streets).length} streets, ${totals.rocks} rocks, ${totals.trees} trees, ${totals.nodes} nodes, ${totals.pigs} pigs, ${totals.chickens} chickens, ${totals.butterflies} butterflies, ${totals.batterflies} batterflies, ${totals.kitties} kitties, ${totals.crabs} crabs -> ${outPath}`);
+  console.log(`${Object.keys(streets).length} streets, ${totals.rocks} rocks, ${totals.trees} trees, ${totals.nodes} nodes, ${totals.pigs} pigs, ${totals.chickens} chickens, ${totals.butterflies} butterflies, ${totals.batterflies} batterflies, ${totals.kitties} kitties, ${totals.crabs} crabs, ${totals.dragons} dragons -> ${outPath}`);
 }
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) await main();

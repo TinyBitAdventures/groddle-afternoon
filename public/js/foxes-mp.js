@@ -102,3 +102,35 @@ export function playersForFoxes(n) {
   while (!serverCanSpawn(n - 1, p)) p += 1;
   return p;
 }
+
+/**
+ * Where the server runs a fox (slice 3 of research/plans/street-animals-shared.md; the realtime
+ * server's foxes_walk.go): each fox_walk is one leg, from x0 to x1 over ms from t0 (server ms) at
+ * 500 px/s ("run"), or a stand at x1 ("eat", "pause", "brushed"). A leg as the server sent it, or
+ * null when it is malformed.
+ */
+export function foxLegFrom(msg) {
+  const x0 = Number(msg?.x0);
+  const x1 = Number(msg?.x1);
+  const t0 = Number(msg?.t0);
+  const ms = Math.max(0, Math.round(Number(msg?.ms) || 0));
+  const pose = ['run', 'eat', 'pause', 'brushed'].includes(msg?.pose) ? msg.pose : '';
+  if (![x0, x1, t0].every(Number.isFinite) || t0 <= 0 || !pose || ms > 600000) return null;
+  return { x0, x1, t0, ms, pose };
+}
+
+/**
+ * A fox on its leg at server time `now`: its x, heading (-1 left, 1 right, 0 as it was) and the
+ * solo state its clip follows (js/foxes.js stepFox: a stand at a bait plays eatStart for 500 ms,
+ * eat to 1000 ms, then eatEnd; at a marker it pauses; brushed it flashes).
+ */
+export function foxOnLeg(leg, now) {
+  if (!leg) return null;
+  const e = Math.max(0, Number(now) - leg.t0);
+  if (leg.pose === 'run') {
+    const f = leg.ms > 0 ? Math.min(1, e / leg.ms) : 1;
+    return { x: leg.x0 + (leg.x1 - leg.x0) * f, dir: leg.x1 > leg.x0 ? 1 : leg.x1 < leg.x0 ? -1 : 0, state: 'run' };
+  }
+  if (leg.pose === 'eat') return { x: leg.x1, dir: 0, state: e < 500 ? 'eatStart' : e < 1000 ? 'eat' : 'eatEnd' };
+  return { x: leg.x1, dir: 0, state: leg.pose === 'pause' ? 'pause' : 'brushed' };
+}
