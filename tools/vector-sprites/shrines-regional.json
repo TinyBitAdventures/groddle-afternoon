@@ -1,0 +1,769 @@
+{
+ "about": "The 33 regional shrines (js/shrine-variants.js, 1x from the OGA dump by tools/shrine-variants/build.mjs) paired with their vector SWFs (glitch-items shrines/npc_shrine_<giant>/npc_shrine_<region>_<giant>, CC0), the open/close DefineSprite of each found with swf-labels.mjs. Same options as characters.json: every sheet swaps to 3x on first draw. Run: node tools/vector-sprites/build.mjs --manifest tools/vector-sprites/shrines-regional.json",
+ "firstDraw": true,
+ "budget": {
+  "maxSide": 8192,
+  "maxMB": 64
+ },
+ "jobs": [
+  {
+   "name": "shrine-firebog-alph",
+   "swf": "shrines/npc_shrine_alph/npc_shrine_firebog_alph/npc_shrine_firebog_alph.swf",
+   "sprite": 150,
+   "sheets": [
+    {
+     "path": "assets/sprites/shrines/firebog/alph_open.webp",
+     "label": "open",
+     "fw": 164,
+     "fh": 212,
+     "cols": 6,
+     "frames": 22
+    },
+    {
+     "path": "assets/sprites/shrines/firebog/alph_close.webp",
+     "label": "close",
+     "fw": 164,
+     "fh": 212,
+     "cols": 6,
+     "frames": 23
+    }
+   ]
+  },
+  {
+   "name": "shrine-firebog-cosma",
+   "swf": "shrines/npc_shrine_cosma/npc_shrine_firebog_cosma/npc_shrine_firebog_cosma.swf",
+   "sprite": 151,
+   "sheets": [
+    {
+     "path": "assets/sprites/shrines/firebog/cosma_open.webp",
+     "label": "open",
+     "fw": 164,
+     "fh": 212,
+     "cols": 6,
+     "frames": 22
+    },
+    {
+     "path": "assets/sprites/shrines/firebog/cosma_close.webp",
+     "label": "close",
+     "fw": 164,
+     "fh": 212,
+     "cols": 6,
+     "frames": 23
+    }
+   ]
+  },
+  {
+   "name": "shrine-firebog-friendly",
+   "swf": "shrines/npc_shrine_friendly/npc_shrine_firebog_friendly/npc_shrine_firebog_friendly.swf",
+   "sprite": 150,
+   "sheets": [
+    {
+     "path": "assets/sprites/shrines/firebog/friendly_open.webp",
+     "label": "open",
+     "fw": 164,
+     "fh": 212,
+     "cols": 6,
+     "frames": 22
+    },
+    {
+     "path": "assets/sprites/shrines/firebog/friendly_close.webp",
+     "label": "close",
+     "fw": 164,
+     "fh": 212,
+     "cols": 6,
+     "frames": 23
+    }
+   ]
+  },
+  {
+   "name": "shrine-firebog-grendaline",
+   "swf": "shrines/npc_shrine_grendaline/npc_shrine_firebog_grendaline/npc_shrine_firebog_grendaline.swf",
+   "sprite": 150,
+   "sheets": [
+    {
+     "path": "assets/sprites/shrines/firebog/grendaline_open.webp",
+     "label": "open",
+     "fw": 164,
+     "fh": 212,
+     "cols": 6,
+     "frames": 22
+    },
+    {
+     "path": "assets/sprites/shrines/firebog/grendaline_close.webp",
+     "label": "close",
+     "fw": 164,
+     "fh": 212,
+     "cols": 6,
+     "frames": 23
+    }
+   ]
+  },
+  {
+   "name": "shrine-firebog-humbaba",
+   "swf": "shrines/npc_shrine_humbaba/npc_shrine_firebog_humbaba/npc_shrine_firebog_humbaba.swf",
+   "sprite": 150,
+   "sheets": [
+    {
+     "path": "assets/sprites/shrines/firebog/humbaba_open.webp",
+     "label": "open",
+     "fw": 164,
+     "fh": 212,
+     "cols": 6,
+     "frames": 22
+    },
+    {
+     "path": "assets/sprites/shrines/firebog/humbaba_close.webp",
+     "label": "close",
+     "fw": 164,
+     "fh": 212,
+     "cols": 6,
+     "frames": 23
+    }
+   ]
+  },
+  {
+   "name": "shrine-firebog-lem",
+   "swf": "shrines/npc_shrine_lem/npc_shrine_firebog_lem/npc_shrine_firebog_lem.swf",
+   "sprite": 151,
+   "sheets": [
+    {
+     "path": "assets/sprites/shrines/firebog/lem_open.webp",
+     "label": "open",
+     "fw": 164,
+     "fh": 212,
+     "cols": 6,
+     "frames": 22
+    },
+    {
+     "path": "assets/sprites/shrines/firebog/lem_close.webp",
+     "label": "close",
+     "fw": 164,
+     "fh": 212,
+     "cols": 6,
+     "frames": 23
+    }
+   ]
+  },
+  {
+   "name": "shrine-firebog-mab",
+   "swf": "shrines/npc_shrine_mab/npc_shrine_firebog_mab/npc_shrine_firebog_mab.swf",
+   "sprite": 150,
+   "sheets": [
+    {
+     "path": "assets/sprites/shrines/firebog/mab_open.webp",
+     "label": "open",
+     "fw": 164,
+     "fh": 212,
+     "cols": 6,
+     "frames": 22
+    },
+    {
+     "path": "assets/sprites/shrines/firebog/mab_close.webp",
+     "label": "close",
+     "fw": 164,
+     "fh": 212,
+     "cols": 6,
+     "frames": 23
+    }
+   ]
+  },
+  {
+   "name": "shrine-firebog-pot",
+   "swf": "shrines/npc_shrine_pot/npc_shrine_firebog_pot/npc_shrine_firebog_pot.swf",
+   "sprite": 150,
+   "sheets": [
+    {
+     "path": "assets/sprites/shrines/firebog/pot_open.webp",
+     "label": "open",
+     "fw": 164,
+     "fh": 212,
+     "cols": 6,
+     "frames": 22
+    },
+    {
+     "path": "assets/sprites/shrines/firebog/pot_close.webp",
+     "label": "close",
+     "fw": 164,
+     "fh": 212,
+     "cols": 6,
+     "frames": 23
+    }
+   ]
+  },
+  {
+   "name": "shrine-firebog-spriggan",
+   "swf": "shrines/npc_shrine_spriggan/npc_shrine_firebog_spriggan/npc_shrine_firebog_spriggan.swf",
+   "sprite": 152,
+   "sheets": [
+    {
+     "path": "assets/sprites/shrines/firebog/spriggan_open.webp",
+     "label": "open",
+     "fw": 164,
+     "fh": 212,
+     "cols": 6,
+     "frames": 22
+    },
+    {
+     "path": "assets/sprites/shrines/firebog/spriggan_close.webp",
+     "label": "close",
+     "fw": 164,
+     "fh": 212,
+     "cols": 6,
+     "frames": 23
+    }
+   ]
+  },
+  {
+   "name": "shrine-firebog-ti",
+   "swf": "shrines/npc_shrine_ti/npc_shrine_firebog_tii/npc_shrine_firebog_tii.swf",
+   "sprite": 152,
+   "sheets": [
+    {
+     "path": "assets/sprites/shrines/firebog/ti_open.webp",
+     "label": "open",
+     "fw": 164,
+     "fh": 212,
+     "cols": 6,
+     "frames": 22
+    },
+    {
+     "path": "assets/sprites/shrines/firebog/ti_close.webp",
+     "label": "close",
+     "fw": 164,
+     "fh": 212,
+     "cols": 6,
+     "frames": 23
+    }
+   ]
+  },
+  {
+   "name": "shrine-firebog-zille",
+   "swf": "shrines/npc_shrine_zille/npc_shrine_firebog_zille/npc_shrine_firebog_zille.swf",
+   "sprite": 151,
+   "sheets": [
+    {
+     "path": "assets/sprites/shrines/firebog/zille_open.webp",
+     "label": "open",
+     "fw": 164,
+     "fh": 212,
+     "cols": 6,
+     "frames": 22
+    },
+    {
+     "path": "assets/sprites/shrines/firebog/zille_close.webp",
+     "label": "close",
+     "fw": 164,
+     "fh": 212,
+     "cols": 6,
+     "frames": 23
+    }
+   ]
+  },
+  {
+   "name": "shrine-ix-alph",
+   "swf": "shrines/npc_shrine_alph/npc_shrine_ix_alph/npc_shrine_ix_alph.swf",
+   "sprite": 121,
+   "sheets": [
+    {
+     "path": "assets/sprites/shrines/ix/alph_open.webp",
+     "label": "open",
+     "fw": 168,
+     "fh": 216,
+     "cols": 5,
+     "frames": 24
+    },
+    {
+     "path": "assets/sprites/shrines/ix/alph_close.webp",
+     "label": "close",
+     "fw": 168,
+     "fh": 216,
+     "cols": 5,
+     "frames": 20
+    }
+   ]
+  },
+  {
+   "name": "shrine-ix-cosma",
+   "swf": "shrines/npc_shrine_cosma/npc_shrine_ix_cosma/npc_shrine_ix_cosma.swf",
+   "sprite": 137,
+   "sheets": [
+    {
+     "path": "assets/sprites/shrines/ix/cosma_open.webp",
+     "label": "open",
+     "fw": 168,
+     "fh": 216,
+     "cols": 5,
+     "frames": 24
+    },
+    {
+     "path": "assets/sprites/shrines/ix/cosma_close.webp",
+     "label": "close",
+     "fw": 168,
+     "fh": 216,
+     "cols": 5,
+     "frames": 20
+    }
+   ]
+  },
+  {
+   "name": "shrine-ix-friendly",
+   "swf": "shrines/npc_shrine_friendly/npc_shrine_ix_friendly/npc_shrine_ix_friendly.swf",
+   "sprite": 109,
+   "sheets": [
+    {
+     "path": "assets/sprites/shrines/ix/friendly_open.webp",
+     "label": "open",
+     "fw": 168,
+     "fh": 216,
+     "cols": 5,
+     "frames": 24
+    },
+    {
+     "path": "assets/sprites/shrines/ix/friendly_close.webp",
+     "label": "close",
+     "fw": 168,
+     "fh": 216,
+     "cols": 5,
+     "frames": 20
+    }
+   ]
+  },
+  {
+   "name": "shrine-ix-grendaline",
+   "swf": "shrines/npc_shrine_grendaline/npc_shrine_ix_grendaline/npc_shrine_ix_grendaline.swf",
+   "sprite": 194,
+   "sheets": [
+    {
+     "path": "assets/sprites/shrines/ix/grendaline_open.webp",
+     "label": "open",
+     "fw": 168,
+     "fh": 216,
+     "cols": 5,
+     "frames": 24
+    },
+    {
+     "path": "assets/sprites/shrines/ix/grendaline_close.webp",
+     "label": "close",
+     "fw": 168,
+     "fh": 216,
+     "cols": 5,
+     "frames": 20
+    }
+   ]
+  },
+  {
+   "name": "shrine-ix-humbaba",
+   "swf": "shrines/npc_shrine_humbaba/npc_shrine_ix_humbaba/npc_shrine_ix_humbaba.swf",
+   "sprite": 99,
+   "sheets": [
+    {
+     "path": "assets/sprites/shrines/ix/humbaba_open.webp",
+     "label": "open",
+     "fw": 168,
+     "fh": 216,
+     "cols": 5,
+     "frames": 24
+    },
+    {
+     "path": "assets/sprites/shrines/ix/humbaba_close.webp",
+     "label": "close",
+     "fw": 168,
+     "fh": 216,
+     "cols": 5,
+     "frames": 20
+    }
+   ]
+  },
+  {
+   "name": "shrine-ix-lem",
+   "swf": "shrines/npc_shrine_lem/npc_shrine_ix_lem/npc_shrine_ix_lem.swf",
+   "sprite": 90,
+   "sheets": [
+    {
+     "path": "assets/sprites/shrines/ix/lem_open.webp",
+     "label": "open",
+     "fw": 168,
+     "fh": 216,
+     "cols": 5,
+     "frames": 24
+    },
+    {
+     "path": "assets/sprites/shrines/ix/lem_close.webp",
+     "label": "close",
+     "fw": 168,
+     "fh": 216,
+     "cols": 5,
+     "frames": 20
+    }
+   ]
+  },
+  {
+   "name": "shrine-ix-mab",
+   "swf": "shrines/npc_shrine_mab/npc_shrine_ix_mab/npc_shrine_ix_mab.swf",
+   "sprite": 122,
+   "sheets": [
+    {
+     "path": "assets/sprites/shrines/ix/mab_open.webp",
+     "label": "open",
+     "fw": 168,
+     "fh": 216,
+     "cols": 5,
+     "frames": 24
+    },
+    {
+     "path": "assets/sprites/shrines/ix/mab_close.webp",
+     "label": "close",
+     "fw": 168,
+     "fh": 216,
+     "cols": 5,
+     "frames": 20
+    }
+   ]
+  },
+  {
+   "name": "shrine-ix-pot",
+   "swf": "shrines/npc_shrine_pot/npc_shrine_ix_pot/npc_shrine_ix_pot.swf",
+   "sprite": 153,
+   "sheets": [
+    {
+     "path": "assets/sprites/shrines/ix/pot_open.webp",
+     "label": "open",
+     "fw": 168,
+     "fh": 216,
+     "cols": 5,
+     "frames": 24
+    },
+    {
+     "path": "assets/sprites/shrines/ix/pot_close.webp",
+     "label": "close",
+     "fw": 168,
+     "fh": 216,
+     "cols": 5,
+     "frames": 20
+    }
+   ]
+  },
+  {
+   "name": "shrine-ix-spriggan",
+   "swf": "shrines/npc_shrine_spriggan/npc_shrine_ix_spriggan/npc_shrine_ix_spriggan.swf",
+   "sprite": 185,
+   "sheets": [
+    {
+     "path": "assets/sprites/shrines/ix/spriggan_open.webp",
+     "label": "open",
+     "fw": 168,
+     "fh": 216,
+     "cols": 5,
+     "frames": 24
+    },
+    {
+     "path": "assets/sprites/shrines/ix/spriggan_close.webp",
+     "label": "close",
+     "fw": 168,
+     "fh": 216,
+     "cols": 5,
+     "frames": 20
+    }
+   ]
+  },
+  {
+   "name": "shrine-ix-ti",
+   "swf": "shrines/npc_shrine_ti/npc_shrine_ix_ti/npc_shrine_ix_ti.swf",
+   "sprite": 161,
+   "sheets": [
+    {
+     "path": "assets/sprites/shrines/ix/ti_open.webp",
+     "label": "open",
+     "fw": 168,
+     "fh": 216,
+     "cols": 5,
+     "frames": 24
+    },
+    {
+     "path": "assets/sprites/shrines/ix/ti_close.webp",
+     "label": "close",
+     "fw": 168,
+     "fh": 216,
+     "cols": 5,
+     "frames": 20
+    }
+   ]
+  },
+  {
+   "name": "shrine-ix-zille",
+   "swf": "shrines/npc_shrine_zille/npc_shrine_ix_zille/npc_shrine_ix_zille.swf",
+   "sprite": 125,
+   "sheets": [
+    {
+     "path": "assets/sprites/shrines/ix/zille_open.webp",
+     "label": "open",
+     "fw": 168,
+     "fh": 216,
+     "cols": 5,
+     "frames": 24
+    },
+    {
+     "path": "assets/sprites/shrines/ix/zille_close.webp",
+     "label": "close",
+     "fw": 168,
+     "fh": 216,
+     "cols": 5,
+     "frames": 20
+    }
+   ]
+  },
+  {
+   "name": "shrine-uralia-alph",
+   "swf": "shrines/npc_shrine_alph/npc_shrine_uralia_alph/npc_shrine_uralia_alph.swf",
+   "sprite": 148,
+   "sheets": [
+    {
+     "path": "assets/sprites/shrines/uralia/alph_open.webp",
+     "label": "open",
+     "fw": 126,
+     "fh": 188,
+     "cols": 6,
+     "frames": 22
+    },
+    {
+     "path": "assets/sprites/shrines/uralia/alph_close.webp",
+     "label": "close",
+     "fw": 126,
+     "fh": 188,
+     "cols": 6,
+     "frames": 23
+    }
+   ]
+  },
+  {
+   "name": "shrine-uralia-cosma",
+   "swf": "shrines/npc_shrine_cosma/npc_shrine_uralia_cosma/npc_shrine_uralia_cosma.swf",
+   "sprite": 148,
+   "sheets": [
+    {
+     "path": "assets/sprites/shrines/uralia/cosma_open.webp",
+     "label": "open",
+     "fw": 126,
+     "fh": 188,
+     "cols": 6,
+     "frames": 22
+    },
+    {
+     "path": "assets/sprites/shrines/uralia/cosma_close.webp",
+     "label": "close",
+     "fw": 126,
+     "fh": 188,
+     "cols": 6,
+     "frames": 23
+    }
+   ]
+  },
+  {
+   "name": "shrine-uralia-friendly",
+   "swf": "shrines/npc_shrine_friendly/npc_shrine_uralia_friendly/npc_shrine_uralia_friendly.swf",
+   "sprite": 148,
+   "sheets": [
+    {
+     "path": "assets/sprites/shrines/uralia/friendly_open.webp",
+     "label": "open",
+     "fw": 126,
+     "fh": 188,
+     "cols": 6,
+     "frames": 22
+    },
+    {
+     "path": "assets/sprites/shrines/uralia/friendly_close.webp",
+     "label": "close",
+     "fw": 126,
+     "fh": 188,
+     "cols": 6,
+     "frames": 23
+    }
+   ]
+  },
+  {
+   "name": "shrine-uralia-grendaline",
+   "swf": "shrines/npc_shrine_grendaline/npc_shrine_uralia_grendaline/npc_shrine_uralia_grendaline.swf",
+   "sprite": 148,
+   "sheets": [
+    {
+     "path": "assets/sprites/shrines/uralia/grendaline_open.webp",
+     "label": "open",
+     "fw": 126,
+     "fh": 188,
+     "cols": 6,
+     "frames": 22
+    },
+    {
+     "path": "assets/sprites/shrines/uralia/grendaline_close.webp",
+     "label": "close",
+     "fw": 126,
+     "fh": 188,
+     "cols": 6,
+     "frames": 23
+    }
+   ]
+  },
+  {
+   "name": "shrine-uralia-humbaba",
+   "swf": "shrines/npc_shrine_humbaba/npc_shrine_uralia_humbaba/npc_shrine_uralia_humbaba.swf",
+   "sprite": 148,
+   "sheets": [
+    {
+     "path": "assets/sprites/shrines/uralia/humbaba_open.webp",
+     "label": "open",
+     "fw": 126,
+     "fh": 188,
+     "cols": 6,
+     "frames": 22
+    },
+    {
+     "path": "assets/sprites/shrines/uralia/humbaba_close.webp",
+     "label": "close",
+     "fw": 126,
+     "fh": 188,
+     "cols": 6,
+     "frames": 23
+    }
+   ]
+  },
+  {
+   "name": "shrine-uralia-lem",
+   "swf": "shrines/npc_shrine_lem/npc_shrine_uralia_lem/npc_shrine_uralia_lem.swf",
+   "sprite": 148,
+   "sheets": [
+    {
+     "path": "assets/sprites/shrines/uralia/lem_open.webp",
+     "label": "open",
+     "fw": 126,
+     "fh": 188,
+     "cols": 6,
+     "frames": 22
+    },
+    {
+     "path": "assets/sprites/shrines/uralia/lem_close.webp",
+     "label": "close",
+     "fw": 126,
+     "fh": 188,
+     "cols": 6,
+     "frames": 23
+    }
+   ]
+  },
+  {
+   "name": "shrine-uralia-mab",
+   "swf": "shrines/npc_shrine_mab/npc_shrine_uralia_mab/npc_shrine_uralia_mab.swf",
+   "sprite": 148,
+   "sheets": [
+    {
+     "path": "assets/sprites/shrines/uralia/mab_open.webp",
+     "label": "open",
+     "fw": 126,
+     "fh": 188,
+     "cols": 6,
+     "frames": 22
+    },
+    {
+     "path": "assets/sprites/shrines/uralia/mab_close.webp",
+     "label": "close",
+     "fw": 126,
+     "fh": 188,
+     "cols": 6,
+     "frames": 23
+    }
+   ]
+  },
+  {
+   "name": "shrine-uralia-pot",
+   "swf": "shrines/npc_shrine_pot/npc_shrine_uralia_pot/npc_shrine_uralia_pot.swf",
+   "sprite": 157,
+   "sheets": [
+    {
+     "path": "assets/sprites/shrines/uralia/pot_open.webp",
+     "label": "open",
+     "fw": 126,
+     "fh": 188,
+     "cols": 6,
+     "frames": 22
+    },
+    {
+     "path": "assets/sprites/shrines/uralia/pot_close.webp",
+     "label": "close",
+     "fw": 126,
+     "fh": 188,
+     "cols": 6,
+     "frames": 23
+    }
+   ]
+  },
+  {
+   "name": "shrine-uralia-spriggan",
+   "swf": "shrines/npc_shrine_spriggan/npc_shrine_uralia_spriggan/npc_shrine_uralia_spriggan.swf",
+   "sprite": 148,
+   "sheets": [
+    {
+     "path": "assets/sprites/shrines/uralia/spriggan_open.webp",
+     "label": "open",
+     "fw": 126,
+     "fh": 188,
+     "cols": 6,
+     "frames": 22
+    },
+    {
+     "path": "assets/sprites/shrines/uralia/spriggan_close.webp",
+     "label": "close",
+     "fw": 126,
+     "fh": 188,
+     "cols": 6,
+     "frames": 23
+    }
+   ]
+  },
+  {
+   "name": "shrine-uralia-ti",
+   "swf": "shrines/npc_shrine_ti/npc_shrine_uralia_ti/npc_shrine_uralia_ti.swf",
+   "sprite": 148,
+   "sheets": [
+    {
+     "path": "assets/sprites/shrines/uralia/ti_open.webp",
+     "label": "open",
+     "fw": 126,
+     "fh": 188,
+     "cols": 6,
+     "frames": 22
+    },
+    {
+     "path": "assets/sprites/shrines/uralia/ti_close.webp",
+     "label": "close",
+     "fw": 126,
+     "fh": 188,
+     "cols": 6,
+     "frames": 23
+    }
+   ]
+  },
+  {
+   "name": "shrine-uralia-zille",
+   "swf": "shrines/npc_shrine_zille/npc_shrine_uralia_zille/npc_shrine_uralia_zille.swf",
+   "sprite": 148,
+   "sheets": [
+    {
+     "path": "assets/sprites/shrines/uralia/zille_open.webp",
+     "label": "open",
+     "fw": 126,
+     "fh": 188,
+     "cols": 6,
+     "frames": 22
+    },
+    {
+     "path": "assets/sprites/shrines/uralia/zille_close.webp",
+     "label": "close",
+     "fw": 126,
+     "fh": 188,
+     "cols": 6,
+     "frames": 23
+    }
+   ]
+  }
+ ]
+}

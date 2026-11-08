@@ -20,7 +20,7 @@ import {
 } from './js/action-timing.js?v=5db4e91b';
 import { createWordProgressView, wordAnchor, heldActionDelta, MAX_PUSH_DOWN } from './js/word-progress.js?v=98366023';
 // G374/G375/G378: Tiny Speck's quoin-limit and super-harvest rainbows and the musicblock notes.
-import { OVERLAY_USES, playCountdownArt, playOverlay, rainbowSound, showRainbow } from './js/overlays.js?v=642adbd0';
+import { OVERLAY_USES, playCountdownArt, playOverlay, rainbowSound, showRainbow } from './js/overlays.js?v=ed371926';
 import {
   createQuestState,
   assignQuest,
@@ -597,7 +597,7 @@ import {
 } from './js/making.js?v=b0053dac';
 import { outputIconsHtml, outputsPhrase, recipeOutputRows } from './js/ui/recipe-outputs.js?v=73e19baf';
 import { MAKE_TOOL_SHEETS } from './js/make-tool-sheets.js?v=6f758e09';
-import { LOW_FUEL_LINE, craftSessionElapsedMs, isLowFuel, isMachineArt, machineArtHtml, packMakeState, playMachineHandOver, setMachineArtFrame } from './js/machine-art.js?v=44af04ef';
+import { LOW_FUEL_LINE, craftSessionElapsedMs, isLowFuel, isMachineArt, machineArtHtml, packMakeState, playMachineHandOver, setMachineArtFrame } from './js/machine-art.js?v=664d5aaa';
 import {
   createGarden,
   tickGarden,
@@ -866,6 +866,7 @@ import {
   emblemRelationNote,
   formatSpeedUpTime,
 } from './js/shrines.js?v=3170dbdb';
+import { shrineSheet, shrineVariantFor } from './js/shrine-variants.js?v=7f11c97d';
 import { giantDisplayName } from './js/giant-names.js?v=0e295891';
 import { shrinePowderOptions, shrinePowderAchievementCounters } from './js/powders.js?v=fa5d1e41';
 import {
@@ -963,7 +964,7 @@ import { installTopBar, renderTopBar } from './js/ui/topbar.js?v=57cc6690';
 import { focusBack, installFocusReturn, lastInput } from './js/ui/focus-return.js?v=da190597';
 import { installContextGuard } from './js/ui/context-guard.js?v=0f71ac17';
 import { QUOIN_FRAME_BOB, advanceQuoinClock, quoinBobBetweenFrames } from './js/quoin-motion.js?v=ea0bd408';
-import { installHiresFirstDraw, installHiresSprites, upgradeSource } from './js/sprite-hires.js?v=abaf3d5a';
+import { installHiresFirstDraw, installHiresSprites, upgradeSource } from './js/sprite-hires.js?v=663a7121';
 import { denseSprite } from './js/sprite-dense.js?v=2a0ce07a';
 import { wholeStatAmounts, wholeEffects } from './js/stat-text.js?v=f96d8fd3';
 import { createNotifier, effectTokens, floatKey, offerCardDrop, stackFloat, tokenText } from './js/notify.js?v=37c6b748';
@@ -28354,17 +28355,22 @@ function sellToVendor(classTsid, qty) {
   return r;
 }
 
-async function ensureShrineTextures(giantId) {
-  const def = { fw: 151, fh: 188, cols: 6, rows: 4 };
+/** The texture key of a shrine's sheet (the plain shrine keeps its old key). */
+function shrineTextureKey(giantId, motion, region = 'base') {
+  return region && region !== 'base' ? `shrine_${region}_${giantId}_${motion}` : `shrine_${giantId}_${motion}`;
+}
+
+async function ensureShrineTextures(giantId, region = 'base') {
   for (const motion of ['open', 'close']) {
-    const key = `shrine_${giantId}_${motion}`;
+    const key = shrineTextureKey(giantId, motion, region);
     if (textures[key]) continue;
-    const url = `assets/sprites/shrines/${giantId}_${motion}.webp`;
-    const tex = await loadTexture(url);
+    // js/shrine-variants.js: the region's sheet (plain 151 x 188, open 22 frames, close 23; the rest of the grid is blank).
+    const sheet = shrineSheet(region, giantId, motion);
+    const def = { fw: sheet.fw, fh: sheet.fh, cols: sheet.cols, rows: Math.ceil(sheet.frames / sheet.cols) };
+    const tex = await loadTexture(sheet.url);
     textures[key] = {
-      def: { ...def, url },
-      // Official sheets: open has 22 populated frames, close 23 (the rest of the grid is blank).
-      frames: sliceSheet(tex.source, def, motion === 'open' ? 22 : 23),
+      def: { ...def, url: sheet.url },
+      frames: sliceSheet(tex.source, def, sheet.frames),
     };
   }
 }
@@ -28384,8 +28390,9 @@ function refreshShrineTarget(target) {
 function playShrineDonation(target) {
   const spr = target?.sprite;
   const giantId = target?.state?.giantId;
-  const openFrames = textures[`shrine_${giantId}_open`]?.frames;
-  const closeFrames = textures[`shrine_${giantId}_close`]?.frames;
+  const region = target?.state?.region;
+  const openFrames = textures[shrineTextureKey(giantId, 'open', region)]?.frames;
+  const closeFrames = textures[shrineTextureKey(giantId, 'close', region)]?.frames;
   if (!spr || !openFrames?.length || !closeFrames?.length) return;
   spr.textures = openFrames;
   spr.loop = false;
@@ -28411,8 +28418,10 @@ function playShrineDonation(target) {
 async function spawnShrine(placement = null) {
   if (!entityLayer || !currentStreet) return null;
   const giant = giantForStreet(currentStreet);
-  await ensureShrineTextures(giant.id);
-  const frames = textures[`shrine_${giant.id}_open`]?.frames;
+  // The street's regional shrine (js/shrine-variants.js; QA &shrineregion=base|firebog|ix|uralia).
+  const variant = shrineVariantFor(currentStreet, giant.id, engine.param('shrineregion') || '');
+  await ensureShrineTextures(giant.id, variant.region);
+  const frames = textures[shrineTextureKey(giant.id, 'open', variant.region)]?.frames;
   if (!frames?.length) return null;
   const points = placement ? [] : samplePlatformPoints(10);
   const point = placement || points[7] || points[points.length - 1] || { x: WORLD_W * 0.72, y: GROUND_Y };
@@ -28432,9 +28441,11 @@ async function spawnShrine(placement = null) {
     label: `Shrine to ${giant.name}`,
     subtitle: '',
     sprite: spr,
-    state: { giantId: giant.id },
+    // region and classTsid name the source's regional class (npc_shrine_firebog_mab ...); classId stays the plain one.
+    state: { giantId: giant.id, region: variant.region, classTsid: variant.classTsid },
   });
   spr.shrineTarget = target;
+  app.canvas.dataset.shrineVariant = variant.classTsid;
   refreshShrineTarget(target);
   return target;
 }

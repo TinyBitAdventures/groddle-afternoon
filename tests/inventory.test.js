@@ -291,8 +291,8 @@ describe('other detectors', () => {
 
 describe('item detector: items nobody can get (G125)', () => {
   const item = (id, extra = {}) => ({ id, label: id, tags: [], parents: [id, 'takeable'], takeable: true, hidden: false, verbs: [], ...extra });
-  const judge = (items, { reach = new Map(), present = new Map(), refs = {} } = {}) => judgeItems({
-    items, reach, present, codeCtx: new Map(),
+  const judge = (items, { reach = new Map(), present = new Map(), refs = {}, ownArt = new Map() } = {}) => judgeItems({
+    items, reach, present, codeCtx: new Map(), ownArt,
     gsjsRefs: new Map(items.map((it) => [it.id, gsjsItemRefs(it.id, refs[it.id] || [])])),
   });
 
@@ -309,6 +309,16 @@ describe('item detector: items nobody can get (G125)', () => {
       refs: { rock_x_2: ['items/proto_rock.js'] },
     });
     assert.deepEqual(rows.map((r) => r.status), ['source', 'partial']);
+  });
+
+  it('a proxy variant that draws its own art is source (the regional shrines, lane art 2026-11-08)', () => {
+    const rows = judge([item('npc_shrine_x'), item('npc_shrine_ix_x', { proxy: 'npc_shrine_x' })], {
+      present: new Map([['npc_shrine_x', 'street-ecology.json']]),
+      refs: { npc_shrine_ix_x: ['items/npc_shrine_base.js'] },
+      ownArt: new Map([['npc_shrine_ix_x', 'assets/sprites/shrines/ix/x_open.webp']]),
+    });
+    assert.deepEqual(rows.map((r) => r.status), ['source', 'source']);
+    assert.match(rows[1].evidence, /wearing its own art/);
   });
 
   it('excludes retired items, requirement icons and the item list itself', () => {

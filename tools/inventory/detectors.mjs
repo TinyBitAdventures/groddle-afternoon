@@ -390,7 +390,7 @@ export function gsjsItemRefs(id, files) {
  * gsjsRefs: Map id -> Set(files) of GSJS literal references (own file and catalog_tags excluded);
  * families: [{ prefix, file }] string literals ending in _ that code builds ids from.
  */
-export function judgeItems({ items, reach, present, codeCtx, gsjsRefs, families = [], templates = [] }) {
+export function judgeItems({ items, reach, present, codeCtx, gsjsRefs, families = [], templates = [], ownArt = new Map() }) {
   const rows = [];
   // Base classes: an id other item files list in their parent_classes (bag, quoin, race_ticket ...).
   const subclasses = new Map();
@@ -444,6 +444,12 @@ export function judgeItems({ items, reach, present, codeCtx, gsjsRefs, families 
     const r = byId.get(it.id);
     const baseRow = it.proxy && byId.get(it.proxy);
     if (!r || !baseRow || !['missing', 'unknown'].includes(r.status) || !REACHABLE.has(baseRow.status)) continue;
+    // Lane art 2026-11-08: the regional shrines draw their own sheets (js/shrine-variants.js, assets/sprites/shrines/variants.json).
+    if (ownArt.has(it.id)) {
+      r.status = 'source';
+      r.evidence = `proxy_item ${it.proxy} (${baseRow.status}): the remake runs it as ${it.proxy} wearing its own art (${ownArt.get(it.id)})`;
+      continue;
+    }
     r.status = 'partial';
     r.evidence = `proxy_item ${it.proxy} (${baseRow.status}): the remake runs it as ${it.proxy}; this variant's own art is not used`;
   }

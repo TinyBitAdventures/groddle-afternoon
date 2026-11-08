@@ -1,0 +1,797 @@
+{
+ "source": "OpenGameArt glitch-assets-1.7z / glitch-assets-2.7z (Tiny Speck, CC0)",
+ "files": {
+  "assets/sprites/shrines/firebog/alph_open.webp": {
+   "class": "npc_shrine_firebog_alph",
+   "motion": "open",
+   "oga": "glitch-assets/npc_shrine_firebog_alph/npc_shrine_firebog_alph__x1_open_png_1354832764.png",
+   "size": [
+    984,
+    848
+   ],
+   "frames": 22,
+   "bytes": 134440,
+   "sha256": "79915863e97f8ae82ad0d8afe67106d453d6a9726cc6a71fcc07e63e16371992"
+  },
+  "assets/sprites/shrines/firebog/alph_close.webp": {
+   "class": "npc_shrine_firebog_alph",
+   "motion": "close",
+   "oga": "glitch-assets/npc_shrine_firebog_alph/npc_shrine_firebog_alph__x1_close_png_1354832766.png",
+   "size": [
+    984,
+    848
+   ],
+   "frames": 23,
+   "bytes": 133878,
+   "sha256": "9adbab611836929db29d9cbb9a3ab5c22d725f8d6ffffd2c61586828976f8643"
+  },
+  "assets/sprites/shrines/firebog/cosma_open.webp": {
+   "class": "npc_shrine_firebog_cosma",
+   "motion": "open",
+   "oga": "glitch-assets/npc_shrine_firebog_cosma/npc_shrine_firebog_cosma__x1_open_png_1354832771.png",
+   "size": [
+    984,
+    848
+   ],
+   "frames": 22,
+   "bytes": 134416,
+   "sha256": "8ff8a6a3029c5813af708bc8217e3b0d0efbc936c96ec1930d27f22c4cdafaf3"
+  },
+  "assets/sprites/shrines/firebog/cosma_close.webp": {
+   "class": "npc_shrine_firebog_cosma",
+   "motion": "close",
+   "oga": "glitch-assets/npc_shrine_firebog_cosma/npc_shrine_firebog_cosma__x1_close_png_1354832774.png",
+   "size": [
+    984,
+    848
+   ],
+   "frames": 23,
+   "bytes": 133960,
+   "sha256": "2dbda1fba8359396573069521512a2908421325b69d692ca9cf7bd70c683a676"
+  },
+  "assets/sprites/shrines/firebog/friendly_open.webp": {
+   "class": "npc_shrine_firebog_friendly",
+   "motion": "open",
+   "oga": "glitch-assets/npc_shrine_firebog_friendly/npc_shrine_firebog_friendly__x1_open_png_1354832798.png",
+   "size": [
+    984,
+    848
+   ],
+   "frames": 22,
+   "bytes": 134520,
+   "sha256": "06ef788880cccc6010ead1bc759fae6f00baa4bbb22720a71fff5e6388ac4b19"
+  },
+  "assets/sprites/shrines/firebog/friendly_close.webp": {
+   "class": "npc_shrine_firebog_friendly",
+   "motion": "close",
+   "oga": "glitch-assets/npc_shrine_firebog_friendly/npc_shrine_firebog_friendly__x1_close_png_1354832801.png",
+   "size": [
+    984,
+    848
+   ],
+   "frames": 23,
+   "bytes": 134466,
+   "sha256": "ee682eb1d1a9d517236d616e6f2dc318f1e4e5585d905518a55539547e24592c"
+  },
+  "assets/sprites/shrines/firebog/grendaline_open.webp": {
+   "class": "npc_shrine_firebog_grendaline",
+   "motion": "open",
+   "oga": "glitch-assets/npc_shrine_firebog_grendaline/npc_shrine_firebog_grendaline__x1_open_png_1354832806.png",
+   "size": [
+    984,
+    848
+   ],
+   "frames": 22,
+   "bytes": 134914,
+   "sha256": "29cbcdba4d75396d6f3f03e15156aa6f8a03df5eff47afc32daf40551a5a655a"
+  },
+  "assets/sprites/shrines/firebog/grendaline_close.webp": {
+   "class": "npc_shrine_firebog_grendaline",
+   "motion": "close",
+   "oga": "glitch-assets/npc_shrine_firebog_grendaline/npc_shrine_firebog_grendaline__x1_close_png_1354832808.png",
+   "size": [
+    984,
+    848
+   ],
+   "frames": 23,
+   "bytes": 134012,
+   "sha256": "40a8f4c686465c3b2790aa72db6a82bb490f42c7692fec65b8367232d1edaeb1"
+  },
+  "assets/sprites/shrines/firebog/humbaba_open.webp": {
+   "class": "npc_shrine_firebog_humbaba",
+   "motion": "open",
+   "oga": "glitch-assets/npc_shrine_firebog_humbaba/npc_shrine_firebog_humbaba__x1_open_png_1354832813.png",
+   "size": [
+    984,
+    848
+   ],
+   "frames": 22,
+   "bytes": 134450,
+   "sha256": "c359e00581d8bd813603f9c3cd8fe781e12755dc3b4b2a9a1179950197e5a94b"
+  },
+  "assets/sprites/shrines/firebog/humbaba_close.webp": {
+   "class": "npc_shrine_firebog_humbaba",
+   "motion": "close",
+   "oga": "glitch-assets/npc_shrine_firebog_humbaba/npc_shrine_firebog_humbaba__x1_close_png_1354832816.png",
+   "size": [
+    984,
+    848
+   ],
+   "frames": 23,
+   "bytes": 133790,
+   "sha256": "23d0eef59b434ff53f7a63ed31fbc7c6387959182de73cd6c720d8b858b45c47"
+  },
+  "assets/sprites/shrines/firebog/lem_open.webp": {
+   "class": "npc_shrine_firebog_lem",
+   "motion": "open",
+   "oga": "glitch-assets/npc_shrine_firebog_lem/npc_shrine_firebog_lem__x1_open_png_1354832820.png",
+   "size": [
+    984,
+    848
+   ],
+   "frames": 22,
+   "bytes": 134572,
+   "sha256": "3b295da617048afd999b93fbe267596b393a236a3901f81d4faf837a38e5aa37"
+  },
+  "assets/sprites/shrines/firebog/lem_close.webp": {
+   "class": "npc_shrine_firebog_lem",
+   "motion": "close",
+   "oga": "glitch-assets/npc_shrine_firebog_lem/npc_shrine_firebog_lem__x1_close_png_1354832823.png",
+   "size": [
+    984,
+    848
+   ],
+   "frames": 23,
+   "bytes": 133774,
+   "sha256": "3673ce1cd5676a6d43533e71faf9a2887cb8ae49608c67e81401b6142e280658"
+  },
+  "assets/sprites/shrines/firebog/mab_open.webp": {
+   "class": "npc_shrine_firebog_mab",
+   "motion": "open",
+   "oga": "glitch-assets/npc_shrine_firebog_mab/npc_shrine_firebog_mab__x1_open_png_1354832828.png",
+   "size": [
+    984,
+    848
+   ],
+   "frames": 22,
+   "bytes": 134426,
+   "sha256": "3dda2435ca54f9c4240665aef383e7b3f8eb185af29c0c9cf860eee9b344e100"
+  },
+  "assets/sprites/shrines/firebog/mab_close.webp": {
+   "class": "npc_shrine_firebog_mab",
+   "motion": "close",
+   "oga": "glitch-assets/npc_shrine_firebog_mab/npc_shrine_firebog_mab__x1_close_png_1354832830.png",
+   "size": [
+    984,
+    848
+   ],
+   "frames": 23,
+   "bytes": 133962,
+   "sha256": "3bc677244de4e97878448f25695d7dd016ab5fd76ed46302ab0a20aa5d2e4fe9"
+  },
+  "assets/sprites/shrines/firebog/pot_open.webp": {
+   "class": "npc_shrine_firebog_pot",
+   "motion": "open",
+   "oga": "glitch-assets/npc_shrine_firebog_pot/npc_shrine_firebog_pot__x1_open_png_1354832834.png",
+   "size": [
+    984,
+    848
+   ],
+   "frames": 22,
+   "bytes": 134492,
+   "sha256": "2e242e118e1eea1b2808217054070c86e601a4bd1d08d9db729001941cce1bed"
+  },
+  "assets/sprites/shrines/firebog/pot_close.webp": {
+   "class": "npc_shrine_firebog_pot",
+   "motion": "close",
+   "oga": "glitch-assets/npc_shrine_firebog_pot/npc_shrine_firebog_pot__x1_close_png_1354832836.png",
+   "size": [
+    984,
+    848
+   ],
+   "frames": 23,
+   "bytes": 133824,
+   "sha256": "fffe200cd68b2509dc7d7f3cd8a422def99954271da28f90fc24b44a813e52c1"
+  },
+  "assets/sprites/shrines/firebog/spriggan_open.webp": {
+   "class": "npc_shrine_firebog_spriggan",
+   "motion": "open",
+   "oga": "glitch-assets/npc_shrine_firebog_spriggan/npc_shrine_firebog_spriggan__x1_open_png_1354832841.png",
+   "size": [
+    984,
+    848
+   ],
+   "frames": 22,
+   "bytes": 134632,
+   "sha256": "6acf7dfec9c33916709956567cfee014076b64d50064b85738ed4774ad14cd7e"
+  },
+  "assets/sprites/shrines/firebog/spriggan_close.webp": {
+   "class": "npc_shrine_firebog_spriggan",
+   "motion": "close",
+   "oga": "glitch-assets/npc_shrine_firebog_spriggan/npc_shrine_firebog_spriggan__x1_close_png_1354832843.png",
+   "size": [
+    984,
+    848
+   ],
+   "frames": 23,
+   "bytes": 133892,
+   "sha256": "c71017ee2dad2a6fa76c99878fb51eda2e48b10f0d814de1860698fb28565c1f"
+  },
+  "assets/sprites/shrines/firebog/ti_open.webp": {
+   "class": "npc_shrine_firebog_tii",
+   "motion": "open",
+   "oga": "glitch-assets/npc_shrine_firebog_tii/npc_shrine_firebog_tii__x1_open_png_1354832848.png",
+   "size": [
+    984,
+    848
+   ],
+   "frames": 22,
+   "bytes": 134032,
+   "sha256": "379645f05be09f2de284c3d035947ce9c548b624db021f30d71400eea4ffb43b"
+  },
+  "assets/sprites/shrines/firebog/ti_close.webp": {
+   "class": "npc_shrine_firebog_tii",
+   "motion": "close",
+   "oga": "glitch-assets/npc_shrine_firebog_tii/npc_shrine_firebog_tii__x1_close_png_1354832850.png",
+   "size": [
+    984,
+    848
+   ],
+   "frames": 23,
+   "bytes": 133928,
+   "sha256": "37d294a8dcfb7aed1446d62a4903efcb88c0e6136478f2e20fcd98002b484cf8"
+  },
+  "assets/sprites/shrines/firebog/zille_open.webp": {
+   "class": "npc_shrine_firebog_zille",
+   "motion": "open",
+   "oga": "glitch-assets/npc_shrine_firebog_zille/npc_shrine_firebog_zille__x1_open_png_1354832855.png",
+   "size": [
+    984,
+    848
+   ],
+   "frames": 22,
+   "bytes": 134694,
+   "sha256": "667efc68eac02355ee1ac16c2fb3ea353d6c25c5cee63b64bcab9d110c536406"
+  },
+  "assets/sprites/shrines/firebog/zille_close.webp": {
+   "class": "npc_shrine_firebog_zille",
+   "motion": "close",
+   "oga": "glitch-assets/npc_shrine_firebog_zille/npc_shrine_firebog_zille__x1_close_png_1354832857.png",
+   "size": [
+    984,
+    848
+   ],
+   "frames": 23,
+   "bytes": 133900,
+   "sha256": "a708d6f267b1511d5334ca0bcd59d617ed23df89896dbcc55a2685b5e678235f"
+  },
+  "assets/sprites/shrines/ix/alph_open.webp": {
+   "class": "npc_shrine_ix_alph",
+   "motion": "open",
+   "oga": "glitch-assets/npc_shrine_ix_alph/npc_shrine_ix_alph__x1_open_png_1354831261.png",
+   "size": [
+    840,
+    1080
+   ],
+   "frames": 24,
+   "bytes": 59964,
+   "sha256": "f349d08c9b31c884e18af2a83ece9781196afbb137e4f3626ca7f99ebd7a277a"
+  },
+  "assets/sprites/shrines/ix/alph_close.webp": {
+   "class": "npc_shrine_ix_alph",
+   "motion": "close",
+   "oga": "glitch-assets/npc_shrine_ix_alph/npc_shrine_ix_alph__x1_close_png_1354831264.png",
+   "size": [
+    840,
+    864
+   ],
+   "frames": 20,
+   "bytes": 59430,
+   "sha256": "a0f575293b8f0fa28bc1ea383f558e66b3622d08f459894a52288f2591625a62"
+  },
+  "assets/sprites/shrines/ix/cosma_open.webp": {
+   "class": "npc_shrine_ix_cosma",
+   "motion": "open",
+   "oga": "glitch-assets/npc_shrine_ix_cosma/npc_shrine_ix_cosma__x1_open_png_1354831267.png",
+   "size": [
+    840,
+    1080
+   ],
+   "frames": 24,
+   "bytes": 59860,
+   "sha256": "24fb946d776cd43a2506ccb012c39ced43c671b4107c0abe7358d47f3154c4bc"
+  },
+  "assets/sprites/shrines/ix/cosma_close.webp": {
+   "class": "npc_shrine_ix_cosma",
+   "motion": "close",
+   "oga": "glitch-assets/npc_shrine_ix_cosma/npc_shrine_ix_cosma__x1_close_png_1354831269.png",
+   "size": [
+    840,
+    864
+   ],
+   "frames": 20,
+   "bytes": 59208,
+   "sha256": "22e51e79c2f96832d408facc5294d4ba6a0cfc0b95d123ee57fd07dce0aae1e1"
+  },
+  "assets/sprites/shrines/ix/friendly_open.webp": {
+   "class": "npc_shrine_ix_friendly",
+   "motion": "open",
+   "oga": "glitch-assets/npc_shrine_ix_friendly/npc_shrine_ix_friendly__x1_open_png_1354831272.png",
+   "size": [
+    840,
+    1080
+   ],
+   "frames": 24,
+   "bytes": 60432,
+   "sha256": "58f9d010963a79d1d4c3b1ef4ebee85e21c3967ae25a82353649c8024be234eb"
+  },
+  "assets/sprites/shrines/ix/friendly_close.webp": {
+   "class": "npc_shrine_ix_friendly",
+   "motion": "close",
+   "oga": "glitch-assets/npc_shrine_ix_friendly/npc_shrine_ix_friendly__x1_close_png_1354831273.png",
+   "size": [
+    840,
+    864
+   ],
+   "frames": 20,
+   "bytes": 59848,
+   "sha256": "e4d0e539e52de608ad1edf586f6f0f5f85d8b148fb708d6015fc083025d953ef"
+  },
+  "assets/sprites/shrines/ix/grendaline_open.webp": {
+   "class": "npc_shrine_ix_grendaline",
+   "motion": "open",
+   "oga": "glitch-assets/npc_shrine_ix_grendaline/npc_shrine_ix_grendaline__x1_open_png_1354831277.png",
+   "size": [
+    840,
+    1080
+   ],
+   "frames": 24,
+   "bytes": 59564,
+   "sha256": "ef26f2bceb9cb70478781f78922ea9a66e0e9f35265a17dc0c9825f77984947f"
+  },
+  "assets/sprites/shrines/ix/grendaline_close.webp": {
+   "class": "npc_shrine_ix_grendaline",
+   "motion": "close",
+   "oga": "glitch-assets/npc_shrine_ix_grendaline/npc_shrine_ix_grendaline__x1_close_png_1354831278.png",
+   "size": [
+    840,
+    864
+   ],
+   "frames": 20,
+   "bytes": 59210,
+   "sha256": "9ee6e5d868403aa4507d6743579395044f7c172f1c95ff265b0bc0ebe318bdc4"
+  },
+  "assets/sprites/shrines/ix/humbaba_open.webp": {
+   "class": "npc_shrine_ix_humbaba",
+   "motion": "open",
+   "oga": "glitch-assets/npc_shrine_ix_humbaba/npc_shrine_ix_humbaba__x1_open_png_1354831282.png",
+   "size": [
+    840,
+    1080
+   ],
+   "frames": 24,
+   "bytes": 59696,
+   "sha256": "fa3ae801a17d3b663deb118949bf41953eb70d76786e2fd8a20d5eaa135f72b0"
+  },
+  "assets/sprites/shrines/ix/humbaba_close.webp": {
+   "class": "npc_shrine_ix_humbaba",
+   "motion": "close",
+   "oga": "glitch-assets/npc_shrine_ix_humbaba/npc_shrine_ix_humbaba__x1_close_png_1354831284.png",
+   "size": [
+    840,
+    864
+   ],
+   "frames": 20,
+   "bytes": 58838,
+   "sha256": "78736a1170a723508ebd3a1c3486d02e8dce92e98e943a4adfc08b7211281888"
+  },
+  "assets/sprites/shrines/ix/lem_open.webp": {
+   "class": "npc_shrine_ix_lem",
+   "motion": "open",
+   "oga": "glitch-assets/npc_shrine_ix_lem/npc_shrine_ix_lem__x1_open_png_1354831287.png",
+   "size": [
+    840,
+    1080
+   ],
+   "frames": 24,
+   "bytes": 60414,
+   "sha256": "2623d96af8b7bbb3937e2c1da8e5d0ebca3a46be66be5cb30392dabef705a129"
+  },
+  "assets/sprites/shrines/ix/lem_close.webp": {
+   "class": "npc_shrine_ix_lem",
+   "motion": "close",
+   "oga": "glitch-assets/npc_shrine_ix_lem/npc_shrine_ix_lem__x1_close_png_1354831289.png",
+   "size": [
+    840,
+    864
+   ],
+   "frames": 20,
+   "bytes": 59788,
+   "sha256": "b36de18f91201e5fc81c7825a86bc31657507596849af2e27081e40dad828cb4"
+  },
+  "assets/sprites/shrines/ix/mab_open.webp": {
+   "class": "npc_shrine_ix_mab",
+   "motion": "open",
+   "oga": "glitch-assets/npc_shrine_ix_mab/npc_shrine_ix_mab__x1_open_png_1354831292.png",
+   "size": [
+    840,
+    1080
+   ],
+   "frames": 24,
+   "bytes": 60578,
+   "sha256": "80517e640149bb1d7aac230fd3e5de481d6648586ea488667aa14ca4d3f987de"
+  },
+  "assets/sprites/shrines/ix/mab_close.webp": {
+   "class": "npc_shrine_ix_mab",
+   "motion": "close",
+   "oga": "glitch-assets/npc_shrine_ix_mab/npc_shrine_ix_mab__x1_close_png_1354831294.png",
+   "size": [
+    840,
+    864
+   ],
+   "frames": 20,
+   "bytes": 59890,
+   "sha256": "c6e0347f6f2c1c4aa88a6e73cffa9538011257e034ba45dea0d19d522f6d3102"
+  },
+  "assets/sprites/shrines/ix/pot_open.webp": {
+   "class": "npc_shrine_ix_pot",
+   "motion": "open",
+   "oga": "glitch-assets/npc_shrine_ix_pot/npc_shrine_ix_pot__x1_open_png_1354831298.png",
+   "size": [
+    840,
+    1080
+   ],
+   "frames": 24,
+   "bytes": 60294,
+   "sha256": "5893f4d2f1ef93f91e40facc46f5d8e169df2db6b306a9e1090aa0d826353a63"
+  },
+  "assets/sprites/shrines/ix/pot_close.webp": {
+   "class": "npc_shrine_ix_pot",
+   "motion": "close",
+   "oga": "glitch-assets/npc_shrine_ix_pot/npc_shrine_ix_pot__x1_close_png_1354831299.png",
+   "size": [
+    840,
+    864
+   ],
+   "frames": 20,
+   "bytes": 59620,
+   "sha256": "8c0e4d6c12abeea6090b499f528584aa95236bd3b793a50b7692a3e60aa8943a"
+  },
+  "assets/sprites/shrines/ix/spriggan_open.webp": {
+   "class": "npc_shrine_ix_spriggan",
+   "motion": "open",
+   "oga": "glitch-assets/npc_shrine_ix_spriggan/npc_shrine_ix_spriggan__x1_open_png_1354831303.png",
+   "size": [
+    840,
+    1080
+   ],
+   "frames": 24,
+   "bytes": 59776,
+   "sha256": "8405bcb4692a3b3035f8a0f7272ab5a272bc69c738fd75d4cd5758b664664b3a"
+  },
+  "assets/sprites/shrines/ix/spriggan_close.webp": {
+   "class": "npc_shrine_ix_spriggan",
+   "motion": "close",
+   "oga": "glitch-assets/npc_shrine_ix_spriggan/npc_shrine_ix_spriggan__x1_close_png_1354831304.png",
+   "size": [
+    840,
+    864
+   ],
+   "frames": 20,
+   "bytes": 59178,
+   "sha256": "1b01050b62637d58a434565f15a0dba36738f41d3cd676a6e163de1dc0d8573d"
+  },
+  "assets/sprites/shrines/ix/ti_open.webp": {
+   "class": "npc_shrine_ix_ti",
+   "motion": "open",
+   "oga": "glitch-assets/npc_shrine_ix_ti/npc_shrine_ix_ti__x1_open_png_1354831313.png",
+   "size": [
+    840,
+    1080
+   ],
+   "frames": 24,
+   "bytes": 59448,
+   "sha256": "6b39e1b7ec5c39272a78d8374fd03b6bd3fada8e2ea410e75e4ef7850137232d"
+  },
+  "assets/sprites/shrines/ix/ti_close.webp": {
+   "class": "npc_shrine_ix_ti",
+   "motion": "close",
+   "oga": "glitch-assets/npc_shrine_ix_ti/npc_shrine_ix_ti__x1_close_png_1354831314.png",
+   "size": [
+    840,
+    864
+   ],
+   "frames": 20,
+   "bytes": 58770,
+   "sha256": "4de24d42cda22d15c0800656bfb03c6b467a9212beb6ed942f07aaf538a0cb7a"
+  },
+  "assets/sprites/shrines/ix/zille_open.webp": {
+   "class": "npc_shrine_ix_zille",
+   "motion": "open",
+   "oga": "glitch-assets/npc_shrine_ix_zille/npc_shrine_ix_zille__x1_open_png_1354831308.png",
+   "size": [
+    840,
+    1080
+   ],
+   "frames": 24,
+   "bytes": 59854,
+   "sha256": "2ffe8f6003c867b6ded4da6ab0b1c7bd31746506406166ccb0862868e01613e5"
+  },
+  "assets/sprites/shrines/ix/zille_close.webp": {
+   "class": "npc_shrine_ix_zille",
+   "motion": "close",
+   "oga": "glitch-assets/npc_shrine_ix_zille/npc_shrine_ix_zille__x1_close_png_1354831310.png",
+   "size": [
+    840,
+    864
+   ],
+   "frames": 20,
+   "bytes": 59268,
+   "sha256": "d2c931770ff121df03c2d5f1f448c1d3ea846d2dd59a962593078bc36468f09e"
+  },
+  "assets/sprites/shrines/uralia/alph_open.webp": {
+   "class": "npc_shrine_uralia_alph",
+   "motion": "open",
+   "oga": "glitch-assets/npc_shrine_uralia_alph/npc_shrine_uralia_alph__x1_open_png_1354831859.png",
+   "size": [
+    756,
+    752
+   ],
+   "frames": 22,
+   "bytes": 197380,
+   "sha256": "7c3baed677df4dbfcff3d2bd2ca586016bedc48787754dd1647b4f1fd0a90a28"
+  },
+  "assets/sprites/shrines/uralia/alph_close.webp": {
+   "class": "npc_shrine_uralia_alph",
+   "motion": "close",
+   "oga": "glitch-assets/npc_shrine_uralia_alph/npc_shrine_uralia_alph__x1_close_png_1354831862.png",
+   "size": [
+    756,
+    752
+   ],
+   "frames": 23,
+   "bytes": 184462,
+   "sha256": "66c9261d783c91bb58cb00ada5e83dde7b02a3cfa4cfb08cbd0d436a9c29a14f"
+  },
+  "assets/sprites/shrines/uralia/cosma_open.webp": {
+   "class": "npc_shrine_uralia_cosma",
+   "motion": "open",
+   "oga": "glitch-assets/npc_shrine_uralia_cosma/npc_shrine_uralia_cosma__x1_open_png_1354831867.png",
+   "size": [
+    756,
+    752
+   ],
+   "frames": 22,
+   "bytes": 196586,
+   "sha256": "1e32b0cc744baec266472a95be71db10d3b76d6052eaa98797105c7ce830da30"
+  },
+  "assets/sprites/shrines/uralia/cosma_close.webp": {
+   "class": "npc_shrine_uralia_cosma",
+   "motion": "close",
+   "oga": "glitch-assets/npc_shrine_uralia_cosma/npc_shrine_uralia_cosma__x1_close_png_1354831869.png",
+   "size": [
+    756,
+    752
+   ],
+   "frames": 23,
+   "bytes": 183148,
+   "sha256": "58db244d32ff1064eabf4d4ab2575b2926a189f40aa29d0a9e0634e322bc9b17"
+  },
+  "assets/sprites/shrines/uralia/friendly_open.webp": {
+   "class": "npc_shrine_uralia_friendly",
+   "motion": "open",
+   "oga": "glitch-assets/npc_shrine_uralia_friendly/npc_shrine_uralia_friendly__x1_open_png_1354831874.png",
+   "size": [
+    756,
+    752
+   ],
+   "frames": 22,
+   "bytes": 195500,
+   "sha256": "bcf4c58c8a40cffde5ab24ff95b2794ff9ec1a8b28f923b7fa31856da2fe8d3f"
+  },
+  "assets/sprites/shrines/uralia/friendly_close.webp": {
+   "class": "npc_shrine_uralia_friendly",
+   "motion": "close",
+   "oga": "glitch-assets/npc_shrine_uralia_friendly/npc_shrine_uralia_friendly__x1_close_png_1354831876.png",
+   "size": [
+    756,
+    752
+   ],
+   "frames": 23,
+   "bytes": 183442,
+   "sha256": "4e5f992551b4b5f60ffe5f1684d807e0c355544f77cfae6c24ed90ff4b9e499f"
+  },
+  "assets/sprites/shrines/uralia/grendaline_open.webp": {
+   "class": "npc_shrine_uralia_grendaline",
+   "motion": "open",
+   "oga": "glitch-assets/npc_shrine_uralia_grendaline/npc_shrine_uralia_grendaline__x1_open_png_1354831881.png",
+   "size": [
+    756,
+    752
+   ],
+   "frames": 22,
+   "bytes": 197784,
+   "sha256": "6c03258fa6a41bfc4da8ef8f7cdf046c584ca7ae9e5a9b979f9c119031738909"
+  },
+  "assets/sprites/shrines/uralia/grendaline_close.webp": {
+   "class": "npc_shrine_uralia_grendaline",
+   "motion": "close",
+   "oga": "glitch-assets/npc_shrine_uralia_grendaline/npc_shrine_uralia_grendaline__x1_close_png_1354831883.png",
+   "size": [
+    756,
+    752
+   ],
+   "frames": 23,
+   "bytes": 185068,
+   "sha256": "2038afc66b1637ad8a8466add1e3ae3e241cc1e4c31582795e3b17ca1302eaf9"
+  },
+  "assets/sprites/shrines/uralia/humbaba_open.webp": {
+   "class": "npc_shrine_uralia_humbaba",
+   "motion": "open",
+   "oga": "glitch-assets/npc_shrine_uralia_humbaba/npc_shrine_uralia_humbaba__x1_open_png_1354831888.png",
+   "size": [
+    756,
+    752
+   ],
+   "frames": 22,
+   "bytes": 195518,
+   "sha256": "84fdb5f73503f6ce2611c0cc8c1bc1ff669ad45c2156bda83f16356500660490"
+  },
+  "assets/sprites/shrines/uralia/humbaba_close.webp": {
+   "class": "npc_shrine_uralia_humbaba",
+   "motion": "close",
+   "oga": "glitch-assets/npc_shrine_uralia_humbaba/npc_shrine_uralia_humbaba__x1_close_png_1354831890.png",
+   "size": [
+    756,
+    752
+   ],
+   "frames": 23,
+   "bytes": 183538,
+   "sha256": "d125c903453f5b004f189ec40840aa253e98c8bf02d27aff829b5d2a992dbed3"
+  },
+  "assets/sprites/shrines/uralia/lem_open.webp": {
+   "class": "npc_shrine_uralia_lem",
+   "motion": "open",
+   "oga": "glitch-assets/npc_shrine_uralia_lem/npc_shrine_uralia_lem__x1_open_png_1354831895.png",
+   "size": [
+    756,
+    752
+   ],
+   "frames": 22,
+   "bytes": 197670,
+   "sha256": "da9d12af2d8da4184b3d9692269a3715b72741c4bfc446e409e289db1f6bb295"
+  },
+  "assets/sprites/shrines/uralia/lem_close.webp": {
+   "class": "npc_shrine_uralia_lem",
+   "motion": "close",
+   "oga": "glitch-assets/npc_shrine_uralia_lem/npc_shrine_uralia_lem__x1_close_png_1354831897.png",
+   "size": [
+    756,
+    752
+   ],
+   "frames": 23,
+   "bytes": 184558,
+   "sha256": "8e4cd6f571b3051d6424a62ccdb0a64cbeb74162e0b79714fea09574d4ea5d36"
+  },
+  "assets/sprites/shrines/uralia/mab_open.webp": {
+   "class": "npc_shrine_uralia_mab",
+   "motion": "open",
+   "oga": "glitch-assets/npc_shrine_uralia_mab/npc_shrine_uralia_mab__x1_open_png_1354831902.png",
+   "size": [
+    756,
+    752
+   ],
+   "frames": 22,
+   "bytes": 197802,
+   "sha256": "c6a341d453e8755b96f6fcdc48aff76f83f082f5062dde816b2243e9137cf9ac"
+  },
+  "assets/sprites/shrines/uralia/mab_close.webp": {
+   "class": "npc_shrine_uralia_mab",
+   "motion": "close",
+   "oga": "glitch-assets/npc_shrine_uralia_mab/npc_shrine_uralia_mab__x1_close_png_1354831904.png",
+   "size": [
+    756,
+    752
+   ],
+   "frames": 23,
+   "bytes": 184870,
+   "sha256": "dd61feb319465b482a30c25c5b360d9be116d4fac99ab7ea50133452204b350b"
+  },
+  "assets/sprites/shrines/uralia/pot_open.webp": {
+   "class": "npc_shrine_uralia_pot",
+   "motion": "open",
+   "oga": "glitch-assets/npc_shrine_uralia_pot/npc_shrine_uralia_pot__x1_open_png_1354831908.png",
+   "size": [
+    756,
+    752
+   ],
+   "frames": 22,
+   "bytes": 194102,
+   "sha256": "ac15d5ef8a97d4f6c30656f0a60d1966d897b78cc5a7338d01cc29fc1eb0b0f8"
+  },
+  "assets/sprites/shrines/uralia/pot_close.webp": {
+   "class": "npc_shrine_uralia_pot",
+   "motion": "close",
+   "oga": "glitch-assets/npc_shrine_uralia_pot/npc_shrine_uralia_pot__x1_close_png_1354831911.png",
+   "size": [
+    756,
+    752
+   ],
+   "frames": 23,
+   "bytes": 182016,
+   "sha256": "f986783540456601f7f679302d8ce8275bbaffdbf39ef40168c26d6f973724ee"
+  },
+  "assets/sprites/shrines/uralia/spriggan_open.webp": {
+   "class": "npc_shrine_uralia_spriggan",
+   "motion": "open",
+   "oga": "glitch-assets/npc_shrine_uralia_spriggan/npc_shrine_uralia_spriggan__x1_open_png_1354831915.png",
+   "size": [
+    756,
+    752
+   ],
+   "frames": 22,
+   "bytes": 199802,
+   "sha256": "ef5d1388a3adc3fb85ffe199a9d65f995ce42a67ff126ae665ed90c59d9ff09e"
+  },
+  "assets/sprites/shrines/uralia/spriggan_close.webp": {
+   "class": "npc_shrine_uralia_spriggan",
+   "motion": "close",
+   "oga": "glitch-assets/npc_shrine_uralia_spriggan/npc_shrine_uralia_spriggan__x1_close_png_1354831918.png",
+   "size": [
+    756,
+    752
+   ],
+   "frames": 23,
+   "bytes": 185190,
+   "sha256": "2ba43e07155f21d42d8025adf1a22741f119face984423ea673aac068d079beb"
+  },
+  "assets/sprites/shrines/uralia/ti_open.webp": {
+   "class": "npc_shrine_uralia_ti",
+   "motion": "open",
+   "oga": "glitch-assets/npc_shrine_uralia_ti/npc_shrine_uralia_ti__x1_open_png_1354831922.png",
+   "size": [
+    756,
+    752
+   ],
+   "frames": 22,
+   "bytes": 193630,
+   "sha256": "d059c24cfd6286366c0b5963bd5b7d2b51c9ccf2f9fdb2ad6ac7df806b983cad"
+  },
+  "assets/sprites/shrines/uralia/ti_close.webp": {
+   "class": "npc_shrine_uralia_ti",
+   "motion": "close",
+   "oga": "glitch-assets/npc_shrine_uralia_ti/npc_shrine_uralia_ti__x1_close_png_1354831924.png",
+   "size": [
+    756,
+    752
+   ],
+   "frames": 23,
+   "bytes": 182080,
+   "sha256": "42aaa3891602ea2464b41a616f3ba611d3ba39b1078715d3d2b562a5e5426f29"
+  },
+  "assets/sprites/shrines/uralia/zille_open.webp": {
+   "class": "npc_shrine_uralia_zille",
+   "motion": "open",
+   "oga": "glitch-assets/npc_shrine_uralia_zille/npc_shrine_uralia_zille__x1_open_png_1354831929.png",
+   "size": [
+    756,
+    752
+   ],
+   "frames": 22,
+   "bytes": 195988,
+   "sha256": "ed02d36a3fc089f5c673d042387fdda60e5222dd98c89235545a5c3a204cd694"
+  },
+  "assets/sprites/shrines/uralia/zille_close.webp": {
+   "class": "npc_shrine_uralia_zille",
+   "motion": "close",
+   "oga": "glitch-assets/npc_shrine_uralia_zille/npc_shrine_uralia_zille__x1_close_png_1354831931.png",
+   "size": [
+    756,
+    752
+   ],
+   "frames": 23,
+   "bytes": 183506,
+   "sha256": "7edb9fc4f97188da2ee04eb049fce5474ead8f5b1c2669dea7da3983176ab003"
+  }
+ }
+}

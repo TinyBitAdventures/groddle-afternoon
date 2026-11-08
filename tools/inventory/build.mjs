@@ -514,7 +514,13 @@ export async function collect({ spike = SPIKE, log = () => {} } = {}) {
   }
   for (const it of items) if (placed.has(it.label)) gsjsRefs.get(it.id).add(`location dump ${placed.get(it.label)} (label "${it.label}")`);
   const templates = spawnTemplates(remakeIndex, { skipFile: (f) => D.CATALOG_FILE.test(f) });
-  const itemRows = D.judgeItems({ items, reach, present, codeCtx: remakeCtx, gsjsRefs, families, templates });
+  // Proxy variants that draw their own art: the regional shrines' sheets (tools/shrine-variants/build.mjs).
+  const ownArt = new Map();
+  const shrineArt = join(spike, 'public/assets/sprites/shrines/variants.json');
+  if (existsSync(shrineArt)) {
+    for (const [file, m] of Object.entries(JSON.parse(readFileSync(shrineArt, 'utf8')).files || {})) if (m.class && !ownArt.has(m.class)) ownArt.set(m.class, `${file}, js/shrine-variants.js`);
+  }
+  const itemRows = D.judgeItems({ items, reach, present, codeCtx: remakeCtx, gsjsRefs, families, templates, ownArt });
   const itemStatus = new Map(itemRows.map((r) => [r.id, r.status]));
 
   // Quests.
