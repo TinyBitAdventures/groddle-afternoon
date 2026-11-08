@@ -11,7 +11,7 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { GENTLE_ISLAND, ISLAND_BOXES, exitBoxAction, inHitBox, normalizeNewxpSave } from '../public/js/newxp.js?v=398ca20e';
+import { GENTLE_ISLAND, ISLAND_BOXES, exitBoxAction, inHitBox, normalizeNewxpSave } from '../public/js/newxp.js?v=b7a1699b';
 
 const root = join(import.meta.dirname, '..');
 const read = (rel) => readFileSync(join(root, rel), 'utf8');

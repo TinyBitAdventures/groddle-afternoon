@@ -2733,9 +2733,34 @@
   "deployed": "2026-11-08"
  },
  "git": {
-  "commits": 1487,
+  "commits": 1493,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-08",
+    "kind": "new",
+    "text": "Leave a wrapped Gift Box with a friend's Butler online; they get it back still wrapped, with the same things inside"
+   },
+   {
+    "date": "2026-11-08",
+    "kind": "improve",
+    "text": "Online, the Skills panel says Transcendental Radiation works, and what ranks II and III need"
+   },
+   {
+    "date": "2026-11-08",
+    "kind": "improve",
+    "text": "Online, everyone focused on a Rook stun orb glows at their feet until it fires"
+   },
+   {
+    "date": "2026-11-08",
+    "kind": "new",
+    "text": "Garlic Breath reaches everyone on the street online: other players lose up to 20 mood and smell something funky"
+   },
+   {
+    "date": "2026-11-08",
+    "kind": "new",
+    "text": "Cubimal battles: set a figure down with Panache, Wile or Gumption to fight another player's"
+   },
    {
     "date": "2026-11-08",
     "kind": "fix",
@@ -2830,34 +2855,9 @@
     "date": "2026-11-08",
     "kind": "fix",
     "text": "Notice the Unnoticeable picks its seven cold spots at random for each player, from streets you can reach"
-   },
-   {
-    "date": "2026-11-08",
-    "kind": "new",
-    "text": "The Rook, Fertilidust and Trantsformation Fluid work on trees grown in shared street Patches (switched off until a release turns it on)"
-   },
-   {
-    "date": "2026-11-08",
-    "kind": "new",
-    "text": "Trees grown in shared street Patches are the same for everyone: pet, water, harvest, Tree Poison and its Antidote (switched off until a release turns it on)"
-   },
-   {
-    "date": "2026-11-07",
-    "kind": "new",
-    "text": "Street Patches can be shared online (switched off until a release turns it on)"
-   },
-   {
-    "date": "2026-11-07",
-    "kind": "new",
-    "text": "The realtime server's shared street Patches data (G564)"
-   },
-   {
-    "date": "2026-11-07",
-    "kind": "improve",
-    "text": "Every file's cache key starts fresh for game v0.23.0, so the game's start-up list shrinks from 670 KB to almost nothing"
    }
   ]
  },
- "tests": 742,
+ "tests": 745,
  "generatedAt": "2026-11-08"
 }

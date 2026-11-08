@@ -282,7 +282,12 @@ export const LINES = Object.freeze({
   t2Egg3: 'Mmmm. EGGs! Love \'em!',
   t2HaveEgg: 'You got an EGG! Please gimme it!!!',
   t2NoEgg: 'Heyyyyyyy. You were going to<br>get me an EGG. Fair\'s fair!<br>Go get one!',
-  t2GiveHint: 'Drag an Egg onto the Dustbunny. Or, click on the Dustbunny to give it an Egg.',
+  // npc_newxp_dustbunny.js 204 says "Drag an EGG onto the Dustbunny. Or, click on the Dustbunny ...":
+  // the remake has no dragging onto the world, so the first half names the pack's Give instead (ours).
+  t2GiveHint: 'Click on the Dustbunny to give it an Egg. Or, click the Egg in your pack and choose Give Egg to Dust Bunny.',
+  // drop_tip of verbs.give_egg (npc_newxp_dustbunny.js 192), the pack verb's label here.
+  t2GiveEggPack: 'Give Egg to Dust Bunny',
+  t2GiveEggFar: 'Get a little closer to the Dustbunny.',
   t2Harvest: 'Harvest …',
   t2Delicious: 'Delicious!',
   t2Thanks: 'Thank you very much, {name}.<br>That was SO GOOD!<br><split butt_txt="No problem">As a token of my thanks,<br>let me remove these walls.',
@@ -580,6 +585,18 @@ export function islandExitOpen(island) {
 export function exitBoxAction(save) {
   if (save?.status === 'active' && save?.stage === 'island' && islandExitOpen(save?.island)) return 'tutorial';
   return 'teleport';
+}
+
+/** The Welcoming Flamingo's name box holds 19 letters (newxp_training1.js 582, input_max_chars: 19). */
+export const TUTORIAL_NAME_MAX = 19;
+
+/**
+ * PURE: what the tutorial's name box starts with (Austin 2026-11-08). Online, a player already chose
+ * a character name when they signed up (GRODDLE_MP_BOOT.player.name), so the box holds it and OK
+ * keeps it; they can still type another. Solo has no name before this step: the box starts empty.
+ */
+export function tutorialNameDefault(boot = globalThis.GRODDLE_MP_BOOT) {
+  return String(boot?.player?.name ?? '').replace(/[<>]/g, '').trim().slice(0, TUTORIAL_NAME_MAX);
 }
 
 export function normalizeNewxpSave(seed = {}) {

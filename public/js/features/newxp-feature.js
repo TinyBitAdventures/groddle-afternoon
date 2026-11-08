@@ -122,7 +122,9 @@ import {
   tutorialPhysics,
   SKIP_TUTORIAL_CARDS,
   vogPages,
-} from '../newxp.js?v=398ca20e';
+  tutorialNameDefault,
+  TUTORIAL_NAME_MAX,
+} from '../newxp.js?v=b7a1699b';
 import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=b7609342';
 import { QUOIN_SHEET, QUOIN_TYPES, qrazyRewardForLevel } from '../quoins.js?v=299cc3f4';
 import { soundForQuoin } from '../sound-moments.js?v=2f8597cd';
@@ -135,7 +137,7 @@ import * as kit from '../quest-rooms/kit.js?v=25fc6d59';
 import { frameTexture, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js?v=3149d699';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 import { displayTopOf, itemstackOverlayPoint, playPoofIn, playSheetOverlay, poofInAlpha } from '../overlay-art.js?v=11b6dd7f';
-import { HOME_MACHINE } from '../home-ticket.js?v=91125b31';
+import { HOME_MACHINE } from '../home-ticket.js?v=7512f173';
 import { animalAnchorX, animalAnchorY, createAnimalState } from '../animals.js?v=fd2e3b93';
 import {
   AK_ANIMALS,
@@ -310,6 +312,13 @@ body.nx-island-map #map-panel .map-feature-card:not(.nx-map-card),body.nx-island
 .nx-map-card{margin:0 0 var(--sp-4);padding:var(--sp-4) var(--sp-6);border-radius:var(--radius-lg);background:var(--c-cream-97);color:var(--c-umber-40);font:800 var(--fs-md) var(--font-round);text-align:center}
 body.nx-hide-actions .top-actions>:not(#mute-btn):not(#sound-btn),body.nx-hide-actions .quest-tracker{visibility:hidden}
 body.nx-hide-chat #local-chat-dock{visibility:hidden}
+/* Austin 2026-11-08: in Modern a part the tutorial has not shown yet takes no room, so its pill shrinks to what is
+   shown (the sound button alone on the right) and a pill with nothing in it goes away. Classic keeps its frame. */
+:root[data-ui="modern"] body.nx-hide-meta .metabolics-cluster,:root[data-ui="modern"] body.nx-hide-energy .meta-pill.energy,:root[data-ui="modern"] body.nx-hide-mood .meta-pill.mood{display:none}
+:root[data-ui="modern"] body.nx-hide-meta.nx-hide-energy.nx-hide-mood #hud-stats{display:none}
+:root[data-ui="modern"] body.nx-hide-meta.nx-hide-energy.nx-hide-mood .top-bar .top-actions{margin-left:auto}
+:root[data-ui="modern"] body.nx-hide-actions .top-actions>:not(#mute-btn):not(#sound-btn),:root[data-ui="modern"] body.nx-hide-actions .quest-tracker{display:none}
+:root[data-ui="modern"] body.nx-hide-currants .meta-stat.currants{display:none}
 `;
 
 function el(tag, attrs = {}, html = '') {
@@ -1591,8 +1600,9 @@ async function runTraining1(t) {
   await talk(t, fl, LINES.t1Door1, { buttons: ['Guess so!'], mode: 'short' });
   if (!save.name) {
     await talk(t, fl, LINES.t1Name, { buttons: ['Hmm …'] });
-    const res = await talk(t, fl, LINES.t1NamePrompt, { buttons: ['OK'], input: { max: 19, placeholder: 'Your name' } });
-    const name = filterText(String(res?.text || '').replace(/[<>]/g, '').trim().slice(0, 19)); // the remake's own word filter (js/word-filter.js)
+    // Online the box already holds the character name the player signed up with (tutorialNameDefault).
+    const res = await talk(t, fl, LINES.t1NamePrompt, { buttons: ['OK'], input: { max: TUTORIAL_NAME_MAX, placeholder: 'Your name', value: tutorialNameDefault() } });
+    const name = filterText(String(res?.text || '').replace(/[<>]/g, '').trim().slice(0, TUTORIAL_NAME_MAX)); // the remake's own word filter (js/word-filter.js)
     save.name = name || 'Glitchling';
     engine.save();
   }
@@ -1859,6 +1869,14 @@ async function runTraining2(t) {
   // dustbunny_egg4b: harvest the Egg Plant, give the egg.
   setStep('egg_give');
   run.data.eggGiven = false;
+  // QA: &newxphold=egg stops the autoplay here with an Egg in the pack, beside the Dustbunny (its pack verb).
+  if (holdAt === 'egg' && auto) {
+    for (const q of run.quoins) if (!q.taken) takeQuoin(engine, q);
+    if (!run.data.eggHarvested) harvestEgg(engine);
+    place(db.x - 80, L.floorY);
+    auto = false;
+    engine.setData('newxpAutoplay', 'hold:egg');
+  }
   let lastNear = 0;
   await until(t, () => {
     const near = Math.abs(P().x - db.x) < 70 && Math.abs(P().y - db.y) < 60;
@@ -1957,6 +1975,15 @@ function harvestEgg(engine) {
   engine.pushActivity('You harvested 1 Egg.');
   engine.setData('newxpLast', 'harvest:egg_plain');
   return true;
+}
+
+/** The pack's Give Egg reaches the Dustbunny while it is in plain view nearby (the original's drag needed it on screen). */
+export const EGG_GIVE_REACH = 600;
+function eggGiveNear(engine) {
+  const db = run?.npcs?.find((n) => n.classId === 'newxp_dustbunny' || n.kind === 'dustbunny');
+  const p = engine?.player;
+  if (!db || !p) return true;
+  return Math.abs(p.x - db.x) <= EGG_GIVE_REACH && Math.abs(p.y - db.y) <= 400;
 }
 
 function giveEgg(engine) {
@@ -3848,6 +3875,27 @@ export const newxpFeature = {
     // A reload inside a training scene restarts that scene once the game starts.
     if (isNewxpSceneTsid(saved?.tsid)) return { tsid: DEFAULT_START, x: 0, y: 0 };
     return null;
+  },
+
+  /**
+   * The Egg in the pack (Austin 2026-11-08): while the Dustbunny waits for it, the Egg's own menu
+   * offers Give Egg to Dust Bunny, as the original's drag onto it did (verbs.give_egg is a drop
+   * target, drop_tip "Give Egg to Dust Bunny", npc_newxp_dustbunny.js 190-195).
+   */
+  packVerbs(classTsid, engine) {
+    if (classTsid !== 'egg_plain' || !run || run.stage !== 'training2' || run.step !== 'egg_give') return null;
+    const near = eggGiveNear(engine);
+    return [{ id: 'nx_give_egg', label: LINES.t2GiveEggPack, enabled: near, reason: near ? '' : LINES.t2GiveEggFar, tooltip: LINES.t2GiveEggPack, primary: true }];
+  },
+
+  runPackVerb(classTsid, verbId, engine) {
+    if (verbId !== 'nx_give_egg' || classTsid !== 'egg_plain') return false;
+    if (!eggGiveNear(engine)) {
+      engine.toast(LINES.t2GiveEggFar, 2000);
+      return true;
+    }
+    giveEgg(engine);
+    return true;
   },
 
   verbsFor(target) {
