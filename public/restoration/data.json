@@ -2728,13 +2728,103 @@
   ]
  },
  "release": {
-  "game": "0.23.0",
+  "game": "0.24.0",
   "deployed": "2026-11-08"
  },
  "git": {
-  "commits": 1458,
+  "commits": 1481,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-08",
+    "kind": "new",
+    "text": "Street Patches are shared online: everyone on a street tends, digs, plants and grows the same Patch trees"
+   },
+   {
+    "date": "2026-11-08",
+    "kind": "fix",
+    "text": "A signpost arm's number key stays steady while the camera moves"
+   },
+   {
+    "date": "2026-11-08",
+    "kind": "fix",
+    "text": "Trees and Chickens stand on the ground instead of floating above it"
+   },
+   {
+    "date": "2026-11-08",
+    "kind": "fix",
+    "text": "A street's end stays clear of the Social drawer, so the last signpost is never cut off under the rail"
+   },
+   {
+    "date": "2026-11-08",
+    "kind": "improve",
+    "text": "The region map's subway, shrine and vendor icons stay sharp at any size, and the shrine and vendor icons read dark instead of pale"
+   },
+   {
+    "date": "2026-11-08",
+    "kind": "improve",
+    "text": "Gains from resource nodes float over you with a larger item picture, clear of the node's talk bubble"
+   },
+   {
+    "date": "2026-11-08",
+    "kind": "improve",
+    "text": "A Patch clear cut short because another player cleared the dead tree first says \"Someone else cleared it first.\" (switched off until a release turns it on)"
+   },
+   {
+    "date": "2026-11-08",
+    "kind": "new",
+    "text": "Every street Patch can be shared online, and players' own Patch trees are handed over once when that happens (switched off until a release turns it on)"
+   },
+   {
+    "date": "2026-11-08",
+    "kind": "improve",
+    "text": "Poking Very Stinky Cheese says the cheese became Stinky Cheese"
+   },
+   {
+    "date": "2026-11-08",
+    "kind": "improve",
+    "text": "Items from Dust Traps and other resource nodes float up with their icon"
+   },
+   {
+    "date": "2026-11-08",
+    "kind": "fix",
+    "text": "Pinned quests show bold words, the encyclopedia only says a quest moves you when it does, and quests from the Offered tab pop up"
+   },
+   {
+    "date": "2026-11-08",
+    "kind": "fix",
+    "text": "Elements can't be dropped again; ones already on the ground pick up into a pouch or disperse"
+   },
+   {
+    "date": "2026-11-08",
+    "kind": "improve",
+    "text": "One item picker for posting an auction, giving and the Butler: tiles with a search, How many right under the pick"
+   },
+   {
+    "date": "2026-11-08",
+    "kind": "fix",
+    "text": "Notice the Unnoticeable picks its seven cold spots at random for each player, from streets you can reach"
+   },
+   {
+    "date": "2026-11-08",
+    "kind": "new",
+    "text": "The Rook, Fertilidust and Trantsformation Fluid work on trees grown in shared street Patches (switched off until a release turns it on)"
+   },
+   {
+    "date": "2026-11-08",
+    "kind": "new",
+    "text": "Trees grown in shared street Patches are the same for everyone: pet, water, harvest, Tree Poison and its Antidote (switched off until a release turns it on)"
+   },
+   {
+    "date": "2026-11-07",
+    "kind": "new",
+    "text": "Street Patches can be shared online (switched off until a release turns it on)"
+   },
+   {
+    "date": "2026-11-07",
+    "kind": "new",
+    "text": "The realtime server's shared street Patches data (G564)"
+   },
    {
     "date": "2026-11-07",
     "kind": "improve",
@@ -2764,99 +2854,9 @@
     "date": "2026-11-07",
     "kind": "improve",
     "text": "Groddle Meadow, Groddle Forest and Alakol have redone map paintings, closer to the originals' olive felt"
-   },
-   {
-    "date": "2026-11-07",
-    "kind": "improve",
-    "text": "Holding everything an offered quest wants says to accept it first"
-   },
-   {
-    "date": "2026-11-07",
-    "kind": "improve",
-    "text": "Letters the game sends have real subjects instead of \"Delivered message\""
-   },
-   {
-    "date": "2026-11-07",
-    "kind": "improve",
-    "text": "Hubs that had the original's placeholder map show its grey instead of a made-up tan and green"
-   },
-   {
-    "date": "2026-11-07",
-    "kind": "fix",
-    "text": "Nobody gets stuck in The Back Alley, the Shady Bureaucrat is always there, and leaving Legalize It keeps your cards"
-   },
-   {
-    "date": "2026-11-07",
-    "kind": "new",
-    "text": "Administrators can delete a Global Chat, Live Help or Trade Channel line from inside the game"
-   },
-   {
-    "date": "2026-11-07",
-    "kind": "fix",
-    "text": "Pick up how many on a shared street stack asks, takes only that many and leaves the rest for everyone"
-   },
-   {
-    "date": "2026-11-07",
-    "kind": "fix",
-    "text": "The Card-Carrying Qualification activates from the pack wherever it was bought"
-   },
-   {
-    "date": "2026-11-07",
-    "kind": "fix",
-    "text": "An online character no longer finds free Paradise tickets, a Hatchet or a resource kit in the pack when it loads"
-   },
-   {
-    "date": "2026-11-07",
-    "kind": "fix",
-    "text": "A garden left for hours comes back as far as it grew, a crop instead of dry shoots"
-   },
-   {
-    "date": "2026-11-07",
-    "kind": "new",
-    "text": "A channel line an administrator deletes disappears from the game's chat at once"
-   },
-   {
-    "date": "2026-11-07",
-    "kind": "improve",
-    "text": "Xalanga and Zhambu have new map paintings, and Tamila's is redone, so every region map is repainted"
-   },
-   {
-    "date": "2026-11-07",
-    "kind": "new",
-    "text": "Master Gardener potions work on the shared public gardens, and others see your can or hoe over your head"
-   },
-   {
-    "date": "2026-11-07",
-    "kind": "improve",
-    "text": "Vantalu and the Vortex of Random have new map paintings, repainted from Tiny Speck's thumbnails of the lost originals"
-   },
-   {
-    "date": "2026-11-07",
-    "kind": "improve",
-    "text": "Tamila and Uralia have new map paintings, repainted from Tiny Speck's thumbnails of the lost originals"
-   },
-   {
-    "date": "2026-11-07",
-    "kind": "fix",
-    "text": "The earth under a street's edge fades smoothly into the dark instead of stopping in a straight-edged box"
-   },
-   {
-    "date": "2026-11-07",
-    "kind": "fix",
-    "text": "The planter's 60 seconds refuses beside the reach check, which stays as pinned"
-   },
-   {
-    "date": "2026-11-07",
-    "kind": "new",
-    "text": "The ten public gardens are shared online: everyone on the street sees and tends the same plots"
-   },
-   {
-    "date": "2026-11-07",
-    "kind": "improve",
-    "text": "The Garden Gnome blinks, hops, talks and looks with its own 140 frames"
    }
   ]
  },
  "tests": 739,
- "generatedAt": "2026-11-07"
+ "generatedAt": "2026-11-08"
 }
