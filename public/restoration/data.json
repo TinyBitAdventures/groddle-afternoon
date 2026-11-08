@@ -2728,13 +2728,38 @@
   ]
  },
  "release": {
-  "game": "0.22.0",
-  "deployed": "2026-11-07"
+  "game": "0.23.0",
+  "deployed": "2026-11-08"
  },
  "git": {
-  "commits": 1452,
+  "commits": 1458,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-07",
+    "kind": "improve",
+    "text": "Every file's cache key starts fresh for game v0.23.0, so the game's start-up list shrinks from 670 KB to almost nothing"
+   },
+   {
+    "date": "2026-11-07",
+    "kind": "fix",
+    "text": "/stuck in Wintry Place takes you to the way out on the floor, and its hint only counts the slot you can't jump out of"
+   },
+   {
+    "date": "2026-11-07",
+    "kind": "improve",
+    "text": "A deploy can keep files that left the game for one release"
+   },
+   {
+    "date": "2026-11-07",
+    "kind": "fix",
+    "text": "A chat command with a walking key's letter in front (\"d/home\", \"a/leave\") runs instead of going out as chat"
+   },
+   {
+    "date": "2026-11-07",
+    "kind": "improve",
+    "text": "Game pictures load as lossless WebP, 48.8 MB smaller with identical pixels"
+   },
    {
     "date": "2026-11-07",
     "kind": "improve",
@@ -2829,31 +2854,6 @@
     "date": "2026-11-07",
     "kind": "improve",
     "text": "The Garden Gnome blinks, hops, talks and looks with its own 140 frames"
-   },
-   {
-    "date": "2026-11-07",
-    "kind": "fix",
-    "text": "A walking key held while opening chat no longer types into the box"
-   },
-   {
-    "date": "2026-11-07",
-    "kind": "fix",
-    "text": "Memory repeats come back only through a Street Spirit's reminisce"
-   },
-   {
-    "date": "2026-11-07",
-    "kind": "improve",
-    "text": "Tahli has a new map painting, repainted from Tiny Speck's thumbnail of the lost original"
-   },
-   {
-    "date": "2026-11-07",
-    "kind": "improve",
-    "text": "Sura has a new map painting, repainted from Tiny Speck's thumbnail of the lost original"
-   },
-   {
-    "date": "2026-11-07",
-    "kind": "improve",
-    "text": "Pollokoo, Rasana, Roobrik, Salatu, Samudra and Shimla Mirch have new map paintings, repainted from Tiny Speck's thumbnails of the lost originals"
    }
   ]
  },
