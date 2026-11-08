@@ -11,7 +11,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { assertStreetGeometry } from '../public/js/street-model.js?v=b6cb6a4e';
 import { arrivalInTarget } from '../public/js/location-navigation.js?v=4be109b9';
-import { reachStreet } from '../public/js/builder/reach-graph.js?v=50932a7a';
+import { reachStreet } from '../public/js/builder/reach-graph.js?v=f1b86aeb';
 import { planStreetPlacements, populationForStreet } from '../public/js/street-ecology.js?v=78a1d522';
 import {
   BOTTOM_DOOR,

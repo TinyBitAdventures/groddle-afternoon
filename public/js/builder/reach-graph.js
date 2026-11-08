@@ -75,8 +75,13 @@ export function streetBuff(street) {
   };
 }
 
-/** The physics world of one street: lines in columns, walls, ladders, the shared stepper. */
-export function streetWorld(street, { buff = null, scale = null } = {}) {
+/**
+ * The physics world of one street: lines in columns, walls, ladders, the shared stepper.
+ * `tripleJump`: every launch rises as a triple jump does (twice vy_max, avatar-step.js
+ * streetPhysicsFreeFall), for a run whose `buff.jump` is a triple jump's multiplier
+ * (tools/ecology/build-unreached-floors.mjs); off, the plain-jump model of REACH_LIMITS.
+ */
+export function streetWorld(street, { buff = null, scale = null, tripleJump = false } = {}) {
   const b = streetBuff(street);
   const lines = platformsScreen(street);
   const W = streetWidth(street);
@@ -127,6 +132,7 @@ export function streetWorld(street, { buff = null, scale = null } = {}) {
     buff: buff || b.buff,
     scale: scale || b.scale,
     approximate: b.approximate,
+    tripleJump: tripleJump === true,
     ground: (x, y, vy) => avatarGround(col(x), x, y, vy, { street, bottom }),
   };
   return world;
@@ -139,7 +145,7 @@ export function streetWorld(street, { buff = null, scale = null } = {}) {
  * Returns { points?, landed: {x, y} | null, minY, frames, node? }.
  */
 export function runArc(world, body, { dir = 0, airJumpAt = -1, record = false, maxFrames = MAX_FRAMES, launch = false, onLand = null } = {}) {
-  const b = { x: body.x, y: body.y, vx: body.vx || 0, vy: body.vy || 0, onGround: Boolean(body.onGround) };
+  const b = { x: body.x, y: body.y, vx: body.vx || 0, vy: body.vy || 0, onGround: Boolean(body.onGround), tripleJumping: Boolean(body.tripleJumping) };
   const points = record ? [{ x: b.x, y: b.y }] : null;
   let minY = b.y;
   let air = 0;
@@ -149,7 +155,10 @@ export function runArc(world, body, { dir = 0, airJumpAt = -1, record = false, m
     // `launch`: frame 0 is the jump frame, steered on the floor before the jump leaves it.
     b.vx = steerX(b.vx, dir, b.onGround || (launch && f === 0), world.buff);
     if (!b.onGround) {
-      if (air === airJumpAt) b.vy = jumpV;
+      if (air === airJumpAt) {
+        b.vy = jumpV;
+        b.tripleJumping = world.tripleJump === true;
+      }
       air += 1;
     }
     stepAvatar(b, { buff: world.buff, platforms: world.col(b.x), barriers: world.barriers, worldW: world.W, bodyScale: world.scale, ground: world.ground });
@@ -173,7 +182,7 @@ export function jumpArc(world, from, { dir = 0, run = false, speed = null, recor
   const max = WALK_MAX * world.buff.speed;
   // `speed`: a running jump's speed at takeoff, when the run-up was shorter than a full run (P7).
   const vx = run ? dir * (speed == null ? max : Math.min(max, speed)) : 0;
-  return runArc(world, { x: from.x, y: from.y, vx, vy: JUMP_SPEED * world.buff.jump, onGround: false }, { dir, record, launch: true });
+  return runArc(world, { x: from.x, y: from.y, vx, vy: JUMP_SPEED * world.buff.jump, onGround: false, tripleJumping: world.tripleJump === true }, { dir, record, launch: true });
 }
 
 /**
@@ -617,7 +626,7 @@ export function buildReachGraph(street, opts = {}) {
       for (const side of [-1, 1]) {
         addLanding(L, runArc(world, { x: wall.x, y, vx: side * max * OFF_LADDER_RATIO, vy: jumpV / 10, onGround: false }, { dir: side }), { kind: 'hop', dir: side, y });
       }
-      for (const dir of [-1, 0, 1]) addLanding(L, runArc(world, { x: wall.x, y, vx: 0, vy: jumpV, onGround: false }, { dir }), { kind: 'hop', dir, y, jump: true });
+      for (const dir of [-1, 0, 1]) addLanding(L, runArc(world, { x: wall.x, y, vx: 0, vy: jumpV, onGround: false, tripleJumping: world.tripleJump === true }, { dir }), { kind: 'hop', dir, y, jump: true });
     }
   }
   g.freeze();

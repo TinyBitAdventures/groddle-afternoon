@@ -8,7 +8,7 @@ import assert from 'node:assert/strict';
 import { afterEach, describe, it } from 'node:test';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { hashFor, layersFrontFirst, nudgeStep, parseHash, playTestUrl, searchStreets, zFor, zoomAfter, ZOOM_MAX, ZOOM_MIN, readOverlays, OVERLAY_DEFAULTS, layoutCamera, edgePan, findingCounts, validateWords, groupFindings, parseAt, findingPoint, filtersWith, colourInput, colourHex, tintInput, tintNumber, VIEW_FRAMES } from '../public/js/builder/editor.js?v=d4217f70';
+import { hashFor, layersFrontFirst, nudgeStep, parseHash, playTestUrl, searchStreets, zFor, zoomAfter, ZOOM_MAX, ZOOM_MIN, readOverlays, OVERLAY_DEFAULTS, layoutCamera, edgePan, findingCounts, validateWords, groupFindings, parseAt, findingPoint, filtersWith, colourInput, colourHex, tintInput, tintNumber, VIEW_FRAMES } from '../public/js/builder/editor.js?v=0d3c02ac';
 import { geoKey, parseGeoKey, geoShape, geoHits, geoInRect, geoHandles, handleWorld, dragHandle, moveBy, changedFields, drawnItem, postOnFloor, defaultItem, permKey, permValue, permName, wallSides, dashes, arriveFor, newConnect, distToSegment, geoKindOf, PERMS } from '../public/js/builder/geometry-handles.js?v=394f083e';
 import { gridSnap, endPoints, nearestEnd, joinedEnds, snapPlatform, snapDrawnPlatform, bestPull, guideSnap, snapPoint, floorSnapY, rulerTicks } from '../public/js/builder/snap.js?v=35e1862d';
 import { contains, corners, decoBox, handlePoints, meetsRect, resizeBy, rotationTo, toLocal } from '../public/js/builder/handles.js?v=243c4a14';

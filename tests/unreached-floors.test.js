@@ -23,7 +23,9 @@ import {
   unreachedFloorsFor,
 } from '../public/js/street-ecology.js?v=78a1d522';
 import { placementRequests, streetEcology } from '../tools/build-realtime-quoins.mjs';
-import { unreachedFloorsOf } from '../tools/ecology/build-unreached-floors.mjs';
+import { UNREACHED_JUMP, UNREACHED_JUMPS, overlapRuns, unreachedFloorsOf, unreachedJump } from '../tools/ecology/build-unreached-floors.mjs';
+import { NORMAL_BUFF, jumpApex } from '../public/js/avatar-step.js?v=e8e9581f';
+import { jumpArc, streetWorld } from '../public/js/builder/reach-graph.js?v=f1b86aeb';
 import { shippedArrivals } from '../tools/builder/calibrate.mjs';
 import { shippedStreetFiles } from '../tools/builder/validator-context.mjs';
 
@@ -110,5 +112,37 @@ describe('ticket 64: nothing is planned on a floor nobody reaches', () => {
     for (const f of ['tools/build-realtime-objects.mjs', 'tools/build-realtime-quoins.mjs', 'tools/build-realtime-rook.mjs']) {
       assert.match(read(f), /setStreetEcologyCatalog\(/, f);
     }
+  });
+});
+
+describe('G529: the reach runs jump as a triple jump does', () => {
+  it('a 1.8x launch rises at twice vy_max (about 500 px), not capped near 212', () => {
+    assert.ok(Math.abs(jumpApex(UNREACHED_JUMP) - 212) < 2, 'the old run: capped');
+    assert.ok(jumpApex(UNREACHED_JUMP, undefined, { triple: true }) > 495, 'as a triple jump');
+    // Level 3 East, from its first arrival's floor: the arc's rise with and without the flag.
+    const data = street(LEVEL_3_EAST);
+    const buff = { ...NORMAL_BUFF, jump: UNREACHED_JUMP };
+    const rise = (tripleJump) => {
+      const world = streetWorld(data, { buff, tripleJump });
+      const from = { x: 2000, y: world.ground(2000, -5000, 1) };
+      return from.y - jumpArc(world, from).minY;
+    };
+    const plain = rise(false);
+    const triple = rise(true);
+    assert.ok(plain < 215, `plain-jump model: ${plain}`);
+    assert.ok(triple > plain + 50, `as a triple jump: ${triple} (the cave roof may stop it short of 500)`);
+  });
+
+  it('every jump is tried: plain, the gentlest triple and the best; a street with no triple jump only jumps plain', () => {
+    assert.deepEqual([...UNREACHED_JUMPS], [1, 1.2, 1.8]);
+    assert.deepEqual(unreachedJump({ jump: 1, tripleJump: 1 }), { jump: 1.8, tripleJump: true });
+    assert.deepEqual(unreachedJump({ jump: 1, tripleJump: 1 }, 1), { jump: 1, tripleJump: false });
+    assert.deepEqual(unreachedJump({ jump: 1, tripleJump: 0 }), { jump: 1, tripleJump: false }, 'multiplier_3_jump 0');
+    assert.deepEqual(overlapRuns([[0, 100], [200, 300]], [[50, 250]]), [[50, 100], [200, 250]]);
+    assert.deepEqual(overlapRuns([[0, 100]], [[101, 200]]), []);
+  });
+
+  it('the rebuilt catalog lists fewer floors (236 streets before G529)', () => {
+    assert.ok(Object.keys(catalog.unreachedFloors).length < 200, `${Object.keys(catalog.unreachedFloors).length} streets`);
   });
 });

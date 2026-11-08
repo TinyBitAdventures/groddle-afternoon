@@ -32,7 +32,7 @@ import { cpus } from 'node:os';
 import { Worker, isMainThread, parentPort, workerData } from 'node:worker_threads';
 import { fileURLToPath } from 'node:url';
 import { GAME_DIR } from '../repos.mjs';
-import { reachStreet, streetBuff } from '../../public/js/builder/reach-graph.js?v=50932a7a';
+import { reachStreet, streetBuff } from '../../public/js/builder/reach-graph.js?v=f1b86aeb';
 
 /** A new character, High Jumper I, High Jumper II (js/imagination.js). */
 export const TRAP_JUMPS = Object.freeze([0.7105, 0.907, 1]);

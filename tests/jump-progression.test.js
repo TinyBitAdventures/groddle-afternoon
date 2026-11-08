@@ -33,7 +33,7 @@ import {
 import { isOfferedInRemake, isOfferedOnline } from '../public/js/imagination-remake.js?v=c37ad887';
 import { imaginationFeature } from '../public/js/features/imagination-feature.js?v=251a7aa3';
 import { NORMAL_BUFF, jumpApex } from '../public/js/avatar-step.js?v=e8e9581f';
-import { reachStreet } from '../public/js/builder/reach-graph.js?v=50932a7a';
+import { reachStreet } from '../public/js/builder/reach-graph.js?v=f1b86aeb';
 import { WINTER_WALK_START, WINTER_WALK_TSID } from '../public/js/winter-walk-streets.js?v=8607edd3';
 import { SKIP_TUTORIAL_CARDS } from '../public/js/newxp.js?v=398ca20e';
 

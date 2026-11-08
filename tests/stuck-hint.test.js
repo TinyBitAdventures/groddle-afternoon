@@ -15,8 +15,8 @@ import { STUCK_TEXT, bareCommand, slashPlan } from '../public/js/slash-commands.
 import { STUCK_HINT_DWELL_MS, onTrapFloor, slashCommandsFeature, trapLinesOn } from '../public/js/features/slash-commands-feature.js?v=21fa2b26';
 import { STREET_TRAPS } from '../public/js/street-traps-data.js?v=b2911c49';
 import { TRAP_JUMPS, renderTraps, trapLinesOf } from '../tools/ecology/build-street-traps.mjs';
-import { reachStreet, streetBuff } from '../public/js/builder/reach-graph.js?v=50932a7a';
-import { validateShippedStreet } from '../public/js/builder/validate.js?v=f811c3ff';
+import { reachStreet, streetBuff } from '../public/js/builder/reach-graph.js?v=f1b86aeb';
+import { validateShippedStreet } from '../public/js/builder/validate.js?v=4358f5a7';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const LEVEL_3_WEST = 'GLI107JLRU11EM2';
