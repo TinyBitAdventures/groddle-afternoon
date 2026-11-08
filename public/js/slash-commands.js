@@ -157,6 +157,19 @@ export function misplacedCommand(text) {
 }
 
 /**
+ * G563: a listed command with one stray letter in front ("d/home", "a/leave"): the letter of a walking
+ * key that landed in the box as it opened. No one means that as chat, so it is that command, with its
+ * words after it ("d/butler hello" is "/butler hello"); '' for anything else. Two letters or more
+ * ("aaaa/leave") stay chat with misplacedCommand's hint, as does a word ("go/home").
+ */
+export function strayLetterCommand(text) {
+  const m = /^[a-z](\/[a-z]+)(\s.*)?$/i.exec(String(text || '').trim());
+  if (!m) return '';
+  const cmd = m[1].toLowerCase();
+  return COMMAND_HELP.some(([c]) => c === cmd) ? `${cmd}${m[2] || ''}` : '';
+}
+
+/**
  * G528: a line typed into a box the / key opened. The key opens the box without its slash here
  * (js/ui/social-drawer.js), so "/stuck" comes out as the word "stuck" and goes to the street. A
  * line that is only a listed command's name is that command, in its slash form; anything else

@@ -41,6 +41,8 @@
  *   /help): the command list (js/slash-commands.js COMMAND_HELP) as local lines in
  *   the chat it was typed in, never sent: notes in that drawer conversation online
  *   (Local, Live Help, a group, an IM, the party), one Activity entry solo.
+ * - G563: a listed command with one letter in front ("d/home", "a/leave": a walking key's letter
+ *   that landed in the box as it opened) runs that command (js/slash-commands.js strayLetterCommand).
  * - A message that ends with a listed command ("aaaa/leave") is still said as typed;
  *   a local line after it says "Commands go at the start of a message: /leave".
  *
@@ -55,7 +57,7 @@ import { butlerApi } from './butler-feature.js?v=54762b93';
 import { hellFeature } from './hell-feature.js?v=93f1c8dd';
 import { towerApi } from './home-tower-feature.js?v=ebbc41b4';
 import { platformYAt, platformsScreen } from '../street-model.js?v=505d8990';
-import { COMMAND_HELP_INTRO, STUCK_COOLDOWN_MS, STUCK_TEXT, bareCommand, commandHelpLines, commandHint, isCommandHelp, misplacedCommand, slashPlan, unknownLine } from '../slash-commands.js?v=02bedb12';
+import { COMMAND_HELP_INTRO, STUCK_COOLDOWN_MS, STUCK_TEXT, bareCommand, commandHelpLines, commandHint, isCommandHelp, misplacedCommand, slashPlan, strayLetterCommand, unknownLine } from '../slash-commands.js?v=8533e143';
 import { parseTp, runTeleportCommand, TP_TEXT } from '../admin-teleport.js?v=fa56e8df';
 import { minnUrls } from '../minn-account.js?v=ba6a13c5';
 import { saveStore } from '../save-store.js?v=8839ba7b';
@@ -349,6 +351,14 @@ function onChatSubmit(e) {
       publish(engine);
       return;
     }
+  }
+  // G563: "d/home" is /home (the walking key's letter came first), before every chat reads the box.
+  const stray = strayLetterCommand(box?.value);
+  if (stray) {
+    box.value = stray;
+    last = `stray-letter:${stray}`;
+    publish(engine);
+    return;
   }
   const cmd = misplacedCommand(box?.value);
   if (!cmd) return;

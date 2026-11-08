@@ -8,7 +8,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { MAX_ROWS, bindChatInput, fitHeight, historyKey, oneLine, sendKey, strayRepeat } from '../public/js/ui/chat-input.js?v=0405e07a';
+import { MAX_ROWS, bindChatInput, fitHeight, heldAtFocus, historyKey, keyWatch, oneLine, sendKey, strayRepeat } from '../public/js/ui/chat-input.js?v=2ccd05ab';
 import { FakeEl } from './social-fake-dom.js';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -122,6 +122,63 @@ describe('the chat box: wired', () => {
     assert.equal(f.dispatch('keydown', { key: 'a', code: 'KeyA', repeat: true }).defaultPrevented, true);
     assert.equal(strayRepeat({ key: 'x', repeat: false }, new Set()), false);
     assert.equal(strayRepeat({ key: 'x', code: 'KeyX', repeat: true, isComposing: true }, new Set()), false, 'an input method keeps its keys');
+  });
+
+  it('G563: a walking key down when the box takes the keyboard types nothing until it comes up', () => {
+    // The page: the window watches keys in the capture phase; the box sits in it.
+    const win = new FakeEl('window');
+    const { f, form } = field();
+    win.append(form);
+    bindChatInput(f, { form, win });
+    assert.equal(keyWatch(win), keyWatch(win), 'one watch a window');
+    // Walking with A (the key goes to the page, not the box), then / takes the keyboard to the box.
+    win.dispatch('keydown', { key: 'a', code: 'KeyA' });
+    win.dispatch('keydown', { key: '/', code: 'Slash' });
+    f.dispatch('focus');
+    // The held A, marked as a repeat or not (remote desktops send them unmarked), types nothing:
+    // its keydown, its keypress and the text it would insert.
+    const marked = f.dispatch('keydown', { key: 'a', code: 'KeyA', repeat: true });
+    assert.equal(marked.defaultPrevented, true);
+    const unmarked = f.dispatch('keydown', { key: 'a', code: 'KeyA' });
+    assert.equal(unmarked.defaultPrevented, true, 'an unmarked repeat of the held A');
+    assert.equal(f.dispatch('keypress', { key: 'a', code: 'KeyA' }).defaultPrevented, true);
+    assert.equal(f.dispatch('beforeinput', { inputType: 'insertText', data: 'a' }).defaultPrevented, true);
+    // Other keys type while it is held: the command itself.
+    for (const k of ['l', 'e']) assert.equal(f.dispatch('keydown', { key: k, code: `Key${k.toUpperCase()}` }).defaultPrevented, false, k);
+    assert.equal(f.dispatch('beforeinput', { inputType: 'insertText', data: 'e' }).defaultPrevented, false);
+    // The / that opened the box was down too: a second / after it came up types (a "/leave" typed after /).
+    f.dispatch('keyup', { key: '/', code: 'Slash' });
+    assert.equal(f.dispatch('keydown', { key: '/', code: 'Slash' }).defaultPrevented, false);
+    // Once the A comes up, a real "a" pressed in the box types, and repeats if held.
+    f.dispatch('keyup', { key: 'a', code: 'KeyA' });
+    assert.equal(f.dispatch('keydown', { key: 'a', code: 'KeyA' }).defaultPrevented, false, 'a fresh a types');
+    assert.equal(f.dispatch('keypress', { key: 'a', code: 'KeyA' }).defaultPrevented, false);
+    assert.equal(f.dispatch('keydown', { key: 'a', code: 'KeyA', repeat: true }).defaultPrevented, false, 'and repeats');
+    f.dispatch('keyup', { key: 'a', code: 'KeyA' });
+    f.dispatch('blur');
+    // A box opened with nothing held types the first letter (a real "a" as the first letter).
+    f.dispatch('focus');
+    assert.equal(f.dispatch('keydown', { key: 'a', code: 'KeyA' }).defaultPrevented, false);
+    f.dispatch('keyup', { key: 'a', code: 'KeyA' });
+    f.dispatch('blur');
+    // Arrow keys held for walking (they would move the caret) and Shift+D: the physical key counts.
+    win.dispatch('keydown', { key: 'ArrowRight', code: 'ArrowRight' });
+    win.dispatch('keydown', { key: 'd', code: 'KeyD' });
+    f.dispatch('focus');
+    assert.equal(f.dispatch('keydown', { key: 'ArrowRight', code: 'ArrowRight', repeat: true }).defaultPrevented, true);
+    assert.equal(f.dispatch('keydown', { key: 'D', code: 'KeyD', shiftKey: true }).defaultPrevented, true);
+    // Cmd coming up forgets the held keys (their own key-ups can go missing, js/held-keys.js).
+    f.dispatch('keyup', { key: 'Meta', code: 'MetaLeft' });
+    assert.equal(f.dispatch('keydown', { key: 'd', code: 'KeyD' }).defaultPrevented, false);
+    f.dispatch('blur');
+    // The window losing focus forgets what was down.
+    win.dispatch('keydown', { key: 's', code: 'KeyS' });
+    win.dispatch('blur');
+    f.dispatch('focus');
+    assert.equal(f.dispatch('keydown', { key: 's', code: 'KeyS' }).defaultPrevented, false);
+    assert.equal(heldAtFocus({ key: 'a', code: 'KeyA', isComposing: true }, new Set(['keya'])), false, 'an input method keeps its keys');
+    assert.equal(heldAtFocus({ key: 'a', code: 'KeyA' }, new Set()), false);
+    assert.equal(keyWatch({}), null, 'no window, no watch (strayRepeat still drops repeats)');
   });
 
   it('both skins\' boxes are text areas of the old length, Enter sends, nothing resizes them by hand', () => {

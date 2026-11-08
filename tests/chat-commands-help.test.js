@@ -21,10 +21,11 @@ import {
   isCommandHelp,
   misplacedCommand,
   slashPlan,
-} from '../public/js/slash-commands.js?v=02bedb12';
-import { chatCommandsSection, createHotkeysSheet } from '../public/js/client-hotkeys.js?v=1d3b39fe';
-import { HINT_DELAY_MS, showLocalLines, slashCommandsFeature } from '../public/js/features/slash-commands-feature.js?v=1d470153';
-import { FEATURES } from '../public/js/features/index.js?v=d9128cb3';
+  strayLetterCommand,
+} from '../public/js/slash-commands.js?v=8533e143';
+import { chatCommandsSection, createHotkeysSheet } from '../public/js/client-hotkeys.js?v=31d1891d';
+import { HINT_DELAY_MS, showLocalLines, slashCommandsFeature } from '../public/js/features/slash-commands-feature.js?v=39331e76';
+import { FEATURES } from '../public/js/features/index.js?v=bf9dfe13';
 import { createFeatureHost } from '../public/js/feature-host.js?v=127e0a3c';
 import { CHANNEL_WELCOME, tabCommand } from '../public/js/groups.js?v=07640c71';
 
@@ -214,6 +215,55 @@ describe('the hint under a message that ends with a command', () => {
     slashCommandsFeature._onChatSubmit(e);
     await new Promise((r) => setTimeout(r, HINT_DELAY_MS + 50));
     assert.equal(social.lines.local.length, 1, 'no hint for plain words or a real command');
+  });
+});
+
+describe('G563: a command with a stray letter in front runs', () => {
+  const saved = {};
+  afterEach(() => {
+    if (saved.document === undefined) delete globalThis.document;
+    else globalThis.document = saved.document;
+  });
+
+  it('one letter and a listed command is that command; anything else is not', () => {
+    for (const [line, want] of [
+      ['d/home', '/home'], ['a/leave', '/leave'], ['d/leave', '/leave'], ['d/house', '/house'], [' s/stuck ', '/stuck'],
+      ['W/Home', '/home'], ['d/butler hello there', '/butler hello there'], ['a/who', '/who'],
+    ]) assert.equal(strayLetterCommand(line), want, line);
+    for (const line of ['aaaa/leave', 'ad/home', 'go/home', 'd/beans', 'd/xyzzy', 'd/tp me', '/home', 'd/', 'd/homes', 'and/or', '1/home', 'd /home', 'd/home/leave', 'hello']) {
+      assert.equal(strayLetterCommand(line), '', line);
+    }
+  });
+
+  it('the box is turned into the command before any chat reads it; no hint follows', async () => {
+    saved.document = globalThis.document;
+    const input = { value: 'a/leave' };
+    globalThis.document = { getElementById: (id) => (id === 'local-chat-input' ? input : null), addEventListener: () => {}, activeElement: null };
+    const social = fakeSocial('local');
+    const engine = fakeEngine({ mode: 'multiplayer', social });
+    slashCommandsFeature.init(engine);
+    const e = { target: { id: 'local-chat-form' }, preventDefault() {}, stopPropagation() {} };
+    slashCommandsFeature._onChatSubmit(e);
+    assert.equal(input.value, '/leave', 'the game\'s own submit handler then runs /leave');
+    assert.equal(engine.data.slashLast, 'stray-letter:/leave');
+    // Typed into a box the / key opened (the slash swallowed, then "d/home"): the same.
+    input.value = '';
+    globalThis.document.activeElement = input;
+    slashCommandsFeature._onSlashKey({ key: '/', target: { matches: () => false } });
+    await new Promise((r) => setTimeout(r, 5));
+    input.value = 'd/home';
+    slashCommandsFeature._onChatSubmit(e);
+    assert.equal(input.value, '/home');
+    await new Promise((r) => setTimeout(r, HINT_DELAY_MS + 50));
+    assert.deepEqual(social.lines.local, [], 'no "Commands go at the start" hint');
+    // Two letters stay chat, with the hint (the line goes out as typed).
+    input.value = 'aaaa/leave';
+    slashCommandsFeature._onChatSubmit(e);
+    assert.equal(input.value, 'aaaa/leave');
+    await new Promise((r) => setTimeout(r, HINT_DELAY_MS + 50));
+    assert.deepEqual(social.lines.local, [{ note: true, text: 'Commands go at the start of a message: /leave' }]);
+    // The capture-phase submit handler runs before the drawer, the chat tabs and game.js read the box.
+    assert.ok(read('public/js/features/slash-commands-feature.js').includes("document.addEventListener('submit', onChatSubmit, true);"));
   });
 });
 

@@ -10,13 +10,19 @@
  * only to you would look like two messages. Up and Down still walk back through what you said while
  * the caret is on the box's first (Up) or last (Down) line; elsewhere they move the caret.
  *
- * G563 (a guard): a key already held when the box takes the keyboard keeps auto-repeating into it, so
- * walking with D or A and pressing / to talk typed "dddd" before the first word ("d/home" went out as
- * a chat line). Repeats of a key that went down before the box had the keyboard type nothing; a key
- * pressed in the box repeats as usual (strayRepeat). Arrow keys type nothing either way.
+ * G563: a walking key that is down when the box takes the keyboard (D held, then / or a click on the
+ * box) must not type into it. The window's keys are watched in the capture phase (keyWatch); when the
+ * box takes the keyboard it notes which keys are already down, and those keys type nothing in it
+ * (keydown, keypress and the text they would insert) until they come up, whether or not the browser
+ * marks their events as repeats (remote desktops and some keyboards send a held key's repeats
+ * unmarked). A key pressed in the box types and repeats as usual, so a real "a" typed after the
+ * walking A came up is kept (heldAtFocus). Repeats of a key that never went down in the box are
+ * dropped too (strayRepeat), for a box with no window to watch. Cmd or Ctrl coming up forgets the held
+ * keys, as js/held-keys.js does (their own key-ups can go missing). A single press that lands in the
+ * box after it opened is ordinary typing here; slash-commands-feature runs "d/home" as /home.
  *
- * bindChatInput(field, { form }) wires one; the pure parts (oneLine, fitHeight, historyKey, strayRepeat)
- * are tested in tests/chat-input.test.js.
+ * bindChatInput(field, { form }) wires one; the pure parts (oneLine, fitHeight, historyKey, strayRepeat,
+ * heldAtFocus) are tested in tests/chat-input.test.js.
  */
 
 export const MAX_ROWS = 5;
@@ -67,6 +73,48 @@ export const keyOf = (e) => String(e?.code || e?.key || '').toLowerCase();
  */
 export function strayRepeat(e, pressedHere) {
   return Boolean(e?.repeat && !e.isComposing && !pressedHere?.has(keyOf(e)));
+}
+
+/**
+ * PURE (G563): a key event for a key that was already down when the box took the keyboard and has not
+ * come up since: the walking key, which types nothing (repeat or not). `held` holds keyOf() of those keys.
+ */
+export function heldAtFocus(e, held) {
+  return Boolean(e && !e.isComposing && held?.size && held.has(keyOf(e)));
+}
+
+/** KeyBeacon._keyUpFire 257 (js/held-keys.js RESET_ON_UP): their own key-ups can go missing. */
+const RESET_ON_UP = new Set(['Meta', 'OS', 'Control']);
+
+const watches = new WeakMap();
+
+/**
+ * G563: the keys down on the page right now (keyOf), seen on the window in the capture phase, so a
+ * key held before any chat box had the keyboard is known. One watch a window; null without one.
+ */
+export function keyWatch(win) {
+  if (!win?.addEventListener) return null;
+  let watch = watches.get(win);
+  if (watch) return watch;
+  const down = new Set();
+  watch = {
+    down,
+    keydown(e) {
+      if (e && !e.isComposing) down.add(keyOf(e));
+    },
+    keyup(e) {
+      if (RESET_ON_UP.has(String(e?.key || ''))) down.clear();
+      else down.delete(keyOf(e));
+    },
+    clear() {
+      down.clear();
+    },
+  };
+  win.addEventListener('keydown', watch.keydown, true);
+  win.addEventListener('keyup', watch.keyup, true);
+  win.addEventListener('blur', watch.clear);
+  watches.set(win, watch);
+  return watch;
 }
 
 function px(v) {
@@ -168,13 +216,20 @@ export function bindChatInput(field, { form = field?.form || null, onHistory = n
     }
     fit();
   });
-  // G563: the keys that went down while the box had the keyboard (strayRepeat).
+  // G563: the keys that went down while the box had the keyboard (strayRepeat), and the keys that were
+  // already down when it took the keyboard (heldAtFocus), from the window's watch.
+  const watch = keyWatch(win);
   const pressedHere = new Set();
+  const heldHere = new Set();
+  // The last key down was a held one: the text it would insert is dropped too (beforeinput).
+  let swallowing = false;
   field.addEventListener('keydown', (e) => {
-    if (strayRepeat(e, pressedHere)) {
+    if (heldAtFocus(e, heldHere) || strayRepeat(e, pressedHere)) {
       e.preventDefault();
+      swallowing = true;
       return;
     }
+    swallowing = false;
     if (!e.repeat) pressedHere.add(keyOf(e));
     if (e.key === 'Enter') {
       // No new lines: Enter sends, Shift+Enter (and the rest) adds nothing.
@@ -197,10 +252,30 @@ export function bindChatInput(field, { form = field?.form || null, onHistory = n
       if (ok && onHistory(e.key)) e.preventDefault();
     }
   });
-  field.addEventListener('keyup', (e) => pressedHere.delete(keyOf(e)));
-  field.addEventListener('blur', () => pressedHere.clear());
-  // Shown again (a tab with the box, the other skin): fit it when it takes the keyboard.
-  field.addEventListener('focus', () => fit());
+  field.addEventListener('keypress', (e) => {
+    if (heldAtFocus(e, heldHere)) e.preventDefault();
+  });
+  field.addEventListener('beforeinput', (e) => {
+    if (swallowing && e.inputType === 'insertText' && !e.isComposing) e.preventDefault();
+  });
+  field.addEventListener('keyup', (e) => {
+    swallowing = false;
+    if (RESET_ON_UP.has(String(e.key || ''))) heldHere.clear();
+    pressedHere.delete(keyOf(e));
+    heldHere.delete(keyOf(e));
+  });
+  field.addEventListener('blur', () => {
+    pressedHere.clear();
+    heldHere.clear();
+    swallowing = false;
+  });
+  // Shown again (a tab with the box, the other skin): fit it when it takes the keyboard. The keys down
+  // at this moment (the walking key, the / that opened the box) type nothing here until they come up.
+  field.addEventListener('focus', () => {
+    heldHere.clear();
+    for (const k of watch?.down || []) heldHere.add(k);
+    fit();
+  });
   // The box's width changes (the drawer opens, the window resizes): fit the lines again.
   if (typeof win.ResizeObserver === 'function') {
     let w = -1;
