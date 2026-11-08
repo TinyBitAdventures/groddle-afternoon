@@ -1934,27 +1934,42 @@ function applyWorldZoom() {
 }
 
 /**
- * Translate the HTML quest/activity rail into Pixi view coordinates. The
- * original client reserved this width when calculating its location viewport;
- * doing the same keeps the avatar out from underneath the rail at street ends.
+ * G582: the part of the world's right edge the HUD covers, in Pixi view coordinates. The original
+ * client reserved its right-hand column's width when calculating its location viewport (loc_vp_w),
+ * so the camera stopped with a street's end left of it. Modern: the Social drawer (js/ui/social-drawer.js
+ * insetNow, the same width --inset-r holds: its folded rail or the open drawer, plus their gaps; 0 when
+ * hidden). Classic puts its chat column beside the world, so nothing covers it there (insetNow is 0);
+ * the old #play-context rail still counts wherever a skin shows it over the world.
  */
 function syncCameraSafeArea() {
   const root = document.getElementById('game-root');
-  const rail = document.getElementById('play-context');
-  if (!root || !rail || rail.offsetParent === null || root.clientWidth <= 0) {
+  if (!root || root.clientWidth <= 0) {
     cameraRightInset = 0;
     return cameraRightInset;
   }
   const rootRect = root.getBoundingClientRect();
-  const railRect = rail.getBoundingClientRect();
-  const overlapCss = Math.max(0, rootRect.right - railRect.left);
-  const avatarClearance = 34;
-  cameraRightInset = clamp(
-    overlapCss * (VIEW_W / rootRect.width) + avatarClearance,
-    0,
-    VIEW_W * 0.42
-  );
+  const drawerCss = Math.max(0, Number(socialDrawer?.inset()?.right) || 0);
+  const rail = document.getElementById('play-context');
+  const railCss = rail && rail.offsetParent !== null ? Math.max(0, rootRect.right - rail.getBoundingClientRect().left) : 0;
+  const overlapCss = Math.max(drawerCss, railCss);
+  cameraRightInset = overlapCss > 0
+    ? clamp(overlapCss * (VIEW_W / rootRect.width) + CAMERA_RAIL_CLEARANCE, 0, VIEW_W * 0.42)
+    : 0;
+  drawerInsetSeen = root.style.getPropertyValue('--inset-r');
   return cameraRightInset;
+}
+
+/** G582: Pixi px kept between the covered edge and the street's end (the drawer's inset already holds its gaps). */
+const CAMERA_RAIL_CLEARANCE = 6;
+/** G582: how far the ground skirt runs past a street's right end (street-render buildGroundSkirt rightPad). */
+const SKIRT_RIGHT_PAD = 900;
+/** G582: the --inset-r the camera last measured (the drawer writes it as it opens, folds or hides). */
+let drawerInsetSeen = '';
+
+/** Once a frame: the drawer opened, folded or hid, so measure the camera's reserve again (it glides there). */
+function followDrawerInset() {
+  const root = document.getElementById('game-root');
+  if (root && root.style.getPropertyValue('--inset-r') !== drawerInsetSeen) syncCameraSafeArea();
 }
 
 function cameraTargetForPlayer(playerX, velocityX = 0) {
@@ -2762,6 +2777,7 @@ function tickNotices() {
   notifyView?.frame(performance.now(), { hold, dropBefore: notifyModalSince });
   keepOfferCardClear();
   socialDrawer?.frame();
+  followDrawerInset();
 }
 
 /** POLISH: how far the street's offer card sits under a banner now (px), while it is open. */
@@ -23593,6 +23609,9 @@ async function enterStreet(tsid, opts = {}) {
     cameraBottomPadding: cameraBottomSlack(LOCATION_VIEW_H),
     // The canvas runs on under the overlaid pack.
     skirtBelow: VIEW_H - LOCATION_VIEW_H,
+    // G582: and past the street's right end, where the camera stops with the end left of the
+    // Social drawer (syncCameraSafeArea reserves at most 0.42 of the view; the view grows with zoom).
+    skirtRight: SKIRT_RIGHT_PAD,
   });
   streetPlatforms = bgLayer.platformsScreen;
   streetWalls = wallsScreen(data);

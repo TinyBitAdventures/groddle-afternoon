@@ -1601,8 +1601,11 @@ const SKIRT_BYTES = 24 * 1024 * 1024;
  * Ix's dirt and trunks) still draws over it. That art, the copy and the front layers', darkens
  * into the same colour as it goes down (skirtArtFadeStops, from `floorBelow` under the edge: the
  * deepest walkable ground there, if any), so where it ends it meets the skirt without an edge.
+ * G582: `rightPad` runs the skirt on past the street's right end, the band mirrored there (its
+ * last `rightPad` px flipped about the edge), for the strip the camera shows past the end while it
+ * keeps the end left of the Social drawer's rail (game.js syncCameraSafeArea).
  */
-function buildGroundSkirt(PIXI, renderer, root, grounds, W, sourceH, depthPx, gradientBottom, fallback, fronts = [], floorBelow = 0) {
+function buildGroundSkirt(PIXI, renderer, root, grounds, W, sourceH, depthPx, gradientBottom, fallback, fronts = [], floorBelow = 0, rightPad = 0) {
   const depth = Math.ceil(depthPx);
   const main = grounds.find((lc) => lc.label === 'middleground') || grounds[0];
   if (!main || depth <= 0 || W <= 0) return;
@@ -1726,6 +1729,26 @@ function buildGroundSkirt(PIXI, renderer, root, grounds, W, sourceH, depthPx, gr
     }
     solidFilter?.destroy();
     const chunkCount = mirrors.length ? textures.length - solids.length : 0;
+    // G582: the band's last `pad` px, flipped about the street's right end, down the same tiles.
+    const pad = Math.max(0, Math.min(Math.ceil(Number(rightPad) || 0), Math.floor(W)));
+    if (pad > 0 && band > 0) {
+      const rt = PIXI.RenderTexture.create({ width: pad, height: band, resolution: res });
+      renderer.render({ container: shell, target: rt, transform: new PIXI.Matrix(1, 0, 0, 1, -(W - pad), -top), clear: true });
+      textures.push(rt);
+      for (const tile of skirtTiles(depth, band)) {
+        const spr = new PIXI.Sprite(rt);
+        spr.scale.x = -1;
+        spr.x = W + pad;
+        if (tile.flip) {
+          spr.scale.y = -1;
+          spr.y = sourceH + tile.y + band;
+        } else {
+          spr.y = sourceH + tile.y;
+        }
+        mirrors.push(spr);
+      }
+    }
+    const fullW = W + pad;
     for (const h of [...homes].sort((p, q) => p.index - q.index)) {
       h.lc.x = h.x;
       h.lc.y = h.y;
@@ -1737,23 +1760,23 @@ function buildGroundSkirt(PIXI, renderer, root, grounds, W, sourceH, depthPx, gr
     // Under the mirror: its clear pixels show the ground's colour, not the layers behind.
     const fadeDepth = Math.min(depth, SKIRT_FADE_DEPTH);
     const base = new PIXI.Graphics();
-    base.rect(0, sourceH, W, depth).fill(average ?? colour);
+    base.rect(0, sourceH, fullW, depth).fill(average ?? colour);
     strip.addChild(base);
     for (const spr of mirrors) strip.addChild(spr);
     const stops = skirtFadeStops();
     const fade = new PIXI.Sprite(rampTexture(PIXI, colour, stops.fade));
     fade.x = 0;
     fade.y = sourceH;
-    fade.width = W;
+    fade.width = fullW;
     fade.height = fadeDepth;
     const shade = new PIXI.Sprite(rampTexture(PIXI, 0x000000, stops.shade));
     shade.x = 0;
     shade.y = sourceH;
-    shade.width = W;
+    shade.width = fullW;
     shade.height = fadeDepth;
     const deep = new PIXI.Graphics();
     // Down past the last copy's foot (it can run up to a band past the skirt's depth).
-    deep.rect(0, sourceH + fadeDepth, W, Math.max(0, depth + band - fadeDepth)).fill(colour);
+    deep.rect(0, sourceH + fadeDepth, fullW, Math.max(0, depth + band - fadeDepth)).fill(colour);
     strip.addChild(fade, shade, deep);
     for (const spr of solids) strip.addChild(spr);
     textures.push(fade.texture, shade.texture);
@@ -1834,6 +1857,7 @@ function buildGroundSkirt(PIXI, renderer, root, grounds, W, sourceH, depthPx, gr
       layers: grounds.map((lc) => lc.label),
       chunks: chunkCount,
       copies: mirrors.length,
+      right: pad,
       below,
       resolution: Math.round(res * 100) / 100,
       bytes: Math.round(W * (band + below) * res * res * 4),
@@ -2206,7 +2230,7 @@ export function buildStreetView(street, PIXI, opts = {}) {
     // The front layers' art below the edge fades into the skirt, from under the deepest walkable
     // ground (four streets walk up to 50 px below their edge: Camsteeple Strat).
     const fronts = layerContainers.filter((lc) => lc.inFront);
-    buildGroundSkirt(PIXI, opts.renderer, root, grounds, W, sourceH, skirtDepth, Number.isFinite(parsed) ? parsed : null, fallback, fronts, deepestPlatformY - sourceH);
+    buildGroundSkirt(PIXI, opts.renderer, root, grounds, W, sourceH, skirtDepth, Number.isFinite(parsed) ? parsed : null, fallback, fronts, deepestPlatformY - sourceH, Math.max(0, Number(opts.skirtRight) || 0));
   }
   root.decoDrawn = drawn;
   /** Decos that play, for QA (canvas data-anim-decos): placed, strips in, playing, stopped off screen. */
