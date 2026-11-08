@@ -46,13 +46,13 @@ import {
   yardLook,
   yardStyleChoices,
   yardStyleFor,
-} from '../public/js/home-styles.js?v=eeba82ee';
+} from '../public/js/home-styles.js?v=078d55de';
 import { WALLPAPER_MAPS, WALLPAPER_PIECES } from '../public/js/home-wallpaper-art.js?v=9f8473e6';
 import { roomPieces } from '../public/js/home-wallpaper.js?v=f1969400';
-import { BACK_YARD_GROUND_Y, clampRowsX, homesFeature, shiftHusbandryRows, shiftInteriorRows, towerDropTsid } from '../public/js/features/homes-feature.js?v=49ae8b1a';
+import { BACK_YARD_GROUND_Y, clampRowsX, homesFeature, shiftHusbandryRows, shiftInteriorRows, towerDropTsid } from '../public/js/features/homes-feature.js?v=4ce5dd24';
 import { getGameDayKey } from '../public/js/game-day.js?v=edb00566';
 import { towerApi } from '../public/js/features/home-tower-feature.js?v=ea937899';
-import { shiftBotX } from '../public/js/features/craftybot-feature.js?v=d521af8e';
+import { shiftBotX } from '../public/js/features/craftybot-feature.js?v=57396cb8';
 import { normalizeDroppedItemState } from '../public/js/world-items.js?v=0bbfdab9';
 import { applyAchievementProgress, createAchievementState } from '../public/js/achievements.js?v=f8ccfd34';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=10b118dd';
@@ -235,12 +235,13 @@ describe('the house’s open left end (home_groddle.swf, homes_rebuild_floor lef
 describe('back-yard styles (homes_interior_configs)', () => {
   it('starts on Plush Pasture and draws each built yard with its street pair', () => {
     assert.equal(yardStyleFor(null), 'meadows_int_default__high');
-    assert.equal(yardStyleFor('pol_int_coral_hor_high'), START_YARD_STYLE, 'not built: the start style');
+    assert.equal(yardStyleFor('pol_int_mordor_high'), START_YARD_STYLE, 'not built: the start style');
+    assert.equal(yardStyleFor('pol_int_coral_hor_high'), 'pol_int_coral_hor_high', 'Anemone Alley is built (lane coral)');
     assert.deepEqual(yardLook('meadows_int_default__high'), streetLook('meadow_ext_default_high'));
     assert.deepEqual(yardLook('forest_dusk_int_1_hor_high'), streetLook('forest_dusk_ext_1_high'));
     const { choices, missing } = yardStyleChoices(START_YARD_STYLE, 3);
-    assert.equal(choices.length, 35);
-    assert.equal(missing.length, 2);
+    assert.equal(choices.length, 36);
+    assert.equal(missing.length, 1);
     assert.equal(choices.filter((row) => row.isCurrent).length, 1);
     assert.ok(INTERIOR_STYLES.every((row) => !row.built || row.lookOf));
   });

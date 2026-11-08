@@ -735,8 +735,62 @@ export const RECIPES = {
       trim: ['snow_bush_01a_al1', 'pampas_2', 'mountain_flora_01a_al1'],
     },
   },
+  // Coral Caves (template LHVJ59V4IJ83KVT, September 2012 batch). It had no coral set of its own: a visual
+  // match of every symbol in the 62 production location bundles (lane coral, 2026-11-08; findings in
+  // research/hunts/2026-11-08-coral-caves/findings.md) found its pieces in the same CC0 kit the Samudra
+  // streets use (Matsya GUV2LJJO5UC30B2 and Niyuta GUVV0NRR2FC3D3D draw cone_top_rock_01b_al1 and
+  // underground_bogwillow), under their own names: the tiered rocks are alpine cone_top_rock_01a/01b, the flat
+  // rocks rock_rubble_01*, the beaded branches firebog underground_bogwillow, the boat firebog boat, the
+  // fiddleheads Ilmenskie plant_fern_* and plant_giant_fern_*, the purple mushrooms purple_mushroom_*, the red
+  // ones firebog mushrooms, the dark mounds cave_background_hill_*, the dark columns back_wall_*, all under
+  // one murky olive layer tint. Laid out from header-1346981279 (2400x272) and a
+  // player's game-scale picture (Flickr 8411950008); both reference only. Left out: the tall kelp-like blades
+  // and the dark crystal columns of the header, which no CC0 symbol matched, and the pale spires (most like
+  // Ilmenskie cave_icicle_*, but a tint cannot turn that teal art the header's tan).
   pol_ext_coral_high: {
-    missing: 'Its coral seabed set (pol_ext_coral) is in none of the CC0 street bundles; no coral, kelp or anemone symbol survives.',
+    look: {
+      sky: [0x5e3a20, 0x6e4426, 0x7a4c2c],
+      field: 0x8a7038,
+      fieldDark: 0x6a5428,
+      soil: null,
+      soilColor: 0x4a3a18,
+      layers: [
+        { f: 0.03, items: [item(['cave_stalactite_1', 'cave_stalactite_3', 'cave_stalactite_5'], 0.42, 150, 640, 260, 120, { hang: true, tint: 0xff8528 })] },
+        { f: 0.05, items: [item(['back_wall_1', 'back_wall_2', 'back_wall_4', 'back_wall_5'], 0.36, 566, 560, 240, 0, { tint: 0xffba39 })] },
+        { f: 0.09, items: [item(['cave_background_hill_1', 'cave_background_hill_2'], 0.15, 560, 120, 50, 40, { tint: 0xff8e0e, alpha: 0.8 })] },
+        { band: { y: 550, h: 12, color: 0x24200a, alpha: 1 }, f: 0.11 },
+        { f: 0.2, items: [item(['cone_top_rock_01b_al1', 'cone_top_rock_01a_al1'], 0.26, 568, 720, 260, 100, { tint: 0x7a6630 })] },
+        { f: 0.32, items: [item('underground_bogwillow', 0.42, 580, 820, 260, 380, { tint: 0xffb49f })] },
+        {
+          f: 0.45,
+          items: [
+            item(['cone_top_rock_01a_al1', 'cone_top_rock_01b_al1'], 0.42, 592, 1000, 300, 200, { tint: 0x947c39 }),
+            item(['underground_bogwillow_1', 'underground_bogwillow_3'], 0.7, 592, 1000, 260, 260, { tint: 0xffb49f }),
+            item('mushrooms', 0.4, 592, 900, 260, 560, { tint: 0xae9861 }),
+            item('purple_mushroom_3', 0.35, 592, 1100, 260, 760, { tint: 0x906645 }),
+          ],
+        },
+        {
+          f: 0.75,
+          items: [
+            item('rock_rubble_01b_al1', 0.5, 604, 900, 260, 300, { tint: 0x998245 }),
+            item('plant_giant_fern_2', 0.75, 606, 760, 260, 100, { tint: 0xf39140 }),
+            item('boat', 0.5, 604, 2600, 200, 1700, { tint: 0xccaf6b }),
+          ],
+        },
+      ],
+      near: [
+        { s: 'plant_fern_1', scale: 0.6, every: 300, jitter: 110, tint: 0xff9932 },
+        { s: 'plant_fern_5', scale: 0.7, every: 560, jitter: 160, offset: 150, tint: 0xff9932 },
+        { s: 'rock_rubble_01d_al1', scale: 0.35, every: 480, jitter: 140, offset: 90, tint: 0x998245 },
+        { s: 'rock_rubble_01g_al1', scale: 0.35, every: 700, jitter: 200, offset: 330, tint: 0x998245 },
+        { s: 'purple_mushroom_2', scale: 0.45, every: 520, jitter: 180, offset: 200, tint: 0x906645 },
+        { s: 'underground_bogwillow_2', scale: 0.55, every: 900, jitter: 260, offset: 420, tint: 0xffb49f },
+        { s: 'mushrooms', scale: 0.3, every: 760, jitter: 240, offset: 600, tint: 0xae9861 },
+      ],
+      nearTint: 0x947c39,
+      trim: ['plant_fern_2', 'purple_mushroom_3', 'rock_rubble_01d_al1'],
+    },
   },
   pol_ext_bonsai_high: {
     look: {
@@ -922,7 +976,51 @@ export const YARD_LOOKS = {
   meadows_2__high: 'meadows_2_high',
   meadows_3__high: 'meadows_3_high',
   meadows_int_default__high: 'meadow_ext_default_high',
-  pol_int_coral_hor_high: { missing: 'Its pair, the Coral Caves street, needs a coral seabed set (pol_ext_coral) that is in none of the CC0 street bundles.' },
+  // Anemone Alley, Coral Caves' yard (templates POL_int_coral_HOR_high / POL_ext_coral_high). A player's 2012-09-07
+  // snap through the house door (76401; reference only) shows the yard itself: tiered rocks, beaded
+  // branches among them, a pair of fiddleheads, a big spotted fiddlehead and beaded branches in front, a flat
+  // rock, white-capped pebbles and dark mounds behind, all murky yellow. The same CC0 pieces as the street
+  // (cone_top_rock, underground_bogwillow, plant_fern, plant_giant_fern, rock_rubble, rock_snowy, cave_background_hill).
+  pol_int_coral_hor_high: {
+    lookOf: 'pol_ext_coral_high',
+    ref: 'snap 76401 (2012-09-07, 900x600): the yard through the house door',
+    look: {
+      sky: [0x1c1206, 0x2e200c, 0x4a3418],
+      field: 0x7a6230,
+      fieldDark: 0x5e4a22,
+      soil: null,
+      soilColor: 0x3e3014,
+      layers: [
+        { f: 0.04, items: [item(['back_wall_2', 'back_wall_4'], 0.34, 562, 620, 240, 200, { tint: 0xffa030 })] },
+        { f: 0.08, items: [item(['cave_background_hill_1', 'cave_background_hill_2'], 0.17, 566, 120, 50, 0, { tint: 0xf07a0a, alpha: 0.85 })] },
+        { band: { y: 556, h: 10, color: 0x1a1606, alpha: 1 }, f: 0.1 },
+        { f: 0.22, items: [item('underground_bogwillow', 0.4, 574, 700, 240, 300, { tint: 0xf0c070 })] },
+        {
+          f: 0.4,
+          items: [
+            item(['cone_top_rock_01a_al1', 'cone_top_rock_01b_al1'], 0.48, 594, 560, 200, 0, { tint: 0x8a7032 }),
+            item(['underground_bogwillow_3', 'underground_bogwillow_1'], 0.8, 596, 760, 240, 300, { tint: 0xf0c070 }),
+          ],
+        },
+        {
+          f: 0.7,
+          items: [
+            item('rock_rubble_01b_al1', 0.55, 604, 840, 260, 200, { tint: 0x8a7032 }),
+            item('rock_snowy_1c_al1', 0.6, 604, 1100, 300, 650, { tint: 0xb09a5c }),
+            item('plant_giant_fern_2', 0.85, 608, 900, 260, 500, { tint: 0xe08838 }),
+          ],
+        },
+      ],
+      near: [
+        { s: 'plant_fern_2', scale: 0.6, every: 340, jitter: 120, tint: 0xf09030 },
+        { s: 'plant_fern_1', scale: 0.6, every: 620, jitter: 200, offset: 160, tint: 0xf09030 },
+        { s: 'underground_bogwillow_2', scale: 0.7, every: 560, jitter: 200, offset: 180, tint: 0xf0c070 },
+        { s: 'rock_rubble_01g_al1', scale: 0.4, every: 480, jitter: 160, offset: 320, tint: 0x8a7032 },
+      ],
+      nearTint: 0x8a7032,
+      trim: ['plant_fern_2', 'rock_rubble_01d_al1', 'plant_giant_fern_1'],
+    },
+  },
   pol_int_crimson_hor_high: '_crimson_forest_high',
   pol_int_mordor_high: { missing: 'No street style shares its template family (mordor), and its own template was never archived.' },
   savannah_int_1__high: 'savannah_ext_1_high',

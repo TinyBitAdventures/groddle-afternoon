@@ -32,7 +32,7 @@ import {
   styleChoices,
   styleSwitchCost,
   switchStreetStyle,
-} from '../public/js/home-styles.js?v=eeba82ee';
+} from '../public/js/home-styles.js?v=078d55de';
 import { HOME_STYLES } from '../public/js/homes.js?v=631ab6b8';
 import { templateNames, templatePair } from '../tools/home-styles/build.mjs';
 
@@ -196,19 +196,18 @@ describe('Change Style wording (client HouseStylesDialog.as, HouseSignDialog.as)
 });
 
 describe('composed styles (tools/home-styles/build.mjs)', () => {
-  it('offers every exterior style with surviving art; Coral Caves is left out with its reason', () => {
+  it('offers every exterior style, Coral Caves included (lane coral)', () => {
     const { choices, missing } = styleChoices(START_STREET_STYLE, 5);
-    assert.equal(choices.length, 36);
-    assert.deepEqual(missing.map((row) => row.label), ['Coral Caves']);
-    assert.match(missing[0].reason, /CC0/);
+    assert.equal(choices.length, 37);
+    assert.deepEqual(missing, []);
     assert.equal(choices.filter((row) => row.isCurrent).length, 1);
   });
 
-  it('draws 35 of the 37 back yards with the look of their street pair (G135)', () => {
+  it('draws 36 of the 37 back yards with the look of their street pair (G135)', () => {
     const built = INTERIOR_STYLES.filter((row) => row.built);
-    assert.equal(built.length, 35);
+    assert.equal(built.length, 36);
     for (const row of built) assert.equal(EXTERIOR_STYLES.find((ext) => ext.key === row.lookOf)?.built, true, row.key);
-    assert.deepEqual(INTERIOR_STYLES.filter((row) => !row.built).map((row) => row.label), ['Anemone Alley', 'More Door']);
+    assert.deepEqual(INTERIOR_STYLES.filter((row) => !row.built).map((row) => row.label), ['More Door']);
     for (const row of INTERIOR_STYLES.filter((r) => !r.built)) assert.ok(row.reason);
   });
 
@@ -225,8 +224,8 @@ describe('composed styles (tools/home-styles/build.mjs)', () => {
     const names = new Set(row.look.layers.flatMap((l) => (l.items || []).flatMap((it) => [it.s, ...(it.alts || []).map((a) => a.s)])));
     for (const want of ['tree_deciduous1', 'light_shafts_blue', 'tree_dead_2', 'corey3_shroom_aqua1', 'tree_plane_foliage_01a_g1']) assert.ok(names.has(want), want);
     assert.ok(row.look.near.some((it) => it.s === 'plant_fern_1'), 'fiddleheads in front');
-    // Only this yard has a picture of its own; Plush Pasture, which shares the key's spelling, still draws Heartfelt Heath.
-    assert.deepEqual(INTERIOR_STYLES.filter((r) => r.look).map((r) => r.key), ['_triney__high']);
+    // Only this yard and Anemone Alley have pictures of their own; Plush Pasture, which shares the key's spelling, still draws Heartfelt Heath.
+    assert.deepEqual(INTERIOR_STYLES.filter((r) => r.look).map((r) => r.key).sort(), ['_triney__high', 'pol_int_coral_hor_high']);
     assert.equal(INTERIOR_STYLES.filter((r) => r.borrowed).length, 0);
     assert.equal(YARD_STYLE_BY_KEY.meadows_int_default__high.lookOf, 'meadow_ext_default_high');
     assert.equal(YARD_STYLE_BY_KEY.meadows_int_default__high.label, 'Plush Pasture');
@@ -252,8 +251,8 @@ describe('composed styles (tools/home-styles/build.mjs)', () => {
         continue;
       }
       assert.ok(pair, row.key);
-      if (row.built) assert.equal(row.lookOf, pair.key, `${row.label} (${names[row.template]})`);
-      else assert.equal(pair.key, 'pol_ext_coral_high', row.key);
+      assert.equal(row.built, true, row.key);
+      assert.equal(row.lookOf, pair.key, `${row.label} (${names[row.template]})`);
     }
     // The three the keys got wrong: inc_data_maps_prod.js names LHVMN2RPE9U24OJ uralia_int_2a_HOR_high,
     // LHVMRH2SE9U2SEM firebog_int_4_HOR_high and LHVMS6CSE9U2NKR firebog_int_4a_HOR_high.
@@ -273,6 +272,33 @@ describe('composed styles (tools/home-styles/build.mjs)', () => {
     assert.deepEqual(drums.map((it) => it.s), ['ra_drum_1'], 'one drum, lying down');
     assert.ok(drums[0].every >= 2000, 'out on the plain, now and then');
     assert.ok(!look.near.some((it) => it.s === 'earthdot_grp_3'), 'no orange-brown stains');
+  });
+
+  it('draws Coral Caves and its yard Anemone Alley from the CC0 kit the visual match found (lane coral, G223)', () => {
+    const street = STREET_STYLE_BY_KEY.pol_ext_coral_high;
+    assert.equal(street.label, 'Coral Caves');
+    assert.equal(street.built, true);
+    const yard = YARD_STYLE_BY_KEY.pol_int_coral_hor_high;
+    assert.equal(yard.label, 'Anemone Alley');
+    assert.equal(yard.built, true);
+    assert.equal(yard.lookOf, 'pol_ext_coral_high', 'paired by template names POL_int_coral_HOR_high / POL_ext_coral_high');
+    assert.match(yard.ref, /snap 76401/);
+    assert.deepEqual(yardLook('pol_int_coral_hor_high'), yard.look, 'its own composition from the doorway snap');
+    const names = (look) => new Set([
+      ...look.layers.flatMap((l) => (l.items || []).flatMap((it) => [it.s, ...(it.alts || []).map((a) => a.s)])),
+      ...look.near.flatMap((it) => [it.s, ...(it.alts || []).map((a) => a.s)]),
+      ...look.trim.map((it) => it.s),
+    ]);
+    // The matched pieces (research/hunts/2026-11-08-coral-caves/findings.md): Samudra's rocks and beaded
+    // branches, Ilmenskie's fiddleheads, mushrooms and mounds, Firebog's boat and red mushrooms.
+    const s = names(streetLook('pol_ext_coral_high'));
+    for (const want of ['cone_top_rock_01a_al1', 'rock_rubble_01b_al1', 'underground_bogwillow', 'plant_fern_1', 'plant_giant_fern_2', 'purple_mushroom_2', 'mushrooms', 'cave_background_hill_1', 'back_wall_1', 'boat']) assert.ok(s.has(want), want);
+    const y = names(yard.look);
+    for (const want of ['cone_top_rock_01a_al1', 'underground_bogwillow_3', 'plant_fern_2', 'plant_giant_fern_2', 'rock_rubble_01b_al1', 'rock_snowy_1c_al1', 'cave_background_hill_1']) assert.ok(y.has(want), want);
+    // Nothing stands in for the pieces no CC0 symbol matched (kelp blades, dark crystal columns, pale spires).
+    for (const look of [streetLook('pol_ext_coral_high'), yard.look]) {
+      for (const name of names(look)) assert.ok(!/cave_crystal|cave_icicle|stalagmite_/.test(name), name);
+    }
   });
 
   it('draws only shipped CC0 decos', () => {
@@ -296,7 +322,7 @@ describe('composed styles (tools/home-styles/build.mjs)', () => {
   it('keeps a saved style, else the purchase look’s', () => {
     assert.equal(streetStyleFor('basic', 'firebog'), 'basic');
     assert.equal(streetStyleFor(null, 'firebog'), 'firebog_4_high');
-    assert.equal(streetStyleFor('pol_ext_coral_high', 'uralia'), 'uralia_2_high');
+    assert.equal(streetStyleFor('pol_ext_coral_high', 'uralia'), 'pol_ext_coral_high', 'Coral Caves is built (lane coral)');
     assert.equal(streetStyleFor('nonsense', 'nonsense'), START_STREET_STYLE);
   });
 

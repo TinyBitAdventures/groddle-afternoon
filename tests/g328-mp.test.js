@@ -35,10 +35,10 @@ import {
   visitSceneTsid,
 } from '../public/js/neighbours-mp.js?v=d2a75460';
 import { createMinnAccount } from '../public/js/minn-account.js?v=8f2741cd';
-import { homesFeature, visitorHomeScene, visitorHomeState } from '../public/js/features/homes-feature.js?v=49ae8b1a';
-import { neighboursMpApi, neighboursMpFeature } from '../public/js/features/neighbours-mp-feature.js?v=ed56a65b';
-import { FEATURES } from '../public/js/features/index.js?v=dc27c808';
-import { YARD_STYLE_BY_KEY, streetLook, yardLook, yardStyleFor } from '../public/js/home-styles.js?v=eeba82ee';
+import { homesFeature, visitorHomeScene, visitorHomeState } from '../public/js/features/homes-feature.js?v=4ce5dd24';
+import { neighboursMpApi, neighboursMpFeature } from '../public/js/features/neighbours-mp-feature.js?v=79b8fe9b';
+import { FEATURES } from '../public/js/features/index.js?v=993217cd';
+import { YARD_STYLE_BY_KEY, streetLook, yardLook, yardStyleFor } from '../public/js/home-styles.js?v=078d55de';
 import { serverPath, sitePath, skipWithoutServer, skipWithoutSite } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');
@@ -128,6 +128,11 @@ describe('homes feature, for a visitor', () => {
     assert.equal(v.streetStyle, '_moon_high');
     assert.equal(v.yardStyle, '_triney__high');
     assert.equal(yardLook(v.yardStyle), YARD_STYLE_BY_KEY._triney__high.look, 'Bewitched Backwoods\' own look');
+    // Coral Caves and Anemone Alley (lane coral): once built, a visitor sees them too, not the fallback.
+    const coral = visitorHomeState({ ...VIEW, homes: { ...VIEW.homes, streetStyle: 'pol_ext_coral_high', yardStyle: 'pol_int_coral_hor_high' } });
+    assert.equal(coral.streetStyle, 'pol_ext_coral_high');
+    assert.equal(coral.yardStyle, 'pol_int_coral_hor_high');
+    assert.equal(yardLook(coral.yardStyle), YARD_STYLE_BY_KEY.pol_int_coral_hor_high.look, 'Anemone Alley\'s own look');
     // An owner who never restyled saves none: the visit shim hands homeContext the OWNER's purchase look,
     // so a Firebog owner's yard is Easy Ash, drawn as Vidya Vent (its template pair), for every visitor.
     const plain = visitorHomeState(VIEW);

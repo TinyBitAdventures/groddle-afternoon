@@ -18,14 +18,14 @@ import {
   rockClassFor,
   rockItems,
   soilKeyMap,
-} from '../public/js/features/homes-feature.js?v=49ae8b1a';
+} from '../public/js/features/homes-feature.js?v=4ce5dd24';
 import { WALLPAPER_MAPS } from '../public/js/home-wallpaper-art.js?v=9f8473e6';
 import { HOME_TEXTURE_CONFIGS } from '../public/js/homes-catalog.js?v=10ac34b6';
 import { canPlantBean } from '../public/js/patches.js?v=796732fb';
 import { TOWER_PART_CHOICES, TOWER_STYLES, composeTower, towerBounds } from '../public/js/home-tower.js?v=087df38f';
 import { MIN_GROUND_CLEARANCE, cameraTargetY, cameraWorldHeightForGround, yCamOffsetAnchor } from '../public/js/movement.js?v=b30f84eb';
 import { INTERIOR } from '../public/js/home-decor.js?v=7cee3ace';
-import { EXTERIOR_STYLES, INTERIOR_STYLES, streetLook, yardLook } from '../public/js/home-styles.js?v=eeba82ee';
+import { EXTERIOR_STYLES, INTERIOR_STYLES, streetLook, yardLook } from '../public/js/home-styles.js?v=078d55de';
 import { gardenLayout, gardenStyle } from '../public/js/garden-view.js?v=3683a26f';
 import { listCultivationClasses } from '../public/js/home-cultivation.js?v=42ae453c';
 
@@ -260,9 +260,9 @@ describe('#117: garden beds stand on the field, not over the backdrop', () => {
     ...INTERIOR_STYLES.filter((row) => row.built).map((row) => ({ key: `yard ${row.key}`, look: yardLook(row.key), groundY: BACK_YARD_GROUND_Y })),
   ];
 
-  it('checks all six garden sizes on 36 streets and 35 back yards', () => {
+  it('checks all six garden sizes on 37 streets and 36 back yards (Coral Caves and Anemone Alley, lane coral)', () => {
     assert.equal(gardens.length, 6);
-    assert.equal(places.length, 71);
+    assert.equal(places.length, 73);
   });
 
   it('every bed, the large herb garden included, lies inside the field with room behind it', () => {
