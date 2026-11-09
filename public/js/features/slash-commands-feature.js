@@ -53,7 +53,7 @@
  */
 
 import { BUTLER_STRINGS } from '../butler.js?v=2c95c064';
-import { butlerApi } from './butler-feature.js?v=ff19ea26';
+import { butlerApi } from './butler-feature.js?v=04a67746';
 import { hellFeature } from './hell-feature.js?v=ba4199c6';
 import { towerApi } from './home-tower-feature.js?v=f1fa901c';
 import { platformYAt, platformsScreen } from '../street-model.js?v=b6cb6a4e';

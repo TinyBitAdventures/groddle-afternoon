@@ -12,8 +12,8 @@ import { describe, it } from 'node:test';
 import { PEAT_ANSWER_GRACE_MS, PEAT_EVENT, PEAT_FULL, PEAT_QUEST, PEAT_REACH, PEAT_TEXT, fullBogNear, retireSoloPeatQuest } from '../public/js/peat-quest.js?v=c7baea41';
 import { MULTIPLAYER_QUESTS, creditedMultiplayerQuests } from '../public/js/quests-mp.js?v=1fc5ff58';
 import { ensureQuestOfferState, tickQuestTimers } from '../public/js/quest-offers.js?v=a7ee5b8f';
-import { peatQuestMpFeature } from '../public/js/features/peat-quest-mp-feature.js?v=d67f4aff';
-import { FEATURES } from '../public/js/features/index.js?v=ee44ea28';
+import { peatQuestMpFeature } from '../public/js/features/peat-quest-mp-feature.js?v=2897db5d';
+import { FEATURES } from '../public/js/features/index.js?v=f456702e';
 
 const root = join(import.meta.dirname, '..');
 const read = (rel) => readFileSync(join(root, rel), 'utf8');

@@ -369,8 +369,25 @@ export function applyTreeState(state, s, now = Date.now()) {
  * mood, hunger, isDaily, hasBeenPetted, croaking and the next tick (hungerAt).
  * The player's own Animal Kinship counters on the state stay as they are.
  */
-export function applyPigState(state, s, now = Date.now()) {
+/**
+ * A street Piggy's state from the server. Its name is everyone's (objects_pigs.go namePig,
+ * items/include/animal_naming.js): userName, namer and namedOn in the shape js/animal-husbandry.js
+ * canNameAnimal reads, the namer 'player' when it is this player (me, the realtime id) so the
+ * naming rules need no change, else 'p<id>'. No name from the server: none here either.
+ */
+export function applyPigState(state, s, now = Date.now(), { me = 0 } = {}) {
   if (!state || !s) return state;
+  const name = typeof s.name === 'string' ? s.name.slice(0, 32) : '';
+  if (name) {
+    const namer = Math.floor(Number(s.namer) || 0);
+    state.userName = name;
+    state.namer = me && namer === Number(me) ? 'player' : `p${namer}`;
+    state.namedOn = Math.floor((now - Math.max(0, Number(s.named) || 0)) / 1000);
+  } else {
+    delete state.userName;
+    delete state.namer;
+    delete state.namedOn;
+  }
   const whole = (v, lo, hi) => Math.max(lo, Math.min(hi, Math.floor(Number(v) || 0)));
   state.mood = whole(s.mood, 0, 2);
   state.hunger = whole(s.hunger, 0, 10);
@@ -455,6 +472,8 @@ export function stateFor(copy, id, now = Date.now()) {
   if (Number(s.in) > 0) s.in = Math.max(1, s.in - gone);
   if (Number(s.reset) > 0) s.reset = Math.max(1, s.reset - gone);
   if (Number(s.poison) > 0) s.poison = Math.max(1, s.poison - gone);
+  // A Piggy's name: how long ago it was given, which grows (objects_pigs.go namePig).
+  if (s.name && Number.isFinite(Number(s.named))) s.named = Math.max(0, Number(s.named)) + gone;
   return s;
 }
 
@@ -477,7 +496,7 @@ export function reconcile(obj, copy, now = Date.now()) {
   } else if (obj.kind === 'pig') {
     // The server lists every Piggy of a street it has; one it does not list keeps the local rules.
     if (!s) return false;
-    applyPigState(obj.state, s, now);
+    applyPigState(obj.state, s, now, { me: obj.me });
     if (copy.pigPaths && obj.target) {
       const row = copy.objs.get(obj.id);
       obj.target.sharedPath = pathFrom(s, row?.at ?? now, row?.off ?? copy.offset, row?.srv);
@@ -492,7 +511,7 @@ export function reconcile(obj, copy, now = Date.now()) {
 }
 
 /** An obj_act message, validated the way the server will. */
-export function actMessage({ req, id, verb, perks = [], skill = '', on = '', c = '', n = 0, at = 0 }) {
+export function actMessage({ req, id, verb, perks = [], skill = '', on = '', c = '', n = 0, at = 0, name = '' }) {
   const msg = { req: Math.max(1, Math.floor(Number(req) || 1)), id: String(id || ''), verb: String(verb || '') };
   const words = (perks || []).filter((p) => /^[a-z0-9_]{1,24}$/.test(p)).slice(0, 8);
   if (words.length) msg.perks = words;
@@ -504,6 +523,8 @@ export function actMessage({ req, id, verb, perks = [], skill = '', on = '', c =
     msg.n = Math.max(1, Math.min(9999, Math.floor(Number(n) || 1)));
   }
   // A wait: the path's clock (server ms minus lag) where this player's screen stopped the animal.
+  // A name for a street Piggy (objects_pigs.go namePig): at most 32 of a-z, 0-9 and spaces, the server checks again.
+  if (verb === 'name') msg.name = String(name || '').slice(0, 32).replace(/[^a-z0-9 ]/gi, '');
   if (verb === 'wait' && Number.isSafeInteger(Math.round(Number(at))) && Number(at) > 0) msg.at = Math.round(Number(at));
   return msg;
 }

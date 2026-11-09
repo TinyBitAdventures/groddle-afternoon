@@ -878,20 +878,40 @@ function settleYardFood(engine, food) {
 // —— Naming ——————————————————————————————————————————————————————————————
 
 function applyName(engine, target, value) {
+  // A street Piggy online (G334): the name is everyone's, so the realtime server decides it. The
+  // checks here run on a copy first, so the page says no at once where the server would.
+  if (engine.mode === 'multiplayer' && target.classId === 'npc_piggy' && !target.husbandryAnimal) {
+    const trial = nameAnimal(target.classId, { ...(target.state || {}) }, value, namingCtx(engine));
+    if (!trial.ok) {
+      if (trial.reason !== 'unchanged') engine.toast(trial.reason, 2200);
+      return false;
+    }
+    const asked = engine.query?.('sharedAnimalName', target, value, engine);
+    if (asked) {
+      lastAction = `naming:${target.classId}`;
+      return true;
+    }
+  }
   const res = nameAnimal(target.classId, target.state || (target.state = {}), value, namingCtx(engine));
   if (!res.ok) {
     if (res.reason !== 'unchanged') engine.toast(res.reason, 2200);
     return false;
   }
+  landName(engine, target, res.name);
+  return true;
+}
+
+/** A name landed (here, or the realtime server's go-ahead): the label, the bubble, the counter, the line. */
+function landName(engine, target, name) {
+  if (!name) return;
   target.label = namedAnimalLabel(target.classId, target.state);
-  engine.say(target, res.bubble, 5000);
-  emit(engine, res.counter);
-  engine.pushActivity(`You named a ${NAMEABLE_ANIMALS[target.classId]} "${res.name}".`);
-  lastAction = `named:${target.classId}:${res.name}`;
-  engine.setData('namedAnimal', `${target.classId}:${res.name}`);
+  engine.say(target, `And they shall call me "${name}"`, 5000);
+  emit(engine, `animals_named:${target.classId}`);
+  engine.pushActivity(`You named a ${NAMEABLE_ANIMALS[target.classId]} "${name}".`);
+  lastAction = `named:${target.classId}:${name}`;
+  engine.setData('namedAnimal', `${target.classId}:${name}`);
   engine.save();
   publish(engine, true);
-  return true;
 }
 
 function namingCtx(engine) {
@@ -1893,6 +1913,13 @@ export const animalHusbandryFeature = {
 
   /** Name / Rename / Capture on the street's own animals (content.js lists those verbs). */
   /** Multiplayer: a street Batterfly's home over the server's spot for it (x, y on a platform). */
+  /** street-objects-feature: the realtime server named a street Piggy for this player (objects_pigs.go namePig). */
+  sharedNameLanded(target, name, engine) {
+    if (!target || !name) return null;
+    landName(engine, target, name);
+    return true;
+  },
+
   batterflyHome(target, x, y, engine) {
     const entity = batterflies.find((b) => b.target === target);
     if (!entity || !Number.isFinite(x) || !Number.isFinite(y)) return null;
