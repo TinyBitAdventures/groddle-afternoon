@@ -110,7 +110,7 @@ import { TRANT_META, trantStatusLabel } from '../trants.js?v=1b3c8ae3';
 import { animalStatusLabel } from '../animals.js?v=c2d5ecf3';
 import { quoteAnimalKinship } from '../animal-kinship.js?v=ae02d8d3';
 import { captureVerbState, isFoodItem, itemLabel } from '../animal-husbandry.js?v=6d330f7b';
-import { ROOK_SHEETS, rookAttackFeature } from './rook-attack-feature.js?v=b719f25b';
+import { ROOK_SHEETS, rookAttackFeature } from './rook-attack-feature.js?v=34106aec';
 import { ANIMAL_BODY, ANIMAL_PATROL, TREE_FOOTPRINT } from '../street-ecology.js?v=08076876';
 import {
   CHECK_ON_REMOVE,

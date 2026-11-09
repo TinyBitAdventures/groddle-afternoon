@@ -104,7 +104,7 @@ import {
   strikeBeamFor,
   strikeDamageFor,
   useBalmPoint,
-} from '../rook-attack.js?v=473f236c';
+} from '../rook-attack.js?v=c12e825f';
 import { shrinePrimeBonus } from '../imagination-effects.js?v=70169933';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 import { gainMetabolic, loseEnergy, loseMood } from '../metabolics.js?v=8504134e';
@@ -123,7 +123,7 @@ import {
   strikeDamage as mpStrikeDamage,
   syncKeys,
   syncObjs,
-} from '../rook-mp.js?v=1391d332';
+} from '../rook-mp.js?v=0b9056b1';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
 import { copyChargesLeft, copyFromLedger, keepsCopies, spendCopyCharge, verbCopy } from '../copy-charges.js?v=f01dfda2';
 import { migrateClassValue } from '../tools.js?v=eff5ef6f';
@@ -333,6 +333,12 @@ const ROOK_SINGLE = Object.freeze({
 });
 function rookSingle(target) {
   return ROOK_SINGLE[target?.classId] || rookLabel(target);
+}
+
+/** canRevive 359-375: given plus others' doses under way reach three (this player's own is not counted). */
+function reviveFull(row, me) {
+  const busy = (row?.busy || []).filter((id) => id !== me);
+  return (row?.doses || 0) + busy.length >= ROOK_SOURCE.reviveHealers;
 }
 
 // ---------------------------------------------------------------------------
@@ -2214,13 +2220,15 @@ function rookedVerbs(engine, target) {
     });
   }
   const enough = (engine.pc.energy || 0) > energy;
-  // Multiplayer: one dose per player (items/include/rook.js startRevive 112).
+  // Multiplayer: one dose per player (items/include/rook.js startRevive 112), and three given or
+  // under way at most (canRevive 359-375; G605: others' doses in progress count).
   const dosed = Boolean(mp && row?.by?.includes(mp.client.me?.id));
+  const full = Boolean(mp) && !dosed && reviveFull(row, mp.client.me?.id);
   verbs.push({
     id: 'rook_revive',
     label: `Revive (${(row?.doses || 0) + 1}/${ROOK_SOURCE.reviveHealers})`,
-    enabled: enough && !dosed,
-    reason: dosed ? ROOK_TEXT.reviveDone(rookSingle(target)) : enough ? '' : "You don't have enough energy to do that!",
+    enabled: enough && !dosed && !full,
+    reason: dosed ? ROOK_TEXT.reviveDone(rookSingle(target)) : full ? ROOK_TEXT.reviveFull(rookSingle(target)) : enough ? '' : "You don't have enough energy to do that!",
     tooltip: ROOK_TEXT.reviveTooltip.replace('$itemclass', label.toLowerCase()).replace('$energy_cost', String(energy)),
     durationMs: ROOK_SOURCE.reviveMs,
     energy,
@@ -2289,8 +2297,11 @@ function mpBind(engine) {
   client.on('msg:rook', (msg) => mpOnRook(engineRef || engine, msg));
   client.on('msg:rook_you', (msg) => mpOnYou(engineRef || engine, msg));
   client.on('msg:rook_no', (msg) => {
-    if (msg?.message) (engineRef || engine).toast?.(String(msg.message), 2400);
+    const eng = engineRef || engine;
+    if (msg?.message) eng.toast?.(String(msg.message), 2400);
     lastAction = `refused:${msg?.what || ''}:${msg?.code || ''}`;
+    // G605: the server would not let this dose start (three given or under way): the bar stops.
+    if (msg?.what === 'revive_start' && eng.currentAction?.verbId === 'rook_revive') eng.cancelCurrentAction?.({ quiet: true });
   });
   client.on('state', ({ state }) => {
     if (state === 'online') return;
@@ -3236,6 +3247,22 @@ export const rookAttackFeature = {
   /** No Magic Rock offers over a Rook attack on this street. */
   holdQuestOffers(engine) {
     return here(engine) ? true : null;
+  },
+
+  /** game.js beginVerbAction: a revive dose's 10 s began (include/rook.js startRevive): the street counts it (G605). */
+  verbStarted(target, verb, engine) {
+    if (!mp || verb?.id !== 'rook_revive') return undefined;
+    const key = keyOf.get(target);
+    if (key && mp.slot.rooked[key]) mp.client.send('rook_revive_start', { key });
+    return undefined;
+  },
+
+  /** game.js cancelCurrentAction: a dose stopped before it landed (doReviveCancel). */
+  verbCancelled(target, verbId, engine) {
+    if (!mp || verbId !== 'rook_revive') return undefined;
+    const key = keyOf.get(target);
+    if (key) mp.client.send('rook_revive_stop', { key });
+    return undefined;
   },
 
   verbOverride(target, engine) {

@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=c23b7579';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=127e0a3c';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=f456702e';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=74434b1f';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -12510,6 +12510,8 @@ const engine = {
   get currentAction() {
     return currentAction ? { target: currentAction.target, verbId: currentAction.verbId } : null;
   },
+  /** Stop the timed verb running now (G605: the server refused a revive dose's start). */
+  cancelCurrentAction: (opts) => cancelCurrentAction(opts),
   streetExists(tsid) {
     if (tsid === HOME_STREET_TSID || tsid === HOME_INTERIOR_TSID) return homeState.owned === true;
     return Boolean(resolveIndexTsid(tsid));

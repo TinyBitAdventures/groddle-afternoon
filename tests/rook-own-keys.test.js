@@ -9,8 +9,8 @@
 // Now a key is the animal's own: its class and the index the street spawned it with (rookKeyFor).
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { rookKeyFor } from '../public/js/rook-attack.js?v=473f236c';
-import { syncKeys } from '../public/js/rook-mp.js?v=1391d332';
+import { rookKeyFor } from '../public/js/rook-attack.js?v=c12e825f';
+import { syncKeys } from '../public/js/rook-mp.js?v=0b9056b1';
 
 /** A copy of the feature of its own (its realtime binding is module state, one per player). */
 const featureCopy = async (name) => (await import(`../public/js/features/rook-attack-feature.js?fresh=rook-own-keys-${name}`)).rookAttackFeature;
@@ -211,5 +211,31 @@ describe('ticket 12: a rooked animal keeps its own key and its own healers', () 
     assert.equal(pigs[0].subtitle, undefined);
     assert.equal(pigs[1].subtitle, undefined);
     rookAttackFeature.onStreetClear(engine);
+  });
+});
+
+describe('G605: revive doses in progress count (include/rook.js startRevive 128-133, canRevive 359-375)', () => {
+  it('three given or under way leave the Revive disabled with the source words; a start and a cancel tell the server', async () => {
+    const feature = await featureCopy('busy');
+    const b = streetButterflies();
+    const sent = [];
+    const { engine, fire } = onlineEngine([...b], sent);
+    let cancelled = 0;
+    engine.cancelCurrentAction = () => { cancelled += 1; };
+    engine.currentAction = { target: b[1], verbId: 'rook_revive' };
+    enter(feature, engine);
+    fire('msg:rook', { street: TSID, snap: true, attack: null, rooked: {
+      'npc_butterfly:0': { class: 'npc_butterfly', doses: 1, by: [7], busy: [8, 9] },
+      'npc_butterfly:1': { class: 'npc_butterfly', doses: 1, by: [7], busy: [8, ME] },
+    } });
+    assert.equal(dosedLabel(feature, engine, b[0]), 'Enough people are already helping to revive this Butterfly.');
+    assert.equal(dosedLabel(feature, engine, b[1]), 'can revive', 'your own dose under way is not counted against you');
+    feature.verbStarted(b[1], { id: 'rook_revive' }, engine);
+    assert.deepEqual(sent.at(-1), ['rook_revive_start', { key: 'npc_butterfly:1' }]);
+    feature.verbCancelled(b[1], 'rook_revive', engine);
+    assert.deepEqual(sent.at(-1), ['rook_revive_stop', { key: 'npc_butterfly:1' }]);
+    fire('msg:rook_no', { what: 'revive_start', code: 'full', message: 'Enough people are already helping to revive this Butterfly.' });
+    assert.equal(cancelled, 1, 'a refused start stops the bar');
+    feature.onStreetClear(engine);
   });
 });

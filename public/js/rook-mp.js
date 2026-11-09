@@ -20,7 +20,7 @@
  * with no solo crowd multiplier, and each player gives one revive dose.
  */
 
-import { ROOK_SOURCE, ROOK_TEXT, isRookableClass, strikeDamageFor } from './rook-attack.js?v=473f236c';
+import { ROOK_SOURCE, ROOK_TEXT, isRookableClass, strikeDamageFor } from './rook-attack.js?v=c12e825f';
 
 /** The server's limits (groddle-afternoon-server/rook.go). */
 export const MP_ROOK = Object.freeze({
@@ -141,7 +141,9 @@ export function rookedFromServer(raw) {
     const classId = String(row?.class || m?.[1] || '');
     if (!m || !isRookableClass(classId)) continue;
     const by = (Array.isArray(row?.by) ? row.by : []).map((id) => num(id, 0)).filter(Boolean);
-    out[key] = { classId, doses: Math.max(0, Math.min(ROOK_SOURCE.reviveHealers - 1, Math.floor(num(row?.doses)))), by, at: 0 };
+    // busy: doses under way (G605; include/rook.js startRevive 128-133 in_progress).
+    const busy = (Array.isArray(row?.busy) ? row.busy : []).map((id) => num(id, 0)).filter(Boolean).slice(0, ROOK_SOURCE.reviveHealers);
+    out[key] = { classId, doses: Math.max(0, Math.min(ROOK_SOURCE.reviveHealers - 1, Math.floor(num(row?.doses)))), by, busy, at: 0 };
   }
   return out;
 }

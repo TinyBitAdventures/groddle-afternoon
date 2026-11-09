@@ -12,8 +12,8 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { rookAttackFeature } from '../public/js/features/rook-attack-feature.js?v=b719f25b';
-import { MP_ROOK_TEXT } from '../public/js/rook-mp.js?v=1391d332';
+import { rookAttackFeature } from '../public/js/features/rook-attack-feature.js?v=34106aec';
+import { MP_ROOK_TEXT } from '../public/js/rook-mp.js?v=0b9056b1';
 import { SKILL_REMAKE_NOTES } from '../public/js/skill-tree.js?v=faa54b90';
 
 const root = join(import.meta.dirname, '..');

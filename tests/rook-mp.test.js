@@ -18,9 +18,9 @@ import {
   strikeDamage,
   syncKeys,
   syncObjs,
-} from '../public/js/rook-mp.js?v=1391d332';
-import { rookClockS, canStrike, canStun, rookPresent } from '../public/js/rook-attack.js?v=473f236c';
-import { orbGlowIds } from '../public/js/features/rook-attack-feature.js?v=b719f25b';
+} from '../public/js/rook-mp.js?v=0b9056b1';
+import { rookClockS, canStrike, canStun, rookPresent } from '../public/js/rook-attack.js?v=c12e825f';
+import { orbGlowIds } from '../public/js/features/rook-attack-feature.js?v=34106aec';
 import { HAS_SERVER, serverPath, skipWithoutServer } from '../tools/repos.mjs';
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -75,13 +75,15 @@ describe('rook-mp: the server attack as the UI attack', () => {
 describe('rook-mp: rooked things and keys', () => {
   it('reads the server rows, dropping strangers', () => {
     const rows = rookedFromServer({
-      'npc_piggy:0': { class: 'npc_piggy', doses: 2, by: [7, 8] },
+      'npc_piggy:0': { class: 'npc_piggy', doses: 2, by: [7, 8], busy: [9, 'x'] },
       'trant_bean:1': { class: 'trant_bean', doses: 0, by: [] },
       'rock_beryl_1:0': { class: 'rock_beryl_1', doses: 0 },
       nonsense: { class: 'npc_piggy' },
     });
     assert.deepEqual(Object.keys(rows).sort(), ['npc_piggy:0', 'trant_bean:1']);
-    assert.deepEqual(rows['npc_piggy:0'], { classId: 'npc_piggy', doses: 2, by: [7, 8], at: 0 });
+    // busy: doses under way (G605), ids only.
+    assert.deepEqual(rows['npc_piggy:0'], { classId: 'npc_piggy', doses: 2, by: [7, 8], busy: [9], at: 0 });
+    assert.deepEqual(rows['trant_bean:1'].busy, []);
   });
 
   it('syncs only rookable keys, at most the server\'s limit', () => {
