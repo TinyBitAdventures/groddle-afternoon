@@ -69,7 +69,8 @@ import {
   tradeCommand,
   untradeableReason,
   goodsWithHeldTags,
-} from '../trade.js?v=abb23481';
+} from '../trade.js?v=2b4d7f0e';
+import { UNNAMED_PLAYER } from '../player-names.js?v=f9b78094';
 
 export const TRADE_FEATURE_ID = 'trade';
 export const TRADE_VERB = 'trade_start';
@@ -890,7 +891,7 @@ function createSession(engine, client) {
 
   client.on('msg:trade_open', (msg) => {
     const id = String(msg.trade || '');
-    const withP = { id: n0(msg.with?.id), name: String(msg.with?.name || 'A Glitch') };
+    const withP = { id: n0(msg.with?.id), name: String(msg.with?.name || UNNAMED_PLAYER) };
     if (!id || !withP.id) return;
     if (!holdEmpty(saved.hold) && saved.hold.trade !== id) {
       // Items still held from an earlier trade: settle that first (inc_trading.js 99-104).
@@ -998,7 +999,7 @@ function createSession(engine, client) {
       if (await persist(engine)) client.send('trade_ack', { trade: id });
       return;
     }
-    const withP = { id: n0(msg.with?.id), name: String(msg.with?.name || 'A Glitch') };
+    const withP = { id: n0(msg.with?.id), name: String(msg.with?.name || UNNAMED_PLAYER) };
     const hold = saved.hold?.trade === id ? saved.hold : null;
     if (!hold && Object.keys(countsOf(normalizeGoods(msg.gave))).length) console.warn('[trade] done without its hold', id);
     const s = settleDone(hold, msg);

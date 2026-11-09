@@ -30,7 +30,7 @@ import {
   rowFromServer,
   sharedSlice,
   topLine,
-} from '../public/js/street-jobs-mp.js?v=c920dbb9';
+} from '../public/js/street-jobs-mp.js?v=3a80e9a2';
 import {
   isJobBuilt,
   jobStatus,

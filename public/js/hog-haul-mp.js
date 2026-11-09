@@ -9,6 +9,7 @@
  *
  * Nothing here touches the DOM, Pixi or the socket.
  */
+import { UNNAMED_PLAYER } from './player-names.js?v=f9b78094';
 
 export const HOG_MP_COURSE = 'hogtie_piggy';
 const ID_RE = /^[0-9a-f]{16}$/;
@@ -56,7 +57,7 @@ export function normalizeHogMatch(msg) {
   const players = (Array.isArray(msg.players) ? msg.players : [])
     .map((p) => {
       const id = Number(p?.id);
-      return Number.isInteger(id) && id > 0 ? { id, name: String(p?.name || 'A Glitch').slice(0, 64), slot: Math.max(0, Math.floor(num(p.slot))) } : null;
+      return Number.isInteger(id) && id > 0 ? { id, name: String(p?.name || UNNAMED_PLAYER).slice(0, 64), slot: Math.max(0, Math.floor(num(p.slot))) } : null;
     })
     .filter(Boolean);
   if (players.length < 2) return null;

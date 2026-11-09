@@ -44,9 +44,10 @@ import {
   normalizeParty,
   partiersLine,
   partyCommand,
-} from '../party.js?v=8a98d6dd';
+} from '../party.js?v=7615aab8';
 import { appendLinkedText } from '../chat-links.js?v=b717fac7';
 import { lineKey } from '../chat-reactions.js?v=d65d555b';
+import { UNNAMED_PLAYER } from '../player-names.js?v=f9b78094';
 
 export const PARTY_FEATURE_ID = 'party';
 /** The hit box over another player's Glitch and name plate (realtime-feature PLATE_Y -150). */
@@ -273,7 +274,7 @@ function createSession(engine, client) {
   client.on('msg:party_activity', (msg) => activity(String(msg.text || '')));
   client.on('msg:party_said', (msg) => {
     if (Number(msg.id) !== me() && hidden(msg.id)) return;
-    const name = String(msg.name || 'A Glitch');
+    const name = String(msg.name || UNNAMED_PLAYER);
     const text = String(msg.text || '');
     lastSaid = `${name}:${text}`;
     addLog({ name, text });

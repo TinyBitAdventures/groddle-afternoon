@@ -34,12 +34,12 @@ import { kittyLabel, nameKitty } from '../public/js/heli-kitties.js?v=8fbe314a';
 import { nameCubimal } from '../public/js/cubimals.js?v=bea49c0b';
 import { createButlerState, renameButler, teachButler } from '../public/js/butler.js?v=2c95c064';
 import { cleanTowerName } from '../public/js/home-tower.js?v=087df38f';
-import { PENMANSHIP_SKILL, editNote, writePaperNote } from '../public/js/street-furniture.js?v=05b28557';
+import { PENMANSHIP_SKILL, editNote, writePaperNote } from '../public/js/street-furniture.js?v=55131f49';
 import { MAIL_COMPANIONS, createMailboxState, sendMail } from '../public/js/mailbox.js?v=a3e833ba';
 import { teachPhrase } from '../public/js/seasons.js?v=1978c3f3';
 import { cleanCaption } from '../public/js/snaps.js?v=55d4c257';
 import { sauceLabel, sauceStreetLine } from '../public/js/potions.js?v=4f4c996d';
-import { groupNameProblem } from '../public/js/groups.js?v=f242ba06';
+import { groupNameProblem } from '../public/js/groups.js?v=c9635d96';
 import { characterNameProblem } from '../public/js/account-forms.js?v=318b6815';
 
 const ROOT = join(import.meta.dirname, '..');

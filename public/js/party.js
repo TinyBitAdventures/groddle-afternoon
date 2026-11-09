@@ -6,6 +6,7 @@
  * players/inc_party.js, and the client's party chat (glitch-client
  * RightSideManager.as, InteractionMenuController.as).
  */
+import { UNNAMED_PLAYER } from './player-names.js?v=f9b78094';
 
 /** config_prod.js:40 max_party_size. */
 export const PARTY_MAX_SIZE = 71;
@@ -33,7 +34,7 @@ export const PARTY_TEXT = Object.freeze({
 function normMember(m) {
   return {
     id: Number(m?.id) || 0,
-    name: String(m?.name || 'A Glitch'),
+    name: String(m?.name || UNNAMED_PLAYER),
     leader: m?.leader === true,
     online: m?.online === true,
     away: m?.away === true,

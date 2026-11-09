@@ -49,7 +49,7 @@ import { teleportationFeature as feature } from '../public/js/features/teleporta
 import { cleanContents, createDroppedItemState, dropInventoryStack, pickupDroppedStack, placeDroppedBag } from '../public/js/world-items.js?v=da2bb7a1';
 import { cabinetPut, cabinetTake, cleanHeldList, normalizeContents } from '../public/js/home-storage.js?v=121f1897';
 import { normalizeGroundStack, normalizeItem } from '../public/js/drops-mp.js?v=ac5577f0';
-import { goodsWithHeldTags, normalizeGoods } from '../public/js/trade.js?v=abb23481';
+import { goodsWithHeldTags, normalizeGoods } from '../public/js/trade.js?v=2b4d7f0e';
 
 const root = join(import.meta.dirname, '..');
 const A = { tsid: 'GA5101HF7F429V5', x: 100, y: -68, label: 'Hechey Track', hubId: '58', hubName: 'Groddle Forest' };

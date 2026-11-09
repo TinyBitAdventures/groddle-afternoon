@@ -5,7 +5,7 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { readFileSync } from 'node:fs';
-import { DOOR_CLEARANCE, TREE_OBSTACLE_W, clearOfDoors, treeObstacles } from '../public/js/street-furniture.js?v=05b28557';
+import { DOOR_CLEARANCE, TREE_OBSTACLE_W, clearOfDoors, treeObstacles } from '../public/js/street-furniture.js?v=55131f49';
 import { platformsScreen } from '../public/js/street-model.js?v=b6cb6a4e';
 
 const tii = JSON.parse(readFileSync(new URL('../public/assets/streets/GLI23TBNDHD19F2.json', import.meta.url), 'utf8'));

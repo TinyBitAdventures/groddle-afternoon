@@ -11,7 +11,7 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { getVerbsFor, runVerb } from '../public/content.js?v=a409dfed';
+import { getVerbsFor, runVerb } from '../public/content.js?v=c23b7579';
 import { createInventory } from '../public/js/inventory.js?v=60dfc9ca';
 import { createMineRock, findWorkingPick, miningToolWear } from '../public/js/mining.js?v=483539b8';
 import { clearPlot, createGarden, gardenActionProfile, getPlot, waterPlot } from '../public/js/garden.js?v=d965f416';

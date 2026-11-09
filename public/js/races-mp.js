@@ -8,6 +8,7 @@
  * Nothing here touches the DOM, Pixi or the socket: it cleans what the
  * server sends and works out what this player sees and gets.
  */
+import { UNNAMED_PLAYER } from './player-names.js?v=f9b78094';
 
 /** The courses a ticket can race real players on (groddle-afternoon-server/data/races.json). */
 export const MP_RACE_COURSES = Object.freeze([
@@ -47,7 +48,7 @@ function point(v) {
 function ref(v) {
   const id = Number(v?.id);
   if (!Number.isInteger(id) || id <= 0) return null;
-  return { id, name: String(v?.name || 'A Glitch').slice(0, 64) };
+  return { id, name: String(v?.name || UNNAMED_PLAYER).slice(0, 64) };
 }
 
 /** A race_match message, cleaned, or null when it is not one this client can run. */

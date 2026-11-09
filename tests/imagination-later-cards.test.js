@@ -56,7 +56,7 @@ import { skillPackageDetails } from '../public/js/skill-packages.js?v=bfb87281';
 import { strikeDamageFor } from '../public/js/rook-attack.js?v=0382c223';
 import { createMineRock, mineRock, tickMineRock } from '../public/js/mining.js?v=483539b8';
 import { runTransform, shuckDetails } from '../public/js/item-transforms.js?v=c439eb33';
-import { brushFox, createFox, foxFiberRange } from '../public/js/foxes.js?v=2ddf3590';
+import { brushFox, createFox, foxFiberRange } from '../public/js/foxes.js?v=72967ce0';
 import { soundForMakingTool } from '../public/js/sound-moments.js?v=2f8597cd';
 import { supplyFeature } from '../public/js/features/supply-feature.js?v=2419d62d';
 

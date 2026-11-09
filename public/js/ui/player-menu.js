@@ -28,9 +28,10 @@
 
 import { PROFILE_PAGE_VERB } from '../profiles.js?v=054ca723';
 import { IM_VERB_ID } from '../player-im.js?v=23463a96';
-import { BUDDY_VERBS } from '../buddies.js?v=df41a3bb';
+import { BUDDY_VERBS } from '../buddies.js?v=cff7bf6e';
 import { VISIT_VERB } from '../neighbours-mp.js?v=ca29dfb4';
 import { FOLLOW_STOP_VERB } from '../follow-mp.js?v=313c701f';
+import { UNNAMED_PLAYER } from '../player-names.js?v=f9b78094';
 
 /** The feature that draws other players and owns their targets (features/party-feature.js PARTY_FEATURE_ID). */
 export const PLAYER_TARGET_FEATURE = 'party';
@@ -70,7 +71,7 @@ const n0 = (v) => (Number.isFinite(Number(v)) && Number(v) > 0 ? Math.floor(Numb
 /** PURE: the target a player from a list stands for: their id and name, nothing on the street. */
 export function listPlayerTarget({ id, name = '' } = {}) {
   const playerId = n0(id);
-  const label = String(name || '').trim() || 'A Glitch';
+  const label = String(name || '').trim() || UNNAMED_PLAYER;
   return { featureId: PLAYER_TARGET_FEATURE, classId: 'pc_remote', playerId, label, name: label, fromList: true };
 }
 

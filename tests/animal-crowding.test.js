@@ -31,8 +31,8 @@ import { SAD_PIGGY_LINES, ensurePiggyMood } from '../public/js/animal-mood.js?v=
 import { createAnimalState } from '../public/js/animals.js?v=c2d5ecf3';
 import { GAME_DAY_MS, getGameDayStartMs } from '../public/js/game-day.js?v=edb00566';
 import { advanceYard, capturePiggy, createMachine, normalizeHusbandryPack } from '../public/js/animal-husbandry.js?v=6d330f7b';
-import { getVerbsFor } from '../public/content.js?v=a409dfed';
-import { animalCrowdChanged, animalMoodFeature, crowdLimit } from '../public/js/features/animal-mood-feature.js?v=7c87f516';
+import { getVerbsFor } from '../public/content.js?v=c23b7579';
+import { animalCrowdChanged, animalMoodFeature, crowdLimit } from '../public/js/features/animal-mood-feature.js?v=618be9cf';
 
 const GSJS = join(homedir(), 'Documents/glitch-audit/glitch-GameServerJS');
 const fixed = (v) => () => v;
@@ -221,9 +221,12 @@ describe('Crowding on the street (animal-mood feature)', () => {
     assert.equal(modes.filter((m) => m === 'sad').length, 9);
     assert.ok(isCrowdSad(chickens[0].state, clock));
     assert.equal(chickens[0].sprite.range, 2, 'fullStop');
-    // The first line comes randInt(1, 23) s later, then every 30 s.
-    tick(engine, 12000);
-    assert.ok(engine.said.some(([, m]) => CROWD_SAD_LINES.includes(m)));
+    // The first line comes randInt(1, 23) s later (the forced 0.5: 12 s), then every 30 s. Every
+    // sulker speaks then, never a random few (the line delay once rolled Math.random, flaky in a full run).
+    tick(engine, 11000);
+    assert.equal(engine.said.filter(([, m]) => CROWD_SAD_LINES.includes(m)).length, 0, 'nobody before 12 s');
+    tick(engine, 1000);
+    assert.equal(engine.said.filter(([, m]) => CROWD_SAD_LINES.includes(m)).length, 9, 'all nine at 12 s');
     const verbs = animalMoodFeature.decorateVerbs(chickens[0], getVerbsFor(chickens[0], { pc: engine.pc, inv: { grain: 1 }, learned: [] }), engine);
     const squeeze = verbs.find((v) => v.id === 'squeeze');
     assert.equal(squeeze.enabled, false);

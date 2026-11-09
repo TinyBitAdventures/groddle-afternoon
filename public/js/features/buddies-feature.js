@@ -66,7 +66,8 @@ import {
   isBuddy,
   isIgnoring,
   normalizeList,
-} from '../buddies.js?v=df41a3bb';
+} from '../buddies.js?v=cff7bf6e';
+import { UNNAMED_PLAYER } from '../player-names.js?v=f9b78094';
 
 export const BUDDIES_FEATURE_ID = 'buddies';
 const VERB_IDS = new Set(Object.values(BUDDY_VERBS));
@@ -476,7 +477,7 @@ function createSession(engine, client) {
     const id = Number(msg.id) || 0;
     if (!id || isIgnoring(list, id)) return;
     told.add(id);
-    notice(BUDDY_TEXT.addedYou(String(msg.name || 'A Glitch')));
+    notice(BUDDY_TEXT.addedYou(String(msg.name || UNNAMED_PLAYER)));
     // Your reverse list changed: a fresh list and token, so you watch them too.
     refresh();
   });

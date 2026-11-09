@@ -7,6 +7,7 @@
  * lists the messages). The original is GameServerJS players/inc_buddies.js
  * and the player menu in main.js (3590-3646).
  */
+import { UNNAMED_PLAYER } from './player-names.js?v=f9b78094';
 
 /** config_prod.js:1276 buddy_limit. */
 export const BUDDY_LIMIT = 1000;
@@ -52,14 +53,14 @@ export const BUDDY_TEXT = Object.freeze({
   yes: 'Yes',
   no: 'Never mind.',
   offlineWhere: 'Offline',
-  empty: 'No buddies yet. Click another player\'s Glitch to add them.',
+  empty: 'No buddies yet. Click another player to add them.',
   failed: 'That didn\'t work. Try again in a moment.',
 });
 
 const n0 = (v) => (Number.isFinite(Number(v)) && Number(v) > 0 ? Math.floor(Number(v)) : 0);
 
 function entry(e, extra = {}) {
-  return { id: n0(e?.id), name: String(e?.name || 'A Glitch'), ...extra };
+  return { id: n0(e?.id), name: String(e?.name || UNNAMED_PLAYER), ...extra };
 }
 
 /**
@@ -144,7 +145,7 @@ export function addedYouOnly(list) {
 export function applyPresence(online, msg) {
   const id = n0(msg?.id);
   if (!id) return null;
-  const name = String(msg.name || 'A Glitch');
+  const name = String(msg.name || UNNAMED_PLAYER);
   switch (msg.t) {
     case 'buddy_online':
       online.set(id, { name, street: String(msg.street || '') });
@@ -165,7 +166,7 @@ export function applyStatus(online, msg) {
   online.clear();
   for (const p of Array.isArray(msg?.online) ? msg.online : []) {
     const id = n0(p?.id);
-    if (id) online.set(id, { name: String(p.name || 'A Glitch'), street: String(p.street || '') });
+    if (id) online.set(id, { name: String(p.name || UNNAMED_PLAYER), street: String(p.street || '') });
   }
   return online;
 }

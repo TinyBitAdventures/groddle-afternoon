@@ -79,6 +79,7 @@ import {
   targetSide,
   underTheInfluence,
 } from '../player-verbs-mp.js?v=c82b7e0f';
+import { UNNAMED_PLAYER } from '../player-names.js?v=f9b78094';
 
 export const PLAYER_VERBS_FEATURE_ID = 'player-verbs-mp';
 const PACK_SOAK = 'pverb_soak';
@@ -116,7 +117,7 @@ function el(tag, attrs = {}, text = '') {
 }
 
 function cleanName(v) {
-  return String(v || '').replace(/[<>]/g, '').slice(0, 40) || 'A Glitch';
+  return String(v || '').replace(/[<>]/g, '').slice(0, 40) || UNNAMED_PLAYER;
 }
 
 function createSession(engine, client) {

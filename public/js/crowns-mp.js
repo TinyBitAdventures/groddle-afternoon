@@ -10,6 +10,7 @@
  * Nothing here touches the DOM, Pixi or the socket: it cleans what the
  * server sends and works out what this player sees and gets.
  */
+import { UNNAMED_PLAYER } from './player-names.js?v=f9b78094';
 
 export const CROWNS_MP_STREET_RE = /^CROWNS_[0-9A-F]{16}$/;
 const MATCH_RE = /^[0-9a-f]{16}$/;
@@ -52,7 +53,7 @@ function point(v) {
 export function crownRef(v) {
   const id = Number(v?.id);
   if (!Number.isInteger(id) || id <= 0) return null;
-  return { id, name: String(v?.name || 'A Glitch').slice(0, 64) };
+  return { id, name: String(v?.name || UNNAMED_PLAYER).slice(0, 64) };
 }
 
 /** A crown_match message, cleaned, or null when it is not one this client can play. */

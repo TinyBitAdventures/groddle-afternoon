@@ -29,7 +29,7 @@ import {
   teleportCounters,
   teleportKindOf,
 } from '../public/js/follow-mp.js?v=313c701f';
-import { followMpFeature } from '../public/js/features/follow-mp-feature.js?v=4d320433';
+import { followMpFeature } from '../public/js/features/follow-mp-feature.js?v=294a6205';
 import { COMPANION_FOLLOW_TRAIL_DISTANCE } from '../public/js/local-companions.js?v=188f756c';
 import { loadContentCatalogsFromDir, getQuestCatalog, getAchievementCatalog } from '../public/js/content-catalogs.js?v=10b118dd';
 import { createQuestState } from '../public/js/quests.js?v=2b882eb6';

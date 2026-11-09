@@ -1632,7 +1632,7 @@ async function runTraining1(t) {
     // Online the box already holds the character name the player signed up with (tutorialNameDefault).
     const res = await talk(t, fl, LINES.t1NamePrompt, { buttons: ['OK'], input: { max: TUTORIAL_NAME_MAX, placeholder: 'Your name', value: tutorialNameDefault() } });
     const name = filterText(String(res?.text || '').replace(/[<>]/g, '').trim().slice(0, TUTORIAL_NAME_MAX)); // the remake's own word filter (js/word-filter.js)
-    save.name = name || 'Glitchling';
+    save.name = name || 'Friend'; // our fallback (the source's name box refused an empty name: newxp_training1.js 582 check_user_name); "friend" as quests.js fills {pc_label}
     engine.save();
   }
   await talk(t, fl, LINES.t1Look, { buttons: ['OK'] });

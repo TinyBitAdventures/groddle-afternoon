@@ -72,6 +72,7 @@
 import { FEAT_BY_ID, QUICK_MS, REWARD_ITEM, SOLO_FEATS, WIRED_FEATS, vogTextFor } from './solo-feats.js?v=40f8c7b5';
 import { GAME_DAY_MS, GAME_EPOCH_MS } from './game-day.js?v=edb00566';
 import { giantDisplayName } from './giant-names.js?v=0e295891';
+import { UNNAMED_PLAYER } from './player-names.js?v=f9b78094';
 
 /** players/inc_feats.js 25-27: a Feat is open for 24 real hours. */
 export const RUN_MS = 24 * 60 * 60 * 1000;
@@ -190,7 +191,7 @@ export const MP_TEXT = Object.freeze({
 });
 
 const whole = (v) => Math.max(0, Math.floor(Number(v) || 0));
-const name = (v) => String(v || 'A Glitch').replace(/[\u0000-\u001f]/g, '').slice(0, 40);
+const name = (v) => String(v || UNNAMED_PLAYER).replace(/[\u0000-\u001f]/g, '').slice(0, 40);
 
 /** A server time (ms) on this page's clock: offset is server now minus local now. */
 export const localTime = (t, offset) => (whole(t) ? whole(t) - (Number(offset) || 0) : 0);
@@ -254,7 +255,7 @@ export function ordinal(n) {
 /** "You: 42, 3rd of 7 contributors." */
 export function youLine(run) {
   if (!run) return '';
-  if (!run.mine) return run.count ? `${run.count.toLocaleString()} ${run.count === 1 ? 'Glitch has' : 'Glitches have'} contributed. You have not yet.` : MP_TEXT.noOne;
+  if (!run.mine) return run.count ? `${run.count.toLocaleString()} ${run.count === 1 ? 'player has' : 'players have'} contributed. You have not yet.` : MP_TEXT.noOne;
   return `You: ${run.mine.toLocaleString()}, ${ordinal(run.place)} of ${run.count.toLocaleString()} ${run.count === 1 ? 'contributor' : 'contributors'}.`;
 }
 

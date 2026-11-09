@@ -40,7 +40,7 @@ import { unitRankAt } from '../pack-slots.js?v=6cf9f397';
 import { createMinnAccount } from '../minn-account.js?v=8f2741cd';
 import { createItemPicker } from '../ui/item-picker.js?v=b4c84ac6';
 // The same key as features/index.js: one module instance holds the carried notes.
-import { giveCarriedNote, takeCarriedNote, writtenCarriedNotes } from './street-furniture-feature.js?v=f2cc0bca';
+import { giveCarriedNote, takeCarriedNote, writtenCarriedNotes } from './street-furniture-feature.js?v=7a092854';
 import {
   BOX_KEEP,
   BOX_SLOTS,
@@ -62,6 +62,7 @@ import {
   unwrapPack,
   wrapBox,
 } from '../gifts.js?v=5463c0bf';
+import { UNNAMED_PLAYER } from '../player-names.js?v=f9b78094';
 
 export const GIFTS_FEATURE_ID = 'gifts';
 export const GIFT_VERB = 'gift_give';
@@ -236,7 +237,7 @@ function createSession(engine, client) {
   }
 
   function others() {
-    return (client.players || []).filter((p) => p && p.id).map((p) => ({ id: Number(p.id), name: String(p.name || 'A Glitch') }));
+    return (client.players || []).filter((p) => p && p.id).map((p) => ({ id: Number(p.id), name: String(p.name || UNNAMED_PLAYER) }));
   }
 
   /** The pack's givable things: stacks, each written note, each wrapped box (ids not in a give under way). */
@@ -853,7 +854,7 @@ export const giftsFeature = {
 
   runVerbOverride(target, verbId) {
     if (verbId !== GIFT_VERB || !session || !target?.playerId) return null;
-    return session.open({ to: { id: Number(target.playerId), name: String(target.label || target.name || 'A Glitch') } });
+    return session.open({ to: { id: Number(target.playerId), name: String(target.label || target.name || UNNAMED_PLAYER) } });
   },
 
   /** game.js pack slot dragstart: dragging a stack toward another player on the street (DragVO.as). */

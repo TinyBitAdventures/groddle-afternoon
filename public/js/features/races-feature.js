@@ -89,8 +89,8 @@ import { runStreetTransition } from '../screen-fx.js?v=b4ec277f';
 import { CROWNS_STREET, CROWNS_TICKET, CROWNS_TITLE } from '../game-of-crowns.js?v=e32f35f5';
 import { HOG_HAUL_STREET_ID } from '../hog-haul.js?v=50d2e072';
 import { QUOIN_GRAB_SPLASH, RACE_SPLASH, splashFor } from '../game-splash.js?v=ea0433a7';
-import { crownsMpChallenge, startCrowns } from './crowns-feature.js?v=4da5d5a7';
-import { startHogHaulMp } from './hog-haul-mp-feature.js?v=2062aa77';
+import { crownsMpChallenge, startCrowns } from './crowns-feature.js?v=da80d222';
+import { startHogHaulMp } from './hog-haul-mp-feature.js?v=3bb3202a';
 import { textureFromUrl } from '../textures.js?v=f024bd6a';
 import { QUOIN_SHEET, QUOIN_TYPES } from '../quoins.js?v=299cc3f4';
 import { gainMetabolic } from '../metabolics.js?v=8504134e';
@@ -106,7 +106,7 @@ import {
   othersLabel,
   shardAmount,
   splitScores,
-} from '../races-mp.js?v=c61cc7b5';
+} from '../races-mp.js?v=4531b30c';
 
 const RACE_ICON_DIR = 'assets/sprites/races/';
 /**

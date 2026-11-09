@@ -13,7 +13,7 @@ import { join, relative, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 export const ORIGIN = 'https://groddleafternoon.com';
-export const SHARE_IMAGE = { path: '/brand/share.jpg', width: 1200, height: 630, alt: 'A Glitchen in Kristel Kaos, under red mushrooms, beside the words Groddle Afternoon' };
+export const SHARE_IMAGE = { path: '/brand/share.jpg', width: 1200, height: 630, alt: 'A player in Kristel Kaos, under red mushrooms, beside the words Groddle Afternoon' };
 
 const unescape = (s) => s.replace(/&#0?39;|&apos;/g, "'").replace(/&quot;/g, '"').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&');
 const attr = (s) => String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');

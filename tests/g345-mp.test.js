@@ -35,10 +35,10 @@ import {
   runAt,
   runFromServer,
   youLine,
-} from '../public/js/feats-mp.js?v=a1864075';
+} from '../public/js/feats-mp.js?v=b5e2f816';
 import { FEAT_BY_ID, WIRED_FEATS, vogTextFor } from '../public/js/solo-feats.js?v=40f8c7b5';
 import { GAME_DAY_MS, GAME_EPOCH_MS } from '../public/js/game-day.js?v=edb00566';
-import { soloFeatsFeature } from '../public/js/features/solo-feats-feature.js?v=8bb7b3b8';
+import { soloFeatsFeature } from '../public/js/features/solo-feats-feature.js?v=9be56a77';
 
 const root = join(import.meta.dirname, '..');
 const feature = readFileSync(join(root, 'public/js/features/solo-feats-feature.js'), 'utf8');
@@ -118,7 +118,7 @@ describe('the schedule and the panel words (js/feats-mp.js)', () => {
     assert.equal(goalLine(run), 'Bonus goal met! 29 more to meet the supermegabonus goal.');
     run.total = 95;
     assert.equal(goalLine(run), 'Supermegabonus goal met!');
-    assert.equal(youLine({ ...run, mine: 0, count: 1 }), '1 Glitch has contributed. You have not yet.');
+    assert.equal(youLine({ ...run, mine: 0, count: 1 }), '1 player has contributed. You have not yet.'); // ours (no source line), never the game's name
     assert.equal(ordinal(11), '11th');
     assert.equal(ordinal(22), '22nd');
     assert.equal(endsText(Date.now() + 13 * 3600_000 + 60_000), 'Ends in 13 hours.');

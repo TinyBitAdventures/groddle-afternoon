@@ -12,6 +12,7 @@
  */
 
 import { phaseBaseCost } from './street-jobs.js?v=02a81cb3';
+import { UNNAMED_PLAYER } from './player-names.js?v=f9b78094';
 
 /** Ids a save remembers as applied (the site's LedgerMath::PROJECT_APPLIED_KEEP). */
 export const APPLIED_KEEP = 64;
@@ -159,7 +160,7 @@ export function rowFromServer(row, offset = 0) {
     option: row?.option ? clean(row.option) : null,
     held: counts(row?.held),
     votes: counts(row?.votes),
-    top: (Array.isArray(row?.top) ? row.top : []).slice(0, 5).map((c) => ({ id: whole(c?.id), name: String(c?.name || 'A Glitch').slice(0, 40), cost: whole(c?.cost) })),
+    top: (Array.isArray(row?.top) ? row.top : []).slice(0, 5).map((c) => ({ id: whole(c?.id), name: String(c?.name || UNNAMED_PLAYER).slice(0, 40), cost: whole(c?.cost) })),
     count: whole(row?.count),
     ...(row?.hall ? { hall: hallFromServer(row.hall, offset) } : {}),
   };

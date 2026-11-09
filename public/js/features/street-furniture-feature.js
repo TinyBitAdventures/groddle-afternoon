@@ -100,7 +100,7 @@ import {
   streetNoteSeeds,
   takePinnedNote,
   writePaperNote,
-} from '../street-furniture.js?v=05b28557';
+} from '../street-furniture.js?v=55131f49';
 import {
   CHORES,
   NEIGHBOURS,
@@ -122,10 +122,10 @@ import {
 } from '../neighbours.js?v=161fc2e5';
 import { buildNeighbourBackground, neighbourLoadingColors, neighbourPlatforms } from './neighbour-scene.js?v=15d683af';
 import { closeNoteView, noteViewOpen, openBoardView, openNotePicker, openNoteView, openReportView } from '../note-view.js?v=eca7de52';
-import { BOARD_MP_TEXT, boardByline } from '../boards-mp.js?v=04beb5a6';
+import { BOARD_MP_TEXT, boardByline } from '../boards-mp.js?v=6e2613b2';
 import { textureFromUrl } from '../textures.js?v=f024bd6a';
-import { butlerApi } from './butler-feature.js?v=034142a7';
-import { neighboursMpApi } from './neighbours-mp-feature.js?v=4174e39e';
+import { butlerApi } from './butler-feature.js?v=ff19ea26';
+import { neighboursMpApi } from './neighbours-mp-feature.js?v=f67f710d';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
 import { MAIL_POST_SENDER } from '../mailbox.js?v=a3e833ba';
 
@@ -316,7 +316,7 @@ function bylineFor(note) {
   if (isRemakeNote(note)) return REMAKE_NOTE_BYLINE;
   // Multiplayer: another player's note names them (bag_notice_board.js 203-210 listed the last editor).
   if (n.authorName) return boardByline(n);
-  return n.initialText || n.initialTitle ? 'Left by a Glitch who passed this way' : '';
+  return n.initialText || n.initialTitle ? 'Left by someone who passed this way' : '';
 }
 
 /** Open a note in the note_view window. `save(next)` stores an edited note. */

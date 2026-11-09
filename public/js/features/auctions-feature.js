@@ -73,6 +73,7 @@ import {
   suggestedPrice,
   unitPrice,
 } from '../auctions.js?v=3cdbb521';
+import { UNNAMED_PLAYER } from '../player-names.js?v=f9b78094';
 
 export const AUCTIONS_FEATURE_ID = 'auctions';
 const TABLE_URL = 'assets/content/trade-items.json';
@@ -941,7 +942,7 @@ export const auctionsFeature = {
 
   runVerbOverride(target, verbId) {
     if (verbId !== VIEW_VERB || !session || !target?.playerId) return null;
-    return session.openWindow({ tab: 'browse', seller: { id: Number(target.playerId), name: String(target.label || target.name || 'A Glitch') } });
+    return session.openWindow({ tab: 'browse', seller: { id: Number(target.playerId), name: String(target.label || target.name || UNNAMED_PLAYER) } });
   },
 
   /** The pack popover: Find auctions (GetInfoDialog.as:189) and Sell at auction (ours). */

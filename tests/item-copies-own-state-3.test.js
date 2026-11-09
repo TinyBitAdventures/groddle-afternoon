@@ -30,7 +30,7 @@ import {
   toolCopies,
 } from '../public/js/tools.js?v=eff5ef6f';
 import { COPY_TAG_RULES, cleanCopyTagOf } from '../public/js/copy-tags.js?v=a2d357d4';
-import { goodsWithHeldTags, normalizeGoods, normalizeSlice, sameGoods, settleDone } from '../public/js/trade.js?v=abb23481';
+import { goodsWithHeldTags, normalizeGoods, normalizeSlice, sameGoods, settleDone } from '../public/js/trade.js?v=2b4d7f0e';
 import { giftEffects, normalizeGift, normalizeGiftsSlice, wrapBox } from '../public/js/gifts.js?v=5463c0bf';
 import { dropEffect, normalizeGroundStack, normalizeItem } from '../public/js/drops-mp.js?v=ac5577f0';
 import { normalizeListing } from '../public/js/auctions.js?v=3cdbb521';

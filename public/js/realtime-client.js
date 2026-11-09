@@ -20,6 +20,7 @@
  * 'booted' (4010, stopped for this page), 'suspended' (4011, or the ticket
  * route's 403 groddle_suspended, stopped), 'stopped' (stop() was called).
  */
+import { UNNAMED_PLAYER } from './player-names.js?v=f9b78094';
 
 export const CLOSE_REPLACED = 4001;
 export const CLOSE_TICKET = 4003;
@@ -402,7 +403,7 @@ export function createRealtimeClient({
   function normPlayer(p) {
     return {
       id: Number(p.id),
-      name: String(p.name || 'A Glitch'),
+      name: String(p.name || UNNAMED_PLAYER),
       x: Number(p.x) || 0,
       y: Number(p.y) || 0,
       dir: p.dir < 0 ? -1 : 1,

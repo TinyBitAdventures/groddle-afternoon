@@ -11,7 +11,7 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { normalizeStreetJobState, contributeCurrants, contributeItems, settlePhase, phaseBaseCost, phaseRequirements, workCheck, workGear } from '../public/js/street-jobs.js?v=02a81cb3';
-import { rowFromServer } from '../public/js/street-jobs-mp.js?v=c920dbb9';
+import { rowFromServer } from '../public/js/street-jobs-mp.js?v=3a80e9a2';
 import {
   PROJECTS_TEXT,
   agoWords,

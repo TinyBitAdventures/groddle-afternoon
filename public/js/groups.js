@@ -11,6 +11,7 @@
  */
 
 import { hasBadWord, NAME_REFUSED } from './word-filter.js?v=9a7a7ebb';
+import { UNNAMED_PLAYER } from './player-names.js?v=f9b78094';
 
 /** config_prod.js:39 max_groups. */
 export const GROUPS_MAX = 20;
@@ -107,7 +108,7 @@ export function normalizeGroups(answer) {
   const groups = (Array.isArray(answer?.groups) ? answer.groups : []).map(normalizeGroup).filter((g) => g.id);
   const invites = (Array.isArray(answer?.invites) ? answer.invites : []).map((g) => ({
     ...normalizeGroup(g),
-    invitedBy: { id: n0(g?.invitedBy?.id), name: str(g?.invitedBy?.name, 32) || 'A Glitch' },
+    invitedBy: { id: n0(g?.invitedBy?.id), name: str(g?.invitedBy?.name, 32) || UNNAMED_PLAYER },
   })).filter((g) => g.id && !groups.some((m) => m.id === g.id));
   const ch = answer?.channels || {};
   return {
@@ -198,7 +199,7 @@ export function chatLine(m) {
   if (!id || !text) return null;
   // lid: the line's id for reactions (the server's reactions.go), 0 without one.
   // web: said on the website's /chat/ (groddle-afternoon-server webchat.go); shown as "(web)" after the name.
-  return { id, name: str(m?.name, 32) || 'A Glitch', text, at: Number(m?.at) || 0, lid: Math.max(0, Math.floor(Number(m?.lid)) || 0), web: m?.web === true };
+  return { id, name: str(m?.name, 32) || UNNAMED_PLAYER, text, at: Number(m?.at) || 0, lid: Math.max(0, Math.floor(Number(m?.lid)) || 0), web: m?.web === true };
 }
 
 /** The tag after the name of a line said on the website. */

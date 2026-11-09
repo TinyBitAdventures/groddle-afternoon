@@ -85,13 +85,14 @@ import {
   rangerGreeting,
   splitConversation,
   stepFox,
-} from '../foxes.js?v=2ddf3590';
-import { FOX_FLURRY_COUNTER, foxLegFrom, foxOnLeg, igniteBaitXs, normalizeBaits, normalizeFoxes, preserveOverCapacity, serverId } from '../foxes-mp.js?v=77471018';
+} from '../foxes.js?v=72967ce0';
+import { FOX_FLURRY_COUNTER, foxLegFrom, foxOnLeg, igniteBaitXs, normalizeBaits, normalizeFoxes, preserveOverCapacity, serverId } from '../foxes-mp.js?v=b3ef55ce';
 import { clockOffset } from '../street-creatures.js?v=6bfadcbf';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
 
 export const FOX_FEATURE_ID = 'foxes';
-const PLAYER_NAME = 'Glitch';
+/** {name} in the Fox Ranger's lines: the remake has no player names in solo, so "friend", as quests.js fills {pc_label}. */
+const PLAYER_NAME = 'friend';
 const FOX_SCALE = 0.95;
 const RANGER_SCALE = 1.3;
 const BAIT_SCALE = 0.9;

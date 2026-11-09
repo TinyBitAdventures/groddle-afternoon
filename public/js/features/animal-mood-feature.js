@@ -1023,7 +1023,9 @@ function startCrowdSad(engine, target, rec, { until = 0 } = {}) {
     crowd.delete(target);
     return;
   }
-  const st = sadnessStart(now(), { depressing: isSadIn(target.classId, depressing) });
+  // The first line's randInt(1, 23) s takes the forced roll too (&animalcrowdroll), so a pinned roll
+  // times the whole sulk, not only the check (an unpinned first line made a test flaky: 1 in ~760).
+  const st = sadnessStart(now(), { depressing: isSadIn(target.classId, depressing), rng: crowdRoll(engine) });
   rec.until = until || st.until;
   rec.lineAt = until ? now() + 1000 : st.firstLineAt;
   rec.mode = 'sad';

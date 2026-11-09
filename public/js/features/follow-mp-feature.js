@@ -74,6 +74,7 @@ import {
   teleportKindOf,
   trailingX,
 } from '../follow-mp.js?v=313c701f';
+import { UNNAMED_PLAYER } from '../player-names.js?v=f9b78094';
 
 export const FOLLOW_MP_FEATURE_ID = 'follow-mp';
 
@@ -204,7 +205,7 @@ function createSession(engine, client) {
       client.send('follow_answer', { id, accept: false });
       return;
     }
-    const name = String(msg.name || 'A Glitch');
+    const name = String(msg.name || UNNAMED_PLAYER);
     if (asks.has(id)) engine.removePrompt?.(asks.get(id));
     const answer = (accept) => {
       asks.delete(id);
@@ -253,11 +254,11 @@ function createSession(engine, client) {
   client.on('msg:follow_list', (msg) => {
     const before = new Map(followers.map((f) => [f.id, f.name]));
     followers = (Array.isArray(msg?.followers) ? msg.followers : [])
-      .map((f) => ({ id: Number(f?.id) || 0, name: String(f?.name || 'A Glitch') }))
+      .map((f) => ({ id: Number(f?.id) || 0, name: String(f?.name || UNNAMED_PLAYER) }))
       .filter((f) => f.id);
     const added = Number(msg?.added) || 0;
     const removed = Number(msg?.removed) || 0;
-    if (added) line(FOLLOW_TEXT.followedBy(followers.find((f) => f.id === added)?.name || 'A Glitch'), 2600);
+    if (added) line(FOLLOW_TEXT.followedBy(followers.find((f) => f.id === added)?.name || UNNAMED_PLAYER), 2600);
     else if (removed && before.has(removed)) line(FOLLOW_TEXT.unfollowedBy(before.get(removed)));
     else publish();
   });

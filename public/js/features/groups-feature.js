@@ -85,10 +85,11 @@ import {
   shownName,
   tabOrder,
   writeMemory,
-} from '../groups.js?v=f242ba06';
+} from '../groups.js?v=c9635d96';
 import { appendLinkedText } from '../chat-links.js?v=b717fac7';
 import { lineKey as reactKey } from '../chat-reactions.js?v=d65d555b';
 import { DELETE_TEXT, deletableChannel, lineLidOf, mayDelete } from '../chat-delete.js?v=ce1da244';
+import { UNNAMED_PLAYER } from '../player-names.js?v=f9b78094';
 
 export const GROUPS_FEATURE_ID = 'groups';
 
@@ -672,7 +673,7 @@ function createSession(engine, client) {
     }
     try {
       const answer = await account.group(group.id);
-      people.set(group.id, (Array.isArray(answer?.people) ? answer.people : []).map((p) => ({ id: Number(p.id) || 0, name: String(p.name || 'A Glitch'), role: p.role === 'admin' ? 'admin' : 'member' })));
+      people.set(group.id, (Array.isArray(answer?.people) ? answer.people : []).map((p) => ({ id: Number(p.id) || 0, name: String(p.name || UNNAMED_PLAYER), role: p.role === 'admin' ? 'admin' : 'member' })));
     } catch (err) {
       say0(err?.message || GROUP_TEXT.failed, 'bad');
     }

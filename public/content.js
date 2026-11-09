@@ -206,8 +206,8 @@ export function getVerbsFor(target, ctx) {
       sort: 5,
       durationMs: 0,
       tooltip: isFollowee
-        ? `Stop following ${target.label || 'this Glitch'}`
-        : `Follow ${target.label || 'this Glitch'} from street to street`,
+        ? `Stop following ${target.label || 'this player'}`
+        : `Follow ${target.label || 'this player'} from street to street`,
     });
   }
 

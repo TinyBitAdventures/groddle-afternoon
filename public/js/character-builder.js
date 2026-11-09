@@ -51,7 +51,7 @@ export const BODY_STYLES = {
   // (js/avatar-compositor.js), default look prerendered.
   vector: {
     id: 'vector',
-    label: 'Glitch',
+    label: 'Default',
     sheets: true,
     vector: true,
   },
@@ -179,7 +179,7 @@ function starterPresets() {
 export const APPEARANCE_PRESETS = {
   vector: {
     id: 'vector',
-    label: 'Glitch',
+    label: 'Default',
     appearance: createDefaultAppearance(),
   },
   sunday: {

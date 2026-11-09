@@ -120,10 +120,10 @@ import {
   rowFromServer,
   sharedSlice,
   topLine,
-} from '../street-jobs-mp.js?v=c920dbb9';
+} from '../street-jobs-mp.js?v=3a80e9a2';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 import { createMinnAccount } from '../minn-account.js?v=8f2741cd';
-import { normalizeGroups } from '../groups.js?v=f242ba06';
+import { normalizeGroups } from '../groups.js?v=c9635d96';
 import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=f024bd6a';
 import { JOB_WORK_OVERLAY, jobWorkFloatPoint, jobWorkSoundKey, jobWorkToolScale, jobWorkToolSheet } from '../job-work-fx.js?v=a040a5a7';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
@@ -1310,7 +1310,7 @@ function renderHall(engine, box, jobId, job, hall, status) {
     return;
   }
   if (hall?.claimed) {
-    box.append(el('p', {}, `${HALL_TEXT.claimedBy(hall.group?.name || 'a group')} (${hall.by?.name || 'a Glitch'}).`));
+    box.append(el('p', {}, `${HALL_TEXT.claimedBy(hall.group?.name || 'a group')}${hall.by?.name ? ` (${hall.by.name})` : ''}.`));
     const clock = hallClock(hall);
     if (clock) box.append(el('p', { dataset: { sjHallClock: '' } }, clock));
     return;

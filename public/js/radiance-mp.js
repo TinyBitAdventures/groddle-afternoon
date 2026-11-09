@@ -30,6 +30,7 @@
  */
 
 import { TRANSCENDENTAL_RADIATION_PACKAGE, tankMultiplier } from './meditation.js?v=f0c00590';
+import { UNNAMED_PLAYER } from './player-names.js?v=f9b78094';
 
 export const RADIATE_COOLDOWN_SECONDS = 120; // focusing_orb.js:1305
 export const RADIATE_IMAGINATION_CHANCE = 0.05; // 1213 is_chance(.05)
@@ -241,5 +242,5 @@ export function pulseKey(rad, n) {
 }
 
 export function cleanName(s) {
-  return String(s ?? '').replace(/[\u0000-\u001f\u007f<>]/g, '').slice(0, 40) || 'A Glitch';
+  return String(s ?? '').replace(/[\u0000-\u001f\u007f<>]/g, '').slice(0, 40) || UNNAMED_PLAYER;
 }

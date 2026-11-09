@@ -31,7 +31,7 @@ import {
   normalizeHogMatch,
   pigPose,
   touches,
-} from '../hog-haul-mp.js?v=d8605396';
+} from '../hog-haul-mp.js?v=67f873fe';
 import { HOG_HAUL_SPLASH, splashFor } from '../game-splash.js?v=ea0433a7';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 import { playCountdownArt } from '../overlays.js?v=605c12ff';

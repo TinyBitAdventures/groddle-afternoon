@@ -78,7 +78,7 @@ import {
   normalizeCrownsPaidBack,
   normalizeCrownsReward,
   normalizeCrownsState,
-} from '../crowns-mp.js?v=c1e686e6';
+} from '../crowns-mp.js?v=ab077bca';
 
 const ICON = 'assets/sprites/races/';
 const CROWN_DIR = 'assets/sprites/races/crowns/';

@@ -20,6 +20,7 @@
  */
 
 import { cleanCopyTag } from './tools.js?v=eff5ef6f';
+import { UNNAMED_PLAYER } from './player-names.js?v=f9b78094';
 
 /** TradeDialog.as:50 MAX_TRADE_SLOTS. */
 export const TRADE_SLOTS = 6;
@@ -327,7 +328,7 @@ export function normalizeSlice(slice) {
     for (const [c, n] of Object.entries(hold.items || {})) if (typeof c === 'string' && n0(n)) items[c] = n0(n);
     h = {
       trade: hold.trade,
-      with: { id: n0(hold.with?.id), name: String(hold.with?.name || 'A Glitch').slice(0, 64) },
+      with: { id: n0(hold.with?.id), name: String(hold.with?.name || UNNAMED_PLAYER).slice(0, 64) },
       items,
       currants: n0(hold.currants),
     };

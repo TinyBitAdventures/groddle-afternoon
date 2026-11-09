@@ -194,8 +194,8 @@ export const FOX_TEXT = Object.freeze({
   brushPermitTip: 'Brushing foxes requires a Fox-Brushing Permit. See a Fox Ranger about getting one.',
 });
 
-export function fillName(text, name = 'Glitch') {
-  return String(text).replace(/\{name\}/g, name || 'Glitch');
+export function fillName(text, name = 'friend') {
+  return String(text).replace(/\{name\}/g, name || 'friend');
 }
 
 /** Register Fox Brush, Fox Bait, and Fiber in the shared pack catalog. */

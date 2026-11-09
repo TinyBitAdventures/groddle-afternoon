@@ -2,9 +2,9 @@
  * Groddle Afternoon — original street geometry + layered decos
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
-import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=a409dfed';
+import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=c23b7579';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=127e0a3c';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=60a8380f';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=173f3e5c';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -796,7 +796,7 @@ import {
   APPEARANCE_PRESETS,
   PRESET_GROUPS,
   appearanceCacheKey,
-} from './js/character-builder.js?v=38301e2f';
+} from './js/character-builder.js?v=dac417d3';
 import { clearPresetActive, renderPresetGroups, renderStarterPicker } from './js/avatar-builder-ui.js?v=be72005c';
 import {
   loadAmbientMusicConfig,
@@ -985,7 +985,7 @@ import { ENCYCLOPEDIA_MENU_LABEL, createEncyclopedia, isEncyclopediaKey } from '
 import { EAT_PICK_TEXT, bestFoodIndex, eatChoices, eatTip } from './js/eat-pick.js?v=8fb763d0';
 import { installHeldKeyGuard, isMacPlatform } from './js/held-keys.js?v=98b96620';
 import { signpostArmRows, worldContextAction } from './js/world-context-menu.js?v=f3f48805';
-import { blockedPlayerVerbs, listPlayerTarget, opensPlayerMenu, playerMenuRows } from './js/ui/player-menu.js?v=a71fc0f8';
+import { blockedPlayerVerbs, listPlayerTarget, opensPlayerMenu, playerMenuRows } from './js/ui/player-menu.js?v=a34b34ca';
 import { forgetTexture, frameTexture, isFailed, isLoaded, onFailed, onLoaded, textureFromUrl, whenLoaded } from './js/textures.js?v=f024bd6a';
 import { FALLBACK_MAX as WORLD_ART_FALLBACK_MAX, worldArtFor } from './js/world-art.js?v=df476660';
 import { sceneAnim, syncAnim } from './js/deco-anim.js?v=aa35e023';
@@ -10459,7 +10459,7 @@ function syncLocalCompanionFollowActors() {
     actor.state.followee = companionFollowState.followee || '';
     actor.subtitle = following
       ? `You are following ${actor.name}`
-      : 'Another Glitch';
+      : 'Another player';
     actor.sprite._following = following;
     if (actor.sprite._namePlate) {
       actor.sprite._namePlate.alpha = following ? 1 : 0.72;
@@ -11001,7 +11001,7 @@ function renderAvatarBuilder() {
     tab.setAttribute('aria-selected', active ? 'true' : 'false');
   });
   const meta = document.querySelector('#avatar-panel .panel-meta');
-  if (meta) meta.textContent = 'Pick hair, face, clothes and colours from the original Glitch wardrobe. Saved on this device.';
+  if (meta) meta.textContent = 'Pick hair, face, clothes and colours from the original wardrobe. Saved on this device.';
   renderAvatarSwatches();
 }
 
@@ -25972,7 +25972,7 @@ function renderFeatPanel() {
     if (prompt) {
       prompt.textContent = status.nextStep === 1
         ? 'Gather two street companions, then take your turn in the chain.'
-        : `Waiting for a new Glitch to say line ${status.nextStep}.`;
+        : `Waiting for someone new to say line ${status.nextStep}.`;
     }
     if (say) say.hidden = true;
   }

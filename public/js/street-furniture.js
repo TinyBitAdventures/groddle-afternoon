@@ -319,12 +319,17 @@ function cleanText(value, max) {
   return String(value ?? '').slice(0, max);
 }
 
+/** A retired notice's text as shown now (RETIRED_PIN_REWORDS), else the text as given. */
+function rewordRetired(text) {
+  return Object.hasOwn(RETIRED_PIN_REWORDS, text) ? RETIRED_PIN_REWORDS[text] : text;
+}
+
 export function normalizeNote(seed = {}) {
   const history = Array.isArray(seed.history) ? seed.history.slice(-NOTE_LIMITS.history) : [];
   return {
     id: String(seed.id || ''),
     initialTitle: cleanText(seed.initialTitle, NOTE_LIMITS.title),
-    initialText: cleanText(seed.initialText, NOTE_LIMITS.body),
+    initialText: rewordRetired(cleanText(seed.initialText, NOTE_LIMITS.body)),
     title: cleanText(seed.title, NOTE_LIMITS.title),
     body: cleanText(seed.body, NOTE_LIMITS.body),
     ...(seed.remakeText ? { remakeText: true } : {}),
@@ -662,7 +667,7 @@ export const RETIRED_BOARD_PIN_TEXTS = Object.freeze([
   'Blockmaker: Mon, Wed, Fri. Woodworker: whenever it is in the mood.',
   'The Metal Machine has been tuned. It now goes clunk instead of clonk.',
   'We are low on fuel cells again. Please make two if you use one.',
-  'To the kind Glitch who oiled the Woodworker: it hums now.',
+  'To whoever oiled the Woodworker: it hums now.',
   'It has a little chip in the handle and a lot of sentimental value.',
   'New in the Towers? Knock on any door. Somebody will have tea, or at least hot water and good intentions.',
   'Please stop polishing the stairs. They are already very slippery and very proud.',
@@ -672,6 +677,17 @@ export const RETIRED_BOARD_PIN_TEXTS = Object.freeze([
   'Hats in the lobby box. Please return the tall one, it has a career.',
   'Opening night! Applause is free. Encores are also free, but please pace yourselves.',
 ]);
+
+/**
+ * Retired notices reworded since (old text -> the text shown now): our own
+ * copy never says the game's name (Austin's rule; the original's own texts keep
+ * it). A save from before the change may still hold the old words, so they stay
+ * here only as a key: normalizeNote shows the new words, and a board holding
+ * nothing but untouched retired notices is still seeded afresh.
+ */
+export const RETIRED_PIN_REWORDS = Object.freeze({
+  'To the kind Glitch who oiled the Woodworker: it hums now.': 'To whoever oiled the Woodworker: it hums now.',
+});
 
 /**
  * Where a board hung, when a picture shows it (street world px, the board's
@@ -714,10 +730,17 @@ export function boardPinSeeds(tsid) {
   );
 }
 
-const REMAKE_TEXTS = new Set([
+/**
+ * Every note text the remake wrote, the old words of reworded notices too (a
+ * note carried from before a rewording still counts as ours; the realtime
+ * server's data/boards.json `remake` list comes from this).
+ */
+export const REMAKE_NOTE_TEXTS = Object.freeze([...new Set([
   ...[...Object.values(STREET_NOTES), ...Object.values(BOARD_PINS)].flat().map((row) => row.text),
   ...RETIRED_BOARD_PIN_TEXTS,
-]);
+  ...Object.keys(RETIRED_PIN_REWORDS),
+])].sort());
+const REMAKE_TEXTS = new Set(REMAKE_NOTE_TEXTS);
 const RETIRED_PINS = new Set(RETIRED_BOARD_PIN_TEXTS);
 
 /**
