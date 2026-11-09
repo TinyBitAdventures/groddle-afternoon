@@ -2771,14 +2771,19 @@ const socialDrawer = MODERN_UI
 // LINKS (js/chat-links.js): an address in a chat line is a link; one to another site asks first.
 bindChatLinks(document.getElementById('game-root'));
 
-/** "/" may put the keyboard in the drawer's input: the game runs, nothing modal is up, not in the tutorial's clouds. */
+/**
+ * "/" may put the keyboard in the drawer's input: the game runs, nothing modal is up, not in the tutorial's clouds.
+ * An open quest card (an offer or a conversation) does not hold the chat (the client's / and Tab focused the
+ * chat, KeyBeacon.as 32-33; lane signals found the offer swallowing it, 2026-11-08). Typed keys then go to the
+ * box, never the card: the window's key handler returns for a text field (Escape only leaves the box), so Enter
+ * sends the line instead of answering the card.
+ */
 function socialChatReady() {
   return Boolean(
     state.started &&
       !currentAction &&
       !menuTarget &&
-      !isQuestDialogueOpen() &&
-      !isScreenFxBlocking() &&
+      !isScreenFxBlocking({ questCard: false }) &&
       !panelOnScreen() &&
       !document.body.classList.contains('nx-hide-chat')
   );
@@ -14020,7 +14025,8 @@ function isAwardScreenUp() {
   });
 }
 
-function isScreenFxBlocking() {
+/** `questCard: false` leaves the quest card out (the chat's "/" works over it: socialChatReady). */
+function isScreenFxBlocking({ questCard = true } = {}) {
   const st = document.getElementById('screen-transition');
   const aw = document.getElementById('award-screen');
   const nd = document.getElementById('new-day-screen');
@@ -14035,7 +14041,7 @@ function isScreenFxBlocking() {
     (nd && !nd.hidden && nd.classList.contains('is-visible')) ||
     (fp && !fp.hidden) ||
     (eb && !eb.hidden) ||
-    (qd && !qd.hidden) ||
+    (questCard && qd && !qd.hidden) ||
     (hp && !hp.hidden) ||
     (mp && !mp.hidden) ||
     Boolean(enterChooser?.isOpen())
