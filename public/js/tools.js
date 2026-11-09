@@ -8,7 +8,7 @@
 import { GAME_MODE } from './game-mode.js?v=1ecf2899';
 import { repairGivesMood } from './imagination-effects.js?v=70169933';
 import { energyMax, loseEnergy, metabolicGain, moodMax } from './metabolics.js?v=8504134e';
-import { cleanCopyTagOf } from './copy-tags.js?v=a2d357d4';
+import { COPY_TAG_CLASSES, cleanCopyTagOf } from './copy-tags.js?v=7eec7d48';
 
 export const TOOL_CONDITION_CATALOG = Object.freeze({
   butterfly_lotion: {
@@ -604,7 +604,7 @@ export function receiveToolCopy(state, classTsid, remaining, n = 1, tag = null) 
 
 /** The kind of words a class's copies keep and carry ('' for none): name, phrases, giant, still. */
 export function copyTagKind(classTsid) {
-  return TOOL_CONDITION_CATALOG[classTsid]?.tag || '';
+  return TOOL_CONDITION_CATALOG[classTsid]?.tag || COPY_TAG_CLASSES[classTsid] || '';
 }
 
 /** A class whose copies never lie in one pile, each its own on the ground as in the pack (stackmax 1 with words of its own). */

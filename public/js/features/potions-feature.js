@@ -73,9 +73,9 @@ import { getGameDayKey } from '../game-day.js?v=edb00566';
 import { metabolicGain, moodMax } from '../metabolics.js?v=8504134e';
 import { quoinDailyLimitFor } from '../quoins.js?v=299cc3f4';
 import { emblemCostFor } from '../shrines.js?v=247c9b77';
-import { GROWN_TREE_LABELS, trantsformPlotTree } from '../patches.js?v=dc2b1436';
-import { COPY as SHARED_PATCH_COPY } from '../shared-patches.js?v=311498ba';
-import { isPoisoned } from '../tree-poison.js?v=3e868dfd';
+import { GROWN_TREE_LABELS, trantsformPlotTree } from '../patches.js?v=3103cc6a';
+import { COPY as SHARED_PATCH_COPY } from '../shared-patches.js?v=20e04ad2';
+import { isPoisoned } from '../tree-poison.js?v=5ceea244';
 import { furnitureSize } from '../home-decor.js?v=d6fabb62';
 import { textureFromUrl, sourceFromUrl, frameTexture } from '../textures.js?v=f024bd6a';
 import { POTION_ART } from '../potion-art.js?v=27ccc756';
@@ -135,13 +135,13 @@ import {
   usePotion,
 } from '../potions.js?v=4f4c996d';
 import { itemVerbAchievementCounters } from '../item-verbs.js?v=1e20fa7d';
-import { patchesFeature } from './patches-feature.js?v=7c48413d';
-import { homesFeature } from './homes-feature.js?v=7d812f20';
-import { streetTreeIndex } from './tree-death-feature.js?v=a7bcd25e';
-import { questRoomConverse } from './quest-instances-feature.js?v=99b20cb6';
+import { patchesFeature } from './patches-feature.js?v=ca78263c';
+import { homesFeature } from './homes-feature.js?v=4c127611';
+import { streetTreeIndex } from './tree-death-feature.js?v=e5f34a80';
+import { questRoomConverse } from './quest-instances-feature.js?v=abf01e1e';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
-import { copyChargesLeft, copyFromLedger, keepsCopies, spendCopyCharge, verbCopy } from '../copy-charges.js?v=f01dfda2';
-import { copyTag, migrateClassTag, migrateClassValue, setCopyTag, toolCopies } from '../tools.js?v=eff5ef6f';
+import { copyChargesLeft, copyFromLedger, keepsCopies, spendCopyCharge, verbCopy } from '../copy-charges.js?v=4ffa1c1e';
+import { copyTag, migrateClassTag, migrateClassValue, setCopyTag, toolCopies } from '../tools.js?v=5f482998';
 
 export const POTIONS_FEATURE_ID = 'potions';
 const LOVE = 'feeling_called_love';
@@ -177,7 +177,8 @@ let rugTargets = [];
 let heart = null; // playSheetOverlay handle
 let heartRetryAt = 0;
 let adopting = []; // street trees handed to patches, waiting for their plot's first draw
-let sharedAsk = null; // G564: a Trantsformation Fluid pour the realtime server was asked about: { copy, x, y, treeH, oldLabel }
+let sharedAsk = null;
+let sharedYouth = null; // G605: a youth pour on a street Piggy the realtime server was asked about: { copy, x, y } // G564: a Trantsformation Fluid pour the realtime server was asked about: { copy, x, y, treeH, oldLabel }
 let sauces = []; // alphabet_sauce puddles: { id, tsid, x, y, word, expiresAt }
 let letter = null; // pc.letter: 'A'..'Z', 'heart' or '1' (has_letter)
 let letterView = null; // overlayOrStandIn handle over the avatar
@@ -594,6 +595,17 @@ const EFFECTS = {
     }
     const baby = ANIMAL_BABIES[target.classId];
     const x = target.sprite.x;
+    // G605: a street Piggy online is everyone's: the realtime server takes the pour through the
+    // ledger, takes the Piggy off the street for everyone and puts the Piglet on the ground for
+    // everyone (objects_pigs_gone.go); its go-ahead lands in youthGranted.
+    if (engine.mode === 'multiplayer' && target.classId === 'npc_piggy' && !target.husbandryAnimal) {
+      const copy = keepsCopies(engine, 'potion_animal_youth') ? verbCopy(engine, 'potion_animal_youth', picked) : null;
+      const asked = engine.query?.('sharedPigYouth', target, copy != null && copy >= 0 ? copy : null, engine);
+      if (asked === true) {
+        sharedYouth = { copy: copy != null && copy >= 0 ? copy : null, x, y: target.sprite.y };
+        return { ok: true, asked: true };
+      }
+    }
     const ground = (engine.groundY ?? target.sprite.y) || target.sprite.y;
     const y = target.classId === 'npc_butterfly' ? Math.max(target.sprite.y, ground) : target.sprite.y;
     // replaceWithPoofIfOnGround: the animal goes, its baby lies where it stood.
@@ -1286,6 +1298,61 @@ export const potionsFeature = {
   runVerb(target, verbId, engine) {
     if (target?.classId !== RUG_MUNCH.classTsid || verbId !== RUG_MUNCH.verb) return false;
     return munchRug(engine);
+  },
+
+  /**
+   * G605: the realtime server's go-ahead for a Potion of Animal Youth on a street Piggy (obj_ok
+   * "youth" with the ledger's "use"): the bottle's pour is spent here (its emptying once, through
+   * ledgerReceipt), the poof where the Piggy stood, the counters. The Piggy's leaving comes as its
+   * gone state; the Piglet as a ground stack for everyone (drops-mp-feature).
+   */
+  youthGranted(target, msg, engine) {
+    const classTsid = 'potion_animal_youth';
+    const ask = sharedYouth;
+    sharedYouth = null;
+    if (!engine || !msg || countItem(engine.inv, classTsid) < 1) return null;
+    const def = POTIONS[classTsid];
+    const use = msg.use && typeof msg.use === 'object' ? msg.use : null;
+    const copy = ask?.copy ?? null;
+    if (use?.spent) engine.query?.('ledgerReceipt', String(use.op || ''), engine);
+    if (keepsCopies(engine, classTsid)) {
+      if (use) copyFromLedger(engine, classTsid, copy, use);
+      spendCopyCharge(engine, classTsid, copy != null && copy < countItem(engine.inv, classTsid) ? copy : null);
+    } else {
+      if (use) uses[classTsid] = use.spent ? 1 : Math.min(def.capacity - 1, Math.max(0, Math.floor(Number(use.left) || 0))) + 1;
+      const used = usePotion(classTsid, uses[classTsid]);
+      if (used.emptied) {
+        removeItem(engine.inv, classTsid, 1);
+        delete uses[classTsid];
+      } else {
+        uses[classTsid] = used.uses;
+      }
+    }
+    engine.achievement(`potions_used:${classTsid}`, 1);
+    for (const row of itemVerbAchievementCounters(classTsid, def.verb)) engine.achievement(row.counter, row.amount);
+    const x = Number.isFinite(Number(msg.x)) ? Number(msg.x) : ask?.x;
+    const y = ask?.y ?? target?.sprite?.y;
+    if (Number.isFinite(x) && Number.isFinite(y)) poof(engine, x, y - 1, BABY_STACK_H);
+    say(engine, potionMessage(classTsid, [], false), true);
+    last = `${classTsid}:npc_piggy>piglet:shared`;
+    engine.refreshPack?.();
+    engine.save?.();
+    publish(engine);
+    return true;
+  },
+
+  /** G605: the realtime server refused a youth pour (the bottle stays as it was). */
+  youthRefused() {
+    sharedYouth = null;
+    return true;
+  },
+
+  /** G605: someone else's Potion of Animal Youth on a street Piggy: the poof where it stood. */
+  sharedYouthSeen(target, msg, engine) {
+    const x = Number.isFinite(Number(msg?.x)) ? Number(msg.x) : target?.sprite?.x;
+    const y = Number.isFinite(Number(msg?.y)) ? Number(msg.y) : target?.sprite?.y;
+    if (Number.isFinite(x) && Number.isFinite(y)) poof(engine, x, y - 1, BABY_STACK_H);
+    return true;
   },
 
   /**

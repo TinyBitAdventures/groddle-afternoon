@@ -54,7 +54,15 @@
  *   "n"), the server has the site take it first, a refusal shows "You don't
  *   have enough of that item.", and the go-ahead's op is applied once
  *   (ledgerReceipt) as the feed takes the food from the pack.
- * - A street Piggy's name is everyone's (objects_pigs.go namePig; items/include/animal_naming.js):
+ * - G605: a street Piggy captured (capture: Herdkeeping as "herd", the Pig Bait through the ledger,
+ *   the server's roll) or poured with a Potion of Animal Youth (youth: the bottle's pour through the
+ *   ledger, a Piglet on the ground for everyone) is gone for everyone until the next game day: the
+ *   state's "gone" hides it on every page (animal-husbandry-feature sharedPigGone) and brings it back.
+ *   The capture's go-ahead replays the verb with the server's roll; the pour's lands in
+ *   potions-feature youthGranted. A crop fed to it counts toward Plops the server places on the
+ *   ground for everyone (obj_ev "plop": the feeder's activity line).
+ * - A street Piggy's name is everyone's, and so is a shared Chicken's, Butterfly's or Batterfly's
+ *   (objects_pigs.go nameAnimal; items/include/animal_naming.js):
  *   animal-husbandry-feature's Name Me! / Rename Me! asks the server (sharedAnimalName) with the
  *   "ak5" perk; its word (who may rename within the hour, the word filter) wins, the name comes back
  *   in the Piggy's state for everyone (applyPigState), the label reads "A Piggy Named ...", and the
@@ -133,12 +141,12 @@ import {
   treeId,
   treeReady,
   treeSkill,
-} from '../street-objects.js?v=37a81731';
-import { ROCK_CATALOG } from '../mining.js?v=483539b8';
+} from '../street-objects.js?v=1a069323';
+import { ROCK_CATALOG } from '../mining.js?v=674ed39b';
 import { TRANT_META, trantStatusLabel } from '../trants.js?v=1b3c8ae3';
-import { quoteWoodTreeHarvest } from '../woodcutting.js?v=73472b8c';
-import { animalStatusLabel, pickerMaxCount } from '../animals.js?v=c2d5ecf3';
-import { highestAnimalKinshipRank, quoteAnimalKinship } from '../animal-kinship.js?v=ae02d8d3';
+import { quoteWoodTreeHarvest } from '../woodcutting.js?v=9a2039d1';
+import { animalStatusLabel, pickerMaxCount } from '../animals.js?v=191c70c4';
+import { highestAnimalKinshipRank, quoteAnimalKinship } from '../animal-kinship.js?v=f91347e9';
 import { animalPatrolRange, ANIMAL_BODY, TREE_FOOTPRINT } from '../street-ecology.js?v=08076876';
 import { INCUBATION, PIGGY_FEED, itemBaseCost, namedAnimalLabel, resetIncubation } from '../animal-husbandry.js?v=6d330f7b';
 import {
@@ -167,7 +175,7 @@ import {
   dragonWalkAt,
   kittyWalkAt,
   walkerSpan,
-} from '../street-creatures.js?v=6bfadcbf';
+} from '../street-creatures.js?v=c73c3aaf';
 
 export const STREET_OBJECTS_FEATURE_ID = 'street-objects';
 const RECONCILE_MS = 250;
@@ -279,8 +287,36 @@ function bind(engine) {
     if (!msg || msg.street !== copy.street || copy.street !== engine.streetTsid) return;
     const obj = localObjects(engine).find((row) => row.id === msg.id);
     if (!obj) return;
+    // Someone named it (animal_naming.js 49, a bubble with no pc: everyone sees it); the name itself comes as objs.
+    if (NAMEABLE_KINDS.has(obj.kind) && msg.ev === 'name') {
+      if (Number(msg.by) === Number(client?.me?.id)) return;
+      const name = typeof msg.name === 'string' ? msg.name.slice(0, 32) : '';
+      if (name && obj.target?.sprite && !obj.target.sprite.destroyed) engine.say?.(obj.target, nameBubble(name), 5000);
+      lastAnswer = `${obj.id}:name:seen`;
+      publish(engine);
+      return;
+    }
     if (obj.kind === 'chicken' || obj.kind === 'butterfly' || obj.kind === 'batterfly' || obj.kind === 'kitty' || obj.kind === 'crab' || obj.kind === 'dragon') {
       creatureEvent(engine, obj, msg);
+      return;
+    }
+    // G605: someone else's Potion of Animal Youth: the poof where it stood (its gone state comes as objs).
+    if (obj.kind === 'pig' && msg.ev === 'youth' && Number(msg.by) !== Number(client?.me?.id)) {
+      engine.query?.('sharedYouthSeen', obj.target, msg, engine);
+      lastAnswer = `${obj.id}:youth:seen`;
+      publish(engine);
+      return;
+    }
+    // G605: a Plop the server placed for this Piggy; the feeder hears it (doPlop 1347-1349).
+    if (obj.kind === 'pig' && msg.ev === 'plop') {
+      if (Number(msg.by) === Number(client?.me?.id)) engine.pushActivity?.(`The ${obj.state?.userName || 'Piggy'} plopped on the ground!`);
+      lastAnswer = `${obj.id}:plop:${msg.seed || ''}:${Number(msg.n) || 0}`;
+      publish(engine);
+      return;
+    }
+    if (obj.kind === 'pig' && msg.ev === 'capture') {
+      lastAnswer = `${obj.id}:capture:seen`;
+      publish(engine);
       return;
     }
     // Someone else's pet, nibble or feed: this player sees it happen (G334; its hold comes as objs).
@@ -293,14 +329,6 @@ function bind(engine) {
       publish(engine);
       return;
     }
-    // Someone named it (animal_naming.js 49, a bubble with no pc: everyone sees it); the name itself comes as objs.
-    if (obj.kind === 'pig' && msg.ev === 'name' && Number(msg.by) !== Number(client?.me?.id)) {
-      const name = typeof msg.name === 'string' ? msg.name.slice(0, 32) : '';
-      if (name && obj.target?.sprite && !obj.target.sprite.destroyed) engine.say?.(obj.target, nameBubble(name), 5000);
-      lastAnswer = `${obj.id}:name:seen`;
-      publish(engine);
-      return;
-    }
     const on = msg.on ? localObjects(engine).find((row) => row.id === msg.on) : null;
     engine.query?.('sharedAnimalEvent', obj.target, { ev: String(msg.ev || ''), on: on?.target || null }, engine);
   });
@@ -310,7 +338,11 @@ function bind(engine) {
 /** Local shared objects on this street: { id, kind, target, classId, rock|state|node, ... }. */
 function localObjects(engine) {
   const out = [];
-  for (const t of engine.interactables || []) {
+  // G605: street Piggies hidden while the server says they are gone are still the server's, so
+  // their return reaches them (animal-husbandry-feature keeps them out of interactables meanwhile).
+  const hidden = engine.query?.('sharedGonePiggies', engine) || [];
+  const list = hidden.length ? [...(engine.interactables || []), ...hidden.filter((t) => !(engine.interactables || []).includes(t))] : engine.interactables || [];
+  for (const t of list) {
     if (Number.isInteger(t.rockIndex) && t.state?.rock && ROCK_CATALOG[t.classId]) {
       out.push({ id: rockId(t.rockIndex), kind: 'rock', target: t, classId: t.classId, rock: t.state.rock });
     } else if (Number.isInteger(t.treeIndex) && TRANT_META[t.classId] && t.state) {
@@ -593,12 +625,20 @@ function redraw(engine, obj, before = null) {
       obj.target.subtitle = animalStatusLabel('npc_piggy', obj.state);
       // animal_naming.js getLabel: "A Piggy Named Wilbur", the server's name for everyone.
       obj.target.label = namedAnimalLabel('npc_piggy', obj.state);
+      // G605: gone for everyone (captured, or a Piglet now) until the next game day, then back.
+      engine.query?.('sharedPigGone', obj.target, Boolean(obj.state.sharedGone), engine);
     }
     setPath(engine, obj);
   } else if (obj.kind === 'chicken' || obj.kind === 'butterfly') {
-    if (obj.target) obj.target.subtitle = sharedCreatureLabel(obj.classId, obj.state) || animalStatusLabel(obj.classId, obj.state);
+    if (obj.target) {
+      obj.target.subtitle = sharedCreatureLabel(obj.classId, obj.state) || animalStatusLabel(obj.classId, obj.state);
+      obj.target.label = namedAnimalLabel(obj.classId, obj.state);
+    }
     setPath(engine, obj);
-  } else if (obj.kind === 'batterfly' || obj.kind === 'kitty' || obj.kind === 'crab' || obj.kind === 'dragon') {
+  } else if (obj.kind === 'batterfly') {
+    if (obj.target) obj.target.label = namedAnimalLabel(obj.classId, obj.state);
+    setPath(engine, obj);
+  } else if (obj.kind === 'kitty' || obj.kind === 'crab' || obj.kind === 'dragon') {
     setPath(engine, obj);
   } else obj.refresh?.();
   // G334: the server says this street tree died (for everyone): it dies here too.
@@ -716,6 +756,10 @@ function sharedVerbOn(engine, target, verbId) {
   const pig = streetPigIndex(target, engine.streetTsid);
   if (pig >= 0) {
     const [base, cls] = String(verbId || '').split(':');
+    if (base === 'capture' && verbId === base) {
+      // animal-husbandry-feature checked the player's own side first (Herdkeeping, bait, energy, cooldowns).
+      return { id: pigId(pig), ready: () => true, perks: learned.includes('herdkeeping_1') ? ['herd'] : [] };
+    }
     if (base === 'pet' || base === 'nibble') {
       if (verbId !== base) return null;
       const rank = highestAnimalKinshipRank(learned);
@@ -802,6 +846,26 @@ function answered(engine, msg, ok) {
   lastAnswer = `${msg.id}:${msg.verb}:${ok ? 'ok' : msg.code || 'no'}`;
   publish(engine);
   if (!p || copy.street !== engine.streetTsid) return;
+  // G605: a Potion of Animal Youth poured on a street Piggy (sharedPigYouth): the bottle and the
+  // poof are potions-feature's on the go-ahead; the Piglet comes as a shared ground stack.
+  if (p.youth) {
+    if (!ok) {
+      engine.toast?.(String(msg.message || 'Not now.'), 2600);
+      engine.query?.('youthRefused', p.target, engine);
+      reconcileAll(engine);
+      return;
+    }
+    const obj = localObjects(engine).find((row) => row.id === msg.id && row.target === p.target);
+    if (obj) {
+      const s = stateFor(copy, obj.id, Date.now());
+      if (s) applyKnown(obj, s);
+      seen.set(stateKey(obj), copy.version);
+      dirty.delete(obj.id);
+    }
+    engine.query?.('youthGranted', p.target, msg, engine);
+    if (obj) redraw(engine, obj);
+    return;
+  }
   // A name for a street Piggy (sharedAnimalName): the namer's side runs on the go-ahead, no verb to replay.
   if (p.naming) {
     if (!ok) {
@@ -841,7 +905,7 @@ function answered(engine, msg, ok) {
   // G335 slice 5: food the ledger took for a Piggy or a Batterfly, or the egg a Chicken sits on,
   // leaves the pack with the verb below, once (the trade slice's applied list holds its op, so the
   // site counts it as applied).
-  if (grant.use?.spent && grant.use.n && /^(feed|incubate):/.test(String(p.verbId))) engine.query?.('ledgerReceipt', String(grant.use.op || ''), engine);
+  if (grant.use?.spent && grant.use.n && (/^(feed|incubate):/.test(String(p.verbId)) || p.verbId === 'capture')) engine.query?.('ledgerReceipt', String(grant.use.op || ''), engine);
   try {
     engine.executeVerb?.(p.target, p.verbId, { animated: true });
   } finally {
@@ -911,28 +975,42 @@ function outOfReach(engine, target, verbId, at = null) {
   return inObjectReach(p.x, p.y, spr.x, spr.y) ? null : COPY.far;
 }
 
+/** The street animals the server names (objects_pigs.go nameAnimal; animal_naming.js is in each one's includes). */
+const NAMEABLE_KINDS = new Set(['pig', 'chicken', 'butterfly', 'batterfly']);
+
 /** animal_naming.js onInputBoxResponse 49: the bubble a newly named animal says. */
 function nameBubble(name) {
   return `And they shall call me "${name}"`;
 }
 
 /**
- * Name Me! / Rename Me! on a street Piggy the server holds (objects_pigs.go namePig): true when
- * asked (or refused for now: connecting, busy), null when the name is the page's own (solo, a
- * released or raised Piggy, a street the server does not share).
+ * Name Me! / Rename Me! on a street Piggy, Chicken, Butterfly or Batterfly the server holds
+ * (objects_pigs.go nameAnimal): true when asked (or refused for now: connecting, busy), null when
+ * the name is the page's own (solo, a released or raised animal, a street the server does not share).
  */
 function askName(engine, target, value) {
   if (engine.mode !== 'multiplayer' || target?.yardVisit) return null;
   const c = bind(engine);
   if (!c || LOCAL_STATES.has(c.state) || !roomIsStreet(engine, c)) return null;
-  const pig = streetPigIndex(target, engine.streetTsid);
-  if (pig < 0) return null;
   if (copy.none && copy.street === engine.streetTsid) return null;
-  if (!shared(engine) || !copy.objs.has(pigId(pig))) {
-    engine.toast?.(COPY.connecting, 2400);
-    return true;
-  }
-  const id = pigId(pig);
+  const pig = target?.classId === 'npc_piggy' ? streetPigIndex(target, engine.streetTsid) : -1;
+  const animal = pig < 0 ? creatureOf(target) : null;
+  let id = '';
+  if (pig >= 0) {
+    id = pigId(pig);
+    if (!shared(engine) || !copy.objs.has(id)) {
+      engine.toast?.(COPY.connecting, 2400);
+      return true;
+    }
+  } else if (animal && NAMEABLE_KINDS.has(animal.kind)) {
+    if (!shared(engine)) {
+      engine.toast?.(COPY.connecting, 2400);
+      return true;
+    }
+    // Only an animal this street's snapshot named is the server's; any other stays the page's own.
+    if (!copy.animals.has(animal.id)) return null;
+    id = animal.id;
+  } else return null;
   for (const p of pending.values()) {
     if (p.id === id && !p.silent) {
       engine.toast?.(COPY.busy, 1600);
@@ -1042,6 +1120,37 @@ export const streetObjectsFeature = {
   sharedTree(target, engine) {
     if (!engine || engine.mode !== 'multiplayer' || !isStreetTree(target)) return null;
     return shared(engine) ? true : null;
+  },
+
+  /**
+   * potions-feature, G605: a Potion of Animal Youth poured on a street Piggy the server holds asks it
+   * (k: the bottle, its place among the player's bottles). True when asked (or refused for now),
+   * null when the Piggy is the page's own.
+   */
+  sharedPigYouth(target, k, engine) {
+    if (engine?.mode !== 'multiplayer' || target?.classId !== 'npc_piggy' || target.husbandryAnimal) return null;
+    const c = bind(engine);
+    if (!c || LOCAL_STATES.has(c.state) || !roomIsStreet(engine, c)) return null;
+    const pig = streetPigIndex(target, engine.streetTsid);
+    if (pig < 0 || (copy.none && copy.street === engine.streetTsid)) return null;
+    const id = pigId(pig);
+    if (!shared(engine) || !copy.objs.has(id)) {
+      engine.toast?.(COPY.connecting, 2400);
+      return true;
+    }
+    for (const p of pending.values()) {
+      if (p.id === id && !p.silent) {
+        engine.toast?.(COPY.busy, 1600);
+        return true;
+      }
+    }
+    reqSeq += 1;
+    if (!c.send('obj_act', actMessage({ req: reqSeq, id, verb: 'youth', k: Number.isInteger(k) && k >= 0 ? k : null }))) {
+      engine.toast?.(COPY.connecting, 2400);
+      return true;
+    }
+    pending.set(reqSeq, { id, target, verbId: 'youth', youth: true, at: Date.now() });
+    return true;
   },
 
   /** animal-husbandry-feature's name modal: a street Piggy's name asks the server (askName). */

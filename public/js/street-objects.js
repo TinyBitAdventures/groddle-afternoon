@@ -32,13 +32,13 @@
  * keeps a dig crew (diggers) as a rock keeps miners.
  */
 
-import { ROCK_CATALOG, findWorkingPick, miningProfile, miningToolWear } from './mining.js?v=483539b8';
+import { ROCK_CATALOG, findWorkingPick, miningProfile, miningToolWear } from './mining.js?v=674ed39b';
 import { MINING_EXPERT_UPGRADES } from './imagination-effects.js?v=70169933';
 import { TRANT_META, canHarvestTrant, fruitCapacityAt, resolveArborologyPackage } from './trants.js?v=1b3c8ae3';
-import { highestLightGreenThumbRank, quoteTrantCare } from './trant-care.js?v=8339adef';
-import { RESOURCE_NODE_ALIASES, RESOURCE_NODE_CATALOG, resolveResourceSkillPackage } from './resource-nodes.js?v=937de69e';
-import { highestAnimalKinshipRank } from './animal-kinship.js?v=ae02d8d3';
-import { applyCreatureState, clockOffset, pathFrom } from './street-creatures.js?v=6bfadcbf';
+import { highestLightGreenThumbRank, quoteTrantCare } from './trant-care.js?v=9527ff03';
+import { RESOURCE_NODE_ALIASES, RESOURCE_NODE_CATALOG, resolveResourceSkillPackage } from './resource-nodes.js?v=7a77fd73';
+import { highestAnimalKinshipRank } from './animal-kinship.js?v=f91347e9';
+import { applyAnimalName, applyCreatureState, clockOffset, pathFrom } from './street-creatures.js?v=c73c3aaf';
 
 /** The resource-node classes whose stock is shared (the "N uses left, then regrows" nodes). */
 /**
@@ -377,17 +377,10 @@ export function applyTreeState(state, s, now = Date.now()) {
  */
 export function applyPigState(state, s, now = Date.now(), { me = 0 } = {}) {
   if (!state || !s) return state;
-  const name = typeof s.name === 'string' ? s.name.slice(0, 32) : '';
-  if (name) {
-    const namer = Math.floor(Number(s.namer) || 0);
-    state.userName = name;
-    state.namer = me && namer === Number(me) ? 'player' : `p${namer}`;
-    state.namedOn = Math.floor((now - Math.max(0, Number(s.named) || 0)) / 1000);
-  } else {
-    delete state.userName;
-    delete state.namer;
-    delete state.namedOn;
-  }
+  applyAnimalName(state, s, now, me);
+  // G605: a capture or a Potion of Animal Youth took it off the street for everyone, until the next game day.
+  if (s.gone === true) state.sharedGone = true;
+  else delete state.sharedGone;
   const whole = (v, lo, hi) => Math.max(lo, Math.min(hi, Math.floor(Number(v) || 0)));
   state.mood = whole(s.mood, 0, 2);
   state.hunger = whole(s.hunger, 0, 10);
@@ -511,7 +504,7 @@ export function reconcile(obj, copy, now = Date.now()) {
 }
 
 /** An obj_act message, validated the way the server will. */
-export function actMessage({ req, id, verb, perks = [], skill = '', on = '', c = '', n = 0, at = 0, name = '' }) {
+export function actMessage({ req, id, verb, perks = [], skill = '', on = '', c = '', n = 0, at = 0, name = '', k = null }) {
   const msg = { req: Math.max(1, Math.floor(Number(req) || 1)), id: String(id || ''), verb: String(verb || '') };
   const words = (perks || []).filter((p) => /^[a-z0-9_]{1,24}$/.test(p)).slice(0, 8);
   if (words.length) msg.perks = words;
@@ -525,6 +518,8 @@ export function actMessage({ req, id, verb, perks = [], skill = '', on = '', c =
   // A wait: the path's clock (server ms minus lag) where this player's screen stopped the animal.
   // A name for a street Piggy (objects_pigs.go namePig): at most 32 of a-z, 0-9 and spaces, the server checks again.
   if (verb === 'name') msg.name = String(name || '').slice(0, 32).replace(/[^a-z0-9 ]/gi, '');
+  // G605: the Potion of Animal Youth poured, its place among the player's bottles (objects_uses.go copyOf).
+  if (verb === 'youth' && Number.isInteger(k) && k >= 0 && k <= 255) msg.k = k;
   if (verb === 'wait' && Number.isSafeInteger(Math.round(Number(at))) && Number(at) > 0) msg.at = Math.round(Number(at));
   return msg;
 }

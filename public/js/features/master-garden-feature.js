@@ -27,9 +27,9 @@
  *     mgPlots, mgAutoplay, mgDrop.
  */
 
-import { TOOL_CONDITION_CATALOG, migrateClassValue } from '../tools.js?v=eff5ef6f';
+import { TOOL_CONDITION_CATALOG, migrateClassValue } from '../tools.js?v=5f482998';
 import { ITEM_CATALOG, countItem, ensureItem } from '../inventory.js?v=60dfc9ca';
-import { SEED_CATALOG, listPlantableSeeds } from '../garden.js?v=d965f416';
+import { SEED_CATALOG, listPlantableSeeds } from '../garden.js?v=eae8b052';
 import {
   GARDEN_POTIONS,
   MASTER_GARDENER,
@@ -42,11 +42,11 @@ import {
   potionTendGarden,
   potionUsesLeft,
   usePotion,
-} from '../master-garden.js?v=caa7ac2e';
+} from '../master-garden.js?v=bcd9ac74';
 import { rollDropTable } from '../drop-tables.js?v=16e12632';
 import { payDrop } from './drops-feature.js?v=7f45f07f';
 import { textureFromUrl } from '../textures.js?v=f024bd6a';
-import { copyFromLedger, keepsCopies, verbCopy } from '../copy-charges.js?v=f01dfda2';
+import { copyFromLedger, keepsCopies, verbCopy } from '../copy-charges.js?v=4ffa1c1e';
 import { gardenGrowModifier } from '../imagination-effects.js?v=70169933';
 
 export const MASTER_GARDEN_FEATURE_ID = 'master-garden';

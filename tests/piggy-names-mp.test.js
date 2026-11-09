@@ -82,6 +82,7 @@ function rig({ learned = ['animalkinship_5'] } = {}) {
     },
   };
   const pigT = { classId: 'npc_piggy', label: 'Piggy', animalKey: 'GSTREET:npc_piggy:1', state: { mood: 1, hunger: 0 }, sprite: { x: 300, y: 900 } };
+  const chickT = { classId: 'npc_chicken', label: 'Chicken', classIndex: 0, state: {}, sprite: { x: 500, y: 900 } };
   const said = [];
   const landed = [];
   const engine = {
@@ -91,7 +92,7 @@ function rig({ learned = ['animalkinship_5'] } = {}) {
     inv: {},
     pc: { energy: 200, imaginationUpgrades: [] },
     learnedSkills: learned,
-    interactables: [pigT],
+    interactables: [pigT, chickT],
     data: {},
     toasts: [],
     activeBuffIds: () => [],
@@ -111,9 +112,9 @@ function rig({ learned = ['animalkinship_5'] } = {}) {
   streetObjectsFeature._reset();
   streetObjectsFeature.onTick(16, 0, engine);
   client.emit('roster', { street: 'GSTREET', players: [] });
-  client.emit('msg:objs', { t: 'objs', street: 'GSTREET', snap: true, objs: [PIG] });
+  client.emit('msg:objs', { t: 'objs', street: 'GSTREET', snap: true, creatures: true, animals: ['chicken:0'], objs: [PIG] });
   streetObjectsFeature.onTick(16, 0, engine);
-  return { engine, client, sent, pigT, said, landed };
+  return { engine, client, sent, pigT, chickT, said, landed };
 }
 
 describe('street objects feature: naming a street Piggy', () => {
@@ -157,5 +158,25 @@ describe('street objects feature: naming a street Piggy', () => {
     assert.equal(streetObjectsFeature.sharedAnimalName({ ...r.pigT, animalKey: undefined, husbandryAnimal: true }, 'X', r.engine), null);
     r.engine.mode = 'solo';
     assert.equal(streetObjectsFeature.sharedAnimalName(r.pigT, 'Wilbur', r.engine), null);
+  });
+});
+
+describe('G605: a shared Chicken, Butterfly or Batterfly is named by the same rules', () => {
+  it('a Chicken the street shares asks the server; its name comes back for everyone', () => {
+    const r = rig();
+    assert.equal(streetObjectsFeature.sharedAnimalName(r.chickT, 'Henrietta', r.engine), true);
+    assert.deepEqual(r.sent.at(-1), { t: 'obj_act', req: 1, id: 'chicken:0', verb: 'name', perks: ['ak5'], name: 'Henrietta' });
+    r.client.emit('msg:obj_ok', { t: 'obj_ok', req: 1, id: 'chicken:0', verb: 'name', name: 'Henrietta', obj: { id: 'chicken:0', lag: 0, hold: 0, name: 'Henrietta', namer: 7, named: 0 } });
+    assert.equal(r.chickT.state.userName, 'Henrietta');
+    assert.equal(r.chickT.label, 'A Chicken Named Henrietta');
+    assert.deepEqual(r.landed, [[r.chickT, 'Henrietta']]);
+    r.client.emit('msg:obj_ev', { t: 'obj_ev', street: 'GSTREET', id: 'chicken:0', ev: 'name', name: 'Clucky', by: 9 });
+    assert.deepEqual(r.said.map(([, text]) => text), ['And they shall call me "Clucky"']);
+  });
+
+  it('a Chicken the snapshot does not name stays the page\'s own', () => {
+    const r = rig();
+    const other = { classId: 'npc_chicken', label: 'Chicken', classIndex: 4, state: {}, sprite: { x: 700, y: 900 } };
+    assert.equal(streetObjectsFeature.sharedAnimalName(other, 'X', r.engine), null);
   });
 });

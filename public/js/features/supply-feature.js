@@ -29,7 +29,7 @@
  */
 
 import { ITEM_CATALOG, addItem, countItem, ensureItem } from '../inventory.js?v=60dfc9ca';
-import { getToolCondition, copyForVerb, copyTag, migrateClassTag, setCopyTag } from '../tools.js?v=eff5ef6f';
+import { getToolCondition, copyForVerb, copyTag, migrateClassTag, setCopyTag } from '../tools.js?v=5f482998';
 import {
   MACHINE_ASSEMBLIES,
   MACHINE_IDS,
@@ -51,7 +51,7 @@ import {
   refuelMachine,
   stillEtaSeconds,
   stillRoom,
-} from '../machines.js?v=68ddb45a';
+} from '../machines.js?v=c44050e6';
 import { HERB_SEEDS, ITEM_TRANSFORMS, listTransformVerbs, runTransform, transformVerbCount } from '../item-transforms.js?v=c439eb33';
 import {
   BUREAUCRACY_ITEMS,

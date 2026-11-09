@@ -59,7 +59,7 @@ import { nearestSurfaceY } from '../walk-surface.js?v=106bfdc5';
 import { displayTopOf, itemstackOverlayPoint, playSheetOverlay } from '../overlay-art.js?v=75c3ea34';
 import { SET_FREE, applySetFree, canSetFree, setFreeGoneLine, setFreePrompt } from '../animal-set-free.js?v=3b194fca';
 import { getGameDayKey } from '../game-day.js?v=edb00566';
-import { animalAnchorX, animalAnchorY, createAnimalState, resetAnimalDay, animalStatusLabel, listAnimalFeedOptions } from '../animals.js?v=c2d5ecf3';
+import { animalAnchorX, animalAnchorY, createAnimalState, resetAnimalDay, animalStatusLabel, listAnimalFeedOptions } from '../animals.js?v=191c70c4';
 import {
   BABY_ANIMALS,
   BATTERFLY,
@@ -80,6 +80,7 @@ import {
   batterflyCountForStreet,
   canNameAnimal,
   capturePiggy,
+  captureVerbState,
   collectMachine,
   createMachine,
   depositFeeder,
@@ -106,14 +107,14 @@ import {
   stepHogtie,
   stickPlaceState,
 } from '../animal-husbandry.js?v=6d330f7b';
-import { batterflyBaseY, batterflyResponseFor, flightFloorFor } from '../street-creatures.js?v=6bfadcbf';
+import { batterflyBaseY, batterflyResponseFor, flightFloorFor } from '../street-creatures.js?v=c73c3aaf';
 import { loseEnergy, shiftMetabolic } from '../metabolics.js?v=8504134e';
 import { textureFromUrl } from '../textures.js?v=f024bd6a';
 import { PIGGY_DEATH_DROPS, PIGGY_DEATH_PUFF, SAD_BABY, forcedRoll, isSadIn } from '../animal-mood.js?v=a49495fc';
-import { animalCrowdChanged, animalCrowdSad, animalPlaceIsDepressing, crowdLimit, smokePuff as sharedSmokePuff } from './animal-mood-feature.js?v=257ad9a9';
+import { animalCrowdChanged, animalCrowdSad, animalPlaceIsDepressing, crowdLimit, smokePuff as sharedSmokePuff } from './animal-mood-feature.js?v=fc3f25b2';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
-import { followYardPath, freeYardSpot } from '../yard-wander.js?v=f6d66983';
+import { followYardPath, freeYardSpot } from '../yard-wander.js?v=24dc2de4';
 
 export const HUSBANDRY_FEATURE_ID = 'animal-husbandry';
 export const BATTERFLY_GROUP = 'batterfly';
@@ -746,8 +747,10 @@ function spawnStreet(engine) {
   for (const target of engine.interactables) {
     if (ANIMAL_CLASSES.has(target.classId) && target.state?.userName) target.label = namedAnimalLabel(target.classId, target.state);
   }
-  // Captured ecology piggies stay gone (one capture per location cooldown).
+  // Captured ecology piggies stay gone (one capture per location cooldown). Online a street
+  // Piggy's leaving is the realtime server's (G605: back at the next game day; sharedPigGone).
   for (const target of [...engine.interactables]) {
+    if (engine.mode === 'multiplayer') break;
     if (target.classId === 'npc_piggy' && !target.husbandryAnimal && Number(target.state?.capturedAt) > 0
       && t - Number(target.state.capturedAt) < HERDKEEPING.locationCooldownMs) {
       hideEcologyAnimal(engine, target);
@@ -779,6 +782,15 @@ function hideEcologyAnimal(engine, target) {
   const at = list.indexOf(target);
   if (at >= 0) list.splice(at, 1);
 }
+
+/** G605: a street Piggy the server brought back (the next game day) is on the street again. */
+function showEcologyAnimal(engine, target) {
+  if (target.sprite && !target.sprite.destroyed) target.sprite.visible = true;
+  if (!engine.interactables.includes(target)) engine.interactables.push(target);
+}
+
+/** Street Piggies hidden because the server says they are gone (G605). */
+const goneHidden = new Set();
 
 // —— Yard simulation ————————————————————————————————————————————————————
 
@@ -878,9 +890,10 @@ function settleYardFood(engine, food) {
 // —— Naming ——————————————————————————————————————————————————————————————
 
 function applyName(engine, target, value) {
-  // A street Piggy online (G334): the name is everyone's, so the realtime server decides it. The
-  // checks here run on a copy first, so the page says no at once where the server would.
-  if (engine.mode === 'multiplayer' && target.classId === 'npc_piggy' && !target.husbandryAnimal) {
+  // A street Piggy, Chicken, Butterfly or Batterfly online (G334, G605): the name is everyone's, so
+  // the realtime server decides it. The checks here run on a copy first, so the page says no at once
+  // where the server would; an animal the server does not hold keeps the page's own naming.
+  if (engine.mode === 'multiplayer' && NAMEABLE_ANIMALS[target.classId] && !target.husbandryAnimal) {
     const trial = nameAnimal(target.classId, { ...(target.state || {}) }, value, namingCtx(engine));
     if (!trial.ok) {
       if (trial.reason !== 'unchanged') engine.toast(trial.reason, 2200);
@@ -981,6 +994,35 @@ function rollFor(engine) {
 }
 
 function capture(engine, target) {
+  // G605: online a street Piggy's capture is the realtime server's: it takes the bait through the
+  // ledger, rolls, and takes the Piggy off the street for everyone; the go-ahead replays this verb
+  // with its roll (sharedVerbGrant), and the rest is this player's own, as in solo.
+  const shared = engine.mode === 'multiplayer' && !target.husbandryAnimal && !extras.some((e) => e.target === target)
+    && engine.query?.('sharedPiggy', target, engine) === true;
+  const grant = shared ? engine.query?.('sharedVerbGrant', target, 'capture') : null;
+  if (shared && !grant) {
+    let check = captureVerbState({ inv: engine.inv, learned: engine.learnedSkills, energy: Number(engine.pc?.energy) || 0, streetTsid: engine.streetTsid, depressing: isSadIn('npc_piggy', animalPlaceIsDepressing(engine)) });
+    // No Pig Bait in the pack: the source's line (npc_piggy.js 536); the ledger checks it again.
+    if (check.enabled && !((Number(engine.inv?.pig_bait) || 0) > 0)) {
+      check = { enabled: false, reason: "The piggy ran away! You'll need something in your inventory with which to lure it." };
+    }
+    if (check.enabled === false) {
+      engine.toast(check.reason, 2600);
+      lastAction = 'capture:blocked';
+      return;
+    }
+    if (engine.query?.('sharedObjectVerb', target, 'capture', engine)) {
+      lastAction = 'capture:asked';
+      return;
+    }
+  }
+  let first = grant && Number.isFinite(grant.roll) ? grant.roll : null;
+  const rng = first == null ? rollFor(engine) : () => {
+    if (first == null) return Math.random();
+    const r = first;
+    first = null;
+    return r;
+  };
   const res = capturePiggy(target.state || {}, {
     pc: engine.pc,
     inv: engine.inv,
@@ -991,7 +1033,7 @@ function capture(engine, target) {
     // then with no location cooldown, 383-386) or sulking from crowding (G64).
     sad: isSadIn('npc_piggy', animalPlaceIsDepressing(engine)) || animalCrowdSad(target),
     depressing: isSadIn('npc_piggy', animalPlaceIsDepressing(engine)),
-    rng: rollFor(engine),
+    rng,
   });
   // npc_piggy.js 514-528: capture_failed carries the mood the failure cost; a capture says nothing with slugs.
   if (res.bubble) engine.say(target, res.bubble, 3500, !res.ok && res.attempted ? { slugs: slugsFromEffects({ mood: res.effects?.mood }) } : null);
@@ -1021,7 +1063,11 @@ function capture(engine, target) {
   if (res.questCounter) emit(engine, 'npc_piggy:hogtie');
   const extra = extras.find((e) => e.target === target);
   if (extra) removeExtra(engine, extra);
-  else {
+  else if (grant) {
+    // Gone for everyone until the next game day: the server's state says so (sharedPigGone).
+    goneHidden.add(target);
+    hideEcologyAnimal(engine, target);
+  } else {
     target.state.capturedAt = now();
     hideEcologyAnimal(engine, target);
   }
@@ -1707,6 +1753,7 @@ export const animalHusbandryFeature = {
   },
 
   onStreetClear() {
+    goneHidden.clear();
     generation += 1;
     batterflies = [];
     piles = [];
@@ -1730,6 +1777,8 @@ export const animalHusbandryFeature = {
     for (const plop of drainPlops(now())) {
       const spr = plop.target?.sprite;
       if (!spr || spr.destroyed) continue;
+      // G605: a street Piggy online plops for everyone: the realtime server places its Plops.
+      if (engine.mode === 'multiplayer' && engine.query?.('sharedPiggy', plop.target, engine) === true) continue;
       const dir = spr.scale.x < 0 ? 1 : -1;
       dropPlop(engine, spr.x + dir * 30, plop.seedClass, plop.seedCount);
       engine.pushActivity(`The ${plop.target.state?.userName ? plop.target.state.userName : 'Piggy'} plopped on the ground!`);
@@ -1913,6 +1962,48 @@ export const animalHusbandryFeature = {
 
   /** Name / Rename / Capture on the street's own animals (content.js lists those verbs). */
   /** Multiplayer: a street Batterfly's home over the server's spot for it (x, y on a platform). */
+  /**
+   * street-objects-feature, G605: the realtime server says this street Piggy is gone (captured, or
+   * a Piglet now) or back at the next game day. Hidden while gone, on the street again after.
+   */
+  sharedPigGone(target, gone, engine) {
+    if (!target || target.classId !== 'npc_piggy' || target.husbandryAnimal) return null;
+    if (gone) {
+      goneHidden.add(target);
+      if (engine.interactables.includes(target) || target.sprite?.visible) hideEcologyAnimal(engine, target);
+    } else if (goneHidden.has(target)) {
+      goneHidden.delete(target);
+      showEcologyAnimal(engine, target);
+    }
+    return true;
+  },
+
+  /** street-objects-feature, G605: the street Piggies hidden because the server says they are gone. */
+  sharedGonePiggies() {
+    return goneHidden.size ? [...goneHidden] : null;
+  },
+
+  /** drops-mp-feature, G605: a Plop picked up from the ground brings its seeds (its words "t") into the pack's FIFO. */
+  plopSeedsIn(t, engine) {
+    const seed = typeof t?.seed === 'string' ? t.seed : '';
+    const n = Math.max(1, Math.floor(Number(t?.n) || 0));
+    if (!seed) return null;
+    const list = husbandryPack().plops;
+    // The pack count already went up by one (drops-mp addItem): replace the filler reconcile added, or add.
+    if (list.length >= (Number(engine.inv?.plop) || 0) && list.length) list[list.length - 1] = { seedClass: seed, seedCount: n };
+    else list.push({ seedClass: seed, seedCount: n });
+    reconcilePackPlops(engine.inv);
+    engine.save?.();
+    return true;
+  },
+
+  /** drops-mp-feature, G605: the words a Plop leaving the pack takes down (the FIFO's first, which the count going down takes). */
+  plopSeedsOut(engine) {
+    const list = reconcilePackPlops(engine.inv);
+    const head = list[0];
+    return head ? { seed: head.seedClass, n: Math.max(1, Math.min(7, head.seedCount || 1)) } : null;
+  },
+
   /** street-objects-feature: the realtime server named a street Piggy for this player (objects_pigs.go namePig). */
   sharedNameLanded(target, name, engine) {
     if (!target || !name) return null;

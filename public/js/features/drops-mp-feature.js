@@ -42,10 +42,10 @@
  */
 
 import { ITEM_CATALOG, addItem, countItem, removeItem } from '../inventory.js?v=60dfc9ca';
-import { TOOL_CONDITION_CATALOG, leavingCopyTag, leavingToolWear, receiveToolCopy, takeToolCopy } from '../tools.js?v=eff5ef6f';
+import { TOOL_CONDITION_CATALOG, leavingCopyTag, leavingToolWear, receiveToolCopy, takeToolCopy } from '../tools.js?v=5f482998';
 import { createMinnAccount } from '../minn-account.js?v=8f2741cd';
 import { saveStore } from '../save-store.js?v=8839ba7b';
-import { DROP_OP, DROP_TEXT, dropEffect, eatenStack, groundFrom, isPublicStreet, normalizeGroundStack, normalizeMine, pickupAsk, pigAnimalKey, shareReason, stackLeft } from '../drops-mp.js?v=ac5577f0';
+import { DROP_OP, DROP_TEXT, dropEffect, eatenStack, groundFrom, isPublicStreet, normalizeGroundStack, normalizeMine, pickupAsk, pigAnimalKey, shareReason, stackLeft } from '../drops-mp.js?v=6151ce3d';
 
 export const DROPS_MP_FEATURE_ID = 'drops-mp';
 const TABLE_URL = 'assets/content/trade-items.json';
@@ -148,6 +148,8 @@ function createSession(engine, client) {
       if (d > 0) addItem(inv, c, d);
       else removeItem(inv, c, Math.min(countItem(inv, c), -d));
     }
+    // G605: a Plop picked up brings its seeds (its words) into the pack's Plop table (animal-husbandry-feature).
+    if (side === 'took' && item.c === 'plop' && item.n === 1 && item.t) engine.query?.('plopSeedsIn', item.t, engine);
     if (fx.tool && TOOL_CONDITION_CATALOG[fx.tool.c] && engine.toolState && (fx.pack[fx.tool.c] || 0) > 0) {
       // As a trade does (trade-feature applyDone): the tools picked up keep the stack's wear; yours keep their own.
       receiveToolCopy(engine.toolState, fx.tool.c, fx.tool.r, fx.pack[fx.tool.c], fx.tool.t ?? null);
@@ -318,6 +320,11 @@ function createSession(engine, client) {
       // Its own words go down with it (a named Cubimal on the ground keeps its name).
       const t = leavingCopyTag(engine.toolState, c, n, chosen);
       if (t != null) item.t = t;
+    }
+    // G605: one Plop dropped takes its seeds down as its words (the pack's first, which the count going down takes).
+    if (c === 'plop' && n === 1) {
+      const t = engine.query?.('plopSeedsOut', engine);
+      if (t) item.t = t;
     }
     const ref = `d${Date.now().toString(36)}${(refN += 1)}`;
     dropping = { ref, c, n, r: item.r, t: item.t ?? null, copy: chosen, x: Number(x) || 0, y: Number(y) || 0, at: Date.now() };

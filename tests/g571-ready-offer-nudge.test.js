@@ -12,7 +12,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { loadContentCatalogsFromDir, resetContentCatalogs, getQuestCatalog } from '../public/js/content-catalogs.js?v=10b118dd';
 import { createQuestState } from '../public/js/quests.js?v=2b882eb6';
-import { acceptOffer, declineOffer, markOffered, readyOfferText, readyOfferedQuests } from '../public/js/quest-offers.js?v=a7ee5b8f';
+import { acceptOffer, declineOffer, markOffered, readyOfferText, readyOfferedQuests } from '../public/js/quest-offers.js?v=9c53455c';
 
 const root = join(import.meta.dirname, '..');
 const ROCKS = { dullite: 17, beryl: 13, sparkly: 11 };

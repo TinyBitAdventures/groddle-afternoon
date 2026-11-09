@@ -977,8 +977,30 @@ function count(v) {
  * this player's id: an egg someone else owns is marked incubBy, and this player's own egg is never
  * cleared here (their game hatches it at its own 60 s; the server's "hatched" or "lost" settles it).
  */
+/**
+ * A street animal's name from the server (objects_pigs.go nameAnimal; items/include/animal_naming.js):
+ * userName, namer and namedOn in the shape js/animal-husbandry.js canNameAnimal reads, the namer
+ * 'player' when it is this player (me, the realtime id), else 'p<id>'. No name: none here either.
+ */
+export function applyAnimalName(state, s, now = Date.now(), me = 0) {
+  if (!state) return state;
+  const name = typeof s?.name === 'string' ? s.name.slice(0, 32) : '';
+  if (name) {
+    const namer = Math.floor(Number(s.namer) || 0);
+    state.userName = name;
+    state.namer = me && namer === Number(me) ? 'player' : `p${namer}`;
+    state.namedOn = Math.floor((now - Math.max(0, Number(s.named) || 0)) / 1000);
+  } else {
+    delete state.userName;
+    delete state.namer;
+    delete state.namedOn;
+  }
+  return state;
+}
+
 export function applyCreatureState(classId, state, s, { me = 0, now = Date.now() } = {}) {
   if (!state) return state;
+  if (classId === 'npc_chicken' || classId === 'npc_butterfly' || classId === 'npc_batterfly') applyAnimalName(state, s, now, me);
   if (classId === 'npc_chicken') {
     state.sharedSqueezes = count(s?.sq);
     const inc = s?.inc && typeof s.inc === 'object' ? s.inc : null;

@@ -28,8 +28,8 @@ import {
   unwrapGrowl,
   unwrapPack,
   wrapBox,
-} from '../public/js/gifts.js?v=5463c0bf';
-import { giftsFeature } from '../public/js/features/gifts-feature.js?v=7f628b78';
+} from '../public/js/gifts.js?v=3b8ab24e';
+import { giftsFeature } from '../public/js/features/gifts-feature.js?v=d43b774b';
 import { HAS_SERVER, HAS_SITE, SITE_DIR, serverPath, sitePath } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');

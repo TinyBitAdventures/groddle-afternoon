@@ -17,7 +17,7 @@ import { join } from 'node:path';
 import { ITEM_CATALOG, isToolItem } from '../public/js/inventory.js?v=60dfc9ca';
 import { BAG_DEFS, PACK_CAPACITY, STARTER_FLOOR, arrangeIntoBags, isBagClass, layoutPack, packIntoBags, starterKit } from '../public/js/pack-slots.js?v=6cf9f397';
 import { STACKMAX, TOOL_CLASSES } from '../public/js/pack-slots-data.js?v=800f664c';
-import { applyStarter, bagsFeature, starterMint, starterText } from '../public/js/features/bags-feature.js?v=9438bd28';
+import { applyStarter, bagsFeature, starterMint, starterText } from '../public/js/features/bags-feature.js?v=bd95f07e';
 import { sitePackSlotsJson, OUT } from '../tools/build-site-pack-slots.mjs';
 import { HAS_SITE, SITE_DIR } from '../tools/repos.mjs';
 

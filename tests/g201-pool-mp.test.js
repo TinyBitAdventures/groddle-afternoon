@@ -18,10 +18,10 @@ import { join } from 'node:path';
 import { HOME_POOL_REFRESH_MS, collectAmount, normalizePool, poolView } from '../public/js/home-pool-mp.js?v=d04553e2';
 import { homePoolMpFeature } from '../public/js/features/home-pool-mp-feature.js?v=575920f2';
 import { CULTIVATION_REWARDS_CAP, imgRewards, imgRewardLine } from '../public/js/magic-rock-home.js?v=c07b2327';
-import { DROP_TEXT, eatenStack, normalizeGroundStack, pigAnimalKey } from '../public/js/drops-mp.js?v=ac5577f0';
-import { dropsMpFeature } from '../public/js/features/drops-mp-feature.js?v=94feb98b';
+import { DROP_TEXT, eatenStack, normalizeGroundStack, pigAnimalKey } from '../public/js/drops-mp.js?v=6151ce3d';
+import { dropsMpFeature } from '../public/js/features/drops-mp-feature.js?v=d11ef273';
 import { GAME_DAY_MS, GAME_EPOCH_MS, getGameDayKey } from '../public/js/game-day.js?v=edb00566';
-import { normalizeToolConditionState } from '../public/js/tools.js?v=eff5ef6f';
+import { normalizeToolConditionState } from '../public/js/tools.js?v=5f482998';
 import { tradeTable } from '../tools/build-realtime-trade.mjs';
 import { HAS_SERVER, HAS_SITE, SITE_DIR, serverPath, sitePath } from '../tools/repos.mjs';
 
@@ -133,7 +133,7 @@ describe('the game shows the site\'s pool (home-pool-mp)', () => {
   });
 
   it('the rock hands over the site\'s amount in multiplayer, after the site marked the day', async () => {
-    const { homesFeature } = await import('../public/js/features/homes-feature.js?v=7d812f20');
+    const { homesFeature } = await import('../public/js/features/homes-feature.js?v=4c127611');
     homesFeature.restore({ decor: {}, cult: {}, magicRock: { cultivate: 'cultivate_complete', changestyle: 'howto_shown', expand: 'howto_shown' } });
     const beats = [];
     const data = {};

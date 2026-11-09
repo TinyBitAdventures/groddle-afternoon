@@ -16,8 +16,8 @@ import { execFileSync, spawnSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { SERVER_DIR, SITE_DIR, skipWithoutServer, skipWithoutSite } from '../tools/repos.mjs';
-import { actMessage } from '../public/js/street-objects.js?v=37a81731';
-import { powdersFeature } from '../public/js/features/powders-feature.js?v=8fa5e05d';
+import { actMessage } from '../public/js/street-objects.js?v=1a069323';
+import { powdersFeature } from '../public/js/features/powders-feature.js?v=ea6f6c7c';
 import { tradeTable } from '../tools/build-realtime-trade.mjs';
 
 const hasPhp = spawnSync('php', ['-v']).status === 0;
@@ -123,8 +123,8 @@ describe('the page names what it feeds and follows the ledger (street-objects)',
 
   it('the feed applies the ledger\'s op once, and a shared Piggy eats only a shared tree\'s fruit', () => {
     const src = read('public/js/features/street-objects-feature.js');
-    // A Batterfly's food and a Chicken's egg too (objects_creatures.go).
-    assert.match(src, /if \(grant\.use\?\.spent && grant\.use\.n && \/\^\(feed\|incubate\):\/\.test\(String\(p\.verbId\)\)\) engine\.query\?\.\('ledgerReceipt'/);
+    // A Batterfly's food and a Chicken's egg too (objects_creatures.go), and G605 a capture's Pig Bait.
+    assert.match(src, /if \(grant\.use\?\.spent && grant\.use\.n && \(\/\^\(feed\|incubate\):\/\.test\(String\(p\.verbId\)\) \|\| p\.verbId === 'capture'\)\) engine\.query\?\.\('ledgerReceipt'/);
     assert.match(src, /if \(!isStreetTree\(onTarget\) \|\| !TRANT_META\[onTarget\.classId\]\) return null;/);
     const mood = read('public/js/features/animal-mood-feature.js');
     const arrive = mood.slice(mood.indexOf('function arriveShared('), mood.indexOf('function arriveShared(') + 1600);

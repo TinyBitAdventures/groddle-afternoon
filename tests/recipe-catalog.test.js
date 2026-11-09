@@ -23,7 +23,7 @@ import {
   loadRecipeCatalogFromFile,
   starterToolsInventory,
   STARTER_TOOL_IDS,
-} from '../public/js/making.js?v=25bf06a4';
+} from '../public/js/making.js?v=4e72bb4b';
 import {
   ITEM_CATALOG,
   createInventory,
@@ -41,7 +41,7 @@ import {
   TOOL_CONDITION_CATALOG,
   createToolConditionState,
   getToolCondition,
-} from '../public/js/tools.js?v=eff5ef6f';
+} from '../public/js/tools.js?v=5f482998';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const publicRoot = join(here, '../public');

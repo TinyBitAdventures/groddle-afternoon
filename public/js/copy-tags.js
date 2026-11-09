@@ -26,6 +26,11 @@
  *    (teleportation_script.js 298-319 destination, is_imbued): tsid and hubId letters, digits, _ and
  *    -, at most `id`; x and y whole numbers within `coord` (null when not known); label and hubName as
  *    one phrase of `len`; imbued true or false. No tsid is no words.
+ *  - plop: a Piggy Plop's seeds { seed, n } (plop.js instanceProps seed_class, seed_count; npc_animal
+ *    doPlop 1315-1350): seed one of the crop seed classes (`seeds`, js/animal-husbandry.js
+ *    PIGGY_CROP_SEEDS), n a whole number from 1 to `max` (doPlop's randInt(2, 7)). G605: a shared
+ *    Plop takes its seeds along (groddle-afternoon-server objects_pigs_plops.go). The Plop is not a
+ *    tool: COPY_TAG_CLASSES names it.
  * Anything else, or an empty result, is no words (null): the copy arrives with none, as before.
  */
 import { SYMBOLS, filterText } from './word-filter.js?v=9a7a7ebb';
@@ -36,7 +41,35 @@ export const COPY_TAG_RULES = Object.freeze({
   giant: Object.freeze({ giants: Object.freeze(['alph', 'cosma', 'friendly', 'grendaline', 'humbaba', 'lem', 'mab', 'pot', 'spriggan', 'ti', 'zille']) }),
   still: Object.freeze({ hopper: 600, hooch: 50 }),
   script: Object.freeze({ id: 32, len: 80, coord: 1000000 }),
+  plop: Object.freeze({
+    seeds: Object.freeze([
+      'herb_seed_gandlevery',
+      'herb_seed_hairball_flower',
+      'herb_seed_purple_flower',
+      'herb_seed_rookswort',
+      'herb_seed_rubeweed',
+      'herb_seed_silvertongue',
+      'herb_seed_yellow_crumb_flower',
+      'seed_broccoli',
+      'seed_cabbage',
+      'seed_carrot',
+      'seed_corn',
+      'seed_cucumber',
+      'seed_onion',
+      'seed_parsnip',
+      'seed_potato',
+      'seed_pumpkin',
+      'seed_rice',
+      'seed_spinach',
+      'seed_tomato',
+      'seed_zucchini',
+    ]),
+    max: 7,
+  }),
 });
+
+/** Classes that keep words but are not tools (js/tools.js copyTagKind reads these after the tool catalog). */
+export const COPY_TAG_CLASSES = Object.freeze({ plop: 'plop' });
 
 /** Spaces off both ends (only the ASCII space: tabs and line breaks are spaces by then; other languages trim alike). */
 const trimSpaces = (s) => s.replace(/^ +| +$/g, '');
@@ -126,6 +159,13 @@ function cleanScript(value, rules) {
   };
 }
 
+function cleanPlop(value, rules) {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
+  if (typeof value.seed !== 'string' || !rules.seeds.includes(value.seed)) return null;
+  const n = whole(value.n, rules.max);
+  return n >= 1 ? { seed: value.seed, n } : null;
+}
+
 /** A copy's words of `kind`, as they may travel (null: none). `now` in ms. */
 export function cleanCopyTagOf(kind, value, { now = Date.now(), rules = COPY_TAG_RULES } = {}) {
   if (value == null) return null;
@@ -135,6 +175,7 @@ export function cleanCopyTagOf(kind, value, { now = Date.now(), rules = COPY_TAG
     case 'giant': return typeof value === 'string' && rules.giant.giants.includes(value) ? value : null;
     case 'still': return cleanStill(value, rules.still, now);
     case 'script': return cleanScript(value, rules.script);
+    case 'plop': return cleanPlop(value, rules.plop);
     default: return null;
   }
 }

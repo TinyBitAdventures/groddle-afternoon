@@ -170,7 +170,7 @@ import {
   swatchFilters,
   trayFilters,
 } from '../ui/home-builder.js?v=90f759e8';
-import { RECIPE_CATALOG } from '../making.js?v=25bf06a4';
+import { RECIPE_CATALOG } from '../making.js?v=4e72bb4b';
 import {
   createBackYardState,
   fixtureObstacles,
@@ -207,14 +207,14 @@ import { MOVABLE_FIXTURES, MOVABLE_FIXTURE_IDS, fixtureFits, fixtureText, savedF
 import { displayTopOf, itemstackOverlayPoint, overlayAlpha, overlayLifeMs, playPoofIn, trackOverlay } from '../overlay-art.js?v=75c3ea34';
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=10b5626e';
 import { fadeInNewNear } from '../poof-fade.js?v=8984abd1';
-import { projectApi } from './street-jobs-feature.js?v=c4cab89b';
+import { projectApi } from './street-jobs-feature.js?v=09bad030';
 import { TOWER_CHASSIS, TOWER_CONFIG, TOWER_DOOR_DX, TOWER_GEO, TOWER_PROTO, normalizeTowerState } from '../home-tower.js?v=087df38f';
-import { drawTowerElevator, drawTowerExit, towerApi, visitorTowerView } from './home-tower-feature.js?v=f1fa901c';
+import { drawTowerElevator, drawTowerExit, towerApi, visitorTowerView } from './home-tower-feature.js?v=f574b637';
 import { pieceUrl, roomPieces, surfaceAt, swatchPiece, wallTargetAt } from '../home-wallpaper.js?v=f1969400';
 import { wantsHiresDecos } from '../deco-hires.js?v=9877af94';
-import { resourceNodesFeature } from './resource-nodes-feature.js?v=1d2ca915';
-import { patchesFeature } from './patches-feature.js?v=7c48413d';
-import { GROWN_TREE_LABELS, createPlot, growTree, plotLabel } from '../patches.js?v=dc2b1436';
+import { resourceNodesFeature } from './resource-nodes-feature.js?v=6d5725e5';
+import { patchesFeature } from './patches-feature.js?v=ca78263c';
+import { GROWN_TREE_LABELS, createPlot, growTree, plotLabel } from '../patches.js?v=3103cc6a';
 import { WOTD_DEPLETE_MS, WOTD_TEXT, nearestPourTarget, pourButton, pourConditions, pourConfirmText } from '../wine-pour.js?v=6daa23a7';
 import { WOTD_TOOL, pourApproach, pourDropTip } from '../wine-pour-fx.js?v=364e22d2';
 import { XP_FOR_LEVEL } from '../progression.js?v=33462eaa';
@@ -237,7 +237,7 @@ import {
 import { frameTexture, isLoaded, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js?v=f024bd6a';
 import { FALLBACK_MAX as WORLD_ART_FALLBACK_MAX, worldArtFor } from '../world-art.js?v=df476660';
 import { oneArmSignpost } from '../street-render.js?v=881d705a';
-import { ROCK_CATALOG } from '../mining.js?v=483539b8';
+import { ROCK_CATALOG } from '../mining.js?v=674ed39b';
 import {
   HOUSE_SIGN,
   IMG_BUBBLE_MS,

@@ -27,17 +27,17 @@ import {
   sharedTreeReady,
   sharedTreeSkill,
   TRANTSFORM_VERB,
-} from '../public/js/shared-patches.js?v=311498ba';
-import { sharedPatchesFeature } from '../public/js/features/shared-patches-feature.js?v=4ab48d9c';
-import { patchesFeature } from '../public/js/features/patches-feature.js?v=7c48413d';
-import { treeDeathFeature, decorateTreeVerbs } from '../public/js/features/tree-death-feature.js?v=a7bcd25e';
-import { potionsFeature } from '../public/js/features/potions-feature.js?v=d2cffb43';
-import { powdersFeature, runPowder } from '../public/js/features/powders-feature.js?v=8fa5e05d';
-import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=69a69260';
+} from '../public/js/shared-patches.js?v=20e04ad2';
+import { sharedPatchesFeature } from '../public/js/features/shared-patches-feature.js?v=ff21e549';
+import { patchesFeature } from '../public/js/features/patches-feature.js?v=ca78263c';
+import { treeDeathFeature, decorateTreeVerbs } from '../public/js/features/tree-death-feature.js?v=e5f34a80';
+import { potionsFeature } from '../public/js/features/potions-feature.js?v=e1e8e751';
+import { powdersFeature, runPowder } from '../public/js/features/powders-feature.js?v=ea6f6c7c';
+import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=7ed39dd0';
 import { rookKeyFor } from '../public/js/rook-attack.js?v=c12e825f';
 import { rookedFromServer, syncKeys } from '../public/js/rook-mp.js?v=0b9056b1';
-import { runVerb } from '../public/content.js?v=c23b7579';
-import { isPoisoned, POISON_DURATION_MS, TREE_ANTIDOTE, TREE_POISON } from '../public/js/tree-poison.js?v=3e868dfd';
+import { runVerb } from '../public/content.js?v=bb61dce0';
+import { isPoisoned, POISON_DURATION_MS, TREE_ANTIDOTE, TREE_POISON } from '../public/js/tree-poison.js?v=5ceea244';
 import { getStreetEcologyCatalog, setStreetEcologyCatalog } from '../public/js/street-ecology.js?v=08076876';
 
 const read = (p) => readFileSync(new URL(`../${p}`, import.meta.url), 'utf8');

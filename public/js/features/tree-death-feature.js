@@ -64,11 +64,11 @@
  * treeGuilt, treeDeaths, treePoisonAutoplay.
  */
 
-import { copyFromLedger, keepsCopies } from '../copy-charges.js?v=f01dfda2';
-import { migrateClassValue } from '../tools.js?v=eff5ef6f';
+import { copyFromLedger, keepsCopies } from '../copy-charges.js?v=4ffa1c1e';
+import { migrateClassValue } from '../tools.js?v=5f482998';
 import { ITEM_CATALOG, ensureItem } from '../inventory.js?v=60dfc9ca';
 import { moodMax } from '../metabolics.js?v=8504134e';
-import { plantChoices } from '../patches.js?v=dc2b1436';
+import { plantChoices } from '../patches.js?v=3103cc6a';
 import { textureFromUrl } from '../textures.js?v=f024bd6a';
 import { displayTopOf, itemstackOverlayPoint, playSheetOverlay } from '../overlay-art.js?v=75c3ea34';
 import {
@@ -96,8 +96,8 @@ import {
   quoteAntidoteVerb,
   quotePoisonVerb,
   treeDeathOutcome,
-} from '../tree-poison.js?v=3e868dfd';
-import { patchesFeature } from './patches-feature.js?v=7c48413d';
+} from '../tree-poison.js?v=5ceea244';
+import { patchesFeature } from './patches-feature.js?v=ca78263c';
 
 export const TREE_DEATH_FEATURE_ID = 'tree-death';
 const VERB_PREFIX = 'treepoison:';

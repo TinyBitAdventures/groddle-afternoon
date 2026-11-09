@@ -11,8 +11,8 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { saleVerbs } from '../public/js/home-street-mp.js?v=ef366bb8';
-import { homeStorageFeature } from '../public/js/features/home-storage-feature.js?v=8c2166e0';
+import { saleVerbs } from '../public/js/home-street-mp.js?v=1025fad8';
+import { homeStorageFeature } from '../public/js/features/home-storage-feature.js?v=5c364668';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');

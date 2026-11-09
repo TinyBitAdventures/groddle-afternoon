@@ -19,7 +19,7 @@ import {
   itemIcon,
   ITEM_CATALOG,
 } from './inventory.js?v=60dfc9ca';
-import { GRINDER_TOOLS, canUseTool, firstWorkingTool, useToolCondition } from './tools.js?v=eff5ef6f';
+import { GRINDER_TOOLS, canUseTool, firstWorkingTool, useToolCondition } from './tools.js?v=5f482998';
 import { skillPackageDetails } from './skill-packages.js?v=bfb87281';
 import { grantMoodXp } from './mood-xp.js?v=958e7680';
 import { loseEnergy } from './metabolics.js?v=8504134e';

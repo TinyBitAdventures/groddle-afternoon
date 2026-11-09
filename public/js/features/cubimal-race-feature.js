@@ -54,7 +54,7 @@
  */
 
 import { addItem, countItem, removeItem } from '../inventory.js?v=60dfc9ca';
-import { copyForVerb, copyTag, copyTags, migrateClassTag, setCopyTag, takeToolCopy } from '../tools.js?v=eff5ef6f';
+import { copyForVerb, copyTag, copyTags, migrateClassTag, setCopyTag, takeToolCopy } from '../tools.js?v=5f482998';
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=10b5626e';
 import { landingY, walkSurfaceY } from '../walk-surface.js?v=106bfdc5';
 import { playPoofIn, poofInAlpha } from '../overlay-art.js?v=75c3ea34';
@@ -78,7 +78,7 @@ import {
   nameCubimal,
   rollCubimalRace,
 } from '../cubimals.js?v=bea49c0b';
-import { cleanCopyTagOf } from '../copy-tags.js?v=a2d357d4';
+import { cleanCopyTagOf } from '../copy-tags.js?v=7eec7d48';
 import { cubimalBattleLabel, cubimalBattleStats, cubimalTagName, cubimalTagWith } from '../cubimal-battle.js?v=62d06cf1';
 
 export const CUBIMAL_RACE_FEATURE_ID = 'cubimal-race';

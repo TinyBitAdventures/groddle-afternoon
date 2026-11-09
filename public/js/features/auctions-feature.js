@@ -43,8 +43,8 @@
  */
 
 import { ITEM_CATALOG, addItem, countItem, itemIcon, listPackSlots, removeItem } from '../inventory.js?v=60dfc9ca';
-import { scriptFromTag, scriptLabel } from '../teleportation.js?v=42d36178';
-import { TOOL_CONDITION_CATALOG, copyTagKind, leavingCopyTag, leavingToolWear, receiveToolCopy } from '../tools.js?v=eff5ef6f';
+import { scriptFromTag, scriptLabel } from '../teleportation.js?v=1050225e';
+import { TOOL_CONDITION_CATALOG, copyTagKind, leavingCopyTag, leavingToolWear, receiveToolCopy } from '../tools.js?v=5f482998';
 import { createMinnAccount } from '../minn-account.js?v=8f2741cd';
 import { saveStore } from '../save-store.js?v=8839ba7b';
 import { createItemPicker } from '../ui/item-picker.js?v=b4c84ac6';
@@ -72,7 +72,7 @@ import {
   splitEnded,
   suggestedPrice,
   unitPrice,
-} from '../auctions.js?v=3cdbb521';
+} from '../auctions.js?v=278dc46a';
 import { UNNAMED_PLAYER } from '../player-names.js?v=f9b78094';
 
 export const AUCTIONS_FEATURE_ID = 'auctions';

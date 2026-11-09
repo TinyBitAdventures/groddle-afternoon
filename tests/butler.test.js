@@ -70,14 +70,14 @@ import {
 } from '../public/js/butler.js?v=2c95c064';
 import { canOptIn, stoneVog, STONE_TEXT } from '../public/js/street-furniture.js?v=55131f49';
 import { NEIGHBOURS, neighbourById, normalizeNeighbourState, visitorLetter } from '../public/js/neighbours.js?v=161fc2e5';
-import { butlerApi, butlerFeature } from '../public/js/features/butler-feature.js?v=fb03206c';
+import { butlerApi, butlerFeature } from '../public/js/features/butler-feature.js?v=a1137652';
 // The URL clubhouse.js imports, so these share its Butler.
-import { butlerApi as clubButler, butlerFeature as clubButlerFeature } from '../public/js/features/butler-feature.js?v=fb03206c';
-import { PART_1 as JOIN_CLUB, REMINISCE as JOIN_CLUB_REMINISCE, room as clubRoom } from '../public/js/quest-rooms/clubhouse.js?v=ec5ceda7';
+import { butlerApi as clubButler, butlerFeature as clubButlerFeature } from '../public/js/features/butler-feature.js?v=a1137652';
+import { PART_1 as JOIN_CLUB, REMINISCE as JOIN_CLUB_REMINISCE, room as clubRoom } from '../public/js/quest-rooms/clubhouse.js?v=1094a9fe';
 import { BUTLER_FEET, ButlerPainter, clipRange, drawList } from '../public/js/butler-rig.js?v=e81817d9';
 import { OFFER_OVERRIDES } from '../public/js/quest-rooms/catalog.js?v=d77d3d17';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=10b118dd';
-import { npcQuestOffers, pendingQuestOffers } from '../public/js/quest-offers.js?v=a7ee5b8f';
+import { npcQuestOffers, pendingQuestOffers } from '../public/js/quest-offers.js?v=9c53455c';
 import { createQuestState } from '../public/js/quests.js?v=2b882eb6';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');

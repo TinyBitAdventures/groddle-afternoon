@@ -11,7 +11,7 @@
       "assets/content/signpost-graph.json": "c618fc41",
       "assets/content/street-ecology.json": "52c389c0",
       "assets/content/style-profiles.json": "1a7e5474",
-      "assets/content/trade-items.json": "f12a69ec",
+      "assets/content/trade-items.json": "962cd9b4",
       "assets/decos/groddle/apartment_poster_discover_ix@1.75x.webp": "ef40fd18",
       "assets/decos/groddle/cubicle_wall_left@1.75x.webp": "24d9d9be",
       "assets/decos/groddle/cubicle_wall_right@1.75x.webp": "7e9ee033",

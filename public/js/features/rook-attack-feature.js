@@ -125,8 +125,8 @@ import {
   syncObjs,
 } from '../rook-mp.js?v=0b9056b1';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
-import { copyChargesLeft, copyFromLedger, keepsCopies, spendCopyCharge, verbCopy } from '../copy-charges.js?v=f01dfda2';
-import { migrateClassValue } from '../tools.js?v=eff5ef6f';
+import { copyChargesLeft, copyFromLedger, keepsCopies, spendCopyCharge, verbCopy } from '../copy-charges.js?v=4ffa1c1e';
+import { migrateClassValue } from '../tools.js?v=5f482998';
 import { feedZone, placeRookBadge, unionBox } from '../rook-badge-place.js?v=2bb00dfd';
 
 export const ROOK_FEATURE_ID = 'rook-attack';

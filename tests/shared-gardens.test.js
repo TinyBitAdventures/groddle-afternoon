@@ -10,11 +10,11 @@ import { execFileSync, spawnSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { describe, it } from 'node:test';
 
-import { SEED_CATALOG, createGarden, harvestPlot, plantPlot, tickGarden, waterAllPlots, waterPlot } from '../public/js/garden.js?v=d965f416';
+import { SEED_CATALOG, createGarden, harvestPlot, plantPlot, tickGarden, waterAllPlots, waterPlot } from '../public/js/garden.js?v=eae8b052';
 import { GARDEN_LOCK_MS, LOCK_LINE, SHARED_GARDEN_STREETS, applyPlot, isSharedGardenStreet, localPlot, lockedFor, parsePlotId, plotId, rollPasses } from '../public/js/shared-gardens.js?v=47984e60';
-import { sharedGardensFeature } from '../public/js/features/shared-gardens-feature.js?v=b4823dc9';
-import { FEATURES } from '../public/js/features/index.js?v=873deed1';
-import { mgDetails, potionPlotCount } from '../public/js/master-garden.js?v=caa7ac2e';
+import { sharedGardensFeature } from '../public/js/features/shared-gardens-feature.js?v=0f69ec43';
+import { FEATURES } from '../public/js/features/index.js?v=aa3b665d';
+import { mgDetails, potionPlotCount } from '../public/js/master-garden.js?v=bcd9ac74';
 // A fresh pick's save waits for the server's receipt (GRANT_SAVE_DELAY_MS): the tests wait it out.
 const settle = () => new Promise((res) => setTimeout(res, 2700));
 import { HAS_SITE, SITE_DIR, serverPath, sitePath, skipWithoutServer } from '../tools/repos.mjs';

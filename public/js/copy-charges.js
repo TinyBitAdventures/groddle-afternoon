@@ -11,7 +11,7 @@
  */
 
 import { removeItem } from './inventory.js?v=60dfc9ca';
-import { TOOL_CONDITION_CATALOG, chargesLeft, copyForVerb, setToolRemaining, useCharge } from './tools.js?v=eff5ef6f';
+import { TOOL_CONDITION_CATALOG, chargesLeft, copyForVerb, setToolRemaining, useCharge } from './tools.js?v=5f482998';
 
 /** Whether this engine keeps `classTsid` per copy. */
 export function keepsCopies(engine, classTsid) {
