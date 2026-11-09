@@ -101,7 +101,7 @@
  *   animalMoodRooting (Piggies rooting now), animalMoodLast (root:look | root:sniff).
  */
 
-import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=f7d1852a';
+import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=10b5626e';
 import { nearestSurfaceY } from '../walk-surface.js?v=106bfdc5';
 import { displayTopOf, itemstackOverlayPoint, playSheetOverlay } from '../overlay-art.js?v=75c3ea34';
 import { isInHell } from '../hell.js?v=33a46876';
@@ -110,7 +110,7 @@ import { TRANT_META, trantStatusLabel } from '../trants.js?v=1b3c8ae3';
 import { animalStatusLabel } from '../animals.js?v=c2d5ecf3';
 import { quoteAnimalKinship } from '../animal-kinship.js?v=ae02d8d3';
 import { captureVerbState, isFoodItem, itemLabel } from '../animal-husbandry.js?v=6d330f7b';
-import { ROOK_SHEETS, rookAttackFeature } from './rook-attack-feature.js?v=34106aec';
+import { ROOK_SHEETS, rookAttackFeature } from './rook-attack-feature.js?v=d8ef5dcc';
 import { ANIMAL_BODY, ANIMAL_PATROL, TREE_FOOTPRINT } from '../street-ecology.js?v=08076876';
 import {
   CHECK_ON_REMOVE,
@@ -204,8 +204,12 @@ export const PIGGY_MOOD_SHEETS = Object.freeze({
   tooMuchNibble: Object.freeze({ path: 'assets/sprites/npc_piggy__x1_too_much_nibble_png_1354829441.webp', fw: 88, fh: 62, cols: 11, frames: 65 }),
   chew: Object.freeze({ path: 'assets/sprites/npc_piggy__x1_chew_png_1354829433.webp', fw: 88, fh: 62, cols: 11, frames: 53 }),
   rooked2: Object.freeze({ path: 'assets/sprites/rooks/piggy-rooked2.webp', fw: 88, fh: 62, cols: 8, frames: 24 }),
-  // onRooting's look_screen. Its sniff has no clip in the CC0 exports: the chew clip stands in.
+  // onRooting's look_screen.
   lookScreen: Object.freeze({ path: 'assets/sprites/npc_piggy__x1_look_screen_png_1354829434.webp', fw: 88, fh: 62, cols: 10, frames: 48 }),
+  // onRooting's sniff (G507, G605): the pig clip's "root" (frames 251-299), which only Tiny Speck's
+  // authoring file glitch-items/inhabitants/piggy/npc_piggy.fla keeps (the published SWF and the OGA
+  // sheets have none), drawn by tools/vector-sprites/fla-labels.mjs (CC0). Before it the chew stood in.
+  root: Object.freeze({ path: 'assets/sprites/npc_piggy__x1_root.webp', fw: 88, fh: 62, cols: 10, frames: 49 }),
 });
 
 /**
@@ -508,7 +512,7 @@ function startRoot(engine, r, time, rng = Math.random) {
   r.rootKind = look ? 'look' : 'sniff';
   r.rootUntil = time + (look ? PIGGY_ROOTING.lookMs : PIGGY_ROOTING.sniffMs);
   // Played once: look_screen ends facing you and stays so until it walks on.
-  if (!playClip(engine, r, look ? PIGGY_MOOD_SHEETS.lookScreen : PIGGY_MOOD_SHEETS.chew, { restore: false })) standStill(engine, r);
+  if (!playClip(engine, r, look ? PIGGY_MOOD_SHEETS.lookScreen : PIGGY_MOOD_SHEETS.root, { restore: false })) standStill(engine, r);
   lastEvent = `root:${r.rootKind}`;
 }
 
@@ -1623,7 +1627,7 @@ export const animalMoodFeature = {
     if (pose === 'look') {
       if (!playClip(engine, r, PIGGY_MOOD_SHEETS.lookScreen, { restore: false })) standStill(engine, r);
     } else if (pose === 'sniff') {
-      if (!playClip(engine, r, PIGGY_MOOD_SHEETS.chew, { restore: false })) standStill(engine, r);
+      if (!playClip(engine, r, PIGGY_MOOD_SHEETS.root, { restore: false })) standStill(engine, r);
     } else if (pose === 'stand' || pose === 'eat') {
       // At its food (a server trip's pause) it stands, after any chew the server's "ate" played.
       standStill(engine, r);

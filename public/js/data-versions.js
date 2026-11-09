@@ -32,6 +32,8 @@
       "assets/sprites/interrogation/waiting-chair-red.svg": "298e5bf4",
       "assets/sprites/newxp/chain_hang@3x.webp": "18cd0e08",
       "assets/sprites/newxp/chain_pull@3x.webp": "46368dd4",
+      "assets/sprites/npc_piggy__x1_root.webp": "94143902",
+      "assets/sprites/npc_piggy__x1_root@3x.webp": "a03d58ea",
       "assets/sprites/overlays/click_to_prime@1.5x.webp": "9a5f6f88",
       "assets/sprites/overlays/eyeballing.frames.json": "baaf68dc",
       "assets/sprites/overlays/eyeballing@2x.webp": "c95a6898",

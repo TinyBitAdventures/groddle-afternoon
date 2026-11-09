@@ -1,0 +1,17 @@
+{
+ "_doc": "Clips only Tiny Speck's CC0 authoring files keep (tools/vector-sprites/fla-labels.mjs). fla: under glitch-items; clip: the library symbol on the main timeline; box: the stage area rendered, stage px; ref: a label the shipped @3x sheet has, to find the placement; sheets: the labels to write (public/<out>.webp and @3x).",
+ "jobs": [
+  {
+   "fla": "inhabitants/piggy/npc_piggy.fla",
+   "clip": "pig",
+   "fw": 88,
+   "fh": 62,
+   "box": [-40, -40, 170, 140],
+   "minScore": 0.95,
+   "ref": { "label": "chew", "sheet": "assets/sprites/npc_piggy__x1_chew_png_1354829433@3x.webp", "cols": 11, "frames": 53 },
+   "sheets": [
+    { "label": "root", "cols": 10, "out": "assets/sprites/npc_piggy__x1_root" }
+   ]
+  }
+ ]
+}

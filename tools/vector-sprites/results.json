@@ -59418,5 +59418,22 @@
   "frameScores": [
    0.3763
   ]
+ },
+ "assets/sprites/npc_piggy__x1_root.webp": {
+  "animal": "pig",
+  "source": "fla",
+  "fla": "inhabitants/piggy/npc_piggy.fla",
+  "label": "root",
+  "cells": 49,
+  "fw": 88,
+  "fh": 62,
+  "offset3x": [
+   -120,
+   -117
+  ],
+  "score": 0.9891,
+  "status": "ok",
+  "hires": "assets/sprites/npc_piggy__x1_root@3x.webp",
+  "firstDraw": true
  }
 }

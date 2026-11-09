@@ -7,7 +7,7 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { HIRES_SPRITES, SPLIT_SPRITES, hiresSpriteUrl, installHiresSprites, upgradeSource } from '../public/js/sprite-hires.js?v=37ca7427';
+import { HIRES_SPRITES, SPLIT_SPRITES, hiresSpriteUrl, installHiresSprites, upgradeSource } from '../public/js/sprite-hires.js?v=ac5f0e68';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const pub = join(root, 'public');
@@ -73,6 +73,12 @@ describe('3x vector sprite sheets', () => {
   it('every listed sheet matched its OGA frames after the 3:1 downscale', () => {
     for (const [path, r] of Object.entries(results)) {
       if (r.status !== 'ok') continue;
+      // A clip only an authoring file keeps (tools/vector-sprites/fla-labels.mjs, G605) has no OGA cells:
+      // its placement was scored on a reference label the OGA sheets do have (fla-labels-results.json).
+      if (r.source === 'fla') {
+        assert.ok(r.score >= 0.95, `${path} reference score ${r.score}`);
+        continue;
+      }
       // A job's own bar (harvestables.json ice knobs, G448, with its minScoreWhy) is never under 0.88.
       assert.ok(r.minScore === undefined || r.minScore >= 0.88, path);
       assert.ok(r.score >= (r.minScore ?? 0.9), `${path} score ${r.score}`);

@@ -20,7 +20,7 @@ import {
   syncObjs,
 } from '../public/js/rook-mp.js?v=0b9056b1';
 import { rookClockS, canStrike, canStun, rookPresent } from '../public/js/rook-attack.js?v=c12e825f';
-import { orbGlowIds } from '../public/js/features/rook-attack-feature.js?v=34106aec';
+import { orbGlowIds } from '../public/js/features/rook-attack-feature.js?v=d8ef5dcc';
 import { HAS_SERVER, serverPath, skipWithoutServer } from '../tools/repos.mjs';
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
