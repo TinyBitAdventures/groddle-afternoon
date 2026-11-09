@@ -97,7 +97,7 @@
  */
 
 import { createMinnAccount } from '../minn-account.js?v=8f2741cd';
-import { runStreetTransition } from '../screen-fx.js?v=b4ec277f';
+import { runStreetTransition } from '../screen-fx.js?v=81177be4';
 import { STREET_INDEX } from '../street-loader.js?v=18b181ad';
 import { ITEM_CATALOG, addItem, countItem, listPackItemSlots, removeItem } from '../inventory.js?v=60dfc9ca';
 import { cultivationDef, homeStreetLayout } from '../home-cultivation.js?v=9571e110';

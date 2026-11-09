@@ -8,7 +8,7 @@
  */
 
 import { ACHIEVEMENT_DROP, ACHIEVEMENT_ROCK_WH, achievementBubbleText, easeOutBounce, mountPetRock } from './familiar.js?v=5fd83250';
-import { formatLoadingTime, ordinal } from './exploration.js?v=aa0bd00c';
+import { formatLoadingTime, ordinal } from './exploration.js?v=68f27989';
 import { isModernSkin, momentArt, momentArtShape, rewardChips } from './ui/moment-card.js?v=68e10b61';
 
 /**

@@ -20,7 +20,7 @@ import {
   promptChoices,
   promptStackHasRoom,
   usesIconButtons,
-} from '../public/js/prompt-stack.js?v=c67c01b5';
+} from '../public/js/prompt-stack.js?v=f8aea2cf';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const pub = join(here, '../public');

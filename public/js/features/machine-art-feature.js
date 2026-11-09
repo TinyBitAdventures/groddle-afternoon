@@ -20,7 +20,7 @@
 
 import { addItem, countItem } from '../inventory.js?v=60dfc9ca';
 import { ensureToolCondition } from '../tools.js?v=5f482998';
-import { MACHINE_SKILLS } from '../machine-rooms.js?v=0a46ca80';
+import { MACHINE_SKILLS } from '../machine-rooms.js?v=1be82048';
 import { freezeMachineState, isMachineArt } from '../machine-art.js?v=f7c72c6f';
 
 export const MACHINE_ART_FEATURE_ID = 'machine-art';

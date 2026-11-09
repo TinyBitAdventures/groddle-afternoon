@@ -1388,7 +1388,7 @@
 {"s":"achievements","id":"bounder_untenured","n":"Bounder, Untenured","g":"Player","st":"source","ic":"assets/badges/bounder_untenured.webp","h":"encyclopedia/achievements/bounder_untenured/"},
 {"s":"achievements","id":"bowser","n":"Bowser","g":"Industrial","st":"source","ic":"assets/badges/bowser.webp","h":"encyclopedia/achievements/bowser/"},
 {"s":"achievements","id":"brazier_apprentice","n":"Brazier Apprentice","g":"Cooking","st":"source","ic":"assets/badges/brazier_apprentice.webp","h":"encyclopedia/achievements/brazier_apprentice/"},
-{"s":"achievements","id":"brillah_completist","n":"Brillah Completist","g":"Exploring","st":"unbuilt_original","ic":"assets/badges/brillah_completist.webp","h":"encyclopedia/achievements/brillah_completist/"},
+{"s":"achievements","id":"brillah_completist","n":"Brillah Completist","g":"Exploring","st":"source","ic":"assets/badges/brillah_completist.webp","h":"encyclopedia/achievements/brillah_completist/"},
 {"s":"achievements","id":"broil_king","n":"Broil King","g":"Cooking","st":"source","ic":"assets/badges/broil_king.webp","h":"encyclopedia/achievements/broil_king/"},
 {"s":"achievements","id":"bubble_coaxer","n":"Bubble Coaxer","g":"Trees","st":"source","ic":"assets/badges/bubble_coaxer.webp","h":"encyclopedia/achievements/bubble_coaxer/"},
 {"s":"achievements","id":"bubble_tea_aficionado","n":"Bubble Tea Aficionado","g":"Player","st":"source","ic":"assets/badges/bubble_tea_aficionado.webp","h":"encyclopedia/achievements/bubble_tea_aficionado/"},

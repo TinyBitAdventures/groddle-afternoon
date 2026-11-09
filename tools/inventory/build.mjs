@@ -82,6 +82,7 @@ import { keyOf as moduleKeyOf } from '../module-keys/build.mjs';
 import { buildIndex, contextLiterals, inventoryWrites, listJsFiles, literalIndex, literalRoles, liveFiles, namesReached, qaAt, useRole, matchPattern, patternString, scanEmissions, spawnTemplates, templatePatterns } from './scan.mjs';
 import * as G from './gsjs-data.mjs';
 import * as D from './detectors.mjs';
+import { withAchievementOverrides } from '../achievement-overrides.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
 export const SPIKE = join(here, '..', '..');
@@ -366,7 +367,8 @@ export async function collect({ spike = SPIKE, log = () => {} } = {}) {
   const tagIndex = G.readItemTags(gsjs);
   for (const [k, v] of tagIndex) tagIndex.set(k, [...new Set(v.map((t) => t.replace(/,$/, '')))]);
   const items = G.readItems(gsjs, tagIndex);
-  const achievements = G.readAchievements(gsjs);
+  // Conditions the remake adds where Tiny Speck's file has none (#154, cited in the table).
+  const achievements = withAchievementOverrides(G.readAchievements(gsjs));
   const skills = G.readSkills(gsjs);
   const buffIds = G.readBuffIds(gsjs);
   const questIds = G.readQuestIds(gsjs);

@@ -110,6 +110,72 @@ export function applyStreetVisit({ state, tsid, hubId, indexStreets = {}, apply 
   return results;
 }
 
+/**
+ * #154: hub Completist progress from the saved street lists. Badge progress only
+ * moves on a street's first visit, so a badge whose condition arrived later (Brillah
+ * Completist) never saw the streets a save had already walked. On load every
+ * Completist (a `streets_visited_in_hub:number_<hub>` counter, or a group_count over
+ * `streets_visited_in_hub_<hub>` like Haraiva's) is raised to what
+ * `state.groups.streets_visited_in_hub_<hub>` implies, by streetVisitCounters' rule
+ * (the counting streets seen; the hub map's full count once every kept street is
+ * seen), never lowered and capped at the condition. A badge that now has every
+ * condition goes through `unlock(id)` (the caller's normal award).
+ * @param {object} args
+ * @param {{ unlocked: string[], progress: object, groups?: object }} args.state
+ * @param {Record<string, { conditions?: object[] }>} args.catalog
+ * @param {Record<string, object>} [args.indexStreets]
+ * @param {(id: string) => any} [args.unlock]
+ * @returns {{ classTsid: string, unlocked: boolean, def: object, rewards?: any }[]}
+ */
+export function topUpCompletists({ state, catalog, indexStreets = {}, unlock = null }) {
+  const out = [];
+  const implied = (hub) => {
+    const seen = new Set((state.groups?.[`streets_visited_in_hub_${hub}`] || []).filter((tsid) => countsTowardHub(tsid, hub)));
+    const available = availableHubStreets(hub, indexStreets);
+    const allKept = available.length > 0 && available.every((id) => seen.has(id));
+    return allKept ? Math.max(hubMapStreetCount(hub), seen.size) : seen.size;
+  };
+  const hubOf = (c) => {
+    if (c.type !== 'group_count' && c.group === 'streets_visited_in_hub') {
+      const m = /^number_(\d+)$/.exec(String(c.name || ''));
+      return m ? m[1] : null;
+    }
+    if (c.type === 'group_count') {
+      const m = /^streets_visited_in_hub_(\d+)$/.exec(String(c.group || ''));
+      return m ? m[1] : null;
+    }
+    return null;
+  };
+  for (const [id, def] of Object.entries(catalog || {})) {
+    if (state.unlocked?.includes(id)) continue;
+    const conds = def.conditions || [];
+    const hubConds = conds.filter((c) => {
+      const hub = hubOf(c);
+      return hub != null && !HUBS_COUNTED_ELSEWHERE.has(hub);
+    });
+    if (!hubConds.length) continue;
+    let raised = false;
+    for (const c of hubConds) {
+      const value = Math.min(Number(c.num) || 0, implied(hubOf(c)));
+      const prog = state.progress?.[id]?.progress || {};
+      if (value > (prog[c.name] || 0)) {
+        if (!state.progress[id]) state.progress[id] = { progress: {} };
+        state.progress[id].progress[c.name] = value;
+        raised = true;
+      }
+    }
+    if (!raised) continue;
+    const done = conds.every((c) => (state.progress[id].progress[c.name] || 0) >= c.num);
+    if (done && typeof unlock === 'function') {
+      const r = unlock(id);
+      out.push({ classTsid: id, unlocked: true, rewards: r?.rewards, def });
+    } else {
+      out.push({ classTsid: id, unlocked: false, def });
+    }
+  }
+  return out;
+}
+
 /* ------------------------------------------------------------------ loading card */
 
 /**

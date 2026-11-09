@@ -4,12 +4,12 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=396e6ee3';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=127e0a3c';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=569e71af';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=5e90e725';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
 import { createVogOverlay } from './js/vog-overlay.js?v=c2a9cc07';
-import { createPromptStack } from './js/prompt-stack.js?v=c67c01b5';
+import { createPromptStack } from './js/prompt-stack.js?v=f8aea2cf';
 import { createWindowStack } from './js/window-stack.js?v=a7104f02';
 import { HOG_HAUL_SPLASH, createGameSplash, splashFor } from './js/game-splash.js?v=ea0433a7';
 import {
@@ -397,12 +397,13 @@ import {
 } from './js/achievements.js?v=2e4aa9cb';
 import {
   applyStreetVisit,
+  topUpCompletists,
   STREET_VISITS_SLOT,
   loadingCardDetails,
   loadingVisitLine,
   recordStreetEntry,
   streetLoadingVisit,
-} from './js/exploration.js?v=aa0bd00c';
+} from './js/exploration.js?v=68f27989';
 import { createCombobox, createSuggestBox, watchSelects } from './js/combobox.js?v=d43209e8';
 import {
   INCANTATION_LINES,
@@ -756,7 +757,7 @@ import {
   streetCardUp,
   STREET_CARD_UP,
   POL_OWNER_SIZE,
-} from './js/screen-fx.js?v=b4ec277f';
+} from './js/screen-fx.js?v=81177be4';
 import { momentMoreText } from './js/ui/moment-card.js?v=68e10b61';
 // HUB: the hub is the Modern skin's; Classic owns X in its skin (js/classic/classic-hub.js).
 import { MODERN, onUiModeChange, uiState } from './js/classic/ui-mode.js?v=11da9030';
@@ -768,7 +769,7 @@ import './js/classic/classic-zoom.js?v=3e4e5747';
 import { mountImaginationHub } from './js/ui/imagination-hub.js?v=51fa371f';
 import { newDayBubble, shuffleNewDayMessages, waitForScreenGates } from './js/screen-queue.js?v=cf0132c0';
 import { applyFamiliarLook, familiarCardHeading, familiarLook, skillArtFor, skillLearnedActivity } from './js/familiar.js?v=5fd83250';
-import { armPromptTimeout, promptTimeoutMs } from './js/prompt-timeout.js?v=4ed116c4';
+import { armPromptTimeout, promptTimeoutMs } from './js/prompt-timeout.js?v=b38c9757';
 import {
   planTravel,
   listMapDestinations,
@@ -11576,11 +11577,20 @@ function recordStreetVisit(tsid, { announce = true } = {}) {
  * visited once (persistentWorldState keeps one slot per visited street).
  */
 function backfillStreetVisits() {
-  if (groupLabelCount(achieveState, 'locations_visited') > 0) return;
   const updates = [];
-  for (const tsid of Object.keys(persistentWorldState.streets || {})) {
-    updates.push(...recordStreetVisit(tsid, { announce: false }));
+  if (groupLabelCount(achieveState, 'locations_visited') === 0) {
+    for (const tsid of Object.keys(persistentWorldState.streets || {})) {
+      updates.push(...recordStreetVisit(tsid, { announce: false }));
+    }
   }
+  // #154: Completists from the saved street lists (a condition added later, e.g.
+  // Brillah Completist, never saw the streets walked before it), awarded as usual.
+  updates.push(...topUpCompletists({
+    state: achieveState,
+    catalog: getAchievementCatalog(),
+    indexStreets: STREET_INDEX.streets,
+    unlock: (id) => unlockAchievement(achieveState, id, pc),
+  }));
   announceAchievementUpdates(updates);
 }
 
@@ -31697,7 +31707,7 @@ async function main() {
   }
   // Loading card QA (js/loading-card-qa.js): ?loadcarddemo=<tsid>[,<tsid>].
   if (new URLSearchParams(location.search).has('loadcarddemo')) {
-    import('./js/loading-card-qa.js?v=93bf5bb3').then((m) => m.runLoadingCardDemo({ engine, travel: (tsid) => enterStreetWithTransition(tsid), params: new URLSearchParams(location.search) }));
+    import('./js/loading-card-qa.js?v=8c6cf920').then((m) => m.runLoadingCardDemo({ engine, travel: (tsid) => enterStreetWithTransition(tsid), params: new URLSearchParams(location.search) }));
   }
   installMoreMenu();
   installPlayerMenu();
