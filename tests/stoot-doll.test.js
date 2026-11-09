@@ -31,12 +31,12 @@ import {
   createShrineState,
   listShrineDonationOptions,
   quoteShrineDonation,
-} from '../public/js/shrines.js?v=164b1234';
+} from '../public/js/shrines.js?v=9e895525';
 import {
   createVendorSellQuote,
   listSellOffers,
   vendorSell,
-} from '../public/js/vendor.js?v=afdebbe1';
+} from '../public/js/vendor.js?v=cf56a21c';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 

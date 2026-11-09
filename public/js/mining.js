@@ -310,7 +310,8 @@ export function mineRock(rock, inv, pc, opts = {}) {
   const def = ROCK_CATALOG[rock.classTsid] || Object.values(ROCK_CATALOG).find((r) => r.rockType === rock.rockType);
   const msgs = [];
   if (!rock || rock.depleted || rock.chunksRemaining <= 0) {
-    return { ok: false, reason: 'depleted', msgs: ['This rock is mined out. Wait for it to respawn.'] };
+    // include/mining.js 214-217: isUseable (chunks_remaining > 0) or this line.
+    return { ok: false, reason: 'depleted', msgs: ['This is not the rock you are looking for.'] };
   }
   const skilled = Array.isArray(opts.learned) ? opts.learned : undefined;
   const upgrades = Array.isArray(opts.upgrades) ? opts.upgrades : pc?.imaginationUpgrades || [];
@@ -324,7 +325,8 @@ export function mineRock(rock, inv, pc, opts = {}) {
     return {
       ok: false,
       reason: ownsPick && opts.toolState ? 'broken_tool' : 'no_pick',
-      msgs: [ownsPick ? 'Your pick has become broken, and must be repaired.' : "You'll need a pick first."],
+      // A broken pick is no pick (rock_beryl_1.js verbs.mine conditions 193-214, ticket 63).
+      msgs: ["You'll need a pick first."],
     };
   }
   if (opts.requireSkill !== false) {
@@ -332,7 +334,8 @@ export function mineRock(rock, inv, pc, opts = {}) {
       return {
         ok: false,
         reason: 'skill',
-        msgs: ['You need Mining I to swing a pick.'],
+        // rock_metal_1.js verbs.mine conditions 193-196 (skills_get_name: "Mining I").
+        msgs: ['You need to know Mining I to use this.'],
       };
     }
   }
@@ -474,7 +477,8 @@ export function smeltMetalRocks(inv, pc, opts = {}) {
   if (opts.requireSkill !== false) {
     const learned = opts.learned || [];
     if (!learned.includes(SMELT_COSTS.skill)) {
-      return { ok: false, reason: 'skill', msgs: ['You need Smelting to use a Smelter.'] };
+      // smelter.js verbs.smelt conditions 323-329.
+      return { ok: false, reason: 'skill', msgs: ['You need to know Smelting I to use this.'] };
     }
   }
   const ingots = chunks / per;
@@ -540,12 +544,13 @@ export function crushOre(inv, pc, oreId, opts = {}) {
   }
   // dullite.js:108: a working Grinder or Grand Ol' Grinder.
   if (opts.requireTool !== false && !GRINDER_TOOLS.some((id) => hasMiningTool(inv, id))) {
-    return { ok: false, reason: 'no_grinder', msgs: ['You need a Grinder to crush ore.'] };
+    return { ok: false, reason: 'no_grinder', msgs: ['You could crush this with a working Grinder.'] };
   }
   if (opts.requireSkill !== false) {
     const learned = opts.learned || [];
     if (!learned.includes(REFINE_COSTS.skill) && !learned.includes('refining_2')) {
-      return { ok: false, reason: 'skill', msgs: ['You need Refining to use a Grinder.'] };
+      // ore_grinder.js verbs.grind conditions 341-343.
+      return { ok: false, reason: 'skill', msgs: ['You need to know Refining I to use this.'] };
     }
   }
   // Refining II halves the grind time and lowers energy (4→3) and wear (2→1).
@@ -614,53 +619,53 @@ export function rockStatusLabel(rock) {
 
 export function ensureMiningItems() {
   const defs = {
-    pick: { label: 'Pick', desc: 'A relatively sturdy pick for mining.', isTool: true },
+    pick: { label: 'Pick', desc: "A relatively sturdy pick, without which mining cannot be done. A plain pick takes care of business, but it's not designed to last.", isTool: true },
     fancy_pick: {
       label: 'Fancy Pick',
-      desc: 'Super-deluxe pick. More durability.',
+      desc: "A super-deluxe fancy pick for fancy miners. Okay, maybe it doesn't look that fancy on the outside. It's the inside that counts.",
       isTool: true,
     },
     smelter: {
       label: 'Smelter',
-      desc: 'Turn metal rock into Plain Metal Ingots.',
+      desc: 'Extracting purest metal from even the dullest chunk of Metal Rock, this classic Smelter is the second step to creating all manner of exciting secondary metals. (Learning Smelting is step one.)',
       isTool: true,
     },
     ore_grinder: {
       label: 'Grinder',
-      desc: 'Crush ore into alchemical elements.',
+      desc: 'A sturdy, no-nonsense grinder. Harness its awesome power to grind rocks (and those rock-like barnacles) into alchemical elements.',
       isTool: true,
     },
     metalmaker: {
       label: 'Metal Machine',
-      desc: 'Forge rods and bars from metals.',
+      desc: 'A bangy, squeaky, marvellous red-hot metal machine. For the mutation of Plain Metal, Tin, Copper and Molybdenum into Metal Rods, Bars and Girders. None more metal.',
       isTool: true,
     },
     alchemical_tongs: {
       label: 'Alchemical Tongs',
-      desc: 'Transform Plain Metal with elements.',
+      desc: 'Handy bendy Alchemical Tongs help you to create exciting metals like Tin, Copper and Molybdenum by adding elements to boring old hot smelted metal.',
       isTool: true,
     },
     metal_rock: {
       label: 'Chunk of Metal Rock',
-      desc: 'Smelt five into a Plain Metal Ingot.',
+      desc: "Chunky and metally, this rock, when smelted, makes Plain Metal. Boring maybe, but it's an excellent base for more ambitious alchemical experimentation.",
     },
-    dullite: { label: 'Dullite', desc: 'Common ore. Crush for elements.' },
-    beryl: { label: 'Beryl', desc: 'Greenish ore. Crush for elements.' },
-    sparkly: { label: 'Sparkly', desc: 'Shiny ore. Crush for elements (incl. shiny).' },
+    dullite: { label: 'Dullite', desc: 'A hefty chunk of dullite. What it lacks in sparkliness it makes up for in, um, dullness.' },
+    beryl: { label: 'Beryl', desc: "Halfway between sparkly and dull, it's an innocuous chunk of beryl." },
+    sparkly: { label: 'Sparkly', desc: "It's a pleasantly twinkly chunk of sparkly!" },
     plain_metal: {
       label: 'Plain Metal Ingot',
-      desc: 'Base metal for alchemy and metalworking.',
+      desc: 'Sure, this metal is plain, but with the aid of Alchemical Tongs, Alchemy II and a secret blend of elemental ingredients, more exciting metal materials can be made.',
     },
-    tin: { label: 'Tin', desc: 'Alchemized metal.' },
-    copper: { label: 'Copper', desc: 'Alchemized metal.' },
-    molybdenum: { label: 'Molybdenum', desc: 'Alchemized metal.' },
-    metal_rod: { label: 'Metal Rod', desc: 'Tin + plain metal.' },
-    metal_post: { label: 'Metal Bar', desc: 'Copper + tin.' },
-    fuel_cell: { label: 'Fuel Cell', desc: 'Powers Metal Machine jobs.' },
-    element_red: { label: 'Red Element', desc: 'Alchemical element from refining.' },
-    element_green: { label: 'Green Element', desc: 'Alchemical element from refining.' },
-    element_blue: { label: 'Blue Element', desc: 'Alchemical element from refining.' },
-    element_shiny: { label: 'Shiny Element', desc: 'Rare element from sparkly ore.' },
+    tin: { label: 'Tin', desc: "It's tin." },
+    copper: { label: 'Copper', desc: 'Pliable yet strong, malleably magnificent, copper is a much-prized material for building. A glitch bearing good, strong copper will always be welcome on a building project.' },
+    molybdenum: { label: 'Molybdenum', desc: "The glint off a good piece of Molybdenum is like glimpsing into the future. That's why it's used for sophisticated and desirable electronic gadgetry." },
+    metal_rod: { label: 'Metal Rod', desc: 'Metal Rod, made of tin and plain metal, is not only useful for the yet unimagined construction purposes, but is also a much beloved snack of a Sloth.' },
+    metal_post: { label: 'Metal Bar', desc: 'A post made of metal. Good for arduous construction, securing Mineshafts, and doing daring dances on while people tuck herbs into your elasticated pants (probably not all at the same time).' },
+    fuel_cell: { label: 'Fuel Cell', desc: 'Hundreds of tiny power-pellets in each capsule provide gigajoules of energy to fuel the machines.' },
+    element_red: { label: 'Red Element', desc: 'An element is the basic building block of all stuff. This one is red.' },
+    element_green: { label: 'Green Element', desc: 'An element is the basic building block of all stuff. This one is green.' },
+    element_blue: { label: 'Blue Element', desc: 'An element is the basic building block of all stuff. This one is blue.' },
+    element_shiny: { label: 'Shiny Element', desc: 'An element is the basic building block of all stuff. This one is shiny.' },
   };
   for (const [id, meta] of Object.entries(defs)) {
     ensureItem(id, meta);

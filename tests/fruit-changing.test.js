@@ -17,7 +17,7 @@ import {
   loadRecipeCatalogFromFile,
   starterCraftIngredients,
   starterToolsInventory,
-} from '../public/js/making.js?v=b0053dac';
+} from '../public/js/making.js?v=d29c39c7';
 import {
   ITEM_CATALOG,
   countItem,
@@ -69,7 +69,8 @@ describe('official Fruit Changing Machine catalog', () => {
     const tool = TOOL_CATALOG.fruit_changing_machine;
     assert.equal(tool.label, 'Fruit Changing Machine');
     assert.equal(tool.action, 'convert');
-    assert.match(tool.desc, /transmogrifies cherries/i);
+    // items/fruit_changing_machine.js var description, verbatim (G318).
+    assert.match(tool.desc, /^A triple-carbine fruit-changing machine. It will transmogrify cherries into other fruit./);
     const inv = createInventory(starterToolsInventory());
     const tools = listPackToolSlots(inv);
     assert.ok(tools.some((slot) => slot.classTsid === 'fruit_changing_machine'));

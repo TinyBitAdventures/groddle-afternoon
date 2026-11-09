@@ -27,11 +27,11 @@ import {
 } from '../public/js/elemental-pouch.js?v=ceefa97a';
 import { bagsFeature } from '../public/js/features/bags-feature.js?v=1a8252c1';
 import { runMoreVerb } from '../public/js/features/item-verbs-more-feature.js?v=ceffd94a';
-import { pouchFeature } from '../public/js/features/elemental-pouch-feature.js?v=52e45e2a';
-import { FEATURES } from '../public/js/features/index.js?v=dbf889ab';
+import { pouchFeature } from '../public/js/features/elemental-pouch-feature.js?v=c157a8a5';
+import { FEATURES } from '../public/js/features/index.js?v=1bd2a4b2';
 import { ITEM_CATALOG, countItem, createInventory } from '../public/js/inventory.js?v=b7609342';
 import { STORE_CATALOG } from '../public/js/store-catalog.js?v=74b56af3';
-import { VENDOR_PROFILES, vendorBuy } from '../public/js/vendor.js?v=afdebbe1';
+import { VENDOR_PROFILES, vendorBuy } from '../public/js/vendor.js?v=cf56a21c';
 import { IMAGINATION_UPGRADES } from '../public/js/imagination.js?v=6adb7b9a';
 import { isOfferedInRemake, remakeStatus } from '../public/js/imagination-remake.js?v=c37ad887';
 import { SKILL_REMAKE_NOTES } from '../public/js/skill-tree.js?v=faa54b90';

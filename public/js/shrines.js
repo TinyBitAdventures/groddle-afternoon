@@ -50,50 +50,51 @@ export function donationXpLimit(xp) {
   return Math.round(Math.max(0, base));
 }
 
+/** Descriptions: each shrine's own, verbatim (items/npc_shrine_<giant>.js var description, line 8). */
 export const GIANTS = Object.freeze({
   alph: Object.freeze({
     id: 'alph', name: 'Alph', color: '#d88445',
-    description: 'The giant of creation, and the likely authority on whether the chicken or the Egg Plant came first.',
+    description: "This is a shrine to Alph, the giant of creation. If you've ever wondered \"Why do Piggies make meat?\" or \"Which came first: the chicken or the egg plant?\" chances are Alph has the answer.",
   }),
   cosma: Object.freeze({
     id: 'cosma', name: 'Cosma', color: '#8ab9db',
-    description: 'The giant who governs the sky, levity, meditation, and the extremely specialized art of herding butterflies.',
+    description: 'This is a shrine to Cosma. As the giant who governs the sky, Cosma is also the giant of levity and meditation. She is, also, the only giant capable of herding butterflies.',
   }),
   friendly: Object.freeze({
     id: 'friendly', name: 'Friendly', color: '#7d77bd',
-    description: 'The giant of all things celestial, nocturnal, lunar, stygian and murky, despite being famously nice about it.',
+    description: 'This is a shrine to Friendly, the giant who oversees all things celestial, nocturnal, lunar, stygian and murky. Despite this, he is, as his name implies, considered by many to be the nicest of the giants and the one most likely to loan you twenty currants till payday.',
   }),
   grendaline: Object.freeze({
     id: 'grendaline', name: 'Grendaline', color: '#55aab5',
-    description: 'The giant of clouds, fogs, streams, oceans, and, as a sideline, big fluffy towels.',
+    description: 'This is a shrine to Grendaline. Quietly loyal and fierce, Grendaline is the giant who governs all things watery, from clouds and fogs to mountain streams and oceans. As a sideline, she is also influential in the sphere of big, fluffy towels.',
   }),
   humbaba: Object.freeze({
     id: 'humbaba', name: 'Humbaba', color: '#d27a75',
-    description: 'The giant who rules every beast with an even-numbered quantity of legs.',
+    description: 'This is a shrine to Humbaba, the giant who rules both two-legged and four-legged beasts. Actually, she rules all the beasts with even-numbered quantities of legs. The odd-numbered ones are on their own.',
   }),
   lem: Object.freeze({
     id: 'lem', name: 'Lem', color: '#e0a743',
-    description: 'The giant of travel and navigation, and an unrepentant practitioner of geographical practical jokes.',
+    description: "This is a shrine to Lem, the giant of travel and navigation. If you've ever found yourself somewhere you didn't plan to be, chances are it was a Lemish practical joke, for which he is utterly unrepentant.",
   }),
   mab: Object.freeze({
     id: 'mab', name: 'Mab', color: '#8db85b',
-    description: 'The giant who holds sway over the harvest and honors industriousness, right up until it turns into greed.',
+    description: 'This is a shrine to Mab, the giant who holds sway over the harvest. She honors industriousness, and rightfully so. Sometimes, however, industriousness can turn to greed. This is a problem.',
   }),
   pot: Object.freeze({
     id: 'pot', name: 'Pot', color: '#d99057',
-    description: 'The big-hearted giant who dispenses prosperity and good fortune, provided sloth stays out of the way.',
+    description: 'This is a shrine to Pot. Big-hearted and generous, Pot is the giant who dispenses prosperity and good fortune. Which is all well and good if you can keep sloth and indolence at bay. Tricky.',
   }),
   spriggan: Object.freeze({
     id: 'spriggan', name: 'Spriggan', color: '#6e9b4d',
-    description: 'The taciturn giant with sole dominion over trees. Trees are serious business, you know.',
+    description: 'This is a shrine to Spriggan. Sure, Spriggan is the most taciturn and humorless of all the giants. You would be, too, if you had sole dominion over the trees. Trees are serious business, you know.',
   }),
   ti: Object.freeze({
     id: 'ti', name: 'Tii', color: '#879aa8',
-    description: 'The overseer of elements, forever calculating and combining all matters alchemical.',
+    description: "This is a shrine to Tii, the overseer of elements, and the giant who manipulates all matters alchemical. Unlike the other giants, Tii is neither male nor female. Or both male and female. It's either really simple or really confusing, depending how you look at it. Some reckon this is why Tii seems cold and distant. They are incorrect. Tii is merely calculating and combining. It's distracting.",
   }),
   zille: Object.freeze({
     id: 'zille', name: 'Zille', color: '#9b8064',
-    description: 'The giant of mountains, hills, hillocks, pingos, drumlins, buttes, and nearly every other bump in the ground.',
+    description: "This is a shrine to Zille, the giant whose domain is the mountains. Hills, too. Also hillocks, pingos, drumlins and buttes. It's safe to consider that any bump in the ground is Zille's turf. She takes no responsibility, however, for volcanoes.",
   }),
 });
 

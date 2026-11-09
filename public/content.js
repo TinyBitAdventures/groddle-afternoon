@@ -46,7 +46,7 @@ import {
   findWorkingPick,
   rockStatusLabel,
   ensureMiningItems,
-} from './js/mining.js?v=f132ad75';
+} from './js/mining.js?v=a187df8c';
 import {
   ANIMAL_CLASS_IDS,
   ensureAnimalState,

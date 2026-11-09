@@ -73,22 +73,22 @@ import {
   setStreetEcologyCatalog,
   streetReservedSpots,
 } from '../public/js/street-ecology.js?v=08076876';
-import { ROCK_CATALOG } from '../public/js/mining.js?v=f132ad75';
+import { ROCK_CATALOG } from '../public/js/mining.js?v=a187df8c';
 import { MEGA_ROCK_CHANCE, MEGA_ROCK_CHUNKS } from '../public/js/imagination-effects.js?v=70169933';
 import { RESOURCE_NODE_CATALOG, RESOURCE_SKILL_PACKAGES } from '../public/js/resource-nodes.js?v=1ecc9789';
 import { ARBOROLOGY_HARVEST, TRANT_META } from '../public/js/trants.js?v=1b3c8ae3';
 import { TRANT_CARE_PACKAGES } from '../public/js/trant-care.js?v=8339adef';
 import { ANIMAL_KINSHIP_PACKAGES } from '../public/js/animal-kinship.js?v=ae02d8d3';
 import { locationIsDepressing } from '../public/js/animal-mood.js?v=a49495fc';
-import { resourcePlacementGroups, resourceSpawnPlan } from '../public/js/features/resource-nodes-feature.js?v=0eb61d13';
-import { soilCountsForStreet, soilPlacementGroups } from '../public/js/features/patches-feature.js?v=d5f3eae0';
+import { resourcePlacementGroups, resourceSpawnPlan } from '../public/js/features/resource-nodes-feature.js?v=61dbf225';
+import { soilCountsForStreet, soilPlacementGroups } from '../public/js/features/patches-feature.js?v=1ed72862';
 import { KITTY_GROUP, kittyPlacementGroups } from '../public/js/features/heli-kitties-feature.js?v=de8ce73d';
-import { BATTERFLY_GROUP, batterflyPlacementGroups } from '../public/js/features/animal-husbandry-feature.js?v=fa2daa9a';
+import { BATTERFLY_GROUP, batterflyPlacementGroups } from '../public/js/features/animal-husbandry-feature.js?v=710200a8';
 import { hasRaceDispenser } from '../public/js/races.js?v=ab22a079';
 import { setWildlifeCatalog, wildlifeFor } from '../public/js/wildlife.js?v=670c3a7f';
 import { boardSpotRow, furnitureFor, furniturePlacementGroups } from '../public/js/street-furniture.js?v=05b28557';
 import { INCUBATION } from '../public/js/animal-husbandry.js?v=4fd2fae5';
-import { SHARED_NODE_CLASSES, freshTreePlan } from '../public/js/street-objects.js?v=afa39058';
+import { SHARED_NODE_CLASSES, freshTreePlan } from '../public/js/street-objects.js?v=e09da292';
 import { PIGGY_TRIP } from '../public/js/street-creatures.js?v=fa8f9bcc';
 import { CRAB_PLACEMENT_KEY, CRAB_WALK, crabPlacementGroups } from '../public/js/crabs.js?v=90964bf8';
 import { KITTY_PET } from '../public/js/heli-kitties.js?v=8fbe314a';

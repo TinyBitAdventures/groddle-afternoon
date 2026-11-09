@@ -28,7 +28,7 @@ import {
   loadRecipeCatalogFromFile,
   recipeToolFor,
   recipeToolInUse,
-} from '../public/js/making.js?v=b0053dac';
+} from '../public/js/making.js?v=d29c39c7';
 import { ITEM_CATALOG, countItem, createInventory, isToolItem } from '../public/js/inventory.js?v=b7609342';
 import {
   GRINDER_TOOLS,
@@ -40,7 +40,7 @@ import {
   getToolCondition,
   setToolRemaining,
 } from '../public/js/tools.js?v=eff5ef6f';
-import { crushOre } from '../public/js/mining.js?v=f132ad75';
+import { crushOre } from '../public/js/mining.js?v=a187df8c';
 import { MAKE_TOOL_SHEETS } from '../public/js/make-tool-sheets.js?v=6f758e09';
 import { clearPlot, createGarden, getPlot, hasHoe, hasWateringCan, plantPlot, waterPlot } from '../public/js/garden.js?v=7bf205c7';
 import { performTrantCare, quoteTrantCare } from '../public/js/trant-care.js?v=8339adef';
