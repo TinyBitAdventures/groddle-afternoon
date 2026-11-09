@@ -2748,13 +2748,83 @@
   ]
  },
  "release": {
-  "game": "0.26.0",
+  "game": "0.27.0",
   "deployed": "2026-11-09"
  },
  "git": {
-  "commits": 1532,
+  "commits": 1551,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-09",
+    "kind": "new",
+    "text": "Door keys lie on their streets again, back 5 minutes after a pickup"
+   },
+   {
+    "date": "2026-11-09",
+    "kind": "fix",
+    "text": "The Quests list draws again when it lost its rows"
+   },
+   {
+    "date": "2026-11-09",
+    "kind": "fix",
+    "text": "Brillah Completist can be earned"
+   },
+   {
+    "date": "2026-11-09",
+    "kind": "fix",
+    "text": "Energy and mood go past 100 in the Paradise ticket streets"
+   },
+   {
+    "date": "2026-11-09",
+    "kind": "new",
+    "text": "Report an IM, and a moderator's purge or deleted line leaves every open window"
+   },
+   {
+    "date": "2026-11-09",
+    "kind": "new",
+    "text": "A Console link in the header for administrators"
+   },
+   {
+    "date": "2026-11-09",
+    "kind": "fix",
+    "text": "Visitors draw no more of a home's animals than its street holds"
+   },
+   {
+    "date": "2026-11-09",
+    "kind": "new",
+    "text": "You can put your Mail Dispatcher away, and put it out again in Cultivate"
+   },
+   {
+    "date": "2026-11-09",
+    "kind": "new",
+    "text": "Captures, youth potions, Plops and animal names on the street are everyone's"
+   },
+   {
+    "date": "2026-11-09",
+    "kind": "new",
+    "text": "A rooting Piggy sniffs with its own clip, drawn from Tiny Speck's authoring file"
+   },
+   {
+    "date": "2026-11-09",
+    "kind": "new",
+    "text": "Revive doses under way count for everyone, so a fourth player can't start one"
+   },
+   {
+    "date": "2026-11-09",
+    "kind": "new",
+    "text": "A street Piggy's name is everyone's online"
+   },
+   {
+    "date": "2026-11-09",
+    "kind": "improve",
+    "text": "A revive you already gave says the source's words: now others need to help"
+   },
+   {
+    "date": "2026-11-09",
+    "kind": "improve",
+    "text": "The Restoration page calls players Glitches again"
+   },
    {
     "date": "2026-11-09",
     "kind": "improve",
@@ -2804,76 +2874,6 @@
     "date": "2026-11-08",
     "kind": "new",
     "text": "The Rook stops a Heli Kitty where it struck it: online for everyone, and it is not startled while rooked"
-   },
-   {
-    "date": "2026-11-08",
-    "kind": "improve",
-    "text": "Getting a trophy says where it went: with your furniture, shown from Decorate"
-   },
-   {
-    "date": "2026-11-08",
-    "kind": "fix",
-    "text": "A line typed in Local chat goes to Local, not to Global Chat"
-   },
-   {
-    "date": "2026-11-08",
-    "kind": "new",
-    "text": "The Interrogation room, a moderators' room administrators open from the console"
-   },
-   {
-    "date": "2026-11-08",
-    "kind": "new",
-    "text": "Online, the Crown Game Teleporter takes 50 currants and joins you to a Game of Crowns"
-   },
-   {
-    "date": "2026-11-08",
-    "kind": "new",
-    "text": "Seven back yards look like players' own 2012 pictures of them: Night Lights, Wistful Tangle, Waggish Wander, Arid Boglands, Faithful Fen, Dusty Barrens and Torrid Cove"
-   },
-   {
-    "date": "2026-11-08",
-    "kind": "improve",
-    "text": "Party teleporters, Rook silhouettes, the Ball, Giant icons and quest-room props stay sharp on big screens"
-   },
-   {
-    "date": "2026-11-08",
-    "kind": "improve",
-    "text": "The tutorial's pull chain stays sharp on big screens"
-   },
-   {
-    "date": "2026-11-08",
-    "kind": "fix",
-    "text": "Picking a home street style: walking past a tube no longer picks it"
-   },
-   {
-    "date": "2026-11-08",
-    "kind": "fix",
-    "text": "Mailboxes, Visiting Stones and notice boards keep clear of tree trunks"
-   },
-   {
-    "date": "2026-11-08",
-    "kind": "fix",
-    "text": "Greeterbot says \"A magic rock told me to talk to you.\""
-   },
-   {
-    "date": "2026-11-08",
-    "kind": "new",
-    "text": "Coral Caves and its yard Anemone Alley, drawn with their own pieces found in the CC0 location art"
-   },
-   {
-    "date": "2026-11-08",
-    "kind": "new",
-    "text": "Salmon, foxes' runs and Fire Dragons in the same place for everyone online"
-   },
-   {
-    "date": "2026-11-08",
-    "kind": "improve",
-    "text": "NPCs say the original's words where they survive: the shady Bureaucrat, Mr. Hairball, the jackpot wheel, the Magic Rock and story quest buttons"
-   },
-   {
-    "date": "2026-11-08",
-    "kind": "new",
-    "text": "Drag a pack item onto a thing in the world: the Egg onto the Dustbunny, a Watering Can onto a tree, food onto a Piggy"
    }
   ]
  },
