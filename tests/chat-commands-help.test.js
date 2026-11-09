@@ -24,10 +24,10 @@ import {
   strayLetterCommand,
 } from '../public/js/slash-commands.js?v=8533e143';
 import { chatCommandsSection, createHotkeysSheet } from '../public/js/client-hotkeys.js?v=31d1891d';
-import { HINT_DELAY_MS, showLocalLines, slashCommandsFeature } from '../public/js/features/slash-commands-feature.js?v=e9121e64';
-import { FEATURES } from '../public/js/features/index.js?v=0b7c31e0';
+import { HINT_DELAY_MS, showLocalLines, slashCommandsFeature } from '../public/js/features/slash-commands-feature.js?v=e517b3ee';
+import { FEATURES } from '../public/js/features/index.js?v=d6710ab8';
 import { createFeatureHost } from '../public/js/feature-host.js?v=127e0a3c';
-import { CHANNEL_WELCOME, tabCommand } from '../public/js/groups.js?v=07640c71';
+import { CHANNEL_WELCOME, tabCommand } from '../public/js/groups.js?v=f242ba06';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (rel) => readFileSync(join(root, rel), 'utf8');

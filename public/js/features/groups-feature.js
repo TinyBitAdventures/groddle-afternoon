@@ -75,6 +75,7 @@ import {
   normalizeGroups,
   pushLine,
   readMemory,
+  drawerChat,
   tabCommand,
   EARLIER_MAX,
   EARLIER_TEXT,
@@ -84,7 +85,7 @@ import {
   shownName,
   tabOrder,
   writeMemory,
-} from '../groups.js?v=07640c71';
+} from '../groups.js?v=f242ba06';
 import { appendLinkedText } from '../chat-links.js?v=b717fac7';
 import { lineKey as reactKey } from '../chat-reactions.js?v=d65d555b';
 import { DELETE_TEXT, deletableChannel, lineLidOf, mayDelete } from '../chat-delete.js?v=ce1da244';
@@ -328,7 +329,7 @@ function createSession(engine, client) {
   // The drawer's tab in front is this feature's tab (what a typed line is for).
   social?.onTab((t) => {
     if (t === 'global') joinGlobalTab();
-    const want = t === 'local' ? 'street' : t === 'party' ? 'party' : chats.has(t) ? t : 'street';
+    const want = drawerChat(t, chats);
     if (want === tab) return;
     tab = want;
     const chat = chats.get(tab);
@@ -449,8 +450,15 @@ function createSession(engine, client) {
   }
 
   // —— Sending ——
+  /** The chat a typed line is for: with the drawer, what it shows this moment (never a remembered tab). */
+  function front() {
+    if (social) tab = drawerChat(social.showing, chats);
+    return tab;
+  }
+
   function onSubmit(e) {
     if (!input) return;
+    front();
     const text = String(input.value || '');
     if (tab === 'party') {
       // party-feature's /p: what you type goes to the party.
@@ -938,13 +946,15 @@ function createSession(engine, client) {
 
   // The chats open last time come back (the server opens them once the list is watched).
   for (const ch of memory.open) chatOf(ch);
+  // The drawer opens on its own tab (Local online): start from what it shows, not the tab remembered.
+  front();
   renderTabs();
   refresh();
 
   return {
     client,
     get list() { return list; },
-    get tab() { return tab; },
+    get tab() { return front(); },
     chats,
     refresh,
     openChat,

@@ -23,7 +23,7 @@
  * QA: canvas data threadLast (the last thing that happened); window.groddleThreads.
  */
 import { THREAD_TEXT, replyFrame, siteKey, threadTarget } from '../chat-threads.js?v=42954351';
-import { chatLine, shownName } from '../groups.js?v=07640c71';
+import { chatLine, shownName } from '../groups.js?v=f242ba06';
 import { drawerLine, normalLine } from '../player-im.js?v=23463a96';
 import { imKey, lineKey, normalReactions } from '../chat-reactions.js?v=d65d555b';
 import { createMinnAccount } from '../minn-account.js?v=8f2741cd';

@@ -177,6 +177,20 @@ export function tabOrder(open, list, { inParty = false } = {}) {
   return tabs;
 }
 
+/**
+ * PURE: the chat a line typed in the Social drawer goes to, from what the drawer shows now: its
+ * Local tab is the street, its Party chat the party, an open channel or group that chat; anything
+ * else (Activity, Buddies, the Chats list, an IM) the street. Never a tab remembered from an
+ * earlier visit: the drawer opens on Local, so a remembered Global sent Local's lines to Global
+ * (a player's report, 2026-11-08).
+ */
+export function drawerChat(showing, open) {
+  const s = String(showing || '');
+  if (s === 'party') return 'party';
+  const has = open && typeof open.has === 'function' ? open.has(s) : Array.isArray(open) && open.includes(s);
+  return s !== 'street' && knownChat(s) && has ? s : 'street';
+}
+
 /** A chat line from the server (channel_said or a history entry), or null. */
 export function chatLine(m) {
   const id = n0(m?.id);
