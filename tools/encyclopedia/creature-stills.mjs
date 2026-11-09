@@ -19,11 +19,11 @@ import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { replacePngWithWebp } from '../webp-lossless.mjs';
+import { JAVA } from '../java.mjs'; // $GRODDLE_JAVA, else the first Homebrew JDK (tools/java.json)
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const SPRITES = join(ROOT, 'public/assets/sprites');
 export const STILLS_DIR = 'assets/sprites/encyclopedia';
-const JAVA = '/opt/homebrew/opt/openjdk@21/bin/java';
 const FFDEC = process.env.FFDEC || join(ROOT, '..', 'tools/ffdec/ffdec.jar');
 const ITEMS = join(ROOT, '..', 'glitch-items');
 

@@ -37,6 +37,7 @@ import { dirname, join, relative } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { imageSize } from '../image-size.mjs';
 import { encodeLosslessWebp, pngBufferToWebp } from '../webp-lossless.mjs';
+import { JAVA } from '../java.mjs'; // $GRODDLE_JAVA, else the first Homebrew JDK (tools/java.json)
 
 const here = dirname(fileURLToPath(import.meta.url));
 export const SPIKE = join(here, '../..');
@@ -46,7 +47,6 @@ export const OUT_DIR = join(SPIKE, 'public/assets/classic');
 export const OUT_JS = join(SPIKE, 'public/js/classic/classic-art.js');
 export const URL_DIR = 'assets/classic';
 export const MANIFEST = join(here, 'manifest.json');
-const JAVA = '/opt/homebrew/opt/openjdk@21/bin/java';
 const FFDEC = join(SPIKE, '..', 'tools/ffdec/ffdec.jar');
 const FFDEC_FALLBACK = join(process.env.HOME || '', 'Documents/glitch-audit/tools/ffdec/ffdec.jar');
 
@@ -135,7 +135,7 @@ export function stripSvg(frames) {
 
 function ffdec(args) {
   const jar = existsSync(FFDEC) ? FFDEC : FFDEC_FALLBACK;
-  if (!existsSync(JAVA) || !existsSync(jar)) throw new Error(`rendering the SVGs needs Java 21 (${JAVA}) and FFDec (${jar})`);
+  if (!existsSync(JAVA) || !existsSync(jar)) throw new Error(`rendering the SVGs needs Java (${JAVA}; set GRODDLE_JAVA) and FFDec (${jar})`);
   execFileSync(JAVA, ['-jar', jar, ...args], { stdio: ['ignore', 'ignore', 'pipe'] });
 }
 

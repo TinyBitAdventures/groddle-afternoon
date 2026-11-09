@@ -52,7 +52,8 @@ import webp_lossless  # noqa: E402  (pack icons ship as lossless WebP)
 SPIKE = os.path.normpath(os.path.join(HERE, '../..'))
 ICONS = os.path.join(SPIKE, 'public/assets/sprites/icons')
 HIRES_JS = os.path.join(SPIKE, 'public/js/icon-hires.js')
-JAVA = '/opt/homebrew/opt/openjdk@21/bin/java'
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
+from java_path import JAVA  # noqa: E402  (tools/java_path.py: $GRODDLE_JAVA, else the first Homebrew JDK)
 FFDEC = os.path.expanduser('~/Documents/glitch-audit/tools/ffdec/ffdec.jar')
 MAX_DIFF = 0.16
 SEED_MAX = 160  # the largest OGA pack icons (still, metalmaker, rock_*_1) are about 160 px

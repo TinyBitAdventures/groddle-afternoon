@@ -20,7 +20,7 @@ Usage (python3.11 has Pillow; FFDec needs Java 21):
   python3.11 -I tools/potion-art.py --work <scratch dir>
 The SWFs are data: FFDec reads them, nothing runs them.
 """
-import argparse, glob, json, math, os, subprocess
+import argparse, glob, json, math, os, subprocess, sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 SPIKE = os.path.dirname(HERE)
@@ -30,7 +30,8 @@ OUT_JS = os.path.join(PUBLIC, 'js', 'potion-art.js')
 # GLITCH_AUDIT names the audit workspace when the spike is a worktree elsewhere.
 AUDIT = os.environ.get('GLITCH_AUDIT') or os.path.dirname(SPIKE)
 ITEMS = os.path.join(AUDIT, 'glitch-items')
-JAVA = '/opt/homebrew/opt/openjdk@21/bin/java'
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from java_path import JAVA  # noqa: E402  (tools/java_path.py: $GRODDLE_JAVA, else the first Homebrew JDK)
 FFDEC = os.path.join(AUDIT, 'tools', 'ffdec', 'ffdec.jar')
 
 # item -> swf, sprite id, zoom, reference frame (its alpha box bottom centre is the anchor), sheets.

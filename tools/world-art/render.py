@@ -40,7 +40,8 @@ ART = os.path.join(HERE, 'art.json')
 LIST_JS = os.path.join(SPIKE, 'public/js/world-art-list.js')
 ITEMS = os.path.expanduser('~/Documents/glitch-audit/glitch-items')
 GSJS = os.path.expanduser('~/Documents/glitch-audit/eleven-gsjs/items')
-JAVA = '/opt/homebrew/opt/openjdk@21/bin/java'
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
+from java_path import JAVA  # noqa: E402  (tools/java_path.py: $GRODDLE_JAVA, else the first Homebrew JDK)
 FFDEC = os.path.expanduser('~/Documents/glitch-audit/tools/ffdec/ffdec.jar')
 ZOOM = 3
 BATCH = 60

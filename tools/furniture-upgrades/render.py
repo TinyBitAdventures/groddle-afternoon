@@ -43,7 +43,8 @@ import swfinfo  # noqa: E402
 PLAN = os.path.join(HERE, 'plan.json')
 ART = os.path.join(HERE, 'art.json')
 OUT = os.path.join(SPIKE, 'public/assets/sprites/furniture/upgrades')
-JAVA = '/opt/homebrew/opt/openjdk@21/bin/java'
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
+from java_path import JAVA  # noqa: E402  (tools/java_path.py: $GRODDLE_JAVA, else the first Homebrew JDK)
 FFDEC = os.path.expanduser('~/Documents/glitch-audit/tools/ffdec/ffdec.jar')
 ZOOM = 3
 BATCH = 80

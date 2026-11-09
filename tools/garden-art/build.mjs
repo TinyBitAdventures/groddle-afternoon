@@ -46,6 +46,7 @@ import os from 'node:os';
 import { symbolBounds } from './swf-bounds.mjs';
 import { encodeLosslessWebp, replacePngWithWebp } from '../webp-lossless.mjs';
 import { downscale, readImage, score, writeImage } from '../quoin-art/pixels.mjs';
+import { JAVA } from '../java.mjs'; // $GRODDLE_JAVA, else the first Homebrew JDK (tools/java.json)
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(HERE, '../..');
@@ -56,7 +57,6 @@ const MODULE = join(PUBLIC, 'js/garden-art.js');
 const RESULTS = join(ROOT, 'tools/vector-sprites/results.json');
 const ITEMS = join(os.homedir(), 'Documents/glitch-audit/glitch-items');
 export const SWF_PATH = 'harvestable_resources/garden/garden_new.swf';
-const JAVA = '/opt/homebrew/opt/openjdk@21/bin/java';
 const FFDEC = join(os.homedir(), 'Documents/glitch-audit/tools/ffdec/ffdec.jar');
 
 /** Same bars as tools/vector-sprites (tests/vector-sprites.test.js checks them). */

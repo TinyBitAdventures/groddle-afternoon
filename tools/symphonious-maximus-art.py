@@ -36,7 +36,8 @@ SPIKE = os.path.dirname(HERE)
 AUDIT = os.path.dirname(SPIKE)
 SWF = os.path.join(AUDIT, 'glitch-items', 'misc', 'toy_star_1', 'toy_star_1.swf')
 FFDEC = os.path.join(AUDIT, 'tools', 'ffdec', 'ffdec.jar')
-JAVA = '/opt/homebrew/opt/openjdk@21/bin/java'
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from java_path import JAVA  # noqa: E402  (tools/java_path.py: $GRODDLE_JAVA, else the first Homebrew JDK)
 OUT = os.path.join(SPIKE, 'public', 'assets', 'sprites', 'symphonious')
 DECOS = os.path.join(SPIKE, 'public', 'assets', 'decos', 'groddle')
 ZOOM = 3

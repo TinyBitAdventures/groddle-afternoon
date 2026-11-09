@@ -40,6 +40,7 @@ import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { encodeLosslessWebp, pngBufferToWebp, replacePngWithWebp } from '../webp-lossless.mjs';
+import { JAVA } from '../java.mjs'; // $GRODDLE_JAVA, else the first Homebrew JDK (tools/java.json)
 
 const here = dirname(fileURLToPath(import.meta.url));
 const spike = join(here, '../..');
@@ -53,7 +54,6 @@ const CANCEL = {
 const OUT = join(spike, 'public/assets/sprites/word-progress');
 const OUT_JS = join(spike, 'public/js/word-progress-art.js');
 const URL_DIR = 'assets/sprites/word-progress';
-const JAVA = '/opt/homebrew/opt/openjdk@21/bin/java';
 const FFDEC = join(audit, 'tools/ffdec/ffdec.jar');
 const LAYERS = ['base', 'fill', 'top'];
 const PAD = 2; // 1x px between cells (6 at 3x), so a cell never samples its neighbour

@@ -1,6 +1,8 @@
 import json, os, re, subprocess, sys, glob
 T = sys.argv[1]
-J = '/opt/homebrew/opt/openjdk@21/bin/java'; F = os.path.expanduser('~/Documents/glitch-audit/tools/ffdec/ffdec.jar')
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
+from java_path import JAVA as J  # noqa: E402  (tools/java_path.py)
+F = os.path.expanduser('~/Documents/glitch-audit/tools/ffdec/ffdec.jar')
 r = json.load(open(f'{T}/result.json')); m = json.load(open(f'{T}/map.json'))
 icons = [os.path.basename(p)[:-5] for p in glob.glob(os.path.join(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'public', 'assets', 'sprites', 'icons'), '*.webp')) if '@' not in p]
 want = {}  # icon id -> (swf path, label)

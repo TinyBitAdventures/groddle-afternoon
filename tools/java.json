@@ -1,0 +1,7 @@
+{
+  "about": "The Java the art tools run FFDec under (tools/java.mjs for Node, tools/java_path.py for Python, both read this file): $GRODDLE_JAVA when set, else the first Homebrew JDK found in this order, else plain java on the PATH. openjdk@21 was the only one until a Homebrew upgrade removed it (2026-11); FFDec runs under 17, 25 and 27 too.",
+  "env": "GRODDLE_JAVA",
+  "prefixes": ["/opt/homebrew/opt", "/usr/local/opt"],
+  "jdks": ["openjdk@21", "openjdk@25", "openjdk@17", "openjdk@27", "openjdk"],
+  "fallback": "java"
+}
