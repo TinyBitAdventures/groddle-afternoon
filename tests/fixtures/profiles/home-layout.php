@@ -233,13 +233,17 @@ $split = [
         ['a' => 0, 'x' => 100, 'y' => 100, 'w' => 50, 'h' => 80, 'c' => [150, 80, 50, 80], 's' => 0],
         ['a' => 0, 'x' => 300, 'y' => 100, 'w' => 60, 'h' => 80, 'c' => [40, 0, 60, 80]],
     ],
-    'spots' => [['k' => 'dispatcher', 'b' => [100, 100, 50, 80]]],
+    'spots' => [['k' => 'mailbox', 'b' => [100, 100, 50, 80]]],
 ];
 $out['splitSheets'] = HomeLayout::splitSheets($root);
 $out['splitFrame'] = HomeLayout::hiresFrame($root, 'assets/sprites/mail-npc/fake_left.png', [150, 80, 50, 80]);
 $out['splitSpans'] = HomeLayout::hiresFrame($root, 'assets/sprites/mail-npc/fake_left.png', [40, 0, 60, 80]);
 $out['splitNot'] = HomeLayout::hiresFrame($root, 'assets/sprites/rocks/rock_sheet.png', [0, 0, 100, 100]);
 $out['splitHtml'] = HomeLayout::render(HomeLayout::accept($split, $root), ['owner' => 'Zz', 'root' => $root, 'avatar' => null]);
+// The Mail Dispatcher only its owner sees in the game: a page leaves its art and its name out (HomeLayout::OWNER_ONLY).
+$owned = $split;
+$owned['spots'] = [['k' => 'dispatcher', 'b' => [100, 100, 50, 80]]];
+$out['dispatcherHtml'] = HomeLayout::render(HomeLayout::accept($owned, $root), ['owner' => 'Zz', 'root' => $root, 'avatar' => null]);
 if ($game !== null) {
     $out['realSplits'] = HomeLayout::splitSheets($game);
 }

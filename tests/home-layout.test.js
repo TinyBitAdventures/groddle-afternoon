@@ -360,6 +360,9 @@ describe('the site side (groddle-afternoon-site src/HomeLayout.php)', { skip: sk
     assert.match(html, /<span class="hd-crop hd-lo" [^>]*><img src="\/assets\/sprites\/mail-npc\/fake_left\.png" [^>]*style="left:-300%;top:-100%;width:400%;height:200%" \/><\/span>/);
     assert.match(html, /<span class="hd-crop hd-hi" [^>]*><img src="\/assets\/sprites\/mail-npc\/fake_left\.p2@3x\.webp" [^>]*style="left:-100%;top:-100%;width:200%;height:200%" \/><\/span>/);
     assert.equal((html.match(/hd-hi/g) || []).length, 1, 'the spanning frame has no 3x crop');
+    // Austin 2026-11-09: the Mail Dispatcher (drawn only for its owner in the game) stays off a player's page.
+    assert.doesNotMatch(out.dispatcherHtml, /Mail Dispatcher/);
+    assert.equal((out.dispatcherHtml.match(/fake_left/g) || []).length, 1, 'only the loose frame is drawn, not the dispatcher spot\'s');
     assert.match(site('style.css'), /@media \(min-resolution: 1\.5dppx\), \(-webkit-min-device-pixel-ratio: 1\.5\) \{\n\s*\.home-diorama \.hd-stage \.hd-lo \{ display: none; \}\n\s*\.home-diorama \.hd-stage \.hd-hi \{ display: block; \}/);
   });
 
