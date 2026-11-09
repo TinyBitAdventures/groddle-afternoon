@@ -319,8 +319,8 @@ describe('the chat app\'s header, its bell and its right-click menus (/chat/, Au
     const pages = src('src/CommunityPages.php');
     assert.match(pages, /SiteNav::nav\(SiteNav::links\(\$this->minn, 0\), \$path, \$badges, \['bell' => \$signed \? \(\$badges\[SiteNav::COMMUNITY\] \?\? 0\) : null\]\)/);
     assert.match(src('src/SiteNav.php'), /\$n = \(new Notifications\(\$minn\)\)->unread\(\$reader\);/, 'the Community link counts what the bell counts');
-    // Only /chat/ takes the app layout: the other pages keep the centred header.
-    for (const f of ['src/PlayerPages.php', 'src/AdminConsolePage.php', 'src/AdminBuilderPage.php']) assert.doesNotMatch(src(f), /'bell' =>/, f);
+    // Only /chat/ and the console (Austin 2026-11-09, tests/console-skin.test.js) take the app layout: the other pages keep the centred header.
+    for (const f of ['src/PlayerPages.php', 'src/AdminBuilderPage.php']) assert.doesNotMatch(src(f), /'bell' =>/, f);
   });
 
   it('the notifications are signed-in only, the caller\'s own, and IMs are read through ChatHistory alone', () => {
@@ -437,7 +437,7 @@ describe('the chat app\'s header, its bell and its right-click menus (/chat/, Au
     assert.match(css, /\.community-page \{ --site-nav-h: 48px;/);
     assert.match(css, /\.community-page \.site-nav\.site-nav-app \{[^}]*background: var\(--surface\);[^}]*backdrop-filter: none;[^}]*border-bottom: 1px solid var\(--border\);/);
     assert.match(css, /\.site-nav-app \.site-nav-links a\[aria-current="page"\] \{ color: var\(--fg\); background: var\(--cx-soft\); \}/);
-    assert.match(css, /\n\.community-page, \.cx \{\n  --bg:/, 'the header wears the app\'s tokens');
+    assert.match(css, /\n\.community-page, \.console-page, \.cx \{\n  --bg:/, 'the header wears the app\'s tokens (and the console, which shares the look)');
   });
 
   it('right-click menus use the game\'s component, with its keys and long press, and leave the browser\'s menu on fields, selections and links', async () => {

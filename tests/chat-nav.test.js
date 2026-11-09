@@ -95,7 +95,7 @@ describe('the sources: no move inside /chat/ reloads (site repo community/)', { 
     const bell = src('community/notifications.js');
     assert.match(bell, /if \(nav\) \{\n\s*closePanel\(\);\n\s*nav\.go\(item\.url\);/);
     const pages = src('src/CommunityPages.php');
-    assert.match(pages, /public const ASSET_KEY = 'community-9';/);
+    assert.match(pages, /public const ASSET_KEY = 'community-10';/);
     // A bare path keeps a browser's copy for a year: returning players got a new chat-app.js beside an old chat-pure.js, and /chat/ stuck on Connecting.
     for (const file of ['chat-app.js', 'chat-menus.js', 'chat-nav.js', 'notifications.js', 'community.js']) {
       assert.doesNotMatch(src(`community/${file}`), /(?:^|\n)import [^\n]*from '\.\//, `${file}: a static import of a sibling carries no key`);

@@ -253,8 +253,12 @@ describe('every page that runs scripts loads the map and the hook first', () => 
     return /type="module"/.test(m[1]) || (src && !/(^|\/)site\/theme\.js$/.test(src.split('?')[0]));
   });
 
-  it('site/theme.js (the one script the other pages load) fetches nothing', () => {
-    assert.doesNotMatch(read('public/site/theme.js'), /\bfetch\s*\(|\.src\s*=|new Image\b/);
+  it('site/theme.js (the one script the other pages load) fetches nothing but the Console link\'s question, never a data file', () => {
+    // The administrators' Console link asks /console/me, a route answered per reader and never cached (no key to give it).
+    const theme = read('public/site/theme.js');
+    assert.deepEqual([...theme.matchAll(/\bfetch\s*\(([^,)]+)/g)].map((m) => m[1].trim()), ['`${PATH}me`']);
+    assert.match(theme, /const PATH = '\/console\/';/);
+    assert.doesNotMatch(theme, /\.src\s*=|new Image\b/);
   });
 
   it('js/data-versions.js then js/data-urls.js come before every script with a src and every module', () => {

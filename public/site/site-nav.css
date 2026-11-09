@@ -61,6 +61,36 @@ html { scroll-padding-top: calc(var(--site-nav-h) + 12px); }
   --theme-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm0 2v16a8 8 0 0 1 0-16z'/%3E%3C/svg%3E");
 }
 
+/* The administrators' Console link (site/theme.js; on /console/ the site's own, a pill with its word). */
+.site-nav-console {
+  position: relative; display: inline-flex; align-items: center; justify-content: center; gap: 6px; flex-shrink: 0;
+  box-sizing: border-box; min-width: 36px; height: 36px; padding: 0; border-radius: 999px;
+  border: 1px solid var(--border); background: transparent; color: var(--muted); text-decoration: none;
+  font-weight: 800; font-size: 14px; transition: color .15s ease, border-color .15s ease;
+  view-transition-name: site-nav-console;
+}
+.site-nav-console::before {
+  content: ''; flex: none; width: 18px; height: 18px; background: currentColor;
+  -webkit-mask: var(--console-icon) center / contain no-repeat; mask: var(--console-icon) center / contain no-repeat;
+  --console-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linejoin='round'%3E%3Cpath d='M12 3 5 6v5c0 4.4 3 8 7 10 4-2 7-5.6 7-10V6z'/%3E%3Cpath d='m9 12 2.2 2.2L15.5 10' stroke-linecap='round'/%3E%3C/svg%3E");
+}
+.site-nav-console:hover { color: var(--fg); border-color: var(--muted); }
+.site-nav-console:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+.site-nav-console-word { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.site-nav-console[aria-current="page"] {
+  padding: 0 14px 0 10px; color: var(--fg); border-color: transparent;
+  background: var(--cx-soft, color-mix(in srgb, var(--accent) 18%, transparent));
+}
+.site-nav-console[aria-current="page"] .site-nav-console-word { position: static; width: auto; height: auto; overflow: visible; clip: auto; }
+.site-nav-app .site-nav-console { min-width: 32px; height: 32px; }
+.site-nav-app .site-nav-console[aria-current="page"] { padding: 0 12px 0 9px; }
+@media (max-width: 440px) {
+  .site-nav-console { min-width: 30px; height: 30px; }
+  .site-nav-console::before { width: 16px; height: 16px; }
+  .site-nav-console[aria-current="page"], .site-nav-app .site-nav-console[aria-current="page"] { padding: 0; }
+  .site-nav-console[aria-current="page"] .site-nav-console-word { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+}
+
 /* Its right-click menu: Light, Dark, System (built by site/theme.js, fixed under the button). */
 .site-nav-theme-menu {
   position: fixed; z-index: 60; min-width: 148px; padding: 6px;
@@ -237,6 +267,7 @@ html { scroll-padding-top: calc(var(--site-nav-h) + 12px); }
     display: inline-flex; min-height: 40px; padding: 0 16px; font-size: 15px; flex-shrink: 0;
   }
   :root[data-site-menu] .site-nav:not(.site-nav-app) .site-nav-theme { width: 40px; height: 40px; }
+  :root[data-site-menu] .site-nav:not(.site-nav-app) .site-nav-console { min-width: 40px; height: 40px; }
   :root[data-site-menu] .site-nav:not(.site-nav-app) .site-nav-theme::before { width: 18px; height: 18px; }
   :root[data-site-menu] .site-nav-menu-btn {
     position: relative; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;
@@ -286,7 +317,7 @@ html { scroll-padding-top: calc(var(--site-nav-h) + 12px); }
   :root[data-site-menu] .site-nav:not(.site-nav-app) .site-nav-panel::before { display: none; }
 }
 
-@media (prefers-reduced-motion: reduce) { .site-nav-play, .site-nav-theme, .site-nav-toggle::before { transition: none; } }
+@media (prefers-reduced-motion: reduce) { .site-nav-play, .site-nav-theme, .site-nav-console, .site-nav-toggle::before { transition: none; } }
 
 /* Going from page to page (Austin 2026-11-04): a cross-document View Transition. Every page with the
    header loads this file, the built pages and the Minn ones alike, so every one opts in. The header,

@@ -12,7 +12,8 @@
    and the .site-nav-panel of its links, drawn from the Minn menu): hover with a
    mouse, the toggle with anything; Escape closes back to the toggle, and so do a
    click outside and Tab out. Without this script the link is a plain link.
-   On a phone it also folds the links into a Menu button (site-nav.css, data-site-menu). */
+   On a phone it also folds the links into a Menu button (site-nav.css, data-site-menu).
+   For an administrator it adds the Console link (the last part: its one request). */
 (() => {
   const KEY = 'groddle-theme';
   const OLD_KEY = 'groddle-compare-theme'; // the compare page's own toggle, before this
@@ -346,4 +347,51 @@
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', wireAll);
   else wireAll();
+})();
+
+// The administrators' Console link (Austin 2026-11-09). Never in a page's HTML (bar the console's own, served
+// only to an administrator): added only after GET /console/me (uncached, per reader) says yes, and asked only in
+// a browser that has been an administrator's (HINT, set on the console or under the Minn bar). A no clears HINT.
+// Markup as SiteNav::consoleLink (groddle-afternoon-site).
+(() => {
+  const HINT = 'groddle-console';
+  const PATH = '/console/';
+  const hinted = () => { try { return localStorage.getItem(HINT) === '1'; } catch { return false; } };
+  const hint = (on) => { try { if (on) localStorage.setItem(HINT, '1'); else localStorage.removeItem(HINT); } catch { /* storage blocked */ } };
+
+  function link() {
+    const a = document.createElement('a');
+    a.className = 'site-nav-console';
+    a.href = PATH;
+    a.title = 'Console';
+    if (location.pathname.startsWith(PATH)) a.setAttribute('aria-current', 'page');
+    const word = document.createElement('span');
+    word.className = 'site-nav-console-word';
+    word.textContent = 'Console';
+    a.append(word);
+    return a;
+  }
+
+  function add() {
+    for (const nav of document.querySelectorAll('.site-nav')) {
+      const theme = nav.querySelector('.site-nav-theme');
+      if (!theme || nav.querySelector('.site-nav-console')) continue;
+      theme.before(link());
+    }
+  }
+
+  async function check() {
+    if (document.querySelector('.site-nav .site-nav-console')) { hint(true); return; }
+    if (!hinted() && !document.getElementById('minn-bar')) return;
+    let admin = false;
+    try {
+      const r = await fetch(`${PATH}me`, { credentials: 'same-origin', cache: 'no-store', headers: { Accept: 'application/json' } });
+      admin = r.ok && (await r.json())?.admin === true;
+    } catch { return; } // offline: the hint stays
+    hint(admin);
+    if (admin) add();
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', check);
+  else check();
 })();

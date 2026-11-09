@@ -95,7 +95,7 @@ describe('/chat/\'s Delete line (community/chat-pure.js, chat-menus.js, chat-app
   it('only an administrator\'s page is marked, and the asset key moved with the files', () => {
     const pages = src('src/CommunityPages.php');
     assert.match(pages, /\(\(\$viewer\['admin'\] \?\? false\) \? ' data-chat-admin="1"' : ''\)/);
-    assert.match(pages, /public const ASSET_KEY = 'community-9';/);
+    assert.match(pages, /public const ASSET_KEY = 'community-10';/);
   });
 });
 
@@ -143,7 +143,7 @@ describe('the console\'s chat log marks a deleted line (console/console.js, src/
     assert.match(mod.logWords({ kind: 'chat_delete', delivery: 'down', player: { id: 7, name: 'Ada' }, detail: { where: 'Global Chat', reply: true, text: 'x' } }), /^deleted Ada's thread reply in Global Chat: “x” \(realtime server not answering/);
     const ac = src('src/AdminConsole.php');
     assert.match(ac, /'deleted' => \$this->chatDeleted\(\$l\['deleted'\] \?\? null, \$names\),/);
-    assert.match(src('src/AdminConsolePage.php'), /ASSET_KEY = 'interro-1'/);
+    assert.match(src('src/AdminConsolePage.php'), /ASSET_KEY = 'skin-1'/);
   });
 });
 
