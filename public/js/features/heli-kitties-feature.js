@@ -13,8 +13,12 @@
  *
  * The source class hides the chicken verbs (butter up, squeeze, talk to,
  * incubate, youth potion, set free) behind {state:null} conditions; they are
- * not offered here either. Revive/Apply Balm need Rook attacks, which the
- * remake leaves out.
+ * not offered here either. The Rook rooks them (npc_kitty_chicken includes
+ * items/include/rook.js): rook-attack-feature keys each by its spawn index
+ * (classIndex, js/rook-attack.js rookKeyFor: npc_kitty_chicken:<i>, the same
+ * on every page and the server's, G593), lays it where it was struck and
+ * offers Revive / Apply Balm; a rooked kitty stays put and is not startled
+ * (onPlayerCollision 1207-1210).
  *
  * Online (slice 2 of research/plans/street-animals-shared.md) a street's Heli Kitties are the same
  * for everyone: each walks the shared path street-objects-feature gives it (stepShared: the
@@ -154,6 +158,8 @@ function buildKitty(engine, kitty) {
     sprite: spr,
     airborne: true,
     kittyKey: kitty.key,
+    // Its spawn index: the Rook's key for it (js/rook-attack.js rookKeyFor), the same everywhere (G593).
+    classIndex: kittyIndex(kitty.key),
     // Online the server shares a street's Heli Kitties (street-objects-feature: its path in sharedPath).
     state: {},
   });
@@ -161,6 +167,16 @@ function buildKitty(engine, kitty) {
   kitties.push(entity);
   place(entity);
   return entity;
+}
+
+/** A kitty's spawn index from its key ('kitty:<i>'), or undefined. */
+export function kittyIndex(key) {
+  const m = /^kitty:(\d{1,2})$/.exec(String(key || ''));
+  return m ? Number(m[1]) : undefined;
+}
+
+function rooked(engine, entity) {
+  return Boolean(engine.query?.('targetRooked', entity.target, engine));
 }
 
 function place(entity) {
@@ -175,6 +191,8 @@ function place(entity) {
 
 function scare(engine, entity, force = false) {
   const { kitty } = entity;
+  // Rooked: rookedCollision, not a fright (npc_kitty_chicken.js onPlayerCollision 1207-1210).
+  if (rooked(engine, entity)) return false;
   if (!force && !rollScare(kitty, engine.learnedSkills)) return false;
   if (kitty.state === 'sleep' || kitty.state === 'sleepStart' || kitty.flying) return false;
   if (entity.target.sprite?._walkerPath) {
@@ -438,6 +456,9 @@ export const heliKittiesFeature = {
       // Online a street Heli Kitty is on its shared path (street-objects-feature), else its own walk.
       const p = entity.target?.sprite?._walkerPath?.();
       if (p) stepShared(engine, entity, p, dtMs);
+      // Rooked (solo): it stops where it was struck (include/rook.js rookAttack fullStop) and flies on
+      // from there when revived (unRook, onRevived); rook-attack-feature draws it meanwhile.
+      else if (rooked(engine, entity)) continue;
       else stepKitty(entity.kitty, dtMs, w);
       place(entity);
     }

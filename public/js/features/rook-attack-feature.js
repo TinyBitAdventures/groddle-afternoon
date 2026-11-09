@@ -3242,6 +3242,13 @@ export const rookAttackFeature = {
     return null;
   },
 
+  /** Whether the Rook has this street thing rooked now (true, else null): a rooked Heli Kitty is not startled (npc_kitty_chicken.js onPlayerCollision 1207-1210). */
+  targetRooked(target, engine) {
+    if (!target || !isRookableClass(target.classId)) return null;
+    const key = keyOf.get(target);
+    return key && slot(engine).rooked[key] ? true : null;
+  },
+
   runVerbOverride(target, verbId, engine) {
     if (!String(verbId || '').startsWith('rook_')) return null;
     if (verbId === 'rook_revive') revive(engine, target);
