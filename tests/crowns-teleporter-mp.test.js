@@ -23,8 +23,8 @@ import {
   normalizeCrownsPaid,
   normalizeCrownsPaidBack,
 } from '../public/js/crowns-mp.js?v=c1e686e6';
-import { crownsFeature, crownsMpTeleport } from '../public/js/features/crowns-feature.js?v=dcea4881';
-import { GAME_TELEPORTER_PRICE, GAME_TELEPORTER_STREET, GAME_TELEPORTER_TEXT } from '../public/js/features/game-teleporter-feature.js?v=309d43a6';
+import { crownsFeature, crownsMpTeleport } from '../public/js/features/crowns-feature.js?v=4da5d5a7';
+import { GAME_TELEPORTER_PRICE, GAME_TELEPORTER_STREET, GAME_TELEPORTER_TEXT } from '../public/js/features/game-teleporter-feature.js?v=7cd06bec';
 import { HAS_SERVER, HAS_SITE, SITE_DIR, serverPath, sitePath, skipWithoutServer } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');

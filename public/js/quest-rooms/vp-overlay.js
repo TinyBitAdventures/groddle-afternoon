@@ -24,7 +24,7 @@
  * overlay-art's trackOverlay; the promise resolves false when cancelled.
  */
 
-import { trackOverlay } from '../overlay-art.js?v=11b6dd7f';
+import { trackOverlay } from '../overlay-art.js?v=75c3ea34';
 
 let el = null;
 let current = null;

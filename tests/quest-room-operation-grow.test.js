@@ -9,7 +9,7 @@ import { readFileSync, existsSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import * as mod from '../public/js/quest-rooms/operation-grow.js?v=81fc783b';
+import * as mod from '../public/js/quest-rooms/operation-grow.js?v=da334853';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const GS = join(root, '../glitch-GameServerJS');
@@ -105,7 +105,7 @@ describe('Operation: Grow geometry (G109: two tiers from the Snaps)', () => {
 
   it('ships its art: the Snaps\' Firebog stalks, huts, pots, roots, earth, door and ladder', async () => {
     const { OPERATION_GROW_FILES } = await import('../public/js/operation-grow-art.js?v=3cbe7663');
-    const scene = await import('../public/js/operation-grow-scene.js?v=1f3d0ed4');
+    const scene = await import('../public/js/operation-grow-scene.js?v=3c25d379');
     const plan = JSON.parse(readFileSync(join(root, 'tools/room-art/operation_grow.json'), 'utf8'));
     assert.deepEqual(Object.keys(plan.pieces).sort(), Object.keys(OPERATION_GROW_FILES).sort());
     const expect = {

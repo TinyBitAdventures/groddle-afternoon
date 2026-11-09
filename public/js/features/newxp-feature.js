@@ -133,11 +133,11 @@ import { assignQuest, completeQuest } from '../quests.js?v=2b882eb6';
 import { acceptOffer, enqueueQuestOffer, questAwardPayload, turnInQuest } from '../quest-offers.js?v=a7ee5b8f';
 import { getQuestCatalog } from '../content-catalogs.js?v=10b118dd';
 import { locationEventsApi } from './location-events-feature.js?v=0062e032';
-import * as kit from '../quest-rooms/kit.js?v=25fc6d59';
-import { frameTexture, onLoaded, sourceFromUrl, textureFromUrl, whenLoaded } from '../textures.js?v=3149d699';
+import * as kit from '../quest-rooms/kit.js?v=662d905f';
+import { frameTexture, onLoaded, sourceFromUrl, textureFromUrl, whenLoaded } from '../textures.js?v=f024bd6a';
 import { upgradeSource } from '../sprite-hires.js?v=37ca7427';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
-import { displayTopOf, itemstackOverlayPoint, playPoofIn, playSheetOverlay, poofInAlpha } from '../overlay-art.js?v=11b6dd7f';
+import { displayTopOf, itemstackOverlayPoint, playPoofIn, playSheetOverlay, poofInAlpha } from '../overlay-art.js?v=75c3ea34';
 import { HOME_MACHINE } from '../home-ticket.js?v=911b49bd';
 import { animalAnchorX, animalAnchorY, createAnimalState } from '../animals.js?v=c2d5ecf3';
 import {
@@ -1134,6 +1134,14 @@ const CHAIN_ART = Object.freeze({
   hang: { url: `${ART}chain_hang.webp`, cols: 15, rows: 4, count: 60 },
   pull: { url: `${ART}chain_pull.webp`, cols: 16, rows: 3, count: 45 },
 });
+/**
+ * G596: the handle's bolt runs into its cell's right edge (alpha up to 255 in the last column of
+ * 21 hang and 35 pull frames at 1x), and smooth sampling at the next cell's left edge drew that
+ * column as a faint 1 px line about 6 world px left of the handle. Every frame's first column is
+ * empty (both sheets, 1x and 3x), so each frame leaves it off: the line goes, the art and its
+ * place stay.
+ */
+export const CHAIN_INSET_LEFT = 1;
 
 function buildClouds(engine) {
   const { PIXI } = engine;
@@ -1149,7 +1157,7 @@ function buildClouds(engine) {
   }
   const world = root.layer(1, 2);
   // The chain hangs under the ceiling (items/newxp_chain.js): click it, or press Enter, to pull.
-  const chain = kit.animated(PIXI, CHAIN_ART.hang.url, CHAIN_ART.hang.cols, CHAIN_ART.hang.rows, { count: CHAIN_ART.hang.count, ax: 0.5, ay: 0, speed: 0.4 });
+  const chain = kit.animated(PIXI, CHAIN_ART.hang.url, CHAIN_ART.hang.cols, CHAIN_ART.hang.rows, { count: CHAIN_ART.hang.count, ax: 0.5, ay: 0, speed: 0.4, insetLeft: CHAIN_INSET_LEFT });
   chain.x = L.chain.x;
   chain.y = L.chain.top;
   chain.eventMode = 'static';
@@ -1159,7 +1167,7 @@ function buildClouds(engine) {
   world.addChild(chain);
   // The pull sheet is cut now and swapped to its 3x twin before the click (it is first drawn mid-pull,
   // which would show its opening frames soft); upgradeSource does nothing on small views.
-  const pull = kit.sheetFrames(PIXI, CHAIN_ART.pull.url, CHAIN_ART.pull.cols, CHAIN_ART.pull.rows, CHAIN_ART.pull.count);
+  const pull = kit.sheetFrames(PIXI, CHAIN_ART.pull.url, CHAIN_ART.pull.cols, CHAIN_ART.pull.rows, CHAIN_ART.pull.count, { insetLeft: CHAIN_INSET_LEFT });
   upgradeSource(pull.base, CHAIN_ART.pull.url, whenLoaded);
   // newxp_clicktopull_arrow: blinks under the handle while you wait (K2q5GXruLvE 0:22-0:24).
   const arrow = stageDeco(PIXI, 'newxp_clicktopull_arrow', L.chain.x, L.chain.top + 540, { alpha: 0 });
@@ -1271,7 +1279,7 @@ function pullChain(engine) {
   const { chain, arrow } = run.views;
   if (arrow) arrow.visible = false;
   if (chain && !chain.destroyed) {
-    const pull = run.views.pull || kit.sheetFrames(engine.PIXI, CHAIN_ART.pull.url, CHAIN_ART.pull.cols, CHAIN_ART.pull.rows, CHAIN_ART.pull.count);
+    const pull = run.views.pull || kit.sheetFrames(engine.PIXI, CHAIN_ART.pull.url, CHAIN_ART.pull.cols, CHAIN_ART.pull.rows, CHAIN_ART.pull.count, { insetLeft: CHAIN_INSET_LEFT });
     const go = () => {
       if (chain.destroyed || !pull.frames.length) return;
       chain.textures = pull.frames;

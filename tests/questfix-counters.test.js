@@ -38,13 +38,13 @@ import {
   slatherVerb,
   SLATHER_VERB,
   SLATHER_COPY,
-} from '../public/js/features/quest-verbs-feature.js?v=f17be30c';
+} from '../public/js/features/quest-verbs-feature.js?v=6dff3574';
 import { onOwnYard } from '../public/js/features/quest-offers-feature.js?v=4b2de8c4';
 import {
   giveCubimalVerb,
   GIVE_CUBIMAL_VERB,
   CUBIMAL_GIFT_RESPONSES,
-} from '../public/js/features/quest-verbs-feature.js?v=f17be30c';
+} from '../public/js/features/quest-verbs-feature.js?v=6dff3574';
 import { createFeatureHost } from '../public/js/feature-host.js?v=127e0a3c';
 
 const here = dirname(fileURLToPath(import.meta.url));

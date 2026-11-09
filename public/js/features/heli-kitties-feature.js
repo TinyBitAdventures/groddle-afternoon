@@ -38,7 +38,7 @@
  */
 
 import { slugsFromEffects } from '../speech-slugs.js?v=130338f9';
-import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=7d3c70e7';
+import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=f7d1852a';
 import { followPath } from '../street-creatures.js?v=6bfadcbf';
 import { landingY, nearestSurfaceY, walkSurfaceY } from '../walk-surface.js?v=106bfdc5';
 import { loadWildlifeCatalog, wildlifeCatalog, wildlifeFor } from '../wildlife.js?v=670c3a7f';

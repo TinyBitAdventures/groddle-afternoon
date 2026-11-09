@@ -31,7 +31,7 @@
  */
 
 import { crowdScaleX } from '../avatar-anims.js?v=fb921bf4';
-import { playCountdownArt } from '../overlays.js?v=ed371926';
+import { playCountdownArt } from '../overlays.js?v=605c12ff';
 import {
   RACES,
   RACE_ACHIEVEMENTS,
@@ -83,15 +83,15 @@ import {
   drawFinishGate,
   raceLoadingColors,
   renderRaceCourse,
-} from '../race-render.js?v=c7c235a7';
+} from '../race-render.js?v=6b7e0c03';
 import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=60dfc9ca';
 import { runStreetTransition } from '../screen-fx.js?v=b4ec277f';
 import { CROWNS_STREET, CROWNS_TICKET, CROWNS_TITLE } from '../game-of-crowns.js?v=e32f35f5';
 import { HOG_HAUL_STREET_ID } from '../hog-haul.js?v=50d2e072';
-import { QUOIN_GRAB_SPLASH, RACE_SPLASH, splashFor } from '../game-splash.js?v=5e2c6eb6';
-import { crownsMpChallenge, startCrowns } from './crowns-feature.js?v=dcea4881';
-import { startHogHaulMp } from './hog-haul-mp-feature.js?v=e8f1c5cc';
-import { textureFromUrl } from '../textures.js?v=3149d699';
+import { QUOIN_GRAB_SPLASH, RACE_SPLASH, splashFor } from '../game-splash.js?v=ea0433a7';
+import { crownsMpChallenge, startCrowns } from './crowns-feature.js?v=4da5d5a7';
+import { startHogHaulMp } from './hog-haul-mp-feature.js?v=2062aa77';
+import { textureFromUrl } from '../textures.js?v=f024bd6a';
 import { QUOIN_SHEET, QUOIN_TYPES } from '../quoins.js?v=299cc3f4';
 import { gainMetabolic } from '../metabolics.js?v=8504134e';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';

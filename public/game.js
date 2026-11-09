@@ -4,14 +4,14 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=a409dfed';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=127e0a3c';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=24bfe85e';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=a0014bea';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
 import { createVogOverlay } from './js/vog-overlay.js?v=c2a9cc07';
 import { createPromptStack } from './js/prompt-stack.js?v=c67c01b5';
 import { createWindowStack } from './js/window-stack.js?v=a7104f02';
-import { HOG_HAUL_SPLASH, createGameSplash, splashFor } from './js/game-splash.js?v=5e2c6eb6';
+import { HOG_HAUL_SPLASH, createGameSplash, splashFor } from './js/game-splash.js?v=ea0433a7';
 import {
   actionDurationFor,
   createTimedAction,
@@ -20,7 +20,7 @@ import {
 } from './js/action-timing.js?v=5db4e91b';
 import { createWordProgressView, wordAnchor, heldActionDelta, MAX_PUSH_DOWN } from './js/word-progress.js?v=98366023';
 // G374/G375/G378: Tiny Speck's quoin-limit and super-harvest rainbows and the musicblock notes.
-import { OVERLAY_USES, playCountdownArt, playOverlay, rainbowSound, showRainbow } from './js/overlays.js?v=ed371926';
+import { OVERLAY_USES, playCountdownArt, playOverlay, rainbowSound, showRainbow } from './js/overlays.js?v=605c12ff';
 import {
   createQuestState,
   assignQuest,
@@ -84,7 +84,7 @@ import {
   spinFourLetterBlock,
   startFourLetterPuzzle,
 } from './js/four-letter-quest.js?v=a5574ac7';
-import { KIDS_ROOM_W, buildKidsRoomScene } from './js/kids-room-scene.js?v=b2803888';
+import { KIDS_ROOM_W, buildKidsRoomScene } from './js/kids-room-scene.js?v=8b19357c';
 import {
   AXIS_DENYDE_STREET_ID,
   HOGTIED_JONES_ID,
@@ -131,7 +131,7 @@ import {
 } from './js/legalize-it.js?v=b5645cb6';
 import { HALL, HALL_LAYOUT, HALL_QUESTIONS } from './js/bureaucratic-hall.js?v=a0bc6317';
 import { STATION_X, stationArrival, stationScreen, surfaceStation } from './js/subway.js?v=44d1a09f';
-import { ALLEY, SHADY, drawAlley, inEnteredBox } from './js/quest-rooms/back-alley-set.js?v=d53ba17d';
+import { ALLEY, SHADY, drawAlley, inEnteredBox } from './js/quest-rooms/back-alley-set.js?v=130e33ee';
 import {
   WINTER_HAVEN_STREET_ID,
   WINTER_MOTE_REWARDS,
@@ -377,7 +377,7 @@ import {
   buildParadiseCourseArt,
   paradiseCoursePreloadUrls,
   paradiseCourseRuntime,
-} from './js/paradise-course-runtime.js?v=34d56d80';
+} from './js/paradise-course-runtime.js?v=cebe5fad';
 import {
   createAchievementState,
   applyAchievementProgress as applyAchievementProgressRaw,
@@ -644,7 +644,7 @@ import {
   ensureStreetIndex,
   resolveIndexTsid,
 } from './js/street-loader.js?v=18b181ad';
-import { showDraftBanner, startDraftPlay } from './js/builder/draft-play.js?v=da94edc5';
+import { showDraftBanner, startDraftPlay } from './js/builder/draft-play.js?v=4de947af';
 import {
   ladderTopDeck,
   groundBeneath,
@@ -673,7 +673,7 @@ import {
   setSignpostHover,
   setSignpostKeys,
   signpostBoardAt,
-} from './js/street-render.js?v=18160bb6';
+} from './js/street-render.js?v=881d705a';
 import {
   GAME_DAY_MS,
   shouldFireNewDay,
@@ -785,7 +785,7 @@ import { FAILED_LINE, inVerbReach, movingLine, verbRange, walkOverEnd, walkOverG
 import { hellBuffDesc, isInHell } from './js/hell.js?v=33a46876';
 import { climbBobY, ladderAnimState, ladderSwap } from './js/ladder-anim.js?v=a8b327a0';
 import { VECTOR_AVATAR } from './js/avatar-vector-sheets.js?v=ad801376';
-import { createNpcGlitchKit } from './js/npc-glitch.js?v=894841be';
+import { createNpcGlitchKit } from './js/npc-glitch.js?v=339e1872';
 import { bakeIdleSheet, bakeLook, loadCatalog as loadAvatarCatalog, paintPreview as paintVectorPreview, prepareLook } from './js/avatar-compositor.js?v=dcd906ae';
 import { catalogItem, lookKey, randomVectorFields, resolveLook, variantSwatch } from './js/avatar-looks.js?v=64fab53e';
 import {
@@ -986,12 +986,12 @@ import { EAT_PICK_TEXT, bestFoodIndex, eatChoices, eatTip } from './js/eat-pick.
 import { installHeldKeyGuard, isMacPlatform } from './js/held-keys.js?v=98b96620';
 import { signpostArmRows, worldContextAction } from './js/world-context-menu.js?v=f3f48805';
 import { blockedPlayerVerbs, listPlayerTarget, opensPlayerMenu, playerMenuRows } from './js/ui/player-menu.js?v=a71fc0f8';
-import { forgetTexture, frameTexture, isFailed, isLoaded, onFailed, onLoaded, textureFromUrl, whenLoaded } from './js/textures.js?v=3149d699';
+import { forgetTexture, frameTexture, isFailed, isLoaded, onFailed, onLoaded, textureFromUrl, whenLoaded } from './js/textures.js?v=f024bd6a';
 import { FALLBACK_MAX as WORLD_ART_FALLBACK_MAX, worldArtFor } from './js/world-art.js?v=df476660';
-import { sceneAnim, syncAnim } from './js/deco-anim.js?v=4f2e3d99';
+import { sceneAnim, syncAnim } from './js/deco-anim.js?v=aa35e023';
 import { revealStartCard, whenSceneDrawn } from './js/start-backdrop.js?v=8510d51e';
-import { cancelAllOverlays, playPoofIn, setOverlayResolution } from './js/overlay-art.js?v=11b6dd7f';
-import * as textureUrls from './js/textures.js?v=3149d699';
+import { cancelAllOverlays, playPoofIn, setOverlayResolution } from './js/overlay-art.js?v=75c3ea34';
+import * as textureUrls from './js/textures.js?v=f024bd6a';
 import { installPixiFixes } from './js/pixi-fixes.js?v=173fb649';
 import { hidesChatBubble } from './js/hi-signs.js?v=b90c7d7e';
 // Multiplayer phase 1: the mode flag and the save interface every save read/write goes through.

@@ -48,7 +48,7 @@
  *   towerWork, towerAutoplay, towerSecrets, towerRock, towerVisited, towerTopY (street).
  */
 
-import { playOverlay } from '../overlays.js?v=ed371926';
+import { playOverlay } from '../overlays.js?v=605c12ff';
 import { ITEM_CATALOG, countItem, ensureItem, itemIcon } from '../inventory.js?v=60dfc9ca';
 import { canUseTool, useToolCondition } from '../tools.js?v=eff5ef6f';
 import { acceptOffer, npcQuestOffers } from '../quest-offers.js?v=a7ee5b8f';
@@ -113,7 +113,7 @@ import {
   towerSpotsFor,
   workCheck,
 } from '../home-tower.js?v=087df38f';
-import { textureFromUrl } from '../textures.js?v=3149d699';
+import { textureFromUrl } from '../textures.js?v=f024bd6a';
 import { denseSprite } from '../sprite-dense.js?v=2a0ce07a';
 import { pieceUrl } from '../home-wallpaper.js?v=f1969400';
 import { wantsHiresDecos } from '../deco-hires.js?v=9877af94';

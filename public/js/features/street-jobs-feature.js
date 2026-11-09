@@ -47,7 +47,7 @@ import { ITEM_CATALOG, addItem, countItem, ensureItem, itemIcon, packStamp, remo
 import { canUseTool, useToolCondition } from '../tools.js?v=eff5ef6f';
 import { ecologyForStreet } from '../street-ecology.js?v=08076876';
 import { worldToScreen } from '../street-model.js?v=b6cb6a4e';
-import { signArmWidth } from '../street-render.js?v=18160bb6';
+import { signArmWidth } from '../street-render.js?v=881d705a';
 import { getSkillCatalog } from '../content-catalogs.js?v=10b118dd';
 import { GIANTS } from '../shrines.js?v=247c9b77';
 import { giantDisplayName } from '../giant-names.js?v=0e295891';
@@ -124,7 +124,7 @@ import {
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 import { createMinnAccount } from '../minn-account.js?v=8f2741cd';
 import { normalizeGroups } from '../groups.js?v=f242ba06';
-import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=3149d699';
+import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=f024bd6a';
 import { JOB_WORK_OVERLAY, jobWorkFloatPoint, jobWorkSoundKey, jobWorkToolScale, jobWorkToolSheet } from '../job-work-fx.js?v=a040a5a7';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
 import { SIGN_ARMS, routeGraph } from '../map-routes.js?v=c7e7dc80';

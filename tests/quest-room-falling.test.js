@@ -13,14 +13,14 @@ import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { homedir } from 'node:os';
 
-import { ENTRY, FALL_HUB, INSTANCE_ID, INSTANCE_LABEL, LOADING_LABEL, PHYSICS, STAGE, TEMPLATE, falling, goToFallingLevel, onTeleporter, teleporterBox, withFallingRoom } from '../public/js/quest-rooms/falling-room.js?v=10201635';
+import { ENTRY, FALL_HUB, INSTANCE_ID, INSTANCE_LABEL, LOADING_LABEL, PHYSICS, STAGE, TEMPLATE, falling, goToFallingLevel, onTeleporter, teleporterBox, withFallingRoom } from '../public/js/quest-rooms/falling-room.js?v=04593bbe';
 import {
   ARRIVAL, BURSTS, COLUMNS, DRESSING, FALL, FALL_SPEED, FLOOR, FLOOR_Y, H, NUMBERS, TELEPORTER, TONGUE, TONGUE_MID, TONGUE_TOP, VY_MAX, W,
   fallPlatforms, numberAt, numberMarks, sx, sy, tonguePoint,
-} from '../public/js/quest-rooms/falling-room-scene.js?v=cbf41dc9';
+} from '../public/js/quest-rooms/falling-room-scene.js?v=e194634f';
 import { FALLING_ROOM_FILES } from '../public/js/quest-rooms/falling-room-art.js?v=6d588773';
-import { room as fireflyRoom } from '../public/js/quest-rooms/firefly-whistle.js?v=c90c9864';
-import * as kit from '../public/js/quest-rooms/kit.js?v=25fc6d59';
+import { room as fireflyRoom } from '../public/js/quest-rooms/firefly-whistle.js?v=1633c4ce';
+import * as kit from '../public/js/quest-rooms/kit.js?v=662d905f';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const publicDir = join(root, 'public');

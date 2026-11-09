@@ -59,7 +59,7 @@ after(() => {
   }
 });
 
-const art = () => import('../public/js/overlay-art.js?v=11b6dd7f');
+const art = () => import('../public/js/overlay-art.js?v=75c3ea34');
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 
 describe('G309 cancelAllOverlays', () => {
@@ -162,7 +162,7 @@ describe('G311 players outside overlay-art', () => {
 
   it('a firework under the fx layer stops when the street changes and resolves null', async () => {
     const { cancelAllOverlays, liveOverlayCount } = await art();
-    const { fireworksUnder } = await import('../public/js/features/spirit-loneliness-feature.js?v=f71a4932');
+    const { fireworksUnder } = await import('../public/js/features/spirit-loneliness-feature.js?v=c39253fa');
     cancelAllOverlays();
     const sprites = [];
     const PIXI = {
@@ -209,7 +209,7 @@ describe('G311 players outside overlay-art', () => {
     const games = readFileSync(join(GS, 'players/inc_games.js'), 'utf8');
     const tips = [...games.matchAll(/uid: "it_game_tip",\s*type: "vp_overlay",\s*duration: (\d+),/g)].map((m) => Number(m[1]));
     assert.ok(tips.length >= 4);
-    const { CROWNS_TIP_MS } = await import('../public/js/features/crowns-feature.js?v=dcea4881');
+    const { CROWNS_TIP_MS } = await import('../public/js/features/crowns-feature.js?v=4da5d5a7');
     assert.ok(tips.every((ms) => ms === CROWNS_TIP_MS));
     assert.match(games, /function games_end_it_game\(\)\{[\s\S]*?this\.games_it_dismiss_overlays\(\);/);
     const crowns = readFileSync(join(root, 'public/js/features/crowns-feature.js'), 'utf8');

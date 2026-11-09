@@ -35,9 +35,9 @@ import {
   ladderGeometry,
   touchesStar,
 } from '../public/js/symphonious-maximus.js?v=345ad437';
-import { symphoniousMaximusFeature, isSymphonious } from '../public/js/features/symphonious-maximus-feature.js?v=59145efa';
-import { FEATURES } from '../public/js/features/index.js?v=24bfe85e';
-import { parallaxLayerOffset } from '../public/js/street-render.js?v=18160bb6';
+import { symphoniousMaximusFeature, isSymphonious } from '../public/js/features/symphonious-maximus-feature.js?v=4faefda8';
+import { FEATURES } from '../public/js/features/index.js?v=a0014bea';
+import { parallaxLayerOffset } from '../public/js/street-render.js?v=881d705a';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const pub = join(spike, 'public');

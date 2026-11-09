@@ -19,11 +19,11 @@
  */
 import { addItem, countItem, removeItem } from '../inventory.js?v=60dfc9ca';
 import { readVisitScene } from '../neighbours-mp.js?v=ca29dfb4';
-import { frameTexture, sourceFromUrl } from '../textures.js?v=3149d699';
+import { frameTexture, sourceFromUrl } from '../textures.js?v=f024bd6a';
 import { GNOME_ART, GNOME_ART_DIR } from '../garden-gnome-art.js?v=994b7c76';
 import { filterText } from '../word-filter.js?v=9a7a7ebb';
 import { HOME_INTERIOR_TSID, HOME_STREET_TSID } from '../homes.js?v=631ab6b8';
-import { homesFeature } from './homes-feature.js?v=3175b842';
+import { homesFeature } from './homes-feature.js?v=4a8748e4';
 import {
   GNOME_CLASS,
   GNOME_PHRASE_MAX,

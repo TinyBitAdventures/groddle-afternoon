@@ -60,7 +60,7 @@
 import { slugsFromEffects } from '../speech-slugs.js?v=130338f9';
 import { addItem, countItem, ensureItem, removeItem, ITEM_CATALOG } from '../inventory.js?v=60dfc9ca';
 import { bindCountField, countKeyValue, countStepMarkup } from '../ui/count-chooser.js?v=5bc894c8';
-import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=7d3c70e7';
+import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=f7d1852a';
 import { landingY, nearestSurfaceY } from '../walk-surface.js?v=106bfdc5';
 import { donationValueFor } from '../shrines.js?v=247c9b77';
 import { giantDisplayName } from '../giant-names.js?v=0e295891';
@@ -108,8 +108,8 @@ import {
 import { shrinePrimeBonus } from '../imagination-effects.js?v=70169933';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 import { gainMetabolic, loseEnergy, loseMood } from '../metabolics.js?v=8504134e';
-import { displayTopOf, easeOutBack, itemstackOverlayPoint, playSheetOverlay } from '../overlay-art.js?v=11b6dd7f';
-import { OVERLAY_USES, playOverlay } from '../overlays.js?v=ed371926';
+import { displayTopOf, easeOutBack, itemstackOverlayPoint, playSheetOverlay } from '../overlay-art.js?v=75c3ea34';
+import { OVERLAY_USES, playOverlay } from '../overlays.js?v=605c12ff';
 import {
   MP_ROOK,
   MP_ROOK_TEXT,

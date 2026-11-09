@@ -27,7 +27,7 @@
  * vendorNpcLast.
  */
 
-import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=7d3c70e7';
+import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=f7d1852a';
 import { loadWildlifeCatalog, wildlifeCatalog } from '../wildlife.js?v=670c3a7f';
 import { VENDOR_PROFILES } from '../vendor.js?v=ad64eca6';
 import { addItem, countItem, removeItem } from '../inventory.js?v=60dfc9ca';

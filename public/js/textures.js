@@ -175,10 +175,11 @@ export function textureFromUrl(url, opts = {}) {
  * URL source are dynamic, so sprites pick up the real UVs once it loads.
  * @param {any} source a TextureSource (or Texture)
  * @param {any} [frame] a Rectangle in the source's logical units
+ * @param {{ orig?: any, trim?: any }} [layout] Pixi's orig and trim: a frame drawn smaller than its cell keeps the cell's size and placement
  */
-export function frameTexture(source, frame) {
+export function frameTexture(source, frame, layout = {}) {
   const s = sourceOf(source);
-  const texture = new (pixi().Texture)({ source: s, frame, dynamic: Boolean(s?.[LOAD]) });
+  const texture = new (pixi().Texture)({ source: s, frame, ...(layout.orig ? { orig: layout.orig } : {}), ...(layout.trim ? { trim: layout.trim } : {}), dynamic: Boolean(s?.[LOAD]) });
   const url = s?.[LOAD]?.url;
   if (url && frameTracker?.match(url)) {
     let set = frameSets.get(s);

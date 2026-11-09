@@ -62,7 +62,7 @@ import {
   completePapers,
   completePapersCheck,
 } from '../bureaucracy.js?v=130394fd';
-import { frameTexture, sourceFromUrl } from '../textures.js?v=3149d699';
+import { frameTexture, sourceFromUrl } from '../textures.js?v=f024bd6a';
 import { setMetalMakingMusic } from '../sound-moments.js?v=2f8597cd';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
 

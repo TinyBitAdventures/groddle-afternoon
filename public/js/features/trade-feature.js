@@ -44,7 +44,7 @@ import { ITEM_CATALOG, addItem, countItem, itemIcon, listPackSlots, removeItem }
 import { TOOL_CONDITION_CATALOG, copyTagKind, copyTags, leavingToolWear, moveToolCopy, receiveToolCopies, receiveToolCopy, setCopyTag, setToolRemaining, toolCopies } from '../tools.js?v=eff5ef6f';
 import { scriptFromTag, scriptLabel } from '../teleportation.js?v=42d36178';
 import { saveStore } from '../save-store.js?v=8839ba7b';
-import { playOverlay } from '../overlays.js?v=ed371926';
+import { playOverlay } from '../overlays.js?v=605c12ff';
 import {
   APPLIED_KEEP,
   TRADE_SLOTS,

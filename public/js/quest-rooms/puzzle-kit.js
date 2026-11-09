@@ -10,8 +10,8 @@
  * rooms keep every required rise <= 100 px and every gap <= 150 px.
  */
 
-import { textureFromUrl } from '../textures.js?v=3149d699';
-import { touchesQuoin } from './kit.js?v=25fc6d59';
+import { textureFromUrl } from '../textures.js?v=f024bd6a';
+import { touchesQuoin } from './kit.js?v=662d905f';
 
 export const JUMP_RISE = 100;
 export const JUMP_GAP = 150;

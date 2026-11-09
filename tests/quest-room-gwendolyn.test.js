@@ -10,7 +10,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import * as kit from '../public/js/quest-rooms/kit.js?v=25fc6d59';
+import * as kit from '../public/js/quest-rooms/kit.js?v=662d905f';
 import { QUEST_ROOMS, roomModulePath } from '../public/js/quest-rooms/catalog.js?v=d77d3d17';
 import { loadContentCatalogsFromDir, getQuestCatalog } from '../public/js/content-catalogs.js?v=10b118dd';
 import { acceptOffer, ensureQuestOfferState, questStatus, turnInQuest } from '../public/js/quest-offers.js?v=a7ee5b8f';
@@ -48,7 +48,7 @@ import {
   room,
   stageForQuest,
   thirdPartFor,
-} from '../public/js/quest-rooms/gwendolyn.js?v=b16ce855';
+} from '../public/js/quest-rooms/gwendolyn.js?v=6224b7d3';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const pub = (p) => join(root, 'public', p);

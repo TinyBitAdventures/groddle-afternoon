@@ -9,7 +9,7 @@
  * here as clean vectors.
  */
 
-import { frameTexture, isLoaded, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js?v=3149d699';
+import { frameTexture, isLoaded, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js?v=f024bd6a';
 import { quoinTouches } from '../quoins.js?v=299cc3f4';
 
 export const DECO_DIR = 'assets/decos/groddle/';
@@ -109,18 +109,28 @@ export function roomArt(PIXI, roomId, name, x, y, opts = {}) {
   return deco(PIXI, name, x, y, { ...opts, dir: `${ROOM_ART_DIR}${roomId}/` });
 }
 
-/** Frames cut from a horizontal/grid sheet once it has loaded. */
-export function sheetFrames(PIXI, url, cols, rows, count = cols * rows) {
+/**
+ * Frames cut from a horizontal/grid sheet once it has loaded.
+ * `insetLeft` (px, default 0) leaves that many columns off each frame's left side, drawn as
+ * empty (Pixi trim; the frame keeps its cell's size and placement). For sheets whose art runs
+ * into a cell's right edge: smooth sampling at the next cell's left edge reads that column too
+ * and draws it as a faint 1 px vertical line (the tutorial chain's handle, G596). Only for
+ * sheets whose cells are empty in those left columns.
+ */
+export function sheetFrames(PIXI, url, cols, rows, count = cols * rows, { insetLeft = 0 } = {}) {
   const base = sourceFromUrl(url);
   const frames = [];
   const cut = () => {
     const fw = Math.floor(base.width / cols);
     const fh = Math.floor(base.height / rows);
+    const inset = Math.max(0, Math.min(fw - 1, insetLeft));
     frames.length = 0;
     for (let i = 0; i < count; i++) {
       const cx = (i % cols) * fw;
       const cy = Math.floor(i / cols) * fh;
-      frames.push(frameTexture(base, new PIXI.Rectangle(cx, cy, fw, fh)));
+      frames.push(inset
+        ? frameTexture(base, new PIXI.Rectangle(cx + inset, cy, fw - inset, fh), { orig: new PIXI.Rectangle(0, 0, fw, fh), trim: new PIXI.Rectangle(inset, 0, fw - inset, fh) })
+        : frameTexture(base, new PIXI.Rectangle(cx, cy, fw, fh)));
     }
   };
   if (isLoaded(base)) cut();
@@ -130,7 +140,7 @@ export function sheetFrames(PIXI, url, cols, rows, count = cols * rows) {
 
 /** An animated sprite from a sheet (starts on frame 0 once loaded). */
 export function animated(PIXI, url, cols, rows, opts = {}) {
-  const sheet = sheetFrames(PIXI, url, cols, rows, opts.count);
+  const sheet = sheetFrames(PIXI, url, cols, rows, opts.count, { insetLeft: opts.insetLeft });
   const placeholder = [PIXI.Texture.EMPTY];
   const spr = new PIXI.AnimatedSprite(sheet.frames.length ? sheet.frames : placeholder);
   spr.anchor.set(opts.ax ?? 0.5, opts.ay ?? 1);

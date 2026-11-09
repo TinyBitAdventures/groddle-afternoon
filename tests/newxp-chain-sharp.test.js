@@ -90,7 +90,7 @@ describe('tutorial pull chain 3x', () => {
 
   it('keeps the chain where it was, its hit area and its timing, and warms the pull sheet before the click', () => {
     const src = readFileSync(join(pub, FEATURE), 'utf8');
-    assert.match(src, /kit\.animated\(PIXI, CHAIN_ART\.hang\.url, CHAIN_ART\.hang\.cols, CHAIN_ART\.hang\.rows, \{ count: CHAIN_ART\.hang\.count, ax: 0\.5, ay: 0, speed: 0\.4 \}\)/);
+    assert.match(src, /kit\.animated\(PIXI, CHAIN_ART\.hang\.url, CHAIN_ART\.hang\.cols, CHAIN_ART\.hang\.rows, \{ count: CHAIN_ART\.hang\.count, ax: 0\.5, ay: 0, speed: 0\.4, insetLeft: CHAIN_INSET_LEFT \}\)/);
     assert.match(src, /chain\.hitArea = new PIXI\.Rectangle\(-29, 230, 58, 250\);/);
     assert.match(src, /const pull = kit\.sheetFrames\(PIXI, CHAIN_ART\.pull\.url, [^\n]*\);\n\s*upgradeSource\(pull\.base, CHAIN_ART\.pull\.url, whenLoaded\);/);
     assert.match(src, /run\.views = \{ root, chain, pull, arrow, lit, phrases \};/);

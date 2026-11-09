@@ -33,7 +33,7 @@ import {
   normalizeWayBack,
   wayBackFrom,
 } from '../interrogation-room.js?v=c6a73859';
-import { textureFromUrl } from '../textures.js?v=3149d699';
+import { textureFromUrl } from '../textures.js?v=f024bd6a';
 
 export const INTERROGATION_FEATURE_ID = 'interrogation-room';
 export const INTERROGATION_DOOR_CLASS = 'interrogation_door';

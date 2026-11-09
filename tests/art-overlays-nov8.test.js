@@ -7,12 +7,12 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { OVERLAY_BUBBLE_URL, OVERLAY_USES, overlayBubbleBox } from '../public/js/overlays.js?v=ed371926';
+import { OVERLAY_BUBBLE_URL, OVERLAY_USES, overlayBubbleBox } from '../public/js/overlays.js?v=605c12ff';
 import { OVERLAYS, expandMotionObjects } from '../tools/overlays/build.mjs';
 import { loadFla } from '../tools/overlay-art/xfl-svg.mjs';
 import { SHRINE_SHEETS, shrineClassFor, shrineRegionForHub, shrineSheet, shrineVariantFor } from '../public/js/shrine-variants.js?v=7f11c97d';
 import { checkVariants, variantFiles } from '../tools/shrine-variants/build.mjs';
-import { SLATHER_VERB, SPLATTER_STAGE_SIDE, splatterDy, slatherVerb } from '../public/js/features/quest-verbs-feature.js?v=f17be30c';
+import { SLATHER_VERB, SPLATTER_STAGE_SIDE, splatterDy, slatherVerb } from '../public/js/features/quest-verbs-feature.js?v=6dff3574';
 import { OVERLAY_EMOTES, EMOTES } from '../public/js/realtime-client.js?v=7350df88';
 import {
   GAME_TELEPORTER_DECO,
@@ -22,7 +22,7 @@ import {
   gameTeleporterFeature,
   payForCrowns,
   teleporterPoint,
-} from '../public/js/features/game-teleporter-feature.js?v=309d43a6';
+} from '../public/js/features/game-teleporter-feature.js?v=7cd06bec';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const pub = join(root, 'public');

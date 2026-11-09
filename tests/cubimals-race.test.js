@@ -38,8 +38,8 @@ import { addItem, countItem, createInventory } from '../public/js/inventory.js?v
 import { bindToolInventory, copyTags, createToolConditionState } from '../public/js/tools.js?v=eff5ef6f';
 import { applyAchievementProgress, createAchievementState } from '../public/js/achievements.js?v=2e4aa9cb';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=10b118dd';
-import { FEATURES } from '../public/js/features/index.js?v=24bfe85e';
-import { cubimalRaceFeature, CUBIMAL_RACE_FEATURE_ID } from '../public/js/features/cubimal-race-feature.js?v=c0eba9a1';
+import { FEATURES } from '../public/js/features/index.js?v=a0014bea';
+import { cubimalRaceFeature, CUBIMAL_RACE_FEATURE_ID } from '../public/js/features/cubimal-race-feature.js?v=e9d0c069';
 import { FIRST_DRAW_SPRITES, HIRES_SPRITES } from '../public/js/sprite-hires.js?v=37ca7427';
 
 const here = dirname(fileURLToPath(import.meta.url));

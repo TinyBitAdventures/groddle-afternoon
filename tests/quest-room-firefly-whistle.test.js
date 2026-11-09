@@ -35,13 +35,13 @@ import {
   codeMatches,
   hintFor,
   room,
-} from '../public/js/quest-rooms/firefly-whistle.js?v=c90c9864';
-import { DRESSING, ENTRY, FLOOR, FLOOR_Y, LAB, W, entryPath, labPlatforms, seamsToDraw, sx, sy } from '../public/js/quest-rooms/firefly-whistle-scene.js?v=883e9743';
+} from '../public/js/quest-rooms/firefly-whistle.js?v=1633c4ce';
+import { DRESSING, ENTRY, FLOOR, FLOOR_Y, LAB, W, entryPath, labPlatforms, seamsToDraw, sx, sy } from '../public/js/quest-rooms/firefly-whistle-scene.js?v=101e171e';
 import { FIREFLY_LAB_FILES } from '../public/js/quest-rooms/firefly-lab-art.js?v=481a55f9';
-import * as kit from '../public/js/quest-rooms/kit.js?v=25fc6d59';
+import * as kit from '../public/js/quest-rooms/kit.js?v=662d905f';
 import { BUILT_ROOMS, OFFER_OVERRIDES, QUEST_ROOMS, questGiver } from '../public/js/quest-rooms/catalog.js?v=d77d3d17';
 import { REMAKE_QUEST_NPCS } from '../public/js/quest-offers.js?v=a7ee5b8f';
-import { FIREFLY_OFFER_LINES, FIREFLY_WHISTLE_QUEST, fireflyTouches } from '../public/js/features/resource-nodes-feature.js?v=ef72f1c5';
+import { FIREFLY_OFFER_LINES, FIREFLY_WHISTLE_QUEST, fireflyTouches } from '../public/js/features/resource-nodes-feature.js?v=7b16005e';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const GS = join(homedir(), 'Documents/glitch-audit/glitch-GameServerJS');

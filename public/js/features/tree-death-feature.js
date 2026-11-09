@@ -69,8 +69,8 @@ import { migrateClassValue } from '../tools.js?v=eff5ef6f';
 import { ITEM_CATALOG, ensureItem } from '../inventory.js?v=60dfc9ca';
 import { moodMax } from '../metabolics.js?v=8504134e';
 import { plantChoices } from '../patches.js?v=dc2b1436';
-import { textureFromUrl } from '../textures.js?v=3149d699';
-import { displayTopOf, itemstackOverlayPoint, playSheetOverlay } from '../overlay-art.js?v=11b6dd7f';
+import { textureFromUrl } from '../textures.js?v=f024bd6a';
+import { displayTopOf, itemstackOverlayPoint, playSheetOverlay } from '../overlay-art.js?v=75c3ea34';
 import {
   GUILT_BUFF,
   POISON_COPY,
@@ -97,7 +97,7 @@ import {
   quotePoisonVerb,
   treeDeathOutcome,
 } from '../tree-poison.js?v=3e868dfd';
-import { patchesFeature } from './patches-feature.js?v=83a5fca8';
+import { patchesFeature } from './patches-feature.js?v=8554abf7';
 
 export const TREE_DEATH_FEATURE_ID = 'tree-death';
 const VERB_PREFIX = 'treepoison:';

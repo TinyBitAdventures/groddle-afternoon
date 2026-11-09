@@ -12,11 +12,11 @@ import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { STUCK_TEXT, bareCommand, slashPlan } from '../public/js/slash-commands.js?v=8533e143';
-import { STUCK_HINT_DWELL_MS, onTrapFloor, slashCommandsFeature, trapLinesOn } from '../public/js/features/slash-commands-feature.js?v=4b57c313';
+import { STUCK_HINT_DWELL_MS, onTrapFloor, slashCommandsFeature, trapLinesOn } from '../public/js/features/slash-commands-feature.js?v=4f9e38f4';
 import { STREET_TRAPS } from '../public/js/street-traps-data.js?v=b2911c49';
 import { TRAP_JUMPS, renderTraps, trapLinesOf } from '../tools/ecology/build-street-traps.mjs';
 import { reachStreet, streetBuff } from '../public/js/builder/reach-graph.js?v=f1b86aeb';
-import { validateShippedStreet } from '../public/js/builder/validate.js?v=9c3f638d';
+import { validateShippedStreet } from '../public/js/builder/validate.js?v=2590f49c';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const LEVEL_3_WEST = 'GLI107JLRU11EM2';
