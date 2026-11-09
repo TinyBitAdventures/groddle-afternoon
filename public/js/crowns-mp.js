@@ -15,6 +15,10 @@ export const CROWNS_MP_STREET_RE = /^CROWNS_[0-9A-F]{16}$/;
 const MATCH_RE = /^[0-9a-f]{16}$/;
 /** crowns.go reward ids: crowns-<match>-<round>-<player>. */
 export const CROWNS_REWARD_ID_RE = /^crowns-[0-9a-f]{16}-[0-9]{1,3}-[0-9]{1,12}$/;
+/** crowns_teleporter.go: the Crown Game Teleporter's ledger spend, gtele-<16 hex> (its refund adds -r). */
+export const CROWNS_SPEND_RE = /^gtele-[0-9a-f]{16}$/;
+/** game_teleporter.js onConversation 213: the most one teleporter spend takes. */
+export const CROWNS_TELEPORTER_PRICE = 50;
 
 /** Copy the server does not send (GSJS strings where there are any). */
 export const CROWNS_MP_TEXT = Object.freeze({
@@ -60,12 +64,15 @@ export function normalizeCrownsMatch(msg) {
       return r ? { ...r, slot: Math.max(0, Math.floor(num(p.slot))) } : null;
     })
     .filter(Boolean);
-  if (players.length < 2) return null;
+  // A ticket's game starts with its players; a teleporter's (open) can start with one waiting.
+  const open = msg.open === true;
+  if (players.length < (open ? 1 : 2)) return null;
   const locks = (Array.isArray(msg.locks) ? msg.locks : []).map(point);
   if (locks.some((l) => !l)) return null;
   return {
     match: String(msg.match),
     street: String(msg.street),
+    open,
     slot: Math.max(0, Math.floor(num(msg.slot))),
     spawn: point(msg.spawn),
     players,
@@ -142,4 +149,31 @@ export function crownHolderPos(id, myId, player, roster = []) {
   if (id === myId) return player ? { x: player.x, y: player.y } : null;
   const p = (roster || []).find((r) => Number(r.id) === id);
   return p && Number.isFinite(Number(p.x)) ? { x: Number(p.x), y: Number(p.y) } : null;
+}
+
+/** crown_joined (crowns_teleporter.go): the players of an open game after someone came by the teleporter. */
+export function normalizeCrownsJoined(msg) {
+  if (!msg || !MATCH_RE.test(String(msg.match || ''))) return null;
+  const players = (Array.isArray(msg.players) ? msg.players : [])
+    .map((p) => {
+      const r = crownRef(p);
+      return r ? { ...r, slot: Math.max(0, Math.floor(num(p.slot))) } : null;
+    })
+    .filter(Boolean);
+  return players.length ? { match: String(msg.match), players, name: String(msg.name || '').slice(0, 64) } : null;
+}
+
+/** crown_paid: the teleporter's spend, { id, spend, cost } or null (the id is the spend). */
+export function normalizeCrownsPaid(msg) {
+  const spend = String(msg?.spend || '');
+  if (!CROWNS_SPEND_RE.test(spend) || String(msg?.id || '') !== spend) return null;
+  return { id: spend, spend, cost: Math.max(0, Math.min(CROWNS_TELEPORTER_PRICE, Math.floor(num(msg.cost)))), text: String(msg.text || '') };
+}
+
+/** crown_paid_back: a teleporter spend given back, { id, spend, refund, currants, text } or null. */
+export function normalizeCrownsPaidBack(msg) {
+  const spend = String(msg?.spend || '');
+  const refund = String(msg?.refund || '');
+  if (!CROWNS_SPEND_RE.test(spend) || refund !== `${spend}-r` || String(msg?.id || '') !== refund) return null;
+  return { id: refund, spend, refund, currants: Math.max(0, Math.min(CROWNS_TELEPORTER_PRICE, Math.floor(num(msg.currants)))), text: String(msg.text || '') };
 }

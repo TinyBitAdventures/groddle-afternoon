@@ -15,10 +15,14 @@
  *   later the player joins Game of Crowns (playerJoinInstance it_game: solo,
  *   crowns-feature startCrowns without a ticket). Short of 50: "Oh dear, you
  *   don't have enough currants to play!".
- * - Online the source joined the shared it_game instance through the
- *   shared instance manager; the realtime server's Game of Crowns starts only
- *   from a ticket's challenge (crowns.go), so online the teleporter says so
- *   and points to the ticket.
+ * - Online (G387) the same question; Sounds fun! asks the realtime server
+ *   (crowns-feature crownsMpTeleport, groddle-afternoon-server
+ *   crowns_teleporter.go), which takes the 50 currants through the site's
+ *   ledger and a second later seats the player in the fullest open game, or
+ *   a new one, as the shared instance manager's playerJoinInstance did
+ *   (shared_instance_manager.js 36-87, 585-633). The game starts once three
+ *   are ready and nobody is still to click (instance.js can_start_game
+ *   579-602). The overlay and the words wait for the server's crown_paid.
  *
  * QA: ?autostart=1&questoffer=off&streetdemo=GDOOSA8V29J24I3&streetx=1060&streety=600
  *   (&teleporterautoplay=ask stops on the question, =1 pays and goes in;
@@ -28,7 +32,7 @@
  */
 
 import { OVERLAY_USES, playOverlay } from '../overlays.js?v=ed371926';
-import { startCrowns } from './crowns-feature.js?v=728e36d9';
+import { crownsMpTeleport, startCrowns } from './crowns-feature.js?v=10175705';
 
 export const GAME_TELEPORTER_FEATURE_ID = 'game-teleporter';
 export const GAME_TELEPORTER_CLASS = 'game_teleporter';
@@ -52,7 +56,6 @@ export const GAME_TELEPORTER_TEXT = Object.freeze({
   no: 'Maybe another time',
   paid: 'You are transported to a mystical land of fun and adventure!',
   poor: "Oh dear, you don't have enough currants to play!",
-  online: 'Online, Game of Crowns starts from a Game of Crowns Ticket: activate one in your pack to challenge the street.',
 });
 
 /** The teleporter's screen position on a street with these bounds. */
@@ -101,14 +104,15 @@ function spawn(engine, street) {
   });
 }
 
-function pay(engine, { holdMs = null } = {}) {
-  const res = payForCrowns(engine.pc);
-  if (!res.ok) {
-    last = 'poor';
-    engine.scriptedDialogue({ title: GAME_TELEPORTER_TEXT.label, kicker: '', beats: [{ text: GAME_TELEPORTER_TEXT.poor, response: 'OK' }] });
-    publish(engine);
-    return false;
-  }
+/** onConversation 235-236: conversation_reply with the poor line. */
+function poor(engine) {
+  last = 'poor';
+  engine.scriptedDialogue({ title: GAME_TELEPORTER_TEXT.label, kicker: '', beats: [{ text: GAME_TELEPORTER_TEXT.poor, response: 'OK' }] });
+  publish(engine);
+}
+
+/** What paying looks like (onConversation 215-231): the overlay at the avatar, hit1, the sound and the line. */
+function paidFx(engine, { holdMs = null, text = GAME_TELEPORTER_TEXT.paid } = {}) {
   const use = OVERLAY_USES.game_teleporter_overlay;
   const player = engine.player;
   playOverlay(engine.PIXI, 'game_teleporter_overlay', {
@@ -121,11 +125,20 @@ function pay(engine, { holdMs = null } = {}) {
   });
   engine.playHit?.('hit1', GAME_TELEPORTER_HIT_MS);
   engine.playSound?.(use.sound);
-  engine.pushActivity({ base: GAME_TELEPORTER_TEXT.paid, effects: { currants: -GAME_TELEPORTER_PRICE } });
+  engine.pushActivity({ base: text || GAME_TELEPORTER_TEXT.paid, effects: { currants: -GAME_TELEPORTER_PRICE } });
   engine.updateHud?.();
   engine.save?.();
   last = 'paid';
   publish(engine);
+}
+
+function pay(engine, { holdMs = null } = {}) {
+  const res = payForCrowns(engine.pc);
+  if (!res.ok) {
+    poor(engine);
+    return false;
+  }
+  paidFx(engine, { holdMs });
   if (holdMs != null) return true;
   setTimeout(() => {
     Promise.resolve(startCrowns(engine, {})).then((ok) => {
@@ -136,14 +149,33 @@ function pay(engine, { holdMs = null } = {}) {
   return true;
 }
 
+/**
+ * Sounds fun! online: the server decides there were 50 currants (the ledger) and
+ * seats the player; the overlay plays when it says the spend went through.
+ */
+function payOnline(engine) {
+  if ((Number(engine.pc?.currants) || 0) < GAME_TELEPORTER_PRICE) {
+    poor(engine);
+    return false;
+  }
+  const sent = crownsMpTeleport(engine, {
+    onPaid: (paid, text) => paidFx(engine, { text }),
+    onRefused: (why, text) => {
+      if (why === 'poor') poor(engine);
+      else {
+        last = `refused:${why}`;
+        if (text) engine.toast?.(text, 3200);
+        publish(engine);
+      }
+    },
+  });
+  last = sent ? 'paying' : 'offline';
+  publish(engine);
+  return sent;
+}
+
 function activate(engine) {
   engine.playSound?.('ACTIVATE_GAME_TELEPORTER');
-  if (engine.mode === 'multiplayer') {
-    last = 'online';
-    engine.toast?.(GAME_TELEPORTER_TEXT.online, 4200);
-    publish(engine);
-    return;
-  }
   last = 'asked';
   publish(engine);
   engine.scriptedDialogue({
@@ -152,7 +184,7 @@ function activate(engine) {
     beats: [{ text: GAME_TELEPORTER_TEXT.question, response: GAME_TELEPORTER_TEXT.yes }],
     cancelable: true,
     cancelLabel: GAME_TELEPORTER_TEXT.no,
-    onComplete: () => pay(engine),
+    onComplete: () => (engine.mode === 'multiplayer' ? payOnline(engine) : pay(engine)),
     onCancel: () => {
       last = 'declined';
       publish(engine);

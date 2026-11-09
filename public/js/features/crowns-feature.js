@@ -72,10 +72,13 @@ import {
   crownMsNow,
   crownsMpBoard,
   crownsMpOutcome,
+  normalizeCrownsJoined,
   normalizeCrownsMatch,
+  normalizeCrownsPaid,
+  normalizeCrownsPaidBack,
   normalizeCrownsReward,
   normalizeCrownsState,
-} from '../crowns-mp.js?v=0cb4bb3b';
+} from '../crowns-mp.js?v=c1e686e6';
 
 const ICON = 'assets/sprites/races/';
 const CROWN_DIR = 'assets/sprites/races/crowns/';
@@ -697,6 +700,7 @@ let mpChallenging = false;
 let mpAccepting = false;
 let mpStarting = false;
 let mpAsked = false; // crown_pending sent, no crown_ticket yet
+let mpTeleport = null; // { onPaid, onRefused }: a crown_teleport out, no answer yet (G387)
 let mpLast = '';
 /** race_ticket_it_game.js:119, the ticket's words for a dead player. */
 const MP_TOO_DEAD = 'You are too dead to be racing around.';
@@ -736,7 +740,7 @@ function mpAskPending(engine) {
 }
 
 function mpBusy() {
-  return Boolean(mp || mpStarting || mpChallenging || mpAccepting || game || pending);
+  return Boolean(mp || mpStarting || mpChallenging || mpAccepting || mpTeleport || game || pending);
 }
 
 function mpClearPrompts(engine) {
@@ -790,6 +794,76 @@ export function crownsMpChallenge(classTsid, engine) {
   mpNote(engine, 'challenge');
   publish(engine);
   return true;
+}
+
+/**
+ * The Crown Game Teleporter's Sounds fun! in multiplayer (G387, game_teleporter.js
+ * onConversation 211-237): the realtime server takes the 50 currants through the
+ * site's ledger and a second later seats this player in the fullest open game
+ * (crowns_teleporter.go). onPaid(paid, text) runs once the spend is in (the
+ * overlay, hit1, PAY_FIFTY_CURRANTS); onRefused(why, text) when it is not. The
+ * currants come off here, once per spend (ledgerReceipt). True when it went out.
+ */
+export function crownsMpTeleport(engine, { onPaid = null, onRefused = null } = {}) {
+  if (!isMp(engine)) return false;
+  if (mpBusy()) {
+    engine.toast('You are already racing!', 2400);
+    return false;
+  }
+  const c = mpAttach(engine);
+  if (!c || c.state !== 'online' || !c.street) {
+    engine.toast(CROWNS_MP_TEXT.offline, 2600);
+    return false;
+  }
+  mpTeleport = { onPaid, onRefused };
+  if (!c.send('crown_teleport', {})) {
+    mpTeleport = null;
+    engine.toast(CROWNS_MP_TEXT.offline, 2600);
+    return false;
+  }
+  mpNote(engine, 'teleport');
+  publish(engine);
+  return true;
+}
+
+/** crown_paid: the teleporter's 50 currants left the ledger; off the purse once, then acked. */
+async function mpTeleportPaid(engine, msg) {
+  const p = normalizeCrownsPaid(msg);
+  const c = mpClient;
+  if (!p || !c) return;
+  const receipt = engine.query?.('ledgerReceipt', p.spend, engine);
+  if (receipt === true) engine.pc.currants = Math.max(0, (Number(engine.pc.currants) || 0) - p.cost);
+  const cb = mpTeleport;
+  mpTeleport = null;
+  if (cb && receipt !== false) cb.onPaid?.(p, p.text);
+  else if (receipt === true) engine.pushActivity({ base: p.text, effects: { currants: -p.cost } });
+  engine.updateHud();
+  mpNote(engine, `paid:${p.spend}:${receipt === true ? 'applied' : 'had'}`);
+  publish(engine);
+  if (receipt !== null && await mpPersist(engine)) c.send('crown_ack', { id: p.id });
+}
+
+/**
+ * crown_paid_back: a teleporter spend that bought nothing came back (LedgerSpend.php
+ * refund, a trade id of its own). Both ids go in the applied list, so a spend this
+ * page never applied and its refund net to nothing (as party_space_refunded).
+ */
+async function mpTeleportPaidBack(engine, msg) {
+  const b = normalizeCrownsPaidBack(msg);
+  const c = mpClient;
+  if (!b || !c) return;
+  const hadSpend = engine.query?.('ledgerReceipt', b.spend, engine) === false;
+  const fresh = engine.query?.('ledgerReceipt', b.refund, engine) === true;
+  if (fresh && hadSpend && b.currants) {
+    engine.pc.currants = (Number(engine.pc.currants) || 0) + b.currants;
+    if (b.text) {
+      engine.toast(b.text, 4200);
+      engine.pushActivity(b.text);
+    }
+    engine.updateHud();
+  }
+  mpNote(engine, `paidback:${b.spend}:${fresh && hadSpend ? b.currants : 0}`);
+  if (await mpPersist(engine)) c.send('crown_ack', { id: b.id });
 }
 
 function mpAttach(engine) {
@@ -858,8 +932,27 @@ function mpAttach(engine) {
     mpNote(engine, `failed:${msg.refund === true ? 'refund' : 'no'}`);
     publish(engine);
   });
+  c.on('msg:crown_paid', (msg) => { mpTeleportPaid(engine, msg); });
+  c.on('msg:crown_paid_back', (msg) => { mpTeleportPaidBack(engine, msg); });
+  c.on('msg:crown_joined', (msg) => {
+    const j = normalizeCrownsJoined(msg);
+    if (!mp || !j || j.match !== mp.match) return;
+    mp.players = j.players;
+    mpRenderHud(engine, true);
+    mpNote(engine, `joined:${j.players.length}`);
+    publish(engine);
+  });
   c.on('msg:crown_refused', (msg) => {
     const text = String(msg.text || '');
+    if (mpTeleport) {
+      const cb = mpTeleport;
+      mpTeleport = null;
+      if (cb.onRefused) cb.onRefused(String(msg.why || ''), text);
+      else if (text) engine.toast(text, 3000);
+      mpNote(engine, `refused:${msg.why || ''}`);
+      publish(engine);
+      return;
+    }
     if (mpChallenging) {
       mpChallenging = false;
       mpRefund(engine);
@@ -1058,6 +1151,8 @@ function mpAttach(engine) {
   // Every (re)connect: the server called off any open challenge this page had (crowns.go onDisconnect).
   c.on('hello', () => {
     mpAsked = false;
+    // A crown_teleport out when the socket dropped: its crown_paid (owed) comes again if it went through.
+    mpTeleport = null;
     if (!mp && (mpChallenging || mpAccepting || mpStarting)) {
       // A filled challenge waits for its start, which counts whoever is online then.
       mpChallenging = false;
