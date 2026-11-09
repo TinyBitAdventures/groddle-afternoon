@@ -2748,13 +2748,43 @@
   ]
  },
  "release": {
-  "game": "0.25.0",
-  "deployed": "2026-11-08"
+  "game": "0.26.0",
+  "deployed": "2026-11-09"
  },
  "git": {
-  "commits": 1518,
+  "commits": 1524,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-08",
+    "kind": "fix",
+    "text": "The Quests list always shows the quests it counts as active"
+   },
+   {
+    "date": "2026-11-08",
+    "kind": "new",
+    "text": "Set your own machine down in a Community Machine Room (Meadow, Besara, Forest), for anyone there to use"
+   },
+   {
+    "date": "2026-11-08",
+    "kind": "improve",
+    "text": "Tool, ore and shrine descriptions in the original's own words"
+   },
+   {
+    "date": "2026-11-08",
+    "kind": "new",
+    "text": "The Rook stops a Heli Kitty where it struck it: online for everyone, and it is not startled while rooked"
+   },
+   {
+    "date": "2026-11-08",
+    "kind": "improve",
+    "text": "Getting a trophy says where it went: with your furniture, shown from Decorate"
+   },
+   {
+    "date": "2026-11-08",
+    "kind": "fix",
+    "text": "A line typed in Local chat goes to Local, not to Global Chat"
+   },
    {
     "date": "2026-11-08",
     "kind": "new",
@@ -2844,36 +2874,6 @@
     "date": "2026-11-08",
     "kind": "fix",
     "text": "Six signposts land you where the original did, not at the street's default spot"
-   },
-   {
-    "date": "2026-11-08",
-    "kind": "new",
-    "text": "Bewitched Backwoods draws its own misty yard, and Night Lights, Easy Ash and Perfus Preference match their streets"
-   },
-   {
-    "date": "2026-11-08",
-    "kind": "improve",
-    "text": "Tiny Speck's own splatter, prime arrow, eyeballing bubble, game teleporter beam and moving subway windows"
-   },
-   {
-    "date": "2026-11-08",
-    "kind": "new",
-    "text": "Firebog, Ix and Uralia shrines wear their own art"
-   },
-   {
-    "date": "2026-11-08",
-    "kind": "improve",
-    "text": "The tutorial uses your online name, lets the Egg in your pack go to the Dustbunny, and hides the parts of the top bar it has not introduced"
-   },
-   {
-    "date": "2026-11-08",
-    "kind": "new",
-    "text": "Leave a wrapped Gift Box with a friend's Butler online; they get it back still wrapped, with the same things inside"
-   },
-   {
-    "date": "2026-11-08",
-    "kind": "improve",
-    "text": "Online, the Skills panel says Transcendental Radiation works, and what ranks II and III need"
    }
   ]
  },
