@@ -1,0 +1,752 @@
+{
+ "about": "SHARP sweep (lane sharp, 2026-11-08, Austin: \"Are there other images that are blurry?\"): the original-size sheets left after the newxp chain (G596) that the game draws in Pixi and that have a CC0 SWF in glitch-items or glitch-overlays. Each job names the SWF sprite and label the 1x OGA sheet was cut from; root-timeline stills render from a padded-stage copy (padStage). Run: node tools/vector-sprites/build.mjs --manifest tools/vector-sprites/sharp-sweep.json Sheets whose 1x file is lossy WebP are in sharp-sweep-lossy.json.",
+ "firstDraw": true,
+ "budget": {
+  "maxSide": 8192,
+  "maxMB": 64
+ },
+ "jobs": [
+  {
+   "name": "party-teleporter",
+   "swf": "misc/teleporter/teleporter_visible/teleporter_visible.swf",
+   "sprite": 52,
+   "sheets": [
+    {
+     "path": "assets/sprites/parties/teleporter_visible_portal.webp",
+     "label": "portal",
+     "fw": 143,
+     "fh": 303,
+     "cols": 5,
+     "frames": 15
+    },
+    {
+     "path": "assets/sprites/parties/teleporter_visible_disappear.webp",
+     "label": "disappear",
+     "fw": 143,
+     "fh": 303,
+     "cols": 5,
+     "frames": 13
+    }
+   ]
+  },
+  {
+   "name": "rook-balm-tool",
+   "swf": "alchemy/potion_rook_balm/potion_rook_balm.swf",
+   "sprite": 0,
+   "padStage": 1,
+   "sheets": [
+    {
+     "path": "assets/sprites/rooks/rook-balm-tool.webp",
+     "fw": 88,
+     "fh": 106,
+     "cols": 10,
+     "frames": 67,
+     "swfStart": 3,
+     "swfCount": 75
+    }
+   ]
+  },
+  {
+   "name": "firefly",
+   "swf": "misc/npc/npc_firefly/npc_firefly.swf",
+   "sprite": 3,
+   "sheets": [
+    {
+     "path": "assets/sprites/resources/firefly-full-path.webp",
+     "label": "fullPath",
+     "fw": 87,
+     "fh": 40,
+     "cols": 10,
+     "frames": 89
+    },
+    {
+     "path": "assets/sprites/resources/firefly-half-path.webp",
+     "label": "halfPath",
+     "fw": 87,
+     "fh": 40,
+     "cols": 10,
+     "frames": 40
+    },
+    {
+     "path": "assets/sprites/resources/firefly-small-path.webp",
+     "label": "smallPath",
+     "fw": 87,
+     "fh": 40,
+     "cols": 10,
+     "frames": 20
+    }
+   ]
+  },
+  {
+   "name": "funpickle-bounce",
+   "swf": "misc/special_item_that_only_beta_testers_get/special_item_that_only_beta_testers_get.swf",
+   "sprite": 4,
+   "sheets": [
+    {
+     "path": "assets/sprites/small-items/funpickle_bounce2.webp",
+     "label": "bounce2",
+     "fw": 125,
+     "fh": 227,
+     "cols": 32,
+     "frames": 160
+    }
+   ]
+  },
+  {
+   "name": "fox-brush",
+   "swf": "tools/tool_base/fox_brush/fox_brush.swf",
+   "sprite": 13,
+   "sheets": [
+    {
+     "path": "assets/sprites/foxes/brush-hit.webp",
+     "label": "hit",
+     "fw": 105,
+     "fh": 80,
+     "cols": 6,
+     "frames": 12
+    },
+    {
+     "path": "assets/sprites/foxes/brush-miss.webp",
+     "label": "miss",
+     "fw": 105,
+     "fh": 80,
+     "cols": 6,
+     "frames": 12
+    }
+   ]
+  },
+  {
+   "name": "giant-icon-alph",
+   "swf": "giants/icon_alph/icon_alph.swf",
+   "sprite": 0,
+   "padStage": 1,
+   "sheets": [
+    {
+     "path": "assets/sprites/giant-icons/icon_alph.webp",
+     "fw": 86,
+     "fh": 103,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 2,
+     "swfCount": 1
+    }
+   ]
+  },
+  {
+   "name": "giant-icon-cosma",
+   "swf": "giants/icon_cosma/icon_cosma.swf",
+   "sprite": 0,
+   "padStage": 1,
+   "sheets": [
+    {
+     "path": "assets/sprites/giant-icons/icon_cosma.webp",
+     "fw": 94,
+     "fh": 92,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 2,
+     "swfCount": 1
+    }
+   ]
+  },
+  {
+   "name": "giant-icon-friendly",
+   "swf": "giants/icon_friendly/icon_friendly.swf",
+   "sprite": 0,
+   "padStage": 1,
+   "sheets": [
+    {
+     "path": "assets/sprites/giant-icons/icon_friendly.webp",
+     "fw": 85,
+     "fh": 87,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 2,
+     "swfCount": 1
+    }
+   ]
+  },
+  {
+   "name": "giant-icon-grendaline",
+   "swf": "giants/icon_grendaline/icon_grendaline.swf",
+   "sprite": 0,
+   "padStage": 1,
+   "sheets": [
+    {
+     "path": "assets/sprites/giant-icons/icon_grendaline.webp",
+     "fw": 81,
+     "fh": 96,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 2,
+     "swfCount": 1
+    }
+   ]
+  },
+  {
+   "name": "giant-icon-humbaba",
+   "swf": "giants/icon_humbaba/icon_humbaba.swf",
+   "sprite": 0,
+   "padStage": 1,
+   "sheets": [
+    {
+     "path": "assets/sprites/giant-icons/icon_humbaba.webp",
+     "fw": 79,
+     "fh": 93,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 2,
+     "swfCount": 1
+    }
+   ]
+  },
+  {
+   "name": "giant-icon-lem",
+   "swf": "giants/icon_lem/icon_lem.swf",
+   "sprite": 0,
+   "padStage": 1,
+   "sheets": [
+    {
+     "path": "assets/sprites/giant-icons/icon_lem.webp",
+     "fw": 88,
+     "fh": 93,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 2,
+     "swfCount": 1
+    }
+   ]
+  },
+  {
+   "name": "giant-icon-mab",
+   "swf": "giants/icon_mab/icon_mab.swf",
+   "sprite": 0,
+   "padStage": 1,
+   "sheets": [
+    {
+     "path": "assets/sprites/giant-icons/icon_mab.webp",
+     "fw": 78,
+     "fh": 95,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 2,
+     "swfCount": 1
+    }
+   ]
+  },
+  {
+   "name": "giant-icon-pot",
+   "swf": "giants/icon_pot/icon_pot.swf",
+   "sprite": 0,
+   "padStage": 1,
+   "sheets": [
+    {
+     "path": "assets/sprites/giant-icons/icon_pot.webp",
+     "fw": 104,
+     "fh": 89,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 2,
+     "swfCount": 1
+    }
+   ]
+  },
+  {
+   "name": "giant-icon-spriggan",
+   "swf": "giants/icon_spriggan/icon_spriggan.swf",
+   "sprite": 0,
+   "padStage": 1,
+   "sheets": [
+    {
+     "path": "assets/sprites/giant-icons/icon_spriggan.webp",
+     "fw": 69,
+     "fh": 94,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 2,
+     "swfCount": 1
+    }
+   ]
+  },
+  {
+   "name": "giant-icon-tii",
+   "swf": "giants/icon_tii/icon_tii.swf",
+   "sprite": 0,
+   "padStage": 1,
+   "sheets": [
+    {
+     "path": "assets/sprites/giant-icons/icon_tii.webp",
+     "fw": 86,
+     "fh": 77,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 2,
+     "swfCount": 1
+    }
+   ]
+  },
+  {
+   "name": "giant-icon-zille",
+   "swf": "giants/icon_zille/icon_zille.swf",
+   "sprite": 0,
+   "padStage": 1,
+   "sheets": [
+    {
+     "path": "assets/sprites/giant-icons/icon_zille.webp",
+     "fw": 97,
+     "fh": 90,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 2,
+     "swfCount": 1
+    }
+   ]
+  },
+  {
+   "name": "game-crown",
+   "swf": "misc/game_crown/game_crown.swf",
+   "sprite": 9,
+   "sheets": [
+    {
+     "path": "assets/sprites/races/crowns/game_crown_unlocked.webp",
+     "label": "unlocked",
+     "fw": 56,
+     "fh": 59,
+     "cols": 1,
+     "frames": 1
+    },
+    {
+     "path": "assets/sprites/races/crowns/game_crown_locked.webp",
+     "label": "locked",
+     "fw": 56,
+     "fh": 59,
+     "cols": 1,
+     "frames": 1
+    }
+   ]
+  },
+  {
+   "name": "crown-game-lock",
+   "swf": "misc/crown_game_lock/crown_game_lock.swf",
+   "sprite": 0,
+   "padStage": 1,
+   "sheets": [
+    {
+     "path": "assets/sprites/races/crowns/crown_game_lock.webp",
+     "fw": 25,
+     "fh": 34,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 1,
+     "swfCount": 1
+    }
+   ]
+  },
+  {
+   "name": "wall-button-clubhouse",
+   "swf": "misc/wall_switch/wall_button/wall_button.swf",
+   "sprite": 7,
+   "character": "wall-button-clubhouse",
+   "sheets": [
+    {
+     "path": "assets/sprites/quest-rooms/clubhouse/wall_button_lockIn.webp",
+     "label": "lockIn",
+     "fw": 36,
+     "fh": 35,
+     "cols": 1,
+     "frames": 1
+    },
+    {
+     "path": "assets/sprites/quest-rooms/clubhouse/wall_button_lockOut.webp",
+     "label": "lockOut",
+     "fw": 36,
+     "fh": 35,
+     "cols": 1,
+     "frames": 1
+    }
+   ]
+  },
+  {
+   "name": "wall-button-tile_puzzle",
+   "swf": "misc/wall_switch/wall_button/wall_button.swf",
+   "sprite": 7,
+   "character": "wall-button-tile_puzzle",
+   "sheets": [
+    {
+     "path": "assets/sprites/quest-rooms/tile_puzzle/wall_button_lockIn.webp",
+     "label": "lockIn",
+     "fw": 36,
+     "fh": 35,
+     "cols": 1,
+     "frames": 1
+    },
+    {
+     "path": "assets/sprites/quest-rooms/tile_puzzle/wall_button_lockOut.webp",
+     "label": "lockOut",
+     "fw": 36,
+     "fh": 35,
+     "cols": 1,
+     "frames": 1
+    }
+   ]
+  },
+  {
+   "name": "wall-button-strips",
+   "swf": "misc/wall_switch/wall_button/wall_button.swf",
+   "sprite": 7,
+   "sheets": [
+    {
+     "path": "assets/sprites/quests/greedy-street-spirit/wall_button__x1_in_png_1354839762.webp",
+     "label": "in",
+     "fw": 36,
+     "fh": 35,
+     "cols": 7,
+     "frames": 7
+    },
+    {
+     "path": "assets/sprites/quests/greedy-street-spirit/wall_button__x1_out_png_1354839763.webp",
+     "label": "out",
+     "fw": 36,
+     "fh": 35,
+     "cols": 7,
+     "frames": 7
+    },
+    {
+     "path": "assets/sprites/quest-rooms/le_miserable/reset_button.webp",
+     "label": "in",
+     "fw": 36,
+     "fh": 35,
+     "cols": 7,
+     "frames": 7
+    }
+   ]
+  },
+  {
+   "name": "wall-switch",
+   "swf": "misc/wall_switch/wall_switch.swf",
+   "sprite": 13,
+   "sheets": [
+    {
+     "path": "assets/sprites/quest-rooms/color_unblocking/wall_switch_lockUp.webp",
+     "label": "lockUp",
+     "fw": 33,
+     "fh": 42,
+     "cols": 1,
+     "frames": 1
+    },
+    {
+     "path": "assets/sprites/quest-rooms/color_unblocking/wall_switch_lockDown.webp",
+     "label": "lockDown",
+     "fw": 33,
+     "fh": 42,
+     "cols": 1,
+     "frames": 1
+    }
+   ]
+  },
+  {
+   "name": "esquibeth-button",
+   "swf": "misc/wall_switch/esquibeth_button/esquibeth_button.swf",
+   "sprite": 12,
+   "sheets": [
+    {
+     "path": "assets/sprites/quest-rooms/esquibeth/button_in.webp",
+     "label": "in",
+     "fw": 27,
+     "fh": 34,
+     "cols": 8,
+     "frames": 8
+    }
+   ]
+  },
+  {
+   "name": "esquibeth-note-1",
+   "swf": "quest_items/esquibeth_note_1/esquibeth_note_1.swf",
+   "sprite": 5,
+   "sheets": [
+    {
+     "path": "assets/sprites/quest-rooms/esquibeth/note1_1.webp",
+     "label": "1",
+     "fw": 51,
+     "fh": 51,
+     "cols": 1,
+     "frames": 1,
+     "mirror": false
+    },
+    {
+     "path": "assets/sprites/quest-rooms/esquibeth/note1_right.webp",
+     "label": "right",
+     "fw": 51,
+     "fh": 51,
+     "cols": 1,
+     "frames": 1,
+     "mirror": false
+    },
+    {
+     "path": "assets/sprites/quest-rooms/esquibeth/note1_wrong.webp",
+     "label": "wrong",
+     "fw": 51,
+     "fh": 51,
+     "cols": 1,
+     "frames": 1,
+     "mirror": false
+    }
+   ],
+   "zoom": 4.8
+  },
+  {
+   "name": "esquibeth-note-2",
+   "swf": "quest_items/esquibeth_note_2/esquibeth_note_2.swf",
+   "sprite": 5,
+   "sheets": [
+    {
+     "path": "assets/sprites/quest-rooms/esquibeth/note2_1.webp",
+     "label": "1",
+     "fw": 51,
+     "fh": 51,
+     "cols": 1,
+     "frames": 1,
+     "mirror": false
+    },
+    {
+     "path": "assets/sprites/quest-rooms/esquibeth/note2_right.webp",
+     "label": "right",
+     "fw": 51,
+     "fh": 51,
+     "cols": 1,
+     "frames": 1,
+     "mirror": false
+    },
+    {
+     "path": "assets/sprites/quest-rooms/esquibeth/note2_wrong.webp",
+     "label": "wrong",
+     "fw": 51,
+     "fh": 51,
+     "cols": 1,
+     "frames": 1,
+     "mirror": false
+    }
+   ],
+   "zoom": 4.8
+  },
+  {
+   "name": "esquibeth-note-3",
+   "swf": "quest_items/esquibeth_note_3/esquibeth_note_3.swf",
+   "sprite": 5,
+   "sheets": [
+    {
+     "path": "assets/sprites/quest-rooms/esquibeth/note3_1.webp",
+     "label": "1",
+     "fw": 51,
+     "fh": 51,
+     "cols": 1,
+     "frames": 1,
+     "mirror": false
+    },
+    {
+     "path": "assets/sprites/quest-rooms/esquibeth/note3_right.webp",
+     "label": "right",
+     "fw": 51,
+     "fh": 51,
+     "cols": 1,
+     "frames": 1,
+     "mirror": false
+    },
+    {
+     "path": "assets/sprites/quest-rooms/esquibeth/note3_wrong.webp",
+     "label": "wrong",
+     "fw": 51,
+     "fh": 51,
+     "cols": 1,
+     "frames": 1,
+     "mirror": false
+    }
+   ],
+   "zoom": 4.8
+  },
+  {
+   "name": "esquibeth-note-4",
+   "swf": "quest_items/esquibeth_note_4/esquibeth_note_4.swf",
+   "sprite": 5,
+   "sheets": [
+    {
+     "path": "assets/sprites/quest-rooms/esquibeth/note4_1.webp",
+     "label": "1",
+     "fw": 51,
+     "fh": 51,
+     "cols": 1,
+     "frames": 1,
+     "mirror": false
+    },
+    {
+     "path": "assets/sprites/quest-rooms/esquibeth/note4_right.webp",
+     "label": "right",
+     "fw": 51,
+     "fh": 51,
+     "cols": 1,
+     "frames": 1,
+     "mirror": false
+    },
+    {
+     "path": "assets/sprites/quest-rooms/esquibeth/note4_wrong.webp",
+     "label": "wrong",
+     "fw": 51,
+     "fh": 51,
+     "cols": 1,
+     "frames": 1,
+     "mirror": false
+    }
+   ],
+   "zoom": 4.8,
+   "minScore": 0.88,
+   "minScoreWhy": "The plain note disc is 18 px across at 1x with a 1 px rim, so the score is mostly antialiasing (0.888); its right and wrong states score 0.936 and 0.944 at the same placement"
+  },
+  {
+   "name": "esquibeth-note-5",
+   "swf": "quest_items/esquibeth_note_5/esquibeth_note_5.swf",
+   "sprite": 5,
+   "sheets": [
+    {
+     "path": "assets/sprites/quest-rooms/esquibeth/note5_1.webp",
+     "label": "1",
+     "fw": 49,
+     "fh": 50,
+     "cols": 1,
+     "frames": 1,
+     "mirror": false
+    },
+    {
+     "path": "assets/sprites/quest-rooms/esquibeth/note5_right.webp",
+     "label": "right",
+     "fw": 49,
+     "fh": 50,
+     "cols": 1,
+     "frames": 1,
+     "mirror": false
+    },
+    {
+     "path": "assets/sprites/quest-rooms/esquibeth/note5_wrong.webp",
+     "label": "wrong",
+     "fw": 49,
+     "fh": 50,
+     "cols": 1,
+     "frames": 1,
+     "mirror": false
+    }
+   ],
+   "zoom": 4.8
+  },
+  {
+   "name": "whistle-stand",
+   "swf": "quest_items/whistle_stand_button/whistle_stand_button.swf",
+   "sprite": 35,
+   "sheets": [
+    {
+     "path": "assets/sprites/quest-rooms/firefly_whistle/whistle_stand_off.webp",
+     "label": "button_off",
+     "fw": 149,
+     "fh": 245,
+     "cols": 1,
+     "frames": 1
+    },
+    {
+     "path": "assets/sprites/quest-rooms/firefly_whistle/whistle_stand_on.webp",
+     "label": "button_on",
+     "fw": 149,
+     "fh": 245,
+     "cols": 8,
+     "frames": 16,
+     "step": 3
+    }
+   ]
+  },
+  {
+   "name": "club-house-picture",
+   "swf": "quest_items/club_house_picture/club_house_picture.swf",
+   "sprite": 0,
+   "padStage": 1,
+   "sheets": [
+    {
+     "path": "assets/sprites/quest-rooms/clubhouse/club_house_picture.webp",
+     "fw": 216,
+     "fh": 152,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 1,
+     "swfCount": 1
+    }
+   ]
+  },
+  {
+   "name": "juju-paperweight",
+   "swf": "misc/juju_paperweight/juju_paperweight.swf",
+   "sprite": 0,
+   "padStage": 1,
+   "sheets": [
+    {
+     "path": "assets/sprites/quest-rooms/juju_camp/paperweight.webp",
+     "fw": 38,
+     "fh": 42,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 2,
+     "swfCount": 1
+    }
+   ]
+  },
+  {
+   "name": "cup-of-water",
+   "swf": "misc/cup_of_water/cup_of_water.swf",
+   "sprite": 0,
+   "padStage": 1,
+   "sheets": [
+    {
+     "path": "assets/sprites/quest-rooms/being_watched/cup_of_water.webp",
+     "fw": 40,
+     "fh": 40,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 1,
+     "swfCount": 1
+    }
+   ]
+  },
+  {
+   "name": "small-worthless",
+   "swf": "misc/small_worthless/small_worthless.swf",
+   "sprite": 0,
+   "padStage": 1,
+   "sheets": [
+    {
+     "path": "assets/sprites/quests/de-embiggenify/small_worthless__x1_1_x1_2_png_1354829517.webp",
+     "fw": 25,
+     "fh": 19,
+     "cols": 2,
+     "frames": 2,
+     "swfStart": 1,
+     "swfCount": 2
+    }
+   ]
+  },
+  {
+   "name": "newxp-sloth",
+   "swf": "inhabitants/sloth/npc_sloth.swf",
+   "sprite": 34,
+   "frameRange": [
+    140,
+    146
+   ],
+   "sheets": [
+    {
+     "path": "assets/sprites/newxp/sloth.webp",
+     "fw": 124,
+     "fh": 98,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 142,
+     "swfCount": 1
+    }
+   ]
+  }
+ ]
+}

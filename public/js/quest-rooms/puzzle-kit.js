@@ -129,7 +129,8 @@ export function makeSwitch(ctx, { id, color, x, y, on = false, label }) {
 
 /** A soft vertical light beam (OGA light_beam 161x382, tinted). */
 export function beamSprite(ctx, x, y, color, height = 300) {
-  const spr = new ctx.PIXI.Sprite(textureFromUrl(`${SWITCH_ART}light_beam.webp`));
+  // puzzles/light_beam.webp: the same pixels as color_unblocking/light_beam.webp, with a 3x render (lane sharp).
+  const spr = new ctx.PIXI.Sprite(textureFromUrl('assets/sprites/puzzles/light_beam.webp'));
   spr.anchor.set(0.5, 1);
   spr.x = x;
   spr.y = y;

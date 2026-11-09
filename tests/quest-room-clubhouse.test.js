@@ -10,7 +10,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import * as kit from '../public/js/quest-rooms/kit.js?v=25fc6d59';
-import * as club from '../public/js/quest-rooms/clubhouse.js?v=cb6e99cf';
+import * as club from '../public/js/quest-rooms/clubhouse.js?v=0c2feaf0';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const JUMP_RISE = 100;
@@ -203,7 +203,11 @@ describe('Join the Club (clubhouse)', () => {
     const decos = [...src.matchAll(/(?:deco|at)\(PIXI, '([a-z0-9_]+)'|at\('([a-z0-9_]+)'/g)].map((m) => m[1] || m[2]);
     assert.ok(decos.length > 20);
     for (const d of new Set(decos)) {
-      if (d === 'fireplace') continue;
+      // The fireplace is the furniture sheet (same pixels as the room's copy, with a 3x render).
+      if (d === 'furniture_fireplace') {
+        assert.ok(existsSync(join(root, 'public/assets/sprites/furniture/furniture_fireplace@3x.webp')));
+        continue;
+      }
       assert.ok(existsSync(join(root, 'public/assets/decos/groddle', `${d}.webp`)), `deco ${d}`);
     }
   });

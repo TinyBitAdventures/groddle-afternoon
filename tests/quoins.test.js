@@ -168,7 +168,7 @@ describe('ticket 94: quest rooms keep the daily quoin limit as a street does', (
   });
 
   it('at the limit a room quoin stays where it is and nothing is taken', async () => {
-    const { takeQuoins } = await import('../public/js/quest-rooms/puzzle-kit.js?v=378c28e8');
+    const { takeQuoins } = await import('../public/js/quest-rooms/puzzle-kit.js?v=addc6cb1');
     const q = { id: 'q0', type: 'xp', x: 100, y: 500, taken: false, spr: { visible: true, destroyed: false, scale: { y: 1 } } };
     let refuse = true;
     const ctx = { player: { x: 100, y: 540 }, bodyScale: () => 1, collectQuoin: () => (refuse ? { ok: false, reason: 'daily_limit', dailyLimit: 100 } : { ok: true }) };

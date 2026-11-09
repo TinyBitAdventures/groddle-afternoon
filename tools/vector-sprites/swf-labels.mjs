@@ -5,10 +5,18 @@
  * Usage: node tools/vector-sprites/swf-labels.mjs <file.swf> [--json]
  */
 import { execFileSync } from 'node:child_process';
+import { existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import os from 'node:os';
 
-export const JAVA = '/opt/homebrew/opt/openjdk@21/bin/java';
+/**
+ * The Java FFDec runs under: $GRODDLE_JAVA, else the first Homebrew JDK there
+ * is (openjdk@21 was the only one until a Homebrew upgrade removed it,
+ * 2026-11; FFDec runs under 17, 25 and 27 too).
+ */
+export const JAVA = process.env.GRODDLE_JAVA
+  || ['openjdk@21', 'openjdk@25', 'openjdk@17', 'openjdk'].map((v) => `/opt/homebrew/opt/${v}/bin/java`).find((p) => existsSync(p))
+  || 'java';
 export const FFDEC = `${os.homedir()}/Documents/glitch-audit/tools/ffdec/ffdec.jar`;
 
 export function swfSprites(swf) {

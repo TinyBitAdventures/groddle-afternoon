@@ -78,7 +78,7 @@ import { emblemCostFor } from '../shrines.js?v=164b1234';
 import { rollDropTable } from '../drop-tables.js?v=16e12632';
 import { openNoteView, noteViewOpen } from '../note-view.js?v=eca7de52';
 import { payDrop } from './drops-feature.js?v=f4c077c0';
-import { fireflyJarCounts, setFireflyJar } from './resource-nodes-feature.js?v=b7b95542';
+import { fireflyJarCounts, setFireflyJar } from './resource-nodes-feature.js?v=0eb61d13';
 import { SEASON_DATA } from '../seasons-data.js?v=b5174bc9';
 import {
   CANDY_CLASSES,

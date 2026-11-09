@@ -90,7 +90,7 @@ import { CROWNS_STREET, CROWNS_TICKET, CROWNS_TITLE } from '../game-of-crowns.js
 import { HOG_HAUL_STREET_ID } from '../hog-haul.js?v=50d2e072';
 import { QUOIN_GRAB_SPLASH, RACE_SPLASH, splashFor } from '../game-splash.js?v=5e2c6eb6';
 import { crownsMpChallenge, startCrowns } from './crowns-feature.js?v=728e36d9';
-import { startHogHaulMp } from './hog-haul-mp-feature.js?v=f26b2ae3';
+import { startHogHaulMp } from './hog-haul-mp-feature.js?v=e8f1c5cc';
 import { textureFromUrl } from '../textures.js?v=3149d699';
 import { QUOIN_SHEET, QUOIN_TYPES } from '../quoins.js?v=299cc3f4';
 import { gainMetabolic } from '../metabolics.js?v=8504134e';
@@ -109,6 +109,12 @@ import {
 } from '../races-mp.js?v=c61cc7b5';
 
 const RACE_ICON_DIR = 'assets/sprites/races/';
+/**
+ * Race tickets show their pack icon (assets/sprites/icons/<ticket>.webp, the same pixels as the
+ * old copies in sprites/races/), so js/icon-hires.js serves the 3x render in the pack, the
+ * store, the ready card and the world (lane sharp, 2026-11-08).
+ */
+const TICKET_ICON_DIR = 'assets/sprites/icons/';
 const GAME_LOGO_DIR = 'assets/sprites/overlays/';
 const RIVAL_SCALE = 1.35 * 0.4;
 
@@ -175,7 +181,7 @@ function ensureRaceItems() {
     ensureItem(race.ticket, {
       label: race.ticketLabel,
       desc: race.ticketDesc,
-      icon: `${RACE_ICON_DIR}${race.ticket}.webp`,
+      icon: `${TICKET_ICON_DIR}${race.ticket}.webp`,
       baseCost: 20,
       stackMax: RACE_TICKET_STACK,
       tags: ['no_trade'],
@@ -186,7 +192,7 @@ function ensureRaceItems() {
   ensureItem(HOG_HAUL_TICKET.classTsid, {
     label: HOG_HAUL_TICKET.label,
     desc: HOG_HAUL_TICKET.desc,
-    icon: `${RACE_ICON_DIR}${HOG_HAUL_TICKET.classTsid}.webp`,
+    icon: `${TICKET_ICON_DIR}${HOG_HAUL_TICKET.classTsid}.webp`,
     baseCost: 20,
     stackMax: RACE_TICKET_STACK,
     tags: ['no_rube', 'games', 'ticket', 'races', 'toys'],
@@ -195,7 +201,7 @@ function ensureRaceItems() {
   ensureItem(CROWNS_TICKET, {
     label: 'Game of Crowns Ticket',
     desc: 'Challenge another player to Game of Crowns.',
-    icon: `${RACE_ICON_DIR}${CROWNS_TICKET}.webp`,
+    icon: `${TICKET_ICON_DIR}${CROWNS_TICKET}.webp`,
     baseCost: 20,
     stackMax: RACE_TICKET_STACK,
     tags: ['no_trade'],
@@ -204,7 +210,7 @@ function ensureRaceItems() {
   ensureItem(RACE_GENERIC_TICKET, {
     label: 'Race Ticket',
     desc: 'Challenge another player to a race.',
-    icon: `${RACE_ICON_DIR}race_ticket.webp`,
+    icon: `${TICKET_ICON_DIR}race_ticket.webp`,
     baseCost: 60,
     stackMax: RACE_TICKET_STACK,
     tags: ['no_trade'],
@@ -390,7 +396,7 @@ function renderStore(engine) {
     const poor = (engine.pc.currants || 0) < row.cost;
     const why = !on ? 'Not in this remake yet' : full ? 'Your pack holds 5' : poor ? 'Not enough currants' : '';
     return `<li class="${on ? '' : 'is-off'}">
-      <img src="${RACE_ICON_DIR}${row.classTsid}.webp" alt="" />
+      <img src="${TICKET_ICON_DIR}${row.classTsid}.webp" alt="" />
       <span><b>${escapeHtml(row.label)}</b><small>${on ? escapeHtml(raceDesc(raceId)) : 'Not in this remake yet.'}${owned ? ` · ${owned} in pack` : ''}</small></span>
       <span class="race-store-actions">
         ${owned ? `<button type="button" data-race-activate="${row.classTsid}">Activate</button>` : ''}
@@ -1644,7 +1650,7 @@ function mpEnd(engine, msg) {
 /** A game called off (inc_games.js games_end_quoin_grab 1587-1610: the logo and Leave the Game, no reward). */
 function showCalledOff(engine) {
   const race = RACES[run.raceId];
-  hud.ready.querySelector('[data-race-ready-icon]').src = `${RACE_ICON_DIR}${race.ticket}.webp`;
+  hud.ready.querySelector('[data-race-ready-icon]').src = `${TICKET_ICON_DIR}${race.ticket}.webp`;
   hud.ready.querySelector('[data-race-ready-kicker]').textContent = race.title;
   hud.ready.querySelector('[data-race-ready-desc]').textContent = MP_RACE_TEXT.calledOff(mp?.calledOff || '');
   hud.ready.querySelector('[data-race-ready-btn]').textContent = MP_RACE_TEXT.leaveGame;

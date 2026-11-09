@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=108ab200';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=127e0a3c';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=5429fc1e';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=b5fc9763';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -597,7 +597,7 @@ import {
 } from './js/making.js?v=b0053dac';
 import { outputIconsHtml, outputsPhrase, recipeOutputRows } from './js/ui/recipe-outputs.js?v=73e19baf';
 import { MAKE_TOOL_SHEETS } from './js/make-tool-sheets.js?v=6f758e09';
-import { LOW_FUEL_LINE, craftSessionElapsedMs, isLowFuel, isMachineArt, machineArtHtml, packMakeState, playMachineHandOver, setMachineArtFrame } from './js/machine-art.js?v=f2c80b77';
+import { LOW_FUEL_LINE, craftSessionElapsedMs, isLowFuel, isMachineArt, machineArtHtml, packMakeState, playMachineHandOver, setMachineArtFrame } from './js/machine-art.js?v=ef8a7dd0';
 import {
   createGarden,
   tickGarden,
@@ -964,7 +964,7 @@ import { installTopBar, renderTopBar } from './js/ui/topbar.js?v=40baf379';
 import { focusBack, installFocusReturn, lastInput } from './js/ui/focus-return.js?v=da190597';
 import { installContextGuard } from './js/ui/context-guard.js?v=0f71ac17';
 import { QUOIN_FRAME_BOB, advanceQuoinClock, quoinBobBetweenFrames } from './js/quoin-motion.js?v=ea0bd408';
-import { installHiresFirstDraw, installHiresSprites, upgradeSource } from './js/sprite-hires.js?v=620b68fd';
+import { installHiresFirstDraw, installHiresSprites, upgradeSource } from './js/sprite-hires.js?v=37ca7427';
 import { denseSprite } from './js/sprite-dense.js?v=2a0ce07a';
 import { wholeStatAmounts, wholeEffects } from './js/stat-text.js?v=f96d8fd3';
 import { createNotifier, effectTokens, floatKey, offerCardDrop, stackFloat, tokenText } from './js/notify.js?v=37c6b748';
@@ -1331,7 +1331,7 @@ const SHEETS = {
     whole: true,
   },
   hogHaulTicket: {
-    url: 'assets/sprites/races/race_ticket_hogtie_piggy__x1_iconic_png_1354836452.webp',
+    url: 'assets/sprites/icons/race_ticket_hogtie_piggy.webp', // the races/ copy's pixels, with a 3x render
     whole: true,
   },
   letterBlockA: {
@@ -2535,17 +2535,17 @@ ensureItem(FADED_HEART_ID, {
 ensureItem(HOGTIED_JONES_ID, {
   label: 'Hogtied Ilmenskie Jones',
   desc: 'A famous porkthropologist, temporarily packed for emergency cavern evacuation.',
-  icon: 'assets/sprites/quests/ilmenskie/hogtied-jones.webp',
+  icon: 'assets/sprites/icons/hogtied_piggy_explorer.webp', // same pixels as quests/ilmenskie/hogtied-jones.webp, with a 3x render
 });
 ensureItem(LEGALIZE_CARD_ID, {
   label: 'Card-Carrying Qualification',
   desc: 'The basic bureaucratic proof that you are qualified to carry cards.',
-  icon: 'assets/sprites/quests/legalize/card_carrying_qualification__x1_iconic_png_1354833115.webp',
+  icon: 'assets/sprites/icons/card_carrying_qualification.webp', // the legalize copy's pixels, with a 3x render
 });
 ensureItem('your_papers', {
   label: 'Your Papers',
   desc: 'A full yet incomplete set of papers, waiting to be put in order.',
-  icon: 'assets/sprites/quests/legalize/your_papers__x1_iconic_png_1354833120.webp',
+  icon: 'assets/sprites/icons/your_papers.webp', // the legalize copy's pixels, with a 3x render
 });
 ensureItem('ice', {
   label: 'Ice',
@@ -15412,7 +15412,7 @@ function renderHogHaulHud() {
   if (cargoIcon) {
     cargoIcon.src = hogHaulState.carryingPig
       ? 'assets/sprites/races/hogtied_piggy__x1_1_png_1354830331.webp'
-      : 'assets/sprites/races/pig_bait__x1_iconic_png_1354830334.webp';
+      : 'assets/sprites/icons/pig_bait.webp';
   }
   if (cargoLabel) {
     cargoLabel.textContent = hogHaulState.carryingPig

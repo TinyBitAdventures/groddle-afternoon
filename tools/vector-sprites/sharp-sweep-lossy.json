@@ -1,0 +1,133 @@
+{
+ "about": "SHARP sweep, the sheets whose 1x OGA file is lossy WebP with lossless alpha (VP8X + ALPH): the 3x twins are written the same way (lossy q88, lossless alpha, as street-spirits.json) so a quest-room ghost does not cost 1-2 MB a sheet. Esquibeth's ghost (glitch-items misc/npc/npc_esquibeth_playback, sprite 45; the 36-cell disappear sheet is the label's first 36 of 38 frames), the side-on Rook silhouettes of the Rook herald (glitch-overlays rook_fly_side.swf DefineSprite_53, 18 frames at 592 x 580 drawn at half size in the 1x sheet, so zoom 1.5), the Conch on its pedestal (conch_decoy.swf, every 2nd frame, drawn at 2x in the 1x sheet, so zoom 6) and the Ball (ball.swf morph). Run: node tools/vector-sprites/build.mjs --manifest tools/vector-sprites/sharp-sweep-lossy.json",
+ "firstDraw": true,
+ "lossy": 88,
+ "budget": {
+  "maxSide": 8192,
+  "maxMB": 64
+ },
+ "jobs": [
+  {
+   "name": "rook-side",
+   "swf": "../glitch-overlays/rook_fly_side.swf",
+   "sprite": 53,
+   "zoom": 1.5,
+   "sheets": [
+    {
+     "path": "assets/sprites/rooks/rook-side.webp",
+     "fw": 296,
+     "fh": 290,
+     "cols": 6,
+     "frames": 18,
+     "swfStart": 1,
+     "swfCount": 18
+    }
+   ]
+  },
+  {
+   "name": "ball",
+   "swf": "misc/ball/ball.swf",
+   "sprite": 26,
+   "sheets": [
+    {
+     "path": "assets/sprites/small-items/ball.webp",
+     "label": "morph",
+     "fw": 104,
+     "fh": 91,
+     "cols": 10,
+     "frames": 61
+    }
+   ]
+  },
+  {
+   "name": "conch-decoy",
+   "swf": "quest_items/conch_decoy/conch_decoy.swf",
+   "sprite": 6,
+   "sheets": [
+    {
+     "path": "assets/sprites/quest-rooms/esquibeth/conch_decoy.webp",
+     "label": "conch",
+     "fw": 140,
+     "fh": 140,
+     "cols": 6,
+     "frames": 30,
+     "step": 2
+    }
+   ],
+   "zoom": 6,
+   "minScore": 0.9,
+   "minScoreWhy": "Held back: the 1x cells are the SWF drawn at 2x with soft sparkles, so the match is marginal (0.884, a frame at 0.845) and the 3x costs 1.5 MB for one quest prop; the x1 sheet stays"
+  },
+  {
+   "name": "esquibeth-ghost",
+   "swf": "misc/npc/npc_esquibeth_playback/npc_esquibeth_playback.swf",
+   "sprite": 45,
+   "sheets": [
+    {
+     "path": "assets/sprites/quest-rooms/esquibeth/ghost_appear.webp",
+     "label": "appear",
+     "fw": 157,
+     "fh": 205,
+     "cols": 6,
+     "frames": 41
+    },
+    {
+     "path": "assets/sprites/quest-rooms/esquibeth/ghost_idle.webp",
+     "label": "idle",
+     "fw": 157,
+     "fh": 205,
+     "cols": 6,
+     "frames": 34
+    },
+    {
+     "path": "assets/sprites/quest-rooms/esquibeth/ghost_disappear.webp",
+     "label": "disappear",
+     "fw": 157,
+     "fh": 205,
+     "cols": 6,
+     "frames": 36
+    },
+    {
+     "path": "assets/sprites/quest-rooms/esquibeth/ghost_note1.webp",
+     "label": "note1",
+     "fw": 157,
+     "fh": 205,
+     "cols": 6,
+     "frames": 26
+    },
+    {
+     "path": "assets/sprites/quest-rooms/esquibeth/ghost_note2.webp",
+     "label": "note2",
+     "fw": 157,
+     "fh": 205,
+     "cols": 5,
+     "frames": 25
+    },
+    {
+     "path": "assets/sprites/quest-rooms/esquibeth/ghost_note3.webp",
+     "label": "note3",
+     "fw": 157,
+     "fh": 205,
+     "cols": 6,
+     "frames": 27
+    },
+    {
+     "path": "assets/sprites/quest-rooms/esquibeth/ghost_note4.webp",
+     "label": "note4",
+     "fw": 157,
+     "fh": 205,
+     "cols": 6,
+     "frames": 26
+    },
+    {
+     "path": "assets/sprites/quest-rooms/esquibeth/ghost_note5.webp",
+     "label": "note5",
+     "fw": 157,
+     "fh": 205,
+     "cols": 5,
+     "frames": 25
+    }
+   ]
+  }
+ ]
+}

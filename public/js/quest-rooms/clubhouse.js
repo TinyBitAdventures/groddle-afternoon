@@ -56,7 +56,7 @@
  */
 
 import { textureFromUrl } from '../textures.js?v=3149d699';
-import { butlerApi } from '../features/butler-feature.js?v=7711ea41';
+import { butlerApi } from '../features/butler-feature.js?v=0f48298b';
 
 // source: questInstanceLocation(..., 5*60) -> instances_schedule_exit_prompt (a prompt, not a clock).
 export const EXIT_PROMPT_MS = 5 * 60 * 1000;
@@ -627,7 +627,8 @@ function buildClub(ctx) {
   at('lantern', 3690, cy - 150, { scale: 0.7 });
   at('deco_chair_wooden_ghtest', 3690, cy, { scale: 0.32, tint: 0x6f5a48 });
   at('deco_table_wooden_ghtest', 3745, cy, { scale: 0.2, tint: 0x4b3d36 });
-  const fire = kit.deco(PIXI, 'fireplace', CLUBHOUSE.fireplaceX, cy, { dir: ART, scale: 0.78 });
+  // furniture/furniture_fireplace.webp: the same pixels as this room's old fireplace.webp copy, with a 3x render (lane sharp).
+  const fire = kit.deco(PIXI, 'furniture_fireplace', CLUBHOUSE.fireplaceX, cy, { dir: 'assets/sprites/furniture/', scale: 0.78 });
   props.addChild(fire);
   world.addChild(props);
 

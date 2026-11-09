@@ -38,7 +38,7 @@ import { playCountdownArt } from '../overlays.js?v=ed371926';
 import { HOG_HAUL_STREET_ID } from '../hog-haul.js?v=50d2e072';
 
 const HOLD = 'hog-haul-mp';
-const BAIT_ICON = 'assets/sprites/races/pig_bait__x1_iconic_png_1354830334.webp';
+const BAIT_ICON = 'assets/sprites/icons/pig_bait.webp'; // the races/ copy's pixels, with a 3x render
 const PIG_ICON = 'assets/sprites/races/hogtied_piggy__x1_1_png_1354830331.webp';
 const PIGGY_SCALE = 1.35 * 0.72; // game.js ENTITY_SCALE.piggy
 const WIN = Object.freeze({ currants: 100, xp: 50 }); // inc_games.js 2134-2135
