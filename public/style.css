@@ -10113,6 +10113,97 @@ html[data-street-cards] .notify-notices { visibility: hidden; }
 .line-delete:focus-visible { opacity: 1; outline: 2px solid var(--focus); outline-offset: 1px; }
 @media (hover: none) { .line-delete { opacity: 0.7; } }
 @media (prefers-reduced-motion: reduce) { .line-delete { transition: none; } }
+/* REPORTING (js/im-report.js, features/im-report-feature.js): an IM line from the other player has a small
+   Report button (a flag) after its other buttons, shown as they are; it opens the report window. */
+.line-report {
+  display: inline-grid;
+  place-items: center;
+  box-sizing: border-box;
+  width: 1.8em;
+  height: 1.3em;
+  margin-left: var(--sp-2);
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  background: var(--surface-bright);
+  color: var(--text-muted);
+  vertical-align: -0.25em;
+  opacity: 0;
+  cursor: pointer;
+  transition: opacity 0.12s ease;
+  -webkit-user-select: none;
+  user-select: none;
+}
+.line-report svg { width: 1em; height: 1em; }
+.social-msg.can-report:hover > .line-report, .social-msg.can-report:focus-within > .line-report { opacity: 1; }
+.line-report:hover { border-color: var(--danger); color: var(--danger); }
+.line-report:focus-visible { opacity: 1; outline: 2px solid var(--focus); outline-offset: 1px; }
+@media (hover: none) { .line-report { opacity: 0.7; } }
+@media (prefers-reduced-motion: reduce) { .line-report { transition: none; } }
+/* The report window: over the game, the pack still live below, as the game's other windows. */
+.mod-report-shade {
+  position: absolute;
+  inset: 0;
+  bottom: var(--pack-live-height, 105px);
+  z-index: calc(var(--z-panel) + 6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: color-mix(in srgb, var(--c-sage-30) 22%, transparent);
+  color: var(--text);
+  font-family: var(--font-ui);
+  line-height: var(--lh-normal);
+}
+.mod-report-window {
+  box-sizing: border-box;
+  width: min(440px, 94%);
+  max-height: calc(100% - 12px);
+  overflow: auto;
+  padding: var(--sp-7) var(--sp-8) var(--sp-6);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  box-shadow: var(--shadow-4);
+}
+.mod-report-head { display: flex; align-items: center; gap: var(--sp-5); margin-bottom: var(--sp-3); }
+.mod-report-head h2 { flex: 1 1 auto; margin: 0; font-size: var(--fs-xl); font-weight: var(--fw-bold); }
+.mod-report-body { display: grid; gap: var(--sp-4); font-size: var(--fs-base); }
+.mod-report-intro { margin: 0; color: var(--text-muted); }
+.mod-report-line {
+  margin: 0;
+  padding: var(--sp-4) var(--sp-5);
+  border-left: 3px solid var(--danger);
+  border-radius: var(--radius-xs);
+  background: var(--surface-sunken);
+  overflow-wrap: anywhere;
+}
+.mod-report-body label { font-size: var(--fs-md); color: var(--text-muted); }
+.mod-report-body textarea {
+  box-sizing: border-box;
+  width: 100%;
+  resize: vertical;
+  padding: var(--sp-3) var(--sp-4);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface-bright);
+  color: var(--text);
+  font: inherit;
+}
+.mod-report-body label.mod-report-block { display: flex; align-items: center; gap: var(--sp-3); color: var(--text); font-size: var(--fs-base); cursor: pointer; }
+.mod-report-status { margin: 0; min-height: 1em; color: var(--danger); font-size: var(--fs-md); }
+.mod-report-foot { display: flex; justify-content: flex-end; gap: var(--sp-4); }
+.mod-report-foot button {
+  padding: var(--sp-3) var(--sp-7);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface-bright);
+  color: var(--text);
+  font: inherit;
+  cursor: pointer;
+}
+.mod-report-foot .mod-report-send { border-color: var(--accent); background: var(--accent); color: var(--c-white); font-weight: var(--fw-bold); }
+.mod-report-foot button:disabled { opacity: 0.6; cursor: default; }
+.mod-report-foot button:focus-visible, .mod-report-body textarea:focus-visible, .mod-report-block input:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; }
 .social-act {
   display: grid;
   gap: var(--sp-1);

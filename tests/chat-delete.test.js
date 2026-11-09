@@ -20,7 +20,7 @@ import { readFileSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
 import { HAS_SITE, serverPath, sitePath, skipWithoutServer, skipWithoutSite } from '../tools/repos.mjs';
 import { dropLid } from '../public/js/groups.js?v=c9635d96';
-import { deletedSummary } from '../public/js/features/chat-threads-feature.js?v=a1049d64';
+import { deletedSummary } from '../public/js/features/chat-threads-feature.js?v=e741e0cb';
 
 const src = (f) => readFileSync(sitePath(f), 'utf8');
 const game = (f) => readFileSync(new URL(`../public/js/${f}`, import.meta.url), 'utf8');
@@ -45,7 +45,7 @@ describe('the game takes a deleted line away (groups.js dropLid, chat-threads-fe
     const groups = game('features/groups-feature.js');
     assert.match(groups, /client\.on\('msg:chat_deleted', \(msg\) => \{/);
     assert.match(groups, /if \(!chat \|\| Number\(msg\.parent\) > 0\) return;/);
-    assert.match(groups, /social\?\.setLines\(ch, chat\.lines\.map\(drawerLine\)\);\n  \}\);\n  client\.on\('msg:channel_note'/);
+    assert.match(groups, /social\?\.setLines\(ch, chat\.lines\.map\(drawerLine\)\);\n  \}\);\n  \/\/ MODERATION/, 'then the purge (tests/moderation.test.js)');
     const threads = game('features/chat-threads-feature.js');
     assert.match(threads, /client\.on\('msg:chat_deleted', \(m\) => \{/);
     assert.match(threads, /th\.setReplies\(tk, st\.replies\.filter\(\(r\) => r\.rk !== lineKey\(lid\)\), \{ loaded: st\.loaded \}\);/);
@@ -95,7 +95,7 @@ describe('/chat/\'s Delete line (community/chat-pure.js, chat-menus.js, chat-app
   it('only an administrator\'s page is marked, and the asset key moved with the files', () => {
     const pages = src('src/CommunityPages.php');
     assert.match(pages, /\(\(\$viewer\['admin'\] \?\? false\) \? ' data-chat-admin="1"' : ''\)/);
-    assert.match(pages, /public const ASSET_KEY = 'community-10';/);
+    assert.match(pages, /public const ASSET_KEY = 'community-11';/);
   });
 });
 
@@ -106,7 +106,8 @@ describe('the site deletes for administrators only, and never serves a deleted l
     assert.match(c, /#\[Route\(Method::Delete, '\/groddle\/v1\/chat\/channels\/\{key:global\|help\|trade\}\/lines\/\{lid:\[1-9\]\[0-9\]\{0,18\}\}', policy: new Policy\(Access::Cap, self::ADMIN\)\)\]\n    public function deleteLine/);
     assert.match(c, /\$rooms = \$key === 'help' \? \['help', 'newbie'\] : \[\$key\];/);
     assert.match(c, /\(new RealtimeCall\(\$this->minn\)\)->post\('chat_delete', \$call\);/);
-    assert.match(c, /AdminConsole::recordAction\(\$db, \$admin->id, \$author, 'chat_delete',/);
+    assert.match(c, /AdminConsole::recordAction\(\$db, \$admin->id, \$done\['author'\], 'chat_delete',/);
+    assert.match(c, /public function deleteAs\(int \$by, string \$byName, string \$key, int \$id\): array/, 'the moderators\' delete line shares it (Moderation)');
     assert.match(c, /case 'delete':\n/, 'the server\'s chat store marks a row that came after');
   });
 
@@ -143,7 +144,7 @@ describe('the console\'s chat log marks a deleted line (console/console.js, src/
     assert.match(mod.logWords({ kind: 'chat_delete', delivery: 'down', player: { id: 7, name: 'Ada' }, detail: { where: 'Global Chat', reply: true, text: 'x' } }), /^deleted Ada's thread reply in Global Chat: “x” \(realtime server not answering/);
     const ac = src('src/AdminConsole.php');
     assert.match(ac, /'deleted' => \$this->chatDeleted\(\$l\['deleted'\] \?\? null, \$names\),/);
-    assert.match(src('src/AdminConsolePage.php'), /ASSET_KEY = 'skin-2'/);
+    assert.match(src('src/AdminConsolePage.php'), /ASSET_KEY = 'skin-3'/);
   });
 });
 

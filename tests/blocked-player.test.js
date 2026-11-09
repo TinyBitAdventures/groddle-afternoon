@@ -19,7 +19,7 @@ import { PROFILE_PAGE_VERB } from '../public/js/profiles.js?v=054ca723';
 import { IM_VERB_ID } from '../public/js/player-im.js?v=23463a96';
 import { VISIT_VERB } from '../public/js/neighbours-mp.js?v=c5301a26';
 import { PARTY_TEXT, inviteCandidates } from '../public/js/party.js?v=7615aab8';
-import { mountSocialDrawer } from '../public/js/ui/social-drawer.js?v=2bb4e831';
+import { mountSocialDrawer } from '../public/js/ui/social-drawer.js?v=314c3800';
 import { createNotifier } from '../public/js/notify.js?v=37c6b748';
 import { partyFeature } from '../public/js/features/party-feature.js?v=3690cf08';
 import { SERVER_DIR, skipWithoutServer } from '../tools/repos.mjs';

@@ -30,7 +30,7 @@ import { createHash } from 'node:crypto';
 export const PROTECTED_IDS = Object.freeze([1, 54]);
 
 /** Columns that key a wp_groddle_* row to a user. */
-export const ID_COLUMN_REGEXP = '(user_id|^a_id|^b_id|from_id|to_id|owner_id|holder_id|visitor_id|dropper_id|taker_id|buyer_id|seller_id|buddy_id|ignored_id|neighbor_id|claimer_id|actor_id|poster_id|author_id|reporter_id)$';
+export const ID_COLUMN_REGEXP = '(user_id|^a_id|^b_id|from_id|to_id|owner_id|holder_id|visitor_id|dropper_id|taker_id|buyer_id|seller_id|buddy_id|ignored_id|neighbor_id|claimer_id|actor_id|poster_id|author_id|reporter_id|reported_id|target_id)$';
 
 /** The kept chat history's user keys (site src/ChatHistory.php). Each must match ID_COLUMN_REGEXP. */
 export const CHAT_HISTORY_COLUMNS = Object.freeze([

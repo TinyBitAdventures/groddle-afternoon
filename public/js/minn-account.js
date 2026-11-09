@@ -304,6 +304,15 @@ export function createMinnAccount(opts = {}) {
       return buddyCall('Deleting the line', `chat/channels/${encodeURIComponent(key)}/lines/${Math.max(0, Math.floor(Number(lid)) || 0)}`, { method: 'DELETE' });
     },
 
+    /**
+     * Reports an IM line the other player sent you (groddle-afternoon-site src/ModReports.php): the site
+     * keeps it and the lines around it from its own copy for the moderators; `lines` is your game's
+     * copy, used only for a line said a moment ago that has not reached the site. { status: reported|already }.
+     */
+    async reportIm(body) {
+      return buddyCall('Sending the report', 'mod/report/im', { method: 'POST', body });
+    },
+
     /** An IM line's thread (the two players only): { lines: [{ id, from, text, at, r, parent }] oldest first, blocked }. */
     async imThread(withId, lineId) {
       return buddyCall('Loading the replies', `chat/ims/${Math.floor(Number(withId)) || 0}/threads/${Math.max(0, Math.floor(Number(lineId)) || 0)}`);
