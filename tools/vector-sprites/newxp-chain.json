@@ -1,0 +1,33 @@
+{
+ "about": "The tutorial's pull chain (js/features/newxp-feature.js CHAIN_ART: chain_hang 60 frames, chain_pull 45 frames, the OGA extracted_newxp newxp_chain speechBubble_none x1 sheets, 58 x 505 cells) paired with its vector SWF (glitch-items misc/newxp_chain/newxp_chain.swf, CC0; sprite 17 newxpchain_mc, labels hang 1-60 and pull 61-106, its speechBubbleContainer_mc holds the empty 'none' article). Same options as characters.json: both sheets swap to 3x on first draw. Run: node tools/vector-sprites/build.mjs --manifest tools/vector-sprites/newxp-chain.json",
+ "firstDraw": true,
+ "budget": {
+  "maxSide": 8192,
+  "maxMB": 64
+ },
+ "jobs": [
+  {
+   "name": "newxp-chain",
+   "swf": "misc/newxp_chain/newxp_chain.swf",
+   "sprite": 17,
+   "sheets": [
+    {
+     "path": "assets/sprites/newxp/chain_hang.webp",
+     "label": "hang",
+     "fw": 58,
+     "fh": 505,
+     "cols": 15,
+     "frames": 60
+    },
+    {
+     "path": "assets/sprites/newxp/chain_pull.webp",
+     "label": "pull",
+     "fw": 58,
+     "fh": 505,
+     "cols": 16,
+     "frames": 45
+    }
+   ]
+  }
+ ]
+}

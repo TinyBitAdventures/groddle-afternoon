@@ -134,7 +134,8 @@ import { acceptOffer, enqueueQuestOffer, questAwardPayload, turnInQuest } from '
 import { getQuestCatalog } from '../content-catalogs.js?v=10b118dd';
 import { locationEventsApi } from './location-events-feature.js?v=0062e032';
 import * as kit from '../quest-rooms/kit.js?v=25fc6d59';
-import { frameTexture, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js?v=3149d699';
+import { frameTexture, onLoaded, sourceFromUrl, textureFromUrl, whenLoaded } from '../textures.js?v=3149d699';
+import { upgradeSource } from '../sprite-hires.js?v=620b68fd';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 import { displayTopOf, itemstackOverlayPoint, playPoofIn, playSheetOverlay, poofInAlpha } from '../overlay-art.js?v=11b6dd7f';
 import { HOME_MACHINE } from '../home-ticket.js?v=69769c2f';
@@ -1122,7 +1123,12 @@ export function styleRingHint(label) {
 /** Camera look while you wait at the chain: shows the arrow's bottom (world y 667) in a 408 px view. */
 const CHAIN_LOOK_Y = 370;
 
-/** newxp_chain's 58 x 505 x1 sheets (OGA extracted_newxp newxp_chain, CC0): hang loops, pull plays once. */
+/**
+ * newxp_chain's 58 x 505 x1 sheets (OGA extracted_newxp newxp_chain, CC0): hang loops, pull plays once.
+ * Each has a 3x twin rendered from glitch-items misc/newxp_chain/newxp_chain.swf (sprite 17, labels
+ * hang 1-60, pull 61-105; tools/vector-sprites/newxp-chain.json), used when the view is magnified
+ * (js/sprite-hires.js): same frames, same placement, so the chain's spot, hit area and timing hold.
+ */
 const CHAIN_ART = Object.freeze({
   hang: { url: `${ART}chain_hang.webp`, cols: 15, rows: 4, count: 60 },
   pull: { url: `${ART}chain_pull.webp`, cols: 16, rows: 3, count: 45 },
@@ -1150,6 +1156,10 @@ function buildClouds(engine) {
   chain.hitArea = new PIXI.Rectangle(-29, 230, 58, 250);
   chain.on('pointertap', () => pullChain(engine));
   world.addChild(chain);
+  // The pull sheet is cut now and swapped to its 3x twin before the click (it is first drawn mid-pull,
+  // which would show its opening frames soft); upgradeSource does nothing on small views.
+  const pull = kit.sheetFrames(PIXI, CHAIN_ART.pull.url, CHAIN_ART.pull.cols, CHAIN_ART.pull.rows, CHAIN_ART.pull.count);
+  upgradeSource(pull.base, CHAIN_ART.pull.url, whenLoaded);
   // newxp_clicktopull_arrow: blinks under the handle while you wait (K2q5GXruLvE 0:22-0:24).
   const arrow = stageDeco(PIXI, 'newxp_clicktopull_arrow', L.chain.x, L.chain.top + 540, { alpha: 0 });
   world.addChild(arrow);
@@ -1188,7 +1198,7 @@ function buildClouds(engine) {
   root.frontView = front;
   // Scene names: the source files' header comments (newxp_intro.js 1, newxp_training1.js 3, newxp_training2.js 3).
   enterNewxpScene(engine, 'clouds', L, root, 'Cloud Level');
-  run.views = { root, chain, arrow, lit, phrases };
+  run.views = { root, chain, pull, arrow, lit, phrases };
   return L;
 }
 
@@ -1260,7 +1270,7 @@ function pullChain(engine) {
   const { chain, arrow } = run.views;
   if (arrow) arrow.visible = false;
   if (chain && !chain.destroyed) {
-    const pull = kit.sheetFrames(engine.PIXI, CHAIN_ART.pull.url, CHAIN_ART.pull.cols, CHAIN_ART.pull.rows, CHAIN_ART.pull.count);
+    const pull = run.views.pull || kit.sheetFrames(engine.PIXI, CHAIN_ART.pull.url, CHAIN_ART.pull.cols, CHAIN_ART.pull.rows, CHAIN_ART.pull.count);
     const go = () => {
       if (chain.destroyed || !pull.frames.length) return;
       chain.textures = pull.frames;

@@ -14,6 +14,8 @@
       "assets/content/trade-items.json": "f12a69ec",
       "assets/decos/groddle/apartment_poster_discover_ix@1.75x.webp": "ef40fd18",
       "assets/decos/groddle/door_asset_elevator_door.svg": "fcb83e0a",
+      "assets/sprites/newxp/chain_hang@3x.webp": "18cd0e08",
+      "assets/sprites/newxp/chain_pull@3x.webp": "46368dd4",
       "assets/sprites/overlays/click_to_prime@1.5x.webp": "9a5f6f88",
       "assets/sprites/overlays/eyeballing.frames.json": "baaf68dc",
       "assets/sprites/overlays/eyeballing@2x.webp": "c95a6898",
