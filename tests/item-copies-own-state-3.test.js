@@ -35,11 +35,11 @@ import { giftEffects, normalizeGift, normalizeGiftsSlice, wrapBox } from '../pub
 import { dropEffect, normalizeGroundStack, normalizeItem } from '../public/js/drops-mp.js?v=ac5577f0';
 import { normalizeListing } from '../public/js/auctions.js?v=3cdbb521';
 import { cabinetMove, cabinetPut, cabinetTake, normalizeContents } from '../public/js/home-storage.js?v=121f1897';
-import { CUBIMAL_NAMING } from '../public/js/cubimals.js?v=c48cc6ff';
+import { CUBIMAL_NAMING } from '../public/js/cubimals.js?v=bea49c0b';
 import { FAVOR_GIANTS } from '../public/js/potions.js?v=4f4c996d';
-import { HOPPER_CEILING, STILL } from '../public/js/machines.js?v=6b72e07b';
+import { HOPPER_CEILING, STILL } from '../public/js/machines.js?v=68ddb45a';
 import { teachPhrase } from '../public/js/seasons.js?v=1978c3f3';
-import { addItem, countItem, createInventory } from '../public/js/inventory.js?v=b7609342';
+import { addItem, countItem, createInventory } from '../public/js/inventory.js?v=60dfc9ca';
 
 /** A copy of the feature of its own (its realtime binding is module state). */
 const rookCopy = async (name) => (await import(`../public/js/features/rook-attack-feature.js?fresh=item-state-3-${name}`)).rookAttackFeature;

@@ -34,7 +34,7 @@
  * funpicklePowers, funpickleAward, funpickleSneezes, funpickleOverlay.
  */
 
-import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=b7609342';
+import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=60dfc9ca';
 import { ITEM_BASE_COSTS } from '../store-catalog.js?v=74b56af3';
 import { shiftMetabolic } from '../metabolics.js?v=8504134e';
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=7d3c70e7';

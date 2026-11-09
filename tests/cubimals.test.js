@@ -19,14 +19,14 @@ import {
   openCubimalPackage,
   selectCubimal,
   setCubimalFree,
-} from '../public/js/cubimals.js?v=c48cc6ff';
+} from '../public/js/cubimals.js?v=bea49c0b';
 import {
   ITEM_CATALOG,
   addItem,
   countItem,
   createInventory,
   listPackItemSlots,
-} from '../public/js/inventory.js?v=b7609342';
+} from '../public/js/inventory.js?v=60dfc9ca';
 import {
   applyAchievementProgress,
   createAchievementState,

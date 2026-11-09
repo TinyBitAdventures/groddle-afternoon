@@ -18,9 +18,9 @@ import {
   strikeDamage,
   syncKeys,
   syncObjs,
-} from '../public/js/rook-mp.js?v=0b724b8c';
+} from '../public/js/rook-mp.js?v=2e10f19b';
 import { rookClockS, canStrike, canStun, rookPresent } from '../public/js/rook-attack.js?v=0382c223';
-import { orbGlowIds } from '../public/js/features/rook-attack-feature.js?v=7c0b960b';
+import { orbGlowIds } from '../public/js/features/rook-attack-feature.js?v=53e2cf3c';
 import { HAS_SERVER, serverPath, skipWithoutServer } from '../tools/repos.mjs';
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -201,7 +201,7 @@ describe('rook-mp: wiring', () => {
 
   it('the server prices every offering the browser can make, so none reads as too small (ticket 38)', { skip: skipWithoutServer }, async () => {
     const data = JSON.parse(fs.readFileSync(serverPath('data/rook.json'), 'utf8'));
-    const { MUSICBLOCK_CATALOG } = await import('../public/js/musicblocks.js?v=db6a213b');
+    const { MUSICBLOCK_CATALOG } = await import('../public/js/musicblocks.js?v=6ed77e19');
     const { ITEM_BASE_COSTS } = await import('../public/js/store-catalog.js?v=74b56af3');
     // Registered at run time in the browser, so a catalog-only build left them at the server's floor of 1.
     for (const [id, def] of Object.entries(MUSICBLOCK_CATALOG)) assert.equal(data.values[id], def.baseCost, id);

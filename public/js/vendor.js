@@ -11,9 +11,9 @@ import {
   listPackSlots,
   ITEM_CATALOG,
   ensureItem,
-} from './inventory.js?v=b7609342';
-import { gardenVendorOffers } from './garden.js?v=7bf205c7';
-import { miningVendorOffers } from './mining.js?v=a187df8c';
+} from './inventory.js?v=60dfc9ca';
+import { gardenVendorOffers } from './garden.js?v=d965f416';
+import { miningVendorOffers } from './mining.js?v=483539b8';
 
 import { STORE_CATALOG, ITEM_BASE_COSTS, NO_VENDOR_ITEMS } from './store-catalog.js?v=74b56af3';
 
@@ -31,22 +31,29 @@ function officialOffer(classTsid, label, buyPrice, buyMultiplier = BUYBACK_MULTI
   };
 }
 
-/** Shop-window copy for each street spirit (the source stores have names only). */
+/**
+ * Shop-window copy for each store. Stores kept by their own vendor carry that
+ * vendor's items/<class>.js description (line 8; G318): Sno Cone Vending Machine
+ * (store 5), Tool Vendor (11), the scarecrow Gardening Tools Vendor (12), Uncle
+ * Friendly (npc_jabba1, 13), Helga (npc_jabba2, 15), Monsieur de Nomdenoms the
+ * Meal Vendor (npc_cooking_vendor, 16). Street spirits' descriptions are empty
+ * in the source (street_spirit*.js 8), so their stores' lines are ours.
+ */
 const VENDOR_DESCRIPTIONS = {
   groceries: 'Coffee, oils, syrups, and pantry staples from the official Groceries catalog.',
   gardening: 'Seeds, watering cans, and hoes for a serious patch of dirt.',
   produce: 'Fresh vegetables and peculiar produce tools from the official catalog.',
   toys: 'Dice, bears, fortunes, moons, lips, Cubimal boxes, and other entirely necessary toys.',
   hardware: 'Picks, scrapers, shovels, and sturdy tools for people who hit things for a living.',
-  sno_cone: 'Sno cones in every colour a tongue can turn.',
+  sno_cone: 'An automatic, systematic, hydromatic snowcone vending machine, for the exclusive purchase of snowcones. An acquired taste (in that you have to acquire them before you taste them), some of the more expensive snocones are only suitable for a refined palate - you have to be a certain level to eat them.',
   kitchen: 'Knives, pans, pots, shakers, and grills for an ambitious kitchen.',
   alchemical: 'Tinctures, tubes, beakers, and cauldrons for the scientifically curious.',
   animal: 'Lotions, seasoners, and looms for friends of piggies, chickens, and butterflies.',
-  tools: 'A little of everything a working Glitch could need.',
-  gardening_tools: 'Hoes, cans, seeds, and herb gear for gardeners who mean it.',
-  emporium: 'Uncle Friendly’s grab bag of necessities and delightful oddities.',
-  liquor: 'Helga pours the strong stuff. Drink responsibly, or at least interestingly.',
-  meals: 'Hot meals ready to eat, for Glitches too busy to cook.',
+  tools: "Ever find yourself deep down in the Caverns, chipping away at a rich seam when your Fancy Pick breaks and you find yourself with no tinkertool to correct the problem? The Tool Vendor - widely suspected to be a bureaucroc gone rogue - will help you out. If it's the kind of thing you might need to fix, or the kind of thing you might need to fix it, it's probably here.",
+  gardening_tools: 'A mysterious leftover from another age, the scarecrow has always been a dependable source of gardening tools, keeping, as he does, an infinite number of hoes in his surprisingly capacious bag.',
+  emporium: "An old-school corner store with a small stock of groceries and fresh (-ish) produce. It's a handy little place to shop, if you don't mind that Uncle Friendly isn't friendly (especially if you ask him about his centuries-old tempestuous relationship with Helga), or that everything you buy to eat there looks like the best-before date has been amended with a crayon.",
+  liquor: 'Reticent about discussing her past, it is thought that Helga may remember the Age of Friendly (if there was ever such a time), given that she is, and always has been, the source of many fine beverages.',
+  meals: 'A friend indeed to a miner in need, Monsieur de Nomdenoms is a purveyor of high-end food for those in the deeps who need energy fast - and are willing to pay handsomely for it.',
   mining: 'Picks, smelters, grinders, and tongs for the subterranean set.',
 };
 
@@ -199,19 +206,26 @@ export function vendorSellUnitPrice(classTsid, opts = {}) {
   return vendorSellValue(classTsid, 1, opts).total;
 }
 
+/** item.js formatStack (607-611): "a Cherry" for one, else "3 Cherries". */
+function storeStack(classTsid, label, n) {
+  if (n === 1) return `${/^[aeiou]/i.test(label) ? 'an' : 'a'} ${label}`;
+  return `${n} ${ITEM_CATALOG[classTsid]?.namePlural || label}`;
+}
+
+// G318: the store's own lines (players/inc_stores.js storeBuy 100-198, storeSell 252-378).
 export function vendorBuy(pc, inv, offers, classTsid, qty = 1) {
   const offer = findOffer(offers, classTsid);
-  if (!offer) return { ok: false, reason: 'not_sold', msgs: ['They do not sell that.'] };
+  if (!offer) return { ok: false, reason: 'not_sold', msgs: ['This store no longer sells that item.'] };
   const amount = Math.floor(Number(qty));
   if (!Number.isFinite(amount) || amount < 1) {
-    return { ok: false, reason: 'bad_qty', msgs: ['Buy at least one.'] };
+    return { ok: false, reason: 'bad_qty', msgs: ["You can't buy a negative/zero amount of things!"] };
   }
   const cost = vendorBuyUnitPrice(offer, pc?.imaginationUpgrades) * amount;
   if ((pc.currants || 0) < cost) {
     return {
       ok: false,
       reason: 'broke',
-      msgs: [`Need ${cost} currants (you have ${pc.currants || 0}).`],
+      msgs: ["Sorry, you can't afford that."],
     };
   }
   pc.currants = (pc.currants || 0) - cost;
@@ -222,7 +236,7 @@ export function vendorBuy(pc, inv, offers, classTsid, qty = 1) {
     classTsid,
     qty: amount,
     cost,
-    msgs: [`Bought ${amount}× ${offer.label} for ${cost} ${cost === 1 ? 'currant' : 'currants'}.`],
+    msgs: [`You bought ${storeStack(classTsid, offer.label, amount)}.`],
     packCount: countItem(inv, classTsid),
     currants: pc.currants,
   };
@@ -243,10 +257,10 @@ export function vendorSell(pc, inv, offers, classTsid, qty = 1, opts = {}) {
   const offer = findOffer(offers, classTsid);
   const amount = Math.floor(Number(qty));
   if (!Number.isFinite(amount) || amount < 1) {
-    return { ok: false, reason: 'bad_qty', msgs: ['Sell at least one.'] };
+    return { ok: false, reason: 'bad_qty', msgs: ["You can't sell negative/zero amount of things."] };
   }
   if (countItem(inv, classTsid) < amount) {
-    return { ok: false, reason: 'empty', msgs: ['You do not have enough to sell.'] };
+    return { ok: false, reason: 'empty', msgs: ["Sorry, you don't have as much as you tried to sell."] };
   }
   // A tool goes one copy at a time at its worn price (opts.toolBaseCost); with no callback it stays.
   const isTool = Boolean(ITEM_CATALOG[classTsid]?.isTool);
@@ -262,7 +276,7 @@ export function vendorSell(pc, inv, offers, classTsid, qty = 1, opts = {}) {
   // The caller's last step before the stack shrinks (a tool's copy moves last: tools.js takeToolCopy).
   if (typeof opts.beforeRemove === 'function') opts.beforeRemove();
   if (!removeItem(inv, classTsid, amount)) {
-    return { ok: false, reason: 'empty', msgs: ['You do not have enough to sell.'] };
+    return { ok: false, reason: 'empty', msgs: ["Sorry, you don't have as much as you tried to sell."] };
   }
   pc.currants = (pc.currants || 0) + gain;
   const label = offer?.label || ITEM_CATALOG[classTsid]?.label || classTsid;
@@ -272,7 +286,8 @@ export function vendorSell(pc, inv, offers, classTsid, qty = 1, opts = {}) {
     classTsid,
     qty: amount,
     gain,
-    msgs: [`Sold ${amount}× ${label} for ${gain} ${gain === 1 ? 'currant' : 'currants'}.`],
+    // The source always says "currants" (inc_stores.js 378); one currant reads "1 currant" here.
+    msgs: [`You sold ${storeStack(classTsid, label, amount)} for ${gain} ${gain === 1 ? 'currant' : 'currants'}.`],
     packCount: countItem(inv, classTsid),
     currants: pc.currants,
   };

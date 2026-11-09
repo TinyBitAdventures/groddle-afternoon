@@ -58,9 +58,9 @@ import {
   wineDrinkConditions,
   POOPED_ENERGY_PERCENT,
   SUPER_POOPED_CONSUMED_MULTIPLIER,
-} from '../hell.js?v=ca971c34';
+} from '../hell.js?v=33a46876';
 import { getGameDayKey } from '../game-day.js?v=edb00566';
-import { countItem, removeItem } from '../inventory.js?v=b7609342';
+import { countItem, removeItem } from '../inventory.js?v=60dfc9ca';
 import { frameTexture, sourceFromUrl } from '../textures.js?v=3149d699';
 
 const GRAPE_SCALE = 0.8;
@@ -284,7 +284,7 @@ function spawnGrave(street, engine) {
     classId: 'graveside_marker',
     featureId: 'hell',
     label: graveMarkerLabel('you'),
-    subtitle: 'Rest in peace. For now.',
+    subtitle: 'Someone died here.', // G318: items/graveside_marker.js 6
     sprite: graveSprite,
   });
 }

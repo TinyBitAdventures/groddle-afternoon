@@ -45,7 +45,7 @@
  * }
  */
 
-import { ensureItem } from './inventory.js?v=b7609342';
+import { ensureItem } from './inventory.js?v=60dfc9ca';
 import { GAME_DAY_MS, getGameDayKey, getGameDayStartMs } from './game-day.js?v=edb00566';
 import { giantDisplayName } from './giant-names.js?v=0e295891';
 
@@ -1485,6 +1485,7 @@ export function drinkWineOfTheDead(state, ctx = {}) {
     reason: died.ok ? 'died' : died.reason,
     state: died.state,
     teleport: died.teleport,
+    // wine_of_the_dead.js 87-100: buildVerbMessage('drink', 'drank') + "You died!".
     effects: [...base, { type: 'activity', text: 'You drank a Wine of the Dead. You died!' }, ...died.effects],
   };
 }

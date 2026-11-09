@@ -32,7 +32,7 @@
  *   its SVG frames on a dense screen, else its 2x sheet).
  */
 
-import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=b7609342';
+import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=60dfc9ca';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=3149d699';
 import {

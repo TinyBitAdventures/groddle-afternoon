@@ -28,66 +28,78 @@ function item(classTsid, label, desc, extra = {}) {
   };
 }
 
+// G318: every description is its items/<class>.js `var description` (line 8),
+// links stripped; the eat and drink lines are item.js buildVerbMessage's
+// "You ate a Sammich." / "You drank an Orange Juice." (food.js 188, drink.js 120),
+// with the article from each item file.
 export const ITEM_CATALOG = {
-  apple: item('apple', 'Apple', 'A simple apple. Red, crisp, pickable.'),
+  apple: item('apple', 'Apple', 'A boldly red and brazenly juicy apple.'),
   milk_butterfly: item(
     'milk_butterfly',
     'Butterfly Milk',
-    'Nectar from a properly massaged butterfly.'
+    'A vial of butterfly milk. It has the tingly effervescence of a thousand tiny butterfly farts.'
   ),
   butterfly_lotion: item(
     'butterfly_lotion',
     'Butterfly Lotion',
-    'A five-use tube required for a polite butterfly massage until Animal Kinship 5.'
+    'A tiny tube of butterfly lotion, without which a butterfly cannot be massaged. Remember: butterflies chafe easily, but they still like it pretty hard.'
   ),
-  grain: item('grain', 'Grain', 'Squeezed from a willing chicken.'),
-  plank: item('plank', 'Plank', 'Harvested wood. Flat. Useful.'),
+  grain: item('grain', 'Grain', 'Some plain grain.'),
+  plank: item('plank', 'Plank', 'A plain wooden plank with many uses.'),
   hatchet: item(
     'hatchet',
     'Hatchet',
-    'A slightly dull hatchet for gently extracting planks from Wood Trees.',
+    'A slightly dull hatchet, useful for both dead tree-clearing and showy beard-shaving.',
     { isTool: true }
   ),
-  cherry: item('cherry', 'Cherry', 'Fruit tree harvest.'),
-  egg_plain: item('egg_plain', 'Egg', 'Harvested from an Egg Plant.'),
-  bean_plain: item('bean_plain', 'Bean', 'Harvested from a Bean Tree.'),
-  plain_bubble: item('plain_bubble', 'Bubble', 'Harvested from a Bubble Tree.'),
-  all_spice: item('all_spice', 'Allspice', 'Harvested from a Spice Plant.'),
-  general_vapour: item('general_vapour', 'Vapour', 'Harvested from a Gas Plant.'),
-  meat: item('meat', 'Meat', 'From a nibble. Questionable ethics.'),
-  flour: item('flour', 'Flour', 'Ground grain.'),
-  pinch_of_salt: item('pinch_of_salt', 'Pinch of Salt', 'A little salt for buns.'),
-  bun: item('bun', 'Bun', 'Soft bread.'),
-  sammich: item('sammich', 'Sammich', 'Bun + meat.'),
+  cherry: item('cherry', 'Cherry', 'A basic cherry, freshly picked from a Fruit Tree.'),
+  egg_plain: item('egg_plain', 'Egg', 'A plain, unseasoned egg, newly harvested from an Egg Plant. It can be used for all kinds of cooking, or it can be hatched into different animals.'),
+  bean_plain: item('bean_plain', 'Bean', 'A bean. It can be used for cooking, or it can be seasoned to turn it into seeds for different trees and plants.'),
+  plain_bubble: item('plain_bubble', 'Bubble', 'A common, ordinary, plain bubble harvested from  Bubble Tree.'),
+  all_spice: item('all_spice', 'Allspice', 'Some basic spice, freshly harvested from a Spice Plant.'),
+  general_vapour: item('general_vapour', 'Vapour', 'A flask of all-purpose general vapour, harvested from a Gas Plant.'),
+  meat: item('meat', 'Meat', 'A simple meat.'),
+  flour: item('flour', 'Flour', 'Some ordinary white, powdery flour.'),
+  pinch_of_salt: item('pinch_of_salt', 'Pinch of Salt', 'A tiny pinch of very salty salt.'),
+  bun: item('bun', 'Bun', 'A nice round bun.'),
+  sammich: item('sammich', 'Sammich', "A basic bun 'n' meat sammich."),
   waffles: item('waffles', 'Waffle', 'Fluffy waffles with extra-deep waffle-holes.', {
     baseCost: 185,
     stackMax: 20,
   }),
 };
 
+// Each item file's name_plural (items/<class>.js 6), for "You bought 3 Cherries." (item.js formatStack).
+for (const [cls, plural] of Object.entries({
+  apple: 'Apples', milk_butterfly: 'Butterfly Milks', butterfly_lotion: 'Butterfly Lotions', grain: 'Grains', plank: 'Planks',
+  hatchet: 'Hatchets', cherry: 'Cherries', egg_plain: 'Eggs', bean_plain: 'Beans', plain_bubble: 'Plain Bubbles',
+  all_spice: 'Allspices', general_vapour: 'General Vapour', meat: 'Meats', flour: 'Flour', pinch_of_salt: 'Pinches of Salt',
+  bun: 'Buns', sammich: 'Sammiches', waffles: 'Waffles',
+})) ITEM_CATALOG[cls].namePlural = plural;
+
 const ITEM_USE_CATALOG = {
-  apple: { verb: 'Eat', energy: 10, mood: 5, message: 'You eat an apple. Crunch.' },
-  cherry: { verb: 'Eat', mood: 8, message: 'Cherry! Tart and cheerful.' },
-  grain: { verb: 'Eat', energy: 5, message: 'You snack on grain. Rustic.' },
+  apple: { verb: 'Eat', energy: 10, mood: 5, message: 'You ate an Apple.' },
+  cherry: { verb: 'Eat', mood: 8, message: 'You ate a Cherry.' },
+  grain: { verb: 'Eat', energy: 5, message: 'You ate a Grain.' },
   milk_butterfly: {
     verb: 'Drink',
     energy: 8,
     mood: 12,
-    message: 'Butterfly milk. Surprisingly refreshing.',
+    message: 'You drank a Butterfly Milk.',
   },
-  sammich: { verb: 'Eat', energy: 25, mood: 10, message: 'You eat a Sammich. Hearty!' },
-  bun: { verb: 'Eat', energy: 12, mood: 4, message: 'You nibble a Bun. Soft.' },
-  flour: { verb: 'Taste', energy: 3, message: 'You taste a pinch of Flour. Dusty.' },
-  orange_juice: { verb: 'Drink', energy: 15, mood: 8, message: 'You drink the Orange Juice. Zing!' },
-  lemon_juice: { verb: 'Drink', energy: 15, mood: 8, message: 'You drink the Lemon Juice. Zing!' },
-  fruity_juice: { verb: 'Drink', energy: 15, mood: 8, message: 'You drink the Fruity Juice. Zing!' },
-  bubble_tea: { verb: 'Drink', energy: 18, mood: 12, message: 'Bubble tea. Chewy and cheerful.' },
-  fried_egg: { verb: 'Eat', energy: 14, mood: 6, message: 'You eat Fried Eggs.' },
-  green_eggs: { verb: 'Eat', energy: 14, mood: 6, message: 'You eat Green Eggs.' },
+  sammich: { verb: 'Eat', energy: 25, mood: 10, message: 'You ate a Sammich.' },
+  bun: { verb: 'Eat', energy: 12, mood: 4, message: 'You ate a Bun.' },
+  flour: { verb: 'Eat', energy: 3, message: 'You ate a Flour.' },
+  orange_juice: { verb: 'Drink', energy: 15, mood: 8, message: 'You drank an Orange Juice.' },
+  lemon_juice: { verb: 'Drink', energy: 15, mood: 8, message: 'You drank a Lemon Juice.' },
+  fruity_juice: { verb: 'Drink', energy: 15, mood: 8, message: 'You drank a Fruity Juice.' },
+  bubble_tea: { verb: 'Drink', energy: 18, mood: 12, message: 'You drank a Bubble Tea.' },
+  fried_egg: { verb: 'Eat', energy: 14, mood: 6, message: 'You ate a Fried Egg.' },
+  green_eggs: { verb: 'Eat', energy: 14, mood: 6, message: 'You ate a Green Egg.' },
   waffles: {
     verb: 'Eat',
     energy: 185,
-    message: 'You eat a Waffle. Fluffy, with extra-deep waffle-holes.',
+    message: 'You ate a Waffle.',
   },
 };
 
@@ -157,7 +169,7 @@ export function registerItemUse(classTsid, def, opts = {}) {
     message:
       def.message ||
       existing?.message ||
-      (kind === 'drink' ? `You drink the ${label}.` : `You eat the ${label}.`),
+      `You ${kind === 'drink' ? 'drank' : 'ate'} ${/^[aeiou]/i.test(label) ? 'an' : 'a'} ${label}.`,
   };
   for (const key of ['energy', 'mood', 'xp']) {
     const n = Math.round(Number(def[key]) || 0);

@@ -39,9 +39,9 @@ import {
   towerPlace,
   settleSolo,
   soloRow,
-} from '../public/js/home-machines.js?v=782838ec';
-import { homeMachinesFeature } from '../public/js/features/home-machines-feature.js?v=68b6088e';
-import { RECIPE_CATALOG, setRecipeCatalog } from '../public/js/making.js?v=d29c39c7';
+} from '../public/js/home-machines.js?v=ac4ae446';
+import { homeMachinesFeature } from '../public/js/features/home-machines-feature.js?v=80ac5713';
+import { RECIPE_CATALOG, setRecipeCatalog } from '../public/js/making.js?v=25bf06a4';
 import { HAS_SERVER, HAS_SITE, SITE_DIR, serverPath } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');

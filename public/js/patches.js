@@ -36,7 +36,7 @@
 import { createTrantState, fruitCapacityAt, resetTrantDay } from './trants.js?v=1b3c8ae3';
 import { ensureWoodTreeState, resetWoodTreeDay } from './woodcutting.js?v=73472b8c';
 import { canUseTool, useToolCondition } from './tools.js?v=eff5ef6f';
-import { musicblockItemMeta } from './musicblocks.js?v=db6a213b';
+import { musicblockItemMeta } from './musicblocks.js?v=6ed77e19';
 import { grantMoodXp } from './mood-xp.js?v=958e7680';
 import { metabolicGain, loseEnergy } from './metabolics.js?v=8504134e';
 
@@ -199,8 +199,8 @@ export const SOIL_DROP_TABLES = Object.freeze({
 
 /** Items soil verbs can award (labels/costs from each GSJS item file). */
 export const SOIL_ITEM_DEFS = Object.freeze({
-  earth: Object.freeze({ label: 'Lump of Earth', namePlural: 'Lumps of Earth', baseCost: 3, stackMax: 50, desc: "It's just a lump of earth. For building with." }),
-  loam: Object.freeze({ label: 'Lump of Loam', namePlural: 'Lumps of Loam', baseCost: 10, stackMax: 24, desc: "Moist and fertile, and leagues above plain old earth. Any building project's pride." }),
+  earth: Object.freeze({ label: 'Lump of Earth', namePlural: 'Lumps of Earth', baseCost: 3, stackMax: 50, desc: 'Many have tried to sum up the wonder of Earth, with superlatives like "Earthy", "Lumpy" and "Eart... oh, that\'s been said? Brown, then." But it\'s just a lump of earth. For building with.' }), // G318: items/earth.js 8
+  loam: Object.freeze({ label: 'Lump of Loam', namePlural: 'Lumps of Loam', baseCost: 10, stackMax: 24, desc: 'Ah, loam sweet loam. Moist and fertile, and leagues above plain old earth, this rich, meaty chunk of ground will do any building project proud.' }), // G318: items/loam.js 8
   gem_diamond: Object.freeze({ label: 'Walloping Big Diamond', namePlural: 'Walloping Big Diamonds', baseCost: 2000, stackMax: 3, desc: "Yep, that's a walloping big diamond." }),
   plank: Object.freeze({ label: 'Plank', namePlural: 'Planks', baseCost: 5, stackMax: 250, desc: 'A plain wooden plank with many uses.' }),
   musicblock_b_brown_02: Object.freeze(musicblockItemMeta('musicblock_b_brown_02')),

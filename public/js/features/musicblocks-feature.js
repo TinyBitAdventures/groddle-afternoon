@@ -12,7 +12,7 @@
  * Counting an already-owned block again is harmless (each condition needs 1).
  */
 
-import { MUSICBLOCK_CATALOG } from '../musicblocks.js?v=db6a213b';
+import { MUSICBLOCK_CATALOG } from '../musicblocks.js?v=6ed77e19';
 
 const SYNC_MS = 1_000;
 const BLOCK_IDS = Object.keys(MUSICBLOCK_CATALOG);

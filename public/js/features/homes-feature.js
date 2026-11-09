@@ -99,8 +99,8 @@
  *       (=restorehold stops on the proto, =restoreaward on the award)
  */
 
-import { countItem, ensureItem, ITEM_CATALOG, removeItem } from '../inventory.js?v=b7609342';
-import { pickupCountTitle } from '../world-items.js?v=0bbfdab9';
+import { countItem, ensureItem, ITEM_CATALOG, removeItem } from '../inventory.js?v=60dfc9ca';
+import { pickupCountTitle } from '../world-items.js?v=da2bb7a1';
 import { createCountChooser } from '../ui/count-chooser.js?v=5bc894c8';
 import { isBagClass } from '../pack-slots.js?v=6cf9f397';
 import { createCombobox } from '../combobox.js?v=d43209e8';
@@ -170,7 +170,7 @@ import {
   swatchFilters,
   trayFilters,
 } from '../ui/home-builder.js?v=90f759e8';
-import { RECIPE_CATALOG } from '../making.js?v=d29c39c7';
+import { RECIPE_CATALOG } from '../making.js?v=25bf06a4';
 import {
   createBackYardState,
   fixtureObstacles,
@@ -207,14 +207,14 @@ import { MOVABLE_FIXTURES, MOVABLE_FIXTURE_IDS, fixtureFits, fixtureText, savedF
 import { displayTopOf, itemstackOverlayPoint, overlayAlpha, overlayLifeMs, playPoofIn, trackOverlay } from '../overlay-art.js?v=11b6dd7f';
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=7d3c70e7';
 import { fadeInNewNear } from '../poof-fade.js?v=54ef2431';
-import { projectApi } from './street-jobs-feature.js?v=ab215260';
+import { projectApi } from './street-jobs-feature.js?v=953e2fd4';
 import { TOWER_CHASSIS, TOWER_CONFIG, TOWER_DOOR_DX, TOWER_GEO, TOWER_PROTO, normalizeTowerState } from '../home-tower.js?v=087df38f';
-import { drawTowerElevator, drawTowerExit, towerApi, visitorTowerView } from './home-tower-feature.js?v=1a65b435';
+import { drawTowerElevator, drawTowerExit, towerApi, visitorTowerView } from './home-tower-feature.js?v=0f31a6b7';
 import { pieceUrl, roomPieces, surfaceAt, swatchPiece, wallTargetAt } from '../home-wallpaper.js?v=f1969400';
 import { wantsHiresDecos } from '../deco-hires.js?v=9877af94';
-import { resourceNodesFeature } from './resource-nodes-feature.js?v=0f570b03';
-import { patchesFeature } from './patches-feature.js?v=1ed72862';
-import { GROWN_TREE_LABELS, createPlot, growTree, plotLabel } from '../patches.js?v=796732fb';
+import { resourceNodesFeature } from './resource-nodes-feature.js?v=ef72f1c5';
+import { patchesFeature } from './patches-feature.js?v=83a5fca8';
+import { GROWN_TREE_LABELS, createPlot, growTree, plotLabel } from '../patches.js?v=dc2b1436';
 import { WOTD_DEPLETE_MS, WOTD_TEXT, nearestPourTarget, pourButton, pourConditions, pourConfirmText } from '../wine-pour.js?v=6daa23a7';
 import { WOTD_TOOL, pourApproach, pourDropTip } from '../wine-pour-fx.js?v=364e22d2';
 import { XP_FOR_LEVEL } from '../progression.js?v=33462eaa';
@@ -237,7 +237,7 @@ import {
 import { frameTexture, isLoaded, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js?v=3149d699';
 import { FALLBACK_MAX as WORLD_ART_FALLBACK_MAX, worldArtFor } from '../world-art.js?v=df476660';
 import { oneArmSignpost } from '../street-render.js?v=18160bb6';
-import { ROCK_CATALOG } from '../mining.js?v=a187df8c';
+import { ROCK_CATALOG } from '../mining.js?v=483539b8';
 import {
   HOUSE_SIGN,
   IMG_BUBBLE_MS,
@@ -255,7 +255,7 @@ import {
   ROCK_VERB_IDS,
 } from '../magic-rock-home.js?v=c07b2327';
 import { getGameDayKey } from '../game-day.js?v=edb00566';
-import { HOME_TICKET, HOME_TICKET_CLASS } from '../home-ticket.js?v=69769c2f';
+import { HOME_TICKET, HOME_TICKET_CLASS } from '../home-ticket.js?v=911b49bd';
 import { MIN_GROUND_CLEARANCE, yCamOffsetAnchor } from '../movement.js?v=b30f84eb';
 import { takeFromHouse } from '../ledger-house.js?v=b34f5c89';
 import { storagePickupLock } from '../home-storage.js?v=121f1897';
@@ -518,7 +518,8 @@ export function ensureFurnitureItems() {
       donatable: false,
     });
   }
-  ensureItem('wall_segment', { label: 'Wall Segment', desc: 'A section of wall, ready to make a house a little roomier.' });
+  // G318: items/wall_segment.js 8.
+  ensureItem('wall_segment', { label: 'Wall Segment', desc: 'On its own, it would just fall over. But among a house and other Wall Segments, it becomes the building block of home expansions. Useful for widening and adding floors to houses.' });
 }
 
 // ---------------------------------------------------------------------------

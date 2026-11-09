@@ -11,8 +11,8 @@ import { fileURLToPath } from 'node:url';
 import { loadContentCatalogsFromDir, resetContentCatalogs, getQuestCatalog } from '../public/js/content-catalogs.js?v=10b118dd';
 import { createQuestState } from '../public/js/quests.js?v=2b882eb6';
 import { classifyQuests, eventCounters, isEventEmitted, questRoutingReport, requirementRoute } from '../public/js/quest-offers.js?v=a7ee5b8f';
-import { HELL_LOCATION, HELL_QUESTS, createHellState, croak } from '../public/js/hell.js?v=ca971c34';
-import { PANKA_TSID, HELL_BAR_TSID } from '../public/js/hell-bar.js?v=378fef5e';
+import { HELL_LOCATION, HELL_QUESTS, createHellState, croak } from '../public/js/hell.js?v=33a46876';
+import { PANKA_TSID, HELL_BAR_TSID } from '../public/js/hell-bar.js?v=954af363';
 import {
   GRAVE_VISIT,
   GRAVE_VISITORS,
@@ -26,13 +26,13 @@ import {
   planGraveVisit,
   recognitionBranch,
   ticketDue,
-} from '../public/js/hell-tickets.js?v=2c152c4b';
-import { hellTicketsFeature } from '../public/js/features/hell-tickets-feature.js?v=a08bd34a';
-import { hellFeature } from '../public/js/features/hell-feature.js?v=93f1c8dd';
-import { hellBarFeature } from '../public/js/features/hell-bar-feature.js?v=7bfbcebd';
-import { questOffersFeature } from '../public/js/features/quest-offers-feature.js?v=1e0d5c06';
+} from '../public/js/hell-tickets.js?v=662d296e';
+import { hellTicketsFeature } from '../public/js/features/hell-tickets-feature.js?v=969ccd1d';
+import { hellFeature } from '../public/js/features/hell-feature.js?v=88837f0a';
+import { hellBarFeature } from '../public/js/features/hell-bar-feature.js?v=37e73aa9';
+import { questOffersFeature } from '../public/js/features/quest-offers-feature.js?v=4b2de8c4';
 import { questFlagsFeature } from '../public/js/features/quest-flags-feature.js?v=17c6ef48';
-import { FEATURES } from '../public/js/features/index.js?v=3fdfb4ba';
+import { FEATURES } from '../public/js/features/index.js?v=24bfe85e';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const CONTENT = join(spike, 'public/assets/content');

@@ -125,7 +125,7 @@ import {
   tutorialNameDefault,
   TUTORIAL_NAME_MAX,
 } from '../newxp.js?v=85922204';
-import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=b7609342';
+import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=60dfc9ca';
 import { QUOIN_SHEET, QUOIN_TYPES, qrazyRewardForLevel } from '../quoins.js?v=299cc3f4';
 import { soundForQuoin } from '../sound-moments.js?v=2f8597cd';
 import { IMAGINATION_UPGRADES } from '../imagination.js?v=6adb7b9a';
@@ -138,8 +138,8 @@ import { frameTexture, onLoaded, sourceFromUrl, textureFromUrl, whenLoaded } fro
 import { upgradeSource } from '../sprite-hires.js?v=37ca7427';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 import { displayTopOf, itemstackOverlayPoint, playPoofIn, playSheetOverlay, poofInAlpha } from '../overlay-art.js?v=11b6dd7f';
-import { HOME_MACHINE } from '../home-ticket.js?v=69769c2f';
-import { animalAnchorX, animalAnchorY, createAnimalState } from '../animals.js?v=2f790e9b';
+import { HOME_MACHINE } from '../home-ticket.js?v=911b49bd';
+import { animalAnchorX, animalAnchorY, createAnimalState } from '../animals.js?v=c2d5ecf3';
 import {
   AK_ANIMALS,
   AK_BUBBLE,
@@ -176,8 +176,9 @@ const HOME_STREET_TSID = 'RH_HOME_EXT';
 const DEFAULT_START = 'GLI2V0UN7RD1T2J'; // Hechey Track (index default)
 
 // homestreet_ticket is registered by js/home-ticket.js (homestreet_ticket.js text, G208).
-ensureItem('greeter_twig', { label: 'Greeter Twig', desc: 'A relic of Gentle Island. Greeters once came when it was waved.', baseCost: 0, sellable: false });
-ensureItem('bag_generic', { label: 'Generic Bag', desc: 'A plain, sturdy bag for carrying more stuff.', baseCost: 900 });
+// G318: items/greeter_twig.js 8 and items/bag_generic.js 8, as Tiny Speck wrote them.
+ensureItem('greeter_twig', { label: 'Greeter Twig', desc: 'This twig vibrates in the frequency of Greeters, the helpful humans inhabiting the world of Glitch.', baseCost: 0, sellable: false });
+ensureItem('bag_generic', { label: 'Generic Bag', desc: 'An honest, unpretentious burlap sack. You could probably put things in it, perhaps 10 things, and give it a name. Just a thought.', baseCost: 900 });
 
 let save = normalizeNewxpSave();
 let hadSave = false;

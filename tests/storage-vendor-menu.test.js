@@ -78,8 +78,9 @@ describe('a vendor tile\'s menu (game.js openVendorTileMenu)', () => {
   });
 
   it('greyed with the vendor\'s own refusal when you can\'t afford one', () => {
-    assert.match(fn, /if \(unit > \(pc\.currants \|\| 0\)\) reason = `Need \$\{unit\} currants \(you have \$\{pc\.currants \|\| 0\}\)\.`;/);
-    assert.match(readFileSync(new URL('../public/js/vendor.js', import.meta.url), 'utf8'), /msgs: \[`Need \$\{cost\} currants \(you have \$\{pc\.currants \|\| 0\}\)\.`\]/);
+    // G318: the store's own refusal (players/inc_stores.js 161), the same words as vendorBuy's.
+    assert.ok(fn.includes(`if (unit > (pc.currants || 0)) reason = "Sorry, you can't afford that.";`));
+    assert.ok(readFileSync(new URL('../public/js/vendor.js', import.meta.url), 'utf8').includes(`msgs: ["Sorry, you can't afford that."]`));
   });
 
   it('a pick is the tile\'s click, then the count chooser\'s own Buy button (Max first for Buy max)', () => {

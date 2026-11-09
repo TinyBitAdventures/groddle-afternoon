@@ -42,7 +42,7 @@ export const MP_ROOK_TEXT = Object.freeze({
   orbClick: 'Click to focus your imagination on the orb.', // inc_rook.js:491
   primedBy: (name) => `${name} primed the shrine. Strike the Rook with an offering!`,
   primedYou: 'The shrine is primed. Strike the Rook with an offering!',
-  stronger: 'More Glitches arrive, and the Rook grows stronger.',
+  stronger: 'More players arrive, and the Rook grows stronger.', // ours (no source line); never "Glitch" in our copy
   wingBeat: (energy, mood) => `The Rook attacks! You lose ${energy} energy${mood ? ` and ${mood} mood` : ''}.`,
 });
 

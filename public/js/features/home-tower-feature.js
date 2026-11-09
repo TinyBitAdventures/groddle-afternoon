@@ -49,7 +49,7 @@
  */
 
 import { playOverlay } from '../overlays.js?v=ed371926';
-import { ITEM_CATALOG, countItem, ensureItem, itemIcon } from '../inventory.js?v=b7609342';
+import { ITEM_CATALOG, countItem, ensureItem, itemIcon } from '../inventory.js?v=60dfc9ca';
 import { canUseTool, useToolCondition } from '../tools.js?v=eff5ef6f';
 import { acceptOffer, npcQuestOffers } from '../quest-offers.js?v=a7ee5b8f';
 import { getQuestCatalog } from '../content-catalogs.js?v=10b118dd';

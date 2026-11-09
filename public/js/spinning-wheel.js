@@ -6,8 +6,8 @@
  * - items/include/shrines.js
  */
 
-import { addItem, ensureItem } from './inventory.js?v=b7609342';
-import { musicblockItemMeta } from './musicblocks.js?v=db6a213b';
+import { addItem, ensureItem } from './inventory.js?v=60dfc9ca';
+import { musicblockItemMeta } from './musicblocks.js?v=6ed77e19';
 
 export const GAMESHOW_TICKET_ID = 'gameshow_ticket';
 export const SPINNING_WHEEL_APPEAR_MS = 1_200;
@@ -30,37 +30,39 @@ const ITEM_DEFS = Object.freeze({
   musicblock_d_red_05: Object.freeze(musicblockItemMeta('musicblock_d_red_05')),
   cubimal_package: Object.freeze({
     label: 'Cubimal Series 1 Box',
-    desc: 'Contains one Series 1 Cubimal. Open it up to find out which one is inside.',
+    // G318: items/cubimal_package.js 8 (and _2, below).
+    desc: 'Contains one (1) Series 1 Cubimal. Open it up to find out which one is inside. Collect them all!',
     baseCost: 5_000,
   }),
   cubimal_package_2: Object.freeze({
     label: 'Cubimal Series 2 Box',
-    desc: 'Contains one Series 2 Cubimal. Open it up to find out which one is inside.',
+    desc: "Contains one (1) Series 2 Cubimal. Open it up to find out which one is inside. Collect 'em all!",
     baseCost: 5_000,
   }),
   sno_cone_blue: Object.freeze({
     label: 'Blue Sno Cone',
-    desc: 'A delicious, refreshing Blue Sno Cone with a tangy hit of iMG.',
+    // G318: each sno cone is its items/sno_cone_<colour>.js description (line 8) in full.
+    desc: 'A delicious, refreshing Blue Sno Cone with a tangy hit of iMG. Blended to perfection using ice, hooch, and the very finest elemental additives and preservatives, it tastes exactly what the the concept of blue should taste like. And a little like raspberry, weirdly.',
     baseCost: 75,
   }),
   sno_cone_green: Object.freeze({
     label: 'Green Sno Cone',
-    desc: 'A bright green blend of ice, hooch, elements, and a modest hit of iMG.',
+    desc: "A bright green blend of ice, hooch and elements make a drink the color of days when spring is born, or nights when the northern lights perform. Packed with a modest hit of iMG, winter cannot fade it. Mainly because it's 40% elemental additives and preservatives.",
     baseCost: 150,
   }),
   sno_cone_orange: Object.freeze({
     label: 'Orange Sno Cone',
-    desc: 'A chillingly refreshing Orange Sno Cone with a medium amount of iMG.',
+    desc: "A chillingly refreshing bright Orange Sno Cone, with a medium amount of iMG. A perfect blend of Ice, Hooch, and elemental additives and preservatives, it is the epitome of an orange drink. Not orange the fruit, that is, orange the colour. It's more of a concept.",
     baseCost: 300,
   }),
   sno_cone_red: Object.freeze({
     label: 'Red Sno Cone',
-    desc: 'A tongue-tingling, spine-shiveringly Red Sno Cone.',
+    desc: 'A tongue-tingling spine-shiveringly Red Sno Cone. A seamless blend of Ice, Hooch, and a secret blend of elemental additives, preservatives, iMG and raw energy that make you feel slightly, though not to any copyright-infringing extent, like you may have wings.',
     baseCost: 600,
   }),
   sno_cone_purple: Object.freeze({
     label: 'Purple Sno Cone',
-    desc: 'A refreshing and delicious Purple Sno Cone with considerable iMG.',
+    desc: 'A refreshing and delicious purple Sno Cone. A sophisticated blend of Ice, Hooch and elemental additives and preservatives. Now you too can get all the social frisson of Purple but with none of the nutritional or mental expansion benefits (contains considerable iMG, though).',
     baseCost: 1_100,
   }),
 });

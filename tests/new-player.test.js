@@ -16,13 +16,13 @@ import {
   newPlayerStats,
 } from '../public/js/new-player.js?v=d9fa4f61';
 import { createBrowserSaveStore, createMultiplayerSaveStore, createSaveStore } from '../public/js/save-store.js?v=8839ba7b';
-import { createInventory } from '../public/js/inventory.js?v=b7609342';
-import { normalizePlayerSnapshot, parsePlayerSave, restorePlayerSave } from '../public/js/player-save.js?v=c81ccc75';
+import { createInventory } from '../public/js/inventory.js?v=60dfc9ca';
+import { normalizePlayerSnapshot, parsePlayerSave, restorePlayerSave } from '../public/js/player-save.js?v=dfcf07d3';
 import { createQuoinState } from '../public/js/quoins.js?v=299cc3f4';
-import { createShrineState } from '../public/js/shrines.js?v=9e895525';
+import { createShrineState } from '../public/js/shrines.js?v=247c9b77';
 import { PARADISE_COURSES, PARADISE_TICKET_IDS } from '../public/js/paradise-flight.js?v=5d9aec42';
-import { imaginationFeature, STARTER_UPGRADES } from '../public/js/features/imagination-feature.js?v=251a7aa3';
-import { RESOURCE_FEATURE_ID, resourceNodesFeature } from '../public/js/features/resource-nodes-feature.js?v=0f570b03';
+import { imaginationFeature, STARTER_UPGRADES } from '../public/js/features/imagination-feature.js?v=95458774';
+import { RESOURCE_FEATURE_ID, resourceNodesFeature } from '../public/js/features/resource-nodes-feature.js?v=ef72f1c5';
 
 const here = import.meta.dirname;
 const pub = join(here, '..', 'public');

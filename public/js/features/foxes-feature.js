@@ -48,7 +48,7 @@
  */
 
 import { slugsFromEffects } from '../speech-slugs.js?v=130338f9';
-import { addItem, countItem, removeItem } from '../inventory.js?v=b7609342';
+import { addItem, countItem, removeItem } from '../inventory.js?v=60dfc9ca';
 import { getToolCondition } from '../tools.js?v=eff5ef6f';
 import { worldToScreen } from '../street-model.js?v=b6cb6a4e';
 import { OVERLAY_USES, playOverlay } from '../overlays.js?v=ed371926';
@@ -85,9 +85,9 @@ import {
   rangerGreeting,
   splitConversation,
   stepFox,
-} from '../foxes.js?v=c75842a8';
-import { FOX_FLURRY_COUNTER, foxLegFrom, foxOnLeg, igniteBaitXs, normalizeBaits, normalizeFoxes, preserveOverCapacity, serverId } from '../foxes-mp.js?v=db83040d';
-import { clockOffset } from '../street-creatures.js?v=fa8f9bcc';
+} from '../foxes.js?v=2ddf3590';
+import { FOX_FLURRY_COUNTER, foxLegFrom, foxOnLeg, igniteBaitXs, normalizeBaits, normalizeFoxes, preserveOverCapacity, serverId } from '../foxes-mp.js?v=77471018';
+import { clockOffset } from '../street-creatures.js?v=6bfadcbf';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
 
 export const FOX_FEATURE_ID = 'foxes';
@@ -281,7 +281,7 @@ function buildRanger(engine) {
     classId: FOX_RANGER_ID,
     featureId: FOX_FEATURE_ID,
     label: 'Fox Ranger',
-    subtitle: 'Guardian of the Fox Preserve',
+    subtitle: 'Guardian of the Fox Reserves', // G318: items/npc_fox_ranger.js 8
     sprite: spr,
   });
   const px = engine.player?.x ?? 0;

@@ -76,7 +76,7 @@ import {
   countItem,
   ensureItem,
   ITEM_CATALOG,
-} from './inventory.js?v=b7609342';
+} from './inventory.js?v=60dfc9ca';
 import { canUseTool, useToolCondition } from './tools.js?v=eff5ef6f';
 import { getGameDayKey } from './game-day.js?v=edb00566';
 import { grantMoodXp } from './mood-xp.js?v=958e7680';
@@ -1666,7 +1666,8 @@ export function harvestResourceNode(node, inv, pc, ctx = {}) {
       } else {
         if (verb.id === 'water') node.watered = true;
         else node.petted = true;
-        msgs.push(verb.id === 'water' ? 'You watered the Paper Tree.' : 'You petted the Paper Tree.');
+        // G318: buildVerbMessage(type, 'watered'|'petted') (paper_tree.js 586-609).
+        msgs.push(verb.id === 'water' ? 'You watered a Paper Tree.' : 'You petted a Paper Tree.');
         if (node.watered && node.petted) {
           const before = node.units;
           node.units = Math.min(def.stock.max, node.units + def.tend.refill);

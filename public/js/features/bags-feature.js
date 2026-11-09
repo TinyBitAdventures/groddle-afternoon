@@ -92,7 +92,7 @@
  * grant(class, n) to gain something the way a reward does.
  */
 
-import { ITEM_CATALOG, addItem, isToolItem, removeItem } from '../inventory.js?v=b7609342';
+import { ITEM_CATALOG, addItem, isToolItem, removeItem } from '../inventory.js?v=60dfc9ca';
 import {
   BAG_DEFS,
   PACK_CAPACITY,

@@ -368,7 +368,8 @@ export function phantomPlaceNeed(questState) {
   if (story.finalReady || story.heartGranted) return null;
   const streets = story.hauntStreets.filter((id) => !story.foundStreets.includes(id));
   if (!streets.length) return null;
-  return { name: 'found_ghost', desc: 'Notice the Phantom on its cold spots', streets, need: streets.length };
+  // G318: the requirement's own words (quests/phantom_glitch.js 229).
+  return { name: 'found_ghost', desc: 'Find what cannot be found.', streets, need: streets.length };
 }
 
 export function ghostEncounterAt(questState, streetTsid) {

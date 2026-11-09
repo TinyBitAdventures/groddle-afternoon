@@ -20,23 +20,23 @@ import {
   createInventory,
   ensureItem,
   listPackItemSlots,
-} from '../public/js/inventory.js?v=b7609342';
+} from '../public/js/inventory.js?v=60dfc9ca';
 import {
   createDroppedItemState,
   dropInventoryStack,
   listDroppedStacks,
   pickupDroppedStack,
-} from '../public/js/world-items.js?v=0bbfdab9';
+} from '../public/js/world-items.js?v=da2bb7a1';
 import {
   createShrineState,
   listShrineDonationOptions,
   quoteShrineDonation,
-} from '../public/js/shrines.js?v=9e895525';
+} from '../public/js/shrines.js?v=247c9b77';
 import {
   createVendorSellQuote,
   listSellOffers,
   vendorSell,
-} from '../public/js/vendor.js?v=cf56a21c';
+} from '../public/js/vendor.js?v=ad64eca6';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 

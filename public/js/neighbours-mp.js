@@ -23,7 +23,7 @@
  * Solo never loads any of this: solo's neighbours are js/neighbours.js.
  */
 
-import { SEED_CATALOG, applyFertilizer } from './garden.js?v=7bf205c7';
+import { SEED_CATALOG, applyFertilizer } from './garden.js?v=d965f416';
 import { normalizeParcelBox } from './butler.js?v=2c95c064';
 
 /** The realtime server's street for a player's home street (homes.go). */

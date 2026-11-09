@@ -98,7 +98,7 @@ export function listNames(names, max = 2) {
 
 /** The follower's line for a refusal the server sent (follow_refused why). */
 export function refusedText(why, name) {
-  const n = String(name || 'That Glitch');
+  const n = String(name || 'That player');
   switch (String(why || '')) {
     case 'self': return FOLLOW_TEXT.self;
     case 'street': return FOLLOW_TEXT.sameStreet;
@@ -113,7 +113,7 @@ export function refusedText(why, name) {
 
 /** The follower's line when following ends (follow_ended why). */
 export function endedText(why, name) {
-  const n = String(name || 'that Glitch');
+  const n = String(name || 'that player');
   switch (String(why || '')) {
     case 'offline': return FOLLOW_TEXT.offline(n);
     case 'private': return FOLLOW_TEXT.private(n);

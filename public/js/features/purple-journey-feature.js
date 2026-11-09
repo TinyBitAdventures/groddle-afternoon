@@ -33,7 +33,7 @@
  *   purpleRoom, purpleScions, purpleQuoins, purpleLast, purpleVog.
  */
 
-import { addItem, countItem, ITEM_CATALOG, removeItem } from '../inventory.js?v=b7609342';
+import { addItem, countItem, ITEM_CATALOG, removeItem } from '../inventory.js?v=60dfc9ca';
 import { shiftMetabolic } from '../metabolics.js?v=8504134e';
 import { collectQuoin, QUOIN_SHEET, QUOIN_TYPES, quoinTouches } from '../quoins.js?v=299cc3f4';
 import { frameTexture, sourceFromUrl } from '../textures.js?v=3149d699';
@@ -61,7 +61,7 @@ import {
   scionWords,
 } from '../purple-journey.js?v=5e078ed8';
 import { VOYAGE_FLOOR, VOYAGE_H, VOYAGE_OFFSET, VOYAGE_W, buildVoyageScene } from '../purple-journey-scene.js?v=91dc84e3';
-import { homesFeature } from './homes-feature.js?v=62ee9e64';
+import { homesFeature } from './homes-feature.js?v=3175b842';
 
 export const PURPLE_FEATURE_ID = 'purple-journey';
 /** The scene's own TSID (the template is LNVV4OTMAUG2PQV). */

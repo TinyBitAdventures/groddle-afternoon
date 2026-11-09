@@ -60,8 +60,8 @@ import {
   shouldWarnLowEnergy,
   squishGrape,
   wineDrinkConditions,
-} from '../public/js/hell.js?v=ca971c34';
-import { ITEM_CATALOG } from '../public/js/inventory.js?v=b7609342';
+} from '../public/js/hell.js?v=33a46876';
+import { ITEM_CATALOG } from '../public/js/inventory.js?v=60dfc9ca';
 import { GAME_DAY_MS, getGameDayKey, getGameDayStartMs } from '../public/js/game-day.js?v=edb00566';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=10b118dd';
 import {

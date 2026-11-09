@@ -23,7 +23,7 @@
  * every route that can advance it happens on named streets.
  */
 import { routesForCounter, WINTRY_PLACE_STREETS } from './quest-offers.js?v=a7ee5b8f';
-import { PHANTOM_QUEST_ID, phantomPlaceNeed } from './ghost-quest.js?v=18559ed6';
+import { PHANTOM_QUEST_ID, phantomPlaceNeed } from './ghost-quest.js?v=37adc842';
 
 const G = (t) => String(t || '').replace(/^L/, 'G');
 const slug = (s) => String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '');

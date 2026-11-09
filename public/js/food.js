@@ -10,7 +10,7 @@
  */
 
 import { GAME_DAY_MS } from './game-day.js?v=edb00566';
-import { ITEM_CATALOG } from './inventory.js?v=b7609342';
+import { ITEM_CATALOG } from './inventory.js?v=60dfc9ca';
 
 export const FOOD_VARIETY_UPGRADE = 'food_variety_bonus';
 export const FOOD_ENERGY_LIMIT_MULTIPLIER = 20;
@@ -128,7 +128,7 @@ export function foodFullness(state, energyMax = 100) {
 /** Original food gates. Buff herbs bypass this because they are not sent here. */
 export function canEatFood(state, pc, energyMax = 100) {
   if (foodFullness(state, energyMax).stuffed) {
-    return { ok: false, reason: "You can't eat any more food today. You're stuffed!" };
+    return { ok: false, reason: "You can't eat anymore food today." }; // G318: include/food.js 18
   }
   if (Number(pc?.energy || 0) >= energyMax) {
     return { ok: false, reason: 'You already have full energy.' };

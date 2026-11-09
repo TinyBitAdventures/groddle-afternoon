@@ -34,7 +34,7 @@ import {
   GARDEN_FERTILIZE_MS,
   fertilizeCheck,
   fertilizePlot,
-} from './js/garden.js?v=7bf205c7';
+} from './js/garden.js?v=d965f416';
 import { firstWorkingTool, HOE_TOOLS, WATERING_CAN_TOOLS } from './js/tools.js?v=eff5ef6f';
 import {
   ROCK_CATALOG,
@@ -46,13 +46,13 @@ import {
   findWorkingPick,
   rockStatusLabel,
   ensureMiningItems,
-} from './js/mining.js?v=a187df8c';
+} from './js/mining.js?v=483539b8';
 import {
   ANIMAL_CLASS_IDS,
   ensureAnimalState,
   listAnimalFeedOptions,
   feedAnimal,
-} from './js/animals.js?v=2f790e9b';
+} from './js/animals.js?v=c2d5ecf3';
 import {
   quoteAnimalKinship,
   performAnimalKinship,
@@ -62,7 +62,7 @@ import {
   MUSICBLOCK_CATALOG,
   collectMusicblock,
   isMusicblock,
-} from './js/musicblocks.js?v=db6a213b';
+} from './js/musicblocks.js?v=6ed77e19';
 import { nextDialogue, formatSpokenLine } from './js/dialogue.js?v=fcfed1af';
 import {
   ensureWoodTreeState,
@@ -70,7 +70,7 @@ import {
   harvestWoodTree,
   woodTreeStatusLabel,
 } from './js/woodcutting.js?v=73472b8c';
-import { findWorkingRookTool } from './js/rook-woods.js?v=ea530ecc';
+import { findWorkingRookTool } from './js/rook-woods.js?v=210a5dba';
 import {
   HERDKEEPING,
   INCUBATION,
@@ -80,7 +80,7 @@ import {
   namingVerbs,
   queuePlops,
   startIncubation,
-} from './js/animal-husbandry.js?v=4fd2fae5';
+} from './js/animal-husbandry.js?v=6d330f7b';
 import { loseEnergy, metabolicGain, moodMax } from './js/metabolics.js?v=8504134e';
 import { SET_FREE, setFreeVerbState } from './js/animal-set-free.js?v=3b194fca';
 import { BUTTER_UP, SING_TO, butterUpVerbState, butterUpChicken, singToVerbState, singToButterfly } from './js/animal-flattery.js?v=63001f58';
@@ -88,7 +88,7 @@ import { levelInfoForXp } from './js/progression.js?v=33462eaa';
 import { getGameDayKey } from './js/game-day.js?v=edb00566';
 import { PACK_COPY, isElementClass } from './js/pack-slots.js?v=6cf9f397';
 import { hasPouch } from './js/elemental-pouch.js?v=ceefa97a';
-import { ITEM_CATALOG, countItem } from './js/inventory.js?v=b7609342';
+import { ITEM_CATALOG, countItem } from './js/inventory.js?v=60dfc9ca';
 import { slugsFromEffects } from './js/speech-slugs.js?v=130338f9';
 import { animalResponseKey, failureResponseKey, trantCareResponseKey, rockResponseKey, verbResponse } from './js/verb-responses.js?v=3ceb8a8c';
 
@@ -250,7 +250,7 @@ export function getVerbsFor(target, ctx) {
           : puzzle?.status === 'solved'
             ? 'The riddles are solved.'
             : '',
-      tooltip: 'Spin to the next letter',
+      tooltip: 'Click to spin this letter block and see what you get!', // G318: letter_block.js verbs.spin
     });
   }
 
@@ -259,12 +259,12 @@ export function getVerbsFor(target, ctx) {
     add('talk_to', 'talk to', {
       sort: 10,
       enabled: Boolean(puzzle),
-      tooltip: 'Ask Mr. Block about the current riddle',
+      tooltip: 'Talk to Mr. Block', // G318: npc_letterblock.js verbs.talk_to (and leave, below)
     });
     add('leave', 'leave playroom', {
       sort: 90,
       enabled: puzzle?.status !== 'solved',
-      tooltip: 'Return to the street and abandon this attempt',
+      tooltip: 'Get yourself out of here!',
     });
   }
 

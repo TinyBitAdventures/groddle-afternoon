@@ -23,7 +23,7 @@ import {
   recordFoodEat,
   resetFoodDay,
   foodBonusStatus,
-} from '../public/js/food.js?v=ed75d614';
+} from '../public/js/food.js?v=441bc419';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const publicRoot = join(here, '../public');
@@ -108,7 +108,7 @@ describe('official food memory and variety rewards', () => {
     });
     assert.equal(eaten.fullness.stuffed, true);
     assert.equal(canEatFood(state, { energy: 50 }).ok, false);
-    assert.match(canEatFood(state, { energy: 50 }).reason, /stuffed/i);
+    assert.equal(canEatFood(state, { energy: 50 }).reason, "You can't eat anymore food today."); // include/food.js 18
   });
 
   it('blocks food at full energy and does not remember zero-energy uses', () => {

@@ -30,7 +30,7 @@
  */
 
 import { applyRewards } from '../quests.js?v=2b882eb6';
-import { ITEM_CATALOG, isToolItem } from '../inventory.js?v=b7609342';
+import { ITEM_CATALOG, isToolItem } from '../inventory.js?v=60dfc9ca';
 import { frameTexture, isLoaded, onLoaded, sourceFromUrl } from '../textures.js?v=3149d699';
 import { playPoofIn } from '../overlay-art.js?v=11b6dd7f';
 import { KIDS_ROOM_FLOOR, KIDS_ROOM_H, KIDS_ROOM_W, buildKidsRoomScene } from '../kids-room-scene.js?v=b2803888';
@@ -448,7 +448,8 @@ export const room = {
     ctx.data.mrBlock = ctx.register({
       classId: 'npc_letterblock',
       label: 'Mr. Block',
-      subtitle: ctx.questId === 'letter_block_3' ? 'Has a game of utmost import' : `Collects things that start with ${ctx.data.letter}`,
+      // G318: Mr. Block's own description (items/npc_letterblock.js 8); the other line is the quest's want.
+      subtitle: ctx.questId === 'letter_block_3' ? 'A block with a letter on it.' : `Collects things that start with ${ctx.data.letter}`,
       sprite: spr,
     });
     // Friend Bear and friend Thing are the room's own teddy and pink tall guy.

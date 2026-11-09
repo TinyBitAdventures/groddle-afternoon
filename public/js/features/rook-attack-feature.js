@@ -58,11 +58,11 @@
  */
 
 import { slugsFromEffects } from '../speech-slugs.js?v=130338f9';
-import { addItem, countItem, ensureItem, removeItem, ITEM_CATALOG } from '../inventory.js?v=b7609342';
+import { addItem, countItem, ensureItem, removeItem, ITEM_CATALOG } from '../inventory.js?v=60dfc9ca';
 import { bindCountField, countKeyValue, countStepMarkup } from '../ui/count-chooser.js?v=5bc894c8';
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=7d3c70e7';
 import { landingY, nearestSurfaceY } from '../walk-surface.js?v=106bfdc5';
-import { donationValueFor } from '../shrines.js?v=9e895525';
+import { donationValueFor } from '../shrines.js?v=247c9b77';
 import { giantDisplayName } from '../giant-names.js?v=0e295891';
 import { TRANT_META, trantStatusLabel } from '../trants.js?v=1b3c8ae3';
 import {
@@ -123,9 +123,9 @@ import {
   strikeDamage as mpStrikeDamage,
   syncKeys,
   syncObjs,
-} from '../rook-mp.js?v=0b724b8c';
+} from '../rook-mp.js?v=2e10f19b';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
-import { copyChargesLeft, copyFromLedger, keepsCopies, spendCopyCharge, verbCopy } from '../copy-charges.js?v=507e8d22';
+import { copyChargesLeft, copyFromLedger, keepsCopies, spendCopyCharge, verbCopy } from '../copy-charges.js?v=f01dfda2';
 import { migrateClassValue } from '../tools.js?v=eff5ef6f';
 import { feedZone, placeRookBadge, unionBox } from '../rook-badge-place.js?v=2bb00dfd';
 

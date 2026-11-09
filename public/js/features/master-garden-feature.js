@@ -28,8 +28,8 @@
  */
 
 import { TOOL_CONDITION_CATALOG, migrateClassValue } from '../tools.js?v=eff5ef6f';
-import { ITEM_CATALOG, countItem, ensureItem } from '../inventory.js?v=b7609342';
-import { SEED_CATALOG, listPlantableSeeds } from '../garden.js?v=7bf205c7';
+import { ITEM_CATALOG, countItem, ensureItem } from '../inventory.js?v=60dfc9ca';
+import { SEED_CATALOG, listPlantableSeeds } from '../garden.js?v=d965f416';
 import {
   GARDEN_POTIONS,
   MASTER_GARDENER,
@@ -42,11 +42,11 @@ import {
   potionTendGarden,
   potionUsesLeft,
   usePotion,
-} from '../master-garden.js?v=0fa84ce4';
+} from '../master-garden.js?v=caa7ac2e';
 import { rollDropTable } from '../drop-tables.js?v=16e12632';
-import { payDrop } from './drops-feature.js?v=662ef0fc';
+import { payDrop } from './drops-feature.js?v=7f45f07f';
 import { textureFromUrl } from '../textures.js?v=3149d699';
-import { copyFromLedger, keepsCopies, verbCopy } from '../copy-charges.js?v=507e8d22';
+import { copyFromLedger, keepsCopies, verbCopy } from '../copy-charges.js?v=f01dfda2';
 import { gardenGrowModifier } from '../imagination-effects.js?v=70169933';
 
 export const MASTER_GARDEN_FEATURE_ID = 'master-garden';

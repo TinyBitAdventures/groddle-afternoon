@@ -12,7 +12,7 @@ import { OVERLAYS, expandMotionObjects } from '../tools/overlays/build.mjs';
 import { loadFla } from '../tools/overlay-art/xfl-svg.mjs';
 import { SHRINE_SHEETS, shrineClassFor, shrineRegionForHub, shrineSheet, shrineVariantFor } from '../public/js/shrine-variants.js?v=7f11c97d';
 import { checkVariants, variantFiles } from '../tools/shrine-variants/build.mjs';
-import { SLATHER_VERB, SPLATTER_STAGE_SIDE, splatterDy, slatherVerb } from '../public/js/features/quest-verbs-feature.js?v=258f925b';
+import { SLATHER_VERB, SPLATTER_STAGE_SIDE, splatterDy, slatherVerb } from '../public/js/features/quest-verbs-feature.js?v=f17be30c';
 import { OVERLAY_EMOTES, EMOTES } from '../public/js/realtime-client.js?v=7350df88';
 import {
   GAME_TELEPORTER_DECO,
@@ -22,7 +22,7 @@ import {
   gameTeleporterFeature,
   payForCrowns,
   teleporterPoint,
-} from '../public/js/features/game-teleporter-feature.js?v=822f838f';
+} from '../public/js/features/game-teleporter-feature.js?v=309d43a6';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const pub = join(root, 'public');

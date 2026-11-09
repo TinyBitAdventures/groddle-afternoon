@@ -2,9 +2,9 @@
  * Groddle Afternoon — original street geometry + layered decos
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
-import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=224484b4';
+import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=a409dfed';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=127e0a3c';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=3fdfb4ba';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=24bfe85e';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -56,7 +56,7 @@ import {
   noticePhantom,
   grantFadedHeart,
   rememberWithFadedHeart,
-} from './js/ghost-quest.js?v=18559ed6';
+} from './js/ghost-quest.js?v=37adc842';
 import {
   HOG_HAUL_QUEST_ID,
   HOG_HAUL_STREET_ID,
@@ -128,7 +128,7 @@ import {
   qualificationVerb,
   requestLegalizeQualification,
   travelToGregarious,
-} from './js/legalize-it.js?v=4059f820';
+} from './js/legalize-it.js?v=b5645cb6';
 import { HALL, HALL_LAYOUT, HALL_QUESTIONS } from './js/bureaucratic-hall.js?v=a0bc6317';
 import { STATION_X, stationArrival, stationScreen, surfaceStation } from './js/subway.js?v=44d1a09f';
 import { ALLEY, SHADY, drawAlley, inEnteredBox } from './js/quest-rooms/back-alley-set.js?v=d53ba17d';
@@ -228,7 +228,7 @@ import {
   rookEggStateForProgress,
   rookWoodsObjective,
   rookWoodsRemainingMs,
-} from './js/rook-woods.js?v=ea530ecc';
+} from './js/rook-woods.js?v=210a5dba';
 import {
   ROOK_HALL_QUEST_ID,
   ROOK_HALL_START_QUEST_ID,
@@ -474,13 +474,13 @@ import {
   addItem,
   removeItem,
   isToolItem,
-} from './js/inventory.js?v=b7609342';
+} from './js/inventory.js?v=60dfc9ca';
 import { TROPHY_FIND_TEXT, trophyOfBadge } from './js/home-trophies.js?v=309fd6c7';
 import { PACK_COPY, isBagClass, isElementClass, unitRankAt } from './js/pack-slots.js?v=6cf9f397';
 import { hasPouch } from './js/elemental-pouch.js?v=ceefa97a';
 import { createPackRow, mountPackClearance, packBandRange, packCountText, packSearchEntries, packSlotTip } from './js/ui/pack-row.js?v=65c0f180';
-import { listAnimalFeedOptions } from './js/animals.js?v=2f790e9b';
-import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=2f790e9b';
+import { listAnimalFeedOptions } from './js/animals.js?v=c2d5ecf3';
+import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=c2d5ecf3';
 import {
   createDroppedItemState,
   parseDroppedItemState,
@@ -493,13 +493,13 @@ import {
   pickupDroppedStack,
   placeDroppedBag,
   takeDroppedRecord,
-} from './js/world-items.js?v=0bbfdab9';
+} from './js/world-items.js?v=da2bb7a1';
 import {
   createPlayerSave,
   parsePlayerSave,
   serializePlayerSave,
   restorePlayerSave,
-} from './js/player-save.js?v=c81ccc75';
+} from './js/player-save.js?v=dfcf07d3';
 import {
   HOME_INTERIOR_TSID,
   HOME_STREET_TSID,
@@ -513,7 +513,7 @@ import {
   imagineHome,
   isHomePlaceTsid,
 } from './js/homes.js?v=631ab6b8';
-import { HOME_MACHINE, offerHomeTicket, renderTicketMachine } from './js/home-ticket.js?v=69769c2f';
+import { HOME_MACHINE, offerHomeTicket, renderTicketMachine } from './js/home-ticket.js?v=911b49bd';
 import {
   MAIL_COMPANIONS,
   archiveMail,
@@ -594,7 +594,7 @@ import {
   recipeTaskLimit,
   recipeToolInUse,
   pluralizeItem,
-} from './js/making.js?v=d29c39c7';
+} from './js/making.js?v=25bf06a4';
 import { outputIconsHtml, outputsPhrase, recipeOutputRows } from './js/ui/recipe-outputs.js?v=73e19baf';
 import { MAKE_TOOL_SHEETS } from './js/make-tool-sheets.js?v=6f758e09';
 import { LOW_FUEL_LINE, craftSessionElapsedMs, isLowFuel, isMachineArt, machineArtHtml, packMakeState, playMachineHandOver, setMachineArtFrame } from './js/machine-art.js?v=ef8a7dd0';
@@ -622,7 +622,7 @@ import {
   cropIcon,
   hasWateringCan,
   hasHoe,
-} from './js/garden.js?v=7bf205c7';
+} from './js/garden.js?v=d965f416';
 import { GARDEN_SCALE, PLOT_H as GARDEN_PLOT_H, PLOT_W as GARDEN_PLOT_W, gardenFrame, gardenLayout, gardenStyle, plotPieces } from './js/garden-view.js?v=3683a26f';
 import {
   ROCK_CATALOG,
@@ -636,7 +636,7 @@ import {
   STARTER_MINING_SKILLS,
   findWorkingPick,
   miningToolWear,
-} from './js/mining.js?v=a187df8c';
+} from './js/mining.js?v=483539b8';
 import {
   loadStreetData,
   STREET_INDEX,
@@ -697,7 +697,7 @@ import {
   canEatFood,
   recordFoodEat,
   resetFoodDay,
-} from './js/food.js?v=ed75d614';
+} from './js/food.js?v=441bc419';
 import {
   consumeTakesCount,
   consumeCountCap,
@@ -707,7 +707,7 @@ import {
   limitCountCap,
   useItemMany,
   recordFoodEatMany,
-} from './js/eat-many.js?v=69cdb513';
+} from './js/eat-many.js?v=d6a61b1a';
 import {
   TRIPLE_JUMP_UPGRADES,
   createJumpState,
@@ -782,7 +782,7 @@ import { holdCloseToFloor } from './js/slope-walk.js?v=9af1e505';
 import { JUMP_SPEED, MAX_TICK_FRAMES, WALK_MAX, avatarGround, coastX, frameSteps, stepAvatar, steerAccel, steerX, streetPhysicsExtras } from './js/avatar-step.js?v=e8e9581f';
 import { createUserPath, stepUserPath } from './js/user-path.js?v=8880557f';
 import { FAILED_LINE, inVerbReach, movingLine, verbRange, walkOverEnd, walkOverGoalX } from './js/walk-over.js?v=db80ba07';
-import { hellBuffDesc, isInHell } from './js/hell.js?v=ca971c34';
+import { hellBuffDesc, isInHell } from './js/hell.js?v=33a46876';
 import { climbBobY, ladderAnimState, ladderSwap } from './js/ladder-anim.js?v=a8b327a0';
 import { VECTOR_AVATAR } from './js/avatar-vector-sheets.js?v=ad801376';
 import { createNpcGlitchKit } from './js/npc-glitch.js?v=894841be';
@@ -818,7 +818,7 @@ import {
   planMusicblockDrop,
   playMusicblock,
   starterMusicblocks,
-} from './js/musicblocks.js?v=db6a213b';
+} from './js/musicblocks.js?v=6ed77e19';
 import {
   VENDOR_PROFILES,
   selectVendorProfile,
@@ -829,14 +829,14 @@ import {
   createVendorSellQuote,
   vendorSellUnitPrice,
   vendorBuyUnitPrice,
-} from './js/vendor.js?v=cf56a21c';
+} from './js/vendor.js?v=ad64eca6';
 import {
   animalAnchorX,
   animalAnchorY,
   createAnimalState,
   resetAnimalDay,
   animalStatusLabel,
-} from './js/animals.js?v=2f790e9b';
+} from './js/animals.js?v=c2d5ecf3';
 import {
   ensureWoodTreeState,
   pickWoodTool,
@@ -865,7 +865,7 @@ import {
   favorRelationNote,
   emblemRelationNote,
   formatSpeedUpTime,
-} from './js/shrines.js?v=9e895525';
+} from './js/shrines.js?v=247c9b77';
 import { shrineSheet, shrineVariantFor } from './js/shrine-variants.js?v=7f11c97d';
 import { giantDisplayName } from './js/giant-names.js?v=0e295891';
 import { shrinePowderOptions, shrinePowderAchievementCounters } from './js/powders.js?v=fa5d1e41';
@@ -878,7 +878,7 @@ import {
   spinMeResponse,
   spinningWheelPhase,
   startSpinningWheel,
-} from './js/spinning-wheel.js?v=6f786bdd';
+} from './js/spinning-wheel.js?v=5bfba637';
 import {
   CUBIMAL_PACKAGE_IDS,
   cubimalCollectionProgress,
@@ -887,7 +887,7 @@ import {
   ensureCubimalItems,
   openCubimalPackage,
   setCubimalFree,
-} from './js/cubimals.js?v=c48cc6ff';
+} from './js/cubimals.js?v=bea49c0b';
 import {
   STOOT_DOLL_BUBBLE_MS,
   STOOT_DOLL_ID,
@@ -940,7 +940,7 @@ import {
   ANIMAL_PATROL,
   nearestPlacementGap,
 } from './js/street-ecology.js?v=08076876';
-import { chickenPauseRoll, easeToward, flightFloorAt, flightFloorFor, flyerLift } from './js/street-creatures.js?v=fa8f9bcc';
+import { chickenPauseRoll, easeToward, flightFloorAt, flightFloorFor, flyerLift } from './js/street-creatures.js?v=6bfadcbf';
 import { createSoundBoard, DEFAULT_SFX_VOLUME, watchButtonClicks, watchPanelSounds } from './js/sound-board.js?v=87380a25';
 import {
   actionLoopFor,
@@ -985,7 +985,7 @@ import { ENCYCLOPEDIA_MENU_LABEL, createEncyclopedia, isEncyclopediaKey } from '
 import { EAT_PICK_TEXT, bestFoodIndex, eatChoices, eatTip } from './js/eat-pick.js?v=8fb763d0';
 import { installHeldKeyGuard, isMacPlatform } from './js/held-keys.js?v=98b96620';
 import { signpostArmRows, worldContextAction } from './js/world-context-menu.js?v=f3f48805';
-import { blockedPlayerVerbs, listPlayerTarget, opensPlayerMenu, playerMenuRows } from './js/ui/player-menu.js?v=107fd27a';
+import { blockedPlayerVerbs, listPlayerTarget, opensPlayerMenu, playerMenuRows } from './js/ui/player-menu.js?v=a71fc0f8';
 import { forgetTexture, frameTexture, isFailed, isLoaded, onFailed, onLoaded, textureFromUrl, whenLoaded } from './js/textures.js?v=3149d699';
 import { FALLBACK_MAX as WORLD_ART_FALLBACK_MAX, worldArtFor } from './js/world-art.js?v=df476660';
 import { sceneAnim, syncAnim } from './js/deco-anim.js?v=4f2e3d99';
@@ -2539,22 +2539,26 @@ ensureItem(HOGTIED_JONES_ID, {
 });
 ensureItem(LEGALIZE_CARD_ID, {
   label: 'Card-Carrying Qualification',
-  desc: 'The basic bureaucratic proof that you are qualified to carry cards.',
+  // G318: items/card_carrying_qualification.js 8.
+  desc: 'This is the most basic, entry-level, bureaucratic item of all. Being qualified to carry cards is a prerequisite to becoming the sort of person who can have Papers at all, let alone Papers which are in order.',
   icon: 'assets/sprites/icons/card_carrying_qualification.webp', // the legalize copy's pixels, with a 3x render
 });
 ensureItem('your_papers', {
   label: 'Your Papers',
-  desc: 'A full yet incomplete set of papers, waiting to be put in order.',
+  // G318: items/your_papers.js 8.
+  desc: 'Here is a full yet incomplete set of all the papers a person might require in order that they may prove, justify or otherwise provide evidence that their papers are in order.',
   icon: 'assets/sprites/icons/your_papers.webp', // the legalize copy's pixels, with a 3x render
 });
 ensureItem('ice', {
   label: 'Ice',
-  desc: 'A clear, cold piece of Winter Walk, still sparkling after the journey home.',
+  // G318: items/ice.js 8 (Tiny Speck's own words, glitch-groin and all).
+  desc: 'A nugget of purest ice, plucked with a scraper from the Nubbins of the north and ripe in readiness for sno cones, cocktail making, and icing the occasional strained glitch-groin. Basically: frozen water in pleasingly cuboid form.',
   icon: 'assets/sprites/icons/ice.webp',
 });
 ensureItem(SMALL_WORTHLESS_ID, {
   label: 'Small shiny object with no intrinsic value',
-  desc: 'Shiny, but you can barely see the shine so it ends up a little dull. Totally worthless: it has no purpose.',
+  // G318: items/small_worthless.js 8, in full.
+  desc: 'Shiny, but you can barely see the shine so it ends up a little dull. Totally worthless: it has no purpose. Holding on to this little object simply cannot be recommended.',
 });
 ensureItem(EMOTIONAL_BEAR_ID, {
   label: 'Emotional Bear',
@@ -2566,14 +2570,16 @@ ensureItem(EMOTIONAL_BEAR_ID, {
 });
 ensureItem('lips', {
   label: 'Lips',
-  desc: 'Pre-pursed and super-soft, these Lips can be attached to an Emotional Bear.',
+  // G318: items/lips.js 8 (link dropped).
+  desc: 'Pre-pursed, super-soft and infused with an antibacterial salve, these lips can be attached to whatever might help you kiss people better. Like, say, an Emotional Bear.',
   icon: 'assets/sprites/icons/lips.webp',
   baseCost: 10,
   stackMax: 1,
 });
 ensureItem('moon', {
   label: 'Moon',
-  desc: 'One full, craterous Moon, most useful when attached to an Emotional Bear.',
+  // G318: items/moon.js 8 (link dropped).
+  desc: 'One full, craterous moon, without which mooning cannot happen. Most useful if attached to an Emotional Bear.',
   icon: 'assets/sprites/icons/moon.webp',
   baseCost: 99,
   stackMax: 1,
@@ -6275,7 +6281,7 @@ function usePackItem(classTsid, count = 1) {
       : ` ${r.effectLabel} is active.`
     : '';
   const fullnessSuffix = foodResult?.fullness?.stuffed
-    ? " You're stuffed until the next day."
+    ? ' You are stuffed. You can’t eat any more today.' // G318: the stuffed buff's prompt (catalog_buffs.js 2565)
     : foodResult?.fullness?.percent >= 75
       ? " You're getting quite full."
       : foodResult?.fullness?.percent >= 50
@@ -10209,7 +10215,8 @@ function useGameshowTicket() {
     toast('There is no room for the wheel here.');
     return false;
   }
-  pushActivity('You used a Gameshow Ticket. A Spinning Wheel appeared!');
+  // G318: buildVerbMessage(count, 'use', 'used') (gameshow_ticket.js 125-126).
+  pushActivity('You used a Gameshow Ticket.');
   toast('A Spinning Wheel appears. Give it a moment, then spin!', 3200);
   playSfx('alert', { volume: 0.42, rate: 1.12 });
   updateHud();
@@ -10242,8 +10249,8 @@ function handleSpinningWheelTarget(target, verbId) {
   // The 2.5 s neutral spin is time to fetch the colour's 3x sheets (wheelSheetKey).
   preloadWheelSheets([wheelSheetKey(`${result.color}_spin`), wheelSheetKey(`${result.color}_end`)]);
   setSpinningWheelVisual(target, 'spin');
+  // G318: the source's spin sends no activity line (npc_spinning_wheel.js 190-200), only the sound.
   playSfx('spinningWheel', { volume: 0.72 });
-  pushActivity('You spin the Spinning Wheel. Round and round it goes!');
   if (app?.canvas) {
     app.canvas.dataset.spinningWheelColor = result.color;
     app.canvas.dataset.spinningWheelReward = result.reward.kind === 'currants'
@@ -16136,7 +16143,7 @@ function spawnFourLetterMrBlock() {
   fourLetterMrBlock = register({
     classId: 'npc_letterblock',
     label: 'Mr. Block',
-    subtitle: 'A charming blockhead with three troubling riddles',
+    subtitle: 'A block with a letter on it.', // G318: items/npc_letterblock.js 8
     sprite: spr,
     state: { puzzleState: fourLetterState },
   });
@@ -20234,7 +20241,7 @@ function spawnMrHairball() {
   mrHairballTarget = register({
     classId: 'npc_dustbunny',
     label: 'Mr. Hairball',
-    subtitle: 'A remarkably present little Dust Bunny',
+    subtitle: 'An ikkle fwuffy cutesy wutesy Dust Bunny.', // G318: items/npc_dustbunny.js 8
     sprite,
     state: { deEmbiggenifyState },
   });
@@ -20277,7 +20284,7 @@ function spawnSmallWorthless() {
   smallWorthlessTarget = register({
     classId: SMALL_WORTHLESS_ID,
     label: 'Small shiny object with no intrinsic value',
-    subtitle: 'A tiny glint behind the cake',
+    subtitle: 'Shiny, but you can barely see the shine so it ends up a little dull.', // G318: items/small_worthless.js 8
     sprite,
     state: { deEmbiggenifyState, glint },
   });
@@ -22326,9 +22333,8 @@ function spawnIlmenskieJones({ released = false } = {}) {
   ilmenskieTarget = register({
     classId: 'npc_piggy_explorer',
     label: 'Ilmenskie Jones',
-    subtitle: released
-      ? 'Famed explorer and freshly liberated porkthropologist'
-      : 'Famed explorer, trapped in the Sealed Cavern',
+    // G318: the opening words of items/npc_piggy_explorer.js 8 (his description).
+    subtitle: 'Professor of porkthropology, obtainer of rare artifacts',
     sprite: spr,
     state: { rescueState: rescue, released },
   });
@@ -22348,6 +22354,7 @@ function handleIlmenskieTarget(target, verbId) {
       text: "Don't get fresh with me, kid. This is life or death here.",
       durationMs: 5200,
     });
+    // npc_piggy_explorer.js 284-286 (the source spells him "Ilmenksie" there).
     pushActivity('You tried to nibble Ilmenskie Jones.');
     return;
   }
@@ -28266,7 +28273,7 @@ function openVendorTileMenu(tile, { at = null, keys = false } = {}) {
     unit = vendorBuyUnitPrice(offer, pc.imaginationUpgrades);
     most = unit > 0 ? Math.max(1, Math.floor((pc.currants || 0) / unit)) : 99;
     // vendor.js vendorBuy's own refusal.
-    if (unit > (pc.currants || 0)) reason = `Need ${unit} currants (you have ${pc.currants || 0}).`;
+    if (unit > (pc.currants || 0)) reason = "Sorry, you can't afford that."; // inc_stores.js 161, as vendorBuy says it
   } else {
     const quote = createVendorSellQuote(inv, activeVendor.offers, cls, 1, pc.imaginationUpgrades, vendorSellOpts());
     if (!quote?.ok) return false;
@@ -31673,7 +31680,7 @@ async function main() {
   }
   // Garden talkback QA (js/garden-talk-qa.js): ?gardentalkdemo=herb|crop.
   if (new URLSearchParams(location.search).has('gardentalkdemo')) {
-    import('./js/garden-talk-qa.js?v=fc16e51b').then((m) => m.runGardenTalkDemo({ engine, executeVerb, params: new URLSearchParams(location.search) }));
+    import('./js/garden-talk-qa.js?v=aea5b50c').then((m) => m.runGardenTalkDemo({ engine, executeVerb, params: new URLSearchParams(location.search) }));
   }
   // MEMQA (ticket 21, Safari's memory reload in Naraka): ?memqa=1 lets a probe walk streets through the
   // real street trip (tools/qa/street-memory.mjs). Solo pages only: online pages drop their params.

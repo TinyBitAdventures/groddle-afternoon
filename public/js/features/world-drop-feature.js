@@ -19,8 +19,8 @@
  * (what a stack would do at a client point) and drop(x, y, cls) (the same drop a mouse does).
  */
 
-import { ITEM_CATALOG } from '../inventory.js?v=b7609342';
-import { listAnimalFeedOptions } from '../animals.js?v=2f790e9b';
+import { ITEM_CATALOG } from '../inventory.js?v=60dfc9ca';
+import { listAnimalFeedOptions } from '../animals.js?v=c2d5ecf3';
 import { isBagClass } from '../pack-slots.js?v=6cf9f397';
 import { dropFor, dropTip } from '../world-drop.js?v=f162fb0e';
 

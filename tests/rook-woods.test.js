@@ -36,7 +36,7 @@ import {
   rookEggStateForProgress,
   rookWoodsGroundY,
   rookWoodsRemainingMs,
-} from '../public/js/rook-woods.js?v=ea530ecc';
+} from '../public/js/rook-woods.js?v=210a5dba';
 import {
   createToolConditionState,
   setToolRemaining,

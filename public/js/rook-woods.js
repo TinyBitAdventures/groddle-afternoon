@@ -515,5 +515,5 @@ export function rookWoodsObjective(state) {
   if (state.status === 'warning') return 'Prepare to evade the Crushers';
   if (state.status === 'expired') return 'The Rooks’ Woods closed';
   if (state.status === 'complete') return 'Rook Egg smashed';
-  return 'Evade the Crushers and smash the Rook Egg';
+  return 'Smash the Rook Egg'; // G318: the quest's step (quests/rook_egg_smash.js requirements)
 }

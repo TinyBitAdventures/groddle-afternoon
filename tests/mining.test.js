@@ -26,13 +26,13 @@ import {
   starterMiningTools,
   miningVendorOffers,
   STARTER_MINING_SKILLS,
-} from '../public/js/mining.js?v=a187df8c';
+} from '../public/js/mining.js?v=483539b8';
 import {
   createInventory,
   countItem,
   listPackToolSlots,
   isToolItem,
-} from '../public/js/inventory.js?v=b7609342';
+} from '../public/js/inventory.js?v=60dfc9ca';
 import {
   loadRecipeCatalogFromFile,
   listRecipesForTool,
@@ -40,8 +40,8 @@ import {
   craftRecipe,
   ensureMakingItems,
   TOOL_CATALOG,
-} from '../public/js/making.js?v=d29c39c7';
-import { DEFAULT_VENDOR, vendorBuy } from '../public/js/vendor.js?v=cf56a21c';
+} from '../public/js/making.js?v=25bf06a4';
+import { DEFAULT_VENDOR, vendorBuy } from '../public/js/vendor.js?v=ad64eca6';
 import { createToolConditionState, getToolCondition } from '../public/js/tools.js?v=eff5ef6f';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));

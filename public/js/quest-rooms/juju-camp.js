@@ -416,7 +416,7 @@ function spawnKid(ctx) {
   const hit = proxy(ctx, 56, 80);
   hit.x = view.x;
   hit.y = view.y;
-  const target = ctx.register({ classId: 'npc_juju_bandit', label: 'Juju Bandit', subtitle: 'One of Grandma’s grandsons', sprite: hit });
+  const target = ctx.register({ classId: 'npc_juju_bandit', label: 'Juju Bandit', subtitle: 'The scourge of the Baqala', /* G318: items/npc_juju_bandit.js 8 */ sprite: hit });
   ctx.sound('JUJU_BANDIT_SPAWN', { volume: 0.5 });
   ctx.data.kid = { view, hit, target, x: view.x, walkTo: null };
 }
@@ -754,7 +754,7 @@ export const room = {
     const hit = proxy(ctx, 110, 128);
     hit.x = view.x;
     hit.y = view.y;
-    ctx.data.grandmaTarget = ctx.register({ classId: 'npc_juju_grandma', label: 'Juju Grandma', subtitle: 'The meanest of the Juju band', sprite: hit });
+    ctx.data.grandmaTarget = ctx.register({ classId: 'npc_juju_grandma', label: 'Juju Grandma', subtitle: 'The meanest and most mercenary of the Juju band', /* G318: items/npc_juju_grandma.js 8 */ sprite: hit });
     // onPlayerEnter.
     if (ctx.count('juju_paperweight') > 0) {
       ctx.data.doneFirstConvo = true;

@@ -11,7 +11,7 @@
  * Produce counts are the GSJS seed classProps produces_count.
  */
 
-import { addItem, removeItem, countItem, ensureItem, itemIcon } from './inventory.js?v=b7609342';
+import { addItem, removeItem, countItem, ensureItem, itemIcon } from './inventory.js?v=60dfc9ca';
 import { HOE_TOOLS, WATERING_CAN_TOOLS, canUseTool, firstWorkingTool, useToolCondition } from './tools.js?v=eff5ef6f';
 import { skillPackageDetails } from './skill-packages.js?v=bfb87281';
 import { gardenGrowModifier } from './imagination-effects.js?v=70169933';
@@ -306,13 +306,15 @@ export const GARDEN_TOOLS = {
   watering_can: {
     classTsid: 'watering_can',
     label: 'Watering Can',
-    desc: 'Water garden plots so seeds can grow.',
+    // G318: items/watering_can.js 8.
+    desc: 'A stainless-steel 5-gallon watering can. It can be used to water plants, trees, and crops.',
     isTool: true,
   },
   hoe: {
     classTsid: 'hoe',
     label: 'Hoe',
-    desc: 'Clear dirty plots after harvest.',
+    // G318: items/hoe.js 8.
+    desc: 'A garden-variety hoe. It can be used to tend weedy patches.',
     isTool: true,
   },
 };

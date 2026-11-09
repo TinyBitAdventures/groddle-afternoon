@@ -34,8 +34,8 @@ import {
   RESOURCE_DROP_TABLES,
   DUST_TRAP_RARE_KEY_CHANCE,
   DUST_TRAP_DROP_ITEM_DEFS
-} from '../public/js/resource-nodes.js?v=1ecc9789';
-import { ITEM_CATALOG } from '../public/js/inventory.js?v=b7609342';
+} from '../public/js/resource-nodes.js?v=937de69e';
+import { ITEM_CATALOG } from '../public/js/inventory.js?v=60dfc9ca';
 import {
   TOOL_CONDITION_CATALOG,
   createToolConditionState,

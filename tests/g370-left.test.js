@@ -31,7 +31,7 @@ import { BUFF_ICONS } from '../public/js/buff-triggers.js?v=a3093922';
 import { FEAT_BY_ID, UNWIRED_FEATS, WIRED_FEATS, featsInEpic } from '../public/js/solo-feats.js?v=40f8c7b5';
 import { MP_ACTS, MP_ORDER, MP_PACE, mpGoals, reportFor } from '../public/js/feats-mp.js?v=a1864075';
 import { featTable } from '../tools/build-realtime-feats.mjs';
-import { endComedian } from '../public/js/features/funpickle-feature.js?v=03b7fb5f';
+import { endComedian } from '../public/js/features/funpickle-feature.js?v=667be9ed';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const PUBLIC = join(ROOT, 'public');

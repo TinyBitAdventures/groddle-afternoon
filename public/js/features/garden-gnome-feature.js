@@ -17,13 +17,13 @@
  * window.groddleGnome: state(), place(), bump(id), verbs(id), run(id, verb), menu(id), answer(value),
  * teach(value). Canvas: gnomes (id@x:state:dir:phrases per gnome here, ';'), gnomePlace, gnomeLast.
  */
-import { addItem, countItem, removeItem } from '../inventory.js?v=b7609342';
-import { readVisitScene } from '../neighbours-mp.js?v=d2a75460';
+import { addItem, countItem, removeItem } from '../inventory.js?v=60dfc9ca';
+import { readVisitScene } from '../neighbours-mp.js?v=ca29dfb4';
 import { frameTexture, sourceFromUrl } from '../textures.js?v=3149d699';
 import { GNOME_ART, GNOME_ART_DIR } from '../garden-gnome-art.js?v=994b7c76';
 import { filterText } from '../word-filter.js?v=9a7a7ebb';
 import { HOME_INTERIOR_TSID, HOME_STREET_TSID } from '../homes.js?v=631ab6b8';
-import { homesFeature } from './homes-feature.js?v=62ee9e64';
+import { homesFeature } from './homes-feature.js?v=3175b842';
 import {
   GNOME_CLASS,
   GNOME_PHRASE_MAX,

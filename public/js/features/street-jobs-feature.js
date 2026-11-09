@@ -43,15 +43,15 @@
  * 'restore', job type 5) and finishes the restore in its `onDone` hook.
  */
 
-import { ITEM_CATALOG, addItem, countItem, ensureItem, itemIcon, packStamp, removeItem } from '../inventory.js?v=b7609342';
+import { ITEM_CATALOG, addItem, countItem, ensureItem, itemIcon, packStamp, removeItem } from '../inventory.js?v=60dfc9ca';
 import { canUseTool, useToolCondition } from '../tools.js?v=eff5ef6f';
 import { ecologyForStreet } from '../street-ecology.js?v=08076876';
 import { worldToScreen } from '../street-model.js?v=b6cb6a4e';
 import { signArmWidth } from '../street-render.js?v=18160bb6';
 import { getSkillCatalog } from '../content-catalogs.js?v=10b118dd';
-import { GIANTS } from '../shrines.js?v=9e895525';
+import { GIANTS } from '../shrines.js?v=247c9b77';
 import { giantDisplayName } from '../giant-names.js?v=0e295891';
-import { teleportationFeature } from './teleportation-feature.js?v=627cf405';
+import { teleportationFeature } from './teleportation-feature.js?v=5c7cdb22';
 import {
   SOLO_DIVISOR,
   WORK_UNIT_MS,
@@ -98,7 +98,7 @@ import {
   upgradeOption,
 } from '../street-jobs.js?v=02a81cb3';
 import { gainMetabolic, loseEnergy } from '../metabolics.js?v=8504134e';
-import { closuresInTheWay, holdNote, placeIndex, questHold, questStoryKey, reachableStreets } from '../quest-reach.js?v=21a42c87';
+import { closuresInTheWay, holdNote, placeIndex, questHold, questStoryKey, reachableStreets } from '../quest-reach.js?v=a89c016a';
 import { getQuestCatalog as questCatalog } from '../content-catalogs.js?v=10b118dd';
 import { saveStore } from '../save-store.js?v=8839ba7b';
 import {

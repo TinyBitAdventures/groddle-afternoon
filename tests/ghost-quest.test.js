@@ -25,7 +25,7 @@ import {
   phantomAnimationDurationMs,
   grantFadedHeart,
   rememberWithFadedHeart,
-} from '../public/js/ghost-quest.js?v=18559ed6';
+} from '../public/js/ghost-quest.js?v=37adc842';
 import { createQuestState, parseQuestConversation } from '../public/js/quests.js?v=2b882eb6';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');

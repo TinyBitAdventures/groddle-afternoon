@@ -33,14 +33,14 @@
  * giftDrag (none|dragging|over:<id>); window.groddleGifts.
  */
 
-import { ITEM_CATALOG, addItem, countItem, ensureItem, itemIcon, listPackSlots, removeItem } from '../inventory.js?v=b7609342';
+import { ITEM_CATALOG, addItem, countItem, ensureItem, itemIcon, listPackSlots, removeItem } from '../inventory.js?v=60dfc9ca';
 import { TOOL_CONDITION_CATALOG, copyTag, copyTagKind, copyTags, leavingCopyTag, leavingToolWear, receiveToolCopy, takeToolCopy } from '../tools.js?v=eff5ef6f';
 import { scriptFromTag, scriptLabel } from '../teleportation.js?v=42d36178';
 import { unitRankAt } from '../pack-slots.js?v=6cf9f397';
 import { createMinnAccount } from '../minn-account.js?v=8f2741cd';
 import { createItemPicker } from '../ui/item-picker.js?v=b4c84ac6';
 // The same key as features/index.js: one module instance holds the carried notes.
-import { giveCarriedNote, takeCarriedNote, writtenCarriedNotes } from './street-furniture-feature.js?v=84bf62d7';
+import { giveCarriedNote, takeCarriedNote, writtenCarriedNotes } from './street-furniture-feature.js?v=70ba107f';
 import {
   BOX_KEEP,
   BOX_SLOTS,

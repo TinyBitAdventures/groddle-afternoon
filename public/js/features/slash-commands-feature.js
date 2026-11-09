@@ -53,9 +53,9 @@
  */
 
 import { BUTLER_STRINGS } from '../butler.js?v=2c95c064';
-import { butlerApi } from './butler-feature.js?v=d4703855';
-import { hellFeature } from './hell-feature.js?v=93f1c8dd';
-import { towerApi } from './home-tower-feature.js?v=1a65b435';
+import { butlerApi } from './butler-feature.js?v=108eac74';
+import { hellFeature } from './hell-feature.js?v=88837f0a';
+import { towerApi } from './home-tower-feature.js?v=0f31a6b7';
 import { platformYAt, platformsScreen } from '../street-model.js?v=b6cb6a4e';
 import { COMMAND_HELP_INTRO, STUCK_COOLDOWN_MS, STUCK_TEXT, bareCommand, commandHelpLines, commandHint, isCommandHelp, misplacedCommand, slashPlan, strayLetterCommand, unknownLine } from '../slash-commands.js?v=8533e143';
 import { parseTp, runTeleportCommand, TP_TEXT } from '../admin-teleport.js?v=fa56e8df';

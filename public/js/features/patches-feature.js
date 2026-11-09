@@ -47,7 +47,7 @@
  * street the server doesn't share keep the save's own plots, as before.
  */
 
-import { ensureItem } from '../inventory.js?v=b7609342';
+import { ensureItem } from '../inventory.js?v=60dfc9ca';
 import { isItemFloor, platformYAt } from '../street-model.js?v=b6cb6a4e';
 import { getStreetEcologyCatalog, streetEcologyAliases } from '../street-ecology.js?v=08076876';
 import { trantFootAnchorY, trantStatusLabel } from '../trants.js?v=1b3c8ae3';
@@ -71,11 +71,11 @@ import {
   soilSpawnClasses,
   soilSpritePaths,
   tickPlot,
-} from '../patches.js?v=796732fb';
+} from '../patches.js?v=dc2b1436';
 import { frameTexture, isLoaded, onFailed, onLoaded, textureFromUrl } from '../textures.js?v=3149d699';
 import { HOE_TOOLS, firstWorkingTool } from '../tools.js?v=eff5ef6f';
 import { slugsFromEffects } from '../speech-slugs.js?v=130338f9';
-import { plotSignature, replayRng } from '../shared-patches.js?v=ce6fcc12';
+import { plotSignature, replayRng } from '../shared-patches.js?v=9459ceac';
 
 export const PATCHES_FEATURE_ID = 'patches';
 export const SOIL_GROUP_PREFIX = 'soil:';

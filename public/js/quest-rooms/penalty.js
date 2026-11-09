@@ -31,10 +31,10 @@
  * groddle1.swf decos; their placement is read off the Snap.
  */
 
-import { createPlot, performPlotVerb, plotArtPath, plotVerbs, soilResponse } from '../patches.js?v=796732fb';
+import { createPlot, performPlotVerb, plotArtPath, plotVerbs, soilResponse } from '../patches.js?v=dc2b1436';
 import { getQuestCatalog } from '../content-catalogs.js?v=10b118dd';
 import { onLoaded, textureFromUrl } from '../textures.js?v=3149d699';
-import { ensureItem } from '../inventory.js?v=b7609342';
+import { ensureItem } from '../inventory.js?v=60dfc9ca';
 
 export const PART_1 = 'smuggle_the_smuggler_part1';
 export const PART_2 = 'smuggle_the_smuggler_part2';
@@ -392,7 +392,7 @@ export const room = {
     if (target === ctx.data.vendorTarget) {
       const step = cellStep(questState(ctx));
       return [
-        { id: 'talk_to', label: 'Talk to', enabled: !ctx.data.talking && !ctx.data.crawling && step !== 'free', reason: 'He is busy', tooltip: 'He says he is innocent' },
+        { id: 'talk_to', label: 'Talk to', enabled: !ctx.data.talking && !ctx.data.crawling && step !== 'free', reason: 'He is busy', tooltip: 'Discuss a matter of grave importance' }, // G318: npc_smuggler.js 197
         { id: 'buy', label: 'Buy', enabled: !ctx.data.talking && !ctx.data.crawling, reason: 'He is busy', tooltip: 'Buy extremely rare items' },
       ];
     }

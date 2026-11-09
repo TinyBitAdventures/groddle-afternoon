@@ -10,7 +10,7 @@
 
 import { applyQuestProgress } from './quests.js?v=2b882eb6';
 import { unlockAchievement } from './achievements.js?v=2e4aa9cb';
-import { countItem, removeItem } from './inventory.js?v=b7609342';
+import { countItem, removeItem } from './inventory.js?v=60dfc9ca';
 
 export const LEGALIZE_QUEST_ID = 'card_carrying_qualification';
 export const LEGALIZE_BACK_ALLEY_TSID = 'LIF177DTS6T1KFG';
@@ -423,6 +423,7 @@ export function legalizeObjective(state) {
   if (state.stage === 'hall_processing') {
     return `Continue with ${LEGALIZE_CLERKS[state.clerkIndex].name}`;
   }
-  if (state.stage === 'card_owned') return 'Activate the Card-Carrying Qualification in your pack';
+  // G318: the quest's step (quests/card_carrying_qualification.js requirements).
+  if (state.stage === 'card_owned') return 'Activate Card Carrying Qualification';
   return 'Card-Carrying Qualification activated';
 }

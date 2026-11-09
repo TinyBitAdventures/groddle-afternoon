@@ -21,7 +21,7 @@
  * sceneId, sceneStatus, sceneProgress, sceneQuoins, sceneReward, sceneDemo.
  */
 
-import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=b7609342';
+import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=60dfc9ca';
 import { QUOIN_SHEET, QUOIN_TYPES, quoinTouches } from '../quoins.js?v=299cc3f4';
 import {
   BEAM_ME_DOWN,

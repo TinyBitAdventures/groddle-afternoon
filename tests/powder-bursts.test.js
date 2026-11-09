@@ -10,7 +10,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { closestTarget } from '../public/js/powders.js?v=fa5d1e41';
 import { OVERLAY_USES } from '../public/js/overlays.js?v=ed371926';
-import { powdersFeature } from '../public/js/features/powders-feature.js?v=2be8090b';
+import { powdersFeature } from '../public/js/features/powders-feature.js?v=8e412359';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=10b118dd';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');

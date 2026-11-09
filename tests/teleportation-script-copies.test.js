@@ -12,7 +12,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import { SITE_DIR, skipWithoutServer, skipWithoutSite, SERVER_DIR } from '../tools/repos.mjs';
-import { addItem, countItem, createInventory, ensureItem, ITEM_CATALOG } from '../public/js/inventory.js?v=b7609342';
+import { addItem, countItem, createInventory, ensureItem, ITEM_CATALOG } from '../public/js/inventory.js?v=60dfc9ca';
 import {
   TOOL_CONDITION_CATALOG,
   bindToolInventory,
@@ -45,8 +45,8 @@ import {
   scriptTitle,
   useScript,
 } from '../public/js/teleportation.js?v=42d36178';
-import { teleportationFeature as feature } from '../public/js/features/teleportation-feature.js?v=627cf405';
-import { cleanContents, createDroppedItemState, dropInventoryStack, pickupDroppedStack, placeDroppedBag } from '../public/js/world-items.js?v=0bbfdab9';
+import { teleportationFeature as feature } from '../public/js/features/teleportation-feature.js?v=5c7cdb22';
+import { cleanContents, createDroppedItemState, dropInventoryStack, pickupDroppedStack, placeDroppedBag } from '../public/js/world-items.js?v=da2bb7a1';
 import { cabinetPut, cabinetTake, cleanHeldList, normalizeContents } from '../public/js/home-storage.js?v=121f1897';
 import { normalizeGroundStack, normalizeItem } from '../public/js/drops-mp.js?v=ac5577f0';
 import { goodsWithHeldTags, normalizeGoods } from '../public/js/trade.js?v=abb23481';

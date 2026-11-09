@@ -25,13 +25,13 @@ import {
   shakeElement,
   shakePouch,
 } from '../public/js/elemental-pouch.js?v=ceefa97a';
-import { bagsFeature } from '../public/js/features/bags-feature.js?v=1a8252c1';
-import { runMoreVerb } from '../public/js/features/item-verbs-more-feature.js?v=ceffd94a';
-import { pouchFeature } from '../public/js/features/elemental-pouch-feature.js?v=09353100';
-import { FEATURES } from '../public/js/features/index.js?v=3fdfb4ba';
-import { ITEM_CATALOG, countItem, createInventory } from '../public/js/inventory.js?v=b7609342';
+import { bagsFeature } from '../public/js/features/bags-feature.js?v=9438bd28';
+import { runMoreVerb } from '../public/js/features/item-verbs-more-feature.js?v=ee4ab509';
+import { pouchFeature } from '../public/js/features/elemental-pouch-feature.js?v=da3362d3';
+import { FEATURES } from '../public/js/features/index.js?v=24bfe85e';
+import { ITEM_CATALOG, countItem, createInventory } from '../public/js/inventory.js?v=60dfc9ca';
 import { STORE_CATALOG } from '../public/js/store-catalog.js?v=74b56af3';
-import { VENDOR_PROFILES, vendorBuy } from '../public/js/vendor.js?v=cf56a21c';
+import { VENDOR_PROFILES, vendorBuy } from '../public/js/vendor.js?v=ad64eca6';
 import { IMAGINATION_UPGRADES } from '../public/js/imagination.js?v=6adb7b9a';
 import { isOfferedInRemake, remakeStatus } from '../public/js/imagination-remake.js?v=c37ad887';
 import { SKILL_REMAKE_NOTES } from '../public/js/skill-tree.js?v=faa54b90';
