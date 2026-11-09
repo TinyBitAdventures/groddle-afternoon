@@ -306,6 +306,16 @@ function altarBonus(engine, classTsid, recipeId, made) {
   if (paid.lines[0]) engine.toast?.(altarBonusLine(paid.lines[0]), 4200);
 }
 
+/**
+ * onMakingComplete's Altar bonus for any machine standing in a machine room
+ * (isInCraftingAltar, fuelmaker.js 1197-1199): a player's own machine set
+ * down there (home-machines-feature) rolls it as the room's machines do.
+ */
+export function payAltarBonus(engine, classTsid, recipeId, made) {
+  altarBonus(engine, classTsid, recipeId, made);
+  publish(engine);
+}
+
 /** finishMakingKnown for a machine job whose time is up (wherever you are). */
 function finishJob(engine, id) {
   const job = jobs[id];

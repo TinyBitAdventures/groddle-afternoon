@@ -59,6 +59,30 @@
  *   Rock reads home.exterior's alone, players/inc_houses.js 1706-1709).
  * - Fuel: 200 at most, a fresh machine 50 (onCreate max_fuel / 4), +50 a
  *   Fuel Cell and refused with less than 50 room (refuel 457-470).
+ *
+ * The Community Machine Rooms (lane machines, report #152; Austin 2026-11-08:
+ * "Allow machines in the community machine rooms only."): besides the home,
+ * a player may set their own machine down in the Meadow, Besara and Forest
+ * rooms (config_prod.js:1332 machine_rooms), nowhere else. There the same
+ * canDrop holds (machine_stand.js 771-794): 200 px from any machine, the
+ * room's own included (findCloseStack(is_machine, 200) looks through every
+ * item in the location), and 70 px from the room's ends (geo.l / geo.r, the
+ * rooms' -700..700). A room is no POL, so:
+ * - anyone uses, refuels and collects (as everywhere: no owner check), and
+ *   what each player made waits for them alone (contents per player);
+ * - everyone's output goes after 6 game days, the owner's too
+ *   (expireOldContents 1146-1158: only a POL's owner keeps theirs);
+ * - a finished job rolls the room's Altar bonus (machine_base
+ *   isInCraftingAltar is true for any machine whose container is a machine
+ *   room, fuelmaker.js 1197-1199, 861-866), for whoever made it;
+ * - nobody's Magic Rock pool is paid (no home: inc_cultivation.js:170);
+ * - only its owner picks it up (ours: in the source isInCraftingAltar hides
+ *   disassemble and fully_disassemble in a machine room, fuelmaker.js 64 and
+ *   310, so a machine set down there could never be taken back by anyone;
+ *   the lane's brief keeps the owner's Pick up);
+ * - it stays where it was put when its owner is offline or never comes back,
+ *   as a placed machine did in the original.
+ * Each row's place names its room ("mr:meadow", "mr:besara", "mr:forest").
  */
 
 import {
@@ -77,6 +101,7 @@ import {
 } from './machine-rooms.js?v=61c97ee2';
 import { ASSEMBLY_SKILL, FUEL_PER_CELL, MAX_FUEL, isMachine } from './machines.js?v=6b72e07b';
 import { INTERIOR, interiorBounds } from './home-decor.js?v=d6fabb62';
+import { machineRoomLayout } from './machine-rooms.js?v=61c97ee2';
 
 export const HOME_MACHINES_ID = 'home-machines';
 
@@ -93,8 +118,30 @@ export const HOME_MACHINES_INTERIOR = 'RH_HOME_INT';
  */
 export const PLACE_STREET = 'street';
 export const PLACE_HOUSE = 'house';
-const PLACE_RE = /^(street|house|tower:[0-8])$/;
+const PLACE_RE = /^(street|house|tower:[0-8]|mr:(meadow|besara|forest))$/;
 export const isPlace = (p) => PLACE_RE.test(String(p || ''));
+
+/** The three Community Machine Rooms (config_prod.js:1332 machine_rooms, as built: G prefix) and their places. */
+export const MACHINE_ROOM_PLACES = Object.freeze({
+  GCR101Q98A12EHH: 'mr:meadow',
+  GA9MU59GB792T80: 'mr:besara',
+  GIF16EM56A12FSB: 'mr:forest',
+});
+/** The place a machine room street names (G or L prefix), or ''. */
+export const roomPlaceOf = (tsid) => MACHINE_ROOM_PLACES[String(tsid || '').replace(/^L/, 'G')] || '';
+export const isRoomPlace = (p) => /^mr:(meadow|besara|forest)$/.test(String(p || ''));
+/** The room street a place stands for, or ''. */
+export const roomTsidOf = (place) => Object.keys(MACHINE_ROOM_PLACES).find((t) => MACHINE_ROOM_PLACES[t] === place) || '';
+/** "mr:meadow" -> "meadow" (the site's route names a room so). */
+export const roomName = (place) => (isRoomPlace(place) ? String(place).slice(3) : '');
+/** The rooms' ends: one template, bldg_int_machine.swf, bounds -700..700 (Meadow and Besara's street JSON, forest-machine-room.js). */
+export const MACHINE_ROOM_BOUNDS = Object.freeze({ l: -700, r: 700 });
+/** Where a machine may stand in a room, in room world x: its ends. */
+export const roomMachineSpan = () => ({ lo: MACHINE_ROOM_BOUNDS.l, hi: MACHINE_ROOM_BOUNDS.r });
+/** The room's own machines' x (machine-rooms.js MACHINE_ROOM_LAYOUTS): canDrop keeps 200 px from them too. */
+export const roomFixedXs = (place) => (machineRoomLayout(roomTsidOf(place))?.machines || []).map((m) => m.x);
+/** isInCraftingAltar (fuelmaker.js 1197-1199): a machine in a machine room rolls the Altar bonus. */
+export const placeIsAltar = (p) => isRoomPlace(p);
 export const towerPlace = (floor) => `tower:${Math.max(0, Math.min(8, Math.floor(Number(floor) || 0)))}`;
 /** Only the home street is a home's public half that pays the pool (inc_cultivation.js:170, inc_houses.js 1706-1709). */
 export const placePays = (p) => (p || PLACE_STREET) === PLACE_STREET;
@@ -132,7 +179,7 @@ export { DAYS_TO_STORE_CONTENTS, GAME_DAY_MS, MACHINE_EXTRA_WAIT_MS, MAX_FUEL, F
 export const HOME_MACHINE_TEXT = Object.freeze({
   placeVerb: 'Place',
   placeTip: 'Set it down here, for anyone here to use',
-  placeHome: 'You can only set a machine down in your own home: on your home street, in your house or in your Tower.', // ours
+  placeHome: 'You can only set a machine down in your own home (on your home street, in your house or in your Tower) or in a Community Machine Room.', // ours
   placeHere: (label) => `This ${label} cannot be placed here.`, // machine_stand.js canDrop
   placeMany: 'You have a lot of machines out already.', // ours
   placed: (label) => `You put your ${label} down here.`, // ours
@@ -170,7 +217,7 @@ export const machineLabel = (classTsid) => MACHINE_LABELS[classTsid] || String(c
  * machines: the placed ones ({ rx }) in the same place. In a room `span`
  * ({ lo, hi } in room x, roomSpan) stands for the street's ends.
  */
-export function placeCheck({ machines = [], rx, layout, span, classTsid } = {}) {
+export function placeCheck({ machines = [], rx, layout, span, classTsid, fixed = [] } = {}) {
   const label = machineLabel(classTsid);
   if (!isHomeMachineClass(classTsid)) return { ok: false, why: 'class', msg: 'That is not a machine.' };
   if (machines.length >= HOME_MACHINES_MAX) return { ok: false, why: 'many', msg: HOME_MACHINE_TEXT.placeMany };
@@ -182,7 +229,7 @@ export function placeCheck({ machines = [], rx, layout, span, classTsid } = {}) 
     const wx = layout.houseX + x;
     if (wx <= MACHINE_EDGE || wx >= layout.width - MACHINE_EDGE) return { ok: false, why: 'edge', msg: HOME_MACHINE_TEXT.placeHere(label) };
   }
-  if (machines.some((m) => Math.abs(finite(m.rx) - x) < MACHINE_SPACING)) return { ok: false, why: 'near', msg: HOME_MACHINE_TEXT.placeHere(label) };
+  if (machines.some((m) => Math.abs(finite(m.rx) - x) < MACHINE_SPACING) || fixed.some((fx) => Math.abs(finite(fx) - x) < MACHINE_SPACING)) return { ok: false, why: 'near', msg: HOME_MACHINE_TEXT.placeHere(label) };
   return { ok: true, rx: x };
 }
 
@@ -237,6 +284,9 @@ export function normalizeMachine(raw, offset = 0) {
   return {
     id,
     classTsid,
+    // Whose it is: the site names it in a machine room, where machines of many players stand (solo: '').
+    owner: raw.owner == null ? '' : String(raw.owner),
+    ownerName: String(raw.ownerName || ''),
     place: isPlace(raw.place) ? String(raw.place) : PLACE_STREET,
     rx: Math.round(finite(raw.rx)),
     fuel: Math.max(0, Math.min(MAX_FUEL, whole(raw.fuel))),
@@ -331,7 +381,7 @@ export function settleSolo(row, outputs, now = Date.now()) {
   return true;
 }
 
-/** expireOldContents: anyone's but the owner's, older than 6 game days. */
+/** expireOldContents: anyone's but the owner's, older than 6 game days (owner null: a machine room, no POL, where the owner's goes too). */
 export function expireSolo(row, owner = 'you', now = Date.now()) {
   for (const [user, c] of Object.entries(row.contents)) {
     if (user !== owner && contentsExpired(c.at, now)) delete row.contents[user];
@@ -362,7 +412,7 @@ export function normalizeSlice(raw) {
   const jobs = {};
   for (const [op, j] of Object.entries(raw?.jobs || {})) {
     if (isMachineOp(op) && j && typeof j === 'object' && typeof j.key === 'string' && Number.isFinite(Number(j.readyAt))) {
-      jobs[op] = { key: j.key, qty: Math.max(1, whole(j.qty)), classTsid: String(j.classTsid || ''), readyAt: finite(j.readyAt), held: { ...(j.held || {}) }, owner: whole(j.owner), machine: String(j.machine || '') };
+      jobs[op] = { key: j.key, qty: Math.max(1, whole(j.qty)), classTsid: String(j.classTsid || ''), readyAt: finite(j.readyAt), held: { ...(j.held || {}) }, owner: whole(j.owner), machine: String(j.machine || ''), ...(isPlace(j.place) ? { place: String(j.place) } : {}) };
     }
   }
   const machines = Array.isArray(raw?.machines) ? raw.machines.map(soloRow).filter(Boolean) : [];

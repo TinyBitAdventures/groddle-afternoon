@@ -13,6 +13,16 @@ import { join } from 'node:path';
 import {
   HOME_MACHINES_MAX,
   HOME_MACHINE_POOL,
+  HOME_MACHINE_TEXT,
+  MACHINE_ROOM_BOUNDS,
+  MACHINE_ROOM_PLACES,
+  isRoomPlace,
+  placeIsAltar,
+  roomFixedXs,
+  roomMachineSpan,
+  roomName,
+  roomPlaceOf,
+  roomTsidOf,
   MACHINE_EDGE,
   MACHINE_SPACING,
   expireSolo,
@@ -29,8 +39,8 @@ import {
   towerPlace,
   settleSolo,
   soloRow,
-} from '../public/js/home-machines.js?v=87599804';
-import { homeMachinesFeature } from '../public/js/features/home-machines-feature.js?v=822ad06d';
+} from '../public/js/home-machines.js?v=782838ec';
+import { homeMachinesFeature } from '../public/js/features/home-machines-feature.js?v=8098bed4';
 import { RECIPE_CATALOG, setRecipeCatalog } from '../public/js/making.js?v=d29c39c7';
 import { HAS_SERVER, HAS_SITE, SITE_DIR, serverPath } from '../tools/repos.mjs';
 
@@ -118,6 +128,75 @@ describe('HOMES2: in the house and in the Tower', () => {
   });
   it('findCloseStack looks in one location (player.js 1152-1186)', () => {
     assert.match(line('players/player.js', 1160), /for \(var i in this\.location\.items\)/);
+  });
+});
+
+describe('lane machines (#152): the Community Machine Rooms', () => {
+  const roomSpot = (place, taken = []) => {
+    const ok = [];
+    for (let x = -700; x <= 700; x += 1) {
+      if (placeCheck({ machines: taken.map((rx) => ({ rx })), rx: x, span: roomMachineSpan(), fixed: roomFixedXs(place), classTsid: 'fuelmaker' }).ok) ok.push(x);
+    }
+    return ok;
+  };
+  it('the three rooms are the source\'s machine_rooms (config_prod.js:1332), and isInCraftingAltar reads them (fuelmaker.js 1197-1199)', () => {
+    const list = line('config_prod.js', 1332).match(/L[A-Z0-9]{14}/g);
+    assert.deepEqual(list.map((l) => roomPlaceOf(l)).sort(), ['mr:besara', 'mr:forest', 'mr:meadow']);
+    assert.deepEqual(Object.keys(MACHINE_ROOM_PLACES).sort(), list.map((l) => `G${l.slice(1)}`).sort());
+    assert.match(line('items/fuelmaker.js', 1198), /in_array_real\(this\.container\.tsid, config\.machine_rooms\)/);
+    assert.match(line('items/fuelmaker.js', 861), /if \(!this\.isInCraftingAltar\(\)\) return false;/);
+    assert.equal(roomPlaceOf('GA5101HF7F429V'), '');
+    assert.deepEqual(['mr:meadow', 'mr:forest', 'street', 'house', 'tower:2'].map(placeIsAltar), [true, true, false, false, false]);
+    assert.deepEqual(['mr:besara', 'mr:x', 'street'].map(isRoomPlace), [true, false, false]);
+    assert.equal(roomTsidOf('mr:forest'), 'GIF16EM56A12FSB');
+    assert.equal(roomName('mr:besara'), 'besara');
+    assert.equal(normalizeMachine({ id: 'hm-00000000000000aa', class: 'fuelmaker', rx: 0, fuel: 50, place: 'mr:forest', owner: 9, ownerName: 'Bo' }).place, 'mr:forest');
+  });
+  it('the rooms\' ends are their streets\' (bldg_int_machine.swf, -700..700)', () => {
+    for (const tsid of ['GCR101Q98A12EHH', 'GA9MU59GB792T80']) {
+      const st = JSON.parse(readFileSync(join(root, `public/assets/streets/${tsid}.json`), 'utf8'));
+      assert.deepEqual([st.bounds.l, st.bounds.r], [MACHINE_ROOM_BOUNDS.l, MACHINE_ROOM_BOUNDS.r], tsid);
+    }
+    assert.match(readFileSync(join(root, 'public/js/forest-machine-room.js'), 'utf8'), /bounds -700\.\.700/);
+  });
+  it('canDrop keeps 200 px from the room\'s own machines and 70 px from its ends (machine_stand.js 777-788)', () => {
+    assert.match(line('items/machine_stand.js', 781), /findCloseStack\(is_machine, 200\)/);
+    const forest = roomSpot('mr:forest');
+    assert.ok(forest.length > 0, 'the Forest room has room');
+    assert.deepEqual([forest[0], forest.at(-1)], [-286, 296]);
+    assert.ok(forest.every((x) => roomFixedXs('mr:forest').every((f) => Math.abs(f - x) >= 200) && x > -630 && x < 630));
+    assert.equal(placeCheck({ machines: [], rx: -630, span: roomMachineSpan(), classTsid: 'fuelmaker' }).why, 'edge');
+    assert.equal(placeCheck({ machines: [], rx: -29, span: roomMachineSpan(), fixed: roomFixedXs('mr:forest'), classTsid: 'fuelmaker' }).why, 'near');
+    // One down in each Forest gap, then the room is full; Besara takes two past its Woodworker.
+    assert.equal(roomSpot('mr:forest', [-250, 200]).length, 0);
+    const besara = roomSpot('mr:besara');
+    assert.deepEqual([besara[0], besara.at(-1)], [394, 629]);
+    assert.equal(roomSpot('mr:besara', [394]).length > 0, true);
+    assert.equal(roomSpot('mr:besara', [394, 600]).length, 0);
+    // As the room's five machines stand (two by judgement, machine-rooms.js), Meadow has no spot left.
+    assert.equal(roomSpot('mr:meadow').length, 0);
+  });
+  it('a room is no POL: everyone\'s output goes after 6 game days, the owner\'s too (expireOldContents 1146-1158)', () => {
+    assert.match(line('items/fuelmaker.js', 1149), /if \(!this\.container\.pols_is_pol\(\) \|\| !this\.container\.pols_is_owner\(pc\)\)/);
+    const row = soloRow({ id: 'hm-00000000000000ae', classTsid: 'fuelmaker', place: 'mr:forest', rx: 0, fuel: 100, job: null, contents: { you: { items: { fuel_cell: 1 }, at: 0 } } });
+    expireSolo(row, null, 7 * 14400 * 1000);
+    assert.deepEqual(row.waiting, []);
+    assert.equal(placePays('mr:meadow'), false, 'no pool: no home');
+  });
+  it('the source hid disassemble in a machine room; ours keeps the owner\'s Pick up', () => {
+    assert.match(line('items/fuelmaker.js', 64), /if \(this\.isInCraftingAltar\(\)\) return \{state:null\};/);
+    assert.match(line('items/fuelmaker.js', 310), /if \(this\.isInCraftingAltar\(\)\) return \{state:null\};/);
+    const m = normalizeMachine({ id: 'hm-00000000000000aa', class: 'fuelmaker', rx: 0, fuel: 50, place: 'mr:forest', owner: 7, job: null, waiting: [] });
+    const ctx = { learned: ['fuelmaking_1', 'engineering_1'], fuelCells: 1, now: 5 };
+    assert.equal(placedMachineVerbs(m, { ...ctx, me: '7', mayTake: true }).some((v) => v.id === 'machine_pickup'), true);
+    assert.deepEqual(placedMachineVerbs(m, { ...ctx, me: '9', mayTake: false }).map((v) => v.id), ['use', 'refuel']);
+  });
+  it('the slice keeps where a job runs (for the Altar bonus); the refusal names the rooms', () => {
+    const s = normalizeSlice({ jobs: { 'hm-00000000000000ac': { key: 'fuel_cell', qty: 1, readyAt: 5, held: {}, place: 'mr:besara' }, 'hm-00000000000000ad': { key: 'fuel_cell', qty: 1, readyAt: 5, held: {}, place: 'yard' } } });
+    assert.equal(s.jobs['hm-00000000000000ac'].place, 'mr:besara');
+    assert.equal(s.jobs['hm-00000000000000ad'].place, undefined);
+    assert.match(HOME_MACHINE_TEXT.placeHome, /Community Machine Room/);
+    assert.doesNotMatch(HOME_MACHINE_TEXT.placeHome, /\u2014|Glitch/);
   });
 });
 
@@ -256,6 +335,26 @@ describe('the site decides (src/HomeMachines.php)', { skip: skipSite }, () => {
     assert.equal(onStreet.amount, 7);
     assert.equal(php(`$r = ${row}; $r["place"] = "tower:1"; echo json_encode(H::view($r));`).place, 'tower:1');
   });
+  it('lane machines: the rooms\' places, ends and own machines; canDrop counts them; no pool; the owner\'s output goes too', () => {
+    assert.deepEqual(php('echo json_encode([H::placeId("mr:meadow"), H::placeId("mr:forest"), H::placeId("mr:hall"), H::isRoom("mr:besara"), H::isRoom("street")]);'), [true, true, false, true, false]);
+    assert.deepEqual(php('echo json_encode(H::roomSpan($R, "mr:forest"));'), [-700, 700]);
+    assert.deepEqual(php('echo json_encode(H::roomFixed($R, "mr:forest"));'), roomFixedXs('mr:forest'));
+    assert.equal(php('echo json_encode(H::placeWhy($R, [], "fuelmaker", -29, [-700, 700], H::roomFixed($R, "mr:forest")));'), 'near');
+    assert.equal(php('echo json_encode(H::placeWhy($R, [], "fuelmaker", 200, [-700, 700], H::roomFixed($R, "mr:forest")));'), null);
+    assert.equal(php('echo json_encode(H::placeWhy($R, [["rx" => 250]], "fuelmaker", 200, [-700, 700], H::roomFixed($R, "mr:forest")));'), 'near');
+    assert.equal(php('echo json_encode(H::placeWhy($R, [], "fuelmaker", 631, [-700, 700], []));'), 'edge');
+    const job = '["user"=>9,"key"=>"fuel_cell","qty"=>1,"need"=>1,"name"=>"Fuel Cell","at"=>0,"ready"=>1000]';
+    const [r, paid] = php(`$r = ${row}; $r["place"] = "mr:forest"; $r["job"] = ${job}; echo json_encode(H::settle($R, $r, 7, 1000));`);
+    assert.equal(paid, null, 'a room pays nobody\'s pool');
+    assert.deepEqual(r.contents['9'].items, { fuel_cell: 1 });
+    const [old] = php(`$r = ${row}; $r["place"] = "mr:forest"; $r["contents"] = ["9" => ["items" => ["fuel_cell" => 1], "at" => 0], "7" => ["items" => ["fuel_cell" => 1], "at" => 0]]; echo json_encode(H::settle($R, $r, 7, 7 * 14400000));`);
+    assert.deepEqual(old.contents, [], 'everyone\'s goes, the owner\'s too');
+    assert.equal(php(`$r = ${row}; $r["place"] = "mr:meadow"; echo json_encode(H::view($r));`).owner, 7);
+    const src = readFileSync(join(SITE_DIR, 'src/HomeMachines.php'), 'utf8');
+    assert.match(src, /'\/groddle\/v1\/machine-rooms\/\{room:\[a-z\]\+\}\/machines'/);
+    assert.match(src, /!self::isRoom\(\$place\) && \(new Neighbours/, 'no key-holders in a room');
+    assert.ok(php('echo json_encode(H::span($R, "street", null));') === null);
+  });
   it('placing and refuelling as the game does', () => {
     assert.equal(php('echo json_encode(H::placeWhy($R, [["rx" => 0]], "fuelmaker", 199));'), 'near');
     assert.equal(php('echo json_encode(H::placeWhy($R, [["rx" => 0]], "fuelmaker", 200));'), null);
@@ -280,5 +379,6 @@ describe('the realtime server carries it (home_machines.go)', { skip: HAS_SERVER
     const go = readFileSync(serverPath('home_machines.go'), 'utf8');
     assert.match(go, /ledgerRouteHomeMachines = "\/groddle\/v1\/homes\/machines"/);
     assert.match(go, /func machinePlace\(street string, owner int64\)/, 'the actor stands in the owner\'s home: the street, the house or a Tower floor');
+    for (const [tsid, place] of Object.entries(MACHINE_ROOM_PLACES)) assert.match(go, new RegExp(`"${tsid}": +"${place}"`), `${place} (lane machines)`);
   });
 });

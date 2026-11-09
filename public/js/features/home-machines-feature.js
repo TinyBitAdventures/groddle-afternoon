@@ -33,12 +33,30 @@
  * picking it up are applied once from this feature's slice (placed, taken).
  * Solo: the same rules on this feature's slice (machines).
  *
+ * The Community Machine Rooms (lane machines, report #152; Austin
+ * 2026-11-08: "Allow machines in the community machine rooms only."): in
+ * the Meadow, Besara and Forest rooms anyone may set their own machine down
+ * where canDrop allows (200 px from any machine, the room's own included;
+ * 70 px from the room's ends). Anyone uses, refuels and collects there as at
+ * a home (contents per player, everyone's going after 6 game days, the
+ * owner's too: no POL), a finished job rolls the room's Altar bonus for its
+ * maker (machine-rooms-feature payAltarBonus), and only the owner picks it
+ * up. Online the site keeps every room machine (the same table, place
+ * "mr:<room>", owner its owner: GET groddle/v1/machine-rooms/<room>/machines
+ * lists them all) and the realtime server carries each act for anyone in
+ * the room, telling everyone in it and the owner. A machine stays where it
+ * was set down while its owner is away, for good if they never come back
+ * (as the original left a placed machine).
+ *
  * QA: solo ?autostart=1&fresh=1&resetgame=1&questoffer=off&homedemo=home
  * &homemachinedemo=fuelmaker|blockmaker|woodworker|metalmaker grants the
  * machine, its skill, Engineering and two jobs' ingredients on your home
  * street. window.groddleHomeMachines: state(), place(classTsid), act(index,
  * verb), make(index, recipeKey, qty), standNear(index), refresh(); canvas data hmMachines (id:class:fuel:job:waiting
- * per machine here, ';'), hmWhere (own:<place> | visit:<owner>:<place> | ''), hmLast.
+ * per machine here, ';'), hmWhere (own:<place> | visit:<owner>:<place> | room:<place> | ''), hmLast.
+ * In a machine room: doordemo into it (machine-rooms-feature's routes) plus
+ * &homemachinedemo=<machine>; window.groddleHomeMachines.placeAt(classTsid, x)
+ * stands you at room x and sets it down.
  */
 
 import {
@@ -47,6 +65,12 @@ import {
   HOME_MACHINES_STREET,
   HOME_MACHINE_TEXT as T,
   PLACE_HOUSE,
+  isRoomPlace,
+  placeIsAltar,
+  roomFixedXs,
+  roomMachineSpan,
+  roomName,
+  roomPlaceOf,
   PLACE_STREET,
   ROOM_GROUND_Y,
   roomSpan,
@@ -69,7 +93,7 @@ import {
   expireSolo,
   tankOf,
   TAKEN_KEEP,
-} from '../home-machines.js?v=87599804';
+} from '../home-machines.js?v=782838ec';
 import { CALL_PLAYER_LINES, MACHINE_HITBOX, MACHINE_SKILLS, collectLine, machineJobMs, machineMadeLine, runningSoundKey, takeJobIngredients } from '../machine-rooms.js?v=61c97ee2';
 import { MACHINE_ART_SHEETS, LOW_FUEL_BUBBLE_MS, LOW_FUEL_LINE, isLowFuel, machineFrame, machineSheetDef, roomMachineState } from '../machine-art.js?v=ef8a7dd0';
 import { FUEL_CELL, FUEL_PER_CELL, MAX_FUEL } from '../machines.js?v=6b72e07b';
@@ -83,6 +107,9 @@ import { saveStore } from '../save-store.js?v=8839ba7b';
 import { textureFromUrl } from '../textures.js?v=3149d699';
 import { createSheetLoader } from '../sprite-sheets.js?v=7d3c70e7';
 import { STREET_GROUND_Y, homesFeature } from './homes-feature.js?v=13899063';
+import { payAltarBonus } from './machine-rooms-feature.js?v=bbcbb6ec';
+import { worldToScreen } from '../street-model.js?v=b6cb6a4e';
+import { nearestSurfaceY } from '../walk-surface.js?v=106bfdc5';
 
 export { HOME_MACHINES_ID };
 
@@ -144,6 +171,7 @@ function createSite() {
   }
   return {
     machines: (owner) => call(`homes/${Number(owner)}/machines`),
+    room: (place) => call(`machine-rooms/${roomName(place)}/machines`),
     mine: () => call('homes/machines'),
   };
 }
@@ -153,7 +181,7 @@ function createSession(engine, client) {
   const site = mp ? createSite() : null;
   let slice = normalizeSlice(savedSlice);
   const me = () => (mp ? String(Number(client.me?.id) || 0) : ME_SOLO);
-  /** The home drawn now: { kind: 'own'|'visit', owner, place, name, x0, groundY, layout?, span?, mayTake, key }. */
+  /** The home (or machine room) drawn now: { kind: 'own'|'visit'|'room', owner, place, name, x0, groundY, layout?, span?, fixed?, mayTake, key }. */
   let home = null;
   /** id -> { m, sprite, target, frames, frame, art, bar, near, collectedAt } */
   let drawn = new Map();
@@ -178,7 +206,7 @@ function createSession(engine, client) {
   function publish() {
     const t = Date.now();
     engine.setData?.('hmMachines', [...machines.values()].map((m) => `${m.id}:${m.classTsid}:${m.fuel}:${m.job ? (jobRunning(m.job, t) ? 'run' : 'due') : '-'}:${m.waiting.join('+')}`).join(';'));
-    engine.setData?.('hmWhere', home ? (home.kind === 'visit' ? `visit:${home.owner}:${home.place}` : `own:${home.place}`) : '');
+    engine.setData?.('hmWhere', home ? (home.kind === 'visit' ? `visit:${home.owner}:${home.place}` : `${home.kind}:${home.place}`) : '');
     engine.setData?.('hmLast', last);
   }
 
@@ -194,6 +222,9 @@ function createSession(engine, client) {
 
   function where() {
     const tsid = engine.streetTsid;
+    // A Community Machine Room: anyone's place to set their machine down (not a quest copy of one).
+    const room = roomPlaceOf(tsid);
+    if (room && !engine.transientInstance?.()) return { kind: 'room', owner: me(), place: room, key: `room:${room}` };
     const scene = readVisitScene(tsid);
     if (mp && scene) {
       const place = visitPlace(scene);
@@ -223,6 +254,15 @@ function createSession(engine, client) {
     // The house's left end sits past its back yard (homes-feature houseX0: homeStreetLayout(backCult).houseX); a Tower floor starts at 0.
     const x0 = place === PLACE_HOUSE ? homeStreetLayout(createBackYardState(backYard || {})).houseX : 0;
     return { x0, groundY: ROOM_GROUND_Y, layout: null, span };
+  }
+
+  /** A machine room: room world x (-700..700) from its street's left end, the floor the room's own machines stand on. */
+  function roomGeometry(place) {
+    const street = engine.street;
+    const bounds = street?.bounds || { l: -700, t: -700 };
+    const p = street ? worldToScreen(street, 0, -130) : { x: -bounds.l, y: 570 };
+    const floor = nearestSurfaceY(engine.platforms, p.x, p.y) ?? p.y;
+    return { x0: p.x, groundY: floor + 2, layout: null, span: roomMachineSpan(), fixed: roomFixedXs(place) };
   }
 
   function ownGeometry(place) {
@@ -259,8 +299,24 @@ function createSession(engine, client) {
     });
   }
 
-  function ownerName() {
-    return home?.kind === 'visit' ? home.name || '' : '';
+  /** Whose machine a subtitle names: the home's owner on a visit; in a room each machine's own (yours: none). */
+  function ownerName(m) {
+    if (home?.kind === 'visit') return home.name || '';
+    if (home?.kind === 'room' && mp && m && String(m.owner) !== me()) return m.ownerName || 'Someone';
+    return '';
+  }
+
+  /** Who may pick one up: the home's owner or a key-holder; in a room, only the machine's owner (solo: you). */
+  function mayTake(m) {
+    if (home?.kind === 'room') return !mp || String(m?.owner) === me();
+    return Boolean(home?.mayTake);
+  }
+
+  /** Whether a machine the server or site names belongs to what is drawn now. */
+  function isHere(owner, m, gone = '') {
+    if (!home) return false;
+    if (home.kind === 'room') return m ? m.place === home.place : machines.has(String(gone));
+    return Number(owner) === Number(home.owner);
   }
 
   function drawOne(m) {
@@ -279,7 +335,7 @@ function createSession(engine, client) {
       classId: m.classTsid,
       featureId: HOME_MACHINES_ID,
       label: machineLabel(m.classTsid),
-      subtitle: machineSubtitle(m, { me: me(), ownerName: ownerName() }),
+      subtitle: machineSubtitle(m, { me: me(), ownerName: ownerName(m) }),
       sprite,
       homeMachine: m.id,
     });
@@ -361,7 +417,7 @@ function createSession(engine, client) {
     if (loading === at.key) return;
     loading = at.key;
     try {
-      const answer = await site.machines(at.owner);
+      const answer = at.kind === 'room' ? await site.room(at.place) : await site.machines(at.owner);
       const cur = where();
       if (!cur || cur.key !== at.key) return;
       const offset = Date.now() - (Number(answer?.now) || Date.now());
@@ -370,9 +426,11 @@ function createSession(engine, client) {
         const m = normalizeMachine(raw, offset);
         if (m && m.place === at.place) machines.set(m.id, m);
       }
-      const g = at.kind === 'visit'
-        ? geometry(at.place, { cult: normalizeCultivationState(answer?.cult || {}), backYard: answer?.backYard || null, decor: { wallSegments: Number(answer?.segments) || undefined } })
-        : ownGeometry(at.place);
+      const g = at.kind === 'room'
+        ? roomGeometry(at.place)
+        : at.kind === 'visit'
+          ? geometry(at.place, { cult: normalizeCultivationState(answer?.cult || {}), backYard: answer?.backYard || null, decor: { wallSegments: Number(answer?.segments) || undefined } })
+          : ownGeometry(at.place);
       home = { kind: at.kind, owner: at.owner, place: at.place, name: String(answer?.name || ''), ...g, mayTake: answer?.mayTake === true, key: at.key };
       redraw();
     } catch (err) {
@@ -386,10 +444,12 @@ function createSession(engine, client) {
   }
 
   function enterSolo(at) {
-    home = { kind: 'own', owner: ME_SOLO, place: at.place, name: '', ...ownGeometry(at.place), mayTake: true, key: at.key };
+    const room = at.kind === 'room';
+    home = { kind: room ? 'room' : 'own', owner: ME_SOLO, place: at.place, name: '', ...(room ? roomGeometry(at.place) : ownGeometry(at.place)), mayTake: true, key: at.key };
     machines = new Map();
     for (const row of slice.machines) {
-      expireSolo(row, ME_SOLO);
+      // A room is no POL: the owner's output goes after 6 game days too (expireOldContents).
+      expireSolo(row, isRoomPlace(row.place) ? null : ME_SOLO);
       if (row.place === at.place) machines.set(row.id, row);
     }
     redraw();
@@ -458,8 +518,8 @@ function createSession(engine, client) {
       const hold = { ...job.held };
       const scratch = tankOf({ classTsid: job.classTsid, fuel: MAX_FUEL });
       const res = engine.makeStationJob?.({ key: job.key, qty: job.qty, hold, tool: job.classTsid, toolState: scratch }) || { made: 0, xp: 0, msgs: [] };
-      // finishMakingKnown 915-918: the "pick up your stuff soon" warning only away from your own home.
-      const ownHome = !mp || job.owner === Number(me());
+      // finishMakingKnown 915-918: the "pick up your stuff soon" warning only away from your own home (a machine room is nobody's).
+      const ownHome = !isRoomPlace(job.place) && (!mp || job.owner === Number(me()));
       const line = ownHome ? machineMadeLine(recipe?.name || job.key, job.qty, res.xp).replace(/ Make sure to pick up your stuff soon, or it might disappear!$/, '') : machineMadeLine(recipe?.name || job.key, job.qty, res.xp);
       engine.pushActivity?.(line);
       engine.playSound?.('READY', { volume: 0.55 });
@@ -467,9 +527,12 @@ function createSession(engine, client) {
       const e = drawn.get(job.machine);
       if (e?.target) engine.say?.(e.target, CALL_PLAYER_LINES[Math.floor(Math.random() * CALL_PLAYER_LINES.length)], 3000);
       else engine.toast?.(`${machineLabel(job.classTsid)}: ${line}`, 4200);
+      // onMakingComplete: a machine in a machine room rolls the Altar bonus for its maker (isInCraftingAltar).
+      if (placeIsAltar(job.place) && res.made > 0) payAltarBonus(engine, job.classTsid, recipe?.id ?? '', res.made);
       // The site settles it (the owner's share too) when anyone next looks: ask now.
       if (mp && job.machine) {
-        if (home && Number(home.owner) === job.owner && machines.has(job.machine)) act('check', machines.get(job.machine));
+        if (home && machines.has(job.machine) && (home.kind === 'room' || Number(home.owner) === job.owner)) act('check', machines.get(job.machine));
+        else if (isRoomPlace(job.place)) site.room(job.place).catch(() => {});
         else site.machines(job.owner).catch(() => {});
       }
       engine.save?.();
@@ -485,7 +548,9 @@ function createSession(engine, client) {
     }
     req += 1;
     sent.set(req, { verb, id: m?.id || '', at: Date.now(), extra });
-    const ok = client.send('home_machine', { req, owner: Number(home.owner), verb, ...(m ? { id: m.id } : {}), ...extra });
+    // In a room the act names the machine's owner (a place names me: I set my own down).
+    const owner = home.kind === 'room' ? Number(m ? m.owner : me()) : Number(home.owner);
+    const ok = client.send('home_machine', { req, owner, verb, ...(m ? { id: m.id } : {}), ...extra });
     if (ok === false) {
       sent.delete(req);
       say(T.offline);
@@ -566,10 +631,10 @@ function createSession(engine, client) {
 
   function placeFromPack(classTsid) {
     const at = where();
-    if (!at || at.kind !== 'own' || !home || home.kind !== 'own') return say(T.placeHome, 2600);
+    if (!at || at.kind === 'visit' || !home || home.kind !== at.kind) return say(T.placeHome, 2600);
     if (countItem(engine.inv, classTsid) < 1) return false;
     const rx = Math.round((engine.player?.x || 0) - home.x0);
-    const check = placeCheck({ machines: [...machines.values()], rx, layout: home.layout, span: home.span, classTsid });
+    const check = placeCheck({ machines: [...machines.values()], rx, layout: home.layout, span: home.span, classTsid, fixed: home.fixed || [] });
     if (!check.ok) return say(check.msg, 2600);
     const fuel = engine.toolState ? takeToolCopy(engine.toolState, classTsid, { take: false }) : null;
     if (mp) return send('place', null, { class: classTsid, rx: check.rx, ...(Number.isFinite(fuel) ? { fuel: Math.max(0, Math.min(MAX_FUEL, Math.round(fuel))) } : {}) });
@@ -596,7 +661,7 @@ function createSession(engine, client) {
       const fuel = engine.toolState ? takeToolCopy(engine.toolState, extra.classTsid) : 50;
       removeItem(engine.inv, extra.classTsid, 1);
       engine.refreshPack?.();
-      const row = { id: newId(), classTsid: extra.classTsid, place: home.place, rx: extra.rx, fuel: Math.max(0, Math.min(MAX_FUEL, Math.round(Number(fuel) || 0))), music: true, job: null, contents: {}, waiting: [] };
+      const row = { id: newId(), classTsid: extra.classTsid, owner: '', ownerName: '', place: home.place, rx: extra.rx, fuel: Math.max(0, Math.min(MAX_FUEL, Math.round(Number(fuel) || 0))), music: true, job: null, contents: {}, waiting: [] };
       machines.set(row.id, row);
       drawOne(row);
       say(T.placed(machineLabel(row.classTsid)));
@@ -615,7 +680,7 @@ function createSession(engine, client) {
       }
       const ms = machineJobMs(extra.recipe.waitMs, extra.qty, 1);
       row.job = { user: ME_SOLO, key: extra.key, recipeId: String(extra.recipe.id ?? ''), name: extra.recipe.name || extra.key, qty: extra.qty, held, need: extra.need, startedAt: t, readyAt: t + ms };
-      slice.jobs[row.id] = { key: extra.key, qty: extra.qty, classTsid: row.classTsid, readyAt: t + ms, held, owner: 0, machine: row.id };
+      slice.jobs[row.id] = { key: extra.key, qty: extra.qty, classTsid: row.classTsid, readyAt: t + ms, held, owner: 0, machine: row.id, place: row.place };
       engine.toast?.(`${machineLabel(row.classTsid)}: making ${row.job.name} (x${extra.qty}), ${secondsToString(Math.round(ms / 1000))} to go.`, 2800);
       engine.refreshPack?.();
       last = `start:${row.id}:${extra.key}x${extra.qty}`;
@@ -683,8 +748,8 @@ function createSession(engine, client) {
 
   function refuelled(m, cells) {
     engine.achievement?.('machines:refueled', 1);
-    // refuel 549-551: refueled_for_others away from your own home.
-    if (home?.kind === 'visit') engine.achievement?.('machines:refueled_for_others', 1);
+    // refuel 549-551: refueled_for_others away from your own home (a visit, or a machine room).
+    if (home && home.kind !== 'own') engine.achievement?.('machines:refueled_for_others', 1);
     const msg = `You added ${cells} Fuel Cell${cells === 1 ? '' : 's'}. Fuel: ${m.fuel}/${MAX_FUEL}.`;
     say(msg);
     engine.pushActivity?.(msg);
@@ -719,7 +784,7 @@ function createSession(engine, client) {
     sent.delete(Number(msg.req));
     const offset = Date.now() - (Number(msg.now) || Date.now());
     const m = normalizeMachine(msg.machine, offset);
-    const here = home && Number(msg.owner) === Number(home.owner);
+    const here = isHere(msg.owner, m, msg.gone);
     if (msg.status !== 'settled') {
       last = `no:${msg.verb}:${msg.why || ''}`;
       say(String(msg.text || T.failed), 3000);
@@ -745,7 +810,7 @@ function createSession(engine, client) {
       // The ingredients leave the pack once; the job is mine to be credited when it is done.
       receipt(msg.receipt, -1);
       if (m.job && isMachineOp(msg.op)) {
-        slice.jobs[msg.op] = { key: ask?.extra?.key || '', qty: m.job.qty, classTsid: m.classTsid, readyAt: m.job.readyAt, held: heldOf(msg.receipt), owner: Number(msg.owner), machine: m.id };
+        slice.jobs[msg.op] = { key: ask?.extra?.key || '', qty: m.job.qty, classTsid: m.classTsid, readyAt: m.job.readyAt, held: heldOf(msg.receipt), owner: Number(msg.owner), machine: m.id, place: m.place };
         engine.toast?.(`${machineLabel(m.classTsid)}: making ${m.job.name} (x${m.job.qty}), ${secondsToString(Math.round((m.job.readyAt - Date.now()) / 1000))} to go.`, 2800);
       }
       if (here) setMachine(m);
@@ -780,10 +845,10 @@ function createSession(engine, client) {
         last = `paid:${p?.user}:${p?.amount}`;
       }
     }
-    if (!home || Number(home.owner) !== owner) return publish();
     const offset = Date.now() - (Number(msg.now) || Date.now());
-    if (msg.gone) dropMachine(String(msg.gone));
     const m = normalizeMachine(msg.machine, offset);
+    if (!isHere(owner, m, msg.gone)) return publish();
+    if (msg.gone) dropMachine(String(msg.gone));
     if (m) setMachine(m);
     publish();
   }
@@ -799,7 +864,7 @@ function createSession(engine, client) {
     const p = engine.player;
     for (const e of drawn.values()) {
       const m = seen(e.m, t);
-      const sub = machineSubtitle(m, { me: me(), now: t, ownerName: ownerName() });
+      const sub = machineSubtitle(m, { me: me(), now: t, ownerName: ownerName(m) });
       if (e.target && e.target.subtitle !== sub) e.target.subtitle = sub;
       // onPlayerCollision: come near with your stuff waiting and it calls you.
       const near = p && Math.abs(p.x - e.sprite.x) <= MACHINE_HITBOX.w / 2 && Math.abs((p.y || 0) - e.sprite.y) <= MACHINE_HITBOX.h;
@@ -836,7 +901,7 @@ function createSession(engine, client) {
   /** QA (solo): &homemachinedemo=<machine> on your home street: the machine, its skill, Engineering and two jobs' ingredients. */
   function demo(at) {
     const cls = engine.param?.('homemachinedemo');
-    if (demoDone || mp || !at || at.kind !== 'own' || !DEMO_ITEMS[cls]) return;
+    if (demoDone || mp || !at || at.kind === 'visit' || !DEMO_ITEMS[cls]) return;
     demoDone = true;
     for (const skill of ['engineering_1', MACHINE_SKILLS[cls]]) if (!(engine.learnedSkills || []).includes(skill)) engine.grantSkill?.(skill);
     if (countItem(engine.inv, cls) < 1 && ![...machines.values()].some((m) => m.classTsid === cls)) {
@@ -864,7 +929,7 @@ function createSession(engine, client) {
         retryAt = 0;
         lastKey = '';
       }
-      const key = at ? (at.kind === 'own' ? `${at.key}:${engine.streetTsid}` : at.key) : '';
+      const key = at ? (at.kind === 'own' || at.kind === 'room' ? `${at.key}:${engine.streetTsid}` : at.key) : '';
       const scene = at?.scene || null;
       if (key !== lastKey || scene !== lastScene) {
         lastKey = key;
@@ -878,7 +943,7 @@ function createSession(engine, client) {
         }
         publish();
       }
-      if (mp && engine.started && (!ownAt || (at?.kind === 'own' && now - ownAt > OWN_FETCH_MS))) loadOwn();
+      if (mp && engine.started && (!ownAt || ((at?.kind === 'own' || at?.kind === 'room') && now - ownAt > OWN_FETCH_MS))) loadOwn();
       creditJobs(Date.now());
       for (const e of drawn.values()) drawFrame(e, Date.now());
       if (now - tickAt < 250) return;
@@ -900,7 +965,7 @@ function createSession(engine, client) {
       const t = Date.now();
       return placedMachineVerbs(seen(e.m, t), {
         me: me(),
-        mayTake: Boolean(home?.mayTake),
+        mayTake: mayTake(e.m),
         learned: engine.learnedSkills || [],
         fuelCells: countItem(engine.inv, FUEL_CELL),
         skillName,
@@ -925,7 +990,7 @@ function createSession(engine, client) {
     packVerbs(classTsid) {
       if (!isHomeMachineClass(classTsid) || countItem(engine.inv, classTsid) < 1) return [];
       const at = where();
-      const ok = at?.kind === 'own' && home?.kind === 'own';
+      const ok = Boolean(at) && at.kind !== 'visit' && home?.kind === at.kind;
       return [{ id: 'machine_place', label: T.placeVerb, tooltip: T.placeTip, enabled: ok, reason: ok ? '' : T.placeHome }];
     },
     placeFromPack,
@@ -941,12 +1006,20 @@ function createSession(engine, client) {
       return {
         mode: mp ? 'mp' : 'solo',
         where: home ? { kind: home.kind, owner: home.owner, place: home.place, mayTake: home.mayTake } : null,
-        machines: [...machines.values()].map((m) => ({ id: m.id, classTsid: m.classTsid, place: m.place, rx: m.rx, fuel: m.fuel, job: m.job ? { user: m.job.user, qty: m.job.qty, left: Math.max(0, Math.round((m.job.readyAt - Date.now()) / 1000)) } : null, waiting: m.waiting, art: drawn.get(m.id)?.art || '' })),
+        machines: [...machines.values()].map((m) => ({ id: m.id, classTsid: m.classTsid, owner: m.owner, place: m.place, rx: m.rx, fuel: m.fuel, job: m.job ? { user: m.job.user, qty: m.job.qty, left: Math.max(0, Math.round((m.job.readyAt - Date.now()) / 1000)) } : null, waiting: m.waiting, art: drawn.get(m.id)?.art || '' })),
         slice: { placed: slice.placed.length, taken: slice.taken.length, jobs: Object.keys(slice.jobs).length },
         last,
       };
     },
     place: (classTsid) => placeFromPack(classTsid),
+    /** QA: stand at room (or home) x and set a machine down there. */
+    placeAt(classTsid, x) {
+      const p = engine.player;
+      if (!p || !home) return false;
+      p.x = home.x0 + Number(x);
+      p.vx = 0;
+      return placeFromPack(classTsid);
+    },
     /** QA: how many of a class the pack holds, and a tool's fuel copies. */
     pack: (classTsid) => ({ n: countItem(engine.inv, classTsid), copies: engine.toolState?.condition?.[classTsid]?.copies || null }),
     act(index, verbId) {
