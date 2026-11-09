@@ -9,7 +9,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { loadContentCatalogsFromDir, getAchievementCatalog } from '../public/js/content-catalogs.js?v=10b118dd';
-import { applyAchievementProgress, createAchievementState, getAchievementProgress, resetAchievementCounter, unlockAchievement } from '../public/js/achievements.js?v=f8ccfd34';
+import { applyAchievementProgress, createAchievementState, getAchievementProgress, resetAchievementCounter, unlockAchievement } from '../public/js/achievements.js?v=2e4aa9cb';
 import { COLLECTION_TROPHIES, COUNTED_ON_ARRIVAL, HELD_AT_ONCE, collectionClasses, heldChanges, planCollectionTrophies } from '../public/js/collection-trophies.js?v=69205984';
 import { TROPHY_WHERE_TEXT } from '../public/js/home-trophies.js?v=309fd6c7';
 import { ITEM_CATALOG } from '../public/js/inventory.js?v=b7609342';

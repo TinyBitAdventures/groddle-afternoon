@@ -20,8 +20,8 @@ import { resolveTokens } from './css-tokens.js';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { accountBackupFeature } from '../public/js/features/account-backup-feature.js?v=3efe5c17';
-import { homeStreetMpFeature } from '../public/js/features/home-street-mp-feature.js?v=bb6e5601';
-import { yardVerbsMpFeature } from '../public/js/features/yard-verbs-mp-feature.js?v=914b41c9';
+import { homeStreetMpFeature } from '../public/js/features/home-street-mp-feature.js?v=ee5d0092';
+import { yardVerbsMpFeature } from '../public/js/features/yard-verbs-mp-feature.js?v=f929bde0';
 import { homePoolMpFeature } from '../public/js/features/home-pool-mp-feature.js?v=575920f2';
 import { qurazyFeature, resetQurazyFeatureForTests } from '../public/js/features/qurazy-feature.js?v=ccf25f83';
 import { QURAZY_SPAWN_LINE } from '../public/js/qurazy.js?v=ae135979';
@@ -177,8 +177,12 @@ describe('Quests header counts', () => {
   it('game.js counts the offer cards it drew (put off and story offers) after drawing them', () => {
     const game = read('public/game.js');
     const at = game.indexOf('appendStoryQuestOffers(qBox);');
-    const meta = game.indexOf("offered: qBox.querySelectorAll('.q-put-off, .story-offer').length,");
+    // Lane questlist: the footer reads the tabs' counts (js/ui/quest-sheet.js questCardTab sorts the
+    // put-off and story offer cards into Offered), so it says what the tabs hold.
+    const meta = game.indexOf('offered: tabCounts.offered,');
     assert.ok(at > 0 && meta > at, 'the header is written after every card is in the box');
+    assert.ok(game.indexOf('const tabCounts = questSheet.arrange(qBox);', at) < meta, 'and after the tabs are arranged');
+    assert.match(read('public/js/ui/quest-sheet.js'), /card\.classList\.contains\('q-put-off'\) \|\| card\.classList\.contains\('story-offer'\)\) return 'offered'/);
     assert.doesNotMatch(game, /active · \$\{questState\.completed\.length\} done/);
     // The classes counted are the ones the two offer card builders use.
     assert.match(game, /card\.className = 'q-card story-offer';/);

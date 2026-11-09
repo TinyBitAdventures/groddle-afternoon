@@ -9,7 +9,7 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { questStepHtml } from '../public/js/ui/quest-tracker.js?v=445303df';
-import { questStep, orderQuestCards } from '../public/js/ui/quest-sheet.js?v=1dffc3a6';
+import { questStep, orderQuestCards } from '../public/js/ui/quest-sheet.js?v=8793adcf';
 import { QUEST_MOVES_HERE, questTakesYouAway } from '../tools/encyclopedia/data.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');

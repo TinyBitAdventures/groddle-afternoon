@@ -12,7 +12,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import { contributionsText, jobText, phaseName, plainText } from '../public/js/street-jobs.js?v=02a81cb3';
-import { cleanQuestMarkup } from '../public/js/quests.js?v=c8d9d0a4';
+import { cleanQuestMarkup } from '../public/js/quests.js?v=2b882eb6';
 
 const root = join(import.meta.dirname, '..');
 const catalog = JSON.parse(readFileSync(join(root, 'public/assets/content/street-jobs.json'), 'utf8'));

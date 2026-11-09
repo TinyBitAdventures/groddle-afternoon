@@ -268,7 +268,7 @@ describe('Hall of Rejected Concepts: the Wall Buttons', () => {
       globalThis.PIXI = { Sprite: Obj, Container: Obj, AnimatedSprite: Anim, Rectangle, ImageSource: Source, Texture: class { constructor(o) { Object.assign(this, o); } } };
       globalThis.Image = class { set src(_u) {} decode() { return new Promise(() => {}); } };
       globalThis.document = { createElement: () => ({ width: 0, height: 0, getContext: () => ({ drawImage() {} }) }) };
-      ({ midTowerFeature: feature } = await import('../public/js/features/mid-tower-feature.js?v=a865de3e'));
+      ({ midTowerFeature: feature } = await import('../public/js/features/mid-tower-feature.js?v=b9ac96eb'));
     });
     after(() => {
       for (const [k, v] of Object.entries(saved)) globalThis[k] = v;

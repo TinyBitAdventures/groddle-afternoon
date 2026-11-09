@@ -129,8 +129,8 @@ import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inv
 import { QUOIN_SHEET, QUOIN_TYPES, qrazyRewardForLevel } from '../quoins.js?v=299cc3f4';
 import { soundForQuoin } from '../sound-moments.js?v=2f8597cd';
 import { IMAGINATION_UPGRADES } from '../imagination.js?v=6adb7b9a';
-import { assignQuest, completeQuest } from '../quests.js?v=c8d9d0a4';
-import { acceptOffer, enqueueQuestOffer, questAwardPayload, turnInQuest } from '../quest-offers.js?v=a304c912';
+import { assignQuest, completeQuest } from '../quests.js?v=2b882eb6';
+import { acceptOffer, enqueueQuestOffer, questAwardPayload, turnInQuest } from '../quest-offers.js?v=a7ee5b8f';
 import { getQuestCatalog } from '../content-catalogs.js?v=10b118dd';
 import { locationEventsApi } from './location-events-feature.js?v=0062e032';
 import * as kit from '../quest-rooms/kit.js?v=25fc6d59';

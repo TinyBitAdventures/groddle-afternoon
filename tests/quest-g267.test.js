@@ -22,7 +22,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { getQuestCatalog, loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js?v=10b118dd';
-import { applyQuestProgress, createQuestState } from '../public/js/quests.js?v=c8d9d0a4';
+import { applyQuestProgress, createQuestState } from '../public/js/quests.js?v=2b882eb6';
 import {
   BOOT_STARTER_LEFTOVERS,
   acceptOffer,
@@ -30,7 +30,7 @@ import {
   ensureQuestOfferState,
   routeQuestEvent,
   routesCounter,
-} from '../public/js/quest-offers.js?v=a304c912';
+} from '../public/js/quest-offers.js?v=a7ee5b8f';
 import { racesFeature } from '../public/js/features/races-feature.js?v=369e69a5';
 import { raceSceneTsid } from '../public/js/races.js?v=ab22a079';
 import { HOG_HAUL_STREET_ID } from '../public/js/hog-haul.js?v=50d2e072';

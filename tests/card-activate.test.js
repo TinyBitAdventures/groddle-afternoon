@@ -12,8 +12,8 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js?v=10b118dd';
-import { assignQuest, createQuestState } from '../public/js/quests.js?v=c8d9d0a4';
-import { createAchievementState } from '../public/js/achievements.js?v=f8ccfd34';
+import { assignQuest, createQuestState } from '../public/js/quests.js?v=2b882eb6';
+import { createAchievementState } from '../public/js/achievements.js?v=2e4aa9cb';
 import { addItem, countItem, createInventory } from '../public/js/inventory.js?v=b7609342';
 import { buyDocument } from '../public/js/bureaucracy.js?v=dc1cb181';
 import {
@@ -25,7 +25,7 @@ import {
   ensureLegalizeState,
   legalizeOnAccepted,
   qualificationVerb,
-} from '../public/js/legalize-it.js?v=ffce7efe';
+} from '../public/js/legalize-it.js?v=4059f820';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 

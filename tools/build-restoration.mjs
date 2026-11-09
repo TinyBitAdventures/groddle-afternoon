@@ -30,7 +30,7 @@ import { playFor, playHref } from './restoration/play-links.mjs';
 import { DESIGNERS, DESIGNER_LEVELS, TEXT_LEVELS } from './restoration/designer-levels.mjs';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=10b118dd';
 import { ROOM_NOTES } from './restoration/rooms.mjs';
-import { parseQuestConversation } from '../public/js/quests.js?v=c8d9d0a4';
+import { parseQuestConversation } from '../public/js/quests.js?v=2b882eb6';
 import { seasonsData } from './restoration/seasons.mjs';
 import { HAS_SERVER, HAS_SITE, SERVER_DIR, SITE_DIR } from './repos.mjs';
 

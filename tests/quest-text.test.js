@@ -4,7 +4,7 @@
  */
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { cleanQuestMarkup, parseQuestConversation, setQuestPlayerLabel } from '../public/js/quests.js?v=c8d9d0a4';
+import { cleanQuestMarkup, parseQuestConversation, setQuestPlayerLabel } from '../public/js/quests.js?v=2b882eb6';
 
 describe('quest copy', () => {
   it('fills {pc_label} with the player label', () => {

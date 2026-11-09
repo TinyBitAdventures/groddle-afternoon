@@ -24,7 +24,7 @@ import {
   listQuestLog,
   listQuestLogNewestFirst,
   listQuests,
-} from '../public/js/quests.js?v=c8d9d0a4';
+} from '../public/js/quests.js?v=2b882eb6';
 import {
   createAchievementState,
   applyAchievementProgress,
@@ -33,7 +33,7 @@ import {
   browseAchievementLog,
   achievementCategories,
   getAchievementProgress,
-} from '../public/js/achievements.js?v=f8ccfd34';
+} from '../public/js/achievements.js?v=2e4aa9cb';
 import {
   createSkillState,
   canLearnSkill,
@@ -144,7 +144,8 @@ describe('quest runner on mined catalog', () => {
     const draw = game.slice(at, game.indexOf('questSheet.renderTabs(', at));
     assert.match(draw, /for \(const p of log\) \{/, 'no cap on the rows drawn');
     assert.doesNotMatch(draw, /log\.slice\(/);
-    assert.match(draw, /done: log\.filter\(\(r\) => r\.status === 'completed'\)\.length,/);
+    // Lane questlist: the footer counts the cards the tabs hold (tests/quest-list-count.test.js).
+    assert.match(game, /done: tabCounts\.done,/);
   });
 
   it('listQuests returns large catalog', () => {

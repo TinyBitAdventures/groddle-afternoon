@@ -21,9 +21,9 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=10b118dd';
-import { getQuestProgress } from '../public/js/quests.js?v=c8d9d0a4';
-import { acceptOffer, routeQuestEvent } from '../public/js/quest-offers.js?v=a304c912';
-import { questStep } from '../public/js/ui/quest-sheet.js?v=1dffc3a6';
+import { getQuestProgress } from '../public/js/quests.js?v=2b882eb6';
+import { acceptOffer, routeQuestEvent } from '../public/js/quest-offers.js?v=a7ee5b8f';
+import { questStep } from '../public/js/ui/quest-sheet.js?v=8793adcf';
 
 const PUBLIC = join(dirname(fileURLToPath(import.meta.url)), '../public');
 const read = (p) => readFileSync(join(PUBLIC, p), 'utf8');

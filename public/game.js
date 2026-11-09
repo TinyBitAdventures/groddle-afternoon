@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=224484b4';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=127e0a3c';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=aad7f490';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=3fdfb4ba';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -32,12 +32,12 @@ import {
   parseQuestConversation,
   cleanQuestMarkup,
   questDoneAt,
-} from './js/quests.js?v=c8d9d0a4';
+} from './js/quests.js?v=2b882eb6';
 // Quest copy is Flash htmlText: <b>/<i>/<br> drawn as formatting, the rest dropped, never innerHTML.
 import { questRequirementText, renderQuestText, withQuestMarkup } from './js/quest-text.js?v=7f5d761c';
 // G267: the world-verb quest counters skip offer-system quests; old saves drop the boot Moloko quest.
-import { dropSpiritRepeatOffers, SPIRIT_REPEAT_QUESTS } from './js/spirit-reminisce.js?v=c6d5ef8e';
-import { dropBootStarterQuests, questMoveNote, routesCounter, worldVerbQuestEvents, gardenPlotEvents, makingUnitQuestEvents, shrineDonationQuestEvents } from './js/quest-offers.js?v=a304c912';
+import { dropSpiritRepeatOffers, SPIRIT_REPEAT_QUESTS } from './js/spirit-reminisce.js?v=2df42e2a';
+import { dropBootStarterQuests, questMoveNote, routesCounter, worldVerbQuestEvents, gardenPlotEvents, makingUnitQuestEvents, shrineDonationQuestEvents } from './js/quest-offers.js?v=a7ee5b8f';
 import {
   PHANTOM_QUEST_ID,
   REMEMBER_QUEST_ID,
@@ -128,7 +128,7 @@ import {
   qualificationVerb,
   requestLegalizeQualification,
   travelToGregarious,
-} from './js/legalize-it.js?v=ffce7efe';
+} from './js/legalize-it.js?v=4059f820';
 import { HALL, HALL_LAYOUT, HALL_QUESTIONS } from './js/bureaucratic-hall.js?v=a0bc6317';
 import { STATION_X, stationArrival, stationScreen, surfaceStation } from './js/subway.js?v=44d1a09f';
 import { ALLEY, SHADY, drawAlley, inEnteredBox } from './js/quest-rooms/back-alley-set.js?v=d53ba17d';
@@ -394,7 +394,7 @@ import {
   consumeAchievementCounters,
   resetAchievementCounter,
   purchaseAchievementUpdates,
-} from './js/achievements.js?v=f8ccfd34';
+} from './js/achievements.js?v=2e4aa9cb';
 import {
   applyStreetVisit,
   STREET_VISITS_SLOT,
@@ -499,7 +499,7 @@ import {
   parsePlayerSave,
   serializePlayerSave,
   restorePlayerSave,
-} from './js/player-save.js?v=d0071f52';
+} from './js/player-save.js?v=c81ccc75';
 import {
   HOME_INTERIOR_TSID,
   HOME_STREET_TSID,
@@ -974,7 +974,7 @@ import { mountSocialDrawer } from './js/ui/social-drawer.js?v=2bb4e831';
 import { bindChatLinks } from './js/chat-links.js?v=b717fac7';
 import { bindDragScroll } from './js/ui/drag-scroll.js?v=9a527ac8';
 import { SIDE_SHEET_IDS, bindTabs, inSideSheet, mountPanelShell, sheetKeyToWorld } from './js/ui/panel-shell.js?v=e2abdf9e';
-import { createQuestSheet, failedQuestPin, questStep } from './js/ui/quest-sheet.js?v=1dffc3a6';
+import { createQuestSheet, failedQuestPin, questStep } from './js/ui/quest-sheet.js?v=8793adcf';
 import { createQuestTracker } from './js/ui/quest-tracker.js?v=445303df';
 import { bindContextTrigger, createContextMenu, isContextMenuKey as isMenuKey, MORE_KEYS_LABEL } from './js/ui/context-menu.js?v=79326483';
 import { bindCountField, countKeyValue, countStepMarkup, createCountChooser, typedCount } from './js/ui/count-chooser.js?v=5bc894c8';
@@ -3371,7 +3371,8 @@ function renderQuestTracker() {
   const holds = Object.keys(questState.active || {}).filter((id) => questHoldOf(id));
   if (app?.canvas) app.canvas.dataset.questHolds = holds.join(',');
   const rows = listQuestTracker(questState, 2 + holds.length).filter((row) => !holds.includes(row.classTsid)).slice(0, 2);
-  if (count) count.textContent = String(Object.keys(questState.active).length);
+  // The quests the log lists (a saved id the build no longer has is not one).
+  if (count) count.textContent = String(Object.keys(questState.active || {}).filter((id) => getQuestCatalog()[id]).length);
   box.innerHTML = '';
   if (!rows.length) {
     const empty = document.createElement('div');
@@ -5701,6 +5702,180 @@ function questPinButton(classTsid) {
   return btn;
 }
 
+/**
+ * One quest's card in the Quests sheet (updateHud draws the log newest first). An active quest is drawn
+ * as active even when an earlier finish of it is in `completed` (js/quests.js listQuestLog).
+ */
+function drawQuestLogCard(p) {
+  // Lane questlist: a quest you are on is active, whatever an earlier finish left in `completed`.
+  const done = !p.active && p.completed;
+  const card = document.createElement('div');
+  card.className = 'q-card' + (done ? ' done' : '');
+  // VERBS: an active card names its quest, so the Quests sheet can show its step and rewards.
+  if (p.active) card.dataset.quest = p.def.classTsid;
+  const title = document.createElement('div');
+  title.className = 'q-title';
+  title.textContent = p.def.title + (done ? ' ✓' : '');
+  card.appendChild(title);
+  // Austin 2026-11-03 (js/quest-reach.js): a quest whose street no open road reaches waits,
+  // its progress kept, and comes back by itself when the road opens.
+  const hold = p.active ? questHoldOf(p.def.classTsid) : null;
+  if (hold) {
+    card.classList.add('on-hold');
+    card.dataset.questHold = hold.place;
+    const note = document.createElement('div');
+    note.className = 'q-hold';
+    note.textContent = hold.note;
+    card.appendChild(note);
+  }
+  for (const r of p.requirements || []) {
+    const row = document.createElement('div');
+    row.className = 'q-req';
+    // QuestTracker.as 212-214: "desc (got/need)" when more than one is needed.
+    renderQuestText(row, questRequirementText(r.desc, r.current, r.num));
+    card.appendChild(row);
+    const bar = document.createElement('div');
+    bar.className = 'q-bar';
+    const fill = document.createElement('i');
+    fill.style.width = `${Math.min(100, (r.num ? (r.current / r.num) * 100 : 0))}%`;
+    bar.appendChild(fill);
+    card.appendChild(bar);
+  }
+  if (p.active && p.def.classTsid === PHANTOM_QUEST_ID) {
+    const story = ghostQuestStory();
+    const remaining = story.hauntStreets.filter((id) => !story.foundStreets.includes(id));
+    const hint = document.createElement('div');
+    hint.className = 'q-req';
+    hint.textContent = story.finalReady
+      ? 'The Phantom is ready to appear wherever you next notice it.'
+      : `Cold spots: ${remaining
+          .map((id) => STREET_INDEX.streets[id]?.label || id)
+          .join(' · ')}`;
+    card.appendChild(hint);
+  }
+  // G334: in multiplayer the Hog Haul is raced between players by ticket (races.go), never against the bot.
+  if (isSolo() && p.active && p.def.classTsid === HOG_HAUL_QUEST_ID && !hogHaulIsInstanced()) {
+    const raceButton = document.createElement('button');
+    raceButton.type = 'button';
+    raceButton.className = 'content-action-btn';
+    raceButton.textContent = 'Enter The Great Hog Haul';
+    raceButton.addEventListener('click', () => startHogHaulRace());
+    card.appendChild(raceButton);
+  }
+  if (p.active && p.def.classTsid === FOUR_LETTER_QUEST_ID && !fourLetterIsInstanced()) {
+    const puzzleButton = document.createElement('button');
+    puzzleButton.type = 'button';
+    puzzleButton.className = 'content-action-btn';
+    puzzleButton.textContent = "Enter Mr. Block's Playroom";
+    puzzleButton.addEventListener('click', () => startFourLetterQuest());
+    card.appendChild(puzzleButton);
+  }
+  if (p.active && p.def.classTsid === LEGALIZE_QUEST_ID && !legalizeOnRoute()) {
+    const legalizeButton = document.createElement('button');
+    legalizeButton.type = 'button';
+    legalizeButton.className = 'content-action-btn';
+    legalizeButton.textContent = 'Enter the Back Alley';
+    legalizeButton.addEventListener('click', () => startLegalizeIt());
+    card.appendChild(legalizeButton);
+  }
+  if (
+    p.active &&
+    [DE_EMBIGGENIFY_QUEST_ID, DE_EMBIGGENIFY_PART2_QUEST_ID].includes(p.def.classTsid) &&
+    !deEmbiggenifyIsInstanced()
+  ) {
+    const eestiButton = document.createElement('button');
+    eestiButton.type = 'button';
+    eestiButton.className = 'content-action-btn';
+    eestiButton.textContent = 'Enter Eesti Life Catalogue Page 17';
+    eestiButton.addEventListener('click', () => startDeEmbiggenify());
+    card.appendChild(eestiButton);
+  }
+  if (
+    p.active &&
+    [WINTER_WALK_QUEST_ID, WINTER_WALK_REPEAT_QUEST_ID].includes(p.def.classTsid) &&
+    !winterWalkIsInstanced()
+  ) {
+    const winterButton = document.createElement('button');
+    winterButton.type = 'button';
+    winterButton.className = 'content-action-btn';
+    winterButton.textContent = 'Enter Winter Walk';
+    winterButton.addEventListener('click', () =>
+      startWinterWalk({ repeat: p.def.classTsid === WINTER_WALK_REPEAT_QUEST_ID })
+    );
+    card.appendChild(winterButton);
+  }
+  if (p.active && p.def.classTsid === ROOK_QUEST_ID && !rookWoodsIsInstanced()) {
+    const tool = findWorkingRookTool(inv, toolState);
+    const rookButton = document.createElement('button');
+    rookButton.type = 'button';
+    rookButton.className = 'content-action-btn';
+    rookButton.textContent = tool.ok
+      ? "Enter Rooks' Woods"
+      : 'Working Pick, Fancy Pick, or Hatchet required';
+    rookButton.disabled = !tool.ok;
+    rookButton.addEventListener('click', () => startRookWoodsQuest());
+    card.appendChild(rookButton);
+  }
+  if (
+    p.active &&
+    [ROOK_HALL_START_QUEST_ID, ROOK_HALL_QUEST_ID].includes(p.def.classTsid) &&
+    !rookMuseumIsInstanced()
+  ) {
+    const museumButton = document.createElement('button');
+    museumButton.type = 'button';
+    museumButton.className = 'content-action-btn';
+    museumButton.textContent = 'Enter the Museum of the Rook';
+    museumButton.addEventListener('click', () => startRookMuseum());
+    card.appendChild(museumButton);
+  }
+  if (p.active && p.def.classTsid === ILMENSKIE_QUEST_ID) {
+    const rescue = ilmenskieStory();
+    const hint = document.createElement('div');
+    hint.className = 'q-req';
+    hint.textContent = ilmenskieObjective(rescue, currentStreetTsid);
+    card.appendChild(hint);
+    if (!rescue.pickedUpJones && currentStreetTsid !== AXIS_DENYDE_STREET_ID) {
+      const mapButton = document.createElement('button');
+      mapButton.type = 'button';
+      mapButton.className = 'content-action-btn';
+      mapButton.textContent = 'Open Map to Axis Denyde';
+      mapButton.addEventListener('click', () => openMap());
+      card.appendChild(mapButton);
+    } else if (rescue.pickedUpJones && currentStreetTsid === AXIS_DENYDE_STREET_ID) {
+      const escapeButton = document.createElement('button');
+      escapeButton.type = 'button';
+      escapeButton.className = 'content-action-btn';
+      escapeButton.textContent = 'Open Map to escape';
+      escapeButton.addEventListener('click', () => openMap());
+      card.appendChild(escapeButton);
+    }
+  }
+  // G255: a startable quest's Try button (quest-offers-feature, QuestElementUI.as 224-264).
+  if (p.active) for (const el of features.collect('questLogActions', p.def.classTsid, engine)) card.appendChild(el);
+  // ENCYC: the quest's Encyclopedia page under its buttons, when it has one (the open card shows it).
+  appendQuestEncyclopediaLink(card, p.def.classTsid);
+  return card;
+}
+
+/** The card for a quest whose full card could not be drawn: its title and steps, in the right tab. */
+function plainQuestLogCard(p) {
+  const card = document.createElement('div');
+  card.className = 'q-card' + (p?.active ? '' : p?.completed ? ' done' : '');
+  if (p?.active && p.def?.classTsid) card.dataset.quest = p.def.classTsid;
+  const title = document.createElement('div');
+  title.className = 'q-title';
+  title.textContent = String(p?.def?.title || p?.def?.classTsid || 'Quest') + (!p?.active && p?.completed ? ' ✓' : '');
+  card.appendChild(title);
+  for (const r of p?.requirements || []) {
+    if (!r) continue;
+    const row = document.createElement('div');
+    row.className = 'q-req';
+    row.textContent = questRequirementText(String(r.desc || ''), r.current, r.num);
+    card.appendChild(row);
+  }
+  return card;
+}
+
 /** VERBS (js/ui/quest-tracker.js): the pinned quests under the left pill, ticking with their counts. */
 const questTracker = createQuestTracker({
   el: document.getElementById('quest-pins'),
@@ -5835,7 +6010,12 @@ function updateHud() {
     // first 40 rows, oldest first, so a long log lost its Done tab and the tabs disagreed with the footer.
     const log = listQuestLogNewestFirst(questState);
     // G229: quests put off with "Not right now" wait in the log to be started (quest-offers-feature).
-    const putOff = features.collect('questLogCards', engine);
+    let putOff = [];
+    try {
+      putOff = features.collect('questLogCards', engine);
+    } catch (err) {
+      console.warn('[quests] the put-off cards failed to draw', err);
+    }
     if (!log.length && !putOff.length) {
       const empty = document.createElement('div');
       empty.className = 'q-req';
@@ -5843,151 +6023,15 @@ function updateHud() {
       qBox.appendChild(empty);
     }
     for (const p of log) {
-      const card = document.createElement('div');
-      card.className = 'q-card' + (p.completed ? ' done' : '');
-      // VERBS: an active card names its quest, so the Quests sheet can show its step and rewards.
-      if (p.active) card.dataset.quest = p.def.classTsid;
-      const title = document.createElement('div');
-      title.className = 'q-title';
-      title.textContent = p.def.title + (p.completed ? ' ✓' : '');
-      card.appendChild(title);
-      // Austin 2026-11-03 (js/quest-reach.js): a quest whose street no open road reaches waits,
-      // its progress kept, and comes back by itself when the road opens.
-      const hold = p.active ? questHoldOf(p.def.classTsid) : null;
-      if (hold) {
-        card.classList.add('on-hold');
-        card.dataset.questHold = hold.place;
-        const note = document.createElement('div');
-        note.className = 'q-hold';
-        note.textContent = hold.note;
-        card.appendChild(note);
+      // Lane questlist (2026-11-08): a card that fails to draw is drawn plain, so one quest can never blank
+      // the log while the tabs and the footer count it.
+      let card;
+      try {
+        card = drawQuestLogCard(p);
+      } catch (err) {
+        console.warn('[quests] drew a plain card for', p?.def?.classTsid, err);
+        card = plainQuestLogCard(p);
       }
-      for (const r of p.requirements || []) {
-        const row = document.createElement('div');
-        row.className = 'q-req';
-        // QuestTracker.as 212-214: "desc (got/need)" when more than one is needed.
-        renderQuestText(row, questRequirementText(r.desc, r.current, r.num));
-        card.appendChild(row);
-        const bar = document.createElement('div');
-        bar.className = 'q-bar';
-        const fill = document.createElement('i');
-        fill.style.width = `${Math.min(100, (r.num ? (r.current / r.num) * 100 : 0))}%`;
-        bar.appendChild(fill);
-        card.appendChild(bar);
-      }
-      if (p.active && p.def.classTsid === PHANTOM_QUEST_ID) {
-        const story = ghostQuestStory();
-        const remaining = story.hauntStreets.filter((id) => !story.foundStreets.includes(id));
-        const hint = document.createElement('div');
-        hint.className = 'q-req';
-        hint.textContent = story.finalReady
-          ? 'The Phantom is ready to appear wherever you next notice it.'
-          : `Cold spots: ${remaining
-              .map((id) => STREET_INDEX.streets[id]?.label || id)
-              .join(' · ')}`;
-        card.appendChild(hint);
-      }
-      // G334: in multiplayer the Hog Haul is raced between players by ticket (races.go), never against the bot.
-      if (isSolo() && p.active && p.def.classTsid === HOG_HAUL_QUEST_ID && !hogHaulIsInstanced()) {
-        const raceButton = document.createElement('button');
-        raceButton.type = 'button';
-        raceButton.className = 'content-action-btn';
-        raceButton.textContent = 'Enter The Great Hog Haul';
-        raceButton.addEventListener('click', () => startHogHaulRace());
-        card.appendChild(raceButton);
-      }
-      if (p.active && p.def.classTsid === FOUR_LETTER_QUEST_ID && !fourLetterIsInstanced()) {
-        const puzzleButton = document.createElement('button');
-        puzzleButton.type = 'button';
-        puzzleButton.className = 'content-action-btn';
-        puzzleButton.textContent = "Enter Mr. Block's Playroom";
-        puzzleButton.addEventListener('click', () => startFourLetterQuest());
-        card.appendChild(puzzleButton);
-      }
-      if (p.active && p.def.classTsid === LEGALIZE_QUEST_ID && !legalizeOnRoute()) {
-        const legalizeButton = document.createElement('button');
-        legalizeButton.type = 'button';
-        legalizeButton.className = 'content-action-btn';
-        legalizeButton.textContent = 'Enter the Back Alley';
-        legalizeButton.addEventListener('click', () => startLegalizeIt());
-        card.appendChild(legalizeButton);
-      }
-      if (
-        p.active &&
-        [DE_EMBIGGENIFY_QUEST_ID, DE_EMBIGGENIFY_PART2_QUEST_ID].includes(p.def.classTsid) &&
-        !deEmbiggenifyIsInstanced()
-      ) {
-        const eestiButton = document.createElement('button');
-        eestiButton.type = 'button';
-        eestiButton.className = 'content-action-btn';
-        eestiButton.textContent = 'Enter Eesti Life Catalogue Page 17';
-        eestiButton.addEventListener('click', () => startDeEmbiggenify());
-        card.appendChild(eestiButton);
-      }
-      if (
-        p.active &&
-        [WINTER_WALK_QUEST_ID, WINTER_WALK_REPEAT_QUEST_ID].includes(p.def.classTsid) &&
-        !winterWalkIsInstanced()
-      ) {
-        const winterButton = document.createElement('button');
-        winterButton.type = 'button';
-        winterButton.className = 'content-action-btn';
-        winterButton.textContent = 'Enter Winter Walk';
-        winterButton.addEventListener('click', () =>
-          startWinterWalk({ repeat: p.def.classTsid === WINTER_WALK_REPEAT_QUEST_ID })
-        );
-        card.appendChild(winterButton);
-      }
-      if (p.active && p.def.classTsid === ROOK_QUEST_ID && !rookWoodsIsInstanced()) {
-        const tool = findWorkingRookTool(inv, toolState);
-        const rookButton = document.createElement('button');
-        rookButton.type = 'button';
-        rookButton.className = 'content-action-btn';
-        rookButton.textContent = tool.ok
-          ? "Enter Rooks' Woods"
-          : 'Working Pick, Fancy Pick, or Hatchet required';
-        rookButton.disabled = !tool.ok;
-        rookButton.addEventListener('click', () => startRookWoodsQuest());
-        card.appendChild(rookButton);
-      }
-      if (
-        p.active &&
-        [ROOK_HALL_START_QUEST_ID, ROOK_HALL_QUEST_ID].includes(p.def.classTsid) &&
-        !rookMuseumIsInstanced()
-      ) {
-        const museumButton = document.createElement('button');
-        museumButton.type = 'button';
-        museumButton.className = 'content-action-btn';
-        museumButton.textContent = 'Enter the Museum of the Rook';
-        museumButton.addEventListener('click', () => startRookMuseum());
-        card.appendChild(museumButton);
-      }
-      if (p.active && p.def.classTsid === ILMENSKIE_QUEST_ID) {
-        const rescue = ilmenskieStory();
-        const hint = document.createElement('div');
-        hint.className = 'q-req';
-        hint.textContent = ilmenskieObjective(rescue, currentStreetTsid);
-        card.appendChild(hint);
-        if (!rescue.pickedUpJones && currentStreetTsid !== AXIS_DENYDE_STREET_ID) {
-          const mapButton = document.createElement('button');
-          mapButton.type = 'button';
-          mapButton.className = 'content-action-btn';
-          mapButton.textContent = 'Open Map to Axis Denyde';
-          mapButton.addEventListener('click', () => openMap());
-          card.appendChild(mapButton);
-        } else if (rescue.pickedUpJones && currentStreetTsid === AXIS_DENYDE_STREET_ID) {
-          const escapeButton = document.createElement('button');
-          escapeButton.type = 'button';
-          escapeButton.className = 'content-action-btn';
-          escapeButton.textContent = 'Open Map to escape';
-          escapeButton.addEventListener('click', () => openMap());
-          card.appendChild(escapeButton);
-        }
-      }
-      // G255: a startable quest's Try button (quest-offers-feature, QuestElementUI.as 224-264).
-      if (p.active) for (const el of features.collect('questLogActions', p.def.classTsid, engine)) card.appendChild(el);
-      // ENCYC: the quest's Encyclopedia page under its buttons, when it has one (the open card shows it).
-      appendQuestEncyclopediaLink(card, p.def.classTsid);
       qBox.appendChild(card);
     }
     const firstDone = qBox.querySelector('.q-card.done');
@@ -5996,19 +6040,25 @@ function updateHud() {
       appendQuestEncyclopediaLink(el, el.dataset.questPutOff);
       qBox.insertBefore(el, firstDone);
     }
-    appendStoryQuestOffers(qBox);
-    // The header counts the cards drawn: offers (put off, or a story quest's offer card) on their own.
+    try {
+      appendStoryQuestOffers(qBox);
+    } catch (err) {
+      console.warn('[quests] the story offers failed to draw', err);
+    }
+    // VERBS (js/ui/quest-sheet.js): the Active, Offered and Done tabs, and cards that open and close.
+    const tabCounts = questSheet.arrange(qBox);
+    questSheet.renderTabs(document.getElementById('quest-tabs'), tabCounts);
+    // The footer counts the cards the tabs hold (lane questlist: it counted the log's rows, so a row
+    // drawn in another tab made "1 active" over an empty Active tab).
     const meta = document.getElementById('quest-meta');
     if (meta) {
       meta.textContent = questLogSummary({
-        active: log.filter((r) => r.status === 'active').length,
-        offered: qBox.querySelectorAll('.q-put-off, .story-offer').length,
-        done: log.filter((r) => r.status === 'completed').length,
+        active: tabCounts.active,
+        offered: tabCounts.offered,
+        done: tabCounts.done,
         catalog: Object.keys(getQuestCatalog()).length,
       });
     }
-    // VERBS (js/ui/quest-sheet.js): the Active, Offered and Done tabs, and cards that open and close.
-    questSheet.renderTabs(document.getElementById('quest-tabs'), questSheet.arrange(qBox));
     const drawn = qBox.innerHTML;
     if (drawn !== questLogDrawn) {
       qShown.replaceChildren(...qBox.childNodes);

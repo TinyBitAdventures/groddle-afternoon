@@ -10,14 +10,14 @@ import { before, describe, it } from 'node:test';
 import { join } from 'node:path';
 
 import { loadContentCatalogsFromDir, getQuestCatalog } from '../public/js/content-catalogs.js?v=10b118dd';
-import { createQuestState } from '../public/js/quests.js?v=c8d9d0a4';
+import { createQuestState } from '../public/js/quests.js?v=2b882eb6';
 import {
   acceptOffer,
   classifyQuests,
   ensureQuestOfferState,
   pendingQuestOffers,
   routeQuestEvent,
-} from '../public/js/quest-offers.js?v=a304c912';
+} from '../public/js/quest-offers.js?v=a7ee5b8f';
 import {
   MP_FACTS,
   MP_RACE_QUESTS,
@@ -30,8 +30,8 @@ import {
   offerableMultiplayerQuest,
   tradeHoochCount,
 } from '../public/js/quests-mp.js?v=1fc5ff58';
-import { questOffersFeature } from '../public/js/features/quest-offers-feature.js?v=20fc0cc0';
-import { questsMpFeature } from '../public/js/features/quests-mp-feature.js?v=c7057d57';
+import { questOffersFeature } from '../public/js/features/quest-offers-feature.js?v=1e0d5c06';
+import { questsMpFeature } from '../public/js/features/quests-mp-feature.js?v=80f1764c';
 import { economyCredits } from '../tools/build-economy.mjs';
 import { tradeTable } from '../tools/build-realtime-trade.mjs';
 

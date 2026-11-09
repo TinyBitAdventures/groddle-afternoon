@@ -29,7 +29,7 @@ import { GIANTS } from '../public/js/shrines.js?v=9e895525';
 import { VENDOR_PROFILES } from '../public/js/vendor.js?v=cf56a21c';
 import { CLIENT_KEY_TABLE, clientKeyAction } from '../public/js/client-hotkeys.js?v=31d1891d';
 import { MENU_ROWS } from '../public/js/ui/topbar.js?v=40baf379';
-import { questCardMenuRows } from '../public/js/ui/quest-sheet.js?v=1dffc3a6';
+import { questCardMenuRows } from '../public/js/ui/quest-sheet.js?v=8793adcf';
 import { ISLAND_CONFIRM, ISLAND_LINES } from '../public/js/newxp.js?v=85922204';
 
 const here = dirname(fileURLToPath(import.meta.url));

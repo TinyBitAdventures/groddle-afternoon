@@ -31,10 +31,10 @@ import {
   yourSignLine,
 } from '../public/js/hi-signs-mp.js?v=f4ee6c35';
 import { HI_VARIANTS, HI_VARIANT_COLORS, HI_VARIANT_NAMES, hiDay } from '../public/js/hi-signs.js?v=b90c7d7e';
-import { hiSignsFeature } from '../public/js/features/hi-signs-feature.js?v=28dec5a5';
+import { hiSignsFeature } from '../public/js/features/hi-signs-feature.js?v=3ccdba8c';
 import { powdersFeature, runPowder } from '../public/js/features/powders-feature.js?v=2be8090b';
 import { addItem, countItem } from '../public/js/inventory.js?v=b7609342';
-import { applyAchievementProgress, createAchievementState, getAchievementProgress, seedAchievementNearCompletion } from '../public/js/achievements.js?v=f8ccfd34';
+import { applyAchievementProgress, createAchievementState, getAchievementProgress, seedAchievementNearCompletion } from '../public/js/achievements.js?v=2e4aa9cb';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=10b118dd';
 import { HAS_SERVER, serverPath } from '../tools/repos.mjs';
 

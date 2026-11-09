@@ -413,9 +413,13 @@ export function listQuestLog(state) {
   const rows = [];
   for (const qid of Object.keys(state.active)) {
     const p = getQuestProgress(state, qid);
-    if (p) rows.push({ ...p, status: 'active' });
+    // A quest you are on is listed once, as active, even when `completed` also names it (a save that
+    // holds both, 2026-11-08 "I can see that I have active quests, but cannot see any of them": the row
+    // was drawn as done, so the footer counted it active while the Active tab stood empty).
+    if (p) rows.push({ ...p, completed: false, status: 'active' });
   }
-  for (const qid of state.completed) {
+  for (const qid of new Set(state.completed)) {
+    if (state.active?.[qid]) continue;
     const def = cat[qid];
     if (def) {
       rows.push({

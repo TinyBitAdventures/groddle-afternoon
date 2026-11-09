@@ -31,7 +31,7 @@ import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=7d3c70e7';
 import { loadWildlifeCatalog, wildlifeCatalog } from '../wildlife.js?v=670c3a7f';
 import { VENDOR_PROFILES } from '../vendor.js?v=cf56a21c';
 import { addItem, countItem, removeItem } from '../inventory.js?v=b7609342';
-import { parseQuestConversation } from '../quests.js?v=c8d9d0a4';
+import { parseQuestConversation } from '../quests.js?v=2b882eb6';
 import { getQuestCatalog } from '../content-catalogs.js?v=10b118dd';
 import {
   acceptOffer,
@@ -40,7 +40,7 @@ import {
   npcQuestOffers,
   questAwardPayload,
   turnInQuest,
-} from '../quest-offers.js?v=a304c912';
+} from '../quest-offers.js?v=a7ee5b8f';
 import {
   GOT_QUEST_TEXT,
   VENDOR_NPCS,

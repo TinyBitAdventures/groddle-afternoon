@@ -12,7 +12,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { getQuestCatalog, loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js?v=10b118dd';
-import { createQuestState } from '../public/js/quests.js?v=c8d9d0a4';
+import { createQuestState } from '../public/js/quests.js?v=2b882eb6';
 import {
   acceptOffer,
   listDeclinedOffers,
@@ -22,8 +22,8 @@ import {
   putOffOffer,
   questOfferCard,
   questStatus,
-} from '../public/js/quest-offers.js?v=a304c912';
-import { questOffersFeature, showWaitingOffer } from '../public/js/features/quest-offers-feature.js?v=20fc0cc0';
+} from '../public/js/quest-offers.js?v=a7ee5b8f';
+import { questOffersFeature, showWaitingOffer } from '../public/js/features/quest-offers-feature.js?v=1e0d5c06';
 
 const PUBLIC = join(dirname(fileURLToPath(import.meta.url)), '../public');
 const read = (p) => readFileSync(join(PUBLIC, p), 'utf8');
@@ -142,7 +142,8 @@ describe('G229 quest offers: "Not right now" puts a startable quest in the log',
     const game = read('game.js');
     assert.match(game, /onCancel: declinable === false \? null : onDecline/);
     assert.match(game, /\|\| questDialogueState\.noDecline === true;/);
-    assert.match(game, /const putOff = features\.collect\('questLogCards', engine\);/);
+    // Lane questlist: inside a try, so a feature's cards cannot blank the log.
+    assert.match(game, /putOff = features\.collect\('questLogCards', engine\);/);
     const feature = read('js/features/quest-offers-feature.js');
     assert.match(feature, /go\.textContent = def\.needsStart \? 'Try it' : def\.acceptLabel/);
     assert.doesNotMatch(feature, /from your quest log later/);

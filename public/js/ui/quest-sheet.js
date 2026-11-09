@@ -257,6 +257,14 @@ export function createQuestSheet({ document: doc = globalThis.document, questInf
   let shownBox = null;
   /** Cards the player opened or closed (by quest id); the first card of a tab starts open. */
   const toggled = new Map();
+  /** A quest's details, or null when they cannot be had: one quest never stops the rest (lane questlist). */
+  const infoOf = (id) => {
+    try {
+      return id ? questInfo(id) || null : null;
+    } catch {
+      return null;
+    }
+  };
 
   function cardId(card) {
     return card.dataset.quest || card.dataset.questPutOff || card.querySelector('.q-title')?.textContent?.trim() || '';
@@ -265,7 +273,7 @@ export function createQuestSheet({ document: doc = globalThis.document, questInf
   function makeCollapsible(card, firstInTab) {
     const id = cardId(card);
     const which = questCardTab(card);
-    const info = card.dataset.quest ? questInfo(card.dataset.quest) : null;
+    const info = infoOf(card.dataset.quest);
     const title = card.querySelector(':scope > .q-title');
     const rest = [...card.childNodes].filter((n) => n !== title);
     const open = toggled.has(id) ? toggled.get(id) : firstInTab && which !== 'done';
@@ -372,7 +380,7 @@ export function createQuestSheet({ document: doc = globalThis.document, questInf
   /** How far along a drawn card's quest is (done: all the way; offered: not started). */
   function cardProgress(card, which) {
     if (which === 'done') return 1;
-    const info = card.dataset.quest ? questInfo(card.dataset.quest) : null;
+    const info = infoOf(card.dataset.quest);
     return info ? questProgress(info.requirements) : 0;
   }
 
@@ -411,7 +419,12 @@ export function createQuestSheet({ document: doc = globalThis.document, questInf
         const n = row.el;
         const match = !searching || questMatches(row.words, query);
         n.dataset.questTab = which;
-        makeCollapsible(n, match && shown[which] === 0 && which === tab);
+        try {
+          makeCollapsible(n, match && shown[which] === 0 && which === tab);
+        } catch (err) {
+          // A card that cannot be made collapsible stays as drawn: counted and shown, never a blank tab.
+          globalThis.console?.warn?.('[quests] card left as drawn', cardId(n), err);
+        }
         if (match) shown[which] += 1;
         n.hidden = which !== tab || !match;
         box.appendChild(n);
