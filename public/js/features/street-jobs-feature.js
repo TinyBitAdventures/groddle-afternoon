@@ -133,6 +133,7 @@ import { WINTRY_PORTAL_TELEPORTERS } from '../wintry-portal.js?v=1437deda';
 import { PROJECTS_TEXT, contributedJobs, mineTotal, projectList } from '../projects-tracker.js?v=f34c5236';
 import { PROJECTS_PANEL_ID, buildProjectsPanel, renderProjects } from '../ui/projects-sheet.js?v=69f33fa6';
 import { SIDE_SHEET_IDS } from '../ui/panel-shell.js?v=e2abdf9e';
+import { trophyGotText } from '../home-trophies.js?v=309fd6c7';
 
 export const STREET_JOBS_FEATURE_ID = 'street-jobs';
 const BOARD_CLASS = 'street_job_board';
@@ -637,7 +638,7 @@ function grantFinishedTrophies(engine) {
     for (const cls of plan.take) removeItem(engine.inv, cls, 1);
     grantItems(engine, [{ classTsid: plan.trophy, count: 1 }]);
     const name = itemLabel(plan.trophy);
-    engine.pushActivity(plan.take.length === 5 ? `Your five pieces became the ${name}!` : `You got the ${name}!`);
+    engine.pushActivity(trophyGotText(plan.take.length === 5 ? `Your five pieces became the ${name}!` : `You got the ${name}!`));
   }
   if (plans.length) {
     piecesOwned = new Set(TROPHY_PIECES.filter((cls) => countItem(engine.inv, cls) > 0));

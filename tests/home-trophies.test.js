@@ -9,7 +9,7 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { TROPHY_DECOR, TROPHY_FIND_TEXT, isTrophyDecor, placedTrophies, trophyOfBadge } from '../public/js/home-trophies.js?v=21c2add6';
+import { TROPHY_DECOR, TROPHY_FIND_TEXT, TROPHY_WHERE_TEXT, trophyGotText, isTrophyDecor, placedTrophies, trophyOfBadge } from '../public/js/home-trophies.js?v=309fd6c7';
 import {
   createHomeDecorState,
   displayDeposit,
@@ -21,7 +21,7 @@ import {
   normalizeHomeDecorState,
   pickUpFurniture,
   placeFurniture,
-} from '../public/js/home-decor.js?v=7cee3ace';
+} from '../public/js/home-decor.js?v=d6fabb62';
 import { cabinetRefusal } from '../public/js/home-storage.js?v=121f1897';
 import { canSellClass } from '../public/js/home-street-mp.js?v=fc0ed665';
 import { filterTiles, furniturePane, trayFilters } from '../public/js/ui/home-builder.js?v=90f759e8';
@@ -29,11 +29,11 @@ import { hasUpgrades, upgradeVerb } from '../public/js/furniture-upgrades.js?v=a
 import { NO_SLOT_CLASSES } from '../public/js/pack-slots-data.js?v=800f664c';
 import { layoutPack, takesNoSlot } from '../public/js/pack-slots.js?v=6cf9f397';
 import { WORLD_ART } from '../public/js/world-art-list.js?v=df42115a';
-import { homeTrophyCount, isTrophyClass } from '../public/js/features/item-verbs-feature.js?v=f140756a';
-import { homesFeature } from '../public/js/features/homes-feature.js?v=fd87796b';
+import { homeTrophyCount, isTrophyClass } from '../public/js/features/item-verbs-feature.js?v=ef4bfb94';
+import { homesFeature } from '../public/js/features/homes-feature.js?v=e8b1510b';
 import { planStreetTrophies } from '../public/js/street-jobs.js?v=02a81cb3';
 import { planEggTrophy } from '../public/js/seasons.js?v=1978c3f3';
-import { collectionTrophiesFeature as collection } from '../public/js/features/collection-trophies-feature.js?v=bb848f8f';
+import { collectionTrophiesFeature as collection } from '../public/js/features/collection-trophies-feature.js?v=8b436ad5';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=10b118dd';
 import { applyAchievementProgress, createAchievementState } from '../public/js/achievements.js?v=f8ccfd34';
 
@@ -75,6 +75,10 @@ describe('the eighteen trophies', () => {
     assert.equal(trophyOfBadge('collection_street_creator_wood'), 'trophy_street_creator_wood');
     assert.equal(trophyOfBadge('fine_friend'), null);
     assert.doesNotMatch(TROPHY_FIND_TEXT, /—/);
+    // The line giving a trophy says where it went: it never shows in the pack (report 2026-11-08).
+    assert.equal(trophyGotText('You got the Gem Trophy!'), `You got the Gem Trophy! ${TROPHY_WHERE_TEXT}`);
+    assert.match(TROPHY_WHERE_TEXT, /Decorate/);
+    assert.doesNotMatch(TROPHY_WHERE_TEXT, /—|Glitch/);
   });
 
   it('still takes no pack slot: the Decorate tray is where it shows', () => {

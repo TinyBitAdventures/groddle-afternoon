@@ -11,9 +11,10 @@ import { fileURLToPath } from 'node:url';
 import { loadContentCatalogsFromDir, getAchievementCatalog } from '../public/js/content-catalogs.js?v=10b118dd';
 import { applyAchievementProgress, createAchievementState, getAchievementProgress, resetAchievementCounter, unlockAchievement } from '../public/js/achievements.js?v=f8ccfd34';
 import { COLLECTION_TROPHIES, COUNTED_ON_ARRIVAL, HELD_AT_ONCE, collectionClasses, heldChanges, planCollectionTrophies } from '../public/js/collection-trophies.js?v=69205984';
+import { TROPHY_WHERE_TEXT } from '../public/js/home-trophies.js?v=309fd6c7';
 import { ITEM_CATALOG } from '../public/js/inventory.js?v=b7609342';
 import { vendorSellValue } from '../public/js/vendor.js?v=afdebbe1';
-import { collectionTrophiesFeature as feature } from '../public/js/features/collection-trophies-feature.js?v=bb848f8f';
+import { collectionTrophiesFeature as feature } from '../public/js/features/collection-trophies-feature.js?v=8b436ad5';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const GS = join(here, '../../glitch-GameServerJS');
@@ -184,7 +185,8 @@ describe('collection trophies (G530)', () => {
       assert.deepEqual(engine.announced, [badge]);
       assert.equal(owned(COLLECTION_TROPHIES[badge].trophy, inv), 1);
       for (const [cls, n] of Object.entries(before)) assert.equal(inv[cls], n, `${cls} stays`);
-      assert.deepEqual(engine.activity, [`You got the ${COLLECTION_TROPHIES[badge].label}!`]);
+      // A trophy has no pack slot (as in the original): the line says where it went (report 2026-11-08).
+      assert.deepEqual(engine.activity, [`You got the ${COLLECTION_TROPHIES[badge].label}! ${TROPHY_WHERE_TEXT}`]);
     });
   }
 

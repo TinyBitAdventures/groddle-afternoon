@@ -10,6 +10,7 @@
  */
 import { addItem, countItem, ensureItem } from '../inventory.js?v=b7609342';
 import { getAchievementCatalog } from '../content-catalogs.js?v=10b118dd';
+import { trophyGotText } from '../home-trophies.js?v=309fd6c7';
 import { COLLECTION_TROPHIES, COUNTED_ON_ARRIVAL, HELD_AT_ONCE, collectionClasses, heldChanges, planCollectionTrophies } from '../collection-trophies.js?v=69205984';
 
 const CHECK_MS = 1000;
@@ -51,7 +52,7 @@ function settleTrophies(engine) {
     given.push(plan.badge);
     if (!plan.give) continue;
     addItem(engine.inv, plan.trophy, 1);
-    engine.pushActivity?.(`You got the ${COLLECTION_TROPHIES[plan.badge].label}!`);
+    engine.pushActivity?.(trophyGotText(`You got the ${COLLECTION_TROPHIES[plan.badge].label}!`));
   }
   if (plans.length) {
     engine.refreshPack?.();

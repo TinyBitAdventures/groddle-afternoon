@@ -23,7 +23,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { FURNITURE_CATALOG } from '../public/js/homes-catalog.js?v=10ac34b6';
 import { FURNITURE_UPGRADES } from '../public/js/furniture-upgrades-data.js?v=ced89b64';
-import { createHomeDecorState, INTERIOR, placeFurniture, settleStacks, stackSurfaceAt, STALE_REST_GIVE, surfaceHeight } from '../public/js/home-decor.js?v=7cee3ace';
+import { createHomeDecorState, INTERIOR, placeFurniture, settleStacks, stackSurfaceAt, STALE_REST_GIVE, surfaceHeight } from '../public/js/home-decor.js?v=d6fabb62';
 import { normalizeDroppedItemState } from '../public/js/world-items.js?v=0bbfdab9';
 import { isStandable } from '../public/js/street-model.js?v=b6cb6a4e';
 import { BUILDER_TEXT } from '../public/js/ui/home-builder.js?v=90f759e8';

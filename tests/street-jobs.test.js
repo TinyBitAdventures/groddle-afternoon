@@ -40,12 +40,13 @@ import {
   TROPHY_PIECES,
   planStreetTrophies,
 } from '../public/js/street-jobs.js?v=02a81cb3';
-import { streetJobsFeature } from '../public/js/features/street-jobs-feature.js?v=abb4a581';
+import { streetJobsFeature } from '../public/js/features/street-jobs-feature.js?v=2fde7a65';
 import { createAchievementState, applyAchievementProgress } from '../public/js/achievements.js?v=f8ccfd34';
 import { applyRewards } from '../public/js/quests.js?v=c8d9d0a4';
 import { loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js?v=10b118dd';
 import { addItem, countItem } from '../public/js/inventory.js?v=b7609342';
 import { obtainableItems } from '../tools/job-obtainable.mjs';
+import { TROPHY_WHERE_TEXT } from '../public/js/home-trophies.js?v=309fd6c7';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..', 'public');
 const catalog = JSON.parse(readFileSync(join(root, 'assets/content/street-jobs.json'), 'utf8'));
@@ -425,7 +426,7 @@ describe('report 97: the Street Creator Trophies', () => {
       assert.equal(pc.imagination, 1000);
       assert.deepEqual(Object.keys(pc.giantFavor).sort(), GIANT_IDS);
       assert.ok(Object.values(pc.giantFavor).every((v) => v === 30), '30 with every Giant');
-      assert.deepEqual(log, ['Your five pieces became the Street Creator Rock Trophy!']);
+      assert.deepEqual(log, [`Your five pieces became the Street Creator Rock Trophy! ${TROPHY_WHERE_TEXT}`]);
       // Five more pieces later (a trade): the badge is had, nothing more.
       for (const cls of rock) addItem(engine.inv, cls, 1);
       streetJobsFeature.onTick(16, 12_000, engine);

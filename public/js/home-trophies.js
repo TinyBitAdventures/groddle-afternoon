@@ -86,3 +86,16 @@ export function placedTrophies(decors = []) {
   }
   return n;
 }
+
+/**
+ * What the line giving a trophy adds (ours; a player's report 2026-11-08 could not find one in the
+ * pack). A trophy never shows in the pack, as in the original (bag.js 98-104 and 437 keep it out;
+ * players/inc_furniture.js furniture_migrate_trophies 176-198 puts it in the furniture bag), and the
+ * original said nothing about where it went.
+ */
+export const TROPHY_WHERE_TEXT = 'It waits with your furniture, not in your pack: display it from the Furniture tab when you Decorate your house.';
+
+/** The line for a trophy given: `lead` ("You got the Gem Trophy!") and where it went. */
+export function trophyGotText(lead) {
+  return `${String(lead || '').trim()} ${TROPHY_WHERE_TEXT}`;
+}

@@ -290,7 +290,7 @@ describe('Egg Hunt and Pi Day', () => {
   });
 
   it('counts each egg into the collection however it arrives, then gives the trophy for them (seasons-feature)', async () => {
-    const { seasonsFeature } = await import('../public/js/features/seasons-feature.js?v=34fa0a93');
+    const { seasonsFeature } = await import('../public/js/features/seasons-feature.js?v=9d0986e7');
     const { createInventory, addItem, countItem, removeItem } = await import('../public/js/inventory.js?v=b7609342');
     const unlocked = [];
     const counted = {};
@@ -299,6 +299,8 @@ describe('Egg Hunt and Pi Day', () => {
       inv,
       started: true,
       param: () => null,
+      activity: [],
+      pushActivity(line) { this.activity.push(line); },
       get unlockedAchievements() { return unlocked; },
       achievement(counter) {
         counted[counter] = (counted[counter] || 0) + 1;
@@ -321,6 +323,8 @@ describe('Egg Hunt and Pi Day', () => {
     addItem(inv, 'egghunt_egg_2', 1);
     tick();
     assert.equal(countItem(inv, 'trophy_egghunt'), 1);
+    // A trophy never shows in the pack: the line says where it went (report 2026-11-08).
+    assert.match(engine.activity.at(-1), /^You got the .*, in exchange for your five chocolate eggs\. It waits with your furniture, not in your pack: .*Decorate/);
     assert.deepEqual(EGG_CLASSES.map((cls) => countItem(inv, cls)), [0, 1, 0, 0, 0]);
     assert.equal(seasonsFeature.save().trophyGiven, true);
     for (const cls of EGG_CLASSES) addItem(inv, cls, 1);
@@ -360,7 +364,7 @@ describe('supply paths', () => {
 
 describe('a ?season= preview leaves the save alone (G342)', () => {
   it('a carved pumpkin survives previewing another season, and the save still remembers Zilloween', async () => {
-    const { seasonsFeature } = await import('../public/js/features/seasons-feature.js?v=34fa0a93');
+    const { seasonsFeature } = await import('../public/js/features/seasons-feature.js?v=9d0986e7');
     const { createInventory, addItem, countItem } = await import('../public/js/inventory.js?v=b7609342');
     const inv = createInventory();
     addItem(inv, 'pumpkin_carved_1', 2);

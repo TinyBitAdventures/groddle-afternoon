@@ -138,6 +138,7 @@ import { playOverlay } from '../overlays.js?v=ed371926';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
 import { MAIL_POST_SENDER } from '../mailbox.js?v=a3e833ba';
 import { filterText } from '../word-filter.js?v=9a7a7ebb';
+import { trophyGotText } from '../home-trophies.js?v=309fd6c7';
 
 export const SEASONS_FEATURE_ID = 'seasons';
 const LANTERN_GROUP = 'seasons:lantern';
@@ -1135,7 +1136,7 @@ function tickEggs(engine, now = Date.now()) {
     addItem(engine.inv, plan.trophy, 1);
     eggsOwned = new Set(EGG_CLASSES.filter((cls) => countItem(engine.inv, cls) > 0));
     const trophy = ITEM_CATALOG[plan.trophy]?.label || 'Egg Hunter Trophy';
-    say(engine, plan.take.length === EGG_CLASSES.length ? `You got the ${trophy}, in exchange for your five chocolate eggs.` : `You got the ${trophy}.`);
+    say(engine, trophyGotText(plan.take.length === EGG_CLASSES.length ? `You got the ${trophy}, in exchange for your five chocolate eggs.` : `You got the ${trophy}.`));
     engine.save?.();
   } else if (fresh.length) publish(engine);
 }
