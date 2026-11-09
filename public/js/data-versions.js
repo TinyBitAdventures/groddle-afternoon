@@ -7,6 +7,7 @@
     root: s && s.src ? new URL('../', s.src).href : '',
     epoch: '4774a7f0',
     files: {
+      "assets/content/achievements.json": "f752dcd5",
       "assets/content/deco-catalog.json": "4540131b",
       "assets/content/signpost-graph.json": "c618fc41",
       "assets/content/street-ecology.json": "52c389c0",
@@ -236,7 +237,7 @@
       "assets/streets/GUVVV3FU2FC38SK.json": "b4f1b950",
       "assets/streets/index.json": "68c54aca",
       "contribute/data.json": "e25ce0e0",
-      "encyclopedia/search.json": "71acd0a0",
+      "encyclopedia/search.json": "b5522797",
       "landing/card-explore.webp": "7a2c1124",
       "landing/full/card-explore.webp": "cbce4e96",
       "restoration/shots/interrogation.webp": "4778b1b1",
