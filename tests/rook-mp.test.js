@@ -18,9 +18,9 @@ import {
   strikeDamage,
   syncKeys,
   syncObjs,
-} from '../public/js/rook-mp.js?v=2e10f19b';
-import { rookClockS, canStrike, canStun, rookPresent } from '../public/js/rook-attack.js?v=0382c223';
-import { orbGlowIds } from '../public/js/features/rook-attack-feature.js?v=803ffc97';
+} from '../public/js/rook-mp.js?v=1391d332';
+import { rookClockS, canStrike, canStun, rookPresent } from '../public/js/rook-attack.js?v=473f236c';
+import { orbGlowIds } from '../public/js/features/rook-attack-feature.js?v=b719f25b';
 import { HAS_SERVER, serverPath, skipWithoutServer } from '../tools/repos.mjs';
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');

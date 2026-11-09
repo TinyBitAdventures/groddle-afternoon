@@ -9,8 +9,8 @@
 // Now a key is the animal's own: its class and the index the street spawned it with (rookKeyFor).
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { rookKeyFor } from '../public/js/rook-attack.js?v=0382c223';
-import { syncKeys } from '../public/js/rook-mp.js?v=2e10f19b';
+import { rookKeyFor } from '../public/js/rook-attack.js?v=473f236c';
+import { syncKeys } from '../public/js/rook-mp.js?v=1391d332';
 
 /** A copy of the feature of its own (its realtime binding is module state, one per player). */
 const featureCopy = async (name) => (await import(`../public/js/features/rook-attack-feature.js?fresh=rook-own-keys-${name}`)).rookAttackFeature;
@@ -135,7 +135,7 @@ describe('ticket 12: a rooked animal keeps its own key and its own healers', () 
     const labels = Object.fromEntries(b.map((x) => [x.name, dosedLabel(rookAttackFeature, engine, x)]));
     assert.deepEqual(labels, {
       'butterfly 0': 'can revive',
-      'butterfly 1': 'You have already helped revive this one.',
+      'butterfly 1': 'You have already helped revive this Butterfly. Now others need to help!',
       'butterfly 2': 'can revive',
       'butterfly 3': 'can revive',
     });
@@ -167,7 +167,7 @@ describe('ticket 12: a rooked animal keeps its own key and its own healers', () 
     tick(featureB, B.engine);
     const rooked = { 'npc_butterfly:3': { class: 'npc_butterfly', doses: 1, by: [ME] } };
     B.fire('msg:rook', { street: TSID, snap: true, attack: null, rooked });
-    assert.equal(dosedLabel(featureB, B.engine, b[3]), 'You have already helped revive this one.');
+    assert.equal(dosedLabel(featureB, B.engine, b[3]), 'You have already helped revive this Butterfly. Now others need to help!');
     for (const x of [b[0], b[1], b[2]]) assert.equal(dosedLabel(featureB, B.engine, x), 'not rooked', x.name);
     featureB.onStreetClear(B.engine);
   });

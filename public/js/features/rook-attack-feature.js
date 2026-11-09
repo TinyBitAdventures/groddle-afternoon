@@ -104,7 +104,7 @@ import {
   strikeBeamFor,
   strikeDamageFor,
   useBalmPoint,
-} from '../rook-attack.js?v=0382c223';
+} from '../rook-attack.js?v=473f236c';
 import { shrinePrimeBonus } from '../imagination-effects.js?v=70169933';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 import { gainMetabolic, loseEnergy, loseMood } from '../metabolics.js?v=8504134e';
@@ -123,7 +123,7 @@ import {
   strikeDamage as mpStrikeDamage,
   syncKeys,
   syncObjs,
-} from '../rook-mp.js?v=2e10f19b';
+} from '../rook-mp.js?v=1391d332';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
 import { copyChargesLeft, copyFromLedger, keepsCopies, spendCopyCharge, verbCopy } from '../copy-charges.js?v=f01dfda2';
 import { migrateClassValue } from '../tools.js?v=eff5ef6f';
@@ -323,6 +323,16 @@ function setFeed(text, ms = 5500) {
 
 function rookLabel(target) {
   return target?.label || 'critter';
+}
+
+/** The class's name_single (npc_piggy.js 5 and the others), never a named animal's "A Piggy Named ...". */
+const ROOK_SINGLE = Object.freeze({
+  npc_piggy: 'Piggy', npc_chicken: 'Chicken', npc_butterfly: 'Butterfly', npc_batterfly: 'Batterfly', npc_kitty_chicken: 'Heli Kitty',
+  trant_fruit: 'Fruit Tree', trant_bean: 'Bean Tree', trant_bubble: 'Bubble Tree', trant_egg: 'Egg Plant', trant_gas: 'Gas Plant',
+  trant_spice: 'Spice Plant', wood_tree: 'Wood Tree', paper_tree: 'Paper Tree',
+});
+function rookSingle(target) {
+  return ROOK_SINGLE[target?.classId] || rookLabel(target);
 }
 
 // ---------------------------------------------------------------------------
@@ -2210,7 +2220,7 @@ function rookedVerbs(engine, target) {
     id: 'rook_revive',
     label: `Revive (${(row?.doses || 0) + 1}/${ROOK_SOURCE.reviveHealers})`,
     enabled: enough && !dosed,
-    reason: dosed ? 'You have already helped revive this one.' : enough ? '' : "You don't have enough energy to do that!",
+    reason: dosed ? ROOK_TEXT.reviveDone(rookSingle(target)) : enough ? '' : "You don't have enough energy to do that!",
     tooltip: ROOK_TEXT.reviveTooltip.replace('$itemclass', label.toLowerCase()).replace('$energy_cost', String(energy)),
     durationMs: ROOK_SOURCE.reviveMs,
     energy,
@@ -2891,7 +2901,7 @@ function mpRevive(engine, target, { balm = false, copy = null } = {}) {
     return false;
   }
   if (!balm && row.by?.includes(mpMyId())) {
-    engine.toast('You have already helped revive this one.', 2000);
+    engine.toast(ROOK_TEXT.reviveDone(rookSingle(target)), 2000);
     return false;
   }
   // The tube picked goes with the ask (k, its place among the tubes in the pack): the ledger uses that one's pour.

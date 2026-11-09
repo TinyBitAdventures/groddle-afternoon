@@ -164,6 +164,8 @@ export const ROOK_TEXT = Object.freeze({
   defeatWitness: (xp) => `You got ${xp} iMG for witnessing the defeat of the Rook.`,
   reviveTooltip: 'Help this $itemclass escape the effects of The Rook. Costs $energy_cost energy',
   reviveFull: (label) => `Enough doses are already reviving this ${label}.`,
+  // items/npc_piggy.js revive conditions 236-237 (the same line in every rookable class): a player gives one dose.
+  reviveDone: (single) => `You have already helped revive this ${single}. Now others need to help!`,
   balmTooltip: 'Instantly revive a rooked plant or animal',
   balmNothing: 'There is nothing here to apply this to.',
   armorWait: 'Maybe you should save this for a Rook attack.',
