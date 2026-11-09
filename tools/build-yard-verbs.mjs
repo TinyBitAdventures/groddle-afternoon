@@ -33,6 +33,14 @@
  *   node amounts (include/mining.js 388-401, peat_1.js:301, dirt_pile.js:470,
  *   mortar_barnacle.js:304, jellisac.js:234).
  *
+ * - crowd (HERDCAP): how many of an owner's home-street animals a visitor is
+ *   shown (js/animal-crowding.js yardClassCap, capYardAnimals): each class's
+ *   population_controls [per_width, min_max, max_max] (config_prod.js
+ *   1205-1221), the herdkeeping cards' shares, best first (inc_data_imagination.js
+ *   2707-2756), our cap for every other class and the rows read, and the home
+ *   street's width parts (js/home-cultivation.js homeStreetLayout, config_base.js
+ *   home_limits).
+ *
  *   node tools/build-yard-verbs.mjs           writes the site repo's data/yard-verbs.json
  *   node tools/build-yard-verbs.mjs --check   exits 1 when it is stale
  */
@@ -45,7 +53,7 @@ import { requireSite, sitePath } from './repos.mjs';
 export const OUT = sitePath('data', 'yard-verbs.json');
 
 export async function yardVerbsJson() {
-  const { YARD_POOL, YARD_AK_ITEMS } = await import('../public/js/yard-verbs-mp.js?v=8584f23a');
+  const { YARD_POOL, YARD_AK_ITEMS } = await import('../public/js/yard-verbs-mp.js?v=6b210e26');
   const { ANIMAL_KINSHIP_PACKAGES } = await import('../public/js/animal-kinship.js?v=f91347e9');
   const { ARBOROLOGY_HARVEST, TRANT_META } = await import('../public/js/trants.js?v=1b3c8ae3');
   const { SEASONED_BEANS, SEEDLING_GROW_UPGRADES, SOIL_SKILL_PACKAGES, SOIL_TIMERS } = await import('../public/js/patches.js?v=3103cc6a');
@@ -85,9 +93,15 @@ export async function yardVerbsJson() {
     const hive = d.kind === 'hive' ? `,"hive":[${FIREFLY_HIVE.intervalMs},${FIREFLY_HIVE.maxCount},${FIREFLY_HIVE.radius}]` : '';
     return `${JSON.stringify(id)}:{"kind":${JSON.stringify(d.kind)},"maxWear":${d.maxWear},"nodes":${JSON.stringify(ns)}${hive}}`;
   });
+  const { POPULATION_CONTROLS, CROWD_CARDS, YARD_CAP_OURS, YARD_CAP_SCAN } = await import('../public/js/animal-crowding.js?v=78ad8fa9');
+  const { HOME_LIMITS } = await import('../public/js/homes-catalog.js?v=10ac34b6');
+  const { YARD_SEGMENT_W, HOUSE_LOT_W } = await import('../public/js/home-cultivation.js?v=9571e110');
+  const controls = Object.keys(POPULATION_CONTROLS).sort().map((id) => `${JSON.stringify(id)}:[${POPULATION_CONTROLS[id].perWidth},${POPULATION_CONTROLS[id].minMax},${POPULATION_CONTROLS[id].maxMax}]`);
+  const cards = CROWD_CARDS.map((c) => `[${JSON.stringify(c.id)},${c.share}]`);
+  const crowd = `{"controls":{${controls.join(',')}},"cards":[${cards.join(',')}],"ours":${YARD_CAP_OURS},"scan":${YARD_CAP_SCAN},"street":{"segment":${YARD_SEGMENT_W},"lot":${HOUSE_LOT_W},"left":[${HOME_LIMITS.START_FRONTYARD_LEFT_SEGMENTS},${HOME_LIMITS.MAX_FRONTYARD_LEFT_SEGMENTS}],"right":[${HOME_LIMITS.START_FRONTYARD_RIGHT_SEGMENTS},${HOME_LIMITS.MAX_FRONTYARD_RIGHT_SEGMENTS}]}}`;
   const items = Object.keys(YARD_AK_ITEMS).sort().map((key) => `${JSON.stringify(key)}:${JSON.stringify(YARD_AK_ITEMS[key])}`);
-  const doc = 'Written by groddle-afternoon game tools/build-yard-verbs.mjs from js/yard-verbs-mp.js, js/animal-kinship.js, js/trants.js and js/patches.js: pool the Magic Rock iMG a visitor act adds, ak the Animal Kinship daily limit l and items b per rank 0..7, akItems what those items are, arbor and dig the harvest and dig rows by skill, soil the Patch timers in ms, fruit each tree\'s fruit; rocks, nodes and cult the home street\'s rocks and resource nodes (js/yard-stock-mp.js, js/mining.js, js/resource-nodes.js, js/homes-catalog.js), life the lifespan step a restore adds; wood the Planks a Wood Tree gives by maturity 1..6 (enchanted ones apart), seedling the pets a Seedling takes, its timers and the planter\'s grow cards (the better first), beans each Seasoned Bean\'s tree, jarFull the Fireflies a visitor catches at a home in a game day that count as a full jar (HOMES2).';
-  return `{"_doc":${JSON.stringify(doc)},\n"pool":{${pool.join(',')}},\n"ak":{\n${ak.join(',\n')}},\n"akItems":{${items.join(',')}},\n"arbor":[${arbor.join(',')}],\n"dig":[${dig.join(',')}],\n"soil":{"cleanRegrowMs":${SOIL_TIMERS.cleanRegrowMs},"dugFillMs":${SOIL_TIMERS.dugFillMs}},\n"fruit":{${fruit.join(',')}},\n"rocks":{${rocks.join(',')}},"respawnMs":${ROCK_RESPAWN_MS},\n"nodes":{\n${nodes.join(',\n')}},\n"cult":{${cult.join(',')}},\n"life":{"step":${LIFESPAN_STEP},"max":${MAX_LIFE_STEPS}},\n"wood":{"planks":${JSON.stringify(WOOD_TREE_HARVEST.plankYieldByMaturity)},"enchanted":${JSON.stringify(ENCHANTED_WOOD_TREE.plankYieldByMaturity)}},\n"seedling":{"pets":${SOIL_TIMERS.seedlingPets},"minMs":${SOIL_TIMERS.seedlingMinMs},"maxMs":${SOIL_TIMERS.seedlingMaxMs},"grow":{${grow.join(',')}}},\n"beans":{${beans.join(',')}},"jarFull":${FIREFLY_JAR_FULL}}\n`;
+  const doc = 'Written by groddle-afternoon game tools/build-yard-verbs.mjs from js/yard-verbs-mp.js, js/animal-kinship.js, js/trants.js and js/patches.js: pool the Magic Rock iMG a visitor act adds, ak the Animal Kinship daily limit l and items b per rank 0..7, akItems what those items are, arbor and dig the harvest and dig rows by skill, soil the Patch timers in ms, fruit each tree\'s fruit; rocks, nodes and cult the home street\'s rocks and resource nodes (js/yard-stock-mp.js, js/mining.js, js/resource-nodes.js, js/homes-catalog.js), life the lifespan step a restore adds; wood the Planks a Wood Tree gives by maturity 1..6 (enchanted ones apart), seedling the pets a Seedling takes, its timers and the planter\'s grow cards (the better first), beans each Seasoned Bean\'s tree, jarFull the Fireflies a visitor catches at a home in a game day that count as a full jar (HOMES2); crowd the most of each class of an owner\'s animals a visitor is shown (js/animal-crowding.js: controls per_width, min_max, max_max; cards best first; ours for any other class; scan the rows read; street the home street\'s width parts: a yard segment, the house lot, each side\'s start and most segments) (HERDCAP).';
+  return `{"_doc":${JSON.stringify(doc)},\n"pool":{${pool.join(',')}},\n"ak":{\n${ak.join(',\n')}},\n"akItems":{${items.join(',')}},\n"arbor":[${arbor.join(',')}],\n"dig":[${dig.join(',')}],\n"soil":{"cleanRegrowMs":${SOIL_TIMERS.cleanRegrowMs},"dugFillMs":${SOIL_TIMERS.dugFillMs}},\n"fruit":{${fruit.join(',')}},\n"rocks":{${rocks.join(',')}},"respawnMs":${ROCK_RESPAWN_MS},\n"nodes":{\n${nodes.join(',\n')}},\n"cult":{${cult.join(',')}},\n"life":{"step":${LIFESPAN_STEP},"max":${MAX_LIFE_STEPS}},\n"wood":{"planks":${JSON.stringify(WOOD_TREE_HARVEST.plankYieldByMaturity)},"enchanted":${JSON.stringify(ENCHANTED_WOOD_TREE.plankYieldByMaturity)}},\n"seedling":{"pets":${SOIL_TIMERS.seedlingPets},"minMs":${SOIL_TIMERS.seedlingMinMs},"maxMs":${SOIL_TIMERS.seedlingMaxMs},"grow":{${grow.join(',')}}},\n"beans":{${beans.join(',')}},"jarFull":${FIREFLY_JAR_FULL},\n"crowd":${crowd}}\n`;
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {

@@ -194,6 +194,62 @@ export function sadnessMax(classId, { width = 0, pol = false, upgrades = [] } = 
   return max;
 }
 
+/**
+ * HERDCAP (Austin 2026-11-09): how many of an owner's home-street animals of
+ * a class someone else is shown. An owner's yard animals come from their own
+ * save, which their own game writes (G335), and only that game enforces the
+ * crowding limit above, so a save edited by hand could hold thousands and
+ * every visitor would draw them all. The site (groddle-afternoon-site
+ * src/HomeYard.php animalRows, reading data/yard-verbs.json "crowd" written
+ * from these numbers) and the visitor's game (js/yard-verbs-mp.js
+ * normalizeYardView) keep at most this many per class:
+ * - Piggies, Chickens, Butterflies: getSadnessMax for the home street (a POL,
+ *   so not halved) with the owner's best herdkeeping_animal_sadness card
+ *   (sadnessMax above). `ceiling` assumes Super Happy Animals (+20%) for a
+ *   reader that cannot see the owner's cards.
+ * - Any other class (Batterflies, which the source never limits; the babies,
+ *   piglet, chick and caterpillar; anything else): YARD_CAP_OURS, ours.
+ */
+export const YARD_CAP_OURS = 40;
+/** Ours: the most rows of an owner's saved animals read before stopping, so a huge array costs nothing. */
+export const YARD_CAP_SCAN = 300;
+const YARD_ANIMAL_ID = /^a(\d{1,6})$/;
+
+/** The most of a class someone else is shown on an owner's home street of `width`. */
+export function yardClassCap(classId, { width = 0, upgrades = [], ceiling = false } = {}) {
+  if (!POPULATION_CONTROLS[classId]) return YARD_CAP_OURS;
+  return sadnessMax(classId, { width, pol: true, upgrades: ceiling ? [CROWD_CARDS[0].id] : upgrades });
+}
+
+/**
+ * An owner's saved yard animals as someone else is shown them: the first
+ * YARD_CAP_SCAN rows read, a row with an id seen before skipped, and of each
+ * class the `capFor(classId)` with the lowest ids (the oldest: ids count up),
+ * so the same save always shows the same animals. Kept rows stay in their
+ * saved order. Rows without an a<n> id or a class are dropped.
+ */
+export function capYardAnimals(rows, capFor = (classId) => yardClassCap(classId)) {
+  const list = Array.isArray(rows) ? rows.slice(0, YARD_CAP_SCAN) : [];
+  const seen = new Set();
+  const byClass = new Map();
+  const valid = [];
+  for (const row of list) {
+    const m = row && typeof row === 'object' && typeof row.id === 'string' ? YARD_ANIMAL_ID.exec(row.id) : null;
+    if (!m || typeof row.classId !== 'string' || !row.classId || seen.has(row.id)) continue;
+    seen.add(row.id);
+    valid.push(row);
+    if (!byClass.has(row.classId)) byClass.set(row.classId, []);
+    byClass.get(row.classId).push({ row, n: Number(m[1]) });
+  }
+  const keep = new Set();
+  for (const [classId, entries] of byClass) {
+    const cap = Math.max(0, Math.floor(Number(capFor(classId)) || 0));
+    entries.sort((a, b) => a.n - b.n);
+    for (const e of entries.slice(0, cap)) keep.add(e.row);
+  }
+  return valid.filter((row) => keep.has(row));
+}
+
 /** The onSadnessCheck chance for a population against its limit. */
 export function crowdChance(population, max) {
   const pop = num(population);

@@ -98,7 +98,7 @@ import { OVERLAY_USES, playOverlay } from '../overlays.js?v=605c12ff';
 import { OVERLAY_FADE } from '../overlay-art.js?v=75c3ea34';
 import { vpSequence } from '../quest-rooms/vp-overlay.js?v=75d28bfb';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
-import { salmonSwimAt } from '../street-creatures.js?v=c73c3aaf';
+import { salmonSwimAt } from '../street-creatures.js?v=909163e7';
 import { GAME_EPOCH_MS } from '../game-day.js?v=edb00566';
 
 export const RESOURCE_FEATURE_ID = 'resource-nodes';

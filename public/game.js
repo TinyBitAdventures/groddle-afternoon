@@ -2,9 +2,9 @@
  * Groddle Afternoon — original street geometry + layered decos
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
-import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=bb61dce0';
+import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=396e6ee3';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=127e0a3c';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=151b695e';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=80c41a73';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -479,8 +479,8 @@ import { TROPHY_FIND_TEXT, trophyOfBadge } from './js/home-trophies.js?v=309fd6c
 import { PACK_COPY, isBagClass, isElementClass, unitRankAt } from './js/pack-slots.js?v=6cf9f397';
 import { hasPouch } from './js/elemental-pouch.js?v=ceefa97a';
 import { createPackRow, mountPackClearance, packBandRange, packCountText, packSearchEntries, packSlotTip } from './js/ui/pack-row.js?v=65c0f180';
-import { listAnimalFeedOptions } from './js/animals.js?v=191c70c4';
-import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=191c70c4';
+import { listAnimalFeedOptions } from './js/animals.js?v=e01d2a8a';
+import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=e01d2a8a';
 import {
   createDroppedItemState,
   parseDroppedItemState,
@@ -836,7 +836,7 @@ import {
   createAnimalState,
   resetAnimalDay,
   animalStatusLabel,
-} from './js/animals.js?v=191c70c4';
+} from './js/animals.js?v=e01d2a8a';
 import {
   ensureWoodTreeState,
   pickWoodTool,
@@ -940,7 +940,7 @@ import {
   ANIMAL_PATROL,
   nearestPlacementGap,
 } from './js/street-ecology.js?v=08076876';
-import { chickenPauseRoll, easeToward, flightFloorAt, flightFloorFor, flyerLift } from './js/street-creatures.js?v=c73c3aaf';
+import { chickenPauseRoll, easeToward, flightFloorAt, flightFloorFor, flyerLift } from './js/street-creatures.js?v=909163e7';
 import { createSoundBoard, DEFAULT_SFX_VOLUME, watchButtonClicks, watchPanelSounds } from './js/sound-board.js?v=87380a25';
 import {
   actionLoopFor,

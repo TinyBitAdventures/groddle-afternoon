@@ -37,14 +37,17 @@
  * an animal or tree carries the visitor's uses today, never the owner's.
  */
 
-import { createAnimalState } from './animals.js?v=191c70c4';
+import { createAnimalState } from './animals.js?v=e01d2a8a';
 import { petPiggy } from './animal-mood.js?v=a49495fc';
 import { trantFruitCycle } from './trant-care.js?v=9527ff03';
 import { resetTrantDay } from './trants.js?v=1b3c8ae3';
 import { GROWN_TREE_LABELS, SEASONED_BEANS, SOIL_TIMERS, seedlingTimings } from './patches.js?v=3103cc6a';
 import { GAME_DAY_MS, GAME_EPOCH_MS } from './game-day.js?v=edb00566';
 import { isNodeId, isRockId } from './yard-stock-mp.js?v=96d1c5bc';
-import { STICK_ANIMAL } from './yard-wander.js?v=24dc2de4';
+import { STICK_ANIMAL } from './yard-wander.js?v=06a15d38';
+import { capYardAnimals, yardClassCap } from './animal-crowding.js?v=78ad8fa9';
+import { HOUSE_LOT_W, YARD_SEGMENT_W } from './home-cultivation.js?v=9571e110';
+import { HOME_LIMITS } from './homes-catalog.js?v=10ac34b6';
 
 export const YARD_VERBS_MP_ID = 'yard-verbs-mp';
 /** js/features/homes-feature.js HOME_STREET_TSID: where an owner's save keeps the home street. */
@@ -153,6 +156,37 @@ function plain(value) {
   return value && typeof value === 'object' && !Array.isArray(value) ? value : null;
 }
 
+/**
+ * The owner's home street's width from its cultivation state (js/home-cultivation.js
+ * homeStreetLayout of the front street: the left yard, the house lot, the right yard),
+ * each side's expansions held to what normalizeCultivationState allows (0 up to
+ * MAX - START segments) and anything that is not a number read as none. The
+ * site's HomeYard::herdWidth is the same sum.
+ */
+export function yardStreetWidth(cult) {
+  // PHP's is_numeric: a number or a numeric string.
+  const n = (v, most) => {
+    const ok = typeof v === 'number' || (typeof v === 'string' && /^\s*[+-]?(\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?\s*$/.test(v));
+    const f = ok ? Number(v) : 0;
+    return Number.isFinite(f) ? Math.floor(Math.max(0, Math.min(most, f))) : 0;
+  };
+  const L = HOME_LIMITS;
+  const left = L.START_FRONTYARD_LEFT_SEGMENTS + n(cult?.yardLeft, L.MAX_FRONTYARD_LEFT_SEGMENTS - L.START_FRONTYARD_LEFT_SEGMENTS);
+  const right = L.START_FRONTYARD_RIGHT_SEGMENTS + n(cult?.yardRight, L.MAX_FRONTYARD_RIGHT_SEGMENTS - L.START_FRONTYARD_RIGHT_SEGMENTS);
+  return left * YARD_SEGMENT_W + HOUSE_LOT_W + right * YARD_SEGMENT_W;
+}
+
+/**
+ * HERDCAP: the most of each class a visitor draws of an owner's animals
+ * (js/animal-crowding.js yardClassCap). A visitor cannot see the owner's cards,
+ * so this second line allows the Super Happy Animals ceiling; the site caps
+ * first with the owner's own.
+ */
+export function visitorHerdCap(cult) {
+  const width = yardStreetWidth(cult);
+  return (classId) => yardClassCap(classId, { width, ceiling: true });
+}
+
 /** The site's GET homes/<id>/yard answer, checked: null unless it names an owner. */
 export function normalizeYardView(answer) {
   const owner = Number(answer?.owner);
@@ -160,7 +194,8 @@ export function normalizeYardView(answer) {
   const patches = (Array.isArray(answer.patches) ? answer.patches : [])
     .filter((p) => isPlotKey(p?.key) && plain(p.plot) && Number.isFinite(Number(p.rx)))
     .map((p) => ({ key: p.key, rx: Number(p.rx), plot: p.plot }));
-  const animals = (Array.isArray(answer.animals) ? answer.animals : [])
+  // HERDCAP: no more of a class than the owner's street holds, the oldest first (a save edited by hand could hold thousands).
+  const animals = capYardAnimals(answer.animals, visitorHerdCap(plain(answer.cult)))
     .filter((a) => isAnimalId(a?.id) && ANIMAL_VERBS[a.classId] && Number.isFinite(Number(a.x)))
     .map((a) => ({ id: a.id, classId: a.classId, x: Number(a.x), homeX: Number.isFinite(Number(a.homeX)) && a.homeX !== null ? Number(a.homeX) : Number(a.x), state: plain(a.state) || {} }));
   // Ticket 99: the owner's placed Magic Sticks, so a visitor draws the animals' walks where the owner does.

@@ -52,7 +52,7 @@ import {
   ensureAnimalState,
   listAnimalFeedOptions,
   feedAnimal,
-} from './js/animals.js?v=191c70c4';
+} from './js/animals.js?v=e01d2a8a';
 import {
   quoteAnimalKinship,
   performAnimalKinship,
@@ -80,7 +80,7 @@ import {
   namingVerbs,
   queuePlops,
   startIncubation,
-} from './js/animal-husbandry.js?v=6d330f7b';
+} from './js/animal-husbandry.js?v=2d933bd6';
 import { loseEnergy, metabolicGain, moodMax } from './js/metabolics.js?v=8504134e';
 import { SET_FREE, setFreeVerbState } from './js/animal-set-free.js?v=3b194fca';
 import { BUTTER_UP, SING_TO, butterUpVerbState, butterUpChicken, singToVerbState, singToButterfly } from './js/animal-flattery.js?v=63001f58';

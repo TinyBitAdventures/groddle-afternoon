@@ -44,7 +44,7 @@ import { isSymphoniousTsid } from './symphonious-maximus.js?v=345ad437';
 import { isMissingFloorTsid } from './hidden-floors.js?v=eb220641';
 import { stationByTsid } from './subway.js?v=44d1a09f';
 import { ensurePiggyMood, piggyTwiceDailyTick, satePiggy } from './animal-mood.js?v=a49495fc';
-import { isCrowdSad } from './animal-crowding.js?v=e8d3ce7c';
+import { isCrowdSad } from './animal-crowding.js?v=78ad8fa9';
 import { ecologyForStreet } from './street-ecology.js?v=08076876';
 import { filterText } from './word-filter.js?v=9a7a7ebb';
 

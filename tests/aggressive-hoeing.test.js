@@ -12,7 +12,7 @@ import { AGGRESSIVE_HOEING_VERBS, aggressiveHoeingVerb, clearPlot, createGarden,
 import { plotVerbs, resolveTendPackage } from '../public/js/patches.js?v=3103cc6a';
 import { createToolConditionState, setToolRemaining, getToolCondition } from '../public/js/tools.js?v=5f482998';
 import { createInventory } from '../public/js/inventory.js?v=60dfc9ca';
-import { getVerbsFor, runVerb } from '../public/content.js?v=bb61dce0';
+import { getVerbsFor, runVerb } from '../public/content.js?v=396e6ee3';
 import { normalizePlayerSnapshot } from '../public/js/player-save.js?v=c4512f77';
 import { aggressiveHoeingFeature as feature } from '../public/js/features/aggressive-hoeing-feature.js?v=fe50f90a';
 
