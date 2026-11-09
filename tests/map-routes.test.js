@@ -42,7 +42,7 @@ import { SUBWAY_STREETS } from '../public/js/quest-rooms/back-alley.js?v=edf9527
 import { doorRooms, doorToward, routeGraph } from '../public/js/map-routes.js?v=c7e7dc80';
 import { afterStreetCard, runStreetTransition, streetCardUp } from '../public/js/screen-fx.js?v=b4ec277f';
 import { EMITTED_EVENTS } from '../public/js/quest-offers.js?v=a304c912';
-import { smugglingFeature } from '../public/js/features/smuggling-feature.js?v=fd0e1e68';
+import { smugglingFeature } from '../public/js/features/smuggling-feature.js?v=27c24363';
 import { addItem } from '../public/js/inventory.js?v=b7609342';
 import { resurrect } from '../public/js/hell.js?v=ca971c34';
 

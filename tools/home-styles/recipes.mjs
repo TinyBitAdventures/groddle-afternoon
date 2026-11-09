@@ -901,6 +901,258 @@ export const RECIPES = {
   },
 };
 
+// ---------------------------------------------------------- Yards from their own snaps
+// A player's 39 labelled back-yard snaps of 2012-05-21 (Glitch E, research/hunts/2026-11-07-juju-and-styles/
+// raw/glitch-e-yards; reference only, never shipped) show what many yards really looked like, and some differ
+// from their paired street. The yards furthest from their snap have their own composition here, from CC0 decos
+// only (the same Tiny Speck pieces the streets use), laid out from the picture. A yard is a tall location and
+// the remake's camera shows much less sky over the house's yard (about 460 px at Wide, 240 at Original), so the
+// sky's floating pieces sit lower than in the snaps.
+
+/**
+ * A walking bottletree (the snaps' Firebog giants): a body on a set of root legs, its treetop on the rim. The
+ * pieces share x (no jitter) so they stay together; `y` is the feet.
+ */
+const walker = (scale, y, every, offset, extra = {}) => {
+  const bodyY = Math.round(y - 604 * scale * 0.45);
+  return [
+    item('legs_back_set1', scale * 1.1, Math.round(y - 4), every, 0, offset, extra),
+    item(BOTTLETREES, scale, bodyY, every, 0, offset, extra),
+    item('treetop_noflowers_1', scale * 0.8, Math.round(bodyY - 1314 * scale * 0.93), every, 0, offset, extra),
+    item('legs_front_set', scale, y, every, 0, offset, extra),
+  ];
+};
+
+/** Night Lights (snap 12874): a starry Uralia night under red and green sky bands, floating islands, glowing mushroom trees. */
+const NIGHT_LIGHTS_YARD = {
+  sky: [0x2e1f2e, 0x1f192c, 0x2a2344],
+  field: 0x266b94,
+  fieldDark: 0x1e5676,
+  soil: null,
+  soilColor: 0x1a3046,
+  stars: { count: 130, color: 0xf2dcff, maxY: 480 },
+  layers: [
+    // the snap's red and green bands across the top of the sky
+    { f: 0.02, items: [item('newxp_haze_oval_1', 1.2, 230, 1500, 200, 0, { tint: 0xc0505a, alpha: 0.38 }), item('newxp_haze_oval_1', 1.1, 270, 1500, 200, 760, { tint: 0x48a888, alpha: 0.32 })] },
+    { f: 0.06, items: [item(['bck_hill_6', 'bck_hill_11', 'bck_hill_1'], 0.24, 574, 300, 120, 0, { tint: 0xa880b8 })] },
+    { band: { y: 576, h: 12, color: 0xb8d8f0, alpha: 0.85 }, f: 0.1 },
+    {
+      f: 0.1,
+      items: [
+        item('flying_platform_2', 0.24, 420, 1100, 220, 140, { tint: 0x8cb8e8 }),
+        item('flying_platform_3', 0.32, 386, 1100, 160, 700, { tint: 0x8cb8e8 }),
+      ],
+    },
+    { f: 0.16, items: [item('flying_platform_5', 0.42, 470, 1300, 260, 420, { tint: 0x9cc4f0 })] },
+    {
+      f: 0.35,
+      items: [
+        item('tree_9_part1', 0.42, 586, 1000, 200, 60, { tint: 0x9cb0e0 }),
+        item('zutto_tree_2', 0.5, 584, 900, 220, 380, { tint: 0xb8a8e8 }),
+        item('zutto_platform_3', 0.42, 588, 700, 200, 220, { tint: 0x88c8b0 }),
+        item('tree_6', 0.6, 588, 1200, 240, 820, { tint: 0x90d0e0 }),
+      ],
+    },
+    {
+      f: 0.55,
+      items: [
+        item('light_spot', 0.22, 640, 520, 200, 300, { tint: 0xff5a5a, alpha: 0.5 }),
+        item(['tree_14', 'tree_15'], 0.5, 598, 900, 260, 500, { tint: 0xf0b8c8 }),
+        item('light_spot', 0.2, 640, 900, 260, 760, { tint: 0x58e8e0, alpha: 0.5 }),
+        item('zutto_platform_1', 0.34, 600, 1100, 300, 100, { tint: 0x9ab8e8 }),
+      ],
+    },
+  ],
+  near: [
+    { s: 'plant_fern_2', scale: 0.55, every: 300, jitter: 120, tint: 0x5aa8c8 },
+    { s: 'zutto_plant_3', scale: 0.5, every: 560, jitter: 200, offset: 160, tint: 0x60b8c0 },
+    { s: 'purple_mushroom_3', scale: 0.36, every: 700, jitter: 220, offset: 380 },
+  ],
+  nearTint: 0xa8c0e8,
+  trim: URALIA_TRIM,
+};
+
+/** Wistful Tangle (snap 12961): a lilac-to-blue sky with white clouds, jade spires, floating islands and big Uralia trees. */
+const WISTFUL_TANGLE_YARD = {
+  sky: [0xd8c0eb, 0xbec4eb, 0xa1c8eb],
+  field: 0x3e9a9d,
+  fieldDark: 0x2f8084,
+  soil: null,
+  soilColor: 0x2f5a62,
+  layers: [
+    { f: 0.03, items: [item(['cloud_fluffy_1', 'cloud_fluffy_2'], 0.5, 260, 760, 260, 100, { alpha: 0.9 })] },
+    { f: 0.06, items: [item(['bck_hill_9', 'bck_hill_10'], 0.36, 572, 700, 200, 0, { tint: 0xd0f0e4 })] },
+    { f: 0.1, items: [item(['bck_rock_22', 'bck_rocks_1', 'bck_rock_11'], 0.5, 574, 620, 220, 200)] },
+    {
+      f: 0.16,
+      items: [
+        item('flying_platform_2', 0.26, 460, 1200, 200, 520),
+        item('flying_platform_4', 0.42, 440, 1200, 200, 1080),
+        item(['bck_rock_11', 'bck_rocks_1'], 0.32, 580, 520, 200, 0),
+      ],
+    },
+    {
+      f: 0.32,
+      items: [
+        item('tree_13', 0.5, 586, 900, 200, 0),
+        item('tree_10', 0.56, 586, 900, 200, 300),
+        item('tree_12', 0.56, 586, 900, 200, 600),
+      ],
+    },
+    {
+      f: 0.55,
+      items: [
+        item('tree_11', 0.62, 598, 1100, 220, 140),
+        item('zutto_tree_3', 0.4, 598, 1100, 260, 520),
+        item('tree_14', 0.42, 600, 1100, 260, 860),
+        item('zutto_platform_3', 0.4, 600, 1400, 300, 1000),
+      ],
+    },
+  ],
+  near: [
+    { s: 'plant_grass_2', scale: 0.6, every: 220, jitter: 90, tint: 0x3a6a70 },
+    { s: 'purple_mushroom_3', scale: 0.32, every: 520, jitter: 200, offset: 200 },
+    { s: 'mushroom_amanita_1', scale: 0.2, every: 640, jitter: 200, offset: 60 },
+  ],
+  trim: URALIA_TRIM,
+};
+
+/** Waggish Wander (snap 12963): snow falling from a deep teal sky, a crescent moon, mist, snowy floating islands and trees. */
+const WAGGISH_WANDER_YARD = {
+  sky: [0x1282a8, 0x53a4bf, 0xb9d9cc],
+  field: 0xa9dfe1,
+  fieldDark: 0x8cc6cc,
+  soil: null,
+  soilColor: 0x5a8a94,
+  stars: { count: 110, color: 0xffffff, maxY: 560 },
+  layers: [
+    { f: 0.02, items: [item('moon', 0.22, 300, 2400, 0, 560, { noFlip: true, tint: 0xe0f0f0 })] },
+    { f: 0.06, items: [item(['bck_hill_4', 'bck_hill_5', 'bck_hill_12', 'bck_hill_8'], 0.34, 574, 330, 140, 0, { tint: 0xe4f4ec })] },
+    { f: 0.1, items: [item('newxp_haze_oval_1', 1.1, 590, 640, 200, 0, { tint: 0xffffff, alpha: 0.7 })] },
+    {
+      f: 0.14,
+      items: [
+        item('flying_platform_6', 0.26, 420, 1300, 200, 980),
+        item('flying_platform_5', 0.34, 440, 1300, 200, 300, { tint: 0xf0e8f8 }),
+      ],
+    },
+    {
+      f: 0.3,
+      items: [
+        item('tree_8', 0.34, 588, 1000, 200, 520, { tint: 0xe8e0f0 }),
+        item('zutto_platform_1', 0.36, 588, 1000, 200, 160),
+        item('tree_12', 0.5, 588, 1000, 200, 820, { tint: 0xe0e8f0 }),
+      ],
+    },
+    { f: 0.4, items: [item('newxp_haze_oval_1', 1, 600, 760, 200, 300, { tint: 0xffffff, alpha: 0.55 })] },
+    {
+      f: 0.55,
+      items: [
+        item('tree_11', 0.5, 600, 1100, 220, 0),
+        item(['tree_14', 'tree_15'], 0.46, 600, 1100, 260, 440),
+        item('zutto_platform_3', 0.4, 600, 1100, 260, 760, { tint: 0xd8f0e0 }),
+      ],
+    },
+  ],
+  near: [
+    { s: 'plant_grass_2', scale: 0.6, every: 240, jitter: 90, tint: 0x5a8a94 },
+    { s: 'zutto_plant_3', scale: 0.4, every: 600, jitter: 200, offset: 200, tint: 0x80b8c0 },
+    { s: 'mushroom_amanita_1', scale: 0.18, every: 760, jitter: 200, offset: 420 },
+  ],
+  trim: ['purple_mushroom_3', 'snow_bush_01a_al1', 'plant_fern_2'],
+};
+
+/** Arid Boglands (snap 12968): an olive sky, pale bottletree domes far off, giant walking bottletrees and baskets of dry plants. */
+const ARID_BOGLANDS_YARD = {
+  sky: [0x4b4505, 0x636220, 0x7c833d],
+  field: 0x4c3b2a,
+  fieldDark: 0x3c2e20,
+  soil: null,
+  soilColor: 0x3a2a1c,
+  layers: [
+    { f: 0.03, items: [item('clouds5', 0.9, 380, 700, 260, 0, { tint: 0x4a4410, alpha: 0.6 })] },
+    // the pale striped domes far off
+    { f: 0.07, items: [item(['bck_hill_14', 'bck_hill_2'], 0.3, 568, 420, 140, 100, { tint: 0xe8d898 })] },
+    { f: 0.14, items: [item(['background_bottletree_1', 'background_bottletree_2'], 0.9, 574, 420, 160, 0, { tint: 0x3a3418 })] },
+    { band: { y: 574, h: 14, color: 0x5a5a3a, alpha: 0.7 }, f: 0.16 },
+    { f: 0.32, items: [...walker(0.15, 590, 900, 820, { tint: 0xc8bc98 })] },
+    { f: 0.55, items: [...walker(0.26, 606, 1300, 380), item('sprout', 0.34, 602, 700, 240, 760)] },
+  ],
+  near: [
+    { s: 'grass_solid', scale: 0.6, every: 300, jitter: 120, tint: 0xb8b090 },
+    { s: 'sprout', scale: 0.24, every: 760, jitter: 220, offset: 260 },
+  ],
+  trim: ['sprout', 'grass_solid', 'underground_plant_1'],
+};
+
+/** Faithful Fen (snap 12876): black over a teal sky, mist bands, a bottletree skyline, squat door trees and one giant. */
+const FAITHFUL_FEN_YARD = {
+  sky: [0x000000, 0x466a78, 0x677f87],
+  field: 0x4a3929,
+  fieldDark: 0x3a2d20,
+  soil: null,
+  soilColor: 0x34281c,
+  layers: [
+    { f: 0.03, items: [item('clouds_bg_middle_01a_newxp', 0.6, 470, 900, 300, 0, { tint: 0x8aa4b0, alpha: 0.55 })] },
+    { f: 0.07, items: [item('background_horizon_bottletrees_1', 0.6, 568, 1100, 0, 0, { tint: 0x101416 })] },
+    { f: 0.1, items: [item('clouds_bg_middle_01a_newxp', 0.5, 556, 700, 200, 300, { tint: 0x9ab4c0, alpha: 0.5 })] },
+    { f: 0.22, items: [item(['background_bottletree_face', 'background_bottletree_hut', 'background_bottletree_barred'], 0.3, 584, 440, 140, 60, { tint: 0x8a7058 })] },
+    { f: 0.45, items: [...walker(0.24, 600, 1300, 760), item('firebean_1', 0.5, 600, 800, 240, 300)] },
+  ],
+  near: [
+    { s: 'grass_solid', scale: 0.6, every: 260, jitter: 100, tint: 0xa0a868 },
+    { s: 'firebean_2', scale: 0.32, every: 620, jitter: 220, offset: 200 },
+    { s: 'flower_bush_7', scale: 0.4, every: 900, jitter: 260, offset: 520, tint: 0xd8c840 },
+  ],
+  trim: ['firebean_1', 'grass_solid', 'underground_plant_1'],
+};
+
+/** Dusty Barrens (snaps 12882, 12883): giant acacias whose crowns spread over the top, a canyon behind, sand paths and bushes. */
+const DUSTY_BARRENS_YARD = {
+  sky: [0x9fb4a9, 0xb4b89c, 0xc8c4a0],
+  field: 0x826a42,
+  fieldDark: 0x644f26,
+  soil: null,
+  soilColor: 0x5a4424,
+  layers: [
+    { f: 0.03, items: [item('clouds_bg_middle_01a_newxp', 0.5, 300, 1000, 300, 0, { tint: 0x707878, alpha: 0.5 })] },
+    { f: 0.07, items: [item(['cliff_cover_3', 'cliff_cover_5'], 0.18, 568, 300, 100, 0, { tint: 0xb4aa94 })] },
+    { f: 0.14, items: [item(ACACIAS, 0.1, 574, 600, 200, 300, { tint: 0x7a7a5a }), item('alakol_cliff_1', 0.35, 580, 900, 200, 600, { tint: 0xc0b49c })] },
+    { f: 0.3, items: [item(ACACIAS, 0.22, 590, 800, 240, 200, { tint: 0xc8c0a0 }), item('heights_bush_1', 0.4, 588, 520, 200, 100)] },
+    { f: 0.6, items: [item(ACACIAS, 0.62, 610, 1100, 120, 640), item('pampas_2', 0.42, 602, 640, 200, 100)] },
+  ],
+  near: [
+    { s: 'flower_bush_7', scale: 0.4, every: 360, jitter: 140 },
+    { s: 'pampas_1', scale: 0.36, every: 520, jitter: 180, offset: 160 },
+    { s: 'heights_bush_1', scale: 0.32, every: 700, jitter: 220, offset: 340 },
+  ],
+  trim: SAVANNA_TRIM,
+};
+
+/** Torrid Cove (snaps 12885, 12886): a cave mouth over the savanna, stalactites hanging from its roof, a grassy cliff, an acacia and rock spires. */
+const TORRID_COVE_YARD = {
+  sky: [0x9db4ae, 0xabb393, 0xbab177],
+  field: 0x5f461a,
+  fieldDark: 0x4a3612,
+  soil: null,
+  soilColor: 0x3e2c10,
+  layers: [
+    { f: 0.04, items: [item('land_l4_mesa_1', 0.24, 568, 900, 300, 0, { tint: 0x6a6a78 }), item(ACACIAS, 0.08, 572, 700, 260, 400, { tint: 0x6a6a5a })] },
+    { f: 0.12, items: [item('stalagmite_2', 0.5, 584, 620, 200, 260, { tint: 0x5a4430 })] },
+    { f: 0.3, items: [item(ACACIAS, 0.3, 592, 1100, 260, 500), item('stalagmite_2', 0.62, 592, 1100, 260, 900, { tint: 0x6a5038 })] },
+    { f: 0.45, items: [item('heights_face_1', 0.3, 598, 1500, 100, 170, { tint: 0x7a6040 }), item('heights_bush_1', 0.5, 470, 1500, 60, 120)] },
+    // stalactites hang from the cave roof across the top
+    { f: 0.55, items: [item('stalagmite_2', 0.52, -30, 300, 120, 0, { flipY: true, tint: 0x4a3420 })] },
+    { f: 0.7, items: [item('stalagmite_2', 0.6, -60, 520, 200, 160, { flipY: true, tint: 0x3a2818 })] },
+  ],
+  near: [
+    { s: 'heights_bush_1', scale: 0.34, every: 420, jitter: 160 },
+    { s: 'pampas_2', scale: 0.36, every: 600, jitter: 200, offset: 200 },
+  ],
+  nearTint: 0xa8a070,
+  trim: SAVANNA_TRIM,
+};
+
 /**
  * The purchase looks (js/homes.js HOME_STYLES, picked in the tutorial or at the
  * Home Street Selection Machine) start on the source's tutorial styles (G263):
@@ -952,10 +1204,10 @@ export const PURCHASE_YARD_STYLE = {
 export const YARD_LOOKS = {
   aranna_int_1_hor_high: 'aranna_ext_1_high',
   basic: 'basic',
-  firebog_1_hor_high: 'firebog_1_high',
-  firebog_int_1b_hor_high: 'uralia_2a_high',
+  firebog_1_hor_high: { lookOf: 'firebog_1_high', ref: 'snap 12968 "Arid Boglands backyard style" (2012-05-21, 3000x1516)', look: ARID_BOGLANDS_YARD },
+  firebog_int_1b_hor_high: { lookOf: 'uralia_2a_high', ref: 'snap 12874 "Night Lights backyard style" (2012-05-21, 3000x1516)', look: NIGHT_LIGHTS_YARD },
   firebog_int_1b__high: 'firebog_1b_high',
-  firebog_int_2__high: 'firebog_2_high',
+  firebog_int_2__high: { lookOf: 'firebog_2_high', ref: 'snap 12876 "Faithful Fen backyard style" (2012-05-21, 3000x1516)', look: FAITHFUL_FEN_YARD },
   firebog_int_3_hor_high: 'firebog_3_high',
   firebog_int_4_hor_high: 'firebog_4a_high',
   firebog_int_4__high: 'firebog_4_high',
@@ -969,9 +1221,9 @@ export const YARD_LOOKS = {
   forest_sunset_int_1_hor_high: 'forest_sunset_ext_1_high',
   heights_1__high: 'heights_1_high',
   highlands_1_hor_high: 'highlands_1_high',
-  kajuu_1__high: 'kajuu_1_high',
+  kajuu_1__high: { lookOf: 'kajuu_1_high', ref: 'snaps 12883 and 12882 "Dusty Barrens backyard style", left and right side (2012-05-21, 3000x1516)', look: DUSTY_BARRENS_YARD },
   kajuu_2__high: 'kajuu_2_high',
-  kajuu_int_3_hor_high: 'kajuu_3_high',
+  kajuu_int_3_hor_high: { lookOf: 'kajuu_3_high', ref: 'snaps 12886 and 12885 "Torrid Cove backyard style", left and right side (2012-05-21, 3000x1516)', look: TORRID_COVE_YARD },
   meadows_1__high: 'meadows_1_high',
   meadows_2__high: 'meadows_2_high',
   meadows_3__high: 'meadows_3_high',
@@ -1024,9 +1276,9 @@ export const YARD_LOOKS = {
   pol_int_crimson_hor_high: '_crimson_forest_high',
   pol_int_mordor_high: { missing: 'No street style shares its template family (mordor), and its own template was never archived.' },
   savannah_int_1__high: 'savannah_ext_1_high',
-  uralia_1_hor_high: 'uralia_1_high',
+  uralia_1_hor_high: { lookOf: 'uralia_1_high', ref: 'snap 12961 "Wistful Tangle backyard style" (2012-05-21, 3000x1516)', look: WISTFUL_TANGLE_YARD },
   uralia_int_2_hor_high: 'uralia_2_high',
-  uralia_int_3__high: 'uralia_3_high',
+  uralia_int_3__high: { lookOf: 'uralia_3_high', ref: 'snap 12963 "Waggish Wander backyard style" (2012-05-21, 3000x1516)', look: WAGGISH_WANDER_YARD },
   _moon__high: '_moon_high',
   _rook__high: '_rook_high',
   _ruin__high: '_ruin_high',

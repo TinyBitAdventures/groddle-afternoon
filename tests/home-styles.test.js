@@ -32,7 +32,7 @@ import {
   styleChoices,
   styleSwitchCost,
   switchStreetStyle,
-} from '../public/js/home-styles.js?v=078d55de';
+} from '../public/js/home-styles.js?v=ce82215f';
 import { HOME_STYLES } from '../public/js/homes.js?v=631ab6b8';
 import { templateNames, templatePair } from '../tools/home-styles/build.mjs';
 
@@ -224,8 +224,9 @@ describe('composed styles (tools/home-styles/build.mjs)', () => {
     const names = new Set(row.look.layers.flatMap((l) => (l.items || []).flatMap((it) => [it.s, ...(it.alts || []).map((a) => a.s)])));
     for (const want of ['tree_deciduous1', 'light_shafts_blue', 'tree_dead_2', 'corey3_shroom_aqua1', 'tree_plane_foliage_01a_g1']) assert.ok(names.has(want), want);
     assert.ok(row.look.near.some((it) => it.s === 'plant_fern_1'), 'fiddleheads in front');
-    // Only this yard and Anemone Alley have pictures of their own; Plush Pasture, which shares the key's spelling, still draws Heartfelt Heath.
-    assert.deepEqual(INTERIOR_STYLES.filter((r) => r.look).map((r) => r.key).sort(), ['_triney__high', 'pol_int_coral_hor_high']);
+    // The yards with pictures of their own (this one, Anemone Alley and the lane yards' seven, next test); Plush Pasture,
+    // which shares the key's spelling, still draws Heartfelt Heath.
+    assert.equal(YARD_STYLE_BY_KEY.meadows_int_default__high.look, undefined);
     assert.equal(INTERIOR_STYLES.filter((r) => r.borrowed).length, 0);
     assert.equal(YARD_STYLE_BY_KEY.meadows_int_default__high.lookOf, 'meadow_ext_default_high');
     assert.equal(YARD_STYLE_BY_KEY.meadows_int_default__high.label, 'Plush Pasture');
@@ -239,6 +240,42 @@ describe('composed styles (tools/home-styles/build.mjs)', () => {
     assert.equal(state.yardStyle, '_triney__high');
     assert.equal(pc.imagination, 200);
     assert.equal(yardStyleFor('_triney__high'), '_triney__high', 'a saved choice stands');
+  });
+
+  it('draws the seven yards furthest from their 2012 snaps from those snaps, in CC0 decos (G223, lane yards)', () => {
+    // Glitch E's labelled back-yard snaps of 2012-05-21 (reference only): the yard, its snap, and pieces it must show.
+    const want = {
+      firebog_int_1b_hor_high: ['Night Lights', /snap 12874/, ['flying_platform_2', 'tree_14', 'zutto_platform_3', 'newxp_haze_oval_1']],
+      uralia_1_hor_high: ['Wistful Tangle', /snap 12961/, ['bck_rock_22', 'flying_platform_2', 'tree_11', 'tree_10']],
+      uralia_int_3__high: ['Waggish Wander', /snap 12963/, ['moon', 'flying_platform_6', 'tree_8', 'zutto_platform_1']],
+      firebog_1_hor_high: ['Arid Boglands', /snap 12968/, ['legs_front_set', 'bottletree_body2', 'treetop_noflowers_1', 'sprout']],
+      firebog_int_2__high: ['Faithful Fen', /snap 12876/, ['background_horizon_bottletrees_1', 'background_bottletree_face', 'legs_front_set', 'firebean_1']],
+      kajuu_1__high: ['Dusty Barrens', /snaps 12883 and 12882/, ['tree_acacia_1', 'cliff_cover_3', 'heights_bush_1']],
+      kajuu_int_3_hor_high: ['Torrid Cove', /snaps 12886 and 12885/, ['stalagmite_2', 'heights_face_1', 'tree_acacia_1']],
+    };
+    const own = INTERIOR_STYLES.filter((r) => r.look).map((r) => r.key).sort();
+    assert.deepEqual(own, [...Object.keys(want), '_triney__high', 'pol_int_coral_hor_high'].sort());
+    for (const [key, [label, ref, pieces]] of Object.entries(want)) {
+      const row = YARD_STYLE_BY_KEY[key];
+      assert.equal(row.label, label);
+      assert.equal(row.built, true, label);
+      assert.match(row.ref, ref, label);
+      assert.deepEqual(yardLook(key), row.look, `${label}: its own composition`);
+      assert.notDeepEqual(yardLook(key), streetLook(row.lookOf), `${label}: no longer its street's look`);
+      const names = new Set(row.look.layers.flatMap((l) => (l.items || []).flatMap((it) => [it.s, ...(it.alts || []).map((a) => a.s)])));
+      for (const piece of pieces) assert.ok(names.has(piece), `${label}: ${piece}`);
+      // Every piece is a shipped CC0 deco (build.mjs refuses one that is not). Hanging pieces start at y + YARD_LIFT (60) and must
+      // reach below world y 340, past the top of the yard the camera shows at Original zoom (world 312 on a 760 px window).
+      for (const it of row.look.layers.flatMap((l) => l.items || [])) {
+        if (it.flipY) assert.ok(it.y + 60 + it.h * it.scale > 340, `${label}: ${it.s} hangs into view`);
+      }
+    }
+    // The walking bottletrees keep their legs, body and treetop together (no jitter on any part).
+    for (const key of ['firebog_1_hor_high', 'firebog_int_2__high']) {
+      const parts = YARD_STYLE_BY_KEY[key].look.layers.flatMap((l) => l.items || []).filter((it) => /^(legs_|bottletree_body|treetop_)/.test(it.s));
+      assert.ok(parts.length >= 4);
+      for (const it of parts) assert.equal(it.jitter, 0, `${key}: ${it.s}`);
+    }
   });
 
   it('pairs every yard with its street by the template streets\' names, not the style keys (G223)', () => {
