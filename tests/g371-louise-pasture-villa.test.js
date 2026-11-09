@@ -11,7 +11,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { assertStreetGeometry, platformYAt } from '../public/js/street-model.js?v=b6cb6a4e';
 import { arrivalInTarget } from '../public/js/location-navigation.js?v=90fca5cc';
-import { checkDoorEntry, doorAt, doorDestination } from '../public/js/doors.js?v=c5083537';
+import { checkDoorEntry, doorAt, doorDestination } from '../public/js/doors.js?v=727d0e0b';
 import {
   LOUISE_PASTURE_DOOR,
   LOUISE_PASTURE_ENTRY,

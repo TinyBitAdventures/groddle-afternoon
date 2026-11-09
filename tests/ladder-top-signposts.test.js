@@ -20,7 +20,7 @@ import {
 } from '../public/js/ladder-top-signposts.js?v=046013b4';
 import { navigableSignposts, signpostNear, wallsScreen, worldToScreen } from '../public/js/street-model.js?v=b6cb6a4e';
 import { planSignpostTravel } from '../public/js/travel.js?v=7fd6e363';
-import { visibleDoors } from '../public/js/doors.js?v=c5083537';
+import { visibleDoors } from '../public/js/doors.js?v=727d0e0b';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const streets = join(spike, 'public/assets/streets');

@@ -31,7 +31,7 @@ import {
   signpostToward,
 } from '../public/js/map-routes.js?v=c7e7dc80';
 import { mapRoutesFeature } from '../public/js/features/map-routes-feature.js?v=7bf3ae78';
-import { hellTicketsFeature } from '../public/js/features/hell-tickets-feature.js?v=cdd35020';
+import { hellTicketsFeature } from '../public/js/features/hell-tickets-feature.js?v=6d95fbe2';
 import { hellFeature } from '../public/js/features/hell-feature.js?v=ba4199c6';
 import { createFeatureHost } from '../public/js/feature-host.js?v=127e0a3c';
 import { applyStreetIndex } from '../public/js/street-loader.js?v=18b181ad';

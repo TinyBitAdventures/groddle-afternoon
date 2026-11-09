@@ -30,7 +30,7 @@ import {
 } from '../public/js/small-items.js?v=78d0056a';
 import { smallItemsFeature } from '../public/js/features/small-items-feature.js?v=d7514730';
 import { streetFurnitureFeature } from '../public/js/features/street-furniture-feature.js?v=da5dfb0c';
-import { FEATURES } from '../public/js/features/index.js?v=1ea83ab1';
+import { FEATURES } from '../public/js/features/index.js?v=99b6b5f8';
 import { countItem } from '../public/js/inventory.js?v=60dfc9ca';
 import { pickWoodTool, quoteWoodTreeHarvest, harvestWoodTree, woodToolLabel } from '../public/js/woodcutting.js?v=9a2039d1';
 import { TOOL_CONDITION_CATALOG, createToolConditionState, getToolCondition, setToolRemaining } from '../public/js/tools.js?v=5f482998';

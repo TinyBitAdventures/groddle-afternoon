@@ -12,9 +12,13 @@
  * - players/inc_items.js has_key: key_id N opens door_key_N.
  * - items/door_key_1..12.js labels; keys 1-6 drop from Dust Traps
  *   (catalog_drop_tables.js), key 1 also from Corridor One's key_drop box
- *   once per game day (locations/location.js). Keys 7-10 and 12 had no source: Dust Traps drop
- *   them here by our own design (js/resource-nodes.js dust_trap_rare_keys). Key 11 lies in
- *   Mazza'la Gala (js/party-spaces.js), whose own door it opens.
+ *   once per game day (locations/location.js). Keys 7-10 and 12 did have a source GSJS does not
+ *   show: like keys 1-6 they lay on streets, each street's `spawner` item (items/spawner.js 22-32,
+ *   its settings lost) bringing one back (Level 3 West for 7, Sinig Safes and three more for 8,
+ *   four streets for 9, Kanji Sink and Pannaa Marrim for 10, Bangala Bristles for 12: the fan
+ *   wiki's key table). They lie there again (js/door-key-spawns.js, #157). Dust Traps also drop
+ *   7-10 and 12 by our own design (js/resource-nodes.js dust_trap_rare_keys, G531). Key 11 lies
+ *   in Mazza'la Gala (js/party-spaces.js), whose own door it opens.
  * - client DoorView / LocationRenderer: hidden connects are not drawn; the
  *   hover tip is the destination label plus "Owned by <owner_label>".
  */

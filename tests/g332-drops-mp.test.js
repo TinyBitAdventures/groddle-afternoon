@@ -107,7 +107,8 @@ describe('solo is untouched', () => {
     const game = readFileSync(join(root, 'public/game.js'), 'utf8');
     assert.match(game, /features\.query\('sharedDrop', \{ classTsid, count, x, y, copy: dropCopy \}, engine\)/);
     assert.match(game, /features\.query\('sharedPickup', target, engine, room != null && room < wantCount \? room : wantCount\)/);
-    assert.match(game, /features\.query\('sharedDroppedStacks', droppedStacksTsid\(\), engine\)/);
+    // #157: collected from every feature (the door keys share the street's ground too).
+    assert.match(game, /features\.collect\('sharedDroppedStacks', droppedStacksTsid\(\), engine\)/);
     assert.match(game, /features\.query\('packDragStart', s\.classTsid, event, engine\)/);
     assert.doesNotMatch(game, /from '[^']*drops-mp/, 'game.js imports nothing of it');
   });
