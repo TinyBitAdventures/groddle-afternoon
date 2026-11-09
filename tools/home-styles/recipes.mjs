@@ -1153,6 +1153,353 @@ const TORRID_COVE_YARD = {
   trim: SAVANNA_TRIM,
 };
 
+// ------------------------------------------------- The next yards from their snaps (lane yards2)
+// The same snaps, the next yards by distance: six that need their own landscape (Glaring Muddle, Unkempt Crypt,
+// Silent Orbit, Roaming Rubble, Dark Vista, Perfus Preference), then the ten Groddle forest and meadow yards, whose
+// snaps show a dense pine forest behind tall pines and a flowering meadow where their streets have flat blob hills
+// (pinehills_distant_1, wallpaper_tree_short_1, transition_hill_1). The forest is groddle1.swf's own pine shapes
+// (forestShape_pine, the tree_pineCluster clumps) in front of the far mountains.
+
+/** A dense pine treeline far off (forestShape_pine, 770 px wide), overlapping into one band. */
+const pineBand = (tint, o = {}) => item(['forestShape_pine', 'corey3_forestShape_pine'], 0.5, 574, 300, 90, 0, { tint, ...o });
+/** Pine clumps in front of the band (tree_pineCluster1-4). */
+const pineClumps = (tint, o = {}) => item(['tree_pineCluster1', 'tree_pineCluster4', 'tree_pineCluster2', 'tree_pineCluster3'], 0.62, 582, 190, 80, 60, { tint, ...o });
+/** A row of single pines between the clumps and the tall pines. */
+const pineRow = (tint, o = {}) => item(['tree_coniferous_1', 'tree_coniferous1', 'tree_coniferous_3', 'tree_coniferous_2'], 0.1, 586, 170, 80, 40, { tint, ...o });
+/** The tall pines that stand up out of view in every forest snap. */
+const bigPines = (every, o = {}) => item(TALL_PINES, 0.17, 600, every, 180, 200, o);
+/** Low meadow bushes along the tree line (heights_bush_3, groddle_bush7, bush_3). */
+const meadowBushes = (o = {}) => item(['bush_patch_1', 'bush_3', 'bush_patch_2'], 0.26, 600, 330, 140, 80, o);
+/** The white-flowered bushes dotted over the snaps' meadows. */
+const daisyBushes = (o = {}) => item('flower_bush_7', 0.34, 600, 640, 240, 300, o);
+const snowPeaks = (o = {}) => item('mountain_blue_1', 0.36, 560, 620, 200, 0, o);
+const fluffyClouds = (o = {}) => item(['cloud_fluffy_1', 'cloud_fluffy_2'], 0.6, 470, 900, 300, 100, { alpha: 0.9, ...o });
+const SNAP_MEADOW_NEAR = [
+  { s: 'groddle_grass_2', scale: 0.55, every: 260, jitter: 110 },
+  { s: 'flower_bush_7', scale: 0.26, every: 560, jitter: 200, offset: 180 },
+  { s: 'groddle_fern_1', scale: 0.5, every: 620, jitter: 200, offset: 380 },
+  { s: 'bare_patch_forest', scale: 0.32, every: 900, jitter: 120, offset: 160, below: 6 },
+];
+
+/** A forest yard from its snap: sky, far pieces, the pine band and clumps, tall pines and the meadow's edge. */
+function snapForest({ sky, field, fieldDark, far = [], band, clumps, row, mid = [], tall, edge = [], near = SNAP_MEADOW_NEAR, trim = FOREST_TRIM }) {
+  return {
+    sky,
+    field,
+    fieldDark,
+    soil: 'crosssection_short_3',
+    soilColor: 0x6a4329,
+    layers: [
+      ...far,
+      ...(band ? [{ f: 0.1, items: [band] }] : []),
+      ...(clumps ? [{ f: 0.18, items: [clumps] }] : []),
+      { f: 0.3, items: [...(row ? [row] : []), ...mid] },
+      { f: 0.55, items: tall },
+      { f: 0.75, items: edge },
+    ],
+    near,
+    trim,
+  };
+}
+
+/** Saplings Skip (snaps 12971, 12970): blue sky, white clouds, snowy peaks and brown rock hills over a pine band, tall pines, a flowering meadow. */
+const SAPLINGS_SKIP_YARD = snapForest({
+  sky: [0x4a7cb8, 0x86b2d8, 0xc6dce6],
+  field: 0x627a2c,
+  fieldDark: 0x506424,
+  far: [
+    { f: 0.03, items: [fluffyClouds({ y: 500 })] },
+    { f: 0.05, items: [snowPeaks({ tint: 0xeef4fa })] },
+    { f: 0.08, items: [item('heights_mound_3', 0.26, 570, 700, 260, 300, { tint: 0xc0a090 })] },
+  ],
+  band: pineBand(0x2a4628, { every: 420, jitter: 160 }),
+  clumps: pineClumps(0x46663a, { every: 300, jitter: 140 }),
+  row: pineRow(0x5a7a44, { every: 260 }),
+  tall: [bigPines(620), item('tree_coniferous_2', 0.2, 598, 900, 260, 520)],
+  edge: [meadowBushes(), daisyBushes(), item('heights_mound_3', 0.16, 602, 1300, 300, 900, { tint: 0xb09a8a })],
+});
+
+/** Busy Acre (snaps 12975, 12974): a pale yellow sky, a dark forest behind rows of tall pines, a bare dead tree, stumps and logs. */
+const BUSY_ACRE_YARD = snapForest({
+  sky: [0xe4c98c, 0xe2dcb2, 0xcad6c2],
+  field: 0x5c6c2c,
+  fieldDark: 0x4a5822,
+  far: [{ f: 0.04, items: [item('groddle_mountain_cut1', 0.3, 556, 1200, 200, 500, { tint: 0x9aa6b0 })] }],
+  band: pineBand(0x203620, { every: 260, jitter: 60 }),
+  clumps: pineClumps(0x2a4226, { every: 150, jitter: 60 }),
+  row: item(TALL_PINES, 0.12, 588, 230, 90, 0, { tint: 0x5a6a4c }),
+  mid: [item('heights_tree_bare_2', 0.2, 590, 1300, 300, 700, { tint: 0x8a8a7a })],
+  tall: [bigPines(300, { jitter: 100 })],
+  edge: [meadowBushes({ every: 420 }), item('tree_dead_1', 0.26, 602, 1100, 300, 600), item('treeStump3', 0.3, 602, 900, 260, 200)],
+  near: [...SNAP_MEADOW_NEAR, { s: 'fungus_oyster_01a_et1', scale: 0.16, every: 980, jitter: 260, offset: 700 }],
+});
+
+/** Evergreen Sweep (snaps 12979, 12978): a blue sky, one grey peak, a pine band with gaps, spaced tall pines, logs and rocks. */
+const EVERGREEN_SWEEP_YARD = snapForest({
+  sky: [0x78a4e6, 0xa6c2e4, 0xd6e0e4],
+  field: 0x6a6a2c,
+  fieldDark: 0x585822,
+  far: [{ f: 0.04, items: [item('corey3_mountain_cut2', 0.34, 560, 1400, 300, 600, { tint: 0x8ea2b8 })] }],
+  band: pineBand(0x2e4a2c, { every: 380, jitter: 150 }),
+  clumps: pineClumps(0x3e5e36, { every: 260, jitter: 120 }),
+  row: pineRow(0x50703e),
+  tall: [bigPines(500), item('tree_coniferous2', 0.19, 598, 1100, 260, 700)],
+  edge: [meadowBushes(), item('tree_dead_1', 0.28, 602, 1300, 300, 400), item('heights_mound_3', 0.14, 604, 900, 300, 700, { tint: 0xa09890 })],
+});
+
+/** Mulberry Mark (snaps 12981, 12980): a pink sky with pink mist, pale peaks, a dark forest across the whole yard, tall pines, rocks and roses. */
+const MULBERRY_MARK_YARD = snapForest({
+  sky: [0xe0a2b2, 0xe4aab6, 0xd892a2],
+  field: 0x5e7230,
+  fieldDark: 0x4c5e26,
+  far: [
+    { f: 0.04, items: [snowPeaks({ tint: 0xbcc0dc, scale: 0.26, y: 556, every: 460 })] },
+    { f: 0.07, items: [item('newxp_haze_oval_1', 1.1, 540, 700, 200, 0, { tint: 0xf0b4c4, alpha: 0.6 })] },
+  ],
+  band: pineBand(0x1e3822, { every: 270, jitter: 60 }),
+  clumps: pineClumps(0x284a2a, { every: 170, jitter: 70 }),
+  row: pineRow(0x406a3c, { every: 220 }),
+  tall: [bigPines(560)],
+  edge: [meadowBushes(), item('heights_mound_3', 0.2, 602, 1000, 300, 500, { tint: 0x9a8c8a }), item('tree_dead_1', 0.26, 602, 1500, 300, 1100), item('flower_bush_1', 0.26, 602, 900, 260, 200)],
+});
+
+/** Tip Top Trinket (snaps 13022, 13021): a bright blue sky, clouds, pale blue peaks in mist, a brown rock ridge, very tall pines and grey-green bushes. */
+const TIP_TOP_TRINKET_YARD = snapForest({
+  sky: [0x2a92c8, 0x5ab0d0, 0xaad4d0],
+  field: 0x6a8a30,
+  fieldDark: 0x587426,
+  far: [
+    { f: 0.03, items: [fluffyClouds({ y: 480 })] },
+    { f: 0.05, items: [snowPeaks({ tint: 0xc8dcf2 })] },
+    { f: 0.08, items: [item('newxp_haze_oval_1', 1, 566, 600, 200, 0, { tint: 0xffffff, alpha: 0.5 })] },
+    { f: 0.14, items: [item('heights_face_rock_2', 0.32, 584, 220, 60, 0, { tint: 0xb89a88 })] },
+  ],
+  clumps: pineClumps(0x3e6a3a, { every: 420, jitter: 200 }),
+  tall: [bigPines(640, { scale: 0.19 }), item('tree_coniferous_1', 0.2, 598, 1100, 260, 800)],
+  edge: [item(['heights_bush_1', 'heights_bush_2'], 0.4, 600, 380, 160, 100), item('pampas_2', 0.34, 600, 560, 200, 300)],
+  near: [
+    { s: 'heights_bush_2', scale: 0.32, every: 480, jitter: 180 },
+    { s: 'pampas_2', scale: 0.3, every: 560, jitter: 200, offset: 200 },
+    { s: 'groddle_grass_2', scale: 0.55, every: 300, jitter: 120, offset: 80 },
+  ],
+});
+
+/** Vitric Inlet (snap 12880): a pale sky, white peaks over a still lake, pine clusters along the shore, tall pines, rocks and a log. */
+const VITRIC_INLET_YARD = snapForest({
+  sky: [0xd2eef8, 0xb0cce0, 0x90b0c8],
+  field: 0x5c7a28,
+  fieldDark: 0x4a6420,
+  far: [
+    { f: 0.04, items: [snowPeaks({ tint: 0xf2f6fa, y: 548 })] },
+    { f: 0.06, items: [pineBand(0x34503c, { scale: 0.34, y: 552, every: 520, jitter: 220 })] },
+    // the still inlet in front of the far shore
+    { band: { y: 550, h: 30, color: 0xbccad2, alpha: 1 }, f: 0.08 },
+    { f: 0.08, items: [item('water_ripple_double_1', 0.6, 566, 300, 120, 0, { tint: 0xe8f0f4, alpha: 0.7 })] },
+  ],
+  clumps: pineClumps(0x2e4c34, { every: 340, jitter: 160 }),
+  row: pineRow(0x4a6a40),
+  tall: [bigPines(520)],
+  edge: [meadowBushes(), item('heights_mound_3', 0.14, 602, 900, 300, 300, { tint: 0xa08878 }), item('tree_dead_1', 0.26, 602, 1300, 300, 800)],
+});
+
+/** Olsen Rose (snap 12881): a lilac sky, a small grey peak, a dark forest far off, and an open meadow with one oak and one pine. */
+const OLSEN_ROSE_YARD = snapForest({
+  sky: [0xa898d2, 0xd2c6dc, 0xeadcc8],
+  field: 0x5a7a2c,
+  fieldDark: 0x486422,
+  far: [{ f: 0.04, items: [item('corey3_mountain_cut2', 0.3, 560, 1300, 300, 700, { tint: 0x9aa8bc })] }],
+  band: pineBand(0x3c5a3e, { scale: 0.42, every: 250, jitter: 50, y: 576 }),
+  clumps: pineClumps(0x32502e, { scale: 0.5, every: 150, jitter: 60, y: 584 }),
+  tall: [item('tree_deciduous3', 0.26, 598, 1200, 200, 300), item('tree_coniferous_2', 0.22, 598, 1200, 200, 760)],
+  edge: [item('tree_dead_1', 0.26, 602, 1400, 300, 100), meadowBushes({ every: 520 })],
+});
+
+/** Blossom Thicket (snaps 12959, 12958): blue over a peach sunset, big white peaks, dense tall pines, rocks and wildflowers. */
+const BLOSSOM_THICKET_YARD = snapForest({
+  sky: [0x7a9ae4, 0xd8a4a4, 0xf0aa88],
+  field: 0x5e8030,
+  fieldDark: 0x4c6a26,
+  far: [{ f: 0.04, items: [snowPeaks({ tint: 0xf6f6fa, scale: 0.44, y: 556 })] }],
+  band: pineBand(0x2c4a2c, { every: 360, jitter: 140 }),
+  clumps: pineClumps(0x3a6036, { every: 230, jitter: 100 }),
+  row: pineRow(0x4e7a40, { every: 200 }),
+  tall: [bigPines(380, { scale: 0.16 })],
+  edge: [meadowBushes(), item('heights_mound_3', 0.18, 602, 900, 300, 400, { tint: 0xa89890 })],
+  near: [...SNAP_MEADOW_NEAR, { s: 'flower_bush_3', scale: 0.26, every: 700, jitter: 240, offset: 60 }],
+});
+
+/** Warm Frolic (snap 12965): a yellow-to-pink sky, blue-grey peaks, a big oak, tall pines, a dark forest edge and white flowers. */
+const WARM_FROLIC_YARD = snapForest({
+  sky: [0xf6e060, 0xf2c0a0, 0xeaa2c2],
+  field: 0x58902c,
+  fieldDark: 0x467622,
+  far: [{ f: 0.04, items: [snowPeaks({ tint: 0xb4c2d8, scale: 0.26, y: 562, every: 480 })] }],
+  band: pineBand(0x2a4a28, { every: 440, jitter: 180 }),
+  clumps: pineClumps(0x36602e, { every: 320, jitter: 160 }),
+  tall: [item('tree_deciduous3', 0.3, 598, 1000, 160, 260), bigPines(500, { offset: 620 })],
+  edge: [item('tree_dead_1', 0.26, 602, 1200, 300, 700), daisyBushes({ every: 520 }), meadowBushes({ every: 600 })],
+});
+
+/** Wailing Uplands (snaps 13043, 13042): an overcast blue-grey sky, a far plateau with lakes, oaks, pine clumps and flowering bushes. */
+const WAILING_UPLANDS_YARD = snapForest({
+  sky: [0x7a8c9c, 0x9aaab6, 0xb8c4c8],
+  field: 0x6a8040,
+  fieldDark: 0x586a34,
+  far: [
+    { f: 0.03, items: [fluffyClouds({ y: 480, tint: 0xe8ecf0 })] },
+    { f: 0.04, items: [item('groddle_mountains_cutout', 0.34, 552, 900, 200, 300, { tint: 0xb0bcc6 })] },
+    // the far plateau: flat grassland with grey lakes
+    { f: 0.06, items: [item('evenground_horizon', 0.4, 562, 900, 100, 0, { tint: 0x9aac98 })] },
+    { band: { y: 552, h: 8, color: 0xa4b4be, alpha: 0.9 }, f: 0.07 },
+    { f: 0.08, items: [item('evenground_horizon', 0.34, 572, 700, 200, 300, { tint: 0x8a9c80 })] },
+    { band: { y: 566, h: 6, color: 0xa8b8c0, alpha: 0.9 }, f: 0.09 },
+  ],
+  clumps: pineClumps(0x3e5a3c, { every: 360, jitter: 160 }),
+  row: item(OAKS.slice(0, 2), 0.36, 586, 380, 140, 100, { tint: 0x80946c }),
+  tall: [item('tree_deciduous3', 0.28, 598, 1000, 260, 300), item(OAKS.slice(0, 2), 0.5, 598, 1000, 260, 800)],
+  edge: [daisyBushes({ every: 480 }), meadowBushes({ every: 500 })],
+});
+
+/** Glaring Muddle (snap 12872): a gold sky going red-brown above, streaked clouds, teal domes, walking bottletrees, bent root trunks and potted sprouts. */
+const GLARING_MUDDLE_YARD = {
+  sky: [0x6a3c3c, 0xb27a48, 0xe2b24c],
+  field: 0x4a3a28,
+  fieldDark: 0x3a2d1e,
+  soil: null,
+  soilColor: 0x34281a,
+  layers: [
+    { f: 0.03, items: [item(['clouds3', 'clouds1'], 0.9, 420, 520, 220, 0, { tint: 0x8a5a3c, alpha: 0.55 })] },
+    { f: 0.08, items: [item(['background_bottletree_1', 'background_bottletree_2'], 0.8, 574, 520, 200, 200, { tint: 0x6a5a30 })] },
+    // the teal striped domes behind the bog
+    { f: 0.14, items: [item(['backhill1_green', 'backhill2_green'], 0.5, 582, 300, 100, 0, { tint: 0x70d0e0 })] },
+    { f: 0.3, items: [...walker(0.13, 588, 1100, 900, { tint: 0xd8c098 }), item('legs_moss_4', 0.22, 588, 900, 260, 300, { tint: 0xd8c098 }), item('sprout', 0.22, 588, 600, 200, 100, { tint: 0xd8c098 })] },
+    { f: 0.5, items: [...walker(0.2, 604, 1300, 520), item('legs_moss_1', 0.32, 602, 1300, 200, 80), item('sprout', 0.28, 602, 700, 240, 260)] },
+  ],
+  near: [
+    { s: 'grass_solid', scale: 0.6, every: 260, jitter: 100, tint: 0xa8a070 },
+    { s: 'sprout', scale: 0.22, every: 700, jitter: 240, offset: 300 },
+    { s: 'underground_plant_1', scale: 0.6, every: 520, jitter: 200, offset: 120 },
+  ],
+  trim: ['sprout', 'grass_solid', 'underground_plant_1'],
+};
+
+/** Unkempt Crypt (snap 12877): a dark cave, roots hanging from the roof with their glowing bulbs, walking bottletrees and bent root trunks. */
+const UNKEMPT_CRYPT_YARD = {
+  sky: [0x241e14, 0x2e271a, 0x3a3020],
+  field: 0x3e3224,
+  fieldDark: 0x30261a,
+  soil: null,
+  soilColor: 0x2a2016,
+  layers: [
+    { f: 0.06, items: [item(['background_bottletree_1', 'background_bottletree_2'], 0.8, 574, 520, 200, 0, { tint: 0x3a3020 })] },
+    { f: 0.12, items: [item(['hanging_braches2', 'hanging_braches1'], 0.3, 170, 240, 80, 0, { hang: true, tint: 0x6a4a3a })] },
+    { f: 0.3, items: [...walker(0.15, 590, 1000, 300, { tint: 0xc8a870 }), item('legs_moss_4', 0.24, 590, 1000, 260, 800, { tint: 0xa88a60 })] },
+    { f: 0.5, items: [...walker(0.2, 604, 1300, 760), item('legs_moss_1', 0.34, 604, 1300, 200, 120)] },
+    { f: 0.6, items: [item(['hanging_braches1', 'hanging_braches2'], 0.34, 140, 420, 160, 200, { hang: true, tint: 0x9a7058 })] },
+  ],
+  near: [
+    { s: 'grass_solid', scale: 0.55, every: 300, jitter: 120, tint: 0x8a8060 },
+    { s: 'underground_plant_1', scale: 0.6, every: 560, jitter: 200, offset: 160 },
+    { s: 'mushrooms', scale: 0.3, every: 800, jitter: 260, offset: 420 },
+  ],
+  nearTint: 0xc0a888,
+  trim: ['mushrooms', 'grass_solid', 'underground_plant_1'],
+};
+
+/** Silent Orbit (snaps 13047, 13046): a black starry sky, a pale moon glowing low over the horizon, grey dust with craters and radioactive drums. */
+const SILENT_ORBIT_YARD = {
+  sky: [0x000000, 0x030304, 0x0a0a0c],
+  field: 0xb2b1ac,
+  fieldDark: 0x94938e,
+  soil: null,
+  soilColor: 0x6e6d69,
+  stars: { count: 150, color: 0xffffff, maxY: 600 },
+  layers: [
+    // a pale moon low over the horizon: a white ball (k03_snowball_01) in a soft glow (light_spot)
+    { f: 0.02, items: [item('light_spot', 0.16, 580, 2400, 0, 700, { noFlip: true, tint: 0xffffff, alpha: 0.5 }), item('k03_snowball_01', 0.8, 542, 2400, 0, 700, { noFlip: true, tint: 0xe6e6e2 })] },
+    { band: { y: 580, h: 6, color: 0x2e2e2c, alpha: 1 }, f: 0.1 },
+  ],
+  near: [
+    { s: 'earthdot_grp_2', scale: 1.6, every: 900, jitter: 260, offset: 100, tint: 0x4e4e4a, below: 26 },
+    { s: 'earthdot_grp_4', scale: 0.8, every: 600, jitter: 200, offset: 400, tint: 0x9a9994, alpha: 0.5, below: 30 },
+    { s: 'ra_drum_3', scale: 0.12, every: 1500, jitter: 200, offset: 220, tint: 0xffffff },
+    { s: 'ra_drum_2', scale: 0.14, every: 1500, jitter: 200, offset: 300, tint: 0xffffff },
+    { s: 'radioactive_sign_1', scale: 0.3, every: 1500, jitter: 200, offset: 60, tint: 0xffffff },
+  ],
+  nearTint: 0xc4c3be,
+  trim: ['rock_rubble_01c_al1', 'gravel_2', 'rock_rubble_01f_al1'],
+};
+
+/** Roaming Rubble (snap 12884): a blue savanna sky, grey clouds, a layered canyon cliff, low rock outcrops, far peaks, small pines and big acacias. */
+const ROAMING_RUBBLE_YARD = {
+  sky: [0x5aa4c8, 0x9cc0c6, 0xd2d2b2],
+  field: 0x9a8858,
+  fieldDark: 0x806e44,
+  soil: null,
+  soilColor: 0x6b5232,
+  layers: [
+    { f: 0.03, items: [item(['clouds3', 'clouds1'], 0.8, 470, 700, 260, 200, { tint: 0x6a7480, alpha: 0.5 })] },
+    { f: 0.05, items: [item('groddle_mountains_cutout', 0.32, 562, 900, 200, 0, { tint: 0x8a92a4 })] },
+    { f: 0.1, items: [item('craggyMountain_background_01', 0.2, 584, 1300, 200, 100, { tint: 0xb89a80 }), item(['tree_coniferous_1', 'tree_coniferous_3'], 0.07, 580, 260, 120, 300, { tint: 0x3a5a34 })] },
+    { f: 0.18, items: [item(['cliff_cover_5', 'cliff_cover_3'], 0.12, 586, 210, 80, 100), item(ACACIAS, 0.12, 580, 700, 260, 500, { tint: 0x7a7c60 })] },
+    { f: 0.36, items: [item(ACACIAS, 0.26, 592, 900, 260, 300)] },
+    { f: 0.6, items: [item(ACACIAS, 0.34, 604, 1300, 200, 800), item(['cliff_cover_3', 'heights_face_rock_2'], 0.13, 604, 1000, 300, 200)] },
+  ],
+  near: [
+    { s: 'pampas_2', scale: 0.32, every: 420, jitter: 160 },
+    { s: 'heights_bush_2', scale: 0.28, every: 520, jitter: 200, offset: 160, tint: 0x6a7a4a },
+    { s: 'heights_bush_4', scale: 0.2, every: 700, jitter: 260, offset: 380, tint: 0x8a9a5a },
+  ],
+  trim: SAVANNA_TRIM,
+};
+
+/** Dark Vista (snap 12870): a black-green night, a pale fog light behind the trees, pale rock pillars in the fog, bare trees, vines hanging from above. */
+const DARK_VISTA_YARD = {
+  sky: [0x0a0e0c, 0x161d18, 0x262c26],
+  field: 0x0a0a0a,
+  fieldDark: 0x040404,
+  soil: null,
+  soilColor: 0x080808,
+  layers: [
+    // the pale fog light low behind the trees
+    { f: 0.05, items: [item('groddle_light_pool', 1.7, 616, 600, 200, 100, { tint: 0xfff4c0 })] },
+    { f: 0.07, items: [item(['craggyMountain_background_01', 'craggyMountain_background_02'], 0.14, 580, 420, 160, 100, { tint: 0x9aa090, alpha: 0.55 })] },
+    { f: 0.1, items: [item(SILHOUETTES, 0.1, 580, 90, 50, 0, { tint: 0x323a32, alpha: 0.85 })] },
+    { f: 0.14, items: [item('newxp_haze_oval_1', 1.2, 600, 700, 200, 0, { tint: 0x9a9c94, alpha: 0.3 })] },
+    { f: 0.25, items: [item(SILHOUETTES, 0.15, 590, 260, 120, 60, { tint: 0x161c16 })] },
+    { f: 0.5, items: [item(['tree_02', 'heights_tree_bare_1', 'tree_03'], 0.2, 604, 520, 200, 200, { tint: 0x040504 })] },
+    { f: 0.65, items: [item('hanging_vine_01', 0.32, 20, 900, 260, 300, { hang: true, tint: 0x0c100c })] },
+  ],
+  near: [
+    { s: 'grass_solid', scale: 0.5, every: 240, jitter: 100, tint: 0x141614 },
+    { s: 'underground_plant_1', scale: 0.5, every: 560, jitter: 200, offset: 200, tint: 0x181a18 },
+  ],
+  nearTint: 0x202020,
+  trim: ['grass_solid', 'underground_plant_1', 'grass_solid'],
+};
+
+/** Perfus Preference (snap 12878): a deep green sky, grey cloud streaks, bare trees far off, bottletree huts, walking bottletrees, red-leaved plants, mushrooms. */
+const PERFUS_PREFERENCE_YARD = {
+  sky: [0x063232, 0x214c3c, 0x5c7a58],
+  field: 0x40302a,
+  fieldDark: 0x32251e,
+  soil: null,
+  soilColor: 0x2e221a,
+  layers: [
+    { f: 0.03, items: [item(['clouds3', 'clouds1'], 0.9, 440, 420, 200, 0, { tint: 0x9ab4aa, alpha: 0.55 })] },
+    { f: 0.08, items: [item(['heights_tree_bare_3', 'heights_tree_bare_4', 'background_bottletree_silhouette'], 0.1, 580, 220, 100, 0, { tint: 0x2a3a30 })] },
+    { f: 0.2, items: [item(['background_bottletree_hut', 'background_bottletree_barred'], 0.3, 586, 560, 200, 100, { tint: 0xa09078 })] },
+    { f: 0.35, items: [...bottle(0.15, 592, 1100, 600, 'treetop_noflowers_3', { tint: 0xc0b090 }), item('firebean_1', 0.34, 592, 900, 220, 300)] },
+    { f: 0.55, items: [...walker(0.21, 606, 1300, 380), ...bottle(0.2, 606, 1300, 1000), item('firebean_2', 0.4, 604, 1300, 240, 760)] },
+  ],
+  near: [
+    { s: 'grass_solid', scale: 0.6, every: 240, jitter: 100, tint: 0xa8b078 },
+    { s: 'mushroom_amanita_1', scale: 0.12, every: 560, jitter: 200, offset: 160 },
+    { s: 'firebean_2', scale: 0.26, every: 760, jitter: 240, offset: 420 },
+  ],
+  trim: ['firebean_1', 'grass_solid', 'underground_plant_1'],
+};
+
 /**
  * The purchase looks (js/homes.js HOME_STYLES, picked in the tutorial or at the
  * Home Street Selection Machine) start on the source's tutorial styles (G263):
@@ -1203,28 +1550,28 @@ export const PURCHASE_YARD_STYLE = {
  */
 export const YARD_LOOKS = {
   aranna_int_1_hor_high: 'aranna_ext_1_high',
-  basic: 'basic',
+  basic: { lookOf: 'basic', ref: 'snap 12965 "Warm Frolic backyard style" (2012-05-21, 3000x1516)', look: WARM_FROLIC_YARD },
   firebog_1_hor_high: { lookOf: 'firebog_1_high', ref: 'snap 12968 "Arid Boglands backyard style" (2012-05-21, 3000x1516)', look: ARID_BOGLANDS_YARD },
   firebog_int_1b_hor_high: { lookOf: 'uralia_2a_high', ref: 'snap 12874 "Night Lights backyard style" (2012-05-21, 3000x1516)', look: NIGHT_LIGHTS_YARD },
-  firebog_int_1b__high: 'firebog_1b_high',
+  firebog_int_1b__high: { lookOf: 'firebog_1b_high', ref: 'snap 12872 "Glaring Muddle backyard style" (2012-05-21, 3000x1516)', look: GLARING_MUDDLE_YARD },
   firebog_int_2__high: { lookOf: 'firebog_2_high', ref: 'snap 12876 "Faithful Fen backyard style" (2012-05-21, 3000x1516)', look: FAITHFUL_FEN_YARD },
-  firebog_int_3_hor_high: 'firebog_3_high',
-  firebog_int_4_hor_high: 'firebog_4a_high',
+  firebog_int_3_hor_high: { lookOf: 'firebog_3_high', ref: 'snap 12877 "Unkempt Crypt backyard style" (2012-05-21, 3000x1516)', look: UNKEMPT_CRYPT_YARD },
+  firebog_int_4_hor_high: { lookOf: 'firebog_4a_high', ref: 'snap 12878 "Perfus Preference backyard style" (2012-05-21, 3000x1516)', look: PERFUS_PREFERENCE_YARD },
   firebog_int_4__high: 'firebog_4_high',
-  forest_1_hor_high: 'forest_1_high',
-  forest_2__high: 'forest_2_high',
-  forest_3__high: 'forest_3_high',
-  forest_4__high: 'forest_4_high',
-  forest_5__high: 'forest_5_high',
-  forest_6__high: 'forest_6_high',
+  forest_1_hor_high: { lookOf: 'forest_1_high', ref: 'snaps 12971 and 12970 "Saplings Skip backyard style", left and right side (2012-05-21, 3000x1516)', look: SAPLINGS_SKIP_YARD },
+  forest_2__high: { lookOf: 'forest_2_high', ref: 'snaps 12975 and 12974 "Busy Acre backyard style", left and right side (2012-05-21, 3000x1516)', look: BUSY_ACRE_YARD },
+  forest_3__high: { lookOf: 'forest_3_high', ref: 'snaps 12979 and 12978 "Evergreen Sweep backyard style", left and right side (2012-05-21, 3000x1516)', look: EVERGREEN_SWEEP_YARD },
+  forest_4__high: { lookOf: 'forest_4_high', ref: 'snap 12880 "Vitric Inlet backyard style" (2012-05-21, 3000x1516)', look: VITRIC_INLET_YARD },
+  forest_5__high: { lookOf: 'forest_5_high', ref: 'snaps 12981 and 12980 "Mulberry Mark backyard style", left and right side (2012-05-21, 3000x1516)', look: MULBERRY_MARK_YARD },
+  forest_6__high: { lookOf: 'forest_6_high', ref: 'snap 12881 "Olsen Rose backyard style" (2012-05-21, 3000x1516)', look: OLSEN_ROSE_YARD },
   forest_dusk_int_1_hor_high: 'forest_dusk_ext_1_high',
   forest_sunset_int_1_hor_high: 'forest_sunset_ext_1_high',
-  heights_1__high: 'heights_1_high',
-  highlands_1_hor_high: 'highlands_1_high',
+  heights_1__high: { lookOf: 'heights_1_high', ref: 'snaps 13022 and 13021 "Tip Top Trinket backyard style", left and right side (2012-05-21, 3000x1516)', look: TIP_TOP_TRINKET_YARD },
+  highlands_1_hor_high: { lookOf: 'highlands_1_high', ref: 'snaps 13043 and 13042 "Wailing Uplands backyard style", left and right side (2012-05-21, 3000x1516)', look: WAILING_UPLANDS_YARD },
   kajuu_1__high: { lookOf: 'kajuu_1_high', ref: 'snaps 12883 and 12882 "Dusty Barrens backyard style", left and right side (2012-05-21, 3000x1516)', look: DUSTY_BARRENS_YARD },
-  kajuu_2__high: 'kajuu_2_high',
+  kajuu_2__high: { lookOf: 'kajuu_2_high', ref: 'snap 12884 "Roaming Rubble backyard style" (2012-05-21, 3000x1516)', look: ROAMING_RUBBLE_YARD },
   kajuu_int_3_hor_high: { lookOf: 'kajuu_3_high', ref: 'snaps 12886 and 12885 "Torrid Cove backyard style", left and right side (2012-05-21, 3000x1516)', look: TORRID_COVE_YARD },
-  meadows_1__high: 'meadows_1_high',
+  meadows_1__high: { lookOf: 'meadows_1_high', ref: 'snaps 12959 and 12958 "Blossom Thicket", left and right side (2012-05-21, 3000x1516)', look: BLOSSOM_THICKET_YARD },
   meadows_2__high: 'meadows_2_high',
   meadows_3__high: 'meadows_3_high',
   meadows_int_default__high: 'meadow_ext_default_high',
@@ -1279,8 +1626,8 @@ export const YARD_LOOKS = {
   uralia_1_hor_high: { lookOf: 'uralia_1_high', ref: 'snap 12961 "Wistful Tangle backyard style" (2012-05-21, 3000x1516)', look: WISTFUL_TANGLE_YARD },
   uralia_int_2_hor_high: 'uralia_2_high',
   uralia_int_3__high: { lookOf: 'uralia_3_high', ref: 'snap 12963 "Waggish Wander backyard style" (2012-05-21, 3000x1516)', look: WAGGISH_WANDER_YARD },
-  _moon__high: '_moon_high',
-  _rook__high: '_rook_high',
+  _moon__high: { lookOf: '_moon_high', ref: 'snaps 13047 and 13046 "Silent Orbit backyard style", left and right side (2012-05-21, 3000x1516)', look: SILENT_ORBIT_YARD },
+  _rook__high: { lookOf: '_rook_high', ref: 'snap 12870 "Dark Vista backyard style" (2012-05-21, 3000x1516)', look: DARK_VISTA_YARD },
   _ruin__high: '_ruin_high',
   // The pair's key hid it: Mythical Oak's exterior row is meadows_int_default__high, the same key as
   // interior Plush Pasture (inc_data_homes_prod.js 552, 873). Templates POL_ext_triney_2_high and

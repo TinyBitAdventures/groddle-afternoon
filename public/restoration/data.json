@@ -1019,7 +1019,7 @@
    "group": "home",
    "name": "Your house and yard",
    "status": "source",
-   "blurb": "Get your house and home street free, as in 2012: the Magic Rock hands you a Home Street Ticket and the Home Street Selection Machine takes it for a Meadow, Firebog or Uralia street. Paper it wall by wall with Tiny Speck’s own 109 wallpapers, floors and ceilings, decorate rooms (see Furniture and decorating), cultivate the street (and move its Mailbox, Magic Rock and Mail Dispatcher wherever you like) and the private back yard left of the house (walk out through the house’s open end; worn-out rocks, gardens and patches become protos you restore with a project), expand both (the yard from 5 to 20 segments, which with a full-width street earns Landgrabber), restyle the street as any of the original 37 street styles and the back yard as any of 36 of its 37 (Change Style, level x 10 iMG; each rebuilt from Tiny Speck’s own scenery, a yard drawn like the street its template pairs with, and nine yards, among them Bewitched Backwoods, Night Lights and Wistful Tangle, from players’ pictures of the yards themselves), keep animals. A Butler arrives in a box, stitched part by part from Tiny Speck’s own pieces (choose its head, face, accessory, body, arms and legs), to greet you home, hold what neighbours leave, invite you to join the club and hear about it, and swap daily hi signs with you (press 5; outrun its hi for the evasion badges). Add a second and third floor with a Door (the Furniture Store, or recipe 260): set it on your top floor and put 100 Planks into Build a New Floor.",
+   "blurb": "Get your house and home street free, as in 2012: the Magic Rock hands you a Home Street Ticket and the Home Street Selection Machine takes it for a Meadow, Firebog or Uralia street. Paper it wall by wall with Tiny Speck’s own 109 wallpapers, floors and ceilings, decorate rooms (see Furniture and decorating), cultivate the street (and move its Mailbox, Magic Rock and Mail Dispatcher wherever you like) and the private back yard left of the house (walk out through the house’s open end; worn-out rocks, gardens and patches become protos you restore with a project), expand both (the yard from 5 to 20 segments, which with a full-width street earns Landgrabber), restyle the street as any of the original 37 street styles and the back yard as any of 36 of its 37 (Change Style, level x 10 iMG; each rebuilt from Tiny Speck’s own scenery, a yard drawn like the street its template pairs with, and 25 yards, among them Bewitched Backwoods, Night Lights, Silent Orbit and the pine-forest yards, from players’ pictures of the yards themselves), keep animals. A Butler arrives in a box, stitched part by part from Tiny Speck’s own pieces (choose its head, face, accessory, body, arms and legs), to greet you home, hold what neighbours leave, invite you to join the club and hear about it, and swap daily hi signs with you (press 5; outrun its hi for the evasion badges). Add a second and third floor with a Door (the Furniture Store, or recipe 260): set it on your top floor and put 100 Planks into Build a New Floor.",
    "multiplayer": "Visitors on your home street fill your Magic Rock’s daily iMG, and you collect it there the next game day; your page on the site shows your home street as a diorama drawn from the game’s own art.",
    "spot": "mailbox",
    "evidence": [
@@ -2752,9 +2752,29 @@
   "deployed": "2026-11-09"
  },
  "git": {
-  "commits": 1524,
+  "commits": 1530,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-09",
+    "kind": "fix",
+    "text": "No faint line beside the tutorial pull chain's handle"
+   },
+   {
+    "date": "2026-11-09",
+    "kind": "fix",
+    "text": "\"/\" puts you in the chat while a quest offer is open"
+   },
+   {
+    "date": "2026-11-09",
+    "kind": "improve",
+    "text": "The art tools find Java on their own again"
+   },
+   {
+    "date": "2026-11-09",
+    "kind": "improve",
+    "text": "NPCs, stores, food and items in the original's own words"
+   },
    {
     "date": "2026-11-08",
     "kind": "fix",
@@ -2854,29 +2874,9 @@
     "date": "2026-11-08",
     "kind": "fix",
     "text": "Shrines and vendors no longer stand hidden behind a cave's front rock or a tree trunk"
-   },
-   {
-    "date": "2026-11-08",
-    "kind": "new",
-    "text": "Heli Kitties and Crabs walk in the same place for everyone online"
-   },
-   {
-    "date": "2026-11-08",
-    "kind": "new",
-    "text": "A street Piggy walks to food in the same place for everyone online"
-   },
-   {
-    "date": "2026-11-08",
-    "kind": "new",
-    "text": "Louise Pasture Villa, the apartment hall behind a new door on Louise Pasture"
-   },
-   {
-    "date": "2026-11-08",
-    "kind": "fix",
-    "text": "Six signposts land you where the original did, not at the street's default spot"
    }
   ]
  },
  "tests": 765,
- "generatedAt": "2026-11-08"
+ "generatedAt": "2026-11-09"
 }

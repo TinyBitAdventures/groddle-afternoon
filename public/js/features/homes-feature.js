@@ -233,7 +233,7 @@ import {
   yardLook,
   yardStyleChoices,
   yardStyleFor,
-} from '../home-styles.js?v=ce82215f';
+} from '../home-styles.js?v=3615410c';
 import { frameTexture, isLoaded, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js?v=f024bd6a';
 import { FALLBACK_MAX as WORLD_ART_FALLBACK_MAX, worldArtFor } from '../world-art.js?v=df476660';
 import { oneArmSignpost } from '../street-render.js?v=881d705a';

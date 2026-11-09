@@ -32,7 +32,7 @@ import {
   styleChoices,
   styleSwitchCost,
   switchStreetStyle,
-} from '../public/js/home-styles.js?v=ce82215f';
+} from '../public/js/home-styles.js?v=3615410c';
 import { HOME_STYLES } from '../public/js/homes.js?v=631ab6b8';
 import { templateNames, templatePair } from '../tools/home-styles/build.mjs';
 
@@ -46,6 +46,26 @@ function gsjsStyles() {
   // eslint-disable-next-line no-new-func
   return new Function(`${src}; return { homes_interior_configs, homes_exterior_configs };`)();
 }
+
+/** G223 lane yards2: the next sixteen yards by distance from Glitch E's 2012-05-21 snaps (reference only), and pieces each must show. */
+const NEXT_SNAP_YARDS = {
+  firebog_int_1b__high: ['Glaring Muddle', /snap 12872/, ['legs_front_set', 'backhill1_green', 'legs_moss_1', 'sprout']],
+  firebog_int_3_hor_high: ['Unkempt Crypt', /snap 12877/, ['hanging_braches1', 'hanging_braches2', 'legs_front_set', 'legs_moss_1']],
+  _moon__high: ['Silent Orbit', /snaps 13047 and 13046/, ['k03_snowball_01', 'light_spot']],
+  kajuu_2__high: ['Roaming Rubble', /snap 12884/, ['tree_acacia_1', 'craggyMountain_background_01', 'cliff_cover_5']],
+  _rook__high: ['Dark Vista', /snap 12870/, ['groddle_light_pool', 'craggyMountain_background_01', 'hanging_vine_01', 'tree_02']],
+  firebog_int_4_hor_high: ['Perfus Preference', /snap 12878/, ['background_bottletree_hut', 'legs_front_set', 'firebean_1', 'clouds3']],
+  forest_1_hor_high: ['Saplings Skip', /snaps 12971 and 12970/, ['forestShape_pine', 'tree_pineCluster1', 'mountain_blue_1', 'cloud_fluffy_1']],
+  forest_2__high: ['Busy Acre', /snaps 12975 and 12974/, ['forestShape_pine', 'tree_coniferous_fg_1', 'heights_tree_bare_2', 'treeStump3']],
+  forest_3__high: ['Evergreen Sweep', /snaps 12979 and 12978/, ['forestShape_pine', 'corey3_mountain_cut2', 'tree_dead_1']],
+  forest_4__high: ['Vitric Inlet', /snap 12880/, ['forestShape_pine', 'water_ripple_double_1', 'mountain_blue_1']],
+  forest_5__high: ['Mulberry Mark', /snaps 12981 and 12980/, ['forestShape_pine', 'newxp_haze_oval_1', 'flower_bush_1']],
+  forest_6__high: ['Olsen Rose', /snap 12881/, ['forestShape_pine', 'tree_deciduous3', 'tree_coniferous_2']],
+  heights_1__high: ['Tip Top Trinket', /snaps 13022 and 13021/, ['heights_face_rock_2', 'tree_pineCluster1', 'heights_bush_1']],
+  meadows_1__high: ['Blossom Thicket', /snaps 12959 and 12958/, ['forestShape_pine', 'mountain_blue_1', 'tree_coniferous_fg_1']],
+  basic: ['Warm Frolic', /snap 12965/, ['forestShape_pine', 'tree_deciduous3', 'flower_bush_7']],
+  highlands_1_hor_high: ['Wailing Uplands', /snaps 13043 and 13042/, ['evenground_horizon', 'tree_pineCluster1', 'tree_deciduous3']],
+};
 
 describe('home styles list (inc_data_homes_prod.js)', () => {
   const gs = gsjsStyles();
@@ -254,7 +274,7 @@ describe('composed styles (tools/home-styles/build.mjs)', () => {
       kajuu_int_3_hor_high: ['Torrid Cove', /snaps 12886 and 12885/, ['stalagmite_2', 'heights_face_1', 'tree_acacia_1']],
     };
     const own = INTERIOR_STYLES.filter((r) => r.look).map((r) => r.key).sort();
-    assert.deepEqual(own, [...Object.keys(want), '_triney__high', 'pol_int_coral_hor_high'].sort());
+    assert.deepEqual(own, [...Object.keys(want), ...Object.keys(NEXT_SNAP_YARDS), '_triney__high', 'pol_int_coral_hor_high'].sort());
     for (const [key, [label, ref, pieces]] of Object.entries(want)) {
       const row = YARD_STYLE_BY_KEY[key];
       assert.equal(row.label, label);
@@ -274,6 +294,36 @@ describe('composed styles (tools/home-styles/build.mjs)', () => {
     for (const key of ['firebog_1_hor_high', 'firebog_int_2__high']) {
       const parts = YARD_STYLE_BY_KEY[key].look.layers.flatMap((l) => l.items || []).filter((it) => /^(legs_|bottletree_body|treetop_)/.test(it.s));
       assert.ok(parts.length >= 4);
+      for (const it of parts) assert.equal(it.jitter, 0, `${key}: ${it.s}`);
+    }
+  });
+
+  it('draws the next sixteen yards from the same snaps: six landscapes and ten dense forests (G223, lane yards2)', () => {
+    for (const [key, [label, ref, pieces]] of Object.entries(NEXT_SNAP_YARDS)) {
+      const row = YARD_STYLE_BY_KEY[key];
+      assert.equal(row.label, label);
+      assert.equal(row.built, true, label);
+      assert.match(row.ref, ref, label);
+      assert.deepEqual(yardLook(key), row.look, `${label}: its own composition`);
+      assert.notDeepEqual(yardLook(key), streetLook(row.lookOf), `${label}: no longer its street's look`);
+      const items = row.look.layers.flatMap((l) => l.items || []);
+      const names = new Set(items.flatMap((it) => [it.s, ...(it.alts || []).map((a) => a.s)]));
+      for (const piece of pieces) assert.ok(names.has(piece), `${label}: ${piece}`);
+      // Roots and vines hanging from the top reach into the view at Original zoom (world 312, see the last test).
+      for (const it of items) if (it.hang) assert.ok(it.y + 60 + it.h * it.scale > 340, `${label}: ${it.s} hangs into view`);
+    }
+    // The forest yards' snaps show a dense pine forest where their streets have flat blob hills.
+    const BLOBS = ['pinehills_distant_1', 'pinehills_1', 'wallpaper_tree_short_1', 'transition_hill_1', 'evenground_mound_1'];
+    for (const key of ['forest_1_hor_high', 'forest_2__high', 'forest_3__high', 'forest_4__high', 'forest_5__high', 'forest_6__high', 'heights_1__high', 'meadows_1__high', 'basic', 'highlands_1_hor_high']) {
+      const { look, label } = YARD_STYLE_BY_KEY[key];
+      const names = look.layers.flatMap((l) => (l.items || []).flatMap((it) => [it.s, ...(it.alts || []).map((a) => a.s)]));
+      for (const blob of BLOBS) assert.ok(!names.includes(blob), `${label}: no ${blob}`);
+      assert.ok(names.some((n) => /^tree_pineCluster|^forestShape_pine|^corey3_forestShape_pine/.test(n)), `${label}: a pine forest`);
+    }
+    // Walking bottletrees keep their legs, body and treetop together.
+    for (const key of ['firebog_int_1b__high', 'firebog_int_3_hor_high', 'firebog_int_4_hor_high']) {
+      const parts = YARD_STYLE_BY_KEY[key].look.layers.flatMap((l) => l.items || []).filter((it) => /^(legs_(back|front)|bottletree_body|treetop_)/.test(it.s));
+      assert.ok(parts.length >= 4, key);
       for (const it of parts) assert.equal(it.jitter, 0, `${key}: ${it.s}`);
     }
   });
