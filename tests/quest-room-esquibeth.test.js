@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import * as kit from '../public/js/quest-rooms/kit.js?v=662d905f';
+import * as kit from '../public/js/quest-rooms/kit.js?v=6ec6de2e';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const mod = await import('../public/js/quest-rooms/esquibeth.js?v=ea2a35f4');

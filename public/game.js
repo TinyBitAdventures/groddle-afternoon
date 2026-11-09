@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=396e6ee3';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=127e0a3c';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=b4c5a724';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=569e71af';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -131,7 +131,7 @@ import {
 } from './js/legalize-it.js?v=b5645cb6';
 import { HALL, HALL_LAYOUT, HALL_QUESTIONS } from './js/bureaucratic-hall.js?v=a0bc6317';
 import { STATION_X, stationArrival, stationScreen, surfaceStation } from './js/subway.js?v=44d1a09f';
-import { ALLEY, SHADY, drawAlley, inEnteredBox } from './js/quest-rooms/back-alley-set.js?v=130e33ee';
+import { ALLEY, SHADY, drawAlley, inEnteredBox } from './js/quest-rooms/back-alley-set.js?v=c786ae0c';
 import {
   WINTER_HAVEN_STREET_ID,
   WINTER_MOTE_REWARDS,
@@ -371,7 +371,7 @@ import {
   slipTerrainY,
   starlitMoonPlainAlpha,
   starlitRevealAlpha,
-} from './js/paradise-flight.js?v=5d9aec42';
+} from './js/paradise-flight.js?v=6e0f92a5';
 import { resolveParadiseCourseAlias } from './js/paradise-courses.js?v=1a5d0aa7';
 import {
   buildParadiseCourseArt,
@@ -499,7 +499,7 @@ import {
   parsePlayerSave,
   serializePlayerSave,
   restorePlayerSave,
-} from './js/player-save.js?v=c4512f77';
+} from './js/player-save.js?v=7c9c4d3e';
 import {
   HOME_INTERIOR_TSID,
   HOME_STREET_TSID,
@@ -912,7 +912,8 @@ import {
   quoinClassType,
   resetStreetQuoinsForNewDay,
   creditQuoinStat,
-} from './js/quoins.js?v=299cc3f4';
+  creditMetabolicReward,
+} from './js/quoins.js?v=237c1d5d';
 import {
   buildHubMapView,
   mapClickTravel,
@@ -20762,9 +20763,10 @@ function applyParadiseReward(rewardDef) {
   } else if (rewardDef.type === 'currants') {
     pc.currants = Math.max(0, pc.currants || 0) + amount;
   } else if (rewardDef.type === 'energy' || rewardDef.type === 'mood') {
-    const before = clamp(Number(pc[rewardDef.type]) || 0, 0, 100);
-    pc[rewardDef.type] = clamp(before + amount, 0, 100);
-    actual = pc[rewardDef.type] - before;
+    // #156: the quoin path (items/quoin.js 185-186): the player's own tank, never
+    // lowering a stat above it, refused while dead or Super Pooped (G213).
+    const credited = creditMetabolicReward(pc, rewardDef.type, amount);
+    return { actual: credited.actual, copy: credited.copy };
   } else if (rewardDef.type === 'favor') {
     const giantId = rewardDef.giantId || 'friendly';
     shrineState.favor[giantId] = Math.max(0, shrineState.favor[giantId] || 0) + amount;
@@ -20776,9 +20778,7 @@ function applyParadiseReward(rewardDef) {
         ? `+${amount.toLocaleString()} currants`
         : rewardDef.type === 'favor'
           ? `+${amount.toLocaleString()} ${giantDisplayName(rewardDef.giantId || 'friendly')} favor`
-          : actual > 0
-            ? `+${actual.toLocaleString()} ${rewardDef.type}`
-            : `${rewardDef.type[0].toUpperCase()}${rewardDef.type.slice(1)} already full`;
+          : `+${actual.toLocaleString()} ${rewardDef.type}`;
   return { actual, copy };
 }
 

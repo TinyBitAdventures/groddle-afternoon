@@ -42,7 +42,7 @@
  */
 
 import { locationEventsApi } from './location-events-feature.js?v=0062e032';
-import { collectQuoin, QUOIN_SHEET, QUOIN_TYPES } from '../quoins.js?v=299cc3f4';
+import { collectQuoin, QUOIN_SHEET, QUOIN_TYPES } from '../quoins.js?v=237c1d5d';
 import {
   PUZZLE_DATA_URL,
   SOURCE_PHYSICS,

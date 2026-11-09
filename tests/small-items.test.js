@@ -30,12 +30,12 @@ import {
 } from '../public/js/small-items.js?v=78d0056a';
 import { smallItemsFeature } from '../public/js/features/small-items-feature.js?v=40b03eb4';
 import { streetFurnitureFeature } from '../public/js/features/street-furniture-feature.js?v=ed2df641';
-import { FEATURES } from '../public/js/features/index.js?v=b4c5a724';
+import { FEATURES } from '../public/js/features/index.js?v=569e71af';
 import { countItem } from '../public/js/inventory.js?v=60dfc9ca';
 import { pickWoodTool, quoteWoodTreeHarvest, harvestWoodTree, woodToolLabel } from '../public/js/woodcutting.js?v=9a2039d1';
 import { TOOL_CONDITION_CATALOG, createToolConditionState, getToolCondition, setToolRemaining } from '../public/js/tools.js?v=5f482998';
 import { HOG_HAUL_GAME_ID, HOG_HAUL_TICKET, RACE_STORE_ITEMS } from '../public/js/races.js?v=ab22a079';
-import { racesFeature } from '../public/js/features/races-feature.js?v=a06da3bc';
+import { racesFeature } from '../public/js/features/races-feature.js?v=c1358139';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = join(here, '..');

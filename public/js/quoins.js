@@ -234,6 +234,8 @@ export function creditQuoinStat(pc, typeId, rawAmount, { gated = false } = {}) {
   if (typeId === 'energy' || typeId === 'mood') {
     // metabolics_add_energy / _mood cap at the tank, never lowering a tank above 100.
     const top = typeId === 'mood' ? moodMax(pc) : energyMax(pc);
+    // #156: a stat already above its tank is left alone, never pushed down.
+    if (finite(pc[typeId], 0) > top) return 0;
     const before = clamp(finite(pc[typeId], 0), 0, top);
     pc[typeId] = clamp(before + amount, 0, top);
     // GSJS stats are whole numbers; ours drift by fractions, so report the
@@ -245,6 +247,33 @@ export function creditQuoinStat(pc, typeId, rawAmount, { gated = false } = {}) {
     return amount;
   }
   return 0;
+}
+
+/**
+ * #156: an energy or mood reward outside the street quoin path (Paradise quoins,
+ * Cloud Rings, a course's finish reward) credited the way a quoin is. Paradise
+ * quoins were ordinary quoins (items/quoin.js 185-186: metabolics_add_mood /
+ * _energy), capped at the player's own tank (inc_metabolics.js 386-394), so a
+ * mood above 100 is never pushed down. Returns `{ actual, blocked, copy }`:
+ * `blocked` is the gate's line (dead, Super Pooped; G213), and the copy reads
+ * "already full" only when the stat sits at the player's real max.
+ */
+export function creditMetabolicReward(pc, typeId, rawAmount) {
+  const amount = Math.max(0, Math.round(finite(rawAmount, 0)));
+  const label = typeId === 'mood' ? 'mood' : 'energy';
+  if (amount > 0) {
+    const gate = metabolicGain(label);
+    if (!gate.ok) return { actual: 0, blocked: gate.msg || 'blocked', copy: `+0 ${label}` };
+  }
+  const actual = creditQuoinStat(pc, label, amount, { gated: true });
+  const top = label === 'mood' ? moodMax(pc) : energyMax(pc);
+  const full = actual <= 0 && Math.floor(finite(pc[label], 0)) >= Math.floor(top);
+  const copy = actual > 0
+    ? `+${actual.toLocaleString()} ${label}`
+    : full
+      ? `${label[0].toUpperCase()}${label.slice(1)} already full`
+      : `+0 ${label}`;
+  return { actual, blocked: null, copy };
 }
 
 /**

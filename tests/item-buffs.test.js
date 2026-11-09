@@ -28,7 +28,7 @@ import {
 } from '../public/js/buffs.js?v=036fee53';
 import { accelerateActiveStudy, createSkillState, getStudyStatus, startSkillStudy } from '../public/js/skills.js?v=4542bdf9';
 import { applyRewards } from '../public/js/quests.js?v=2b882eb6';
-import { normalizeBuffSnapshot } from '../public/js/player-save.js?v=c4512f77';
+import { normalizeBuffSnapshot } from '../public/js/player-save.js?v=7c9c4d3e';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '../public');
 
