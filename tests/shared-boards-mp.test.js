@@ -431,7 +431,7 @@ describe('the console page\'s Boards tab (console/console.js)', { skip: skipWith
     const page = readFileSync(sitePath('src/AdminConsolePage.php'), 'utf8');
     assert.match(page, /data-console-tab="boards">Boards <span/);
     for (const hook of ['data-console-tabpanel="boards"', 'data-console-board-filter', 'data-console-boards hidden>', 'data-console-boards-empty', 'data-console-boards-count', 'data-console-boards-reported']) assert.ok(page.includes(hook), hook);
-    assert.match(page, /ASSET_KEY = 'community-3'/);
+    assert.match(page, /ASSET_KEY = 'interro-1'/);
     const src = readFileSync(sitePath('console/console.js'), 'utf8');
     const rm = src.slice(src.indexOf('function removeBoardNote('), src.indexOf("$('[data-console-board-filter]')"));
     assert.ok(rm.indexOf('dialog(COPY.boardRemoveConfirm(') >= 0 && rm.indexOf('dialog(COPY.boardRemoveConfirm(') < rm.indexOf("api.call('admin/board_remove'"), 'the call only from the confirm');

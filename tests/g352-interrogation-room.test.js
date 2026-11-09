@@ -287,6 +287,14 @@ describe('the console: Go to the Interrogation room (groddle-afternoon-site)', {
     assert.equal(item({ id: 1, admin: true }, { me: 1 }).label, 'Go to the Interrogation room');
     assert.equal(mod.logWords({ kind: 'interrogate', detail: {}, delivery: 'live', player: { id: 2, name: 'Ada' } }), 'took Ada to the Interrogation room');
     assert.equal(mod.logWords({ kind: 'interrogate', detail: {}, delivery: 'offline', player: { id: 2, name: 'Ada' } }), 'took Ada to the Interrogation room (they were not online)');
+    // An administrator who sent themselves went there (polish2, 2026-11-09).
+    assert.equal(mod.logWords({ kind: 'interrogate', detail: {}, delivery: 'live', by: { id: 2, name: 'Ada' }, player: { id: 2, name: 'Ada' } }), 'went to the Interrogation room');
+    assert.equal(mod.logWords({ kind: 'interrogate', detail: {}, delivery: 'live', by: { id: 1, name: 'Bo' }, player: { id: 2, name: 'Ada' } }), 'took Ada to the Interrogation room');
+    // The kind chip stays on one line: INTERROGATE, the longest kind, fits its column.
+    const css = readFileSync(sitePath('console/console.css'), 'utf8');
+    assert.match(css, /\.console-kind \{[^}]*white-space: nowrap;/);
+    const col = Number(css.match(/\.console-loglist li \{[^}]*grid-template-columns: [\d.]+em ([\d.]+)em/)[1]);
+    assert.ok(col >= 7.4, `the kind column (${col}em) fits INTERROGATE`);
     const src = readFileSync(sitePath('console/console.js'), 'utf8');
     assert.match(src, /kind === 'interrogation'\) \{\s*act\('interrogation', p, \{\}\)/);
   });
