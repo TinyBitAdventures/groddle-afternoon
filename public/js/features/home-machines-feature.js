@@ -101,12 +101,12 @@ import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inv
 import { receiveToolCopy, takeToolCopy } from '../tools.js?v=5f482998';
 import { RECIPE_CATALOG } from '../making.js?v=4e72bb4b';
 import { getSkillCatalog } from '../content-catalogs.js?v=10b118dd';
-import { createBackYardState, homeStreetLayout, normalizeCultivationState } from '../home-cultivation.js?v=42ae453c';
+import { createBackYardState, homeStreetLayout, normalizeCultivationState } from '../home-cultivation.js?v=9571e110';
 import { readVisitScene } from '../neighbours-mp.js?v=c5301a26';
 import { saveStore } from '../save-store.js?v=8839ba7b';
 import { textureFromUrl } from '../textures.js?v=f024bd6a';
 import { createSheetLoader } from '../sprite-sheets.js?v=10b5626e';
-import { STREET_GROUND_Y, homesFeature } from './homes-feature.js?v=4c127611';
+import { STREET_GROUND_Y, homesFeature } from './homes-feature.js?v=3bcd4031';
 import { payAltarBonus } from './machine-rooms-feature.js?v=237138fa';
 import { worldToScreen } from '../street-model.js?v=b6cb6a4e';
 import { nearestSurfaceY } from '../walk-surface.js?v=106bfdc5';

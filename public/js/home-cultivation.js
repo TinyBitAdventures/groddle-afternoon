@@ -53,6 +53,8 @@
  *   one) and cultivations keep clear of it, as it keeps clear of them.
  *   PORCH: the Mailbox and the Magic Rock too, once moved (`mailboxRx`,
  *   `rockRx`); a fixture steps aside for a cultivation, never the other way round.
+ *   Report 153: an owner may put the dispatcher away (`dispatcherAway`); then
+ *   nothing keeps clear of it until it is put out again (putOutDispatcher).
  */
 
 import { CULTIVATION_CLASSES, HOME_LIMITS } from './homes-catalog.js?v=10ac34b6';
@@ -65,17 +67,20 @@ import {
   TOWER_WIDTH,
 } from './home-tower.js?v=087df38f';
 import {
+  DISPATCHER_AWAY_KEY,
   DISPATCHER_HALF,
   MOVABLE_FIXTURES,
   MOVABLE_FIXTURE_IDS,
   STREET_ROCK,
   dispatcherDefaultRx,
+  dispatcherAway,
+  fixtureFits,
   fixtureName,
   fixtureSpot,
   savedFixtureRx,
   signpostX,
   streetFixtures,
-} from './home-street-fixtures.js?v=badcb725';
+} from './home-street-fixtures.js?v=bad831a1';
 import { gardenHalfWidth } from './garden-view.js?v=3683a26f';
 
 export const YARD_SEGMENT_W = 150;
@@ -196,6 +201,8 @@ export function normalizeCultivationState(seed = {}) {
       const rx = savedFixtureRx(seed, id);
       if (rx != null) state[MOVABLE_FIXTURES[id].key] = rx;
     }
+    // Report 153: put away by its owner (only a saved true; older saves keep it out).
+    if (dispatcherAway(seed)) state[DISPATCHER_AWAY_KEY] = true;
   }
   settleGardens(state);
   return state;
@@ -387,7 +394,8 @@ export function placementCheck(state, protoClass, rx, excludeId = null, { dispat
       if (wx + half > f.x1 && wx - half < f.x2) return { ok: false, reason: f.id, msg: `Keep it clear of your ${fixtureName(f.id)}.` };
     }
   }
-  if (!back && dispatcher && Math.abs(dispatcherRx(state, { excludeId }) - x) < half + DISPATCHER_HALF) {
+  const dispX = !back && dispatcher ? dispatcherRx(state, { excludeId }) : null;
+  if (dispX != null && Math.abs(dispX - x) < half + DISPATCHER_HALF) {
     return { ok: false, reason: 'dispatcher', msg: 'Keep it clear of your Mail Dispatcher.' };
   }
   for (const other of state.items) {
@@ -419,6 +427,7 @@ export function usualFixtureRx(layout, id, at = {}) {
 export function fixtureObstacles(state, id, { excludeId = null, at = {} } = {}) {
   const layout = homeStreetLayout(state);
   const spot = (other) => {
+    if (other === 'dispatcher' && dispatcherAway(state)) return undefined;
     const rx = savedFixtureRx(state, other) ?? usualFixtureRx(layout, other, at);
     return rx == null ? undefined : layout.houseX + rx;
   };
@@ -439,6 +448,7 @@ export function fixtureObstacles(state, id, { excludeId = null, at = {} } = {}) 
  */
 export function fixtureRx(state, id, { excludeId = null, at = {} } = {}) {
   if (isBackYard(state) || !MOVABLE_FIXTURES[id]) return null;
+  if (id === 'dispatcher' && dispatcherAway(state)) return null;
   const layout = homeStreetLayout(state);
   const saved = savedFixtureRx(state, id);
   const usual = usualFixtureRx(layout, id, at);
@@ -450,10 +460,40 @@ export function fixtureRx(state, id, { excludeId = null, at = {} } = {}) {
  * Where the Mail Dispatcher stands on the home street, x from the house's centre: its saved
  * spot (or the usual one), or the nearest that is clear of the fixtures and of the
  * cultivations (but `excludeId`). `at` adds the drawn Mailbox and door x (home-street-fixtures
- * streetFixtures). Null in a back yard.
+ * streetFixtures). Null in a back yard, or while it is put away (report 153).
  */
 export function dispatcherRx(state, { excludeId = null, at = {} } = {}) {
   return fixtureRx(state, 'dispatcher', { excludeId, at });
+}
+
+/**
+ * Report 153: the owner puts the Mail Dispatcher away. Its last spot stays saved for when it
+ * is put out again. False when there is nothing to put away (a back yard, or already away).
+ */
+export function putAwayDispatcher(state) {
+  if (!state || isBackYard(state) || dispatcherAway(state)) return false;
+  state[DISPATCHER_AWAY_KEY] = true;
+  return true;
+}
+
+/**
+ * Report 153: stand the Mail Dispatcher on the street again, at its last spot if it still fits
+ * there (cultivations planted while it was away may have taken it), else at the usual spot
+ * (which steps aside as always). Returns { ok, kept, rx } (rx: x from the house's centre), or
+ * { ok: false } when it is not away.
+ */
+export function putOutDispatcher(state, { at = {} } = {}) {
+  if (!state || isBackYard(state) || !dispatcherAway(state)) return { ok: false };
+  delete state[DISPATCHER_AWAY_KEY];
+  const key = MOVABLE_FIXTURES.dispatcher.key;
+  const saved = savedFixtureRx(state, 'dispatcher');
+  let kept = false;
+  if (saved != null) {
+    const layout = homeStreetLayout(state);
+    kept = fixtureFits(layout, 'dispatcher', layout.houseX + saved, fixtureObstacles(state, 'dispatcher', { at })).ok;
+    if (!kept) delete state[key];
+  }
+  return { ok: true, kept, rx: fixtureRx(state, 'dispatcher', { at }) };
 }
 
 /** The nearest free spot to `rx` (searching outward), or null. */

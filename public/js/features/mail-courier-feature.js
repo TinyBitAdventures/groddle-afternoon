@@ -39,6 +39,13 @@
  *   frog takes the box away (doParcel 208-258, doPickup 260-292). GSJS never
  *   calls sendParcel (no caller in the 2012 snapshot); this calls it for an
  *   item letter sent from the station (reimagined trigger, source sequence).
+ *   Put away (player report 153, Austin 2026-11-09): its owner can take it off
+ *   the street (Put away here, or in Cultivate) and put it out again in
+ *   Cultivate (homes-feature putAwayHomeDispatcher / putOutHomeDispatcher,
+ *   saved as cult.dispatcherAway). Not while a parcel run or its mail window
+ *   is under way. Without it nothing is lost: the Mailbox's Write mail sends
+ *   letters and items as before, with no parcel run (that is only the
+ *   station's), and the frog still brings express mail to you.
  *
  * Auction deliveries (ticket 74, G518; rules in js/mail-courier.js)
  *   A purchase, a cancelled or an expired listing comes 10 minutes later by
@@ -75,7 +82,8 @@
  *   shows the next-ten line), &mailautoplay as above. Dispatcher:
  *   &homedemo=home&maildemo=dispatcher&mailautoplay=1 (Send mail, an Apple
  *   to Amp, close, the parcel run); &mailautoplay=open stops with the window
- *   open. Other lanes' QA routes (any *demo / *autoplay param) never get a
+ *   open; &mailautoplay=putaway puts it away from its verb (Put out is the
+ *   Cultivate banner: &homedemo=cultivate). Other lanes' QA routes (any *demo / *autoplay param) never get a
  *   frog unless maildemo is set.
  *   Canvas: mailCourier (idle|due|prompt|frog), mailCourierNext (ms),
  *   mailFrog (kind:mode:clip), mailFrogX, mailFrogY, mailDispatcher (clip),
@@ -84,10 +92,10 @@
 
 import { ITEM_CATALOG, itemIcon } from '../inventory.js?v=60dfc9ca';
 import { frameTexture, sourceFromUrl } from '../textures.js?v=f024bd6a';
-import { questRoomConverse } from './quest-instances-feature.js?v=abf01e1e';
+import { questRoomConverse } from './quest-instances-feature.js?v=a68cf10c';
 import { hellFeature } from './hell-feature.js?v=ba4199c6';
 import { DISPATCHER_ART, FROG_ART, MAIL_NPC_ART_DIR } from '../mail-npc-art.js?v=1ed97a5d';
-import { DISPATCHER_GAP, DISPATCHER_HALF, SIGNPOST } from '../home-street-fixtures.js?v=badcb725';
+import { DISPATCHER_GAP, DISPATCHER_HALF, DISPATCHER_TEXT, SIGNPOST } from '../home-street-fixtures.js?v=bad831a1';
 import { MAIL_POST_SENDER } from '../mailbox.js?v=a3e833ba';
 import {
   AUCTION_PAGE,
@@ -782,6 +790,21 @@ function scheduleTick(engine) {
   if (autoplayMode(engine)) setTimeout(() => clickPrompt(), 600);
 }
 
+/** Report 153: Put away from its verb menu; homes-feature saves it with the street. */
+function putAwayStation(engine) {
+  if (!station) return false;
+  if (stationBusy()) {
+    engine.toast?.(DISPATCHER_TEXT.putAwayBusy);
+    return false;
+  }
+  const out = engine.query?.('homeDispatcherPutAway', engine);
+  if (!out?.ok) return false;
+  clearStation(engine);
+  last = 'dispatcher:away';
+  publish(engine, true);
+  return true;
+}
+
 function clickPrompt() {
   if (typeof document === 'undefined') return;
   if (document.getElementById('quest-dialogue')?.hidden === false) document.getElementById('quest-dialogue-next')?.click();
@@ -939,13 +962,24 @@ function spawnPickup(engine, s) {
   });
 }
 
+/** Report 153: the owner put it away (homes-feature answers on their own home street). */
+function stationAway(engine) {
+  return engine.query?.('homeDispatcherAway', engine) === true;
+}
+
+/** Report 153: a parcel run or the Send mail window holds it on the street (no Put away until it ends). */
+function stationBusy() {
+  return Boolean(station && (station.parcels > 0 || station.session || pickup));
+}
+
 function tickStation(engine) {
   const t = now();
   if (t - lastStationScan > 400) {
     lastStationScan = t;
     const home = homeStreet(engine);
-    const mailbox = home ? homeMailbox(engine) : null;
-    if (station && (!home || station.sprite?.destroyed)) clearStation(engine);
+    const away = home && stationAway(engine);
+    const mailbox = home && !away ? homeMailbox(engine) : null;
+    if (station && (!home || away || station.sprite?.destroyed)) clearStation(engine);
     if (!station && mailbox) station = spawnStation(engine, mailbox);
     // A left yard expansion moves the house and its Mailbox (homes-feature homeRoomShifted).
     if (station && mailbox) station.sprite.x = stationX(engine, mailbox);
@@ -1023,6 +1057,11 @@ function autoplayTick(engine) {
   if (demo === 'dispatcher' && station && !autoStep && busy(engine)) {
     engine.setData?.('mailCourierAutoplay', `wait:${['busy', 'acting', 'questDialogueOpen', 'streetCardUp'].filter((k) => engine[k]?.()).join(',')}`);
   }
+  if (demo === 'dispatcher' && station && !autoStep && !busy(engine) && mode === 'putaway') {
+    autoStep = 1;
+    putAwayStation(engine);
+    return;
+  }
   if (demo === 'dispatcher' && station && !autoStep && !busy(engine)) {
     autoStep = 1;
     openStation(engine);
@@ -1099,7 +1138,12 @@ export const mailCourierFeature = {
     }
     if (station?.target === target) {
       const parcel = station.parcels > 0;
-      return [{ id: 'send_mail', label: COURIER_TEXT.sendMail, enabled: !parcel, reason: parcel ? 'Waiting for the frog.' : '', tooltip: COURIER_TEXT.sendTip, durationMs: 0 }];
+      const held = stationBusy();
+      return [
+        { id: 'send_mail', label: COURIER_TEXT.sendMail, enabled: !parcel, reason: parcel ? 'Waiting for the frog.' : '', tooltip: COURIER_TEXT.sendTip, durationMs: 0 },
+        // Report 153: its owner can put it away (only the owner ever sees it here).
+        { id: 'put_away', label: DISPATCHER_TEXT.putAway, enabled: !held, reason: held ? DISPATCHER_TEXT.putAwayBusy : '', tooltip: DISPATCHER_TEXT.putAwayTitle, durationMs: 0 },
+      ];
     }
     return null;
   },
@@ -1113,7 +1157,24 @@ export const mailCourierFeature = {
       openStation(engine);
       return true;
     }
+    if (verbId === 'put_away' && station?.target === target) {
+      putAwayStation(engine);
+      return true;
+    }
     return false;
+  },
+
+  /** Report 153: homes-feature asks before Put away (a parcel run or the mail window holds it). */
+  mailDispatcherBusy() {
+    return stationBusy() ? true : null;
+  },
+
+  /** Report 153: homes-feature put it away or out: look again now, not at the next 400 ms scan. */
+  mailDispatcherSync(engine) {
+    lastStationScan = 0;
+    if (engine?.started) tickStation(engine);
+    publish(engine, true);
+    return true;
   },
 
   save() {

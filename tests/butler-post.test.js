@@ -11,9 +11,9 @@ import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { BUTLER, butlerPostRx, createButler, createButlerState, normalizeButlerState } from '../public/js/butler.js?v=2c95c064';
 import { HOME_LIMITS } from '../public/js/homes-catalog.js?v=10ac34b6';
-import { createCultivationState, homeStreetLayout } from '../public/js/home-cultivation.js?v=42ae453c';
-import { BUTLER_BOX, STREET_ROCK } from '../public/js/home-street-fixtures.js?v=badcb725';
-import { HOUSE_STYLE_KEYS, houseDoorway } from '../public/js/features/homes-feature.js?v=4c127611';
+import { createCultivationState, homeStreetLayout } from '../public/js/home-cultivation.js?v=9571e110';
+import { BUTLER_BOX, STREET_ROCK } from '../public/js/home-street-fixtures.js?v=bad831a1';
+import { HOUSE_STYLE_KEYS, houseDoorway } from '../public/js/features/homes-feature.js?v=3bcd4031';
 
 const ROOT = join(import.meta.dirname, '..');
 const read = (rel) => readFileSync(join(ROOT, 'public', 'js', rel), 'utf8');

@@ -33,6 +33,14 @@
  * (inc_homes.js homes_demo_frontyard 2469-2471). Until you move one it stands where it always
  * did; a moved one keeps clear of the door and its mat, the other fixtures and your
  * cultivations, and steps aside (never the other way round) if something is in its way.
+ *
+ * Put away (player report 153, Austin 2026-11-09: "owners can put it away"). The Mail Dispatcher
+ * is our own addition to the home street, and the Mailbox already has Write mail, so an owner may
+ * take it off the street: Put away from its verb menu or its Cultivate actions. It is saved with
+ * the street as `dispatcherAway` (its last spot `dispatcherRx` is kept), and Cultivate offers
+ * Put out Mail Dispatcher to stand it there again: at its last spot if that still fits, else at
+ * the usual one (stepping aside as always). Saves without the flag keep it out. Nothing else needs
+ * it: Write mail and parcels go from the Mailbox, and no quest or hint points at it.
  */
 
 /** The dispatcher art's drawn half width (dispatcher_left.png: x 8..107 around its origin 59). */
@@ -63,7 +71,23 @@ export const DISPATCHER_TEXT = Object.freeze({
   resetDone: 'Your Mail Dispatcher is back in its usual spot.',
   edge: 'Not enough street there.',
   door: 'Keep the path to your front door clear.',
+  // Report 153: put it away, put it out again (our own words).
+  putAway: 'Put away',
+  putAwayTitle: 'Take it off your street. Your Mailbox still sends mail, and you can put it out again in Cultivate.',
+  putAwayDone: 'You put your Mail Dispatcher away. Put it out again any time in Cultivate.',
+  putAwayBusy: 'Waiting for the frog.',
+  putOut: 'Put out Mail Dispatcher',
+  putOutTitle: 'Stand your Mail Dispatcher on your street again',
+  putOutDone: 'Your Mail Dispatcher is back on your street.',
 });
+
+/** The street state key that says the Mail Dispatcher is put away (report 153). */
+export const DISPATCHER_AWAY_KEY = 'dispatcherAway';
+
+/** Whether the owner has put the Mail Dispatcher away (only a saved `true` counts). */
+export function dispatcherAway(state) {
+  return state?.[DISPATCHER_AWAY_KEY] === true;
+}
 
 const FIXTURE_NAMES = Object.freeze({
   signpost: 'signpost',

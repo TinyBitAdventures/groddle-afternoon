@@ -100,12 +100,12 @@ import { createMinnAccount } from '../minn-account.js?v=8f2741cd';
 import { runStreetTransition } from '../screen-fx.js?v=b4ec277f';
 import { STREET_INDEX } from '../street-loader.js?v=18b181ad';
 import { ITEM_CATALOG, addItem, countItem, listPackItemSlots, removeItem } from '../inventory.js?v=60dfc9ca';
-import { cultivationDef, homeStreetLayout } from '../home-cultivation.js?v=42ae453c';
+import { cultivationDef, homeStreetLayout } from '../home-cultivation.js?v=9571e110';
 import { tickGarden } from '../garden.js?v=eae8b052';
 import { BUTLER_RIG_SCALE, ButlerPainter, butlerRigNow, loadButlerRig } from '../butler-rig.js?v=e81817d9';
 import { butlerPostRx, normalizeButlerParts } from '../butler.js?v=2c95c064';
-import { butlerApi } from './butler-feature.js?v=a1137652';
-import { homesFeature, visitorHomeScene, visitorHomeState } from './homes-feature.js?v=4c127611';
+import { butlerApi } from './butler-feature.js?v=7cca53ba';
+import { homesFeature, visitorHomeScene, visitorHomeState } from './homes-feature.js?v=3bcd4031';
 import {
   BUTLER_MESSAGE_MAX,
   KEY_VERB,

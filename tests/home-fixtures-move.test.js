@@ -22,7 +22,7 @@ import {
   homeStreetLayout,
   normalizeCultivationState,
   placementCheck,
-} from '../public/js/home-cultivation.js?v=42ae453c';
+} from '../public/js/home-cultivation.js?v=9571e110';
 import {
   MOVABLE_FIXTURES,
   MOVABLE_FIXTURE_IDS,
@@ -30,8 +30,8 @@ import {
   fixtureFits,
   fixtureText,
   savedFixtureRx,
-} from '../public/js/home-street-fixtures.js?v=badcb725';
-import { HOUSE_STYLE_KEYS, homesFeature, houseDoorway, houseFixtureX } from '../public/js/features/homes-feature.js?v=4c127611';
+} from '../public/js/home-street-fixtures.js?v=bad831a1';
+import { HOUSE_STYLE_KEYS, homesFeature, houseDoorway, houseFixtureX } from '../public/js/features/homes-feature.js?v=3bcd4031';
 
 const read = (rel) => readFileSync(join(import.meta.dirname, '..', 'public', 'js', rel), 'utf8');
 const atFor = (layout, style) => {

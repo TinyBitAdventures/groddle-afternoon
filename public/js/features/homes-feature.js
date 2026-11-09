@@ -198,12 +198,14 @@ import {
   normalizeCultivationState,
   nudgeCultivation,
   placementCheck,
+  putAwayDispatcher,
+  putOutDispatcher,
   quoteYardExpansion,
   removeCultivation,
   towerItem,
-} from '../home-cultivation.js?v=42ae453c';
+} from '../home-cultivation.js?v=9571e110';
 import { PROTO_DEPLETED_ART } from '../home-proto-art.js?v=9309e9f3';
-import { MOVABLE_FIXTURES, MOVABLE_FIXTURE_IDS, fixtureFits, fixtureText, savedFixtureRx, signpostX } from '../home-street-fixtures.js?v=badcb725';
+import { DISPATCHER_TEXT, MOVABLE_FIXTURES, MOVABLE_FIXTURE_IDS, dispatcherAway, fixtureFits, fixtureText, savedFixtureRx, signpostX } from '../home-street-fixtures.js?v=bad831a1';
 import { displayTopOf, itemstackOverlayPoint, overlayAlpha, overlayLifeMs, playPoofIn, trackOverlay } from '../overlay-art.js?v=75c3ea34';
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=10b5626e';
 import { fadeInNewNear } from '../poof-fade.js?v=8984abd1';
@@ -659,6 +661,8 @@ function publish(engine) {
     engine.setData(spot, fx == null ? '' : `${Math.round(fx)}:${savedFixtureRx(cult, id) ?? 'usual'}`);
     engine.setData(last, fixtureLast[id]);
   }
+  // Report 153: whether the owner has put the Mail Dispatcher away (saved with the street).
+  engine.setData('homeDispatcherAway', dispatcherAway(cult) ? '1' : '0');
   // G358: placed pieces' upgrades (class:id), the open picker and the last upgrade.
   engine.setData('furnupPlaced', decor.placed.filter((p) => p.upgradeId).map((p) => `${p.classTsid}:${p.upgradeId}`).join(','));
   engine.setData('furnupStored', Object.entries(decor.styles || {}).map(([c, rows]) => rows.map((r) => `${c}:${r.upgradeId || 0}`).join(',')).filter(Boolean).join(','));
@@ -2037,13 +2041,91 @@ function fixturePop(engine) {
         attrs: { 'data-home-action': `${id}-reset` },
         onClick: () => resetFixture(engine, id),
       },
+      // Report 153: the Mail Dispatcher (our own addition to the street) can be put away.
+      ...(id === 'dispatcher' ? [dispatcherPutAwayAction(engine)] : []),
     ],
   };
 }
 
-/** The banner's Move Mailbox, Move Magic Rock and Move Mail Dispatcher (those on the street now). */
+/** Report 153: the Put away button (in the Mail Dispatcher's Cultivate actions). */
+function dispatcherPutAwayAction(engine) {
+  const busy = dispatcherBusy(engine);
+  return {
+    label: DISPATCHER_TEXT.putAway,
+    disabled: busy,
+    title: busy ? DISPATCHER_TEXT.putAwayBusy : DISPATCHER_TEXT.putAwayTitle,
+    attrs: { 'data-home-action': 'dispatcher-put-away', 'data-home-dispatcher': 'put-away' },
+    onClick: () => putAwayHomeDispatcher(engine),
+  };
+}
+
+/** A parcel run or an open Send mail window holds the Mail Dispatcher on the street (mail-courier-feature). */
+function dispatcherBusy(engine) {
+  return engine?.query?.('mailDispatcherBusy', engine) === true;
+}
+
+/** Your own home street (not a back yard), where the Mail Dispatcher stands or can be put out. */
+function onOwnHomeStreet() {
+  return scene?.room === 'street' && !isBackYard(cult);
+}
+
+/**
+ * Report 153 (Austin 2026-11-09: owners can put it away). Takes the Mail Dispatcher off your
+ * street; the spot it stood on is kept for Put out. Saved with the street (cult.dispatcherAway),
+ * solo and online, like its spot. The mail courier drops its sprite at once (mailDispatcherSync).
+ */
+function putAwayHomeDispatcher(engine) {
+  if (!onOwnHomeStreet() || dispatcherAway(cult)) return { ok: false, reason: 'away' };
+  if (dispatcherBusy(engine)) {
+    engine.toast?.(DISPATCHER_TEXT.putAwayBusy);
+    engine.playSound?.('CLICK_FAILURE', { volume: 0.4 });
+    fixtureLast.dispatcher = 'refused:busy';
+    publish(engine);
+    return { ok: false, reason: 'busy' };
+  }
+  if (placing?.kind === 'fixture' && placing.id === 'dispatcher') cancelCarry(engine);
+  if (selected?.kind === 'fixture' && selected.id === 'dispatcher') selected = null;
+  dimFixture(engine, 'dispatcher', false);
+  putAwayDispatcher(cult);
+  engine.query?.('mailDispatcherSync', engine);
+  engine.playSound?.('ITEM_PICKUP', { volume: 0.45 });
+  engine.pushActivity?.(DISPATCHER_TEXT.putAwayDone);
+  fixtureLast.dispatcher = 'away';
+  engine.save?.();
+  if (mode) {
+    drawCultivationMarkers(engine);
+    renderBar(engine);
+  }
+  publish(engine);
+  return { ok: true };
+}
+
+/** Report 153: Put out Mail Dispatcher (Cultivate): at its last spot if it still fits, else the usual one. */
+function putOutHomeDispatcher(engine) {
+  if (!onOwnHomeStreet()) return { ok: false, reason: 'street' };
+  const out = putOutDispatcher(cult, { at: streetFixtureAt() });
+  if (!out.ok) return { ok: false, reason: 'out' };
+  engine.query?.('mailDispatcherSync', engine);
+  engine.playSound?.('ITEM_DROP', { volume: 0.45 });
+  engine.pushActivity?.(DISPATCHER_TEXT.putOutDone);
+  fixtureLast.dispatcher = `out:${out.kept ? 'last' : 'usual'}`;
+  engine.save?.();
+  if (mode) {
+    // Select it so its actions (Move, Back to its usual spot, Put away) are at hand.
+    if (mode === 'cultivate' && fixtureTarget(engine, 'dispatcher')) selected = { kind: 'fixture', id: 'dispatcher' };
+    drawCultivationMarkers(engine);
+    renderBar(engine);
+  }
+  publish(engine);
+  return { ok: true, kept: out.kept, rx: out.rx };
+}
+
+/**
+ * The banner's Move Mailbox, Move Magic Rock and Move Mail Dispatcher (those on the street now);
+ * report 153: Put out Mail Dispatcher in its place while it is put away.
+ */
 function fixtureBannerActions(engine) {
-  return MOVABLE_FIXTURE_IDS.filter((id) => fixtureTarget(engine, id)).map((id) => ({
+  const rows = MOVABLE_FIXTURE_IDS.filter((id) => fixtureTarget(engine, id)).map((id) => ({
     label: fixtureText(id).banner,
     title: fixtureText(id).bannerTitle,
     attrs: { 'data-home-fixture': id, ...(id === 'dispatcher' ? { 'data-home-dispatcher': 'select' } : {}) },
@@ -2051,6 +2133,15 @@ function fixtureBannerActions(engine) {
       if (selectFixture(engine, id)) ui?.builder?.pop?.querySelector('button:not([disabled])')?.focus({ preventScroll: true });
     },
   }));
+  if (onOwnHomeStreet() && dispatcherAway(cult)) {
+    rows.push({
+      label: DISPATCHER_TEXT.putOut,
+      title: DISPATCHER_TEXT.putOutTitle,
+      attrs: { 'data-home-fixture': 'dispatcher', 'data-home-dispatcher': 'put-out' },
+      onClick: () => putOutHomeDispatcher(engine),
+    });
+  }
+  return rows;
 }
 
 /**
@@ -7449,6 +7540,21 @@ export const homesFeature = {
    */
   homeDispatcherX() {
     return dispatcherWorldX();
+  },
+
+  /** Report 153: true while the owner has put the Mail Dispatcher away (on their own home street); else null. */
+  homeDispatcherAway() {
+    return onOwnHomeStreet() && dispatcherAway(cult) ? true : null;
+  },
+
+  /** Report 153: the Mail Dispatcher's Put away verb (mail-courier-feature) and QA: { ok, reason? }. */
+  homeDispatcherPutAway(engine) {
+    return putAwayHomeDispatcher(engine);
+  },
+
+  /** Report 153: Put out Mail Dispatcher (the Cultivate banner) and QA: { ok, kept?, rx? }. */
+  homeDispatcherPutOut(engine) {
+    return putOutHomeDispatcher(engine);
   },
 
   /** Ticket 51: redraws the room's furniture (a box's count or a cabinet changed under it). */

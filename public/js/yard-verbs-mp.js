@@ -43,7 +43,7 @@ import { trantFruitCycle } from './trant-care.js?v=9527ff03';
 import { resetTrantDay } from './trants.js?v=1b3c8ae3';
 import { GROWN_TREE_LABELS, SEASONED_BEANS, SOIL_TIMERS, seedlingTimings } from './patches.js?v=3103cc6a';
 import { GAME_DAY_MS, GAME_EPOCH_MS } from './game-day.js?v=edb00566';
-import { isNodeId, isRockId } from './yard-stock-mp.js?v=148d9a23';
+import { isNodeId, isRockId } from './yard-stock-mp.js?v=96d1c5bc';
 import { STICK_ANIMAL } from './yard-wander.js?v=24dc2de4';
 
 export const YARD_VERBS_MP_ID = 'yard-verbs-mp';
