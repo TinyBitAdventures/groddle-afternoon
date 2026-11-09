@@ -271,7 +271,8 @@ describe('G255 game.js wiring', () => {
   const game = read('game.js');
   it('the quest log draws only while open, and only when its markup changed', () => {
     assert.match(game, /if \(qShown && isQuestOpen\(\)\) \{\n\s+const qBox = document\.createElement\('div'\);/);
-    assert.match(game, /if \(drawn !== questLogDrawn\) \{\n\s+qShown\.replaceChildren\(\.\.\.qBox\.childNodes\);/);
+    // #155: also when the shown list holds fewer rows than the draw (questLogNeedsSwap, tests/quest-log-redraw155.test.js).
+    assert.match(game, /if \(questLogNeedsSwap\(\{ drawn, lastDrawn: questLogDrawn, [^)]*\}\)\) \{\n\s+qShown\.replaceChildren\(\.\.\.qBox\.childNodes\);/);
     assert.doesNotMatch(game, /qBox\.innerHTML = ''/);
     // openQuestPanel shows the panel before updateHud draws it.
     assert.match(game, /panel\.hidden = false;\n\s+updateHud\(\);\n\s+\}\n\}/);

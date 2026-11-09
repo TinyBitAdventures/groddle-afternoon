@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=396e6ee3';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=127e0a3c';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=5e90e725';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=1ea83ab1';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -976,7 +976,7 @@ import { mountSocialDrawer } from './js/ui/social-drawer.js?v=eac982f5';
 import { bindChatLinks } from './js/chat-links.js?v=b717fac7';
 import { bindDragScroll } from './js/ui/drag-scroll.js?v=9a527ac8';
 import { SIDE_SHEET_IDS, bindTabs, inSideSheet, mountPanelShell, sheetKeyToWorld } from './js/ui/panel-shell.js?v=e2abdf9e';
-import { createQuestSheet, failedQuestPin, questStep } from './js/ui/quest-sheet.js?v=8793adcf';
+import { createQuestSheet, failedQuestPin, questLogNeedsSwap, questStep } from './js/ui/quest-sheet.js?v=ccaa43a8';
 import { createQuestTracker } from './js/ui/quest-tracker.js?v=445303df';
 import { bindContextTrigger, createContextMenu, isContextMenuKey as isMenuKey, MORE_KEYS_LABEL } from './js/ui/context-menu.js?v=79326483';
 import { bindCountField, countKeyValue, countStepMarkup, createCountChooser, typedCount } from './js/ui/count-chooser.js?v=5bc894c8';
@@ -6073,7 +6073,9 @@ function updateHud() {
       });
     }
     const drawn = qBox.innerHTML;
-    if (drawn !== questLogDrawn) {
+    // #155: a list that lost its rows (emptied or detached since the last swap) while the markup
+    // stayed the same was never drawn again; one with fewer rows than this draw is swapped too.
+    if (questLogNeedsSwap({ drawn, lastDrawn: questLogDrawn, shownCount: qShown.childElementCount, drawnCount: qBox.childElementCount })) {
       qShown.replaceChildren(...qBox.childNodes);
       questLogDrawn = drawn;
     }

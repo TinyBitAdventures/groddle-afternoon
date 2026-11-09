@@ -10,7 +10,7 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { BUG_TEXT, MAX_MESSAGE, benignError, bugReportFeature, buildKey, rememberError, reportContext } from '../public/js/features/bug-report-feature.js?v=680d7750';
+import { BUG_TEXT, MAX_MESSAGE, benignError, bugReportFeature, buildKey, rememberError, reportContext } from '../public/js/features/bug-report-feature.js?v=24196602';
 import { createMinnAccount } from '../public/js/minn-account.js?v=8f2741cd';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');

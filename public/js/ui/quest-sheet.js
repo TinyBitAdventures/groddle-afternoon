@@ -139,6 +139,17 @@ export function orderQuestCards(rows, sort) {
   return [...sorted.filter((r) => r.pinned), ...sorted.filter((r) => !r.pinned)];
 }
 
+/**
+ * G255 + #155: whether game.js swaps a fresh draw into the shown list. It swaps when the markup
+ * changed (so a HUD update never replaces the buttons under the pointer), and also when the shown
+ * list holds fewer elements than the draw: a list emptied or detached since the last swap kept
+ * its old markup string, so it was never drawn again (a report had the tabs counting 26 active
+ * over no rows).
+ */
+export function questLogNeedsSwap({ drawn = '', lastDrawn = '', shownCount = 0, drawnCount = 0 } = {}) {
+  return drawn !== lastDrawn || (Number(shownCount) || 0) < (Number(drawnCount) || 0);
+}
+
 /** A tab's label: "Active 40", or "Active 3 of 40" while a search is on. */
 export function questTabLabel(id, total, shown = total, searching = false) {
   const name = TAB_LABELS[id] || id;

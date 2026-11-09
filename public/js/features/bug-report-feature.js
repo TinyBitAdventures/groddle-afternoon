@@ -161,6 +161,9 @@ export function openPanels(doc = globalThis.document) {
     } else if (n.id === 'shrine-panel') {
       const giant = slug(n.querySelector('h2')?.textContent).replace(/^shrine to\s*/, '');
       if (giant) name += `:${giant}`;
+    } else if (n.id === 'quest-panel') {
+      const detail = questLogDetail(n);
+      if (detail) name += `:${detail}`;
     } else if (n.id === 'vendor-panel') {
       const tab = slug(n.querySelector('[aria-selected="true"], .active')?.textContent);
       if (tab) name += `:${tab}`;
@@ -168,6 +171,24 @@ export function openPanels(doc = globalThis.document) {
     out.push(name);
   }
   return out;
+}
+
+/**
+ * #155 (Quests sheet with counts and no rows): the sheet as drawn when the report was written,
+ * "active 0/69 cards, tabs 26/8/32": the tab in use, the cards shown in it of the cards #quest
+ * holds (every tab), and the numbers on the tabs. A report then tells a list that never drew
+ * (0/0) from cards drawn but not shown (0/69) from a picture that missed them (25/69).
+ */
+export function questLogDetail(panel) {
+  const list = panel?.querySelector?.('#quest');
+  if (!list) return '';
+  const cards = [...(list.querySelectorAll?.('.q-card') || [])];
+  const shown = cards.filter((c) => !c.hidden && c.getClientRects?.().length).length;
+  const tabs = [...(panel.querySelectorAll?.('[role="tab"]') || [])];
+  const on = tabs.find((t) => t.getAttribute?.('aria-selected') === 'true');
+  const tab = slug(on?.dataset?.tab || on?.textContent?.replace(/[\d\s]+(of[\d\s]+)?$/, '') || '');
+  const counts = tabs.map((t) => (/\d+(?:\s+of\s+\d+)?/.exec(String(t.textContent || '')) || ['?'])[0]);
+  return `${tab ? `${tab} ` : ''}${shown}/${cards.length} cards${counts.length ? `, tabs ${counts.join('/')}` : ''}`;
 }
 
 /** What the report carries besides the player's words. */

@@ -12,7 +12,7 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { FakeEl, matches } from './social-fake-dom.js';
-import { failedQuestPin } from '../public/js/ui/quest-sheet.js?v=8793adcf';
+import { failedQuestPin } from '../public/js/ui/quest-sheet.js?v=ccaa43a8';
 import { createQuestTracker } from '../public/js/ui/quest-tracker.js?v=445303df';
 import { isPinMenuKey, placePinMenu, LONG_PRESS_MS, PIN_MENU_ROWS } from '../public/js/ui/quest-pin-menu.js?v=361dad0c';
 import { questPinsFeature } from '../public/js/features/quest-pins-feature.js?v=e59012f1';
