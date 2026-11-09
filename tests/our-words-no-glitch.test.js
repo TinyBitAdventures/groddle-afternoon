@@ -4,7 +4,7 @@
  * butler_data.js, rook_hall.js and the rest), so this guards only the lines we wrote:
  *   - the retired notice about the Woodworker, reworded without breaking older saves;
  *   - the one fallback name for a player with no name (js/player-names.js);
- *   - the copy the sweep found (landing, Feats, buddies, follow, builder, foxes, restoration).
+ *   - the copy the sweep found (landing, Feats, buddies, follow, builder, foxes); the Restoration page keeps "Glitches" (Austin 2026-11-09: players are Glitches/Glitchens).
  */
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
@@ -113,7 +113,7 @@ describe('our own lines the sweep found', () => {
     assert.equal(BODY_STYLES.vector.label, 'Default');
   });
 
-  it('leave no Glitch in the game, landing and restoration lines we wrote', () => {
+  it('leave no Glitch in the game and landing lines we wrote (the Restoration page keeps Glitches: Austin 2026-11-09)', () => {
     const gone = {
       'public/game.js': ["'Another Glitch'", 'original Glitch wardrobe', 'a new Glitch to say'],
       'public/content.js': ["'this Glitch'"],
@@ -123,9 +123,6 @@ describe('our own lines the sweep found', () => {
       'public/js/features/foxes-feature.js': ["PLAYER_NAME = 'Glitch'"],
       'public/play/index.html': ['Three different Glitches', '<b data-hog-player>Glitch</b>'],
       'public/index.html': ['other Glitches', 'alt="A Glitch', 'a Glitch with silver hair', 'over a Glitch', 'rival Glitches'],
-      'public/restoration/index.html': ['rival Glitches'],
-      'tools/restoration/to-minn.mjs': ['rival Glitches'],
-      'tools/restoration/checklist.mjs': ['rival Glitches', 'Other Glitches', 'other Glitches', "'Your Glitch'", 'your Glitch'],
       'tools/deploy/social.mjs': ['Glitchen'],
     };
     for (const [file, phrases] of Object.entries(gone)) {

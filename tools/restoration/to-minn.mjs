@@ -79,7 +79,7 @@ export function restorationContent() {
         group('div', '', null, [
           h(3, 'Gone for good'),
           data('lost'),
-          p('note', 'Solo play adapts what needed other players where it works (races against rivals, Feats with companions, street projects with a hired hand). Multiplayer brings back the shared street: chat, parties, races, trading and Rook fights. What neither can bring back is listed here.'),
+          p('note', 'Solo play adapts what needed other players where it works (races against rival Glitches, Feats with companions, street projects with a hired hand). Multiplayer brings back the shared street: chat, parties, races, trading and Rook fights. What neither can bring back is listed here.'),
         ]),
         group('div', '', null, [h(3, 'How to read the tags'), data('legend')]),
       ]),

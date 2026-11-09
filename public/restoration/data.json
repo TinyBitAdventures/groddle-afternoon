@@ -26,7 +26,7 @@
    "short": "Solo",
    "tone": "sun",
    "mark": "✓",
-   "desc": "A multiplayer system reworked so one player can enjoy it: rivals, companions, a hired hand."
+   "desc": "A multiplayer system reworked so one player can enjoy it: rival Glitches, companions, a hired hand."
   },
   "progress": {
    "label": "In progress",
@@ -224,7 +224,7 @@
   {
    "id": "avatar",
    "group": "world",
-   "name": "Your avatar",
+   "name": "Your Glitch",
    "status": "source",
    "blurb": "Tiny Speck’s own vector avatar, rebuilt part by part: walk, climb, jump, happy, angry, surprised, with real hair, eyes, mouths, hats and clothes in their original colourways, sharp on Retina. Start fresh with Tiny Speck’s new-player picker, four choices for each part, or dress up as a giant, the Rook or a chicken from the original wardrobe. Nineteen pieces Tiny Speck left in greyscale are reimagined with colours borrowed from their siblings, and tagged as such. A player’s 2012 sheets, found on the Wayback Machine, were the first reference for the poses; they stay in the research notes and never ship.",
    "multiplayer": "Other players see you in your own look, and a new outfit shows on their screens as soon as you put it on.",
@@ -536,7 +536,7 @@
    "group": "making",
    "name": "Mining and metal",
    "status": "source",
-   "blurb": "Mine four rock types, smelt, grind and make metal with the original tools. Other players sometimes work a rock near you: Help mine it for I Me Mine, and when they join your rock each one adds to what you get.",
+   "blurb": "Mine four rock types, smelt, grind and make metal with the original tools. Other Glitches sometimes work a rock near you: Help mine it for I Me Mine, and when they join your rock each one adds to what you get.",
    "multiplayer": "Rocks are shared by everyone on the street, and real players can help each other mine for more chunks. On a friend’s home street you can mine the rocks they cultivated: the chunks are yours, the rock and its wear are the same for everyone, and mining one out fills their Magic Rock.",
    "spot": "rock",
    "evidence": [
@@ -642,7 +642,7 @@
    "group": "economy",
    "name": "Quoins",
    "status": "source",
-   "blurb": "All eight quoin types, daily limits, multipliers and Qurazy quoins. Each street quoin spot is given one of the original quoin classes, which sets what it gives (a tiny 1, a small 2 to 6, a steady 25, a long-wait 2 to 100) and how long it takes to come back. Grab an iMG, mood, energy or currants quoin near other players and they get a shard, and their grabs near you share with you. In multiplayer a street’s quoins are shared: the first to touch one gets it.",
+   "blurb": "All eight quoin types, daily limits, multipliers and Qurazy quoins. Each street quoin spot is given one of the original quoin classes, which sets what it gives (a tiny 1, a small 2 to 6, a steady 25, a long-wait 2 to 100) and how long it takes to come back. Grab an iMG, mood, energy or currants quoin near other Glitches and they get a shard, and their grabs near you share with you. In multiplayer a street’s quoins are shared: the first to touch one gets it.",
    "multiplayer": "A street’s quoins are shared by everyone on it: the first player to touch one gets it.",
    "spot": "quoin",
    "evidence": [
@@ -906,7 +906,7 @@
    "group": "quests",
    "name": "Races and Game of Crowns",
    "status": "rebuilt",
-   "blurb": "Seven race courses rebuilt from footage, raced against recovered rival racers under the final ticket-race rules, to Tiny Speck’s own finish gate: a striped post behind you, one in front and the red and white bar between (how far apart they stand is ours). In multiplayer, Grab ’Em Good, the seven finish-line races and the Game of Crowns are against the real players on your street; played alone, against the rival racers.",
+   "blurb": "Seven race courses rebuilt from footage, raced against recovered rival Glitches under the final ticket-race rules, to Tiny Speck’s own finish gate: a striped post behind you, one in front and the red and white bar between (how far apart they stand is ours). In multiplayer, Grab ’Em Good, the seven finish-line races and the Game of Crowns are against the real players on your street; played alone, against the rival Glitches.",
    "multiplayer": "Grab ’Em Good, the seven finish-line races, The Great Hog Haul and the Game of Crowns (four players, the crown, tags and locks decided by the server) are played against the real players on your street; a reload mid-race ends it for both, as a logout did. A reload during a Game of Crowns takes you out while the others play on, and nobody races from Naraka. Math Mayhem, the crowd game on the same arena, is played between real players too: a Game Pig beside the ticket dispensers puts four to twenty in one game, blue and red teams add and subtract numbers when they touch, and the first to make the target wins.",
    "spot": null,
    "evidence": [
@@ -1140,7 +1140,7 @@
    "group": "home",
    "name": "Other players and chat",
    "status": "source",
-   "blurb": "Make a character with an email and a password, right in the game, and finish it from the link we email you; in multiplayer you share the street with other players: see them walk and emote, chat on the street, form a party with its own chat, keep buddies (who is online and where) and block players. Global Chat, Live Help and the Trade Channel are open to everyone the original let in, and players make, find and join groups with their own chat. Say hi with 5 and your daily hi sign flies to another player; a player with no sign catches it, matching signs share a bonus, and the clock shows the day’s Hi sign leaderboard. Follow another player and your avatar walks after them wherever they go, teleports included. Send anyone an IM from their menu, the Buddies tab or their page on the site, even when they are offline (it waits until they are back); every conversation beyond Local, Global and Buddies is in the Chats tab.",
+   "blurb": "Make a character with an email and a password, right in the game, and finish it from the link we email you; in multiplayer you share the street with other players: see them walk and emote, chat on the street, form a party with its own chat, keep buddies (who is online and where) and block players. Global Chat, Live Help and the Trade Channel are open to everyone the original let in, and players make, find and join groups with their own chat. Say hi with 5 and your daily hi sign flies to another player; a player with no sign catches it, matching signs share a bonus, and the clock shows the day’s Hi sign leaderboard. Follow another player and your Glitch walks after them wherever they go, teleports included. Send anyone an IM from their menu, the Buddies tab or their page on the site, even when they are offline (it waits until they are back); every conversation beyond Local, Global and Buddies is in the Chats tab.",
    "multiplayer": "See other players and chat on the street, form parties, keep buddies, send IMs, join groups and channels, trade hi signs, follow another player from street to street, and see a little “…” over a player who is starting to say something. Hug, high five, kiss, moon or splank another player from their menu, soak them with a Watering Can or play them a Musicblock, play Charades on the street (the first to say your word wins), and throw a house party big enough for Epic Blowout.",
    "spot": null,
    "evidence": [
@@ -2752,9 +2752,14 @@
   "deployed": "2026-11-09"
  },
  "git": {
-  "commits": 1531,
+  "commits": 1532,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-09",
+    "kind": "improve",
+    "text": "Our own words say player, someone or friend, and a sulking crowd's first line comes on time"
+   },
    {
     "date": "2026-11-09",
     "kind": "new",
@@ -2869,11 +2874,6 @@
     "date": "2026-11-08",
     "kind": "new",
     "text": "Drag a pack item onto a thing in the world: the Egg onto the Dustbunny, a Watering Can onto a tree, food onto a Piggy"
-   },
-   {
-    "date": "2026-11-08",
-    "kind": "fix",
-    "text": "The top bar fits a narrow window: what does not fit moves into the Menu"
    }
   ]
  },
