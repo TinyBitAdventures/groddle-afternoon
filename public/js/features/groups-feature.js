@@ -53,8 +53,8 @@
  * window.groddleGroups.
  */
 
-import { purgeOf, withoutPurged } from '../im-report.js?v=93211487';
-import { createMinnAccount } from '../minn-account.js?v=9057becf';
+import { purgeOf, withoutPurged } from '../chat-purge.js?v=6c41f62d';
+import { createMinnAccount } from '../minn-account.js?v=8f2741cd';
 import { saveStore } from '../save-store.js?v=8839ba7b';
 import {
   CHANNELS,
@@ -930,7 +930,7 @@ function createSession(engine, client) {
     if (ch === tab) renderBox();
     social?.setLines(ch, chat.lines.map(drawerLine));
   });
-  // MODERATION (js/im-report.js): a moderator's purge takes the player's lines out of every chat now.
+  // MODERATION (js/chat-purge.js): a moderator's purge takes the player's lines out of every chat now.
   client.on('msg:chat_purged', (msg) => {
     const p = purgeOf(msg);
     if (!p) return;

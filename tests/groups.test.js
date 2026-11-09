@@ -32,9 +32,9 @@ import {
   tabOrder,
   writeMemory,
 } from '../public/js/groups.js?v=c9635d96';
-import { createMinnAccount } from '../public/js/minn-account.js?v=9057becf';
-import { groupsFeature } from '../public/js/features/groups-feature.js?v=5862bd3e';
-import { FEATURES } from '../public/js/features/index.js?v=bc0efda9';
+import { createMinnAccount } from '../public/js/minn-account.js?v=8f2741cd';
+import { groupsFeature } from '../public/js/features/groups-feature.js?v=33286053';
+import { FEATURES } from '../public/js/features/index.js?v=b4c5a724';
 import { serverPath, sitePath, skipWithoutServer, skipWithoutSite } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');

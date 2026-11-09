@@ -1633,56 +1633,6 @@
 :root[data-ui="classic"] .line-delete svg { width: calc(14 * var(--cu)); height: calc(14 * var(--cu)); }
 :root[data-ui="classic"] .line-delete:hover { border-color: var(--c-classic-input-hi-border); background: var(--c-classic-input-hi); color: var(--danger); }
 :root[data-ui="classic"] .line-delete:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--c-classic-focus); }
-/* Report (an IM line from the other player, js/im-report.js): dressed as Delete line beside it. */
-:root[data-ui="classic"] .line-report {
-  width: calc(22 * var(--cu));
-  height: calc(16 * var(--cu));
-  margin-left: calc(4 * var(--cu));
-  border: 1px solid var(--c-classic-input-border);
-  border-radius: 3px;
-  background: var(--c-classic-panel);
-  color: var(--c-classic-tab-off);
-  vertical-align: calc(-3 * var(--cu));
-}
-:root[data-ui="classic"] .line-report svg { width: calc(13 * var(--cu)); height: calc(13 * var(--cu)); }
-:root[data-ui="classic"] .line-report:hover { border-color: var(--c-classic-input-hi-border); background: var(--c-classic-input-hi); color: var(--danger); }
-:root[data-ui="classic"] .line-report:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--c-classic-focus); }
-/* The report window in the dialog shell (as Preferences: Dialog.as, BigDialog.as): no shade, the white
-   window with its outline and halo, the title, the body in the grey well, minor buttons. */
-:root[data-ui="classic"] .mod-report-shade { background: transparent; font: var(--fs-classic-body)/var(--lh-normal) var(--font-classic-body); color: var(--c-classic-text); }
-:root[data-ui="classic"] .mod-report-window {
-  width: min(450px, 94%);
-  padding: 0;
-  border: 0;
-  border-radius: var(--radius-xs);
-  background: var(--c-classic-panel);
-  box-shadow:
-    0 0 0 1px color-mix(in srgb, var(--c-classic-ink) 37%, transparent),
-    0 0 1px 7px color-mix(in srgb, var(--c-classic-ink) 15%, transparent);
-}
-:root[data-ui="classic"] .mod-report-head { margin: 0; padding: var(--sp-5) var(--sp-8) var(--sp-5) var(--sp-10); min-height: 35px; }
-:root[data-ui="classic"] .mod-report-head h2 { color: var(--c-classic-title); font: 800 var(--fs-classic-window)/var(--lh-tight) var(--font-classic-title); }
-:root[data-ui="classic"] .mod-report-body { padding: var(--sp-5) var(--sp-10); background: var(--c-classic-well); font-size: var(--fs-classic-body); }
-:root[data-ui="classic"] .mod-report-intro,
-:root[data-ui="classic"] .mod-report-body label { color: var(--c-classic-text); font-size: var(--fs-classic-body); }
-:root[data-ui="classic"] .mod-report-line { background: var(--c-classic-panel); border-radius: 0; }
-:root[data-ui="classic"] .mod-report-body textarea { border: 1px solid var(--c-classic-input-border); border-radius: 0; background: var(--c-classic-panel); color: var(--c-classic-text); }
-:root[data-ui="classic"] .mod-report-foot button {
-  padding: var(--sp-3) var(--sp-8);
-  border: 1px solid var(--c-classic-btn-minor-border);
-  border-radius: var(--radius-xs);
-  color: var(--c-classic-btn-minor-label);
-  background: linear-gradient(180deg, var(--c-classic-btn-minor-top), var(--c-classic-btn-minor-bottom));
-  box-shadow: 0 1px 0 color-mix(in srgb, var(--c-classic-ink) 30%, transparent);
-  font: 800 var(--fs-classic-body)/var(--lh-normal) var(--font-classic-title);
-}
-:root[data-ui="classic"] .mod-report-foot .mod-report-send {
-  border-color: var(--c-classic-btn-dark-bottom);
-  color: var(--c-classic-btn-dark-label);
-  background: linear-gradient(180deg, var(--c-classic-btn-dark-top), var(--c-classic-btn-dark-bottom));
-}
-:root[data-ui="classic"] .mod-report-foot button:focus-visible,
-:root[data-ui="classic"] .mod-report-body textarea:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--c-classic-focus); }
 :root[data-ui="classic"] .thread-open {
   gap: calc(3 * var(--cu));
   min-height: calc(18 * var(--cu));

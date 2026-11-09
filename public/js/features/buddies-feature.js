@@ -48,7 +48,7 @@
  * buddiesLast (the last notice); window.groddleBuddies.
  */
 
-import { createMinnAccount } from '../minn-account.js?v=9057becf';
+import { createMinnAccount } from '../minn-account.js?v=8f2741cd';
 import { bindContextTrigger } from '../ui/context-menu.js?v=79326483';
 import { STREET_INDEX } from '../street-loader.js?v=18b181ad';
 import {
@@ -597,15 +597,6 @@ export const buddiesFeature = {
   buddyNames() {
     const list = session?.list;
     return list ? list.buddies.map((b) => ({ id: b.id, name: b.name })) : null;
-  },
-
-  /** im-report-feature's "Block them too": blocks a player as the menu's Block does, without asking again. */
-  blockPlayer(id, name) {
-    const n = Math.floor(Number(id));
-    if (!session || !(n > 0)) return null;
-    if (session.isIgnoring(n)) return true;
-    session.ignore({ id: n, name: String(name || '') });
-    return true;
   },
 
   /**

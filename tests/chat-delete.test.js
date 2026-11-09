@@ -20,7 +20,7 @@ import { readFileSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
 import { HAS_SITE, serverPath, sitePath, skipWithoutServer, skipWithoutSite } from '../tools/repos.mjs';
 import { dropLid } from '../public/js/groups.js?v=c9635d96';
-import { deletedSummary } from '../public/js/features/chat-threads-feature.js?v=e741e0cb';
+import { deletedSummary } from '../public/js/features/chat-threads-feature.js?v=a1049d64';
 
 const src = (f) => readFileSync(sitePath(f), 'utf8');
 const game = (f) => readFileSync(new URL(`../public/js/${f}`, import.meta.url), 'utf8');
@@ -95,7 +95,7 @@ describe('/chat/\'s Delete line (community/chat-pure.js, chat-menus.js, chat-app
   it('only an administrator\'s page is marked, and the asset key moved with the files', () => {
     const pages = src('src/CommunityPages.php');
     assert.match(pages, /\(\(\$viewer\['admin'\] \?\? false\) \? ' data-chat-admin="1"' : ''\)/);
-    assert.match(pages, /public const ASSET_KEY = 'community-11';/);
+    assert.match(pages, /public const ASSET_KEY = 'community-12';/);
   });
 });
 
@@ -144,7 +144,7 @@ describe('the console\'s chat log marks a deleted line (console/console.js, src/
     assert.match(mod.logWords({ kind: 'chat_delete', delivery: 'down', player: { id: 7, name: 'Ada' }, detail: { where: 'Global Chat', reply: true, text: 'x' } }), /^deleted Ada's thread reply in Global Chat: “x” \(realtime server not answering/);
     const ac = src('src/AdminConsole.php');
     assert.match(ac, /'deleted' => \$this->chatDeleted\(\$l\['deleted'\] \?\? null, \$names\),/);
-    assert.match(src('src/AdminConsolePage.php'), /ASSET_KEY = 'skin-4'/);
+    assert.match(src('src/AdminConsolePage.php'), /ASSET_KEY = 'skin-5'/);
   });
 });
 

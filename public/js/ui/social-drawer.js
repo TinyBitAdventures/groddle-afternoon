@@ -79,11 +79,9 @@
  * for everyone?", Delete for everyone or Cancel, Cancel focused. Delete for everyone hands the line to the
  * moderator; the line leaves when the realtime server says it was deleted (chat_deleted).
  *
- * REPORTING (js/im-report.js; Austin 2026-11-09): once a feature connects a reporter
- * (features/im-report-feature.js, multiplayer), an IM line from the other player has a small Report
- * button (a flag) after its other buttons, shown as they are; it hands the line to the reporter, which
- * asks for a note. purge(test) takes every line `test` says yes to out of every conversation and
- * thread (a moderator's purge: chat_purged).
+ * PURGE (js/chat-purge.js; Austin 2026-11-09): purge(test) takes every line `test` says yes to out of
+ * every conversation and thread (a moderator's purge: chat_purged, features/chat-purge-feature.js).
+ * Nothing in the drawer reports an IM: no IM's words go to moderation (Austin 2026-11-09).
  *
  * QA: canvas data socialThread (chat|key of the thread open, or ''), socialThreadReplies (how many it
  * shows), socialOpen (open|rail), socialTab (the tab selected: activity, local, global,
@@ -102,7 +100,6 @@ import { createReactionUI } from './reaction-strip.js?v=5118c23b';
 import { sameWords } from '../chat-reactions.js?v=d65d555b';
 import { THREAD_TEXT, mergeReplies, normalSummary, summaryText } from '../chat-threads.js?v=42954351';
 import { DELETE_CONFIRM_FOCUS, DELETE_TEXT, deleteConfirmRows } from '../chat-delete.js?v=ce1da244';
-import { REPORT_TEXT } from '../im-report.js?v=93211487';
 
 export const SOCIAL_STORE_KEY = 'groddle-social-drawer';
 /** The drawer opens by default at this window width and up (the mock's 1440 rule). */
@@ -186,7 +183,6 @@ const ICONS = {
   channel: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M2.5 3.5h10v7h-5l-3 2.5v-2.5h-2z"/><path d="M14.5 7.5h3v7h-1.5v2.5l-3-2.5h-4v-2"/></svg>',
   chats: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M2.5 4h11M2.5 8h11M2.5 12h7"/></svg>',
   thread: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M3 4.5h10v6.5H8l-3 2.5V11H3z"/><path d="M15 8h2v6.5h-1.5V17l-3-2.5H10"/></svg>',
-  flag: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 17V3.5M5 4h9l-2 3.25L14 10.5H5"/></svg>',
   trash: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 6h12M8 6V4.5h4V6M5.5 6l.8 10h7.4l.8-10M8.5 9v4.5M11.5 9v4.5"/></svg>',
   back: '<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="m7.5 3-3 3 3 3"/></svg>',
   buddies: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true" focusable="false"><circle cx="9" cy="7" r="3"/><path d="M3.5 16.5c.6-3 2.8-4.7 5.5-4.7 1.2 0 2.3.3 3.2 1M15 11.5v5M12.5 14h5"/></svg>',
@@ -525,45 +521,6 @@ export function mountSocialDrawer({
     if (opened) drawerMenu = owner;
     return opened;
   }
-  // REPORTING: the reporter once a feature connects one; row -> its Report button.
-  let reporter = null;
-  const reportParts = new WeakMap();
-  const reportable = (chatId, line) => Boolean(online && reporter && chatId && line?.rk && !line.note && !line.sep && !line.mine && reporter.can?.(chatId, line));
-  /** A line's Report button (after its other buttons), or none when the reporter says no. */
-  function decorateReport(row, line, chatId) {
-    let p = reportParts.get(row);
-    if (!reportable(chatId, line)) {
-      if (p) {
-        p.btn.remove();
-        reportParts.delete(row);
-        row.classList.toggle('can-report', false);
-      }
-      return;
-    }
-    if (!p || p.rk !== String(line.rk)) {
-      p?.btn.remove();
-      const btn = el('button', { type: 'button', class: 'line-report', 'data-line-report': String(line.rk), 'aria-haspopup': 'dialog', 'aria-label': REPORT_TEXT.buttonLabel(line.name), title: REPORT_TEXT.button });
-      btn.innerHTML = ICONS.flag;
-      btn.addEventListener('pointerdown', (e) => {
-        if (e.button === 0) e.preventDefault?.();
-      });
-      btn.addEventListener('click', (e) => {
-        const cur = reportParts.get(row);
-        if (!cur || !reporter) return;
-        setData('socialReport', `${cur.chatId}#${cur.rk}`);
-        Promise.resolve(reporter.report?.(cur.chatId, cur.line, { opener: btn, keys: e.detail === 0 })).catch((err) => console.warn('social', err));
-      });
-      p = { rk: String(line.rk), btn };
-      reportParts.set(row, p);
-      row.classList.add('can-report');
-    }
-    p.chatId = chatId;
-    p.line = line;
-    const after = row.querySelector?.('[data-line-delete]') || row.querySelector?.('[data-thread-reply]') || row.querySelector?.('[data-react-add]');
-    if (after) {
-      if (after.nextSibling !== p.btn) row.insertBefore(p.btn, after.nextSibling ?? null);
-    } else if (p.btn.parentElement !== row) row.append(p.btn);
-  }
   /**
    * A drawn row of a line: its reaction button and chips (once), as they are now; in a conversation with
    * threads, its thread controls; where the moderator says so, its Delete line button (`modChat`: the
@@ -573,7 +530,6 @@ export function mountSocialDrawer({
     if (reactUI && line?.rk && !line.note && !line.sep) reactUI.decorate(node, line);
     if (chatId) decorateThread(node, line, chatId);
     if (modChat || deleteParts.has(node)) decorateDelete(node, line, modChat);
-    if (modChat || reportParts.has(node)) decorateReport(node, line, modChat);
     return node;
   };
 
@@ -1220,7 +1176,7 @@ export function mountSocialDrawer({
       const v = node.getAttribute?.(a);
       if (v !== null && v !== undefined) return `[${a}="${esc(v)}"]`;
     }
-    for (const a of ['data-thread-open', 'data-thread-reply', 'data-line-delete', 'data-line-report']) {
+    for (const a of ['data-thread-open', 'data-thread-reply', 'data-line-delete']) {
       const v = node.getAttribute?.(a);
       if (v !== null && v !== undefined) return `[${a}="${esc(v)}"]`;
     }
@@ -1439,7 +1395,7 @@ export function mountSocialDrawer({
     return b && log.contains(b) && tabs.has(b.getAttribute('data-social-chat')) ? b : null;
   };
   /** The head buttons a conversation shows over its lines, as rows (each presses its button). */
-  const HEAD_ACTIONS = ['[data-groups-who]', '[data-groups-close-chat]', '[data-party-leave]', '[data-im-report]', '[data-im-close]'];
+  const HEAD_ACTIONS = ['[data-groups-who]', '[data-groups-close-chat]', '[data-party-leave]', '[data-im-close]'];
   function headRows(t) {
     const out = [];
     for (const sel of HEAD_ACTIONS) {
@@ -1936,20 +1892,7 @@ export function mountSocialDrawer({
       confirm: (row, opts) => confirmDelete(row, deleteParts.get(row)?.btn, opts),
     } : null,
     /**
-     * REPORTING: online only (null solo). connect({ can(chat, line) -> bool, report(chat, line, { opener, keys }) })
-     * (null takes the buttons away).
-     */
-    reporting: online ? {
-      connect(r) {
-        reporter = r && typeof r.can === 'function' && typeof r.report === 'function' ? r : null;
-        render();
-      },
-      get connected() {
-        return Boolean(reporter);
-      },
-    } : null,
-    /**
-     * A moderator's purge (chat_purged) or a deleted IM line: every line `test(line, chatId)` says yes to
+     * A moderator's purge (chat_purged): every line `test(line, chatId)` says yes to
      * leaves every conversation and every thread now. How many went.
      */
     purge(test) {

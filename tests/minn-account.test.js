@@ -15,12 +15,12 @@ import { execFileSync } from 'node:child_process';
 import { join } from 'node:path';
 import { homedir } from 'node:os';
 
-import { createMinnAccount, minnUrls } from '../public/js/minn-account.js?v=9057becf';
+import { createMinnAccount, minnUrls } from '../public/js/minn-account.js?v=8f2741cd';
 import { GATE_COPY, JUJU_BOSS_GATES, SAVE_ALERT_COPY, bootDataFrom, deliverHandoff, gateFor, saveAlertFor } from '../public/js/online-boot.js?v=19450640';
 import { SAVE_STOPPED } from '../public/js/save-store.js?v=8839ba7b';
 import { FORM_COPY, SETTINGS_COPY, resetLinkFrom } from '../public/js/account-forms.js?v=318b6815';
-import { restoreNeedsAsking, sizeLabel, slotForNewBackup, accountBackupFeature } from '../public/js/features/account-backup-feature.js?v=99a60e37';
-import { FEATURES } from '../public/js/features/index.js?v=bc0efda9';
+import { restoreNeedsAsking, sizeLabel, slotForNewBackup, accountBackupFeature } from '../public/js/features/account-backup-feature.js?v=3efe5c17';
+import { FEATURES } from '../public/js/features/index.js?v=b4c5a724';
 import { multiplayerEntryUrl } from '../public/js/game-mode.js?v=1ecf2899';
 import { SAVE_ENTRY_NAMES, createMultiplayerSaveStore } from '../public/js/save-store.js?v=8839ba7b';
 import { HAS_SITE, SITE_DIR, serverPath, skipWithoutServer, skipWithoutSite } from '../tools/repos.mjs';
@@ -544,7 +544,7 @@ describe('createMinnAccount: the core and the game\'s calls', () => {
       assert.equal(typeof full[name], 'function', name);
       assert.equal(core[name], undefined, `${name} stays out of the phone`);
     }
-    assert.equal(Object.keys(full).length, 81, 'no call lost in the move (G567 added deleteChannelLine, moderation reportIm)');
+    assert.equal(Object.keys(full).length, 80, 'no call lost in the move (G567 added deleteChannelLine)');
     assert.equal(minnUrls, coreUrls, 'one minnUrls, whichever file it is imported from');
   });
 

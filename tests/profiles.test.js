@@ -19,8 +19,8 @@ import {
   PROFILE_ABOUT_MAX, PROFILE_COPY, RETRY_MS,
   aboutCounter, aboutLength, avatarKeyOf, base64Bytes, cleanAbout, homeKeyOf, homeSizes, imageBase64, pngBase64, profileSlug, shortHash, shouldUpload, stillTransform,
 } from '../public/js/profiles.js?v=054ca723';
-import { createMinnAccount } from '../public/js/minn-account.js?v=9057becf';
-import { FEATURES } from '../public/js/features/index.js?v=bc0efda9';
+import { createMinnAccount } from '../public/js/minn-account.js?v=8f2741cd';
+import { FEATURES } from '../public/js/features/index.js?v=b4c5a724';
 import { SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
 import { loadContentCatalogsFromDir, getSkillCatalog } from '../public/js/content-catalogs.js?v=10b118dd';
 import { skillTitle } from '../public/js/skill-tree.js?v=faa54b90';

@@ -19,7 +19,7 @@ import { resolveTokens } from './css-tokens.js';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { quietSession } from '../public/js/online-boot.js?v=19450640';
-import { createMinnAccount } from '../public/js/minn-account.js?v=9057becf';
+import { createMinnAccount } from '../public/js/minn-account.js?v=8f2741cd';
 import { buildOnlinePage, ONLINE_BOOT_SRC } from '../tools/play-online/build.mjs';
 
 const root = join(import.meta.dirname, '..');

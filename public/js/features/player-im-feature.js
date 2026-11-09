@@ -45,10 +45,10 @@ import {
   normalState,
   refusalText,
 } from '../player-im.js?v=23463a96';
-import { REPORT_TEXT, purgeOf, withoutPurged } from '../im-report.js?v=93211487';
+import { purgeOf, withoutPurged } from '../chat-purge.js?v=6c41f62d';
 import { EARLIER_TEXT } from '../groups.js?v=c9635d96';
 import { imKey } from '../chat-reactions.js?v=d65d555b';
-import { createMinnAccount } from '../minn-account.js?v=9057becf';
+import { createMinnAccount } from '../minn-account.js?v=8f2741cd';
 
 export const PLAYER_IM_FEATURE_ID = 'player-im';
 
@@ -99,17 +99,13 @@ function createSession(engine, client) {
       h = el('div', { class: 'social-chan-head', 'data-im-head': String(id) });
       const close = el('button', { type: 'button', 'data-im-close': String(id) }, IM_TEXT.close);
       close.addEventListener('click', () => closeConv(id));
-      // MODERATION (js/im-report.js): report the conversation (their newest line) to the moderators.
-      const report = el('button', { type: 'button', 'data-im-report': String(id) }, REPORT_TEXT.headButton);
-      report.addEventListener('click', () => engine.query?.('imReport', id, report, engine));
       // The site keeps the conversation for the two of you: scroll back past the server's last lines.
       const back = el('button', { type: 'button', 'data-im-earlier': String(id) }, EARLIER_TEXT.more);
       back.addEventListener('click', () => earlier(id, back));
-      h.append(back, report, close);
+      h.append(back, close);
       heads.set(id, h);
     }
     h.querySelector('[data-im-close]')?.setAttribute('aria-label', IM_TEXT.closeLabel(nameOf(id)));
-    h.querySelector('[data-im-report]')?.setAttribute('aria-label', REPORT_TEXT.headLabel(nameOf(id)));
     return h;
   }
 
@@ -327,20 +323,12 @@ function createSession(engine, client) {
   client.on('msg:im_state', onState);
   client.on('msg:im', onLine);
   client.on('msg:im_no', onRefused);
-  // MODERATION: a moderator's purge (moderation.go chat_purged) or a reported line deleted (im_deleted).
+  // MODERATION (js/chat-purge.js): a moderator's purge (moderation.go chat_purged). No IM is ever reported.
   client.on('msg:chat_purged', (msg) => {
     const p = purgeOf(msg);
     if (!p) return;
     for (const c of convs.values()) c.lines = withoutPurged(c.lines, { ...p, me: me() });
     note(`purged:${p.player}`);
-  });
-  client.on('msg:im_deleted', (msg) => {
-    const c = convs.get(Math.floor(Number(msg?.with)));
-    if (!c) return;
-    const id = Math.floor(Number(msg.line));
-    const at = Math.floor(Number(msg.at));
-    c.lines = c.lines.filter((l) => !(l.id === id && (!at || l.at === at)) && !(l.parent === id));
-    note(`deleted:${c.id}:${id}`);
   });
   if (client.state === 'online') client.send('im_sync', {});
 
@@ -351,9 +339,6 @@ function createSession(engine, client) {
     send,
     close: closeConv,
     convs: () => [...convs.values()].map((c) => ({ id: c.id, name: c.name, online: c.online, unread: c.unread, lines: c.lines.length })),
-    /** A conversation's kept lines (server lines), for a report (im-report-feature). */
-    linesOf: (id) => (convs.get(Math.floor(Number(id)))?.lines || []).map((l) => ({ ...l })),
-    nameOf: (id) => nameOf(Math.floor(Number(id))),
     /** Tells the server a conversation was read once the drawer has shown it (its count went to 0). */
     tick() {
       if (!social || client.state !== 'online') return;
@@ -431,14 +416,6 @@ export const playerImFeature = {
   imOpen(id, name, engine) {
     const s = ensure(engine);
     return s ? s.open(id, name) : null;
-  },
-
-  /** im-report-feature: a conversation's kept lines and the other player's name. */
-  imLines(id) {
-    return session ? session.linesOf(id) : null;
-  },
-  imName(id) {
-    return session ? session.nameOf(id) : null;
   },
 
   /** Whether IMs are on (multiplayer with the realtime server): the Buddies rows show IM. */
