@@ -10,9 +10,9 @@ import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { HIRES_DECOS, HIRES_DECOS_BIG } from '../public/js/deco-hires-list.js?v=2c460d64';
-import { decoUrl, installHiresDecos, wantsHiresDecos } from '../public/js/deco-hires.js?v=aeb0c9bd';
+import { decoUrl, installHiresDecos, wantsHiresDecos } from '../public/js/deco-hires.js?v=9877af94';
 import { resolutionOfUrl } from '../public/js/textures.js?v=3149d699';
-import { recolourBudgetBytes } from '../public/js/street-render.js?v=418a3d31';
+import { recolourBudgetBytes } from '../public/js/street-render.js?v=18160bb6';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const decoDir = join(root, 'public/assets/decos/groddle');

@@ -80,9 +80,9 @@ describe('the zone schema (docs/level-builder/zone.schema.json)', () => {
   it('every shipped street fits $defs/street', () => {
     const street = compileSchema(schema, '#/$defs/street');
     const dir = join(root, 'public/assets/streets');
-    // Tiny Speck's 1,460, the 15 abandoned-tower floors (G144) and Louise Pasture Villa (G371); a published zone's streets (GZ, spec 11) are checked by tests/zones.test.js.
+    // Tiny Speck's 1,460, the 15 abandoned-tower floors (G144), Louise Pasture Villa (G371) and the Interrogation room (G352); a published zone's streets (GZ, spec 11) are checked by tests/zones.test.js.
     const files = readdirSync(dir).filter((f) => /^[GL][A-Z0-9]+\.json$/.test(f) && !/^[GL]Z[A-Z0-9]{13}\.json$/.test(f));
-    assert.equal(files.length, 1476);
+    assert.equal(files.length, 1477);
     const bad = [];
     for (const f of files) {
       const errors = street(JSON.parse(readFileSync(join(dir, f), 'utf8')), { limit: 3 });
@@ -127,10 +127,11 @@ describe('the deco catalog (tools/builder/deco-catalog.mjs, assets/content/deco-
     const manifest = json('public/assets/decos/manifest.json');
     assert.equal(cat.count, 2993);
     assert.equal(cat.decos.length, manifest.length);
-    assert.equal(cat.streetsScanned, 1476);
+    assert.equal(cat.streetsScanned, 1477);
     assert.deepEqual(cat.decos.map((d) => d.name), [...manifest].sort((a, b) => (a < b ? -1 : a > b ? 1 : 0)));
     const placed = cat.decos.filter((d) => !d.neverPlaced);
-    assert.equal(cat.decos.length - placed.length, 138, 'spec 2.4: 138 library decos never placed (the Enchanted Forest door is a door sprite)');
+    // The Interrogation room (G352) is the first street to place bureaucratic_hall_waitingroom_1: 138 before.
+    assert.equal(cat.decos.length - placed.length, 137, 'spec 2.4: 137 library decos never placed (the Enchanted Forest door is a door sprite)');
     assert.ok(placed.every((d) => Object.keys(d.layers).length > 0 && d.drawn && d.streets > 0));
     assert.ok(cat.decos.every((d) => Object.keys(d.layers).every((r) => LAYER_ROLES.includes(r))));
     assert.ok(cat.decos.every((d) => Array.isArray(d.size2) && d.size2.length === 2));

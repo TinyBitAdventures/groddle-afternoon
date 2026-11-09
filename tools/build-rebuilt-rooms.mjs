@@ -10,6 +10,9 @@
  * Also Louise Pasture Villa (public/js/louise-pasture-villa.js, G371): its
  * EXIT door out to Louise Pasture, and the door and apartment sign that lead
  * in, added to Louise Pasture.
+ * Also the Interrogation room (public/js/interrogation-room.js, G352): no door
+ * leads in or out (the console's teleport brings an administrator in, and the
+ * room's own door, run by its feature, takes them back).
  * Each door's own connect x/y is kept and snapped to the rebuilt floor. Safe to
  * re-run; run it again after a street re-import or a build-street-navigation.mjs
  * pass.
@@ -72,6 +75,12 @@ import {
   louiseVillaIndexEntry,
   louiseVillaStreet,
 } from '../public/js/louise-pasture-villa.js?v=9d267f7e';
+import {
+  INTERROGATION_ARRIVE,
+  INTERROGATION_TSID,
+  interrogationIndexEntry,
+  interrogationStreet,
+} from '../public/js/interrogation-room.js?v=c6a73859';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const streetsDir = join(root, 'public/assets/streets');
@@ -206,6 +215,15 @@ function indexRow(tsid, row) {
   put(`${LOUISE_VILLA_TSID}.json`, `${JSON.stringify(room)}\n`);
   put(`${LOUISE_PASTURE_TSID}.json`, `${JSON.stringify(pasture)}\n`);
   indexRow(LOUISE_VILLA_TSID, louiseVillaIndexEntry(room));
+}
+
+// The Interrogation room: a closed room, its arrival on the floor in the booth.
+{
+  const room = interrogationStreet();
+  const at = arrivalInTarget(room, INTERROGATION_ARRIVE.x, INTERROGATION_ARRIVE.y - 4);
+  if (!at?.snapped) throw new Error('no floor under the Interrogation room arrival');
+  put(`${INTERROGATION_TSID}.json`, `${JSON.stringify(room)}\n`);
+  indexRow(INTERROGATION_TSID, interrogationIndexEntry(room));
 }
 
 if (indexChanged) put('index.json', `${JSON.stringify(index, null, 2)}\n`);

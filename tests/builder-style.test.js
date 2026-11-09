@@ -64,7 +64,8 @@ describe('the style profile (tools/builder/style-profile.mjs, assets/content/sty
     assert.deepEqual(world.size.w, [2500, 6000, 6000, 8000]);
     assert.deepEqual(world.size.h.slice(0, 3), [1000, 1000, 2400]);
     // The Enchanted Forests draw their shelves on their own layers, so their middleground is nearly bare (28.2 before 2026-10-31).
-    assert.deepEqual(world.roles.middleground.density, [0.4, 28, 86.7]);
+    // The Interrogation room (G352) puts only its sign, bulb and door on its middleground: 86.7 before.
+    assert.deepEqual(world.roles.middleground.density, [0.4, 28, 86.5]);
     assert.deepEqual(world.roles.middleground.decoW, [87, 249, 703]); // R5 rooms (Room 15, the Ventilation Room, Room 23): 86 before
     assert.ok(world.roles.sky.filters.saturation.band[1] < world.roles.middleground.filters.saturation.band[1], 'further back is greyer');
     for (const role of Object.values(world.roles)) {

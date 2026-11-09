@@ -18,7 +18,7 @@ import { SUBWAY_STREETS, closedStreets, initializeStreetJobs, normalizeStreetJob
 import { stationByTsid } from '../public/js/subway.js?v=44d1a09f';
 import { reachRoutes, reachStreet } from '../public/js/builder/reach-graph.js?v=f1b86aeb';
 import { applyWorld } from '../public/js/street-jobs-mp.js?v=c920dbb9';
-import { SIGN_MAX_ARMS } from '../public/js/street-render.js?v=418a3d31';
+import { SIGN_MAX_ARMS } from '../public/js/street-render.js?v=18160bb6';
 import { obtainableItems } from '../tools/job-obtainable.mjs';
 
 const root = join(import.meta.dirname, '..');

@@ -107,9 +107,9 @@ describe('street data (build-street-layers.mjs item_perm)', () => {
     });
   });
 
-  it('the rebuilt streets: the ones copied from an archived street carry it, the 49 drawn by hand have none', () => {
+  it('the rebuilt streets: the ones copied from an archived street carry it, the 50 drawn by hand have none', () => {
     const rebuilt = allStreets().filter((s) => /^reconstruction/.test(s.source || ''));
-    assert.equal(rebuilt.length, 54); // + the 15 abandoned-tower floors (G144), Louise Pasture Villa (G371)
+    assert.equal(rebuilt.length, 55); // + the 15 abandoned-tower floors (G144), Louise Pasture Villa (G371), the Interrogation room (G352)
     // tools/build-enchanted-forests.mjs slices the parent street; tools/build-forest-machine-room.mjs
     // copies the Meadow room's template; Louise Pasture Villa (G371) the apartment lobby template's.
     const copied = rebuilt.filter((s) => /Enchanted Forest hollows|Forest Community Machine Room|apartment lobby template/.test(s.source));

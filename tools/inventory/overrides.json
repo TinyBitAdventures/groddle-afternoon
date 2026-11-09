@@ -1895,10 +1895,9 @@
   "lost": "nosource"
  },
  "location:LIFLFPPBUUT11SP": {
-  "status": "lost",
-  "reason": "no geometry survives anywhere: Interrogation (category instance-template-no-geometry: quest/instance room with no geometry anywhere); listed in the round 2 hunt brief (research/coverage/hunt-outline-2026-10-27-round2.md) and comes back if a source turns up. G352 (2026-11-08): a staff room in hub 67 (the dev and template hub, inc_data_maps_prod.js:17992) that no door, signpost, quest or item leads into; its empty-street render (720 x 864) shows one hanging bulb (hanging_lightbulb), the seated-figure-and-clock sign (bureaucratic_hall_waitingroom_1) and a red theatre chair (glitch-items furniture_bench_theater_chair_red.swf, CC0, not rendered yet) between dark speckled panels (no CC0 piece found); not built while players have no way in",
-  "register": "G351",
-  "lost": "nosource"
+  "status": "reimagined",
+  "reason": "Interrogation: rebuilt from its render as the moderators' room (G352, Austin 2026-11-08). A staff room in hub 67 (the developers' hub, inc_data_maps_prod.js:17992) that no door, signpost, quest or item led into; no location XML. Its 720 x 864 render (reference only) is the street at 1.5x: a bare bulb (hanging_lightbulb) over a booth in a row of the Bureaucratic Hall's cubicle walls (the dark speckled panels; bldg_int_bhall.swf cubicle_wall_left, _right, _double), the waiting-room pictogram (bureaucratic_hall_waitingroom_1) over it and the hall's waiting chair in red-brown (cut out of bureaucratic_hall_bg, tools/interrogation/build-chair.mjs; the glitch-items theatre chair candidate is a row of three seats, not it). An administrator goes in from the console (site AdminConsole admin/interrogation, the realtime teleport); its door goes back where they came from (public/js/interrogation-room.js, features/interrogation-room-feature.js). Not built: the beam and plastered frames over the partitions",
+  "register": "G352"
  },
  "location:LA5F9AT6U133F5T": {
   "status": "lost",

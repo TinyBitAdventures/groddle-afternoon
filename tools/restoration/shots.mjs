@@ -17,6 +17,8 @@ export const SHOTS = Object.freeze({
   physics: { route: `${Q}&streetdemo=GUVUMTSQ2FC34ES`, wait: 11000 },
   // Vicar's Peak's top ledge: the arched door, a vined ladder and the tier below (G93).
   'vicars-peak': { route: `${Q}&streetdemo=GCR1516SFHM122V&streetx=1000&streety=185`, wait: 12000 },
+  // The Interrogation room (G352): standing by the right partitions, the booth's chair in the light.
+  interrogation: { route: `${Q}&streetdemo=GIFLFPPBUUT11SP&streetx=720&streety=970`, wait: 12000 },
   'street-events': { route: `${Q}&puzzledemo=GHVOD0F3T403694`, wait: 12000 },
   camera: { route: `${Q}&camerademo=1&cameraskill=1&cameralook=-1100,-60`, wait: 12000 },
   piggies: { route: `${Q}&animaldemo=piggy&animalrank=2`, wait: 9000 },

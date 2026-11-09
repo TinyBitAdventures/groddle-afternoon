@@ -340,6 +340,25 @@
    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&streetdemo=GA9RLGSQ05F3Q69&streetx=1644&streety=527&practice=1"
   },
   {
+   "id": "interrogation",
+   "group": "world",
+   "name": "The Interrogation room",
+   "status": "reimagined",
+   "blurb": "A room nothing in the original game led into: a staff street in the developers’ hub that survives only as one 2011 picture, a bare bulb over a booth of grey office partitions with a red chair in it. Rebuilt from that picture with the Bureaucratic Hall’s own art (its cubicle walls, waiting-room sign, light and door, and its waiting chair in red), it is now the moderators’ room: an administrator goes there from the console, and the door on the left takes them back where they were. Play it to look inside.",
+   "multiplayer": null,
+   "spot": null,
+   "evidence": [
+    "public/js/interrogation-room.js",
+    "public/js/features/interrogation-room-feature.js",
+    "public/assets/streets/GIFLFPPBUUT11SP.json",
+    "public/assets/sprites/interrogation/waiting-chair-red.svg",
+    "tools/interrogation/build-chair.mjs",
+    "tests/g352-interrogation-room.test.js"
+   ],
+   "shot": "shots/interrogation.webp",
+   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&timedemo=day&streetdemo=GIFLFPPBUUT11SP&streetx=720&streety=970&practice=1"
+  },
+  {
    "id": "ancestral-lands",
    "group": "world",
    "name": "The Ancestral Lands",
@@ -1324,12 +1343,12 @@
  "tally": {
   "source": 57,
   "rebuilt": 11,
-  "reimagined": 4,
+  "reimagined": 5,
   "solo": 3,
   "progress": 1
  },
- "back": 75,
- "possible": 76,
+ "back": 76,
+ "possible": 77,
  "multiplayer": 42,
  "quests": {
   "total": 445,
@@ -2733,9 +2752,24 @@
   "deployed": "2026-11-08"
  },
  "git": {
-  "commits": 1514,
+  "commits": 1518,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-08",
+    "kind": "new",
+    "text": "The Interrogation room, a moderators' room administrators open from the console"
+   },
+   {
+    "date": "2026-11-08",
+    "kind": "new",
+    "text": "Online, the Crown Game Teleporter takes 50 currants and joins you to a Game of Crowns"
+   },
+   {
+    "date": "2026-11-08",
+    "kind": "new",
+    "text": "Seven back yards look like players' own 2012 pictures of them: Night Lights, Wistful Tangle, Waggish Wander, Arid Boglands, Faithful Fen, Dusty Barrens and Torrid Cove"
+   },
    {
     "date": "2026-11-08",
     "kind": "improve",
@@ -2840,24 +2874,9 @@
     "date": "2026-11-08",
     "kind": "improve",
     "text": "Online, the Skills panel says Transcendental Radiation works, and what ranks II and III need"
-   },
-   {
-    "date": "2026-11-08",
-    "kind": "improve",
-    "text": "Online, everyone focused on a Rook stun orb glows at their feet until it fires"
-   },
-   {
-    "date": "2026-11-08",
-    "kind": "new",
-    "text": "Garlic Breath reaches everyone on the street online: other players lose up to 20 mood and smell something funky"
-   },
-   {
-    "date": "2026-11-08",
-    "kind": "new",
-    "text": "Cubimal battles: set a figure down with Panache, Wile or Gumption to fight another player's"
    }
   ]
  },
- "tests":757,
+ "tests": 758,
  "generatedAt": "2026-11-08"
 }

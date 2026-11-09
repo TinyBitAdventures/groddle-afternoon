@@ -69,7 +69,7 @@ test('every street on the map lists has its own location hub, which the map data
 
 test('rebuilt rooms (no location XML) keep a hub the map data lists them under', () => {
   const rebuilt = rows.filter((r) => !r.own);
-  assert.equal(rebuilt.length, 54); // + Louise Pasture Villa (G371), Snowed In, Ethereal Endeavour, Martleby Hare, Growing Stuff (G157-G159), Winter Walk, Winter Haven, the 15 abandoned-tower floors (G144)
+  assert.equal(rebuilt.length, 55); // + the Interrogation room (G352), Louise Pasture Villa (G371), Snowed In, Ethereal Endeavour, Martleby Hare, Growing Stuff (G157-G159), Winter Walk, Winter Haven, the 15 abandoned-tower floors (G144)
   // The abandoned towers' floors were quarter streets, never on a map list: they keep their lobby's hub.
   const floors = rebuilt.filter((r) => r.meta.internalLabel === `Abandoned ${r.meta.label}` && /, floor \d$/.test(r.meta.label));
   assert.equal(floors.length, 15);

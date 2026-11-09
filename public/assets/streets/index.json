@@ -13346,6 +13346,15 @@
       "platforms": 12,
       "decos": 6,
       "reconstructed": true
+    },
+    "GIFLFPPBUUT11SP": {
+      "label": "Interrogation",
+      "file": "assets/streets/GIFLFPPBUUT11SP.json",
+      "hubId": "67",
+      "hubName": "Multiplayer Quests",
+      "platforms": 1,
+      "decos": 10,
+      "reconstructed": true
     }
   }
 }

@@ -201,8 +201,8 @@ describe('the console page (groddle-afternoon-site console/console.js)', { skip:
     const ids = (m) => m.filter((i) => i.enabled).map((i) => i.id);
     assert.deepEqual(ids(mod.menuFor({ id: 9 }, { me: 1, online: true })), ['message', 'chatlog', 'teleport', 'give', 'refill', 'boot', 'ban']);
     assert.deepEqual(ids(mod.menuFor({ id: 9 }, { me: 1, online: false })), ['message', 'chatlog', 'teleport', 'give', 'ban']);
-    assert.deepEqual(ids(mod.menuFor({ id: 1, admin: true }, { me: 1, online: true })), ['message', 'chatlog', 'give', 'refill']);
-    assert.deepEqual(ids(mod.menuFor({ id: 2, admin: true }, { me: 1, online: true })), ['message', 'chatlog', 'teleport', 'give', 'refill', 'boot']);
+    assert.deepEqual(ids(mod.menuFor({ id: 1, admin: true }, { me: 1, online: true })), ['message', 'chatlog', 'give', 'refill', 'interrogation']);
+    assert.deepEqual(ids(mod.menuFor({ id: 2, admin: true }, { me: 1, online: true })), ['message', 'chatlog', 'teleport', 'give', 'refill', 'boot', 'interrogation']);
     assert.deepEqual(ids(mod.menuFor({ id: 9, banned: true }, { me: 1 })).slice(-1), ['unban']);
     assert.ok(mod.menuFor({ id: 2, admin: true }, { me: 1 }).find((i) => i.id === 'ban').reason);
   });
