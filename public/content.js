@@ -34,7 +34,7 @@ import {
   GARDEN_FERTILIZE_MS,
   fertilizeCheck,
   fertilizePlot,
-} from './js/garden.js?v=617db897';
+} from './js/garden.js?v=eae8b052';
 import { firstWorkingTool, HOE_TOOLS, WATERING_CAN_TOOLS } from './js/tools.js?v=5f482998';
 import { miningGemHint } from './js/gem-hints.js?v=4b65f7ac';
 import {
@@ -1032,6 +1032,14 @@ function applyRewardIfAny(classId, verbId, pc, effects) {
   return { ok: true };
 }
 
+/**
+ * A garden plot's answer (js/garden.js talkbacks, 3.5 s: items/item.js sendResponse 1064) with the
+ * mark that its time is the source's own, so it stays up exactly that long (G629, js/read-time.js bubbleMs).
+ */
+function plotSpeech(speech) {
+  return speech ? { ...speech, exact: true } : null;
+}
+
 function finalizeMsgs(msgs, effects) {
   const base = effects._activityBase || msgs[0] || 'You did a thing.';
   const line = formatActivityLine(
@@ -1636,7 +1644,7 @@ export function runVerb(target, verbId, ctx) {
     } else {
       return { ok: false, msgs: [`Cannot ${verbId} this plot.`], effects };
     }
-    if (!r.ok) return { ok: false, msgs: r.msgs || ['Cannot do that.'], effects, speech: r.speech || null, toastWithSpeech: Boolean(r.toastWithSpeech) };
+    if (!r.ok) return { ok: false, msgs: r.msgs || ['Cannot do that.'], effects, speech: plotSpeech(r.speech), toastWithSpeech: Boolean(r.toastWithSpeech) };
     if (r.effects) {
       effects.energy += r.effects.energy || 0;
       effects.mood += r.effects.mood || 0;
@@ -1671,7 +1679,7 @@ export function runVerb(target, verbId, ctx) {
         superHarvest: Boolean(r.superHarvest),
       },
       // garden_new.js talkback: the plot answers with a line and the slugs.
-      speech: r.speech || null,
+      speech: plotSpeech(r.speech),
     };
   }
 

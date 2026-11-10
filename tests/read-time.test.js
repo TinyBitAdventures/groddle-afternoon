@@ -182,7 +182,10 @@ describe("inhabitants' lines keep the source's own times (G629)", () => {
     assert.match(content, /durationMs: butter\.bubbleMs, exact: true/);
     assert.match(content, /durationMs: sung\.bubbleMs, exact: true/);
     // item.js sendResponse 1064 (3.5 s), npc_crab.js 548 (4 s), npc_yoga_frog.js 193 (3 s), npc_forehorseman.js 190 (3 s).
-    assert.equal(read('public/js/garden.js').match(/durationMs: GARDEN_TALKBACK_MS,\s+exact: true,/g).length, 2);
+    // A plot's answer is marked where the plot's verb hands it on (content.js), not in the garden rules.
+    assert.match(content, /function plotSpeech\(speech\) \{\n\s+return speech \? \{ \.\.\.speech, exact: true \} : null;\n\}/);
+    assert.equal(content.match(/speech: plotSpeech\(r\.speech\)/g).length, 2, 'a plot verb that worked, and one refused with its line');
+    assert.doesNotMatch(read('public/js/garden.js'), /exact: true/);
     assert.match(read('public/js/features/crabs-feature.js'), /CRAB_REPLY_MS, \{\n\s+exact: true,/);
     assert.match(read('public/js/features/mail-courier-feature.js'), /COURIER\.bubbleMs, \{ exact: true \}\)/);
     assert.equal(read('public/js/features/rook-attack-feature.js').match(/ROOK_SOURCE\.forehorsemanBubbleMs, \{ exact: true \}\)/g).length, 2);

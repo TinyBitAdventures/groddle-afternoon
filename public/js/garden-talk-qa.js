@@ -11,7 +11,7 @@
  * Canvas: data-garden-talk (running|done|missing), data-garden-talk-step,
  * data-last-speech, data-last-speech-slugs.
  */
-import { SEED_CATALOG } from './garden.js?v=617db897';
+import { SEED_CATALOG } from './garden.js?v=eae8b052';
 
 const STEPS = ['clear', 'plant', 'water', 'harvest'];
 const STEP_MS = 2600;

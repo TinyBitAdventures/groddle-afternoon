@@ -655,7 +655,7 @@ export function gardenTalkback(key, { rng, slugs = null, failed = false } = {}) 
     }
     if (!Object.keys(clean).length) clean = null;
   }
-  return { key, text, durationMs: GARDEN_TALKBACK_MS, exact: true, slugs: clean, ...(failed ? { failed: true } : {}) };
+  return { key, text, durationMs: GARDEN_TALKBACK_MS, slugs: clean, ...(failed ? { failed: true } : {}) };
 }
 
 function actionTalkback(garden, action, opts, slugs, extra = {}) {
@@ -1332,7 +1332,6 @@ export function harvestPlot(garden, key, inv, pc, opts = {}) {
         speaker: profile.gardenType === 'herb' ? 'Herb Garden plot' : 'Crop Garden plot',
         text: line,
         durationMs: GARDEN_TALKBACK_MS,
-        exact: true,
         slugs: null,
         failed: true,
       },
