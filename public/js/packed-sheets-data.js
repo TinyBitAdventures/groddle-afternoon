@@ -62,4 +62,12 @@ export const PACKED_SHEETS = Object.freeze({
     // OGA potion_tree_poison__x1_tool_animation_png_1354836878.png: 880x721, 11 x 7 cells of 80x103, 75 frames, 72 distinct
     "potion_tree_poison": Object.freeze({ path: 'assets/sprites/potions/potion_tree_poison-tool.webp', fw: 63, fh: 103, cols: 11, frames: 72, plays: 75, cell: Object.freeze([80, 103]), at: Object.freeze([17, 0]), fps: 30, loop: true, seq: Object.freeze([-1,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,-1,-1]) }),
   }),
+  "tools": Object.freeze({
+    // OGA scraper__x1_tool_animation_png_1354832719.png: 924x390, 11 x 5 cells of 84x78, 51 frames, 50 distinct
+    "scraper": Object.freeze({ path: 'assets/sprites/tools/scraper-tool.webp', fw: 84, fh: 78, cols: 7, frames: 50, plays: 51, cell: Object.freeze([84, 78]), at: Object.freeze([0, 0]), fps: 30, loop: true, seq: Object.freeze([0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,0]) }),
+    // OGA super_scraper__x1_tool_animation_png_1354836358.png: 871x280, 13 x 4 cells of 67x70, 51 frames, 50 distinct
+    "super_scraper": Object.freeze({ path: 'assets/sprites/tools/super-scraper-tool.webp', fw: 67, fh: 70, cols: 7, frames: 50, plays: 51, cell: Object.freeze([67, 70]), at: Object.freeze([0, 0]), fps: 30, loop: true, seq: Object.freeze([0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,0]) }),
+    // OGA ace_of_spades__x1_tool_animation_png_1354839802.png: 882x316, 14 x 4 cells of 63x79, 53 frames, 45 distinct
+    "ace_of_spades": Object.freeze({ path: 'assets/sprites/tools/ace-of-spades-tool.webp', fw: 63, fh: 79, cols: 8, frames: 45, plays: 53, cell: Object.freeze([63, 79]), at: Object.freeze([0, 0]), fps: 30, loop: true, seq: Object.freeze([0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,14,14,15,16,17,18,19,20,21,21,21,22,23,24,25,26,26,26,27,28,29,30,31,32,33,34,35,36,37,38,39,39,40,41,42,43,44,0]) }),
+  }),
 });

@@ -19,12 +19,13 @@
  * archive, so no nudge is applied.
  *
  * Memory: a sheet is fetched when first played and only the last KEEP_SHEETS are kept decoded;
- * an older one nobody is playing is destroyed (its 3x twin too) and fetched again if wanted.
+ * an older one nobody is playing is destroyed (its 3x twin too) and fetched again if wanted. A
+ * sheet marked `keep` is one another module draws from too, and is left alone.
  */
 
 import { OVERLAY_FADE, overlayAlpha, overlayLifeMs, trackOverlay } from './overlay-art.js?v=75c3ea34';
-import { cutPackedFrames, packedFrameAt } from './packed-sheets.js?v=ad5e6b30';
-import { upgradeSource } from './sprite-hires.js?v=84018f88';
+import { cutPackedFrames, packedFrameAt } from './packed-sheets.js?v=e62b4abd';
+import { upgradeSource } from './sprite-hires.js?v=68150c4c';
 import { forgetTexture, loadTexture, whenLoaded } from './textures.js?v=f024bd6a';
 
 /** Decoded sheets kept after their overlay ends. */
@@ -66,14 +67,21 @@ function evict(entry) {
 }
 
 function trim() {
-  const idle = [...held.values()].filter((e) => e.refs <= 0 && e.frames).sort((a, b) => a.usedAt - b.usedAt);
-  while (held.size > KEEP_SHEETS && idle.length) evict(idle.shift());
+  // A sheet another module also draws from (def.keep: the Shovel's, which the Patches cut their own
+  // frames from) is never destroyed here, and does not count.
+  const ours = [...held.values()].filter((e) => !e.keep);
+  const idle = ours.filter((e) => e.refs <= 0 && e.frames).sort((a, b) => a.usedAt - b.usedAt);
+  let count = ours.length;
+  while (count > KEEP_SHEETS && idle.length) {
+    evict(idle.shift());
+    count -= 1;
+  }
 }
 
 function hold(PIXI, def) {
   let entry = held.get(def.path);
   if (!entry) {
-    entry = { path: def.path, refs: 0, usedAt: 0, frames: null, source: null, promise: null };
+    entry = { path: def.path, refs: 0, usedAt: 0, frames: null, source: null, promise: null, keep: Boolean(def.keep) };
     const e = entry;
     e.promise = loadTexture(def.path, { raw: true }).then((texture) => {
       e.source = texture.source;

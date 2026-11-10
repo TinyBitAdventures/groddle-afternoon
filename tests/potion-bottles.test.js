@@ -19,10 +19,10 @@ import {
   potionBottleClasses,
   potionBottleSheet,
   potionPourSide,
-} from '../public/js/potion-bottles.js?v=5a9cdc9e';
-import { PACKED_SHEETS } from '../public/js/packed-sheets-data.js?v=3b5055a3';
-import { packedCell, packedDurationMs, packedFrameAt } from '../public/js/packed-sheets.js?v=ad5e6b30';
-import { KEEP_SHEETS, itemOverlayPlacement, pcOverlayPoint } from '../public/js/item-overlay.js?v=99b7664e';
+} from '../public/js/potion-bottles.js?v=180d73b5';
+import { PACKED_SHEETS } from '../public/js/packed-sheets-data.js?v=9ccb684a';
+import { packedCell, packedDurationMs, packedFrameAt } from '../public/js/packed-sheets.js?v=e62b4abd';
+import { KEEP_SHEETS, itemOverlayPlacement, pcOverlayPoint } from '../public/js/item-overlay.js?v=26400bfc';
 import { POTIONS } from '../public/js/potions.js?v=4f4c996d';
 import { GARDEN_POTIONS } from '../public/js/master-garden.js?v=2953386a';
 import { TREE_ANTIDOTE, TREE_POISON } from '../public/js/tree-poison.js?v=5ceea244';
@@ -193,7 +193,8 @@ describe('where the game plays it', () => {
     assert.match(fx, /wh: POTION_SELF_OVERLAY\.wh,[\s\S]{0,200}?at: \(\) => pcOverlayPoint\(engine\.player, \{ dy: POTION_SELF_OVERLAY\.deltaY \}\),/);
     assert.equal(KEEP_SHEETS, 2);
     const overlay = read('js/item-overlay.js');
-    assert.match(overlay, /while \(held\.size > KEEP_SHEETS && idle\.length\) evict\(idle\.shift\(\)\);/);
+    assert.match(overlay, /while \(count > KEEP_SHEETS && idle\.length\) \{\s+evict\(idle\.shift\(\)\);/);
+    assert.match(overlay, /const ours = \[\.\.\.held\.values\(\)\]\.filter\(\(e\) => !e\.keep\);/, 'a sheet another module draws from is never unloaded');
     assert.match(overlay, /const release = trackOverlay\(\(\) => handle\.cancel\(\)\);/, 'a street change cancels it with the other overlays');
   });
 });

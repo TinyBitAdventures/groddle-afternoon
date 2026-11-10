@@ -20,11 +20,11 @@ import {
   chickenIdleSheet,
   chickenPoseState,
   chickenWaitPose,
-} from '../public/js/chicken-idles.js?v=bb22ac49';
-import { PACKED_SHEETS } from '../public/js/packed-sheets-data.js?v=3b5055a3';
-import { packedCell, packedDurationMs, packedFrameAt, packedRect } from '../public/js/packed-sheets.js?v=ad5e6b30';
-import { CHICKEN_PAUSE, chickenPlan, chickenSeed, chickenWalkAt } from '../public/js/street-creatures.js?v=8ba71c8a';
-import { yardPlan, yardWanderAt, followYardPath } from '../public/js/yard-wander.js?v=f2c968a4';
+} from '../public/js/chicken-idles.js?v=6c0c1dd3';
+import { PACKED_SHEETS } from '../public/js/packed-sheets-data.js?v=9ccb684a';
+import { packedCell, packedDurationMs, packedFrameAt, packedRect } from '../public/js/packed-sheets.js?v=e62b4abd';
+import { CHICKEN_PAUSE, chickenPlan, chickenSeed, chickenWalkAt } from '../public/js/street-creatures.js?v=71a8ee88';
+import { yardPlan, yardWanderAt, followYardPath } from '../public/js/yard-wander.js?v=908141cb';
 import { imageSize } from '../tools/image-size.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -286,7 +286,7 @@ describe('the pose on a sprite', () => {
   const table = { chickenWalk: { frames: frames(24, 'walk') }, chickenStand: { frames: frames(1, 'stand') }, chickenPeck: { frames: frames(32, 'peck') } };
 
   it('pecking_once plays once from the shared frame and holds; walk and stand are as they were', async () => {
-    const { chickenPose, showsChickenIdle } = await import('../public/js/chicken-idle-art.js?v=6eddcb98');
+    const { chickenPose, showsChickenIdle } = await import('../public/js/chicken-idle-art.js?v=89c3bcb0');
     const spr = sprite(table.chickenWalk.frames.slice(0, 6));
     assert.equal(chickenPose(null, table, spr, 'pecking_once', 500), 'pecking_once');
     assert.equal(spr.textures, table.chickenPeck.frames);
@@ -316,7 +316,7 @@ describe('the pose on a sprite', () => {
   });
 
   it('a state whose sheet is not in yet shows the still, and a squeeze is left to finish', async () => {
-    const { chickenPose } = await import('../public/js/chicken-idle-art.js?v=6eddcb98');
+    const { chickenPose } = await import('../public/js/chicken-idle-art.js?v=89c3bcb0');
     const spr = sprite(table.chickenWalk.frames.slice(0, 6));
     assert.equal(chickenPose(null, table, spr, 'idle2', 100), 'stand', 'no Pixi here, so no sheet: the still');
     assert.equal(spr.textures, table.chickenStand.frames);

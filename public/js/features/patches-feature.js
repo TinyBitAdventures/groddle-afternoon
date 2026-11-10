@@ -75,7 +75,7 @@ import {
 import { frameTexture, isLoaded, onFailed, onLoaded, textureFromUrl } from '../textures.js?v=f024bd6a';
 import { HOE_TOOLS, firstWorkingTool } from '../tools.js?v=5f482998';
 import { slugsFromEffects } from '../speech-slugs.js?v=130338f9';
-import { plotSignature, replayRng } from '../shared-patches.js?v=7e01b453';
+import { plotSignature, replayRng } from '../shared-patches.js?v=6d29f25c';
 
 export const PATCHES_FEATURE_ID = 'patches';
 export const SOIL_GROUP_PREFIX = 'soil:';

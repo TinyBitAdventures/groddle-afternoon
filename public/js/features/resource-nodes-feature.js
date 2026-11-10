@@ -60,7 +60,7 @@
 import { ITEM_CATALOG, addItem, countItem } from '../inventory.js?v=60dfc9ca';
 import { setToolRemaining, toolCopies } from '../tools.js?v=5f482998';
 import { isItemFloor, platformYAt } from '../street-model.js?v=b6cb6a4e';
-import { hiresSpriteUrl } from '../sprite-hires.js?v=84018f88';
+import { hiresSpriteUrl } from '../sprite-hires.js?v=68150c4c';
 import { rollResourceNodeDrop } from './drops-feature.js?v=04d201c2';
 import { slugsFromEffects } from '../speech-slugs.js?v=130338f9';
 import { resourceNodeResponseKey, verbResponse } from '../verb-responses.js?v=3ceb8a8c';
@@ -95,10 +95,12 @@ import {
 import { frameTexture as sheetFrameTexture, loadTexture, textureFromUrl } from '../textures.js?v=f024bd6a';
 import { acceptOffer, markOffered, npcQuestOffers, putOffOffer, questStatus } from '../quest-offers.js?v=9c53455c';
 import { OVERLAY_USES, playOverlay } from '../overlays.js?v=605c12ff';
-import { OVERLAY_FADE } from '../overlay-art.js?v=75c3ea34';
+import { OVERLAY_FADE, displayTopOf, itemstackOverlayPoint } from '../overlay-art.js?v=75c3ea34';
+import { playItemOverlay } from '../item-overlay.js?v=26400bfc';
+import { nodeToolOverlay, nodeToolSheet } from '../node-tools.js?v=a78fc3ce';
 import { vpSequence } from '../quest-rooms/vp-overlay.js?v=75d28bfb';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
-import { salmonSwimAt } from '../street-creatures.js?v=8ba71c8a';
+import { salmonSwimAt } from '../street-creatures.js?v=71a8ee88';
 import { GAME_EPOCH_MS } from '../game-day.js?v=edb00566';
 
 export const RESOURCE_FEATURE_ID = 'resource-nodes';
@@ -534,6 +536,12 @@ let lastTickAt = 0;
 let lastHarvest = '';
 let demoUsed = false;
 let demoEntity = null;
+/** The tool overlay playing on a node (verbStarted), and its end. */
+let nodeTool = null;
+function stopNodeTool() {
+  nodeTool?.stop();
+  nodeTool = null;
+}
 let autoplayTimer = null;
 let jarFx = null;
 let releaseState = '';
@@ -1686,6 +1694,7 @@ export const resourceNodesFeature = {
   },
 
   onStreetClear() {
+    stopNodeTool();
     generation += 1;
     clearTimeout(autoplayTimer);
     clearTimeout(releaseTimer);
@@ -1742,6 +1751,41 @@ export const resourceNodesFeature = {
     if (!entity) return true;
     performVerb(engine, entity, rulesVerbId(verbId));
     return true;
+  },
+
+  /**
+   * game.js beginVerbAction: a timed verb began. Scraping, digging and cutting Peat show the tool
+   * at work on the node for as long as the verb runs, as mining shows the pick (js/node-tools.js).
+   */
+  verbStarted(target, verb, engine) {
+    const entity = entities.find((row) => row.target === target);
+    if (!entity) return undefined;
+    stopNodeTool();
+    const rule = resourceNodeVerbs(entity.node, engine.inv, engine.pc, verbContext(engine, entity)).find((v) => v.id === rulesVerbId(verb?.id));
+    const def = nodeToolSheet(rule?.tool);
+    const spr = target.sprite;
+    const layer = engine.fxLayer || engine.entityLayer;
+    if (!def || !spr || spr.destroyed || !layer || !(verb?.durationMs > 0)) return undefined;
+    const place = nodeToolOverlay(entity.classTsid, spr.x, engine.player?.x);
+    const hold = Number(engine.param?.('nodetoolhold'));
+    nodeTool = playItemOverlay(engine.PIXI, def, {
+      layer,
+      flipped: place.flipped,
+      durationMs: verb.durationMs,
+      holdMs: Number.isFinite(hold) && hold > 0 ? hold : null,
+      label: `node-tool:${rule.tool}`,
+      onFrame: (frame) => engine.setData?.('nodeTool', `${rule.tool}:${entity.classTsid}:${frame}`),
+      at: () => (spr.destroyed
+        ? { x: 0, y: 0 }
+        : itemstackOverlayPoint(spr.x, displayTopOf(spr), { dx: place.deltaX, dy: place.deltaY })),
+    });
+    return undefined;
+  },
+
+  /** game.js cancelCurrentAction: the swing stopped before it landed. */
+  verbCancelled(target) {
+    if (entities.some((row) => row.target === target)) stopNodeTool();
+    return undefined;
   },
 
   /** salmon.js 30-100: Release on the Pocket Salmon, hidden outside Jal and Samudra. */

@@ -61,7 +61,7 @@ import { CRAB_WALK } from './crabs.js?v=18976e26';
 import { FIRE_DRAGON_WALK } from './fire-dragon.js?v=b7f3d751';
 import { walkSurfaceY } from './walk-surface.js?v=106bfdc5';
 import { EAT_PAUSE_MS } from './animal-mood.js?v=a49495fc';
-import { CHICKEN_PAUSE_STATES } from './chicken-idles.js?v=bb22ac49';
+import { CHICKEN_PAUSE_STATES } from './chicken-idles.js?v=6c0c1dd3';
 
 export const CREATURE_KINDS = Object.freeze(['chicken', 'butterfly', 'batterfly']);
 

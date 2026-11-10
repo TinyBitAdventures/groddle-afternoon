@@ -75,7 +75,7 @@ test('every sharpened home graphic is found, with the counts the audit measured'
 });
 
 test('each 3x twin exists and is exactly three times its 1x file; the 1x files stay as the fallback', async () => {
-  const { HIRES_SPRITES } = await import('../public/js/sprite-hires.js?v=84018f88');
+  const { HIRES_SPRITES } = await import('../public/js/sprite-hires.js?v=68150c4c');
   const { DENSE_SPRITES } = await import('../public/js/sprite-dense.js?v=2a0ce07a');
   const bad = [];
   for (const row of await homeArt()) {
@@ -95,7 +95,7 @@ test('each 3x twin exists and is exactly three times its 1x file; the 1x files s
 });
 
 test('each sharpened home graphic stores at least as many pixels as its largest draw scale', async () => {
-  const { HIRES_SPRITES } = await import('../public/js/sprite-hires.js?v=84018f88');
+  const { HIRES_SPRITES } = await import('../public/js/sprite-hires.js?v=68150c4c');
   const { DENSE_SPRITES } = await import('../public/js/sprite-dense.js?v=2a0ce07a');
   const stage = await stageScale();
   assert.ok(stage > 2 && stage < 3, `stage ${stage}`);

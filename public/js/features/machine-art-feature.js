@@ -21,7 +21,7 @@
 import { addItem, countItem } from '../inventory.js?v=60dfc9ca';
 import { ensureToolCondition } from '../tools.js?v=5f482998';
 import { MACHINE_SKILLS } from '../machine-rooms.js?v=1be82048';
-import { freezeMachineState, isMachineArt } from '../machine-art.js?v=d7da5faa';
+import { freezeMachineState, isMachineArt } from '../machine-art.js?v=6e6503e7';
 import { packSlotFor } from '../pack-slot-qa.js?v=1d74bf2d';
 
 export const MACHINE_ART_FEATURE_ID = 'machine-art';

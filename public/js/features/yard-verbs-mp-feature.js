@@ -69,8 +69,8 @@ import { frameTexture, onLoaded, sourceFromUrl, textureFromUrl } from '../textur
 import { homeStreetLayout, normalizeCultivationState } from '../home-cultivation.js?v=9571e110';
 import { readVisitScene } from '../neighbours-mp.js?v=f221f6e6';
 import { saveStore } from '../save-store.js?v=8839ba7b';
-import { STREET_GROUND_Y, homesFeature, wearHomeCultivation } from './homes-feature.js?v=f0cebe0f';
-import { patchesFeature, treeFrameUrl } from './patches-feature.js?v=70e431a0';
+import { STREET_GROUND_Y, homesFeature, wearHomeCultivation } from './homes-feature.js?v=721723de';
+import { patchesFeature, treeFrameUrl } from './patches-feature.js?v=d8dc0c76';
 import {
   YARD_STREET,
   YARD_TEXT as T,
@@ -86,18 +86,18 @@ import {
   treeSnapshot,
   visitorAnimalState,
   visitorTreeState,
-} from '../yard-verbs-mp.js?v=0ced052a';
+} from '../yard-verbs-mp.js?v=76bac0a5';
 import { yardFixtureRows, yardFixtureVerbs, yardFixturesKey } from '../yard-fixtures-mp.js?v=dd022fe8';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
-import { followYardPath, stickForClass } from '../yard-wander.js?v=f2c968a4';
-import { showsChickenIdle, yardChickenPose } from '../chicken-idle-art.js?v=6eddcb98';
-import { chickenWaitPose } from '../chicken-idles.js?v=bb22ac49';
+import { followYardPath, stickForClass } from '../yard-wander.js?v=908141cb';
+import { showsChickenIdle, yardChickenPose } from '../chicken-idle-art.js?v=89c3bcb0';
+import { chickenWaitPose } from '../chicken-idles.js?v=6c0c1dd3';
 import { countItem, removeItem } from '../inventory.js?v=60dfc9ca';
 import { ROCK_CATALOG, rockStatusLabel, tickMineRock } from '../mining.js?v=674ed39b';
 import { getResourceNodeDef, regrowDelayMs } from '../resource-nodes.js?v=7a77fd73';
 import { getGameDayKey } from '../game-day.js?v=edb00566';
-import { rockReady } from '../street-objects.js?v=c594cb8d';
-import { resourceNodesFeature } from './resource-nodes-feature.js?v=c8c76815';
+import { rockReady } from '../street-objects.js?v=9b571cb1';
+import { resourceNodesFeature } from './resource-nodes-feature.js?v=c455f797';
 import {
   ROCK_RESPAWN_MS,
   STOCK_NODE_VERBS,

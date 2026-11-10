@@ -19,7 +19,7 @@ import {
 import { SHEET_ORDER, bakeLook } from '../public/js/avatar-compositor.js?v=02e642c7';
 import { CORE_FRAMES, IDLE_FRAMES, IDLE_SHEETS, SHEET_FRAMES } from '../public/js/avatar-anims.js?v=fb921bf4';
 import { VECTOR_AVATAR, VECTOR_AVATAR_HIRES } from '../public/js/avatar-vector-sheets.js?v=ad801376';
-import { FIRST_DRAW_SPRITES, HIRES_SPRITES } from '../public/js/sprite-hires.js?v=84018f88';
+import { FIRST_DRAW_SPRITES, HIRES_SPRITES } from '../public/js/sprite-hires.js?v=68150c4c';
 import { compactD } from '../tools/avatar-compositor/shapes.mjs';
 import { customEase, easeAt, layerAt, readSymbol, tweenElement } from '../tools/avatar-compositor/xfl.mjs';
 
