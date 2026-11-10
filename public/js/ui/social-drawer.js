@@ -654,6 +654,17 @@ export function mountSocialDrawer({
     return open && tab === id && !document.hidden;
   }
 
+  /**
+   * Your own line always brings its log to the end (report #171): a line long enough to wrap the
+   * input made the log shorter, so it no longer counted as at its end and stayed where it was.
+   * `ownSaid` lets a second view of a log (the Classic skin's lower pane) do the same.
+   */
+  let ownSaid = { n: 0, id: '' };
+  function saidOwn(id) {
+    ownSaid = { n: ownSaid.n + 1, id };
+    if (open && tab === id) log.dataset.jump = '1';
+  }
+
   function sorted() {
     return [...tabs.values()].sort((a, b) => a.order - b.order || String(a.label).localeCompare(String(b.label)));
   }
@@ -1139,12 +1150,13 @@ export function mountSocialDrawer({
     else delete log.dataset.socialThread;
     if (t.kind === 'chats') log.dataset.socialList = '1';
     else delete log.dataset.socialList;
-    if (atEnd || log.dataset.jump) log.scrollTop = log.scrollHeight;
-    delete log.dataset.jump;
     // The input under the log: what it says and where your words go.
     // Global waits for groups-feature to join it: a line typed before then would go to Local.
     const showCompose = Boolean(form) && t.compose && t.live !== false;
     compose.hidden = !showCompose;
+    // After the input shows or hides: it changes the log's height, and the end is measured with it.
+    if (atEnd || log.dataset.jump) log.scrollTop = log.scrollHeight;
+    delete log.dataset.jump;
     if (input && showCompose) {
       const street = streetName();
       const hint = th ? THREAD_TEXT.placeholder : t.placeholder || (isConversation(t.id) ? `Message ${t.label}` : street ? `Say something on ${street}` : 'Say something');
@@ -1752,6 +1764,7 @@ export function mountSocialDrawer({
       t.lines.push(l);
       trim(t.lines);
       if (!l.mine && !visible(id)) t.unread += 1;
+      if (l.mine && !l.note) saidOwn(id);
       render();
       return true;
     },
@@ -1820,7 +1833,7 @@ export function mountSocialDrawer({
         updateThread(k);
         if (thread?.tk === k) {
           const atEnd = log.scrollHeight - log.scrollTop - log.clientHeight < 24;
-          if (atEnd) log.dataset.jump = '1';
+          if (atEnd || (added && line.mine)) log.dataset.jump = '1';
           render();
         } else publish();
         return added;
@@ -1954,6 +1967,7 @@ export function mountSocialDrawer({
      */
     localLine(name, text, { mine = false, feat = false, playerId = 0, rk = '' } = {}) {
       if (online) return api.push('local', { name, text, mine, feat, playerId, rk });
+      if (mine) saidOwn('activity');
       notifier.chat(`${name}: ${text}`);
       return true;
     },
@@ -2023,6 +2037,10 @@ export function mountSocialDrawer({
     },
     /** A tab's or conversation's name, or ''. */
     label: (id) => (id === CHATS_TAB ? CHATS_VIEW.label : tabs.get(id)?.label || ''),
+    /** Your own lines so far and the tab the last went to ({ n, id }): a second view follows it to the end. */
+    get ownSaid() {
+      return { ...ownSaid };
+    },
     onRender(fn) {
       renderListeners.add(fn);
       return () => renderListeners.delete(fn);

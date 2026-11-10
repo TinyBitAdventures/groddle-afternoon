@@ -241,6 +241,8 @@ export function installClassicPanes({ doc = globalThis.document, win = globalThi
   }
 
   let busy = false;
+  // Your own line brings this pane to its end too (report #171, the drawer's ownSaid).
+  let ownSeen = d.ownSaid?.n || 0;
   function sync() {
     if (busy || !classic()) return;
     busy = true;
@@ -263,7 +265,10 @@ export function installClassicPanes({ doc = globalThis.document, win = globalThi
         const atEnd = lowerLog.scrollHeight - lowerLog.scrollTop - lowerLog.clientHeight < 24;
         // Only the rows that changed: a selection in this pane stays (js/ui/keyed-nodes.js).
         reconcileChildren(lowerLog, d.logNodes(LOCAL_TABS, { cache: 'classic-lower' }));
-        if (atEnd) lowerLog.scrollTop = lowerLog.scrollHeight;
+        const own = d.ownSaid || { n: 0, id: '' };
+        const mine = own.n !== ownSeen && LOCAL_TABS.includes(own.id);
+        ownSeen = own.n;
+        if (atEnd || mine) lowerLog.scrollTop = lowerLog.scrollHeight;
         lowerPill.textContent = pillText(d.unread('local') + d.unread('activity'));
         lowerPill.style.display = lowerPill.textContent ? '' : 'none';
         const street = (doc.getElementById('street-name')?.textContent || '').split('·')[0].trim();
