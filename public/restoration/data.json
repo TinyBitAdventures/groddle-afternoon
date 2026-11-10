@@ -2748,13 +2748,78 @@
   ]
  },
  "release": {
-  "game": "0.28.1",
+  "game": "0.29.0",
   "deployed": "2026-11-10"
  },
  "git": {
-  "commits": 1568,
+  "commits": 1583,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-10",
+    "kind": "improve",
+    "text": "Make opens on your tools, grouped by kind"
+   },
+   {
+    "date": "2026-11-10",
+    "kind": "new",
+    "text": "Buddies show their faces, and Set as Destination leads you to a buddy"
+   },
+   {
+    "date": "2026-11-10",
+    "kind": "new",
+    "text": "Click the favor display to see your favor with all eleven Giants"
+   },
+   {
+    "date": "2026-11-10",
+    "kind": "improve",
+    "text": "An incubating Chicken's halfway line stays up 10 seconds, as in Glitch"
+   },
+   {
+    "date": "2026-11-10",
+    "kind": "improve",
+    "text": "A Street Spirit with a story calls you over from as far as Glitch's did"
+   },
+   {
+    "date": "2026-11-10",
+    "kind": "fix",
+    "text": "Speech bubbles stay with their speaker instead of lining the edge of the screen"
+   },
+   {
+    "date": "2026-11-10",
+    "kind": "new",
+    "text": "Leave a line with your Butler for visitors, who can ask it about you"
+   },
+   {
+    "date": "2026-11-10",
+    "kind": "new",
+    "text": "Things dropped on a home street are seen by the owner and every visitor"
+   },
+   {
+    "date": "2026-11-10",
+    "kind": "fix",
+    "text": "The Ancestral Lands timer stops while you are at home"
+   },
+   {
+    "date": "2026-11-10",
+    "kind": "fix",
+    "text": "The It's Educational page no longer says Piety and Martial Imagination offer it"
+   },
+   {
+    "date": "2026-11-10",
+    "kind": "fix",
+    "text": "Eating a Sno Cone says how much iMG it gave"
+   },
+   {
+    "date": "2026-11-10",
+    "kind": "fix",
+    "text": "A bag's tray closes when you drag from it onto a shrine"
+   },
+   {
+    "date": "2026-11-10",
+    "kind": "fix",
+    "text": "Your own chat line scrolls the chat to it"
+   },
    {
     "date": "2026-11-10",
     "kind": "fix",
@@ -2809,71 +2874,6 @@
     "date": "2026-11-09",
     "kind": "fix",
     "text": "A player without papers is no longer left at a subway gate with no road home"
-   },
-   {
-    "date": "2026-11-09",
-    "kind": "fix",
-    "text": "Harbinger Heath's leftmost ladder has all its rungs"
-   },
-   {
-    "date": "2026-11-09",
-    "kind": "fix",
-    "text": "Another player walking in no longer stops the street"
-   },
-   {
-    "date": "2026-11-09",
-    "kind": "fix",
-    "text": "The Cubimal card counts every figure you have found"
-   },
-   {
-    "date": "2026-11-09",
-    "kind": "new",
-    "text": "Door keys lie on their streets again, back 5 minutes after a pickup"
-   },
-   {
-    "date": "2026-11-09",
-    "kind": "fix",
-    "text": "The Quests list draws again when it lost its rows"
-   },
-   {
-    "date": "2026-11-09",
-    "kind": "fix",
-    "text": "Brillah Completist can be earned"
-   },
-   {
-    "date": "2026-11-09",
-    "kind": "fix",
-    "text": "Energy and mood go past 100 in the Paradise ticket streets"
-   },
-   {
-    "date": "2026-11-09",
-    "kind": "new",
-    "text": "Report an IM, and a moderator's purge or deleted line leaves every open window"
-   },
-   {
-    "date": "2026-11-09",
-    "kind": "new",
-    "text": "A Console link in the header for administrators"
-   },
-   {
-    "date": "2026-11-09",
-    "kind": "fix",
-    "text": "Visitors draw no more of a home's animals than its street holds"
-   },
-   {
-    "date": "2026-11-09",
-    "kind": "new",
-    "text": "You can put your Mail Dispatcher away, and put it out again in Cultivate"
-   },
-   {
-    "date": "2026-11-09",
-    "kind": "new",
-    "text": "Captures, youth potions, Plops and animal names on the street are everyone's"
-   },
-   {
-    "date": "2026-11-09",
-    "kind": "new",
-    "text": "A rooting Piggy sniffs with its own clip, drawn from Tiny Speck's authoring file"
    }
   ]
  },
