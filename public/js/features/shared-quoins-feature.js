@@ -40,7 +40,7 @@
  */
 
 import { QUOIN_TYPES, creditQuoinStat } from '../quoins.js?v=237c1d5d';
-import { quoinShardGrabberSound, quoinShardSoundKey } from '../quoin-shards.js?v=9a2e4c37';
+import { quoinShardGrabberSound, quoinShardSoundKey } from '../quoin-shards.js?v=25e0d8b4';
 import { LOCAL_STATES, SHARD_STATS, createSharedQuoinBook, fxShards, normalizeGrab, shardFor, statusOf } from '../shared-quoins.js?v=98d9f115';
 
 export const SHARED_QUOINS_FEATURE_ID = 'shared-quoins';

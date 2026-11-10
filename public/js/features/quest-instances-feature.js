@@ -861,7 +861,9 @@ function makeContext(engine) {
       const lab = QUOIN_TYPES[result.resolvedTypeId || type]?.label || 'iMG';
       if (result.hitLimit) engine.announceQuoinLimit?.(result.dailyLimit);
       if (result.ok) {
-        if (result.amount) engine.floatText(x, y - 16, `+${result.amount} ${lab}`, '#ffffff');
+        // Report #181: the amount as a street quoin shows it (game.js quoinGotText).
+        if (result.amount && engine.quoinGotText) engine.quoinGotText(x, y, `+${result.amount} ${lab}`, '#ffffff');
+        else if (result.amount) engine.floatText(x, y - 16, `+${result.amount} ${lab}`, '#ffffff');
         engine.playSound(`QUOIN_${String(result.typeId || 'xp').toUpperCase()}`, { volume: 0.5 });
       } else if (result.reason === 'daily_limit') {
         // Ticket 94: a quest room keeps the limit as a street does (items/quoin.js 159: only games,

@@ -32,6 +32,10 @@
  *     &quoinclass=slow medium-large xp for a steady 25, or fast tiny xp for 1).
  * Canvas: data-quoin-shard-last, -crowd, -sound, -you, -fx, -demo,
  *     data-companion-quoins; data-last-sound for the sound check.
+ *
+ * The collector's own amount (report #181): every quoin you take, shared or not, shows its
+ * amount as the client's full burst at the quoin (quoinGotFx, called by game.js quoinGotText).
+ * Canvas: data-quoin-got-fx = "<words>@<x>,<y>" (where the words sit).
  */
 
 import { QUOIN_TYPES, creditQuoinStat, quoinClassAmount } from '../quoins.js?v=237c1d5d';
@@ -42,10 +46,12 @@ import {
   companionTouchesQuoin,
   pickCompanionQuoin,
   planQuoinShards,
+  quoinBurstPose,
   quoinShardFxPlan,
   quoinShardGrabberSound,
   quoinTypeShards,
-} from '../quoin-shards.js?v=9a2e4c37';
+  stackQuoinText,
+} from '../quoin-shards.js?v=25e0d8b4';
 
 let fxRoot = null;
 const fxItems = [];
@@ -54,23 +60,9 @@ const interest = new Map();
 let companionGrabs = 0;
 let demo = null;
 
-// —— Tweener easings (the client's TSTweener uses Penner's set) ——
-const easeOutBack = (t) => {
-  const s = 1.70158;
-  const u = t - 1;
-  return u * u * ((s + 1) * u + s) + 1;
-};
-const easeInOutBack = (t) => {
-  const s = 1.70158 * 1.525;
-  const u = t * 2;
-  if (u < 1) return 0.5 * (u * u * ((s + 1) * u - s));
-  const v = u - 2;
-  return 0.5 * (v * v * ((s + 1) * v + s) + 2);
-};
+// Tweener easings for the bolts (the client's TSTweener uses Penner's set; the bursts' are in js/quoin-shards.js quoinBurstPose).
 const easeInExpo = (t) => (t <= 0 ? 0 : 2 ** (10 * (t - 1)));
 const easeOutExpo = (t) => (t >= 1 ? 1 : 1 - 2 ** (-10 * t));
-const easeOutCubic = (t) => 1 - (1 - t) ** 3;
-const clamp01 = (t) => Math.max(0, Math.min(1, t));
 
 function ensureRoot(engine) {
   const layer = engine.fxLayer;
@@ -131,10 +123,10 @@ function addBolt(engine, root, bolt) {
   });
 }
 
-function burstText(engine, value, stat, small) {
+function burstText(engine, value, stat, small, words = '') {
   const fx = QUOIN_SHARD_FX;
   const color = small ? fx.shardColor : fx.plainColor;
-  const label = value < 0 ? `-${Math.abs(value)}${stat ? ` ${stat}` : ''}` : `${small ? '' : '+'}${Math.abs(value)}${stat ? ` ${stat}` : ''}`;
+  const label = words || (value < 0 ? `-${Math.abs(value)}${stat ? ` ${stat}` : ''}` : `${small ? '' : '+'}${Math.abs(value)}${stat ? ` ${stat}` : ''}`);
   const text = new engine.PIXI.Text({ text: label, style: {
     fontFamily: 'Trebuchet MS, sans-serif',
     fontSize: small ? fx.smallText : fx.text,
@@ -155,11 +147,11 @@ function addBurst(engine, root, burst) {
   node.y = burst.y;
   const circle = new engine.PIXI.Graphics();
   node.addChild(circle);
-  const hasText = !burst.plain && (burst.value || burst.stat);
-  const text = hasText ? burstText(engine, burst.value, burst.stat, burst.small) : null;
+  const hasText = !burst.plain && Boolean(burst.value || burst.stat || burst.label);
+  const text = hasText ? burstText(engine, burst.value, burst.stat, burst.small, burst.label) : null;
   if (text) node.addChild(text);
   root.addChild(node);
-  fxItems.push({
+  const item = {
     kind: 'burst',
     node,
     circle,
@@ -169,8 +161,31 @@ function addBurst(engine, root, burst) {
     delaySec: burst.delaySec,
     color: burst.small ? fx.shardColor : fx.plainColor,
     size: burst.small ? fx.smallCircle : fx.circle,
+    // A full burst under prefers-reduced-motion shows its amount in place (quoinBurstPose `still`).
+    still: !burst.small && hasText && reducedMotion(),
+    textFit: 1,
+    textW: 0,
+    textY: 0,
     age: 0,
-  });
+  };
+  if (text && !burst.small) {
+    // Ours: a long line is drawn no wider than textMaxWidth, and one raised over an amount still
+    // showing sits a line above it (the client's "+5 iMG" was short, and its bursts overlapped).
+    // The words start at scale 0: their drawn width is the local bounds'.
+    const natural = Math.max(1, text.getLocalBounds().width);
+    item.textFit = Math.min(1, fx.textMaxWidth / natural);
+    item.textW = natural * item.textFit;
+    const live = fxItems.filter((row) => row.kind === 'burst' && row.textW && !row.node.destroyed)
+      .map((row) => ({ x: row.node.x, y: row.node.y + row.textY, w: row.textW }));
+    item.textY = stackQuoinText(live, node.x, node.y, item.textW) - node.y;
+    text.y = item.textY;
+  }
+  fxItems.push(item);
+  return item;
+}
+
+function reducedMotion() {
+  return Boolean(globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches);
 }
 
 function showFx(engine, plan) {
@@ -178,7 +193,7 @@ function showFx(engine, plan) {
   if (!root) return;
   for (const bolt of plan.bolts) addBolt(engine, root, bolt);
   for (const burst of plan.bursts) {
-    // The player's own grab keeps game.js's pickup text at the quoin.
+    // The player's own amount at the quoin is the pickup's (game.js quoinGotText, quoinGotFx below).
     if (burst.own) continue;
     addBurst(engine, root, burst);
   }
@@ -212,45 +227,16 @@ function drawCircle(item, perc) {
 }
 
 function tickBurst(item) {
-  const fx = QUOIN_SHARD_FX;
   const t = item.age - item.delaySec;
-  if (t < 0) {
-    drawCircle(item, 0);
-    return true;
-  }
-  if (item.plain) {
-    // tweenGrowAndShrink: 0.3 s out, 0.2 s back, then done.
-    if (t < fx.plainInSec) drawCircle(item, easeOutBack(t / fx.plainInSec));
-    else if (t < fx.plainInSec + fx.plainOutSec) drawCircle(item, 1 - easeInOutBack((t - fx.plainInSec) / fx.plainOutSec));
-    else return false;
-    return true;
-  }
-  // tweenCircle: 0.5 s out, 0.5 s back.
-  if (t < fx.circleInSec) drawCircle(item, easeOutBack(t / fx.circleInSec));
-  else if (t < fx.circleInSec + fx.circleOutSec) drawCircle(item, Math.max(0, 1 - easeInOutBack((t - fx.circleInSec) / fx.circleOutSec)));
-  else drawCircle(item, 0);
-  // tweenText: grows over 0.2 s (a shard at once, a full burst 0.4 s on), then fades.
-  const textAt = item.small ? 0 : fx.textDelaySec;
-  const tt = t - textAt;
+  // QuoinAnimation.as, as js/quoin-shards.js quoinBurstPose reads it.
+  const pose = quoinBurstPose(t, { small: item.small, plain: item.plain, still: item.still });
+  drawCircle(item, pose.circle);
   if (item.text) {
-    if (tt < 0) item.text.scale.set(0);
-    else if (tt < fx.textInSec) item.text.scale.set(easeOutCubic(tt / fx.textInSec));
-    else {
-      item.text.scale.set(1);
-      const hold = item.small ? fx.shardTextHoldSec : fx.textHoldSec;
-      const out = item.small ? fx.shardTextOutSec : fx.textOutSec;
-      const after = tt - fx.textInSec - hold;
-      if (after > 0) {
-        const p = easeOutCubic(clamp01(after / out));
-        item.text.alpha = 1 - p;
-        if (!item.small) item.text.y = -fx.textRise * p;
-        if (after >= out) return false;
-      }
-    }
-  } else if (t >= fx.circleInSec + fx.circleOutSec) {
-    return false;
+    item.text.scale.set(pose.textScale * item.textFit);
+    item.text.y = item.textY + pose.textY;
+    item.text.alpha = pose.textAlpha;
   }
-  return true;
+  return !pose.done;
 }
 
 function tickFx(dtMs, engine) {
@@ -575,5 +561,24 @@ export const quoinShardsFeature = {
     const plan = quoinShardFxPlan(opts);
     showFx(engine, plan);
     return plan;
+  },
+
+  /**
+   * engine.query('quoinGotFx', { x, y, label }, engine): the collector's own amount, drawn as the
+   * client drew it (report #181): AnnouncementController.as doQuoinGot 815-816 and 890-902 puts a
+   * QuoinAnimation at the quoin, 15 px up, and runs qa.go(0, delta, stat), the full burst (24 px
+   * words in a 50 px circle, QuoinAnimation.as 24-26). `x`, `y` are the quoin's; `label` the
+   * words ("+5 iMG"). Returns { node, x, y } (where the words sit), or null with no layer to draw on.
+   */
+  quoinGotFx(opts, engine) {
+    const root = ensureRoot(engine);
+    const label = String(opts?.label || '');
+    if (!root || !label) return null;
+    const x = Number(opts.x) || 0;
+    const y = (Number(opts.y) || 0) - QUOIN_SHARD_FX.startLift;
+    const item = addBurst(engine, root, { x, y, delaySec: 0, value: 0, stat: '', label, small: false });
+    engine.setData('quoinShardFx', String(fxItems.length));
+    engine.setData('quoinGotFx', `${label}@${Math.round(x)},${Math.round(y + item.textY)}`);
+    return { node: item.node, x, y: y + item.textY };
   },
 };

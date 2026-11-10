@@ -4,6 +4,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import {
   COMPANION_QUOIN_RULES,
+  QUOIN_BURST_FULL_SEC,
   QUOIN_SHARD_FX,
   QUOIN_SHARD_RADIUS,
   QUOIN_SHARD_STATS,
@@ -11,13 +12,15 @@ import {
   companionTouchesQuoin,
   pickCompanionQuoin,
   planQuoinShards,
+  quoinBurstPose,
   quoinShardAmount,
   quoinShardFxPlan,
   quoinShardGrabberSound,
   quoinShardPercentage,
   quoinShardSoundKey,
   quoinTypeShards,
-} from '../public/js/quoin-shards.js?v=9a2e4c37';
+  stackQuoinText,
+} from '../public/js/quoin-shards.js?v=25e0d8b4';
 import { QUOIN_TYPES, collectQuoin, createQuoinState, creditQuoinStat } from '../public/js/quoins.js?v=237c1d5d';
 import { SOUND_ALIASES, SOUND_FILES } from '../public/js/sound-keys.js?v=6aedc206';
 
@@ -203,6 +206,214 @@ describe('the shard picture (glitch-client doQuoinGot)', () => {
     assert.equal(QUOIN_SHARD_FX.startLift, 15);
     assert.equal(QUOIN_SHARD_FX.shardColor, 0xf0f0bd);
     assert.equal(QUOIN_SHARD_FX.boltSec, 1.5);
+  });
+});
+
+describe('a quoin\'s amount stays readable (report #181, QuoinAnimation.as)', () => {
+  const near = (a, b, msg) => assert.ok(Math.abs(a - b) < 1e-9, `${msg}: ${a} vs ${b}`);
+
+  it('your amount: 0.4 s in, grown over 0.2 s, the nod, 1.5 s held, 0.4 s rising 40 px and fading', () => {
+    assert.equal(QUOIN_BURST_FULL_SEC, 2.8);
+    // The circle grows 0.5 s and is back to nothing by 1 s.
+    assert.equal(quoinBurstPose(0.5).circle, 1);
+    assert.equal(quoinBurstPose(1).circle, 0);
+    // No words before 0.4 s; full size at 0.6 s.
+    assert.equal(quoinBurstPose(0.39).textScale, 0);
+    assert.ok(quoinBurstPose(0.5).textScale > 0.8 && quoinBurstPose(0.5).textScale < 1);
+    assert.equal(quoinBurstPose(0.6).textScale, 1);
+    // tweenText2 to tweenText5: 2 up, 4 down, 4 up, 2 down in 0.05, 0.1, 0.1, 0.05 s.
+    near(quoinBurstPose(0.6).textY, 0, 'nod start');
+    assert.ok(quoinBurstPose(0.649).textY < -1.9, 'up 2');
+    assert.ok(quoinBurstPose(0.749).textY > 1.9, 'down to +2');
+    assert.ok(quoinBurstPose(0.849).textY < -1.9, 'up to -2');
+    near(quoinBurstPose(0.91).textY, 0, 'nod end');
+    // Held at full strength where it is until 2.4 s.
+    for (const t of [0.95, 1.5, 2, 2.39]) {
+      const pose = quoinBurstPose(t);
+      assert.deepEqual([pose.textScale, pose.textY, pose.textAlpha, pose.done], [1, 0, 1, false], `held at ${t}`);
+    }
+    // Then it rises 40 px and fades over 0.4 s.
+    const mid = quoinBurstPose(2.6);
+    assert.ok(mid.textY < -30 && mid.textY > -40 && mid.textAlpha > 0 && mid.textAlpha < 0.2);
+    const end = quoinBurstPose(2.81);
+    assert.deepEqual([end.textY, end.textAlpha, end.done], [-40, 0, true]);
+    // The old float was gone in 55 frames (0.92 s), fading from its first frame.
+    assert.ok(QUOIN_BURST_FULL_SEC > 55 / 60 * 3);
+  });
+
+  it('someone else\'s shard and a bystander\'s plain burst keep their own short timings', () => {
+    assert.equal(quoinBurstPose(0.1, { small: true }).textScale > 0, true, 'a shard shows at once');
+    assert.equal(quoinBurstPose(0.5, { small: true }).textY, 0);
+    assert.equal(quoinBurstPose(0.69, { small: true }).textAlpha, 1);
+    assert.equal(quoinBurstPose(1.11, { small: true }).done, true);
+    assert.equal(quoinBurstPose(1.0, { small: true }).done, false);
+    assert.equal(quoinBurstPose(0.3, { plain: true }).circle, 1);
+    assert.equal(quoinBurstPose(0.51, { plain: true }).done, true);
+    assert.equal(quoinBurstPose(-0.1).done, false);
+    assert.equal(quoinBurstPose(-0.1).textScale, 0);
+  });
+
+  it('with reduced motion the amount shows at once, stays put for the same time and fades in place', () => {
+    for (const t of [0, 0.3, 1, 2.39]) {
+      const pose = quoinBurstPose(t, { still: true });
+      assert.deepEqual([pose.circle, pose.textScale, pose.textY, pose.textAlpha, pose.done], [0, 1, 0, 1, false], `still at ${t}`);
+    }
+    const fading = quoinBurstPose(2.6, { still: true });
+    assert.ok(fading.textAlpha > 0 && fading.textAlpha < 1);
+    assert.equal(fading.textY, 0);
+    assert.equal(quoinBurstPose(2.81, { still: true }).done, true);
+    // A shard is not a full burst: `still` leaves it alone.
+    assert.deepEqual(quoinBurstPose(0.1, { small: true, still: true }), quoinBurstPose(0.1, { small: true }));
+  });
+
+  it('an amount raised over one still showing sits a line above it', () => {
+    const line = QUOIN_SHARD_FX.textLine;
+    assert.equal(stackQuoinText([], 100, 200, 80), 200);
+    // 60 px apart with 80 px words: they would touch.
+    assert.equal(stackQuoinText([{ x: 100, y: 200, w: 80 }], 160, 200, 80), 200 - line);
+    // Far enough apart: each at its own quoin, as the client drew them.
+    assert.equal(stackQuoinText([{ x: 100, y: 200, w: 80 }], 190, 200, 80), 200);
+    // A different height already clears it.
+    assert.equal(stackQuoinText([{ x: 100, y: 200, w: 80 }], 100, 200 - line, 80), 200 - line);
+    // Two already stacked: the third goes above both.
+    assert.equal(stackQuoinText([{ x: 100, y: 200, w: 80 }, { x: 100, y: 200 - line, w: 80 }], 100, 200, 80), 200 - line * 2);
+  });
+
+  it('uses the client numbers', { skip: !existsSync(client) && 'glitch-client not beside the spike' }, () => {
+    const qa = readFileSync(join(client, 'port/QuoinAnimation.as'), 'utf8');
+    const annc = readFileSync(join(client, 'control/engine/AnnouncementController.as'), 'utf8');
+    assert.match(qa, /private const move_by:int = 2;/);
+    assert.match(qa, /private const move_in:Number = \.05;/);
+    assert.match(qa, /private const default_end_circle_size:int = 50;/);
+    assert.match(qa, /private const default_end_text_size:Number = 24;/);
+    assert.match(qa, /var this_delay:Number = \(is_shard\) \? delay : \.4\+delay;/);
+    assert.match(qa, /\{text_perc:1, time:\.2, delay:this_delay, transition:'easeOutCubic', onComplete:tweenText2\}/);
+    assert.match(qa, /\{y:val_tf\.y-move_by, delay:0, time:move_in, transition:'easeOutCubic', onComplete:tweenText3\}/);
+    assert.match(qa, /\{y:val_tf\.y\+\(move_by\*2\), delay:0, time:move_in\*2, transition:'easeOutCubic', onComplete:tweenText4\}/);
+    assert.match(qa, /\{y:val_tf\.y-\(move_by\*2\), delay:0, time:move_in\*2, transition:'easeOutCubic', onComplete:tweenText5\}/);
+    assert.match(qa, /\{y:val_tf\.y\+move_by, delay:0, time:move_in, transition:'easeOutCubic', onComplete:tweenText6\}/);
+    assert.match(qa, /\{y:val_tf\.y-40, alpha:0, delay:1\.5, time:\.4, transition:'easeOutCubic', onComplete:done\}/);
+    assert.match(qa, /\{circle_perc:1, delay:delay, time:\.5, transition:'easeOutBack', onComplete:tweenCircle2\}/);
+    // The getter's burst: at the quoin, 15 px up, the default (full) sizes.
+    assert.match(annc, /qa\.x = start_x;\s+qa\.y = start_y;[\s\S]{0,200}if \(this_is_the_quoin_getter\) \{[\s\S]{0,300}qa\.go\(0, delta, txt\);/);
+    const fx = QUOIN_SHARD_FX;
+    assert.deepEqual([fx.text, fx.circle, fx.textDelaySec, fx.textInSec, fx.textBobPx, fx.textBobSec, fx.textHoldSec, fx.textOutSec, fx.textRise, fx.circleInSec, fx.circleOutSec],
+      [24, 50, 0.4, 0.2, 2, 0.05, 1.5, 0.4, 40, 0.5, 0.5]);
+  });
+});
+
+describe('the collector\'s burst on the page (features/quoin-shards-feature.js quoinGotFx)', () => {
+  /** Enough of Pixi for the feature's drawing. */
+  function fakePixi() {
+    class Node {
+      constructor() {
+        this.children = [];
+        this.parent = null;
+        this.destroyed = false;
+        this.x = 0;
+        this.y = 0;
+        this.alpha = 1;
+        const node = this;
+        this.scale = { x: 1, y: 1, set(v) { node.scale.x = v; node.scale.y = v; } };
+        this.anchor = { set() {} };
+      }
+      addChild(...kids) {
+        for (const k of kids) {
+          k.parent = this;
+          this.children.push(k);
+        }
+        return kids[0];
+      }
+      destroy() {
+        this.destroyed = true;
+        if (this.parent) this.parent.children = this.parent.children.filter((k) => k !== this);
+      }
+    }
+    class Graphics extends Node {
+      clear() { this.drawn = 0; return this; }
+      circle(x, y, r) { this.drawn = r; return this; }
+      fill() { return this; }
+      stroke() { return this; }
+    }
+    class Text extends Node {
+      constructor({ text, style }) {
+        super();
+        this.text = text;
+        this.style = style;
+      }
+      // About 0.55 em a letter, like the page's bold face.
+      getLocalBounds() { return { width: this.text.length * this.style.fontSize * 0.55 }; }
+    }
+    return { Container: Node, Graphics, Text };
+  }
+
+  async function setup() {
+    const { quoinShardsFeature } = await import('../public/js/features/quoin-shards-feature.js?v=f9bffa8e');
+    const PIXI = fakePixi();
+    const data = {};
+    const engine = { PIXI, fxLayer: new PIXI.Container(), setData: (k, v) => { data[k] = v; }, param: () => null };
+    quoinShardsFeature.onStreetClear();
+    return { feature: quoinShardsFeature, engine, data };
+  }
+  const tick = (feature, engine, seconds, step = 1 / 60) => {
+    for (let t = 0; t < seconds - 1e-9; t += step) feature.onTick(step * 1000, 0, engine);
+  };
+
+  it('draws the amount at the quoin, 15 px up, in 24 px words, for 2.8 s', async () => {
+    const { feature, engine, data } = await setup();
+    const drawn = feature.quoinGotFx({ x: 400, y: 300, label: '+5 iMG' }, engine);
+    assert.deepEqual([drawn.x, drawn.y], [400, 285]);
+    assert.equal(data.quoinGotFx, '+5 iMG@400,285');
+    const words = drawn.node.children.find((k) => k.text);
+    assert.equal(words.text, '+5 iMG');
+    assert.equal(words.style.fontSize, 24);
+    assert.equal(words.style.fill, 0xffffff);
+    tick(feature, engine, 0.3);
+    assert.equal(words.scale.x, 0, 'no words for the first 0.4 s');
+    tick(feature, engine, 0.7);
+    assert.equal(words.scale.x, 1);
+    assert.equal(words.alpha, 1);
+    tick(feature, engine, 1.3);
+    assert.deepEqual([words.scale.x, words.alpha, words.y, drawn.node.destroyed], [1, 1, 0, false], 'still there, where it was, 2.3 s on');
+    tick(feature, engine, 0.6);
+    assert.equal(drawn.node.destroyed, true);
+    assert.equal(data.quoinShardFx, '0');
+    feature.onStreetClear();
+  });
+
+  it('keeps a long line inside 280 px and lifts an amount raised over one still showing', async () => {
+    const { feature, engine } = await setup();
+    const long = feature.quoinGotFx({ x: 400, y: 300, label: 'No active study to accelerate' }, engine);
+    const words = long.node.children.find((k) => k.text);
+    tick(feature, engine, 1);
+    assert.ok(words.scale.x < 1, 'drawn smaller');
+    assert.ok(Math.abs(words.getLocalBounds().width * words.scale.x - QUOIN_SHARD_FX.textMaxWidth) < 1e-6);
+    const second = feature.quoinGotFx({ x: 430, y: 300, label: '+5 iMG' }, engine);
+    assert.equal(second.y, 285 - QUOIN_SHARD_FX.textLine);
+    const far = feature.quoinGotFx({ x: 900, y: 300, label: '+5 iMG' }, engine);
+    assert.equal(far.y, 285);
+    assert.equal(feature.quoinGotFx({ x: 1, y: 1, label: '' }, engine), null);
+    assert.equal(feature.quoinGotFx({ x: 1, y: 1, label: '+1 iMG' }, { ...engine, fxLayer: null }), null);
+    feature.onStreetClear();
+  });
+
+  it('the pickup shows its amount once: the burst, and the old float only with no layer to draw on', () => {
+    const game = read('game.js');
+    const grab = game.slice(game.indexOf('function grabWorldQuoin('), game.indexOf('function announceQuoinLimit('));
+    assert.match(grab, /quoinGotText\(q\.x, q\.y, copy, rewardDef\.color\);/);
+    assert.equal((grab.match(/floatText\(/g) || []).length, 0);
+    assert.match(game, /const drawn = features\.query\('quoinGotFx', \{ x, y, label: words \}, engine\);\s+if \(!drawn\?\.node\) return floatText\(x, y - 20, text, color\);/);
+    // Everything else a pickup does is still there.
+    assert.match(grab, /logGain\(`You collected \$\{/);
+    assert.match(grab, /if \(result\.hitLimit\) announceQuoinLimit\(result\.dailyLimit\);/);
+    assert.match(grab, /if \(result\.typeId === 'mystery'\) notify\.notice\(/);
+    assert.match(grab, /burst\(q\.x, q\.y, rewardDef\.color, result\.typeId === 'qurazy' \? 28 : 12\);/);
+    // The feature still leaves the grabber's own burst to the pickup.
+    const feature = read('js/features/quoin-shards-feature.js');
+    assert.match(feature, /if \(burst\.own\) continue;/);
+    // Quest-room quoins show it the same way.
+    const rooms = read('js/features/quest-instances-feature.js');
+    assert.match(rooms, /if \(result\.amount && engine\.quoinGotText\) engine\.quoinGotText\(x, y, `\+\$\{result\.amount\} \$\{lab\}`, '#ffffff'\);/);
   });
 });
 

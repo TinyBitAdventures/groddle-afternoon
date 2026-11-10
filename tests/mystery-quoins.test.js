@@ -136,7 +136,8 @@ describe('what the player sees', () => {
     assert.match(game, /if \(result\.typeId === 'mystery'\) notify\.notice\(wholeStatAmounts\(`Mystery quoin: \$\{copy\}`\), \{ log: false \}\);/);
     assert.match(game, /if \(result\.resolvedTypeId === 'xp'\) return `\+\$\{amount\} iMG`;/);
     assert.match(game, /const rewardDef = QUOIN_TYPES\[result\.resolvedTypeId\] \|\| q\.def;/);
-    assert.match(game, /floatText\(q\.x, q\.y - 20, copy, rewardDef\.color\);/);
+    // Report #181: the amount is Glitch's burst at the quoin (quoinGotText), in the rolled kind's words.
+    assert.match(game, /quoinGotText\(q\.x, q\.y, copy, rewardDef\.color\);/);
     assert.match(game, /soundForQuoin\(result\.resolvedTypeId\)/);
     assert.match(game, /resolvedType: shared\.resolved/, 'multiplayer passes the server\'s roll');
   });

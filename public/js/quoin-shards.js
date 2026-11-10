@@ -67,9 +67,116 @@ export const QUOIN_SHARD_FX = Object.freeze({
   textHoldSec: 1.5,
   textOutSec: 0.4,
   textRise: 40,
+  // QuoinAnimation.as 22-23 and tweenText2 to tweenText5 (159-177): once grown, a full burst's
+  // amount nods 2 px up, 4 down, 4 up and 2 down in 0.05, 0.1, 0.1 and 0.05 s before it holds.
+  textBobPx: 2,
+  textBobSec: 0.05,
   plainInSec: 0.3,
   plainOutSec: 0.2,
+  // Ours: the remake's longer lines ("Mood already full") are drawn no wider than this, and an
+  // amount raised over one still showing sits a line above it.
+  textMaxWidth: 280,
+  textLine: 26,
 });
+
+// The client's TSTweener uses Penner's easings.
+const easeOutBack = (t) => {
+  const s = 1.70158;
+  const u = t - 1;
+  return u * u * ((s + 1) * u + s) + 1;
+};
+const easeInOutBack = (t) => {
+  const s = 1.70158 * 1.525;
+  const u = t * 2;
+  if (u < 1) return 0.5 * (u * u * ((s + 1) * u - s));
+  const v = u - 2;
+  return 0.5 * (v * v * ((s + 1) * v + s) + 2);
+};
+const easeOutCubic = (t) => 1 - (1 - t) ** 3;
+const clamp01 = (t) => Math.max(0, Math.min(1, t));
+
+/** How long a full burst's amount shows from the pickup to gone: 0.4 + 0.2 + 0.3 + 1.5 + 0.4 s. */
+export const QUOIN_BURST_FULL_SEC = Math.round((QUOIN_SHARD_FX.textDelaySec + QUOIN_SHARD_FX.textInSec + QUOIN_SHARD_FX.textBobSec * 6
+  + QUOIN_SHARD_FX.textHoldSec + QUOIN_SHARD_FX.textOutSec) * 1000) / 1000;
+
+/**
+ * QuoinAnimation.as as a pose: one burst `t` seconds after its delay. `circle` is the circle's
+ * size (1 = full, past 1 on the back ease), `textScale`, `textY` (px, up is negative) and
+ * `textAlpha` are the amount's; `done` when the burst is over.
+ *  - plain (no amount): tweenGrowAndShrink 185-191, 0.3 s out and 0.2 s back.
+ *  - small (someone else's shard): tweenText 155-156 and tweenText2 160-161, the amount at once,
+ *    0.5 s held, 0.4 s fade, no move.
+ *  - full (your amount): tweenCircle 141-150 (0.5 s out, 0.5 s back), tweenText 0.4 s in, grown
+ *    over 0.2 s, the nod (tweenText2 to tweenText5), 1.5 s held, then 0.4 s rising 40 px and
+ *    fading (tweenText6 179-181).
+ *  - still (prefers-reduced-motion, a full burst only): no circle, no growing, no nod, no rise;
+ *    the amount shows at once for the same 2.4 s and fades where it is.
+ */
+export function quoinBurstPose(t, { small = false, plain = false, still = false } = {}) {
+  const fx = QUOIN_SHARD_FX;
+  const pose = { circle: 0, textScale: 0, textY: 0, textAlpha: 1, done: false };
+  if (!(t >= 0)) return pose;
+  if (plain) {
+    if (t < fx.plainInSec) pose.circle = easeOutBack(t / fx.plainInSec);
+    else if (t < fx.plainInSec + fx.plainOutSec) pose.circle = 1 - easeInOutBack((t - fx.plainInSec) / fx.plainOutSec);
+    else pose.done = true;
+    return pose;
+  }
+  if (still && !small) {
+    const shown = fx.textDelaySec + fx.textInSec + fx.textBobSec * 6 + fx.textHoldSec;
+    pose.textScale = 1;
+    pose.textAlpha = 1 - easeOutCubic(clamp01((t - shown) / fx.textOutSec));
+    pose.done = t >= shown + fx.textOutSec;
+    return pose;
+  }
+  if (t < fx.circleInSec) pose.circle = easeOutBack(t / fx.circleInSec);
+  else if (t < fx.circleInSec + fx.circleOutSec) pose.circle = Math.max(0, 1 - easeInOutBack((t - fx.circleInSec) / fx.circleOutSec));
+  const tt = t - (small ? 0 : fx.textDelaySec);
+  if (tt < 0) return pose;
+  if (tt < fx.textInSec) {
+    pose.textScale = easeOutCubic(tt / fx.textInSec);
+    return pose;
+  }
+  pose.textScale = 1;
+  let after = tt - fx.textInSec;
+  if (!small) {
+    const b = fx.textBobPx;
+    const u = fx.textBobSec;
+    // [from, to, seconds]: each leg eases out, as the client's four tweens do.
+    const legs = [[0, -b, u], [-b, b, u * 2], [b, -b, u * 2], [-b, 0, u]];
+    for (const [from, to, sec] of legs) {
+      if (after < sec) {
+        pose.textY = from + (to - from) * easeOutCubic(after / sec);
+        return pose;
+      }
+      after -= sec;
+    }
+  }
+  after -= small ? fx.shardTextHoldSec : fx.textHoldSec;
+  if (after <= 0) return pose;
+  const out = small ? fx.shardTextOutSec : fx.textOutSec;
+  const p = easeOutCubic(clamp01(after / out));
+  pose.textAlpha = 1 - p;
+  if (!small) pose.textY = -fx.textRise * p;
+  pose.done = after >= out;
+  return pose;
+}
+
+/**
+ * Where a new amount's words go so they are not drawn on words still showing (ours: the client
+ * drew each burst at its quoin and let near ones overlap). `live` are the amounts on screen
+ * ({ x, y, w }); a new one `w` wide at (x, y) that would touch one of them sits a line above it.
+ */
+export function stackQuoinText(live, x, y, w, { line = QUOIN_SHARD_FX.textLine, gap = 8 } = {}) {
+  const rows = (Array.isArray(live) ? live : []).filter((r) => r && Math.abs(finite(r.x, Infinity) - x) < (finite(r.w, 0) + w) / 2 + gap);
+  let out = y;
+  for (let pass = 0; pass <= rows.length; pass += 1) {
+    const hit = rows.find((r) => Math.abs(r.y - out) < line);
+    if (!hit) break;
+    out = hit.y - line;
+  }
+  return out;
+}
 
 function finite(value, fallback = 0) {
   const number = Number(value);
@@ -170,8 +277,9 @@ export function planQuoinShards({ typeId, amount, grabber, players = [] } = {}) 
  * (2, 3, ...) in a small shard-coloured circle; when the viewer took a shard
  * from someone else, the quoin shows a small 1. A viewer with no part in the
  * grab sees only a plain grow-and-shrink at the quoin.
- * The grabber's own amount at the quoin is left to the caller's usual pickup
- * text (`own: true` on the start burst).
+ * The grabber's own amount at the quoin is the pickup's to draw (`own: true` on
+ * the start burst): game.js quoinGotText draws it for every quoin, shared or
+ * not, through the feature's quoinGotFx.
  */
 export function quoinShardFxPlan({ quoin, grabberIsViewer = false, viewerId = 'player', shards = [], delta = 0, stat = '' } = {}) {
   const fx = QUOIN_SHARD_FX;

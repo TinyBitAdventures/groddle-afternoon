@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=0c78b59c';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=127e0a3c';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=77037d21';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=52cb0155';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -7938,6 +7938,24 @@ function floatText(x, y, text, color = 0xfff4d6, opts = {}) {
   return float;
 }
 
+/**
+ * A quoin's amount, where the collector reads it (report #181): Glitch's own burst at the quoin,
+ * 24 px words that grow in, nod, stay 1.5 s and rise away, 2.8 s in all (QuoinAnimation.as,
+ * AnnouncementController.as doQuoinGot 890-902; drawn by features/quoin-shards-feature.js
+ * quoinGotFx). It used to be a plain float, gone in under a second. `x`, `y` are the quoin's.
+ * The words count as a float raised here, so the same amount is not floated again from the
+ * avatar and a float raised beside it stacks clear. With no layer for the burst, the old float.
+ */
+function quoinGotText(x, y, text, color = 0xffffff) {
+  const words = wholeStatAmounts(text);
+  const drawn = features.query('quoinGotFx', { x, y, label: words }, engine);
+  if (!drawn?.node) return floatText(x, y - 20, text, color);
+  const now = performance.now();
+  while (recentFloats.length && now - recentFloats[0].t > 1500) recentFloats.shift();
+  recentFloats.push({ x: drawn.x, y: drawn.y, t: now, key: floatKey(words), sprite: drawn.node });
+  return drawn.node;
+}
+
 function burst(x, y, color = 0xffe066, n = 10) {
   for (let i = 0; i < n; i++) {
     const g = new PIXI.Graphics();
@@ -12328,6 +12346,8 @@ const engine = {
     return street.features[featureId];
   },
   floatText: (x, y, text, color, opts) => floatText(x, y, text, color, opts),
+  /** A quoin's amount at the quoin (x, y), as Glitch drew it (quoinGotText). */
+  quoinGotText: (x, y, text, color) => quoinGotText(x, y, text, color),
   /** NOTIFY zones: a banner's box in #game-root px (null releases it); notices, the Enter hint and speech keep off it. */
   reserveZone: (name, rect) => notifyView?.reserve(name, rect),
   /** NOTIFY: the notifier itself (js/notify.js), for a feature that wants a lane by name. */
@@ -14075,7 +14095,7 @@ function grabWorldQuoin(q, shared = null) {
   if (result.acceleration?.completed?.length) {
     handleSkillCompletions(result.acceleration.completed);
   }
-  floatText(q.x, q.y - 20, copy, rewardDef.color);
+  quoinGotText(q.x, q.y, copy, rewardDef.color);
   burst(q.x, q.y, rewardDef.color, result.typeId === 'qurazy' ? 28 : 12);
   applyQuestProgress(questState, 'quoins_collected', 1, pc);
   if (result.resolvedTypeId === 'favor') {
