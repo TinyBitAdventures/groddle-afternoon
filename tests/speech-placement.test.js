@@ -13,7 +13,10 @@ import {
   SPEECH_HUD_MARGIN,
   SPEECH_TAIL_HEIGHT,
   SPEECH_OFFSETS,
+  SPEECH_EDGE_LIMIT,
   SPEECH_PUSH_LIMIT,
+  limitSpeechShift,
+  limitSpeechTip,
   SPEECH_BUBBLE_RADIUS,
   SPEECH_TAIL_HALF,
   SPEECH_TAIL_TIP_INSET,
@@ -86,6 +89,46 @@ describe('conversation offsets (GameServerJS classProps)', () => {
     const bubble = readFileSync(join(CLIENT, 'port/ChatBubble.as'), 'utf8');
     assert.match(bubble, /y-= Math\.max\(-120, reusable_rect\.y\);/);
     assert.equal(SPEECH_PUSH_LIMIT, 120);
+  });
+});
+
+describe('a speaker out of view keeps its bubble (G242, ChatBubble.as keepInBounds)', () => {
+  it('slides a bubble in from the side by at most 100 px', () => {
+    assert.equal(SPEECH_EDGE_LIMIT, 100);
+    // In view, or near the edge: wholly in view, as before.
+    assert.deepEqual(limitSpeechShift(500, 500), { x: 500, far: false });
+    assert.deepEqual(limitSpeechShift(1000, 900), { x: 900, far: false });
+    assert.deepEqual(limitSpeechShift(-40, 60), { x: 60, far: false });
+    // Further off: 100 px toward the view, and no more.
+    assert.deepEqual(limitSpeechShift(1400, 900), { x: 1300, far: true });
+    assert.deepEqual(limitSpeechShift(-600, 80), { x: -500, far: true });
+  });
+
+  it('pushes a bubble down at most 120 px and never pulls one up', () => {
+    // Pushed 80 px: kept.
+    assert.deepEqual(limitSpeechTip({ tip: 140, flip: false }, 60), { tip: 140, flip: false, far: false });
+    // A speaker 400 px above the view: 120 px, not into view.
+    assert.deepEqual(limitSpeechTip({ tip: 140, flip: false }, -260), { tip: -140, flip: false, far: true });
+    // A speaker under the view: its bubble stays with it.
+    assert.deepEqual(limitSpeechTip({ tip: 390, flip: false }, 500), { tip: 500, flip: false, far: true });
+    // Hung under the feet (the remake's own, G185): left alone.
+    assert.deepEqual(limitSpeechTip({ tip: 118, flip: true }, 60), { tip: 118, flip: true, far: false });
+  });
+
+  it('the client limits are these', { skip: !existsSync(CLIENT) && 'no client checkout' }, () => {
+    const bubble = readFileSync(join(CLIENT, 'port/ChatBubble.as'), 'utf8');
+    assert.match(bubble, /if \(adj_x && keep_in_viewport_within_reason\) \{\s+var adj_x_limit:int = 100;/);
+    assert.match(bubble, /if \(!keep_in_viewport_within_reason && pt\.y - reusable_rect\.height > max_y\)\{/);
+    const ava = readFileSync(join(CLIENT, 'view/avatar/AvaChatBubbleManager.as'), 'utf8');
+    assert.match(ava, /_currentChatBubble\.keep_in_viewport_within_reason = true;/);
+  });
+
+  it('game.js applies both, and clears or slides nothing for a bubble out of view', () => {
+    const game = readFileSync(join(ROOT, 'public/game.js'), 'utf8');
+    const fn = game.slice(game.indexOf('function positionSpeechBubble'), game.indexOf('function drawSpeechBubble'));
+    assert.match(fn, /const shift = limitSpeechShift\(spr\.x \+ offset\.x, clampWorldOverlayX\(spr\.x \+ offset\.x, meta\.width, 12\)\);/);
+    assert.match(fn, /const reach = limitSpeechTip\(place, want\);/);
+    assert.match(fn, /const outOfView = shift\.far \|\| reach\.far;/);
   });
 });
 
@@ -231,10 +274,10 @@ describe('art heights', () => {
 describe('wiring', () => {
   it('game.js places every bubble through the module and gives registered targets art heights', () => {
     const game = read('public/game.js');
-    assert.match(game, /import \{ SPEECH_HOLD_MARGIN, clearSpeechOfBox, deepestSpeechTip, giveArtHeight, holdSpeechSide, hudColumnBox, placeSpeechTail, placeSpeechTip, slideOffAvatars, speechBubbleOutline, speechOffsetFor, speechTipOnSide \} from '\.\/js\/speech-placement\.js\?v=[\w-]+';/);
+    assert.match(game, /import \{ SPEECH_HOLD_MARGIN, clearSpeechOfBox, deepestSpeechTip, giveArtHeight, holdSpeechSide, hudColumnBox, limitSpeechShift, limitSpeechTip, placeSpeechTail, placeSpeechTip, slideOffAvatars, speechBubbleOutline, speechOffsetFor, speechTipOnSide \} from '\.\/js\/speech-placement\.js\?v=[\w-]+';/);
     assert.match(game, /function register\(target\) \{\n[^\n]*\n  giveArtHeight\(target\);\n  interactables\.push\(target\);/);
     const fn = game.slice(game.indexOf('function positionSpeechBubble'), game.indexOf('function showSpeechBubble'));
-    assert.match(fn, /const offset = speechOffsetFor\(meta\.target\);\n  bubble\.x = clampWorldOverlayX\(spr\.x \+ offset\.x, meta\.width, 12\);/);
+    assert.match(fn, /const offset = speechOffsetFor\(meta\.target\);\n[^\n]*\n[^\n]*\n  const shift = limitSpeechShift\(spr\.x \+ offset\.x, clampWorldOverlayX\(spr\.x \+ offset\.x, meta\.width, 12\)\);\n  bubble\.x = shift\.x;/);
     assert.match(fn, /const want = spr\.y - spriteHeight - 12 \+ offset\.y;/);
     assert.match(fn, /dataset\.speechArt = /);
     // G233: the tail is aimed at the speaker the bubble was meant to centre on.
@@ -317,11 +360,11 @@ describe('bubbles keep clear of the activity feed column (G269)', () => {
   it('game.js asks it with the buff strip, then the notices and banner (NOTIFY zones), every placement', () => {
     const game = readFileSync(join(ROOT, 'public/game.js'), 'utf8');
     assert.match(game, /hudColumnBox\(\[document\.getElementById\('buff-strip'\)\]/);
-    assert.match(game, /const clear = clearSpeechOfBox\(\{/);
+    assert.match(game, /const clear = !outOfView && clearSpeechOfBox\(\{/);
     assert.match(game, /meta\.overHud = clear\?\.how === 'over';/);
     assert.match(game, /el\.toggleAttribute\('data-under-speech', over\)/);
     // The notices' stack and a banner (js/notify-view.js zoneBoxes): moved clear, or the notices fade under it.
-    assert.match(game, /const clearZone = zone && clearSpeechOfBox\(\{/);
+    assert.match(game, /const clearZone = !outOfView && zone && clearSpeechOfBox\(\{/);
     assert.match(game, /meta\.overNotices = clearZone\?\.how === 'over';/);
     assert.match(game, /notifyView\?\.setUnderSpeech\(speechBubbles\.some\(\(b\) => b\._speechFx\?\.overNotices\)\);/);
     const css = readFileSync(join(ROOT, 'public/style.css'), 'utf8');
@@ -377,7 +420,7 @@ describe('bubbles slide off players\' heads (G357 Austin 2026-10-27, G427 2026-1
   it('game.js slides tip-down bubbles, hangs a covered one under the feet, names only players and sizes a bubble to its line', () => {
     const game = read('public/game.js');
     const fn = game.slice(game.indexOf('function positionSpeechBubble'), game.indexOf('function showSpeechBubble'));
-    assert.match(fn, /const slideFor = \(p\) => \(p\.flip \? \{ dx: 0, covered: false \} : slideOffAvatars\(\{/);
+    assert.match(fn, /const slideFor = \(p\) => \(p\.flip \|\| outOfView \? \{ dx: 0, covered: false \} : slideOffAvatars\(\{/);
     assert.match(fn, /const avatars = speechAvoidBoxes\(meta\.target\);\n/);
     assert.match(fn, /const belowSpare = cameraY \+ LOCATION_VIEW_H - 8 - \(below \+ 11 \+ meta\.height\);/);
     assert.match(fn, /if \(slide\.covered && belowSpare >= \(keep === false \? SPEECH_HOLD_MARGIN : 0\)\) place = \{ tip: below, flip: true \};/);
@@ -513,6 +556,6 @@ describe('bubbles hold their place (Austin 2026-11-01: a Bean Tree\'s bubble bou
     assert.match(fn, /prefer: meta\.zoneHow \|\| null,/);
     assert.match(fn, /prefer: meta\.slideWant \|\| 0,/);
     assert.match(fn, /const side = holdSpeechSide\(hold, place\.flip, performance\.now\(\), \{ forced: hold\.side === true && belowSpare < -SPEECH_HOLD_MARGIN \}\);/);
-    assert.match(fn, /place = speechTipOnSide\(side, \{ want, minTip: lowestTip, maxTip: highestTip, below \}\);/);
+    assert.match(fn, /const held = limitSpeechTip\(speechTipOnSide\(side, \{ want, minTip: lowestTip, maxTip: highestTip, below \}\), want\);/);
   });
 });

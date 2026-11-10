@@ -1002,7 +1002,7 @@ import { hidesChatBubble } from './js/hi-signs.js?v=b90c7d7e';
 import { GAME_MODE, isSolo } from './js/game-mode.js?v=1ecf2899';
 import { saveStore } from './js/save-store.js?v=8839ba7b';
 import { grantSoloStarterItems, isNewMultiplayerPlayer, newPlayerInventory, newPlayerStats } from './js/new-player.js?v=d9fa4f61';
-import { SPEECH_HOLD_MARGIN, clearSpeechOfBox, deepestSpeechTip, giveArtHeight, holdSpeechSide, hudColumnBox, placeSpeechTail, placeSpeechTip, slideOffAvatars, speechBubbleOutline, speechOffsetFor, speechTipOnSide } from './js/speech-placement.js?v=d12cdd6a';
+import { SPEECH_HOLD_MARGIN, clearSpeechOfBox, deepestSpeechTip, giveArtHeight, holdSpeechSide, hudColumnBox, limitSpeechShift, limitSpeechTip, placeSpeechTail, placeSpeechTip, slideOffAvatars, speechBubbleOutline, speechOffsetFor, speechTipOnSide } from './js/speech-placement.js?v=d12cdd6a';
 import { shrineDonationResponseKey, verbResponse } from './js/verb-responses.js?v=3ceb8a8c';
 import { itemZ } from './js/item-bands.js?v=e98b10bc';
 import { SLUG_ANIMATION, SLUG_LAYOUT, SLUG_STYLES, SLUG_TARGETS, drawSlugIcon, formatRawSlugs, formatSlugList, layoutSlugRow, slugBox, slugNumber, slugPillPath, slugSign, speechSlugList } from './js/speech-slugs.js?v=130338f9';
@@ -7466,7 +7466,10 @@ function positionSpeechBubble(bubble) {
   const spriteHeight = artHeight > 0 ? artHeight : clamp(Math.abs(spr.height || 60), 36, 170);
   // The class's conversation_offset_x/y (G214, js/speech-placement.js): street spirits point 60 px into their art.
   const offset = speechOffsetFor(meta.target);
-  bubble.x = clampWorldOverlayX(spr.x + offset.x, meta.width, 12);
+  // G242, ChatBubble.as keepInBounds 158-169: slid in from the view's edge by at most 100 px, so a
+  // speaker further off keeps its bubble with it, out of view, instead of lining the screen's edge.
+  const shift = limitSpeechShift(spr.x + offset.x, clampWorldOverlayX(spr.x + offset.x, meta.width, 12));
+  bubble.x = shift.x;
   // The tail tip sits at bubble.y; the bubble's top is height + 11 above it.
   let lowestTip = cameraY + meta.height + 24;
   const pill = nameplateViewBox();
@@ -7495,8 +7498,14 @@ function positionSpeechBubble(bubble) {
     deepest,
     keep,
   });
+  // The client's push is at most 120 px down and never up (keepInBounds 106-117, 148): a speaker
+  // well above or under the view keeps its bubble too.
+  const reach = limitSpeechTip(place, want);
+  place = { tip: reach.tip, flip: reach.flip };
+  // Out of view, wholly or partly: nothing on screen to clear or to slide off.
+  const outOfView = shift.far || reach.far;
   // G269: clear of the activity feed and buff strip (js/speech-placement.js clearSpeechOfBox).
-  const clear = clearSpeechOfBox({
+  const clear = !outOfView && clearSpeechOfBox({
     left: bubble.x - cameraX - meta.width / 2, width: meta.width, height: meta.height,
     tip: place.tip - cameraY, flip: place.flip, speakerX: spr.x + offset.x - cameraX, feet: spr.y - cameraY, deepest: deepest - cameraY,
     box: hudColumnViewBox(), viewWidth: horizontalLocationViewWidth(), viewBottom: LOCATION_VIEW_H - 18, prefer: meta.clearHow || null,
@@ -7509,7 +7518,7 @@ function positionSpeechBubble(bubble) {
   meta.overHud = clear?.how === 'over';
   // NOTIFY zones: clear of the notices and a banner too; where it cannot be, the notices fade under it.
   const zone = notifyZoneViewBox();
-  const clearZone = zone && clearSpeechOfBox({
+  const clearZone = !outOfView && zone && clearSpeechOfBox({
     left: bubble.x - cameraX - meta.width / 2, width: meta.width, height: meta.height,
     tip: place.tip - cameraY, flip: place.flip, speakerX: spr.x + offset.x - cameraX, feet: spr.y - cameraY, deepest: deepest - cameraY,
     box: zone, viewWidth: horizontalLocationViewWidth(), viewBottom: LOCATION_VIEW_H - 18, prefer: meta.zoneHow || null,
@@ -7525,7 +7534,7 @@ function positionSpeechBubble(bubble) {
   // when that fits; eased so it doesn't jump. The tail never stretches (ChatBubble.as 374-379).
   const speakerX = spr.x + offset.x;
   const avatars = speechAvoidBoxes(meta.target);
-  const slideFor = (p) => (p.flip ? { dx: 0, covered: false } : slideOffAvatars({
+  const slideFor = (p) => (p.flip || outOfView ? { dx: 0, covered: false } : slideOffAvatars({
     left: bubble.x - meta.width / 2, width: meta.width, height: meta.height, tip: p.tip, speakerX,
     avatars,
     minLeft: cameraX + 12, maxRight: cameraX + horizontalLocationViewWidth() - 12,
@@ -7536,7 +7545,8 @@ function positionSpeechBubble(bubble) {
   // Hold the side: a change waits, and after one flip only an under-the-feet bubble that no longer fits goes back.
   const side = holdSpeechSide(hold, place.flip, performance.now(), { forced: hold.side === true && belowSpare < -SPEECH_HOLD_MARGIN });
   if (side !== place.flip) {
-    place = speechTipOnSide(side, { want, minTip: lowestTip, maxTip: highestTip, below });
+    const held = limitSpeechTip(speechTipOnSide(side, { want, minTip: lowestTip, maxTip: highestTip, below }), want);
+    place = { tip: held.tip, flip: held.flip };
     slide = slideFor(place);
     // Held where a move had cleared the HUD or the notices: they fade under it meanwhile.
     if (clear) meta.overHud = true;
@@ -7575,6 +7585,8 @@ function positionSpeechBubble(bubble) {
     app.canvas.dataset.speechWidth = Number(meta.width).toFixed(2);
     app.canvas.dataset.speechTail = meta.tailAt;
     app.canvas.dataset.speechClear = clear?.how || '';
+    // G242: 'x' / 'y' when the speaker is further out of view than the bubble may be moved.
+    app.canvas.dataset.speechOutOfView = `${shift.far ? 'x' : ''}${reach.far ? 'y' : ''}`;
     app.canvas.dataset.speechSlide = `${Math.round(slide.dx)}${slide.covered ? ':covered' : ''}`;
     app.canvas.dataset.speechHold = `${hold.side ? 'under' : 'over'}:${hold.flips}${hold.since === null ? '' : ':pending'}`;
   }

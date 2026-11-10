@@ -18,6 +18,12 @@
  *   (LisChatBubbleManager.as 124: keep_in_viewport_within_reason) at most
  *   120 px (114).
  *
+ * - keepInBounds 158-169: sideways it is slid in from the edge by at most
+ *   100 px (limitSpeechShift), and a bubble "within reason" is never pulled up
+ *   for a speaker under the view (148). So a speaker well out of view keeps
+ *   its bubble with it, unseen (G242; reports of bubbles from all over the
+ *   street lining the screen's edge).
+ *
  * The remake keeps its own rule beyond that (G185): when even the client's
  * push would leave the bubble pointing past the middle of the speaker, it
  * hangs under the speaker's feet, tail up, when that fits.
@@ -25,6 +31,41 @@
 
 /** ChatBubble.as keepInBounds 114: y -= Math.max(-120, rect.y). */
 export const SPEECH_PUSH_LIMIT = 120;
+
+/**
+ * ChatBubble.as keepInBounds 158-169 (register G242): a bubble kept in the viewport "within
+ * reason" (every itemstack's, LisChatBubbleManager.as 124, and every avatar's,
+ * AvaChatBubbleManager.as 137) is slid in from the side of the view by at most 100 px. A speaker
+ * further off than that keeps its bubble over it, out of view. (The client allowed 300 px on the
+ * right while the bubble met the mini map, 161-165; the remake clears its own HUD another way.)
+ */
+export const SPEECH_EDGE_LIMIT = 100;
+
+/**
+ * The bubble's centre x: `natural` (over the speaker) moved toward `clamped` (wholly in view) by at
+ * most `limit`. `far` when that was not enough, so the bubble is partly or wholly out of view.
+ */
+export function limitSpeechShift(natural, clamped, limit = SPEECH_EDGE_LIMIT) {
+  const n = Number(natural);
+  const c = Number(clamped);
+  if (!Number.isFinite(n) || !Number.isFinite(c)) return { x: Number.isFinite(c) ? c : n, far: false };
+  const d = c - n;
+  if (Math.abs(d) <= limit) return { x: c, far: false };
+  return { x: n + Math.sign(d) * limit, far: true };
+}
+
+/**
+ * The same for the tip's y (ChatBubble.as keepInBounds 106-117, 148): a tip-down bubble is pushed
+ * down over its speaker by at most 120 px, and never pulled up for a speaker under the view (a
+ * bubble "within reason" skips the client's bottom check). A bubble hung under the feet is left.
+ * `far` when the placement had asked for more.
+ */
+export function limitSpeechTip(place, want, limit = SPEECH_PUSH_LIMIT) {
+  if (!place || place.flip || !Number.isFinite(want)) return { ...place, far: false };
+  if (place.tip > want + limit) return { tip: want + limit, flip: false, far: true };
+  if (place.tip < want) return { tip: want, flip: false, far: true };
+  return { ...place, far: false };
+}
 
 /** An alpha at or under this counts as empty when measuring art. */
 export const OPAQUE_ALPHA = 16;
