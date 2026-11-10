@@ -190,5 +190,5 @@ import { chatPurgeFeature } from './chat-purge-feature.js?v=cb6c250d'; FEATURES.
 import { streetFixesFeature } from './street-fixes-feature.js?v=39e41b46'; FEATURES.push(streetFixesFeature);
 import { gameTeleporterFeature } from './game-teleporter-feature.js?v=ca9bc29c'; FEATURES.push(gameTeleporterFeature);
 import { streetObjectsFeature } from './street-objects-feature.js?v=ddc43409'; FEATURES.push(streetObjectsFeature);
-import { realtimeFeature } from './realtime-feature.js?v=afb13948'; FEATURES.push(realtimeFeature);
+import { realtimeFeature } from './realtime-feature.js?v=190838fc'; FEATURES.push(realtimeFeature);
 import { accountBackupFeature } from './account-backup-feature.js?v=3efe5c17'; FEATURES.push(accountBackupFeature);

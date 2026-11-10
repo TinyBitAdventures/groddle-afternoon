@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=f6a37125';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=127e0a3c';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=c454b060';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=56fbacca';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -759,6 +759,7 @@ import {
   POL_OWNER_SIZE,
 } from './js/screen-fx.js?v=81177be4';
 import { momentMoreText } from './js/ui/moment-card.js?v=68e10b61';
+import { CHAT_MAX_CHARS } from './js/ui/chat-input.js?v=15183179';
 // HUB: the hub is the Modern skin's; Classic owns X in its skin (js/classic/classic-hub.js).
 import { MODERN, onUiModeChange, uiState } from './js/classic/ui-mode.js?v=11da9030';
 // ZOOM: the world zoom (a device preference) and Classic's frame scale under it; both load before main().
@@ -973,7 +974,7 @@ import { wholeStatAmounts, wholeEffects } from './js/stat-text.js?v=f96d8fd3';
 import { createNotifier, effectTokens, floatKey, offerCardDrop, stackFloat, tokenText } from './js/notify.js?v=37c6b748';
 import { holdMs } from './js/read-time.js?v=60ae7efc';
 import { mountNotifyView } from './js/notify-view.js?v=2835afc0';
-import { mountSocialDrawer } from './js/ui/social-drawer.js?v=eac982f5';
+import { mountSocialDrawer } from './js/ui/social-drawer.js?v=8fd33c55';
 import { bindChatLinks } from './js/chat-links.js?v=b717fac7';
 import { bindDragScroll } from './js/ui/drag-scroll.js?v=9a527ac8';
 import { SIDE_SHEET_IDS, bindTabs, inSideSheet, mountPanelShell, sheetKeyToWorld } from './js/ui/panel-shell.js?v=e2abdf9e';
@@ -1008,7 +1009,7 @@ import { SLUG_ANIMATION, SLUG_LAYOUT, SLUG_STYLES, SLUG_TARGETS, drawSlugIcon, f
 import { filterText } from './js/word-filter.js?v=9a7a7ebb'; // the remake's own word filter
 import { arrangeMapCards, fitMapExtras } from './js/map-extras.js?v=9f38c312'; // the Map's Shortcuts
 // The interface skin (js/classic/ui-mode.js) sets <html data-ui> as it loads: before main(), so before the boot cover lifts.
-import { installInterfaceSettings } from './js/classic/classic-prefs.js?v=0c28fc31';
+import { installInterfaceSettings } from './js/classic/classic-prefs.js?v=e98ebe27';
 
 /** @type {object|null} assets/maps/index.json */
 let mapIndexCache = null;
@@ -25953,7 +25954,7 @@ function handleFeatResult(result, participant) {
 }
 
 function sayLocalChat(message, participant = 'Ur', { quietActivity = false } = {}) {
-  const typed = String(message || '').trim().slice(0, 180);
+  const typed = String(message || '').trim().slice(0, CHAT_MAX_CHARS);
   if (!typed) return { ok: false, reason: 'empty' };
   // main.js doLocalChat 1708-1710: under the cone of silence the line goes nowhere, not even a bubble of your own (G480).
   if (participant === 'Ur' && features.query('localChatRefused', engine)) return { ok: false, reason: 'suspended' };

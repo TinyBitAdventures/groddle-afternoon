@@ -40,7 +40,7 @@ export const QUIET_MS = 50000;
 export const BACKOFF_MIN_MS = 1000;
 export const BACKOFF_MAX_MS = 30000;
 /** The server's limits (hub.go maxChat; maxLook is 4096 bytes of JSON). */
-export const MAX_CHAT = 200;
+export const MAX_CHAT = 1000;
 export const MAX_LOOK_BYTES = 4096;
 
 /** Emotes a player can send: the Glitch emotion animations (avatar-anims.js EMOTIONS). */

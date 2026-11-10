@@ -8,8 +8,10 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { MAX_ROWS, bindChatInput, fitHeight, heldAtFocus, historyKey, keyWatch, oneLine, sendKey, strayRepeat } from '../public/js/ui/chat-input.js?v=2ccd05ab';
+import { CHAT_MAX_CHARS, MAX_ROWS, bindChatInput, fitHeight, heldAtFocus, historyKey, keyWatch, oneLine, sendKey, strayRepeat } from '../public/js/ui/chat-input.js?v=15183179';
 import { FakeEl } from './social-fake-dom.js';
+import { MAX_CHAT } from '../public/js/realtime-client.js?v=342dae8e';
+import { SERVER_DIR, SITE_DIR, skipWithoutServer, skipWithoutSite } from '../tools/repos.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');
@@ -181,14 +183,35 @@ describe('the chat box: wired', () => {
     assert.equal(keyWatch({}), null, 'no window, no watch (strayRepeat still drops repeats)');
   });
 
-  it('both skins\' boxes are text areas of the old length, Enter sends, nothing resizes them by hand', () => {
+  it('a chat line holds 1,000 characters, as the original box did, in the box, the client, the server and the site', () => {
+    assert.equal(CHAT_MAX_CHARS, 1000);
+    assert.equal(MAX_CHAT, CHAT_MAX_CHARS, 'what the client sends');
+    const game = read('public/game.js');
+    assert.match(game, /const typed = String\(message \|\| ''\)\.trim\(\)\.slice\(0, CHAT_MAX_CHARS\);/, 'what a solo player says');
+    assert.doesNotMatch(game, /slice\(0, 180\);\n  if \(!typed\)/);
+  });
+
+  it('the server cuts a line at the same length', { skip: skipWithoutServer }, () => {
+    const hub = readFileSync(join(SERVER_DIR, 'hub.go'), 'utf8');
+    assert.equal(Number(hub.match(/\tmaxChat\s+= (\d+)/)?.[1]), CHAT_MAX_CHARS);
+    // A line of four-byte characters with its envelope still fits one frame.
+    const frame = Number(readFileSync(join(SERVER_DIR, 'main.go'), 'utf8').match(/\tmaxFrame\s+= (\d+)/)?.[1]);
+    assert.ok(frame >= CHAT_MAX_CHARS * 6 + 512, `maxFrame ${frame}`);
+  });
+
+  it('the site keeps a line that long', { skip: skipWithoutSite }, () => {
+    const history = readFileSync(join(SITE_DIR, 'src/ChatHistory.php'), 'utf8');
+    assert.equal(Number(history.match(/public const TEXT_MAX = (\d+);/)?.[1]), CHAT_MAX_CHARS);
+  });
+
+  it('both skins\' boxes are text areas of the original length, Enter sends, nothing resizes them by hand', () => {
     for (const p of ['public/play/index.html', 'public/play/online/index.html']) {
       const html = read(p);
-      assert.match(html, /<textarea id="local-chat-input" rows="1" maxlength="180" /, p);
+      assert.match(html, /<textarea id="local-chat-input" rows="1" maxlength="1000" /, p);
       assert.doesNotMatch(html, /<input id="local-chat-input"/, p);
     }
     const panes = read('public/js/classic/classic-panes.js');
-    assert.match(panes, /el\(doc, 'textarea', \{ class: 'classic-lower-input', rows: '1', maxlength: '180'/);
+    assert.match(panes, /el\(doc, 'textarea', \{ class: 'classic-lower-input', rows: '1', maxlength: String\(CHAT_MAX_CHARS\)/);
     assert.match(panes, /bindChatInput\(lowerInput, \{ form: lowerForm, win \}\)/);
     const drawer = read('public/js/ui/social-drawer.js');
     assert.match(drawer, /bindChatInput\(input, \{\n\s+form,\n\s+onHistory\(key\) \{/);

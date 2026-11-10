@@ -31,10 +31,10 @@ import {
   pushSample,
   sampleTrack,
   socketUrl,
-} from '../public/js/realtime-client.js?v=b13cbae1';
+} from '../public/js/realtime-client.js?v=342dae8e';
 import { createMinnAccount } from '../public/js/minn-account.js?v=8f2741cd';
-import { emoteCommand, lookOf, poseOf, realtimeFeature, sharedStreet, statusText } from '../public/js/features/realtime-feature.js?v=afb13948';
-import { FEATURES } from '../public/js/features/index.js?v=c454b060';
+import { emoteCommand, lookOf, poseOf, realtimeFeature, sharedStreet, statusText } from '../public/js/features/realtime-feature.js?v=190838fc';
+import { FEATURES } from '../public/js/features/index.js?v=56fbacca';
 
 const root = join(import.meta.dirname, '..');
 const read = (rel) => readFileSync(join(root, rel), 'utf8');
@@ -314,7 +314,7 @@ describe('realtime-client: moves, chat, emotes', () => {
     assert.ok(sent >= 9 && sent <= 11, `sent ${sent}`);
   });
 
-  it('chat is one trimmed line of at most 200 characters, sent only on a street', async () => {
+  it('chat is one trimmed line of at most 1,000 characters, sent only on a street', async () => {
     const ctx = setup();
     const ws = await online(ctx);
     assert.equal(ctx.client.chat('hi'), false, 'no street yet');
@@ -322,8 +322,9 @@ describe('realtime-client: moves, chat, emotes', () => {
     ws.receive({ t: 'street', street: 'S1', players: [] });
     assert.equal(ctx.client.chat('  hello\n  there  '), true);
     assert.deepEqual(ws.sent.at(-1), { t: 'chat', text: 'hello there' });
-    ctx.client.chat('x'.repeat(300));
+    ctx.client.chat('x'.repeat(MAX_CHAT + 300));
     assert.equal(ws.sent.at(-1).text.length, MAX_CHAT);
+    assert.equal(MAX_CHAT, 1000);
     assert.equal(ctx.client.chat('   '), false);
     ws.receive({ t: 'said', id: 7, name: 'Ada', text: 'hello there', at: 5 });
     ws.receive({ t: 'said', id: 8, name: 'Bo', text: 'hi Ada', at: 6 });

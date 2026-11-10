@@ -26,6 +26,13 @@
  */
 
 export const MAX_ROWS = 5;
+/**
+ * The most a chat line holds, as the original's chat box did (InputField.as 32 MAX_CHARS 1000). The
+ * realtime server cuts a line at the same length (hub.go maxChat, js/realtime-client.js MAX_CHAT) and
+ * the site's chat history keeps as much (ChatHistory::TEXT_MAX). It was 180 here and 200 on the
+ * server, too short to explain anything in (Austin 2026-11-09).
+ */
+export const CHAT_MAX_CHARS = 1000;
 
 /** PURE: the words as one line: each line break (and the spaces round it) is one space. */
 export function oneLine(text) {
