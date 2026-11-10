@@ -191,6 +191,54 @@
    }
   }
  },
+ "artifact_butterfly_hair_clip_piece1": {
+  "sha": "97fd0bb9742b38df",
+  "swf": "artifacts/artifact_butterfly_hair_clip_piece1/artifact_butterlfy_hair_clip_piece1.swf",
+  "states": {
+   "1": {
+    "w": 33,
+    "h": 16,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "artifact_butterfly_hair_clip_piece2": {
+  "sha": "2c45eba572ca5656",
+  "swf": "artifacts/artifact_butterfly_hair_clip_piece2/artifact_butterlfy_hair_clip_piece2.swf",
+  "states": {
+   "1": {
+    "w": 37,
+    "h": 21,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "artifact_butterfly_hair_clip_piece3": {
+  "sha": "2b3af7cc689b1d74",
+  "swf": "artifacts/artifact_butterfly_hair_clip_piece3/artifact_butterlfy_hair_clip_piece3.swf",
+  "states": {
+   "1": {
+    "w": 24,
+    "h": 13,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "artifact_butterfly_hair_clip_piece4": {
+  "sha": "404883e5ac536a4a",
+  "swf": "artifacts/artifact_butterfly_hair_clip_piece4/artifact_butterlfy_hair_clip_piece4.swf",
+  "states": {
+   "1": {
+    "w": 23,
+    "h": 17,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
  "artifact_chicken_brick": {
   "sha": "3b04a996b13f474a",
   "swf": "artifacts/artifact_chicken_brick/artifact_chicken_brick.swf",
@@ -4613,6 +4661,18 @@
    }
   }
  },
+ "fiber": {
+  "sha": "2c0f044a4caf8f3a",
+  "swf": "misc/fiber/strips_of_fabric.swf",
+  "states": {
+   "1": {
+    "w": 40,
+    "h": 17,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
  "firefly_jar": {
   "sha": "5372bfb8e1389b82",
   "swf": "misc/firefly_jar/firefly_jar.swf",
@@ -6013,6 +6073,216 @@
     "w": 52,
     "h": 43,
     "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "herb_seed_gandlevery": {
+  "sha": "602ce7d75dea4580",
+  "swf": "seeds/herb_seed_gandlevery/seed_gandlevery.swf",
+  "states": {
+   "1": {
+    "w": 17,
+    "h": 8,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 28,
+    "h": 12,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 34,
+    "h": 16,
+    "dx": 1,
+    "lift": 0
+   },
+   "4": {
+    "w": 34,
+    "h": 19,
+    "dx": 1,
+    "lift": 0
+   }
+  }
+ },
+ "herb_seed_hairball_flower": {
+  "sha": "12376683c7382f97",
+  "swf": "seeds/herb_seed_hairball_flower/seed_hairball_flower.swf",
+  "states": {
+   "1": {
+    "w": 18,
+    "h": 9,
+    "dx": 1,
+    "lift": 0
+   },
+   "2": {
+    "w": 28,
+    "h": 13,
+    "dx": 1,
+    "lift": 0
+   },
+   "3": {
+    "w": 34,
+    "h": 17,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 34,
+    "h": 20,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "herb_seed_purple_flower": {
+  "sha": "bf33e7344f8bd7c3",
+  "swf": "seeds/herb_seed_purple_flower/seed_purple_flower.swf",
+  "states": {
+   "1": {
+    "w": 18,
+    "h": 9,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 28,
+    "h": 13,
+    "dx": 1,
+    "lift": 0
+   },
+   "3": {
+    "w": 34,
+    "h": 17,
+    "dx": 1,
+    "lift": 0
+   },
+   "4": {
+    "w": 34,
+    "h": 20,
+    "dx": 1,
+    "lift": 0
+   }
+  }
+ },
+ "herb_seed_rookswort": {
+  "sha": "66be37bc4e577388",
+  "swf": "seeds/herb_seed_rookswort/seed_rookswort.swf",
+  "states": {
+   "1": {
+    "w": 17,
+    "h": 8,
+    "dx": 2,
+    "lift": 0
+   },
+   "2": {
+    "w": 28,
+    "h": 13,
+    "dx": -1,
+    "lift": 0
+   },
+   "3": {
+    "w": 34,
+    "h": 16,
+    "dx": 1,
+    "lift": 0
+   },
+   "4": {
+    "w": 34,
+    "h": 19,
+    "dx": 1,
+    "lift": 0
+   }
+  }
+ },
+ "herb_seed_rubeweed": {
+  "sha": "103399fdce42f6e2",
+  "swf": "seeds/herb_seed_rubeweed/seed_rubeweed.swf",
+  "states": {
+   "1": {
+    "w": 18,
+    "h": 9,
+    "dx": 2,
+    "lift": 0
+   },
+   "2": {
+    "w": 28,
+    "h": 13,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 35,
+    "h": 16,
+    "dx": 1,
+    "lift": 0
+   },
+   "4": {
+    "w": 35,
+    "h": 19,
+    "dx": 1,
+    "lift": 0
+   }
+  }
+ },
+ "herb_seed_silvertongue": {
+  "sha": "2324d302e5e6045f",
+  "swf": "seeds/herb_seed_silvertongue/seed_silvertongue.swf",
+  "states": {
+   "1": {
+    "w": 17,
+    "h": 9,
+    "dx": 1,
+    "lift": 0
+   },
+   "2": {
+    "w": 28,
+    "h": 13,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 34,
+    "h": 16,
+    "dx": 1,
+    "lift": 0
+   },
+   "4": {
+    "w": 34,
+    "h": 19,
+    "dx": 1,
+    "lift": 0
+   }
+  }
+ },
+ "herb_seed_yellow_crumb_flower": {
+  "sha": "2f4f3066b3d1f5c8",
+  "swf": "seeds/herb_seed_yellow_crumb_flower/seed_yellow_crumb_flower.swf",
+  "states": {
+   "1": {
+    "w": 17,
+    "h": 8,
+    "dx": 1,
+    "lift": 0
+   },
+   "2": {
+    "w": 28,
+    "h": 12,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 34,
+    "h": 16,
+    "dx": 1,
+    "lift": 0
+   },
+   "4": {
+    "w": 34,
+    "h": 20,
+    "dx": 1,
     "lift": 0
    }
   }

@@ -12,14 +12,29 @@ import { describe, it } from 'node:test';
 import { createHash } from 'node:crypto';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
-import { WORLD_ART } from '../public/js/world-art-list.js?v=df42115a';
-import { FALLBACK_MAX, artIdOf, worldArtFor, worldStateFor } from '../public/js/world-art.js?v=df476660';
+import { WORLD_ART } from '../public/js/world-art-list.js?v=2d47f296';
+import { FALLBACK_MAX, artIdOf, worldArtFor, worldStateFor } from '../public/js/world-art.js?v=0729bf92';
 import { surfaceHeight, stackSurfaceAt, createHomeDecorState } from '../public/js/home-decor.js?v=d6fabb62';
 import { FURNITURE_UPGRADES } from '../public/js/furniture-upgrades-data.js?v=ced89b64';
 
 const root = join(import.meta.dirname, '..');
 const pub = join(root, 'public');
 const items = join(root, '../glitch-items');
+// Lane refsart: the classes whose one SWF is not named for them, and where it is in tinyspeck/glitch-items.
+const OTHER_NAMES = {
+  fiber: 'misc/fiber/strips_of_fabric.swf',
+  herb_seed_gandlevery: 'seeds/herb_seed_gandlevery/seed_gandlevery.swf',
+  herb_seed_hairball_flower: 'seeds/herb_seed_hairball_flower/seed_hairball_flower.swf',
+  herb_seed_purple_flower: 'seeds/herb_seed_purple_flower/seed_purple_flower.swf',
+  herb_seed_rookswort: 'seeds/herb_seed_rookswort/seed_rookswort.swf',
+  herb_seed_rubeweed: 'seeds/herb_seed_rubeweed/seed_rubeweed.swf',
+  herb_seed_silvertongue: 'seeds/herb_seed_silvertongue/seed_silvertongue.swf',
+  herb_seed_yellow_crumb_flower: 'seeds/herb_seed_yellow_crumb_flower/seed_yellow_crumb_flower.swf',
+  artifact_butterfly_hair_clip_piece1: 'artifacts/artifact_butterfly_hair_clip_piece1/artifact_butterlfy_hair_clip_piece1.swf',
+  artifact_butterfly_hair_clip_piece2: 'artifacts/artifact_butterfly_hair_clip_piece2/artifact_butterlfy_hair_clip_piece2.swf',
+  artifact_butterfly_hair_clip_piece3: 'artifacts/artifact_butterfly_hair_clip_piece3/artifact_butterlfy_hair_clip_piece3.swf',
+  artifact_butterfly_hair_clip_piece4: 'artifacts/artifact_butterfly_hair_clip_piece4/artifact_butterlfy_hair_clip_piece4.swf',
+};
 
 describe('world art (tools/world-art/render.py)', () => {
   it('lists exactly the rendered files, one per state', () => {
@@ -75,7 +90,9 @@ describe('world art (tools/world-art/render.py)', () => {
     for (const [id, row] of Object.entries(art)) {
       const swf = String(row.swf || '');
       const parts = swf.split('/');
-      if (parts[0] === 'achievements' || parts.at(-1) !== `${id}.swf`) wrong.push(`${id}: ${swf || 'no swf'}`);
+      // Its own name, or (lane refsart) the one SWF in the folder of its name: OTHER_NAMES below.
+      const own = parts.at(-1) === `${id}.swf` || (parts.at(-2) === id && OTHER_NAMES[id] === swf);
+      if (parts[0] === 'achievements' || !own) wrong.push(`${id}: ${swf || 'no swf'}`);
     }
     assert.deepEqual(wrong, []);
     assert.equal(art.card_carrying_qualification.swf, 'misc/card_carrying_qualification/card_carrying_qualification.swf');
@@ -84,6 +101,41 @@ describe('world art (tools/world-art/render.py)', () => {
     }
     // The card lies flat at its own 58 x 16, not the 172 x 172 badge.
     assert.deepEqual(WORLD_ART.card_carrying_qualification, { 1: [58, 16] });
+  });
+
+  // Lane refsart (register G646): twelve things lay on the ground as their pack icons because their
+  // SWFs are not named for their class (Fiber is strips_of_fabric.swf, a herb seed seed_<herb>.swf,
+  // a butterfly hair clip piece is misspelt "butterlfy"). The render pairs a class that has no SWF
+  // of its own name with the one SWF in the folder of its name.
+  it('the twelve whose SWF has another name are drawn from it, each count its own state', () => {
+    const art = JSON.parse(readFileSync(join(root, 'tools/world-art/art.json'), 'utf8'));
+    assert.equal(Object.keys(OTHER_NAMES).length, 12);
+    for (const [id, swf] of Object.entries(OTHER_NAMES)) {
+      assert.equal(art[id]?.swf, swf, id);
+      for (const state of Object.keys(WORLD_ART[id])) assert.ok(existsSync(join(root, 'public/assets/sprites/world', id, `${state}@3x.webp`)), `${id} ${state}`);
+    }
+    // Measured: Fiber's one state is 40 x 17 (the OGA frame is 41 x 17); a herb seed has four, the
+    // fourth 34 or 35 wide and 19 or 20 high (the OGA strip of four is 136 x 19); a piece has one.
+    assert.deepEqual(WORLD_ART.fiber, { 1: [40, 17] });
+    for (const id of Object.keys(OTHER_NAMES).filter((k) => k.startsWith('herb_seed_'))) {
+      assert.deepEqual(Object.keys(WORLD_ART[id]), ['1', '2', '3', '4'], id);
+      const [w, h] = WORLD_ART[id][4];
+      assert.ok(w >= 34 && w <= 35 && h >= 19 && h <= 20, `${id}: ${w} x ${h}`);
+    }
+    assert.deepEqual(WORLD_ART.artifact_butterfly_hair_clip_piece1, { 1: [33, 16] });
+    assert.equal(worldArtFor('herb_seed_rubeweed', 7).state, '4', 'seven seeds lie as the pile of four');
+    assert.equal(worldArtFor('fiber', 30).url, 'assets/sprites/world/fiber/1@3x.webp');
+    const render = readFileSync(join(root, 'tools/world-art/render.py'), 'utf8');
+    assert.match(render, /if folder not in idx and len\(paths\) == 1:\s+idx\[folder\] = paths\[0\]/);
+  });
+
+  // King of Condiments has a SWF of its own name and still no world art: its '1' scene is empty in
+  // Tiny Speck's file (every object is removed on frame 2), and their own OGA frame of it is a blank
+  // 15 x 15. Glitch drew nothing for one on the ground; the remake keeps its icon there.
+  it('King of Condiments keeps its icon: the original\'s own lying-down state is empty', () => {
+    assert.equal(WORLD_ART.kings_of_condiments, undefined);
+    assert.equal(worldArtFor('kings_of_condiments', 1), null);
+    assert.ok(existsSync(join(root, 'public/assets/sprites/icons/kings_of_condiments.webp')));
   });
 
   it('each SWF named in art.json is the one rendered (its hash), when glitch-items is beside the repo', { skip: !existsSync(items) && 'needs glitch-items beside the repo' }, () => {

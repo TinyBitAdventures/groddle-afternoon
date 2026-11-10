@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=afe3caa8';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=06bb8b74';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=e0953ade';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=23e03196';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -1000,7 +1000,7 @@ import { installHeldKeyGuard, isMacPlatform } from './js/held-keys.js?v=98b96620
 import { signpostArmRows, worldContextAction } from './js/world-context-menu.js?v=f3f48805';
 import { blockedPlayerVerbs, listPlayerTarget, opensPlayerMenu, playerMenuRows } from './js/ui/player-menu.js?v=7a708b3c';
 import { forgetTexture, frameTexture, isFailed, isLoaded, onFailed, onLoaded, textureFromUrl, whenLoaded } from './js/textures.js?v=f024bd6a';
-import { FALLBACK_MAX as WORLD_ART_FALLBACK_MAX, worldArtFor } from './js/world-art.js?v=df476660';
+import { FALLBACK_MAX as WORLD_ART_FALLBACK_MAX, worldArtFor } from './js/world-art.js?v=0729bf92';
 import { sceneAnim, syncAnim } from './js/deco-anim.js?v=aa35e023';
 import { revealStartCard, whenSceneDrawn } from './js/start-backdrop.js?v=8510d51e';
 import { cancelAllOverlays, playPoofIn, setOverlayResolution } from './js/overlay-art.js?v=75c3ea34';
@@ -31574,6 +31574,24 @@ async function main() {
         if (app?.canvas) app.canvas.dataset.speechDemo = String(speaker.classId || speaker.kind || speaker.label || '');
       };
       setTimeout(find, 1500);
+    }
+    // QA: &grounddemo=<class>[:<count>][,<class>...] puts those stacks on the ground to your right, 70 px
+    // apart, as a drop would (the art a put-down stack shows, js/world-art.js). Canvas: groundDemo
+    // (<class>:<count>:<the state drawn, or icon>, comma separated).
+    const groundDemo = bootParams.get('grounddemo');
+    if (groundDemo) {
+      setTimeout(() => {
+        const rows = [];
+        String(groundDemo).split(',').filter(Boolean).slice(0, 16).forEach((part, i) => {
+          const [cls, n] = part.split(':');
+          const count = Math.max(1, Math.floor(Number(n)) || 1);
+          if (!ITEM_CATALOG[cls]) return;
+          const res = engine.dropWorldStack(cls, count, player.x + 90 + i * 70, player.y - 20);
+          const art = res?.ok ? worldArtFor(cls, count, ITEM_CATALOG[cls]?.icon) : null;
+          rows.push(`${cls}:${count}:${res?.ok ? (art ? art.state : 'icon') : 'refused'}`);
+        });
+        if (app?.canvas) app.canvas.dataset.groundDemo = rows.join(',');
+      }, 1500);
     }
     if (!state.muted && audio.ctx?.state === 'suspended') {
       try { await audio.ctx.resume(); } catch (_) { /* */ }

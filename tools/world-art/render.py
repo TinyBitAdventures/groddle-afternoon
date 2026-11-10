@@ -80,12 +80,24 @@ NOT_ITEMS = ('achievements',)
 
 
 def swf_index():
-    """{name: path}: each item SWF by its file name, from the item folders only (never a badge)."""
+    """{name: path}: each item SWF by its file name, from the item folders only (never a badge).
+
+    A few SWFs are not named for their class but sit alone in a folder that is: Fiber is
+    misc/fiber/strips_of_fabric.swf, the herb seeds seeds/herb_seed_<herb>/seed_<herb>.swf, the
+    butterfly hair clip pieces artifacts/artifact_butterfly_hair_clip_piece<n>/artifact_butterlfy_...
+    (misspelt in the original). A class with no SWF of its own name takes the one SWF in the folder
+    of its name (lane refsart, register G646: these 12 lay on the ground as their pack icons).
+    """
     idx = {}
+    by_folder = {}
     for p in sorted(glob.glob(os.path.join(ITEMS, '**/*.swf'), recursive=True)):
         if os.path.relpath(p, ITEMS).split(os.sep)[0] in NOT_ITEMS:
             continue
         idx.setdefault(os.path.basename(p)[:-4], p)
+        by_folder.setdefault(os.path.basename(os.path.dirname(p)), []).append(p)
+    for folder, paths in by_folder.items():
+        if folder not in idx and len(paths) == 1:
+            idx[folder] = paths[0]
     return idx
 
 
