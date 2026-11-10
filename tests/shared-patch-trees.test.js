@@ -27,13 +27,13 @@ import {
   sharedTreeReady,
   sharedTreeSkill,
   TRANTSFORM_VERB,
-} from '../public/js/shared-patches.js?v=6d29f25c';
-import { sharedPatchesFeature } from '../public/js/features/shared-patches-feature.js?v=2418ab88';
-import { patchesFeature } from '../public/js/features/patches-feature.js?v=d8dc0c76';
-import { treeDeathFeature, decorateTreeVerbs } from '../public/js/features/tree-death-feature.js?v=3df7e751';
-import { potionsFeature } from '../public/js/features/potions-feature.js?v=749d3eaf';
-import { powdersFeature, runPowder } from '../public/js/features/powders-feature.js?v=54d9c9a2';
-import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=399c24d9';
+} from '../public/js/shared-patches.js?v=c6dd1727';
+import { sharedPatchesFeature } from '../public/js/features/shared-patches-feature.js?v=91981fb5';
+import { patchesFeature } from '../public/js/features/patches-feature.js?v=631fffe7';
+import { treeDeathFeature, decorateTreeVerbs } from '../public/js/features/tree-death-feature.js?v=c68f206e';
+import { potionsFeature } from '../public/js/features/potions-feature.js?v=8ccb41cd';
+import { powdersFeature, runPowder } from '../public/js/features/powders-feature.js?v=bef9428c';
+import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=8a3e5bc3';
 import { rookKeyFor } from '../public/js/rook-attack.js?v=c12e825f';
 import { rookedFromServer, syncKeys } from '../public/js/rook-mp.js?v=0b9056b1';
 import { runVerb } from '../public/content.js?v=afe3caa8';

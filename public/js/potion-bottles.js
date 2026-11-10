@@ -24,7 +24,7 @@
  * the scene in their SWFs but no OGA sheet; they keep the rocking icon.
  */
 
-import { PACKED_SHEETS } from './packed-sheets-data.js?v=9ccb684a';
+import { PACKED_SHEETS } from './packed-sheets-data.js?v=32023e3a';
 
 /** The overlay's 2500 ms (and the effect's timer). */
 export const POTION_POUR_MS = 2500;

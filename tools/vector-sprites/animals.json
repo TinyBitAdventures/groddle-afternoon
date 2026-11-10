@@ -27,7 +27,8 @@
     ] },
     { "name": "batterfly", "swf": "inhabitants/batterfly/npc_batterfly.swf", "sprite": 81, "sheets": [
       { "path": "assets/sprites/animals/npc_batterfly_profile.webp", "label": "profile", "fw": 111, "fh": 96, "cols": 8, "frames": 40 },
-      { "path": "assets/sprites/animals/npc_batterfly_chew.webp", "label": "chew", "fw": 111, "fh": 96, "cols": 9, "frames": 120 }
+      { "path": "assets/sprites/animals/npc_batterfly_chew.webp", "label": "chew", "fw": 111, "fh": 96, "cols": 9, "frames": 120 },
+      {"path": "assets/sprites/animals/npc_batterfly_profile_turned.webp", "label": "profile_turned", "fw": 79, "fh": 87, "cols": 3, "frames": 10, "frameList": [41, 42, 43, 44, 45, 46, 47, 48, 49, 50], "firstDraw": true}
     ] },
     { "name": "fox-orange", "swf": "inhabitants/fox/npc_fox.swf", "sprite": 151, "sheets": [
       { "path": "assets/sprites/foxes/fox-orange-run.webp", "label": "run", "fw": 153, "fh": 139, "cols": 6, "frames": 12 },

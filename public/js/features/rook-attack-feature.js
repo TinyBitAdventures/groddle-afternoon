@@ -60,7 +60,7 @@
 import { slugsFromEffects } from '../speech-slugs.js?v=130338f9';
 import { addItem, countItem, ensureItem, removeItem, ITEM_CATALOG } from '../inventory.js?v=60dfc9ca';
 import { bindCountField, countKeyValue, countStepMarkup } from '../ui/count-chooser.js?v=5bc894c8';
-import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=44415661';
+import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=d9a73bdc';
 import { landingY, nearestSurfaceY } from '../walk-surface.js?v=106bfdc5';
 import { donationValueFor } from '../shrines.js?v=aa00a504';
 import { giantDisplayName } from '../giant-names.js?v=0e295891';
@@ -127,7 +127,7 @@ import {
 import { itemZ } from '../item-bands.js?v=e98b10bc';
 import { copyChargesLeft, copyFromLedger, keepsCopies, spendCopyCharge, verbCopy } from '../copy-charges.js?v=4ffa1c1e';
 import { migrateClassValue } from '../tools.js?v=5f482998';
-import { playPotionBottle } from '../potion-bottle-fx.js?v=3de95cd9';
+import { playPotionBottle } from '../potion-bottle-fx.js?v=d959d748';
 import { feedZone, placeRookBadge, unionBox } from '../rook-badge-place.js?v=2bb00dfd';
 
 export const ROOK_FEATURE_ID = 'rook-attack';

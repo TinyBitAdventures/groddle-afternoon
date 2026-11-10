@@ -23,7 +23,7 @@
  * Until 2026-11-10 these verbs showed only the word bar.
  */
 
-import { PACKED_SHEETS } from './packed-sheets-data.js?v=9ccb684a';
+import { PACKED_SHEETS } from './packed-sheets-data.js?v=32023e3a';
 
 /** The Shovel's sheet as shipped for Patches (features/patches-feature.js), in a packed sheet's shape. */
 const SHOVEL_SHEET = Object.freeze({

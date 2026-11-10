@@ -13,7 +13,7 @@ import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { FIRST_DRAW_SPRITES, HIRES_SPRITES } from '../public/js/sprite-hires.js?v=68150c4c';
+import { FIRST_DRAW_SPRITES, HIRES_SPRITES } from '../public/js/sprite-hires.js?v=6b09d38f';
 import { DENSE_SPRITES, denseSprite } from '../public/js/sprite-dense.js?v=2a0ce07a';
 import { MAILBOX_SHEETS, STONE_ART, NOTE_ART, BOARD_ART } from '../public/js/street-furniture.js?v=55131f49';
 import { FURNITURE_CATALOG } from '../public/js/homes-catalog.js?v=10ac34b6';

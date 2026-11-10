@@ -86,14 +86,15 @@ const PACK_SOAK = 'pverb_soak';
 const PACK_PLAY_FOR = 'pverb_play_for';
 const PACK_BESTOW = 'pverb_bestow';
 const INFLUENCE_EVERY_MS = 1000;
+/** The Plank's emote_animation as one animated picture: OGA 8 x 12 cells of 490 x 291, 90 frames (tools/emote-art/build.py). */
+export const SPLANK_ART = 'assets/sprites/emotes/plank.webp';
 
 const STYLE = `
 .pverb-fx { position: fixed; left: 50%; top: 42%; z-index: var(--z-dialog); transform: translate(-50%, -50%); pointer-events: none; display: grid; justify-items: center; gap: var(--sp-3); }
 .pverb-fx[hidden] { display: none; }
 .pverb-fx img { width: min(46vw, 260px); height: auto; filter: drop-shadow(0 6px 14px color-mix(in srgb, var(--c-black) 35%, transparent)); }
-.pverb-fx.is-splank img { width: min(60vw, 360px); animation: pverb-splank 0.5s ease-in-out 0s 6 alternate; transform-origin: 80% 90%; }
+.pverb-fx.is-splank img { width: min(92vw, 490px); filter: none; }
 .pverb-fx p { margin: 0; padding: var(--sp-3) 0.8rem; border-radius: var(--radius-pill); background: color-mix(in srgb, var(--surface-dark) 82%, transparent); color: var(--text-inverse); font: 600 var(--fs-base)/var(--lh-snug) var(--font-system); }
-@keyframes pverb-splank { from { transform: rotate(-28deg); } to { transform: rotate(12deg); } }
 .pverb-pick-list { display: grid; gap: var(--sp-3); padding: 0.2rem var(--sp-7) var(--sp-7); }
 .pverb-pick-list button { font: inherit; text-align: left; border: 1px solid var(--border); border-radius: var(--radius-md); padding: var(--sp-3) 0.7rem; background: var(--surface-bright); cursor: pointer; }
 .pverb-pick-list button:hover, .pverb-pick-list button:focus-visible { background: var(--surface-parchment); }
@@ -175,7 +176,10 @@ function createSession(engine, client) {
     const splank = overlay.anim === 'splank';
     fx.classList.toggle('is-splank', splank);
     img.src = '';
-    const src = splank ? 'assets/sprites/icons/plank@3x.webp' : `assets/sprites/emotional-bear/${overlay.anim}.webp?play=${Date.now()}`;
+    // The Plank's own swing (plank.js 70-78: its emote_animation, 90 frames played once in 3 s of the
+    // overlay's 10; tools/emote-art/build.py), as the bear's emotes are its own states. Shown at the
+    // sheet's own 490 px: the client drew the SWF itself at 225% of the view's short side.
+    const src = `${splank ? SPLANK_ART : `assets/sprites/emotional-bear/${overlay.anim}.webp`}?play=${Date.now()}`;
     requestAnimationFrame(() => { img.src = src; });
     fx.querySelector('p').textContent = caption;
     fx.hidden = false;

@@ -141,8 +141,9 @@ def plan(row):
 
 
 def shipped_hash(path):
+    # The colour under a fully transparent pixel is not kept by the WebP encoder: compare what is seen.
     from PIL import Image
-    return hashlib.sha256(Image.open(path).convert('RGBA').tobytes()).hexdigest()
+    return hashlib.sha256(clear_transparent(Image.open(path).convert('RGBA')).tobytes()).hexdigest()
 
 
 def js_text(results):

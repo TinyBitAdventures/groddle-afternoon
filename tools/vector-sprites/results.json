@@ -63722,5 +63722,54 @@
    0.9611,
    0.9459
   ]
+ },
+ "assets/sprites/animals/npc_batterfly_profile_turned.webp": {
+  "animal": "batterfly",
+  "swf": "inhabitants/batterfly/npc_batterfly.swf",
+  "sprite": 81,
+  "label": "profile_turned",
+  "swfFrames": [
+   41,
+   42,
+   43,
+   44,
+   45,
+   46,
+   47,
+   48,
+   49,
+   50
+  ],
+  "swfLabelFrames": 40,
+  "cells": 10,
+  "fw": 79,
+  "fh": 87,
+  "mirror": true,
+  "shift": 0,
+  "offset3x": [
+   -53,
+   0
+  ],
+  "score": 0.9831,
+  "minFrame": 0.9778,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/animals/npc_batterfly_profile_turned@3x.webp",
+  "bytes": 180148,
+  "firstDraw": true,
+  "frameScores": [
+   0.9848,
+   0.983,
+   0.9808,
+   0.9844,
+   0.984,
+   0.9829,
+   0.9778,
+   0.9826,
+   0.9852,
+   0.9856
+  ]
  }
 }

@@ -1,0 +1,32 @@
+{
+ "file": "assets/sprites/emotes/plank.webp",
+ "size": [
+  490,
+  291
+ ],
+ "frames": 90,
+ "fps": 30,
+ "loop": 1,
+ "oga": {
+  "file": "plank__x1_emote_animation_png_1354829970.png",
+  "size": [
+   3920,
+   3492
+  ],
+  "cols": 8,
+  "rows": 12,
+  "blank": [
+   88,
+   89
+  ]
+ },
+ "swf": {
+  "path": "food/plank/plank.swf",
+  "scene": "emote_animation",
+  "frames": [
+   6,
+   95
+  ]
+ },
+ "sha256": "94b533d5b7fc07da8a3e521ff2edf0e5531103717ae637c0d4299b853b122540"
+}

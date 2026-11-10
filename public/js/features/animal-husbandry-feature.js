@@ -57,7 +57,7 @@
  */
 
 import { slugsFromEffects } from '../speech-slugs.js?v=130338f9';
-import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=44415661';
+import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=d9a73bdc';
 import { nearestSurfaceY } from '../walk-surface.js?v=106bfdc5';
 import { displayTopOf, itemstackOverlayPoint, playSheetOverlay } from '../overlay-art.js?v=75c3ea34';
 import { SET_FREE, applySetFree, canSetFree, setFreeGoneLine, setFreePrompt } from '../animal-set-free.js?v=3b194fca';
@@ -110,16 +110,18 @@ import {
   stepHogtie,
   stickPlaceState,
 } from '../animal-husbandry.js?v=7b3b3181';
-import { batterflyBaseY, batterflyResponseFor, flightFloorFor } from '../street-creatures.js?v=71a8ee88';
+import { batterflyBaseY, batterflyResponseFor, flightFloorFor } from '../street-creatures.js?v=e0768d00';
 import { loseEnergy, shiftMetabolic } from '../metabolics.js?v=8504134e';
 import { textureFromUrl } from '../textures.js?v=f024bd6a';
 import { PIGGY_DEATH_DROPS, PIGGY_DEATH_PUFF, SAD_BABY, forcedRoll, isSadIn } from '../animal-mood.js?v=a49495fc';
-import { animalCrowdChanged, animalCrowdSad, animalPlaceIsDepressing, crowdLimit, smokePuff as sharedSmokePuff } from './animal-mood-feature.js?v=8da5bb1b';
+import { animalCrowdChanged, animalCrowdSad, animalPlaceIsDepressing, crowdLimit, smokePuff as sharedSmokePuff } from './animal-mood-feature.js?v=9fbd1dd1';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
-import { followYardPath, freeYardSpot } from '../yard-wander.js?v=908141cb';
-import { showsChickenIdle, yardChickenPose } from '../chicken-idle-art.js?v=89c3bcb0';
-import { chickenWaitPose } from '../chicken-idles.js?v=6c0c1dd3';
+import { followYardPath, freeYardSpot } from '../yard-wander.js?v=83418f5f';
+import { showsChickenIdle, yardChickenPose } from '../chicken-idle-art.js?v=b5dd62ed';
+import { chickenWaitPose } from '../chicken-idles.js?v=2d5c6d41';
+import { PACKED_SHEETS } from '../packed-sheets-data.js?v=32023e3a';
+import { createPackedLoader } from '../packed-sheets.js?v=cb13ee62';
 
 export const HUSBANDRY_FEATURE_ID = 'animal-husbandry';
 export const BATTERFLY_GROUP = 'batterfly';
@@ -133,6 +135,9 @@ export const BATTERFLY_SHEETS = Object.freeze({
   profile: Object.freeze({ path: `${DIR}npc_batterfly_profile.webp`, fw: 111, fh: 96, cols: 8, frames: 40 }),
   chew: Object.freeze({ path: `${DIR}npc_batterfly_chew.webp`, fw: 111, fh: 96, cols: 9, frames: 120 }),
 });
+/** The look it gives a player at it: the packed 'profile_turned' state (10 pictures, looping). */
+export const BATTERFLY_TURNED = PACKED_SHEETS.batterfly.profile_turned;
+let turnedLoader = null;
 const ART = Object.freeze({
   plop: `${DIR}plop.webp`,
   guano: 'assets/sprites/icons/guano.webp',
@@ -319,6 +324,47 @@ function buildBatterfly(engine, key, x, y, state) {
   return entity;
 }
 
+/**
+ * A player at a Batterfly (its menu, a verb on it): it stops and turns to look at them, the
+ * source's 'profile_turned' state, which loops (npc_batterfly.js onWaitStart 1074-1081:
+ * apiStopMoving, state 'profile_turned'; npc_batterfly.fla loopers). Its sheet (OGA 888 x 480,
+ * 8 x 5 cells of 111 x 96, 40 frames of 10 pictures; js/packed-sheets-data.js) loads the first
+ * time one is looked at. The source also flew it to beside the player (moveToWait 1173-1185);
+ * here it turns where it is. Returns true while it waits.
+ */
+function batterflyWaits(engine, entity) {
+  const spr = entity.sprite;
+  const waiting = !entity.chewUntil && Boolean(engine.actingOn?.(entity.target));
+  if (!waiting) {
+    if (entity.turned) {
+      entity.turned = false;
+      spr.textures = loader.frames(BATTERFLY_SHEETS.profile);
+      spr.loop = true;
+      spr.animationSpeed = pixiSpeed(30);
+      spr.play();
+      engine.setData?.('batterflyLook', 'profile');
+    }
+    return false;
+  }
+  if (!entity.turned) {
+    turnedLoader ||= createPackedLoader(engine.PIXI);
+    if (!turnedLoader.ready(BATTERFLY_TURNED)) {
+      turnedLoader.load(BATTERFLY_TURNED);
+    } else {
+      entity.turned = true;
+      spr.textures = turnedLoader.frames(BATTERFLY_TURNED);
+      spr.loop = true;
+      spr.animationSpeed = pixiSpeed(BATTERFLY_TURNED.fps);
+      spr.play();
+      engine.setData?.('batterflyLook', 'profile_turned');
+    }
+  }
+  // The art faces right: toward the player.
+  const p = engine.player;
+  if (p) spr.scale.x = Math.abs(spr.scale.y) * (p.x >= spr.x ? 1 : -1);
+  return true;
+}
+
 function stepBatterfly(engine, entity, dtMs) {
   const spr = entity.sprite;
   if (!spr || spr.destroyed) return;
@@ -328,6 +374,8 @@ function stepBatterfly(engine, entity, dtMs) {
     spr.loop = true;
     spr.play();
   }
+  // Stopped for the player at it (online its shared path is held for everyone meanwhile).
+  if (batterflyWaits(engine, entity)) return;
   // Multiplayer: a street Batterfly the server shares flies its shared path (held while it chews).
   if (spr._path?.(dtMs / (1000 / 60))) return;
   // The flight path pauses while it chews, so it resumes where it stopped instead of jumping ahead.
@@ -347,6 +395,7 @@ function stepBatterfly(engine, entity, dtMs) {
 function chewBatterfly(entity) {
   const frames = loader.frames(BATTERFLY_SHEETS.chew);
   if (!frames.length || !entity.sprite || entity.sprite.destroyed) return;
+  entity.turned = false;
   entity.sprite.textures = frames;
   entity.sprite.loop = false;
   entity.sprite.animationSpeed = pixiSpeed(30);

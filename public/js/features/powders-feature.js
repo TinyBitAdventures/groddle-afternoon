@@ -116,10 +116,12 @@ import { itemVerbAchievementCounters } from '../item-verbs.js?v=1e20fa7d';
 import { copyChargesLeft, copyFromLedger, keepsCopies, spendCopyCharge, verbCopy } from '../copy-charges.js?v=4ffa1c1e';
 import { migrateClassValue } from '../tools.js?v=5f482998';
 import { DEAD_TRANT_CLASSES } from '../patches.js?v=3103cc6a';
-import { COPY as SHARED_PATCH_COPY } from '../shared-patches.js?v=6d29f25c';
+import { COPY as SHARED_PATCH_COPY } from '../shared-patches.js?v=c6dd1727';
 import { hellFeature } from './hell-feature.js?v=ba4199c6';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 import { displayTopOf, playSheetOverlay } from '../overlay-art.js?v=75c3ea34';
+import { pcOverlayPoint, playItemOverlay } from '../item-overlay.js?v=99215179';
+import { POWDER_SHAKE, powderShakerSheet } from '../powder-shakers.js?v=f42441bf';
 import { OVERLAY_USES, playOverlay, playWindowOverlay, windowOverlayFit } from '../overlays.js?v=605c12ff';
 import {
   POWDER_MP,
@@ -265,8 +267,30 @@ function powderBurst(engine, key, targets, useKey = key) {
   engine.setData?.('powderBurst', `${key}:${targets.length}`);
 }
 
+/**
+ * The powder's own jar puffing over the one who used it, for the use's 3 s (the source's
+ * pc_overlay, e.g. fertilidust.js 453-467; js/powder-shakers.js). QA: canvas powderShaker
+ * (<class>:<frame>), &powdershakerhold=<ms> freezes it.
+ */
+function playShaker(engine, classTsid) {
+  const sheet = powderShakerSheet(classTsid);
+  const layer = engine.fxLayer || engine.entityLayer;
+  if (!sheet || !engine.PIXI || !layer || !engine.player) return null;
+  const hold = Number(engine.param?.('powdershakerhold'));
+  return playItemOverlay(engine.PIXI, sheet, {
+    layer,
+    wh: POWDER_SHAKE.wh,
+    durationMs: POWDER_SHAKE.ms,
+    holdMs: Number.isFinite(hold) && hold > 0 ? hold : null,
+    label: `powder-shaker:${classTsid}`,
+    onFrame: (frame) => engine.setData?.('powderShaker', `${classTsid}:${frame}`),
+    at: () => pcOverlayPoint(engine.player, { dy: POWDER_SHAKE.deltaY }),
+  });
+}
+
 function finishUse(engine, classTsid) {
   const def = POWDERS[classTsid];
+  playShaker(engine, classTsid);
   if (def.sound) engine.playSound?.(def.sound, { volume: 0.6 });
   const use = granted?.classTsid === classTsid ? granted.use : null;
   if (def.maxCharges && keepsCopies(engine, classTsid)) {
