@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=f6a37125';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=127e0a3c';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=5b9533de';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=f67d20af';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -989,7 +989,7 @@ import { ENCYCLOPEDIA_MENU_LABEL, createEncyclopedia, isEncyclopediaKey } from '
 import { EAT_PICK_TEXT, bestFoodIndex, eatChoices, eatTip } from './js/eat-pick.js?v=8fb763d0';
 import { installHeldKeyGuard, isMacPlatform } from './js/held-keys.js?v=98b96620';
 import { signpostArmRows, worldContextAction } from './js/world-context-menu.js?v=f3f48805';
-import { blockedPlayerVerbs, listPlayerTarget, opensPlayerMenu, playerMenuRows } from './js/ui/player-menu.js?v=efa23fd2';
+import { blockedPlayerVerbs, listPlayerTarget, opensPlayerMenu, playerMenuRows } from './js/ui/player-menu.js?v=b6e4b945';
 import { forgetTexture, frameTexture, isFailed, isLoaded, onFailed, onLoaded, textureFromUrl, whenLoaded } from './js/textures.js?v=f024bd6a';
 import { FALLBACK_MAX as WORLD_ART_FALLBACK_MAX, worldArtFor } from './js/world-art.js?v=df476660';
 import { sceneAnim, syncAnim } from './js/deco-anim.js?v=aa35e023';
@@ -1002,7 +1002,7 @@ import { hidesChatBubble } from './js/hi-signs.js?v=b90c7d7e';
 import { GAME_MODE, isSolo } from './js/game-mode.js?v=1ecf2899';
 import { saveStore } from './js/save-store.js?v=8839ba7b';
 import { grantSoloStarterItems, isNewMultiplayerPlayer, newPlayerInventory, newPlayerStats } from './js/new-player.js?v=d9fa4f61';
-import { SPEECH_HOLD_MARGIN, clearSpeechOfBox, deepestSpeechTip, giveArtHeight, holdSpeechSide, hudColumnBox, limitSpeechShift, limitSpeechTip, placeSpeechTail, placeSpeechTip, slideOffAvatars, speechBubbleOutline, speechOffsetFor, speechTipOnSide } from './js/speech-placement.js?v=d12cdd6a';
+import { SPEECH_HOLD_MARGIN, clearSpeechOfBox, deepestSpeechTip, giveArtHeight, holdSpeechSide, hudColumnBox, limitSpeechShift, limitSpeechTip, placeSpeechTail, placeSpeechTip, slideOffAvatars, speechBubbleOutline, speechOffsetFor, speechTipOnSide } from './js/speech-placement.js?v=09802fc5';
 import { shrineDonationResponseKey, verbResponse } from './js/verb-responses.js?v=3ceb8a8c';
 import { itemZ } from './js/item-bands.js?v=e98b10bc';
 import { SLUG_ANIMATION, SLUG_LAYOUT, SLUG_STYLES, SLUG_TARGETS, drawSlugIcon, formatRawSlugs, formatSlugList, layoutSlugRow, slugBox, slugNumber, slugPillPath, slugSign, speechSlugList } from './js/speech-slugs.js?v=130338f9';

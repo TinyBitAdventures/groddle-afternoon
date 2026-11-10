@@ -41,7 +41,7 @@ import {
   holdSpeechSide,
   speechTipOnSide,
   texelsPerUnit,
-} from '../public/js/speech-placement.js?v=d12cdd6a';
+} from '../public/js/speech-placement.js?v=09802fc5';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const GSJS = join(ROOT, '../glitch-GameServerJS');

@@ -24,7 +24,7 @@
  */
 
 import { SEED_CATALOG, applyFertilizer } from './garden.js?v=eae8b052';
-import { normalizeParcelBox } from './butler.js?v=2c95c064';
+import { normalizeParcelBox } from './butler.js?v=4a4b82a2';
 
 /** The realtime server's street for a player's home street (homes.go). */
 export const HOME_STREET_PREFIX = 'HOME_';
