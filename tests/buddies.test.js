@@ -30,8 +30,11 @@ import {
   normalizeList,
 } from '../public/js/buddies.js?v=cff7bf6e';
 import { createMinnAccount } from '../public/js/minn-account.js?v=8f2741cd';
-import { buddiesFeature } from '../public/js/features/buddies-feature.js?v=9a7b87b6';
-import { FEATURES } from '../public/js/features/index.js?v=f67d20af';
+import { buddiesFeature } from '../public/js/features/buddies-feature.js?v=cea4455f';
+import { BUDDY_DESTINATION_TEXT, BUDDY_DESTINATION_VERB, buddyDestination, buddyFaceUrl, createFaceMemory } from '../public/js/buddy-list.js?v=b418f3f2';
+import { STREET_INDEX } from '../public/js/street-loader.js?v=18b181ad';
+import { FROM_LIST_VERBS, playerMenuRows } from '../public/js/ui/player-menu.js?v=9eb33f09';
+import { FEATURES } from '../public/js/features/index.js?v=aa7e2acb';
 import { serverPath, sitePath, skipWithoutServer, skipWithoutSite } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');
@@ -80,6 +83,33 @@ describe('buddies rules (js/buddies.js)', () => {
     assert.equal(buddyWhere({ street: '' }, label), 'A secret place');
     assert.equal(buddyWhere({ street: 'GA1' }, label), 'Groddle Meadow');
     assert.equal(buddyWhere({ street: 'GZZZ' }, label), 'A secret place', 'a street the game has no name for');
+  });
+
+  it('report #178: a destination only for a public street the game holds, never a private place', () => {
+    const isStreet = (t) => t === 'GA5101HF7F429V5' || t === 'GLI32G3NUTD100I';
+    assert.equal(buddyDestination({ street: 'GA5101HF7F429V5' }, { here: 'GLI32G3NUTD100I', isStreet }), 'GA5101HF7F429V5');
+    assert.equal(buddyDestination(undefined, { isStreet }), '', 'offline');
+    assert.equal(buddyDestination({ street: '' }, { isStreet }), '', 'a secret place');
+    for (const hidden of ['HOME_12', 'HOUSE_12', 'PARTY_7', 'RACE_3', 'CROWNS_9', 'NB_dorrit', 'GA5101HF7F429V5_2', 'ga5101hf7f429v5', '../x']) {
+      assert.equal(buddyDestination({ street: hidden }, { isStreet: () => true }), '', `${hidden} is no destination`);
+    }
+    assert.equal(buddyDestination({ street: 'GZZZZZZZZZZ' }, { isStreet }), '', 'a street the game does not hold');
+    assert.equal(buddyDestination({ street: 'GA5101HF7F429V5' }, { here: 'GA5101HF7F429V5', isStreet }), '', 'your own street');
+    assert.equal(buddyDestination({ street: 'GA5101HF7F429V5' }, { here: 'LA5101HF7F429V5', isStreet }), '', 'your own street under its other id');
+    assert.equal(buddyDestination({ street: 'GA5101HF7F429V5' }), '', 'nothing without the street index');
+  });
+
+  it('report #178: a buddy\'s face is the site\'s tile picture, and a miss is left alone for a while', () => {
+    assert.equal(buddyFaceUrl(7), '/players/7/tile');
+    assert.equal(buddyFaceUrl(0), '');
+    assert.equal(buddyFaceUrl('x'), '');
+    const faces = createFaceMemory(1000);
+    assert.equal(faces.state(7, 0), '');
+    faces.bad(7, 100);
+    assert.equal(faces.state(7, 500), 'bad');
+    assert.equal(faces.state(7, 1200), '', 'asked again later');
+    faces.ok(7);
+    assert.equal(faces.state(7, 99999), 'ok');
   });
 
   it('applies presence and status', () => {
@@ -367,6 +397,77 @@ describe('buddies feature (js/features/buddies-feature.js)', () => {
     client.msg({ t: 'buddy_offline', id: 2, name: 'Bo' });
     assert.ok(events.includes(`toast:${BUDDY_TEXT.offline('Bo')}`));
     globalThis.groddleBuddies.close();
+  });
+
+  it('report #178: Set as Destination for a buddy online on a public street, through the Map\'s directions', () => {
+    const MEADOW = 'GA5101HF7F429V5';
+    const hadStreet = STREET_INDEX.streets[MEADOW];
+    STREET_INDEX.streets[MEADOW] = hadStreet || { label: 'Groddle Meadow' };
+    const label = STREET_INDEX.streets[MEADOW].label;
+    const routes = [];
+    let answer = { ok: true };
+    const query = engine.query;
+    engine.query = (hook, ...args) => {
+      if (hook === 'mapRoute') { routes.push(args.slice(0, 2)); return answer; }
+      if (hook === 'labelFor') return String(args[0]).startsWith('HOME_') ? { street: 'Somebody\'s Home Street' } : null;
+      return query(hook, ...args);
+    };
+    engine.streetTsid = 'GLI32G3NUTD100I';
+    const bo = { classId: 'pc_remote', playerId: 2, label: 'Bo', fromList: true };
+    const dest = () => buddiesFeature.verbOverride(bo, engine).find((v) => v.id === BUDDY_DESTINATION_VERB);
+    try {
+      events.length = 0;
+      // Offline: no row.
+      assert.equal(dest(), undefined);
+      client.msg({ t: 'buddy_online', id: 2, name: 'Bo', street: MEADOW });
+      const verb = dest();
+      assert.deepEqual([verb.label, verb.tooltip, verb.enabled], ['Set as Destination', `Get a guided path to ${label}`, true]);
+      // It is one of the rows a list menu keeps (a buddy row is "from a list").
+      assert.ok(FROM_LIST_VERBS.includes(BUDDY_DESTINATION_VERB));
+      assert.ok(playerMenuRows(buddiesFeature.verbOverride(bo, engine)).some((r) => r.label === 'Set as Destination'));
+      // The drawer's row carries the face and the same words the list always showed.
+      const row = globalThis.groddleBuddies.drawerView().rows.find((r) => r.id === 2);
+      assert.deepEqual([row.face, row.where], ['/players/2/tile', `Online: ${label}`]);
+      // Picking it sets the Map's route to that street, as a player's own destination.
+      assert.equal(buddiesFeature.runVerbOverride(bo, BUDDY_DESTINATION_VERB, engine), true);
+      assert.deepEqual(routes, [['set', { to: MEADOW, source: 'player' }]]);
+      assert.ok(events.includes(`toast:${BUDDY_DESTINATION_TEXT.set(label)}`));
+      assert.ok(events.includes(`activity:${BUDDY_DESTINATION_TEXT.set(label)}`));
+      assert.equal(engine.data.buddiesDestination, `2@${MEADOW}`);
+      // The Map's refusal is said, and nothing is claimed.
+      events.length = 0;
+      answer = { ok: false, error: 'No path to there.' };
+      buddiesFeature.runVerbOverride(bo, BUDDY_DESTINATION_VERB, engine);
+      assert.deepEqual(events, ['toast:No path to there.']);
+      answer = { ok: true };
+      // Never a private place: a secret place, a home (even one a feature can name), a party space, a race.
+      for (const street of ['', 'HOME_2', 'HOUSE_2', 'PARTY_4', 'RACE_1']) {
+        client.msg({ t: 'buddy_moved', id: 2, name: 'Bo', street });
+        assert.equal(dest(), undefined, `no destination for "${street}"`);
+      }
+      // They moved to a private place after the menu opened: nothing is set, and no street is named.
+      routes.length = 0;
+      events.length = 0;
+      buddiesFeature.runVerbOverride(bo, BUDDY_DESTINATION_VERB, engine);
+      assert.deepEqual(routes, []);
+      assert.deepEqual(events, [`toast:${BUDDY_DESTINATION_TEXT.gone('Bo')}`]);
+      // Not on the street you are on, and not for someone who is not your buddy (Ed only added you).
+      client.msg({ t: 'buddy_moved', id: 2, name: 'Bo', street: MEADOW });
+      engine.streetTsid = MEADOW;
+      assert.equal(dest(), undefined);
+      engine.streetTsid = 'GLI32G3NUTD100I';
+      client.msg({ t: 'buddy_moved', id: 5, name: 'Ed', street: MEADOW });
+      assert.equal(buddiesFeature.verbOverride({ classId: 'pc_remote', playerId: 5, label: 'Ed' }, engine).some((v) => v.id === BUDDY_DESTINATION_VERB), false);
+      // Solo never has it.
+      assert.equal(buddiesFeature.verbOverride(bo, { mode: 'solo', query: () => null }), null);
+    } finally {
+      engine.query = query;
+      delete engine.streetTsid;
+      if (!hadStreet) delete STREET_INDEX.streets[MEADOW];
+      client.msg({ t: 'buddy_offline', id: 2, name: 'Bo' });
+      client.msg({ t: 'buddy_offline', id: 5, name: 'Ed' });
+      events.length = 0;
+    }
   });
 
   it('tells "added you" live, then refreshes the list', async () => {

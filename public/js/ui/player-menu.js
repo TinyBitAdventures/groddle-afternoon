@@ -10,7 +10,8 @@
  *   the full world player menu, the same rows a click on their Glitch gives (Give, Offer to Trade,
  *   Follow, the pack emotes too).
  * - Anywhere else: the rows that work at a distance, as Glitch's list menu kept them: Open Profile
- *   Page, Invite to Party, IM, Visit Home Street, Add to / Remove from Friends, Block / Un-Block.
+ *   Page, Invite to Party, IM, Visit Home Street, Add to / Remove from Friends, Block / Un-Block,
+ *   and the remake's Set as Destination for a buddy on a public street (report #178, js/buddy-list.js).
  *   The rows are the features' own (engine.targetVerbs on a target built from the id and the name),
  *   so their labels, tips and reasons are the world menu's.
  * - Your own name: no menu (ContactElement.as 269 skipped yourself).
@@ -29,6 +30,7 @@
 import { PROFILE_PAGE_VERB } from '../profiles.js?v=054ca723';
 import { IM_VERB_ID } from '../player-im.js?v=23463a96';
 import { BUDDY_VERBS } from '../buddies.js?v=cff7bf6e';
+import { BUDDY_DESTINATION_VERB } from '../buddy-list.js?v=b418f3f2';
 import { VISIT_VERB } from '../neighbours-mp.js?v=91c8e177';
 import { FOLLOW_STOP_VERB } from '../follow-mp.js?v=313c701f';
 import { UNNAMED_PLAYER } from '../player-names.js?v=f9b78094';
@@ -42,6 +44,7 @@ export const FROM_LIST_VERBS = Object.freeze([
   'party_invite',
   IM_VERB_ID,
   VISIT_VERB.id,
+  BUDDY_DESTINATION_VERB,
   BUDDY_VERBS.add,
   BUDDY_VERBS.remove,
   BUDDY_VERBS.ignore,

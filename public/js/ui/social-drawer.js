@@ -99,6 +99,7 @@ import { createNodeCache, pressLeavesKeys, reconcileChildren, uniqueKeys } from 
 import { createReactionUI } from './reaction-strip.js?v=5118c23b';
 import { sameWords } from '../chat-reactions.js?v=d65d555b';
 import { THREAD_TEXT, mergeReplies, normalSummary, summaryText } from '../chat-threads.js?v=42954351';
+import { createFaceMemory } from '../buddy-list.js?v=b418f3f2';
 import { DELETE_CONFIRM_FOCUS, DELETE_TEXT, deleteConfirmRows } from '../chat-delete.js?v=ce1da244';
 
 export const SOCIAL_STORE_KEY = 'groddle-social-drawer';
@@ -1002,6 +1003,30 @@ export function mountSocialDrawer({
     return row;
   }
 
+  /** Report #178: which buddies' pictures loaded and which did not (js/buddy-list.js createFaceMemory). */
+  const faces = createFaceMemory();
+  /** id -> the one picture node of a buddy, moved into each redraw of their row (no reload, no flash). */
+  const faceNodes = new Map();
+  function faceNode(r) {
+    if (!r.face || faces.state(r.id) === 'bad') return null;
+    const had = faceNodes.get(r.id);
+    if (had && had.src === r.face) return had.node;
+    const node = el('span', { class: 'social-face' });
+    const img = el('img', { src: r.face, alt: '', width: '100', height: '144', decoding: 'async', draggable: 'false' });
+    // The circle the picture sits in now (its row is drawn again whenever the list changes).
+    const circle = () => node.parentElement || null;
+    img.addEventListener('load', () => { faces.ok(r.id); circle()?.setAttribute('data-face', ''); });
+    img.addEventListener('error', () => {
+      faces.bad(r.id);
+      faceNodes.delete(r.id);
+      circle()?.removeAttribute('data-face');
+      node.remove?.();
+    });
+    node.append(img);
+    faceNodes.set(r.id, { src: r.face, node });
+    return node;
+  }
+
   function buddyData() {
     try {
       return globalThis.groddleBuddies?.drawerView?.() || null;
@@ -1058,6 +1083,13 @@ export function mountSocialDrawer({
       const li = el('li', { 'data-social-buddy': String(r.id), 'data-online': String(Boolean(r.online)), 'data-ctx': playerMenu ? 'player' : false, 'data-name': r.name });
       const a = avatarOf(r.name);
       const av = el('span', { class: 'social-av', 'data-hue': String(a.hue), 'aria-hidden': 'true' }, a.initial);
+      // Report #178: the buddy's own look over the lettered circle, which stays when there is no
+      // picture or it does not load (and is not asked for again for a while).
+      const face = faceNode(r, av);
+      if (face) {
+        if (faces.state(r.id) === 'ok') av.setAttribute('data-face', '');
+        av.append(face);
+      }
       if (r.online) av.append(el('span', { class: 'social-dot' }));
       const what = playerMenu
         ? el('button', { type: 'button', class: 'social-buddy-what', 'data-social-buddy-who': String(r.id), 'aria-haspopup': 'menu', 'aria-keyshortcuts': 'Shift+F10' })

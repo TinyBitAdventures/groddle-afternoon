@@ -43,7 +43,12 @@
  *   Visit where homes can be visited, who added you, and Manage buddies for this panel. Its head
  *   counts the buddies online (drawerView()).
  *
- * QA: canvas data buddiesCount, buddiesOnline (name@street,...),
+ * - Report #178 (the remake's own, Austin 2026-11-10): the Buddies tab shows each buddy's own
+ *   look (the site's tile picture, the lettered circle when there is none), and a buddy who is
+ *   online on a public street has Set as Destination in their menu: the Map's directions to the
+ *   street the list already names. Never for a private place.
+ *
+ * QA: canvas data buddiesDestination (id@street, the last one set), buddiesCount, buddiesOnline (name@street,...),
  * buddiesIgnoring (ids), buddiesAsking (ids with an "Add them back?" prompt),
  * buddiesLast (the last notice); window.groddleBuddies.
  */
@@ -51,6 +56,7 @@
 import { createMinnAccount } from '../minn-account.js?v=8f2741cd';
 import { bindContextTrigger } from '../ui/context-menu.js?v=79326483';
 import { STREET_INDEX } from '../street-loader.js?v=18b181ad';
+import { BUDDY_DESTINATION_TEXT, BUDDY_DESTINATION_VERB, buddyDestination, buddyFaceUrl } from '../buddy-list.js?v=b418f3f2';
 import {
   BUDDY_COUNTER,
   BUDDY_TEXT,
@@ -70,7 +76,7 @@ import {
 import { UNNAMED_PLAYER } from '../player-names.js?v=f9b78094';
 
 export const BUDDIES_FEATURE_ID = 'buddies';
-const VERB_IDS = new Set(Object.values(BUDDY_VERBS));
+const VERB_IDS = new Set([...Object.values(BUDDY_VERBS), BUDDY_DESTINATION_VERB]);
 
 const STYLE = `
 .buddies-shade { position: fixed; inset: 0; z-index: var(--z-screen); display: grid; place-items: center; padding: var(--sp-8); background: color-mix(in srgb, var(--c-sage-23) 45%, transparent); }
@@ -115,6 +121,13 @@ function streetLabel(engine, tsid) {
   const s = STREET_INDEX.streets || {};
   const meta = s[tsid] || s[String(tsid).replace(/^G/, 'L')] || s[String(tsid).replace(/^L/, 'G')];
   return meta?.label || tsid;
+}
+
+/** A street the game holds (js/street-loader.js STREET_INDEX), under either of its ids. */
+function knownStreet(tsid) {
+  const s = STREET_INDEX.streets || {};
+  const t = String(tsid || '');
+  return Boolean(s[t] || s[t.replace(/^G/, 'L')] || s[t.replace(/^L/, 'G')]);
 }
 
 function createSession(engine, client) {
@@ -215,6 +228,38 @@ function createSession(engine, client) {
 
   function where(id) {
     return buddyWhere(online.get(id), (t) => streetLabel(engine, t));
+  }
+
+  /**
+   * Report #178: the public street an online buddy is on, when the Map can be pointed at it
+   * ('' otherwise: offline, a private place, your own street, a street the game does not hold,
+   * or the name the list would not show). Multiplayer only, as the whole feature is.
+   */
+  function destinationOf(id) {
+    if (!isBuddy(list, id)) return '';
+    const p = online.get(id);
+    const street = buddyDestination(p, { here: String(engine.streetTsid || ''), isStreet: knownStreet });
+    return street && buddyWhere(p, (t) => streetLabel(engine, t)) !== BUDDY_TEXT.hidden ? street : '';
+  }
+
+  /** Set as Destination: the Map's own directions (map-routes-feature mapRoute), to the street the list names. */
+  function setDestination(player) {
+    const street = destinationOf(player.id);
+    if (!street) {
+      engine.toast?.(BUDDY_DESTINATION_TEXT.gone(player.name), 2600);
+      return;
+    }
+    const label = streetLabel(engine, street);
+    const res = engine.query?.('mapRoute', 'set', { to: street, source: 'player' }, engine);
+    if (!res || res.ok === false) {
+      // Routes never go through a closed road (js/map-routes.js findRoute): say which street is in the way.
+      const through = (Array.isArray(res?.through) ? res.through : []).map((t) => engine.query?.('streetUnderConstruction', t, engine)).find(Boolean);
+      engine.toast?.(through ? `No open road leads to ${label} yet: the way runs through ${through.label}, which is still under construction. ${through.note}` : res?.error || BUDDY_DESTINATION_TEXT.none, 6000);
+      return;
+    }
+    engine.pushActivity?.(BUDDY_DESTINATION_TEXT.set(label));
+    engine.toast?.(BUDDY_DESTINATION_TEXT.set(label), 2600);
+    engine.setData?.('buddiesDestination', `${player.id}@${street}`);
   }
 
   function row(entry, { buttons = [], showWhere = true, isNew = false } = {}) {
@@ -523,7 +568,8 @@ function createSession(engine, client) {
             ...(canIm ? [{ label: 'IM', run: () => engine.query?.('imOpen', b.id, b.name, engine) }] : []),
             ...(canVisit ? [{ label: 'Visit', run: () => engine.query?.('visitHome', b.id, b.name, engine) }] : []),
           ];
-          return { id: b.id, name: b.name, online: on, where, actions };
+          // Report #178: the buddy's own look (the site's tile picture; the circle when there is none).
+          return { id: b.id, name: b.name, online: on, where, actions, face: buddyFaceUrl(b.id) };
         });
       const back = addedYouOnly(list);
       return {
@@ -535,7 +581,11 @@ function createSession(engine, client) {
       };
     },
     verbs(target) {
-      return buddyVerbs(list, { id: target.playerId, name: target.label || target.name });
+      const out = buddyVerbs(list, { id: target.playerId, name: target.label || target.name });
+      // Report #178: a buddy online on a public street (never a private place): the Map's directions there.
+      const street = destinationOf(Number(target.playerId) || 0);
+      if (street) out.unshift({ id: BUDDY_DESTINATION_VERB, label: BUDDY_DESTINATION_TEXT.verb, tooltip: BUDDY_DESTINATION_TEXT.tip(streetLabel(engine, street)), enabled: true, reason: '', durationMs: 0, sort: 3 });
+      return out;
     },
     run(target, verbId) {
       const p = { id: target.playerId, name: target.label || target.name || 'them' };
@@ -544,7 +594,8 @@ function createSession(engine, client) {
         refresh();
         return true;
       }
-      if (verbId === BUDDY_VERBS.add) add(p);
+      if (verbId === BUDDY_DESTINATION_VERB) setDestination(p);
+      else if (verbId === BUDDY_VERBS.add) add(p);
       else if (verbId === BUDDY_VERBS.remove) confirmRemove(p);
       else if (verbId === BUDDY_VERBS.ignore) confirmIgnore(p);
       else if (verbId === BUDDY_VERBS.unignore) confirmUnignore(p);

@@ -28,7 +28,7 @@ import {
   splitChat,
   withTimeLines,
   writeChoice,
-} from '../public/js/ui/social-drawer.js?v=6661b561';
+} from '../public/js/ui/social-drawer.js?v=ed00963c';
 import { createNotifier } from '../public/js/notify.js?v=37c6b748';
 import { resolveTokens } from './css-tokens.js';
 
@@ -324,7 +324,7 @@ describe('the Social drawer: mounted', () => {
     globalThis.groddleBuddies = {
       drawerView: () => ({
         rows: [
-          { id: 4, name: 'Moss', online: true, where: 'Online: Groddle Meadow', actions: [] },
+          { id: 4, name: 'Moss', online: true, where: 'Online: Groddle Meadow', actions: [], face: '/players/4/tile' },
           { id: 5, name: 'Pip', online: false, where: 'Offline', actions: [] },
         ],
         empty: 'No buddies yet.',
@@ -341,6 +341,23 @@ describe('the Social drawer: mounted', () => {
     assert.deepEqual(log.querySelectorAll('[data-social-buddy]').map((li) => [li.getAttribute('data-social-buddy'), li.getAttribute('data-online')]), [['4', 'true'], ['5', 'false']]);
     assert.match(log.textContent, /Online: Groddle Meadow/);
     assert.match(log.textContent, /Added you: Bramble/);
+    // Report #178: a buddy's own look over the lettered circle; the circle stays when there is no
+    // picture (Pip's row has none) or it fails to load, and a miss is not asked for again.
+    const av = (id) => log.querySelector(`[data-social-buddy="${id}"]`).querySelector('.social-av');
+    const face = (id) => av(id).querySelector('img');
+    assert.equal(face(4).getAttribute('src'), '/players/4/tile');
+    assert.equal(face(5), null);
+    assert.equal(av(4).textContent, 'M', 'the letter is still there under the picture');
+    assert.equal(av(4).getAttribute('data-face'), null, 'not shown until it loads');
+    for (const l of face(4).listeners.load) (l.fn || l)({});
+    assert.equal(av(4).getAttribute('data-face'), '');
+    t.drawer.refresh();
+    assert.equal(av(4).getAttribute('data-face'), '', 'a redraw shows a loaded face at once');
+    for (const l of face(4).listeners.error) (l.fn || l)({});
+    assert.equal(av(4).getAttribute('data-face'), null);
+    t.drawer.refresh();
+    assert.equal(face(4), null, 'a picture that did not load is not asked for again');
+    assert.equal(av(4).textContent, 'M');
     assert.equal(t.dock.querySelector('[data-social-compose]').hidden, true, 'no input on Buddies (no buddy IMs)');
     log.querySelector('[data-social-manage-buddies]').click();
     assert.equal(managed, 1);

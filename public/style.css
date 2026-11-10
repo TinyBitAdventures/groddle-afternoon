@@ -10148,6 +10148,12 @@ html[data-street-cards] .notify-notices { visibility: hidden; }
 .social-buddies { display: grid; gap: var(--sp-1); margin: 0; padding: 0; list-style: none; }
 .social-buddies li { display: flex; align-items: center; gap: var(--sp-4); min-height: 40px; padding: var(--sp-1) var(--sp-2); border-radius: var(--radius-sm); }
 .social-buddies li[data-online="false"] .social-av { opacity: 0.55; }
+/* Report #178: a buddy's own look in the circle (the site's 100x144 tile picture, head at the top);
+   the lettered circle shows until it loads and stays when there is none (js/ui/social-drawer.js). */
+.social-buddies .social-av { width: 32px; height: 32px; font-size: var(--fs-md); }
+.social-face { position: absolute; inset: 0; overflow: hidden; border-radius: var(--radius-round); background: var(--surface-sunken); opacity: 0; }
+.social-av[data-face] .social-face { opacity: 1; }
+.social-face img { position: absolute; left: 50%; top: -6%; width: 150%; height: auto; max-width: none; transform: translateX(-50%); pointer-events: none; }
 .social-buddy-what { flex: 1 1 auto; min-width: 0; font-weight: 700; }
 /* RIGHTCLICK (js/ui/player-menu.js): a row opens the buddy's menu; its name is the button for the keys. */
 .social-buddies li[data-ctx] { cursor: pointer; }
