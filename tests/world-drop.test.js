@@ -151,12 +151,15 @@ describe('the feature', () => {
     assert.match(pub('css/classic.css'), /:root\[data-ui="classic"\] \.world-drop-tip \{/);
   });
 
-  it('a stack dragged from a bag\'s tray onto a shrine closes the tray under the donation window (report #168)', () => {
+  it('an open bag\'s tray closes under the donation window however it opens (report #168, G623)', () => {
     const game = pub('game.js');
     const open = game.slice(game.indexOf('function openShrinePanel('), game.indexOf('function renderShrinePanel('));
-    assert.match(open, /if \(item\) closePackTray\(\);/, 'only when a dragged stack opens it');
-    assert.ok(open.indexOf('if (item) closePackTray();') < open.indexOf('panel.hidden = false'), 'before the window shows');
-    // What a donation does to the window afterwards is unchanged (a call for Austin).
+    // By a dragged stack, by the shrine's verb or by the keyboard: every way in is openShrinePanel.
+    assert.match(open, /\n  closePackTray\(\);\n/, 'always, not only for a dragged stack');
+    assert.doesNotMatch(open, /if \(item\) closePackTray/);
+    assert.ok(open.indexOf('closePackTray();') < open.indexOf('panel.hidden = false'), 'before the window shows');
     assert.doesNotMatch(open, /closeShrinePanel/);
+    for (const call of game.match(/[^\n]*openShrinePanel\(target[^\n]*/g)) assert.match(call, /openShrinePanel\(target(, \{ item[^)]*\})?\)/, call);
   });
+
 });
