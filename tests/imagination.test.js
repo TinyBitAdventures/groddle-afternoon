@@ -147,6 +147,19 @@ describe('imagination deck', () => {
   });
 });
 
+describe('a gold card in Firefox (report #163)', () => {
+  it('the sparkle over a gold card has no blend mode, so the card can show its back', () => {
+    // In Firefox a mix-blend-mode inside a face of the flipping card stops backface-visibility: the
+    // front showed mirrored over the back and took the click meant for Get Upgrade. Gold cards
+    // (Trade Channelling) are the only ones with the sparkle. Checked in Firefox 141 before and after.
+    const css = readFileSync(join(import.meta.dirname, '..', 'public/js/features/imagination-feature.js'), 'utf8');
+    const sparkle = css.match(/\.img-sparkle\{[^}]*\}/)?.[0] || '';
+    assert.ok(sparkle.includes('animation:img-sparkle'));
+    assert.doesNotMatch(sparkle, /mix-blend-mode/);
+    assert.doesNotMatch(css, /mix-blend-mode/, 'nothing in the Upgrades window blends');
+  });
+});
+
 describe('imagination hand', () => {
   it('a once-only card you already own leaves the hand (report #163)', () => {
     const state = createImaginationState();

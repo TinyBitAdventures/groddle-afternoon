@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=f6a37125';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=127e0a3c';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=959728e3';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=230330b0';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -25972,9 +25972,9 @@ function sayLocalChat(message, participant = 'Ur', { quietActivity = false } = {
   if (hidesChatBubble(text)) {
     // A plain "hi" says hi (the hi sign) with no bubble (RightSideManager.as 233).
   } else if (participant === 'Ur') {
-    // The bubble shows a long line's start; the chat keeps every word (chatBubbleText).
     showSpeechBubble(playerSpeechTarget, {
       speaker: shown,
+      // The bubble shows a long line's start; the chat keeps every word (chatBubbleText).
       text: chatBubbleText(text),
       durationMs: result.matched ? 12_000 : 7_200,
     });

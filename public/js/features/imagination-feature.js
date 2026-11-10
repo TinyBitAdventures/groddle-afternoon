@@ -377,7 +377,7 @@ const PANEL_CSS = `
 .img-celebrate p{margin:0;font-size:var(--fs-base);color:var(--c-violet-88)}
 .img-celebrate button{font:inherit;font-weight:800;border:0;border-radius:var(--radius-pill);padding:7px var(--sp-9);background:var(--c-gold-89);color:var(--c-umber-30);cursor:pointer}
 .img-sparkle{position:absolute;inset:0;pointer-events:none;background-image:radial-gradient(circle,color-mix(in srgb, var(--surface-bright) 95%, transparent) 0 1.4px,transparent 2px);
-  background-size:38px 46px;opacity:.0;animation:img-sparkle 2.4s linear infinite;mix-blend-mode:screen}
+  background-size:38px 46px;opacity:.0;animation:img-sparkle 2.4s linear infinite}
 @keyframes img-sparkle{0%{opacity:0;background-position:0 0}50%{opacity:.55}100%{opacity:0;background-position:19px 23px}}
 .meta-stat.img-stat-link{cursor:pointer}
 .meta-stat.img-stat-link:hover{filter:brightness(1.08)}
