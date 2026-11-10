@@ -2748,13 +2748,63 @@
   ]
  },
  "release": {
-  "game": "0.28.0",
-  "deployed": "2026-11-09"
+  "game": "0.28.1",
+  "deployed": "2026-11-10"
  },
  "git": {
-  "commits": 1557,
+  "commits": 1568,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-10",
+    "kind": "fix",
+    "text": "A gold upgrade card can be bought in Firefox"
+   },
+   {
+    "date": "2026-11-10",
+    "kind": "improve",
+    "text": "The bubble over a speaker shows the start of a long line"
+   },
+   {
+    "date": "2026-11-10",
+    "kind": "fix",
+    "text": "An upgrade card you already own leaves your hand"
+   },
+   {
+    "date": "2026-11-10",
+    "kind": "fix",
+    "text": "Oppidan Avenue's teleporters carry you between its caves and its city"
+   },
+   {
+    "date": "2026-11-09",
+    "kind": "improve",
+    "text": "A chat line holds 1,000 characters, as the original's did"
+   },
+   {
+    "date": "2026-11-09",
+    "kind": "fix",
+    "text": "The five Firebog back yards stand their giants on the ground"
+   },
+   {
+    "date": "2026-11-09",
+    "kind": "improve",
+    "text": "A visitor's look paints its walk sheet on arrival, the rest when first needed"
+   },
+   {
+    "date": "2026-11-09",
+    "kind": "fix",
+    "text": "Firebog home streets stand their trees and huts on the ground"
+   },
+   {
+    "date": "2026-11-09",
+    "kind": "improve",
+    "text": "Players are told how gems are found"
+   },
+   {
+    "date": "2026-11-09",
+    "kind": "fix",
+    "text": "The Map's puzzle card brings you back from Piano Party"
+   },
    {
     "date": "2026-11-09",
     "kind": "fix",
@@ -2824,59 +2874,9 @@
     "date": "2026-11-09",
     "kind": "new",
     "text": "A rooting Piggy sniffs with its own clip, drawn from Tiny Speck's authoring file"
-   },
-   {
-    "date": "2026-11-09",
-    "kind": "new",
-    "text": "Revive doses under way count for everyone, so a fourth player can't start one"
-   },
-   {
-    "date": "2026-11-09",
-    "kind": "new",
-    "text": "A street Piggy's name is everyone's online"
-   },
-   {
-    "date": "2026-11-09",
-    "kind": "improve",
-    "text": "A revive you already gave says the source's words: now others need to help"
-   },
-   {
-    "date": "2026-11-09",
-    "kind": "improve",
-    "text": "The Restoration page calls players Glitches again"
-   },
-   {
-    "date": "2026-11-09",
-    "kind": "improve",
-    "text": "Our own words say player, someone or friend, and a sulking crowd's first line comes on time"
-   },
-   {
-    "date": "2026-11-09",
-    "kind": "new",
-    "text": "Sixteen more back yards look like players' own 2012 pictures of them, and the forest yards grow a real pine forest"
-   },
-   {
-    "date": "2026-11-09",
-    "kind": "fix",
-    "text": "No faint line beside the tutorial pull chain's handle"
-   },
-   {
-    "date": "2026-11-09",
-    "kind": "fix",
-    "text": "\"/\" puts you in the chat while a quest offer is open"
-   },
-   {
-    "date": "2026-11-09",
-    "kind": "improve",
-    "text": "The art tools find Java on their own again"
-   },
-   {
-    "date": "2026-11-09",
-    "kind": "improve",
-    "text": "NPCs, stores, food and items in the original's own words"
    }
   ]
  },
  "tests": 784,
- "generatedAt": "2026-11-09"
+ "generatedAt": "2026-11-10"
 }
