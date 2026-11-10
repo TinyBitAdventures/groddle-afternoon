@@ -4,7 +4,7 @@
  */
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
@@ -239,5 +239,32 @@ describe('the window: tools first, a tool\'s screen with a way back, two searche
     assert.match(classic, /#make-panel \.make-tool-tile \{ min-height: calc\(46 \* var\(--cu\)\);/);
     assert.match(classic, /\.badge-load-more, \.make-tools-back\) \{/);
     for (const css of [style, classic]) assert.doesNotMatch(css, /make-tool-chip|make-tool-tabs/);
+  });
+
+  it('Classic: in a low window the body gives way so the footer stays whole, as the original\'s did', () => {
+    // On main at 1280 x 720 a tool's screen came to 79 + 105 + 235 + 75 px in a window that holds 470:
+    // the foot hung 24 px out of the bottom edge. The body's floor now follows the game's height.
+    const sel = ':root[data-ui="classic"] #game-root #make-panel > .make-card:not(:has(#make-result:not([hidden]), #make-detail:not([hidden]))) > .ui-sheet-body';
+    const at = classic.indexOf(`\n${sel} {`);
+    assert.ok(at > 0, 'the rule for the screens with the Tools row and the search');
+    assert.match(classic.slice(at, classic.indexOf('}', at)), /\{\n  min-height: min\(calc\(200 \* var\(--cu\)\), calc\(var\(--cvh\) - 280 \* var\(--cu\)\)\);\n$/);
+    // It comes after the shared 200 (same specificity would not do: this one names the card too), and
+    // a recipe and a result, which hide those rows, keep the shared rule.
+    const shared = classic.indexOf(':is(#quest-panel, #projects-panel, #make-panel) .ui-sheet-body { flex: 1 1 auto; min-height: calc(200 * var(--cu));');
+    assert.ok(shared > 0 && shared < at);
+    assert.match(classic, /#make-panel \.make-card:has\(#make-result:not\(\[hidden\]\), #make-detail:not\(\[hidden\]\)\) :is\(\.make-search-row, \.make-nav, \.make-question\) \{ display: none; \}/);
+    // The foot never shrinks and the window still clips at the game's height.
+    assert.match(classic, /> :is\(\.side-card, \.make-card\) > \.ui-sheet-foot \{\n  flex: none;/);
+    // The numbers: the window's two 20 margins, the head, the rows, the foot, and 20 to spare.
+    assert.equal(20 + 20 + 67 + 89 + 64 + 20, 280);
+    // Modern is untouched: every selector here is Classic's.
+    assert.doesNotMatch(style, /cvh/);
+    // The original: a fixed head, body and foot, the body scrolling inside.
+    const src = join(root, '../glitch-client/com/tinyspeck/engine/port/MakingDialog.as');
+    if (existsSync(src)) {
+      const as = readFileSync(src, 'utf8');
+      assert.match(as, /_head_min_h = 67;\s+_body_min_h = 320;\s+_foot_min_h = 64;/);
+      assert.match(as, /_h = _head_h \+ _body_h \+ _foot_h;/);
+    }
   });
 });

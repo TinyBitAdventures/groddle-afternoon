@@ -1958,6 +1958,16 @@
 :root[data-ui="classic"] #game-root :is(#quest-panel, #projects-panel, #make-panel, #map-panel) .ui-sheet-icon { width: auto; height: calc(28 * var(--cu)); }
 /* The sheet's body scrolls; its foot is the window's white footer (Making: head 67, body 320, foot 64). */
 :root[data-ui="classic"] #game-root :is(#quest-panel, #projects-panel, #make-panel) .ui-sheet-body { flex: 1 1 auto; min-height: calc(200 * var(--cu)); overflow-y: auto; padding-top: calc(10 * var(--cu)); padding-bottom: calc(10 * var(--cu)); }
+/* Make's tool screens put the Tools row and the search (about 89) between the head and the body. In a
+   low window (1280 x 720) the head, those rows, the body's 200 and the foot came to more than the game's
+   height holds, and the foot was pushed out of the window's bottom edge (24 px of its 75 cut, its line
+   left on the edge). There the body gives way and scrolls instead: 200 where that fits, else what is
+   left of the game's height after the two 20 margins, the head (67), the rows (89), the foot (64) and
+   20 to spare. The original's dialog was a fixed 451 with the body scrolling inside, its footer always
+   whole (MakingDialog.as 62-66, 331-344). A recipe and a result have no such rows and keep the 200. */
+:root[data-ui="classic"] #game-root #make-panel > .make-card:not(:has(#make-result:not([hidden]), #make-detail:not([hidden]))) > .ui-sheet-body {
+  min-height: min(calc(200 * var(--cu)), calc(var(--cvh) - 280 * var(--cu)));
+}
 :root[data-ui="classic"] #game-root :is(#quest-panel, #projects-panel, #make-panel) > :is(.side-card, .make-card) > .ui-sheet-foot {
   flex: none;
   display: flex;
