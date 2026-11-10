@@ -34,7 +34,7 @@ import {
   GARDEN_FERTILIZE_MS,
   fertilizeCheck,
   fertilizePlot,
-} from './js/garden.js?v=eae8b052';
+} from './js/garden.js?v=617db897';
 import { firstWorkingTool, HOE_TOOLS, WATERING_CAN_TOOLS } from './js/tools.js?v=5f482998';
 import { miningGemHint } from './js/gem-hints.js?v=4b65f7ac';
 import {
@@ -1236,7 +1236,7 @@ export function runVerb(target, verbId, ctx) {
       effects,
       animalChanged: true,
       // npc_chicken.js 225-230: slugs xp, mood, energy.
-      speech: { speaker: target.label || 'Chicken', text: butter.bubble, durationMs: butter.bubbleMs, slugs: slugsFromEffects(effects) },
+      speech: { speaker: target.label || 'Chicken', text: butter.bubble, durationMs: butter.bubbleMs, exact: true, slugs: slugsFromEffects(effects) },
     };
   }
   if (classId === 'npc_chicken' && verbId === 'talk_to') {
@@ -1309,7 +1309,7 @@ export function runVerb(target, verbId, ctx) {
       animalChanged: true,
       wisdom: sung.wisdom,
       // npc_butterfly.js 661-677: slugs xp, energy.
-      speech: { speaker: target.label || 'Butterfly', text: sung.bubble, durationMs: sung.bubbleMs, slugs: slugsFromEffects(effects) },
+      speech: { speaker: target.label || 'Butterfly', text: sung.bubble, durationMs: sung.bubbleMs, exact: true, slugs: slugsFromEffects(effects) },
     };
   }
   if (classId === 'npc_butterfly' && verbId === 'talk_to') {

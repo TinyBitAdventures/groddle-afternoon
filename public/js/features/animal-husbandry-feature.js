@@ -111,7 +111,7 @@ import { batterflyBaseY, batterflyResponseFor, flightFloorFor } from '../street-
 import { loseEnergy, shiftMetabolic } from '../metabolics.js?v=8504134e';
 import { textureFromUrl } from '../textures.js?v=f024bd6a';
 import { PIGGY_DEATH_DROPS, PIGGY_DEATH_PUFF, SAD_BABY, forcedRoll, isSadIn } from '../animal-mood.js?v=a49495fc';
-import { animalCrowdChanged, animalCrowdSad, animalPlaceIsDepressing, crowdLimit, smokePuff as sharedSmokePuff } from './animal-mood-feature.js?v=83cd0f37';
+import { animalCrowdChanged, animalCrowdSad, animalPlaceIsDepressing, crowdLimit, smokePuff as sharedSmokePuff } from './animal-mood-feature.js?v=9500d777';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
 import { followYardPath, freeYardSpot } from '../yard-wander.js?v=06a15d38';
@@ -808,7 +808,7 @@ function advanceYardNow(engine) {
       lastAction = `yard:ate:${ev.kind}:${ev.classTsid}`;
       if (isYard(engine)) {
         const eater = extras.find((e) => e.row === ev.animal);
-        if (eater) engine.say(eater.target, 'Yum!', 3000);
+        if (eater) engine.say(eater.target, 'Yum!', 3000, { exact: true });
       }
       continue;
     }
@@ -821,7 +821,7 @@ function advanceYardNow(engine) {
       lastAction = `full:${ev.classTsid}`;
     } else if (ev.type === 'happy' && isYard(engine)) {
       const cheered = extras.find((e) => e.row === ev.animal);
-      if (cheered) engine.say(cheered.target, ev.line, 3000);
+      if (cheered) engine.say(cheered.target, ev.line, 3000, { exact: true });
     } else if (ev.type === 'die') {
       // advanceYard already took it out of the herd. At home: the puff and the
       // remains now (the catch-up on arrival runs before the herd is built, so
@@ -918,7 +918,7 @@ function applyName(engine, target, value) {
 function landName(engine, target, name) {
   if (!name) return;
   target.label = namedAnimalLabel(target.classId, target.state);
-  engine.say(target, `And they shall call me "${name}"`, 5000);
+  engine.say(target, `And they shall call me "${name}"`, 5000, { exact: true });
   emit(engine, `animals_named:${target.classId}`);
   engine.pushActivity(`You named a ${NAMEABLE_ANIMALS[target.classId]} "${name}".`);
   lastAction = `named:${target.classId}:${name}`;

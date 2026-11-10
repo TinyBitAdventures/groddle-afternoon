@@ -18,7 +18,7 @@ import {
   verbResponse,
 } from '../public/js/verb-responses.js?v=3ceb8a8c';
 import { VERB_RESPONSE_POOLS } from '../public/js/verb-responses-data.js?v=0b948684';
-import { runVerb } from '../public/content.js?v=f6a37125';
+import { runVerb } from '../public/content.js?v=3269fd15';
 import { setTrantTables, createTrantState } from '../public/js/trants.js?v=1b3c8ae3';
 import { setMetabolicLossGate } from '../public/js/metabolics.js?v=8504134e';
 import { createResourceNode, harvestResourceNode } from '../public/js/resource-nodes.js?v=7a77fd73';
@@ -204,7 +204,7 @@ describe('resource nodes and patches', () => {
     assert.match(read('js/features/patches-feature.js'), /if \(result\.response\) talk\(engine, entity, result\.response, speaker, slugs\);/);
     assert.match(read('js/features/crabs-feature.js'), /slugs: slugsFromEffects\(\{ mood: effects\.mood, energy: effects\.energy, xp: effects\.xp, currants: r\.currants \}\),/);
     assert.match(read('js/features/foxes-feature.js'), /\{ slugs: slugsFromEffects\(\{ energy: result\.energy, xp: result\.xp \}\) \}/);
-    assert.match(read('js/features/heli-kitties-feature.js'), /\{ slugs: slugsFromEffects\(\{ energy: result\.energy, mood: result\.mood, xp: result\.xp \}\) \}/);
+    assert.match(read('js/features/heli-kitties-feature.js'), /\{ slugs: slugsFromEffects\(\{ energy: result\.energy, mood: result\.mood, xp: result\.xp \}\), exact: true \}/);
     assert.match(read('js/features/rook-attack-feature.js'), /favor: r\.done && r\.favor \? \[\{ giant: 'all', points: r\.favor \}\] : 0,/);
     assert.match(read('js/features/animal-husbandry-feature.js'), /\{ slugs: slugsFromEffects\(\{ mood: res\.effects\?\.mood \}\) \}/);
     assert.match(read('js/features/enchanted-forest-feature.js'), /\{ slugs: slugsFromEffects\(\{ energy: -\(result\.energyCost \|\| 0\) \}\) \}/);

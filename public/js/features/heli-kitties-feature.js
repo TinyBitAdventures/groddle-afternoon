@@ -200,7 +200,7 @@ function scare(engine, entity, force = false) {
     // source kicked the one kitty into the air for everyone; here its place is everyone's).
     entity.hopAt = Date.now();
   } else kickKitty(kitty);
-  engine.say(entity.target, KITTY_MOTION.mewBubble, KITTY_MOTION.mewBubbleMs);
+  engine.say(entity.target, KITTY_MOTION.mewBubble, KITTY_MOTION.mewBubbleMs, { exact: true });
   engine.playSound('FLYING_KITTY_MEW', { volume: 0.5 });
   lastAction = 'scared';
   publish(engine, true);
@@ -220,7 +220,7 @@ function pet(engine, entity) {
     engine.query?.('sharedWalkerVerb', entity.target, 'pet', engine);
   }
   // npc_kitty_chicken.js 240-279: sendBubble("purrrrrr", 2000, pc, slugs), xp, mood and energy.
-  engine.say(entity.target, result.bubble, KITTY_PET.bubbleMs, { slugs: slugsFromEffects({ energy: result.energy, mood: result.mood, xp: result.xp }) });
+  engine.say(entity.target, result.bubble, KITTY_PET.bubbleMs, { slugs: slugsFromEffects({ energy: result.energy, mood: result.mood, xp: result.xp }), exact: true });
   engine.playSound('FLYING_KITTY_PURR', { volume: 0.6 });
   // npc_kitty_chicken.js 283-287: animal_love +1 for the first 3 pets of each kitty (G143).
   engine.featsIncrement?.('animal_love', 1, { cap: { key: `kitty:${engine.streetTsid}:${entity.kitty.key}`, max: 3 } });
@@ -290,7 +290,7 @@ function applyName(engine, entity, value) {
   const s = slot(engine);
   s.names[entity.kitty.key] = { name: entity.kitty.name, namer: entity.kitty.namer, namedOn: entity.kitty.namedOn };
   entity.target.label = kittyLabel(entity.kitty);
-  engine.say(entity.target, res.bubble, 5000);
+  engine.say(entity.target, res.bubble, 5000, { exact: true });
   engine.achievement(res.counter, 1);
   engine.pushActivity(`You named a Heli Kitty "${res.name}".`);
   lastAction = `named:${res.name}`;

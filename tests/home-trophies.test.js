@@ -23,7 +23,7 @@ import {
   placeFurniture,
 } from '../public/js/home-decor.js?v=d6fabb62';
 import { cabinetRefusal } from '../public/js/home-storage.js?v=121f1897';
-import { canSellClass } from '../public/js/home-street-mp.js?v=a4b8a429';
+import { canSellClass } from '../public/js/home-street-mp.js?v=44e21586';
 import { filterTiles, furniturePane, trayFilters } from '../public/js/ui/home-builder.js?v=90f759e8';
 import { hasUpgrades, upgradeVerb } from '../public/js/furniture-upgrades.js?v=a3788c0d';
 import { NO_SLOT_CLASSES } from '../public/js/pack-slots-data.js?v=800f664c';

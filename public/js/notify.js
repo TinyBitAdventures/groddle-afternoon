@@ -25,7 +25,7 @@
  * the view, the zones it measures and game.js call into it.
  */
 
-import { holdMs } from './read-time.js?v=60ae7efc';
+import { holdMs } from './read-time.js?v=be140198';
 
 export const NOTICE_LIMIT = 2;
 /** GrowlQueue.as 25-30: a growl held 4 s. Ticket 69: a longer line holds its reading time (js/read-time.js). */

@@ -110,7 +110,7 @@ import { TRANT_META, trantStatusLabel } from '../trants.js?v=1b3c8ae3';
 import { animalStatusLabel } from '../animals.js?v=e01d2a8a';
 import { quoteAnimalKinship } from '../animal-kinship.js?v=f91347e9';
 import { captureVerbState, isFoodItem, itemLabel } from '../animal-husbandry.js?v=2d933bd6';
-import { ROOK_SHEETS, rookAttackFeature } from './rook-attack-feature.js?v=91c94ba8';
+import { ROOK_SHEETS, rookAttackFeature } from './rook-attack-feature.js?v=8f50ee28';
 import { ANIMAL_BODY, ANIMAL_PATROL, TREE_FOOTPRINT } from '../street-ecology.js?v=08076876';
 import {
   CHECK_ON_REMOVE,
@@ -528,8 +528,9 @@ function endRoot(engine, r) {
   if (r.mode === 'idle' && spr && !spr.destroyed) spr.vx = (turn ? -dir : dir) * Math.abs(Number(spr.vx) || 0.45);
 }
 
-function say(engine, target, text, ms) {
-  if (text) engine.say(target, text, ms);
+/** `exact`: ms is the source's own bubble time, used as given (G629, js/read-time.js bubbleMs). */
+function say(engine, target, text, ms, exact = false) {
+  if (text) engine.say(target, text, ms, exact ? { exact: true } : null);
 }
 
 // —— Food on the street ————————————————————————————————————————————————————
@@ -701,7 +702,7 @@ function arriveShared(engine, r) {
   }
   if (ate) {
     playClip(engine, r, PIGGY_MOOD_SHEETS.chew);
-    say(engine, target, PIGGY_LINES.yum, PIGGY_LINES.yumMs);
+    say(engine, target, PIGGY_LINES.yum, PIGGY_LINES.yumMs, true);
     target.subtitle = animalStatusLabel('npc_piggy', target.state);
     lastEvent = `ate:${ate.classTsid}:shared`;
   } else {
@@ -722,7 +723,7 @@ function arrive(engine, r) {
   if (ate) {
     satePiggy(target.state);
     playClip(engine, r, PIGGY_MOOD_SHEETS.chew);
-    say(engine, target, PIGGY_LINES.yum, PIGGY_LINES.yumMs);
+    say(engine, target, PIGGY_LINES.yum, PIGGY_LINES.yumMs, true);
     target.subtitle = animalStatusLabel('npc_piggy', target.state);
     lastEvent = `ate:${ate.classTsid}`;
     engine.save();
@@ -743,7 +744,7 @@ function startSad(engine, r) {
 }
 
 function sadInterval(engine, r) {
-  say(engine, r.target, pickLine(SAD_PIGGY_LINES), 7000);
+  say(engine, r.target, pickLine(SAD_PIGGY_LINES), 7000, true);
   const clip = sadPiggyClip();
   playClip(engine, r, clip === 'rooked2' ? PIGGY_MOOD_SHEETS.rooked2 : PIGGY_MOOD_SHEETS.tooMuchNibble, { restore: false });
   r.nextSadAt = now() + SAD_INTERVAL_MS;
@@ -892,7 +893,7 @@ function crowdClipDef(classId, clip) {
 /** onSadnessInterval: the bubble and the sulk clip. */
 function crowdInterval(engine, target, rec, depressing) {
   const pool = crowdSadLinePool(target.classId, { depressing, depressedLines: SAD_PIGGY_LINES, babyLines: SAD_BABY_LINES });
-  say(engine, target, pickLine(pool), CROWD_TIMING.bubbleMs);
+  say(engine, target, pickLine(pool), CROWD_TIMING.bubbleMs, true);
   const clip = crowdSadClip(target.classId);
   const def = crowdClipDef(target.classId, clip);
   const spr = target.sprite;
@@ -975,7 +976,7 @@ function runCrowdCheck(engine, target, population, max) {
     r.mode = 'leaving';
     r.puffAt = t + CROWD_TIMING.leavePuffMs;
     r.goneAt = t + CROWD_TIMING.leaveMs;
-    say(engine, target, CROWD_LEAVE_LINE, CROWD_TIMING.leaveMs);
+    say(engine, target, CROWD_LEAVE_LINE, CROWD_TIMING.leaveMs, true);
     markGone(engine, target, r);
     crowdLast = `check:${target.classId}:leave:${population}/${max}`;
   } else if (res.outcome === 'vanish') {
@@ -1237,7 +1238,7 @@ function handleTickEvents(engine, results, { live }) {
   for (const { row, events } of results) {
     tickCount += 1;
     for (const ev of events) {
-      if (ev.type === 'happy' && live) say(engine, row.target, ev.line, 3000);
+      if (ev.type === 'happy' && live) say(engine, row.target, ev.line, 3000, true);
       if (ev.type === 'croak') {
         recordFor(row.target).nextCroakAt = Math.min(recordFor(row.target).nextCroakAt || Infinity, now() + 1500);
         lastEvent = `croak:tick:${isExtra(row.target) ? 'owned' : 'ecology'}`;
@@ -1523,7 +1524,7 @@ export const animalMoodFeature = {
       }
       if (target.state.croaking && Number(target.state.hunger) >= PIGGY_HUNGER.max) {
         if (r.nextCroakAt && time >= r.nextCroakAt) {
-          say(engine, target, PIGGY_LINES.croak, PIGGY_LINES.croakMs);
+          say(engine, target, PIGGY_LINES.croak, PIGGY_LINES.croakMs, true);
           r.nextCroakAt = time + CROAK_INTERVAL_MS;
           lastEvent = 'croak';
         } else if (!r.nextCroakAt) r.nextCroakAt = time + CROAK_INTERVAL_MS;
@@ -1581,14 +1582,14 @@ export const animalMoodFeature = {
   sharedAnimalEvent(target, { ev, on, at, classTsid } = {}, engine) {
     if (target?.classId !== 'npc_piggy' || !target.sprite || target.sprite.destroyed) return null;
     const r = recordFor(target);
-    if (ev === 'happy') say(engine, target, PIGGY_LINES.happy, 3000);
+    if (ev === 'happy') say(engine, target, PIGGY_LINES.happy, 3000, true);
     else if (ev === 'croak') r.nextCroakAt = Math.min(r.nextCroakAt || Infinity, now() + 1500);
     else if (ev === 'fed' && r.mode === 'idle' && !isRooked(target, engine)) playClip(engine, r, PIGGY_MOOD_SHEETS.chew); // someone else's feed (G334)
     else if (ev === 'ate' && engine.query?.('sharedPiggyTrips', target, engine) === true) {
       // The server walked it to the food on its shared path (its trip) and it just got there:
       // the chew and the "Yum!" (onFoodPathing 1489-1500), the same moment on every page.
       if (r.mode === 'idle' && !isRooked(target, engine)) playClip(engine, r, PIGGY_MOOD_SHEETS.chew);
-      say(engine, target, PIGGY_LINES.yum, PIGGY_LINES.yumMs);
+      say(engine, target, PIGGY_LINES.yum, PIGGY_LINES.yumMs, true);
     } else if (ev === 'ate' && isRooked(target, engine)) {
       // A rooked Piggy stays put (include/rook.js fullStop), whatever the server's tick decided.
     } else if (ev === 'ate' && on?.sprite && r.mode !== 'sad') {
@@ -1598,7 +1599,7 @@ export const animalMoodFeature = {
     } else if (ev === 'ate' && at && Number.isFinite(at.x) && r.mode !== 'sad') {
       if (!startSeek(engine, r, { kind: 'stack', x: at.x, y: at.y, classTsid: String(classTsid || ''), shared: true })) {
         playClip(engine, r, PIGGY_MOOD_SHEETS.chew);
-        say(engine, target, PIGGY_LINES.yum, PIGGY_LINES.yumMs);
+        say(engine, target, PIGGY_LINES.yum, PIGGY_LINES.yumMs, true);
       }
     }
     lastEvent = `shared:${ev}`;

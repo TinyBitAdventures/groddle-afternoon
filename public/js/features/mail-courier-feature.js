@@ -92,7 +92,7 @@
 
 import { ITEM_CATALOG, itemIcon } from '../inventory.js?v=60dfc9ca';
 import { frameTexture, sourceFromUrl } from '../textures.js?v=f024bd6a';
-import { questRoomConverse } from './quest-instances-feature.js?v=aa5fc47a';
+import { questRoomConverse } from './quest-instances-feature.js?v=cb21105d';
 import { hellFeature } from './hell-feature.js?v=ba4199c6';
 import { DISPATCHER_ART, FROG_ART, MAIL_NPC_ART_DIR } from '../mail-npc-art.js?v=1ed97a5d';
 import { DISPATCHER_GAP, DISPATCHER_HALF, DISPATCHER_TEXT, SIGNPOST } from '../home-street-fixtures.js?v=bad831a1';
@@ -512,7 +512,7 @@ async function talkToFrog(engine) {
   if (!f || talking) return;
   if (f.delivered) {
     // talk_to 205-213.
-    engine.say?.(f.target, COURIER_TEXT.offToYoga, COURIER.bubbleMs);
+    engine.say?.(f.target, COURIER_TEXT.offToYoga, COURIER.bubbleMs, { exact: true });
     last = 'frog:yoga-bye';
     return;
   }

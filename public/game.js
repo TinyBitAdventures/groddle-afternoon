@@ -2,9 +2,9 @@
  * Groddle Afternoon — original street geometry + layered decos
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
-import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=f6a37125';
+import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=3269fd15';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=127e0a3c';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=d1eda80f';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=f08ed5d0';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -625,7 +625,7 @@ import {
   cropIcon,
   hasWateringCan,
   hasHoe,
-} from './js/garden.js?v=eae8b052';
+} from './js/garden.js?v=617db897';
 import { GARDEN_SCALE, PLOT_H as GARDEN_PLOT_H, PLOT_W as GARDEN_PLOT_W, gardenFrame, gardenLayout, gardenStyle, plotPieces } from './js/garden-view.js?v=3683a26f';
 import {
   ROCK_CATALOG,
@@ -834,7 +834,7 @@ import {
   createVendorSellQuote,
   vendorSellUnitPrice,
   vendorBuyUnitPrice,
-} from './js/vendor.js?v=595411dd';
+} from './js/vendor.js?v=f6c4fd7a';
 import {
   animalAnchorX,
   animalAnchorY,
@@ -975,10 +975,10 @@ import { QUOIN_FRAME_BOB, advanceQuoinClock, quoinBobBetweenFrames } from './js/
 import { installHiresFirstDraw, installHiresSprites, upgradeSource } from './js/sprite-hires.js?v=ac5f0e68';
 import { denseSprite } from './js/sprite-dense.js?v=2a0ce07a';
 import { wholeStatAmounts, wholeEffects } from './js/stat-text.js?v=f96d8fd3';
-import { createNotifier, effectTokens, floatKey, offerCardDrop, stackFloat, tokenText } from './js/notify.js?v=37c6b748';
-import { holdMs } from './js/read-time.js?v=60ae7efc';
-import { mountNotifyView } from './js/notify-view.js?v=2835afc0';
-import { mountSocialDrawer } from './js/ui/social-drawer.js?v=ed00963c';
+import { createNotifier, effectTokens, floatKey, offerCardDrop, stackFloat, tokenText } from './js/notify.js?v=1fb97b21';
+import { bubbleMs } from './js/read-time.js?v=be140198';
+import { mountNotifyView } from './js/notify-view.js?v=5a43a760';
+import { mountSocialDrawer } from './js/ui/social-drawer.js?v=82bcf45b';
 import { bindChatLinks } from './js/chat-links.js?v=b717fac7';
 import { SIDE_SHEET_IDS, bindTabs, inSideSheet, mountPanelShell, sheetKeyToWorld } from './js/ui/panel-shell.js?v=e2abdf9e';
 import { createQuestSheet, failedQuestPin, questLogNeedsSwap, questStep } from './js/ui/quest-sheet.js?v=ccaa43a8';
@@ -992,7 +992,7 @@ import { ENCYCLOPEDIA_MENU_LABEL, createEncyclopedia, isEncyclopediaKey } from '
 import { EAT_PICK_TEXT, bestFoodIndex, eatChoices, eatTip } from './js/eat-pick.js?v=8fb763d0';
 import { installHeldKeyGuard, isMacPlatform } from './js/held-keys.js?v=98b96620';
 import { signpostArmRows, worldContextAction } from './js/world-context-menu.js?v=f3f48805';
-import { blockedPlayerVerbs, listPlayerTarget, opensPlayerMenu, playerMenuRows } from './js/ui/player-menu.js?v=9eb33f09';
+import { blockedPlayerVerbs, listPlayerTarget, opensPlayerMenu, playerMenuRows } from './js/ui/player-menu.js?v=7ab12563';
 import { forgetTexture, frameTexture, isFailed, isLoaded, onFailed, onLoaded, textureFromUrl, whenLoaded } from './js/textures.js?v=f024bd6a';
 import { FALLBACK_MAX as WORLD_ART_FALLBACK_MAX, worldArtFor } from './js/world-art.js?v=df476660';
 import { sceneAnim, syncAnim } from './js/deco-anim.js?v=aa35e023';
@@ -1012,7 +1012,7 @@ import { SLUG_ANIMATION, SLUG_LAYOUT, SLUG_STYLES, SLUG_TARGETS, drawSlugIcon, f
 import { filterText } from './js/word-filter.js?v=9a7a7ebb'; // the remake's own word filter
 import { arrangeMapCards, fitMapExtras } from './js/map-extras.js?v=9f38c312'; // the Map's Shortcuts
 // The interface skin (js/classic/ui-mode.js) sets <html data-ui> as it loads: before main(), so before the boot cover lifts.
-import { installInterfaceSettings } from './js/classic/classic-prefs.js?v=b12bff9f';
+import { installInterfaceSettings } from './js/classic/classic-prefs.js?v=8f902f92';
 
 /** @type {object|null} assets/maps/index.json */
 let mapIndexCache = null;
@@ -7694,7 +7694,8 @@ function showSpeechBubble(target, speech) {
     flipped: null,
     life: 0,
     // Ticket 69: at least its reading time (js/read-time.js: AvaChatBubbleManager.as 18-20, 51).
-    max: holdMs(text, speech.durationMs || 5000) / (1000 / 60),
+    // G629: an inhabitant's line with the source's own time (speech.exact) stays up that time exactly.
+    max: bubbleMs(text, speech.durationMs, speech.exact === true && !named) / (1000 / 60),
   };
   speechBubbles.push(bubble);
   fxLayer.addChild(bubble);
@@ -12833,7 +12834,10 @@ const engine = {
   stopHit() {
     if (player) player.hitUntil = 0;
   },
-  /** A cream speech bubble that follows a registered target; `extra.slugs` ({ xp, mood, energy }) adds the stat pills (G284). */
+  /**
+   * A cream speech bubble that follows a registered target; `extra.slugs` ({ xp, mood, energy }) adds the stat pills (G284).
+   * `extra.exact`: durationMs is the source's own time for an inhabitant's line and is used as given (G629, js/read-time.js bubbleMs).
+   */
   say(target, text, durationMs = 4000, extra = null) {
     return showSpeechBubble(target, { ...(extra || {}), text, durationMs });
   },
@@ -32012,7 +32016,7 @@ async function main() {
   }
   // Garden talkback QA (js/garden-talk-qa.js): ?gardentalkdemo=herb|crop.
   if (new URLSearchParams(location.search).has('gardentalkdemo')) {
-    import('./js/garden-talk-qa.js?v=e334273e').then((m) => m.runGardenTalkDemo({ engine, executeVerb, params: new URLSearchParams(location.search) }));
+    import('./js/garden-talk-qa.js?v=fba283d6').then((m) => m.runGardenTalkDemo({ engine, executeVerb, params: new URLSearchParams(location.search) }));
   }
   // MEMQA (ticket 21, Safari's memory reload in Naraka): ?memqa=1 lets a probe walk streets through the
   // real street trip (tools/qa/street-memory.mjs). Solo pages only: online pages drop their params.

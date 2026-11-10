@@ -20,8 +20,8 @@ import {
   summaryText,
   threadTarget,
 } from '../public/js/chat-threads.js?v=42954351';
-import { mountSocialDrawer } from '../public/js/ui/social-drawer.js?v=ed00963c';
-import { createNotifier } from '../public/js/notify.js?v=37c6b748';
+import { mountSocialDrawer } from '../public/js/ui/social-drawer.js?v=82bcf45b';
+import { createNotifier } from '../public/js/notify.js?v=1fb97b21';
 import { chatThreadsFeature, replyLine } from '../public/js/features/chat-threads-feature.js?v=a1049d64';
 import { ACTIVE_EVERY_MS, activeDue, presenceMpFeature } from '../public/js/features/presence-mp-feature.js?v=21272297';
 import { channelOpts, normalLine } from '../public/js/player-im.js?v=23463a96';

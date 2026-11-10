@@ -1306,7 +1306,7 @@ function updateForehorseman(engine, dtMs) {
   if (fore.speakAt && t >= fore.speakAt) {
     fore.speakAt = 0;
     const line = FOREHORSEMAN_LINES[Math.floor(Math.random() * FOREHORSEMAN_LINES.length)];
-    engine.say(fore.target, line, ROOK_SOURCE.forehorsemanBubbleMs);
+    engine.say(fore.target, line, ROOK_SOURCE.forehorsemanBubbleMs, { exact: true });
   }
   // The art faces right.
   spr.scale.set(0.78 * (fore.dir > 0 ? 1 : -1), 0.78);
@@ -3303,7 +3303,7 @@ export const rookAttackFeature = {
   runVerb(target, verbId, engine) {
     if (target?.classId === 'npc_forehorseman') {
       const line = FOREHORSEMAN_LINES[Math.floor(Math.random() * FOREHORSEMAN_LINES.length)];
-      engine.say(target, line, ROOK_SOURCE.forehorsemanBubbleMs);
+      engine.say(target, line, ROOK_SOURCE.forehorsemanBubbleMs, { exact: true });
     }
     return true;
   },

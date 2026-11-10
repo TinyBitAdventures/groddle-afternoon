@@ -140,7 +140,7 @@ import {
   visitorsReport,
 } from '../butler.js?v=4a4b82a2';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
-import { holdMs } from '../read-time.js?v=60ae7efc';
+import { holdMs } from '../read-time.js?v=be140198';
 import { createItemPicker } from '../ui/item-picker.js?v=b4c84ac6';
 
 export const BUTLER_FEATURE_ID = 'butler';

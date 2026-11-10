@@ -458,6 +458,7 @@ function onSettle(engine, row) {
     setClip(row.crab, row.heard.settleState);
     // npc_crab.js 535-548: sendBubble(reply, 4000, pc, rewards), the mood, energy, iMG and currants that landed.
     engine.say(row.crab.target, row.heard.reply, CRAB_REPLY_MS, {
+      exact: true,
       slugs: slugsFromEffects({ mood: effects.mood, energy: effects.energy, xp: effects.xp, currants: r.currants }),
     });
     resume(row.crab, CRAB_RESUME_MS);

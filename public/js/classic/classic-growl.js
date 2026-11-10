@@ -12,8 +12,8 @@
  * hidden stack no longer speaks.
  */
 import { uiState, onUiModeChange } from './ui-mode.js?v=11da9030';
-import { readMs } from '../read-time.js?v=60ae7efc';
-import { NOTICE_KEEP_MS } from '../notify.js?v=37c6b748';
+import { readMs } from '../read-time.js?v=be140198';
+import { NOTICE_KEEP_MS } from '../notify.js?v=1fb97b21';
 
 export const GROWL_IN_MS = 200;
 export const GROWL_HOLD_MS = 4000;
