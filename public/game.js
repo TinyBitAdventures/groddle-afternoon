@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=afe3caa8';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=06bb8b74';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=a13cad29';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=e0953ade';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -601,7 +601,7 @@ import {
 import { outputIconsHtml, outputsPhrase, recipeOutputRows } from './js/ui/recipe-outputs.js?v=73e19baf';
 import { MAKE_TOOL_SHEETS } from './js/make-tool-sheets.js?v=6f758e09';
 import { groupMakingTools, makeToolCounts, makeToolCountLine, makeToolSpokenLine, makeOpeningTool, gridStep } from './js/make-tools.js?v=3e4818c0';
-import { LOW_FUEL_LINE, craftSessionElapsedMs, isLowFuel, isMachineArt, machineArtHtml, packMakeState, playMachineHandOver, setMachineArtFrame } from './js/machine-art.js?v=f20ac642';
+import { LOW_FUEL_LINE, craftSessionElapsedMs, isLowFuel, isMachineArt, machineArtHtml, packMakeState, playMachineHandOver, setMachineArtFrame } from './js/machine-art.js?v=d7da5faa';
 import {
   createGarden,
   tickGarden,
@@ -950,9 +950,10 @@ import {
   ANIMAL_PATROL,
   nearestPlacementGap,
 } from './js/street-ecology.js?v=08076876';
-import { CHICKEN_PAUSE, chickenPauseRoll, easeToward, flightFloorAt, flightFloorFor, flyerLift } from './js/street-creatures.js?v=d3fd3a3a';
-import { chickenPose, chickenIdleSheetsAsked } from './js/chicken-idle-art.js?v=b7ff77c3';
-import { chickenWaitPose } from './js/chicken-idles.js?v=404bed14';
+import { CHICKEN_PAUSE, chickenPauseRoll, easeToward, flightFloorAt, flightFloorFor, flyerLift } from './js/street-creatures.js?v=8ba71c8a';
+import { chickenPose, chickenIdleSheetsAsked } from './js/chicken-idle-art.js?v=6eddcb98';
+import { chickenWaitPose } from './js/chicken-idles.js?v=bb22ac49';
+import { itemOverlayStats } from './js/item-overlay.js?v=99b7664e';
 import { isCrowdSad } from './js/animal-crowding.js?v=78ad8fa9';
 import { createSoundBoard, DEFAULT_SFX_VOLUME, watchButtonClicks, watchPanelSounds } from './js/sound-board.js?v=87380a25';
 import {
@@ -977,7 +978,7 @@ import { installTopBar, renderTopBar } from './js/ui/topbar.js?v=8f8adaa1';
 import { focusBack, installFocusReturn, lastInput } from './js/ui/focus-return.js?v=da190597';
 import { installContextGuard } from './js/ui/context-guard.js?v=0f71ac17';
 import { QUOIN_FRAME_BOB, advanceQuoinClock, quoinBobBetweenFrames } from './js/quoin-motion.js?v=ea0bd408';
-import { installHiresFirstDraw, installHiresSprites, upgradeSource } from './js/sprite-hires.js?v=258027ca';
+import { installHiresFirstDraw, installHiresSprites, upgradeSource } from './js/sprite-hires.js?v=84018f88';
 import { denseSprite } from './js/sprite-dense.js?v=2a0ce07a';
 import { wholeStatAmounts, wholeEffects } from './js/stat-text.js?v=f96d8fd3';
 import { createNotifier, effectTokens, floatKey, offerCardDrop, stackFloat, tokenText } from './js/notify.js?v=1fb97b21';
@@ -31880,6 +31881,8 @@ async function main() {
      * SHARP QA: the GPU textures (uploaded, so drawn) whose URL matches `pattern` (a RegExp source),
      * with their resolution and pixel size: a 3x twin reports resolution 3 and its @3x URL.
      */
+    /** Item overlays (a potion's bottle, a powder's shaker, a tool at a node): the sheets decoded now (js/item-overlay.js). */
+    itemOverlays: () => itemOverlayStats(),
     drawnTextures(pattern = '') {
       const re = new RegExp(String(pattern || ''));
       const out = [];

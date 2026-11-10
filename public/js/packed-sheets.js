@@ -1,4 +1,4 @@
-import { upgradeSource } from './sprite-hires.js?v=258027ca';
+import { upgradeSource } from './sprite-hires.js?v=84018f88';
 import { frameTexture, loadTexture, whenLoaded } from './textures.js?v=f024bd6a';
 
 /**
@@ -10,7 +10,7 @@ import { frameTexture, loadTexture, whenLoaded } from './textures.js?v=f024bd6a'
  * keeps the size, anchor and hit box it has with the uncropped sheets.
  */
 
-/** PURE: the packed cell that frame k of the state shows. */
+/** PURE: the packed cell that frame k of the state shows (-1: the recording's frame is empty). */
 export function packedCell(def, k) {
   const i = Math.min(def.plays - 1, Math.max(0, Math.floor(Number(k) || 0)));
   return def.seq ? def.seq[i] : i;
@@ -34,6 +34,25 @@ export function packedFrameAt(def, ms) {
 /** PURE: how long the state runs once through (ms). */
 export function packedDurationMs(def) {
   return (def.plays * 1000) / def.fps;
+}
+
+/**
+ * The state's textures in play order, cut from a loaded source: each frame keeps its original
+ * cell (orig) with its box placed in it (trim); an empty frame is Pixi's Texture.EMPTY.
+ */
+export function cutPackedFrames(PIXI, base, def) {
+  const orig = new PIXI.Rectangle(0, 0, def.cell[0], def.cell[1]);
+  const cells = [];
+  for (let i = 0; i < def.frames; i += 1) {
+    const r = packedRect(def, i);
+    cells.push(frameTexture(base, new PIXI.Rectangle(r.x, r.y, r.w, r.h), {
+      orig,
+      trim: new PIXI.Rectangle(def.at[0], def.at[1], r.w, r.h),
+    }));
+  }
+  const out = [];
+  for (let k = 0; k < def.plays; k += 1) out.push(cells[packedCell(def, k)] || PIXI.Texture.EMPTY);
+  return out;
 }
 
 /**
@@ -73,17 +92,7 @@ export function createPackedLoader(PIXI) {
       const hit = lists.get(def.path);
       if (hit) return hit;
       upgradeSource(base, def.path, whenLoaded);
-      const orig = new PIXI.Rectangle(0, 0, def.cell[0], def.cell[1]);
-      const cells = [];
-      for (let i = 0; i < def.frames; i += 1) {
-        const r = packedRect(def, i);
-        cells.push(frameTexture(base, new PIXI.Rectangle(r.x, r.y, r.w, r.h), {
-          orig,
-          trim: new PIXI.Rectangle(def.at[0], def.at[1], r.w, r.h),
-        }));
-      }
-      const out = [];
-      for (let k = 0; k < def.plays; k += 1) out.push(cells[packedCell(def, k)]);
+      const out = cutPackedFrames(PIXI, base, def);
       lists.set(def.path, out);
       return out;
     },

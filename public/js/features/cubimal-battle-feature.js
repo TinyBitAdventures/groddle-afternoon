@@ -31,7 +31,7 @@
 
 import { addItem, countItem, removeItem } from '../inventory.js?v=60dfc9ca';
 import { copyForVerb, copyTag, setCopyTag, takeToolCopy } from '../tools.js?v=5f482998';
-import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=5f217a9f';
+import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=d4fd8dc2';
 import { landingY, walkSurfaceY } from '../walk-surface.js?v=106bfdc5';
 import { displayTopOf, itemstackOverlayPoint, playSheetOverlay } from '../overlay-art.js?v=75c3ea34';
 import { CUBIMAL_RACE, cubimalArticle, cubimalInfo, cubimalRaceSheet } from '../cubimals.js?v=5e340c94';

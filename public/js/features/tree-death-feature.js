@@ -70,6 +70,7 @@ import { ITEM_CATALOG, ensureItem } from '../inventory.js?v=60dfc9ca';
 import { moodMax } from '../metabolics.js?v=8504134e';
 import { plantChoices } from '../patches.js?v=3103cc6a';
 import { textureFromUrl } from '../textures.js?v=f024bd6a';
+import { playPotionBottle } from '../potion-bottle-fx.js?v=b37032ea';
 import { displayTopOf, itemstackOverlayPoint, playSheetOverlay } from '../overlay-art.js?v=75c3ea34';
 import {
   GUILT_BUFF,
@@ -97,7 +98,7 @@ import {
   quotePoisonVerb,
   treeDeathOutcome,
 } from '../tree-poison.js?v=5ceea244';
-import { patchesFeature } from './patches-feature.js?v=68438dca';
+import { patchesFeature } from './patches-feature.js?v=70e431a0';
 
 export const TREE_DEATH_FEATURE_ID = 'tree-death';
 const VERB_PREFIX = 'treepoison:';
@@ -281,13 +282,16 @@ function pourFx(engine, potionClass, target) {
   const root = new PIXI.Container();
   root.zIndex = 9000;
   root.eventMode = 'none';
-  const bottle = new PIXI.Sprite(textureFromUrl(ITEM_CATALOG[potionClass]?.icon || `assets/sprites/icons/${potionClass}.webp`));
+  // The bottle's own pouring animation on the tree (the source's itemstack_overlay on the target,
+  // potion_tree_poison.js; js/potion-bottles.js), its icon only if it has no sheet.
+  const pour = playPotionBottle(engine, potionClass, target);
+  const bottle = new PIXI.Sprite(pour ? PIXI.Texture.EMPTY : textureFromUrl(ITEM_CATALOG[potionClass]?.icon || `assets/sprites/icons/${potionClass}.webp`));
   bottle.anchor.set(0.5);
   root.addChild(bottle);
   const drops = new PIXI.Graphics();
   root.addChild(drops);
   engine.fxLayer.addChild(root);
-  return { root, bottle, drops, target, age: 0, color: potionClass === TREE_POISON ? 0x6f8f2a : 0x8fd8ff };
+  return { root, bottle, drops, target, pour, age: 0, color: potionClass === TREE_POISON ? 0x6f8f2a : 0x8fd8ff };
 }
 
 function tickPourFx(fx, engine, dtMs) {
@@ -302,6 +306,8 @@ function tickPourFx(fx, engine, dtMs) {
   const dir = fx.target?.sprite && p && fx.target.sprite.x < p.x ? -1 : 1;
   fx.bottle.rotation = dir * (0.6 * Math.min(1, k * 3) + Math.sin(fx.age / 140) * 0.25);
   fx.drops.clear();
+  // The bottle's own animation pours by itself: the drawn drops were its stand-in.
+  if (fx.pour) return;
   const tx = fx.target?.sprite?.x ?? fx.bottle.x;
   const ty = (fx.target?.sprite?.y ?? fx.bottle.y + 120) - 30;
   for (let i = 0; i < 6; i += 1) {

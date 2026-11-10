@@ -46,6 +46,7 @@ import {
 import { rollDropTable } from '../drop-tables.js?v=16e12632';
 import { payDrop } from './drops-feature.js?v=04d201c2';
 import { textureFromUrl } from '../textures.js?v=f024bd6a';
+import { playPotionBottle } from '../potion-bottle-fx.js?v=b37032ea';
 import { copyFromLedger, keepsCopies, verbCopy } from '../copy-charges.js?v=4ffa1c1e';
 import { gardenGrowModifier } from '../imagination-effects.js?v=70169933';
 
@@ -127,7 +128,10 @@ function pourFx(engine, potionClass, target) {
   const p = engine.player;
   if (!PIXI || !p || !engine.fxLayer) return null;
   const root = new PIXI.Container();
-  const bottle = new PIXI.Sprite(textureFromUrl(ITEM_CATALOG[potionClass]?.icon || `assets/sprites/icons/${potionClass}.webp`));
+  // The bottle's own pouring animation on the bed (the source's itemstack_overlay on the garden,
+  // e.g. potion_garden_water.js 332-381; js/potion-bottles.js), its icon only if it has no sheet.
+  const pour = playPotionBottle(engine, potionClass, target);
+  const bottle = new PIXI.Sprite(pour ? PIXI.Texture.EMPTY : textureFromUrl(ITEM_CATALOG[potionClass]?.icon || `assets/sprites/icons/${potionClass}.webp`));
   bottle.anchor.set(0.5);
   bottle.x = p.x;
   bottle.y = (p.y || 0) - 135;
@@ -136,7 +140,7 @@ function pourFx(engine, potionClass, target) {
   root.addChild(drops);
   engine.fxLayer.addChild(root);
   const plots = (target?.state?.plotTargets || []).map((pt) => ({ x: pt.sprite.x, y: pt.sprite.y - 18 }));
-  return { root, bottle, drops, plots, age: 0, color: { water: 0x6cc4ff, plant: 0xc9a46a, pick: 0xffe066, hoe: 0xb08850, fertilize: 0x9bd36a }[GARDEN_POTIONS[potionClass].action] };
+  return { root, bottle, drops, plots, pour, age: 0, color: { water: 0x6cc4ff, plant: 0xc9a46a, pick: 0xffe066, hoe: 0xb08850, fertilize: 0x9bd36a }[GARDEN_POTIONS[potionClass].action] };
 }
 
 function tickFx(fx, dtMs) {

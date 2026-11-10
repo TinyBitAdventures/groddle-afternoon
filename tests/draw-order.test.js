@@ -224,7 +224,8 @@ describe('player and item overlays draw over the street\'s front layers', () => 
 
   for (const [what, file, pattern] of [
     ['the Wine of the Dead pour', 'public/js/features/homes-feature.js', /const layer = engine\.fxLayer \|\| engine\.entityLayer;\s*if \(!frames\.length[\s\S]{0,400}layer\.addChild\(clip\);/],
-    ['a potion bottle', 'public/js/features/potions-feature.js', /function bottleFx[\s\S]{0,300}const layer = engine\.fxLayer \|\| engine\.entityLayer;[\s\S]{0,400}layer\.addChild\(spr\);/],
+    ['a potion bottle', 'public/js/potion-bottle-fx.js', /const layer = engine\?\.fxLayer \|\| engine\?\.entityLayer;[\s\S]{0,1600}playItemOverlay\(engine\.PIXI, def, \{\s+layer,/],
+    ['a potion with no pouring sheet (its icon)', 'public/js/features/potions-feature.js', /function bottleFx[\s\S]{0,800}const layer = engine\.fxLayer \|\| engine\.entityLayer;[\s\S]{0,400}layer\.addChild\(spr\);/],
     ['a cultivation poofing in', 'public/js/features/homes-feature.js', /playPoofIn\(engine\.PIXI, \{ layer: engine\.fxLayer \|\| engine\.entityLayer, x: cultivationWorldX/],
     ['the Butler box puff', 'public/js/features/butler-feature.js', /'proto_puff', \{ layer: engine\.fxLayer \|\| engine\.entityLayer/],
     ['the Craftybot puff', 'public/js/features/craftybot-feature.js', /'proto_puff', \{ layer: engine\.fxLayer \|\| engine\.entityLayer/],

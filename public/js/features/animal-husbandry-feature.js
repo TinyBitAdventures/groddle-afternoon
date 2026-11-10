@@ -57,7 +57,7 @@
  */
 
 import { slugsFromEffects } from '../speech-slugs.js?v=130338f9';
-import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=5f217a9f';
+import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=d4fd8dc2';
 import { nearestSurfaceY } from '../walk-surface.js?v=106bfdc5';
 import { displayTopOf, itemstackOverlayPoint, playSheetOverlay } from '../overlay-art.js?v=75c3ea34';
 import { SET_FREE, applySetFree, canSetFree, setFreeGoneLine, setFreePrompt } from '../animal-set-free.js?v=3b194fca';
@@ -110,16 +110,16 @@ import {
   stepHogtie,
   stickPlaceState,
 } from '../animal-husbandry.js?v=7b3b3181';
-import { batterflyBaseY, batterflyResponseFor, flightFloorFor } from '../street-creatures.js?v=d3fd3a3a';
+import { batterflyBaseY, batterflyResponseFor, flightFloorFor } from '../street-creatures.js?v=8ba71c8a';
 import { loseEnergy, shiftMetabolic } from '../metabolics.js?v=8504134e';
 import { textureFromUrl } from '../textures.js?v=f024bd6a';
 import { PIGGY_DEATH_DROPS, PIGGY_DEATH_PUFF, SAD_BABY, forcedRoll, isSadIn } from '../animal-mood.js?v=a49495fc';
-import { animalCrowdChanged, animalCrowdSad, animalPlaceIsDepressing, crowdLimit, smokePuff as sharedSmokePuff } from './animal-mood-feature.js?v=dca2ea95';
+import { animalCrowdChanged, animalCrowdSad, animalPlaceIsDepressing, crowdLimit, smokePuff as sharedSmokePuff } from './animal-mood-feature.js?v=aa63e60c';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
-import { followYardPath, freeYardSpot } from '../yard-wander.js?v=11c4a164';
-import { showsChickenIdle, yardChickenPose } from '../chicken-idle-art.js?v=b7ff77c3';
-import { chickenWaitPose } from '../chicken-idles.js?v=404bed14';
+import { followYardPath, freeYardSpot } from '../yard-wander.js?v=f2c968a4';
+import { showsChickenIdle, yardChickenPose } from '../chicken-idle-art.js?v=6eddcb98';
+import { chickenWaitPose } from '../chicken-idles.js?v=bb22ac49';
 
 export const HUSBANDRY_FEATURE_ID = 'animal-husbandry';
 export const BATTERFLY_GROUP = 'batterfly';

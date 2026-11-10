@@ -63,7 +63,6 @@ const MODULE_ALLOWED = [
   [/^potion-art\.js POTION_ART\.scion_of_purple_fade cell 31$/, 'the Scion of Purple fades out to nothing'],
   [/^hi \w+ hi( @3x)? cell (5[4-9]|6[0-4])$/, 'hi_overlay.swf hi state (played once, 2 s) ends after its burst'],
   [/^hi \w+ bonus( @3x)? cell 3[3-6]$/, 'the 2x bonus state (played once) ends after its burst'],
-  [/^features\/rook-attack-feature\.js ROOK_SHEETS\.balm cell 0$/, 'the balm tool loop starts empty (loaded, not played yet)'],
 ];
 const TAIL_ALLOWED = [
   [/^juju camp grandma angry:/, 'cell 126 repeats cell 0; the loop stops before it'],

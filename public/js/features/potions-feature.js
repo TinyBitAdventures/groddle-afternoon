@@ -74,9 +74,10 @@ import { metabolicGain, moodMax } from '../metabolics.js?v=8504134e';
 import { quoinDailyLimitFor } from '../quoins.js?v=237c1d5d';
 import { emblemCostFor } from '../shrines.js?v=aa00a504';
 import { GROWN_TREE_LABELS, trantsformPlotTree } from '../patches.js?v=3103cc6a';
-import { COPY as SHARED_PATCH_COPY } from '../shared-patches.js?v=630929b3';
+import { COPY as SHARED_PATCH_COPY } from '../shared-patches.js?v=7e01b453';
 import { isPoisoned } from '../tree-poison.js?v=5ceea244';
 import { furnitureSize } from '../home-decor.js?v=d6fabb62';
+import { playPotionBottle } from '../potion-bottle-fx.js?v=b37032ea';
 import { textureFromUrl, sourceFromUrl, frameTexture } from '../textures.js?v=f024bd6a';
 import { POTION_ART } from '../potion-art.js?v=27ccc756';
 import { levelInfoForXp, XP_FOR_LEVEL } from '../progression.js?v=33462eaa';
@@ -135,10 +136,10 @@ import {
   usePotion,
 } from '../potions.js?v=4f4c996d';
 import { itemVerbAchievementCounters } from '../item-verbs.js?v=1e20fa7d';
-import { patchesFeature } from './patches-feature.js?v=68438dca';
-import { homesFeature } from './homes-feature.js?v=e09afc01';
-import { streetTreeIndex } from './tree-death-feature.js?v=95f41833';
-import { questRoomConverse } from './quest-instances-feature.js?v=44b99d16';
+import { patchesFeature } from './patches-feature.js?v=70e431a0';
+import { homesFeature } from './homes-feature.js?v=c0bc90f7';
+import { streetTreeIndex } from './tree-death-feature.js?v=a7a28329';
+import { questRoomConverse } from './quest-instances-feature.js?v=e5f372a2';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
 import { copyChargesLeft, copyFromLedger, keepsCopies, spendCopyCharge, verbCopy } from '../copy-charges.js?v=4ffa1c1e';
 import { copyTag, migrateClassTag, migrateClassValue, setCopyTag, toolCopies } from '../tools.js?v=5f482998';
@@ -392,6 +393,11 @@ function withCopy(copy, fn) {
 
 function bottleFx(engine, classTsid, target) {
   const { PIXI } = engine;
+  // The bottle's own pouring animation (its tool_animation), where the source's overlay puts it:
+  // over a pour's target, else over you (js/potion-bottles.js, js/potion-bottle-fx.js).
+  const pour = playPotionBottle(engine, classTsid, target);
+  if (pour) return { pour, follow() {} };
+  // A potion with no sheet (Draught of Wisdom, Rocky Regeneration Solution, Alphabet Sauce): its icon, rocking.
   // The bottle's tool_animation is an itemstack_overlay: over the street's front layers too.
   const layer = engine.fxLayer || engine.entityLayer;
   if (!PIXI?.Sprite || !layer) return null;
@@ -413,7 +419,9 @@ function bottleFx(engine, classTsid, target) {
   return { spr, follow };
 }
 
-function stopFx() {
+function stopFx({ played = false } = {}) {
+  // A pour that ran its 2.5 s fades out by itself (the overlay's last 0.2 s); a cut one goes at once.
+  if (!played) pending?.fx?.pour?.stop();
   const s = pending?.fx?.spr;
   if (s && !s.destroyed) {
     s.parent?.removeChild(s);
@@ -449,7 +457,7 @@ export function usePotionNow(engine, classTsid, extra = {}) {
 /** onQuaffComplete / onPourComplete. */
 function complete(engine) {
   const { classTsid, target, extra, copy } = pending;
-  stopFx();
+  stopFx({ played: true });
   pending = null;
   if (countItem(engine.inv, classTsid) < 1) return;
   // A copy that is no longer there (sold or given during the 2.5 s) falls back to the one in use.

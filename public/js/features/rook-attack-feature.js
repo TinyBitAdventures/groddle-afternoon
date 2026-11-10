@@ -60,7 +60,7 @@
 import { slugsFromEffects } from '../speech-slugs.js?v=130338f9';
 import { addItem, countItem, ensureItem, removeItem, ITEM_CATALOG } from '../inventory.js?v=60dfc9ca';
 import { bindCountField, countKeyValue, countStepMarkup } from '../ui/count-chooser.js?v=5bc894c8';
-import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=5f217a9f';
+import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=d4fd8dc2';
 import { landingY, nearestSurfaceY } from '../walk-surface.js?v=106bfdc5';
 import { donationValueFor } from '../shrines.js?v=aa00a504';
 import { giantDisplayName } from '../giant-names.js?v=0e295891';
@@ -127,6 +127,7 @@ import {
 import { itemZ } from '../item-bands.js?v=e98b10bc';
 import { copyChargesLeft, copyFromLedger, keepsCopies, spendCopyCharge, verbCopy } from '../copy-charges.js?v=4ffa1c1e';
 import { migrateClassValue } from '../tools.js?v=5f482998';
+import { playPotionBottle } from '../potion-bottle-fx.js?v=b37032ea';
 import { feedZone, placeRookBadge, unionBox } from '../rook-badge-place.js?v=2bb00dfd';
 
 export const ROOK_FEATURE_ID = 'rook-attack';
@@ -141,6 +142,8 @@ const SCREEN_PAD = 400;
 const PLAYER_LABEL = 'Ur';
 const ORB_CLASS = 'focusing_orb';
 const BALM_CLASS = 'potion_rook_balm';
+/** The Balm pour playing on a rooked thing (verbStarted), stopped if the pour is cancelled. */
+let balmPour = null;
 const ARMOR_CLASS = 'essence_of_rookswort';
 /** music_map ROOK_FLOCK (archive.org 'rook flight'): inc_rook.js:40 loops it for the whole attack. */
 const ROOK_MUSIC = 'assets/audio/sfx/ROOK_FLOCK.mp3';
@@ -165,7 +168,6 @@ export const ROOK_SHEETS = Object.freeze({
   // emotional_bear.swf scene rooked_halo (frames 479-508): 30 frames of 124x46 in an 8 x 4 grid. Read
   // as 124x92 it played two frames stacked, and the last two cells came up half empty each loop.
   halo: sheet('rooked-halo.webp', 124, 46, 8, 30),
-  balm: sheet('rook-balm-tool.webp', 88, 106, 10, 67),
   piggy1: sheet('piggy-rooked1.webp', 88, 62, 10, 10),
   piggy2: sheet('piggy-rooked2.webp', 88, 62, 8, 24),
   chicken1: sheet('chicken-rooked1.webp', 148, 110, 1, 1),
@@ -3251,6 +3253,13 @@ export const rookAttackFeature = {
 
   /** game.js beginVerbAction: a revive dose's 10 s began (include/rook.js startRevive): the street counts it (G605). */
   verbStarted(target, verb, engine) {
+    // Apply Balm: the tube's own pouring animation on the rooked thing for the pour's 2.5 s
+    // (potion_rook_balm.js, the potions' itemstack_overlay; js/potion-bottles.js).
+    if (verb?.id === 'rook_apply_balm') {
+      balmPour?.stop();
+      balmPour = playPotionBottle(engine, BALM_CLASS, target, { durationMs: ROOK_SOURCE.balmPourMs });
+      return undefined;
+    }
     if (!mp || verb?.id !== 'rook_revive') return undefined;
     const key = keyOf.get(target);
     if (key && mp.slot.rooked[key]) mp.client.send('rook_revive_start', { key });
@@ -3259,6 +3268,11 @@ export const rookAttackFeature = {
 
   /** game.js cancelCurrentAction: a dose stopped before it landed (doReviveCancel). */
   verbCancelled(target, verbId, engine) {
+    if (verbId === 'rook_apply_balm') {
+      balmPour?.stop();
+      balmPour = null;
+      return undefined;
+    }
     if (!mp || verbId !== 'rook_revive') return undefined;
     const key = keyOf.get(target);
     if (key) mp.client.send('rook_revive_stop', { key });
@@ -3360,6 +3374,8 @@ export const rookAttackFeature = {
     }
     if (verbId === 'rook_pour') {
       const near = nearestRooked(engine);
+      // From the pack the Balm works at once here; the tube still pours over what it revives.
+      if (near) playPotionBottle(engine, BALM_CLASS, near.row.target, { durationMs: ROOK_SOURCE.balmPourMs });
       if (near) revive(engine, near.row.target, { balm: true, copy: opts?.copy ?? null });
       else engine.toast(ROOK_TEXT.balmNothing, 2000);
       return true;

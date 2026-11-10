@@ -27,7 +27,7 @@
  * new ones are packed (js/packed-sheets-data.js, set 'chicken') and load when first played.
  */
 
-import { PACKED_SHEETS } from './packed-sheets-data.js?v=f4623e14';
+import { PACKED_SHEETS } from './packed-sheets-data.js?v=3b5055a3';
 
 /** model/TSEngineConstants.as 6: TARGET_FRAMERATE. */
 export const CHICKEN_IDLE_FPS = 30;

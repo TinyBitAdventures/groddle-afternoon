@@ -20,8 +20,9 @@ row (one SWF frame per packed cell) goes into that tool's manifest.
 
 sheets.json rows: { set, name, class, file (the OGA sheet's name), fw, fh, frames, out (under
 public/), fps, loop, swf: { path, sprite, label, start } and a `source` note }. The grid is
-measured here, never trusted: the sheet must divide into fw x fh cells, exactly `frames` cells
-must hold art and they must be the first ones.
+measured here, never trusted: the sheet must divide into fw x fh cells, and the first `frames`
+cells must hold art (all but those a row lists in `blank`: a frame Tiny Speck's recording left
+empty, which gets -1 in seq) and no cell after them.
 
   python3.11 -I tools/packed-sheets/build.py            writes the sheets, results.json and the module
   python3.11 -I tools/packed-sheets/build.py --check    exit 1 when anything is stale. With the OGA
@@ -106,6 +107,10 @@ def plan(row):
     w, h = x1 - x0, y1 - y0
     seen, uniq, seq, first = {}, [], [], []
     for k, c in enumerate(cells):
+        if not c.getchannel('A').getbbox():
+            # A frame with nothing in it (row `blank`): no cell, the game draws nothing for it.
+            seq.append(-1)
+            continue
         crop = clear_transparent(c.crop((x0, y0, x1, y1)))
         key = hashlib.sha1(crop.tobytes()).hexdigest()
         if key not in seen:
@@ -148,7 +153,7 @@ def js_text(results):
         "// States of Tiny Speck's own animations (OGA sheets, CC0), each packed as its distinct cells cropped to",
         '// one box. path, fw, fh, cols, frames: the packed grid (frames = the cells drawn in the file, as every',
         '// sheet def here). plays: how many frames the state has; seq: the packed cell each of them shows (absent:',
-        '// frame k is cell k). cell: the original OGA cell; at: where the box sits in it. fps and loop: how the',
+        '// frame k is cell k; -1: an empty frame). cell: the original OGA cell; at: where the box sits in it. fps and loop: how the',
         '// client played it. js/packed-sheets.js cuts the textures.',
         '',
         'export const PACKED_SHEETS = Object.freeze({',

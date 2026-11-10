@@ -30,23 +30,6 @@
    ]
   },
   {
-   "name": "rook-balm-tool",
-   "swf": "alchemy/potion_rook_balm/potion_rook_balm.swf",
-   "sprite": 0,
-   "padStage": 1,
-   "sheets": [
-    {
-     "path": "assets/sprites/rooks/rook-balm-tool.webp",
-     "fw": 88,
-     "fh": 106,
-     "cols": 10,
-     "frames": 67,
-     "swfStart": 3,
-     "swfCount": 75
-    }
-   ]
-  },
-  {
    "name": "firefly",
    "swf": "misc/npc/npc_firefly/npc_firefly.swf",
    "sprite": 3,

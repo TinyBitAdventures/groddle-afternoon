@@ -207,7 +207,7 @@ const js = lines.join('\n');
 const want = new Set(rows.flatMap((r) => [r.path.split('/').pop(), r.hires.split('/').pop()]));
 if (CHECK) {
   const same = existsSync(OUT_JS) && readFileSync(OUT_JS, 'utf8') === js;
-  const { HIRES_SPRITES } = await import('../../public/js/sprite-hires.js?v=258027ca');
+  const { HIRES_SPRITES } = await import('../../public/js/sprite-hires.js?v=84018f88');
   const bad = checkPairs(results, SOURCE, rows.map((r) => r.path), PUB, HIRES_SPRITES);
   for (const r of rows) if (results[r.path] && results[r.path].hires !== r.hires) bad.push(`${r.path}: results name ${results[r.path].hires}`);
   for (const f of readdirSync(OUT_DIR)) if (!want.has(f) && f !== 'tower_expander.webp' && !/^tower_expander@\d+x\.webp$/.test(f)) bad.push(`${REL_DIR}/${f}: not built here`);
