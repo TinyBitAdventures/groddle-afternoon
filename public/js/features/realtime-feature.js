@@ -56,6 +56,7 @@
  * administrator sent you to, once there); window.groddleRealtime in multiplayer.
  */
 
+import { chatBubbleText } from '../ui/chat-input.js?v=72d000ac';
 import { createMinnAccount } from '../minn-account.js?v=8f2741cd';
 import { EMOTES, createRealtimeClient, createTrack, pushSample, sampleTrack } from '../realtime-client.js?v=342dae8e';
 import { ANIM_FPS, EMOTION_MS, animForState, crowdScaleX } from '../avatar-anims.js?v=fb921bf4';
@@ -570,7 +571,8 @@ function createSession(engine) {
     if (r?.typingUntil) {
       r.typingUntil = 0;
     }
-    if (r) engine.say?.(r.target, text, BUBBLE_MS, { speaker: name });
+    // The bubble shows a long line's start; Local keeps every word (chatBubbleText).
+    if (r) engine.say?.(r.target, chatBubbleText(text), BUBBLE_MS, { speaker: name });
     // RIGHTCLICK: who said it, so their name in Local opens their menu (js/ui/player-menu.js).
     // REACTIONS: the line's key (features/chat-reactions-feature.js claims your own lines' keys).
     engine.chatLine?.(name, text, { playerId: Number(id) || 0, rk: lineKey(lid) });

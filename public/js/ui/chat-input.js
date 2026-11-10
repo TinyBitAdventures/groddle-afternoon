@@ -33,6 +33,23 @@ export const MAX_ROWS = 5;
  * server, too short to explain anything in (Austin 2026-11-09).
  */
 export const CHAT_MAX_CHARS = 1000;
+/**
+ * The most of a chat line the bubble over its speaker shows (Austin 2026-11-10). The original's
+ * bubble showed the whole line (ChatBubble.as), but a 1,000-character one fills the view for as
+ * long as it stays, over everyone on the street. The chat keeps every word; the bubble shows the
+ * start and "…". OUR OWN number, not the original's.
+ */
+export const CHAT_BUBBLE_CHARS = 240;
+
+/** PURE: a chat line as its bubble shows it: whole when short, else cut at a word with "…". */
+export function chatBubbleText(text, max = CHAT_BUBBLE_CHARS) {
+  const line = String(text || '').trim();
+  if (line.length <= max) return line;
+  const head = line.slice(0, max);
+  const cut = head.lastIndexOf(' ');
+  // A word break in the last third keeps whole words; one long word is cut where it stands.
+  return `${(cut > max * 0.66 ? head.slice(0, cut) : head).replace(/[\s,;:.!?-]+$/, '')}…`;
+}
 
 /** PURE: the words as one line: each line break (and the spaces round it) is one space. */
 export function oneLine(text) {

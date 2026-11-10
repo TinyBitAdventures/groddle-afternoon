@@ -8,7 +8,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { CHAT_MAX_CHARS, MAX_ROWS, bindChatInput, fitHeight, heldAtFocus, historyKey, keyWatch, oneLine, sendKey, strayRepeat } from '../public/js/ui/chat-input.js?v=15183179';
+import { CHAT_BUBBLE_CHARS, CHAT_MAX_CHARS, MAX_ROWS, bindChatInput, chatBubbleText, fitHeight, heldAtFocus, historyKey, keyWatch, oneLine, sendKey, strayRepeat } from '../public/js/ui/chat-input.js?v=72d000ac';
 import { FakeEl } from './social-fake-dom.js';
 import { MAX_CHAT } from '../public/js/realtime-client.js?v=342dae8e';
 import { SERVER_DIR, SITE_DIR, skipWithoutServer, skipWithoutSite } from '../tools/repos.mjs';
@@ -189,6 +189,25 @@ describe('the chat box: wired', () => {
     const game = read('public/game.js');
     assert.match(game, /const typed = String\(message \|\| ''\)\.trim\(\)\.slice\(0, CHAT_MAX_CHARS\);/, 'what a solo player says');
     assert.doesNotMatch(game, /slice\(0, 180\);\n  if \(!typed\)/);
+  });
+
+  it('the bubble over a speaker shows a long line\'s start, the chat every word', () => {
+    assert.equal(CHAT_BUBBLE_CHARS, 240);
+    assert.equal(chatBubbleText('  hello there  '), 'hello there');
+    const exact = 'x'.repeat(240);
+    assert.equal(chatBubbleText(exact), exact);
+    const long = Array.from({ length: 200 }, (_, i) => `word${i}`).join(' ');
+    const shown = chatBubbleText(long);
+    assert.ok(shown.length <= 241 && shown.endsWith('…'));
+    assert.ok(long.startsWith(shown.slice(0, -1)) && long[shown.length - 1] === ' ', 'cut between words');
+    assert.equal(chatBubbleText('y'.repeat(400)), `${'y'.repeat(240)}…`, 'one long word is cut where it stands');
+    const game = read('public/game.js');
+    assert.match(game, /text: chatBubbleText\(text\),\n      durationMs: result\.matched/);
+    assert.match(game, /showLocalCompanionSpeech\(participant, chatBubbleText\(text\), \{/);
+    assert.match(game, /showLocalChatBubble\(shown, text, \{/, 'the chat gets the whole line');
+    const rt = read('public/js/features/realtime-feature.js');
+    assert.match(rt, /engine\.say\?\.\(r\.target, chatBubbleText\(text\), BUBBLE_MS, \{ speaker: name \}\);/);
+    assert.match(rt, /engine\.chatLine\?\.\(name, text, \{/, 'Local gets the whole line');
   });
 
   it('the server cuts a line at the same length', { skip: skipWithoutServer }, () => {
