@@ -2748,13 +2748,33 @@
   ]
  },
  "release": {
-  "game": "0.27.0",
+  "game": "0.28.0",
   "deployed": "2026-11-09"
  },
  "git": {
-  "commits": 1551,
+  "commits": 1557,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-09",
+    "kind": "fix",
+    "text": "A player without papers is no longer left at a subway gate with no road home"
+   },
+   {
+    "date": "2026-11-09",
+    "kind": "fix",
+    "text": "Harbinger Heath's leftmost ladder has all its rungs"
+   },
+   {
+    "date": "2026-11-09",
+    "kind": "fix",
+    "text": "Another player walking in no longer stops the street"
+   },
+   {
+    "date": "2026-11-09",
+    "kind": "fix",
+    "text": "The Cubimal card counts every figure you have found"
+   },
    {
     "date": "2026-11-09",
     "kind": "new",
@@ -2854,26 +2874,6 @@
     "date": "2026-11-09",
     "kind": "improve",
     "text": "NPCs, stores, food and items in the original's own words"
-   },
-   {
-    "date": "2026-11-08",
-    "kind": "fix",
-    "text": "The Quests list always shows the quests it counts as active"
-   },
-   {
-    "date": "2026-11-08",
-    "kind": "new",
-    "text": "Set your own machine down in a Community Machine Room (Meadow, Besara, Forest), for anyone there to use"
-   },
-   {
-    "date": "2026-11-08",
-    "kind": "improve",
-    "text": "Tool, ore and shrine descriptions in the original's own words"
-   },
-   {
-    "date": "2026-11-08",
-    "kind": "new",
-    "text": "The Rook stops a Heli Kitty where it struck it: online for everyone, and it is not startled while rooked"
    }
   ]
  },
