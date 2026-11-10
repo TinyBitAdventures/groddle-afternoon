@@ -16,6 +16,9 @@ import {
   BUTLER_FALLBACK,
   BUTLER_FRAMES,
   BUTLER_HINTS,
+  BUTLER_INFO,
+  butlerInfoText,
+  leaveButlerInfo,
   BUTLER_JOKES,
   BUTLER_LEGACY_LOOKS,
   BUTLER_LOOKS,
@@ -150,6 +153,66 @@ describe('naming and teaching', () => {
     assert.equal(s.ownerGreeting, 'Cheerio!');
     assert.equal(teachButler(s, 'idle_comment', 'Dusting, dusting.').text, "Ok, I will say Dusting, dusting. when I'm bored.");
     assert.equal(teachButler(s, 'friend_greeting', 'x').ok, false);
+  });
+});
+
+describe('leave info and tell me about... (bag_butler.js verbs.record_info, verbs.info)', () => {
+  it('keeps one line of 141 characters for visitors and answers teachInfoSuccess', () => {
+    const s = owned();
+    assert.equal(s.info, '');
+    assert.equal(leaveButlerInfo(s, '   ').ok, false);
+    assert.equal(leaveButlerInfo(s, 'Help yourself to the <b>cherries</b>.').text, 'Ok, I will tell visitors Help yourself to the cherries.');
+    leaveButlerInfo(s, 'Gardens need water.');
+    assert.equal(s.info, 'Gardens need water.', 'phrase_limit 1: the newest replaces the old');
+    leaveButlerInfo(s, 'x'.repeat(200));
+    assert.equal(s.info.length, BUTLER.INFO_MAX);
+    assert.equal(BUTLER.INFO_MAX, 141);
+    assert.equal(normalizeButlerState(serializeButlerState(s)).info, s.info, 'saved with the Butler');
+  });
+
+  it('words the owner and the visitor dialogs as the source does', () => {
+    const mine = butlerInfoText('Pip', 'Mind the piggies.', { forOwner: true });
+    assert.equal(mine.text, "Your info is:\n\nThis is Pip's home street.\n\nPip says: Mind the piggies.");
+    const theirs = butlerInfoText('Pip', 'Mind the piggies.');
+    assert.equal(theirs.head, "This is Pip's home street.");
+    assert.equal(theirs.says, 'Pip says: Mind the piggies.');
+    const none = butlerInfoText('Pip', '');
+    assert.equal(none.text, "This is Pip's home street.");
+    assert.equal(none.says, '');
+  });
+
+  it('runs a line other players read through the word filter, when left and when shown', () => {
+    const s = owned();
+    leaveButlerInfo(s, 'Oh fuck, a rock!');
+    assert.equal(s.info, 'Oh #!@$, a rock!');
+    // A line that reached the site unfiltered (an older save, a hand-made request) is filtered on the visitor's side too.
+    assert.equal(butlerInfoText('Pip', 'Oh fuck, a rock!').says, 'Pip says: Oh #!@$, a rock!');
+  });
+
+  it('is the owner verb in multiplayer only, and a verb on the Butler a visitor meets', () => {
+    const feature = readFileSync(new URL('../public/js/features/butler-feature.js', import.meta.url), 'utf8');
+    assert.match(feature, /engine\.mode === 'multiplayer' \? \[\{ \.\.\.BUTLER_INFO\.ownerVerb/);
+    const visitor = readFileSync(new URL('../public/js/features/neighbours-mp-feature.js', import.meta.url), 'utf8');
+    assert.match(visitor, /verbId === BV\.info\.id\) tellAbout\(\)/);
+    assert.equal(BUTLER_INFO.ownerVerb.label, 'leave info');
+    assert.equal(BUTLER_INFO.visitorVerb.label, 'tell me about...');
+    assert.equal(BUTLER_INFO.visitorVerb.tooltip('Pip'), 'Learn about Pip');
+  });
+
+  it('matches the source words when the server source is beside the repo', (t) => {
+    const dir = new URL('../../glitch-GameServerJS/items/', import.meta.url);
+    if (!existsSync(new URL('bag_butler.js', dir))) return t.skip('glitch-GameServerJS not beside the repo');
+    const butler = readFileSync(new URL('bag_butler.js', dir), 'latin1');
+    const strings = readFileSync(new URL('include/butler_strings.js', dir), 'latin1');
+    assert.ok(butler.includes('"name"\t\t\t\t: "leave info"'));
+    assert.ok(butler.includes('"tooltip"\t\t\t: "Record information for your visitors"'));
+    assert.ok(butler.includes('"name"\t\t\t\t: "tell me about..."'));
+    assert.ok(butler.includes('return "Learn about "+this.getOwner().label;'));
+    assert.ok(butler.includes('input_max_chars: 141'));
+    assert.ok(butler.includes("this.askPlayer(pc, 'leaveInfo', 'Visitor Information', args);"));
+    assert.ok(butler.includes('{txt:"Change it!", value:"changeInfo"}, {txt:"Never mind.", value:"noChangeInfo" }'));
+    assert.ok(strings.includes(`teachInfoSuccess: "${BUTLER_STRINGS.teachInfoSuccess}"`));
+    assert.ok(strings.includes(`infoDialogLabel: "${BUTLER_STRINGS.infoDialogLabel}"`));
   });
 });
 

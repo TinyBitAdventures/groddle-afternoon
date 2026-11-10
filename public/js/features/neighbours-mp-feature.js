@@ -103,7 +103,7 @@ import { ITEM_CATALOG, addItem, countItem, listPackItemSlots, removeItem } from 
 import { cultivationDef, homeStreetLayout } from '../home-cultivation.js?v=9571e110';
 import { tickGarden } from '../garden.js?v=eae8b052';
 import { BUTLER_RIG_SCALE, ButlerPainter, butlerRigNow, loadButlerRig } from '../butler-rig.js?v=dca8f3ad';
-import { butlerPostRx, normalizeButlerParts } from '../butler.js?v=2c95c064';
+import { BUTLER, BUTLER_INFO, butlerInfoText, butlerPostRx, normalizeButlerParts } from '../butler.js?v=2c95c064';
 import { butlerApi } from './butler-feature.js?v=b2b90e49';
 import { homesFeature, visitorHomeScene, visitorHomeState } from './homes-feature.js?v=6f903b44';
 import {
@@ -561,7 +561,8 @@ function createSession(engine, client) {
 
   function answerButler(view) {
     const b = view?.butler;
-    return b?.owned === true ? { name: String(b.name || '').slice(0, 19) || 'Butler', parts: normalizeButlerParts(b.parts), post: Number.isFinite(Number(b.post)) && b.post !== null ? Number(b.post) : null } : null;
+    // info: the owner's leave info line (bag_butler.js this.info), when the site sends it; butlerInfoText filters it.
+    return b?.owned === true ? { name: String(b.name || '').slice(0, 19) || 'Butler', parts: normalizeButlerParts(b.parts), post: Number.isFinite(Number(b.post)) && b.post !== null ? Number(b.post) : null, info: typeof b.info === 'string' ? b.info.slice(0, BUTLER.INFO_MAX) : '' } : null;
   }
 
   function spawnVisitorButler(groundY) {
@@ -703,6 +704,30 @@ function createSession(engine, client) {
       actions.append(ok);
       panel.append(area, actions);
     }, () => (optional ? done('') : butlerSay(BT.messageNo)));
+  }
+
+  /**
+   * tell me about... (bag_butler.js verbs.info 1580-1638): "This is <owner>'s home street.", then
+   * "<owner> says: <info>" when the owner left any, and a Thanks! button. The Butler talks meanwhile.
+   */
+  function tellAbout() {
+    if (!visit?.butler || vb?.busy) return;
+    const out = butlerInfoText(visit.name, visit.butler.info);
+    vb.busy = true;
+    last = out.text;
+    engine.setData?.('neighboursButlerInfo', out.text);
+    openBox(visit.butler.name || 'Butler', (panel) => {
+      const head = el('p', { class: 'keys-sub', 'data-butler-info-head': '' });
+      head.append(el('strong', {}, out.head));
+      panel.append(head);
+      if (out.says) panel.append(el('p', { class: 'keys-sub', 'data-butler-info-says': '' }, out.says));
+      const actions = el('div', { class: 'butler-actions' });
+      const ok = el('button', { type: 'button', class: 'key-act', 'data-butler-info-ok': '' }, BUTLER_INFO.thanks);
+      ok.addEventListener('click', () => closeBox(false));
+      actions.append(ok);
+      panel.append(actions);
+    });
+    publish();
   }
 
   function itemLabel(cls, n) {
@@ -1466,12 +1491,14 @@ function createSession(engine, client) {
         { ...BV.talk, enabled: true, reason: '' },
         { ...BV.leavePackage, enabled: !busy, reason: busy },
         { ...BV.leaveMessage, enabled: !busy, reason: busy },
+        { ...BV.info, tooltip: BUTLER_INFO.visitorVerb.tooltip(visit?.name || 'the owner'), enabled: !busy, reason: busy },
       ];
     },
     runButler(verbId) {
       if (verbId === BV.talk.id) butlerSay(greeting());
       else if (verbId === BV.leavePackage.id) leavePackage();
       else if (verbId === BV.leaveMessage.id) leaveMessage();
+      else if (verbId === BV.info.id) tellAbout();
       else return false;
       return true;
     },

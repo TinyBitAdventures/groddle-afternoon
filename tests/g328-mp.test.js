@@ -85,6 +85,10 @@ describe('neighbours rules (js/neighbours-mp.js)', () => {
     assert.equal(normalizeHomeView({ ...VIEW, home: { owned: false } }), null);
     assert.equal(normalizeHomeView({ owner: { id: -1, name: 'x' }, home: { owned: true } }), null);
     assert.deepEqual(normalizeHomeView({ ...VIEW, homes: [1, 2] }).homes, {});
+    // The Butler with its owner's leave info line (bag_butler.js verbs.info); none sent reads as none.
+    assert.equal(normalizeHomeView({ ...VIEW, butler: { owned: true, name: 'Jeeves', parts: {}, post: null, info: 'Mind the piggies.' } }).butler.info, 'Mind the piggies.');
+    assert.equal(normalizeHomeView({ ...VIEW, butler: { owned: true, name: 'Jeeves', parts: {}, post: null } }).butler.info, '');
+    assert.equal(normalizeHomeView({ ...VIEW, butler: { owned: true, name: 'Jeeves', info: 'x'.repeat(300) } }).butler.info.length, 141);
     const k = normalizeKeys({ given: [{ id: 9, name: 'Bo', at: '2026-10-26T10:00:00Z' }, { id: 0, name: 'x' }], received: [{ id: 7, name: 'Ada', at: '' }], hasHouse: true });
     assert.deepEqual(k.given.map((r) => r.id), [9]);
     assert.ok(holdsKeyFrom(k, 7));

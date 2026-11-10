@@ -182,8 +182,8 @@ export function normalizeHomeView(answer) {
     key: answer.key === true,
     pass: typeof answer.pass?.token === 'string' && answer.pass.token ? answer.pass.token : '',
     random: answer.random === true,
-    // Slice 2: the owner's Butler as it looks (Neighbours::butlerView), or null.
-    butler: answer.butler?.owned === true ? { owned: true, name: String(answer.butler.name || '').slice(0, 19), parts: answer.butler.parts && typeof answer.butler.parts === 'object' ? answer.butler.parts : {}, post: Number.isFinite(Number(answer.butler.post)) && answer.butler.post !== null ? Math.round(Number(answer.butler.post)) : null } : null,
+    // Slice 2: the owner's Butler as it looks (Neighbours::butlerView), or null; `info` is its owner's leave info line (141 characters, bag_butler.js 3419).
+    butler: answer.butler?.owned === true ? { owned: true, name: String(answer.butler.name || '').slice(0, 19), parts: answer.butler.parts && typeof answer.butler.parts === 'object' ? answer.butler.parts : {}, post: Number.isFinite(Number(answer.butler.post)) && answer.butler.post !== null ? Math.round(Number(answer.butler.post)) : null, info: typeof answer.butler.info === 'string' ? answer.butler.info.slice(0, 141) : '' } : null,
   };
 }
 
@@ -263,6 +263,8 @@ export const VISITOR_BUTLER_VERBS = Object.freeze({
   // bag_butler.js leave_package 991-1004, leave_message 1146-1158.
   leavePackage: Object.freeze({ id: 'mp_butler_leave_package', label: 'leave package', tooltip: 'Leave a gift for the owner' }),
   leaveMessage: Object.freeze({ id: 'mp_butler_leave_message', label: 'leave message', tooltip: 'Leave a message for the owner' }),
+  // bag_butler.js verbs.info 1580-1638 (a visitor's verb): "tell me about...", tooltip "Learn about <owner>".
+  info: Object.freeze({ id: 'mp_butler_info', label: 'tell me about...', tooltip: 'Learn about the owner' }),
 });
 
 export const VISITOR_BUTLER_TEXT = Object.freeze({

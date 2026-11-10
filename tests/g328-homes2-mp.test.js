@@ -90,7 +90,7 @@ describe('the owner\'s Butler holds what real visitors left', () => {
 
   it('keeps the owner\'s Butler in the visit view (its look, not what it holds)', () => {
     const view = normalizeHomeView({ owner: { id: 7, name: 'Ada' }, home: { owned: true, style: 'meadow' }, homes: {}, butler: { owned: true, name: 'Pip', parts: { skull: 'skull3' }, post: 280.4 } });
-    assert.deepEqual(view.butler, { owned: true, name: 'Pip', parts: { skull: 'skull3' }, post: 280 });
+    assert.deepEqual(view.butler, { owned: true, name: 'Pip', parts: { skull: 'skull3' }, post: 280, info: '' }); // info: the owner's leave info line, none sent
     assert.equal(normalizeHomeView({ owner: { id: 7, name: 'Ada' }, home: { owned: true }, butler: { owned: false } }).butler, null);
   });
 

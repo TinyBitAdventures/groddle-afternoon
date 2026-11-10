@@ -93,6 +93,7 @@ import {
   BUTLER_LOOPERS,
   BUTLER_OPTIONS,
   BUTLER_RIG_FRAMES,
+  BUTLER_INFO,
   BUTLER_PART_NAMES,
   BUTLER_PART_ORDER,
   BUTLER_SERVICE,
@@ -101,6 +102,7 @@ import {
   afterGreetingForOwner,
   boxDue,
   butlerCounts,
+  butlerInfoText,
   butlerName,
   butlerSheetUrl,
   butlerText,
@@ -115,6 +117,7 @@ import {
   newestVisit,
   hintDue,
   idleChatter,
+  leaveButlerInfo,
   nearLevel,
   nextHandover,
   normalizeButlerState,
@@ -1187,6 +1190,8 @@ function butlerVerbs(engine) {
         : { id: 'visitors', label: 'who visited?', tooltip: 'Find out who visited your street', enabled: false, reason: 'There have been no visitors since the last time you asked.' };
     })(),
     { id: 'give', label: 'give', tooltip: st.gift ? butlerText('visitorGiftTooltip', { param: itemName(st.gift.classTsid, st.gift.count) }) : 'Leave a gift for your visitors', enabled: true },
+    // leave info (verbs.record_info, sort_on 75, just before name's 76): multiplayer only, where visitors read it.
+    ...(engine.mode === 'multiplayer' ? [{ ...BUTLER_INFO.ownerVerb, enabled: true }] : []),
     { id: 'name', label: 'name', tooltip: "Change the Butler's name", enabled: true },
     { id: 'customize', label: 'customize', tooltip: "Change the Butler's appearance", enabled: true },
     { id: 'set_post', label: 'set post', tooltip: "Change the Butler's assigned post to your current position", enabled: true },
@@ -1217,6 +1222,7 @@ function runButlerVerb(engine, id) {
     case 'retrieve_packages': return retrieve(engine, 'packages');
     case 'visitors': return whoVisited(engine);
     case 'give': return giveMenu(engine);
+    case 'record_info': return leaveInfo(engine);
     case 'name': return nameMenu(engine);
     case 'customize': return customize(engine);
     case 'set_post': return setPost(engine);
@@ -1289,6 +1295,44 @@ function teachMenu(engine) {
       });
     },
   });
+}
+
+/** The owner as the Butler names them to visitors (owner.label): the character's name online. */
+function ownerLabel(engine) {
+  return String(engine.query?.('realtimeClient')?.me?.name || engine.pc?.name || 'friend');
+}
+
+/**
+ * leave info (bag_butler.js verbs.record_info 1226-1285): "Your info is:" with what visitors
+ * read now, then Change it! (the Visitor Information box, 141 characters: onConversation
+ * changeInfo 3411-3426) or Never mind. onTeach 'info' answers teachInfoSuccess with an ok.
+ */
+function leaveInfo(engine) {
+  if (engine.mode !== 'multiplayer') return null;
+  openDialog(engine, {
+    key: 'info',
+    text: butlerInfoText(ownerLabel(engine), st.info, { forOwner: true }).text,
+    choices: [{ value: 'changeInfo', txt: BUTLER_INFO.change, primary: true }, { value: 'noChangeInfo', txt: BUTLER_INFO.keep }],
+    onChoice: (value) => {
+      if (value !== 'changeInfo') return closeDialog(engine);
+      openDialog(engine, {
+        key: 'info:change',
+        title: BUTLER_INFO.boxTitle,
+        text: '',
+        input: { label: BUTLER_STRINGS.infoDialogLabel, value: '', max: BUTLER.INFO_MAX },
+        choices: [{ value: 'cancel', txt: 'Cancel' }, { value: 'ok', txt: 'OK', primary: true }],
+        onChoice: (v, txt) => {
+          if (v !== 'ok') return closeDialog(engine);
+          const out = leaveButlerInfo(st, txt);
+          if (!out.ok) return closeDialog(engine);
+          engine.save?.();
+          lastMsg = 'info:set';
+          line(engine, 'info:taught', out.text, BUTLER_INFO.ok);
+        },
+      });
+    },
+  });
+  return true;
 }
 
 /** doClick: summon from afar, else the click responses and a reaction. */

@@ -32,6 +32,13 @@
  *    chatter (idle chatter), and the IM commands dance (faster, faster
  *    again falls over), jump and zombie. The after_greeting_owner and teach
  *    conversations give "talk to" its menu and the alphy jokes.
+ *  - leave info (verbs.record_info, owner) and tell me about... (verbs.info, a visitor): one
+ *    line of up to 141 characters the owner records for visitors, who read it by asking the
+ *    Butler. Multiplayer only here (solo has no visiting players). The greetings for friends
+ *    and strangers that conversation_run_teach lists stay out: in the source every way to
+ *    teach one was switched off (verbs.teach and verbs.talk_to return state null, parseTeach is
+ *    never called, onInputBoxResponse takes no greeting), though getAfterGreetingForStranger /
+ *    ForFriend (butler_data.js 292-311, 565-584) would still have spoken one.
  *  - Hints (items/include/butler_hints.js giveHint): from ten minutes after the
  *    intro, when the owner comes within near_dist 250, at most every 7 min
  *    (level 7 and under), 30 min (12 and under) or an hour.
@@ -90,6 +97,8 @@ export const BUTLER = Object.freeze({
   IDLE_MAX_MS: 30_000,
   NAME_MAX: 19,
   MESSAGE_MAX: 431,
+  /** bag_butler.js 3419: the Visitor Information box's input_max_chars. */
+  INFO_MAX: 141,
   /** inc_butler.js createButler: doIntro after 2 s. */
   INTRO_DELAY_MS: 2000,
   /** butler_box.js open: createButler after 750 ms. */
@@ -157,6 +166,9 @@ export const BUTLER_STRINGS = Object.freeze({
   fasterFall: ["I'm so dizzy.", 'Fall down, go boom.', 'Ouch.', 'Ooof.'],
   teachOwnerSuccess: 'Ok, I will say $owner_greeting to you.',
   teachIdleSuccess: 'Ok, I will say $idle_comment when I\'m bored.',
+  // butler_strings.js 125, 127: leave info.
+  teachInfoSuccess: 'Ok, I will tell visitors $info',
+  infoDialogLabel: 'What would you like to tell visitors?',
   messageFail: "Sorry, I can't remember any more messages.",
   visitorGiftTooltip: 'Leave a gift for your visitors. Current gift: $param.',
   visitorGiftPrevious: 'Right now I have $param for visitors, which you will have to take back if you give me something new. ',
@@ -501,6 +513,8 @@ export function normalizeButlerState(seed = {}) {
     muted: s.muted === true,
     ownerGreeting: cleanLine(s.ownerGreeting, 140),
     idleComment: cleanLine(s.idleComment, 140),
+    /** leave info (bag_butler.js this.info, phrase_limit 1): what visitors read under "tell me about...". */
+    info: cleanLine(s.info, BUTLER.INFO_MAX),
     packages,
     messages,
     nextId: next,
@@ -949,6 +963,47 @@ export function teachButler(state, type, txt) {
     return { ok: true, text: butlerText('teachIdleSuccess', { idle_comment: line }) };
   }
   return { ok: false };
+}
+
+/**
+ * leave info / tell me about... (bag_butler.js verbs.record_info 1226-1285, verbs.info 1580-1638).
+ * The owner records one line for visitors; a visitor asks the Butler and reads it. The verb names,
+ * tooltips, box title and buttons are the source's.
+ */
+export const BUTLER_INFO = Object.freeze({
+  ownerVerb: Object.freeze({ id: 'record_info', label: 'leave info', tooltip: 'Record information for your visitors' }),
+  visitorVerb: Object.freeze({ id: 'info', label: 'tell me about...', tooltip: (owner) => `Learn about ${owner}` }),
+  boxTitle: 'Visitor Information',
+  change: 'Change it!',
+  keep: 'Never mind.',
+  thanks: 'Thanks!',
+  ok: 'ok',
+});
+
+function possessiveName(name) {
+  return `${name}'s`;
+}
+
+/**
+ * What the Butler says about its owner (bag_butler.js 1263-1269 for the owner, 1618-1623 for a
+ * visitor): the home street line, then "<owner> says: <info>" when there is one. `head` is the
+ * bold first line, `says` the rest ('' with no info); `text` is both as plain words.
+ */
+export function butlerInfoText(ownerName, info, { forOwner = false } = {}) {
+  const owner = cleanLine(ownerName, 80) || 'friend';
+  const line = filterText(cleanLine(info, BUTLER.INFO_MAX)); // read by other players: the word filter, as chat
+  const head = `This is ${possessiveName(owner)} home street.`;
+  const says = line ? `${owner} says: ${line}` : '';
+  const lead = forOwner ? 'Your info is:' : '';
+  return { lead, head, says, text: [lead, head, says].filter(Boolean).join('\n\n') };
+}
+
+/** onTeach 'info' (bag_butler.js 4709-4739): the newest line replaces the old; teachInfoSuccess. */
+export function leaveButlerInfo(state, txt) {
+  const line = filterText(cleanLine(txt, BUTLER.INFO_MAX)); // the remake's own word filter (js/word-filter.js)
+  if (!line) return { ok: false };
+  state.info = line;
+  return { ok: true, text: butlerText('teachInfoSuccess', { info: line }) };
 }
 
 /** doClickAnim: which reaction a click plays. */
