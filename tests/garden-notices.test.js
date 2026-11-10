@@ -6,7 +6,7 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { GARDEN_WATER_MS, SEED_CATALOG, createGarden, tickGarden } from '../public/js/garden.js?v=eae8b052';
+import { GARDEN_SPEEDUP, GARDEN_WATER_MS, SEED_CATALOG, createGarden, tickGarden } from '../public/js/garden.js?v=1e8a887d';
 import {
   GARDEN_CROP_LINE,
   GARDEN_DRY_LINE,
@@ -16,14 +16,14 @@ import {
   noticeAllowed,
   plotMarks,
 } from '../public/js/garden-notices.js?v=dc26dd82';
-import { gardenNoticesFeature } from '../public/js/features/garden-notices-feature.js?v=e98e7947';
+import { gardenNoticesFeature } from '../public/js/features/garden-notices-feature.js?v=79d6ded6';
 import { homesFeature } from '../public/js/features/homes-feature.js?v=4003110f';
 
 const T0 = 1_000_000;
 
 function bed(state, extra = {}) {
   const garden = createGarden({ cols: 2, rows: 1, now: T0 });
-  Object.assign(garden.plots['1-1'], { state, seed: state === 'clean' ? null : 'seed_spinach', wet: true, wetAt: T0, stageStartedAt: T0, growthMs: 0, growModifier: 1 }, extra);
+  Object.assign(garden.plots['1-1'], { state, seed: state === 'clean' ? null : 'seed_spinach', wet: true, wetAt: T0, stageStartedAt: T0, growthMs: 0, growModifier: 1, pace: GARDEN_SPEEDUP, wetPace: GARDEN_SPEEDUP }, extra);
   return garden;
 }
 
@@ -152,8 +152,11 @@ describe('G405 the feature', () => {
   });
 
   it('holds the next one for 10 minutes, then says it; the mark is on the garden, so a reload keeps it', () => {
-    const potato = SEED_CATALOG.seed_potato;
-    const a = bed('shoots', { seed: 'seed_potato' });
+    // Spinach: its shoots take 90 s at the garden's speed, well inside the 10 minutes (the source's
+    // own real 10 * 60 s between prompts, include/garden.js 1063, which the garden's speed leaves alone).
+    const potato = SEED_CATALOG.seed_spinach;
+    assert.ok(2 * potato.grow2Ms < GARDEN_NOTICE_GAP_MS);
+    const a = bed('shoots', { seed: 'seed_spinach' });
     const b = a.plots['2-1'];
     const h = run({ 9: a });
     try {
@@ -162,7 +165,7 @@ describe('G405 the feature', () => {
       assert.equal(h.prompts.length, 1);
       assert.equal(a.lastNoticeAt, T0 + potato.grow2Ms);
       // A second plot ripens inside the 10 minutes.
-      Object.assign(b, { state: 'shoots', seed: 'seed_potato', wet: true, wetAt: T0 + potato.grow2Ms, stageStartedAt: T0 + potato.grow2Ms, growthMs: 0, growModifier: 1 });
+      Object.assign(b, { state: 'shoots', seed: 'seed_spinach', wet: true, wetAt: T0 + potato.grow2Ms, stageStartedAt: T0 + potato.grow2Ms, growthMs: 0, growModifier: 1, pace: GARDEN_SPEEDUP, wetPace: GARDEN_SPEEDUP });
       h.step(T0 + potato.grow2Ms + 1000);
       h.step(T0 + 2 * potato.grow2Ms);
       assert.equal(b.state, 'crop');

@@ -2,9 +2,9 @@
  * Groddle Afternoon — original street geometry + layered decos
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
-import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=eda9ba3f';
+import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=0c78b59c';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=127e0a3c';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=e118446f';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=cdfcc5c6';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -500,7 +500,7 @@ import {
   parsePlayerSave,
   serializePlayerSave,
   restorePlayerSave,
-} from './js/player-save.js?v=02a25aba';
+} from './js/player-save.js?v=75ca0bd4';
 import {
   HOME_INTERIOR_TSID,
   HOME_STREET_TSID,
@@ -625,7 +625,7 @@ import {
   cropIcon,
   hasWateringCan,
   hasHoe,
-} from './js/garden.js?v=eae8b052';
+} from './js/garden.js?v=1e8a887d';
 import { GARDEN_SCALE, PLOT_H as GARDEN_PLOT_H, PLOT_W as GARDEN_PLOT_W, gardenFrame, gardenLayout, gardenStyle, plotPieces } from './js/garden-view.js?v=3683a26f';
 import {
   ROCK_CATALOG,
@@ -834,7 +834,7 @@ import {
   createVendorSellQuote,
   vendorSellUnitPrice,
   vendorBuyUnitPrice,
-} from './js/vendor.js?v=595411dd';
+} from './js/vendor.js?v=0c55a0bf';
 import {
   animalAnchorX,
   animalAnchorY,
@@ -993,7 +993,7 @@ import { ENCYCLOPEDIA_MENU_LABEL, createEncyclopedia, isEncyclopediaKey } from '
 import { EAT_PICK_TEXT, bestFoodIndex, eatChoices, eatTip } from './js/eat-pick.js?v=8fb763d0';
 import { installHeldKeyGuard, isMacPlatform } from './js/held-keys.js?v=98b96620';
 import { signpostArmRows, worldContextAction } from './js/world-context-menu.js?v=f3f48805';
-import { blockedPlayerVerbs, listPlayerTarget, opensPlayerMenu, playerMenuRows } from './js/ui/player-menu.js?v=9eb33f09';
+import { blockedPlayerVerbs, listPlayerTarget, opensPlayerMenu, playerMenuRows } from './js/ui/player-menu.js?v=e44afbac';
 import { forgetTexture, frameTexture, isFailed, isLoaded, onFailed, onLoaded, textureFromUrl, whenLoaded } from './js/textures.js?v=f024bd6a';
 import { FALLBACK_MAX as WORLD_ART_FALLBACK_MAX, worldArtFor } from './js/world-art.js?v=df476660';
 import { sceneAnim, syncAnim } from './js/deco-anim.js?v=aa35e023';
@@ -29021,6 +29021,46 @@ function spawnGarden(opts = {}) {
 }
 
 /**
+ * QA `?gardenqa=1` (solo: the online page takes no parameters): the garden's QA clock. Crops take
+ * minutes to an hour (js/garden.js GARDEN_SPEEDUP), so a check lets garden time pass instead of
+ * waiting: `window.groddleGardenQA.skip(ms)` moves every drawn garden's stored times back by ms, as
+ * if each plot had been planted and watered that much earlier, and the next frame grows and dries
+ * them by the game's own rules (tickGarden); `.plots()` lists every plot with its words and its
+ * spot in the world.
+ */
+if (isSolo(GAME_MODE)) {
+  try {
+    if (new URLSearchParams(location.search).get('gardenqa')) {
+      window.groddleGardenQA = {
+        skip(ms) {
+          const by = Math.max(0, Number(ms) || 0);
+          for (const t of gardens) {
+            for (const plot of Object.values(t.state?.garden?.plots || {})) {
+              if (typeof plot.stageStartedAt === 'number') plot.stageStartedAt -= by;
+              if (typeof plot.wetAt === 'number') plot.wetAt -= by;
+            }
+          }
+          gardenLabelsAt = 0;
+          tickAllGardens(Date.now());
+          return this.plots();
+        },
+        plots() {
+          const now = Date.now();
+          return gardens.flatMap((t) => listPlotKeys(t.state.garden).map((key) => {
+            const plot = getPlot(t.state.garden, key);
+            // x, y: the plot's spot in the world, as groddleQA.snapshot() gives its target (to click the right one).
+            const at = (t.state.plotTargets || []).find((p) => p.state?.plotKey === key)?.sprite;
+            return { bed: t.state.garden.gardenType, key, state: plot.state, seed: plot.seed, wet: plot.wet, pace: plot.pace ?? null, wetPace: plot.wetPace ?? null, label: plotStatusLabel(plot, now), x: at?.x ?? null, y: at?.y ?? null };
+          }));
+        },
+      };
+    }
+  } catch {
+    // no location (tests)
+  }
+}
+
+/**
  * QA `?gardenstates=1`: the plots of every garden drawn take a spread of states, so one look
  * shows them all: crop gardens empty, seeds, seedling dry, fertilized, grown tomato and corn,
  * harvested dry and wet; herb gardens empty wet, herb seedling dry and wet, grown rubeweed,
@@ -29149,7 +29189,13 @@ function refreshGardenVisual(target) {
   if (entity) drawGardenPlots(entity);
 }
 
+/** When the growing plots' time-left words were last brought up to date (they count in minutes). */
+let gardenLabelsAt = 0;
+const GARDEN_LABEL_EVERY_MS = 5000;
+
 function tickAllGardens(now = Date.now()) {
+  const relabel = now - gardenLabelsAt >= GARDEN_LABEL_EVERY_MS || now < gardenLabelsAt;
+  if (relabel) gardenLabelsAt = now;
   for (const t of gardens) {
     const garden = t.state?.garden;
     if (!garden) continue;
@@ -29157,6 +29203,12 @@ function tickAllGardens(now = Date.now()) {
     if (changed.length) {
       refreshGardenVisual(t);
       if (activeGarden === garden && isGardenOpen()) renderGardenPanel();
+    } else if (relabel) {
+      // A growing plot says how long is left ("ready in 12 min"): keep the words current.
+      for (const plotTarget of t.state.plotTargets || []) {
+        const plot = plotTarget.state?.plot;
+        if (plot?.state === 'seeds' || plot?.state === 'shoots') plotTarget.subtitle = plotStatusLabel(plot, now);
+      }
     }
   }
   tickAllMineRocks(now);
@@ -32028,7 +32080,7 @@ async function main() {
   }
   // Garden talkback QA (js/garden-talk-qa.js): ?gardentalkdemo=herb|crop.
   if (new URLSearchParams(location.search).has('gardentalkdemo')) {
-    import('./js/garden-talk-qa.js?v=e334273e').then((m) => m.runGardenTalkDemo({ engine, executeVerb, params: new URLSearchParams(location.search) }));
+    import('./js/garden-talk-qa.js?v=f28e30df').then((m) => m.runGardenTalkDemo({ engine, executeVerb, params: new URLSearchParams(location.search) }));
   }
   // MEMQA (ticket 21, Safari's memory reload in Naraka): ?memqa=1 lets a probe walk streets through the
   // real street trip (tools/qa/street-memory.mjs). Solo pages only: online pages drop their params.

@@ -48,7 +48,8 @@
  * QA: canvas data sharedGardens (street:snap|none|local|waiting), sharedGardensLast
  * (plot:verb:ok|code), sharedGardensView (each plot as this page has it: default:1-1=crop@7,
  * the planter while locked). window.groddleSharedGardens: plots(), dev({ lock, water }) for a
- * server started with GRODDLE_GARDENS_DEV=1.
+ * server started with GRODDLE_GARDENS_DEV=1, and dev({ skip: ms }) to let garden time pass there
+ * (crops take minutes to an hour: a check skips ahead instead of waiting).
  */
 
 import {
@@ -62,7 +63,7 @@ import {
   hasWateringCan,
   pickSeedToPlant,
   seedFitsGarden,
-} from '../garden.js?v=eae8b052';
+} from '../garden.js?v=1e8a887d';
 import { HOE_TOOLS, WATERING_CAN_TOOLS, canUseTool, firstWorkingTool } from '../tools.js?v=5f482998';
 import { addItem, countItem, ITEM_CATALOG, itemIcon } from '../inventory.js?v=60dfc9ca';
 import { JOB_WORK_OVERLAY, jobWorkToolScale, jobWorkToolSheet } from '../job-work-fx.js?v=a040a5a7';
@@ -78,7 +79,7 @@ import {
   parsePlotId,
   plotId,
   rollPasses,
-} from '../shared-gardens.js?v=47984e60';
+} from '../shared-gardens.js?v=43c290ef';
 
 export const SHARED_GARDENS_FEATURE_ID = 'shared-gardens';
 const REQUEST_TIMEOUT_MS = 8000;
@@ -658,7 +659,7 @@ export const sharedGardensFeature = {
       window.groddleSharedGardens = {
         plots: () => Object.fromEntries(copy.plots),
         beds: () => Object.fromEntries([...copy.beds].map(([bed, g]) => [bed, g.plots])),
-        dev: (opts = {}) => client?.send('garden_dev', { lock: Number(opts.lock) || 0, water: Number(opts.water) || 0 }),
+        dev: (opts = {}) => client?.send('garden_dev', { lock: Number(opts.lock) || 0, water: Number(opts.water) || 0, skip: Number(opts.skip) || 0 }),
         state: () => ({ street: copy.street, snap: copy.snap, none: copy.none, pending: pending.size, applied: applied.length, stripped }),
         count: (c) => countItem(engine.inv, String(c)),
         me: () => me(),

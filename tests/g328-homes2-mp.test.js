@@ -37,13 +37,13 @@ import {
   tendAct,
   tendCounters,
   tendedText,
-} from '../public/js/neighbours-mp.js?v=91c8e177';
+} from '../public/js/neighbours-mp.js?v=6d97976d';
 import { createButlerState, giveGiftTo, newestVisit, nextHandover, normalizeButlerState, packagesAndMessagesForOwner, recordVisitor, setGift, visitorsReport } from '../public/js/butler.js?v=4a4b82a2';
-import { createGarden, tickGarden } from '../public/js/garden.js?v=eae8b052';
+import { GARDEN_SPEEDUP, SEED_CATALOG as GARDEN_SEEDS, createGarden, tickGarden } from '../public/js/garden.js?v=1e8a887d';
 import { butlerApi } from '../public/js/features/butler-feature.js?v=1e184f0b';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=10b118dd';
 import { acceptOffer, routeQuestEvent } from '../public/js/quest-offers.js?v=9c53455c';
-import { neighboursMpFeature } from '../public/js/features/neighbours-mp-feature.js?v=aea63cf8';
+import { neighboursMpFeature } from '../public/js/features/neighbours-mp-feature.js?v=167ad85b';
 import { createMinnAccount } from '../public/js/minn-account.js?v=8f2741cd';
 import { HAS_SERVER, HAS_SITE, SITE_DIR, serverPath, sitePath } from '../tools/repos.mjs';
 
@@ -142,7 +142,12 @@ describe('key-holders tending the owner\'s gardens', () => {
     assert.equal(applyTendAct(g, { plot: '1-1', act: 'plant', seed: 'seed_spinach', at: 1000 }, tickGarden), true);
     assert.equal(applyTendAct(g, { plot: '1-1', act: 'water', at: 2000 }, tickGarden), true);
     assert.deepEqual(plotsSnapshot(g)['1-1'], { state: 'seeds', seed: 'seed_spinach', wet: true });
-    tickGarden(g, 2000 + 4000);
+    // The seed and the water are on today's garden clock, as the owner's own would be.
+    assert.equal(g.plots['1-1'].pace, GARDEN_SPEEDUP);
+    assert.equal(g.plots['1-1'].wetPace, GARDEN_SPEEDUP);
+    tickGarden(g, 2000 + GARDEN_SEEDS.seed_spinach.grow1Ms - 1);
+    assert.equal(g.plots['1-1'].state, 'seeds');
+    tickGarden(g, 2000 + GARDEN_SEEDS.seed_spinach.grow1Ms);
     assert.equal(g.plots['1-1'].state, 'shoots');
     assert.equal(applyTendAct(g, { plot: '9-9', act: 'water', at: 1 }), false);
     const acts = normalizeTendActs([{ id: 'tend-0000000000000001', from: { id: 9, name: 'Bo' }, yard: 'back', garden: 'g1', plot: '1-2', act: 'water', at: 5 }, { garden: 'g1', plot: 'x', act: 'water' }]);

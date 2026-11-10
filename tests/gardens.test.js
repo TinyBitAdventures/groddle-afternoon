@@ -36,6 +36,16 @@ import {
   gardenVendorOffers,
   suggestedPlotAction,
   GARDEN_WATER_MS,
+  GARDEN_SPEEDUP,
+  GARDEN_HOUR_MS,
+  LEGACY_GARDEN,
+  legacyGrowMs,
+  plotStageMs,
+  plotWaterMs,
+  plotRipeInMs,
+  gardenWaitLabel,
+  sowPlot,
+  wetPlot as pourWater,
   gardenActionProfile,
   GARDEN_TALKBACKS,
   GARDEN_TALKBACK_MS,
@@ -44,10 +54,10 @@ import {
   plotNeedsWater,
   gardenNeedsWater,
   GARDEN_NO_DRY_PLOTS_LINE,
-} from '../public/js/garden.js?v=eae8b052';
-import { getVerbsFor, runVerb } from '../public/content.js?v=eda9ba3f';
+} from '../public/js/garden.js?v=1e8a887d';
+import { getVerbsFor, runVerb } from '../public/content.js?v=0c78b59c';
 import { plotPieces } from '../public/js/garden-view.js?v=3683a26f';
-import { plotsFor } from '../public/js/master-garden.js?v=bcd9ac74';
+import { plotsFor } from '../public/js/master-garden.js?v=2953386a';
 import {
   createInventory,
   countItem,
@@ -55,7 +65,7 @@ import {
   listPackToolSlots,
   isToolItem,
 } from '../public/js/inventory.js?v=60dfc9ca';
-import { DEFAULT_VENDOR, vendorBuy } from '../public/js/vendor.js?v=595411dd';
+import { DEFAULT_VENDOR, vendorBuy } from '../public/js/vendor.js?v=0c55a0bf';
 import { HAS_SITE, SITE_DIR } from '../tools/repos.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -189,7 +199,7 @@ describe('plot lifecycle clean → plant → water → grow → harvest → clea
     assert.equal(r.baseCount, 12); // round(23 / 2)
   });
 
-  it('wetness lasts 12 hours, pauses growth when dry, and carries over', () => {
+  it('wetness lasts 12 garden hours, pauses growth when dry, and carries over', () => {
     const garden = createGarden({ cols: 1, rows: 1, now: 0 });
     const key = '1-1';
     const inv = createInventory({ seed_potato: 2 });
@@ -204,7 +214,7 @@ describe('plot lifecycle clean → plant → water → grow → harvest → clea
     assert.equal(plot.state, 'seeds');
     assert.equal(plot.growthMs, GARDEN_WATER_MS);
     assert.equal(plotGrowProgress(plot, GARDEN_WATER_MS * 3), 0.6);
-    // Re-watering resumes from the banked 12 hours.
+    // Re-watering resumes from the banked 12 garden hours.
     waterPlot(garden, key, pc, { now: GARDEN_WATER_MS * 3, requireTool: false });
     assert.deepEqual(tickGarden(garden, GARDEN_WATER_MS * 3 + H * 7), []);
     assert.deepEqual(tickGarden(garden, GARDEN_WATER_MS * 3 + H * 8), [key]);
@@ -303,10 +313,8 @@ describe('plot lifecycle clean → plant → water → grow → harvest → clea
 
   it('plotGrowProgress is 0 when dry and advances when wet', () => {
     const plot = createEmptyPlot(0);
-    plot.state = 'seeds';
-    plot.seed = 'seed_spinach';
+    sowPlot(plot, 'seed_spinach', 0);
     plot.wet = false;
-    plot.stageStartedAt = 0;
     assert.equal(plotGrowProgress(plot, 99999), 0);
     plot.wet = true;
     const mid = SEED_CATALOG.seed_spinach.grow1Ms / 2;
@@ -562,7 +570,7 @@ describe('the tick catches up across every stage the time covers (G561)', () => 
   const T0 = 1_700_000_000_000;
   const H = GARDEN_WATER_MS / 12;
   const DRY = T0 + GARDEN_WATER_MS;
-  const wetPlot = (seed, state, o = {}) => ({ state, seed, wet: true, wetAt: T0, stageStartedAt: T0, growthMs: 0, growModifier: 1, ...o });
+  const wetPlot = (seed, state, o = {}) => ({ state, seed, wet: true, wetAt: T0, stageStartedAt: T0, growthMs: 0, growModifier: 1, pace: GARDEN_SPEEDUP, wetPace: GARDEN_SPEEDUP, ...o });
   const tickOne = (plot, now) => {
     const garden = { plots: { '1-1': structuredClone(plot) } };
     const changed = tickGarden(garden, now);
@@ -587,6 +595,28 @@ describe('the tick catches up across every stage the time covers (G561)', () => 
   cases.push({ name: 'crop dries', plot: wetPlot('seed_spinach', 'crop'), now: T0 + 13 * H });
   cases.push({ name: 'clean dries', plot: wetPlot(null, 'clean'), now: T0 + 13 * H });
   cases.push({ name: 'dirty stays wet', plot: wetPlot(null, 'dirty'), now: T0 + H });
+  // The same looks at plots stored before the garden's speed changed (no pace, no wetPace): the
+  // old stage times and the old 12 real hours of water, on both sides.
+  const OLD_H = LEGACY_GARDEN.waterMs / 12;
+  const OLD_DRY = T0 + LEGACY_GARDEN.waterMs;
+  const oldPlot = (seed, state, o = {}) => ({ state, seed, wet: true, wetAt: T0, stageStartedAt: T0, growthMs: 0, growModifier: 1, ...o });
+  for (const [id, s] of Object.entries(SEED_CATALOG)) {
+    const l1 = legacyGrowMs(s.grow1H);
+    const l2 = legacyGrowMs(s.grow2H);
+    for (const dt of [0, l1 - 1, l1, l1 + l2 - 1, l1 + l2, s.grow1Ms, GARDEN_WATER_MS, LEGACY_GARDEN.waterMs - 1, LEGACY_GARDEN.waterMs, 13 * OLD_H]) {
+      cases.push({ name: `old ${id} +${dt}`, plot: oldPlot(id, 'seeds'), now: T0 + dt });
+    }
+    cases.push({ name: `old ${id} Growth Spurt`, plot: oldPlot(id, 'seeds', { growModifier: 0.9 }), now: T0 + Math.ceil(l1 * 0.9) });
+    cases.push({ name: `old ${id} planted just before it dried`, plot: oldPlot(id, 'seeds', { stageStartedAt: OLD_DRY - Math.floor(l1 / 2) }), now: T0 + 13 * OLD_H });
+    cases.push({ name: `old ${id} planted 3 hours after the water`, plot: oldPlot(id, 'seeds', { stageStartedAt: T0 + 3 * OLD_H }), now: T0 + 3 * OLD_H + l1 + l2 });
+    cases.push({ name: `old ${id} dry with banked growth`, plot: { ...oldPlot(id, 'seeds', { growthMs: 1000 }), wet: false, wetAt: null }, now: T0 + 13 * OLD_H });
+    // Mixed: an old crop under new water, a new crop under old water.
+    cases.push({ name: `old ${id} under new water`, plot: oldPlot(id, 'seeds', { wetPace: GARDEN_SPEEDUP }), now: T0 + l1 + l2 });
+    cases.push({ name: `new ${id} under old water, 3 hours in`, plot: oldPlot(id, 'seeds', { pace: GARDEN_SPEEDUP, stageStartedAt: T0 + 3 * OLD_H }), now: T0 + 3 * OLD_H + l1 + l2 });
+    cases.push({ name: `new ${id} under old water, ripe`, plot: oldPlot(id, 'seeds', { pace: GARDEN_SPEEDUP, stageStartedAt: T0 + 3 * OLD_H }), now: T0 + 3 * OLD_H + s.grow1Ms + s.grow2Ms });
+  }
+  cases.push({ name: 'old crop keeps its 12 hours', plot: oldPlot('seed_spinach', 'crop'), now: T0 + GARDEN_WATER_MS * 2 });
+  cases.push({ name: 'old clean dries at 12 hours', plot: oldPlot(null, 'clean'), now: T0 + 13 * OLD_H });
 
   it('a plot watered and planted 13 hours ago is a crop, dry, its stages ended at their own times', () => {
     const s = SEED_CATALOG.seed_spinach;
@@ -597,7 +627,7 @@ describe('the tick catches up across every stage the time covers (G561)', () => 
     assert.equal(plot.wetAt, null);
     assert.equal(plot.stageStartedAt, DRY);
     assert.equal(plot.growthMs, 0);
-    // Watered 13 hours ago but planted later: the crop came 8 s after planting, not 13 hours.
+    // Watered an hour of garden time ago but planted later: the crop came its own grow time after planting.
     const late = tickOne(wetPlot('seed_spinach', 'seeds', { stageStartedAt: T0 + H }), T0 + H + s.grow1Ms + s.grow2Ms);
     assert.equal(late.plot.state, 'crop');
     assert.equal(late.plot.wet, true);
@@ -638,7 +668,7 @@ describe('the tick catches up across every stage the time covers (G561)', () => 
       echo json_encode($out);`;
     const site = JSON.parse(execFileSync('php', ['-r', code, '--', JSON.stringify(cases)], { encoding: 'utf8' }));
     assert.equal(site.length, cases.length);
-    const pick = (p) => ({ state: p.state, wet: p.wet, wetAt: p.wetAt ?? null, stageStartedAt: p.stageStartedAt, growthMs: p.growthMs });
+    const pick = (p) => ({ state: p.state, wet: p.wet, wetAt: p.wetAt ?? null, stageStartedAt: p.stageStartedAt, growthMs: p.growthMs, pace: p.pace ?? null, wetPace: p.wet ? p.wetPace ?? null : null });
     cases.forEach((c, i) => assert.deepEqual(pick(tickOne(c.plot, c.now).plot), pick(site[i]), c.name));
     // The fixture reaches every stage both ways.
     const states = new Set(site.map((p) => `${p.state}/${p.wet}`));

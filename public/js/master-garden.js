@@ -28,10 +28,10 @@
  *   catalog_skill_packages.js mg_croppery_* / mg_herbalism_*
  *
  * Plots are js/garden.js plots: { state, seed, wet, stageStartedAt,
- * growModifier }. Growth uses SEED_CATALOG grow1Ms / grow2Ms.
+ * growModifier, pace, wetPace }. Growth uses js/garden.js plotStageMs (sowPlot sets the plot's clock).
  */
 
-import { SEED_CATALOG, applyFertilizer, wetPlot, stageElapsedMs } from './garden.js?v=eae8b052';
+import { SEED_CATALOG, applyFertilizer, sowPlot, wetPlot, stageElapsedMs } from './garden.js?v=1e8a887d';
 import { gardenGrowModifier } from './imagination-effects.js?v=70169933';
 import { skillPackageDetails } from './skill-packages.js?v=bfb87281';
 import { metabolicGain, moodMax, loseEnergy } from './metabolics.js?v=8504134e';
@@ -243,12 +243,7 @@ export function potionTendGarden(garden, action, inv, pc, ctx = {}) {
       if (!pay()) break;
       inv[ctx.seedId] -= 1;
       if (inv[ctx.seedId] <= 0) delete inv[ctx.seedId];
-      plot.state = 'seeds';
-      plot.seed = seed.seedId;
-      plot.fertilized = false;
-      plot.growModifier = 1 - gardenGrowModifier(type, ctx.upgrades || []);
-      plot.stageStartedAt = now;
-      plot.growthMs = 0;
+      sowPlot(plot, seed.seedId, now, 1 - gardenGrowModifier(type, ctx.upgrades || []));
       count += 1;
     } else if (action === 'pick') {
       if (plot.state !== 'crop' || !plot.seed) continue;

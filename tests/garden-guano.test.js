@@ -9,7 +9,7 @@ import assert from 'node:assert/strict';
 import { execFileSync, spawnSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { HAS_SITE, SITE_DIR } from '../tools/repos.mjs';
-import {
+import { GARDEN_SPEEDUP,
   FERTILIZE_TEXT,
   GARDEN_FERTILIZE_MS,
   GARDEN_WATER_MS,
@@ -23,18 +23,18 @@ import {
   tickGarden,
   gardenActionProfile,
   gardenTalkbackKey,
-} from '../public/js/garden.js?v=eae8b052';
-import { getVerbsFor, runVerb } from '../public/content.js?v=eda9ba3f';
+} from '../public/js/garden.js?v=1e8a887d';
+import { getVerbsFor, runVerb } from '../public/content.js?v=0c78b59c';
 import { actionDurationFor, actionLabelFor } from '../public/js/action-timing.js?v=5db4e91b';
 import { gardenPlotEvents } from '../public/js/quest-offers.js?v=9c53455c';
-import { applyTendAct, normalizeTendActs, plotsSnapshot, tendAct, tendedText } from '../public/js/neighbours-mp.js?v=91c8e177';
-import { guanoOver, plotHit } from '../public/js/features/garden-guano-feature.js?v=404cbf75';
+import { applyTendAct, normalizeTendActs, plotsSnapshot, tendAct, tendedText } from '../public/js/neighbours-mp.js?v=6d97976d';
+import { guanoOver, plotHit } from '../public/js/features/garden-guano-feature.js?v=5596a952';
 
 const NOW = 1_000_000_000;
 
 function bed(state = 'seeds', extra = {}) {
   const garden = createGarden({ cols: 2, rows: 1, now: NOW });
-  Object.assign(garden.plots['1-1'], { state, seed: state === 'clean' ? null : 'seed_spinach', wet: true, wetAt: NOW, stageStartedAt: NOW, growthMs: 0, growModifier: 1 }, extra);
+  Object.assign(garden.plots['1-1'], { state, seed: state === 'clean' ? null : 'seed_spinach', wet: true, wetAt: NOW, stageStartedAt: NOW, growthMs: 0, growModifier: 1, pace: GARDEN_SPEEDUP, wetPace: GARDEN_SPEEDUP }, extra);
   return { garden, plot: garden.plots['1-1'] };
 }
 

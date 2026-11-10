@@ -2,12 +2,14 @@
  * Crop gardens — simplified from GSJS items/include/garden.js + seed_*.js.
  *
  * Plot states (original): clean → seeds → shoots → crop → dirty → (clear) clean
- * Growth only advances while wet. Watering keeps a plot wet for 12 hours
+ * Growth only advances while wet. A watering lasts 12 garden hours
  * (timings.water); a plot that dries pauses its growth until watered again.
  * Wetness carries over through picking, hoeing and replanting, and any dry plot
  * takes water, an empty one too (G537), so a seed planted there grows at once.
  *
- * Grow timings are demo-scaled seconds (original used hours × garden_grow_multiplier).
+ * Garden time runs GARDEN_SPEEDUP times faster than Glitch's (below): the seeds keep the
+ * source's hours (time_grow1, time_grow2 x config.garden_grow_multiplier, 1.0 on prod) and
+ * every time here is those hours at that speed.
  * Produce counts are the GSJS seed classProps produces_count.
  */
 
@@ -27,6 +29,8 @@ import { grantMoodXp } from './mood-xp.js?v=958e7680';
  *   cropId: string,
  *   cropLabel: string,
  *   produces: number,
+ *   grow1H: number,
+ *   grow2H: number,
  *   grow1Ms: number,
  *   grow2Ms: number,
  *   gardenType: 'default'|'herb',
@@ -35,12 +39,65 @@ import { grantMoodXp } from './mood-xp.js?v=958e7680';
  */
 
 /**
- * GSJS seed_base classProps (time_grow in hours) → demo ms.
- * Scale: hours × 8s so spinach is quick, potato still a wait.
- * @param {number} hours
+ * How many times faster than Glitch a garden runs (Austin 2026-11-10: about 10, beside the
+ * other sped-up systems: a mining swing is 8 times, a rock's respawn about 11). The one number
+ * every garden time comes from, here, in the realtime server's data/gardens.json
+ * (tools/build-realtime-gardens.mjs) and in the site's data/garden-seeds.json
+ * (tools/build-garden-seeds.mjs): change it, run those two builders, and all three agree.
  */
-/** include/garden.js timings.water: hours a watering lasts (not grow-scaled). */
-export const GARDEN_WATER_MS = 12 * 60 * 60 * 1000;
+export const GARDEN_SPEEDUP = 10;
+
+/** One hour of the source's garden time, in real ms (6 minutes at 10 times). */
+export const GARDEN_HOUR_MS = Math.round(3_600_000 / GARDEN_SPEEDUP);
+
+/** include/garden.js 3-4 timings.water: the hours a watering lasts. */
+export const GARDEN_WATER_HOURS = 12;
+
+/** A watering at the garden's speed (72 minutes at 10 times): about one long crop, as in Glitch. */
+export const GARDEN_WATER_MS = GARDEN_WATER_HOURS * GARDEN_HOUR_MS;
+
+/**
+ * The clock gardens ran on before GARDEN_SPEEDUP (8 s a source hour and never under 4 s a stage,
+ * so 8 to 92 s a crop; a watering was 12 real hours). A crop planted then finishes on it, and a
+ * watering poured then lasts its 12 hours: a plot says which clock its crop and its water run on
+ * with `pace` (set at planting) and `wetPace` (set at watering), and a plot stored without them
+ * is from before. Nothing in the ground is lost, reset or made to wait when the speed changes.
+ */
+export const LEGACY_GARDEN = Object.freeze({ hourMs: 8000, floorMs: 4000, waterMs: 12 * 60 * 60 * 1000 });
+
+/** A stage of `hours` source hours at the garden's speed, in ms. */
+export function growHoursToMs(hours) {
+  return Math.round(Number(hours) * GARDEN_HOUR_MS);
+}
+
+/** The same stage on the clock from before GARDEN_SPEEDUP. */
+export function legacyGrowMs(hours) {
+  return Math.max(LEGACY_GARDEN.floorMs, Math.round(Number(hours) * LEGACY_GARDEN.hourMs));
+}
+
+/** Whether the crop in this plot was planted on today's clock (else: before it, see LEGACY_GARDEN). */
+export function plotOnPace(plot) {
+  return Number(plot?.pace) === GARDEN_SPEEDUP;
+}
+
+/**
+ * How long a stage of this plot's crop takes, with its grow modifier: on the clock the crop was
+ * planted under. state: 'seeds' (grow 1) or 'shoots' (grow 2); the plot's own when left out.
+ */
+export function plotStageMs(plot, state = plot?.state) {
+  const seed = SEED_CATALOG[plot?.seed];
+  if (!seed || (state !== 'seeds' && state !== 'shoots')) return 0;
+  const mod = Number(plot.growModifier) > 0 ? Number(plot.growModifier) : 1;
+  const base = plotOnPace(plot)
+    ? (state === 'seeds' ? seed.grow1Ms : seed.grow2Ms)
+    : legacyGrowMs(state === 'seeds' ? seed.grow1H : seed.grow2H);
+  return Math.ceil(base * mod);
+}
+
+/** How long this plot's watering lasts: on the clock it was poured under. */
+export function plotWaterMs(plot) {
+  return Number(plot?.wetPace) === GARDEN_SPEEDUP ? GARDEN_WATER_MS : LEGACY_GARDEN.waterMs;
+}
 
 /** Growth so far in the plot's current stage, paused while dry. */
 export function stageElapsedMs(plot, now = Date.now()) {
@@ -51,11 +108,26 @@ export function stageElapsedMs(plot, now = Date.now()) {
   return banked + Math.max(0, now - started);
 }
 
-/** Water a plot: restart a paused stage clock and the 12-hour dry timer. */
+/** Water a plot: restart a paused stage clock and the watering's dry timer (GARDEN_WATER_MS). */
 export function wetPlot(plot, now = Date.now()) {
   if (!plot.wet) plot.stageStartedAt = now;
   plot.wet = true;
   plot.wetAt = now;
+  plot.wetPace = GARDEN_SPEEDUP;
+}
+
+/**
+ * Put a seed in a plot (include/garden.js 357-378): seeds, its stage clock from now, the
+ * planter's grow modifier, and today's clock. Every planting goes through here (a hand, a
+ * Seed Dibber, a key-holder's act), so no new crop is ever taken for one from before.
+ */
+export function sowPlot(plot, seedId, now = Date.now(), growModifier = 1) {
+  plot.state = 'seeds';
+  plot.seed = seedId;
+  plot.fertilized = false;
+  plot.growModifier = Number(growModifier) > 0 ? Number(growModifier) : 1;
+  plot.pace = GARDEN_SPEEDUP;
+  startStage(plot, now);
 }
 
 /** stateChanged('dry'): bank the stage's growth and stop the clock. */
@@ -67,16 +139,13 @@ function dryPlot(plot, at) {
   plot.stageStartedAt = at;
   plot.wet = false;
   plot.wetAt = null;
+  delete plot.wetPace;
 }
 
 /** Enter a new stage (or plant/clear): its clock starts now. */
 function startStage(plot, now) {
   plot.stageStartedAt = now;
   plot.growthMs = 0;
-}
-
-function growHoursToMs(hours) {
-  return Math.max(4000, Math.round(Number(hours) * 8000));
 }
 
 /** @param {Omit<SeedDef,'grow1Ms'|'grow2Ms'> & { grow1H: number, grow2H: number }} def */
@@ -87,6 +156,10 @@ function seedDef(def) {
     cropId: def.cropId,
     cropLabel: def.cropLabel,
     produces: def.produces,
+    // The source's hours (seed_*.js, herb_seed_*.js classProps time_grow1, time_grow2), and the
+    // same two stages at the garden's speed.
+    grow1H: def.grow1H,
+    grow2H: def.grow2H,
     grow1Ms: growHoursToMs(def.grow1H),
     grow2Ms: growHoursToMs(def.grow2H),
     gardenType: def.gardenType || 'default',
@@ -960,6 +1033,7 @@ export function createEmptyPlot(now = Date.now()) {
     stageStartedAt: now,
     growthMs: 0,
     growModifier: 1,
+    // pace, wetPace: the clock the crop and the watering run on (sowPlot, wetPlot; LEGACY_GARDEN).
   };
 }
 
@@ -1025,12 +1099,11 @@ function tickPlot(plot, now) {
   let changed = false;
   for (let step = 0; step < 3 && plot?.wet; step++) {
     if (typeof plot.wetAt !== 'number') plot.wetAt = now;
-    const dryAt = plot.wetAt + GARDEN_WATER_MS;
+    const dryAt = plot.wetAt + plotWaterMs(plot);
     const at = Math.min(now, dryAt);
     const seed = SEED_CATALOG[plot.seed];
     if (seed && (plot.state === 'seeds' || plot.state === 'shoots')) {
-      const mod = Number(plot.growModifier) > 0 ? Number(plot.growModifier) : 1;
-      const need = Math.ceil((plot.state === 'seeds' ? seed.grow1Ms : seed.grow2Ms) * mod);
+      const need = plotStageMs(plot);
       const started = typeof plot.stageStartedAt === 'number' ? plot.stageStartedAt : at;
       const banked = Math.max(0, Number(plot.growthMs) || 0);
       const doneAt = started + Math.max(0, need - banked);
@@ -1182,17 +1255,14 @@ export function plantPlot(garden, key, inv, pc, seedId, opts = {}) {
   }
   const got = applyGardenRewards(pc, profile);
   const now = opts.now ?? Date.now();
-  plot.state = 'seeds';
-  plot.seed = seed.seedId;
-  // Guard: a plot picked by hand after a Dung-Kicker pour kept the mark in older saves.
-  plot.fertilized = false;
-  startStage(plot, now);
   // Growth Spurt / Speedy Herbs cards: crop or herb plots grow 10/20% faster
-  // (include/garden.js plot grow_modifier, set at planting).
-  plot.growModifier = 1 - gardenGrowModifier(
+  // (include/garden.js 361-378 plot grow_modifier, set at planting).
+  // sowPlot also clears the fertilizer mark: a plot picked by hand after a Dung-Kicker pour
+  // kept it in older saves.
+  sowPlot(plot, seed.seedId, now, 1 - gardenGrowModifier(
     seed.gardenType === 'herb' ? 'herb' : 'default',
     opts.upgrades || pc?.imaginationUpgrades || []
-  );
+  ));
   // A plot still wet from before starts growing at once (include/garden.js plant).
   return {
     ok: true,
@@ -1501,11 +1571,18 @@ export const FERTILIZE_TEXT = Object.freeze({
   tipNo: "You can't fertilize this!",
 });
 
-/** water_time / max_water_time: how much of the watering's 12 hours is left, 0 on a dry plot. */
+/** water_time / max_water_time: how much of the watering is left, 0 on a dry plot. */
 export function plotWaterFraction(plot, now = Date.now()) {
   if (!plot?.wet) return 0;
   const wetAt = typeof plot.wetAt === 'number' ? plot.wetAt : now;
-  return Math.max(0, Math.min(1, 1 - (now - wetAt) / GARDEN_WATER_MS));
+  return Math.max(0, Math.min(1, 1 - (now - wetAt) / plotWaterMs(plot)));
+}
+
+/** How long until a wet plot dries, in ms (0 on a dry plot). */
+export function plotWaterLeftMs(plot, now = Date.now()) {
+  if (!plot?.wet) return 0;
+  const wetAt = typeof plot.wetAt === 'number' ? plot.wetAt : now;
+  return Math.max(0, wetAt + plotWaterMs(plot) - now);
 }
 
 /**
@@ -1531,7 +1608,7 @@ export function applyFertilizer(plot, seed, now = Date.now()) {
     plot.state = 'shoots';
     startStage(plot, now);
   } else if (plot.state === 'shoots') {
-    const need = seed.grow2Ms * (plot.growModifier || 1);
+    const need = plotStageMs(plot, 'shoots');
     const left = Math.max(0, need - stageElapsedMs(plot, now));
     plot.stageStartedAt = now - (need - 0.1 * left);
     plot.growthMs = 0;
@@ -1640,20 +1717,55 @@ export function waterAllPlots(garden, pc, opts = {}) {
 }
 
 /**
- * Human-readable plot status for UI.
+ * A wait in plain words: "under a minute", "4 min", "1 h 9 min". Minutes round up, so a
+ * crop is never said to be ready before it is.
+ */
+export function gardenWaitLabel(ms) {
+  const left = Math.max(0, Number(ms) || 0);
+  if (left < 60_000) return 'under a minute';
+  const mins = Math.ceil(left / 60_000);
+  if (mins < 60) return `${mins} min`;
+  const h = Math.floor(mins / 60);
+  const m = mins % 60;
+  return m ? `${h} h ${m} min` : `${h} h`;
+}
+
+/**
+ * Growing time left until the plot is a crop, in ms: the rest of this stage and, for seeds, the
+ * shoots after it. Time only passes while wet (getPlotStatus grow_time, include/garden.js 1166-1174).
+ */
+export function plotRipeInMs(plot, now = Date.now()) {
+  if (!plot || (plot.state !== 'seeds' && plot.state !== 'shoots')) return 0;
+  const left = Math.max(0, plotStageMs(plot) - stageElapsedMs(plot, now));
+  return left + (plot.state === 'seeds' ? plotStageMs(plot, 'shoots') : 0);
+}
+
+/**
+ * Human-readable plot status for UI. A growing plot says how long is left: the original drew a
+ * growth bar and a water bar over the plot (GardenPlotDetails.as 83-96); the words say the same.
  * @param {ReturnType<typeof createEmptyPlot>} plot
  */
-export function plotStatusLabel(plot) {
+export function plotStatusLabel(plot, now = Date.now()) {
   if (!plot) return '—';
   const seed = plot.seed ? SEED_CATALOG[plot.seed] : null;
   const crop = seed?.cropLabel || '';
+  const growing = (stage) => {
+    if (!seed) return `${crop} ${stage}${plot.wet ? ' · wet' : ' · needs water'}`;
+    const ripeIn = plotRipeInMs(plot, now);
+    if (!plot.wet) return `${crop} ${stage} · needs water · ${gardenWaitLabel(ripeIn)} of growing left`;
+    const waterLeft = plotWaterLeftMs(plot, now);
+    // The water runs out first: say when, so the gardener knows to come back with the can.
+    return waterLeft < ripeIn
+      ? `${crop} ${stage} · wet · ready in ${gardenWaitLabel(ripeIn)} · dries in ${gardenWaitLabel(waterLeft)}`
+      : `${crop} ${stage} · wet · ready in ${gardenWaitLabel(ripeIn)}`;
+  };
   switch (plot.state) {
     case 'clean':
       return 'Clean · ready to plant';
     case 'seeds':
-      return `${crop} seeds${plot.wet ? ' · wet' : ' · needs water'}`;
+      return growing('seeds');
     case 'shoots':
-      return `${crop} shoots${plot.wet ? ' · wet' : ' · needs water'}`;
+      return growing('shoots');
     case 'crop':
       return `${crop} ready to harvest!`;
     case 'dirty':
@@ -1670,10 +1782,7 @@ export function plotGrowProgress(plot, now = Date.now()) {
   if (!plot || (plot.state !== 'seeds' && plot.state !== 'shoots')) return 0;
   const seed = SEED_CATALOG[plot.seed];
   if (!seed) return 0;
-  const need =
-    plot.state === 'seeds'
-      ? seed.grow1Ms * (plot.growModifier || 1)
-      : seed.grow2Ms * (plot.growModifier || 1);
+  const need = plotStageMs(plot);
   if (need <= 0) return 1;
   return Math.min(1, Math.max(0, stageElapsedMs(plot, now) / need));
 }

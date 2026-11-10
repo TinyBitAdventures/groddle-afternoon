@@ -4,10 +4,13 @@
  * src/HomeTending.php): for every seed of js/garden.js SEED_CATALOG its
  * garden type and the two stage times the game grows it in (grow1Ms seeds to
  * shoots, grow2Ms shoots to a crop; seedDef: the source's time_grow1 /
- * time_grow2 hours from seed_*.js / herb_seed_*.js classProps, scaled
- * hours x 8 s), and the watering's 12 hours (include/garden.js timings.water,
+ * time_grow2 hours from seed_*.js / herb_seed_*.js classProps at
+ * GARDEN_SPEEDUP times Glitch's speed, "pace"), and the watering
+ * (include/garden.js timings.water's 12 hours at the same speed,
  * GARDEN_WATER_MS), so the site ticks an owner's stored plots as the game
- * does (tickGarden) before it lets a visitor water, plant, clear or harvest.
+ * does. l1/l2 and legacyWaterMs are the clock from before the speed changed
+ * (js/garden.js LEGACY_GARDEN): a stored plot with no pace finishes on it
+ * (tickGarden), before the site lets a visitor water, plant, clear or harvest.
  * Each seed also names its crop and produces_count (c, n), and "shared" lists
  * js/shared-gardens.js SHARED_GARDEN_STREETS, for the one-time payout of a
  * player's own plots on the public gardens (register G368, src/GardenSettle.php).
@@ -24,14 +27,14 @@ import { requireSite, sitePath } from './repos.mjs';
 export const OUT = sitePath('data', 'garden-seeds.json');
 
 export async function gardenSeedsJson() {
-  const { SEED_CATALOG, GARDEN_WATER_MS } = await import('../public/js/garden.js?v=eae8b052');
-  const { SHARED_GARDEN_STREETS } = await import('../public/js/shared-gardens.js?v=47984e60');
+  const { SEED_CATALOG, GARDEN_WATER_MS, GARDEN_SPEEDUP, LEGACY_GARDEN, legacyGrowMs } = await import('../public/js/garden.js?v=1e8a887d');
+  const { SHARED_GARDEN_STREETS } = await import('../public/js/shared-gardens.js?v=43c290ef');
   const seeds = Object.keys(SEED_CATALOG).sort().map((id) => {
     const s = SEED_CATALOG[id];
-    return `${JSON.stringify(id)}:{"t":${JSON.stringify(s.gardenType === 'herb' ? 'herb' : 'default')},"g1":${s.grow1Ms},"g2":${s.grow2Ms},"c":${JSON.stringify(s.cropId)},"n":${s.produces}}`;
+    return `${JSON.stringify(id)}:{"t":${JSON.stringify(s.gardenType === 'herb' ? 'herb' : 'default')},"g1":${s.grow1Ms},"g2":${s.grow2Ms},"l1":${legacyGrowMs(s.grow1H)},"l2":${legacyGrowMs(s.grow2H)},"c":${JSON.stringify(s.cropId)},"n":${s.produces}}`;
   });
-  const doc = 'Written by groddle-afternoon game tools/build-garden-seeds.mjs from js/garden.js SEED_CATALOG: t the garden type, g1/g2 the stage times in ms, c the crop, n produces_count; waterMs how long a watering lasts; shared the public gardens shared online (js/shared-gardens.js).';
-  return `{"_doc":${JSON.stringify(doc)},"waterMs":${GARDEN_WATER_MS},"shared":${JSON.stringify([...SHARED_GARDEN_STREETS])},"seeds":{\n${seeds.join(',\n')}}}\n`;
+  const doc = 'Written by groddle-afternoon game tools/build-garden-seeds.mjs from js/garden.js SEED_CATALOG: t the garden type, g1/g2 the stage times in ms at pace (how many times faster than Glitch a garden runs), l1/l2 the same on the clock before it, c the crop, n produces_count; waterMs how long a watering lasts at pace, legacyWaterMs before it; shared the public gardens shared online (js/shared-gardens.js).';
+  return `{"_doc":${JSON.stringify(doc)},"pace":${GARDEN_SPEEDUP},"waterMs":${GARDEN_WATER_MS},"legacyWaterMs":${LEGACY_GARDEN.waterMs},"shared":${JSON.stringify([...SHARED_GARDEN_STREETS])},"seeds":{\n${seeds.join(',\n')}}}\n`;
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {

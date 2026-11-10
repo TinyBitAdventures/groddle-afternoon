@@ -23,7 +23,7 @@
  * Solo never loads any of this: solo's neighbours are js/neighbours.js.
  */
 
-import { SEED_CATALOG, applyFertilizer } from './garden.js?v=eae8b052';
+import { SEED_CATALOG, applyFertilizer, sowPlot, wetPlot } from './garden.js?v=1e8a887d';
 import { normalizeParcelBox } from './butler.js?v=4a4b82a2';
 
 /** The realtime server's street for a player's home street (homes.go). */
@@ -463,9 +463,7 @@ export function applyTendAct(garden, act, tick = null) {
   const at = Number(act.at) || Date.now();
   if (typeof tick === 'function') tick(garden, at);
   if (act.act === 'water') {
-    if (!plot.wet) plot.stageStartedAt = at;
-    plot.wet = true;
-    plot.wetAt = at;
+    wetPlot(plot, at);
     return true;
   }
   if (act.act === 'guano') {
@@ -476,16 +474,20 @@ export function applyTendAct(garden, act, tick = null) {
     return true;
   }
   if (!['plant', 'clear', 'harvest'].includes(act.act)) return false;
-  plot.state = act.act === 'plant' ? 'seeds' : act.act === 'clear' ? 'clean' : 'dirty';
-  plot.seed = act.act === 'plant' ? String(act.seed || '') || null : null;
   // include/garden.js 553: picking ends the fertilizer with the crop.
   if (act.act !== 'clear' && (plot.fertilized || plot.guanoAt)) {
     plot.fertilized = false;
     plot.guanoAt = null;
   }
+  if (act.act === 'plant') {
+    // The key-holder's seed goes in on today's garden clock, as the owner's own would (sowPlot).
+    sowPlot(plot, String(act.seed || '') || null, at, 1);
+    return true;
+  }
+  plot.state = act.act === 'clear' ? 'clean' : 'dirty';
+  plot.seed = null;
   plot.stageStartedAt = at;
   plot.growthMs = 0;
-  if (act.act === 'plant') plot.growModifier = 1;
   return true;
 }
 

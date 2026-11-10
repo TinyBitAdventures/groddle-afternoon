@@ -10,7 +10,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
-import { getVerbsFor } from '../public/content.js?v=eda9ba3f';
+import { getVerbsFor } from '../public/content.js?v=0c78b59c';
 import { SYNTH_KEY_RECIPES, SYNTH_RECIPES } from '../public/js/synth-sfx.js?v=030fad18';
 
 const root = join(import.meta.dirname, '..');

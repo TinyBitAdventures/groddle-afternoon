@@ -69,7 +69,7 @@ const STATES = new Set(['clean', 'seeds', 'shoots', 'crop', 'dirty']);
 /**
  * A server plot as js/garden.js keeps a plot, on this page's clock (offset: server ms minus local
  * ms). The fields garden.js reads: state, seed, wet, wetAt, stageStartedAt, growthMs, growModifier,
- * fertilized; plus the lock (planter, lockUntil) for this page's own refusal.
+ * fertilized, pace, wetPace; plus the lock (planter, lockUntil) for this page's own refusal.
  */
 export function localPlot(s, offset = 0, now = Date.now()) {
   const at = (ms) => (Number.isFinite(ms) && ms > 0 ? ms - offset : null);
@@ -83,6 +83,10 @@ export function localPlot(s, offset = 0, now = Date.now()) {
     growthMs: Math.max(0, Number(s?.banked) || 0),
     growModifier: Number.isFinite(s?.mod) && s.mod > 0 ? s.mod : 1,
     fertilized: s?.fert === true,
+    // The clock the crop and the watering run on (js/garden.js LEGACY_GARDEN): the server's word,
+    // left off for a plot from before the garden's speed changed (and by a server from before).
+    ...(Number(s?.pace) > 0 ? { pace: Number(s.pace) } : {}),
+    ...(s?.wet === true && Number(s?.wetPace) > 0 ? { wetPace: Number(s.wetPace) } : {}),
     planter: Number(s?.planter) || 0,
     lockUntil: Number(s?.planter) && Number(s?.lock) > 0 ? now + Number(s.lock) : 0,
   };

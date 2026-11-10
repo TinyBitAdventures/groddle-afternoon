@@ -5,7 +5,7 @@
  */
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { createGarden, SEED_CATALOG } from '../public/js/garden.js?v=eae8b052';
+import { createGarden, GARDEN_SPEEDUP, SEED_CATALOG } from '../public/js/garden.js?v=1e8a887d';
 import {
   GARDEN_POTIONS,
   POTION_USES,
@@ -17,7 +17,7 @@ import {
   pickedMessage,
   potionTendGarden,
   usePotion,
-} from '../public/js/master-garden.js?v=bcd9ac74';
+} from '../public/js/master-garden.js?v=2953386a';
 import { remakeStatus } from '../public/js/imagination-remake.js?v=c37ad887';
 
 const MG = ['croppery_1', 'mastergardener_1'];
@@ -77,7 +77,7 @@ describe('whole-garden actions', () => {
   it('fertilized shoots finish in a tenth of their remaining time', () => {
     const g = createGarden({ cols: 1, rows: 1, now: 0 });
     const plot = Object.values(g.plots)[0];
-    Object.assign(plot, { state: 'shoots', seed: 'seed_tomato', wet: true, stageStartedAt: 0, growModifier: 1 });
+    Object.assign(plot, { state: 'shoots', seed: 'seed_tomato', wet: true, stageStartedAt: 0, growModifier: 1, pace: GARDEN_SPEEDUP, wetPace: GARDEN_SPEEDUP });
     const need = SEED_CATALOG.seed_tomato.grow2Ms;
     potionTendGarden(g, 'fertilize', {}, { energy: 50 }, { learned: MG, now: need / 2 });
     const remaining = need - (need / 2 - plot.stageStartedAt);

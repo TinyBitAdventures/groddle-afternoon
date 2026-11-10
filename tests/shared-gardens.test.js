@@ -10,11 +10,11 @@ import { execFileSync, spawnSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { describe, it } from 'node:test';
 
-import { SEED_CATALOG, createGarden, harvestPlot, plantPlot, tickGarden, waterAllPlots, waterPlot } from '../public/js/garden.js?v=eae8b052';
-import { GARDEN_LOCK_MS, LOCK_LINE, SHARED_GARDEN_STREETS, applyPlot, isSharedGardenStreet, localPlot, lockedFor, parsePlotId, plotId, rollPasses } from '../public/js/shared-gardens.js?v=47984e60';
-import { sharedGardensFeature } from '../public/js/features/shared-gardens-feature.js?v=0f69ec43';
-import { FEATURES } from '../public/js/features/index.js?v=e118446f';
-import { mgDetails, potionPlotCount } from '../public/js/master-garden.js?v=bcd9ac74';
+import { SEED_CATALOG, createGarden, harvestPlot, plantPlot, tickGarden, waterAllPlots, waterPlot } from '../public/js/garden.js?v=1e8a887d';
+import { GARDEN_LOCK_MS, LOCK_LINE, SHARED_GARDEN_STREETS, applyPlot, isSharedGardenStreet, localPlot, lockedFor, parsePlotId, plotId, rollPasses } from '../public/js/shared-gardens.js?v=43c290ef';
+import { sharedGardensFeature } from '../public/js/features/shared-gardens-feature.js?v=1859e193';
+import { FEATURES } from '../public/js/features/index.js?v=cdfcc5c6';
+import { mgDetails, potionPlotCount } from '../public/js/master-garden.js?v=2953386a';
 // A fresh pick's save waits for the server's receipt (GRANT_SAVE_DELAY_MS): the tests wait it out.
 const settle = () => new Promise((res) => setTimeout(res, 2700));
 import { HAS_SITE, SITE_DIR, serverPath, sitePath, skipWithoutServer } from '../tools/repos.mjs';
@@ -71,18 +71,22 @@ describe('the server\'s data and growth agree with the game', { skip: skipWithou
     assert.equal(plots, 140, '20 beds, 140 plots');
     for (const [id, s] of Object.entries(SEED_CATALOG)) {
       assert.deepEqual(data.rules.seeds[id], [s.gardenType === 'herb' ? 'herb' : 'default', s.grow1Ms, s.grow2Ms, s.cropId, s.produces], id);
+      assert.deepEqual(data.rules.legacy.seeds[id], [Math.max(4000, s.grow1H * 8000), Math.max(4000, s.grow2H * 8000)], id);
     }
+    assert.deepEqual([data.rules.pace, data.rules.waterMs, data.rules.legacy.waterMs, data.rules.lockMs], [10, 72 * 60_000, 12 * 3_600_000, 60_000]);
   });
 
   it('the page grows each fixture plot as the server does (testdata/garden-growth.json)', () => {
     const cases = JSON.parse(readFileSync(serverPath('testdata', 'garden-growth.json'), 'utf8'));
     for (const c of cases) {
       const r = c.plot;
-      const plot = localPlot({ state: r.s, seed: r.seed, wet: r.wet, wetAt: r.wetAt, stageAt: r.stageAt ?? 0, banked: r.banked, mod: r.mod }, 0, r.stageAt ?? 0);
+      const plot = localPlot({ state: r.s, seed: r.seed, wet: r.wet, wetAt: r.wetAt, stageAt: r.stageAt ?? 0, banked: r.banked, mod: r.mod, pace: r.pace, wetPace: r.wetPace }, 0, r.stageAt ?? 0);
       if (!r.wet) plot.wetAt = null;
       const garden = { plots: { '1-1': plot } };
       // The page ticks every frame; one stage a call (G561) is the same at that pace.
-      for (let t = Math.min(r.stageAt ?? 0, r.wetAt ?? 0); t < c.at; t += 250) tickGarden(garden, t);
+      // (Long cases step a minute at a time: the fixtures from before the garden's speed changed carry no pace.)
+      const step = c.at > 1_000_000 ? 60_000 : 250;
+      for (let t = Math.min(r.stageAt ?? 0, r.wetAt ?? 0); t < c.at; t += step) tickGarden(garden, t);
       tickGarden(garden, c.at);
       const got = { state: plot.state, wet: plot.wet, banked: plot.growthMs };
       for (const [k, want] of Object.entries(c.expect)) assert.equal(got[k], want, `${c.name}: ${k}`);
@@ -306,7 +310,9 @@ describe('the one-time payout by mail (site GardenPayout.php)', { skip: !HAS_SIT
 
   it('the site lists the same ten streets, with each seed\'s crop and count', () => {
     assert.deepEqual(seeds.shared, [...SHARED_GARDEN_STREETS]);
-    assert.deepEqual(seeds.seeds.seed_spinach, { t: 'default', g1: 4000, g2: 4000, c: 'spinach', n: 12 });
+    // 0.5 h and 0.25 h at 10 times Glitch's speed; l1, l2 the clock before it (8 s an hour, 4 s at least).
+    assert.deepEqual(seeds.seeds.seed_spinach, { t: 'default', g1: 180000, g2: 90000, l1: 4000, l2: 4000, c: 'spinach', n: 12 });
+    assert.deepEqual([seeds.pace, seeds.waterMs, seeds.legacyWaterMs], [10, 4320000, 43200000]);
   });
 
   it('pays the full crop for seeds, shoots and crops, on the ten streets only', () => {

@@ -262,6 +262,11 @@ function normalizePlotSnapshot(seed = {}) {
     growthMs: Math.max(0, Math.floor(finite(seed?.growthMs, 0))),
     growModifier: clamp(finite(seed?.growModifier, 1), 0.05, 100),
     fertilized: seed?.fertilized === true,
+    // The clock the crop and the watering run on (js/garden.js sowPlot, wetPlot): kept as
+    // written, and left off a plot stored before them, which then finishes on the old clock
+    // (LEGACY_GARDEN). Never filled in here: that would move an old crop onto the new clock.
+    ...(Number.isFinite(Number(seed?.pace)) && Number(seed.pace) > 0 ? { pace: Number(seed.pace) } : {}),
+    ...(seed?.wet === true && Number.isFinite(Number(seed?.wetPace)) && Number(seed.wetPace) > 0 ? { wetPace: Number(seed.wetPace) } : {}),
   };
 }
 
