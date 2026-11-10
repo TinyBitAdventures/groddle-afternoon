@@ -440,7 +440,9 @@ export function createHomeBuilder({ root, doc = root?.ownerDocument }) {
     const actions = el(doc, 'div', { class: 'hb-banner-actions' }, (m.bannerActions || []).map((b) => button(doc, b, 'hb-bt')));
     const close = el(doc, 'button', { type: 'button', class: 'hb-close', 'aria-label': m.closeLabel || 'Close', title: m.closeLabel || 'Close', text: '×' });
     close.addEventListener('click', () => m.onClose?.());
-    banner.replaceChildren(title, actions, close);
+    // `m.bannerNote`: why a banner button is off, in words under the banner (its buttons point at it).
+    const note = m.bannerNote ? el(doc, 'p', { class: 'hb-banner-note', id: 'homes-banner-note', 'data-home-banner-note': '1', text: m.bannerNote }) : null;
+    banner.replaceChildren(title, actions, close, ...(note ? [note] : []));
   }
 
   function renderTray(m) {

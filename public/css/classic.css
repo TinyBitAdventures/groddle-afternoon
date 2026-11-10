@@ -2715,6 +2715,8 @@
 :root[data-ui="classic"] #game-root .hb-banner .hb-title { color: var(--c-classic-title); font: 800 calc(var(--fs-classic-row-title) * var(--cu-n, 1))/1.1 var(--font-classic-title); }
 :root[data-ui="classic"] #game-root .hb-banner .hb-hint { color: var(--c-classic-text); font-size: calc(var(--fs-classic-count) * var(--cu-n, 1)); line-height: 1.2; }
 :root[data-ui="classic"] #game-root .hb-banner-actions { gap: calc(4 * var(--cu)); }
+/* Report #182: the reason a toolbar button is off, a tab of the header's own colour hung under it. */
+:root[data-ui="classic"] #game-root .hb-banner .hb-banner-note { padding: calc(3 * var(--cu)) calc(12 * var(--cu)) calc(4 * var(--cu)); border-radius: 0 0 calc(6 * var(--cu)) calc(6 * var(--cu)); background: var(--c-classic-page); box-shadow: 0 1px 3px color-mix(in srgb, var(--c-classic-ink) 25%, transparent); color: var(--c-classic-text); font-size: calc(var(--fs-classic-energy) * var(--cu-n, 1)); line-height: 1.25; }
 :root[data-ui="classic"] #game-root :is(.hb-banner, .hb-tray, .hb-pop) .hb-bt {
   display: inline-flex;
   flex-direction: column;

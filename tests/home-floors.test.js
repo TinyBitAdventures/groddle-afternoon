@@ -16,6 +16,7 @@ import {
   DOOR_JOB,
   DOOR_JOB_PHASES,
   DOOR_TEXT,
+  EXPAND_NOTE,
   MAX_FLOORS,
   addFloor,
   clearPendingDoor,
@@ -27,15 +28,16 @@ import {
   doorPlaceCheck,
   doorRole,
   expandHouseFloors,
+  expandNote,
   floorCount,
   quoteHouseExpansion,
   quoteHouseUnexpand,
   unexpandHouseFloors,
   wallExpandItems,
-} from '../public/js/home-floors.js?v=40335c45';
+} from '../public/js/home-floors.js?v=16e242ce';
 import { createHomeDecorState, placeFurniture } from '../public/js/home-decor.js?v=d6fabb62';
 import { FURNITURE_CATALOG, FURNITURE_STORE } from '../public/js/homes-catalog.js?v=10ac34b6';
-import { furnitureStoreProfile } from '../public/js/features/homes-feature.js?v=ff63e234';
+import { furnitureStoreProfile } from '../public/js/features/homes-feature.js?v=576d0fef';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const GSJS = join(homedir(), 'Documents/glitch-audit/glitch-GameServerJS');
@@ -195,9 +197,77 @@ describe('expanding a house with floors (homes_get_expand_costs, homes_extend)',
   });
 });
 
+describe('the Expand button says what it needs while it is off (report #182)', () => {
+  const CLIENT = join(homedir(), 'Documents/glitch-audit/glitch-client/com/tinyspeck/engine');
+  const client = (f) => (existsSync(join(CLIENT, f)) ? readFileSync(join(CLIENT, f), 'utf8') : null);
+
+  it('one floor: one Wall Segment, how many you hold, and how one is made', () => {
+    const fs = createFloorsState();
+    const ground = createHomeDecorState();
+    const none = quoteHouseExpansion(fs, ground, {});
+    assert.equal(none.ok, false);
+    assert.equal(expandNote(none, {}), 'The next expansion will cost 1 Wall Segment (you have 0). A Wall Segment is made with a Construction Tool.');
+    // The parts an un-expand gives back are not a Wall Segment yet.
+    const parts = { wood_post: 4, board: 12, barnacle_talc: 15, beam: 1, girder: 1 };
+    assert.equal(expandNote(quoteHouseExpansion(fs, ground, parts), parts), expandNote(none, {}));
+    // With one held the button is on and the note goes.
+    assert.equal(expandNote(quoteHouseExpansion(fs, ground, { wall_segment: 1 }), { wall_segment: 1 }), '');
+    assert.equal(expandNote(null), '');
+  });
+
+  it('taller houses list every item with what you hold of each', () => {
+    const fs = createFloorsState();
+    const { ground, door } = houseWithDoor();
+    fs.pending = { floor: 0, id: door.id };
+    addFloor(fs, ground);
+    const inv = { wall_segment: 1, girder: 2 };
+    const quote = quoteHouseExpansion(fs, ground, inv);
+    assert.equal(quote.reason, 'need_items');
+    const want = wallExpandItems(2, ground.wallSegments - 2);
+    const row = (cls, name, plural) => `${want[cls]} ${want[cls] === 1 ? name : plural} (you have ${inv[cls] || 0})`;
+    const rows = [row('wall_segment', 'Wall Segment', 'Wall Segments'), row('grade_aa_earth_block', 'Urth Block', 'Urth Blocks'), ...(want.girder ? [row('girder', 'Girder', 'Girders')] : [])];
+    assert.equal(expandNote(quote, inv), `The next expansion will cost ${rows.slice(0, -1).join(', ')} and ${rows[rows.length - 1]}. ${EXPAND_NOTE.made}`);
+    // Three floors, the eighth wall: three of each.
+    const three = { ok: false, reason: 'need_items', items: wallExpandItems(3, 7) };
+    assert.equal(
+      expandNote(three, { wall_segment: 3, grade_aa_earth_block: 1 }),
+      'The next expansion will cost 3 Wall Segments (you have 3), 3 Urth Blocks (you have 1) and 3 Girders (you have 0). A Wall Segment is made with a Construction Tool.',
+    );
+  });
+
+  it('the widest house and a floor under construction say so, in the client\'s words', () => {
+    const fs = createFloorsState();
+    const { ground, door } = houseWithDoor();
+    const wide = { ...ground, wallSegments: 20 };
+    assert.equal(quoteHouseExpansion(fs, wide, { wall_segment: 5 }).reason, 'max');
+    assert.equal(expandNote(quoteHouseExpansion(fs, wide, { wall_segment: 5 }), { wall_segment: 5 }), 'Your house is already sooo wide!');
+    fs.pending = { floor: 0, id: door.id };
+    assert.equal(expandNote(quoteHouseExpansion(fs, ground, { wall_segment: 5 }), { wall_segment: 5 }), 'You need to finish up your floor project first!');
+    const dialog = client('port/HouseExpandDialog.as');
+    if (dialog) {
+      assert.ok(dialog.includes("'The next expansion will cost:'"));
+      assert.ok(dialog.includes("title_txt = 'Your '+what+' is already sooo wide!';"));
+      assert.ok(dialog.includes("expand_tip.txt = 'You need to finish up your floor project first!';"));
+    }
+    const req = client('view/ui/decorate/HouseExpandReqUI.as');
+    if (req) assert.ok(req.includes('pc.hasHowManyItems(current_item.tsid)'));
+  });
+
+  it('homes-feature shows the note under the banner in both skins, and notices keep clear of it', () => {
+    const src = readFileSync(join(root, 'public/js/features/homes-feature.js'), 'utf8');
+    assert.match(src, /bannerNote: inTower\(\) \? '' : expandNote\(quoteHouseExpansion\(floors, houseDecor, engine\.inv\), engine\.inv\)/);
+    assert.match(src, /'data-home-expand': 'house', \.\.\.\(quote\.ok \? \{\} : \{ 'aria-describedby': 'homes-banner-note' \}\)/);
+    assert.match(src, /banner\.querySelector\?\.\('\.hb-banner-note'\)\?\.getBoundingClientRect/);
+    const css = readFileSync(join(root, 'public/style.css'), 'utf8');
+    assert.match(css, /#game-root \.hb-banner \.hb-banner-note \{[^}]*top: 100%;[^}]*pointer-events: none;/);
+    assert.match(css, /\[data-ui="modern"\] #game-root \.hb-banner \.hb-banner-note \{/);
+    assert.match(readFileSync(join(root, 'public/css/classic.css'), 'utf8'), /:root\[data-ui="classic"\] #game-root \.hb-banner \.hb-banner-note \{/);
+  });
+});
+
 describe('homes-feature keeps the floors', () => {
   it('saves and restores floors, links and the floor you are on; each upper floor keeps its own stacks', async () => {
-    const { homesFeature } = await import('../public/js/features/homes-feature.js?v=ff63e234');
+    const { homesFeature } = await import('../public/js/features/homes-feature.js?v=576d0fef');
     const engine = { param: () => null, setData() {} };
     const { ground, door } = houseWithDoor(600);
     const fs = createFloorsState();

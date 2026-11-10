@@ -12745,6 +12745,8 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
 #game-root .hb-banner-text { min-width: 0; }
 #game-root .hb-banner .hb-title, #game-root .hb-banner .hb-hint { margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 #game-root .hb-banner-actions { display: flex; align-items: center; flex-wrap: nowrap; }
+/* Why a banner button is off (report #182): one short line hung under the banner, centred on it. Clicks pass through to the room. */
+#game-root .hb-banner .hb-banner-note { position: absolute; top: 100%; left: 50%; transform: translateX(-50%); box-sizing: border-box; width: max-content; max-width: min(760px, calc(100vw - 32px)); margin: 0; text-align: center; text-wrap: balance; pointer-events: none; }
 #game-root .hb-tray { position: absolute; box-sizing: border-box; display: grid; grid-template-columns: auto minmax(0, 1fr); grid-template-areas: "tabs tabs" "panel panel" "filters foot"; }
 #game-root .hb-tray .hb-foot .hb-foot-mirror { display: none !important; }
 #game-root .hb-tray .hb-foot { grid-area: foot; display: flex; align-items: center; justify-content: flex-end; min-width: 0; }
@@ -12810,6 +12812,7 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
 [data-ui="modern"] #game-root .hb-banner .hb-title { color: var(--text); font-size: var(--fs-m); font-weight: var(--fw-heavy); line-height: var(--lh-tight); }
 [data-ui="modern"] #game-root .hb-banner .hb-hint { color: var(--text-muted); font-size: var(--fs-xs); line-height: var(--lh-tight); }
 [data-ui="modern"] #game-root .hb-banner-actions { gap: var(--space-1); padding-left: var(--space-3); border-left: 1px solid var(--border); }
+[data-ui="modern"] #game-root .hb-banner .hb-banner-note { margin-top: var(--space-1); padding: var(--space-1) var(--space-3); border: 1px solid var(--border); border-radius: var(--radius-m); background: var(--surface); box-shadow: var(--shadow-1); color: var(--text); font-size: var(--fs-s); line-height: var(--lh-snug); }
 [data-ui="modern"] #game-root :is(.hb-banner, .hb-tray, .hb-pop) .hb-bt {
   display: inline-flex;
   align-items: center;

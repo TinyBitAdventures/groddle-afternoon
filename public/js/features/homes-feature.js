@@ -169,7 +169,7 @@ import {
   placeCostText,
   swatchFilters,
   trayFilters,
-} from '../ui/home-builder.js?v=90f759e8';
+} from '../ui/home-builder.js?v=b71acd91';
 import { RECIPE_CATALOG } from '../making.js?v=4e72bb4b';
 import {
   createBackYardState,
@@ -275,6 +275,7 @@ import {
   doorPlaceCheck,
   doorRole,
   expandHouseFloors,
+  expandNote,
   floorCount,
   floorDecor,
   itemsText,
@@ -282,7 +283,7 @@ import {
   quoteHouseExpansion,
   quoteHouseUnexpand,
   unexpandHouseFloors,
-} from '../home-floors.js?v=40335c45';
+} from '../home-floors.js?v=16e242ce';
 
 export const HOMES_FEATURE_ID = 'homes';
 const HOME_STREET_TSID = 'RH_HOME_EXT';
@@ -3717,7 +3718,8 @@ function decorateBannerActions(engine) {
       icon: '↔',
       disabled: !quote.ok,
       title: `${about}${!quote.ok && quote.msg ? ` ${quote.msg}` : many ? '' : ` You have ${segments} Wall Segment${segments === 1 ? '' : 's'}.`}`,
-      attrs: { 'data-home-expand': 'house' },
+      // Report #182: the reason is on screen too (decorateModel's bannerNote), and read with the button.
+      attrs: { 'data-home-expand': 'house', ...(quote.ok ? {} : { 'aria-describedby': 'homes-banner-note' }) },
       onClick: () => expandHouse(engine),
     },
     { label: UNEXPAND_TEXT.button, attrs: { 'data-home-unexpand': 'house' }, onClick: () => confirmUnexpand(engine) },
@@ -3734,6 +3736,8 @@ function decorateModel(engine) {
     closeLabel: 'Leave Decoration Mode',
     onClose: () => setMode(engine, null),
     bannerActions: decorateBannerActions(engine),
+    // Report #182: while the house's Expand is off, what it takes and what you hold (HouseExpandDialog's words).
+    bannerNote: inTower() ? '' : expandNote(quoteHouseExpansion(floors, houseDecor, engine.inv), engine.inv),
     // The Pack tab's tooltip says what it is for, as its footer does.
     tabs: DECOR_TABS.map(([id, label]) => ({ id, label, title: id === 'pack' ? BUILDER_TEXT.packNote : '' })),
     tab: tabId,
@@ -5655,7 +5659,10 @@ function reserveBannerZone(engine, force = false) {
   if (!force && now - bannerZoneAt < 500) return;
   bannerZoneAt = now;
   const banner = mode && ui?.builder && !ui.builder.bar.hidden ? ui.builder.banner : null;
-  const r = banner?.getBoundingClientRect?.();
+  const b = banner?.getBoundingClientRect?.();
+  // The banner's note hangs under it (report #182): notices keep clear of both.
+  const n = b?.height ? banner.querySelector?.('.hb-banner-note')?.getBoundingClientRect?.() : null;
+  const r = n?.height ? { left: Math.min(b.left, n.left), top: b.top, right: Math.max(b.right, n.right), bottom: Math.max(b.bottom, n.bottom), height: b.height } : b;
   const host = ui?.root?.getBoundingClientRect?.();
   const rect = r?.height && host ? { left: r.left - host.left, top: r.top - host.top, right: r.right - host.left, bottom: r.bottom - host.top } : null;
   const key = rect ? `${Math.round(rect.left)},${Math.round(rect.top)},${Math.round(rect.right)},${Math.round(rect.bottom)}` : '';

@@ -26,7 +26,7 @@ import {
   panKey,
   placeCostText,
   trayFilters,
-} from '../public/js/ui/home-builder.js?v=90f759e8';
+} from '../public/js/ui/home-builder.js?v=b71acd91';
 import {
   INTERIOR,
   createHomeDecorState,
@@ -385,6 +385,18 @@ describe('the builder DOM', () => {
       onDragEnd: (e, how) => calls.push(`dragend:${how.overTray}`),
     }],
     footActions: [{ label: 'Furniture Store', attrs: { 'data-home-store': '1' }, onClick: () => calls.push('store') }],
+  });
+
+  it('hangs a banner note under the banner while a banner button is off (report #182)', () => {
+    const { b } = setup();
+    b.render(model([]));
+    assert.equal(b.banner.querySelector('.hb-banner-note'), null);
+    b.render({ ...model([]), bannerNote: 'The next expansion will cost 1 Wall Segment (you have 0).' });
+    const note = b.banner.querySelector('.hb-banner-note');
+    assert.equal(note.textContent, 'The next expansion will cost 1 Wall Segment (you have 0).');
+    assert.equal(note.getAttribute('id'), 'homes-banner-note');
+    b.render(model([]));
+    assert.equal(b.banner.querySelector('.hb-banner-note'), null);
   });
 
   it('keeps the old bar id and close class that Shift+D clicks', () => {

@@ -233,6 +233,40 @@ export function quoteHouseExpansion(fs, ground, inv = {}) {
   return { ok: true, items, floors };
 }
 
+/**
+ * The words by the Expand button while it is off (report #182: the reason was only in its hover
+ * tip). The original's Expand always opened HouseExpandDialog, which said all of this on screen:
+ * its title "The next expansion will cost:" (HouseExpandDialog.as:248), a row per item with what
+ * is still missing (HouseExpandReqUI.as:86 "Nx", 132 "Need N more"), the widest house's title
+ * "Your house is already sooo wide!" (:400) and the Expand button's tip while a floor is being
+ * built, "You need to finish up your floor project first!" (:584). `made` is ours: the client
+ * linked each row to its item's info window, which named the recipe (catalog_recipes.js 261).
+ */
+export const EXPAND_NOTE = Object.freeze({
+  cost: 'The next expansion will cost',
+  max: 'Your house is already sooo wide!',
+  locked: 'You need to finish up your floor project first!',
+  made: 'A Wall Segment is made with a Construction Tool.',
+});
+
+/**
+ * quoteHouseExpansion's quote as one line for the screen, '' while Expand is on: what the next
+ * segment takes, how many of each the player holds (the inventory counts, so what sits in a bag
+ * counts, as pc.hasHowManyItems did: PC.as:332), and how a Wall Segment is made.
+ */
+export function expandNote(quote, inv = {}) {
+  if (!quote || quote.ok) return '';
+  if (quote.reason === 'locked') return EXPAND_NOTE.locked;
+  if (quote.reason === 'max') return EXPAND_NOTE.max;
+  if (quote.reason !== 'need_items') return String(quote.msg || '');
+  const rows = Object.entries(quote.items || {}).map(([cls, n]) => {
+    const have = Math.max(0, Math.floor(Number(inv?.[cls]) || 0));
+    return `${n} ${(NAMES[cls] || [cls, cls])[n === 1 ? 0 : 1]} (you have ${have})`;
+  });
+  const list = rows.length > 1 ? `${rows.slice(0, -1).join(', ')} and ${rows[rows.length - 1]}` : rows.join('');
+  return `${EXPAND_NOTE.cost} ${list}. ${EXPAND_NOTE.made}`;
+}
+
 /** homes_extend: one segment on every floor, the items taken once. */
 export function expandHouseFloors(fs, ground, inv = {}) {
   const quote = quoteHouseExpansion(fs, ground, inv);
