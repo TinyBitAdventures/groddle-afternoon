@@ -42,6 +42,11 @@
  *   home sees the rock or node change; the owner's game takes the chunks off
  *   its rock, the use off its node and the wear off its cultivation.
  *
+ * - The owner's placed Magic Sticks (rules and sources in js/yard-fixtures-mp.js)
+ *   stand where the owner set them, to look at: the site's view already
+ *   carries them for the animals' walks. A stick's Pick up is disabled with
+ *   the source's line.
+ *
  * Multiplayer only (engine.mode and the realtime client): solo never runs any
  * of it.
  *
@@ -49,7 +54,8 @@
  * 'plot:<key>' | 'tree:<key>' | 'animal:<id>', standNear(what), refresh();
  * act('rock:rock:0', 'mine') / act('node:node:peat_1:0', 'harvest');
  * canvas data yardVisit (owner:patches:trees:animals:rocks:nodes), yardStock
- * (rock:0=43,node:peat_1:0=3: the copies), yardLast,
+ * (rock:0=43,node:peat_1:0=3: the copies), yardFixtures (the owner's sticks
+ * drawn: magic_pig_stick@812,...), yardLast,
  * yardApplied (acts applied to my home), yardSent (acts the site took).
  */
 
@@ -79,6 +85,7 @@ import {
   visitorAnimalState,
   visitorTreeState,
 } from '../yard-verbs-mp.js?v=6b210e26';
+import { yardFixtureRows, yardFixtureVerbs, yardFixturesKey } from '../yard-fixtures-mp.js?v=ba2a2fe5';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
 import { followYardPath, stickForClass } from '../yard-wander.js?v=06a15d38';
 import { countItem, removeItem } from '../inventory.js?v=60dfc9ca';
@@ -173,6 +180,7 @@ function createSession(engine, client) {
     const v = visit;
     engine.setData?.('yardVisit', v ? `${v.owner}:${v.plots.size}:${v.trees.size}:${v.animals.size}:${v.rocks.size}:${v.nodes.size}` : '');
     engine.setData?.('yardStock', v ? stockView() : '');
+    engine.setData?.('yardFixtures', v ? v.fixturesKey : '');
     engine.setData?.('yardLast', last);
     engine.setData?.('yardApplied', String(appliedCount));
     engine.setData?.('yardSent', String(sentOk));
@@ -192,7 +200,49 @@ function createSession(engine, client) {
         if (e.sprite && !e.sprite.destroyed) e.sprite.destroy();
       }
     }
+    clearFixtures();
     visit = null;
+  }
+
+  /** The owner's placed things a visitor only looks at (js/yard-fixtures-mp.js), as the owner's game draws its own. */
+  function clearFixtures() {
+    for (const e of visit?.fixtures || []) {
+      if (e.target) engine.unregister?.(e.target);
+      if (e.sprite && !e.sprite.destroyed) e.sprite.destroy();
+    }
+    if (visit) {
+      visit.fixtures = [];
+      visit.fixturesKey = '';
+    }
+  }
+
+  function drawFixtures(view) {
+    if (!visit) return;
+    clearFixtures();
+    const rows = yardFixtureRows(view);
+    for (const row of rows) {
+      const sprite = new engine.PIXI.Sprite(textureFromUrl(row.art));
+      sprite.anchor.set(0.5, 1);
+      sprite.scale.set(row.scale);
+      sprite.zIndex = itemZ(row.classTsid, { background: 7, normal: 3 });
+      sprite.x = row.x;
+      sprite.y = STREET_GROUND_Y + 2;
+      sprite._worldHitW = row.hitW;
+      sprite._worldHitH = row.hitH;
+      engine.entityLayer.addChild(sprite);
+      const target = engine.register({
+        classId: row.classTsid,
+        featureId: YARD_VERBS_MP_ID,
+        label: row.label,
+        subtitle: T.notYours(visit.name),
+        sprite,
+        yardFixture: row,
+        // No verb for a visitor (InteractionMenu.as: no choices, a growl).
+        emptyMenuGrowl: T.notYours(visit.name),
+      });
+      visit.fixtures.push({ row, sprite, target });
+    }
+    visit.fixturesKey = yardFixturesKey(rows);
   }
 
   function houseX(view) {
@@ -322,10 +372,11 @@ function createSession(engine, client) {
 
   function draw(view, tsid, name) {
     clearVisit();
-    visit = { owner: view.owner, name, tsid, view, plots: new Map(), trees: new Map(), animals: new Map(), rocks: new Map(), nodes: new Map() };
+    visit = { owner: view.owner, name, tsid, view, plots: new Map(), trees: new Map(), animals: new Map(), rocks: new Map(), nodes: new Map(), fixtures: [], fixturesKey: '' };
     const hx = houseX(view);
     view.patches.forEach((p, i) => drawPatch(p, hx + p.rx, i));
     for (const row of view.animals) drawAnimal(row);
+    drawFixtures(view);
     for (const row of view.stock.rocks) drawRock(row, hx + row.rx);
     spawnNodes(view, hx);
     publish();
@@ -569,6 +620,11 @@ function createSession(engine, client) {
         a.snap = animalUses(a.classId, a.state);
         a.target.subtitle = animalStatusLabel(a.classId, a.state);
       }
+      // A stick set down or taken up since stands, or is gone, here too.
+      if (yardFixturesKey(yardFixtureRows(view)) !== visit.fixturesKey) {
+        drawFixtures(view);
+        publish();
+      }
     } catch (err) {
       console.warn('[yard]', err?.message || err);
     }
@@ -634,6 +690,7 @@ function createSession(engine, client) {
   }
 
   function verbsFor(target) {
+    if (visit && target?.yardFixture) return yardFixtureVerbs(target.yardFixture);
     const e = plotOf(target);
     if (!e) return [];
     return plotVerbs(e.plot, plotCtx())
@@ -1014,6 +1071,8 @@ function createSession(engine, client) {
         // Ticket 99: where each animal is drawn now (the owner's page draws the same walk: canvas extraWalks).
         walks: visit ? Object.fromEntries([...visit.animals].map(([k, a]) => [k, { x: Math.round(a.sprite.x), y: Math.round(a.sprite.y), stick: Boolean(a.walk.stick) }])) : {},
         stock: visit ? stockView() : '',
+        // The owner's placed sticks drawn here: where each stands and the menu a visitor gets on it.
+        fixtures: visit ? visit.fixtures.map((e) => ({ id: e.row.id, classTsid: e.row.classTsid, x: Math.round(e.sprite.x), y: Math.round(e.sprite.y), label: e.target.label, verbs: yardFixtureVerbs(e.row).map((v) => `${v.id}${v.enabled === false ? '!' : ''}`) })) : [],
         applied: applied.length,
         appliedCount,
         sentOk,
