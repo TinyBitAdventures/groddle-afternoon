@@ -9,12 +9,12 @@
   "recoveredWayback": 38,
   "mirrored": 1,
   "downloadsBestFit": 27,
-  "archiveorgSfx": 216,
-  "soundsZip": 186,
+  "archiveorgSfx": 214,
+  "soundsZip": 189,
   "overlayFla": 3,
-  "withFile": 471,
+  "withFile": 472,
   "aliases": 89,
-  "playable": 560,
+  "playable": 561,
   "dead": 3,
   "live": 635
  },
@@ -4299,7 +4299,13 @@
    ],
    "sources": [
     "gsjs:items/still.js:370 (initInstanceProps)"
-   ]
+   ],
+   "file": "assets/audio/sfx/FUELMAKER_LOAD_OPEN.mp3",
+   "origin": "sounds-zip",
+   "why": "still.js:370 distill: the hopper lid as Grain, Corn or Potatoes go into the Still (supply-feature.js)",
+   "zipFile": "1302286163-fuelmaker_loadopen_30.mp3",
+   "zipMd5": "7b13016a54404666c58af056105a7d94",
+   "zipMatch": "filename"
   },
   "FUTURE_SWING_20": {
    "category": "music",
@@ -9065,10 +9071,11 @@
     "gsjs:items/still.js:166 (initInstanceProps)"
    ],
    "file": "assets/audio/sfx/STILL_COLLECT.mp3",
-   "origin": "archiveorg-sfx",
-   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/still-collect.mp3",
-   "archiveItem": "glitch-mmo-sfx-tiny-speck",
-   "archiveFile": "still-collect.mp3"
+   "origin": "sounds-zip",
+   "why": "still.js:166 collect: Hooch is taken from the Still (supply-feature.js). The archive.org copy this key played before (still-collect.mp3) is this take, 11 dB louder (r 0.978), so the server's own file plays instead",
+   "zipFile": "1322173667-Collect_1.3.mp3",
+   "zipMd5": "741471ee915e742825d9d982cf24f5f6",
+   "zipMatch": "same-take"
   },
   "STILL_READY": {
    "category": "making",
@@ -9082,10 +9089,11 @@
     "gsjs:items/still.js:416 (finishWorking)"
    ],
    "file": "assets/audio/sfx/STILL_READY.mp3",
-   "origin": "archiveorg-sfx",
-   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/still-ready.mp3",
-   "archiveItem": "glitch-mmo-sfx-tiny-speck",
-   "archiveFile": "still-ready.mp3"
+   "origin": "sounds-zip",
+   "why": "still.js:413 finishWorking: the Still has run dry or is full, a moment the remake does not have yet. The archive.org copy this key had before (still-ready.mp3) is this take, 8.4 dB louder (r 0.981), so the server's own file is its recording",
+   "zipFile": "1322173657-Ready_1.1.mp3",
+   "zipMd5": "f1d531c34b66a6e6a3e938296d68cb60",
+   "zipMatch": "same-take"
   },
   "STREET_LOADED": {
    "category": "ui",

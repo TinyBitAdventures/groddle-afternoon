@@ -66,7 +66,7 @@ import {
 } from '../garden.js?v=1e8a887d';
 import { HOE_TOOLS, WATERING_CAN_TOOLS, canUseTool, firstWorkingTool } from '../tools.js?v=5f482998';
 import { addItem, countItem, ITEM_CATALOG, itemIcon } from '../inventory.js?v=60dfc9ca';
-import { JOB_WORK_OVERLAY, jobWorkToolScale, jobWorkToolSheet } from '../job-work-fx.js?v=06384465';
+import { JOB_WORK_OVERLAY, jobWorkToolScale, jobWorkToolSheet } from '../job-work-fx.js?v=ca8ba8d6';
 import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=f024bd6a';
 import { gardenGrowModifier } from '../imagination-effects.js?v=70169933';
 import { saveStore } from '../save-store.js?v=8839ba7b';

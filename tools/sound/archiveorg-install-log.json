@@ -5,8 +5,8 @@
   -10
  ],
  "peakCeiling": -1,
- "bytesIn": 32761824,
- "bytesOut": 16854862,
+ "bytesIn": 32479840,
+ "bytesOut": 16681062,
  "files": {
   "ACTIVATE_1": {
    "source": "glitch-mmo-sfx-tiny-speck/activate.mp3",
@@ -1734,28 +1734,6 @@
    "mode": "copy",
    "bytesIn": 123274,
    "bytesOut": 16546
-  },
-  "STILL_COLLECT": {
-   "source": "glitch-mmo-sfx-tiny-speck/still-collect.mp3",
-   "sourceMd5": "74a467ab0d40f68ee954c26f6b6b53c3",
-   "seconds": 3.36,
-   "loudness": -17,
-   "peak": -1.8,
-   "gainDb": 0,
-   "mode": "copy",
-   "bytesIn": 94722,
-   "bytesOut": 93368
-  },
-  "STILL_READY": {
-   "source": "glitch-mmo-sfx-tiny-speck/still-ready.mp3",
-   "sourceMd5": "542874cd7684accf55a9e50bebcae951",
-   "seconds": 2.69,
-   "loudness": -14.2,
-   "peak": -4.2,
-   "gainDb": 0,
-   "mode": "copy",
-   "bytesIn": 187262,
-   "bytesOut": 80432
   },
   "STREET_LOADED": {
    "source": "glitch-mmo-sfx-tiny-speck/street loaded.mp3",

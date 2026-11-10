@@ -49,7 +49,7 @@ import { ecologyForStreet } from '../street-ecology.js?v=08076876';
 import { worldToScreen } from '../street-model.js?v=b6cb6a4e';
 import { signArmWidth } from '../street-render.js?v=881d705a';
 import { getSkillCatalog } from '../content-catalogs.js?v=10b118dd';
-import { GIANTS } from '../shrines.js?v=8fb6c728';
+import { GIANTS } from '../shrines.js?v=56ae73be';
 import { giantDisplayName } from '../giant-names.js?v=0e295891';
 import { teleportationFeature } from './teleportation-feature.js?v=e867c103';
 import {
@@ -127,7 +127,7 @@ import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 import { createMinnAccount } from '../minn-account.js?v=8f2741cd';
 import { normalizeGroups } from '../groups.js?v=c9635d96';
 import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=f024bd6a';
-import { JOB_WORK_OVERLAY, jobWorkFloatPoint, jobWorkSoundKey, jobWorkToolScale, jobWorkToolSheet } from '../job-work-fx.js?v=06384465';
+import { JOB_WORK_OVERLAY, jobWorkFloatPoint, jobWorkSoundKey, jobWorkToolScale, jobWorkToolSheet } from '../job-work-fx.js?v=ca8ba8d6';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
 import { SIGN_ARMS, routeGraph } from '../map-routes.js?v=c7e7dc80';
 import { TELEPORTERS } from '../hidden-floors.js?v=eb220641';

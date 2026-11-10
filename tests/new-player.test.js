@@ -17,12 +17,12 @@ import {
 } from '../public/js/new-player.js?v=d9fa4f61';
 import { createBrowserSaveStore, createMultiplayerSaveStore, createSaveStore } from '../public/js/save-store.js?v=8839ba7b';
 import { createInventory } from '../public/js/inventory.js?v=60dfc9ca';
-import { normalizePlayerSnapshot, parsePlayerSave, restorePlayerSave } from '../public/js/player-save.js?v=cc58c43a';
+import { normalizePlayerSnapshot, parsePlayerSave, restorePlayerSave } from '../public/js/player-save.js?v=cd59da2d';
 import { createQuoinState } from '../public/js/quoins.js?v=237c1d5d';
-import { createShrineState } from '../public/js/shrines.js?v=8fb6c728';
+import { createShrineState } from '../public/js/shrines.js?v=56ae73be';
 import { PARADISE_COURSES, PARADISE_TICKET_IDS } from '../public/js/paradise-flight.js?v=6e0f92a5';
 import { imaginationFeature, STARTER_UPGRADES } from '../public/js/features/imagination-feature.js?v=19c3a230';
-import { RESOURCE_FEATURE_ID, resourceNodesFeature } from '../public/js/features/resource-nodes-feature.js?v=bb375d7b';
+import { RESOURCE_FEATURE_ID, resourceNodesFeature } from '../public/js/features/resource-nodes-feature.js?v=c7011867';
 
 const here = import.meta.dirname;
 const pub = join(here, '..', 'public');

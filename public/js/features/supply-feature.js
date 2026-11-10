@@ -5,6 +5,12 @@
  *    Blockmaker from the stand and three vendor parts (js/machines.js).
  *  - Machines: Refuel from pack Fuel Cells (+50 each, 200 max). Machine
  *    recipes burn the tank, so a Fuelmaker keeps every machine running.
+ *  - Sounds: the stand and each part while a machine is put together, each
+ *    part as it is taken apart (js/machines.js assemblySounds), the hopper
+ *    lid on Distill and the Still's chime on Collect. Not here: STILL_READY,
+ *    which the source rang when a Still ran dry or filled up (still.js
+ *    406-418); this Still's Hooch is counted when you look, with no moment
+ *    of its own.
  *  - Still: Distill Grain, Corn, Potatoes or Bushels into the hopper, then
  *    Collect the Hooch it makes, one every 140 seconds, offline too.
  *  - Butterfly Milk, Butter, the four Cheeses and every herb: Shake,
@@ -368,6 +374,8 @@ function runMachineVerb(classTsid, verbId, engine) {
         : null;
     if (!res) return false;
     storeStill(engine, at);
+    // still.js:370 distill: the hopper lid; still.js:166 collect: the Still's own collect chime.
+    if (res.ok) engine.playSound?.(verb === 'distill' ? 'FUELMAKER_LOAD_OPEN' : 'STILL_COLLECT', verb === 'distill' ? undefined : { volume: 0.6 });
     // still.js:454-455 giveHooch: only Hooch collected in your own home (POL) counts.
     if (res.ok && verb === 'collect' && engine.homeContext?.().inHome) engine.achievement?.('still:collected_in_pol', res.got);
     // still.js:453 giveHooch: quests_inc_counter('make_hooch', hooch) on every collect, for the

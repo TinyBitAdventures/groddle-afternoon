@@ -2410,7 +2410,7 @@
 {"s":"sounds","id":"fuelmaker_case1","n":"Fuelmaker case 1","g":"Machines and making","st":"snd_original","ic":"assets/sprites/icons/fuelmaker.webp","h":"encyclopedia/sounds/fuelmaker_case1/"},
 {"s":"sounds","id":"fuelmaker_core1","n":"Fuelmaker core 1","g":"Machines and making","st":"snd_original","ic":"assets/sprites/icons/fuelmaker.webp","h":"encyclopedia/sounds/fuelmaker_core1/"},
 {"s":"sounds","id":"fuelmaker_engine1","n":"Fuelmaker engine 1","g":"Machines and making","st":"snd_standin","ic":"assets/sprites/icons/fuelmaker.webp","h":"encyclopedia/sounds/fuelmaker_engine1/"},
-{"s":"sounds","id":"fuelmaker_load_open","n":"Fuelmaker load open","g":"Machines and making","st":"snd_synth","ic":"assets/sprites/icons/still.webp","h":"encyclopedia/sounds/fuelmaker_load_open/"},
+{"s":"sounds","id":"fuelmaker_load_open","n":"Fuelmaker load open","g":"Machines and making","st":"snd_original","ic":"assets/sprites/icons/still.webp","h":"encyclopedia/sounds/fuelmaker_load_open/"},
 {"s":"sounds","id":"future_swing_20","n":"Future swing 20","g":"Party and event music","st":"snd_missing","ic":"assets/sprites/icons/musicblock_d_green_01.webp","h":"encyclopedia/sounds/future_swing_20/"},
 {"s":"sounds","id":"future_swing_30","n":"Future swing 30","g":"Party and event music","st":"snd_missing","ic":"assets/sprites/icons/musicblock_d_green_01.webp","h":"encyclopedia/sounds/future_swing_30/"},
 {"s":"sounds","id":"game_go","n":"Game go","g":"New in the remake","st":"snd_synth","ic":"","h":"encyclopedia/sounds/game_go/"},

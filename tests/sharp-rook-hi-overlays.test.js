@@ -75,7 +75,7 @@ function sheets() {
 }
 
 test('the Rook, its halo and every hi sign keep their frames, cells and timings', async () => {
-  const { ROOK_SHEETS, ROOKED_HALO } = await import('../public/js/features/rook-attack-feature.js?v=375d0d61');
+  const { ROOK_SHEETS, ROOKED_HALO } = await import('../public/js/features/rook-attack-feature.js?v=c84d1864');
   const { HI_ART, HI_ART_CELLS, HI_VARIANTS, hiArtSheet } = await import('../public/js/hi-signs.js?v=b90c7d7e');
   const rows = new Map(sheets().map((s) => [s.path, s]));
   assert.equal(rows.size, 2 + 3 * HI_VARIANTS.length);
@@ -156,7 +156,7 @@ test('each has a 3x render of its vector SWF, matched to the 1x frame for frame,
 test('the 3x covers the Rook, its halo and the hi signs where they are drawn; the swoop is the one draw it cannot', async () => {
   const { HIRES_SPRITES, SPLIT_SPRITES } = await import('../public/js/sprite-hires.js?v=dd5da64c');
   const { moduleConsts } = await import('./sheet-sources.js');
-  const { ROOK_SHEETS, ROOKED_HALO } = await import('../public/js/features/rook-attack-feature.js?v=375d0d61');
+  const { ROOK_SHEETS, ROOKED_HALO } = await import('../public/js/features/rook-attack-feature.js?v=c84d1864');
   const stage = await stageScale();
   const density = (path) => (HIRES_SPRITES.has(path) || SPLIT_SPRITES.has(path) ? 3 : 1);
   const home = moduleConsts('js/features/rook-attack-feature.js').get('ROOK_HOME');

@@ -774,6 +774,13 @@
    "why": "fuelmaker.js:824, metalmaker.js:899, woodworker.js:824 onDisassemblePart: the second part comes off (supply-feature.js, disassembly)"
   },
   {
+   "key": "FUELMAKER_LOAD_OPEN",
+   "zip": "1302286163-fuelmaker_loadopen_30.mp3",
+   "md5": "7b13016a54404666c58af056105a7d94",
+   "match": "filename",
+   "why": "still.js:370 distill: the hopper lid as Grain, Corn or Potatoes go into the Still (supply-feature.js)"
+  },
+  {
    "key": "GLITCHMAS_PARTY_LOCATION",
    "zip": "1324484819-Holiday_Party_Space_Loop_2.1.mp3",
    "md5": "6fe2445ea8a98cf427f2ba610c0c110a",
@@ -1122,6 +1129,20 @@
    "why": "the 2011-04 machine-part batch (chassis1/2, engine1/2, plates1/2, fuelmaker_* name their keys); blockmaker_base is the stand the parts go on and STAND1 its only key without a file; forum 29544 \"Assemble Machine Stand\". machine_stand.js 693 plays it when assembly starts, as the remake now does"
   },
   {
+   "key": "STILL_COLLECT",
+   "zip": "1322173667-Collect_1.3.mp3",
+   "md5": "741471ee915e742825d9d982cf24f5f6",
+   "match": "same-take",
+   "why": "still.js:166 collect: Hooch is taken from the Still (supply-feature.js). The archive.org copy this key played before (still-collect.mp3) is this take, 11 dB louder (r 0.978), so the server's own file plays instead"
+  },
+  {
+   "key": "STILL_READY",
+   "zip": "1322173657-Ready_1.1.mp3",
+   "md5": "f1d531c34b66a6e6a3e938296d68cb60",
+   "match": "same-take",
+   "why": "still.js:413 finishWorking: the Still has run dry or is full, a moment the remake does not have yet. The archive.org copy this key had before (still-ready.mp3) is this take, 8.4 dB louder (r 0.981), so the server's own file is its recording"
+  },
+  {
    "key": "TEST",
    "zip": "1339778284-Glowing_Orb_Summer_2.2.mp3",
    "md5": "a41e255f3ca3a5e1752f1d8eb1f74b10",
@@ -1219,12 +1240,6 @@
    "zip": "1286143226-crusher_collision_01.mp3",
    "md5": "0d36de2713bc33abae5728e9ffc7cfa3",
    "why": "crusher.js:172 onPlayerCollision; the remake's Rook's Woods Crusher hit plays a pitched pickup instead (game.js beginRookCrusherHit)."
-  },
-  {
-   "key": "FUELMAKER_LOAD_OPEN",
-   "zip": "1302286163-fuelmaker_loadopen_30.mp3",
-   "md5": "7b13016a54404666c58af056105a7d94",
-   "why": "still.js:370 load open; not played by the remake."
   },
   {
    "key": "HAND_PULL_DOWN",

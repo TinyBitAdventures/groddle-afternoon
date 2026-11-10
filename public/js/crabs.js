@@ -21,7 +21,7 @@
  * the crab, runs its conversation and applies these results.
  */
 
-import { MUSICBLOCK_CATALOG } from './musicblocks.js?v=b4eae35a';
+import { MUSICBLOCK_CATALOG } from './musicblocks.js?v=b28f77cc';
 
 export const CRAB_CLASS = 'npc_crab';
 export const CRAB_FEATURE_ID = 'crabs';

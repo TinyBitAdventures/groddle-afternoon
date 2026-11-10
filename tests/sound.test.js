@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { SOUND_ALIASES, SOUND_FILES, SOUND_KEY_COUNTS } from '../public/js/sound-keys.js?v=821e71ee';
+import { SOUND_ALIASES, SOUND_FILES, SOUND_KEY_COUNTS } from '../public/js/sound-keys.js?v=df36f0cf';
 import {
   SYNTH_KEY_RECIPES,
   SYNTH_RECIPE_NAMES,
@@ -12,7 +12,7 @@ import {
   playSynthRecipe,
   recipeForKey,
 } from '../public/js/synth-sfx.js?v=920944cd';
-import { createSoundBoard, resolveSound } from '../public/js/sound-board.js?v=ead5c7b6';
+import { createSoundBoard, resolveSound } from '../public/js/sound-board.js?v=1a35b1da';
 import {
   LEGACY_SFX_KEYS,
   actionLoopFor,
@@ -127,7 +127,8 @@ describe('sound-key catalog', () => {
         } else if (catalog.keys[key].origin === 'sounds-zip') {
           // Sounds.zip (2026-11-02): the zip's file name, md5 and how the key was matched.
           assert.match(catalog.keys[key].zipMd5, /^[0-9a-f]{32}$/, key);
-          assert.ok(['music_map', 'client-url', 'filename', 'note-set', 'batch', 'forum'].includes(catalog.keys[key].zipMatch), key);
+          // same-take: the key's archive.org copy measured as this very take, so the server's file plays (tests/still-sounds.test.js).
+          assert.ok(['music_map', 'client-url', 'filename', 'note-set', 'batch', 'forum', 'same-take'].includes(catalog.keys[key].zipMatch), key);
           // music_map and client-url rows are the url's own file; the others are matched on evidence (no url survives).
           const exact = ['music_map', 'client-url'].includes(catalog.keys[key].zipMatch);
           if (exact) assert.match(catalog.keys[key].url, /^http:\/\/c2\.glitch\.bz\/sounds\/20\d\d-\d\d\//);
