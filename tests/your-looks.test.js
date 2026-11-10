@@ -11,9 +11,9 @@ import {
   normalizeYourLooks, noteWear, pastLooks, recordLook, removeLook, totalLine, wearLook,
 } from '../public/js/your-looks.js?v=fd9949a4';
 import { createFeatureHost } from '../public/js/feature-host.js?v=127e0a3c';
-import { yourLooksFeature, YOUR_LOOKS_FEATURE_ID } from '../public/js/features/your-looks-feature.js?v=c6209aa8';
+import { yourLooksFeature, YOUR_LOOKS_FEATURE_ID } from '../public/js/features/your-looks-feature.js?v=8c6a095d';
 import { createPlayerSave, parsePlayerSave, serializePlayerSave } from '../public/js/player-save.js?v=7c9c4d3e';
-import { APPEARANCE_PRESETS } from '../public/js/character-builder.js?v=e4d48b97';
+import { APPEARANCE_PRESETS } from '../public/js/character-builder.js?v=3c78a868';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (f) => readFileSync(join(root, f), 'utf8');

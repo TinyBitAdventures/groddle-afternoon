@@ -59,6 +59,7 @@
 import { createMinnAccount } from '../minn-account.js?v=8f2741cd';
 import { EMOTES, createRealtimeClient, createTrack, pushSample, sampleTrack } from '../realtime-client.js?v=b13cbae1';
 import { ANIM_FPS, EMOTION_MS, animForState, crowdScaleX } from '../avatar-anims.js?v=fb921bf4';
+import { redrawFrame } from '../avatar-pack.js?v=d8fba962';
 import { movedLine } from '../admin-teleport.js?v=fa56e8df';
 import { ADMIN_TEXT, applyAdminGive, applyAdminRefill, showAdminMessage, showBooted } from '../admin-console-mp.js?v=265b9fc2';
 import { saveStore } from '../save-store.js?v=8839ba7b';
@@ -388,6 +389,9 @@ function createSession(engine) {
     if (r.st === st && r.body.textures) return;
     const { anim, loop, then, hold } = animForState(st, { idles: false });
     const anims = r.pack.anims || {};
+    // A painted look paints this animation's sheet the first time someone plays it (G614): the
+    // frames hold the still stand until it is in, then fill in place (framesReady).
+    engine.needGlitchAnim?.(r.pack, anim);
     const frames = anims[anim]?.length ? anims[anim] : [r.pack.idleFrame];
     r.st = st;
     r.body.textures = frames;
@@ -415,6 +419,15 @@ function createSession(engine) {
       r.st = null;
       applyAnim(r, st);
     }
+  }
+
+  /**
+   * game.js painted a sheet a look had left for later (a visitor's first jump, climb or emote)
+   * and refilled the pack's frame lists in place: each Glitch drawn from it shows the frame it
+   * is on from the new sheet, keeping its place in the animation.
+   */
+  function framesReady(anims) {
+    for (const r of remotesOnFreedFrames(remotes.values(), new Set([anims]))) redrawFrame(r.body);
   }
 
   function drawRemotes(t) {
@@ -696,6 +709,7 @@ function createSession(engine) {
       return [...remotes.values()].map((r) => r.target).filter((t) => t.sprite && !t.sprite.destroyed && t.sprite.visible !== false);
     },
     framesFreed,
+    framesReady,
   };
   return session;
 }
@@ -766,6 +780,12 @@ export const realtimeFeature = {
   /** game.js dropIdleSheet: these packs' anims were refilled and an idle sheet is about to be destroyed. */
   glitchFramesFreed(anims) {
     session?.framesFreed(anims);
+    return null;
+  },
+
+  /** game.js lateSheetReady: a sheet this pack's look had left for later is painted and its frame lists refilled in place. */
+  glitchFramesReady(anims) {
+    session?.framesReady(anims);
     return null;
   },
 

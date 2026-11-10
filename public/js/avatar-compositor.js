@@ -430,18 +430,29 @@ export async function paintSheetSpread(prep, layout, scale, { budgetMs = 4, canv
 }
 
 /**
+ * Bake one sheet of a prepared look without stalling a frame: the layout in its own task
+ * (it measures every frame of the sheet), then the paint in slices. The game paints a look's
+ * sheets this way one at a time, each when first needed (js/avatar-pack.js): the same pixels
+ * as bakeLook's. Resolves { canvas, def, stats }.
+ */
+export async function bakeSheet(prep, name, scale, { budgetMs = 4 } = {}) {
+  const stats = { layoutMs: 0 };
+  const t = performance.now();
+  const layout = sheetLayout(prep, name);
+  stats.layoutMs = performance.now() - t;
+  await new Promise((r) => setTimeout(r, 0));
+  const canvas = await paintSheetSpread(prep, layout, scale, { budgetMs, stats });
+  return { canvas, def: sheetDef(layout, `${name}.png`), stats };
+}
+
+/**
  * Bake one idle sheet of a prepared look without stalling a frame: loads
  * the idle frames (prepareIdle), lays the sheet out, paints it in slices.
  * Resolves { canvas, def, stats }.
  */
 export async function bakeIdleSheet(prep, name, scale, { budgetMs = 4 } = {}) {
   await prepareIdle(prep);
-  const stats = { layoutMs: 0 };
-  const t = performance.now();
-  const layout = sheetLayout(prep, name);
-  stats.layoutMs = performance.now() - t;
-  const canvas = await paintSheetSpread(prep, layout, scale, { budgetMs, stats });
-  return { canvas, def: sheetDef(layout, `${name}.png`), stats };
+  return bakeSheet(prep, name, scale, { budgetMs });
 }
 
 /** VECTOR_AVATAR-style sheet def for a layout (anchored on the standing feet). */
@@ -474,6 +485,8 @@ export function paintPreview(prep, canvas, swfFrame = 801, { pad = 6, flip = fal
 
 /**
  * Bake every sheet of a look; resolves { sheets: { name: { canvas, def } }, scale }.
+ * `sheets` names the ones to paint (default all six, SHEET_ORDER): the game paints only
+ * ['base'] when a look first shows and each other sheet with bakeSheet when first needed.
  *
  * With `budgetMs` each sheet is laid out, then painted in slices of about that long
  * (paintSheetSpread), so a look baked while the game runs never holds a frame for a whole sheet.
@@ -485,7 +498,7 @@ export function paintPreview(prep, canvas, swfFrame = 801, { pad = 6, flip = fal
  * `stats` collects the slices (count, longest, paint time), the longest layout and the longest
  * of the two warm-up tasks.
  */
-export async function bakeLook(prep, scale, { onSheet, budgetMs = 0, stats = null } = {}) {
+export async function bakeLook(prep, scale, { onSheet, budgetMs = 0, stats = null, sheets: names = SHEET_ORDER } = {}) {
   const sheets = {};
   const spread = budgetMs > 0;
   if (spread) {
@@ -505,7 +518,7 @@ export async function bakeLook(prep, scale, { onSheet, budgetMs = 0, stats = nul
     if (stats) stats.maxWarmMs = Math.max(warmed - t, performance.now() - t2);
     await new Promise((r) => setTimeout(r, 0));
   }
-  for (const name of SHEET_ORDER) {
+  for (const name of names) {
     const t = performance.now();
     const layout = sheetLayout(prep, name);
     if (stats) stats.maxLayoutMs = Math.max(stats.maxLayoutMs || 0, performance.now() - t);

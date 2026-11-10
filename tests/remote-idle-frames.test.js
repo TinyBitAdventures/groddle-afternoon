@@ -16,7 +16,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { remotesOnFreedFrames } from '../public/js/features/realtime-feature.js?v=d90ae938';
+import { remotesOnFreedFrames } from '../public/js/features/realtime-feature.js?v=afb13948';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const read = (rel) => readFileSync(join(here, '..', rel), 'utf8');
@@ -80,6 +80,9 @@ describe('the freed idle sheet goes only after the other Glitches let go of it',
   it('a Glitch with your look really is drawn from your pack (why it shares your idle sheets)', () => {
     const game = read('public/game.js');
     assert.match(game, /glitchPack\(look\) \{\s*return getAppearanceTextures\(/);
-    assert.match(fnBody(game, 'getAppearanceTextures'), /if \(appearanceTexCache\.has\(key\)\) return appearanceTexCache\.get\(key\);/);
+    // The cached pack comes back for another player as it is (G614: your own look also asks that every sheet is in).
+    const body = fnBody(game, 'getAppearanceTextures');
+    assert.match(body, /const cached = appearanceTexCache\.get\(key\);\s*if \(cached && \(!full \|\| packComplete\(cached\)\)\) return cached;/);
+    assert.match(body, /if \(!pack\.pending\) appearanceTexCache\.set\(key, pack\);/);
   });
 });

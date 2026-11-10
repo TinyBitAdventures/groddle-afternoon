@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=f6a37125';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=127e0a3c';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=1cb2bcb1';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=0cc95229';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -777,7 +777,7 @@ import {
   planSignpostTravel,
 } from './js/travel.js?v=7fd6e363';
 import { facingScaleX, facingFromVelocity } from './js/avatar.js?v=c4da73ea';
-import { AFK_SEQUENCE, AFK_TIMEOUT_MS, ANIMS, ANIM_FPS, EMOTIONS, EMOTION_MS, FALL_LOOP, IDLE_SHEETS, RANDOM_IDLE_MS, RANDOM_IDLE_WAIT_MS, animForState, avatarAnimState, createIdleClock, crowdScaleX, frameRef, idleSheetFor } from './js/avatar-anims.js?v=fb921bf4';
+import { AFK_TIMEOUT_MS, ANIMS, ANIM_FPS, EMOTIONS, EMOTION_MS, IDLE_SHEETS, RANDOM_IDLE_MS, RANDOM_IDLE_WAIT_MS, animForState, avatarAnimState, createIdleClock, crowdScaleX, idleSheetFor } from './js/avatar-anims.js?v=fb921bf4';
 import { landingY, stackRestY, walkSurfaceY } from './js/walk-surface.js?v=106bfdc5';
 import { holdCloseToFloor } from './js/slope-walk.js?v=9af1e505';
 import { JUMP_SPEED, MAX_TICK_FRAMES, WALK_MAX, avatarGround, coastX, frameSteps, stepAvatar, steerAccel, steerX, streetPhysicsExtras } from './js/avatar-step.js?v=e8e9581f';
@@ -787,7 +787,8 @@ import { hellBuffDesc, isInHell } from './js/hell.js?v=33a46876';
 import { climbBobY, ladderAnimState, ladderSwap } from './js/ladder-anim.js?v=a8b327a0';
 import { VECTOR_AVATAR } from './js/avatar-vector-sheets.js?v=ad801376';
 import { createNpcGlitchKit } from './js/npc-glitch.js?v=339e1872';
-import { bakeIdleSheet, bakeLook, loadCatalog as loadAvatarCatalog, paintPreview as paintVectorPreview, prepareLook } from './js/avatar-compositor.js?v=b5fec8e6';
+import { bakeIdleSheet, bakeLook, bakeSheet, loadCatalog as loadAvatarCatalog, paintPreview as paintVectorPreview, prepareLook } from './js/avatar-compositor.js?v=02e642c7';
+import { LATE_SHEETS, anchorSheetFrames, ensureAnimSheets, ensureLateSheet, fillPackAnims, packComplete, redrawFrame, showsStandIn } from './js/avatar-pack.js?v=d8fba962';
 import { catalogItem, lookKey, randomVectorFields, resolveLook, variantSwatch } from './js/avatar-looks.js?v=64fab53e';
 import {
   createDefaultAppearance,
@@ -797,7 +798,7 @@ import {
   APPEARANCE_PRESETS,
   PRESET_GROUPS,
   appearanceCacheKey,
-} from './js/character-builder.js?v=e4d48b97';
+} from './js/character-builder.js?v=3c78a868';
 import { clearPresetActive, renderPresetGroups, renderStarterPicker } from './js/avatar-builder-ui.js?v=be72005c';
 import {
   loadAmbientMusicConfig,
@@ -10335,8 +10336,8 @@ function updateSpinningWheel() {
 }
 
 function makePlayer() {
-  // The vector Glitch in the character builder's look.
-  const pack = getAppearanceTextures(playerAppearance);
+  // The vector Glitch in the character builder's look (every sheet in: your own jump never holds a frame).
+  const pack = getAppearanceTextures(playerAppearance, { full: true });
   const walkFrames = pack.walkFrames;
   const idleFrame = pack.idleFrame;
   const body = new PIXI.AnimatedSprite(walkFrames);
@@ -10727,35 +10728,18 @@ const loadVectorIdleSheet = (name) => loadIdleSheetTexture(glitchSheetDef(name, 
 /**
  * Sheets laid out like VECTOR_AVATAR (one per animation group, cells in
  * SHEET_FRAMES order) as an animation pack, each frame anchored on its
- * sheet's feet.
+ * sheet's feet. A frame on a sheet that is not in yet shows its stand-in
+ * (js/avatar-pack.js fillPackAnims): the idle sheets (idleLoader) and, for a
+ * painted look, the sheets it leaves for later (lateLoader, G614), whose
+ * climb borrows the `placeholder` look's frames as the original client did.
  */
-function animPackFromSheets(key, sheets, av, idleLoader = null) {
+function animPackFromSheets(key, sheets, av, idleLoader = null, lateLoader = null, placeholder = null) {
   for (const [name, sheet] of Object.entries(sheets)) anchorSheetFrames(sheet, av.sheets[name]);
-  const pack = { key, sheets: { ...sheets }, av, idleLoader, idleLoading: new Map(), anims: {} };
+  const pack = { key, sheets: { ...sheets }, av, idleLoader, idleLoading: new Map(), lateLoader, lateLoading: new Map(), placeholder, anims: {} };
   fillPackAnims(pack);
   pack.idleFrame = pack.anims.idle0[0];
   pack.walkFrames = pack.anims.walk2x;
   return pack;
-}
-
-function anchorSheetFrames(sheet, def) {
-  for (const tex of sheet?.frames || []) tex.defaultAnchor = { x: def.midX / def.fw, y: def.feetY / def.fh };
-}
-
-/**
- * Every source animation as textures from the pack's loaded sheets; a frame
- * on a sheet that is not loaded yet (the idle sheets) shows the still stand.
- * Fills pack.anims in place, so a sprite holding it sees new sheets.
- */
-function fillPackAnims(pack) {
-  const { sheets } = pack;
-  const toTextures = (list) => list.map((fn) => {
-    const ref = frameRef(fn);
-    return (ref && sheets[ref.sheet]?.frames?.[ref.index]) || sheets.base.frames[14];
-  });
-  for (const [name, list] of Object.entries(ANIMS)) pack.anims[name] = toTextures(list);
-  pack.anims.fallLoop = toTextures(FALL_LOOP);
-  pack.anims.afk = toTextures(AFK_SEQUENCE);
 }
 
 /**
@@ -10793,10 +10777,12 @@ const idleSheetLog = [];
 // —— Vector Glitch looks (js/avatar-compositor.js) ——
 /** assets/avatar/catalog.json once loaded (character builder, look resolving). */
 let avatarCatalog = null;
-/** Baked custom looks: lookKey -> { pack?, promise, bases }. Two at most. */
+/** Baked custom looks: lookKey -> { pack?, promise, bases }. Two at most, and the ones in use. */
 const vectorBakes = new Map();
 /** Packs other players' Glitches are drawn with (multiplayer, engine.holdGlitchPacks): never trimmed. */
 let heldGlitchAnims = new Set();
+/** QA: every sheet a look painted, with its time (window.groddleQA.vectorBakes()). */
+const vectorBakeLog = [];
 
 /**
  * A custom look's bake paints for about this long, then lets a frame through (avatar-compositor
@@ -10804,6 +10790,12 @@ let heldGlitchAnims = new Set();
  * walks in. Whole sheets at once stopped the street when someone arrived (players, 2026-11-09).
  */
 const VECTOR_BAKE_BUDGET_MS = 4;
+/**
+ * A bake someone asked for this recently is not freed: a Glitch waiting on its look asks again
+ * every 400 ms (realtime-feature drawRemotes), and a look that finishes between two asks must
+ * still be there for the next one (several players arriving together finish close together).
+ */
+const VECTOR_BAKE_ASKED_MS = 2000;
 
 /** Device pixels per art pixel decide the bake: 3x like js/sprite-hires.js, else 1x. */
 function vectorBakeScale() {
@@ -10834,11 +10826,44 @@ function defaultVectorLookKey() {
 }
 
 /**
+ * A late sheet's frames are in a pack (js/avatar-pack.js ensureLateSheet): every Glitch drawn
+ * from it shows the frame it is on from the refilled list (feature hook glitchFramesReady).
+ */
+function lateSheetReady(pack) {
+  if (player?.anims === pack.anims) redrawFrame(player);
+  features.collect('glitchFramesReady', pack.anims, engine);
+}
+const LATE_SHEET_OPTS = Object.freeze({ onReady: lateSheetReady });
+
+/**
+ * The player's own look: paint the sheets a visitor's look leaves for later straight after its
+ * base, then put the look on (applyPlayerAppearance asks for a complete pack). A held frame on
+ * your own first jump would be noticed, so your look waits for all six as it always did.
+ */
+function finishOwnBake(bake) {
+  if (bake.finishing || !bake.pack) return;
+  bake.finishing = Promise.all(LATE_SHEETS.map((name) => ensureLateSheet(bake.pack, name, LATE_SHEET_OPTS))).then(() => {
+    bake.finishing = null;
+    const keys = [...bake.ownKeys];
+    bake.ownKeys.clear();
+    // A sheet that failed was warned about; the next applyPlayerAppearance asks for it again.
+    if (!packComplete(bake.pack)) return;
+    // The player may have moved on to another look while this painted.
+    if (keys.some((key) => appearanceCacheKey(playerAppearance) === key || (player && player.appearanceKey === `${key}#pending`))) applyPlayerAppearance();
+  });
+}
+
+/**
  * A vector look's pack: the prerendered sheets for the default outfit, a
  * baked pack for any other, or (while it bakes) the default with a pending
  * key so the finished bake swaps in.
+ *
+ * A baked look paints only its base sheet (stand and walk) at first, and its pack is handed
+ * out as soon as that is in (G614): its jump, climb and emotion sheets are painted when an
+ * animation first needs them (engine.needGlitchAnim), so a visitor who only walks holds one
+ * sheet. `full` (the player's own look) hands the pack out only with every sheet in.
  */
-function vectorAnimPack(key, app) {
+function vectorAnimPack(key, app, { full = false } = {}) {
   if (!avatarCatalog) {
     const fallback = vectorDefaultPack(`${key}#pending`);
     if (fallback) fallback.pending = true;
@@ -10848,26 +10873,44 @@ function vectorAnimPack(key, app) {
   const lk = lookKey(look);
   if (lk === defaultVectorLookKey()) return vectorDefaultPack(key);
   let bake = vectorBakes.get(lk);
-  if (bake?.pack) return { ...bake.pack, key };
+  if (bake?.pack && (!full || packComplete(bake.pack))) return { ...bake.pack, key };
   if (!bake) {
-    bake = { promise: null, pack: null, bases: [], prep: null, scale: vectorBakeScale() };
+    bake = { promise: null, pack: null, bases: [], prep: null, scale: vectorBakeScale(), late: Promise.resolve(), ownKeys: new Set(), finishing: null, askedAt: 0 };
     vectorBakes.set(lk, bake);
     const scale = bake.scale;
+    const started = performance.now();
+    const baseStats = {};
+    /** A painted canvas as a sheet of frames; the bake owns its texture (freed with it). */
+    const adopt = (name, canvas, def, at, stats = null) => {
+      const base = new PIXI.CanvasSource({ resource: canvas, resolution: scale, scaleMode: 'linear' });
+      bake.bases.push(base);
+      vectorBakeLog.push({ look: lk, sheet: name, at: Math.round(at), ms: Math.round(performance.now() - at), bytes: canvas.width * canvas.height * 4, ...(stats || {}) });
+      if (vectorBakeLog.length > 200) vectorBakeLog.shift();
+      return { base, def, stats, frames: sliceSheet(base, { fw: def.fw, fh: def.fh, cols: def.cols, rows: def.rows }, def.cells) };
+    };
     bake.promise = prepareLook(look)
       .then((prep) => {
         bake.prep = prep;
-        // Painted in slices: another player's look bakes while the street is being played.
-        return bakeLook(prep, scale, { budgetMs: VECTOR_BAKE_BUDGET_MS });
+        // Only the stand and walk sheet now (G614), painted in slices: another player's look
+        // bakes while the street is being played.
+        return bakeLook(prep, scale, { budgetMs: VECTOR_BAKE_BUDGET_MS, sheets: ['base'], stats: baseStats });
       })
       .then(({ sheets }) => {
-        const loaded = {};
-        const defs = {};
-        for (const [name, sh] of Object.entries(sheets)) {
-          const base = new PIXI.CanvasSource({ resource: sh.canvas, resolution: scale, scaleMode: 'linear' });
-          bake.bases.push(base);
-          defs[name] = sh.def;
-          loaded[name] = { frames: sliceSheet(base, { fw: sh.def.fw, fh: sh.def.fh, cols: sh.def.cols, rows: sh.def.rows }, sh.def.cells) };
-        }
+        const base = adopt('base', sheets.base.canvas, sheets.base.def, started, baseStats);
+        // The jump, climb and emotion sheets paint when first needed, one at a time for a look.
+        const lateLoader = (name) => {
+          const job = bake.late.then(async () => {
+            if (vectorBakes.get(lk) !== bake) return null;
+            const at = performance.now();
+            const { canvas, def, stats } = await bakeSheet(bake.prep, name, scale, { budgetMs: VECTOR_BAKE_BUDGET_MS });
+            // Freed while it painted (trimVectorBakes): the canvas goes with the look.
+            if (vectorBakes.get(lk) !== bake) return null;
+            const sheet = adopt(name, canvas, def, at, stats);
+            return { def, frames: sheet.frames };
+          });
+          bake.late = job.catch(() => {});
+          return job;
+        };
         // Idle sheets bake one at a time when first needed, painted in slices.
         const idleLoader = async (name) => {
           if (!vectorBakes.has(lk)) return null;
@@ -10881,37 +10924,54 @@ function vectorAnimPack(key, app) {
           };
           return { def, stats, release, frames: sliceSheet(base, { fw: def.fw, fh: def.fh, cols: def.cols, rows: def.rows }, def.cells) };
         };
-        bake.pack = animPackFromSheets(lk, loaded, { sheets: defs }, idleLoader);
+        // Until the climb sheet is in, a climb shows the placeholder avatar's (the default look's) climb frames:
+        // AvatarAnimationDefinitions.as climb standin_frame 0, "instead of showing a frame from the side view".
+        const climb = textures.vectorAvatarClimb?.frames?.length ? textures.vectorAvatarClimb : null;
+        if (climb) anchorSheetFrames(climb, VECTOR_AVATAR.sheets.climb);
+        bake.pack = animPackFromSheets(lk, { base: { frames: base.frames } }, { sheets: { base: base.def } }, idleLoader, lateLoader, climb ? { sheets: { climb } } : null);
         trimVectorBakes(lk);
-        // The player may have moved on to another look while this baked.
-        if (appearanceCacheKey(playerAppearance) === key || (player && player.appearanceKey === `${key}#pending`)) applyPlayerAppearance();
+        if (bake.ownKeys.size) finishOwnBake(bake);
       })
       .catch((err) => {
         vectorBakes.delete(lk);
         console.warn('avatar bake failed', err);
       });
   }
+  if (full) {
+    bake.ownKeys.add(key);
+    finishOwnBake(bake);
+  }
+  bake.askedAt = performance.now();
   const pending = vectorDefaultPack(`${key}#pending`);
   if (pending) pending.pending = true;
   return pending;
 }
 
-/** Keep the newest bake and the player's current one; free the rest. */
+/**
+ * Keep the newest bake, the player's own (worn, or still painting) and the ones other players
+ * are drawn with; free the rest, every sheet of each (base, late and idle).
+ */
 function trimVectorBakes(keep) {
   for (const [lk, bake] of vectorBakes) {
     if (vectorBakes.size <= 2) break;
-    if (lk === keep || !bake.pack || player?.anims === bake.pack.anims || heldGlitchAnims.has(bake.pack.anims)) continue;
+    if (lk === keep || !bake.pack || bake.finishing || bake.ownKeys.size || player?.anims === bake.pack.anims || heldGlitchAnims.has(bake.pack.anims)) continue;
+    if (performance.now() - bake.askedAt < VECTOR_BAKE_ASKED_MS) continue;
     for (const [k, p] of appearanceTexCache) if (p.anims === bake.pack.anims) appearanceTexCache.delete(k);
     for (const base of bake.bases) base.destroy();
     vectorBakes.delete(lk);
   }
 }
 
-function getAppearanceTextures(appearance) {
+/**
+ * The animation pack for a look. `full`: only a pack with every sheet in (the player's own
+ * look); without it a painted look comes back as soon as its base sheet is in (other players).
+ */
+function getAppearanceTextures(appearance, { full = false } = {}) {
   const app = normalizeAppearance(appearance);
   const key = appearanceCacheKey(app);
-  if (appearanceTexCache.has(key)) return appearanceTexCache.get(key);
-  const pack = vectorAnimPack(key, app);
+  const cached = appearanceTexCache.get(key);
+  if (cached && (!full || packComplete(cached))) return cached;
+  const pack = vectorAnimPack(key, app, { full });
   if (pack) {
     if (!pack.pending) appearanceTexCache.set(key, pack);
     return pack;
@@ -10923,7 +10983,8 @@ function getAppearanceTextures(appearance) {
 /** Apply current playerAppearance to the live player sprite. */
 function applyPlayerAppearance() {
   if (!player) return;
-  swapPlayerPack(getAppearanceTextures(playerAppearance));
+  // Your own look goes on only with every sheet painted (G614): the default stays until then.
+  swapPlayerPack(getAppearanceTextures(playerAppearance, { full: true }));
 }
 
 function swapPlayerPack(pack) {
@@ -11814,6 +11875,14 @@ const engine = {
    */
   glitchPack(look) {
     return getAppearanceTextures(normalizeAppearance({ vector: look?.vector && typeof look.vector === 'object' ? look.vector : {} }));
+  },
+  /**
+   * A Glitch drawn from this pack is about to play this animation (pack.anims name): a painted
+   * look paints the sheet it draws from now, if it has not yet (G614). The animation's frames
+   * show the still stand until then and fill in place (feature hook glitchFramesReady).
+   */
+  needGlitchAnim(pack, anim) {
+    ensureAnimSheets(pack, anim, LATE_SHEET_OPTS);
   },
   /** The packs other players are drawn with: their bakes are kept, every other bake may be freed. */
   holdGlitchPacks(packs) {
@@ -31652,6 +31721,35 @@ async function main() {
     /** World quoins as drawn: sprite y plus the frame's baked bob (QA for js/quoin-motion.js). */
     quoins() {
       return quoins.map((q) => ({ type: q.typeId, x: q.x, y: q.y, frame: q.currentFrame, clock: q.frameClock, drawnY: q.y + (QUOIN_FRAME_BOB[q.typeId]?.[q.currentFrame] || 0) * q.scale.y }));
+    },
+    /**
+     * Painted looks in memory (G614): each one's sheets and canvas bytes, who uses it, every sheet
+     * painted so far (ms from asked to in the pack), and the frame the player's Glitch shows now
+     * (ok: a live texture; held: a stand-in for a jump, climb or emotion, which your own never shows).
+     */
+    vectorBakes() {
+      const id = (lk) => { let h = 5381; for (let i = 0; i < lk.length; i++) h = ((h << 5) + h + lk.charCodeAt(i)) >>> 0; return h.toString(16); };
+      const tex = player?.texture || null;
+      return {
+        looks: [...vectorBakes.entries()].map(([lk, bake]) => ({
+          look: id(lk),
+          scale: bake.scale,
+          ready: Boolean(bake.pack),
+          sheets: bake.pack ? Object.keys(bake.pack.sheets) : [],
+          canvases: bake.bases.length,
+          bytes: bake.bases.reduce((n, b) => n + (b.resource?.width || 0) * (b.resource?.height || 0) * 4, 0),
+          own: Boolean(bake.pack && player?.anims === bake.pack.anims),
+          held: Boolean(bake.pack && heldGlitchAnims.has(bake.pack.anims)),
+          finishing: Boolean(bake.finishing),
+        })),
+        log: vectorBakeLog.map((row) => ({ ...row, look: id(row.look) })),
+        playerFrame: {
+          anim: player?.glitchState || null,
+          ok: Boolean(tex && !tex.destroyed && tex.source && !tex.source.destroyed),
+          held: Boolean(player?.pack && showsStandIn(player.pack, animForState(player.glitchState || 'stand', { idles: false }).anim, tex)),
+          pending: Boolean(player?.pack?.pending),
+        },
+      };
     },
     idleState() {
       return {

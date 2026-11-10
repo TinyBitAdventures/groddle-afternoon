@@ -16,7 +16,7 @@ import {
 import {
   COLOR_FIELDS, articleColors, expandCatalog, lookKey, normalizeVectorFields, randomVectorFields, resolveLook, vectorFieldsFromColors,
 } from '../public/js/avatar-looks.js?v=64fab53e';
-import { SHEET_ORDER, bakeLook } from '../public/js/avatar-compositor.js?v=b5fec8e6';
+import { SHEET_ORDER, bakeLook } from '../public/js/avatar-compositor.js?v=02e642c7';
 import { CORE_FRAMES, IDLE_FRAMES, IDLE_SHEETS, SHEET_FRAMES } from '../public/js/avatar-anims.js?v=fb921bf4';
 import { VECTOR_AVATAR, VECTOR_AVATAR_HIRES } from '../public/js/avatar-vector-sheets.js?v=ad801376';
 import { FIRST_DRAW_SPRITES, HIRES_SPRITES } from '../public/js/sprite-hires.js?v=ac5f0e68';
@@ -456,8 +456,11 @@ describe('baking a look in slices', () => {
 
   it('the game bakes every custom look with a budget (another player walking in must not stop the street)', () => {
     const game = readFileSync(join(pub, 'game.js'), 'utf8');
-    assert.match(game, /bakeLook\(prep, scale, \{ budgetMs: VECTOR_BAKE_BUDGET_MS \}\)/);
+    // G614: the base sheet when the look first shows, each other sheet when first needed (tests/avatar-pack.test.js).
+    assert.match(game, /bakeLook\(prep, scale, \{ budgetMs: VECTOR_BAKE_BUDGET_MS, sheets: \['base'\], stats: baseStats \}\)/);
+    assert.match(game, /bakeSheet\(bake\.prep, name, scale, \{ budgetMs: VECTOR_BAKE_BUDGET_MS \}\)/);
     assert.doesNotMatch(game, /bakeLook\(prep, scale\)/);
+    assert.doesNotMatch(game, /bakeSheet\([^)]*scale\)/, 'no sheet is painted without a budget');
     const budget = Number(game.match(/const VECTOR_BAKE_BUDGET_MS = ([\d.]+);/)?.[1]);
     assert.ok(budget > 0 && budget <= 8, 'a slice leaves room in a 16 ms frame');
   });

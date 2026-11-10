@@ -9,7 +9,7 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { expandCatalog } from '../public/js/avatar-looks.js?v=64fab53e';
-import { REIMAGINED_TAG, decorateWardrobe, installReimaginedTags, isReimagined, reimaginedNote } from '../public/js/avatar-reimagined.js?v=249a775b';
+import { REIMAGINED_TAG, decorateWardrobe, installReimaginedTags, isReimagined, reimaginedNote } from '../public/js/avatar-reimagined.js?v=44752d2c';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const catalog = expandCatalog(JSON.parse(readFileSync(join(root, 'public/assets/avatar/catalog.json'), 'utf8')));
