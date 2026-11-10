@@ -32,7 +32,7 @@ import {
   styleChoices,
   styleSwitchCost,
   switchStreetStyle,
-} from '../public/js/home-styles.js?v=3615410c';
+} from '../public/js/home-styles.js?v=5b49a731';
 import { HOME_STYLES } from '../public/js/homes.js?v=631ab6b8';
 import { templateNames, templatePair } from '../tools/home-styles/build.mjs';
 

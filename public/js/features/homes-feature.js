@@ -235,7 +235,7 @@ import {
   yardLook,
   yardStyleChoices,
   yardStyleFor,
-} from '../home-styles.js?v=3615410c';
+} from '../home-styles.js?v=5b49a731';
 import { frameTexture, isLoaded, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js?v=f024bd6a';
 import { FALLBACK_MAX as WORLD_ART_FALLBACK_MAX, worldArtFor } from '../world-art.js?v=df476660';
 import { oneArmSignpost } from '../street-render.js?v=881d705a';
@@ -908,6 +908,8 @@ function interiorBackground(engine, opts = {}) {
       lift: YARD_LIFT,
       // grass and plants stop short of the way into the house
       skipNear: (x) => x > x0 - 90,
+      // The yard runs left from the house: what stands in its field is counted from there.
+      lot: { left: x0, right: null },
     });
     root.updateParallax = (camX, camY, vpW, vpH, skyH = vpH) => land.update(camX, camY, vpW, skyH);
   }
@@ -1575,24 +1577,89 @@ export function streetNearSkip(layout, { towerX = null } = {}) {
 }
 
 /**
- * The street style's `near` row along the ground (grass, flowers, plants): each sprite's x,
- * half width and flip, skipping where `skip(px, half)` says. PURE; drawLandscape draws these.
+ * Where a `near` piece's feet stand over a walk line (G616). A piece with `inField` stands in
+ * the field, that many px behind the walk line (never past the field's back edge, `depth`),
+ * and `on` px above the ground there (a tuft on a ledge, a treetop on its trunk; negative for
+ * a shadow under a trunk). Without `inField` it is the front fringe, as before: 22 px in front
+ * of the walk line, lower by `below`. PURE.
  */
-export function landscapeNearSpots(style, seed, width, skip = () => false) {
+export function nearFeetY(item, groundY, depth = FIELD_DEPTH) {
+  if (!Number.isFinite(item?.inField)) return groundY + 22 + (item?.below || 0);
+  return groundY - Math.max(0, Math.min(depth, item.inField)) - (Number(item.on) || 0);
+}
+
+/**
+ * The street style's `near` row along the ground (grass, flowers, plants; with `inField`, the
+ * trunks, huts, ledges and tufts standing in the field): each sprite's x, half width, flip
+ * and feet (`back`: its `inField` clamped to the field, or null for the front fringe),
+ * skipping where `skip(px, half)` says.
+ *
+ * The front fringe repeats from the street's left end, as it always has. A piece in the
+ * field is counted from the house lot outward when the caller names the lot (`lot`: its left
+ * and right edge in world x; a back yard has only a left): `offset` px out from that edge,
+ * again every `every` px (once without `every`), on both sides or the one its `side` names
+ * ('left' or 'right'). So the trees and huts by the house stay where they are when the yard
+ * grows, and new ground brings new ones at its far end. Rows that share a `group` are one
+ * thing (a trunk, its treetop and its shadow): they jitter together, and where one is
+ * skipped all are. The spots come back to front: the field's pieces by depth (drawn in that
+ * order, a nearer trunk covers a farther ledge), then the front fringe in the recipe's order.
+ * PURE; drawLandscape draws these.
+ */
+export function landscapeNearSpots(style, seed, width, skip = () => false, { lot = null } = {}) {
   const out = [];
+  const gone = new Set();
+  const depth = fieldDepth(style);
+  /** How far a row's art reaches either side of its x (its widest alt). */
+  const reachOf = (item) => (Math.max(item.w || 0, ...(item.alts || []).map((alt) => alt.w || 0)) * item.scale) / 2;
+  // A group runs off the street's end as one: its widest piece decides (no treetop without its trunk).
+  const groupReach = new Map();
   for (const item of style?.near || []) {
-    let i = 0;
-    for (let x = item.offset || 0; x < width; x += item.every) {
-      const jx = (hash01(`${seed}:near:${item.s}:${i}`) - 0.5) * item.jitter * 2;
+    if (item.group) groupReach.set(item.group, Math.max(groupReach.get(item.group) || 0, reachOf(item)));
+  }
+  for (const item of style?.near || []) {
+    const key = item.group || item.s;
+    const back = Number.isFinite(item.inField) ? Math.max(0, Math.min(depth, item.inField)) : null;
+    const every = item.every > 0 ? item.every : Infinity;
+    /** One sprite of the row at x (before its jitter), the i-th of its run `tag`. */
+    const place = (x, i, tag) => {
+      const jx = item.jitter ? (hash01(`${seed}:near:${key}:${tag}${i}`) - 0.5) * item.jitter * 2 : 0;
       const px = x + jx;
-      i += 1;
-      const row = pickAlt(item, `${seed}:near:${item.s}:${i}:alt`);
+      const part = item.group ? `${item.group}:${tag}${i}` : null;
+      const row = pickAlt(item, `${seed}:near:${item.s}:${tag}${i + 1}:alt`);
       const half = (row.w * row.scale) / 2;
-      if (skip(px, half)) continue;
-      out.push({ item, row, x: px, half, flip: hash01(`${item.s}:${i}`) > 0.5 });
+      if (skip(px, half)) {
+        if (part) gone.add(part);
+        return;
+      }
+      out.push({ item, row, x: px, half, flip: hash01(`${item.s}:${tag}${i + 1}`) > 0.5, back, part });
+    };
+    if (back == null || !lot) {
+      let i = 0;
+      for (let x = item.offset || 0; x < width; x += every) {
+        place(x, i, '');
+        i += 1;
+      }
+      continue;
+    }
+    const reach = item.group ? groupReach.get(item.group) : reachOf(item);
+    for (const [side, edge, dir] of [['left', lot.left, -1], ['right', lot.right, 1]]) {
+      if (!Number.isFinite(edge) || (item.side && item.side !== side)) continue;
+      let i = 0;
+      for (let d = item.offset || 0; d < width + reach; d += every) {
+        const x = edge + dir * d;
+        // Past the street's end (a piece half over the end still shows its near half).
+        if (x + reach < 0 || x - reach > width) break;
+        place(x, i, side === 'left' ? 'L' : 'R');
+        i += 1;
+      }
     }
   }
-  return out;
+  const kept = gone.size ? out.filter((spot) => !gone.has(spot.part)) : out;
+  // Back to front (a stable sort: pieces at one depth keep the recipe's order).
+  return kept
+    .map((spot, n) => ({ spot, n }))
+    .sort((a, b) => (b.spot.back ?? -1) - (a.spot.back ?? -1) || a.n - b.n)
+    .map((row) => row.spot);
 }
 
 /** The house's left end, its front door and its sign corner (where the Mailbox stands), in world x. */
@@ -1701,12 +1768,13 @@ export function landscapeGeometry(look, groundY) {
 
 /**
  * A style's landscape (js/home-styles.js looks): the sky, parallax layers, the
- * walkable field with its soil, and grass and plants along it. Item y values
- * are on the old 620 px street, moved down by `lift` and up by the deeper
- * field's rise (landscapeGeometry). Returns the parallax update for
+ * walkable field with its soil, what stands in the field (the `near` rows with
+ * `inField`, counted from the house `lot`) and grass and plants along it. Item
+ * y values are on the old 620 px street, moved down by `lift` and up by the
+ * deeper field's rise (landscapeGeometry). Returns the parallax update for
  * bgLayer.updateParallax.
  */
-function drawLandscape(engine, root, style, seed, { width, groundY, lift, skipNear = () => false }) {
+function drawLandscape(engine, root, style, seed, { width, groundY, lift, skipNear = () => false, lot = null }) {
   const { fieldTop, rise } = landscapeGeometry(style, groundY);
   const { PIXI } = engine;
   const sky = new PIXI.Sprite(gradientTexture(PIXI, ...style.sky));
@@ -1795,13 +1863,15 @@ function drawLandscape(engine, root, style, seed, { width, groundY, lift, skipNe
     soil.zIndex = -39;
     root.addChild(soil);
   }
-  // Grass, flowers and plants along the yard, kept off the house lot (landscapeNearSpots).
+  // What stands in the field (trunks, huts, ledges: `inField`, back to front) and the grass,
+  // flowers and plants along the yard, kept off the house lot (landscapeNearSpots).
   const near = new PIXI.Container();
   near.zIndex = -30;
-  for (const spot of landscapeNearSpots(style, seed, width, skipNear)) {
+  const depth = groundY - fieldTop;
+  for (const spot of landscapeNearSpots(style, seed, width, skipNear, { lot })) {
     const row = spot.row;
     if (row.tint == null && style.nearTint != null) row.tint = style.nearTint;
-    near.addChild(decoSprite(PIXI, row, spot.x, groundY + 22 + (spot.item.below || 0), spot.flip));
+    near.addChild(decoSprite(PIXI, row, spot.x, nearFeetY(spot.item, groundY, depth), spot.flip));
   }
   root.addChild(near);
 
@@ -1830,6 +1900,8 @@ function streetBackground(engine, styleKey, houseStyle = 'meadow') {
     lift: STREET_LIFT,
     // Grass, flowers and plants along the yard, kept off the house lot and a Tower's doorway.
     skipNear: streetNearSkip(layout, { towerX: towerFootX(cult) }),
+    // What stands in the field is counted from the house lot outward (landscapeNearSpots).
+    lot: { left: layout.lotLeft, right: layout.lotRight },
   });
 
   // The house, centred on its lot
@@ -3395,6 +3467,22 @@ function stylePreviewEl(look) {
     });
   });
   box.append(el('span', { class: 'hs-field', style: `height:${fieldPct}%;background:${hexColor(look.field)}` }));
+  // What stands in the field (near rows with `inField`): its two tallest pieces, where they stand.
+  const light = look.nearTint;
+  const dim = light == null ? 1 : (((light >> 16) & 255) * 0.3 + ((light >> 8) & 255) * 0.59 + (light & 255) * 0.11) / 255;
+  (look.near || [])
+    .filter((row) => Number.isFinite(row.inField) && !(row.on > 0) && row.h * row.scale > 100)
+    .sort((a, b) => b.h * b.scale - a.h * a.scale)
+    .filter((row, n, rows) => rows.findIndex((other) => other.s === row.s) === n)
+    .slice(0, 2)
+    .forEach((row, n) => {
+      box.append(el('img', {
+        src: decoImageUrl(row.s),
+        alt: '',
+        loading: 'lazy',
+        style: `left:${n ? 70 : 38}%;bottom:${Math.round(nearFeetY(row, 0, depth) * -k)}px;height:${Math.round(Math.min(H * 1.2, row.h * row.scale * k))}px;${dim < 0.98 ? `filter:brightness(${dim.toFixed(2)});` : ''}`,
+      }));
+    });
   return box;
 }
 

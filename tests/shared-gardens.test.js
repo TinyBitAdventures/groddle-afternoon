@@ -13,7 +13,7 @@ import { describe, it } from 'node:test';
 import { SEED_CATALOG, createGarden, harvestPlot, plantPlot, tickGarden, waterAllPlots, waterPlot } from '../public/js/garden.js?v=eae8b052';
 import { GARDEN_LOCK_MS, LOCK_LINE, SHARED_GARDEN_STREETS, applyPlot, isSharedGardenStreet, localPlot, lockedFor, parsePlotId, plotId, rollPasses } from '../public/js/shared-gardens.js?v=47984e60';
 import { sharedGardensFeature } from '../public/js/features/shared-gardens-feature.js?v=0f69ec43';
-import { FEATURES } from '../public/js/features/index.js?v=bf400d12';
+import { FEATURES } from '../public/js/features/index.js?v=1cb2bcb1';
 import { mgDetails, potionPlotCount } from '../public/js/master-garden.js?v=bcd9ac74';
 // A fresh pick's save waits for the server's receipt (GRANT_SAVE_DELAY_MS): the tests wait it out.
 const settle = () => new Promise((res) => setTimeout(res, 2700));

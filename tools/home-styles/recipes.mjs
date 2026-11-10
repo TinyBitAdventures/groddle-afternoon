@@ -22,6 +22,18 @@
  * from y), noFlip (never mirrored).
  * Layer fields: f (parallax: 0 sky, 1 world), items, or band ({ y, h, color,
  * alpha }: a full-width strip such as water or mist), tint, alpha.
+ * Near rows (the look's `near`): s, scale, every, jitter, offset and below (px
+ * lower) make the front fringe, the grass and plants 22 px in front of the walk
+ * line, repeated from the street's left end. A near row with `inField` stands
+ * in the field instead (G616: a trunk, a hut, a ledge, a tuft): its feet that
+ * many px behind the walk line (0 to the field's depth), `on` px above the
+ * ground there (a treetop on its trunk, grass on a ledge; negative for a shadow
+ * under it). Those rows are counted from the house lot outward: `offset` px out
+ * from the lot's edge, again every `every` px (once without it), on both sides
+ * of the house or the one `side` names ('left', 'right'; a back yard has only
+ * the left), so they stay put when the yard grows. Rows sharing a `group` are
+ * one thing: they jitter together and are skipped together. They are drawn back
+ * to front, behind the house and everything on the street.
  * Look fields: sky [top, bottom] or [top, middle, bottom], field, fieldDark,
  * soil (deco or null), soilColor, stars, layers, near, nearTint, trim, and
  * depth: how far the field reaches back from the walk line (default
@@ -101,8 +113,126 @@ const FIREBOG_NEAR = [
 ];
 const FIREBOG_TRIM = ['mushrooms', 'grass_solid', 'underground_plant_1'];
 
-function firebog({ sky, field = 0x5e4430, fieldDark = 0x4a3324, layers, near = FIREBOG_NEAR, trim = FIREBOG_TRIM, nearTint }) {
-  return { sky, field, fieldDark, soil: null, soilColor: 0x4c3022, layers, near, nearTint, trim };
+
+// What stands in a Firebog field (G616, report #160). Tiny Speck's Firebog streets stand their
+// bottletrees, huts and ledges right down in the walking ground (the header pictures show it);
+// the remake's first recipes stood every layer on the field's back edge, so the near trunks
+// ended on one hard line over an empty brown band. These rows are `near` pieces with `inField`
+// (homes-feature landscapeNearSpots): `offset` is px out from the house lot, `side` the side
+// of the house, `every` how often it comes again on a long yard.
+
+/** The flat brown of Tiny Speck's Firebog ground decos (ground_generic_*, the foot of grass_solid): a field of this colour takes them without a seam. */
+const FIREBOG_GROUND = 0x4c3b2a;
+/** A colour under a light (a Pixi tint multiplies the same way). */
+const lit = (color, light = 0xffffff) => [16, 8, 0].reduce((out, sh) => out | (Math.round((((color >> sh) & 255) * ((light >> sh) & 255)) / 255) << sh), 0);
+const round2 = (n) => Math.round(n * 100) / 100;
+
+/** A piece standing in the field: feet `inField` px behind the walk line, `offset` px out from the house lot. */
+const stand = (s, scale, inField, offset, extra = {}) => ({ s, scale, inField, offset, jitter: 0, ...extra });
+/** The painted width and height of the bottletree bodies (the PNGs have empty sides). */
+const BODY = {
+  bottletree_body1: [888, 832], bottletree_body2: [785, 1314], bottletree_body3: [780, 1312], bottletree_body4: [780, 1312],
+  bottletree_body5_face: [786, 820], bottletree_burb_wndw_2: [853, 1286], bottletree_city_wndw_1: [778, 734],
+};
+/** The soft shadow a thing `width` px wide sits on (the `shadow` deco, 412 px of paint in 432x156). */
+const shade = (group, width, inField, offset, extra = {}) => {
+  const scale = round2((width * 1.3) / 412);
+  return stand('shadow', scale, inField, offset, { group, ...extra, on: -Math.round(156 * scale * 0.4) });
+};
+/** A bottletree body sitting in the field on its own shadow, a treetop on its rim (`top: null` for none). */
+function standBottle(group, body, scale, inField, offset, { top = 'treetop_noflowers_1', topScale = 0.8, ...extra } = {}) {
+  const [w, h] = BODY[body];
+  const more = { group, ...extra };
+  return [
+    shade(group, w * scale, inField, offset, extra),
+    stand(body, scale, inField, offset, more),
+    ...(top ? [stand(top, round2(scale * topScale), inField, offset, { ...more, on: Math.round(h * scale * 0.93) })] : []),
+  ];
+}
+/** A whole small bottletree on its legs (background_bottletree_hut, _face, _barred: about 480x620): a hut at the back of the field. */
+function standHut(group, s, scale, inField, offset, extra = {}) {
+  return [shade(group, 330 * scale, inField, offset, extra), stand(s, scale, inField, offset, { group, ...extra })];
+}
+/** A walking bottletree: a body up on a set of root legs (as the yards' walker), its legs in the field. */
+function standWalker(group, body, scale, inField, offset, { top = 'treetop_noflowers_1', ...extra } = {}) {
+  const [, h] = BODY[body];
+  const more = { group, ...extra };
+  const lift = Math.round(604 * scale * 0.45);
+  return [
+    shade(group, 800 * scale, inField, offset, extra),
+    stand('legs_back_set1', round2(scale * 1.1), inField + 4, offset, more),
+    stand(body, scale, inField, offset, { ...more, on: lift }),
+    ...(top ? [stand(top, round2(scale * 0.8), inField, offset, { ...more, on: lift + Math.round(h * scale * 0.93) })] : []),
+    stand('legs_front_set', scale, inField, offset, more),
+  ];
+}
+/**
+ * Raised ledges (front_ground_*), as the headers' stepped ground: a long low step in front,
+ * a higher one behind it, grass and a plant on top. `inField` is the front step's foot; the
+ * steps run about 300 px out from `offset`.
+ */
+function standLedges(group, inField, offset, { plant = 'underground_plant_1', plantScale = 0.5, ...extra } = {}) {
+  const more = { group, ...extra };
+  return [
+    // the back step: taller, set deeper
+    stand('front_ground_set_3', 0.3, inField + 30, offset + 150, more),
+    stand('grass_solid', 0.4, inField + 30, offset + 160, { ...more, on: 88 }),
+    // the front step: two lengths of front_ground_2 (which has 24 px of empty foot)
+    stand('front_ground_2', 0.36, inField, offset + 70, { ...more, on: -8 }),
+    stand('front_ground_2', 0.36, inField, offset + 232, { ...more, on: -8 }),
+    stand('grass_solid', 0.46, inField, offset + 24, { ...more, on: 54 }),
+    stand(plant, plantScale, inField, offset + 84, { ...more, on: 56 }),
+    stand('grass_solid', 0.4, inField, offset + 270, { ...more, on: 54 }),
+  ];
+}
+/** A campfire with a mossy stone beside it (the Vidya Vent and Crinum Quag headers). fire1 has 47 px of empty foot. */
+const standCamp = (group, inField, offset, extra = {}) => [
+  shade(group, 70, inField, offset, extra),
+  stand('fire1', 0.2, inField, offset, { group, ...extra, on: -9, noFlip: true }),
+  stand('stone_moss_2', 0.26, inField - 6, offset + 70, { group, ...extra }),
+];
+/** Loose things scattered through the field (each row jitters on its own): rows of [sprite, scale, inField, every, offset]. */
+const scatter = (tag, rows, extra = {}) => rows.map(([s, scale, inField, every, offset = 0, more = {}], n) => (
+  { s, scale, inField, every, offset, jitter: Math.round(every * 0.28), group: `${tag}${n}`, ...extra, ...more }
+));
+/** Grass through the field: small at the back, larger towards the walk line. */
+const FIREBOG_TUFTS = scatter('tuft', [
+  ['grass_solid', 0.34, 112, 330, 40],
+  ['grass_solid', 0.42, 84, 410, 190],
+  ['grass_solid', 0.5, 52, 470, 110],
+  ['grass_solid', 0.56, 24, 520, 300],
+  ['ground_spots_dark_1', 0.4, 96, 540, 0],
+  ['ground_spots_dark_1', 0.5, 40, 620, 260],
+]);
+/** The field's back edge: low mounds of the ground's own colour, so the far layers stand behind rolling ground, not on a ruled line. */
+const firebogRim = (light) => ({
+  f: 1,
+  ...(light === 0xffffff ? {} : { tint: light }),
+  items: [
+    item('ground_generic_2_spotless', 0.62, 586 + 70, 520, 140, 60),
+    item('ground_generic_1_spotless', 0.42, 586 + 62, 1180, 260, 700),
+    item('ground_generic_3_spotless', 0.4, 586 + 66, 1500, 300, 1200),
+  ],
+});
+
+/**
+ * A Firebog look. `light` tints the ground and everything standing on it (the header's ground
+ * colour over FIREBOG_GROUND); `stand` is what stands in the field, drawn with the grass tufts
+ * and the front fringe.
+ */
+function firebog({ seed, sky, light = 0xffffff, layers, stand: standing, near = FIREBOG_NEAR, trim = FIREBOG_TRIM }) {
+  return {
+    ...(seed ? { seed } : {}),
+    sky,
+    field: lit(FIREBOG_GROUND, light),
+    fieldDark: lit(0x3b2d20, light),
+    soil: null,
+    soilColor: lit(0x44301f, light),
+    layers: [...layers, firebogRim(light)],
+    near: [...standing, ...FIREBOG_TUFTS, ...near],
+    ...(light === 0xffffff ? {} : { nearTint: light }),
+    trim,
+  };
 }
 
 // Uralia (zutto1.swf, the Uralia and Ilmenskie streets)
@@ -379,135 +509,206 @@ export const RECIPES = {
   },
 
   // ---------------------------------------------------------------- Firebog
+  // G616: each look's near trunks, huts and ledges stand in the field (`stand`), laid out from
+  // its header picture; the far layers stay on the horizon behind the field's rolling rim.
   firebog_1_high: {
-    // The remake's first Firebog look, unchanged.
-    look: {
+    // Florid Tangles (header-1338326874): the remake's first Firebog look (its sky and far layers
+    // unchanged): bodies with round windows, ledges with pots, glowing bogwillows.
+    look: firebog({
       seed: 'firebog',
       sky: [0xf0d98a, 0x9a5a3a],
-      field: 0x6a4a34,
-      fieldDark: 0x523726,
-      soil: null,
-      soilColor: 0x4c3022,
       layers: [
         { f: 0.1, items: [item('background_horizon_bottletrees_1', 0.7, 500, 1300, 0)] },
         { f: 0.25, items: [item('background_brown_bump3', 0.6, 548, 1280, 0)] },
         {
           f: 0.45,
           items: [
-            item('treetop_noflowers_2', 0.2, 420, 900, 180, 200),
-            item('bottletree_body1', 0.16, 566, 900, 180, 200),
+            item('treetop_noflowers_2', 0.2, 440, 900, 180, 200),
+            item('bottletree_body1', 0.16, 588, 900, 180, 200),
             item('background_bottletree_silhouette', 0.8, 560, 430, 120, 60),
           ],
         },
-        {
-          f: 0.75,
-          items: [
-            item('background_brown_bump1', 0.55, 600, 1600, 0),
-            item('mushrooms', 0.42, 600, 560, 200, 300),
-          ],
-        },
+        { f: 0.75, items: [item('background_brown_bump1', 0.55, 596, 1600, 0)] },
       ],
-      near: FIREBOG_NEAR,
-      trim: FIREBOG_TRIM,
-    },
+      stand: [
+        // left of the house: a windowed body between the signpost and the street's end, ledges beyond
+        ...standBottle('l-trunk', 'bottletree_burb_wndw_2', 0.2, 80, 196, { side: 'left', every: 1500, top: 'treetop_noflowers_3' }),
+        stand('ground_rootpipe2', 0.34, 48, 268, { side: 'left', every: 1500, group: 'l-trunk' }),
+        ...standLedges('l-ledge', 50, 330, { side: 'left', every: 1500, plant: 'underground_bogwillow_3', plantScale: 0.34 }),
+        // right of the house: a great trunk and a low windowed hut, ledges with pots, a short tree
+        ...standBottle('r-trunk', 'bottletree_body2', 0.24, 86, 150, { side: 'right', every: 1900 }),
+        ...standBottle('r-low', 'bottletree_city_wndw_1', 0.2, 46, 290, { side: 'right', every: 1900, top: null }),
+        stand('ground_rootpipe2', 0.34, 26, 196, { side: 'right', every: 1900, group: 'r-low' }),
+        ...standLedges('r-ledge', 46, 450, { side: 'right', every: 1900, plant: 'underground_bogwillow_3', plantScale: 0.34 }),
+        stand('ground_rootpipe1', 0.3, 20, 790, { side: 'right', every: 1900, group: 'r-pots' }),
+        stand('underground_bogwillow', 0.26, 56, 840, { side: 'right', every: 1900, group: 'r-pots' }),
+        ...standBottle('r-short', 'bottletree_body1', 0.14, 72, 960, { side: 'right', every: 1900, top: 'treetop_noflowers_2' }),
+        stand('mushrooms', 0.3, 34, 1040, { side: 'right', every: 1900, group: 'r-short' }),
+        ...standLedges('r-ledge2', 52, 1150, { side: 'right', every: 1900 }),
+        ...standBottle('r-far', 'bottletree_burb_wndw_2', 0.2, 84, 1560, { side: 'right', every: 1900, top: 'treetop_noflowers_3' }),
+      ],
+    }),
   },
   firebog_1b_high: {
+    // Raima's Roost (header-1338327068): the Florid Tangles ground in a dusk light: dark bodies,
+    // ledges, pots and mossy stones.
     look: firebog({
       sky: [0x8c7a48, 0x8a8a52],
-      field: 0x4a3828,
-      fieldDark: 0x3b2c1e,
+      light: 0xc8b8a0,
       layers: [
         { f: 0.1, items: [item('background_horizon_bottletrees_2', 0.7, 520, 1300, 0, 0, { tint: 0xb0a070 })] },
-        { f: 0.3, items: [item('backhill1_green', 0.5, 560, 820, 200, 200), item('backhill2_green', 0.6, 562, 900, 200, 640)] },
-        {
-          f: 0.5,
-          items: [
-            ...bottle(0.2, 590, 760, 120),
-            item('legs_moss_4', 0.3, 594, 1100, 300, 500),
-          ],
-        },
-        { f: 0.75, items: [item('stone_moss_group_3', 0.5, 600, 900, 260, 300), item('underground_bogwillow', 0.5, 600, 700, 200, 100)] },
+        { f: 0.3, items: [item('backhill1_green', 0.5, 566, 820, 200, 200), item('backhill2_green', 0.6, 568, 900, 200, 640)] },
+        { f: 0.5, items: [...bottle(0.15, 590, 760, 120), item('legs_moss_4', 0.22, 592, 1100, 300, 500)], tint: 0xc0b090 },
+      ],
+      stand: [
+        ...standLedges('l-ledge', 48, 150, { side: 'left', every: 1500 }),
+        ...standBottle('l-trunk', 'bottletree_body2', 0.22, 84, 420, { side: 'left', every: 1500, top: 'treetop_noflowers_3' }),
+        stand('stone_moss_group_3', 0.34, 28, 96, { side: 'left', every: 1500, group: 'l-stone' }),
+        ...standBottle('r-low', 'bottletree_city_wndw_1', 0.2, 66, 170, { side: 'right', every: 1900, top: null }),
+        stand('underground_bogwillow', 0.26, 34, 262, { side: 'right', every: 1900, group: 'r-low' }),
+        ...standBottle('r-trunk', 'bottletree_body4', 0.24, 88, 420, { side: 'right', every: 1900, top: 'treetop_noflowers_3' }),
+        stand('ground_rootpipe2', 0.34, 52, 500, { side: 'right', every: 1900, group: 'r-trunk' }),
+        ...standLedges('r-ledge', 44, 600, { side: 'right', every: 1900, plant: 'underground_bogwillow_3', plantScale: 0.34 }),
+        stand('stone_moss_group_3', 0.36, 20, 940, { side: 'right', every: 1900, group: 'r-stone' }),
+        ...standWalker('r-walker', 'bottletree_burb_wndw_2', 0.19, 72, 1090, { side: 'right', every: 1900, top: null }),
+        ...standLedges('r-ledge2', 50, 1330, { side: 'right', every: 1900 }),
       ],
     }),
   },
   firebog_3_high: {
+    // Idle Undergrowth (header-1338327079): a dark hollow: great bodies, root legs, hanging
+    // branches, red firebeans and mossy stones on stepped ground.
     look: firebog({
       sky: [0x3a2410, 0x5a3a14],
-      field: 0x463322,
-      fieldDark: 0x37281a,
+      light: 0xd8c8b0,
       layers: [
         { f: 0.1, items: [item('background', 0.5, 540, 1700, 0, 0, { tint: 0x8a6a40 })] },
-        { f: 0.3, items: [...bottle(0.18, 580, 700, 0, 'treetop_noflowers_3', { tint: 0xa08060 })] },
+        { f: 0.3, items: [...bottle(0.18, 588, 700, 0, 'treetop_noflowers_3', { tint: 0xa08060 })] },
         {
           f: 0.55,
           items: [
             item('hanging_braches1', 0.4, 120, 900, 260, 300, { hang: true, tint: 0xc0a080 }),
-            item('legs_moss_4', 0.34, 596, 1000, 260, 700),
-            item('sprout', 0.4, 594, 1300, 300, 1100),
+            item('legs_moss_4', 0.24, 592, 1000, 260, 700, { tint: 0xb89878 }),
           ],
         },
-        { f: 0.75, items: [item('hang_branch1', 0.5, 140, 700, 200, 100, { hang: true }), item('stone_moss_group_3', 0.5, 600, 900, 260, 400)] },
+        { f: 0.75, items: [item('hang_branch1', 0.5, 140, 700, 200, 100, { hang: true })] },
       ],
-      nearTint: 0xd8c0a0,
+      stand: [
+        ...standWalker('l-walker', 'bottletree_burb_wndw_2', 0.19, 68, 210, { side: 'left', every: 1500, top: null }),
+        stand('firebean_2', 0.22, 38, 110, { side: 'left', every: 1500, group: 'l-bean' }),
+        ...standLedges('l-ledge', 50, 360, { side: 'left', every: 1500, plant: 'firebean_1', plantScale: 0.2 }),
+        ...standBottle('r-trunk', 'bottletree_body3', 0.25, 86, 140, { side: 'right', every: 1900, top: null }),
+        stand('sprout', 0.13, 50, 226, { side: 'right', every: 1900, group: 'r-trunk' }),
+        stand('stone_moss_group_3', 0.36, 24, 300, { side: 'right', every: 1900, group: 'r-stone' }),
+        ...standLedges('r-ledge', 46, 400, { side: 'right', every: 1900, plant: 'firebean_1', plantScale: 0.2 }),
+        stand('legs_moss_4', 0.2, 76, 780, { side: 'right', every: 1900, group: 'r-leg' }),
+        stand('firebean_2', 0.22, 42, 850, { side: 'right', every: 1900, group: 'r-leg' }),
+        ...standBottle('r-face', 'bottletree_body5_face', 0.22, 64, 1010, { side: 'right', every: 1900, top: 'treetop_noflowers_3', topScale: 0.7 }),
+        stand('ground_rootpipe2', 0.34, 34, 1110, { side: 'right', every: 1900, group: 'r-face' }),
+        ...standLedges('r-ledge2', 50, 1280, { side: 'right', every: 1900 }),
+      ],
     }),
   },
   firebog_4_high: {
+    // Vidya Vent (header-1338327089): golden haze, two great bodies under one treetop, a hut
+    // with holes, stepped ledges with grass and bug flowers, a campfire, far bottletrees in the haze.
     look: firebog({
       sky: [0xc8b46c, 0xa48a62],
-      field: 0x544232,
-      fieldDark: 0x433426,
       layers: [
-        { f: 0.08, items: [item(['background_bottletree_1', 'background_bottletree_2'], 0.9, 540, 360, 160, 0, { tint: 0xc8b488 })] },
-        { f: 0.2, items: [item('background_horizon_no_bottletrees_1', 0.6, 560, 1300, 0, 0, { tint: 0xa89070 })] },
+        { f: 0.08, items: [item(['background_bottletree_1', 'background_bottletree_2'], 0.9, 546, 360, 160, 0, { tint: 0xc8b488 })] },
+        { f: 0.2, items: [item('background_horizon_no_bottletrees_1', 0.6, 566, 1300, 0, 0, { tint: 0xa89070 })] },
         {
           f: 0.45,
           items: [
-            item('background_bottletree_hut', 0.4, 588, 1100, 300, 200),
-            ...shortBottle(0.2, 590, 1100, 760),
+            item('background_bottletree_hut', 0.3, 590, 1100, 300, 200),
+            ...shortBottle(0.15, 592, 1100, 760),
           ],
+          tint: 0xd8c8a0,
         },
-        { f: 0.75, items: [...bottle(0.24, 600, 900, 300), item('lantern_stacked', 0.6, 600, 1300, 300, 600)] },
+      ],
+      stand: [
+        // left of the house: a great trunk between the signpost and the street's end, ledges beyond
+        ...standBottle('l-trunk', 'bottletree_body3', 0.24, 82, 196, { side: 'left', every: 1500 }),
+        stand('sprout', 0.13, 50, 270, { side: 'left', every: 1500, group: 'l-trunk' }),
+        ...standLedges('l-ledge', 48, 330, { side: 'left', every: 1500 }),
+        // right of the house: the pair under one treetop, a campfire, ledges, a short tree, a hut
+        ...standBottle('r-pair', 'bottletree_body4', 0.25, 86, 150, { side: 'right', every: 1900 }),
+        ...standBottle('r-face', 'bottletree_body5_face', 0.21, 48, 268, { side: 'right', every: 1900, top: null }),
+        stand('sprout', 0.13, 30, 176, { side: 'right', every: 1900, group: 'r-face' }),
+        ...standCamp('r-camp', 30, 420, { side: 'right', every: 1900 }),
+        ...standLedges('r-ledge', 46, 540, { side: 'right', every: 1900 }),
+        ...standBottle('r-short', 'bottletree_body1', 0.14, 72, 950, { side: 'right', every: 1900, top: 'treetop_noflowers_2' }),
+        stand('lantern_stacked', 0.5, 42, 1030, { side: 'right', every: 1900, group: 'r-short' }),
+        ...standHut('r-hut', 'background_bottletree_hut', 0.3, 92, 1130, { side: 'right', every: 1900 }),
+        stand('mushrooms', 0.3, 28, 1076, { side: 'right', every: 1900, group: 'r-hut' }),
+        ...standLedges('r-ledge2', 50, 1330, { side: 'right', every: 1900 }),
       ],
     }),
   },
   firebog_2_high: {
+    // Gilded Marsh (header-1338327111): a storm-blue sky over low stepped ground: root legs
+    // holding bodies up out of sight, small whole bottletrees, yellow bogwillows, red firebeans.
     look: firebog({
       sky: [0x41535e, 0x6a8592],
-      field: 0x4a3929,
-      fieldDark: 0x3a2d20,
       layers: [
         { f: 0.08, items: [item('clouds5', 0.8, 360, 900, 300, 0, { alpha: 0.5 })] },
-        { f: 0.2, items: [item('background_horizon_bottletrees_1', 0.7, 540, 1300, 0, 0, { tint: 0x2a2a28 })] },
+        { f: 0.2, items: [item('background_horizon_bottletrees_1', 0.7, 548, 1300, 0, 0, { tint: 0x2a2a28 })] },
         {
           f: 0.45,
           items: [
-            item('background_bottletree_face', 0.42, 590, 1000, 260, 300),
-            item('legs_moss_4', 0.36, 596, 1300, 300, 900),
-            item('underground_bogwillow', 0.42, 596, 520, 160, 100),
+            item('background_bottletree_face', 0.3, 590, 1000, 260, 300),
+            item('legs_moss_4', 0.24, 592, 1300, 300, 900),
           ],
           tint: 0xb8c0c8,
         },
-        { f: 0.75, items: [item('firebean_2', 0.4, 600, 760, 220, 300), item('underground_bogwillow_2', 0.6, 600, 600, 200, 100)] },
+      ],
+      stand: [
+        ...standWalker('l-walker', 'bottletree_body2', 0.2, 64, 210, { side: 'left', every: 1500 }),
+        stand('underground_bogwillow', 0.28, 34, 110, { side: 'left', every: 1500, group: 'l-bush' }),
+        ...standLedges('l-ledge', 50, 360, { side: 'left', every: 1500, plant: 'underground_bogwillow_3', plantScale: 0.34 }),
+        ...standHut('r-hut', 'background_bottletree_hut', 0.3, 88, 130, { side: 'right', every: 1900 }),
+        stand('firebean_2', 0.22, 50, 214, { side: 'right', every: 1900, group: 'r-hut' }),
+        stand('underground_bogwillow', 0.3, 30, 300, { side: 'right', every: 1900, group: 'r-bush' }),
+        ...standLedges('r-ledge', 46, 380, { side: 'right', every: 1900, plant: 'mushrooms', plantScale: 0.24 }),
+        ...standWalker('r-walker', 'bottletree_body4', 0.2, 70, 820, { side: 'right', every: 1900 }),
+        stand('stone_moss_group_3', 0.36, 24, 950, { side: 'right', every: 1900, group: 'r-stone' }),
+        ...standHut('r-hut2', 'background_bottletree_face', 0.28, 92, 1080, { side: 'right', every: 1900 }),
+        stand('underground_bogwillow', 0.28, 40, 1160, { side: 'right', every: 1900, group: 'r-hut2' }),
+        ...standLedges('r-ledge2', 50, 1300, { side: 'right', every: 1900, plant: 'firebean_1', plantScale: 0.2 }),
       ],
     }),
   },
   firebog_4a_high: {
+    // Crinum Quag (header-1338327163): Vidya Vent's ground at green dusk: lanterns on a line, a
+    // hut on its legs, a campfire, the golden pair, stepped ledges at both ends.
     look: firebog({
       sky: [0x3c4834, 0x6e7048],
-      field: 0x433427,
-      fieldDark: 0x35291e,
+      light: 0xdcdce6,
       layers: [
-        { f: 0.15, items: [item('background_horizon_bottletrees_2', 0.7, 540, 1300, 0, 0, { tint: 0x5a5c40 })] },
+        { f: 0.15, items: [item('background_horizon_bottletrees_2', 0.7, 548, 1300, 0, 0, { tint: 0x5a5c40 })] },
         {
           f: 0.45,
           items: [
-            item('background_bottletree_hut', 0.36, 588, 1200, 300, 200),
-            ...bottle(0.2, 590, 1200, 800, 'treetop_noflowers_3'),
+            item('background_bottletree_hut', 0.28, 590, 1200, 300, 200),
+            ...bottle(0.15, 592, 1200, 800, 'treetop_noflowers_3'),
             item('lantern', 0.7, 150, 300, 80, 0, { hang: true }),
           ],
           tint: 0xc0c4a0,
         },
-        { f: 0.75, items: [item('lantern_stacked', 0.6, 600, 900, 260, 400), item('stone_moss_group_4', 0.5, 600, 1000, 260, 200)] },
+      ],
+      stand: [
+        ...standLedges('l-ledge', 48, 130, { side: 'left', every: 1500 }),
+        ...standWalker('l-walker', 'bottletree_burb_wndw_2', 0.19, 72, 420, { side: 'left', every: 1500, top: null }),
+        ...standHut('r-hut', 'background_bottletree_barred', 0.28, 90, 120, { side: 'right', every: 1900 }),
+        stand('lantern_stacked', 0.5, 46, 200, { side: 'right', every: 1900, group: 'r-hut' }),
+        ...standCamp('r-camp', 28, 310, { side: 'right', every: 1900 }),
+        ...standBottle('r-pair', 'bottletree_body4', 0.24, 86, 520, { side: 'right', every: 1900 }),
+        ...standBottle('r-face', 'bottletree_body5_face', 0.21, 50, 636, { side: 'right', every: 1900, top: null }),
+        stand('sprout', 0.13, 32, 548, { side: 'right', every: 1900, group: 'r-face' }),
+        ...standLedges('r-ledge', 46, 800, { side: 'right', every: 1900 }),
+        stand('stone_moss_group_4', 0.36, 20, 1130, { side: 'right', every: 1900, group: 'r-stone' }),
+        ...standBottle('r-short', 'bottletree_body1', 0.14, 74, 1240, { side: 'right', every: 1900, top: 'treetop_noflowers_2' }),
+        ...standLedges('r-ledge2', 50, 1420, { side: 'right', every: 1900 }),
       ],
     }),
   },

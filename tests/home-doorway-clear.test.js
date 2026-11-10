@@ -18,7 +18,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { HOME_LIMITS } from '../public/js/homes-catalog.js?v=10ac34b6';
 import { createCultivationState, homeStreetLayout } from '../public/js/home-cultivation.js?v=9571e110';
-import { EXTERIOR_STYLES, streetLook } from '../public/js/home-styles.js?v=3615410c';
+import { EXTERIOR_STYLES, streetLook } from '../public/js/home-styles.js?v=5b49a731';
 import { NEIGHBOURS, neighbourLayout } from '../public/js/neighbours.js?v=161fc2e5';
 import { SCENE_STYLES, propPlan } from '../public/js/features/neighbour-scene.js?v=15d683af';
 import {
@@ -31,7 +31,7 @@ import {
   streetNearSkip,
   streetTrimSpots,
   towerDoorway,
-} from '../public/js/features/homes-feature.js?v=64e8d9cd';
+} from '../public/js/features/homes-feature.js?v=6f689019';
 
 const read = (rel) => readFileSync(join(import.meta.dirname, '..', 'public', 'js', rel), 'utf8');
 const maxLeft = HOME_LIMITS.MAX_FRONTYARD_LEFT_SEGMENTS - HOME_LIMITS.START_FRONTYARD_LEFT_SEGMENTS;
@@ -120,7 +120,7 @@ describe('the home street keeps its doorways clear of scenery (PORCH)', () => {
           const towers = [null];
           for (let x = layout.lotRight + 200; x < layout.width - 200; x += 37) towers.push(x);
           for (const towerX of towers) {
-            const spots = landscapeNearSpots(look, seed, layout.width, streetNearSkip(layout, { towerX }));
+            const spots = landscapeNearSpots(look, seed, layout.width, streetNearSkip(layout, { towerX }), { lot: { left: layout.lotLeft, right: layout.lotRight } });
             for (const s of spots) {
               checked += 1;
               for (const style of HOUSE_STYLE_KEYS) assert.ok(!over(s.x, s.half, houseDoorway(layout, style)), `${row.key} ${s.row.s} on the ${style} doorway`);
@@ -137,6 +137,6 @@ describe('the home street keeps its doorways clear of scenery (PORCH)', () => {
     const src = read('features/homes-feature.js');
     assert.match(src, /for \(const spot of streetTrimSpots\(style, layout, houseStyle\)\)/);
     assert.match(src, /skipNear: streetNearSkip\(layout, \{ towerX: towerFootX\(cult\) \}\)/);
-    assert.match(src, /for \(const spot of landscapeNearSpots\(style, seed, width, skipNear\)\)/);
+    assert.match(src, /for \(const spot of landscapeNearSpots\(style, seed, width, skipNear, \{ lot \}\)\)/);
   });
 });
