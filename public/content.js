@@ -36,6 +36,7 @@ import {
   fertilizePlot,
 } from './js/garden.js?v=eae8b052';
 import { firstWorkingTool, HOE_TOOLS, WATERING_CAN_TOOLS } from './js/tools.js?v=5f482998';
+import { miningGemHint } from './js/gem-hints.js?v=4b65f7ac';
 import {
   ROCK_CATALOG,
   MINING_COSTS,
@@ -975,6 +976,8 @@ export function getVerbsFor(target, ctx) {
     const mineUpgrades = ctx.imaginationUpgrades || pc.imaginationUpgrades || [];
     const swing = (hasSkill && miningProfile(learned, pick || 'pick', mineUpgrades))
       || miningProfile(undefined, pick || 'pick', mineUpgrades);
+    // G617: tell a player with no Truly Outrageous card how gems are found (the remake's own line).
+    const gemHint = miningGemHint(swing);
     add('mine', 'mine', {
       sort: 10,
       energy: swing?.energy ?? MINING_COSTS.energy,
@@ -992,7 +995,7 @@ export function getVerbsFor(target, ctx) {
         : worn
           ? 'Your pick does not have enough uses left.'
         : pick
-          ? `Swing your ${pick.replace(/_/g, ' ')} (${rock.chunksRemaining ?? '?'} chunks left)`
+          ? `Swing your ${pick.replace(/_/g, ' ')} (${rock.chunksRemaining ?? '?'} chunks left)${gemHint ? `. ${gemHint}` : ''}`
           : 'Requires a Pick in your pack',
     });
     add('talk_to', 'inspect', {

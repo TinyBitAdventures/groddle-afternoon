@@ -136,6 +136,7 @@ import { PROJECTS_TEXT, contributedJobs, mineTotal, projectList } from '../proje
 import { PROJECTS_PANEL_ID, buildProjectsPanel, renderProjects } from '../ui/projects-sheet.js?v=972ce850';
 import { SIDE_SHEET_IDS } from '../ui/panel-shell.js?v=e2abdf9e';
 import { trophyGotText } from '../home-trophies.js?v=309fd6c7';
+import { GEM_HINTS, isGem } from '../gem-hints.js?v=4b65f7ac';
 
 export const STREET_JOBS_FEATURE_ID = 'street-jobs';
 const BOARD_CLASS = 'street_job_board';
@@ -1222,6 +1223,8 @@ function renderPanel(engine) {
     else if (!r.done && !r.open) meta.push('opens after the earlier steps');
     if (shared(jobId) && row.held?.[r.id]) meta.push(`${row.held[r.id]} being counted`);
     text.append(el('small', {}, meta.join(' · ')));
+    // G617: how gems are found, under a gem ask still open (the remake's own line; no source).
+    if (r.type === 'item' && isGem(r.classId) && !r.done) text.append(el('small', { class: 'sj-hint', dataset: { sjHint: 'gems' } }, GEM_HINTS.project));
     const acts = el('div', { class: 'sj-acts' });
     if (open && r.open) {
       if (r.type === 'item') {
