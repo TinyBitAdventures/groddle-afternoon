@@ -98,6 +98,30 @@ export function gnomePlaceFor(scene, { inHome = false, visiting = false } = {}) 
   return scene.houseFloor ? `house:${scene.houseFloor}` : 'house';
 }
 
+/**
+ * G640: a home room's world x moved by `dx` (the home street grew to the left, or the back yard
+ * did and pushed the house along): the gnomes set down there move with it, so each keeps its place
+ * beside the house, as dropped stacks and the Craftybot do (homes-feature shiftShownRoom and its
+ * homeRoomShifted query). In the source the house stands at x 0 and an expansion only moves the
+ * street's left edge (locations/inc_homes.js homes_yard_rebuild 2309-2335: new_dims.l = 0 - the
+ * yard's size), so nothing set down ever moved against the house. `room`: 'street', or 'interior'
+ * for the house's ground floor (place 'house'); upper floors and Tower floors start at x 0 and
+ * never move. The stored shape stays a world x (the site's Neighbours::gnomeRows reads it as it
+ * is). Returns the gnomes moved.
+ */
+export function shiftGnomes(placed, room, dx) {
+  const place = room === 'street' ? 'street' : room === 'interior' ? 'house' : null;
+  const by = Number(dx);
+  if (!place || !Number.isFinite(by) || !by || !Array.isArray(placed)) return [];
+  const moved = [];
+  for (const g of placed) {
+    if (g?.place !== place) continue;
+    g.x = Math.round((Number(g.x) || 0) + by);
+    moved.push(g);
+  }
+  return moved;
+}
+
 /** The most of an owner's gnomes one visit shows (the site's Neighbours::GNOMES_MAX). */
 export const GNOME_VISIT_MAX = 24;
 

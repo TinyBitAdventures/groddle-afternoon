@@ -37,13 +37,13 @@ import {
   tendAct,
   tendCounters,
   tendedText,
-} from '../public/js/neighbours-mp.js?v=38cc03d8';
+} from '../public/js/neighbours-mp.js?v=f221f6e6';
 import { createButlerState, giveGiftTo, newestVisit, nextHandover, normalizeButlerState, packagesAndMessagesForOwner, recordVisitor, setGift, visitorsReport } from '../public/js/butler.js?v=4a4b82a2';
 import { GARDEN_SPEEDUP, SEED_CATALOG as GARDEN_SEEDS, createGarden, tickGarden } from '../public/js/garden.js?v=1e8a887d';
 import { butlerApi } from '../public/js/features/butler-feature.js?v=7790ab9c';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=10b118dd';
 import { acceptOffer, routeQuestEvent } from '../public/js/quest-offers.js?v=9c53455c';
-import { neighboursMpFeature } from '../public/js/features/neighbours-mp-feature.js?v=76b63950';
+import { neighboursMpFeature } from '../public/js/features/neighbours-mp-feature.js?v=b9b50f7c';
 import { createMinnAccount } from '../public/js/minn-account.js?v=8f2741cd';
 import { HAS_SERVER, HAS_SITE, SITE_DIR, serverPath, sitePath } from '../tools/repos.mjs';
 

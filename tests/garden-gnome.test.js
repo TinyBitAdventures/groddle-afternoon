@@ -32,16 +32,17 @@ import {
   phraseMs,
   placeState,
   resetDirection,
+  shiftGnomes,
   teachMenu,
   tickGnome,
   visitGnomePlace,
-} from '../public/js/garden-gnome.js?v=a316da65';
-import { gardenGnomeFeature as feature } from '../public/js/features/garden-gnome-feature.js?v=79b00ad2';
+} from '../public/js/garden-gnome.js?v=d9f8e52b';
+import { gardenGnomeFeature as feature } from '../public/js/features/garden-gnome-feature.js?v=8b3c9818';
 import { worldArtFor } from '../public/js/world-art.js?v=df476660';
 import { GNOME_ART, GNOME_ART_DIR } from '../public/js/garden-gnome-art.js?v=994b7c76';
 import { HOME_STREET_TSID } from '../public/js/homes.js?v=631ab6b8';
-import { normalizeHomeView, readVisitScene } from '../public/js/neighbours-mp.js?v=38cc03d8';
-import { neighboursMpFeature } from '../public/js/features/neighbours-mp-feature.js?v=76b63950';
+import { normalizeHomeView, readVisitScene } from '../public/js/neighbours-mp.js?v=f221f6e6';
+import { neighboursMpFeature } from '../public/js/features/neighbours-mp-feature.js?v=b9b50f7c';
 import { HAS_SITE, SITE_DIR, sitePath } from '../tools/repos.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -236,6 +237,76 @@ describe('the feature', () => {
   it('player-facing copy has no em-dash', () => {
     const copy = Object.values(T).filter((v) => typeof v === 'string').join(' ');
     assert.doesNotMatch(copy, /—/);
+  });
+});
+
+describe('a gnome keeps its place beside the house when the home grows (G640)', () => {
+  beforeEach(() => feature._reset());
+  const placed = () => [
+    { id: 'st', place: 'street', x: 800, y: 870, facingLeft: true, phrases: ['hello'] },
+    { id: 'ho', place: 'house', x: 1700, y: 620, facingLeft: false, phrases: [] },
+    { id: 'up', place: 'house:1', x: 300, y: 620, facingLeft: true, phrases: [] },
+    { id: 'to', place: 'tower:2', x: 400, y: 620, facingLeft: true, phrases: [] },
+  ];
+  const xs = (list) => Object.fromEntries(list.map((g) => [g.id, g.x]));
+  const skipSite = !HAS_SITE ? 'no groddle-afternoon-site checkout' : spawnSync('php', ['-v']).status !== 0 ? 'no php' : false;
+
+  it('the source never moves what is set down: the house is x 0 and only the left edge moves', { skip: !existsSync(join(root, '../glitch-GameServerJS/locations/inc_homes.js')) && 'glitch-GameServerJS is not beside the game' }, () => {
+    const src = readFileSync(join(root, '../glitch-GameServerJS/locations/inc_homes.js'), 'utf8');
+    const fn = src.slice(src.indexOf('function homes_yard_rebuild'), src.indexOf('this.apiGeometryUpdated()', src.indexOf('function homes_yard_rebuild')));
+    assert.match(fn, /new_dims\.l = 0 - sz\[0\];/);
+    assert.match(fn, /new_dims\.l = 0 - this\.home_get_yard_size\(\);/);
+  });
+
+  it('a left expansion of the home street moves the street\'s gnomes by as much, and no others', () => {
+    const list = placed();
+    assert.deepEqual(shiftGnomes(list, 'street', 600).map((g) => g.id), ['st']);
+    assert.deepEqual(xs(list), { st: 1400, ho: 1700, up: 300, to: 400 });
+    // A removed expansion moves them back.
+    shiftGnomes(list, 'street', -600);
+    assert.equal(list[0].x, 800);
+  });
+
+  it('a back-yard expansion moves the gnomes on the house\'s ground floor, not upstairs or in the Tower', () => {
+    const list = placed();
+    assert.deepEqual(shiftGnomes(list, 'interior', 300.4).map((g) => g.id), ['ho']);
+    assert.deepEqual(xs(list), { st: 800, ho: 2000, up: 300, to: 400 });
+  });
+
+  it('nothing moves without a real shift or a room it knows', () => {
+    const list = placed();
+    for (const [room, dx] of [['street', 0], ['street', NaN], ['street', undefined], ['tower', 50], ['', 50], [null, 50]]) {
+      assert.deepEqual(shiftGnomes(list, room, dx), []);
+    }
+    assert.deepEqual(shiftGnomes(null, 'street', 50), []);
+    assert.deepEqual(xs(list), { st: 800, ho: 1700, up: 300, to: 400 });
+  });
+
+  it('the feature hears homes-feature\'s shift as the stacks and the Craftybot do, and the save keeps the same shape', () => {
+    feature.restore({ placed: placed() });
+    const before = feature.save();
+    assert.equal(feature.homeRoomShifted('street', 600, null), null, 'null, so every feature hears it');
+    const after = feature.save();
+    assert.deepEqual(xs(after.placed), { st: 1400, ho: 1700, up: 300, to: 400 });
+    // Only x changed: the site (Neighbours::gnomeRows) reads the same fields as before.
+    assert.deepEqual(after.placed.map((g) => ({ ...g, x: 0 })), before.placed.map((g) => ({ ...g, x: 0 })));
+    assert.deepEqual(Object.keys(after.placed[0]).sort(), ['facingLeft', 'id', 'phrases', 'place', 'x', 'y']);
+    feature.homeRoomShifted('interior', -150, null);
+    assert.equal(feature.save().placed[1].x, 1550);
+    // An old save is left as it stands: nothing moves until the home next grows.
+    feature.restore({ placed: placed() });
+    assert.deepEqual(xs(feature.save().placed), { st: 800, ho: 1700, up: 300, to: 400 });
+    const homes = readFileSync(join(root, 'public/js/features/homes-feature.js'), 'utf8');
+    const shift = homes.slice(homes.indexOf('function shiftShownRoom'), homes.indexOf('function keepStacksInHouse'));
+    assert.match(shift, /engine\.query\?\.\('homeRoomShifted', room, dx, engine\);\s+engine\.save\?\.\(\);/);
+  });
+
+  it('a visitor is sent the moved x as it is stored', { skip: skipSite }, () => {
+    feature.restore({ placed: placed() });
+    feature.homeRoomShifted('street', 600, null);
+    const state = { systems: { features: { 'garden-gnome': feature.save() } } };
+    const out = JSON.parse(execFileSync('php', ['-r', `foreach (["WordFilter", "Neighbours"] as $c) require ${JSON.stringify(SITE_DIR)} . "/src/$c.php"; echo json_encode(Groddle\\Minn\\Neighbours::gnomeRows(json_decode(${JSON.stringify(JSON.stringify(state))}), true));`]).toString());
+    assert.deepEqual(out.map((g) => [g.id, g.place, g.x]), [['st', 'street', 1400], ['ho', 'house', 1700], ['to', 'tower:2', 400]]);
   });
 });
 

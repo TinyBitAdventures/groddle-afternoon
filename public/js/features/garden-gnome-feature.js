@@ -23,7 +23,7 @@
  * teach(value). Canvas: gnomes (id@x:state:dir:phrases per gnome here, ';'), gnomePlace, gnomeLast.
  */
 import { addItem, countItem, removeItem } from '../inventory.js?v=60dfc9ca';
-import { readVisitScene } from '../neighbours-mp.js?v=38cc03d8';
+import { readVisitScene } from '../neighbours-mp.js?v=f221f6e6';
 import { frameTexture, sourceFromUrl } from '../textures.js?v=f024bd6a';
 import { GNOME_ART, GNOME_ART_DIR } from '../garden-gnome-art.js?v=994b7c76';
 import { filterText } from '../word-filter.js?v=9a7a7ebb';
@@ -48,9 +48,10 @@ import {
   normalizeGnomeSlice,
   placeState,
   resetDirection,
+  shiftGnomes,
   teachMenu,
   tickGnome,
-} from '../garden-gnome.js?v=a316da65';
+} from '../garden-gnome.js?v=d9f8e52b';
 
 export const GARDEN_GNOME_ID = 'garden-gnome';
 const NAME = 'Garden Gnome';
@@ -432,6 +433,24 @@ export const gardenGnomeFeature = {
   runPackVerb(classTsid, verbId, engine) {
     if (classTsid !== GNOME_CLASS || verbId !== 'gnome_place') return false;
     return placeFromPack(engine);
+  },
+
+  /**
+   * G640: homes-feature's shiftShownRoom says a home room's contents moved by dx in world x (the
+   * home street grew to the left, or the back yard did): your own gnomes there move with the house,
+   * as the street's stacks and the Craftybot do. homes-feature saves after asking. Null so every
+   * feature hears it.
+   */
+  homeRoomShifted(room, dx, engine) {
+    const moved = shiftGnomes(slice.placed, room, dx);
+    if (!moved.length) return null;
+    for (const g of moved) {
+      const e = drawn.get(g.id);
+      if (e?.own && e.g === g && !e.holder.destroyed) e.holder.x = g.x;
+    }
+    lastAction = `shifted:${room}:${Math.round(dx)}:${moved.length}`;
+    if (engine) publish(engine);
+    return null;
   },
 
   /** verbs.drop 320-341: "Replaced by place". */

@@ -38,10 +38,10 @@ import {
   saleVerbs,
   signpostArms,
   signpostCandidates,
-} from '../public/js/home-street-mp.js?v=4e133b37';
+} from '../public/js/home-street-mp.js?v=64251576';
 import { NOTE_POLE_CONTAINERS, NOTE_POLE_PARTS, NOTE_POLE_SIGN_Y } from '../public/js/note-pole-art.js?v=fbda2f8a';
 import { isSharedJob } from '../public/js/street-jobs-mp.js?v=24a85415';
-import { homeStreetMpFeature } from '../public/js/features/home-street-mp-feature.js?v=0e7bf3c6';
+import { homeStreetMpFeature } from '../public/js/features/home-street-mp-feature.js?v=5d69e807';
 import { projectTable } from '../tools/build-realtime-projects.mjs';
 import { HAS_SITE, SITE_DIR, serverPath } from '../tools/repos.mjs';
 
