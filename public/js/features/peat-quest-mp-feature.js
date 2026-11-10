@@ -14,7 +14,7 @@
  */
 
 import { ensureQuestOfferState } from '../quest-offers.js?v=9c53455c';
-import { nodeId } from '../street-objects.js?v=02faf4f7';
+import { nodeId } from '../street-objects.js?v=23e976c9';
 import { PEAT_ANSWER_GRACE_MS, PEAT_EVENT, PEAT_QUEST, PEAT_TEXT, fullBogNear } from '../peat-quest.js?v=c7baea41';
 
 export const PEAT_QUEST_FEATURE_ID = 'peat-quest-mp';

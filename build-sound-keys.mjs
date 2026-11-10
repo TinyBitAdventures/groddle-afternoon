@@ -195,6 +195,7 @@ for (const row of ZIP_MAP.files) {
     match: row.match,
     ...(row.url ? { url: row.url } : {}),
     ...(row.nearest ? { doubt: `nearest surviving take: ${row.nearest}` } : {}),
+    ...(row.doubt ? { doubt: row.doubt } : {}),
     ...(row.sameAs ? { why: `the zip's ${row.zip} is ${row.sameAs.split('/').pop()} byte for byte` } : {}),
     ...(row.why ? { why: row.why } : {}),
   };
@@ -292,7 +293,7 @@ const MOMENTS = {
   SPINNING_WHEEL: 'Gameshow Ticket wheel spins',
   STEWARTDOLL1: 'Stoot pull-string doll line 1 (quotes 29-42 map to STEWARTDOLL1-14)',
   COUNT_DOWN: 'Race / Game of Crowns countdown',
-  READY: 'Race ready',
+  READY: 'A machine finishes its job',
   YOU_WIN: 'Win a race or game',
   YOU_LOSE: 'Lose a race or game',
   CROWN_CHANGES_HANDS: 'Game of Crowns: crown changes hands',
@@ -530,6 +531,7 @@ const REMAKE = {
   FOX_YIP: 'Fox bark',
   KITTY_MEW: 'Heli kitty mew',
   NEIGHBOUR_WAVE: 'Neighbour chore greeting',
+  GAME_GO: 'A race or game starts, on GO! (the original played only COUNT_DOWN, which runs through GO)',
 };
 for (const [key, moment] of Object.entries(REMAKE)) {
   note(key, { category: 'remake', where: 'remake', context: moment, via: 'remake' });

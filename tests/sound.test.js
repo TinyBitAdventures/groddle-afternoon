@@ -4,15 +4,15 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { SOUND_ALIASES, SOUND_FILES, SOUND_KEY_COUNTS } from '../public/js/sound-keys.js?v=6aedc206';
+import { SOUND_ALIASES, SOUND_FILES, SOUND_KEY_COUNTS } from '../public/js/sound-keys.js?v=723af004';
 import {
   SYNTH_KEY_RECIPES,
   SYNTH_RECIPE_NAMES,
   SYNTH_RECIPES,
   playSynthRecipe,
   recipeForKey,
-} from '../public/js/synth-sfx.js?v=030fad18';
-import { createSoundBoard, resolveSound } from '../public/js/sound-board.js?v=87380a25';
+} from '../public/js/synth-sfx.js?v=920944cd';
+import { createSoundBoard, resolveSound } from '../public/js/sound-board.js?v=5e2f5acc';
 import {
   LEGACY_SFX_KEYS,
   actionLoopFor,
@@ -20,10 +20,11 @@ import {
   soundForConsume,
   soundForDonation,
   soundForGameEvent,
+  soundForMakingDone,
   soundForPanel,
   soundForQuoin,
   soundForVerb,
-} from '../public/js/sound-moments.js?v=2f8597cd';
+} from '../public/js/sound-moments.js?v=52ad523c';
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 const pub = path.join(root, 'public');
@@ -242,6 +243,32 @@ describe('sound moments', () => {
     assert.equal(soundForGameEvent('teleported'), 'TELEPORT_ARRIVE');
     assert.equal(soundForGameEvent('npc_piggy:pet'), null);
     for (const key of Object.values(LEGACY_SFX_KEYS)) assert.ok(catalog.keys[key], key);
+  });
+
+  test('a machine that finishes a job rings READY, Tiny Speck\'s own chime; the countdowns keep theirs under GAME_GO', () => {
+    // players/inc_making.js:827-830: announce_sound('READY') for making_type machine, wherever it stands.
+    for (const machine of ['woodworker', 'fuelmaker', 'metalmaker', 'blockmaker']) assert.equal(soundForMakingDone(machine), 'READY', machine);
+    for (const tool of ['frying_pan', 'knife_and_board', 'still', '', undefined]) assert.equal(soundForMakingDone(tool), 'CRAFT_DONE', String(tool));
+    const ready = catalog.keys.READY;
+    assert.equal(ready.file, 'assets/audio/sfx/READY.mp3');
+    assert.equal(ready.origin, 'sounds-zip');
+    assert.equal(ready.zipFile, '1322173657-Ready_1.1.mp3');
+    assert.match(ready.sources.join(' '), /inc_making\.js:830/);
+    // The take is matched by name only, and the catalog says so.
+    assert.match(ready.doubt, /ready_30/);
+    assert.equal(resolveSound('READY').file, 'assets/audio/sfx/READY.mp3');
+    const feature = (name) => fs.readFileSync(path.join(pub, 'js/features', name), 'utf8');
+    for (const name of ['home-machines-feature.js', 'machine-rooms-feature.js']) assert.match(feature(name), /playSound\?\.\('READY'/, name);
+    assert.match(fs.readFileSync(path.join(pub, 'game.js'), 'utf8'), /soundForMakingDone\(record\.recipe\?\.tool\)/);
+    // GO! of a race, Game of Crowns or Mayhem is a remake beep (the original's COUNT_DOWN ran through GO): never the machine chime.
+    for (const name of ['crowns-feature.js', 'races-feature.js', 'mayhem-feature.js', 'hog-haul-mp-feature.js']) {
+      assert.doesNotMatch(feature(name), /'READY'/, name);
+    }
+    for (const name of ['crowns-feature.js', 'races-feature.js', 'mayhem-feature.js']) assert.match(feature(name), /playSound\('GAME_GO'/, name);
+    assert.equal(catalog.keys.GAME_GO.category, 'remake');
+    assert.equal(catalog.keys.GAME_GO.file, undefined);
+    assert.equal(recipeForKey('GAME_GO'), 'go');
+    assert.equal(resolveSound('GAME_GO').recipe, 'go');
   });
 
   test('every literal key played in the game is catalogued and audible', () => {

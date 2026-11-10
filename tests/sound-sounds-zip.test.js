@@ -10,7 +10,7 @@ import { createHash } from 'node:crypto';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { SOUND_ALIASES, SOUND_FILES, SOUND_KEY_COUNTS } from '../public/js/sound-keys.js?v=6aedc206';
+import { SOUND_ALIASES, SOUND_FILES, SOUND_KEY_COUNTS } from '../public/js/sound-keys.js?v=723af004';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const pub = join(root, 'public');
@@ -72,7 +72,9 @@ describe('Sounds.zip originals', () => {
       assert.ok(!existsSync(join(pub, 'assets/audio/sfx', `${row.key}.mp3`)) || row.key === 'OPENING_SCREEN', row.key);
     }
     assert.ok(map.held.some((r) => r.key === 'MUSICBLOCK_TRUMPETS'));
-    assert.ok(map.held.some((r) => r.key === 'READY'));
+    // READY left the held list on 2026-11-10: the machines play it when a job is done (tests/sound.test.js).
+    assert.ok(!map.held.some((r) => r.key === 'READY'));
+    assert.equal(map.files.find((r) => r.key === 'READY').zip, '1322173657-Ready_1.1.mp3');
     // A name-only SFX match ships only where the game plays the key; each says where.
     for (const row of map.files.filter((r) => r.match === 'filename')) assert.ok(row.why, row.key);
   });

@@ -27,17 +27,17 @@ import {
   planMusicblockDrop,
   playMusicblock,
   starterMusicblocks,
-} from '../public/js/musicblocks.js?v=6ed77e19';
-import { SOUND_ALIASES, SOUND_FILES } from '../public/js/sound-keys.js?v=6aedc206';
+} from '../public/js/musicblocks.js?v=76762c47';
+import { SOUND_ALIASES, SOUND_FILES } from '../public/js/sound-keys.js?v=723af004';
 import { DROP_TABLES } from '../public/js/drop-tables-data.js?v=c51a6400';
-import { SOIL_DROP_TABLES } from '../public/js/patches.js?v=3103cc6a';
-import { SPINNING_WHEEL_DROP_TABLE } from '../public/js/spinning-wheel.js?v=5bfba637';
+import { SOIL_DROP_TABLES } from '../public/js/patches.js?v=fa8f7e12';
+import { SPINNING_WHEEL_DROP_TABLE } from '../public/js/spinning-wheel.js?v=8e4bf8f0';
 import {
   ITEM_CATALOG,
   countItem,
   createInventory,
 } from '../public/js/inventory.js?v=60dfc9ca';
-import { getVerbsFor, runVerb } from '../public/content.js?v=afe3caa8';
+import { getVerbsFor, runVerb } from '../public/content.js?v=42ad4343';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const publicRoot = join(here, '../public');
@@ -308,7 +308,7 @@ describe('Musicblock game integration', () => {
 
 describe('Musicblock collection badges from any source', () => {
   it('emits in_inventory the first time a block reaches the pack', async () => {
-    const { musicblocksFeature, newlyOwnedMusicblocks } = await import('../public/js/features/musicblocks-feature.js?v=2a6cbea5');
+    const { musicblocksFeature, newlyOwnedMusicblocks } = await import('../public/js/features/musicblocks-feature.js?v=4faea485');
     assert.deepEqual(newlyOwnedMusicblocks(new Set(['musicblock_d_blue_01']), {
       musicblock_d_blue_01: 2, musicblock_d_blue_02: 1, apple: 3, musicblock_trumpets: 1,
     }), ['musicblock_d_blue_02']);

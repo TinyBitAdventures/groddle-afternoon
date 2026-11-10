@@ -2,21 +2,21 @@
  "generatedBy": "build-sound-keys.mjs",
  "soundsXml": "http://c2.glitch.bz/sounds/2012-12/sounds_1354665929.xml (not archived)",
  "counts": {
-  "keys": 637,
+  "keys": 638,
   "original": 602,
   "music": 208,
-  "remake": 32,
+  "remake": 33,
   "recoveredWayback": 38,
   "mirrored": 1,
   "downloadsBestFit": 27,
   "archiveorgSfx": 216,
-  "soundsZip": 178,
+  "soundsZip": 179,
   "overlayFla": 3,
-  "withFile": 463,
+  "withFile": 464,
   "aliases": 88,
-  "playable": 551,
+  "playable": 552,
   "dead": 3,
-  "live": 634
+  "live": 635
  },
  "keys": {
   "11_SECRET_LOCATIONS_BEACON_LOOP": {
@@ -4293,6 +4293,17 @@
    ],
    "url": "http://c2.glitch.bz/sounds/2010-05/1274905292-Future_Swing_30_sec.mp3"
   },
+  "GAME_GO": {
+   "category": "remake",
+   "moment": "A race or game starts, on GO! (the original played only COUNT_DOWN, which runs through GO)",
+   "uses": 1,
+   "via": [
+    "remake"
+   ],
+   "sources": [
+    "remake (A race or game starts, on GO! (the original played only COUNT_DOWN, which runs through GO))"
+   ]
+  },
   "GAME_STARTING_SOON": {
    "category": "event",
    "moment": "groups/shared_instance_manager.js:313 (dismissOverlaysAndStart)",
@@ -7953,14 +7964,21 @@
   },
   "READY": {
    "category": "event",
-   "moment": "Race ready",
+   "moment": "A machine finishes its job",
    "uses": 1,
    "via": [
     "announce_sound"
    ],
    "sources": [
     "gsjs:players/inc_making.js:830 (finishMakingKnown)"
-   ]
+   ],
+   "file": "assets/audio/sfx/READY.mp3",
+   "origin": "sounds-zip",
+   "why": "players/inc_making.js:830: a machine's job is done (home machines, machine rooms, a machine used from the pack). Uploaded 2011-11-24, ten seconds before Collect_1.3 (COLLECT).",
+   "doubt": "Name match only: the sounds XML is lost. The first machine set (2011-04) has its own take, 1302286275-ready_30.mp3 (0.2 s, very quiet), and the composer's later sound-effects release titles this recording as the Still's ready chime (STILL_READY, items/still.js:413). Which take the last XML gave READY is not known.",
+   "zipFile": "1322173657-Ready_1.1.mp3",
+   "zipMd5": "f1d531c34b66a6e6a3e938296d68cb60",
+   "zipMatch": "filename"
   },
   "RECEIVE_MEAT_FROM_PIGGY": {
    "category": "animal",

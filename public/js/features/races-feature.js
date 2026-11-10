@@ -89,7 +89,7 @@ import { runStreetTransition } from '../screen-fx.js?v=81177be4';
 import { CROWNS_STREET, CROWNS_TICKET, CROWNS_TITLE } from '../game-of-crowns.js?v=e32f35f5';
 import { HOG_HAUL_STREET_ID } from '../hog-haul.js?v=50d2e072';
 import { QUOIN_GRAB_SPLASH, RACE_SPLASH, splashFor } from '../game-splash.js?v=ea0433a7';
-import { crownsMpChallenge, startCrowns } from './crowns-feature.js?v=da80d222';
+import { crownsMpChallenge, startCrowns } from './crowns-feature.js?v=a29fd3bf';
 import { startHogHaulMp } from './hog-haul-mp-feature.js?v=3bb3202a';
 import { textureFromUrl } from '../textures.js?v=f024bd6a';
 import { QUOIN_SHEET, QUOIN_TYPES } from '../quoins.js?v=237c1d5d';
@@ -893,7 +893,7 @@ function raceTick(engine, now) {
       setTimeout(() => {
         if (run?.status === 'running') hud.countdown.hidden = true;
       }, 650);
-      engine.playSound('READY', { volume: 0.65 });
+      engine.playSound('GAME_GO', { volume: 0.65 });
       spendPendingTicket();
       autoplayStartAt = now;
       engine.save();

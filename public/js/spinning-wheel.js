@@ -7,7 +7,7 @@
  */
 
 import { addItem, ensureItem } from './inventory.js?v=60dfc9ca';
-import { musicblockItemMeta } from './musicblocks.js?v=6ed77e19';
+import { musicblockItemMeta } from './musicblocks.js?v=76762c47';
 
 export const GAMESHOW_TICKET_ID = 'gameshow_ticket';
 export const SPINNING_WHEEL_APPEAR_MS = 1_200;

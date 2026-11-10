@@ -2,9 +2,9 @@
  * Groddle Afternoon — original street geometry + layered decos
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
-import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=afe3caa8';
+import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=42ad4343';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=06bb8b74';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=f7ccc844';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=bd8aa2ab';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -481,8 +481,8 @@ import { TROPHY_FIND_TEXT, trophyOfBadge } from './js/home-trophies.js?v=309fd6c
 import { PACK_COPY, isBagClass, isElementClass, unitRankAt } from './js/pack-slots.js?v=6cf9f397';
 import { hasPouch } from './js/elemental-pouch.js?v=ceefa97a';
 import { createPackRow, mountPackClearance, packBandRange, packCountText, packSearchEntries, packSlotTip } from './js/ui/pack-row.js?v=65c0f180';
-import { listAnimalFeedOptions } from './js/animals.js?v=07cfdcd8';
-import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=07cfdcd8';
+import { listAnimalFeedOptions } from './js/animals.js?v=29f6d059';
+import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=29f6d059';
 import {
   createDroppedItemState,
   parseDroppedItemState,
@@ -501,7 +501,7 @@ import {
   parsePlayerSave,
   serializePlayerSave,
   restorePlayerSave,
-} from './js/player-save.js?v=d0fde2dd';
+} from './js/player-save.js?v=85572db4';
 import {
   HOME_INTERIOR_TSID,
   HOME_STREET_TSID,
@@ -824,7 +824,7 @@ import {
   planMusicblockDrop,
   playMusicblock,
   starterMusicblocks,
-} from './js/musicblocks.js?v=6ed77e19';
+} from './js/musicblocks.js?v=76762c47';
 import {
   VENDOR_PROFILES,
   selectVendorProfile,
@@ -842,7 +842,7 @@ import {
   createAnimalState,
   resetAnimalDay,
   animalStatusLabel,
-} from './js/animals.js?v=07cfdcd8';
+} from './js/animals.js?v=29f6d059';
 import {
   ensureWoodTreeState,
   pickWoodTool,
@@ -874,7 +874,7 @@ import {
   favorRelationNote,
   emblemRelationNote,
   formatSpeedUpTime,
-} from './js/shrines.js?v=aa00a504';
+} from './js/shrines.js?v=0e6d6526';
 import { shrineSheet, shrineVariantFor } from './js/shrine-variants.js?v=7f11c97d';
 import { giantDisplayName } from './js/giant-names.js?v=0e295891';
 import { shrinePowderOptions, shrinePowderAchievementCounters } from './js/powders.js?v=397984f7';
@@ -887,7 +887,7 @@ import {
   spinMeResponse,
   spinningWheelPhase,
   startSpinningWheel,
-} from './js/spinning-wheel.js?v=5bfba637';
+} from './js/spinning-wheel.js?v=8e4bf8f0';
 import {
   CUBIMAL_PACKAGE_IDS,
   cubimalCollectionProgress,
@@ -950,12 +950,12 @@ import {
   ANIMAL_PATROL,
   nearestPlacementGap,
 } from './js/street-ecology.js?v=08076876';
-import { CHICKEN_PAUSE, chickenPauseRoll, easeToward, flightFloorAt, flightFloorFor, flyerLift } from './js/street-creatures.js?v=9da7fe66';
+import { CHICKEN_PAUSE, chickenPauseRoll, easeToward, flightFloorAt, flightFloorFor, flyerLift } from './js/street-creatures.js?v=3ca47d38';
 import { chickenPose, chickenIdleSheetsAsked } from './js/chicken-idle-art.js?v=108c4357';
 import { chickenWaitPose } from './js/chicken-idles.js?v=eef0279b';
 import { itemOverlayStats } from './js/item-overlay.js?v=37bde39e';
 import { isCrowdSad } from './js/animal-crowding.js?v=78ad8fa9';
-import { createSoundBoard, DEFAULT_SFX_VOLUME, watchButtonClicks, watchPanelSounds } from './js/sound-board.js?v=87380a25';
+import { createSoundBoard, DEFAULT_SFX_VOLUME, watchButtonClicks, watchPanelSounds } from './js/sound-board.js?v=5e2f5acc';
 import {
   actionLoopFor,
   legacySoundKey,
@@ -963,12 +963,13 @@ import {
   soundForConsume,
   soundForDonation,
   soundForGardenAction,
+  soundForMakingDone,
   soundForMakingTool,
   soundForPanel,
   soundForGameEvent,
   soundForQuoin,
   soundForVerb,
-} from './js/sound-moments.js?v=2f8597cd';
+} from './js/sound-moments.js?v=52ad523c';
 import { loseMood, moodMax, setMetabolicGainGate, setMetabolicLossGate } from './js/metabolics.js?v=8504134e';
 import { installHiresIcons } from './js/icon-hires.js?v=165dbd6e';
 import { installHiresDecos } from './js/deco-hires.js?v=9877af94';
@@ -26976,7 +26977,9 @@ function finishMakeCraft(record, { close = false, cancelled = false, quiet = fal
       pushActivity(result.activityLine);
       if (!quiet) toast(result.activityLine);
       record.opts?.station?.onComplete?.({ recipe: record.recipe, key: record.key, made: record.made });
-      playSound('CRAFT_DONE', { volume: 0.6 });
+      // A machine used from the pack rings READY like one standing in a home or a machine room.
+      const doneSound = soundForMakingDone(record.recipe?.tool);
+      playSound(doneSound, { volume: doneSound === 'READY' ? 0.55 : 0.6 });
       if (player) floatText(player.x, player.y - 80, record.recipe.name, 0xffe066);
       if (!close) showMakeResult(record.lowFuel ? { ...result, lowFuel: true } : result, record.key);
     }
@@ -32134,7 +32137,7 @@ async function main() {
     },
   };
   if (new URLSearchParams(location.search).has('soundtest')) {
-    import('./js/sound-test.js?v=988a2a33').then((m) => m.openSoundTest({ document, playSound, board: () => audio.board, unmute: async () => {
+    import('./js/sound-test.js?v=a2cff0eb').then((m) => m.openSoundTest({ document, playSound, board: () => audio.board, unmute: async () => {
       state.muted = false;
       if (audio.ctx?.state === 'suspended') {
         try { await audio.ctx.resume(); } catch (_) { /* opt-in */ }

@@ -10,8 +10,8 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
-import { getVerbsFor } from '../public/content.js?v=afe3caa8';
-import { SYNTH_KEY_RECIPES, SYNTH_RECIPES } from '../public/js/synth-sfx.js?v=030fad18';
+import { getVerbsFor } from '../public/content.js?v=42ad4343';
+import { SYNTH_KEY_RECIPES, SYNTH_RECIPES } from '../public/js/synth-sfx.js?v=920944cd';
 
 const root = join(import.meta.dirname, '..');
 const game = readFileSync(join(root, 'public/game.js'), 'utf8');

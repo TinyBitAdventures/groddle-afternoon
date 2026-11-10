@@ -163,6 +163,15 @@ export function soundForMakingTool(toolClassTsid, opts = {}) {
   return t ? t.toUpperCase() : 'CRAFT_TICK';
 }
 
+/**
+ * A making job is done. A machine (making_type machine) rings READY for its
+ * maker (players/inc_making.js:827-830); the hand tools had no done sound of
+ * their own, so they keep ours (CRAFT_DONE).
+ */
+export function soundForMakingDone(toolClassTsid) {
+  return MACHINE_MAKING_TOOLS.includes(String(toolClassTsid || '').trim()) ? 'READY' : 'CRAFT_DONE';
+}
+
 /** Full-screen awards. */
 export function soundForAward(kind) {
   switch (kind) {

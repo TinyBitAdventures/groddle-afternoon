@@ -59,7 +59,7 @@ import {
   tickCrowns,
 } from '../game-of-crowns.js?v=e32f35f5';
 import { RACE_RIVALS } from '../races.js?v=ab22a079';
-import { mayhemHoldsArena } from './mayhem-feature.js?v=50ea12e9';
+import { mayhemHoldsArena } from './mayhem-feature.js?v=3ecdedc4';
 import { wallsScreen } from '../street-model.js?v=b6cb6a4e';
 import { addItem, countItem, removeItem } from '../inventory.js?v=60dfc9ca';
 import { textureFromUrl } from '../textures.js?v=f024bd6a';
@@ -394,7 +394,7 @@ function handleEvents(events, engine) {
       setTimeout(() => {
         if (game?.status === 'running') hud.countdown.hidden = true;
       }, 650);
-      engine.playSound('READY', { volume: 0.65 });
+      engine.playSound('GAME_GO', { volume: 0.65 });
       record.pendingTicket = null;
       engine.save();
       tip(engine, game.itId === 'you' ? CROWNS_TEXT.youreItAbove : `${game.players[game.itId].name} has the crown! Tag them to steal it.`);
@@ -1074,7 +1074,7 @@ function mpAttach(engine) {
         if (mp?.status === 'running' && hud) hud.countdown.hidden = true;
       }, 650);
     }
-    engine.playSound('READY', { volume: 0.65 });
+    engine.playSound('GAME_GO', { volume: 0.65 });
     const it = mp.state.it;
     if (it === mp.myId) {
       tip(engine, CROWNS_TEXT.youreItAbove);

@@ -315,7 +315,7 @@ function attach(engine) {
       }, 650);
       hud.bar.hidden = false;
     }
-    engine.playSound('READY', { volume: 0.65 });
+    engine.playSound('GAME_GO', { volume: 0.65 });
     const me = st.players.find((p) => p.id === mm.myId);
     if (me) tip(`You are ${me.team}: ${me.score}. Make ${st.target}!`);
     note(engine, `go:${st.target}`);
