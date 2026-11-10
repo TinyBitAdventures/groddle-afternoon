@@ -18,7 +18,8 @@
  * Remake: the machine is a pack tool like the Metalmaker always was here, the
  * stand is assembled in one go from the pack (60 energy for three
  * components), and the tank is the tool's condition in js/tools.js
- * (capacity 200, not repairable, refuelled here).
+ * (capacity 200, not repairable, refuelled here). The parts still sound one
+ * by one while the install runs (assemblySounds, disassemblySounds).
  */
 
 import { addItem, countItem, removeItem } from './inventory.js?v=60dfc9ca';
@@ -62,6 +63,78 @@ export const MACHINE_PART_ITEMS = Object.freeze({
 
 export function isMachine(classTsid) {
   return Boolean(MACHINE_ASSEMBLIES[classTsid]);
+}
+
+/**
+ * What each part sounds like, in MACHINE_ASSEMBLIES order: [it lands, it is
+ * fixed on, it comes off]. items/<machine>.js onApplyPart (the part lands:
+ * state <part>1), onApplyPartStep step 2 (installed: state <part>2) and
+ * onDisassemblePart (state <part>1Hold). Only the Blockmaker has plates, and
+ * only it reuses its landing sounds on the way off (blockmaker.js 727-830);
+ * the other three share one set (fuelmaker.js 726-835, metalmaker.js 801-910,
+ * woodworker.js 726-835).
+ */
+const CASE_SOUNDS = Object.freeze(['CHASSIS1', 'CHASSIS2', 'FUELMAKER_CASE1']);
+const CORE_SOUNDS = Object.freeze(['CHASSIS1', 'CHASSIS2', 'FUELMAKER_CORE1']);
+const ENGINE_SOUNDS = Object.freeze(['ENGINE1', 'ENGINE2', 'FUELMAKER_ENGINE1']);
+export const MACHINE_PART_SOUNDS = Object.freeze({
+  woodworker: Object.freeze([CASE_SOUNDS, CORE_SOUNDS, ENGINE_SOUNDS]),
+  metalmaker: Object.freeze([CASE_SOUNDS, CORE_SOUNDS, ENGINE_SOUNDS]),
+  fuelmaker: Object.freeze([CASE_SOUNDS, CORE_SOUNDS, ENGINE_SOUNDS]),
+  blockmaker: Object.freeze([
+    Object.freeze(['CHASSIS1', 'CHASSIS2', 'CHASSIS1']),
+    Object.freeze(['ENGINE1', 'ENGINE2', 'ENGINE1']),
+    Object.freeze(['PLATES1', 'PLATES2', 'PLATES1']),
+  ]),
+});
+
+/** onApplyPart's timer: a part's second step comes 1100 ms after it lands, when the parts go on by themselves. */
+export const PART_STEP_MS = 1100;
+
+/**
+ * The sounds of an assembly, as [{ atMs, key }] from its start. The source put
+ * each part on in two steps, a sound each, 1100 ms apart, 2200 ms a part when
+ * a Master Assembler's machine built itself (checkAutoAssemble). Here all the
+ * parts go on in one install of 2000 ms a part (1000 with Speedy Assembler),
+ * so each part gets its share of that time: it lands a quarter of the way in
+ * (the stand's own STAND1 opens the install) and is fixed on 55% of a share
+ * later, which is the source's 1100 ms at 2000 ms a part.
+ */
+export function assemblySounds(machine, durationMs) {
+  const parts = MACHINE_PART_SOUNDS[machine];
+  const total = Number(durationMs) || 0;
+  if (!parts || total <= 0) return [];
+  const share = total / parts.length;
+  const out = [];
+  parts.forEach(([lands, fixed], i) => {
+    const at = share / 4 + i * share;
+    out.push({ atMs: Math.round(at), key: lands });
+    out.push({ atMs: Math.round(at + (share * PART_STEP_MS) / 2000), key: fixed });
+  });
+  return out;
+}
+
+/**
+ * The sounds of taking a machine apart, last part first. Part by part the
+ * source played a part's sound when its 2000 ms disassembling overlay was up
+ * (onDisassemble 1310-1359), then the part went to the pack: here three
+ * quarters through each part's share of the time. Master Exploder's whole
+ * machine went in one 6600 ms overlay with a part every 2200 ms, the first at
+ * once (onFullyDisassemble 1362-1405, checkAutoDisassemble).
+ */
+export function disassemblySounds(machine, durationMs, { full = false } = {}) {
+  const parts = MACHINE_PART_SOUNDS[machine];
+  const total = Number(durationMs) || 0;
+  if (!parts || total <= 0) return [];
+  const share = total / parts.length;
+  return [...parts].reverse().map(([, , off], i) => ({ atMs: Math.round(full ? i * share : (i + 0.75) * share), key: off }));
+}
+
+/** The part sounds of a pending assembly or disassembly (startAssembly / startDisassembly `pending`). */
+export function machineWorkSounds(pending) {
+  if (pending?.kind === 'assemble') return assemblySounds(pending.machine, pending.ms);
+  if (pending?.kind === 'disassemble') return disassemblySounds(pending.machine, pending.ms, { full: pending.full === true });
+  return [];
 }
 
 /**
@@ -121,7 +194,7 @@ export function startAssembly(inv, pc, machine, learned = [], upgrades = [], now
     ok: true,
     energy,
     durationMs: check.durationMs,
-    pending: { kind: 'assemble', machine, energy, readyAt: now + check.durationMs },
+    pending: { kind: 'assemble', machine, energy, ms: check.durationMs, readyAt: now + check.durationMs },
     msg: `Installing the ${check.def.label}'s parts…${energy ? ` (-${energy} energy)` : ''}`,
   };
 }
@@ -185,7 +258,7 @@ export function startDisassembly(inv, pc, machine, learned = [], upgrades = [], 
     ok: true,
     energy,
     durationMs: check.durationMs,
-    pending: { kind: 'disassemble', machine, energy, full: check.full, readyAt: now + check.durationMs },
+    pending: { kind: 'disassemble', machine, energy, full: check.full, ms: check.durationMs, readyAt: now + check.durationMs },
     msg: `Taking the ${check.def.label} apart…${energy ? ` (-${energy} energy)` : ''}`,
   };
 }

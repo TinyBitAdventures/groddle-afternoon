@@ -17,7 +17,7 @@ import {
   quoteShrineDonation,
   resetShrineDay,
   shrineFillQty,
-} from '../public/js/shrines.js?v=0e6d6526';
+} from '../public/js/shrines.js?v=8fb6c728';
 import { GIANT_NAMES, giantDisplayName } from '../public/js/giant-names.js?v=0e295891';
 
 const publicRoot = join(import.meta.dirname, '..', 'public');
@@ -155,7 +155,7 @@ describe('shrine official art and client wiring', () => {
   });
 
   it('follows the source donation rules: level cap, capped bonus, favor accounting, emblem iMG', async () => {
-    const { donationXpLimit, EMBLEM_XP } = await import('../public/js/shrines.js?v=0e6d6526');
+    const { donationXpLimit, EMBLEM_XP } = await import('../public/js/shrines.js?v=8fb6c728');
     const { XP_FOR_LEVEL } = await import('../public/js/progression.js?v=33462eaa');
     // stats_donation_xp_limit: 250 to level 5, 500 to 10, then a share of the level's interval.
     assert.equal(donationXpLimit(0), 250);

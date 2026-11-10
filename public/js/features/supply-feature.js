@@ -45,13 +45,14 @@ import {
   distillInStill,
   finishMachineWork,
   isMachine,
+  machineWorkSounds,
   startAssembly,
   startDisassembly,
   refuelCheck,
   refuelMachine,
   stillEtaSeconds,
   stillRoom,
-} from '../machines.js?v=c44050e6';
+} from '../machines.js?v=73f20b2b';
 import { HERB_SEEDS, ITEM_TRANSFORMS, listTransformVerbs, runTransform, transformVerbCount } from '../item-transforms.js?v=c439eb33';
 import {
   BUREAUCRACY_ITEMS,
@@ -111,8 +112,12 @@ function storeStill(engine, at) {
 
 /** The copy the pack menu is about while its verbs are drawn or run (feature-host opts.copy). */
 let pickedStill = null;
-/** Machine parts being installed or uninstalled: { kind, machine, energy, readyAt, full? }. */
+/** Machine parts being installed or uninstalled: { kind, machine, energy, ms, readyAt, full? }. */
 let work = null;
+/** The part sounds of that work still to play: { startAt, plan: [{ atMs, key }], next }. */
+let workSounds = null;
+/** A part sound more than this late (a tab asleep, a reload) is skipped, so nothing plays in a burst. */
+const WORK_SOUND_LATE_MS = 600;
 /** metalmaker.js music_on: on by default, toggled by Turn Music Off / On. */
 let metalMusicOn = true;
 let last = '';
@@ -164,11 +169,29 @@ function syncMetalMusic(engine) {
   setMetalMakingMusic(upgrades(engine).includes('metalmaking_music') && metalMusicOn);
 }
 
+/** Line up the part sounds of the work just started (js/machines.js assemblySounds / disassemblySounds). */
+function cueWorkSounds(pending) {
+  const plan = machineWorkSounds(pending);
+  workSounds = plan.length ? { startAt: pending.readyAt - pending.ms, plan, next: 0 } : null;
+}
+
+/** Play each part's sound as its moment in the install comes (items/<machine>.js announce_sound_to_all). */
+function playWorkSounds(engine, now) {
+  if (!work || !workSounds) return;
+  const t = now - workSounds.startAt;
+  while (workSounds.next < workSounds.plan.length && workSounds.plan[workSounds.next].atMs <= t) {
+    const cue = workSounds.plan[workSounds.next];
+    workSounds.next += 1;
+    if (t - cue.atMs <= WORK_SOUND_LATE_MS) engine.playSound?.(cue.key);
+  }
+}
+
 /** Finish the installing / uninstalling overlay once its time is up. */
 function settleWork(engine, now = Date.now()) {
   if (!work || now < work.readyAt) return;
   const done = work;
   work = null;
+  workSounds = null;
   const res = finishMachineWork(engine.inv, engine.toolState, done);
   if (!res.ok) return;
   // metalmaker.js:1386 and siblings: machines_assembled:<machine>.
@@ -303,8 +326,9 @@ function runMachineVerb(classTsid, verbId, engine) {
     if (res.ok) {
       work = res.pending;
       engine.updateHud?.();
-      // machine_stand.js 693: the stand's assembly starts with STAND1.
+      // machine_stand.js 693: the stand's assembly starts with STAND1; then each part, in its turn.
       engine.playSound?.('STAND1');
+      cueWorkSounds(work);
       settleWork(engine);
     }
     say(engine, res.ok && work ? `${res.msg} (${(res.durationMs / 1000).toFixed(0)} s)` : res.msg, res.ok);
@@ -322,6 +346,7 @@ function runMachineVerb(classTsid, verbId, engine) {
     const res = startDisassembly(inv, engine.pc, classTsid, learned(engine), upgrades(engine), { full: arg === 'full', busy });
     if (res.ok) {
       work = res.pending;
+      cueWorkSounds(work);
       engine.updateHud?.();
     }
     say(engine, res.ok ? `${res.msg} (${(res.durationMs / 1000).toFixed(1).replace(/\.0$/, '')} s)` : res.msg, res.ok);
@@ -486,7 +511,10 @@ export const supplyFeature = {
 
   onTick(dtMs, now, engine) {
     syncMetalMusic(engine);
-    if (work) settleWork(engine, now);
+    if (work) {
+      playWorkSounds(engine, now);
+      settleWork(engine, now);
+    }
     if (autoplayAt && !autoplayDone && now >= autoplayAt) autoplay(engine);
   },
 
@@ -570,6 +598,7 @@ export const supplyFeature = {
     work = saved && MACHINE_ASSEMBLIES[saved.machine] && (saved.kind === 'assemble' || saved.kind === 'disassemble')
       ? { ...saved, readyAt: 0 }
       : null;
+    workSounds = null;
   },
 
   /** QA / tests. */
@@ -579,6 +608,7 @@ export const supplyFeature = {
   _reset() {
     still = createStillState();
     work = null;
+    workSounds = null;
     metalMusicOn = true;
     last = '';
     demoDone = false;

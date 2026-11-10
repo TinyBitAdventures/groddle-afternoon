@@ -209,7 +209,7 @@ describe('The Last Pilgrimage of Esquibeth (esquibeth)', () => {
   });
 
   it("plays the playback overlay's own melody take for the ghost", async () => {
-    const { SOUND_FILES, SOUND_CATEGORIES } = await import('../public/js/sound-keys.js?v=723af004');
+    const { SOUND_FILES, SOUND_CATEGORIES } = await import('../public/js/sound-keys.js?v=821e71ee');
     const catalog = JSON.parse(readFileSync(join(root, 'public/assets/content/sound-keys.json'), 'utf8')).keys;
     // DOMSoundItem externalFileSize in glitch-overlays/npc_esquibeth_playback*.fla.
     const takes = {

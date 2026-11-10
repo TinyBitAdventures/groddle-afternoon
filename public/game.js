@@ -2,9 +2,9 @@
  * Groddle Afternoon — original street geometry + layered decos
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
-import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=42ad4343';
+import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=2fde1d1a';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=06bb8b74';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=bd8aa2ab';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=4226187b';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -481,8 +481,8 @@ import { TROPHY_FIND_TEXT, trophyOfBadge } from './js/home-trophies.js?v=309fd6c
 import { PACK_COPY, isBagClass, isElementClass, unitRankAt } from './js/pack-slots.js?v=6cf9f397';
 import { hasPouch } from './js/elemental-pouch.js?v=ceefa97a';
 import { createPackRow, mountPackClearance, packBandRange, packCountText, packSearchEntries, packSlotTip } from './js/ui/pack-row.js?v=65c0f180';
-import { listAnimalFeedOptions } from './js/animals.js?v=29f6d059';
-import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=29f6d059';
+import { listAnimalFeedOptions } from './js/animals.js?v=ce68d939';
+import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=ce68d939';
 import {
   createDroppedItemState,
   parseDroppedItemState,
@@ -501,7 +501,7 @@ import {
   parsePlayerSave,
   serializePlayerSave,
   restorePlayerSave,
-} from './js/player-save.js?v=85572db4';
+} from './js/player-save.js?v=cc58c43a';
 import {
   HOME_INTERIOR_TSID,
   HOME_STREET_TSID,
@@ -824,7 +824,7 @@ import {
   planMusicblockDrop,
   playMusicblock,
   starterMusicblocks,
-} from './js/musicblocks.js?v=76762c47';
+} from './js/musicblocks.js?v=b4eae35a';
 import {
   VENDOR_PROFILES,
   selectVendorProfile,
@@ -842,7 +842,7 @@ import {
   createAnimalState,
   resetAnimalDay,
   animalStatusLabel,
-} from './js/animals.js?v=29f6d059';
+} from './js/animals.js?v=ce68d939';
 import {
   ensureWoodTreeState,
   pickWoodTool,
@@ -874,7 +874,7 @@ import {
   favorRelationNote,
   emblemRelationNote,
   formatSpeedUpTime,
-} from './js/shrines.js?v=0e6d6526';
+} from './js/shrines.js?v=8fb6c728';
 import { shrineSheet, shrineVariantFor } from './js/shrine-variants.js?v=7f11c97d';
 import { giantDisplayName } from './js/giant-names.js?v=0e295891';
 import { shrinePowderOptions, shrinePowderAchievementCounters } from './js/powders.js?v=397984f7';
@@ -887,7 +887,7 @@ import {
   spinMeResponse,
   spinningWheelPhase,
   startSpinningWheel,
-} from './js/spinning-wheel.js?v=8e4bf8f0';
+} from './js/spinning-wheel.js?v=6c596026';
 import {
   CUBIMAL_PACKAGE_IDS,
   cubimalCollectionProgress,
@@ -950,12 +950,12 @@ import {
   ANIMAL_PATROL,
   nearestPlacementGap,
 } from './js/street-ecology.js?v=08076876';
-import { CHICKEN_PAUSE, chickenPauseRoll, easeToward, flightFloorAt, flightFloorFor, flyerLift } from './js/street-creatures.js?v=3ca47d38';
+import { CHICKEN_PAUSE, chickenPauseRoll, easeToward, flightFloorAt, flightFloorFor, flyerLift } from './js/street-creatures.js?v=bfe9af42';
 import { chickenPose, chickenIdleSheetsAsked } from './js/chicken-idle-art.js?v=108c4357';
 import { chickenWaitPose } from './js/chicken-idles.js?v=eef0279b';
 import { itemOverlayStats } from './js/item-overlay.js?v=37bde39e';
 import { isCrowdSad } from './js/animal-crowding.js?v=78ad8fa9';
-import { createSoundBoard, DEFAULT_SFX_VOLUME, watchButtonClicks, watchPanelSounds } from './js/sound-board.js?v=5e2f5acc';
+import { createSoundBoard, DEFAULT_SFX_VOLUME, watchButtonClicks, watchPanelSounds } from './js/sound-board.js?v=ead5c7b6';
 import {
   actionLoopFor,
   legacySoundKey,
@@ -32137,7 +32137,7 @@ async function main() {
     },
   };
   if (new URLSearchParams(location.search).has('soundtest')) {
-    import('./js/sound-test.js?v=a2cff0eb').then((m) => m.openSoundTest({ document, playSound, board: () => audio.board, unmute: async () => {
+    import('./js/sound-test.js?v=e8ed8d29').then((m) => m.openSoundTest({ document, playSound, board: () => audio.board, unmute: async () => {
       state.muted = false;
       if (audio.ctx?.state === 'suspended') {
         try { await audio.ctx.resume(); } catch (_) { /* opt-in */ }

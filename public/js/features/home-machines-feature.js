@@ -93,10 +93,10 @@ import {
   expireSolo,
   tankOf,
   TAKEN_KEEP,
-} from '../home-machines.js?v=9c57598e';
-import { CALL_PLAYER_LINES, MACHINE_HITBOX, MACHINE_SKILLS, collectLine, machineJobMs, machineMadeLine, runningSoundKey, takeJobIngredients } from '../machine-rooms.js?v=1be82048';
+} from '../home-machines.js?v=3e64dc92';
+import { CALL_PLAYER_LINES, MACHINE_HITBOX, MACHINE_SKILLS, collectLine, machineJobMs, machineMadeLine, runningSoundKey, takeJobIngredients } from '../machine-rooms.js?v=ead8def5';
 import { MACHINE_ART_SHEETS, LOW_FUEL_BUBBLE_MS, LOW_FUEL_LINE, isLowFuel, machineFrame, machineSheetDef, roomMachineState } from '../machine-art.js?v=608f7257';
-import { FUEL_CELL, FUEL_PER_CELL, MAX_FUEL } from '../machines.js?v=c44050e6';
+import { FUEL_CELL, FUEL_PER_CELL, MAX_FUEL } from '../machines.js?v=73f20b2b';
 import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=60dfc9ca';
 import { receiveToolCopy, takeToolCopy } from '../tools.js?v=5f482998';
 import { RECIPE_CATALOG } from '../making.js?v=4e72bb4b';
@@ -106,8 +106,8 @@ import { readVisitScene } from '../neighbours-mp.js?v=f221f6e6';
 import { saveStore } from '../save-store.js?v=8839ba7b';
 import { textureFromUrl } from '../textures.js?v=f024bd6a';
 import { createSheetLoader } from '../sprite-sheets.js?v=59ca0e2b';
-import { STREET_GROUND_Y, homesFeature } from './homes-feature.js?v=5cc55db0';
-import { payAltarBonus } from './machine-rooms-feature.js?v=c319bce8';
+import { STREET_GROUND_Y, homesFeature } from './homes-feature.js?v=bd7e36a7';
+import { payAltarBonus } from './machine-rooms-feature.js?v=ae5e821e';
 import { worldToScreen } from '../street-model.js?v=b6cb6a4e';
 import { nearestSurfaceY } from '../walk-surface.js?v=106bfdc5';
 

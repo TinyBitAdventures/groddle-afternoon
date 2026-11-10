@@ -10,11 +10,11 @@
   "mirrored": 1,
   "downloadsBestFit": 27,
   "archiveorgSfx": 216,
-  "soundsZip": 179,
+  "soundsZip": 186,
   "overlayFla": 3,
-  "withFile": 464,
-  "aliases": 88,
-  "playable": 552,
+  "withFile": 471,
+  "aliases": 89,
+  "playable": 560,
   "dead": 3,
   "live": 635
  },
@@ -2424,7 +2424,13 @@
     "gsjs:items/fuelmaker.js:737 (onApplyPart)",
     "gsjs:items/metalmaker.js:808 (onApplyPart)",
     "gsjs:items/metalmaker.js:812 (onApplyPart)"
-   ]
+   ],
+   "file": "assets/audio/sfx/CHASSIS1.mp3",
+   "origin": "sounds-zip",
+   "why": "blockmaker.js:733, fuelmaker.js:733/737, metalmaker.js:808/812, woodworker.js:733/737 onApplyPart: a machine's first or second part lands (supply-feature.js, assembly); blockmaker.js:819: the chassis comes off",
+   "zipFile": "1302285963-chassis1_30.mp3",
+   "zipMd5": "57d63b34d567d7093341108dbba78716",
+   "zipMatch": "filename"
   },
   "CHASSIS2": {
    "category": "making",
@@ -2440,7 +2446,13 @@
     "gsjs:items/metalmaker.js:839 (onApplyPartStep)",
     "gsjs:items/metalmaker.js:855 (onApplyPartStep)",
     "gsjs:items/woodworker.js:764 (onApplyPartStep)"
-   ]
+   ],
+   "file": "assets/audio/sfx/CHASSIS2.mp3",
+   "origin": "sounds-zip",
+   "why": "blockmaker.js:764, fuelmaker.js:764/780, metalmaker.js:839/855, woodworker.js:764/780 onApplyPartStep: that part is fixed on (supply-feature.js, assembly)",
+   "zipFile": "1302285971-chassis2_30.mp3",
+   "zipMd5": "6c9f36ac153deb765c3900f354c50bec",
+   "zipMatch": "filename"
   },
   "CHICKEN_SQUEEZED": {
    "category": "animal",
@@ -3646,7 +3658,13 @@
     "gsjs:items/fuelmaker.js:796 (onApplyPartStep)",
     "gsjs:items/metalmaker.js:871 (onApplyPartStep)",
     "gsjs:items/woodworker.js:796 (onApplyPartStep)"
-   ]
+   ],
+   "file": "assets/audio/sfx/ENGINE2.mp3",
+   "origin": "sounds-zip",
+   "why": "blockmaker.js:780, fuelmaker.js:796, metalmaker.js:871, woodworker.js:796 onApplyPartStep: the Machine Engine is fixed on (supply-feature.js, assembly)",
+   "zipFile": "1302286012-engine2_30.mp3",
+   "zipMd5": "15f4283669b4ce5568ae1e4889aa6a4b",
+   "zipMatch": "filename"
   },
   "ESQUIBETH_PLAYBACK_A": {
    "category": "music",
@@ -4230,7 +4248,13 @@
     "gsjs:items/fuelmaker.js:819 (onDisassemblePart)",
     "gsjs:items/metalmaker.js:894 (onDisassemblePart)",
     "gsjs:items/woodworker.js:819 (onDisassemblePart)"
-   ]
+   ],
+   "file": "assets/audio/sfx/FUELMAKER_CASE1.mp3",
+   "origin": "sounds-zip",
+   "why": "fuelmaker.js:819, metalmaker.js:894, woodworker.js:819 onDisassemblePart: the first part comes off, last of the three (supply-feature.js, disassembly)",
+   "zipFile": "1302286068-fuelmaker_case1_30.mp3",
+   "zipMd5": "d89ff0cf1fd9866b7efb72c261a35eba",
+   "zipMatch": "filename"
   },
   "FUELMAKER_CORE1": {
    "category": "making",
@@ -4243,7 +4267,13 @@
     "gsjs:items/fuelmaker.js:824 (onDisassemblePart)",
     "gsjs:items/metalmaker.js:899 (onDisassemblePart)",
     "gsjs:items/woodworker.js:824 (onDisassemblePart)"
-   ]
+   ],
+   "file": "assets/audio/sfx/FUELMAKER_CORE1.mp3",
+   "origin": "sounds-zip",
+   "why": "fuelmaker.js:824, metalmaker.js:899, woodworker.js:824 onDisassemblePart: the second part comes off (supply-feature.js, disassembly)",
+   "zipFile": "1302286130-fuelmaker_core1_30.mp3",
+   "zipMd5": "aa17787af141c0d8c906a4ed537c51ca",
+   "zipMatch": "filename"
   },
   "FUELMAKER_ENGINE1": {
    "category": "making",
@@ -4256,7 +4286,9 @@
     "gsjs:items/fuelmaker.js:830 (onDisassemblePart)",
     "gsjs:items/metalmaker.js:905 (onDisassemblePart)",
     "gsjs:items/woodworker.js:830 (onDisassemblePart)"
-   ]
+   ],
+   "doubt": "fuelmaker.js:830, metalmaker.js:905, woodworker.js:830 play this key when the Machine Engine comes off; no file of that name is in the zip. The engine is the same part on all four machines and the Blockmaker plays ENGINE1 for it (blockmaker.js:824), so this key borrows ENGINE1",
+   "alias": "ENGINE1"
   },
   "FUELMAKER_LOAD_OPEN": {
    "category": "making",
@@ -7003,7 +7035,13 @@
    "sources": [
     "gsjs:items/blockmaker.js:741 (onApplyPart)",
     "gsjs:items/blockmaker.js:830 (onDisassemblePart)"
-   ]
+   ],
+   "file": "assets/audio/sfx/PLATES1.mp3",
+   "origin": "sounds-zip",
+   "why": "blockmaker.js:741 onApplyPart: the Blockmaker's plates land; :830 onDisassemblePart: they come off (supply-feature.js)",
+   "zipFile": "1302286260-plates1_30.mp3",
+   "zipMd5": "4441bdf669e2a187be342675578ac56e",
+   "zipMatch": "filename"
   },
   "PLATES2": {
    "category": "making",
@@ -7014,7 +7052,13 @@
    ],
    "sources": [
     "gsjs:items/blockmaker.js:796 (onApplyPartStep)"
-   ]
+   ],
+   "file": "assets/audio/sfx/PLATES2.mp3",
+   "origin": "sounds-zip",
+   "why": "blockmaker.js:796 onApplyPartStep: the Blockmaker's plates are fixed on (supply-feature.js, assembly)",
+   "zipFile": "1302286267-plates2_30.mp3",
+   "zipMd5": "4edf51aca187f27f84fc3377b4fcebda",
+   "zipMatch": "filename"
   },
   "PLEASE_LET_ME_GO_BACK_TO_GRODDLE": {
    "category": "music",

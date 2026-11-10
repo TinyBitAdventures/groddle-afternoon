@@ -2282,14 +2282,14 @@
  "sounds": {
   "keys": 635,
   "deadKeys": 3,
-  "withFile": 464,
-  "playable": 552,
-  "soundsZip": 179,
+  "withFile": 471,
+  "playable": 560,
+  "soundsZip": 186,
   "archiveorgSfx": 216,
   "recoveredWayback": 38,
   "downloadsBestFit": 27,
   "otherFiles": 4,
-  "aliases": 88,
+  "aliases": 89,
   "ambientTracks": 34,
   "musicTracks": 200
  },
@@ -2877,6 +2877,6 @@
    }
   ]
  },
- "tests": 795,
+ "tests": 796,
  "generatedAt": "2026-11-10"
 }

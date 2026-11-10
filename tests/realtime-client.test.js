@@ -34,7 +34,7 @@ import {
 } from '../public/js/realtime-client.js?v=342dae8e';
 import { createMinnAccount } from '../public/js/minn-account.js?v=8f2741cd';
 import { emoteCommand, lookOf, poseOf, realtimeFeature, sharedStreet, statusText } from '../public/js/features/realtime-feature.js?v=85bd3b0a';
-import { FEATURES } from '../public/js/features/index.js?v=bd8aa2ab';
+import { FEATURES } from '../public/js/features/index.js?v=4226187b';
 
 const root = join(import.meta.dirname, '..');
 const read = (rel) => readFileSync(join(root, rel), 'utf8');

@@ -16,8 +16,8 @@ import { execFileSync, spawnSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { SERVER_DIR, SITE_DIR, skipWithoutServer, skipWithoutSite } from '../tools/repos.mjs';
-import { actMessage } from '../public/js/street-objects.js?v=23e976c9';
-import { powdersFeature } from '../public/js/features/powders-feature.js?v=bb5a536e';
+import { actMessage } from '../public/js/street-objects.js?v=07ce0b03';
+import { powdersFeature } from '../public/js/features/powders-feature.js?v=425844c4';
 import { tradeTable } from '../tools/build-realtime-trade.mjs';
 
 const hasPhp = spawnSync('php', ['-v']).status === 0;

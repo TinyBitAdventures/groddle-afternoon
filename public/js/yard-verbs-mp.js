@@ -37,14 +37,14 @@
  * an animal or tree carries the visitor's uses today, never the owner's.
  */
 
-import { createAnimalState } from './animals.js?v=29f6d059';
+import { createAnimalState } from './animals.js?v=ce68d939';
 import { petPiggy } from './animal-mood.js?v=a49495fc';
 import { trantFruitCycle } from './trant-care.js?v=9527ff03';
 import { resetTrantDay } from './trants.js?v=1b3c8ae3';
-import { GROWN_TREE_LABELS, SEASONED_BEANS, SOIL_TIMERS, seedlingTimings } from './patches.js?v=fa8f7e12';
+import { GROWN_TREE_LABELS, SEASONED_BEANS, SOIL_TIMERS, seedlingTimings } from './patches.js?v=02552313';
 import { GAME_DAY_MS, GAME_EPOCH_MS } from './game-day.js?v=edb00566';
 import { isNodeId, isRockId } from './yard-stock-mp.js?v=96d1c5bc';
-import { STICK_ANIMAL } from './yard-wander.js?v=392eac67';
+import { STICK_ANIMAL } from './yard-wander.js?v=5e5411e4';
 import { normalizeYardMachines } from './yard-fixtures-mp.js?v=dd022fe8';
 import { capYardAnimals, yardClassCap } from './animal-crowding.js?v=78ad8fa9';
 import { HOUSE_LOT_W, YARD_SEGMENT_W } from './home-cultivation.js?v=9571e110';

@@ -18,12 +18,12 @@ import {
   slashWords,
   unknownLine,
 } from '../public/js/slash-commands.js?v=8533e143';
-import { slashCommandsFeature, slashContext } from '../public/js/features/slash-commands-feature.js?v=ffeb2905';
-import { smallItemsFeature } from '../public/js/features/small-items-feature.js?v=b757e4bc';
+import { slashCommandsFeature, slashContext } from '../public/js/features/slash-commands-feature.js?v=e967e1ca';
+import { smallItemsFeature } from '../public/js/features/small-items-feature.js?v=bf32c5e6';
 import { towerApi } from '../public/js/features/home-tower-feature.js?v=f574b637';
 import { BUTLER_STRINGS } from '../public/js/butler.js?v=4a4b82a2';
-import { butlerFeature } from '../public/js/features/butler-feature.js?v=31b9a6e6';
-import { FEATURES } from '../public/js/features/index.js?v=bd8aa2ab';
+import { butlerFeature } from '../public/js/features/butler-feature.js?v=b44621ef';
+import { FEATURES } from '../public/js/features/index.js?v=4226187b';
 import { createFeatureHost } from '../public/js/feature-host.js?v=06bb8b74';
 import { countItem } from '../public/js/inventory.js?v=60dfc9ca';
 

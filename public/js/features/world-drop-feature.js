@@ -20,7 +20,7 @@
  */
 
 import { ITEM_CATALOG } from '../inventory.js?v=60dfc9ca';
-import { listAnimalFeedOptions } from '../animals.js?v=29f6d059';
+import { listAnimalFeedOptions } from '../animals.js?v=ce68d939';
 import { isBagClass } from '../pack-slots.js?v=6cf9f397';
 import { dropFor, dropTip } from '../world-drop.js?v=f162fb0e';
 

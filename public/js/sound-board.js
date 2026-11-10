@@ -11,7 +11,7 @@
  * bus defaults to 0.7 to keep the same balance (?sfxvol=0..1 overrides).
  */
 
-import { SOUND_ALIASES, SOUND_CATEGORIES, SOUND_FILES } from './sound-keys.js?v=723af004';
+import { SOUND_ALIASES, SOUND_CATEGORIES, SOUND_FILES } from './sound-keys.js?v=821e71ee';
 import { playSynthRecipe, recipeForKey } from './synth-sfx.js?v=920944cd';
 import { legacySoundKey } from './sound-moments.js?v=52ad523c';
 

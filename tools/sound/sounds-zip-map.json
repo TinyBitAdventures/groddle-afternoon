@@ -639,6 +639,20 @@
    "why": "items/newxp_chain.js:56: the tutorial chain is pulled (newxp-feature.js)"
   },
   {
+   "key": "CHASSIS1",
+   "zip": "1302285963-chassis1_30.mp3",
+   "md5": "57d63b34d567d7093341108dbba78716",
+   "match": "filename",
+   "why": "blockmaker.js:733, fuelmaker.js:733/737, metalmaker.js:808/812, woodworker.js:733/737 onApplyPart: a machine's first or second part lands (supply-feature.js, assembly); blockmaker.js:819: the chassis comes off"
+  },
+  {
+   "key": "CHASSIS2",
+   "zip": "1302285971-chassis2_30.mp3",
+   "md5": "6c9f36ac153deb765c3900f354c50bec",
+   "match": "filename",
+   "why": "blockmaker.js:764, fuelmaker.js:764/780, metalmaker.js:839/855, woodworker.js:764/780 onApplyPartStep: that part is fixed on (supply-feature.js, assembly)"
+  },
+  {
    "key": "COLLECT",
    "zip": "1322173667-Collect_1.3.mp3",
    "md5": "741471ee915e742825d9d982cf24f5f6",
@@ -693,6 +707,13 @@
    "why": "blockmaker.js:737 onApplyPart: a Machine Stand part goes on (supply-feature.js assembly)"
   },
   {
+   "key": "ENGINE2",
+   "zip": "1302286012-engine2_30.mp3",
+   "md5": "15f4283669b4ce5568ae1e4889aa6a4b",
+   "match": "filename",
+   "why": "blockmaker.js:780, fuelmaker.js:796, metalmaker.js:871, woodworker.js:796 onApplyPartStep: the Machine Engine is fixed on (supply-feature.js, assembly)"
+  },
+  {
    "key": "FIRST_STREET_LOADING",
    "zip": "1331167039-00._Street_Loading_1.2.mp3",
    "md5": "6ef341f0287b7fc2d964151d6a7b0260",
@@ -737,6 +758,20 @@
    "md5": "d41dda48e0d966d1f489c146a3c58f47",
    "match": "music_map",
    "nearest": "Forest Theme 4.7; music_map names 4.6 (1309454863-Forest_Theme_4.6.mp3), which is not in the zip"
+  },
+  {
+   "key": "FUELMAKER_CASE1",
+   "zip": "1302286068-fuelmaker_case1_30.mp3",
+   "md5": "d89ff0cf1fd9866b7efb72c261a35eba",
+   "match": "filename",
+   "why": "fuelmaker.js:819, metalmaker.js:894, woodworker.js:819 onDisassemblePart: the first part comes off, last of the three (supply-feature.js, disassembly)"
+  },
+  {
+   "key": "FUELMAKER_CORE1",
+   "zip": "1302286130-fuelmaker_core1_30.mp3",
+   "md5": "aa17787af141c0d8c906a4ed537c51ca",
+   "match": "filename",
+   "why": "fuelmaker.js:824, metalmaker.js:899, woodworker.js:824 onDisassemblePart: the second part comes off (supply-feature.js, disassembly)"
   },
   {
    "key": "GLITCHMAS_PARTY_LOCATION",
@@ -991,6 +1026,20 @@
    "match": "music_map"
   },
   {
+   "key": "PLATES1",
+   "zip": "1302286260-plates1_30.mp3",
+   "md5": "4441bdf669e2a187be342675578ac56e",
+   "match": "filename",
+   "why": "blockmaker.js:741 onApplyPart: the Blockmaker's plates land; :830 onDisassemblePart: they come off (supply-feature.js)"
+  },
+  {
+   "key": "PLATES2",
+   "zip": "1302286267-plates2_30.mp3",
+   "md5": "4edf51aca187f27f84fc3377b4fcebda",
+   "match": "filename",
+   "why": "blockmaker.js:796 onApplyPartStep: the Blockmaker's plates are fixed on (supply-feature.js, assembly)"
+  },
+  {
    "key": "PURPLE_LOCATION",
    "zip": "1321639889-ZeGroupTheme.mp3",
    "md5": "96aa7677be99a433f69918856c57be2e",
@@ -1148,27 +1197,17 @@
  ],
  "aliases": {
   "ANDRA_KAJUU_10": "ANDRA_KAJUU_11",
+  "FUELMAKER_ENGINE1": "ENGINE1",
   "HOME_STREET_GRODDLE_WHISTLE": "SNAPPY_LOOP",
   "MUSICAL_PARTY_SPACE_URALIA": "HOME_STREET_URALIA",
   "WHISTLE_SONG": "SNAPPY_LOOP",
   "WINTER_WALK_QUEST": "GLITCHMAS_PARTY_LOCATION"
  },
  "aliasDoubts": {
-  "HOME_STREET_GRODDLE_WHISTLE": "music_map names the 2012-08 re-upload 1344474851-Snappy_w_and_wo_whistle_Loop.mp3; the zip has only the 2011-09 upload (SNAPPY_LOOP), which may differ"
+  "HOME_STREET_GRODDLE_WHISTLE": "music_map names the 2012-08 re-upload 1344474851-Snappy_w_and_wo_whistle_Loop.mp3; the zip has only the 2011-09 upload (SNAPPY_LOOP), which may differ",
+  "FUELMAKER_ENGINE1": "fuelmaker.js:830, metalmaker.js:905, woodworker.js:830 play this key when the Machine Engine comes off; no file of that name is in the zip. The engine is the same part on all four machines and the Blockmaker plays ENGINE1 for it (blockmaker.js:824), so this key borrows ENGINE1"
  },
  "held": [
-  {
-   "key": "CHASSIS1",
-   "zip": "1302285963-chassis1_30.mp3",
-   "md5": "57d63b34d567d7093341108dbba78716",
-   "why": "Machine part sound (blockmaker.js:733); the remake's Machine Stand plays only ENGINE1."
-  },
-  {
-   "key": "CHASSIS2",
-   "zip": "1302285971-chassis2_30.mp3",
-   "md5": "6c9f36ac153deb765c3900f354c50bec",
-   "why": "Machine part step (blockmaker.js:764); not played by the remake."
-  },
   {
    "key": "CHOOSE_ROD",
    "zip": "1334296652-Choose_Rod_1.3.mp3",
@@ -1180,24 +1219,6 @@
    "zip": "1286143226-crusher_collision_01.mp3",
    "md5": "0d36de2713bc33abae5728e9ffc7cfa3",
    "why": "crusher.js:172 onPlayerCollision; the remake's Rook's Woods Crusher hit plays a pitched pickup instead (game.js beginRookCrusherHit)."
-  },
-  {
-   "key": "ENGINE2",
-   "zip": "1302286012-engine2_30.mp3",
-   "md5": "15f4283669b4ce5568ae1e4889aa6a4b",
-   "why": "Machine part step (blockmaker.js:780); not played by the remake."
-  },
-  {
-   "key": "FUELMAKER_CASE1",
-   "zip": "1302286068-fuelmaker_case1_30.mp3",
-   "md5": "d89ff0cf1fd9866b7efb72c261a35eba",
-   "why": "Fuelmaker/metalmaker disassembly (fuelmaker.js:819); not played by the remake."
-  },
-  {
-   "key": "FUELMAKER_CORE1",
-   "zip": "1302286130-fuelmaker_core1_30.mp3",
-   "md5": "aa17787af141c0d8c906a4ed537c51ca",
-   "why": "Fuelmaker/metalmaker disassembly (fuelmaker.js:824); not played by the remake."
   },
   {
    "key": "FUELMAKER_LOAD_OPEN",
@@ -1240,18 +1261,6 @@
    "zip": "1331163543-Opening_Screen_1.6.mp3",
    "md5": "6dd6ce4e8cc4c3b128d14f52e19470a3",
    "why": "The handoff file is Opening_Screen_1.6 (2012-03-07); the client's own url is 1331738581-Opening_Screen_Chimes_1.1.mp3 (BootStrapController.as:824), also in the zip, which ships instead."
-  },
-  {
-   "key": "PLATES1",
-   "zip": "1302286260-plates1_30.mp3",
-   "md5": "4441bdf669e2a187be342675578ac56e",
-   "why": "Machine part (blockmaker.js:741); not played by the remake."
-  },
-  {
-   "key": "PLATES2",
-   "zip": "1302286267-plates2_30.mp3",
-   "md5": "4edf51aca187f27f84fc3377b4fcebda",
-   "why": "Machine part step (blockmaker.js:796); not played by the remake."
   },
   {
    "key": "RAINBOW_70F",

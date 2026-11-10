@@ -9,11 +9,11 @@ import { readFileSync, existsSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { AGGRESSIVE_HOEING_VERBS, aggressiveHoeingVerb, clearPlot, createGarden, gardenActionProfile, getPlot, runAggressiveHoeingVerb } from '../public/js/garden.js?v=1e8a887d';
-import { plotVerbs, resolveTendPackage } from '../public/js/patches.js?v=fa8f7e12';
+import { plotVerbs, resolveTendPackage } from '../public/js/patches.js?v=02552313';
 import { createToolConditionState, setToolRemaining, getToolCondition } from '../public/js/tools.js?v=5f482998';
 import { createInventory } from '../public/js/inventory.js?v=60dfc9ca';
-import { getVerbsFor, runVerb } from '../public/content.js?v=42ad4343';
-import { normalizePlayerSnapshot } from '../public/js/player-save.js?v=85572db4';
+import { getVerbsFor, runVerb } from '../public/content.js?v=2fde1d1a';
+import { normalizePlayerSnapshot } from '../public/js/player-save.js?v=cc58c43a';
 import { aggressiveHoeingFeature as feature } from '../public/js/features/aggressive-hoeing-feature.js?v=9e21ad24';
 
 const GS = join(dirname(fileURLToPath(import.meta.url)), '../../glitch-GameServerJS');

@@ -19,7 +19,7 @@
 
 import { MAKE_TOOL_SHEETS } from './make-tool-sheets.js?v=6f758e09';
 import { ORB_TOOL_SHEET } from './meditation.js?v=f0c00590';
-import { SOUND_ALIASES, SOUND_FILES } from './sound-keys.js?v=723af004';
+import { SOUND_ALIASES, SOUND_FILES } from './sound-keys.js?v=821e71ee';
 
 /** items/include/jobs.js startJobWork 293-305. */
 export const JOB_WORK_OVERLAY = Object.freeze({ deltaY: -110, width: 40, height: 40, bubble: true });
