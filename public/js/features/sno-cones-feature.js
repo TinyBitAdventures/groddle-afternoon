@@ -18,7 +18,7 @@
  *   Canvas: snoConeLast, snoConeEaten.
  */
 
-import { ITEM_CATALOG, addItem, countItem, removeItem } from '../inventory.js?v=60dfc9ca';
+import { addItem, countItem, removeItem } from '../inventory.js?v=60dfc9ca';
 import { getGameDayKey } from '../game-day.js?v=edb00566';
 import { listDroppedStacks } from '../world-items.js?v=da2bb7a1';
 import { XP_FOR_LEVEL } from '../progression.js?v=33462eaa';
@@ -31,7 +31,8 @@ import {
   isSnoCone,
   snoConeEatButton,
   snoConeMelted,
-} from '../sno-cones.js?v=2d23307e';
+  snoConeVerbLine,
+} from '../sno-cones.js?v=3cb5d7e5';
 
 export const SNO_CONES_FEATURE_ID = 'sno-cones';
 export const BEMOAN_VERB = 'sno_cone_bemoan';
@@ -70,7 +71,7 @@ export function eatPackedSnoCone(engine, classTsid, rng = Math.random) {
   const now = Date.now();
   const out = eatSnoCone(classTsid, engine.pc, { eatenToday: eatenToday(now), rng });
   if (!out.ok) {
-    for (const msg of out.msgs) say(engine, msg, false);
+    say(engine, snoConeVerbLine(classTsid, { ok: false, msgs: out.msgs }), false);
     last = `${classTsid}:${out.reason || 'refused'}`;
     publish(engine);
     return last;
@@ -81,9 +82,9 @@ export function eatPackedSnoCone(engine, classTsid, rng = Math.random) {
   // items/item.js notifyVerb: VERB:eat:<class> (and <class>:eat).
   engine.achievement(`${classTsid}:eat`, 1);
   engine.achievement(`VERB:eat:${classTsid}`, 1);
-  for (const msg of out.msgs) say(engine, msg, !out.froze);
+  // What the original said (buildVerbMessage): the cone, any warning, then the iMG it gave (report #169).
+  say(engine, snoConeVerbLine(classTsid, { msgs: out.msgs, xp: out.xp, moodLost: out.moodLost }), !out.froze);
   if (out.xp && engine.player) engine.floatText?.(engine.player.x, engine.player.y - 90, `+${out.xp} iMG`, 0xb388ff);
-  if (!out.msgs.length) engine.pushActivity?.(`You ate a ${ITEM_CATALOG[classTsid]?.label || 'Sno Cone'}.`);
   last = `${classTsid}:${out.froze ? 'froze' : 'ate'}:${out.eatenToday}`;
   engine.updateHud?.();
   engine.refreshPack?.();
@@ -118,8 +119,8 @@ export function bemoanDroppedSnoCone(engine, target) {
   removeStack(engine, stack.id);
   engine.droppedItemsChanged?.();
   engine.achievement(`VERB:bemoan:${stack.classTsid}`, out.count);
-  for (const msg of out.msgs) say(engine, msg);
-  if (engine.player) engine.floatText?.(engine.player.x, engine.player.y - 90, `+${out.xp} iMG`, 0xb388ff);
+  say(engine, snoConeVerbLine(stack.classTsid, { verb: 'bemoan', count: out.count, msgs: out.msgs, xp: out.xp }));
+  if (out.xp && engine.player) engine.floatText?.(engine.player.x, engine.player.y - 90, `+${out.xp} iMG`, 0xb388ff);
   last = `${stack.classTsid}:bemoan:${out.xp}`;
   engine.updateHud?.();
   engine.save?.();

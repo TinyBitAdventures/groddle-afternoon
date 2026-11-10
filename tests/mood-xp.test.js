@@ -19,7 +19,7 @@ import { applyVerbReward, getVerbReward } from '../public/js/verb-rewards.js?v=d
 import { applyDropResult } from '../public/js/drop-tables.js?v=16e12632';
 import { quoteShrineDonation } from '../public/js/shrines.js?v=247c9b77';
 import { applyRewards } from '../public/js/quests.js?v=2b882eb6';
-import { bemoanSnoCone, eatSnoCone } from '../public/js/sno-cones.js?v=2d23307e';
+import { bemoanSnoCone, eatSnoCone } from '../public/js/sno-cones.js?v=3cb5d7e5';
 
 const GSJS = join(import.meta.dirname, '../../glitch-GameServerJS');
 const gsjs = (rel) => readFileSync(join(GSJS, rel), 'utf8');

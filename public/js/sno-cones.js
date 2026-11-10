@@ -22,14 +22,14 @@
 import { grantMoodXp } from './mood-xp.js?v=958e7680';
 import { loseMood } from './metabolics.js?v=8504134e';
 
-/** classProps eat_min_level / eat_xp and the bemoan verb's iMG and line, per cone. */
+/** name_single, classProps eat_min_level / eat_xp and the bemoan verb's iMG and line, per cone. */
 export const SNO_CONES = Object.freeze({
-  sno_cone_blue: Object.freeze({ minLevel: 2, xp: 37, bemoanXp: 19, bemoan: 'Sigh. You should have known not to drop a cone.' }),
-  sno_cone_green: Object.freeze({ minLevel: 4, xp: 75, bemoanXp: 37, bemoan: 'Oy. A dropped cone is a real wasted opportunity.' }),
-  sno_cone_orange: Object.freeze({ minLevel: 6, xp: 150, bemoanXp: 75, bemoan: 'Drat, drat, drat. A dropped cone. I hope you learned something.' }),
-  sno_cone_red: Object.freeze({ minLevel: 8, xp: 300, bemoanXp: 150, bemoan: 'Grrr. Pffft. A dropped sno cone is a painful thing to behold.' }),
-  sno_cone_purple: Object.freeze({ minLevel: 11, xp: 550, bemoanXp: 275, bemoan: 'Aiy! Wail!! That is an expensive lesson.' }),
-  sno_cone_rainbow: Object.freeze({ minLevel: 0, xp: 1100, bemoanXp: 550, bemoan: 'Aiy! Wail!! That is an expensive lesson.' }),
+  sno_cone_blue: Object.freeze({ name: 'Blue Sno Cone', minLevel: 2, xp: 37, bemoanXp: 19, bemoan: 'Sigh. You should have known not to drop a cone.' }),
+  sno_cone_green: Object.freeze({ name: 'Green Sno Cone', minLevel: 4, xp: 75, bemoanXp: 37, bemoan: 'Oy. A dropped cone is a real wasted opportunity.' }),
+  sno_cone_orange: Object.freeze({ name: 'Orange Sno Cone', minLevel: 6, xp: 150, bemoanXp: 75, bemoan: 'Drat, drat, drat. A dropped cone. I hope you learned something.' }),
+  sno_cone_red: Object.freeze({ name: 'Red Sno Cone', minLevel: 8, xp: 300, bemoanXp: 150, bemoan: 'Grrr. Pffft. A dropped sno cone is a painful thing to behold.' }),
+  sno_cone_purple: Object.freeze({ name: 'Purple Sno Cone', minLevel: 11, xp: 550, bemoanXp: 275, bemoan: 'Aiy! Wail!! That is an expensive lesson.' }),
+  sno_cone_rainbow: Object.freeze({ name: 'Rainbo Sno Cone', minLevel: 0, xp: 1100, bemoanXp: 550, bemoan: 'Aiy! Wail!! That is an expensive lesson.' }),
 });
 
 export const SNO_CONE_TEXT = Object.freeze({
@@ -38,6 +38,8 @@ export const SNO_CONE_TEXT = Object.freeze({
   almost: 'This Sno Cone almost gave you a Brain Freeze! I would consider carefully before eating another one today.',
   froze: 'Aiiiiiii! Can\'t… feel… my brain?!? Brain freeze!',
   lucky: 'Huh! No brain freeze! Lucky!',
+  // sno_cone_*.js 314-316: the mood bonus (stats_add_xp) left nothing of the cone's iMG.
+  noXp: 'You gain 0 iMG due to low mood. Unlucky!',
   level: (n) => `You must be at least level ${n} to eat this sno cone.`,
   bemoanTooltip: 'Grieve, for you cannot eat it',
   pickupTooltip: 'You saved it!',
@@ -76,8 +78,28 @@ export function snoConeEatButton(classTsid, eatenToday = 0) {
 }
 
 /**
+ * What the original told the player after eat or bemoan (the handlers end in
+ * pc.sendActivity(this.buildVerbMessage(...)), items/item.js 26-77 with
+ * buildSimpleVerbMessage 79-125 and transformEffects 138-190): "You ate a
+ * Purple Sno Cone. " (failed: "You tried to eat a ..."; several: "2 Blue Sno
+ * Cones. "), then each flavour line, then the effects on you ("+550 iMG",
+ * "-87 Mood"). The article and names are each cone file's own (line 5-7:
+ * "an" only for the Orange Sno Cone; name_plural adds an s).
+ */
+export function snoConeVerbLine(classTsid, { verb = 'eat', ok = true, count = 1, msgs = [], xp = 0, moodLost = 0 } = {}) {
+  const name = SNO_CONES[classTsid]?.name || 'Sno Cone';
+  const past = verb === 'bemoan' ? 'bemoaned the loss of' : 'ate';
+  const n = Math.max(1, Math.floor(Number(count) || 1));
+  const what = n > 1 ? `${n} ${name}s` : `${/^[aeiou]/i.test(name) ? 'an' : 'a'} ${name}`;
+  const effects = [];
+  if (moodLost > 0) effects.push(`-${Math.abs(Math.round(moodLost))} Mood`);
+  if (xp > 0) effects.push(`+${Math.abs(Math.round(xp))} iMG`);
+  return [`You ${ok ? past : `tried to ${verb}`} ${what}.`, ...msgs, effects.join(' ')].filter(Boolean).join(' ');
+}
+
+/**
  * sno_cone_base eat handler for one cone (is_single). Mutates pc (xp,
- * imagination, mood) and returns { ok, msgs, eatenToday, froze, xp,
+ * imagination, mood) and returns { ok, msgs, eatenToday, froze, xp, moodLost,
  * achievementCounters }. A failed level check eats nothing; otherwise the
  * cone is used up (apiDelete) whether or not your brain froze.
  */
@@ -92,6 +114,7 @@ export function eatSnoCone(classTsid, pc, { eatenToday = 0, rng = Math.random } 
   const msgs = [];
   const rows = [];
   let froze = false;
+  let moodLost = 0;
   if (eaten === 3) {
     msgs.push(SNO_CONE_TEXT.almost);
   } else if (eaten > 3) {
@@ -100,15 +123,18 @@ export function eatSnoCone(classTsid, pc, { eatenToday = 0, rng = Math.random } 
       msgs.push(SNO_CONE_TEXT.froze);
       rows.push({ counter: 'brain:frozen', amount: 1 });
       // sno_cone_orange.js 289: metabolics_set_mood(0), a metabolics_lose_mood (G300).
-      loseMood(pc, Number(pc.mood) || 0);
+      moodLost = loseMood(pc, Number(pc.mood) || 0);
     } else {
       msgs.push(SNO_CONE_TEXT.lucky);
     }
   }
   let xp = 0;
   // sno_cone_*.js 305 eat, 81 bemoan: stats_add_xp(n, false) takes the mood bonus.
-  if (!froze) xp = grantMoodXp(pc, def.xp);
-  return { ok: true, msgs, eatenToday: eaten, froze, xp, achievementCounters: rows };
+  if (!froze) {
+    xp = grantMoodXp(pc, def.xp);
+    if (!xp) msgs.push(SNO_CONE_TEXT.noXp);
+  }
+  return { ok: true, msgs, eatenToday: eaten, froze, xp, moodLost, achievementCounters: rows };
 }
 
 /** The bemoan verb (in location): 19-550 iMG per cone and the cones are gone. */

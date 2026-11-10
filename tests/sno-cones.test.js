@@ -17,8 +17,9 @@ import {
   eatSnoCone,
   snoConeEatButton,
   snoConeMelted,
-} from '../public/js/sno-cones.js?v=2d23307e';
-import { BEMOAN_VERB, snoConesFeature } from '../public/js/features/sno-cones-feature.js?v=a2281d36';
+  snoConeVerbLine,
+} from '../public/js/sno-cones.js?v=3cb5d7e5';
+import { BEMOAN_VERB, snoConesFeature } from '../public/js/features/sno-cones-feature.js?v=6e04ce8d';
 import {
   applyAchievementProgress,
   createAchievementState,
@@ -167,7 +168,65 @@ describe('sno cones feature', () => {
     assert.equal(engine.pc.xp, 38);
     assert.equal(engine.droppedItems.streets.GTEST, undefined);
     assert.equal(calls.changed, 1);
-    assert.ok(calls.activity.includes('Sigh. You should have known not to drop a cone.'));
+    // buildVerbMessage(count, 'bemoan', 'bemoaned the loss of', ...): the cones, the line, the iMG.
+    assert.deepEqual(calls.activity, ['You bemoaned the loss of 2 Blue Sno Cones. Sigh. You should have known not to drop a cone. +38 iMG']);
+  });
+
+  it('eating says what the original said: the cone, any warning, and the iMG it gave (report #169)', () => {
+    // sno_cone_*.js eat handler: pc.sendActivity(this.buildVerbMessage(msg.count, 'eat', 'ate', failed, self_msgs, self_effects, they_effects)).
+    const { engine, calls } = fakeEngine();
+    engine.inv.sno_cone_purple = 4;
+    engine.inv.sno_cone_orange = 1;
+    snoConesFeature.runPackVerb('sno_cone_purple', 'eat', engine);
+    assert.deepEqual(calls.activity, ['You ate a Purple Sno Cone. +550 iMG'], 'the activity line');
+    assert.deepEqual(calls.toasts, ['You ate a Purple Sno Cone. +550 iMG'], 'and the pop-up');
+    snoConesFeature.runPackVerb('sno_cone_orange', 'eat', engine);
+    assert.equal(calls.activity[1], 'You ate an Orange Sno Cone. +150 iMG', 'the Orange cone\'s own article');
+    snoConesFeature.runPackVerb('sno_cone_purple', 'eat', engine);
+    assert.equal(calls.activity[2], `You ate a Purple Sno Cone. ${SNO_CONE_TEXT.almost} +550 iMG`, 'the third of the day warns, then the iMG');
+    // Too low a level: "You tried to eat ...".
+    const low = fakeEngine();
+    low.engine.pc.level = 3;
+    low.engine.inv.sno_cone_purple = 1;
+    snoConesFeature.runPackVerb('sno_cone_purple', 'eat', low.engine);
+    assert.deepEqual(low.calls.activity, ['You tried to eat a Purple Sno Cone. You must be at least level 11 to eat this sno cone.']);
+    assert.equal(low.engine.inv.sno_cone_purple, 1);
+  });
+
+  it('a brain freeze names the mood it cost and no iMG; low mood says the cone gave none', () => {
+    assert.equal(snoConeVerbLine('sno_cone_blue', { msgs: [SNO_CONE_TEXT.froze], moodLost: 87 }), `You ate a Blue Sno Cone. ${SNO_CONE_TEXT.froze} -87 Mood`);
+    const pc = { level: 12, xp: 0, imagination: 0, mood: 80, moodMax: 100, energyMax: 100 };
+    const froze = eatSnoCone('sno_cone_blue', pc, { eatenToday: 4, rng: () => 0.1 });
+    assert.equal(froze.moodLost, 80);
+    assert.equal(froze.xp, 0);
+    // sno_cone_purple.js 314-316: stats_add_xp returned nothing (mood under 10% of the tank).
+    const sad = { level: 12, xp: 0, imagination: 0, mood: 5, moodMax: 100, energyMax: 100 };
+    const none = eatSnoCone('sno_cone_blue', sad, { eatenToday: 0 });
+    assert.equal(none.xp, 0);
+    assert.deepEqual(none.msgs, [SNO_CONE_TEXT.noXp]);
+    assert.equal(snoConeVerbLine('sno_cone_blue', none), 'You ate a Blue Sno Cone. You gain 0 iMG due to low mood. Unlucky!');
+  });
+
+  it('the lines are the source\'s (items/item.js buildVerbMessage, each cone\'s article)', (t) => {
+    let item;
+    let orange;
+    let purple;
+    try {
+      item = readFileSync(join(root, '..', 'glitch-GameServerJS', 'items', 'item.js'), 'utf8');
+      orange = readFileSync(join(root, '..', 'glitch-GameServerJS', 'items', 'sno_cone_orange.js'), 'utf8');
+      purple = readFileSync(join(root, '..', 'glitch-GameServerJS', 'items', 'sno_cone_purple.js'), 'utf8');
+    } catch {
+      t.skip('needs glitch-GameServerJS beside the repo');
+      return;
+    }
+    assert.match(item, /msg \+= "tried to "\+verb\+" ";/);
+    assert.match(item, /msg \+= this\.article \+ " " \+ this\.name_single \+ "\. ";/);
+    assert.match(item, /out\.push\(gain\+v\+' iMG'\);/);
+    assert.match(orange, /var article = "an";/);
+    for (const [cls, def] of Object.entries(SNO_CONES)) assert.ok(readFileSync(join(GSJS, `${cls}.js`), 'utf8').includes(`var name_single = "${def.name}";`), cls);
+    assert.match(purple, /var article = "a";/);
+    assert.match(purple, /this\.buildVerbMessage\(msg\.count, 'eat', 'ate', failed, self_msgs, self_effects, they_effects\)/);
+    assert.match(purple, /self_msgs\.push\("You gain 0 iMG due to low mood\. Unlucky!"\);/);
   });
 
   it('melts old dropped cones on every street, leaving other stacks', () => {
