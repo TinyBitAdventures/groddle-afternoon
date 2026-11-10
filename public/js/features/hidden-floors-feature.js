@@ -17,6 +17,8 @@
  *   into the snowy oval takes you to Wintry Place, its secret entrance. Level 3
  *   West's pit (js/cave-pit.js, G527): our own stand-in for its lost teleporter,
  *   each end of the pit floor back up to that end's signpost island.
+ *   Oppidan Avenue's four (js/seam-teleporters.js, G620): each cave's beam to that end of the
+ *   city, each end of the city to that side's cave, as the footage shows.
  * - The painted "EXIT" on both floors: the forgotten floor's archived
  *   sign_txt and, on the lost floor, the word read off the footage.
  * - Goorsh Gam's canopy and Ilmenskie's cave mouth: there the avatar walks
@@ -61,6 +63,7 @@ import {
 import { narakaTeleportersOn } from '../hell.js?v=33a46876';
 import { wintryPortalTeleportersOn } from '../wintry-portal.js?v=1437deda';
 import { cavePitTeleportersOn } from '../cave-pit.js?v=81e62950';
+import { seamTeleportersOn } from '../seam-teleporters.js?v=09d11340';
 
 export const HIDDEN_FLOORS_FEATURE_ID = 'hidden-floors';
 const CHECK_MS = 60;
@@ -197,7 +200,7 @@ export const hiddenFloorsFeature = {
       publish(engine, enteredAt, true);
       return;
     }
-    boxes = [...teleportersOn(street.tsid), ...narakaTeleportersOn(street.tsid), ...wintryPortalTeleportersOn(street.tsid), ...cavePitTeleportersOn(street.tsid)];
+    boxes = [...teleportersOn(street.tsid), ...narakaTeleportersOn(street.tsid), ...wintryPortalTeleportersOn(street.tsid), ...cavePitTeleportersOn(street.tsid), ...seamTeleportersOn(street.tsid)];
     zone = clientPhysicsZone(street);
     if (isIlmenskieTsid(street.tsid)) ceilings = ceilingsScreen(street);
     const row = exitSignOn(street.tsid);
