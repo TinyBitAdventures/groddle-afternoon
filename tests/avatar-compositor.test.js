@@ -16,6 +16,7 @@ import {
 import {
   COLOR_FIELDS, articleColors, expandCatalog, lookKey, normalizeVectorFields, randomVectorFields, resolveLook, vectorFieldsFromColors,
 } from '../public/js/avatar-looks.js?v=64fab53e';
+import { SHEET_ORDER, bakeLook } from '../public/js/avatar-compositor.js?v=b5fec8e6';
 import { CORE_FRAMES, IDLE_FRAMES, IDLE_SHEETS, SHEET_FRAMES } from '../public/js/avatar-anims.js?v=fb921bf4';
 import { VECTOR_AVATAR, VECTOR_AVATAR_HIRES } from '../public/js/avatar-vector-sheets.js?v=ad801376';
 import { FIRST_DRAW_SPRITES, HIRES_SPRITES } from '../public/js/sprite-hires.js?v=ac5f0e68';
@@ -415,6 +416,50 @@ describe('prerendered default sheets', () => {
       assert.equal(s.drift.length, 0, name);
       assert.equal(s.frames.length, SHEET_FRAMES[name].length);
     }
+  });
+});
+
+describe('baking a look in slices', () => {
+  /** A canvas that takes every call and draws nothing (the slicing is what is under test). */
+  const fakeCanvas = () => ({ width: 0, height: 0, getContext: () => new Proxy({}, { get: (o, k) => (k in o ? o[k] : () => {}), set: (o, k, v) => { o[k] = v; return true; } }) });
+  /** A prepared look with no shape sources: layouts are real, painting has nothing to fill. */
+  const prepFor = (look) => ({ rig, ...lookCtx(look), sources: new Map(), standSoleRow: 0 });
+
+  it('with a budget no task paints a whole sheet, and the sheets come out the same', async () => {
+    const before = { document: globalThis.document, Path2D: globalThis.Path2D, DOMMatrix: globalThis.DOMMatrix };
+    globalThis.document = { createElement: fakeCanvas };
+    // Masks build a clip path even with nothing to fill.
+    globalThis.Path2D = class { addPath() {} };
+    globalThis.DOMMatrix = class {};
+    try {
+      const look = resolveLook({ outfit: { hair: 'Buzzcut' } }, catalog);
+      const whole = await bakeLook(prepFor(look), 3);
+      const stats = {};
+      const order = [];
+      // A budget no frame fits in: every frame ends its slice, so the slices are the frames.
+      const sliced = await bakeLook(prepFor(look), 3, { budgetMs: 1e-9, stats, onSheet: (name) => order.push(name) });
+      const frames = SHEET_ORDER.reduce((n, name) => n + SHEET_FRAMES[name].length, 0);
+      assert.equal(stats.slices, frames, 'one slice a frame');
+      assert.deepEqual(order, [...SHEET_ORDER]);
+      for (const name of SHEET_ORDER) {
+        assert.deepEqual(sliced.sheets[name].def, whole.sheets[name].def, name);
+        assert.equal(sliced.sheets[name].canvas.width, whole.sheets[name].canvas.width, name);
+        assert.equal(sliced.sheets[name].canvas.height, whole.sheets[name].canvas.height, name);
+      }
+      assert.ok(Number.isFinite(stats.maxLayoutMs) && Number.isFinite(stats.maxWarmMs));
+    } finally {
+      globalThis.document = before.document;
+      globalThis.Path2D = before.Path2D;
+      globalThis.DOMMatrix = before.DOMMatrix;
+    }
+  });
+
+  it('the game bakes every custom look with a budget (another player walking in must not stop the street)', () => {
+    const game = readFileSync(join(pub, 'game.js'), 'utf8');
+    assert.match(game, /bakeLook\(prep, scale, \{ budgetMs: VECTOR_BAKE_BUDGET_MS \}\)/);
+    assert.doesNotMatch(game, /bakeLook\(prep, scale\)/);
+    const budget = Number(game.match(/const VECTOR_BAKE_BUDGET_MS = ([\d.]+);/)?.[1]);
+    assert.ok(budget > 0 && budget <= 8, 'a slice leaves room in a 16 ms frame');
   });
 });
 

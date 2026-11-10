@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=396e6ee3';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=127e0a3c';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=be2a5c0e';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=a475c5b7';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -787,7 +787,7 @@ import { hellBuffDesc, isInHell } from './js/hell.js?v=33a46876';
 import { climbBobY, ladderAnimState, ladderSwap } from './js/ladder-anim.js?v=a8b327a0';
 import { VECTOR_AVATAR } from './js/avatar-vector-sheets.js?v=ad801376';
 import { createNpcGlitchKit } from './js/npc-glitch.js?v=339e1872';
-import { bakeIdleSheet, bakeLook, loadCatalog as loadAvatarCatalog, paintPreview as paintVectorPreview, prepareLook } from './js/avatar-compositor.js?v=dcd906ae';
+import { bakeIdleSheet, bakeLook, loadCatalog as loadAvatarCatalog, paintPreview as paintVectorPreview, prepareLook } from './js/avatar-compositor.js?v=b5fec8e6';
 import { catalogItem, lookKey, randomVectorFields, resolveLook, variantSwatch } from './js/avatar-looks.js?v=64fab53e';
 import {
   createDefaultAppearance,
@@ -797,7 +797,7 @@ import {
   APPEARANCE_PRESETS,
   PRESET_GROUPS,
   appearanceCacheKey,
-} from './js/character-builder.js?v=dac417d3';
+} from './js/character-builder.js?v=e4d48b97';
 import { clearPresetActive, renderPresetGroups, renderStarterPicker } from './js/avatar-builder-ui.js?v=be72005c';
 import {
   loadAmbientMusicConfig,
@@ -10798,6 +10798,13 @@ const vectorBakes = new Map();
 /** Packs other players' Glitches are drawn with (multiplayer, engine.holdGlitchPacks): never trimmed. */
 let heldGlitchAnims = new Set();
 
+/**
+ * A custom look's bake paints for about this long, then lets a frame through (avatar-compositor
+ * bakeLook). Every look on a street that is not the default bakes: your own, and each player who
+ * walks in. Whole sheets at once stopped the street when someone arrived (players, 2026-11-09).
+ */
+const VECTOR_BAKE_BUDGET_MS = 4;
+
 /** Device pixels per art pixel decide the bake: 3x like js/sprite-hires.js, else 1x. */
 function vectorBakeScale() {
   const dpr = window.devicePixelRatio || 1;
@@ -10849,7 +10856,8 @@ function vectorAnimPack(key, app) {
     bake.promise = prepareLook(look)
       .then((prep) => {
         bake.prep = prep;
-        return bakeLook(prep, scale);
+        // Painted in slices: another player's look bakes while the street is being played.
+        return bakeLook(prep, scale, { budgetMs: VECTOR_BAKE_BUDGET_MS });
       })
       .then(({ sheets }) => {
         const loaded = {};

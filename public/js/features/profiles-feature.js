@@ -62,7 +62,7 @@
  */
 
 import { createMinnAccount } from '../minn-account.js?v=8f2741cd';
-import { drawListFor, loadCatalog, paintItems, prepareLook } from '../avatar-compositor.js?v=dcd906ae';
+import { drawListFor, loadCatalog, paintItems, prepareLook } from '../avatar-compositor.js?v=b5fec8e6';
 import { drawListBounds } from '../avatar-rig.js?v=b67f0da8';
 import { lookKey, resolveLook } from '../avatar-looks.js?v=64fab53e';
 import {

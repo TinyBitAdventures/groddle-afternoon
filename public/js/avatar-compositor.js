@@ -473,14 +473,45 @@ export function paintPreview(prep, canvas, swfFrame = 801, { pad = 6, flip = fal
 }
 
 /**
- * Bake every sheet of a look. Yields between sheets so a runtime bake does
- * not stall the game; resolves { sheets: { name: { canvas, def } }, scale }.
+ * Bake every sheet of a look; resolves { sheets: { name: { canvas, def } }, scale }.
+ *
+ * With `budgetMs` each sheet is laid out, then painted in slices of about that long
+ * (paintSheetSpread), so a look baked while the game runs never holds a frame for a whole sheet.
+ * The game bakes every custom look this way: another player's arrival used to stop the street a
+ * sheet at a time (players, 2026-11-09: the street froze for seconds when someone walked in;
+ * measured 0.13 s a sheet on a fast machine and 0.38 s at a sixth of its speed, six sheets a
+ * look). Without a budget each sheet is painted in one go, yielding between sheets (the offline
+ * build, where nothing is waiting on a frame).
+ * `stats` collects the slices (count, longest, paint time), the longest layout and the longest
+ * of the two warm-up tasks.
  */
-export async function bakeLook(prep, scale, { onSheet } = {}) {
+export async function bakeLook(prep, scale, { onSheet, budgetMs = 0, stats = null } = {}) {
   const sheets = {};
+  const spread = budgetMs > 0;
+  if (spread) {
+    // A look's first paint builds its paths and tints its skin, and the stand's sole row reads
+    // pixels back: one task each, ahead of the first sheet's layout (together they were the
+    // longest stop left once the sheets were painted in slices).
+    const t = performance.now();
+    const stand = drawListFor(prep, 801);
+    const warm = document.createElement('canvas');
+    warm.width = 1;
+    warm.height = 1;
+    paintItems(warm.getContext('2d'), stand, prep.sources, [1, 0, 0, 1, 0, 0]);
+    const warmed = performance.now();
+    await new Promise((r) => setTimeout(r, 0));
+    const t2 = performance.now();
+    standSoleRow(prep, drawListBounds(stand, prep.shapeOf) || [0, 0, 0, 0]);
+    if (stats) stats.maxWarmMs = Math.max(warmed - t, performance.now() - t2);
+    await new Promise((r) => setTimeout(r, 0));
+  }
   for (const name of SHEET_ORDER) {
+    const t = performance.now();
     const layout = sheetLayout(prep, name);
-    const canvas = paintSheet(prep, layout, scale);
+    if (stats) stats.maxLayoutMs = Math.max(stats.maxLayoutMs || 0, performance.now() - t);
+    // The layout measures every frame of the sheet: its own task, then the paint in slices.
+    if (spread) await new Promise((r) => setTimeout(r, 0));
+    const canvas = spread ? await paintSheetSpread(prep, layout, scale, { budgetMs, stats }) : paintSheet(prep, layout, scale);
     sheets[name] = { canvas, def: sheetDef(layout, `${name}.png`) };
     onSheet?.(name, sheets[name]);
     await new Promise((r) => setTimeout(r, 0));

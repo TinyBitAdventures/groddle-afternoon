@@ -13,7 +13,7 @@
  * (migrateAppearance).
  */
 import { normalizeVectorFields, vectorFieldsFromColors } from './avatar-looks.js?v=64fab53e';
-import { installReimaginedTags } from './avatar-reimagined.js?v=b651b38a';
+import { installReimaginedTags } from './avatar-reimagined.js?v=249a775b';
 import { starterRowFields } from './avatar-starter.js?v=2ba02b11';
 import { saveStore } from './save-store.js?v=8839ba7b';
 

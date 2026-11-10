@@ -36,8 +36,8 @@ import {
 } from '../public/js/neighbours-mp.js?v=c5301a26';
 import { createMinnAccount } from '../public/js/minn-account.js?v=8f2741cd';
 import { homesFeature, visitorHomeScene, visitorHomeState } from '../public/js/features/homes-feature.js?v=aca728d5';
-import { neighboursMpApi, neighboursMpFeature } from '../public/js/features/neighbours-mp-feature.js?v=d72e9cb2';
-import { FEATURES } from '../public/js/features/index.js?v=be2a5c0e';
+import { neighboursMpApi, neighboursMpFeature } from '../public/js/features/neighbours-mp-feature.js?v=e862252c';
+import { FEATURES } from '../public/js/features/index.js?v=a475c5b7';
 import { YARD_STYLE_BY_KEY, streetLook, yardLook, yardStyleFor } from '../public/js/home-styles.js?v=3615410c';
 import { serverPath, sitePath, skipWithoutServer, skipWithoutSite } from '../tools/repos.mjs';
 
