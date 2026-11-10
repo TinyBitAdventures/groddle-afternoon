@@ -40,11 +40,11 @@
   </script>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Groddle Afternoon</title>
-    <link rel="stylesheet" href="style.css?v=fce87b37" />
+    <link rel="stylesheet" href="style.css?v=bb0cc57f" />
   <!-- The UI font, self-hosted (style.css @font-face; OFL in assets/fonts/nunito/): the roman latin file, before first paint. -->
   <link rel="preload" href="assets/fonts/nunito/nunito-roman-latin.woff2" as="font" type="font/woff2" crossorigin />
   <!-- The Classic interface (js/classic/ui-mode.js sets <html data-ui="classic">); every rule is scoped to it. -->
-  <link rel="stylesheet" href="css/classic.css?v=81e96ec8" />
+  <link rel="stylesheet" href="css/classic.css?v=78ba146b" />
   <!-- Content keys for data and art URLs (js/data-urls.js): before every other script. -->
   <script src="js/data-versions.js?v=4533c501"></script>
   <script src="js/data-urls.js?v=523668ca"></script>
@@ -713,24 +713,29 @@
         </div>
       </div>
 
-      <!-- Making / crafting (tool-driven, GSJS catalog_recipes). Modern: a side sheet of the panel shell
-           with the tool strip, search and the "Can make now" filter. -->
+      <!-- Making / crafting (tool-driven, GSJS catalog_recipes). Modern: a side sheet of the panel shell.
+           It opens on the tools, grouped by kind (#make-tools, js/make-tools.js); a tool opens its
+           recipes with a way back (#make-tools-back). The search looks in every tool from the first screen
+           and in the one tool from its own; "Can make now" filters both. -->
       <div id="make-panel" class="glitch-modal make-panel ui-sheet" role="region" aria-labelledby="make-panel-title" hidden>
         <div class="glitch-modal-card make-card ui-sheet-card">
           <div class="glitch-modal-head ui-sheet-head">
             <img class="ui-sheet-icon" src="assets/sprites/icons/tinkertool.webp?v=4774a7f0" alt="" width="28" height="28" />
             <h2 id="make-panel-title" class="ui-sheet-title" tabindex="-1">Make</h2>
             <span class="kcap ui-sheet-key" aria-hidden="true">N</span>
-            <div class="glitch-modal-tabs make-tool-tabs" id="make-tools" role="toolbar" aria-label="Tool"></div>
             <button type="button" id="make-close" class="verb-menu-x ui-sheet-x" aria-label="Close Make (Esc)">×</button>
           </div>
-          <p id="make-title" class="make-question">Making</p>
+          <div id="make-nav" class="make-nav">
+            <button type="button" id="make-tools-back" class="make-tools-back" aria-label="Back to the tools (Backspace)" hidden><span aria-hidden="true">←</span> Tools</button>
+            <p id="make-title" class="make-question">Making</p>
+          </div>
           <div class="make-search-row">
             <input type="search" id="make-search" class="make-search" placeholder="Find a recipe or ingredient" aria-label="Find a recipe or ingredient" autocomplete="off" />
             <label class="make-canmake"><input type="checkbox" id="make-canmake" checked /> Can make now</label>
           </div>
           <div class="ui-sheet-body make-body">
             <div id="make-list" class="make-grid" role="list"></div>
+            <div id="make-tools" class="make-tools" aria-label="Tools" hidden></div>
             <div id="make-detail" class="make-detail" hidden></div>
             <div id="make-progress" class="make-progress" hidden></div>
             <div id="make-result" class="make-result" hidden></div>
@@ -975,6 +980,6 @@
   </div>
   <!-- Password managers skip the game's own boxes (chat, searches, names); the account forms keep autofill. -->
   <script type="module" src="js/no-autofill.js?v=6a1a4382"></script>
-  <script type="module" src="game.js?v=bf19afea"></script>
+  <script type="module" src="game.js?v=d5e610c0"></script>
 </body>
 </html>

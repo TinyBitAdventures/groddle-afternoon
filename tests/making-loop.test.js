@@ -7,7 +7,6 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { bindDragScroll, wheelToSideways, DRAG_SLOP } from '../public/js/ui/drag-scroll.js?v=9a527ac8';
 import {
   getVerbReward,
   applyVerbReward,
@@ -475,85 +474,6 @@ describe('quest-taught recipes (learnt 3)', () => {
     assert.notEqual(canCraft(inv, bar, { completedQuests: ['batterfly_bounty'] }).reason, 'quest');
     assert.ok(!searchRecipes('batterfly', { tool: 'all', completedQuests: [] }).some((r) => r.id === '305'));
     assert.ok(searchRecipes('batterfly', { tool: 'all', completedQuests: ['batterfly_bounty'] }).some((r) => r.id === '305'));
-  });
-});
-
-describe('Make tool strip: no scrollbar over the names (report 2026-11-01)', () => {
-  /** A stand-in strip: listeners by type, a class list and a clamped scrollLeft. */
-  function fakeStrip({ scrollWidth = 900, clientWidth = 300 } = {}) {
-    const on = {};
-    const classes = new Set();
-    let left = 0;
-    return {
-      scrollWidth,
-      clientWidth,
-      get scrollLeft() { return left; },
-      set scrollLeft(v) { left = Math.max(0, Math.min(scrollWidth - clientWidth, v)); },
-      classList: { add: (c) => classes.add(c), remove: (c) => classes.delete(c), contains: (c) => classes.has(c) },
-      setPointerCapture() {},
-      addEventListener: (t, f) => { (on[t] ||= []).push(f); },
-      removeEventListener: (t, f) => { on[t] = (on[t] || []).filter((g) => g !== f); },
-      fire(t, e = {}) {
-        const ev = { defaultPrevented: false, stopped: false, preventDefault() { this.defaultPrevented = true; }, stopPropagation() { this.stopped = true; }, ...e };
-        for (const f of on[t] || []) f(ev);
-        return ev;
-      },
-    };
-  }
-
-  it('the strip hides its scrollbar in every browser and no longer scrolls smoothly under a drag', () => {
-    const css = readFileSync(join(__dirname, '../public/style.css'), 'utf8');
-    const rule = css.match(/\n\.glitch-modal-tabs\.make-tool-tabs \{[^}]*\}/)[0];
-    assert.match(rule, /overflow-x: auto;/);
-    assert.match(rule, /overflow-y: hidden;/);
-    assert.match(rule, /scrollbar-width: none;/);
-    assert.doesNotMatch(rule, /scroll-behavior: smooth/);
-    assert.ok(css.includes('.glitch-modal-tabs.make-tool-tabs::-webkit-scrollbar { display: none; }'));
-    // The fade at the right edge stays, and crafting still makes the strip inert.
-    assert.match(css, /\.glitch-modal-tabs\.make-tool-tabs::after \{[^}]*position: sticky;/);
-    assert.match(css, /\.make-card\.is-crafting \.make-tool-tabs \{\s*pointer-events: none;/);
-    const game = readFileSync(join(__dirname, '../public/game.js'), 'utf8');
-    assert.match(game, /bindDragScroll\(document\.getElementById\('make-tools'\)\)/);
-    assert.match(game, /toolsEl\.scrollLeft = stripLeft;/);
-  });
-
-  it('a vertical wheel scrolls it sideways; a mostly sideways one is left to the browser', () => {
-    assert.equal(wheelToSideways(0, 40), 40);
-    assert.equal(wheelToSideways(30, 10), 0);
-    const strip = fakeStrip();
-    bindDragScroll(strip);
-    const ev = strip.fire('wheel', { deltaX: 0, deltaY: 120, deltaMode: 0 });
-    assert.equal(strip.scrollLeft, 120);
-    assert.equal(ev.defaultPrevented, true);
-    assert.equal(strip.fire('wheel', { deltaX: 50, deltaY: 5, deltaMode: 0 }).defaultPrevented, false);
-    // Nothing to scroll: the wheel is the page's.
-    const fits = fakeStrip({ scrollWidth: 300 });
-    bindDragScroll(fits);
-    assert.equal(fits.fire('wheel', { deltaX: 0, deltaY: 120, deltaMode: 0 }).defaultPrevented, false);
-  });
-
-  it('a mouse drag scrolls it and does not pick the tab it ends on; a click still picks', () => {
-    const strip = fakeStrip();
-    strip.scrollLeft = 200;
-    bindDragScroll(strip);
-    strip.fire('pointerdown', { pointerType: 'mouse', button: 0, pointerId: 1, clientX: 100 });
-    strip.fire('pointermove', { pointerId: 1, clientX: 100 - (DRAG_SLOP - 1) });
-    assert.equal(strip.scrollLeft, 200, 'a shaky click is not a drag');
-    strip.fire('pointermove', { pointerId: 1, clientX: 40 });
-    assert.equal(strip.scrollLeft, 260);
-    assert.equal(strip.classList.contains('is-dragging'), true);
-    strip.fire('pointerup', { pointerId: 1 });
-    assert.equal(strip.classList.contains('is-dragging'), false);
-    assert.equal(strip.fire('click').stopped, true, 'the drag\'s click is swallowed');
-    assert.equal(strip.fire('click').stopped, false, 'the next click picks');
-    // A plain click: down and up in place.
-    strip.fire('pointerdown', { pointerType: 'mouse', button: 0, pointerId: 2, clientX: 80 });
-    strip.fire('pointerup', { pointerId: 2 });
-    assert.equal(strip.fire('click').stopped, false);
-    // Touch scrolls natively: the strip leaves it alone.
-    strip.fire('pointerdown', { pointerType: 'touch', button: 0, pointerId: 3, clientX: 80 });
-    strip.fire('pointermove', { pointerId: 3, clientX: 10 });
-    assert.equal(strip.scrollLeft, 260);
   });
 });
 

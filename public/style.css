@@ -4037,10 +4037,6 @@ button.play-context-head:focus-visible {
 }
 .make-progress .mp-overall-row { margin-top: 0.42rem; opacity: 0.82; }
 .make-progress .mp-cancel { margin-top: var(--sp-5); }
-.make-card.is-crafting .make-tool-tabs {
-  pointer-events: none;
-  opacity: 0.45;
-}
 .make-progress .mp-bar {
   height: 8px;
   background: var(--surface-sunken);
@@ -5269,39 +5265,7 @@ body.buff-purple-pulse::after {
   gap: 0;
   margin-left: auto;
 }
-/* More tools than fit scroll sideways with no scrollbar: a bar drawn over the strip covered the
-   tool names (Safari, 2026-11-01). A trackpad swipe, touch, a vertical wheel and a mouse drag scroll
-   it (js/ui/drag-scroll.js), the fade below says there is more, and the picked tool glides into view. */
-.glitch-modal-tabs.make-tool-tabs {
-  flex: 1 1 100%;
-  order: 3;
-  max-width: 100%;
-  overflow-x: auto;
-  overflow-y: hidden;
-  padding: 0 0 var(--sp-2);
-  scrollbar-width: none;
-  overscroll-behavior-x: contain;
-}
-.glitch-modal-tabs.make-tool-tabs::-webkit-scrollbar { display: none; }
-.glitch-modal-tabs.make-tool-tabs.is-dragging { cursor: grabbing; user-select: none; -webkit-user-select: none; }
-.glitch-modal-tabs.make-tool-tabs.is-dragging .make-tool-chip { cursor: grabbing; }
-/* More tools than fit: the strip scrolls sideways under a fade pinned to its right edge (the card's
-   colour, never fully opaque), so the next tool still peeks in. The fade's own place is after the
-   last tool, so scrolled to the end nothing is faded. */
-.glitch-modal-tabs.make-tool-tabs::after {
-  content: '';
-  position: sticky;
-  right: 0;
-  flex: 0 0 4.5rem;
-  pointer-events: none;
-  background: linear-gradient(to right, transparent, color-mix(in srgb, var(--c-grey-94) 85%, transparent));
-}
-.glitch-modal-tabs.make-tool-tabs .make-tool-chip {
-  flex: 0 0 auto;
-  white-space: nowrap;
-}
-.glitch-modal-tabs .vendor-tab,
-.glitch-modal-tabs .make-tool-chip {
+.glitch-modal-tabs .vendor-tab {
   border: 1px solid var(--border-grey);
   background: var(--c-grey-94);
   color: var(--c-blue-51);
@@ -5311,16 +5275,13 @@ body.buff-purple-pulse::after {
   cursor: pointer;
   border-radius: 0;
 }
-.glitch-modal-tabs .vendor-tab:first-child,
-.glitch-modal-tabs .make-tool-chip:first-child {
+.glitch-modal-tabs .vendor-tab:first-child {
   border-radius: var(--radius-sm) 0 0 var(--radius-sm);
 }
-.glitch-modal-tabs .vendor-tab:last-child,
-.glitch-modal-tabs .make-tool-chip:last-child {
+.glitch-modal-tabs .vendor-tab:last-child {
   border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
 }
-.glitch-modal-tabs .vendor-tab.active,
-.glitch-modal-tabs .make-tool-chip.active {
+.glitch-modal-tabs .vendor-tab.active {
   background: var(--surface-bright);
   color: var(--c-grey-29);
   border-bottom-color: var(--c-white);
@@ -5914,20 +5875,6 @@ body.buff-purple-pulse::after {
   font-size: var(--fs-base);
   text-align: right;
   color: var(--text-muted);
-}
-.make-tool-chip {
-  border: 1px solid var(--border-grey);
-  background: var(--c-grey-94);
-  border-radius: var(--radius-sm);
-  padding: var(--sp-2) 0.55rem;
-  font-size: var(--fs-sm);
-  font-weight: 700;
-  cursor: pointer;
-  color: var(--c-blue-51);
-}
-.make-tool-chip.active {
-  background: var(--surface-bright);
-  color: var(--c-grey-29);
 }
 
 /* Achievement badge grid */
@@ -9090,14 +9037,62 @@ header.top-bar + .sub { display: none; }
   }
 }
 
-/* Making: owned tools lead; recipe search spans every tool */
-.make-tool-chip.unowned {
-  opacity: 0.55;
-  font-weight: 600;
+/* Make's first screen (report #175; js/make-tools.js): the tools as buttons with their picture and name,
+   grouped by kind. The tools you have none of come last, dimmed. A tool's own screen has the
+   way back above its recipes. While a recipe, the work or its result is up, the way back is the
+   recipe's own Back, so the row above steps aside. */
+.make-tools { display: flex; flex-direction: column; gap: var(--sp-6); }
+.make-tools[hidden],
+.make-tools-back[hidden] { display: none; }
+.make-tool-group-title {
+  margin: 0 0 var(--sp-3);
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
 }
-.make-tool-chip.unowned.active {
-  opacity: 1;
+.make-tool-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: var(--sp-3); }
+.make-tool-tile {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-4);
+  min-width: 0;
+  min-height: 46px;
+  padding: var(--sp-2) var(--sp-4);
+  border: 1px solid var(--border-grey);
+  border-radius: var(--radius-md);
+  background: var(--surface-card);
+  color: var(--c-grey-29);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
 }
+.make-tool-tile:hover { background: var(--surface-bright); border-color: var(--border-strong); }
+.make-tool-tile img { flex: none; width: 32px; height: 32px; object-fit: contain; }
+.make-tool-tile .tool-text { display: flex; flex-direction: column; gap: var(--sp-1); min-width: 0; }
+.make-tool-tile .tool-label { font-size: var(--fs-sm); font-weight: 700; line-height: var(--lh-tight); overflow-wrap: anywhere; }
+.make-tool-tile .tool-count { font-size: var(--fs-xs); font-weight: 600; line-height: var(--lh-tight); color: var(--text-muted); }
+.make-tool-tile.ready .tool-count { color: var(--text-moss); }
+.make-tool-tile.unowned { border-style: dashed; background: none; }
+.make-tool-tile.unowned img { opacity: 0.45; filter: grayscale(1); }
+.make-tool-tile.unowned .tool-label { font-weight: 600; color: var(--text-muted); }
+.make-nav { display: flex; flex-direction: column; align-items: flex-start; gap: var(--sp-3); }
+.make-tools-back {
+  border: 1px solid var(--border-grey);
+  border-radius: var(--radius-sm);
+  padding: var(--sp-2) var(--sp-5);
+  background: var(--surface-card);
+  color: var(--c-blue-51);
+  font: inherit;
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  cursor: pointer;
+}
+.make-tools-back:hover { background: var(--surface-bright); }
+.make-card:has(#make-detail:not([hidden]), #make-progress:not([hidden]), #make-result:not([hidden])) .make-tools-back { display: none; }
+/* A search over every tool names the tool under each recipe. */
+.make-tile .tile-tool { font-size: var(--fs-2xs); font-weight: 700; line-height: var(--lh-tight); color: var(--text-muted); }
 .make-search-row {
   margin: 0.45rem 0 0;
 }
@@ -11930,20 +11925,40 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
 .more-list #projects-btn .pj-dot[hidden] { display: none; }
 [data-ui="modern"] .top-bar .more-menu:has(.pj-dot:not([hidden])) .more-btn::before { content: ''; position: absolute; top: 6px; right: 6px; width: 7px; height: 7px; border-radius: var(--radius-round); background: var(--accent); box-shadow: 0 0 0 2px var(--surface-raised); pointer-events: none; }
 
-/* Make: the tool strip (its fade in the sheet's colour), search and "Can make now", a 3-column grid. */
-[data-ui="modern"] #make-panel .make-tool-tabs { order: 3; flex: 1 1 100%; margin: var(--space-1) 0 0; padding-right: var(--space-2); }
-[data-ui="modern"] #make-panel .glitch-modal-tabs.make-tool-tabs::after { background: linear-gradient(to right, transparent, color-mix(in srgb, var(--surface) 85%, transparent)); }
-[data-ui="modern"] #make-panel .glitch-modal-tabs .make-tool-chip {
+/* Make: the tools screen (two buttons across the sheet), the way back on a tool's screen, search and
+   "Can make now", and the recipes in a 3-column grid. */
+[data-ui="modern"] #make-panel .make-tools { gap: var(--space-3); }
+[data-ui="modern"] #make-panel .make-tool-group-title { margin: 0 0 var(--space-1); color: var(--text-muted); font-size: var(--fs-xs); font-weight: var(--fw-heavy); }
+[data-ui="modern"] #make-panel .make-tool-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-2); }
+[data-ui="modern"] #make-panel .make-tool-tile {
+  min-height: 46px;
+  padding: var(--space-1) var(--space-2);
   border: 1px solid var(--border);
+  border-radius: var(--radius-m);
+  background: var(--surface-raised);
+  color: var(--text);
+}
+[data-ui="modern"] #make-panel .make-tool-tile:hover { border-color: var(--border-strong); background: var(--surface-hover); }
+[data-ui="modern"] #make-panel .make-tool-tile:focus-visible,
+[data-ui="modern"] #make-panel .make-tools-back:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; }
+[data-ui="modern"] #make-panel .make-tool-tile .tool-label { font-size: var(--fs-s); font-weight: var(--fw-heavy); }
+[data-ui="modern"] #make-panel .make-tool-tile .tool-count { font-size: var(--fs-xs); font-weight: var(--fw-bold); color: var(--text-muted); }
+[data-ui="modern"] #make-panel .make-tool-tile.ready .tool-count { color: var(--text-moss); }
+[data-ui="modern"] #make-panel .make-tool-tile.unowned { border-style: dashed; background: none; }
+[data-ui="modern"] #make-panel .make-tool-tile.unowned .tool-label { font-weight: var(--fw-bold); color: var(--text-muted); }
+[data-ui="modern"] #make-panel .make-nav { flex: none; gap: var(--space-2); margin: 0; padding: 0 var(--space-4) var(--space-2); }
+[data-ui="modern"] #make-panel .make-tools-back {
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
   background: var(--surface-raised);
   color: var(--text-muted);
   font-size: var(--fs-s);
   font-weight: var(--fw-heavy);
-  padding: var(--space-1) var(--space-3);
 }
-[data-ui="modern"] #make-panel .glitch-modal-tabs .make-tool-chip.active { background: var(--accent-soft); color: var(--text); box-shadow: none; border-color: var(--border-strong); }
-[data-ui="modern"] #make-panel .glitch-modal-tabs .make-tool-chip.unowned { color: var(--text-subtle); }
-[data-ui="modern"] #make-panel .make-question { flex: none; margin: 0; padding: 0 var(--space-4) var(--space-2); color: var(--text-muted); font-size: var(--fs-s); font-weight: var(--fw-bold); }
+[data-ui="modern"] #make-panel .make-tools-back:hover { border-color: var(--border-strong); background: var(--surface-hover); color: var(--text); }
+[data-ui="modern"] #make-panel .make-tile .tile-tool { font-size: var(--fs-2xs); font-weight: var(--fw-heavy); color: var(--text-subtle); }
+[data-ui="modern"] #make-panel .make-question { flex: none; margin: 0; padding: 0; color: var(--text-muted); font-size: var(--fs-s); font-weight: var(--fw-bold); }
 [data-ui="modern"] #make-panel .make-search-row { flex: none; display: flex; flex-direction: column; gap: var(--space-2); margin: 0; padding: 0 var(--space-4) var(--space-2); }
 [data-ui="modern"] #make-panel .make-search {
   box-sizing: border-box;

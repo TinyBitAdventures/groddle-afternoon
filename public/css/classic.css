@@ -1973,7 +1973,7 @@
 :root[data-ui="classic"] #game-root :is(#quest-panel, #projects-panel, #make-panel) .ui-sheet-foot .panel-meta { margin: 0; color: var(--c-classic-offline); font-size: calc(var(--fs-classic-body) * var(--cu-n, 1)); }
 :root[data-ui="classic"] #game-root :is(#quest-panel, #projects-panel, #make-panel) .ui-sheet-esc { display: none; }
 /* Minor buttons (PROPOSED colours, build-plan §3; 29 px tall and Nunito 800 13 FROM FRAME). */
-:root[data-ui="classic"] #game-root :is(#skills-panel, #buffs-panel, #achieve-panel, #quest-panel, #projects-panel, #map-panel, #make-panel) :is(.content-action-btn, [data-mr-back], [data-mr-more], [data-mr-done], [data-make-back], [data-make-go], [data-mq], .qc-pin, .badge-load-more, .make-tool-chip) {
+:root[data-ui="classic"] #game-root :is(#skills-panel, #buffs-panel, #achieve-panel, #quest-panel, #projects-panel, #map-panel, #make-panel) :is(.content-action-btn, [data-mr-back], [data-mr-more], [data-mr-done], [data-make-back], [data-make-go], [data-mq], .qc-pin, .badge-load-more, .make-tools-back) {
   min-height: calc(29 * var(--cu));
   padding: 0 calc(16 * var(--cu));
   border: 1px solid var(--c-classic-btn-minor-border);
@@ -1985,13 +1985,26 @@
   text-shadow: none;
   cursor: pointer;
 }
-:root[data-ui="classic"] #game-root :is(#skills-panel, #buffs-panel, #achieve-panel, #quest-panel, #projects-panel, #map-panel, #make-panel) :is(.content-action-btn, [data-mr-back], [data-mr-more], [data-mr-done], [data-make-back], [data-make-go], [data-mq], .qc-pin, .badge-load-more, .make-tool-chip):is(:hover, :focus-visible) { background: linear-gradient(180deg, var(--c-classic-panel), var(--c-classic-btn-minor-top)); outline: none; box-shadow: 0 0 0 2px var(--c-classic-focus); }
+:root[data-ui="classic"] #game-root :is(#skills-panel, #buffs-panel, #achieve-panel, #quest-panel, #projects-panel, #map-panel, #make-panel) :is(.content-action-btn, [data-mr-back], [data-mr-more], [data-mr-done], [data-make-back], [data-make-go], [data-mq], .qc-pin, .badge-load-more, .make-tools-back):is(:hover, :focus-visible) { background: linear-gradient(180deg, var(--c-classic-panel), var(--c-classic-btn-minor-top)); outline: none; box-shadow: 0 0 0 2px var(--c-classic-focus); }
 /* The footer's "Done" (and Make's go) is the large one at the right (ref/video-2011-make-result.jpg: 84 x 34). */
 :root[data-ui="classic"] #game-root #make-panel :is([data-mr-done], [data-make-go]) { min-height: calc(34 * var(--cu)); min-width: calc(84 * var(--cu)); font-size: calc(var(--fs-classic-row) * var(--cu-n, 1)); }
 :root[data-ui="classic"] #game-root #make-panel [data-mr-done] { margin-left: auto; }
 :root[data-ui="classic"] #game-root #make-panel .mr-actions { display: flex; align-items: center; gap: calc(10 * var(--cu)); margin-top: calc(14 * var(--cu)); padding-top: calc(10 * var(--cu)); border-top: 1px solid var(--c-classic-rule); }
-:root[data-ui="classic"] #game-root #make-panel .make-tool-chip.active { background: var(--c-classic-panel); border-color: var(--c-classic-link); color: var(--c-classic-title); }
-:root[data-ui="classic"] #game-root #make-panel .make-tool-chip.unowned { opacity: 0.45; }
+/* Report #175: the tools screen in the window's own slots (the recipe tiles' white panel and ring), three
+   across the 614 window; the way back is a minor button over a tool's recipes. */
+:root[data-ui="classic"] #game-root #make-panel .make-tool-group-title { color: var(--c-classic-offline); font: 700 calc(var(--fs-classic-count) * var(--cu-n, 1))/var(--lh-tight) var(--font-classic-body); }
+:root[data-ui="classic"] #game-root #make-panel .make-tool-grid { grid-template-columns: repeat(auto-fill, minmax(calc(150 * var(--cu)), 1fr)); gap: calc(8 * var(--cu)); }
+:root[data-ui="classic"] #game-root #make-panel .make-tool-tile { min-height: calc(46 * var(--cu)); background: var(--c-classic-panel); box-shadow: 0 0 0 1px var(--c-classic-slot-ring); border: 0; border-radius: 5px; color: var(--c-classic-title); }
+:root[data-ui="classic"] #game-root #make-panel .make-tool-tile:is(:hover, :focus-visible) { box-shadow: 0 0 0 2px var(--c-classic-link); outline: none; }
+:root[data-ui="classic"] #game-root #make-panel .make-tool-tile img { width: calc(32 * var(--cu)); height: calc(32 * var(--cu)); }
+:root[data-ui="classic"] #game-root #make-panel .make-tool-tile .tool-label { font: 800 calc(var(--fs-classic-body) * var(--cu-n, 1))/var(--lh-tight) var(--font-classic-title); }
+:root[data-ui="classic"] #game-root #make-panel .make-tool-tile .tool-count { font-size: calc(var(--fs-classic-count) * var(--cu-n, 1)); color: var(--c-classic-offline); }
+:root[data-ui="classic"] #game-root #make-panel .make-tool-tile.unowned { background: none; box-shadow: 0 0 0 1px var(--c-classic-rule); }
+:root[data-ui="classic"] #game-root #make-panel .make-tool-tile.unowned .tool-label { color: var(--c-classic-offline); }
+:root[data-ui="classic"] #game-root #make-panel .make-tile .tile-tool { font-size: calc(var(--fs-classic-count) * var(--cu-n, 1)); color: var(--c-classic-link); }
+/* The way back and the tool's question share a line: the window is wide enough, and its body keeps its height. */
+:root[data-ui="classic"] #game-root #make-panel .make-nav { flex-direction: row; align-items: center; gap: calc(12 * var(--cu)); }
+:root[data-ui="classic"] #game-root #make-panel .make-nav .make-question { margin: 0; padding: 0; }
 :root[data-ui="classic"] #game-root #make-panel .make-question { font: 800 calc(var(--fs-classic-row-title) * var(--cu-n, 1))/var(--lh-tight) var(--font-classic-title); color: var(--c-classic-title); padding-top: calc(10 * var(--cu)); }
 :root[data-ui="classic"] #game-root #make-panel .make-detail-body .make-why { font: 800 calc(var(--fs-classic-row-title) * var(--cu-n, 1))/var(--lh-tight) var(--font-classic-title); color: var(--text-danger); } /* making_details_title: "You're missing an ingredient!" */
 :root[data-ui="classic"] #game-root #make-panel .make-tile { background: var(--c-classic-panel); box-shadow: 0 0 0 1px var(--c-classic-slot-ring); border: 0; border-radius: 5px; color: var(--c-classic-title); }
@@ -2125,7 +2138,7 @@
 /* Make's result as the client's (ref/video-2011-make-result.jpg): the item large on the left, then
    "Nice" in big green, "You made …", the energy and iMG as slug pills, "You used" and its stacks; the
    recipe list's search goes while a recipe or its result is showing. */
-:root[data-ui="classic"] #game-root #make-panel .make-card:has(#make-result:not([hidden]), #make-detail:not([hidden])) :is(.make-search-row, .make-question) { display: none; }
+:root[data-ui="classic"] #game-root #make-panel .make-card:has(#make-result:not([hidden]), #make-detail:not([hidden])) :is(.make-search-row, .make-nav, .make-question) { display: none; }
 :root[data-ui="classic"] #game-root #make-panel #make-result:not([hidden]) {
   display: grid;
   grid-template-columns: calc(190 * var(--cu)) minmax(0, 1fr);
@@ -2166,7 +2179,7 @@
 :root[data-ui="classic"] #game-root #quest-panel .qc-head .qc-count:has(+ .qc-step)::before { content: "("; }
 :root[data-ui="classic"] #game-root #quest-panel .qc-head .qc-step + .qc-count::after,
 :root[data-ui="classic"] #game-root #quest-panel .qc-head .qc-count:has(+ .qc-step)::after { content: ")"; }
-/* Make's recipe and result views (video-2011-make-result.jpg): no tool tabs, a 338 px body and the
+/* Make's recipe and result views (video-2011-make-result.jpg): no tools, a 338 px body and the
    buttons in the white 64 px footer band, where the tool's note sits on the recipe list. */
 :root[data-ui="classic"] #game-root #make-panel > .make-card:has(#make-result:not([hidden]), #make-detail:not([hidden])) { position: relative; }
 :root[data-ui="classic"] #game-root #make-panel > .make-card:has(#make-result:not([hidden]), #make-detail:not([hidden])) #make-tools,

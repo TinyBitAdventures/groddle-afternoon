@@ -112,8 +112,9 @@ describe('report 119: the Make title shows the tab\'s tool', () => {
     }
   });
 
-  it('the panel keeps the title in step with the tab or the recipe', () => {
-    assert.match(game, /const tool = selected \|\| \(makeSearchQuery\.trim\(\) \? '' : makeToolFilter\);/);
+  it('the panel keeps the title in step with the open tool or the recipe', () => {
+    // Report #175: the tools screen and a search over every tool keep the panel's own icon.
+    assert.match(game, /const tool = selected \|\| \(makeView === 'tool' \? makeToolFilter : ''\);/);
     assert.ok(game.indexOf('syncMakePanelIcon();') > game.indexOf('function renderMakePanel()'));
   });
 });

@@ -154,7 +154,8 @@ export function openPanels(doc = globalThis.document) {
     seen.add(n.id);
     let name = PANEL_NAMES[n.id] || n.id.replace(/-panel$/, '');
     if (n.id === 'make-panel') {
-      const tool = slug(n.querySelector('.make-tool-chip.active')?.textContent);
+      // The open tool's name (game.js renderMakePanel sets it on a tool's own screen; the tools screen has none).
+      const tool = slug(n.dataset?.makeToolName);
       const recipe = slug(n.querySelector('#make-title')?.textContent).replace(/^make\s*/, '');
       if (tool) name += `:${tool}`;
       if (recipe) name += `/${recipe}`;

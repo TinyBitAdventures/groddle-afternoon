@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=f6a37125';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=127e0a3c';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=aa7e2acb';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=d99719fa';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -574,6 +574,7 @@ import {
   recipeEnergyCost,
   makingSkillAdjustments,
   makePanelIcon,
+  recipeToolFor,
   recipeBlockedLine,
   createCraftSession,
   advanceCraftSession,
@@ -598,6 +599,7 @@ import {
 } from './js/making.js?v=4e72bb4b';
 import { outputIconsHtml, outputsPhrase, recipeOutputRows } from './js/ui/recipe-outputs.js?v=73e19baf';
 import { MAKE_TOOL_SHEETS } from './js/make-tool-sheets.js?v=6f758e09';
+import { groupMakingTools, makeToolCounts, makeToolCountLine, makeToolSpokenLine, makeOpeningTool, gridStep } from './js/make-tools.js?v=3e4818c0';
 import { LOW_FUEL_LINE, craftSessionElapsedMs, isLowFuel, isMachineArt, machineArtHtml, packMakeState, playMachineHandOver, setMachineArtFrame } from './js/machine-art.js?v=f7c72c6f';
 import {
   createGarden,
@@ -977,7 +979,6 @@ import { holdMs } from './js/read-time.js?v=60ae7efc';
 import { mountNotifyView } from './js/notify-view.js?v=2835afc0';
 import { mountSocialDrawer } from './js/ui/social-drawer.js?v=ed00963c';
 import { bindChatLinks } from './js/chat-links.js?v=b717fac7';
-import { bindDragScroll } from './js/ui/drag-scroll.js?v=9a527ac8';
 import { SIDE_SHEET_IDS, bindTabs, inSideSheet, mountPanelShell, sheetKeyToWorld } from './js/ui/panel-shell.js?v=e2abdf9e';
 import { createQuestSheet, failedQuestPin, questLogNeedsSwap, questStep } from './js/ui/quest-sheet.js?v=ccaa43a8';
 import { createQuestTracker } from './js/ui/quest-tracker.js?v=445303df';
@@ -2250,6 +2251,12 @@ let vendorSellReceipt = null;
 let vendorReceiptTimer = 0;
 /** @type {string} make panel tool filter (`all` or tool class_tsid) */
 let makeToolFilter = 'all';
+/** Report #175: Make opens on the tools ('tools'); a tool's own screen is 'tool' (makeToolFilter names it). */
+let makeView = 'tools';
+/** Where the tools screen was scrolled when a tool was opened: Back returns there. */
+let makeToolsScroll = 0;
+/** The tool opened last this session (never saved): N and the Make button reopen on it while it can be used. */
+let makeLastTool = null;
 let makeSearchQuery = '';
 /** VERBS: Make's "Can make now" filter (on by default, as in the HUD mock): only the recipes you can make now. */
 let makeCanMakeOnly = true;
@@ -4844,8 +4851,7 @@ function renderPackPopover(classTsid, anchor = null) {
   });
   pop.querySelector('[data-pack-make]')?.addEventListener('click', () => {
     closePackPopover();
-    makeToolFilter = slot.isTool ? classTsid : recipeTarget.tool;
-    openMakePanel();
+    openMakePanel(null, { tool: slot.isTool ? classTsid : recipeTarget.tool });
     if (!slot.isTool && recipeTarget) {
       makeSelected = recipeTarget.key;
       makeQty = 1;
@@ -27202,12 +27208,12 @@ function makeBlockedLine(recipe, check) {
   });
 }
 
-/** Report 119: the title's icon is the current tab's tool, or the recipe's (MakingDialog.as setTitle 299, 305). */
+/** Report 119: the title's icon is the open tool's, or the recipe's (MakingDialog.as setTitle 299, 305); the tools screen and a search over every tool keep the panel's own. */
 function syncMakePanelIcon() {
   const img = document.querySelector('#make-panel .ui-sheet-icon');
   if (!img) return;
   const selected = makeSelected ? RECIPE_CATALOG[makeSelected]?.tool : null;
-  const tool = selected || (makeSearchQuery.trim() ? '' : makeToolFilter);
+  const tool = selected || (makeView === 'tool' ? makeToolFilter : '');
   const icon = makePanelIcon(tool, inv, makeStation?.toolState || toolState, Boolean(makeStation) && makeStation.tool === tool);
   if (img.getAttribute('src') !== icon.src) img.setAttribute('src', icon.src);
   img.dataset.tool = icon.tool;
@@ -27219,6 +27225,127 @@ const makeScroller = () => document.querySelector('#make-panel .ui-sheet-body');
 function setMakeScroll(top) {
   const body = makeScroller();
   if (body) body.scrollTop = top;
+}
+
+/** Keyboard only (a click a key made has detail 0): focus follows the screen, so Enter and the arrows carry on. */
+function makeKeyFocus(event, selector) {
+  if (!event || event.detail !== 0) return;
+  document.querySelector(`#make-panel ${selector}`)?.focus({ preventScroll: false });
+}
+
+/** Report #175: a tool's own screen, from its button on the tools screen. */
+function openMakeTool(toolId, event = null) {
+  makeToolsScroll = makeScroller()?.scrollTop || 0;
+  makeView = 'tool';
+  makeToolFilter = toolId;
+  makeLastTool = toolId;
+  makeSearchQuery = '';
+  makeSelected = null;
+  makeQty = 1;
+  renderMakePanel();
+  setMakeScroll(0);
+  makeKeyFocus(event, '#make-list .make-tile');
+  if (event?.detail === 0 && !document.querySelector('#make-list .make-tile')) makeKeyFocus(event, '#make-tools-back');
+}
+
+/** Back to the tools, where the player left them. `keepSearch` carries a tool's search over to every tool. */
+function showMakeTools(event = null, { keepSearch = false } = {}) {
+  const from = makeToolFilter;
+  makeView = 'tools';
+  makeSelected = null;
+  makeQty = 1;
+  if (!keepSearch) makeSearchQuery = '';
+  renderMakePanel();
+  setMakeScroll(keepSearch ? 0 : makeToolsScroll);
+  makeKeyFocus(event, keepSearch ? '#make-search' : `[data-make-tool="${recipeToolFor(from)}"]`);
+}
+
+/** One step back with Backspace: a recipe to its list, a tool to the tools. True when it went anywhere. */
+function makeStepBack() {
+  if (activeCraftSession || document.getElementById('make-result')?.hidden === false) return false;
+  const key = { detail: 0 };
+  if (makeSelected) {
+    const recipe = makeSelected;
+    makeSelected = null;
+    renderMakePanel();
+    setMakeScroll(makeListScroll);
+    makeKeyFocus(key, `[data-make-recipe="${recipe}"]`);
+    return true;
+  }
+  if (makeView === 'tool') {
+    showMakeTools(key);
+    return true;
+  }
+  return false;
+}
+
+/** The arrow keys over the tool buttons or the recipe tiles, once one of them has focus (js/make-tools.js gridStep). */
+function makeGridKey(event) {
+  const tile = event.target?.closest?.('.make-tool-tile, .make-tile');
+  if (!tile) return false;
+  const all = [...tile.closest('#make-tools, #make-list').querySelectorAll('.make-tool-tile, .make-tile')];
+  const rects = all.map((n) => n.getBoundingClientRect());
+  const next = all[gridStep(rects, all.indexOf(tile), event.key)];
+  if (next && next !== tile) {
+    next.focus({ preventScroll: true });
+    next.scrollIntoView({ block: 'nearest' });
+  }
+  return true;
+}
+
+/**
+ * The tools screen: every making tool as a button with its picture and name, grouped by kind
+ * (js/make-tools.js). The tools you have none of come last, dimmed, and say what you need.
+ * @param {HTMLElement} toolsEl
+ * @param {{ key: string, tool: string }[]} known  every recipe the player knows
+ * @param {(recipe: object) => boolean} canMake
+ * @returns {{ owned: number, total: number }}
+ */
+function renderMakeTools(toolsEl, known, canMake) {
+  const usable = (id) => makeStation?.tool === id || hasTool(inv, id);
+  const groups = groupMakingTools(listMakingTools(), usable);
+  const counts = makeToolCounts(known, canMake);
+  // Redrawn when the pack changes: the place in the list and a focused button stay where they were.
+  const scrollTop = toolsEl.childElementCount ? makeScroller()?.scrollTop || 0 : 0;
+  const focusedTool = document.activeElement?.closest?.('#make-tools .make-tool-tile')?.dataset.makeTool || '';
+  toolsEl.innerHTML = '';
+  let owned = 0;
+  let total = 0;
+  for (const group of groups) {
+    const section = document.createElement('section');
+    section.className = 'make-tool-group';
+    section.dataset.makeGroup = group.id;
+    const heading = document.createElement('h3');
+    heading.className = 'make-tool-group-title';
+    heading.id = `make-group-${group.id}`;
+    heading.textContent = group.label;
+    const grid = document.createElement('div');
+    grid.className = 'make-tool-grid';
+    grid.setAttribute('role', 'group');
+    grid.setAttribute('aria-labelledby', heading.id);
+    for (const t of group.tools) {
+      total += 1;
+      if (t.owned) owned += 1;
+      const count = counts[t.classTsid] || { total: 0, ready: 0 };
+      const icon = makePanelIcon(t.classTsid, inv, makeStation?.toolState || toolState, makeStation?.tool === t.classTsid);
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'make-tool-tile' + (t.owned ? '' : ' unowned') + (count.ready > 0 ? ' ready' : '');
+      btn.dataset.makeTool = t.classTsid;
+      btn.innerHTML = `
+        <img src="${icon.src}" alt="" width="32" height="32" />
+        <span class="tool-text"><span class="tool-label">${escapeHtml(t.label)}</span><span class="tool-count">${escapeHtml(makeToolCountLine(count))}</span></span>`;
+      if (!t.owned) btn.title = `You need ${/^[aeiou]/i.test(t.label) ? 'an' : 'a'} ${t.label}`;
+      btn.setAttribute('aria-label', makeToolSpokenLine(t.label, count, t.owned));
+      btn.addEventListener('click', (event) => openMakeTool(t.classTsid, event));
+      grid.appendChild(btn);
+    }
+    section.append(heading, grid);
+    toolsEl.appendChild(section);
+  }
+  if (scrollTop) setMakeScroll(scrollTop);
+  if (focusedTool) toolsEl.querySelector(`[data-make-tool="${focusedTool}"]`)?.focus({ preventScroll: true });
+  return { owned, total };
 }
 
 function renderMakePanel() {
@@ -27237,54 +27364,30 @@ function renderMakePanel() {
   // Recipe browser path — hide progress/result overlays
   clearMakeFeedback();
 
-  // Prefer a real tool filter (original: open tool → recipes for that tool)
-  if (makeToolFilter === 'all') {
+  // A tool's screen needs a real tool (original: open tool → recipes for that tool)
+  if (makeView === 'tool' && makeToolFilter === 'all') {
     const firstOwned = listMakingTools().find((t) => hasTool(inv, t.classTsid));
     if (firstOwned) makeToolFilter = firstOwned.classTsid;
+    else makeView = 'tools';
   }
+  // Report #175: three screens share the window. The tools (the first screen), one tool's recipes,
+  // and a search over every tool; a recipe opens over any of the last two.
+  const inTool = makeView === 'tool';
+  const query = makeSearchQuery.trim();
+  const showTools = !inTool && !query && !makeSelected;
+  const panel = document.getElementById('make-panel');
+  const toolLabel = TOOL_CATALOG[makeToolFilter]?.label || makeToolFilter || 'tools';
+  if (panel) {
+    panel.dataset.makeView = inTool ? 'tool' : query ? 'search' : 'tools';
+    // The open tool, for a bug report's list of windows (js/features/bug-report-feature.js).
+    if (inTool) panel.dataset.makeToolName = toolLabel;
+    else delete panel.dataset.makeToolName;
+  }
+  const backEl = document.getElementById('make-tools-back');
+  if (backEl) backEl.hidden = !inTool;
 
   syncMakePanelIcon();
 
-  if (toolsEl) {
-    // Rebuilt on every pick: keep where the strip was scrolled, so the picked tool glides into
-    // view from where it was instead of the strip jumping back to its start first.
-    const stripLeft = toolsEl.scrollLeft;
-    toolsEl.innerHTML = '';
-    // Owned tools first: the original opened recipes from a tool in the pack,
-    // so the 28-tool catalog leads with what the player can actually use.
-    const makingTools = listMakingTools();
-    const usable = (id) => makeStation?.tool === id || hasTool(inv, id);
-    const ownedTools = makingTools.filter((t) => usable(t.classTsid));
-    const otherTools = makingTools.filter((t) => !usable(t.classTsid));
-    for (const t of [...ownedTools, ...otherTools]) {
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      const owned = usable(t.classTsid);
-      btn.className = 'make-tool-chip'
-        + (makeToolFilter === t.classTsid && !makeSearchQuery.trim() ? ' active' : '')
-        + (owned ? '' : ' unowned');
-      btn.textContent = owned ? t.label : `${t.label}`;
-      btn.title = owned ? t.label : `You need a ${t.label}`;
-      btn.addEventListener('click', () => {
-        makeToolFilter = t.classTsid;
-        makeSearchQuery = '';
-        makeSelected = null;
-        makeQty = 1;
-        renderMakePanel();
-      });
-      toolsEl.appendChild(btn);
-    }
-    toolsEl.scrollLeft = stripLeft;
-    requestAnimationFrame(() => {
-      toolsEl.querySelector('.make-tool-chip.active')?.scrollIntoView({
-        behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
-        block: 'nearest',
-        inline: 'center',
-      });
-    });
-  }
-
-  const toolLabel = TOOL_CATALOG[makeToolFilter]?.label || makeToolFilter || 'tools';
   // The Tinkertool repairs from the pack, but its recipe list is for making.
   const toolAction = makeToolFilter === 'tinkertool'
     ? 'make'
@@ -27292,35 +27395,59 @@ function renderMakePanel() {
   if (titleEl) {
     titleEl.textContent = makeSelected
       ? `Make ${RECIPE_CATALOG[makeSelected]?.name || ''}`
-      : makeSearchQuery.trim()
-        ? `Recipes for “${makeSearchQuery.trim()}”`
-        : `You want to ${toolAction} with a ${toolLabel}?`;
+      : inTool
+        ? `You want to ${toolAction} with a ${toolLabel}?`
+        : query
+          ? `Recipes for “${query}”`
+          : 'Pick a tool, or find a recipe';
   }
 
   const searchEl = document.getElementById('make-search');
-  if (searchEl && searchEl.value !== makeSearchQuery) searchEl.value = makeSearchQuery;
-  // A search looks across every tool: "where do I make this?"
-  const recipes = searchRecipes(makeSearchQuery, {
-    tool: makeSearchQuery.trim() ? 'all' : makeToolFilter,
-    completedQuests: questState.completed || [],
-    keptRecipes: features.query('keptRecipes'),
-  });
+  if (searchEl) {
+    if (searchEl.value !== makeSearchQuery) searchEl.value = makeSearchQuery;
+    // On a tool's screen the search stays in that tool; on the first screen it looks in every tool.
+    const hint = inTool ? `Find in ${toolLabel}` : 'Find a recipe or ingredient';
+    const spoken = inTool ? `Find a recipe or ingredient in ${toolLabel}` : 'Find a recipe or ingredient in every tool';
+    if (searchEl.placeholder !== hint) searchEl.placeholder = hint;
+    if (searchEl.getAttribute('aria-label') !== spoken) searchEl.setAttribute('aria-label', spoken);
+  }
+  const known = { completedQuests: questState.completed || [], keptRecipes: features.query('keptRecipes') };
   const opts = craftOpts();
-  recipes.sort((a, b) => {
-    const ca = canCraft(inv, a, opts).ok && pc.energy > recipeEnergyCost(a, opts.learned, pc.imaginationUpgrades) ? 0 : 1;
-    const cb = canCraft(inv, b, opts).ok && pc.energy > recipeEnergyCost(b, opts.learned, pc.imaginationUpgrades) ? 0 : 1;
-    if (ca !== cb) return ca - cb;
-    return a.name.localeCompare(b.name);
-  });
+  const canMakeNow = (r) => canCraft(inv, r, opts).ok && pc.energy > recipeEnergyCost(r, opts.learned, pc.imaginationUpgrades);
   // VERBS: "Can make now" (on by default) leaves out what you can't make yet.
   const canMakeEl = document.getElementById('make-canmake');
   if (canMakeEl && canMakeEl.checked !== makeCanMakeOnly) canMakeEl.checked = makeCanMakeOnly;
+
+  if (toolsEl) {
+    toolsEl.hidden = !showTools;
+    if (!showTools) toolsEl.innerHTML = '';
+  }
+  if (showTools) {
+    const tally = toolsEl ? renderMakeTools(toolsEl, searchRecipes('', { tool: 'all', ...known }), canMakeNow) : { owned: 0, total: 0 };
+    list.hidden = true;
+    list.innerHTML = '';
+    if (detail) {
+      detail.hidden = true;
+      detail.innerHTML = '';
+    }
+    if (app?.canvas) app.canvas.dataset.makeShown = `tools:${tally.owned}/${tally.total}`;
+    if (meta) meta.textContent = `You have ${tally.owned} of ${tally.total} tools · energy ${Math.floor(pc.energy)}`;
+    return;
+  }
+
+  // From the first screen a search looks across every tool: "where do I make this?"
+  const recipes = searchRecipes(makeSearchQuery, { tool: inTool ? makeToolFilter : 'all', ...known });
+  recipes.sort((a, b) => {
+    const ca = canMakeNow(a) ? 0 : 1;
+    const cb = canMakeNow(b) ? 0 : 1;
+    if (ca !== cb) return ca - cb;
+    return a.name.localeCompare(b.name);
+  });
   const allRecipes = recipes.length;
   const everyRecipe = makeCanMakeOnly ? recipes.slice() : recipes;
   if (makeCanMakeOnly) {
     for (let i = recipes.length - 1; i >= 0; i--) {
-      const r = recipes[i];
-      if (!(canCraft(inv, r, opts).ok && pc.energy > recipeEnergyCost(r, opts.learned, pc.imaginationUpgrades))) recipes.splice(i, 1);
+      if (!canMakeNow(recipes[i])) recipes.splice(i, 1);
     }
   }
   if (app?.canvas) app.canvas.dataset.makeShown = `${recipes.length}/${allRecipes}${makeCanMakeOnly ? ':canmake' : ''}`;
@@ -27328,7 +27455,7 @@ function renderMakePanel() {
   if (meta) {
     meta.textContent = makeSelected
       ? `Uses ${recipeEnergyCost(RECIPE_CATALOG[makeSelected], skillState.learned, pc.imaginationUpgrades)} energy · energy now ${Math.floor(pc.energy)}`
-      : makeToolFilter === 'fruit_changing_machine'
+      : inTool && makeToolFilter === 'fruit_changing_machine'
         ? `${makeCanMakeOnly ? `${recipes.length} of ${allRecipes}` : recipes.length} fruits · ${countItem(inv, 'cherry')} cherries ready · energy ${Math.floor(pc.energy)}`
         : makeCanMakeOnly
           ? `${recipes.length} of ${allRecipes} recipes you can make now · energy ${Math.floor(pc.energy)}`
@@ -27392,10 +27519,11 @@ function renderMakePanel() {
         </div>`;
       // restructure to match grid CSS (back spans full)
       detail.style.display = 'block';
-      detail.querySelector('[data-make-back]')?.addEventListener('click', () => {
+      detail.querySelector('[data-make-back]')?.addEventListener('click', (event) => {
         makeSelected = null;
         renderMakePanel();
         setMakeScroll(makeListScroll);
+        makeKeyFocus(event, `[data-make-recipe="${key}"]`);
       });
       const applyQty = (n) => {
         makeQty = Math.max(1, Math.min(maxMake || 1, n));
@@ -27419,14 +27547,20 @@ function renderMakePanel() {
   list.innerHTML = '';
   if (!recipes.length) {
     // Report 129: why, and a button that turns the filter off.
+    // A search with nothing says what it looked in; from a tool it offers the other tools.
     list.innerHTML = makeCanMakeOnly && allRecipes
       ? `<div class="make-empty"><p>${escapeHtml(makeEmptyLine(inv, everyRecipe, opts))}</p><button type="button" class="make-show-all" data-make-show-all>Show them</button></div>`
-      : '<div class="make-empty">No recipes for this tool yet.</div>';
+      : query && inTool
+        ? `<div class="make-empty"><p>${escapeHtml(`No ${toolLabel} recipes for “${query}”.`)}</p><button type="button" class="make-show-all" data-make-search-all>Look in every tool</button></div>`
+        : query
+          ? `<div class="make-empty">${escapeHtml(`No recipes for “${query}”.`)}</div>`
+          : '<div class="make-empty">No recipes for this tool yet.</div>';
     list.querySelector('[data-make-show-all]')?.addEventListener('click', () => {
       makeCanMakeOnly = false;
       renderMakePanel();
       document.getElementById('make-canmake')?.focus({ preventScroll: true });
     });
+    list.querySelector('[data-make-search-all]')?.addEventListener('click', (event) => showMakeTools(event, { keepSearch: true }));
     return;
   }
 
@@ -27443,9 +27577,12 @@ function renderMakePanel() {
     const tile = document.createElement('button');
     tile.type = 'button';
     tile.className = 'make-tile'
-      + (makeToolFilter === 'fruit_changing_machine' ? ' fruit-change-tile' : '')
+      + (inTool && makeToolFilter === 'fruit_changing_machine' ? ' fruit-change-tile' : '')
       + (canMake ? '' : ' blocked');
     tile.setAttribute('role', 'listitem');
+    tile.dataset.makeRecipe = key;
+    // A search over every tool says which tool makes each recipe.
+    const withTool = inTool ? '' : TOOL_CATALOG[recipe.tool]?.label || '';
     const inputs = (recipe.inputs || [])
       .map((i) => `${i.qty} ${recipeInputLabel(recipe, i)}`)
       .join(', ');
@@ -27453,32 +27590,52 @@ function renderMakePanel() {
     tile.innerHTML = `
       ${outRows.length > 1 ? recipeOutputsHtml(outRows, { className: 'tile-outs' }) : `<img src="${itemIconUrl(outId)}" alt="" />`}
       <span class="tile-label">${recipe.name}</span>
-      <span class="tile-req">${inputs}</span>`;
+      <span class="tile-req">${inputs}</span>${withTool ? `
+      <span class="tile-tool" data-make-tile-tool>${escapeHtml(withTool)}</span>` : ''}`;
     const makes = recipeMakesLine(recipe);
     const tileTip = [blockedLine, makes].filter(Boolean).join(' ');
     if (tileTip) tile.title = tileTip;
     tile.setAttribute(
       'aria-label',
-      `${recipe.name}. ${makes ? `${makes} ` : ''}${inputs}. ${recipeEnergyCost(recipe, skillState.learned, pc.imaginationUpgrades)} energy.${blockedLine ? ` ${blockedLine}` : ''}`
+      `${recipe.name}. ${withTool ? `${withTool}. ` : ''}${makes ? `${makes} ` : ''}${inputs}. ${recipeEnergyCost(recipe, skillState.learned, pc.imaginationUpgrades)} energy.${blockedLine ? ` ${blockedLine}` : ''}`
     );
-    tile.addEventListener('click', () => {
+    tile.addEventListener('click', (event) => {
       // G554: the recipe opens at its top, with Back in view, and Back returns to this place in the list.
       makeListScroll = makeScroller()?.scrollTop || 0;
       makeSelected = key;
       makeQty = 1;
       renderMakePanel();
       setMakeScroll(0);
+      makeKeyFocus(event, '[data-make-go]:not(:disabled)');
+      if (event.detail === 0 && !document.querySelector('#make-panel [data-make-go]:not(:disabled)')) makeKeyFocus(event, '[data-make-back]');
     });
     list.appendChild(tile);
   }
 }
 
-function openMakePanel(station = null) {
+/**
+ * Report #175: a machine in the world, and Make from the pack (`tool`), open that tool's own screen.
+ * The N key and the Make button open the tool used last this session while it is still in the pack,
+ * and the tools screen otherwise (js/make-tools.js makeOpeningTool); "Tools" is one click away.
+ * @param {{ tool: string, toolState?: object }|null} [station]
+ * @param {{ tool?: string|null }} [opts]
+ */
+function openMakePanel(station = null, { tool = null } = {}) {
   makeStation = typeof station?.tool === 'string' ? station : null;
-  if (makeStation) {
-    makeToolFilter = makeStation.tool;
-    makeSearchQuery = '';
+  const openTool = makeOpeningTool({
+    stationTool: makeStation?.tool,
+    askedTool: tool,
+    lastTool: makeLastTool,
+    known: (id) => Boolean(TOOL_CATALOG[id]),
+    usable: (id) => hasTool(inv, id),
+  });
+  makeView = openTool ? 'tool' : 'tools';
+  if (openTool) {
+    makeToolFilter = openTool;
+    makeLastTool = openTool;
   }
+  makeSearchQuery = '';
+  makeToolsScroll = 0;
   closeFeatPanel();
   if (isShrineOpen()) closeShrinePanel();
   closePackPopover();
@@ -31055,8 +31212,18 @@ async function main() {
     else openMakePanel();
   });
   document.getElementById('make-close')?.addEventListener('click', closeMakePanel);
-  // The tool strip has no scrollbar (it covered the tool names): wheel and mouse drag scroll it.
-  bindDragScroll(document.getElementById('make-tools'));
+  document.getElementById('make-tools-back')?.addEventListener('click', (event) => showMakeTools(event));
+  // Once a tool button or a recipe tile has focus the arrows move between them (they walk otherwise, as
+  // in every side sheet), and Backspace steps back: a recipe to its list, a tool to the tools.
+  document.getElementById('make-panel')?.addEventListener('keydown', (event) => {
+    if (event.altKey || event.ctrlKey || event.metaKey) return;
+    const arrow = ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End'].includes(event.key);
+    const typing = Boolean(event.target?.closest?.('input, textarea, select, [contenteditable]'));
+    const handled = arrow ? makeGridKey(event) : event.key === 'Backspace' && !typing && !event.repeat ? makeStepBack() : false;
+    if (!handled) return;
+    event.preventDefault();
+    event.stopPropagation();
+  });
   document.getElementById('make-search')?.addEventListener('input', (event) => {
     makeSearchQuery = event.target.value || '';
     makeSelected = null;
