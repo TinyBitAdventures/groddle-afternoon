@@ -79,6 +79,7 @@ import {
   rollCubimalRace,
 } from '../cubimals.js?v=5e340c94';
 import { cleanCopyTagOf } from '../copy-tags.js?v=7eec7d48';
+import { packSlotFor } from '../pack-slot-qa.js?v=1d74bf2d';
 import { cubimalBattleLabel, cubimalBattleStats, cubimalTagName, cubimalTagWith } from '../cubimal-battle.js?v=80a58864';
 
 export const CUBIMAL_RACE_FEATURE_ID = 'cubimal-race';
@@ -581,8 +582,12 @@ function click(sel) {
   return false;
 }
 
-function openSlot(classTsid) {
-  return click(`.pack-slot[data-tsid="${classTsid}"]`);
+/** The figure's pack card, as a player opens it; in a fresh game it sits in a bag, opened first (js/pack-slot-qa.js). */
+function openSlot(engine, classTsid) {
+  const slot = packSlotFor(engine, classTsid);
+  if (!slot || slot.disabled) return false;
+  slot.click();
+  return true;
 }
 
 function setStep(engine, value) {
@@ -622,7 +627,7 @@ function demoRace(engine, classTsid, then) {
 
 function demoDrop(engine, classTsid, then) {
   setStep(engine, 'drop');
-  openSlot(classTsid);
+  openSlot(engine, classTsid);
   later(500, () => {
     click('[data-pack-drop]');
     later(1_200, () => {
@@ -653,7 +658,7 @@ function demoDrop(engine, classTsid, then) {
 
 function demoFree(engine, classTsid, then) {
   setStep(engine, 'free');
-  openSlot(classTsid);
+  openSlot(engine, classTsid);
   later(500, () => {
     click('[data-pack-use]');
     later(900, () => {

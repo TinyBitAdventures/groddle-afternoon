@@ -43,7 +43,7 @@ import { MACHINE_EXTRA_WAIT_MS, machineTank, tankFuel } from '../public/js/machi
 import { craftRecipe, ensureMakingItems, loadRecipeCatalogFromFile } from '../public/js/making.js?v=4e72bb4b';
 import { platformsScreen } from '../public/js/street-model.js?v=b6cb6a4e';
 import { machineRoomsFeature } from '../public/js/features/machine-rooms-feature.js?v=255be456';
-import { machineArtFeature } from '../public/js/features/machine-art-feature.js?v=5f4b5c11';
+import { machineArtFeature } from '../public/js/features/machine-art-feature.js?v=93f49506';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const pub = join(spike, 'public');

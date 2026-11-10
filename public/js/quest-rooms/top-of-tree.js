@@ -24,6 +24,7 @@
  */
 
 import { metabolicGain } from '../metabolics.js?v=8504134e';
+import { packSlotFor } from '../pack-slot-qa.js?v=1d74bf2d';
 
 export const TREE_W = 1400;
 export const TREE_H = 2320;
@@ -339,7 +340,8 @@ export const room = {
     const ground = ctx.data.spinach.find((s) => s.id === 'ground');
     ctx.place(ground.x, GROUND - 10);
     for (let i = 0; i < 30 && ground.left > 0; i++) await ctx.wait(100);
-    const slot = typeof document !== 'undefined' && document.querySelector('.pack-slot[data-tsid="spinach"]');
+    // The Spinach may have landed in a bag: it is opened first (js/pack-slot-qa.js).
+    const slot = typeof document !== 'undefined' && packSlotFor(ctx.engine, 'spinach');
     if (slot) slot.dispatchEvent(new MouseEvent('click', { bubbles: true, shiftKey: true }));
     for (let i = 0; i < 20 && !ctx.data.spinachActivated; i++) await ctx.wait(100);
     if (mode === 'spinach') return 'spinach';

@@ -25,7 +25,7 @@ import { doChore, neighbourById, normalizeNeighbourState } from '../public/js/ne
 import { runVerb } from '../public/content.js?v=0c78b59c';
 import { applySetFree } from '../public/js/animal-set-free.js?v=3b194fca';
 import { RESOURCE_SKILL_PACKAGES, createResourceNode, harvestResourceNode } from '../public/js/resource-nodes.js?v=7a77fd73';
-import { room as topOfTree } from '../public/js/quest-rooms/top-of-tree.js?v=a8f8abb6';
+import { room as topOfTree } from '../public/js/quest-rooms/top-of-tree.js?v=0a18a565';
 import { room as esquibeth } from '../public/js/quest-rooms/esquibeth.js?v=ea2a35f4';
 
 const here = dirname(fileURLToPath(import.meta.url));

@@ -157,7 +157,7 @@ let rubeTraded = false;
  */
 const ROOM_MODULES = {
   rainbow_run: () => import('../quest-rooms/rainbow-run.js?v=d73899b1'),
-  top_of_tree: () => import('../quest-rooms/top-of-tree.js?v=a8f8abb6'),
+  top_of_tree: () => import('../quest-rooms/top-of-tree.js?v=0a18a565'),
   color_unblocking: () => import('../quest-rooms/color-unblocking.js?v=8f5912c1'),
   vision_quest: () => import('../quest-rooms/vision-quest.js?v=e81febef'),
   kids_room: () => import('../quest-rooms/kids-room.js?v=b9d8e3c6'),

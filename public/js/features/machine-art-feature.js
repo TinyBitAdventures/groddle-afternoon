@@ -22,6 +22,7 @@ import { addItem, countItem } from '../inventory.js?v=60dfc9ca';
 import { ensureToolCondition } from '../tools.js?v=5f482998';
 import { MACHINE_SKILLS } from '../machine-rooms.js?v=1be82048';
 import { freezeMachineState, isMachineArt } from '../machine-art.js?v=5cf2a870';
+import { packSlotFor } from '../pack-slot-qa.js?v=1d74bf2d';
 
 export const MACHINE_ART_FEATURE_ID = 'machine-art';
 
@@ -59,9 +60,10 @@ function packDemo(engine, machine) {
   engine.updateHud?.();
   engine.refreshPack?.();
   engine.setData?.('machineArtDemo', machine);
-  // The pack card's Make button, as a player opens it.
+  // The pack card's Make button, as a player opens it: the machine is a tool, so it sits in the
+  // toolbox, which is opened first (js/pack-slot-qa.js).
   later(() => {
-    document.querySelector(`.pack-slot[data-tsid="${machine}"]`)?.click();
+    packSlotFor(engine, machine)?.click();
     later(() => {
       document.querySelector('[data-pack-make]')?.click();
       if (!engine.param?.('machineartautoplay')) return;
