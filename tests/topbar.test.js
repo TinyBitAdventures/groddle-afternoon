@@ -9,6 +9,7 @@ import {
   MENU_ROWS,
   TOP_OVERFLOW_STEPS,
   FAVOR_NEUTRAL_ICON,
+  popoverLeft,
   favorChip,
   favorRowText,
   levelRing,
@@ -21,7 +22,7 @@ import {
   vitalRing,
   volumeLevel,
   soundChannelToggle,
-} from '../public/js/ui/topbar.js?v=e0363197';
+} from '../public/js/ui/topbar.js?v=717d5b4c';
 
 import { GIANTS, canClaimEmblem, createShrineState, emblemCostFor, favorPanelRows } from '../public/js/shrines.js?v=a36da400';
 
@@ -249,7 +250,7 @@ describe('the favor panel (report #170): all eleven Giants from the favor displa
     const body = topbar.slice(at, topbar.indexOf('\n}\n', at));
     assert.match(body, /pop\.id = 'favor-pop';/);
     assert.match(body, /chip\.setAttribute\('role', 'button'\)/);
-    assert.match(body, /popover\(doc, chip, pop, \{ onOpen: draw \}\)/);
+    assert.match(body, /popover\(doc, chip, pop, \{ onOpen: draw, clear: true \}\)/);
     assert.match(body, /e\.key !== 'Enter' && e\.key !== ' '/);
     // No button inside: the panel only shows, so the keys stay on the display and Esc returns there.
     assert.doesNotMatch(body, /<button/);
@@ -303,3 +304,42 @@ describe('the favor display shows whenever any Giant has favor (report #170, G63
   });
 });
 
+
+describe('the favor panel opens clear of an open side sheet and the Social drawer', () => {
+  const topbar = read('js/ui/topbar.js');
+  // 1280 wide, a 300 px panel, the favor display centred at x 295: alone it sits at 145 to 445.
+  const base = { center: 295, w: 300, lo: 4, hi: 1280 - 300 - 4 };
+
+  it('alone, it centres under the display, inside the bar', () => {
+    assert.equal(popoverLeft(base), 145);
+    assert.equal(popoverLeft({ ...base, center: 20 }), 4);
+    assert.equal(popoverLeft({ ...base, center: 1270 }), 976);
+  });
+
+  it('with a sheet open on the left it starts where the sheet ends', () => {
+    // Make at 1280: the sheet and its gap cover everything left of x 368.
+    assert.equal(popoverLeft({ ...base, clearL: 368 }), 368);
+    // A display already right of the sheet keeps its place.
+    assert.equal(popoverLeft({ ...base, center: 700, clearL: 368 }), 550);
+  });
+
+  it('with the Social drawer open on the right it ends where the drawer begins', () => {
+    assert.equal(popoverLeft({ ...base, center: 1000, clearR: 964 }), 664);
+    assert.equal(popoverLeft({ ...base, clearL: 368, clearR: 964 }), 368);
+  });
+
+  it('with no room for both it stays clear of the sheet, and never leaves the bar', () => {
+    assert.equal(popoverLeft({ ...base, clearL: 600, clearR: 800 }), 600);
+    assert.equal(popoverLeft({ ...base, clearL: 1200, clearR: 1250 }), 976);
+  });
+
+  it('reads the insets the sheets and the drawer already publish, and follows them while open', () => {
+    assert.match(topbar, /const l = px\('--inset-l'\);\n\s+const r = px\('--inset-r'\);/);
+    assert.match(topbar, /doc\.getElementById\('game-root'\)/);
+    assert.match(topbar, /else \{\n\s+draw\(\);[^}]*p\.place\(\);\n\s+\}/);
+    // Esc closes the panel first: the popover's own key handler stops the key before the sheet's.
+    assert.match(topbar, /if \(e\.key !== 'Escape' \|\| !isOpen\(\)\) return;\n\s+e\.stopPropagation\(\);\n\s+close\(true\);/);
+    // The bar still lifts over the drawer while the panel is open (a token, no raw layer number).
+    assert.match(read('style.css'), /#favor-pop:not\(\[hidden\]\)\) \{\n\s+z-index: var\(--z-hud-pop\);/);
+  });
+});

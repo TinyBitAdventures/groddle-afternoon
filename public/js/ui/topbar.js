@@ -292,17 +292,47 @@ export function renderTopBar(doc, state = {}) {
   }
 }
 
+/**
+ * PURE: a popover's left edge. Centred under its button at `center`, kept inside the bar
+ * (`lo` to `hi`, the popover's left edge) and, with `clearL` / `clearR` given, clear of an open
+ * side sheet and the Social drawer: the sheet's layer (--z-panel) is over the lifted bar
+ * (--z-hud-pop), so a popover that reached under it was covered. Where the free width is
+ * narrower than the popover it stays clear of the sheet and laps over the drawer's edge (the
+ * lifted bar is drawn over the drawer).
+ */
+export function popoverLeft({ center, w, lo, hi, clearL = null, clearR = null }) {
+  let min = lo;
+  let max = hi;
+  if (clearL != null) min = Math.max(min, clearL);
+  if (clearR != null) max = Math.min(max, clearR - w);
+  if (max < min) {
+    min = Math.min(min, Math.max(lo, hi));
+    max = min;
+  }
+  return Math.max(min, Math.min(max, center - w / 2));
+}
+
 /** Opens and closes one popover under its button: Esc, a click away or the button again closes it. */
-function popover(doc, btn, pop, { onOpen } = {}) {
+function popover(doc, btn, pop, { onOpen, clear = false } = {}) {
   if (!btn || !pop) return { close() {}, isOpen: () => false };
   const isOpen = () => !pop.hidden;
+  /** With `clear`: the free width between an open side sheet (--inset-l) and the Social drawer (--inset-r). */
+  const free = () => {
+    const root = clear ? doc.getElementById('game-root') : null;
+    const box = root?.getBoundingClientRect?.();
+    if (!box) return {};
+    const css = doc.defaultView?.getComputedStyle?.(root);
+    const px = (name) => Number.parseFloat(css?.getPropertyValue(name)) || 0;
+    const l = px('--inset-l');
+    const r = px('--inset-r');
+    return { clearL: l > 0 ? box.left + l : null, clearR: r > 0 ? box.right - r : null };
+  };
   const place = () => {
     const bar = pop.offsetParent?.getBoundingClientRect?.() || { left: 0, top: 0, right: doc.documentElement.clientWidth };
     const r = btn.getBoundingClientRect();
     const w = pop.offsetWidth;
     const right = Math.min(bar.right, doc.documentElement.clientWidth);
-    let left = r.left + r.width / 2 - w / 2;
-    left = Math.max(bar.left + 4, Math.min(right - w - 4, left));
+    const left = popoverLeft({ center: r.left + r.width / 2, w, lo: bar.left + 4, hi: right - w - 4, ...free() });
     pop.style.left = `${Math.round(left - bar.left)}px`;
   };
   const close = (back = false) => {
@@ -328,7 +358,7 @@ function popover(doc, btn, pop, { onOpen } = {}) {
     e.stopPropagation();
     close(true);
   });
-  return { close, isOpen, open };
+  return { close, isOpen, open, place };
 }
 
 /** The installed favor panel (installFavor), for renderTopBar: { sync() } or null. */
@@ -382,7 +412,8 @@ function installFavor(doc, favor) {
         + '</li>';
     }).join('')}</ul>`;
   };
-  const p = popover(doc, chip, pop, { onOpen: draw });
+  // Clear of an open side sheet (Make, Quests, Skills and the rest) and the Social drawer.
+  const p = popover(doc, chip, pop, { onOpen: draw, clear: true });
   chip.addEventListener('keydown', (e) => {
     if (e.key !== 'Enter' && e.key !== ' ') return;
     // Not the game's Enter (verbs) or Space (jump).
@@ -394,7 +425,11 @@ function installFavor(doc, favor) {
     sync() {
       if (!p.isOpen()) return;
       if (chip.hidden) p.close();
-      else draw();
+      else {
+        draw();
+        // A sheet opened or closed by its key while the panel is up: it steps clear again.
+        p.place();
+      }
     },
   };
 }
