@@ -203,7 +203,7 @@ describe('resource nodes and patches', () => {
     assert.match(read('js/features/resource-nodes-feature.js'), /engine\.say\(entity\.target, answer\.text, answer\.durationMs, \{ slugs: answer\.slugs \}\)/);
     assert.match(read('js/features/patches-feature.js'), /if \(result\.response\) talk\(engine, entity, result\.response, speaker, slugs\);/);
     assert.match(read('js/features/crabs-feature.js'), /slugs: slugsFromEffects\(\{ mood: effects\.mood, energy: effects\.energy, xp: effects\.xp, currants: r\.currants \}\),/);
-    assert.match(read('js/features/foxes-feature.js'), /\{ slugs: slugsFromEffects\(\{ energy: result\.energy, xp: result\.xp \}\) \}/);
+    assert.match(read('js/features/foxes-feature.js'), /\{ slugs: slugsFromEffects\(\{ energy: result\.energy, xp: result\.xp \}\), exact: true \}/);
     assert.match(read('js/features/heli-kitties-feature.js'), /\{ slugs: slugsFromEffects\(\{ energy: result\.energy, mood: result\.mood, xp: result\.xp \}\), exact: true \}/);
     assert.match(read('js/features/rook-attack-feature.js'), /favor: r\.done && r\.favor \? \[\{ giant: 'all', points: r\.favor \}\] : 0,/);
     assert.match(read('js/features/animal-husbandry-feature.js'), /\{ slugs: slugsFromEffects\(\{ mood: res\.effects\?\.mood \}\) \}/);

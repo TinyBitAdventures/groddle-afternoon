@@ -93,6 +93,7 @@ export const FOX_TIMING = Object.freeze({
   eatResumeMs: 2500, // startMoving at 2500 ms
   brushCooldownMs: 2000, // time() - pc['!last_fox_brush'] < 2
   brushDisableMs: 2000, // fox_brush.disable() re-enables after 2 s
+  brushedBubbleMs: 3500, // sendResponse('brushed') 421-438: every sendResponse line is up 3.5 s (items/item.js 1060-1065)
   maxBrushes: 21,
   maxBrushers: 3,
   fleetWindowS: 10,
@@ -114,6 +115,23 @@ export const FOX_TIMING = Object.freeze({
   rangerHitBoxH: 1000,
   rangerPushBack: 100, // moveAvatar(ranger.x +/- 100)
   overCapacity: 8,
+});
+
+/**
+ * How long each of the Ranger's bubbles is sent for (npc_fox_ranger.js sendBubble calls): cancel 276,
+ * no-buy 289, no-buy-license 315, over-capacity 336, out of bait 419, the greetings 429, the gate's
+ * three reasons 461 and 466. They are sentences of 7 to 19 words, so on screen each still stays up
+ * its reading time where that is longer (ticket 69, js/read-time.js holdMs); only the Fox's short
+ * brushed line is held to the source's time exactly (FOX_TIMING.brushedBubbleMs, G636).
+ */
+export const FOX_RANGER_BUBBLE_MS = Object.freeze({
+  cancel: 5000,
+  noBuy: 3000,
+  noBuyLicense: 4000,
+  overCapacityThanks: 5000,
+  noBait: 5000,
+  greetings: 4000,
+  gate: 3000,
 });
 
 const strip = (html) => String(html).replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();

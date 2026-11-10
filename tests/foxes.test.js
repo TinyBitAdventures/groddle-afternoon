@@ -2,12 +2,13 @@
 
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 
 import {
   FOX_BRUSHING_PACKAGE,
   FOX_ITEM_DEFS,
   FOX_LICENSE,
+  FOX_RANGER_BUBBLE_MS,
   FOX_RANGER_STORE,
   FOX_RANGER_TEXT,
   FOX_TEXT,
@@ -29,7 +30,7 @@ import {
   rangerGreeting,
   splitConversation,
   stepFox,
-} from '../public/js/foxes.js?v=16290105';
+} from '../public/js/foxes.js?v=59323f35';
 import { createToolConditionState, getToolCondition } from '../public/js/tools.js?v=5f482998';
 import { ITEM_CATALOG } from '../public/js/inventory.js?v=60dfc9ca';
 import { getAchievementCatalog, loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=10b118dd';
@@ -37,10 +38,11 @@ import {
   inReach,
   isPreserveRow,
   preserveEcologyEntry,
-} from '../public/js/features/foxes-feature.js?v=d4d54218';
+} from '../public/js/features/foxes-feature.js?v=3817fb08';
 import { wildlifeFor } from '../public/js/wildlife.js?v=670c3a7f';
 import { createFeatureHost } from '../public/js/feature-host.js?v=127e0a3c';
-import { foxesFeature } from '../public/js/features/foxes-feature.js?v=d4d54218';
+import { foxesFeature } from '../public/js/features/foxes-feature.js?v=3817fb08';
+import { bubbleMs, readMs } from '../public/js/read-time.js?v=be140198';
 
 const ecology = JSON.parse(readFileSync(new URL('../public/assets/content/street-ecology.json', import.meta.url)));
 
@@ -397,5 +399,56 @@ describe('fox feature registers cleanly', () => {
     assert.deepEqual(Object.keys(saved), ['foxes']);
     host.restore({ foxes: { visited: true, intro: 'yes', hubsBrushed: ['121'] } }, {});
     assert.deepEqual(foxesFeature.save(), { visited: true, intro: false, hubsBrushed: ['121'], totalFibers: 0, totalBrushes: 0 });
+  });
+});
+
+describe("how long the Fox's and the Ranger's lines are sent for (G636)", () => {
+  const GS = new URL('../../glitch-GameServerJS/items/', import.meta.url);
+  const skip = !existsSync(new URL('npc_fox.js', GS)) && 'glitch-GameServerJS is not beside the game';
+  const feature = readFileSync(new URL('../public/js/features/foxes-feature.js', import.meta.url), 'utf8');
+
+  it("the brushed line is a sendResponse, 3.5 s in the source, and is held to exactly that", { skip }, () => {
+    const fox = readFileSync(new URL('npc_fox.js', GS), 'utf8');
+    assert.equal(fox.match(/this\.sendResponse\('brushed', pc, slugs\)/g).length, 3, 'npc_fox.js 421, 428, 438');
+    const item = readFileSync(new URL('item.js', GS), 'utf8');
+    const send = item.slice(item.indexOf('function sendResponse('), item.indexOf('function isRookable('));
+    assert.match(send, /this\.sendBubble\(choice, 3500, pc, slugs\);/);
+    assert.equal(FOX_TIMING.brushedBubbleMs, 3500);
+    assert.match(feature, /engine\.say\(entity\.target, result\.response, FOX_TIMING\.brushedBubbleMs, \{ slugs: [^\n]*, exact: true \}\);/);
+    // Both lines are short enough to read in that time; without `exact` they stayed up 5.2 and 5.8 s.
+    for (const line of FOX_TEXT.brushed) {
+      assert.equal(bubbleMs(line, FOX_TIMING.brushedBubbleMs, true), 3500);
+      assert.ok(readMs(line) > 5000 && line.split(' ').length <= 6, line);
+    }
+    assert.deepEqual([...FOX_TEXT.brushed], [...fox.matchAll(/^\t\t"([^"]+)",$/gm)].map((m) => m[1]));
+  });
+
+  it("the Ranger's bubbles carry the source's times, and keep their reading time on screen", { skip }, () => {
+    const src = readFileSync(new URL('npc_fox_ranger.js', GS), 'utf8');
+    const sent = (start) => {
+      const m = src.match(new RegExp(`sendBubble\\("${start.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}[^\\n]*?, (\\d+), pc\\);`));
+      assert.ok(m, `npc_fox_ranger.js sends: ${start}`);
+      return Number(m[1]);
+    };
+    assert.equal(sent('OK well then, if you change your mind, any of us rangers'), FOX_RANGER_BUBBLE_MS.cancel);
+    assert.equal(sent('OK well then, if you change your mind, just let me know.'), FOX_RANGER_BUBBLE_MS.noBuy);
+    assert.equal(sent('OK well then, if you change your mind, my offer stands.'), FOX_RANGER_BUBBLE_MS.noBuyLicense);
+    assert.equal(sent('Thanks for understanding.'), FOX_RANGER_BUBBLE_MS.overCapacityThanks);
+    assert.equal(sent('Welcome back, '), FOX_RANGER_BUBBLE_MS.noBait);
+    assert.match(src, /this\.sendBubble\(choose_one\(greetings\), 4000, pc\);/);
+    assert.equal(FOX_RANGER_BUBBLE_MS.greetings, 4000);
+    assert.equal(src.match(/this\.sendBubble\(txt, 3000, pc\);/g).length, 2, 'the gate, from either side');
+    assert.equal(FOX_RANGER_BUBBLE_MS.gate, 3000);
+    assert.deepEqual(FOX_RANGER_BUBBLE_MS, { cancel: 5000, noBuy: 3000, noBuyLicense: 4000, overCapacityThanks: 5000, noBait: 5000, greetings: 4000, gate: 3000 });
+    // Every Ranger bubble goes through rangerSay with a time from the table, and none is marked exact:
+    // they are sentences, and ticket 69's reading time still holds for them.
+    const says = [...feature.matchAll(/rangerSay\(engine, [^;]*;/g)].map((m) => m[0]).filter((call) => !call.startsWith('rangerSay(engine, text, ms'));
+    assert.equal(says.length, 6);
+    for (const call of says) assert.match(call, /FOX_RANGER_BUBBLE_MS\./, call);
+    assert.match(feature, /function rangerSay\(engine, text, ms = 4000\) \{\n  if \(ranger\?\.target\) engine\.say\(ranger\.target, fillName\(text, PLAYER_NAME\), ms\);\n\}/);
+    for (const line of [FOX_RANGER_TEXT.cancel, FOX_RANGER_TEXT.noBuy, FOX_RANGER_TEXT.noBuyLicense, FOX_RANGER_TEXT.overCapacityThanks, FOX_RANGER_TEXT.noBait, ...FOX_RANGER_TEXT.greetings]) {
+      assert.ok(line.split(' ').length >= 7, line);
+    }
+    assert.equal(feature.match(/exact: true/g).length, 1, 'only the brushed line');
   });
 });

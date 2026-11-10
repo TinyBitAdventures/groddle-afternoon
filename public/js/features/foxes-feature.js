@@ -63,6 +63,7 @@ import {
   FOX_ID,
   FOX_LICENSE,
   FOX_LICENSE_ACHIEVEMENT,
+  FOX_RANGER_BUBBLE_MS,
   FOX_RANGER_ID,
   FOX_RANGER_TEXT,
   FOX_TEXT,
@@ -85,8 +86,8 @@ import {
   rangerGreeting,
   splitConversation,
   stepFox,
-} from '../foxes.js?v=16290105';
-import { FOX_FLURRY_COUNTER, foxLegFrom, foxOnLeg, igniteBaitXs, normalizeBaits, normalizeFoxes, preserveOverCapacity, serverId } from '../foxes-mp.js?v=c4dfa447';
+} from '../foxes.js?v=59323f35';
+import { FOX_FLURRY_COUNTER, foxLegFrom, foxOnLeg, igniteBaitXs, normalizeBaits, normalizeFoxes, preserveOverCapacity, serverId } from '../foxes-mp.js?v=5bbee4df';
 import { clockOffset } from '../street-creatures.js?v=909163e7';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
 
@@ -781,8 +782,10 @@ function performBrush(engine, entity, { ignoreReach = false } = {}) {
     effects: { energy: result.energy, xp: result.xp, items: { Fiber: result.fibers } },
   });
   engine.floatText(entity.fox.x, entity.fox.y - 96, `+${result.fibers} Fiber`, 0xfff1c2);
-  // npc_fox.js 421-438: sendResponse('brushed', pc, slugs), the package's energy and iMG.
-  if (entity.target) engine.say(entity.target, result.response, 2500, { slugs: slugsFromEffects({ energy: result.energy, xp: result.xp }) });
+  // npc_fox.js 421-438: sendResponse('brushed', pc, slugs), the package's energy and iMG. sendResponse
+  // sends every line for 3.5 s (items/item.js 1060-1065); the two brushed lines are 4 and 6 words, so
+  // the source's time is kept exactly (G636: it was 2.5 s here, held to a 5.2 s reading time on screen).
+  if (entity.target) engine.say(entity.target, result.response, FOX_TIMING.brushedBubbleMs, { slugs: slugsFromEffects({ energy: result.energy, xp: result.xp }), exact: true });
   for (const { counter, amount } of result.counters) engine.achievement(counter, amount);
   if (result.fleet && !engine.unlockedAchievements.includes(FLEET_FOXER_ACHIEVEMENT)) {
     engine.grantAchievement(FLEET_FOXER_ACHIEVEMENT);
@@ -845,15 +848,15 @@ function rangerDialog(engine, { text, beats, accept, decline, onAccept, onDeclin
 function choose(engine, value) {
   const pc = engine.pc;
   if (value === 'cancel') {
-    rangerSay(engine, FOX_RANGER_TEXT.cancel, 5000);
+    rangerSay(engine, FOX_RANGER_TEXT.cancel, FOX_RANGER_BUBBLE_MS.cancel);
     return;
   }
   if (value === 'no-buy') {
-    rangerSay(engine, FOX_RANGER_TEXT.noBuy, 3000);
+    rangerSay(engine, FOX_RANGER_TEXT.noBuy, FOX_RANGER_BUBBLE_MS.noBuy);
     return;
   }
   if (value === 'no-buy-license') {
-    rangerSay(engine, FOX_RANGER_TEXT.noBuyLicense, 4000);
+    rangerSay(engine, FOX_RANGER_TEXT.noBuyLicense, FOX_RANGER_BUBBLE_MS.noBuyLicense);
     return;
   }
   if (value === 'ok') {
@@ -963,7 +966,7 @@ function greet(engine, { fromVerb = false } = {}) {
   if (licensed(engine) && slice.intro && mpOverCapacity()) {
     // npc_fox_ranger.js:405-410: eight players are already inside.
     ranger.greeted = true;
-    rangerDialog(engine, { key: 'overCapacity', text: FOX_RANGER_TEXT.overCapacity, accept: 'OK', onAccept: () => rangerSay(engine, FOX_RANGER_TEXT.overCapacityThanks, 4000) });
+    rangerDialog(engine, { key: 'overCapacity', text: FOX_RANGER_TEXT.overCapacity, accept: 'OK', onAccept: () => rangerSay(engine, FOX_RANGER_TEXT.overCapacityThanks, FOX_RANGER_BUBBLE_MS.overCapacityThanks) });
     return;
   }
   const g = rangerGreeting({
@@ -982,7 +985,7 @@ function greet(engine, { fromVerb = false } = {}) {
     const line = g.key === 'greetings'
       ? FOX_RANGER_TEXT.greetings[Math.floor(rng() * FOX_RANGER_TEXT.greetings.length)]
       : FOX_RANGER_TEXT[g.key];
-    rangerSay(engine, line, g.key === 'noBait' ? 5000 : 4000);
+    rangerSay(engine, line, g.key === 'noBait' ? FOX_RANGER_BUBBLE_MS.noBait : FOX_RANGER_BUBBLE_MS.greetings);
   } else if (g.key === 'noBrush') {
     rangerDialog(engine, { key: g.key, text: FOX_RANGER_TEXT.noBrush, accept: 'Good point', onAccept: () => choose(engine, 'buy') });
   } else {
@@ -1028,7 +1031,7 @@ function tickRanger(engine, now) {
     if (reason) {
       p.x = preserve.rangerX - inside * FOX_TIMING.rangerPushBack;
       p.vx = 0;
-      rangerSay(engine, reason, 3000);
+      rangerSay(engine, reason, FOX_RANGER_BUBBLE_MS.gate);
       ranger.inBox = true;
       return;
     }
