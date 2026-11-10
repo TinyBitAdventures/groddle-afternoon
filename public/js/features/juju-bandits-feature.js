@@ -412,15 +412,34 @@ function atAHome(engine) {
 }
 
 /**
+ * A place that is not a street: a quest room or any other feature scene (engine.inScene), or one
+ * of the older rooms that stand in for the street (engine.transientInstance with no hold; a hold
+ * is a game on a real street, whose own entry trackRegion saw). None of them is in a Savanna hub.
+ */
+function inARoom(engine) {
+  if (engine.inScene?.()) return true;
+  return Boolean(engine.transientInstance?.()) && !engine.instanceHold;
+}
+
+/**
  * Going home from the Savanna is leaving it (report #167). In the original a home is another
  * location outside the Savanna region, so savanna_on_exit ran leave_savanna (savanna.js 42-63):
  * the buff went and the visit's time stopped (inc_special_locations.js 90-100), and coming back
  * ran start_baqala_buff, which takes half the time away off the time spent (32-34). Homes here
  * are scenes the street hooks never see, so the clock ran on at home; this stops it there. The
  * way back is a street entry, where trackRegion starts the visit again.
+ *
+ * A quest room or other instance entered from the Savanna is the same (G626). Every location
+ * entry ran region_on_enter (locations/location.js 469), which ran savanna_on_exit whenever the
+ * region left was the Savanna and the one entered was not (locations/inc_regions.js 4-26). A
+ * region is its hub's, and only Baqala, Choru, Zhambu and Xalanga are Savanna (config_prod.js
+ * hubs 1223-1246, regions 1248-1271); any other hub is 'None' (inc_regions.js 56-62). The one
+ * room entered from the Savanna by design, the Juju Hideout (quests/help_juju_bandits.js 102-104,
+ * 367: LNVDIG7F7DO2CM5), sat in hub 61 with the other quest rooms (inc_data_maps_prod.js
+ * 17918-17928), so walking into it stopped the visit and walking out started it again.
  */
 function leaveForHome(engine, now) {
-  if (!clock.inside || !atAHome(engine)) return false;
+  if (!clock.inside || !(atAHome(engine) || inARoom(engine))) return false;
   ancestralLeave(clock, now, false);
   leftSavanna(engine, true);
   publish(engine);

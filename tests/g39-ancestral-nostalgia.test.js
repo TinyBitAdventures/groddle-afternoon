@@ -26,7 +26,7 @@ import { getBuffCatalog, loadContentCatalogsFromDir } from '../public/js/content
 import { IMAGINATION_UPGRADES, buildDeck, upgradeStatus } from '../public/js/imagination.js?v=1bdfd77c';
 import { isOfferedInRemake, remakeStatus } from '../public/js/imagination-remake.js?v=c37ad887';
 import { POTION_TEXT, ancestralCheck } from '../public/js/potions.js?v=4f4c996d';
-import { FEATURES } from '../public/js/features/index.js?v=f08ed5d0';
+import { FEATURES } from '../public/js/features/index.js?v=81a67ab3';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const GSJS = join(root, '../glitch-GameServerJS');
@@ -327,15 +327,73 @@ describe('the visit, in the feature', () => {
       assert.equal(engine.data.nostalgiaLeft, '');
       assert.equal(engine.travels.length, 0, 'no kick from home');
     }
-    // A quest room or other scene entered from the Savanna is not a home: unchanged, the visit holds.
+    feature.restore(undefined);
+  });
+
+  it('a quest room or other instance entered from the Ancestral Lands stops the visit too (G626)', (t) => {
+    // The original: every location entry ran region_on_enter, which ran savanna_on_exit when the
+    // region left was the Savanna and the one entered was not. Quest rooms sat in hub 61, which is
+    // no Savanna hub; the Juju Hideout, entered from the Savanna by its quest, is listed there.
+    try {
+      const gs = (rel) => readFileSync(new URL(`../../glitch-GameServerJS/${rel}`, import.meta.url), 'utf8');
+      assert.match(gs('locations/location.js'), /this\.region_on_enter\(pc\);/);
+      assert.match(gs('locations/inc_regions.js'), /if\(pc\.last_region\(\) != this\.hub_region\(\)\) \{[\s\S]*?case 'Savanna':\s+this\.savanna_on_exit\(pc, false\);/);
+      assert.match(gs('locations/inc_regions.js'), /function hub_region\(\) \{\s+if\(config\.hubs\[this\.hubid\]\) \{\s+return config\.regions\[config\.hubs\[this\.hubid\]\];\s+\} else \{\s+return 'None';/);
+      const config = gs('config_prod.js');
+      const savanna = [...config.matchAll(/'([^']+)': 'Savanna'/g)].map((m) => m[1]).sort();
+      assert.deepEqual(savanna, ['Baqala', 'Choru', 'Xalanga', 'Zhambu']);
+      assert.doesNotMatch(config.slice(config.indexOf('var hubs = {'), config.indexOf('var regions = {')), /'61':/, 'hub 61 has no region');
+      const maps = gs('inc_data_maps_prod.js');
+      const at = maps.indexOf('"LNVDIG7F7DO2CM5"\t: "Juju Hideout"');
+      assert.ok(at > 0, 'the Juju Hideout is on the map data');
+      const hubsBefore = [...maps.slice(0, at).matchAll(/\n\t\t\t"(\d+)"\t: \{/g)];
+      assert.equal(hubsBefore[hubsBefore.length - 1][1], '61', 'in hub 61, with the other quest rooms');
+      assert.match(gs('quests/help_juju_bandits.js'), /this\.questInstanceLocation\(this\.owner, 'juju_camp', -839, -98, 5 \* 60\);/);
+    } catch (e) {
+      if (e.code !== 'ENOENT') throw e;
+      t.diagnostic('glitch-GameServerJS not beside the repo: source lines not checked');
+    }
+    const cases = [
+      ['a quest room (scene)', (e) => { e.scene = true; e.sceneTsid = 'QUEST_juju_camp'; }],
+      ['an older room in place of the street', (e) => { e.transientInstance = () => true; }],
+    ];
+    for (const [name, go] of cases) {
+      feature.restore(undefined);
+      const engine = makeEngine();
+      engine.homeContext = () => ({ inHome: false });
+      enter(engine, street('86'));
+      clockNow = Date.now();
+      play(engine, 100);
+      assert.equal(engine.data.nostalgiaLeft, '500', name);
+      go(engine);
+      play(engine, 60);
+      const state = feature._state();
+      assert.equal(state.clock.inside, false, `${name}: the visit is over`);
+      assert.ok(Math.abs(state.clock.spent - 100) < 1.5, `${name}: no time counted in the room (${state.clock.spent})`);
+      assert.ok(state.clock.exitAt > 0, `${name}: half the time away comes back`);
+      assert.equal(engine.hasBuff('ancestral_nostalgia'), false, `${name}: the timer is gone`);
+      assert.equal(engine.travels.length, 0, `${name}: no kick in the room`);
+      // Out of the room, back on the Savanna street: the visit starts again, with half the minute away given back.
+      engine.scene = false;
+      engine.transientInstance = () => false;
+      // The street hook reads the wall clock; the ticks above ran on the test's clock.
+      const wall = Date.now;
+      Date.now = () => clockNow;
+      try { enter(engine, street('86')); } finally { Date.now = wall; }
+      play(engine, 1);
+      assert.equal(feature._state().clock.inside, true, `${name}: back in the visit`);
+      const left = Number(engine.data.nostalgiaLeft);
+      assert.ok(left >= 526 && left <= 531, `${name}: 500 left + half of 60 s away, less the second played (${left})`);
+    }
+    // A game held on a real street (Game of Crowns, a party) is not a room: its street's hub decides.
     feature.restore(undefined);
     const engine = makeEngine();
     engine.homeContext = () => ({ inHome: false });
     enter(engine, street('86'));
     clockNow = Date.now();
     play(engine, 100);
-    engine.scene = true;
-    engine.sceneTsid = 'juju_camp';
+    engine.transientInstance = () => true;
+    engine.instanceHold = 'crowns';
     play(engine, 60);
     assert.equal(feature._state().clock.inside, true);
     assert.ok(feature._state().clock.spent > 158);
