@@ -42,10 +42,12 @@
  *   home sees the rock or node change; the owner's game takes the chunks off
  *   its rock, the use off its node and the wear off its cultivation.
  *
- * - The owner's placed Magic Sticks (rules and sources in js/yard-fixtures-mp.js)
- *   stand where the owner set them, to look at: the site's view already
- *   carries them for the animals' walks. A stick's Pick up is disabled with
- *   the source's line.
+ * - The owner's placed Magic Sticks, Meat Collectors, Butterfly Milkers and
+ *   Piggy Feeders (rules and sources in js/yard-fixtures-mp.js) stand where
+ *   the owner set them, to look at, from the site's view ("sticks",
+ *   "machines"). A stick's Pick up is disabled with the source's line; a
+ *   machine has no verb for a visitor, as in the source for anyone without
+ *   the owner's key.
  *
  * Multiplayer only (engine.mode and the realtime client): solo never runs any
  * of it.
@@ -55,7 +57,7 @@
  * act('rock:rock:0', 'mine') / act('node:node:peat_1:0', 'harvest');
  * canvas data yardVisit (owner:patches:trees:animals:rocks:nodes), yardStock
  * (rock:0=43,node:peat_1:0=3: the copies), yardFixtures (the owner's sticks
- * drawn: magic_pig_stick@812,...), yardLast,
+ * and yard machines drawn: magic_pig_stick@812,meat_collector@1500), yardLast,
  * yardApplied (acts applied to my home), yardSent (acts the site took).
  */
 
@@ -84,8 +86,8 @@ import {
   treeSnapshot,
   visitorAnimalState,
   visitorTreeState,
-} from '../yard-verbs-mp.js?v=6b210e26';
-import { yardFixtureRows, yardFixtureVerbs, yardFixturesKey } from '../yard-fixtures-mp.js?v=ba2a2fe5';
+} from '../yard-verbs-mp.js?v=c13bb617';
+import { yardFixtureRows, yardFixtureVerbs, yardFixturesKey } from '../yard-fixtures-mp.js?v=dd022fe8';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
 import { followYardPath, stickForClass } from '../yard-wander.js?v=06a15d38';
 import { countItem, removeItem } from '../inventory.js?v=60dfc9ca';
@@ -620,7 +622,7 @@ function createSession(engine, client) {
         a.snap = animalUses(a.classId, a.state);
         a.target.subtitle = animalStatusLabel(a.classId, a.state);
       }
-      // A stick set down or taken up since stands, or is gone, here too.
+      // A stick or a machine set down or taken up since stands, or is gone, here too.
       if (yardFixturesKey(yardFixtureRows(view)) !== visit.fixturesKey) {
         drawFixtures(view);
         publish();
@@ -1071,7 +1073,7 @@ function createSession(engine, client) {
         // Ticket 99: where each animal is drawn now (the owner's page draws the same walk: canvas extraWalks).
         walks: visit ? Object.fromEntries([...visit.animals].map(([k, a]) => [k, { x: Math.round(a.sprite.x), y: Math.round(a.sprite.y), stick: Boolean(a.walk.stick) }])) : {},
         stock: visit ? stockView() : '',
-        // The owner's placed sticks drawn here: where each stands and the menu a visitor gets on it.
+        // The owner's placed sticks and yard machines drawn here: where each stands and the menu a visitor gets on it.
         fixtures: visit ? visit.fixtures.map((e) => ({ id: e.row.id, classTsid: e.row.classTsid, x: Math.round(e.sprite.x), y: Math.round(e.sprite.y), label: e.target.label, verbs: yardFixtureVerbs(e.row).map((v) => `${v.id}${v.enabled === false ? '!' : ''}`) })) : [],
         applied: applied.length,
         appliedCount,

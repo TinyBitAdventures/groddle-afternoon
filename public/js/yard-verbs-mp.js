@@ -45,6 +45,7 @@ import { GROWN_TREE_LABELS, SEASONED_BEANS, SOIL_TIMERS, seedlingTimings } from 
 import { GAME_DAY_MS, GAME_EPOCH_MS } from './game-day.js?v=edb00566';
 import { isNodeId, isRockId } from './yard-stock-mp.js?v=96d1c5bc';
 import { STICK_ANIMAL } from './yard-wander.js?v=06a15d38';
+import { normalizeYardMachines } from './yard-fixtures-mp.js?v=dd022fe8';
 import { capYardAnimals, yardClassCap } from './animal-crowding.js?v=78ad8fa9';
 import { HOUSE_LOT_W, YARD_SEGMENT_W } from './home-cultivation.js?v=9571e110';
 import { HOME_LIMITS } from './homes-catalog.js?v=10ac34b6';
@@ -207,7 +208,9 @@ export function normalizeYardView(answer) {
     if (/^[a-z]{2,8}:[A-Za-z0-9_:]{1,24}$/.test(k) && Number.isInteger(n) && n > 0) mine[k] = n;
   }
   const name = typeof answer.name === 'string' && answer.name ? answer.name.slice(0, 40) : '';
-  return { owner, name, cult: plain(answer.cult) || {}, patches, animals, sticks, mine };
+  // The owner's Meat Collectors, Butterfly Milkers and Piggy Feeders, to look at (js/yard-fixtures-mp.js).
+  const machines = normalizeYardMachines(answer.machines);
+  return { owner, name, cult: plain(answer.cult) || {}, patches, animals, sticks, machines, mine };
 }
 
 /**
