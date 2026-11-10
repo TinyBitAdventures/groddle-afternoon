@@ -417,3 +417,13 @@ describe('Batterfly flight after feeding', () => {
     assert.match(read('js/features/animal-mood-feature.js'), /spr\.scale\.x = Math\.abs\(spr\.baseScale \|\| spr\.scale\.x\) \* \(dir > 0 \? 1 : -1\);/);
   });
 });
+
+describe('the incubating Chicken\'s halfway line (npc_chicken.js onIncubationHalfway)', () => {
+  it('stays up 10 s, as the source sent it', () => {
+    const read = (f) => readFileSync(new URL(`../public/${f}`, import.meta.url), 'utf8');
+    assert.match(read('js/features/animal-husbandry-feature.js'), /engine\.say\(target, INCUBATION\.halfwayLine, 10000\);/);
+    let src = '';
+    try { src = readFileSync(new URL('../../glitch-GameServerJS/items/npc_chicken.js', import.meta.url), 'latin1'); } catch { return; }
+    assert.ok(src.includes(`this.sendBubble("I'm almost done with this thing.", 10*1000);`));
+  });
+});

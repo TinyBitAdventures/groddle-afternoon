@@ -1227,7 +1227,8 @@ function watchIncubations(engine) {
     target.subtitle = `Incubating a ${itemLabel(target.state.incubatingEgg)} · ${left}s`;
     if (phase === 'halfway' && !target.state.incubationHalfwaySaid) {
       target.state.incubationHalfwaySaid = true;
-      engine.say(target, INCUBATION.halfwayLine, 6000);
+      // npc_chicken.js 1071-1073 onIncubationHalfway: sendBubble(..., 10*1000). It was 6 s here.
+      engine.say(target, INCUBATION.halfwayLine, 10000);
     }
     // Multiplayer: only the egg's owner hatches it (the server credits the hatchling to them).
     if (phase === 'complete' && !target.state.incubBy) {
