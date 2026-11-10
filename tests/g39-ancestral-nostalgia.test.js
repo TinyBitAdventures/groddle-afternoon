@@ -26,7 +26,7 @@ import { getBuffCatalog, loadContentCatalogsFromDir } from '../public/js/content
 import { IMAGINATION_UPGRADES, buildDeck, upgradeStatus } from '../public/js/imagination.js?v=1bdfd77c';
 import { isOfferedInRemake, remakeStatus } from '../public/js/imagination-remake.js?v=c37ad887';
 import { POTION_TEXT, ancestralCheck } from '../public/js/potions.js?v=4f4c996d';
-import { FEATURES } from '../public/js/features/index.js?v=e439c5c8';
+import { FEATURES } from '../public/js/features/index.js?v=e5fdd42e';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const GSJS = join(root, '../glitch-GameServerJS');
@@ -288,6 +288,57 @@ describe('the visit, in the feature', () => {
     // The exit-prompt flag is saved.
     const saved = JSON.parse(JSON.stringify(feature.save()));
     assert.equal(saved.nostalgia.exitPromptShown, true);
+    feature.restore(undefined);
+  });
+
+  it('going home from the Ancestral Lands stops the visit, as leaving them did (report #167)', (t) => {
+    // The original: a home is outside the Savanna region, so savanna_on_exit ran leave_savanna
+    // (the buff removed, the time spent banked), and coming back ran start_baqala_buff (half the
+    // time away comes off).
+    try {
+      const loc = readFileSync(new URL('../../glitch-GameServerJS/players/inc_special_locations.js', import.meta.url), 'utf8');
+      const sav = readFileSync(new URL('../../glitch-GameServerJS/locations/savanna.js', import.meta.url), 'utf8');
+      assert.match(sav, /function savanna_on_exit\(pc, logout\) \{[\s\S]*?pc\.leave_savanna\(logout\);/);
+      assert.match(loc, /function leave_savanna\(logout\) \{[\s\S]*?this\.buffs_remove\('ancestral_nostalgia'\);[\s\S]*?this\.baqala_times\.exit_time = time\(\);/);
+      assert.match(loc, /this\.baqala_times\.time_spent -= \(time\(\) - this\.baqala_times\.exit_time\) \/ 2\.0;/);
+    } catch (e) {
+      if (e.code !== 'ENOENT') throw e;
+      t.diagnostic('glitch-GameServerJS not beside the repo: source lines not checked');
+    }
+    for (const home of ['own', 'MPH_552', 'MPH_552_IN', 'NB_dorrit']) {
+      feature.restore(undefined);
+      const engine = makeEngine();
+      engine.homeContext = () => ({ inHome: engine.atHome === true });
+      enter(engine, street('86'));
+      clockNow = Date.now();
+      play(engine, 100);
+      assert.equal(engine.data.nostalgiaLeft, '500', home);
+      // Home is a scene: no street hook runs, the street under you is no longer the Savanna's.
+      engine.street = street('');
+      if (home === 'own') engine.atHome = true;
+      else { engine.scene = true; engine.sceneTsid = home; }
+      play(engine, 60);
+      const state = feature._state();
+      assert.equal(state.clock.inside, false, `${home}: the visit is over`);
+      assert.ok(Math.abs(state.clock.spent - 100) < 1.5, `${home}: no time counted at home (${state.clock.spent})`);
+      assert.ok(state.clock.exitAt > 0, `${home}: the time away is counted from here (half of it comes back)`);
+      assert.equal(engine.hasBuff('ancestral_nostalgia'), false, `${home}: the timer is gone`);
+      assert.equal(engine.data.jujuAncestralInside, '0');
+      assert.equal(engine.data.nostalgiaLeft, '');
+      assert.equal(engine.travels.length, 0, 'no kick from home');
+    }
+    // A quest room or other scene entered from the Savanna is not a home: unchanged, the visit holds.
+    feature.restore(undefined);
+    const engine = makeEngine();
+    engine.homeContext = () => ({ inHome: false });
+    enter(engine, street('86'));
+    clockNow = Date.now();
+    play(engine, 100);
+    engine.scene = true;
+    engine.sceneTsid = 'juju_camp';
+    play(engine, 60);
+    assert.equal(feature._state().clock.inside, true);
+    assert.ok(feature._state().clock.spent > 158);
     feature.restore(undefined);
   });
 

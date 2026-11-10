@@ -390,16 +390,41 @@ function trackRegion(street, engine, now) {
     // The line lands after the travel's own "Arrived:" line, so it stays in view.
     warnAt = now + WARN_DELAY_MS;
     nostalgiaLast = login ? 'login' : 'entered';
-  } else if (!savanna) {
-    if (wasInside) {
-      // leave_savanna: the buff goes and potion_used is forgotten.
-      nostalgia.potionUsed = false;
-      nostalgiaLast = 'left';
-    }
-    // Out of the Savanna, a kick still waiting is moot (not the one under way).
-    if (pendingBoot && pendingBoot.nextAt !== Infinity) pendingBoot = null;
-    if (buffOn(engine, NOSTALGIA_BUFF)) engine.removeBuff?.(NOSTALGIA_BUFF);
+  } else if (!savanna) leftSavanna(engine, wasInside);
+}
+
+/** leave_savanna (inc_special_locations.js 88-112) once the clock has stopped. */
+function leftSavanna(engine, wasInside) {
+  if (wasInside) {
+    // leave_savanna: the buff goes and potion_used is forgotten.
+    nostalgia.potionUsed = false;
+    nostalgiaLast = 'left';
   }
+  // Out of the Savanna, a kick still waiting is moot (not the one under way).
+  if (pendingBoot && pendingBoot.nextAt !== Infinity) pendingBoot = null;
+  if (buffOn(engine, NOSTALGIA_BUFF)) engine.removeBuff?.(NOSTALGIA_BUFF);
+}
+
+/** At a home: your own street, house or Tower, a player's you are visiting (MPH_<id>), a neighbour's (NB_<id>). */
+function atAHome(engine) {
+  if (engine.homeContext?.()?.inHome) return true;
+  return Boolean(engine.inScene?.()) && /^(MPH|NB)_/.test(String(engine.sceneTsid || ''));
+}
+
+/**
+ * Going home from the Savanna is leaving it (report #167). In the original a home is another
+ * location outside the Savanna region, so savanna_on_exit ran leave_savanna (savanna.js 42-63):
+ * the buff went and the visit's time stopped (inc_special_locations.js 90-100), and coming back
+ * ran start_baqala_buff, which takes half the time away off the time spent (32-34). Homes here
+ * are scenes the street hooks never see, so the clock ran on at home; this stops it there. The
+ * way back is a street entry, where trackRegion starts the visit again.
+ */
+function leaveForHome(engine, now) {
+  if (!clock.inside || !atAHome(engine)) return false;
+  ancestralLeave(clock, now, false);
+  leftSavanna(engine, true);
+  publish(engine);
+  return true;
 }
 
 /* ------------------------------------------------------------------ */
@@ -841,6 +866,7 @@ export const jujuBanditsFeature = {
   },
 
   onTick(dtMs, now, engine) {
+    leaveForHome(engine, now);
     // Real play time: wall-clock frame gaps, capped so a paused ticker adds nothing.
     if (clock.inside) {
       ancestralTick(clock, lastTickAt ? now - lastTickAt : 0);
