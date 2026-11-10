@@ -11,7 +11,7 @@
  * into its state.
  */
 
-import { phaseBaseCost } from './street-jobs.js?v=02a81cb3';
+import { phaseBaseCost } from './street-jobs.js?v=68562ef0';
 import { UNNAMED_PLAYER } from './player-names.js?v=f9b78094';
 
 /** Ids a save remembers as applied (the site's LedgerMath::PROJECT_APPLIED_KEEP). */

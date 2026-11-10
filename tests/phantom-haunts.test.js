@@ -26,12 +26,12 @@ import {
 } from '../public/js/ghost-quest.js?v=37adc842';
 import { createQuestState } from '../public/js/quests.js?v=2b882eb6';
 import { loadContentCatalogsFromDir, resetContentCatalogs, getQuestCatalog } from '../public/js/content-catalogs.js?v=10b118dd';
-import { SUBWAY_STREETS, closedStreets, initializeStreetJobs, normalizeStreetJobState } from '../public/js/street-jobs.js?v=02a81cb3';
+import { SUBWAY_STREETS, closedStreets, initializeStreetJobs, normalizeStreetJobState } from '../public/js/street-jobs.js?v=68562ef0';
 import { routeGraph } from '../public/js/map-routes.js?v=c7e7dc80';
 import { TELEPORTERS } from '../public/js/hidden-floors.js?v=eb220641';
 import { WINTRY_PORTAL_TELEPORTERS } from '../public/js/wintry-portal.js?v=1437deda';
 import { placeIndex, questHold, questStoryNeeds, reachableStreets } from '../public/js/quest-reach.js?v=5a77e3d1';
-import { streetJobsFeature } from '../public/js/features/street-jobs-feature.js?v=09bad030';
+import { streetJobsFeature } from '../public/js/features/street-jobs-feature.js?v=2a9bdb04';
 
 const root = join(import.meta.dirname, '..');
 const PUB = join(root, 'public');

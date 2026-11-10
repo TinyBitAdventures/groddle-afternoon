@@ -11,7 +11,7 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { SUBWAY_STREETS, closedStreets, initializeStreetJobs, noteArrival, normalizeStreetJobState, openWayHome, roadClosure } from '../public/js/street-jobs.js?v=02a81cb3';
+import { SUBWAY_STREETS, closedStreets, initializeStreetJobs, noteArrival, normalizeStreetJobState, openWayHome, roadClosure, wayHomeTerms } from '../public/js/street-jobs.js?v=68562ef0';
 import { routeGraph } from '../public/js/map-routes.js?v=c7e7dc80';
 import { TELEPORTERS } from '../public/js/hidden-floors.js?v=eb220641';
 import { WINTRY_PORTAL_TELEPORTERS, WINTRY_PLACE_TSID } from '../public/js/wintry-portal.js?v=1437deda';
@@ -126,6 +126,52 @@ describe('ticket 50 and Wintry Place: a road closure never cuts a player off', (
     assert.deepEqual(openWayHome(st, cat, { graph: toy, here: 'GA', homes: ['GH'] }), ['GB'], 'one closure (GB), not two (GC, GD)');
     assert.deepEqual(openWayHome(st, cat, { graph: toy, here: 'GA', homes: ['GH'] }), [], 'already open');
     assert.deepEqual(openWayHome(st, cat, { graph: toy, here: 'GH', homes: ['GH'] }), []);
+  });
+
+  it('report #162: without papers the subway is no way home, and the road to the starter street opens', () => {
+    // The rails among the free ways, as the feature keeps them.
+    const rails = {};
+    for (const a of SUBWAY_STREETS) for (const b of SUBWAY_STREETS) if (a !== b) (rails[a] ||= []).push(b);
+    const rider = wayHomeTerms({ starter: HOME, free, rails, papers: true });
+    assert.deepEqual(rider.homes, homes);
+    assert.equal(rider.free, free);
+    const walker = wayHomeTerms({ starter: HOME, free, rails, papers: false });
+    assert.deepEqual(walker.homes, [HOME]);
+    for (const t of SUBWAY_STREETS) assert.ok(!(walker.free[t] || []).some((to) => SUBWAY_STREETS.includes(to)), `${t}: no rails`);
+    for (const t of [...TELEPORTERS, ...WINTRY_PORTAL_TELEPORTERS]) assert.ok(walker.free[G(t.from)].includes(G(t.to)), 'teleporters stay');
+
+    // Piano Party, where the Map's puzzle card sets a player down, on a fresh world's roads.
+    const PIANO = 'GA96OS42D6F3M9P';
+    const walk = (state, ways) => {
+      const shut = new Set(closedStreets(state, catalog, opts));
+      const seen = new Set([PIANO]);
+      const queue = [PIANO];
+      while (queue.length) {
+        const at = queue.shift();
+        for (const to of [...(graph[at] || []).filter((n) => !shut.has(n)), ...(ways[at] || [])]) if (!seen.has(to)) { seen.add(to); queue.push(to); }
+      }
+      return seen;
+    };
+    assert.ok(!walk(fresh(), walker.free).has(HOME), 'cut off by road on a fresh world');
+    // As it was: a way to the nearest station, which turns a player without papers back.
+    const old = fresh();
+    const toStation = openWayHome(old, catalog, { graph, free, here: PIANO, homes, opts });
+    assert.ok(toStation.length > 0);
+    assert.ok(SUBWAY_STREETS.some((t) => walk(old, walker.free).has(t)), 'a station in reach');
+    assert.ok(!walk(old, walker.free).has(HOME), 'and still no road home');
+    // Now: the roads on the way to the starter street open.
+    const now = fresh();
+    const opened = openWayHome(now, catalog, { graph, free: walker.free, here: PIANO, homes: walker.homes, opts });
+    assert.ok(opened.length > 0);
+    assert.ok(walk(now, walker.free).has(HOME), 'home by road');
+    // With papers nothing more opens than before.
+    const ridden = fresh();
+    assert.deepEqual(openWayHome(ridden, catalog, { graph, free: rider.free, here: PIANO, homes: rider.homes, opts }), toStation);
+
+    const feature = read('public/js/features/street-jobs-feature.js');
+    assert.match(feature, /const papers = \(engine\.unlockedAchievements \|\| \[\]\)\.includes\(PAPERS_BADGE\);/);
+    assert.match(feature, /wayHomeTerms\(\{ starter: streetIndex\?\.default, free: w\.free, rails: w\.rails, papers \}\)/);
+    assert.match(feature, /openWayHome\(state, catalog, \{ graph: w\.graph, free: terms\.free, here: engine\.streetTsid, homes: terms\.homes, opts: opts\(\) \}\)/);
   });
 
   it('the feature keeps a way home on every arrival', () => {

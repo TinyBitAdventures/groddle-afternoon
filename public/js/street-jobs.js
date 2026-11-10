@@ -216,6 +216,24 @@ export function openWayHome(state, catalog, { graph = {}, free = {}, here = '', 
   return opened.reverse();
 }
 
+/**
+ * Where home is for openWayHome, and the ways no closure holds, for one player (report #162). The
+ * subway carries only a player with papers (subway.js gateRefusal): without them a subway street
+ * is no way home and the rails are no way at all. A player set down in the Vortex of Random by the
+ * Map's puzzle card had a way opened to Alakol's station and no further, and the gate turned them
+ * back. `free` holds every free way, `rails` the subway's among them (street -> [streets]).
+ */
+export function wayHomeTerms({ starter = '', free = {}, rails = {}, papers = false, subway = SUBWAY_STREETS } = {}) {
+  if (papers) return { homes: [starter, ...subway].filter(Boolean), free };
+  const walk = {};
+  for (const [from, tos] of Object.entries(free)) {
+    const onRails = new Set(rails[from] || []);
+    const kept = tos.filter((to) => !onRails.has(to));
+    if (kept.length) walk[from] = kept;
+  }
+  return { homes: [starter].filter(Boolean), free: walk };
+}
+
 const rowFor = (state, jobId) => (state.jobs[jobId] ||= cleanRow({}));
 
 /* ------------------------------------------------------------------ */

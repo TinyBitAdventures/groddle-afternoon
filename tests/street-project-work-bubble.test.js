@@ -18,8 +18,8 @@ import { after, before, describe, it } from 'node:test';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { projectApi, streetJobsFeature } from '../public/js/features/street-jobs-feature.js?v=09bad030';
-import { soloNeed } from '../public/js/street-jobs.js?v=02a81cb3';
+import { projectApi, streetJobsFeature } from '../public/js/features/street-jobs-feature.js?v=2a9bdb04';
+import { soloNeed } from '../public/js/street-jobs.js?v=68562ef0';
 import { createToolConditionState } from '../public/js/tools.js?v=5f482998';
 import { Display, FakeEl, fakePixi } from './fake-scene.js';
 
@@ -86,6 +86,9 @@ describe('the street project\'s work bubble counts the last unit (report 111)', 
       inv: { hatchet: 1 },
       pc: { level: 10, energy: 500, mood: 100, currants: 0 },
       learnedSkills: [],
+      // The board stands on Somewhat Sump, a subway street no road reaches on a fresh world: this player rode
+      // there, so has papers (without them the way-home rule opens the road home, Lowland Slough with it: #162).
+      unlockedAchievements: ['you_have_papers'],
       toolState: createToolConditionState(),
       param: () => null,
       placement: () => [],

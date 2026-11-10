@@ -82,6 +82,7 @@ import {
   noteArrival,
   openWayHome,
   SUBWAY_STREETS,
+  wayHomeTerms,
   closedStreets,
   appliedUpgrade,
   upgradeEcologyEntry,
@@ -96,7 +97,8 @@ import {
   cancelJob,
   jobDivisor,
   upgradeOption,
-} from '../street-jobs.js?v=02a81cb3';
+} from '../street-jobs.js?v=68562ef0';
+import { PAPERS_BADGE } from '../subway.js?v=44d1a09f';
 import { gainMetabolic, loseEnergy } from '../metabolics.js?v=8504134e';
 import { closuresInTheWay, holdNote, placeIndex, questHold, questStoryKey, reachableStreets } from '../quest-reach.js?v=5a77e3d1';
 import { getQuestCatalog as questCatalog } from '../content-catalogs.js?v=10b118dd';
@@ -120,7 +122,7 @@ import {
   rowFromServer,
   sharedSlice,
   topLine,
-} from '../street-jobs-mp.js?v=3a80e9a2';
+} from '../street-jobs-mp.js?v=24a85415';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 import { createMinnAccount } from '../minn-account.js?v=8f2741cd';
 import { normalizeGroups } from '../groups.js?v=c9635d96';
@@ -130,8 +132,8 @@ import { itemZ } from '../item-bands.js?v=e98b10bc';
 import { SIGN_ARMS, routeGraph } from '../map-routes.js?v=c7e7dc80';
 import { TELEPORTERS } from '../hidden-floors.js?v=eb220641';
 import { WINTRY_PORTAL_TELEPORTERS } from '../wintry-portal.js?v=1437deda';
-import { PROJECTS_TEXT, contributedJobs, mineTotal, projectList } from '../projects-tracker.js?v=f34c5236';
-import { PROJECTS_PANEL_ID, buildProjectsPanel, renderProjects } from '../ui/projects-sheet.js?v=69f33fa6';
+import { PROJECTS_TEXT, contributedJobs, mineTotal, projectList } from '../projects-tracker.js?v=e1f51caf';
+import { PROJECTS_PANEL_ID, buildProjectsPanel, renderProjects } from '../ui/projects-sheet.js?v=972ce850';
 import { SIDE_SHEET_IDS } from '../ui/panel-shell.js?v=e2abdf9e';
 import { trophyGotText } from '../home-trophies.js?v=309fd6c7';
 
@@ -210,11 +212,12 @@ function loadWays() {
     .then((r) => r.json())
     .then((json) => {
       const free = {};
+      const rails = {};
       const add = (a, b) => (free[a] ||= []).push(b);
-      for (const a of SUBWAY_STREETS) for (const b of SUBWAY_STREETS) if (a !== b) add(a, b);
+      for (const a of SUBWAY_STREETS) for (const b of SUBWAY_STREETS) if (a !== b) { add(a, b); (rails[a] ||= []).push(b); }
       const g = (t) => String(t || '').replace(/^L/, 'G');
       for (const t of [...TELEPORTERS, ...WINTRY_PORTAL_TELEPORTERS]) add(g(t.from), g(t.to));
-      waysReady = { graph: routeGraph(json).graph, free };
+      waysReady = { graph: routeGraph(json).graph, free, rails };
       return waysReady;
     })
     .catch(() => null);
@@ -321,7 +324,11 @@ function questHoldFor(classTsid, engine) {
 function keepWayHome(engine, mine) {
   loadWays().then((w) => {
     if (!w || mine !== generation || !catalog || demo) return;
-    const opened = openWayHome(state, catalog, { ...w, here: engine.streetTsid, homes: [streetIndex?.default, ...SUBWAY_STREETS].filter(Boolean), opts: opts() });
+    // The subway is a way home only for a player it will carry (report #162: no papers, turned back at Alakol's gate).
+    const papers = (engine.unlockedAchievements || []).includes(PAPERS_BADGE);
+    const terms = wayHomeTerms({ starter: streetIndex?.default, free: w.free, rails: w.rails, papers });
+    const opened = openWayHome(state, catalog, { graph: w.graph, free: terms.free, here: engine.streetTsid, homes: terms.homes, opts: opts() });
+    engine.setData('streetJobWayHomeBy', papers ? 'subway' : 'road');
     engine.setData('streetJobWayHome', opened.join(','));
     if (!opened.length) return;
     engine.save();

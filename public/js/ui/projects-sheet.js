@@ -17,7 +17,7 @@
  * [data-can=yes|some|no] (ticket 81: whether you can do it now), #projects-meta, #projects-close.
  */
 
-import { PROJECTS_TEXT as T, shareLine, statusLine } from '../projects-tracker.js?v=f34c5236';
+import { PROJECTS_TEXT as T, shareLine, statusLine } from '../projects-tracker.js?v=e1f51caf';
 
 export const PROJECTS_PANEL_ID = 'projects-panel';
 const ICON = 'assets/sprites/street-jobs/sign_stake.webp';
