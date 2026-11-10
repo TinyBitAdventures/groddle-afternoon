@@ -500,7 +500,7 @@ import {
   parsePlayerSave,
   serializePlayerSave,
   restorePlayerSave,
-} from './js/player-save.js?v=7c9c4d3e';
+} from './js/player-save.js?v=a9db41f9';
 import {
   HOME_INTERIOR_TSID,
   HOME_STREET_TSID,
@@ -855,6 +855,7 @@ import {
   quoteShrineDonation,
   donateToShrine,
   canClaimEmblem,
+  favorPanelRows,
   claimShrineEmblem,
   emblemCostFor,
   inEmblemHitbox,
@@ -868,7 +869,7 @@ import {
   favorRelationNote,
   emblemRelationNote,
   formatSpeedUpTime,
-} from './js/shrines.js?v=247c9b77';
+} from './js/shrines.js?v=73185a14';
 import { shrineSheet, shrineVariantFor } from './js/shrine-variants.js?v=7f11c97d';
 import { giantDisplayName } from './js/giant-names.js?v=0e295891';
 import { shrinePowderOptions, shrinePowderAchievementCounters } from './js/powders.js?v=397984f7';
@@ -964,7 +965,7 @@ import { installHiresIcons } from './js/icon-hires.js?v=165dbd6e';
 import { installHiresDecos } from './js/deco-hires.js?v=9877af94';
 import { loadAudioLevels, loadMutedPreference, saveAudioLevel, saveMutedPreference } from './js/audio-pref.js?v=6fe817bc';
 import { createAudioBuses, fadeGain } from './js/audio-buses.js?v=af167b54';
-import { installTopBar, renderTopBar } from './js/ui/topbar.js?v=40baf379';
+import { installTopBar, renderTopBar } from './js/ui/topbar.js?v=e606f7e1';
 import { focusBack, installFocusReturn, lastInput } from './js/ui/focus-return.js?v=da190597';
 import { installContextGuard } from './js/ui/context-guard.js?v=0f71ac17';
 import { QUOIN_FRAME_BOB, advanceQuoinClock, quoinBobBetweenFrames } from './js/quoin-motion.js?v=ea0bd408';
@@ -31897,6 +31898,7 @@ async function main() {
     zoom: { get: worldZoom, set: setWorldZoom, onChange: onZoomChange, fixed: zoomFixed, onFixedChange: onZoomFixedChange },
     nightTint,
     streetMap: streetMapSetting,
+    favor: { rows: () => favorPanelRows(shrineState, currentStreet ? giantForStreet(currentStreet)?.id : null) },
     onImagination: () => (modernUi() && imaginationHub ? imaginationHub.toggle() : document.getElementById('img-btn')?.click()),
     onMail: () => { if (state.started) openMailboxPanel(); },
     onPlayerCard: () => document.getElementById('player-menu-btn')?.click(),

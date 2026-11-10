@@ -25,7 +25,7 @@ const z = (sel, sheet = css) => {
   }
   assert.fail(`${sel} has no rule with a z-index`);
 };
-const LIFT = '#wrap > header.top-bar:has(#more-list:not([hidden]), #sound-pop:not([hidden]), #vitals-menu:not([hidden]))';
+const LIFT = '#wrap > header.top-bar:has(#more-list:not([hidden]), #sound-pop:not([hidden]), #vitals-menu:not([hidden]), #favor-pop:not([hidden]))';
 
 describe('the top bar over the Social drawer', () => {
   it('lifts the bar to --z-hud-pop only while its Menu, Sound popover or eat menu is open', () => {

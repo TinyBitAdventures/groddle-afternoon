@@ -277,7 +277,7 @@ describe('icon conversations (G202: the shared record)', () => {
   });
 
   it('a version 1 save hands its talked list to the record once, in either restore order', async () => {
-    const { giantIconsFeature } = await import('../public/js/features/giant-icons-feature.js?v=a7b97342');
+    const { giantIconsFeature } = await import('../public/js/features/giant-icons-feature.js?v=4df7d55c');
     const old = { version: 1, talked: ['icon_humbaba_1', 'icon_alph_1'] };
     const saved = { completed: { npc_chicken: { chickens_cautionary_tales_1: 700 } } };
     const t0 = Date.now();
@@ -316,7 +316,7 @@ describe('imagination cards', () => {
 
 describe('giant icons feature', () => {
   it('offers the source pack verbs and iconizes through the engine', async () => {
-    const { giantIconsFeature } = await import('../public/js/features/giant-icons-feature.js?v=a7b97342');
+    const { giantIconsFeature } = await import('../public/js/features/giant-icons-feature.js?v=4df7d55c');
     giantIconsFeature._reset();
     const events = [];
     const granted = [];
@@ -349,7 +349,7 @@ describe('giant icons feature', () => {
   });
 
   it('Caress adds mood up to the real limit and never takes any away; the popup says what landed (ticket 48)', async () => {
-    const { giantIconsFeature } = await import('../public/js/features/giant-icons-feature.js?v=a7b97342');
+    const { giantIconsFeature } = await import('../public/js/features/giant-icons-feature.js?v=4df7d55c');
     giantIconsFeature._reset();
     const toasts = [];
     const engine = {

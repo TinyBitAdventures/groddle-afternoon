@@ -10625,6 +10625,30 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
 [data-ui="modern"] .top-bar .vitals-menu[data-stat="mood"] .vitals-snack b { color: var(--good); font-weight: var(--fw-heavy); }
 [data-ui="modern"] .top-bar .vitals-menu-empty { color: var(--text-muted); margin: var(--space-1) var(--space-2); }
 
+/* Favor with the Giants (report #170, js/ui/topbar.js installFavor): opens from the favor display. */
+[data-ui="modern"] .top-bar #favor-stat[role="button"] { cursor: pointer; }
+[data-ui="modern"] .top-bar #favor-stat[aria-expanded="true"] { background: var(--surface-hover); }
+[data-ui="modern"] .top-bar #favor-stat:focus-visible { outline: none; box-shadow: inset 0 0 0 2px var(--focus); }
+[data-ui="modern"] .favor-pop { width: 300px; max-width: calc(100vw - 2 * var(--hud-inset)); }
+[data-ui="modern"] .favor-list { list-style: none; margin: 0; padding: 0; }
+[data-ui="modern"] .favor-row {
+  display: grid; grid-template-columns: 20px 84px 1fr 100px; align-items: center; gap: var(--space-2);
+  min-height: 30px; padding: 0 var(--space-2); border-radius: var(--radius-s);
+  font-size: var(--fs-m); font-weight: var(--fw-bold); color: var(--text);
+}
+[data-ui="modern"] .favor-row[data-here] { background: var(--surface-sunken); }
+[data-ui="modern"] .favor-row img { width: auto; height: 24px; justify-self: center; }
+[data-ui="modern"] .favor-meter { height: 6px; border-radius: var(--radius-pill); background: var(--track); overflow: hidden; }
+[data-ui="modern"] .favor-meter i { display: block; height: 100%; border-radius: inherit; background: var(--accent); }
+[data-ui="modern"] .favor-row[data-ready] .favor-meter i { background: var(--good); }
+[data-ui="modern"] .favor-count,
+[data-ui="modern"] .favor-ready { justify-self: end; }
+[data-ui="modern"] .favor-count { color: var(--text-muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+[data-ui="modern"] .favor-ready {
+  padding: 2px var(--space-2); border-radius: var(--radius-pill); white-space: nowrap;
+  background: var(--good); color: var(--c-white); font-size: var(--fs-s); font-weight: var(--fw-heavy);
+}
+
 /* Sound: Effects, Music, Mute. */
 [data-ui="modern"] .sound-pop { width: 260px; }
 [data-ui="modern"] .hud-pop-title { margin: var(--space-1) var(--space-2) var(--space-2); font-size: var(--fs-m); font-weight: var(--fw-heavy); }
@@ -11212,9 +11236,9 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
 /* The top bar is its own stacking layer (--z-hud), under the open Social drawer or Classic's chat
    column (--z-hud + 14) where they meet: at 1440 px and up the Menu and the Sound popover drop from
    the bar's right end onto the drawer (in Classic the Sound popover onto the chat column), and
-   their lower rows took no clicks. While one of the bar's popovers (the Menu, Sound, the eat menu)
+   their lower rows took no clicks. While one of the bar's popovers (the Menu, Sound, the eat menu, favor)
    is open, the bar lifts to --z-hud-pop; the rest of the time it stays under the drawer. */
-#wrap > header.top-bar:has(#more-list:not([hidden]), #sound-pop:not([hidden]), #vitals-menu:not([hidden])) {
+#wrap > header.top-bar:has(#more-list:not([hidden]), #sound-pop:not([hidden]), #vitals-menu:not([hidden]), #favor-pop:not([hidden])) {
   z-index: var(--z-hud-pop);
 }
 /* —— end HUB top bar layer —— */

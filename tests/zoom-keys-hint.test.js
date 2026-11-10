@@ -17,7 +17,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { ZOOM_KEYS_HINT, createWorldZoom, nextZoom, zoomKeyAction, zoomKeyToast } from '../public/js/world-zoom.js?v=1d0c0cfb';
-import { zoomSlider } from '../public/js/ui/topbar.js?v=40baf379';
+import { zoomSlider } from '../public/js/ui/topbar.js?v=e606f7e1';
 import { hotkeySections, hotkeyText } from '../public/js/client-hotkeys.js?v=31d1891d';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');

@@ -9,6 +9,7 @@ import {
   MENU_ROWS,
   TOP_OVERFLOW_STEPS,
   favorChip,
+  favorRowText,
   levelRing,
   lowEnergyText,
   mailText,
@@ -19,7 +20,9 @@ import {
   vitalRing,
   volumeLevel,
   soundChannelToggle,
-} from '../public/js/ui/topbar.js?v=40baf379';
+} from '../public/js/ui/topbar.js?v=e606f7e1';
+
+import { GIANTS, canClaimEmblem, createShrineState, emblemCostFor, favorPanelRows } from '../public/js/shrines.js?v=73185a14';
 
 const pub = join(import.meta.dirname, '..', 'public');
 const read = (f) => readFileSync(join(pub, f), 'utf8');
@@ -199,5 +202,61 @@ describe('a narrow window: the actions pill gives way instead of running off the
   it('the street map steps under the nameplate in a narrow window', () => {
     const narrow = css.slice(css.indexOf('@media (max-width: 760px) {\n  [data-ui="modern"] .top-bar .hud-cur.currants'));
     assert.match(narrow.slice(0, 1200), /\[data-ui="modern"\] \.street-minimap \{ top: calc\(2 \* var\(--hud-h\) \+ var\(--space-4\)\); \}/);
+  });
+});
+
+describe('the favor panel (report #170): all eleven Giants from the favor display', () => {
+  it('lists every Giant with favor against the next emblem, and marks the ready ones', () => {
+    const state = createShrineState({ favor: { alph: 250, lem: 1100, zille: 1000, ti: 3 }, emblems: { lem: 1 } });
+    const rows = favorPanelRows(state, 'ti');
+    assert.equal(rows.length, 11);
+    assert.deepEqual(rows.map((r) => r.id), Object.keys(GIANTS));
+    const by = Object.fromEntries(rows.map((r) => [r.id, r]));
+    assert.deepEqual([by.alph.points, by.alph.target, by.alph.share, by.alph.ready], [250, 1000, 0.25, false]);
+    // A second emblem costs 100 more (emblemCostFor): 1,100 of 1,100 is ready.
+    assert.deepEqual([by.lem.target, by.lem.ready, by.lem.share], [1100, true, 1]);
+    assert.equal(by.zille.ready, true);
+    assert.equal(by.cosma.points, 0);
+    assert.equal(by.cosma.ready, false);
+    assert.deepEqual(rows.filter((r) => r.here).map((r) => r.id), ['ti']);
+    assert.equal(by.ti.icon, 'assets/sprites/giant-icons/icon_tii.webp');
+    for (const r of rows) {
+      assert.equal(r.target, emblemCostFor(state, r.id));
+      assert.equal(r.ready, canClaimEmblem(state, r.id));
+      assert.ok(readFileSync(join(pub, r.icon)).length > 0, `${r.icon} ships`);
+    }
+    assert.equal(favorPanelRows(state).some((r) => r.here), false);
+  });
+
+  it('reads the state and never changes it', () => {
+    const state = createShrineState({ favor: { pot: 1000 } });
+    const before = JSON.stringify(state);
+    favorPanelRows(state, 'pot');
+    assert.equal(JSON.stringify(state), before);
+  });
+
+  it('says each row in words: the count, or Emblem ready', () => {
+    assert.deepEqual(favorRowText({ name: 'Alph', points: 250, target: 1000, ready: false, here: false }),
+      { count: '250 / 1,000', mark: '', label: 'Alph: 250 of 1,000 favor' });
+    const t = favorRowText({ name: 'Lem', points: 1100, target: 1100, ready: true, here: true });
+    assert.equal(t.mark, 'Emblem ready');
+    assert.equal(t.label, 'Lem: 1,100 of 1,100 favor. Emblem ready. The Giant of this street');
+  });
+
+  it('opens from the favor display by click, Enter or Space; Esc and a second click close it', () => {
+    const at = topbar.indexOf('function installFavor(');
+    const body = topbar.slice(at, topbar.indexOf('\n}\n', at));
+    assert.match(body, /pop\.id = 'favor-pop';/);
+    assert.match(body, /chip\.setAttribute\('role', 'button'\)/);
+    assert.match(body, /popover\(doc, chip, pop, \{ onOpen: draw \}\)/);
+    assert.match(body, /e\.key !== 'Enter' && e\.key !== ' '/);
+    // No button inside: the panel only shows, so the keys stay on the display and Esc returns there.
+    assert.doesNotMatch(body, /<button/);
+    assert.match(topbar, /favorPanel = installFavor\(doc, opts\.favor\);/);
+    assert.match(topbar, /favorPanel\?\.sync\(\);/);
+    assert.match(game, /favor: \{ rows: \(\) => favorPanelRows\(shrineState, currentStreet \? giantForStreet\(currentStreet\)\?\.id : null\) \},/);
+    // The display still shows the street's Giant (favorChip), and the tooltip hides while the panel is open.
+    assert.match(game, /favor: favorGiant \? \{\n\s+name: favorGiant\.name,/);
+    assert.match(read('style.css'), /\[data-ui="modern"\] \.favor-pop \{ width: 300px;/);
   });
 });

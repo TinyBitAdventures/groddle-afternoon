@@ -412,6 +412,28 @@ export function canClaimEmblem(state, giantId) {
   return whole(state?.favor?.[giantId]) >= emblemCostFor(state, giantId);
 }
 
+/**
+ * The top bar's favor panel (report #170, js/ui/topbar.js): every Giant in name order with the
+ * favor held, what the next emblem needs (emblemCostFor) and whether that emblem is ready to
+ * claim (canClaimEmblem). `hereId` marks the Giant of the street the player is on. Reads only.
+ */
+export function favorPanelRows(state, hereId = null) {
+  return Object.values(GIANTS).map((giant) => {
+    const points = whole(state?.favor?.[giant.id]);
+    const target = emblemCostFor(state, giant.id);
+    return {
+      id: giant.id,
+      name: giant.name,
+      points,
+      target,
+      share: target > 0 ? Math.min(1, points / target) : 0,
+      ready: canClaimEmblem(state, giant.id),
+      here: giant.id === hereId,
+      icon: `assets/sprites/giant-icons/icon_${giant.id === 'ti' ? 'tii' : giant.id}.webp`,
+    };
+  });
+}
+
 /** Every emblem after a Giant's first also pays 50 iMG (items/include/shrines.js:111). */
 export const EMBLEM_XP = 50;
 

@@ -45,7 +45,7 @@ import {
 } from '../public/js/conversations.js?v=7cbdfea4';
 import { assignQuest, completeQuest, questDoneAt } from '../public/js/quests.js?v=2b882eb6';
 import { loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js?v=10b118dd';
-import { normalizeQuestSnapshot } from '../public/js/player-save.js?v=7c9c4d3e';
+import { normalizeQuestSnapshot } from '../public/js/player-save.js?v=a9db41f9';
 import { SPIRIT_CONVERSATIONS, TALK_CLASSES, TALK_ORDER, UNBUILT_GATES, canOffer as spiritCanOffer, offerNext } from '../public/js/street-spirit-talks.js?v=5321850f';
 import { GIANT_ICON_DATA } from '../public/js/giant-icons-data.js?v=5026b09c';
 import { buildConversations } from '../tools/build-conversations.mjs';

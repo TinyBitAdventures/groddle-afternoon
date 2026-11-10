@@ -259,6 +259,8 @@ export function renderTopBar(doc, state = {}) {
       if (img && state.favor.icon && img.getAttribute('src') !== state.favor.icon) img.setAttribute('src', state.favor.icon);
     }
   }
+  // The open favor panel follows the game (a donation, an emblem claimed); it closes with its chip.
+  favorPanel?.sync();
   if ('unread' in state) {
     const mail = doc.getElementById('mail-btn');
     const m = mailText(state.unread, state.parcels);
@@ -304,6 +306,74 @@ function popover(doc, btn, pop, { onOpen } = {}) {
     close(true);
   });
   return { close, isOpen, open };
+}
+
+/** The installed favor panel (installFavor), for renderTopBar: { sync() } or null. */
+let favorPanel = null;
+
+/** One row of the favor panel: the Giant, a meter, favor of what the next emblem needs, and the ready mark. */
+export function favorRowText(row) {
+  const count = `${fmt(row.points)} / ${fmt(row.target)}`;
+  return {
+    count,
+    mark: row.ready ? 'Emblem ready' : '',
+    label: `${row.name}: ${fmt(row.points)} of ${fmt(row.target)} favor${row.ready ? '. Emblem ready' : ''}${row.here ? '. The Giant of this street' : ''}`,
+  };
+}
+
+/**
+ * Report #170: a click on the favor display (or Enter or Space when it has the keys) opens a
+ * small panel of all eleven Giants: favor against what the next emblem needs, and a mark on
+ * any Giant whose emblem is ready. The display itself keeps showing the street's Giant. Esc,
+ * a click away or the display again closes it. `favor.rows()` gives js/shrines.js favorPanelRows.
+ */
+function installFavor(doc, favor) {
+  const chip = doc.getElementById('favor-stat');
+  const bar = chip?.closest('header.top-bar');
+  if (!chip || !bar || !favor?.rows || doc.getElementById('favor-pop')) return null;
+  const pop = doc.createElement('div');
+  pop.id = 'favor-pop';
+  pop.className = 'hud-pop favor-pop';
+  pop.hidden = true;
+  pop.setAttribute('role', 'dialog');
+  pop.setAttribute('aria-label', 'Favor with the Giants');
+  bar.append(pop);
+  chip.setAttribute('role', 'button');
+  chip.setAttribute('aria-haspopup', 'dialog');
+  chip.setAttribute('aria-controls', 'favor-pop');
+  chip.setAttribute('aria-expanded', 'false');
+  const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+  const draw = () => {
+    const rows = favor.rows() || [];
+    const key = rows.map((r) => `${r.id}:${r.points}/${r.target}${r.ready ? '!' : ''}${r.here ? '@' : ''}`).join(',');
+    if (pop.dataset.key === key) return;
+    pop.dataset.key = key;
+    pop.dataset.ready = String(rows.filter((r) => r.ready).length);
+    pop.innerHTML = `<h3 class="hud-pop-title">Favor with the Giants</h3><ul class="favor-list">${rows.map((r) => {
+      const t = favorRowText(r);
+      return `<li class="favor-row" data-giant="${esc(r.id)}"${r.ready ? ' data-ready' : ''}${r.here ? ' data-here' : ''} aria-label="${esc(t.label)}">`
+        + `<img src="${esc(r.icon)}" alt="" width="18" height="24" />`
+        + `<span class="favor-name">${esc(r.name)}</span>`
+        + `<span class="favor-meter" aria-hidden="true"><i style="width: ${Math.round(r.share * 100)}%"></i></span>`
+        + (r.ready ? `<b class="favor-ready">${esc(t.mark)}</b>` : `<span class="favor-count">${esc(t.count)}</span>`)
+        + '</li>';
+    }).join('')}</ul>`;
+  };
+  const p = popover(doc, chip, pop, { onOpen: draw });
+  chip.addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    // Not the game's Enter (verbs) or Space (jump).
+    e.preventDefault();
+    e.stopPropagation();
+    chip.click();
+  });
+  return {
+    sync() {
+      if (!p.isOpen()) return;
+      if (chip.hidden) p.close();
+      else draw();
+    },
+  };
 }
 
 /** The Menu: rows into their groups (features keep appending to #more-list), key caps, arrow keys. */
@@ -903,6 +973,7 @@ function installStreetMap(doc, setting) {
  *   zoom: { get(), set(0..1), onChange(fn) } (js/world-zoom.js)
  *   nightTint: { get(), set(bool), onChange(fn) } (js/night-tint.js)
  *   streetMap: { get(), set(bool), onChange(fn) } (js/ui/street-minimap.js)
+ *   favor: { rows() } the favor panel's eleven Giants (js/shrines.js favorPanelRows)
  *   onImagination(), onMail(), onPlayerCard(): what those controls open.
  */
 export function installTopBar(doc, opts = {}) {
@@ -918,6 +989,7 @@ export function installTopBar(doc, opts = {}) {
   installZoom(doc, opts.zoom);
   installNightTint(doc, opts.nightTint);
   installStreetMap(doc, opts.streetMap);
+  favorPanel = installFavor(doc, opts.favor);
   const tips = installTooltips(doc, [bar, doc.getElementById('street-nameplate')]);
   adoptTitles(bar);
   shapeStreetName(doc);
