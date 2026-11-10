@@ -10,15 +10,20 @@
  * with hopEnd played out as a hop lands (gnomeVisual). Canvas gnomeArt: label:cell per gnome.
  *
  * Saved in this feature's slice in your own save: { placed, packed }. packed holds what a picked-up
- * gnome knows, for the next one set down. Phrases are your own text and stay in your save: a visitor
- * to your home does not see your gnome, so "Cheater..." (onConversation 521) has nobody to answer.
+ * gnome knows, for the next one set down.
+ *
+ * Online, on a visit to another player's home, their gnomes stand where they set them (the site's
+ * list with the visit, src/Neighbours.php gnomeRows, through neighbours-mp-feature homeVisitGnomes):
+ * a visitor's bump makes one hop and say its owner's phrases, as in the source, and it has no verbs
+ * for anyone but its owner (Teach, Flip and Pick up are hidden: 354-364, 232-243, 303-312), so
+ * "Cheater..." (onConversation 521) still has nobody to answer. A visited gnome is never saved here.
  *
  * QA: ?autostart=1&fresh=1&resetgame=1&questoffer=off&homedemo=home&gnomedemo=1 puts one in the pack.
  * window.groddleGnome: state(), place(), bump(id), verbs(id), run(id, verb), menu(id), answer(value),
  * teach(value). Canvas: gnomes (id@x:state:dir:phrases per gnome here, ';'), gnomePlace, gnomeLast.
  */
 import { addItem, countItem, removeItem } from '../inventory.js?v=60dfc9ca';
-import { readVisitScene } from '../neighbours-mp.js?v=6d97976d';
+import { readVisitScene } from '../neighbours-mp.js?v=38cc03d8';
 import { frameTexture, sourceFromUrl } from '../textures.js?v=f024bd6a';
 import { GNOME_ART, GNOME_ART_DIR } from '../garden-gnome-art.js?v=994b7c76';
 import { filterText } from '../word-filter.js?v=9a7a7ebb';
@@ -34,6 +39,7 @@ import {
   forgetPhrase,
   gnomePlaceFor,
   gnomeCell,
+  gnomesHere,
   gnomeScaleX,
   gnomeVisual,
   inGnomeBox,
@@ -44,7 +50,7 @@ import {
   resetDirection,
   teachMenu,
   tickGnome,
-} from '../garden-gnome.js?v=fd02c15b';
+} from '../garden-gnome.js?v=a316da65';
 
 export const GARDEN_GNOME_ID = 'garden-gnome';
 const NAME = 'Garden Gnome';
@@ -104,7 +110,20 @@ function clearDrawn(engine) {
   drawn.clear();
 }
 
-function drawOne(engine, g) {
+/**
+ * What stands here to draw: your own gnomes in your own home ({ key: the place, own: true }), or,
+ * online on a visit, the owner's in the room you stand in ({ key: visit:<owner>:<place>, own: false,
+ * name: whose }); null anywhere else.
+ */
+function shownHere(engine) {
+  const ownPlace = placeHere(engine);
+  const multiplayer = engine.mode === 'multiplayer';
+  const scene = !ownPlace && multiplayer ? readVisitScene(engine.streetTsid) : null;
+  const visit = scene ? engine.query?.('homeVisitGnomes', engine) : null;
+  return gnomesHere({ ownPlace, placed: slice.placed, multiplayer, scene, visit });
+}
+
+function drawOne(engine, g, { own = true, name = '' } = {}) {
   const { PIXI } = engine;
   if (!PIXI || !engine.entityLayer) return;
   const textures = gnomeTextures(PIXI);
@@ -125,14 +144,16 @@ function drawOne(engine, g) {
     label: NAME,
     sprite: holder,
     gnomeId: g.id,
+    // Someone else's gnome has no verbs for a visitor (InteractionMenu.as: no choices, a growl).
+    ...(own ? {} : { subtitle: T.theirs(name), emptyMenuGrowl: T.theirs(name) }),
   });
-  drawn.set(g.id, { g, rt, holder, target, body, vis: gnomeVisual(null, rt.state, Date.now(), GNOME_ART), cell: GNOME_ART.frames[0] });
+  drawn.set(g.id, { g, rt, holder, target, body, own, vis: gnomeVisual(null, rt.state, Date.now(), GNOME_ART), cell: GNOME_ART.frames[0] });
 }
 
-function redraw(engine, place) {
+function redraw(engine, here) {
   clearDrawn(engine);
-  drawnPlace = place;
-  if (place) for (const g of slice.placed) if (g.place === place) drawOne(engine, g);
+  drawnPlace = here?.key || null;
+  if (here) for (const g of here.list) drawOne(engine, g, here);
   publish(engine);
 }
 
@@ -339,8 +360,8 @@ export const gardenGnomeFeature = {
     if (t - lastPollAt >= 250) {
       lastPollAt = t;
       trimPacked(engine);
-      const place = placeHere(engine);
-      if (place !== drawnPlace) redraw(engine, place);
+      const here = shownHere(engine);
+      if ((here?.key || null) !== drawnPlace) redraw(engine, here);
     }
     const p = engine.player;
     let changed = false;
@@ -375,7 +396,10 @@ export const gardenGnomeFeature = {
   },
 
   verbsFor(target) {
-    if (!drawn.has(target?.gnomeId)) return null;
+    const e = drawn.get(target?.gnomeId);
+    if (!e) return null;
+    // Its owner's alone: Teach, Flip and Pick up are hidden from anyone else (state null in the source).
+    if (!e.own) return [];
     return [
       { id: 'teach', label: 'Teach', enabled: true, tooltip: T.teachTip },
       { id: 'flip', label: 'Flip', enabled: true, tooltip: T.flipTip },
@@ -385,7 +409,7 @@ export const gardenGnomeFeature = {
 
   runVerb(target, verbId, engine) {
     const e = drawn.get(target?.gnomeId);
-    if (!e) return false;
+    if (!e || !e.own) return false;
     if (verbId === 'teach') return openTeachMenu(engine, e);
     if (verbId === 'pickup') return pickUp(engine, e);
     if (verbId === 'flip') {
@@ -425,7 +449,7 @@ export const gardenGnomeFeature = {
   restore(seed) {
     slice = normalizeGnomeSlice(seed || {});
     drawnPlace = null;
-    if (engineRef) redraw(engineRef, placeHere(engineRef));
+    if (engineRef) redraw(engineRef, shownHere(engineRef));
   },
 
   /** Tests. */

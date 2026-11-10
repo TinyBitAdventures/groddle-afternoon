@@ -25,6 +25,7 @@
 
 import { SEED_CATALOG, applyFertilizer, sowPlot, wetPlot } from './garden.js?v=1e8a887d';
 import { normalizeParcelBox } from './butler.js?v=4a4b82a2';
+import { normalizeVisitGnomes } from './garden-gnome.js?v=a316da65';
 
 /** The realtime server's street for a player's home street (homes.go). */
 export const HOME_STREET_PREFIX = 'HOME_';
@@ -182,6 +183,8 @@ export function normalizeHomeView(answer) {
     key: answer.key === true,
     pass: typeof answer.pass?.token === 'string' && answer.pass.token ? answer.pass.token : '',
     random: answer.random === true,
+    // The owner's Garden Gnomes where they stand (Neighbours::gnomeRows; features/garden-gnome-feature.js draws them).
+    gnomes: normalizeVisitGnomes(answer.gnomes),
     // Slice 2: the owner's Butler as it looks (Neighbours::butlerView), or null; `info` is its owner's leave info line (141 characters, bag_butler.js 3419).
     butler: answer.butler?.owned === true ? { owned: true, name: String(answer.butler.name || '').slice(0, 19), parts: answer.butler.parts && typeof answer.butler.parts === 'object' ? answer.butler.parts : {}, post: Number.isFinite(Number(answer.butler.post)) && answer.butler.post !== null ? Math.round(Number(answer.butler.post)) : null, info: typeof answer.butler.info === 'string' ? answer.butler.info.slice(0, 141) : '' } : null,
   };

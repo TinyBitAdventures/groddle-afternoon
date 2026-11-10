@@ -31,7 +31,7 @@ import { PROFILE_PAGE_VERB } from '../profiles.js?v=054ca723';
 import { IM_VERB_ID } from '../player-im.js?v=23463a96';
 import { BUDDY_VERBS } from '../buddies.js?v=cff7bf6e';
 import { BUDDY_DESTINATION_VERB } from '../buddy-list.js?v=b418f3f2';
-import { VISIT_VERB } from '../neighbours-mp.js?v=6d97976d';
+import { VISIT_VERB } from '../neighbours-mp.js?v=38cc03d8';
 import { FOLLOW_STOP_VERB } from '../follow-mp.js?v=313c701f';
 import { UNNAMED_PLAYER } from '../player-names.js?v=f9b78094';
 

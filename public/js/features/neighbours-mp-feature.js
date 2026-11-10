@@ -150,7 +150,7 @@ import {
   tendedText,
   TENDED_KEEP,
   visitSceneTsid,
-} from '../neighbours-mp.js?v=6d97976d';
+} from '../neighbours-mp.js?v=38cc03d8';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
 import { elevatorStops, towerLabel } from '../home-tower.js?v=087df38f';
 
@@ -1615,6 +1615,16 @@ export const neighboursMpFeature = {
   neighboursVisiting(engine) {
     if (!session?.visit || engine?.mode !== 'multiplayer') return null;
     return { owner: session.visit.owner, key: session.mayTend() };
+  },
+
+  /**
+   * garden-gnome-feature: the Garden Gnomes of the home you stand in on a visit (the site's list,
+   * js/garden-gnome.js normalizeVisitGnomes) and whose they are, or null anywhere else.
+   */
+  homeVisitGnomes(engine) {
+    const v = session?.visit;
+    if (!v || engine?.mode !== 'multiplayer' || readVisitScene(engine.streetTsid)?.owner !== v.owner) return null;
+    return { owner: v.owner, name: v.name, gnomes: Array.isArray(v.view?.gnomes) ? v.view.gnomes : [] };
   },
 
   /** GATESIGN: game.js homeWayOut, the Imagination menu's Back to world while you visit a home. */

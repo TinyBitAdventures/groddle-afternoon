@@ -13,6 +13,13 @@
  *   each state shows its label (gnomeCell); hopLoop and talk repeat, the others play once and
  *   hold. hop_onExit (427-429) broadcasts hopEnd as the hop gives way to talk or idle0, so the
  *   landing plays out once before the next label (gnomeVisual).
+ * - Someone else's gnome (online, on a visit): it stood in the location for everyone, anyone who
+ *   bumped it made it hop and say its owner's phrases (onPlayerCollision 744-748 is any player's;
+ *   talk_onRun's bubble goes to the whole location), and Teach, Flip and Pick up were hidden from
+ *   anyone but its owner (354-364, 232-243, 303-312: state null). The site sends an owner's gnomes
+ *   with a visit (src/Neighbours.php gnomeRows); here a visitor sees each one where it stands and
+ *   it hops and talks for the visitor who bumps it. Ours: each player's game runs its own copy,
+ *   so only the one who bumped it sees that hop.
  */
 
 export const GNOME_CLASS = 'npc_garden_gnome';
@@ -47,6 +54,7 @@ export const GNOME_TEXT = Object.freeze({
   teachWitty: 'I have a witty phrase.',
   nevermind: 'Nevermind!',
   forgot: 'Ok, forgot that one.',
+  theirs: (name) => `That belongs to ${name}.`, // ours: a visitor's click on a gnome with no verbs for them
   inputTitle: 'Teach Me',
   inputLabel: 'A witty phrase:',
   boom: (phrase) => `BOOM! Now I know how to say: "${phrase}"`,
@@ -88,6 +96,45 @@ export function gnomePlaceFor(scene, { inHome = false, visiting = false } = {}) 
   if (scene.room !== 'interior') return null;
   if (scene.tower != null) return `tower:${scene.tower}`;
   return scene.houseFloor ? `house:${scene.houseFloor}` : 'house';
+}
+
+/** The most of an owner's gnomes one visit shows (the site's Neighbours::GNOMES_MAX). */
+export const GNOME_VISIT_MAX = 24;
+
+/**
+ * The place a visitor stands in, as a gnome's `place` names it, or null: the home street, the
+ * house's ground floor, a Tower floor (js/neighbours-mp.js readVisitScene's { room, floor }).
+ */
+export function visitGnomePlace(scene) {
+  if (!scene) return null;
+  if (scene.room === 'street') return 'street';
+  if (scene.room === 'interior') return 'house';
+  if (scene.room === 'tower' && Number.isInteger(scene.floor) && scene.floor >= 0 && scene.floor <= 9) return `tower:${scene.floor}`;
+  return null;
+}
+
+/** The site's list of an owner's gnomes (Neighbours::gnomeRows), checked: only places a visitor can reach. */
+export function normalizeVisitGnomes(list) {
+  return (Array.isArray(list) ? list : [])
+    .slice(0, GNOME_VISIT_MAX * 4)
+    .filter((g) => g && typeof g === 'object' && Number.isFinite(Number(g.x)) && Number.isFinite(Number(g.y)))
+    .map(normalizePlaced)
+    .filter((g) => /^[A-Za-z0-9_-]{1,40}$/.test(g.id) && /^(street|house|tower:\d)$/.test(g.place))
+    .slice(0, GNOME_VISIT_MAX);
+}
+
+/**
+ * What stands here to draw: your own gnomes in your own home ({ key: the place, own: true }), or,
+ * online on a visit, the owner's in the room you stand in ({ key: visit:<owner>:<place>, own:
+ * false, name: whose }); null anywhere else. ownPlace: gnomePlaceFor's answer; placed: your own;
+ * scene: readVisitScene's answer; visit: { owner, name, gnomes } of the home you visit.
+ */
+export function gnomesHere({ ownPlace = null, placed = [], multiplayer = false, scene = null, visit = null } = {}) {
+  if (ownPlace) return { key: ownPlace, own: true, name: '', list: placed.filter((g) => g.place === ownPlace) };
+  const there = multiplayer ? visitGnomePlace(scene) : null;
+  if (!there || !visit || visit.owner !== scene.owner) return null;
+  const list = (Array.isArray(visit.gnomes) ? visit.gnomes : []).filter((g) => g.place === there);
+  return { key: `visit:${visit.owner}:${there}`, own: false, name: String(visit.name || 'someone'), list };
 }
 
 /** The Place verb's state: conditions 113-140. */

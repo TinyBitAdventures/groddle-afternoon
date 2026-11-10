@@ -1,8 +1,10 @@
 /**
  * G435: the Garden Gnome (items/npc_garden_gnome.js): place, teach, flip, pick up, and a bump.
+ * Online, a visitor to your home sees your gnomes and can bump them (the last suite).
  */
 import { beforeEach, describe, it } from 'node:test';
 import assert from 'node:assert/strict';
+import { execFileSync, spawnSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -12,6 +14,7 @@ import {
   GNOME_PHRASE_MAX,
   GNOME_TEXT as T,
   GNOME_TIMES,
+  GNOME_VISIT_MAX,
   bumpGnome,
   cleanPhrases,
   createGnomeRuntime,
@@ -21,19 +24,25 @@ import {
   gnomePlaceFor,
   gnomeScaleX,
   gnomeVisual,
+  gnomesHere,
   inGnomeBox,
   learnPhrase,
   normalizeGnomeSlice,
+  normalizeVisitGnomes,
   phraseMs,
   placeState,
   resetDirection,
   teachMenu,
   tickGnome,
-} from '../public/js/garden-gnome.js?v=fd02c15b';
-import { gardenGnomeFeature as feature } from '../public/js/features/garden-gnome-feature.js?v=b5db2659';
+  visitGnomePlace,
+} from '../public/js/garden-gnome.js?v=a316da65';
+import { gardenGnomeFeature as feature } from '../public/js/features/garden-gnome-feature.js?v=262aa3f6';
 import { worldArtFor } from '../public/js/world-art.js?v=df476660';
 import { GNOME_ART, GNOME_ART_DIR } from '../public/js/garden-gnome-art.js?v=994b7c76';
 import { HOME_STREET_TSID } from '../public/js/homes.js?v=631ab6b8';
+import { normalizeHomeView, readVisitScene } from '../public/js/neighbours-mp.js?v=38cc03d8';
+import { neighboursMpFeature } from '../public/js/features/neighbours-mp-feature.js?v=045487db';
+import { HAS_SITE, SITE_DIR, sitePath } from '../tools/repos.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const GS = join(root, '../glitch-GameServerJS/items/npc_garden_gnome.js');
@@ -297,5 +306,134 @@ describe('the 140 frames (npc_garden_gnome.swf sprite 31)', () => {
     const src = readFileSync(join(root, 'public/js/features/garden-gnome-feature.js'), 'utf8');
     assert.match(src, /gnomeVisual\(e\.vis, e\.rt\.state, t, GNOME_ART\)/);
     assert.doesNotMatch(src, /hopLift|worldArtFor/);
+  });
+});
+
+describe('someone else\'s gnome, on a visit (multiplayer)', () => {
+  const hasPhp = spawnSync('php', ['-v']).status === 0;
+  const skipSite = !HAS_SITE ? 'no groddle-afternoon-site checkout' : !hasPhp ? 'no php' : false;
+  const placed = [
+    { id: 'gs1', place: 'street', x: 812, y: 870, facingLeft: false, phrases: ['Welcome!'] },
+    { id: 'gh1', place: 'house', x: 300, y: 620, facingLeft: true, phrases: [] },
+    { id: 'gt2', place: 'tower:2', x: 55, y: 620, facingLeft: true, phrases: ['Up here'] },
+  ];
+
+  it('the source lets anyone bump it and only its owner teach, flip or pick it up', { skip: !existsSync(GS) && 'glitch-GameServerJS is not beside the game' }, () => {
+    const src = readFileSync(GS, 'utf8').split('\n');
+    // onPlayerCollision 744-748: any player's bump reaches the state machine.
+    assert.ok(src[743].includes('function onPlayerCollision(pc)'));
+    assert.ok(src[745].includes("this.fsm_event_notify('player_collision', pc);"));
+    // talk_onRun 611-616: the bubble has no player, so the whole location reads it, chat-filtered.
+    assert.ok(src[615].includes('this.sendBubble(utils.filter_chat(phrase), duration + 250);'));
+    // flip 232-243, pickup 303-312, teach 354-364: hidden (state null) from anyone but the owner.
+    assert.ok(src[237].includes('else if (this.owner == pc.tsid)') && src[241].includes('return {state:null};'), 'flip');
+    assert.ok(src[307].includes('else if (this.owner != pc.tsid)') && src[308].includes('return {state:null};'), 'pick up');
+    assert.ok(src[359].includes('else if (this.owner == pc.tsid)') && src[363].includes('return {state:null};'), 'teach');
+  });
+
+  it('names the room a visitor stands in as the owner\'s gnome does', () => {
+    assert.equal(visitGnomePlace(readVisitScene('MPH_7')), 'street');
+    assert.equal(visitGnomePlace(readVisitScene('MPH_7_IN')), 'house');
+    assert.equal(visitGnomePlace(readVisitScene('MPH_7_T2')), 'tower:2');
+    assert.equal(visitGnomePlace(readVisitScene('GLI2V0UN7RD1T2J')), null);
+    assert.equal(visitGnomePlace({ room: 'tower', floor: 12 }), null);
+    // The owner's own names for the same rooms (an upper house floor is no room a visitor reaches).
+    assert.equal(gnomePlaceFor({ room: 'street' }, { inHome: true }), 'street');
+    assert.equal(gnomePlaceFor({ room: 'interior' }, { inHome: true }), 'house');
+    assert.equal(gnomePlaceFor({ room: 'interior', tower: 2 }, { inHome: true }), 'tower:2');
+    assert.equal(gnomePlaceFor({ room: 'interior', houseFloor: 1 }, { inHome: true }), 'house:1');
+  });
+
+  it('reads the site\'s list, checked: only rooms a visitor can reach, three phrases of 150', () => {
+    const list = normalizeVisitGnomes([
+      ...placed,
+      { id: 'up', place: 'house:1', x: 1, y: 1 },
+      { id: 'bad id', place: 'street', x: 1, y: 1 },
+      { id: 'nox', place: 'street', y: 1 },
+      { id: 'talk', place: 'street', x: 9.6, y: 870.2, phrases: ['a', '', 'b', 'c', 'd', 'x'.repeat(400)] },
+      'junk',
+      null,
+    ]);
+    assert.deepEqual(list.map((g) => g.id), ['gs1', 'gh1', 'gt2', 'talk']);
+    assert.deepEqual(list[0], { facingLeft: false, phrases: ['Welcome!'], id: 'gs1', place: 'street', x: 812, y: 870 });
+    assert.deepEqual([list[3].x, list[3].y, list[3].phrases], [10, 870, ['a', 'b', 'c']]);
+    assert.deepEqual(normalizeVisitGnomes(null), []);
+    assert.equal(normalizeVisitGnomes(Array.from({ length: 200 }, (_, i) => ({ id: `g${i}`, place: 'street', x: i, y: 0 }))).length, GNOME_VISIT_MAX);
+    // The visit's view carries them; a site from before the list gives none.
+    const view = { owner: { id: 7, name: 'Ada' }, home: { owned: true, style: 'meadow' }, homes: {}, gnomes: placed };
+    assert.deepEqual(normalizeHomeView(view).gnomes.map((g) => g.id), ['gs1', 'gh1', 'gt2']);
+    assert.deepEqual(normalizeHomeView({ ...view, gnomes: undefined }).gnomes, []);
+  });
+
+  it('shows the owner\'s gnomes of the room you stand in, and yours only at your own home', () => {
+    const visit = { owner: 7, name: 'Ada', gnomes: normalizeVisitGnomes(placed) };
+    const mine = [{ id: 'm1', place: 'street', x: 1, y: 2, facingLeft: true, phrases: [] }];
+    const street = gnomesHere({ placed: mine, multiplayer: true, scene: readVisitScene('MPH_7'), visit });
+    assert.deepEqual([street.key, street.own, street.name, street.list.map((g) => g.id)], ['visit:7:street', false, 'Ada', ['gs1']]);
+    assert.deepEqual(gnomesHere({ multiplayer: true, scene: readVisitScene('MPH_7_IN'), visit }).list.map((g) => g.id), ['gh1']);
+    assert.deepEqual(gnomesHere({ multiplayer: true, scene: readVisitScene('MPH_7_T2'), visit }).list.map((g) => g.id), ['gt2']);
+    assert.deepEqual(gnomesHere({ multiplayer: true, scene: readVisitScene('MPH_7_T1'), visit }).list, []);
+    // Someone else's visit data never shows at another home, off a visit, or in solo.
+    assert.equal(gnomesHere({ multiplayer: true, scene: readVisitScene('MPH_9'), visit }), null);
+    assert.equal(gnomesHere({ multiplayer: true, scene: null, visit }), null);
+    assert.equal(gnomesHere({ multiplayer: false, scene: readVisitScene('MPH_7'), visit }), null);
+    assert.equal(gnomesHere({ multiplayer: true, scene: readVisitScene('MPH_7'), visit: null }), null);
+    // At your own home: yours, as before.
+    const own = gnomesHere({ ownPlace: 'street', placed: mine, multiplayer: true, scene: null, visit });
+    assert.deepEqual([own.key, own.own, own.list], ['street', true, mine]);
+  });
+
+  it('a visitor\'s bump makes it hop and say its owner\'s phrase', () => {
+    const [g] = normalizeVisitGnomes(placed);
+    const rt = createGnomeRuntime(g);
+    assert.equal(bumpGnome(g, rt, { x: g.x, playerX: g.x - 50, now: 1000 }), 'hop');
+    assert.deepEqual(run(g, rt, 1000).map((line) => line.say), ['Welcome!']);
+  });
+
+  it('has no verbs for a visitor, is never saved, and tells whose it is', () => {
+    const f = readFileSync(join(root, 'public/js/features/garden-gnome-feature.js'), 'utf8');
+    assert.match(f, /if \(!e\.own\) return \[\];/, 'verbsFor: Teach, Flip and Pick up are the owner\'s');
+    assert.match(f, /if \(!e \|\| !e\.own\) return false;/, 'runVerb');
+    assert.match(f, /\.\.\.\(own \? \{\} : \{ subtitle: T\.theirs\(name\), emptyMenuGrowl: T\.theirs\(name\) \}\),/);
+    assert.equal(T.theirs('Ada'), 'That belongs to Ada.');
+    // save() writes only the slice; a visit's list lives in the visit view.
+    assert.match(f, /const visit = scene \? engine\.query\?\.\('homeVisitGnomes', engine\) : null;/);
+    assert.doesNotMatch(f, /slice\.placed\.push\([^g]/);
+    feature._reset();
+    assert.equal(feature.save(), undefined);
+    // The hook answers only in multiplayer with a visit under way.
+    assert.equal(neighboursMpFeature.homeVisitGnomes({ mode: 'solo', streetTsid: 'MPH_7' }), null);
+    assert.equal(neighboursMpFeature.homeVisitGnomes({ mode: 'multiplayer', streetTsid: 'MPH_7' }), null);
+  });
+
+  it('the site lists them from the owner\'s save, word-filtered; house phrases only for the owner and key-holders', { skip: skipSite }, () => {
+    const state = { systems: { features: { 'garden-gnome': { placed: [
+      { id: 'gs1', place: 'street', x: 812.4, y: 870, facingLeft: false, phrases: ['Hello  <b>there</b>', '  ', 'shit happens', 'four', 'five'] },
+      { id: 'gh1', place: 'house', x: 300, y: 620, phrases: ['secret'] },
+      { id: 'gu1', place: 'house:1', x: 300, y: 620, phrases: ['upstairs'] },
+      { id: 'gt2', place: 'tower:2', x: '55', y: 620 },
+      { id: 'bad id', place: 'street', x: 1, y: 1 },
+      'junk',
+      { id: 'g5', place: 'street', x: 'x', y: 1 },
+    ], packed: [{ phrases: ['in the pack'] }] } } } };
+    const run2 = (s, key) => execFileSync('php', ['-r', `foreach (["WordFilter", "Neighbours"] as $c) require ${JSON.stringify(SITE_DIR)} . "/src/$c.php"; echo json_encode(Groddle\\Minn\\Neighbours::gnomeRows(json_decode(${JSON.stringify(JSON.stringify(s))}), ${key ? 'true' : 'false'}));`]).toString();
+    const noKey = JSON.parse(run2(state, false));
+    assert.deepEqual(noKey.map((g) => [g.id, g.place, g.x, g.y, g.facingLeft]), [['gs1', 'street', 812, 870, false], ['gh1', 'house', 300, 620, true], ['gt2', 'tower:2', 55, 620, true]]);
+    assert.equal(noKey[0].phrases.length, 3);
+    assert.equal(noKey[0].phrases[0], 'Hello there');
+    assert.match(noKey[0].phrases[1], /^\S{4} happens$/);
+    assert.doesNotMatch(noKey[0].phrases[1], /shit/);
+    assert.deepEqual(noKey[1].phrases, [], 'a gnome in the house is silent for someone without the key');
+    assert.deepEqual(JSON.parse(run2(state, true))[1].phrases, ['secret']);
+    assert.doesNotMatch(run2(state, true), /in the pack|upstairs/);
+    assert.equal(run2({}, true), '[]');
+    const many = { systems: { features: { 'garden-gnome': { placed: Array.from({ length: 90 }, (_, i) => ({ id: `g${i}`, place: 'street', x: i, y: 0 })) } } } };
+    assert.equal(JSON.parse(run2(many, false)).length, GNOME_VISIT_MAX);
+    // What the game reads back is what the site sent.
+    assert.deepEqual(normalizeVisitGnomes(noKey), noKey.map((g) => ({ facingLeft: g.facingLeft, phrases: g.phrases, id: g.id, place: g.place, x: g.x, y: g.y })));
+    const src = readFileSync(sitePath('src', 'Neighbours.php'), 'utf8');
+    assert.match(src, /'gnomes' => self::gnomeRows\(\$theirs, \$key\),/);
+    assert.match(src, new RegExp(`GNOMES_MAX = ${GNOME_VISIT_MAX};`));
+    assert.match(src, new RegExp(`GNOME_PHRASE_MAX = ${GNOME_PHRASE_MAX};`));
   });
 });
