@@ -8,11 +8,11 @@
  */
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { readFileSync, readdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { saleVerbs } from '../public/js/home-street-mp.js?v=4e133b37';
-import { homeStorageFeature } from '../public/js/features/home-storage-feature.js?v=5a17361d';
+import { homeStorageFeature } from '../public/js/features/home-storage-feature.js?v=26e9480c';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');
@@ -125,6 +125,26 @@ describe('the windows (CabinetDialog.as, StoreBuyUI.as) in both skins', () => {
     for (const s of [feature, windows]) {
       const strings = [...s.matchAll(/'([^'\n]{3,})'|`([^`\n]{3,})`/g)].map((m) => m[1] || m[2]).filter((x) => /[a-z] [a-z]/i.test(x));
       for (const x of strings) assert.doesNotMatch(x, /—/, x);
+    }
+  });
+});
+
+describe('names from neighbours-mp.js are imported wherever a feature calls them', () => {
+  // A key-holder walking into a friend's house threw "possessive is not defined": this feature
+  // called it for a visitor's cabinet and display-box subtitles and never imported it.
+  it('no feature calls one of its exports without importing or defining it', () => {
+    const names = [...read('public/js/neighbours-mp.js').matchAll(/^export (?:async )?function (\w+)/gm)].map((m) => m[1]);
+    assert.ok(names.includes('possessive'));
+    const dir = join(root, 'public/js/features');
+    for (const f of readdirSync(dir).filter((x) => x.endsWith('.js'))) {
+      const code = readFileSync(join(dir, f), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
+      const imported = new Set([...code.matchAll(/import\s*\{([^}]*)\}\s*from/g)]
+        .flatMap((m) => m[1].split(',').map((x) => x.trim().split(/\s+as\s+/).pop())).filter(Boolean));
+      for (const n of names) {
+        if (!new RegExp(`(?<![.\\w$])${n}\\(`).test(code)) continue;
+        if (new RegExp(`(?:function|const|let|var)\\s+${n}\\b`).test(code)) continue;
+        assert.ok(imported.has(n), `${f} calls ${n}() without importing it`);
+      }
     }
   });
 });
