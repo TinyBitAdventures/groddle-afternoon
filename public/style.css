@@ -118,6 +118,7 @@
   --z-world: 5;     /* drawn over the world: tints, the verb menu */
   --z-hud: 12;      /* nameplate, tracker, feed, buffs, chat dock */
   --z-hud-pop: calc(var(--z-hud) + 16); /* the top bar while its Menu, Sound or eat menu is open: over the Social drawer (z-hud + 14) */
+  --z-hud-pop-under: calc(var(--z-hud) + 15); /* notices and world announcements while a top bar popover is open: one under the lifted bar, still over the Social drawer */
   --z-overlay: 32;  /* world announcements (the Qurazy banner): over the HUD, under every panel */
   --z-overlay: 32;  /* world announcements (the Qurazy banner): over the HUD, under every panel */
   --z-quest-hud: calc(var(--z-overlay) + 1); /* a quest's progress card (Legalize It): over the HUD, under every panel, menu, form and dialog */
@@ -11244,6 +11245,15 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
    is open, the bar lifts to --z-hud-pop; the rest of the time it stays under the drawer. */
 #wrap > header.top-bar:has(#more-list:not([hidden]), #sound-pop:not([hidden]), #vitals-menu:not([hidden]), #favor-pop:not([hidden])) {
   z-index: var(--z-hud-pop);
+}
+/* G637: for the seconds they show, a notice (--z-notice) and a world announcement (--z-overlay, the
+   Qurazy banner) drew over an open popover of the bar, and a notice's card took its clicks. The bar
+   cannot lift over them: side panels, windows and award screens (--z-panel and up) must go on
+   covering it. So while one of the bar's popovers is open, those two layers drop to one under the
+   lifted bar (--z-hud-pop-under) and go back when it closes; nothing else moves. */
+#wrap:has(> header.top-bar :is(#more-list, #sound-pop, #vitals-menu, #favor-pop):not([hidden])) > #game-root > canvas.overlay-art,
+#wrap:has(> header.top-bar :is(#more-list, #sound-pop, #vitals-menu, #favor-pop):not([hidden])) > #game-root .notify-notices {
+  z-index: var(--z-hud-pop-under);
 }
 /* —— end HUB top bar layer —— */
 
