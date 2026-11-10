@@ -133,6 +133,7 @@ const stand = (s, scale, inField, offset, extra = {}) => ({ s, scale, inField, o
 const BODY = {
   bottletree_body1: [888, 832], bottletree_body2: [785, 1314], bottletree_body3: [780, 1312], bottletree_body4: [780, 1312],
   bottletree_body5_face: [786, 820], bottletree_burb_wndw_2: [853, 1286], bottletree_city_wndw_1: [778, 734],
+  bottletree_city_wndw_3: [904, 850],
 };
 /** The soft shadow a thing `width` px wide sits on (the `shadow` deco, 412 px of paint in 432x156). */
 const shade = (group, width, inField, offset, extra = {}) => {
@@ -1263,12 +1264,67 @@ const WAGGISH_WANDER_YARD = {
   trim: ['purple_mushroom_3', 'snow_bush_01a_al1', 'plant_fern_2'],
 };
 
-/** Arid Boglands (snap 12968): an olive sky, pale bottletree domes far off, giant walking bottletrees and baskets of dry plants. */
-const ARID_BOGLANDS_YARD = {
+// The five Firebog back yards with a look of their own stand on their ground (G616 follow-up).
+// Their first recipes stood the giant walkers on the field's back edge, on a backdrop layer that
+// slid over the ground: the trunks ended on one hard line above an empty brown band. Each
+// snap shows the giants standing right down in the walking ground among ledges, baskets of dry
+// plants, mossy stones and grass. So the near giants are `near` pieces with `inField`, the
+// street styles' kit (stand, standBottle, standWalker, standHut, standLedges, scatter), laid
+// out from each yard's own snap, right to left from the house. A snap is the whole 3,000 px
+// yard, and the remake's camera shows less above the ground, so the giants are drawn at about
+// half their size in the snap, the snap's pieces stand closer together (a new house's yard is
+// 750 px and should already show its giant), and they come again every `every` px on a long
+// yard. A trunk that lies fallen in a snap sits upright here: a deco is never turned. The far
+// layers stay on the horizon, behind the field's rolling rim.
+
+/** A basket of dry plants (`sprout`: the basket is about 190 px of its 452) on its shadow. */
+const standPot = (group, scale, inField, offset, extra = {}) => [
+  shade(group, 190 * scale, inField, offset, extra),
+  stand('sprout', scale, inField, offset, { group, ...extra }),
+];
+/** The sleepy face of a giant (bottletree_face1, 370x84), `up` px above its feet. */
+const standFace = (group, scale, inField, offset, up, extra = {}) => stand('bottletree_face1', scale, inField, offset, { group, ...extra, on: Math.round(up) });
+/** Grass through a yard's field: small at the back, larger towards the walk line; `gap` spreads it out, `tint` dries it. */
+const yardTufts = (grass, gap = 1, tint = null) => {
+  const dry = tint == null ? {} : { tint };
+  return scatter('tuft', [
+    [grass, 0.34, 112, Math.round(330 * gap), 40, dry],
+    [grass, 0.42, 84, Math.round(410 * gap), 190, dry],
+    [grass, 0.5, 52, Math.round(470 * gap), 110, dry],
+    [grass, 0.56, 24, Math.round(520 * gap), 300, dry],
+    ['ground_spots_dark_1', 0.4, 96, 540, 0],
+    ['ground_spots_dark_1', 0.5, 40, 620, 260],
+  ]);
+};
+
+/**
+ * A Firebog back yard drawn from its own snap. `light` tints the ground and what stands on it
+ * (over FIREBOG_GROUND, so the ledges and the rim sit in the field without a seam); `stand` is
+ * what stands in the field, each piece again every `every` px out from the house; `tufts` the
+ * grass through the field; `near` the front fringe, as it was.
+ */
+function firebogYard({ sky, light = 0xffffff, fieldDark, soilColor, layers, stand: standing, every = 1500, tufts, near, trim }) {
+  return {
+    sky,
+    field: lit(FIREBOG_GROUND, light),
+    fieldDark,
+    soil: null,
+    soilColor,
+    layers: [...layers, firebogRim(light)],
+    near: [...standing.map((row) => ({ ...row, every })), ...tufts, ...near],
+    ...(light === 0xffffff ? {} : { nearTint: light }),
+    trim,
+  };
+}
+
+/**
+ * Arid Boglands (snap 12968): an olive sky, pale bottletree domes far off, giant walking bottletrees and baskets
+ * of dry plants. In the field, from the house: a basket, a small walker behind the snap's fallen trunk, the giant
+ * with a sleepy face, stepped ledges with baskets at the yard's end, then the trunk with holes.
+ */
+const ARID_BOGLANDS_YARD = firebogYard({
   sky: [0x4b4505, 0x636220, 0x7c833d],
-  field: 0x4c3b2a,
   fieldDark: 0x3c2e20,
-  soil: null,
   soilColor: 0x3a2a1c,
   layers: [
     { f: 0.03, items: [item('clouds5', 0.9, 380, 700, 260, 0, { tint: 0x4a4410, alpha: 0.6 })] },
@@ -1276,29 +1332,62 @@ const ARID_BOGLANDS_YARD = {
     { f: 0.07, items: [item(['bck_hill_14', 'bck_hill_2'], 0.3, 568, 420, 140, 100, { tint: 0xe8d898 })] },
     { f: 0.14, items: [item(['background_bottletree_1', 'background_bottletree_2'], 0.9, 574, 420, 160, 0, { tint: 0x3a3418 })] },
     { band: { y: 574, h: 14, color: 0x5a5a3a, alpha: 0.7 }, f: 0.16 },
-    { f: 0.32, items: [...walker(0.15, 590, 900, 820, { tint: 0xc8bc98 })] },
-    { f: 0.55, items: [...walker(0.26, 606, 1300, 380), item('sprout', 0.34, 602, 700, 240, 760)] },
+    { f: 0.32, items: [...walker(0.13, 590, 900, 820, { tint: 0xc8bc98 })] },
   ],
+  stand: [
+    ...standPot('pot-a', 0.26, 50, 150),
+    ...standWalker('small', 'bottletree_body4', 0.11, 104, 268),
+    ...standBottle('fallen', 'bottletree_body1', 0.19, 76, 366, { top: 'treetop_noflowers_2', topScale: 0.62 }),
+    stand('ground_rootpipe1', 0.3, 38, 446, { group: 'fallen' }),
+    ...standWalker('giant', 'bottletree_body2', 0.22, 68, 596),
+    standFace('giant', 0.22, 68, 596, 604 * 0.22 * 0.45 + 1314 * 0.22 * 0.4),
+    ...standLedges('ledge', 46, 700, { plant: 'sprout', plantScale: 0.2 }),
+    ...standPot('pot-b', 0.24, 44, 1040),
+    ...standBottle('holes', 'bottletree_burb_wndw_2', 0.2, 84, 1130, { top: 'treetop_noflowers_3' }),
+    stand('stone_moss_group_3', 0.34, 28, 1240, { group: 'stone' }),
+    ...standPot('pot-c', 0.2, 92, 1330),
+    ...standLedges('ledge-b', 50, 1280, { plant: 'sprout', plantScale: 0.18 }),
+  ],
+  tufts: yardTufts('grass_solid_trans', 1.3, 0xc6c0a0),
   near: [
     { s: 'grass_solid', scale: 0.6, every: 300, jitter: 120, tint: 0xb8b090 },
     { s: 'sprout', scale: 0.24, every: 760, jitter: 220, offset: 260 },
   ],
   trim: ['sprout', 'grass_solid', 'underground_plant_1'],
-};
+});
 
-/** Faithful Fen (snap 12876): black over a teal sky, mist bands, a bottletree skyline, squat door trees and one giant. */
-const FAITHFUL_FEN_YARD = {
+/**
+ * Faithful Fen (snap 12876): black over a teal sky, mist bands, a bottletree skyline, squat door trees and one
+ * giant. In the field, from the house: a yellow bogwillow, the giant standing behind stepped ledges with
+ * firebeans and mossy stones, door trees at the back of the field, red mushrooms, and grass everywhere.
+ */
+const FAITHFUL_FEN_YARD = firebogYard({
   sky: [0x000000, 0x466a78, 0x677f87],
-  field: 0x4a3929,
   fieldDark: 0x3a2d20,
-  soil: null,
   soilColor: 0x34281c,
   layers: [
     { f: 0.03, items: [item('clouds_bg_middle_01a_newxp', 0.6, 470, 900, 300, 0, { tint: 0x8aa4b0, alpha: 0.55 })] },
     { f: 0.07, items: [item('background_horizon_bottletrees_1', 0.6, 568, 1100, 0, 0, { tint: 0x101416 })] },
     { f: 0.1, items: [item('clouds_bg_middle_01a_newxp', 0.5, 556, 700, 200, 300, { tint: 0x9ab4c0, alpha: 0.5 })] },
-    { f: 0.22, items: [item(['background_bottletree_face', 'background_bottletree_hut', 'background_bottletree_barred'], 0.3, 584, 440, 140, 60, { tint: 0x8a7058 })] },
-    { f: 0.45, items: [...walker(0.24, 600, 1300, 760), item('firebean_1', 0.5, 600, 800, 240, 300)] },
+    { f: 0.22, items: [item(['background_bottletree_face', 'background_bottletree_hut', 'background_bottletree_barred'], 0.22, 588, 440, 140, 60, { tint: 0x8a7058 })] },
+  ],
+  stand: [
+    stand('underground_bogwillow', 0.36, 64, 136, { group: 'bush' }),
+    ...standWalker('giant', 'bottletree_body2', 0.24, 80, 400),
+    ...standLedges('ledge', 46, 200, { plant: 'firebean_1', plantScale: 0.24 }),
+    stand('stone_moss_group_3', 0.36, 26, 560, { group: 'stone' }),
+    stand('firebean_2', 0.26, 60, 620, { group: 'stone' }),
+    stand('mushrooms', 0.26, 34, 660, { group: 'shrooms' }),
+    ...standHut('hut-a', 'background_bottletree_hut', 0.3, 110, 700),
+    ...standHut('hut-b', 'background_bottletree_face', 0.28, 112, 980),
+    stand('underground_bogwillow_3', 0.4, 56, 900, { group: 'hut-b' }),
+    ...standLedges('ledge-b', 44, 1040, { plant: 'underground_bogwillow_3', plantScale: 0.34 }),
+    stand('stone_moss_group_1', 0.32, 22, 1380, { group: 'stone-b' }),
+    ...standHut('hut-c', 'background_bottletree_barred', 0.27, 108, 1420),
+  ],
+  tufts: [
+    ...yardTufts('grass_solid', 0.7),
+    ...scatter('bug', [['underground_plant_1', 0.5, 70, 520, 330], ['underground_plant_1', 0.6, 30, 640, 60]]),
   ],
   near: [
     { s: 'grass_solid', scale: 0.6, every: 260, jitter: 100, tint: 0xa0a868 },
@@ -1306,7 +1395,7 @@ const FAITHFUL_FEN_YARD = {
     { s: 'flower_bush_7', scale: 0.4, every: 900, jitter: 260, offset: 520, tint: 0xd8c840 },
   ],
   trim: ['firebean_1', 'grass_solid', 'underground_plant_1'],
-};
+});
 
 /** Dusty Barrens (snaps 12882, 12883): giant acacias whose crowns spread over the top, a canyon behind, sand paths and bushes. */
 const DUSTY_BARRENS_YARD = {
@@ -1561,12 +1650,15 @@ const WAILING_UPLANDS_YARD = snapForest({
   edge: [daisyBushes({ every: 480 }), meadowBushes({ every: 500 })],
 });
 
-/** Glaring Muddle (snap 12872): a gold sky going red-brown above, streaked clouds, teal domes, walking bottletrees, bent root trunks and potted sprouts. */
-const GLARING_MUDDLE_YARD = {
+/**
+ * Glaring Muddle (snap 12872): a gold sky going red-brown above, streaked clouds, teal domes, walking bottletrees,
+ * bent root trunks and potted sprouts. In the field, from the house: a bent root trunk over stepped ledges with a
+ * basket, the giant with a sleepy face among baskets, a bogwillow, a second bent trunk at the yard's end, then
+ * the squat trunk with holes.
+ */
+const GLARING_MUDDLE_YARD = firebogYard({
   sky: [0x6a3c3c, 0xb27a48, 0xe2b24c],
-  field: 0x4a3a28,
   fieldDark: 0x3a2d1e,
-  soil: null,
   soilColor: 0x34281a,
   layers: [
     { f: 0.03, items: [item(['clouds3', 'clouds1'], 0.9, 420, 520, 220, 0, { tint: 0x8a5a3c, alpha: 0.55 })] },
@@ -1574,38 +1666,72 @@ const GLARING_MUDDLE_YARD = {
     // the teal striped domes behind the bog
     { f: 0.14, items: [item(['backhill1_green', 'backhill2_green'], 0.5, 582, 300, 100, 0, { tint: 0x70d0e0 })] },
     { f: 0.3, items: [...walker(0.13, 588, 1100, 900, { tint: 0xd8c098 }), item('legs_moss_4', 0.22, 588, 900, 260, 300, { tint: 0xd8c098 }), item('sprout', 0.22, 588, 600, 200, 100, { tint: 0xd8c098 })] },
-    { f: 0.5, items: [...walker(0.2, 604, 1300, 520), item('legs_moss_1', 0.32, 602, 1300, 200, 80), item('sprout', 0.28, 602, 700, 240, 260)] },
   ],
+  stand: [
+    stand('legs_moss_2', 0.36, 72, 140, { group: 'bent-a' }),
+    ...standLedges('ledge', 42, 160, { plant: 'sprout', plantScale: 0.2 }),
+    ...standWalker('giant', 'bottletree_body3', 0.21, 74, 500),
+    standFace('giant', 0.21, 74, 500, 604 * 0.21 * 0.45 + 1312 * 0.21 * 0.4),
+    ...standPot('pot-a', 0.24, 40, 600),
+    stand('underground_bogwillow', 0.3, 98, 668, { group: 'bush' }),
+    stand('stone_moss_2', 0.3, 30, 700, { group: 'bush' }),
+    stand('legs_moss_4', 0.38, 66, 800, { group: 'bent-b' }),
+    ...standBottle('holes', 'bottletree_city_wndw_3', 0.18, 80, 990, { top: 'treetop_noflowers_2', topScale: 0.6 }),
+    ...standPot('pot-b', 0.26, 46, 1090),
+    ...standLedges('ledge-b', 44, 1160, { plant: 'sprout', plantScale: 0.2 }),
+    stand('legs_moss_1', 0.34, 78, 1400, { group: 'bent-c' }),
+  ],
+  tufts: yardTufts('grass_solid_trans', 1.1, 0xd2c898),
   near: [
     { s: 'grass_solid', scale: 0.6, every: 260, jitter: 100, tint: 0xa8a070 },
     { s: 'sprout', scale: 0.22, every: 700, jitter: 240, offset: 300 },
     { s: 'underground_plant_1', scale: 0.6, every: 520, jitter: 200, offset: 120 },
   ],
   trim: ['sprout', 'grass_solid', 'underground_plant_1'],
-};
+});
 
-/** Unkempt Crypt (snap 12877): a dark cave, roots hanging from the roof with their glowing bulbs, walking bottletrees and bent root trunks. */
-const UNKEMPT_CRYPT_YARD = {
+/** The Crypt's trunks glow gold in the dark, as its snap shows; the ground and what lies on it keep the cave's dim light. */
+const CRYPT_GLOW = { tint: 0xfff0dc };
+
+/**
+ * Unkempt Crypt (snap 12877): a dark cave, roots hanging from the roof with their glowing bulbs, walking
+ * bottletrees and bent root trunks. In the field, from the house: a bent root trunk, a walker with a face, the
+ * sitting giant with a basket at its foot, the squat trunk with holes at the yard's end, then a ledge and a
+ * second bent trunk.
+ */
+const UNKEMPT_CRYPT_YARD = firebogYard({
   sky: [0x241e14, 0x2e271a, 0x3a3020],
-  field: 0x3e3224,
+  light: 0xd0c0a8,
   fieldDark: 0x30261a,
-  soil: null,
   soilColor: 0x2a2016,
   layers: [
     { f: 0.06, items: [item(['background_bottletree_1', 'background_bottletree_2'], 0.8, 574, 520, 200, 0, { tint: 0x3a3020 })] },
     { f: 0.12, items: [item(['hanging_braches2', 'hanging_braches1'], 0.3, 170, 240, 80, 0, { hang: true, tint: 0x6a4a3a })] },
-    { f: 0.3, items: [...walker(0.15, 590, 1000, 300, { tint: 0xc8a870 }), item('legs_moss_4', 0.24, 590, 1000, 260, 800, { tint: 0xa88a60 })] },
-    { f: 0.5, items: [...walker(0.2, 604, 1300, 760), item('legs_moss_1', 0.34, 604, 1300, 200, 120)] },
+    { f: 0.3, items: [...walker(0.13, 590, 1000, 300, { tint: 0xc8a870 }), item('legs_moss_4', 0.22, 590, 1000, 260, 800, { tint: 0xa88a60 })] },
     { f: 0.6, items: [item(['hanging_braches1', 'hanging_braches2'], 0.34, 140, 420, 160, 200, { hang: true, tint: 0x9a7058 })] },
   ],
+  stand: [
+    stand('legs_moss_2', 0.4, 70, 144, { group: 'bent-a' }),
+    stand('stone_moss_2', 0.3, 36, 214, { group: 'bent-a' }),
+    ...standPot('pot-a', 0.22, 44, 262),
+    ...standWalker('walker', 'bottletree_body5_face', 0.2, 76, 372, CRYPT_GLOW),
+    ...standBottle('sitter', 'bottletree_body2', 0.22, 86, 620, CRYPT_GLOW),
+    standFace('sitter', 0.22, 86, 620, 1314 * 0.22 * 0.46),
+    ...standPot('pot-b', 0.26, 38, 574),
+    ...standBottle('holes', 'bottletree_city_wndw_3', 0.17, 66, 812, { top: 'treetop_noflowers_2', topScale: 0.62, ...CRYPT_GLOW }),
+    stand('stone_moss_group_3', 0.34, 26, 920, { group: 'stone' }),
+    ...standLedges('ledge', 46, 980, { plant: 'firebean_1', plantScale: 0.2 }),
+    stand('legs_moss_1', 0.42, 74, 1340, { group: 'bent-b' }),
+    ...standPot('pot-c', 0.22, 42, 1424),
+  ],
+  tufts: yardTufts('grass_solid_trans', 1.3, 0xb4aa8c),
   near: [
     { s: 'grass_solid', scale: 0.55, every: 300, jitter: 120, tint: 0x8a8060 },
     { s: 'underground_plant_1', scale: 0.6, every: 560, jitter: 200, offset: 160 },
     { s: 'mushrooms', scale: 0.3, every: 800, jitter: 260, offset: 420 },
   ],
-  nearTint: 0xc0a888,
   trim: ['mushrooms', 'grass_solid', 'underground_plant_1'],
-};
+});
 
 /** Silent Orbit (snaps 13047, 13046): a black starry sky, a pale moon glowing low over the horizon, grey dust with craters and radioactive drums. */
 const SILENT_ORBIT_YARD = {
@@ -1679,19 +1805,41 @@ const DARK_VISTA_YARD = {
   trim: ['grass_solid', 'underground_plant_1', 'grass_solid'],
 };
 
-/** Perfus Preference (snap 12878): a deep green sky, grey cloud streaks, bare trees far off, bottletree huts, walking bottletrees, red-leaved plants, mushrooms. */
-const PERFUS_PREFERENCE_YARD = {
+/**
+ * Perfus Preference (snap 12878): a deep green sky, grey cloud streaks, bare trees far off, bottletree huts,
+ * walking bottletrees, red-leaved plants, mushrooms. In the field, from the house: the golden trunk with holes,
+ * a hut at the back, the squat trunk with a sleepy face under its treetop, the giant walker, then stepped
+ * ledges with red mushrooms and a second hut.
+ */
+const PERFUS_PREFERENCE_YARD = firebogYard({
   sky: [0x063232, 0x214c3c, 0x5c7a58],
-  field: 0x40302a,
+  light: 0xd8d4dc,
   fieldDark: 0x32251e,
-  soil: null,
   soilColor: 0x2e221a,
   layers: [
     { f: 0.03, items: [item(['clouds3', 'clouds1'], 0.9, 440, 420, 200, 0, { tint: 0x9ab4aa, alpha: 0.55 })] },
     { f: 0.08, items: [item(['heights_tree_bare_3', 'heights_tree_bare_4', 'background_bottletree_silhouette'], 0.1, 580, 220, 100, 0, { tint: 0x2a3a30 })] },
-    { f: 0.2, items: [item(['background_bottletree_hut', 'background_bottletree_barred'], 0.3, 586, 560, 200, 100, { tint: 0xa09078 })] },
-    { f: 0.35, items: [...bottle(0.15, 592, 1100, 600, 'treetop_noflowers_3', { tint: 0xc0b090 }), item('firebean_1', 0.34, 592, 900, 220, 300)] },
-    { f: 0.55, items: [...walker(0.21, 606, 1300, 380), ...bottle(0.2, 606, 1300, 1000), item('firebean_2', 0.4, 604, 1300, 240, 760)] },
+    { f: 0.2, items: [item(['background_bottletree_hut', 'background_bottletree_barred'], 0.22, 588, 560, 200, 100, { tint: 0xa09078 })] },
+    { f: 0.35, items: [...bottle(0.11, 592, 1100, 600, 'treetop_noflowers_3', { tint: 0xc0b090 })] },
+  ],
+  stand: [
+    ...standBottle('gold', 'bottletree_burb_wndw_2', 0.21, 84, 150),
+    ...standPot('pot-a', 0.2, 50, 258),
+    ...standHut('hut-a', 'background_bottletree_barred', 0.28, 106, 336),
+    stand('firebean_1', 0.26, 62, 292, { group: 'hut-a' }),
+    stand('stone_moss_group_3', 0.34, 24, 400, { group: 'stone' }),
+    ...standBottle('squat', 'bottletree_body5_face', 0.19, 70, 500, { top: 'treetop_noflowers_3', topScale: 0.8 }),
+    stand('mushrooms', 0.26, 34, 580, { group: 'squat' }),
+    ...standWalker('giant', 'bottletree_body3', 0.2, 72, 706),
+    ...standLedges('ledge', 46, 820, { plant: 'mushrooms', plantScale: 0.24 }),
+    ...standHut('hut-b', 'background_bottletree_hut', 0.28, 108, 1190),
+    stand('firebean_2', 0.24, 56, 1256, { group: 'hut-b' }),
+    ...standPot('pot-b', 0.22, 44, 1330),
+    stand('stone_moss_group_1', 0.32, 22, 1410, { group: 'stone-b' }),
+  ],
+  tufts: [
+    ...yardTufts('grass_solid', 0.8),
+    ...scatter('bug', [['underground_plant_1', 0.5, 66, 560, 240], ['mushrooms', 0.22, 28, 700, 80]]),
   ],
   near: [
     { s: 'grass_solid', scale: 0.6, every: 240, jitter: 100, tint: 0xa8b078 },
@@ -1699,7 +1847,7 @@ const PERFUS_PREFERENCE_YARD = {
     { s: 'firebean_2', scale: 0.26, every: 760, jitter: 240, offset: 420 },
   ],
   trim: ['firebean_1', 'grass_solid', 'underground_plant_1'],
-};
+});
 
 /**
  * The purchase looks (js/homes.js HOME_STYLES, picked in the tutorial or at the

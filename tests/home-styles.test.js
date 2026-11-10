@@ -32,7 +32,7 @@ import {
   styleChoices,
   styleSwitchCost,
   switchStreetStyle,
-} from '../public/js/home-styles.js?v=5b49a731';
+} from '../public/js/home-styles.js?v=13fe0aaa';
 import { HOME_STYLES } from '../public/js/homes.js?v=631ab6b8';
 import { templateNames, templatePair } from '../tools/home-styles/build.mjs';
 
@@ -46,6 +46,9 @@ function gsjsStyles() {
   // eslint-disable-next-line no-new-func
   return new Function(`${src}; return { homes_interior_configs, homes_exterior_configs };`)();
 }
+
+/** What stands in a look's field (near rows with `inField`, G616): trunks, legs, ledges, baskets. */
+const standing = (look) => look.near.filter((row) => Number.isFinite(row.inField));
 
 /** G223 lane yards2: the next sixteen yards by distance from Glitch E's 2012-05-21 snaps (reference only), and pieces each must show. */
 const NEXT_SNAP_YARDS = {
@@ -282,7 +285,8 @@ describe('composed styles (tools/home-styles/build.mjs)', () => {
       assert.match(row.ref, ref, label);
       assert.deepEqual(yardLook(key), row.look, `${label}: its own composition`);
       assert.notDeepEqual(yardLook(key), streetLook(row.lookOf), `${label}: no longer its street's look`);
-      const names = new Set(row.look.layers.flatMap((l) => (l.items || []).flatMap((it) => [it.s, ...(it.alts || []).map((a) => a.s)])));
+      // On a backdrop layer, or standing in the yard's field (G616: the Firebog yards' giants, tests/home-field-standing.test.js).
+      const names = new Set([...row.look.layers.flatMap((l) => l.items || []), ...standing(row.look)].flatMap((it) => [it.s, ...(it.alts || []).map((a) => a.s)]));
       for (const piece of pieces) assert.ok(names.has(piece), `${label}: ${piece}`);
       // Every piece is a shipped CC0 deco (build.mjs refuses one that is not). Hanging pieces start at y + YARD_LIFT (60) and must
       // reach below world y 340, past the top of the yard the camera shows at Original zoom (world 312 on a 760 px window).
@@ -292,7 +296,8 @@ describe('composed styles (tools/home-styles/build.mjs)', () => {
     }
     // The walking bottletrees keep their legs, body and treetop together (no jitter on any part).
     for (const key of ['firebog_1_hor_high', 'firebog_int_2__high']) {
-      const parts = YARD_STYLE_BY_KEY[key].look.layers.flatMap((l) => l.items || []).filter((it) => /^(legs_|bottletree_body|treetop_)/.test(it.s));
+      const look = YARD_STYLE_BY_KEY[key].look;
+      const parts = [...look.layers.flatMap((l) => l.items || []), ...standing(look)].filter((it) => /^(legs_|bottletree_body|treetop_)/.test(it.s));
       assert.ok(parts.length >= 4);
       for (const it of parts) assert.equal(it.jitter, 0, `${key}: ${it.s}`);
     }
@@ -307,7 +312,7 @@ describe('composed styles (tools/home-styles/build.mjs)', () => {
       assert.deepEqual(yardLook(key), row.look, `${label}: its own composition`);
       assert.notDeepEqual(yardLook(key), streetLook(row.lookOf), `${label}: no longer its street's look`);
       const items = row.look.layers.flatMap((l) => l.items || []);
-      const names = new Set(items.flatMap((it) => [it.s, ...(it.alts || []).map((a) => a.s)]));
+      const names = new Set([...items, ...standing(row.look)].flatMap((it) => [it.s, ...(it.alts || []).map((a) => a.s)]));
       for (const piece of pieces) assert.ok(names.has(piece), `${label}: ${piece}`);
       // Roots and vines hanging from the top reach into the view at Original zoom (world 312, see the last test).
       for (const it of items) if (it.hang) assert.ok(it.y + 60 + it.h * it.scale > 340, `${label}: ${it.s} hangs into view`);
@@ -322,7 +327,8 @@ describe('composed styles (tools/home-styles/build.mjs)', () => {
     }
     // Walking bottletrees keep their legs, body and treetop together.
     for (const key of ['firebog_int_1b__high', 'firebog_int_3_hor_high', 'firebog_int_4_hor_high']) {
-      const parts = YARD_STYLE_BY_KEY[key].look.layers.flatMap((l) => l.items || []).filter((it) => /^(legs_(back|front)|bottletree_body|treetop_)/.test(it.s));
+      const look = YARD_STYLE_BY_KEY[key].look;
+      const parts = [...look.layers.flatMap((l) => l.items || []), ...standing(look)].filter((it) => /^(legs_(back|front)|bottletree_body|treetop_)/.test(it.s));
       assert.ok(parts.length >= 4, key);
       for (const it of parts) assert.equal(it.jitter, 0, `${key}: ${it.s}`);
     }

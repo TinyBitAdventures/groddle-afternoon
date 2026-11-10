@@ -8,7 +8,9 @@
  * The rule (homes-feature landscapeNearSpots, nearFeetY; tools/home-styles/recipes.mjs): a
  * `near` row with `inField` stands that many px behind the walk line, inside the field, drawn
  * behind the house and everything on the street; it is counted from the house lot outward, so
- * it stays put when the yard grows. The six Firebog exterior styles are laid out this way.
+ * it stays put when the yard grows. The six Firebog exterior styles are laid out this way, and so
+ * are the five Firebog back yards with a look of their own (Arid Boglands, Glaring Muddle,
+ * Faithful Fen, Unkempt Crypt, Perfus Preference), each from its own snap.
  */
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
@@ -16,7 +18,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { HOME_LIMITS } from '../public/js/homes-catalog.js?v=10ac34b6';
 import { createCultivationState, homeStreetLayout } from '../public/js/home-cultivation.js?v=9571e110';
-import { EXTERIOR_STYLES, streetLook, yardLook } from '../public/js/home-styles.js?v=5b49a731';
+import { EXTERIOR_STYLES, INTERIOR_STYLES, streetLook, yardLook } from '../public/js/home-styles.js?v=13fe0aaa';
 import {
   FIELD_DEPTH,
   fieldDepth,
@@ -24,7 +26,7 @@ import {
   nearFeetY,
   streetNearSkip,
   towerDoorway,
-} from '../public/js/features/homes-feature.js?v=6f689019';
+} from '../public/js/features/homes-feature.js?v=6f903b44';
 
 const read = (rel) => readFileSync(join(import.meta.dirname, '..', 'public', 'js', rel), 'utf8');
 const FIREBOG = ['firebog_1_high', 'firebog_1b_high', 'firebog_3_high', 'firebog_4_high', 'firebog_2_high', 'firebog_4a_high'];
@@ -152,6 +154,152 @@ describe('the Firebog home streets stand on their ground (G616)', () => {
     const big = spots.filter((s) => s.back != null && BIG.test(s.row.s));
     assert.ok(big.length >= 3, `${big.length} big pieces in the yard`);
     assert.ok(big.every((s) => s.x < width), 'all left of the house');
+  });
+});
+
+/**
+ * G616 follow-up: the five Firebog back yards drawn from their own snaps (reference only). Each
+ * first stood its giant walkers on a backdrop layer at the field's back edge; they stand in the
+ * field now, among the ledges, baskets, stones and grass its snap shows.
+ */
+const YARDS = {
+  firebog_1_hor_high: { label: 'Arid Boglands', street: 'firebog_1_high', shows: ['sprout', 'bottletree_face1', 'bottletree_burb_wndw_2'], fringe: ['grass_solid', 'sprout'] },
+  firebog_int_1b__high: { label: 'Glaring Muddle', street: 'firebog_1b_high', shows: ['legs_moss_2', 'sprout', 'bottletree_face1'], fringe: ['grass_solid', 'sprout', 'underground_plant_1'] },
+  firebog_int_2__high: { label: 'Faithful Fen', street: 'firebog_2_high', shows: ['background_bottletree_hut', 'firebean_1', 'stone_moss_group_3'], fringe: ['grass_solid', 'firebean_2', 'flower_bush_7'] },
+  firebog_int_3_hor_high: { label: 'Unkempt Crypt', street: 'firebog_3_high', shows: ['legs_moss_2', 'bottletree_body5_face', 'sprout'], fringe: ['grass_solid', 'underground_plant_1', 'mushrooms'] },
+  firebog_int_4_hor_high: { label: 'Perfus Preference', street: 'firebog_4a_high', shows: ['background_bottletree_barred', 'bottletree_body5_face', 'mushrooms'], fringe: ['grass_solid', 'mushroom_amanita_1', 'firebean_2'] },
+};
+/** A back yard of `segments` 150 px segments: the house's left end is its right edge (homes-feature interiorBackground). */
+const yardSpots = (key, segments = HOME_LIMITS.START_BACKYARD_SEGMENTS) => {
+  const x0 = segments * 150;
+  const look = yardLook(key);
+  return { x0, look, spots: landscapeNearSpots(look, `yard:${key}`, x0 + 1400, (x) => x > x0 - 90, { lot: { left: x0, right: null } }) };
+};
+/** A trunk: a bottletree body, a whole small bottletree, or a bent root trunk. */
+const TRUNK = /^bottletree_(body|burb_wndw|city_wndw)|^background_bottletree_(hut|face|barred)$|^legs_moss_\d$/;
+
+describe('the five Firebog back yards with a look of their own stand on their ground (G616 follow-up)', () => {
+  it('each is still its own look, by its own name, and the Firebog ground under its own light', () => {
+    for (const [key, want] of Object.entries(YARDS)) {
+      const row = INTERIOR_STYLES.find((style) => style.key === key);
+      assert.equal(row.label, want.label);
+      assert.equal(row.lookOf, want.street, `${want.label}: its street`);
+      const look = yardLook(key);
+      assert.equal(look, row.look, `${want.label}: its own composition`);
+      assert.notDeepEqual(look, streetLook(want.street), `${want.label}: not its street's layout`);
+      assert.equal(look.field, lit(GROUND, look.nearTint ?? 0xffffff), `${want.label}: the ground decos sit in it without a seam`);
+      const rim = look.layers.at(-1);
+      assert.equal(rim.f, 1, `${want.label}: the rim moves with the ground`);
+      assert.equal(rim.tint, look.nearTint, `${want.label}: lit like the ground`);
+      for (const item of rim.items) {
+        assert.match(item.s, /^ground_generic_\d_spotless$/);
+        const over = 586 - (item.y - item.h * item.scale);
+        assert.ok(item.y > 586 + 20 && over > 12 && over < 60, `${want.label} ${item.s}: ${Math.round(over)} px over the edge`);
+      }
+    }
+  });
+
+  it('the first yard a new house has (5 segments) already shows a giant, another trunk, a ledge or a basket, and grass', () => {
+    for (const [key, want] of Object.entries(YARDS)) {
+      const { x0, look, spots } = yardSpots(key);
+      const inField = spots.filter((s) => s.back != null);
+      assert.ok(inField.every((s) => s.x <= x0 - 90), `${want.label}: all left of the way into the house`);
+      const seen = inField.filter((s) => s.x + s.half > 0);
+      const trunks = seen.filter((s) => TRUNK.test(s.row.s));
+      assert.ok(trunks.length >= 2, `${want.label}: ${trunks.length} trunks`);
+      // a giant: a trunk at least twice the avatar's 115 px, or one up on its root legs
+      assert.ok(trunks.some((s) => s.row.h * s.row.scale + (s.item.on || 0) >= 230), `${want.label}: a giant`);
+      assert.ok(seen.some((s) => /^legs_(front|back)_set/.test(s.row.s)), `${want.label}: root legs in the ground`);
+      assert.ok(seen.some((s) => /^front_ground_|^sprout$|^ground_rootpipe/.test(s.row.s)), `${want.label}: a ledge or a basket`);
+      assert.ok(seen.filter((s) => /^grass_solid/.test(s.row.s)).length >= 4, `${want.label}: grass through the field`);
+      assert.ok(seen.filter((s) => s.row.s === 'shadow').length >= 2, `${want.label}: the giant and the baskets on their shadows`);
+      for (const piece of want.shows) assert.ok(look.near.some((row) => row.s === piece && Number.isFinite(row.inField)), `${want.label}: ${piece} from its snap`);
+    }
+  });
+
+  it('every piece in a yard\'s field has its feet inside it, and a raised piece belongs to something on the ground', () => {
+    let checked = 0;
+    for (const [key, want] of Object.entries(YARDS)) {
+      const look = yardLook(key);
+      const depth = fieldDepth(look);
+      const rows = look.near.filter((row) => Number.isFinite(row.inField));
+      for (const row of rows) {
+        checked += 1;
+        assert.ok(row.inField >= 0 && row.inField <= depth, `${want.label} ${row.s}: inField ${row.inField} within the ${depth} px field`);
+        assert.ok(row.every > 0, `${want.label} ${row.s}: comes again on a long yard`);
+        assert.notEqual(row.side, 'right', `${want.label} ${row.s}: a back yard has only a left`);
+        const feet = nearFeetY(row, 680, depth);
+        if (row.on > 0) {
+          const others = rows.filter((other) => other.group === row.group && other !== row && other.s !== 'shadow');
+          assert.ok(row.group && others.some((other) => !(other.on > 0)), `${want.label} ${row.s}: raised ${row.on} px with nothing on the ground under it`);
+          const tallest = Math.max(...others.map((other) => other.inField + (other.on || 0) + other.h * other.scale));
+          assert.ok(row.inField + row.on <= tallest + 8, `${want.label} ${row.s}: raised ${row.on} px, above its ${row.group}`);
+        } else {
+          assert.ok(feet >= 680 - depth && feet <= 680 + 22, `${want.label} ${row.s}: feet at ${feet}`);
+        }
+      }
+    }
+    assert.ok(checked > 150, `checked ${checked} rows`);
+  });
+
+  it('no backdrop layer carries a near giant any more, and the far layers stay on the horizon', () => {
+    for (const [key, want] of Object.entries(YARDS)) {
+      const look = yardLook(key);
+      for (const layer of look.layers) {
+        for (const item of layer.items || []) {
+          if (item.hang || /^(clouds|treetop_)/.test(item.s)) continue;
+          assert.ok(item.y >= 586 - 90, `${want.label} ${item.s}: its foot at y ${item.y}`);
+          if (layer.f === 1) continue;
+          // What is left on the backdrop is far off: it slides at under half the ground's pace, stands at
+          // the field's back edge (behind the rim) and is small. The giants that slid at 0.45 to 0.55 are gone.
+          assert.ok(layer.f < 0.45, `${want.label} ${item.s}: on the f ${layer.f} layer`);
+          assert.ok(item.y <= 586 + 8, `${want.label} ${item.s}: stands in the field's band at y ${item.y}, on a layer that slides`);
+          if (/^(bottletree_body|legs_)/.test(item.s)) assert.ok(item.scale <= 0.22, `${want.label} ${item.s}: far, so small (${item.scale})`);
+        }
+      }
+    }
+  });
+
+  it('the front grass and plants of each yard are the rows they were', () => {
+    for (const [key, want] of Object.entries(YARDS)) {
+      const fringe = yardLook(key).near.filter((row) => !Number.isFinite(row.inField));
+      assert.deepEqual(fringe.map((row) => row.s), want.fringe, want.label);
+      for (const row of fringe) assert.ok(row.every > 0 && row.jitter > 0 && row.group == null && row.side == null, `${want.label} ${row.s}`);
+    }
+  });
+
+  it('they are drawn back to front, then the front fringe, and what stands by the house stays when the yard grows', () => {
+    const max = HOME_LIMITS.MAX_BACKYARD_SEGMENTS;
+    for (const [key, want] of Object.entries(YARDS)) {
+      const small = yardSpots(key);
+      const grown = yardSpots(key, max);
+      for (const { spots } of [small, grown]) {
+        const firstFringe = spots.findIndex((s) => s.back == null);
+        assert.ok(firstFringe > 0);
+        assert.ok(spots.slice(firstFringe).every((s) => s.back == null), `${want.label}: the fringe is drawn last`);
+        for (let i = 1; i < firstFringe; i += 1) assert.ok(spots[i].back <= spots[i - 1].back, `${want.label}: ${spots[i].row.s} behind ${spots[i - 1].row.s}`);
+      }
+      // everything standing within the first yard's width of the house is the same on the full yard
+      const byHouse = ({ x0, spots }) => spots
+        .filter((s) => s.back != null && !s.item.jitter && x0 - s.x < 600)
+        .map((s) => `${Math.round(x0 - s.x)}:${s.row.s}:${s.back}:${s.flip}`)
+        .sort();
+      assert.ok(byHouse(small).length >= 10, `${want.label}: ${byHouse(small).length} fixed pieces by the house`);
+      assert.deepEqual(byHouse(grown), byHouse(small), want.label);
+      // and the full 20-segment yard holds the composition twice over, whole groups only
+      const trunks = (list) => list.spots.filter((s) => TRUNK.test(s.row.s) && s.back != null).length;
+      assert.ok(trunks(grown) >= trunks(small) + 4, `${want.label}: ${trunks(grown)} trunks on the full yard`);
+    }
+  });
+
+  it('every other yard with a look of its own is laid out as it always was (nothing of theirs stands in the field)', () => {
+    let checked = 0;
+    for (const row of INTERIOR_STYLES.filter((style) => style.look && !YARDS[style.key])) {
+      assert.ok(row.look.near.every((item) => !Number.isFinite(item.inField) && item.group == null), row.label);
+      assert.ok(row.look.layers.every((layer) => layer.f !== 1), `${row.label}: no rim`);
+      checked += 1;
+    }
+    assert.ok(checked >= 18, `checked ${checked} other yards`);
   });
 });
 
