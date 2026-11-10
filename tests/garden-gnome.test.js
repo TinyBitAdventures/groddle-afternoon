@@ -36,12 +36,12 @@ import {
   tickGnome,
   visitGnomePlace,
 } from '../public/js/garden-gnome.js?v=a316da65';
-import { gardenGnomeFeature as feature } from '../public/js/features/garden-gnome-feature.js?v=262aa3f6';
+import { gardenGnomeFeature as feature } from '../public/js/features/garden-gnome-feature.js?v=79b00ad2';
 import { worldArtFor } from '../public/js/world-art.js?v=df476660';
 import { GNOME_ART, GNOME_ART_DIR } from '../public/js/garden-gnome-art.js?v=994b7c76';
 import { HOME_STREET_TSID } from '../public/js/homes.js?v=631ab6b8';
 import { normalizeHomeView, readVisitScene } from '../public/js/neighbours-mp.js?v=38cc03d8';
-import { neighboursMpFeature } from '../public/js/features/neighbours-mp-feature.js?v=045487db';
+import { neighboursMpFeature } from '../public/js/features/neighbours-mp-feature.js?v=76b63950';
 import { HAS_SITE, SITE_DIR, sitePath } from '../tools/repos.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');

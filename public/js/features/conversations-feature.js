@@ -224,6 +224,14 @@ function isIcon(target) {
   return String(target?.classId || '').startsWith('icon_');
 }
 
+/**
+ * A Chicken's collision is its scare feature's (features/chicken-scare-feature.js): the offer
+ * comes first there too, and takes the collision (npc_chicken.js onPlayerCollision 1320-1326).
+ */
+function ownCollision(target) {
+  return isIcon(target) || target?.classId === 'npc_chicken';
+}
+
 /** One teller's onPlayerCollision offer; true when it offered and called out. */
 function collide(engine, target, now, busy) {
   const cls = tellerClass(target);
@@ -252,7 +260,7 @@ function scanOffers(engine, now) {
   if (!engine.player || active) return;
   const busy = engine.busy?.() || engine.transientInstance?.();
   for (const target of engine.interactables || []) {
-    if (isIcon(target)) continue;
+    if (ownCollision(target)) continue;
     if (collide(engine, target, now, busy)) return;
   }
 }
@@ -537,9 +545,11 @@ export const conversationsFeature = {
    * A placed Icon's onPlayerCollision (items/include/icon.js 565-575) runs
    * through its feature every tick: the conversation offer comes first, and
    * true (it offered) means no bestowment on that collision. null otherwise.
+   * A Chicken's the same (npc_chicken.js 1320-1326): true means no scare on
+   * that collision (features/chicken-scare-feature.js).
    */
   tellerCollision(target, engine) {
-    if (!isIcon(target) || !engine?.player || active) return null;
+    if (!ownCollision(target) || !engine?.player || active) return null;
     const busy = engine.busy?.() || engine.transientInstance?.();
     return collide(engine, target, Date.now(), busy) ? true : null;
   },

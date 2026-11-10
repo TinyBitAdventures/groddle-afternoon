@@ -54,7 +54,7 @@
  */
 
 import { slugsFromEffects } from '../speech-slugs.js?v=130338f9';
-import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=10b5626e';
+import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=c57ef43e';
 import { nearestSurfaceY } from '../walk-surface.js?v=106bfdc5';
 import { displayTopOf, itemstackOverlayPoint, playSheetOverlay } from '../overlay-art.js?v=75c3ea34';
 import { SET_FREE, applySetFree, canSetFree, setFreeGoneLine, setFreePrompt } from '../animal-set-free.js?v=3b194fca';
@@ -111,7 +111,7 @@ import { batterflyBaseY, batterflyResponseFor, flightFloorFor } from '../street-
 import { loseEnergy, shiftMetabolic } from '../metabolics.js?v=8504134e';
 import { textureFromUrl } from '../textures.js?v=f024bd6a';
 import { PIGGY_DEATH_DROPS, PIGGY_DEATH_PUFF, SAD_BABY, forcedRoll, isSadIn } from '../animal-mood.js?v=a49495fc';
-import { animalCrowdChanged, animalCrowdSad, animalPlaceIsDepressing, crowdLimit, smokePuff as sharedSmokePuff } from './animal-mood-feature.js?v=8025a944';
+import { animalCrowdChanged, animalCrowdSad, animalPlaceIsDepressing, crowdLimit, smokePuff as sharedSmokePuff } from './animal-mood-feature.js?v=935ea6a8';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
 import { followYardPath, freeYardSpot } from '../yard-wander.js?v=06a15d38';
@@ -553,7 +553,8 @@ function stepExtra(engine, entity, dtMs) {
   if (!spr || spr.destroyed) return;
   // The animal-mood feature walks a hungry piggy to food and holds a sad one; then it walks back
   // onto its own path (followYardPath), so _moodRebase has nothing left to move.
-  if (spr._moodHold) {
+  // Scared into the air (features/chicken-scare-feature.js), it is the flight's until it has landed.
+  if (spr._moodHold || spr._scareFlight) {
     entity.row.x = Math.round(spr.x);
     return;
   }
@@ -1746,6 +1747,15 @@ export const animalHusbandryFeature = {
   placementGroups(population, street) {
     if (!street?.tsid) return [];
     return batterflyPlacementGroups(street);
+  },
+
+  /**
+   * A Chicken of yours bound to a Magic Chicken Stick (npc_chicken.js move_limits): scared, its
+   * kick is smaller so it stays near the stick (fly 872-876; features/chicken-scare-feature.js).
+   */
+  chickenStickBound(target, engine) {
+    if (target?.classId !== 'npc_chicken' || !extras.some((e) => e.target === target)) return null;
+    return stickFor(engine, 'npc_chicken') ? true : null;
   },
 
   onStreetEnter() {
