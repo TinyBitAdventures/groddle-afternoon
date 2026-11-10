@@ -125,15 +125,34 @@ export function levelRing(info) {
   };
 }
 
-/** Favor with a Giant: the number and its tooltip, or null without a Giant. */
+/** The favor display's mark on a street with no Giant: Tiny Speck's favor star (glitch-client graphics/slug_favor_pos.png). */
+export const FAVOR_NEUTRAL_ICON = 'assets/classic/slug_favor_pos.webp';
+
+/**
+ * The favor display: the number and its tooltip, or null when it hides.
+ * It shows whenever any Giant has favor (`favor.any`; report #170, G631), so the Favor with the
+ * Giants panel can be opened from every street: the street's Giant and its favor, 0 included,
+ * or on a street with no Giant the favor star alone, with no number (`neutral`).
+ * With no favor anywhere it hides (it would only say 0, and the panel would be all zeros).
+ */
 export function favorChip(favor) {
-  if (!favor?.name) return null;
-  const points = whole(favor.points);
-  // No favor yet: the chip waits for the first donation or reward (it would only say 0).
-  if (points <= 0) return null;
+  if (!favor) return null;
+  const points = favor.name ? whole(favor.points) : 0;
+  const any = 'any' in favor ? Boolean(favor.any) : points > 0;
+  if (!any && points <= 0) return null;
+  if (!favor.name) {
+    return {
+      num: '',
+      neutral: true,
+      tip: 'Favor with the Giants',
+      sub: 'No Giant has a shrine on this street',
+      label: 'Favor with the Giants. No Giant has a shrine on this street',
+    };
+  }
   const target = whole(favor.target);
   return {
     num: fmt(points),
+    neutral: false,
     tip: `Favor with ${favor.name}`,
     sub: target > 0 ? `${fmt(points)} of ${fmt(target)} for an emblem` : '',
     label: `Favor with ${favor.name}: ${fmt(points)}${target > 0 ? ` of ${fmt(target)}` : ''}`,
@@ -255,8 +274,12 @@ export function renderTopBar(doc, state = {}) {
       setAttr(chip, 'data-tip', f.tip);
       setAttr(chip, 'data-sub', f.sub);
       setAttr(chip, 'aria-label', f.label);
+      // No Giant on this street: the favor star alone, no number (G631).
+      if (f.neutral) setAttr(chip, 'data-neutral', '');
+      else if (chip.hasAttribute?.('data-neutral')) chip.removeAttribute('data-neutral');
       const img = chip.querySelector('img');
-      if (img && state.favor.icon && img.getAttribute('src') !== state.favor.icon) img.setAttribute('src', state.favor.icon);
+      const icon = f.neutral ? FAVOR_NEUTRAL_ICON : state.favor.icon;
+      if (img && icon && img.getAttribute('src') !== icon) img.setAttribute('src', icon);
     }
   }
   // The open favor panel follows the game (a donation, an emblem claimed); it closes with its chip.

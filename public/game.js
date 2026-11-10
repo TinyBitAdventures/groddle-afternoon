@@ -968,7 +968,7 @@ import { installHiresIcons } from './js/icon-hires.js?v=165dbd6e';
 import { installHiresDecos } from './js/deco-hires.js?v=9877af94';
 import { loadAudioLevels, loadMutedPreference, saveAudioLevel, saveMutedPreference } from './js/audio-pref.js?v=6fe817bc';
 import { createAudioBuses, fadeGain } from './js/audio-buses.js?v=af167b54';
-import { installTopBar, renderTopBar } from './js/ui/topbar.js?v=e606f7e1';
+import { installTopBar, renderTopBar } from './js/ui/topbar.js?v=e0363197';
 import { focusBack, installFocusReturn, lastInput } from './js/ui/focus-return.js?v=da190597';
 import { installContextGuard } from './js/ui/context-guard.js?v=0f71ac17';
 import { QUOIN_FRAME_BOB, advanceQuoinClock, quoinBobBetweenFrames } from './js/quoin-motion.js?v=ea0bd408';
@@ -6147,8 +6147,10 @@ function updateHud() {
   }
   // The top bar's rings (js/ui/topbar.js): energy and mood with their states (g458, js/vitals.js:
   // amber under 20%, red with a slow pulse under 10%, said in words too), the level, and favor
-  // with the street's Giant.
+  // with the street's Giant. The favor display shows whenever any Giant has favor (G631), so its
+  // panel opens on every street; with no Giant here it is the favor star alone.
   const favorGiant = currentStreet ? giantForStreet(currentStreet) : null;
+  const favorAny = Object.values(shrineState.favor || {}).some((points) => Number(points) > 0);
   renderTopBar(document, {
     energy: [pc.energy, energyCap()],
     mood: [pc.mood, moodMax(pc)],
@@ -6158,7 +6160,8 @@ function updateHud() {
       points: shrineState.favor?.[favorGiant.id] || 0,
       target: emblemCostFor(shrineState, favorGiant.id),
       icon: `assets/sprites/giant-icons/icon_${favorGiant.id === 'ti' ? 'tii' : favorGiant.id}.webp`,
-    } : null,
+      any: favorAny,
+    } : { name: '', any: favorAny },
   });
   refreshVitalsMenu();
 

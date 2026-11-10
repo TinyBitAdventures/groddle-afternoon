@@ -2,12 +2,13 @@
 // rings, key caps, Menu groups and Sound popover over the game's real values and its existing ids.
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import {
   MENU_GROUPS,
   MENU_ROWS,
   TOP_OVERFLOW_STEPS,
+  FAVOR_NEUTRAL_ICON,
   favorChip,
   favorRowText,
   levelRing,
@@ -20,7 +21,7 @@ import {
   vitalRing,
   volumeLevel,
   soundChannelToggle,
-} from '../public/js/ui/topbar.js?v=e606f7e1';
+} from '../public/js/ui/topbar.js?v=e0363197';
 
 import { GIANTS, canClaimEmblem, createShrineState, emblemCostFor, favorPanelRows } from '../public/js/shrines.js?v=a36da400';
 
@@ -260,3 +261,45 @@ describe('the favor panel (report #170): all eleven Giants from the favor displa
     assert.match(read('style.css'), /\[data-ui="modern"\] \.favor-pop \{ width: 300px;/);
   });
 });
+describe('the favor display shows whenever any Giant has favor (report #170, G631)', () => {
+  const topbar = read('js/ui/topbar.js');
+  const game = read('game.js');
+
+  it('hides only when no Giant has any favor', () => {
+    assert.equal(favorChip({ name: 'Spriggan', points: 0, target: 1000, any: false }), null);
+    assert.equal(favorChip({ name: '', any: false }), null);
+    assert.equal(favorChip(null), null);
+  });
+
+  it("the street's Giant shows with its favor, 0 included, when another Giant has some", () => {
+    const zero = favorChip({ name: 'Spriggan', points: 0, target: 1000, any: true });
+    assert.deepEqual([zero.num, zero.neutral, zero.tip, zero.sub], ['0', false, 'Favor with Spriggan', '0 of 1,000 for an emblem']);
+    assert.equal(zero.label, 'Favor with Spriggan: 0 of 1,000');
+    const some = favorChip({ name: 'Lem', points: 37, target: 1100, any: true });
+    assert.deepEqual([some.num, some.tip, some.sub, some.label], ['37', 'Favor with Lem', '37 of 1,100 for an emblem', 'Favor with Lem: 37 of 1,100']);
+  });
+
+  it('with no Giant on the street: the favor star alone, no number, and words that say so', () => {
+    const none = favorChip({ name: '', any: true });
+    assert.deepEqual([none.num, none.neutral, none.tip, none.sub], ['', true, 'Favor with the Giants', 'No Giant has a shrine on this street']);
+    assert.equal(none.label, 'Favor with the Giants. No Giant has a shrine on this street');
+    assert.equal(FAVOR_NEUTRAL_ICON, 'assets/classic/slug_favor_pos.webp');
+    assert.ok(existsSync(join(pub, FAVOR_NEUTRAL_ICON)), 'Tiny Speck\'s favor star ships');
+    assert.match(topbar, /if \(f\.neutral\) setAttr\(chip, 'data-neutral', ''\);/);
+    assert.match(topbar, /const icon = f\.neutral \? FAVOR_NEUTRAL_ICON : state\.favor\.icon;/);
+    const css = read('style.css');
+    assert.match(css, /\[data-ui="modern"\] \.top-bar #favor-stat\[data-neutral\] strong \{ display: none; \}/);
+  });
+
+  it('the game says whether any Giant has favor, with or without a Giant here', () => {
+    assert.match(game, /const favorAny = Object\.values\(shrineState\.favor \|\| \{\}\)\.some\(\(points\) => Number\(points\) > 0\);/);
+    assert.match(game, /any: favorAny,\n\s+\} : \{ name: '', any: favorAny \},/);
+  });
+
+  it('still hidden under 1,100 px wide and in Classic', () => {
+    const css = read('style.css');
+    assert.match(css, /@media \(max-width: 1100px\) \{[^}]*\}\s*\[data-ui="modern"\] \.top-bar \.hud-favor,\s*\[data-ui="modern"\] \.top-bar \.quoin-stat \{ display: none; \}/);
+    assert.match(read('css/classic.css'), /:root\[data-ui="classic"\] \.top-bar #favor-stat,/);
+  });
+});
+
