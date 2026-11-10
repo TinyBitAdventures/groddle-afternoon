@@ -22,7 +22,7 @@ import {
   penumbraStreet,
   windowOrbs,
 } from '../public/js/penumbra.js?v=f6f7176e';
-import { autoplaySteps, normalizePuzzleData, quoinsInReach, stepTriggers } from '../public/js/puzzle-triggers.js?v=b341f855';
+import { autoplaySteps, normalizePuzzleData, quoinsInReach, stepTriggers } from '../public/js/puzzle-triggers.js?v=44eec9ea';
 import { createEventRuntime, dueEventTimers, runLocationEvent } from '../public/js/location-events.js?v=05663361';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');

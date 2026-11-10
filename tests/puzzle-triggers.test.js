@@ -15,7 +15,7 @@ import {
   rewardBits,
   stepTriggers,
   triggerHit,
-} from '../public/js/puzzle-triggers.js?v=b341f855';
+} from '../public/js/puzzle-triggers.js?v=44eec9ea';
 import {
   createEventRuntime,
   dueEventTimers,

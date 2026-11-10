@@ -174,13 +174,71 @@ export function rewardBits(r) {
   return bits;
 }
 
-/** Saved slice: { completed: { tsid: n }, best: { tsid: ms }, returnTo }. */
+/**
+ * The Map card's way back (register G618, report #162; Austin 2026-11-10: "Leaving Piano Party
+ * after arriving by the card returns you to where you were, like the colour streets. Walking in
+ * stays as it is."). The colour streets send a player back from their exit door. Piano Party is
+ * a real street the player stays on after the moon (exit.stay), in a hub far from anywhere, so
+ * the card remembers which puzzle street it sent the player to (returnTo.card) and the name of
+ * the street it took them from (returnTo.name), and on such a street the Map's card offers the
+ * way back. A player who walked in carries no mark for the street and is offered nothing.
+ * The card and its words are the remake's own (the original had no Map card).
+ */
+export const CARD_RETURN_TEXT = Object.freeze({
+  button: (name) => (name ? `Back to ${name}` : 'Back to where you were'),
+  // The card sits in the Map's Shortcuts (js/map-extras.js), shut after a reload.
+  toast: (name) => `Open the Map's Shortcuts to head back to ${name || 'where you were'}.`,
+});
+
+/**
+ * The card is clicked: what to remember. `here` is the street the player stands on (its G key),
+ * `onPuzzle` whether that is a puzzle street or a private instance (never a place to return to),
+ * `dest` the puzzle street the card sends them to.
+ *   - from the world: remember here, marked for dest
+ *   - from a street the card itself brought them to: the first place stands, the mark moves on
+ *   - from a puzzle street they reached another way: nothing new, and no mark
+ */
+export function cardDeparture(returnTo, { here, tsid = here, onPuzzle = false, dest, x = 0, y = 0, name = '' } = {}) {
+  if (!onPuzzle) {
+    const out = { tsid, x: Math.round(num(x)), y: Math.round(num(y)), card: dest };
+    if (name) out.name = String(name).slice(0, 80);
+    return out;
+  }
+  if (!returnTo) return null;
+  if (returnTo.card === here) return { ...returnTo, card: dest };
+  const { card, ...rest } = returnTo;
+  return rest;
+}
+
+/**
+ * A street is entered (`tsid`, its G key): the return that still stands. Leaving the street the
+ * card sent the player to by another road (Piano Party's signposts, a teleport) ends a Piano
+ * Party return; a colour street's keeps its place for the exit door, as before, without the mark.
+ */
+export function cardArrival(returnTo, tsid, defs) {
+  if (!returnTo?.card || returnTo.card === tsid) return returnTo || null;
+  if (defs?.[returnTo.card]?.exit?.stay) return null;
+  const { card, ...rest } = returnTo;
+  return rest;
+}
+
+/** The way back the Map card offers on this street (`tsid`, its G key; `def` its entry), or null. */
+export function cardReturn(returnTo, def, tsid) {
+  if (!def?.exit?.stay || !returnTo?.card || returnTo.card !== tsid || returnTo.tsid === tsid) return null;
+  return returnTo;
+}
+
+/** Saved slice: { completed: { tsid: n }, best: { tsid: ms }, returnTo: { tsid, x, y, card?, name? } }. */
 export function normalizePuzzleSave(seed) {
   const out = { completed: {}, best: {}, returnTo: null };
   if (!seed || typeof seed !== 'object') return out;
   for (const [k, v] of Object.entries(seed.completed || {})) if (/^[GL][A-Z0-9]+$/.test(k) && num(v) > 0) out.completed[k] = Math.floor(num(v));
   for (const [k, v] of Object.entries(seed.best || {})) if (/^[GL][A-Z0-9]+$/.test(k) && num(v) > 0) out.best[k] = Math.round(num(v));
   const r = seed.returnTo;
-  if (r && typeof r.tsid === 'string') out.returnTo = { tsid: r.tsid, x: num(r.x), y: num(r.y) };
+  if (r && typeof r.tsid === 'string') {
+    out.returnTo = { tsid: r.tsid, x: num(r.x), y: num(r.y) };
+    if (typeof r.card === 'string' && /^[GL][A-Z0-9]+$/.test(r.card)) out.returnTo.card = r.card;
+    if (typeof r.name === 'string' && r.name.trim()) out.returnTo.name = r.name.trim().slice(0, 80);
+  }
   return out;
 }

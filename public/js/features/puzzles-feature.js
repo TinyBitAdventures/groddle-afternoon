@@ -16,6 +16,11 @@
  * route (collected through the normal quoin economy and daily limit), pit
  * recovery to the last ledge passed, the exit door as the finish line (first
  * finish pays the colour-level reward), and a Map card to reach the levels.
+ * The colour levels' exit door returns the player to where the card took them
+ * from. Piano Party has no door and is a real street far from anywhere, so
+ * after a card arrival (and only then) the card shows "Back to <street>"
+ * there, which does the same; its two signposts still lead on, and leaving by
+ * one forgets the return (register G618; rules in js/puzzle-triggers.js).
  *
  * A trigger with `verb` is an item the player clicks rather than walks into:
  * Shim Shiri's six Light Beams (items/light_beam.js beam_up "Beam Up", key e,
@@ -38,15 +43,21 @@
  * &puzzlex=&puzzley= start elsewhere; &puzzleend=x,y moves the avatar there
  * after the last step (framing a result). Canvas data: puzzleStreet,
  * puzzleStrict, puzzleTriggers, puzzleFired, puzzleLast, puzzleQuoins,
- * puzzleRespawns, puzzleComplete, puzzleReward, puzzleDemo.
+ * puzzleRespawns, puzzleComplete, puzzleReward, puzzleDemo, puzzleReturn
+ * ("<street left>><street the card sent to>"), puzzleWayBack (1 while the
+ * card offers the way back here).
  */
 
 import { locationEventsApi } from './location-events-feature.js?v=0062e032';
 import { collectQuoin, QUOIN_SHEET, QUOIN_TYPES } from '../quoins.js?v=237c1d5d';
 import {
+  CARD_RETURN_TEXT,
   PUZZLE_DATA_URL,
   SOURCE_PHYSICS,
   autoplaySteps,
+  cardArrival,
+  cardDeparture,
+  cardReturn,
   completionReward,
   normalizePuzzleData,
   normalizePuzzleSave,
@@ -54,7 +65,7 @@ import {
   respawnPoint,
   rewardBits,
   stepTriggers,
-} from '../puzzle-triggers.js?v=b341f855';
+} from '../puzzle-triggers.js?v=44eec9ea';
 import { energyMax, metabolicGain, moodMax } from '../metabolics.js?v=8504134e';
 import { isLoaded, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js?v=f024bd6a';
 
@@ -670,10 +681,40 @@ function complete(engine) {
 /* Map card                                                            */
 /* ------------------------------------------------------------------ */
 
-function rememberReturn(engine) {
-  if (defFor(engine.streetTsid) || engine.transientInstance()) return;
+/** The card is clicked for `dest`: remember this street, marked for the street the card sends to (G618). */
+function rememberReturn(engine, dest) {
   const p = engine.player;
-  save.returnTo = { tsid: engine.streetTsid, x: Math.round(p?.x || 0), y: Math.round(p?.y || 0) };
+  save.returnTo = cardDeparture(save.returnTo, {
+    here: key(engine.streetTsid),
+    tsid: engine.streetTsid,
+    onPuzzle: Boolean(defFor(engine.streetTsid) || engine.transientInstance()),
+    dest: key(dest),
+    x: p?.x || 0,
+    y: p?.y || 0,
+    name: engine.street?.label || '',
+  });
+}
+
+/** The way back the card offers on this street: only on Piano Party, only after a card arrival (G618). */
+function wayBack(engine) {
+  const here = key(engine.streetTsid);
+  const back = cardReturn(save.returnTo, defFor(here), here);
+  return back && engine.streetExists(back.tsid) ? back : null;
+}
+
+/** Back to the street the card took the player from, at the spot they stood on. */
+function goBack(engine) {
+  const back = wayBack(engine);
+  if (!back) return false;
+  const gate = engine.travelGate(back.tsid);
+  if (gate && gate.ok === false) {
+    if (gate.msg) engine.toast(gate.msg);
+    return false;
+  }
+  save.returnTo = null;
+  engine.closeMap?.();
+  engine.enter(back.tsid, { spawnX: back.x, spawnY: back.y });
+  return true;
 }
 
 function travelTo(engine, tsid) {
@@ -684,7 +725,7 @@ function travelTo(engine, tsid) {
     if (gate.msg) engine.toast(gate.msg);
     return false;
   }
-  rememberReturn(engine);
+  rememberReturn(engine, tsid);
   engine.closeMap?.();
   engine.enter(tsid, def.start ? { spawnX: def.start.x, spawnY: def.start.y } : {});
   return true;
@@ -715,6 +756,19 @@ function buildMapCard(engine) {
     wrap.appendChild(b);
   }
   card.appendChild(wrap);
+  // G618: Piano Party has no exit door, so after a card arrival the card itself is the way back.
+  // The remake's own words (no source: the original had no Map card).
+  const back = wayBack(engine);
+  if (back) {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'puzzle-map-back';
+    b.textContent = CARD_RETURN_TEXT.button(back.name);
+    b.title = 'Return to the street the Map card took you from';
+    b.style.cssText = 'display:block;margin-top:8px;padding:4px 12px;border-radius:999px;border:1px solid #8f6fc9;background:#4b2f75;color:#fff;font-weight:700;cursor:pointer';
+    b.addEventListener('click', () => goBack(engine));
+    card.appendChild(b);
+  }
   return card;
 }
 
@@ -734,6 +788,10 @@ function publish(engine, now) {
   engine.setData('puzzleRespawns', run?.respawns || 0);
   engine.setData('puzzleGravity', run ? Number(locationEventsApi.gravity().toFixed(2)) : '');
   engine.setData('puzzleFlips', run?.flips || 0);
+  // G618: the remembered return ("<street>><card street>") and whether this street offers the way back.
+  const r = save.returnTo;
+  engine.setData('puzzleReturn', r ? `${r.tsid}>${r.card || ''}` : '');
+  engine.setData('puzzleWayBack', wayBack(engine) ? '1' : '0');
 }
 
 function demoStep(engine, now) {
@@ -855,15 +913,24 @@ export const puzzlesFeature = {
     if (!street || engine.homeContext?.().inHome) return;
     if (engine.transientInstance() && !engine.heldInstance?.()) return;
     const tsid = street.tsid;
+    // G618: a card return lasts only while the player stays on the street the card sent them to.
+    const settleReturn = () => {
+      if (!engine.transientInstance()) save.returnTo = cardArrival(save.returnTo, key(tsid), data);
+    };
     const setup = () => {
       const def = defFor(tsid);
       if (!def || !runsHere(engine, def) || key(engine.streetTsid) !== key(tsid) || run) return;
       startRun(engine, street, def);
+      const back = wayBack(engine);
+      if (back) engine.toast(CARD_RETURN_TEXT.toast(back.name), 5000);
     };
-    if (data) setup();
-    else {
+    if (data) {
+      settleReturn();
+      setup();
+    } else {
       load().then(() => {
         if (key(engine.streetTsid) !== key(tsid)) return;
+        settleReturn();
         // The street arrived before the trigger data: rerun its scripts strictly.
         const def = defFor(tsid);
         if (!runsHere(engine, def)) return;
