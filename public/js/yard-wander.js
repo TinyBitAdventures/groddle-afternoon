@@ -39,7 +39,7 @@
  */
 
 import { GAME_EPOCH_MS } from './game-day.js?v=edb00566';
-import { chickenPauseRoll, seededRandom } from './street-creatures.js?v=af15b057';
+import { chickenPauseRoll, seededRandom } from './street-creatures.js?v=d3fd3a3a';
 
 /** Speeds (px/s), pauses and windows per class. */
 export const YARD_WANDER = Object.freeze({
@@ -148,7 +148,7 @@ const planCache = new Map();
  * One animal's walk inside [left, right], as a round that repeats: YARD_LEGS legs, each to a random
  * place at least YARD_MIN_STEP on in its heading (turning round where there is no room) and a
  * pause, then back to where it began. Returns { ms, speed, offset, lift, phase, segs } with segs
- * { at, ms, x, tx, pose: 'walk'|'stand' } and speed in px/ms.
+ * { at, ms, x, tx, pose: 'walk'|'stand' } (a Chicken's stand also has idle: its state) and speed in px/ms.
  */
 export function yardPlan({ id = '', classId = 'npc_piggy', left = 0, right = 220 } = {}) {
   const key = `${classId}|${id}|${left}|${right}`;
@@ -177,8 +177,11 @@ export function yardPlan({ id = '', classId = 'npc_piggy', left = 0, right = 220
     segs.push({ at, ms: walk, x, tx: nx, pose: 'walk' });
     at += walk;
     x = nx;
-    const hold = pauseRoll(classId, rng);
-    segs.push({ at, ms: hold, x, tx: x, pose: 'stand' });
+    // A Chicken's pause keeps the state the same roll picked (npc_chicken.js pause_state_choices,
+    // js/chicken-idles.js); the numbers drawn, and so the walk, are what they were.
+    const roll = spec.pauses === 'chicken' ? chickenPauseRoll(rng) : null;
+    const hold = roll ? roll.holdMs : pauseRoll(classId, rng);
+    segs.push(roll ? { at, ms: hold, x, tx: x, pose: 'stand', idle: roll.pose } : { at, ms: hold, x, tx: x, pose: 'stand' });
     at += hold;
     // onPathing 1687-1692: at its place it turns round and sets off again.
     dir = -dir;
@@ -219,7 +222,13 @@ export function yardWanderAt(animal, t) {
   const walkSeg = seg.pose === 'walk' ? seg : plan.segs[i - 1] || seg;
   const dir = walkSeg.tx >= walkSeg.x ? 1 : -1;
   const bob = spec.bob ? Math.sin(((Number(t) || 0) / 1000) * 1.3 + plan.phase) * spec.bob : 0;
-  return { x, dir, pose: seg.pose, lift: plan.lift, bob, speed: plan.speed };
+  const at = { x, dir, pose: seg.pose, lift: plan.lift, bob, speed: plan.speed };
+  // A Chicken standing: which of the original's states, and how far into it.
+  if (seg.idle) {
+    at.idle = seg.idle;
+    at.poseMs = tc - seg.at;
+  }
+  return at;
 }
 
 /**
@@ -247,8 +256,9 @@ export function freeYardSpot(x, others = [], { gap = YARD_SPAWN_GAP, min = 60, m
  *   nowMs    the wall clock now, dtMs the frame
  *   held     a player is at it now (its menu open, a verb on it, its own action playing)
  *   groundAt (x, y) => the floor's y at x
- * Returns { x, y, dir, pose, moving } as drawn, and sets spr.x, spr.y and the facing (spr.scale.x,
- * walk art facing right: unflipped going right).
+ * Returns { x, y, dir, pose, moving } as drawn (and, for a Chicken standing on its path, idle and
+ * poseMs: its state and how far in), and sets spr.x, spr.y and the facing (spr.scale.x, walk art
+ * facing right: unflipped going right).
  */
 export function followYardPath(spr, drive, { animal, nowMs = Date.now(), dtMs = 16.67, held = false, groundAt = () => 0 } = {}) {
   const linger = YARD_LINGER_MS[animal.classId] || 2000;
@@ -286,5 +296,10 @@ export function followYardPath(spr, drive, { animal, nowMs = Date.now(), dtMs = 
   spr.x = x;
   spr.y = y;
   if (spr.scale && Number.isFinite(spr.baseScale)) spr.scale.x = Math.abs(spr.baseScale) * (dir >= 0 ? 1 : -1);
-  return { x, y, dir, pose, moving: pose === 'walk' };
+  const out = { x, y, dir, pose, moving: pose === 'walk' };
+  if (pose !== 'walk' && at.idle) {
+    out.idle = at.idle;
+    out.poseMs = at.poseMs;
+  }
+  return out;
 }

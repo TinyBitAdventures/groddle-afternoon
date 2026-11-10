@@ -61,6 +61,7 @@ import { CRAB_WALK } from './crabs.js?v=18976e26';
 import { FIRE_DRAGON_WALK } from './fire-dragon.js?v=b7f3d751';
 import { walkSurfaceY } from './walk-surface.js?v=106bfdc5';
 import { EAT_PAUSE_MS } from './animal-mood.js?v=a49495fc';
+import { CHICKEN_PAUSE_STATES } from './chicken-idles.js?v=404bed14';
 
 export const CREATURE_KINDS = Object.freeze(['chicken', 'butterfly', 'batterfly']);
 
@@ -174,22 +175,14 @@ export function walkerAt({ baseX, range = CREATURE_PATHS.chicken.range, speed = 
  * idle1, idle1, idle1, idle2, idle3 and pause for 4 s, pecking_twice for 3 s, pecking_once for
  * 2 s), turns round half the time (is_chance(0.5) turnAround, 1225-1228) and walks on
  * (startMoving after the pause's seconds, 1253-1256). At the end of its walk it turns and walks
- * straight back (onPathing 1168-1186). The remake has the walk and pecking_once sheets plus one
- * still: an idle holds idle1's first frame (game.js chickenStand, 'stand'), a peck plays
- * pecking_once ('peck').
+ * straight back (onPathing 1168-1186). Each pause's pose is the source's own state, which plays
+ * once and holds its last frame (js/chicken-idles.js: the sheets were in Tiny Speck's art all
+ * along; until 2026-11-10 an idle held one still and pecking_twice played pecking_once). The
+ * times and the order of the rolls are unchanged, so a shared walk is where it always was.
  */
 export const CHICKEN_PAUSE = Object.freeze({
   everyMs: Object.freeze([6000, 14000]),
-  choices: Object.freeze([
-    Object.freeze([4000, 'stand']),
-    Object.freeze([4000, 'stand']),
-    Object.freeze([4000, 'stand']),
-    Object.freeze([4000, 'stand']),
-    Object.freeze([4000, 'stand']),
-    Object.freeze([4000, 'stand']),
-    Object.freeze([3000, 'peck']),
-    Object.freeze([2000, 'peck']),
-  ]),
+  choices: Object.freeze(CHICKEN_PAUSE_STATES.map(([s, state]) => Object.freeze([s * 1000, state]))),
   turnChance: 0.5,
 });
 
@@ -279,21 +272,22 @@ export function chickenPlan({ baseX = 0, range = CREATURE_PATHS.chicken.range, s
 }
 
 /**
- * A shared Chicken at path time t (ms): x, heading and pose ('walk', 'stand', 'peck') on its
- * chickenPlan round. A pause that turns it shows the new heading when it walks on.
+ * A shared Chicken at path time t (ms): x, heading and pose ('walk' or a pause's state, CHICKEN_PAUSE)
+ * on its chickenPlan round, and poseMs: how far into that pose it is, so every page shows the same
+ * frame of it. A pause that turns it shows the new heading when it walks on.
  */
 export function chickenWalkAt(home, t, seed = 1) {
   const plan = chickenPlan(home, seed);
   const baseX = home?.baseX ?? 0;
-  if (!(plan.ms > 0)) return { ...loopAt(baseX, plan.r, 0), pose: 'walk' };
+  if (!(plan.ms > 0)) return { ...loopAt(baseX, plan.r, 0), pose: 'walk', poseMs: 0 };
   const tc = mod(Number(t) || 0, plan.ms);
   let seg = plan.segs[0];
   for (const g of plan.segs) {
     if (g.at > tc) break;
     seg = g;
   }
-  if (seg.pose !== 'walk') return { ...loopAt(baseX, plan.r, seg.s), pose: seg.pose };
-  return { ...loopAt(baseX, plan.r, mod(seg.s + plan.v * (tc - seg.at), 4 * plan.r)), pose: 'walk' };
+  if (seg.pose !== 'walk') return { ...loopAt(baseX, plan.r, seg.s), pose: seg.pose, poseMs: tc - seg.at };
+  return { ...loopAt(baseX, plan.r, mod(seg.s + plan.v * (tc - seg.at), 4 * plan.r)), pose: 'walk', poseMs: tc - seg.at };
 }
 
 /**

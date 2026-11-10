@@ -60,7 +60,7 @@
 import { slugsFromEffects } from '../speech-slugs.js?v=130338f9';
 import { addItem, countItem, ensureItem, removeItem, ITEM_CATALOG } from '../inventory.js?v=60dfc9ca';
 import { bindCountField, countKeyValue, countStepMarkup } from '../ui/count-chooser.js?v=5bc894c8';
-import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=c57ef43e';
+import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=5f217a9f';
 import { landingY, nearestSurfaceY } from '../walk-surface.js?v=106bfdc5';
 import { donationValueFor } from '../shrines.js?v=aa00a504';
 import { giantDisplayName } from '../giant-names.js?v=0e295891';

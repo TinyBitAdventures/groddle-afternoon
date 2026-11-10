@@ -147,7 +147,7 @@ import {
   treeId,
   treeReady,
   treeSkill,
-} from '../street-objects.js?v=3e1098a9';
+} from '../street-objects.js?v=5a6d8604';
 import { ROCK_CATALOG } from '../mining.js?v=674ed39b';
 import { TRANT_META, trantStatusLabel } from '../trants.js?v=1b3c8ae3';
 import { quoteWoodTreeHarvest } from '../woodcutting.js?v=9a2039d1';
@@ -181,7 +181,7 @@ import {
   dragonWalkAt,
   kittyWalkAt,
   walkerSpan,
-} from '../street-creatures.js?v=af15b057';
+} from '../street-creatures.js?v=d3fd3a3a';
 
 export const STREET_OBJECTS_FEATURE_ID = 'street-objects';
 const RECONCILE_MS = 250;
@@ -404,10 +404,12 @@ function setPath(engine, obj) {
       const bs = spr.baseScale ?? Math.abs(spr.scale.y);
       spr.scale.x = p.dir * bs;
       spr.scale.y = Math.abs(bs);
-      // Walking, standing or pecking (game.js spawnChickens walkPose); held for someone at it, it
-      // stands rather than walking in place (onWaitStart stopMoving).
+      // Walking, or the pause its path is in, at the frame every page shows (game.js spawnChickens
+      // walkPose, js/chicken-idles.js). Held for someone at it, it stops and looks, the source's
+      // 'verb' (npc_chicken.js onWaitStart 1630-1638); held on an egg it stands.
       const held = Number(t.sharedPath?.holdEnd) > Date.now() + (Number(copy.offset) || 0);
-      spr.walkPose?.(held && p.pose === 'walk' ? 'stand' : p.pose);
+      if (held) spr.walkPose?.(t.state?.incubatingEgg ? 'stand' : 'verb');
+      else spr.walkPose?.(p.pose, p.poseMs);
       return true;
     };
   } else if (obj.kind === 'pig') {

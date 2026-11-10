@@ -57,7 +57,7 @@
  */
 
 import { slugsFromEffects } from '../speech-slugs.js?v=130338f9';
-import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=c57ef43e';
+import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=5f217a9f';
 import { nearestSurfaceY } from '../walk-surface.js?v=106bfdc5';
 import { displayTopOf, itemstackOverlayPoint, playSheetOverlay } from '../overlay-art.js?v=75c3ea34';
 import { SET_FREE, applySetFree, canSetFree, setFreeGoneLine, setFreePrompt } from '../animal-set-free.js?v=3b194fca';
@@ -110,14 +110,16 @@ import {
   stepHogtie,
   stickPlaceState,
 } from '../animal-husbandry.js?v=7b3b3181';
-import { batterflyBaseY, batterflyResponseFor, flightFloorFor } from '../street-creatures.js?v=af15b057';
+import { batterflyBaseY, batterflyResponseFor, flightFloorFor } from '../street-creatures.js?v=d3fd3a3a';
 import { loseEnergy, shiftMetabolic } from '../metabolics.js?v=8504134e';
 import { textureFromUrl } from '../textures.js?v=f024bd6a';
 import { PIGGY_DEATH_DROPS, PIGGY_DEATH_PUFF, SAD_BABY, forcedRoll, isSadIn } from '../animal-mood.js?v=a49495fc';
-import { animalCrowdChanged, animalCrowdSad, animalPlaceIsDepressing, crowdLimit, smokePuff as sharedSmokePuff } from './animal-mood-feature.js?v=a2c0499e';
+import { animalCrowdChanged, animalCrowdSad, animalPlaceIsDepressing, crowdLimit, smokePuff as sharedSmokePuff } from './animal-mood-feature.js?v=dca2ea95';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
-import { followYardPath, freeYardSpot } from '../yard-wander.js?v=1bb00dc5';
+import { followYardPath, freeYardSpot } from '../yard-wander.js?v=11c4a164';
+import { showsChickenIdle, yardChickenPose } from '../chicken-idle-art.js?v=b7ff77c3';
+import { chickenWaitPose } from '../chicken-idles.js?v=404bed14';
 
 export const HUSBANDRY_FEATURE_ID = 'animal-husbandry';
 export const BATTERFLY_GROUP = 'batterfly';
@@ -657,8 +659,12 @@ function stepExtra(engine, entity, dtMs) {
   }
   delete spr._moodRebase;
   if (spr._butterflyCare) stepButterflyCare(spr, dtMs);
-  // A player at this one (its menu, a verb, its own pet or nibble playing) holds it alone.
-  const held = Boolean(engine.actingOn?.(entity.target)) || !spr.loop || Boolean(spr._butterflyCare);
+  // A player at this one (its menu, a verb, its own pet or nibble playing) holds it alone. A
+  // Chicken's idle state also plays once, and is no hold (js/chicken-idle-art.js).
+  const chicken = entity.row.classId === 'npc_chicken';
+  const acting = Boolean(engine.actingOn?.(entity.target));
+  const oneShot = !spr.loop && !(chicken && showsChickenIdle(spr, engine.textures));
+  const held = acting || oneShot || Boolean(spr._butterflyCare);
   const at = followYardPath(spr, entity.drive, {
     animal: extraWalk(engine, entity),
     nowMs: now(),
@@ -666,7 +672,20 @@ function stepExtra(engine, entity, dtMs) {
     held,
     groundAt: (x, y) => surfaceAt(engine, x, entity.row.classId === 'npc_butterfly' ? undefined : y),
   });
-  setWalkPose(spr, at.moving, entity.row.classId);
+  if (chicken) {
+    // Standing, it plays the original's idle states, and looks at a player at it (npc_chicken.js
+    // pause_state_choices 1856-1865, onWaitStart 1630-1638; js/chicken-idles.js).
+    const wait = acting
+      ? chickenWaitPose({
+        rooked: Boolean(engine.query?.('targetRooked', entity.target, engine)),
+        sad: animalCrowdSad(entity.target),
+        incubating: Boolean(entity.target.state?.incubatingEgg),
+      })
+      : null;
+    if (!oneShot) yardChickenPose(engine.PIXI, engine.textures, spr, at, wait);
+  } else {
+    setWalkPose(spr, at.moving, entity.row.classId);
+  }
   entity.row.x = Math.round(spr.x);
 }
 

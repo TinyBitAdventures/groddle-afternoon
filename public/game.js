@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=afe3caa8';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=06bb8b74';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=4c2589e2';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=a13cad29';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -601,7 +601,7 @@ import {
 import { outputIconsHtml, outputsPhrase, recipeOutputRows } from './js/ui/recipe-outputs.js?v=73e19baf';
 import { MAKE_TOOL_SHEETS } from './js/make-tool-sheets.js?v=6f758e09';
 import { groupMakingTools, makeToolCounts, makeToolCountLine, makeToolSpokenLine, makeOpeningTool, gridStep } from './js/make-tools.js?v=3e4818c0';
-import { LOW_FUEL_LINE, craftSessionElapsedMs, isLowFuel, isMachineArt, machineArtHtml, packMakeState, playMachineHandOver, setMachineArtFrame } from './js/machine-art.js?v=5cf2a870';
+import { LOW_FUEL_LINE, craftSessionElapsedMs, isLowFuel, isMachineArt, machineArtHtml, packMakeState, playMachineHandOver, setMachineArtFrame } from './js/machine-art.js?v=f20ac642';
 import {
   createGarden,
   tickGarden,
@@ -950,7 +950,10 @@ import {
   ANIMAL_PATROL,
   nearestPlacementGap,
 } from './js/street-ecology.js?v=08076876';
-import { chickenPauseRoll, easeToward, flightFloorAt, flightFloorFor, flyerLift } from './js/street-creatures.js?v=af15b057';
+import { CHICKEN_PAUSE, chickenPauseRoll, easeToward, flightFloorAt, flightFloorFor, flyerLift } from './js/street-creatures.js?v=d3fd3a3a';
+import { chickenPose, chickenIdleSheetsAsked } from './js/chicken-idle-art.js?v=b7ff77c3';
+import { chickenWaitPose } from './js/chicken-idles.js?v=404bed14';
+import { isCrowdSad } from './js/animal-crowding.js?v=78ad8fa9';
 import { createSoundBoard, DEFAULT_SFX_VOLUME, watchButtonClicks, watchPanelSounds } from './js/sound-board.js?v=87380a25';
 import {
   actionLoopFor,
@@ -974,7 +977,7 @@ import { installTopBar, renderTopBar } from './js/ui/topbar.js?v=8f8adaa1';
 import { focusBack, installFocusReturn, lastInput } from './js/ui/focus-return.js?v=da190597';
 import { installContextGuard } from './js/ui/context-guard.js?v=0f71ac17';
 import { QUOIN_FRAME_BOB, advanceQuoinClock, quoinBobBetweenFrames } from './js/quoin-motion.js?v=ea0bd408';
-import { installHiresFirstDraw, installHiresSprites, upgradeSource } from './js/sprite-hires.js?v=6525af0d';
+import { installHiresFirstDraw, installHiresSprites, upgradeSource } from './js/sprite-hires.js?v=258027ca';
 import { denseSprite } from './js/sprite-dense.js?v=2a0ce07a';
 import { wholeStatAmounts, wholeEffects } from './js/stat-text.js?v=f96d8fd3';
 import { createNotifier, effectTokens, floatKey, offerCardDrop, stackFloat, tokenText } from './js/notify.js?v=1fb97b21';
@@ -13056,6 +13059,8 @@ function spawnPiggies(xs) {
 
 function spawnChickens(xs) {
   const list = [];
+  // QA: what each of the street's Chickens shows (canvas chickenPose, "0:walk,1:idle2").
+  const poses = [];
   (xs !== undefined ? xs : [520, 1200, 1750]).forEach((x, i) => {
     const spr = makeAnimated('chickenWalk', {
       animationSpeed: 0.12,
@@ -13090,40 +13095,16 @@ function spawnChickens(xs) {
       };
     };
     // Its walk's pose (js/street-creatures.js CHICKEN_PAUSE): 'walk' plays the walk, 'stand' holds
-    // the idle1 standing frame (chickenStand), 'peck' plays pecking_once (2 s, as the source's
-    // state). A one-shot clip (a squeeze) plays to its end first.
-    spr.walkPose = (pose) => {
-      if (spr.destroyed || (!spr.loop && spr.onComplete)) return;
-      const walk = textures.chickenWalk.frames.slice(0, 6);
-      const stand = textures.chickenStand?.frames;
-      if (pose === 'stand' && stand?.length) {
-        if (spr.textures[0] !== stand[0]) {
-          spr.textures = stand;
-          spr.loop = true;
-          spr.gotoAndStop(0);
-        }
-        return;
+    // the idle1 standing frame (chickenStand), and a pause plays the original's own state once and
+    // holds its last frame (idle1-3, pause, pecking_twice, pecking_once; 'verb' with a player at it:
+    // js/chicken-idles.js, js/chicken-idle-art.js). A one-shot clip (a squeeze) plays to its end first.
+    spr.walkPose = (pose, ms = null) => {
+      const shown = chickenPose(PIXI, textures, spr, pose, ms);
+      if (shown && poses[i] !== shown && app?.canvas) {
+        poses[i] = shown;
+        app.canvas.dataset.chickenPose = poses.map((p, k) => `${k}:${p || 'walk'}`).join(',');
+        app.canvas.dataset.chickenIdleSheets = chickenIdleSheetsAsked().join(',');
       }
-      if (pose === 'peck') {
-        const peck = textures.chickenPeck.frames;
-        if (spr.textures[0] !== peck[0] || spr.textures.length !== peck.length) {
-          spr.textures = peck;
-          spr.loop = true;
-          spr.animationSpeed = peck.length / 120;
-          spr.gotoAndPlay(0);
-        }
-        return;
-      }
-      if (spr.textures[0] !== walk[0] || spr.textures.length !== walk.length) {
-        spr.textures = walk;
-        spr.loop = true;
-        spr.animationSpeed = 0.12;
-        if (pose === 'stand') spr.gotoAndStop(0);
-        else spr.gotoAndPlay(0);
-        return;
-      }
-      if (pose === 'stand' && spr.playing) spr.gotoAndStop(0);
-      else if (pose !== 'stand' && !spr.playing) spr.play();
     };
     entityLayer.addChild(spr);
     list.push(spr);
@@ -14851,14 +14832,22 @@ function handleInput() {
 /**
  * A solo Chicken's pauses (js/street-creatures.js chickenPauseRoll; online its shared path has them,
  * street-objects-feature): true while it stands or pecks this frame. dt in 60 fps frames.
+ * QA: &chickenidle=idle1|idle2|idle3|pause|pecking_twice|pecking_once makes every pause that state,
+ * the first 1.5 s in and 2 s apart after. Canvas: chickenPose (<index>:<state> for each of the street's),
+ * chickenIdleSheets (the states whose sheets have been asked for).
  */
+const CHICKEN_IDLE_QA = String(new URLSearchParams(location.search).get('chickenidle') || '');
 function soloChickenPause(c, dt) {
   const ms = (Math.max(0, dt) * 1000) / 60;
-  if (!Number.isFinite(c._nextPauseMs)) c._nextPauseMs = chickenPauseRoll().nextMs;
+  if (!Number.isFinite(c._nextPauseMs)) c._nextPauseMs = CHICKEN_IDLE_QA ? 1500 : chickenPauseRoll().nextMs;
   c._nextPauseMs -= ms;
   if (c._pause) {
     c._pause.left -= ms;
-    if (c._pause.left > 0) return true;
+    if (c._pause.left > 0) {
+      // Every frame, with how far in it is: a state whose sheet was still loading joins in where it should be.
+      c.walkPose?.(c._pause.pose, c._pause.ms - c._pause.left);
+      return true;
+    }
     // Walking on, the other way half the time (turnAround).
     if (c._pause.turn) c.vx *= -1;
     c._pause = null;
@@ -14870,9 +14859,11 @@ function soloChickenPause(c, dt) {
     return false;
   }
   const roll = chickenPauseRoll();
+  const qa = CHICKEN_IDLE_QA && CHICKEN_PAUSE.choices.find(([, state]) => state === CHICKEN_IDLE_QA);
+  if (qa) Object.assign(roll, { holdMs: qa[0], pose: qa[1], turn: false, nextMs: qa[0] + 2000 });
   c._nextPauseMs = roll.nextMs;
-  c._pause = { left: roll.holdMs, turn: roll.turn };
-  c.walkPose?.(roll.pose);
+  c._pause = { left: roll.holdMs, ms: roll.holdMs, turn: roll.turn, pose: roll.pose };
+  c.walkPose?.(roll.pose, 0);
   return true;
 }
 
@@ -15000,10 +14991,18 @@ function physics(dt) {
   for (const c of chickens) {
     // Scared into the air (features/chicken-scare-feature.js): its flight moves it until it has landed.
     if (c._scareFlight) continue;
-    // A player at it: it stands (the source's onWaitStart stopMoving, npc_chicken.js 1635-1643),
-    // not walking in place; a squeeze's peck plays to its end first (walkPose).
+    // A player at it: it stops and turns to look (the source's onWaitStart, npc_chicken.js
+    // 1630-1638: apiStopMoving and state 'verb'), not walking in place; a squeeze's peck plays to its
+    // end first (walkPose). A rooked or sad one is left as it is, and one on an egg stands
+    // (js/chicken-idles.js chickenWaitPose).
     if (menuTarget?.sprite === c || currentAction?.target?.sprite === c) {
-      c.walkPose?.('stand');
+      const at = menuTarget?.sprite === c ? menuTarget : currentAction.target;
+      const pose = chickenWaitPose({
+        rooked: Boolean(features.query('targetRooked', at, engine)),
+        sad: isCrowdSad(at?.state, Date.now()),
+        incubating: Boolean(at?.state?.incubatingEgg),
+      });
+      if (pose) c.walkPose?.(pose);
       continue;
     }
     // Multiplayer: a street Chicken the server shares walks its shared path (street-objects-feature),

@@ -1,0 +1,11 @@
+{
+ "about": "States of Tiny Speck's own animations the game plays from packed sheets (tools/packed-sheets/build.py). Each row is one OGA sheet (opengameart/*/glitch-assets/<class>/<file>, CC0): fw x fh cells, `frames` of them drawn. swf names the same frames in glitch-items (sprite and FrameLabel, start = the label's first frame), for the 3x render.",
+ "sheets": [
+  {"set": "chicken", "name": "idle1", "class": "npc_chicken", "file": "npc_chicken__x1_idle1_png_1354830404.png", "fw": 148, "fh": 110, "frames": 67, "out": "assets/sprites/animals/npc_chicken_idle1.webp", "swf": {"path": "inhabitants/chicken/npc_chicken.swf", "sprite": 183, "label": "idle1", "start": 670}},
+  {"set": "chicken", "name": "idle2", "class": "npc_chicken", "file": "npc_chicken__x1_idle2_png_1354830405.png", "fw": 148, "fh": 110, "frames": 47, "out": "assets/sprites/animals/npc_chicken_idle2.webp", "swf": {"path": "inhabitants/chicken/npc_chicken.swf", "sprite": 183, "label": "idle2", "start": 737}},
+  {"set": "chicken", "name": "idle3", "class": "npc_chicken", "file": "npc_chicken__x1_idle3_png_1354830407.png", "fw": 148, "fh": 110, "frames": 86, "out": "assets/sprites/animals/npc_chicken_idle3.webp", "swf": {"path": "inhabitants/chicken/npc_chicken.swf", "sprite": 183, "label": "idle3", "start": 784}},
+  {"set": "chicken", "name": "pause", "class": "npc_chicken", "file": "npc_chicken__x1_pause_png_1354830395.png", "fw": 148, "fh": 110, "frames": 131, "out": "assets/sprites/animals/npc_chicken_pause.webp", "swf": {"path": "inhabitants/chicken/npc_chicken.swf", "sprite": 183, "label": "pause", "start": 202}},
+  {"set": "chicken", "name": "pecking_twice", "class": "npc_chicken", "file": "npc_chicken__x1_pecking_twice_png_1354830400.png", "fw": 148, "fh": 110, "frames": 40, "out": "assets/sprites/animals/npc_chicken_pecking_twice.webp", "swf": {"path": "inhabitants/chicken/npc_chicken.swf", "sprite": 183, "label": "pecking_twice", "start": 388}},
+  {"set": "chicken", "name": "verb", "class": "npc_chicken", "file": "npc_chicken__x1_verb_png_1354830397.png", "fw": 148, "fh": 110, "frames": 55, "out": "assets/sprites/animals/npc_chicken_verb.webp", "swf": {"path": "inhabitants/chicken/npc_chicken.swf", "sprite": 183, "label": "verb", "start": 333}}
+ ]
+}

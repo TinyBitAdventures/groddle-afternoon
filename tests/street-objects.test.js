@@ -38,9 +38,9 @@ import {
   takeObjs,
   treeReady,
   treeSkill,
-} from '../public/js/street-objects.js?v=3e1098a9';
-import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=8124da77';
-import { FEATURES } from '../public/js/features/index.js?v=4c2589e2';
+} from '../public/js/street-objects.js?v=5a6d8604';
+import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=442fdd60';
+import { FEATURES } from '../public/js/features/index.js?v=a13cad29';
 import { createMineRock, mineRock } from '../public/js/mining.js?v=674ed39b';
 import { createResourceNode } from '../public/js/resource-nodes.js?v=7a77fd73';
 import { createTrantState, fruitCapacityAt, setTrantTables } from '../public/js/trants.js?v=1b3c8ae3';

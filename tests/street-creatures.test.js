@@ -35,10 +35,10 @@ import {
   restAt,
   sharedCreatureLabel,
   walkerAt,
-} from '../public/js/street-creatures.js?v=af15b057';
-import { actMessage, createStreetCopy, guanoPiles, idKind, reconcile, takeObjs } from '../public/js/street-objects.js?v=3e1098a9';
-import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=8124da77';
-import { FEATURES } from '../public/js/features/index.js?v=4c2589e2';
+} from '../public/js/street-creatures.js?v=d3fd3a3a';
+import { actMessage, createStreetCopy, guanoPiles, idKind, reconcile, takeObjs } from '../public/js/street-objects.js?v=5a6d8604';
+import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=442fdd60';
+import { FEATURES } from '../public/js/features/index.js?v=a13cad29';
 import { GAME_EPOCH_MS } from '../public/js/game-day.js?v=edb00566';
 import { creatureRequests, setCreatureEcology, streetObjectLayout } from '../tools/build-realtime-objects.mjs';
 import { STREET_INDEX, applyStreetIndex, loadStreetDataFromFs } from '../public/js/street-loader.js?v=18b181ad';
@@ -174,10 +174,12 @@ describe('street animals: a Chicken\'s walk, turns and pauses (lane CHICKWALK)',
 
   it('the original\'s pauses: every 6-14 s, 2-4 s standing or pecking, turning round half the time', () => {
     assert.deepEqual([...CHICKEN_PAUSE.everyMs], [6000, 14000]);
-    assert.deepEqual(CHICKEN_PAUSE.choices.map(([ms, pose]) => `${ms / 1000}${pose}`), ['4stand', '4stand', '4stand', '4stand', '4stand', '4stand', '3peck', '2peck']);
+    // Each pause's pose is the source's own state (npc_chicken.js pause_state_choices 1856-1865; lane
+    // refsart drew them: tests/chicken-idles.test.js). The times and the rolls are what they were.
+    assert.deepEqual(CHICKEN_PAUSE.choices.map(([ms, pose]) => `${ms / 1000}${pose}`), ['4idle1', '4idle1', '4idle1', '4idle2', '4idle3', '4pause', '3pecking_twice', '2pecking_once']);
     const rng = (() => { let k = 0; const v = [0, 0.4, 0, 0.99, 0.6, 0.999999]; return () => v[k++ % v.length]; })();
-    assert.deepEqual(chickenPauseRoll(rng), { holdMs: 4000, pose: 'stand', turn: true, nextMs: 6000 });
-    assert.deepEqual(chickenPauseRoll(rng), { holdMs: 2000, pose: 'peck', turn: false, nextMs: 14000 });
+    assert.deepEqual(chickenPauseRoll(rng), { holdMs: 4000, pose: 'idle1', turn: true, nextMs: 6000 });
+    assert.deepEqual(chickenPauseRoll(rng), { holdMs: 2000, pose: 'pecking_once', turn: false, nextMs: 14000 });
   });
 
   it('walks to each end of its walk, turns there and walks back, never a jump', () => {
@@ -268,13 +270,14 @@ describe('street animals: a Chicken\'s walk, turns and pauses (lane CHICKWALK)',
   it('online and solo walk with the pauses: the shared path and game.js\'s own walk', () => {
     const feat = read('public/js/features/street-objects-feature.js');
     assert.match(feat, /chickenWalkAt\(home, pathTime\(t\.sharedPath, Date\.now\(\), copy\.offset\), seed\)/);
-    assert.match(feat, /spr\.walkPose\?\.\(held && p\.pose === 'walk' \? 'stand' : p\.pose\)/);
+    // Held for a player at it, it looks (the source's 'verb'); else the path's pose at the path's frame.
+    assert.match(feat, /if \(held\) spr\.walkPose\?\.\(t\.state\?\.incubatingEgg \? 'stand' : 'verb'\);\n\s+else spr\.walkPose\?\.\(p\.pose, p\.poseMs\);/);
     const game = read('public/game.js');
     assert.match(game, /Math\.abs\(c\.vx\) >= 0\.01 && soloChickenPause\(c, dt\)/);
     assert.match(game, /function soloChickenPause\(c, dt\) \{[\s\S]*?chickenPauseRoll\(\)/);
-    assert.match(game, /spr\.walkPose = \(pose\) =>/);
-    // A player at it: it stands, not walking in place.
-    assert.match(game, /currentAction\?\.target\?\.sprite === c\) \{\n\s+c\.walkPose\?\.\('stand'\);\n\s+continue;/);
+    assert.match(game, /spr\.walkPose = \(pose, ms = null\) =>/);
+    // A player at it: it stops and looks (or is left alone: rooked, sad), not walking in place.
+    assert.match(game, /currentAction\?\.target\?\.sprite === c\) \{[\s\S]{0,500}?const pose = chickenWaitPose\(\{[\s\S]{0,300}?if \(pose\) c\.walkPose\?\.\(pose\);\n\s+continue;/);
   });
 });
 

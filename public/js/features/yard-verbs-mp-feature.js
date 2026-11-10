@@ -69,8 +69,8 @@ import { frameTexture, onLoaded, sourceFromUrl, textureFromUrl } from '../textur
 import { homeStreetLayout, normalizeCultivationState } from '../home-cultivation.js?v=9571e110';
 import { readVisitScene } from '../neighbours-mp.js?v=f221f6e6';
 import { saveStore } from '../save-store.js?v=8839ba7b';
-import { STREET_GROUND_Y, homesFeature, wearHomeCultivation } from './homes-feature.js?v=7c6c9b3e';
-import { patchesFeature, treeFrameUrl } from './patches-feature.js?v=8edd8853';
+import { STREET_GROUND_Y, homesFeature, wearHomeCultivation } from './homes-feature.js?v=e09afc01';
+import { patchesFeature, treeFrameUrl } from './patches-feature.js?v=68438dca';
 import {
   YARD_STREET,
   YARD_TEXT as T,
@@ -86,16 +86,18 @@ import {
   treeSnapshot,
   visitorAnimalState,
   visitorTreeState,
-} from '../yard-verbs-mp.js?v=70992ae5';
+} from '../yard-verbs-mp.js?v=1755ef50';
 import { yardFixtureRows, yardFixtureVerbs, yardFixturesKey } from '../yard-fixtures-mp.js?v=dd022fe8';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
-import { followYardPath, stickForClass } from '../yard-wander.js?v=1bb00dc5';
+import { followYardPath, stickForClass } from '../yard-wander.js?v=11c4a164';
+import { showsChickenIdle, yardChickenPose } from '../chicken-idle-art.js?v=b7ff77c3';
+import { chickenWaitPose } from '../chicken-idles.js?v=404bed14';
 import { countItem, removeItem } from '../inventory.js?v=60dfc9ca';
 import { ROCK_CATALOG, rockStatusLabel, tickMineRock } from '../mining.js?v=674ed39b';
 import { getResourceNodeDef, regrowDelayMs } from '../resource-nodes.js?v=7a77fd73';
 import { getGameDayKey } from '../game-day.js?v=edb00566';
-import { rockReady } from '../street-objects.js?v=3e1098a9';
-import { resourceNodesFeature } from './resource-nodes-feature.js?v=13f4226f';
+import { rockReady } from '../street-objects.js?v=5a6d8604';
+import { resourceNodesFeature } from './resource-nodes-feature.js?v=37cac710';
 import {
   ROCK_RESPAWN_MS,
   STOCK_NODE_VERBS,
@@ -991,8 +993,12 @@ function createSession(engine, client) {
     for (const a of visit.animals.values()) {
       const spr = a.sprite;
       if (!spr || spr.destroyed) continue;
-      // The visitor at this one (its menu, a verb, its pet or squeeze playing) holds it alone.
-      const held = Boolean(engine.actingOn?.(a.target)) || !spr.loop;
+      // The visitor at this one (its menu, a verb, its pet or squeeze playing) holds it alone. A
+      // Chicken's idle state also plays once, and is no hold (js/chicken-idle-art.js).
+      const chicken = a.classId === 'npc_chicken';
+      const acting = Boolean(engine.actingOn?.(a.target));
+      const oneShot = !spr.loop && !(chicken && showsChickenIdle(spr, engine.textures));
+      const held = acting || oneShot;
       a.walk.worldW = engine.worldW;
       const at = followYardPath(spr, a.drive, {
         animal: a.walk,
@@ -1001,7 +1007,10 @@ function createSession(engine, client) {
         held,
         groundAt: () => STREET_GROUND_Y,
       });
-      if (a.classId !== 'npc_butterfly' && spr.loop) {
+      if (chicken) {
+        // The owner's page draws the same walk, so both see the same idle state at the same frame.
+        if (!oneShot) yardChickenPose(engine.PIXI, engine.textures, spr, at, acting ? chickenWaitPose({}) : null);
+      } else if (a.classId !== 'npc_butterfly' && spr.loop) {
         if (at.moving && !spr.playing) spr.play?.();
         else if (!at.moving && spr.playing) spr.gotoAndStop?.(0);
       }
