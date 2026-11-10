@@ -312,6 +312,35 @@ export function quoteShrineDonation(state, giantId, inv, classTsid, count = 1, o
   };
 }
 
+/**
+ * The count the donation window opens with (G630, report #168): the original set it to what would
+ * fill the emblem or reach the day's favor limit, whichever is less, and never more than you hold
+ * (ShrineDonateDialog.as tryToFillFavor 242-264, called as the window starts, 224-225):
+ * min(how_many, floor((max - current) / item_favor), floor((max_daily_favor - cur_daily_favor) / item_favor)).
+ * item_favor is one item's favor unrounded, cost * 0.1 * the powder bonus (items/include/shrines.js
+ * favorRequest 670-697), and max is the same number as max_daily_favor (700-704). The picker's
+ * least is 1 (ShrineDonateDialog.as 101, QuantityPicker.as 269-274), so an item worth more than
+ * the favor left, or a full meter, still opens at 1; so does an item worth no favor (258-261).
+ * A tool goes one at a time here.
+ * @param {{ powderBonus?: number, toolBaseCost?: (classTsid: string) => number|null }} [opts]
+ */
+export function shrineFillQty(state, giantId, inv, classTsid, opts = {}) {
+  if (!GIANTS[giantId] || !classTsid) return 1;
+  const toolValue = toolDonationValue(classTsid, opts);
+  if (toolValue != null) return 1;
+  const have = Math.min(whole(inv?.[classTsid]), 9999);
+  const powderBonus = [2, 3].includes(Number(opts.powderBonus)) ? Number(opts.powderBonus) : 1;
+  const itemFavor = donationValueFor(classTsid) * 0.1 * powderBonus;
+  if (!(itemFavor > 0)) return 1;
+  const max = emblemCostFor(state, giantId);
+  const amount = Math.min(
+    have,
+    Math.floor((max - whole(state?.favor?.[giantId])) / itemFavor),
+    Math.floor((max - whole(state?.dailyFavor?.[giantId])) / itemFavor),
+  );
+  return Math.max(1, Math.min(amount, Math.max(1, have)));
+}
+
 export function listShrineDonationOptions(state, giantId, inv = {}, opts = {}) {
   return Object.keys(inv)
     .filter((classTsid) =>

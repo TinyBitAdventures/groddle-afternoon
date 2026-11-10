@@ -22,7 +22,7 @@ import {
   soundChannelToggle,
 } from '../public/js/ui/topbar.js?v=e606f7e1';
 
-import { GIANTS, canClaimEmblem, createShrineState, emblemCostFor, favorPanelRows } from '../public/js/shrines.js?v=73185a14';
+import { GIANTS, canClaimEmblem, createShrineState, emblemCostFor, favorPanelRows } from '../public/js/shrines.js?v=a36da400';
 
 const pub = join(import.meta.dirname, '..', 'public');
 const read = (f) => readFileSync(join(pub, f), 'utf8');

@@ -16,7 +16,8 @@ import {
   normalizeShrineState,
   quoteShrineDonation,
   resetShrineDay,
-} from '../public/js/shrines.js?v=73185a14';
+  shrineFillQty,
+} from '../public/js/shrines.js?v=a36da400';
 import { GIANT_NAMES, giantDisplayName } from '../public/js/giant-names.js?v=0e295891';
 
 const publicRoot = join(import.meta.dirname, '..', 'public');
@@ -154,7 +155,7 @@ describe('shrine official art and client wiring', () => {
   });
 
   it('follows the source donation rules: level cap, capped bonus, favor accounting, emblem iMG', async () => {
-    const { donationXpLimit, EMBLEM_XP } = await import('../public/js/shrines.js?v=73185a14');
+    const { donationXpLimit, EMBLEM_XP } = await import('../public/js/shrines.js?v=a36da400');
     const { XP_FOR_LEVEL } = await import('../public/js/progression.js?v=33462eaa');
     // stats_donation_xp_limit: 250 to level 5, 500 to 10, then a share of the level's interval.
     assert.equal(donationXpLimit(0), 250);
@@ -239,5 +240,63 @@ describe('Giant names players read (report #102)', () => {
     const { GIANT_ICON_DATA } = await import('../public/js/giant-icons-data.js?v=5026b09c');
     const used = { used: { [`${GIANT_ICON_DATA.ti.emblemClass}:caress`]: 1 } };
     assert.equal(emblemVerbCheck(used, 'ti', 'caress').msg, "You've already caressed an Emblem of Tii today.");
+  });
+});
+
+describe('the donation window opens with the count filled in (G630, report #168)', () => {
+  // ShrineDonateDialog.as tryToFillFavor 242-264: min(how many you hold, floor(favor to the emblem /
+  // one item's favor), floor(favor left today / one item's favor)); the picker's least is 1 (101).
+  it('opens at what fills the emblem when you hold more than that', () => {
+    // A Sammich is worth 29, so 2.9 favor each: floor(1000 / 2.9) = 344.
+    assert.equal(shrineFillQty(createShrineState(), 'spriggan', { sammich: 500 }, 'sammich'), 344);
+    assert.equal(shrineFillQty(createShrineState({ favor: { spriggan: 900 } }), 'spriggan', { sammich: 500 }, 'sammich'), 34);
+  });
+
+  it('opens at all you hold when that is fewer than needed', () => {
+    assert.equal(shrineFillQty(createShrineState(), 'spriggan', { sammich: 5 }, 'sammich'), 5);
+  });
+
+  it("the day's favor limit counts when it is nearer than the emblem", () => {
+    const state = createShrineState({ favor: { spriggan: 100 }, dailyFavor: { spriggan: 950 } });
+    assert.equal(shrineFillQty(state, 'spriggan', { sammich: 500 }, 'sammich'), 17, 'floor(50 / 2.9)');
+  });
+
+  it('an item worth more than the favor left, or a full meter, opens at 1', () => {
+    assert.equal(shrineFillQty(createShrineState({ favor: { spriggan: 999 } }), 'spriggan', { sammich: 40 }, 'sammich'), 1);
+    assert.equal(shrineFillQty(createShrineState({ favor: { spriggan: 1000 } }), 'spriggan', { sammich: 40 }, 'sammich'), 1);
+    assert.equal(shrineFillQty(createShrineState({ dailyFavor: { spriggan: 1000 } }), 'spriggan', { sammich: 40 }, 'sammich'), 1);
+  });
+
+  it('a later emblem costs more, and a hallowed powder makes each item count for more', () => {
+    assert.equal(emblemCostFor(createShrineState({ emblems: { spriggan: 1 } }), 'spriggan'), 1100);
+    assert.equal(shrineFillQty(createShrineState({ emblems: { spriggan: 1 } }), 'spriggan', { sammich: 500 }, 'sammich'), 379, 'floor(1100 / 2.9)');
+    assert.equal(shrineFillQty(createShrineState(), 'spriggan', { sammich: 500 }, 'sammich', { powderBonus: 3 }), 114, 'floor(1000 / 8.7)');
+  });
+
+  it('never more than 9,999, the most the picker took (ShrineDonateDialog.as 284)', () => {
+    assert.equal(shrineFillQty(createShrineState(), 'spriggan', { cherry: 20000 }, 'cherry'), 9999);
+  });
+
+  it('the prefilled count is one the quote accepts, and gives no more favor than the meter holds', () => {
+    const state = createShrineState({ favor: { spriggan: 900 } });
+    const inv = { sammich: 500 };
+    const n = shrineFillQty(state, 'spriggan', inv, 'sammich');
+    const quote = quoteShrineDonation(state, 'spriggan', inv, 'sammich', n);
+    assert.equal(quote.qty, n);
+    assert.ok(quote.favor <= 100 && quote.favor > 100 - 3, String(quote.favor));
+  });
+
+  it('the window fills it in when it opens and when another stack is chosen; Max is still all you hold', () => {
+    const game = readFileSync(join(publicRoot, 'game.js'), 'utf8');
+    const open = game.slice(game.indexOf('function openShrinePanel('), game.indexOf('function renderShrinePanel('));
+    assert.match(open, /shrineQty = null;/);
+    const draw = game.slice(game.indexOf('function renderShrinePanel('), game.indexOf('function performShrineDonation('));
+    assert.match(draw, /if \(shrineQty == null\) \{\n\s+shrineQty = shrineSelected \? shrineFillQty\(shrineState, giantId, inv, shrineSelected, \{ \.\.\.shrinePowderOpts\(\), \.\.\.shrineToolOpts\(\) \}\) : 1;/);
+    assert.equal(draw.match(/shrineQty = null;/g).length, 2, 'the first stack, and a stack clicked');
+    // QuantityPicker.as 114-122, 150-152: the original's Max button set all you hold too.
+    assert.match(draw, /\[data-shrine-max\]'\)\?\.addEventListener\('click', \(\) => setQty\(quote\.maxQty\)\);/);
+    // The window still closes after each donation (ShrineManager.as 109-114).
+    const give = game.slice(game.indexOf('function performShrineDonation('), game.indexOf('function shrineToolOpts('));
+    assert.match(give, /closeShrinePanel\(\);/);
   });
 });
