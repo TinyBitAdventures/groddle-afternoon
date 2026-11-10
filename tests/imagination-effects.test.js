@@ -17,7 +17,7 @@ import {
   skillTimeFactor,
   toolWearMultiplier,
 } from '../public/js/imagination-effects.js?v=70169933';
-import { IMAGINATION_UPGRADES } from '../public/js/imagination.js?v=6adb7b9a';
+import { IMAGINATION_UPGRADES } from '../public/js/imagination.js?v=1bdfd77c';
 import { REMAKE_STATUS_RULES, isOfferedInRemake, remakeStatus } from '../public/js/imagination-remake.js?v=c37ad887';
 import { applyRewards } from '../public/js/quests.js?v=2b882eb6';
 import { createInventory, countItem, ensureItem } from '../public/js/inventory.js?v=60dfc9ca';

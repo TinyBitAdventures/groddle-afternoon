@@ -35,7 +35,7 @@ import {
   reshuffleHand,
   resurrectionCardCost,
   upgradeStatus,
-} from '../public/js/imagination.js?v=6adb7b9a';
+} from '../public/js/imagination.js?v=1bdfd77c';
 import { resolveTokens } from './css-tokens.js';
 import { parseColour } from '../tools/tokens/colour.mjs';
 
@@ -148,6 +148,20 @@ describe('imagination deck', () => {
 });
 
 describe('imagination hand', () => {
+  it('a once-only card you already own leaves the hand (report #163)', () => {
+    const state = createImaginationState();
+    state.hand = [{ class_tsid: 'trade_channel', amount: 0, cost: 200 }, null, null];
+    // Not owned: it stays where it was dealt.
+    dealHand(state, { level: 20, owned: POST_TUTORIAL }, seeded(3));
+    assert.equal(state.hand[0].class_tsid, 'trade_channel');
+    // Owned: it could never be bought (purchaseCard refuses), so the slot is dealt again.
+    const owned = [...POST_TUTORIAL, 'trade_channel'];
+    assert.equal(purchaseCard(state, owned, { imagination: 999 }, 0, { level: 20, owned }).reason, 'You already have that upgrade.');
+    dealHand(state, { level: 20, owned }, seeded(3));
+    assert.ok(state.hand.every(Boolean));
+    assert.ok(!state.hand.some((c) => c.class_tsid === 'trade_channel'));
+  });
+
   it('deals three cards without repeating a single-use card', () => {
     const state = createImaginationState();
     dealHand(state, { level: 20, owned: POST_TUTORIAL }, seeded(7));

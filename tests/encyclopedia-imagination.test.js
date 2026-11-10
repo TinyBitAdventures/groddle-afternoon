@@ -8,7 +8,7 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
-import { IMAGINATION_UPGRADES } from '../public/js/imagination.js?v=6adb7b9a';
+import { IMAGINATION_UPGRADES } from '../public/js/imagination.js?v=1bdfd77c';
 import { remakeStatus } from '../public/js/imagination-remake.js?v=c37ad887';
 import { cardName } from '../tools/encyclopedia/imagination.mjs';
 import { esc } from '../tools/encyclopedia/parts.mjs';

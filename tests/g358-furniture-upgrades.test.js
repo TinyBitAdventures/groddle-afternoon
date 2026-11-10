@@ -35,7 +35,7 @@ import {
   surfaceHeight,
 } from '../public/js/home-decor.js?v=d6fabb62';
 import { FURNITURE_CATALOG } from '../public/js/homes-catalog.js?v=10ac34b6';
-import { IMAGINATION_UPGRADES, upgradeStatus, DEALT_SECRET_CARDS } from '../public/js/imagination.js?v=6adb7b9a';
+import { IMAGINATION_UPGRADES, upgradeStatus, DEALT_SECRET_CARDS } from '../public/js/imagination.js?v=1bdfd77c';
 import { isOfferedInRemake, remakeStatus } from '../public/js/imagination-remake.js?v=c37ad887';
 import { visitorHomeState } from '../public/js/features/homes-feature.js?v=6f903b44';
 

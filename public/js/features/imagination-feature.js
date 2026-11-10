@@ -53,7 +53,7 @@ import {
   remakeMovementMultipliers,
   ignoresUpgradePhysics,
   reshuffleHand,
-} from '../imagination.js?v=6adb7b9a';
+} from '../imagination.js?v=1bdfd77c';
 import { brainCapacityRescale, skillTimeFactor } from '../imagination-effects.js?v=70169933';
 import { betterLearningDiscount } from '../better-learning.js?v=044ff9ff';
 import { rescaleStudiesForLearningModifier } from '../skills.js?v=4542bdf9';

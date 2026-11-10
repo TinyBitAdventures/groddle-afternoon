@@ -308,6 +308,9 @@ export function dealHand(state, ctx = {}, rng = Math.random) {
   for (let i = 0; i < HAND_SIZE; i += 1) {
     const card = hand[i];
     if (!card || !IMAGINATION_UPGRADES[card.class_tsid]) hand[i] = null;
+    // A once-only card you already have cannot be bought again (purchaseCard), so it must not sit in the hand
+    // either: the deck leaves it out, but a card dealt before it was owned stayed for good (report #163).
+    else if (IMAGINATION_UPGRADES[card.class_tsid].max_uses && (ctx.owned || []).includes(card.class_tsid)) hand[i] = null;
     else if (card.class_tsid === 'brain_capacity' && finite(ctx.brainCapacity, BRAIN_CAPACITY_DEFAULT) >= BRAIN_CAPACITY_LIMIT) hand[i] = null;
     else if (card.class_tsid === 'quoin_multiplier' && finite(ctx.quoinMultiplier, 1) >= QUOIN_MULTIPLIER_LIMIT) hand[i] = null;
   }

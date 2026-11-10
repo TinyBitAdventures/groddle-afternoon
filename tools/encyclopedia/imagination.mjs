@@ -17,7 +17,7 @@
 import {
   BRAIN_CAPACITY_AMOUNTS, BRAIN_CAPACITY_LIMIT, DEALT_SECRET_CARDS, ENERGY_TANK_AMOUNTS, IMAGINATION_UPGRADES,
   JUMP_CARDS, QUOIN_MULTIPLIER_AMOUNTS, QUOIN_MULTIPLIER_LIMIT, SHUFFLE_CARD_COST, STARTER_UPGRADES, upgradeKind,
-} from '../../public/js/imagination.js?v=6adb7b9a';
+} from '../../public/js/imagination.js?v=1bdfd77c';
 import { isOfferedInRemake, isOfferedOnline, remakeStatus } from '../../public/js/imagination-remake.js?v=c37ad887';
 import { andList, esc, fmt } from './parts.mjs';
 
