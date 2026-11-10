@@ -187,6 +187,7 @@ import { sharedGardensFeature } from './shared-gardens-feature.js?v=0f69ec43'; F
 import { sharedPatchesFeature } from './shared-patches-feature.js?v=c353f6fe'; FEATURES.push(sharedPatchesFeature);
 import { cubimalBattleFeature } from './cubimal-battle-feature.js?v=513f11ac'; FEATURES.push(cubimalBattleFeature);
 import { chatPurgeFeature } from './chat-purge-feature.js?v=cb6c250d'; FEATURES.push(chatPurgeFeature);
+import { streetFixesFeature } from './street-fixes-feature.js?v=39e41b46'; FEATURES.push(streetFixesFeature);
 import { gameTeleporterFeature } from './game-teleporter-feature.js?v=ca9bc29c'; FEATURES.push(gameTeleporterFeature);
 import { streetObjectsFeature } from './street-objects-feature.js?v=ddc43409'; FEATURES.push(streetObjectsFeature);
 import { realtimeFeature } from './realtime-feature.js?v=d90ae938'; FEATURES.push(realtimeFeature);
