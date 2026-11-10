@@ -125,14 +125,15 @@ export function levelRing(info) {
   };
 }
 
-/** The favor display's mark on a street with no Giant: Tiny Speck's favor star (glitch-client graphics/slug_favor_pos.png). */
+/** The favor display's mark where no Giant's shrine stands: Tiny Speck's favor star (glitch-client graphics/slug_favor_pos.png). */
 export const FAVOR_NEUTRAL_ICON = 'assets/classic/slug_favor_pos.webp';
 
 /**
  * The favor display: the number and its tooltip, or null when it hides.
  * It shows whenever any Giant has favor (`favor.any`; report #170, G631), so the Favor with the
  * Giants panel can be opened from every street: the street's Giant and its favor, 0 included,
- * or on a street with no Giant the favor star alone, with no number (`neutral`).
+ * or with no Giant to read (no name: js/shrines.js favorDisplayGiant, a place with no shrine)
+ * the favor star alone, with no number (`neutral`).
  * With no favor anywhere it hides (it would only say 0, and the panel would be all zeros).
  */
 export function favorChip(favor) {
@@ -145,8 +146,8 @@ export function favorChip(favor) {
       num: '',
       neutral: true,
       tip: 'Favor with the Giants',
-      sub: 'No Giant has a shrine on this street',
-      label: 'Favor with the Giants. No Giant has a shrine on this street',
+      sub: 'No Giant has a shrine here',
+      label: 'Favor with the Giants. No Giant has a shrine here',
     };
   }
   const target = whole(favor.target);

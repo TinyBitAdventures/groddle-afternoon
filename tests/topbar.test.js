@@ -22,9 +22,9 @@ import {
   vitalRing,
   volumeLevel,
   soundChannelToggle,
-} from '../public/js/ui/topbar.js?v=717d5b4c';
+} from '../public/js/ui/topbar.js?v=8f8adaa1';
 
-import { GIANTS, canClaimEmblem, createShrineState, emblemCostFor, favorPanelRows } from '../public/js/shrines.js?v=a36da400';
+import { GIANTS, canClaimEmblem, createShrineState, emblemCostFor, favorDisplayGiant, favorPanelRows, giantForStreet } from '../public/js/shrines.js?v=aa00a504';
 
 const pub = join(import.meta.dirname, '..', 'public');
 const read = (f) => readFileSync(join(pub, f), 'utf8');
@@ -256,7 +256,7 @@ describe('the favor panel (report #170): all eleven Giants from the favor displa
     assert.doesNotMatch(body, /<button/);
     assert.match(topbar, /favorPanel = installFavor\(doc, opts\.favor\);/);
     assert.match(topbar, /favorPanel\?\.sync\(\);/);
-    assert.match(game, /favor: \{ rows: \(\) => favorPanelRows\(shrineState, currentStreet \? giantForStreet\(currentStreet\)\?\.id : null\) \},/);
+    assert.match(game, /favor: \{ rows: \(\) => favorPanelRows\(shrineState, favorGiantHere\(\)\?\.id \|\| null\) \},/);
     // The display still shows the street's Giant (favorChip), and the tooltip hides while the panel is open.
     assert.match(game, /favor: favorGiant \? \{\n\s+name: favorGiant\.name,/);
     assert.match(read('style.css'), /\[data-ui="modern"\] \.favor-pop \{ width: 300px;/);
@@ -282,8 +282,8 @@ describe('the favor display shows whenever any Giant has favor (report #170, G63
 
   it('with no Giant on the street: the favor star alone, no number, and words that say so', () => {
     const none = favorChip({ name: '', any: true });
-    assert.deepEqual([none.num, none.neutral, none.tip, none.sub], ['', true, 'Favor with the Giants', 'No Giant has a shrine on this street']);
-    assert.equal(none.label, 'Favor with the Giants. No Giant has a shrine on this street');
+    assert.deepEqual([none.num, none.neutral, none.tip, none.sub], ['', true, 'Favor with the Giants', 'No Giant has a shrine here']);
+    assert.equal(none.label, 'Favor with the Giants. No Giant has a shrine here');
     assert.equal(FAVOR_NEUTRAL_ICON, 'assets/classic/slug_favor_pos.webp');
     assert.ok(existsSync(join(pub, FAVOR_NEUTRAL_ICON)), 'Tiny Speck\'s favor star ships');
     assert.match(topbar, /if \(f\.neutral\) setAttr\(chip, 'data-neutral', ''\);/);
@@ -295,6 +295,29 @@ describe('the favor display shows whenever any Giant has favor (report #170, G63
   it('the game says whether any Giant has favor, with or without a Giant here', () => {
     assert.match(game, /const favorAny = Object\.values\(shrineState\.favor \|\| \{\}\)\.some\(\(points\) => Number\(points\) > 0\);/);
     assert.match(game, /any: favorAny,\n\s+\} : \{ name: '', any: favorAny \},/);
+  });
+
+  it("the Giant it reads is the one whose shrine stands on the street; a place with no shrine has none at 0", () => {
+    const forest = { tsid: 'GLI1018LOKA18M6', hubName: 'Groddle Forest', officialGiantId: 'friendly' };
+    const noShrine = { tsid: 'GCR10K3BPJK1U6F', hubId: '64', hubName: 'Groddle Meadow' };
+    const region = giantForStreet(noShrine).id;
+    const none = createShrineState();
+    const other = createShrineState({ favor: { [region === 'mab' ? 'lem' : 'mab']: 40 } });
+    // A shrine's Giant shows with no favor too (the display itself still hides until some Giant has favor).
+    assert.equal(favorDisplayGiant(none, forest).id, 'friendly');
+    assert.equal(favorDisplayGiant(other, forest).id, 'friendly');
+    // No shrine: no Giant at 0, so the favor star alone; the region's Giant while you have favor with it, as before.
+    assert.equal(favorDisplayGiant(other, noShrine), null);
+    assert.equal(favorDisplayGiant(createShrineState({ favor: { [region]: 12 } }), noShrine).id, region);
+    // A home or a room is a place with no shrine; before a street loads there is none either.
+    assert.equal(favorDisplayGiant(other, { tsid: 'HOME_1', hubName: 'Homes' }), null);
+    assert.equal(favorDisplayGiant(other, null), null);
+    // A shrine standing there without an archived row (the starter fallback, a QA shrine) counts.
+    assert.equal(favorDisplayGiant(other, noShrine, { shrineHere: true }).id, region);
+    // The game asks it for the display and for the panel's "here" row.
+    assert.match(game, /const favorGiant = favorGiantHere\(\);/);
+    assert.match(game, /function favorGiantHere\(\) \{\n\s+return favorDisplayGiant\(shrineState, currentStreet, \{\n\s+shrineHere: interactables\.some\(\(target\) => String\(target\?\.classId \|\| ''\)\.startsWith\('npc_shrine_'\)\),/);
+    assert.match(game, /favor: \{ rows: \(\) => favorPanelRows\(shrineState, favorGiantHere\(\)\?\.id \|\| null\) \},/);
   });
 
   it('still hidden under 1,100 px wide and in Classic', () => {

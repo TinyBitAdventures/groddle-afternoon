@@ -442,9 +442,25 @@ export function canClaimEmblem(state, giantId) {
 }
 
 /**
+ * The Giant the top bar's favor display reads on this street, or null for none (G631).
+ * Where a shrine stands it is that shrine's Giant, with no favor too: the street's archived shrine
+ * (street.officialGiantId, js/street-ecology.js) or one standing there now (`shrineHere`: the
+ * starter street without its catalog row, a QA shrine).
+ * Every other place (a street with no shrine, a home, a room) still has a Giant its favor quoins
+ * go to (giantForStreet's region rule). The display went on showing that one while you had favor
+ * with it, as it did before G631; with none it shows no Giant, only the favor star.
+ */
+export function favorDisplayGiant(state, street, { shrineHere = false } = {}) {
+  if (!street) return null;
+  const giant = giantForStreet(street);
+  if (shrineHere || GIANTS[String(street.officialGiantId || '').toLowerCase()]) return giant;
+  return whole(state?.favor?.[giant.id]) > 0 ? giant : null;
+}
+
+/**
  * The top bar's favor panel (report #170, js/ui/topbar.js): every Giant in name order with the
  * favor held, what the next emblem needs (emblemCostFor) and whether that emblem is ready to
- * claim (canClaimEmblem). `hereId` marks the Giant of the street the player is on. Reads only.
+ * claim (canClaimEmblem). `hereId` marks the Giant the favor display reads here (favorDisplayGiant). Reads only.
  */
 export function favorPanelRows(state, hereId = null) {
   return Object.values(GIANTS).map((giant) => {

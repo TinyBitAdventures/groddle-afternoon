@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=3269fd15';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=127e0a3c';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=81a67ab3';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=af437551';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -500,7 +500,7 @@ import {
   parsePlayerSave,
   serializePlayerSave,
   restorePlayerSave,
-} from './js/player-save.js?v=d8ede7ff';
+} from './js/player-save.js?v=02a25aba';
 import {
   HOME_INTERIOR_TSID,
   HOME_STREET_TSID,
@@ -859,6 +859,7 @@ import {
   donateToShrine,
   canClaimEmblem,
   favorPanelRows,
+  favorDisplayGiant,
   claimShrineEmblem,
   emblemCostFor,
   inEmblemHitbox,
@@ -872,7 +873,7 @@ import {
   favorRelationNote,
   emblemRelationNote,
   formatSpeedUpTime,
-} from './js/shrines.js?v=a36da400';
+} from './js/shrines.js?v=aa00a504';
 import { shrineSheet, shrineVariantFor } from './js/shrine-variants.js?v=7f11c97d';
 import { giantDisplayName } from './js/giant-names.js?v=0e295891';
 import { shrinePowderOptions, shrinePowderAchievementCounters } from './js/powders.js?v=397984f7';
@@ -968,7 +969,7 @@ import { installHiresIcons } from './js/icon-hires.js?v=165dbd6e';
 import { installHiresDecos } from './js/deco-hires.js?v=9877af94';
 import { loadAudioLevels, loadMutedPreference, saveAudioLevel, saveMutedPreference } from './js/audio-pref.js?v=6fe817bc';
 import { createAudioBuses, fadeGain } from './js/audio-buses.js?v=af167b54';
-import { installTopBar, renderTopBar } from './js/ui/topbar.js?v=717d5b4c';
+import { installTopBar, renderTopBar } from './js/ui/topbar.js?v=8f8adaa1';
 import { focusBack, installFocusReturn, lastInput } from './js/ui/focus-return.js?v=da190597';
 import { installContextGuard } from './js/ui/context-guard.js?v=0f71ac17';
 import { QUOIN_FRAME_BOB, advanceQuoinClock, quoinBobBetweenFrames } from './js/quoin-motion.js?v=ea0bd408';
@@ -6148,8 +6149,9 @@ function updateHud() {
   // The top bar's rings (js/ui/topbar.js): energy and mood with their states (g458, js/vitals.js:
   // amber under 20%, red with a slow pulse under 10%, said in words too), the level, and favor
   // with the street's Giant. The favor display shows whenever any Giant has favor (G631), so its
-  // panel opens on every street; with no Giant here it is the favor star alone.
-  const favorGiant = currentStreet ? giantForStreet(currentStreet) : null;
+  // panel opens on every street; where no shrine stands and its region's Giant has none, it is
+  // the favor star alone (js/shrines.js favorDisplayGiant).
+  const favorGiant = favorGiantHere();
   const favorAny = Object.values(shrineState.favor || {}).some((points) => Number(points) > 0);
   renderTopBar(document, {
     energy: [pc.energy, energyCap()],
@@ -27737,6 +27739,13 @@ function isVendorOpen() {
   return panel && !panel.hidden;
 }
 
+/** The Giant the top bar's favor display reads here, or null (G631, js/shrines.js favorDisplayGiant). */
+function favorGiantHere() {
+  return favorDisplayGiant(shrineState, currentStreet, {
+    shrineHere: interactables.some((target) => String(target?.classId || '').startsWith('npc_shrine_')),
+  });
+}
+
 function isShrineOpen() {
   const panel = document.getElementById('shrine-panel');
   return Boolean(panel && !panel.hidden);
@@ -32080,7 +32089,7 @@ async function main() {
     zoom: { get: worldZoom, set: setWorldZoom, onChange: onZoomChange, fixed: zoomFixed, onFixedChange: onZoomFixedChange },
     nightTint,
     streetMap: streetMapSetting,
-    favor: { rows: () => favorPanelRows(shrineState, currentStreet ? giantForStreet(currentStreet)?.id : null) },
+    favor: { rows: () => favorPanelRows(shrineState, favorGiantHere()?.id || null) },
     onImagination: () => (modernUi() && imaginationHub ? imaginationHub.toggle() : document.getElementById('img-btn')?.click()),
     onMail: () => { if (state.started) openMailboxPanel(); },
     onPlayerCard: () => document.getElementById('player-menu-btn')?.click(),
