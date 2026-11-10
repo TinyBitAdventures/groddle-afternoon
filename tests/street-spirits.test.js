@@ -582,3 +582,23 @@ test.describe('conversations against GameServerJS (G185)', () => {
     assert.match(feature, /if \(farLook\) \{\n      farLook = false;\n      engine\?\.setCameraLook\?\.\(0, 0\);/);
   });
 });
+
+test.describe('the Street Spirit\'s collision box (street_spirit.js apiSetHitBox)', () => {
+  const feature = readFileSync(join(ROOT, 'public/js/features/street-spirits-feature.js'), 'utf8');
+
+  test('is the source\'s 400 x 400, read as the other tellers\' boxes are', () => {
+    assert.match(feature, /export const SPIRIT_HIT_BOX = Object\.freeze\(\[400, 400\]\);/);
+    assert.match(feature, /return Math\.abs\(player\.x - sprite\.x\) <= w \/ 2 && player\.y <= sprite\.y \+ 40 && player\.y >= sprite\.y - h;/);
+    assert.match(feature, /const near = inSpiritBox\(p, t\.sprite\);/);
+    // The same reading as features/conversations-feature.js inBox.
+    const convo = readFileSync(join(ROOT, 'public/js/features/conversations-feature.js'), 'utf8');
+    assert.match(convo, /return Math\.abs\(player\.x - spr\.x\) <= w \/ 2 && player\.y <= spr\.y \+ 40 && player\.y >= spr\.y - h;/);
+  });
+
+  test('matches the source', { skip: !existsSync(GSJS) && 'no GameServerJS checkout' }, () => {
+    for (const f of ['street_spirit.js', 'street_spirit_groddle.js']) {
+      const src = readFileSync(join(GSJS, 'items', f), 'latin1');
+      assert.ok(src.includes('this.apiSetHitBox(400, 400);'), f);
+    }
+  });
+});

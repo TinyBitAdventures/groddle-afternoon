@@ -171,6 +171,18 @@ function publishTalk(engine, now = Date.now()) {
   engine.setData('spiritConvoLast', lastTalk);
 }
 
+/**
+ * The Street Spirit's collision box: apiSetHitBox(400, 400) (street_spirit.js 430,
+ * street_spirit_groddle.js 375 and 386), 200 px either side of it and 400 px up from its feet, read
+ * as the other tellers' boxes are (features/conversations-feature.js inBox). It was 90 x 120 here.
+ */
+export const SPIRIT_HIT_BOX = Object.freeze([400, 400]);
+
+export function inSpiritBox(player, sprite, [w, h] = SPIRIT_HIT_BOX) {
+  if (!player || !sprite) return false;
+  return Math.abs(player.x - sprite.x) <= w / 2 && player.y <= sprite.y + 40 && player.y >= sprite.y - h;
+}
+
 /** street_spirit onPlayerCollision: a player walking up gets the next conversation offered. */
 function tickOffer(engine, now) {
   const t = talkTarget;
@@ -178,7 +190,7 @@ function tickOffer(engine, now) {
   if (!t || !p || !TALK_ORDER[talkVariant] || active || !t.sprite || t.sprite.destroyed) return;
   // G185: a lonely spirit's collision is the loneliness visit (street_spirit.js 541-545).
   if (engine.query?.('spiritLonelyHere', engine)) return;
-  const near = Math.abs(p.x - t.sprite.x) <= 90 && Math.abs(p.y - t.sprite.y) <= 120;
+  const near = inSpiritBox(p, t.sprite);
   const dev = devRules(engine);
   // Collision fires on the way in; dev QA keeps checking while the player stands there.
   const entering = near && (!wasNear || (dev && now >= nextCheckAt));
