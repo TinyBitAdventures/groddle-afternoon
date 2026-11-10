@@ -1,5 +1,6 @@
 /**
- * Stacks dropped on a public street are everyone's in multiplayer (register
+ * Stacks dropped on a public street, or on a player's home street (report
+ * #173), are everyone's in multiplayer (register
  * G332): a drop goes through the realtime server
  * (groddle-afternoon-server/drops.go, whose header lists the messages and
  * the source rules) to the site's ledger (src/LedgerDrop.php), every player
@@ -8,8 +9,9 @@
  *
  * Multiplayer only (engine.mode and engine.query('realtimeClient')). In solo
  * this feature answers nothing, so every drop is the player's own as always.
- * In multiplayer the same holds for a private place (a home, a tower floor,
- * a party space, a race), for a class the ledger does not carry, a note
+ * In multiplayer the same holds for a private place (a house, a tower floor,
+ * a party space, a race), for food the owner drops on their own home street
+ * (their animals there eat it from their own stacks: js/drops-mp.js), for a class the ledger does not carry, a note
  * (its writing would not travel), and whenever the server is out of reach: game.js drops those as it
  * always did.
  *
@@ -45,7 +47,7 @@ import { ITEM_CATALOG, addItem, countItem, removeItem } from '../inventory.js?v=
 import { TOOL_CONDITION_CATALOG, leavingCopyTag, leavingToolWear, receiveToolCopy, takeToolCopy } from '../tools.js?v=5f482998';
 import { createMinnAccount } from '../minn-account.js?v=8f2741cd';
 import { saveStore } from '../save-store.js?v=8839ba7b';
-import { DROP_OP, DROP_TEXT, dropEffect, eatenStack, groundFrom, isPublicStreet, normalizeGroundStack, normalizeMine, pickupAsk, pigAnimalKey, shareReason, stackLeft } from '../drops-mp.js?v=6151ce3d';
+import { DROP_OP, DROP_TEXT, dropEffect, eatenStack, groundFrom, homeStreetOwner, isPublicStreet, normalizeGroundStack, normalizeMine, pickupAsk, pigAnimalKey, shareReason, stackAt, stackLeft } from '../drops-mp.js?v=ec6a135d';
 
 export const DROPS_MP_FEATURE_ID = 'drops-mp';
 const TABLE_URL = 'assets/content/trade-items.json';
@@ -122,10 +124,36 @@ function createSession(engine, client) {
     publish();
   }
 
-  /** The street the player shares with others now ('' when it is a private place or not joined). */
+  /**
+   * Where drops are everyone's now, or null (a private place, not joined): { street: the realtime
+   * street, key: the game's own name for it, ox: the x the server's stack positions start from,
+   * ownHome }. A public street is itself; a home street (report #173) is HOME_<owner> on the server,
+   * RH_HOME_EXT or MPH_<owner> in the game, with x kept from the house (home-street-mp-feature
+   * homeStreetOrigin).
+   */
   function here() {
     const s = String(client.street || '');
-    return client.state === 'online' && s && s === String(engine.streetTsid || '') && isPublicStreet(s) ? s : '';
+    const scene = String(engine.streetTsid || '');
+    if (client.state !== 'online' || !s || !scene) return null;
+    if (isPublicStreet(s)) return s === scene ? { street: s, key: s, ox: 0, ownHome: false } : null;
+    const owner = homeStreetOwner(s);
+    if (!owner) return null;
+    const o = engine.query?.('homeStreetOrigin', engine);
+    if (!o || Number(o.owner) !== owner || !Number.isFinite(Number(o.houseX))) return null;
+    return { street: s, key: scene, ox: Math.round(Number(o.houseX)), ownHome: o.own === true };
+  }
+
+  /**
+   * Why a class dropped here stays the player's own, or '' when it is dropped for everyone. Food
+   * is the trade table's (include/food.js, what the original's Piggies ate from the ground).
+   */
+  function reasonAt(p, c) {
+    return shareReason(c, table, { street: p.street, sceneKey: p.key, dropKey: String(engine.dropTsid || p.key), ownHome: p.ownHome, herdFood: p.ownHome && table?.items?.[c]?.food === true });
+  }
+
+  /** A stack of the server's, where this game draws it. */
+  function shown(s) {
+    return stackAt(s, here()?.ox || 0);
   }
 
   /**
@@ -240,7 +268,7 @@ function createSession(engine, client) {
       return;
     }
     const s = normalizeGroundStack(msg.stack, street);
-    apply(String(msg.op || ''), 'dropped', s ? { c: s.classTsid, n: s.count } : d ? { c: d.c, n: d.n } : null, s, d?.copy ?? null);
+    apply(String(msg.op || ''), 'dropped', s ? { c: s.classTsid, n: s.count } : d ? { c: d.c, n: d.n } : null, shown(s), d?.copy ?? null);
   });
 
   client.on('msg:ground_taken', (msg) => {
@@ -250,7 +278,7 @@ function createSession(engine, client) {
       return;
     }
     const s = stacks.get(String(msg.id || ''));
-    apply(String(msg.op || ''), 'took', msg.item, s || engine.player);
+    apply(String(msg.op || ''), 'took', msg.item, shown(s) || engine.player);
   });
 
   client.on('msg:ground_back', (msg) => {
@@ -295,14 +323,14 @@ function createSession(engine, client) {
 
   /** dropPackItem: true when the drop went to the server (the pack changes on its answer). */
   function drop({ classTsid, count, x, y, copy = null }) {
-    const s = here();
+    const p = here();
     const c = String(classTsid || '');
-    if (!s) return null;
+    if (!p) return null;
     if (!table) {
       loadTable();
       return null;
     }
-    if (shareReason(c, table, { street: s, dropKey: String(engine.dropTsid || s) })) return null;
+    if (reasonAt(p, c)) return null;
     if (dropping) {
       if (Date.now() - dropping.at < WAIT_MS) {
         engine.toast?.(DROP_TEXT.busy, 2400);
@@ -332,7 +360,8 @@ function createSession(engine, client) {
     // The ledger must have seen what the drop takes: write the save first.
     persist(engine).then(() => {
       if (dropping?.ref !== ref) return;
-      if (!client.send('ground_drop', { ref, item, x: dropping.x, y: dropping.y })) {
+      // On a home street the server keeps the stack's x from the house: ox is the house's x as drawn here.
+      if (!client.send('ground_drop', { ref, item, x: dropping.x, y: dropping.y, ...(p.ox ? { ox: p.ox } : {}) })) {
         const d = dropping;
         dropping = null;
         dropOwn(d);
@@ -360,26 +389,27 @@ function createSession(engine, client) {
     if (picking && Date.now() - picking.at < WAIT_MS) return true;
     const n = pickupAsk(stacks.get(id).count, count);
     picking = { id, n, at: Date.now() };
-    client.send('ground_pickup', n == null ? { id } : { id, n });
+    const ox = here()?.ox || 0;
+    client.send('ground_pickup', { id, ...(n == null ? {} : { n }), ...(ox ? { ox } : {}) });
     publish();
     return true;
   }
 
   /** Whether a pack stack of this class would be dropped for everyone here now. */
   function wouldShare(classTsid) {
-    const s = here();
-    if (!s) return false;
+    const p = here();
+    if (!p) return false;
     if (!table) {
       loadTable();
       return false;
     }
-    return !shareReason(String(classTsid || ''), table, { street: s, dropKey: String(engine.dropTsid || s) });
+    return !reasonAt(p, String(classTsid || ''));
   }
 
   function list(tsid) {
-    const s = here();
-    if (!s || tsid !== s || street !== s) return [];
-    return [...stacks.values()];
+    const p = here();
+    if (!p || tsid !== p.key || street !== p.street) return [];
+    return p.ox ? [...stacks.values()].map((s) => stackAt(s, p.ox)) : [...stacks.values()];
   }
 
   publish();

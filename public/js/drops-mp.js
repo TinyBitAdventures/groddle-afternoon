@@ -1,6 +1,7 @@
 /**
- * Stacks dropped on a public street for everyone in multiplayer (register
- * G332): the pure rules and words. features/drops-mp-feature.js talks to the
+ * Stacks dropped on a public street, or on a player's home street, for
+ * everyone in multiplayer (register G332; home streets: report #173): the
+ * pure rules and words. features/drops-mp-feature.js talks to the
  * realtime server (groddle-afternoon-server drops.go, whose header lists the
  * messages and the source rules) and draws the stacks through game.js's own
  * dropped-stack path; the site's ledger keeps them (src/LedgerDrop.php).
@@ -16,8 +17,21 @@
  * - location.js deleteTakeables 4619-4626 is called from nowhere: a dropped
  *   stack waited on the street for whoever came.
  *
+ * A home street (report #173, Austin 2026-11-10: "visitors' and owners' drops
+ * are seen by everyone there, as on public streets"): in the original a home
+ * street was a location like any other, so the same drop and pickup rules ran
+ * there (the one home rule, house_lock at takeable.js 34-36 and 179-198, is
+ * for what the owner sets on furniture inside the house or Tower). Ours there:
+ * a stack's x is kept from the house (the remake's home street grows to the
+ * left and moves the house; drops.go "A home street"), and food (the trade
+ * table's "food", include/food.js) the owner
+ * drops on their own home street stays their own, because their own animals
+ * there eat from the owner's own stacks (animal-husbandry-feature yardFood,
+ * animal-mood-feature) and the server holds no home street animals to eat a
+ * shared one.
+ *
  * Ours: a class the ledger does not carry (the trade table), a note (its
- * writing would not travel) and anything dropped in a private place (a home, a tower floor, a party
+ * writing would not travel) and anything dropped in a private place (a house, a tower floor, a party
  * space, a race) stay the player's own, as in solo; a stack nobody picks up
  * in seven days goes back to its dropper. A copy's own words (a Cubimal's
  * name ...) ride with a one-copy stack as "t", as its wear rides as "r".
@@ -54,18 +68,40 @@ export function isPublicStreet(street) {
   return Boolean(s) && !s.includes('_');
 }
 
+/** Whose home street a realtime street is (homes.go HOME_<owner>; drops.go dropHomeOwner), or 0. */
+export function homeStreetOwner(street) {
+  const m = /^HOME_([1-9][0-9]{0,17})$/.exec(String(street || ''));
+  return m ? Number(m[1]) : 0;
+}
+
+/** A street whose drops are everyone's: a public street or a player's home street (drops.go dropShared). */
+export function isSharedStreet(street) {
+  return isPublicStreet(street) || homeStreetOwner(street) > 0;
+}
+
 /**
  * Whether a pack stack is dropped for everyone: '' when it is, else why it
  * stays the player's own (the game then drops it as in solo).
+ * street: the realtime street; sceneKey: the game's own name for the place
+ * (the same on a public street; RH_HOME_EXT or MPH_<owner> on a home street);
+ * dropKey: where the game keeps this place's own stacks; ownHome: the player
+ * stands on their own home street; herdFood: their animals there eat the class.
  */
-export function shareReason(classTsid, table, { street = '', dropKey = '' } = {}) {
+export function shareReason(classTsid, table, { street = '', dropKey = '', sceneKey = street, ownHome = false, herdFood = false } = {}) {
   const c = String(classTsid || '');
-  if (!isPublicStreet(street)) return 'private';
-  if (dropKey && dropKey !== street) return 'private'; // a Tower floor keeps its own stacks (G226)
+  if (!isSharedStreet(street)) return 'private';
+  if (dropKey && dropKey !== sceneKey) return 'private'; // a Tower floor keeps its own stacks (G226)
   if (!table?.items) return 'table';
   if (!table.items[c]) return 'type';
   if (c === 'note') return 'note';
+  if (ownHome && herdFood && homeStreetOwner(street) > 0) return 'herd'; // the owner's animals eat it from the owner's own stacks
   return '';
+}
+
+/** A stack as the server keeps it (x from the house on a home street), set where this game draws it. */
+export function stackAt(stack, ox = 0) {
+  const d = Math.round(Number(ox) || 0);
+  return stack && d ? { ...stack, x: stack.x + d } : stack;
 }
 
 function finite(v, d = 0) {

@@ -22,8 +22,8 @@ import {
   normalizeGroundStack,
   normalizeMine,
   shareReason,
-} from '../public/js/drops-mp.js?v=6151ce3d';
-import { dropsMpFeature } from '../public/js/features/drops-mp-feature.js?v=d11ef273';
+} from '../public/js/drops-mp.js?v=ec6a135d';
+import { dropsMpFeature } from '../public/js/features/drops-mp-feature.js?v=dfa23fc7';
 import { giftsFeature } from '../public/js/features/gifts-feature.js?v=b82bb7f2';
 import { HAS_SERVER, HAS_SITE, SITE_DIR, serverPath, sitePath } from '../tools/repos.mjs';
 
@@ -44,7 +44,8 @@ describe('what a drop shares', () => {
     assert.equal(isPublicStreet(street), true);
     for (const s of ['', 'HOME_7', 'HOUSE_7', 'PARTY_12', 'RACE_ab', 'CROWNS_1']) assert.equal(isPublicStreet(s), false, s);
     assert.equal(shareReason('cherry', TABLE, { street }), '');
-    assert.equal(shareReason('cherry', TABLE, { street: 'HOME_7' }), 'private');
+    assert.equal(shareReason('cherry', TABLE, { street: 'HOUSE_7' }), 'private');
+    assert.equal(shareReason('cherry', TABLE, { street: 'HOME_7' }), '', 'a home street is shared (report #173: tests/home-street-drops.test.js)');
     assert.equal(shareReason('cherry', TABLE, { street, dropKey: `${street}:floor2` }), 'private', 'a Tower floor keeps its own');
     assert.equal(shareReason('no_such_thing', TABLE, { street }), 'type', 'the ledger does not carry it: the game drops it as its own');
     assert.equal(shareReason('note', { items: { note: {} } }, { street }), 'note', 'a note\'s writing would not travel');

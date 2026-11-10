@@ -1225,6 +1225,13 @@ function createSession(engine, client) {
     restoreWire(item, yard) {
       return restoreWireId(me(), item, yard) || null;
     },
+    /** The home street I stand on, mine or one I visit: whose it is and the house's x as drawn here. */
+    streetOrigin() {
+      const w = where();
+      if (w === 'street') return { owner: me(), houseX: ownGeometry().street.houseX, own: true };
+      if (w === 'visit' && visit.room === 'street' && readVisitScene(engine.streetTsid)?.room === 'street') return { owner: visit.owner, houseX: visit.houseX, own: false };
+      return null;
+    },
     saleLock(decor, id) {
       const st = homesFeature._state?.();
       if (!st || decor !== st.houseDecor) return null;
@@ -1355,6 +1362,15 @@ export const homeStreetMpFeature = {
     if (!s || !info?.owner) return null;
     s.onVisit(info);
     return true;
+  },
+
+  /**
+   * drops-mp-feature (report #173): the home street the player stands on, { owner, houseX, own },
+   * or null anywhere else. A stack dropped for everyone there keeps its x from the house.
+   */
+  homeStreetOrigin(engine) {
+    if (engine?.mode !== 'multiplayer') return null;
+    return ensure(engine)?.streetOrigin() || null;
   },
 
   /** homes-feature registerRestore: the realtime server's id for my restoration (multiplayer only). */
