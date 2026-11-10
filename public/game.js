@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=396e6ee3';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=127e0a3c';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=99b6b5f8';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=be2a5c0e';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -888,7 +888,7 @@ import {
   ensureCubimalItems,
   openCubimalPackage,
   setCubimalFree,
-} from './js/cubimals.js?v=bea49c0b';
+} from './js/cubimals.js?v=5e340c94';
 import {
   STOOT_DOLL_BUBBLE_MS,
   STOOT_DOLL_ID,
@@ -3861,7 +3861,7 @@ function getPackUseInfo(classTsid) {
   if (featureUse) return featureUse;
   const cubimalPackage = cubimalPackageInfo(classTsid);
   if (cubimalPackage) {
-    const progress = cubimalCollectionProgress(inv, cubimalPackage.series);
+    const progress = cubimalCollectionProgress(inv, cubimalPackage.series, cubimalFound);
     return {
       usable: countItem(inv, classTsid) > 0,
       verb: 'Open',
@@ -3873,7 +3873,7 @@ function getPackUseInfo(classTsid) {
   }
   const cubimal = cubimalInfo(classTsid);
   if (cubimal) {
-    const progress = cubimalCollectionProgress(inv, cubimal.series);
+    const progress = cubimalCollectionProgress(inv, cubimal.series, cubimalFound);
     const canFree = cubimal.setFreeImg > 0;
     return {
       usable: canFree && countItem(inv, classTsid) > 0,
@@ -6320,6 +6320,17 @@ function usePackItem(classTsid, count = 1) {
   if (isVendorOpen()) renderVendorList();
 }
 
+/**
+ * A figure its series' collection badge has counted: it arrived once, whatever became of it
+ * (js/collection-trophies.js COUNTED_ON_ARRIVAL). The "collection: N/23" lines count these with
+ * the pack, so they match the Badges panel (report #159).
+ */
+function cubimalFound(classTsid) {
+  const badge = cubimalInfo(classTsid)?.series === 2 ? 'collection_cubimals_2' : 'collection_cubimals';
+  if (achieveState.unlocked.includes(badge)) return true;
+  return (achieveState.progress[badge]?.progress?.[classTsid] || 0) > 0;
+}
+
 /** Open one source-weighted Cubimal box and celebrate the clean recovered figure. */
 function openPackedCubimalBox(classTsid) {
   const params = new URLSearchParams(location.search);
@@ -6346,17 +6357,19 @@ function openPackedCubimalBox(classTsid) {
     pc
   );
   announceAchievementUpdates(achievementUpdates);
+  // Counted after the badge has this figure, so the card and the Badges panel agree (report #159).
+  const collection = cubimalCollectionProgress(inv, result.package.series, cubimalFound);
   if (app?.canvas) {
     app.canvas.dataset.cubimalPackage = classTsid;
     app.canvas.dataset.cubimalSeries = String(result.package.series);
     app.canvas.dataset.cubimalPrize = result.prize.classTsid;
-    app.canvas.dataset.cubimalCollection = `${result.collection.owned}/${result.collection.total}`;
+    app.canvas.dataset.cubimalCollection = `${collection.owned}/${collection.total}`;
     app.canvas.dataset.cubimalRoll = String(roll);
   }
   enqueueAward({
     kind: 'generic',
     title: result.prize.label,
-    body: `Series ${result.package.series} collection: ${result.collection.owned}/${result.collection.total}`,
+    body: `Series ${result.package.series} collection: ${collection.owned}/${collection.total}`,
     subtitle: 'You opened the box!',
     iconUrl: `assets/sprites/icons/${result.prize.classTsid}.webp`,
   });

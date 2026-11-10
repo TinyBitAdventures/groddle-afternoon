@@ -34,7 +34,7 @@ import { copyForVerb, copyTag, setCopyTag, takeToolCopy } from '../tools.js?v=5f
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=10b5626e';
 import { landingY, walkSurfaceY } from '../walk-surface.js?v=106bfdc5';
 import { displayTopOf, itemstackOverlayPoint, playSheetOverlay } from '../overlay-art.js?v=75c3ea34';
-import { CUBIMAL_RACE, cubimalArticle, cubimalInfo, cubimalRaceSheet } from '../cubimals.js?v=bea49c0b';
+import { CUBIMAL_RACE, cubimalArticle, cubimalInfo, cubimalRaceSheet } from '../cubimals.js?v=5e340c94';
 import {
   CUBIMAL_BATTLE,
   battleStyleOfVerb,
@@ -45,7 +45,7 @@ import {
   cubimalEgo,
   cubimalTagName,
   cubimalTagWith,
-} from '../cubimal-battle.js?v=62d06cf1';
+} from '../cubimal-battle.js?v=80a58864';
 
 export const CUBIMAL_BATTLE_FEATURE_ID = 'cubimal-battle';
 const SOLO_ID = 'solo';

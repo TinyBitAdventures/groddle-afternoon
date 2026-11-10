@@ -35,7 +35,7 @@ import { giftEffects, normalizeGift, normalizeGiftsSlice, wrapBox } from '../pub
 import { dropEffect, normalizeGroundStack, normalizeItem } from '../public/js/drops-mp.js?v=6151ce3d';
 import { normalizeListing } from '../public/js/auctions.js?v=278dc46a';
 import { cabinetMove, cabinetPut, cabinetTake, normalizeContents } from '../public/js/home-storage.js?v=121f1897';
-import { CUBIMAL_NAMING } from '../public/js/cubimals.js?v=bea49c0b';
+import { CUBIMAL_NAMING } from '../public/js/cubimals.js?v=5e340c94';
 import { FAVOR_GIANTS } from '../public/js/potions.js?v=4f4c996d';
 import { HOPPER_CEILING, STILL } from '../public/js/machines.js?v=c44050e6';
 import { teachPhrase } from '../public/js/seasons.js?v=1978c3f3';

@@ -77,9 +77,9 @@ import {
   isCubimal,
   nameCubimal,
   rollCubimalRace,
-} from '../cubimals.js?v=bea49c0b';
+} from '../cubimals.js?v=5e340c94';
 import { cleanCopyTagOf } from '../copy-tags.js?v=7eec7d48';
-import { cubimalBattleLabel, cubimalBattleStats, cubimalTagName, cubimalTagWith } from '../cubimal-battle.js?v=62d06cf1';
+import { cubimalBattleLabel, cubimalBattleStats, cubimalTagName, cubimalTagWith } from '../cubimal-battle.js?v=80a58864';
 
 export const CUBIMAL_RACE_FEATURE_ID = 'cubimal-race';
 const DEMO_DEFAULT = 'npc_cubimal_chick';

@@ -31,7 +31,7 @@ import { BAG_DEFS, PACK_CAPACITY, layoutPack, normalizePrefs, renameBag } from '
 import { ITEM_CATALOG, isToolItem } from '../public/js/inventory.js?v=60dfc9ca';
 import { nameAnimal, namedAnimalLabel } from '../public/js/animal-husbandry.js?v=2d933bd6';
 import { kittyLabel, nameKitty } from '../public/js/heli-kitties.js?v=8fbe314a';
-import { nameCubimal } from '../public/js/cubimals.js?v=bea49c0b';
+import { nameCubimal } from '../public/js/cubimals.js?v=5e340c94';
 import { createButlerState, renameButler, teachButler } from '../public/js/butler.js?v=2c95c064';
 import { cleanTowerName } from '../public/js/home-tower.js?v=087df38f';
 import { PENMANSHIP_SKILL, editNote, writePaperNote } from '../public/js/street-furniture.js?v=55131f49';

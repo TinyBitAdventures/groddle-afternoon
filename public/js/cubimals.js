@@ -147,10 +147,16 @@ export function ensureCubimalItems() {
   }
 }
 
-/** Unique figures currently represented in the pack for one official series. */
-export function cubimalCollectionProgress(inv, series) {
+/**
+ * Unique figures of one official series: those in the pack now and, given `found`, those the
+ * series' collection badge has already counted. The badge counts a figure when it first arrives
+ * and never takes it back (js/collection-trophies.js COUNTED_ON_ARRIVAL), so a figure set free,
+ * given away or raced on the ground still counts; the "collection: N/23" lines must say the same
+ * number as the Badges panel (report #159: the box said 7/23 with more found).
+ */
+export function cubimalCollectionProgress(inv, series, found = null) {
   const rows = CUBIMAL_SERIES[series] || [];
-  const owned = rows.filter((row) => countItem(inv, row.classTsid) > 0);
+  const owned = rows.filter((row) => countItem(inv, row.classTsid) > 0 || Boolean(found?.(row.classTsid)));
   return {
     series: Number(series),
     owned: owned.length,

@@ -19,7 +19,7 @@ import {
   openCubimalPackage,
   selectCubimal,
   setCubimalFree,
-} from '../public/js/cubimals.js?v=bea49c0b';
+} from '../public/js/cubimals.js?v=5e340c94';
 import {
   ITEM_CATALOG,
   addItem,
@@ -140,6 +140,24 @@ describe('Cubimal pack lifecycle', () => {
       total: 23,
       ids: ['npc_cubimal_chick', 'npc_cubimal_piggy'],
     });
+  });
+
+  it('counts figures the collection badge already has, though they left the pack (report #159)', () => {
+    // Seven in the pack, two more found earlier and set free: the card says 9, as the Badges panel does.
+    const inv = createInventory({ npc_cubimal_chick: 1, npc_cubimal_piggy: 1 });
+    const found = (cls) => ['npc_cubimal_butterfly', 'npc_cubimal_chick'].includes(cls);
+    const progress = cubimalCollectionProgress(inv, 1, found);
+    assert.equal(progress.owned, 3);
+    assert.equal(progress.total, 23);
+    assert.deepEqual([...progress.ids].sort(), ['npc_cubimal_butterfly', 'npc_cubimal_chick', 'npc_cubimal_piggy']);
+    // A found figure of the other series is not counted here.
+    assert.equal(cubimalCollectionProgress(inv, 2, found).owned, 0);
+    // The game counts from the badge at all three "collection: N/23" lines, after the box's own figure is counted.
+    const game = readFileSync(join(publicRoot, 'game.js'), 'utf8');
+    assert.equal(game.match(/cubimalCollectionProgress\(inv, [\w.]+, cubimalFound\)/g)?.length, 3);
+    assert.doesNotMatch(game, /result\.collection\.owned/);
+    const open = game.slice(game.indexOf('function openPackedCubimalBox('));
+    assert.ok(open.indexOf('applyAchievementProgress(') < open.indexOf('cubimalCollectionProgress(inv, result.package.series, cubimalFound)'));
   });
 
   it('sets common figures free for exact iMG and preserves rare figures', () => {
