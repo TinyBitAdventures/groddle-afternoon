@@ -1141,7 +1141,7 @@
 {"s":"quests","id":"rising_moon","n":"Rising Moon","g":"Other quests","st":"source","ic":"assets/ui/quest-book.webp","h":"encyclopedia/quests/rising_moon/"},
 {"s":"quests","id":"rook_egg_smash","n":"Prove Your Rook-Fighting Mettle","g":"Quests with their own place","st":"source","ic":"assets/ui/quest-book.webp","h":"encyclopedia/quests/rook_egg_smash/"},
 {"s":"quests","id":"rook_hall","n":"It's Educational II","g":"Other quests","st":"source","ic":"assets/ui/quest-book.webp","h":"encyclopedia/quests/rook_hall/"},
-{"s":"quests","id":"rook_hall_start","n":"It's Educational","g":"Skill quests","st":"source","ic":"assets/ui/quest-book.webp","h":"encyclopedia/quests/rook_hall_start/"},
+{"s":"quests","id":"rook_hall_start","n":"It's Educational","g":"Quests with their own place","st":"source","ic":"assets/ui/quest-book.webp","h":"encyclopedia/quests/rook_hall_start/"},
 {"s":"quests","id":"rube_spy","n":"The Wrizzards and The Rube","g":"Quests with their own place","st":"rebuilt","ic":"assets/ui/quest-book.webp","h":"encyclopedia/quests/rube_spy/"},
 {"s":"quests","id":"saucery_make_level1_recipes","n":"Sauce Trifecta","g":"Skill quests","st":"source","ic":"assets/ui/quest-book.webp","h":"encyclopedia/quests/saucery_make_level1_recipes/"},
 {"s":"quests","id":"saucery_make_level2_recipes","n":"Get Sauced","g":"Skill quests","st":"source","ic":"assets/ui/quest-book.webp","h":"encyclopedia/quests/saucery_make_level2_recipes/"},

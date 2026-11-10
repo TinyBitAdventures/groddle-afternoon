@@ -60,6 +60,30 @@ describe('encyclopedia', () => {
     }
   });
 
+  it('a quest lists only offer rules that can offer it: not a skill that needs the quest itself (report #166)', async () => {
+    const { ownOfferTriggers } = await import('../tools/encyclopedia/data.mjs');
+    const quests = JSON.parse(readFileSync(join(pub, 'assets/content/quests.json'), 'utf8'));
+    const skills = JSON.parse(readFileSync(join(pub, 'assets/content/skills.json'), 'utf8'));
+    // The source's skill-to-quest map names It's Educational for the two skills that need it done.
+    assert.deepEqual(quests.rook_hall_start.offerTriggers.map((t) => t.skill || t.type), ['level', 'piety_1', 'martial_imagination_1']);
+    assert.deepEqual(skills.piety_1.reqQuests, ['rook_hall_start']);
+    assert.deepEqual(skills.martial_imagination_1.reqQuests, ['rook_hall_start']);
+    assert.deepEqual(ownOfferTriggers('rook_hall_start', quests.rook_hall_start.offerTriggers, skills), [{ type: 'level', level: 12 }]);
+    // Those two rows are the only ones of the kind; every other quest keeps all its rules.
+    const cut = Object.entries(quests).filter(([id, q]) => ownOfferTriggers(id, q.offerTriggers, skills).length !== q.offerTriggers.length).map(([id]) => id);
+    assert.deepEqual(cut, ['rook_hall_start']);
+    const page = read('encyclopedia/quests/rook_hall_start/index.html');
+    assert.match(page, /Offered once you reach level 12\./);
+    assert.doesNotMatch(page, /Offered when you learn/);
+    // Part II keeps its own rule, and the skills still say they need the quest but no longer that they open it.
+    assert.match(read('encyclopedia/quests/rook_hall/index.html'), /Offered after you finish <a href="[^"]*quests\/rook_hall_start\/">It(&#39;|')s Educational<\/a>\./);
+    if (BUILT_SECTIONS.includes('skills')) for (const id of ['piety_1', 'martial_imagination_1']) {
+      const skill = read(`encyclopedia/skills/${id}/index.html`);
+      assert.match(skill, /quests\/rook_hall_start\/[\s\S]*?finish it first/, `${id} needs it`);
+      assert.doesNotMatch(skill, /offered when you learn it/, `${id} does not open it`);
+    }
+  });
+
   it('answers the stuck-player questions on a quest page: how to get it, steps, where, rewards', { skip: skipWithoutInventory }, () => {
     const html = read('encyclopedia/quests/animalkinship_nibble_meat/index.html');
     if (BUILT_SECTIONS.includes('skills')) assert.match(html, /Offered when you learn <a href="\.\.\/\.\.\/\.\.\/encyclopedia\/skills\/animalkinship_3\/">Animal Kinship III<\/a>\./);

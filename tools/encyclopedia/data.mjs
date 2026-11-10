@@ -179,6 +179,18 @@ function peopleGroup(id) {
 
 const slug = (s) => String(s).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 
+/**
+ * A quest's own offer rules (report #166). The source offers a skill's quest when the skill is
+ * learned (inc_data_skills.js skills_get_quest_map, each skill's quest_id), and its map names
+ * rook_hall_start (It's Educational) for Piety and Martial Imagination, although both skills need
+ * that same quest done before they can be learned (their req_quests). Learning them can never be
+ * how a player gets it (quests_level_map offers it at level 12, inc_quests.js 1027), so a "learn
+ * this skill" rule whose skill needs the quest is left off the page. The game's data keeps the row.
+ */
+export function ownOfferTriggers(id, triggers = [], skills = {}) {
+  return triggers.filter((t) => !(t.type === 'skill' && (skills[t.skill]?.reqQuests || []).includes(id)));
+}
+
 export async function loadEncyclopedia({ inventory = readInventoryAll() } = {}) {
   const live = (kind) => [...(inventory[kind] || new Map())].filter(([, r]) => r.status !== 'excluded');
   const entries = new Map(); // `${section}:${id}` -> entry
@@ -207,8 +219,8 @@ export async function loadEncyclopedia({ inventory = readInventoryAll() } = {}) 
 
   /* Quests (inventory kind quest; street projects are a kind of their own). */
   for (const [id, r] of live('quest')) {
-    const q = quests[id];
-    if (!q) continue;
+    if (!quests[id]) continue;
+    const q = { ...quests[id], offerTriggers: ownOfferTriggers(id, quests[id].offerTriggers, skills) };
     add('quests', id, { name: String(q.title).trim(), status: r.status, register: r.register, quest: q, icon: picture('assets/ui/quest-book.webp'), group: questGroup(id, q) });
   }
 
@@ -355,7 +367,8 @@ export async function loadEncyclopedia({ inventory = readInventoryAll() } = {}) 
       for (const id of s.reqSkills || []) ref(e, `skills:${id}`, 'needs-skill');
       for (const id of s.reqQuests || []) ref(e, `quests:${id}`, 'after');
       for (const id of s.reqAchievements || []) ref(e, `achievements:${id}`, 'after');
-      if (s.questId) ref(e, `quests:${s.questId}`, 'opens');
+      // A skill that needs its own quest done first does not open it (ownOfferTriggers).
+      if (s.questId && !(s.reqQuests || []).includes(s.questId)) ref(e, `quests:${s.questId}`, 'opens');
       for (const [, r] of Object.entries(recipes)) {
         if (r.skill !== e.id) continue;
         for (const o of r.outputs || []) ref(e, keyOf(o.classTsid), 'recipe', { recipe: r.name });
