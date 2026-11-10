@@ -150,4 +150,13 @@ describe('the feature', () => {
     assert.match(pub('style.css'), /\.world-drop-tip\.is-no \{ color: var\(--c-red-53d\); \}/);
     assert.match(pub('css/classic.css'), /:root\[data-ui="classic"\] \.world-drop-tip \{/);
   });
+
+  it('a stack dragged from a bag\'s tray onto a shrine closes the tray under the donation window (report #168)', () => {
+    const game = pub('game.js');
+    const open = game.slice(game.indexOf('function openShrinePanel('), game.indexOf('function renderShrinePanel('));
+    assert.match(open, /if \(item\) closePackTray\(\);/, 'only when a dragged stack opens it');
+    assert.ok(open.indexOf('if (item) closePackTray();') < open.indexOf('panel.hidden = false'), 'before the window shows');
+    // What a donation does to the window afterwards is unchanged (a call for Austin).
+    assert.doesNotMatch(open, /closeShrinePanel/);
+  });
 });

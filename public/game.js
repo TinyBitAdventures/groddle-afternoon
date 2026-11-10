@@ -27587,6 +27587,8 @@ function openShrinePanel(target, { item = '' } = {}) {
   closeVendor();
   closeGardenPanel();
   closeAvatarPanel();
+  // A stack dragged here from a bag's tray (world-drop-feature): the open tray lay over the window (report #168).
+  if (item) closePackTray();
   activeShrineTarget = target;
   // renderShrinePanel falls back to the first donatable stack when this one isn't.
   shrineSelected = item && (inv[item] || 0) > 0 ? item : null;
