@@ -69,8 +69,8 @@ import { frameTexture, onLoaded, sourceFromUrl, textureFromUrl } from '../textur
 import { homeStreetLayout, normalizeCultivationState } from '../home-cultivation.js?v=9571e110';
 import { readVisitScene } from '../neighbours-mp.js?v=9de1f9dc';
 import { saveStore } from '../save-store.js?v=8839ba7b';
-import { STREET_GROUND_Y, homesFeature, wearHomeCultivation } from './homes-feature.js?v=09265442';
-import { patchesFeature, treeFrameUrl } from './patches-feature.js?v=85691d7e';
+import { STREET_GROUND_Y, homesFeature, wearHomeCultivation } from './homes-feature.js?v=6ea63fe5';
+import { patchesFeature, treeFrameUrl } from './patches-feature.js?v=05e44649';
 import {
   YARD_STREET,
   YARD_TEXT as T,
@@ -81,12 +81,13 @@ import {
   applyYardAct,
   keepApplied,
   normalizeYardActs,
+  growIfReady,
   normalizeYardView,
   treeActs,
   treeSnapshot,
   visitorAnimalState,
   visitorTreeState,
-} from '../yard-verbs-mp.js?v=421b5366';
+} from '../yard-verbs-mp.js?v=857faa6b';
 import { yardFixtureRows, yardFixtureVerbs, yardFixturesKey } from '../yard-fixtures-mp.js?v=dd022fe8';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
 import { followYardPath, stickForClass } from '../yard-wander.js?v=0317472d';
@@ -333,6 +334,8 @@ function createSession(engine, client) {
 
   function drawPatch(p, x, i) {
     const plot = JSON.parse(JSON.stringify(p.plot));
+    // Report #200: a Seedling the owner's game grows by now is drawn as its tree.
+    growIfReady(plot, Date.now());
     if (plot.stage === 'tree' && plot.tree?.state) {
       const classId = plot.tree.classId;
       const state = visitorTreeState(plot, p.key, visit.view.mine);
@@ -342,7 +345,7 @@ function createSession(engine, client) {
       sprite.y = STREET_GROUND_Y + 2;
       engine.entityLayer.addChild(sprite);
       const target = engine.register({ classId, label: plotLabel(plot), subtitle: treeSubtitle(classId, state), sprite, state, yardVisit: { kind: 'tree', id: p.key } });
-      visit.trees.set(p.key, { key: p.key, classId, plot, state, sprite, target, snap: treeSnapshot(state) });
+      visit.trees.set(p.key, { key: p.key, x, i, classId, plot, state, sprite, target, snap: treeSnapshot(state) });
       return;
     }
     const sprite = soilSprite(plot);
@@ -350,7 +353,28 @@ function createSession(engine, client) {
     sprite.y = STREET_GROUND_Y + 2;
     engine.entityLayer.addChild(sprite);
     const target = engine.register({ classId: CLASS_PLOT, featureId: YARD_VERBS_MP_ID, label: plotLabel(plot), subtitle: plotStatusLabel(plot, Date.now()), sprite, yardVisit: { kind: 'plot', id: p.key } });
-    visit.plots.set(p.key, { key: p.key, plot, sprite, target });
+    visit.plots.set(p.key, { key: p.key, x, i, plot, sprite, target });
+  }
+
+  /**
+   * Report #200: a Patch drawn again from `plot` (a Seedling that grew, a tree
+   * the site says is gone): the old sprite and target leave, and it is drawn
+   * as on arrival, a tree with its own art and verbs or a Patch.
+   */
+  function redrawPatch(e, plot) {
+    if (!visit) return;
+    if (e.target) engine.unregister?.(e.target);
+    if (e.sprite && !e.sprite.destroyed) e.sprite.destroy();
+    visit.plots.delete(e.key);
+    visit.trees.delete(e.key);
+    drawPatch({ key: e.key, plot }, e.x, e.i);
+    publish();
+  }
+
+  /** The drawn entry's kind no longer matches the plot (a plot that is a tree now, or the other way). */
+  function kindChanged(e, plot) {
+    const tree = plot?.stage === 'tree' && Boolean(plot.tree?.state);
+    return visit.trees.has(e.key) ? !tree || plot.tree.classId !== e.classId : tree;
   }
 
   function drawAnimal(row) {
@@ -601,13 +625,21 @@ function createSession(engine, client) {
         n.refresh?.();
       }
       for (const p of view.patches) {
+        const plot = JSON.parse(JSON.stringify(p.plot));
+        growIfReady(plot, Date.now());
+        // Report #200: a Patch that is a tree now (or no longer one) is drawn again, as on arrival.
+        const drawn = visit.plots.get(p.key) || visit.trees.get(p.key);
+        if (drawn && kindChanged(drawn, plot)) {
+          redrawPatch(drawn, plot);
+          continue;
+        }
         const e = visit.plots.get(p.key);
-        if (e && p.plot.stage !== 'tree') {
-          Object.assign(e.plot, p.plot);
+        if (e) {
+          Object.assign(e.plot, plot);
           redrawPlot(e);
         }
         const tr = visit.trees.get(p.key);
-        const fresh = tr ? visitorTreeState(p.plot, p.key, view.mine) : null;
+        const fresh = tr ? visitorTreeState(plot, p.key, view.mine) : null;
         if (tr && fresh) {
           Object.assign(tr.state, fresh);
           tr.snap = treeSnapshot(tr.state);
@@ -727,7 +759,9 @@ function createSession(engine, client) {
     for (const row of result.counters || []) engine.achievement?.(row.counter, row.amount);
     if (verbId !== 'pet') engine.playSound?.(verbId === 'dig' ? 'SHOVEL' : 'HOE', { volume: 0.6, jitter: 0.05 });
     engine.refreshPack?.();
-    redrawPlot(e);
+    // Report #200: the third pet past its least time grew the Seedling (performPlotVerb growTree): the tree is drawn, with its verbs.
+    if (e.plot.stage === 'tree') redrawPatch(e, e.plot);
+    else redrawPlot(e);
     engine.save?.();
     send('plot', e.key, verbId);
     return true;
@@ -858,7 +892,12 @@ function createSession(engine, client) {
     const changed = applyYardAct({ plots, animals: rows }, act);
     if (!changed) return;
     const pe = visit.plots.get(act.target);
-    if (pe) redrawPlot(pe);
+    if (pe) {
+      // Report #200: their third pet (or the tree they tended) grew it here too.
+      growIfReady(pe.plot, Date.now());
+      if (pe.plot.stage === 'tree') redrawPatch(pe, pe.plot);
+      else redrawPlot(pe);
+    }
     const tr = visit.trees.get(act.target);
     if (tr) {
       tr.snap = treeSnapshot(tr.state);
@@ -907,7 +946,10 @@ function createSession(engine, client) {
       engine.pushActivity?.(line);
       if (!here) continue;
       notice(line, 3600);
-      if (changed.kind === 'plot') {
+      if (changed.grew) {
+        // Report #200: a visitor tended the tree my petted Seedling grew into before my tick grew it here.
+        patchesFeature.rebuildPlot?.(engine, act.target);
+      } else if (changed.kind === 'plot') {
         const e = patchesFeature.entityByKey?.(act.target);
         if (e?.sprite && !e.sprite.destroyed && e.plot === changed.plot) {
           e.sprite.texture = textureFromUrl(plotArtPath(e.plot));
@@ -980,6 +1022,8 @@ function createSession(engine, client) {
       }
     }
     if (!visit) return;
+    // Report #200: a petted Seedling grows when its least time is up, as on the owner's own street (tickPlot).
+    for (const e of [...visit.plots.values()]) if (growIfReady(e.plot, wall)) redrawPatch(e, e.plot);
     for (const r of visit.rocks.values()) {
       if (tickMineRock(r.rock, wall)) engine.refreshRock?.(r.target);
       else if (r.rock.depleted) r.target.subtitle = rockStatusLabel(r.rock);

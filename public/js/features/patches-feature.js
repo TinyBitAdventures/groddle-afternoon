@@ -1172,6 +1172,16 @@ export const patchesFeature = {
     return performVerb(engine, entity, verbId, over);
   },
 
+  /** Report #200: a plot a visitor's act grew into a tree (js/yard-verbs-mp.js applyYardAct) is drawn again, as the tick draws one. */
+  rebuildPlot(engine, key) {
+    const entity = entities.find((e) => e.key === key);
+    if (!entity) return false;
+    const grew = entity.plot.stage === 'tree';
+    if (grew) engine.pushActivity?.(`A Seedling grew into a ${GROWN_TREE_LABELS[entity.plot.tree.classId]}!`);
+    buildView(engine, entity, generation, { grow: grew });
+    return true;
+  },
+
   /** QA: the plot entity for a key on the loaded street. */
   entityByKey(key) {
     return entities.find((e) => e.key === key) || null;

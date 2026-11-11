@@ -40,8 +40,9 @@
 import { createAnimalState } from './animals.js?v=968d7c3c';
 import { petPiggy } from './animal-mood.js?v=a49495fc';
 import { trantFruitCycle } from './trant-care.js?v=9527ff03';
-import { resetTrantDay } from './trants.js?v=1b3c8ae3';
-import { GROWN_TREE_LABELS, SEASONED_BEANS, SOIL_TIMERS, seedlingTimings } from './patches.js?v=ff90c37d';
+import { fruitCapacityAt, resetTrantDay } from './trants.js?v=1b3c8ae3';
+import { ensureWoodTreeState } from './woodcutting.js?v=9a2039d1';
+import { GROWN_TREE_LABELS, SEASONED_BEANS, SOIL_TIMERS, growTree, seedlingTimings } from './patches.js?v=ff90c37d';
 import { GAME_DAY_MS, GAME_EPOCH_MS } from './game-day.js?v=edb00566';
 import { isNodeId, isRockId } from './yard-stock-mp.js?v=96d1c5bc';
 import { STICK_ANIMAL } from './yard-wander.js?v=0317472d';
@@ -245,6 +246,12 @@ export function visitorTreeState(plot, key, mine = {}, now = Date.now()) {
   const tree = plot?.tree;
   if (!tree || !plain(tree.state)) return null;
   const state = JSON.parse(JSON.stringify(tree.state));
+  // A tree the site grew from a Seedling (HomeYard plotNow) carries the few fields it knows: the rest as growTree makes them.
+  if (tree.classId === 'wood_tree') ensureWoodTreeState(state);
+  else {
+    if (typeof state.classTsid !== 'string') state.classTsid = tree.classId;
+    if (!Number.isFinite(state.fruitCapacity)) state.fruitCapacity = fruitCapacityAt(tree.classId, Number(state.maturity) || 1, Number(state.health) || 7);
+  }
   if ((Number(tree.resetAt) || 0) < gameDayStart(now)) {
     if (tree.classId === 'wood_tree') {
       state.petted = false;
@@ -297,6 +304,24 @@ export function normalizeYardActs(list) {
     out.push(row);
   }
   return out;
+}
+
+/**
+ * Report #200: a Seedling petted three times is a tree once its least time is
+ * up (patch_seedling.js onMinTimePassed / onPetted growUp; js/patches.js
+ * tickPlot grows it at max(minAt, thirdPetAt)). The site's HomeYard plotNow
+ * grows it the same way, so a visitor's copy, the site and the owner's game
+ * all hold the tree from that moment. Mutates `plot`; true when it grew.
+ */
+export function growIfReady(plot, now = Date.now()) {
+  const s = plot?.stage === 'seedling' ? plot.seedling : null;
+  if (!s || (Number(s.petted) || 0) < SOIL_TIMERS.seedlingPets) return false;
+  const min = Number(s.minAt) || 0;
+  if (min <= 0) return false;
+  const ready = Math.max(min, Number(s.thirdPetAt) || 0);
+  const max = Number(s.maxAt) > 0 ? Number(s.maxAt) : Infinity;
+  if (ready > now || ready > max) return false;
+  return Boolean(growTree(plot, ready));
 }
 
 /** tickPlot's Patch timers: a tended or dug Patch goes back to weeds when its time is up (patch.js onRegrowTimer / onFillTimer). */
@@ -375,10 +400,19 @@ export function applyYardAct({ plots = {}, animals = [] } = {}, act) {
     } else return null;
     return { kind: 'plot', what: plot.kind === 'patch_dark' ? 'Dark Patch' : 'Patch', plot };
   }
+  // A tree the site grew from a petted Seedling before my game ticked it: grown here first, so the act lands.
+  const grew = growIfReady(plot, act.at);
   const tree = plot.stage === 'tree' ? plot.tree : null;
   if (!tree?.state) return null;
   const s = tree.state;
   const what = GROWN_TREE_LABELS[tree.classId] || 'tree';
+  const changed = applyTreeAct(tree, s, what, plot, act);
+  if (changed && grew) changed.grew = true;
+  return changed;
+}
+
+/** applyYardAct's tree half: a tending, a harvest. */
+function applyTreeAct(tree, s, what, plot, act) {
   if (act.verb === 'harvest' && tree.classId === 'wood_tree') {
     // wood_tree.js 744-764: a maturity off every second harvest, at once at 2 or less; 0 clears it (tickPlot).
     const m = Number(s.maturity) || 0;

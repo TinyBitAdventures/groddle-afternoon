@@ -72,7 +72,7 @@
 
 import { addItem, countItem, ITEM_CATALOG } from '../inventory.js?v=60dfc9ca';
 import { saveStore } from '../save-store.js?v=8839ba7b';
-import { patchesFeature } from './patches-feature.js?v=85691d7e';
+import { patchesFeature } from './patches-feature.js?v=05e44649';
 import {
   COPY,
   GRANT_CLASSES,
