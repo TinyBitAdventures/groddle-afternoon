@@ -156,6 +156,14 @@ describe('the boards\' words and links (groddle-afternoon-site src/CommunityText
 describe('the routes (src/Community.php, CommunityPages.php, AdminCommunity.php)', { skip: skipWithoutSite }, () => {
   const src = (f) => readFileSync(sitePath(f), 'utf8');
 
+  it('lists the Boards above a signed-in player\'s Buddies in the rail (Austin 2026-11-10)', () => {
+    // The Buddies list grows with every buddy; the six boards must not sit under it.
+    const php = src('src/CommunityPages.php');
+    const at = (id) => php.indexOf(`id="cx-sec-${id}"`);
+    for (const id of ['channels', 'chats', 'boards', 'buddies']) assert.ok(at(id) > 0, `the rail has ${id}`);
+    assert.ok(at('channels') < at('chats') && at('chats') < at('boards') && at('boards') < at('buddies'), 'Channels, Chats, Boards, Buddies');
+  });
+
   it('reads are open, writes need a signed-in player, the console needs manage_options', () => {
     const c = src('src/Community.php');
     for (const [m, path] of [['Get', 'community/boards'], ['Get', 'community/boards/{board:[a-z-]+}'], ['Get', 'community/threads/{id:\\d+}'], ['Get', 'community/threads/{id:\\d+}/updates']]) {
