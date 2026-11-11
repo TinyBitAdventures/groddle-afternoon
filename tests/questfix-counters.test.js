@@ -133,7 +133,8 @@ describe('trees (G439 G449 G450 G452 G469)', () => {
     route(qs, 'wood_tree:water');
     send(qs, worldVerbQuestEvents({ classId: 'wood_tree' }, 'water', { ok: true }));
     assert.equal(progress(qs, 'lightgreenthumb_water_trees', 'trees_watered'), 1);
-    assert.match(read('game.js'), /const verbEvent = `\$\{target\.classId\}:\$\{verbId\}`;/);
+    // #197: a garden plot's plant:<seed> is sent as garden_plot:plant; every other class keeps its verbId.
+    assert.match(read('game.js'), /const verbEvent = `\$\{target\.classId\}:\$\{target\.classId === 'garden_plot' \? baseVerb : verbId\}`;/);
   });
 
   it('Wood Tree and Paper Tree harvests count for One, Two, Tree (wood_tree.js 779, paper_tree.js 475)', () => {

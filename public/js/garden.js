@@ -13,7 +13,7 @@
  * Produce counts are the GSJS seed classProps produces_count.
  */
 
-import { addItem, removeItem, countItem, ensureItem, itemIcon } from './inventory.js?v=60dfc9ca';
+import { ITEM_CATALOG, addItem, removeItem, countItem, ensureItem, itemIcon } from './inventory.js?v=60dfc9ca';
 import { HOE_TOOLS, WATERING_CAN_TOOLS, canUseTool, firstWorkingTool, useToolCondition } from './tools.js?v=5f482998';
 import { skillPackageDetails } from './skill-packages.js?v=bfb87281';
 import { gardenGrowModifier } from './imagination-effects.js?v=70169933';
@@ -1209,6 +1209,52 @@ export function pickSeedToPlant(inv, preferSeedId, gardenType = 'default') {
   return listPlantableSeeds(inv, want)[0] || null;
 }
 
+/** #197: the seed menu's question (InteractionMenuController.as startGardenPlotMenu 1531-1556). */
+export const PLANT_PICK_TITLE = 'What would you like to plant?';
+
+/** A seed's plural for a tip ("Plant Spinach Seeds"). */
+function seedPlural(seed) {
+  return ITEM_CATALOG[seed.seedId]?.namePlural || `${seed.label}s`;
+}
+
+/**
+ * PURE (#197): the seeds a plot's Plant can ask about, as the verb menu's picture choices
+ * ({ classTsid, label, have }), sorted by name as the original's seed menu was
+ * (InteractionMenuController.as 1547-1552, sortArrayOfItems: label, case-insensitive).
+ */
+export function plantSeedChoices(inv, gardenType = 'default') {
+  return listPlantableSeeds(inv, gardenType)
+    .map((s) => ({ classTsid: s.seedId, label: s.label, have: countItem(inv, s.seedId) }))
+    .sort((a, b) => a.label.toLowerCase().localeCompare(b.label.toLowerCase()));
+}
+
+/** PURE (#197): why a named seed can't go in this bed now, or null when it can. */
+export function chosenSeedRefusal(inv, seedId, gardenType = 'default') {
+  ensureGardenItems();
+  const seed = SEED_CATALOG[seedId];
+  const herb = gardenType === 'herb';
+  if (!seed) return { reason: 'wrong_garden', msg: "This can't be planted here." };
+  if (!seedFitsGarden(seed, gardenType)) {
+    return { reason: 'wrong_garden', msg: herb ? 'Only herb seeds go in an herb garden.' : 'Only crop seeds go in a crop garden.' };
+  }
+  if (countItem(inv, seedId) < 1) return { reason: 'seed', msg: `You don't have any ${seedPlural(seed)}.` };
+  if (!seedInSeason(seedId)) return { reason: 'season', msg: 'Pumpkin Seeds are seasonal. They can only be grown during Zilloween.' };
+  return null;
+}
+
+/**
+ * PURE (#197): what a plot says to a seed dragged over it (GardenPlotView.as dragOver 166-176,
+ * handleDrop 211-215): a seed of the bed's kind on a clean plot plants (ok), on any other plot
+ * "Clear the plot first!", and any other seed "This can't be planted here".
+ */
+export function seedDropCheck(plot, seedId, gardenType = 'default') {
+  ensureGardenItems();
+  const seed = SEED_CATALOG[seedId];
+  if (!seed || !seedFitsGarden(seed, gardenType)) return { ok: false, tip: "This can't be planted here" };
+  if (plot?.state !== 'clean') return { ok: false, tip: 'Clear the plot first!' };
+  return { ok: true, tip: `Plant ${seedPlural(seed)}` };
+}
+
 /**
  * @param {SeedDef} seed
  * @param {'default'|'herb'|string} gardenType
@@ -1246,6 +1292,12 @@ export function plantPlot(garden, key, inv, pc, seedId, opts = {}) {
     return { ok: false, reason: 'state', msgs: ['That plot is not ready to plant.'] };
   }
   const gType = garden.gardenType || 'default';
+  // #197: a seed chosen by name (the Plant menu's choice, a seed dropped on the plot) is that seed
+  // or nothing, never another one (include/garden.js 339-342 checks pc.items_has(args.seed)).
+  if (opts.exactSeed && seedId) {
+    const why = chosenSeedRefusal(inv, seedId, gType);
+    if (why) return { ok: false, reason: why.reason, msgs: [why.msg] };
+  }
   const seed = pickSeedToPlant(inv, seedId, gType);
   if (!seed && Object.keys(SEASONAL_SEEDS).some((id) => countItem(inv, id) > 0 && !seedInSeason(id))) {
     return {

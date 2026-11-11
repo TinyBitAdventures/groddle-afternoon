@@ -64,7 +64,7 @@ import {
   hasWateringCan,
   pickSeedToPlant,
   seedFitsGarden,
-} from '../garden.js?v=f784821d';
+} from '../garden.js?v=788f2dbb';
 import { HOE_TOOLS, WATERING_CAN_TOOLS, canUseTool, firstWorkingTool } from '../tools.js?v=5f482998';
 import { addItem, countItem, ITEM_CATALOG, itemIcon } from '../inventory.js?v=60dfc9ca';
 import { JOB_WORK_OVERLAY, jobWorkToolScale, jobWorkToolSheet } from '../job-work-fx.js?v=ee7e10ca';
@@ -467,8 +467,12 @@ function planVerb(engine, target, verbId) {
   if (!plot || !key) return null;
   const id = plotId(bk, key);
   const cost = (action) => gardenActionProfile(gType, action, learned(engine), upgrades(engine)).energy;
-  if (verbId === 'plant') {
-    const seed = pickSeedToPlant(inv, undefined, gType);
+  const [base, chosen] = String(verbId).split(':');
+  if (base === 'plant') {
+    // #197: plant:<seed> plants the seed the player chose (the Plant menu, a seed dropped on the
+    // plot) or nothing; plain plant (one kind held) the first, as before.
+    const seed = pickSeedToPlant(inv, chosen || undefined, gType);
+    if (chosen && seed?.seedId !== chosen) return null;
     if (plot.state !== 'clean' || !seed || !seedFitsGarden(seed, gType) || energy <= cost('plant')) return null;
     const mod = 1 - gardenGrowModifier(gType, upgrades(engine));
     return { send: { id, seed: seed.seedId, mod }, rolls: [], flush: true };
@@ -530,7 +534,9 @@ function ask(engine, target, verbId) {
   if (engine.mode !== 'multiplayer' || !isSharedTarget(target)) return null;
   if (grant && grant.target === target && grant.verbId === verbId) return null;
   const isBed = target.classId === 'garden_new';
-  if (isBed ? verbId !== 'water_all' : !VERBS.has(verbId)) return null;
+  // #197: plant:<seed> is Plant with the seed chosen; the server hears plant and the seed.
+  const base = String(verbId).split(':')[0];
+  if (isBed ? verbId !== 'water_all' : !VERBS.has(base) || (base !== verbId && base !== 'plant')) return null;
   const c = bind(engine);
   if (!c || LOCAL_STATES.has(c.state)) return null;
   if (!shared(engine)) {
@@ -557,7 +563,7 @@ function ask(engine, target, verbId) {
   const send = () => {
     if (!pending.has(req)) return;
     pending.get(req).at = Date.now();
-    if (!c.send('garden_act', { req, verb: verbId, ...plan.send })) {
+    if (!c.send('garden_act', { req, verb: base, ...plan.send })) {
       pending.delete(req);
       engine.toast?.(COPY.connecting, 2400);
     }

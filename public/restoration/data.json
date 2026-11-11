@@ -2752,9 +2752,14 @@
   "deployed": "2026-11-11"
  },
  "git": {
-  "commits": 1641,
+  "commits": 1642,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-11",
+    "kind": "fix",
+    "text": "The Emotional Bear's emotes pick from the players on the street online"
+   },
    {
     "date": "2026-11-11",
     "kind": "improve",
@@ -2869,14 +2874,9 @@
     "date": "2026-11-10",
     "kind": "improve",
     "text": "A potion's bottle uncorks, tips and pours when you quaff or pour it"
-   },
-   {
-    "date": "2026-11-10",
-    "kind": "improve",
-    "text": "A pausing Chicken scratches, stretches and pecks, and looks at you while its menu is open"
    }
   ]
  },
- "tests": 798,
+ "tests": 799,
  "generatedAt": "2026-11-11"
 }

@@ -24,7 +24,7 @@ import { PACKED_SHEETS } from '../public/js/packed-sheets-data.js?v=192c6f15';
 import { packedCell, packedDurationMs, packedFrameAt } from '../public/js/packed-sheets.js?v=da88fa23';
 import { KEEP_SHEETS, itemOverlayPlacement, pcOverlayPoint } from '../public/js/item-overlay.js?v=37bde39e';
 import { POTIONS } from '../public/js/potions.js?v=4f4c996d';
-import { GARDEN_POTIONS } from '../public/js/master-garden.js?v=d1d313ea';
+import { GARDEN_POTIONS } from '../public/js/master-garden.js?v=3b5ec3c3';
 import { TREE_ANTIDOTE, TREE_POISON } from '../public/js/tree-poison.js?v=5ceea244';
 import { imageSize } from '../tools/image-size.mjs';
 

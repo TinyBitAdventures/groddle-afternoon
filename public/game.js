@@ -2,9 +2,9 @@
  * Groddle Afternoon — original street geometry + layered decos
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
-import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=69b550bf';
+import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=5719e569';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=06bb8b74';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=ae7e017c';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=1f81c762';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -628,7 +628,9 @@ import {
   cropIcon,
   hasWateringCan,
   hasHoe,
-} from './js/garden.js?v=f784821d';
+  plantSeedChoices,
+  PLANT_PICK_TITLE,
+} from './js/garden.js?v=788f2dbb';
 import { GARDEN_SCALE, PLOT_H as GARDEN_PLOT_H, PLOT_W as GARDEN_PLOT_W, gardenFrame, gardenLayout, gardenStyle, plotPieces } from './js/garden-view.js?v=3683a26f';
 import {
   ROCK_CATALOG,
@@ -837,7 +839,7 @@ import {
   createVendorSellQuote,
   vendorSellUnitPrice,
   vendorBuyUnitPrice,
-} from './js/vendor.js?v=169b43f6';
+} from './js/vendor.js?v=25d9f6ba';
 import {
   animalAnchorX,
   animalAnchorY,
@@ -1001,7 +1003,7 @@ import { ENCYCLOPEDIA_MENU_LABEL, createEncyclopedia, isEncyclopediaKey } from '
 import { EAT_PICK_TEXT, bestFoodIndex, eatChoices, eatTip } from './js/eat-pick.js?v=8fb763d0';
 import { installHeldKeyGuard, isMacPlatform } from './js/held-keys.js?v=98b96620';
 import { signpostArmRows, worldContextAction } from './js/world-context-menu.js?v=f3f48805';
-import { blockedPlayerVerbs, listPlayerTarget, opensPlayerMenu, playerMenuRows } from './js/ui/player-menu.js?v=4a5b7744';
+import { blockedPlayerVerbs, listPlayerTarget, opensPlayerMenu, playerMenuRows } from './js/ui/player-menu.js?v=3d4a199d';
 import { forgetTexture, frameTexture, isFailed, isLoaded, onFailed, onLoaded, textureFromUrl, whenLoaded } from './js/textures.js?v=f024bd6a';
 import { FALLBACK_MAX as WORLD_ART_FALLBACK_MAX, worldArtFor } from './js/world-art.js?v=0729bf92';
 import { sceneAnim, syncAnim } from './js/deco-anim.js?v=aa35e023';
@@ -8247,11 +8249,20 @@ function openVerbPickLevel(target, verb, row, focusFood = '') {
     // The reason in the footer, where the menu's other reasons go (was a toast).
     if (!row) return false;
     row.setAttribute('aria-disabled', 'true');
-    row.dataset.vmReason = verb?.emptyMsg || `You don't have anything this ${target.label || 'animal'} wants to eat.`;
+    row.dataset.vmReason = verb?.emptyMsg || (verbId === 'plant' ? PLANT_NO_SEEDS_LINE : `You don't have anything this ${target.label || 'animal'} wants to eat.`);
     refuseVerbRow(menu, row);
     return false;
   }
-  renderVerbMenu(target, null, { verbId, verb, options, title: FEED_PICKER_TITLES[verbId] || 'Feed what?' });
+  // #197: a garden plot's Plant asks which seed; the picture runs Plant with it (plant:<seed>),
+  // with the verb's own cost and timing, as a click on a one-seed plot does.
+  const plantPick = verbId === 'plant' && target.classId === 'garden_plot'
+    ? (seed) => {
+      closeVerbMenu();
+      setCanvasData('plantSeedPick', seed.classTsid);
+      requestVerb(target, { ...verb, id: `plant:${seed.classTsid}`, picker: undefined }, { label: verb.label || 'plant' });
+    }
+    : null;
+  renderVerbMenu(target, null, { verbId, verb, options, title: FEED_PICKER_TITLES[verbId] || 'Feed what?', ...(plantPick ? { onPick: plantPick } : {}) });
   placeWorldVerbMenu(target);
   const at = Math.max(0, options.findIndex((o) => o.classTsid === focusFood));
   focusVerbRow(menu, at + 1);
@@ -8433,13 +8444,19 @@ function closeFeedPicker(result = 'cancelled') {
 
 /** Eligible stacks for the picker's verb (Feed keeps the original animal list). */
 function feedPickerChoices(target, verbId = feedPickerVerb) {
+  // #197: a plot's seeds of its bed's kind (herb seeds for an herb bed), by name.
+  if (verbId === 'plant' && target?.classId === 'garden_plot') {
+    return plantSeedChoices(inv, target.state?.garden?.gardenType || 'default');
+  }
   return verbId === 'feed'
     ? listAnimalFeedOptions(target.classId, inv)
     : pickerOptionsFor(target.classId, verbId, inv);
 }
 
-const FEED_PICKER_TITLES = { feed: 'Feed what?', incubate: 'Incubate what?', deposit: 'Deposit what?' };
-const FEED_PICKER_VERB_LABELS = { feed: 'Feed', incubate: 'Incubate', deposit: 'Deposit' };
+const FEED_PICKER_TITLES = { feed: 'Feed what?', incubate: 'Incubate what?', deposit: 'Deposit what?', plant: PLANT_PICK_TITLE };
+const FEED_PICKER_VERB_LABELS = { feed: 'Feed', incubate: 'Incubate', deposit: 'Deposit', plant: 'Plant' };
+/** GardenView.as onPlotClick 500-509: a clean plot clicked with no seeds. */
+const PLANT_NO_SEEDS_LINE = "You don't have any seeds to plant!";
 
 /** requires_target_item_count: the second step asks how many of the chosen stack. */
 function showFeedPickerQty(food) {
@@ -9479,7 +9496,8 @@ function executeVerb(target, verbId) {
     }
     // Every world verb is also a `<class>:<verb>` quest event, unless a badge
     // counter of the same name already carried it.
-    const verbEvent = `${target.classId}:${verbId}`;
+    // #197: a plot's plant:<seed> is still garden_plot:plant (the skill package drops, quests).
+    const verbEvent = `${target.classId}:${target.classId === 'garden_plot' ? baseVerb : verbId}`;
     if (!achievementEvents.some((event) => event.counter === verbEvent)) emitGameEvent(verbEvent, 1, verbDetail);
     // Tree quest counters the badge events leave out (wood trees, super and last harvests, healing).
     for (const row of worldVerbQuestEvents(target, verbId, result)) emitGameEvent(row.event, row.amount, verbDetail);
@@ -32252,7 +32270,7 @@ async function main() {
   }
   // Garden talkback QA (js/garden-talk-qa.js): ?gardentalkdemo=herb|crop.
   if (new URLSearchParams(location.search).has('gardentalkdemo')) {
-    import('./js/garden-talk-qa.js?v=e394c5b8').then((m) => m.runGardenTalkDemo({ engine, executeVerb, params: new URLSearchParams(location.search) }));
+    import('./js/garden-talk-qa.js?v=e5e8f014').then((m) => m.runGardenTalkDemo({ engine, executeVerb, params: new URLSearchParams(location.search) }));
   }
   // MEMQA (ticket 21, Safari's memory reload in Naraka): ?memqa=1 lets a probe walk streets through the
   // real street trip (tools/qa/street-memory.mjs). Solo pages only: online pages drop their params.

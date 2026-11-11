@@ -12,12 +12,18 @@
  * feature: a key-holder's copy offers fertilize (the site keeps the act as 'guano', src/HomeTending.php), and
  * without a key the plot has none, so Guano can't go on it.
  *
- * QA: canvas data guanoDrag (none | dragging | over:<plot>:ok | over:<plot>:no), guanoDropLast.
+ * #197: a seed dragged onto a plot plants that seed (GardenPlotView.as dragOver 166-176, handleDrop
+ * 211-215): a seed of the bed's kind (herb seeds on an herb bed) on a clean plot runs the plot's
+ * Plant with it (plant:<seed>, content.js), the menu's way; any other plot or seed shows the
+ * original's tip in red and the drop does nothing.
+ *
+ * QA: canvas data guanoDrag (none | dragging | over:<plot>:ok | over:<plot>:no), guanoDropLast;
+ * for a seed seedDrag (none | dragging:<seed> | over:<plot>:ok|no) and seedDropLast.
  * &guanodemo=1 (=herb for an herb bed) puts Guano in the pack and a bed by the avatar;
  * window.groddleGuano reads and sets its plots (plot, set, bed).
  */
 
-import { FERTILIZE_TEXT, GARDEN_FERTILIZER, fertilizeCheck } from '../garden.js?v=f784821d';
+import { FERTILIZE_TEXT, GARDEN_FERTILIZER, SEED_CATALOG, fertilizeCheck, seedDropCheck } from '../garden.js?v=788f2dbb';
 
 export const GARDEN_GUANO_FEATURE_ID = 'garden-guano';
 const VERB = 'fertilize';
@@ -37,8 +43,29 @@ export function guanoOver(target, verbs, now = Date.now()) {
   return { verb, tip: check.tip };
 }
 
+/**
+ * #197: what a plot says to a dragged seed: the verb a drop runs (the plot's Plant with that seed,
+ * plant:<seed>) or null, and the tip. A Plant the menu greys (too tired) refuses with its reason.
+ */
+export function seedOver(target, seedId, verbs) {
+  const gType = target?.state?.garden?.gardenType === 'herb' ? 'herb' : 'default';
+  const check = seedDropCheck(target?.state?.plot, seedId, gType);
+  if (!check.ok) return { verb: null, tip: check.tip };
+  const plant = (verbs || []).find((v) => v.id === 'plant');
+  if (!plant) return { verb: null, tip: "This can't be planted here" };
+  if (plant.enabled === false) return { verb: null, tip: plant.reason || check.tip };
+  return { verb: { ...plant, id: `plant:${seedId}`, picker: undefined }, tip: check.tip };
+}
+
+/** The pack class a drag carries that a plot takes: Guano or a seed, else ''. */
+export function plotDragClass(cls) {
+  const c = String(cls || '');
+  return c === GARDEN_FERTILIZER || SEED_CATALOG[c] ? c : '';
+}
+
 let wired = false;
-let dragging = false;
+/** The class being dragged (Guano or a seed), or ''. */
+let dragging = '';
 let tip = null;
 
 function showTip(text, no, x, y) {
@@ -71,9 +98,16 @@ function plotAt(engine, event) {
 }
 
 function endDrag(engine) {
-  dragging = false;
+  const seed = dragging && dragging !== GARDEN_FERTILIZER;
+  dragging = '';
   showTip('');
-  engine.setData?.('guanoDrag', 'none');
+  engine.setData?.(seed ? 'seedDrag' : 'guanoDrag', 'none');
+}
+
+/** What the plot does with the dragged class: { verb, tip } (Guano or a seed). */
+function overPlot(engine, plot, cls) {
+  const verbs = engine.targetVerbs?.(plot);
+  return cls === GARDEN_FERTILIZER ? guanoOver(plot, verbs) : seedOver(plot, cls, verbs);
 }
 
 function wire(engine) {
@@ -83,21 +117,23 @@ function wire(engine) {
   wired = true;
   // After the pack slot's own dragstart: a drag it cancelled is no drag.
   document.addEventListener('dragstart', (event) => {
-    dragging = !event.defaultPrevented && event.target?.closest?.('.pack-slot')?.dataset?.tsid === GARDEN_FERTILIZER;
-    if (dragging) engine.setData?.('guanoDrag', 'dragging');
+    dragging = event.defaultPrevented ? '' : plotDragClass(event.target?.closest?.('.pack-slot')?.dataset?.tsid);
+    if (dragging === GARDEN_FERTILIZER) engine.setData?.('guanoDrag', 'dragging');
+    else if (dragging) engine.setData?.('seedDrag', `dragging:${dragging}`);
   });
   document.addEventListener('dragend', () => { if (dragging) endDrag(engine); });
   canvas.addEventListener('dragover', (event) => {
     if (!dragging) return;
     // Decorate and Cultivate have the room's own drops.
     const plot = engine.query?.('homeEditMode', engine) ? null : plotAt(engine, event);
+    const key = dragging === GARDEN_FERTILIZER ? 'guanoDrag' : 'seedDrag';
     if (!plot) {
-      engine.setData?.('guanoDrag', 'dragging');
+      engine.setData?.(key, dragging === GARDEN_FERTILIZER ? 'dragging' : `dragging:${dragging}`);
       showTip('');
       return;
     }
-    const over = guanoOver(plot, engine.targetVerbs?.(plot));
-    engine.setData?.('guanoDrag', `over:${plot.state?.plotKey}:${over.verb ? 'ok' : 'no'}`);
+    const over = overPlot(engine, plot, dragging);
+    engine.setData?.(key, `over:${plot.state?.plotKey}:${over.verb ? 'ok' : 'no'}`);
     showTip(over.tip, !over.verb, event.clientX, event.clientY);
     event.preventDefault();
     if (event.dataTransfer) event.dataTransfer.dropEffect = over.verb ? 'move' : 'none';
@@ -105,12 +141,13 @@ function wire(engine) {
   canvas.addEventListener('dragleave', () => { if (dragging) showTip(''); });
   canvas.addEventListener('drop', (event) => {
     if (!dragging) return;
+    const cls = dragging;
     const plot = engine.query?.('homeEditMode', engine) ? null : plotAt(engine, event);
     endDrag(engine);
     if (!plot) return;
     event.preventDefault();
-    const { verb } = guanoOver(plot, engine.targetVerbs?.(plot));
-    engine.setData?.('guanoDropLast', verb ? `ran:${plot.state?.plotKey}` : `refused:${plot.state?.plotKey}`);
+    const { verb } = overPlot(engine, plot, cls);
+    engine.setData?.(cls === GARDEN_FERTILIZER ? 'guanoDropLast' : 'seedDropLast', verb ? `ran:${plot.state?.plotKey}` : `refused:${plot.state?.plotKey}`);
     if (!verb) {
       engine.playSound?.('CLICK_FAILURE', { volume: 0.4 });
       return;

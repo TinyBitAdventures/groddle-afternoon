@@ -34,7 +34,7 @@ import {
   GARDEN_FERTILIZE_MS,
   fertilizeCheck,
   fertilizePlot,
-} from './js/garden.js?v=f784821d';
+} from './js/garden.js?v=788f2dbb';
 import { firstWorkingTool, HOE_TOOLS, WATERING_CAN_TOOLS } from './js/tools.js?v=5f482998';
 import { miningGemHint } from './js/gem-hints.js?v=4b65f7ac';
 import {
@@ -899,9 +899,14 @@ export function getVerbsFor(target, ctx) {
         ...(refusedAtOnce('plant') ? { durationMs: 0 } : {}),
         enabled: seeds.length > 0,
         reason: seeds.length ? '' : gType === 'herb' ? 'Need herb seeds' : 'Need crop seeds',
-        tooltip: seeds.length
-          ? `Plant ${seeds[0].label}`
-          : 'Buy seeds from the street spirit',
+        tooltip: seeds.length > 1
+          ? 'Choose which seeds to plant'
+          : seeds.length
+            ? `Plant ${seeds[0].label}`
+            : 'Buy seeds from the street spirit',
+        // #197: more than one kind of seed asks which (the original's "What would you like to
+        // plant?", InteractionMenuController.as 1531-1556); the choice runs plant:<seed>.
+        ...(seeds.length > 1 ? { picker: 'plant' } : {}),
       });
     }
     // G537: a dry empty plot takes water too (GardenView: a click on a dry plot with nothing in
@@ -1619,13 +1624,17 @@ export function runVerb(target, verbId, ctx) {
     if (!garden || !key) {
       return { ok: false, msgs: ['That plot is not ready.'], effects };
     }
+    // #197: plant:<seed> is the seed the player chose (the Plant menu, a seed dropped on the plot).
+    const chosenSeed = verbBase === 'plant' && verbTarget ? verbTarget : '';
     const preferSeed =
+      chosenSeed ||
       ctx.seedId ||
       listPlantableSeeds(inv, garden.gardenType || 'default')[0]?.seedId;
     const opts = {
       inv,
       now: Date.now(),
       seedId: preferSeed,
+      exactSeed: Boolean(chosenSeed),
       toolState: ctx.tools,
       learned: ctx.skills?.learned || ctx.learned || [],
       upgrades: ctx.imaginationUpgrades || pc.imaginationUpgrades || [],
@@ -1633,7 +1642,7 @@ export function runVerb(target, verbId, ctx) {
       ...(ctx.sharedGarden ? { rng: ctx.rng } : {}),
     };
     let r = null;
-    if (verbId === 'plant') r = plantPlot(garden, key, inv, pc, preferSeed, opts);
+    if (verbBase === 'plant') r = plantPlot(garden, key, inv, pc, preferSeed, opts);
     else if (verbId === 'water') r = waterPlot(garden, key, pc, opts);
     else if (verbId === 'harvest') r = harvestPlot(garden, key, inv, pc, opts);
     else if (verbId === 'clear') r = clearPlot(garden, key, pc, opts);
@@ -1665,12 +1674,12 @@ export function runVerb(target, verbId, ctx) {
       ok: true,
       msgs,
       effects,
-      anim: verbId,
+      anim: verbBase,
       gardenChanged: true,
       gardenTarget: s.gardenEntity,
       // Ticket 68: what the plot did, for its quest and badge counters (quest-offers.js gardenPlotEvents).
       gardenPlot: {
-        verb: verbId,
+        verb: verbBase,
         gardenType: garden.gardenType || 'default',
         home: Boolean(s.gardenEntity?.state?.detached),
         seedId: r.seedId || null,
