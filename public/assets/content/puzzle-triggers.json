@@ -724,7 +724,7 @@
      "onEnter": [
       "part2_gravity_off"
      ],
-     "why": "Floor pad hover_platform_1340320557464 (middleground, screen x=3376); its sprite bottom sits ~30 px under the floor (y=484), so the box is the floor above it. Part 2 pad set (show2_* events): touching it turns gravity to x-0.1, the float up in video 2j0v9FgQPig 0:05-0:20."
+     "why": "Floor pad hover_platform_1340320557464 (middleground, screen x=3376, sprite bottom y=474). Known wrong, left as first measured: the box is at the underside of its block (plat_1337125697389, y=484, pc_perm 1: a ceiling), not at the floor the pad stands on (plat_1337125697387, x 3304-3463, y=439), so this pad never fires. Not moved with pad 7465 (report #185): the block lies under the crystal cluster icicles_8, 97 px above its floor over its whole width, and is reached only through that gap. In the game on 2026-11-10 an avatar set on the block was sent back by those crystals in most tries, pad on or off, so a moved box could not be seen working. Body boxes take the avatar's height from its drawn bounds (51 px measured under a ceiling, more at other moments), not the 34 px these levels were built for. Move the box to y 443 when that height is settled. Part 2 pad set (show2_* events): touching it turns gravity to x-0.1, the float up in video 2j0v9FgQPig 0:05-0:20."
     },
     {
      "id": "pad_floor_7463",
@@ -751,13 +751,13 @@
     {
      "id": "pad_floor_7465",
      "x": 4687,
-     "y": 460,
+     "y": 428,
      "w": 56,
      "h": 34,
      "onEnter": [
       "part3_gravity_off"
      ],
-     "why": "Floor pad hover_platform_1340320557465 (middleground, screen x=4687); its sprite bottom sits ~30 px under the floor (y=456), so the box is the floor above it. Part 3 pad set (show3_* events): touching it turns gravity to x-0.1, the float up in video 2j0v9FgQPig 0:05-0:20."
+     "why": "Floor pad hover_platform_1340320557465 (middleground, screen x=4687, sprite bottom y=466); it stands in the U-shaped block on plat_1337187375119 (x 4656-4714, y=424, solid from above), so the box is that floor. The first measure took the block's underside (plat_1337187375144, y=456, pc_perm 1: a ceiling), and the box (426-464) began 2 px under the avatar's feet: the pad did nothing (report #185). Part 3 pad set (show3_* events): touching it turns gravity to x-0.1, the float up in video 2j0v9FgQPig 0:05-0:20."
     },
     {
      "id": "pad_floor_7467",

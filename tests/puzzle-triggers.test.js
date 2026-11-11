@@ -398,3 +398,83 @@ describe('report 184: every colour level has its exit door', () => {
     assert.match(readFileSync(join(root, 'public/js/doors.js'), 'utf8'), /return \(street\?\.doors \|\| \[\]\)\.filter\(\(door\) => door && !door\.hidden\);/);
   });
 });
+
+describe('report 185: every gravity pad of Purplysa fires where the avatar stands on it', () => {
+  const TSID = 'GHVP7QOKT403F5Q';
+  const st = street(TSID);
+  const ox = -st.bounds.l;
+  const oy = -st.bounds.t;
+  const BODY = 34; // the avatar's height at the colour levels' scale (puzzles-feature BODY_H)
+  const pads = data[TSID].triggers.filter((t) => t.id.startsWith('pad_'));
+  const decos = st.layers.flatMap((l) => l.decos || []).filter((d) => d.sprite === 'hover_platform');
+  const decoOf = (t) => decos.find((d) => d.id.endsWith(t.id.slice(-4)));
+  /** Screen y of the platforms over screen x that hold the avatar from that side (pc_perm -1 from above, 1 from below). */
+  const linesAt = (x, perm) => st.platforms
+    .filter((p) => p.pc_perm === perm && Math.min(p.x1, p.x2) + ox <= x && x <= Math.max(p.x1, p.x2) + ox)
+    .map((p) => p.y1 + oy + ((x - (p.x1 + ox)) / ((p.x2 - p.x1) || 1)) * (p.y2 - p.y1))
+    .sort((a, b) => a - b);
+
+  test('each of the 19 pad decos has one box, at its own x', () => {
+    assert.equal(decos.length, 19);
+    assert.equal(pads.length, 19);
+    for (const t of pads) {
+      const d = decoOf(t);
+      assert.ok(d, t.id);
+      assert.equal(t.x, d.x + ox, t.id);
+      assert.equal(d.r === -180 || d.r === 180, t.id.startsWith('pad_ceiling'), `${t.id} hangs or stands`);
+    }
+  });
+
+  test('a floor pad\'s box holds the avatar standing on the floor its art stands on', () => {
+    const floors = {};
+    for (const t of pads.filter((p) => p.id.startsWith('pad_floor'))) {
+      const d = decoOf(t);
+      // The art sinks 29 to 42 px into its floor: the floor is the lowest line above the sprite's bottom edge.
+      const floor = linesAt(t.x, -1).filter((y) => y <= d.y + oy).pop();
+      floors[t.id] = Math.round(floor);
+      assert.ok(d.y + oy - floor >= 29 && d.y + oy - floor <= 42, `${t.id}: art bottom ${d.y + oy}, floor ${floor}`);
+      if (t.id === 'pad_floor_7464') {
+        // Known dead, left so on purpose: its box is under the block (y 454-492, the floor is 439). The block
+        // lies under the crystals (icicles_8, 97 px above), which sent the avatar back in most tries in the
+        // game, pad on or off, so a moved box could not be seen working (the note in the data has the rest).
+        assert.equal(triggerHit(t, t.x, floor), false, 'pad 7464 is still off: move it with the avatar height');
+        const crystals = data[TSID].triggers.find((c) => c.id === 'icicles_8');
+        assert.ok(Math.abs(crystals.x - t.x) <= 2 && crystals.w / 2 > t.w / 2, 'the crystals hang over the whole pad');
+        assert.equal(floor - (crystals.y + 4), 97);
+        assert.match(raw.streets[TSID].triggers.find((c) => c.id === t.id).why, /Known wrong, left as first measured/);
+        continue;
+      }
+      for (const dy of [-2, 0, 2]) assert.equal(triggerHit(t, t.x, floor + dy), true, `${t.id} at its floor ${floor}${dy ? ` ${dy}` : ''}`);
+      for (const dx of [-20, 20]) assert.equal(triggerHit(t, t.x + dx, floor), true, `${t.id} ${dx} px off centre`);
+      assert.equal(t.y, Math.round(floor) + 4, `${t.id}: the box sits on its floor (the measure of the other pads)`);
+      assert.deepEqual([t.w, t.h], [56, 34], t.id);
+    }
+    // Report #185's pad was measured to the underside of its block (pc_perm 1, y 456), not its top (424).
+    assert.equal(floors.pad_floor_7465, 424);
+    assert.deepEqual(linesAt(4687, 1).filter((y) => y > 424 && y < 500), [456]);
+    assert.deepEqual(linesAt(3376, 1).filter((y) => y > 439 && y < 500), [484]);
+    // Nothing hangs over it: the way up from the U-shaped block is clear to the ceiling.
+    const over = data[TSID].triggers.filter((c) => c.respawn && Math.abs(c.x - 4687) <= c.w / 2 + 28 && c.y < 424);
+    assert.deepEqual(over.map((c) => c.id), []);
+  });
+
+  test('a ceiling pad\'s box holds the avatar hanging from the ceiling its art hangs from', () => {
+    for (const t of pads.filter((p) => p.id.startsWith('pad_ceiling'))) {
+      const d = decoOf(t);
+      // The art's top edge is up in the rock: the ceiling is the first line under it.
+      const ceiling = linesAt(t.x, 1).find((y) => y >= d.y + oy);
+      assert.ok(ceiling - (d.y + oy) <= 65, `${t.id}: art top ${d.y + oy}, ceiling ${ceiling}`);
+      assert.equal(triggerHit(t, t.x, ceiling + BODY, BODY), true, `${t.id} with its head at ${ceiling}`);
+      assert.equal(triggerHit(t, t.x, ceiling + BODY + 30, BODY), true, `${t.id} still rising`);
+    }
+  });
+
+  test('pads fire by their box alone: no event of the level gates them on a flag', () => {
+    for (const n of [1, 2, 3]) {
+      for (const name of [`part${n}_gravity_off`, `part${n}_gravity_on`]) {
+        assert.ok(st.events[name].every((a) => a.type === 'physics' || a.type === 'event'), name);
+      }
+    }
+    assert.deepEqual(pads.map((t) => t.onEnter.length), Array(19).fill(1));
+  });
+});
