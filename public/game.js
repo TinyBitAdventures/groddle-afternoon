@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=50ca835b';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=06bb8b74';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=59339f20';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=23ead0ce';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -653,7 +653,7 @@ import {
   ensureStreetIndex,
   resolveIndexTsid,
 } from './js/street-loader.js?v=18b181ad';
-import { showDraftBanner, startDraftPlay } from './js/builder/draft-play.js?v=4de947af';
+import { showDraftBanner, startDraftPlay } from './js/builder/draft-play.js?v=b23f3d53';
 import {
   ladderTopDeck,
   groundBeneath,
@@ -682,7 +682,7 @@ import {
   setSignpostHover,
   setSignpostKeys,
   signpostBoardAt,
-} from './js/street-render.js?v=881d705a';
+} from './js/street-render.js?v=1876e623';
 import {
   GAME_DAY_MS,
   shouldFireNewDay,
@@ -1970,6 +1970,9 @@ function applyWorldZoom() {
   }
 }
 
+/** G582: the most of the view the camera reserves at the right (street-render's edge mirrors cover it). */
+const CAMERA_RESERVE_SHARE = 0.42;
+
 /**
  * G582: the part of the world's right edge the HUD covers, in Pixi view coordinates. The original
  * client reserved its right-hand column's width when calculating its location viewport (loc_vp_w),
@@ -1990,7 +1993,7 @@ function syncCameraSafeArea() {
   const railCss = rail && rail.offsetParent !== null ? Math.max(0, rootRect.right - rail.getBoundingClientRect().left) : 0;
   const overlapCss = Math.max(drawerCss, railCss);
   cameraRightInset = overlapCss > 0
-    ? clamp(overlapCss * (VIEW_W / rootRect.width) + CAMERA_RAIL_CLEARANCE, 0, VIEW_W * 0.42)
+    ? clamp(overlapCss * (VIEW_W / rootRect.width) + CAMERA_RAIL_CLEARANCE, 0, VIEW_W * CAMERA_RESERVE_SHARE)
     : 0;
   drawerInsetSeen = root.style.getPropertyValue('--inset-r');
   return cameraRightInset;
@@ -23988,6 +23991,9 @@ async function enterStreet(tsid, opts = {}) {
     // G582: and past the street's right end, where the camera stops with the end left of the
     // Social drawer (syncCameraSafeArea reserves at most 0.42 of the view; the view grows with zoom).
     skirtRight: SKIRT_RIGHT_PAD,
+    // EDGE MIRROR (G582): each layer's art mirrored past the street's ends, where the camera can
+    // show past them (the Social drawer floats over the reserve). Classic covers nothing: narrow streets only.
+    edgeMirror: { insetShare: () => (modernUi() ? CAMERA_RESERVE_SHARE : 0) },
   });
   streetPlatforms = bgLayer.platformsScreen;
   streetWalls = wallsScreen(data);
@@ -31955,6 +31961,8 @@ async function main() {
   window.groddleQA = {
     /** SKIRT QA: the street's ground skirt (street-render buildGroundSkirt): depth, band, colours, layers, chunks. */
     groundSkirt: () => (bgLayer?.groundSkirt ? { ...bgLayer.groundSkirt } : null),
+    /** EDGE MIRROR QA: the street's mirrored end strips (street-render attachEdgeMirrors): sizes, resolution, bytes, builds. */
+    edgeMirrors: () => bgLayer?.edgeMirrorStats?.() || null,
     /**
      * FRIENDPOST QA: every signpost arm on screen (street posts' and a scene post's, the home
      * street's signpost) with its centre in view px (times the canvas's client box over viewW,

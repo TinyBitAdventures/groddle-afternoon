@@ -23,7 +23,7 @@ import {
   SKIRT_BAND,
   SKIRT_FADE_DEPTH,
   SKIRT_SLIDE_MAX,
-} from '../public/js/street-render.js?v=881d705a';
+} from '../public/js/street-render.js?v=1876e623';
 import { streetHeight, streetWidth } from '../public/js/street-model.js?v=b6cb6a4e';
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -76,7 +76,8 @@ describe('street layer data', () => {
     assert.match(body, /for \(const spr of solids\) strip\.addChild\(spr\);/);
     assert.ok(body.indexOf('strip.addChild(fade, shade, deep)') < body.indexOf('for (const spr of solids) strip.addChild(spr)'), 'the copy goes over the fade');
     // One texture per chunk, freed with the view.
-    assert.match(body, /root\.once\('destroyed', \(\) => \{\s*for \(const t of textures\) t\.destroy\(true\);/);
+    // The edge mirror's texture views go first (their sources go with the textures they frame).
+    assert.match(body, /root\.once\('destroyed', \(\) => \{\s*(?:\/\/[^\n]*\n\s*)?for \(const v of views\) v\.destroy\(false\);\s*for \(const t of textures\) t\.destroy\(true\);/);
     assert.match(src, /buildGroundSkirt\(PIXI, opts\.renderer, root, grounds, W, sourceH, skirtDepth, /);
   });
 

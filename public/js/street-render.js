@@ -1799,6 +1799,25 @@ function buildGroundSkirt(PIXI, renderer, root, grounds, W, sourceH, depthPx, gr
       cover.x = spr.x;
       cover.y = spr.y;
       strip.addChild(cover);
+      spr.edgeCover = cover;
+    }
+    // EDGE MIRROR (G582): past the right end, the middleground's art below the edge and its fade
+    // mirrored too (the last chunk's last `pad` px, flipped about the end), so under the edge the
+    // dirt meets its reflection instead of stopping at the end over the skirt's flat colour.
+    const views = [];
+    const lastSolid = solids[solids.length - 1];
+    if (pad > 0 && lastSolid && lastSolid.x + lastSolid.texture.width >= W - 1) {
+      for (const src of [lastSolid, lastSolid.edgeCover].filter(Boolean)) {
+        const tw = src.texture.width;
+        const take = Math.min(pad, tw);
+        const view = new PIXI.Texture({ source: src.texture.source, frame: new PIXI.Rectangle(tw - take, 0, take, src.texture.height) });
+        views.push(view);
+        const flip = new PIXI.Sprite(view);
+        flip.scale.x = -1;
+        flip.x = src.x + tw + take;
+        flip.y = src.y;
+        strip.addChild(flip);
+      }
     }
     // Each front layer's art below its bottom (in its own coordinates, where its bottom meets the
     // street's whenever the camera is low enough to show below the edge), rendered alone, gets a
@@ -1836,6 +1855,18 @@ function buildGroundSkirt(PIXI, renderer, root, grounds, W, sourceH, depthPx, gr
         spr.x = x0;
         spr.y = refY;
         cover.addChild(spr);
+        // EDGE MIRROR (G582): the last chunk's fade flipped past the layer's end, over its art's
+        // reflection there (street-render attachEdgeMirrors).
+        if (pad > 0 && x0 + w >= lw) {
+          const take = Math.min(pad, w);
+          const view = new PIXI.Texture({ source: over.source, frame: new PIXI.Rectangle(w - take, 0, take, deepest) });
+          views.push(view);
+          const flip = new PIXI.Sprite(view);
+          flip.scale.x = -1;
+          flip.x = x0 + w + take;
+          flip.y = refY;
+          cover.addChild(flip);
+        }
       }
       lc.x = home.x;
       lc.y = home.y;
@@ -1850,6 +1881,8 @@ function buildGroundSkirt(PIXI, renderer, root, grounds, W, sourceH, depthPx, gr
     for (const child of culled) child.culled = true;
     root.addChild(strip);
     root.once('destroyed', () => {
+      // Views first (their sources go with the textures they frame).
+      for (const v of views) v.destroy(false);
       for (const t of textures) t.destroy(true);
     });
     root.groundSkirt = {
@@ -1895,6 +1928,343 @@ function buildGroundSkirt(PIXI, renderer, root, grounds, W, sourceH, depthPx, gr
     onLoaded(base, done);
     onFailed(base, done);
   }
+}
+
+/** EDGE MIRROR (G582): px a mirrored strip runs on past the furthest the camera can show past a layer's end. */
+export const EDGE_MIRROR_MARGIN = 24;
+/** EDGE MIRROR: how far below a layer's bottom its strips run (the ground skirt's depth, about). */
+const EDGE_MIRROR_BELOW = 400;
+/** EDGE MIRROR: how far a layer's end clip runs on its open sides and up and down. */
+const EDGE_CLIP_FAR = 100000;
+/** EDGE MIRROR: the street's mirrored strips' texture budget (their resolution drops to fit). */
+export const EDGE_MIRROR_BYTES = 32 * 1024 * 1024;
+
+/**
+ * PURE (EDGE MIRROR, G582, Austin 2026-11-11 "mirror the street's edge"): how much of a layer's
+ * own art the camera can show past each of its ends, plus `margin` (0 where it shows none). The
+ * camera runs from 0 to the street's width less its location view (game.js cameraTargetForPlayer:
+ * the view less the right-hand reserve, `maxInset` at most), or sits centred on a street narrower
+ * than the view. Each parallax layer slides by parallaxLayerOffset, so past the street's end each
+ * ends at its own place: by the reserve itself for the middleground, by more for a layer wider
+ * than the street (the foreground), by less for a far one, and not at all for one narrower than
+ * the view. `parallax` false: a layer in street coordinates (the middleground; `layerW` unused).
+ * Capped at the layer's own width: a strip can only mirror the art there is.
+ */
+export function edgeMirrorWidths({ layerW, parallax = true, streetW, vpW, maxInset = 0, margin = EDGE_MIRROR_MARGIN }) {
+  const W = Number(streetW) || 0;
+  const view = Number(vpW) || 0;
+  const lw = parallax ? Number(layerW) || 0 : W;
+  if (!(lw > 0) || !(W > 0) || !(view > 0)) return { left: 0, right: 0 };
+  const inset = Math.min(Math.max(0, Number(maxInset) || 0), view * 0.48);
+  const cams = W >= view ? [0, Math.max(0, W - (view - inset))] : [-(view - W) / 2];
+  const maxX = W - view;
+  let left = 0;
+  let right = 0;
+  for (const cam of cams) {
+    // The layer's left end on screen: parallaxLayerOffset less the camera.
+    const lx = parallax ? (maxX > 0 ? cam / maxX : 1) * (view - lw) : -cam;
+    left = Math.max(left, lx);
+    right = Math.max(right, view - (lx + lw));
+  }
+  const fit = (gap) => (gap > 0.5 ? Math.min(Math.ceil(gap + Math.max(0, margin)), Math.floor(lw)) : 0);
+  return { left: fit(left), right: fit(right) };
+}
+
+/**
+ * PURE (EDGE MIRROR): the column of a layer one end's strip mirrors, in the layer's coordinates.
+ * 'right' takes the last `width` px and flips them about the layer's end (x = layerW), 'left' the
+ * first `width` px about x = 0, so the art at the end meets its own reflection. The strip runs from
+ * the highest art box crossing the column to the lowest, no lower than `bottom` (below a layer's
+ * bottom is the ground skirt's). Returns { side, x0, y0, w, h, at } (`at`: the x of the copy drawn
+ * with scale.x -1) or null when no art crosses the column.
+ */
+export function edgeMirrorStrip(side, width, layerW, boxes, bottom = Infinity) {
+  const w = Math.max(0, Math.floor(Number(width) || 0));
+  if (!w || !(layerW > 0)) return null;
+  const x0 = side === 'right' ? layerW - w : 0;
+  const x1 = x0 + w;
+  let y0 = Infinity;
+  let y1 = -Infinity;
+  for (const b of boxes || []) {
+    if (!b || b.x1 <= x0 || b.x0 >= x1 || b.y1 <= b.y0) continue;
+    y0 = Math.min(y0, b.y0);
+    y1 = Math.max(y1, b.y1);
+  }
+  y1 = Math.min(y1, bottom);
+  if (!(y1 > y0)) return null;
+  y0 = Math.floor(y0);
+  y1 = Math.ceil(y1);
+  return { side, x0, y0, w, h: y1 - y0, at: side === 'right' ? layerW + w : 0 };
+}
+
+/** PURE (EDGE MIRROR): the strips' render resolution: the renderer's (2 at most), lowered to fit `budget`. */
+export function edgeMirrorResolution(strips, base = 1, budget = EDGE_MIRROR_BYTES) {
+  let res = Math.min(2, Number(base) || 1);
+  const px = (strips || []).reduce((n, s) => n + s.w * s.h, 0);
+  while (res > 0.5 && px * res * res * 4 > budget) res /= 1.25;
+  return res;
+}
+
+/** EDGE MIRROR: a layer's drawn art as boxes in its coordinates (blur tiles by their tile). */
+function layerArtBoxes(PIXI, lc) {
+  const boxes = [];
+  for (const child of lc.children) {
+    const tile = child.blurTile;
+    if (tile) {
+      boxes.push({ x0: tile.x, y0: tile.y, x1: tile.x + tile.w, y1: tile.y + tile.h, child });
+      continue;
+    }
+    // Hidden decos, a blurred layer's parked originals, and the end clip.
+    if (!child.visible || child.edgeClip) continue;
+    const b = child instanceof PIXI.Sprite ? decoBox(child) : childBox(PIXI, child);
+    if (b) boxes.push({ ...b, child });
+  }
+  return boxes;
+}
+
+/**
+ * EDGE MIRROR: render one layer's strip column as on screen (its colour filter applied, its blur
+ * tiles and recoloured copies there baked, nothing culled), the layer alone in a throwaway parent
+ * (as buildGroundSkirt does), then put it back where it was.
+ */
+function renderEdgeStrip(PIXI, renderer, root, lc, strip, boxes, res) {
+  const x1 = strip.x0 + strip.w;
+  const y1 = strip.y0 + strip.h;
+  const unculled = [];
+  for (const b of boxes) {
+    if (b.x1 <= strip.x0 || b.x0 >= x1 || b.y1 <= strip.y0 || b.y0 >= y1) continue;
+    const child = b.child;
+    if (child.blurTile && root.blurStats) bakeBlurTile(child.blurTile, root.blurStats);
+    else if (child.recolour && !child.recolour.entry.texture && root.recolourCache) ensureRecoloured(PIXI, renderer, root.recolourCache, child);
+    if (child.culled) {
+      child.culled = false;
+      unculled.push(child);
+    }
+  }
+  const home = { parent: lc.parent, index: lc.parent ? lc.parent.getChildIndex(lc) : -1, x: lc.x, y: lc.y };
+  const shell = new PIXI.Container();
+  shell.addChild(lc);
+  lc.x = 0;
+  lc.y = 0;
+  const rt = PIXI.RenderTexture.create({ width: strip.w, height: strip.h, resolution: res });
+  try {
+    renderer.render({ container: shell, target: rt, transform: new PIXI.Matrix(1, 0, 0, 1, -strip.x0, -strip.y0), clear: true });
+  } finally {
+    lc.x = home.x;
+    lc.y = home.y;
+    if (home.parent) home.parent.addChildAt(lc, Math.min(home.index, home.parent.children.length));
+    shell.destroy();
+    for (const child of unculled) child.culled = true;
+  }
+  return rt;
+}
+
+/**
+ * EDGE MIRROR (G582, Austin 2026-11-11): the camera stops with a street's right end left of the
+ * Modern skin's Social drawer (game.js syncCameraSafeArea), and the drawer is a floating card, so
+ * the world past the end shows below and around it; on a street narrower than the view, past both
+ * ends. Each layer gets its own strip there: its art at that end, as drawn, flipped about the
+ * layer's own end, in a container beside the layer that moves with it (updateParallax), so the
+ * seam holds at every camera position whatever each layer's parallax. Art only: entities, items,
+ * signposts and platforms live elsewhere, and nothing past the end is walkable. One render texture
+ * per layer end, made once the street's art has loaded and the view width is known, made again
+ * when the view width (zoom, window) needs other widths or the renderer's resolution changes, and
+ * freed with the street view. `insetShare` (a number, or a function read every frame): the most
+ * of the view the camera reserves at the right (0 where nothing covers the world, as in Classic:
+ * only a narrow street's ends then); a change rebuilds.
+ */
+export function attachEdgeMirrors(PIXI, renderer, root, layers, W, sourceH, insetShare = 0) {
+  const state = { vpW: 0, share: 0, ready: false, timer: null, key: '', views: [], textures: [], strips: [], builds: 0, bytes: 0, res: 0, base: 0, ms: 0 };
+  const shareNow = () => Math.max(0, Number(typeof insetShare === 'function' ? insetShare() : insetShare) || 0);
+  state.share = shareNow();
+  const free = () => {
+    for (const view of state.views) {
+      const lc = view.edgeOf;
+      const clip = view.edgeClip;
+      if (clip && !clip.destroyed) {
+        if (lc && !lc.destroyed && lc.mask === clip) lc.mask = null;
+        clip.destroy();
+      }
+      if (lc && lc.edgeMirror === view) lc.edgeMirror = null;
+      if (!view.destroyed) view.destroy({ children: true });
+    }
+    for (const t of state.textures) t.destroy(true);
+    state.views = [];
+    state.textures = [];
+    state.strips = [];
+    state.bytes = 0;
+  };
+  const plan = (vpW) => layers
+    .filter((lc) => !lc.destroyed && lc.visible && lc.parent)
+    .map((lc) => {
+      const parallax = Boolean(lc.parallaxLayer);
+      const lw = parallax ? lc.parallaxLayer.w : W;
+      const widths = edgeMirrorWidths({ layerW: lw, parallax, streetW: W, vpW, maxInset: vpW * state.share });
+      // Art below the layer's bottom too (a front layer's dirt there fades into the skirt under
+      // its edge-fade cover, mirrored with it in buildGroundSkirt), down to EDGE_MIRROR_BELOW.
+      return { lc, lw, bottom: (parallax ? lc.parallaxLayer.h : sourceH) + EDGE_MIRROR_BELOW, ...widths };
+    });
+  const build = () => {
+    state.timer = null;
+    if (root.destroyed || !state.ready || !state.vpW) return;
+    const plans = plan(state.vpW);
+    const base = renderer.resolution || 1;
+    const wanted = plans.filter((p) => p.left || p.right);
+    const key = wanted.length ? `${base}|${wanted.map((p) => `${p.lc.label}:${p.left},${p.right}`).join(';')}` : 'none';
+    state.base = base;
+    if (key === state.key) return;
+    const t0 = performance.now();
+    free();
+    state.key = key;
+    const strips = [];
+    for (const p of wanted) {
+      const boxes = layerArtBoxes(PIXI, p.lc);
+      for (const side of ['left', 'right']) {
+        const s = edgeMirrorStrip(side, p[side], p.lw, boxes, p.bottom);
+        if (s) strips.push({ ...s, plan: p, boxes });
+      }
+    }
+    const res = edgeMirrorResolution(strips, base);
+    const views = new Map();
+    for (const s of strips) {
+      const lc = s.plan.lc;
+      let rt;
+      try {
+        rt = renderEdgeStrip(PIXI, renderer, root, lc, s, s.boxes, res);
+      } catch {
+        continue;
+      }
+      state.textures.push(rt);
+      state.bytes += Math.ceil(s.w * res) * Math.ceil(s.h * res) * 4;
+      let view = views.get(lc);
+      if (!view) {
+        view = new PIXI.Container();
+        view.label = `edge-mirror-${lc.label}`;
+        // Over the layer: art overhanging its end (Groddle Forest Junction's cliff runs 120 px on)
+        // is covered, so the reflection meets the art at the end itself.
+        view.zIndex = lc.zIndex + 0.5;
+        view.x = lc.x;
+        view.y = lc.y;
+        view.edgeOf = lc;
+        lc.parent.addChild(view);
+        lc.edgeMirror = view;
+        views.set(lc, view);
+        state.views.push(view);
+      }
+      const spr = new PIXI.Sprite(rt);
+      spr.scale.x = -1;
+      spr.x = s.at;
+      spr.y = s.y0;
+      spr.edgeSide = s.side;
+      spr.edgeLayerW = s.plan.lw;
+      view.addChild(spr);
+      state.strips.push({ layer: lc.label, side: s.side, w: s.w, h: s.h, y: s.y0 });
+    }
+    // Art that overhangs a mirrored end (Groddle Forest Junction's dirt lip runs 133 px on, higher
+    // than its reflection) would show over the reflection's clear pixels: those layers are clipped
+    // at their end while a strip is on screen (edgeMirrorFrame), the 2012 client never showing
+    // anything past a street's bounds.
+    for (const [lc, view] of views) {
+      const sides = new Set(view.children.map((spr) => spr.edgeSide));
+      const lw = view.children[0].edgeLayerW;
+      const boxes = strips.find((s) => s.plan.lc === lc).boxes;
+      const over = boxes.some((b) => (sides.has('right') && b.x1 > lw + 0.5) || (sides.has('left') && b.x0 < -0.5));
+      if (!over) continue;
+      const x0 = sides.has('left') ? 0 : -EDGE_CLIP_FAR;
+      const x1 = sides.has('right') ? lw : lw + EDGE_CLIP_FAR;
+      const clip = new PIXI.Graphics();
+      clip.rect(x0, -EDGE_CLIP_FAR, x1 - x0, EDGE_CLIP_FAR * 2).fill(0xffffff);
+      clip.label = 'edge-clip';
+      clip.edgeClip = true;
+      clip.visible = false;
+      lc.addChild(clip);
+      view.edgeClip = clip;
+    }
+    state.res = res;
+    state.builds += 1;
+    state.ms = Math.round(performance.now() - t0);
+  };
+  const schedule = (ms) => {
+    if (state.timer !== null) clearTimeout(state.timer);
+    state.timer = setTimeout(build, ms);
+  };
+  /** Once a frame from updateParallax: follow the layers, hide strips off screen, rebuild on a new width or resolution. */
+  root.edgeMirrorFrame = (camX, vpW) => {
+    const share = shareNow();
+    if (vpW !== state.vpW || share !== state.share) {
+      const first = !state.vpW;
+      state.vpW = vpW;
+      state.share = share;
+      if (state.ready) schedule(first ? 0 : 250);
+    } else if (state.ready && state.builds && state.timer === null && (renderer.resolution || 1) !== state.base) {
+      schedule(250);
+    }
+    for (const view of state.views) {
+      const lc = view.edgeOf;
+      if (!lc || lc.destroyed || view.destroyed) continue;
+      view.x = lc.x;
+      view.y = lc.y;
+      view.visible = lc.visible;
+      let shown = false;
+      for (const spr of view.children) {
+        // The layer's end on screen: the strip lies right of it (or left, at the left end).
+        const end = view.x + (spr.edgeSide === 'right' ? spr.edgeLayerW : 0) - camX;
+        spr.visible = spr.edgeSide === 'right' ? end < vpW + 1 : end > -1;
+        shown = shown || spr.visible;
+      }
+      const clip = view.edgeClip;
+      if (clip && !clip.destroyed) {
+        const want = shown && lc.visible ? clip : null;
+        if (lc.mask !== want) {
+          clip.visible = Boolean(want);
+          lc.mask = want;
+        }
+      }
+    }
+  };
+  /** QA (game.js groddleQA.edgeMirrors): the strips, their resolution and bytes, builds and the last build's ms. */
+  root.edgeMirrorStats = () => ({
+    vpW: state.vpW,
+    ready: state.ready,
+    builds: state.builds,
+    resolution: Math.round(state.res * 100) / 100,
+    textures: state.textures.length,
+    bytes: state.bytes,
+    ms: state.ms,
+    strips: state.strips.map((s) => ({ ...s })),
+  });
+  root.once('destroyed', () => {
+    if (state.timer !== null) clearTimeout(state.timer);
+    state.timer = null;
+    free();
+  });
+  // Wait for the layers' art (and, a turn later, their colour and blur bakes) as the skirt does.
+  const sprites = [];
+  for (const lc of layers) {
+    lc.children.forEach(function walk(child) {
+      if (child instanceof PIXI.Sprite) sprites.push(child);
+      (child.children || []).forEach(walk);
+    });
+  }
+  const pending = [...new Set(sprites.map((spr) => spr.texture?.source).filter((base) => base && !isLoaded(base)))];
+  const ready = () => setTimeout(() => {
+    state.ready = true;
+    if (state.vpW) schedule(0);
+  }, 0);
+  if (!pending.length) {
+    ready();
+    return state;
+  }
+  let left = pending.length;
+  const done = () => {
+    left -= 1;
+    if (left === 0) ready();
+  };
+  for (const base of pending) {
+    onLoaded(base, done);
+    onFailed(base, done);
+  }
+  return state;
 }
 
 /**
@@ -2053,9 +2423,11 @@ export function buildStreetView(street, PIXI, opts = {}) {
   const themeTop = 0x8eb8d8;
   const themeMid = 0xb5d4a0;
   const themeBot = 0x6b8f3c;
-  sky.rect(0, 0, W, sourceH * 0.45).fill(themeTop);
-  sky.rect(0, sourceH * 0.4, W, sourceH * 0.35).fill(themeMid);
-  sky.rect(0, sourceH * 0.7, W, Math.max(sourceH * 0.35, H - sourceH * 0.7)).fill(themeBot);
+  // EDGE MIRROR: past the ends too, behind the mirrored strips.
+  const skyPad = opts.edgeMirror ? 2048 : 0;
+  sky.rect(-skyPad, 0, W + skyPad * 2, sourceH * 0.45).fill(themeTop);
+  sky.rect(-skyPad, sourceH * 0.4, W + skyPad * 2, sourceH * 0.35).fill(themeMid);
+  sky.rect(-skyPad, sourceH * 0.7, W + skyPad * 2, Math.max(sourceH * 0.35, H - sourceH * 0.7)).fill(themeBot);
   sky.zIndex = -1000;
   if (!skyView) root.addChild(sky);
 
@@ -2235,6 +2607,10 @@ export function buildStreetView(street, PIXI, opts = {}) {
     const fronts = layerContainers.filter((lc) => lc.inFront);
     buildGroundSkirt(PIXI, opts.renderer, root, grounds, W, sourceH, skirtDepth, Number.isFinite(parsed) ? parsed : null, fallback, fronts, deepestPlatformY - sourceH, Math.max(0, Number(opts.skirtRight) || 0));
   }
+  // EDGE MIRROR (G582): each layer's art mirrored past its ends, where the camera can show past them.
+  if (opts.edgeMirror && opts.renderer) {
+    attachEdgeMirrors(PIXI, opts.renderer, root, layerContainers, W, sourceH, opts.edgeMirror.insetShare || 0);
+  }
   root.decoDrawn = drawn;
   /** Decos that play, for QA (canvas data-anim-decos): placed, strips in, playing, stopped off screen. */
   root.animStats = (detail = false) => {
@@ -2380,6 +2756,7 @@ export function buildStreetView(street, PIXI, opts = {}) {
       skyView.width = vpW;
       skyView.height = skyH;
     }
+    root.edgeMirrorFrame?.(camX, vpW);
   };
 
   // Collision geometry is normally invisible, as it was in the original

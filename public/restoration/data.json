@@ -2752,9 +2752,19 @@
   "deployed": "2026-11-11"
  },
  "git": {
-  "commits": 1659,
+  "commits": 1661,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-11",
+    "kind": "new",
+    "text": "A street's art carries on past its ends, mirrored"
+   },
+   {
+    "date": "2026-11-11",
+    "kind": "fix",
+    "text": "Clicking a garden plot picks the plot under the pointer, every row"
+   },
    {
     "date": "2026-11-11",
     "kind": "fix",
@@ -2864,19 +2874,9 @@
     "date": "2026-11-10",
     "kind": "fix",
     "text": "The Herb Gardens streets of Chakra Phool, Jethimadh and Shimla Mirch grow herbs in every bed"
-   },
-   {
-    "date": "2026-11-10",
-    "kind": "fix",
-    "text": "Typing a C in chat or a bug report no longer opens Camera Mode in the Institute of Ocular Testing"
-   },
-   {
-    "date": "2026-11-10",
-    "kind": "fix",
-    "text": "Ilmenskie Jones and the Sealed Cavern waits for Teleportation IV"
    }
   ]
  },
- "tests": 808,
+ "tests": 809,
  "generatedAt": "2026-11-11"
 }
