@@ -55,6 +55,7 @@
 import {
   GARDEN_FERTILIZER,
   SEED_CATALOG,
+  bedKind,
   createGarden,
   fertilizeCheck,
   gardenActionProfile,
@@ -63,7 +64,7 @@ import {
   hasWateringCan,
   pickSeedToPlant,
   seedFitsGarden,
-} from '../garden.js?v=1e8a887d';
+} from '../garden.js?v=f784821d';
 import { HOE_TOOLS, WATERING_CAN_TOOLS, canUseTool, firstWorkingTool } from '../tools.js?v=5f482998';
 import { addItem, countItem, ITEM_CATALOG, itemIcon } from '../inventory.js?v=60dfc9ca';
 import { JOB_WORK_OVERLAY, jobWorkToolScale, jobWorkToolSheet } from '../job-work-fx.js?v=ee7e10ca';
@@ -74,12 +75,14 @@ import {
   LOCK_LINE,
   SHARED_GARDEN_STREETS,
   applyPlot,
+  bedKey,
+  gardenBedKey,
   isSharedGardenStreet,
   lockedFor,
   parsePlotId,
   plotId,
   rollPasses,
-} from '../shared-gardens.js?v=43c290ef';
+} from '../shared-gardens.js?v=443ea35a';
 
 export const SHARED_GARDENS_FEATURE_ID = 'shared-gardens';
 const REQUEST_TIMEOUT_MS = 8000;
@@ -197,11 +200,12 @@ function takeSnapshot(engine, msg) {
 }
 
 /** The bed this feature holds for a garden type on this street (made the first time). */
-function sharedBed(engine, gardenType, cols, rows) {
-  const bed = gardenType === 'herb' ? 'herb' : 'default';
+function sharedBed(engine, bedName, cols, rows) {
+  const bed = bedKey(bedName);
   let garden = copy.beds.get(bed);
   if (!garden || garden.street !== engine.streetTsid) {
-    garden = createGarden({ cols, rows, gardenType: bed });
+    // herb2 is an herb bed (a Herb Gardens street's second, garden.js streetGardenBed).
+    garden = createGarden({ cols, rows, gardenType: bedKind(bed), bed });
     garden.shared = true;
     garden.street = engine.streetTsid;
     garden.source = 'shared public garden (G368)';
@@ -218,7 +222,7 @@ function adoptBeds(engine) {
   for (const t of engine.interactables || []) {
     const g = t.classId === 'garden_new' ? t.state?.garden : null;
     if (!g || g.shared || t.state.detached) continue;
-    const garden = sharedBed(engine, g.gardenType, g.cols, g.rows);
+    const garden = sharedBed(engine, gardenBedKey(g), g.cols, g.rows);
     t.state.garden = garden;
     for (const p of t.state.plotTargets || []) {
       p.state.garden = garden;
@@ -253,8 +257,9 @@ function backToLocal(engine) {
   const street = engine.streetWorld?.(engine.streetTsid);
   for (const t of bedTargets(engine)) {
     const g = t.state.garden;
-    const local = street?.gardens?.[g.gardenType] || createGarden({ cols: g.cols, rows: g.rows, gardenType: g.gardenType });
-    if (street) street.gardens[g.gardenType] = local;
+    const k = gardenBedKey(g);
+    const local = street?.gardens?.[k] || createGarden({ cols: g.cols, rows: g.rows, gardenType: g.gardenType, bed: k });
+    if (street) street.gardens[k] = local;
     t.state.garden = local;
     for (const p of t.state.plotTargets || []) {
       p.state.garden = local;
@@ -433,6 +438,8 @@ function toolUsed(engine, tools, wear) {
 function planVerb(engine, target, verbId) {
   const garden = target.state?.garden;
   const gType = garden?.gardenType === 'herb' ? 'herb' : 'default';
+  // The bed's key for the server (herb2 on a Herb Gardens street); gType is its kind.
+  const bk = gardenBedKey(garden);
   const pc = engine.pc || {};
   const inv = engine.inv || {};
   const energy = Number(pc.energy) || 0;
@@ -450,15 +457,15 @@ function planVerb(engine, target, verbId) {
       left -= profile.energy;
       const roll = Math.random();
       rolls.push(roll);
-      if (rollPasses(roll, profile.successRate)) ids.push(plotId(gType, key));
+      if (rollPasses(roll, profile.successRate)) ids.push(plotId(bk, key));
     }
     if (!ids.length) return { local: true, rolls };
-    return { send: { bed: gType, ids, tool: toolUsed(engine, WATERING_CAN_TOOLS, profile.toolWear) }, rolls };
+    return { send: { bed: bk, ids, tool: toolUsed(engine, WATERING_CAN_TOOLS, profile.toolWear) }, rolls };
   }
   const plot = target.state?.plot;
   const key = target.state?.plotKey;
   if (!plot || !key) return null;
-  const id = plotId(gType, key);
+  const id = plotId(bk, key);
   const cost = (action) => gardenActionProfile(gType, action, learned(engine), upgrades(engine)).energy;
   if (verbId === 'plant') {
     const seed = pickSeedToPlant(inv, undefined, gType);
@@ -507,7 +514,7 @@ function restorePlots(engine, target) {
   if (!garden?.shared) return;
   const now = Date.now();
   for (const key of Object.keys(garden.plots || {})) {
-    const s = copy.plots.get(plotId(garden.gardenType, key)) || { state: 'clean' };
+    const s = copy.plots.get(plotId(gardenBedKey(garden), key)) || { state: 'clean' };
     applyPlot(garden.plots[key], s, copy.offset, now);
   }
   engine.refreshGarden?.(target.classId === 'garden_new' ? target : target.state?.gardenEntity);
@@ -665,7 +672,7 @@ export const sharedGardensFeature = {
         me: () => me(),
         /** A bed's foot (Water All) in client px. */
         bedPoint(bed) {
-          const t = bedTargets(engine).find((b) => b.state.garden.gardenType === bed);
+          const t = bedTargets(engine).find((b) => gardenBedKey(b.state.garden) === bed);
           const rect = document.querySelector('#game-root > canvas')?.getBoundingClientRect();
           if (!t || !rect || !engine.entityLayer) return null;
           // Just below the front plots, whose hit boxes win over the bed's foot strip (game.js spawnGarden bedFoot).
@@ -676,7 +683,7 @@ export const sharedGardensFeature = {
         /** A plot's middle in client px, for a real click (garden-guano-feature's point). */
         point(id) {
           const at = parsePlotId(id);
-          const t = (engine.interactables || []).find((p) => p.classId === 'garden_plot' && p.state?.garden?.shared && p.state.garden.gardenType === at?.bed && p.state.plotKey === at?.key);
+          const t = (engine.interactables || []).find((p) => p.classId === 'garden_plot' && p.state?.garden?.shared && gardenBedKey(p.state.garden) === at?.bed && p.state.plotKey === at?.key);
           const rect = document.querySelector('#game-root > canvas')?.getBoundingClientRect();
           if (!t || !rect || !engine.entityLayer) return null;
           const g = engine.entityLayer.toGlobal(new engine.PIXI.Point(t.sprite.x, t.sprite.y - t.sprite._gardenHitH / 2));
@@ -692,12 +699,12 @@ export const sharedGardensFeature = {
    * game.js spawnGarden on a street bed: the shared bed this feature holds, or null when the bed
    * is the save's own (solo, a street not shared, no live realtime, a server without gardens).
    */
-  sharedGardenFor(gardenType, size, engine) {
+  sharedGardenFor(bedName, size, engine) {
     if (engine?.mode !== 'multiplayer' || !isSharedGardenStreet(engine.streetTsid)) return null;
     const c = bind(engine);
     if (!c || LOCAL_STATES.has(c.state)) return null;
     if (copy.street === engine.streetTsid && copy.none) return null;
-    const bed = gardenType === 'herb' ? 'herb' : 'default';
+    const bed = bedKey(bedName);
     const garden = sharedBed(engine, bed, size?.cols, size?.rows);
     const now = Date.now();
     for (const key of Object.keys(garden.plots)) {
@@ -774,7 +781,7 @@ export const sharedGardensFeature = {
       engine.toast?.(COPY.connecting, 2400);
       return true;
     }
-    const bed = target.state.garden.gardenType === 'herb' ? 'herb' : 'default';
+    const bed = gardenBedKey(target.state.garden);
     const id = `bed:${bed}`;
     for (const p of pending.values()) {
       if (p.id === id) {

@@ -17,7 +17,7 @@
  * window.groddleGuano reads and sets its plots (plot, set, bed).
  */
 
-import { FERTILIZE_TEXT, GARDEN_FERTILIZER, fertilizeCheck } from '../garden.js?v=1e8a887d';
+import { FERTILIZE_TEXT, GARDEN_FERTILIZER, fertilizeCheck } from '../garden.js?v=f784821d';
 
 export const GARDEN_GUANO_FEATURE_ID = 'garden-guano';
 const VERB = 'fertilize';

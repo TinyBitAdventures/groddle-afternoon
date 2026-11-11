@@ -2,9 +2,9 @@
  * Groddle Afternoon — original street geometry + layered decos
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
-import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=bb13a931';
+import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=69b550bf';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=06bb8b74';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=c5c83cf3';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=338b4e3b';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -501,7 +501,7 @@ import {
   parsePlayerSave,
   serializePlayerSave,
   restorePlayerSave,
-} from './js/player-save.js?v=bdbc947f';
+} from './js/player-save.js?v=8403daef';
 import {
   HOME_INTERIOR_TSID,
   HOME_STREET_TSID,
@@ -604,6 +604,7 @@ import { groupMakingTools, makeToolCounts, makeToolCountLine, makeToolSpokenLine
 import { LOW_FUEL_LINE, craftSessionElapsedMs, isLowFuel, isMachineArt, machineArtHtml, packMakeState, playMachineHandOver, setMachineArtFrame } from './js/machine-art.js?v=608f7257';
 import {
   createGarden,
+  streetGardenBed,
   tickGarden,
   plantPlot,
   waterPlot,
@@ -626,7 +627,7 @@ import {
   cropIcon,
   hasWateringCan,
   hasHoe,
-} from './js/garden.js?v=1e8a887d';
+} from './js/garden.js?v=f784821d';
 import { GARDEN_SCALE, PLOT_H as GARDEN_PLOT_H, PLOT_W as GARDEN_PLOT_W, gardenFrame, gardenLayout, gardenStyle, plotPieces } from './js/garden-view.js?v=3683a26f';
 import {
   ROCK_CATALOG,
@@ -835,7 +836,7 @@ import {
   createVendorSellQuote,
   vendorSellUnitPrice,
   vendorBuyUnitPrice,
-} from './js/vendor.js?v=0c55a0bf';
+} from './js/vendor.js?v=169b43f6';
 import {
   animalAnchorX,
   animalAnchorY,
@@ -999,7 +1000,7 @@ import { ENCYCLOPEDIA_MENU_LABEL, createEncyclopedia, isEncyclopediaKey } from '
 import { EAT_PICK_TEXT, bestFoodIndex, eatChoices, eatTip } from './js/eat-pick.js?v=8fb763d0';
 import { installHeldKeyGuard, isMacPlatform } from './js/held-keys.js?v=98b96620';
 import { signpostArmRows, worldContextAction } from './js/world-context-menu.js?v=f3f48805';
-import { blockedPlayerVerbs, listPlayerTarget, opensPlayerMenu, playerMenuRows } from './js/ui/player-menu.js?v=448b308a';
+import { blockedPlayerVerbs, listPlayerTarget, opensPlayerMenu, playerMenuRows } from './js/ui/player-menu.js?v=4a5b7744';
 import { forgetTexture, frameTexture, isFailed, isLoaded, onFailed, onLoaded, textureFromUrl, whenLoaded } from './js/textures.js?v=f024bd6a';
 import { FALLBACK_MAX as WORLD_ART_FALLBACK_MAX, worldArtFor } from './js/world-art.js?v=0729bf92';
 import { sceneAnim, syncAnim } from './js/deco-anim.js?v=aa35e023';
@@ -24022,12 +24023,15 @@ async function enterStreet(tsid, opts = {}) {
   if (currentStreetPopulation.shrine) await spawnShrine(placement('shrine')[0]);
   refreshDroppedWorldItems();
   placement('gardens').forEach((point, index) => {
+    // The first bed grows crops and the second herbs, except on the Herb Gardens streets (report 188).
+    const bed = streetGardenBed(data.tsid, index);
     spawnGarden({
       x: point.x,
       y: point.y + 2,
-      cols: index === 0 ? 4 : 3,
+      cols: bed.cols,
       rows: 2,
-      gardenType: index === 0 ? 'default' : 'herb',
+      gardenType: bed.gardenType,
+      bed: bed.bed,
     });
   });
   spawnMineRocks(currentStreetPopulation.rockClasses, placement('rocks'));
@@ -28964,11 +28968,16 @@ function spawnGarden(opts = {}) {
   const streetState = streetWorldState();
   // G368: a public garden shared online is the realtime server's (features/shared-gardens-feature.js),
   // held by that feature and never kept in the save; null everywhere else (solo, homes, other streets).
-  const sharedGarden = !opts.detached && !opts.garden ? features.query('sharedGardenFor', gardenType, { cols, rows }, engine) : null;
+  // A street bed's key (garden.js streetGardenBed): its kind, or herb2 on a Herb Gardens street.
+  const bedKey = opts.bed || gardenType;
+  const sharedGarden = !opts.detached && !opts.garden ? features.query('sharedGardenFor', bedKey, { cols, rows }, engine) : null;
   // Detached gardens (home cultivations) keep their plots with their owner.
-  const garden = opts.garden || sharedGarden || (opts.detached ? null : streetState.gardens[gardenType]) ||
-    createGarden({ cols, rows, gardenType });
-  if (!opts.detached && !sharedGarden) streetState.gardens[gardenType] = garden;
+  const garden = opts.garden || sharedGarden || (opts.detached ? null : streetState.gardens[bedKey]) ||
+    createGarden({ cols, rows, gardenType, bed: bedKey });
+  if (!opts.detached && !sharedGarden) {
+    if (bedKey !== gardenType) garden.bed = bedKey;
+    streetState.gardens[bedKey] = garden;
+  }
   // Growth continues while the player is away or the browser is closed.
   tickGarden(garden, Date.now());
   const pts = samplePlatformPoints(3);
@@ -32153,7 +32162,7 @@ async function main() {
   }
   // Garden talkback QA (js/garden-talk-qa.js): ?gardentalkdemo=herb|crop.
   if (new URLSearchParams(location.search).has('gardentalkdemo')) {
-    import('./js/garden-talk-qa.js?v=f28e30df').then((m) => m.runGardenTalkDemo({ engine, executeVerb, params: new URLSearchParams(location.search) }));
+    import('./js/garden-talk-qa.js?v=e394c5b8').then((m) => m.runGardenTalkDemo({ engine, executeVerb, params: new URLSearchParams(location.search) }));
   }
   // MEMQA (ticket 21, Safari's memory reload in Naraka): ?memqa=1 lets a probe walk streets through the
   // real street trip (tools/qa/street-memory.mjs). Solo pages only: online pages drop their params.

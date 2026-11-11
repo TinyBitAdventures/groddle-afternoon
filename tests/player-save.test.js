@@ -12,7 +12,7 @@ import {
   parsePlayerSave,
   restorePlayerSave,
   serializePlayerSave,
-} from '../public/js/player-save.js?v=bdbc947f';
+} from '../public/js/player-save.js?v=8403daef';
 
 const publicRoot = join(import.meta.dirname, '..', 'public');
 
@@ -342,7 +342,7 @@ describe('player save client integration', () => {
     assert.match(game, /systems: persistentSystems\(\)/);
     assert.match(game, /world: persistentWorldState/);
     assert.match(game, /restoreAnimalStateCache\(\)/);
-    assert.match(game, /streetState\.gardens\[gardenType\]/);
+    assert.match(game, /streetState\.gardens\[bedKey\]/);
     assert.match(game, /streetState\.trees\[i\]/);
     assert.match(game, /streetState\.rocks\[index\]/);
     assert.match(game, /collectedApples/);

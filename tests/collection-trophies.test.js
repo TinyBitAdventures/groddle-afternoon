@@ -13,7 +13,7 @@ import { applyAchievementProgress, createAchievementState, getAchievementProgres
 import { COLLECTION_TROPHIES, COUNTED_ON_ARRIVAL, HELD_AT_ONCE, collectionClasses, heldChanges, planCollectionTrophies } from '../public/js/collection-trophies.js?v=69205984';
 import { TROPHY_WHERE_TEXT } from '../public/js/home-trophies.js?v=309fd6c7';
 import { ITEM_CATALOG } from '../public/js/inventory.js?v=60dfc9ca';
-import { vendorSellValue } from '../public/js/vendor.js?v=0c55a0bf';
+import { vendorSellValue } from '../public/js/vendor.js?v=169b43f6';
 import { collectionTrophiesFeature as feature } from '../public/js/features/collection-trophies-feature.js?v=a54215da';
 
 const here = dirname(fileURLToPath(import.meta.url));

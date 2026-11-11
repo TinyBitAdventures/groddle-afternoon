@@ -10,11 +10,11 @@ import { execFileSync, spawnSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { describe, it } from 'node:test';
 
-import { SEED_CATALOG, createGarden, harvestPlot, plantPlot, tickGarden, waterAllPlots, waterPlot } from '../public/js/garden.js?v=1e8a887d';
-import { GARDEN_LOCK_MS, LOCK_LINE, SHARED_GARDEN_STREETS, applyPlot, isSharedGardenStreet, localPlot, lockedFor, parsePlotId, plotId, rollPasses } from '../public/js/shared-gardens.js?v=43c290ef';
-import { sharedGardensFeature } from '../public/js/features/shared-gardens-feature.js?v=70f93f53';
-import { FEATURES } from '../public/js/features/index.js?v=c5c83cf3';
-import { mgDetails, potionPlotCount } from '../public/js/master-garden.js?v=2953386a';
+import { SEED_CATALOG, createGarden, harvestPlot, plantPlot, tickGarden, waterAllPlots, waterPlot } from '../public/js/garden.js?v=f784821d';
+import { GARDEN_LOCK_MS, LOCK_LINE, SHARED_GARDEN_STREETS, applyPlot, isSharedGardenStreet, localPlot, lockedFor, parsePlotId, plotId, rollPasses } from '../public/js/shared-gardens.js?v=443ea35a';
+import { sharedGardensFeature } from '../public/js/features/shared-gardens-feature.js?v=904836bf';
+import { FEATURES } from '../public/js/features/index.js?v=338b4e3b';
+import { mgDetails, potionPlotCount } from '../public/js/master-garden.js?v=d1d313ea';
 // A fresh pick's save waits for the server's receipt (GRANT_SAVE_DELAY_MS): the tests wait it out.
 const settle = () => new Promise((res) => setTimeout(res, 2700));
 import { HAS_SITE, SITE_DIR, serverPath, sitePath, skipWithoutServer } from '../tools/repos.mjs';
@@ -104,8 +104,8 @@ describe('the feature', () => {
     assert.ok(ids.includes('shared-gardens'));
     assert.ok(ids.indexOf('shared-gardens') < ids.indexOf('street-objects'));
     const game = read('public/game.js');
-    assert.match(game, /features\.query\('sharedGardenFor', gardenType, \{ cols, rows \}, engine\)/);
-    assert.match(game, /if \(!opts\.detached && !sharedGarden\) streetState\.gardens\[gardenType\] = garden;/);
+    assert.match(game, /features\.query\('sharedGardenFor', bedKey, \{ cols, rows \}, engine\)/);
+    assert.match(game, /if \(!opts\.detached && !sharedGarden\) \{\n    if \(bedKey !== gardenType\) garden\.bed = bedKey;\n    streetState\.gardens\[bedKey\] = garden;/);
     assert.match(game, /const refusedNow = features\.query\('verbRefusedNow', target, verb\.id, engine\);\s*if \(refusedNow\) \{\s*toast\(refusedNow, 2600\);\s*pushActivity\(refusedNow\);\s*playSound\('CLICK_FAILURE'/);
     assert.match(game, /sharedGarden: Boolean\(sharedGrant\?\.garden\)/);
     const content = read('public/content.js');
@@ -424,3 +424,38 @@ function rig({ street = COMMUNITY }) {
   };
   return { engine, client, sent, world, receipts, bed, bedT, plot };
 }
+
+describe('report 188: the Herb Gardens streets grow herbs in both beds', () => {
+  it('streetGardenBed gives two herb beds there (herb2, herb) and crop then herb everywhere else', async () => {
+    const { HERB_GARDEN_STREETS, bedKind, streetGardenBed } = await import('../public/js/garden.js?v=f784821d');
+    assert.deepEqual([...HERB_GARDEN_STREETS].sort(), ['GA95U14319524O9', 'GA97L62229522GS', 'GA99U5PI39524GN']);
+    for (const tsid of HERB_GARDEN_STREETS) {
+      assert.deepEqual(streetGardenBed(tsid, 0), { bed: 'herb2', gardenType: 'herb', cols: 4 });
+      assert.deepEqual(streetGardenBed(tsid, 1), { bed: 'herb', gardenType: 'herb', cols: 3 });
+      // The L tsid names the same street.
+      assert.equal(streetGardenBed(`L${tsid.slice(1)}`, 0).gardenType, 'herb');
+    }
+    assert.deepEqual(streetGardenBed('GLI2V0UN7RD1T2J', 0), { bed: 'default', gardenType: 'default', cols: 4 });
+    assert.deepEqual(streetGardenBed('GLI2V0UN7RD1T2J', 1), { bed: 'herb', gardenType: 'herb', cols: 3 });
+    assert.equal(bedKind('herb2'), 'herb');
+    assert.equal(bedKind('default'), 'default');
+  });
+
+  it('herb2 plot ids round-trip, and the save keeps an herb2 bed', async () => {
+    assert.equal(plotId('herb2', '4-2'), 'herb2:4-2');
+    assert.deepEqual(parsePlotId('herb2:4-2'), { bed: 'herb2', key: '4-2' });
+    assert.equal(parsePlotId('herb3:1-1'), null);
+    const { gardenBedKey } = await import('../public/js/shared-gardens.js?v=443ea35a');
+    assert.equal(gardenBedKey(createGarden({ gardenType: 'herb', bed: 'herb2' })), 'herb2');
+    assert.equal(gardenBedKey(createGarden({ gardenType: 'herb' })), 'herb');
+    assert.equal(gardenBedKey(createGarden({})), 'default');
+    const src = readFileSync(new URL('../public/js/player-save.js', import.meta.url), 'utf8');
+    assert.match(src, /for \(const type of \['default', 'herb', 'herb2'\]\)/);
+  });
+
+  it('game.js lays the street beds out by streetGardenBed and keeps each under its own key', () => {
+    const src = readFileSync(new URL('../public/game.js', import.meta.url), 'utf8');
+    assert.match(src, /const bed = streetGardenBed\(data\.tsid, index\);/);
+    assert.match(src, /streetState\.gardens\[bedKey\] = garden;/);
+  });
+});

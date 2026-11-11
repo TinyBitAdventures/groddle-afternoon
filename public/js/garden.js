@@ -1040,6 +1040,35 @@ export function createEmptyPlot(now = Date.now()) {
 /**
  * @param {{ cols?: number, rows?: number, gardenType?: string, now?: number }} [opts]
  */
+/**
+ * The three Herb Gardens streets, where every planter box was an herb garden: Tiny Speck's blog
+ * of 2011-08-15 ("Beta livin'": herb seeds go in "special planter boxes located in the community
+ * gardens and living quarters of Shimla Mirch, Chakra Phool and Jethimadh"), and player footage of
+ * Jethimadh Herb Gardens (nNe9qJWrcwI, reference only) shows herbs in its beds. Each garden's own
+ * garden_type was not archived (the location XML keeps only the label "Garden"). Report 188.
+ */
+export const HERB_GARDEN_STREETS = Object.freeze(['GA95U14319524O9', 'GA97L62229522GS', 'GA99U5PI39524GN']);
+
+const tsidBody = (tsid) => String(tsid || '').slice(1);
+
+/**
+ * A street's bed at placement index 0 or 1 (street-ecology places at most two): its key (where the
+ * street's state and the shared plot ids keep it), its kind and its width. Everywhere else the
+ * first is the crop bed and the second the herb bed; on the Herb Gardens streets both are herb
+ * beds, the first keyed herb2 so the two never share a key.
+ * @returns {{ bed: 'default'|'herb'|'herb2', gardenType: 'default'|'herb', cols: number }}
+ */
+export function streetGardenBed(tsid, index) {
+  const herbStreet = HERB_GARDEN_STREETS.some((t) => tsidBody(t) === tsidBody(tsid));
+  if (index === 0) return herbStreet ? { bed: 'herb2', gardenType: 'herb', cols: 4 } : { bed: 'default', gardenType: 'default', cols: 4 };
+  return { bed: 'herb', gardenType: 'herb', cols: 3 };
+}
+
+/** A bed key's kind: herb2 is an herb bed. */
+export function bedKind(bed) {
+  return bed === 'herb' || bed === 'herb2' ? 'herb' : 'default';
+}
+
 export function createGarden(opts = {}) {
   ensureGardenItems();
   const cols = Math.max(1, opts.cols || 4);
@@ -1057,6 +1086,8 @@ export function createGarden(opts = {}) {
     classId: 'garden_new',
     label: gardenType === 'herb' ? 'Herb Garden' : 'Crop Garden',
     gardenType,
+    // The street's key for this bed (streetGardenBed); a home bed has none.
+    ...(opts.bed && opts.bed !== gardenType ? { bed: opts.bed } : {}),
     cols,
     rows,
     plots,

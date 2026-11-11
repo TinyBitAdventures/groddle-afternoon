@@ -54,10 +54,10 @@ import {
   plotNeedsWater,
   gardenNeedsWater,
   GARDEN_NO_DRY_PLOTS_LINE,
-} from '../public/js/garden.js?v=1e8a887d';
-import { getVerbsFor, runVerb } from '../public/content.js?v=bb13a931';
+} from '../public/js/garden.js?v=f784821d';
+import { getVerbsFor, runVerb } from '../public/content.js?v=69b550bf';
 import { plotPieces } from '../public/js/garden-view.js?v=3683a26f';
-import { plotsFor } from '../public/js/master-garden.js?v=2953386a';
+import { plotsFor } from '../public/js/master-garden.js?v=d1d313ea';
 import {
   createInventory,
   countItem,
@@ -65,7 +65,7 @@ import {
   listPackToolSlots,
   isToolItem,
 } from '../public/js/inventory.js?v=60dfc9ca';
-import { DEFAULT_VENDOR, vendorBuy } from '../public/js/vendor.js?v=0c55a0bf';
+import { DEFAULT_VENDOR, vendorBuy } from '../public/js/vendor.js?v=169b43f6';
 import { HAS_SITE, SITE_DIR } from '../tools/repos.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -351,7 +351,8 @@ describe('UI wiring for garden', () => {
     assert.ok(
       game.includes("gardenType: 'herb'") ||
       game.includes('gardenType: "herb"') ||
-      /gardenType:\s*index\s*===\s*0\s*\?\s*['"]default['"]\s*:\s*['"]herb['"]/.test(game)
+      // Report 188: the beds come from garden.js streetGardenBed (crop then herb, or two herb beds).
+      /gardenType:\s*bed\.gardenType/.test(game)
     );
     assert.ok(game.includes('starterGardenTools') || game.includes('watering_can'));
     const content = readFileSync(join(__dirname, '../public/content.js'), 'utf8');

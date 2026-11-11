@@ -54,13 +54,23 @@ export function isSharedGardenStreet(tsid) {
   return SHARED_GARDEN_STREETS.includes(String(tsid || ''));
 }
 
+/** A bed key as the server names it: default, herb, or herb2 (a Herb Gardens street's second herb bed, garden.js streetGardenBed). */
+export function bedKey(bed) {
+  return bed === 'herb' || bed === 'herb2' ? bed : 'default';
+}
+
+/** The key of a street garden object: its bed (herb2) or its kind. */
+export function gardenBedKey(garden) {
+  return bedKey(garden?.bed || (garden?.gardenType === 'herb' ? 'herb' : 'default'));
+}
+
 export function plotId(bed, key) {
-  return `${bed === 'herb' ? 'herb' : 'default'}:${key}`;
+  return `${bedKey(bed)}:${key}`;
 }
 
 /** "herb:2-1" -> { bed: 'herb', key: '2-1' }, or null. */
 export function parsePlotId(id) {
-  const m = String(id || '').match(/^(default|herb):(\d{1,2}-\d{1,2})$/);
+  const m = String(id || '').match(/^(default|herb|herb2):(\d{1,2}-\d{1,2})$/);
   return m ? { bed: m[1], key: m[2] } : null;
 }
 
