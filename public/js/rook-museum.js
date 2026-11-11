@@ -97,7 +97,9 @@ export const ROOK_MUSEUM_GREETING = Object.freeze([
   },
   {
     text: 'Yes, for if not you, then who else?',
-    response: 'Lead the way.',
+    // The last page of rook_hall_start's completion has no butt_txt; "Lead the way." is Part II's
+    // accept (rook_hall.js button_accept), on its own offer now (game.js offerPartTwo, report 191).
+    response: 'OK',
   },
 ]);
 

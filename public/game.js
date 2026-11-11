@@ -251,7 +251,7 @@ import {
   rookMuseumOverlayPoint,
   rookMuseumPaintingAlphas,
   visitRookMuseumExhibit,
-} from './js/rook-museum.js?v=fa8a0120';
+} from './js/rook-museum.js?v=825ff833';
 import {
   DE_EMBIGGENIFY_PART2_QUEST_ID,
   DE_EMBIGGENIFY_QUEST_ID,
@@ -20177,12 +20177,36 @@ function beginRookMuseumOrientation() {
         updateHud();
       },
     });
+  // Report 191: Part II is its own offer, as the Greeterbot gave it (items/include/npc_quests.js
+  // offerQuests: the quest by its title, then its offer, rook_hall.js "Now, this way please. Let us
+  // enter the museum." with "Lead the way."). It used to start silently, so its completion card
+  // was the first a player heard of It's Educational II. Not now leaves it for another talk.
+  const offerPartTwo = () => {
+    if (questState.active?.[ROOK_HALL_QUEST_ID]) {
+      beginTourDialogue();
+      return;
+    }
+    const def = getQuestCatalog()[ROOK_HALL_QUEST_ID] || {};
+    openScriptedQuestDialogue({
+      title: def.title || 'It’s Educational II',
+      kicker: 'Greeterbot Sentry G-42',
+      offer: true,
+      beats: [{ text: def.offer || 'Now, this way please. Let us enter the museum.', response: def.acceptLabel || 'Lead the way.' }],
+      onComplete: () => {
+        playSound('QUEST_ADDED', { volume: 0.6 });
+        if (!questState.active?.[ROOK_HALL_QUEST_ID]) assignQuest(questState, ROOK_HALL_QUEST_ID, { ignorePrereq: true });
+        beginTourDialogue();
+      },
+      onCancel: () => {},
+      cancelable: true,
+      primaryLabel: def.acceptLabel || 'Lead the way.',
+      cancelLabel: 'Not right now',
+    });
+  };
   if (questState.completed.includes(ROOK_HALL_START_QUEST_ID)) {
     // Part one done but part two left unfinished: the Greeterbot offers it again (rook_hall.js).
-    if (!questState.active?.[ROOK_HALL_QUEST_ID] && !questState.completed.includes(ROOK_HALL_QUEST_ID)) {
-      assignQuest(questState, ROOK_HALL_QUEST_ID, { ignorePrereq: true });
-    }
-    beginTourDialogue();
+    if (!questState.completed.includes(ROOK_HALL_QUEST_ID)) offerPartTwo();
+    else beginTourDialogue();
     return;
   }
   openScriptedQuestDialogue({
@@ -20193,10 +20217,7 @@ function beginRookMuseumOrientation() {
       if (questState.active?.[ROOK_HALL_START_QUEST_ID]) {
         completeQuest(questState, ROOK_HALL_START_QUEST_ID, pc);
       }
-      if (!questState.active?.[ROOK_HALL_QUEST_ID]) {
-        assignQuest(questState, ROOK_HALL_QUEST_ID, { ignorePrereq: true });
-      }
-      beginTourDialogue();
+      offerPartTwo();
     },
   });
 }

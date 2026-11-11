@@ -30,7 +30,7 @@ import {
   rookMuseumPaintingAlphas,
   rookMuseumWorldPoint,
   visitRookMuseumExhibit,
-} from '../public/js/rook-museum.js?v=fa8a0120';
+} from '../public/js/rook-museum.js?v=825ff833';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -230,4 +230,21 @@ test('the hall draws Tiny Speck art only: no drawn walls, labels, Greeterbot or 
   assert.equal((html.match(/data-rook-museum-layer="\d"/g) || []).length, 4);
   assert.match(html, /data-rook-museum-frame/);
   assert.doesNotMatch(css, /is-painting img \{[^}]*border: 10px/);
+});
+
+test("report 191: It's Educational II has its own offer after Part I, as the Greeterbot gave it", () => {
+  // rook_hall_start's completion ends without a butt_txt; "Lead the way." is rook_hall's accept.
+  assert.equal(ROOK_MUSEUM_GREETING.at(-1).response, 'OK');
+  const quests = JSON.parse(fs.readFileSync(new URL('../public/assets/content/quests.json', import.meta.url), 'utf8'));
+  const two = (quests.quests || quests).rook_hall;
+  assert.equal(two.title, "It's Educational II");
+  assert.equal(two.offer, 'Now, this way please. Let us enter the museum.');
+  assert.equal(two.acceptLabel, 'Lead the way.');
+  const game = fs.readFileSync(new URL('../public/game.js', import.meta.url), 'utf8');
+  const fn = game.slice(game.indexOf('function beginRookMuseumOrientation('), game.indexOf('function finishRookMuseumQuest('));
+  assert.match(fn, /const offerPartTwo = \(\) => \{/);
+  assert.match(fn, /offer: true,\n      beats: \[\{ text: def\.offer/);
+  assert.match(fn, /completeQuest\(questState, ROOK_HALL_START_QUEST_ID, pc\);\n      \}\n      offerPartTwo\(\);/);
+  // Part II is never assigned without its offer being accepted.
+  assert.equal((fn.match(/assignQuest\(questState, ROOK_HALL_QUEST_ID/g) || []).length, 1);
 });
