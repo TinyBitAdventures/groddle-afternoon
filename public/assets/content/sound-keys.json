@@ -9093,7 +9093,7 @@
    ],
    "file": "assets/audio/sfx/STILL_READY.mp3",
    "origin": "sounds-zip",
-   "why": "still.js:413 finishWorking: the Still has run dry or is full, a moment the remake does not have yet. The archive.org copy this key had before (still-ready.mp3) is this take, 8.4 dB louder (r 0.981), so the server's own file is its recording",
+   "why": "still.js:413 finishWorking: the Still has run dry or is full, and rings for its holder (supply-feature.js). The archive.org copy this key had before (still-ready.mp3) is this take, 8.4 dB louder (r 0.981), so the server's own file is its recording",
    "zipFile": "1322173657-Ready_1.1.mp3",
    "zipMd5": "f1d531c34b66a6e6a3e938296d68cb60",
    "zipMatch": "same-take"

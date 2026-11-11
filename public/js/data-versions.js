@@ -22,7 +22,7 @@
       "assets/content/deco-catalog.json": "4540131b",
       "assets/content/puzzle-triggers.json": "5d5b997c",
       "assets/content/signpost-graph.json": "c618fc41",
-      "assets/content/sound-keys.json": "9ea4c89c",
+      "assets/content/sound-keys.json": "e223c5a7",
       "assets/content/street-ecology.json": "52c389c0",
       "assets/content/style-profiles.json": "1a7e5474",
       "assets/content/trade-items.json": "962cd9b4",

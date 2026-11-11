@@ -1,6 +1,6 @@
 /**
  * The Still's sounds (items/still.js): the hopper lid on Distill, its own chime on
- * Collect, both Tiny Speck's server files (tools/sound/sounds-zip-map.json). The
+ * Collect, its done chime when it runs dry or fills up, all Tiny Speck's server files (tools/sound/sounds-zip-map.json). The
  * Still's two keys used to play archive.org copies of the same takes; they now
  * play the server's own files, and the copies are listed as duplicates.
  * Run: node --test tests/still-sounds.test.js
@@ -12,10 +12,11 @@ import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createInventory, countItem } from '../public/js/inventory.js?v=60dfc9ca';
-import { copyForVerb, createToolConditionState, setCopyTag } from '../public/js/tools.js?v=5f482998';
+import { bindToolInventory, copyForVerb, copyTags, createToolConditionState, setCopyTag } from '../public/js/tools.js?v=5f482998';
 import { resolveSound } from '../public/js/sound-board.js?v=3b2df993';
 import { SOUND_ALIASES, SOUND_FILES } from '../public/js/sound-keys.js?v=fb6ee553';
-import { supplyFeature } from '../public/js/features/supply-feature.js?v=b16b4654';
+import { supplyFeature } from '../public/js/features/supply-feature.js?v=65175221';
+import { STILL, advanceStill, createStillState, stillStopsAt } from '../public/js/machines.js?v=39290298';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const PUB = join(ROOT, 'public');
@@ -74,6 +75,15 @@ describe('the Still\'s sounds', () => {
     assert.match(verb('distill'), /pc\.announce_sound\('FUELMAKER_LOAD_OPEN'\)/);
     assert.match(verb('collect'), /pc\.announce_sound\('STILL_COLLECT'\)/);
     assert.match(src, /function finishWorking\(\)[\s\S]*?announce_sound\('STILL_READY'\)/);
+    // finishWorking 400-418: one Hooch made; with another's worth in the hopper and room for it the
+    // Still starts again, else it is done and rings: in a house for its owner standing there, on a
+    // street for everyone there. No other line of the file plays the key.
+    const done = src.slice(src.indexOf('function finishWorking()'), src.indexOf('function getContentCount()'));
+    assert.match(done, /if \(this\.getHopperAmount\(\) >= this\.getHoochCost\(\) && this\.getHooch\(\) < this\.getMaxHooch\(\)\) \{\s*this\.startWorking\(\);\s*\} else \{/);
+    assert.match(done, /if \(owner\.get_location\(\) == this\.container\) \{\s*owner\.announce_sound\('STILL_READY'\);/);
+    assert.match(done, /this\.container\.announce_sound_to_all\('STILL_READY'\);/);
+    assert.equal(src.split("'STILL_READY'").length - 1, 2);
+    assert.match(src, /this\.apiSetTimer\('finishWorking', \(7\.0\/3\.0\) \* 60 \* 1000\);/);
   });
 
   it('the hopper lid is the server\'s own file, byte for byte', () => {
@@ -114,10 +124,158 @@ describe('the Still\'s sounds', () => {
     }
   });
 
-  it('STILL_READY has no moment yet: the remake\'s Still never announces that it is done', () => {
-    const dir = join(PUB, 'js/features');
-    const users = readdirSync(dir).filter((f) => /'STILL_READY'/.test(readFileSync(join(dir, f), 'utf8')));
-    assert.deepEqual(users, []);
-    assert.doesNotMatch(readFileSync(join(PUB, 'game.js'), 'utf8'), /'STILL_READY'/);
+  it('a working Still knows when it will stop: out of grain, or full', () => {
+    const t0 = 1_000_000;
+    const at = (seed) => stillStopsAt(createStillState({ workingSince: t0, ...seed }));
+    assert.equal(STILL.workMs, 140000);
+    assert.equal(stillStopsAt(createStillState({ hopper: 500, hooch: 3 })), 0, 'an idle Still');
+    assert.equal(at({ hopper: 14, hooch: 0 }), t0 + STILL.workMs);
+    assert.equal(at({ hopper: 27, hooch: 0 }), t0 + STILL.workMs);
+    assert.equal(at({ hopper: 28, hooch: 0 }), t0 + 2 * STILL.workMs);
+    assert.equal(at({ hopper: 500, hooch: 0 }), t0 + 35 * STILL.workMs);
+    // Full first: two more fit, however much is in the hopper.
+    assert.equal(at({ hopper: 500, hooch: 48 }), t0 + 2 * STILL.workMs);
+    // The same answer as counting it out, and the same part way through.
+    for (const seed of [{ hopper: 14, hooch: 0 }, { hopper: 100, hooch: 0 }, { hopper: 500, hooch: 44 }, { hopper: 600, hooch: 0 }]) {
+      const state = createStillState({ workingSince: t0, ...seed });
+      const stop = stillStopsAt(state);
+      advanceStill(state, stop - 1);
+      assert.ok(state.workingSince, `${JSON.stringify(seed)} is still working a moment before`);
+      assert.equal(stillStopsAt(state), stop, JSON.stringify(seed));
+      advanceStill(state, stop);
+      assert.equal(state.workingSince, 0, `${JSON.stringify(seed)} has stopped`);
+    }
+  });
+
+  describe('the done chime', () => {
+    const tick = (engine, now) => supplyFeature.onTick(16, now, engine);
+    const seed = (engine, tag, at = 0) => setCopyTag(engine.toolState, 'still', at, tag);
+    const t0 = 5_000_000;
+    const stop = t0 + STILL.workMs;
+
+    it('rings once, for the holder, at the moment the Still runs dry', () => {
+      supplyFeature._reset();
+      const engine = stillEngine({});
+      seed(engine, { hopper: 14, hooch: 0, workingSince: t0 });
+      tick(engine, t0 + 1000);
+      tick(engine, stop - 300);
+      assert.deepEqual(engine.played, []);
+      tick(engine, stop + 20);
+      assert.deepEqual(engine.played, [['STILL_READY', 0.55]]);
+      // Its Hooch is counted and kept on the Still.
+      assert.deepEqual(copyTags(engine.toolState, 'still')[0], { hopper: 0, hooch: 1, workingSince: 0 });
+      for (const later of [stop + 400, stop + 1500, stop + 60000]) tick(engine, later);
+      assert.equal(engine.played.length, 1);
+      supplyFeature._reset();
+    });
+
+    it('rings when the Still fills up with grain to spare, and not between Hooches', () => {
+      supplyFeature._reset();
+      const engine = stillEngine({});
+      seed(engine, { hopper: 100, hooch: 48, workingSince: t0 });
+      tick(engine, t0 + 1000);
+      // The 49th: it carries on, no chime.
+      tick(engine, stop + 20);
+      assert.deepEqual(engine.played, []);
+      tick(engine, stop + STILL.workMs - 300);
+      assert.deepEqual(engine.played, []);
+      // The 50th: full.
+      tick(engine, stop + STILL.workMs + 20);
+      assert.deepEqual(engine.played, [['STILL_READY', 0.55]]);
+      assert.deepEqual(copyTags(engine.toolState, 'still')[0], { hopper: 72, hooch: 50, workingSince: 0 });
+      supplyFeature._reset();
+    });
+
+    it('still rings when a menu counted the Hooch first', () => {
+      supplyFeature._reset();
+      const engine = stillEngine({});
+      seed(engine, { hopper: 14, hooch: 0, workingSince: t0 });
+      tick(engine, stop - 300);
+      // What opening the Still's menu just after the stop writes back (loadStill, storeStill).
+      seed(engine, { hopper: 0, hooch: 1, workingSince: 0 });
+      tick(engine, stop + 60);
+      assert.deepEqual(engine.played, [['STILL_READY', 0.55]]);
+      tick(engine, stop + 600);
+      assert.equal(engine.played.length, 1);
+      supplyFeature._reset();
+    });
+
+    it('a Still that stopped while the game was closed or asleep passes in silence', () => {
+      supplyFeature._reset();
+      // Closed: the first look comes long after.
+      const closed = stillEngine({});
+      seed(closed, { hopper: 14, hooch: 0, workingSince: t0 });
+      tick(closed, stop + 3600000);
+      assert.deepEqual(closed.played, []);
+      assert.deepEqual(copyTags(closed.toolState, 'still')[0], { hopper: 0, hooch: 1, workingSince: 0 });
+      supplyFeature._reset();
+      // Asleep: seen working, then nothing until well after.
+      const asleep = stillEngine({});
+      seed(asleep, { hopper: 14, hooch: 0, workingSince: t0 });
+      tick(asleep, stop - 5000);
+      tick(asleep, stop + 2500);
+      assert.deepEqual(asleep.played, []);
+      supplyFeature._reset();
+    });
+
+    it('more grain or a Collect moves the moment; an idle or empty Still never rings', () => {
+      supplyFeature._reset();
+      const engine = stillEngine({});
+      seed(engine, { hopper: 14, hooch: 0, workingSince: t0 });
+      tick(engine, t0 + 1000);
+      // Distilled again before it ran dry: one more Hooch's worth.
+      seed(engine, { hopper: 28, hooch: 0, workingSince: t0 });
+      tick(engine, stop + 20);
+      assert.deepEqual(engine.played, []);
+      tick(engine, stop + STILL.workMs + 20);
+      assert.equal(engine.played.length, 1);
+      supplyFeature._reset();
+      const idle = stillEngine({});
+      seed(idle, { hopper: 5, hooch: 2, workingSince: 0 });
+      for (const now of [t0, t0 + 1000, stop + 20]) tick(idle, now);
+      seed(idle, null);
+      tick(idle, stop + 2000);
+      assert.deepEqual(idle.played, []);
+      // No Still in the pack: nothing to watch.
+      const none = stillEngine({});
+      none.inv = createInventory({ grain: 14 });
+      tick(none, stop + 20);
+      assert.deepEqual(none.played, []);
+      supplyFeature._reset();
+    });
+
+    it('two Stills done at once ring one chime; a second Still on its own time rings its own', () => {
+      supplyFeature._reset();
+      const engine = stillEngine({ still: 2 });
+      bindToolInventory(engine.toolState, engine.inv);
+      assert.equal(copyTags(engine.toolState, 'still').length, 2);
+      seed(engine, { hopper: 14, hooch: 0, workingSince: t0 }, 0);
+      seed(engine, { hopper: 14, hooch: 7, workingSince: t0 }, 1);
+      tick(engine, t0 + 1000);
+      tick(engine, stop + 20);
+      assert.deepEqual(engine.played, [['STILL_READY', 0.55]]);
+      assert.deepEqual(copyTags(engine.toolState, 'still'), [{ hopper: 0, hooch: 1, workingSince: 0 }, { hopper: 0, hooch: 8, workingSince: 0 }]);
+      supplyFeature._reset();
+      const apart = stillEngine({ still: 2 });
+      bindToolInventory(apart.toolState, apart.inv);
+      seed(apart, { hopper: 14, hooch: 0, workingSince: t0 }, 0);
+      seed(apart, { hopper: 14, hooch: 0, workingSince: t0 + 30000 }, 1);
+      tick(apart, t0 + 31000);
+      tick(apart, stop + 20);
+      assert.equal(apart.played.length, 1);
+      tick(apart, stop + 30020);
+      assert.equal(apart.played.length, 2);
+      supplyFeature._reset();
+    });
+
+    it('only the Still plays STILL_READY, and it is the chime of November 2011', () => {
+      const dir = join(PUB, 'js/features');
+      const users = readdirSync(dir).filter((f) => /'STILL_READY'/.test(readFileSync(join(dir, f), 'utf8')));
+      assert.deepEqual(users, ['supply-feature.js']);
+      assert.doesNotMatch(readFileSync(join(PUB, 'game.js'), 'utf8'), /'STILL_READY'/);
+      assert.equal(catalog.STILL_READY.zipFile, '1322173657-Ready_1.1.mp3');
+      assert.match(catalog.STILL_READY.why, /still\.js:413/);
+      assert.doesNotMatch(catalog.STILL_READY.why, /does not have yet/);
+    });
   });
 });

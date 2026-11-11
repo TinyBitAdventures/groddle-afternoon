@@ -356,6 +356,17 @@ export function advanceStill(state, now = Date.now()) {
   return state;
 }
 
+/**
+ * When a working Still stops: the time of the finishWorking that leaves the hopper under one
+ * Hooch's worth or the Still full (still.js 400-418), or 0 for a Still that is not working.
+ * The same before and after advanceStill, until a Distill or Collect changes the Still.
+ */
+export function stillStopsAt(state) {
+  if (!state?.workingSince) return 0;
+  const runs = Math.max(1, Math.min(Math.floor(state.hopper / STILL.hoochCost), STILL.maxHooch - state.hooch));
+  return state.workingSince + runs * STILL.workMs;
+}
+
 export function stillRoom(state) {
   return Math.max(0, STILL.hopperSize - state.hopper);
 }

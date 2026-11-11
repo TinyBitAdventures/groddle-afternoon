@@ -36,7 +36,7 @@ import {
 } from '../public/js/shared-patches.js?v=82d0a263';
 import { sharedPatchesFeature } from '../public/js/features/shared-patches-feature.js?v=d98b3995';
 import { patchesFeature, soilSpawnPlan } from '../public/js/features/patches-feature.js?v=39b3b397';
-import { FEATURES } from '../public/js/features/index.js?v=87f03c5d';
+import { FEATURES } from '../public/js/features/index.js?v=f641c428';
 import { getStreetEcologyCatalog, setStreetEcologyCatalog } from '../public/js/street-ecology.js?v=08076876';
 import { HAS_SERVER, serverPath } from '../tools/repos.mjs';
 

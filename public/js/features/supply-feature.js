@@ -7,10 +7,13 @@
  *    recipes burn the tank, so a Fuelmaker keeps every machine running.
  *  - Sounds: the stand and each part while a machine is put together, each
  *    part as it is taken apart (js/machines.js assemblySounds), the hopper
- *    lid on Distill and the Still's chime on Collect. Not here: STILL_READY,
- *    which the source rang when a Still ran dry or filled up (still.js
- *    406-418); this Still's Hooch is counted when you look, with no moment
- *    of its own.
+ *    lid on Distill, the Still's chime on Collect, and its done chime
+ *    (STILL_READY) at the moment a Still runs dry or fills up (still.js
+ *    400-418 finishWorking: the last Hooch it can make is made). The source
+ *    rang that for the owner standing in the house the Still was in, or for
+ *    everyone on a street; this Still works from the pack, so its holder
+ *    hears it, like its other sounds. A Still that stopped while the game was
+ *    closed or the tab asleep does not ring late.
  *  - Still: Distill Grain, Corn, Potatoes or Bushels into the hopper, then
  *    Collect the Hooch it makes, one every 140 seconds, offline too.
  *  - Butterfly Milk, Butter, the four Cheeses and every herb: Shake,
@@ -28,6 +31,8 @@
  *     distills, collects (the demo still starts with 3 Hooch made), shakes,
  *     compresses, ages and shucks. Canvas: data-supply-machines,
  *     data-supply-fuel, data-supply-still, data-supply-last, data-supply-autoplay.
+ *     &supplystillsoon=<seconds> starts the demo Still on its last Hooch, done in
+ *     that many seconds (data-supply-still-ready counts the done chimes).
  *     Clerk: ?autostart=1&fresh=1&resetgame=1&streetdemo=GLI32G3NUTD100I&supplydemo=clerk
  *     puts a Bureaucrat beside you on the street, for QA only
  *     (&supplyautoplay=1 buys Your Papers, completes them, buys a permit;
@@ -35,7 +40,7 @@
  */
 
 import { ITEM_CATALOG, addItem, countItem, ensureItem } from '../inventory.js?v=60dfc9ca';
-import { getToolCondition, copyForVerb, copyTag, migrateClassTag, setCopyTag } from '../tools.js?v=5f482998';
+import { getToolCondition, copyForVerb, copyTag, copyTags, migrateClassTag, setCopyTag } from '../tools.js?v=5f482998';
 import {
   MACHINE_ASSEMBLIES,
   MACHINE_IDS,
@@ -58,7 +63,8 @@ import {
   refuelMachine,
   stillEtaSeconds,
   stillRoom,
-} from '../machines.js?v=73f20b2b';
+  stillStopsAt,
+} from '../machines.js?v=39290298';
 import { HERB_SEEDS, ITEM_TRANSFORMS, listTransformVerbs, runTransform, transformVerbCount } from '../item-transforms.js?v=c439eb33';
 import {
   BUREAUCRACY_ITEMS,
@@ -114,6 +120,55 @@ function storeStill(engine, at) {
   if (at < 0 || !engine?.toolState) return;
   const empty = !still.hopper && !still.hooch && !still.workingSince;
   setCopyTag(engine.toolState, STILL.classTsid, at, empty ? null : { ...still });
+}
+
+/*
+ * The done chime (still.js 400-418). A Still's Hooch is counted whenever something reads it, so
+ * the watcher remembers when each working Still will stop (pack order) and rings at that moment,
+ * whether it or a menu did the counting. `stillStops` holds those times, 0 for an idle Still.
+ */
+let stillStops = [];
+let stillChimes = 0;
+let stillWatchedAt = 0;
+/** The watcher looks four times a second: the chime is a moment, not a frame. */
+const STILL_WATCH_MS = 250;
+/** A stop noticed more than this late (the game was closed, the tab asleep) passes in silence. */
+const STILL_READY_LATE_MS = 2000;
+
+function watchStills(engine, now = Date.now()) {
+  if (now >= stillWatchedAt && now - stillWatchedAt < STILL_WATCH_MS) return;
+  stillWatchedAt = now;
+  if (!keepsStills(engine)) {
+    stillStops = [];
+    return;
+  }
+  const tags = copyTags(engine.toolState, STILL.classTsid);
+  // A Still came or went: the places no longer line up, so start over without a chime.
+  if (tags.length !== stillStops.length) stillStops = tags.map(() => 0);
+  let rang = false;
+  tags.forEach((tag, at) => {
+    const state = createStillState(tag || {});
+    const stopsAt = stillStopsAt(state);
+    if (stopsAt && now < stopsAt) {
+      stillStops[at] = stopsAt;
+      return;
+    }
+    // Stopped: counted here, or already by a menu since the last look (then the tag is idle).
+    const due = stopsAt || stillStops[at];
+    stillStops[at] = 0;
+    if (stopsAt) {
+      advanceStill(state, now);
+      setCopyTag(engine.toolState, STILL.classTsid, at, !state.hopper && !state.hooch && !state.workingSince ? null : { ...state });
+    }
+    if (due && now >= due && now - due <= STILL_READY_LATE_MS) rang = true;
+  });
+  if (!rang) return;
+  // still.js:413 owner.announce_sound('STILL_READY'); one chime however many Stills stop at once.
+  stillChimes += 1;
+  engine.playSound?.('STILL_READY', { volume: 0.55 });
+  engine.setData?.('supplyStillReady', String(stillChimes));
+  engine.refreshPack?.();
+  publish(engine);
 }
 
 /** The copy the pack menu is about while its verbs are drawn or run (feature-host opts.copy). */
@@ -449,8 +504,12 @@ function demoSetup(engine) {
     rookswort: 2,
   };
   for (const [id, n] of Object.entries(grants)) if (countItem(engine.inv, id) < n) addItem(engine.inv, id, n - countItem(engine.inv, id));
-  // A Still that has already been working: three Hooch waiting.
-  still = createStillState({ hopper: 0, hooch: 3 });
+  // A Still that has already been working: three Hooch waiting. With supplystillsoon it is on
+  // its last Hooch (one run's worth in the hopper), done in that many seconds.
+  const soon = Number(engine.param?.('supplystillsoon'));
+  still = Number.isFinite(soon) && soon > 0
+    ? createStillState({ hopper: STILL.hoochCost, hooch: 3, workingSince: Date.now() - STILL.workMs + Math.round(soon * 1000) })
+    : createStillState({ hopper: 0, hooch: 3 });
   if (keepsStills(engine)) storeStill(engine, copyForVerb(engine.toolState, STILL.classTsid, null));
   engine.pc.energy = Math.max(engine.pc.energy || 0, 400);
   engine.pc.mood = Math.max(engine.pc.mood || 0, 200);
@@ -523,6 +582,7 @@ export const supplyFeature = {
       playWorkSounds(engine, now);
       settleWork(engine, now);
     }
+    watchStills(engine, now);
     if (autoplayAt && !autoplayDone && now >= autoplayAt) autoplay(engine);
   },
 
@@ -607,6 +667,8 @@ export const supplyFeature = {
       ? { ...saved, readyAt: 0 }
       : null;
     workSounds = null;
+    stillStops = [];
+    stillWatchedAt = 0;
   },
 
   /** QA / tests. */
@@ -617,6 +679,9 @@ export const supplyFeature = {
     still = createStillState();
     work = null;
     workSounds = null;
+    stillStops = [];
+    stillChimes = 0;
+    stillWatchedAt = 0;
     metalMusicOn = true;
     last = '';
     demoDone = false;
