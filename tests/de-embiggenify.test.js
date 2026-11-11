@@ -41,7 +41,7 @@ import {
   findSmallWorthless,
 } from '../public/js/de-embiggenify.js?v=db347ac1';
 import { jumpApex, NORMAL_BUFF } from '../public/js/avatar-step.js?v=e8e9581f';
-import { SOURCE_PHYSICS, triggerHit } from '../public/js/puzzle-triggers.js?v=44eec9ea';
+import { SOURCE_PHYSICS, triggerHit } from '../public/js/puzzle-triggers.js?v=facc2c29';
 import { barriersScreen, blockBarrierCrossing } from '../public/js/street-model.js?v=b6cb6a4e';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');

@@ -14,7 +14,8 @@
  *   name, strict: true,                  // walkable fallback off (real perms)
  *   start: { x, y },                     // the lost Teleport Marker
  *   fallY, checkpoints: [{ x, y }],      // pit recovery: back to the last passed
- *   exit: { door: true } | { x, y, w, h } // completion
+ *   exit: { door: true } | { x, y, w, h } // completion; `show` (a door id, with `showWhy`) puts
+ *                                         // back an exit door the source data has switched off
  *   reward: { xp, energy, mood, currants, favor: [{ giant, points }], source },
  *   triggers: [{ id, x, y, w, h, onEnter: [], onExit: [], body, once, art, why }],
  *   quoins: [{ x, y, type, amount }],
@@ -153,6 +154,21 @@ export function autoplaySteps(def) {
   if (!order.includes('*quoins')) steps.push(...(def?.quoins || []).map((q) => ({ kind: 'quoin', q })), { kind: 'exit' });
   else if (def?.exit) steps.push({ kind: 'exit' });
   return steps;
+}
+
+/**
+ * A level's own exit door that Tiny Speck's data has switched off (`exit.show`: its id). The
+ * client drew no door whose connect was hidden and never let a player choose it (DoorView.as
+ * 210-219; MiddleGroundRenderer.as glowRenderer 1157-1166), so the level had no way out; the
+ * remake offers the level, so its door is put back, the door the data itself has. Mutates the
+ * street before it is built; returns whether a door was shown.
+ */
+export function showExitDoor(street, def) {
+  const id = def?.exit?.door === true ? def.exit.show : null;
+  const door = id ? (street?.doors || []).find((d) => d && d.id === id) : null;
+  if (!door || !door.hidden) return false;
+  door.hidden = false;
+  return true;
 }
 
 /** Completion reward: the first finish only; later runs are for fun. */

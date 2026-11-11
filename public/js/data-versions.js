@@ -9,6 +9,7 @@
     files: {
       "assets/content/achievements.json": "f752dcd5",
       "assets/content/deco-catalog.json": "4540131b",
+      "assets/content/puzzle-triggers.json": "602eed56",
       "assets/content/signpost-graph.json": "c618fc41",
       "assets/content/street-ecology.json": "52c389c0",
       "assets/content/style-profiles.json": "1a7e5474",

@@ -14,7 +14,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { assertStreetGeometry } from '../public/js/street-model.js?v=b6cb6a4e';
 import { arrivalInTarget } from '../public/js/location-navigation.js?v=90fca5cc';
-import { SOURCE_PHYSICS } from '../public/js/puzzle-triggers.js?v=44eec9ea';
+import { SOURCE_PHYSICS } from '../public/js/puzzle-triggers.js?v=facc2c29';
 import {
   AVATAR_BODY_H,
   CANOPY_PHYSICS,
@@ -50,7 +50,7 @@ import {
   teleportersOn,
 } from '../public/js/hidden-floors.js?v=eb220641';
 import { hiddenFloorsFeature } from '../public/js/features/hidden-floors-feature.js?v=8475c970';
-import { FEATURES } from '../public/js/features/index.js?v=deac4bec';
+import { FEATURES } from '../public/js/features/index.js?v=4c2589e2';
 import { rawTripleJumpMultiplier, scaledTripleJumpMultiplier } from '../public/js/movement.js?v=b30f84eb';
 import { GRAVITY, JUMP_SPEED, WALK_MAX } from '../public/js/avatar-step.js?v=e8e9581f';
 import { buffPhysics } from '../public/js/buffs.js?v=819cb342';

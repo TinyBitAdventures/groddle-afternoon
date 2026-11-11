@@ -207,7 +207,9 @@
     "y": 414
    },
    "exit": {
-    "door": true
+    "door": true,
+    "show": "door_1340742449389",
+    "showWhy": "Amberlyza's exit door (source x 3307, y -387, door_asset_stairs_up_basic 60 x 93, on plat_1340657276605 at the end of the top ledge, the same random-destination door as Purplysa's and Fernucopia's) has connect.hidden true in the location XML, the only one of the seven colour levels: the client drew no hidden door and never offered it to a player (DoorView.as 210-219), so the level had no way out. No event names a door, and nothing on the street calls geo_unlock_door_connection (inc_geo.js 265-274). The remake offers the level from its card, so the street's own door is shown and ends the level as the other six do (live report #184)."
    },
    "reward": {
     "xp": 250,

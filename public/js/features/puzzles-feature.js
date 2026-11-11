@@ -64,8 +64,9 @@ import {
   quoinsInReach,
   respawnPoint,
   rewardBits,
+  showExitDoor,
   stepTriggers,
-} from '../puzzle-triggers.js?v=44eec9ea';
+} from '../puzzle-triggers.js?v=facc2c29';
 import { energyMax, metabolicGain, moodMax } from '../metabolics.js?v=8504134e';
 import { isLoaded, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js?v=f024bd6a';
 
@@ -114,6 +115,8 @@ function patchStreet(street) {
   const def = defFor(street?.tsid);
   if (!def || !street) return;
   if (def.events) street.events = { ...(street.events || {}), ...def.events };
+  // Amberlyza's exit door is switched off in the source data (report #184): the finish needs it.
+  showExitDoor(street, def);
   // Geometry a street's own events still name but the archive lost (`platforms`, source
   // space, each with its `why`), with the art that marks it (`decos`, middleground).
   for (const plat of def.platforms || []) {

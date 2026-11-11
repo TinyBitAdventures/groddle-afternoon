@@ -13,9 +13,10 @@ import {
   quoinsInReach,
   respawnPoint,
   rewardBits,
+  showExitDoor,
   stepTriggers,
   triggerHit,
-} from '../public/js/puzzle-triggers.js?v=44eec9ea';
+} from '../public/js/puzzle-triggers.js?v=facc2c29';
 import {
   createEventRuntime,
   dueEventTimers,
@@ -336,5 +337,64 @@ describe('report 136: Blooian\'s discs show the path that is open', () => {
       assert.equal(Number(/<int id="z">(-?\d+)/.exec(body)[1]), deco.z, id);
       assert.equal(/<bool id="h_flip">true/.test(body), Boolean(deco.flip), id);
     }
+  });
+});
+
+describe('report 184: every colour level has its exit door', () => {
+  const LEVELS = ['GHVCKEPHO403BN5', 'GHVOD0F3T403694', 'GHVP6H0KT403N8A', 'GHVP7QOKT403F5Q', 'GHVP8TCLT40336S', 'GHVQMS17V813FN7', 'GHVDKQ2O6S23LVJ'];
+  /** The door a player can use once the feature has prepared the street (js/doors.js visibleDoors: not hidden). */
+  const usable = (tsid) => {
+    const st = street(tsid);
+    showExitDoor(st, data[tsid]);
+    return { st, doors: st.doors.filter((d) => !d.hidden) };
+  };
+
+  test('the seven levels finish at a door, and each has one a player can use', () => {
+    assert.deepEqual(Object.keys(data).filter((t) => data[t].exit?.door === true).sort(), [...LEVELS].sort());
+    for (const tsid of LEVELS) {
+      const { st, doors } = usable(tsid);
+      assert.equal(st.doors.length, 1, data[tsid].name);
+      assert.equal(doors.length, 1, `${data[tsid].name} has a door to finish at`);
+      assert.equal(doors[0].sprite, 'door_asset_stairs_up_basic', data[tsid].name);
+    }
+  });
+
+  test('Amberlyza is the only one whose door the source switches off, and only that door is put back', () => {
+    const off = LEVELS.filter((tsid) => street(tsid).doors[0].hidden === true);
+    assert.deepEqual(off, ['GHVDKQ2O6S23LVJ']);
+    assert.deepEqual(LEVELS.filter((tsid) => data[tsid].exit.show), ['GHVDKQ2O6S23LVJ']);
+    const exit = raw.streets.GHVDKQ2O6S23LVJ.exit;
+    assert.equal(exit.show, 'door_1340742449389');
+    assert.match(exit.showWhy, /connect\.hidden true/);
+    const st = street('GHVDKQ2O6S23LVJ');
+    assert.equal(showExitDoor(st, data.GHVDKQ2O6S23LVJ), true);
+    assert.equal(showExitDoor(st, data.GHVDKQ2O6S23LVJ), false, 'already shown');
+    const door = st.doors[0];
+    assert.deepEqual([door.x, door.y, door.w, door.h, door.hidden], [6707, 313, 60, 93, false]);
+    // It stands on the solid top ledge past the last ladder (plat_1340657276605, source x 3249..3355).
+    const ox = -st.bounds.l;
+    const oy = -st.bounds.t;
+    const ledge = st.platforms.find((pl) => pl.id === 'plat_1340657276605');
+    assert.ok(ledge.x1 + ox < door.x && door.x < ledge.x2 + ox && ledge.pc_perm === -1);
+    assert.ok(Math.abs((ledge.y1 + ledge.y2) / 2 + oy - door.y) <= 2);
+    // No street event shows a door: the script cannot do it.
+    assert.ok(!JSON.stringify(st.events).includes('door'));
+  });
+
+  test('a door is only shown where an entry names it', () => {
+    const st = { doors: [{ id: 'a', hidden: true }, { id: 'b', hidden: true }] };
+    assert.equal(showExitDoor(st, { exit: { door: true } }), false);
+    assert.equal(showExitDoor(st, { exit: { door: true, show: 'zz' } }), false);
+    assert.equal(showExitDoor(st, { exit: { x: 1, y: 2, show: 'a' } }), false, 'not a door exit');
+    assert.equal(showExitDoor(st, { exit: { door: true, show: 'b' } }), true);
+    assert.deepEqual(st.doors.map((d) => d.hidden), [true, false]);
+    assert.equal(showExitDoor(null, null), false);
+  });
+
+  test('the feature prepares the street before the doors are built', () => {
+    const src = readFileSync(join(root, 'public/js/features/puzzles-feature.js'), 'utf8');
+    assert.match(src, /function patchStreet\(street\) \{[\s\S]{0,400}showExitDoor\(street, def\);/);
+    assert.match(src, /prepareStreet\(street\) \{\s*patchStreet\(street\);/);
+    assert.match(readFileSync(join(root, 'public/js/doors.js'), 'utf8'), /return \(street\?\.doors \|\| \[\]\)\.filter\(\(door\) => door && !door\.hidden\);/);
   });
 });
