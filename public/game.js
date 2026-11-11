@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=69b550bf';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=06bb8b74';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=6669debc';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=ae7e017c';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -4315,16 +4315,20 @@ function renderPackPopover(classTsid, anchor = null) {
   const bearActionRows = isEmotionalBear
     ? bearActions
         .filter((action) => action.available)
-        .map((action) => ({
-          attrs: `data-bear-action="${action.id}"`,
-          cls: `pack-bear-action${action.id === 'anthropomorphize' ? ' pack-pop-primary' : ''}`,
-          label: action.label,
-          cost: action.energy || 0,
-          gain: action.energy ? '' : '+20 mood',
-          disabled: !action.enabled,
-          reason: action.reason,
-          tip: action.id === 'anthropomorphize' ? 'Cheer yourself up, once a game day' : 'Pick a companion on this street to emote with',
-        }))
+        .map((action) => {
+          // Report #201: in multiplayer an emote is for the players here (player-verbs-mp-feature bearEmoteRow).
+          const mp = action.id === 'anthropomorphize' ? null : features.query('bearEmoteRow', action.id, engine);
+          return {
+            attrs: `data-bear-action="${action.id}"`,
+            cls: `pack-bear-action${action.id === 'anthropomorphize' ? ' pack-pop-primary' : ''}`,
+            label: action.label,
+            cost: action.energy || 0,
+            gain: action.energy ? '' : '+20 mood',
+            disabled: mp ? !mp.enabled : !action.enabled,
+            reason: mp ? mp.reason : action.reason,
+            tip: action.id === 'anthropomorphize' ? 'Cheer yourself up, once a game day' : mp?.tooltip || 'Pick a companion on this street to emote with',
+          };
+        })
     : [];
   const bearUpgradeRows = isEmotionalBear
     ? [
@@ -4839,8 +4843,16 @@ function renderPackPopover(classTsid, anchor = null) {
   pop.querySelectorAll('[data-bear-action]').forEach((button) => {
     button.addEventListener('click', () => {
       const actionId = button.dataset.bearAction;
-      if (actionId === 'anthropomorphize') runEmotionalBearAction(actionId);
-      else openEmotionalBearPicker(actionId);
+      if (actionId === 'anthropomorphize') {
+        runEmotionalBearAction(actionId);
+        return;
+      }
+      // Report #201: multiplayer picks from the players on the street (bearEmote); solo keeps the companions.
+      if (engine.mode === 'multiplayer') {
+        closePackPopover();
+        if (features.query('bearEmote', actionId, engine) === true) return;
+      }
+      openEmotionalBearPicker(actionId);
     });
   });
   pop.querySelector('[data-bear-reminisce]')?.addEventListener('click', () => {

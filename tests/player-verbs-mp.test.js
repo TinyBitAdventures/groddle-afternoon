@@ -27,7 +27,7 @@ import {
   targetSide,
   underTheInfluence,
 } from '../public/js/player-verbs-mp.js?v=c82b7e0f';
-import { playerVerbsMpFeature } from '../public/js/features/player-verbs-mp-feature.js?v=96bbe5c2';
+import { playerVerbsMpFeature } from '../public/js/features/player-verbs-mp-feature.js?v=ed95a543';
 import { loadContentCatalogsFromDir, getQuestCatalog } from '../public/js/content-catalogs.js?v=10b118dd';
 import { createQuestState } from '../public/js/quests.js?v=2b882eb6';
 import { pendingQuestOffers, acceptOffer } from '../public/js/quest-offers.js?v=9c53455c';
@@ -108,6 +108,8 @@ describe('player verbs: solo is untouched', () => {
     assert.equal(playerVerbsMpFeature.charadesQuaff(engine), null);
     assert.equal(playerVerbsMpFeature.garlicBreath(3, engine), null);
     assert.equal(playerVerbsMpFeature.playerVerbsReady(engine), null);
+    assert.equal(playerVerbsMpFeature.bearEmoteRow('kiss', engine), null, 'report #201: solo bear rows stay the companions');
+    assert.equal(playerVerbsMpFeature.bearEmote('kiss', engine), null);
     assert.equal(globalThis.groddlePlayerVerbs, undefined);
     assert.equal(playerVerbsMpFeature.save(), undefined);
   });
@@ -233,6 +235,61 @@ describe('player verbs: between two players (fake server)', () => {
     assert.equal(engine.pc.energy, 90);
     assert.ok(engine.log.achievements.some(([c]) => c === 'players_splanked:2'));
     assert.equal(engine.log.activity.at(-1), 'You splanked Bo. Energy -10');
+  });
+
+  it("puts the pack bear's emotes on the players here, not the companions (report #201)", () => {
+    const s = globalThis.groddlePlayerVerbs;
+    // Only the bear's four (requires_target_pc, emotional_bear.js 57, 135, 203, 319).
+    assert.equal(playerVerbsMpFeature.bearEmoteRow('splank', engine), null);
+    assert.equal(playerVerbsMpFeature.bearEmoteRow('anthropomorphize', engine), null);
+    for (const id of ['hug', 'high_five', 'kiss', 'moon']) {
+      assert.deepEqual(playerVerbsMpFeature.bearEmoteRow(id, engine), { enabled: true, reason: '', tooltip: 'Pick a player on this street to emote with' });
+    }
+    // The click asks whom through the player picker, then acts as the player menu does.
+    const picked = [];
+    const pick = s.pickPlayer;
+    s.pickPlayer = (verb, extra) => { picked.push(verb); return true; };
+    try {
+      assert.equal(playerVerbsMpFeature.bearEmote('kiss', engine), true);
+    } finally {
+      s.pickPlayer = pick;
+    }
+    assert.deepEqual(picked, ['kiss']);
+    client.sent.length = 0;
+    s.act('kiss', { id: 2, name: 'Bo' });
+    const [kind, payload] = client.sent[0];
+    assert.equal(kind, 'verb_do');
+    assert.equal(payload.verb, 'kiss');
+    assert.equal(payload.to, 2);
+    const energy = engine.pc.energy;
+    client.msg({ t: 'verb_done', verb: 'kiss', ref: payload.ref, status: 'ok', id: 'v-k1', to: { id: 2, name: 'Bo' } });
+    assert.equal(engine.pc.energy, energy - 10);
+    // Nobody else here: the row is off and a click says so, with nothing sent and no companions.
+    client.players = [];
+    client.sent.length = 0;
+    assert.deepEqual(playerVerbsMpFeature.bearEmoteRow('hug', engine), { enabled: false, reason: 'There is nobody here to do that to.', tooltip: 'Pick a player on this street to emote with' });
+    assert.equal(playerVerbsMpFeature.bearEmote('hug', engine), true);
+    assert.equal(engine.log.toasts.at(-1), 'There is nobody here to do that to.');
+    assert.equal(client.sent.length, 0);
+    client.players = [{ id: 2, name: 'Bo', x: 10, y: 0 }];
+    // In a race (conditions, emotional_bear.js 67-71).
+    const street = engine.streetTsid;
+    engine.streetTsid = 'RACE_1';
+    assert.equal(playerVerbsMpFeature.bearEmoteRow('moon', engine).reason, "You're in a race! Save your emotional outbursts for later.");
+    assert.equal(playerVerbsMpFeature.bearEmote('moon', engine), true);
+    assert.equal(engine.log.toasts.at(-1), "You're in a race! Save your emotional outbursts for later.");
+    engine.streetTsid = street;
+  });
+
+  it('wires the pack bear to the multiplayer picker before the solo companions (report #201)', () => {
+    const game = readFileSync(join(PUBLIC, 'game.js'), 'utf8');
+    const at = game.indexOf("pop.querySelectorAll('[data-bear-action]')");
+    assert.ok(at > 0);
+    const handler = game.slice(at, at + 900);
+    const mp = handler.indexOf("features.query('bearEmote', actionId, engine) === true) return;");
+    const solo = handler.indexOf('openEmotionalBearPicker(actionId);');
+    assert.ok(mp > 0 && solo > mp, 'bearEmote answers before the companions picker');
+    assert.match(game, /features\.query\('bearEmoteRow', action\.id, engine\)/);
   });
 
   it('applies what another player did once per act', () => {

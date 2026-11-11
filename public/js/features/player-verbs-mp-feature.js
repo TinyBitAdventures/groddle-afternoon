@@ -12,7 +12,9 @@
  *   Emotional Bear, Kiss and Moon with its Lips and Moon upgrades. Off in a
  *   race with the source's reasons.
  * - The pack: Soak (Watering Can), Play for (any musicblock) and Bestow
- *   (Random Kindness, G432) ask whom, from the players on the street.
+ *   (Random Kindness, G432) ask whom, from the players on the street, and so
+ *   do the Emotional Bear's own Hug, High five, Kiss and Moon (report #201:
+ *   game.js asks bearEmoteRow and bearEmote before the solo companions).
  * - Each act goes to the server (verb_do). Only its verb_done charges the
  *   doer (energy and mood as the source) and counts: Hanky Splanky
  *   (players_splanked), Super Soaker (players_soaked, once per player while
@@ -55,6 +57,7 @@ import { playSheetOverlay } from '../overlay-art.js?v=75c3ea34';
 import { showRainbow, rainbowSound } from '../overlays.js?v=605c12ff';
 import { copyFromLedger, spendCopyCharge } from '../copy-charges.js?v=4ffa1c1e';
 import {
+  BEAR,
   CHARADES_BUFF,
   CHARADES_POTION,
   CHARADES_TEXT,
@@ -655,6 +658,35 @@ export const playerVerbsMpFeature = {
     if (verbId === PACK_SOAK) return session.pickPlayer('soak');
     if (verbId === PACK_PLAY_FOR && isMusicblock(classTsid)) return session.pickPlayer('play_for', { block: String(classTsid) });
     return false;
+  },
+
+  /**
+   * The pack's Emotional Bear (report #201): Hug, High five, Kiss and Moon are requires_target_pc
+   * (emotional_bear.js 57, 135, 203, 319), so in multiplayer they are for the players on the
+   * street, never the solo companions. The row: off in a race (conditions 67-71) or with nobody
+   * here (the client left such verbs out when you were alone, InteractionMenuController.as 1695);
+   * the energy check is the handler's, with the real name (act). Null in solo.
+   */
+  bearEmoteRow(actionId, engine) {
+    const v = PLAYER_VERBS[actionId];
+    if (engine?.mode !== 'multiplayer' || v?.item !== BEAR) return null;
+    const s = ensure(engine);
+    const reason = isVerbRaceStreet(engine.streetTsid) ? VERB_TEXT.bearRace : !s?.here().length ? VERB_TEXT.nobody : '';
+    return { enabled: !reason, reason, tooltip: 'Pick a player on this street to emote with' };
+  },
+
+  /** The bear row's click in multiplayer: whom, from the players here (pickPlayer); then act as the player menu does. */
+  bearEmote(actionId, engine) {
+    const v = PLAYER_VERBS[actionId];
+    if (engine?.mode !== 'multiplayer' || v?.item !== BEAR) return null;
+    const s = ensure(engine);
+    const why = isVerbRaceStreet(engine.streetTsid) ? VERB_TEXT.bearRace : !s?.here().length ? VERB_TEXT.nobody : '';
+    if (why) {
+      engine.toast?.(why);
+      return true;
+    }
+    s.pickPlayer(actionId);
+    return true;
   },
 
   /** potions-feature: canQuaff with real players (potion_charades.js 511-517). */

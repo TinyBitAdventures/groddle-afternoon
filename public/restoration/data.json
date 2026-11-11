@@ -2752,9 +2752,14 @@
   "deployed": "2026-11-11"
  },
  "git": {
-  "commits": 1640,
+  "commits": 1641,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-11",
+    "kind": "improve",
+    "text": "Gem, fruit and other held-at-once badges say they count your pack"
+   },
    {
     "date": "2026-11-11",
     "kind": "fix",
@@ -2869,11 +2874,6 @@
     "date": "2026-11-10",
     "kind": "improve",
     "text": "A pausing Chicken scratches, stretches and pecks, and looks at you while its menu is open"
-   },
-   {
-    "date": "2026-11-10",
-    "kind": "fix",
-    "text": "Purplysa: the gravity pad in the U-shaped block lifts you"
    }
   ]
  },
