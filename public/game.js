@@ -3,8 +3,8 @@
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=afe3caa8';
-import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=127e0a3c';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=ad4dcd1c';
+import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=06bb8b74';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=deac4bec';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -501,7 +501,7 @@ import {
   parsePlayerSave,
   serializePlayerSave,
   restorePlayerSave,
-} from './js/player-save.js?v=75ca0bd4';
+} from './js/player-save.js?v=d0fde2dd';
 import {
   HOME_INTERIOR_TSID,
   HOME_STREET_TSID,
@@ -4609,7 +4609,8 @@ function renderPackPopover(classTsid, anchor = null) {
   if (recipeTarget) rows.push({ attrs: 'data-pack-make', label: makeLabel, tip: recipeNote ? `${recipeNote} · opens Make` : 'Opens Make' });
   const dropBlock = packDropBlockReason(classTsid);
   // takeable_drop_conditions {state: null}: an element's menu has no Drop row at all (element_red.js 143-145).
-  if (!isElementClass(classTsid)) rows.push({
+  // A class whose feature has a drop verb of its own (the Crafty Bot's, npc_crafty_bot.js 323-342) shows that one.
+  if (!isElementClass(classTsid) && !features.query('packOwnDrop', classTsid, engine)) rows.push({
     attrs: 'data-pack-drop',
     label: 'Drop',
     next: stackCount > 1,
@@ -12605,6 +12606,10 @@ const engine = {
   dropPackStackAt(classTsid, count, x, y) {
     if (!state.started || !currentStreetTsid) return { ok: false, reason: 'not_started' };
     const blocked = packDropBlockReason(classTsid);
+    // A class a feature puts down itself (the Crafty Bot): its own drop and its own reason.
+    const own = features.query('packDrop', classTsid, { x, y }, engine);
+    if (own?.ok) closePackPopover();
+    if (own) return own;
     if (blocked) return { ok: false, reason: 'blocked', msg: blocked };
     const n = normalizeStackQuantity(count, inv[classTsid] || 0);
     if (!n) return { ok: false, reason: 'missing', msg: 'That stack is no longer in your pack.' };
@@ -13663,6 +13668,13 @@ function arrivingToolPoints(classTsid, n, points, tags = null) {
 function dropPackItem(classTsid, requested = 1) {
   if (!state.started || !player || !currentStreetTsid) return;
   const blocked = packDropBlockReason(classTsid);
+  // A class a feature puts down itself (the Crafty Bot): its own drop, or its own reason.
+  const own = features.query('packDrop', classTsid, null, engine);
+  if (own) {
+    if (own.ok) closePackPopover();
+    else if (own.msg) toast(own.msg);
+    return;
+  }
   if (blocked) {
     toast(blocked);
     return;

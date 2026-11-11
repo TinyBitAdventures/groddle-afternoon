@@ -35,7 +35,7 @@ import {
   setJobTotal,
   setPaused,
   serializeCraftybotState,
-} from '../public/js/craftybot.js?v=41eacd5d';
+} from '../public/js/craftybot.js?v=77d8315d';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const PUBLIC = join(ROOT, 'public');
@@ -402,9 +402,9 @@ describe('delivery and wiring', () => {
 
 describe('craftybot feature: the ingredient source and the job menu', async () => {
   // The feature imports these with their browser cache tags; load the same module instances.
-  const { craftybotFeature } = await import('../public/js/features/craftybot-feature.js?v=61b451b4');
-  const { homesFeature } = await import('../public/js/features/homes-feature.js?v=e5184a14');
-  const cbMod = await import('../public/js/craftybot.js?v=41eacd5d');
+  const { craftybotFeature } = await import('../public/js/features/craftybot-feature.js?v=2622fcc2');
+  const { homesFeature } = await import('../public/js/features/homes-feature.js?v=7c6c9b3e');
+  const cbMod = await import('../public/js/craftybot.js?v=77d8315d');
   const making = await import('../public/js/making.js?v=4e72bb4b');
 
   function fakeEngine(extra = {}) {
@@ -492,6 +492,88 @@ describe('craftybot feature: the ingredient source and the job menu', async () =
     assert.equal(engine.inv.cherry, 3);
   });
 
+  describe('dropping the bot from the pack (npc_crafty_bot.js verbs.drop 323-342, canDrop 729-735)', () => {
+    const inHouse = (extra = {}) => fakeEngine({
+      inv: { npc_crafty_bot: 1 },
+      streetTsid: 'RH_HOME_INT',
+      homeContext: () => ({ inHome: true, owned: true }),
+      player: { x: 420 },
+      setData() {},
+      pushActivity() {},
+      ...extra,
+    });
+    /** Stand on a scene homes-feature would have built (an upper floor, a Tower floor). */
+    const withScene = (scene, fn) => {
+      const real = homesFeature._state;
+      homesFeature._state = () => ({ ...real.call(homesFeature), scene });
+      try { return fn(); } finally { homesFeature._state = real; }
+    };
+    const dropVerb = (engine) => craftybotFeature.packVerbs('npc_crafty_bot', engine).find((v) => v.id === 'drop_bot');
+
+    it('in the house: one "drop" row of its own, and it puts the bot at your feet', () => {
+      craftybotFeature.restore({ owned: true, where: 'pack', x: 0 });
+      const engine = inHouse();
+      const verb = dropVerb(engine);
+      assert.deepEqual([verb.label, verb.enabled, verb.reason, verb.tooltip], ['drop', true, '', 'Drop it on the ground']);
+      assert.equal(craftybotFeature.packOwnDrop('npc_crafty_bot'), true);
+      assert.equal(craftybotFeature.packOwnDrop('cherry'), null);
+      assert.equal(craftybotFeature.packDrop('cherry', null, engine), null, 'other classes keep the general drop rules');
+      assert.equal(craftybotFeature.runPackVerb('npc_crafty_bot', 'drop_bot', engine), true);
+      const { bot } = craftybotFeature._state();
+      assert.deepEqual([bot.where, bot.x, engine.inv.npc_crafty_bot || 0], ['interior', 420, 0]);
+    });
+
+    it('any other drop of it is the same drop: Decoration Mode\'s drag puts it where it was let go', () => {
+      craftybotFeature.restore({ owned: true, where: 'pack', x: 0 });
+      const engine = inHouse();
+      const res = craftybotFeature.packDrop('npc_crafty_bot', { x: 812.4, y: 300 }, engine);
+      assert.deepEqual([res.ok, res.own, res.count], [true, true, 1]);
+      const { bot } = craftybotFeature._state();
+      assert.deepEqual([bot.where, bot.x, engine.inv.npc_crafty_bot || 0], ['interior', 812, 0]);
+      // Already out: nothing to drop, and no second bot.
+      assert.equal(craftybotFeature.packDrop('npc_crafty_bot', null, engine).ok, false);
+      assert.equal(craftybotFeature._state().bot.x, 812);
+    });
+
+    it('stays in the pack on the home street and on a Tower floor, and says where it goes', () => {
+      for (const [name, engine, scene] of [
+        ['home street', inHouse({ streetTsid: 'RH_HOME_EXT' }), null],
+        ['Tower floor', inHouse(), { room: 'interior', tower: 0 }],
+        ['another street', inHouse({ streetTsid: 'GA5101HF7F429V5', homeContext: () => ({ inHome: false }) }), null],
+      ]) {
+        craftybotFeature.restore({ owned: true, where: 'pack', x: 0 });
+        withScene(scene, () => {
+          const verb = dropVerb(engine);
+          assert.deepEqual([verb.label, verb.enabled, verb.reason], ['drop', false, cbMod.CRAFTYBOT_COPY.dropOutside], name);
+          assert.deepEqual(craftybotFeature.packDrop('npc_crafty_bot', { x: 500, y: 300 }, engine), { ok: false, reason: 'blocked', msg: cbMod.CRAFTYBOT_COPY.dropOutside }, name);
+        });
+        assert.deepEqual([craftybotFeature._state().bot.where, engine.inv.npc_crafty_bot], ['pack', 1], name);
+      }
+    });
+
+    it('an upper floor of the house names the ground floor (ours: Glitch\'s house was one location)', () => {
+      craftybotFeature.restore({ owned: true, where: 'pack', x: 0 });
+      const engine = inHouse();
+      withScene({ room: 'interior', houseFloor: 1 }, () => {
+        assert.equal(dropVerb(engine).reason, cbMod.CRAFTYBOT_COPY.dropUpstairs);
+        assert.equal(craftybotFeature.packDrop('npc_crafty_bot', null, engine).msg, cbMod.CRAFTYBOT_COPY.dropUpstairs);
+      });
+      assert.equal(craftybotFeature._state().bot.where, 'pack');
+      assert.match(cbMod.CRAFTYBOT_COPY.dropUpstairs, /ground floor of your house/);
+    });
+
+    it('game.js sends every drop of it to the feature, and draws no second Drop row', () => {
+      const game = readFileSync(join(PUBLIC, 'game.js'), 'utf8');
+      assert.match(game, /if \(!isElementClass\(classTsid\) && !features\.query\('packOwnDrop', classTsid, engine\)\) rows\.push\(\{\s*attrs: 'data-pack-drop',/);
+      assert.match(game, /dropPackStackAt\(classTsid, count, x, y\) \{[\s\S]{0,360}const own = features\.query\('packDrop', classTsid, \{ x, y \}, engine\);\s*if \(own\?\.ok\) closePackPopover\(\);\s*if \(own\) return own;\s*if \(blocked\)/);
+      assert.match(game, /function dropPackItem\(classTsid, requested = 1\) \{[\s\S]{0,320}const own = features\.query\('packDrop', classTsid, null, engine\);\s*if \(own\) \{[\s\S]{0,120}return;\s*\}\s*if \(blocked\) \{/);
+      // The item keeps no_drop, so storage boxes, the butler and trades still leave it alone.
+      assert.match(readFileSync(join(PUBLIC, 'js/features/craftybot-feature.js'), 'utf8'), /tags: \['no_rube', 'no_trade', 'no_bag', 'no_drop'\]/);
+      // The pack hint is for stacks, not for the bot.
+      assert.match(readFileSync(join(PUBLIC, 'js/features/homes-feature.js'), 'utf8'), /if \(!stackHintShown && !res\.own\) \{/);
+    });
+  });
+
   it('lists only recipes the player can make: transmogrification for everyone, the rest by skill, no furniture or machines', async () => {
     await making.loadRecipeCatalogFromFile(join(PUBLIC, 'assets/content/recipes.json'));
     const none = craftybotFeature._menu(fakeEngine());
@@ -546,7 +628,7 @@ describe('the quantity box follows the count as it is typed', () => {
 // sheet still loading draws nothing until it arrives. The original client had the whole SWF at
 // once, so the bot keeps its frame until the next sheet is in.
 describe('G538: the bot never draws a sheet that is still loading', async () => {
-  const { showClipWhenLoaded } = await import('../public/js/features/craftybot-feature.js?v=61b451b4');
+  const { showClipWhenLoaded } = await import('../public/js/features/craftybot-feature.js?v=2622fcc2');
   const fakeIo = () => {
     const loaded = new Set();
     const waiting = [];

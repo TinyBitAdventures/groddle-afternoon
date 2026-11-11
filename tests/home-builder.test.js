@@ -205,9 +205,9 @@ describe('pack items on shelves and tables (the dropped-stack model)', () => {
   it('drops through game.js as Drop does: the same block reasons and the same dropped-stack record', () => {
     const game = read('public/game.js');
     const fn = game.slice(game.indexOf('dropPackStackAt(classTsid, count, x, y) {'));
-    assert.match(fn.slice(0, 900), /const blocked = packDropBlockReason\(classTsid\);/);
-    assert.match(fn.slice(0, 900), /dropInventoryStack\(droppedItemState, inv, droppedStacksTsid\(\), classTsid, n, \{ x, y \}/);
-    assert.match(fn.slice(0, 900), /saveDroppedItems\(\);\s+refreshDroppedWorldItems\(\);/);
+    assert.match(fn.slice(0, 1200), /const blocked = packDropBlockReason\(classTsid\);/);
+    assert.match(fn.slice(0, 1200), /dropInventoryStack\(droppedItemState, inv, droppedStacksTsid\(\), classTsid, n, \{ x, y \}/);
+    assert.match(fn.slice(0, 1200), /saveDroppedItems\(\);\s+refreshDroppedWorldItems\(\);/);
     const homes = read('public/js/features/homes-feature.js');
     assert.match(homes, /engine\.dropPackStackAt\?\.\(was\.classTsid, was\.count, target\.x \+ roomX0\(\), target\.y\)/);
     // The pack's dragstart reaches the decorate drag through the pour hook.

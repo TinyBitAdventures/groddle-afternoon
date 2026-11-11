@@ -17,6 +17,13 @@
  *    refuel (one Fuel Cell, +500), craft (opens the job panel); in the pack:
  *    craft, refuel, install a crystal, kick, drop (canDrop: only inside the
  *    house). Teach and Stop Crafting are disabled in the source.
+ *  - Drop is the bot's own (verbs.drop 323-342, canDrop 729-735): the pack
+ *    menu's one "drop" row, and a drag from the pack onto the house floor in
+ *    Decoration Mode, both put the bot down (game.js asks packOwnDrop and
+ *    packDrop before its own drop rules; the item keeps its no_drop tag so
+ *    nothing else carries it off). Outside the house Glitch showed no drop
+ *    verb at all (takeable.js 110-114, a canDrop refusal with no words); the
+ *    remake keeps the row, off, with its own line saying where the bot goes.
  *  - Where it stands decides its ingredient source: on the home street or in
  *    the house it fetches dropped stacks (and Storage Display Boxes indoors)
  *    by walking to them; in the pack it uses the pack and cannot run machines.
@@ -46,7 +53,7 @@ import { ITEM_CATALOG, addItem, countItem, ensureItem, itemIcon, removeItem } fr
 import { canUseTool, getToolCondition, setToolRemaining } from '../tools.js?v=5f482998';
 import { MAKING_TOOL_SKILLS, listRecipes, recipeKnown, TOOL_CATALOG } from '../making.js?v=4e72bb4b';
 import { listDroppedStacks } from '../world-items.js?v=da2bb7a1';
-import { BACK_YARD_GROUND_Y, homesFeature } from './homes-feature.js?v=e5184a14';
+import { BACK_YARD_GROUND_Y, homesFeature } from './homes-feature.js?v=7c6c9b3e';
 import { cabinetTake, isCabinetClass } from '../home-storage.js?v=121f1897';
 import {
   CRAFTYBOT,
@@ -82,7 +89,7 @@ import {
   setJobTotal,
   setLocked,
   setPaused,
-} from '../craftybot.js?v=41eacd5d';
+} from '../craftybot.js?v=77d8315d';
 import { frameTexture, isLoaded, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js?v=f024bd6a';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 import { displayTopOf, itemstackOverlayPoint, playSheetOverlay } from '../overlay-art.js?v=75c3ea34';
@@ -854,12 +861,26 @@ function canDropHere(engine) {
   return currentRoom(engine) === 'interior';
 }
 
-function dropBot(engine) {
-  if (bot.where !== 'pack' || !canDropHere(engine)) return;
+/**
+ * Why the bot stays in the pack here, in our words (Glitch gave none: the verb
+ * was not offered). Glitch's house was one location, every floor of it; here
+ * the bot fetches and crafts on the ground floor only, so an upper floor says so.
+ */
+function dropRefusal(engine) {
+  if (canDropHere(engine)) return '';
+  const scene = homesFeature._state?.()?.scene;
+  const upstairs = engine.homeContext?.()?.inHome && engine.streetTsid === HOME_INTERIOR_TSID && scene?.tower == null && scene?.houseFloor > 0;
+  return upstairs ? CRAFTYBOT_COPY.dropUpstairs : CRAFTYBOT_COPY.dropOutside;
+}
+
+/** Put the bot down at world x (the player's feet when none is given). Returns whether it went down. */
+function dropBot(engine, atX = null) {
+  if (bot.where !== 'pack' || !canDropHere(engine) || countItem(engine.inv, BOT) < 1) return false;
+  const x = Number.isFinite(atX) ? atX : engine.player?.x || 600;
   act(engine, () => {
     removeItem(engine.inv, BOT, 1);
     bot.where = 'interior';
-    bot.x = Math.round(engine.player?.x || 600);
+    bot.x = Math.round(x);
     bot.move = null;
     onMoved(bot, makeWorld(engine));
     engine.refreshPack?.();
@@ -869,6 +890,7 @@ function dropBot(engine) {
       view.target = view.bot.target;
     }
   });
+  return true;
 }
 
 function refuel(engine) {
@@ -921,8 +943,9 @@ function botVerbs(engine, inPack) {
     { id: 'refuel', label: 'refuel', enabled: fuelCheck.ok, reason: fuelCheck.msg || '', tooltip: refuelTooltip(), durationMs: 0 },
   ];
   if (inPack) {
-    const ok = canDropHere(engine);
-    verbs.push({ id: 'drop_bot', label: 'set down', enabled: ok, reason: ok ? '' : 'You can only put your Crafty Bot down inside your house.', tooltip: CRAFTYBOT_COPY.tooltips.drop, durationMs: 0 });
+    // verbs.drop: "drop", "Drop it on the ground". The one drop row of the bot's menu (packOwnDrop).
+    const why = dropRefusal(engine);
+    verbs.push({ id: 'drop_bot', label: 'drop', enabled: !why, reason: why, tooltip: CRAFTYBOT_COPY.tooltips.drop, durationMs: 0 });
   } else {
     verbs.push({ id: 'pickup', label: 'pick up', enabled: true, tooltip: CRAFTYBOT_COPY.tooltips.pickup, durationMs: 0 });
   }
@@ -1958,6 +1981,23 @@ export const craftybotFeature = {
   runPackVerb(classTsid, verbId, engine) {
     if (classTsid !== BOT) return false;
     return runBotVerb(engine, verbId);
+  },
+
+  /** game.js: the bot's menu has its own drop row, so the pack's general Drop row is left out. */
+  packOwnDrop(classTsid) {
+    return classTsid === BOT ? true : null;
+  },
+
+  /**
+   * game.js dropPackItem / dropPackStackAt: any way of dropping the bot from the pack (a drag onto
+   * the floor in Decoration Mode, `at` its world point) is the bot's own drop, with its own rule.
+   */
+  packDrop(classTsid, at, engine) {
+    if (classTsid !== BOT) return null;
+    const why = dropRefusal(engine);
+    if (why) return { ok: false, reason: 'blocked', msg: why };
+    if (!dropBot(engine, Number.isFinite(at?.x) ? at.x : null)) return { ok: false, reason: 'missing', msg: '' };
+    return { ok: true, classTsid: BOT, count: 1, own: true };
   },
 
   /** QA / tests. */

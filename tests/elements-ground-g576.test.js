@@ -48,7 +48,8 @@ describe('#139 Drop', () => {
   });
 
   it("an element's pack menu has no Drop row (state null hides it)", () => {
-    assert.match(game, /if \(!isElementClass\(classTsid\)\) rows\.push\(\{\s*attrs: 'data-pack-drop',/);
+    // (A class with a drop verb of its own, the Crafty Bot, shows that one instead: tests/craftybot.test.js.)
+    assert.match(game, /if \(!isElementClass\(classTsid\) && !features\.query\('packOwnDrop', classTsid, engine\)\) rows\.push\(\{\s*attrs: 'data-pack-drop',/);
   });
 });
 

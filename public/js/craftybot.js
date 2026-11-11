@@ -94,6 +94,9 @@ export const CRAFTYBOT_COPY = Object.freeze({
   crystalsTip: 'Crystals affect Craftybot’s capacity',
   idleStatus: 'Just hanging out',
   defaultStatus: 'Confabulating thingies',
+  // Ours: Glitch gave no words where the bot could not be dropped (canDrop 729-735 hid the verb).
+  dropOutside: 'You can only put your Crafty Bot down inside your house.',
+  dropUpstairs: 'Your Crafty Bot works on the ground floor of your house. Put it down there.',
   tooltips: {
     install_crystal: 'Install a crystal to increase the queue size',
     kick: 'Am I standing there looking like a goof?',

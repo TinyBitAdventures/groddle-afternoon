@@ -34,6 +34,11 @@
  *                                         //    opts.copy: which of the class's copies the menu is
  *                                         //    about (js/tools.js, its place in pack order), or null
  *   runPackVerb(classTsid, verbId, engine, opts) // -> true when handled (opts as packVerbs)
+ *   packOwnDrop(classTsid, engine)        // -> true when the class's packVerbs carry its own drop:
+ *                                         //    the popover's general Drop row is left out (engine.query)
+ *   packDrop(classTsid, at, engine)       // -> { ok, msg } when the feature puts that class down itself
+ *                                         //    (Drop, or a Decoration Mode drag to world point `at`),
+ *                                         //    else null and the general drop rules run (engine.query)
  *   mapCards(engine)                      // -> [HTMLElement] cards shown above the Map canvas
  *   furnitureRow(street, base, engine)    // -> street furniture row (base = the archived row or null),
  *                                         //    row.at[classTsid] = fixed screen points (engine.query)

@@ -5315,8 +5315,9 @@ function wirePackDrag(engine) {
       engine.playSound?.('CLICK_FAILURE', { volume: 0.4 });
     } else {
       settleRoomStacks(engine);
-      // Once a visit: how to move it or take it back (Austin 2026-11-01).
-      if (!stackHintShown) {
+      // Once a visit: how to move it or take it back (Austin 2026-11-01). Not for what a feature
+      // put down itself (res.own: the Crafty Bot is no stack; it comes back by its own pick up).
+      if (!stackHintShown && !res.own) {
         stackHintShown = true;
         engine.toast(BUILDER_TEXT.stackHint, 4200);
       }

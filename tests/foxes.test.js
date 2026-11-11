@@ -40,7 +40,7 @@ import {
   preserveEcologyEntry,
 } from '../public/js/features/foxes-feature.js?v=8230c878';
 import { wildlifeFor } from '../public/js/wildlife.js?v=670c3a7f';
-import { createFeatureHost } from '../public/js/feature-host.js?v=127e0a3c';
+import { createFeatureHost } from '../public/js/feature-host.js?v=06bb8b74';
 import { foxesFeature } from '../public/js/features/foxes-feature.js?v=8230c878';
 import { bubbleMs, readMs } from '../public/js/read-time.js?v=be140198';
 
