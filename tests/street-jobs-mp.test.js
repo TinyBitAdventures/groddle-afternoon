@@ -30,7 +30,7 @@ import {
   rowFromServer,
   sharedSlice,
   topLine,
-} from '../public/js/street-jobs-mp.js?v=a0a54e60';
+} from '../public/js/street-jobs-mp.js?v=25efcadf';
 import {
   isJobBuilt,
   jobStatus,
@@ -39,7 +39,7 @@ import {
   phaseRequirements,
   roadClosure,
   soloNeed,
-} from '../public/js/street-jobs.js?v=68562ef0';
+} from '../public/js/street-jobs.js?v=94f8d250';
 
 const root = join(import.meta.dirname, '..');
 const catalog = JSON.parse(readFileSync(join(root, 'public/assets/content/street-jobs.json'), 'utf8'));
@@ -268,7 +268,7 @@ describe('the site ledger counts project records (src/LedgerMath.php)', () => {
 
 describe('ticket 190: the final card of a shared project names your share', () => {
   it('contributedKey is the key markContributed records', async () => {
-    const { contributedKey } = await import('../public/js/street-jobs-mp.js?v=a0a54e60');
+    const { contributedKey } = await import('../public/js/street-jobs-mp.js?v=25efcadf');
     const state = { phasesContributed: [] };
     markContributed(state, 'job-g-123', 'job_street_baq_12');
     assert.deepEqual(state.phasesContributed, [contributedKey('job-g-123', 'job_street_baq_12')]);

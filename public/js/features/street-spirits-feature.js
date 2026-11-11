@@ -102,7 +102,7 @@ import {
 } from '../conversations.js?v=7cbdfea4';
 import { acceptOffer, npcQuestOffers, questStatus } from '../quest-offers.js?v=9c53455c';
 import { getQuestCatalog } from '../content-catalogs.js?v=10b118dd';
-import { questRoomConverse } from './quest-instances-feature.js?v=f47bc58f';
+import { questRoomConverse } from './quest-instances-feature.js?v=f2469141';
 import { SPIRIT_REMINISCE_TEXT, isStreetSpiritClass, spiritReminisceOffers, withReminisceVerb } from '../spirit-reminisce.js?v=af43c271';
 import { questDoneAt } from '../quests.js?v=2b882eb6';
 
@@ -190,6 +190,8 @@ function tickOffer(engine, now) {
   if (!t || !p || !TALK_ORDER[talkVariant] || active || !t.sprite || t.sprite.destroyed) return;
   // G185: a lonely spirit's collision is the loneliness visit (street_spirit.js 541-545).
   if (engine.query?.('spiritLonelyHere', engine)) return;
+  // Gap 3: a spirit offering a project offers no conversation (onPlayerCollision, street_spirit.js 547).
+  if (engine.query?.('spiritHasJobs', t, engine) === true) return;
   const near = inSpiritBox(p, t.sprite);
   const dev = devRules(engine);
   // Collision fires on the way in; dev QA keeps checking while the player stands there.
@@ -667,6 +669,9 @@ export const streetSpiritsFeature = {
     }
     if (verbId !== 'talk_to') return null;
     if (spirit && target === spirit.target) startTalk(engine, Date.now());
+    // Gap 3: a spirit with a street project offers it first (street_spirit.js talk_to 309-315:
+    // hasJobs -> talk clip, offerJobs); its conversations wait until the project is done.
+    if (engine.query?.('spiritOfferJobs', target, engine) === true) return true;
     if (target && target === talkTarget && !active && startConversation(engine, target, Date.now())) return true;
     return null;
   },

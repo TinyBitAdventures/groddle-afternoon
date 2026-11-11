@@ -2752,9 +2752,14 @@
   "deployed": "2026-11-11"
  },
  "git": {
-  "commits": 1645,
+  "commits": 1646,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-11",
+    "kind": "improve",
+    "text": "Browse goods stays first in a street spirit's menu when it can reminisce"
+   },
    {
     "date": "2026-11-11",
     "kind": "fix",
@@ -2869,14 +2874,9 @@
     "date": "2026-11-10",
     "kind": "improve",
     "text": "Draught of Wisdom, Rocky Regeneration Solution and Alphabet Sauce pour from their own bottles"
-   },
-   {
-    "date": "2026-11-10",
-    "kind": "improve",
-    "text": "Powders puff from their jar, the Plank swings at whoever is splanked, and a Batterfly turns to look at you"
    }
   ]
  },
- "tests": 801,
+ "tests": 803,
  "generatedAt": "2026-11-11"
 }

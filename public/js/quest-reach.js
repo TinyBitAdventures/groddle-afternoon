@@ -212,12 +212,13 @@ export function questHold(def, reach, idx, questState = null) {
  * The Quests list's note for a held quest. `building`: the first street project on the way that
  * can be built now, `board`: the street its project board stands on (both when known).
  */
-export function holdNote(hold, { building = '', board = '' } = {}) {
+export function holdNote(hold, { building = '', board = '', giver = '' } = {}) {
   if (!hold) return '';
   const road = `On hold: waiting for the road to ${hold.place} to be built`;
   if (building && board) {
     const first = building === hold.place ? 'Help build it' : `Start with ${building}`;
-    return `${road}. ${first}, at the project board on ${board}.`;
+    // Gap 3: `giver` names who gives it there ("the Street Spirit"), else the project board.
+    return `${road}. ${first}, at ${giver || 'the project board'} on ${board}.`;
   }
   return `${road}.`;
 }

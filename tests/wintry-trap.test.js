@@ -24,7 +24,7 @@ import { fileURLToPath } from 'node:url';
 import { platformYAt, platformsScreen, stuckWay, worldToScreen } from '../public/js/street-model.js?v=b6cb6a4e';
 import { reachStreet, streetBuff } from '../public/js/builder/reach-graph.js?v=d03eeab1';
 import { STREET_TRAPS } from '../public/js/street-traps-data.js?v=b2911c49';
-import { onTrapFloor, trapLinesOn } from '../public/js/features/slash-commands-feature.js?v=75b6f268';
+import { onTrapFloor, trapLinesOn } from '../public/js/features/slash-commands-feature.js?v=28c1737f';
 import { trapEntry } from '../tools/ecology/build-street-traps.mjs';
 import { DRINK_TICKS } from '../public/js/buffs.js?v=819cb342';
 import { coldPlaceMessage, isKukubeeWinter } from '../public/js/buff-triggers.js?v=a3093922';

@@ -16,14 +16,15 @@
  * and only the player's own share is read from it (`mine`). Words come from `labels`.
  */
 
-import { jobDef, jobDivisor, jobStatus, phaseBaseCost, phaseClass, phaseName, phaseRequirements, workGear } from './street-jobs.js?v=68562ef0';
+import { jobDef, jobDivisor, jobStatus, phaseBaseCost, phaseClass, phaseName, phaseRequirements, workGear } from './street-jobs.js?v=94f8d250';
 
 /** The projects the panel follows: a street's build or upgrade, and online a group hall. Homes' restorations stay their home's. */
 export const TRACKED_KINDS = Object.freeze(['street', 'upgrade', 'hall']);
 
 export const PROJECTS_TEXT = Object.freeze({
   title: 'Projects',
-  empty: 'You have not put anything into a street project yet. Look for a project board on a street, and every street you help build shows up here.',
+  // Gap 3: Street Spirits give the projects (a board only where no spirit stands).
+  empty: 'You have not put anything into a street project yet. Look for a Street Spirit with a "Project available" bubble, and every street you help build shows up here.',
   active: 'Under way',
   done: 'Done',
   noneActive: 'None under way right now.',

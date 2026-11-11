@@ -1,17 +1,23 @@
 /**
- * Street projects: the Job Board on a street offers the archived street's
+ * Street projects: the Street Spirit on a street offers the archived street's
  * collaborative projects (build a new street, upgrade this one) in the solo
  * form documented in js/street-jobs.js.
  *
- *  - Boards spawn on every street the source's Street Spirit offered a
- *    project from (catalog.byStreet), one per street, at a planner point.
+ *  - Every street the source's Street Spirit offered a project from
+ *    (catalog.byStreet) offers it from its spirit (talk to, and the
+ *    clickable bubble over it: js/job-indicator.js). A street whose archived
+ *    location has no spirit, and a group hall, get a Job Board (sign_stake)
+ *    at a planner point with the same bubble.
  *  - Contribute items, currants, or timed work (1.5 s a unit, energy and tool
  *    wear per unit); hire a hand for work you cannot do.
  *  - Finishing a street project opens the road (the signpost into the new
  *    street, which shows a barricade until then) and hands you an imbued
  *    Teleportation Script there. Finishing an upgrade re-plans the street
  *    with the chosen option's shrine, animals, rocks, and flora.
- *  - The Map stays open to every street; only signpost roads close.
+ *  - A street still being built is shut to signposts, doors and teleports
+ *    (travelGate), and the Map draws it as the client drew a locked street,
+ *    a row of dots with a dimmed name, with no destination or teleport
+ *    (streetUnderConstruction; js/map-graph.js, MapStreet.as 51-64, 125).
  *
  * QA: ?autostart=1&fresh=1&resetgame=1&jobdemo=<job class or job id>
  *     (&jobautoplay=1, &jobphase=N)
@@ -97,10 +103,10 @@ import {
   cancelJob,
   jobDivisor,
   upgradeOption,
-} from '../street-jobs.js?v=68562ef0';
+} from '../street-jobs.js?v=94f8d250';
 import { PAPERS_BADGE } from '../subway.js?v=44d1a09f';
 import { gainMetabolic, loseEnergy } from '../metabolics.js?v=8504134e';
-import { closuresInTheWay, holdNote, placeIndex, questHold, questStoryKey, reachableStreets } from '../quest-reach.js?v=5a77e3d1';
+import { closuresInTheWay, holdNote, placeIndex, questHold, questStoryKey, reachableStreets } from '../quest-reach.js?v=a206bc33';
 import { getQuestCatalog as questCatalog } from '../content-catalogs.js?v=10b118dd';
 import { saveStore } from '../save-store.js?v=8839ba7b';
 import {
@@ -123,18 +129,20 @@ import {
   rowFromServer,
   sharedSlice,
   topLine,
-} from '../street-jobs-mp.js?v=a0a54e60';
+} from '../street-jobs-mp.js?v=25efcadf';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 import { createMinnAccount } from '../minn-account.js?v=8f2741cd';
 import { normalizeGroups } from '../groups.js?v=c9635d96';
 import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=f024bd6a';
+import { createJobIndicator, jobIndicatorView, jobPerc } from '../job-indicator.js?v=e172dd30';
+import { LOT_ART, LOT_CLASS, LOT_PLACEMENT, LOT_SIGN_BLOCKERS, LOT_SIGN_X, LOT_TEXT, floorYAt, lotFit, lotHeadline, lotVerb } from '../group-hall-lot.js?v=23e8fbd9';
 import { JOB_WORK_OVERLAY, jobWorkFloatPoint, jobWorkSoundKey, jobWorkToolScale, jobWorkToolSheet } from '../job-work-fx.js?v=ee7e10ca';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
 import { SIGN_ARMS, routeGraph } from '../map-routes.js?v=c7e7dc80';
 import { TELEPORTERS } from '../hidden-floors.js?v=732a2610';
 import { WINTRY_PORTAL_TELEPORTERS } from '../wintry-portal.js?v=1437deda';
-import { PROJECTS_TEXT, contributedJobs, mineTotal, projectList } from '../projects-tracker.js?v=e1f51caf';
-import { PROJECTS_PANEL_ID, buildProjectsPanel, renderProjects } from '../ui/projects-sheet.js?v=972ce850';
+import { PROJECTS_TEXT, contributedJobs, mineTotal, projectList } from '../projects-tracker.js?v=8b529103';
+import { PROJECTS_PANEL_ID, buildProjectsPanel, renderProjects } from '../ui/projects-sheet.js?v=2fd516d0';
 import { SIDE_SHEET_IDS } from '../ui/panel-shell.js?v=e2abdf9e';
 import { trophyGotText } from '../home-trophies.js?v=2020b29b';
 import { GEM_HINTS, isGem } from '../gem-hints.js?v=4b65f7ac';
@@ -316,7 +324,7 @@ function questHoldFor(classTsid, engine) {
     const jobId = first ? Object.keys(catalog.jobs || {}).find((id) => catalog.jobs[id].kind === 'street' && catalog.jobs[id].street === first.street) || '' : '';
     const job = jobId ? catalog.jobs[jobId] : null;
     out = { ...hold, street: first?.street || '', jobId, building: job ? job.label || streetLabel(first.street) : '', board: first?.board ? streetLabel(first.board) : '' };
-    out.note = holdNote(out, { building: out.building, board: out.board });
+    out.note = holdNote(out, { building: out.building, board: out.board, giver: first?.board && jobId ? giverNoun(first.board, jobId) : '' });
   }
   r.holds.set(cacheKey, out);
   return out;
@@ -398,27 +406,122 @@ function boardJobs(engine) {
   return (catalog?.byStreet?.[engine.streetTsid] || []).slice();
 }
 
+/** The street's projects, best first (offerJobs order), or the QA demo's one. */
+function headRows(engine) {
+  return demo
+    ? [{ jobId: demo.jobId, ...jobStatus(state, catalog, demo.jobId, Date.now(), opts()) }]
+    : streetJobs(state, catalog, engine.streetTsid, Date.now(), opts());
+}
+
 function boardHeadline(engine) {
   const ids = boardJobs(engine);
   if (!ids.length) return null;
-  const rows = demo
-    ? [{ jobId: demo.jobId, ...jobStatus(state, catalog, demo.jobId, Date.now(), opts()) }]
-    : streetJobs(state, catalog, engine.streetTsid, Date.now(), opts());
-  return rows[0] || null;
+  // Gap 3: what the street's spirit gives is not the board's; gap 1: nor is a hall, its lot's.
+  return headRows(engine).filter((r) => !(giver && spiritOffers(r.jobId)) && !lotOffers(r.jobId))[0] || null;
 }
 
-/** The walkable platform surface at x, nearest at or below fromY. */
-function groundYAt(engine, x, fromY) {
-  let best = null;
-  for (const pl of engine.platforms || []) {
-    const lo = Math.min(pl.x1, pl.x2);
-    const hi = Math.max(pl.x1, pl.x2);
-    if (x < lo || x > hi || hi === lo) continue;
-    const y = pl.y1 + ((pl.y2 - pl.y1) * (x - pl.x1)) / (pl.x2 - pl.x1);
-    if (y < fromY - 24) continue;
-    if (best == null || y < best) best = y;
+/*
+ * Gap 3 (research/street-projects-audit-2026-11-11.md): the Street Spirit gives the street's
+ * projects. Glitch's projects came from the spirit on the connecting street (the job's `connecting`
+ * street, catalog.byStreet): items/include/street_spirits.js 1 includes jobs.js, and its talk_to
+ * (items/street_spirit.js 279-315, sort_on 53, tooltip "See what's up with this spirit") offers
+ * them first (hasJobs -> offerJobs). A spirit offers job types 1, 2 and 4 (jobs.js canOffer 101-103);
+ * a group hall (type 3) came from its lot marker (104-106), drawn as the lot (gap 1, below). The board
+ * (sign_stake) stays only where no spirit stands in the archive (the Baqala and Ajaya Bliss streets
+ * and others: their location XML lists no street_spirit).
+ */
+export const SPIRIT_PROJECT_VERB = Object.freeze({ id: 'talk_to', label: 'talk to', tooltip: "See what's up with this spirit" });
+/** The bubble's tip above its giver's top: clear of the Enter hint (12 px up, 22 px tall) with 4 px to spare. */
+const INDICATOR_LIFT = 38;
+let giver = null; // { target, indicator }: the street's spirit, when it gives a project here
+let boardIndicator = null;
+
+const spiritOffers = (jobId) => {
+  const kind = jobDef(catalog, jobId)?.kind;
+  return kind === 'street' || kind === 'upgrade';
+};
+
+/** The street's selling spirit (game.js spawnVendorNpc; street-spirits-feature vendorSpirit). */
+function streetSpirit(engine) {
+  return (engine.interactables || []).find(
+    (it) => /^street_spirit_/.test(String(it.classId || '')) && it.state?.vendorKey && it.sprite && !it.sprite.destroyed
+  ) || null;
+}
+
+/** The spirit's headline: its best project not built (offerJobs: given, then open). */
+function giverHeadline(engine) {
+  if (!giver) return null;
+  return headRows(engine).filter((r) => spiritOffers(r.jobId))[0] || null;
+}
+
+/** hasJobs (jobs.js 91-96): a project open or under way, not resting between phases or after a build. */
+function giverHasJobs(engine) {
+  const head = giverHeadline(engine);
+  return Boolean(head && (head.status === 'active' || head.status === 'open'));
+}
+
+/** Who gives this job on this street: the spirit, else the board. */
+function giverFor(jobId) {
+  if (lot && lotOffers(jobId)) return lot;
+  return giver && spiritOffers(jobId) ? giver : board;
+}
+
+/** Does this street need the Job Board: a project not built that no spirit here gives (halls, spirit-less streets)? */
+function boardNeeded(tsid, spiritHere) {
+  return streetJobs(state, catalog, tsid, Date.now(), opts()).some(
+    (r) => r.status !== 'done' && r.status !== 'built' && !(spiritHere && spiritOffers(r.jobId)) && !lotOffers(r.jobId)
+  );
+}
+
+/** Gap 3: who gives this job on a street, in words ("the Street Spirit"), or '' for the project board. */
+const upperFirst = (t) => (t ? t[0].toUpperCase() + t.slice(1) : t);
+function giverNoun(tsid, jobId) {
+  if (!catalog || !spiritOffers(jobId)) return '';
+  return Number(ecologyForStreet(String(tsid || '').replace(/^L/, 'G'))?.counts?.street_spirit) > 0 ? 'the Street Spirit' : '';
+}
+
+function openGiver(engine, from) {
+  const head = from === 'board' ? boardHeadline(engine) : giverHeadline(engine);
+  if (head) openPanel(engine, head.jobId);
+}
+
+function spawnGiver(engine, target) {
+  const ind = createJobIndicator(engine.PIXI, { onClick: () => openGiver(engine, 'spirit'), textureFor: textureFromUrl });
+  ind.root.label = 'job-indicator-spirit';
+  (engine.fxLayer || engine.entityLayer).addChild(ind.root);
+  giver = { target, indicator: ind };
+  tickIndicators(engine);
+}
+
+/** The bubble's view for a headline (JobManager.as 100-125). */
+function indicatorView(head, now) {
+  if (!head) return null;
+  const job = jobDef(catalog, head.jobId);
+  const reqs = phaseRequirements(state, catalog, head.jobId);
+  return jobIndicatorView(head, { phases: job?.phases?.length || 1, perc: jobPerc(reqs), now });
+}
+
+/** Each frame: the bubbles' text (the countdown ticks each second), their flip, and the spirit's over its head. */
+function tickIndicators(engine, now = Date.now()) {
+  if (giver) {
+    const spr = giver.target?.sprite;
+    const root = giver.indicator.root;
+    if (spr && !spr.destroyed && !root.destroyed) {
+      const v = indicatorView(giverHeadline(engine), now);
+      giver.indicator.update(v, now);
+      // Over the spirit's head and its name (ActionIndicatorView worldDisposableSpriteChangeHandler:
+      // y above the display, less the bubble's height), and over our Enter hint, which sits on
+      // the same top (game.js: box.top - 12, a 22 px chip), so the two never cover each other.
+      root.x = spr.x;
+      root.y = spr.y - Math.abs(spr._worldHitH || spr.height || 0) - INDICATOR_LIFT;
+      giver.bubble = v ? v.main.join(' ') : '';
+    }
   }
-  return best ?? fromY;
+  if (boardIndicator && !boardIndicator.root.destroyed) {
+    const v = indicatorView(boardHeadline(engine), now);
+    boardIndicator.update(v, now);
+    if (board) board.bubble = v ? v.main.join(' ') : '';
+  }
 }
 
 function spawnBoard(engine, point) {
@@ -427,8 +530,10 @@ function spawnBoard(engine, point) {
   const sign = new PIXI.Sprite(textureFromUrl(BOARD_ART));
   sign.anchor.set(0.5, 1);
   spr.addChild(sign);
-  const plate = new PIXI.Graphics();
-  plate.y = -118;
+  // Gap 4: the board where no spirit stands carries the same bubble.
+  boardIndicator = createJobIndicator(PIXI, { onClick: () => openGiver(engine, 'board'), textureFor: textureFromUrl });
+  boardIndicator.root.y = -110 - INDICATOR_LIFT;
+  const plate = boardIndicator.root;
   spr.addChild(plate);
   spr.x = point.x;
   spr.y = point.y + 2;
@@ -450,33 +555,97 @@ function spawnBoard(engine, point) {
   drawPlate(engine);
 }
 
-/** A small progress pill above the sign: phase n/m and the phase's progress. */
+/** Gap 4: the givers' bubbles, after a change (each frame keeps them too: tickIndicators). */
 function drawPlate(engine) {
-  if (!board?.plate || board.plate.destroyed) return;
-  const g = board.plate;
-  g.clear();
-  g.removeChildren().forEach((c) => c.destroy());
-  const head = boardHeadline(engine);
-  if (!head) return;
-  const job = jobDef(catalog, head.jobId);
-  const reqs = phaseRequirements(state, catalog, head.jobId);
-  const need = reqs.reduce((s, r) => s + r.need, 0) || 1;
-  const got = reqs.reduce((s, r) => s + r.got, 0);
-  const perc = head.status === 'done' || head.status === 'built' ? 1 : got / need;
-  const w = 74;
-  g.roundRect(-w / 2, -12, w, 22, 9).fill({ color: 0x2d2a24, alpha: 0.82 });
-  g.roundRect(-w / 2 + 5, 4, w - 10, 3, 1.5).fill({ color: 0x5c564a, alpha: 1 });
-  g.roundRect(-w / 2 + 5, 4, Math.max(2, (w - 10) * perc), 3, 1.5).fill({ color: 0xf2c14e, alpha: 1 });
-  const label = new engine.PIXI.Text(
-    { text: head.status === 'done' || head.status === 'built'
-      ? 'Complete'
-      : head.status === 'delayed' || head.status === 'cooldown'
-        ? 'Resting'
-        : `Phase ${Math.min(job.phases.length, head.phase + 1)}/${job.phases.length}`, style: { fontFamily: 'Arial', fontSize: 10, fontWeight: '700', fill: 0xfff6dc } },
-  );
-  label.anchor.set(0.5, 0.5);
-  label.y = -4;
-  g.addChild(label);
+  tickIndicators(engine);
+}
+
+/*
+ * Gap 1 (research/street-projects-audit-2026-11-11.md): the Group Hall lot. A hall (job type 3) is
+ * offered by its group_hall_lot_marker, not the spirit or a board (items/include/jobs.js canOffer
+ * 104-106): the roped plot and its sign (group_hall_lot_marker.swf, js/group-hall-lot.js), the sign
+ * being what you click (its interaction_target) with the job bubble over it (jobs.js onPlayerEnter,
+ * items/group_hall_lot_marker.js 63-98, sends the status as the spirit's does). A finished hall
+ * hides the lot (quest.js 1838 'visible:false'). Halls are multiplayer only (G331, mergeHalls),
+ * so the lot is too.
+ */
+let lot = null; // { jobId, plot, sign, target, indicator, bubble }
+
+/** Does the lot give this job (a group hall)? */
+const lotOffers = (jobId) => jobDef(catalog, jobId)?.kind === 'hall';
+
+/** The hall the street's lot offers, or null when it shows none (no hall here, or all built). */
+function lotHead(engine) {
+  if (!mpMode || demo || !catalog) return null;
+  return lotHeadline(streetJobs(state, catalog, engine.streetTsid, Date.now(), opts()), catalog);
+}
+
+function spawnLot(engine, at, head) {
+  const { PIXI } = engine;
+  const z = itemZ(LOT_CLASS);
+  // The sign clear of the shrine, trees and the rest (lotFit): slid along its floor, or facing the other way.
+  const planned = {};
+  for (const key of Object.keys(LOT_SIGN_BLOCKERS)) planned[key] = engine.placement(key);
+  const fit = lotFit(at, planned);
+  const side = fit.side;
+  const point = { x: fit.x, y: fit.x === at.x ? at.y : floorYAt(engine.platforms, fit.x, at.y) };
+  // The plot: in_background (group_hall_lot_marker.js 134), behind everyone in the line along the rope.
+  const plot = new PIXI.Sprite(textureFromUrl(LOT_ART.plot.url));
+  plot.label = 'group-hall-lot-plot';
+  plot.x = point.x + side * LOT_ART.plot.x;
+  plot.y = point.y + LOT_ART.plot.y;
+  plot.scale.x = side;
+  plot.zIndex = z;
+  // The sign (DefineSprite 3, interaction_target): its post's foot at the item's origin line.
+  const sign = new PIXI.Container();
+  sign.label = 'group-hall-lot-sign';
+  const art = new PIXI.Sprite(textureFromUrl(LOT_ART.sign.url));
+  art.x = -LOT_ART.sign.w / 2;
+  art.y = -LOT_ART.sign.h;
+  sign.addChild(art);
+  sign.x = point.x + side * LOT_SIGN_X;
+  sign.y = point.y;
+  sign.zIndex = itemZ(LOT_CLASS, 0.01);
+  sign._worldHitW = Math.ceil(LOT_ART.sign.w);
+  sign._worldHitH = Math.ceil(LOT_ART.sign.h);
+  engine.entityLayer.addChild(plot, sign);
+  const target = engine.register({ classId: LOT_CLASS, featureId: STREET_JOBS_FEATURE_ID, label: LOT_TEXT.label, subtitle: LOT_TEXT.desc, sprite: sign });
+  const indicator = createJobIndicator(PIXI, { onClick: () => openLot(engine), textureFor: textureFromUrl });
+  indicator.root.label = 'job-indicator-lot';
+  indicator.root.x = sign.x;
+  indicator.root.y = sign.y - LOT_ART.sign.h - 4;
+  (engine.fxLayer || engine.entityLayer).addChild(indicator.root);
+  lot = { jobId: head.jobId, plot, sign, target, indicator, bubble: '', x: point.x, side };
+  engine.setData('streetJobLot', head.jobId);
+  engine.setData('streetJobLotX', String(Math.round(point.x)));
+}
+
+function clearLot(engine) {
+  if (!lot) return;
+  lot.indicator.destroy();
+  if (engine?.unregister) engine.unregister(lot.target);
+  else if (!lot.sign.destroyed) lot.sign.destroy({ children: true });
+  if (!lot.plot.destroyed) lot.plot.destroy();
+  lot = null;
+  engine?.setData('streetJobLot', '');
+  engine?.setData('streetJobLotX', '');
+}
+
+/** offerJobs (jobs.js 124-158): the lot's hall, given or open. */
+function openLot(engine) {
+  const head = lotHead(engine);
+  if (head) openPanel(engine, head.jobId);
+}
+
+/** Each frame: the bubble; a hall built while you watch takes its lot away (quest.js 1838). */
+function tickLot(engine, now) {
+  if (!lot) return;
+  const head = lotHead(engine);
+  if (!head) return clearLot(engine);
+  lot.jobId = head.jobId;
+  const v = indicatorView(head, now);
+  lot.indicator.update(v, now);
+  lot.bubble = v ? v.main.join(' ') : '';
 }
 
 function signpostTsids(street) {
@@ -923,7 +1092,7 @@ function workToolFx(engine, tool) {
 
 /** A work unit's float, beside the bubble and away from the board's Enter hint. */
 function workFloat(engine, text) {
-  const boardX = (external.get(work?.jobId)?.target?.() || board?.target)?.sprite?.x;
+  const boardX = (external.get(work?.jobId)?.target?.() || giverFor(work?.jobId)?.target)?.sprite?.x;
   const at = jobWorkFloatPoint(engine.player, Number.isFinite(boardX) ? boardX : null);
   engine.floatText(at.x, at.y, text, 0xf2c14e);
 }
@@ -975,7 +1144,7 @@ function stopWork(engine, reason, left = null) {
   w.sound?.stop?.();
   const req = phaseRequirements(state, catalog, w.jobId).find((r) => r.id === w.rid);
   if (reason) engine.prompt({ kicker: 'Street Project', title: 'Work stopped', text: reason });
-  const sayTo = external.get(w.jobId)?.target?.() || board?.target;
+  const sayTo = external.get(w.jobId)?.target?.() || giverFor(w.jobId)?.target;
   const known = Number.isFinite(left);
   if ((req || known) && sayTo && w.units) {
     const remaining = known ? Math.max(0, left) : Math.max(0, req.need - req.got);
@@ -1996,9 +2165,14 @@ function autoplayStep(engine, now) {
 
 function publish(engine) {
   if (!catalog) return;
-  const head = board ? boardHeadline(engine) : null;
+  // Gap 3: the spirit's project first, else the board's.
+  const head = (giver ? giverHeadline(engine) : null) || (board ? boardHeadline(engine) : null);
+  const giving = head ? giverFor(head.jobId) : null;
+  const giverSprite = giving === giver ? giver?.target?.sprite : board?.sprite;
   engine.setData('streetJobBoard', head?.jobId || '');
-  engine.setData('streetJobBoardX', board?.sprite && !board.sprite.destroyed ? String(Math.round(board.sprite.x)) : '');
+  engine.setData('streetJobBoardX', giverSprite && !giverSprite.destroyed ? String(Math.round(giverSprite.x)) : '');
+  engine.setData('streetJobGiver', !head ? '' : giving === giver ? 'spirit' : 'board');
+  engine.setData('streetJobBubble', (giving === giver ? giver?.bubble : board?.bubble) || '');
   engine.setData('streetJobStatus', head?.status || '');
   if (head) {
     const job = jobDef(catalog, head.jobId);
@@ -2092,7 +2266,7 @@ function trackerList(engine, seenAt) {
     if (known[e.jobId]?.partial) e.known = false;
     const where = streetMeta(e.place);
     e.placeLabel = where.label;
-    e.placeTip = e.finished ? `A guided path to ${where.label}` : `A guided path to the project board on ${where.label}`;
+    e.placeTip = e.finished ? `A guided path to ${where.label}` : `A guided path to ${giverNoun(e.place, e.jobId) || 'the project board'} on ${where.label}`;
   }
   return list;
 }
@@ -2242,7 +2416,7 @@ function projectAction(engine, act, e) {
   }
   if (act === 'route') {
     if (where.tsid === engine.streetTsid) {
-      engine.toast(e.finished ? `You are on ${where.label}.` : `The project board is here on ${where.label}.`, 2600);
+      engine.toast(e.finished ? `You are on ${where.label}.` : `${upperFirst(giverNoun(e.place, e.jobId) || 'the project board')} is here on ${where.label}.`, 2600);
       return;
     }
     const res = engine.query?.('mapRoute', 'set', { to: where.tsid, source: 'player' }, engine);
@@ -2372,9 +2546,11 @@ export const streetJobsFeature = {
     if (!catalog || !street?.tsid) return [];
     const out = [];
     const tsid = street.tsid;
-    if (!engineRef?.param('jobdemo') && streetHasOpenProject(state, catalog, tsid, Date.now(), opts())) {
+    if (!engineRef?.param('jobdemo') && boardNeeded(tsid, Boolean(population?.vendor))) {
       out.push({ key: 'street-job-board', count: 1, clearance: 110 });
     }
+    // Gap 1: the hall's lot wants a floor run as wide as its rope (the archive kept no x/y).
+    if (mpMode && lotHeadline(streetJobs(state, catalog, tsid, Date.now(), opts()), catalog)) out.push({ ...LOT_PLACEMENT });
     const option = appliedUpgrade(state, catalog, tsid);
     if (option && upgradeFeatures(option).flora.length) out.push({ key: 'street-job-flora', count: FLORA_COUNT, clearance: 60 });
     return out;
@@ -2394,14 +2570,21 @@ export const streetJobsFeature = {
       if (mpMode) ensureMp(engine);
       if (engine.param('jobdemo') && !demo && !mpMode) demo = resolveDemo(engine);
       const tsid = engine.streetTsid;
-      if (demo) {
+      // Gap 3: the street's spirit gives its projects (a QA demo's too, when one stands here).
+      const spiritHere = streetSpirit(engine);
+      if (spiritHere && (demo ? spiritOffers(demo.jobId) : streetJobs(state, catalog, tsid, Date.now(), opts()).some((r) => spiritOffers(r.jobId) && r.status !== 'built' && r.status !== 'done'))) {
+        spawnGiver(engine, spiritHere);
+      }
+      if (demo && !giver) {
         const p = engine.player;
         const x = p.x + 110;
-        spawnBoard(engine, { x, y: groundYAt(engine, x, p.y) });
-      } else if (streetHasOpenProject(state, catalog, tsid, Date.now(), opts())) {
+        spawnBoard(engine, { x, y: floorYAt(engine.platforms, x, p.y) });
+      } else if (!demo && boardNeeded(tsid, Boolean(spiritHere))) {
         const point = engine.placement('street-job-board')[0] || { x: engine.player.x + 220, y: engine.player.y };
         spawnBoard(engine, point);
       }
+      const hall = lotHead(engine);
+      if (hall) spawnLot(engine, engine.placement(LOT_PLACEMENT.key)[0] || { x: engine.player.x + 360, y: engine.player.y }, hall);
       drawBarricades(engine);
       drawFlora(engine);
       grantFinishedTrophies(engine);
@@ -2416,6 +2599,16 @@ export const streetJobsFeature = {
     if (panel) panel.hidden = true;
     if (board?.sprite && !board.sprite.destroyed) board.sprite.destroy({ children: true });
     board = null;
+    boardIndicator = null;
+    // Gap 3: the spirit is the street's (game.js clears it); only its bubble is ours.
+    giver?.indicator.destroy();
+    giver = null;
+    clearLot(engine);
+    // Gap 2: the bubbles go with the street; who works stays until the roster says otherwise (tickCrew redraws).
+    for (const c of mp?.crew?.values() || []) {
+      if (c.sprite && !c.sprite.destroyed) c.sprite.destroy({ children: true });
+      c.sprite = null;
+    }
     clearBarricades();
     clearFlora();
   },
@@ -2445,9 +2638,12 @@ export const streetJobsFeature = {
     tickProjectsPack(engine, now);
     tickReload(engine);
     autoplayStep(engine, now);
-    if (board && now - (board.platedAt || 0) > 5000) {
-      board.platedAt = now;
-      drawPlate(engine);
+    // Gap 4: the bubbles each frame (the countdown and the flip); the QA data every 5 s.
+    tickIndicators(engine, Date.now());
+    tickLot(engine, Date.now());
+    const giving = board || giver;
+    if (giving && now - (giving.platedAt || 0) > 5000) {
+      giving.platedAt = now;
       publish(engine);
     }
   },
@@ -2479,7 +2675,7 @@ export const streetJobsFeature = {
     if (!catalog || !['signpost', 'door', 'teleport'].includes(via)) return null;
     const closed = roadClosure(state, catalog, tsid, via === 'signpost' ? signpostTsids(engine.street) : [tsid], opts());
     if (!closed) return null;
-    return { ok: false, msg: closedRoadText(state, catalog, closed, { here: engine.streetTsid, via, label: streetLabel, opts: opts() }) };
+    return { ok: false, msg: closedRoadText(state, catalog, closed, { here: engine.streetTsid, via, label: streetLabel, giver: (t) => giverNoun(t, closed.jobId), opts: opts() }) };
   },
 
   /**
@@ -2509,17 +2705,50 @@ export const streetJobsFeature = {
     if (!catalog || !tsid) return null;
     const closed = roadClosure(state, catalog, tsid, [tsid], opts());
     if (!closed) return null;
-    const text = (via) => closedRoadText(state, catalog, closed, { here: engine?.streetTsid, via, label: streetLabel, opts: opts() });
+    const text = (via) => closedRoadText(state, catalog, closed, { here: engine?.streetTsid, via, label: streetLabel, giver: (t) => giverNoun(t, closed.jobId), opts: opts() });
     return { tsid: closed.job.street, label: closed.job.label || streetLabel(closed.job.street), note: text('map'), road: text('signpost') };
   },
 
+  /**
+   * Gap 3: the spirit's talk to while it has a project (street_spirit.js talk_to 279-315: its
+   * tooltip, and offerJobs first). Its place in the menu stays after Browse goods (and reminisce),
+   * as the source's sort_on 53 follows buy/sell 52 and reminisce 51.
+   */
+  decorateVerbs(target, verbs, engine) {
+    if (!giver || target !== giver.target || !giverHasJobs(engine) || !Array.isArray(verbs)) return null;
+    const at = verbs.findIndex((v) => v?.id === SPIRIT_PROJECT_VERB.id);
+    if (at < 0) return null;
+    const out = verbs.slice();
+    out[at] = { ...out[at], tooltip: SPIRIT_PROJECT_VERB.tooltip, enabled: true };
+    return out;
+  },
+
+  /** street-spirits-feature runVerbOverride: talk to on a spirit with a project opens it (offerJobs). */
+  spiritOfferJobs(target, engine) {
+    if (!giver || target !== giver.target || !giverHasJobs(engine)) return null;
+    openGiver(engine, 'spirit');
+    return true;
+  },
+
+  /** street-spirits-feature tickOffer: a spirit with a project offers no conversation (street_spirit.js 547). */
+  spiritHasJobs(target, engine) {
+    if (!giver || target !== giver.target) return null;
+    return giverHasJobs(engine) || null;
+  },
+
   verbsFor(target, engine) {
+    // Gap 1: the lot's talk_to (group_hall_lot_marker.js 39-61).
+    if (target.classId === LOT_CLASS) return catalog ? [lotVerb(lotHead(engine))] : [];
     if (target.classId !== BOARD_CLASS || !catalog) return [];
     const head = boardHeadline(engine);
     return [{ id: 'view', label: 'view project', enabled: Boolean(head), tooltip: head ? jobDef(catalog, head.jobId).title : '', durationMs: 0 }];
   },
 
   runVerb(target, verbId, engine) {
+    if (target.classId === LOT_CLASS) {
+      openLot(engine);
+      return true;
+    }
     if (target.classId !== BOARD_CLASS) return false;
     const head = boardHeadline(engine);
     if (head) openPanel(engine, head.jobId);
@@ -2567,7 +2796,7 @@ export const streetJobsFeature = {
 
   /** QA / tests. */
   _state() {
-    return { state, catalog, board: Boolean(board), work, demo, barricades: barricades.length };
+    return { state, catalog, board: Boolean(board), giver: Boolean(giver), lot: lot ? { jobId: lot.jobId, x: Math.round(lot.x), side: lot.side, signX: Math.round(lot.sign.x) } : null, bubble: { spirit: giver?.bubble || '', board: board?.bubble || '', lot: lot?.bubble || '', at: giver?.indicator.root.getGlobalPosition?.() || null }, work, demo, barricades: barricades.length };
   },
 };
 
