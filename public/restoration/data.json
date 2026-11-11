@@ -2748,13 +2748,73 @@
   ]
  },
  "release": {
-  "game": "0.30.0",
+  "game": "0.31.0",
   "deployed": "2026-11-10"
  },
  "git": {
-  "commits": 1611,
+  "commits": 1626,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-10",
+    "kind": "improve",
+    "text": "A Still rings its chime when it runs dry or fills up"
+   },
+   {
+    "date": "2026-11-10",
+    "kind": "improve",
+    "text": "A machine that finishes a job plays the machines' own ready beep, and the chime is the Still's"
+   },
+   {
+    "date": "2026-11-10",
+    "kind": "improve",
+    "text": "The Still has its sounds: the hopper lid on Distill, its chime on Collect"
+   },
+   {
+    "date": "2026-11-10",
+    "kind": "improve",
+    "text": "Machine parts clunk on and off one by one, in Tiny Speck's own sounds"
+   },
+   {
+    "date": "2026-11-10",
+    "kind": "improve",
+    "text": "A machine that finishes a job rings Tiny Speck's own ready chime"
+   },
+   {
+    "date": "2026-11-10",
+    "kind": "new",
+    "text": "A Thank you reaction (🙏) on chat lines and the Community boards"
+   },
+   {
+    "date": "2026-11-10",
+    "kind": "improve",
+    "text": "Draught of Wisdom, Rocky Regeneration Solution and Alphabet Sauce pour from their own bottles"
+   },
+   {
+    "date": "2026-11-10",
+    "kind": "improve",
+    "text": "Powders puff from their jar, the Plank swings at whoever is splanked, and a Batterfly turns to look at you"
+   },
+   {
+    "date": "2026-11-10",
+    "kind": "improve",
+    "text": "Your Scraper and Shovel are seen at work on Barnacles, Ice Nubbins, Dirt Piles and Peat"
+   },
+   {
+    "date": "2026-11-10",
+    "kind": "fix",
+    "text": "Fiber, the seven herb seeds and the butterfly hair clip pieces lie on the ground as themselves"
+   },
+   {
+    "date": "2026-11-10",
+    "kind": "improve",
+    "text": "A potion's bottle uncorks, tips and pours when you quaff or pour it"
+   },
+   {
+    "date": "2026-11-10",
+    "kind": "improve",
+    "text": "A pausing Chicken scratches, stretches and pecks, and looks at you while its menu is open"
+   },
    {
     "date": "2026-11-10",
     "kind": "fix",
@@ -2814,66 +2874,6 @@
     "date": "2026-11-10",
     "kind": "fix",
     "text": "A Garden Gnome keeps its place beside the house when the home street grows"
-   },
-   {
-    "date": "2026-11-10",
-    "kind": "fix",
-    "text": "An open top bar panel stays in front of notices and the Qurazy banner"
-   },
-   {
-    "date": "2026-11-10",
-    "kind": "fix",
-    "text": "Walking into a friend's house with a key no longer trips on their cabinets"
-   },
-   {
-    "date": "2026-11-10",
-    "kind": "new",
-    "text": "A Chicken you walk into says Squawk! and flies off"
-   },
-   {
-    "date": "2026-11-10",
-    "kind": "improve",
-    "text": "A visitor sees an owner's Garden Gnomes, and a bump makes one hop and talk"
-   },
-   {
-    "date": "2026-11-10",
-    "kind": "improve",
-    "text": "A visitor sees an owner's Meat Collector, Butterfly Milker and Piggy Feeder"
-   },
-   {
-    "date": "2026-11-10",
-    "kind": "improve",
-    "text": "A visitor sees the Magic Sticks an owner set down on their home street"
-   },
-   {
-    "date": "2026-11-10",
-    "kind": "improve",
-    "text": "Garden crops take minutes to an hour, about 10 times Glitch's speed"
-   },
-   {
-    "date": "2026-11-10",
-    "kind": "improve",
-    "text": "A garden plot's answer keeps its 3.5 seconds, marked where the plot hands it on"
-   },
-   {
-    "date": "2026-11-10",
-    "kind": "improve",
-    "text": "The favor display is a plain favor star where no Giant's shrine stands"
-   },
-   {
-    "date": "2026-11-10",
-    "kind": "fix",
-    "text": "The Favor with the Giants panel opens beside an open side sheet, not under it"
-   },
-   {
-    "date": "2026-11-10",
-    "kind": "fix",
-    "text": "The Ancestral Lands timer stops in a quest room too"
-   },
-   {
-    "date": "2026-11-10",
-    "kind": "improve",
-    "text": "The favor display shows whenever you have favor with any Giant"
    }
   ]
  },
