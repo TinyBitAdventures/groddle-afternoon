@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=69b550bf';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=06bb8b74';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=01dfe9a6';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=347b1b13';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -11943,6 +11943,11 @@ const engine = {
   },
   /** A line in the Local chat dock (it fades like the street's own; the modern skin's drawer keeps it in Local). */
   chatLine: (speaker, text, { playerId = 0, rk = '' } = {}) => showLocalChatBubble(String(speaker || ''), String(text || ''), { playerId: Number(playerId) || 0, rk: String(rk || '') }),
+  /**
+   * Another player's line in Local chat (realtime-feature): it joins the street's incantation chain
+   * the way every speaker's line did in location.js doIncantationsFeat 4522-4570, then shows in Local.
+   */
+  hearLocal: (speaker, text, opts = {}) => hearLocalChat(String(speaker || ''), String(text || ''), opts),
   /** SOCIAL: the modern skin's drawer (js/ui/social-drawer.js), or null (a classic skin keeps the old dock). */
   get social() {
     return socialDrawer;
@@ -26123,6 +26128,20 @@ function sayLocalChat(message, participant = 'Ur', { quietActivity = false } = {
   return result;
 }
 
+/**
+ * Multiplayer: another player's Local line. main.js doLocalChat 1732-1745 ran every speaker's line
+ * through the street's chain, so a line from someone new can carry it on and any other line
+ * breaks it (clearIncantationsFeat 4573-4585). Points are only ever yours for your own lines.
+ */
+function hearLocalChat(speaker, text, { playerId = 0, rk = '' } = {}) {
+  // 'Ur' is this player in the chain (feats.js); another player of that name keeps their own seat.
+  const participant = speaker === 'Ur' ? 'Ur (player)' : speaker;
+  const result = speaker ? submitIncantation(featState, text, participant, Date.now()) : { ok: false, matched: false, broken: false };
+  showLocalChatBubble(speaker, text, { feat: result.matched || result.broken, playerId: Number(playerId) || 0, rk: String(rk || '') });
+  if (result.ok || result.broken) handleFeatResult(result, participant);
+  return result;
+}
+
 function finishAssistedFeatChain(playerResult) {
   if (!assistedFeatChain || !playerResult?.ok) return;
   const remaining = INCANTATION_LINES.filter((line) => line.step > playerResult.step);
@@ -26207,8 +26226,11 @@ function renderFeatPanel() {
     }
   } else {
     if (prompt) {
+      // Multiplayer: three different players on one street, one line each, in order (location.js 4522-4570).
       prompt.textContent = status.nextStep === 1
-        ? 'Gather two street companions, then take your turn in the chain.'
+        ? (GAME_MODE === 'multiplayer'
+          ? 'Three different players on one street each say one line in Local chat, in order. Anything else said in between breaks the chain.'
+          : 'Gather two street companions, then take your turn in the chain.')
         : `Waiting for someone new to say line ${status.nextStep}.`;
     }
     if (say) say.hidden = true;

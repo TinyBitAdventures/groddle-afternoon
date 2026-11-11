@@ -128,9 +128,10 @@ describe('a speaker\'s name in the drawer (js/ui/social-drawer.js)', () => {
 });
 
 describe('the sender\'s id on every line path', () => {
-  it('Local: realtime-feature passes it to engine.chatLine, game.js on to the drawer', () => {
-    assert.match(src('js/features/realtime-feature.js'), /engine\.chatLine\?\.\(name, text, \{ playerId: Number\(id\) \|\| 0, rk: lineKey\(lid\) \}\);/);
+  it('Local: realtime-feature passes it to engine.hearLocal (the incantation chain, then chatLine\'s drawer path)', () => {
+    assert.match(src('js/features/realtime-feature.js'), /\(engine\.hearLocal \|\| engine\.chatLine\)\?\.\(name, text, \{ playerId: Number\(id\) \|\| 0, rk: lineKey\(lid\) \}\);/);
     const game = src('game.js');
+    assert.match(game, /showLocalChatBubble\(speaker, text, \{ feat: result\.matched \|\| result\.broken, playerId: Number\(playerId\) \|\| 0, rk: String\(rk \|\| ''\) \}\);/);
     assert.match(game, /chatLine: \(speaker, text, \{ playerId = 0, rk = '' \} = \{\}\) => showLocalChatBubble\(String\(speaker \|\| ''\), String\(text \|\| ''\), \{ playerId: Number\(playerId\) \|\| 0, rk: String\(rk \|\| ''\) \}\),/);
     assert.match(game, /socialDrawer\.localLine\(participant, message, \{ feat, mine, playerId, rk \}\);/);
     assert.match(game, /playerMenu: \(opts\) => openPlayerListMenu\(opts\),\n\s+contextMenu: \(\) => playerContextMenu\(\),/);

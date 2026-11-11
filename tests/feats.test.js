@@ -145,3 +145,34 @@ describe('Feat client integration', () => {
     assert.equal(imageSize(badge).h, 180);
   });
 });
+
+describe('Incantations between real players (multiplayer, 2026-11-11)', () => {
+  it('another player\'s lines carry the chain and only your own line scores for you', () => {
+    const state = createFeatState();
+    assert.equal(submitIncantation(state, 'This game is absolutely preposterous', 'Ada', 1).ok, true);
+    const mine = submitIncantation(state, 'I agree wholeheartedly', 'Ur', 2);
+    assert.equal(mine.ok, true);
+    const last = submitIncantation(state, 'And yet, I will really miss it', 'Bo', 3);
+    assert.equal(last.chainCompleted, true);
+    assert.deepEqual(last.chainParticipants, ['Ada', 'Ur', 'Bo']);
+    assert.equal(state.personalPoints, 2);
+    assert.equal(state.totalPoints, 6);
+  });
+
+  it('a player saying every line alone never scores past the first, and other chat breaks the chain', () => {
+    const state = createFeatState();
+    submitIncantation(state, 'This game is absolutely preposterous', 'Ur', 1);
+    const again = submitIncantation(state, 'I agree wholeheartedly', 'Ur', 2);
+    assert.equal(again.broken, true);
+    assert.equal(again.reason, 'same-participant');
+    submitIncantation(state, 'This game is absolutely preposterous', 'Ada', 3);
+    assert.equal(submitIncantation(state, 'hmm', 'Bo', 4).reason, 'other-chat');
+  });
+
+  it('the realtime feature hands other players\' Local lines to the chain', () => {
+    const realtime = readFileSync(join(publicRoot, 'js', 'features', 'realtime-feature.js'), 'utf8');
+    assert.match(realtime, /\(engine\.hearLocal \|\| engine\.chatLine\)\?\.\(name, text/);
+    const game = readFileSync(join(publicRoot, 'game.js'), 'utf8');
+    assert.match(game, /function hearLocalChat\([^)]*\) \{[\s\S]{0,600}submitIncantation\(featState, text, participant/);
+  });
+});

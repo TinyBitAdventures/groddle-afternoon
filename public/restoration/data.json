@@ -2752,9 +2752,19 @@
   "deployed": "2026-11-11"
  },
  "git": {
-  "commits": 1634,
+  "commits": 1638,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-11",
+    "kind": "fix",
+    "text": "It's Educational II is offered after Part I, as the Greeterbot gave it"
+   },
+   {
+    "date": "2026-11-11",
+    "kind": "fix",
+    "text": "The Butler can be clicked when it stands in front of the house"
+   },
    {
     "date": "2026-11-10",
     "kind": "improve",
@@ -2864,19 +2874,9 @@
     "date": "2026-11-10",
     "kind": "fix",
     "text": "A Crafty Bot in your pack can be dropped in your house, by Drop or by dragging it in Decoration Mode"
-   },
-   {
-    "date": "2026-11-10",
-    "kind": "fix",
-    "text": "Stuffed stays until the new day, and the Encyclopedia knows the game has it"
-   },
-   {
-    "date": "2026-11-10",
-    "kind": "fix",
-    "text": "Solo: Guano a Batterfly left while you were away no longer stands twice"
    }
   ]
  },
  "tests": 798,
- "generatedAt": "2026-11-10"
+ "generatedAt": "2026-11-11"
 }

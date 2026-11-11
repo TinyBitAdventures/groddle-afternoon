@@ -575,7 +575,7 @@ function createSession(engine) {
     if (r) engine.say?.(r.target, chatBubbleText(text), BUBBLE_MS, { speaker: name });
     // RIGHTCLICK: who said it, so their name in Local opens their menu (js/ui/player-menu.js).
     // REACTIONS: the line's key (features/chat-reactions-feature.js claims your own lines' keys).
-    engine.chatLine?.(name, text, { playerId: Number(id) || 0, rk: lineKey(lid) });
+    (engine.hearLocal || engine.chatLine)?.(name, text, { playerId: Number(id) || 0, rk: lineKey(lid) });
   });
   client.on('typing', ({ id }) => {
     if (engine.query?.('realtimeHidden', id)) return;
