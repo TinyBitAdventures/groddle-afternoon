@@ -462,6 +462,13 @@ describe('G470 Cold Comfort', () => {
     assert.match(COLD_COMFORT_LEAVE_TEXT, /^Too cold for ya, eh\? <split butt_txt=/);
     assert.ok(!/—/.test(COLD_COMFORT_LEAVE_TEXT));
   });
+
+  it('the requirement says seconds, as the counter counts them (focusing_orb.js 831, 980; report #195)', () => {
+    const quests = JSON.parse(readFileSync(join(dirname(fileURLToPath(import.meta.url)), '..', 'public', 'assets', 'content', 'quests.json'), 'utf8'));
+    const list = Array.isArray(quests) ? quests : Object.values(quests.quests || quests);
+    const quest = list.find((q) => q?.title === 'Cold Comfort');
+    assert.equal(quest.requirements[0].desc, 'Meditate for 60 seconds in Wintry Place without leaving');
+  });
 });
 
 describe('routing report', () => {

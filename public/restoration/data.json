@@ -2752,9 +2752,14 @@
   "deployed": "2026-11-11"
  },
  "git": {
-  "commits": 1638,
+  "commits": 1639,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-11",
+    "kind": "fix",
+    "text": "Real players chant the Incantations together"
+   },
    {
     "date": "2026-11-11",
     "kind": "fix",
@@ -2869,11 +2874,6 @@
     "date": "2026-11-10",
     "kind": "fix",
     "text": "Amberlyza has its exit door"
-   },
-   {
-    "date": "2026-11-10",
-    "kind": "fix",
-    "text": "A Crafty Bot in your pack can be dropped in your house, by Drop or by dragging it in Decoration Mode"
    }
   ]
  },

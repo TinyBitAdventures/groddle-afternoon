@@ -29298,7 +29298,7 @@
     "name": "wintry_place_meditation",
     "num": 60,
     "classId": "focusing_orb",
-    "desc": "Replenish 60 energy by meditating in Wintry Place"
+    "desc": "Meditate for 60 seconds in Wintry Place without leaving"
    }
   ],
   "rewards": {

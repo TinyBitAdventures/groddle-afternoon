@@ -21,6 +21,7 @@
       "assets/content/achievements.json": "f752dcd5",
       "assets/content/deco-catalog.json": "4540131b",
       "assets/content/puzzle-triggers.json": "5d5b997c",
+      "assets/content/quests.json": "3d1c3335",
       "assets/content/signpost-graph.json": "c618fc41",
       "assets/content/sound-keys.json": "e223c5a7",
       "assets/content/street-ecology.json": "52c389c0",
