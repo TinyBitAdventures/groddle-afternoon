@@ -2748,132 +2748,132 @@
   ]
  },
  "release": {
-  "game": "0.29.0",
+  "game": "0.30.0",
   "deployed": "2026-11-10"
  },
  "git": {
-  "commits": 1583,
+  "commits": 1611,
   "since": "2026-10-19",
   "recent": [
    {
     "date": "2026-11-10",
-    "kind": "improve",
-    "text": "Make opens on your tools, grouped by kind"
+    "kind": "fix",
+    "text": "Purplysa: the gravity pad in the U-shaped block lifts you"
+   },
+   {
+    "date": "2026-11-10",
+    "kind": "fix",
+    "text": "Amberlyza has its exit door"
+   },
+   {
+    "date": "2026-11-10",
+    "kind": "fix",
+    "text": "A Crafty Bot in your pack can be dropped in your house, by Drop or by dragging it in Decoration Mode"
+   },
+   {
+    "date": "2026-11-10",
+    "kind": "fix",
+    "text": "Stuffed stays until the new day, and the Encyclopedia knows the game has it"
+   },
+   {
+    "date": "2026-11-10",
+    "kind": "fix",
+    "text": "Solo: Guano a Batterfly left while you were away no longer stands twice"
    },
    {
     "date": "2026-11-10",
     "kind": "new",
-    "text": "Buddies show their faces, and Set as Destination leads you to a buddy"
+    "text": "Online, a Batterfly's hourly Guano is one pile on the street for everyone"
+   },
+   {
+    "date": "2026-11-10",
+    "kind": "improve",
+    "text": "A quoin's amount stays up long enough to read, as it did in Glitch"
+   },
+   {
+    "date": "2026-11-10",
+    "kind": "improve",
+    "text": "The house's Expand button says what it needs when it is off"
+   },
+   {
+    "date": "2026-11-10",
+    "kind": "fix",
+    "text": "Classic: the Make window's footer is whole in a low window"
+   },
+   {
+    "date": "2026-11-10",
+    "kind": "fix",
+    "text": "The machineartdemo QA route opens Make again"
+   },
+   {
+    "date": "2026-11-10",
+    "kind": "improve",
+    "text": "The Fox's line when brushed stays up 3.5 seconds, as it did in Glitch"
+   },
+   {
+    "date": "2026-11-10",
+    "kind": "fix",
+    "text": "A Garden Gnome keeps its place beside the house when the home street grows"
+   },
+   {
+    "date": "2026-11-10",
+    "kind": "fix",
+    "text": "An open top bar panel stays in front of notices and the Qurazy banner"
+   },
+   {
+    "date": "2026-11-10",
+    "kind": "fix",
+    "text": "Walking into a friend's house with a key no longer trips on their cabinets"
    },
    {
     "date": "2026-11-10",
     "kind": "new",
-    "text": "Click the favor display to see your favor with all eleven Giants"
+    "text": "A Chicken you walk into says Squawk! and flies off"
    },
    {
     "date": "2026-11-10",
     "kind": "improve",
-    "text": "An incubating Chicken's halfway line stays up 10 seconds, as in Glitch"
+    "text": "A visitor sees an owner's Garden Gnomes, and a bump makes one hop and talk"
    },
    {
     "date": "2026-11-10",
     "kind": "improve",
-    "text": "A Street Spirit with a story calls you over from as far as Glitch's did"
-   },
-   {
-    "date": "2026-11-10",
-    "kind": "fix",
-    "text": "Speech bubbles stay with their speaker instead of lining the edge of the screen"
-   },
-   {
-    "date": "2026-11-10",
-    "kind": "new",
-    "text": "Leave a line with your Butler for visitors, who can ask it about you"
-   },
-   {
-    "date": "2026-11-10",
-    "kind": "new",
-    "text": "Things dropped on a home street are seen by the owner and every visitor"
-   },
-   {
-    "date": "2026-11-10",
-    "kind": "fix",
-    "text": "The Ancestral Lands timer stops while you are at home"
-   },
-   {
-    "date": "2026-11-10",
-    "kind": "fix",
-    "text": "The It's Educational page no longer says Piety and Martial Imagination offer it"
-   },
-   {
-    "date": "2026-11-10",
-    "kind": "fix",
-    "text": "Eating a Sno Cone says how much iMG it gave"
-   },
-   {
-    "date": "2026-11-10",
-    "kind": "fix",
-    "text": "A bag's tray closes when you drag from it onto a shrine"
-   },
-   {
-    "date": "2026-11-10",
-    "kind": "fix",
-    "text": "Your own chat line scrolls the chat to it"
-   },
-   {
-    "date": "2026-11-10",
-    "kind": "fix",
-    "text": "A gold upgrade card can be bought in Firefox"
+    "text": "A visitor sees an owner's Meat Collector, Butterfly Milker and Piggy Feeder"
    },
    {
     "date": "2026-11-10",
     "kind": "improve",
-    "text": "The bubble over a speaker shows the start of a long line"
+    "text": "A visitor sees the Magic Sticks an owner set down on their home street"
+   },
+   {
+    "date": "2026-11-10",
+    "kind": "improve",
+    "text": "Garden crops take minutes to an hour, about 10 times Glitch's speed"
+   },
+   {
+    "date": "2026-11-10",
+    "kind": "improve",
+    "text": "A garden plot's answer keeps its 3.5 seconds, marked where the plot hands it on"
+   },
+   {
+    "date": "2026-11-10",
+    "kind": "improve",
+    "text": "The favor display is a plain favor star where no Giant's shrine stands"
    },
    {
     "date": "2026-11-10",
     "kind": "fix",
-    "text": "An upgrade card you already own leaves your hand"
+    "text": "The Favor with the Giants panel opens beside an open side sheet, not under it"
    },
    {
     "date": "2026-11-10",
     "kind": "fix",
-    "text": "Oppidan Avenue's teleporters carry you between its caves and its city"
+    "text": "The Ancestral Lands timer stops in a quest room too"
    },
    {
-    "date": "2026-11-09",
+    "date": "2026-11-10",
     "kind": "improve",
-    "text": "A chat line holds 1,000 characters, as the original's did"
-   },
-   {
-    "date": "2026-11-09",
-    "kind": "fix",
-    "text": "The five Firebog back yards stand their giants on the ground"
-   },
-   {
-    "date": "2026-11-09",
-    "kind": "improve",
-    "text": "A visitor's look paints its walk sheet on arrival, the rest when first needed"
-   },
-   {
-    "date": "2026-11-09",
-    "kind": "fix",
-    "text": "Firebog home streets stand their trees and huts on the ground"
-   },
-   {
-    "date": "2026-11-09",
-    "kind": "improve",
-    "text": "Players are told how gems are found"
-   },
-   {
-    "date": "2026-11-09",
-    "kind": "fix",
-    "text": "The Map's puzzle card brings you back from Piano Party"
-   },
-   {
-    "date": "2026-11-09",
-    "kind": "fix",
-    "text": "A player without papers is no longer left at a subway gate with no road home"
+    "text": "The favor display shows whenever you have favor with any Giant"
    }
   ]
  },
