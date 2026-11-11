@@ -20,7 +20,7 @@ import {
   toolWornBaseCost,
 } from '../public/js/tools.js?v=5f482998';
 import { addItem, countItem, createInventory, ensureItem } from '../public/js/inventory.js?v=60dfc9ca';
-import { createVendorSellQuote, listSellOffers, vendorSell } from '../public/js/vendor.js?v=25d9f6ba';
+import { createVendorSellQuote, listSellOffers, vendorSell } from '../public/js/vendor.js?v=fd4bd725';
 import { createShrineState, donateToShrine, listShrineDonationOptions, quoteShrineDonation } from '../public/js/shrines.js?v=2707c79f';
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -163,7 +163,7 @@ describe('vendors buy tools (inc_stores.js storeSell)', () => {
     assert.match(game, /const toolSlot = Boolean\(s\.isTool \|\| opts\.toolRow\);\n\s*const canDragToVendor = true;/);
     assert.match(game, /if \(!toolSlot && !s\.bag && features\.query\('packDragStart', s\.classTsid, event, engine\)\) return;/);
     assert.match(game, /vendorDragCopy = toolSlot && s\.copy != null \? s\.copy : null;/);
-    assert.match(game, /if \(classTsid\) stageVendorSell\(classTsid, copy, place\);/);
+    assert.match(game, /if \(classTsid\) stageVendorSell\(classTsid, copy, place, bag\);/);
   });
 
   it('sells one copy, the worn one, through the caller\'s last step', () => {

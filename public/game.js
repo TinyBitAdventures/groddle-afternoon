@@ -2,9 +2,9 @@
  * Groddle Afternoon — original street geometry + layered decos
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
-import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=29f2e034';
+import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=50ca835b';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=06bb8b74';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=8a577c5f';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=5d4fce6f';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -479,7 +479,7 @@ import {
 } from './js/inventory.js?v=60dfc9ca';
 import { TROPHY_FIND_TEXT, trophyOfBadge } from './js/home-trophies.js?v=2020b29b';
 import { HELD_AT_ONCE, HELD_AT_ONCE_TEXT } from './js/collection-trophies.js?v=3760d603';
-import { PACK_COPY, isBagClass, isElementClass, unitRankAt } from './js/pack-slots.js?v=6cf9f397';
+import { PACK_COPY, isBagClass, isElementClass, unitRankAt } from './js/pack-slots.js?v=6b8393a1';
 import { hasPouch } from './js/elemental-pouch.js?v=ceefa97a';
 import { createPackRow, mountPackClearance, packBandRange, packCountText, packSearchEntries, packSlotTip } from './js/ui/pack-row.js?v=65c0f180';
 import { listAnimalFeedOptions } from './js/animals.js?v=af1ee6f4';
@@ -839,7 +839,8 @@ import {
   createVendorSellQuote,
   vendorSellUnitPrice,
   vendorBuyUnitPrice,
-} from './js/vendor.js?v=25d9f6ba';
+  VENDOR_BAG_HOLDS,
+} from './js/vendor.js?v=fd4bd725';
 import {
   animalAnchorX,
   animalAnchorY,
@@ -2258,6 +2259,8 @@ let vendorDragTsid = null;
 let vendorDragCopy = null;
 /** The pack stack being dragged to the vendor ({ cls, container, index }), so that one sells. */
 let vendorDragPlace = null;
+/** The bag being dragged to the vendor (its prefs key), else '' (report #79: only an empty one sells). */
+let vendorDragBag = '';
 /** @type {null|{ label:string, qty:number, gain:number }} */
 let vendorSellReceipt = null;
 let vendorReceiptTimer = 0;
@@ -4631,7 +4634,9 @@ function renderPackPopover(classTsid, anchor = null) {
     reason: dropBlock || '',
     tip: stackCount > 1 ? `Choose how many to drop at your feet (${stackCount} here)` : 'Put it on the ground at your feet',
   });
-  if (canSellHere) rows.push({ attrs: 'data-pack-sell', cls: 'pack-pop-sell', label: 'Sell', gain: `◎ ${sellPrice}`, tip: `Sell one to this vendor for ${sellPrice} currants` });
+  // Report #79 (Austin 2026-11-11, "Refuse: empty it first"): this bag's Sell is greyed while it holds anything.
+  const sellBlock = canSellHere && isBagClass(classTsid) && features.query('packSaleBags', classTsid, engine, packSelectedBag || '') === 0 ? VENDOR_BAG_HOLDS : '';
+  if (canSellHere) rows.push({ attrs: 'data-pack-sell', cls: 'pack-pop-sell', label: 'Sell', gain: `◎ ${sellPrice}`, tip: `Sell one to this vendor for ${sellPrice} currants`, disabled: Boolean(sellBlock), reason: sellBlock });
 
   // Eat more and Drop (more than one) are second levels: a back row (0 or Backspace) and the count.
   // A feature verb's level (a bag's Sort) is a back row and its verbs, picked as any row is (1-9).
@@ -4887,8 +4892,9 @@ function renderPackPopover(classTsid, anchor = null) {
     leavingMenuBag(classTsid);
     const copy = slot.isTool ? packSelectedCopy : null;
     const place = packSelectedStack ? { cls: classTsid, container: packSelectedStack.container, index: packSelectedStack.index } : null;
+    const bag = isBagClass(classTsid) ? packSelectedBag || '' : '';
     closePackPopover();
-    stageVendorSell(classTsid, copy, place);
+    stageVendorSell(classTsid, copy, place, bag);
   });
   pop.querySelector('[data-pack-drop]')?.addEventListener('click', () => {
     // A bag is one bag: drop the one this menu is about, with what it holds (no count chooser).
@@ -5301,6 +5307,7 @@ function renderPackRow(box, slots, opts = {}) {
         vendorDragTsid = s.classTsid;
         vendorDragCopy = toolSlot && s.copy != null ? s.copy : null;
         vendorDragPlace = inLayout ? { cls: s.classTsid, container: s.container, index: s.index } : null;
+        vendorDragBag = s.bag?.key || '';
         vendorSellReceipt = null;
         vendorTab = 'sell';
         vendorSelected = null;
@@ -28476,23 +28483,33 @@ function vendorSellChosenCopy(classTsid) {
 
 /** The pack stack the Sell detail was staged from (the pack menu or a drag), or null. */
 let vendorSellPlace = null;
+/** The bag the Sell detail was staged from (its menu or a drag: its prefs key), or ''. */
+let vendorSellBag = '';
 
 function vendorSellOpts() {
   return {
     buyMultiplier: activeVendor?.buyMultiplier,
     // Any vendor bought tools, at their worn price (inc_stores.js storeSell; tool_base.js getBaseCost).
     toolBaseCost: (classTsid) => leavingToolBaseCost(classTsid, vendorSellChosenCopy(classTsid)),
+    // Report #79 (Austin 2026-11-11, "Refuse: empty it first"): a bag sells only empty, the one
+    // chosen if it was chosen (bags-feature packSaleBags; null for anything that is not a bag).
+    emptyBags: (classTsid) => (isBagClass(classTsid) ? features.query('packSaleBags', classTsid, engine, vendorSellBag) ?? null : null),
   };
 }
 
-/** Stage a pack item in the Sell detail without mutating inventory (`copy`: the tool copy, from the pack menu). */
-function stageVendorSell(classTsid, copy = null, place = null) {
+/**
+ * Stage a pack item in the Sell detail without mutating inventory (`copy`: the tool copy, from the pack
+ * menu; `bag`: the bag's key, when a bag's menu or a drag chose one).
+ */
+function stageVendorSell(classTsid, copy = null, place = null, bag = '') {
   vendorToolCopy = copy != null && TOOL_WEAR[classTsid] ? { classTsid, copy } : null;
   vendorSellPlace = place?.cls === classTsid ? { ...place } : null;
+  vendorSellBag = isBagClass(classTsid) ? String(bag || '') : '';
   const quote = createVendorSellQuote(inv, activeVendor.offers, classTsid, 1, pc.imaginationUpgrades, vendorSellOpts());
   if (!quote.ok) {
     vendorToolCopy = null;
     vendorSellPlace = null;
+    vendorSellBag = '';
     toast(quote.msgs?.[0] || 'That item cannot be sold here.');
     return quote;
   }
@@ -28558,6 +28575,8 @@ function renderVendorList() {
     const quote = isBuy ? null : createVendorSellQuote(inv, activeVendor.offers, vendorSelected, vendorQty, pc.imaginationUpgrades, vendorSellOpts());
     if (!isBuy && !quote?.ok) {
       vendorSelected = null;
+      // A bag with stuff in it (report #79): say why, as a drag or the pack menu would.
+      if (quote?.reason === 'bag_not_empty') toast(quote.msgs[0]);
       renderVendorList();
       return;
     }
@@ -28763,11 +28782,14 @@ function openVendorTileMenu(tile, { at = null, keys = false } = {}) {
     // vendor.js vendorBuy's own refusal.
     if (unit > (pc.currants || 0)) reason = "Sorry, you can't afford that."; // inc_stores.js 161, as vendorBuy says it
   } else {
+    vendorSellBag = '';
     const quote = createVendorSellQuote(inv, activeVendor.offers, cls, 1, pc.imaginationUpgrades, vendorSellOpts());
-    if (!quote?.ok) return false;
+    // Only bags with stuff in them (report #79): the rows are greyed with the vendor's words.
+    if (!quote?.ok && quote?.reason !== 'bag_not_empty') return false;
     label = quote.label;
     unit = quote.unitPrice;
-    most = Math.max(1, quote.maxQty ?? quote.have);
+    most = quote.ok ? Math.max(1, quote.maxQty ?? quote.have) : 1;
+    if (!quote.ok) reason = quote.msgs[0];
   }
   const verb = isBuy ? 'Buy' : 'Sell';
   const coins = (n) => `${n} ${n === 1 ? 'currant' : 'currants'}`;
@@ -28791,6 +28813,7 @@ function openVendorTileMenu(tile, { at = null, keys = false } = {}) {
       vendorSelected = cls;
       vendorToolCopy = null;
       vendorSellPlace = null;
+      vendorSellBag = '';
       vendorQty = id === 'max' ? Number.MAX_SAFE_INTEGER : 1;
       renderVendorList();
       if (id === 'choose') return;
@@ -28857,6 +28880,7 @@ function drawVendorTiles(list) {
         vendorSelected = row.classTsid;
         vendorToolCopy = null;
         vendorSellPlace = null;
+        vendorSellBag = '';
         vendorQty = 1;
         renderVendorList();
       });
@@ -28890,7 +28914,10 @@ function sellToVendor(classTsid, qty) {
   // A stack staged from the pack (its menu or a drag) gives the ones sold.
   const place = vendorSellPlace?.cls === classTsid ? vendorSellPlace : null;
   const r = vendorSell(pc, inv, activeVendor.offers, classTsid, qty, place ? { ...opts, beforeRemove: () => takeChosenStack(classTsid, qty, { place }) } : opts);
-  if (r.ok) vendorSellPlace = null;
+  if (r.ok) {
+    vendorSellPlace = null;
+    vendorSellBag = '';
+  }
   return r;
 }
 
@@ -31554,11 +31581,14 @@ async function main() {
       vendorDragTsid;
     const copy = classTsid === vendorDragTsid ? vendorDragCopy : null;
     const place = classTsid === vendorDragTsid ? vendorDragPlace : null;
+    const bag = classTsid === vendorDragTsid ? vendorDragBag : '';
     vendorDragTsid = null;
     vendorDragCopy = null;
     vendorDragPlace = null;
-    // A dragged tool sells the copy that was dragged, any other stack the one dragged (stageVendorSell).
-    if (classTsid) stageVendorSell(classTsid, copy, place);
+    vendorDragBag = '';
+    // A dragged tool sells the copy that was dragged, a dragged bag that bag (refused with stuff in
+    // it, report #79), any other stack the one dragged (stageVendorSell).
+    if (classTsid) stageVendorSell(classTsid, copy, place, bag);
   });
 
   document.getElementById('garden-close')?.addEventListener('click', closeGardenPanel);

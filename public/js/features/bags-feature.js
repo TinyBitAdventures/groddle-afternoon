@@ -49,8 +49,8 @@
  *
  * Departures (see js/pack-slots.js): every overflow is held by the magic rock
  * (the source put things made from a source on the ground); rock-held stacks
- * are out of the pack but recipes and quests still count them; a bag that leaves the pack some other way (sold, given,
- * traded) leaves its contents behind, but a dropped bag takes them with it and
+ * are out of the pack but recipes and quests still count them; a bag that leaves the pack some other way (given,
+ * traded) leaves its contents behind (a vendor buys only an empty bag: packSaleBags, report #79), but a dropped bag takes them with it and
  * brings them back when it is picked up, as the source's did (packTakeBag,
  * packGiveBag; player report 2026-11-01); a
  * bag that arrives (bought, a reward, a gift, mail, picked up, made) goes in
@@ -118,11 +118,12 @@ import {
   packIntoBags,
   renameBag,
   roomFor,
+  saleBags,
   takeBag,
   unitOrder,
   unitPlaces,
   unitRankAt,
-} from '../pack-slots.js?v=6cf9f397';
+} from '../pack-slots.js?v=6b8393a1';
 import { TOOL_CONDITION_CATALOG, moveToolCopy, pickToolCopies, placeToolCopies } from '../tools.js?v=5f482998';
 import { createMinnAccount } from '../minn-account.js?v=8f2741cd';
 import { BAG_NAME_MAX, BAG_RENAME_COPY, bagLabel, canRenameBag, cleanBagName, renamedTo } from '../bag-names.js?v=22391c55';
@@ -881,6 +882,21 @@ export const bagsFeature = {
   packBagLeaves(key) {
     slice.prefs = bagLeavesLast(slice.prefs, key);
     return true;
+  },
+
+  /**
+   * A vendor sale of a bag class (game.js vendorSellOpts; report #79, Austin 2026-11-11: "Refuse:
+   * empty it first"): how many of its bags can go, only empty ones (0 when `chosen`, the bag dragged
+   * or whose menu sold it, holds something), with the empty ones (the chosen one last) arranged to
+   * be the ones that leave (pack-slots.js saleBags). null for a class that is not a bag.
+   */
+  packSaleBags(cls, engine, chosen = '') {
+    if (!engine?.inv) return null;
+    reconcile(engine);
+    const res = saleBags(engine.inv, slice.prefs, String(cls || ''), opts(), chosen);
+    if (!res) return null;
+    slice.prefs = normalizePrefs(res.prefs);
+    return res.empty;
   },
 
   /** Whether a dropped bag with these contents fits back in the pack now (pick up). */

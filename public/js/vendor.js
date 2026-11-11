@@ -21,6 +21,23 @@ import { STORE_CATALOG, ITEM_BASE_COSTS, NO_VENDOR_ITEMS } from './store-catalog
 
 const BUYBACK_MULTIPLIER = 0.66;
 
+/**
+ * Report #79 (Austin 2026-11-11, "Refuse: empty it first"): a vendor buys only an empty bag. Our
+ * words, after the trade window's tip on a bag with things in it ("There is still stuff in this!",
+ * TradeDialog.as:1052-1054) and the vendors' own refusals.
+ */
+export const VENDOR_BAG_HOLDS = "You can't sell a bag with stuff in it. Empty it first.";
+
+/**
+ * How many of a bag class can go to the vendor (opts.emptyBags(classTsid): only empty bags, see
+ * bags-feature packSaleBags), or null when the class is not a bag or nobody asked.
+ */
+function sellableBags(classTsid, opts) {
+  if (typeof opts?.emptyBags !== 'function') return null;
+  const n = opts.emptyBags(classTsid);
+  return n == null ? null : Math.max(0, Math.floor(Number(n) || 0));
+}
+
 /** Build one catalog_stores.js offer using the store's buy-back rate. */
 function officialOffer(classTsid, label, buyPrice, buyMultiplier = BUYBACK_MULTIPLIER) {
   return {
@@ -273,6 +290,11 @@ export function vendorSell(pc, inv, offers, classTsid, qty = 1, opts = {}) {
   if (gain <= 0) {
     return { ok: false, reason: 'no_value', msgs: ["You can't sell that item."] };
   }
+  // A bag goes only empty; asked last, it also arranges for the empty ones to be the ones that leave.
+  const bags = sellableBags(classTsid, opts);
+  if (bags != null && amount > bags) {
+    return { ok: false, reason: 'bag_not_empty', msgs: [VENDOR_BAG_HOLDS] };
+  }
   // The caller's last step before the stack shrinks (a tool's copy moves last: tools.js takeToolCopy).
   if (typeof opts.beforeRemove === 'function') opts.beforeRemove();
   if (!removeItem(inv, classTsid, amount)) {
@@ -360,19 +382,25 @@ export function createVendorSellQuote(inv, offers, classTsid, qty = 1, upgrades 
     return { ok: false, reason: 'not_sellable', classTsid, msgs: ['That item is not sellable from your pack.'] };
   }
   const offer = findOffer(offers, classTsid);
-  const amount = Math.max(1, Math.min(row.maxQty, Math.floor(Number(qty) || 1)));
+  // A bag class: only its empty bags can go (none: the refusal, with the price for a menu's rows).
+  const bags = sellableBags(classTsid, opts);
+  const maxQty = bags == null ? row.maxQty : Math.min(row.maxQty, bags);
+  const amount = Math.max(1, Math.min(Math.max(1, maxQty), Math.floor(Number(qty) || 1)));
   const value = vendorSellValue(classTsid, amount, { ...opts, upgrades, baseCost: row.baseCost });
   if (value.unit <= 0) {
     return { ok: false, reason: 'no_value', classTsid, msgs: ["You can't sell that kind of thing."] };
   }
   const unitPrice = vendorSellUnitPrice(classTsid, { ...opts, upgrades, baseCost: row.baseCost });
+  if (maxQty < 1) {
+    return { ok: false, reason: 'bag_not_empty', classTsid, label: offer?.label || slot.label, have: slot.count, unitPrice, msgs: [VENDOR_BAG_HOLDS] };
+  }
   return {
     ok: true,
     reason: 'quoted',
     classTsid,
     label: offer?.label || slot.label,
     have: slot.count,
-    maxQty: row.maxQty,
+    maxQty,
     tool: Boolean(slot.isTool),
     qty: amount,
     unitPrice,

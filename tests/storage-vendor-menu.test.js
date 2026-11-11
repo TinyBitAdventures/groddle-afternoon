@@ -84,7 +84,7 @@ describe('a vendor tile\'s menu (game.js openVendorTileMenu)', () => {
   });
 
   it('a pick is the tile\'s click, then the count chooser\'s own Buy button (Max first for Buy max)', () => {
-    assert.match(fn, /vendorSelected = cls;\n\s+vendorToolCopy = null;\n\s+vendorSellPlace = null;\n\s+vendorQty = id === 'max' \? Number\.MAX_SAFE_INTEGER : 1;\n\s+renderVendorList\(\);\n\s+if \(id === 'choose'\) return;\n\s+document\.querySelector\('#vendor-detail \[data-v-go\]'\)\?\.click\(\);/);
+    assert.match(fn, /vendorSelected = cls;\n\s+vendorToolCopy = null;\n\s+vendorSellPlace = null;\n\s+vendorSellBag = '';\n\s+vendorQty = id === 'max' \? Number\.MAX_SAFE_INTEGER : 1;\n\s+renderVendorList\(\);\n\s+if \(id === 'choose'\) return;\n\s+document\.querySelector\('#vendor-detail \[data-v-go\]'\)\?\.click\(\);/);
   });
 
   it('wired once on the shelf (right-click, long press, the keys); tiles say so; closing the vendor closes it', () => {

@@ -35,9 +35,9 @@ import {
 } from '../public/js/tools.js?v=5f482998';
 import { ITEM_CATALOG, addItem, createInventory, ensureItem, isToolItem, removeItem } from '../public/js/inventory.js?v=60dfc9ca';
 import { createPlayerSave, restorePlayerSave } from '../public/js/player-save.js?v=6e4f7b37';
-import { layoutPack, unitPlaces } from '../public/js/pack-slots.js?v=6cf9f397';
-import { bagsFeature } from '../public/js/features/bags-feature.js?v=bd95f07e';
-import { VENDOR_PROFILES, vendorBuy, vendorSell } from '../public/js/vendor.js?v=25d9f6ba';
+import { layoutPack, unitPlaces } from '../public/js/pack-slots.js?v=6b8393a1';
+import { bagsFeature } from '../public/js/features/bags-feature.js?v=c802a863';
+import { VENDOR_PROFILES, vendorBuy, vendorSell } from '../public/js/vendor.js?v=fd4bd725';
 import { createResourceNode, harvestResourceNode, ensureResourceItems } from '../public/js/resource-nodes.js?v=7a77fd73';
 import {
   fireflyJarCounts,
@@ -181,7 +181,7 @@ describe('a verb on the item you chose acts on that one (two Tinkertools, one in
     assert.match(game, /function takeChosenStack\(classTsid, n, \{ copy = null, place = null, wait \} = \{\}\)/);
     assert.match(game, /beforeRemove: \(\) => \{\n\s*takeChosenStack\(classTsid, 1, \{ copy \}\);\n\s*takeToolCopy\(toolState, classTsid, \{ copy \}\);/);
     assert.match(game, /takeChosenStack\(shrineSelected, 1, \{ copy: toolCopy \}\);/);
-    assert.match(game, /stageVendorSell\(classTsid, copy, place\);/);
+    assert.match(game, /stageVendorSell\(classTsid, copy, place, bag\);/);
     assert.match(game, /vendorDragPlace = inLayout \? \{ cls: s\.classTsid, container: s\.container, index: s\.index \} : null;/);
     assert.match(game, /if \(dropCopy != null\) takeToolCopy\(toolState, classTsid, \{ copy: dropCopy \}\);/);
     // Online drops and gives carry the chosen tool's own wear and take that one when the server answers.

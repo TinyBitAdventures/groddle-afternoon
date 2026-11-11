@@ -2752,9 +2752,14 @@
   "deployed": "2026-11-11"
  },
  "git": {
-  "commits": 1649,
+  "commits": 1650,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-11",
+    "kind": "improve",
+    "text": "The making stage shows the output's count as a badge, and none for one"
+   },
    {
     "date": "2026-11-11",
     "kind": "improve",
@@ -2869,14 +2874,9 @@
     "date": "2026-11-10",
     "kind": "improve",
     "text": "The Still has its sounds: the hopper lid on Distill, its chime on Collect"
-   },
-   {
-    "date": "2026-11-10",
-    "kind": "improve",
-    "text": "Machine parts clunk on and off one by one, in Tiny Speck's own sounds"
    }
   ]
  },
- "tests": 804,
+ "tests": 805,
  "generatedAt": "2026-11-11"
 }

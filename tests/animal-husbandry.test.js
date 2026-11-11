@@ -48,7 +48,7 @@ import {
   takePlop,
 } from '../public/js/animal-husbandry.js?v=d4869bf0';
 import { pickerMaxCount, pickerOptionsFor, pickerTakesCount, listAnimalFeedOptions, createAnimalState } from '../public/js/animals.js?v=af1ee6f4';
-import { getVerbsFor, runVerb } from '../public/content.js?v=29f2e034';
+import { getVerbsFor, runVerb } from '../public/content.js?v=50ca835b';
 import { setStreetEcologyCatalog } from '../public/js/street-ecology.js?v=08076876';
 import { batterflyPlacementGroups, normalizeHusbandrySlot } from '../public/js/features/animal-husbandry-feature.js?v=4fa2b051';
 

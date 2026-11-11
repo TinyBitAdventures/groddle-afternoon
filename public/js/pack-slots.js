@@ -954,6 +954,30 @@ export function bagLeavesLast(prefs, key) {
 }
 
 /**
+ * A bag sold to a vendor goes only empty (report #79, Austin 2026-11-11: "Refuse: empty it
+ * first"; before, its contents stayed behind and the magic rock held what no longer fit).
+ * Returns { empty, prefs } for a bag class (null for any other): `empty` is how many of the
+ * class's bags hold nothing (a bag the magic rock holds holds nothing), or 0 when the bag the
+ * player chose (`chosen`, a prefs key: the one dragged to the vendor or whose menu sold it)
+ * holds something; `prefs` is the arrangement with the class's empty bags last, the chosen
+ * one very last, so the ones that leave are empty (layoutPack keeps a class's first saved bags).
+ */
+export function saleBags(inv, prefs, cls, opts = {}, chosen = '') {
+  if (!isBagClass(cls)) return null;
+  const layout = layoutPack(inv, prefs, opts);
+  // Only the bags' order changes (as bagLeavesLast); the arrangement is the saved one.
+  const next = normalizePrefs(prefs);
+  if (layout.prefs.bags.length > next.bags.length) next.bags = layout.prefs.bags.map((b) => ({ ...b }));
+  const holds = (key) => (layout.bags[key]?.slots?.length || 0) > 0;
+  const mine = next.bags.filter((b) => b.cls === cls);
+  const pick = mine.find((b) => b.key === String(chosen || '')) || null;
+  if (pick && holds(pick.key)) return { empty: 0, prefs: next };
+  const empties = mine.filter((b) => b !== pick && !holds(b.key));
+  next.bags = [...next.bags.filter((b) => b !== pick && !empties.includes(b)), ...empties, ...(pick ? [pick] : [])];
+  return { empty: empties.length + (pick ? 1 : 0), prefs: next };
+}
+
+/**
  * A bag comes back into the pack with what it held (a pick up): in the source a
  * bag only ever sits in the pack's own row (bag_generic.js canContain 588-590;
  * PackDisplayManager.as:675), so it takes a free pack slot, next to the other
