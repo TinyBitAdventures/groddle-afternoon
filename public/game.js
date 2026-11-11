@@ -412,7 +412,7 @@ import {
   featStatus,
   resetIncantationChain,
   submitIncantation,
-} from './js/feats.js?v=77f4e4ef';
+} from './js/feats.js?v=f6c3b551';
 import {
   createSkillState,
   listSkills,
@@ -502,7 +502,7 @@ import {
   parsePlayerSave,
   serializePlayerSave,
   restorePlayerSave,
-} from './js/player-save.js?v=6e4f7b37';
+} from './js/player-save.js?v=774f5b50';
 import {
   HOME_INTERIOR_TSID,
   HOME_STREET_TSID,
@@ -26161,6 +26161,16 @@ function handleFeatResult(result, participant) {
   savePlayerState();
 }
 
+/** G656: the hint for a line you already said in the chain (ours; Glitch said nothing), once a session. */
+const FEAT_REPEAT_HINT = 'The next line needs someone else on this street.';
+let featRepeatHinted = false;
+function featRepeatHint() {
+  if (featRepeatHinted) return;
+  featRepeatHinted = true;
+  toast(FEAT_REPEAT_HINT, 4200);
+  if (app?.canvas) app.canvas.dataset.featRepeatHint = '1';
+}
+
 function sayLocalChat(message, participant = 'Ur', { quietActivity = false } = {}) {
   const typed = String(message || '').trim().slice(0, CHAT_MAX_CHARS);
   if (!typed) return { ok: false, reason: 'empty' };
@@ -26169,6 +26179,8 @@ function sayLocalChat(message, participant = 'Ur', { quietActivity = false } = {
   // The word filter (the remake's own addition, js/word-filter.js): the line is shown with a bad word as a grawlix.
   const text = filterText(typed);
   const result = submitIncantation(featState, text, participant, Date.now());
+  // G656: your own repeat line is ignored as in Glitch; say why once.
+  if (result.ignored && participant === 'Ur') featRepeatHint();
   // Multiplayer: the player's line also goes to the street, under their own name (realtime-feature);
   // the server filters it for everyone and its chat log keeps what was typed.
   const shown = participant === 'Ur' ? features.query('playerChatName', engine) || participant : participant;

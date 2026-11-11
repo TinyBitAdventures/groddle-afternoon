@@ -2752,9 +2752,14 @@
   "deployed": "2026-11-11"
  },
  "git": {
-  "commits": 1665,
+  "commits": 1666,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-11",
+    "kind": "fix",
+    "text": "Yard plants step aside for a garden instead of poking through it"
+   },
    {
     "date": "2026-11-11",
     "kind": "fix",
@@ -2869,11 +2874,6 @@
     "date": "2026-11-11",
     "kind": "fix",
     "text": "It's Educational II is offered after Part I, as the Greeterbot gave it"
-   },
-   {
-    "date": "2026-11-11",
-    "kind": "fix",
-    "text": "The Butler can be clicked when it stands in front of the house"
    }
   ]
  },

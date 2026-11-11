@@ -15,7 +15,7 @@ import {
   normalizeFeatSnapshot,
   normalizeFeatState,
   submitIncantation,
-} from '../public/js/feats.js?v=77f4e4ef';
+} from '../public/js/feats.js?v=f6c3b551';
 
 const publicRoot = join(import.meta.dirname, '..', 'public');
 
@@ -53,11 +53,11 @@ describe('Incantations of Absurdity Feat', () => {
     });
   });
 
-  it('breaks an active chain on unrelated chat, an out-of-order line, or a repeated participant', () => {
+  it('breaks an active chain on unrelated chat or an out-of-order line', () => {
     for (const [message, participant, reason] of [
       ['What a nice tree.', 'Amp', 'other-chat'],
       [INCANTATION_LINES[2].phrase, 'Amp', 'out-of-order'],
-      [INCANTATION_LINES[1].phrase, 'Ur', 'same-participant'],
+      ['Nice weather.', 'Ur', 'other-chat'],
     ]) {
       const state = createFeatState();
       submitIncantation(state, INCANTATION_LINES[0].phrase, 'Ur', 100);
@@ -159,14 +159,20 @@ describe('Incantations between real players (multiplayer, 2026-11-11)', () => {
     assert.equal(state.totalPoints, 6);
   });
 
-  it('a player saying every line alone never scores past the first, and other chat breaks the chain', () => {
+  it('a line from someone who already spoke is ignored and the chain waits (location.js 4527, G656)', () => {
     const state = createFeatState();
     submitIncantation(state, 'This game is absolutely preposterous', 'Ur', 1);
     const again = submitIncantation(state, 'I agree wholeheartedly', 'Ur', 2);
-    assert.equal(again.broken, true);
+    assert.equal(again.ignored, true);
+    assert.equal(again.broken, false);
     assert.equal(again.reason, 'same-participant');
-    submitIncantation(state, 'This game is absolutely preposterous', 'Ada', 3);
-    assert.equal(submitIncantation(state, 'hmm', 'Bo', 4).reason, 'other-chat');
+    assert.equal(state.nextStep, 2, 'still waiting for line 2');
+    assert.deepEqual(state.participants, ['Ur']);
+    assert.equal(submitIncantation(state, 'And yet, I will really miss it', 'Ur', 3).ignored, true);
+    // Someone new carries it on, and other chat still breaks it.
+    assert.equal(submitIncantation(state, 'I agree wholeheartedly', 'Ada', 4).ok, true);
+    assert.equal(submitIncantation(state, 'hmm', 'Bo', 5).reason, 'other-chat');
+    assert.equal(state.nextStep, 1);
   });
 
   it('online your own line reads with your name, and a first contribution that closes a chain still says it is complete', () => {
@@ -183,5 +189,15 @@ describe('Incantations between real players (multiplayer, 2026-11-11)', () => {
     assert.match(realtime, /\(engine\.hearLocal \|\| engine\.chatLine\)\?\.\(name, text/);
     const game = readFileSync(join(publicRoot, 'game.js'), 'utf8');
     assert.match(game, /function hearLocalChat\([^)]*\) \{[\s\S]{0,600}submitIncantation\(featState, text, participant/);
+  });
+});
+
+describe('the repeat-line hint (G656)', () => {
+  it('your own ignored line shows the hint once a session', () => {
+    const game = readFileSync(join(publicRoot, 'game.js'), 'utf8');
+    assert.match(game, /if \(result\.ignored && participant === 'Ur'\) featRepeatHint\(\);/);
+    assert.match(game, /const FEAT_REPEAT_HINT = 'The next line needs someone else on this street\.';/);
+    const fn = game.slice(game.indexOf('function featRepeatHint('), game.indexOf('function sayLocalChat('));
+    assert.match(fn, /if \(featRepeatHinted\) return;\s*featRepeatHinted = true;\s*toast\(FEAT_REPEAT_HINT/);
   });
 });

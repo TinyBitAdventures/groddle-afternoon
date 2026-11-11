@@ -101,6 +101,12 @@ export function submitIncantation(state, message, participant = 'Ur', now = Date
   const active = state.nextStep !== 1;
   const repeatedParticipant = state.participants.includes(name);
 
+  // location.js doIncantationsFeat 4527: a line from someone who already spoke in the chain does
+  // nothing at all (the chain waits for someone new); any other chat still breaks it (main.js 1742,
+  // clearIncantationsFeat). Austin 2026-11-11 (G656): as Glitch, with a one-time hint (game.js).
+  if (step && active && repeatedParticipant) {
+    return { ok: false, matched: true, broken: false, ignored: true, reason: 'same-participant' };
+  }
   if (!step || repeatedParticipant || step !== state.nextStep) {
     if (!active) {
       return {
@@ -115,7 +121,7 @@ export function submitIncantation(state, message, participant = 'Ur', now = Date
       ok: false,
       matched: Boolean(step),
       broken: true,
-      reason: repeatedParticipant ? 'same-participant' : step ? 'out-of-order' : 'other-chat',
+      reason: !step ? 'other-chat' : repeatedParticipant ? 'same-participant' : 'out-of-order',
       activityLine: 'Oops! The incantation chain has been broken!',
     };
   }
