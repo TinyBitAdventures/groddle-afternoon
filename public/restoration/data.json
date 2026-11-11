@@ -2748,13 +2748,18 @@
   ]
  },
  "release": {
-  "game": "0.31.1",
+  "game": "0.32.0",
   "deployed": "2026-11-11"
  },
  "git": {
-  "commits": 1661,
+  "commits": 1662,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-11",
+    "kind": "fix",
+    "text": "Your incantation reads with your name online, and a first line that closes a chain says so"
+   },
    {
     "date": "2026-11-11",
     "kind": "new",
@@ -2869,11 +2874,6 @@
     "date": "2026-11-10",
     "kind": "improve",
     "text": "Notice the Unnoticeable, Legalize It and Four Letter Words wait for what offered them in Glitch"
-   },
-   {
-    "date": "2026-11-10",
-    "kind": "fix",
-    "text": "The Herb Gardens streets of Chakra Phool, Jethimadh and Shimla Mirch grow herbs in every bed"
    }
   ]
  },
