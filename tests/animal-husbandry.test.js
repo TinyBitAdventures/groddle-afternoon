@@ -50,7 +50,7 @@ import {
 import { pickerMaxCount, pickerOptionsFor, pickerTakesCount, listAnimalFeedOptions, createAnimalState } from '../public/js/animals.js?v=07cfdcd8';
 import { getVerbsFor, runVerb } from '../public/content.js?v=afe3caa8';
 import { setStreetEcologyCatalog } from '../public/js/street-ecology.js?v=08076876';
-import { batterflyPlacementGroups, normalizeHusbandrySlot } from '../public/js/features/animal-husbandry-feature.js?v=7fb42521';
+import { batterflyPlacementGroups, normalizeHusbandrySlot } from '../public/js/features/animal-husbandry-feature.js?v=8ac76180';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const publicDir = join(here, '../public');
@@ -128,6 +128,18 @@ describe('Batterflies and Guano (npc_batterfly.js)', () => {
     assert.equal(ownGuanoDue(early, t0 + H, 0, { since: t0 + 2 * H }), 1);
     assert.equal(early.passiveAt, t0 + H);
     assert.equal(ownGuanoDue({ passiveAt: t0 }, t0 + 9 * H, 0, { since: 0 }), 0);
+  });
+
+  it('draws the saved piles before the catch-up adds its own, so no pile stands twice', () => {
+    // dropGuano draws the pile it adds. Rows drawn after the catch-up gave a new pile two copies,
+    // and picking up each copy paid its whole count.
+    const src = readFileSync(new URL('../public/js/features/animal-husbandry-feature.js', import.meta.url), 'utf8');
+    const body = src.slice(src.indexOf('function spawnStreet('), src.indexOf('// Named animals keep their names'));
+    const rows = body.indexOf("for (const row of s.guano) buildPile(engine, 'guano', row);");
+    const catchUp = body.indexOf('ownHourlyGuano(engine, now(),');
+    assert.ok(rows > 0 && catchUp > 0, 'both steps are in spawnStreet');
+    assert.ok(rows < catchUp, 'saved rows are drawn first');
+    assert.equal(body.split("buildPile(engine, 'guano', row)").length - 1, 1, 'the rows are drawn once');
   });
 
   it('lives where the live street pages listed Batterflies, as many as they did', () => {

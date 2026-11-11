@@ -833,11 +833,13 @@ function spawnStreet(engine) {
     s.batterflies[key] ||= {};
     buildBatterfly(engine, key, pt.x, pt.y, s.batterflies[key]);
   });
+  // The saved piles first: dropGuano draws any pile it adds, so rows drawn after the catch-up would
+  // give a new pile two copies on the street, and each copy pays.
+  for (const row of s.guano) buildPile(engine, 'guano', row);
+  for (const row of s.plops) buildPile(engine, 'plop', row);
   // Passive guano for the time away. Online it waits for onTick, where it is known who keeps the
   // street's Guano (the realtime server's word, guanoSharing).
   if (engine.mode !== 'multiplayer') ownHourlyGuano(engine, now(), (b) => b.baseX + ((b.key.length * 37) % 80) - 40);
-  for (const row of s.guano) buildPile(engine, 'guano', row);
-  for (const row of s.plops) buildPile(engine, 'plop', row);
   // Named animals keep their names (getLabel) across visits and reloads.
   for (const target of engine.interactables) {
     if (ANIMAL_CLASSES.has(target.classId) && target.state?.userName) target.label = namedAnimalLabel(target.classId, target.state);
